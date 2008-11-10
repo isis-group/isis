@@ -1,0 +1,10 @@
+FILE(REMOVE
+"libvvITKAntiAlias.pdb"
+"libvvITKAntiAlias.a"
+"libvvITKAntiAlias.so"
+"CMakeFiles/vvITKAntiAlias.dir/vvITKAntiAlias.o"
+"CMakeFiles/CMakeRelink.dir/libvvITKAntiAlias.pdb"
+"CMakeFiles/CMakeRelink.dir/libvvITKAntiAlias.a"
+"CMakeFiles/CMakeRelink.dir/libvvITKAntiAlias.so"
+"CMakeFiles/vvITKAntiAlias.dir/vvITKAntiAlias.o"
+)

@@ -1,0 +1,10 @@
+FILE(REMOVE
+"EnergyTablePlotter.pdb"
+"EnergyTablePlotter"
+"CMakeFiles/EnergyTablePlotter.dir/EnergyTablePlotter.o"
+"CMakeFiles/EnergyTablePlotter.dir/OptionList.o"
+"CMakeFiles/CMakeRelink.dir/EnergyTablePlotter.pdb"
+"CMakeFiles/CMakeRelink.dir/EnergyTablePlotter"
+"CMakeFiles/EnergyTablePlotter.dir/EnergyTablePlotter.o"
+"CMakeFiles/EnergyTablePlotter.dir/OptionList.o"
+)

@@ -1,0 +1,10 @@
+FILE(REMOVE
+"libvvITKGradientMagnitude.pdb"
+"libvvITKGradientMagnitude.a"
+"libvvITKGradientMagnitude.so"
+"CMakeFiles/vvITKGradientMagnitude.dir/vvITKGradientMagnitude.o"
+"CMakeFiles/CMakeRelink.dir/libvvITKGradientMagnitude.pdb"
+"CMakeFiles/CMakeRelink.dir/libvvITKGradientMagnitude.a"
+"CMakeFiles/CMakeRelink.dir/libvvITKGradientMagnitude.so"
+"CMakeFiles/vvITKGradientMagnitude.dir/vvITKGradientMagnitude.o"
+)

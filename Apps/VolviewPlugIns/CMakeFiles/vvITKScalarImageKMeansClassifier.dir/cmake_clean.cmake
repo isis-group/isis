@@ -1,0 +1,10 @@
+FILE(REMOVE
+"libvvITKScalarImageKMeansClassifier.pdb"
+"libvvITKScalarImageKMeansClassifier.a"
+"libvvITKScalarImageKMeansClassifier.so"
+"CMakeFiles/vvITKScalarImageKMeansClassifier.dir/vvITKScalarImageKMeansClassifier.o"
+"CMakeFiles/CMakeRelink.dir/libvvITKScalarImageKMeansClassifier.pdb"
+"CMakeFiles/CMakeRelink.dir/libvvITKScalarImageKMeansClassifier.a"
+"CMakeFiles/CMakeRelink.dir/libvvITKScalarImageKMeansClassifier.so"
+"CMakeFiles/vvITKScalarImageKMeansClassifier.dir/vvITKScalarImageKMeansClassifier.o"
+)

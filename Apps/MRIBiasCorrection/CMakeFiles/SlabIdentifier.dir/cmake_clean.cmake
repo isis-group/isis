@@ -1,0 +1,10 @@
+FILE(REMOVE
+"SlabIdentifier.pdb"
+"SlabIdentifier"
+"CMakeFiles/SlabIdentifier.dir/SlabIdentifier.o"
+"CMakeFiles/SlabIdentifier.dir/OptionList.o"
+"CMakeFiles/CMakeRelink.dir/SlabIdentifier.pdb"
+"CMakeFiles/CMakeRelink.dir/SlabIdentifier"
+"CMakeFiles/SlabIdentifier.dir/SlabIdentifier.o"
+"CMakeFiles/SlabIdentifier.dir/OptionList.o"
+)

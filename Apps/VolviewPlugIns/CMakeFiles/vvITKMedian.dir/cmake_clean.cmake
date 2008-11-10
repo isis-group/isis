@@ -1,0 +1,10 @@
+FILE(REMOVE
+"libvvITKMedian.pdb"
+"libvvITKMedian.a"
+"libvvITKMedian.so"
+"CMakeFiles/vvITKMedian.dir/vvITKMedian.o"
+"CMakeFiles/CMakeRelink.dir/libvvITKMedian.pdb"
+"CMakeFiles/CMakeRelink.dir/libvvITKMedian.a"
+"CMakeFiles/CMakeRelink.dir/libvvITKMedian.so"
+"CMakeFiles/vvITKMedian.dir/vvITKMedian.o"
+)

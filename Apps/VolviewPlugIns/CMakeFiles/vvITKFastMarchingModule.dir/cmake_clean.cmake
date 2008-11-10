@@ -1,0 +1,10 @@
+FILE(REMOVE
+"libvvITKFastMarchingModule.pdb"
+"libvvITKFastMarchingModule.a"
+"libvvITKFastMarchingModule.so"
+"CMakeFiles/vvITKFastMarchingModule.dir/vvITKFastMarchingModule.o"
+"CMakeFiles/CMakeRelink.dir/libvvITKFastMarchingModule.pdb"
+"CMakeFiles/CMakeRelink.dir/libvvITKFastMarchingModule.a"
+"CMakeFiles/CMakeRelink.dir/libvvITKFastMarchingModule.so"
+"CMakeFiles/vvITKFastMarchingModule.dir/vvITKFastMarchingModule.o"
+)

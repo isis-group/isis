@@ -1,0 +1,3 @@
+FILE(REMOVE
+"CMakeFiles/Continuous"
+)

@@ -1,0 +1,10 @@
+FILE(REMOVE
+"libvvITKMaskNegated.pdb"
+"libvvITKMaskNegated.a"
+"libvvITKMaskNegated.so"
+"CMakeFiles/vvITKMaskNegated.dir/vvITKMaskNegated.o"
+"CMakeFiles/CMakeRelink.dir/libvvITKMaskNegated.pdb"
+"CMakeFiles/CMakeRelink.dir/libvvITKMaskNegated.a"
+"CMakeFiles/CMakeRelink.dir/libvvITKMaskNegated.so"
+"CMakeFiles/vvITKMaskNegated.dir/vvITKMaskNegated.o"
+)

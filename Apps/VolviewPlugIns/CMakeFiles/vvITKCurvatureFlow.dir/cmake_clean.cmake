@@ -1,0 +1,10 @@
+FILE(REMOVE
+"libvvITKCurvatureFlow.pdb"
+"libvvITKCurvatureFlow.a"
+"libvvITKCurvatureFlow.so"
+"CMakeFiles/vvITKCurvatureFlow.dir/vvITKCurvatureFlow.o"
+"CMakeFiles/CMakeRelink.dir/libvvITKCurvatureFlow.pdb"
+"CMakeFiles/CMakeRelink.dir/libvvITKCurvatureFlow.a"
+"CMakeFiles/CMakeRelink.dir/libvvITKCurvatureFlow.so"
+"CMakeFiles/vvITKCurvatureFlow.dir/vvITKCurvatureFlow.o"
+)

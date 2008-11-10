@@ -1,0 +1,3 @@
+IBSRValidation/AtlasSegmentation/CMakeLists.txt
+IBSRValidation/AtlasSegmentation/Code/BrainStripValidationApp.cxx
+IBSRValidation/AtlasSegmentation/Code/BrainStripValidationApp.h

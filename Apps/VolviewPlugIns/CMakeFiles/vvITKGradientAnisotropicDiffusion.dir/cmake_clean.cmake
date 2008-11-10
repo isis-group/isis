@@ -1,0 +1,10 @@
+FILE(REMOVE
+"libvvITKGradientAnisotropicDiffusion.pdb"
+"libvvITKGradientAnisotropicDiffusion.a"
+"libvvITKGradientAnisotropicDiffusion.so"
+"CMakeFiles/vvITKGradientAnisotropicDiffusion.dir/vvITKGradientAnisotropicDiffusion.o"
+"CMakeFiles/CMakeRelink.dir/libvvITKGradientAnisotropicDiffusion.pdb"
+"CMakeFiles/CMakeRelink.dir/libvvITKGradientAnisotropicDiffusion.a"
+"CMakeFiles/CMakeRelink.dir/libvvITKGradientAnisotropicDiffusion.so"
+"CMakeFiles/vvITKGradientAnisotropicDiffusion.dir/vvITKGradientAnisotropicDiffusion.o"
+)

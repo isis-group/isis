@@ -1,0 +1,10 @@
+FILE(REMOVE
+"libvvITKGeodesicActiveContourModule.pdb"
+"libvvITKGeodesicActiveContourModule.a"
+"libvvITKGeodesicActiveContourModule.so"
+"CMakeFiles/vvITKGeodesicActiveContourModule.dir/vvITKGeodesicActiveContourModule.o"
+"CMakeFiles/CMakeRelink.dir/libvvITKGeodesicActiveContourModule.pdb"
+"CMakeFiles/CMakeRelink.dir/libvvITKGeodesicActiveContourModule.a"
+"CMakeFiles/CMakeRelink.dir/libvvITKGeodesicActiveContourModule.so"
+"CMakeFiles/vvITKGeodesicActiveContourModule.dir/vvITKGeodesicActiveContourModule.o"
+)

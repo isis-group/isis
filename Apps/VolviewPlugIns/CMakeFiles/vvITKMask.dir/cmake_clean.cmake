@@ -1,0 +1,10 @@
+FILE(REMOVE
+"libvvITKMask.pdb"
+"libvvITKMask.a"
+"libvvITKMask.so"
+"CMakeFiles/vvITKMask.dir/vvITKMask.o"
+"CMakeFiles/CMakeRelink.dir/libvvITKMask.pdb"
+"CMakeFiles/CMakeRelink.dir/libvvITKMask.a"
+"CMakeFiles/CMakeRelink.dir/libvvITKMask.so"
+"CMakeFiles/vvITKMask.dir/vvITKMask.o"
+)

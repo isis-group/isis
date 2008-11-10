@@ -1,0 +1,10 @@
+FILE(REMOVE
+"MIValidationApp.pdb"
+"MIValidationApp"
+"CMakeFiles/MIValidationApp.dir/Code/MIValidationApp.o"
+"CMakeFiles/MIValidationApp.dir/Code/VanderbiltModality.o"
+"CMakeFiles/CMakeRelink.dir/MIValidationApp.pdb"
+"CMakeFiles/CMakeRelink.dir/MIValidationApp"
+"CMakeFiles/MIValidationApp.dir/Code/MIValidationApp.o"
+"CMakeFiles/MIValidationApp.dir/Code/VanderbiltModality.o"
+)

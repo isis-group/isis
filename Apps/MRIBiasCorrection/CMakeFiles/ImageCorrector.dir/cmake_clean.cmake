@@ -1,0 +1,10 @@
+FILE(REMOVE
+"ImageCorrector.pdb"
+"ImageCorrector"
+"CMakeFiles/ImageCorrector.dir/ImageCorrector.o"
+"CMakeFiles/ImageCorrector.dir/OptionList.o"
+"CMakeFiles/CMakeRelink.dir/ImageCorrector.pdb"
+"CMakeFiles/CMakeRelink.dir/ImageCorrector"
+"CMakeFiles/ImageCorrector.dir/ImageCorrector.o"
+"CMakeFiles/ImageCorrector.dir/OptionList.o"
+)

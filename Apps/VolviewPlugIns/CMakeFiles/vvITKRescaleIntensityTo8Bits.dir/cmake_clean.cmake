@@ -1,0 +1,10 @@
+FILE(REMOVE
+"libvvITKRescaleIntensityTo8Bits.pdb"
+"libvvITKRescaleIntensityTo8Bits.a"
+"libvvITKRescaleIntensityTo8Bits.so"
+"CMakeFiles/vvITKRescaleIntensityTo8Bits.dir/vvITKRescaleIntensityTo8Bits.o"
+"CMakeFiles/CMakeRelink.dir/libvvITKRescaleIntensityTo8Bits.pdb"
+"CMakeFiles/CMakeRelink.dir/libvvITKRescaleIntensityTo8Bits.a"
+"CMakeFiles/CMakeRelink.dir/libvvITKRescaleIntensityTo8Bits.so"
+"CMakeFiles/vvITKRescaleIntensityTo8Bits.dir/vvITKRescaleIntensityTo8Bits.o"
+)

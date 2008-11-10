@@ -1,0 +1,8 @@
+FILE(REMOVE
+"itkEllipsoidInteriorExteriorSpatialFunctionExample.pdb"
+"itkEllipsoidInteriorExteriorSpatialFunctionExample"
+"CMakeFiles/itkEllipsoidInteriorExteriorSpatialFunctionExample.dir/itkEllipsoidInteriorExteriorSpatialFunctionExample.o"
+"CMakeFiles/CMakeRelink.dir/itkEllipsoidInteriorExteriorSpatialFunctionExample.pdb"
+"CMakeFiles/CMakeRelink.dir/itkEllipsoidInteriorExteriorSpatialFunctionExample"
+"CMakeFiles/itkEllipsoidInteriorExteriorSpatialFunctionExample.dir/itkEllipsoidInteriorExteriorSpatialFunctionExample.o"
+)

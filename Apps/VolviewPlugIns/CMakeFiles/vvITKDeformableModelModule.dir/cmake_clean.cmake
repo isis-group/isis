@@ -1,0 +1,10 @@
+FILE(REMOVE
+"libvvITKDeformableModelModule.pdb"
+"libvvITKDeformableModelModule.a"
+"libvvITKDeformableModelModule.so"
+"CMakeFiles/vvITKDeformableModelModule.dir/vvITKDeformableModelModule.o"
+"CMakeFiles/CMakeRelink.dir/libvvITKDeformableModelModule.pdb"
+"CMakeFiles/CMakeRelink.dir/libvvITKDeformableModelModule.a"
+"CMakeFiles/CMakeRelink.dir/libvvITKDeformableModelModule.so"
+"CMakeFiles/vvITKDeformableModelModule.dir/vvITKDeformableModelModule.o"
+)

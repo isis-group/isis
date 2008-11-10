@@ -1,0 +1,10 @@
+FILE(REMOVE
+"libvvITKSigmoid.pdb"
+"libvvITKSigmoid.a"
+"libvvITKSigmoid.so"
+"CMakeFiles/vvITKSigmoid.dir/vvITKSigmoid.o"
+"CMakeFiles/CMakeRelink.dir/libvvITKSigmoid.pdb"
+"CMakeFiles/CMakeRelink.dir/libvvITKSigmoid.a"
+"CMakeFiles/CMakeRelink.dir/libvvITKSigmoid.so"
+"CMakeFiles/vvITKSigmoid.dir/vvITKSigmoid.o"
+)

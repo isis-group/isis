@@ -1,0 +1,10 @@
+FILE(REMOVE
+"libvvITKIsolatedConnected.pdb"
+"libvvITKIsolatedConnected.a"
+"libvvITKIsolatedConnected.so"
+"CMakeFiles/vvITKIsolatedConnected.dir/vvITKIsolatedConnected.o"
+"CMakeFiles/CMakeRelink.dir/libvvITKIsolatedConnected.pdb"
+"CMakeFiles/CMakeRelink.dir/libvvITKIsolatedConnected.a"
+"CMakeFiles/CMakeRelink.dir/libvvITKIsolatedConnected.so"
+"CMakeFiles/vvITKIsolatedConnected.dir/vvITKIsolatedConnected.o"
+)

@@ -1,0 +1,10 @@
+FILE(REMOVE
+"BiasFieldEstimator.pdb"
+"BiasFieldEstimator"
+"CMakeFiles/BiasFieldEstimator.dir/BiasFieldEstimator.o"
+"CMakeFiles/BiasFieldEstimator.dir/OptionList.o"
+"CMakeFiles/CMakeRelink.dir/BiasFieldEstimator.pdb"
+"CMakeFiles/CMakeRelink.dir/BiasFieldEstimator"
+"CMakeFiles/BiasFieldEstimator.dir/BiasFieldEstimator.o"
+"CMakeFiles/BiasFieldEstimator.dir/OptionList.o"
+)

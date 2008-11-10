@@ -1,0 +1,10 @@
+FILE(REMOVE
+"libvvITKConnectedThreshold.pdb"
+"libvvITKConnectedThreshold.a"
+"libvvITKConnectedThreshold.so"
+"CMakeFiles/vvITKConnectedThreshold.dir/vvITKConnectedThreshold.o"
+"CMakeFiles/CMakeRelink.dir/libvvITKConnectedThreshold.pdb"
+"CMakeFiles/CMakeRelink.dir/libvvITKConnectedThreshold.a"
+"CMakeFiles/CMakeRelink.dir/libvvITKConnectedThreshold.so"
+"CMakeFiles/vvITKConnectedThreshold.dir/vvITKConnectedThreshold.o"
+)

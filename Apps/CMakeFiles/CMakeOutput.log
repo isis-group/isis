@@ -1,0 +1,125 @@
+The system is: Linux - 2.6.24-21-generic - unknown
+Determining if the C compiler is GNU succeeded with the following output:
+# 1 "/usr/share/cmake-2.4/Modules/CMakeTestGNU.c"
+# 1 "<built-in>"
+# 1 "<command-line>"
+# 1 "/usr/share/cmake-2.4/Modules/CMakeTestGNU.c"
+
+void THIS_IS_GNU();
+
+Determining if the C++ compiler is GNU succeeded with the following output:
+# 1 "/usr/share/cmake-2.4/Modules/CMakeTestGNU.c"
+# 1 "<built-in>"
+# 1 "<command-line>"
+# 1 "/usr/share/cmake-2.4/Modules/CMakeTestGNU.c"
+
+void THIS_IS_GNU();
+
+Determining if the C compiler works passed with the following output:
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[1]: Entering directory `/home/erik/src/InsightApplications-3.8.0/LandmarkInitializedMutualInformationRegistration/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/erik/src/InsightApplications-3.8.0/LandmarkInitializedMutualInformationRegistration/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/testCCompiler.o
+/usr/bin/gcc   -o CMakeFiles/cmTryCompileExec.dir/testCCompiler.o   -c /home/erik/src/InsightApplications-3.8.0/LandmarkInitializedMutualInformationRegistration/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTryCompileExec
+/usr/bin/cmake -P CMakeFiles/cmTryCompileExec.dir/cmake_clean_target.cmake
+/usr/bin/gcc        -fPIC "CMakeFiles/cmTryCompileExec.dir/testCCompiler.o"   -o cmTryCompileExec -rdynamic 
+make[1]: Leaving directory `/home/erik/src/InsightApplications-3.8.0/LandmarkInitializedMutualInformationRegistration/CMakeFiles/CMakeTmp'
+
+
+Determining size of void* passed with the following output:
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[1]: Entering directory `/home/erik/src/InsightApplications-3.8.0/LandmarkInitializedMutualInformationRegistration/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/erik/src/InsightApplications-3.8.0/LandmarkInitializedMutualInformationRegistration/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckTypeSize.o
+/usr/bin/gcc   -o CMakeFiles/cmTryCompileExec.dir/CheckTypeSize.o   -c /home/erik/src/InsightApplications-3.8.0/LandmarkInitializedMutualInformationRegistration/CMakeFiles/CMakeTmp/CheckTypeSize.c
+Linking C executable cmTryCompileExec
+/usr/bin/cmake -P CMakeFiles/cmTryCompileExec.dir/cmake_clean_target.cmake
+/usr/bin/gcc        -fPIC "CMakeFiles/cmTryCompileExec.dir/CheckTypeSize.o"   -o cmTryCompileExec -rdynamic 
+make[1]: Leaving directory `/home/erik/src/InsightApplications-3.8.0/LandmarkInitializedMutualInformationRegistration/CMakeFiles/CMakeTmp'
+
+
+Determining if the CXX compiler works passed with the following output:
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[1]: Entering directory `/home/erik/src/InsightApplications-3.8.0/LandmarkInitializedMutualInformationRegistration/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/erik/src/InsightApplications-3.8.0/LandmarkInitializedMutualInformationRegistration/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building CXX object CMakeFiles/cmTryCompileExec.dir/testCXXCompiler.o
+/usr/bin/c++    -o CMakeFiles/cmTryCompileExec.dir/testCXXCompiler.o -c /home/erik/src/InsightApplications-3.8.0/LandmarkInitializedMutualInformationRegistration/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+Linking CXX executable cmTryCompileExec
+/usr/bin/cmake -P CMakeFiles/cmTryCompileExec.dir/cmake_clean_target.cmake
+/usr/bin/c++         -fPIC "CMakeFiles/cmTryCompileExec.dir/testCXXCompiler.o"   -o cmTryCompileExec -rdynamic 
+make[1]: Leaving directory `/home/erik/src/InsightApplications-3.8.0/LandmarkInitializedMutualInformationRegistration/CMakeFiles/CMakeTmp'
+
+
+Determining if the function XOpenDisplay exists in the /usr/lib/libX11.so;/usr/lib/libXext.so passed with the following output:
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[1]: Entering directory `/home/erik/src/InsightApplications-3.8.0/LandmarkInitializedMutualInformationRegistration/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/erik/src/InsightApplications-3.8.0/LandmarkInitializedMutualInformationRegistration/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.o
+/usr/bin/gcc  -Wall -Wno-uninitialized -Wno-unused-parameter  -DCHECK_FUNCTION_EXISTS=XOpenDisplay   -o CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.o   -c /usr/share/cmake-2.4/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec
+/usr/bin/cmake -P CMakeFiles/cmTryCompileExec.dir/cmake_clean_target.cmake
+/usr/bin/gcc      -Wall -Wno-uninitialized -Wno-unused-parameter  -DCHECK_FUNCTION_EXISTS=XOpenDisplay  -fPIC "CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.o"   -o cmTryCompileExec -rdynamic -lX11 -lXext 
+make[1]: Leaving directory `/home/erik/src/InsightApplications-3.8.0/LandmarkInitializedMutualInformationRegistration/CMakeFiles/CMakeTmp'
+
+
+Determining if the function gethostbyname exists passed with the following output:
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[1]: Entering directory `/home/erik/src/InsightApplications-3.8.0/LandmarkInitializedMutualInformationRegistration/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/erik/src/InsightApplications-3.8.0/LandmarkInitializedMutualInformationRegistration/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.o
+/usr/bin/gcc  -Wall -Wno-uninitialized -Wno-unused-parameter  -DCHECK_FUNCTION_EXISTS=gethostbyname   -o CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.o   -c /usr/share/cmake-2.4/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec
+/usr/bin/cmake -P CMakeFiles/cmTryCompileExec.dir/cmake_clean_target.cmake
+/usr/bin/gcc      -Wall -Wno-uninitialized -Wno-unused-parameter  -DCHECK_FUNCTION_EXISTS=gethostbyname  -fPIC "CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.o"   -o cmTryCompileExec -rdynamic 
+make[1]: Leaving directory `/home/erik/src/InsightApplications-3.8.0/LandmarkInitializedMutualInformationRegistration/CMakeFiles/CMakeTmp'
+
+
+Determining if the function connect exists passed with the following output:
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[1]: Entering directory `/home/erik/src/InsightApplications-3.8.0/LandmarkInitializedMutualInformationRegistration/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/erik/src/InsightApplications-3.8.0/LandmarkInitializedMutualInformationRegistration/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.o
+/usr/bin/gcc  -Wall -Wno-uninitialized -Wno-unused-parameter  -DCHECK_FUNCTION_EXISTS=connect   -o CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.o   -c /usr/share/cmake-2.4/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec
+/usr/bin/cmake -P CMakeFiles/cmTryCompileExec.dir/cmake_clean_target.cmake
+/usr/bin/gcc      -Wall -Wno-uninitialized -Wno-unused-parameter  -DCHECK_FUNCTION_EXISTS=connect  -fPIC "CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.o"   -o cmTryCompileExec -rdynamic 
+make[1]: Leaving directory `/home/erik/src/InsightApplications-3.8.0/LandmarkInitializedMutualInformationRegistration/CMakeFiles/CMakeTmp'
+
+
+Determining if the function remove exists passed with the following output:
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[1]: Entering directory `/home/erik/src/InsightApplications-3.8.0/LandmarkInitializedMutualInformationRegistration/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/erik/src/InsightApplications-3.8.0/LandmarkInitializedMutualInformationRegistration/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.o
+/usr/bin/gcc  -Wall -Wno-uninitialized -Wno-unused-parameter  -DCHECK_FUNCTION_EXISTS=remove   -o CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.o   -c /usr/share/cmake-2.4/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec
+/usr/bin/cmake -P CMakeFiles/cmTryCompileExec.dir/cmake_clean_target.cmake
+/usr/bin/gcc      -Wall -Wno-uninitialized -Wno-unused-parameter  -DCHECK_FUNCTION_EXISTS=remove  -fPIC "CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.o"   -o cmTryCompileExec -rdynamic 
+make[1]: Leaving directory `/home/erik/src/InsightApplications-3.8.0/LandmarkInitializedMutualInformationRegistration/CMakeFiles/CMakeTmp'
+
+
+Determining if the function shmat exists passed with the following output:
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[1]: Entering directory `/home/erik/src/InsightApplications-3.8.0/LandmarkInitializedMutualInformationRegistration/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/erik/src/InsightApplications-3.8.0/LandmarkInitializedMutualInformationRegistration/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.o
+/usr/bin/gcc  -Wall -Wno-uninitialized -Wno-unused-parameter  -DCHECK_FUNCTION_EXISTS=shmat   -o CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.o   -c /usr/share/cmake-2.4/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec
+/usr/bin/cmake -P CMakeFiles/cmTryCompileExec.dir/cmake_clean_target.cmake
+/usr/bin/gcc      -Wall -Wno-uninitialized -Wno-unused-parameter  -DCHECK_FUNCTION_EXISTS=shmat  -fPIC "CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.o"   -o cmTryCompileExec -rdynamic 
+make[1]: Leaving directory `/home/erik/src/InsightApplications-3.8.0/LandmarkInitializedMutualInformationRegistration/CMakeFiles/CMakeTmp'
+
+
+Determining if the function IceConnectionNumber exists in the ICE passed with the following output:
+/usr/bin/make -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+make[1]: Entering directory `/home/erik/src/InsightApplications-3.8.0/LandmarkInitializedMutualInformationRegistration/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/erik/src/InsightApplications-3.8.0/LandmarkInitializedMutualInformationRegistration/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.o
+/usr/bin/gcc  -Wall -Wno-uninitialized -Wno-unused-parameter  -DCHECK_FUNCTION_EXISTS=IceConnectionNumber   -o CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.o   -c /usr/share/cmake-2.4/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec
+/usr/bin/cmake -P CMakeFiles/cmTryCompileExec.dir/cmake_clean_target.cmake
+/usr/bin/gcc      -Wall -Wno-uninitialized -Wno-unused-parameter  -DCHECK_FUNCTION_EXISTS=IceConnectionNumber  -fPIC "CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.o"   -o cmTryCompileExec -rdynamic -lICE 
+make[1]: Leaving directory `/home/erik/src/InsightApplications-3.8.0/LandmarkInitializedMutualInformationRegistration/CMakeFiles/CMakeTmp'
+
+

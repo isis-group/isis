@@ -1,0 +1,10 @@
+FILE(REMOVE
+"libvvITKWatershedRGBModule.pdb"
+"libvvITKWatershedRGBModule.a"
+"libvvITKWatershedRGBModule.so"
+"CMakeFiles/vvITKWatershedRGBModule.dir/vvITKWatershedRGBModule.o"
+"CMakeFiles/CMakeRelink.dir/libvvITKWatershedRGBModule.pdb"
+"CMakeFiles/CMakeRelink.dir/libvvITKWatershedRGBModule.a"
+"CMakeFiles/CMakeRelink.dir/libvvITKWatershedRGBModule.so"
+"CMakeFiles/vvITKWatershedRGBModule.dir/vvITKWatershedRGBModule.o"
+)

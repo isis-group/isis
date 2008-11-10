@@ -1,0 +1,10 @@
+FILE(REMOVE
+"libvvITKCannyEdgeDetection.pdb"
+"libvvITKCannyEdgeDetection.a"
+"libvvITKCannyEdgeDetection.so"
+"CMakeFiles/vvITKCannyEdgeDetection.dir/vvITKCannyEdgeDetection.o"
+"CMakeFiles/CMakeRelink.dir/libvvITKCannyEdgeDetection.pdb"
+"CMakeFiles/CMakeRelink.dir/libvvITKCannyEdgeDetection.a"
+"CMakeFiles/CMakeRelink.dir/libvvITKCannyEdgeDetection.so"
+"CMakeFiles/vvITKCannyEdgeDetection.dir/vvITKCannyEdgeDetection.o"
+)

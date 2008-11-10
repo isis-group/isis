@@ -1,0 +1,10 @@
+FILE(REMOVE
+"libvvITKVectorConfidenceConnected.pdb"
+"libvvITKVectorConfidenceConnected.a"
+"libvvITKVectorConfidenceConnected.so"
+"CMakeFiles/vvITKVectorConfidenceConnected.dir/vvITKVectorConfidenceConnected.o"
+"CMakeFiles/CMakeRelink.dir/libvvITKVectorConfidenceConnected.pdb"
+"CMakeFiles/CMakeRelink.dir/libvvITKVectorConfidenceConnected.a"
+"CMakeFiles/CMakeRelink.dir/libvvITKVectorConfidenceConnected.so"
+"CMakeFiles/vvITKVectorConfidenceConnected.dir/vvITKVectorConfidenceConnected.o"
+)

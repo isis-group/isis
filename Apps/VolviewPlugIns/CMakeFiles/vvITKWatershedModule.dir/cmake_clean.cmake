@@ -1,0 +1,10 @@
+FILE(REMOVE
+"libvvITKWatershedModule.pdb"
+"libvvITKWatershedModule.a"
+"libvvITKWatershedModule.so"
+"CMakeFiles/vvITKWatershedModule.dir/vvITKWatershedModule.o"
+"CMakeFiles/CMakeRelink.dir/libvvITKWatershedModule.pdb"
+"CMakeFiles/CMakeRelink.dir/libvvITKWatershedModule.a"
+"CMakeFiles/CMakeRelink.dir/libvvITKWatershedModule.so"
+"CMakeFiles/vvITKWatershedModule.dir/vvITKWatershedModule.o"
+)

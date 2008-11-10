@@ -1,0 +1,10 @@
+FILE(REMOVE
+"libvvITKCurvatureAnisotropicDiffusion.pdb"
+"libvvITKCurvatureAnisotropicDiffusion.a"
+"libvvITKCurvatureAnisotropicDiffusion.so"
+"CMakeFiles/vvITKCurvatureAnisotropicDiffusion.dir/vvITKCurvatureAnisotropicDiffusion.o"
+"CMakeFiles/CMakeRelink.dir/libvvITKCurvatureAnisotropicDiffusion.pdb"
+"CMakeFiles/CMakeRelink.dir/libvvITKCurvatureAnisotropicDiffusion.a"
+"CMakeFiles/CMakeRelink.dir/libvvITKCurvatureAnisotropicDiffusion.so"
+"CMakeFiles/vvITKCurvatureAnisotropicDiffusion.dir/vvITKCurvatureAnisotropicDiffusion.o"
+)

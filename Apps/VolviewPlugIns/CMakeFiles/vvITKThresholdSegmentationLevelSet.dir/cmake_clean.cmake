@@ -1,0 +1,10 @@
+FILE(REMOVE
+"libvvITKThresholdSegmentationLevelSet.pdb"
+"libvvITKThresholdSegmentationLevelSet.a"
+"libvvITKThresholdSegmentationLevelSet.so"
+"CMakeFiles/vvITKThresholdSegmentationLevelSet.dir/vvITKThresholdSegmentationLevelSet.o"
+"CMakeFiles/CMakeRelink.dir/libvvITKThresholdSegmentationLevelSet.pdb"
+"CMakeFiles/CMakeRelink.dir/libvvITKThresholdSegmentationLevelSet.a"
+"CMakeFiles/CMakeRelink.dir/libvvITKThresholdSegmentationLevelSet.so"
+"CMakeFiles/vvITKThresholdSegmentationLevelSet.dir/vvITKThresholdSegmentationLevelSet.o"
+)

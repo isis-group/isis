@@ -1,0 +1,10 @@
+FILE(REMOVE
+"libvvITKShapeDetectionModule.pdb"
+"libvvITKShapeDetectionModule.a"
+"libvvITKShapeDetectionModule.so"
+"CMakeFiles/vvITKShapeDetectionModule.dir/vvITKShapeDetectionModule.o"
+"CMakeFiles/CMakeRelink.dir/libvvITKShapeDetectionModule.pdb"
+"CMakeFiles/CMakeRelink.dir/libvvITKShapeDetectionModule.a"
+"CMakeFiles/CMakeRelink.dir/libvvITKShapeDetectionModule.so"
+"CMakeFiles/vvITKShapeDetectionModule.dir/vvITKShapeDetectionModule.o"
+)
