@@ -1,8 +1,0 @@
-FILE(REMOVE
-"MRFGaussianIBSRClassificationApp.pdb"
-"MRFGaussianIBSRClassificationApp"
-"CMakeFiles/MRFGaussianIBSRClassificationApp.dir/Code/MRFGaussianClassifierValidationApp.o"
-"CMakeFiles/CMakeRelink.dir/MRFGaussianIBSRClassificationApp.pdb"
-"CMakeFiles/CMakeRelink.dir/MRFGaussianIBSRClassificationApp"
-"CMakeFiles/MRFGaussianIBSRClassificationApp.dir/Code/MRFGaussianClassifierValidationApp.o"
-)

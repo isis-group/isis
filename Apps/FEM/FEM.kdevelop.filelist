@@ -1,7 +1,0 @@
-FEM/CMakeLists.txt
-FEM/FEMImageRegLMEx.cxx
-FEM/FEMImageRegLMEx.h
-FEM/FEMRead.cxx
-FEM/FEMSolverHyperbolicExample.cxx
-FEM/FEMSolverHyperbolicExample.h
-FEM/FEMTruss.cxx

@@ -1,8 +1,0 @@
-FILE(REMOVE
-"itk2DCannySegmentationLevelSetImageFilter.pdb"
-"itk2DCannySegmentationLevelSetImageFilter"
-"CMakeFiles/itk2DCannySegmentationLevelSetImageFilter.dir/itk2DCannySegmentationLevelSetImageFilter.o"
-"CMakeFiles/CMakeRelink.dir/itk2DCannySegmentationLevelSetImageFilter.pdb"
-"CMakeFiles/CMakeRelink.dir/itk2DCannySegmentationLevelSetImageFilter"
-"CMakeFiles/itk2DCannySegmentationLevelSetImageFilter.dir/itk2DCannySegmentationLevelSetImageFilter.o"
-)

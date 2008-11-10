@@ -1,2 +1,0 @@
-/usr/bin/ar cr libparam.a  "CMakeFiles/param.dir/lex.yy.o" "CMakeFiles/param.dir/y.tab.o" "CMakeFiles/param.dir/param.o" 
-/usr/bin/ranlib libparam.a 

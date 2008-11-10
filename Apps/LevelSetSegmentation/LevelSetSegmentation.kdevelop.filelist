@@ -1,3 +1,0 @@
-LevelSetSegmentation/CMakeLists.txt
-LevelSetSegmentation/itk2DCannySegmentationLevelSetImageFilter.cxx
-LevelSetSegmentation/itk2DThresholdSegmentationLevelSetImageFilter.cxx

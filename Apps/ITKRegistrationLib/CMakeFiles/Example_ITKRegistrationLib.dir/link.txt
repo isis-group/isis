@@ -1,2 +1,0 @@
-/usr/bin/ar cr libExample_ITKRegistrationLib.a  "CMakeFiles/Example_ITKRegistrationLib.dir/ITKRegistrationLib.o" 
-/usr/bin/ranlib libExample_ITKRegistrationLib.a 

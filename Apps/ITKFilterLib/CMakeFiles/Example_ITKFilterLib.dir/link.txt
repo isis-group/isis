@@ -1,2 +1,0 @@
-/usr/bin/ar cr libExample_ITKFilterLib.a  "CMakeFiles/Example_ITKFilterLib.dir/ITKFilterLib.o" 
-/usr/bin/ranlib libExample_ITKFilterLib.a 

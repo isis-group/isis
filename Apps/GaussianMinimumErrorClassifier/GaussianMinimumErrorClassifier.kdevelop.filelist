@@ -1,4 +1,0 @@
-GaussianMinimumErrorClassifier/CMakeLists.txt
-GaussianMinimumErrorClassifier/GaussianMinimumErrorClassifier.cxx
-MRIBiasCorrection/OptionList.cxx
-MRIBiasCorrection/OptionList.h

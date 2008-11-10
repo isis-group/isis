@@ -1,8 +1,0 @@
-FILE(REMOVE
-"itkFloodFilledSpatialFunctionExample.pdb"
-"itkFloodFilledSpatialFunctionExample"
-"CMakeFiles/itkFloodFilledSpatialFunctionExample.dir/itkFloodFilledSpatialFunctionExample.o"
-"CMakeFiles/CMakeRelink.dir/itkFloodFilledSpatialFunctionExample.pdb"
-"CMakeFiles/CMakeRelink.dir/itkFloodFilledSpatialFunctionExample"
-"CMakeFiles/itkFloodFilledSpatialFunctionExample.dir/itkFloodFilledSpatialFunctionExample.o"
-)
