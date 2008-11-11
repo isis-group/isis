@@ -1,7 +1,22 @@
 PROJECT(imageRegTool)
 
 
+cmake_minimum_required(VERSION 2.6)
+
+
 IF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
+
+  # The fluid-generated fltk sources have many warnings.  This macro
+  # will disable warnings for the generated files on some compilers.
+  MACRO ( ITK_DISABLE_FLTK_GENERATED_WARNINGS files )
+    IF ( CMAKE_COMPILER_IS_GNUCXX )
+      FOREACH ( f ${files} )
+	STRING ( REGEX REPLACE "\\.fl$" ".cxx" SRC "${f}" )
+	STRING ( REGEX REPLACE ".*/([^/]*)$" "\\1" SRC "${SRC}" )
+	SET_SOURCE_FILES_PROPERTIES ( ${SRC} PROPERTIES COMPILE_FLAGS -w )
+      ENDFOREACH ( f )
+    ENDIF ( CMAKE_COMPILER_IS_GNUCXX )
+  ENDMACRO ( ITK_DISABLE_FLTK_GENERATED_WARNINGS )
 
   FIND_PACKAGE(ITK)
   IF(ITK_FOUND)
@@ -22,8 +37,6 @@ ENDIF( BUILD_OUTSIDE_INSIGHT_APPLICATIONS )
 IF(UNIX)
   INCLUDE( ${CMAKE_ROOT}/Modules/FindX11.cmake )
 ENDIF(UNIX)
-CONFIGURE_FILE(${InsightApplications_SOURCE_DIR}/LandmarkInitializedMutualInformationRegistration/Help/Index.html
-               ${InsightApplications_BINARY_DIR}/LandmarkInitializedMutualInformationRegistration/Help/Index.html COPYONLY)
 
 INCLUDE_DIRECTORIES(
   ${ITK_SOURCE_DIR}/Code/Common
