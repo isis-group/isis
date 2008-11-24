@@ -37,14 +37,14 @@ ENDIF(FLTK_FOUND)
 find_package(InsightApplications REQUIRED)
 
 if(NOT InsightApplications_BINARY_DIR)
-message(FATAL_ERROR 
-"InsightApplications binary dir not found. Please specify the directory where the InsightApplications binaries reside")
+	message(FATAL_ERROR
+		"InsightApplications_BINARY_DIR not set correctly. Please specify the directory where the InsightApplications binaries reside")
 endif(NOT InsightApplications_BINARY_DIR)
 
 # Workaround to build this package outside of the InsightApplications source tree
 if(NOT InsightApplications_SOURCE_DIR)
-message(FATAL_ERROR 
-"InsightApplications source tree not found. Please specify the directory where the InsightApplications source code resides")
+	message(FATAL_ERROR 
+		"InsightApplications_SOURCE_DIR not found. Please specify the directory where the InsightApplications source code resides")
 endif(NOT InsightApplications_SOURCE_DIR)
 
 ###################################################################
@@ -85,6 +85,7 @@ ADD_EXECUTABLE(imageRegTool
     main.cxx
     ${imageRegTool_FLTK_UI_SRCS}
     )
+
 INSTALL_TARGETS(/bin imageRegTool)
 
 TARGET_LINK_LIBRARIES (imageRegTool
@@ -92,6 +93,8 @@ ITKIO
 ITKMetaIO
 ITKBasicFilters
 ITKStatistics
+ITKNumerics
 ITKFlFileWriter
 ITKFltkImageViewer
+${FLTK_LIBRARIES}
 )
