@@ -94,6 +94,7 @@ class guiMainImplementation : public guiMain
     void HandleInputImageChange(std::string & fileName, bool isFixedImage) ;
     ImagePointer LoadImage( const char * filename );
     void SaveFinalRegisteredImage();
+    void SaveDisplayedImage();
 
     /////////////////////////////////////////////////
     // Image view functions

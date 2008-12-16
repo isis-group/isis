@@ -3,8 +3,8 @@
   Program:   Insight Segmentation & Registration Toolkit
   Module:    $RCSfile: ImageRegistrationApp.h,v $
   Language:  C++
-  Date:      $Date: 2007-04-01 14:27:24 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2008-09-05 14:57:59 $
+  Version:   $Revision: 1.16 $
 
   Copyright (c) Insight Software Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
@@ -215,8 +215,7 @@ class ImageRegistrationApp : public Object
 
     typedef enum { ONEPLUSONE,
                    GRADIENT,
-                   ONEPLUSONEPLUSGRADIENT,
-                   LBFGS
+                   ONEPLUSONEPLUSGRADIENT
                  } OptimizerMethodType;
 
     typename NoneRegTransformType::Pointer       m_NoneRegTransform ;
