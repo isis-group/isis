@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0106 
+version 1.0109 
 header_name {.h} 
 code_name {.cxx}
 class guiMain {open
@@ -10,9 +10,9 @@ class guiMain {open
   } {
     Fl_Window tkWindow {
       label {Landmarkd Initialized Mutual Information 3D Registration Tool } open
-      xywh {206 158 1060 705} type Double box PLASTIC_UP_BOX color 159 resizable visible
+      xywh {206 65 1060 705} type Double box PLASTIC_UP_BOX color 159 resizable visible
     } {
-      Fl_Group tkMainGroup {open
+      Fl_Group tkMainGroup {
         xywh {0 30 1050 710} resizable
       } {
         Fl_Value_Slider tkSliceValuator {
@@ -24,22 +24,22 @@ class guiMain {open
           callback {SetDisplayMovingImage();} open
           xywh {885 31 158 15} box PLASTIC_UP_BOX down_box BORDER_BOX color 255 selection_color 255 labelsize 10 when 1 textsize 10
         } {
-          menuitem tkUnregisteredView {
+          MenuItem tkUnregisteredView {
             label {Unregistered Images}
             callback {SelectImageSet(0) ;}
             xywh {5 5 100 20} labelsize 10
           }
-          menuitem tkInitializationView {
+          MenuItem tkInitializationView {
             label Initialization
             callback {SelectImageSet(1) ;}
             xywh {15 15 100 20} labelsize 10
           }
-          menuitem tkAffineRegisteredView {
+          MenuItem tkAffineRegisteredView {
             label {Affine Registered Images}
             callback {SelectImageSet(2) ;}
             xywh {25 25 100 20} labelsize 10 deactivate
           }
-          menuitem tkRegisteredView {
+          MenuItem tkRegisteredView {
             label {Registered Images}
             callback {SelectImageSet(3) ;}
             xywh {35 35 100 20} labelsize 10 deactivate
@@ -49,23 +49,23 @@ class guiMain {open
           label {Initialization:} open
           xywh {370 666 100 19} box PLASTIC_UP_BOX down_box BORDER_BOX color 255 selection_color 255 labelsize 10 align 36 when 1 textsize 10
         } {
-          menuitem tkInitNoneMethod {
+          MenuItem tkInitNoneMethod {
             label None
             xywh {45 45 100 34} labelsize 10
           }
-          menuitem tkInitCentersMethod {
+          MenuItem tkInitCentersMethod {
             label {Image Centers}
             xywh {55 55 100 34} value 1 labelsize 10
           }
-          menuitem tkInitLandmarkMethod {
+          MenuItem tkInitLandmarkMethod {
             label Landmark
             xywh {35 35 100 34} labelsize 10
           }
-          menuitem tkInitMassMethod {
+          MenuItem tkInitMassMethod {
             label Mass
             xywh {45 45 100 34} labelsize 10
           }
-          menuitem tkInitMomentsMethod {
+          MenuItem tkInitMomentsMethod {
             label Moments
             xywh {55 55 100 34} labelsize 10
           }
@@ -74,19 +74,19 @@ class guiMain {open
           label {Registration:} open
           xywh {545 666 100 19} box PLASTIC_UP_BOX down_box BORDER_BOX color 255 selection_color 255 labelsize 10 align 36 when 1 textsize 10
         } {
-          menuitem tkRegNoneMethod {
+          MenuItem tkRegNoneMethod {
             label None
             xywh {35 35 100 34} labelsize 10
           }
-          menuitem tkRegRigidMethod {
+          MenuItem tkRegRigidMethod {
             label Rigid
             xywh {25 25 100 34} value 1 labelsize 10
           }
-          menuitem tkRegAffineMethod {
+          MenuItem tkRegAffineMethod {
             label Affine
             xywh {25 25 100 34} labelsize 10
           }
-          menuitem tkRegRigidAffineMethod {
+          MenuItem tkRegRigidAffineMethod {
             label {Rigid + Affine}
             xywh {35 35 100 34} labelsize 10
           }
@@ -307,50 +307,55 @@ Register();}
           xywh {670 670 80 15} down_box ROUND_DOWN_BOX labelsize 10
         }
       }
-      Fl_Menu_Bar {} {
+      Fl_Menu_Bar {} {open
         xywh {1 0 1060 20} box PLASTIC_UP_BOX down_box PLASTIC_DOWN_BOX color 247 selection_color 247 labelsize 9 textsize 9
       } {
-        submenu {} {
+        Submenu {} {
           label File open
           xywh {0 0 100 20} labelsize 10
         } {
-          menuitem {} {
+          MenuItem {} {
             label {Save registered final moving image...}
             callback {SaveFinalRegisteredImage();}
             xywh {20 20 100 20} labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
+            label {Save displayed image...}
+            callback {SaveDisplayedImage();}
+            xywh {0 0 36 21} labelsize 10
+          }
+          MenuItem {} {
             label {Save transform...}
             callback {SaveTransform();}
             xywh {15 15 100 20} labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label Quit
             callback {Quit();}
             xywh {5 5 100 20} labelsize 10
           }
         }
-        submenu {} {
+        Submenu {} {
           label Options open
           xywh {0 0 100 20} labelsize 10
         } {
-          menuitem {} {
+          MenuItem {} {
             label {Advanced Registration Options}
             callback {ShowAdvancedOptions();}
             xywh {0 0 100 20} labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label {Save options...}
             callback {SaveOptions() ;}
             xywh {0 0 100 20} labelsize 10
           }
-          menuitem {} {
+          MenuItem {} {
             label {Load options...}
             callback {LoadOptions() ;}
             xywh {0 0 100 20} labelsize 10
           }
         }
-        menuitem {} {
+        MenuItem {} {
           label Help
           callback {ShowHelp("Help/Index.html");}
           xywh {0 0 100 20} labelsize 10
@@ -497,8 +502,8 @@ tkMovingImageViewer->DrawRegionOfInterest() ;}
       }
     }
     Fl_Window tkAdvancedOptionsWindow {
-      label {Advanced Registration Options} open
-      xywh {871 158 405 520} type Double box PLASTIC_UP_BOX color 159 labelsize 10 resizable visible
+      label {Advanced Registration Options}
+      xywh {870 158 405 520} type Double box PLASTIC_UP_BOX color 159 labelsize 10 resizable visible
     } {
       Fl_Tabs {} {open
         xywh {15 15 385 465} labelsize 12
@@ -546,11 +551,11 @@ tkMovingImageViewer->DrawRegionOfInterest() ;}
           }
           Fl_Value_Input tkLandmarkRotationScale {
             label Rotation
-            xywh {235 100 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
+            xywh {235 100 65 25} labelsize 12 maximum 1e+09 step 0.1 value 1
           }
           Fl_Value_Input tkLandmarkTranslationScale {
             label Translation
-            xywh {235 135 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
+            xywh {235 135 65 25} labelsize 12 maximum 1e+09 step 0.1 value 1
           }
         }
         Fl_Group {} {
@@ -571,11 +576,11 @@ tkMovingImageViewer->DrawRegionOfInterest() ;}
           }
           Fl_Value_Input tkRigidRotationScale {
             label Rotation
-            xywh {235 100 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
+            xywh {235 100 65 25} labelsize 12 maximum 1e+09 step 0.1 value 1
           }
           Fl_Value_Input tkRigidTranslationScale {
             label Translation
-            xywh {235 135 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
+            xywh {235 135 65 25} labelsize 12 maximum 1e+09 step 0.1 value 1
           }
         }
         Fl_Group {} {
@@ -596,23 +601,23 @@ tkMovingImageViewer->DrawRegionOfInterest() ;}
           }
           Fl_Value_Input tkAffineRotationScale {
             label Rotation
-            xywh {235 100 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
+            xywh {235 100 65 25} labelsize 12 maximum 1e+09 step 0.1 value 1
           }
           Fl_Value_Input tkAffineTranslationScale {
             label Translation
-            xywh {235 135 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
+            xywh {235 135 65 25} labelsize 12 maximum 1e+09 step 0.1 value 1
           }
           Fl_Value_Input tkAffineScaleScale {
             label Scale
-            xywh {235 170 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
+            xywh {235 170 65 25} labelsize 12 maximum 1e+09 step 0.1 value 1
           }
           Fl_Value_Input tkAffineSkewScale {
             label Skew
-            xywh {235 205 65 25} labelsize 12 maximum 1e+009 step 0.1 value 1
+            xywh {235 205 65 25} labelsize 12 maximum 1e+09 step 0.1 value 1
           }
         }
         Fl_Group {} {
-          label Deformable open selected
+          label Deformable open
           xywh {15 40 375 430}
         } {
           Fl_Value_Input tkDeformableNumberOfIterations {
@@ -649,6 +654,8 @@ tkMovingImageViewer->DrawRegionOfInterest() ;}
   } {}
   Function {SelectMovingImage()} {open return_type {virtual void}
   } {}
+  Function {SaveDisplayedImage()} {open selected return_type {virtual void}
+  } {}
   Function {UpdateSliceNumber()} {open return_type {virtual void}
   } {}
   Function {Register()} {open return_type {virtual void}
@@ -659,7 +666,7 @@ tkMovingImageViewer->DrawRegionOfInterest() ;}
   } {}
   Function {Quit()} {open return_type {virtual void}
   } {}
-  Function {ClearLandmarks(Fl_Group* parent)} {open return_type {virtual void}
+  Function {ClearLandmarks(Fl_Group* parent)} {return_type {virtual void}
   } {}
   Function {SaveLandmarks( bool moving )} {open return_type {virtual void}
   } {}

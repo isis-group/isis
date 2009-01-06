@@ -26,6 +26,8 @@
 #include "AffineRegistrator.h"
 #include "DeformableRegistrator.h"
 
+#include "itkRegionOfInterestImageFilter.h"
+
 #include "itkAffineTransform.h"
 
 #include "itkVersor.h"
@@ -111,6 +113,8 @@ class ImageRegistrationApp : public Object
 
     void RegisterUsingMass();
 
+    void SetROI(unsigned int);
+ 
     void RegisterUsingMoments();
 
     void SetLoadedTransform(const LoadedRegTransformType & tfm);
@@ -252,6 +256,7 @@ class ImageRegistrationApp : public Object
     
     RegionType          m_FixedImageRegion ;
   
+    
     PriorRegistrationMethodType   m_PriorRegistrationMethod;
 
     OptimizerMethodType        m_OptimizerMethod;

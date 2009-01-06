@@ -6,6 +6,9 @@ cmake_minimum_required(VERSION 2.6)
 # cmake needs to know where to find additional modules
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
+set(CMAKE_BUILD_TYPE "Debug")
+
+
 # The fluid-generated fltk sources have many warnings.  This macro
 # will disable warnings for the generated files on some compilers.
 # -- Shamelessly stolen from InsightApplications/CMakeLists.txt --

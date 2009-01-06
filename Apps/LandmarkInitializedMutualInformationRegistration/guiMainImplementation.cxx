@@ -214,7 +214,7 @@ guiMainImplementation
 
   reader = ImageReaderType::New();
   reader->SetFileName(filename);
-  std::cout << "gna";
+
   try
     {
     reader->Update();      
@@ -234,40 +234,13 @@ guiMainImplementation
   return image;
   }
 
+
 void 
 guiMainImplementation
 ::SaveDisplayedImage()
-{
-  std::cout << "Save displayed Image!" << std::endl;
-  std::cout << guiMain::currentSelectedImage << std::endl;
-  if (guiMain::currentSelectedImage == 0)
-    {
-    itkFlFileWriter< ImageType >( m_MovingImage.GetPointer(), "Save unregistered image file...", "*.mh?", "", 0 );
-		}
-	if (guiMain::currentSelectedImage == 1)
-		{
-		itkFlFileWriter< ImageType >( m_InitializedMovingImage.GetPointer(), "Save initialized moving image file...", "*.mh?", "", 0);
-		}
-  if (guiMain::currentSelectedImage == 2)
-		{
-		itkFlFileWriter< ImageType >( m_AffineRegisteredMovingImage.GetPointer(), "Save affine registered image file...", "*.mh?", "", 0);
-		}
-	if (guiMain::currentSelectedImage == 3)
-		{
-		if (m_DeformableRegisteredMovingImage)
-    	{
-    	itkFlFileWriter< ImageType >( m_DeformableRegisteredMovingImage.GetPointer(),
-      	                          "Save registered image file...",
-        	                        "*.mh?", "", 0 );
-    	}
-  	else if (m_AffineRegisteredMovingImage)
-  	  {
-  	  itkFlFileWriter< ImageType >( m_AffineRegisteredMovingImage.GetPointer(),
-  	                              "Save registered image file...",
-  	                              "*.mh?", "", 0 );
-  	  }
-		}
-}
+	{
+	std::cout << "Save displayed image" << std::endl;
+	}
 
 
 void
@@ -288,9 +261,13 @@ guiMainImplementation
     }
   }
 
+
+
+
 /////////////////////////////////////////////////
 // Image view functions
 /////////////////////////////////////////////////
+
 void
 guiMainImplementation
 ::Show()
@@ -352,7 +329,6 @@ void
 guiMainImplementation
 ::SelectImageSet(unsigned int i)
   {
-  guiMain::currentSelectedImage = i;
   if (i == 0)
     {
     if ( m_MovingImageLoaded && m_MovingImage )

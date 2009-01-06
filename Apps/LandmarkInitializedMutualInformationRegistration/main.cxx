@@ -51,7 +51,9 @@ int main(int argc, char **argv)
                            MetaCommand::STRING, true);
     command.AddOptionField("InitLandmarks", "MovingLandmarksFile",
                            MetaCommand::STRING, true);
-
+		
+		
+		
     command.SetOption("TfmNone", "TfmNone", false,
                       "Do not perform registration");
     command.SetOption("TfmRigid", "TfmRigid", false,
@@ -80,27 +82,38 @@ int main(int argc, char **argv)
                            MetaCommand::INT, true, "20000");
 
 
+		command.SetOption("ROI", "ROI", false,
+                   "Setting up the ROI (1/# of the Fixed Image starting from the center");
+    command.AddOptionField("ROI", "Denominator",
+                           MetaCommand::INT, true, "1");
+	
     command.SetOption("SaveTransform", "SaveTransform", false,
                       "Save registration transform <Filename>");
     command.AddOptionField("SaveTransform", "Filename",
                             MetaCommand::STRING, true);
 
-    command.SetOption("SaveMovingImage", "SaveMovingImage", false,
+    command.SetOption("out", "out", false,
                       "Save registered moving image <Filename>");
-    command.AddOptionField("SaveMovingImage", "Filename",
+    command.AddOptionField("out", "Filename",
                            MetaCommand::STRING, true);
 
-    // Fields are added in order
-    command.AddField("FixedImage", "FixedImage's Filename",
-                     MetaCommand::STRING, true);
-    command.AddField("MovingImage","MovingImage's Filename",
-                     MetaCommand::STRING, true);
-    
-    if(!command.Parse(argc,argv))
+    command.SetOption("ref", "ref", false,
+											"Fixed image <Filename>");
+		command.AddOptionField("ref", "Filename",
+														MetaCommand::STRING, true);
+
+		command.SetOption("in", "in", false,
+											"Moving image <Filename>");
+		command.AddOptionField("in", "Filename",
+													MetaCommand::STRING, true);
+
+
+		
+
+		if(!command.Parse(argc,argv))
       {
       return 1;
       }
-
     typedef itk::Image<short, 3>            ImageType;
     typedef ImageRegistrationApp<ImageType> ImageRegistrationAppType;
 
@@ -123,7 +136,7 @@ int main(int argc, char **argv)
     
     /** Read the fixed image **/
     ImageReaderType::Pointer fixedReader = ImageReaderType::New();
-    fixedReader->SetFileName(command.GetValueAsString("FixedImage").c_str());
+    fixedReader->SetFileName(command.GetValueAsString("ref", "Filename").c_str());
     try
       {
       fixedReader->Update();
@@ -139,8 +152,8 @@ int main(int argc, char **argv)
     /** Read the moving image **/
     ImageReaderType::Pointer movingReader = ImageReaderType::New();
     movingReader = ImageReaderType::New();
-    movingReader->SetFileName(command.GetValueAsString("MovingImage").c_str());
-    try
+    movingReader->SetFileName(command.GetValueAsString("in", "Filename").c_str());
+		try
       {
       movingReader->Update();
       }
@@ -167,7 +180,7 @@ int main(int argc, char **argv)
                            command.GetValueAsInt("MetricSamples","Number") );
     imageRegistrationApp->SetAffineNumberOfSpatialSamples(
                            command.GetValueAsInt("MetricSamples","Number") );
-
+		imageRegistrationApp->SetROI( command.GetValueAsInt("ROI", "Denominator") );
 
     if( command.GetOptionWasSet("InitMass") )
       {
@@ -415,13 +428,13 @@ int main(int argc, char **argv)
     std::cout << timeRegEnd - timeInitEnd << " ";
     std::cout << finalMetricValue << std::endl;
     
-    if( command.GetOptionWasSet("SaveMovingImage") )
+    if( command.GetOptionWasSet("out") )
       {
       std::cout << "Writing registered moving image to "
-                << command.GetValueAsString("SaveMovingImage", "Filename")
+                << command.GetValueAsString("out", "Filename")
                 << std::endl;
       ImageWriterType::Pointer imageWriter = ImageWriterType::New();
-      imageWriter->SetFileName(  command.GetValueAsString("SaveMovingImage",
+      imageWriter->SetFileName(  command.GetValueAsString("out",
                                                           "Filename").c_str() );
       imageWriter->SetUseCompression(true);
       imageWriter->SetInput( 
@@ -454,11 +467,9 @@ int main(int argc, char **argv)
         }
       transformWriter->Update();
       }
-
-    return 0;
-    }
-
-  guiMainImplementation* gui = new guiMainImplementation();
+		return 0;
+	}
+	guiMainImplementation* gui = new guiMainImplementation();
   gui->Show();
-  return Fl::run();
+  return Fl::run();	
   }

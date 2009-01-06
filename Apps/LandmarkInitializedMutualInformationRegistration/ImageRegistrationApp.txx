@@ -578,6 +578,61 @@ ImageRegistrationApp< TImage >
             //<< "   Center = " << m_FinalTransform->GetCenter() << std::endl;
   }
 
+
+template< class TImage >
+void
+ImageRegistrationApp< TImage >
+::SetROI(unsigned int denominator)
+  {
+  std::cout << "Setting ROI to 1/" << denominator  << std::endl;
+  typename ImageType::SizeType sizeROI;
+  typename ImageType::SizeType sizeImageFixed;
+  typename ImageType::SizeType sizeImageMoving;
+	typename ImageType::IndexType start;
+  double denominator_new;
+  sizeImageFixed = m_FixedImage->GetLargestPossibleRegion().GetSize();
+  sizeImageMoving = m_MovingImage->GetLargestPossibleRegion().GetSize();
+  std::cout << "Size Image Fixed: " << sizeImageFixed << std::endl;
+  std::cout << "Size Image Moving: " << sizeImageMoving << std::endl;
+
+  for( int i=0; i<3; i++ )
+    {
+		if( sizeImageMoving[i] >= sizeImageFixed[i] )
+			{
+			denominator_new = ((double)denominator / (double)sizeImageMoving[i]) * (double)sizeImageFixed[i];
+      if( denominator_new < 1 )
+				{
+				denominator_new = 1;
+				}
+			std::cout << "denominator_new_" << i << ": " << denominator_new << std::endl;
+      sizeROI[i] = sizeImageFixed[i] / denominator_new;
+			}
+    else
+			{
+			sizeImageFixed[i] = sizeImageMoving[i];
+			sizeROI[i] = sizeImageMoving[i];
+			}
+	  }
+
+  std::cout << "Size ROI: " << sizeROI << std::endl;
+  std::cout << "Size Image Fixed: " << sizeImageFixed << std::endl;
+  std::cout << "Size Image Moving: " << sizeImageMoving << std::endl;
+  
+  start[0] = (sizeImageFixed[0] / 2) - (sizeROI[0] / 2);
+  start[1] = (sizeImageFixed[1] / 2) - (sizeROI[1] / 2);
+  start[2] = (sizeImageFixed[2] / 2) - (sizeROI[2] / 2);
+	
+	std::cout << "Start ROI: " << start << std::endl;	
+
+  
+	m_FixedImageRegion.SetSize( sizeROI );
+  m_FixedImageRegion.SetIndex( start );
+  
+  
+  }
+
+
+
 template< class TImage >
 void
 ImageRegistrationApp< TImage >
@@ -664,7 +719,7 @@ ImageRegistrationApp< TImage >
   registrator->SetMovingImage( m_MovingImage ) ;   // ITK transforms the fixed 
   registrator->SetFixedImage( m_FixedImage ) ; //   image into the moving image
   registrator->SetFixedImageRegion( m_FixedImageRegion ) ;
-  registrator->SetOptimizerScales( m_RigidScales );
+	registrator->SetOptimizerScales( m_RigidScales );
   registrator->SetOptimizerNumberOfIterations(m_RigidNumberOfIterations);
   switch(m_OptimizerMethod)
     {
