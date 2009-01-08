@@ -44,7 +44,6 @@ LandmarkSliceViewer<TImagePixel>
   size.Fill(0);
   m_RegionOfInterest.SetIndex(index);
   m_RegionOfInterest.SetSize(size);
-
   this->cColorTable->SetColor(0, 0, 0, 1, "Blue");
   this->cColorTable->SetColor(1, 1, 0, 0, "Red");
   this->cColorTable->SetColor(2, 0, 1, 0, "Green");

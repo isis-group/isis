@@ -73,10 +73,12 @@ class RigidRegistrator : public ImageRegistrationMethod < TImage, TImage >
 
     void StartRegistration() ;
 
+
     TransformType * GetTypedTransform(void)
       {
       return static_cast<TransformType *>(Superclass::GetTransform());
       }
+
 
     void SetOptimizerToOnePlusOne();
     void SetOptimizerToGradient();

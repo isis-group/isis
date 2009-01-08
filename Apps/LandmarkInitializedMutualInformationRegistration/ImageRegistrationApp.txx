@@ -184,6 +184,7 @@ ImageRegistrationApp< TImage >
 
   m_PriorRegistrationMethod = NONE;
   m_OptimizerMethod = ONEPLUSONEPLUSGRADIENT;
+	m_spatialImageObject = ImageSpatialObjectType::New();
   }
 
 template< class TImage >
@@ -582,6 +583,48 @@ ImageRegistrationApp< TImage >
 template< class TImage >
 void
 ImageRegistrationApp< TImage >
+::CreateImageMaskUsingThreshold(unsigned int threshold)
+	{
+	std::cout << "Creating image mask using threshold " << threshold << std::endl;
+
+  
+	typename BinaryFilterType::Pointer binaryFilter = BinaryFilterType::New();
+	typename MaskWriterType::Pointer maskWriter = MaskWriterType::New();
+	typename MaskReaderType::Pointer maskReader = MaskReaderType::New();
+  
+
+  binaryFilter->SetInput( m_FixedImage );
+	binaryFilter->SetOutsideValue( 0 );
+	binaryFilter->SetInsideValue( 255 );
+	binaryFilter->SetLowerThreshold( threshold );
+	binaryFilter->SetUpperThreshold( 32000 );
+	m_spatialImageObject->SetImage( binaryFilter->GetOutput() );
+  
+  m_spatialImageObject->Update();
+	}
+
+
+template< class TImage >
+void
+ImageRegistrationApp< TImage >
+::SetInitialFixedImageRegion()
+	{
+  m_FixedImageRegion.SetSize( m_MovingImage->GetLargestPossibleRegion().GetSize() );
+	typename ImageType::IndexType index;
+	index[0] = 0;
+	index[1] = 0;
+	index[2] = 0;	
+  m_FixedImageRegion.SetIndex( index );
+	std::cout << m_FixedImage->GetOrigin() << std::endl;
+	std::cout << m_MovingImage->GetOrigin() << std::endl;
+	}
+
+
+
+
+template< class TImage >
+void
+ImageRegistrationApp< TImage >
 ::SetROI(unsigned int denominator)
   {
   std::cout << "Setting ROI to 1/" << denominator  << std::endl;
@@ -680,7 +723,9 @@ ImageRegistrationApp< TImage >
   m_LoadedRegTransform->SetIdentity();
   m_LoadedRegTransform->SetCenter(m_LoadedAffineTransform->GetCenter());
   m_LoadedRegTransform->SetMatrix(m_LoadedAffineTransform->GetMatrix());
-  m_LoadedRegTransform->SetOffset(m_LoadedAffineTransform->GetOffset());
+  m_LoadedRegTransform->SetOffset(
+
+m_LoadedAffineTransform->GetOffset());
 
   m_LoadedRegValid = true;
   }
@@ -715,12 +760,17 @@ ImageRegistrationApp< TImage >
   {
   typename RigidRegistratorType::Pointer registrator = 
                                          RigidRegistratorType::New();
-
+  
   registrator->SetMovingImage( m_MovingImage ) ;   // ITK transforms the fixed 
   registrator->SetFixedImage( m_FixedImage ) ; //   image into the moving image
-  registrator->SetFixedImageRegion( m_FixedImageRegion ) ;
+  //registrator->SetFixedImageRegion( m_FixedImageRegion ) ;
+	registrator->SetFixedImageRegion( m_FixedImageRegion );
 	registrator->SetOptimizerScales( m_RigidScales );
   registrator->SetOptimizerNumberOfIterations(m_RigidNumberOfIterations);
+	
+	//registrator->GetMetric()->SetFixedImageMask( m_spatialImageObject );
+	//registrator->GetMetric()->SetMovingImageMask( m_spatialImageObject );
+
   switch(m_OptimizerMethod)
     {
     case ONEPLUSONE:

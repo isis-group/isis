@@ -20,6 +20,7 @@
 
 #include "itkImage.h"
 
+#include "itkImageSpatialObject.h"
 #include "LandmarkRegistrator.h"
 #include "MomentRegistrator.h"
 #include "RigidRegistrator.h"
@@ -28,9 +29,21 @@
 
 #include "itkRegionOfInterestImageFilter.h"
 
+#include "itkThresholdImageFilter.h"
 #include "itkAffineTransform.h"
 
 #include "itkVersor.h"
+
+//binaryImageFilter for creating the mask
+#include "itkBinaryThresholdImageFilter.h"
+
+#include "itkRegionOfInterestImageFilter.h"
+//create ImageSpatialObject with the created mask
+#include "itkImageSpatialObject.h"
+
+//debug
+#include "itkImageFileWriter.h"
+#include "itkImageFileReader.h"
 
 // including all the type of transform that could possibly be used
 // as templated type.
@@ -49,13 +62,26 @@ class ImageRegistrationApp : public Object
   
     itkNewMacro(Self);
     itkTypeMacro(ImageRegistrationApp, Object);
-  
+    
     typedef TImage                        ImageType;
     typedef typename ImageType::Pointer   ImagePointer;
     typedef typename TImage::PixelType    ImagePixelType ;
     typedef typename TImage::RegionType   RegionType ;
     typedef typename TImage::OffsetType   OffsetType ;
-  
+
+    typedef itk::Image< unsigned char, 3> MaskImageType;
+
+    typedef itk::BinaryThresholdImageFilter<
+             ImageType, MaskImageType > BinaryFilterType;
+
+		typedef itk::ImageFileWriter< MaskImageType > MaskWriterType;
+		typedef itk::ImageFileReader< MaskImageType > MaskReaderType;
+		
+
+	
+	  typedef typename itk::ImageSpatialObject< 3, unsigned char > ImageSpatialObjectType;
+
+		
     typedef MomentRegistrator< TImage >               NoneRegistratorType;
     typedef typename NoneRegistratorType::TransformType 
                                                       NoneRegTransformType;
@@ -100,7 +126,16 @@ class ImageRegistrationApp : public Object
     typedef AffineTransform<double, 3>              AffineTransformType;
     typedef itk::BSplineDeformableTransform<double, 3, 3> 
                                                     DeformableTransformType ;
-  
+
+    
+
+		typename MaskImageType::Pointer maskImage;
+
+		
+    void CreateImageMaskUsingThreshold(unsigned int);    
+
+		void SetInitialFixedImageRegion();
+
     void SetOptimizerToOnePlusOne();
 
     void SetOptimizerToGradient();
@@ -114,7 +149,7 @@ class ImageRegistrationApp : public Object
     void RegisterUsingMass();
 
     void SetROI(unsigned int);
- 
+
     void RegisterUsingMoments();
 
     void SetLoadedTransform(const LoadedRegTransformType & tfm);
@@ -200,7 +235,7 @@ class ImageRegistrationApp : public Object
     itkGetMacro(RigidMetricValue, double);
     itkGetMacro(AffineMetricValue, double);
     itkGetMacro(DeformableMetricValue, double);
-  
+    
                                     
   protected:
     ImageRegistrationApp() ;
@@ -221,7 +256,7 @@ class ImageRegistrationApp : public Object
                    GRADIENT,
                    ONEPLUSONEPLUSGRADIENT
                  } OptimizerMethodType;
-
+    
     typename NoneRegTransformType::Pointer       m_NoneRegTransform ;
     typename AffineTransformType::Pointer        m_NoneAffineTransform ;
     typename CenterRegTransformType::Pointer     m_CenterRegTransform ;
@@ -242,10 +277,14 @@ class ImageRegistrationApp : public Object
     typename DeformableTransformType::Pointer    m_DeformableRegTransform ;
     typename AffineTransformType::Pointer        m_FinalTransform;
     typename DeformableTransformType::Pointer    m_FinalDeformableTransform;
+		typename ImageSpatialObjectType::Pointer 		 m_spatialImageObject;
+
     
     DeformableParametersType            m_FinalParameters;
     
     ImagePointer                        m_FinalDeformableImageP;
+
+		
   
     double m_RigidMetricValue;
     double m_AffineMetricValue;

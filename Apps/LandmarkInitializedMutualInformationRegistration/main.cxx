@@ -82,8 +82,13 @@ int main(int argc, char **argv)
                            MetaCommand::INT, true, "20000");
 
 
+		command.SetOption("Threshold", "Threshold", false,
+											"Setting up th threshold for defining the ROI");
+		command.AddOptionField("Threshold", "ROIThreshold",
+														MetaCommand::INT, true, "0");
+
 		command.SetOption("ROI", "ROI", false,
-                   "Setting up the ROI (1/# of the Fixed Image starting from the center");
+                   		"Setting up the ROI (1/# of the Fixed Image starting from the center");
     command.AddOptionField("ROI", "Denominator",
                            MetaCommand::INT, true, "1");
 	
@@ -164,11 +169,10 @@ int main(int argc, char **argv)
       return 1;
       }
     imageRegistrationApp->SetMovingImage( movingReader->GetOutput() );
-
     imageRegistrationApp->SetFixedImageRegion( 
-                                fixedReader->GetOutput()
+                              fixedReader->GetOutput()
                                             ->GetLargestPossibleRegion() );
-
+		
     std::cout << "Optimizer number of iterations = "
               << command.GetValueAsInt("OptIterations", "Number")
               << std::endl;
@@ -180,8 +184,17 @@ int main(int argc, char **argv)
                            command.GetValueAsInt("MetricSamples","Number") );
     imageRegistrationApp->SetAffineNumberOfSpatialSamples(
                            command.GetValueAsInt("MetricSamples","Number") );
-		imageRegistrationApp->SetROI( command.GetValueAsInt("ROI", "Denominator") );
 
+		//imageRegistrationApp->SetInitialFixedImageRegion();
+
+		if( command.GetOptionWasSet("ROI") )
+			{
+			imageRegistrationApp->SetROI( command.GetValueAsInt("ROI", "Denominator") );
+			}
+		if( command.GetOptionWasSet("Threshold") )
+			{
+			imageRegistrationApp->CreateImageMaskUsingThreshold( command.GetValueAsInt("Threshold", "ROIThreshold") );
+			}
     if( command.GetOptionWasSet("InitMass") )
       {
       imageRegistrationApp->RegisterUsingMass();

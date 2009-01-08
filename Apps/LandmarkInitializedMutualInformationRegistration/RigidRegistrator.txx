@@ -118,6 +118,7 @@ RigidRegistrator< TImage >
       opt->SetMaximumIteration(m_OptimizerNumberOfIterations);
       opt->SetScales( m_OptimizerScales );
       this->SetOptimizer(opt);
+      
       this->SetSecondaryOptimizer(0);
       if(m_Observer)
         {
@@ -162,6 +163,9 @@ RigidRegistrator< TImage >
     throw(e);
     }
   }
+
+
+
 
 template< class TImage >
 void
