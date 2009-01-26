@@ -3,6 +3,9 @@
 // C++ headers
 #include <iostream>
 
+/* this is a test comment */
+
+
 // ITK related stuff
 #include "itkImageRegistrationMethod.h"
 #include "itkVersorRigid3DTransform.h"
