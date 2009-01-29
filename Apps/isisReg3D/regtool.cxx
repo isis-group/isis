@@ -121,23 +121,22 @@ int main ( int argc, char** argv )
 	                         true );
 
 	// -out -- the output file
-	command.SetOption ( "output", "out", true, "The result of the\
-	                    registration process" );
+	command.SetOption ( "output", "out", true, "The result of the registration process" );
 	command.AddOptionField ( "output","resultImageName", MetaCommand::STRING,
 	                         true );
 
 	// -ref -- the fixed image file
-	command.SetOption ( "ref", "ref", true, "The moving image." );
+	command.SetOption ( "ref", "ref", true, "The fixed image." );
 	command.AddOptionField ( "ref","refImageName", MetaCommand::STRING, true );
 
 	// -iter -- number of iterations
-	command.SetOption ("iter", "iter", false, "Number of iterations." );
+	command.SetOption ("iter", "iter", false, "Number of optimizer iterations." );
 	command.AddOptionField( "iter", "niterations", MetaCommand::INT,
 							 true, "200");
 
 	// bins - bumber of bins to compute the entropy
 	command.SetOption ("bins", "bins",false,
-					   "Number if bins for calculating the entropy value");
+					   "Number of bins for calculating the entropy value");
 	command.AddOptionField("bins", "nbins", MetaCommand::INT, true, "30");
 
 	// parse the commandline and quit if there are any parameter errors
@@ -145,7 +144,7 @@ int main ( int argc, char** argv )
 	{
 		std::cout << progName << ": ERROR parsing arguments."
 		<< std::endl
-		<< "Usage: " << progName << "-in <moving image> -ref <fixed image>"
+		<< "Usage: " << progName << " -in <moving image> -ref <fixed image> [optional Options]"
 		<< " -out <output image>" << std::endl;
 		return EXIT_FAILURE;
 	}
