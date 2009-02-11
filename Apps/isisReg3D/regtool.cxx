@@ -23,6 +23,15 @@
 // additional stuff
 #include "isisIterationObserver.h"
 
+//masking related stuff
+#include "itkImageMaskSpatialObject.h"
+#include "itkBinaryThresholdImageFilter.h"
+#include "itkMinimumMaximumImageCalculator.h"
+
+#include "itkOtsuThresholdImageFilter.h"
+
+
+
 int main ( int argc, char** argv )
 {
 
@@ -41,6 +50,7 @@ int main ( int argc, char** argv )
 	typedef itk::Image<InputPixelType, Dimension> MovingImageType;
 	typedef itk::Image<OutputPixelType, Dimension> OutputImageType;
 	typedef itk::Image<InternalPixelType, Dimension> InternalImageType;
+	typedef itk::Image<unsigned char, Dimension> CharImageType;
 
 	/**************************************************
 	 * IO types
@@ -81,11 +91,23 @@ int main ( int argc, char** argv )
 	typedef itk::CastImageFilter<FixedImageType, OutputImageType>
 	CastFilterType;
 
+	typedef itk::CastImageFilter<FixedImageType, CharImageType>
+	MaskCastFilterType;
+
 	// checker board
 	typedef itk::CheckerBoardImageFilter<FixedImageType>
 	CheckerBoardFilterType;
 
+	typedef itk::BinaryThresholdImageFilter<FixedImageType, CharImageType>
+	BinaryThresholdImageFilterType;
 
+	typedef itk::OtsuThresholdImageFilter<FixedImageType, CharImageType>
+	OtsuThresholdImageFilterType;
+
+	typedef itk::ImageMaskSpatialObject<Dimension> MaskObjectType;
+
+	typedef itk::MinimumMaximumImageCalculator<FixedImageType>
+	MinimumMaximumImageCalculatorType;
 	/**************************************************
 	 * variables
 	 **************************************************/
@@ -97,12 +119,21 @@ int main ( int argc, char** argv )
 	ParametersType params ( transform->GetNumberOfParameters() );
 
 	FixedReaderType::Pointer fixedImageReader = FixedReaderType::New();
+	FixedReaderType::Pointer maskImageReader = FixedReaderType::New();
 	MovingReaderType::Pointer movingImageReader = MovingReaderType::New();
 	WriterType::Pointer writer = WriterType::New();
 
 	ResampleFilterType::Pointer resampler = ResampleFilterType::New();
 	CastFilterType::Pointer caster = CastFilterType::New();
+	MaskCastFilterType::Pointer maskCaster = MaskCastFilterType::New();
 	CheckerBoardFilterType::Pointer checker = CheckerBoardFilterType::New();
+
+	//mask related stuff
+	OtsuThresholdImageFilterType::Pointer otsuThresholdFilter = OtsuThresholdImageFilterType::New();
+	CharImageType::Pointer charImage = CharImageType::New();
+	MaskObjectType::Pointer maskObject = MaskObjectType::New();
+	MinimumMaximumImageCalculatorType::Pointer minMaxCalc = MinimumMaximumImageCalculatorType::New();
+	BinaryThresholdImageFilterType::Pointer binaryThresholdFilter = BinaryThresholdImageFilterType::New();
 
 	MetaCommand command;
 
@@ -139,6 +170,35 @@ int main ( int argc, char** argv )
 					   "Number of bins for calculating the entropy value");
 	command.AddOptionField("bins", "nbins", MetaCommand::INT, true, "30");
 
+	//absolute threshold
+	command.SetOption ("threshold_abs", "threshold_abs",false,
+						   "Absolute threshold for creating a mask applied during the registration");
+	command.AddOptionField("threshold_abs", "vthreshold_abs", MetaCommand::INT, true, "0");
+
+	//relative threshold
+	command.SetOption ("threshold_rel", "threshold_rel",false,
+							   "Relative threshold for creating a mask applied during the registration. Has to be between 0 and 1");
+	command.AddOptionField("threshold_rel", "vthreshold_rel", MetaCommand::FLOAT, true, "0");
+
+	//option to save the mask calculated with the threshold
+	command.SetOption ( "savemask", "sm", false, "Path to save the mask" );
+	command.AddOptionField ( "savemask","pathsavemask", MetaCommand::STRING,
+		                         true );
+
+	//option to load a mask from a file
+	command.SetOption ( "loadmask", "lm", false, "Loading an existing mask applied in the registration" );
+	command.AddOptionField ( "loadmask","pathloadmask", MetaCommand::STRING,
+			                         true );
+
+	//option to change the crop for limiting the ROI
+	command.SetOption ("crop", "crop",false,
+						   "crop for limiting the ROI. ""1"" is maximum and represents the whole image.");
+	command.AddOptionField("crop", "vcrop", MetaCommand::FLOAT, true, "1");
+
+	command.SetOption ("otsuMask", "otsuMask", false,
+					   "Using the OtsuSegmentationMethod for creating the mask. Threshold needs to be set, too.");
+
+
 	// parse the commandline and quit if there are any parameter errors
 	if ( !command.Parse ( argc,argv ) )
 	{
@@ -148,6 +208,25 @@ int main ( int argc, char** argv )
 		<< " -out <output image>" << std::endl;
 		return EXIT_FAILURE;
 	}
+
+	if ((command.GetOptionWasSet("threshold_rel") or command.GetOptionWasSet("threshold_abs")) and command.GetOptionWasSet("loadmask"))
+	{
+		std::cout << "attempt to use both methods for getting the mask!" << std::endl;
+		return EXIT_FAILURE;
+	}
+	if (command.GetOptionWasSet("threshold_rel") and command.GetOptionWasSet("threshold_abs"))
+	{
+		std::cout << "attempt to use relative and absolute threshold method for getting the mask!" << std::endl;
+		return EXIT_FAILURE;
+	}
+	if (command.GetOptionWasSet("threshold_rel") and command.GetValueAsFloat("threshold_rel", "vthreshold_rel") > 1)
+	{
+		std::cout << "threshold_rel has to be between 0 and 1 included!" << std::endl;
+		return EXIT_FAILURE;
+	}
+
+
+
 
 	// configure the readers
 
@@ -167,6 +246,77 @@ int main ( int argc, char** argv )
 	}
 
 	// preprocess the input image data
+	if (command.GetOptionWasSet("loadmask"))
+	{
+		maskImageReader->SetFileName( command.GetValueAsString("loadmask", "pathloadmask"));
+		maskCaster->SetInput( maskImageReader->GetOutput() );
+		maskCaster->Update();
+		maskObject->SetImage( maskCaster->GetOutput() );
+
+	}
+
+	if (command.GetOptionWasSet("otsuMask"))
+	{
+		otsuThresholdFilter->SetNumberOfHistogramBins( 128 );
+		otsuThresholdFilter->SetInput( fixedImageReader->GetOutput() );
+		fixedImageReader->Update();
+		otsuThresholdFilter->SetInsideValue( 0 );
+		otsuThresholdFilter->SetOutsideValue( 255 );
+		otsuThresholdFilter->Update();
+		if(command.GetOptionWasSet("savemask"))
+		{
+			std::cout << "Saving otsuMask to " << command.GetValueAsString("savemask", "pathsavemask") << std::endl;
+			typedef itk::ImageFileWriter<CharImageType> BinaryImageWriterType;
+			BinaryImageWriterType::Pointer binaryWriter = BinaryImageWriterType::New();
+			binaryWriter->SetFileName(command.GetValueAsString("savemask", "pathsavemask"));
+			binaryWriter->SetInput( otsuThresholdFilter->GetOutput() );
+			binaryWriter->Update();
+		}
+		maskObject->SetImage(otsuThresholdFilter->GetOutput() );
+		maskObject->Update();
+	}
+	if (command.GetOptionWasSet("threshold_rel") or command.GetOptionWasSet("threshold_abs"))
+	{
+
+		//FixedImageType::PixelType threshold;
+		int threshold;
+		if (command.GetOptionWasSet("threshold_rel"))
+		{
+			minMaxCalc->SetImage( fixedImageReader->GetOutput() );
+			fixedImageReader->Update();
+			minMaxCalc->Compute();
+			threshold = static_cast<int>(minMaxCalc->GetMaximum() * (command.GetValueAsFloat("threshold_rel", "vthreshold_rel")));
+		}
+		if (command.GetOptionWasSet("threshold_abs"))
+		{
+			threshold = command.GetValueAsInt("threshold_abs", "vthreshold_abs");
+		}
+
+		std::cout << "Threshold for creating the mask: " << threshold << std::endl;
+		std::cout << "Maximum Image: " << minMaxCalc->GetMaximum() << std::endl;
+		//used for creating the mask
+
+		binaryThresholdFilter->SetInput( fixedImageReader->GetOutput() );
+		binaryThresholdFilter->SetOutsideValue( 0 );
+		binaryThresholdFilter->SetInsideValue( 255 );
+		binaryThresholdFilter->SetLowerThreshold( threshold );
+		binaryThresholdFilter->SetUpperThreshold( minMaxCalc->GetMaximum()  );
+		binaryThresholdFilter->Update();
+		//debug
+		if (command.GetOptionWasSet("savemask"))
+		{
+			typedef itk::ImageFileWriter<CharImageType> BinaryImageWriterType;
+			BinaryImageWriterType::Pointer binaryWriter = BinaryImageWriterType::New();
+			binaryWriter->SetFileName(command.GetValueAsString("savemask", "pathsavemask"));
+			binaryWriter->SetInput( binaryThresholdFilter->GetOutput() );
+			binaryWriter->Update();
+		}
+		maskObject->SetImage( binaryThresholdFilter->GetOutput() );
+		maskObject->Update();
+
+	}
+
+
 
 	// configure the registration method
 	registration->SetMetric ( metric );
@@ -188,7 +338,7 @@ int main ( int argc, char** argv )
 	FixedImageType::IndexType index = fixedImageRegion.GetIndex();
 
 	// the cropping factor for the ROI relativ to the whole fixed image
-	const float cropFactor = 0.5;
+	const float cropFactor = command.GetValueAsFloat("crop", "vcrop");
 	const int dims = FixedImageType::RegionType::GetImageDimension();
 
 	for ( int i =0;i<dims;i++ )
@@ -201,6 +351,7 @@ int main ( int argc, char** argv )
 		        ( size[i] - newSize ) / 2.0 );
 		size[i] = newSize;
 	}
+
 
 	fixedImageRegion.SetIndex ( index );
 	fixedImageRegion.SetSize ( size );
@@ -240,6 +391,10 @@ int main ( int argc, char** argv )
 	// disable samples
 	// metric->UseAllPixelsOn();
 	metric->SetNumberOfHistogramBins ( nbins );
+	if (command.GetOptionWasSet("threshold_rel") or command.GetOptionWasSet("loadmask") or command.GetOptionWasSet("threshold_abs") or command.GetOptionWasSet("otsuMask"))
+	{
+		metric->SetFixedImageMask( maskObject );
+	}
 
 	/**************************************************
 	 * OPTIMIZER

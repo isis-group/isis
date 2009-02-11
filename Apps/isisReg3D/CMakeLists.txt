@@ -29,5 +29,5 @@ ADD_EXECUTABLE(isischecker3d
 	checkerboard.cxx)
 
 # link versus ITK library
-TARGET_LINK_LIBRARIES(isisreg3d ITKIO ITKNumerics)
+TARGET_LINK_LIBRARIES(isisreg3d ITKIO ITKNumerics ITKSpatialObject)
 TARGET_LINK_LIBRARIES(isischecker3d ITKIO)
