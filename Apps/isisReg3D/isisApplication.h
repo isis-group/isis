@@ -2,7 +2,7 @@
  * isisApplication.h
  *
  * \date Feb 11, 2009
- * \author Erik T&uuml;rke.
+ * \author Thomas Pröger
  */
 
 #ifndef ISISAPPLICATION_H_
@@ -24,12 +24,22 @@ private:
 	static Self* m_instance;
 	std::string name;
 
+	class Guardian {
+		~Guardian() {
+			if (Application::m_instance != 0)
+				delete Application::m_instance;
+		}
+	};
+	friend class Guardian;	// we need access to private members
+
 protected:
 
-	/** Constructor - Hidden though singleton pattern. */
-	Application(void){}
-	/** Destructor - Hidden though singleton pattern. */
-	~Application(void){}
+	/** Constructor - Hidden on account of the singleton pattern. */
+	Application(void) {
+	}
+	/** Destructor - Hidden in account of the singleton pattern. */
+	~Application(void) {
+	}
 
 public:
 
@@ -37,7 +47,7 @@ public:
 	 * \typedef
 	 * The ITK default naming convention.
 	 */
-	typedef Application 	Self;
+	typedef Application Self;
 
 	/**
 	 * \brief Access to the one and only class instance.
@@ -59,15 +69,13 @@ public:
 	 */
 	virtual void start() = 0;
 
-
 };
 
 Application::Self* m_instance = 0;
 
-inline Self *Application::instance(void)
-{
-	if (!m_instance)
-	{
+inline Self *Application::instance(void) {
+	if (!m_instance) {
+		static Guardian g;
 		m_instance = new Self;
 	}
 	return m_instance;
