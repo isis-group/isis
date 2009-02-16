@@ -25,6 +25,7 @@
 
 //masking related stuff
 #include "itkImageMaskSpatialObject.h"
+#include "itkImageSpatialObject.h"
 #include "itkBinaryThresholdImageFilter.h"
 #include "itkMinimumMaximumImageCalculator.h"
 
@@ -105,6 +106,12 @@ int main ( int argc, char** argv )
 	OtsuThresholdImageFilterType;
 
 	typedef itk::ImageMaskSpatialObject<Dimension> MaskObjectType;
+
+	typedef itk::ImageSpatialObject<Dimension, InputPixelType>
+	FixedImageSpatialObjectType;
+
+	typedef itk::ImageSpatialObject<Dimension, InputPixelType>
+	MovingImageSpatialObjectType;
 
 	typedef itk::MinimumMaximumImageCalculator<FixedImageType>
 	MinimumMaximumImageCalculatorType;
@@ -351,12 +358,31 @@ int main ( int argc, char** argv )
 		        ( size[i] - newSize ) / 2.0 );
 		size[i] = newSize;
 	}
-
-
 	fixedImageRegion.SetIndex ( index );
 	fixedImageRegion.SetSize ( size );
+
 	// end crop image region
 
+	if (!command.GetOptionWasSet("crop"))
+	{
+		//get a ImageMaskSpatialObject of the moving image size including intensity 255 over the whole volume
+		//define this mask as the fixedImageMask
+		std::cout << "Using MovingMask" << std::endl;
+		minMaxCalc->SetImage( movingImageReader->GetOutput() );
+		movingImageReader->Update();
+		minMaxCalc->Compute();
+		binaryThresholdFilter->SetInput( movingImageReader->GetOutput() );
+		binaryThresholdFilter->SetOutsideValue( 0 );
+		binaryThresholdFilter->SetInsideValue( 255 );
+		binaryThresholdFilter->SetLowerThreshold( 0 );
+		binaryThresholdFilter->SetUpperThreshold( minMaxCalc->GetMaximum()  );
+		binaryThresholdFilter->Update();
+		maskObject->SetImage( binaryThresholdFilter->GetOutput() );
+		maskObject->Update();
+		metric->SetFixedImageMask( maskObject );
+		maskObject->Print(std::cout);
+
+	}
 	registration->SetFixedImageRegion ( fixedImageRegion );
 
 	// init transform parameters
