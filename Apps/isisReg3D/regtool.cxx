@@ -363,11 +363,26 @@ int main ( int argc, char** argv )
 
 	// end crop image region
 
-	if (!command.GetOptionWasSet("crop"))
+
+	//compare the image size of the moving image and the fixed image.
+	fixedImageReader->Update();
+	movingImageReader->Update();
+	FixedImageType::SizeType sizeFixed = fixedImageReader->GetOutput()->GetLargestPossibleRegion().GetSize();
+	FixedImageType::SizeType sizeMoving = movingImageReader->GetOutput()->GetLargestPossibleRegion().GetSize();
+	bool fixedImageIsBigger = false;
+	for (int i=0; i<3; i++)
+	{
+		if (sizeFixed[i] > sizeMoving[i])
+		{
+			fixedImageIsBigger = true;
+		}
+	}
+
+	if (fixedImageIsBigger and (!command.GetOptionWasSet("loadmask")))
 	{
 		//get a ImageMaskSpatialObject of the moving image size including intensity 255 over the whole volume
 		//define this mask as the fixedImageMask
-		std::cout << "Using MovingMask" << std::endl;
+		std::cout << "Fixed image is bigger than moving image...creating image mask" << std::endl;
 		minMaxCalc->SetImage( movingImageReader->GetOutput() );
 		movingImageReader->Update();
 		minMaxCalc->Compute();
@@ -379,9 +394,16 @@ int main ( int argc, char** argv )
 		binaryThresholdFilter->Update();
 		maskObject->SetImage( binaryThresholdFilter->GetOutput() );
 		maskObject->Update();
-		metric->SetFixedImageMask( maskObject );
-		maskObject->Print(std::cout);
 
+		metric->SetFixedImage( fixedImageReader->GetOutput() );
+		metric->SetMovingImage( movingImageReader->GetOutput() );
+		metric->SetFixedImageRegion( movingImageReader->GetOutput()->GetLargestPossibleRegion() );
+		metric->SetFixedImageMask( maskObject );
+		//The option UseAllPixelOn() disables the random sampling and uses all the pixels of the FixedImageRegion in order to estimate the joint intensity PDF.
+		metric->UseAllPixelsOn();
+		//metric->SetNumberOfSpatialSamples( static_cast<int>((movingImageReader->GetOutput()->GetLargestPossibleRegion().GetNumberOfPixels()) * 0.01) );
+		metric->Initialize();
+		std::cout << "size: " << metric->GetFixedImageRegion() << std::endl;
 	}
 	registration->SetFixedImageRegion ( fixedImageRegion );
 
@@ -410,17 +432,22 @@ int main ( int argc, char** argv )
 	/**************************************************
 	 * METRIC
 	 *************************************************/
+
 	const unsigned int nPixels = fixedImageRegion.GetNumberOfPixels();
 	// be aware that this value is relativ to the CROPED image region.
-	metric->SetNumberOfSpatialSamples ( static_cast<int> ( nPixels * 0.01 ) );
-	//metric->SetNumberOfSpatialSamples(1000);
-	// disable samples
-	// metric->UseAllPixelsOn();
+	if (!fixedImageIsBigger)
+	{
+		metric->SetNumberOfSpatialSamples ( static_cast<int> ( nPixels * 0.01 ) );
+	}
+
 	metric->SetNumberOfHistogramBins ( nbins );
+
 	if (command.GetOptionWasSet("threshold_rel") or command.GetOptionWasSet("loadmask") or command.GetOptionWasSet("threshold_abs") or command.GetOptionWasSet("otsuMask"))
 	{
 		metric->SetFixedImageMask( maskObject );
 	}
+	std::cout << "spatial samples: " << metric->GetNumberOfSpatialSamples() << std::endl;
+
 
 	/**************************************************
 	 * OPTIMIZER
