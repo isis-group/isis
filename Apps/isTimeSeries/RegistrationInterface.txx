@@ -7,6 +7,8 @@
 
 #include "RegistrationInterface.h"
 
+namespace isis {
+
 template< class TFixedImageType, class TMovingImageType >
 RegistrationInterface< TFixedImageType, TMovingImageType >
 ::RegistrationInterface()
@@ -225,4 +227,6 @@ RegistrationInterface< TFixedImage, TMovingImage >
 ::SetOptimizer( Self::OptimizerType optimizer )
 {
 	m_Optimizer = optimizer;
+}
+
 }

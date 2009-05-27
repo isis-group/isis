@@ -12,6 +12,7 @@
 #include "itkImage.h"
 #include "itkExtractImageFilter.h"
 
+namespace isis {
 
 template< class TImageInput, class TImageOutput >
 class TimeStepExtractorFilter
@@ -70,5 +71,6 @@ private:
 
 };
 
+}
 #include "timeStepExtractorFilter.txx"
 #endif /* _TIMESTEPEXTRACTORFILTER_H_ */

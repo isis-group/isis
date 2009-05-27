@@ -32,9 +32,9 @@ int main( int argc, char** argv)
 	typedef itk::Image< PixelType, 3 > FixedImageType;
 	typedef itk::Image< PixelType, 3 > MovingImageType;
 
-	typedef TimeStepExtractorFilter< InputImageType, OutputImageType > TimeStepExtractorFilterType;
+	typedef isis::TimeStepExtractorFilter< InputImageType, OutputImageType > TimeStepExtractorFilterType;
 
-	typedef RegistrationInterface< FixedImageType, MovingImageType > RegistrationInterfaceType;
+	typedef isis::RegistrationInterface< FixedImageType, MovingImageType > RegistrationInterfaceType;
 
 
 

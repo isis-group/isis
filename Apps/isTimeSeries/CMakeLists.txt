@@ -1,7 +1,7 @@
 # this option is required in cmake version 2.4
 cmake_minimum_required(VERSION 2.4)
 
-PROJECT(ITKSeries)
+PROJECT(isTimeSeries)
 
 # set(CMAKE_BUILD_TYPE "Debug")
 
@@ -22,10 +22,10 @@ ENDIF(ITK_FOUND)
 
 
 #the executables
-ADD_EXECUTABLE(ITKSeries
+ADD_EXECUTABLE(isTimeSeries
 	main.cxx
 	)
 
 
 # link versus ITK library
-TARGET_LINK_LIBRARIES(ITKSeries ITKIO ITKNumerics ITKSpatialObject)
+TARGET_LINK_LIBRARIES(isTimeSeries ITKIO ITKNumerics ITKSpatialObject)

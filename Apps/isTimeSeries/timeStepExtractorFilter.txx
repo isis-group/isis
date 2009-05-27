@@ -9,7 +9,7 @@
 
 #include "timeStepExtractorFilter.h"
 
-
+namespace isis {
 
 
 template< class TImageInput, class TImageOutput >
@@ -97,4 +97,6 @@ TimeStepExtractorFilter< TImageInput, TImageOutput >
 	return m_NumberOfTimeSteps;
 }
 
+
+}
 #endif //TIMESTEPEXTRACTOR_TXX

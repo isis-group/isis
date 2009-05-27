@@ -35,6 +35,8 @@
 #include "itkLinearInterpolateImageFunction.h"
 
 
+namespace isis {
+
 
 
 template< class TFixedImageType, class TMovingImageType >
@@ -170,7 +172,7 @@ private:
 	typename LinearInterpolatorType::Pointer 		m_LinearInterpolator;
 };
 
-
+}
 
 
 #include "RegistrationInterface.txx"
