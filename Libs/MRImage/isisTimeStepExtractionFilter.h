@@ -97,8 +97,8 @@ private:
 
 } // end namespace isis
 
-#ifndef ITK_MANUAL_INSTANTIATION
+#ifndef ITK_TEMPLATE_TXX
 #include "isisTimeStepExtractionFilter.txx"
-#endif /* ITK_MANUAL_INSTANTIATION */
+#endif /* ITK_TEMPLATE_TXX */
 
 #endif /* __TIMESTEPEXTRACTIONFILTER_H_ */
