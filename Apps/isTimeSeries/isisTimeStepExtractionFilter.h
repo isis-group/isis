@@ -12,6 +12,7 @@
 
 #include "itkImageToImageFilter.h"
 #include "itkExtractImageFilter.h"
+#include "itkSmartPointer.h"
 
 
 namespace isis {
@@ -31,6 +32,7 @@ public:
 	itkStaticConstMacro( OutputImageDimension, unsigned int,
 			TOutputImage::ImageDimension );
 
+
 	typedef TInputImage								InputImageType;
 	typedef TOutputImage							OutputImageType;
 
@@ -40,6 +42,8 @@ public:
 			< TInputImage, TOutputImage >			Superclass;
 	typedef itk::SmartPointer< Self >				Pointer;
 	typedef itk::SmartPointer< const Self >			ConstPointer;
+
+	typedef typename Superclass::InputImagePointer	InputImagePointer;
 
 	itkNewMacro( Self );
 
@@ -52,10 +56,12 @@ public:
 	typedef typename InputImageType::SizeType		InputSizeType;
 	typedef typename InputImageType::IndexType		InputIndexType;
 
-	typedef typename InputImageType::RegionType		InputRegionType;
-	typedef typename OutputImageType::RegionType	OutputRegionType;
+	typedef typename TInputImage::RegionType		InputRegionType;
+	typedef typename TOutputImage::RegionType		OutputRegionType;
 
 	itkSetMacro( RequestedTimeStep, unsigned int );
+
+	virtual void GenerateOutputInformation();
 
 
 protected:
@@ -69,7 +75,9 @@ protected:
 
 	void GenerateData( void );
 
+
 private:
+	TimeStepExtractionFilter(const Self&);
 
 	typename InputImageType::Pointer				m_InputImage;
 	typename OutputImageType::Pointer				m_OutputImage;
@@ -80,6 +88,9 @@ private:
 
 	InputRegionType 								m_InputRegion;
 	InputRegionType 								m_DesiredRegion;
+	InputRegionType									m_ExtractionRegion;
+	OutputRegionType								m_OutputRegion;
+
 
 	unsigned int									m_RequestedTimeStep;
 };

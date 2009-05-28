@@ -51,12 +51,13 @@ int main( int argc, char** argv)
 		TimeStepExtractionFilterType::New();
 
 	reader->SetFileName( argv[1] );
+	reader->Update();
 
 	extractionFilter->SetInput( reader->GetOutput() );
-	extractionFilter->SetRequestedTimeStep( atoi(argv[2]) );
-	std::cout << "djfksjf" << std::endl;
-	extractionFilter->Update();
 
+	extractionFilter->SetRequestedTimeStep( atoi(argv[2]) );
+
+	extractionFilter->Update();
 
 	writer->SetFileName( argv[3] );
 	writer->SetInput( extractionFilter->GetOutput() );
