@@ -6,9 +6,8 @@
  */
 
 //programm related stuff
-#include "timeStepExtractorFilter.h"
+#include "isisTimeStepExtractionFilter.h"
 
-#include "RegistrationInterface.h"
 
 
 #include "itkImage.h"
@@ -32,12 +31,8 @@ int main( int argc, char** argv)
 	typedef itk::Image< PixelType, 3 > FixedImageType;
 	typedef itk::Image< PixelType, 3 > MovingImageType;
 
-	typedef isis::TimeStepExtractorFilter< InputImageType, OutputImageType > TimeStepExtractorFilterType;
-
-	typedef isis::RegistrationInterface< FixedImageType, MovingImageType > RegistrationInterfaceType;
-
-
-
+	typedef isis::TimeStepExtractionFilter< InputImageType, OutputImageType >
+		TimeStepExtractionFilterType;
 
 
 
@@ -46,50 +41,27 @@ int main( int argc, char** argv)
 	typedef itk::ImageFileReader< InputImageType > ReaderType;
 	typedef itk::ImageFileWriter< OutputImageType > WriterType;
 
-
-
-
-
-	TimeStepExtractorFilterType* extractorFilter = new TimeStepExtractorFilterType;
-
-	RegistrationInterfaceType* registrator = new RegistrationInterfaceType;
-
-
-
-
-
 	ReaderType::Pointer reader = ReaderType::New();
 	WriterType::Pointer writer = WriterType::New();
 
-	InputImageType::Pointer inputImage = InputImageType::New();
-	OutputImageType::Pointer outputImage = OutputImageType::New();
 
-	FixedImageType::Pointer fixedImage = FixedImageType::New();
-	MovingImageType::Pointer movingImage = MovingImageType::New();
+
+
+	TimeStepExtractionFilterType::Pointer extractionFilter =
+		TimeStepExtractionFilterType::New();
 
 	reader->SetFileName( argv[1] );
-	inputImage = reader->GetOutput();
-	inputImage->Update();
-	//image->Print(std::cout);
+
+	extractionFilter->SetInput( reader->GetOutput() );
+	extractionFilter->SetRequestedTimeStep( atoi(argv[2]) );
+	std::cout << "djfksjf" << std::endl;
+	extractionFilter->Update();
 
 
-
-	extractorFilter->SetSliceNumber( atoi(argv[2]) );
-	extractorFilter->SetInputImage( inputImage );
-	extractorFilter->Start();
-
-	outputImage = extractorFilter->GetOutputImage();
 	writer->SetFileName( argv[3] );
-	writer->SetInput( outputImage );
+	writer->SetInput( extractionFilter->GetOutput() );
 	writer->Update();
 
-	std::cout << "Number of time steps: " << extractorFilter->GetNumberOfTimeSteps() << std::endl;
-
-	registrator->SetFixedImage( fixedImage );
-	registrator->SetMovingImage( movingImage );
-	registrator->SetMetric( RegistrationInterfaceType::MEANSQUARE );
-	registrator->SetRegistrationMethod( RegistrationInterfaceType::TRANSLATION );
-	registrator->StartRegistration();
 
 
 
