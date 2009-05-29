@@ -60,6 +60,8 @@ public:
 	typedef typename TOutputImage::RegionType		OutputRegionType;
 
 	itkSetMacro( RequestedTimeStep, unsigned int );
+	itkSetMacro( RequestedTimeRangeBegin, unsigned int );
+	itkSetMacro( RequestedTimeRangeEnd, unsigned int );
 
 	virtual void GenerateOutputInformation();
 
@@ -93,11 +95,14 @@ private:
 
 
 	unsigned int									m_RequestedTimeStep;
+	unsigned int 									m_RequestedTimeRangeBegin;
+	unsigned int 									m_RequestedTimeRangeEnd;
+
 };
 
 } // end namespace isis
 
-#ifndef ITK_TEMPLATE_TXX
+#if ITK_TEMPLATE_TXX
 #include "isisTimeStepExtractionFilter.txx"
 #endif /* ITK_TEMPLATE_TXX */
 

@@ -16,7 +16,9 @@ TimeStepExtractionFilter< TInputImage, TOutputImage >
 ::TimeStepExtractionFilter()
 {
 	m_ExtractFilter = ExtractFilterType::New();
-	m_RequestedTimeStep = 1;
+	m_RequestedTimeStep = 0;
+	m_RequestedTimeRangeBegin = 0;
+	m_RequestedTimeRangeEnd = 0;
 
 }
 
@@ -37,6 +39,7 @@ TimeStepExtractionFilter<TInputImage,TOutputImage>
     {
     return;
     }
+  m_ExtractionRegion = inputPtr->GetLargestPossibleRegion();
 
   // Set the output image size to the same value as the extraction region.
   outputPtr->SetLargestPossibleRegion( m_OutputRegion );
@@ -56,6 +59,7 @@ TimeStepExtractionFilter<TInputImage,TOutputImage>
     unsigned int i;
     const typename InputImageType::SpacingType&
       inputSpacing = inputPtr->GetSpacing();
+    std::cout << "Input spacing: " << inputSpacing << std::endl;
     const typename InputImageType::DirectionType&
       inputDirection = inputPtr->GetDirection();
     const typename InputImageType::PointType&
@@ -96,15 +100,20 @@ TimeStepExtractionFilter<TInputImage,TOutputImage>
       outputDirection.SetIdentity();
       int nonZeroCount = 0;
       for (i=0; i < InputImageDimension; ++i)
+
         {
+
         if (m_ExtractionRegion.GetSize()[i])
           {
           outputSpacing[nonZeroCount] = inputSpacing[i];
+
           outputOrigin[nonZeroCount] = inputOrigin[i];
           int nonZeroCount2 = 0;
           for (unsigned int dim = 0; dim < InputImageDimension; ++dim)
             {
+
             if (m_ExtractionRegion.GetSize()[dim])
+
               {
               outputDirection[nonZeroCount][nonZeroCount2] =
                 inputDirection[nonZeroCount][dim];
@@ -124,6 +133,7 @@ TimeStepExtractionFilter<TInputImage,TOutputImage>
       }
 
     // set the spacing and origin
+
     outputPtr->SetSpacing( outputSpacing );
     outputPtr->SetDirection( outputDirection );
     outputPtr->SetOrigin( outputOrigin );
@@ -147,31 +157,76 @@ void
 TimeStepExtractionFilter< TInputImage, TOutputImage>
 ::GenerateData()
 {
-	std::cout << "Starting extraction" << std::endl;
-	m_InputRegion = this->GetInput()->GetLargestPossibleRegion();
-	m_InputSize = m_InputRegion.GetSize();
-	m_InputIndex = m_InputRegion.GetIndex();
 
-	m_InputSize[ OutputImageDimension ] = 0;
-	m_InputIndex[ OutputImageDimension ] = m_RequestedTimeStep;
+	if ( m_RequestedTimeRangeBegin == 0 and m_RequestedTimeRangeEnd == 0 )
+	{
+	//extraction of a single timestep if m_RequestedTimeRangeBegin and m_RequestedTimeRangeEnd not set
+		m_InputRegion = this->GetInput()->GetLargestPossibleRegion();
+		m_InputSize = m_InputRegion.GetSize();
+		m_InputIndex = m_InputRegion.GetIndex();
+		//this collapses the last dimension so the output dimension is input dimension-1
+		m_InputSize[ OutputImageDimension ] = 0;
+		m_InputIndex[ OutputImageDimension ] = m_RequestedTimeStep;
+		m_DesiredRegion.SetSize( m_InputSize );
+		m_DesiredRegion.SetIndex( m_InputIndex );
+		m_ExtractFilter->SetExtractionRegion( m_DesiredRegion );
+		m_ExtractFilter->SetInput( this->GetInput() );
+		try
+			{
+				m_ExtractFilter->Update();
+			}
+			catch( itk::ExceptionObject & err )
+			{
+				std::cerr << "ExceptionObject caught !" << std::endl;
+				std::cerr << err << std::endl;
+			}
+		this->GraftOutput( m_ExtractFilter->GetOutput() );
 
-	m_DesiredRegion.SetSize( m_InputSize );
-	m_DesiredRegion.SetIndex( m_InputIndex );
-
-	m_ExtractFilter->SetExtractionRegion( m_DesiredRegion );
-	m_ExtractFilter->SetInput( this->GetInput() );
-	try
+	}
+	else
+	{
+		if ( m_RequestedTimeRangeEnd - m_RequestedTimeRangeBegin > 1 )
 		{
-			m_ExtractFilter->Update();
+			//extraction of a certain timespan set by m_RequestedTimeRangeBegin and m_RequestedTimeRangeBegin
+			//notice that the timespan has to be bigger than 1
+			std::cout << "extracting time range " << m_RequestedTimeRangeBegin
+			<< " to " << m_RequestedTimeRangeEnd << std::endl;
+			m_InputRegion = this->GetInput()->GetLargestPossibleRegion();
+			m_InputSize = m_InputRegion.GetSize();
+			m_InputIndex = m_InputRegion.GetIndex();
+
+			m_InputSize[ OutputImageDimension - 1] = m_RequestedTimeRangeEnd - m_RequestedTimeRangeBegin;
+			m_InputIndex[ OutputImageDimension - 1] = m_RequestedTimeRangeBegin;
+
+			m_DesiredRegion.SetSize( m_InputSize );
+			m_DesiredRegion.SetIndex( m_InputIndex );
+
+			m_ExtractFilter->SetExtractionRegion( m_DesiredRegion );
+			m_ExtractFilter->SetInput( this->GetInput() );
+			try
+				{
+					m_ExtractFilter->Update();
+				}
+				catch( itk::ExceptionObject & err )
+				{
+					std::cerr << "ExceptionObject caught !" << std::endl;
+					std::cerr << err << std::endl;
+				}
+			this->GraftOutput( m_ExtractFilter->GetOutput() );
+
+
+
+
 		}
-		catch( itk::ExceptionObject & err )
+		else
 		{
-			std::cerr << "ExceptionObject caught ! GNA!" << std::endl;
-			std::cerr << err << std::endl;
+			std::cout << "range has to be bigger than 1" << std::endl;
+
 		}
 
+	}
 
-	this->GraftOutput( m_ExtractFilter->GetOutput() );
+
 
 }
 
