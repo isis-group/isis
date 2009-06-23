@@ -14,8 +14,8 @@ template< class TInputImage, class TOutputImage >
 STDEVMaskFilter< TInputImage, TOutputImage >
 ::STDEVMaskFilter()
 {
-	m_InputImage = InputImageType::New();
-	m_OutputImage = OutputImageType::New();
+	//m_InputImage = InputImageType::New();
+	//m_OutputImage = OutputImageType::New();
 }
 
 
@@ -24,6 +24,7 @@ void
 STDEVMaskFilter< TInputImage, TOutputImage >
 ::SetOutputParameters()
 {
+	m_InputImage = this->GetInput();
 	m_InputRegion = m_InputImage->GetBufferedRegion();
 
 	m_InputIndex = m_InputRegion.GetIndex();
@@ -51,6 +52,46 @@ STDEVMaskFilter< TInputImage, TOutputImage >
 
 
 
+}
+
+template< class TInputImage, class TOutputImage >
+void
+STDEVMaskFilter< TInputImage, TOutputImage >
+::Update()
+{
+	this->SetOutputParameters();
+	IteratorType m_Iterator( m_InputImage, m_InputRegion );
+	m_Iterator.SetDirection( OutputImageDimension );
+	m_Iterator.GoToBegin();
+	while( !m_Iterator.IsAtEnd() )
+	{
+		SumType sum = itk::NumericTraits< SumType >::Zero;
+		m_Iterator.GoToBeginOfLine();
+		m_InputIndex = m_Iterator.GetIndex();
+
+		while( !m_Iterator.IsAtEndOfLine() )
+		{
+			sum += m_Iterator.Get();
+			++m_Iterator;
+		}
+		MeanType mean = static_cast< MeanType >( sum ) /
+						static_cast< MeanType >( m_Timelength );
+		for( unsigned int i = 0; i < OutputImageDimension; i++ )
+		{
+			m_OutputIndex[i] = m_InputIndex[i];
+		}
+		m_OutputImage->SetPixel( m_OutputIndex, static_cast< OutputPixelType >( mean) );
+		m_Iterator.NextLine();
+	}
+}
+
+
+template< class TInputImage, class TOutputImage >
+typename STDEVMaskFilter< TInputImage, TOutputImage >::OutputImagePointer
+STDEVMaskFilter< TInputImage, TOutputImage >
+::GetOutput( void )
+{
+	return m_OutputImage;
 }
 
 

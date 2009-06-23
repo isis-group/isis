@@ -10,11 +10,16 @@
 
 #include "itkSmartPointer.h"
 #include "itkImageToImageFilter.h"
+#include "itkImageLinearConstIteratorWithIndex.h"
+
+#include <vector>
+#include <algorithm>
 
 namespace isis {
 
 template< class TInputImage, class TOutputImage >
-class STDEVMaskFilter
+class ITK_EXPORT STDEVMaskFilter :
+public itk::ImageToImageFilter< TInputImage, TOutputImage >
 {
 public:
 
@@ -28,11 +33,21 @@ public:
 	typedef STDEVMaskFilter							Self;
 	typedef itk::SmartPointer< Self >				Pointer;
 	typedef itk::SmartPointer< const Self >			ConstPointer;
+	typedef itk::ImageToImageFilter< TInputImage, TOutputImage >
+													Superclass;
 
 	typedef TInputImage								InputImageType;
 	typedef TOutputImage							OutputImageType;
 
+	typedef typename InputImageType::ConstPointer	InputImageConstPointer;
+	typedef typename OutputImageType::Pointer		OutputImagePointer;
+
+	typedef typename Superclass::InputImagePointer	InputImagePointer;
+
+
 	itkNewMacro( Self );
+
+	itkTypeMacro( STDEVMaskFilter, itk::ImageToImageFilter );
 
 	typedef typename InputImageType::PixelType		InputPixelType;
 	typedef typename OutputImageType::PixelType		OutputPixelType;
@@ -52,24 +67,32 @@ public:
 	typedef typename InputImageType::SizeType		InputSizeType;
 	typedef typename OutputImageType::SizeType		OutputSizeType;
 
-	typedef typename itk::NumericTraits< InputPixelType >
+	typedef typename itk::NumericTraits< OutputPixelType >
 								::AccumulateType	SumType;
 	typedef typename itk::NumericTraits< SumType >::RealType
 													MeanType;
 
+	typedef typename itk::ImageLinearConstIteratorWithIndex
+					 < InputImageType >				IteratorType;
+
+	virtual void Update( void );
+
+	itkSetMacro( InputImage, InputImageConstPointer );
 
 
-protected:
+
+	OutputImagePointer GetOutput( void );
 	STDEVMaskFilter();
 	virtual ~STDEVMaskFilter() {}
 
 private:
+
 	STDEVMaskFilter( const Self& );
 
 	void SetOutputParameters( void );
 
-	typename InputImageType::ConstPointer			m_InputImage;
-	typename OutputImageType::Pointer				m_OutputImage;
+	InputImageConstPointer							m_InputImage;
+	OutputImagePointer								m_OutputImage;
 
 	InputIndexType									m_InputIndex;
 	OutputIndexType									m_OutputIndex;
@@ -85,6 +108,8 @@ private:
 
 	InputPointType									m_InputOrigin;
 	OutputPointType									m_OutputOrigin;
+
+
 
 	unsigned int 									m_Timelength;
 
