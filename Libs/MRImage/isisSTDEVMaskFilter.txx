@@ -14,8 +14,8 @@ template< class TInputImage, class TOutputImage >
 STDEVMaskFilter< TInputImage, TOutputImage >
 ::STDEVMaskFilter()
 {
-	//m_InputImage = InputImageType::New();
-	//m_OutputImage = OutputImageType::New();
+	m_InputImage = InputImageType::New();
+	m_OutputImage = OutputImageType::New();
 }
 
 
