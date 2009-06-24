@@ -63,6 +63,7 @@ public:
 	itkSetMacro( RequestedTimeRangeBegin, unsigned int );
 	itkSetMacro( RequestedTimeRangeEnd, unsigned int );
 
+
 	virtual void GenerateOutputInformation();
 
 

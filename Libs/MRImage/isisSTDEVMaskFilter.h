@@ -12,6 +12,7 @@
 #include "itkImageToImageFilter.h"
 #include "itkImageLinearConstIteratorWithIndex.h"
 
+
 #include <vector>
 #include <algorithm>
 
@@ -23,7 +24,7 @@ public itk::ImageToImageFilter< TInputImage, TOutputImage >
 {
 public:
 
-
+	STDEVMaskFilter();
 	itkStaticConstMacro( InputImageDimension, unsigned int,
 			TInputImage::ImageDimension);
 	itkStaticConstMacro( OutputImageDimension, unsigned int,
@@ -34,20 +35,18 @@ public:
 	typedef itk::SmartPointer< Self >				Pointer;
 	typedef itk::SmartPointer< const Self >			ConstPointer;
 	typedef itk::ImageToImageFilter< TInputImage, TOutputImage >
-													Superclass;
+													itkSuperclass;
+
+
+
+	typedef typename itkSuperclass::InputImagePointer
+												InputImagePointer;
 
 	typedef TInputImage								InputImageType;
 	typedef TOutputImage							OutputImageType;
 
 	typedef typename InputImageType::ConstPointer	InputImageConstPointer;
 	typedef typename OutputImageType::Pointer		OutputImagePointer;
-
-	typedef typename Superclass::InputImagePointer	InputImagePointer;
-
-
-	itkNewMacro( Self );
-
-	itkTypeMacro( STDEVMaskFilter, itk::ImageToImageFilter );
 
 	typedef typename InputImageType::PixelType		InputPixelType;
 	typedef typename OutputImageType::PixelType		OutputPixelType;
@@ -66,6 +65,11 @@ public:
 
 	typedef typename InputImageType::SizeType		InputSizeType;
 	typedef typename OutputImageType::SizeType		OutputSizeType;
+	itkNewMacro( Self );
+
+	itkTypeMacro( STDEVMaskFilter, itk::ImageToImageFilter );
+
+
 
 	typedef typename itk::NumericTraits< OutputPixelType >
 								::AccumulateType	SumType;
@@ -77,12 +81,10 @@ public:
 
 	virtual void Update( void );
 
-	itkSetMacro( InputImage, InputImageConstPointer );
-
-
 
 	OutputImagePointer GetOutput( void );
-	STDEVMaskFilter();
+
+
 	virtual ~STDEVMaskFilter() {}
 
 private:

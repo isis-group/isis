@@ -254,7 +254,7 @@ TimeStepExtractorFilter< TInputImage, TOutputImage >
 		std::cerr << "ExceptionObject caught !" << std::endl;
 		std::cerr << err << std::endl;
 	}
-	m_OutputImage = extractFilter->GetOutput();
+	outputPtr = extractFilter->GetOutput();
 }
 
 */
