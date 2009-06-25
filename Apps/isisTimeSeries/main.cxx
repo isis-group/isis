@@ -6,8 +6,10 @@
  */
 
 //programm related stuff
-#include "isisTimeStepExtractionFilter.h"
+//#include "isisTimeStepExtractionFilter.h"
 #include "isisSTDEVMaskFilter.h"
+#include "isisTimeStepExtractionFilter.h"
+#include "isisGradientMagnitudeSegmentationFilter.h"
 
 
 #include <iostream>
@@ -85,28 +87,36 @@ int main( int argc, char** argv)
 {
 	const std::string progName = "isTimeSeries";
 
-	typedef short PixelType;
-	const unsigned int inputDimension = 4;
-	const unsigned int outputDimension = 3;
-	typedef itk::Image< PixelType, inputDimension > InputImageType;
-	typedef itk::Image< short, outputDimension > OutputImageType;
+
+	const unsigned int fmriDimension = 4;
+	const unsigned int MNIDimension = 3;
+	const unsigned int fmriDimensionOut = 3;
+
+	typedef short MNIPixelType;
+
+	typedef itk::Image< float, 3 > FloatImageType;
+	typedef itk::Image< short, MNIDimension > MNIImageType;
+	typedef itk::Image< short, MNIDimension > OutputImageType;
+	typedef itk::Image< MNIPixelType, fmriDimension > FMRIImageType;
+
+
 
 	typedef itk::Image< short, 3 > FixedImageType;
 	typedef itk::Image< short, 3 > MovingImageType;
 	typedef itk::Image< short, 3 > InternalImageType;
 
 	//filter for extracting a timestep from the fMRT-dataset
-	typedef isis::TimeStepExtractionFilter< InputImageType, OutputImageType >
-		TimeStepExtractionFilterType;
+	typedef isis::TimeStepExtractionFilter< FMRIImageType, OutputImageType >
+	TimeStepExtractionFilterType;
 
 	TimeStepExtractionFilterType::Pointer extractionFilter =
 			TimeStepExtractionFilterType::New();
 
 	//reader and writer
-	typedef itk::ImageFileReader< InputImageType > FMRIReaderType;
-	typedef itk::ImageFileReader< FixedImageType > FixedReaderType;
+	typedef itk::ImageFileReader< FMRIImageType > FMRIReaderType;
+	typedef itk::ImageFileReader< MNIImageType > FixedReaderType;
 	typedef itk::ImageFileReader< MovingImageType > MovingReaderType;
-	typedef itk::ImageFileWriter< OutputImageType > WriterType;
+	typedef itk::ImageFileWriter< FloatImageType > WriterType;
 
 
 	FMRIReaderType::Pointer fmriReader = FMRIReaderType::New();
@@ -158,14 +168,14 @@ int main( int argc, char** argv)
 	MetaCommand command;
 	command.DisableDeprecatedWarnings();
 
-/*
+
 	//-ref -- the fixed image (MNI atlas)
-	command.SetOption("ref", "ref", true, "The fixed image.");
-	command.AddOptionField("ref", "refImageName", MetaCommand::STRING, true);
-*/
+	command.SetOption("mni", "mni", true, "The MNI atlas.");
+	command.AddOptionField("mni", "refImageName", MetaCommand::STRING, true);
+
 	// -in -- the moving image file
-	command.SetOption("input", "in", true, "The moving image.");
-	command.AddOptionField("input", "movingImageName", MetaCommand::STRING, true);
+	command.SetOption("fmri", "fmri", true, "The fmri image.");
+	command.AddOptionField("fmri", "movingImageName", MetaCommand::STRING, true);
 /*
 	//-timestep -- the desired timestep picked from the fmri image
 	command.SetOption("timestep", "timestep", true, "Timestep of the fmri image.");
@@ -204,26 +214,61 @@ int main( int argc, char** argv)
 	   return EXIT_FAILURE;
 	 }
 
+	typedef isis::GradientMagnitudeSegmentationFilter< MNIImageType, OutputImageType >
+							GradientMagnitudeFilterType;
+
+	GradientMagnitudeFilterType::Pointer gradientFilter1 = GradientMagnitudeFilterType::New();
+	GradientMagnitudeFilterType::Pointer gradientFilter2 = GradientMagnitudeFilterType::New();
 
 
 
-
-
-	fmriReader->SetFileName( command.GetValueAsString("input", "movingImageName") );
-	fmriReader->Update();
-
-
-
-	typedef isis::STDEVMaskFilter< InputImageType, OutputImageType > STDEVFilterType;
+	typedef isis::STDEVMaskFilter< FMRIImageType, FloatImageType > STDEVFilterType;
 
 	STDEVFilterType::Pointer stdevFilter = STDEVFilterType::New();
 
+
+
+
+	fmriReader->SetFileName( command.GetValueAsString("fmri", "movingImageName") );
+	fmriReader->Update();
+
+	fixedReader->SetFileName( command.GetValueAsString("mni", "refImageName") );
+	fixedReader->Update();
+
+/*
+	extractionFilter->SetInput( fmriReader->GetOutput() );
+	extractionFilter->SetRequestedTimeStep( 100 );
+	extractionFilter->Update();
+*/
+
 	stdevFilter->SetInput( fmriReader->GetOutput() );
+	stdevFilter->SetBegin( 200 );
 	stdevFilter->Update();
 
-	writer->SetFileName( "STDEVImage.nii" );
 	writer->SetInput( stdevFilter->GetOutput() );
+	writer->SetFileName( "fmriSTDEV.nii");
 	writer->Update();
+/*
+	gradientFilter1->SetInput( stdevFilter->GetOutput() );
+	gradientFilter1->SetSigma( 0.1 );
+	gradientFilter1->SetSmoothingTimeStep( 0.05 );
+	gradientFilter1->Update();
+	writer->SetFileName( "fmriSegmented.nii" );
+	writer->SetInput( gradientFilter1->GetOutput() );
+	writer->Update();
+
+
+	gradientFilter2->SetInput( fixedReader->GetOutput() );
+	gradientFilter2->SetSigma( 0.1 );
+	gradientFilter2->SetSmoothingTimeStep( 0.05 );
+	gradientFilter2->Update();
+	writer->SetFileName( "MNISegmented.nii" );
+	writer->SetInput( gradientFilter2->GetOutput() );
+
+
+	writer->Update();
+*/
+
 
 
 	return 0;
