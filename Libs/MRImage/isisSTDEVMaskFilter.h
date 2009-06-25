@@ -11,10 +11,13 @@
 #include "itkSmartPointer.h"
 #include "itkImageToImageFilter.h"
 #include "itkImageLinearConstIteratorWithIndex.h"
+#include "itkBinaryThresholdImageFilter.h"
 
 
 #include <vector>
 #include <algorithm>
+#include <cmath>
+
 
 namespace isis {
 
@@ -69,6 +72,8 @@ public:
 
 	itkTypeMacro( STDEVMaskFilter, itk::ImageToImageFilter );
 
+	itkSetMacro( Begin, unsigned int );
+
 
 
 	typedef typename itk::NumericTraits< OutputPixelType >
@@ -114,6 +119,7 @@ private:
 
 
 	unsigned int 									m_Timelength;
+	unsigned int 									m_Begin;
 
 
 

@@ -18,6 +18,7 @@ STDEVMaskFilter< TInputImage, TOutputImage >
 
 	m_InputImage = InputImageType::New();
 	m_OutputImage = OutputImageType::New();
+	m_Begin = 1;
 }
 
 
@@ -61,28 +62,49 @@ void
 STDEVMaskFilter< TInputImage, TOutputImage >
 ::Update()
 {
+	float dev;
+	unsigned int ts;
+
+
+
 	this->SetOutputParameters();
 	IteratorType m_Iterator( m_InputImage, m_InputRegion );
 	m_Iterator.SetDirection( OutputImageDimension );
 	m_Iterator.GoToBegin();
 	while( !m_Iterator.IsAtEnd() )
 	{
+		SumType q = itk::NumericTraits< SumType >::Zero;
 		SumType sum = itk::NumericTraits< SumType >::Zero;
 		m_Iterator.GoToBeginOfLine();
 		m_InputIndex = m_Iterator.GetIndex();
-
+		ts = 0;
 		while( !m_Iterator.IsAtEndOfLine() )
 		{
-			sum += m_Iterator.Get();
+
+			ts++;
+			if ( ts > m_Begin )
+			{
+
+				sum += m_Iterator.Get();
+				q += m_Iterator.Get() * m_Iterator.Get();
+			}
+			//std::cout << "q: " << q << std::endl;
+
 			++m_Iterator;
+
 		}
-		MeanType mean = static_cast< MeanType >( sum ) /
-						static_cast< MeanType >( m_Timelength );
+		//MeanType mean = static_cast< MeanType >( sum ) /
+			//			static_cast< MeanType >( m_Timelength );
+		dev = sqrt( (((m_Timelength - m_Begin) * q) - (sum * sum)) / ( (m_Timelength - m_Begin) * ( m_Timelength - ( m_Begin + 1 ) ) ));
+		sum = 0;
+		q = 0;
+		//std::cout << dev << std::endl;
+
 		for( unsigned int i = 0; i < OutputImageDimension; i++ )
 		{
 			m_OutputIndex[i] = m_InputIndex[i];
 		}
-		m_OutputImage->SetPixel( m_OutputIndex, static_cast< OutputPixelType >( mean) );
+		m_OutputImage->SetPixel( m_OutputIndex, static_cast< OutputPixelType >( dev) );
 		m_Iterator.NextLine();
 	}
 }

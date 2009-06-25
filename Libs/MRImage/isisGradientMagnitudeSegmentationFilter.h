@@ -34,7 +34,7 @@ public:
 			TOutputImage::ImageDimension );
 
 	//standard typedefs
-	typedef GradientMagnitudeSegmentationFilter			Self;
+	typedef GradientMagnitudeSegmentationFilter		Self;
 	typedef itk::SmartPointer< Self >				Pointer;
 	typedef itk::SmartPointer< const Self >			ConstPointer;
 	typedef itk::ImageToImageFilter< TInputImage, TOutputImage >
@@ -49,6 +49,10 @@ public:
 
 	typedef typename InputImageType::PixelType		InputPixelType;
 	typedef typename OutputImageType::PixelType		OutputPixelType;
+	typedef float									InternalPixelType;
+
+	typedef typename InputImageType::DirectionType	InputDirectionType;
+	typedef typename OutputImageType::DirectionType OutputDirectionType;
 
 	typedef typename InputImageType::PointType		InputPointType;
 	typedef typename OutputImageType::PointType		OutputPointType;
@@ -89,18 +93,22 @@ public:
 
 
 
-	void Update( void );
 
-	OutputImagePointer GetOutput( void );
+
+	//OutputImagePointer GetOutput( void );
 
 	GradientMagnitudeSegmentationFilter();
 	virtual ~GradientMagnitudeSegmentationFilter() {}
+	void GenerateData();
+	virtual void GenerateInputRequestedRegion() throw(itk::InvalidRequestedRegionError);
+
+
 
 private:
 
 	void CalculateMinMax( void );
 
-	void SetOutputParameters( void );
+
 
 
 
@@ -109,6 +117,9 @@ private:
 
 	InputRegionType									m_InputRegion;
 	OutputRegionType								m_OutputRegion;
+
+	InputDirectionType								m_InputDirection;
+	OutputDirectionType								m_OutputDirection;
 
 	InputPointType									m_InputOrigin;
 	OutputPointType									m_OutputOrigin;
