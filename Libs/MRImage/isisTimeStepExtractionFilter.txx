@@ -8,6 +8,7 @@
 #define __TIMESTEPEXTRACTIONFILTER_TXX
 
 #include "isisTimeStepExtractionFilter.h"
+#include "itkImageBase.h"
 
 namespace isis {
 
@@ -21,6 +22,7 @@ TimeStepExtractionFilter< TInputImage, TOutputImage >
 	m_RequestedTimeRangeEnd = 0;
 
 }
+
 
 
 template <class TInputImage, class TOutputImage>
@@ -39,10 +41,9 @@ TimeStepExtractionFilter<TInputImage,TOutputImage>
     {
     return;
     }
-  m_ExtractionRegion = inputPtr->GetLargestPossibleRegion();
 
   // Set the output image size to the same value as the extraction region.
-  outputPtr->SetLargestPossibleRegion( m_OutputRegion );
+  outputPtr->SetLargestPossibleRegion( m_OutputImageRegion );
 
   // Set the output spacing and origin
   const itk::ImageBase<InputImageDimension> *phyData;
@@ -59,7 +60,6 @@ TimeStepExtractionFilter<TInputImage,TOutputImage>
     unsigned int i;
     const typename InputImageType::SpacingType&
       inputSpacing = inputPtr->GetSpacing();
-    std::cout << "Input spacing: " << inputSpacing << std::endl;
     const typename InputImageType::DirectionType&
       inputDirection = inputPtr->GetDirection();
     const typename InputImageType::PointType&
@@ -100,20 +100,15 @@ TimeStepExtractionFilter<TInputImage,TOutputImage>
       outputDirection.SetIdentity();
       int nonZeroCount = 0;
       for (i=0; i < InputImageDimension; ++i)
-
         {
-
         if (m_ExtractionRegion.GetSize()[i])
           {
           outputSpacing[nonZeroCount] = inputSpacing[i];
-
           outputOrigin[nonZeroCount] = inputOrigin[i];
           int nonZeroCount2 = 0;
           for (unsigned int dim = 0; dim < InputImageDimension; ++dim)
             {
-
             if (m_ExtractionRegion.GetSize()[dim])
-
               {
               outputDirection[nonZeroCount][nonZeroCount2] =
                 inputDirection[nonZeroCount][dim];
@@ -133,7 +128,6 @@ TimeStepExtractionFilter<TInputImage,TOutputImage>
       }
 
     // set the spacing and origin
-
     outputPtr->SetSpacing( outputSpacing );
     outputPtr->SetDirection( outputDirection );
     outputPtr->SetOrigin( outputOrigin );
@@ -150,8 +144,6 @@ TimeStepExtractionFilter<TInputImage,TOutputImage>
 }
 
 
-
-
 template< class TInputImage, class TOutputImage >
 void
 TimeStepExtractionFilter< TInputImage, TOutputImage>
@@ -161,9 +153,9 @@ TimeStepExtractionFilter< TInputImage, TOutputImage>
 	if ( m_RequestedTimeRangeBegin == 0 and m_RequestedTimeRangeEnd == 0 )
 	{
 	//extraction of a single timestep if m_RequestedTimeRangeBegin and m_RequestedTimeRangeEnd not set
-		m_InputRegion = this->GetInput()->GetLargestPossibleRegion();
-		m_InputSize = m_InputRegion.GetSize();
-		m_InputIndex = m_InputRegion.GetIndex();
+		m_InputImageRegion = this->GetInput()->GetLargestPossibleRegion();
+		m_InputSize = m_InputImageRegion.GetSize();
+		m_InputIndex = m_InputImageRegion.GetIndex();
 		//this collapses the last dimension so the output dimension is input dimension-1
 		m_InputSize[ OutputImageDimension ] = 0;
 		m_InputIndex[ OutputImageDimension ] = m_RequestedTimeStep;
@@ -191,9 +183,9 @@ TimeStepExtractionFilter< TInputImage, TOutputImage>
 			//notice that the timespan has to be bigger than 1
 			std::cout << "extracting time range " << m_RequestedTimeRangeBegin
 			<< " to " << m_RequestedTimeRangeEnd << std::endl;
-			m_InputRegion = this->GetInput()->GetLargestPossibleRegion();
-			m_InputSize = m_InputRegion.GetSize();
-			m_InputIndex = m_InputRegion.GetIndex();
+			m_InputImageRegion = this->GetInput()->GetLargestPossibleRegion();
+			m_InputSize = m_InputImageRegion.GetSize();
+			m_InputIndex = m_InputImageRegion.GetIndex();
 
 			m_InputSize[ OutputImageDimension - 1] = m_RequestedTimeRangeEnd - m_RequestedTimeRangeBegin;
 			m_InputIndex[ OutputImageDimension - 1] = m_RequestedTimeRangeBegin;
@@ -213,10 +205,6 @@ TimeStepExtractionFilter< TInputImage, TOutputImage>
 					std::cerr << err << std::endl;
 				}
 			this->GraftOutput( m_ExtractFilter->GetOutput() );
-
-
-
-
 		}
 		else
 		{

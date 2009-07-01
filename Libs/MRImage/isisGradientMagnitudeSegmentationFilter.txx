@@ -26,6 +26,7 @@ GradientMagnitudeSegmentationFilter< TInputImage, TOutputImage >
 	m_SmoothingTimeStep = 0.125;
 	m_SmoothingNumberOfIterations = 5;
 	m_SmoothingConductanceParameter = 9.0;
+	m_UseThresholdMethod = false;
 
 
 }
@@ -46,38 +47,7 @@ GradientMagnitudeSegmentationFilter< TInputImage, TOutputImage >
 	m_MinOutput = 0;
 	m_MaxOutput = temp;
 }
-/*
-template< class TInputImage, class TOutputImage >
-void
-GradientMagnitudeSegmentationFilter< TInputImage, TOutputImage >
-::SetOutputParameters( void )
-{
-	m_InputImage = this->GetInput();
-	m_InputRegion = m_InputImage->GetBufferedRegion();
-	m_InputIndex = m_InputRegion.GetIndex();
-	m_InputSize = m_InputRegion.GetSize();
-	m_InputSpacing = m_InputImage->GetSpacing();
-	m_InputOrigin = m_InputImage->GetOrigin();
-	m_InputDirection = m_InputImage->GetDirection();
 
-	m_OutputSize = m_InputSize;
-	m_OutputDirection = m_InputDirection;
-	m_OutputIndex = m_InputIndex;
-	m_OutputSpacing = m_InputSpacing;
-	m_OutputOrigin = m_InputOrigin;
-	m_OutputImage->SetSpacing( m_OutputSpacing );
-	m_OutputImage->SetOrigin( m_OutputOrigin );
-	m_OutputImage->SetDirection( m_OutputDirection );
-	m_OutputRegion.SetSize( m_OutputSize );
-	m_OutputRegion.SetIndex( m_OutputIndex );
-
-	m_OutputImage->SetRegions( m_OutputRegion );
-	m_OutputImage->Allocate();
-	this->GraftOutput( m_OutputImage );
-
-
-}
-*/
 
 
 template <class TInputImage, class TOutputImage>
@@ -149,18 +119,25 @@ GradientMagnitudeSegmentationFilter< TInputImage, TOutputImage >
 	m_GradientMagnitude->Update();
 	m_OutputImage = m_GradientMagnitude->GetOutput();
 	m_OutputImage->Update();
+
+	if ( m_UseThresholdMethod )
+	{
+		std::cout << "Using threshold method" << std::endl;
+		m_OtsuThresholdFilter = OtsuThresholdFilterType::New();
+		m_OtsuThresholdFilter->SetInput( m_OutputImage );
+		m_OtsuThresholdFilter->SetOutsideValue( 1 );
+		m_OtsuThresholdFilter->SetInsideValue( 0 );
+		m_OtsuThresholdFilter->SetNumberOfHistogramBins( 128 );
+		m_OtsuThresholdFilter->Update();
+		this->GraftOutput( m_OtsuThresholdFilter->GetOutput() );
+
+
+	}
+	else
+	{
 	this->GraftOutput( m_OutputImage );
-
-}
-/*
-template< class TInputImage, class TOutputImage >
-typename GradientMagnitudeSegmentationFilter< TInputImage, TOutputImage >::OutputImagePointer
-GradientMagnitudeSegmentationFilter< TInputImage, TOutputImage >
-::GetOutput( void )
-{
-	return m_OutputImage;
+	}
 }
 
-*/
 } //end namespace isis
 

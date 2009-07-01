@@ -89,10 +89,10 @@ private:
 	InputIndexType									m_InputIndex;
 
 
-	InputRegionType 								m_InputRegion;
+	InputRegionType 								m_InputImageRegion;
 	InputRegionType 								m_DesiredRegion;
 	InputRegionType									m_ExtractionRegion;
-	OutputRegionType								m_OutputRegion;
+	OutputRegionType								m_OutputImageRegion;
 
 
 	unsigned int									m_RequestedTimeStep;

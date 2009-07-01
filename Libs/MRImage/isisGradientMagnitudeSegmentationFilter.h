@@ -17,6 +17,8 @@
 
 #include "itkMinimumMaximumImageCalculator.h"
 
+#include "itkOtsuThresholdImageFilter.h"
+
 
 
 
@@ -78,10 +80,13 @@ public:
 			< InputImageType, OutputImageType >		SmoothingFilterType;
 
 	typedef typename itk::GradientMagnitudeRecursiveGaussianImageFilter
-			< InputImageType, InputImageType >		GradientFilterType;
+			< OutputImageType, OutputImageType >		GradientFilterType;
 
 	typedef typename itk::MinimumMaximumImageCalculator
-			< OutputImageType >						MinMaxFilterType;
+			< InputImageType >						MinMaxFilterType;
+
+	typedef typename itk::OtsuThresholdImageFilter
+			< OutputImageType, OutputImageType >	OtsuThresholdFilterType;
 
 
 
@@ -90,12 +95,8 @@ public:
 	itkSetMacro( SmoothingTimeStep, float );
 	itkSetMacro( SmoothingNumberOfIterations, int );
 	itkSetMacro( SmoothingConductanceParameter, float );
+	itkSetMacro( UseThresholdMethod, bool );
 
-
-
-
-
-	//OutputImagePointer GetOutput( void );
 
 	GradientMagnitudeSegmentationFilter();
 	virtual ~GradientMagnitudeSegmentationFilter() {}
@@ -109,6 +110,7 @@ private:
 	void CalculateMinMax( void );
 
 
+	typename OtsuThresholdFilterType::Pointer		m_OtsuThresholdFilter;
 
 
 
@@ -150,6 +152,8 @@ private:
 	float											m_SmoothingTimeStep;
 	int 											m_SmoothingNumberOfIterations;
 	float											m_SmoothingConductanceParameter;
+
+	bool											m_UseThresholdMethod;
 
 };
 
