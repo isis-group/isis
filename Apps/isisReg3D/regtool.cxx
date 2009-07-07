@@ -17,7 +17,9 @@
 #include "itkImageFileWriter.h"
 #include "itkImage.h"
 #include "metaCommand.h"
-
+#include "itkCenteredTransformInitializer.h"
+#include "itkAffineTransform.h"
+#include "itkRegularStepGradientDescentOptimizer.h"
 #include "itkCenteredTransformInitializer.h"
 
 // additional stuff
@@ -40,8 +42,8 @@ int main(int argc, char** argv) {
    * image types
    *************************************************/
   const unsigned int Dimension = 3;
-  typedef int InputPixelType;
-  typedef short OutputPixelType;
+  typedef float InputPixelType;
+  typedef float OutputPixelType;
   typedef float InternalPixelType;
 
   // image types
@@ -63,8 +65,13 @@ int main(int argc, char** argv) {
    **************************************************/
   // transform
   typedef itk::VersorRigid3DTransform<double> TransformType;
+
+
   // optimizer
   typedef itk::VersorRigid3DTransformOptimizer OptimizerType;
+
+  typedef itk::RegularStepGradientDescentOptimizer RegularOptimizerType;
+
   // metric
   typedef itk::MattesMutualInformationImageToImageMetric<FixedImageType,
           MovingImageType> MetricType;
@@ -77,8 +84,14 @@ int main(int argc, char** argv) {
     RegistrationType;
   typedef RegistrationType::ParametersType ParametersType;
 
+
+  typedef itk::CenteredTransformInitializer< TransformType, FixedImageType, MovingImageType >
+  InitializerType;
+
+
   typedef itk::CenteredTransformInitializer< TransformType, FixedImageType, MovingImageType >
 	  TransformInitializerType;
+
 
   /**************************************************
    * additional filter
@@ -122,10 +135,13 @@ int main(int argc, char** argv) {
    **************************************************/
   TransformType::Pointer transform = TransformType::New();
   OptimizerType::Pointer optimizer = OptimizerType::New();
+  RegularOptimizerType::Pointer regularOptimizer = RegularOptimizerType::New();
   MetricType::Pointer metric = MetricType::New();
   InterpolatorType::Pointer interpolator = InterpolatorType::New();
   RegistrationType::Pointer registration = RegistrationType::New();
   ParametersType params(transform->GetNumberOfParameters());
+  InitializerType::Pointer initializer = InitializerType::New();
+
 
   FixedReaderType::Pointer fixedImageReader = FixedReaderType::New();
   FixedReaderType::Pointer maskImageReader = FixedReaderType::New();
@@ -222,6 +238,13 @@ int main(int argc, char** argv) {
       false,
       "Using the OtsuSegmentationMethod for creating the mask. Threshold needs to be set, too.");
 
+  command.SetOption(
+		  "init",
+		  "init",
+		  false,
+		  "Using a transform initializer before the registration process to roughly allign the images."
+		  );
+
   command.SetOption("allSamples", "allSamples",false, "Using all samples containing to the fixedImage to calculate the metric.");
 
   command.SetOption("initTransform", "initTransform", false, "Using an initial transform brfore the registration process.");
@@ -264,6 +287,16 @@ int main(int argc, char** argv) {
         "movingImageName"));
   writer->SetFileName(command.GetValueAsString("output", "resultImageName"));
 
+  fixedImageReader->Update();
+  movingImageReader->Update();
+  // configure the registration method
+  registration->SetMetric(metric);
+  registration->SetOptimizer(optimizer);
+  registration->SetTransform(transform);
+  registration->SetInterpolator(interpolator);
+
+  registration->SetFixedImage(fixedImageReader->GetOutput());
+  registration->SetMovingImage(movingImageReader->GetOutput());
   const int nbins = command.GetValueAsInt("bins", "nbins");
   const int niter = command.GetValueAsInt("iter", "niterations");
 
@@ -347,17 +380,10 @@ int main(int argc, char** argv) {
 
   }
 
-  // configure the registration method
-  registration->SetMetric(metric);
-  registration->SetOptimizer(optimizer);
-  registration->SetTransform(transform);
-  registration->SetInterpolator(interpolator);
 
-  registration->SetFixedImage(fixedImageReader->GetOutput());
-  registration->SetMovingImage(movingImageReader->GetOutput());
+
 
   // set ROI in fixed image -> maximum
-  fixedImageReader->Update();
   FixedImageType::RegionType fixedImageRegion =
     fixedImageReader->GetOutput()->GetBufferedRegion();
 
@@ -387,8 +413,7 @@ int main(int argc, char** argv) {
 
 
   //compare the image size of the moving image and the fixed image.
-  fixedImageReader->Update();
-  movingImageReader->Update();
+
   FixedImageType::SizeType sizeFixed =
     fixedImageReader->GetOutput()->GetLargestPossibleRegion().GetSize();
   FixedImageType::SizeType
@@ -404,14 +429,15 @@ int main(int argc, char** argv) {
 
 
 
-  if (command.GetOptionWasSet("intiTransform") )
+  if (command.GetOptionWasSet("init") )
   {
 	  std::cout << "Using initial transform!" << std::endl;
+	  registration->SetFixedImageRegion( fixedImageReader->GetOutput()->GetBufferedRegion() );
 	  TransformInitializerType::Pointer initializer = TransformInitializerType::New();
 	  initializer->SetTransform( transform );
 	  initializer->SetFixedImage( fixedImageReader->GetOutput() );
 	  initializer->SetMovingImage( movingImageReader->GetOutput() );
-	  initializer->GeometryOn();
+	  initializer->MomentsOn();
 	  initializer->InitializeTransform();
 	  registration->SetInitialTransformParameters( transform->GetParameters() );
 
@@ -419,7 +445,7 @@ int main(int argc, char** argv) {
 
   }
 
-
+  metric->SetNumberOfSpatialSamples( static_cast<int>((movingImageReader->GetOutput()->GetBufferedRegion().GetNumberOfPixels()) * 0.01) );
   if (fixedImageIsBigger) {
 
     CharImageType::Pointer fixedMaskImage = CharImageType::New();
@@ -470,7 +496,7 @@ int main(int argc, char** argv) {
     jointMask->Update();
 
   }
-  if (fixedImageIsBigger and (!command.GetOptionWasSet("loadmask")))
+  if (fixedImageIsBigger and (!command.GetOptionWasSet("loadmask") and (!command.GetOptionWasSet("init")) ))
   {
     //get an ImageMaskSpatialObject of the moving image size including intensity 255 over the whole volume
     //define this mask as the fixedImageMask
@@ -514,28 +540,35 @@ int main(int argc, char** argv) {
   // init transform parameters
   // since we don't want to change the translational part we only initialize
   //the rotation.
-  typedef TransformType::VersorType VersorType;
-  typedef VersorType::VectorType VectorType;
+  if ( !command.GetOptionWasSet("init") )
+  {
 
-  VersorType rotation;
-  VectorType axis;
+	  typedef TransformType::VersorType VersorType;
+	  typedef VersorType::VectorType VectorType;
 
-  const double angle = 0.;
+	  VersorType rotation;
+	  VectorType axis;
 
-  axis[0]= 0;
-  axis[1]= 0;
-  axis[2]= 1;
+	  const double angle = 0.;
 
-  rotation.Set ( axis, angle );
+	  axis[0]= 0;
+	  axis[1]= 0;
+	  axis[2]= 1;
 
-  transform->SetRotation ( rotation );
+	  rotation.Set ( axis, angle );
+	  transform->SetRotation ( rotation );
 
-  registration->SetInitialTransformParameters ( transform->GetParameters());
+	  registration->SetInitialTransformParameters ( transform->GetParameters());
+  }
+
 
   /**************************************************
    * METRIC
    *************************************************/
-
+  metric->SetFixedImage( fixedImageReader->GetOutput() );
+  metric->SetMovingImage( movingImageReader->GetOutput() );
+  metric->SetFixedImageRegion( movingImageReader->GetOutput()->GetBufferedRegion() );
+  metric->Initialize();
   const unsigned int nPixels = fixedImageRegion.GetNumberOfPixels();
   // be aware that this value is relativ to the CROPED image region.
   if (!fixedImageIsBigger)
@@ -557,16 +590,20 @@ int main(int argc, char** argv) {
   typedef OptimizerType::ScalesType ScalesType;
   ScalesType optimizerScales ( transform->GetNumberOfParameters() );
   const double translationScale = 1.0 / 1000.0;
+  double steplength = 0.1;
+
 
   optimizerScales[0]=1.0;
-  optimizerScales[1]=1.0;
-  optimizerScales[2]=1.0;
+  optimizerScales[1]=translationScale;
+  optimizerScales[2]=translationScale;
   optimizerScales[3]=translationScale;
   optimizerScales[4]=translationScale;
   optimizerScales[5]=translationScale;
-
+  optimizer->SetMaximumStepLength( steplength );
+  optimizer->SetMinimumStepLength( 0.0001 );
   optimizer->SetScales ( optimizerScales );
   optimizer->SetNumberOfIterations ( niter );
+
 
   // add observer
   optimizer->AddObserver ( itk::IterationEvent(), observer );
@@ -577,7 +614,7 @@ int main(int argc, char** argv) {
   std::cout << "Starting registration ..." << std::endl;
   try
   {
-    registration->Update();
+    registration->StartRegistration();
   }
   catch ( itk::ExceptionObject & err )
   {
