@@ -1,6 +1,6 @@
 
 // C++ headers
-#include <iostream>
+
 
 /* this is a test comment */
 
@@ -17,6 +17,8 @@
 #include "itkImageFileWriter.h"
 #include "itkImage.h"
 #include "metaCommand.h"
+
+#include "itkCenteredTransformInitializer.h"
 
 // additional stuff
 #include "isisIterationObserver.h"
@@ -74,6 +76,9 @@ int main(int argc, char** argv) {
   typedef itk::ImageRegistrationMethod<FixedImageType, MovingImageType>
     RegistrationType;
   typedef RegistrationType::ParametersType ParametersType;
+
+  typedef itk::CenteredTransformInitializer< TransformType, FixedImageType, MovingImageType >
+	  TransformInitializerType;
 
   /**************************************************
    * additional filter
@@ -218,6 +223,8 @@ int main(int argc, char** argv) {
       "Using the OtsuSegmentationMethod for creating the mask. Threshold needs to be set, too.");
 
   command.SetOption("allSamples", "allSamples",false, "Using all samples containing to the fixedImage to calculate the metric.");
+
+  command.SetOption("initTransform", "initTransform", false, "Using an initial transform brfore the registration process.");
 
 
   // parse the commandline and quit if there are any parameter errors
@@ -394,6 +401,25 @@ int main(int argc, char** argv) {
     }
   }
   MaskObjectType::Pointer jointMask = MaskObjectType::New();
+
+
+
+  if (command.GetOptionWasSet("intiTransform") )
+  {
+	  std::cout << "Using initial transform!" << std::endl;
+	  TransformInitializerType::Pointer initializer = TransformInitializerType::New();
+	  initializer->SetTransform( transform );
+	  initializer->SetFixedImage( fixedImageReader->GetOutput() );
+	  initializer->SetMovingImage( movingImageReader->GetOutput() );
+	  initializer->GeometryOn();
+	  initializer->InitializeTransform();
+	  registration->SetInitialTransformParameters( transform->GetParameters() );
+
+
+
+  }
+
+
   if (fixedImageIsBigger) {
 
     CharImageType::Pointer fixedMaskImage = CharImageType::New();
@@ -436,13 +462,13 @@ int main(int argc, char** argv) {
 
 
     jointImage = andFilter->GetOutput();
-    jointImage->Print(std::cout);
+
     maskWriter->SetInput( andFilter->GetOutput() );
     maskWriter->SetFileName("CropMask.nii");
     maskWriter->Update();
     jointMask->SetImage( andFilter->GetOutput() );
     jointMask->Update();
-    jointMask->Print(std::cout);
+
   }
   if (fixedImageIsBigger and (!command.GetOptionWasSet("loadmask")))
   {
@@ -466,19 +492,22 @@ int main(int argc, char** argv) {
     metric->SetFixedImageRegion( movingImageReader->GetOutput()->GetBufferedRegion() );
     metric->SetFixedImageMask( jointMask );
     //The option UseAllPixelOn() disables the random sampling and uses all the pixels of the FixedImageRegion in order to estimate the joint intensity PDF.
+
+
+
     if (command.GetOptionWasSet("allSamples"))
     {
       metric->UseAllPixelsOn();
       std::cout << "Using all pixels on" << std::endl;
     }
-    if (!command.GetOptionWasSet("allSamples"))
+    else
     {
       metric->SetNumberOfSpatialSamples( static_cast<int>((movingImageReader->GetOutput()->GetBufferedRegion().GetNumberOfPixels()) * 0.01) );
     }
 
 
     metric->Initialize();
-    std::cout << "size: " << metric->GetFixedImageRegion() << std::endl;
+
   }
   registration->SetFixedImageRegion ( fixedImageReader->GetOutput()->GetBufferedRegion() );
 
