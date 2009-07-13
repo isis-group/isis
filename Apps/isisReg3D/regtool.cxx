@@ -20,7 +20,7 @@
 #include "itkCenteredTransformInitializer.h"
 #include "itkAffineTransform.h"
 #include "itkRegularStepGradientDescentOptimizer.h"
-#include "itkCenteredTransformInitializer.h"
+
 
 // additional stuff
 #include "isisIterationObserver.h"
@@ -33,6 +33,8 @@
 #include "itkAndImageFilter.h"
 
 #include "itkOtsuThresholdImageFilter.h"
+
+#include "isisRegistrationFactory.h"
 
 int main(int argc, char** argv) {
 
@@ -239,11 +241,11 @@ int main(int argc, char** argv) {
       "Using the OtsuSegmentationMethod for creating the mask. Threshold needs to be set, too.");
 
   command.SetOption(
-		  "init",
-		  "init",
-		  false,
-		  "Using a transform initializer before the registration process to roughly allign the images."
-		  );
+	  "init",
+	  "init",
+	  false,
+	  "Using a transform initializer before the registration process to roughly allign the images."
+	  );
 
   command.SetOption("allSamples", "allSamples",false, "Using all samples containing to the fixedImage to calculate the metric.");
 
