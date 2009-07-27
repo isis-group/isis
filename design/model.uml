@@ -1,97 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <uml:Model xmi:version="2.1" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmlns:uml="http://www.eclipse.org/uml2/3.0.0/UML" xmi:id="_A2Fh0XnsEd6L0ssCVn1r9Q" name="PropertyMap">
   <packagedElement xmi:type="uml:Package" xmi:id="_A2GI4HnsEd6L0ssCVn1r9Q" name="isis">
-    <packagedElement xmi:type="uml:Class" xmi:id="_A2GI4XnsEd6L0ssCVn1r9Q" name="Property" clientDependency="_A2GwFXnsEd6L0ssCVn1r9Q">
-      <generalization xmi:id="_A2GI4nnsEd6L0ssCVn1r9Q" general="_A2GwGHnsEd6L0ssCVn1r9Q"/>
-      <ownedOperation xmi:id="_A2GI43nsEd6L0ssCVn1r9Q" name="Property" visibility="public">
-        <ownedParameter xmi:id="_A2GI5HnsEd6L0ssCVn1r9Q" name="ref" type="_A2LBYXnsEd6L0ssCVn1r9Q"/>
-      </ownedOperation>
-      <ownedOperation xmi:id="_A2GI5XnsEd6L0ssCVn1r9Q" name="Property" visibility="public"/>
-      <ownedOperation xmi:id="_A2GI5nnsEd6L0ssCVn1r9Q" name="operator #0" visibility="public">
-        <ownedParameter xmi:id="_A2GI53nsEd6L0ssCVn1r9Q" type="_A2LBYnnsEd6L0ssCVn1r9Q" direction="return"/>
-      </ownedOperation>
-    </packagedElement>
-    <packagedElement xmi:type="uml:Class" xmi:id="_A2GI6HnsEd6L0ssCVn1r9Q" name="PropMap">
-      <ownedTemplateSignature xmi:type="uml:RedefinableTemplateSignature" xmi:id="_A2GI6XnsEd6L0ssCVn1r9Q" parameter="_A2GI6nnsEd6L0ssCVn1r9Q">
-        <ownedParameter xmi:type="uml:ClassifierTemplateParameter" xmi:id="_A2GI6nnsEd6L0ssCVn1r9Q" parameteredElement="_A2GI63nsEd6L0ssCVn1r9Q">
-          <ownedParameteredElement xmi:type="uml:Class" xmi:id="_A2GI63nsEd6L0ssCVn1r9Q" name="T" templateParameter="_A2GI6nnsEd6L0ssCVn1r9Q"/>
-        </ownedParameter>
-      </ownedTemplateSignature>
-      <generalization xmi:id="_A2GI7HnsEd6L0ssCVn1r9Q" general="_A2GwGXnsEd6L0ssCVn1r9Q"/>
-    </packagedElement>
-    <packagedElement xmi:type="uml:Class" xmi:id="_A2GI7XnsEd6L0ssCVn1r9Q" name="TypeBase" isAbstract="true">
-      <ownedTemplateSignature xmi:type="uml:RedefinableTemplateSignature" xmi:id="_A2GI7nnsEd6L0ssCVn1r9Q" parameter="_A2GI73nsEd6L0ssCVn1r9Q _A2GI8XnsEd6L0ssCVn1r9Q">
-        <ownedParameter xmi:type="uml:ClassifierTemplateParameter" xmi:id="_A2GI73nsEd6L0ssCVn1r9Q" parameteredElement="_A2GI8HnsEd6L0ssCVn1r9Q">
-          <ownedParameteredElement xmi:type="uml:Class" xmi:id="_A2GI8HnsEd6L0ssCVn1r9Q" name="Target" templateParameter="_A2GI73nsEd6L0ssCVn1r9Q"/>
-        </ownedParameter>
-        <ownedParameter xmi:type="uml:ClassifierTemplateParameter" xmi:id="_A2GI8XnsEd6L0ssCVn1r9Q" parameteredElement="_A2GI8nnsEd6L0ssCVn1r9Q">
-          <ownedParameteredElement xmi:type="uml:Class" xmi:id="_A2GI8nnsEd6L0ssCVn1r9Q" name="Source" templateParameter="_A2GI8XnsEd6L0ssCVn1r9Q"/>
-        </ownedParameter>
-      </ownedTemplateSignature>
-      <ownedOperation xmi:id="_A2GI83nsEd6L0ssCVn1r9Q" name="is" visibility="public">
-        <ownedParameter xmi:id="_A2GI9HnsEd6L0ssCVn1r9Q" type="_A2LBY3nsEd6L0ssCVn1r9Q" direction="return"/>
-      </ownedOperation>
-      <ownedOperation xmi:id="_A2GI9XnsEd6L0ssCVn1r9Q" name="is" visibility="public">
-        <ownedParameter xmi:id="_A2GI9nnsEd6L0ssCVn1r9Q" name="t" type="_A2LBZHnsEd6L0ssCVn1r9Q"/>
-        <ownedParameter xmi:id="_A2GI93nsEd6L0ssCVn1r9Q" type="_A2LBY3nsEd6L0ssCVn1r9Q" direction="return"/>
-      </ownedOperation>
-      <ownedOperation xmi:id="_A2GI-HnsEd6L0ssCVn1r9Q" name="toString" visibility="public">
-        <ownedParameter xmi:id="_A2GI-XnsEd6L0ssCVn1r9Q" name="labeled" type="_A2LBY3nsEd6L0ssCVn1r9Q"/>
-        <ownedParameter xmi:id="_A2GI-nnsEd6L0ssCVn1r9Q" type="_A2GwGnnsEd6L0ssCVn1r9Q" direction="return"/>
-      </ownedOperation>
-      <ownedOperation xmi:id="_A2Gv8HnsEd6L0ssCVn1r9Q" name="~TypeBase" visibility="public"/>
-    </packagedElement>
-    <packagedElement xmi:type="uml:Class" xmi:id="_A2Gv8XnsEd6L0ssCVn1r9Q" name="Type">
-      <ownedTemplateSignature xmi:type="uml:RedefinableTemplateSignature" xmi:id="_A2Gv8nnsEd6L0ssCVn1r9Q" parameter="_A2Gv83nsEd6L0ssCVn1r9Q">
-        <ownedParameter xmi:type="uml:ClassifierTemplateParameter" xmi:id="_A2Gv83nsEd6L0ssCVn1r9Q" parameteredElement="_A2Gv9HnsEd6L0ssCVn1r9Q">
-          <ownedParameteredElement xmi:type="uml:Class" xmi:id="_A2Gv9HnsEd6L0ssCVn1r9Q" name="TYPE" templateParameter="_A2Gv83nsEd6L0ssCVn1r9Q"/>
-        </ownedParameter>
-      </ownedTemplateSignature>
-      <generalization xmi:id="_A2Gv9XnsEd6L0ssCVn1r9Q" general="_A2GI7XnsEd6L0ssCVn1r9Q"/>
-      <ownedAttribute xmi:id="_A2Gv9nnsEd6L0ssCVn1r9Q" name="val" visibility="private" type="_A2Gv9HnsEd6L0ssCVn1r9Q"/>
-      <ownedAttribute xmi:id="_A2Gv93nsEd6L0ssCVn1r9Q" name="typeName" visibility="private" isStatic="true" type="_A2GwGnnsEd6L0ssCVn1r9Q"/>
-      <ownedAttribute xmi:id="_A2Gv-HnsEd6L0ssCVn1r9Q" name="typeID" visibility="private" isStatic="true" type="_A2LBYHnsEd6L0ssCVn1r9Q"/>
-      <ownedOperation xmi:id="_A2Gv-XnsEd6L0ssCVn1r9Q" name="Type" visibility="public">
-        <ownedParameter xmi:id="_A2Gv-nnsEd6L0ssCVn1r9Q" name="value" type="_A2LBYXnsEd6L0ssCVn1r9Q"/>
-      </ownedOperation>
-      <ownedOperation xmi:id="_A2Gv-3nsEd6L0ssCVn1r9Q" name="as" visibility="public">
-        <ownedParameter xmi:id="_A2Gv_HnsEd6L0ssCVn1r9Q" type="_A2LBYnnsEd6L0ssCVn1r9Q" direction="return"/>
-      </ownedOperation>
-      <ownedOperation xmi:id="_A2Gv_XnsEd6L0ssCVn1r9Q" name="is" visibility="public">
-        <ownedParameter xmi:id="_A2Gv_nnsEd6L0ssCVn1r9Q" name="t" type="_A2LBZHnsEd6L0ssCVn1r9Q"/>
-        <ownedParameter xmi:id="_A2Gv_3nsEd6L0ssCVn1r9Q" type="_A2LBY3nsEd6L0ssCVn1r9Q" direction="return"/>
-      </ownedOperation>
-      <ownedOperation xmi:id="_A2GwAHnsEd6L0ssCVn1r9Q" name="toString" visibility="public">
-        <ownedParameter xmi:id="_A2GwAXnsEd6L0ssCVn1r9Q" name="labeled" type="_A2LBY3nsEd6L0ssCVn1r9Q"/>
-        <ownedParameter xmi:id="_A2GwAnnsEd6L0ssCVn1r9Q" type="_A2GwGnnsEd6L0ssCVn1r9Q" direction="return"/>
-      </ownedOperation>
-      <ownedOperation xmi:id="_A2GwA3nsEd6L0ssCVn1r9Q" name="id" visibility="public" isStatic="true">
-        <ownedParameter xmi:id="_A2GwBHnsEd6L0ssCVn1r9Q" type="_A2LBYHnsEd6L0ssCVn1r9Q" direction="return"/>
-      </ownedOperation>
-      <ownedOperation xmi:id="_A2GwBXnsEd6L0ssCVn1r9Q" name="name" visibility="public" isStatic="true">
-        <ownedParameter xmi:id="_A2GwBnnsEd6L0ssCVn1r9Q" type="_A2GwGnnsEd6L0ssCVn1r9Q" direction="return"/>
-      </ownedOperation>
-      <ownedOperation xmi:id="_A2GwB3nsEd6L0ssCVn1r9Q" name="operator #0" visibility="public">
-        <ownedParameter xmi:id="_A2GwCHnsEd6L0ssCVn1r9Q" type="_A2Gv9HnsEd6L0ssCVn1r9Q" direction="return"/>
-      </ownedOperation>
-      <ownedOperation xmi:id="_A2GwCXnsEd6L0ssCVn1r9Q" name="~Type" visibility="public"/>
-    </packagedElement>
-    <packagedElement xmi:type="uml:Association" xmi:id="_A2GwCnnsEd6L0ssCVn1r9Q" name="N_TypeBase_string" memberEnd="_A2GwC3nsEd6L0ssCVn1r9Q _A2GwDHnsEd6L0ssCVn1r9Q" navigableOwnedEnd="_A2GwDHnsEd6L0ssCVn1r9Q">
-      <ownedEnd xmi:id="_A2GwC3nsEd6L0ssCVn1r9Q" name="isis::TypeBase" type="_A2GI7XnsEd6L0ssCVn1r9Q" isUnique="false" association="_A2GwCnnsEd6L0ssCVn1r9Q"/>
-      <ownedEnd xmi:id="_A2GwDHnsEd6L0ssCVn1r9Q" name="string" type="_A2GwGnnsEd6L0ssCVn1r9Q" isUnique="false" association="_A2GwCnnsEd6L0ssCVn1r9Q"/>
-    </packagedElement>
-    <packagedElement xmi:type="uml:Association" xmi:id="_A2GwDXnsEd6L0ssCVn1r9Q" name="C_Type_string" memberEnd="_A2GwDnnsEd6L0ssCVn1r9Q _A2GwD3nsEd6L0ssCVn1r9Q">
-      <ownedEnd xmi:id="_A2GwDnnsEd6L0ssCVn1r9Q" name="isis::Type" type="_A2Gv8XnsEd6L0ssCVn1r9Q" isUnique="false" association="_A2GwDXnsEd6L0ssCVn1r9Q"/>
-      <ownedEnd xmi:id="_A2GwD3nsEd6L0ssCVn1r9Q" name="string" type="_A2GwGnnsEd6L0ssCVn1r9Q" isUnique="false" aggregation="composite" association="_A2GwDXnsEd6L0ssCVn1r9Q">
-        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_A2GwEHnsEd6L0ssCVn1r9Q" value="1"/>
-        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_A2GwEXnsEd6L0ssCVn1r9Q" value="1"/>
-      </ownedEnd>
-    </packagedElement>
-    <packagedElement xmi:type="uml:Association" xmi:id="_A2GwEnnsEd6L0ssCVn1r9Q" name="N_Type_string" memberEnd="_A2GwE3nsEd6L0ssCVn1r9Q _A2GwFHnsEd6L0ssCVn1r9Q" navigableOwnedEnd="_A2GwFHnsEd6L0ssCVn1r9Q">
-      <ownedEnd xmi:id="_A2GwE3nsEd6L0ssCVn1r9Q" name="isis::Type" type="_A2Gv8XnsEd6L0ssCVn1r9Q" isUnique="false" association="_A2GwEnnsEd6L0ssCVn1r9Q"/>
-      <ownedEnd xmi:id="_A2GwFHnsEd6L0ssCVn1r9Q" name="string" type="_A2GwGnnsEd6L0ssCVn1r9Q" isUnique="false" association="_A2GwEnnsEd6L0ssCVn1r9Q"/>
-    </packagedElement>
-    <packagedElement xmi:type="uml:Usage" xmi:id="_A2GwFXnsEd6L0ssCVn1r9Q" name="isis::Property_isis::Type" supplier="_A2Gv8XnsEd6L0ssCVn1r9Q" client="_A2GI4XnsEd6L0ssCVn1r9Q"/>
     <packagedElement xmi:type="uml:Component" xmi:id="_aTdhAHohEd6Nz_9A0K36ug" name="DataStorage" clientDependency="_YA9ToHq1Ed6WXdFhqrXVTQ _ibMQUnrVEd63NdOxGTrelw _j_07w3rpEd6KV4UtlHpIHg _GtZlsnr4Ed6Jor7AP9WGOw">
       <ownedComment xmi:id="_M7hdAHrFEd6CjMGRXd8Bmg" annotatedElement="_xZ0J0HonEd6Nz_9A0K36ug">
         <body>Freki.. :)</body>
@@ -107,8 +16,99 @@
       </ownedComment>
       <interfaceRealization xmi:id="_YA9ToHq1Ed6WXdFhqrXVTQ" name="InterfaceRealization1" supplier="_azk-8Ho2Ed6Nz_9A0K36ug" client="_aTdhAHohEd6Nz_9A0K36ug" contract="_azk-8Ho2Ed6Nz_9A0K36ug"/>
       <interfaceRealization xmi:id="_ibMQUnrVEd63NdOxGTrelw" name="InterfaceRealization2" supplier="_gUWfoHrVEd63NdOxGTrelw" client="_aTdhAHohEd6Nz_9A0K36ug" contract="_gUWfoHrVEd63NdOxGTrelw"/>
+      <nestedClassifier xmi:type="uml:Class" xmi:id="_A2GI4XnsEd6L0ssCVn1r9Q" name="Property" clientDependency="_A2GwFXnsEd6L0ssCVn1r9Q">
+        <generalization xmi:id="_A2GI4nnsEd6L0ssCVn1r9Q" general="_A2GwGHnsEd6L0ssCVn1r9Q"/>
+        <ownedOperation xmi:id="_A2GI43nsEd6L0ssCVn1r9Q" name="Property" visibility="public">
+          <ownedParameter xmi:id="_A2GI5HnsEd6L0ssCVn1r9Q" name="ref" type="_A2LBYXnsEd6L0ssCVn1r9Q"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_A2GI5XnsEd6L0ssCVn1r9Q" name="Property" visibility="public"/>
+        <ownedOperation xmi:id="_A2GI5nnsEd6L0ssCVn1r9Q" name="operator #0" visibility="public">
+          <ownedParameter xmi:id="_A2GI53nsEd6L0ssCVn1r9Q" type="_A2LBYnnsEd6L0ssCVn1r9Q" direction="return"/>
+        </ownedOperation>
+      </nestedClassifier>
+      <nestedClassifier xmi:type="uml:Class" xmi:id="_A2GI6HnsEd6L0ssCVn1r9Q" name="PropMap">
+        <ownedTemplateSignature xmi:type="uml:RedefinableTemplateSignature" xmi:id="_A2GI6XnsEd6L0ssCVn1r9Q" parameter="_A2GI6nnsEd6L0ssCVn1r9Q">
+          <ownedParameter xmi:type="uml:ClassifierTemplateParameter" xmi:id="_A2GI6nnsEd6L0ssCVn1r9Q" parameteredElement="_A2GI63nsEd6L0ssCVn1r9Q">
+            <ownedParameteredElement xmi:type="uml:Class" xmi:id="_A2GI63nsEd6L0ssCVn1r9Q" name="T" templateParameter="_A2GI6nnsEd6L0ssCVn1r9Q"/>
+          </ownedParameter>
+        </ownedTemplateSignature>
+        <generalization xmi:id="_A2GI7HnsEd6L0ssCVn1r9Q" general="_A2GwGXnsEd6L0ssCVn1r9Q"/>
+      </nestedClassifier>
+      <nestedClassifier xmi:type="uml:Class" xmi:id="_A2GI7XnsEd6L0ssCVn1r9Q" name="TypeBase" isAbstract="true">
+        <ownedTemplateSignature xmi:type="uml:RedefinableTemplateSignature" xmi:id="_A2GI7nnsEd6L0ssCVn1r9Q" parameter="_A2GI73nsEd6L0ssCVn1r9Q _A2GI8XnsEd6L0ssCVn1r9Q">
+          <ownedParameter xmi:type="uml:ClassifierTemplateParameter" xmi:id="_A2GI73nsEd6L0ssCVn1r9Q" parameteredElement="_A2GI8HnsEd6L0ssCVn1r9Q">
+            <ownedParameteredElement xmi:type="uml:Class" xmi:id="_A2GI8HnsEd6L0ssCVn1r9Q" name="Target" templateParameter="_A2GI73nsEd6L0ssCVn1r9Q"/>
+          </ownedParameter>
+          <ownedParameter xmi:type="uml:ClassifierTemplateParameter" xmi:id="_A2GI8XnsEd6L0ssCVn1r9Q" parameteredElement="_A2GI8nnsEd6L0ssCVn1r9Q">
+            <ownedParameteredElement xmi:type="uml:Class" xmi:id="_A2GI8nnsEd6L0ssCVn1r9Q" name="Source" templateParameter="_A2GI8XnsEd6L0ssCVn1r9Q"/>
+          </ownedParameter>
+        </ownedTemplateSignature>
+        <ownedOperation xmi:id="_A2GI83nsEd6L0ssCVn1r9Q" name="is" visibility="public">
+          <ownedParameter xmi:id="_A2GI9HnsEd6L0ssCVn1r9Q" type="_A2LBY3nsEd6L0ssCVn1r9Q" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_A2GI9XnsEd6L0ssCVn1r9Q" name="is" visibility="public">
+          <ownedParameter xmi:id="_A2GI9nnsEd6L0ssCVn1r9Q" name="t" type="_A2LBZHnsEd6L0ssCVn1r9Q"/>
+          <ownedParameter xmi:id="_A2GI93nsEd6L0ssCVn1r9Q" type="_A2LBY3nsEd6L0ssCVn1r9Q" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_A2GI-HnsEd6L0ssCVn1r9Q" name="toString" visibility="public">
+          <ownedParameter xmi:id="_A2GI-XnsEd6L0ssCVn1r9Q" name="labeled" type="_A2LBY3nsEd6L0ssCVn1r9Q"/>
+          <ownedParameter xmi:id="_A2GI-nnsEd6L0ssCVn1r9Q" type="_A2GwGnnsEd6L0ssCVn1r9Q" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_A2Gv8HnsEd6L0ssCVn1r9Q" name="~TypeBase" visibility="public"/>
+      </nestedClassifier>
+      <nestedClassifier xmi:type="uml:Class" xmi:id="_A2Gv8XnsEd6L0ssCVn1r9Q" name="Type">
+        <ownedTemplateSignature xmi:type="uml:RedefinableTemplateSignature" xmi:id="_A2Gv8nnsEd6L0ssCVn1r9Q" parameter="_A2Gv83nsEd6L0ssCVn1r9Q">
+          <ownedParameter xmi:type="uml:ClassifierTemplateParameter" xmi:id="_A2Gv83nsEd6L0ssCVn1r9Q" parameteredElement="_A2Gv9HnsEd6L0ssCVn1r9Q">
+            <ownedParameteredElement xmi:type="uml:Class" xmi:id="_A2Gv9HnsEd6L0ssCVn1r9Q" name="TYPE" templateParameter="_A2Gv83nsEd6L0ssCVn1r9Q"/>
+          </ownedParameter>
+        </ownedTemplateSignature>
+        <generalization xmi:id="_A2Gv9XnsEd6L0ssCVn1r9Q" general="_A2GI7XnsEd6L0ssCVn1r9Q"/>
+        <ownedAttribute xmi:id="_A2Gv9nnsEd6L0ssCVn1r9Q" name="val" visibility="private" type="_A2Gv9HnsEd6L0ssCVn1r9Q"/>
+        <ownedAttribute xmi:id="_A2Gv93nsEd6L0ssCVn1r9Q" name="typeName" visibility="private" isStatic="true" type="_A2GwGnnsEd6L0ssCVn1r9Q"/>
+        <ownedAttribute xmi:id="_A2Gv-HnsEd6L0ssCVn1r9Q" name="typeID" visibility="private" isStatic="true" type="_A2LBYHnsEd6L0ssCVn1r9Q"/>
+        <ownedOperation xmi:id="_A2Gv-XnsEd6L0ssCVn1r9Q" name="Type" visibility="public">
+          <ownedParameter xmi:id="_A2Gv-nnsEd6L0ssCVn1r9Q" name="value" type="_A2LBYXnsEd6L0ssCVn1r9Q"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_A2Gv-3nsEd6L0ssCVn1r9Q" name="as" visibility="public">
+          <ownedParameter xmi:id="_A2Gv_HnsEd6L0ssCVn1r9Q" type="_A2LBYnnsEd6L0ssCVn1r9Q" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_A2Gv_XnsEd6L0ssCVn1r9Q" name="is" visibility="public">
+          <ownedParameter xmi:id="_A2Gv_nnsEd6L0ssCVn1r9Q" name="t" type="_A2LBZHnsEd6L0ssCVn1r9Q"/>
+          <ownedParameter xmi:id="_A2Gv_3nsEd6L0ssCVn1r9Q" type="_A2LBY3nsEd6L0ssCVn1r9Q" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_A2GwAHnsEd6L0ssCVn1r9Q" name="toString" visibility="public">
+          <ownedParameter xmi:id="_A2GwAXnsEd6L0ssCVn1r9Q" name="labeled" type="_A2LBY3nsEd6L0ssCVn1r9Q"/>
+          <ownedParameter xmi:id="_A2GwAnnsEd6L0ssCVn1r9Q" type="_A2GwGnnsEd6L0ssCVn1r9Q" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_A2GwA3nsEd6L0ssCVn1r9Q" name="id" visibility="public" isStatic="true">
+          <ownedParameter xmi:id="_A2GwBHnsEd6L0ssCVn1r9Q" type="_A2LBYHnsEd6L0ssCVn1r9Q" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_A2GwBXnsEd6L0ssCVn1r9Q" name="name" visibility="public" isStatic="true">
+          <ownedParameter xmi:id="_A2GwBnnsEd6L0ssCVn1r9Q" type="_A2GwGnnsEd6L0ssCVn1r9Q" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_A2GwB3nsEd6L0ssCVn1r9Q" name="operator #0" visibility="public">
+          <ownedParameter xmi:id="_A2GwCHnsEd6L0ssCVn1r9Q" type="_A2Gv9HnsEd6L0ssCVn1r9Q" direction="return"/>
+        </ownedOperation>
+        <ownedOperation xmi:id="_A2GwCXnsEd6L0ssCVn1r9Q" name="~Type" visibility="public"/>
+      </nestedClassifier>
+      <nestedClassifier xmi:type="uml:Association" xmi:id="_A2GwCnnsEd6L0ssCVn1r9Q" name="N_TypeBase_string" memberEnd="_A2GwC3nsEd6L0ssCVn1r9Q _A2GwDHnsEd6L0ssCVn1r9Q" navigableOwnedEnd="_A2GwDHnsEd6L0ssCVn1r9Q">
+        <ownedEnd xmi:id="_A2GwC3nsEd6L0ssCVn1r9Q" name="isis::TypeBase" type="_A2GI7XnsEd6L0ssCVn1r9Q" isUnique="false" association="_A2GwCnnsEd6L0ssCVn1r9Q"/>
+        <ownedEnd xmi:id="_A2GwDHnsEd6L0ssCVn1r9Q" name="string" type="_A2GwGnnsEd6L0ssCVn1r9Q" isUnique="false" association="_A2GwCnnsEd6L0ssCVn1r9Q"/>
+      </nestedClassifier>
+      <nestedClassifier xmi:type="uml:Association" xmi:id="_A2GwDXnsEd6L0ssCVn1r9Q" name="C_Type_string" memberEnd="_A2GwDnnsEd6L0ssCVn1r9Q _A2GwD3nsEd6L0ssCVn1r9Q">
+        <ownedEnd xmi:id="_A2GwDnnsEd6L0ssCVn1r9Q" name="isis::Type" type="_A2Gv8XnsEd6L0ssCVn1r9Q" isUnique="false" association="_A2GwDXnsEd6L0ssCVn1r9Q"/>
+        <ownedEnd xmi:id="_A2GwD3nsEd6L0ssCVn1r9Q" name="string" type="_A2GwGnnsEd6L0ssCVn1r9Q" isUnique="false" aggregation="composite" association="_A2GwDXnsEd6L0ssCVn1r9Q">
+          <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_A2GwEHnsEd6L0ssCVn1r9Q" value="1"/>
+          <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_A2GwEXnsEd6L0ssCVn1r9Q" value="1"/>
+        </ownedEnd>
+      </nestedClassifier>
+      <nestedClassifier xmi:type="uml:Association" xmi:id="_A2GwEnnsEd6L0ssCVn1r9Q" name="N_Type_string" memberEnd="_A2GwE3nsEd6L0ssCVn1r9Q _A2GwFHnsEd6L0ssCVn1r9Q" navigableOwnedEnd="_A2GwFHnsEd6L0ssCVn1r9Q">
+        <ownedEnd xmi:id="_A2GwE3nsEd6L0ssCVn1r9Q" name="isis::Type" type="_A2Gv8XnsEd6L0ssCVn1r9Q" isUnique="false" association="_A2GwEnnsEd6L0ssCVn1r9Q"/>
+        <ownedEnd xmi:id="_A2GwFHnsEd6L0ssCVn1r9Q" name="string" type="_A2GwGnnsEd6L0ssCVn1r9Q" isUnique="false" association="_A2GwEnnsEd6L0ssCVn1r9Q"/>
+      </nestedClassifier>
       <packagedElement xmi:type="uml:Usage" xmi:id="_j_07w3rpEd6KV4UtlHpIHg" name="Usage1" supplier="_7NY_4HorEd6Nz_9A0K36ug" client="_aTdhAHohEd6Nz_9A0K36ug"/>
       <packagedElement xmi:type="uml:Usage" xmi:id="_GtZlsnr4Ed6Jor7AP9WGOw" name="Usage2" supplier="__BnlwHr3Ed6Jor7AP9WGOw" client="_aTdhAHohEd6Nz_9A0K36ug"/>
+      <packagedElement xmi:type="uml:Usage" xmi:id="_A2GwFXnsEd6L0ssCVn1r9Q" name="isis::Property_isis::Type" supplier="_A2Gv8XnsEd6L0ssCVn1r9Q" client="_A2GI4XnsEd6L0ssCVn1r9Q"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Component" xmi:id="_xZ0J0HonEd6Nz_9A0K36ug" name="IO" clientDependency="_42_Ysnq5Ed6WXdFhqrXVTQ _5YLaMnq5Ed6WXdFhqrXVTQ _emvuUXrVEd63NdOxGTrelw _GFbmwnr4Ed6Jor7AP9WGOw">
       <interfaceRealization xmi:id="_5YLaMnq5Ed6WXdFhqrXVTQ" name="InterfaceRealization1" supplier="_7NY_4HorEd6Nz_9A0K36ug" client="_xZ0J0HonEd6Nz_9A0K36ug" contract="_7NY_4HorEd6Nz_9A0K36ug"/>
