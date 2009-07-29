@@ -1,8 +1,4 @@
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -15,7 +11,8 @@ struct FileIO{
 
 int main(int argc, char *argv[])
 {
-  ENABLE_LOG(FileIO,MessagePrintNeq,2);
+  ENABLE_LOG(FileIO,DefaultMsgPrintNeq,2);
+  DefaultMsgPrintNeq::setStream(std::cerr);
   {
     MAKE_LOG(FileIO);
     LOG(FileIO,2) << "Hallo " << MSubject("test") <<  std::endl;

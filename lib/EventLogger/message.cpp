@@ -40,16 +40,18 @@ std::string Message::merge()const{
   return ret;
 }
 
-void MessagePrint::commit(const Message &mesg){
-  std::cout << "[" << mesg.file << "::" << mesg.object << ":" << mesg.line << "\t";
-  std::cout << mesg.strTime() << "]\t" << mesg.merge() << std::endl;
+void DefaultMsgPrint::commit(const Message &mesg){
+  *o << "[" << mesg.strTime() << "|" << mesg.file << "::" << mesg.object << ":" << mesg.line << "]\t" << mesg.merge() << std::endl;
 }
 
-void MessagePrintNeq::commit(const Message &mesg){
+void DefaultMsgPrint::setStream(std::ostream &_o){
+	o = &_o;
+}
+
+void DefaultMsgPrintNeq::commit(const Message &mesg){
   const std::string out(mesg.merge());
   if(last!=out){
-    std::cout << "[" << mesg.file << "::" << mesg.object << ":" << mesg.line << "\t";
-    std::cout << mesg.strTime() << "]\t" <<  out << std::endl;
+    *o << "[" << mesg.strTime() << "|" << mesg.file << "::" << mesg.object << ":" << mesg.line << "]\t" <<  out << std::endl;
     last=out;
   }
 }
@@ -67,3 +69,4 @@ Message& std::endl(Message& __os) {
   return __os;
 }
 
+std::ostream *DefaultMsgPrint::o=&std::cout;

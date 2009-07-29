@@ -65,16 +65,19 @@ public:
   bool shouldCommit()const;
 };
 
-class MessagePrint : public MessageHandlerBase {
+class DefaultMsgPrint : public MessageHandlerBase {
+protected:
+	static std::ostream *o;
 public:
-  MessagePrint(unsigned short level):MessageHandlerBase(level){}
-  void commit(const Message &mesg);
+	DefaultMsgPrint(unsigned short level):MessageHandlerBase(level){}
+	void commit(const Message &mesg);
+	static void setStream( std::ostream &_o);
 };
 
-class MessagePrintNeq : public MessageHandlerBase {
+class DefaultMsgPrintNeq : public DefaultMsgPrint {
   std::string last;
 public:
-  MessagePrintNeq(unsigned short level):MessageHandlerBase(level){}
+  DefaultMsgPrintNeq(unsigned short level):DefaultMsgPrint(level){}
   void commit(const Message &mesg);
 };
 
