@@ -16,6 +16,8 @@
 #include <list>
 #include <iostream>
 
+namespace isis{
+
 template<class MODULE> class Log;
 class Message;
 
@@ -97,11 +99,12 @@ public:
   }
 };
 
-namespace std{
-  Message& endl(Message& __os);
 }
 
-  
+namespace std{
+  isis::Message& endl(isis::Message& __os);
+}
+
 #include "log.h"
 
 #endif //MESSAGE_H
