@@ -1,1 +1,2 @@
 add_subdirectory(EventLoggerTest)
+add_subdirectory(PropertyTest)

@@ -1,1 +1,2 @@
 add_subdirectory(EventLogger)
+add_subdirectory(DataStorage)
