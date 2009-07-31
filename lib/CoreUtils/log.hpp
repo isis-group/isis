@@ -13,7 +13,7 @@
 #define LOG_H
 
 #include <string>
-#include "message.h"
+#include "message.hpp"
 #include "../common.hpp"
 
 namespace isis{

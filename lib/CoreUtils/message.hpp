@@ -106,6 +106,6 @@ namespace std{
   isis::Message& endl(isis::Message& __os);
 }
 
-#include "log.h"
+#include "log.hpp"
 
 #endif //MESSAGE_H

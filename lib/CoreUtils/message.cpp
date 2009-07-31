@@ -6,7 +6,7 @@
  *  Copyright 2008 __MyCompanyName__. All rights reserved.
  */
 
-#include "message.h"
+#include "message.hpp"
 #include "../common.hpp"
 #include <sys/time.h>
 

@@ -1,2 +1,1 @@
-add_subdirectory(EventLogger)
-add_subdirectory(DataStorage)
+add_subdirectory(CoreUtils)
