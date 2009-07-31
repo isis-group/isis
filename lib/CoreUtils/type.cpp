@@ -17,8 +17,8 @@
 namespace isis{
 
 #define DEF_TYPE(TYPE,NAME,ID)  \
-  template<> std::string Type<TYPE>::typeName=#NAME;\
-  template<> unsigned int Type<TYPE>::typeID=ID;
+  template<> std::string Type<TYPE>::_type=#NAME;\
+  template<> unsigned short Type<TYPE>::_typeID=ID;
 
   DEF_TYPE(char,s8bit,0x5);
   DEF_TYPE(unsigned char,u8bit,0x6);

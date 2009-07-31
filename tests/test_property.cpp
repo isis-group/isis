@@ -8,8 +8,12 @@
 #include "property.hpp"
 #include "propmap.hpp"
 #include <iostream>
+#include "log.hpp"
 
 int main(int argc, char *argv[]){
+
+  ENABLE_LOG(isis::CoreLog,isis::DefaultMsgPrint,2);
+
   isis::Property a=std::string("Hallo");
   std::cout << a->toString(true) << std::endl;
 
@@ -31,7 +35,7 @@ int main(int argc, char *argv[]){
   std::cout << x << std::endl;
 
   //will fail at runtime
-  //int fail=map["Test3"];
-
+  int fail=map["Test3"];
+  
   return EXIT_SUCCESS;
 }

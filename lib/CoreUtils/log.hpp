@@ -14,7 +14,7 @@
 
 #include <string>
 #include "message.hpp"
-#include "../common.hpp"
+#include "common.hpp"
 
 namespace isis{
 
