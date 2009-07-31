@@ -24,21 +24,23 @@ string Message::strTime()const{
 }
 
 Message::Message(string _object,string _file,int _line,unsigned short _level,MessageHandlerBase *_commitTo)
-  :object(_object),subject(),file(_file),line(_line),level(_level),commitTo(_commitTo){
+  :object(_object),file(_file),line(_line),level(_level),commitTo(_commitTo){
   time(&timeStamp);
 }
 Message::Message(const Message &src)
-: ::std::ostringstream(src.str()),object(src.object),subject(src.subject),file(src.file),timeStamp(src.timeStamp),line(src.line),commitTo(src.commitTo)
+: ::std::ostringstream(src.str()),object(src.object),file(src.file),subjects(src.subjects),timeStamp(src.timeStamp),line(src.line),commitTo(src.commitTo)
 {}
 
   
 string Message::merge()const{
   string ret(str());
-  size_t found;
+  size_t found=string::npos;
+  std::list<std::string>::const_iterator subj=subjects.begin();
   if((found=ret.find("{o}"))!=string::npos)
     ret.replace(found,3,object);
-  if((found=ret.find("{s}"))!=string::npos)
-    ret.replace(found,3,subject);
+  found=0;
+  while((found=ret.find("{s}",found))!=string::npos)
+    ret.replace(found,3,*(subj++));
   return ret;
 }
 

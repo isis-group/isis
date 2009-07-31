@@ -41,7 +41,8 @@ public:
 
 class Message: public std::ostringstream{
 public:
-  std::string object,subject,file;
+  std::string object,file;
+  std::list<std::string> subjects;
   time_t timeStamp;
   int line;
   unsigned short level;
@@ -56,7 +57,7 @@ public:
     return *this;
   }
   Message &operator << (const MSubject &subj){
-    subject = subj;
+    subjects.push_back(subj);
     *((std::ostringstream*)this) << "{s}";
     return *this;
   }

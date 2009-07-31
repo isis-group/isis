@@ -20,7 +20,7 @@ int main(int argc, char *argv[]){
 		LOG(FileIO,2) << "Hallo " << isis::MSubject("Echo") << std::endl;
 		LOG(FileIO,2) << "Hallo " << isis::MSubject("Otto") <<  std::endl;
 		LOG(FileIO,2) << "Hallo " << isis::MSubject("Otto") <<  std::endl;//wont be displayed, because its the same as before
-		LOG(FileIO,2) << "Hallo " << isis::MSubject("du") << ", wie gehts denn so" <<  std::endl;
+		LOG(FileIO,2) << "Hallo " << isis::MSubject("du") << ", wie gehts "  << isis::MSubject("dir") <<  " denn so" <<  std::endl;//multiple subjects
 		LOG(FileIO,3) << "Hallo " << isis::MSubject("Mutti") <<  std::endl;//wont be processed, because loglevel is only 2
 	}//created logging object will be destroyed here
 
