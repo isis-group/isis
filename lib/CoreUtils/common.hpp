@@ -14,9 +14,8 @@
 //   return o;
 // }
 
-#include "../common.hpp"
-
 namespace isis{
-struct CoreLog{enum {use_rel = _ENABLE_CORE_LOG};};
+	typedef ::std::string string;
+	struct CoreLog{enum {use_rel = _ENABLE_CORE_LOG};};
 }
 #endif //ISISCOMMON_HPP

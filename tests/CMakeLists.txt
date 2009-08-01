@@ -1,5 +1,3 @@
-include_directories(../lib/CoreUtils)
-
 add_definitions(-D_ENABLE_FILEIO_LOG=1 -D_ENABLE_CORE_LOG=1)
 
 add_executable(test_logger		test_logger.cpp)

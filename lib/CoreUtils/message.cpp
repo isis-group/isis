@@ -7,7 +7,7 @@
  */
 
 #include "message.hpp"
-#include "../common.hpp"
+#include "common.hpp"
 #include <sys/time.h>
 
 namespace isis{

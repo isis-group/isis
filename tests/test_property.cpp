@@ -5,10 +5,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "property.hpp"
-#include "propmap.hpp"
+#include "CoreUtils/property.hpp"
+#include "CoreUtils/propmap.hpp"
 #include <iostream>
-#include "log.hpp"
+#include "CoreUtils/log.hpp"
 
 int main(int argc, char *argv[]){
 

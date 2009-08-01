@@ -8,6 +8,7 @@ project(isis)
 #add definitions, compiler switches, etc.
 add_definitions(-Wall)
 
+include_directories(lib)
 
 add_subdirectory(lib)
 add_subdirectory(tests)
