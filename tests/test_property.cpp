@@ -34,7 +34,7 @@ int main(int argc, char *argv[]){
   std::string x=map["Test3"];
   std::cout << x << std::endl;
 
-  //will fail at runtime
+  //will get "0"
   int fail=map["Test3"];
   
   return EXIT_SUCCESS;
