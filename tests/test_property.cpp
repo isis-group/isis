@@ -34,8 +34,15 @@ int main(int argc, char *argv[]){
 	std::string x=map["Test3"];
 	std::cout << x << std::endl;
 
-	//will fail at runtime
+	//will get you int() ("0")
 	int fail=map["Test3"];
+	
+	//will raise bad_cast (Because "Hallo" cannot lexically be casted to "3"
+// 	fail=map["Test3"]->as<int>();
+
+	//will be ok ("3" can be lexically casted to int)
+	map["Test3"]=std::string("3");
+	int ok=map["Test3"]->as<int>();
 	
 	return EXIT_SUCCESS;
 }

@@ -24,13 +24,11 @@ public:
 	template<typename T> bool is(){return is(typeid(T));}
 	virtual bool is(const std::type_info & t)const = 0;
 	virtual std::string toString(bool labeled=false)const=0;
-	virtual TypeBase& fromString(std::string)=0;
 	virtual std::string typeName()const=0;
 	virtual unsigned short typeID()const=0;
 
 	template<class T> T as(){
-		Type<T> ret;
-		ret.fromString(this->toString());
+		Type<T> ret(this->toString());
 		return (T)ret;
 	}
 
@@ -67,10 +65,6 @@ public:
 	}
 	virtual bool is(const std::type_info & t)const{
 		return t==typeid(TYPE);
-	}
-	virtual TypeBase &fromString(std::string val){
-		(*this)=Type<TYPE>(val);
-		return *this;
 	}
 	virtual std::string toString(bool labeled=false)const{
 		std::string ret=boost::lexical_cast<std::string>(m_val);

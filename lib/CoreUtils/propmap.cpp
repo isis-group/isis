@@ -25,12 +25,3 @@ namespace boost{namespace detail{
 	}
 }}
 
-namespace isis {
-
-template<> TypeBase &Type<PropMap>::fromString(std::string val){
-	MAKE_LOG(CoreLog);
-	LOG(CoreLog,0) << "Not implemented yet!" << std::endl;
-	return *this;
-}
-
-}
