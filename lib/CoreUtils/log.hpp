@@ -19,20 +19,20 @@
 namespace isis{
 
 template<class MODULE> class Log{
-  string file,object;
-  inline static MessageHandlerBase* &handler(){
-    static MessageHandlerBase *msg;
-    return msg;
-  }
-public:
-  Log(const char *_file,string _object):file(_file),object(_object){ }
+	string file,object;
+	inline static MessageHandlerBase* &handler(){
+		static MessageHandlerBase *msg;
+		return msg;
+	}
+	public:
+	Log(const char *_file,string _object):file(_file),object(_object){ }
 
-  template<class HANDLE_CLASS> static void enable(unsigned short enable){
-    Log<MODULE>::handler()= enable ? new HANDLE_CLASS(enable):0;
-  }
-  Message send(int line,unsigned short level){
-    return Message(object,file,line, level,Log<MODULE>::handler());
-  }
+	template<class HANDLE_CLASS> static void enable(unsigned short enable){
+		Log<MODULE>::handler()= enable ? new HANDLE_CLASS(enable):0;
+	}
+	Message send(int line,unsigned short level){
+		return Message(object,file,line, level,Log<MODULE>::handler());
+	}
 };
 }
 

@@ -15,19 +15,15 @@ common property class
 */
 
 class Property:public boost::shared_ptr<TypeBase>{
-  public:
-  template<typename T> Property(const T& ref):boost::shared_ptr <TypeBase >(new Type<T>(ref)){ }
-  Property(){ }
-  template<typename T> operator T()const{
-	  const TypeBase *dummy=get();
-	  const Type<T> ret=
-	  dummy->cast_to_type<T>();
-	  return (T)ret;
-/*	} else {
-	  LOG(CoreLog,0) << "Cannot cast " << get()->typeName() << " to " << Type<T>::name() << " returning \"" << T() << "\"" << std::endl;
-	  return T();
-	}*/
-  }
+	public:
+	template<typename T> Property(const T& ref):boost::shared_ptr <TypeBase >(new Type<T>(ref)){ }
+	Property(){ }
+	template<typename T> operator T()const{
+		const TypeBase *dummy=get();
+		const Type<T> ret=
+		dummy->cast_to_type<T>();
+		return (T)ret;
+	}
 };
 
 }

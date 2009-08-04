@@ -8,8 +8,8 @@
 
 namespace isis {
 
-class PropMap : public std::map<std::string,Property>{
-};
+class PropMap : public std::map<std::string,Property>{};
+template<> TypeBase &Type<PropMap>::fromString(std::string val);
 
 }
 
