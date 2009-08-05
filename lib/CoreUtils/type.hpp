@@ -6,10 +6,11 @@
 #include <map>
 #include "log.hpp"
 
-namespace isis{
+namespace iUtil{
 
 template<typename TYPE> class Type;
 
+namespace _internal{
 template<typename TYPE,typename T> TYPE __cast_to(Type<TYPE> *dest,const T& value){
 	return boost::lexical_cast<TYPE>(value);
 }
@@ -53,8 +54,10 @@ public:
 		return *ret;
 	}
 };
+}
 
-template<typename TYPE> class Type: public TypeBase{
+/// Generic class for type aware variables
+template<typename TYPE> class Type: public _internal::TypeBase{
 	TYPE m_val;
 	static std::string m_typeName;
 	static unsigned short m_typeID;

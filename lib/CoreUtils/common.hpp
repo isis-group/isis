@@ -14,7 +14,7 @@
 //   return o;
 // }
 
-namespace isis{
+namespace iUtil{
 	typedef ::std::string string;
 	struct CoreLog{enum {use_rel = _ENABLE_CORE_LOG};};
 }

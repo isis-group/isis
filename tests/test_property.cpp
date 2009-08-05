@@ -12,18 +12,18 @@
 
 int main(int argc, char *argv[]){
 
-	ENABLE_LOG(isis::CoreLog,isis::DefaultMsgPrint,2);
+	ENABLE_LOG(iUtil::CoreLog,iUtil::DefaultMsgPrint,2);
 
-	isis::Property a=std::string("Hallo");
+	iUtil::Property a=std::string("Hallo");
 	std::cout << a->toString(true) << std::endl;
 
-	isis::Property b=a;
+	iUtil::Property b=a;
 	std::cout << b->toString(true) << std::endl;
 
 	b=5.2;
 	std::cout << b->toString(true) << std::endl;
 
-	isis::PropMap map,cont;
+	iUtil::PropMap map,cont;
 	map["Test1"]=6.4;
 	map["Test2"]=6;
 	map["Test3"]=std::string("Hallo");

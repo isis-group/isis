@@ -1,16 +1,27 @@
 /*
  *  message.cpp
- *  log_concept
  *
  *  Created by Enrico Reimer on 04.05.08.
- *  Copyright 2008 __MyCompanyName__. All rights reserved.
+ *  Copyright 2008. All rights reserved.
  */
 
 #include "message.hpp"
 #include "common.hpp"
 #include <sys/time.h>
 
-namespace isis{
+using iUtil::_internal::Message;
+using ::std::string;
+
+namespace iUtil{
+
+void _internal::MessageHandlerBase::stopBelow(unsigned int stop){
+	m_stop_below=stop;
+}
+
+bool _internal::MessageHandlerBase::requestStop(){
+	if(m_stop_below>level)
+		pause();
+}
 
 string Message::strTime()const{
 	char buffer[11];
@@ -68,11 +79,12 @@ bool Message::shouldCommit()const{
 
 }
 namespace std{
-::isis::Message& endl(::isis::Message& __os) {
+Message& endl(Message& __os) {
 	if(__os.shouldCommit()){
 		__os.commitTo->commit(__os);
 		__os.str("");
 		__os.clear();
+		__os.commitTo->requestStop();
 	}
 	return __os;
 }

@@ -14,7 +14,7 @@
 #include "property.hpp"
 #include "propmap.hpp"
 
-namespace isis{
+namespace iUtil{
 
 #define DEF_TYPE(TYPE,NAME,ID)  \
   template<> std::string Type<TYPE>::m_typeName=#NAME;\

@@ -16,27 +16,32 @@
 #include <list>
 #include <iostream>
 
-namespace isis{
+namespace iUtil{
+
+class MSubject : public std::string{
+	public:
+		template<typename T> MSubject(const T& cont) : std::string(){ 
+			std::ostringstream text;
+			text << cont; 
+			assign(text.str());
+		}
+};
+
+namespace _internal{
 
 template<class MODULE> class Log;
 class Message;
 
 class MessageHandlerBase{
+	unsigned int m_stop_below;
 protected:
 	MessageHandlerBase(unsigned short _level):level(_level){}
 	virtual ~MessageHandlerBase(){}
 public:
 	unsigned short level;
-	virtual void commit(const Message &msg)=0; 
-};
-
-class MSubject : public std::string{
-public:
-	template<typename T> MSubject(const T& cont) : std::string(){ 
-		std::ostringstream text;
-		text << cont; 
-		assign(text.str());
-	}
+	virtual void commit(const Message &msg)=0;
+	void stopBelow(unsigned int=0);
+	bool requestStop();
 };
 
 class Message: public std::ostringstream{
@@ -67,13 +72,14 @@ public:
 	}
 	bool shouldCommit()const;
 };
+}
 
-class DefaultMsgPrint : public MessageHandlerBase {
+class DefaultMsgPrint : public _internal::MessageHandlerBase {
 protected:
 	static std::ostream *o;
 public:
-	DefaultMsgPrint(unsigned short level):MessageHandlerBase(level){}
-	void commit(const Message &mesg);
+	DefaultMsgPrint(unsigned short level):_internal::MessageHandlerBase(level){}
+	void commit(const _internal::Message &mesg);
 	static void setStream( std::ostream &_o);
 };
 
@@ -81,20 +87,20 @@ class DefaultMsgPrintNeq : public DefaultMsgPrint {
 	std::string last;
 public:
 	DefaultMsgPrintNeq(unsigned short level):DefaultMsgPrint(level){}
-	void commit(const Message &mesg);
+	void commit(const _internal::Message &mesg);
 };
 
 
-template<class MODULE>class MessageQueue : public MessageHandlerBase {
-	std::list<Message> msg;
+template<class MODULE>class MessageQueue : public _internal::MessageHandlerBase {
+	std::list<_internal::Message> msg;
 public:
-	MessageQueue(unsigned short level):msg(),MessageHandlerBase(level){}
+	MessageQueue(unsigned short level):msg(),_internal::MessageHandlerBase(level){}
 	~MessageQueue(){
-		for(std::list<Message>::iterator i=msg.begin();i!=msg.end();i++){
+		for(std::list<_internal::Message>::iterator i=msg.begin();i!=msg.end();i++){
 		std::cout << i->str() << std::endl;
 		}
 	}
-	void commit(const Message &mesg){
+	void commit(const _internal::Message &mesg){
 		std::cout << "Flushing " << mesg.str() << std::endl;
 		msg.push_back(mesg);//@needs to be mutexed
 	}
@@ -103,7 +109,7 @@ public:
 }
 
 namespace std{
-	isis::Message& endl(isis::Message& __os);
+	iUtil::_internal::Message& endl(iUtil::_internal::Message& __os);
 }
 
 #include "log.hpp"
