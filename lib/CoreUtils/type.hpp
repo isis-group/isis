@@ -19,8 +19,6 @@ template<typename TYPE> TYPE __cast_to(Type<TYPE> *dest,const TYPE& value){
 }
 
 class TypeBase{
-protected:
-	std::map<unsigned short,TypeBase*> _references;
 public:
 	template<typename T> bool is(){return is(typeid(T));}
 	virtual bool is(const std::type_info & t)const = 0;
@@ -33,7 +31,6 @@ public:
 		return (T)ret;
 	}
 
-	TypeBase *clone(unsigned short typeID);
 	template<typename T> const Type<T> cast_to_type() const{
 		MAKE_LOG(CoreLog);
 		const Type<T>* ret=dynamic_cast<const Type<T>* >(this);
