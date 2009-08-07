@@ -33,5 +33,5 @@ DEF_TYPE(float,float,0x30);
 DEF_TYPE(double,double,0x31);
 
 DEF_TYPE(std::string,string,0x40);
-DEF_TYPE(PropMap,PropertyMap,0xFE);
+DEF_TYPE(PropMap,PropertyMap,0xF0);
 }

@@ -20,8 +20,7 @@ class Property:public boost::shared_ptr<_internal::TypeBase>{
 	Property(){ }
 	template<typename T> operator T()const{
 		const _internal::TypeBase *dummy=get();
-		const Type<T> ret=
-		dummy->cast_to_type<T>();
+		const Type<T> ret=dummy->cast_to_type<T>();
 		return (T)ret;
 	}
 };

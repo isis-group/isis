@@ -8,6 +8,9 @@
 #include "message.hpp"
 #include "common.hpp"
 #include <sys/time.h>
+#include <sys/types.h>
+#include <signal.h>
+#include <unistd.h>
 
 using iUtil::_internal::Message;
 using ::std::string;
@@ -18,9 +21,9 @@ void _internal::MessageHandlerBase::stopBelow(unsigned int stop){
 	m_stop_below=stop;
 }
 
-bool _internal::MessageHandlerBase::requestStop(){
-	if(m_stop_below>level)
-		pause();
+bool _internal::MessageHandlerBase::requestStop(unsigned int _level){
+	if(m_stop_below>_level)
+		kill(getpid(),SIGTSTP);
 }
 
 string Message::strTime()const{
@@ -76,6 +79,8 @@ bool Message::shouldCommit()const{
 }
 
 ::std::ostream *DefaultMsgPrint::o=&::std::cout;
+unsigned int _internal::MessageHandlerBase::m_stop_below=0;
+
 
 }
 namespace std{
@@ -84,7 +89,7 @@ Message& endl(Message& __os) {
 		__os.commitTo->commit(__os);
 		__os.str("");
 		__os.clear();
-		__os.commitTo->requestStop();
+		__os.commitTo->requestStop(__os.level);
 	}
 	return __os;
 }

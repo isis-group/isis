@@ -33,15 +33,15 @@ template<class MODULE> class Log;
 class Message;
 
 class MessageHandlerBase{
-	unsigned int m_stop_below;
+	static unsigned int m_stop_below;
 protected:
 	MessageHandlerBase(unsigned short _level):level(_level){}
 	virtual ~MessageHandlerBase(){}
 public:
 	unsigned short level;
 	virtual void commit(const Message &msg)=0;
-	void stopBelow(unsigned int=0);
-	bool requestStop();
+	static void stopBelow(unsigned int=0);
+	bool requestStop(unsigned int _level);
 };
 
 class Message: public std::ostringstream{
