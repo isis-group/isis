@@ -23,13 +23,9 @@
 
 namespace iData{
 
-class Chunk : ::iUtil::_internal::TypeBase
-{
+template<typename T> class Chunk : ::iUtil::TypePtr<T*>{
 public:
-	bool is(const std::type_info & t);
-	std::string toString(bool labeled=false);
-	std::string typeName();
-	unsigned short typeID();
+	Chunk(T* src): ::iUtil::TypePtr<T*>(src){}
 };
 }
 #endif // CHUNK_H
