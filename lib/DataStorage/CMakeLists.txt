@@ -7,3 +7,4 @@ add_library(data SHARED chunk.cpp)
 set_target_properties(data PROPERTIES 
     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
     LINK_FLAGS "--no-undefined")
+

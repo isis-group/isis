@@ -317,7 +317,7 @@ private:
 
 
 }
-#include "isisRegistrationFactory.txx"
+//#include "isisRegistrationFactory.txx"
 
 
 #endif /* ISISREGISTRATIONFACTORY_H_ */

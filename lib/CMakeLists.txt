@@ -11,5 +11,5 @@ add_definitions(-Wall)
 add_subdirectory(CoreUtils)
 add_subdirectory(DataStorage)
 #add_subdirectory(ImageIO)
-#add_subdirectory(extRegistration)
+add_subdirectory(extRegistration)
 
