@@ -23,6 +23,7 @@ int main(int argc, char *argv[]){
 		LOG(CoreLog,2) << "Hallo " << iUtil::MSubject("du") << ", wie gehts "  << iUtil::MSubject("dir") <<  " denn so" <<  std::endl;//multiple subjects
 		LOG(CoreLog,3) << "Hallo " << iUtil::MSubject("Mutti") <<  std::endl;//wont be processed, because loglevel is only 2
 		LOG(CoreLog,0) << "HAAALT!!!11111" <<  std::endl;//will stop the process at this point because 0<1 (stopBelow(1) )
+		LOG(CoreLog,2) << "Weiter gehts" <<  std::endl;//will be printed after process was resumed
 	}//created logging object will be destroyed here
 
   return EXIT_SUCCESS;
