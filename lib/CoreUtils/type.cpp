@@ -19,8 +19,8 @@ namespace iUtil{
 #define DEF_TYPE(TYPE,NAME,ID)  \
   template<> std::string Type<TYPE>::m_typeName=#NAME;\
   template<> unsigned short Type<TYPE>::m_typeID=ID; \
-  template<> std::string TypePtr<TYPE*>::m_typeName=#NAME + std::string("*");\
-  template<> unsigned short TypePtr<TYPE*>::m_typeID=ID<<2; 
+  template<> std::string TypePtr<TYPE>::m_typeName=#NAME + std::string("*");\
+  template<> unsigned short TypePtr<TYPE>::m_typeID=ID<<2; 
   
 DEF_TYPE(char,s8bit,0x5);
 DEF_TYPE(unsigned char,u8bit,0x6);

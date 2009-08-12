@@ -23,9 +23,9 @@
 
 namespace iData{
 
-template<typename T> class Chunk : ::iUtil::TypePtr<T*>{
+template<typename T> class Chunk : ::iUtil::TypePtr<T>{
 public:
-	Chunk(T* src): ::iUtil::TypePtr<T*>(src){}
+	Chunk(T* src): ::iUtil::TypePtr<T>(src){}
 };
 }
 #endif // CHUNK_H

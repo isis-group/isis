@@ -113,14 +113,21 @@ template<typename TYPE> class TypePtr: public _internal::TypeBase{
 	static unsigned short m_typeID;
 	template<typename T> TypePtr(const Type<T>& value); // Dont do this
 public:
-	struct Deleter{
+	struct BasicDeleter{
 		virtual void operator()(TYPE *p){
 			MAKE_LOG(CoreLog);
-			LOG(CoreLog,2) << "Freeing pointer " << p << " (" << TypePtr<TYPE>::staticName() << ") " << std::endl;
+			LOG(CoreLog,info) << "Freeing pointer " << p << " (" << TypePtr<TYPE>::staticName() << ") " << std::endl;
+			free(p);
+		};
+	};
+	struct ObjectDeleter{
+		virtual void operator()(TYPE *p){
+			MAKE_LOG(CoreLog);
+			LOG(CoreLog,info) << "Deleting object " << p << " (" << TypePtr<TYPE>::staticName() << ") " << std::endl;
 			delete p;
 		};
 	};
-	template<typename T> TypePtr(T* ptr):m_val(ptr,Deleter()){}
+	template<typename T> TypePtr(T* ptr):m_val(ptr,BasicDeleter()){}
 	template<typename T, typename D> TypePtr(T* ptr,D d):m_val(ptr,d){}
 	virtual bool is(const std::type_info & t)const{
 		return t==typeid(TYPE);

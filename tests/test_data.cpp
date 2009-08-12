@@ -1,6 +1,10 @@
 #include "CoreUtils/log.hpp"
 #include <DataStorage/chunk.hpp>
 
+using namespace iUtil;
+
 int main(){
-	iData::Chunk<short> a(NULL);
+	ENABLE_LOG(CoreLog,DefaultMsgPrint,info);
+	
+	iData::Chunk<short> a(new short[50]);
 }
