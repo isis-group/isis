@@ -6,9 +6,11 @@
 #include <iostream>
 #include "CoreUtils/log.hpp"
 
+using namespace iUtil; //needed for the log-levels
+
 int main(int argc, char *argv[]){
 
-	ENABLE_LOG(iUtil::CoreLog,iUtil::DefaultMsgPrint,2);
+	ENABLE_LOG(CoreLog,DefaultMsgPrint,info);
 
 	iUtil::Property a=std::string("Hallo");
 	std::cout << a->toString(true) << std::endl;

@@ -17,13 +17,15 @@ using ::std::string;
 
 namespace iUtil{
 
-void _internal::MessageHandlerBase::stopBelow(unsigned int stop){
+void _internal::MessageHandlerBase::stopBelow(LogLevel stop){
 	m_stop_below=stop;
 }
 
-bool _internal::MessageHandlerBase::requestStop(unsigned int _level){
+bool _internal::MessageHandlerBase::requestStop(LogLevel _level){
 	if(m_stop_below>_level)
-		kill(getpid(),SIGTSTP);
+		return kill(getpid(),SIGTSTP) == 0;
+	else 
+		return false;
 }
 
 string Message::strTime()const{
@@ -37,7 +39,7 @@ string Message::strTime()const{
 	return result;
 }
 
-Message::Message(string _object,string _file,int _line,unsigned short _level,MessageHandlerBase *_commitTo)
+Message::Message(string _object,string _file,int _line,LogLevel _level,MessageHandlerBase *_commitTo)
 :object(_object),file(_file),line(_line),level(_level),commitTo(_commitTo){
 	time(&timeStamp);
 }
@@ -79,7 +81,7 @@ bool Message::shouldCommit()const{
 }
 
 ::std::ostream *DefaultMsgPrint::o=&::std::cout;
-unsigned int _internal::MessageHandlerBase::m_stop_below=0;
+LogLevel _internal::MessageHandlerBase::m_stop_below=error;
 
 
 }

@@ -27,21 +27,23 @@ class MSubject : public std::string{
 		}
 };
 
+enum LogLevel{error=0,warning,info,verbose_info};
+
 namespace _internal{
 
 template<class MODULE> class Log;
 class Message;
 
 class MessageHandlerBase{
-	static unsigned int m_stop_below;
+	static LogLevel m_stop_below;
 protected:
-	MessageHandlerBase(unsigned short _level):level(_level){}
+	MessageHandlerBase(LogLevel _level):level(_level){}
 	virtual ~MessageHandlerBase(){}
 public:
-	unsigned short level;
+	LogLevel level;
 	virtual void commit(const Message &msg)=0;
-	static void stopBelow(unsigned int=0);
-	bool requestStop(unsigned int _level);
+	static void stopBelow(LogLevel =error);
+	bool requestStop(LogLevel _level);
 };
 
 class Message: public std::ostringstream{
@@ -50,9 +52,9 @@ public:
 	std::list<std::string> subjects;
 	time_t timeStamp;
 	int line;
-	unsigned short level;
+	LogLevel level;
 	MessageHandlerBase *commitTo;
-	Message(std::string object,std::string file,int line,unsigned short level,MessageHandlerBase *commitTo);
+	Message(std::string object,std::string file,int line,LogLevel level,MessageHandlerBase *commitTo);
 	Message(const Message &src);
 	std::string merge()const;
 	std::string strTime()const;
@@ -78,7 +80,7 @@ class DefaultMsgPrint : public _internal::MessageHandlerBase {
 protected:
 	static std::ostream *o;
 public:
-	DefaultMsgPrint(unsigned short level):_internal::MessageHandlerBase(level){}
+	DefaultMsgPrint(LogLevel level):_internal::MessageHandlerBase(level){}
 	void commit(const _internal::Message &mesg);
 	static void setStream( std::ostream &_o);
 };
@@ -86,7 +88,7 @@ public:
 class DefaultMsgPrintNeq : public DefaultMsgPrint {
 	std::string last;
 public:
-	DefaultMsgPrintNeq(unsigned short level):DefaultMsgPrint(level){}
+	DefaultMsgPrintNeq(LogLevel level):DefaultMsgPrint(level){}
 	void commit(const _internal::Message &mesg);
 };
 
@@ -94,7 +96,7 @@ public:
 template<class MODULE>class MessageQueue : public _internal::MessageHandlerBase {
 	std::list<_internal::Message> msg;
 public:
-	MessageQueue(unsigned short level):msg(),_internal::MessageHandlerBase(level){}
+	MessageQueue(LogLevel level):msg(),_internal::MessageHandlerBase(level){}
 	~MessageQueue(){
 		for(std::list<_internal::Message>::iterator i=msg.begin();i!=msg.end();i++){
 		std::cout << i->str() << std::endl;

@@ -26,7 +26,7 @@ class TypeBase{
 		if(ret){
 			return *ret;
 		} else {
-			LOG(CoreLog,0) << "Cannot cast " << typeName() << " to " << T::staticName() << ". Returning \"" << defaultVal.toString() << "\"." << std::endl;
+			LOG(CoreLog,error) << "Cannot cast " << typeName() << " to " << T::staticName() << ". Returning \"" << defaultVal.toString() << "\"." << std::endl;
 			return defaultVal;
 		}
 	}
@@ -50,7 +50,7 @@ public:
 	template<class T> T as(){
 		MAKE_LOG(CoreLog);
 		if(typeID() & 0xFF00){
-			LOG(CoreLog,1) 
+			LOG(CoreLog,warning) 
 				<< "You're trying to lexically cast a pointer (" 
 				<< typeName() << ") to a value ("<< Type<T>::staticName() 
 				<< ") this is most likely nonsense" << std::endl;
@@ -112,11 +112,16 @@ template<typename TYPE> class TypePtr: public _internal::TypeBase{
 	static std::string m_typeName;
 	static unsigned short m_typeID;
 	template<typename T> TypePtr(const Type<T>& value); // Dont do this
-	
 public:
-	template<typename T> TypePtr(T* ptr){
-		// @todo implement me
-	}
+	struct Deleter{
+		virtual void operator()(TYPE *p){
+			MAKE_LOG(CoreLog);
+			LOG(CoreLog,2) << "Freeing pointer " << p << " (" << TypePtr<TYPE>::staticName() << ") " << std::endl;
+			delete p;
+		};
+	};
+	template<typename T> TypePtr(T* ptr):m_val(ptr,Deleter()){}
+	template<typename T, typename D> TypePtr(T* ptr,D d):m_val(ptr,d){}
 	virtual bool is(const std::type_info & t)const{
 		return t==typeid(TYPE);
 	}

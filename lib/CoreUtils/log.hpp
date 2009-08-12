@@ -16,20 +16,22 @@
 #include "message.hpp"
 #include "common.hpp"
 
-namespace iUtil{namespace _internal{
+namespace iUtil{
+	
+namespace _internal{
 template<class MODULE> class Log{
 	string file,object;
 	inline static MessageHandlerBase* &handler(){
 		static MessageHandlerBase *msg;
 		return msg;
 	}
-	public:
+public:
 	Log(const char *_file,string _object):file(_file),object(_object){ }
 
-	template<class HANDLE_CLASS> static void enable(unsigned short enable){
+	template<class HANDLE_CLASS> static void enable(LogLevel enable){
 		Log<MODULE>::handler()= enable ? new HANDLE_CLASS(enable):0;
 	}
-	Message send(int line,unsigned short level){
+	Message send(int line,LogLevel level){
 		return Message(object,file,line, level,Log<MODULE>::handler());
 	}
 };
