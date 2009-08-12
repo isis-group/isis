@@ -1,5 +1,5 @@
 /*
- * isisFastMarchingSegmentationFilter.txx
+ * isisGradientMagnitudeSegmentationFilter.txx
  *
  *  Created on: Jun 24, 2009
  *      Author: tuerke

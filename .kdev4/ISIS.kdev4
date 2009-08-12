@@ -1,0 +1,11 @@
+[Buildset]
+Number of Builditems=0
+
+[CMake]
+BuildDirs=/scr/kastanie1/proeger/workspace/ISIS/build
+CMakeDir=/usr/share/cmake-2.6/Modules
+Current CMake Binary=file:///usr/bin/cmake
+CurrentBuildDir=file:///scr/kastanie1/proeger/workspace/ISIS/build
+CurrentBuildType=debug
+CurrentInstallDir=
+ProjectRootRelative=./
