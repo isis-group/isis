@@ -3,7 +3,7 @@
 
 #include <string>
 #include <boost/lexical_cast.hpp>
-#include <map>
+#include <boost/shared_ptr.hpp>
 #include "log.hpp"
 
 namespace iUtil{
@@ -108,7 +108,7 @@ public:
 
 /// Generic class for type aware pointers
 template<typename TYPE> class TypePtr: public _internal::TypeBase{
-	TYPE* m_val;
+	boost::shared_ptr<TYPE> m_val;
 	static std::string m_typeName;
 	static unsigned short m_typeID;
 	template<typename T> TypePtr(const Type<T>& value); // Dont do this
@@ -132,7 +132,7 @@ public:
 	}
 	static unsigned short staticId(){return m_typeID;}
 	static std::string staticName(){return m_typeName;}
-	operator TYPE()const{return m_val;}
+	operator TYPE*()const{return m_val;}
 	
 	virtual ~TypePtr(){
 		//@todo implement me
