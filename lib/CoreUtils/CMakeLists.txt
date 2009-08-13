@@ -1,6 +1,10 @@
 add_definitions(-D_ENABLE_DATA_LOG=1)
 add_definitions(-D_ENABLE_CORE_LOG=1)
 
+# find the boost libraries
+set(Boost_ADDITIONAL_VERSIONS "1.35.0" "1.35.1")
+find_package(Boost)
+
 #list all source files here
 add_library(utils SHARED type.cpp  propmap.cpp message.cpp)
 
