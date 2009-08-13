@@ -54,7 +54,7 @@ namespace isis {
 
 
 template< class TFixedImageType, class TMovingImageType >
-class RegistrationFactory3D
+class RegistrationFactory3D : public itk::LightObject
 {
 public:
 
