@@ -54,14 +54,12 @@ namespace isis {
 
 
 template< class TFixedImageType, class TMovingImageType >
-class RegistrationFactory3D : public itk::LightObject
+class RegistrationFactory3D
 {
 public:
 
-	itkStaticConstMacro( FixedImageDimension, unsigned int,
-								TFixedImageType::ImageDimension );
-	itkStaticConstMacro( MovingImageDimension, unsigned int,
-									TFixedImageType::ImageDimension );
+	itkStaticConstMacro( FixedImageDimension, unsigned int, TFixedImageType::ImageDimension );
+	itkStaticConstMacro( MovingImageDimension, unsigned int, TFixedImageType::ImageDimension );
 
 	typedef RegistrationFactory3D						Self;
 	typedef itk::SmartPointer< Self >				Pointer;
@@ -317,7 +315,10 @@ private:
 
 
 }
-//#include "isisRegistrationFactory.txx"
+
+#if ITK_TEMPLATE_TXX
+# include "isisRegistrationFactory3D.txx"
+#endif
 
 
 #endif /* ISISREGISTRATIONFACTORY_H_ */
