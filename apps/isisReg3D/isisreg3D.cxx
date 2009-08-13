@@ -7,11 +7,10 @@
 
 
 
-#include "isisRegistrationFactory3D.h"
+#include "extRegistration/isisRegistrationFactory3D.h"
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
 #include "itkImage.h"
-
 #include "itkResampleImageFilter.h"
 #include "itkCastImageFilter.h"
 
