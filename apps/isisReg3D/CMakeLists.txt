@@ -21,21 +21,22 @@ ENDIF(ITK_FOUND)
 #ADD_DEFINITIONS(-Wall -O2)
 
 # find ISIS library
-set(ISIS_LIBRARY_DIR "" CACHE PATH "The root path of the ISIS library package")
+set(ISIS_LIBRARY_DIR "" CACHE PATH "The root path of the ISIS library source package")
 if(NOT ISIS_LIBRARY_DIR)
     message(FATAL_ERROR "ISIS library path not found. Please set ISIS_LIBRARY_DIR.")
 else(NOT ISIS_LIBRARY_DIR)
     include_directories(${ISIS_LIBRARY_DIR})
-    link_directories(${ISIS_LIBRARY_PATH})
+    link_directories("${ISIS_LIBRARY_DIR}/Debug")
 endif(NOT ISIS_LIBRARY_DIR)
 
 
 #the executables
 ADD_EXECUTABLE(isisreg3d
 	isisreg3D.cxx
-	isisIterationObserver.cxx)
+	isisIterationObserver.cxx
+	isisRegistrationFactory3D.cxx)
 
 
 # link versus ITK library
-TARGET_LINK_LIBRARIES(isisreg3d ITKIO  ITKSpatialObject isisreg)
+TARGET_LINK_LIBRARIES(isisreg3d isisreg ITKIO  ITKSpatialObject)
 
