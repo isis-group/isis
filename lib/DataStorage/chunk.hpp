@@ -20,12 +20,53 @@
 #define CHUNK_H
 
 #include "CoreUtils/type.hpp"
+#include "CoreUtils/log.hpp"
+#include "common.hpp"
 
 namespace iData{
+	
+namespace _internal{
 
-template<typename T> class Chunk : ::iUtil::TypePtr<T>{
+template<typename T> class ChunkBase : public ::iUtil::TypePtr<T>{
+	size_t fourthSize,thirdSize,secondSize,firstSize;
+	inline size_t dim2index(size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim){
+		return	firstDim + secondDim*firstSize + thirdDim*secondSize*firstSize+
+				fourthDim*thirdSize*secondSize*firstSize;
+	}
+protected:
+	template<typename D> ChunkBase(T* src,D d,size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim): 
+	::iUtil::TypePtr<T>(src,d),
+	fourthSize(fourthDim),thirdSize(thirdDim),secondSize(secondDim),firstSize(firstDim){
+		MAKE_LOG(DataDebug);
+		if(!(fourthSize && thirdSize && secondSize && firstSize)){
+			LOG(DataDebug,iUtil::error) << "Chunksize (" << fourthSize << "x" << thirdSize << "x" << secondSize << "x" << firstSize  << ") not valid" << std::endl;
+		}
+	}
 public:
-	Chunk(T* src): ::iUtil::TypePtr<T>(src){}
+	T &operator()(size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim){
+		MAKE_LOG(DataDebug);
+		if(fourthDim>=fourthSize || thirdDim>=thirdSize || secondDim>=secondSize || firstDim>=firstSize)
+			LOG(DataDebug,iUtil::error) 
+				<< "Index " << fourthDim << "|" << thirdDim << "|" << secondDim << "|" << firstDim 
+				<< " is out of range (" << fourthSize << "x" << thirdSize << "x" << secondSize << "x" << firstSize  << ")" 
+				<< std::endl;
+		return this->operator[](dim2index(fourthDim,thirdDim,secondDim,firstDim));
+	}
+	template<typename S> bool copyTo(const ChunkBase<S> &src){
+		//@todo implement me
+	}
+};
+
+}
+
+template<typename T> class MemChunk : public _internal::ChunkBase<T>{
+public:
+	MemChunk(size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim): 
+	_internal::ChunkBase<T>( 
+		(T*)malloc(sizeof(T)*fourthDim*thirdDim*secondDim*firstDim),
+		typename ::iUtil::TypePtr<T>::BasicDeleter(),
+		fourthDim,thirdDim,secondDim,firstDim
+	){}
 };
 }
 #endif // CHUNK_H

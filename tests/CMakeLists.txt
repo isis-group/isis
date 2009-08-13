@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 2.4)
 
-add_definitions(-D_ENABLE_DATA_LOG=1 -D_ENABLE_CORE_LOG=1)
+add_definitions(-D_ENABLE_DATA_LOG=1)
+add_definitions(-D_ENABLE_CORE_LOG=1)
+add_definitions(-D_ENABLE_DATA_DEBUG=1)
+add_definitions(-D_ENABLE_CORE_DEBUG=1)
 
 set(ISIS_LIB_DIR "../lib" CACHE PATH "Path to the isis-library-path")
 include_directories(${ISIS_LIB_DIR})

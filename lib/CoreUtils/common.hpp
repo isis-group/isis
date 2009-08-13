@@ -17,5 +17,6 @@
 namespace iUtil{
 	typedef ::std::string string;
 	struct CoreLog{enum {use_rel = _ENABLE_CORE_LOG};};
+	struct CoreDebug{enum {use_rel = _ENABLE_CORE_DEBUG};};
 }
 #endif //ISISCOMMON_HPP

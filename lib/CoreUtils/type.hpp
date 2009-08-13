@@ -115,15 +115,15 @@ template<typename TYPE> class TypePtr: public _internal::TypeBase{
 public:
 	struct BasicDeleter{
 		virtual void operator()(TYPE *p){
-			MAKE_LOG(CoreLog);
-			LOG(CoreLog,info) << "Freeing pointer " << p << " (" << TypePtr<TYPE>::staticName() << ") " << std::endl;
+			MAKE_LOG(CoreDebug);
+			LOG(CoreDebug,info) << "Freeing pointer " << p << " (" << TypePtr<TYPE>::staticName() << ") " << std::endl;
 			free(p);
 		};
 	};
-	struct ObjectDeleter{
+	struct ObjectArrayDeleter{
 		virtual void operator()(TYPE *p){
-			MAKE_LOG(CoreLog);
-			LOG(CoreLog,info) << "Deleting object " << p << " (" << TypePtr<TYPE>::staticName() << ") " << std::endl;
+			MAKE_LOG(CoreDebug);
+			LOG(CoreDebug,info) << "Deleting object " << p << " (" << TypePtr<TYPE>::staticName() << ") " << std::endl;
 			delete p;
 		};
 	};
@@ -144,11 +144,10 @@ public:
 	}
 	static unsigned short staticId(){return m_typeID;}
 	static std::string staticName(){return m_typeName;}
-	operator TYPE*()const{return m_val;}
-	
-	virtual ~TypePtr(){
-		//@todo implement me
+	TYPE& operator[](size_t idx){
+		return (m_val.get())[idx];
 	}
+	operator boost::shared_ptr<TYPE>(){return m_val;}
 };
 
 }
