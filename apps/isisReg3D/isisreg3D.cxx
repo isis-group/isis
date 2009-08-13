@@ -7,7 +7,7 @@
 
 
 
-#include "extRegistration/isisRegistrationFactory3D.h"
+#include "isisRegistrationFactory3D.h"
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
 #include "itkImage.h"

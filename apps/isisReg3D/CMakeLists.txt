@@ -26,7 +26,6 @@ if(NOT ISIS_LIBRARY_DIR)
     message(FATAL_ERROR "ISIS library path not found. Please set ISIS_LIBRARY_DIR.")
 else(NOT ISIS_LIBRARY_DIR)
     include_directories(${ISIS_LIBRARY_DIR})
-    link_directories("${ISIS_LIBRARY_DIR}/Debug")
 endif(NOT ISIS_LIBRARY_DIR)
 
 
@@ -35,7 +34,6 @@ ADD_EXECUTABLE(isisreg3d
 	isisreg3D.cxx
 	isisIterationObserver.cxx)
 
-
 # link versus ITK library
-TARGET_LINK_LIBRARIES(isisreg3d isisreg ITKIO  ITKSpatialObject)
+TARGET_LINK_LIBRARIES(isisreg3d  ITKIO ITKSpatialObject ITKNumerics)
 
