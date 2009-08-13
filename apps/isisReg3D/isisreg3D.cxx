@@ -34,7 +34,7 @@ int main( int argc, char** argv )
 	typedef itk::ImageFileReader< MovingImageType > MovingImageReaderType;
 	typedef itk::ImageFileWriter< OutputImageType > WriterType;
 
-	typedef isis::RegistrationFactory< FixedImageType, MovingImageType > RegistrationFactoryType;
+	typedef isis::RegistrationFactory3D< FixedImageType, MovingImageType > RegistrationFactoryType;
 
 	typedef itk::ResampleImageFilter< MovingImageType, FixedImageType > ResampleFilterType;
 	typedef itk::CastImageFilter< FixedImageType, OutputImageType > CasterType;
@@ -59,7 +59,7 @@ int main( int argc, char** argv )
 
 	registrationFactory->SetInterpolator( RegistrationFactoryType::Linear );
 	registrationFactory->SetTransform( RegistrationFactoryType::VersorRigid3DTransform );
-	registrationFactory->SetOptimizer( RegistrationFactoryType:: );
+	registrationFactory->SetOptimizer( RegistrationFactoryType::RegularStepGradientDescentOptimizer );
 	registrationFactory->UserOptions.NumberOfIterations = 300;
 	registrationFactory->UserOptions.PRINTRESULTS = true;
 	registrationFactory->SetMetric( RegistrationFactoryType::MattesMutualInformation );

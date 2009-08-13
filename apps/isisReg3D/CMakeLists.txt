@@ -33,8 +33,7 @@ endif(NOT ISIS_LIBRARY_DIR)
 #the executables
 ADD_EXECUTABLE(isisreg3d
 	isisreg3D.cxx
-	isisIterationObserver.cxx
-	isisRegistrationFactory3D.cxx)
+	isisIterationObserver.cxx)
 
 
 # link versus ITK library
