@@ -106,11 +106,12 @@ public:
 	virtual ~Type(){}
 };
 
-/// Generic class for type aware pointers
+/// Generic class for type (and length) - aware pointers
 template<typename TYPE> class TypePtr: public _internal::TypeBase{
 	boost::shared_ptr<TYPE> m_val;
 	static std::string m_typeName;
 	static unsigned short m_typeID;
+	const size_t m_len;
 	template<typename T> TypePtr(const Type<T>& value); // Dont do this
 public:
 	struct BasicDeleter{
@@ -127,14 +128,21 @@ public:
 			delete p;
 		};
 	};
-	template<typename T> TypePtr(T* ptr):m_val(ptr,BasicDeleter()){}
-	template<typename T, typename D> TypePtr(T* ptr,D d):m_val(ptr,d){}
+	template<typename T> TypePtr(T* ptr,size_t len):m_val(ptr,BasicDeleter()),m_len(len){}
+	template<typename T, typename D> TypePtr(T* ptr,size_t len,D d):m_val(ptr,d),m_len(len){}
 	virtual bool is(const std::type_info & t)const{
 		return t==typeid(TYPE);
 	}
 	virtual std::string toString(bool labeled=false)const{
+		std::string ret;
+		if(m_len){
+			const TYPE* ptr=m_val.get();
+			for(size_t i=0;i<m_len-1;i++)
+				ret+=Type<TYPE>(ptr[i]).toString(false)+"|";
+			ret+=Type<TYPE>(ptr[m_len-1]).toString(true);
+		}
 		//@todo implement me
-		return "implement me";
+		return Type<int>(m_len).toString()+"#"+ret;
 	}
 	virtual std::string typeName()const{
 		return staticName();

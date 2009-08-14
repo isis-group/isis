@@ -35,7 +35,7 @@ template<typename T> class ChunkBase : public ::iUtil::TypePtr<T>{
 	}
 protected:
 	template<typename D> ChunkBase(T* src,D d,size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim): 
-	::iUtil::TypePtr<T>(src,d),
+	::iUtil::TypePtr<T>(src,fourthDim*thirdDim*secondDim*firstDim,d),
 	fourthSize(fourthDim),thirdSize(thirdDim),secondSize(secondDim),firstSize(firstDim){
 		MAKE_LOG(DataDebug);
 		if(!(fourthSize && thirdSize && secondSize && firstSize)){
@@ -45,11 +45,12 @@ protected:
 public:
 	T &operator()(size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim){
 		MAKE_LOG(DataDebug);
-		if(fourthDim>=fourthSize || thirdDim>=thirdSize || secondDim>=secondSize || firstDim>=firstSize)
+		if(fourthDim>=fourthSize || thirdDim>=thirdSize || secondDim>=secondSize || firstDim>=firstSize){
 			LOG(DataDebug,iUtil::error) 
 				<< "Index " << fourthDim << "|" << thirdDim << "|" << secondDim << "|" << firstDim 
 				<< " is out of range (" << fourthSize << "x" << thirdSize << "x" << secondSize << "x" << firstSize  << ")" 
 				<< std::endl;
+		}
 		return this->operator[](dim2index(fourthDim,thirdDim,secondDim,firstDim));
 	}
 	template<typename S> bool copyTo(const ChunkBase<S> &src){
