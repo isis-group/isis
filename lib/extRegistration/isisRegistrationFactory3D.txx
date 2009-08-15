@@ -33,6 +33,7 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 	UserOptions.METRICUSEALLPIXELS = false;
 	UserOptions.PRINTRESULTS = false;
 	UserOptions.NumberOfIterations = 200;
+	UserOptions.NumberOfBins = 50;
 
 
 }
@@ -273,7 +274,7 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 												m_FixedImageRegion.GetNumberOfPixels() * 0.01 );
 
 		}
-		m_MattesMutualInformationMetric->SetNumberOfHistogramBins( 30 );
+		m_MattesMutualInformationMetric->SetNumberOfHistogramBins( UserOptions.NumberOfBins );
 
 	}
 

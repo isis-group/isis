@@ -182,6 +182,7 @@ public:
 	struct
 	{
 		unsigned int NumberOfIterations;
+		unsigned int NumberOfBins;
 		bool INITIALIZEMOMENTS;
 		bool INITIALIZEGEOMETRY;
 		bool METRICUSEALLPIXELS;
