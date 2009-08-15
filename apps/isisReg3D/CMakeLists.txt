@@ -35,5 +35,5 @@ ADD_EXECUTABLE(isisreg3d
 	isisIterationObserver.cxx)
 
 # link versus ITK library
-TARGET_LINK_LIBRARIES(isisreg3d  ITKIO ITKSpatialObject ITKNumerics)
+TARGET_LINK_LIBRARIES(isisreg3d  ITKIO ITKSpatialObject ITKNumerics viaio)
 

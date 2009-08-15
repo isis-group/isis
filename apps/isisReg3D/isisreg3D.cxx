@@ -14,12 +14,46 @@
 #include "itkResampleImageFilter.h"
 #include "itkCastImageFilter.h"
 
+//via command parser include
+#include "viaio/option.h"
+#include "viaio/mu.h" //this is required for VNumber
+
+//command line parser options
+VString ref_filename = NULL;
+VString in_filename = NULL;
+VString out_filename = NULL;
+VShort number_of_bins = 50;
+VShort number_of_iterations = 200;
+VBoolean VersorRigid = false;
+VBoolean QuaternionRigid = false;
+static VOptionDescRec options[] = {
+		{"ref", VStringRepn, 1, &ref_filename, VRequiredOpt, 0,
+		"the fixed image filename" },
+		{"in", VStringRepn, 1, &in_filename, VRequiredOpt, 0,
+		"the moving image filename" },
+		{"out", VStringRepn, 1, &out_filename, VRequiredOpt, 0,
+		"the output image filename" },
+		{"bins", VShortRepn, 1, &number_of_bins, VOptionalOpt, 0,
+		"Number of bins used by the MattesMutualInformationMetric to calculate the image histogram"	},
+		{"iter", VShortRepn, 1, &number_of_iterations, VOptionalOpt, 0,
+		"Maximum number of iteration used by the optimizer" },
+		{"VersorRigid", VBooleanRepn, 1, &VersorRigid, VOptionalOpt, 0,
+		"Using a VersorRigid transform"	},
+		{"QuaternionRigid", VBooleanRepn, 1, &QuaternionRigid, VOptionalOpt, 0,
+		"Using a QuaternionRigid transform" }
 
 
+};
 
-
-int main( int argc, char** argv )
+int main( int argc, char* argv[] )
 {
+	VParseCommand( VNumber(options), options,  & argc, argv );
+
+	//define the standard transform type used for registration if the user has not specified any of them
+	if (!VersorRigid and !QuaternionRigid)
+	{
+		VersorRigid = true;
+	}
 
 	typedef float InputPixelType;
 	typedef short OutputPixelType;
@@ -46,20 +80,31 @@ int main( int argc, char** argv )
 	ResampleFilterType::Pointer resampler = ResampleFilterType::New();
 	CasterType::Pointer caster = CasterType::New();
 
-	fixedReader->SetFileName( argv[1] );
-	movingReader->SetFileName( argv[2] );
-	writer->SetFileName( argv[3] );
+	fixedReader->SetFileName( ref_filename );
+	movingReader->SetFileName( in_filename );
+	writer->SetFileName( out_filename );
 
 	fixedReader->Update();
 	movingReader->Update();
 
 
 	RegistrationFactoryType::Pointer registrationFactory = RegistrationFactoryType::New();
-
 	registrationFactory->SetInterpolator( RegistrationFactoryType::Linear );
-	registrationFactory->SetTransform( RegistrationFactoryType::VersorRigid3DTransform );
+
+	if (VersorRigid)
+	{
+		std::cout << "transform: VersorRigid3D" << std::endl;
+		registrationFactory->SetTransform( RegistrationFactoryType::VersorRigid3DTransform );
+	}
+	if (QuaternionRigid)
+	{
+		std::cout << "transform: QuaternionRigid3D" << std::endl;
+		registrationFactory->SetTransform( RegistrationFactoryType::QuaternionRigidTransform );
+	}
+
 	registrationFactory->SetOptimizer( RegistrationFactoryType::RegularStepGradientDescentOptimizer );
-	registrationFactory->UserOptions.NumberOfIterations = 300;
+	registrationFactory->UserOptions.NumberOfIterations = number_of_iterations;
+	registrationFactory->UserOptions.NumberOfBins = number_of_bins;
 	registrationFactory->UserOptions.PRINTRESULTS = true;
 	registrationFactory->SetMetric( RegistrationFactoryType::MattesMutualInformation );
 
