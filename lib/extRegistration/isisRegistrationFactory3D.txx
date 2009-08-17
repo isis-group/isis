@@ -24,7 +24,10 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 
 	transform.VERSORRIGID = false;
 	transform.QUATERNIONRIGID = false;
-	metric.MATTESMUTUALINFORMATIONMETRIC = false;
+	transform.CENTEREDEULER3DTRANSFORM = false;
+
+	metric.MATTESMUTUALINFORMATION = false;
+	metric.NORMALIZEDMUTUALINFORMATION = false;
 
 	m_FixedImageIsBigger = false;
 
@@ -75,10 +78,15 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 	switch (e_metric)
 	{
 	case MattesMutualInformation:
-		metric.MATTESMUTUALINFORMATIONMETRIC = true;
+		metric.MATTESMUTUALINFORMATION = true;
 		m_MattesMutualInformationMetric = MattesMutualInformationMetricType::New();
 		m_RegistrationObject->SetMetric( m_MattesMutualInformationMetric );
+		break;
 
+	case NormalizedMutualInformation:
+		metric.NORMALIZEDMUTUALINFORMATION = true;
+		m_NormalizedMutualInformationMetric = NormalizedMutualInformationHistogramMetricType::New();
+		m_RegistrationObject->SetMetric( m_NormalizedMutualInformationMetric );
 		break;
 	}
 }
@@ -118,10 +126,17 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 		m_VersorRigid3DTransform = VersorRigid3DTransformType::New();
 		m_RegistrationObject->SetTransform( m_VersorRigid3DTransform );
 		break;
+
 	case QuaternionRigidTransform:
 		transform.QUATERNIONRIGID = true;
 		m_QuaternionRigidTransform = QuaternionRigidTransformType::New();
 		m_RegistrationObject->SetTransform( m_QuaternionRigidTransform );
+		break;
+
+	case CenteredEuler3DTransform:
+		transform.CENTEREDEULER3DTRANSFORM = true;
+		m_CenteredEuler3DTransform = CenteredEuler3DTransformType::New();
+		m_RegistrationObject->SetTransform( m_CenteredEuler3DTransform );
 		break;
 
 
@@ -200,7 +215,7 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 		RegularStepGradientDescentOptimizerType::ScalesType optimizerScale
 										 ( m_RegistrationObject->GetTransform()->GetNumberOfParameters() );
 		unsigned int NumberOfParameters = m_RegistrationObject->GetTransform()->GetNumberOfParameters();
-		if( transform.VERSORRIGID or transform.QUATERNIONRIGID )
+		if( transform.VERSORRIGID or transform.QUATERNIONRIGID or transform.CENTEREDEULER3DTRANSFORM )
 		{
 		//...for the rigid transform
 			//number of parameters are dependent on the dimension of the images (2D: 4 parameter, 3D: 6 parameters)
@@ -219,7 +234,7 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 		VersorRigid3DTransformOptimizerType::ScalesType optimizerScale
 										( m_RegistrationObject->GetTransform()->GetNumberOfParameters() );
 		unsigned  int NumberOfParameters = m_RegistrationObject->GetTransform()->GetNumberOfParameters();
-		if( transform.VERSORRIGID or transform.QUATERNIONRIGID )
+		if( transform.VERSORRIGID or transform.QUATERNIONRIGID or transform.CENTEREDEULER3DTRANSFORM )
 		{
 			optimizerScale[0] = 1.0;
 			for( unsigned int i = 1; i < NumberOfParameters; i++ )
@@ -258,7 +273,7 @@ void
 RegistrationFactory3D< TFixedImageType, TMovingImageType >
 ::SetUpMetric()
 {
-	if( metric.MATTESMUTUALINFORMATIONMETRIC )
+	if( metric.MATTESMUTUALINFORMATION )
 	{
 		//setting up the mattes mutual information metric
 		m_MattesMutualInformationMetric->SetFixedImage( m_FixedImage );
@@ -277,6 +292,29 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 		m_MattesMutualInformationMetric->SetNumberOfHistogramBins( UserOptions.NumberOfBins );
 
 	}
+	if( metric.NORMALIZEDMUTUALINFORMATION )
+	{
+		//setting up the normalize mutual information metric
+		m_NormalizedMutualInformationMetric->SetFixedImage( m_FixedImage );
+		m_NormalizedMutualInformationMetric->SetMovingImage( m_MovingImage );
+		m_NormalizedMutualInformationMetric->SetFixedImageRegion( m_FixedImageRegion );
+		if( UserOptions.METRICUSEALLPIXELS )
+		{
+			m_NormalizedMutualInformationMetric->UseAllPixelsOn();
+		}
+		else
+		{
+			m_NormalizedMutualInformationMetric->SetNumberOfSpatialSamples(
+													m_FixedImageRegion.GetNumberOfPixels() * 0.01 );
+		}
+
+		typename NormalizedMutualInformationHistogramMetricType::HistogramType::SizeType histogramSize;
+		histogramSize[0] = UserOptions.NumberOfBins;
+		histogramSize[1] = UserOptions.NumberOfBins;
+		m_NormalizedMutualInformationMetric->SetHistogramSize( histogramSize );
+
+
+	}
 
 }
 
@@ -291,10 +329,17 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 	m_ResampleFilter = ResampleFilterType::New();
 	m_ImageCaster = ImageCasterType::New();
 
+	std::cout << "fixed image spacing: " << m_FixedImage->GetSpacing() << std::endl;
+	std::cout << "moving image spacing: " << m_MovingImage->GetSpacing() << std::endl;
+
+	std::cout << "fixed image size: " << m_FixedImage->GetLargestPossibleRegion().GetSize() << std::endl;
+	std::cout << "moving image size: " << m_MovingImage->GetLargestPossibleRegion().GetSize() << std::endl;
+
+
 	m_ResampleFilter->SetInput( m_MovingImage );
 	m_ResampleFilter->SetTransform( m_RegistrationObject->GetOutput()->Get() );
 	m_ResampleFilter->SetOutputOrigin( m_FixedImage->GetOrigin() );
-	m_ResampleFilter->SetSize( m_FixedImage->GetLargestPossibleRegion().GetSize() );
+	m_ResampleFilter->SetSize( m_FixedImageRegion.GetSize() );
 	m_ResampleFilter->SetOutputSpacing( m_FixedImage->GetSpacing() );
 	m_ResampleFilter->SetOutputDirection( m_FixedImage->GetDirection() );
 	m_ResampleFilter->SetDefaultPixelValue( 0 );
@@ -360,6 +405,11 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 	if( transform.QUATERNIONRIGID )
 	{
 		m_RegistrationObject->SetInitialTransformParameters( m_QuaternionRigidTransform->GetParameters() );
+	}
+
+	if( transform.CENTEREDEULER3DTRANSFORM )
+	{
+		m_RegistrationObject->SetInitialTransformParameters( m_CenteredEuler3DTransform->GetParameters() );
 	}
 
 }
@@ -429,9 +479,13 @@ void
 RegistrationFactory3D< TFixedImageType, TMovingImageType >
 ::SetFixedImageMask( void )
 {
-	if( metric.MATTESMUTUALINFORMATIONMETRIC )
+	if( metric.MATTESMUTUALINFORMATION )
 	{
 		m_MattesMutualInformationMetric->SetFixedImageMask( m_JointImageMask );
+	}
+	if( metric.NORMALIZEDMUTUALINFORMATION )
+	{
+		m_NormalizedMutualInformationMetric->SetFixedImageMask( m_JointImageMask );
 	}
 }
 

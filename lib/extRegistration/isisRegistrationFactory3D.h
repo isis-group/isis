@@ -16,6 +16,7 @@
 //rigid:
 #include "itkVersorRigid3DTransform.h"
 #include "itkQuaternionRigidTransform.h"
+#include "itkCenteredEuler3DTransform.h"
 
 
 //affine:
@@ -128,6 +129,8 @@ public:
 
 	typedef itk::VersorRigid3DTransform< double >	VersorRigid3DTransformType;
 	typedef itk::QuaternionRigidTransform< double > QuaternionRigidTransformType;
+	typedef itk::CenteredEuler3DTransform< double > CenteredEuler3DTransformType;
+
 
 
 
@@ -142,6 +145,8 @@ public:
 	//metric typedefs
 	typedef itk::MattesMutualInformationImageToImageMetric< TFixedImageType, TMovingImageType >
 													MattesMutualInformationMetricType;
+	typedef typename itk::NormalizedMutualInformationHistogramImageToImageMetric< TFixedImageType, TMovingImageType >
+													NormalizedMutualInformationHistogramMetricType;
 
 
 	//initializer typedefs
@@ -155,14 +160,15 @@ public:
 	enum eTransformType
 	{
 		VersorRigid3DTransform,
-		QuaternionRigidTransform
+		QuaternionRigidTransform,
+		CenteredEuler3DTransform
 
 	};
 
 	enum eMetricType
 	{
 		MattesMutualInformation,
-		NormalizedMattesMutualInformation,
+		NormalizedMutualInformation,
 		Correlation
 	};
 
@@ -234,6 +240,7 @@ private:
 	{
 		bool	VERSORRIGID;
 		bool	QUATERNIONRIGID;
+		bool 	CENTEREDEULER3DTRANSFORM;
 	} transform;
 
 	struct Optimizer
@@ -245,7 +252,8 @@ private:
 
 	struct Metric
 	{
-		bool	MATTESMUTUALINFORMATIONMETRIC;
+		bool	MATTESMUTUALINFORMATION;
+		bool	NORMALIZEDMUTUALINFORMATION;
 	} metric;
 
 
@@ -295,10 +303,12 @@ private:
 	//transform
 	VersorRigid3DTransformType::Pointer					m_VersorRigid3DTransform;
 	QuaternionRigidTransformType::Pointer				m_QuaternionRigidTransform;
-
+	CenteredEuler3DTransformType::Pointer				m_CenteredEuler3DTransform;
 
 	//metric
 	typename MattesMutualInformationMetricType::Pointer m_MattesMutualInformationMetric;
+	typename NormalizedMutualInformationHistogramMetricType::Pointer
+														m_NormalizedMutualInformationMetric;
 
 	//interpolator
 	typename LinearInterpolatorType::Pointer			m_LinearInterpolator;
