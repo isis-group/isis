@@ -11,8 +11,7 @@
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
 #include "itkImage.h"
-#include "itkResampleImageFilter.h"
-#include "itkCastImageFilter.h"
+
 
 //via command parser include
 #include "viaio/option.h"
@@ -24,8 +23,12 @@ VString in_filename = NULL;
 VString out_filename = NULL;
 VShort number_of_bins = 50;
 VShort number_of_iterations = 200;
-VBoolean VersorRigid = false;
-VBoolean QuaternionRigid = false;
+VBoolean transformVersorRigid = false;
+VBoolean transformQuaternionRigid = false;
+VBoolean transformEulerRigid = false;
+VBoolean metricNormalizeMutualInformation = false;
+VBoolean metricMattesMutualInformation = false;
+
 static VOptionDescRec options[] = {
 		{"ref", VStringRepn, 1, &ref_filename, VRequiredOpt, 0,
 		"the fixed image filename" },
@@ -37,11 +40,14 @@ static VOptionDescRec options[] = {
 		"Number of bins used by the MattesMutualInformationMetric to calculate the image histogram"	},
 		{"iter", VShortRepn, 1, &number_of_iterations, VOptionalOpt, 0,
 		"Maximum number of iteration used by the optimizer" },
-		{"VersorRigid", VBooleanRepn, 1, &VersorRigid, VOptionalOpt, 0,
+		{"VersorRigid", VBooleanRepn, 1, &transformVersorRigid, VOptionalOpt, 0,
 		"Using a VersorRigid transform"	},
-		{"QuaternionRigid", VBooleanRepn, 1, &QuaternionRigid, VOptionalOpt, 0,
-		"Using a QuaternionRigid transform" }
-
+		{"QuaternionRigid", VBooleanRepn, 1, &transformQuaternionRigid, VOptionalOpt, 0,
+		"Using a QuaternionRigid transform" },
+		{"EulerRigid", VBooleanRepn, 1, &transformEulerRigid, VOptionalOpt, 0,
+		"Using a CenteredEuler3DRigid transform" },
+		{"NormalizedMutualInformation", VBooleanRepn, 1, &metricNormalizeMutualInformation, VOptionalOpt, 0,
+		"Using a NormalizedMutualInformation metric" }
 
 };
 
@@ -49,13 +55,18 @@ int main( int argc, char* argv[] )
 {
 	VParseCommand( VNumber(options), options,  & argc, argv );
 
-	//define the standard transform type used for registration if the user has not specified any of them
-	if (!VersorRigid and !QuaternionRigid)
+	//define the standard transform type used for registration if the user has not specified it
+	if (!transformVersorRigid and !transformQuaternionRigid and !transformEulerRigid)
 	{
-		VersorRigid = true;
+		transformVersorRigid = true;
+	}
+	//define the standard metric type used for registration if the user has not specified a it
+	if (!metricMattesMutualInformation and !metricNormalizeMutualInformation)
+	{
+		metricMattesMutualInformation = true;
 	}
 
-	typedef float InputPixelType;
+	typedef short InputPixelType;
 	typedef short OutputPixelType;
 	const unsigned int Dimension = 3;
 
@@ -69,16 +80,9 @@ int main( int argc, char* argv[] )
 
 	typedef isis::RegistrationFactory3D< FixedImageType, MovingImageType > RegistrationFactoryType;
 
-	typedef itk::ResampleImageFilter< MovingImageType, FixedImageType > ResampleFilterType;
-	typedef itk::CastImageFilter< FixedImageType, OutputImageType > CasterType;
-
-
 	FixedImageReaderType::Pointer fixedReader = FixedImageReaderType::New();
 	MovingImageReaderType::Pointer movingReader = MovingImageReaderType::New();
 	WriterType::Pointer writer = WriterType::New();
-
-	ResampleFilterType::Pointer resampler = ResampleFilterType::New();
-	CasterType::Pointer caster = CasterType::New();
 
 	fixedReader->SetFileName( ref_filename );
 	movingReader->SetFileName( in_filename );
@@ -91,40 +95,47 @@ int main( int argc, char* argv[] )
 	RegistrationFactoryType::Pointer registrationFactory = RegistrationFactoryType::New();
 	registrationFactory->SetInterpolator( RegistrationFactoryType::Linear );
 
-	if (VersorRigid)
+
+	//transform setup
+	if (transformVersorRigid)
 	{
 		std::cout << "transform: VersorRigid3D" << std::endl;
 		registrationFactory->SetTransform( RegistrationFactoryType::VersorRigid3DTransform );
 	}
-	if (QuaternionRigid)
+	if (transformQuaternionRigid)
 	{
 		std::cout << "transform: QuaternionRigid3D" << std::endl;
 		registrationFactory->SetTransform( RegistrationFactoryType::QuaternionRigidTransform );
 	}
+	if (transformEulerRigid)
+	{
+		std::cout << "transform: CenteredEulerRigid3D" << std::endl;
+		registrationFactory->SetTransform( RegistrationFactoryType::CenteredEuler3DTransform );
+	}
 
-	registrationFactory->SetOptimizer( RegistrationFactoryType::RegularStepGradientDescentOptimizer );
+	//metric setup
+	if (metricMattesMutualInformation)
+	{
+		std::cout << "metric: MattesMutualInformation" << std::endl;
+		registrationFactory->SetMetric( RegistrationFactoryType::MattesMutualInformation );
+
+	}
+	if (metricNormalizeMutualInformation)
+	{
+		std::cout << "metric: NormalizedMutualInformation" << std::endl;
+		registrationFactory->SetMetric( RegistrationFactoryType::NormalizedMutualInformation );
+	}
+
+
+	registrationFactory->SetOptimizer( RegistrationFactoryType::VersorRigidOptimizer );
 	registrationFactory->UserOptions.NumberOfIterations = number_of_iterations;
 	registrationFactory->UserOptions.NumberOfBins = number_of_bins;
 	registrationFactory->UserOptions.PRINTRESULTS = true;
-	registrationFactory->SetMetric( RegistrationFactoryType::MattesMutualInformation );
 
 	registrationFactory->SetFixedImage( fixedReader->GetOutput() );
 	registrationFactory->SetMovingImage( movingReader->GetOutput() );
 	registrationFactory->StartRegistration();
-
-
-	//resample
-	resampler->SetTransform( registrationFactory->GetTransform() );
-	resampler->SetInput( movingReader->GetOutput() );
-	resampler->SetOutputOrigin( fixedReader->GetOutput()->GetOrigin() );
-	resampler->SetOutputDirection( fixedReader->GetOutput()->GetDirection() );
-	resampler->SetSize( fixedReader->GetOutput()->GetLargestPossibleRegion().GetSize() );
-	resampler->SetOutputSpacing( fixedReader->GetOutput()->GetSpacing() );
-	resampler->SetDefaultPixelValue( 0 );
-	caster->SetInput( resampler->GetOutput() );
-
-
-	writer->SetInput( caster->GetOutput() );
+	writer->SetInput( registrationFactory->GetRegisteredImage() );
 	writer->Update();
 
 
