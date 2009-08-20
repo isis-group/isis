@@ -47,6 +47,7 @@
 #include "itkBinaryThresholdImageFilter.h"
 #include "itkMinimumMaximumImageCalculator.h"
 #include "itkImageMaskSpatialObject.h"
+#include "itkOtsuThresholdImageFilter.h"
 
 
 
@@ -89,6 +90,9 @@ public:
 													MovingMinMaxCalculatorType;
 	typedef itk::ImageMaskSpatialObject< FixedImageDimension >
 													MaskObjectType;
+
+	typedef itk::OtsuThresholdImageFilter< TFixedImageType, MaskImageType >
+													OtsuThresholdFilterType;
 
 
 
@@ -148,6 +152,9 @@ public:
 	typedef typename itk::NormalizedMutualInformationHistogramImageToImageMetric< TFixedImageType, TMovingImageType >
 													NormalizedMutualInformationHistogramMetricType;
 
+	typedef typename itk::NormalizedCorrelationImageToImageMetric< TFixedImageType, TMovingImageType >
+													NormalizedCorrelationMetricType;
+
 
 	//initializer typedefs
 	typedef itk::CenteredTransformInitializer < VersorRigid3DTransformType,
@@ -169,7 +176,7 @@ public:
 	{
 		MattesMutualInformation,
 		NormalizedMutualInformation,
-		Correlation
+		NormalizedCorrelation
 	};
 
 	enum eOptimizerType
@@ -189,10 +196,13 @@ public:
 	{
 		unsigned int NumberOfIterations;
 		unsigned int NumberOfBins;
+		unsigned int NumberOfThreads;
+		float PixelDensity;
 		bool INITIALIZEMOMENTS;
 		bool INITIALIZEGEOMETRY;
-		bool METRICUSEALLPIXELS;
 		bool PRINTRESULTS;
+		bool USEOTSUTHRESHOLDING;	//using an otsu threshold filter to create a mask which is designed to restrict the region given to the metric
+
 	} UserOptions;
 
 
@@ -229,7 +239,7 @@ protected:
 	void SetInitializeTransform( void );
 	void PrintResults( void );
 	void CheckImageSizes( void );
-	void SetFixedImageMask();
+	void SetFixedImageMask( void );
 
 	RegistrationFactory3D();
 	virtual ~RegistrationFactory3D() {}
@@ -254,6 +264,7 @@ private:
 	{
 		bool	MATTESMUTUALINFORMATION;
 		bool	NORMALIZEDMUTUALINFORMATION;
+		bool	NORMALIZEDCORRELATION;
 	} metric;
 
 
@@ -262,10 +273,13 @@ private:
     FixedImagePointer   								m_FixedImage;
 	MovingImagePointer									m_MovingImage;
 	OutputImagePointer									m_OutputImage;
+	typename MaskImageType::Pointer						m_JointImage1;
+	typename MaskImageType::Pointer						m_JointImage2;
 
 	typename MaskImageType::Pointer						m_FixedImageMask;
 	typename MaskImageType::Pointer						m_MovingImageMask;
 	typename MaskObjectType::Pointer			   		m_JointImageMask;
+	typename MaskObjectType::Pointer 					m_OtsuImageMask;
 
 	FixedImageRegionType								m_FixedImageRegion;
 	MovingImageRegionType								m_MovingImageRegion;
@@ -286,6 +300,9 @@ private:
 
 	typename ResampleFilterType::Pointer    			m_ResampleFilter;
 	typename ImageCasterType::Pointer					m_ImageCaster;
+
+	typename OtsuThresholdFilterType::Pointer			m_OtsuThresholdFilter;
+
 
 	//registration method
 	RegistrationMethodPointer							m_RegistrationObject;
@@ -309,6 +326,7 @@ private:
 	typename MattesMutualInformationMetricType::Pointer m_MattesMutualInformationMetric;
 	typename NormalizedMutualInformationHistogramMetricType::Pointer
 														m_NormalizedMutualInformationMetric;
+	typename NormalizedCorrelationMetricType::Pointer   m_NormalizedCorrelationMetric;
 
 	//interpolator
 	typename LinearInterpolatorType::Pointer			m_LinearInterpolator;

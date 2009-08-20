@@ -17,6 +17,7 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 
 	m_RegistrationObject = RegistrationMethodType::New();
 
+
 	//boolean settings
 	optimizer.REGULARSTEPGRADIENTDESCENT = false;
 	optimizer.VERSORRIGID3D = false;
@@ -28,15 +29,18 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 
 	metric.MATTESMUTUALINFORMATION = false;
 	metric.NORMALIZEDMUTUALINFORMATION = false;
+	metric.NORMALIZEDCORRELATION = false;
 
 	m_FixedImageIsBigger = false;
 
 	UserOptions.INITIALIZEGEOMETRY = false;
 	UserOptions.INITIALIZEMOMENTS = false;
-	UserOptions.METRICUSEALLPIXELS = false;
 	UserOptions.PRINTRESULTS = false;
 	UserOptions.NumberOfIterations = 200;
 	UserOptions.NumberOfBins = 50;
+	UserOptions.PixelDensity = 0.01;
+	UserOptions.NumberOfThreads = 1;
+	UserOptions.USEOTSUTHRESHOLDING = false;
 
 
 }
@@ -87,6 +91,12 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 		metric.NORMALIZEDMUTUALINFORMATION = true;
 		m_NormalizedMutualInformationMetric = NormalizedMutualInformationHistogramMetricType::New();
 		m_RegistrationObject->SetMetric( m_NormalizedMutualInformationMetric );
+		break;
+
+	case NormalizedCorrelation:
+		metric.NORMALIZEDCORRELATION = true;
+		m_NormalizedCorrelationMetric = NormalizedCorrelationMetricType::New();
+		m_RegistrationObject->SetMetric( m_NormalizedCorrelationMetric );
 		break;
 	}
 }
@@ -279,16 +289,10 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 		m_MattesMutualInformationMetric->SetFixedImage( m_FixedImage );
 		m_MattesMutualInformationMetric->SetMovingImage( m_MovingImage );
 		m_MattesMutualInformationMetric->SetFixedImageRegion( m_FixedImageRegion );
-		if( UserOptions.METRICUSEALLPIXELS )
-		{
-			m_MattesMutualInformationMetric->UseAllPixelsOn();
-		}
-		else
-		{
-			m_MattesMutualInformationMetric->SetNumberOfSpatialSamples(
-												m_FixedImageRegion.GetNumberOfPixels() * 0.01 );
+		m_MattesMutualInformationMetric->SetNumberOfSpatialSamples(
+												m_FixedImageRegion.GetNumberOfPixels() * UserOptions.PixelDensity );
 
-		}
+
 		m_MattesMutualInformationMetric->SetNumberOfHistogramBins( UserOptions.NumberOfBins );
 
 	}
@@ -298,20 +302,24 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 		m_NormalizedMutualInformationMetric->SetFixedImage( m_FixedImage );
 		m_NormalizedMutualInformationMetric->SetMovingImage( m_MovingImage );
 		m_NormalizedMutualInformationMetric->SetFixedImageRegion( m_FixedImageRegion );
-		if( UserOptions.METRICUSEALLPIXELS )
-		{
-			m_NormalizedMutualInformationMetric->UseAllPixelsOn();
-		}
-		else
-		{
-			m_NormalizedMutualInformationMetric->SetNumberOfSpatialSamples(
-													m_FixedImageRegion.GetNumberOfPixels() * 0.01 );
-		}
+		m_NormalizedMutualInformationMetric->SetNumberOfSpatialSamples(
+													m_FixedImageRegion.GetNumberOfPixels() * UserOptions.PixelDensity );
+
 
 		typename NormalizedMutualInformationHistogramMetricType::HistogramType::SizeType histogramSize;
 		histogramSize[0] = UserOptions.NumberOfBins;
 		histogramSize[1] = UserOptions.NumberOfBins;
 		m_NormalizedMutualInformationMetric->SetHistogramSize( histogramSize );
+
+
+	}
+	if( metric.NORMALIZEDCORRELATION )
+	{
+		//setting up the normalized correlation metric
+		m_NormalizedCorrelationMetric->SetFixedImage( m_FixedImage );
+		m_NormalizedCorrelationMetric->SetMovingImage( m_MovingImage );
+		m_NormalizedCorrelationMetric->SetFixedImageRegion( m_FixedImageRegion );
+		m_NormalizedCorrelationMetric->SetNumberOfThreads( UserOptions.NumberOfThreads );
 
 
 	}
@@ -414,8 +422,13 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 
 }
 
+/*
+this method checks the images sizes of the fixed and the moving image.
+if the fixed image size, in any direction, is bigger than the image size
+of the moving image in the respective direction, it will create a binary
+image which contains the intersection of both images
 
-
+*/
 template< class TFixedImageType, class TMovingImageType >
 void
 RegistrationFactory3D< TFixedImageType, TMovingImageType >
@@ -432,7 +445,6 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 	{
 		m_FixedImageMask = MaskImageType::New();
 		m_MovingImageMask = MaskImageType::New();
-		m_JointImageMask = MaskObjectType::New();
 		m_AndFilter = AndFilterType::New();
 		m_FixedThresholdFilter = FixedThresholdFilterType::New();
 		m_MovingThresholdFilter = MovingThresholdFilterType::New();
@@ -463,11 +475,7 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 		m_AndFilter->SetInput2( m_FixedThresholdFilter->GetOutput() );
 
 		m_AndFilter->Update();
-
-		m_JointImageMask->SetImage( m_AndFilter->GetOutput() );
-		m_JointImageMask->Update();
-		this->SetFixedImageMask();
-
+		m_JointImage1 = m_AndFilter->GetOutput();
 
 	}
 
@@ -479,6 +487,28 @@ void
 RegistrationFactory3D< TFixedImageType, TMovingImageType >
 ::SetFixedImageMask( void )
 {
+
+	if (UserOptions.USEOTSUTHRESHOLDING and m_FixedImageIsBigger)
+	{
+		m_JointImageMask = MaskObjectType::New();
+		m_AndFilter->SetInput1( m_JointImage1 );
+		m_AndFilter->SetInput2( m_JointImage2 );
+		m_AndFilter->Update();
+		m_JointImageMask->SetImage( m_AndFilter->GetOutput() );
+		m_JointImageMask->Update();
+	}
+	if (UserOptions.USEOTSUTHRESHOLDING and !m_FixedImageIsBigger)
+	{
+		m_JointImageMask = MaskObjectType::New();
+		m_JointImageMask->SetImage( m_JointImage2 );
+		m_JointImageMask->Update();
+	}
+	if (!UserOptions.USEOTSUTHRESHOLDING and m_FixedImageIsBigger )
+	{
+		m_JointImageMask = MaskObjectType::New();
+		m_JointImageMask->SetImage( m_JointImage1 );
+		m_JointImageMask->Update();
+	}
 	if( metric.MATTESMUTUALINFORMATION )
 	{
 		m_MattesMutualInformationMetric->SetFixedImageMask( m_JointImageMask );
@@ -528,7 +558,18 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 	this->CheckImageSizes();
 	//set up the initial transform parameters
 	this->SetInitializeTransform();
+	if (UserOptions.USEOTSUTHRESHOLDING)
+	{
+		m_OtsuThresholdFilter = OtsuThresholdFilterType::New();
+		m_OtsuThresholdFilter->SetInput( m_FixedImage );
+		m_OtsuThresholdFilter->Update();
+		m_JointImage2 = m_OtsuThresholdFilter->GetOutput();
+	}
 
+	if (UserOptions.USEOTSUTHRESHOLDING or m_FixedImageIsBigger)
+	{
+		this->SetFixedImageMask();
+	}
 
 	try
 	{
