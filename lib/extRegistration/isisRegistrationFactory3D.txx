@@ -318,7 +318,6 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 		m_NormalizedCorrelationMetric->SetFixedImage( m_FixedImage );
 		m_NormalizedCorrelationMetric->SetMovingImage( m_MovingImage );
 		m_NormalizedCorrelationMetric->SetFixedImageRegion( m_FixedImageRegion );
-		m_NormalizedCorrelationMetric->SetNumberOfThreads( UserOptions.NumberOfThreads );
 
 
 	}
