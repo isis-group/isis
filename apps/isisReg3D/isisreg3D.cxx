@@ -33,19 +33,18 @@ VDictEntry TYPTransform[] = {
 		{ NULL }
 };
 
+
+
 //command line parser options
 VString ref_filename = NULL;
 VString in_filename = NULL;
 VString out_filename = NULL;
 VShort number_of_bins = 50;
 VShort number_of_iterations = 200;
-VBoolean transformVersorRigid = false;
-VBoolean transformQuaternionRigid = false;
-VBoolean transformEulerRigid = false;
-VBoolean metricNormalizeMutualInformation = false;
-VBoolean metricMattesMutualInformation = false;
+VFloat pixel_density = 0.01;
 static VShort metricType = 0;
 static VShort transformType = 0;
+
 
 static VOptionDescRec options[] = {
 		//required inputs
@@ -55,11 +54,15 @@ static VOptionDescRec options[] = {
 		"the moving image filename" },
 		{"out", VStringRepn, 1, &out_filename, VRequiredOpt, 0,
 		"the output image filename" },
+
 		//parameter inputs
 		{"bins", VShortRepn, 1, &number_of_bins, VOptionalOpt, 0,
 		"Number of bins used by the MattesMutualInformationMetric to calculate the image histogram"	},
 		{"iter", VShortRepn, 1, &number_of_iterations, VOptionalOpt, 0,
 		"Maximum number of iteration used by the optimizer" },
+		{"pd", VFloatRepn, 1, &pixel_density, VOptionalOpt, 0,
+		"The density of pixels the metric uses. 1 denotes the metric uses all pixels. Has to be > 0. Only operative with a MattesMutualInformation metric"},
+
 		//component inputs
 		{"metric",	VShortRepn, 1, (VPointer) &metricType, VOptionalOpt, TYPMetric, "Type of the metric"},
 		{"transform", VShortRepn, 1, (VPointer) &transformType, VOptionalOpt, TYPTransform, "Type of the transform"}
@@ -69,7 +72,16 @@ int main( int argc, char* argv[] )
 {
 	VParseCommand( VNumber(options), options,  & argc, argv );
 
-
+	//check pixel density
+	if( pixel_density <= 0 )
+	{
+		std::cerr << "wrong pixel density...set to 0.01" << std::endl;
+		pixel_density = 0.01;
+	}
+	if( pixel_density >= 1 )
+	{
+		std::cerr << "metric uses all pixels" << std::endl;
+	}
 
 
 	typedef short InputPixelType;
@@ -129,9 +141,16 @@ int main( int argc, char* argv[] )
 		registrationFactory->SetMetric( RegistrationFactoryType::NormalizedMutualInformation );
 		break;
 
-
-
+	case 2:
+		registrationFactory->SetMetric( RegistrationFactoryType::NormalizedCorrelation );
+		break;
 	}
+
+
+
+	std::cout << "creating otsu mask" << std::endl;
+	registrationFactory->UserOptions.USEOTSUTHRESHOLDING = true;
+
 
 
 
@@ -139,7 +158,9 @@ int main( int argc, char* argv[] )
 	registrationFactory->SetOptimizer( RegistrationFactoryType::VersorRigidOptimizer );
 	registrationFactory->UserOptions.NumberOfIterations = number_of_iterations;
 	registrationFactory->UserOptions.NumberOfBins = number_of_bins;
+	registrationFactory->UserOptions.PixelDensity = pixel_density;
 	registrationFactory->UserOptions.PRINTRESULTS = true;
+
 
 	registrationFactory->SetFixedImage( fixedReader->GetOutput() );
 	registrationFactory->SetMovingImage( movingReader->GetOutput() );
