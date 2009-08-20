@@ -17,6 +17,22 @@
 #include "viaio/option.h"
 #include "viaio/mu.h" //this is required for VNumber
 
+VDictEntry TYPMetric[] = {
+		{ "MattesMutualInformation", 0},
+		{ "NormalizedHistogrammMutualInformation", 1 },
+		{ "NormalizedCorrelation", 2 },
+		{ NULL }
+};
+
+VDictEntry TYPTransform[] = {
+		{ "Rigid", 0},
+		{ "Affine", 1},
+		{ "NonLinear", 2},
+		{ "QuaternionRigid", 3},
+		{ "EulerRigid", 4},
+		{ NULL }
+};
+
 //command line parser options
 VString ref_filename = NULL;
 VString in_filename = NULL;
@@ -28,43 +44,33 @@ VBoolean transformQuaternionRigid = false;
 VBoolean transformEulerRigid = false;
 VBoolean metricNormalizeMutualInformation = false;
 VBoolean metricMattesMutualInformation = false;
+static VShort metricType = 0;
+static VShort transformType = 0;
 
 static VOptionDescRec options[] = {
+		//required inputs
 		{"ref", VStringRepn, 1, &ref_filename, VRequiredOpt, 0,
 		"the fixed image filename" },
 		{"in", VStringRepn, 1, &in_filename, VRequiredOpt, 0,
 		"the moving image filename" },
 		{"out", VStringRepn, 1, &out_filename, VRequiredOpt, 0,
 		"the output image filename" },
+		//parameter inputs
 		{"bins", VShortRepn, 1, &number_of_bins, VOptionalOpt, 0,
 		"Number of bins used by the MattesMutualInformationMetric to calculate the image histogram"	},
 		{"iter", VShortRepn, 1, &number_of_iterations, VOptionalOpt, 0,
 		"Maximum number of iteration used by the optimizer" },
-		{"VersorRigid", VBooleanRepn, 1, &transformVersorRigid, VOptionalOpt, 0,
-		"Using a VersorRigid transform"	},
-		{"QuaternionRigid", VBooleanRepn, 1, &transformQuaternionRigid, VOptionalOpt, 0,
-		"Using a QuaternionRigid transform" },
-		{"EulerRigid", VBooleanRepn, 1, &transformEulerRigid, VOptionalOpt, 0,
-		"Using a CenteredEuler3DRigid transform" },
-		{"NormalizedMutualInformation", VBooleanRepn, 1, &metricNormalizeMutualInformation, VOptionalOpt, 0,
-		"Using a NormalizedMutualInformation metric" }
-
+		//component inputs
+		{"metric",	VShortRepn, 1, (VPointer) &metricType, VOptionalOpt, TYPMetric, "Type of the metric"},
+		{"transform", VShortRepn, 1, (VPointer) &transformType, VOptionalOpt, TYPTransform, "Type of the transform"}
 };
 
 int main( int argc, char* argv[] )
 {
 	VParseCommand( VNumber(options), options,  & argc, argv );
 
-	//define the standard transform type used for registration if the user has not specified it
-	if (!transformVersorRigid and !transformQuaternionRigid and !transformEulerRigid)
-	{
-		transformVersorRigid = true;
-	}
-	//define the standard metric type used for registration if the user has not specified a it
-	if (!metricMattesMutualInformation and !metricNormalizeMutualInformation)
-	{
-		metricMattesMutualInformation = true;
-	}
+
+
 
 	typedef short InputPixelType;
 	typedef short OutputPixelType;
@@ -97,34 +103,37 @@ int main( int argc, char* argv[] )
 
 
 	//transform setup
-	if (transformVersorRigid)
+	std::cout << "used transform: " << TYPTransform[transformType].keyword << std::endl;
+	switch (transformType)
 	{
-		std::cout << "transform: VersorRigid3D" << std::endl;
+	case 0:
 		registrationFactory->SetTransform( RegistrationFactoryType::VersorRigid3DTransform );
-	}
-	if (transformQuaternionRigid)
-	{
-		std::cout << "transform: QuaternionRigid3D" << std::endl;
+		break;
+	case 3:
 		registrationFactory->SetTransform( RegistrationFactoryType::QuaternionRigidTransform );
-	}
-	if (transformEulerRigid)
-	{
-		std::cout << "transform: CenteredEulerRigid3D" << std::endl;
+		break;
+	case 4:
 		registrationFactory->SetTransform( RegistrationFactoryType::CenteredEuler3DTransform );
+		break;
 	}
 
 	//metric setup
-	if (metricMattesMutualInformation)
+	std::cout << "used metric: " << TYPMetric[metricType].keyword << std::endl;
+	switch (metricType)
 	{
-		std::cout << "metric: MattesMutualInformation" << std::endl;
+	case 0:
 		registrationFactory->SetMetric( RegistrationFactoryType::MattesMutualInformation );
+		break;
+
+	case 1:
+		registrationFactory->SetMetric( RegistrationFactoryType::NormalizedMutualInformation );
+		break;
+
+
 
 	}
-	if (metricNormalizeMutualInformation)
-	{
-		std::cout << "metric: NormalizedMutualInformation" << std::endl;
-		registrationFactory->SetMetric( RegistrationFactoryType::NormalizedMutualInformation );
-	}
+
+
 
 
 	registrationFactory->SetOptimizer( RegistrationFactoryType::VersorRigidOptimizer );
