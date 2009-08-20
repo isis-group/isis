@@ -39,7 +39,6 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 	UserOptions.NumberOfIterations = 200;
 	UserOptions.NumberOfBins = 50;
 	UserOptions.PixelDensity = 0.01;
-	UserOptions.NumberOfThreads = 1;
 	UserOptions.USEOTSUTHRESHOLDING = false;
 
 

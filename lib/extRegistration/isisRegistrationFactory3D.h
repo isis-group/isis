@@ -196,7 +196,6 @@ public:
 	{
 		unsigned int NumberOfIterations;
 		unsigned int NumberOfBins;
-		unsigned int NumberOfThreads;
 		float PixelDensity;
 		bool INITIALIZEMOMENTS;
 		bool INITIALIZEGEOMETRY;
