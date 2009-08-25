@@ -20,6 +20,7 @@
 
 
 //affine:
+#include "itkAffineTransform.h"
 #include "itkCenteredAffineTransform.h"
 
 //metric includes
@@ -135,6 +136,9 @@ public:
 	typedef itk::QuaternionRigidTransform< double > QuaternionRigidTransformType;
 	typedef itk::CenteredEuler3DTransform< double > CenteredEuler3DTransformType;
 
+	typedef itk::AffineTransform< double, FixedImageDimension >
+													AffineTransformType;
+
 
 
 
@@ -149,7 +153,7 @@ public:
 	//metric typedefs
 	typedef itk::MattesMutualInformationImageToImageMetric< TFixedImageType, TMovingImageType >
 													MattesMutualInformationMetricType;
-	typedef typename itk::NormalizedMutualInformationHistogramImageToImageMetric< TFixedImageType, TMovingImageType >
+	typedef itk::NormalizedMutualInformationHistogramImageToImageMetric< TFixedImageType, TMovingImageType >
 													NormalizedMutualInformationHistogramMetricType;
 
 	typedef typename itk::NormalizedCorrelationImageToImageMetric< TFixedImageType, TMovingImageType >
@@ -321,10 +325,14 @@ private:
 	QuaternionRigidTransformType::Pointer				m_QuaternionRigidTransform;
 	CenteredEuler3DTransformType::Pointer				m_CenteredEuler3DTransform;
 
+	typename AffineTransformType::Pointer				m_AffineTransform;
+
 	//metric
 	typename MattesMutualInformationMetricType::Pointer m_MattesMutualInformationMetric;
 	typename NormalizedMutualInformationHistogramMetricType::Pointer
 														m_NormalizedMutualInformationMetric;
+
+
 	typename NormalizedCorrelationMetricType::Pointer   m_NormalizedCorrelationMetric;
 
 	//interpolator

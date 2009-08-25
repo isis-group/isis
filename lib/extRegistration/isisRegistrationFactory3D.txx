@@ -297,6 +297,7 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 	}
 	if( metric.NORMALIZEDMUTUALINFORMATION )
 	{
+
 		//setting up the normalize mutual information metric
 		m_NormalizedMutualInformationMetric->SetFixedImage( m_FixedImage );
 		m_NormalizedMutualInformationMetric->SetMovingImage( m_MovingImage );
@@ -305,10 +306,12 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 													m_FixedImageRegion.GetNumberOfPixels() * UserOptions.PixelDensity );
 
 
-		typename NormalizedMutualInformationHistogramMetricType::HistogramType::SizeType histogramSize;
-		histogramSize[0] = UserOptions.NumberOfBins;
-		histogramSize[1] = UserOptions.NumberOfBins;
-		m_NormalizedMutualInformationMetric->SetHistogramSize( histogramSize );
+		typename NormalizedMutualInformationHistogramMetricType::HistogramType::SizeType
+													m_histogramSize;
+		m_histogramSize[0] = 50;
+		m_histogramSize[1] = 50;
+		m_NormalizedMutualInformationMetric->SetHistogramSize( m_histogramSize );
+
 
 
 	}
@@ -318,6 +321,7 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 		m_NormalizedCorrelationMetric->SetFixedImage( m_FixedImage );
 		m_NormalizedCorrelationMetric->SetMovingImage( m_MovingImage );
 		m_NormalizedCorrelationMetric->SetFixedImageRegion( m_FixedImageRegion );
+
 
 
 	}
