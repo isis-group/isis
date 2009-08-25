@@ -40,10 +40,11 @@ VString ref_filename = NULL;
 VString in_filename = NULL;
 VString out_filename = NULL;
 VShort number_of_bins = 50;
-VShort number_of_iterations = 200;
-VFloat pixel_density = 0.01;
+static VShort number_of_iterations = 200;
+static VFloat pixel_density = 0.01;
 static VShort metricType = 0;
 static VShort transformType = 0;
+static VBoolean automask = false;
 
 
 static VOptionDescRec options[] = {
@@ -62,6 +63,8 @@ static VOptionDescRec options[] = {
 		"Maximum number of iteration used by the optimizer" },
 		{"pd", VFloatRepn, 1, &pixel_density, VOptionalOpt, 0,
 		"The density of pixels the metric uses. 1 denotes the metric uses all pixels. Has to be > 0. Only operative with a MattesMutualInformation metric"},
+		{"automask", VBooleanRepn, 1, &automask, VOptionalOpt, 0,
+		"Creating and applying an automask using the itkOtsuThresholdFilter" },
 
 		//component inputs
 		{"metric",	VShortRepn, 1, (VPointer) &metricType, VOptionalOpt, TYPMetric, "Type of the metric"},
@@ -148,8 +151,8 @@ int main( int argc, char* argv[] )
 
 
 
-	std::cout << "creating otsu mask" << std::endl;
-	registrationFactory->UserOptions.USEOTSUTHRESHOLDING = true;
+	if( automask ) { registrationFactory->UserOptions.USEOTSUTHRESHOLDING = true; }
+
 
 
 
