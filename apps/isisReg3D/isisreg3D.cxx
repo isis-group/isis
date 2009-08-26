@@ -65,14 +65,14 @@ int main(
 	if(!VParseCommand(VNumber(options), options, &argc, argv) || !VIdentifyFiles(VNumber (options), options, "in",
 	    &argc, argv, 0) || !VIdentifyFiles(VNumber (options), options, "out", &argc, argv, -1)) {
 		VReportUsage(argv[0], VNumber(options), options, NULL);
-		exit( EXIT_FAILURE);
+		exit(1);
 	}
 
 	// VParseCommand reduces the argv vector to the name of the program and  unknown command line parameters.
 	if(argc > 1) {
 		VReportBadArgs(argc, argv);
 		VReportUsage(argv[0], VNumber(options), options, NULL);
-		exit( EXIT_FAILURE);
+		exit(1);
 	}
 
 	//check pixel density
