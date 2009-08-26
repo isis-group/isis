@@ -76,8 +76,6 @@ int main(
 		exit(1);
 	}
 
-
-
 	//check pixel density
 	if(pixel_density <= 0) {
 		std::cerr << "wrong pixel density...set to 0.01" << std::endl;
