@@ -58,6 +58,7 @@ static VOptionDescRec
                 "transform", VShortRepn, 1, (VPointer) &transformType, VOptionalOpt, TYPTransform,
                 "Type of the transform"}};
 
+// This is the main function
 int main(
     int argc, char* argv[]) {
 
