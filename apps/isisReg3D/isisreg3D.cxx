@@ -69,7 +69,6 @@ int main(
 		exit(1);
 	}
 
-
 	// VParseCommand reduces the argv vector to the name of the program and  unknown command line parameters.
 	if(argc > 1) {
 		VReportBadArgs(argc, argv);
@@ -159,7 +158,7 @@ int main(
 	registrationFactory->StartRegistration();
 	writer->SetInput(registrationFactory->GetRegisteredImage());
 	writer->Update();
-
+	// Das ist ein Kommentar von Thomas
 	return 0;
 
 }
