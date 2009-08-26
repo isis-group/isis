@@ -68,6 +68,7 @@ int main(
 		exit(1);
 	}
 
+
 	// VParseCommand reduces the argv vector to the name of the program and  unknown command line parameters.
 	if(argc > 1) {
 		VReportBadArgs(argc, argv);
