@@ -139,6 +139,9 @@ public:
 	typedef itk::AffineTransform< double, FixedImageDimension >
 													AffineTransformType;
 
+	typedef itk::CenteredAffineTransform< double, FixedImageDimension >
+													CenteredAffineTransformType;
+
 
 
 
@@ -172,7 +175,9 @@ public:
 	{
 		VersorRigid3DTransform,
 		QuaternionRigidTransform,
-		CenteredEuler3DTransform
+		CenteredEuler3DTransform,
+		AffineTransform,
+		CenteredAffineTransform
 
 	};
 
@@ -254,6 +259,8 @@ private:
 		bool	VERSORRIGID;
 		bool	QUATERNIONRIGID;
 		bool 	CENTEREDEULER3DTRANSFORM;
+		bool	AFFINE;
+		bool	CENTEREDAFFINE;
 	} transform;
 
 	struct Optimizer
@@ -326,6 +333,7 @@ private:
 	CenteredEuler3DTransformType::Pointer				m_CenteredEuler3DTransform;
 
 	typename AffineTransformType::Pointer				m_AffineTransform;
+	typename CenteredAffineTransformType::Pointer		m_CenteredAffineTransform;
 
 	//metric
 	typename MattesMutualInformationMetricType::Pointer m_MattesMutualInformationMetric;

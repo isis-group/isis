@@ -26,9 +26,11 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 	transform.VERSORRIGID = false;
 	transform.QUATERNIONRIGID = false;
 	transform.CENTEREDEULER3DTRANSFORM = false;
+	transform.AFFINE = false;
+	transform.CENTEREDAFFINE = false;
 
 	metric.MATTESMUTUALINFORMATION = false;
-	metric.NORMALIZEDMUTUALINFORMATION = false;
+	//metric.NORMALIZEDMUTUALINFORMATION = false;
 	metric.NORMALIZEDCORRELATION = false;
 
 	m_FixedImageIsBigger = false;
@@ -85,13 +87,13 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 		m_MattesMutualInformationMetric = MattesMutualInformationMetricType::New();
 		m_RegistrationObject->SetMetric( m_MattesMutualInformationMetric );
 		break;
-
+/*
 	case NormalizedMutualInformation:
 		metric.NORMALIZEDMUTUALINFORMATION = true;
 		m_NormalizedMutualInformationMetric = NormalizedMutualInformationHistogramMetricType::New();
 		m_RegistrationObject->SetMetric( m_NormalizedMutualInformationMetric );
 		break;
-
+*/
 	case NormalizedCorrelation:
 		metric.NORMALIZEDCORRELATION = true;
 		m_NormalizedCorrelationMetric = NormalizedCorrelationMetricType::New();
@@ -148,7 +150,17 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 		m_RegistrationObject->SetTransform( m_CenteredEuler3DTransform );
 		break;
 
+	case AffineTransform:
+		transform.AFFINE = true;
+		m_AffineTransform = AffineTransformType::New();
+		m_RegistrationObject->SetTransform( m_AffineTransform );
+		break;
 
+	case CenteredAffineTransform:
+		transform.CENTEREDAFFINE = true;
+		m_CenteredAffineTransform = CenteredAffineTransformType::New();
+		m_RegistrationObject->SetTransform( m_CenteredAffineTransform );
+		break;
 
 	}
 }
@@ -165,6 +177,7 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 		m_RegularStepGradientDescentOptimizer =
 				RegularStepGradientDescentOptimizerType::New();
 		m_RegistrationObject->SetOptimizer( m_RegularStepGradientDescentOptimizer );
+		break;
 	case VersorRigidOptimizer:
 		optimizer.VERSORRIGID3D = true;
 		m_VersorRigid3DTransformOptimizer =
@@ -221,38 +234,39 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 	if( optimizer.REGULARSTEPGRADIENTDESCENT )
 	{
 		//setting up the regular step gradient descent optimizer...
-		RegularStepGradientDescentOptimizerType::ScalesType optimizerScale
+		RegularStepGradientDescentOptimizerType::ScalesType optimizerScaleRegularStepGradient
 										 ( m_RegistrationObject->GetTransform()->GetNumberOfParameters() );
 		unsigned int NumberOfParameters = m_RegistrationObject->GetTransform()->GetNumberOfParameters();
-		if( transform.VERSORRIGID or transform.QUATERNIONRIGID or transform.CENTEREDEULER3DTRANSFORM )
+		if( transform.VERSORRIGID or transform.QUATERNIONRIGID or transform.CENTEREDEULER3DTRANSFORM or transform.CENTEREDAFFINE or transform.AFFINE)
 		{
 		//...for the rigid transform
 			//number of parameters are dependent on the dimension of the images (2D: 4 parameter, 3D: 6 parameters)
 			for( unsigned int i = 0; i < NumberOfParameters; i++ )
 			{
-				optimizerScale[i] = 1.0/1000.0;
+				optimizerScaleRegularStepGradient[i] = 1.0/1000.0;
 			}
 			m_RegularStepGradientDescentOptimizer->SetMaximumStepLength( 0.1 );
 			m_RegularStepGradientDescentOptimizer->SetMinimumStepLength( 0.0001 );
-			m_RegularStepGradientDescentOptimizer->SetScales( optimizerScale );
+			m_RegularStepGradientDescentOptimizer->SetScales( optimizerScaleRegularStepGradient );
 			m_RegularStepGradientDescentOptimizer->SetNumberOfIterations( UserOptions.NumberOfIterations );
 		}
 	}
 	if( optimizer.VERSORRIGID3D )
 	{
-		VersorRigid3DTransformOptimizerType::ScalesType optimizerScale
+		VersorRigid3DTransformOptimizerType::ScalesType optimizerScaleVersorRigid3D
 										( m_RegistrationObject->GetTransform()->GetNumberOfParameters() );
 		unsigned  int NumberOfParameters = m_RegistrationObject->GetTransform()->GetNumberOfParameters();
+
 		if( transform.VERSORRIGID or transform.QUATERNIONRIGID or transform.CENTEREDEULER3DTRANSFORM )
 		{
-			optimizerScale[0] = 1.0;
-			for( unsigned int i = 1; i < NumberOfParameters; i++ )
+
+			for( unsigned int i = 0; i < NumberOfParameters; i++ )
 			{
-				optimizerScale[i] = 1.0/1000.0;
+				optimizerScaleVersorRigid3D[i] = 1.0/1000.0;
 			}
 			m_VersorRigid3DTransformOptimizer->SetMaximumStepLength( 0.1 );
 			m_VersorRigid3DTransformOptimizer->SetMinimumStepLength( 0.0001 );
-			m_VersorRigid3DTransformOptimizer->SetScales( optimizerScale );
+			m_VersorRigid3DTransformOptimizer->SetScales( optimizerScaleVersorRigid3D );
 			m_VersorRigid3DTransformOptimizer->SetNumberOfIterations( UserOptions.NumberOfIterations );
 		}
 
@@ -295,6 +309,7 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 		m_MattesMutualInformationMetric->SetNumberOfHistogramBins( UserOptions.NumberOfBins );
 
 	}
+	/*
 	if( metric.NORMALIZEDMUTUALINFORMATION )
 	{
 
@@ -315,6 +330,7 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 
 
 	}
+	*/
 	if( metric.NORMALIZEDCORRELATION )
 	{
 		//setting up the normalized correlation metric
@@ -338,12 +354,6 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 {
 	m_ResampleFilter = ResampleFilterType::New();
 	m_ImageCaster = ImageCasterType::New();
-
-	std::cout << "fixed image spacing: " << m_FixedImage->GetSpacing() << std::endl;
-	std::cout << "moving image spacing: " << m_MovingImage->GetSpacing() << std::endl;
-
-	std::cout << "fixed image size: " << m_FixedImage->GetLargestPossibleRegion().GetSize() << std::endl;
-	std::cout << "moving image size: " << m_MovingImage->GetLargestPossibleRegion().GetSize() << std::endl;
 
 
 	m_ResampleFilter->SetInput( m_MovingImage );
@@ -421,6 +431,15 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 	{
 		m_RegistrationObject->SetInitialTransformParameters( m_CenteredEuler3DTransform->GetParameters() );
 	}
+	if( transform.AFFINE )
+	{
+
+		m_RegistrationObject->SetInitialTransformParameters( m_AffineTransform->GetParameters() );
+	}
+	if( transform.CENTEREDAFFINE )
+	{
+		m_RegistrationObject->SetInitialTransformParameters( m_CenteredAffineTransform->GetParameters() );
+	}
 
 }
 
@@ -442,9 +461,13 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 		{
 			m_FixedImageIsBigger = true;
 		}
+
 	}
+
+
 	if( m_FixedImageIsBigger )
 	{
+		std::cout << "fixed image is bigger" << std::endl;
 		m_FixedImageMask = MaskImageType::New();
 		m_MovingImageMask = MaskImageType::New();
 		m_AndFilter = AndFilterType::New();
@@ -472,12 +495,10 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 		m_MovingThresholdFilter->SetLowerThreshold( m_MovingMinMaxCalculator->GetMinimum() );
 		m_MovingThresholdFilter->UpdateLargestPossibleRegion();
 		m_MovingThresholdFilter->Update();
+		m_JointImageMask = MaskObjectType::New();
+		m_JointImageMask->SetImage( m_MovingThresholdFilter->GetOutput() );
+		m_JointImageMask->Update();
 
-		m_AndFilter->SetInput1( m_MovingThresholdFilter->GetOutput() );
-		m_AndFilter->SetInput2( m_FixedThresholdFilter->GetOutput() );
-
-		m_AndFilter->Update();
-		m_JointImage1 = m_AndFilter->GetOutput();
 
 	}
 
@@ -490,35 +511,16 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 ::SetFixedImageMask( void )
 {
 
-	if (UserOptions.USEOTSUTHRESHOLDING and m_FixedImageIsBigger)
-	{
-		m_JointImageMask = MaskObjectType::New();
-		m_AndFilter->SetInput1( m_JointImage1 );
-		m_AndFilter->SetInput2( m_JointImage2 );
-		m_AndFilter->Update();
-		m_JointImageMask->SetImage( m_AndFilter->GetOutput() );
-		m_JointImageMask->Update();
-	}
-	if (UserOptions.USEOTSUTHRESHOLDING and !m_FixedImageIsBigger)
-	{
-		m_JointImageMask = MaskObjectType::New();
-		m_JointImageMask->SetImage( m_JointImage2 );
-		m_JointImageMask->Update();
-	}
-	if (!UserOptions.USEOTSUTHRESHOLDING and m_FixedImageIsBigger )
-	{
-		m_JointImageMask = MaskObjectType::New();
-		m_JointImageMask->SetImage( m_JointImage1 );
-		m_JointImageMask->Update();
-	}
-	if( metric.MATTESMUTUALINFORMATION )
-	{
-		m_MattesMutualInformationMetric->SetFixedImageMask( m_JointImageMask );
-	}
+
+
+	m_MattesMutualInformationMetric->SetFixedImageMask( m_JointImageMask );
+
+	/*
 	if( metric.NORMALIZEDMUTUALINFORMATION )
 	{
 		m_NormalizedMutualInformationMetric->SetFixedImageMask( m_JointImageMask );
 	}
+	*/
 }
 
 
@@ -560,18 +562,9 @@ RegistrationFactory3D< TFixedImageType, TMovingImageType >
 	this->CheckImageSizes();
 	//set up the initial transform parameters
 	this->SetInitializeTransform();
-	if (UserOptions.USEOTSUTHRESHOLDING)
-	{
-		m_OtsuThresholdFilter = OtsuThresholdFilterType::New();
-		m_OtsuThresholdFilter->SetInput( m_FixedImage );
-		m_OtsuThresholdFilter->Update();
-		m_JointImage2 = m_OtsuThresholdFilter->GetOutput();
-	}
 
-	if (UserOptions.USEOTSUTHRESHOLDING or m_FixedImageIsBigger)
-	{
-		this->SetFixedImageMask();
-	}
+
+	this->SetFixedImageMask();
 
 	try
 	{
