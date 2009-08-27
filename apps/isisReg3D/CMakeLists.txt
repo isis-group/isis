@@ -32,8 +32,8 @@ endif(NOT ISIS_LIBRARY_DIR)
 #the executables
 ADD_EXECUTABLE(isisreg3d
 	isisreg3D.cxx
-	isisIterationObserver.cxx)
+	)
 
 # link versus ITK library
-TARGET_LINK_LIBRARIES(isisreg3d  ITKStatistics ITKIO ITKSpatialObject ITKNumerics viaio)
+TARGET_LINK_LIBRARIES(isisreg3d  ITKIO ITKSpatialObject ITKNumerics viaio)
 

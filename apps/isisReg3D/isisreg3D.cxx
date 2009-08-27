@@ -20,25 +20,32 @@ VDictEntry TYPTransform[] = { { "Rigid", 0 }, { "Affine", 1 }, {
 		"CenteredAffine", 2 }, { "NonLinear", 3 }, { "QuaternionRigid", 4 }, {
 		"EulerRigid", 5 }, { NULL } };
 
+VDictEntry TYPInterpolator[] = { { "Linear", 0 }, { "BSpline", 1 }, { NULL } };
+
+VDictEntry TYPOptimizer[] = { { "RegularStepGradientDescent", 0 }, {
+		"VersorRigid", 1 }, { NULL } };
+
 //command line parser options
-VString ref_filename = NULL;
-VString in_filename = NULL;
-VString out_filename = NULL;
-VShort number_of_bins = 50;
+static VString ref_filename = NULL;
+static VString in_filename = NULL;
+static VString out_filename = NULL;
+static VShort number_of_bins = 50;
 static VShort number_of_iterations = 200;
 static VFloat pixel_density = 0.01;
 static VShort metricType = 0;
 static VShort transformType = 0;
-static VBoolean automask = false;
+static VShort interpolatorType = 0;
+static VShort optimizerType = 0;
+static VBoolean in_found, out_found, ref_found;
 
 static VOptionDescRec
 		options[] = {
 				//required inputs
-				{ "ref", VStringRepn, 1, &ref_filename, VRequiredOpt, 0,
+				{ "ref", VStringRepn, 1, &ref_filename, &ref_found, 0,
 						"the fixed image filename" },
-				{ "in", VStringRepn, 1, &in_filename, VRequiredOpt, 0,
+				{ "in", VStringRepn, 1, &in_filename, &in_found, 0,
 						"the moving image filename" },
-				{ "out", VStringRepn, 1, &out_filename, VRequiredOpt, 0,
+				{ "out", VStringRepn, 1, &out_filename, &out_found, 0,
 						"the output image filename" },
 
 				//parameter inputs
@@ -60,14 +67,18 @@ static VOptionDescRec
 						VOptionalOpt,
 						0,
 						"The density of pixels the metric uses. 1 denotes the metric uses all pixels. Has to be > 0. Only operative with a MattesMutualInformation metric" },
-				{ "automask", VBooleanRepn, 1, &automask, VOptionalOpt, 0,
-						"Creating and applying an automask using the itkOtsuThresholdFilter" },
 
 				//component inputs
-				{ "metric", VShortRepn, 1, (VPointer) & metricType,
-						VOptionalOpt, TYPMetric, "Type of the metric" }, {
-						"transform", VShortRepn, 1, (VPointer) & transformType,
-						VOptionalOpt, TYPTransform, "Type of the transform" } };
+				{ "metric", VShortRepn, 1, (VPointer) &metricType,
+						VOptionalOpt, TYPMetric, "Type of the metric" },
+				{ "transform", VShortRepn, 1, (VPointer) &transformType,
+						VOptionalOpt, TYPTransform, "Type of the transform" },
+				{ "interpolator", VShortRepn, 1, (VPointer) &interpolatorType,
+						VOptionalOpt, TYPInterpolator, "Type of interpolator" },
+				{ "optimizer", VShortRepn, 1, (VPointer) &optimizerType,
+						VOptionalOpt, TYPOptimizer, "Type of optimizer" }
+
+		};
 
 // This is the main function
 int main(int argc, char* argv[]) {
@@ -125,7 +136,6 @@ int main(int argc, char* argv[]) {
 
 	RegistrationFactoryType::Pointer registrationFactory =
 			RegistrationFactoryType::New();
-	registrationFactory->SetInterpolator(RegistrationFactoryType::Linear);
 
 	//transform setup
 	std::cout << "used transform: " << TYPTransform[transformType].keyword
@@ -167,12 +177,26 @@ int main(int argc, char* argv[]) {
 		break;
 	}
 
-	if (automask) {
-		registrationFactory->UserOptions.USEOTSUTHRESHOLDING = true;
+	//interpolator setup
+	std::cout << "used interpolator: "
+			<< TYPInterpolator[interpolatorType].keyword << std::endl;
+	switch (interpolatorType) {
+	case 0:
+		registrationFactory->SetInterpolator(
+				RegistrationFactoryType::LinearInterpolator);
+		break;
+	case 1:
+		registrationFactory->SetInterpolator(
+				RegistrationFactoryType::BSplineInterpolator);
+		break;
 	}
+	//optimizer setup
+	std::cout << "used optimizer: " << TYPOptimizer[optimizerType].keyword << std::endl;
+
 
 	registrationFactory->SetOptimizer(
-			RegistrationFactoryType::VersorRigidOptimizer);
+			RegistrationFactoryType::RegularStepGradientDescentOptimizer);
+
 	registrationFactory->UserOptions.NumberOfIterations = number_of_iterations;
 	registrationFactory->UserOptions.NumberOfBins = number_of_bins;
 	registrationFactory->UserOptions.PixelDensity = pixel_density;
@@ -183,7 +207,7 @@ int main(int argc, char* argv[]) {
 	registrationFactory->StartRegistration();
 	writer->SetInput(registrationFactory->GetRegisteredImage());
 	writer->Update();
-	// Das ist ein Kommentar von Thomas
+
 	return 0;
 
 }
