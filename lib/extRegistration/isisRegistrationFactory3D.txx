@@ -80,10 +80,13 @@ template<class TFixedImageType, class TMovingImageType>
 void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetInterpolator(
 		eInterpolationType e_interpolator) {
 	switch (e_interpolator) {
-	case Linear:
+	case LinearInterpolator:
 		m_LinearInterpolator = LinearInterpolatorType::New();
 		m_RegistrationObject->SetInterpolator(m_LinearInterpolator);
-
+		break;
+	case BSplineInterpolator:
+		m_BSplineInterpolator = BSplineInterpolatorType::New();
+		m_RegistrationObject->SetInterpolator(m_BSplineInterpolator);
 		break;
 
 	}
@@ -358,7 +361,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::CheckImageSizes(
 
 	if (m_FixedImageIsBigger) {
 
-		m_MovingImageMask = MaskImageType::New();
+		m_MovingImageMaskObject = MaskObjectType::New();
 		m_MovingThresholdFilter = MovingThresholdFilterType::New();
 		m_MovingMinMaxCalculator = MovingMinMaxCalculatorType::New();
 
@@ -373,6 +376,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::CheckImageSizes(
 		m_MovingThresholdFilter->SetLowerThreshold(
 				m_MovingMinMaxCalculator->GetMinimum());
 		m_MovingThresholdFilter->Update();
+
 		m_MovingImageMaskObject->SetImage(m_MovingThresholdFilter->GetOutput());
 
 	}

@@ -30,6 +30,7 @@
 
 //interpolator includes
 #include "itkLinearInterpolateImageFunction.h"
+#include "itkBSplineInterpolateImageFunction.h"
 
 //resample include
 #include "itkResampleImageFilter.h"
@@ -107,6 +108,9 @@ public:
 	typedef itk::LinearInterpolateImageFunction<MovingImageType, double>
 			LinearInterpolatorType;
 
+	typedef itk::BSplineInterpolateImageFunction<TMovingImageType, double,
+			double> BSplineInterpolatorType;
+
 	//transform typedefs
 	typedef itk::SmartPointer<
 			const typename RegistrationMethodType::TransformType>
@@ -158,7 +162,7 @@ public:
 	};
 
 	enum eInterpolationType {
-		Linear
+		LinearInterpolator, BSplineInterpolator
 	};
 
 	struct {
@@ -224,12 +228,15 @@ private:
 		bool MATTESMUTUALINFORMATION;
 		bool NORMALIZEDCORRELATION;
 	} metric;
+	struct Interpolator {
+		bool LINEAR;
+		bool BSPLINE;
+	};
 
 	FixedImagePointer m_FixedImage;
 	MovingImagePointer m_MovingImage;
 	OutputImagePointer m_OutputImage;
 
-	typename MaskImageType::Pointer m_MovingImageMask;
 	typename MaskObjectType::Pointer m_MovingImageMaskObject;
 
 	FixedImageRegionType m_FixedImageRegion;
@@ -273,6 +280,7 @@ private:
 
 	//interpolator
 	typename LinearInterpolatorType::Pointer m_LinearInterpolator;
+	typename BSplineInterpolatorType::Pointer m_BSplineInterpolator;
 
 	//initializer
 	typename VersorRigid3DTransformInitializerType::Pointer
