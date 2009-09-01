@@ -116,7 +116,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	//check combinations of components
-	if (!(optimizerType == 1 and transformType == 0)) {
+	if ((optimizerType == 1 and transformType != 0)) {
 		std::cerr
 				<< "\nInappropriate combination of transform and optimizer! Setting optimizer to RegularStepGradientDescent.\n"
 				<< std::endl;
