@@ -193,6 +193,7 @@ public:
 	struct {
 		unsigned int NumberOfIterations;
 		unsigned int NumberOfBins;
+		unsigned int BSplineGridSize;
 		float PixelDensity;
 		bool PRINTRESULTS;
 		bool USEOTSUTHRESHOLDING; //using an otsu threshold filter to create a mask which is designed to restrict the region given to the metric
@@ -270,7 +271,7 @@ private:
 
 	bool m_FixedImageIsBigger;
 
-	int m_NumberOfParameters;
+	unsigned int m_NumberOfParameters;
 
 	//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
