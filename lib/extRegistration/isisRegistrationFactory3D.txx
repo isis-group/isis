@@ -17,25 +17,31 @@ RegistrationFactory3D<TFixedImageType, TMovingImageType>::RegistrationFactory3D(
 	//boolean settings
 	optimizer.REGULARSTEPGRADIENTDESCENT = false;
 	optimizer.VERSORRIGID3D = false;
+	optimizer.LBFGSBOPTIMIZER = false;
 
 	transform.VERSORRIGID = false;
 	transform.QUATERNIONRIGID = false;
 	transform.CENTEREDEULER3DTRANSFORM = false;
 	transform.AFFINE = false;
 	transform.CENTEREDAFFINE = false;
+	transform.BSPLINEDEFORMABLETRANSFORM = false;
 
 	metric.MATTESMUTUALINFORMATION = false;
 	metric.NORMALIZEDCORRELATION = false;
+	metric.VIOLAWELLSMUTUALINFORMATION = false;
+
+	interpolator.BSPLINE = false;
+	interpolator.LINEAR = false;
 
 	m_FixedImageIsBigger = false;
 
-	UserOptions.INITIALIZEGEOMETRY = false;
-	UserOptions.INITIALIZEMOMENTS = false;
 	UserOptions.PRINTRESULTS = false;
 	UserOptions.NumberOfIterations = 200;
 	UserOptions.NumberOfBins = 50;
 	UserOptions.PixelDensity = 0.01;
 	UserOptions.USEOTSUTHRESHOLDING = false;
+
+	m_NumberOfParameters = 0;
 
 }
 
@@ -68,6 +74,13 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetMetric(
 		m_RegistrationObject->SetMetric(m_MattesMutualInformationMetric);
 		break;
 
+	case ViolaWellsMutualInformation:
+		metric.VIOLAWELLSMUTUALINFORMATION = true;
+		m_ViolaWellsMutualInformationMetric
+				= ViolaWellsMutualInformationMetricType::New();
+		m_RegistrationObject->SetMetric(m_ViolaWellsMutualInformationMetric);
+		break;
+
 	case NormalizedCorrelation:
 		metric.NORMALIZEDCORRELATION = true;
 		m_NormalizedCorrelationMetric = NormalizedCorrelationMetricType::New();
@@ -81,10 +94,13 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetInterpolator(
 		eInterpolationType e_interpolator) {
 	switch (e_interpolator) {
 	case LinearInterpolator:
+		interpolator.LINEAR = true;
 		m_LinearInterpolator = LinearInterpolatorType::New();
 		m_RegistrationObject->SetInterpolator(m_LinearInterpolator);
 		break;
+
 	case BSplineInterpolator:
+		interpolator.BSPLINE = true;
 		m_BSplineInterpolator = BSplineInterpolatorType::New();
 		m_RegistrationObject->SetInterpolator(m_BSplineInterpolator);
 		break;
@@ -127,6 +143,12 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetTransform(
 		m_RegistrationObject->SetTransform(m_CenteredAffineTransform);
 		break;
 
+	case BSplineDeformableTransform:
+		transform.BSPLINEDEFORMABLETRANSFORM = true;
+		m_BSplineTransform = BSplineTransformType::New();
+		m_RegistrationObject->SetTransform(m_BSplineTransform);
+		break;
+
 	}
 }
 
@@ -148,6 +170,12 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetOptimizer(
 		m_RegistrationObject->SetOptimizer(m_VersorRigid3DTransformOptimizer);
 		break;
 
+	case LBFGSBOptimizer:
+		optimizer.LBFGSBOPTIMIZER = true;
+		m_LBFGSBOptimizer = LBFGSBOptimizerType::New();
+		m_RegistrationObject->SetOptimizer(m_LBFGSBOptimizer);
+		break;
+
 	}
 }
 
@@ -159,11 +187,11 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetOptimizer(
 template<class TFixedImageType, class TMovingImageType>
 void RegistrationFactory3D<TFixedImageType, TMovingImageType>::UpdateParameters() {
 
-	//optimizer parameters:
-	this->SetUpOptimizer();
-
 	//transform parameters:
 	this->SetUpTransform();
+
+	//optimizer parameters:
+	this->SetUpOptimizer();
 
 	//metric parameters;
 	this->SetUpMetric();
@@ -175,16 +203,15 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer() 
 	if (optimizer.REGULARSTEPGRADIENTDESCENT) {
 		//setting up the regular step gradient descent optimizer...
 		RegularStepGradientDescentOptimizerType::ScalesType
-				optimizerScaleRegularStepGradient(
-						m_RegistrationObject->GetTransform()->GetNumberOfParameters());
-		unsigned int NumberOfParameters =
-				m_RegistrationObject->GetTransform()->GetNumberOfParameters();
+				optimizerScaleRegularStepGradient(m_NumberOfParameters);
+
 		if (transform.VERSORRIGID or transform.QUATERNIONRIGID
 				or transform.CENTEREDEULER3DTRANSFORM
-				or transform.CENTEREDAFFINE or transform.AFFINE) {
+				or transform.CENTEREDAFFINE or transform.AFFINE
+				or transform.BSPLINEDEFORMABLETRANSFORM) {
 			//...for the rigid transform
 			//number of parameters are dependent on the dimension of the images (2D: 4 parameter, 3D: 6 parameters)
-			for (unsigned int i = 0; i < NumberOfParameters; i++) {
+			for (unsigned int i = 0; i < m_NumberOfParameters; i++) {
 				optimizerScaleRegularStepGradient[i] = 1.0 / 1000.0;
 			}
 			m_RegularStepGradientDescentOptimizer->SetMaximumStepLength(0.1);
@@ -194,18 +221,19 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer() 
 			m_RegularStepGradientDescentOptimizer->SetNumberOfIterations(
 					UserOptions.NumberOfIterations);
 		}
+
+		if (metric.VIOLAWELLSMUTUALINFORMATION) {
+			m_RegularStepGradientDescentOptimizer->MaximizeOn();
+		}
 	}
 	if (optimizer.VERSORRIGID3D) {
 		VersorRigid3DTransformOptimizerType::ScalesType
-				optimizerScaleVersorRigid3D(
-						m_RegistrationObject->GetTransform()->GetNumberOfParameters());
-		unsigned int NumberOfParameters =
-				m_RegistrationObject->GetTransform()->GetNumberOfParameters();
+				optimizerScaleVersorRigid3D(m_NumberOfParameters);
 
 		if (transform.VERSORRIGID or transform.QUATERNIONRIGID
 				or transform.CENTEREDEULER3DTRANSFORM) {
 
-			for (unsigned int i = 0; i < NumberOfParameters; i++) {
+			for (unsigned int i = 0; i < m_NumberOfParameters; i++) {
 				optimizerScaleVersorRigid3D[i] = 1.0 / 1000.0;
 			}
 			m_VersorRigid3DTransformOptimizer->SetMaximumStepLength(0.1);
@@ -218,15 +246,120 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer() 
 
 	}
 
+	if (optimizer.LBFGSBOPTIMIZER) {
+
+		LBFGSBOptimizerType::BoundSelectionType boundSelect(
+				m_NumberOfParameters);
+		LBFGSBOptimizerType::BoundValueType lowerBound(m_NumberOfParameters);
+		LBFGSBOptimizerType::BoundValueType upperBound(m_NumberOfParameters);
+
+		boundSelect.Fill(0);
+		lowerBound.Fill(0.0);
+		upperBound.Fill(0.0);
+
+		m_LBFGSBOptimizer->SetBoundSelection(boundSelect);
+		m_LBFGSBOptimizer->SetLowerBound(lowerBound);
+		m_LBFGSBOptimizer->SetUpperBound(upperBound);
+
+		m_LBFGSBOptimizer->SetCostFunctionConvergenceFactor(1e+12);
+		m_LBFGSBOptimizer->SetProjectedGradientTolerance(1e-4);
+		m_LBFGSBOptimizer->SetMaximumNumberOfIterations(
+				UserOptions.NumberOfIterations);
+		m_LBFGSBOptimizer->SetMaximumNumberOfEvaluations(
+				UserOptions.NumberOfIterations);
+		m_LBFGSBOptimizer->SetMaximumNumberOfCorrections(12);
+
+	}
+
 }
 
 template<class TFixedImageType, class TMovingImageType>
 void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpTransform() {
-	if (transform.VERSORRIGID) {
-		//setting up the rigid transform
 
+	if (transform.BSPLINEDEFORMABLETRANSFORM) {
+
+		typedef typename BSplineTransformType::RegionType BSplineRegionType;
+		typedef typename BSplineTransformType::SpacingType BSplineSpacingType;
+		typedef typename BSplineTransformType::OriginType BSplineOriginType;
+		typedef typename BSplineTransformType::DirectionType
+				BSplineDirectionType;
+
+		BSplineRegionType bsplineRegion;
+		typename BSplineRegionType::SizeType gridSizeOnImage;
+		typename BSplineRegionType::SizeType gridBorderSize;
+		typename BSplineRegionType::SizeType totalGridSize;
+
+		gridSizeOnImage.Fill(5);
+		gridBorderSize.Fill(3); //Border for spline order = 3 (1 lower, 2 upper)
+		totalGridSize = gridSizeOnImage + gridBorderSize;
+
+		bsplineRegion.SetSize(totalGridSize);
+		BSplineSpacingType bsplineSpacing = m_FixedImage->GetSpacing();
+
+		BSplineOriginType bsplineOrigin = m_FixedImage->GetOrigin();
+
+		BSplineDirectionType bsplineDirection = m_FixedImage->GetDirection();
+		BSplineSpacingType gridOriginOffset = bsplineDirection * bsplineSpacing;
+
+		typename FixedImageType::SizeType fixedImageSize =
+				m_FixedImageRegion.GetSize();
+
+		for (unsigned int r = 0; r < FixedImageDimension; r++) {
+			bsplineSpacing[r] *= floor(static_cast<double> (fixedImageSize[r]
+					- 1) / static_cast<double> (gridSizeOnImage[r] - 1));
+		}
+
+		bsplineOrigin = bsplineOrigin - gridOriginOffset;
+
+		m_BSplineTransform->SetGridSpacing(bsplineSpacing);
+		m_BSplineTransform->SetGridOrigin(bsplineOrigin);
+		m_BSplineTransform->SetGridRegion(bsplineRegion);
+		m_BSplineTransform->SetGridDirection(bsplineDirection);
+
+		typedef typename BSplineTransformType::ParametersType
+				BSplineParametersType;
+
+		m_NumberOfParameters = m_BSplineTransform->GetNumberOfParameters();
+
+		BSplineParametersType bsplineParameters(m_NumberOfParameters);
+		bsplineParameters.Fill(0.0);
+
+		m_BSplineTransform->SetParameters(bsplineParameters);
+		m_RegistrationObject->SetInitialTransformParameters(
+				m_BSplineTransform->GetParameters());
 
 	}
+
+	if (transform.AFFINE) {
+		m_NumberOfParameters = m_AffineTransform->GetNumberOfParameters();
+		m_RegistrationObject->SetInitialTransformParameters(
+				m_AffineTransform->GetParameters());
+	}
+	if (transform.CENTEREDAFFINE) {
+		m_NumberOfParameters
+				= m_CenteredAffineTransform->GetNumberOfParameters();
+		m_RegistrationObject->SetInitialTransformParameters(
+				m_CenteredAffineTransform->GetParameters());
+	}
+	if (transform.VERSORRIGID) {
+		m_NumberOfParameters
+				= m_VersorRigid3DTransform->GetNumberOfParameters();
+		m_RegistrationObject->SetInitialTransformParameters(
+				m_VersorRigid3DTransform->GetParameters());
+	}
+	if (transform.CENTEREDEULER3DTRANSFORM) {
+		m_NumberOfParameters
+				= m_CenteredEuler3DTransform->GetNumberOfParameters();
+		m_RegistrationObject->SetInitialTransformParameters(
+				m_CenteredEuler3DTransform->GetParameters());
+	}
+	if (transform.QUATERNIONRIGID) {
+		m_NumberOfParameters
+				= m_QuaternionRigidTransform->GetNumberOfParameters();
+		m_RegistrationObject->SetInitialTransformParameters(
+				m_QuaternionRigidTransform->GetParameters());
+	}
+
 }
 
 template<class TFixedImageType, class TMovingImageType>
@@ -243,7 +376,43 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpMetric() {
 		m_MattesMutualInformationMetric->SetNumberOfHistogramBins(
 				UserOptions.NumberOfBins);
 
+	}
 
+	if (metric.VIOLAWELLSMUTUALINFORMATION) {
+
+		//set up the filters
+		m_FixedGaussianFilter = DiscreteGaussianImageFitlerType::New();
+		m_MovingGaussianFilter = DiscreteGaussianImageFitlerType::New();
+
+		m_FixedNormalizeImageFilter = FixedNormalizeImageFilterType::New();
+		m_MovingNormalizeImageFilter = MovingNormalizeImageFilterType::New();
+
+		m_FixedGaussianFilter->SetVariance(2.0);
+		m_MovingGaussianFilter->SetVariance(2.0);
+
+		//pipelining the images: NormalizeImageFilter -> GaussianImageFilter -> RegistrationMethod
+
+		m_FixedNormalizeImageFilter->SetInput(m_FixedImage);
+		m_MovingNormalizeImageFilter->SetInput(m_MovingImage);
+
+		m_FixedGaussianFilter->SetInput(
+				m_FixedNormalizeImageFilter->GetOutput());
+		m_MovingGaussianFilter->SetInput(
+				m_MovingNormalizeImageFilter->GetOutput());
+
+		m_ViolaWellsMutualInformationMetric->SetFixedImage(
+				m_FixedGaussianFilter->GetOutput());
+		m_ViolaWellsMutualInformationMetric->SetMovingImage(
+				m_MovingGaussianFilter->GetOutput());
+		m_ViolaWellsMutualInformationMetric->SetFixedImageRegion(
+				m_FixedImageRegion);
+		m_ViolaWellsMutualInformationMetric->SetNumberOfSpatialSamples(
+				m_FixedImageRegion.GetNumberOfPixels()
+						* UserOptions.PixelDensity);
+
+		m_ViolaWellsMutualInformationMetric->SetFixedImageStandardDeviation(0.4);
+		m_ViolaWellsMutualInformationMetric->SetMovingImageStandardDeviation(
+				0.4);
 	}
 
 	if (metric.NORMALIZEDCORRELATION) {
@@ -251,7 +420,6 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpMetric() {
 		m_NormalizedCorrelationMetric->SetFixedImage(m_FixedImage);
 		m_NormalizedCorrelationMetric->SetMovingImage(m_MovingImage);
 		m_NormalizedCorrelationMetric->SetFixedImageRegion(m_FixedImageRegion);
-
 
 	}
 
@@ -291,59 +459,6 @@ typename RegistrationFactory3D<TFixedImageType, TMovingImageType>::RegistrationM
 
 }
 
-template<class TFixedImageType, class TMovingImageType>
-void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetInitializeTransform(
-		void) {
-
-	if (transform.VERSORRIGID) {
-		if (UserOptions.INITIALIZEGEOMETRY or UserOptions.INITIALIZEMOMENTS)
-		//the user has selected either the geometry initializer, which alignes the geometrical centers
-		//of the images or the moment initializer, which alignes the center of mass of the images
-		{
-			m_VersorRigid3DTransformInitializer
-					= VersorRigid3DTransformInitializerType::New();
-			m_VersorRigid3DTransformInitializer->SetTransform(
-					m_VersorRigid3DTransform);
-			m_VersorRigid3DTransformInitializer->SetFixedImage(m_FixedImage);
-			m_VersorRigid3DTransformInitializer->SetMovingImage(m_MovingImage);
-			if (UserOptions.INITIALIZEGEOMETRY) {
-				m_VersorRigid3DTransformInitializer->GeometryOn();
-			}
-			if (UserOptions.INITIALIZEMOMENTS) {
-				m_VersorRigid3DTransformInitializer->MomentsOn();
-			}
-			m_VersorRigid3DTransformInitializer->InitializeTransform();
-
-			m_RegistrationObject->SetInitialTransformParameters(
-					m_VersorRigid3DTransform->GetParameters());
-		} else //the user has not set a specific initializer
-		{
-			m_RegistrationObject->SetInitialTransformParameters(
-					m_VersorRigid3DTransform->GetParameters());
-		}
-
-	}
-	if (transform.QUATERNIONRIGID) {
-		m_RegistrationObject->SetInitialTransformParameters(
-				m_QuaternionRigidTransform->GetParameters());
-	}
-
-	if (transform.CENTEREDEULER3DTRANSFORM) {
-		m_RegistrationObject->SetInitialTransformParameters(
-				m_CenteredEuler3DTransform->GetParameters());
-	}
-	if (transform.AFFINE) {
-
-		m_RegistrationObject->SetInitialTransformParameters(
-				m_AffineTransform->GetParameters());
-	}
-	if (transform.CENTEREDAFFINE) {
-		m_RegistrationObject->SetInitialTransformParameters(
-				m_CenteredAffineTransform->GetParameters());
-	}
-
-}
-
 /*
  this method checks the images sizes of the fixed and the moving image.
  if the fixed image size, in any direction, is bigger than the image size
@@ -380,6 +495,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::CheckImageSizes(
 		m_MovingThresholdFilter->Update();
 
 		m_MovingImageMaskObject->SetImage(m_MovingThresholdFilter->GetOutput());
+		m_MovingImageMaskObject->Update();
 
 	}
 
@@ -389,7 +505,15 @@ template<class TFixedImageType, class TMovingImageType>
 void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetFixedImageMask(
 		void) {
 
-	m_MattesMutualInformationMetric->SetFixedImageMask(m_MovingImageMaskObject);
+	if (metric.MATTESMUTUALINFORMATION) {
+		m_MattesMutualInformationMetric->SetFixedImageMask(
+				m_MovingImageMaskObject);
+
+	}
+	if (metric.VIOLAWELLSMUTUALINFORMATION) {
+		m_ViolaWellsMutualInformationMetric->SetFixedImageMask(
+				m_MovingImageMaskObject);
+	}
 
 }
 
@@ -433,6 +557,13 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::PrintResults(
 				<< m_VersorRigid3DTransformOptimizer->GetValue() << std::endl;
 
 	}
+	if (optimizer.LBFGSBOPTIMIZER) {
+		std::cout << "Iterations: " << m_LBFGSBOptimizer->GetCurrentIteration()
+				<< std::endl;
+		std::cout << "Metric value: " << m_LBFGSBOptimizer->GetValue()
+				<< std::endl;
+
+	}
 
 }
 
@@ -444,8 +575,6 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::StartRegistration
 	//check the image sizes and creat a joint image mask if the fixed image is bigger than the moving image
 	//to avoid a itk sample error caused by a lack of spatial samples used by the metric
 	this->CheckImageSizes();
-	//set up the initial transform parameters
-	this->SetInitializeTransform();
 
 	this->SetFixedImageMask();
 
