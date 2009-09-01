@@ -243,6 +243,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpMetric() {
 		m_MattesMutualInformationMetric->SetNumberOfHistogramBins(
 				UserOptions.NumberOfBins);
 
+
 	}
 
 	if (metric.NORMALIZEDCORRELATION) {
@@ -250,6 +251,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpMetric() {
 		m_NormalizedCorrelationMetric->SetFixedImage(m_FixedImage);
 		m_NormalizedCorrelationMetric->SetMovingImage(m_MovingImage);
 		m_NormalizedCorrelationMetric->SetFixedImageRegion(m_FixedImageRegion);
+
 
 	}
 
@@ -422,6 +424,13 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::PrintResults(
 		std::cout << "Metric value: "
 				<< m_RegularStepGradientDescentOptimizer->GetValue()
 				<< std::endl;
+	}
+	if (optimizer.VERSORRIGID3D) {
+		std::cout << "Iterations: "
+				<< m_VersorRigid3DTransformOptimizer->GetCurrentIteration()
+				<< std::endl;
+		std::cout << "Metric value: "
+				<< m_VersorRigid3DTransformOptimizer->GetValue() << std::endl;
 
 	}
 
