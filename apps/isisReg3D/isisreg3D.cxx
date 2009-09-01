@@ -16,16 +16,17 @@
 #include "viaio/option.h"
 #include "viaio/mu.h" //this is required for VNumber
 VDictEntry TYPMetric[] = { { "MattesMutualInformation", 0 }, {
-		"NormalizedCorrelation", 1 }, { NULL } };
+		"ViolaWellsMutualInformation", 1 }, { "NormalizedCorrelation", 2 }, {
+		NULL } };
 
 VDictEntry TYPTransform[] = { { "Rigid", 0 }, { "Affine", 1 }, {
-		"CenteredAffine", 2 }, { "NonLinear", 3 }, { "QuaternionRigid", 4 }, {
-		"EulerRigid", 5 }, { NULL } };
+		"CenteredAffine", 2 }, { "BSplineDeformable", 3 }, { "QuaternionRigid",
+		4 }, { "EulerRigid", 5 }, { NULL } };
 
 VDictEntry TYPInterpolator[] = { { "Linear", 0 }, { "BSpline", 1 }, { NULL } };
 
 VDictEntry TYPOptimizer[] = { { "RegularStepGradientDescent", 0 }, {
-		"VersorRigid", 1 }, { NULL } };
+		"VersorRigid", 1 }, { "LBFGSB", 2 }, { NULL } };
 
 //command line parser options
 static VString ref_filename = NULL;
@@ -114,6 +115,14 @@ int main(int argc, char* argv[]) {
 		std::cerr << "metric uses all pixels" << std::endl;
 	}
 
+	//check combinations of components
+	if (!(optimizerType == 1 and transformType == 0)) {
+		std::cerr
+				<< "\nInappropriate combination of transform and optimizer! Setting optimizer to RegularStepGradientDescent.\n"
+				<< std::endl;
+		optimizerType = 0;
+	}
+
 	typedef short InputPixelType;
 	typedef short OutputPixelType;
 	const unsigned int Dimension = 3;
@@ -164,9 +173,13 @@ int main(int argc, char* argv[]) {
 		break;
 	case 3:
 		registrationFactory->SetTransform(
-				RegistrationFactoryType::QuaternionRigidTransform);
+				RegistrationFactoryType::BSplineDeformableTransform);
 		break;
 	case 4:
+		registrationFactory->SetTransform(
+				RegistrationFactoryType::QuaternionRigidTransform);
+		break;
+	case 5:
 		registrationFactory->SetTransform(
 				RegistrationFactoryType::CenteredEuler3DTransform);
 		break;
@@ -181,6 +194,11 @@ int main(int argc, char* argv[]) {
 		break;
 
 	case 1:
+		registrationFactory->SetMetric(
+				RegistrationFactoryType::ViolaWellsMutualInformation);
+		break;
+
+	case 2:
 		registrationFactory->SetMetric(
 				RegistrationFactoryType::NormalizedCorrelation);
 		break;
@@ -203,8 +221,20 @@ int main(int argc, char* argv[]) {
 	std::cout << "used optimizer: " << TYPOptimizer[optimizerType].keyword
 			<< std::endl;
 
-	registrationFactory->SetOptimizer(
-			RegistrationFactoryType::RegularStepGradientDescentOptimizer);
+	switch (optimizerType) {
+	case 0:
+		registrationFactory->SetOptimizer(
+				RegistrationFactoryType::RegularStepGradientDescentOptimizer);
+		break;
+	case 1:
+		registrationFactory->SetOptimizer(
+				RegistrationFactoryType::VersorRigidOptimizer);
+		break;
+	case 2:
+		registrationFactory->SetOptimizer(
+				RegistrationFactoryType::LBFGSBOptimizer);
+		break;
+	}
 
 	registrationFactory->UserOptions.NumberOfIterations = number_of_iterations;
 	registrationFactory->UserOptions.NumberOfBins = number_of_bins;
@@ -215,18 +245,8 @@ int main(int argc, char* argv[]) {
 	registrationFactory->SetMovingImage(movingReader->GetOutput());
 	registrationFactory->StartRegistration();
 
-
-
-
-
 	writer->SetInput(registrationFactory->GetRegisteredImage());
 	writer->Update();
-
-
-
-
-
-
 
 	//checkerboard filter
 	if (checker_parts > 0) {
@@ -236,7 +256,7 @@ int main(int argc, char* argv[]) {
 		}
 		checker->SetInput1(fixedReader->GetOutput());
 		checker->SetInput2(registrationFactory->GetRegisteredImage());
-		checker->SetCheckerPattern( patterns );
+		checker->SetCheckerPattern(patterns);
 		checker->Update();
 		writer->SetFileName("checkerboard.nii");
 		writer->SetInput(checker->GetOutput());
