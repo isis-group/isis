@@ -50,6 +50,8 @@
 //additional include stuff
 #include "itkNormalizeImageFilter.h" //for ViolaWellMutualInformation. Sets mean to zero and the variance to 1
 #include "itkDiscreteGaussianImageFilter.h" // low pass filtering for ViolaWellsMutualInformation to increase robustness against noise.
+#include "itkCenteredTransformInitializer.h"
+
 namespace isis {
 
 template<class TFixedImageType, class TMovingImageType>
@@ -164,6 +166,9 @@ public:
 	typedef typename itk::DiscreteGaussianImageFilter<TFixedImageType,
 			TFixedImageType> DiscreteGaussianImageFitlerType;
 
+	typedef typename itk::CenteredTransformInitializer<
+			VersorRigid3DTransformType, TFixedImageType, TMovingImageType>
+			CenteredTransformInitializerType;
 	enum eTransformType {
 		VersorRigid3DTransform,
 		QuaternionRigidTransform,
@@ -197,6 +202,7 @@ public:
 		float PixelDensity;
 		bool PRINTRESULTS;
 		bool USEOTSUTHRESHOLDING; //using an otsu threshold filter to create a mask which is designed to restrict the region given to the metric
+		bool INITIALIZEOFF;
 
 	} UserOptions;
 
@@ -258,7 +264,7 @@ private:
 	struct Interpolator {
 		bool LINEAR;
 		bool BSPLINE;
-	}interpolator;
+	} interpolator;
 
 	FixedImagePointer m_FixedImage;
 	MovingImagePointer m_MovingImage;
@@ -282,6 +288,8 @@ private:
 	typename ImageCasterType::Pointer m_ImageCaster;
 
 	typename OtsuThresholdFilterType::Pointer m_OtsuThresholdFilter;
+
+	typename CenteredTransformInitializerType::Pointer m_Initializer;
 
 	//registration method
 	RegistrationMethodPointer m_RegistrationObject;
