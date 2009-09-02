@@ -34,7 +34,7 @@ static VShort number_of_iterations = 200;
 static VFloat pixel_density = 0.01;
 static VShort grid_size = 7;
 static VShort metricType = 0;
-static VShort transformType;
+static VShort transformType = 0;
 static VShort interpolatorType = 0;
 static VShort optimizerType = 0;
 static VBoolean in_found, out_found, ref_found;
@@ -66,7 +66,7 @@ static VOptionDescRec
                 "Grid size used for the BSplineDeformable transform."},
             //component inputs
             {"metric", VShortRepn, 1, (VPointer) &metricType, VOptionalOpt, TYPMetric, "Type of the metric"}, {
-                "transform", VShortRepn, 0, (VPointer) &transformType, VOptionalOpt, TYPTransform,
+                "transform", VShortRepn, 1, (VPointer) &transformType, VOptionalOpt, TYPTransform,
                 "Type of the transform"}, {"interpolator", VShortRepn, 1, (VPointer) &interpolatorType, VOptionalOpt,
                 TYPInterpolator, "Type of interpolator"}, {"optimizer", VShortRepn, 1, (VPointer) &optimizerType,
                 VOptionalOpt, TYPOptimizer, "Type of optimizer"}
