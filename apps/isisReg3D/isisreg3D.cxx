@@ -18,7 +18,7 @@
 VDictEntry TYPMetric[] = { {"MattesMutualInformation", 0}, {"ViolaWellsMutualInformation", 1}, {
     "NormalizedCorrelation", 2}, {NULL}};
 
-VDictEntry TYPTransform[] = { {"Rigid", 0}, {"Affine", 1}, {"CenteredAffine", 2}, {"BSplineDeformable", 3}, {
+VDictEntry TYPTransform[] = { {"Rigid", 0}, {"Affine", 1}, {"BSplineDeformable", 2}, {"CenteredAffine", 3}, {
     "QuaternionRigid", 4}, {"EulerRigid", 5}, {NULL}};
 
 VDictEntry TYPInterpolator[] = { {"Linear", 0}, {"BSpline", 1}, {NULL}};
@@ -34,7 +34,7 @@ static VShort number_of_iterations = 200;
 static VFloat pixel_density = 0.01;
 static VShort grid_size = 7;
 static VShort metricType = 0;
-static VShort transformType = 0;
+static VShort transformType;
 static VShort interpolatorType = 0;
 static VShort optimizerType = 0;
 static VBoolean in_found, out_found, ref_found;
@@ -66,7 +66,7 @@ static VOptionDescRec
                 "Grid size used for the BSplineDeformable transform."},
             //component inputs
             {"metric", VShortRepn, 1, (VPointer) &metricType, VOptionalOpt, TYPMetric, "Type of the metric"}, {
-                "transform", VShortRepn, 1, (VPointer) &transformType, VOptionalOpt, TYPTransform,
+                "transform", VShortRepn, 0, (VPointer) &transformType, VOptionalOpt, TYPTransform,
                 "Type of the transform"}, {"interpolator", VShortRepn, 1, (VPointer) &interpolatorType, VOptionalOpt,
                 TYPInterpolator, "Type of interpolator"}, {"optimizer", VShortRepn, 1, (VPointer) &optimizerType,
                 VOptionalOpt, TYPOptimizer, "Type of optimizer"}
@@ -90,6 +90,7 @@ int main(
 		VReportUsage(argv[0], VNumber(options), options, NULL);
 		exit(1);
 	}
+
 
 	//check pixel density
 	if(pixel_density <= 0) {
@@ -154,10 +155,10 @@ int main(
 		registrationFactory->SetTransform(RegistrationFactoryType::AffineTransform);
 		break;
 	case 2:
-		registrationFactory->SetTransform(RegistrationFactoryType::CenteredAffineTransform);
+		registrationFactory->SetTransform(RegistrationFactoryType::BSplineDeformableTransform);
 		break;
 	case 3:
-		registrationFactory->SetTransform(RegistrationFactoryType::BSplineDeformableTransform);
+		registrationFactory->SetTransform(RegistrationFactoryType::CenteredAffineTransform);
 		break;
 	case 4:
 		registrationFactory->SetTransform(RegistrationFactoryType::QuaternionRigidTransform);
