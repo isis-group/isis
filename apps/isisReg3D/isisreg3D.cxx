@@ -12,6 +12,7 @@
 
 #include "itkCheckerBoardImageFilter.h"
 
+
 //via command parser include
 #include "viaio/option.h"
 #include "viaio/mu.h" //this is required for VNumber
@@ -91,6 +92,7 @@ int main(
 		exit(1);
 	}
 
+	std::cout << "setting up the registration object..." << std::endl;
 
 	//check pixel density
 	if(pixel_density <= 0) {
@@ -127,7 +129,7 @@ int main(
 	typedef itk::ImageFileReader<MovingImageType> MovingImageReaderType;
 	typedef itk::ImageFileWriter<OutputImageType> WriterType;
 
-	typedef isis::RegistrationFactory3D<FixedImageType, MovingImageType> RegistrationFactoryType;
+	typedef isis::Registration::RegistrationFactory3D<FixedImageType, MovingImageType> RegistrationFactoryType;
 
 	typedef itk::CheckerBoardImageFilter<FixedImageType> CheckerBoardFilterType;
 
@@ -135,6 +137,7 @@ int main(
 	FixedImageReaderType::Pointer fixedReader = FixedImageReaderType::New();
 	MovingImageReaderType::Pointer movingReader = MovingImageReaderType::New();
 	WriterType::Pointer writer = WriterType::New();
+
 
 	fixedReader->SetFileName(ref_filename);
 	movingReader->SetFileName(in_filename);
@@ -217,13 +220,20 @@ int main(
 
 	registrationFactory->SetFixedImage(fixedReader->GetOutput());
 	registrationFactory->SetMovingImage(movingReader->GetOutput());
+
+	std::cout << "starting the registration..." << std::endl;
+
 	registrationFactory->StartRegistration();
 
+	std::cout << "starting resampling..." << std::endl;
+
 	writer->SetInput(registrationFactory->GetRegisteredImage());
+
 	writer->Update();
 
 	//checkerboard filter
 	if(checker_parts > 0) {
+		std::cout << "building checkerboard..." << std::endl;
 		CheckerBoardFilterType::PatternArrayType patterns;
 		for(int i = 0; i < 3; i++) {
 			patterns[i] = checker_parts;
