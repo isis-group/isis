@@ -8,6 +8,7 @@
 #include "isisRegistrationFactory3D.h"
 
 namespace isis {
+namespace Registration {
 
 template<class TFixedImageType, class TMovingImageType>
 RegistrationFactory3D<TFixedImageType, TMovingImageType>::RegistrationFactory3D() {
@@ -605,4 +606,6 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::StartRegistration
 
 }
 
+
+} //end namespace Registration
 } //end namespace isis

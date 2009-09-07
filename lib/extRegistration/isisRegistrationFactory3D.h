@@ -53,6 +53,7 @@
 #include "itkCenteredTransformInitializer.h"
 
 namespace isis {
+namespace Registration {
 
 template<class TFixedImageType, class TMovingImageType>
 class RegistrationFactory3D: public itk::LightObject {
@@ -335,7 +336,9 @@ private:
 
 };
 
-}
+} //end namespace Registration
+
+} //end namespace isis
 
 #if ITK_TEMPLATE_TXX
 # include "isisRegistrationFactory3D.txx"
