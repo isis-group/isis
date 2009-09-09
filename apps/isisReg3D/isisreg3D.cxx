@@ -34,6 +34,7 @@ VDictEntry TYPOptimizer[] = { { "RegularStepGradientDescent", 0 }, {
 static VString ref_filename = NULL;
 static VString in_filename = NULL;
 static VString out_filename = NULL;
+static VString transform_filename = NULL;
 static VShort number_of_bins = 50;
 static VShort number_of_iterations = 200;
 static VFloat pixel_density = 0.01;
@@ -56,6 +57,9 @@ static VOptionDescRec
 				{ "out", VStringRepn, 1, &out_filename, &out_found, 0,
 						"the output image filename" },
 
+				//non-required inputs
+				{ "tout", VStringRepn, 1, &transform_filename, VOptionalOpt, 0,
+						"the saved transform filename" },
 				//parameter inputs
 				{
 						"bins",
@@ -262,6 +266,7 @@ int main(int argc, char* argv[]) {
 	registrationFactory->UserOptions.PixelDensity = pixel_density;
 	registrationFactory->UserOptions.BSplineGridSize = grid_size;
 	registrationFactory->UserOptions.PRINTRESULTS = true;
+	registrationFactory->UserOptions.NumberOfThreads = number_threads;
 
 	registrationFactory->SetFixedImage(fixedReader->GetOutput());
 	registrationFactory->SetMovingImage(movingReader->GetOutput());
@@ -276,11 +281,13 @@ int main(int argc, char* argv[]) {
 
 	writer->Update();
 
-	transformWriter->SetPrecision(100);
-	transformWriter->SetInput(registrationFactory->GetTransform());
-	transformWriter->SetFileName("transform.nii");
-	transformWriter->Update();
-
+	if (transform_filename)
+	{
+		transformWriter->SetPrecision(100);
+		transformWriter->SetInput(registrationFactory->GetTransform());
+		transformWriter->SetFileName(transform_filename);
+		transformWriter->Update();
+	}
 	//checkerboard filter
 	if (checker_parts > 0) {
 		std::cout << "building checkerboard..." << std::endl;
