@@ -281,9 +281,8 @@ int main(int argc, char* argv[]) {
 
 	writer->Update();
 
-	if (transform_filename)
-	{
-		transformWriter->SetPrecision(100);
+	//safe the gained transform to a user specific filename
+	if (transform_filename) {
 		transformWriter->SetInput(registrationFactory->GetTransform());
 		transformWriter->SetFileName(transform_filename);
 		transformWriter->Update();
