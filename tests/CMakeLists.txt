@@ -9,23 +9,21 @@ add_definitions(-D_ENABLE_CORE_DEBUG=1)
 
 find_path(ISIS_LIBRARY_DIR
     "libutils.so"
-    PATHS ${CMAKE_SOURCE_DIR}/../libisis/Debug
-              ${CMAKE_SOURCE_DIR}/../libisis/Release
-              ${CMAKE_SOURCE_DIR}/../libisis/build
-    DOC "Path to the isis library"
+    PATHS ${CMAKE_SOURCE_DIR}/../build/lib/
+    DOC "Path to the isis libraries"
     )
     
 find_path(ISIS_INCLUDE_DIR
     "CoreUtils/common.hpp"
-    PATHS ${CMAKE_SOURCE_DIR}/../libisis
+    PATHS ${CMAKE_SOURCE_DIR}/../lib
     DOC "Path to the isis header files"
     )
 
 include_directories(${ISIS_INCLUDE_DIR})
 link_directories(${ISIS_LIBRARY_DIR})
 
-#find_library(utils PATHS ${ISIS_LIBRARY_PATH})
-#ind_library(data PATHS ${ISIS_LIBRARY_PATH})
+find_library(LIB_UTILS utils PATHS ${ISIS_LIBRARY_DIR})
+find_library(LIB_DATA data PATHS ${ISIS_LIBRARY_DIR})
 
 add_executable(test_logger		test_logger.cpp)
 add_executable(test_property	test_property.cpp)
