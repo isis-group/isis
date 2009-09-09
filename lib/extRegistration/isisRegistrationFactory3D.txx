@@ -43,6 +43,7 @@ RegistrationFactory3D<TFixedImageType, TMovingImageType>::RegistrationFactory3D(
 	UserOptions.USEOTSUTHRESHOLDING = false;
 	UserOptions.BSplineGridSize = 10;
 	UserOptions.INITIALIZEOFF = false;
+	UserOptions.NumberOfThreads = 1;
 
 	m_NumberOfParameters = 0;
 
@@ -391,6 +392,9 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpMetric() {
 		m_MattesMutualInformationMetric->SetNumberOfHistogramBins(
 				UserOptions.NumberOfBins);
 
+		//multi threading approach
+		//m_MattesMutualInformationMetric->SetNumberOfThreads(UserOptions.NumberOfThreads);
+
 	}
 
 	if (metric.VIOLAWELLSMUTUALINFORMATION) {
@@ -428,6 +432,10 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpMetric() {
 		m_ViolaWellsMutualInformationMetric->SetFixedImageStandardDeviation(0.4);
 		m_ViolaWellsMutualInformationMetric->SetMovingImageStandardDeviation(
 				0.4);
+
+		//m_ViolaWellsMutualInformationMetric->SetNumberOfThreads(UserOptions.NumberOfThreads);
+
+
 	}
 
 	if (metric.NORMALIZEDCORRELATION) {
@@ -461,14 +469,14 @@ typename RegistrationFactory3D<TFixedImageType, TMovingImageType>::OutputImagePo
 
 template<class TFixedImageType, class TMovingImageType>
 typename RegistrationFactory3D<TFixedImageType, TMovingImageType>::ConstTransformPointer RegistrationFactory3D<
-		TFixedImageType, TMovingImageType>::GetTransform(void) {
+		TFixedImageType, TMovingImageType>::GetTransform(void) const {
 
 	return m_RegistrationObject->GetOutput()->Get();
 }
 
 template<class TFixedImageType, class TMovingImageType>
 typename RegistrationFactory3D<TFixedImageType, TMovingImageType>::RegistrationMethodPointer RegistrationFactory3D<
-		TFixedImageType, TMovingImageType>::GetRegistrationObject(void) {
+		TFixedImageType, TMovingImageType>::GetRegistrationObject(void) const {
 	this->UpdateParameters();
 	return m_RegistrationObject;
 
@@ -605,7 +613,6 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::StartRegistration
 	}
 
 }
-
 
 } //end namespace Registration
 } //end namespace isis

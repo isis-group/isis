@@ -200,11 +200,11 @@ public:
 		unsigned int NumberOfIterations;
 		unsigned int NumberOfBins;
 		unsigned int BSplineGridSize;
+		unsigned int NumberOfThreads;
 		float PixelDensity;
 		bool PRINTRESULTS;
 		bool USEOTSUTHRESHOLDING; //using an otsu threshold filter to create a mask which is designed to restrict the region given to the metric
 		bool INITIALIZEOFF;
-
 	} UserOptions;
 
 	void UpdateParameters(void);
@@ -225,9 +225,9 @@ public:
 	void SetUpMetric(void);
 
 	//getter methods
-	RegistrationMethodPointer GetRegistrationObject(void);
+	RegistrationMethodPointer GetRegistrationObject(void) const;
 	OutputImagePointer GetRegisteredImage(void);
-	ConstTransformPointer GetTransform(void);
+	ConstTransformPointer GetTransform(void) const;
 
 protected:
 	void PrintResults(void);
