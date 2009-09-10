@@ -6,7 +6,7 @@
 #include "type.hpp"
 #include "log.hpp"
 
-namespace iUtil {
+namespace isis{ namespace util{
 
 /**
 common property class
@@ -32,7 +32,7 @@ public:
 	}
 };
 
-}
+}}
 
 #endif
 

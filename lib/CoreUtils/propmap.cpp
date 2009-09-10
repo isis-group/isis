@@ -12,8 +12,8 @@
 #include "propmap.hpp"
 
 namespace boost{namespace detail{
-	template<> bool lexical_stream<std::string, iUtil::PropMap, std::ostringstream::traits_type>::operator<<(const iUtil::PropMap& s){
-		iUtil::PropMap::const_iterator i=s.begin();
+	template<> bool lexical_stream<std::string, isis::util::PropMap, std::ostringstream::traits_type>::operator<<(const isis::util::PropMap& s){
+		isis::util::PropMap::const_iterator i=s.begin();
 		if(i==s.end())
 			return false;
 		else

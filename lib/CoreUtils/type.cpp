@@ -14,7 +14,7 @@
 #include "property.hpp"
 #include "propmap.hpp"
 
-namespace iUtil{
+namespace isis{ namespace util{
 
 #define DEF_TYPE(TYPE,NAME,ID)  \
   template<> std::string Type<TYPE>::m_typeName=#NAME;\
@@ -36,4 +36,4 @@ DEF_TYPE(double,double,0x31);
 
 DEF_TYPE(std::string,string,0x40);
 DEF_TYPE(PropMap,PropertyMap,0xF0);
-}
+}}

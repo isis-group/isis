@@ -12,10 +12,10 @@
 #include <signal.h>
 #include <unistd.h>
 
-using iUtil::_internal::Message;
+using isis::util::_internal::Message;
 using ::std::string;
 
-namespace iUtil{
+namespace isis{ namespace util{
 
 void _internal::MessageHandlerBase::stopBelow(LogLevel stop){
 	m_stop_below=stop;
@@ -84,7 +84,7 @@ bool Message::shouldCommit()const{
 LogLevel _internal::MessageHandlerBase::m_stop_below=error;
 
 
-}
+}}
 namespace std{
 Message& endl(Message& __os) {
 	if(__os.shouldCommit()){

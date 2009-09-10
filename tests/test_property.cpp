@@ -6,22 +6,22 @@
 #include <iostream>
 #include "CoreUtils/log.hpp"
 
-using namespace iUtil; //needed for the log-levels
+using namespace isis::util; //needed for the log-levels
 
 int main(int argc, char *argv[]){
 
 	ENABLE_LOG(CoreLog,DefaultMsgPrint,info);
 
-	iUtil::Property a=std::string("Hallo");
+	Property a=std::string("Hallo");
 	std::cout << a->toString(true) << std::endl;
 
-	iUtil::Property b=a;
+	Property b=a;
 	std::cout << b->toString(true) << std::endl;
 
 	b=5.2;
 	std::cout << b->toString(true) << std::endl;
 
-	iUtil::PropMap map,cont;
+	PropMap map,cont;
 	map["Test1"]=6.4;
 	map["Test2"]=6;
 	map["Test3"]=std::string("Hallo");

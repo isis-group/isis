@@ -2,13 +2,13 @@
 #include "DataStorage/chunk.hpp"
 #include "CoreUtils/vector.hpp"
 
-using namespace iData;
-using namespace iUtil;
+using namespace isis::data;
+using namespace isis::util;
 
 int main(){
-	ENABLE_LOG(CoreDebug,iUtil::DefaultMsgPrint,iUtil::info);
-	ENABLE_LOG(DataDebug,iUtil::DefaultMsgPrint,iUtil::info);
-	ENABLE_LOG(DataLog,iUtil::DefaultMsgPrint,iUtil::info);
+	ENABLE_LOG(CoreDebug,DefaultMsgPrint,info);
+	ENABLE_LOG(DataDebug,DefaultMsgPrint,info);
+	ENABLE_LOG(DataLog,DefaultMsgPrint,info);
 	
 // 	iUtil::DefaultMsgPrint::stopBelow(iUtil::warning);
 	

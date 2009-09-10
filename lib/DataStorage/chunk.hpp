@@ -23,11 +23,11 @@
 #include "CoreUtils/log.hpp"
 #include "common.hpp"
 
-namespace iData{
+namespace isis{ namespace data{
 	
 namespace _internal{
 
-template<typename T> class ChunkBase : public ::iUtil::TypePtr<T>{
+template<typename T> class ChunkBase : public ::isis::util::TypePtr<T>{
 	size_t fourthSize,thirdSize,secondSize,firstSize;
 	inline size_t dim2index(size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim){
 		return	firstDim + secondDim*firstSize + thirdDim*secondSize*firstSize+
@@ -35,18 +35,18 @@ template<typename T> class ChunkBase : public ::iUtil::TypePtr<T>{
 	}
 protected:
 	template<typename D> ChunkBase(T* src,D d,size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim): 
-	::iUtil::TypePtr<T>(src,fourthDim*thirdDim*secondDim*firstDim,d),
+	::isis::util::TypePtr<T>(src,fourthDim*thirdDim*secondDim*firstDim,d),
 	fourthSize(fourthDim),thirdSize(thirdDim),secondSize(secondDim),firstSize(firstDim){
 		MAKE_LOG(DataDebug);
 		if(!(fourthSize && thirdSize && secondSize && firstSize)){
-			LOG(DataDebug,iUtil::error) << "Chunksize (" << fourthSize << "x" << thirdSize << "x" << secondSize << "x" << firstSize  << ") not valid" << std::endl;
+			LOG(DataDebug,isis::util::error) << "Chunksize (" << fourthSize << "x" << thirdSize << "x" << secondSize << "x" << firstSize  << ") not valid" << std::endl;
 		}
 	}
 public:
 	T &operator()(size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim){
 		MAKE_LOG(DataDebug);
 		if(fourthDim>=fourthSize || thirdDim>=thirdSize || secondDim>=secondSize || firstDim>=firstSize){
-			LOG(DataDebug,iUtil::error) 
+			LOG(DataDebug,isis::util::error) 
 				<< "Index " << fourthDim << "|" << thirdDim << "|" << secondDim << "|" << firstDim 
 				<< " is out of range (" << fourthSize << "x" << thirdSize << "x" << secondSize << "x" << firstSize  << ")" 
 				<< std::endl;
@@ -65,9 +65,9 @@ public:
 	MemChunk(size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim): 
 	_internal::ChunkBase<T>( 
 		(T*)malloc(sizeof(T)*fourthDim*thirdDim*secondDim*firstDim),
-		typename ::iUtil::TypePtr<T>::BasicDeleter(),
+		typename ::isis::util::TypePtr<T>::BasicDeleter(),
 		fourthDim,thirdDim,secondDim,firstDim
 	){}
 };
-}
+}}
 #endif // CHUNK_H

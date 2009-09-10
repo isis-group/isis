@@ -2,7 +2,7 @@
 #include "CoreUtils/type.hpp"
 #include <cstdarg>
 
-namespace iUtil{
+namespace isis{ namespace util{
 
 template<typename T, size_t SIZE> class FixedVector : public TypePtr<T>{
 public:
@@ -12,4 +12,4 @@ public:
 			this->operator[](i)=src[i];
 	}
 };
-}
+}}

@@ -6,7 +6,7 @@
 #include <boost/shared_ptr.hpp>
 #include "log.hpp"
 
-namespace iUtil{
+namespace isis{ namespace util{
 
 template<typename TYPE> class Type;
 template<typename TYPE> class TypePtr;
@@ -158,6 +158,6 @@ public:
 	operator boost::shared_ptr<TYPE>(){return m_val;}
 };
 
-}
+}}
 
 #endif //DATATYPE_INC

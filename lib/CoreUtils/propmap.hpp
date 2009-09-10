@@ -6,15 +6,15 @@
 
 #include "property.hpp"
 
-namespace iUtil {
+namespace isis{ namespace util{
 
 class PropMap : public std::map<std::string,Property>{};
 
-}
+}}
 
 //make PropMap printable
 namespace boost{namespace detail{
-	template<> bool lexical_stream<std::string, iUtil::PropMap, std::ostringstream::traits_type>::operator<<(const iUtil::PropMap& s);
+	template<> bool lexical_stream<std::string, isis::util::PropMap, std::ostringstream::traits_type>::operator<<(const isis::util::PropMap& s);
 }}
 
 #endif

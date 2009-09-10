@@ -16,7 +16,7 @@
 #include <list>
 #include <iostream>
 
-namespace iUtil{
+namespace isis{namespace util{
 
 class MSubject : public std::string{
 	public:
@@ -108,10 +108,10 @@ public:
 	}
 };
 
-}
+}}
 
 namespace std{
-	iUtil::_internal::Message& endl(iUtil::_internal::Message& __os);
+	isis::util::_internal::Message& endl(isis::util::_internal::Message& __os);
 }
 
 #include "log.hpp"

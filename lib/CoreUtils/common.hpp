@@ -14,9 +14,9 @@
 //   return o;
 // }
 
-namespace iUtil{
+namespace isis{ namespace util{
 	typedef ::std::string string;
 	struct CoreLog{enum {use_rel = _ENABLE_CORE_LOG};};
 	struct CoreDebug{enum {use_rel = _ENABLE_CORE_DEBUG};};
-}
+}}
 #endif //ISISCOMMON_HPP

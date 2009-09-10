@@ -16,9 +16,8 @@
 #include "message.hpp"
 #include "common.hpp"
 
-namespace iUtil{
+namespace isis{ namespace util{namespace _internal{
 	
-namespace _internal{
 template<class MODULE> class Log{
 	string file,object;
 	inline static MessageHandlerBase* &handler(){
@@ -35,12 +34,13 @@ public:
 		return Message(object,file,line, level,Log<MODULE>::handler());
 	}
 };
-}}
+
+}}}
 #define MAKE_LOG(MODULE)\
-iUtil::_internal::Log<MODULE> __logger_ ## MODULE(__FILE__,__PRETTY_FUNCTION__)
+isis::util::_internal::Log<MODULE> __logger_ ## MODULE(__FILE__,__PRETTY_FUNCTION__)
 
 #define ENABLE_LOG(MODULE,HANDLE_CLASS,set)\
-if(!MODULE::use_rel);else iUtil::_internal::Log<MODULE>::enable<HANDLE_CLASS>(set)
+if(!MODULE::use_rel);else isis::util::_internal::Log<MODULE>::enable<HANDLE_CLASS>(set)
 
 #define LOG(MODULE,LEVEL)\
 if(!MODULE::use_rel);else __logger_ ## MODULE.send(__LINE__,LEVEL)
