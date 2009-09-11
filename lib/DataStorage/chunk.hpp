@@ -23,8 +23,15 @@
 #include "CoreUtils/log.hpp"
 #include "common.hpp"
 
-namespace isis{ namespace data{
-	
+namespace isis{ 
+/*! \addtogroup data
+*  Additional documentation for group `mygrp'
+*  @{
+*/
+
+namespace data{
+
+/// @cond _internal
 namespace _internal{
 
 template<typename T> class ChunkBase : public ::isis::util::TypePtr<T>{
@@ -59,6 +66,7 @@ public:
 };
 
 }
+/// @endcond
 
 template<typename T> class MemChunk : public _internal::ChunkBase<T>{
 public:
@@ -69,5 +77,7 @@ public:
 		fourthDim,thirdDim,secondDim,firstDim
 	){}
 };
-}}
+}
+/** @} */
+}
 #endif // CHUNK_H

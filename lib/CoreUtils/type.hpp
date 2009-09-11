@@ -6,11 +6,17 @@
 #include <boost/shared_ptr.hpp>
 #include "log.hpp"
 
-namespace isis{ namespace util{
+namespace isis{ 
+/*! \addtogroup util
+ *  Additional documentation for group `mygrp'
+ *  @{
+ */
+namespace util{
 
 template<typename TYPE> class Type;
 template<typename TYPE> class TypePtr;
 
+/// @cond _internal
 namespace _internal{
 template<typename TYPE,typename T> TYPE __cast_to(Type<TYPE> *dest,const T& value){
 	return boost::lexical_cast<TYPE>(value);
@@ -73,6 +79,7 @@ public:
 	}
 };
 }
+/// @endcond
 
 /// Generic class for type aware variables
 template<typename TYPE> class Type: public _internal::TypeBase{
@@ -158,6 +165,8 @@ public:
 	operator boost::shared_ptr<TYPE>(){return m_val;}
 };
 
-}}
+}
+/** @} */
+}
 
 #endif //DATATYPE_INC

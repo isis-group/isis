@@ -1,5 +1,5 @@
-#ifndef ISISCOMMON_HPP
-#define ISISCOMMON_HPP
+#ifndef CORE_COMMON_HPP
+#define CORE_COMMON_HPP
 
 // template<class InputIterator,typename _CharT, typename _Traits> std::basic_ostream<_CharT, _Traits> &
 // write_list(InputIterator start,InputIterator end,
@@ -14,9 +14,18 @@
 //   return o;
 // }
 
-namespace isis{ namespace util{
-	typedef ::std::string string;
+namespace isis{ 
+/*! \addtogroup util
+ *  Additional documentation for group `mygrp'
+ *  @{
+ */
+	
+namespace util{
+/// @cond _hidden
 	struct CoreLog{enum {use_rel = _ENABLE_CORE_LOG};};
 	struct CoreDebug{enum {use_rel = _ENABLE_CORE_DEBUG};};
-}}
-#endif //ISISCOMMON_HPP
+/// @endcond
+}
+/** @} */
+}
+#endif //CORE_COMMON_HPP

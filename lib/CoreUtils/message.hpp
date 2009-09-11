@@ -16,7 +16,12 @@
 #include <list>
 #include <iostream>
 
-namespace isis{namespace util{
+namespace isis{
+/*! \addtogroup util
+ *  Additional documentation for group `mygrp'
+ *  @{
+ */
+namespace util{
 
 class MSubject : public std::string{
 	public:
@@ -29,6 +34,7 @@ class MSubject : public std::string{
 
 enum LogLevel{error=0,warning,info,verbose_info};
 
+/// @cond _internal
 namespace _internal{
 
 template<class MODULE> class Log;
@@ -75,6 +81,7 @@ public:
 	bool shouldCommit()const;
 };
 }
+/// @endcond
 
 class DefaultMsgPrint : public _internal::MessageHandlerBase {
 protected:
@@ -108,7 +115,9 @@ public:
 	}
 };
 
-}}
+}
+/** @} */
+}
 
 namespace std{
 	isis::util::_internal::Message& endl(isis::util::_internal::Message& __os);

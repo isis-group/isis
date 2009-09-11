@@ -2,7 +2,12 @@
 #include "CoreUtils/type.hpp"
 #include <cstdarg>
 
-namespace isis{ namespace util{
+namespace isis{ 
+/*! \addtogroup util
+ *  Additional documentation for group `mygrp'
+ *  @{
+ */
+namespace util{
 
 template<typename T, size_t SIZE> class FixedVector : public TypePtr<T>{
 public:
@@ -12,4 +17,6 @@ public:
 			this->operator[](i)=src[i];
 	}
 };
-}}
+}
+/** @} */
+}

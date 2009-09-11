@@ -6,11 +6,18 @@
 
 #include "property.hpp"
 
-namespace isis{ namespace util{
+namespace isis{ 
+/*! \addtogroup util
+ *  Additional documentation for group `mygrp'
+ *  @{
+ */
+namespace util{
 
 class PropMap : public std::map<std::string,Property>{};
 
-}}
+}
+/** @} */
+}
 
 //make PropMap printable
 namespace boost{namespace detail{

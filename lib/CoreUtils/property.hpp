@@ -6,7 +6,12 @@
 #include "type.hpp"
 #include "log.hpp"
 
-namespace isis{ namespace util{
+namespace isis{ 
+/*! \addtogroup util
+ *  Additional documentation for group `mygrp'
+ *  @{
+ */
+namespace util{
 
 /**
 common property class
@@ -32,7 +37,9 @@ public:
 	}
 };
 
-}}
+}
+/** @} */
+}
 
 #endif
 
