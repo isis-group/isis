@@ -135,8 +135,8 @@ public:
 			delete p;
 		};
 	};
-	template<typename T> TypePtr(T* ptr,size_t len):m_val(ptr,BasicDeleter()),m_len(len){}
-	template<typename T, typename D> TypePtr(T* ptr,size_t len,D d):m_val(ptr,d),m_len(len){}
+	TypePtr(TYPE* ptr,size_t len):m_val(ptr,BasicDeleter()),m_len(len){}
+	template<typename D> TypePtr(TYPE* ptr,size_t len,D d):m_val(ptr,d),m_len(len){}
 	virtual bool is(const std::type_info & t)const{
 		return t==typeid(TYPE);
 	}
@@ -149,7 +149,7 @@ public:
 			ret+=Type<TYPE>(ptr[m_len-1]).toString(true);
 		}
 		//@todo implement me
-		return Type<int>(m_len).toString()+"#"+ret;
+		return boost::lexical_cast<std::string>(m_len) +"#"+ret;
 	}
 	virtual std::string typeName()const{
 		return staticName();
