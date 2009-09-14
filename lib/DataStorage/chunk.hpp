@@ -22,6 +22,7 @@
 #include "CoreUtils/type.hpp"
 #include "CoreUtils/log.hpp"
 #include "common.hpp"
+#include <string.h>
 
 namespace isis{ 
 /*! \addtogroup data
@@ -33,14 +34,21 @@ namespace data{
 
 /// @cond _internal
 namespace _internal{
-
+/**
+ * Base class for four-dimensional random-access data blocks.
+ */
 template<typename T> class ChunkBase : public ::isis::util::TypePtr<T>{
 	size_t fourthSize,thirdSize,secondSize,firstSize;
-	inline size_t dim2index(size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim){
+	inline size_t dim2index(size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim)const{
 		return	firstDim + secondDim*firstSize + thirdDim*secondSize*firstSize+
 				fourthDim*thirdSize*secondSize*firstSize;
 	}
 protected:
+	/**
+	 * Creates an data-block from existing data.
+	 * \param src is a pointer to the existing data. This data will automatically be deleted. So don't use this pointer afterwards.
+	 * \param d is the deleter to be used for deletion of src. It must define operator(T *), which than shall free the given pointer.
+	 */
 	template<typename D> ChunkBase(T* src,D d,size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim): 
 	::isis::util::TypePtr<T>(src,fourthDim*thirdDim*secondDim*firstDim,d),
 	fourthSize(fourthDim),thirdSize(thirdDim),secondSize(secondDim),firstSize(firstDim){
@@ -50,6 +58,11 @@ protected:
 		}
 	}
 public:
+	/**
+	Returns reference to the element at at given index.
+	If index is invalid, behaviour is undefined. Most probably it will crash.
+	If _ENABLE_DATA_DEBUG is true an error message will be send (but it will still crash).
+	*/
 	T &operator()(size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim){
 		MAKE_LOG(DataDebug);
 		if(fourthDim>=fourthSize || thirdDim>=thirdSize || secondDim>=secondSize || firstDim>=firstSize){
@@ -60,7 +73,7 @@ public:
 		}
 		return this->operator[](dim2index(fourthDim,thirdDim,secondDim,firstDim));
 	}
-	template<typename S> bool copyTo(const ChunkBase<S> &src){
+	template<typename S> bool copyTo(const ChunkBase<S> &src)const{
 		//@todo implement me
 	}
 };
@@ -68,6 +81,9 @@ public:
 }
 /// @endcond
 
+/**
+ * Chunk class for memory-based buffers
+ */
 template<typename T> class MemChunk : public _internal::ChunkBase<T>{
 public:
 	MemChunk(size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim): 

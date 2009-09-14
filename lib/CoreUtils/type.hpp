@@ -47,13 +47,22 @@ class TypeBase{
 	}
 	
 public:
+	/// Returns true if the stored value is of type T.
 	template<typename T> bool is(){return is(typeid(T));}
 	virtual bool is(const std::type_info & t)const = 0;
+	/// Returns the value represented as text.
 	virtual std::string toString(bool labeled=false)const=0;
+	/// Returns the name of its actual type
 	virtual std::string typeName()const=0;
+	/// Returns the id of its actual type
 	virtual unsigned short typeID()const=0;
 
-	template<class T> T as(){
+	/**
+	 * Lexically cast the TypeBase up to any Type\<T\>.
+	 * This is a runtime-based cast via string. The value is converted into a string, which is then parsed as T.
+	 * If you know the type of source and destination at compile time you should use Type<DEST_TYPE>((SOURCE_TYPE)src).
+	 */
+	template<class T> T as()const{
 		MAKE_LOG(CoreLog);
 		if(typeID() & 0xFF00){
 			LOG(CoreLog,warning) 
@@ -65,15 +74,34 @@ public:
 		return (T)ret;
 	}
 
+	/**
+	 * Dynamically cast the TypeBase up to its actual Type\<T\>. Constant version.
+	 * Will return a copy of the stored value.
+	 * Will return T() if T is not the actual type.
+	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
+	 */
 	template<typename T> const Type<T> cast_to_type() const{
 		return m_cast_to<Type<T> >(Type<T>(T()));
 	}
+	/**
+	 * Dynamically cast the TypeBase up to its actual TypePtr\<T\>. Constant version.
+	 * Will return a copy of the pointer.
+	 * Will return TypePtr\<T\\>(NULL) if T is not the actual type.
+	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
+	 */
 	template<typename T> const TypePtr<T> cast_to_type_ptr() const{
 		return m_cast_to<TypePtr<T> >(TypePtr<T>((T*)0));
 	}
+	/**
+	 * Dynamically cast the TypeBase up to its actual Type\<T\>. Referenced version.
+	 * Will return a reference of the stored value.
+	 * Will throw std::bad_cast if T is not the actual type.
+	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
+	 */
 	template<typename T> Type<T>& cast_to_type() throw(std::bad_cast){
 		return m_cast_to<Type<T> >();
 	}
+	//@todo do we need this
 	template<typename T> TypePtr<T>& cast_to_type_ptr() throw(std::bad_cast){
 		return m_cast_to<TypePtr<T> >();
 	}
@@ -159,6 +187,13 @@ public:
 	}
 	static unsigned short staticId(){return m_typeID;}
 	static std::string staticName(){return m_typeName;}
+	
+	/**
+	Returns reference to element at at given index.
+	If index is invalid, behaviour is undefined. Probably it will crash.
+	If _ENABLE_DATA_DEBUG is true an error message will be send (but it will still crash).
+	*/
+	
 	TYPE& operator[](size_t idx){
 		return (m_val.get())[idx];
 	}
