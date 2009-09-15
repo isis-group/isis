@@ -29,6 +29,13 @@ int main(){
 	Type<short> short_0_5((short)float_0_5);//will be ok, because the float-value (which is returned from Type<float>::operator float() ) is implicitely casted to short
 	std::cout << "short_0_5.toString():" <<  short_0_5.toString(true) << std::endl;
 	
+	Type<int> i(5);
+	float f_=i;
+
+	Type<float> f(5.4);
+	int i_=f;
+	
+	
 	TypePtr<int> p((int*)calloc(5,sizeof(int)),5,SpeakingDeleter("Rolf"));
 	std::cout << "p.toString():" <<  p.toString() << std::endl;
 

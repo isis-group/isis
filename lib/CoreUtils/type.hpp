@@ -58,9 +58,18 @@ public:
 	virtual unsigned short typeID()const=0;
 
 	/**
-	 * Lexically cast the TypeBase up to any Type\<T\> and return its value.
-	 * This is a runtime-based cast via string. The value is converted into a string, which is then parsed as T.
-	 * If you know the type of source and destination at compile time you should use Type<DEST_TYPE>((SOURCE_TYPE)src).
+	 * Interpret the value as value of any (other) type.
+	 * This is a runtime-based cast via string. The value is converted into a string, which is then parsed as the requestet type.
+	 * \code 
+	 * TypeBase *mephisto=new Type<std::string>("666");
+	 * int devil=mephisto->as<int>(); 
+	 * \endcode
+	 * If you know the type of source and destination at compile time you should use Type\<DEST_TYPE\>((SOURCE_TYPE)src).
+	 * \code 
+	 * Type<std::string> mephisto("666");
+	 * Type<int> devil((std::string)devil);
+	 * \endcode
+	 * \return value of any requested type parsed from toString().
 	 */
 	template<class T> T as()const{
 		MAKE_LOG(CoreLog);
@@ -120,7 +129,7 @@ public:
 	/**
 	 * Create a Type from any type of value-type.
 	 * The type of the parameter is not the same as the content type of the object, the system tries to do a type conversion.
-	 * If that fails, std::bad_cast is thrown.
+	 * If that fails, boost::bad_lexical_cast is thrown.
 	 */
 	template<typename T> Type(const T& value){
 		m_val = __cast_to(this,value);
@@ -141,6 +150,18 @@ public:
 	}
 	static unsigned short staticId(){return m_typeID;}
 	static std::string staticName(){return m_typeName;}
+	
+	/**
+	 * Implicit conversion of Type to its value type.
+	 * Only the actual type is allowed.
+	 * However, the following is valid:
+	 * \code 
+	 * Type<int> i(5);
+	 * float f=i;
+	 * \endcode
+	 * The this case this function returns int which is then also implicitely converted to float.
+	 * \return the stored value
+	 */
 	operator TYPE()const{return m_val;}
 
 	virtual ~Type(){}
@@ -194,14 +215,19 @@ public:
 	static std::string staticName(){return m_typeName;}
 	
 	/**
-	Returns reference to element at at given index.
-	If index is invalid, behaviour is undefined. Probably it will crash.
-	If _ENABLE_DATA_DEBUG is true an error message will be send (but it will still crash).
-	*/
-	
+	 * Reference element at at given index.
+	 * If index is invalid, behaviour is undefined. Probably it will crash.
+	 * If _ENABLE_DATA_DEBUG is true, an error message will be send (but it will still crash).
+	 * \return reference to element at at given index.
+	 */
 	TYPE& operator[](size_t idx){
 		return (m_val.get())[idx];
 	}
+	/**
+	 * Implicit conversion to boost::shared_ptr\<TYPE\>
+	 * The returned smart pointer will be part of the reference-counting and will correctly delete the data if required.
+	 * \return boost::shared_ptr\<TYPE\> handling same data as the object.
+	 */
 	operator boost::shared_ptr<TYPE>(){return m_val;}
 };
 
