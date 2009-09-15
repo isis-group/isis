@@ -61,7 +61,7 @@ string Message::merge()const{
 }
 
 void DefaultMsgPrint::commit(const Message &mesg){
-	*o << "[" << mesg.strTime() << "|" << mesg.file << ":" << mesg.line << "::" << mesg.object << "]\t" << mesg.merge() << std::endl;
+	*o << "[" << mesg.file << ":" << mesg.line << "|" << mesg.object << "]\t" << mesg.merge() << std::endl;
 }
 
 void DefaultMsgPrint::setStream(::std::ostream &_o){
