@@ -58,7 +58,7 @@ public:
 	virtual unsigned short typeID()const=0;
 
 	/**
-	 * Lexically cast the TypeBase up to any Type\<T\>.
+	 * Lexically cast the TypeBase up to any Type\<T\> and return its value.
 	 * This is a runtime-based cast via string. The value is converted into a string, which is then parsed as T.
 	 * If you know the type of source and destination at compile time you should use Type<DEST_TYPE>((SOURCE_TYPE)src).
 	 */
@@ -117,6 +117,11 @@ template<typename TYPE> class Type: public _internal::TypeBase{
 	static unsigned short m_typeID;
 
 public:
+	/**
+	 * Create a Type from any type of value-type.
+	 * The type of the parameter is not the same as the content type of the object, the system tries to do a type conversion.
+	 * If that fails, std::bad_cast is thrown.
+	 */
 	template<typename T> Type(const T& value){
 		m_val = __cast_to(this,value);
 	}
@@ -166,7 +171,7 @@ public:
 	TypePtr(TYPE* ptr,size_t len):m_val(ptr,BasicDeleter()),m_len(len){}
 	template<typename D> TypePtr(TYPE* ptr,size_t len,D d):m_val(ptr,d),m_len(len){}
 	virtual bool is(const std::type_info & t)const{
-		return t==typeid(TYPE);
+		return t==typeid(TYPE*);
 	}
 	virtual std::string toString(bool labeled=false)const{
 		std::string ret;
