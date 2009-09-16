@@ -18,7 +18,7 @@
 
 //Local includes
 #include "ImageFormatDCM.h"  // class implemented
-#include "../../LibraryToReadFromSO/ImageFormatFactory.h"
+#include "DataStorage/ImageFormatFactory.h"
 
 
 /////////////////////////////// PUBLIC ///////////////////////////////////////

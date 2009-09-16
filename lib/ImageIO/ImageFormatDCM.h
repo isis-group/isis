@@ -23,7 +23,7 @@
 
 // PROJECT INCLUDES
 //
-#include "../../LibraryToReadFromSO/ImageFormat.h"
+#include "DataStorage/ImageFormat.h"
 
 // LOCAL INCLUDES
 //
