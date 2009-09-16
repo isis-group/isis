@@ -6,7 +6,7 @@
  */
 
 #include "ImageFormatNii.h"  // class implemented
-#include "ImageFormatFactory.h"
+#include "DataStorage/ImageFormatFactory.h"
 /////////////////////////////// PUBLIC ///////////////////////////////////////
 /*
  * The unique Id of this format
