@@ -53,14 +53,15 @@
 #include "itkCenteredTransformInitializer.h"
 
 namespace isis {
-namespace Registration {
+namespace registration {
 
 template<class TFixedImageType, class TMovingImageType>
-class RegistrationFactory3D: public itk::LightObject {
+class RegistrationFactory3D : public itk::LightObject
+{
 public:
 
-		itkStaticConstMacro( FixedImageDimension, unsigned int, TFixedImageType::ImageDimension );
-		itkStaticConstMacro( MovingImageDimension, unsigned int, TFixedImageType::ImageDimension );
+	itkStaticConstMacro( FixedImageDimension, unsigned int, TFixedImageType::ImageDimension );
+	itkStaticConstMacro( MovingImageDimension, unsigned int, TFixedImageType::ImageDimension );
 
 	typedef RegistrationFactory3D Self;
 	typedef itk::SmartPointer<Self> Pointer;
@@ -81,18 +82,13 @@ public:
 
 	typedef itk::Image<MaskPixelType, FixedImageDimension> MaskImageType;
 
-	typedef itk::BinaryThresholdImageFilter<FixedImageType, MaskImageType>
-			FixedThresholdFilterType;
-	typedef itk::BinaryThresholdImageFilter<MovingImageType, MaskImageType>
-			MovingThresholdFilterType;
-	typedef itk::MinimumMaximumImageCalculator<FixedImageType>
-			FixedMinMaxCalculatorType;
-	typedef itk::MinimumMaximumImageCalculator<MovingImageType>
-			MovingMinMaxCalculatorType;
+	typedef itk::BinaryThresholdImageFilter<FixedImageType, MaskImageType> FixedThresholdFilterType;
+	typedef itk::BinaryThresholdImageFilter<MovingImageType, MaskImageType> MovingThresholdFilterType;
+	typedef itk::MinimumMaximumImageCalculator<FixedImageType> FixedMinMaxCalculatorType;
+	typedef itk::MinimumMaximumImageCalculator<MovingImageType> MovingMinMaxCalculatorType;
 	typedef itk::ImageMaskSpatialObject<FixedImageDimension> MaskObjectType;
 
-	typedef itk::OtsuThresholdImageFilter<TFixedImageType, MaskImageType>
-			OtsuThresholdFilterType;
+	typedef itk::OtsuThresholdImageFilter<TFixedImageType, MaskImageType> OtsuThresholdFilterType;
 
 	typedef typename FixedImageType::RegionType FixedImageRegionType;
 	typedef typename MovingImageType::RegionType MovingImageRegionType;
@@ -104,99 +100,86 @@ public:
 	typedef typename FixedImageType::PixelType FixedPixelType;
 	typedef typename MovingImageType::PixelType MovingPixelType;
 
-	typedef itk::ImageRegistrationMethod<TFixedImageType, TMovingImageType>
-			RegistrationMethodType;
+	typedef itk::ImageRegistrationMethod<TFixedImageType, TMovingImageType> RegistrationMethodType;
 
 	typedef typename RegistrationMethodType::Pointer RegistrationMethodPointer;
 
 	//resample filter and caster
-	typedef typename itk::ResampleImageFilter<MovingImageType, FixedImageType>
-			ResampleFilterType;
-	typedef typename itk::CastImageFilter<FixedImageType, OutputImageType>
-			ImageCasterType;
+	typedef typename itk::ResampleImageFilter<MovingImageType, FixedImageType> ResampleFilterType;
+	typedef typename itk::CastImageFilter<FixedImageType, OutputImageType> ImageCasterType;
 
 	//interpolator typedefs
-	typedef itk::LinearInterpolateImageFunction<MovingImageType, double>
-			LinearInterpolatorType;
+	typedef itk::LinearInterpolateImageFunction<MovingImageType, double> LinearInterpolatorType;
 
-	typedef itk::BSplineInterpolateImageFunction<TMovingImageType, double,
-			double> BSplineInterpolatorType;
+	typedef itk::BSplineInterpolateImageFunction<TMovingImageType, double, double> BSplineInterpolatorType;
 
 	//transform typedefs
-	typedef itk::SmartPointer<
-			const typename RegistrationMethodType::TransformType>
-			ConstTransformPointer;
+	typedef itk::SmartPointer<const typename RegistrationMethodType::TransformType> ConstTransformPointer;
+	typedef itk::SmartPointer<typename RegistrationMethodType::TransformType> TransformPointer;
+	typedef itk::TransformBase::Pointer TransformBaseTypePointer;
 
 	typedef itk::VersorRigid3DTransform<double> VersorRigid3DTransformType;
 	typedef itk::QuaternionRigidTransform<double> QuaternionRigidTransformType;
 	typedef itk::CenteredEuler3DTransform<double> CenteredEuler3DTransformType;
 
-	typedef itk::AffineTransform<double, FixedImageDimension>
-			AffineTransformType;
+	typedef itk::AffineTransform<double, FixedImageDimension> AffineTransformType;
 
-	typedef itk::CenteredAffineTransform<double, FixedImageDimension>
-			CenteredAffineTransformType;
+	typedef itk::CenteredAffineTransform<double, FixedImageDimension> CenteredAffineTransformType;
 
-	typedef typename itk::BSplineDeformableTransform<CoordinateRepType,
-			FixedImageDimension, 3> BSplineTransformType;
+	typedef typename itk::BSplineDeformableTransform<CoordinateRepType, FixedImageDimension, 3> BSplineTransformType;
 
 	//optimizer typedefs
-	typedef itk::RegularStepGradientDescentOptimizer
-			RegularStepGradientDescentOptimizerType;
-	typedef itk::VersorRigid3DTransformOptimizer
-			VersorRigid3DTransformOptimizerType;
+	typedef itk::RegularStepGradientDescentOptimizer RegularStepGradientDescentOptimizerType;
+	typedef itk::VersorRigid3DTransformOptimizer VersorRigid3DTransformOptimizerType;
 	typedef itk::LBFGSBOptimizer LBFGSBOptimizerType;
 
 	//metric typedefs
-	typedef itk::MattesMutualInformationImageToImageMetric<TFixedImageType,
-			TMovingImageType> MattesMutualInformationMetricType;
+	typedef itk::MattesMutualInformationImageToImageMetric<TFixedImageType, TMovingImageType>
+	        MattesMutualInformationMetricType;
 
-	typedef typename itk::NormalizedCorrelationImageToImageMetric<
-			TFixedImageType, TMovingImageType> NormalizedCorrelationMetricType;
+	typedef typename itk::NormalizedCorrelationImageToImageMetric<TFixedImageType, TMovingImageType>
+	        NormalizedCorrelationMetricType;
 
-	typedef typename itk::MutualInformationImageToImageMetric<TFixedImageType,
-			TMovingImageType> ViolaWellsMutualInformationMetricType;
+	typedef typename itk::MutualInformationImageToImageMetric<TFixedImageType, TMovingImageType>
+	        ViolaWellsMutualInformationMetricType;
 
 	//additional typedefs
-	typedef typename itk::NormalizeImageFilter<TFixedImageType, TFixedImageType>
-			FixedNormalizeImageFilterType;
+	typedef typename itk::NormalizeImageFilter<TFixedImageType, TFixedImageType> FixedNormalizeImageFilterType;
 
-	typedef typename itk::NormalizeImageFilter<TMovingImageType,
-			TMovingImageType> MovingNormalizeImageFilterType;
+	typedef typename itk::NormalizeImageFilter<TMovingImageType, TMovingImageType> MovingNormalizeImageFilterType;
 
-	typedef typename itk::DiscreteGaussianImageFilter<TFixedImageType,
-			TFixedImageType> DiscreteGaussianImageFitlerType;
+	typedef typename itk::DiscreteGaussianImageFilter<TFixedImageType, TFixedImageType> DiscreteGaussianImageFitlerType;
 
-	typedef typename itk::CenteredTransformInitializer<
-			VersorRigid3DTransformType, TFixedImageType, TMovingImageType>
-			CenteredTransformInitializerType;
-	enum eTransformType {
-		VersorRigid3DTransform,
-		QuaternionRigidTransform,
-		CenteredEuler3DTransform,
-		AffineTransform,
-		CenteredAffineTransform,
-		BSplineDeformableTransform
+	typedef typename itk::CenteredTransformInitializer<VersorRigid3DTransformType, TFixedImageType, TMovingImageType>
+	        CenteredTransformInitializerType;
+	enum eTransformType
+	{
+		    VersorRigid3DTransform,
+		    QuaternionRigidTransform,
+		    CenteredEuler3DTransform,
+		    AffineTransform,
+		    CenteredAffineTransform,
+		    BSplineDeformableTransform
 
 	};
 
-	enum eMetricType {
-		MattesMutualInformation,
-		ViolaWellsMutualInformation,
-		NormalizedCorrelation
+	enum eMetricType
+	{
+		MattesMutualInformation, ViolaWellsMutualInformation, NormalizedCorrelation
 	};
 
-	enum eOptimizerType {
-		RegularStepGradientDescentOptimizer,
-		VersorRigidOptimizer,
-		LBFGSBOptimizer
+	enum eOptimizerType
+	{
+		RegularStepGradientDescentOptimizer, VersorRigidOptimizer, LBFGSBOptimizer
 	};
 
-	enum eInterpolationType {
+	enum eInterpolationType
+	{
 		LinearInterpolator, BSplineInterpolator
 	};
 
-	struct {
+	struct
+	{
 		unsigned int NumberOfIterations;
 		unsigned int NumberOfBins;
 		unsigned int BSplineGridSize;
@@ -207,32 +190,52 @@ public:
 		bool INITIALIZEOFF;
 	} UserOptions;
 
-	void UpdateParameters(void);
-	void StartRegistration(void);
+	void UpdateParameters(
+	    void);
+	void StartRegistration(
+	    void);
 
 	//setter methods
-	void SetTransform(eTransformType);
-	void SetMetric(eMetricType);
-	void SetOptimizer(eOptimizerType);
-	void SetInterpolator(eInterpolationType);
+	void SetTransform(
+	    eTransformType);
+	void SetMetric(
+	    eMetricType);
+	void SetOptimizer(
+	    eOptimizerType);
+	void SetInterpolator(
+	    eInterpolationType);
 
-	void SetFixedImage(FixedImagePointer);
-	void SetMovingImage(MovingImagePointer);
+	void SetFixedImage(
+	    FixedImagePointer);
+	void SetMovingImage(
+	    MovingImagePointer);
 
 	//parameter-set methods
-	void SetUpOptimizer(void);
-	void SetUpTransform(void);
-	void SetUpMetric(void);
+	void SetUpOptimizer(
+	    void);
+	void SetUpTransform(
+	    void);
+	void SetUpMetric(
+	    void);
+
+	void SetInitialTransform(
+	    TransformBaseTypePointer);
 
 	//getter methods
-	RegistrationMethodPointer GetRegistrationObject(void) const;
-	OutputImagePointer GetRegisteredImage(void);
-	ConstTransformPointer GetTransform(void) const;
+	RegistrationMethodPointer GetRegistrationObject(
+	    void) const;
+	OutputImagePointer GetRegisteredImage(
+	    void);
+	ConstTransformPointer GetTransform(
+	    void) const;
 
 protected:
-	void PrintResults(void);
-	void CheckImageSizes(void);
-	void SetFixedImageMask(void);
+	void PrintResults(
+	    void);
+	void CheckImageSizes(
+	    void);
+	void SetFixedImageMask(
+	    void);
 
 	RegistrationFactory3D();
 	virtual ~RegistrationFactory3D() {
@@ -240,7 +243,8 @@ protected:
 
 private:
 
-	struct {
+	struct
+	{
 		bool VERSORRIGID;
 		bool QUATERNIONRIGID;
 		bool CENTEREDEULER3DTRANSFORM;
@@ -249,20 +253,23 @@ private:
 		bool BSPLINEDEFORMABLETRANSFORM;
 	} transform;
 
-	struct Optimizer {
+	struct Optimizer
+	{
 		bool REGULARSTEPGRADIENTDESCENT;
 		bool VERSORRIGID3D;
 		bool LBFGSBOPTIMIZER;
 
 	} optimizer;
 
-	struct Metric {
+	struct Metric
+	{
 		bool MATTESMUTUALINFORMATION;
 		bool NORMALIZEDCORRELATION;
 		bool VIOLAWELLSMUTUALINFORMATION;
 	} metric;
 
-	struct Interpolator {
+	struct Interpolator
+	{
 		bool LINEAR;
 		bool BSPLINE;
 	} interpolator;
@@ -296,10 +303,8 @@ private:
 	RegistrationMethodPointer m_RegistrationObject;
 
 	//optimizer
-	RegularStepGradientDescentOptimizerType::Pointer
-			m_RegularStepGradientDescentOptimizer;
-	VersorRigid3DTransformOptimizerType::Pointer
-			m_VersorRigid3DTransformOptimizer;
+	RegularStepGradientDescentOptimizerType::Pointer m_RegularStepGradientDescentOptimizer;
+	VersorRigid3DTransformOptimizerType::Pointer m_VersorRigid3DTransformOptimizer;
 	LBFGSBOptimizerType::Pointer m_LBFGSBOptimizer;
 
 	//transform
@@ -313,14 +318,11 @@ private:
 	typename BSplineTransformType::Pointer m_BSplineTransform;
 
 	//metric
-	typename MattesMutualInformationMetricType::Pointer
-			m_MattesMutualInformationMetric;
+	typename MattesMutualInformationMetricType::Pointer m_MattesMutualInformationMetric;
 
-	typename NormalizedCorrelationMetricType::Pointer
-			m_NormalizedCorrelationMetric;
+	typename NormalizedCorrelationMetricType::Pointer m_NormalizedCorrelationMetric;
 
-	typename ViolaWellsMutualInformationMetricType::Pointer
-			m_ViolaWellsMutualInformationMetric;
+	typename ViolaWellsMutualInformationMetricType::Pointer m_ViolaWellsMutualInformationMetric;
 
 	//interpolator
 	typename LinearInterpolatorType::Pointer m_LinearInterpolator;
@@ -328,8 +330,7 @@ private:
 
 	//additional declarations
 	typename FixedNormalizeImageFilterType::Pointer m_FixedNormalizeImageFilter;
-	typename MovingNormalizeImageFilterType::Pointer
-			m_MovingNormalizeImageFilter;
+	typename MovingNormalizeImageFilterType::Pointer m_MovingNormalizeImageFilter;
 
 	typename DiscreteGaussianImageFitlerType::Pointer m_FixedGaussianFilter;
 	typename DiscreteGaussianImageFitlerType::Pointer m_MovingGaussianFilter;
