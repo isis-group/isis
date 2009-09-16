@@ -448,7 +448,12 @@ typename RegistrationFactory3D<TFixedImageType, TMovingImageType>::RegistrationM
 
 template<class TFixedImageType, class TMovingImageType>
 void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetInitialTransform(
-    TransformBaseTypePointer initialTransform) {
+    TransformListType* initialTransformList) {
+	TransformListType::const_iterator transformIterator;
+	transformIterator = initialTransformList->begin();
+	if(!strcmp((*transformIterator)->GetNameOfClass(), "AffineTransform") and transform.BSPLINEDEFORMABLETRANSFORM) {
+		m_BSplineTransform->SetBulkTransform(static_cast<AffineTransformType*> ((*transformIterator).GetPointer()));
+	}
 
 }
 

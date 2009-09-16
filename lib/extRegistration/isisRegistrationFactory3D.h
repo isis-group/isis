@@ -11,6 +11,7 @@
 #include "itkImageRegistrationMethod.h"
 
 //transform includes
+#include "itkTransformFileReader.h"
 //rigid:
 #include "itkVersorRigid3DTransform.h"
 #include "itkQuaternionRigidTransform.h"
@@ -115,8 +116,7 @@ public:
 
 	//transform typedefs
 	typedef itk::SmartPointer<const typename RegistrationMethodType::TransformType> ConstTransformPointer;
-	typedef itk::SmartPointer<typename RegistrationMethodType::TransformType> TransformPointer;
-	typedef itk::TransformBase::Pointer TransformBaseTypePointer;
+	typedef itk::TransformFileReader::TransformListType TransformListType;
 
 	typedef itk::VersorRigid3DTransform<double> VersorRigid3DTransformType;
 	typedef itk::QuaternionRigidTransform<double> QuaternionRigidTransformType;
@@ -219,7 +219,7 @@ public:
 	    void);
 
 	void SetInitialTransform(
-	    TransformBaseTypePointer);
+	    TransformListType*);
 
 	//getter methods
 	RegistrationMethodPointer GetRegistrationObject(
