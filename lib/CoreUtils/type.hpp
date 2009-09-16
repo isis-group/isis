@@ -19,19 +19,7 @@ template<typename TYPE> class TypePtr;
 /// @cond _internal
 namespace _internal{
 template<typename TYPE,typename T> TYPE __cast_to(Type<TYPE> *dest,const T& value){
-	TYPE ret;
-	MAKE_LOG(CoreLog);
-// 	try{
-		ret=boost::lexical_cast<TYPE>(value);
-/*	} catch(boost::bad_lexical_cast* e){
-		//@todo this wont work if T is not available for Type
-		LOG(CoreLog,error) 
-		<< "Cannot lexically cast " << MSubject(Type<T>(value).toString(true)) 
-		<< " to " << MSubject(Type<TYPE>::staticName()) << ": " 
-		<< e->what() << std::endl;
-		ret=TYPE();
-	}*/
-	return ret;
+	return boost::lexical_cast<TYPE>(value);
 }
 template<typename TYPE> TYPE __cast_to(Type<TYPE> *dest,const TYPE& value){
 	return value;
@@ -90,9 +78,13 @@ public:
 				<< "You're trying to lexically cast a pointer (" 
 				<< typeName() << ") to a value ("<< Type<T>::staticName() 
 				<< ") this is most likely nonsense" << std::endl;
+		} else if(typeID()==Type<T>::staticId()){
+			LOG(CoreLog,info) 
+				<< "Doing dynamic cast instead of useless lexical cast from " << toString(true) 
+				<< " to " << Type<T>::staticName() << std::endl;
+			return this->cast_to_Type<T>();
 		}
-		Type<T> ret(this->toString());
-		return (T)ret;
+		return Type<T>(this->toString());
 	}
 
 	/**

@@ -37,7 +37,7 @@ namespace _internal{
 /**
  * Base class for four-dimensional random-access data blocks.
  */
-template<typename T> class ChunkBase : public ::isis::util::TypePtr<T>{
+template<typename TYPE> class ChunkBase : public ::isis::util::TypePtr<TYPE>{
 	size_t fourthSize,thirdSize,secondSize,firstSize;
 	inline size_t dim2index(size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim)const{
 		return	firstDim + secondDim*firstSize + thirdDim*secondSize*firstSize+
@@ -47,10 +47,10 @@ protected:
 	/**
 	 * Creates an data-block from existing data.
 	 * \param src is a pointer to the existing data. This data will automatically be deleted. So don't use this pointer afterwards.
-	 * \param d is the deleter to be used for deletion of src. It must define operator(T *), which than shall free the given pointer.
+	 * \param d is the deleter to be used for deletion of src. It must define operator(TYPE *), which than shall free the given pointer.
 	 */
-	template<typename D> ChunkBase(T* src,D d,size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim): 
-	::isis::util::TypePtr<T>(src,fourthDim*thirdDim*secondDim*firstDim,d),
+	template<typename D> ChunkBase(TYPE* src,D d,size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim): 
+	::isis::util::TypePtr<TYPE>(src,fourthDim*thirdDim*secondDim*firstDim,d),
 	fourthSize(fourthDim),thirdSize(thirdDim),secondSize(secondDim),firstSize(firstDim){
 		MAKE_LOG(DataDebug);
 		if(!(fourthSize && thirdSize && secondSize && firstSize)){
@@ -63,7 +63,7 @@ public:
 	If index is invalid, behaviour is undefined. Most probably it will crash.
 	If _ENABLE_DATA_DEBUG is true an error message will be send (but it will still crash).
 	*/
-	T &operator()(size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim){
+	TYPE &operator()(size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim){
 		MAKE_LOG(DataDebug);
 		if(fourthDim>=fourthSize || thirdDim>=thirdSize || secondDim>=secondSize || firstDim>=firstSize){
 			LOG(DataDebug,isis::util::error) 
@@ -84,12 +84,12 @@ public:
 /**
  * Chunk class for memory-based buffers
  */
-template<typename T> class MemChunk : public _internal::ChunkBase<T>{
+template<typename TYPE> class MemChunk : public _internal::ChunkBase<TYPE>{
 public:
 	MemChunk(size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim): 
-	_internal::ChunkBase<T>( 
-		(T*)malloc(sizeof(T)*fourthDim*thirdDim*secondDim*firstDim),
-		typename ::isis::util::TypePtr<T>::BasicDeleter(),
+	_internal::ChunkBase<TYPE>( 
+		(TYPE*)malloc(sizeof(TYPE)*fourthDim*thirdDim*secondDim*firstDim),
+		typename ::isis::util::TypePtr<TYPE>::BasicDeleter(),
 		fourthDim,thirdDim,secondDim,firstDim
 	){}
 };

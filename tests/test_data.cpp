@@ -15,38 +15,44 @@ struct SpeakingDeleter{
 };
 
 int main(){
-	ENABLE_LOG(CoreDebug,DefaultMsgPrint,warning);
-	ENABLE_LOG(DataDebug,DefaultMsgPrint,warning);
-	ENABLE_LOG(DataLog,DefaultMsgPrint,warning);
+	ENABLE_LOG(CoreDebug,DefaultMsgPrint,info);
+	ENABLE_LOG(CoreLog,DefaultMsgPrint,info);
+	ENABLE_LOG(DataDebug,DefaultMsgPrint,info);
+	ENABLE_LOG(DataLog,DefaultMsgPrint,info);
 	
 // 	iUtil::DefaultMsgPrint::stopBelow(warning); 
 	
 	Type<float> float_0_5(0.5);//will implicitly convert the double to float
 	std::cout << "float_0_5.toString():" <<  float_0_5.toString() << std::endl;
 	
+	::isis::util::_internal::TypeBase *mephisto=new Type<std::string>("666");
+	int devil=mephisto->as<int>();
+	std::string lucifer=mephisto->as<std::string>();
 	
-	Type<short> short_0_5((float)float_0_5);
-// 	Type<short> short_0_5((short)float_0_5);//will be ok, because the float-value (which is returned from Type<float>::operator float() ) is implicitely casted to short
+	//Type<short> short_0_5((float)float_0_5); // Will throw exception because conversion float->int is "bad"
+	Type<short> short_0_5((short)float_0_5);//will be ok, because the float-value (which is returned from Type<float>::operator float() ) is implicitely casted to short
 	std::cout << "short_0_5.toString():" <<  short_0_5.toString(true) << std::endl;
 	
 	Type<int> i(5);
 	float f_=i;
+	std::cout << "Type<int>(5) is " << i.toString(true) << " float from that is " << f_ << std::endl;
 
 	Type<float> f(5.4);
-	int i_=f;
+	int i_=f;//this wont throw an exception because it only does an implizit conversions from Type<float>=>float and float=>int
+	std::cout << "Type<float>(5.4) is " << f.toString(true) << " int from that is " << i_ << std::endl;
 	
 	
 	TypePtr<int> p((int*)calloc(5,sizeof(int)),5,SpeakingDeleter("Rolf"));
 	std::cout << "p.toString():" <<  p.toString() << std::endl;
 
-	MemChunk<short> a(1,1,1,50);
+	MemChunk<short> a(1,1,1,10);
 	const short x[]={1,2,3,4};
 	FixedVector<short,4> v(x);
 	
 	std::cout << "v.toString():" << v.toString() << std::endl;
 	
-	a[30]=5;
-	std::cout << "a(0,0,0,30):" << a(0,0,0,30) << std::endl;
+	a[5]=5;
+	std::cout << "a(0,0,0,5):" << a(0,0,0,5) << std::endl;
 	std::cout << "a.toString():" << a.toString() << std::endl;
-	a(3,0,0,30)=3;//fail (may crash or not)
+	a(3,0,0,5)=3;//fail (may crash or not)
 }

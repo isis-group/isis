@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 2.4)
 
+SET(CMAKE_C_FLAGS "-fexceptions")
+SET(CMAKE_CXX_FLAGS "-fexceptions")
+
 add_definitions(-D_ENABLE_DATA_LOG=1)
 add_definitions(-D_ENABLE_CORE_LOG=1)
 add_definitions(-D_ENABLE_DATA_DEBUG=1)
