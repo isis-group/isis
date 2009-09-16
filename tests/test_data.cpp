@@ -29,9 +29,13 @@ int main(){
 	int devil=mephisto->as<int>();
 	std::string lucifer=mephisto->as<std::string>();
 	
-	//Type<short> short_0_5((float)float_0_5); // Will throw exception because conversion float->int is "bad"
-	Type<short> short_0_5((short)float_0_5);//will be ok, because the float-value (which is returned from Type<float>::operator float() ) is implicitely casted to short
-	std::cout << "short_0_5.toString():" <<  short_0_5.toString(true) << std::endl;
+	try{
+		Type<short> short_0_5((float)float_0_5); // Will throw exception because conversion float->int is "bad"
+		//Type<short> short_0_5((short)float_0_5);//will be ok, because the float-value (which is returned from Type<float>::operator float() ) is implicitely casted to short
+		std::cout << "short_0_5.toString():" <<  short_0_5.toString(true) << std::endl;
+	} catch(boost::bad_lexical_cast&) {
+		std::cout << "Whoops " << std::endl;
+	}
 	
 	Type<int> i(5);
 	float f_=i;
