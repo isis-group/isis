@@ -25,8 +25,8 @@ int main(){
 	std::cout << "float_0_5.toString():" <<  float_0_5.toString() << std::endl;
 	
 	
-	//Type<short> short_0_5((float)float_0_5);Will fail with bad cast
-	Type<short> short_0_5((short)float_0_5);//will be ok, because the float-value (which is returned from Type<float>::operator float() ) is implicitely casted to short
+	Type<short> short_0_5((float)float_0_5);
+// 	Type<short> short_0_5((short)float_0_5);//will be ok, because the float-value (which is returned from Type<float>::operator float() ) is implicitely casted to short
 	std::cout << "short_0_5.toString():" <<  short_0_5.toString(true) << std::endl;
 	
 	Type<int> i(5);

@@ -26,7 +26,7 @@ public:
 	Property():m_needed(false){ }
 	template<typename T> operator T()const{
 		const _internal::TypeBase *dummy=get();
-		const Type<T> ret=dummy->cast_to_type<T>();
+		const Type<T> ret=dummy->cast_to_Type<T>();
 		return (T)ret;
 	}
 	bool empty(){

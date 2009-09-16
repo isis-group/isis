@@ -19,7 +19,19 @@ template<typename TYPE> class TypePtr;
 /// @cond _internal
 namespace _internal{
 template<typename TYPE,typename T> TYPE __cast_to(Type<TYPE> *dest,const T& value){
-	return boost::lexical_cast<TYPE>(value);
+	TYPE ret;
+	MAKE_LOG(CoreLog);
+// 	try{
+		ret=boost::lexical_cast<TYPE>(value);
+/*	} catch(boost::bad_lexical_cast* e){
+		//@todo this wont work if T is not available for Type
+		LOG(CoreLog,error) 
+		<< "Cannot lexically cast " << MSubject(Type<T>(value).toString(true)) 
+		<< " to " << MSubject(Type<TYPE>::staticName()) << ": " 
+		<< e->what() << std::endl;
+		ret=TYPE();
+	}*/
+	return ret;
 }
 template<typename TYPE> TYPE __cast_to(Type<TYPE> *dest,const TYPE& value){
 	return value;
@@ -85,33 +97,33 @@ public:
 
 	/**
 	 * Dynamically cast the TypeBase up to its actual Type\<T\>. Constant version.
-	 * Will return a copy of the stored value.
-	 * Will return T() if T is not the actual type.
 	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
+	 * \returns a copy of the stored value.
+	 * \returns T() if T is not the actual type.
 	 */
-	template<typename T> const Type<T> cast_to_type() const{
+	template<typename T> const Type<T> cast_to_Type() const{
 		return m_cast_to<Type<T> >(Type<T>(T()));
 	}
 	/**
 	 * Dynamically cast the TypeBase up to its actual TypePtr\<T\>. Constant version.
-	 * Will return a copy of the pointer.
-	 * Will return TypePtr\<T\\>(NULL) if T is not the actual type.
 	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
+	 * \returns a copy of the pointer.
+	 * \returns TypePtr\<T\\>(NULL) if T is not the actual type.
 	 */
-	template<typename T> const TypePtr<T> cast_to_type_ptr() const{
+	template<typename T> const TypePtr<T> cast_to_TypePtr() const{
 		return m_cast_to<TypePtr<T> >(TypePtr<T>((T*)0));
 	}
 	/**
 	 * Dynamically cast the TypeBase up to its actual Type\<T\>. Referenced version.
-	 * Will return a reference of the stored value.
 	 * Will throw std::bad_cast if T is not the actual type.
 	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
+	 * \returns a reference of the stored value.
 	 */
-	template<typename T> Type<T>& cast_to_type() throw(std::bad_cast){
+	template<typename T> Type<T>& cast_to_Type() throw(std::bad_cast){
 		return m_cast_to<Type<T> >();
 	}
 	//@todo do we need this
-	template<typename T> TypePtr<T>& cast_to_type_ptr() throw(std::bad_cast){
+	template<typename T> TypePtr<T>& cast_to_TypePtr() throw(std::bad_cast){
 		return m_cast_to<TypePtr<T> >();
 	}
 };
