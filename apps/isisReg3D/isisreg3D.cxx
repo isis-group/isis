@@ -230,11 +230,9 @@ int main(
 	if(transform_filename_in) {
 		transformReader->SetFileName(transform_filename_in);
 		transformReader->Update();
-		itk::TransformFileReader::TransformListType* transformList;
-		transformList = transformReader->GetTransformList();
-		itk::TransformFileReader::TransformListType::const_iterator transformIterator;
-		transformIterator = transformList->begin();
-		registrationFactory->SetInitialTransform(transformIterator->GetPointer());
+
+		itk::TransformFileReader::TransformListType *transformList = transformReader->GetTransformList();
+		registrationFactory->SetInitialTransform(transformList);
 
 	}
 	registrationFactory->UserOptions.NumberOfIterations = number_of_iterations;
