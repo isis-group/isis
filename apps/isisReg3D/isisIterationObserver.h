@@ -16,38 +16,45 @@
 #include "itkCommand.h"
 
 namespace isis {
+namespace Observer {
 
 /**
  * This special implementation of an observer will observe the iteration
  * steps of a VersorRigid3DTransformOptimizer.
  *
  * @author Thomas Proeger <proeger@cbs.mpg.de>
-*/
-class IterationObserver : public itk::Command {
+ */
+class IterationObserver : public itk::Command
+{
 public:
 
-    // ITK default macros
-    typedef IterationObserver 	Self;
-    typedef itk::Command			Superlass;
-	typedef itk::SmartPointer<Self>	Pointer;
+	// ITK default macros
+	typedef IterationObserver Self;
+	typedef itk::Command Superlass;
+	typedef itk::SmartPointer<Self> Pointer;
 
-	itkNewMacro(Self);
+	//itkNewMacro(Self);
 
-    virtual void Execute(const itk::Object* caller,
-						 const itk::EventObject& event);
-    virtual void Execute(itk::Object* caller,
-						 const itk::EventObject& event);
+	virtual void Execute(
+	    const itk::Object* caller, const itk::EventObject& event);
+	virtual void Execute(
+	    itk::Object* caller, const itk::EventObject& event);
+
+	IterationObserver();
 
 protected:
 
-  	typedef itk::VersorRigid3DTransformOptimizer OptimizerType;
+	typedef itk::VersorRigid3DTransformOptimizer OptimizerType;
 	typedef const OptimizerType* OptimizerPointer;
 
-    IterationObserver();
-    ~IterationObserver() {}
+
+	~IterationObserver() {
+	}
 
 };
 
-}
+} //end namespace Observer
+
+} //end namespace isis
 
 #endif
