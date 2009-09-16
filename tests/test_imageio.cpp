@@ -19,10 +19,10 @@
 #include <boost/function.hpp>
 #include <boost/scoped_ptr.hpp>
 
-#include "../../LibraryToReadFromSO/animal.hpp"
+//#include "../../LibraryToReadFromSO/animal.hpp"
 //#include "../../LibraryToReadFromSO/LibTestClass.h"
-#include "../../LibraryToReadFromSO/ImageFormatFactory.h"
-#include "../../LibraryToReadFromSO/ImageFormat.h"
+#include "DataStorage/ImageFormatFactory.h"
+#include "DataStorage//ImageFormat.h"
 
 
 int main() {

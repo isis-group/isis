@@ -22,4 +22,4 @@ include_directories(lib)
 add_definitions(-Wall)
 
 add_subdirectory(lib)
-add_subdirectory(tests)
+#add_subdirectory(tests)

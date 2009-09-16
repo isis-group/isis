@@ -14,16 +14,28 @@
 //   return o;
 // }
 
-namespace isis{ 
+namespace isis {
 /*! \addtogroup util
  *  Additional documentation for group `mygrp'
  *  @{
  */
-	
-namespace util{
+
+namespace util {
 /// @cond _hidden
-	struct CoreLog{enum {use_rel = _ENABLE_CORE_LOG};};
-	struct CoreDebug{enum {use_rel = _ENABLE_CORE_DEBUG};};
+struct CoreLog
+{
+	enum
+	{
+		use_rel = _ENABLE_CORE_LOG
+	};
+};
+struct CoreDebug
+{
+	enum
+	{
+		use_rel = _ENABLE_CORE_DEBUG
+	};
+};
 /// @endcond
 }
 /** @} */
