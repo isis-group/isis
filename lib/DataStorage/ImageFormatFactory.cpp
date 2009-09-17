@@ -72,10 +72,11 @@ bool ImageFormatFactory::LoadFromPluginPath(){
 	//TODO: Aufdroeseln in Pfad und Libname und while (libs_available) do...
 
 	std::string arrayOfLibs[2];
-	arrayOfLibs[0] = "../../ImageFormatTest/Release/libImageFormatTest.so";
-	//arrayOfLibs[0] = "/SCR/Programming2/hellrung/ImageFormatTest/Release/libImageFormatTest.so";
-	//std::string library_path = "../../ImageFormatTest/Debug/libImageFormatTest.so";
-	for (int index = 0; index < 1; index++) {
+	arrayOfLibs[0] = "libisisImageFormatDCM.so";
+	arrayOfLibs[1] = "libisisImageFormatNii.so";
+
+
+	for (int index = 0; index < 2; index++) {
 
 
 		shared_library lib(arrayOfLibs[index]);
@@ -101,10 +102,10 @@ bool ImageFormatFactory::LoadFromPluginPath(){
 			return false;
 		}
 
-		//only for test purposes
-		for(std::map<std::string, factory<ImageFormat> >::iterator it = factories.begin(); it != factories.end(); ++it) {
-			std::cout << "Creating a format using factory: " << it->first << std::endl;
-		}
+//		//only for test purposes
+//		for(std::map<std::string, factory<ImageFormat> >::iterator it = factories.begin(); it != factories.end(); ++it) {
+//			std::cout << "Creating a format using factory: " << it->first << std::endl;
+//		}
 
 		//REFLECTIONS
 		using boost::reflections::instance;
