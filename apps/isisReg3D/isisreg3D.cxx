@@ -232,7 +232,9 @@ int main(
 		transformReader->Update();
 
 		itk::TransformFileReader::TransformListType *transformList = transformReader->GetTransformList();
-		registrationFactory->SetInitialTransform(transformList);
+		itk::TransformFileReader::TransformListType::const_iterator ti;
+		ti = transformList->begin();
+		registrationFactory->SetInitialTransform((*ti).GetPointer());
 
 	}
 	registrationFactory->UserOptions.NumberOfIterations = number_of_iterations;
