@@ -116,7 +116,7 @@ public:
 
 	//transform typedefs
 	typedef itk::SmartPointer<const typename RegistrationMethodType::TransformType> ConstTransformPointer;
-	typedef itk::TransformFileReader::TransformListType TransformListType;
+	typedef itk::TransformBase* TransformBasePointer;	//not allowed to be a itk::SmartPointer because of static_cast usage
 
 	typedef itk::VersorRigid3DTransform<double> VersorRigid3DTransformType;
 	typedef itk::QuaternionRigidTransform<double> QuaternionRigidTransformType;
@@ -219,7 +219,7 @@ public:
 	    void);
 
 	void SetInitialTransform(
-	    TransformListType*);
+	    TransformBasePointer);
 
 	//getter methods
 	RegistrationMethodPointer GetRegistrationObject(
