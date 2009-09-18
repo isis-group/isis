@@ -1,10 +1,15 @@
+cmake_policy(SET CMP0005 OLD) #make it complain about escaped Preprocessor definition
+add_definitions(-DDL_SUFFIX=\\"${CMAKE_SHARED_LIBRARY_SUFFIX}\\")
+add_definitions(-DDL_PREFIX=\\"${CMAKE_SHARED_LIBRARY_PREFIX}\\")
+
 #list all source files here
-add_library(data SHARED chunk.cpp ImageFormatFactory.cpp ImageFormat.cpp)
+add_library(data SHARED chunk.cpp io_factory.cpp)
 
 # needed for dlsym, dlopen, etc. pp.
-target_link_libraries(data		dl)
+find_library(LIB_DL dl)
+
+target_link_libraries(data ${LIB_DL})
 
 set_target_properties(data PROPERTIES 
     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
     LINK_FLAGS "--no-undefined")
-

@@ -1,6 +1,7 @@
 #include "CoreUtils/log.hpp"
 #include "DataStorage/chunk.hpp"
 #include "CoreUtils/vector.hpp"
+#include "DataStorage/io_factory.hpp"
 
 using namespace isis::data;
 using namespace isis::util;
@@ -19,6 +20,9 @@ int main(){
 	ENABLE_LOG(CoreLog,DefaultMsgPrint,info);
 	ENABLE_LOG(DataDebug,DefaultMsgPrint,info);
 	ENABLE_LOG(DataLog,DefaultMsgPrint,info);
+	
+	IOFactory fact(std::string(BUILD_PATH)+ "/lib/ImageIO");
+	fact.do_load("delme.dcm","none");
 	
 // 	iUtil::DefaultMsgPrint::stopBelow(warning); 
 	

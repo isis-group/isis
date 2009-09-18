@@ -5,6 +5,7 @@
 #include "CoreUtils/propmap.hpp"
 #include <iostream>
 #include "CoreUtils/log.hpp"
+#include "CoreUtils/vector.hpp"
 
 using namespace isis::util; //needed for the log-levels
 
@@ -25,7 +26,8 @@ int main(int argc, char *argv[]){
 	map["Test1"]=6.4;
 	map["Test2"]=6;
 	map["Test3"]=std::string("Hallo");
-
+// 	map["Vector"]=FixedVector<short,4>();
+	
 	cont["Prop"]=map;
 	std::cout << cont["Prop"]->toString() << std::endl;
 

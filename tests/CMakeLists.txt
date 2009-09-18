@@ -1,11 +1,13 @@
-cmake_minimum_required(VERSION 2.4)
+cmake_policy(SET CMP0005 OLD) #make it complain about escaped Preprocessor definition
+
+add_definitions(-DBUILD_PATH=\\"${PROJECT_BINARY_DIR}\\")
 
 add_executable(test_logger		test_logger.cpp)
 add_executable(test_property	test_property.cpp)
 add_executable(test_data		test_data.cpp)
-add_executable(test_imageio	test_imageio.cpp)
+#add_executable(test_imageio	test_imageio.cpp)
 
 target_link_libraries(test_logger 	utils)
 target_link_libraries(test_property utils)
 target_link_libraries(test_data    	utils data)
-target_link_libraries(test_imageio 	utils data)
+#target_link_libraries(test_imageio 	utils data)

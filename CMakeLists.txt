@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 2.4)
 project(isis)
 
 # add path for new modules
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
 	"${CMAKE_SOURCE_DIR}/cmake/Modules")
 
 # find the boost libraries
@@ -18,8 +18,5 @@ add_definitions(-D_ENABLE_CORE_DEBUG=1)
 
 include_directories(lib)
 
-#add definitions, compiler switches, etc.
-add_definitions(-Wall)
-
 add_subdirectory(lib)
-#add_subdirectory(tests)
+add_subdirectory(tests)
