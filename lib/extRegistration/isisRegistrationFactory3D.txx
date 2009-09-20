@@ -327,6 +327,10 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpTransform() 
 	if(transform.AFFINE) {
 		m_NumberOfParameters = m_AffineTransform->GetNumberOfParameters();
 		m_RegistrationObject->SetInitialTransformParameters(m_AffineTransform->GetParameters());
+#ifdef DEBUG
+		std::cout << m_AffineTransform->GetParameters() << std::endl;
+#endif
+
 	}
 
 	if(transform.CENTEREDAFFINE) {
@@ -449,10 +453,23 @@ typename RegistrationFactory3D<TFixedImageType, TMovingImageType>::RegistrationM
 template<class TFixedImageType, class TMovingImageType>
 void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetInitialTransform(
     TransformBasePointer initialTransform) {
-	if(!strcmp(initialTransform->GetNameOfClass(), "AffineTransform") and transform.BSPLINEDEFORMABLETRANSFORM) {
+	const char* initialTransformName = initialTransform->GetNameOfClass();
+	if(!strcmp(initialTransformName, "AffineTransform") and transform.BSPLINEDEFORMABLETRANSFORM) {
 		m_BSplineTransform->SetBulkTransform(static_cast<AffineTransformType*> (initialTransform));
 	}
+	if(!strcmp(initialTransformName, "VersorRigid3DTransform") and transform.BSPLINEDEFORMABLETRANSFORM) {
+		m_BSplineTransform->SetBulkTransform(static_cast<VersorRigid3DTransformType*> (initialTransform));
+	}
+	if(!strcmp(initialTransformName, "CenteredAffineTransform") and transform.BSPLINEDEFORMABLETRANSFORM) {
+		m_BSplineTransform->SetBulkTransform(static_cast<CenteredAffineTransformType*> (initialTransform));
+	}
 
+	if(!strcmp(initialTransformName, "VersorRigid3DTransform") and transform.AFFINE) {
+
+		m_AffineTransform->SetTranslation((static_cast<VersorRigid3DTransformType*> (initialTransform)->GetTranslation()));
+		m_AffineTransform->SetMatrix((static_cast<VersorRigid3DTransformType*> (initialTransform)->GetMatrix()));
+
+	}
 }
 
 /*
