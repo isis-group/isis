@@ -1,6 +1,3 @@
-cmake_policy(SET CMP0005 OLD) #make it complain about escaped Preprocessor definition
-
-add_definitions(-DBUILD_PATH=\\"${PROJECT_BINARY_DIR}\\")
 
 add_executable(test_logger		test_logger.cpp)
 add_executable(test_property	test_property.cpp)

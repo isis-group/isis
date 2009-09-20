@@ -21,8 +21,7 @@ int main(){
 	ENABLE_LOG(DataDebug,DefaultMsgPrint,info);
 	ENABLE_LOG(DataLog,DefaultMsgPrint,info);
 	
-	IOFactory fact(std::string(BUILD_PATH)+ "/lib/ImageIO");
-	fact.do_load("delme.dcm","none");
+	IOFactory fact;
 	
 // 	iUtil::DefaultMsgPrint::stopBelow(warning); 
 	

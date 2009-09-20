@@ -3,38 +3,66 @@
 #include <iostream>
 #include <CoreUtils/log.hpp>
 #include "common.hpp"
+#include <boost/filesystem.hpp>
+#include <boost/regex.hpp>
 
 namespace isis{ namespace data{
 
-IOFactory::IOFactory(std::string path){
+IOFactory::IOFactory(){
 	MAKE_LOG(DataDebug);
-	std::string libname="isisImageFormat_Null";
-	libname = path + "/" + DL_PREFIX + libname + DL_SUFFIX;
+	findPlugins(std::string(BUILD_PATH)+ "/lib/ImageIO");
 	
-	void *handle=dlopen(libname.c_str(),RTLD_NOW);
-	if(handle){
-		void (*plugin_load)(const char* filename,const char* dialect) = 
-			(void (*)(const char* filename,const char* dialect))dlsym(handle,"isis_io_load");
-		if (plugin_load)
-			io_func["null"]=plugin_load;
-		else
-			LOG(DataDebug,::isis::util::error) 
-				<< "could not bind function: " << isis::util::MSubject(dlerror()) << std::endl;
-
-	} else
-		LOG(DataDebug,::isis::util::error) 
-			<< "Could not load lib: " << isis::util::MSubject(dlerror()) << std::endl;
 }
 
-void IOFactory::do_load(std::string filename,std::string dialect){
-	MAKE_LOG(DataDebug);
-	std::string type="null";
-	//@todo insert nifty file-type-detection here
-	if(io_func[type])
-		io_func[type](filename.c_str(),dialect.c_str());
-	else
-		LOG(DataDebug,::isis::util::error)
-			<< "There is no loader available for " << isis::util::MSubject(filename) << std::endl;
+bool IOFactory::registerIOClass(boost::shared_ptr< isis::data::FileFormat > plugin){
+	MAKE_LOG(DataLog);
+	if(!plugin)return false;
+	std::list<FileFormat::format> formats(plugin->formats());
+
+	LOG(DataLog,::isis::util::info)<< "Registering io-plugin \"" << plugin->name() << "\" with " << formats.size() << " supported formats" <<  std::endl;
+
+	for(std::list<FileFormat::format>::const_iterator i=formats.begin();i!=formats.end();i++)
+		io_format[i->name]=plugin;
+
+	return true;
+}
+
+void IOFactory::findPlugins(std::string path){
+	MAKE_LOG(DataLog);
+	boost::filesystem::path p(path);
+	if (!exists(p)){
+		LOG(DataLog,::isis::util::warning) << ::isis::util::MSubject(p.native_file_string()) << " not found" << std::endl;
+		return;
+	}
+	if(!boost::filesystem::is_directory(p)){
+		LOG(DataLog,::isis::util::warning) << ::isis::util::MSubject(p.native_file_string()) << " is no directory" << std::endl;
+		return;
+	}
+
+	boost::regex pluginFilter(std::string("^")+DL_PREFIX+"isisImageFormat_"+"[[:word:]]+"+DL_SUFFIX+"$");
+
+	for (boost::filesystem::directory_iterator itr(p); itr!=boost::filesystem::directory_iterator(); ++itr)	{
+		if(boost::regex_match(itr->path().leaf(),pluginFilter)){
+			const std::string pluginName=itr->path().string();
+			void *handle=dlopen(pluginName.c_str(),RTLD_NOW);
+			if(handle){
+				isis::data::FileFormat* (*plugin_get_class)() = (isis::data::FileFormat* (*)())dlsym(handle,"factory");
+				if (plugin_get_class){
+					boost::shared_ptr<isis::data::FileFormat> io_class(plugin_get_class());
+					if(!registerIOClass(io_class))
+						LOG(DataLog,::isis::util::error) << "invalid image format" << std::endl;
+				} else
+					LOG(DataLog,::isis::util::error)
+						<< "could not get format factory function: " << isis::util::MSubject(dlerror()) << std::endl;
+			} else
+				LOG(DataLog,::isis::util::error)
+					<< "Could not load library: " << isis::util::MSubject(dlerror()) << std::endl;
+		} else {
+			LOG(DataLog,::isis::util::info)
+				<< "Ignoring " << ::isis::util::MSubject(itr->path())
+				<< " because it doesn't match " << pluginFilter.str() << std::endl;
+		}
+	}
 }
 
 }}

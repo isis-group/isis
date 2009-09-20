@@ -8,7 +8,9 @@ add_library(data SHARED chunk.cpp io_factory.cpp)
 # needed for dlsym, dlopen, etc. pp.
 find_library(LIB_DL dl)
 
-target_link_libraries(data ${LIB_DL})
+FIND_PACKAGE(Boost COMPONENTS filesystem regex)
+
+target_link_libraries(data ${LIB_DL} ${Boost_LIBRARIES})
 
 set_target_properties(data PROPERTIES 
     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
