@@ -17,6 +17,12 @@ ELSE(ITK_FOUND)
     "ITK not found. Please set ITK_DIR.")
 ENDIF(ITK_FOUND)
 
+
+IF(CMAKE_CXX_FLAGS_DEBUG)
+  MESSAGE("DEFINITION 'DEBUG' WAS SET")
+  ADD_DEFINITIONS(-DDEBUG)
+ENDIF(CMAKE_CXX_FLAGS_DEBUG)
+
 #add definitions, compiler switches, etc.
 #ADD_DEFINITIONS(-Wall -O2)
 
