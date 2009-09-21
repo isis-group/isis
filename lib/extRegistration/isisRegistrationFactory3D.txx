@@ -19,6 +19,7 @@ RegistrationFactory3D<TFixedImageType, TMovingImageType>::RegistrationFactory3D(
 	optimizer.REGULARSTEPGRADIENTDESCENT = false;
 	optimizer.VERSORRIGID3D = false;
 	optimizer.LBFGSBOPTIMIZER = false;
+	optimizer.AMOEBA = false;
 
 	transform.VERSORRIGID = false;
 	transform.QUATERNIONRIGID = false;
@@ -30,6 +31,8 @@ RegistrationFactory3D<TFixedImageType, TMovingImageType>::RegistrationFactory3D(
 	metric.MATTESMUTUALINFORMATION = false;
 	metric.NORMALIZEDCORRELATION = false;
 	metric.VIOLAWELLSMUTUALINFORMATION = false;
+	metric.MEANSQUARE = false;
+	metric.MUTUALINFORMATIONHISTOGRAM = false;
 
 	interpolator.BSPLINE = false;
 	interpolator.LINEAR = false;
@@ -71,22 +74,32 @@ template<class TFixedImageType, class TMovingImageType>
 void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetMetric(
     eMetricType e_metric) {
 	switch(e_metric) {
-	case MattesMutualInformation:
+	case MattesMutualInformationMetric:
 		metric.MATTESMUTUALINFORMATION = true;
 		m_MattesMutualInformationMetric = MattesMutualInformationMetricType::New();
 		m_RegistrationObject->SetMetric(m_MattesMutualInformationMetric);
 		break;
 
-	case ViolaWellsMutualInformation:
+	case ViolaWellsMutualInformationMetric:
 		metric.VIOLAWELLSMUTUALINFORMATION = true;
 		m_ViolaWellsMutualInformationMetric = ViolaWellsMutualInformationMetricType::New();
 		m_RegistrationObject->SetMetric(m_ViolaWellsMutualInformationMetric);
 		break;
+	case MutualInformationHistogramMetric:
+		metric.MUTUALINFORMATIONHISTOGRAM = true;
+		m_MutualInformationHistogramMetric = MutualInformationHistogramMetricType::New();
+		m_RegistrationObject->SetMetric(m_MutualInformationHistogramMetric);
+		break;
 
-	case NormalizedCorrelation:
+	case NormalizedCorrelationMetric:
 		metric.NORMALIZEDCORRELATION = true;
 		m_NormalizedCorrelationMetric = NormalizedCorrelationMetricType::New();
 		m_RegistrationObject->SetMetric(m_NormalizedCorrelationMetric);
+		break;
+	case MeanSquareMetric:
+		metric.MEANSQUARE = true;
+		m_MeanSquareMetric = MeanSquareImageToImageMetricType::New();
+		m_RegistrationObject->SetMetric(m_MeanSquareMetric);
 		break;
 	}
 }
@@ -168,11 +181,15 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetOptimizer(
 		m_VersorRigid3DTransformOptimizer = VersorRigid3DTransformOptimizerType::New();
 		m_RegistrationObject->SetOptimizer(m_VersorRigid3DTransformOptimizer);
 		break;
-
 	case LBFGSBOptimizer:
 		optimizer.LBFGSBOPTIMIZER = true;
 		m_LBFGSBOptimizer = LBFGSBOptimizerType::New();
 		m_RegistrationObject->SetOptimizer(m_LBFGSBOptimizer);
+		break;
+	case AmoebaOptimizer:
+		optimizer.AMOEBA = true;
+		m_AmoebaOptimizer = AmoebaOptimizerType::New();
+		m_RegistrationObject->SetOptimizer(m_AmoebaOptimizer);
 		break;
 
 	}
@@ -216,9 +233,10 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer() 
 			m_RegularStepGradientDescentOptimizer->SetNumberOfIterations(UserOptions.NumberOfIterations);
 		}
 
-		if(metric.VIOLAWELLSMUTUALINFORMATION) {
+		if(metric.VIOLAWELLSMUTUALINFORMATION or metric.MUTUALINFORMATIONHISTOGRAM) {
 			m_RegularStepGradientDescentOptimizer->MaximizeOn();
 		}
+
 	}
 	if(optimizer.VERSORRIGID3D) {
 		VersorRigid3DTransformOptimizerType::ScalesType optimizerScaleVersorRigid3D(m_NumberOfParameters);
@@ -256,6 +274,19 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer() 
 		m_LBFGSBOptimizer->SetMaximumNumberOfEvaluations(UserOptions.NumberOfIterations);
 		m_LBFGSBOptimizer->SetMaximumNumberOfCorrections(12);
 
+	}
+	if(optimizer.AMOEBA) {
+		AmoebaOptimizerType::ParametersType simplexDelta(m_NumberOfParameters);
+		//simplexDelta.Fill(5.0);
+		m_AmoebaOptimizer->AutomaticInitialSimplexOn();
+		m_AmoebaOptimizer->SetInitialSimplexDelta(simplexDelta);
+		m_AmoebaOptimizer->SetMaximumNumberOfIterations(UserOptions.NumberOfIterations);
+		m_AmoebaOptimizer->SetParametersConvergenceTolerance(0.1);
+		m_AmoebaOptimizer->SetFunctionConvergenceTolerance(0.001);
+
+		if(metric.VIOLAWELLSMUTUALINFORMATION or metric.MUTUALINFORMATIONHISTOGRAM) {
+			m_AmoebaOptimizer->MaximizeOn();
+		}
 	}
 
 }
@@ -402,6 +433,16 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpMetric() {
 
 
 	}
+	if(metric.MUTUALINFORMATIONHISTOGRAM) {
+		typename MutualInformationHistogramMetricType::HistogramSizeType histogramSize;
+		histogramSize[0] = UserOptions.NumberOfBins;
+		histogramSize[1] = UserOptions.NumberOfBins;
+		m_MutualInformationHistogramMetric->SetHistogramSize(histogramSize);
+		if(optimizer.AMOEBA) {
+			m_MutualInformationHistogramMetric->ComputeGradientOff();
+		}
+
+	}
 
 	if(metric.NORMALIZEDCORRELATION) {
 		//setting up the normalized correlation metric
@@ -409,6 +450,11 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpMetric() {
 		m_NormalizedCorrelationMetric->SetMovingImage(m_MovingImage);
 		m_NormalizedCorrelationMetric->SetFixedImageRegion(m_FixedImageRegion);
 
+	}
+	if(metric.MEANSQUARE) {
+		m_MeanSquareMetric->SetFixedImage(m_FixedImage);
+		m_MeanSquareMetric->SetMovingImage(m_MovingImage);
+		m_MeanSquareMetric->SetFixedImageRegion(m_FixedImageRegion);
 	}
 
 }
@@ -464,14 +510,27 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetInitialTransfo
 		m_BSplineTransform->SetBulkTransform(static_cast<CenteredAffineTransformType*> (initialTransform));
 	}
 
+	if(!strcmp(initialTransformName, "VersorRigid3DTransform") and transform.CENTEREDAFFINE) {
+
+		m_CenteredAffineTransform->SetTranslation(
+		    (static_cast<VersorRigid3DTransformType*> (initialTransform)->GetTranslation()));
+		m_CenteredAffineTransform->SetMatrix((static_cast<VersorRigid3DTransformType*> (initialTransform)->GetMatrix()));
+
+	}
 	if(!strcmp(initialTransformName, "VersorRigid3DTransform") and transform.AFFINE) {
 
-		m_AffineTransform->SetTranslation((static_cast<VersorRigid3DTransformType*> (initialTransform)->GetTranslation()));
+		m_AffineTransform->SetTranslation(
+		    (static_cast<VersorRigid3DTransformType*> (initialTransform)->GetTranslation()));
 		m_AffineTransform->SetMatrix((static_cast<VersorRigid3DTransformType*> (initialTransform)->GetMatrix()));
 
 	}
-}
+	if(!strcmp(initialTransformName, "VersorRigid3DTransform") and transform.VERSORRIGID) {
+		m_VersorRigid3DTransform->SetTranslation(
+		    (static_cast<VersorRigid3DTransformType*> (initialTransform)->GetTranslation()));
+		m_VersorRigid3DTransform->SetMatrix((static_cast<VersorRigid3DTransformType*> (initialTransform)->GetMatrix()));
 
+	}
+}
 /*
  this method checks the images sizes of the fixed and the moving image.
  if the fixed image size, in any direction, is bigger than the image size
@@ -522,6 +581,10 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetFixedImageMask
 	}
 	if(metric.VIOLAWELLSMUTUALINFORMATION) {
 		m_ViolaWellsMutualInformationMetric->SetFixedImageMask(m_MovingImageMaskObject);
+	}
+	if(metric.MUTUALINFORMATIONHISTOGRAM)
+	{
+		m_MutualInformationHistogramMetric->SetFixedImageMask(m_MovingImageMaskObject);
 	}
 
 }

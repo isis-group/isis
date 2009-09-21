@@ -8,11 +8,10 @@
 #ifndef ISISREGISTRATIONFACTORY_H_
 #define ISISREGISTRATIONFACTORY_H_
 
-
 #include "itkImageRegistrationMethod.h"
 
 //transform includes
-#include "itkTransformFileReader.h"
+
 //rigid:
 #include "itkVersorRigid3DTransform.h"
 #include "itkQuaternionRigidTransform.h"
@@ -27,13 +26,16 @@
 
 //metric includes
 #include "itkMutualInformationImageToImageMetric.h" //Viola-Wells-Mutual
+#include "itkMutualInformationHistogramImageToImageMetric.h"
 #include "itkMattesMutualInformationImageToImageMetric.h"
 #include "itkNormalizedCorrelationImageToImageMetric.h"
+#include "itkMeanSquaresImageToImageMetric.h"
 
 //optimizer inlcudes
 #include "itkRegularStepGradientDescentOptimizer.h"
 #include "itkVersorRigid3DTransformOptimizer.h"
 #include "itkLBFGSBOptimizer.h"
+#include "itkAmoebaOptimizer.h"
 
 //interpolator includes
 #include "itkLinearInterpolateImageFunction.h"
@@ -53,6 +55,10 @@
 #include "itkNormalizeImageFilter.h" //for ViolaWellMutualInformation. Sets mean to zero and the variance to 1
 #include "itkDiscreteGaussianImageFilter.h" // low pass filtering for ViolaWellsMutualInformation to increase robustness against noise.
 #include "itkCenteredTransformInitializer.h"
+
+//multi-resolution registration includes
+#include "itkMultiResolutionImageRegistrationMethod.h"
+#include "itkMultiResolutionPyramidImageFilter.h"
 
 namespace isis {
 namespace registration {
@@ -76,6 +82,7 @@ public:
 	typedef TMovingImageType MovingImageType;
 	typedef TFixedImageType OutputImageType;
 	typedef unsigned char MaskPixelType;
+	typedef float InternalPixelType;
 
 	typedef double CoordinateRepType; //type for coordinates representation used by the BSplineDeformableTransform
 
@@ -101,6 +108,7 @@ public:
 
 	typedef typename FixedImageType::PixelType FixedPixelType;
 	typedef typename MovingImageType::PixelType MovingPixelType;
+	typedef itk::Image<InternalPixelType, FixedImageDimension> InternalImageType;
 
 	typedef itk::ImageRegistrationMethod<TFixedImageType, TMovingImageType> RegistrationMethodType;
 
@@ -117,7 +125,7 @@ public:
 
 	//transform typedefs
 	typedef itk::SmartPointer<const typename RegistrationMethodType::TransformType> ConstTransformPointer;
-	typedef itk::TransformBase* TransformBasePointer;	//not allowed to be a itk::SmartPointer because of static_cast usage
+	typedef itk::TransformBase* TransformBasePointer; //not allowed to be a itk::SmartPointer because of static_cast usage
 
 	typedef itk::VersorRigid3DTransform<double> VersorRigid3DTransformType;
 	typedef itk::QuaternionRigidTransform<double> QuaternionRigidTransformType;
@@ -133,6 +141,7 @@ public:
 	typedef itk::RegularStepGradientDescentOptimizer RegularStepGradientDescentOptimizerType;
 	typedef itk::VersorRigid3DTransformOptimizer VersorRigid3DTransformOptimizerType;
 	typedef itk::LBFGSBOptimizer LBFGSBOptimizerType;
+	typedef itk::AmoebaOptimizer AmoebaOptimizerType;
 
 	//metric typedefs
 	typedef itk::MattesMutualInformationImageToImageMetric<TFixedImageType, TMovingImageType>
@@ -144,6 +153,11 @@ public:
 	typedef typename itk::MutualInformationImageToImageMetric<TFixedImageType, TMovingImageType>
 	        ViolaWellsMutualInformationMetricType;
 
+	typedef typename itk::MeanSquaresImageToImageMetric<TFixedImageType, TMovingImageType>
+	        MeanSquareImageToImageMetricType;
+
+	typedef typename itk::MutualInformationHistogramImageToImageMetric<TFixedImageType, TMovingImageType>
+	        MutualInformationHistogramMetricType;
 	//additional typedefs
 	typedef typename itk::NormalizeImageFilter<TFixedImageType, TFixedImageType> FixedNormalizeImageFilterType;
 
@@ -153,6 +167,11 @@ public:
 
 	typedef typename itk::CenteredTransformInitializer<VersorRigid3DTransformType, TFixedImageType, TMovingImageType>
 	        CenteredTransformInitializerType;
+
+	//multi-resolution registration typedefs
+	typedef itk::MultiResolutionImageRegistrationMethod<InternalImageType, InternalImageType>
+	        MultiResolutionRegistrationMethodType;
+
 	enum eTransformType
 	{
 		    VersorRigid3DTransform,
@@ -166,12 +185,16 @@ public:
 
 	enum eMetricType
 	{
-		MattesMutualInformation, ViolaWellsMutualInformation, NormalizedCorrelation
+		    MattesMutualInformationMetric,
+		    ViolaWellsMutualInformationMetric,
+		    NormalizedCorrelationMetric,
+		    MeanSquareMetric,
+		    MutualInformationHistogramMetric
 	};
 
 	enum eOptimizerType
 	{
-		RegularStepGradientDescentOptimizer, VersorRigidOptimizer, LBFGSBOptimizer
+		RegularStepGradientDescentOptimizer, VersorRigidOptimizer, LBFGSBOptimizer, AmoebaOptimizer
 	};
 
 	enum eInterpolationType
@@ -259,6 +282,7 @@ private:
 		bool REGULARSTEPGRADIENTDESCENT;
 		bool VERSORRIGID3D;
 		bool LBFGSBOPTIMIZER;
+		bool AMOEBA;
 
 	} optimizer;
 
@@ -267,6 +291,8 @@ private:
 		bool MATTESMUTUALINFORMATION;
 		bool NORMALIZEDCORRELATION;
 		bool VIOLAWELLSMUTUALINFORMATION;
+		bool MEANSQUARE;
+		bool MUTUALINFORMATIONHISTOGRAM;
 	} metric;
 
 	struct Interpolator
@@ -307,6 +333,7 @@ private:
 	RegularStepGradientDescentOptimizerType::Pointer m_RegularStepGradientDescentOptimizer;
 	VersorRigid3DTransformOptimizerType::Pointer m_VersorRigid3DTransformOptimizer;
 	LBFGSBOptimizerType::Pointer m_LBFGSBOptimizer;
+	AmoebaOptimizerType::Pointer m_AmoebaOptimizer;
 
 	//transform
 	VersorRigid3DTransformType::Pointer m_VersorRigid3DTransform;
@@ -320,10 +347,10 @@ private:
 
 	//metric
 	typename MattesMutualInformationMetricType::Pointer m_MattesMutualInformationMetric;
-
 	typename NormalizedCorrelationMetricType::Pointer m_NormalizedCorrelationMetric;
-
 	typename ViolaWellsMutualInformationMetricType::Pointer m_ViolaWellsMutualInformationMetric;
+	typename MeanSquareImageToImageMetricType::Pointer m_MeanSquareMetric;
+	typename MutualInformationHistogramMetricType::Pointer m_MutualInformationHistogramMetric;
 
 	//interpolator
 	typename LinearInterpolatorType::Pointer m_LinearInterpolator;
