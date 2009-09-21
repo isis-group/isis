@@ -16,7 +16,6 @@ class IOFactory{
 	void findPlugins(std::string path);
 public:
 	IOFactory();
-	void do_load(std::string filename,std::string dialect);
 };
 
 	

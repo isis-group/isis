@@ -23,6 +23,7 @@
 #include "CoreUtils/log.hpp"
 #include "common.hpp"
 #include <string.h>
+#include <list>
 
 namespace isis{ 
 /*! \addtogroup data
@@ -93,6 +94,7 @@ public:
 		fourthDim,thirdDim,secondDim,firstDim
 	){}
 };
+
 }
 /** @} */
 }

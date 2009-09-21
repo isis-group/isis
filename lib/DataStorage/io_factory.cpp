@@ -11,18 +11,16 @@ namespace isis{ namespace data{
 IOFactory::IOFactory(){
 	MAKE_LOG(DataDebug);
 	findPlugins(std::string(BUILD_PATH)+ "/lib/ImageIO");
-	
 }
 
 bool IOFactory::registerIOClass(boost::shared_ptr< isis::data::FileFormat > plugin){
 	MAKE_LOG(DataLog);
 	if(!plugin)return false;
-	std::list<FileFormat::format> formats(plugin->formats());
 
-	LOG(DataLog,::isis::util::info)<< "Registering io-plugin \"" << plugin->name() << "\" with " << formats.size() << " supported formats" <<  std::endl;
+	LOG(DataLog,::isis::util::info)<< "Registering io-plugin \"" << plugin->name() << "\" with " << " supported formats" <<  std::endl;
 
-	for(std::list<FileFormat::format>::const_iterator i=formats.begin();i!=formats.end();i++)
-		io_format[i->name]=plugin;
+// 	for(std::list<FileFormat::format>::const_iterator i=formats.begin();i!=formats.end();i++)
+// 		io_format[i->name]=plugin;
 
 	return true;
 }

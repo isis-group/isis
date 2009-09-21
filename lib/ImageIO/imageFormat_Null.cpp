@@ -2,8 +2,11 @@
 
 class NullFormat: public isis::data::FileFormat{
 public:
-  std::list<format> formats(){
-    return std::list<format>();
+  std::string formats(){
+    return std::string();
+  }
+  std::string dialects(){
+    return std::string();
   }
   std::string name(){
     return "Null";

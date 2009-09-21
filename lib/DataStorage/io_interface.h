@@ -8,12 +8,9 @@
 namespace isis{ namespace data{
 class FileFormat {
 public:
-	struct format{
-		std::string name;
-		std::list<std::string> suffixes,dialects;
-	};
 	virtual std::string name()=0;
-	virtual std::list<format> formats()=0;
+	virtual std::string formats()=0;
+	virtual std::string dialects()=0;
 };
 }}
 #else
