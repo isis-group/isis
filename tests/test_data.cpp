@@ -22,7 +22,7 @@ int main(){
 	ENABLE_LOG(DataLog,DefaultMsgPrint,info);
 	
 	IOFactory::get();//get the IO Factory
-	IOFactory::get();//do it again - it should not cause reinit
+	IOFactory::get().print_formats(std::cout);//do it again - it should not cause reinit
 	
 // 	iUtil::DefaultMsgPrint::stopBelow(warning); 
 	

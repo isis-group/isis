@@ -6,7 +6,7 @@
 #include <string>
 
 namespace isis{ namespace data{
-class FileReader {
+class FileFormat {
 public:
 	virtual std::string name()=0;
 	virtual std::string suffixes()=0;
@@ -24,7 +24,7 @@ extern "C" {
 #endif
 	
 #if defined(__STDC__) || defined(__cplusplus)
-	extern isis::data::FileReader* factory();
+	extern isis::data::FileFormat* factory();
 #else
 	extern FileFormat* factory();
 #endif

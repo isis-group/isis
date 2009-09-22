@@ -1,6 +1,6 @@
 #include <DataStorage/io_interface.h>
 
-class NullFormat: public isis::data::FileReader{
+class NullFormat: public isis::data::FileFormat{
 public:
   std::string suffixes(){
     return std::string();
@@ -14,6 +14,6 @@ public:
   bool tainted(){return false;}//internal plugins are not tainted
 };
 
-isis::data::FileReader* factory(){
+isis::data::FileFormat* factory(){
   return new NullFormat();
 }
