@@ -21,7 +21,8 @@ int main(){
 	ENABLE_LOG(DataDebug,DefaultMsgPrint,info);
 	ENABLE_LOG(DataLog,DefaultMsgPrint,info);
 	
-	IOFactory fact;
+	IOFactory::get();//get the IO Factory
+	IOFactory::get();//do it again - it should not cause reinit
 	
 // 	iUtil::DefaultMsgPrint::stopBelow(warning); 
 	

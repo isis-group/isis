@@ -6,11 +6,12 @@
 #include <string>
 
 namespace isis{ namespace data{
-class FileFormat {
+class FileReader {
 public:
 	virtual std::string name()=0;
-	virtual std::string formats()=0;
+	virtual std::string suffixes()=0;
 	virtual std::string dialects()=0;
+	virtual bool tainted(){return true;}
 };
 }}
 #else
@@ -23,7 +24,7 @@ extern "C" {
 #endif
 	
 #if defined(__STDC__) || defined(__cplusplus)
-	extern isis::data::FileFormat* factory();
+	extern isis::data::FileReader* factory();
 #else
 	extern FileFormat* factory();
 #endif

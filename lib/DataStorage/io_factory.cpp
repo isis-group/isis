@@ -5,6 +5,7 @@
 #include "common.hpp"
 #include <boost/filesystem.hpp>
 #include <boost/regex.hpp>
+#include <boost/foreach.hpp>
 
 namespace isis{ namespace data{
 
@@ -13,42 +14,48 @@ IOFactory::IOFactory(){
 	findPlugins(std::string(BUILD_PATH)+ "/lib/ImageIO");
 }
 
-bool IOFactory::registerIOClass(boost::shared_ptr< isis::data::FileFormat > plugin){
+bool IOFactory::registerReader(FileReaderPtr plugin){
 	MAKE_LOG(DataLog);
 	if(!plugin)return false;
 
-	LOG(DataLog,::isis::util::info)<< "Registering io-plugin \"" << plugin->name() << "\" with " << " supported formats" <<  std::endl;
+	std::list<std::string> suffixes=getSuffixes(plugin);
+	LOG(DataLog,::isis::util::info)
+		<< "Registering " << (plugin->tainted() ? "tainted " :"") << "io-plugin \"" << plugin->name()
+		<< "\" with " << suffixes.size() << " supported suffixes" << std::endl;
 
-// 	for(std::list<FileFormat::format>::const_iterator i=formats.begin();i!=formats.end();i++)
-// 		io_format[i->name]=plugin;
+	BOOST_FOREACH(std::string &it,suffixes)
+		io_suffix[it].push_back(plugin);
 
 	return true;
 }
 
-void IOFactory::findPlugins(std::string path){
+unsigned int IOFactory::findPlugins(std::string path){
 	MAKE_LOG(DataLog);
 	boost::filesystem::path p(path);
 	if (!exists(p)){
 		LOG(DataLog,::isis::util::warning) << ::isis::util::MSubject(p.native_file_string()) << " not found" << std::endl;
-		return;
+		return 0;
 	}
 	if(!boost::filesystem::is_directory(p)){
 		LOG(DataLog,::isis::util::warning) << ::isis::util::MSubject(p.native_file_string()) << " is no directory" << std::endl;
-		return;
+		return 0;
 	}
 
 	boost::regex pluginFilter(std::string("^")+DL_PREFIX+"isisImageFormat_"+"[[:word:]]+"+DL_SUFFIX+"$");
-
+	unsigned int ret=0;
 	for (boost::filesystem::directory_iterator itr(p); itr!=boost::filesystem::directory_iterator(); ++itr)	{
 		if(boost::regex_match(itr->path().leaf(),pluginFilter)){
 			const std::string pluginName=itr->path().string();
 			void *handle=dlopen(pluginName.c_str(),RTLD_NOW);
 			if(handle){
-				isis::data::FileFormat* (*plugin_get_class)() = (isis::data::FileFormat* (*)())dlsym(handle,"factory");
-				if (plugin_get_class){
-					boost::shared_ptr<isis::data::FileFormat> io_class(plugin_get_class());
-					if(!registerIOClass(io_class))
+				isis::data::FileReader* (*factory_func)() = (isis::data::FileReader* (*)())dlsym(handle,"factory");
+				if (factory_func){
+					FileReaderPtr io_class(factory_func());
+					if(registerReader(io_class))
+						ret++;
+					else
 						LOG(DataLog,::isis::util::error) << "invalid image format" << std::endl;
+					  
 				} else
 					LOG(DataLog,::isis::util::error)
 						<< "could not get format factory function: " << isis::util::MSubject(dlerror()) << std::endl;
@@ -61,6 +68,19 @@ void IOFactory::findPlugins(std::string path){
 				<< " because it doesn't match " << pluginFilter.str() << std::endl;
 		}
 	}
+	return ret;
+}
+
+std::list<std::string> IOFactory::getSuffixes(FileReaderPtr reader){
+	const boost::sregex_token_iterator token_begin=boost::make_regex_token_iterator(reader->suffixes(), boost::regex("\\s+"), -1);
+	const boost::sregex_token_iterator token_end;
+
+	return std::list<std::string>(token_begin,token_end);
+}
+
+IOFactory& IOFactory::get(){
+	static IOFactory ret;
+	return ret;
 }
 
 }}

@@ -10,15 +10,22 @@
 namespace isis{ namespace data{
 
 class IOFactory{
-	std::map<std::string,boost::shared_ptr< isis::data::FileFormat> > io_format;
-	std::map<std::string,std::string> io_suffix;
-	bool registerIOClass(boost::shared_ptr< isis::data::FileFormat > plugin);
-	void findPlugins(std::string path);
+	IOFactory();//shall not be created directly
+	IOFactory& operator =(IOFactory&); //dont do that
 public:
-	IOFactory();
+	typedef boost::shared_ptr< FileReader> FileReaderPtr;
+	typedef std::list< FileReaderPtr > FileReaderList;
+	
+	static std::list<std::string> getSuffixes(FileReaderPtr reader);
+	static IOFactory &get();
+protected:
+	FileReaderList io_reader;
+	std::map<std::string,FileReaderList > io_suffix;
+
+	bool registerReader(FileReaderPtr plugin);
+	unsigned int findPlugins(std::string path);
 };
 
-	
 }}
 
 #endif //IO_FACTORY_H
