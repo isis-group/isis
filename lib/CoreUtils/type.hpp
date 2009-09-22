@@ -119,6 +119,19 @@ public:
 		return m_cast_to<TypePtr<T> >();
 	}
 };
+
+/**
+ * Base class to store and handle references to Type and TypePtr objects.
+ */
+class TypeContainer:public boost::shared_ptr<TypeBase>{
+protected:
+	//dont use this directly
+	TypeContainer(TypeBase *t);
+	TypeContainer();
+public:
+	/// \returns true if "contained" type has no value (a.k.a. is undefined)
+	bool empty();
+};
 }
 /// @endcond
 

@@ -2,8 +2,8 @@
 #define IO_INTERFACE_H
 
 #ifdef __cplusplus
-#include <list>
 #include <string>
+#include "chunk.hpp"
 
 namespace isis{ namespace data{
 class FileFormat {
@@ -12,6 +12,8 @@ public:
 	virtual std::string suffixes()=0;
 	virtual std::string dialects()=0;
 	virtual bool tainted(){return true;}
+	virtual Chunks load(std::string filename,std::string dialect)=0;
+	virtual bool save(const Chunks &chunks,std::string filename,std::string dialect)=0;
 };
 }}
 #else

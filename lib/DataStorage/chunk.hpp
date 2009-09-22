@@ -21,6 +21,7 @@
 
 #include "CoreUtils/type.hpp"
 #include "CoreUtils/log.hpp"
+#include "CoreUtils/propmap.hpp"
 #include "common.hpp"
 #include <string.h>
 #include <list>
@@ -77,10 +78,14 @@ public:
 	template<typename S> bool copyTo(const ChunkBase<S> &src)const{
 		//@todo implement me
 	}
+	::isis::util::PropMap properties;
 };
 
 }
 /// @endcond
+
+class Chunks:public std::list< ::isis::util::_internal::TypeContainer>{
+};
 
 /**
  * Chunk class for memory-based buffers
