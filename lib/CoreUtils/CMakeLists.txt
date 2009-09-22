@@ -1,5 +1,5 @@
 #list all source files here
-add_library(utils SHARED types.cpp type.cpp propmap.cpp message.cpp)
+add_library(utils SHARED type.cpp types.cpp propmap.cpp message.cpp)
 
 set_target_properties(utils PROPERTIES 
     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}

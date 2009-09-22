@@ -12,7 +12,8 @@ add_definitions(-D_ENABLE_CORE_LOG=1)
 add_definitions(-D_ENABLE_DATA_DEBUG=1)
 add_definitions(-D_ENABLE_CORE_DEBUG=1)
 
-include_directories(lib)
+FIND_PACKAGE(Boost COMPONENTS filesystem regex system)
+include_directories(${Boost_INCLUDE_DIR}  lib)
 
 add_subdirectory(lib)
 add_subdirectory(tests)
