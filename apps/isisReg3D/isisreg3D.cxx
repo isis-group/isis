@@ -18,15 +18,16 @@
 //via command parser include
 #include "viaio/option.h"
 #include "viaio/mu.h" //this is required for VNumber
-VDictEntry TYPMetric[] = { {"MattesMutualInformation", 0}, {"ViolaWellsMutualInformation", 1}, {
-    "NormalizedCorrelation", 2}, {NULL}};
+VDictEntry TYPMetric[] = { {"MattesMutualInformation", 0}, {"MutualInformationHistogram", 1}, {"NormalizedCorrelation",
+    2}, {"MeanSquare", 3}, {NULL}};
 
 VDictEntry TYPTransform[] = { {"Rigid", 0}, {"Affine", 1}, {"BSplineDeformable", 2}, {"CenteredAffine", 3}, {
     "QuaternionRigid", 4}, {"EulerRigid", 5}, {NULL}};
 
 VDictEntry TYPInterpolator[] = { {"Linear", 0}, {"BSpline", 1}, {NULL}};
 
-VDictEntry TYPOptimizer[] = { {"RegularStepGradientDescent", 0}, {"VersorRigid", 1}, {"LBFGSB", 2}, {NULL}};
+VDictEntry TYPOptimizer[] = { {"RegularStepGradientDescent", 0}, {"VersorRigid", 1}, {"LBFGSB", 2}, {"Amoeba", 3}, {
+    NULL}};
 
 //command line parser options
 static VString ref_filename = NULL;
@@ -105,31 +106,6 @@ int main(
 		exit(1);
 	}
 
-	std::cout << "setting up the registration object..." << std::endl;
-
-	//check pixel density
-	if(pixel_density <= 0) {
-		std::cerr << "wrong pixel density...set to 0.01" << std::endl;
-		pixel_density = 0.01;
-	}
-	if(pixel_density >= 1) {
-		std::cerr << "metric uses all pixels" << std::endl;
-	}
-
-	//check grid size
-	if(grid_size <= 4) {
-		std::cerr << "\ngrid size has to be bigger than 4...setting grid size to 5\n" << std::endl;
-		grid_size = 5;
-	}
-
-	//check combinations of components
-	if((optimizerType == 1 and transformType != 0)) {
-		std::cerr
-		        << "\nInappropriate combination of transform and optimizer! Setting optimizer to RegularStepGradientDescent.\n"
-		        << std::endl;
-		optimizerType = 0;
-	}
-
 	typedef short InputPixelType;
 	typedef short OutputPixelType;
 	const unsigned int Dimension = 3;
@@ -163,6 +139,31 @@ int main(
 
 	RegistrationFactoryType::Pointer registrationFactory = RegistrationFactoryType::New();
 
+	std::cout << "setting up the registration object..." << std::endl;
+
+	//check pixel density
+	if(pixel_density <= 0) {
+		std::cerr << "wrong pixel density...set to 0.01" << std::endl;
+		pixel_density = 0.01;
+	}
+	if(pixel_density >= 1) {
+		std::cerr << "metric uses all pixels" << std::endl;
+	}
+
+	//check grid size
+	if(grid_size <= 4) {
+		std::cerr << "\ngrid size has to be bigger than 4...setting grid size to 5\n" << std::endl;
+		grid_size = 5;
+	}
+
+	//check combinations of components
+	if((optimizerType == 1 and transformType != 0)) {
+		std::cerr
+		        << "\nInappropriate combination of transform and optimizer! Setting optimizer to RegularStepGradientDescent.\n"
+		        << std::endl;
+		optimizerType = 0;
+	}
+
 	//transform setup
 	std::cout << "used transform: " << TYPTransform[transformType].keyword << std::endl;
 	switch(transformType) {
@@ -190,16 +191,18 @@ int main(
 	std::cout << "used metric: " << TYPMetric[metricType].keyword << std::endl;
 	switch(metricType) {
 	case 0:
-		registrationFactory->SetMetric(RegistrationFactoryType::MattesMutualInformation);
+		registrationFactory->SetMetric(RegistrationFactoryType::MattesMutualInformationMetric);
 		break;
-
 	case 1:
-		registrationFactory->SetMetric(RegistrationFactoryType::ViolaWellsMutualInformation);
+		registrationFactory->SetMetric(RegistrationFactoryType::MutualInformationHistogramMetric);
+		break;
+	case 2:
+		registrationFactory->SetMetric(RegistrationFactoryType::NormalizedCorrelationMetric);
+		break;
+	case 3:
+		registrationFactory->SetMetric(RegistrationFactoryType::MeanSquareMetric);
 		break;
 
-	case 2:
-		registrationFactory->SetMetric(RegistrationFactoryType::NormalizedCorrelation);
-		break;
 	}
 
 	//interpolator setup
@@ -224,6 +227,9 @@ int main(
 		break;
 	case 2:
 		registrationFactory->SetOptimizer(RegistrationFactoryType::LBFGSBOptimizer);
+		break;
+	case 3:
+		registrationFactory->SetOptimizer(RegistrationFactoryType::AmoebaOptimizer);
 		break;
 	}
 

@@ -41,5 +41,5 @@ ADD_EXECUTABLE(isisreg3d
 	)
 
 # link versus ITK library
-TARGET_LINK_LIBRARIES(isisreg3d  ITKIO ITKSpatialObject ITKNumerics viaio)
+TARGET_LINK_LIBRARIES(isisreg3d  ITKIO ITKSpatialObject ITKNumerics ITKStatistics viaio)
 
