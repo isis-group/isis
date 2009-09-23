@@ -482,7 +482,7 @@ typename RegistrationFactory3D<TFixedImageType, TMovingImageType>::OutputImagePo
 template<class TFixedImageType, class TMovingImageType>
 typename RegistrationFactory3D<TFixedImageType, TMovingImageType>::ConstTransformPointer RegistrationFactory3D<
         TFixedImageType, TMovingImageType>::GetTransform(
-    void) const {
+    void) {
 
 	return m_RegistrationObject->GetOutput()->Get();
 }
@@ -582,8 +582,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetFixedImageMask
 	if(metric.VIOLAWELLSMUTUALINFORMATION) {
 		m_ViolaWellsMutualInformationMetric->SetFixedImageMask(m_MovingImageMaskObject);
 	}
-	if(metric.MUTUALINFORMATIONHISTOGRAM)
-	{
+	if(metric.MUTUALINFORMATIONHISTOGRAM) {
 		m_MutualInformationHistogramMetric->SetFixedImageMask(m_MovingImageMaskObject);
 	}
 

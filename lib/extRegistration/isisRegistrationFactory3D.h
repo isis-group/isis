@@ -251,7 +251,7 @@ public:
 	OutputImagePointer GetRegisteredImage(
 	    void);
 	ConstTransformPointer GetTransform(
-	    void) const;
+	    void);
 
 protected:
 	void PrintResults(
