@@ -27,7 +27,7 @@ public:
 	 * Creates and stores a value from any known type.
 	 * If the type is not known (there is no Type\<type\> available) an compiler error will be raised.
 	 */ 
-	template<typename T> PropertyValue(const T& ref,bool _needed = false):_internal::TypeContainer(new Type<T>(ref)),m_needed(_needed{ }
+	template<typename T> PropertyValue(const T& ref,bool _needed = false):_internal::TypeContainer(new Type<T>(ref)),m_needed(_needed){ }
 	/**
 	 * Empty constructor.
 	 * Creates an empty property value. So PropertyValue().empty() is allways true;

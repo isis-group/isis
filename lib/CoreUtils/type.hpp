@@ -125,7 +125,7 @@ public:
  * The values (Type or TypePtr) are refernced as smart pointers to TypeBase.
  * So the references are counted and data are automatically deleted if necessary.
  * The usual dereferencing pointer interface ("*" and "->") is supported.
- * This class designed as base class for specialsations, it should not be used directly.
+ * This class is designed as base class for specialisations, it should not be used directly.
  * Because of that, the contructors of this class are protected.
  */
 class TypeContainer:public boost::shared_ptr<TypeBase>{
@@ -224,6 +224,9 @@ public:
 	 * If ptr is a pointer to C++ objects (delete[] needed) you must use 
 	 * TypePtr(ptr,len,TypePtr\<TYPE\>::ObjectArrayDeleter())!
 	 * The usual dereferencing pointer interface ("*" and "->") is supported.
+	 * \param ptr the pointer to the used array
+	 * \param len the length of the used array (TypePtr does NOT check for length, 
+	 * this is just here for child classes which may want to check)
 	 */
 	TypePtr(TYPE* ptr,size_t len):m_val(ptr,BasicDeleter()),m_len(len){}
 	/**
@@ -231,6 +234,9 @@ public:
 	 * The pointers are automatically deleted by an copy of d and should not be used outside once used here.
 	 * The usual dereferencing pointer interface ("*" and "->") is supported.
 	 * D must implement operator()(TYPE *p).
+	 * \param ptr the pointer to the used array
+	 * \param len the length of the used array (TypePtr does NOT check for length,
+	 * \param d the deleter to be used when the data shall be deleted ( d() is called then )
 	 */
 	template<typename D> TypePtr(TYPE* ptr,size_t len,D d):m_val(ptr,d),m_len(len){}
 	/// @copydoc Type::is()
@@ -265,10 +271,13 @@ public:
 	/**
 	 * Reference element at at given index.
 	 * If index is invalid, behaviour is undefined. Probably it will crash.
-	 * If _ENABLE_DATA_DEBUG is true, an error message will be send (but it will still crash).
+	 * If _ENABLE_CORE_DEBUG is true, an error message will be send (but it will still crash).
 	 * \return reference to element at at given index.
 	 */
 	TYPE& operator[](size_t idx){
+		MAKE_LOG(CoreDebug);
+		if(idx>=m_len)
+			LOG(CoreDebug,error) << "Index " << idx << " is out of range (0-" << m_len-1 << ")" << std::endl;
 		return (m_val.get())[idx];
 	}
 	/**

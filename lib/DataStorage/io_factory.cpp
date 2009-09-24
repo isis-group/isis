@@ -21,7 +21,8 @@ bool IOFactory::registerFormat(FileFormatPtr plugin){
 	io_formats.push_back(plugin);
 	std::list<std::string> suffixes=getSuffixes(plugin);
 	LOG(DataLog,::isis::util::info)
-		<< "Registering " << (plugin->tainted() ? "tainted " :"") << "io-plugin \"" << plugin->name()
+		<< "Registering " << (plugin->tainted() ? "tainted " :"") << "io-plugin \"" 
+		<< ::isis::util::MSubject(plugin->name())
 		<< "\" with " << suffixes.size() << " supported suffixes" << std::endl;
 
 	BOOST_FOREACH(std::string &it,suffixes)
