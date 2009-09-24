@@ -83,7 +83,8 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = 
+INPUT                  = lib \
+                         /usr/include/boost/shared_ptr.hpp
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = 
 RECURSIVE              = YES

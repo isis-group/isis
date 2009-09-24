@@ -122,6 +122,11 @@ public:
 
 /**
  * Base class to store and handle references to Type and TypePtr objects.
+ * The values (Type or TypePtr) are refernced as smart pointers to TypeBase.
+ * So the references are counted and data are automatically deleted if necessary.
+ * The usual dereferencing pointer interface ("*" and "->") is supported.
+ * This class designed as base class for specialsations, it should not be used directly.
+ * Because of that, the contructors of this class are protected.
  */
 class TypeContainer:public boost::shared_ptr<TypeBase>{
 protected:
@@ -184,7 +189,12 @@ public:
 	virtual ~Type(){}
 };
 
-/// Generic class for type (and length) - aware pointers
+/**
+ * Generic class for type (and length) - aware pointers.
+ * The class is designed for arrays, but you can also "point" to an single element
+ * by just use "1" for the length.
+ * The pointers are reference counted and will be deleted automatically by a customizable deleter.
+ */
 template<typename TYPE> class TypePtr: public _internal::TypeBase{
 	boost::shared_ptr<TYPE> m_val;
 	static std::string m_typeName;
@@ -192,6 +202,7 @@ template<typename TYPE> class TypePtr: public _internal::TypeBase{
 	const size_t m_len;
 	template<typename T> TypePtr(const Type<T>& value); // Dont do this
 public:
+	/// Default delete-functor for c-arrays (uses free()).
 	struct BasicDeleter{
 		virtual void operator()(TYPE *p){
 			MAKE_LOG(CoreDebug);
@@ -199,18 +210,34 @@ public:
 			free(p);
 		};
 	};
+	/// Default delete-functor for arrays of objects (uses delete[]).
 	struct ObjectArrayDeleter{
 		virtual void operator()(TYPE *p){
 			MAKE_LOG(CoreDebug);
-			LOG(CoreDebug,info) << "Deleting object " << p << " (" << TypePtr<TYPE>::staticName() << ") " << std::endl;
-			delete p;
+			LOG(CoreDebug,info) << "Deleting object array at " << p << " (" << TypePtr<TYPE>::staticName() << ") " << std::endl;
+			delete[] p;
 		};
 	};
+	/**
+	 * Creates TypePtr from a pointer of type TYPE.
+	 * The pointers are automatically deleted by an instance of BasicDeleter and should not be used outside once used here.
+	 * If ptr is a pointer to C++ objects (delete[] needed) you must use 
+	 * TypePtr(ptr,len,TypePtr\<TYPE\>::ObjectArrayDeleter())!
+	 * The usual dereferencing pointer interface ("*" and "->") is supported.
+	 */
 	TypePtr(TYPE* ptr,size_t len):m_val(ptr,BasicDeleter()),m_len(len){}
+	/**
+	 * Creates TypePtr from a pointer of type TYPE.
+	 * The pointers are automatically deleted by an copy of d and should not be used outside once used here.
+	 * The usual dereferencing pointer interface ("*" and "->") is supported.
+	 * D must implement operator()(TYPE *p).
+	 */
 	template<typename D> TypePtr(TYPE* ptr,size_t len,D d):m_val(ptr,d),m_len(len){}
+	/// @copydoc Type::is()
 	virtual bool is(const std::type_info & t)const{
 		return t==typeid(TYPE*);
 	}
+	/// @copydoc Type::toString()
 	virtual std::string toString(bool labeled=false)const{
 		std::string ret;
 		if(m_len){
@@ -222,13 +249,17 @@ public:
 		//@todo implement me
 		return boost::lexical_cast<std::string>(m_len) +"#"+ret;
 	}
+	/// @copydoc Type::typeName()
 	virtual std::string typeName()const{
 		return staticName();
 	}
+	/// @copydoc Type::typeID()
 	virtual unsigned short typeID()const{
 		return staticId();
 	}
+	/// @copydoc Type::staticID()
 	static unsigned short staticId(){return m_typeID;}
+	/// @copydoc Type::staticName()
 	static std::string staticName(){return m_typeName;}
 	
 	/**
@@ -242,7 +273,8 @@ public:
 	}
 	/**
 	 * Implicit conversion to boost::shared_ptr\<TYPE\>
-	 * The returned smart pointer will be part of the reference-counting and will correctly delete the data if required.
+	 * The returned smart pointer will be part of the reference-counting and will correctly delete the data 
+	 * (using the given deleter) if required.
 	 * \return boost::shared_ptr\<TYPE\> handling same data as the object.
 	 */
 	operator boost::shared_ptr<TYPE>(){return m_val;}
