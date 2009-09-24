@@ -15,14 +15,14 @@
 BOOST_AUTO_TEST_CASE(property_init_test) {
 
 	//	default constructor
-	isis::util::Property propZero;
+	isis::util::PropertyValue propZero;
 
 	//	initializer
-	isis::util::Property propA = std::string("Property01");
+	isis::util::PropertyValue propA = std::string("Property01");
 	BOOST_CHECK(propA->toString().compare("Property01") == 0);
 
 	//	copy constructor
-	isis::util::Property propB = propA;
+	isis::util::PropertyValue propB = propA;
 	BOOST_CHECK(propB->toString().compare("Property01") == 0);
 
 	//	default: not needed
