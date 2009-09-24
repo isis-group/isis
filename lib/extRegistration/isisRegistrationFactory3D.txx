@@ -614,7 +614,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::PrintResults(
 		std::cout << "Metric value: " << m_LBFGSBOptimizer->GetValue() << std::endl;
 
 	}
-
+	std::cout << m_RegistrationObject->GetOptimizer()->GetCurrentPosition() << std::endl;
 }
 
 template<class TFixedImageType, class TMovingImageType>
