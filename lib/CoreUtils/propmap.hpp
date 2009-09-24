@@ -13,7 +13,7 @@ namespace isis{
  */
 namespace util{
 
-class PropMap : public std::map<std::string,Property>{};
+class PropMap : public std::map<std::string,PropertyValue>{};
 
 }
 /** @} */

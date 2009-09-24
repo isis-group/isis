@@ -13,10 +13,10 @@ int main(int argc, char *argv[]){
 
 	ENABLE_LOG(CoreLog,DefaultMsgPrint,info);
 
-	Property a=std::string("Hallo");
+	PropertyValue a=std::string("Hallo");
 	std::cout << a->toString(true) << std::endl;
 
-	Property b=a;
+	PropertyValue b=a;
 	std::cout << b->toString(true) << std::endl;
 
 	b=5.2;
