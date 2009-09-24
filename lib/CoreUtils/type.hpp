@@ -26,6 +26,7 @@ template<typename TYPE> TYPE __cast_to(Type<TYPE> *dest,const TYPE& value){
 }
 
 class TypeBase{
+protected:
 	template<typename T> const T m_cast_to(T defaultVal) const{
 		MAKE_LOG(CoreLog);
 		const T* ret=dynamic_cast<const T* >(this);
@@ -252,7 +253,6 @@ public:
 				ret+=Type<TYPE>(ptr[i]).toString(false)+"|";
 			ret+=Type<TYPE>(ptr[m_len-1]).toString(true);
 		}
-		//@todo implement me
 		return boost::lexical_cast<std::string>(m_len) +"#"+ret;
 	}
 	/// @copydoc Type::typeName()

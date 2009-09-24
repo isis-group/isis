@@ -85,6 +85,17 @@ public:
 /// @endcond
 
 class Chunks:public std::list< ::isis::util::_internal::TypeContainer>{
+public:
+	template<typename T> iterator add(const _internal::ChunkBase<T> &chunk){
+		push_back(::isis::util::_internal::TypeContainer(new _internal::ChunkBase<T>(chunk)));
+	}
+	template<typename T> static T& getAs(iterator it){
+		::isis::util::_internal::TypeContainer &cont=*it;
+		return cont->m_cast_to<T>();
+	}
+	template<typename T> static _internal::ChunkBase<T> &getChunk(iterator it){
+		return getAs<_internal::ChunkBase<T> >();
+	}
 };
 
 /**

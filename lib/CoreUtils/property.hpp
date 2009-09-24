@@ -26,11 +26,15 @@ public:
 	 * Default constructor.
 	 * Creates and stores a value from any known type.
 	 * If the type is not known (there is no Type\<type\> available) an compiler error will be raised.
+	 * \param ref the value to be stored
+	 * \param _needed flag if this PropertyValue is needed an thus not allowed to be empty (a.k.a. undefined)
 	 */ 
 	template<typename T> PropertyValue(const T& ref,bool _needed = false):_internal::TypeContainer(new Type<T>(ref)),m_needed(_needed){ }
 	/**
 	 * Empty constructor.
-	 * Creates an empty property value. So PropertyValue().empty() is allways true;
+	 * Creates an empty property value. So PropertyValue().empty() will allways be true.
+	 * \param ref the value to be stored
+	 * \param _needed flag if this PropertyValue is needed an thus not allowed to be empty (a.k.a. undefined)
 	 */
 	PropertyValue(bool _needed = false):m_needed(_needed){ }
 	/**
