@@ -32,7 +32,7 @@ namespace data {
 class IOFactory
 {
 public:
-	typedef boost::shared_ptr<FileFormat> FileFormatPtr;
+	typedef boost::shared_ptr< ::isis::image_io::FileFormat> FileFormatPtr;
 	typedef std::list<FileFormatPtr> FileFormatList;
 private:
 	typedef std::map<std::string, FileFormatPtr> FormatFormatMap;

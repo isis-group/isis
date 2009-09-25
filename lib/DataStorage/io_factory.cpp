@@ -51,13 +51,13 @@ unsigned int IOFactory::findPlugins(std::string path){
 			const std::string pluginName=itr->path().string();
 			void *handle=dlopen(pluginName.c_str(),RTLD_NOW);
 			if(handle){
-				isis::data::FileFormat* (*factory_func)() = (isis::data::FileFormat* (*)())dlsym(handle,"factory");
+				isis::image_io::FileFormat* (*factory_func)() = (isis::image_io::FileFormat* (*)())dlsym(handle,"factory");
 				if (factory_func){
 					FileFormatPtr io_class(factory_func());
 					if(registerFormat(io_class))
 						ret++;
 					else
-						LOG(DataLog,::isis::util::error) << "invalid image format" << std::endl;
+						LOG(DataLog,::isis::util::error) << "failed to register plugin " << isis::util::MSubject(pluginName) << std::endl;
 					  
 				} else
 					LOG(DataLog,::isis::util::error)

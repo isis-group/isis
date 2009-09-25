@@ -5,15 +5,15 @@
 #include <string>
 #include "chunk.hpp"
 
-namespace isis{ namespace data{
+namespace isis{ namespace image_io{
 class FileFormat {
 public:
 	virtual std::string name()=0;
 	virtual std::string suffixes()=0;
 	virtual std::string dialects()=0;
 	virtual bool tainted(){return true;}
-	virtual ChunkList load(std::string filename,std::string dialect)=0;
-	virtual bool save(const ChunkList &chunks,std::string filename,std::string dialect)=0;
+	virtual ::isis::data::ChunkList load(std::string filename,std::string dialect)=0;
+	virtual bool save(const ::isis::data::ChunkList &chunks,std::string filename,std::string dialect)=0;
 };
 }}
 #else
@@ -26,7 +26,7 @@ extern "C" {
 #endif
 	
 #if defined(__STDC__) || defined(__cplusplus)
-	extern isis::data::FileFormat* factory();
+	extern isis::image_io::FileFormat* factory();
 #else
 	extern FileFormat* factory();
 #endif
