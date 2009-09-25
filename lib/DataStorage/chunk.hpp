@@ -34,12 +34,10 @@ namespace isis{
 
 namespace data{
 
-/// @cond _internal
-namespace _internal{
 /**
- * Base class for four-dimensional random-access data blocks.
+ * Main class for four-dimensional random-access data blocks.
  */
-template<typename TYPE> class ChunkBase : public ::isis::util::TypePtr<TYPE>{
+template<typename TYPE> class Chunk : public ::isis::util::TypePtr<TYPE>{
 	size_t fourthSize,thirdSize,secondSize,firstSize;
 	inline size_t dim2index(size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim)const{
 		return	firstDim + secondDim*firstSize + thirdDim*secondSize*firstSize+
@@ -51,7 +49,7 @@ protected:
 	 * \param src is a pointer to the existing data. This data will automatically be deleted. So don't use this pointer afterwards.
 	 * \param d is the deleter to be used for deletion of src. It must define operator(TYPE *), which than shall free the given pointer.
 	 */
-	template<typename D> ChunkBase(TYPE* src,D d,size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim): 
+	template<typename D> Chunk(TYPE* src,D d,size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim):
 	::isis::util::TypePtr<TYPE>(src,fourthDim*thirdDim*secondDim*firstDim,d),
 	fourthSize(fourthDim),thirdSize(thirdDim),secondSize(secondDim),firstSize(firstDim){
 		MAKE_LOG(DataDebug);
@@ -75,36 +73,36 @@ public:
 		}
 		return this->operator[](dim2index(fourthDim,thirdDim,secondDim,firstDim));
 	}
-	template<typename S> bool copyTo(const ChunkBase<S> &src)const{
-		//@todo implement me
-	}
 	::isis::util::PropMap properties;
 };
 
+/// @cond _internal
+namespace _internal{
+class ChunkReference : public ::isis::util::_internal::TypeReference{
+public:
+	template<typename T> ChunkReference(const Chunk<T> &src) :
+	::isis::util::_internal::TypeReference(new Chunk<T>(src)){}
+	template<typename T> Chunk<T>& getAs(){
+		return dynamic_cast<Chunk<T>& >((*this)->cast_to_TypePtr<T>());
+	}
+};
 }
 /// @endcond
 
-class Chunks:public std::list< ::isis::util::_internal::TypeContainer>{
+class Chunks:public std::list< _internal::ChunkReference>{
 public:
-	template<typename T> iterator add(const _internal::ChunkBase<T> &chunk){
-		push_back(::isis::util::_internal::TypeContainer(new _internal::ChunkBase<T>(chunk)));
-	}
-	template<typename T> static T& getAs(iterator it){
-		::isis::util::_internal::TypeContainer &cont=*it;
-		return cont->m_cast_to<T>();
-	}
-	template<typename T> static _internal::ChunkBase<T> &getChunk(iterator it){
-		return getAs<_internal::ChunkBase<T> >();
+	template<typename T> iterator add(const Chunk<T> &chunk){
+		push_back(_internal::ChunkReference(chunk));
 	}
 };
 
 /**
  * Chunk class for memory-based buffers
  */
-template<typename TYPE> class MemChunk : public _internal::ChunkBase<TYPE>{
+template<typename TYPE> class MemChunk : public Chunk<TYPE>{
 public:
 	MemChunk(size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim): 
-	_internal::ChunkBase<TYPE>( 
+	Chunk<TYPE>(
 		(TYPE*)malloc(sizeof(TYPE)*fourthDim*thirdDim*secondDim*firstDim),
 		typename ::isis::util::TypePtr<TYPE>::BasicDeleter(),
 		fourthDim,thirdDim,secondDim,firstDim

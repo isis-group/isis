@@ -53,14 +53,21 @@ int main(){
 	TypePtr<int> p((int*)calloc(5,sizeof(int)),5,SpeakingDeleter("Rolf"));
 	std::cout << "p.toString():" <<  p.toString() << std::endl;
 
-	MemChunk<short> a(1,1,1,10);
 	const short x[]={1,2,3,4};
 	FixedVector<short,4> v(x);
 	
 	std::cout << "v.toString():" << v.toString() << std::endl;
-	
-	a[5]=5;
-	std::cout << "a(0,0,0,5):" << a(0,0,0,5) << std::endl;
-	std::cout << "a.toString():" << a.toString() << std::endl;
-	a(3,0,0,5)=3;//fail (may crash or not)
+
+	Chunks list;
+	{
+		MemChunk<short> a(1,1,1,10);
+		list.add(a);
+		a[5]=5;
+		std::cout << "a(0,0,0,5):" << a(0,0,0,5) << std::endl;
+		std::cout << "a.toString():" << a.toString() << std::endl;
+		a(3,0,0,5)=3;//fail (may crash or not)
+	}
+	Chunk<short> &ref=list.begin()->getAs<short>();
+	std::cout << "ref(0,0,0,5):" << ref(0,0,0,5) << std::endl;
+	std::cout << "ref.toString():" << ref.toString() << std::endl;
 }

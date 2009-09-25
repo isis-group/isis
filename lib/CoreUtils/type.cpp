@@ -2,9 +2,9 @@
 
 namespace isis{ namespace util{ namespace _internal{
 
-TypeContainer::TypeContainer(TypeBase *t):boost::shared_ptr <_internal::TypeBase >(t){}
-TypeContainer::TypeContainer(){}
-bool TypeContainer::empty(){
+TypeReference::TypeReference(TypeBase *t):boost::shared_ptr <_internal::TypeBase >(t){}
+TypeReference::TypeReference(){}
+bool TypeReference::empty(){
 	return get()!=NULL;
 }
 

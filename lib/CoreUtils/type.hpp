@@ -41,7 +41,7 @@ protected:
 		MAKE_LOG(CoreLog);
 		T* ret=dynamic_cast<T* >(this);
 		if(!ret){
-			LOG(CoreLog,0) << "Cannot cast " << typeName() << " to " << T::staticName() << ". Throwing bad_cast"<< std::endl;
+			LOG(CoreLog,error) << "Cannot cast " << typeName() << " to " << T::staticName() << ". Throwing bad_cast"<< std::endl;
 			throw(std::bad_cast());
 		}
 		return *ret;
@@ -129,11 +129,11 @@ public:
  * This class is designed as base class for specialisations, it should not be used directly.
  * Because of that, the contructors of this class are protected.
  */
-class TypeContainer:public boost::shared_ptr<TypeBase>{
+class TypeReference:public boost::shared_ptr<TypeBase>{
 protected:
 	//dont use this directly
-	TypeContainer(TypeBase *t);
-	TypeContainer();
+	TypeReference(TypeBase *t);
+	TypeReference();
 public:
 	/// \returns true if "contained" type has no value (a.k.a. is undefined)
 	bool empty();
@@ -271,13 +271,9 @@ public:
 	/**
 	 * Reference element at at given index.
 	 * If index is invalid, behaviour is undefined. Probably it will crash.
-	 * If _ENABLE_CORE_DEBUG is true, an error message will be send (but it will still crash).
 	 * \return reference to element at at given index.
 	 */
 	TYPE& operator[](size_t idx){
-		MAKE_LOG(CoreDebug);
-		if(idx>=m_len)
-			LOG(CoreDebug,error) << "Index " << idx << " is out of range (0-" << m_len-1 << ")" << std::endl;
 		return (m_val.get())[idx];
 	}
 	/**
