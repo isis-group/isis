@@ -83,15 +83,12 @@ protected:
 	 *
 	 * @return true if registration was successful, false otherwise
 	 * */
-	bool registerFormat(
-	    FileFormatPtr plugin);
-	unsigned int findPlugins(
-	    std::string path);
+	bool registerFormat(FileFormatPtr plugin);
+	unsigned int findPlugins(std::string path);
 private:
 	std::map<std::string, FileFormatList> io_suffix;
 	IOFactory();//shall not be created directly
-	IOFactory& operator =(
-	    IOFactory&); //dont do that
+	IOFactory& operator =(IOFactory&); //dont do that
 };
 
 }

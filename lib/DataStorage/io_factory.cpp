@@ -1,7 +1,7 @@
 #include "io_factory.hpp"
 #include <dlfcn.h>
 #include <iostream>
-#include <CoreUtils/log.hpp>
+#include "CoreUtils/log.hpp"
 #include "common.hpp"
 #include <boost/filesystem.hpp>
 #include <boost/regex.hpp>

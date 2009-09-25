@@ -59,7 +59,7 @@ protected:
 	}
 public:
 	/**
-	Returns reference to the element at at given index.
+	Returns reference to the element at a given index.
 	If index is invalid, behaviour is undefined. Most probably it will crash.
 	If _ENABLE_DATA_DEBUG is true an error message will be send (but it will still crash).
 	*/
@@ -80,8 +80,8 @@ public:
 namespace _internal{
 class ChunkReference : public ::isis::util::_internal::TypeReference{
 public:
-	template<typename T> ChunkReference(const Chunk<T> &src) :
-	::isis::util::_internal::TypeReference(new Chunk<T>(src)){}
+	template<typename T> ChunkReference(const Chunk<T> &src) : ::isis::util::_internal::TypeReference(new Chunk<T>(src)){}
+	
 	template<typename T> Chunk<T>& getAs(){
 		return dynamic_cast<Chunk<T>& >((*this)->cast_to_TypePtr<T>());
 	}

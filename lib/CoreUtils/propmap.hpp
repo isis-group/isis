@@ -3,6 +3,7 @@
 
 #include <map>
 #include <string>
+#include <ostream>
 
 #include "property.hpp"
 
@@ -20,8 +21,18 @@ class PropMap : public std::map<std::string,PropertyValue>{};
 }
 
 //make PropMap printable
-namespace boost{namespace detail{
-	template<> bool lexical_stream<std::string, isis::util::PropMap, std::ostringstream::traits_type>::operator<<(const isis::util::PropMap& s);
-}}
+namespace std {
+template<typename charT, typename traits> basic_ostream<charT, traits>& 
+operator<<(basic_ostream<charT, traits> &out,const isis::util::PropMap& s){
+	isis::util::PropMap::const_iterator i=s.begin();
+	if(i!=s.end()){
+		out << i->first << ": " << i->second->toString(true);
+		for(i++;i!=s.end();i++){
+			out << std::endl << i->first << ": " << i->second->toString(true);
+		}
+	}
+	return out;
+}
+}
 
 #endif
