@@ -73,7 +73,7 @@ unsigned int IOFactory::findPlugins(std::string path){
 	return ret;
 }
 
-std::list<std::string> IOFactory::getSuffixes(FileFormatPtr reader){
+std::list<std::string> IOFactory::getSuffixes(const FileFormatPtr& reader){
 	const boost::sregex_token_iterator token_begin=boost::make_regex_token_iterator(reader->suffixes(), boost::regex("\\s+"), -1);
 	const boost::sregex_token_iterator token_end;
 
@@ -85,4 +85,16 @@ IOFactory& IOFactory::get(){
 	return ret;
 }
 
-}}
+isis::data::Chunks IOFactory::createImage(
+		const std::string& strFilename){
+
+	for(std::list<FileFormatPtr>::const_iterator it = io_formats.begin(); it != io_formats.end(); it++) {
+		return (*it)->load(strFilename, "");
+
+		}
+
+
+}
+
+
+}} // namespaces data isis
