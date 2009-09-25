@@ -62,7 +62,7 @@ public:
 	 *
 	 *@return image object
 	 * */
-	Chunks createImage(
+	ChunkList createImage(
 		const std::string& strFilename);
 
 

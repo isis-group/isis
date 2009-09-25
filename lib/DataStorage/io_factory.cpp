@@ -11,7 +11,7 @@ namespace isis{ namespace data{
 
 IOFactory::IOFactory(){
 	MAKE_LOG(DataDebug);
-	findPlugins(std::string(BUILD_PATH)+ "/lib/ImageIO");
+	findPlugins(std::string(BUILD_PATH));
 }
 
 bool IOFactory::registerFormat(FileFormatPtr plugin){
@@ -46,6 +46,7 @@ unsigned int IOFactory::findPlugins(std::string path){
 	boost::regex pluginFilter(std::string("^")+DL_PREFIX+"isisImageFormat_"+"[[:word:]]+"+DL_SUFFIX+"$");
 	unsigned int ret=0;
 	for (boost::filesystem::directory_iterator itr(p); itr!=boost::filesystem::directory_iterator(); ++itr)	{
+		if(boost::filesystem::is_directory(*itr))continue;
 		if(boost::regex_match(itr->path().leaf(),pluginFilter)){
 			const std::string pluginName=itr->path().string();
 			void *handle=dlopen(pluginName.c_str(),RTLD_NOW);
@@ -85,7 +86,7 @@ IOFactory& IOFactory::get(){
 	return ret;
 }
 
-isis::data::Chunks IOFactory::createImage(
+isis::data::ChunkList IOFactory::createImage(
 		const std::string& strFilename){
 
 	for(std::list<FileFormatPtr>::const_iterator it = io_formats.begin(); it != io_formats.end(); it++) {

@@ -34,15 +34,29 @@ BOOST_AUTO_TEST_CASE(type_init_test) {
 	}
 	// see if an exception was thrown
 	BOOST_CHECK_MESSAGE(catched,
-		"no std::bad_cast exception was thrown");
+						 "no std::bad_cast exception was thrown from Type<int>(3.1415)");
 
 	// an implicit cast from the string representation
 	// should produce a type with the same value if the type
-	// is the same.
+	// is the same (its just a lexical cast like any other).
 	Type<int> x(42);
 	Type<int> y(x.toString(false));
-
+	
 	BOOST_CHECK((int)x == (int)y);
+	
+	Type<float> f(42.2);
+	try {
+		// this conversion shouldn't work, since float 
+		// can't be lexical casted to int.
+		// (even if its encoded as string)
+		Type<int> tError(f.toString(false));
+	} catch(std::bad_cast) {
+		catched = true;
+	}
+
+	// see if an exception was thrown
+	BOOST_CHECK_MESSAGE(catched,
+		"no std::bad_cast exception was thrown");
 }
 
 // TestCase toString()

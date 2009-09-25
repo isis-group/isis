@@ -58,7 +58,7 @@ int main(){
 	
 	std::cout << "v.toString():" << v.toString() << std::endl;
 
-	Chunks list;
+	ChunkList list;
 	{
 		MemChunk<short> a(1,1,1,10);
 		list.add(a);

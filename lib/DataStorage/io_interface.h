@@ -12,8 +12,8 @@ public:
 	virtual std::string suffixes()=0;
 	virtual std::string dialects()=0;
 	virtual bool tainted(){return true;}
-	virtual Chunks load(std::string filename,std::string dialect)=0;
-	virtual bool save(const Chunks &chunks,std::string filename,std::string dialect)=0;
+	virtual ChunkList load(std::string filename,std::string dialect)=0;
+	virtual bool save(const ChunkList &chunks,std::string filename,std::string dialect)=0;
 };
 }}
 #else

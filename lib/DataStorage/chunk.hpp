@@ -89,7 +89,7 @@ public:
 }
 /// @endcond
 
-class Chunks:public std::list< _internal::ChunkReference>{
+class ChunkList:public std::list< _internal::ChunkReference>{
 public:
 	template<typename T> iterator add(const Chunk<T> &chunk){
 		push_back(_internal::ChunkReference(chunk));

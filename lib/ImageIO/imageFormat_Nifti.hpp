@@ -31,54 +31,27 @@
 // FORWARD REFERENCES
 //
 
+namespace isis{ namespace image_io{ 
 
 class ImageFormatNii : public isis::data::FileFormat
 {
 public:
-	// LIFECYCLE
-
-	/** Default constructor.
-	 */
-	ImageFormatNii(void);
-	/** Destructor.
-	 */
-	~ImageFormatNii(void);
-
-
 	// OPERATIONS
 
 	std::string name();
 	std::string suffixes();
 	std::string dialects();
 	bool tainted(){return false;}//internal plugins are not tainted
-	isis::data::Chunks load(std::string filename,std::string dialect);
-	bool save(const isis::data::Chunks &chunks,std::string filename,std::string dialect);
+	isis::data::ChunkList load(std::string filename,std::string dialect);
+	bool save(const isis::data::ChunkList &chunks,std::string filename,std::string dialect);
 	// ACCESS
 	// INQUIRY
 
-
-
-protected:
-private:
-
-	/** Copy constructor.
-	 * @param from The value to copy to this object.
-	 */
-	ImageFormatNii(const ImageFormatNii& from);
-
-
-	// OPERATORS
-
-	/** Assignment operator.
-	 * @param from The value to assign to this object.
-	 * @return A reference to this object.
-	 */
-	ImageFormatNii& operator=(const ImageFormatNii&);
-
 };
+}}
 
 isis::data::FileFormat* factory(){
-  return new ImageFormatNii();
+  return new isis::image_io::ImageFormatNii();
 }
 
 // EXTERNAL REFERENCES
