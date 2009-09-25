@@ -23,7 +23,8 @@
 
 // PROJECT INCLUDES
 //
-#include "DataStorage/ImageFormat.h"
+#include <DataStorage/io_interface.h>
+
 // LOCAL INCLUDES
 //
 
@@ -31,53 +32,27 @@
 //
 
 
-class ImageFormatNii : public ImageFormat
+class ImageFormatNii : public isis::data::FileFormat
 {
 public:
 	// LIFECYCLE
 
-	//
-	/*Creator function
-	 * */
-	static ImageFormat* CreateImageFormatNii(){
-		return new ImageFormatNii;};
-
-
 	/** Default constructor.
 	 */
-
-	ImageFormatNii(
-	    void);
-
-	/** Copy constructor.
-	 *
-	 * @param from The value to copy to this object.
-	 */
-	ImageFormatNii(
-	    const ImageFormatNii& from);
-
+	ImageFormatNii(void);
 	/** Destructor.
 	 */
-	~ImageFormatNii(
-	    void);
+	~ImageFormatNii(void);
 
-	// OPERATORS
-
-	/** Assignment operator.
-	 *
-	 * @param from The value to assign to this object.
-	 *
-	 * @return A reference to this object.
-	 */
-	ImageFormatNii& operator=(
-	    const ImageFormatNii& from);
 
 	// OPERATIONS
 
-
-	virtual bool ImageFormatIsFunny();
-	virtual std::string ImageFormatExtensions();
-	virtual bool CanHandleThisFile();
+	std::string name();
+	std::string suffixes();
+	std::string dialects();
+	bool tainted(){return false;}//internal plugins are not tainted
+	isis::data::Chunks load(std::string filename,std::string dialect);
+	bool save(const isis::data::Chunks &chunks,std::string filename,std::string dialect);
 	// ACCESS
 	// INQUIRY
 
@@ -85,11 +60,26 @@ public:
 
 protected:
 private:
-	static const std::string FormatID;
-	static const bool isRegistered;
-	virtual ImageFormat* CreateClone() const;
+
+	/** Copy constructor.
+	 * @param from The value to copy to this object.
+	 */
+	ImageFormatNii(const ImageFormatNii& from);
+
+
+	// OPERATORS
+
+	/** Assignment operator.
+	 * @param from The value to assign to this object.
+	 * @return A reference to this object.
+	 */
+	ImageFormatNii& operator=(const ImageFormatNii&);
+
 };
 
+isis::data::FileFormat* factory(){
+  return new ImageFormatNii();
+}
 
 // EXTERNAL REFERENCES
 //
