@@ -70,4 +70,5 @@ int main(){
 	Chunk<short> &ref=list.begin()->getAs<short>();
 	std::cout << "ref(0,0,0,5):" << ref(0,0,0,5) << std::endl;
 	std::cout << "ref.toString():" << ref.toString() << std::endl;
+	std::cout << "list.begin()->getAs<short>().toString():" << list.begin()->getAs<short>().toString() << std::endl;
 }

@@ -11,21 +11,21 @@
 
 //============================= OPERATIONS ===================================
 
-std::string isis::image_io::ImageFormatNii::suffixes(){
+std::string isis::image_io::ImageFormat_Nifti::suffixes(){
 	return std::string("nii");
 }
-std::string isis::image_io::ImageFormatNii::dialects(){
+std::string isis::image_io::ImageFormat_Nifti::dialects(){
 	return std::string("fsl");
 }
-std::string isis::image_io::ImageFormatNii::name(){
+std::string isis::image_io::ImageFormat_Nifti::name(){
 	return "Nifti";
 }
 
-isis::data::ChunkList isis::image_io::ImageFormatNii::load ( std::string filename, std::string dialect ){
+isis::data::ChunkList isis::image_io::ImageFormat_Nifti::load ( std::string filename, std::string dialect ){
 	return isis::data::ChunkList();
 }
 
-bool isis::image_io::ImageFormatNii::save ( const isis::data::ChunkList& chunks, std::string filename, std::string dialect ){
+bool isis::image_io::ImageFormat_Nifti::save ( const isis::data::ChunkList& chunks, std::string filename, std::string dialect ){
 	return false;
 }
 //============================= ACCESS     ===================================

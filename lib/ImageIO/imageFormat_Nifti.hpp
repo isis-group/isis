@@ -33,7 +33,7 @@
 
 namespace isis{ namespace image_io{ 
 
-class ImageFormatNii : public isis::data::FileFormat
+class ImageFormat_Nifti : public isis::data::FileFormat
 {
 public:
 	// OPERATIONS
@@ -51,7 +51,7 @@ public:
 }}
 
 isis::data::FileFormat* factory(){
-  return new isis::image_io::ImageFormatNii();
+  return new isis::image_io::ImageFormat_Nifti();
 }
 
 // EXTERNAL REFERENCES

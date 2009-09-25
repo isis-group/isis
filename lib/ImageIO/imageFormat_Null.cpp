@@ -2,7 +2,7 @@
 
 namespace isis{ namespace image_io{ 
 
-class NullFormat: public isis::data::FileFormat{
+class ImageFormat_Null: public isis::data::FileFormat{
 public:
 	std::string suffixes(){
 		return std::string();
@@ -25,5 +25,5 @@ public:
 };
 }}
 isis::data::FileFormat* factory(){
-  return new isis::image_io::NullFormat();
+  return new isis::image_io::ImageFormat_Null();
 }

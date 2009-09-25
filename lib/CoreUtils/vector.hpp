@@ -11,8 +11,11 @@ namespace util{
 
 template<typename TYPE, size_t SIZE> class FixedVector : public TypePtr<TYPE>{
 public:
-	FixedVector():TypePtr<TYPE>((TYPE*)calloc(SIZE,sizeof(TYPE)),4){}
-	FixedVector(const TYPE src[SIZE]):TypePtr<TYPE>((TYPE*)malloc(SIZE*sizeof(TYPE)),4){
+	FixedVector():
+	TypePtr<TYPE>((TYPE*)calloc(SIZE,sizeof(TYPE)),SIZE){}
+
+	FixedVector(const TYPE src[SIZE]):
+	TypePtr<TYPE>((TYPE*)malloc(SIZE*sizeof(TYPE)),SIZE){
 		for(size_t i=0;i<SIZE;i++)
 			this->operator[](i)=src[i];
 	}
