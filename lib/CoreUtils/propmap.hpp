@@ -14,7 +14,17 @@ namespace isis{
  */
 namespace util{
 
-class PropMap : public std::map<std::string,PropertyValue>{};
+/// @cond _internal
+namespace _internal {
+struct nocase_less{
+	bool operator() (const std::string& a, const std::string& b) const	{
+		return (strcasecmp (a.c_str ( ), b.c_str ( )) < 0);
+	}
+};
+}
+/// @endcond
+	
+class PropMap : public std::map<std::string,PropertyValue,_internal::nocase_less>{};
 
 }
 /** @} */
