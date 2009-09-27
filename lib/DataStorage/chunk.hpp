@@ -78,9 +78,9 @@ public:
 
 /// @cond _internal
 namespace _internal{
-class ChunkReference : public ::isis::util::_internal::TypeReference{
+class ChunkReference : public ::isis::util::_internal::TypePtrBase::Reference {
 public:
-	template<typename T> ChunkReference(const Chunk<T> &src) : ::isis::util::_internal::TypeReference(new Chunk<T>(src)){}
+	template<typename T> ChunkReference(const Chunk<T> &src) : ::isis::util::_internal::TypePtrBase::Reference(new Chunk<T>(src)){}
 	
 	template<typename T> Chunk<T>& getAs(){
 		return dynamic_cast<Chunk<T>& >((*this)->cast_to_TypePtr<T>());

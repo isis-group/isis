@@ -25,7 +25,7 @@ template<typename TYPE> TYPE __cast_to(Type<TYPE> *dest,const TYPE& value){
 	return value;
 }
 
-class TypeBase{
+class GenericType{
 protected:
 	template<typename T> const T m_cast_to(T defaultVal) const{
 		MAKE_LOG(CoreLog);
@@ -57,7 +57,31 @@ public:
 	virtual std::string typeName()const=0;
 	/// Returns the id of its actual type
 	virtual unsigned short typeID()const=0;
-	
+};
+
+/**
+ * Base class to store and handle references to Type and TypePtr objects.
+ * The values (Type or TypePtr) are refernced as smart pointers to TypeBase.
+ * So the references are counted and data are automatically deleted if necessary.
+ * The usual dereferencing pointer interface ("*" and "->") is supported.
+ * This class is designed as base class for specialisations, it should not be used directly.
+ * Because of that, the contructors of this class are protected.
+ */
+template<typename TYPE_TYPE> class TypeReference:public boost::shared_ptr<TYPE_TYPE>{
+protected:
+	//dont use this directly
+	TypeReference(TYPE_TYPE *t):boost::shared_ptr <TYPE_TYPE>(t){}
+	TypeReference(){}
+public:
+	/// \returns true if "contained" type has no value (a.k.a. is undefined)
+	bool empty(){
+		return this->get()!=NULL;
+	}
+};
+
+class TypeBase : public GenericType{
+public:
+	typedef TypeReference<TypeBase> Reference;
 	//operators
 	template<typename T> bool operator ==(const Type<T> &src){
 		MAKE_LOG(CoreLog);
@@ -68,6 +92,18 @@ public:
 				<< "Doing unstable lexical cast to compare " << this->toString(true) << " and " << src.toString(true) << std::endl;
 			return (T)src==this->as<T>();
 		}
+	};
+	template<typename T> Type<T> operator +(const Type<T> &src)const throw(std::bad_cast){
+		return this->cast_to_Type<T>() + src;
+	};
+	template<typename T> Type<T> operator -(const Type<T> &src)const throw(std::bad_cast){
+		return this->cast_to_Type<T>() - src;
+	};
+	template<typename T> Type<T> operator *(const Type<T> &src)const throw(std::bad_cast){
+		return this->cast_to_Type<T>() * src;
+	};
+	template<typename T> Type<T> operator /(const Type<T> &src)const throw(std::bad_cast){
+		return this->cast_to_Type<T>() / src;
 	};
 	
 	/**
@@ -86,12 +122,7 @@ public:
 	 */
 	template<class T> T as()const{
 		MAKE_LOG(CoreLog);
-		if(typeID() & 0xFF00){
-			LOG(CoreLog,warning) 
-				<< "You're trying to lexically cast a pointer (" 
-				<< typeName() << ") to a value ("<< Type<T>::staticName() 
-				<< ") this is most likely nonsense" << std::endl;
-		} else if(typeID()==Type<T>::staticId()){
+		if(typeID()==Type<T>::staticId()){
 			LOG(CoreLog,info) 
 				<< "Doing dynamic cast instead of useless lexical cast from " << toString(true) 
 				<< " to " << Type<T>::staticName() << std::endl;
@@ -110,15 +141,6 @@ public:
 		return m_cast_to<Type<T> >(Type<T>(T()));
 	}
 	/**
-	 * Dynamically cast the TypeBase up to its actual TypePtr\<T\>. Constant version.
-	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
-	 * \returns a copy of the pointer.
-	 * \returns TypePtr\<T\\>(NULL) if T is not the actual type.
-	 */
-	template<typename T> const TypePtr<T> cast_to_TypePtr() const{
-		return m_cast_to<TypePtr<T> >(TypePtr<T>((T*)0));
-	}
-	/**
 	 * Dynamically cast the TypeBase up to its actual Type\<T\>. Referenced version.
 	 * Will throw std::bad_cast if T is not the actual type.
 	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
@@ -126,6 +148,20 @@ public:
 	 */
 	template<typename T> Type<T>& cast_to_Type() throw(std::bad_cast){
 		return m_cast_to<Type<T> >();
+	}
+};
+
+class TypePtrBase : public GenericType{
+public:
+	typedef TypeReference<TypePtrBase> Reference;
+	/**
+	 * Dynamically cast the TypeBase up to its actual TypePtr\<T\>. Constant version.
+	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
+	 * \returns a copy of the pointer.
+	 * \returns TypePtr\<T\\>(NULL) if T is not the actual type.
+	 */
+	template<typename T> const TypePtr<T> cast_to_TypePtr() const{
+		return m_cast_to<TypePtr<T> >(TypePtr<T>((T*)0));
 	}
 	/**
 	 * Dynamically cast the TypeBase up to its actual TypePtr\<T\>. Referenced version.
@@ -138,33 +174,14 @@ public:
 	}
 };
 
-/**
- * Base class to store and handle references to Type and TypePtr objects.
- * The values (Type or TypePtr) are refernced as smart pointers to TypeBase.
- * So the references are counted and data are automatically deleted if necessary.
- * The usual dereferencing pointer interface ("*" and "->") is supported.
- * This class is designed as base class for specialisations, it should not be used directly.
- * Because of that, the contructors of this class are protected.
- */
-class TypeReference:public boost::shared_ptr<TypeBase>{
-protected:
-	//dont use this directly
-	TypeReference(TypeBase *t);
-	TypeReference();
-public:
-	/// \returns true if "contained" type has no value (a.k.a. is undefined)
-	bool empty();
-};
 }
 /// @endcond
 
 /// Generic class for type aware variables
 template<typename TYPE> class Type: public _internal::TypeBase{
-	template<typename T> Type(const TypePtr<T>& value); // Dont do this
 	TYPE m_val;
 	static std::string m_typeName;
 	static unsigned short m_typeID;
-
 public:
 	/**
 	 * Create a Type from any type of value-type.
@@ -213,7 +230,7 @@ public:
  * by just use "1" for the length.
  * The pointers are reference counted and will be deleted automatically by a customizable deleter.
  */
-template<typename TYPE> class TypePtr: public _internal::TypeBase{
+template<typename TYPE> class TypePtr: public _internal::TypePtrBase{
 	boost::shared_ptr<TYPE> m_val;
 	static std::string m_typeName;
 	static unsigned short m_typeID;

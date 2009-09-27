@@ -19,7 +19,7 @@ namespace util{
  * @author Enrico Reimer
  */
 
-class PropertyValue:public _internal::TypeReference{
+class PropertyValue:public _internal::TypeBase::Reference{
 	bool m_needed;
 public:
 	/**
@@ -29,7 +29,7 @@ public:
 	 * \param ref the value to be stored
 	 * \param _needed flag if this PropertyValue is needed an thus not allowed to be empty (a.k.a. undefined)
 	 */ 
-	template<typename T> PropertyValue(const T& ref,bool _needed = false):_internal::TypeReference(new Type<T>(ref)),m_needed(_needed){ }
+	template<typename T> PropertyValue(const T& ref,bool _needed = false):_internal::TypeBase::Reference(new Type<T>(ref)),m_needed(_needed){ }
 	/**
 	 * Empty constructor.
 	 * Creates an empty property value. So PropertyValue().empty() will allways be true.
@@ -44,7 +44,7 @@ public:
 	 * \returns a copy of the stored value
 	 */
 	template<typename T> operator T()const{
-		const _internal::TypeBase *dummy=get();
+		const element_type *dummy=get();
 		const Type<T> ret=dummy->cast_to_Type<T>();
 		return (T)ret;
 	}
