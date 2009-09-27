@@ -57,7 +57,19 @@ public:
 	virtual std::string typeName()const=0;
 	/// Returns the id of its actual type
 	virtual unsigned short typeID()const=0;
-
+	
+	//operators
+	template<typename T> bool operator ==(const Type<T> &src){
+		MAKE_LOG(CoreLog);
+		if(typeID()==Type<T>::staticId()){
+			return this->cast_to_Type<T>() == src;
+		} else {
+			LOG(CoreLog,warning) 
+				<< "Doing unstable lexical cast to compare " << this->toString(true) << " and " << src.toString(true) << std::endl;
+			return (T)src==this->as<T>();
+		}
+	};
+	
 	/**
 	 * Interpret the value as value of any (other) type.
 	 * This is a runtime-based cast via string. The value is converted into a string, which is then parsed as the requestet type.
@@ -114,10 +126,6 @@ public:
 	 */
 	template<typename T> Type<T>& cast_to_Type() throw(std::bad_cast){
 		return m_cast_to<Type<T> >();
-	}
-	//@todo do we need this
-	template<typename T> TypePtr<T>& cast_to_TypePtr() throw(std::bad_cast){
-		return m_cast_to<TypePtr<T> >();
 	}
 };
 

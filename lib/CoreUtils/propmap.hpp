@@ -17,9 +17,7 @@ namespace util{
 /// @cond _internal
 namespace _internal {
 struct nocase_less{
-	bool operator() (const std::string& a, const std::string& b) const	{
-		return (strcasecmp (a.c_str ( ), b.c_str ( )) < 0);
-	}
+	bool operator() (const std::string& a, const std::string& b) const;
 };
 }
 /// @endcond

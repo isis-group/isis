@@ -23,6 +23,13 @@ int main(int argc, char *argv[]){
 
 	PropMap map,cont;
 	map["Test1"]=6.4;
+	
+	if ((*map["Test1"]) == Type<double>(6.4)) {
+		std::cout << map["Test1"]->toString(true) <<  " ist gleich " <<Type<double>(6.4).toString() << std::endl;
+	}
+	
+	
+	
 	map["Test2"]=6;
 	map["Test3"]=std::string("Hallo");
 // 	map["Vector"]=FixedVector<short,4>();
