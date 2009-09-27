@@ -48,8 +48,7 @@ int main(){
 	Type<float> f(5.4);
 	int i_=f;//this wont throw an exception because it only does an implizit conversions from Type<float>=>float and float=>int
 	std::cout << "Type<float>(5.4) is " << f.toString(true) << " int from that is " << i_ << std::endl;
-	
-	
+
 	TypePtr<int> p((int*)calloc(5,sizeof(int)),5,SpeakingDeleter("Rolf"));
 	std::cout << "p.toString():" <<  p.toString() << std::endl;
 

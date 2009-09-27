@@ -127,6 +127,15 @@ public:
 	template<typename T> Type<T>& cast_to_Type() throw(std::bad_cast){
 		return m_cast_to<Type<T> >();
 	}
+	/**
+	 * Dynamically cast the TypeBase up to its actual TypePtr\<T\>. Referenced version.
+	 * Will throw std::bad_cast if T is not the actual type.
+	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
+	 * \returns a reference of the pointer.
+	 */
+	template<typename T> TypePtr<T>& cast_to_TypePtr() throw(std::bad_cast){
+		return m_cast_to<TypePtr<T> >();
+	}
 };
 
 /**

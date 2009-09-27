@@ -3,6 +3,7 @@
 
 #include <map>
 #include <string>
+#include <strings.h>
 #include <ostream>
 
 #include "property.hpp"
