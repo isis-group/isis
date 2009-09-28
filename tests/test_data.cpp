@@ -23,6 +23,8 @@ int main(){
 	
 	IOFactory::get();//get the IO Factory
 	IOFactory::get().print_formats(std::cout);//do it again - it should not cause reinit
+	IOFactory::get().loadFile("test.nii.gz", "");
+	IOFactory::get().loadFile("test.nii", "");
 	
 // 	iUtil::DefaultMsgPrint::stopBelow(warning); 
 	
