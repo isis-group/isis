@@ -23,8 +23,11 @@ int main(){
 	
 	IOFactory::get();//get the IO Factory
 	IOFactory::get().print_formats(std::cout);//do it again - it should not cause reinit
-	IOFactory::get().loadFile("test.nii.gz", "");
-	IOFactory::get().loadFile("test.nii", "");
+	IOFactory::get().loadFile("test.null.gz", "");
+	IOFactory::get().loadFile("test.null", "");
+	IOFactory::get().loadFile("test.null", "dia1");
+	IOFactory::get().loadFile("test.null", "dia2");
+	IOFactory::get().loadFile("test.xxx", "");//returns that plugin is missing
 	
 // 	iUtil::DefaultMsgPrint::stopBelow(warning); 
 	

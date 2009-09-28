@@ -90,30 +90,44 @@ isis::data::ChunkList IOFactory::loadFile(
 		const std::string& filename, const std::string& dialect){
 	MAKE_LOG(DataLog);
 
-	FileFormatList formatReader = getFormatReader(filename);
-	if(true == formatReader.empty()){
-		LOG(DataLog,::isis::util::info)
-				<< "PlugInName loadFile list empty" << std::endl;
+	FileFormatList formatReader = getFormatReader(filename, dialect);
+	if(true == formatReader.empty()){//no suitable plugin
+		LOG(DataLog,::isis::util::error)
+				<< "Missing plugin to open file: " << filename << " with dialect: " << dialect << std::endl;
 		return isis::data::ChunkList();
 	}
 
-	for(std::list<FileFormatPtr>::const_iterator it = formatReader.begin(); it != formatReader.end(); it++) {
-		LOG(DataLog,::isis::util::info)
-				<< "PlugInName loadFile " << (*it)->name() << std::endl;
-					return (*it)->load(filename, dialect);
+	for(FileFormatList::const_iterator it = formatReader.begin(); it != formatReader.end(); it++) {
+		isis::data::ChunkList loadedChunks = (*it)->load(filename, dialect);
+		if (false == loadedChunks.empty()){//load succesfully
+			LOG(DataLog,::isis::util::info)
+					<< "plugin to load file " <<  filename << " : " << (*it)->name() << " with dialect: " << dialect << std::endl;
+			return loadedChunks;
+		}
 	}
+	LOG(DataLog,::isis::util::error)
+		<< "Could not open file: " << filename <<std::endl;
+	return isis::data::ChunkList();//no plugin of proposed list could load file
 }
 
-IOFactory::FileFormatList IOFactory::getFormatReader(const std::string& filename){
+IOFactory::FileFormatList IOFactory::getFormatReader(const std::string& filename, const std::string& dialect){
 
 	MAKE_LOG(DataLog);
 	size_t pos = filename.find_first_of(".", 1);
 	if (std::string::npos == pos){
 		return FileFormatList();}
 	std::string ext = filename.substr(pos);
-	LOG(DataLog,::isis::util::info)
-			<< "PlugInName Extension " << ext << std::endl;
-	return io_suffix[ext];
+
+	if(true == dialect.empty()){//give back whole list of plugins for this file extension
+		return io_suffix[ext];
+	}
+	//otherwise sort out by dialect
+	FileFormatList reader;
+	for ( FileFormatList::const_iterator it = io_suffix[ext].begin(); it != io_suffix[ext].end(); it++){
+		if(std::string::npos != (*it)->dialects().find(dialect)){
+			reader.push_back(*it);}
+	}
+	return reader;
 }
 
 }} // namespaces data isis

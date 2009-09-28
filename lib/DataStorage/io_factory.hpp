@@ -47,19 +47,10 @@ public:
 	static std::list<std::string> getSuffixes(
 	    const FileFormatPtr& reader);
 
-	/*??NUR EINS VON BEIDEN FOLGENDEN BENOETIGT
-	 * create ImageFormats
-	 *@params strFormatId the unique id of an image format
-	 *
-	 *@return pointer to an object of an image format
-	 * */
-	FileFormatPtr createImageFormat(
-		const std::string& strFormatId);
-
 	/*
-	 * create Image
-	 *@params strFilename file to open
-	 *
+	 * load a data file with given filename and dialect
+	 *@params filename file to open
+	 *@params dialect dialect of the fileformat to load
 	 *@return list of chunks (part of an image)
 	 * */
 	ChunkList loadFile(
@@ -85,7 +76,7 @@ protected:
 	 * */
 	bool registerFormat(FileFormatPtr plugin);
 	unsigned int findPlugins(std::string path);
-	FileFormatList getFormatReader(const std::string& filename);
+	FileFormatList getFormatReader(const std::string& filename, const std::string& dialect);
 private:
 	std::map<std::string, FileFormatList> io_suffix;
 	IOFactory();//shall not be created directly
