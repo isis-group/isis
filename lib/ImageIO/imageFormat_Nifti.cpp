@@ -12,7 +12,7 @@
 //============================= OPERATIONS ===================================
 
 std::string isis::image_io::ImageFormat_Nifti::suffixes(){
-	return std::string("nii");
+	return std::string(".nii.gz .nii");
 }
 std::string isis::image_io::ImageFormat_Nifti::dialects(){
 	return std::string("fsl");

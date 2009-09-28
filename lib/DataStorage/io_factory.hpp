@@ -60,10 +60,10 @@ public:
 	 * create Image
 	 *@params strFilename file to open
 	 *
-	 *@return image object
+	 *@return list of chunks (part of an image)
 	 * */
-	ChunkList createImage(
-		const std::string& strFilename);
+	ChunkList loadFile(
+		const std::string& filename, const std::string& dialect);
 
 
 	template<typename charT, typename traits> void print_formats(
@@ -85,6 +85,7 @@ protected:
 	 * */
 	bool registerFormat(FileFormatPtr plugin);
 	unsigned int findPlugins(std::string path);
+	FileFormatList getFormatReader(const std::string& filename);
 private:
 	std::map<std::string, FileFormatList> io_suffix;
 	IOFactory();//shall not be created directly

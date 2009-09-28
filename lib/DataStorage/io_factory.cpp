@@ -86,16 +86,34 @@ IOFactory& IOFactory::get(){
 	return ret;
 }
 
-isis::data::ChunkList IOFactory::createImage(
-		const std::string& strFilename){
+isis::data::ChunkList IOFactory::loadFile(
+		const std::string& filename, const std::string& dialect){
+	MAKE_LOG(DataLog);
 
-	for(std::list<FileFormatPtr>::const_iterator it = io_formats.begin(); it != io_formats.end(); it++) {
-		return (*it)->load(strFilename, "");
+	FileFormatList formatReader = getFormatReader(filename);
+	if(true == formatReader.empty()){
+		LOG(DataLog,::isis::util::info)
+				<< "PlugInName loadFile list empty" << std::endl;
+		return isis::data::ChunkList();
+	}
 
-		}
-
-
+	for(std::list<FileFormatPtr>::const_iterator it = formatReader.begin(); it != formatReader.end(); it++) {
+		LOG(DataLog,::isis::util::info)
+				<< "PlugInName loadFile " << (*it)->name() << std::endl;
+					return (*it)->load(filename, dialect);
+	}
 }
 
+IOFactory::FileFormatList IOFactory::getFormatReader(const std::string& filename){
+
+	MAKE_LOG(DataLog);
+	size_t pos = filename.find_first_of(".", 1);
+	if (std::string::npos == pos){
+		return FileFormatList();}
+	std::string ext = filename.substr(pos);
+	LOG(DataLog,::isis::util::info)
+			<< "PlugInName Extension " << ext << std::endl;
+	return io_suffix[ext];
+}
 
 }} // namespaces data isis
