@@ -7,14 +7,10 @@
 
 #include "isisGradientMagnitudeSegmentationFilter.h"
 
-
 namespace isis {
 
-
-template< class TInputImage, class TOutputImage >
-GradientMagnitudeSegmentationFilter< TInputImage, TOutputImage >
-::GradientMagnitudeSegmentationFilter()
-{
+template<class TInputImage, class TOutputImage>
+GradientMagnitudeSegmentationFilter<TInputImage, TOutputImage>::GradientMagnitudeSegmentationFilter() {
 
 	m_OutputImage = OutputImageType::New();
 
@@ -28,18 +24,15 @@ GradientMagnitudeSegmentationFilter< TInputImage, TOutputImage >
 	m_SmoothingConductanceParameter = 9.0;
 	m_UseThresholdMethod = false;
 
-
 }
 
-template< class TInputImage, class TOutputImage >
-void
-GradientMagnitudeSegmentationFilter< TInputImage, TOutputImage >
-::CalculateMinMax( void )
-{
+template<class TInputImage, class TOutputImage>
+void GradientMagnitudeSegmentationFilter<TInputImage, TOutputImage>::CalculateMinMax(
+		void) {
 
 	OutputPixelType temp;
 
-	m_MinMaxFilter->SetImage( this->GetInput() );
+	m_MinMaxFilter->SetImage(this->GetInput());
 	m_MinMaxFilter->Compute();
 	m_MinOutput = m_MinMaxFilter->GetMinimum();
 	m_MaxOutput = m_MinMaxFilter->GetMaximum();
@@ -48,94 +41,78 @@ GradientMagnitudeSegmentationFilter< TInputImage, TOutputImage >
 	m_MaxOutput = temp;
 }
 
+template<class TInputImage, class TOutputImage>
+void GradientMagnitudeSegmentationFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion()
+		throw (itk::InvalidRequestedRegionError) {
+	// call the superclass' implementation of this method. this should
+	// copy the output requested region to the input requested region
+	Superclass::GenerateInputRequestedRegion();
 
+	// get pointers to the input and output
+	typename Superclass::InputImagePointer inputPtr =
+			const_cast<TInputImage *> (this->GetInput());
 
-template <class TInputImage, class TOutputImage>
-void
-GradientMagnitudeSegmentationFilter <TInputImage,TOutputImage>
-::GenerateInputRequestedRegion() throw(itk::InvalidRequestedRegionError)
-{
-  // call the superclass' implementation of this method. this should
-  // copy the output requested region to the input requested region
-  Superclass::GenerateInputRequestedRegion();
+	if (!inputPtr) {
+		return;
+	}
 
-  // get pointers to the input and output
-  typename Superclass::InputImagePointer  inputPtr =
-    const_cast< TInputImage *>( this->GetInput() );
+	// get a copy of the input requested region (should equal the output
+	// requested region)
+	typename TInputImage::RegionType inputRequestedRegion;
+	inputRequestedRegion = inputPtr->GetRequestedRegion();
 
-  if ( !inputPtr )
-    {
-    return;
-    }
+	// crop the input requested region at the input's largest possible region
+	if (inputRequestedRegion.Crop(inputPtr->GetLargestPossibleRegion())) {
+		inputPtr->SetRequestedRegion(inputRequestedRegion);
+		return;
+	} else {
+		// Couldn't crop the region (requested region is outside the largest
+		// possible region).  Throw an exception.
 
+		// store what we tried to request (prior to trying to crop)
+		inputPtr->SetRequestedRegion(inputRequestedRegion);
 
-  // get a copy of the input requested region (should equal the output
-  // requested region)
-  typename TInputImage::RegionType inputRequestedRegion;
-  inputRequestedRegion = inputPtr->GetRequestedRegion();
-
-
-  // crop the input requested region at the input's largest possible region
-  if ( inputRequestedRegion.Crop(inputPtr->GetLargestPossibleRegion()) )
-    {
-    inputPtr->SetRequestedRegion( inputRequestedRegion );
-    return;
-    }
-  else
-    {
-    // Couldn't crop the region (requested region is outside the largest
-    // possible region).  Throw an exception.
-
-    // store what we tried to request (prior to trying to crop)
-    inputPtr->SetRequestedRegion( inputRequestedRegion );
-
-    // build an exception
-    itk::InvalidRequestedRegionError e(__FILE__, __LINE__);
-    e.SetLocation(ITK_LOCATION);
-    e.SetDescription("Requested region is (at least partially) outside the largest possible region.");
-    e.SetDataObject(inputPtr);
-    throw e;
-    }
+		// build an exception
+		itk::InvalidRequestedRegionError e(__FILE__, __LINE__);
+		e.SetLocation(ITK_LOCATION);
+		e.SetDescription(
+				"Requested region is (at least partially) outside the largest possible region.");
+		e.SetDataObject(inputPtr);
+		throw e;
+	}
 }
 
-template< class TInputImage, class TOutputImage >
-void
-GradientMagnitudeSegmentationFilter< TInputImage, TOutputImage >
-::GenerateData()
-{
+template<class TInputImage, class TOutputImage>
+void GradientMagnitudeSegmentationFilter<TInputImage, TOutputImage>::GenerateData() {
 
 	this->CalculateMinMax();
 
 	//smoothing filter
-	m_Smoothing->SetInput( this->GetInput() );
-	m_Smoothing->SetTimeStep( m_SmoothingTimeStep );
-	m_Smoothing->SetNumberOfIterations( m_SmoothingNumberOfIterations );
-	m_Smoothing->SetConductanceParameter( m_SmoothingConductanceParameter );
+	m_Smoothing->SetInput(this->GetInput());
+	m_Smoothing->SetTimeStep(m_SmoothingTimeStep);
+	m_Smoothing->SetNumberOfIterations(m_SmoothingNumberOfIterations);
+	m_Smoothing->SetConductanceParameter(m_SmoothingConductanceParameter);
 
 	//gradient filter
-	m_GradientMagnitude->SetInput( m_Smoothing->GetOutput() );
-	m_GradientMagnitude->SetSigma( m_Sigma );
+	m_GradientMagnitude->SetInput(m_Smoothing->GetOutput());
+	m_GradientMagnitude->SetSigma(m_Sigma);
 
 	m_GradientMagnitude->Update();
 	m_OutputImage = m_GradientMagnitude->GetOutput();
 	m_OutputImage->Update();
 
-	if ( m_UseThresholdMethod )
-	{
+	if (m_UseThresholdMethod) {
 		std::cout << "Using threshold method" << std::endl;
 		m_OtsuThresholdFilter = OtsuThresholdFilterType::New();
-		m_OtsuThresholdFilter->SetInput( m_OutputImage );
-		m_OtsuThresholdFilter->SetOutsideValue( 1 );
-		m_OtsuThresholdFilter->SetInsideValue( 0 );
-		m_OtsuThresholdFilter->SetNumberOfHistogramBins( 128 );
+		m_OtsuThresholdFilter->SetInput(m_OutputImage);
+		m_OtsuThresholdFilter->SetOutsideValue(1);
+		m_OtsuThresholdFilter->SetInsideValue(0);
+		m_OtsuThresholdFilter->SetNumberOfHistogramBins(128);
 		m_OtsuThresholdFilter->Update();
-		this->GraftOutput( m_OtsuThresholdFilter->GetOutput() );
+		this->GraftOutput(m_OtsuThresholdFilter->GetOutput());
 
-
-	}
-	else
-	{
-	this->GraftOutput( m_OutputImage );
+	} else {
+		this->GraftOutput(m_OutputImage);
 	}
 }
 
