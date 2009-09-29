@@ -15,6 +15,15 @@ RegistrationFactory3D<TFixedImageType, TMovingImageType>::RegistrationFactory3D(
 
 	m_RegistrationObject = RegistrationMethodType::New();
 
+	this->Reset();
+
+
+
+}
+
+template<class TFixedImageType, class TMovingImageType>
+void RegistrationFactory3D<TFixedImageType, TMovingImageType>::Reset(void) {
+
 	//boolean settings
 	optimizer.REGULARSTEPGRADIENTDESCENT = false;
 	optimizer.VERSORRIGID3D = false;
@@ -49,7 +58,6 @@ RegistrationFactory3D<TFixedImageType, TMovingImageType>::RegistrationFactory3D(
 	UserOptions.NumberOfThreads = 1;
 
 	m_NumberOfParameters = 0;
-
 }
 
 template<class TFixedImageType, class TMovingImageType>
