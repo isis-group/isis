@@ -28,7 +28,6 @@ bool PropMap::valid() const {
 
 
 PropMap::string_map PropMap::diff(const PropMap& second) const{
-	//iterate through the whole map and return false as soon as we find something needed _and_ empty
 	PropMap::string_map ret;
 
 	//insert everything that is in this but not in second or is on both but differs
@@ -40,7 +39,7 @@ PropMap::string_map PropMap::diff(const PropMap& second) const{
 		else if(!found->second.operator==(ref.second))
 			ret.insert(std::make_pair(ref.first,str+found->second->toString(true)+"<"));
 	}
-	//insert everything that is in second but not this
+	//insert everything that is in second but not in this
  	BOOST_FOREACH(const_reference ref,second){
 		const std::string str="><>"+ref.second->toString(true)+"<";
 		const_iterator found=find(ref.first);
