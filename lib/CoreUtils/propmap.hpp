@@ -23,7 +23,14 @@ struct nocase_less{
 }
 /// @endcond
 	
-class PropMap : public std::map<std::string,PropertyValue,_internal::nocase_less>{};
+class PropMap : public std::map<std::string,PropertyValue,_internal::nocase_less>{
+public:
+	typedef std::list<key_type> key_list;
+	typedef std::map<key_type,std::string,_internal::nocase_less> string_map;
+	bool valid()const;
+	key_list missing()const;
+	string_map diff(const PropMap &second)const;
+};
 
 }
 /** @} */

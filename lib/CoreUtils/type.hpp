@@ -48,15 +48,21 @@ protected:
 	}
 	
 public:
-	/// Returns true if the stored value is of type T.
-	template<typename T> bool is(){return is(typeid(T));}
+	/// \returns true if the stored value is of type T.
+	template<typename T> bool is()const{return is(typeid(T));}
 	virtual bool is(const std::type_info & t)const = 0;
-	/// Returns the value represented as text.
+
+	/// \returns the value represented as text.
 	virtual std::string toString(bool labeled=false)const=0;
-	/// Returns the name of its actual type
+
+	/// \returns the name of its actual type
 	virtual std::string typeName()const=0;
-	/// Returns the id of its actual type
+
+	/// \returns the id of its actual type
 	virtual unsigned short typeID()const=0;
+
+	/// \returns true if type of this and second are equal
+	bool isSameType(const GenericType &second)const;
 };
 
 /**
@@ -74,7 +80,7 @@ protected:
 	TypeReference(){}
 public:
 	/// \returns true if "contained" type has no value (a.k.a. is undefined)
-	bool empty(){
+	bool empty()const{
 		return this->get()!=NULL;
 	}
 };
@@ -126,7 +132,7 @@ public:
 	template<typename T> Type<T>& cast_to_Type() throw(std::bad_cast){
 		return m_cast_to<Type<T> >();
 	}
-	virtual bool eq(TypeBase &second)=0;
+	virtual bool eq(const TypeBase &second)=0;
 };
 
 class TypePtrBase : public GenericType{
@@ -184,7 +190,7 @@ public:
 		return staticId();
 	}
 
-	virtual bool eq(TypeBase &second){
+	virtual bool eq(const TypeBase &second){
 		if(second.is<TYPE>()){
 			const TYPE sec= second.cast_to_Type<TYPE>();
 			return m_val == sec;

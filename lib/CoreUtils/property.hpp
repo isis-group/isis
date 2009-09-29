@@ -50,8 +50,10 @@ public:
 	}
 	/// Accessor for the needed flag
 	bool &needed();
-	bool operator ==(const PropertyValue &second);
-	template<typename T> bool operator ==(const T &second){
+	bool needed()const;
+	bool operator ==(const PropertyValue &second)const;
+	bool operator ==(const _internal::TypeBase &second)const;
+	template<typename T> bool operator ==(const T &second)const{
 		if(get()->is<T>())
 			return get()->cast_to_Type<T>() == second;
 		else

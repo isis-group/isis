@@ -1,6 +1,5 @@
 #include "type.hpp"
 
-namespace isis{ namespace util{ namespace _internal{
-
-}}}
-
+bool isis::util::_internal::GenericType::isSameType ( const isis::util::_internal::GenericType& second ) const {
+	return typeID() == second.typeID();
+}
