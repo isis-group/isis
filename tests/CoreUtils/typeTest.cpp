@@ -88,7 +88,14 @@ BOOST_AUTO_TEST_CASE(test_type_is) {
 	BOOST_CHECK(tInt.is(typeid(int)));
 	BOOST_CHECK(tString.is(typeid(std::string)));
 	BOOST_CHECK(tFloat.is(typeid(float)));
-
 }
 
+// TestCase operators()
+BOOST_AUTO_TEST_CASE(test_type_operators) {
 
+	// for operations Type<T> should automatically cast to it's internal type and do the operations on it
+	Type<int> tInt1(21), tInt2(21);
+	BOOST_CHECK(tInt1+tInt2 == Type<int>(42));
+	BOOST_CHECK(tInt1*2 == 42);
+	BOOST_CHECK(42 - tInt1 == tInt2);
+}

@@ -36,7 +36,7 @@ public:
 	 * \param ref the value to be stored
 	 * \param _needed flag if this PropertyValue is needed an thus not allowed to be empty (a.k.a. undefined)
 	 */
-	PropertyValue(bool _needed = false):m_needed(_needed){ }
+	PropertyValue(bool _needed = false);
 	/**
 	 * Implicit conversion of the property value to its actual type.
 	 * Does a TypeBase::cast_to_type\<T\>() and returns a copy of its value.
@@ -49,8 +49,13 @@ public:
 		return (T)ret;
 	}
 	/// Accessor for the needed flag
-	bool &needed(){
-		return m_needed;
+	bool &needed();
+	bool operator ==(const PropertyValue &second);
+	template<typename T> bool operator ==(const T &second){
+		if(get()->is<T>())
+			return get()->cast_to_Type<T>() == second;
+		else
+			return false;
 	}
 };
 

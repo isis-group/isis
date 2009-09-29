@@ -82,30 +82,7 @@ public:
 class TypeBase : public GenericType{
 public:
 	typedef TypeReference<TypeBase> Reference;
-	//operators
-	template<typename T> bool operator ==(const Type<T> &src){
-		MAKE_LOG(CoreLog);
-		if(typeID()==Type<T>::staticId()){
-			return this->cast_to_Type<T>() == src;
-		} else {
-			LOG(CoreLog,warning) 
-				<< "Doing unstable lexical cast to compare " << this->toString(true) << " and " << src.toString(true) << std::endl;
-			return (T)src==this->as<T>();
-		}
-	};
-	template<typename T> Type<T> operator +(const Type<T> &src)const throw(std::bad_cast){
-		return this->cast_to_Type<T>() + src;
-	};
-	template<typename T> Type<T> operator -(const Type<T> &src)const throw(std::bad_cast){
-		return this->cast_to_Type<T>() - src;
-	};
-	template<typename T> Type<T> operator *(const Type<T> &src)const throw(std::bad_cast){
-		return this->cast_to_Type<T>() * src;
-	};
-	template<typename T> Type<T> operator /(const Type<T> &src)const throw(std::bad_cast){
-		return this->cast_to_Type<T>() / src;
-	};
-	
+
 	/**
 	 * Interpret the value as value of any (other) type.
 	 * This is a runtime-based cast via string. The value is converted into a string, which is then parsed as the requestet type.
@@ -149,6 +126,7 @@ public:
 	template<typename T> Type<T>& cast_to_Type() throw(std::bad_cast){
 		return m_cast_to<Type<T> >();
 	}
+	virtual bool eq(TypeBase &second)=0;
 };
 
 class TypePtrBase : public GenericType{
@@ -205,6 +183,15 @@ public:
 	virtual unsigned short typeID()const{
 		return staticId();
 	}
+
+	virtual bool eq(TypeBase &second){
+		if(second.is<TYPE>()){
+			const TYPE sec= second.cast_to_Type<TYPE>();
+			return m_val == sec;
+		} else
+			return  false;
+	}
+
 	static unsigned short staticId(){return m_typeID;}
 	static std::string staticName(){return m_typeName;}
 	
