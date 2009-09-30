@@ -332,7 +332,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpTransform() 
 		typename BSplineRegionType::SizeType totalGridSize;
 
 		gridSizeOnImage.Fill(UserOptions.BSplineGridSize);
-		gridBorderSize.Fill(3); //Border for spline order = 3 (1 lower, 2 upper)
+		gridBorderSize.Fill(UserOptions.BSplineBorderSize); //Border for spline order = 3 (1 lower, 2 upper)
 		totalGridSize = gridSizeOnImage + gridBorderSize;
 
 		bsplineRegion.SetSize(totalGridSize);
@@ -348,9 +348,10 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpTransform() 
 		for(unsigned int r = 0; r < FixedImageDimension; r++) {
 			bsplineSpacing[r] *= floor(static_cast<double> (fixedImageSize[r] - 1)
 			        / static_cast<double> (gridSizeOnImage[r] - 1));
+			bsplineOrigin[r] -= bsplineSpacing[r];
 		}
 
-		bsplineOrigin = bsplineOrigin - gridOriginOffset;
+		//bsplineOrigin = bsplineOrigin - gridOriginOffset;
 
 		m_BSplineTransform->SetGridSpacing(bsplineSpacing);
 		m_BSplineTransform->SetGridOrigin(bsplineOrigin);
@@ -569,7 +570,6 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::CheckImageSizes(
 		}
 
 	}
-
 	if(m_FixedImageIsBigger) {
 #ifdef DEBUG
 		std::cout << "m_FixedImageIsBigger=true" << std::endl;

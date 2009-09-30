@@ -210,6 +210,7 @@ public:
 		unsigned int NumberOfIterations;
 		unsigned int NumberOfBins;
 		unsigned int BSplineGridSize;
+		unsigned int BSplineBorderSize;
 		unsigned int NumberOfThreads;
 		float PixelDensity;
 		bool PRINTRESULTS;
