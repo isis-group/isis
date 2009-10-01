@@ -27,24 +27,31 @@ bool PropMap::valid() const {
 }
 
 
-PropMap::string_map PropMap::diff(const PropMap& second) const{
-	PropMap::string_map ret;
+PropMap::diff_map PropMap::diff(const PropMap& second) const{
+	PropMap::diff_map ret;
 
 	//insert everything that is in this but not in second or is on both but differs
  	BOOST_FOREACH(const_reference ref,*this){
-		std::string str=">" + ref.second->toString(true)+"<>";
 		const_iterator found=second.find(ref.first);
 		if(found == second.end())
-			ret.insert(std::make_pair(ref.first,str+"<"));
+			ret.insert(std::make_pair(
+				ref.first,
+				std::make_pair(ref.second,found->second)
+			));
 		else if(!found->second.operator==(ref.second))
-			ret.insert(std::make_pair(ref.first,str+found->second->toString(true)+"<"));
+			ret.insert(std::make_pair(
+				ref.first,
+				std::make_pair(ref.second,PropertyValue())
+		));
 	}
 	//insert everything that is in second but not in this
  	BOOST_FOREACH(const_reference ref,second){
-		const std::string str="><>"+ref.second->toString(true)+"<";
 		const_iterator found=find(ref.first);
 		if(found == end())
-			ret.insert(std::make_pair(ref.first,str));
+			ret.insert(std::make_pair(
+				ref.first,
+				std::make_pair(PropertyValue(),ref.second)
+			));
 	}
 	return ret;
 }
@@ -57,5 +64,13 @@ PropMap::key_list PropMap::missing() const{
 	}
 	return ret;
 }
+
+
+std::ostream& PropMap::print ( std::ostream& out,bool label ) {
+	BOOST_FOREACH(const_reference ref,*this)
+		out << ref.first << ": " << ref.second->toString(label) << std::endl;
+	return out;
+}
+
 
 }}

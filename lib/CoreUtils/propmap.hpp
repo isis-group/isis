@@ -4,8 +4,8 @@
 #include <map>
 #include <string>
 #include <strings.h>
-#include <ostream>
 
+#include "common.hpp"
 #include "property.hpp"
 
 namespace isis{ 
@@ -26,29 +26,15 @@ struct nocase_less{
 class PropMap : public std::map<std::string,PropertyValue,_internal::nocase_less>{
 public:
 	typedef std::list<key_type> key_list;
-	typedef std::map<key_type,std::string,_internal::nocase_less> string_map;
+	typedef std::map<key_type,std::pair<mapped_type,mapped_type>,_internal::nocase_less> diff_map;
 	bool valid()const;
 	key_list missing()const;
-	string_map diff(const PropMap &second)const;
+	diff_map diff(const PropMap &second)const;
+	std::ostream& print(std::ostream &out,bool label=false);
 };
 
 }
 /** @} */
-}
-
-//make PropMap printable
-namespace std {
-template<typename charT, typename traits> basic_ostream<charT, traits>& 
-operator<<(basic_ostream<charT, traits> &out,const isis::util::PropMap& s){
-	isis::util::PropMap::const_iterator i=s.begin();
-	if(i!=s.end()){
-		out << i->first << ": " << i->second->toString(true);
-		for(i++;i!=s.end();i++){
-			out << std::endl << i->first << ": " << i->second->toString(true);
-		}
-	}
-	return out;
-}
 }
 
 #endif
