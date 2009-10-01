@@ -278,7 +278,7 @@ public:
 			const TYPE* ptr=m_val.get();
 			for(size_t i=0;i<m_len-1;i++)
 				ret+=Type<TYPE>(ptr[i]).toString(false)+"|";
-			ret+=Type<TYPE>(ptr[m_len-1]).toString(true);
+			ret+=Type<TYPE>(ptr[m_len-1]).toString(labeled);
 		}
 		return boost::lexical_cast<std::string>(m_len) +"#"+ret;
 	}
