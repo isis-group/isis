@@ -7,6 +7,7 @@
 
 #include "common.hpp"
 #include "property.hpp"
+#include <set>
 
 namespace isis{ 
 /*! \addtogroup util
@@ -25,11 +26,11 @@ struct nocase_less{
 	
 class PropMap : public std::map<std::string,PropertyValue,_internal::nocase_less>{
 public:
-	typedef std::list<key_type> key_list;
+	typedef std::set<key_type,_internal::nocase_less> key_list;
 	typedef std::map<key_type,std::pair<mapped_type,mapped_type>,_internal::nocase_less> diff_map;
 	bool valid()const;
 	key_list missing()const;
-	diff_map diff(const PropMap &second)const;
+	diff_map diff(const PropMap &second,key_list ignore=key_list())const;
 	std::ostream& print(std::ostream &out,bool label=false);
 };
 

@@ -43,14 +43,15 @@ struct CoreDebug
 /// @endcond
 }}
 
-//Make pairs printable
 namespace std {
+/// Streaming output for std::pair
 template<typename charT, typename traits, typename _FIRST, typename _SECOND > basic_ostream<charT, traits>&
 operator<<(basic_ostream<charT, traits> &out, const pair<_FIRST,_SECOND> &s)
 {
 	return out << ">" << s.first << "<>" << s.second << "<";
 }
 
+/// Streaming output for std::map
 template<typename charT, typename traits,
 typename _Key, typename _Tp, typename _Compare, typename _Alloc > basic_ostream<charT, traits>&
 operator<<(basic_ostream<charT, traits> &out,const map<_Key,_Tp,_Compare,_Alloc>& s)

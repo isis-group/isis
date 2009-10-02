@@ -17,7 +17,7 @@ public:
 	virtual isis::data::ChunkList load ( std::string filename, std::string dialect ){
 		isis::data::MemChunk<short> test(1,1,1,5);
 		isis::data::ChunkList list;
-		list.add(test);
+		list.push_back(test);
 		return list;//return isis::data::ChunkList();
 	}
 	

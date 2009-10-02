@@ -15,7 +15,7 @@ namespace util{
 template<typename TYPE> class Type;
 template<typename TYPE> class TypePtr;
 
-/// @cond _internal
+/// @cond _hidden
 namespace _internal{
 template<typename TYPE,typename T> TYPE __cast_to(Type<TYPE> *dest,const T& value){
 	return boost::lexical_cast<TYPE>(value);
@@ -23,7 +23,9 @@ template<typename TYPE,typename T> TYPE __cast_to(Type<TYPE> *dest,const T& valu
 template<typename TYPE> TYPE __cast_to(Type<TYPE> *dest,const TYPE& value){
 	return value;
 }
+/// @endcond
 
+/// @cond _internal
 class GenericType{
 protected:
 	template<typename T> const T m_cast_to(T defaultVal) const{
@@ -167,12 +169,12 @@ public:
 }}
 
 namespace std {
-/// @copydoc std::operator<<
+/// Streaming output for Type - classes
 template<typename charT, typename traits> basic_ostream<charT, traits>&
 operator<<(basic_ostream<charT, traits> &out,const isis::util::_internal::GenericType &s){
 	return out<< s.toString();
 }
-/// @copydoc std::operator<<
+/// /// Streaming output for Type referencing classes
 template<typename charT, typename traits,typename TYPE_TYPE> basic_ostream<charT, traits>&
 operator<<(basic_ostream<charT, traits> &out,const isis::util::_internal::TypeReference<TYPE_TYPE> &s){
 	if(!s.empty())

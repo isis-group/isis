@@ -65,7 +65,7 @@ int main(){
 	ChunkList list;
 	{
 		MemChunk<short> a(1,1,1,10);
-		list.add(a);
+		list.push_back(a);
 		a[5]=5;
 		std::cout << "a(0,0,0,5):" << a(0,0,0,5) << std::endl;
 		std::cout << "a.toString():" << a.toString() << std::endl;

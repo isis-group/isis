@@ -91,8 +91,8 @@ public:
 
 class ChunkList:public std::list< _internal::ChunkReference>{
 public:
-	template<typename T> iterator add(const Chunk<T> &chunk){
-		push_back(_internal::ChunkReference(chunk));
+	template<typename T> iterator push_back(const Chunk<T> &chunk){
+		std::list< _internal::ChunkReference>::push_back(_internal::ChunkReference(chunk));
 	}
 };
 

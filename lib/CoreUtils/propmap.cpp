@@ -27,10 +27,10 @@ bool PropMap::valid() const {
 }
 
 
-PropMap::diff_map PropMap::diff(const PropMap& second) const{
+PropMap::diff_map PropMap::diff(const PropMap& second,key_list ignore) const{
 	PropMap::diff_map ret;
 
-	//insert everything that is in this but not in second or is on both but differs
+	//insert everything that is in this, but not in second or is on both but differs
  	BOOST_FOREACH(const_reference ref,*this){
 		const_iterator found=second.find(ref.first);
 		if(found == second.end())
@@ -60,7 +60,7 @@ PropMap::key_list PropMap::missing() const{
 	PropMap::key_list ret;
  	BOOST_FOREACH(const_reference ref,*this){
 		if(ref.second.needed() && ref.second.empty())
-			ret.push_back(ref.first);
+			ret.insert(ref.first);
 	}
 	return ret;
 }
