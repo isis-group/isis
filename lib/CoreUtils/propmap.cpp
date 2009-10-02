@@ -32,6 +32,8 @@ PropMap::diff_map PropMap::diff(const PropMap& second,key_list ignore) const{
 
 	//insert everything that is in this, but not in second or is on both but differs
  	BOOST_FOREACH(const_reference ref,*this){
+		if(ignore.find(ref.first)==ignore.end())
+			continue;
 		const_iterator found=second.find(ref.first);
 		if(found == second.end())
 			ret.insert(std::make_pair(
