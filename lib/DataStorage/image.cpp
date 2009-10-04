@@ -23,6 +23,9 @@ namespace isis{ namespace data{
 	
 Image::Image (_internal::image_lt lt ) :
 std::set< isis::data::_internal::ChunkReference, isis::data::_internal::image_lt > ( lt )
-{}
+{
+	const size_t idx[]={0,0,0,0};
+	init(idx);
+}
 
 }}

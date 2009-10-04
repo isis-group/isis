@@ -25,6 +25,7 @@
 #include "common.hpp"
 #include <string.h>
 #include <list>
+#include "ndimensional.h"
 
 namespace isis{ 
 /*! \addtogroup data
@@ -37,12 +38,7 @@ namespace data{
 /**
  * Main class for four-dimensional random-access data blocks.
  */
-template<typename TYPE> class Chunk : public ::isis::util::TypePtr<TYPE>{
-	size_t fourthSize,thirdSize,secondSize,firstSize;
-	inline size_t dim2index(size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim)const{
-		return	firstDim + secondDim*firstSize + thirdDim*secondSize*firstSize+
-				fourthDim*thirdSize*secondSize*firstSize;
-	}
+template<typename TYPE> class Chunk : public ::isis::util::TypePtr<TYPE>, private _internal::NDimensional<4> {
 protected:
 	/**
 	 * Creates an data-block from existing data.
@@ -50,12 +46,10 @@ protected:
 	 * \param d is the deleter to be used for deletion of src. It must define operator(TYPE *), which than shall free the given pointer.
 	 */
 	template<typename D> Chunk(TYPE* src,D d,size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim):
-	::isis::util::TypePtr<TYPE>(src,fourthDim*thirdDim*secondDim*firstDim,d),
-	fourthSize(fourthDim),thirdSize(thirdDim),secondSize(secondDim),firstSize(firstDim){
+	::isis::util::TypePtr<TYPE>(src,fourthDim*thirdDim*secondDim*firstDim,d){
 		MAKE_LOG(DataDebug);
-		if(!(fourthSize && thirdSize && secondSize && firstSize)){
-			LOG(DataDebug,isis::util::error) << "Chunksize (" << fourthSize << "x" << thirdSize << "x" << secondSize << "x" << firstSize  << ") not valid" << std::endl;
-		}
+		const size_t idx[]={firstDim,secondDim,thirdDim,fourthDim};
+		init(idx);
 	}
 public:
 	/**
@@ -65,13 +59,14 @@ public:
 	*/
 	TYPE &operator()(size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim){
 		MAKE_LOG(DataDebug);
-		if(fourthDim>=fourthSize || thirdDim>=thirdSize || secondDim>=secondSize || firstDim>=firstSize){
-			LOG(DataDebug,isis::util::error) 
-				<< "Index " << fourthDim << "|" << thirdDim << "|" << secondDim << "|" << firstDim 
-				<< " is out of range (" << fourthSize << "x" << thirdSize << "x" << secondSize << "x" << firstSize  << ")" 
+		const size_t idx[]={firstDim,secondDim,thirdDim,fourthDim};
+		if(!rangeCheck(idx)){
+			LOG(DataDebug,isis::util::error)
+				<< "Index " << fourthDim << "|" << thirdDim << "|" << secondDim << "|" << firstDim
+				<< " is out of range"
 				<< std::endl;
 		}
-		return this->operator[](dim2index(fourthDim,thirdDim,secondDim,firstDim));
+		return this->operator[](dim2Index(idx));
 	}
 	::isis::util::PropMap properties;
 };

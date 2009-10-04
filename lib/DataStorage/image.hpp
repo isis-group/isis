@@ -36,7 +36,7 @@ struct image_lt{
 };
 	
 }
-class Image: public std::set<_internal::ChunkReference,_internal::image_lt>{
+class Image: public std::set<_internal::ChunkReference,_internal::image_lt>, _internal::NDimensional<4>{
 	isis::util::PropMap properties;
 public:
 	Image(_internal::image_lt  lt=_internal::image_lt());
