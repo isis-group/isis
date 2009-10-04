@@ -19,3 +19,10 @@
 
 #include "image.hpp"
 
+namespace isis{ namespace data{
+	
+Image::Image (_internal::image_lt lt ) :
+std::set< isis::data::_internal::ChunkReference, isis::data::_internal::image_lt > ( lt )
+{}
+
+}}

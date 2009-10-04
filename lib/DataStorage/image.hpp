@@ -22,17 +22,24 @@
 
 #include "chunk.hpp"
 
-#include <list>
+#include <set>
 #include <boost/shared_ptr.hpp>
 
 namespace isis{ namespace data
 {
 
-class Image
-{
+class Image;
 
+namespace _internal{
+struct image_lt{
+	bool operator() (const ::isis::data::Image& a, const ::isis::data::Image& b) const;
+};
+	
+}
+class Image: public std::set<_internal::ChunkReference,_internal::image_lt>{
+	isis::util::PropMap properties;
 public:
-
+	Image(_internal::image_lt  lt=_internal::image_lt());
 	/**
 	 * This method returns a reference to the voxel value at the given coordinates.
 	 *
@@ -66,7 +73,7 @@ public:
 	 *
 	 * \return A reference to the addressed voxel value. Only reading access is provided
 	 */
-	template <typename T> T& voxel(
+	template <typename T> T voxel(
 		const size_t &first,
 		const size_t &second,
 		const size_t &third,
@@ -101,7 +108,8 @@ public:
 	 *  chunk list.
 	 */
 	void insertChunkList(const ChunkList &chunks);
-
+	void insertChunk(const _internal::ChunkReference chunk);
+	
 };
 
 /// @cond _internal

@@ -31,6 +31,7 @@ public:
 	bool valid()const;
 	key_list missing()const;
 	diff_map diff(const PropMap &second,key_list ignore=key_list())const;
+	void make_unique(const PropMap &second,key_list ignore=key_list());
 	std::ostream& print(std::ostream &out,bool label=false);
 };
 
