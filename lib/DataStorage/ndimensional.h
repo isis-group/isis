@@ -71,6 +71,9 @@ public:
 	bool rangeCheck(const size_t d[SIZE]){
 		return __rangeCheck<SIZE-1>(d,dim);
 	}
+	size_t size(){
+	  return __dimStride<SIZE>(dim);
+	}
 };
 
 }}}

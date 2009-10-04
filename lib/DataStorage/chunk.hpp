@@ -47,9 +47,12 @@ protected:
 	 */
 	template<typename D> Chunk(TYPE* src,D d,size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim):
 	::isis::util::TypePtr<TYPE>(src,fourthDim*thirdDim*secondDim*firstDim,d){
-		MAKE_LOG(DataDebug);
+		MAKE_LOG(DataLog);
 		const size_t idx[]={firstDim,secondDim,thirdDim,fourthDim};
 		init(idx);
+		if(!size())
+			LOG(DataLog,isis::util::error)
+				<< "Size " << fourthDim << "|" << thirdDim << "|" << secondDim << "|" << firstDim << " is invalid" << std::endl;
 	}
 public:
 	/**
