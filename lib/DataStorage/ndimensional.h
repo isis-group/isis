@@ -24,6 +24,9 @@
 #include <stddef.h>
 #include <algorithm>
 #include <boost/static_assert.hpp>
+#include <string>
+#include <sstream>
+#include "CoreUtils/common.hpp"
 
 namespace isis{ namespace data{ namespace _internal{
 
@@ -48,6 +51,7 @@ template<> size_t __dimStride<0> (                 const size_t dim[]);
 template<> size_t __dim2Index<0> (const size_t d[],const size_t dim[]);
 template<> bool   __rangeCheck<0>(const size_t d[],const size_t dim[]);
 
+/// Base class for anything that has dimensional size
 template<unsigned short SIZE> class NDimensional{
 	size_t dim[SIZE];
 protected:
@@ -61,7 +65,7 @@ public:
 		init(src.dim);
 	}
 	/**
-	Compute linear index from nDimensional index,
+	Compute linear index from n-dimensional index,
 	\param d array of indexes (d[0] is most iterating element / lowest dimension)
 	*/
 	size_t dim2Index(const size_t d[SIZE])const
@@ -73,6 +77,14 @@ public:
 	}
 	size_t size(){
 	  return __dimStride<SIZE>(dim);
+	}
+	/// generates a string representing the size
+	std::string sizeToString(std::string delim="x"){
+		std::ostringstream ret;
+		size_t rev[SIZE];
+		std::reverse_copy(dim,dim+SIZE,rev);
+		isis::util::write_list(rev,rev+SIZE,ret,delim);
+		return ret.str();
 	}
 };
 

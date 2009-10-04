@@ -12,6 +12,15 @@
 *  @{
 */
 namespace isis { namespace util {
+
+/**
+Write a list of elements to a std::basic_ostream
+\param start starting iterator of input
+\param start end iterator of input
+\param delim delimiter used to seperate the elements (default: " ")
+\param prefix will be send to the stream as start (default: "")
+\param suffix will be send to the stream at the end (default: "")
+*/
 template<class InputIterator,typename _CharT, typename _Traits> std::basic_ostream<_CharT, _Traits> &
 write_list(InputIterator start,InputIterator end,
 		   std::basic_ostream<_CharT, _Traits> &o,

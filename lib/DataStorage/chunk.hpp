@@ -66,7 +66,7 @@ public:
 		if(!rangeCheck(idx)){
 			LOG(DataDebug,isis::util::error)
 				<< "Index " << fourthDim << "|" << thirdDim << "|" << secondDim << "|" << firstDim
-				<< " is out of range"
+				<< " is out of range (" << sizeToString() << ")"
 				<< std::endl;
 		}
 		return this->operator[](dim2Index(idx));

@@ -107,7 +107,7 @@ type.
 	* Type<std::string> mephisto("666");
 	* Type<int> devil((std::string)devil);
 	* \endcode
-	* \return value of any requested type parsed from toString().
+	* \return value of any requested type parsed from toString(false).
 	*/
 	template<class T> T as()const{
 		MAKE_LOG(CoreLog);
@@ -117,7 +117,7 @@ type.
 			<< " to " << Type<T>::staticName() << std::endl;
 			return this->cast_to_Type<T>();
 		}
-		return Type<T>(this->toString());
+		return Type<T>(this->toString(false));
 	}
 
 	/**
