@@ -1,11 +1,14 @@
-/*
- *  message.h
- *  log_concept
- *
- *  Created by Enrico Reimer on 04.05.08.
- *  Copyright: See COPYING file that comes with this distribution
- *
- */
+//
+// C++ Interface: message
+//
+// Description:
+//
+//
+// Author: Enrico Reimer<reimer@cbs.mpg.de>, (C) 2008
+//
+// Copyright: See COPYING file that comes with this distribution
+//
+//
 
 #ifndef MESSAGE_H
 #define MESSAGE_H

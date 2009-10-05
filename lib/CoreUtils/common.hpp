@@ -1,3 +1,15 @@
+//
+// C++ Interface: common
+//
+// Description:
+//
+//
+// Author: Enrico Reimer<reimer@cbs.mpg.de>, (C) 2009
+//
+// Copyright: See COPYING file that comes with this distribution
+//
+//
+
 #ifndef CORE_COMMON_HPP
 #define CORE_COMMON_HPP
 

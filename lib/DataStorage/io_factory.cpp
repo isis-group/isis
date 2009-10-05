@@ -1,3 +1,15 @@
+//
+// C++ Implementation: io_factory
+//
+// Description:
+//
+//
+// Author: Enrico Reimer<reimer@cbs.mpg.de>, (C) 2009
+//
+// Copyright: See COPYING file that comes with this distribution
+//
+//
+
 #include "io_factory.hpp"
 #include <dlfcn.h>
 #include <iostream>

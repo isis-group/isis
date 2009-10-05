@@ -1,9 +1,14 @@
-/*
- *  message.cpp
- *
- *  Created by Enrico Reimer on 04.05.08.
- *  Copyright 2008. All rights reserved.
- */
+//
+// C++ Implementation: message
+//
+// Description:
+//
+//
+// Author: Enrico Reimer<reimer@cbs.mpg.de>, (C) 2008
+//
+// Copyright: See COPYING file that comes with this distribution
+//
+//
 
 #include "message.hpp"
 #include "common.hpp"

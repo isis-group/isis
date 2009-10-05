@@ -1,3 +1,15 @@
+//
+// C/C++ Interface: io_interface
+//
+// Description:
+//
+//
+// Author: Enrico Reimer<reimer@cbs.mpg.de>, (C) 2009
+//
+// Copyright: See COPYING file that comes with this distribution
+//
+//
+
 #ifndef IO_INTERFACE_H
 #define IO_INTERFACE_H
 

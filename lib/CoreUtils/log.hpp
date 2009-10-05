@@ -4,11 +4,12 @@
 // Description:
 //
 //
-// Author:  <>, (C) 2008
+// Author: Enrico Reimer<reimer@cbs.mpg.de>, (C) 2008
 //
 // Copyright: See COPYING file that comes with this distribution
 //
 //
+
 #ifndef LOG_H
 #define LOG_H
 

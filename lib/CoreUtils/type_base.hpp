@@ -1,3 +1,15 @@
+//
+// C++ Interface: type_base
+//
+// Description:
+//
+//
+// Author: Enrico Reimer<reimer@cbs.mpg.de>, (C) 2009
+//
+// Copyright: See COPYING file that comes with this distribution
+//
+//
+
 #ifndef ISISTYPE_BASE_HPP
 #define ISISTYPE_BASE_HPP
 

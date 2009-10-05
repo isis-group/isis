@@ -1,3 +1,15 @@
+//
+// C++ Interface: type
+//
+// Description:
+//
+//
+// Author: Enrico Reimer<reimer@cbs.mpg.de>, (C) 2009
+//
+// Copyright: See COPYING file that comes with this distribution
+//
+//
+
 #ifndef ISISTYPE_HPP
 #define ISISTYPE_HPP
 
@@ -16,12 +28,12 @@ namespace util{
 /// Generic class for type aware variables
 template<typename TYPE> class Type: public _internal::TypeBase{
 	TYPE m_val;
-	static std::string m_typeName;
-	static unsigned short m_typeID;
+	static const std::string m_typeName;
+	static const unsigned short m_typeID;
 public:
 	/**
 	 * Create a Type from any type of value-type.
-	 * The type of the parameter is not the same as the content type of the object, the system tries to do a type conversion.
+	 * If the type of the parameter is not the same as the content type of the object, the system tries to do a type conversion.
 	 * If that fails, boost::bad_lexical_cast is thrown.
 	 */
 	template<typename T> Type(const T& value){
@@ -61,7 +73,7 @@ public:
 	 * Type<int> i(5);
 	 * float f=i;
 	 * \endcode
-	 * The this case this function returns int which is then also implicitely converted to float.
+	 * In this case the function returns int which is then also implicitely converted to float.
 	 * \return the stored value
 	 */
 	operator TYPE()const{return m_val;}
@@ -77,8 +89,8 @@ public:
  */
 template<typename TYPE> class TypePtr: public _internal::TypePtrBase{
 	boost::shared_ptr<TYPE> m_val;
-	static std::string m_typeName;
-	static unsigned short m_typeID;
+	static const std::string m_typeName;
+	static const unsigned short m_typeID;
 	const size_t m_len;
 	template<typename T> TypePtr(const Type<T>& value); // Dont do this
 public:

@@ -1,17 +1,15 @@
-/**  The factory that loads and generates image formats from all available plugins
- *
- * #include "ImageFormatFactory.h" <BR>
- * -ldl
- *
- * @see
- *
- */
-/*
- * io_factory.hpp
- *
- *  Created on: Sep 18, 2009
- *      Author: reimer
- */
+//
+// C++ Interface: io_factory
+//
+// Description:
+//
+//
+// Author: Enrico Reimer<reimer@cbs.mpg.de>, (C) 2009
+//
+// Copyright: See COPYING file that comes with this distribution
+//
+//
+
 
 
 #ifndef IO_FACTORY_H
