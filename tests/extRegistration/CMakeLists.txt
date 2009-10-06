@@ -1,2 +1,2 @@
-add_executeable(extRegistrationTest extRegistrationTest.cpp)
+add_executable(extRegistrationTest extRegistrationTest.cpp)
 
