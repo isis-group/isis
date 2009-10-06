@@ -58,7 +58,6 @@
 #include "itkDiscreteGaussianImageFilter.h" // low pass filtering for ViolaWellsMutualInformation to increase robustness against noise.
 #include "itkCenteredTransformInitializer.h"
 
-
 namespace isis {
 namespace registration {
 
@@ -116,7 +115,6 @@ public:
 	//resample filter and caster
 	typedef typename itk::ResampleImageFilter<MovingImageType, FixedImageType> ResampleFilterType;
 	typedef typename itk::CastImageFilter<FixedImageType, OutputImageType> ImageCasterType;
-	typedef typename itk::CastImageFilter<FixedImageType, InternalPixelType> FixedToInternalImageCasterType;
 
 	//interpolator typedefs
 	typedef itk::LinearInterpolateImageFunction<MovingImageType, double> LinearInterpolatorType;
@@ -171,7 +169,6 @@ public:
 	typedef typename itk::CenteredTransformInitializer<VersorRigid3DTransformType, TFixedImageType, TMovingImageType>
 	        CenteredTransformInitializerType;
 
-
 	enum eTransformType
 	{
 		    VersorRigid3DTransform,
@@ -194,11 +191,8 @@ public:
 
 	enum eOptimizerType
 	{
-		    RegularStepGradientDescentOptimizer,
-		    VersorRigidOptimizer,
-		    LBFGSBOptimizer,
-		    AmoebaOptimizer,
-		    LevenbergMarquardtOptimizer
+		RegularStepGradientDescentOptimizer, VersorRigidOptimizer, LBFGSBOptimizer, AmoebaOptimizer
+
 	};
 
 	enum eInterpolationType
@@ -330,7 +324,6 @@ private:
 
 	typename ResampleFilterType::Pointer m_ResampleFilter;
 	typename ImageCasterType::Pointer m_ImageCaster;
-	typename FixedToInternalImageCasterType::Pointer m_FixedToInternalImageCaster;
 
 	typename OtsuThresholdFilterType::Pointer m_OtsuThresholdFilter;
 
