@@ -28,6 +28,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::Reset(
 	optimizer.VERSORRIGID3D = false;
 	optimizer.LBFGSBOPTIMIZER = false;
 	optimizer.AMOEBA = false;
+	optimizer.LEVENBERGMARQUARDT = false;
 
 	transform.VERSORRIGID = false;
 	transform.QUATERNIONRIGID = false;
@@ -301,6 +302,15 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer() 
 		if(metric.VIOLAWELLSMUTUALINFORMATION or metric.MUTUALINFORMATIONHISTOGRAM) {
 			m_AmoebaOptimizer->MaximizeOn();
 		}
+	}
+
+	if(optimizer.LEVENBERGMARQUARDT) {
+		LevenbergMarquardtOptimizerType::ScalesType optimizerScaleLevenbergMarquardt(m_NumberOfParameters);
+		for(unsigned int i = 0; i < m_NumberOfParameters; i++) {
+			optimizerScaleLevenbergMarquardt[i] = 1.0 / 1000.0;
+		}
+		m_LevenbergMarquardtOptimizer->SetScales(optimizerScaleLevenbergMarquardt);
+
 	}
 
 }

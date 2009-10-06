@@ -36,6 +36,7 @@
 #include "itkVersorRigid3DTransformOptimizer.h"
 #include "itkLBFGSBOptimizer.h"
 #include "itkAmoebaOptimizer.h"
+#include "itkLevenbergMarquardtOptimizer.h"
 
 //interpolator includes
 #include "itkLinearInterpolateImageFunction.h"
@@ -57,9 +58,6 @@
 #include "itkDiscreteGaussianImageFilter.h" // low pass filtering for ViolaWellsMutualInformation to increase robustness against noise.
 #include "itkCenteredTransformInitializer.h"
 
-//multi-resolution registration includes
-#include "itkMultiResolutionImageRegistrationMethod.h"
-#include "itkMultiResolutionPyramidImageFilter.h"
 
 namespace isis {
 namespace registration {
@@ -118,6 +116,7 @@ public:
 	//resample filter and caster
 	typedef typename itk::ResampleImageFilter<MovingImageType, FixedImageType> ResampleFilterType;
 	typedef typename itk::CastImageFilter<FixedImageType, OutputImageType> ImageCasterType;
+	typedef typename itk::CastImageFilter<FixedImageType, InternalPixelType> FixedToInternalImageCasterType;
 
 	//interpolator typedefs
 	typedef itk::LinearInterpolateImageFunction<MovingImageType, double> LinearInterpolatorType;
@@ -145,6 +144,7 @@ public:
 	typedef itk::VersorRigid3DTransformOptimizer VersorRigid3DTransformOptimizerType;
 	typedef itk::LBFGSBOptimizer LBFGSBOptimizerType;
 	typedef itk::AmoebaOptimizer AmoebaOptimizerType;
+	typedef itk::LevenbergMarquardtOptimizer LevenbergMarquardtOptimizerType;
 
 	//metric typedefs
 	typedef itk::MattesMutualInformationImageToImageMetric<TFixedImageType, TMovingImageType>
@@ -171,9 +171,6 @@ public:
 	typedef typename itk::CenteredTransformInitializer<VersorRigid3DTransformType, TFixedImageType, TMovingImageType>
 	        CenteredTransformInitializerType;
 
-	//multi-resolution registration typedefs
-	typedef itk::MultiResolutionImageRegistrationMethod<InternalImageType, InternalImageType>
-	        MultiResolutionRegistrationMethodType;
 
 	enum eTransformType
 	{
@@ -182,7 +179,7 @@ public:
 		    CenteredEuler3DTransform,
 		    AffineTransform,
 		    CenteredAffineTransform,
-		    BSplineDeformableTransform
+		    BSplineDeformableTransform,
 
 	};
 
@@ -197,7 +194,11 @@ public:
 
 	enum eOptimizerType
 	{
-		RegularStepGradientDescentOptimizer, VersorRigidOptimizer, LBFGSBOptimizer, AmoebaOptimizer
+		    RegularStepGradientDescentOptimizer,
+		    VersorRigidOptimizer,
+		    LBFGSBOptimizer,
+		    AmoebaOptimizer,
+		    LevenbergMarquardtOptimizer
 	};
 
 	enum eInterpolationType
@@ -289,6 +290,7 @@ private:
 		bool VERSORRIGID3D;
 		bool LBFGSBOPTIMIZER;
 		bool AMOEBA;
+		bool LEVENBERGMARQUARDT;
 
 	} optimizer;
 
@@ -328,6 +330,7 @@ private:
 
 	typename ResampleFilterType::Pointer m_ResampleFilter;
 	typename ImageCasterType::Pointer m_ImageCaster;
+	typename FixedToInternalImageCasterType::Pointer m_FixedToInternalImageCaster;
 
 	typename OtsuThresholdFilterType::Pointer m_OtsuThresholdFilter;
 
@@ -341,6 +344,7 @@ private:
 	VersorRigid3DTransformOptimizerType::Pointer m_VersorRigid3DTransformOptimizer;
 	LBFGSBOptimizerType::Pointer m_LBFGSBOptimizer;
 	AmoebaOptimizerType::Pointer m_AmoebaOptimizer;
+	LevenbergMarquardtOptimizerType::Pointer m_LevenbergMarquardtOptimizer;
 
 	//transform
 	VersorRigid3DTransformType::Pointer m_VersorRigid3DTransform;
