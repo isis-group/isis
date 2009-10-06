@@ -1,2 +1,4 @@
 add_executable(extRegistrationTest registrationFactory3DTest.cpp)
 
+target_link_libraries(extRegistrationTest registration)
+
