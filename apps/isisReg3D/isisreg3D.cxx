@@ -197,6 +197,11 @@ int main(int argc, char* argv[]) {
 		optimizerType = 0;
 	}
 
+	if(transformType == 0 and optimizerType != 1) {
+		std::cerr << "\nIt is recommended using the rigid transform in connection with the versor rigid optimizer!\n"
+		        << std::endl;
+	}
+
 	//transform setup
 	std::cout << "used transform: " << TYPTransform[transformType].keyword
 			<< std::endl;
