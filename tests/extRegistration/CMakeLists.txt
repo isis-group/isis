@@ -1,0 +1,2 @@
+add_executeable(extRegistrationTest extRegistrationTest.cpp)
+
