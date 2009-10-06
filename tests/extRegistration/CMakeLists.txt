@@ -1,2 +1,2 @@
-add_executable(extRegistrationTest extRegistrationTest.cpp)
+add_executable(extRegistrationTest registrationFactory3DTest.cpp)
 
