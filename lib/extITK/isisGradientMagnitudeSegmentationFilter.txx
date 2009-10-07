@@ -19,6 +19,7 @@ GradientMagnitudeSegmentationFilter<TInputImage, TOutputImage>::GradientMagnitud
 	m_MinMaxFilter = MinMaxFilterType::New();
 
 	//standard parameters for smoothingfilter
+	m_Sigma = 0.5;
 	m_SmoothingTimeStep = 0.125;
 	m_SmoothingNumberOfIterations = 5;
 	m_SmoothingConductanceParameter = 9.0;
