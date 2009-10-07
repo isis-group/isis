@@ -61,9 +61,8 @@ public:
 	;
 	itkSetMacro( RequestedTimeRangeEnd, unsigned int )
 	;
-
-	virtual void GenerateOutputInformation();
-
+	void Update(void);
+	typename OutputImageType::Pointer GetOutput() const;
 protected:
 	TimeStepExtractionFilter();
 	virtual ~TimeStepExtractionFilter() {
@@ -74,7 +73,7 @@ protected:
 
 	typename ExtractFilterType::Pointer m_ExtractFilter;
 
-	void GenerateData(void);
+
 
 private:
 	TimeStepExtractionFilter(const Self&);
