@@ -100,7 +100,7 @@ public:
 	typedef typename FixedImageType::RegionType FixedImageRegionType;
 	typedef typename MovingImageType::RegionType MovingImageRegionType;
 
-	typedef typename FixedImageType::ConstPointer FixedImagePointer;
+	typedef typename FixedImageType::Pointer FixedImagePointer;
 	typedef typename MovingImageType::Pointer MovingImagePointer;
 	typedef typename OutputImageType::Pointer OutputImagePointer;
 
@@ -167,7 +167,10 @@ public:
 	typedef typename itk::DiscreteGaussianImageFilter<TFixedImageType, TFixedImageType> DiscreteGaussianImageFitlerType;
 
 	typedef typename itk::CenteredTransformInitializer<VersorRigid3DTransformType, TFixedImageType, TMovingImageType>
-	        CenteredTransformInitializerType;
+	        RigidCenteredTransformInitializerType;
+
+	typedef typename itk::CenteredTransformInitializer<AffineTransformType, TFixedImageType, TMovingImageType>
+		        AffineCenteredTransformInitializerType;
 
 	enum eTransformType
 	{
@@ -326,7 +329,8 @@ private:
 
 	typename OtsuThresholdFilterType::Pointer m_OtsuThresholdFilter;
 
-	typename CenteredTransformInitializerType::Pointer m_Initializer;
+	typename RigidCenteredTransformInitializerType::Pointer m_RigidInitializer;
+	typename AffineCenteredTransformInitializerType::Pointer m_AffineInitializer;
 
 	//registration method
 	RegistrationMethodPointer m_RegistrationObject;

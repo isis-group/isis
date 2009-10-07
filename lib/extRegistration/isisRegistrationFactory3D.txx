@@ -50,7 +50,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::Reset(
 	m_FixedImageIsBigger = false;
 
 	UserOptions.PRINTRESULTS = false;
-	UserOptions.NumberOfIterations = 200;
+	UserOptions.NumberOfIterations = 300;
 	UserOptions.NumberOfBins = 50;
 	UserOptions.PixelDensity = 0.01;
 	UserOptions.USEOTSUTHRESHOLDING = false;
@@ -67,9 +67,6 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetFixedImage(
 	m_FixedImage = fixedImage;
 	m_RegistrationObject->SetFixedImage(m_FixedImage);
 	m_FixedImageRegion = m_FixedImage->GetLargestPossibleRegion();
-#ifdef DEBUG
-	std::cout << "Fixed Image Region:\n" << m_FixedImageRegion << std::endl;
-#endif
 }
 
 template<class TFixedImageType, class TMovingImageType>
@@ -78,9 +75,6 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetMovingImage(
 	m_MovingImage = movingImage;
 	m_RegistrationObject->SetMovingImage(m_MovingImage);
 	m_MovingImageRegion = m_MovingImage->GetLargestPossibleRegion();
-#ifdef DEBUG
-	std::cout << "Moving Image Region:\n" << m_MovingImageRegion << std::endl;
-#endif
 
 }
 
@@ -229,9 +223,6 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::UpdateParameters(
 	this->SetUpOptimizer();
 	//metric parameters;
 	this->SetUpMetric();
-
-	m_RegistrationObject->SetFixedImageRegion(m_FixedImage->GetBufferedRegion());
-
 }
 
 template<class TFixedImageType, class TMovingImageType>
@@ -289,10 +280,10 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer() 
 		m_LBFGSBOptimizer->SetUpperBound(upperBound);
 
 		m_LBFGSBOptimizer->SetCostFunctionConvergenceFactor(1.e7);
-		m_LBFGSBOptimizer->SetProjectedGradientTolerance(1e-6);
+		m_LBFGSBOptimizer->SetProjectedGradientTolerance(1e-9);
 		m_LBFGSBOptimizer->SetMaximumNumberOfIterations(UserOptions.NumberOfIterations);
 		m_LBFGSBOptimizer->SetMaximumNumberOfEvaluations(30);
-		m_LBFGSBOptimizer->SetMaximumNumberOfCorrections(5);
+		m_LBFGSBOptimizer->SetMaximumNumberOfCorrections(12);
 
 	}
 	if(optimizer.AMOEBA) {
@@ -325,13 +316,23 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpTransform() 
 
 	//initialize transform
 	if(!UserOptions.INITIALIZEOFF) {
-		m_VersorRigid3DTransform = VersorRigid3DTransformType::New();
-		m_Initializer = CenteredTransformInitializerType::New();
-		m_Initializer->SetTransform(m_VersorRigid3DTransform);
-		m_Initializer->SetFixedImage(m_FixedImage);
-		m_Initializer->SetMovingImage(m_MovingImage);
-		m_Initializer->GeometryOn();
-		m_Initializer->InitializeTransform();
+
+		if(transform.VERSORRIGID) {
+			m_RigidInitializer = RigidCenteredTransformInitializerType::New();
+			m_RigidInitializer->SetTransform(m_VersorRigid3DTransform);
+			m_RigidInitializer->SetFixedImage(m_FixedImage);
+			m_RigidInitializer->SetMovingImage(m_MovingImage);
+			m_RigidInitializer->GeometryOn();
+			m_RigidInitializer->InitializeTransform();
+		}
+		if(transform.AFFINE) {
+			m_AffineInitializer = AffineCenteredTransformInitializerType::New();
+			m_AffineInitializer->SetTransform(m_AffineTransform);
+			m_AffineInitializer->SetFixedImage(m_FixedImage);
+			m_AffineInitializer->SetMovingImage(m_MovingImage);
+			m_AffineInitializer->GeometryOn();
+			m_AffineInitializer->InitializeTransform();
+		}
 	}
 
 	if(transform.BSPLINEDEFORMABLETRANSFORM) {
@@ -387,10 +388,6 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpTransform() 
 	if(transform.AFFINE) {
 		m_NumberOfParameters = m_AffineTransform->GetNumberOfParameters();
 		m_RegistrationObject->SetInitialTransformParameters(m_AffineTransform->GetParameters());
-#ifdef DEBUG
-		std::cout << m_AffineTransform->GetParameters() << std::endl;
-#endif
-
 	}
 
 	if(transform.CENTEREDAFFINE) {
@@ -583,9 +580,6 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::CheckImageSizes(
 
 	}
 	if(m_FixedImageIsBigger) {
-#ifdef DEBUG
-		std::cout << "m_FixedImageIsBigger=true" << std::endl;
-#endif
 		m_MovingImageMaskObject = MaskObjectType::New();
 		m_MovingThresholdFilter = MovingThresholdFilterType::New();
 		m_MovingMinMaxCalculator = MovingMinMaxCalculatorType::New();
@@ -667,11 +661,6 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::StartRegistration
 	this->CheckImageSizes();
 
 	this->SetFixedImageMask();
-
-#ifdef DEBUG
-	m_RegistrationObject->DebugOn();
-	m_RegistrationObject->Print(std::cout);
-#endif
 
 	try {
 		m_RegistrationObject->StartRegistration();
