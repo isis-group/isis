@@ -54,7 +54,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::Reset(
 	UserOptions.NumberOfBins = 50;
 	UserOptions.PixelDensity = 0.01;
 	UserOptions.USEOTSUTHRESHOLDING = false;
-	UserOptions.BSplineGridSize = 10;
+	UserOptions.BSplineGridSize = 5;
 	UserOptions.INITIALIZEOFF = false;
 	UserOptions.NumberOfThreads = 1;
 
@@ -66,8 +66,10 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetFixedImage(
     FixedImagePointer fixedImage) {
 	m_FixedImage = fixedImage;
 	m_RegistrationObject->SetFixedImage(m_FixedImage);
-	m_FixedImageRegion = m_FixedImage->GetBufferedRegion();
-	m_RegistrationObject->SetFixedImageRegion(m_FixedImageRegion);
+	m_FixedImageRegion = m_FixedImage->GetLargestPossibleRegion();
+#ifdef DEBUG
+	std::cout << "Fixed Image Region:\n" << m_FixedImageRegion << std::endl;
+#endif
 }
 
 template<class TFixedImageType, class TMovingImageType>
@@ -75,7 +77,10 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetMovingImage(
     MovingImagePointer movingImage) {
 	m_MovingImage = movingImage;
 	m_RegistrationObject->SetMovingImage(m_MovingImage);
-	m_MovingImageRegion = m_MovingImage->GetBufferedRegion();
+	m_MovingImageRegion = m_MovingImage->GetLargestPossibleRegion();
+#ifdef DEBUG
+	std::cout << "Moving Image Region:\n" << m_MovingImageRegion << std::endl;
+#endif
 
 }
 
@@ -136,7 +141,6 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetInterpolator(
 		break;
 
 	}
-
 }
 
 template<class TFixedImageType, class TMovingImageType>
@@ -223,9 +227,10 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::UpdateParameters(
 
 	//optimizer parameters:
 	this->SetUpOptimizer();
-
 	//metric parameters;
 	this->SetUpMetric();
+
+	m_RegistrationObject->SetFixedImageRegion(m_FixedImage->GetBufferedRegion());
 
 }
 
@@ -283,11 +288,11 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer() 
 		m_LBFGSBOptimizer->SetLowerBound(lowerBound);
 		m_LBFGSBOptimizer->SetUpperBound(upperBound);
 
-		m_LBFGSBOptimizer->SetCostFunctionConvergenceFactor(1e+1);
-		m_LBFGSBOptimizer->SetProjectedGradientTolerance(1e-4);
+		m_LBFGSBOptimizer->SetCostFunctionConvergenceFactor(1.e7);
+		m_LBFGSBOptimizer->SetProjectedGradientTolerance(1e-6);
 		m_LBFGSBOptimizer->SetMaximumNumberOfIterations(UserOptions.NumberOfIterations);
-		m_LBFGSBOptimizer->SetMaximumNumberOfEvaluations(UserOptions.NumberOfIterations);
-		m_LBFGSBOptimizer->SetMaximumNumberOfCorrections(12);
+		m_LBFGSBOptimizer->SetMaximumNumberOfEvaluations(30);
+		m_LBFGSBOptimizer->SetMaximumNumberOfCorrections(5);
 
 	}
 	if(optimizer.AMOEBA) {
@@ -342,7 +347,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpTransform() 
 		typename BSplineRegionType::SizeType totalGridSize;
 
 		gridSizeOnImage.Fill(UserOptions.BSplineGridSize);
-		gridBorderSize.Fill(UserOptions.BSplineBorderSize); //Border for spline order = 3 (1 lower, 2 upper)
+		gridBorderSize.Fill(3); //Border for spline order = 3 (1 lower, 2 upper)
 		totalGridSize = gridSizeOnImage + gridBorderSize;
 
 		bsplineRegion.SetSize(totalGridSize);
@@ -350,18 +355,17 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpTransform() 
 
 		BSplineOriginType bsplineOrigin = m_FixedImage->GetOrigin();
 
+		typename FixedImageType::SizeType fixedImageSize = m_FixedImage->GetBufferedRegion().GetSize();
+
+		for(unsigned int r = 0; r < FixedImageDimension; r++) {
+			bsplineSpacing[r] *= static_cast<double> (fixedImageSize[r] - 1) / static_cast<double> (gridSizeOnImage[r]
+			        - 1);
+		}
+
 		BSplineDirectionType bsplineDirection = m_FixedImage->GetDirection();
 		BSplineSpacingType gridOriginOffset = bsplineDirection * bsplineSpacing;
 
-		typename FixedImageType::SizeType fixedImageSize = m_FixedImageRegion.GetSize();
-
-		for(unsigned int r = 0; r < FixedImageDimension; r++) {
-			bsplineSpacing[r] *= floor(static_cast<double> (fixedImageSize[r] - 1)
-			        / static_cast<double> (gridSizeOnImage[r] - 1));
-			bsplineOrigin[r] -= bsplineSpacing[r];
-		}
-
-		//bsplineOrigin = bsplineOrigin - gridOriginOffset;
+		bsplineOrigin = bsplineOrigin - gridOriginOffset;
 
 		m_BSplineTransform->SetGridSpacing(bsplineSpacing);
 		m_BSplineTransform->SetGridOrigin(bsplineOrigin);
@@ -419,7 +423,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpMetric() {
 		        * UserOptions.PixelDensity);
 
 		m_MattesMutualInformationMetric->SetNumberOfHistogramBins(UserOptions.NumberOfBins);
-		m_MattesMutualInformationMetric->ReinitializeSeed();
+		m_MattesMutualInformationMetric->ReinitializeSeed(76926294);
 
 		//multi threading approach
 		//m_MattesMutualInformationMetric->SetNumberOfThreads(UserOptions.NumberOfThreads);
@@ -492,10 +496,13 @@ typename RegistrationFactory3D<TFixedImageType, TMovingImageType>::OutputImagePo
 	m_ResampleFilter = ResampleFilterType::New();
 	m_ImageCaster = ImageCasterType::New();
 
+	typename RegistrationMethodType::OptimizerType::ParametersType finalParameters =
+	        m_RegistrationObject->GetLastTransformParameters();
+	m_RegistrationObject->GetTransform()->SetParameters(finalParameters);
 	m_ResampleFilter->SetInput(m_MovingImage);
-	m_ResampleFilter->SetTransform(m_RegistrationObject->GetOutput()->Get());
+	m_ResampleFilter->SetTransform(m_RegistrationObject->GetTransform());
 	m_ResampleFilter->SetOutputOrigin(m_FixedImage->GetOrigin());
-	m_ResampleFilter->SetSize(m_FixedImageRegion.GetSize());
+	m_ResampleFilter->SetSize(m_FixedImage->GetLargestPossibleRegion().GetSize());
 	m_ResampleFilter->SetOutputSpacing(m_FixedImage->GetSpacing());
 	m_ResampleFilter->SetOutputDirection(m_FixedImage->GetDirection());
 	m_ResampleFilter->SetDefaultPixelValue(0);
@@ -569,11 +576,6 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::CheckImageSizes(
     void) {
 
 	for(int i = 0; i < FixedImageDimension; i++) {
-#ifdef DEBUG
-		std::cout << "fixed: " << m_FixedImageRegion.GetSize()[i] << std::endl;
-		std::cout << "moving: " << m_MovingImageRegion.GetSize()[i] << std::endl;
-#endif
-
 		if(m_FixedImageRegion.GetSize()[i] > m_MovingImageRegion.GetSize()[i]) {
 
 			m_FixedImageIsBigger = true;
@@ -665,6 +667,11 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::StartRegistration
 	this->CheckImageSizes();
 
 	this->SetFixedImageMask();
+
+#ifdef DEBUG
+	m_RegistrationObject->DebugOn();
+	m_RegistrationObject->Print(std::cout);
+#endif
 
 	try {
 		m_RegistrationObject->StartRegistration();

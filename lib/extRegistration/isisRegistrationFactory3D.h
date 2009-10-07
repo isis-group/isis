@@ -100,7 +100,7 @@ public:
 	typedef typename FixedImageType::RegionType FixedImageRegionType;
 	typedef typename MovingImageType::RegionType MovingImageRegionType;
 
-	typedef typename FixedImageType::Pointer FixedImagePointer;
+	typedef typename FixedImageType::ConstPointer FixedImagePointer;
 	typedef typename MovingImageType::Pointer MovingImagePointer;
 	typedef typename OutputImageType::Pointer OutputImagePointer;
 
@@ -205,7 +205,6 @@ public:
 		unsigned int NumberOfIterations;
 		unsigned int NumberOfBins;
 		unsigned int BSplineGridSize;
-		unsigned int BSplineBorderSize;
 		unsigned int NumberOfThreads;
 		float PixelDensity;
 		bool PRINTRESULTS;

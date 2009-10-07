@@ -38,8 +38,7 @@ static VString transform_filename_out = NULL;
 static VShort number_of_bins = 50;
 static VShort number_of_iterations = 200;
 static VFloat pixel_density = 0.01;
-static VShort grid_size = 7;
-static VShort border_size = 1;
+static VShort grid_size = 5;
 static VShort metricType = 0;
 static VShort transformType = 0;
 static VShort interpolatorType = 0;
@@ -79,8 +78,7 @@ static VOptionDescRec
             {"j", VShortRepn, 1, &number_threads, VOptionalOpt, 0, "Number of threads used for the registration"},
 
             {"gridSize", VShortRepn, 1, &grid_size, VOptionalOpt, 0,
-                "Grid size used for the BSplineDeformable transform."}, {"borderSize", VShortRepn, 1, &border_size,
-                VOptionalOpt, 0, "Border size used for the BSplineDeformable transform"},
+                "Grid size used for the BSplineDeformable transform."},
 
             {"prealign", VBooleanRepn, 1, &initialize, VOptionalOpt, 0,
                 "Using an initializer to align the image centers"},
@@ -111,8 +109,8 @@ int main(
 		exit(1);
 	}
 
-	typedef short InputPixelType;
-	typedef short OutputPixelType;
+	typedef signed short InputPixelType;
+	typedef signed short OutputPixelType;
 	const unsigned int Dimension = 3;
 
 	typedef itk::Image<InputPixelType, Dimension> FixedImageType;
@@ -260,7 +258,6 @@ int main(
 	registrationFactory->UserOptions.NumberOfBins = number_of_bins;
 	registrationFactory->UserOptions.PixelDensity = pixel_density;
 	registrationFactory->UserOptions.BSplineGridSize = grid_size;
-	registrationFactory->UserOptions.BSplineBorderSize = border_size;
 	registrationFactory->UserOptions.PRINTRESULTS = true;
 	registrationFactory->UserOptions.NumberOfThreads = number_threads;
 	if(!initialize)
