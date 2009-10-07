@@ -36,7 +36,7 @@ static VString out_filename = NULL;
 static VString transform_filename_in = NULL;
 static VString transform_filename_out = NULL;
 static VShort number_of_bins = 50;
-static VShort number_of_iterations = 200;
+static VShort number_of_iterations = 300;
 static VFloat pixel_density = 0.01;
 static VShort grid_size = 5;
 static VShort metricType = 0;
@@ -160,7 +160,7 @@ int main(
 	}
 
 	//check combinations of components
-	if((optimizerType == 1 and transformType != 0)) {
+	if(optimizerType == 1 and transformType != 0) {
 		std::cerr
 		        << "\nInappropriate combination of transform and optimizer! Setting optimizer to RegularStepGradientDescent.\n"
 		        << std::endl;
@@ -169,6 +169,11 @@ int main(
 
 	if(transformType == 0 and optimizerType != 1) {
 		std::cerr << "\nIt is recommended using the rigid transform in connection with the versor rigid optimizer!\n"
+		        << std::endl;
+	}
+
+	if(transformType == 2 and optimizerType != 2) {
+		std::cerr << "\nIt is recommended using the BSpline transform in connection with the LBFGSB optimizer!\n"
 		        << std::endl;
 	}
 
