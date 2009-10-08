@@ -31,7 +31,9 @@ namespace isis{
 namespace data{
 
 namespace _internal{
-class ChunkBase :public NDimensional<4>,public PropertyObject{
+class ChunkBase :protected NDimensional<4>,public PropertyObject{
+protected:
+	static const isis::util::PropMap::key_type needed[];
 public:
 	typedef isis::util::_internal::TypeReference <ChunkBase > Reference;
 	ChunkBase(size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim);

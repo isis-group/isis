@@ -11,8 +11,16 @@
 //
 
 #include "propertyobject.h"
+#include <boost/foreach.hpp>
 
 namespace isis{ namespace data { namespace _internal {
+
+PropertyObject::PropertyObject ( const isis::util::PropMap::key_type needed[] ) {
+	for(size_t i=0;i<sizeof(needed)/sizeof(isis::util::PropMap::key_type);i++)
+		addNeeded(needed[i]);
+}
+
+// PropertyObject::PropertyObject() {}
 
 void PropertyObject::addNeeded ( const std::string& key )
 {

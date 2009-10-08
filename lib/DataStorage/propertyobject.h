@@ -20,6 +20,8 @@ namespace isis{ namespace data{ namespace _internal {
 class PropertyObject {
 	::isis::util::PropMap properties;
 public:
+	PropertyObject(const isis::util::PropMap::key_type needed[]);
+// 	PropertyObject();
 	template<typename T> void setProperty(const ::isis::util::PropMap::key_type &key,const T &val){
 		properties[key]=val;
 	}

@@ -28,7 +28,7 @@ namespace isis{
  */
 namespace util{
 
-/// @cond _internal
+/// @cond _hidden
 namespace _internal {
 struct nocase_less{
 	bool operator() (const std::string& a, const std::string& b) const;

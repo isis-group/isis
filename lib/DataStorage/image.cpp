@@ -38,10 +38,17 @@ bool image_chunk_order::operator() ( const isis::data::_internal::ChunkReference
 }
 	
 Image::Image (_internal::image_chunk_order lt ) :
-std::set< isis::data::_internal::ChunkReference, isis::data::_internal::image_chunk_order > ( lt )
+std::set< isis::data::_internal::ChunkReference, isis::data::_internal::image_chunk_order > ( lt ),
+PropertyObject(needed)
 {
 	const size_t idx[]={0,0,0,0};
 	init(idx);
 }
+
+
+bool Image::insertChunk ( const isis::data::_internal::ChunkReference &chunk ) {
+	insert(chunk);
+}
+
 
 }}

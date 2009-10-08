@@ -15,7 +15,7 @@
 namespace isis{ namespace data{
 namespace _internal{
 	
-ChunkBase::ChunkBase ( size_t fourthDim, size_t thirdDim, size_t secondDim, size_t firstDim )
+ChunkBase::ChunkBase ( size_t fourthDim, size_t thirdDim, size_t secondDim, size_t firstDim ):PropertyObject(needed)
 {
 	MAKE_LOG(DataLog);
 	const size_t idx[]={firstDim,secondDim,thirdDim,fourthDim};
@@ -28,6 +28,6 @@ ChunkBase::ChunkBase ( size_t fourthDim, size_t thirdDim, size_t secondDim, size
 ChunkBase::~ChunkBase() { }
 
 }
-	
+
 }}
 

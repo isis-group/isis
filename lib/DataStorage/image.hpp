@@ -30,8 +30,14 @@ struct image_chunk_order: binary_chunk_comarison{
 
 class Image;
 
-class Image: public std::set<_internal::ChunkReference,_internal::image_chunk_order>, _internal::NDimensional<4>{
+class Image:
+	public std::set<_internal::ChunkReference,_internal::image_chunk_order>,
+	protected _internal::NDimensional<4>,
+	public _internal::PropertyObject
+{
 	isis::util::PropMap properties;
+protected:
+	static const isis::util::PropMap::key_type needed[];
 public:
 	/**
 	 * Creates an empty Image object
@@ -106,7 +112,10 @@ public:
 	 *  chunk list.
 	 */
 	void insertChunkList(const ChunkList &chunks);
-	void insertChunk(const _internal::ChunkReference chunk);
+	template<typename T> bool insertChunk(const Chunk<T> &chunk){
+		insertChunk(_internal::ChunkReference(chunk));
+	}
+	bool insertChunk(const _internal::ChunkReference &chunk);
 	
 };
 
