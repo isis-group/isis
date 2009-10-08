@@ -20,11 +20,14 @@
 
 namespace isis{ namespace data
 {
+/// @cond _hidden
 namespace _internal{
 struct image_chunk_order: binary_chunk_comarison{
 	virtual bool operator() ( const ChunkReference& a, const ChunkReference& b );
 };
 }
+/// @endcond
+
 class Image;
 
 class Image: public std::set<_internal::ChunkReference,_internal::image_chunk_order>, _internal::NDimensional<4>{

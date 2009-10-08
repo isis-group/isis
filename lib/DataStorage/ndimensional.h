@@ -1,21 +1,14 @@
-/*
-    <one line to give the program's name and a brief idea of what it does.>
-    Copyright (C) <2009>  <Enrico Reimer>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-*/
+//
+// C++ Interface: ndimensional
+//
+// Description:
+//
+//
+// Author: Enrico Reimer<reimer@cbs.mpg.de>, (C) 2009
+//
+// Copyright: See COPYING file that comes with this distribution
+//
+//
 
 #ifndef NDIMENSIONAL_H
 #define NDIMENSIONAL_H
@@ -29,7 +22,8 @@
 #include "CoreUtils/common.hpp"
 
 namespace isis{ namespace data{ namespace _internal{
-
+/// @cond _hidden
+	
 template<unsigned short DIM> size_t __dimStride(const size_t dim[])
 {
 	BOOST_STATIC_ASSERT(DIM>0);//Make sure recursion terminates
@@ -50,40 +44,52 @@ template<unsigned short DIM> bool __rangeCheck(const size_t d[],const size_t dim
 template<> size_t __dimStride<0> (                 const size_t dim[]);
 template<> size_t __dim2Index<0> (const size_t d[],const size_t dim[]);
 template<> bool   __rangeCheck<0>(const size_t d[],const size_t dim[]);
+/// @endcond
 
 /// Base class for anything that has dimensional size
-template<unsigned short SIZE> class NDimensional{
-	size_t dim[SIZE];
+template<unsigned short DIMS> class NDimensional{
+	size_t dim[DIMS];
 protected:
 	NDimensional(){}
 public:
-	void init(const size_t d[SIZE]){
-		std::copy(d,d+SIZE,dim);
+	/**
+	 * Initializes the size-vector.
+	 * This must be done before anything else, or behaviour will be undefined.
+	 * \param d array with sizes to use
+	 */
+	void init(const size_t d[DIMS]){
+		std::copy(d,d+DIMS,dim);
 		//@todo make validity check
 	}
-	NDimensional(const NDimensional &src){
+	NDimensional(const NDimensional &src){//@todo default copier should do the job
 		init(src.dim);
 	}
 	/**
-	Compute linear index from n-dimensional index,
-	\param d array of indexes (d[0] is most iterating element / lowest dimension)
-	*/
-	size_t dim2Index(const size_t d[SIZE])const
+	 * Compute linear index from n-dimensional index,
+	 * \param d array of indexes (d[0] is most iterating element / lowest dimension)
+	 */
+	size_t dim2Index(const size_t d[DIMS])const
 	{
-		return __dim2Index<SIZE-1>(d,dim);
+		return __dim2Index<DIMS-1>(d,dim);
 	}
-	bool rangeCheck(const size_t d[SIZE]){
-		return __rangeCheck<SIZE-1>(d,dim);
+	/**
+	 * Check if index fits into size of the object.
+	 * \param d index to be checked (d[0] is most iterating element / lowest dimension)
+	 * \returns true if given index wil get a reasonable result when used for dim2index
+	 */
+	bool rangeCheck(const size_t d[DIMS]){
+		return __rangeCheck<DIMS-1>(d,dim);
 	}
+	///\returns the whole size of the object in elements of TYPE
 	size_t size(){
-	  return __dimStride<SIZE>(dim);
+	  return __dimStride<DIMS>(dim);
 	}
 	/// generates a string representing the size
 	std::string sizeToString(std::string delim="x"){
 		std::ostringstream ret;
-		size_t rev[SIZE];
-		std::reverse_copy(dim,dim+SIZE,rev);
-		isis::util::write_list(rev,rev+SIZE,ret,delim);
+		size_t rev[DIMS];
+		std::reverse_copy(dim,dim+DIMS,rev);
+		isis::util::write_list(rev,rev+DIMS,ret,delim);
 		return ret.str();
 	}
 };
