@@ -20,19 +20,21 @@
 
 namespace isis{ namespace data
 {
-
+namespace _internal{
+struct image_chunk_order: binary_chunk_comarison{
+	virtual bool operator() ( const ChunkReference& a, const ChunkReference& b );
+};
+}
 class Image;
 
-namespace _internal{
-struct image_lt{
-	bool operator() (const ::isis::data::Image& a, const ::isis::data::Image& b) const;
-};
-	
-}
-class Image: public std::set<_internal::ChunkReference,_internal::image_lt>, _internal::NDimensional<4>{
+class Image: public std::set<_internal::ChunkReference,_internal::image_chunk_order>, _internal::NDimensional<4>{
 	isis::util::PropMap properties;
 public:
-	Image(_internal::image_lt  lt=_internal::image_lt());
+	/**
+	 * Creates an empty Image object
+	 * \param lt copmarison functor used to sort the chunks 
+	 */
+	Image(_internal::image_chunk_order lt=_internal::image_chunk_order());
 	/**
 	 * This method returns a reference to the voxel value at the given coordinates.
 	 *

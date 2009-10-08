@@ -20,6 +20,7 @@
 #include <string.h>
 #include <list>
 #include "ndimensional.h"
+#include "propertyobject.h"
 
 namespace isis{ 
 /*! \addtogroup data
@@ -29,10 +30,19 @@ namespace isis{
 
 namespace data{
 
+namespace _internal{
+class ChunkBase :public NDimensional<4>,public PropertyObject{
+public:
+	typedef isis::util::_internal::TypeReference <ChunkBase > Reference;
+	ChunkBase(size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim);
+	virtual ~ChunkBase(); //needed to make it polymorphic
+};
+}
+	
 /**
  * Main class for four-dimensional random-access data blocks.
  */
-template<typename TYPE> class Chunk : public ::isis::util::TypePtr<TYPE>, private _internal::NDimensional<4> {
+template<typename TYPE> class Chunk : public ::isis::util::TypePtr<TYPE>, public _internal::ChunkBase{
 protected:
 	/**
 	 * Creates an data-block from existing data.
@@ -40,13 +50,9 @@ protected:
 	 * \param d is the deleter to be used for deletion of src. It must define operator(TYPE *), which than shall free the given pointer.
 	 */
 	template<typename D> Chunk(TYPE* src,D d,size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim):
-	::isis::util::TypePtr<TYPE>(src,fourthDim*thirdDim*secondDim*firstDim,d){
-		MAKE_LOG(DataLog);
-		const size_t idx[]={firstDim,secondDim,thirdDim,fourthDim};
-		init(idx);
-		if(!size())
-			LOG(DataLog,isis::util::error)
-				<< "Size " << fourthDim << "|" << thirdDim << "|" << secondDim << "|" << firstDim << " is invalid" << std::endl;
+	_internal::ChunkBase(fourthDim,thirdDim,secondDim,firstDim),
+	::isis::util::TypePtr<TYPE>(src,size(),d)
+	{
 	}
 public:
 	/**
@@ -65,18 +71,29 @@ public:
 		}
 		return this->operator[](dim2Index(idx));
 	}
-	::isis::util::PropMap properties;
 };
 
 /// @cond _internal
 namespace _internal{
-class ChunkReference : public ::isis::util::_internal::TypePtrBase::Reference {
-public:
-	template<typename T> ChunkReference(const Chunk<T> &src) : ::isis::util::_internal::TypePtrBase::Reference(new Chunk<T>(src)){}
-	
-	template<typename T> Chunk<T>& getAs(){
-		return dynamic_cast<Chunk<T>& >((*this)->cast_to_TypePtr<T>());
+class ChunkReference : public _internal::ChunkBase::Reference {
+	template<typename T> ::isis::util::TypePtr<T> &getTypePtr(){
+		MAKE_LOG(DataLog);
+		boost::shared_ptr<isis::util::_internal::TypePtrBase>
+		const ptr(boost::dynamic_pointer_cast<isis::util::_internal::TypePtrBase>(*this));
+		if(!ptr)
+			LOG(DataLog,isis::util::error)
+			<< "Cannot cast this ChunkReference to TypePtrBase." << std::endl;
+		return ptr->cast_to_TypePtr<T>();
 	}
+public:
+	template<typename T> ChunkReference(const Chunk<T> &src) :	ChunkBase::Reference(new Chunk<T>(src)){}
+	template<typename T> Chunk<T>& getChunk(){
+		return dynamic_cast<Chunk<T>& >(getTypePtr<T>());
+	}
+};
+
+struct binary_chunk_comarison : public std::binary_function< ChunkReference, ChunkReference, bool>{
+	virtual bool operator() (const ChunkReference& a, const ChunkReference& b)=0;
 };
 }
 /// @endcond

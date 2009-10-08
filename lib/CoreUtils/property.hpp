@@ -41,7 +41,8 @@ public:
 	 * \param ref the value to be stored
 	 * \param _needed flag if this PropertyValue is needed an thus not allowed to be empty (a.k.a. undefined)
 	 */ 
-	template<typename T> PropertyValue(const T& ref,bool _needed = false):_internal::TypeBase::Reference(new Type<T>(ref)),m_needed(_needed){ }
+	template<typename T> PropertyValue(const T& ref,bool _needed = false):
+	_internal::TypeBase::Reference(new Type<T>(ref)),m_needed(_needed){ }
 	/**
 	 * Empty constructor.
 	 * Creates an empty property value. So PropertyValue().empty() will allways be true.

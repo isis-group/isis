@@ -34,7 +34,7 @@ int main(int argc, char *argv[]){
 	
 	map2["Test2"]=6;
 	map2["Test3"]=std::string("Hallo");
-// 	map["Vector"]=FixedVector<short,4>();
+ 	map1["Vector"]=fvector4(1,1,1,1);
 	
 	cont["Prop"]=map2;
 	std::cout << cont["Prop"]->toString() << std::endl;

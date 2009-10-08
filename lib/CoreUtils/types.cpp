@@ -13,6 +13,7 @@
 #include "type.hpp"
 #include "property.hpp"
 #include "propmap.hpp"
+#include "vector.hpp"
 
 namespace isis{ namespace util{
 
@@ -35,5 +36,6 @@ DEF_TYPE(float,float,0x7);
 DEF_TYPE(double,double,0x8);
 
 DEF_TYPE(std::string,string,0x20);
-DEF_TYPE(PropMap,PropertyMap,0xF0);
+DEF_TYPE(PropMap,PropertyMap,0xA0);
+DEF_TYPE(fvector4,fvector4,0xA1);
 }}

@@ -60,7 +60,7 @@ int main(){
 	const short x[]={1,2,3,4};
 	FixedVector<short,4> v(x);
 	
-	std::cout << "v.toString():" << v.toString() << std::endl;
+// 	std::cout << "v.toString():" << v.toString() << std::endl;
 
 	ChunkList list;
 	{
@@ -71,8 +71,8 @@ int main(){
 		std::cout << "a.toString():" << a.toString() << std::endl;
 		a(3,0,0,5)=3;//fail (may crash or not)
 	}
-	Chunk<short> &ref=list.begin()->getAs<short>();
+	Chunk<short> &ref=list.begin()->getChunk<short>();
 	std::cout << "ref(0,0,0,5):" << ref(0,0,0,5) << std::endl;
 	std::cout << "ref.toString():" << ref.toString() << std::endl;
-	std::cout << "list.begin()->getAs<short>().toString():" << list.begin()->getAs<short>().toString() << std::endl;
+	std::cout << "list.begin()->getChunk<short>().toString():" << list.begin()->getChunk<short>().toString() << std::endl;
 }

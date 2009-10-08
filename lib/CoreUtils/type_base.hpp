@@ -150,7 +150,7 @@ type.
 	template<typename T> Type<T>& cast_to_Type() throw(std::bad_cast){
 		return m_cast_to<Type<T> >();
 	}
-	virtual bool eq(const TypeBase &second)=0;
+	virtual bool eq(const TypeBase &second)const=0;
 };
 
 class TypePtrBase : public GenericType{
