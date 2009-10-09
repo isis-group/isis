@@ -96,6 +96,7 @@ protected:
 	TypeReference(TYPE_TYPE *t):boost::shared_ptr <TYPE_TYPE>(t){}
 	TypeReference(){}
 public:
+	TypeReference(boost::shared_ptr <TYPE_TYPE> src):boost::shared_ptr <TYPE_TYPE>(src){}
 	/// \returns true if "contained" type has no value (a.k.a. is undefined)
 	bool empty()const{
 		return this->get()==NULL;
@@ -108,8 +109,8 @@ public:
 
 	/**
 	* Interpret the value as value of any (other) type.
-	* This is a runtime-based cast via string. The value is converted into a string, which is then parsed as the requestet
-type.
+	* This is a runtime-based cast via string. The value is converted into a string, which is then parsed as 
+	* the requestet type.
 	* \code
 	* TypeBase *mephisto=new Type<std::string>("666");
 	* int devil=mephisto->as<int>();
@@ -151,6 +152,7 @@ type.
 		return m_cast_to<Type<T> >();
 	}
 	virtual bool eq(const TypeBase &second)const=0;
+	virtual Reference clone()const=0;
 };
 
 class TypePtrBase : public GenericType{

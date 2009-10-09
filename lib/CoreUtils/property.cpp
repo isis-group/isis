@@ -16,6 +16,12 @@
 bool& isis::util::PropertyValue::needed() {	return m_needed;}
 bool isis::util::PropertyValue::needed()const {	return m_needed;}
 
+
+isis::util::PropertyValue& isis::util::PropertyValue::operator= ( const isis::util::PropertyValue& src ) {
+	_internal::TypeBase::Reference::operator=(src->clone());
+}
+
+
 bool isis::util::PropertyValue::operator== ( const isis::util::PropertyValue& second )const {
 	return operator==(*second);
 }

@@ -76,6 +76,12 @@ public:
 	 * \return the stored value
 	 */
 	operator TYPE()const{return m_val;}
+	
+	virtual Reference clone() const{
+		return _internal::TypeBase::Reference(
+			boost::shared_ptr<_internal::TypeBase>(new Type<TYPE>(m_val))
+		);
+	}
 
 	virtual ~Type(){}
 };

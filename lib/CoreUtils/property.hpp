@@ -64,6 +64,14 @@ public:
 	/// Accessor for the needed flag
 	bool &needed();
 	bool needed()const;
+
+	/**
+	 * Copy operator
+	 * This operator creates a copy of the referenced Type-Object. 
+	 * So its NO cheap copy. (At least not if the copy-operator contained type is not cheap)
+	 */
+	PropertyValue &operator=(const PropertyValue &src);
+	
 	bool operator ==(const PropertyValue &second)const;
 	bool operator ==(const _internal::TypeBase &second)const;
 	template<typename T> bool operator ==(const T &second)const{

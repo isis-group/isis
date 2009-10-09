@@ -12,7 +12,8 @@
 #include <string>
 #include <iostream>
 
-BOOST_AUTO_TEST_CASE(property_init_test) {
+BOOST_AUTO_TEST_CASE(property_init_test)
+{
 
 	//	default constructor
 	isis::util::PropertyValue propZero;
@@ -29,4 +30,15 @@ BOOST_AUTO_TEST_CASE(property_init_test) {
 	BOOST_CHECK(!propA.needed());
 	BOOST_CHECK(!propZero.needed());
 
+}
+
+BOOST_AUTO_TEST_CASE(property_copy_test)
+{
+	// Test copy operator
+	isis::util::PropertyValue propA = 5;
+	isis::util::PropertyValue propB = propA;
+	BOOST_CHECK(propB == 5);
+
+	propA = 6;
+	BOOST_CHECK(propB == 5);
 }
