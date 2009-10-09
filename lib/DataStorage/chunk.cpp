@@ -20,12 +20,27 @@ ChunkBase::ChunkBase ( size_t fourthDim, size_t thirdDim, size_t secondDim, size
 	MAKE_LOG(DataLog);
 	const size_t idx[]={firstDim,secondDim,thirdDim,fourthDim};
 	init(idx);
-	if(!size())
+	if(!NDimensional<4>::volume())
 		LOG(DataLog,isis::util::error)
 		<< "Size " << fourthDim << "|" << thirdDim << "|" << secondDim << "|" << firstDim << " is invalid" << std::endl;
 }
 
 ChunkBase::~ChunkBase() { }
+
+size_t ChunkBase::size ( size_t index )const
+{
+	return NDimensional<4>::dimSize(index);
+}
+util::fvector4 ChunkBase::size()const
+{
+	return util::fvector4(size(0),size(1),size(2),size(3));
+}
+
+size_t ChunkBase::volume()const
+{
+	return NDimensional<4>::volume();
+}
+
 
 }
 

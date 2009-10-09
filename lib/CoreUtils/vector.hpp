@@ -10,6 +10,9 @@
 //
 //
 
+#ifndef VECTOR_HPP
+#define VECTOR_HPP
+
 #include "CoreUtils/log.hpp"
 #include "CoreUtils/type.hpp"
 #include <algorithm>
@@ -75,3 +78,5 @@ operator<<(basic_ostream<charT, traits> &out,const ::isis::util::FixedVector<TYP
 	return out;
 }
 }
+
+#endif //VECTOR_HPP

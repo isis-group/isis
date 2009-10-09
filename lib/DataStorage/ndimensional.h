@@ -75,17 +75,23 @@ public:
 	/**
 	 * Check if index fits into size of the object.
 	 * \param d index to be checked (d[0] is most iterating element / lowest dimension)
-	 * \returns true if given index wil get a reasonable result when used for dim2index
+	 * \returns true if given index will get a reasonable result when used for dim2index
 	 */
-	bool rangeCheck(const size_t d[DIMS]){
+	bool rangeCheck(const size_t d[DIMS])const{
 		return __rangeCheck<DIMS-1>(d,dim);
 	}
 	///\returns the whole size of the object in elements of TYPE
-	size_t size(){
+	size_t volume()const
+	{
 	  return __dimStride<DIMS>(dim);
 	}
+	///\returns the size of the object in the given dimension
+	size_t dimSize(size_t idx)const{
+		return dim[idx];
+	}
+	
 	/// generates a string representing the size
-	std::string sizeToString(std::string delim="x"){
+	std::string sizeToString(std::string delim="x")const{
 		std::ostringstream ret;
 		size_t rev[DIMS];
 		std::reverse_copy(dim,dim+DIMS,rev);

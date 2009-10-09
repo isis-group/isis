@@ -5,6 +5,7 @@ add_executable(test_data		test_data.cpp)
 #add_executable(test_imageio	test_imageio.cpp)
 
 add_subdirectory(CoreUtils)
+add_subdirectory(DataStorage)
 
 target_link_libraries(test_logger 	utils)
 target_link_libraries(test_property utils)

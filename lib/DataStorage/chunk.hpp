@@ -21,6 +21,7 @@
 #include <list>
 #include "ndimensional.h"
 #include "propertyobject.h"
+#include "CoreUtils/vector.hpp"
 
 namespace isis{ 
 /*! \addtogroup data
@@ -35,16 +36,22 @@ class ChunkBase :protected NDimensional<4>,public PropertyObject{
 protected:
 	static const isis::util::PropMap::key_type needed[];
 public:
+	enum {time=0,slice,phase,read,n_dims}dimensions;
 	typedef isis::util::_internal::TypeReference <ChunkBase > Reference;
+	
 	ChunkBase(size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim);
 	virtual ~ChunkBase(); //needed to make it polymorphic
+
+	size_t size(size_t index)const;
+	size_t volume()const;
+	isis::util::fvector4 size()const;
 };
 }
 	
 /**
  * Main class for four-dimensional random-access data blocks.
  */
-template<typename TYPE> class Chunk : public ::isis::util::TypePtr<TYPE>, public _internal::ChunkBase{
+template<typename TYPE> class Chunk : public _internal::ChunkBase, public ::isis::util::TypePtr<TYPE>{
 protected:
 	/**
 	 * Creates an data-block from existing data.
@@ -53,7 +60,7 @@ protected:
 	 */
 	template<typename D> Chunk(TYPE* src,D d,size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim):
 	_internal::ChunkBase(fourthDim,thirdDim,secondDim,firstDim),
-	::isis::util::TypePtr<TYPE>(src,size(),d)
+	::isis::util::TypePtr<TYPE>(src,volume(),d)
 	{
 	}
 public:

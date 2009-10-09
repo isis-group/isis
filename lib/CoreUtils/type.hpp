@@ -119,7 +119,10 @@ public:
 	 * \param len the length of the used array (TypePtr does NOT check for length, 
 	 * this is just here for child classes which may want to check)
 	 */
-	TypePtr(TYPE* ptr,size_t len):m_val(ptr,BasicDeleter()),m_len(len){}
+	TypePtr(TYPE* ptr,size_t len):
+	m_val(ptr,BasicDeleter()),m_len(len)
+	{
+	}
 	/**
 	 * Creates TypePtr from a pointer of type TYPE.
 	 * The pointers are automatically deleted by an copy of d and should not be used outside once used here.
@@ -129,7 +132,10 @@ public:
 	 * \param len the length of the used array (TypePtr does NOT check for length,
 	 * \param d the deleter to be used when the data shall be deleted ( d() is called then )
 	 */
-	template<typename D> TypePtr(TYPE* ptr,size_t len,D d):m_val(ptr,d),m_len(len){}
+	template<typename D> TypePtr(TYPE* ptr,size_t len,D d):
+	m_val(ptr,d),m_len(len)
+	{
+	}
 	/// @copydoc Type::is()
 	virtual bool is(const std::type_info & t)const{
 		return t==typeid(TYPE*);
