@@ -90,7 +90,7 @@ template<typename TYPE> class TypePtr: public _internal::TypePtrBase{
 	boost::shared_ptr<TYPE> m_val;
 	static const std::string m_typeName;
 	static const unsigned short m_typeID;
-	const size_t m_len;
+	size_t m_len;
 	template<typename T> TypePtr(const Type<T>& value); // Dont do this
 public:
 	/// Default delete-functor for c-arrays (uses free()).

@@ -12,9 +12,18 @@
 /* create an image */
 BOOST_AUTO_TEST_CASE (image_init_test)
 {
+	isis::data::MemChunk<float> ch(1,1,4,4);
+	isis::data::Image img;
 
-//	TODO create an empty image
+	ch.setProperty("position",isis::util::fvector4(1,1,1,1));
+	
+	BOOST_CHECK(img.insertChunk(ch));
+	BOOST_CHECK(not img.insertChunk(ch)); //inserting the same chunk twice should fail
 
+	ch = isis::data::MemChunk<float>(1,1,4,4);
+	ch.setProperty("position",isis::util::fvector4(1,2,1,1));
+	BOOST_CHECK(img.insertChunk(ch));
+	
 //	TODO create an image out of an ChunkList
 
 }

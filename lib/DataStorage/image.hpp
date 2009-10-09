@@ -113,7 +113,7 @@ public:
 	 */
 	void insertChunkList(const ChunkList &chunks);
 	template<typename T> bool insertChunk(const Chunk<T> &chunk){
-		insertChunk(_internal::ChunkReference(chunk));
+		return insertChunk(_internal::ChunkReference(chunk));
 	}
 	bool insertChunk(const _internal::ChunkReference &chunk);
 	

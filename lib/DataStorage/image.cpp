@@ -47,7 +47,14 @@ PropertyObject(needed)
 
 
 bool Image::insertChunk ( const isis::data::_internal::ChunkReference &chunk ) {
-	insert(chunk);
+	MAKE_LOG(DataLog);
+	if(!chunk->sufficient()){
+		LOG(DataLog,isis::util::error)
+			<< "Cannot insert insufficient chunk" << std::endl;
+		return false;
+	}
+		
+	return insert(chunk).second;
 }
 
 

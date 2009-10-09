@@ -60,9 +60,7 @@ protected:
 	 */
 	template<typename D> Chunk(TYPE* src,D d,size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim):
 	_internal::ChunkBase(fourthDim,thirdDim,secondDim,firstDim),
-	::isis::util::TypePtr<TYPE>(src,volume(),d)
-	{
-	}
+	::isis::util::TypePtr<TYPE>(src,volume(),d)	{}
 public:
 	/**
 	Returns reference to the element at a given index.
