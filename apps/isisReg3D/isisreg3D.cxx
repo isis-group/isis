@@ -26,7 +26,7 @@ VDictEntry TYPTransform[] = { {"Rigid", 0}, {"Affine", 1}, {"BSplineDeformable",
 
 VDictEntry TYPInterpolator[] = { {"Linear", 0}, {"BSpline", 1}, {"NearestNeighbor", 2}, {NULL}};
 
-VDictEntry TYPOptimizer[] = { {"RegularStepGradientDescent", 0}, {"VersorRigid", 1}, {"LBFGSB", 2}, {"Amoeba", 3}, {
+VDictEntry TYPOptimizer[] = { {"VersorRigid", 0}, {"RegularStepGradientDescent", 1}, {"LBFGSB", 2}, {"Amoeba", 3}, {
     NULL}};
 
 //command line parser options
@@ -43,7 +43,7 @@ static VShort metricType = 0;
 static VShort transformType = 0;
 static VShort interpolatorType = 0;
 static VShort optimizerType = 0;
-static VBoolean in_found, out_found, ref_found;
+static VBoolean in_found, ref_found;
 static VShort checker_parts = 0;
 static VShort number_threads = 1;
 static VBoolean initialize = false;
@@ -53,9 +53,9 @@ static VOptionDescRec
             //required inputs
             {"ref", VStringRepn, 1, &ref_filename, &ref_found, 0, "the fixed image filename"},
             {"in", VStringRepn, 1, &in_filename, &in_found, 0, "the moving image filename"},
-            {"out", VStringRepn, 1, &out_filename, &out_found, 0, "the output image filename"},
 
             //non-required inputs
+            {"out", VStringRepn, 1, &out_filename, VOptionalOpt, 0, "the output image filename"},
             {"tout", VStringRepn, 1, &transform_filename_out, VOptionalOpt, 0, "the saved transform filename"},
             {"tin", VStringRepn, 1, &transform_filename_in, VOptionalOpt, 0,
                 "filename of the transform used as an initial transform"},
@@ -97,7 +97,7 @@ int main(
 
 	// DANGER! Kids don't try this at home! VParseCommand modifies the values of argc and argv!!!
 	if(!VParseCommand(VNumber(options), options, &argc, argv) || !VIdentifyFiles(VNumber(options), options, "in",
-	    &argc, argv, 0) || !VIdentifyFiles(VNumber(options), options, "out", &argc, argv, -1)) {
+	    &argc, argv, 0)) {
 		VReportUsage(argv[0], VNumber(options), options, NULL);
 		exit(1);
 	}
@@ -135,13 +135,17 @@ int main(
 
 	fixedReader->SetFileName(ref_filename);
 	movingReader->SetFileName(in_filename);
-	writer->SetFileName(out_filename);
 
 	fixedReader->Update();
 	movingReader->Update();
 
 	RegistrationFactoryType::Pointer registrationFactory = RegistrationFactoryType::New();
 
+	//check, whether at least 1 output filename is given
+	if(!out_filename and !transform_filename_out) {
+		std::cerr << "\nAt least one output parameter must be set! (-out or -tout)\n" << std::endl;
+		return EXIT_FAILURE;
+	}
 	std::cout << "setting up the registration object..." << std::endl;
 
 	//check pixel density
@@ -167,7 +171,7 @@ int main(
 		optimizerType = 0;
 	}
 
-	if(transformType == 0 and optimizerType != 1) {
+	if(transformType == 0 and optimizerType != 0) {
 		std::cerr << "\nIt is recommended using the rigid transform in connection with the versor rigid optimizer!\n"
 		        << std::endl;
 	}
@@ -275,12 +279,13 @@ int main(
 
 	registrationFactory->StartRegistration();
 
-	std::cout << "starting resampling..." << std::endl;
+	if(out_filename) {
+		std::cout << "starting resampling..." << std::endl;
 
-	writer->SetInput(registrationFactory->GetRegisteredImage());
-
-	writer->Update();
-
+		writer->SetFileName(out_filename);
+		writer->SetInput(registrationFactory->GetRegisteredImage());
+		writer->Update();
+	}
 	//safe the gained transform to a user specific filename
 	if(transform_filename_out) {
 		transformWriter->SetInput(registrationFactory->GetTransform());
