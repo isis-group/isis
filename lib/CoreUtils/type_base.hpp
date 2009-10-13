@@ -15,6 +15,7 @@
 
 #include "log.hpp"
 #include <boost/shared_ptr.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 
 /*! \addtogroup util
@@ -84,19 +85,37 @@ public:
 
 /**
 * Base class to store and handle references to Type and TypePtr objects.
-* The values (Type or TypePtr) are refernced as smart pointers to TypeBase.
+* The values are refernced as smart pointers to their base class.
 * So the references are counted and data are automatically deleted if necessary.
 * The usual dereferencing pointer interface ("*" and "->") is supported.
 * This class is designed as base class for specialisations, it should not be used directly.
 * Because of that, the contructors of this class are protected.
 */
-template<typename TYPE_TYPE> class TypeReference:public boost::shared_ptr<TYPE_TYPE>{
+template<typename TYPE_TYPE> class TypeReference:public boost::scoped_ptr<TYPE_TYPE>{
 protected:
 	//dont use this directly
-	TypeReference(TYPE_TYPE *t):boost::shared_ptr <TYPE_TYPE>(t){}
+	TypeReference(TYPE_TYPE *t):boost::scoped_ptr<TYPE_TYPE>(t){}
 	TypeReference(){}
 public:
-	TypeReference(boost::shared_ptr <TYPE_TYPE> src):boost::shared_ptr <TYPE_TYPE>(src){}
+	/**
+	* Copy constructor
+	* This operator creates a copy of the referenced Type-Object.
+	* So its NO cheap copy. (At least not if the copy-operator contained type is not cheap)
+	*/
+	TypeReference(const TypeReference &src)
+	{
+		operator=(src);
+	}
+	/**
+	 * Copy operator
+	 * This operator replaces the current content by a copy of the content of src.
+	 * So its NO cheap copy. (At least not if the copy-operator contained type is not cheap)
+	 */
+	TypeReference<TYPE_TYPE>& operator=(const TypeReference<TYPE_TYPE> &src)
+	{
+		if(not src.empty())
+			reset(src->clone());
+	}
 	/// \returns true if "contained" type has no value (a.k.a. is undefined)
 	bool empty()const{
 		return this->get()==NULL;
@@ -152,7 +171,8 @@ public:
 		return m_cast_to<Type<T> >();
 	}
 	virtual bool eq(const TypeBase &second)const=0;
-	virtual Reference clone()const=0;
+
+	virtual TypeBase* clone()const=0;
 };
 
 class TypePtrBase : public GenericType{
@@ -176,6 +196,8 @@ public:
 	template<typename T> TypePtr<T>& cast_to_TypePtr() throw(std::bad_cast){
 		return m_cast_to<TypePtr<T> >();
 	}
+
+	virtual TypePtrBase* clone()const=0;
 };
 
 }

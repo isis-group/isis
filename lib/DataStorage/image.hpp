@@ -23,7 +23,7 @@ namespace isis{ namespace data
 /// @cond _hidden
 namespace _internal{
 struct image_chunk_order: binary_chunk_comarison{
-	virtual bool operator() ( const ChunkReference& a, const ChunkReference& b );
+	virtual bool operator() ( const Chunk& a, const Chunk& b );
 };
 }
 /// @endcond
@@ -31,7 +31,7 @@ struct image_chunk_order: binary_chunk_comarison{
 class Image;
 
 class Image:
-	public std::set<_internal::ChunkReference,_internal::image_chunk_order>,
+	public std::set<Chunk,_internal::image_chunk_order>,
 	protected _internal::NDimensional<4>,
 	public _internal::PropertyObject
 {
@@ -93,7 +93,7 @@ public:
 	 *
 	 *
 	 */
-	template <typename T> Chunk<T> getChunk(
+	Chunk getChunk(
 		const size_t &first,
 		const size_t &second,
 		const size_t &third,
@@ -111,11 +111,7 @@ public:
 	 * \param chunks A list of chunks that should be merged with the image's internal
 	 *  chunk list.
 	 */
-	void insertChunkList(const ChunkList &chunks);
-	template<typename T> bool insertChunk(const Chunk<T> &chunk){
-		return insertChunk(_internal::ChunkReference(chunk));
-	}
-	bool insertChunk(const _internal::ChunkReference &chunk);
+	bool insertChunk(const Chunk &chunk);
 	
 };
 

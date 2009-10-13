@@ -39,7 +39,7 @@ bool PropertyObject::hasProperty ( const std::string& key )const {
 	return (not getPropertyValue(key).empty());
 }
 
-bool PropertyObject::sufficient() {
+bool PropertyObject::sufficient()const {
 	return properties.valid();
 }
 

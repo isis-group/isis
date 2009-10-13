@@ -41,7 +41,6 @@ size_t ChunkBase::volume()const
 	return NDimensional<4>::volume();
 }
 
-
 }
 
 }}

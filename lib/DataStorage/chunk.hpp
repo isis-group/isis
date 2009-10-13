@@ -33,41 +33,42 @@ namespace data{
 
 namespace _internal{
 class ChunkBase :protected NDimensional<4>,public PropertyObject{
-protected:
-	static const isis::util::PropMap::key_type needed[];
-public:
-	enum {time=0,slice,phase,read,n_dims}dimensions;
-	typedef isis::util::_internal::TypeReference <ChunkBase > Reference;
-	
-	ChunkBase(size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim);
-	virtual ~ChunkBase(); //needed to make it polymorphic
+	protected:
+		static const isis::util::PropMap::key_type needed[];
+	public:
+		enum {time=0,slice,phase,read,n_dims}dimensions;
+		typedef isis::util::_internal::TypeReference <ChunkBase > Reference;
 
-	size_t size(size_t index)const;
-	size_t volume()const;
-	isis::util::fvector4 size()const;
+		ChunkBase(size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim);
+		virtual ~ChunkBase(); //needed to make it polymorphic
+
+		size_t size(size_t index)const;
+		size_t volume()const;
+		isis::util::fvector4 size()const;
 };
 }
 	
 /**
  * Main class for four-dimensional random-access data blocks.
  */
-template<typename TYPE> class Chunk : public _internal::ChunkBase, public ::isis::util::TypePtr<TYPE>{
+class Chunk : public _internal::ChunkBase, public util::_internal::TypeReference<util::_internal::TypePtrBase>{
 protected:
 	/**
 	 * Creates an data-block from existing data.
 	 * \param src is a pointer to the existing data. This data will automatically be deleted. So don't use this pointer afterwards.
 	 * \param d is the deleter to be used for deletion of src. It must define operator(TYPE *), which than shall free the given pointer.
 	 */
-	template<typename D> Chunk(TYPE* src,D d,size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim):
+	template<typename TYPE,typename D> Chunk(TYPE* src,D d,size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim):
 	_internal::ChunkBase(fourthDim,thirdDim,secondDim,firstDim),
-	::isis::util::TypePtr<TYPE>(src,volume(),d)	{}
+	util::_internal::TypeReference<util::_internal::TypePtrBase>(new util::TypePtr<TYPE>(src,volume()))
+	{}
 public:
 	/**
 	Returns reference to the element at a given index.
 	If index is invalid, behaviour is undefined. Most probably it will crash.
 	If _ENABLE_DATA_DEBUG is true an error message will be send (but it will still crash).
 	*/
-	TYPE &operator()(size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim){
+	template<typename TYPE> TYPE &voxel(size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim){
 		MAKE_LOG(DataDebug);
 		const size_t idx[]={firstDim,secondDim,thirdDim,fourthDim};
 		if(!rangeCheck(idx)){
@@ -76,49 +77,32 @@ public:
 				<< " is out of range (" << sizeToString() << ")"
 				<< std::endl;
 		}
-		return this->operator[](dim2Index(idx));
+		util::TypePtr<TYPE> &ret=getTypePtr<TYPE>();
+		return ret[dim2Index(idx)];
+	}
+	template<typename TYPE> util::TypePtr<TYPE> &getTypePtr(){
+		return operator*().cast_to_TypePtr<TYPE>();
 	}
 };
 
 /// @cond _internal
 namespace _internal{
-class ChunkReference : public _internal::ChunkBase::Reference {
-	template<typename T> ::isis::util::TypePtr<T> &getTypePtr(){
-		MAKE_LOG(DataLog);
-		boost::shared_ptr<isis::util::_internal::TypePtrBase>
-		const ptr(boost::dynamic_pointer_cast<isis::util::_internal::TypePtrBase>(*this));
-		if(!ptr)
-			LOG(DataLog,isis::util::error)
-			<< "Cannot cast this ChunkReference to TypePtrBase." << std::endl;
-		return ptr->cast_to_TypePtr<T>();
-	}
-public:
-	template<typename T> ChunkReference(const Chunk<T> &src) :	ChunkBase::Reference(new Chunk<T>(src)){}
-	template<typename T> Chunk<T>& getChunk(){
-		return dynamic_cast<Chunk<T>& >(getTypePtr<T>());
-	}
-};
 
-struct binary_chunk_comarison : public std::binary_function< ChunkReference, ChunkReference, bool>{
-	virtual bool operator() (const ChunkReference& a, const ChunkReference& b)=0;
+struct binary_chunk_comarison : public std::binary_function< Chunk, Chunk, bool>{
+	virtual bool operator() (const Chunk& a, const Chunk& b)=0;
 };
 }
 /// @endcond
 
-class ChunkList:public std::list< _internal::ChunkReference>{
-public:
-	template<typename T> void push_back(const Chunk<T> &chunk){
-		std::list< _internal::ChunkReference>::push_back(_internal::ChunkReference(chunk));
-	}
-};
+typedef std::list<Chunk> ChunkList;
 
 /**
  * Chunk class for memory-based buffers
  */
-template<typename TYPE> class MemChunk : public Chunk<TYPE>{
+template<typename TYPE> class MemChunk : public Chunk{
 public:
-	MemChunk(size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim): 
-	Chunk<TYPE>(
+	MemChunk(size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim):
+	Chunk(
 		(TYPE*)malloc(sizeof(TYPE)*fourthDim*thirdDim*secondDim*firstDim),
 		typename ::isis::util::TypePtr<TYPE>::BasicDeleter(),
 		fourthDim,thirdDim,secondDim,firstDim

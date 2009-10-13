@@ -77,14 +77,17 @@ public:
 	 */
 	operator TYPE()const{return m_val;}
 	
-	virtual Reference clone() const{
-		return _internal::TypeBase::Reference(
-			boost::shared_ptr<_internal::TypeBase>(new Type<TYPE>(m_val))
-		);
+	TypeBase* clone() const
+	{
+		MAKE_LOG(CoreDebug);
+		LOG(CoreDebug,verbose_info)	<< "Creating cloned copy of " << toString(true) << std::endl;
+		return new Type<TYPE>(*this);
 	}
-
+	
 	virtual ~Type(){}
 };
+
+struct NullClass{};
 
 /**
  * Generic class for type (and length) - aware pointers.
@@ -185,6 +188,14 @@ public:
 	 * \return boost::shared_ptr\<TYPE\> handling same data as the object.
 	 */
 	operator boost::shared_ptr<TYPE>(){return m_val;}
+
+	TypePtrBase* clone() const
+	{
+		MAKE_LOG(CoreDebug);
+		LOG(CoreDebug,verbose_info)	<< "Creating cloned copy of TypePtr<" << typeName() << ">" << std::endl;
+		return new TypePtr<TYPE>(*this);
+	}
+
 };
 
 }

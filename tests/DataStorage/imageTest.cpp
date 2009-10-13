@@ -12,6 +12,9 @@
 /* create an image */
 BOOST_AUTO_TEST_CASE (image_init_test)
 {
+	ENABLE_LOG(isis::util::CoreLog,isis::util::DefaultMsgPrint,isis::util::info);
+	ENABLE_LOG(isis::util::CoreDebug,isis::util::DefaultMsgPrint,isis::util::verbose_info);
+	
 	isis::data::MemChunk<float> ch(1,1,4,4);
 	isis::data::Image img;
 

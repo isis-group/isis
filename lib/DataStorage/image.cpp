@@ -17,13 +17,13 @@ namespace isis{ namespace data{
 
 namespace _internal{
 	
-bool image_chunk_order::operator() ( const isis::data::_internal::ChunkReference& a, const isis::data::_internal::ChunkReference& b )
+bool image_chunk_order::operator() ( const isis::data::Chunk& a, const isis::data::Chunk& b )
 {
 	MAKE_LOG(DataDebug);
-	const PropertyObject &propA=*a;
-	const PropertyObject &propB=*b;
+/*	const ChunkBase &propA=a.base();
+	const ChunkBase &propB=b.base();
 
-	//@todo exception ??
+// 	@todo exception ??
 	if(!(propA.hasProperty("position") && propB.hasProperty("position"))){
 		LOG(DataDebug,isis::util::error) << "The chunk has no position, it can not be sorted" << std::endl;
 		return false;
@@ -32,13 +32,14 @@ bool image_chunk_order::operator() ( const isis::data::_internal::ChunkReference
 	const isis::util::fvector4 posA=propA.getProperty<isis::util::fvector4>("position");
 	const isis::util::fvector4 posB=propA.getProperty<isis::util::fvector4>("position");
 	
-	return posA<posB;
+	return posA<posB;*/
+	return false;
 }
 
 }
 	
 Image::Image (_internal::image_chunk_order lt ) :
-std::set< isis::data::_internal::ChunkReference, isis::data::_internal::image_chunk_order > ( lt ),
+std::set< Chunk, isis::data::_internal::image_chunk_order > ( lt ),
 PropertyObject(needed)
 {
 	const size_t idx[]={0,0,0,0};
@@ -46,9 +47,9 @@ PropertyObject(needed)
 }
 
 
-bool Image::insertChunk ( const isis::data::_internal::ChunkReference &chunk ) {
+bool Image::insertChunk ( const Chunk &chunk ) {
 	MAKE_LOG(DataLog);
-	if(!chunk->sufficient()){
+	if(!chunk.sufficient()){
 		LOG(DataLog,isis::util::error)
 			<< "Cannot insert insufficient chunk" << std::endl;
 		return false;
