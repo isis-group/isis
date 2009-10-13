@@ -1,3 +1,1 @@
-SUBDIRS(
-	isisReg3D
-	)	
+add_subdirectory(isisReg3D)

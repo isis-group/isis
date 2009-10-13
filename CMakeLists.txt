@@ -24,11 +24,9 @@ OPTION(BUILD_TESTS "Build the isis tests directory." ON)
 #OPTION(BUILD_SHARED_LIBS "Build isis with shared libraries" OFF)
 
 IF(BUILD_APPLICATIONS)
-	SUBDIRS(apps)
+	add_subdirectory(apps)
 ENDIF(BUILD_APPLICATIONS)
 
 IF(BUILD_TESTS)
     add_subdirectory(tests)
 ENDIF(BUILD_TESTS)
-
-SET(ISIS_LIBRARY_DIR "/lib")
