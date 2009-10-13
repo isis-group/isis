@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 2.4)
 
 PROJECT(isisReg3D)
 
+
+
 # set(CMAKE_BUILD_TYPE "Debug")
 
 #if you don't want the full compiler output, remove the following line
@@ -31,6 +33,12 @@ ADD_EXECUTABLE(isisreg3d
 	isisreg3D.cxx
 	)
 
+set_target_properties(isisreg3d PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${ISIS_INSTALL_BIN_DIR})
+
 # link versus ITK library
 TARGET_LINK_LIBRARIES(isisreg3d  ITKIO ITKSpatialObject ITKNumerics ITKStatistics viaio)
+
+
+
+
 
