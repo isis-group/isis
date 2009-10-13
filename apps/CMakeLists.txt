@@ -1,0 +1,3 @@
+SUBDIRS(
+	isisReg3D
+	)	

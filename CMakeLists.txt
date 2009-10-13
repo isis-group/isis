@@ -15,5 +15,20 @@ add_definitions(-D_ENABLE_CORE_DEBUG=1)
 FIND_PACKAGE(Boost COMPONENTS filesystem regex system)
 include_directories(${Boost_INCLUDE_DIR}  lib)
 
+
 add_subdirectory(lib)
-add_subdirectory(tests)
+
+
+OPTION(BUILD_APPLICATIONS "Build the isis application directory." OFF)
+OPTION(BUILD_TESTS "Build the isis tests directory." ON)
+#OPTION(BUILD_SHARED_LIBS "Build isis with shared libraries" OFF)
+
+IF(BUILD_APPLICATIONS)
+	SUBDIRS(apps)
+ENDIF(BUILD_APPLICATIONS)
+
+IF(BUILD_TESTS)
+    add_subdirectory(tests)
+ENDIF(BUILD_TESTS)
+
+SET(ISIS_LIBRARY_DIR "/lib")
