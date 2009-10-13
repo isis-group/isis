@@ -21,7 +21,7 @@ add_subdirectory(lib)
 
 OPTION(BUILD_APPLICATIONS "Build the isis application directory." OFF)
 OPTION(BUILD_TESTS "Build the isis tests directory." ON)
-#OPTION(BUILD_SHARED_LIBS "Build isis with shared libraries" OFF)
+OPTION(BUILD_SHARED_LIBS "Build isis with shared libraries" OFF)
 
 IF(BUILD_APPLICATIONS)
 	add_subdirectory(apps)
