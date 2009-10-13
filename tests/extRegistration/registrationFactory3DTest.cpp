@@ -9,15 +9,15 @@
 #include "boost/test/included/unit_test.hpp"
 #include "extRegistration/isisRegistrationFactory3D.h"
 
-
+typedef unsigned short PixelType;
+const unsigned int ImageDimension = 3;
+typedef itk::Image<PixelType, ImageDimension> ImageType;
 
 BOOST_AUTO_TEST_CASE(registrationFactory_init_test)
 {
-	// default constructor
-	isis::registration::RegistrationFactory3D regFactoryStd;
 
 	// itk smartpointer constructor
-	isis::registration::RegistrationFactory3D::Pointer regFactoryITK = isis::registration::RegistrationFactory3D::New();
-
+	isis::registration::RegistrationFactory3D<ImageType, ImageType>::Pointer regFactoryITK =
+	        isis::registration::RegistrationFactory3D<ImageType, ImageType>::New();
 
 }

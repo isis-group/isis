@@ -6,6 +6,7 @@ add_executable(test_data		test_data.cpp)
 
 add_subdirectory(CoreUtils)
 add_subdirectory(DataStorage)
+add_subdirectory(extRegistration)
 
 target_link_libraries(test_logger 	utils)
 target_link_libraries(test_property utils)

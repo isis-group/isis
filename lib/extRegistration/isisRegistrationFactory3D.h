@@ -170,7 +170,7 @@ public:
 	        RigidCenteredTransformInitializerType;
 
 	typedef typename itk::CenteredTransformInitializer<AffineTransformType, TFixedImageType, TMovingImageType>
-		        AffineCenteredTransformInitializerType;
+	        AffineCenteredTransformInitializerType;
 
 	enum eTransformType
 	{
@@ -256,7 +256,6 @@ public:
 	ConstTransformPointer GetTransform(
 	    void);
 
-protected:
 	void PrintResults(
 	    void);
 	void CheckImageSizes(
