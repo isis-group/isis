@@ -23,6 +23,9 @@ OPTION(BUILD_APPLICATIONS "Build the isis application directory." OFF)
 OPTION(BUILD_TESTS "Build the isis tests directory." ON)
 OPTION(BUILD_SHARED_LIBS "Build isis with shared libraries" OFF)
 
+
+SET(ISIS_INSTALL_BIN_DIR "${CMAKE_BINARY_DIR}/bin/")
+
 IF(BUILD_APPLICATIONS)
 	add_subdirectory(apps)
 ENDIF(BUILD_APPLICATIONS)
@@ -30,5 +33,3 @@ ENDIF(BUILD_APPLICATIONS)
 IF(BUILD_TESTS)
     add_subdirectory(tests)
 ENDIF(BUILD_TESTS)
-
-SET(ISIS_INSTALL_BIN_DIR "${CMAKE_BINARY_DIR}/bin/")
