@@ -66,13 +66,11 @@ int main(){
 	{
 		MemChunk<short> a(1,1,1,10);
 		list.push_back(a);
-		a[5]=5;
-		std::cout << "a(0,0,0,5):" << a(0,0,0,5) << std::endl;
-		std::cout << "a.toString():" << a.toString() << std::endl;
-		a(3,0,0,5)=3;//fail (may crash or not)
+		a.getTypePtr<short>()[5]=5;
+		std::cout << "a.voxel<short>(0,0,0,5):" << a.voxel<short>(0,0,0,5) << std::endl;
+		a.voxel<short>(3,0,0,5)=3;//fail (may crash or not)
 	}
-	Chunk<short> &ref=list.begin()->getChunk<short>();
-	std::cout << "ref(0,0,0,5):" << ref(0,0,0,5) << std::endl;
-	std::cout << "ref.toString():" << ref.toString() << std::endl;
-	std::cout << "list.begin()->getChunk<short>().toString():" << list.begin()->getChunk<short>().toString() << std::endl;
+	Chunk cp=*list.begin();
+	std::cout << "cp.voxel(0,0,0,5):" << cp.voxel<short>(0,0,0,5) << std::endl;
+	std::cout << "list.begin()->getTypePtr<short>().toString():" << list.begin()->getTypePtr<short>().toString() << std::endl;
 }
