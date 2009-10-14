@@ -28,11 +28,11 @@ void PropertyObject::addNeeded ( const std::string& key )
 }
 
 
-::isis::util::PropMap::mapped_type
+const ::isis::util::PropMap::mapped_type&
 PropertyObject::getPropertyValue ( const std::string& key ) const
 {
 	::isis::util::PropMap::const_iterator found=properties.find(key);
-	return found!=properties.end() ? found->second: ::isis::util::PropMap::mapped_type();
+	return found!=properties.end() ? found->second: emptyProp;
 }
 
 bool PropertyObject::hasProperty ( const std::string& key )const {
@@ -42,5 +42,7 @@ bool PropertyObject::hasProperty ( const std::string& key )const {
 bool PropertyObject::sufficient()const {
 	return properties.valid();
 }
+
+const util::PropMap::mapped_type PropertyObject::emptyProp;
 
 }}}

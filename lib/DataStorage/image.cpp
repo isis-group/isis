@@ -20,20 +20,17 @@ namespace _internal{
 bool image_chunk_order::operator() ( const isis::data::Chunk& a, const isis::data::Chunk& b )
 {
 	MAKE_LOG(DataDebug);
-/*	const ChunkBase &propA=a.base();
-	const ChunkBase &propB=b.base();
 
-// 	@todo exception ??
-	if(!(propA.hasProperty("position") && propB.hasProperty("position"))){
-		LOG(DataDebug,isis::util::error) << "The chunk has no position, it can not be sorted" << std::endl;
+	//@todo exception ??
+	if(!(a.hasProperty("indexOrigin") && a.hasProperty("indexOrigin"))){
+		LOG(DataDebug,isis::util::error) << "The chunk has no position, it can not be sorted into the image." << std::endl;
 		return false;
 	}
 
-	const isis::util::fvector4 posA=propA.getProperty<isis::util::fvector4>("position");
-	const isis::util::fvector4 posB=propA.getProperty<isis::util::fvector4>("position");
+	const isis::util::fvector4 &posA=a.getProperty<isis::util::fvector4>("indexOrigin");
+	const isis::util::fvector4 &posB=b.getProperty<isis::util::fvector4>("indexOrigin");
 	
-	return posA<posB;*/
-	return false;
+	return posA<posB;
 }
 
 }

@@ -15,14 +15,15 @@ add_definitions(-D_ENABLE_CORE_DEBUG=1)
 FIND_PACKAGE(Boost COMPONENTS filesystem regex system)
 include_directories(${Boost_INCLUDE_DIR}  lib)
 
-
-add_subdirectory(lib)
-
-
 OPTION(BUILD_APPLICATIONS "Build the isis application directory." OFF)
 OPTION(BUILD_TESTS "Build the isis tests directory." ON)
 OPTION(BUILD_SHARED_LIBS "Build isis with shared libraries" OFF)
 
+OPTION(BUILD_COREUTILS "Build the isis coreutils." ON)
+OPTION(BUILD_DATA_IO "Build the isis data and io modules." ON)
+OPTION(BUILD_ITK "Build the ITK stuff." OFF)
+
+add_subdirectory(lib)
 
 SET(ISIS_INSTALL_BIN_DIR "${CMAKE_BINARY_DIR}/bin/")
 

@@ -18,17 +18,17 @@
 
 namespace isis{ namespace data{ namespace _internal {
 class PropertyObject {
-	::isis::util::PropMap properties;
+	util::PropMap properties;
+	static const util::PropMap::mapped_type emptyProp;//dummy to be able to return an empty Property
 public:
 	PropertyObject(const isis::util::PropMap::key_type needed[]);
-// 	PropertyObject();
 	template<typename T> void setProperty(const ::isis::util::PropMap::key_type &key,const T &val){
 		properties[key]=val;
 	}
-	::isis::util::PropMap::mapped_type getPropertyValue(const ::isis::util::PropMap::key_type &key)const;
+	const util::PropMap::mapped_type& getPropertyValue(const ::isis::util::PropMap::key_type &key)const;
 	template<typename T> isis::util::Type<T> getProperty(const ::isis::util::PropMap::key_type &key)const{
 		MAKE_LOG(DataLog);
-		const ::isis::util::PropMap::mapped_type value=getPropertyValue(key);
+		const ::isis::util::PropMap::mapped_type &value=getPropertyValue(key);
 		if(value.empty()){
 			const isis::util::Type<T> dummy=T();
 			LOG(DataLog,isis::util::error)
