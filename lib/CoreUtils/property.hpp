@@ -69,7 +69,7 @@ public:
 	bool operator ==(const _internal::TypeBase &second)const;
 	template<typename T> bool operator ==(const T &second)const{
 		if(get()->is<T>())
-			return get()->cast_to_Type<T>() == second;
+			return second == get()->cast_to_Type<T>();
 		else
 			return false;
 	}

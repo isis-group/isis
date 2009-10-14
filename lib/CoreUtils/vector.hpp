@@ -69,10 +69,9 @@ namespace std{
 template<typename charT, typename traits,typename TYPE, size_t SIZE > basic_ostream<charT, traits>&
 operator<<(basic_ostream<charT, traits> &out,const ::isis::util::FixedVector<TYPE,SIZE>& s)
 {
-	size_t i=0;
-	if(i>SIZE){
-		out << s[i];
-		for(i++;i<SIZE;i++)
+	if(SIZE>0){
+		out << s[0];
+		for(size_t i=1;i<SIZE;i++)
 			out << "|" << s[i];
 	}
 	return out;

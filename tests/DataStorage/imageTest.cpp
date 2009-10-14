@@ -7,7 +7,9 @@
 
 #define BOOST_TEST_MODULE ImageTest
 #include <boost/test/included/unit_test.hpp>
+#include <boost/foreach.hpp>
 #include "DataStorage/image.hpp"
+
 
 /* create an image */
 BOOST_AUTO_TEST_CASE (image_init_test)
@@ -18,16 +20,30 @@ BOOST_AUTO_TEST_CASE (image_init_test)
 	isis::data::MemChunk<float> ch(1,1,4,4);
 	isis::data::Image img;
 
-	BOOST_CHECK(!img.insertChunk(ch)); // inserting insufficient Chunk should fail
-	
-	ch.setProperty("indexOrigin",isis::util::fvector4(1,1,1,1));
-	
-	BOOST_CHECK(img.insertChunk(ch));
-	BOOST_CHECK(not img.insertChunk(ch)); //inserting the same chunk twice should fail
+	// inserting insufficient Chunk should fail
+	BOOST_CHECK(!img.insertChunk(ch)); 
 
-	ch = isis::data::MemChunk<float>(1,1,4,4);
-	ch.setProperty("indexOrigin",isis::util::fvector4(1,2,1,1));
+	// but inserting a proper Chunk should work
+	ch.setProperty("indexOrigin",isis::util::fvector4(0,2,0,0));
 	BOOST_CHECK(img.insertChunk(ch));
+
+	//inserting the same chunk twice should fail
+	BOOST_CHECK(not img.insertChunk(ch)); 
+
+	// but inserting another Chunk should work
+	ch = isis::data::MemChunk<float>(1,1,4,4);
+	ch.setProperty("indexOrigin",isis::util::fvector4(0,0,0,0));
+	BOOST_CHECK(img.insertChunk(ch));
+
+	// Chunks should be inserted based on their position (lowest first)
+	ch = isis::data::MemChunk<float>(1,1,4,4);
+	ch.setProperty("indexOrigin",isis::util::fvector4(0,1,0,0));
+	BOOST_CHECK(img.insertChunk(ch));
+
+	unsigned short i=0;
+	BOOST_FOREACH(const isis::data::Chunk &ref,img){
+		BOOST_CHECK(ref.getPropertyValue("indexOrigin") == isis::util::fvector4(0,i++,0,0));
+	}
 	
 //	TODO create an image out of an ChunkList
 
