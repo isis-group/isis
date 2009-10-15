@@ -33,8 +33,8 @@ VDictEntry TYPOptimizer[] = { {"VersorRigid", 0}, {"RegularStepGradientDescent",
 static VString ref_filename = NULL;
 static VString in_filename = NULL;
 static VString out_filename = NULL;
+static VString vout_filename = NULL;
 static VString transform_filename_in = NULL;
-static VString transform_filename_out = NULL;
 static VShort number_of_bins = 50;
 static VShort number_of_iterations = 300;
 static VFloat pixel_density = 0.01;
@@ -44,7 +44,6 @@ static VArgVector transformType;
 static VShort interpolatorType = 0;
 static VArgVector optimizerType;
 static VBoolean in_found, ref_found;
-static VShort checker_parts = 0;
 static VShort number_threads = 1;
 static VBoolean initialize = false;
 
@@ -55,8 +54,8 @@ static VOptionDescRec
             {"in", VStringRepn, 1, &in_filename, &in_found, 0, "the moving image filename"},
 
             //non-required inputs
-            {"out", VStringRepn, 1, &out_filename, VOptionalOpt, 0, "the output image filename"},
-            {"tout", VStringRepn, 1, &transform_filename_out, VOptionalOpt, 0, "the saved transform filename"},
+            {"out", VStringRepn, 1, &out_filename, VOptionalOpt, 0, "the output transform filename"}, {"vout",
+                VStringRepn, 1, &vout_filename, VOptionalOpt, 0, "the output vector image filename"},
             {"tin", VStringRepn, 1, &transform_filename_in, VOptionalOpt, 0,
                 "filename of the transform used as an initial transform"},
             //parameter inputs
@@ -64,7 +63,6 @@ static VOptionDescRec
                 "Number of bins used by the MattesMutualInformationMetric to calculate the image histogram"},
             {"iter", VShortRepn, 1, &number_of_iterations, VOptionalOpt, 0,
                 "Maximum number of iteration used by the optimizer"},
-            {"cb", VShortRepn, 1, &checker_parts, VOptionalOpt, 0, "Number of patterns in each dimension"},
 
             {
                 "pd",
@@ -146,12 +144,6 @@ int main(
 	movingReader->Update();
 
 	RegistrationFactoryType::Pointer registrationFactory = RegistrationFactoryType::New();
-
-	//check, whether at least 1 output filename is given
-	if(!out_filename and !transform_filename_out) {
-		std::cerr << "\nAt least one output parameter must be set! (-out or -tout)\n" << std::endl;
-		return EXIT_FAILURE;
-	}
 
 	//analyse transform vector
 	unsigned int repetition = transformType.number;
@@ -315,34 +307,11 @@ int main(
 
 	}//end repetition
 
-	if(out_filename) {
-		std::cout << "starting resampling..." << std::endl;
-
-		writer->SetFileName(out_filename);
-		writer->SetInput(registrationFactory->GetRegisteredImage());
-		writer->Update();
-	}
 	//safe the gained transform to a user specific filename
-	if(transform_filename_out) {
+	if(out_filename) {
 		transformWriter->SetInput(registrationFactory->GetTransform());
-		transformWriter->SetFileName(transform_filename_out);
+		transformWriter->SetFileName(out_filename);
 		transformWriter->Update();
-	}
-	//checkerboard filter
-	if(checker_parts > 0) {
-		std::cout << "building checkerboard..." << std::endl;
-		CheckerBoardFilterType::PatternArrayType patterns;
-		for(int i = 0; i < 3; i++) {
-			patterns[i] = checker_parts;
-		}
-		checker->SetInput1(fixedReader->GetOutput());
-		checker->SetInput2(registrationFactory->GetRegisteredImage());
-		checker->SetCheckerPattern(patterns);
-		checker->Update();
-		writer->SetFileName("checkerboard.nii");
-		writer->SetInput(checker->GetOutput());
-		writer->Update();
-
 	}
 
 	return 0;
