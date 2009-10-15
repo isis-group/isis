@@ -100,16 +100,12 @@ public:
 		const size_t &fourth)const;
 
 	/**
-	 * This method merges the content of a ChunkList eith the Image's internal chunks.
+	 * Inserts a Chunk into the Image.
+	 * The insertion is sorted and unique. So the Chunk will be inserted behind a geometrically "lower" Chunk if there is one.
+	 * If there is allready a Chunk at the proposed position this Chunk wont be inserted.
 	 *
-	 * The given ChunkList will be traversed and each chunk will be inserted in the right
-	 * place according to its properties. The chunks properties must be set correctly
-	 * to match the image's voxel sort order.
-	 *
-	 * Maybe in the near future, this function throws an exception.
-	 *
-	 * \param chunks A list of chunks that should be merged with the image's internal
-	 *  chunk list.
+	 * \param chunk The Chunk to be inserted
+	 * \returns true if the Chunk was inserted
 	 */
 	bool insertChunk(const Chunk &chunk);
 	

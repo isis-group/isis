@@ -56,4 +56,9 @@ bool Image::insertChunk ( const Chunk &chunk ) {
 }
 
 
+Chunk Image::getChunk ( const size_t& first, const size_t& second, const size_t& third, const size_t& fourth ) const {
+
+}
+
+
 }}

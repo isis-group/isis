@@ -10,6 +10,6 @@ const isis::util::PropMap::key_type isis::data::_internal::ChunkBase::needed[]=
 // Stuff needed for any Image
 const isis::util::PropMap::key_type isis::data::Image::needed[]=
 {
-	"position"
+	"indexOrigin"
 };
 

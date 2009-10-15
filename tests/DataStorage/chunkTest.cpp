@@ -12,6 +12,9 @@
 /* create an image */
 BOOST_AUTO_TEST_CASE (chunk_init_test)
 {
+	ENABLE_LOG(isis::util::CoreLog,isis::util::DefaultMsgPrint,isis::util::warning);
+	ENABLE_LOG(isis::util::CoreDebug,isis::util::DefaultMsgPrint,isis::util::warning);
+
 	isis::data::MemChunk<float> ch(1,2,3,4);
 	BOOST_CHECK(ch.volume()==1*2*3*4);
 	BOOST_CHECK(ch.size(isis::data::MemChunk<float>::read)==1);
@@ -26,18 +29,18 @@ BOOST_AUTO_TEST_CASE (chunk_property_test)
 
 	//an basic Cunk must be invalid
 	BOOST_CHECK(not ch.sufficient());
-	BOOST_CHECK(not ch.hasProperty("position"));
+	BOOST_CHECK(not ch.hasProperty("indexOrigin"));
 
 	//with an position its valid
 	isis::util::fvector4 pos(1,1,1,1);
-	ch.setProperty("Position",pos);
+	ch.setProperty("indexOrigin",pos);
 	BOOST_CHECK(ch.sufficient());
 
 	//properties shall not be case sensitive
-	BOOST_CHECK(ch.hasProperty("position"));
+	BOOST_CHECK(ch.hasProperty("indexorigin"));
 
 	// and of course the property shall be what it was set to
-	BOOST_CHECK(pos == ch.getProperty<isis::util::fvector4>("position"));
+	BOOST_CHECK(pos == ch.getProperty<isis::util::fvector4>("indexOrigin"));
 }
 
 BOOST_AUTO_TEST_CASE (chunk_data_test1)//Access Chunk elements via dimensional index
@@ -76,9 +79,6 @@ BOOST_AUTO_TEST_CASE (chunk_data_test2)//Access Chunk elements via linear index 
 
 BOOST_AUTO_TEST_CASE (chunk_copy_test)//Copy chunks
 {
-	ENABLE_LOG(isis::util::CoreLog,isis::util::DefaultMsgPrint,isis::util::info);
-	ENABLE_LOG(isis::util::CoreDebug,isis::util::DefaultMsgPrint,isis::util::verbose_info);
-
 	isis::data::MemChunk<float> ch1(1,2,3,4);
 	for(size_t i=0;i<ch1.volume();i++)
 		ch1.getTypePtr<float>()[i]=i;

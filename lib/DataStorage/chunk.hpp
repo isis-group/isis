@@ -50,6 +50,8 @@ class ChunkBase :protected NDimensional<4>,public PropertyObject{
 	
 /**
  * Main class for four-dimensional random-access data blocks.
+ * Like in TypePtr, the copy of a Chunk will refernece the same data.
+ * (If you want to make a memory based deep copy of a Chunk create a MemChunk from it)
  */
 class Chunk : public _internal::ChunkBase, public util::_internal::TypeReference<util::_internal::TypePtrBase>{
 protected:
@@ -107,6 +109,15 @@ public:
 		typename ::isis::util::TypePtr<TYPE>::BasicDeleter(),
 		fourthDim,thirdDim,secondDim,firstDim
 	){}
+	MemChunk(const Chunk &ref):Chunk(ref)
+	{
+		util::TypePtr<TYPE> rep(
+			(TYPE*)malloc(sizeof(TYPE)*ref.volume()),ref.volume(),
+			typename ::isis::util::TypePtr<TYPE>::BasicDeleter()
+		);
+		ref.getTypePtr<TYPE>().deepCopy(rep);
+		getTypePtr<TYPE>()=rep;
+	}
 };
 
 }
