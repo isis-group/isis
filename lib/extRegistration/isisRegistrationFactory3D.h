@@ -124,8 +124,8 @@ public:
 	typedef itk::NearestNeighborInterpolateImageFunction<TMovingImageType, double> NearestNeighborInterpolatorType;
 
 	//transform typedefs
-	typedef itk::SmartPointer<const typename RegistrationMethodType::TransformType> ConstTransformPointer;
 	typedef itk::TransformBase* TransformBasePointer; //not allowed to be a itk::SmartPointer because of static_cast usage
+	typedef const itk::TransformBase* ConstTransformBasePointer;
 
 	typedef itk::VersorRigid3DTransform<double> VersorRigid3DTransformType;
 	typedef itk::QuaternionRigidTransform<double> QuaternionRigidTransformType;
@@ -253,7 +253,7 @@ public:
 	    void) const;
 	OutputImagePointer GetRegisteredImage(
 	    void);
-	ConstTransformPointer GetTransform(
+	ConstTransformBasePointer GetTransform(
 	    void);
 
 	void PrintResults(

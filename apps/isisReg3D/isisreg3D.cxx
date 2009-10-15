@@ -40,9 +40,9 @@ static VShort number_of_iterations = 300;
 static VFloat pixel_density = 0.01;
 static VShort grid_size = 5;
 static VShort metricType = 0;
-static VShort transformType = 0;
+static VArgVector transformType;
 static VShort interpolatorType = 0;
-static VShort optimizerType = 0;
+static VArgVector optimizerType;
 static VBoolean in_found, ref_found;
 static VShort checker_parts = 0;
 static VShort number_threads = 1;
@@ -84,9 +84,9 @@ static VOptionDescRec
                 "Using an initializer to align the image centers"},
             //component inputs
             {"metric", VShortRepn, 1, (VPointer) &metricType, VOptionalOpt, TYPMetric, "Type of the metric"}, {
-                "transform", VShortRepn, 1, (VPointer) &transformType, VOptionalOpt, TYPTransform,
+                "transform", VShortRepn, 0, (VPointer) &transformType, VOptionalOpt, TYPTransform,
                 "Type of the transform"}, {"interpolator", VShortRepn, 1, (VPointer) &interpolatorType, VOptionalOpt,
-                TYPInterpolator, "Type of interpolator"}, {"optimizer", VShortRepn, 1, (VPointer) &optimizerType,
+                TYPInterpolator, "Type of interpolator"}, {"optimizer", VShortRepn, 0, (VPointer) &optimizerType,
                 VOptionalOpt, TYPOptimizer, "Type of optimizer"}
 
         };
@@ -113,6 +113,9 @@ int main(
 	typedef signed short OutputPixelType;
 	const unsigned int Dimension = 3;
 
+	VShort transform;
+	VShort optimizer;
+
 	typedef itk::Image<InputPixelType, Dimension> FixedImageType;
 	typedef itk::Image<InputPixelType, Dimension> MovingImageType;
 	typedef itk::Image<OutputPixelType, Dimension> OutputImageType;
@@ -124,6 +127,9 @@ int main(
 	typedef isis::registration::RegistrationFactory3D<FixedImageType, MovingImageType> RegistrationFactoryType;
 
 	typedef itk::CheckerBoardImageFilter<FixedImageType> CheckerBoardFilterType;
+
+	const itk::TransformBase* tmpConstTransformPointer;
+	typedef itk::TransformBase* TransformBasePointerType;
 
 	CheckerBoardFilterType::Pointer checker = CheckerBoardFilterType::New();
 	FixedImageReaderType::Pointer fixedReader = FixedImageReaderType::New();
@@ -146,138 +152,168 @@ int main(
 		std::cerr << "\nAt least one output parameter must be set! (-out or -tout)\n" << std::endl;
 		return EXIT_FAILURE;
 	}
-	std::cout << "setting up the registration object..." << std::endl;
 
-	//check pixel density
-	if(pixel_density <= 0) {
-		std::cerr << "wrong pixel density...set to 0.01" << std::endl;
-		pixel_density = 0.01;
-	}
-	if(pixel_density >= 1) {
-		std::cerr << "metric uses all pixels" << std::endl;
-	}
+	//analyse transform vector
+	unsigned int repetition = transformType.number;
+	if(!repetition)
+		repetition = 1;
+	//analyse optimizer vector
 
-	//check grid size
-	if(grid_size <= 4) {
-		std::cerr << "\ngrid size has to be bigger than 4...setting grid size to 5\n" << std::endl;
-		grid_size = 5;
-	}
 
-	//check combinations of components
-	if(optimizerType == 1 and transformType != 0) {
-		std::cerr
-		        << "\nInappropriate combination of transform and optimizer! Setting optimizer to RegularStepGradientDescent.\n"
-		        << std::endl;
-		optimizerType = 0;
-	}
+	for(unsigned int counter = 0; counter < repetition; counter++) {
 
-	if(transformType == 0 and optimizerType != 0) {
-		std::cerr << "\nIt is recommended using the rigid transform in connection with the versor rigid optimizer!\n"
-		        << std::endl;
-	}
+		if(transformType.number) {
+			transform = ((VShort*) transformType.vector)[counter];
+		} else {
+			transform = 0;
+		}
+		if(optimizerType.number) {
+			optimizer = ((VShort*) optimizerType.vector)[counter];
+		} else {
+			optimizer = 0;
+		}
 
-	if(transformType == 2 and optimizerType != 2) {
-		std::cerr << "\nIt is recommended using the BSpline transform in connection with the LBFGSB optimizer!\n"
-		        << std::endl;
-	}
+		std::cout << "setting up the registration object..." << std::endl;
+		registrationFactory->Reset();
 
-	//transform setup
-	std::cout << "used transform: " << TYPTransform[transformType].keyword << std::endl;
-	switch(transformType) {
-	case 0:
-		registrationFactory->SetTransform(RegistrationFactoryType::VersorRigid3DTransform);
-		break;
-	case 1:
-		registrationFactory->SetTransform(RegistrationFactoryType::AffineTransform);
-		break;
-	case 2:
-		registrationFactory->SetTransform(RegistrationFactoryType::BSplineDeformableTransform);
-		break;
-	case 3:
-		registrationFactory->SetTransform(RegistrationFactoryType::CenteredAffineTransform);
-		break;
-	case 4:
-		registrationFactory->SetTransform(RegistrationFactoryType::QuaternionRigidTransform);
-		break;
-	case 5:
-		registrationFactory->SetTransform(RegistrationFactoryType::CenteredEuler3DTransform);
-		break;
-	}
+		//check pixel density
+		if(pixel_density <= 0) {
+			std::cerr << "wrong pixel density...set to 0.01" << std::endl;
+			pixel_density = 0.01;
+		}
+		if(pixel_density >= 1) {
+			std::cerr << "metric uses all pixels" << std::endl;
+		}
 
-	//metric setup
-	std::cout << "used metric: " << TYPMetric[metricType].keyword << std::endl;
-	switch(metricType) {
-	case 0:
-		registrationFactory->SetMetric(RegistrationFactoryType::MattesMutualInformationMetric);
-		break;
-	case 1:
-		registrationFactory->SetMetric(RegistrationFactoryType::MutualInformationHistogramMetric);
-		break;
-	case 2:
-		registrationFactory->SetMetric(RegistrationFactoryType::NormalizedCorrelationMetric);
-		break;
-	case 3:
-		registrationFactory->SetMetric(RegistrationFactoryType::MeanSquareMetric);
-		break;
+		//check grid size
+		if(grid_size <= 4) {
+			std::cerr << "\ngrid size has to be bigger than 4...setting grid size to 5\n" << std::endl;
+			grid_size = 5;
+		}
 
-	}
+		//check combinations of components
+		if(optimizer == 0 and transform != 0) {
+			std::cerr
+			        << "\nInappropriate combination of transform and optimizer! Setting optimizer to RegularStepGradientDescent.\n"
+			        << std::endl;
+			optimizer = 1;
+		}
 
-	//interpolator setup
-	std::cout << "used interpolator: " << TYPInterpolator[interpolatorType].keyword << std::endl;
-	switch(interpolatorType) {
-	case 0:
-		registrationFactory->SetInterpolator(RegistrationFactoryType::LinearInterpolator);
-		break;
-	case 1:
-		registrationFactory->SetInterpolator(RegistrationFactoryType::BSplineInterpolator);
-		break;
-	case 2:
-		registrationFactory->SetInterpolator(RegistrationFactoryType::NearestNeighborInterpolator);
-		break;
-	}
-	//optimizer setup
-	std::cout << "used optimizer: " << TYPOptimizer[optimizerType].keyword << std::endl;
+		if(transform == 0 and optimizer != 0) {
+			std::cerr
+			        << "\nIt is recommended using the rigid transform in connection with the versor rigid optimizer!\n"
+			        << std::endl;
+		}
 
-	switch(optimizerType) {
-	case 0:
-		registrationFactory->SetOptimizer(RegistrationFactoryType::RegularStepGradientDescentOptimizer);
-		break;
-	case 1:
-		registrationFactory->SetOptimizer(RegistrationFactoryType::VersorRigidOptimizer);
-		break;
-	case 2:
-		registrationFactory->SetOptimizer(RegistrationFactoryType::LBFGSBOptimizer);
-		break;
-	case 3:
-		registrationFactory->SetOptimizer(RegistrationFactoryType::AmoebaOptimizer);
-		break;
-	}
+		if(transform == 2 and optimizer != 2) {
+			std::cerr << "\nIt is recommended using the BSpline transform in connection with the LBFGSB optimizer!\n"
+			        << std::endl;
+		}
 
-	if(transform_filename_in) {
-		transformReader->SetFileName(transform_filename_in);
-		transformReader->Update();
+		//transform setup
+		std::cout << "used transform: " << TYPTransform[transform].keyword << std::endl;
+		switch(transform) {
+		case 0:
+			registrationFactory->SetTransform(RegistrationFactoryType::VersorRigid3DTransform);
+			break;
+		case 1:
+			registrationFactory->SetTransform(RegistrationFactoryType::AffineTransform);
+			break;
+		case 2:
+			registrationFactory->SetTransform(RegistrationFactoryType::BSplineDeformableTransform);
+			break;
+		case 3:
+			registrationFactory->SetTransform(RegistrationFactoryType::CenteredAffineTransform);
+			break;
+		case 4:
+			registrationFactory->SetTransform(RegistrationFactoryType::QuaternionRigidTransform);
+			break;
+		case 5:
+			registrationFactory->SetTransform(RegistrationFactoryType::CenteredEuler3DTransform);
+			break;
+		}
 
-		itk::TransformFileReader::TransformListType *transformList = transformReader->GetTransformList();
-		itk::TransformFileReader::TransformListType::const_iterator ti;
-		ti = transformList->begin();
-		registrationFactory->SetInitialTransform((*ti).GetPointer());
+		//metric setup
+		std::cout << "used metric: " << TYPMetric[metricType].keyword << std::endl;
+		switch(metricType) {
+		case 0:
+			registrationFactory->SetMetric(RegistrationFactoryType::MattesMutualInformationMetric);
+			break;
+		case 1:
+			registrationFactory->SetMetric(RegistrationFactoryType::MutualInformationHistogramMetric);
+			break;
+		case 2:
+			registrationFactory->SetMetric(RegistrationFactoryType::NormalizedCorrelationMetric);
+			break;
+		case 3:
+			registrationFactory->SetMetric(RegistrationFactoryType::MeanSquareMetric);
+			break;
 
-	}
-	registrationFactory->UserOptions.NumberOfIterations = number_of_iterations;
-	registrationFactory->UserOptions.NumberOfBins = number_of_bins;
-	registrationFactory->UserOptions.PixelDensity = pixel_density;
-	registrationFactory->UserOptions.BSplineGridSize = grid_size;
-	registrationFactory->UserOptions.PRINTRESULTS = true;
-	registrationFactory->UserOptions.NumberOfThreads = number_threads;
-	if(!initialize)
-		registrationFactory->UserOptions.INITIALIZEOFF = true;
+		}
 
-	registrationFactory->SetFixedImage(fixedReader->GetOutput());
-	registrationFactory->SetMovingImage(movingReader->GetOutput());
+		//interpolator setup
+		std::cout << "used interpolator: " << TYPInterpolator[interpolatorType].keyword << std::endl;
+		switch(interpolatorType) {
+		case 0:
+			registrationFactory->SetInterpolator(RegistrationFactoryType::LinearInterpolator);
+			break;
+		case 1:
+			registrationFactory->SetInterpolator(RegistrationFactoryType::BSplineInterpolator);
+			break;
+		case 2:
+			registrationFactory->SetInterpolator(RegistrationFactoryType::NearestNeighborInterpolator);
+			break;
+		}
+		//optimizer setup
+		std::cout << "used optimizer: " << TYPOptimizer[optimizer].keyword << std::endl;
 
-	std::cout << "starting the registration..." << std::endl;
+		switch(optimizer) {
+		case 0:
+			registrationFactory->SetOptimizer(RegistrationFactoryType::VersorRigidOptimizer);
+			break;
+		case 1:
+			registrationFactory->SetOptimizer(RegistrationFactoryType::RegularStepGradientDescentOptimizer);
+			break;
+		case 2:
+			registrationFactory->SetOptimizer(RegistrationFactoryType::LBFGSBOptimizer);
+			break;
+		case 3:
+			registrationFactory->SetOptimizer(RegistrationFactoryType::AmoebaOptimizer);
+			break;
+		}
 
-	registrationFactory->StartRegistration();
+		if(transform_filename_in and counter == 0) {
+			transformReader->SetFileName(transform_filename_in);
+			transformReader->Update();
+
+			itk::TransformFileReader::TransformListType *transformList = transformReader->GetTransformList();
+			itk::TransformFileReader::TransformListType::const_iterator ti;
+			ti = transformList->begin();
+			registrationFactory->SetInitialTransform((*ti).GetPointer());
+
+		}
+		if(counter != 0 and !transform_filename_in) {
+			registrationFactory->SetInitialTransform(const_cast<TransformBasePointerType> (tmpConstTransformPointer));
+		}
+
+		registrationFactory->UserOptions.NumberOfIterations = number_of_iterations;
+		registrationFactory->UserOptions.NumberOfBins = number_of_bins;
+		registrationFactory->UserOptions.PixelDensity = pixel_density;
+		registrationFactory->UserOptions.BSplineGridSize = grid_size;
+		registrationFactory->UserOptions.PRINTRESULTS = true;
+		registrationFactory->UserOptions.NumberOfThreads = number_threads;
+		if(!initialize)
+			registrationFactory->UserOptions.INITIALIZEOFF = true;
+
+		registrationFactory->SetFixedImage(fixedReader->GetOutput());
+		registrationFactory->SetMovingImage(movingReader->GetOutput());
+
+		std::cout << "starting the registration..." << std::endl;
+
+		registrationFactory->StartRegistration();
+		tmpConstTransformPointer = registrationFactory->GetTransform();
+
+	}//end repetition
 
 	if(out_filename) {
 		std::cout << "starting resampling..." << std::endl;

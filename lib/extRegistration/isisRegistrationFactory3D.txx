@@ -227,6 +227,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::UpdateParameters(
 
 template<class TFixedImageType, class TMovingImageType>
 void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer() {
+
 	if(optimizer.REGULARSTEPGRADIENTDESCENT) {
 		//setting up the regular step gradient descent optimizer...
 		RegularStepGradientDescentOptimizerType::ScalesType optimizerScaleRegularStepGradient(m_NumberOfParameters);
@@ -235,6 +236,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer() 
 		        or transform.CENTEREDAFFINE or transform.AFFINE or transform.BSPLINEDEFORMABLETRANSFORM) {
 			//...for the rigid transform
 			//number of parameters are dependent on the dimension of the images (2D: 4 parameter, 3D: 6 parameters)
+
 			for(unsigned int i = 0; i < m_NumberOfParameters; i++) {
 				optimizerScaleRegularStepGradient[i] = 1.0 / 1000.0;
 			}
@@ -406,7 +408,6 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpTransform() 
 		m_NumberOfParameters = m_QuaternionRigidTransform->GetNumberOfParameters();
 		m_RegistrationObject->SetInitialTransformParameters(m_QuaternionRigidTransform->GetParameters());
 	}
-
 }
 
 template<class TFixedImageType, class TMovingImageType>
@@ -510,7 +511,7 @@ typename RegistrationFactory3D<TFixedImageType, TMovingImageType>::OutputImagePo
 }
 
 template<class TFixedImageType, class TMovingImageType>
-typename RegistrationFactory3D<TFixedImageType, TMovingImageType>::ConstTransformPointer RegistrationFactory3D<
+typename RegistrationFactory3D<TFixedImageType, TMovingImageType>::ConstTransformBasePointer RegistrationFactory3D<
         TFixedImageType, TMovingImageType>::GetTransform(
     void) {
 
