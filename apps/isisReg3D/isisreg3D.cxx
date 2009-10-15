@@ -7,6 +7,7 @@
 
 #include "extRegistration/isisRegistrationFactory3D.h"
 #include "itkImageFileReader.h"
+#include "itkImageFileWriter.h"
 #include "itkImage.h"
 
 #include "itkTransformFileWriter.h"
@@ -119,6 +120,11 @@ int main(
 
 	typedef isis::registration::RegistrationFactory3D<FixedImageType, MovingImageType> RegistrationFactoryType;
 
+	typedef itk::Vector<float, Dimension> VectorType;
+	typedef itk::Image<VectorType, Dimension> DeformationFieldType;
+
+	typedef itk::ImageFileWriter<DeformationFieldType> VectorWriterType;
+
 	const itk::TransformBase* tmpConstTransformPointer;
 	typedef itk::TransformBase* TransformBasePointerType;
 
@@ -126,6 +132,7 @@ int main(
 	MovingImageReaderType::Pointer movingReader = MovingImageReaderType::New();
 
 	itk::TransformFileWriter::Pointer transformWriter = itk::TransformFileWriter::New();
+	VectorWriterType::Pointer vectorWriter = VectorWriterType::New();
 	itk::TransformFileReader::Pointer transformReader = itk::TransformFileReader::New();
 
 	fixedReader->SetFileName(ref_filename);
@@ -303,6 +310,13 @@ int main(
 		transformWriter->SetInput(registrationFactory->GetTransform());
 		transformWriter->SetFileName(out_filename);
 		transformWriter->Update();
+	}
+
+	if(vout_filename) {
+		vectorWriter->SetInput(registrationFactory->GetTransformVectorField());
+		vectorWriter->SetFileName(vout_filename);
+		vectorWriter->Update();
+
 	}
 
 	return 0;

@@ -26,7 +26,7 @@ ENDIF()
 
 #the executables
 ADD_EXECUTABLE(isisdotrans3d
-	isisdotrans.cxx
+	isisdotrans3D.cxx
 	)
 	
 set_target_properties(isisdotrans3d PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${ISIS_INSTALL_BIN_DIR})

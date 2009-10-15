@@ -84,6 +84,9 @@ public:
 
 	typedef double CoordinateRepType; //type for coordinates representation used by the BSplineDeformableTransform
 
+	typedef itk::Vector<float, FixedImageDimension> VectorType;
+	typedef itk::Image<VectorType, FixedImageDimension> DeformationFieldType;
+	typedef typename DeformationFieldType::Pointer DeformationFieldPointer;
 
 	//typedefs for the joint mask creation
 
@@ -256,6 +259,9 @@ public:
 	ConstTransformBasePointer GetTransform(
 	    void);
 
+	DeformationFieldPointer GetTransformVectorField(
+	    void);
+
 	void PrintResults(
 	    void);
 	void CheckImageSizes(
@@ -305,6 +311,7 @@ private:
 		bool NEARESTNEIGHBOR;
 	} interpolator;
 
+	DeformationFieldPointer m_DeformationField;
 	FixedImagePointer m_FixedImage;
 	MovingImagePointer m_MovingImage;
 	OutputImagePointer m_OutputImage;

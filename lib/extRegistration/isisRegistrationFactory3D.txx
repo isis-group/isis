@@ -519,6 +519,43 @@ typename RegistrationFactory3D<TFixedImageType, TMovingImageType>::ConstTransfor
 }
 
 template<class TFixedImageType, class TMovingImageType>
+typename RegistrationFactory3D<TFixedImageType, TMovingImageType>::DeformationFieldPointer RegistrationFactory3D<
+        TFixedImageType, TMovingImageType>::GetTransformVectorField(
+    void) {
+	m_DeformationField = DeformationFieldType::New();
+	m_DeformationField->SetRegions(m_FixedImageRegion);
+	m_DeformationField->SetOrigin(m_FixedImage->GetOrigin());
+	m_DeformationField->SetSpacing(m_FixedImage->GetSpacing());
+	m_DeformationField->SetDirection(m_FixedImage->GetDirection());
+	m_DeformationField->Allocate();
+
+	typedef itk::ImageRegionIterator<DeformationFieldType> DeformationFieldIteratorType;
+	DeformationFieldIteratorType fi(m_DeformationField, m_FixedImageRegion);
+	fi.GoToBegin();
+
+	typename itk::Transform<double, FixedImageDimension, MovingImageDimension>::InputPointType fixedPoint;
+	typename itk::Transform<double, FixedImageDimension, MovingImageDimension>::OutputPointType movingPoint;
+	typename DeformationFieldType::IndexType index;
+
+	VectorType displacement;
+	while(!fi.IsAtEnd()) {
+		index = fi.GetIndex();
+		m_DeformationField->TransformIndexToPhysicalPoint(index, fixedPoint);
+		if(transform.BSPLINEDEFORMABLETRANSFORM)
+			movingPoint = m_BSplineTransform->TransformPoint(fixedPoint);
+		if(transform.VERSORRIGID)
+			movingPoint = m_VersorRigid3DTransform->TransformPoint(fixedPoint);
+		if(transform.AFFINE)
+			movingPoint = m_AffineTransform->TransformPoint(fixedPoint);
+		displacement = movingPoint - fixedPoint;
+		fi.Set(displacement);
+		++fi;
+	}
+	return m_DeformationField;
+
+}
+
+template<class TFixedImageType, class TMovingImageType>
 typename RegistrationFactory3D<TFixedImageType, TMovingImageType>::RegistrationMethodPointer RegistrationFactory3D<
         TFixedImageType, TMovingImageType>::GetRegistrationObject(
     void) const {
