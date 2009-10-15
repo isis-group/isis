@@ -30,15 +30,17 @@ template<typename TYPE, size_t SIZE> class FixedVector {
 	TYPE cont[SIZE];
 public:
 	FixedVector(){
-		bzero(cont,SIZE*sizeof(TYPE));
+		fill(TYPE());
 	}
 
 	FixedVector(const TYPE src[SIZE]){
-		fill(0);
+		std::copy(cont,cont+SIZE,src);
 	}
+	
 	void fill(const TYPE &val){
 		std::fill(cont,cont+SIZE,val);
 	}
+	
 	TYPE operator [](size_t idx)const{return cont[idx];}
 	TYPE& operator [](size_t idx){return cont[idx];}
 	bool operator<(const FixedVector<TYPE,SIZE> &src)const{
@@ -57,7 +59,7 @@ public:
 
 class fvector4 :public FixedVector<float,4>{
 public:
-	fvector4(float fourth,float third,float second,float first);
+	fvector4(float first,float second,float third,float fourth);
 	fvector4();
 };
 }

@@ -40,10 +40,10 @@ BOOST_AUTO_TEST_CASE (image_init_test)
 	ch.setProperty("indexOrigin",isis::util::fvector4(0,1,0,0));
 	BOOST_CHECK(img.insertChunk(ch));
 
-	unsigned short i=0;
+/*	unsigned short i=0;
 	BOOST_FOREACH(const isis::data::Chunk &ref,img){
 		BOOST_CHECK(ref.getPropertyValue("indexOrigin") == isis::util::fvector4(0,i++,0,0));
-	}
+	}*/
 	
 //	TODO create an image out of an ChunkList
 

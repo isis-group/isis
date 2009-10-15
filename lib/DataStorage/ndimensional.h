@@ -93,9 +93,7 @@ public:
 	/// generates a string representing the size
 	std::string sizeToString(std::string delim="x")const{
 		std::ostringstream ret;
-		size_t rev[DIMS];
-		std::reverse_copy(dim,dim+DIMS,rev);
-		isis::util::write_list(rev,rev+DIMS,ret,delim);
+		isis::util::write_list(dim,dim+DIMS,ret,delim);
 		return ret.str();
 	}
 };

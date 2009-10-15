@@ -36,10 +36,10 @@ class ChunkBase :protected NDimensional<4>,public PropertyObject{
 	protected:
 		static const isis::util::PropMap::key_type needed[];
 	public:
-		enum {time=0,slice,phase,read,n_dims}dimensions;
+		enum {read=0,phase,slice,time,n_dims}dimensions;
 		typedef isis::util::_internal::TypeReference <ChunkBase > Reference;
 
-		ChunkBase(size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim);
+		ChunkBase(size_t firstDim,size_t secondDim,size_t thirdDim,size_t fourthDim);
 		virtual ~ChunkBase(); //needed to make it polymorphic
 
 		size_t size(size_t index)const;
@@ -60,8 +60,8 @@ protected:
 	 * \param src is a pointer to the existing data. This data will automatically be deleted. So don't use this pointer afterwards.
 	 * \param d is the deleter to be used for deletion of src. It must define operator(TYPE *), which than shall free the given pointer.
 	 */
-	template<typename TYPE,typename D> Chunk(TYPE* src,D d,size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim):
-	_internal::ChunkBase(fourthDim,thirdDim,secondDim,firstDim),
+	template<typename TYPE,typename D> Chunk(TYPE* src,D d,size_t firstDim,size_t secondDim,size_t thirdDim,size_t fourthDim):
+	_internal::ChunkBase(firstDim,secondDim,thirdDim,fourthDim),
 	util::_internal::TypeReference<util::_internal::TypePtrBase>(new util::TypePtr<TYPE>(src,volume()))
 	{}
 public:
@@ -70,12 +70,12 @@ public:
 	If index is invalid, behaviour is undefined. Most probably it will crash.
 	If _ENABLE_DATA_DEBUG is true an error message will be send (but it will still crash).
 	*/
-	template<typename TYPE> TYPE &voxel(size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim){
+	template<typename TYPE> TYPE &voxel(size_t firstDim,size_t secondDim,size_t thirdDim,size_t fourthDim){
 		MAKE_LOG(DataDebug);
 		const size_t idx[]={firstDim,secondDim,thirdDim,fourthDim};
 		if(!rangeCheck(idx)){
 			LOG(DataDebug,isis::util::error)
-				<< "Index " << fourthDim << "|" << thirdDim << "|" << secondDim << "|" << firstDim
+				<< "Index " << firstDim << "|" << secondDim << "|" << thirdDim << "|" << fourthDim
 				<< " is out of range (" << sizeToString() << ")"
 				<< std::endl;
 		}
@@ -91,7 +91,7 @@ public:
 namespace _internal{
 
 struct binary_chunk_comarison : public std::binary_function< Chunk, Chunk, bool>{
-	virtual bool operator() (const Chunk& a, const Chunk& b)=0;
+	virtual bool operator() (const Chunk& a, const Chunk& b)const=0;
 };
 }
 /// @endcond
@@ -103,12 +103,13 @@ typedef std::list<Chunk> ChunkList;
  */
 template<typename TYPE> class MemChunk : public Chunk{
 public:
-	MemChunk(size_t fourthDim,size_t thirdDim,size_t secondDim,size_t firstDim):
+	MemChunk(size_t firstDim,size_t secondDim,size_t thirdDim,size_t fourthDim):
 	Chunk(
 		(TYPE*)malloc(sizeof(TYPE)*fourthDim*thirdDim*secondDim*firstDim),
 		typename ::isis::util::TypePtr<TYPE>::BasicDeleter(),
-		fourthDim,thirdDim,secondDim,firstDim
+		  firstDim,secondDim,thirdDim,fourthDim
 	){}
+	/// Creates a deep copy of the given Chunk
 	MemChunk(const Chunk &ref):Chunk(ref)
 	{
 		util::TypePtr<TYPE> rep(

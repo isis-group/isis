@@ -17,13 +17,14 @@
 
 #include <set>
 #include <boost/shared_ptr.hpp>
+#include <vector>
 
 namespace isis{ namespace data
 {
 /// @cond _hidden
 namespace _internal{
 struct image_chunk_order: binary_chunk_comarison{
-	virtual bool operator() ( const Chunk& a, const Chunk& b );
+	virtual bool operator() ( const Chunk& a, const Chunk& b )const;
 };
 }
 /// @endcond
@@ -31,11 +32,12 @@ struct image_chunk_order: binary_chunk_comarison{
 class Image;
 
 class Image:
-	public std::set<Chunk,_internal::image_chunk_order>,
 	protected _internal::NDimensional<4>,
 	public _internal::PropertyObject
 {
-	isis::util::PropMap properties;
+	std::set<Chunk,_internal::image_chunk_order> set;
+	std::vector<std::set<Chunk,_internal::image_chunk_order>::iterator> lookup;
+	bool clean;
 protected:
 	static const isis::util::PropMap::key_type needed[];
 public:
@@ -108,7 +110,7 @@ public:
 	 * \returns true if the Chunk was inserted
 	 */
 	bool insertChunk(const Chunk &chunk);
-	
+	bool reIndex();
 };
 
 /// @cond _internal

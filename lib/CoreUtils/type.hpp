@@ -143,12 +143,14 @@ public:
 
 	template<typename D> TypePtr(TYPE* ptr,size_t len,D d):
 	m_val(ptr,d),m_len(len)	{}
-
+	
+	/// \returns the length of the data pointed to
 	size_t len()
 	{
 		return m_len;
 	}
 	
+	/// Copies the data pointed to into another TypePtr
 	void deepCopy(TypePtr<TYPE> &dst)
 	{
 		MAKE_LOG(CoreLog);

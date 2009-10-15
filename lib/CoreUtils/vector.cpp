@@ -14,7 +14,7 @@
 
 
 namespace isis{ namespace util{
-fvector4::fvector4 ( float fourth, float third, float second, float first )
+	fvector4::fvector4 ( float first , float second, float third, float fourth)
 {
 	operator[](3)=fourth;
 	operator[](2)=third;
