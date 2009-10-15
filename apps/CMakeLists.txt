@@ -1,1 +1,2 @@
 add_subdirectory(isisReg3D)
+add_subdirectory(isisDoTrans)

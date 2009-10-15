@@ -1,5 +1,5 @@
 /*
- * isisRegistration.cxx
+ * isisreg3D.cxx
  *
  *  Created on: July 13, 2009
  *      Author: tuerke
