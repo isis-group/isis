@@ -45,6 +45,39 @@ static VOptionDescRec
 
         };
 
+#include "itkCommand.h"
+class ProcessUpdate : public itk::Command
+{
+public:
+  typedef  ProcessUpdate   Self;
+  typedef  itk::Command             Superclass;
+  typedef itk::SmartPointer<Self>  Pointer;
+  itkNewMacro( Self );
+protected:
+  ProcessUpdate() {};
+public:
+  typedef   const itk::ProcessObject   *    ProcessPointer;
+
+  void Execute(itk::Object *caller, const itk::EventObject & event)
+    {
+      Execute( (const itk::Object *)caller, event);
+    }
+
+  void Execute(const itk::Object * object, const itk::EventObject & event)
+    {
+      ProcessPointer filter =
+        dynamic_cast< ProcessPointer >( object );
+      if( !(itk::ProgressEvent().CheckEvent( &event )) )
+        {
+        return;
+        }
+
+
+      std::cout << filter->GetProgress() * 100 << "%...\n";
+
+    }
+};
+
 int main(
     int argc, char* argv[]) {
 	// DANGER! Kids don't try this at home! VParseCommand modifies the values of argc and argv!!!
@@ -69,7 +102,6 @@ int main(
 
 	typedef OutputImageType::SpacingType OutputSpacingType;
 	typedef OutputImageType::SizeType OutputSizeType;
-	typedef OutputImageType::IndexType OutputIndexType;
 
 	typedef itk::ResampleImageFilter<InputImageType, OutputImageType> ResampleImageFilterType;
 	typedef itk::CastImageFilter<InputImageType, OutputImageType> CastImageFilterType;
@@ -90,13 +122,16 @@ int main(
 	itk::TransformFileReader::Pointer transformFileReader = itk::TransformFileReader::New();
 	ResampleImageFilterType::Pointer resampler = ResampleImageFilterType::New();
 
+	ProcessUpdate::Pointer progressObserver = ProcessUpdate::New();
+
 	ImageReaderType::Pointer reader = ImageReaderType::New();
 	ImageReaderType::Pointer templateReader = ImageReaderType::New();
 	ImageFileWriter::Pointer writer = ImageFileWriter::New();
 
 	OutputSpacingType outputSpacing;
 	OutputSizeType outputSize;
-	OutputIndexType outputOrigin;
+
+	resampler->AddObserver(itk::ProgressEvent(), progressObserver);
 
 	if(!trans_filename.number) {
 		std::cout << "No transform specified!!" << std::endl;
