@@ -7,27 +7,30 @@
 
 #define BOOST_TEST_MODULE ChunkTest
 #include <boost/test/included/unit_test.hpp>
-#include <DataStorage/chunk.hpp>
+#include "DataStorage/chunk.hpp"
+
+using isis::util::CoreLog;
+using isis::util::CoreDebug;
 
 /* create an image */
 BOOST_AUTO_TEST_CASE (chunk_init_test)
 {
-	ENABLE_LOG(isis::util::CoreLog,isis::util::DefaultMsgPrint,isis::util::warning);
-	ENABLE_LOG(isis::util::CoreDebug,isis::util::DefaultMsgPrint,isis::util::warning);
+	ENABLE_LOG(CoreLog,isis::util::DefaultMsgPrint,isis::util::warning);
+	ENABLE_LOG(CoreDebug,isis::util::DefaultMsgPrint,isis::util::warning);
 
 	isis::data::MemChunk<float> ch(1,2,3,4);
 	BOOST_CHECK(ch.volume()==1*2*3*4);
-	BOOST_CHECK(ch.size(isis::data::MemChunk<float>::read)==1);
-	BOOST_CHECK(ch.size(isis::data::MemChunk<float>::phase)==2);
-	BOOST_CHECK(ch.size(isis::data::MemChunk<float>::slice)==3);
-	BOOST_CHECK(ch.size(isis::data::MemChunk<float>::time)==4);
+	BOOST_CHECK(ch.size(isis::data::MemChunk<float>::read)==4);
+	BOOST_CHECK(ch.size(isis::data::MemChunk<float>::phase)==3);
+	BOOST_CHECK(ch.size(isis::data::MemChunk<float>::slice)==2);
+	BOOST_CHECK(ch.size(isis::data::MemChunk<float>::time)==1);
 }
 
 BOOST_AUTO_TEST_CASE (chunk_property_test)
 {
 	isis::data::MemChunk<float> ch(1,2,3,4);
 
-	//an basic Cunk must be invalid
+	//an basic Chunk must be invalid
 	BOOST_CHECK(not ch.sufficient());
 	BOOST_CHECK(not ch.hasProperty("indexOrigin"));
 
