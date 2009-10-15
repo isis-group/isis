@@ -16,15 +16,17 @@ BOOST_AUTO_TEST_CASE (image_init_test)
 {
 	ENABLE_LOG(isis::util::CoreLog,isis::util::DefaultMsgPrint,isis::util::warning);
 	ENABLE_LOG(isis::util::CoreDebug,isis::util::DefaultMsgPrint,isis::util::warning);
+	ENABLE_LOG(isis::data::DataLog,isis::util::DefaultMsgPrint,isis::util::warning);
+	ENABLE_LOG(isis::data::DataDebug,isis::util::DefaultMsgPrint,isis::util::warning);
 	
-	isis::data::MemChunk<float> ch(1,1,4,4);
+	isis::data::MemChunk<float> ch(4,4);
 	isis::data::Image img;
 
 	// inserting insufficient Chunk should fail
 	BOOST_CHECK(!img.insertChunk(ch)); 
 
 	// but inserting a proper Chunk should work
-	ch.setProperty("indexOrigin",isis::util::fvector4(0,2,0,0));
+	ch.setProperty("indexOrigin",isis::util::fvector4(0,0,2,0));
 	BOOST_CHECK(img.insertChunk(ch));
 
 	//inserting the same chunk twice should fail
@@ -37,15 +39,35 @@ BOOST_AUTO_TEST_CASE (image_init_test)
 
 	// Chunks should be inserted based on their position (lowest first)
 	ch = isis::data::MemChunk<float>(1,1,4,4);
-	ch.setProperty("indexOrigin",isis::util::fvector4(0,1,0,0));
+	ch.setProperty("indexOrigin",isis::util::fvector4(0,0,1,0));
 	BOOST_CHECK(img.insertChunk(ch));
 
-/*	unsigned short i=0;
-	BOOST_FOREACH(const isis::data::Chunk &ref,img){
-		BOOST_CHECK(ref.getPropertyValue("indexOrigin") == isis::util::fvector4(0,i++,0,0));
-	}*/
+	//threat image as a list of sorted chunks
+	//Image-Chunk-List should be copyable into other list (and its order should be correct)
+	//@todo equality test
+	std::list<isis::data::Chunk> list(img.chunksBegin(),img.chunksEnd());
+	unsigned short i=0;
+	BOOST_FOREACH(const isis::data::Chunk &ref,list){
+		BOOST_CHECK(ref.getPropertyValue("indexOrigin") == isis::util::fvector4(0,0,i++,0));
+	}
 	
 //	TODO create an image out of an ChunkList
+
+}
+
+BOOST_AUTO_TEST_CASE (image_chunk_test)
+{
+	isis::data::MemChunk<float> ch1(3,3);
+	isis::data::MemChunk<float> ch2(3,3);
+	isis::data::MemChunk<float> ch3(3,3);
+	isis::data::Image img;
+
+	ch1.setProperty("indexOrigin",isis::util::fvector4(0,0,0,0));
+	ch2.setProperty("indexOrigin",isis::util::fvector4(0,0,1,0));
+	ch3.setProperty("indexOrigin",isis::util::fvector4(0,0,2,0));
+	BOOST_CHECK(img.insertChunk(ch1));
+	BOOST_CHECK(img.insertChunk(ch2));
+	BOOST_CHECK(img.insertChunk(ch3));
 
 }
 

@@ -111,6 +111,8 @@ public:
 	 */
 	bool insertChunk(const Chunk &chunk);
 	bool reIndex();
+	std::set<Chunk,_internal::image_chunk_order>::iterator chunksBegin();
+	std::set<Chunk,_internal::image_chunk_order>::iterator chunksEnd();
 };
 
 /// @cond _internal

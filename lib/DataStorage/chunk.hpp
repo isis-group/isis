@@ -103,7 +103,7 @@ typedef std::list<Chunk> ChunkList;
  */
 template<typename TYPE> class MemChunk : public Chunk{
 public:
-	MemChunk(size_t firstDim,size_t secondDim,size_t thirdDim,size_t fourthDim):
+	MemChunk(size_t firstDim,size_t secondDim=1,size_t thirdDim=1,size_t fourthDim=1):
 	Chunk(
 		(TYPE*)malloc(sizeof(TYPE)*fourthDim*thirdDim*secondDim*firstDim),
 		typename ::isis::util::TypePtr<TYPE>::BasicDeleter(),

@@ -145,7 +145,7 @@ public:
 	m_val(ptr,d),m_len(len)	{}
 	
 	/// \returns the length of the data pointed to
-	size_t len()
+	size_t len()const
 	{
 		return m_len;
 	}
@@ -166,7 +166,7 @@ public:
 	
 	/// @copydoc Type::is()
 	virtual bool is(const std::type_info & t)const{
-		return t==typeid(TYPE*);
+		return t==typeid(TYPE);
 	}
 	/// @copydoc Type::toString()
 	virtual std::string toString(bool labeled=false)const{

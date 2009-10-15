@@ -88,8 +88,9 @@ BOOST_AUTO_TEST_CASE (chunk_copy_test)//Copy chunks
 
 	isis::data::Chunk ch2=ch1;//This shall clone the underlying TypePtr-Object
 
-	//but it should of course be the of the same type an contain the same data
+	//but it should of course be the of the same type and contain the same data
 	BOOST_CHECK(ch1->isSameType(*ch2));
+	BOOST_CHECK(ch1->is<float>());
 	BOOST_CHECK(ch1.volume()==ch2.volume());
 	for(size_t i=0;i<ch2.volume();i++)
 		BOOST_CHECK(ch2.getTypePtr<float>()[i]==i);
