@@ -7,13 +7,10 @@
 
 #include "extRegistration/isisRegistrationFactory3D.h"
 #include "itkImageFileReader.h"
-#include "itkImageFileWriter.h"
 #include "itkImage.h"
 
 #include "itkTransformFileWriter.h"
 #include "itkTransformFileReader.h"
-
-#include "itkCheckerBoardImageFilter.h"
 
 //via command parser include
 #include "viaio/option.h"
@@ -116,23 +113,17 @@ int main(
 
 	typedef itk::Image<InputPixelType, Dimension> FixedImageType;
 	typedef itk::Image<InputPixelType, Dimension> MovingImageType;
-	typedef itk::Image<OutputPixelType, Dimension> OutputImageType;
 
 	typedef itk::ImageFileReader<FixedImageType> FixedImageReaderType;
 	typedef itk::ImageFileReader<MovingImageType> MovingImageReaderType;
-	typedef itk::ImageFileWriter<OutputImageType> WriterType;
 
 	typedef isis::registration::RegistrationFactory3D<FixedImageType, MovingImageType> RegistrationFactoryType;
-
-	typedef itk::CheckerBoardImageFilter<FixedImageType> CheckerBoardFilterType;
 
 	const itk::TransformBase* tmpConstTransformPointer;
 	typedef itk::TransformBase* TransformBasePointerType;
 
-	CheckerBoardFilterType::Pointer checker = CheckerBoardFilterType::New();
 	FixedImageReaderType::Pointer fixedReader = FixedImageReaderType::New();
 	MovingImageReaderType::Pointer movingReader = MovingImageReaderType::New();
-	WriterType::Pointer writer = WriterType::New();
 
 	itk::TransformFileWriter::Pointer transformWriter = itk::TransformFileWriter::New();
 	itk::TransformFileReader::Pointer transformReader = itk::TransformFileReader::New();
@@ -284,7 +275,7 @@ int main(
 			registrationFactory->SetInitialTransform((*ti).GetPointer());
 
 		}
-		if(counter != 0 and !transform_filename_in) {
+		if(counter != 0) {
 			registrationFactory->SetInitialTransform(const_cast<TransformBasePointerType> (tmpConstTransformPointer));
 		}
 
@@ -292,7 +283,7 @@ int main(
 		registrationFactory->UserOptions.NumberOfBins = number_of_bins;
 		registrationFactory->UserOptions.PixelDensity = pixel_density;
 		registrationFactory->UserOptions.BSplineGridSize = grid_size;
-		registrationFactory->UserOptions.PRINTRESULTS = true;
+		registrationFactory->UserOptions.PRINTRESULTS = false;
 		registrationFactory->UserOptions.NumberOfThreads = number_threads;
 		if(!initialize)
 			registrationFactory->UserOptions.INITIALIZEOFF = true;

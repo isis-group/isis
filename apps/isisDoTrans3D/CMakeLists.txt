@@ -1,7 +1,7 @@
 # this option is required in cmake version 2.4
 cmake_minimum_required(VERSION 2.4)
 
-PROJECT(isisDoTrans)
+PROJECT(isisDoTrans3D)
 
 #if you don't want the full compiler output, remove the following line
 #SET(CMAKE_VERBOSE_MAKEFILE ON)
@@ -25,11 +25,11 @@ ENDIF()
 
 
 #the executables
-ADD_EXECUTABLE(isisdotrans
+ADD_EXECUTABLE(isisdotrans3d
 	isisdotrans.cxx
 	)
 	
-set_target_properties(isisdotrans PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${ISIS_INSTALL_BIN_DIR})
+set_target_properties(isisdotrans3d PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${ISIS_INSTALL_BIN_DIR})
 
 # link versus ITK library
-TARGET_LINK_LIBRARIES(isisdotrans  ITKIO ITKCommon viaio)
+TARGET_LINK_LIBRARIES(isisdotrans3d  ITKIO ITKCommon viaio)
