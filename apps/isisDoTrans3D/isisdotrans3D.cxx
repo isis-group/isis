@@ -24,22 +24,24 @@ VDictEntry TYPInterpolator[] = { {"Linear", 0}, {"BSpline", 1}, {"NearestNeighbo
 
 static VString in_filename = NULL;
 static VString out_filename = NULL;
-static VString trans_filename = NULL;
+static VArgVector trans_filename;
 static VString template_filename = NULL;
 static VBoolean in_found, out_found, trans_found;
 static VShort interpolator_type = 0;
+static VArgVector resolution;
 
 static VOptionDescRec
         options[] = {
         //requiered inputs
             {"in", VStringRepn, 1, &in_filename, &in_found, 0, "the input image filename"}, {"out", VStringRepn, 1,
-                &out_filename, &out_found, 0, "the output image filename"}, {"trans", VStringRepn, 1, &trans_filename,
+                &out_filename, &out_found, 0, "the output image filename"}, {"trans", VStringRepn, 0, &trans_filename,
                 &trans_found, 0, "the transform filename"},
 
             //non-required inputs
             {"interpolator", VShortRepn, 1, &interpolator_type, VOptionalOpt, 0,
                 "The interpolator used to resample the image"}, {"tmp", VStringRepn, 1, &template_filename,
-                VOptionalOpt, 0, "The template image"}
+                VOptionalOpt, 0, "The template image"}, {"res", VFloatRepn, 0, (VPointer) &resolution, VOptionalOpt, 0,
+                "The output resolution. One value for isotrop output"}
 
         };
 
@@ -65,6 +67,10 @@ int main(
 	typedef itk::Image<PixelType, Dimension> InputImageType;
 	typedef itk::Image<PixelType, Dimension> OutputImageType;
 
+	typedef OutputImageType::SpacingType OutputSpacingType;
+	typedef OutputImageType::SizeType OutputSizeType;
+	typedef OutputImageType::IndexType OutputIndexType;
+
 	typedef itk::ResampleImageFilter<InputImageType, OutputImageType> ResampleImageFilterType;
 	typedef itk::CastImageFilter<InputImageType, OutputImageType> CastImageFilterType;
 
@@ -88,14 +94,74 @@ int main(
 	ImageReaderType::Pointer templateReader = ImageReaderType::New();
 	ImageFileWriter::Pointer writer = ImageFileWriter::New();
 
-	writer->SetFileName(out_filename);
+	OutputSpacingType outputSpacing;
+	OutputSizeType outputSize;
+	OutputIndexType outputOrigin;
+
+	if(!trans_filename.number) {
+		std::cout << "No transform specified!!" << std::endl;
+		return EXIT_FAILURE;
+	}
 
 	//reading the input image
 	reader->SetFileName(in_filename);
 	reader->Update();
 
+	writer->SetFileName(out_filename);
+
+	//if template file is specified by the user
+	if(template_filename) {
+		templateReader->SetFileName(template_filename);
+		templateReader->Update();
+	}
+
+	//setting up the output resolution
+	if(resolution.number) {
+
+		if(static_cast<unsigned int> (resolution.number) < Dimension) {
+			//user has specified less than 3 resolution values->sets isotrop resolution with the first typed value
+			outputSpacing.Fill(((VFloat *) resolution.vector)[0]);
+
+		}
+		if(resolution.number >= 3) {
+			//user has specified at least 3 values -> sets anisotrop resolution
+			for(unsigned int i = 0; i < 3; i++) {
+				outputSpacing[i] = ((VFloat *) resolution.vector)[i];
+			}
+		}
+	}
+
+	if(!resolution.number) {
+		if(template_filename) {
+			outputSpacing = templateReader->GetOutput()->GetSpacing();
+		}
+		if(!template_filename) {
+			outputSpacing = reader->GetOutput()->GetSpacing();
+		}
+	}
+
+	if(resolution.number and template_filename) {
+		for(unsigned int i = 0; i < 3; i++) {
+			//output spacing = (template size / output resolution) * template resolution
+			outputSize[i] = ((templateReader->GetOutput()->GetLargestPossibleRegion().GetSize()[i]) / outputSpacing[i])
+			        * templateReader->GetOutput()->GetSpacing()[i];
+		}
+	}
+	if(resolution.number and !template_filename) {
+		for(unsigned int i = 0; i < 3; i++) {
+			//output spacing = (moving size / output resolution) * moving resolution
+			outputSize[i] = ((reader->GetOutput()->GetLargestPossibleRegion().GetSize()[i]) / outputSpacing[i])
+			        * reader->GetOutput()->GetSpacing()[i];
+		}
+	}
 	//reading the transform from a file
-	transformFileReader->SetFileName(trans_filename);
+
+	unsigned int number_trans = trans_filename.number;
+	if(number_trans > 1) {
+		//merging the transforms to one final transform
+		//TODO
+	}
+	transformFileReader->SetFileName(((VStringConst *) trans_filename.vector)[0]);
 	transformFileReader->Update();
 
 	itk::TransformFileReader::TransformListType *transformList = transformFileReader->GetTransformList();
@@ -109,15 +175,14 @@ int main(
 	if(!template_filename) {
 		resampler->SetOutputDirection(reader->GetOutput()->GetDirection());
 		resampler->SetOutputOrigin(reader->GetOutput()->GetOrigin());
-		resampler->SetOutputSpacing(reader->GetOutput()->GetSpacing());
-		resampler->SetSize(reader->GetOutput()->GetLargestPossibleRegion().GetSize());
+		resampler->SetOutputSpacing(outputSpacing);
+		resampler->SetSize(outputSize);
 	} else {
-		templateReader->SetFileName(template_filename);
-		templateReader->Update();
+
 		resampler->SetOutputDirection(templateReader->GetOutput()->GetDirection());
 		resampler->SetOutputOrigin(templateReader->GetOutput()->GetOrigin());
-		resampler->SetOutputSpacing(templateReader->GetOutput()->GetSpacing());
-		resampler->SetSize(templateReader->GetOutput()->GetLargestPossibleRegion().GetSize());
+		resampler->SetOutputSpacing(outputSpacing);
+		resampler->SetSize(outputSize);
 	}
 
 	//setting up the interpolator
