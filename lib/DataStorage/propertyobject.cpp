@@ -39,9 +39,15 @@ bool PropertyObject::hasProperty ( const std::string& key )const {
 	return (not getPropertyValue(key).empty());
 }
 
-bool PropertyObject::sufficient()const {
+bool PropertyObject::sufficient()const
+{
 	return properties.valid();
 }
+
+util::PropMap::key_list PropertyObject::missing()const {
+	return properties.missing();
+}
+
 
 const util::PropMap::mapped_type PropertyObject::emptyProp;
 

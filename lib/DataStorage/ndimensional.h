@@ -18,7 +18,6 @@
 #include <algorithm>
 #include <boost/static_assert.hpp>
 #include <string>
-#include <sstream>
 #include "CoreUtils/common.hpp"
 
 namespace isis{ namespace data{ namespace _internal{
@@ -92,9 +91,7 @@ public:
 	
 	/// generates a string representing the size
 	std::string sizeToString(std::string delim="x")const{
-		std::ostringstream ret;
-		isis::util::write_list(dim,dim+DIMS,ret,delim);
-		return ret.str();
+		return util::list2string(dim,dim+DIMS,delim);
 	}
 };
 

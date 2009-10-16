@@ -35,11 +35,18 @@ class Image:
 	protected _internal::NDimensional<4>,
 	public _internal::PropertyObject
 {
-	std::set<Chunk,_internal::image_chunk_order> set;
-	std::vector<std::set<Chunk,_internal::image_chunk_order>::iterator> lookup;
+public:
+	typedef std::set<Chunk,_internal::image_chunk_order> ChunkSet;
+	typedef ChunkSet::iterator ChunkIterator;
+
+private:
+	ChunkSet set;
+	std::vector<ChunkIterator> lookup;
 	bool clean;
+
 protected:
 	static const isis::util::PropMap::key_type needed[];
+
 public:
 	/**
 	 * Creates an empty Image object
@@ -62,9 +69,9 @@ public:
 	 */
 	template <typename T> T& voxel(
 		const size_t &first,
-		const size_t &second,
-		const size_t &third,
-		const size_t &fourth);
+		const size_t &second=0,
+		const size_t &third=0,
+		const size_t &fourth=0);
 
 	/**
 	 * This method returns a reference to the voxel value at the given coordinates.
@@ -81,9 +88,9 @@ public:
 	 */
 	template <typename T> T voxel(
 		const size_t &first,
-		const size_t &second,
-		const size_t &third,
-		const size_t &fourth)const;
+		const size_t &second=0,
+		const size_t &third=0,
+		const size_t &fourth=0)const;
 
 	/**
 	 * Returns a copy of the chunk that contains the voxel at the given coordinates.
@@ -97,10 +104,15 @@ public:
 	 */
 	Chunk getChunk(
 		const size_t &first,
-		const size_t &second,
-		const size_t &third,
-		const size_t &fourth)const;
-
+		const size_t &second=0,
+		const size_t &third=0,
+		const size_t &fourth=0)const;
+	Chunk getChunk(
+		const size_t &first,
+		const size_t &second=0,
+		const size_t &third=0,
+		const size_t &fourth=0);
+					   
 	/**
 	 * Inserts a Chunk into the Image.
 	 * The insertion is sorted and unique. So the Chunk will be inserted behind a geometrically "lower" Chunk if there is one.
@@ -111,8 +123,8 @@ public:
 	 */
 	bool insertChunk(const Chunk &chunk);
 	bool reIndex();
-	std::set<Chunk,_internal::image_chunk_order>::iterator chunksBegin();
-	std::set<Chunk,_internal::image_chunk_order>::iterator chunksEnd();
+	ChunkIterator chunksBegin();
+	ChunkIterator chunksEnd();
 };
 
 /// @cond _internal

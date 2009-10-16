@@ -41,6 +41,7 @@ public:
 	bool hasProperty(const ::isis::util::PropMap::key_type &key)const;
 	void addNeeded(const ::isis::util::PropMap::key_type &key);
 	bool sufficient()const;
+	util::PropMap::key_list missing()const;
 };
 }}}
 

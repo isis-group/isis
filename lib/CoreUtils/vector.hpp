@@ -43,17 +43,31 @@ public:
 	
 	TYPE operator [](size_t idx)const{return cont[idx];}
 	TYPE& operator [](size_t idx){return cont[idx];}
-	bool operator<(const FixedVector<TYPE,SIZE> &src)const{
-		for(size_t i=0;i<SIZE;i++)
-			if(cont[i]<src[i])
-				return true;
-			return false;
+
+	///\returns true if this is lexically less than the given vector (first entry has highest rank)
+	bool lexical_less(const FixedVector<TYPE,SIZE> &src)const{
+		for(size_t i=0;i<SIZE;i++){
+			if (src[i]<cont[i]) return false;
+			else if (cont[i]<src[i]) return true;
+		}
+		return false;
+	}
+	///\returns true if this is lexically less than the given vector (first entry has lowest rank)
+	bool lexical_less_reverse(const FixedVector<TYPE,SIZE> &src)const{
+		for(size_t i=SIZE;i;i--){
+			if (src[i-1]<cont[i-1]) return false;
+			else if (cont[i-1]<src[i-1]) return true;
+		}
+		return false;
 	}
 	bool operator==(const FixedVector<TYPE,SIZE> &src)const{
 		for(size_t i=0;i<SIZE;i++)
 			if(cont[i]!=src[i])
 				return false;
 		return true;
+	}
+	template<class OutputIterator> void copyTo(OutputIterator out){
+		std::copy(cont,cont+SIZE,out);
 	}
 };
 

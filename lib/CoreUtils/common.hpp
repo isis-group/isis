@@ -17,6 +17,7 @@
 #include <ostream>
 #include <map>
 #include <string>
+#include <sstream>
 
 
 /*! \addtogroup util
@@ -44,6 +45,16 @@ write_list(InputIterator start,InputIterator end,
 		o << delim << *i;
 	o << suffix;
 	return o;
+}
+
+template<class InputIterator> std::string list2string(
+	InputIterator start,InputIterator end,
+	std::string delim=" ",
+	std::string prefix="",std::string suffix="")
+{
+	std::ostringstream ret;
+	isis::util::write_list(start,end,ret,delim,prefix,suffix);
+	return ret.str();
 }
 	
 /// @cond _hidden

@@ -70,7 +70,7 @@ public:
 	If index is invalid, behaviour is undefined. Most probably it will crash.
 	If _ENABLE_DATA_DEBUG is true an error message will be send (but it will still crash).
 	*/
-	template<typename TYPE> TYPE &voxel(size_t firstDim,size_t secondDim,size_t thirdDim,size_t fourthDim){
+	template<typename TYPE> TYPE &voxel(size_t firstDim,size_t secondDim=0,size_t thirdDim=0,size_t fourthDim=0){
 		MAKE_LOG(DataDebug);
 		const size_t idx[]={firstDim,secondDim,thirdDim,fourthDim};
 		if(!rangeCheck(idx)){
@@ -82,7 +82,22 @@ public:
 		util::TypePtr<TYPE> &ret=getTypePtr<TYPE>();
 		return ret[dim2Index(idx)];
 	}
+	template<typename TYPE> TYPE voxel(size_t firstDim,size_t secondDim=0,size_t thirdDim=0,size_t fourthDim=0)const{
+		MAKE_LOG(DataDebug);
+		const size_t idx[]={firstDim,secondDim,thirdDim,fourthDim};
+		if(!rangeCheck(idx)){
+			LOG(DataDebug,isis::util::error)
+			<< "Index " << firstDim << "|" << secondDim << "|" << thirdDim << "|" << fourthDim
+			<< " is out of range (" << sizeToString() << ")"
+			<< std::endl;
+		}
+		const util::TypePtr<TYPE> &ret=getTypePtr<TYPE>();
+		return ret[dim2Index(idx)];
+	}
 	template<typename TYPE> util::TypePtr<TYPE> &getTypePtr(){
+		return operator*().cast_to_TypePtr<TYPE>();
+	}
+	template<typename TYPE> const util::TypePtr<TYPE> getTypePtr()const{
 		return operator*().cast_to_TypePtr<TYPE>();
 	}
 };

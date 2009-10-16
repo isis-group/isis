@@ -200,6 +200,9 @@ public:
 	TYPE& operator[](size_t idx){
 		return (m_val.get())[idx];
 	}
+	TYPE operator[](size_t idx)const{
+		return (m_val.get())[idx];
+	}
 	/**
 	 * Implicit conversion to boost::shared_ptr\<TYPE\>
 	 * The returned smart pointer will be part of the reference-counting and will correctly delete the data 
