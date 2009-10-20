@@ -6,6 +6,8 @@
  */
 
 #include "extRegistration/isisRegistrationFactory3D.h"
+#include "extITK/isisTransformMerger.hpp"
+
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
 #include "itkImage.h"
@@ -142,6 +144,7 @@ int main(
 	movingReader->Update();
 
 	RegistrationFactoryType::Pointer registrationFactory = RegistrationFactoryType::New();
+	isis::extitk::TransformMerger* transformMerger = new isis::extitk::TransformMerger;
 
 	//analyse transform vector
 	unsigned int repetition = transformType.number;
@@ -302,6 +305,9 @@ int main(
 
 		registrationFactory->StartRegistration();
 		tmpConstTransformPointer = registrationFactory->GetTransform();
+
+		transformMerger->push_back(const_cast<itk::TransformBase*> (registrationFactory->GetTransform()));
+		transformMerger->merge();
 
 	}//end repetition
 
