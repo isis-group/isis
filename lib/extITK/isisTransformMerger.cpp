@@ -15,13 +15,10 @@ namespace extitk {
 void TransformMerger::merge(
     void) {
 
-	itk::TransformBase* tmpTransform;
-	unsigned count = 0;
 	for(transformIterator_ = this->begin(); transformIterator_ != this->end(); transformIterator_++) {
 
-		if(!count)
-			tmpTransform = *transformIterator_;
 		if(VersorRigid3DTransformType* transform = dynamic_cast<VersorRigid3DTransformType*> (*transformIterator_)) {
+
 			//TODO versor rigid 3d type
 		}
 		if(AffineTransformType* transform = dynamic_cast<AffineTransformType*> (*transformIterator_)) {
@@ -29,9 +26,8 @@ void TransformMerger::merge(
 		}
 		if(BSplineDeformableTransformType* transform = dynamic_cast<BSplineDeformableTransformType*> (*transformIterator_)) {
 			//TODO deformable transform type
-		}
 
-		count++;
+		}
 	}
 
 }

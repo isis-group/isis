@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.4)
 
 PROJECT(isisReg3D)
 
-
+cmake_policy(SET CMP0003 NEW)
 
 # set(CMAKE_BUILD_TYPE "Debug")
 
