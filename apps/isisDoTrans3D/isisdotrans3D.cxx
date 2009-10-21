@@ -169,9 +169,11 @@ int main(
 	if(!resolution.number) {
 		if(template_filename) {
 			outputSpacing = templateReader->GetOutput()->GetSpacing();
+			outputSize = templateReader->GetOutput()->GetLargestPossibleRegion().GetSize();
 		}
 		if(!template_filename) {
 			outputSpacing = reader->GetOutput()->GetSpacing();
+			outputSize = reader->GetOutput()->GetLargestPossibleRegion().GetSize();
 		}
 	}
 
