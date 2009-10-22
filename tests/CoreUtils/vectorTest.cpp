@@ -8,7 +8,7 @@
 *      Author: reimer
 */
 
-#define BOOST_TEST_MODULE TypeTest
+#define BOOST_TEST_MODULE VectorTest
 #include <boost/test/included/unit_test.hpp>
 #include "CoreUtils/vector.hpp"
 #include <string.h>

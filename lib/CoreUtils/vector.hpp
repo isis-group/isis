@@ -75,7 +75,7 @@ public:
 
 	FixedVector(const TYPE src[SIZE])
 	{
-		std::copy(CONTAINER::begin(),CONTAINER::end(),src);
+		std::copy(src,src+SIZE,CONTAINER::begin());
 	}
 	
 	void fill(const TYPE &val)
