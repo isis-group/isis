@@ -24,19 +24,29 @@ public:
 	typedef TransformMerger Self;
 	typedef std::list<TransformBasePointer> Superclass;
 
+	typedef itk::MatrixOffsetTransformBase<double, 3, 3> MatrixOffsetTransformType;
+
 	typedef itk::VersorRigid3DTransform<double> VersorRigid3DTransformType;
 	typedef itk::AffineTransform<double, 3> AffineTransformType;
 	typedef itk::BSplineDeformableTransform<double, 3, 3> BSplineDeformableTransformType;
 
-	TransformMerger() {
-	}
+	TransformMerger();
 
 	void merge(
 	    void);
 
-private:
+	TransformBasePointer getTransform(
+	    void);
 
+private:
+	unsigned int outputType;
 	Self::iterator transformIterator_;
+	MatrixOffsetTransformType::MatrixType temporaryMatrix_;
+	MatrixOffsetTransformType::TranslationType temporaryTranslation_;
+	MatrixOffsetTransformType::OffsetType temporaryOffset_;
+
+	TransformBasePointer outputTransform_;
+
 };
 
 }//end namespace itk

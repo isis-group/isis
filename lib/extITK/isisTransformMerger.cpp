@@ -12,17 +12,26 @@
 namespace isis {
 namespace extitk {
 
+TransformMerger::TransformMerger() {
+	outputType = 0;
+
+}
+
 void TransformMerger::merge(
     void) {
 
 	for(transformIterator_ = this->begin(); transformIterator_ != this->end(); transformIterator_++) {
 
 		if(VersorRigid3DTransformType* transform = dynamic_cast<VersorRigid3DTransformType*> (*transformIterator_)) {
-
+			outputType = 1;
+			std::cout << transform->GetParameters() << std::endl;
 			//TODO versor rigid 3d type
 		}
 		if(AffineTransformType* transform = dynamic_cast<AffineTransformType*> (*transformIterator_)) {
 			//TODO affine rigid 3d type
+			outputType = 2;
+			std::cout << transform->GetParameters() << std::endl;
+
 		}
 		if(BSplineDeformableTransformType* transform = dynamic_cast<BSplineDeformableTransformType*> (*transformIterator_)) {
 			//TODO deformable transform type
@@ -32,7 +41,13 @@ void TransformMerger::merge(
 
 }
 
+TransformBasePointer TransformMerger::getTransform(
+    void) {
+
+
 }
-}
+
+}//end namespace extitk
+}//end namespace isis
 
 #endif //ISISTRANSFORMMERGER_H_

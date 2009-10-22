@@ -49,33 +49,39 @@ static VOptionDescRec
 class ProcessUpdate : public itk::Command
 {
 public:
-  typedef  ProcessUpdate   Self;
-  typedef  itk::Command             Superclass;
-  typedef itk::SmartPointer<Self>  Pointer;
-  itkNewMacro( Self );
+	typedef ProcessUpdate Self;
+	typedef itk::Command Superclass;
+	typedef itk::SmartPointer<Self> Pointer;
+	itkNewMacro( Self )
+	;
+	void ShowProgressBar(
+	    float progress) const {
+		std::cout << progress * 100 << "%\r" << std::flush;
+	}
+
 protected:
-  ProcessUpdate() {};
+	ProcessUpdate() {
+	}
+	;
 public:
-  typedef   const itk::ProcessObject   *    ProcessPointer;
+	typedef const itk::ProcessObject * ProcessPointer;
 
-  void Execute(itk::Object *caller, const itk::EventObject & event)
-    {
-      Execute( (const itk::Object *)caller, event);
-    }
+	void Execute(
+	    itk::Object *caller, const itk::EventObject & event) {
+		Execute((const itk::Object *) caller, event);
+	}
 
-  void Execute(const itk::Object * object, const itk::EventObject & event)
-    {
-      ProcessPointer filter =
-        dynamic_cast< ProcessPointer >( object );
-      if( !(itk::ProgressEvent().CheckEvent( &event )) )
-        {
-        return;
-        }
+	void Execute(
+	    const itk::Object * object, const itk::EventObject & event) {
+		ProcessPointer filter = dynamic_cast<ProcessPointer> (object);
+		if(!(itk::ProgressEvent().CheckEvent(&event))) {
+			return;
+		}
 
+		ShowProgressBar(filter->GetProgress());
 
-      std::cout << filter->GetProgress() * 100 << "%...\n";
+	}
 
-    }
 };
 
 int main(

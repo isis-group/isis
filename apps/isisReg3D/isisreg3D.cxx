@@ -307,13 +307,14 @@ int main(
 		tmpConstTransformPointer = registrationFactory->GetTransform();
 
 		transformMerger->push_back(const_cast<itk::TransformBase*> (registrationFactory->GetTransform()));
-		transformMerger->merge();
 
 	}//end repetition
+	transformMerger->merge();
+
 
 	//safe the gained transform to a user specific filename
 	if(out_filename) {
-		transformWriter->SetInput(registrationFactory->GetTransform());
+		transformWriter->SetInput(tmpConstTransformPointer);
 		transformWriter->SetFileName(out_filename);
 		transformWriter->Update();
 	}
