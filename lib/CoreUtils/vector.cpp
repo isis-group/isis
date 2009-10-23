@@ -24,4 +24,7 @@ namespace isis{ namespace util{
 
 fvector4::fvector4(){}
 
+fvector4::fvector4 ( const isis::util::FixedVector< float, 4 >& src ) : FixedVector< float, 4 > ( src ) {}
+
+
 }}

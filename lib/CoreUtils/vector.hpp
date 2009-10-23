@@ -18,6 +18,8 @@
 #include <algorithm>
 #include <ostream>
 #include <strings.h>
+#include <numeric>
+#include <cmath>
 
 namespace isis{ 
 /*! \addtogroup util
@@ -122,6 +124,13 @@ public:
 	this_class operator+(const TYPE &src)const{return binary_op<std::plus<TYPE>       >(src);}
 	this_class operator*(const TYPE &src)const{return binary_op<std::multiplies<TYPE> >(src);}
 	this_class operator/(const TYPE &src)const{return binary_op<std::divides<TYPE>    >(src);}
+
+	TYPE sqlen()const
+	{
+		const this_class sq=*this * *this;
+		return std::accumulate(sq.begin(),sq.end(),TYPE());
+	}
+	TYPE len()const{return std::sqrt(sqlen());}
 	
 	template<class OutputIterator> void copyTo(OutputIterator out){
 		std::copy(CONTAINER::begin(),CONTAINER::end(),out);
@@ -130,8 +139,9 @@ public:
 
 class fvector4 :public FixedVector<float,4>{
 public:
-	fvector4(float first,float second,float third,float fourth);
 	fvector4();
+	fvector4(const FixedVector<float,4> &src);
+	fvector4(float first,float second,float third,float fourth);
 };
 }
 /** @} */

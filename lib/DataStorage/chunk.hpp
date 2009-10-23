@@ -32,7 +32,7 @@ namespace isis{
 namespace data{
 
 namespace _internal{
-class ChunkBase :protected NDimensional<4>,public PropertyObject{
+class ChunkBase :public NDimensional<4>,public PropertyObject{
 	protected:
 		static const isis::util::PropMap::key_type needed[];
 	public:

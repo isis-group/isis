@@ -35,7 +35,7 @@ bool image_chunk_order::operator() ( const isis::data::Chunk& a, const isis::dat
 
 }
 	
-Image::Image (_internal::image_chunk_order lt ) :set ( lt ),PropertyObject(needed),clean(false)
+Image::Image (_internal::image_chunk_order lt ) :set ( lt ),PropertyObject(needed),clean(true)
 {
 	const size_t idx[]={0,0,0,0};
 	init(idx);
@@ -66,7 +66,7 @@ bool Image::reIndex() {
 	//@todo for now this only works for 1D difference between Chunk and Image
 	MAKE_LOG(DataLog);
 	lookup.resize(set.size());
-	if(lookup.size()==0){
+	if(set.empty()){
 		clean=true;
 		LOG(DataLog,util::info) << "Reindexing an empty image." << std::endl;
 		return true;
@@ -74,15 +74,12 @@ bool Image::reIndex() {
 	size_t idx=0;
 	for(std::set<Chunk,_internal::image_chunk_order>::iterator it=set.begin();it!=set.end();it++,idx++)
 		lookup[idx]=it;
+	
+	const unsigned short chunk_dims=chunksBegin()->dimRange().second;
 
-	const ChunkIterator first=set.begin();
-
-	unsigned short chunk_dims=0;
-	size_t size[Chunk::n_dims];
-	for(size_t i=0;i<Chunk::n_dims;i++){
-		size[i]=first->size(i);
-		if(size[i]>1)chunk_dims=i+1;
-	}
+	size_t size[4];
+	for(unsigned short i=0;i<chunk_dims;i++)
+		size[i]=chunksBegin()->dimSize(i);
 
 	if(chunk_dims>=Chunk::n_dims){
 		if(lookup.size()>1){
@@ -91,8 +88,11 @@ bool Image::reIndex() {
 			<< Chunk::n_dims-1 << " dimensions" << std::endl;
 			return false;
 		}
-	} else
-		size[chunk_dims]=lookup.size();
+	} else {
+		size[chunk_dims]= getChunkStride() ?:1;
+		for(unsigned short i=chunk_dims+1;i<Chunk::n_dims;i++)
+			size[i]= getChunkStride(size[i-1])/size[i-1] ?:1;
+	}
 	init(size);
 	clean=true;
 	return true;
@@ -125,8 +125,44 @@ Chunk Image::getChunk ( const size_t& first, const size_t& second, const size_t&
 	return *(lookup[index/chunkStride]);
 }
 
+size_t Image::getChunkStride ( size_t base_stride ) {
+	MAKE_LOG(DataLog);
+	MAKE_LOG(DataDebug);
+	size_t ret;
+	if(lookup.empty()){
+		LOG(DataLog,util::error)
+		<< "Trying to get chunk stride in an empty image" << std::endl;
+		return 0;
+	} else if(lookup.size()>3*base_stride) {
+		/// there cant be any stride with less than 3*base_stride chunks in (which would actually be an invalid image)
+		util::fvector4 thisV=lookup[0]->getProperty<util::fvector4>("indexOrigin");
+		util::fvector4 nextV=lookup[base_stride]->getProperty<util::fvector4>("indexOrigin");
+		const util::fvector4 dist1 =nextV-thisV;
+		for(size_t i=base_stride;i<lookup.size()-1;i+=base_stride){
+			util::fvector4 thisV=lookup[i]->getProperty<util::fvector4>("indexOrigin");
+			util::fvector4 nextV=lookup[i+base_stride]->getProperty<util::fvector4>("indexOrigin");
+			const util::fvector4 dist =nextV-thisV;
 
-std::_Rb_tree_const_iterator< Chunk > Image::chunksBegin(){return set.begin();}
-std::_Rb_tree_const_iterator< Chunk > Image::chunksEnd(){return set.end();}
+			LOG(DataDebug,util::verbose_info)
+			<< "Distance between chunk " << util::MSubject(i) << " and " << util::MSubject(i+base_stride)
+			<< " is " << dist.len() << std::endl;
+			if(dist.sqlen() > dist1.sqlen()*4){
+				ret=i+1;
+				LOG(DataDebug,util::info)
+				<< "Distance between chunk " << util::MSubject(i) << " and " << util::MSubject(i+base_stride)
+				<< " is more then twice the first distance, assuming dimensional break at " << ret << std::endl;
+				return ret;
+			}
+		}
+	}
+	ret=lookup.size();
+	LOG(DataDebug,util::info)
+	<< "No dimensional break found assuming it to be at the end (" << ret << ")" << std::endl;
+	return ret;
+}
+
+
+Image::ChunkIterator Image::chunksBegin(){return set.begin();}
+Image::ChunkIterator Image::chunksEnd(){return set.end();}
 
 }}

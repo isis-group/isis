@@ -87,8 +87,6 @@ public:
 	virtual ~Type(){}
 };
 
-struct NullClass{};
-
 /**
  * Generic class for type (and length) - aware pointers.
  * The class is designed for arrays, but you can also "point" to an single element

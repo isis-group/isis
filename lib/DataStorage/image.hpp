@@ -47,6 +47,16 @@ private:
 protected:
 	static const isis::util::PropMap::key_type needed[];
 
+	/**
+	 * Get the ammount of chunks before dimensional switch.
+	 * For example for an image of 2D-chunks (slices) getChunkStride(1) will 
+	 * get the number of slices (size of third dim) and  getChunkStride(slices) 
+	 * will get the number of timesteps
+	 * \param base_stride the stride of the dimension before
+	 * \returns overall ammount of chunks in one slice of this dimension or 0 in case of an error
+	 */
+	size_t getChunkStride(size_t base_stride=1);
+
 public:
 	/**
 	 * Creates an empty Image object
