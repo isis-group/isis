@@ -9,8 +9,9 @@
 #include <boost/test/included/unit_test.hpp>
 #include "DataStorage/chunk.hpp"
 
-using isis::util::CoreLog;
-using isis::util::CoreDebug;
+namespace isis{namespace test{
+using util::CoreLog;
+using util::CoreDebug;
 
 /* create an image */
 BOOST_AUTO_TEST_CASE (chunk_init_test)
@@ -101,3 +102,4 @@ BOOST_AUTO_TEST_CASE (chunk_copy_test)//Copy chunks
 		BOOST_CHECK(ch2.getTypePtr<float>()[i]==0);
 	}
 }
+}}

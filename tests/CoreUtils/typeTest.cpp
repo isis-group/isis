@@ -13,7 +13,9 @@
 #include <string>
 #include <CoreUtils/type.hpp>
 
-using isis::util::Type;
+namespace isis{namespace test{
+	
+using util::Type;
 
 // TestCase object instantiation
 BOOST_AUTO_TEST_CASE(type_init_test) {
@@ -99,3 +101,4 @@ BOOST_AUTO_TEST_CASE(test_type_operators) {
 	BOOST_CHECK(tInt1*2 == 42);
 	BOOST_CHECK(42 - tInt1 == tInt2);
 }
+}}

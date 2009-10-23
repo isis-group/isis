@@ -10,7 +10,7 @@
 #include <boost/foreach.hpp>
 #include "DataStorage/image.hpp"
 
-namespace test{
+namespace isis{namespace test{
 
 /* create an image */
 BOOST_AUTO_TEST_CASE (image_init_test)
@@ -167,4 +167,4 @@ BOOST_AUTO_TEST_CASE(image_insertChunk_test)
 //	insert a valid and non-valid list of chunks
 
 }
-}
+}}

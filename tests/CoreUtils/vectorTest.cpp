@@ -13,7 +13,9 @@
 #include "CoreUtils/vector.hpp"
 #include <string.h>
 
-using isis::util::fvector4;
+namespace isis{namespace test{
+	
+using util::fvector4;
 
 // TestCase object instantiation
 BOOST_AUTO_TEST_CASE(vector_init_test)
@@ -52,3 +54,4 @@ BOOST_AUTO_TEST_CASE(vector_op_test)
 	test2-test1 == test2; // 42-0 = 42
 	test2+test2 == test2*2; // 42+42 = 42*2
 }
+}}

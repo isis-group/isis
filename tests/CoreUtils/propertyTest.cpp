@@ -12,6 +12,8 @@
 #include <string>
 #include <iostream>
 
+namespace isis{namespace test{
+	
 BOOST_AUTO_TEST_CASE(property_init_test)
 {
 	ENABLE_LOG(isis::util::CoreLog,isis::util::DefaultMsgPrint,isis::util::info);
@@ -45,3 +47,5 @@ BOOST_AUTO_TEST_CASE(property_copy_test)
 	BOOST_CHECK(propA == 6);
 	BOOST_CHECK(propB == 5);
 }
+
+}}
