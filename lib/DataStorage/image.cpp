@@ -98,17 +98,9 @@ bool Image::reIndex() {
 	return true;
 }
 
-Chunk Image::getChunk ( const size_t& first, const size_t& second, const size_t& third, const size_t& fourth ) {
-	MAKE_LOG(DataDebug);
-	if(not clean){
-		LOG(DataDebug,util::info)
-		<< "Image is not clean. Running reIndex ..." << std::endl;
-		reIndex();
-	}
-	return const_cast<const Image*>(this)->getChunk(first,second,third,fourth);
-}
-	
-Chunk Image::getChunk ( const size_t& first, const size_t& second, const size_t& third, const size_t& fourth ) const {
+std::pair<size_t,size_t>
+Image::commonGet ( const size_t& first, const size_t& second, const size_t& third, const size_t& fourth ) const
+{
 	MAKE_LOG(DataDebug);
 	if(not clean){
 		LOG(DataDebug,util::error)
@@ -122,7 +114,22 @@ Chunk Image::getChunk ( const size_t& first, const size_t& second, const size_t&
 	const size_t dim[]={first,second,third,fourth};
 	const size_t chunkStride=set.begin()->volume();
 	const size_t index=dim2Index(dim);
-	return *(lookup[index/chunkStride]);
+	return std::make_pair(index,chunkStride);
+}
+
+Chunk Image::getChunk ( const size_t& first, const size_t& second, const size_t& third, const size_t& fourth ) {
+	MAKE_LOG(DataDebug);
+	if(not clean){
+		LOG(DataDebug,util::info)
+		<< "Image is not clean. Running reIndex ..." << std::endl;
+		reIndex();
+	}
+	return const_cast<const Image*>(this)->getChunk(first,second,third,fourth);
+}
+	
+Chunk Image::getChunk ( const size_t& first, const size_t& second, const size_t& third, const size_t& fourth ) const {
+	const std::pair<size_t,size_t> index=commonGet(first,second,third,fourth);
+	return *(lookup[index.first/index.second]);
 }
 
 size_t Image::getChunkStride ( size_t base_stride ) {
@@ -160,7 +167,6 @@ size_t Image::getChunkStride ( size_t base_stride ) {
 	<< "No dimensional break found assuming it to be at the end (" << ret << ")" << std::endl;
 	return ret;
 }
-
 
 Image::ChunkIterator Image::chunksBegin(){return set.begin();}
 Image::ChunkIterator Image::chunksEnd(){return set.end();}

@@ -121,10 +121,33 @@ BOOST_AUTO_TEST_CASE (image_chunk_test)
 BOOST_AUTO_TEST_CASE (image_voxel_test)
 {
 
-//	TODO test the const and non-const version of voxel,
-//
-//	get a voxel from inside and outside the image
+	//	TODO test the const and non-const version of voxel,
+	//
+	//	get a voxel from inside and outside the image
+	isis::data::MemChunk<float> ch11(3,3);
+	isis::data::MemChunk<float> ch12(3,3);
+	isis::data::MemChunk<float> ch13(3,3);
+	isis::data::Image img;
 
+	ch11.setProperty("indexOrigin",isis::util::fvector4(0,0,0,0));
+	ch12.setProperty("indexOrigin",isis::util::fvector4(0,0,1,0));
+	ch13.setProperty("indexOrigin",isis::util::fvector4(0,0,2,0));
+
+	ch11.voxel<float>(0,0)=42;
+	ch12.voxel<float>(1,1)=42;
+	ch13.voxel<float>(2,2)=42;
+
+	BOOST_CHECK(img.insertChunk(ch11));
+	BOOST_CHECK(img.insertChunk(ch12));
+	BOOST_CHECK(img.insertChunk(ch13));
+
+	BOOST_CHECK(img.voxel<float>(0,0,0,0)==42);
+	BOOST_CHECK(img.voxel<float>(1,1,1,0)==42);
+	BOOST_CHECK(img.voxel<float>(2,2,2,0)==42);
+
+	/// check for setting voxel data
+	img.voxel<float>(2,2,2,0)=23;
+	BOOST_CHECK(img.voxel<float>(2,2,2,0)==23);
 }
 
 BOOST_AUTO_TEST_CASE(image_getChunk_test)

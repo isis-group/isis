@@ -44,6 +44,9 @@ private:
 	std::vector<ChunkIterator> lookup;
 	bool clean;
 
+	std::pair<size_t,size_t>
+	commonGet(const size_t &first,const size_t &second,const size_t &third,const size_t &fourth)const;
+
 protected:
 	static const isis::util::PropMap::key_type needed[];
 
@@ -81,7 +84,21 @@ public:
 		const size_t &first,
 		const size_t &second=0,
 		const size_t &third=0,
-		const size_t &fourth=0);
+		const size_t &fourth=0)
+	{
+		MAKE_LOG(DataDebug);
+		if(not clean){
+			LOG(DataDebug,util::info)
+			<< "Image is not clean. Running reIndex ..." << std::endl;
+			reIndex();
+		}
+		
+		const std::pair<size_t,size_t> index=commonGet(first,second,third,fourth);
+		const size_t chunk_index=index.first/index.second;
+		const size_t voxel_index=index.first%index.second;
+		util::TypePtr<T> data=(lookup[chunk_index])->getTypePtr<T>();
+		return data[voxel_index];		
+	}
 
 	/**
 	 * This method returns a reference to the voxel value at the given coordinates.
@@ -100,7 +117,15 @@ public:
 		const size_t &first,
 		const size_t &second=0,
 		const size_t &third=0,
-		const size_t &fourth=0)const;
+		const size_t &fourth=0)const
+	{
+		const std::pair<size_t,size_t> index=commonGet(first,second,third,fourth);
+		const size_t chunk_index=index.first/index.second;
+		const size_t voxel_index=index.first%index.second;
+		const util::TypePtr<T> data=(lookup[chunk_index])->getTypePtr<T>();
+		const T ret=data[voxel_index];
+		return ret;
+	}
 
 	/**
 	 * Returns a copy of the chunk that contains the voxel at the given coordinates.
