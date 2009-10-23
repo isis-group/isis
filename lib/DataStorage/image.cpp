@@ -52,7 +52,7 @@ bool Image::insertChunk ( const Chunk &chunk ) {
 	if(not chunk.sufficient()){
 		const util::PropMap::key_list missing=chunk.missing();
 		LOG(DataLog,isis::util::error)
-			<< "Cannot insert chunk. Missing proprties: " << util::list2string(missing.begin(),missing.end(),", ") << std::endl;
+			<< "Cannot insert chunk. Missing properties: " << util::list2string(missing.begin(),missing.end(),", ") << std::endl;
 		return false;
 	}
 	if(set.insert(chunk).second){
@@ -77,7 +77,7 @@ bool Image::reIndex() {
 	
 	const unsigned short chunk_dims=chunksBegin()->dimRange().second;
 
-	size_t size[4];
+	size_t size[Chunk::n_dims];
 	for(unsigned short i=0;i<chunk_dims;i++)
 		size[i]=chunksBegin()->dimSize(i);
 
@@ -104,11 +104,11 @@ Image::commonGet ( const size_t& first, const size_t& second, const size_t& thir
 	MAKE_LOG(DataDebug);
 	if(not clean){
 		LOG(DataDebug,util::error)
-		<< "Getting data from a non indexed image will result undefined behavior. Run reIndex first." << std::endl;
+		<< "Getting data from a non indexed image will result in undefined behavior. Run reIndex first." << std::endl;
 	}
 	if(set.empty()){
 		LOG(DataDebug,util::error)
-		<< "Getting data from a empty image will result undefined behavior." << std::endl;
+		<< "Getting data from a empty image will result in undefined behavior." << std::endl;
 	}
 	
 	const size_t dim[]={first,second,third,fourth};
@@ -145,7 +145,7 @@ size_t Image::getChunkStride ( size_t base_stride ) {
 		util::fvector4 thisV=lookup[0]->getProperty<util::fvector4>("indexOrigin");
 		util::fvector4 nextV=lookup[base_stride]->getProperty<util::fvector4>("indexOrigin");
 		const util::fvector4 dist1 =nextV-thisV;
-		for(size_t i=base_stride;i<lookup.size()-1;i+=base_stride){
+		for(size_t i=base_stride;i<lookup.size()-base_stride;i+=base_stride){
 			util::fvector4 thisV=lookup[i]->getProperty<util::fvector4>("indexOrigin");
 			util::fvector4 nextV=lookup[i+base_stride]->getProperty<util::fvector4>("indexOrigin");
 			const util::fvector4 dist =nextV-thisV;
@@ -164,7 +164,7 @@ size_t Image::getChunkStride ( size_t base_stride ) {
 	}
 	ret=lookup.size();
 	LOG(DataDebug,util::info)
-	<< "No dimensional break found assuming it to be at the end (" << ret << ")" << std::endl;
+	<< "No dimensional break found, assuming it to be at the end (" << ret << ")" << std::endl;
 	return ret;
 }
 
