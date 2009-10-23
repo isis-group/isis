@@ -59,7 +59,7 @@ PropMap::diff_map PropMap::diff(const PropMap& second,key_list ignore) const{
 	return ret;
 }
 
-void PropMap::make_unique (const isis::util::PropMap& second, PropMap::key_list ignore ) {
+void PropMap::make_unique (const util::PropMap& second, PropMap::key_list ignore ) {
 	//remove everything that is also in second and equal
 	BOOST_FOREACH(const_reference ref,second){
 		if(ignore.find(ref.first)==ignore.end())

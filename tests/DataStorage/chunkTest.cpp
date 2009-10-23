@@ -16,27 +16,27 @@ using util::CoreDebug;
 /* create an image */
 BOOST_AUTO_TEST_CASE (chunk_init_test)
 {
-	ENABLE_LOG(CoreLog,isis::util::DefaultMsgPrint,isis::util::warning);
-	ENABLE_LOG(CoreDebug,isis::util::DefaultMsgPrint,isis::util::warning);
+	ENABLE_LOG(CoreLog,util::DefaultMsgPrint,util::warning);
+	ENABLE_LOG(CoreDebug,util::DefaultMsgPrint,util::warning);
 
-	isis::data::MemChunk<float> ch(4,3,2,1);
+	data::MemChunk<float> ch(4,3,2,1);
 	BOOST_CHECK(ch.volume()==1*2*3*4);
-	BOOST_CHECK(ch.size(isis::data::MemChunk<float>::read)==4);
-	BOOST_CHECK(ch.size(isis::data::MemChunk<float>::phase)==3);
-	BOOST_CHECK(ch.size(isis::data::MemChunk<float>::slice)==2);
-	BOOST_CHECK(ch.size(isis::data::MemChunk<float>::time)==1);
+	BOOST_CHECK(ch.size(data::MemChunk<float>::read)==4);
+	BOOST_CHECK(ch.size(data::MemChunk<float>::phase)==3);
+	BOOST_CHECK(ch.size(data::MemChunk<float>::slice)==2);
+	BOOST_CHECK(ch.size(data::MemChunk<float>::time)==1);
 }
 
 BOOST_AUTO_TEST_CASE (chunk_property_test)
 {
-	isis::data::MemChunk<float> ch(4,3,2,1);
+	data::MemChunk<float> ch(4,3,2,1);
 
 	//an basic Chunk must be invalid
 	BOOST_CHECK(not ch.sufficient());
 	BOOST_CHECK(not ch.hasProperty("indexOrigin"));
 
 	//with an position its valid
-	isis::util::fvector4 pos(1,1,1,1);
+	util::fvector4 pos(1,1,1,1);
 	ch.setProperty("indexOrigin",pos);
 	BOOST_CHECK(ch.sufficient());
 
@@ -44,26 +44,26 @@ BOOST_AUTO_TEST_CASE (chunk_property_test)
 	BOOST_CHECK(ch.hasProperty("indexorigin"));
 
 	// and of course the property shall be what it was set to
-	BOOST_CHECK(pos == ch.getProperty<isis::util::fvector4>("indexOrigin"));
+	BOOST_CHECK(pos == ch.getProperty<util::fvector4>("indexOrigin"));
 }
 
 BOOST_AUTO_TEST_CASE (chunk_data_test1)//Access Chunk elements via dimensional index
 {
-	isis::data::MemChunk<float> ch(4,3,2,1);
+	data::MemChunk<float> ch(4,3,2,1);
 
-	for(size_t i=0;i<ch.size(isis::data::readDim);i++)
+	for(size_t i=0;i<ch.size(data::readDim);i++)
 		ch.voxel<float>(0,0,0,i)=i;
-	for(size_t i=0;i<ch.size(isis::data::readDim);i++)
+	for(size_t i=0;i<ch.size(data::readDim);i++)
 		BOOST_CHECK(ch.voxel<float>(0,0,0,i)==i);
 
-	isis::data::Chunk ch2 = ch;
-	for(size_t i=0;i<ch.size(isis::data::readDim);i++)
+	data::Chunk ch2 = ch;
+	for(size_t i=0;i<ch.size(data::readDim);i++)
 		BOOST_CHECK(ch2.voxel<float>(0,0,0,i)==i);
 }
 
 BOOST_AUTO_TEST_CASE (chunk_data_test2)//Access Chunk elements via linear index (threat it as TypePtr)
 {
-	isis::data::MemChunk<float> ch(4,3,2,1);
+	data::MemChunk<float> ch(4,3,2,1);
 
 	std::ostringstream o;
 	unsigned short sample[ch.volume()];
@@ -74,20 +74,20 @@ BOOST_AUTO_TEST_CASE (chunk_data_test2)//Access Chunk elements via linear index 
 	for(size_t i=0;i<ch.volume();i++)
 		BOOST_CHECK(ch.getTypePtr<float>()[i]==i);
 
-	isis::util::write_list(
+	util::write_list(
 		sample,sample+ch.volume(),o,
-		"|",isis::util::Type<int>(ch.volume()).toString(false)+"#"
+		"|",util::Type<int>(ch.volume()).toString(false)+"#"
 	);
 	BOOST_CHECK(o.str() == ch.getTypePtr<float>().toString());
 }
 
 BOOST_AUTO_TEST_CASE (chunk_copy_test)//Copy chunks
 {
-	isis::data::MemChunk<float> ch1(4,3,2,1);
+	data::MemChunk<float> ch1(4,3,2,1);
 	for(size_t i=0;i<ch1.volume();i++)
 		ch1.getTypePtr<float>()[i]=i;
 
-	isis::data::Chunk ch2=ch1;//This shall clone the underlying TypePtr-Object
+	data::Chunk ch2=ch1;//This shall clone the underlying TypePtr-Object
 
 	//but it should of course be the of the same type and contain the same data
 	BOOST_CHECK(ch1->isSameType(*ch2));

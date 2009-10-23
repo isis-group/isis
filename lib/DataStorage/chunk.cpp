@@ -21,7 +21,7 @@ ChunkBase::ChunkBase ( size_t firstDim, size_t secondDim, size_t thirdDim, size_
 	const size_t idx[]={firstDim,secondDim,thirdDim,fourthDim};
 	init(idx);
 	if(!NDimensional<4>::volume())
-		LOG(DataLog,isis::util::error)
+		LOG(DataLog,util::error)
 		<< "Size " << fourthDim << "|" << thirdDim << "|" << secondDim << "|" << firstDim << " is invalid" << std::endl;
 }
 

@@ -17,10 +17,11 @@
 #include <signal.h>
 #include <unistd.h>
 
-using isis::util::_internal::Message;
+namespace isis{ namespace util{
+	
+using _internal::Message;
 using ::std::string;
 
-namespace isis{ namespace util{
 
 void _internal::MessageHandlerBase::stopBelow(LogLevel stop){
 	m_stop_below=stop;
@@ -91,7 +92,7 @@ LogLevel _internal::MessageHandlerBase::m_stop_below=error;
 
 }}
 namespace std{
-Message& endl(Message& __os) {
+isis::util::_internal::Message& endl(isis::util::_internal::Message& __os) {
 	if(__os.shouldCommit()){
 		__os.commitTo->commit(__os);
 		__os.str("");

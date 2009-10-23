@@ -2,7 +2,7 @@
  * typeTest.cpp
  *
  * A unit test suite to confirm the capabilities of the
- * isis::utils::Type class.
+ * utils::Type class.
  *
  *  Created on: Sep 24, 2009
  *      Author: proeger

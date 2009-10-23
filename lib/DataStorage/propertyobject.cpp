@@ -15,8 +15,8 @@
 
 namespace isis{ namespace data { namespace _internal {
 
-PropertyObject::PropertyObject ( const isis::util::PropMap::key_type needed[] ) {
-	for(size_t i=0;i<sizeof(needed)/sizeof(isis::util::PropMap::key_type);i++)
+PropertyObject::PropertyObject ( const util::PropMap::key_type needed[] ) {
+	for(size_t i=0;i<sizeof(needed)/sizeof(util::PropMap::key_type);i++)
 		addNeeded(needed[i]);
 }
 
@@ -28,10 +28,10 @@ void PropertyObject::addNeeded ( const std::string& key )
 }
 
 
-const ::isis::util::PropMap::mapped_type&
+const util::PropMap::mapped_type&
 PropertyObject::getPropertyValue ( const std::string& key ) const
 {
-	::isis::util::PropMap::const_iterator found=properties.find(key);
+	util::PropMap::const_iterator found=properties.find(key);
 	return found!=properties.end() ? found->second: emptyProp;
 }
 

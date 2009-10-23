@@ -32,9 +32,9 @@ bool IOFactory::registerFormat(FileFormatPtr plugin){
 
 	io_formats.push_back(plugin);
 	std::list<std::string> suffixes=getSuffixes(plugin);
-	LOG(DataLog,::isis::util::info)
+	LOG(DataLog,util::info)
 		<< "Registering " << (plugin->tainted() ? "tainted " :"") << "io-plugin \"" 
-		<< ::isis::util::MSubject(plugin->name())
+		<< util::MSubject(plugin->name())
 		<< "\" with " << suffixes.size() << " supported suffixes" << std::endl;
 
 	BOOST_FOREACH(std::string &it,suffixes)
@@ -47,11 +47,11 @@ unsigned int IOFactory::findPlugins(std::string path){
 	MAKE_LOG(DataLog);
 	boost::filesystem::path p(path);
 	if (!exists(p)){
-		LOG(DataLog,::isis::util::warning) << ::isis::util::MSubject(p.native_file_string()) << " not found" << std::endl;
+		LOG(DataLog,util::warning) << util::MSubject(p.native_file_string()) << " not found" << std::endl;
 		return 0;
 	}
 	if(!boost::filesystem::is_directory(p)){
-		LOG(DataLog,::isis::util::warning) << ::isis::util::MSubject(p.native_file_string()) << " is no directory" << std::endl;
+		LOG(DataLog,util::warning) << util::MSubject(p.native_file_string()) << " is no directory" << std::endl;
 		return 0;
 	}
 
@@ -63,23 +63,23 @@ unsigned int IOFactory::findPlugins(std::string path){
 			const std::string pluginName=itr->path().string();
 			void *handle=dlopen(pluginName.c_str(),RTLD_NOW);
 			if(handle){
-				isis::image_io::FileFormat* (*factory_func)() = (isis::image_io::FileFormat* (*)())dlsym(handle,"factory");
+				image_io::FileFormat* (*factory_func)() = (image_io::FileFormat* (*)())dlsym(handle,"factory");
 				if (factory_func){
 					FileFormatPtr io_class(factory_func());
 					if(registerFormat(io_class))
 						ret++;
 					else
-						LOG(DataLog,::isis::util::error) << "failed to register plugin " << isis::util::MSubject(pluginName) << std::endl;
+						LOG(DataLog,util::error) << "failed to register plugin " << util::MSubject(pluginName) << std::endl;
 					  
 				} else
-					LOG(DataLog,::isis::util::error)
-						<< "could not get format factory function: " << isis::util::MSubject(dlerror()) << std::endl;
+					LOG(DataLog,util::error)
+						<< "could not get format factory function: " << util::MSubject(dlerror()) << std::endl;
 			} else
-				LOG(DataLog,::isis::util::error)
-					<< "Could not load library: " << isis::util::MSubject(dlerror()) << std::endl;
+				LOG(DataLog,util::error)
+					<< "Could not load library: " << util::MSubject(dlerror()) << std::endl;
 		} else {
-			LOG(DataLog,::isis::util::info)
-				<< "Ignoring " << ::isis::util::MSubject(itr->path())
+			LOG(DataLog,util::info)
+				<< "Ignoring " << util::MSubject(itr->path())
 				<< " because it doesn't match " << pluginFilter.str() << std::endl;
 		}
 	}
@@ -98,28 +98,28 @@ IOFactory& IOFactory::get(){
 	return ret;
 }
 
-isis::data::ChunkList IOFactory::loadFile(
+data::ChunkList IOFactory::loadFile(
 		const std::string& filename, const std::string& dialect){
 	MAKE_LOG(DataLog);
 
 	FileFormatList formatReader = getFormatReader(filename, dialect);
 	if(true == formatReader.empty()){//no suitable plugin
-		LOG(DataLog,::isis::util::error)
+		LOG(DataLog,util::error)
 				<< "Missing plugin to open file: " << filename << " with dialect: " << dialect << std::endl;
-		return isis::data::ChunkList();
+		return data::ChunkList();
 	}
 
 	for(FileFormatList::const_iterator it = formatReader.begin(); it != formatReader.end(); it++) {
-		isis::data::ChunkList loadedChunks = (*it)->load(filename, dialect);
+		data::ChunkList loadedChunks = (*it)->load(filename, dialect);
 		if (false == loadedChunks.empty()){//load succesfully
-			LOG(DataLog,::isis::util::info)
+			LOG(DataLog,util::info)
 					<< "plugin to load file " <<  filename << " : " << (*it)->name() << " with dialect: " << dialect << std::endl;
 			return loadedChunks;
 		}
 	}
-	LOG(DataLog,::isis::util::error)
+	LOG(DataLog,util::error)
 		<< "Could not open file: " << filename <<std::endl;
-	return isis::data::ChunkList();//no plugin of proposed list could load file
+	return data::ChunkList();//no plugin of proposed list could load file
 }
 
 IOFactory::FileFormatList IOFactory::getFormatReader(const std::string& filename, const std::string& dialect){

@@ -14,14 +14,14 @@ public:
 		return "Null";
 	}
   
-	virtual isis::data::ChunkList load ( std::string filename, std::string dialect ){
-		isis::data::MemChunk<short> test(1,1,1,5);
-		isis::data::ChunkList list;
+	virtual data::ChunkList load ( std::string filename, std::string dialect ){
+		data::MemChunk<short> test(1,1,1,5);
+		data::ChunkList list;
 		list.push_back(test);
-		return list;//return isis::data::ChunkList();
+		return list;//return data::ChunkList();
 	}
 	
-	virtual bool save ( const isis::data::ChunkList& chunks, std::string filename, std::string dialect ){
+	virtual bool save ( const data::ChunkList& chunks, std::string filename, std::string dialect ){
 		return false;
 	}
 	bool tainted(){return false;}//internal plugins are not tainted

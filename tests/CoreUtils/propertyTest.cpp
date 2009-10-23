@@ -16,14 +16,14 @@ namespace isis{namespace test{
 	
 BOOST_AUTO_TEST_CASE(property_init_test)
 {
-	ENABLE_LOG(isis::util::CoreLog,isis::util::DefaultMsgPrint,isis::util::info);
-	ENABLE_LOG(isis::util::CoreDebug,isis::util::DefaultMsgPrint,isis::util::verbose_info);
+	ENABLE_LOG(util::CoreLog,util::DefaultMsgPrint,util::info);
+	ENABLE_LOG(util::CoreDebug,util::DefaultMsgPrint,util::verbose_info);
 	
 	//	default constructor
-	isis::util::PropertyValue propZero;
+	util::PropertyValue propZero;
 
 	//	initializer
-	isis::util::PropertyValue propA = std::string("Property01");
+	util::PropertyValue propA = std::string("Property01");
 	BOOST_CHECK(propA->toString().compare("Property01") == 0);
 
 	//	default: not needed
@@ -34,12 +34,12 @@ BOOST_AUTO_TEST_CASE(property_init_test)
 
 BOOST_AUTO_TEST_CASE(property_copy_test)
 {
-	ENABLE_LOG(isis::util::CoreLog,isis::util::DefaultMsgPrint,isis::util::info);
-	ENABLE_LOG(isis::util::CoreDebug,isis::util::DefaultMsgPrint,isis::util::verbose_info);
+	ENABLE_LOG(util::CoreLog,util::DefaultMsgPrint,util::info);
+	ENABLE_LOG(util::CoreDebug,util::DefaultMsgPrint,util::verbose_info);
 
 	// Test copy operator
-	isis::util::PropertyValue propA = 5;
-	isis::util::PropertyValue propB = propA;
+	util::PropertyValue propA = 5;
+	util::PropertyValue propB = propA;
 	BOOST_CHECK(propB == 5);
 
 	//check for deep copy (change of propA shall not change propB)

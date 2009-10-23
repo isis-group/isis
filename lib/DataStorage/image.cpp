@@ -17,18 +17,18 @@ namespace isis{ namespace data{
 
 namespace _internal{
 	
-bool image_chunk_order::operator() ( const isis::data::Chunk& a, const isis::data::Chunk& b )const
+bool image_chunk_order::operator() ( const data::Chunk& a, const data::Chunk& b )const
 {
 	MAKE_LOG(DataDebug);
 
 	//@todo exception ??
 	if(!(a.hasProperty("indexOrigin") && a.hasProperty("indexOrigin"))){
-		LOG(DataDebug,isis::util::error) << "The chunk has no position, it can not be sorted into the image." << std::endl;
+		LOG(DataDebug,util::error) << "The chunk has no position, it can not be sorted into the image." << std::endl;
 		return false;
 	}
 
-	const isis::util::fvector4 &posA=a.getProperty<isis::util::fvector4>("indexOrigin");
-	const isis::util::fvector4 &posB=b.getProperty<isis::util::fvector4>("indexOrigin");
+	const util::fvector4 &posA=a.getProperty<util::fvector4>("indexOrigin");
+	const util::fvector4 &posB=b.getProperty<util::fvector4>("indexOrigin");
 	
 	return posA.lexical_less_reverse(posB);
 }
@@ -51,7 +51,7 @@ bool Image::insertChunk ( const Chunk &chunk ) {
 	}
 	if(not chunk.sufficient()){
 		const util::PropMap::key_list missing=chunk.missing();
-		LOG(DataLog,isis::util::error)
+		LOG(DataLog,util::error)
 			<< "Cannot insert chunk. Missing properties: " << util::list2string(missing.begin(),missing.end(),", ") << std::endl;
 		return false;
 	}
