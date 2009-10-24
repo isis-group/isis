@@ -14,6 +14,7 @@
 #define LOG_H
 
 #include <string>
+#include <boost/scoped_ptr.hpp>
 #include "message.hpp"
 #include "common.hpp"
 
@@ -48,13 +49,14 @@ public:
 /// @endcond
 
 #define MAKE_LOG(MODULE)\
-isis::util::_internal::Log<MODULE> __logger_ ## MODULE(__FILE__,__PRETTY_FUNCTION__)
+boost::scoped_ptr<isis::util::_internal::Log<MODULE> > \
+__logger_ ## MODULE ( MODULE::use_rel ? new isis::util::_internal::Log<MODULE> (__FILE__,__PRETTY_FUNCTION__):NULL)
 
 #define ENABLE_LOG(MODULE,HANDLE_CLASS,set)\
 if(!MODULE::use_rel);else isis::util::_internal::Log<MODULE>::enable<HANDLE_CLASS>(set)
 
 #define LOG(MODULE,LEVEL)\
-if(!MODULE::use_rel);else __logger_ ## MODULE.send(__LINE__,LEVEL)
+if(!MODULE::use_rel);else __logger_ ## MODULE->send(__LINE__,LEVEL)
 
 
 #endif

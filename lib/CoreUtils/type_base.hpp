@@ -14,6 +14,8 @@
 #define ISISTYPE_BASE_HPP
 
 #include "log.hpp"
+#include <stdexcept>
+#include <cstdlib>
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/lexical_cast.hpp>
@@ -42,27 +44,33 @@ template<typename TYPE> TYPE __cast_to(Type<TYPE> *dest,const TYPE& value){
 class GenericType{
 protected:
 	template<typename T> const T m_cast_to(T defaultVal) const{
-		MAKE_LOG(CoreLog);
-		const T* ret=dynamic_cast<const T* >(this);
-		if(ret){
-			return *ret;
-		} else {
-			LOG(CoreLog,error) 
-				<< "Cannot cast " << typeName() << " to " << T::staticName()
-				<< ". Returning \"" << defaultVal.toString() << "\"." << std::endl;
-			return defaultVal;
+		MAKE_LOG(CoreDebug);
+		if (typeID() == T::staticId()) { // ok its exactly the same type - no fiddling necessary
+			return *reinterpret_cast<const T*>(this);
+		} else {			
+			const T* const ret=dynamic_cast<const T* >(this);
+			if(ret){
+				return *ret;
+			} else {
+				LOG(CoreDebug,error) 
+					<< "Cannot cast " << typeName() << " to " << T::staticName()
+					<< ". Returning \"" << defaultVal.toString() << "\"." << std::endl;
+				return defaultVal;
+			}
 		}
 	}
-	template<typename T> T& m_cast_to() throw(std::bad_cast){
-		MAKE_LOG(CoreLog);
-		T* ret=dynamic_cast<T* >(this);
-		if(!ret){
-			LOG(CoreLog,error)
-				<< "Cannot cast " << typeName() << " to " << T::staticName()
-				<< ". Throwing bad_cast"<< std::endl;
-			throw(std::bad_cast());
+	template<typename T> T& m_cast_to() throw(std::invalid_argument){
+		if (typeID() == T::staticId()) { // ok its exactly the same type - no fiddling necessary
+			return *reinterpret_cast<T*>(this);
+		} else {
+			T* const ret=dynamic_cast<T* >(this); //@todo have a look at http://lists.apple.com/archives/Xcode-users/2005/Dec/msg00061.html and http://www.mailinglistarchive.com/xcode-users@lists.apple.com/msg15790.html
+			if(ret == NULL){
+				std::stringstream msg;
+				msg << "cannot cast " << typeName() << " at " << this << " to " << T::staticName();
+				throw(std::invalid_argument(msg.str()));
+			}
+			return *ret;
 		}
-		return *ret;
 	}
 
 public:
@@ -167,7 +175,7 @@ public:
 	* Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
 	* \returns a reference of the stored value.
 	*/
-	template<typename T> Type<T>& cast_to_Type() throw(std::bad_cast){
+	template<typename T> Type<T>& cast_to_Type(){
 		return m_cast_to<Type<T> >();
 	}
 	virtual bool eq(const TypeBase &second)const=0;
