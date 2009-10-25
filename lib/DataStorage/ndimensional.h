@@ -40,9 +40,10 @@ template<unsigned short DIM> bool __rangeCheck(const size_t d[],const size_t dim
 	return (d[DIM] < dim[DIM]) && __rangeCheck<DIM-1>(d,dim);
 }
 
-template<> size_t __dimStride<0> (                 const size_t dim[]);
-template<> size_t __dim2Index<0> (const size_t d[],const size_t dim[]);
-template<> bool   __rangeCheck<0>(const size_t d[],const size_t dim[]);
+template<> inline size_t __dimStride<0>(const size_t dim[]){return 1;}
+template<> inline size_t __dim2Index<0>(const size_t d[],const size_t dim[]){return d[0]*__dimStride<0>(dim);}
+template<> inline bool   __rangeCheck<0>(const size_t d[],const size_t dim[]){return d[0]<dim[0];}
+
 /// @endcond
 
 /// Base class for anything that has dimensional size

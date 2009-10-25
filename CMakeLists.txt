@@ -7,11 +7,6 @@ project(isis)
 # set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
 # 	"${CMAKE_SOURCE_DIR}/cmake/Modules")
 
-add_definitions(-D_ENABLE_DATA_LOG=1)
-add_definitions(-D_ENABLE_CORE_LOG=1)
-add_definitions(-D_ENABLE_DATA_DEBUG=1)
-add_definitions(-D_ENABLE_CORE_DEBUG=1)
-
 FIND_PACKAGE(Boost COMPONENTS filesystem regex system)
 include_directories(${Boost_INCLUDE_DIR}  lib)
 
@@ -22,6 +17,26 @@ OPTION(BUILD_SHARED_LIBS "Build isis with shared libraries" OFF)
 OPTION(BUILD_COREUTILS "Build the isis coreutils." ON)
 OPTION(BUILD_DATA_IO "Build the isis data and io modules." ON)
 OPTION(BUILD_ITK "Build the ITK stuff." OFF)
+
+OPTION(RUNTIME_LOG "Enable runtime logging" ON)
+OPTION(DEBUG_LOG "Enable debug logging" ON)
+
+if(RUNTIME_LOG)
+	add_definitions(-D_ENABLE_DATA_LOG=1)
+	add_definitions(-D_ENABLE_CORE_LOG=1)
+else(RUNTIME_LOG)
+	add_definitions(-D_ENABLE_DATA_LOG=0)
+	add_definitions(-D_ENABLE_CORE_LOG=0)
+endif(RUNTIME_LOG)
+
+if(DEBUG_LOG)
+	add_definitions(-D_ENABLE_DATA_DEBUG=1)
+	add_definitions(-D_ENABLE_CORE_DEBUG=1)
+else(DEBUG_LOG)
+	add_definitions(-D_ENABLE_DATA_DEBUG=0)
+	add_definitions(-D_ENABLE_CORE_DEBUG=0)
+endif(DEBUG_LOG)
+
 
 if (NOT BUILD_SHARED_LIBS)
 	IF("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
