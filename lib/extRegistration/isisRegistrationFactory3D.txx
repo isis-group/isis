@@ -324,7 +324,8 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpTransform() 
 			m_RigidInitializer->SetTransform(m_VersorRigid3DTransform);
 			m_RigidInitializer->SetFixedImage(m_FixedImage);
 			m_RigidInitializer->SetMovingImage(m_MovingImage);
-			m_RigidInitializer->GeometryOn();
+			m_RigidInitializer->MomentsOn();
+
 			m_RigidInitializer->InitializeTransform();
 		}
 		if(transform.AFFINE) {
