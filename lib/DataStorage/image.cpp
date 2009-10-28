@@ -76,6 +76,7 @@ bool Image::reIndex() {
 		lookup[idx]=it;
 	
 	const unsigned short chunk_dims=chunksBegin()->dimRange().second;
+	chunkVolume = chunksBegin()->volume();
 
 	size_t size[Chunk::n_dims];
 	for(unsigned short i=0;i<chunk_dims;i++)
@@ -98,8 +99,7 @@ bool Image::reIndex() {
 	return true;
 }
 
-std::pair<size_t,size_t>
-Image::commonGet ( const size_t& first, const size_t& second, const size_t& third, const size_t& fourth ) const
+std::pair<size_t,size_t> Image::commonGet (size_t first,size_t second,size_t third,size_t fourth) const
 {
 	MAKE_LOG(DataDebug);
 	if(not clean){
@@ -111,25 +111,43 @@ Image::commonGet ( const size_t& first, const size_t& second, const size_t& thir
 		<< "Getting data from a empty image will result in undefined behavior." << std::endl;
 	}
 	
-	const size_t dim[]={first,second,third,fourth};
-	const size_t chunkStride=set.begin()->volume();
-	const size_t index=dim2Index(dim);
-	return std::make_pair(index,chunkStride);
+	const size_t idx[]={first,second,third,fourth};
+	if(!rangeCheck(idx)){
+		LOG(DataDebug,isis::util::error)
+		<< "Index " << first << "|" << second << "|" << third << "|" << fourth << " is out of range (" << sizeToString() << ")"
+		<< std::endl;
+	}
+	
+	const size_t index=dim2Index(idx);
+	return std::make_pair(index/chunkVolume,index%chunkVolume);
 }
+	
+const Chunk& Image::getChunkAt(size_t at)const
+{
+	return *(lookup[at]);
+}
+Chunk& Image::getChunkAt(size_t at)
+{
+	//we must cast away the const here because std::set has no non-const iterators
+	Chunk &ret=const_cast<Chunk&>(*(lookup[at]));
+	return ret;
+}
+	
 
-Chunk Image::getChunk ( const size_t& first, const size_t& second, const size_t& third, const size_t& fourth ) {
+Chunk& Image::getChunk (size_t first,size_t second,size_t third,size_t fourth) {
 	MAKE_LOG(DataDebug);
 	if(not clean){
 		LOG(DataDebug,util::info)
 		<< "Image is not clean. Running reIndex ..." << std::endl;
 		reIndex();
 	}
-	return const_cast<const Image*>(this)->getChunk(first,second,third,fourth);
+	const size_t index=commonGet(first,second,third,fourth).first;
+	return getChunkAt(index);
 }
 	
-Chunk Image::getChunk ( const size_t& first, const size_t& second, const size_t& third, const size_t& fourth ) const {
-	const std::pair<size_t,size_t> index=commonGet(first,second,third,fourth);
-	return *(lookup[index.first/index.second]);
+const Chunk& Image::getChunk (size_t first,size_t second,size_t third,size_t fourth) const {
+	const size_t index=commonGet(first,second,third,fourth).first;
+	return getChunkAt(index);
 }
 
 size_t Image::getChunkStride ( size_t base_stride ) {

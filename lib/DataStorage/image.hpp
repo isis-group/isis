@@ -43,9 +43,10 @@ private:
 	ChunkSet set;
 	std::vector<ChunkIterator> lookup;
 	bool clean;
+	size_t chunkVolume;
 
 	std::pair<size_t,size_t>
-	commonGet(const size_t &first,const size_t &second,const size_t &third,const size_t &fourth)const;
+	commonGet(size_t first,size_t second,size_t third,size_t fourth)const;
 
 protected:
 	static const isis::util::PropMap::key_type needed[];
@@ -59,6 +60,8 @@ protected:
 	 * \returns overall ammount of chunks in one slice of this dimension or 0 in case of an error
 	 */
 	size_t getChunkStride(size_t base_stride=1);
+	Chunk& getChunkAt(size_t at);
+	const Chunk& getChunkAt(size_t at)const;
 
 public:
 	/**
@@ -80,11 +83,7 @@ public:
 	 * \return A reference to the addressed voxel value. Reading and writing access
 	 * is provided.
 	 */
-	template <typename T> T& voxel(
-		const size_t &first,
-		const size_t &second=0,
-		const size_t &third=0,
-		const size_t &fourth=0)
+	template <typename T> T& voxel(size_t first,size_t second=0,size_t third=0,size_t fourth=0)
 	{
 		MAKE_LOG(DataDebug);
 		if(not clean){
@@ -94,10 +93,8 @@ public:
 		}
 		
 		const std::pair<size_t,size_t> index=commonGet(first,second,third,fourth);
-		const size_t chunk_index=index.first/index.second;
-		const size_t voxel_index=index.first%index.second;
-		util::TypePtr<T> data=(lookup[chunk_index])->getTypePtr<T>();
-		return data[voxel_index];		
+		util::TypePtr<T> &data=getChunkAt(index.first).asTypePtr<T>();
+		return data[index.second];		
 	}
 
 	/**
@@ -113,18 +110,11 @@ public:
 	 *
 	 * \return A reference to the addressed voxel value. Only reading access is provided
 	 */
-	template <typename T> T voxel(
-		const size_t &first,
-		const size_t &second=0,
-		const size_t &third=0,
-		const size_t &fourth=0)const
+	template <typename T> T voxel(size_t first,size_t second=0,size_t third=0,size_t fourth=0)const
 	{
 		const std::pair<size_t,size_t> index=commonGet(first,second,third,fourth);
-		const size_t chunk_index=index.first/index.second;
-		const size_t voxel_index=index.first%index.second;
-		const util::TypePtr<T> data=(lookup[chunk_index])->getTypePtr<T>();
-		const T ret=data[voxel_index];
-		return ret;
+		const util::TypePtr<T> &data=(lookup[index.first])->getTypePtr<T>();
+		return data[index.second];
 	}
 
 	/**
@@ -137,16 +127,8 @@ public:
 	 *
 	 *
 	 */
-	Chunk getChunk(
-		const size_t &first,
-		const size_t &second=0,
-		const size_t &third=0,
-		const size_t &fourth=0)const;
-	Chunk getChunk(
-		const size_t &first,
-		const size_t &second=0,
-		const size_t &third=0,
-		const size_t &fourth=0);
+	const Chunk& getChunk(size_t first,size_t second=0,size_t third=0,size_t fourth=0)const;
+	Chunk& getChunk(size_t first,size_t second=0,size_t third=0,size_t fourth=0);
 					   
 	/**
 	 * Inserts a Chunk into the Image.

@@ -79,7 +79,7 @@ public:
 				<< " is out of range (" << sizeToString() << ")"
 				<< std::endl;
 		}
-		util::TypePtr<TYPE> &ret=getTypePtr<TYPE>();
+		util::TypePtr<TYPE> &ret=asTypePtr<TYPE>();
 		return ret[dim2Index(idx)];
 	}
 	template<typename TYPE> TYPE voxel(size_t firstDim,size_t secondDim=0,size_t thirdDim=0,size_t fourthDim=0)const{
@@ -94,10 +94,10 @@ public:
 		const util::TypePtr<TYPE> &ret=getTypePtr<TYPE>();
 		return ret[dim2Index(idx)];
 	}
-	template<typename TYPE> util::TypePtr<TYPE> &getTypePtr(){
+	template<typename TYPE> util::TypePtr<TYPE> &asTypePtr(){
 		return operator*().cast_to_TypePtr<TYPE>();
 	}
-	template<typename TYPE> const util::TypePtr<TYPE> getTypePtr()const{
+	template<typename TYPE> const util::TypePtr<TYPE>& getTypePtr()const{
 		return operator*().cast_to_TypePtr<TYPE>();
 	}
 };
