@@ -52,6 +52,26 @@ add_subdirectory(lib)
 
 SET(ISIS_INSTALL_BIN_DIR "${CMAKE_BINARY_DIR}/bin/")
 
+# Set the revision number if this dir is a svn working copy.
+# The revision number will be stored in SVN_REVISION.
+FIND_FILE(SVNVERSION svnversion
+    PATHS /usr/bin /usr/local/bin 
+    DOC "The subversion revision information tool.")
+
+IF (SVNVERSION)
+  EXECUTE_PROCESS(COMMAND ${SVNVERSION} 
+      OUTPUT_VARIABLE OUT
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+  string(COMPARE EQUAL ${OUT} "exported" EXPORTED)
+  IF (NOT EXPORTED)
+      string(REGEX MATCH "^[0-9]+" SVN_REVISION ${OUT})
+  ENDIF (NOT EXPORTED)
+ENDIF (SVNVERSION)
+
+IF (SVN_REVISION)
+  message(STATUS "SVN Revision: ${SVN_REVISION}")
+endif(SVN_REVISION)
+
 IF(BUILD_APPLICATIONS)
 	add_subdirectory(apps)
 ENDIF(BUILD_APPLICATIONS)

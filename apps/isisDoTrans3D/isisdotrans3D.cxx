@@ -89,7 +89,12 @@ public:
 };
 
 int main(
+
     int argc, char* argv[]) {
+
+    // show revision information string constant
+    std::cout << "Revision: " << SVN_REVISION << std::endl;
+
 	// DANGER! Kids don't try this at home! VParseCommand modifies the values of argc and argv!!!
 	if(!VParseCommand(VNumber(options), options, &argc, argv) || !VIdentifyFiles(VNumber(options), options, "in",
 	    &argc, argv, 0) || !VIdentifyFiles(VNumber (options), options, "out", &argc, argv, -1)) {
