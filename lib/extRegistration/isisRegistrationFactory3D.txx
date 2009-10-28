@@ -50,13 +50,14 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::Reset(
 	m_FixedImageIsBigger = false;
 
 	UserOptions.PRINTRESULTS = false;
-	UserOptions.NumberOfIterations = 300;
+	UserOptions.NumberOfIterations = 1000;
 	UserOptions.NumberOfBins = 50;
-	UserOptions.PixelDensity = 0.01;
+	UserOptions.PixelDensity = 0.1;
 	UserOptions.USEOTSUTHRESHOLDING = false;
 	UserOptions.BSplineGridSize = 5;
 	UserOptions.INITIALIZEOFF = false;
 	UserOptions.NumberOfThreads = 1;
+	UserOptions.MattesMutualInitializeSeed = 1;
 
 	m_NumberOfParameters = 0;
 }
@@ -237,13 +238,18 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer() 
 			//...for the rigid transform
 			//number of parameters are dependent on the dimension of the images (2D: 4 parameter, 3D: 6 parameters)
 
-			for(unsigned int i = 0; i < m_NumberOfParameters; i++) {
+			optimizerScaleRegularStepGradient[0] = 1.0;
+			optimizerScaleRegularStepGradient[1] = 1.0;
+			optimizerScaleRegularStepGradient[2] = 1.0;
+			for(unsigned int i = 3; i < m_NumberOfParameters; i++) {
 				optimizerScaleRegularStepGradient[i] = 1.0 / 1000.0;
 			}
 			m_RegularStepGradientDescentOptimizer->SetMaximumStepLength(0.1);
 			m_RegularStepGradientDescentOptimizer->SetMinimumStepLength(0.0001);
 			m_RegularStepGradientDescentOptimizer->SetScales(optimizerScaleRegularStepGradient);
 			m_RegularStepGradientDescentOptimizer->SetNumberOfIterations(UserOptions.NumberOfIterations);
+			m_RegularStepGradientDescentOptimizer->SetRelaxationFactor(0.8);
+			m_RegularStepGradientDescentOptimizer->SetMinimize(true);
 		}
 
 		if(metric.VIOLAWELLSMUTUALINFORMATION or metric.MUTUALINFORMATIONHISTOGRAM) {
@@ -256,13 +262,19 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer() 
 
 		if(transform.VERSORRIGID or transform.QUATERNIONRIGID or transform.CENTEREDEULER3DTRANSFORM) {
 
-			for(unsigned int i = 0; i < m_NumberOfParameters; i++) {
+			optimizerScaleVersorRigid3D[0] = 1.0;
+			optimizerScaleVersorRigid3D[1] = 1.0;
+			optimizerScaleVersorRigid3D[2] = 1.0;
+			for(unsigned int i = 3; i < m_NumberOfParameters; i++) {
 				optimizerScaleVersorRigid3D[i] = 1.0 / 1000.0;
 			}
 			m_VersorRigid3DTransformOptimizer->SetMaximumStepLength(0.1);
 			m_VersorRigid3DTransformOptimizer->SetMinimumStepLength(0.0001);
 			m_VersorRigid3DTransformOptimizer->SetScales(optimizerScaleVersorRigid3D);
 			m_VersorRigid3DTransformOptimizer->SetNumberOfIterations(UserOptions.NumberOfIterations);
+			m_VersorRigid3DTransformOptimizer->SetRelaxationFactor(0.8);
+			m_VersorRigid3DTransformOptimizer->SetMinimize(true);
+
 		}
 
 	}
@@ -422,7 +434,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpMetric() {
 		        * UserOptions.PixelDensity);
 
 		m_MattesMutualInformationMetric->SetNumberOfHistogramBins(UserOptions.NumberOfBins);
-		m_MattesMutualInformationMetric->ReinitializeSeed(76926294);
+		m_MattesMutualInformationMetric->ReinitializeSeed(UserOptions.MattesMutualInitializeSeed);
 
 		//multi threading approach
 		//m_MattesMutualInformationMetric->SetNumberOfThreads(UserOptions.NumberOfThreads);

@@ -14,6 +14,8 @@ namespace extitk {
 
 TransformMerger::TransformMerger() {
 	outputType = 0;
+	tmpTransform_ = BSplineDeformableTransformType::New();
+	outputTransform_ = BSplineDeformableTransformType::New();
 
 }
 
@@ -25,6 +27,9 @@ void TransformMerger::merge(
 		if(VersorRigid3DTransformType* transform = dynamic_cast<VersorRigid3DTransformType*> (*transformIterator_)) {
 			outputType = 1;
 			std::cout << transform->GetParameters() << std::endl;
+
+			std::cout << tmpTransform_->GetParameters() << std::endl;
+			std::cout << tmpTransform_->GetNumberOfParameters() << std::endl;
 			//TODO versor rigid 3d type
 		}
 		if(AffineTransformType* transform = dynamic_cast<AffineTransformType*> (*transformIterator_)) {
@@ -43,7 +48,6 @@ void TransformMerger::merge(
 
 TransformBasePointer TransformMerger::getTransform(
     void) {
-
 
 }
 

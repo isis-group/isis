@@ -9,6 +9,7 @@
 #include "itkVersorRigid3DTransform.h"
 #include "itkAffineTransform.h"
 #include "itkBSplineDeformableTransform.h"
+#include "itkImageRegistrationMethod.h"
 
 #include <list>
 
@@ -45,7 +46,8 @@ private:
 	MatrixOffsetTransformType::TranslationType temporaryTranslation_;
 	MatrixOffsetTransformType::OffsetType temporaryOffset_;
 
-	TransformBasePointer outputTransform_;
+	BSplineDeformableTransformType::Pointer tmpTransform_;
+	BSplineDeformableTransformType::Pointer outputTransform_;
 
 };
 

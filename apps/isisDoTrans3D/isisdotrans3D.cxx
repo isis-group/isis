@@ -11,6 +11,8 @@
 #include "itkNearestNeighborInterpolateImageFunction.h"
 #include "itkBSplineInterpolateImageFunction.h"
 
+#include "extITK/isisTimeStepExtractionFilter.h"
+
 #include "itkResampleImageFilter.h"
 #include "itkCastImageFilter.h"
 
@@ -29,6 +31,7 @@ static VString template_filename = NULL;
 static VBoolean in_found, out_found, trans_found;
 static VShort interpolator_type = 0;
 static VArgVector resolution;
+static VBoolean fmri;
 
 static VOptionDescRec
         options[] = {
@@ -41,7 +44,8 @@ static VOptionDescRec
             {"interpolator", VShortRepn, 1, &interpolator_type, VOptionalOpt, 0,
                 "The interpolator used to resample the image"}, {"tmp", VStringRepn, 1, &template_filename,
                 VOptionalOpt, 0, "The template image"}, {"res", VFloatRepn, 0, (VPointer) &resolution, VOptionalOpt, 0,
-                "The output resolution. One value for isotrop output"}
+                "The output resolution. One value for isotrop output"}, {"fmri", VBooleanRepn, 1, &fmri, VOptionalOpt,
+                0, "Input and output image file are functional data"}
 
         };
 
@@ -102,9 +106,12 @@ int main(
 	//typedef section
 	typedef short PixelType;
 	const unsigned int Dimension = 3;
+	const unsigned int fmriDimension = 4;
 
 	typedef itk::Image<PixelType, Dimension> InputImageType;
 	typedef itk::Image<PixelType, Dimension> OutputImageType;
+	typedef itk::Image<PixelType, fmriDimension> FMRIInputType;
+	typedef itk::Image<PixelType, fmriDimension> FMRIOutputType;
 
 	typedef OutputImageType::SpacingType OutputSpacingType;
 	typedef OutputImageType::SizeType OutputSizeType;
@@ -114,6 +121,11 @@ int main(
 
 	typedef itk::ImageFileReader<InputImageType> ImageReaderType;
 	typedef itk::ImageFileWriter<OutputImageType> ImageFileWriter;
+
+	typedef itk::ImageFileReader<FMRIInputType> FMRIImageReaderType;
+	typedef itk::ImageFileWriter<FMRIOutputType> FMRIImageWriterType;
+
+	typedef isis::TimeStepExtractionFilter<FMRIInputType, InputImageType> TimeStepExtractionFilterType;
 
 	typedef const itk::Transform<double, Dimension, Dimension>* ConstTransformPointer;
 
@@ -130,9 +142,15 @@ int main(
 
 	ProcessUpdate::Pointer progressObserver = ProcessUpdate::New();
 
+	TimeStepExtractionFilterType::Pointer timeStepExtractionFilter = TimeStepExtractionFilterType::New();
+
 	ImageReaderType::Pointer reader = ImageReaderType::New();
 	ImageReaderType::Pointer templateReader = ImageReaderType::New();
 	ImageFileWriter::Pointer writer = ImageFileWriter::New();
+	FMRIImageReaderType::Pointer fmriReader = FMRIImageReaderType::New();
+	FMRIImageWriterType::Pointer fmriWriter = FMRIImageWriterType::New();
+
+	InputImageType::Pointer inputImage = InputImageType::New();
 
 	OutputSpacingType outputSpacing;
 	OutputSizeType outputSize;
@@ -145,10 +163,17 @@ int main(
 	}
 
 	//reading the input image
-	reader->SetFileName(in_filename);
-	reader->Update();
-
-	writer->SetFileName(out_filename);
+	if(!fmri) {
+		reader->SetFileName(in_filename);
+		reader->Update();
+		writer->SetFileName(out_filename);
+	}
+	if(fmri) {
+		fmriReader->SetFileName(in_filename);
+		fmriReader->Update();
+		timeStepExtractionFilter->SetInput(fmriReader->GetOutput());
+		fmriWriter->SetFileName(out_filename);
+	}
 
 	//if template file is specified by the user
 	if(template_filename) {

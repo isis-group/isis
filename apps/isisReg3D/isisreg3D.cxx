@@ -7,6 +7,7 @@
 
 #include "extRegistration/isisRegistrationFactory3D.h"
 #include "extITK/isisTransformMerger.hpp"
+#include "extITK/itkSerialTransform.h"
 
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
@@ -36,8 +37,8 @@ static VString out_filename = NULL;
 static VString vout_filename = NULL;
 static VString transform_filename_in = NULL;
 static VShort number_of_bins = 50;
-static VShort number_of_iterations = 300;
-static VFloat pixel_density = 0.01;
+static VShort number_of_iterations = 1000;
+static VFloat pixel_density = 0.1;
 static VShort grid_size = 5;
 static VShort metricType = 0;
 static VArgVector transformType;
@@ -45,6 +46,7 @@ static VShort interpolatorType = 0;
 static VArgVector optimizerType;
 static VBoolean in_found, ref_found;
 static VShort number_threads = 1;
+static VShort initial_seed = 1;
 static VBoolean initialize = false;
 
 static VOptionDescRec
@@ -54,8 +56,8 @@ static VOptionDescRec
             {"in", VStringRepn, 1, &in_filename, &in_found, 0, "the moving image filename"},
 
             //non-required inputs
-            {"out", VStringRepn, 1, &out_filename, VOptionalOpt, 0, "the output transform filename"}, {"vout",
-                VStringRepn, 1, &vout_filename, VOptionalOpt, 0, "the output vector image filename"},
+            {"out", VStringRepn, 1, &out_filename, VOptionalOpt, 0, "the output transform filename"},
+            {"vout", VStringRepn, 1, &vout_filename, VOptionalOpt, 0, "the output vector image filename"},
             {"tin", VStringRepn, 1, &transform_filename_in, VOptionalOpt, 0,
                 "filename of the transform used as an initial transform"},
             //parameter inputs
@@ -63,6 +65,8 @@ static VOptionDescRec
                 "Number of bins used by the MattesMutualInformationMetric to calculate the image histogram"},
             {"iter", VShortRepn, 1, &number_of_iterations, VOptionalOpt, 0,
                 "Maximum number of iteration used by the optimizer"},
+            {"seed", VShortRepn, 1, &initial_seed, VOptionalOpt, 0,
+                "The initialize seed for the MattesMutualInformationMetric"},
 
             {
                 "pd",
@@ -127,6 +131,8 @@ int main(
 
 	typedef itk::ImageFileWriter<DeformationFieldType> VectorWriterType;
 
+	typedef itk::SerialTransform<float, 3> SerialTransformType;
+
 	const itk::TransformBase* tmpConstTransformPointer;
 	typedef itk::TransformBase* TransformBasePointerType;
 
@@ -136,6 +142,8 @@ int main(
 	itk::TransformFileWriter::Pointer transformWriter = itk::TransformFileWriter::New();
 	VectorWriterType::Pointer vectorWriter = VectorWriterType::New();
 	itk::TransformFileReader::Pointer transformReader = itk::TransformFileReader::New();
+
+	SerialTransformType::Pointer serialTransform = SerialTransformType::New();
 
 	fixedReader->SetFileName(ref_filename);
 	movingReader->SetFileName(in_filename);
@@ -286,15 +294,17 @@ int main(
 
 		}
 		if(counter != 0) {
-			registrationFactory->SetInitialTransform(const_cast<TransformBasePointerType> (tmpConstTransformPointer));
+			//	registrationFactory->SetInitialTransform(const_cast<TransformBasePointerType> (tmpConstTransformPointer));
+			registrationFactory->SetInitialTransform(serialTransform);
 		}
 
 		registrationFactory->UserOptions.NumberOfIterations = number_of_iterations;
 		registrationFactory->UserOptions.NumberOfBins = number_of_bins;
 		registrationFactory->UserOptions.PixelDensity = pixel_density;
 		registrationFactory->UserOptions.BSplineGridSize = grid_size;
-		registrationFactory->UserOptions.PRINTRESULTS = false;
+		registrationFactory->UserOptions.PRINTRESULTS = true;
 		registrationFactory->UserOptions.NumberOfThreads = number_threads;
+		registrationFactory->UserOptions.MattesMutualInitializeSeed = initial_seed;
 		if(!initialize)
 			registrationFactory->UserOptions.INITIALIZEOFF = true;
 
@@ -305,16 +315,16 @@ int main(
 
 		registrationFactory->StartRegistration();
 		tmpConstTransformPointer = registrationFactory->GetTransform();
-
-		transformMerger->push_back(const_cast<itk::TransformBase*> (registrationFactory->GetTransform()));
-
+		/*
+		 itk::TransformBase* tmpTransform = const_cast<itk::TransformBase*> (registrationFactory->GetTransform());
+		 serialTransform->AddTransform(dynamic_cast<SerialTransformType::TransformType*> (tmpTransform));
+		 */
 	}//end repetition
-	transformMerger->merge();
-
 
 	//safe the gained transform to a user specific filename
 	if(out_filename) {
 		transformWriter->SetInput(tmpConstTransformPointer);
+		//transformWriter->SetInput(static_cast<itk::TransformBase*> (serialTransform));
 		transformWriter->SetFileName(out_filename);
 		transformWriter->Update();
 	}
