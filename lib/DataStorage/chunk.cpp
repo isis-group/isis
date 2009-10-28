@@ -41,6 +41,7 @@ size_t ChunkBase::volume()const
 	return NDimensional<4>::volume();
 }
 
+const ChunkBase::dimensions ChunkBase::dimension[ChunkBase::n_dims]={ChunkBase::read,ChunkBase::phase,ChunkBase::slice,ChunkBase::time};
 }
 
 }}

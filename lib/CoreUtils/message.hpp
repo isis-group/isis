@@ -28,7 +28,7 @@ namespace util{
 
 class MSubject : public std::string{
 	public:
-		template<typename T> MSubject(const T& cont) : std::string(){ 
+		template<typename T> MSubject(const T& cont) {
 			std::ostringstream text;
 			text << cont; 
 			assign(text.str());
@@ -125,7 +125,5 @@ public:
 namespace std{
 	isis::util::_internal::Message& endl(isis::util::_internal::Message& __os);
 }
-
-#include "log.hpp"
 
 #endif //MESSAGE_H

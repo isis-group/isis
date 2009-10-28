@@ -1,7 +1,7 @@
 #include "chunk.hpp"
 #include "image.hpp"
 
-// Stuff needed for any Chunk
+// Stuff needed for every Chunk
 const isis::util::PropMap::key_type isis::data::_internal::ChunkBase::needed[]=
 {
 	"indexOrigin",

@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE (chunk_data_test2)//Access Chunk elements via linear index 
 	std::ostringstream o;
 	unsigned short sample[ch.volume()];
 	for(size_t i=0;i<ch.volume();i++){
-		ch.getTypePtr<float>()[i]=i;
+		ch.asTypePtr<float>()[i]=i;
 		sample[i]=i;
 	}
 	for(size_t i=0;i<ch.volume();i++)
@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE (chunk_copy_test)//Copy chunks
 {
 	data::MemChunk<float> ch1(4,3,2,1);
 	for(size_t i=0;i<ch1.volume();i++)
-		ch1.getTypePtr<float>()[i]=i;
+		ch1.asTypePtr<float>()[i]=i;
 
 	data::Chunk ch2=ch1;//This shall clone the underlying TypePtr-Object
 
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE (chunk_copy_test)//Copy chunks
 
 	//cloning chunks is a cheap copy, thus any copied chunk shares data
 	for(size_t i=0;i<ch2.volume();i++){
-		ch1.getTypePtr<float>()[i]=0;
+		ch1.asTypePtr<float>()[i]=0;
 		BOOST_CHECK(ch2.getTypePtr<float>()[i]==0);
 	}
 }

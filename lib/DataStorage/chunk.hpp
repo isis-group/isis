@@ -36,7 +36,8 @@ class ChunkBase :public NDimensional<4>,public PropertyObject{
 	protected:
 		static const isis::util::PropMap::key_type needed[];
 	public:
-		enum {read=0,phase,slice,time,n_dims}dimensions;
+		enum dimensions{read=0,phase,slice,time,n_dims};
+		static const dimensions dimension[n_dims];
 		typedef isis::util::_internal::TypeReference <ChunkBase > Reference;
 
 		ChunkBase(size_t firstDim,size_t secondDim,size_t thirdDim,size_t fourthDim);
@@ -66,10 +67,10 @@ protected:
 	{}
 public:
 	/**
-	Returns reference to the element at a given index.
-	If index is invalid, behaviour is undefined. Most probably it will crash.
-	If _ENABLE_DATA_DEBUG is true an error message will be send (but it will still crash).
-	*/
+	 * Returns reference to the element at a given index.
+	 * If index is invalid, behaviour is undefined. Most probably it will crash.
+	 * If _ENABLE_DATA_DEBUG is true an error message will be send (but it will still crash).
+	 */
 	template<typename TYPE> TYPE &voxel(size_t firstDim,size_t secondDim=0,size_t thirdDim=0,size_t fourthDim=0){
 		MAKE_LOG(DataDebug);
 		const size_t idx[]={firstDim,secondDim,thirdDim,fourthDim};
