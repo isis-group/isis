@@ -4,12 +4,16 @@
 // Stuff needed for any Chunk
 const isis::util::PropMap::key_type isis::data::_internal::ChunkBase::needed[]=
 {
-	"indexOrigin"
+	"indexOrigin",
+	"acquisitionNumber"
 };
 
 // Stuff needed for any Image
 const isis::util::PropMap::key_type isis::data::Image::needed[]=
 {
-	"indexOrigin"
+	"voxelSize",
+	"readVec",
+	"phaseVec",
+	"sliceVec"
 };
 

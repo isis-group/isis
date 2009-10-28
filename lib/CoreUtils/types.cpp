@@ -17,6 +17,13 @@
 
 namespace isis{ namespace util{
 
+/*
+ * Define types for the Type<>-System here.
+ * There must be a streaming output available for every type used here.
+ * template<typename charT, typename traits,typename TYPE > basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits> &out,const TYPE& s)
+ */
+
+	
 #define DEF_TYPE(TYPE,NAME,ID)  \
   template<> const std::string Type<TYPE>::m_typeName=#NAME;\
   template<> const unsigned short Type<TYPE>::m_typeID=ID; \

@@ -49,6 +49,8 @@ public:
 	typedef typename CONTAINER::const_iterator const_iterator;
 	typedef FixedVector<TYPE,SIZE,CONTAINER> this_class;
 public:
+
+	/// Generic operations
 	template<typename OP> this_class binary_op(const this_class &src)const
 	{
 		this_class ret;
@@ -70,23 +72,31 @@ public:
 		std::transform(CONTAINER::begin(),CONTAINER::end(),ret.begin(),OP());
 		return ret;
 	}
-	FixedVector()
-	{
-		fill(TYPE());
-	}
+
+	////////////////////////////////////////////////////////////////////////////////////
+	// Contructor stuff
+	////////////////////////////////////////////////////////////////////////////////////
+	FixedVector(){fill(TYPE());	}
 
 	FixedVector(const TYPE src[SIZE])
 	{
 		std::copy(src,src+SIZE,CONTAINER::begin());
 	}
-	
+
 	void fill(const TYPE &val)
 	{
 		std::fill(CONTAINER::begin(),CONTAINER::end(),val);
 	}
+
+	////////////////////////////////////////////////////////////////////////////////////
+	// Accessors
+	////////////////////////////////////////////////////////////////////////////////////
 	TYPE operator [](size_t idx)const{return CONTAINER::begin()[idx];}
 	TYPE& operator [](size_t idx){return CONTAINER::begin()[idx];}
 
+	////////////////////////////////////////////////////////////////////////////////////
+	// Comparison
+	////////////////////////////////////////////////////////////////////////////////////
 	///\returns true if this is lexically less than the given vector (first entry has highest rank)
 	bool lexical_less(const this_class &src)const{
 		const_iterator they=src.begin();
@@ -115,6 +125,11 @@ public:
 	bool operator!=(const this_class &src)const{
 		return !operator==(src);
 	}
+
+
+	////////////////////////////////////////////////////////////////////////////////////
+	// Arithmetic operations
+	////////////////////////////////////////////////////////////////////////////////////
 	this_class operator-(const this_class &src)const{return binary_op<std::minus<TYPE>      >(src);}
 	this_class operator+(const this_class &src)const{return binary_op<std::plus<TYPE>       >(src);}
 	this_class operator*(const this_class &src)const{return binary_op<std::multiplies<TYPE> >(src);}
@@ -125,16 +140,33 @@ public:
 	this_class operator*(const TYPE &src)const{return binary_op<std::multiplies<TYPE> >(src);}
 	this_class operator/(const TYPE &src)const{return binary_op<std::divides<TYPE>    >(src);}
 
-	TYPE sqlen()const
-	{
-		const this_class sq=*this * *this;
-		return std::accumulate(sq.begin(),sq.end(),TYPE());
-	}
+	/// \returns the inner product
+	TYPE dot(const this_class &vect)const{return std::inner_product(CONTAINER::begin(),CONTAINER::end(),vect.begin(), TYPE());}
+	/// \returns the inner product with itself (aka squared length)
+	TYPE sqlen()const{return dot(*this);}
+	/// \returns the length of the vector
 	TYPE len()const{return std::sqrt(sqlen());}
-	
-	template<class OutputIterator> void copyTo(OutputIterator out){
+
+	/// norms the vector (make len()==1)
+	void norm()throw(std::invalid_argument)
+	{
+		double d= len();
+		if(d==0)throw(std::invalid_argument("Trying to normalize a vector of length 0"));
+		else *this = *this / d;
+	}
+
+	/// copy the data to somthing designed after the output iterator model
+	template<class OutputIterator> void copyTo(OutputIterator out)
+	{
 		std::copy(CONTAINER::begin(),CONTAINER::end(),out);
 	}
+
+	/// write the data formated to basic_ostream
+	template<typename charT, typename traits> void writeTo(std::basic_ostream<charT, traits> &out)const
+	{
+		util::write_list(CONTAINER::begin(),CONTAINER::end(),out,"|","<",">");
+	}
+
 };
 
 class fvector4 :public FixedVector<float,4>{
@@ -158,12 +190,8 @@ namespace std{
 
 template<typename charT, typename traits,typename TYPE, size_t SIZE,typename CONTAINER > basic_ostream<charT, traits>&
 operator<<(basic_ostream<charT, traits> &out,const ::isis::util::FixedVector<TYPE,SIZE,CONTAINER>& s)
-{
-	if(SIZE>0){
-		out << s[0];
-		for(size_t i=1;i<SIZE;i++)
-			out << "|" << s[i];
-	}
+{	
+	s.writeTo(out);
 	return out;
 }
 }
