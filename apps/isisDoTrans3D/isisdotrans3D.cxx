@@ -125,7 +125,7 @@ int main(
 	typedef itk::ImageFileReader<FMRIInputType> FMRIImageReaderType;
 	typedef itk::ImageFileWriter<FMRIOutputType> FMRIImageWriterType;
 
-	typedef isis::TimeStepExtractionFilter<FMRIInputType, InputImageType> TimeStepExtractionFilterType;
+	typedef isis::extitk::TimeStepExtractionFilter<FMRIInputType, InputImageType> TimeStepExtractionFilterType;
 
 	typedef const itk::Transform<double, Dimension, Dimension>* ConstTransformPointer;
 

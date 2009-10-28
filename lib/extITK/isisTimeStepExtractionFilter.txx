@@ -10,7 +10,7 @@
 #include "isisTimeStepExtractionFilter.h"
 #include "itkImageBase.h"
 
-namespace isis {
+namespace isis { namespace extitk {
 
 template<class TInputImage, class TOutputImage>
 TimeStepExtractionFilter<TInputImage, TOutputImage>::TimeStepExtractionFilter() {
@@ -89,5 +89,6 @@ typename TimeStepExtractionFilter<TInputImage, TOutputImage>::OutputImageType::P
 	return m_OutputImage;
 }
 
+} // end namespace extitk
 }// end namspace isis
 #endif

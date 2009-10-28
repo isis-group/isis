@@ -7,7 +7,7 @@
 
 #include "isisGradientMagnitudeSegmentationFilter.h"
 
-namespace isis {
+namespace isis { namespace extitk {
 
 template<class TInputImage, class TOutputImage>
 GradientMagnitudeSegmentationFilter<TInputImage, TOutputImage>::GradientMagnitudeSegmentationFilter() {
@@ -117,5 +117,7 @@ void GradientMagnitudeSegmentationFilter<TInputImage, TOutputImage>::GenerateDat
 	}
 }
 
+} //end namespace extitk
 } //end namespace isis
+
 

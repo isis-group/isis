@@ -111,6 +111,8 @@ int main(
 		exit(1);
 	}
 
+	std::cout << "$Revision$" << std::endl;
+
 	typedef signed short InputPixelType;
 	typedef signed short OutputPixelType;
 	const unsigned int Dimension = 3;

@@ -18,7 +18,7 @@
 
 #include "itkOtsuThresholdImageFilter.h"
 
-namespace isis {
+namespace isis { namespace extitk {
 
 template<class TInputImage, class TOutputImage>
 class ITK_EXPORT GradientMagnitudeSegmentationFilter: public itk::ImageToImageFilter<
@@ -146,6 +146,7 @@ private:
 
 };
 
+}
 }
 #if ITK_TEMPLATE_TXX
 #include "isisGradientMagnitudeSegmentationFilter.txx"

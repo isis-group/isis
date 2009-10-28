@@ -17,7 +17,7 @@
 #include <algorithm>
 #include <cmath>
 
-namespace isis {
+namespace isis { namespace extitk {
 
 template<class TInputImage, class TOutputImage>
 class ITK_EXPORT STDEVMaskFilter: public itk::ImageToImageFilter<TInputImage,
@@ -113,6 +113,7 @@ private:
 
 };
 
+}
 }
 
 #include "isisSTDEVMaskFilter.txx"

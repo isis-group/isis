@@ -7,7 +7,7 @@
 
 #include "isisSTDEVMaskFilter.h"
 
-namespace isis {
+namespace isis { namespace extitk {
 
 template<class TInputImage, class TOutputImage>
 STDEVMaskFilter<TInputImage, TOutputImage>::STDEVMaskFilter() {
@@ -95,6 +95,7 @@ template<class TInputImage, class TOutputImage>
 typename STDEVMaskFilter<TInputImage, TOutputImage>::OutputImagePointer STDEVMaskFilter<
 		TInputImage, TOutputImage>::GetOutput(void) {
 	return m_OutputImage;
+}
 }
 
 } //end namespace isis

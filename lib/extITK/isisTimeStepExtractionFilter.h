@@ -12,7 +12,7 @@
 #include "itkExtractImageFilter.h"
 #include "itkSmartPointer.h"
 
-namespace isis {
+namespace isis { namespace extitk {
 /** \class TimeStepExtractionFilter
  * \brief Filtertype for extracting a n-1 dimensional image
  *
@@ -95,6 +95,7 @@ private:
 
 };
 
+} // end namesapce extitk
 } // end namespace isis
 
 #if ITK_TEMPLATE_TXX
