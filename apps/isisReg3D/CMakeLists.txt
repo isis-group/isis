@@ -38,6 +38,9 @@ set_target_properties(isisreg3d PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${ISIS_INSTA
 # link versus ITK library
 TARGET_LINK_LIBRARIES(isisreg3d  ITKIO ITKSpatialObject ITKNumerics ITKStatistics extitk viaio)
 
+SET(CMAKE_KVIRC_BUILD_REVISION ${Sim-IM_WC_REVISION})
+MESSAGE("-- Current revision is ${Sim-IM_WC_REVISION}")
+
 
 
 

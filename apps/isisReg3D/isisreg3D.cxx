@@ -7,7 +7,6 @@
 
 #include "extRegistration/isisRegistrationFactory3D.h"
 #include "extITK/isisTransformMerger.hpp"
-#include "extITK/itkSerialTransform.h"
 
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
@@ -111,8 +110,6 @@ int main(
 		exit(1);
 	}
 
-	std::cout << "$Revision$" << std::endl;
-
 	typedef signed short InputPixelType;
 	typedef signed short OutputPixelType;
 	const unsigned int Dimension = 3;
@@ -133,8 +130,6 @@ int main(
 
 	typedef itk::ImageFileWriter<DeformationFieldType> VectorWriterType;
 
-	typedef itk::SerialTransform<float, 3> SerialTransformType;
-
 	const itk::TransformBase* tmpConstTransformPointer;
 	typedef itk::TransformBase* TransformBasePointerType;
 
@@ -144,8 +139,6 @@ int main(
 	itk::TransformFileWriter::Pointer transformWriter = itk::TransformFileWriter::New();
 	VectorWriterType::Pointer vectorWriter = VectorWriterType::New();
 	itk::TransformFileReader::Pointer transformReader = itk::TransformFileReader::New();
-
-	SerialTransformType::Pointer serialTransform = SerialTransformType::New();
 
 	fixedReader->SetFileName(ref_filename);
 	movingReader->SetFileName(in_filename);
@@ -296,8 +289,8 @@ int main(
 
 		}
 		if(counter != 0) {
-			//	registrationFactory->SetInitialTransform(const_cast<TransformBasePointerType> (tmpConstTransformPointer));
-			registrationFactory->SetInitialTransform(serialTransform);
+			registrationFactory->SetInitialTransform(const_cast<TransformBasePointerType> (tmpConstTransformPointer));
+
 		}
 
 		registrationFactory->UserOptions.NumberOfIterations = number_of_iterations;
