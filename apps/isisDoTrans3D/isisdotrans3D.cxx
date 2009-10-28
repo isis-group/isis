@@ -7,6 +7,7 @@
 
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
+#include "itkImageSeriesWriter.h"
 
 #include "itkNearestNeighborInterpolateImageFunction.h"
 #include "itkBSplineInterpolateImageFunction.h"
@@ -15,6 +16,8 @@
 
 #include "itkResampleImageFilter.h"
 #include "itkCastImageFilter.h"
+
+#include "itkTileImageFilter.h"
 
 #include "itkTransformFileReader.h"
 //via command parser include
@@ -130,7 +133,11 @@ int main(
 	typedef itk::ImageFileReader<FMRIInputType> FMRIImageReaderType;
 	typedef itk::ImageFileWriter<FMRIOutputType> FMRIImageWriterType;
 
+	typedef itk::ImageSeriesWriter<FMRIOutputType, OutputImageType> ImageSeriesWriterType;
+
 	typedef isis::extitk::TimeStepExtractionFilter<FMRIInputType, InputImageType> TimeStepExtractionFilterType;
+
+	typedef itk::TileImageFilter<OutputImageType, FMRIOutputType> TileImageFitlerType;
 
 	typedef const itk::Transform<double, Dimension, Dimension>* ConstTransformPointer;
 
@@ -144,6 +151,7 @@ int main(
 
 	itk::TransformFileReader::Pointer transformFileReader = itk::TransformFileReader::New();
 	ResampleImageFilterType::Pointer resampler = ResampleImageFilterType::New();
+	CastImageFilterType::Pointer caster = CastImageFilterType::New();
 
 	ProcessUpdate::Pointer progressObserver = ProcessUpdate::New();
 
@@ -154,13 +162,14 @@ int main(
 	ImageFileWriter::Pointer writer = ImageFileWriter::New();
 	FMRIImageReaderType::Pointer fmriReader = FMRIImageReaderType::New();
 	FMRIImageWriterType::Pointer fmriWriter = FMRIImageWriterType::New();
+	ImageSeriesWriterType::Pointer seriesWriter = ImageSeriesWriterType::New();
+
+	TileImageFitlerType::Pointer tileImageFilter = TileImageFitlerType::New();
 
 	InputImageType::Pointer inputImage = InputImageType::New();
 
 	OutputSpacingType outputSpacing;
 	OutputSizeType outputSize;
-
-	resampler->AddObserver(itk::ProgressEvent(), progressObserver);
 
 	if(!trans_filename.number) {
 		std::cout << "No transform specified!!" << std::endl;
@@ -169,6 +178,7 @@ int main(
 
 	//reading the input image
 	if(!fmri) {
+		resampler->AddObserver(itk::ProgressEvent(), progressObserver);
 		reader->SetFileName(in_filename);
 		reader->Update();
 		writer->SetFileName(out_filename);
@@ -243,20 +253,16 @@ int main(
 
 	//setting up the resample object
 	resampler->SetTransform(static_cast<ConstTransformPointer> ((*ti).GetPointer()));
-	resampler->SetInput(reader->GetOutput());
 
 	if(!template_filename) {
 		resampler->SetOutputDirection(reader->GetOutput()->GetDirection());
 		resampler->SetOutputOrigin(reader->GetOutput()->GetOrigin());
-		resampler->SetOutputSpacing(outputSpacing);
-		resampler->SetSize(outputSize);
 	} else {
-
 		resampler->SetOutputDirection(templateReader->GetOutput()->GetDirection());
 		resampler->SetOutputOrigin(templateReader->GetOutput()->GetOrigin());
-		resampler->SetOutputSpacing(outputSpacing);
-		resampler->SetSize(outputSize);
 	}
+	resampler->SetOutputSpacing(outputSpacing);
+	resampler->SetSize(outputSize);
 
 	//setting up the interpolator
 	switch(interpolator_type) {
@@ -271,10 +277,54 @@ int main(
 		break;
 	}
 
-	writer->SetInput(resampler->GetOutput());
-	writer->Update();
+	if(!fmri) {
+		resampler->SetInput(reader->GetOutput());
+		writer->SetInput(resampler->GetOutput());
+		writer->Update();
+	}
 
-	std::cout << "Done." << std::endl;
+	if(fmri) {
+		OutputImageType::SizeType fmriOutputSize;
+		OutputImageType::SpacingType fmriOutputSpacing;
+		OutputImageType::DirectionType fmriOutputDirection;
+		OutputImageType::PointType fmriOutputOrigin;
+		for(unsigned int i = 0; i < 3; i++) {
+			fmriOutputOrigin[i] = fmriReader->GetOutput()->GetOrigin()[i];
+			fmriOutputSpacing[i] = fmriReader->GetOutput()->GetSpacing()[i];
+			fmriOutputSize[i] = fmriReader->GetOutput()->GetLargestPossibleRegion().GetSize()[i];
+			fmriOutputOrigin[i] = fmriReader->GetOutput()->GetOrigin()[i];
+			for(unsigned int j = 0; j < 3; j++) {
+				fmriOutputDirection[j][i] = fmriReader->GetOutput()->GetDirection()[j][i];
+			}
+		}
+		resampler->SetOutputDirection(fmriOutputDirection);
+		resampler->SetOutputSpacing(fmriOutputSpacing);
+		resampler->SetSize(fmriOutputSize);
+		resampler->SetOutputOrigin(fmriOutputOrigin);
+
+		itk::FixedArray<unsigned int, 4> layout;
+		layout[0] = 1;
+		layout[1] = 1;
+		layout[2] = 1;
+		layout[3] = 0;
+		InputImageType::IndexType pixel;
+		pixel.Fill(8);
+		const unsigned int numberOfTimeSteps = fmriReader->GetOutput()->GetLargestPossibleRegion().GetSize()[3];
+		for(unsigned int timestep = 0; timestep < numberOfTimeSteps; timestep++) {
+			std::cout << "Resampling timestep: " << timestep << "...\r" << std::flush;
+			timeStepExtractionFilter->SetRequestedTimeStep(timestep);
+			timeStepExtractionFilter->Update();
+			resampler->SetInput(timeStepExtractionFilter->GetOutput());
+			resampler->Update();
+			tileImageFilter->PushBackInput(resampler->GetOutput());
+		}
+		tileImageFilter->SetLayout(layout);
+		tileImageFilter->Update();
+		fmriWriter->SetInput(tileImageFilter->GetOutput());
+		fmriWriter->Update();
+
+	}
+	std::cout << "\nDone.    " << std::endl;
 
 	return 0;
 }
