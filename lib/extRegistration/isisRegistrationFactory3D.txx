@@ -293,7 +293,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer() 
 		m_LBFGSBOptimizer->SetLowerBound(lowerBound);
 		m_LBFGSBOptimizer->SetUpperBound(upperBound);
 
-		m_LBFGSBOptimizer->SetCostFunctionConvergenceFactor(1.e7);
+		m_LBFGSBOptimizer->SetCostFunctionConvergenceFactor(1.e8);
 		m_LBFGSBOptimizer->SetProjectedGradientTolerance(1e-9);
 		m_LBFGSBOptimizer->SetMaximumNumberOfIterations(UserOptions.NumberOfIterations);
 		m_LBFGSBOptimizer->SetMaximumNumberOfEvaluations(30);

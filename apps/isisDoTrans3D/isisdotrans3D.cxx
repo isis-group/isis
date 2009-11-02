@@ -316,7 +316,9 @@ int main(
 			timeStepExtractionFilter->Update();
 			resampler->SetInput(timeStepExtractionFilter->GetOutput());
 			resampler->Update();
-			tileImageFilter->PushBackInput(resampler->GetOutput());
+			OutputImageType::Pointer tileImage = resampler->GetOutput();
+			tileImage->DisconnectPipeline();
+			tileImageFilter->PushBackInput( tileImage   );
 		}
 		tileImageFilter->SetLayout(layout);
 		tileImageFilter->Update();
