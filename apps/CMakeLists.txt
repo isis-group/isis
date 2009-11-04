@@ -1,2 +1,3 @@
 add_subdirectory(isisReg3D)
 add_subdirectory(isisDoTrans3D)
+add_subdirectory(isisCheckerboard3D)
