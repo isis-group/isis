@@ -21,7 +21,7 @@ ADD_EXECUTABLE(isischeckerboard3d
 	isisCheckerboard3D.cxx
 	)
 	
-set_target_properties(isisdotrans3d PROPERTIES 
+set_target_properties(isischeckerboard3d PROPERTIES 
     RUNTIME_OUTPUT_DIRECTORY ${ISIS_INSTALL_BIN_DIR}
     COMPILE_DEFINITIONS "SVN_REVISION=${SVN_REVISION}")
 
