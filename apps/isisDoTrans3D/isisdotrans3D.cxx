@@ -363,6 +363,8 @@ int main(
             warper->SetOutputOrigin(fmriOutputOrigin);
             warper->SetOutputSize(fmriOutputSize);
             warper->SetOutputSpacing(fmriOutputSpacing);
+ 	    warper->SetInput(reader->GetOutput());
+            warper->SetDeformationField(deformationFieldReader->GetOutput());
         }
 
         itk::FixedArray<unsigned int, 4> layout;
