@@ -270,8 +270,7 @@ public:
 	    void);
 	void CheckImageSizes(
 	    void);
-	void SetFixedImageMask(
-	    void);
+	void SetFixedImageMask(typename MaskObjectType::Pointer);
 
 	RegistrationFactory3D();
 	virtual ~RegistrationFactory3D() {
@@ -314,7 +313,10 @@ private:
 		bool BSPLINE;
 		bool NEARESTNEIGHBOR;
 	} interpolator;
-
+	
+	void SetFixedImageMask(
+	    void);
+	    
 	DeformationFieldPointer m_DeformationField;
 	FixedImagePointer m_FixedImage;
 	MovingImagePointer m_MovingImage;

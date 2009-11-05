@@ -655,6 +655,12 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::CheckImageSizes(
 }
 
 template<class TFixedImageType, class TMovingImageType>
+void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetFixedImageMask(typename MaskObjectType::Pointer maskObject) {
+	m_MovingImageMaskObject = maskObject;
+	this->SetFixedImageMask();
+}
+
+template<class TFixedImageType, class TMovingImageType>
 void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetFixedImageMask(
     void) {
 
@@ -667,6 +673,12 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetFixedImageMask
     }
     if (metric.MUTUALINFORMATIONHISTOGRAM) {
         m_MutualInformationHistogramMetric->SetFixedImageMask(m_MovingImageMaskObject);
+    }
+    if(metric.NORMALIZEDCORRELATION) {
+	m_NormalizedCorrelationMetric->SetFixedImageMask(m_MovingImageMaskObject);
+    }
+    if(metric.MEANSQUARE) {
+	m_MeanSquareMetric->SetFixedImageMask(m_MovingImageMaskObject);
     }
 
 }

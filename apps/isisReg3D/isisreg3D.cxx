@@ -7,6 +7,7 @@
 
 
 #include "itkWarpImageFilter.h"
+#include "itkImageMaskSpatialObject.h"
 
 #include "extRegistration/isisRegistrationFactory3D.h"
 #include "extITK/isisTransformMerger.hpp"
@@ -53,6 +54,7 @@ static VBoolean in_found, ref_found;
 static VShort number_threads = 1;
 static VShort initial_seed = 1;
 static VBoolean initialize = false;
+static VString mask_filename = NULL;
 
 static VOptionDescRec
 options[] = {
@@ -61,6 +63,7 @@ options[] = {
     {"in", VStringRepn, 1, &in_filename, &in_found, 0, "the moving image filename"},
 
     //non-required inputs
+    {"mask", VStringRepn, 1, &mask_filename, VOptionalOpt, 0, "the mask filename"},
     {"out", VStringRepn, 1, &out_filename, VOptionalOpt, 0, "the output transform filename"},
     {"vout", VStringRepn, 1, &vout_filename, VOptionalOpt, 0, "the output vector image filename"},
     {"tin", VStringRepn, 1, &transform_filename_in, VOptionalOpt, 0,
@@ -120,6 +123,7 @@ int main(
         exit(1);
     }
 
+    typedef unsigned char MaskPixelType;
     typedef signed short InputPixelType;
     typedef signed short OutputPixelType;
     const unsigned int Dimension = 3;
@@ -129,9 +133,12 @@ int main(
 
     typedef itk::Image<InputPixelType, Dimension> FixedImageType;
     typedef itk::Image<InputPixelType, Dimension> MovingImageType;
-
+    typedef itk::Image<MaskPixelType, Dimension> MaskImageType;
+    typedef itk::ImageMaskSpatialObject<Dimension> ImageMaskSpatialObjectType;
+    
     typedef itk::ImageFileReader<FixedImageType> FixedImageReaderType;
     typedef itk::ImageFileReader<MovingImageType> MovingImageReaderType;
+    typedef itk::ImageFileReader<MaskImageType> MaskImageReaderType;
 
     typedef isis::registration::RegistrationFactory3D<FixedImageType, MovingImageType> RegistrationFactoryType;
 
@@ -145,11 +152,14 @@ int main(
 
     FixedImageReaderType::Pointer fixedReader = FixedImageReaderType::New();
     MovingImageReaderType::Pointer movingReader = MovingImageReaderType::New();
+    MaskImageReaderType::Pointer maskReader = MaskImageReaderType::New();
 
     itk::TransformFileWriter::Pointer transformWriter = itk::TransformFileWriter::New();
     VectorWriterType::Pointer vectorWriter = VectorWriterType::New();
     itk::TransformFileReader::Pointer transformReader = itk::TransformFileReader::New();
 
+    ImageMaskSpatialObjectType::Pointer mask = ImageMaskSpatialObjectType::New();
+    
     fixedReader->SetFileName(ref_filename);
     movingReader->SetFileName(in_filename);
 
@@ -216,6 +226,15 @@ int main(
                       << std::endl;
         }
 
+	if(mask_filename)
+	{
+		maskReader->SetFileName(mask_filename);
+		maskReader->Update();
+		mask->SetImage(maskReader->GetOutput());
+		mask->Update();
+		registrationFactory->SetFixedImageMask(mask);
+	}
+		
         //transform setup
         std::cout << "used transform: " << TYPTransform[transform].keyword << std::endl;
         switch (transform) {
