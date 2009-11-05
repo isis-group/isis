@@ -318,7 +318,7 @@ int main(
             warper->AddObserver(itk::ProgressEvent(), progressObserver);
             warper->SetOutputDirection(outputDirection);
             warper->SetOutputOrigin(outputOrigin);
-            warper->SetOutputSize(outputSize);
+            //warper->SetOutputSize(outputSize);
             warper->SetOutputSpacing(outputSpacing);
             warper->SetInput(reader->GetOutput());
             warper->SetDeformationField(deformationFieldReader->GetOutput());
@@ -361,7 +361,7 @@ int main(
         {
             warper->SetOutputDirection(fmriOutputDirection);
             warper->SetOutputOrigin(fmriOutputOrigin);
-            warper->SetOutputSize(fmriOutputSize);
+            //warper->SetOutputSize(fmriOutputSize);
             warper->SetOutputSpacing(fmriOutputSpacing);
  	    warper->SetInput(reader->GetOutput());
             warper->SetDeformationField(deformationFieldReader->GetOutput());

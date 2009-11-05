@@ -4,6 +4,8 @@
  *  Created on: July 13, 2009
  *      Author: tuerke
  */
+
+
 #include "itkWarpImageFilter.h"
 
 #include "extRegistration/isisRegistrationFactory3D.h"
@@ -137,7 +139,7 @@ int main(
     typedef itk::Image<VectorType, Dimension> DeformationFieldType;
 
     typedef itk::ImageFileWriter<DeformationFieldType> VectorWriterType;
-
+    
     const itk::TransformBase* tmpConstTransformPointer;
     typedef itk::TransformBase* TransformBasePointerType;
 
@@ -301,6 +303,7 @@ int main(
 
         }
 
+	
         registrationFactory->UserOptions.NumberOfIterations = number_of_iterations;
         registrationFactory->UserOptions.NumberOfBins = number_of_bins;
         registrationFactory->UserOptions.PixelDensity = pixel_density;
@@ -308,6 +311,7 @@ int main(
         registrationFactory->UserOptions.PRINTRESULTS = true;
         registrationFactory->UserOptions.NumberOfThreads = number_threads;
         registrationFactory->UserOptions.MattesMutualInitializeSeed = initial_seed;
+	registrationFactory->UserOptions.SHOWITERATIONSTATUS = true;
         if (!initialize)
             registrationFactory->UserOptions.INITIALIZEOFF = true;
 

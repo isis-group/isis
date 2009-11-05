@@ -10,6 +10,8 @@
 
 #include "itkImageRegistrationMethod.h"
 
+#include "extRegistration/isisIterationObserver.h"
+
 //transform includes
 
 //rigid:
@@ -217,6 +219,7 @@ public:
 		bool PRINTRESULTS;
 		bool USEOTSUTHRESHOLDING; //using an otsu threshold filter to create a mask which is designed to restrict the region given to the metric
 		bool INITIALIZEOFF;
+		bool SHOWITERATIONSTATUS;
 	} UserOptions;
 
 	void Reset(
@@ -254,7 +257,7 @@ public:
 
 	//getter methods
 	RegistrationMethodPointer GetRegistrationObject(
-	    void) const;
+	    void) ;
 	OutputImagePointer GetRegisteredImage(
 	    void);
 	ConstTransformBasePointer GetTransform(
@@ -325,6 +328,8 @@ private:
 	bool m_FixedImageIsBigger;
 
 	unsigned int m_NumberOfParameters;
+	
+	IterationObserver::Pointer m_observer;
 
 	//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

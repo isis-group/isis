@@ -58,6 +58,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::Reset(
     UserOptions.INITIALIZEOFF = false;
     UserOptions.NumberOfThreads = 1;
     UserOptions.MattesMutualInitializeSeed = 1;
+    UserOptions.SHOWITERATIONSTATUS = false;
 
     m_NumberOfParameters = 0;
 }
@@ -332,6 +333,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpTransform() 
     if (!UserOptions.INITIALIZEOFF) {
 
         if (transform.VERSORRIGID) {
+		std::cout << "dhsjdhfsk" << std::endl;
             m_RigidInitializer = RigidCenteredTransformInitializerType::New();
             m_RigidInitializer->SetTransform(m_VersorRigid3DTransform);
             m_RigidInitializer->SetFixedImage(m_FixedImage);
@@ -571,7 +573,7 @@ TFixedImageType, TMovingImageType>::GetTransformVectorField(
 template<class TFixedImageType, class TMovingImageType>
 typename RegistrationFactory3D<TFixedImageType, TMovingImageType>::RegistrationMethodPointer RegistrationFactory3D<
 TFixedImageType, TMovingImageType>::GetRegistrationObject(
-    void) const {
+    void) {
     this->UpdateParameters();
     return m_RegistrationObject;
 
@@ -713,6 +715,12 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::StartRegistration
 
     this->SetFixedImageMask();
 
+    if(UserOptions.SHOWITERATIONSTATUS)
+    {
+	    m_observer = IterationObserver::New();
+	    m_RegistrationObject->GetOptimizer()->AddObserver(itk::IterationEvent(), m_observer );
+    }
+    
     try {
         m_RegistrationObject->StartRegistration();
     } catch (itk::ExceptionObject & err) {
