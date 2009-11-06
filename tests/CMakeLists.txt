@@ -9,9 +9,9 @@ target_link_libraries(test_property utils)
 ENDIF(BUILD_COREUTILS)
 
 IF(BUILD_DATA_IO)
-add_executable(test_data		test_data.cpp)
+# add_executable(test_data		test_data.cpp)
 add_subdirectory(DataStorage)
-target_link_libraries(test_data    	utils data)
+# target_link_libraries(test_data    	utils data)
 ENDIF(BUILD_DATA_IO)
 #add_executable(test_imageio	test_imageio.cpp)
 
