@@ -226,14 +226,7 @@ int main(
                       << std::endl;
         }
 
-	if(mask_filename)
-	{
-		maskReader->SetFileName(mask_filename);
-		maskReader->Update();
-		mask->SetImage(maskReader->GetOutput());
-		mask->Update();
-		registrationFactory->SetFixedImageMask(mask);
-	}
+	
 		
         //transform setup
         std::cout << "used transform: " << TYPTransform[transform].keyword << std::endl;
@@ -321,7 +314,14 @@ int main(
             registrationFactory->SetInitialTransform(const_cast<TransformBasePointerType> (tmpConstTransformPointer));
 
         }
-
+	if(mask_filename)
+	{
+		maskReader->SetFileName(mask_filename);
+		maskReader->Update();
+		mask->SetImage(maskReader->GetOutput());
+		mask->Update();
+		registrationFactory->SetFixedImageMask(mask);
+	}
 	
         registrationFactory->UserOptions.NumberOfIterations = number_of_iterations;
         registrationFactory->UserOptions.NumberOfBins = number_of_bins;

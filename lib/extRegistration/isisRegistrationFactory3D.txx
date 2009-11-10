@@ -725,7 +725,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::StartRegistration
     //to avoid a itk sample error caused by a lack of spatial samples used by the metric
     this->CheckImageSizes();
 
-    this->SetFixedImageMask();
+    //this->SetFixedImageMask();
 
     if(UserOptions.SHOWITERATIONSTATUS)
     {
