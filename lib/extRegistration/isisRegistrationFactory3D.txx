@@ -59,6 +59,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::Reset(
     UserOptions.NumberOfThreads = 1;
     UserOptions.MattesMutualInitializeSeed = 1;
     UserOptions.SHOWITERATIONSTATUS = false;
+    UserOptions.USEMASK = false;
 
     m_NumberOfParameters = 0;
 }
@@ -656,6 +657,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::CheckImageSizes(
 
 template<class TFixedImageType, class TMovingImageType>
 void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetFixedImageMask(typename MaskObjectType::Pointer maskObject) {
+	UserOptions.USEMASK = true;
 	m_MovingImageMaskObject = maskObject;
 	this->SetFixedImageMask();
 }
@@ -724,9 +726,12 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::StartRegistration
     //check the image sizes and creat a joint image mask if the fixed image is bigger than the moving image
     //to avoid a itk sample error caused by a lack of spatial samples used by the metric
     this->CheckImageSizes();
-
-    //this->SetFixedImageMask();
-
+    
+    if(!UserOptions.USEMASK)
+    {
+	this->SetFixedImageMask();
+    }
+    
     if(UserOptions.SHOWITERATIONSTATUS)
     {
 	    m_observer = IterationObserver::New();

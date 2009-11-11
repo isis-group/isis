@@ -25,7 +25,7 @@ public:
 	
     typedef TransformMerger Self;
     typedef std::list<TransformBasePointer> Superclass;
-
+        
     typedef itk::Vector<float, 3> VectorType;
     typedef itk::Image<VectorType, 3> DeformationFieldType;
     typedef itk::ImageRegionIterator<DeformationFieldType> DeformationFieldIteratorType;

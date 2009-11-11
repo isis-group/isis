@@ -13,6 +13,7 @@
 #include "itkBSplineInterpolateImageFunction.h"
 
 #include "extITK/isisTimeStepExtractionFilter.h"
+#include "extITK/isisTransformMerger.hpp"
 
 #include "itkResampleImageFilter.h"
 #include "itkWarpImageFilter.h"
@@ -161,6 +162,7 @@ int main(
     ProcessUpdate::Pointer progressObserver = ProcessUpdate::New();
 
     TimeStepExtractionFilterType::Pointer timeStepExtractionFilter = TimeStepExtractionFilterType::New();
+    isis::extitk::TransformMerger* transformMerger = new isis::extitk::TransformMerger;
 
     DeformationFieldReaderType::Pointer deformationFieldReader = DeformationFieldReaderType::New();
     ImageReaderType::Pointer reader = ImageReaderType::New();
@@ -186,23 +188,43 @@ int main(
         std::cout << "No transform specified!!" << std::endl;
         return EXIT_FAILURE;
     }
-
+    reader->SetFileName(in_filename);
+    reader->Update();
+    //if template file is specified by the user
+    if (template_filename) {
+        templateReader->SetFileName(template_filename);
+        templateReader->Update();
+    }
     if (trans_filename.number)
     {
         unsigned int number_trans = trans_filename.number;
         if (number_trans > 1) {
-            //merging the transforms to one final transform
-            //TODO
-        }
-        transformFileReader->SetFileName(((VStringConst *) trans_filename.vector)[0]);
-        transformFileReader->Update();
+	    
+	    for(unsigned int i = 0; i < number_trans; i++)
+	    {
+		itk::TransformFileReader::TransformListType* transformList = new itk::TransformFileReader::TransformListType;
+		transformFileReader->SetFileName(((VStringConst *) trans_filename.vector)[i]);
+		transformFileReader->Update();
+		transformList = transformFileReader->GetTransformList();
+		itk::TransformFileReader::TransformListType::const_iterator ti = transformList->begin();
+		transformMerger->push_back((*ti).GetPointer());
+	    }
+	    transformMerger->setTemplateImage(templateReader->GetOutput());
+	    transformMerger->merge();
+	    warper->SetDeformationField(transformMerger->getTransform());
+	}
+	if(number_trans == 1)
+	{
+	    transformFileReader->SetFileName(((VStringConst *) trans_filename.vector)[0]);
+	    transformFileReader->Update();
 
-        itk::TransformFileReader::TransformListType *transformList = transformFileReader->GetTransformList();
-        itk::TransformFileReader::TransformListType::const_iterator ti;
-        ti = transformList->begin();
-
-        //setting up the resample object
-        resampler->SetTransform(static_cast<ConstTransformPointer> ((*ti).GetPointer()));
+	    itk::TransformFileReader::TransformListType *transformList = transformFileReader->GetTransformList();
+	    itk::TransformFileReader::TransformListType::const_iterator ti;
+	    ti = transformList->begin();
+	    //setting up the resample object
+	    resampler->SetTransform(static_cast<ConstTransformPointer> ((*ti).GetPointer()));
+	}
+        
     }
 
     if (vtrans_filename)
@@ -212,11 +234,7 @@ int main(
     }
 
 
-    //if template file is specified by the user
-    if (template_filename) {
-        templateReader->SetFileName(template_filename);
-        templateReader->Update();
-    }
+   
 
     //setting up the output resolution
     if (resolution.number) {
@@ -299,21 +317,20 @@ int main(
 
     if (!fmri) {
 
-        reader->SetFileName(in_filename);
-        reader->Update();
+        
         writer->SetFileName(out_filename);
-        if (!vtrans_filename)
+        if (!vtrans_filename and trans_filename.number == 1)
         {
-            resampler->AddObserver(itk::ProgressEvent(), progressObserver);
-            resampler->SetInput(reader->GetOutput());
-            resampler->SetOutputSpacing(outputSpacing);
-            resampler->SetSize(outputSize);
-            resampler->SetOutputOrigin(outputOrigin);
-            resampler->SetOutputDirection(outputDirection);
-            writer->SetInput(resampler->GetOutput());
+	    resampler->AddObserver(itk::ProgressEvent(), progressObserver);
+	    resampler->SetInput(reader->GetOutput());
+	    resampler->SetOutputSpacing(outputSpacing);
+	    resampler->SetSize(outputSize);
+	    resampler->SetOutputOrigin(outputOrigin);
+	    resampler->SetOutputDirection(outputDirection);
+	    writer->SetInput(resampler->GetOutput());
             writer->Update();
         }
-        if (vtrans_filename)
+        if (vtrans_filename or trans_filename.number > 1)
         {
             warper->AddObserver(itk::ProgressEvent(), progressObserver);
             warper->SetOutputDirection(outputDirection);
@@ -321,7 +338,10 @@ int main(
             //warper->SetOutputSize(outputSize);
             warper->SetOutputSpacing(outputSpacing);
             warper->SetInput(reader->GetOutput());
-            warper->SetDeformationField(deformationFieldReader->GetOutput());
+	    if(trans_filename.number == 0)
+	    {
+		warper->SetDeformationField(deformationFieldReader->GetOutput());
+	    }
             writer->SetInput(warper->GetOutput());
             writer->Update();
         }
@@ -363,8 +383,11 @@ int main(
             warper->SetOutputOrigin(fmriOutputOrigin);
             //warper->SetOutputSize(fmriOutputSize);
             warper->SetOutputSpacing(fmriOutputSpacing);
- 	    warper->SetInput(reader->GetOutput());
-            warper->SetDeformationField(deformationFieldReader->GetOutput());
+            warper->SetInput(reader->GetOutput());
+	    if(trans_filename.number == 0)
+	    {
+		warper->SetDeformationField(deformationFieldReader->GetOutput());
+	    }
         }
 
         itk::FixedArray<unsigned int, 4> layout;
