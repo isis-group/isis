@@ -15,6 +15,9 @@
 
 namespace isis{ namespace data { namespace _internal {
 
+	
+PropertyObject::PropertyObject(){}
+
 PropertyObject::PropertyObject ( const util::PropMap::key_type needed[] ) {
 	for(size_t i=0;i<sizeof(needed)/sizeof(util::PropMap::key_type);i++)
 		addNeeded(needed[i]);
