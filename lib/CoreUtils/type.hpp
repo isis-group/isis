@@ -148,12 +148,12 @@ public:
 		return m_len;
 	}
 	
-	/// Copies the data pointed to into another TypePtr
+	/// Copies the data pointed to into another TypePtr of the same type
 	void deepCopy(TypePtr<TYPE> &dst)
 	{
 		MAKE_LOG(CoreLog);
 		if(m_len!=dst.len())
-			LOG(CoreLog,error) << "Source and destination do not have the same length, using the smaller" << std::endl;
+			LOG(CoreLog,error) << "Source and destination do not have the same size, using the smaller" << std::endl;
 		boost::shared_ptr<TYPE> &pDst=(boost::shared_ptr<TYPE>)dst;
 		std::copy(
 			m_val.get(),

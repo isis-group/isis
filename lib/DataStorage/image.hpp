@@ -23,7 +23,7 @@ namespace isis{ namespace data
 {
 /// @cond _hidden
 namespace _internal{
-struct image_chunk_order: binary_chunk_comarison{
+struct image_chunk_order: chunk_comarison{
 	virtual bool operator() ( const Chunk& a, const Chunk& b )const;
 };
 }
