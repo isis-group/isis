@@ -67,7 +67,7 @@ protected:
 	{}
 public:
 	/**
-	 * Returns reference to the element at a given index.
+	 * Gets a reference to the element at a given index.
 	 * If index is invalid, behaviour is undefined. Most probably it will crash.
 	 * If _ENABLE_DATA_DEBUG is true an error message will be send (but it will still crash).
 	 */
@@ -83,6 +83,10 @@ public:
 		util::TypePtr<TYPE> &ret=asTypePtr<TYPE>();
 		return ret[dim2Index(idx)];
 	}
+	/**
+	 * Gets a copy of the element at a given index.
+	 * \copydetails Chunk::voxel
+	 */
 	template<typename TYPE> TYPE voxel(size_t firstDim,size_t secondDim=0,size_t thirdDim=0,size_t fourthDim=0)const{
 		MAKE_LOG(DataDebug);
 		const size_t idx[]={firstDim,secondDim,thirdDim,fourthDim};

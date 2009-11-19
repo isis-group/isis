@@ -33,25 +33,25 @@ PropMap::diff_map PropMap::diff(const PropMap& second,key_list ignore) const{
 
 	//insert everything that is in this, but not in second or is on both but differs
  	BOOST_FOREACH(const_reference ref,*this){
-		if(ignore.find(ref.first)==ignore.end())
+		if(ignore.find(ref.first)==ignore.end()) // if its in the ignore list, skip it
 			continue;
 		const_iterator found=second.find(ref.first);
-		if(found == second.end())
-			ret.insert(std::make_pair(
-				ref.first,
-				std::make_pair(ref.second,found->second)
-			));
-		else if(!found->second.operator==(ref.second))
-			ret.insert(std::make_pair(
+		if(found == second.end())// if its not in second 
+			ret.insert(std::make_pair( // add (propertyname|(value1|[empty]))
 				ref.first,
 				std::make_pair(ref.second,PropertyValue())
+			));
+		else if(!found->second.operator==(ref.second)) // if is in second as well, but not equal
+			ret.insert(std::make_pair( // add (propertyname|(value1|value2))
+				ref.first,
+				std::make_pair(ref.second,found->second)
 		));
 	}
 	//insert everything that is in second but not in this
  	BOOST_FOREACH(const_reference ref,second){
 		const_iterator found=find(ref.first);
-		if(found == end())
-			ret.insert(std::make_pair(
+		if(found == end()) // if its not in ref
+			ret.insert(std::make_pair( // add (propertyname|([empty]|value2))
 				ref.first,
 				std::make_pair(PropertyValue(),ref.second)
 			));

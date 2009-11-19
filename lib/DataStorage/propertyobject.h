@@ -48,7 +48,7 @@ public:
 	 * Get the given property.
 	 * \returns a reference of the stored PropertyValue
 	 */
-	const util::PropMap::mapped_type& getPropertyValue(const util::PropMap::key_type &key)const;
+	const util::PropMap::mapped_type &getPropertyValue(const util::PropMap::key_type &key)const;
 	/**
 	 * Get the value of the given Property.
 	 * If DataLog is enabled and the stored type is not T an error will be send.
@@ -74,9 +74,15 @@ public:
 	 * If the given property allready exists, it is just flagged as needed.
 	 */
 	void addNeeded(const util::PropMap::key_type &key);
-	/// \returns false if there is any needed and empty property, true otherwhise.
+	/**
+	* Check if every needed property is set.
+	* \returns false if there is any needed and empty property, true otherwhise.
+	*/
 	bool sufficient()const;
-	/// \returns a list of all needed and empty properties.
+	/**
+	 * Get a list of missing properties.
+	 * \returns a list of all needed and empty properties.
+	 */
 	util::PropMap::key_list missing()const;
 };
 }}}
