@@ -45,6 +45,11 @@ private:
 	bool clean;
 	size_t chunkVolume;
 
+	/** 
+	 * Computes chunk- and voxel- indices.
+	 * The returned chunk-index applies to the lookup-table (getChunkAt), and the voxel-index to this chunk.
+	 * \returns a pair <chunk-index,voxel-index>
+	 */
 	std::pair<size_t,size_t>
 	commonGet(size_t first,size_t second,size_t third,size_t fourth)const;
 
@@ -52,14 +57,22 @@ protected:
 	static const isis::util::PropMap::key_type needed[];
 
 	/**
-	 * Get the ammount of chunks before dimensional switch.
+	 * Search for a dimensional break in all stored chunks
+	 * This function searches for two chunks whose (geometrical) distance is more than twice 
+	 * the distance between the first and the second chunk. It wll assume a dimensional break 
+	 * at this position. 
+	 * Normally chunks are beneath each other (like characters in a text) so their distance is 
+	 * more or less constant. But if there is a dimensional break (analogous to the linebreak 
+	 * in a text) the distance between this particular chunks/characters is much bigger (bigger
+	 * than twice the normal distance)
 	 * For example for an image of 2D-chunks (slices) getChunkStride(1) will 
 	 * get the number of slices (size of third dim) and  getChunkStride(slices) 
 	 * will get the number of timesteps
-	 * \param base_stride the stride of the dimension before
-	 * \returns overall ammount of chunks in one slice of this dimension or 0 in case of an error
+	 * \param base_stride the base_stride for the iteration between chunks (1 for the first dimension, one "line" for the second and so on...)
 	 */
 	size_t getChunkStride(size_t base_stride=1);
+	
+	///Access a chunk via index (and the lookup table)
 	Chunk& getChunkAt(size_t at);
 	const Chunk& getChunkAt(size_t at)const;
 
@@ -74,6 +87,8 @@ public:
 	 *
 	 * The voxel reference provides reading and writing access to the refered
 	 * value.
+	 *
+	 * If the image is not indexed (not clean), reIndex will be run.
 	 *
 	 * \param first The first coordinate in voxel space. Usually the x value.
 	 * \param second The second coordinate in voxel space. Usually the y value.
@@ -98,9 +113,9 @@ public:
 	}
 
 	/**
-	 * This method returns a reference to the voxel value at the given coordinates.
+	 * This method returns the value of the voxel value at the given coordinates.
 	 *
-	 * The const voxel reference provides only reading access to the refered
+	 * The voxel reference provides reading and writing access to the refered
 	 * value.
 	 *
 	 * \param first The first coordinate in voxel space. Usually the x value.

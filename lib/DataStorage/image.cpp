@@ -63,25 +63,29 @@ bool Image::insertChunk ( const Chunk &chunk ) {
 
 
 bool Image::reIndex() {
-	//@todo for now this only works for 1D difference between Chunk and Image
 	MAKE_LOG(DataLog);
-	lookup.resize(set.size());
 	if(set.empty()){
 		clean=true;
 		LOG(DataLog,util::info) << "Reindexing an empty image." << std::endl;
 		return true;
 	}
+	
+	//redo lookup table
+	lookup.resize(set.size());
 	size_t idx=0;
 	for(std::set<Chunk,_internal::image_chunk_order>::iterator it=set.begin();it!=set.end();it++,idx++)
 		lookup[idx]=it;
 	
+	//get primary attributes from first chunk
 	const unsigned short chunk_dims=chunksBegin()->dimRange().second;
 	chunkVolume = chunksBegin()->volume();
 
+	//copy sizes of the chunks to to the first chunk_dims sizes of the image
 	size_t size[Chunk::n_dims];
 	for(unsigned short i=0;i<chunk_dims;i++)
 		size[i]=chunksBegin()->dimSize(i);
 
+	//if there are many chunks, they must leave at least on dimension to the image to sort them in
 	if(chunk_dims>=Chunk::n_dims){
 		if(lookup.size()>1){
 			LOG(DataLog,util::error)
@@ -89,11 +93,17 @@ bool Image::reIndex() {
 			<< Chunk::n_dims-1 << " dimensions" << std::endl;
 			return false;
 		}
-	} else {
+		//if there is only one chunk, its ok - the image will consist only of this one, 
+		//and commonGet will allways return <0,set.begin()->dim2Index()>
+		//thus voxel() equals set.begin()->voxel()
+	} else {// OK there is at least one dimension to sort in the chunks 
+		// check the chunks for at least one dimensional break - use that for the size of that dimension
 		size[chunk_dims]= getChunkStride() ?:1;
-		for(unsigned short i=chunk_dims+1;i<Chunk::n_dims;i++)
+		for(unsigned short i=chunk_dims+1;i<Chunk::n_dims;i++)//if there are dimensions left figure out their size
 			size[i]= getChunkStride(size[i-1])/size[i-1] ?:1;
 	}
+	
+	
 	init(size);
 	clean=true;
 	return true;
@@ -133,7 +143,6 @@ Chunk& Image::getChunkAt(size_t at)
 	return ret;
 }
 	
-
 Chunk& Image::getChunk (size_t first,size_t second,size_t third,size_t fourth) {
 	MAKE_LOG(DataDebug);
 	if(not clean){
@@ -154,15 +163,32 @@ size_t Image::getChunkStride ( size_t base_stride ) {
 	MAKE_LOG(DataLog);
 	MAKE_LOG(DataDebug);
 	size_t ret;
-	if(lookup.empty()){
+	if(set.empty()){
 		LOG(DataLog,util::error)
 		<< "Trying to get chunk stride in an empty image" << std::endl;
 		return 0;
+	} else if (lookup.empty()) {
+		LOG(DataDebug,util::error)
+		<< "Lookup table for chunks is empty. Do reIndex() first!" << std::endl;
+		return 0;
 	} else if(lookup.size()>3*base_stride) {
-		/// there cant be any stride with less than 3*base_stride chunks in (which would actually be an invalid image)
+		/* there can't be any stride with less than 3*base_stride chunks (which would actually be an invalid image)
+		 * _____
+		 * |c c| has no stride/dimensional break
+		 * _____
+		 * |c c|
+		 * |c  | has a dimensional break, but is invalid
+		 * _____
+		 * |c c|
+		 * |c c| is the first reasonable case
+		 */
+		
+		// get the distance between first and second chunk for comparision
 		util::fvector4 thisV=lookup[0]->getProperty<util::fvector4>("indexOrigin");
 		util::fvector4 nextV=lookup[base_stride]->getProperty<util::fvector4>("indexOrigin");
 		const util::fvector4 dist1 =nextV-thisV;
+		
+		// compare every follwing distance to that
 		for(size_t i=base_stride;i<lookup.size()-base_stride;i+=base_stride){
 			util::fvector4 thisV=lookup[i]->getProperty<util::fvector4>("indexOrigin");
 			util::fvector4 nextV=lookup[i+base_stride]->getProperty<util::fvector4>("indexOrigin");
@@ -171,15 +197,17 @@ size_t Image::getChunkStride ( size_t base_stride ) {
 			LOG(DataDebug,util::verbose_info)
 			<< "Distance between chunk " << util::MSubject(i) << " and " << util::MSubject(i+base_stride)
 			<< " is " << dist.len() << std::endl;
-			if(dist.sqlen() > dist1.sqlen()*4){
+			
+			if(dist.sqlen() > dist1.sqlen()*4){// found an dimensional break - leave
 				ret=i+1;
 				LOG(DataDebug,util::info)
 				<< "Distance between chunk " << util::MSubject(i) << " and " << util::MSubject(i+base_stride)
 				<< " is more then twice the first distance, assuming dimensional break at " << ret << std::endl;
-				return ret;
+				return ret; 
 			}
 		}
 	}
+	//we didn't find any break, so we asumme its a linear image |c c ... c|
 	ret=lookup.size();
 	LOG(DataDebug,util::info)
 	<< "No dimensional break found, assuming it to be at the end (" << ret << ")" << std::endl;
