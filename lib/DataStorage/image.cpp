@@ -66,7 +66,7 @@ bool Image::reIndex() {
 	MAKE_LOG(DataLog);
 	if(set.empty()){
 		clean=true;
-		LOG(DataLog,util::info) << "Reindexing an empty image." << std::endl;
+		LOG(DataLog,util::warning) << "Reindexing an empty image." << std::endl;
 		return true;
 	}
 	

@@ -10,6 +10,8 @@
 //
 //
 
+/// @cond _hidden
+
 #include "type.hpp"
 #include "property.hpp"
 #include "propmap.hpp"
@@ -46,3 +48,5 @@ DEF_TYPE(std::string,string,0x20);
 DEF_TYPE(PropMap,PropertyMap,0xA0);
 DEF_TYPE(fvector4,fvector4,0xA1);
 }}
+
+/// @endcond

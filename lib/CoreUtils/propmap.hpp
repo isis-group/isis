@@ -67,14 +67,14 @@ public:
 	 * \return a map of property names and value-pairs
 	 */
 	diff_map diff(const PropMap &second,key_list ignore=key_list())const;
-	/// Remove everything that is also in sceond and equal.
+	/// Remove everything that is also in second and equal.
 	void make_unique(const PropMap &second,key_list ignore=key_list());
 	/**
 	 * "Print" the PropMap.
 	 * Will send the name and the result of PropertyValue->toString(label) to the given ostream.
-	 * One line per property.
+	 * Is equivalent to common streaming operation but has the option to print the type of the printed properties.
 	 * \param out the output stream to use
-	 * \param label the labeled-flag for Type::toString()
+	 * \param label print the type of the property (see Type::toString())
 	 */
 	std::ostream& print(std::ostream &out,bool label=false);
 };

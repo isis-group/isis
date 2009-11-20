@@ -47,6 +47,7 @@ write_list(InputIterator start,InputIterator end,
 	return o;
 }
 
+/// use write_list to create a string from a list
 template<class InputIterator> std::string list2string(
 	InputIterator start,InputIterator end,
 	std::string delim=" ",
@@ -58,17 +59,13 @@ template<class InputIterator> std::string list2string(
 }
 	
 /// @cond _hidden
-struct CoreLog
-{
-	enum
-	{
+struct CoreLog{
+	enum{
 		use_rel = _ENABLE_CORE_LOG
 	};
 };
-struct CoreDebug
-{
-	enum
-	{
+struct CoreDebug{
+	enum{
 		use_rel = _ENABLE_CORE_DEBUG
 	};
 };

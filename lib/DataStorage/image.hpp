@@ -48,6 +48,12 @@ private:
 	/** 
 	 * Computes chunk- and voxel- indices.
 	 * The returned chunk-index applies to the lookup-table (getChunkAt), and the voxel-index to this chunk.
+	 * Behaviour will be undefined if:
+	 * - the image is not clean (not indexed)
+	 * - the image is empty
+	 * - the coordinates are not in the image
+	 *
+	 * Additionally an error will be sent if DataDebug is enabled.
 	 * \returns a pair <chunk-index,voxel-index>
 	 */
 	std::pair<size_t,size_t>
@@ -57,7 +63,7 @@ protected:
 	static const isis::util::PropMap::key_type needed[];
 
 	/**
-	 * Search for a dimensional break in all stored chunks
+	 * Search for a dimensional break in all stored chunks.
 	 * This function searches for two chunks whose (geometrical) distance is more than twice 
 	 * the distance between the first and the second chunk. It wll assume a dimensional break 
 	 * at this position. 
@@ -74,11 +80,12 @@ protected:
 	
 	///Access a chunk via index (and the lookup table)
 	Chunk& getChunkAt(size_t at);
+	///Access a chunk via index (and the lookup table)
 	const Chunk& getChunkAt(size_t at)const;
 
 public:
 	/**
-	 * Creates an empty Image object
+	 * Creates an empty Image object.
 	 * \param lt copmarison functor used to sort the chunks 
 	 */
 	Image(_internal::image_chunk_order lt=_internal::image_chunk_order());
@@ -88,7 +95,7 @@ public:
 	 * The voxel reference provides reading and writing access to the refered
 	 * value.
 	 *
-	 * If the image is not indexed (not clean), reIndex will be run.
+	 * If the image is not clean, reIndex will be run.
 	 *
 	 * \param first The first coordinate in voxel space. Usually the x value.
 	 * \param second The second coordinate in voxel space. Usually the y value.
@@ -113,14 +120,14 @@ public:
 	}
 
 	/**
-	 * This method returns the value of the voxel value at the given coordinates.
+	 * Get the value of the voxel value at the given coordinates.
 	 *
 	 * The voxel reference provides reading and writing access to the refered
 	 * value.
 	 *
-	 * \param first The first coordinate in voxel space. Usually the x value.
-	 * \param second The second coordinate in voxel space. Usually the y value.
-	 * \param third The third coordinate in voxel space. Ususally the z value.
+	 * \param first The first coordinate in voxel space. Usually the x value / the read-encoded position..
+	 * \param second The second coordinate in voxel space. Usually the y value / the phase-encoded position.
+	 * \param third The third coordinate in voxel space. Ususally the z value / the time-encoded position.
 	 * \param fourth The fourth coordinate in voxel space. Usually the time value.
 	 *
 	 * \return A reference to the addressed voxel value. Only reading access is provided
@@ -133,27 +140,44 @@ public:
 	}
 
 	/**
-	 * Returns a copy of the chunk that contains the voxel at the given coordinates.
+	 * Get the chunk that contains the voxel at the given coordinates.
+	 * 
+	 * If the image is not clean, behaviour is undefined. (See Image::commonGet).
+	 *
+	 * \param first The first coordinate in voxel space. Usually the x value / the read-encoded position.
+	 * \param second The second coordinate in voxel space. Usually the y value / the phase-encoded position.
+	 * \param third The third coordinate in voxel space. Ususally the z value / the slice-encoded position.
+	 * \param fourth The fourth coordinate in voxel space. Usually the time value.
+	 * \returns a copy of the chunk that contains the voxel at the given coordinates. 
+	 * (Reminder: Chunk-copies are cheap, so the data are NOT copied)
+	 */
+	const Chunk& getChunk(size_t first,size_t second=0,size_t third=0,size_t fourth=0)const;
+	/**
+	 * Get the chunk that contains the voxel at the given coordinates.
+	 * If the image is not clean Image::reIndex() will be run.
 	 *
 	 * \param first The first coordinate in voxel space. Usually the x value.
 	 * \param second The second coordinate in voxel space. Usually the y value.
 	 * \param third The third coordinate in voxel space. Ususally the z value.
 	 * \param fourth The fourth coordinate in voxel space. Usually the time value.
-	 *
-	 *
+	 * \returns a reference of the chunk that contains the voxel at the given coordinates.
 	 */
-	const Chunk& getChunk(size_t first,size_t second=0,size_t third=0,size_t fourth=0)const;
 	Chunk& getChunk(size_t first,size_t second=0,size_t third=0,size_t fourth=0);
 					   
 	/**
-	 * Inserts a Chunk into the Image.
+	 * Insert a Chunk into the Image.
 	 * The insertion is sorted and unique. So the Chunk will be inserted behind a geometrically "lower" Chunk if there is one.
 	 * If there is allready a Chunk at the proposed position this Chunk wont be inserted.
 	 *
 	 * \param chunk The Chunk to be inserted
-	 * \returns true if the Chunk was inserted
+	 * \returns true if the Chunk was inserted, false otherwise.
 	 */
 	bool insertChunk(const Chunk &chunk);
+	/**
+	 * (Re)computes the image layout and metadata.
+	 * The image will be "clean" on success.
+	 * \returns true if the image was successfully reindexed, false otherwise.
+	 */
 	bool reIndex();
 	ChunkIterator chunksBegin();
 	ChunkIterator chunksEnd();
