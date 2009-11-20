@@ -119,9 +119,11 @@ public:
 		}
 		return false;
 	}
+	///\returns true if this is equal to src
 	bool operator==(const this_class &src)const{
 		return std::equal(CONTAINER::begin(),CONTAINER::end(),src.begin());
 	}
+	///\returns false if this is equal to src
 	bool operator!=(const this_class &src)const{
 		return !operator==(src);
 	}
@@ -140,9 +142,14 @@ public:
 	this_class operator*(const TYPE &src)const{return binary_op<std::multiplies<TYPE> >(src);}
 	this_class operator/(const TYPE &src)const{return binary_op<std::divides<TYPE>    >(src);}
 
-	/// \returns the inner product
+	/**
+	 * Get the inner product.
+	 * \returns \f$ \overrightarrow{this} \cdot \overrightarrow{src} \f$
+	 */
 	TYPE dot(const this_class &vect)const{return std::inner_product(CONTAINER::begin(),CONTAINER::end(),vect.begin(), TYPE());}
-	/// \returns the inner product with itself (aka squared length)
+	/** 
+	 * the inner product with itself (aka squared length)
+	 * \returns
 	TYPE sqlen()const{return dot(*this);}
 	/// \returns the length of the vector
 	TYPE len()const{return std::sqrt(sqlen());}
