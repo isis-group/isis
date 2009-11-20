@@ -76,13 +76,21 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////
 	// Contructor stuff
 	////////////////////////////////////////////////////////////////////////////////////
+	/**
+	 * Default constructor.
+	 * Initializes all elements with default value of TYPE.
+	 */
 	FixedVector(){fill(TYPE());	}
 
+	/**
+	 * Create a FixedVector out of an array of same type and length.
+	 */
 	FixedVector(const TYPE src[SIZE])
 	{
 		std::copy(src,src+SIZE,CONTAINER::begin());
 	}
 
+	/// Set all elements to a value
 	void fill(const TYPE &val)
 	{
 		std::fill(CONTAINER::begin(),CONTAINER::end(),val);
@@ -144,31 +152,43 @@ public:
 
 	/**
 	 * Get the inner product.
-	 * \returns \f$ \overrightarrow{this} \cdot \overrightarrow{src} \f$
+	 * \returns \f$ \overrightarrow{this} \cdot \overrightarrow{src}  = \sum_{i=0}^{SIZE-1} {this_i * src_i} \f$
 	 */
 	TYPE dot(const this_class &vect)const{return std::inner_product(CONTAINER::begin(),CONTAINER::end(),vect.begin(), TYPE());}
 	/** 
-	 * the inner product with itself (aka squared length)
-	 * \returns
+	 * Get the inner product with itself (aka squared length).
+	 * \returns \f$ \overrightarrow{this} \cdot \overrightarrow{this} = \sum_{i=0}^{SIZE-1} this_i^2 \f$
+	 */
 	TYPE sqlen()const{return dot(*this);}
-	/// \returns the length of the vector
+	/**
+	 * Get the the length of the vector.
+	 * \returns \f$ \sqrt{\sum_{i=0}^{SIZE-1} this_i^2} \f$
+	 */
 	TYPE len()const{return std::sqrt(sqlen());}
 
-	/// norms the vector (make len()==1)
+	/** 
+	 * Norm the vector (make len()==1).
+	 * Applies scalar division with the result of len() to this.
+	 * 
+	 * Equivalent to: 
+	 * \f[ \overrightarrow{this} = \overrightarrow{this} * {1 \over {\sqrt{\sum_{i=0}^{SIZE-1} this_i^2}}}  \f]
+	 * 
+	 * If len() is equal to zero std::invalid_argument will be thrown, and this wont be changed.
+	 */
 	void norm()throw(std::invalid_argument)
 	{
-		double d= len();
+		const TYPE d= len();
 		if(d==0)throw(std::invalid_argument("Trying to normalize a vector of length 0"));
 		else *this = *this / d;
 	}
 
-	/// copy the data to somthing designed after the output iterator model
+	/// copy the elements to somthing designed after the output iterator model
 	template<class OutputIterator> void copyTo(OutputIterator out)
 	{
 		std::copy(CONTAINER::begin(),CONTAINER::end(),out);
 	}
 
-	/// write the data formated to basic_ostream
+	/// write the elements formated to basic_ostream
 	template<typename charT, typename traits> void writeTo(std::basic_ostream<charT, traits> &out)const
 	{
 		util::write_list(CONTAINER::begin(),CONTAINER::end(),out,"|","<",">");
