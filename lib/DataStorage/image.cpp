@@ -12,6 +12,7 @@
 
 #include "image.hpp"
 #include "CoreUtils/vector.hpp"
+#include <boost/foreach.hpp>
 
 namespace isis{ namespace data{
 
@@ -52,7 +53,7 @@ bool Image::insertChunk ( const Chunk &chunk ) {
 	if(not chunk.sufficient()){
 		const util::PropMap::key_list missing=chunk.missing();
 		LOG(DataLog,util::error)
-			<< "Cannot insert chunk. Missing properties: " << util::list2string(missing.begin(),missing.end(),", ") << std::endl;
+			<< "Cannot insert chunk. Missing properties: " << util::list2string(missing.begin(),missing.end(),", ","<",">") << std::endl;
 		return false;
 	}
 	if(set.insert(chunk).second){
@@ -64,6 +65,7 @@ bool Image::insertChunk ( const Chunk &chunk ) {
 
 bool Image::reIndex() {
 	MAKE_LOG(DataLog);
+	MAKE_LOG(DataDebug);
 	if(set.empty()){
 		clean=true;
 		LOG(DataLog,util::warning) << "Reindexing an empty image." << std::endl;
@@ -86,7 +88,7 @@ bool Image::reIndex() {
 		size[i]=chunksBegin()->dimSize(i);
 
 	//if there are many chunks, they must leave at least on dimension to the image to sort them in
-	if(chunk_dims>=Chunk::n_dims){
+	if(chunk_dims>=Image::n_dims){
 		if(lookup.size()>1){
 			LOG(DataLog,util::error)
 			<< "Cannot handle multiple Chunks, if they have more than "
@@ -95,14 +97,31 @@ bool Image::reIndex() {
 		}
 		//if there is only one chunk, its ok - the image will consist only of this one, 
 		//and commonGet will allways return <0,set.begin()->dim2Index()>
-		//thus voxel() equals set.begin()->voxel()
+		//thus in this case voxel() equals set.begin()->voxel()
 	} else {// OK there is at least one dimension to sort in the chunks 
 		// check the chunks for at least one dimensional break - use that for the size of that dimension
 		size[chunk_dims]= getChunkStride() ?:1;
-		for(unsigned short i=chunk_dims+1;i<Chunk::n_dims;i++)//if there are dimensions left figure out their size
+		for(unsigned short i=chunk_dims+1;i<Image::n_dims;i++)//if there are dimensions left figure out their size
 			size[i]= getChunkStride(size[i-1])/size[i-1] ?:1;
 	}
-	
+
+	//Clean up the properties
+	util::PropMap buff= set.begin()->propMap();
+	std::set<util::PropMap::key_type> uniques;
+	for(ChunkIterator i= ++chunksBegin();i!=chunksEnd();i++){
+		const util::PropMap::diff_map difference=buff.diff(i->propMap());
+		BOOST_FOREACH(const util::PropMap::diff_map::value_type &ref,difference){
+			uniques.insert(ref.first);
+		}
+	}
+	LOG(DataDebug,util::info) << uniques.size() << " Unique properties found in the chunks" << std::endl;
+	LOG(DataDebug,util::verbose_info) << util::list2string(uniques.begin(),uniques.end(),", ") << std::endl;
+
+	BOOST_FOREACH(const util::PropMap::key_type &ref,uniques){
+		properties.erase(ref);
+	}
+	LOG(DataDebug,util::info) << properties.size() << " common properties left in the image" << std::endl;
+	LOG(DataDebug,util::verbose_info) << util::list2string(properties.begin(),properties.end(),", ") << std::endl;
 	
 	init(size);
 	clean=true;
@@ -207,12 +226,28 @@ size_t Image::getChunkStride ( size_t base_stride ) {
 			}
 		}
 	}
-	//we didn't find any break, so we asumme its a linear image |c c ... c|
+	//we didn't find any break, so we assume its a linear image |c c ... c|
 	ret=lookup.size();
 	LOG(DataDebug,util::info)
 	<< "No dimensional break found, assuming it to be at the end (" << ret << ")" << std::endl;
 	return ret;
 }
+
+std::list<util::PropMap::mapped_type> Image::getChunkProperties(const util::PropMap::key_type& key, bool unique)const
+{
+	std::list<util::PropertyValue > ret;
+	for(ChunkSet::const_iterator i=set.begin();i!=set.end();i++){
+		const util::PropertyValue &prop=i->getPropertyValue(key);
+		if(unique && prop.empty()) //if unique is requested and the property is empty
+			continue; //skip it
+		else if(unique && !(ret.empty() ||  prop == ret.back())) //if unique is requested and the property is equal to the one added before
+			continue;//skip it
+		else
+			ret.push_back(prop);
+	}
+	return ret;
+}
+
 
 Image::ChunkIterator Image::chunksBegin(){return set.begin();}
 Image::ChunkIterator Image::chunksEnd(){return set.end();}

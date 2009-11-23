@@ -38,7 +38,8 @@ class Image:
 public:
 	typedef std::set<Chunk,_internal::image_chunk_order> ChunkSet;
 	typedef ChunkSet::iterator ChunkIterator;
-
+	enum dimensions{read=0,phase,slice,time,n_dims};
+	
 private:
 	ChunkSet set;
 	std::vector<ChunkIterator> lookup;
@@ -152,6 +153,8 @@ public:
 	 * (Reminder: Chunk-copies are cheap, so the data are NOT copied)
 	 */
 	const Chunk& getChunk(size_t first,size_t second=0,size_t third=0,size_t fourth=0)const;
+/*	const util::PropMap::mapped_type &getChunkPropertyValue(size_t first,size_t second=0,size_t third=0,size_t fourth=0);
+	const stdutil::PropMap::mapped_type &getChunkPropertyValue(size_t first,size_t second=0,size_t third=0,size_t fourth=0);*/
 	/**
 	 * Get the chunk that contains the voxel at the given coordinates.
 	 * If the image is not clean Image::reIndex() will be run.
@@ -176,9 +179,17 @@ public:
 	/**
 	 * (Re)computes the image layout and metadata.
 	 * The image will be "clean" on success.
-	 * \returns true if the image was successfully reindexed, false otherwise.
+	 * \returns true if the image was successfully reindexed, false otherwise. 
 	 */
 	bool reIndex();
+
+	/**
+	 * Get a list of the properties of the chunks for the given key
+	 * \param key the name of the property to search for
+	 * \param unique when true empty or consecutive duplicates wont be added
+	 */
+	std::list<util::PropMap::mapped_type> getChunkProperties(const util::PropMap::key_type &key,bool unique=false)const;
+
 	ChunkIterator chunksBegin();
 	ChunkIterator chunksEnd();
 };

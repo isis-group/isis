@@ -18,8 +18,9 @@
 
 namespace isis{ namespace data{ namespace _internal {
 class PropertyObject {
-	util::PropMap properties;
 	static const util::PropMap::mapped_type emptyProp;//dummy to be able to return an empty Property
+protected:
+	util::PropMap properties;
 public:
 	/// Create an PropertyObject without any property.
 	PropertyObject();
@@ -84,6 +85,7 @@ public:
 	 * \returns a list of all needed and empty properties.
 	 */
 	util::PropMap::key_list missing()const;
+	const util::PropMap &propMap()const;
 };
 }}}
 

@@ -18,7 +18,7 @@ BOOST_AUTO_TEST_CASE (image_init_test)
 	ENABLE_LOG(util::CoreLog,util::DefaultMsgPrint,util::warning);
 	ENABLE_LOG(util::CoreDebug,util::DefaultMsgPrint,util::warning);
 	ENABLE_LOG(data::DataLog,util::DefaultMsgPrint,util::info);
-	ENABLE_LOG(data::DataDebug,util::DefaultMsgPrint,util::info);
+	ENABLE_LOG(data::DataDebug,util::DefaultMsgPrint,util::verbose_info);
 	
 	data::MemChunk<float> ch(4,4);
 	data::Image img;
@@ -52,6 +52,14 @@ BOOST_AUTO_TEST_CASE (image_init_test)
 		BOOST_CHECK(ref.getPropertyValue("indexOrigin") == util::fvector4(0,0,i++,0));
 	}
 
+	//Get a list of properties from the chunks in the image 
+	//List of the properties shall be as if every chunk of the image was asked for the property
+	i=0;
+	std::list<util::PropMap::mapped_type> origins=img.getChunkProperties("indexOrigin");
+	BOOST_FOREACH(const util::PropMap::mapped_type &ref,origins){
+		BOOST_CHECK(ref == util::fvector4(0,0,i++,0));
+	}
+	
 	// Check for insertion in two dimensions
 	ch = data::MemChunk<float>(4,4);
 	ch.setProperty("indexOrigin",util::fvector4(0,0,0,1));

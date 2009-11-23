@@ -52,6 +52,11 @@ util::PropMap::key_list PropertyObject::missing()const {
 }
 
 
+const util::PropMap& PropertyObject::propMap()const {
+	return properties;
+}
+
+
 const util::PropMap::mapped_type PropertyObject::emptyProp;
 
 }}}
