@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 2.4)
 
 PROJECT(isisDoTrans3D)
 
+cmake_policy(SET CMP0003 NEW)
+
 #if you don't want the full compiler output, remove the following line
 #SET(CMAKE_VERBOSE_MAKEFILE ON)
 
