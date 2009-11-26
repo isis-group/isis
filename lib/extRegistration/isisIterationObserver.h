@@ -1,6 +1,29 @@
+/****************************************************************
+ *
+ * Copyright (C) 2009 Max Planck Institute
+ * for Human Cognitive and Brain Sciences, Leipzig
+ *
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ *
+ * Author: Erik Tuerke, tuerke@cbs.mpg.de, 2009
+ *
+ *****************************************************************/
+
 #ifndef ISISITERATIONOBSERVER_H
 #define ISISITERATIONOBSERVER_H
-
 
 #include "itkCommand.h"
 #include "itkRegularStepGradientDescentOptimizer.h"
@@ -8,59 +31,57 @@
 #include "itkLBFGSBOptimizer.h"
 #include "itkAmoebaOptimizer.h"
 
-
 namespace isis
 {
-
 
 class IterationObserver : public itk::Command
 {
 public:
-        typedef IterationObserver Self;
-        typedef itk::Command Superclass;
-        typedef itk::SmartPointer<Self> Pointer;
-	itkNewMacro( Self );
+
+	typedef IterationObserver Self;
+	typedef itk::Command Superclass;
+	typedef itk::SmartPointer<Self> Pointer;
+	itkNewMacro( Self);
+
 protected:
 
-        IterationObserver() {};
+	IterationObserver()	{}
 
 public:
 
-        void Execute ( itk::Object *caller, const itk::EventObject & event ) {
-                Execute ( ( const itk::Object * ) caller, event );
-        }
+	void Execute(itk::Object *caller, const itk::EventObject & event)
+	{
+		Execute((const itk::Object *) caller, event);
+	}
 
-        void Execute ( const itk::Object * object, const  itk::EventObject & event ) {
-		if ( ! itk::IterationEvent().CheckEvent ( &event ) ) {
-                        return;
-			}
-                if (const itk::RegularStepGradientDescentOptimizer* optimizer = dynamic_cast<const itk::RegularStepGradientDescentOptimizer*> ( object ) )
+	void Execute(const itk::Object * object, const itk::EventObject & event)
+	{
+		if(!itk::IterationEvent().CheckEvent(&event))
 		{
-			
-                        std::cout << optimizer->GetCurrentIteration() << " = ";
-                        std::cout << optimizer->GetValue() << " : ";
-                        std::cout << optimizer->GetCurrentPosition() << std::endl;
+			return;
 		}
-		if (const itk::VersorRigid3DTransformOptimizer* optimizer = dynamic_cast<const itk::VersorRigid3DTransformOptimizer*> ( object ) )
+		if(const itk::RegularStepGradientDescentOptimizer* optimizer =
+						dynamic_cast<const itk::RegularStepGradientDescentOptimizer*> ( object ) )
 		{
+
 			std::cout << optimizer->GetCurrentIteration() << " = ";
-                        std::cout << optimizer->GetValue() << " : ";
+			std::cout << optimizer->GetValue() << " : ";
 			std::cout << optimizer->GetCurrentPosition() << std::endl;
 		}
-		/*
-		if (const itk::LBFGSBOptimizer* optimizer = dynamic_cast<const itk::LBFGSBOptimizer*> ( object ) )
+		if(const itk::VersorRigid3DTransformOptimizer* optimizer =
+						dynamic_cast<const itk::VersorRigid3DTransformOptimizer*> ( object ) )
 		{
-			//std::cout << optimizer->GetCurrentIteration() << " = ";
-                        //std::cout << optimizer->GetValue() << std::endl;
-			//std::cout << optimizer->GetCurrentPosition() << " : ";
-		}*/
-		
-		
-		
-	}
-	
-};
+//			std::cout << optimizer->GetCurrentIteration() << " = ";
+//			std::cout << optimizer->GetValue() << " : ";
+//			std::cout << optimizer->GetCurrentPosition() << std::endl;
 
+			std::cout << optimizer->GetCurrentIteration() << "\t" <<
+			std::cout << optimizer->GetValue() << std::endl;
+
+		}
+	}
+
+};
 
 } //end namespace isis
 #endif // ISISITERATIONOBSERVER_H
