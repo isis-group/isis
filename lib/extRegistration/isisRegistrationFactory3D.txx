@@ -264,11 +264,11 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer() 
 
         if (transform.VERSORRIGID or transform.QUATERNIONRIGID or transform.CENTEREDEULER3DTRANSFORM) {
 
-            optimizerScaleVersorRigid3D[0] = 1.0;
-            optimizerScaleVersorRigid3D[1] = 1.0;
-            optimizerScaleVersorRigid3D[2] = 1.0;
-            for (unsigned int i = 3; i < m_NumberOfParameters; i++) {
-                optimizerScaleVersorRigid3D[i] = 1.0 / 1000.0;
+            optimizerScaleVersorRigid3D[3] = 1.0;
+            optimizerScaleVersorRigid3D[4] = 1.0;
+            optimizerScaleVersorRigid3D[5] = 1.0;
+            for (unsigned int i = 0; i < m_NumberOfParameters/2; i++) {
+                optimizerScaleVersorRigid3D[i] = 1.0 / 1.0;
             }
             m_VersorRigid3DTransformOptimizer->SetMaximumStepLength(0.1);
             m_VersorRigid3DTransformOptimizer->SetMinimumStepLength(0.0001);

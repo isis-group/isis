@@ -5,7 +5,6 @@
  *      Author: tuerke
  */
 
-
 #include "itkWarpImageFilter.h"
 #include "itkImageMaskSpatialObject.h"
 
