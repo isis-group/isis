@@ -1,3 +1,5 @@
+// kate: show-indent on; indent-mode tab; indent-width 4; tab-width 4; replace-tabs off; auto-insert-doxygen on
+
 //
 // C++ Implementation: image
 //
@@ -79,7 +81,7 @@ bool Image::reIndex() {
 		lookup[idx]=it;
 	
 	//get primary attributes from first chunk
-	const unsigned short chunk_dims=chunksBegin()->dimRange().second;
+	const unsigned short chunk_dims=chunksBegin()->dimRange().second+1;
 	chunkVolume = chunksBegin()->volume();
 
 	//copy sizes of the chunks to to the first chunk_dims sizes of the image
@@ -253,5 +255,29 @@ std::list<util::PropMap::mapped_type> Image::getChunksProperties(const util::Pro
 
 Image::ChunkIterator Image::chunksBegin(){return set.begin();}
 Image::ChunkIterator Image::chunksEnd(){return set.end();}
+
+
+util::fvector4 Image::size()const
+{
+	return util::fvector4(dimSize(0),dimSize(1),dimSize(2),dimSize(3));
+}
+
+ImageList::ImageList(ChunkList src)
+{
+	while(!src.empty()){
+		value_type buff(new Image);
+		for(ChunkList::iterator i=src.begin();i!=src.end();){
+			if(buff->insertChunk(*i))
+				src.erase(i++);
+			else
+				i++;
+		}
+		if(buff->chunksBegin()!=buff->chunksEnd()){
+			buff->reIndex();
+			push_back(buff);
+		}
+	}
+}
+
 
 }}

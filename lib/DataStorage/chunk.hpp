@@ -43,8 +43,6 @@ class ChunkBase :public NDimensional<4>,public PropertyObject{
 		ChunkBase(size_t firstDim,size_t secondDim,size_t thirdDim,size_t fourthDim);
 		virtual ~ChunkBase(); //needed to make it polymorphic
 
-		size_t size(size_t index)const;
-		size_t volume()const;
 		isis::util::fvector4 size()const;
 };
 }

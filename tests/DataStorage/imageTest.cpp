@@ -68,8 +68,6 @@ BOOST_AUTO_TEST_CASE (image_init_test)
 	//as all other chunks where timestep 0 this must be at the end
 	BOOST_CHECK((--it)->getPropertyValue("indexOrigin")==util::fvector4(0,0,0,1));
 
-//	TODO create an image out of an ChunkList
-
 }
 
 BOOST_AUTO_TEST_CASE (image_chunk_test)

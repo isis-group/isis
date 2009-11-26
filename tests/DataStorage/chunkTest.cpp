@@ -21,10 +21,10 @@ BOOST_AUTO_TEST_CASE (chunk_init_test)
 
 	data::MemChunk<float> ch(4,3,2,1);
 	BOOST_CHECK(ch.volume()==1*2*3*4);
-	BOOST_CHECK(ch.size(data::MemChunk<float>::read)==4);
-	BOOST_CHECK(ch.size(data::MemChunk<float>::phase)==3);
-	BOOST_CHECK(ch.size(data::MemChunk<float>::slice)==2);
-	BOOST_CHECK(ch.size(data::MemChunk<float>::time)==1);
+	BOOST_CHECK(ch.dimSize(data::MemChunk<float>::read)==4);
+	BOOST_CHECK(ch.dimSize(data::MemChunk<float>::phase)==3);
+	BOOST_CHECK(ch.dimSize(data::MemChunk<float>::slice)==2);
+	BOOST_CHECK(ch.dimSize(data::MemChunk<float>::time)==1);
 }
 
 BOOST_AUTO_TEST_CASE (chunk_property_test)
@@ -51,13 +51,13 @@ BOOST_AUTO_TEST_CASE (chunk_data_test1)//Access Chunk elements via dimensional i
 {
 	data::MemChunk<float> ch(4,3,2,1);
 
-	for(size_t i=0;i<ch.size(data::readDim);i++)
+	for(size_t i=0;i<ch.dimSize(data::readDim);i++)
 		ch.voxel<float>(0,0,0,i)=i;
-	for(size_t i=0;i<ch.size(data::readDim);i++)
+	for(size_t i=0;i<ch.dimSize(data::readDim);i++)
 		BOOST_CHECK(ch.voxel<float>(0,0,0,i)==i);
 
 	data::Chunk ch2 = ch;
-	for(size_t i=0;i<ch.size(data::readDim);i++)
+	for(size_t i=0;i<ch.dimSize(data::readDim);i++)
 		BOOST_CHECK(ch2.voxel<float>(0,0,0,i)==i);
 }
 

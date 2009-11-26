@@ -27,18 +27,9 @@ ChunkBase::ChunkBase ( size_t firstDim, size_t secondDim, size_t thirdDim, size_
 
 ChunkBase::~ChunkBase() { }
 
-size_t ChunkBase::size ( size_t index )const
-{
-	return NDimensional<4>::dimSize(index);
-}
 util::fvector4 ChunkBase::size()const
 {
-	return util::fvector4(size(0),size(1),size(2),size(3));
-}
-
-size_t ChunkBase::volume()const
-{
-	return NDimensional<4>::volume();
+	return util::fvector4(dimSize(0),dimSize(1),dimSize(2),dimSize(3));
 }
 
 const ChunkBase::dimensions ChunkBase::dimension[ChunkBase::n_dims]={ChunkBase::read,ChunkBase::phase,ChunkBase::slice,ChunkBase::time};

@@ -32,7 +32,7 @@ struct image_chunk_order: chunk_comarison{
 class Image;
 
 class Image:
-	protected _internal::NDimensional<4>,
+	public _internal::NDimensional<4>,
 	public _internal::PropertyObject
 {
 public:
@@ -194,10 +194,10 @@ public:
 
 	ChunkIterator chunksBegin();
 	ChunkIterator chunksEnd();
+
+	isis::util::fvector4 size()const;
 };
 
-/// @cond _internal
-namespace _internal{
 class ImageList : public std::list< boost::shared_ptr<Image> >
 {
 public:
@@ -205,12 +205,9 @@ public:
 	/**
 	 * Create a number of images out of a Chunk list.
 	 */
-	ImageList(const ChunkList src);
+	ImageList(ChunkList src);
 
 };
-
-}
-/// @endcond
 }}
 
 #endif // IMAGE_H

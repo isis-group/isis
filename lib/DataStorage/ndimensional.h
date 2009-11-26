@@ -95,13 +95,13 @@ public:
 		return util::list2string(dim,dim+DIMS,delim);
 	}
 
-	/// get the lowest and higest relevant (size>1) dimenstion
-	std::pair<int,int> dimRange()const
+	/// get the lowest and higest relevant (size>1) dimension
+	std::pair<size_t,size_t> dimRange()const
 	{
-		std::pair<int,int> ret(-1,-1);
+		std::pair<size_t,size_t> ret(-1,-1);
 		for(unsigned short i=0;i<DIMS;i++){
 			if(dim[i]>1 && ret.first==-1)ret.first=i;
-			if(dim[DIMS-i-1]>1  && ret.second==-1)ret.second=i;
+			if(dim[DIMS-i-1]>1  && ret.second==-1)ret.second=DIMS-i-1;
 		}
 		return ret;
 	}
