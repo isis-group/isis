@@ -46,7 +46,6 @@ public:
 	/**
 	 * Empty constructor.
 	 * Creates an empty property value. So PropertyValue().empty() will allways be true.
-	 * \param ref the value to be stored
 	 * \param _needed flag if this PropertyValue is needed an thus not allowed to be empty (a.k.a. undefined)
 	 */
 	PropertyValue(bool _needed = false);
@@ -65,8 +64,32 @@ public:
 	bool &needed();
 	bool needed()const;
 
+	/**
+	 * Equality to another PropertyValue.
+	 * Properties are equal if, and only if:
+	 * - both properties are not empty
+	 * - both properties contain the same value type T
+	 * - the stored values are equal
+	 * \returns (this->cast_to_type\<T\>() == second->cast_to_type\<T\>()) if both contain a value of type T, false otherwise.
+	 */
 	bool operator ==(const PropertyValue &second)const;
+	/**
+	 * Equality to another Type-Object.
+	 * Properties are equal to Type-Object if, and only if:
+	 * - the property is not empty
+	 * - the property and the Type-Object contain the same value type T
+	 * - both stored values are equal
+	 * \returns (this->cast_to_type\<T\>() == second->cast_to_type\<T\>()) if both contain a value of type T, false otherwise.
+	 */
 	bool operator ==(const _internal::TypeBase &second)const;
+	/**
+	 * Equality to a Value of type T.
+	 * Properties are equal to Values if, and only if:
+	 * - the property is not empty
+	 * - the property contains the value type T
+	 * - both stored value is equal to the given value
+	 * \returns (this->cast_to_type\<T\>() == second) if the property contains a value of type T, false otherwise.
+	 */
 	template<typename T> bool operator ==(const T &second)const{
 		if(get()->is<T>())
 			return second == get()->cast_to_Type<T>();

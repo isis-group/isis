@@ -41,11 +41,14 @@ PropMap::diff_map PropMap::diff(const PropMap& second,key_list ignore) const{
 				ref.first,
 				std::make_pair(ref.second,PropertyValue())
 			));
-		else if(!found->second.operator==(ref.second)) // if is in second as well, but not equal
-			ret.insert(std::make_pair( // add (propertyname|(value1|value2))
-				ref.first,
-				std::make_pair(ref.second,found->second)
-		));
+		else { //if it is in second as well
+			const PropertyValue &first=found->second,&second = ref.second;
+			if(!(first.empty() || second.empty() || first==second)) // if they are not empty, but not equal
+				ret.insert(std::make_pair( // add (propertyname|(value1|value2))
+					ref.first,
+					std::make_pair(ref.second,found->second)
+				));
+		}
 	}
 	//insert everything that is in second but not in this
  	BOOST_FOREACH(const_reference ref,second){
@@ -67,6 +70,19 @@ void PropMap::make_unique (const util::PropMap& second, PropMap::key_list ignore
 		iterator found=find(ref.first);
 		if(found != second.end() && found->second.operator==(ref.second))
 			erase(found);
+	}
+}
+
+void PropMap::join(const isis::util::PropMap& second, bool overwrite, PropMap::key_list ignore) {
+	BOOST_FOREACH(const_reference ref,second){
+		if(ignore.find(ref.first)==ignore.end())//skip any prop from the ignore-list
+			continue;
+		iterator found=find(ref.first);
+		if(found != second.end()){ // if its allready here
+			if(found->second.empty() || overwrite)
+				found->second=ref.second;
+		} else 
+			insert(ref);
 	}
 }
 

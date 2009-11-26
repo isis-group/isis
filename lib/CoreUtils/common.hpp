@@ -29,7 +29,8 @@ namespace isis { namespace util {
 /**
 Write a list of elements to a std::basic_ostream
 \param start starting iterator of input
-\param start end iterator of input
+\param end end iterator of input
+\param o the output stream to write into
 \param delim delimiter used to seperate the elements (default: " ")
 \param prefix will be send to the stream as start (default: "")
 \param suffix will be send to the stream at the end (default: "")
@@ -54,7 +55,7 @@ template<class InputIterator> std::string list2string(
 	std::string prefix="",std::string suffix="")
 {
 	std::ostringstream ret;
-	isis::util::write_list(start,end,ret,delim,prefix,suffix);
+	write_list(start,end,ret,delim,prefix,suffix);
 	return ret.str();
 }
 	
@@ -77,7 +78,7 @@ namespace std {
 template<typename charT, typename traits, typename _FIRST, typename _SECOND > basic_ostream<charT, traits>&
 operator<<(basic_ostream<charT, traits> &out, const pair<_FIRST,_SECOND> &s)
 {
-	return out << ">" << s.first << "<>" << s.second << "<";
+	return out << "<" << s.first << "|" << s.second << ">";
 }
 
 /// Streaming output for std::map

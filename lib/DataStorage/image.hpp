@@ -55,7 +55,7 @@ private:
 	 * - the coordinates are not in the image
 	 *
 	 * Additionally an error will be sent if DataDebug is enabled.
-	 * \returns a pair <chunk-index,voxel-index>
+	 * \returns a std::pair\<chunk-index,voxel-index\>
 	 */
 	std::pair<size_t,size_t>
 	commonGet(size_t first,size_t second,size_t third,size_t fourth)const;
@@ -68,14 +68,18 @@ protected:
 	 * This function searches for two chunks whose (geometrical) distance is more than twice 
 	 * the distance between the first and the second chunk. It wll assume a dimensional break 
 	 * at this position. 
+	 * 
 	 * Normally chunks are beneath each other (like characters in a text) so their distance is 
 	 * more or less constant. But if there is a dimensional break (analogous to the linebreak 
-	 * in a text) the distance between this particular chunks/characters is much bigger (bigger
-	 * than twice the normal distance)
+	 * in a text) the distance between this particular chunks/characters is bigger than twice 
+	 * the normal distance
+	 * 
 	 * For example for an image of 2D-chunks (slices) getChunkStride(1) will 
 	 * get the number of slices (size of third dim) and  getChunkStride(slices) 
 	 * will get the number of timesteps
-	 * \param base_stride the base_stride for the iteration between chunks (1 for the first dimension, one "line" for the second and so on...)
+	 * \param base_stride the base_stride for the iteration between chunks (1 for the first 
+	 * dimension, one "line" for the second and soon...)
+	 * \returns the length of this chunk-"line" / the stride
 	 */
 	size_t getChunkStride(size_t base_stride=1);
 	
@@ -98,12 +102,12 @@ public:
 	 *
 	 * If the image is not clean, reIndex will be run.
 	 *
-	 * \param first The first coordinate in voxel space. Usually the x value.
-	 * \param second The second coordinate in voxel space. Usually the y value.
-	 * \param third The third coordinate in voxel space. Ususally the z value.
+	 * \param first The first coordinate in voxel space. Usually the x value / the read-encoded position..
+	 * \param second The second coordinate in voxel space. Usually the y value / the phase-encoded position.
+	 * \param third The third coordinate in voxel space. Ususally the z value / the time-encoded position.
 	 * \param fourth The fourth coordinate in voxel space. Usually the time value.
 	 *
-	 * \return A reference to the addressed voxel value. Reading and writing access
+	 * \returns A reference to the addressed voxel value. Reading and writing access
 	 * is provided.
 	 */
 	template <typename T> T& voxel(size_t first,size_t second=0,size_t third=0,size_t fourth=0)
@@ -131,7 +135,7 @@ public:
 	 * \param third The third coordinate in voxel space. Ususally the z value / the time-encoded position.
 	 * \param fourth The fourth coordinate in voxel space. Usually the time value.
 	 *
-	 * \return A reference to the addressed voxel value. Only reading access is provided
+	 * \returns A reference to the addressed voxel value. Only reading access is provided
 	 */
 	template <typename T> T voxel(size_t first,size_t second=0,size_t third=0,size_t fourth=0)const
 	{
@@ -153,8 +157,6 @@ public:
 	 * (Reminder: Chunk-copies are cheap, so the data are NOT copied)
 	 */
 	const Chunk& getChunk(size_t first,size_t second=0,size_t third=0,size_t fourth=0)const;
-/*	const util::PropMap::mapped_type &getChunkPropertyValue(size_t first,size_t second=0,size_t third=0,size_t fourth=0);
-	const stdutil::PropMap::mapped_type &getChunkPropertyValue(size_t first,size_t second=0,size_t third=0,size_t fourth=0);*/
 	/**
 	 * Get the chunk that contains the voxel at the given coordinates.
 	 * If the image is not clean Image::reIndex() will be run.
@@ -188,7 +190,7 @@ public:
 	 * \param key the name of the property to search for
 	 * \param unique when true empty or consecutive duplicates wont be added
 	 */
-	std::list<util::PropMap::mapped_type> getChunkProperties(const util::PropMap::key_type &key,bool unique=false)const;
+	std::list<util::PropMap::mapped_type> getChunksProperties(const util::PropMap::key_type &key,bool unique=false)const;
 
 	ChunkIterator chunksBegin();
 	ChunkIterator chunksEnd();

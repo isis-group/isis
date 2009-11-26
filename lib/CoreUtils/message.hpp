@@ -121,9 +121,9 @@ public:
 }
 /** @} */
 }
-
+/// @cond _hidden
 namespace std{
 	isis::util::_internal::Message& endl(isis::util::_internal::Message& __os);
 }
-
+/// @endcond
 #endif //MESSAGE_H

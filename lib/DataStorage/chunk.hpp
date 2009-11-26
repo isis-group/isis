@@ -60,6 +60,10 @@ protected:
 	 * Creates an data-block from existing data.
 	 * \param src is a pointer to the existing data. This data will automatically be deleted. So don't use this pointer afterwards.
 	 * \param d is the deleter to be used for deletion of src. It must define operator(TYPE *), which than shall free the given pointer.
+	 * \param firstDim size in the first dimension (usually read-encoded dim)
+	 * \param secondDim size in the second dimension (usually phase-encoded dim)
+	 * \param thirdDim size in the third dimension (usually slice-encoded dim)
+	 * \param fourthDim size in the fourth dimension
 	 */
 	template<typename TYPE,typename D> Chunk(TYPE* src,D d,size_t firstDim,size_t secondDim,size_t thirdDim,size_t fourthDim):
 	_internal::ChunkBase(firstDim,secondDim,thirdDim,fourthDim),

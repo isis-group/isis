@@ -19,7 +19,7 @@ bool PropertyValue::needed()const {	return m_needed;}
 
 
 bool PropertyValue::operator== ( const util::PropertyValue& second )const {
-	return operator==(*second);
+	return !second.empty() && operator==(*second);
 }
 
 

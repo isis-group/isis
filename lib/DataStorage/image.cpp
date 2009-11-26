@@ -105,22 +105,23 @@ bool Image::reIndex() {
 			size[i]= getChunkStride(size[i-1])/size[i-1] ?:1;
 	}
 
-	//Clean up the properties
-	util::PropMap buff= set.begin()->propMap();
+	//Clean up the properties 
+	//@todo might fail if the image contains a prop that differs to that in the Chunks (which is equal in the chunks)
+	util::PropMap common= set.begin()->propMap();
 	std::set<util::PropMap::key_type> uniques;
 	for(ChunkIterator i= ++chunksBegin();i!=chunksEnd();i++){
-		const util::PropMap::diff_map difference=buff.diff(i->propMap());
-		BOOST_FOREACH(const util::PropMap::diff_map::value_type &ref,difference){
+		const util::PropMap::diff_map difference=common.diff(i->propMap());
+		BOOST_FOREACH(const util::PropMap::diff_map::value_type &ref,difference)
 			uniques.insert(ref.first);
-		}
 	}
-	LOG(DataDebug,util::info) << uniques.size() << " Unique properties found in the chunks" << std::endl;
+	LOG(DataDebug,util::info) << uniques.size() << " Chunk-unique properties found in the Image" << std::endl;
 	LOG(DataDebug,util::verbose_info) << util::list2string(uniques.begin(),uniques.end(),", ") << std::endl;
 
-	BOOST_FOREACH(const util::PropMap::key_type &ref,uniques){
-		properties.erase(ref);
-	}
-	LOG(DataDebug,util::info) << properties.size() << " common properties left in the image" << std::endl;
+	BOOST_FOREACH(const util::PropMap::key_type &ref,uniques)
+		common.erase(ref);
+
+	properties.join(common);
+	LOG(DataDebug,util::info) << common.size() << " common properties saved into the image" << std::endl;
 	LOG(DataDebug,util::verbose_info) << util::list2string(properties.begin(),properties.end(),", ") << std::endl;
 	
 	init(size);
@@ -143,8 +144,7 @@ std::pair<size_t,size_t> Image::commonGet (size_t first,size_t second,size_t thi
 	const size_t idx[]={first,second,third,fourth};
 	if(!rangeCheck(idx)){
 		LOG(DataDebug,isis::util::error)
-		<< "Index " << first << "|" << second << "|" << third << "|" << fourth << " is out of range (" << sizeToString() << ")"
-		<< std::endl;
+		<< "Index " << util::list2string(idx,idx+4,"|") << " is out of range (" << sizeToString() << ")" 	<< std::endl;
 	}
 	
 	const size_t index=dim2Index(idx);
@@ -157,7 +157,7 @@ const Chunk& Image::getChunkAt(size_t at)const
 }
 Chunk& Image::getChunkAt(size_t at)
 {
-	//we must cast away the const here because std::set has no non-const iterators
+	//@todo we must cast away the const here because std::set has no non-const iterators
 	Chunk &ret=const_cast<Chunk&>(*(lookup[at]));
 	return ret;
 }
@@ -178,7 +178,8 @@ const Chunk& Image::getChunk (size_t first,size_t second,size_t third,size_t fou
 	return getChunkAt(index);
 }
 
-size_t Image::getChunkStride ( size_t base_stride ) {
+size_t Image::getChunkStride ( size_t base_stride )
+{
 	MAKE_LOG(DataLog);
 	MAKE_LOG(DataDebug);
 	size_t ret;
@@ -233,14 +234,15 @@ size_t Image::getChunkStride ( size_t base_stride ) {
 	return ret;
 }
 
-std::list<util::PropMap::mapped_type> Image::getChunkProperties(const util::PropMap::key_type& key, bool unique)const
+std::list<util::PropMap::mapped_type> Image::getChunksProperties(const util::PropMap::key_type& key, bool unique)const
 {
 	std::list<util::PropertyValue > ret;
 	for(ChunkSet::const_iterator i=set.begin();i!=set.end();i++){
 		const util::PropertyValue &prop=i->getPropertyValue(key);
 		if(unique && prop.empty()) //if unique is requested and the property is empty
 			continue; //skip it
-		else if(unique && !(ret.empty() ||  prop == ret.back())) //if unique is requested and the property is equal to the one added before
+		else if(unique && !(ret.empty() ||  prop == ret.back()))
+			//if unique is requested and the property is equal to the one added before
 			continue;//skip it
 		else
 			ret.push_back(prop);

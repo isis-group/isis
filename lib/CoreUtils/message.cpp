@@ -91,6 +91,8 @@ LogLevel _internal::MessageHandlerBase::m_stop_below=error;
 
 
 }}
+
+/// @cond _hidden
 namespace std{
 isis::util::_internal::Message& endl(isis::util::_internal::Message& __os) {
 	if(__os.shouldCommit()){
@@ -101,5 +103,5 @@ isis::util::_internal::Message& endl(isis::util::_internal::Message& __os) {
 	}
 	return __os;
 }
-
 }
+/// @endcond
