@@ -15,18 +15,19 @@
 #include <iostream>
 #include "CoreUtils/log.hpp"
 #include "common.hpp"
-#include <boost/filesystem.hpp>
 #include <boost/regex.hpp>
 #include <boost/foreach.hpp>
 
 namespace isis{ namespace data{
 
-IOFactory::IOFactory(){
+IOFactory::IOFactory()
+{
 	MAKE_LOG(DataDebug);
 	findPlugins(std::string(BUILD_PATH));
 }
 
-bool IOFactory::registerFormat(FileFormatPtr plugin){
+bool IOFactory::registerFormat(FileFormatPtr plugin)
+{
 	MAKE_LOG(DataLog);
 	if(!plugin)return false;
 
@@ -43,7 +44,8 @@ bool IOFactory::registerFormat(FileFormatPtr plugin){
 	return true;
 }
 
-unsigned int IOFactory::findPlugins(std::string path){
+unsigned int IOFactory::findPlugins(std::string path)
+{
 	MAKE_LOG(DataLog);
 	boost::filesystem::path p(path);
 	if (!exists(p)){
@@ -86,23 +88,26 @@ unsigned int IOFactory::findPlugins(std::string path){
 	return ret;
 }
 
-std::list<std::string> IOFactory::getSuffixes(const FileFormatPtr& reader){
+std::list<std::string> IOFactory::getSuffixes(const FileFormatPtr& reader)
+{
 	const boost::sregex_token_iterator token_begin=boost::make_regex_token_iterator(reader->suffixes(), boost::regex("\\s+"), -1);
 	const boost::sregex_token_iterator token_end;
 
 	return std::list<std::string>(token_begin,token_end);
 }
 
-IOFactory& IOFactory::get(){
+IOFactory& IOFactory::get()
+{
 	static IOFactory ret;
 	return ret;
 }
 
-data::ChunkList IOFactory::loadFile(
-		const std::string& filename, const std::string& dialect){
+data::ChunkList IOFactory::loadFile(const boost::filesystem::path& filename, const std::string& dialect)
+{
 	MAKE_LOG(DataLog);
-
-	FileFormatList formatReader = getFormatReader(filename, dialect);
+	MAKE_LOG(DataDebug);
+	
+	FileFormatList formatReader = getFormatReader(filename.string(), dialect);
 	if(true == formatReader.empty()){//no suitable plugin
 		LOG(DataLog,util::error)
 				<< "Missing plugin to open file: " << filename << " with dialect: " << dialect << std::endl;
@@ -110,20 +115,22 @@ data::ChunkList IOFactory::loadFile(
 	}
 
 	for(FileFormatList::const_iterator it = formatReader.begin(); it != formatReader.end(); it++) {
-		data::ChunkList loadedChunks = (*it)->load(filename, dialect);
-		if (false == loadedChunks.empty()){//load succesfully
-			LOG(DataLog,util::info)
-					<< "plugin to load file " <<  filename << " : " << (*it)->name() << " with dialect: " << dialect << std::endl;
+		LOG(DataDebug,util::info)
+			<< "plugin to load file " <<  filename << " : " << (*it)->name() << " with dialect: " << dialect << std::endl;
+		const data::ChunkList loadedChunks = (*it)->load(filename.string(), dialect);
+		if (not loadedChunks.empty()){//load succesfully
+			LOG(DataLog,util::verbose_info)
+				<< "loaded " << loadedChunks.size() << " Chunks from " <<  filename << std::endl;
 			return loadedChunks;
 		}
 	}
 	LOG(DataLog,util::error)
-		<< "Could not open file: " << filename <<std::endl;
+		<< "Could not open file: " << filename << std::endl; //@todo error message missing
 	return data::ChunkList();//no plugin of proposed list could load file
 }
 
-IOFactory::FileFormatList IOFactory::getFormatReader(const std::string& filename, const std::string& dialect){
-
+IOFactory::FileFormatList IOFactory::getFormatReader(const std::string& filename, const std::string& dialect)
+{
 	MAKE_LOG(DataLog);
 	size_t pos = filename.find_first_of(".", 1);
 	if (std::string::npos == pos){
@@ -141,5 +148,32 @@ IOFactory::FileFormatList IOFactory::getFormatReader(const std::string& filename
 	}
 	return reader;
 }
+
+
+data::ImageList IOFactory::load(const std::string& path, const std::string& dialect)
+{
+	MAKE_LOG(DataLog);
+	const boost::filesystem::path p(path);
+	const ChunkList chunks =boost::filesystem::is_directory(p) ? loadPath(p,dialect):loadFile(p,dialect);
+	const data::ImageList images(chunks);
+	LOG(DataLog,util::info)
+		<< "Loaded " << images.size() << " images from " << p << std::endl;
+	return images;
+}
+
+ChunkList IOFactory::loadPath(const boost::filesystem::path& path, const std::string& dialect)
+{
+	MAKE_LOG(DataDebug);
+	ChunkList ret;
+	for (boost::filesystem::directory_iterator itr(path); itr!=boost::filesystem::directory_iterator(); ++itr)	{
+		if(boost::filesystem::is_directory(*itr))continue;
+		const ChunkList buff=loadFile(itr->path(),dialect);
+		ret.insert(ret.end(),buff.begin(),buff.end());
+	}
+	LOG(DataDebug,util::info)
+		<< "Got " << ret.size() << " Chunks from loading directory " << path << std::endl;
+	return ret;
+}
+
 
 }} // namespaces data isis

@@ -20,9 +20,11 @@
 #include "io_interface.h"
 #include <boost/shared_ptr.hpp>
 #include <boost/regex.hpp>
+#include <boost/filesystem.hpp>
 
 //????
 #include "chunk.hpp"
+#include "image.hpp"
 
 namespace isis {
 namespace data {
@@ -34,7 +36,16 @@ public:
 	typedef std::list<FileFormatPtr> FileFormatList;
 private:
 	typedef std::map<std::string, FileFormatPtr> FormatFormatMap;
-
+protected:
+	/**
+	* load a data file with given filename and dialect
+	* @params filename file to open
+	* @params dialect dialect of the fileformat to load
+	* @return list of chunks (part of an image)
+	*/
+	ChunkList loadFile(const boost::filesystem::path& filename, const std::string& dialect);
+	ChunkList loadPath(const boost::filesystem::path& path, const std::string& dialect);
+	
 
 public:
 	/*get all file suffixes a plugin suggests to handle
@@ -45,15 +56,7 @@ public:
 	static std::list<std::string> getSuffixes(
 	    const FileFormatPtr& reader);
 
-	/*
-	 * load a data file with given filename and dialect
-	 *@params filename file to open
-	 *@params dialect dialect of the fileformat to load
-	 *@return list of chunks (part of an image)
-	 * */
-	ChunkList loadFile(
-		const std::string& filename, const std::string& dialect);
-
+	ImageList load(const std::string& path, const std::string& dialect);
 
 	template<typename charT, typename traits> void print_formats(
 	    std::basic_ostream<charT, traits> &out) {
