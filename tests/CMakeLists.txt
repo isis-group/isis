@@ -8,10 +8,9 @@ ENDIF(BUILD_COREUTILS)
 
 IF(BUILD_DATA_IO)
 	add_subdirectory(DataStorage)
+	add_subdirectory(ImageIO)
 ENDIF(BUILD_DATA_IO)
 
 IF(BUILD_ITK)
 	add_subdirectory(extRegistration)
 ENDIF(BUILD_ITK)
-
-

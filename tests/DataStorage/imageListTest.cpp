@@ -5,7 +5,7 @@
  *      Author: proeger
  */
 
-#define BOOST_TEST_MODULE ImageTest
+#define BOOST_TEST_MODULE ImageListTest
 #include <boost/test/included/unit_test.hpp>
 #include <boost/foreach.hpp>
 #include "DataStorage/image.hpp"

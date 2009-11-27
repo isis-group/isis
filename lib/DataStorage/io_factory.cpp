@@ -108,6 +108,7 @@ data::ChunkList IOFactory::loadFile(const boost::filesystem::path& filename, con
 	MAKE_LOG(DataDebug);
 	
 	FileFormatList formatReader = getFormatReader(filename.string(), dialect);
+	
 	if(true == formatReader.empty()){//no suitable plugin
 		LOG(DataLog,util::error)
 				<< "Missing plugin to open file: " << filename << " with dialect: " << dialect << std::endl;
@@ -115,8 +116,10 @@ data::ChunkList IOFactory::loadFile(const boost::filesystem::path& filename, con
 	}
 
 	for(FileFormatList::const_iterator it = formatReader.begin(); it != formatReader.end(); it++) {
-		LOG(DataDebug,util::info)
-			<< "plugin to load file " <<  filename << " : " << (*it)->name() << " with dialect: " << dialect << std::endl;
+		LOG(DataDebug,util::info) << "plugin to load file " <<  filename << ": " << (*it)->name();
+		if(dialect=="")LOG(DataDebug,util::info) << " with dialect: " << dialect;
+		LOG(DataDebug,util::info) << std::endl; //@fixme log is not printed
+		
 		const data::ChunkList loadedChunks = (*it)->load(filename.string(), dialect);
 		if (not loadedChunks.empty()){//load succesfully
 			LOG(DataLog,util::verbose_info)
@@ -154,7 +157,9 @@ data::ImageList IOFactory::load(const std::string& path, const std::string& dial
 {
 	MAKE_LOG(DataLog);
 	const boost::filesystem::path p(path);
-	const ChunkList chunks =boost::filesystem::is_directory(p) ? loadPath(p,dialect):loadFile(p,dialect);
+	const ChunkList chunks =boost::filesystem::is_directory(p) ?
+		get().loadPath(p,dialect):
+		get().loadFile(p,dialect);
 	const data::ImageList images(chunks);
 	LOG(DataLog,util::info)
 		<< "Loaded " << images.size() << " images from " << p << std::endl;

@@ -38,31 +38,29 @@ private:
 	typedef std::map<std::string, FileFormatPtr> FormatFormatMap;
 protected:
 	/**
-	* load a data file with given filename and dialect
-	* @params filename file to open
-	* @params dialect dialect of the fileformat to load
-	* @return list of chunks (part of an image)
-	*/
+	 * load a data file with given filename and dialect
+	 * @params filename file to open
+	 * @params dialect dialect of the fileformat to load
+	 * @return list of chunks (part of an image)
+	 */
 	ChunkList loadFile(const boost::filesystem::path& filename, const std::string& dialect);
 	ChunkList loadPath(const boost::filesystem::path& path, const std::string& dialect);
 	
 
 public:
-	/*get all file suffixes a plugin suggests to handle
+	/**
+	 * get all file suffixes a plugin suggests to handle
 	 * @param reader the plugin to ask
-	 *
 	 * @return a list of suffixes the plugin handles
-	 * */
-	static std::list<std::string> getSuffixes(
-	    const FileFormatPtr& reader);
+	 */
+	static std::list<std::string> getSuffixes(const FileFormatPtr& reader);
 
-	ImageList load(const std::string& path, const std::string& dialect);
+	static ImageList load(const std::string& path, const std::string& dialect);
 
-	template<typename charT, typename traits> void print_formats(
-	    std::basic_ostream<charT, traits> &out) {
-		for(std::list<FileFormatPtr>::const_iterator it = io_formats.begin(); it != io_formats.end(); it++) {
+	template<typename charT, typename traits> static void print_formats(std::basic_ostream<charT, traits> &out)
+	{
+		for(std::list<FileFormatPtr>::const_iterator it = get().io_formats.begin(); it != get().io_formats.end(); it++)
 			out << (*it)->name() << std::endl;
-		}
 	}
 
 	static IOFactory &get();
