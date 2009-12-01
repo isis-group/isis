@@ -75,7 +75,7 @@ public:
 //			std::cout << optimizer->GetValue() << " : ";
 //			std::cout << optimizer->GetCurrentPosition() << std::endl;
 
-			std::cout << optimizer->GetCurrentIteration() << "\t" <<
+			std::cout << optimizer->GetCurrentIteration() << "\t";
 			std::cout << optimizer->GetValue() << std::endl;
 
 		}
