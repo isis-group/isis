@@ -58,17 +58,20 @@ FIND_FILE(SVNVERSION svnversion
     PATHS /usr/bin /usr/local/bin 
     DOC "The subversion revision information tool.")
 
-IF (SVNVERSION)
-  EXECUTE_PROCESS(COMMAND ${SVNVERSION} 
-      OUTPUT_VARIABLE OUT
-      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-  string(REGEX MATCH "exported" EXPORTED "${OUT}")
-  IF (NOT EXPORTED)
-      string(REGEX MATCH "^[0-9]+" SVN_REVISION "${OUT}") #@todo wont work with more complex revisions/modified sources
-  ELSE (NOT EXPORTED)
-      set(SVN_REVISION "exported")
-  ENDIF (NOT EXPORTED)
-ENDIF (SVNVERSION)
+IF (NOT SVN_REVISION)
+	IF (SVNVERSION)
+		EXECUTE_PROCESS(COMMAND ${SVNVERSION} 
+			OUTPUT_VARIABLE OUT
+			WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+		string(REGEX MATCH "exported" EXPORTED "${OUT}")
+		IF (NOT EXPORTED)
+			string(REGEX MATCH "^[0-9]+" SVN_REVISION "${OUT}") #@todo wont work with more complex revisions/modified sources
+		ELSE (NOT EXPORTED)
+			set(SVN_REVISION "exported")
+		ENDIF (NOT EXPORTED)
+	ENDIF (SVNVERSION)
+ENDIF (NOT SVN_REVISION)
+
 
 IF (SVN_REVISION)
   message(STATUS "SVN Revision: ${SVN_REVISION}")

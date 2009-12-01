@@ -21,7 +21,8 @@
 #include <fstream>
 #include "boost/algorithm/string.hpp"
 
-#include "itkPointSet.h"
+#include "itkLandmarkBasedTransformInitializer.h"
+#include "itkVersorRigid3DTransform.h"
 
 //via command parser include
 #include "viaio/option.h"
@@ -49,7 +50,7 @@ static VString pointset_filename = NULL;
 static VString transform_filename_in = NULL;
 static VShort number_of_bins = 50;
 static VShort number_of_iterations = 1000;
-static VFloat pixel_density = 0.1;
+static VFloat pixel_density = 0.01;
 static VShort grid_size = 5;
 static VShort metricType = 0;
 static VArgVector transformType;
@@ -151,7 +152,15 @@ int main(
     typedef itk::Vector<float, Dimension> VectorType;
     typedef itk::Image<VectorType, Dimension> DeformationFieldType;
     
-    typedef itk::PointSet< float, Dimension > PointSetType;
+    typedef itk::VersorRigid3DTransform<double> VersorRigid3DTransformType;
+    typedef itk::LandmarkBasedTransformInitializer<VersorRigid3DTransformType, FixedImageType, MovingImageType>
+    		RigidLandmarkBasedTransformInitializerType;
+
+    typedef itk::PointSet<float, Dimension> PointSetType;
+
+    typedef itk::VersorRigid3DTransform<double> VersorRigid3DTransformType;
+    typedef itk::LandmarkBasedTransformInitializer<VersorRigid3DTransformType, FixedImageType, MovingImageType>
+			LandmarkBasedTransformInitializerType;
 
     typedef itk::ImageFileWriter<DeformationFieldType> VectorWriterType;
     
@@ -168,9 +177,8 @@ int main(
 
     ImageMaskSpatialObjectType::Pointer mask = ImageMaskSpatialObjectType::New();
     
-    PointSetType::PointsContainer::Pointer fixedPointsContainer = PointSetType::PointsContainer::New();
-    PointSetType::PointsContainer::Pointer movingPointsContainer = PointSetType::PointsContainer::New();
-    
+
+
     fixedReader->SetFileName(ref_filename);
     movingReader->SetFileName(in_filename);
 
@@ -334,8 +342,9 @@ int main(
 		registrationFactory->SetFixedImageMask(mask);
 	}
 	
-	if(pointset_filename and pointset_found)
+	if(pointset_filename)
 	{
+		registrationFactory->UserOptions.LANDMARKINITIALIZE = true;
 	    std::ifstream pointSetFile;
 	    pointSetFile.open(pointset_filename);
 	    if(pointSetFile.fail())
@@ -343,22 +352,36 @@ int main(
 		std::cout << "Pointset file " << pointset_filename << " not found!" << std::endl;
 		return EXIT_FAILURE;
 	    }
-	    PointSetType::PointType fixedPoint;
-	    PointSetType::PointType movingPoint;
-	    unsigned int pointId = 0;
+	    LandmarkBasedTransformInitializerType::LandmarkPointContainer fixedPointsContainer;
+	    LandmarkBasedTransformInitializerType::LandmarkPointContainer movingPointsContainer;
+	    LandmarkBasedTransformInitializerType::LandmarkPointType fixedPoint;
+	    LandmarkBasedTransformInitializerType::LandmarkPointType movingPoint;
 	    pointSetFile >> fixedPoint;
 	    pointSetFile >> movingPoint;
+
 	    while( !pointSetFile.eof() )
 	    {
-		fixedPointsContainer->InsertElement( pointId, fixedPoint );
-		movingPointsContainer->InsertElement( pointId, movingPoint );
-		pointSetFile >> fixedPoint;
-		pointSetFile >> movingPoint;
-		pointId++;
+	    	/*
+	    	for( unsigned int i = 0; i<3; i++)
+	    	{
+	    		std::cout << fixedPoint << std::endl;
+	    		std::cout << movingPoint << std::endl;
+	    		fixedPoint[i] = fixedPoint[i] * fixedReader->GetOutput()->GetSpacing()[i];
+	    		movingPoint[i] = movingPoint[i] * movingReader->GetOutput()->GetSpacing()[i];
+	    		std::cout << fixedPoint << std::endl;
+	    		std::cout << movingPoint << std::endl;
+
+	    	}
+	    	*/
+			fixedPointsContainer.push_back( fixedPoint );
+			movingPointsContainer.push_back( movingPoint );
+			pointSetFile >> fixedPoint;
+			pointSetFile >> movingPoint;
+
 	    }	    
-	   
-	    registrationFactory->SetFixedPointSet( fixedPointsContainer );
-	    registrationFactory->SetMovingPointSet( movingPointsContainer );
+
+	    registrationFactory->SetFixedPointContainer( fixedPointsContainer );
+	    registrationFactory->SetMovingPointContainer( movingPointsContainer );
 	    
 	}
 	

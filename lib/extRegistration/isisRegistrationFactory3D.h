@@ -92,12 +92,11 @@ public:
 	typedef itk::Vector<float, FixedImageDimension> VectorType;
 	typedef itk::Image<VectorType, FixedImageDimension> DeformationFieldType;
 	typedef typename DeformationFieldType::Pointer DeformationFieldPointer;
-	
-	typedef itk::PointSet<float, FixedImageDimension> PointSetType;
 
 	//typedefs for the joint mask creation
 
 	typedef itk::Image<MaskPixelType, FixedImageDimension> MaskImageType;
+	typedef typename itk::PointSet<float, FixedImageDimension> PointSetType;
 
 	typedef itk::BinaryThresholdImageFilter<FixedImageType, MaskImageType> FixedThresholdFilterType;
 	typedef itk::BinaryThresholdImageFilter<MovingImageType, MaskImageType> MovingThresholdFilterType;
@@ -265,8 +264,8 @@ public:
 	void SetInitialTransform(
 	    TransformBasePointer);
 
-	void SetMovingPointSet(typename PointSetType::PointsContainer::Pointer);
-	void SetFixedPointSet(typename PointSetType::PointsContainer::Pointer);
+	void SetMovingPointContainer(typename RigidLandmarkBasedTransformInitializerType::LandmarkPointContainer);
+	void SetFixedPointContainer(typename RigidLandmarkBasedTransformInitializerType::LandmarkPointContainer);
 	
 	//getter methods
 	RegistrationMethodPointer GetRegistrationObject(

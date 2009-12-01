@@ -52,7 +52,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::Reset(
     UserOptions.PRINTRESULTS = false;
     UserOptions.NumberOfIterations = 1000;
     UserOptions.NumberOfBins = 50;
-    UserOptions.PixelDensity = 0.1;
+    UserOptions.PixelDensity = 0.01;
     UserOptions.USEOTSUTHRESHOLDING = false;
     UserOptions.BSplineGridSize = 5;
     UserOptions.INITIALIZEOFF = false;
@@ -269,14 +269,14 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer() 
             optimizerScaleVersorRigid3D[4] = 1.0;
             optimizerScaleVersorRigid3D[5] = 1.0;
             for (unsigned int i = 0; i < m_NumberOfParameters/2; i++) {
-                optimizerScaleVersorRigid3D[i] = 1.0 / 1.0;
+                optimizerScaleVersorRigid3D[i] = 1.0 / 10.0;
             }
             m_VersorRigid3DTransformOptimizer->SetMaximumStepLength(0.1);
-            m_VersorRigid3DTransformOptimizer->SetMinimumStepLength(0.0001);
+            m_VersorRigid3DTransformOptimizer->SetMinimumStepLength(0.00001);
             m_VersorRigid3DTransformOptimizer->SetScales(optimizerScaleVersorRigid3D);
             m_VersorRigid3DTransformOptimizer->SetNumberOfIterations(UserOptions.NumberOfIterations);
-            m_VersorRigid3DTransformOptimizer->SetRelaxationFactor(0.8);
-            m_VersorRigid3DTransformOptimizer->SetMinimize(true);
+            m_VersorRigid3DTransformOptimizer->SetRelaxationFactor(0.99);
+            m_VersorRigid3DTransformOptimizer->MinimizeOn();
 
         }
 
@@ -360,6 +360,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpTransform() 
 	m_RigidLandmarkInitializer->SetFixedLandmarks(m_FixedPointContainer);
 	m_RigidLandmarkInitializer->SetFixedImage(m_FixedImage);
 	m_RigidLandmarkInitializer->SetMovingImage(m_MovingImage);
+	m_RigidLandmarkInitializer->SetTransform(m_VersorRigid3DTransform);
 	m_RigidLandmarkInitializer->InitializeTransform();
 	
 
@@ -669,17 +670,15 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::CheckImageSizes(
 }
 
 template<class TFixedImageType, class TMovingImageType>
-void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetMovingPointSet(typename PointSetType::PointsContainer::Pointer pointSet)
+void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetMovingPointContainer(typename RigidLandmarkBasedTransformInitializerType::LandmarkPointContainer pointContainer)
 {	
-    m_MovingPointContainer
-    
-   
+	m_FixedPointContainer = pointContainer;
 }
 
 template<class TFixedImageType, class TMovingImageType>
-void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetFixedPointSet(typename PointSetType::PointsContainer::Pointer pointSet)
+void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetFixedPointContainer(typename RigidLandmarkBasedTransformInitializerType::LandmarkPointContainer  pointContainer)
 {
-  
+	m_MovingPointContainer = pointContainer;
 }
 
 template<class TFixedImageType, class TMovingImageType>
