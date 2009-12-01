@@ -59,6 +59,9 @@
 #include "itkNormalizeImageFilter.h" //for ViolaWellMutualInformation. Sets mean to zero and the variance to 1
 #include "itkDiscreteGaussianImageFilter.h" // low pass filtering for ViolaWellsMutualInformation to increase robustness against noise.
 #include "itkCenteredTransformInitializer.h"
+#include "itkLandmarkBasedTransformInitializer.h"
+
+#include "itkPointSet.h"
 
 namespace isis {
 namespace registration {
@@ -89,6 +92,8 @@ public:
 	typedef itk::Vector<float, FixedImageDimension> VectorType;
 	typedef itk::Image<VectorType, FixedImageDimension> DeformationFieldType;
 	typedef typename DeformationFieldType::Pointer DeformationFieldPointer;
+	
+	typedef itk::PointSet<float, FixedImageDimension> PointSetType;
 
 	//typedefs for the joint mask creation
 
@@ -176,6 +181,9 @@ public:
 
 	typedef typename itk::CenteredTransformInitializer<AffineTransformType, TFixedImageType, TMovingImageType>
 	        AffineCenteredTransformInitializerType;
+	
+	typedef typename itk::LandmarkBasedTransformInitializer<VersorRigid3DTransformType, TFixedImageType, TMovingImageType> 
+		RigidLandmarkBasedTransformInitializerType;
 
 	enum eTransformType
 	{
@@ -221,6 +229,7 @@ public:
 		bool INITIALIZEOFF;
 		bool SHOWITERATIONSTATUS;
 		bool USEMASK;
+		bool LANDMARKINITIALIZE;
 	} UserOptions;
 
 	void Reset(
@@ -244,7 +253,7 @@ public:
 	    FixedImagePointer);
 	void SetMovingImage(
 	    MovingImagePointer);
-
+	    
 	//parameter-set methods
 	void SetUpOptimizer(
 	    void);
@@ -256,6 +265,9 @@ public:
 	void SetInitialTransform(
 	    TransformBasePointer);
 
+	void SetMovingPointSet(typename PointSetType::PointsContainer::Pointer);
+	void SetFixedPointSet(typename PointSetType::PointsContainer::Pointer);
+	
 	//getter methods
 	RegistrationMethodPointer GetRegistrationObject(
 	    void) ;
@@ -346,6 +358,10 @@ private:
 
 	typename RigidCenteredTransformInitializerType::Pointer m_RigidInitializer;
 	typename AffineCenteredTransformInitializerType::Pointer m_AffineInitializer;
+	
+	typename RigidLandmarkBasedTransformInitializerType::Pointer m_RigidLandmarkInitializer;
+	typename RigidLandmarkBasedTransformInitializerType::LandmarkPointContainer m_MovingPointContainer;
+	typename RigidLandmarkBasedTransformInitializerType::LandmarkPointContainer m_FixedPointContainer;
 
 	//registration method
 	RegistrationMethodPointer m_RegistrationObject;

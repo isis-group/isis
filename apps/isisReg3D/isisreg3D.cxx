@@ -18,6 +18,11 @@
 #include "itkTransformFileWriter.h"
 #include "itkTransformFileReader.h"
 
+#include <fstream>
+#include "boost/algorithm/string.hpp"
+
+#include "itkPointSet.h"
+
 //via command parser include
 #include "viaio/option.h"
 #include "viaio/mu.h" //this is required for VNumber
@@ -40,6 +45,7 @@ static VString ref_filename = NULL;
 static VString in_filename = NULL;
 static VString out_filename = NULL;
 static VString vout_filename = NULL;
+static VString pointset_filename = NULL;
 static VString transform_filename_in = NULL;
 static VShort number_of_bins = 50;
 static VShort number_of_iterations = 1000;
@@ -49,7 +55,7 @@ static VShort metricType = 0;
 static VArgVector transformType;
 static VShort interpolatorType = 0;
 static VArgVector optimizerType;
-static VBoolean in_found, ref_found;
+static VBoolean in_found, ref_found, pointset_found;
 static VShort number_threads = 1;
 static VShort initial_seed = 1;
 static VBoolean initialize = false;
@@ -63,6 +69,7 @@ options[] = {
 
     //non-required inputs
     {"mask", VStringRepn, 1, &mask_filename, VOptionalOpt, 0, "the mask filename"},
+    {"pointset", VStringRepn, 1, &pointset_filename, &pointset_found, 0, "the pointset filename"},
     {"out", VStringRepn, 1, &out_filename, VOptionalOpt, 0, "the output transform filename"},
     {"vout", VStringRepn, 1, &vout_filename, VOptionalOpt, 0, "the output vector image filename"},
     {"tin", VStringRepn, 1, &transform_filename_in, VOptionalOpt, 0,
@@ -143,6 +150,8 @@ int main(
 
     typedef itk::Vector<float, Dimension> VectorType;
     typedef itk::Image<VectorType, Dimension> DeformationFieldType;
+    
+    typedef itk::PointSet< float, Dimension > PointSetType;
 
     typedef itk::ImageFileWriter<DeformationFieldType> VectorWriterType;
     
@@ -158,6 +167,9 @@ int main(
     itk::TransformFileReader::Pointer transformReader = itk::TransformFileReader::New();
 
     ImageMaskSpatialObjectType::Pointer mask = ImageMaskSpatialObjectType::New();
+    
+    PointSetType::PointsContainer::Pointer fixedPointsContainer = PointSetType::PointsContainer::New();
+    PointSetType::PointsContainer::Pointer movingPointsContainer = PointSetType::PointsContainer::New();
     
     fixedReader->SetFileName(ref_filename);
     movingReader->SetFileName(in_filename);
@@ -320,6 +332,34 @@ int main(
 		mask->SetImage(maskReader->GetOutput());
 		mask->Update();
 		registrationFactory->SetFixedImageMask(mask);
+	}
+	
+	if(pointset_filename and pointset_found)
+	{
+	    std::ifstream pointSetFile;
+	    pointSetFile.open(pointset_filename);
+	    if(pointSetFile.fail())
+	    {
+		std::cout << "Pointset file " << pointset_filename << " not found!" << std::endl;
+		return EXIT_FAILURE;
+	    }
+	    PointSetType::PointType fixedPoint;
+	    PointSetType::PointType movingPoint;
+	    unsigned int pointId = 0;
+	    pointSetFile >> fixedPoint;
+	    pointSetFile >> movingPoint;
+	    while( !pointSetFile.eof() )
+	    {
+		fixedPointsContainer->InsertElement( pointId, fixedPoint );
+		movingPointsContainer->InsertElement( pointId, movingPoint );
+		pointSetFile >> fixedPoint;
+		pointSetFile >> movingPoint;
+		pointId++;
+	    }	    
+	   
+	    registrationFactory->SetFixedPointSet( fixedPointsContainer );
+	    registrationFactory->SetMovingPointSet( movingPointsContainer );
+	    
 	}
 	
         registrationFactory->UserOptions.NumberOfIterations = number_of_iterations;

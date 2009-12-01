@@ -60,6 +60,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::Reset(
     UserOptions.MattesMutualInitializeSeed = 1;
     UserOptions.SHOWITERATIONSTATUS = false;
     UserOptions.USEMASK = false;
+    UserOptions.LANDMARKINITIALIZE = false;
 
     m_NumberOfParameters = 0;
 }
@@ -352,6 +353,18 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpTransform() 
             m_AffineInitializer->InitializeTransform();
         }
     }
+    if (UserOptions.LANDMARKINITIALIZE)
+    {
+	m_RigidLandmarkInitializer = RigidLandmarkBasedTransformInitializerType::New();
+	m_RigidLandmarkInitializer->SetMovingLandmarks(m_MovingPointContainer);
+	m_RigidLandmarkInitializer->SetFixedLandmarks(m_FixedPointContainer);
+	m_RigidLandmarkInitializer->SetFixedImage(m_FixedImage);
+	m_RigidLandmarkInitializer->SetMovingImage(m_MovingImage);
+	m_RigidLandmarkInitializer->InitializeTransform();
+	
+
+    }
+    
 
     if (transform.BSPLINEDEFORMABLETRANSFORM) {
 
@@ -653,6 +666,20 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::CheckImageSizes(
 
     }
 
+}
+
+template<class TFixedImageType, class TMovingImageType>
+void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetMovingPointSet(typename PointSetType::PointsContainer::Pointer pointSet)
+{	
+    m_MovingPointContainer
+    
+   
+}
+
+template<class TFixedImageType, class TMovingImageType>
+void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetFixedPointSet(typename PointSetType::PointsContainer::Pointer pointSet)
+{
+  
 }
 
 template<class TFixedImageType, class TMovingImageType>
