@@ -4,9 +4,9 @@ add_definitions(-DDL_PREFIX=\\"${CMAKE_SHARED_LIBRARY_PREFIX}\\")
 
 #list all source files here
 IF(BUILD_SHARED_LIBS)
-    add_library(data SHARED needed.cpp chunk.cpp propertyobject.cpp ndimensional.cpp image.cpp io_factory.cpp)
+    add_library(data SHARED needed.cpp chunk.cpp propertyobject.cpp ndimensional.cpp image.cpp io_factory.cpp io_interface.cpp)
 ELSE(BUILD_SHARED_LIBS)
-    add_library(data STATIC needed.cpp chunk.cpp propertyobject.cpp ndimensional.cpp image.cpp io_factory.cpp)
+    add_library(data STATIC needed.cpp chunk.cpp propertyobject.cpp ndimensional.cpp image.cpp io_factory.cpp io_interface.cpp)
 ENDIF(BUILD_SHARED_LIBS)
 
 # needed for dlsym, dlopen, etc. pp.

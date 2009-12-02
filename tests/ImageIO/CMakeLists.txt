@@ -1,4 +1,4 @@
 
-add_executable(imageLoadTest imageLoadTest.cpp)
-target_link_libraries(imageLoadTest utils data)
+add_executable(imageIOTest imageIOTest.cpp)
+target_link_libraries(imageIOTest utils data)
 

@@ -41,9 +41,10 @@ public:
 	std::string name();
 	std::string suffixes();
 	std::string dialects();
+	size_t maxDim(){return 4;}	
 	bool tainted(){return false;}//internal plugins are not tainted
 	isis::data::ChunkList load(std::string filename,std::string dialect);
-	bool save(const isis::data::ChunkList &chunks,std::string filename,std::string dialect);
+	bool write(const data::Image &image,std::string filename,std::string dialect);
 	// ACCESS
 	// INQUIRY
 

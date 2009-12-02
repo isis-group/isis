@@ -6,31 +6,35 @@
  */
 
 #include "imageFormat_Nifti.hpp"
-
+namespace isis{ namespace image_io{
+	
 /////////////////////////////// PUBLIC ///////////////////////////////////////
 
 //============================= OPERATIONS ===================================
 
-std::string isis::image_io::ImageFormat_Nifti::suffixes(){
+
+std::string ImageFormat_Nifti::suffixes(){
 	return std::string(".nii.gz .nii");
 }
-std::string isis::image_io::ImageFormat_Nifti::dialects(){
+std::string ImageFormat_Nifti::dialects(){
 	return std::string("fsl");
 }
-std::string isis::image_io::ImageFormat_Nifti::name(){
+std::string ImageFormat_Nifti::name(){
 	return "Nifti";
 }
 
-isis::data::ChunkList isis::image_io::ImageFormat_Nifti::load ( std::string filename, std::string dialect ){
-	return isis::data::ChunkList();
+data::ChunkList ImageFormat_Nifti::load ( std::string filename, std::string dialect ){
+	return data::ChunkList();
 }
 
-bool isis::image_io::ImageFormat_Nifti::save ( const isis::data::ChunkList& chunks, std::string filename, std::string dialect ){
+bool ImageFormat_Nifti::write(const data::Image &image,std::string filename,std::string dialect){
 	return false;
 }
+
 //============================= ACCESS     ===================================
 //============================= INQUIRY    ===================================
 /////////////////////////////// PROTECTED  ///////////////////////////////////
 
 /////////////////////////////// PRIVATE    ///////////////////////////////////
 
+}}

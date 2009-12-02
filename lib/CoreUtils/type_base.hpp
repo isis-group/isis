@@ -118,11 +118,12 @@ public:
 	 * Copy operator
 	 * This operator replaces the current content by a copy of the content of src.
 	 * So its NO cheap copy. (At least not if the copy-operator contained type is not cheap)
+	 * If the source is empty the target will drop its content. Thus it will become empty as well.
+	 * \returns reference to the (just changed) target
 	 */
 	TypeReference<TYPE_TYPE>& operator=(const TypeReference<TYPE_TYPE> &src)
 	{
-		if(not src.empty())
-			reset(src->clone());
+		reset(src.empty() ? 0:src->clone());
 	}
 	/// \returns true if "contained" type has no value (a.k.a. is undefined)
 	bool empty()const{

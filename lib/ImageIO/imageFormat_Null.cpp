@@ -24,6 +24,7 @@ public:
 			for(int c=0;c<images;c++){
 				data::MemChunk<short> ch(3,3,3);
 				ch.setProperty("indexOrigin",util::fvector4(0,0,0,i));
+				ch.setProperty("sequenceNumber",c);
 				for(int x=0;x<3;x++)
 					ch.voxel<short>(x,x,x)=c+i;
 				chunks.push_back(ch);
@@ -32,10 +33,20 @@ public:
 		return chunks;//return data::ChunkList();
 	}
 	
-	virtual bool save ( const data::ChunkList& chunks, std::string filename, std::string dialect ){
-		return false;
+	bool write(const data::Image &image,std::string filename,std::string dialect ){
+		if(image.size() != util::fvector4(3,3,3,10))return false;
+		const int snum=image.getPropertyValue("sequenceNumber");
+
+		std::cout
+		<<  "If I was a real writer, I would now write an image with the sequence number "
+		<< image.getPropertyValue("sequenceNumber") << " and the size " << image.size() << " to " << filename << std::endl;
+		
+		for(int i=0;i<10;i++)
+			if(image.voxel<short>(0,0,0,i) != i+snum)return false;
+		return true;
 	}
 	bool tainted(){return false;}//internal plugins are not tainted
+	size_t maxDim(){return 4;}
 };
 }}
 isis::image_io::FileFormat* factory(){

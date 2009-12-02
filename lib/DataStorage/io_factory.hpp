@@ -56,7 +56,8 @@ public:
 	static std::list<std::string> getSuffixes(const FileFormatPtr& reader);
 
 	static ImageList load(const std::string& path, const std::string& dialect);
-
+	static bool write(const ImageList &images,const std::string& path, const std::string& dialect);
+	
 	template<typename charT, typename traits> static void print_formats(std::basic_ostream<charT, traits> &out)
 	{
 		for(std::list<FileFormatPtr>::const_iterator it = get().io_formats.begin(); it != get().io_formats.end(); it++)
@@ -75,7 +76,7 @@ protected:
 	 * */
 	bool registerFormat(FileFormatPtr plugin);
 	unsigned int findPlugins(std::string path);
-	FileFormatList getFormatReader(const std::string& filename, const std::string& dialect);
+	FileFormatList getFormatInterface(const std::string& filename, const std::string& dialect);
 private:
 	std::map<std::string, FileFormatList> io_suffix;
 	IOFactory();//shall not be created directly

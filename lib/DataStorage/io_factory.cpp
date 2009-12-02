@@ -107,7 +107,7 @@ data::ChunkList IOFactory::loadFile(const boost::filesystem::path& filename, con
 	MAKE_LOG(DataLog);
 	MAKE_LOG(DataDebug);
 	
-	FileFormatList formatReader = getFormatReader(filename.string(), dialect);
+	FileFormatList formatReader = getFormatInterface(filename.string(), dialect);
 	
 	if(true == formatReader.empty()){//no suitable plugin
 		LOG(DataLog,util::error)
@@ -132,7 +132,7 @@ data::ChunkList IOFactory::loadFile(const boost::filesystem::path& filename, con
 	return data::ChunkList();//no plugin of proposed list could load file
 }
 
-IOFactory::FileFormatList IOFactory::getFormatReader(const std::string& filename, const std::string& dialect)
+IOFactory::FileFormatList IOFactory::getFormatInterface(const std::string& filename, const std::string& dialect)
 {
 	MAKE_LOG(DataLog);
 	size_t pos = filename.find_first_of(".", 1);
@@ -178,6 +178,37 @@ ChunkList IOFactory::loadPath(const boost::filesystem::path& path, const std::st
 	LOG(DataDebug,util::info)
 		<< "Got " << ret.size() << " Chunks from loading directory " << path << std::endl;
 	return ret;
+}
+
+bool IOFactory::write(const isis::data::ImageList& images, const std::string& filename, const std::string& dialect)
+{
+	MAKE_LOG(DataLog);
+	MAKE_LOG(DataDebug);
+	
+	FileFormatList formatWriter = get().getFormatInterface(filename, dialect);
+	
+	if(formatWriter.empty()){//no suitable plugin
+		LOG(DataLog,util::error)
+		<< "Missing plugin to write file: " << filename << " with dialect: " << dialect << std::endl;
+		return false;
+	}
+	
+	BOOST_FOREACH(FileFormatList::const_reference it,formatWriter) {
+		LOG(DataDebug,util::info)
+			<< "plugin to write file " <<  filename << ": "
+			<< it->name() << std::endl; 
+		
+		if (it->write(images,filename, dialect)){//succesfully written
+			LOG(DataDebug,util::info) << images.size() << " images written using " <<  it->name() << std::endl; 
+			return true;
+		} else
+			LOG(DataLog,util::error)
+			<< " could not write " <<  images.size()
+			<< " images using " <<  it->name() << std::endl;
+	}
+	LOG(DataLog,util::error)
+		<< "Could not write to: " << filename << std::endl; //@todo error message missing
+	return false;
 }
 
 

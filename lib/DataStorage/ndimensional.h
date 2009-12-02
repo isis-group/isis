@@ -80,7 +80,10 @@ public:
 	bool rangeCheck(const size_t d[DIMS])const{
 		return __rangeCheck<DIMS-1>(d,dim);
 	}
-	///\returns the whole size of the object in elements of TYPE
+	/**
+	 * Get the size of the object in elements of TYPE.
+	 * \returns \f$ \prod_{i=0}^{DIMS-1} dimSize(i) \f$
+	 */
 	size_t volume()const
 	{
 	  return __dimStride<DIMS>(dim);

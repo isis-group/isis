@@ -19,8 +19,8 @@ BOOST_AUTO_TEST_CASE (imageLoadtest)
 {
 	ENABLE_LOG(util::CoreLog,util::DefaultMsgPrint,util::warning);
 	ENABLE_LOG(util::CoreDebug,util::DefaultMsgPrint,util::warning);
-	ENABLE_LOG(data::DataLog,util::DefaultMsgPrint,util::info);
-	ENABLE_LOG(data::DataDebug,util::DefaultMsgPrint,util::info);
+	ENABLE_LOG(data::DataLog,util::DefaultMsgPrint,util::verbose_info);
+	ENABLE_LOG(data::DataDebug,util::DefaultMsgPrint,util::verbose_info);
 	
 	data::ImageList images=data::IOFactory::load("test.null.gz", "");
 
@@ -34,6 +34,6 @@ BOOST_AUTO_TEST_CASE (imageLoadtest)
 			BOOST_CHECK(ref->voxel<short>(0,0,0,i) == i+cnt);
 		cnt++;
 	}
-	
+	BOOST_CHECK(data::IOFactory::write(images,"test.null.gz",""));
 }
 }}
