@@ -126,7 +126,7 @@ bool Image::reIndex() {
 	LOG(DataDebug,util::info) << common.size() << " common properties saved into the image" << std::endl;
 	LOG(DataDebug,util::verbose_info) << util::list2string(common.begin(),common.end(),", ") << std::endl;
 	
-	LOG(DataDebug,util::verbose_info) << "It now has: " << util::list2string(properties.begin(),properties.end(),", ") << std::endl;
+	LOG(DataDebug,util::verbose_info) << "It now has: " << util::list2string(properties.begin(),properties.end(),",") << std::endl;
 
 	//get indexOrigin from the first chunk
 	setProperty("indexOrigin",chunksBegin()->getPropertyValue("indexOrigin"));

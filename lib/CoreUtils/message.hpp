@@ -30,7 +30,7 @@ class MSubject : public std::string{
 	public:
 		template<typename T> MSubject(const T& cont) {
 			std::ostringstream text;
-			text << cont; 
+			text << cont;
 			assign(text.str());
 		}
 };

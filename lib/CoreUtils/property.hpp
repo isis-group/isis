@@ -49,17 +49,6 @@ public:
 	 * \param _needed flag if this PropertyValue is needed an thus not allowed to be empty (a.k.a. undefined)
 	 */
 	PropertyValue(bool _needed = false);
-	/**
-	 * Implicit conversion of the property value to its actual type.
-	 * Does a TypeBase::cast_to_type\<T\>() and returns a copy of its value.
-	 * Trying to convert to another type that the property was created from will raise a bad_cast exception at runtime.
-	 * \returns a copy of the stored value
-	 */
-	template<typename T> operator T()const{
-		const element_type *dummy=get();
-		const Type<T> ret=dummy->cast_to_Type<T>();
-		return (T)ret;
-	}
 	/// Accessor for the needed flag
 	bool &needed();
 	bool needed()const;

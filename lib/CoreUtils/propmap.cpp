@@ -86,7 +86,7 @@ void PropMap::join(const isis::util::PropMap& second, bool overwrite, PropMap::k
 		iterator found=find(ref.first);
 		if(found != this->end()){ // if its allready here
 			if(found->second.empty() || overwrite){
-				LOG(CoreDebug,verbose_info) << "Replacing " << found->first << " by " << ref.second << std::endl;
+				LOG(CoreDebug,verbose_info) << "Replacing " << MSubject(*found) << " by " << MSubject(ref.second) << std::endl;
 				found->second=ref.second;
 			}
 		} else {

@@ -35,11 +35,11 @@ public:
 	
 	bool write(const data::Image &image,std::string filename,std::string dialect ){
 		if(image.size() != util::fvector4(3,3,3,10))return false;
-		const int snum=image.getPropertyValue("sequenceNumber");
+		const int snum=image.getProperty<int>("sequenceNumber");
 
 		std::cout
 		<<  "If I was a real writer, I would now write an image with the sequence number "
-		<< image.getPropertyValue("sequenceNumber") << " and the size " << image.size() << " to " << filename << std::endl;
+		<< image.getPropertyValue("sequenceNumber") << " and the size " << image.sizeToString() << " to " << filename << std::endl;
 		
 		for(int i=0;i<10;i++)
 			if(image.voxel<short>(0,0,0,i) != i+snum)return false;

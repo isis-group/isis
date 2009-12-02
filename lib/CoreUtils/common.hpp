@@ -39,7 +39,7 @@ template<class InputIterator,typename _CharT, typename _Traits> std::basic_ostre
 write_list(InputIterator start,InputIterator end,
 		   std::basic_ostream<_CharT, _Traits> &o,
 		   std::string delim=" ",
-		   std::string prefix="",std::string suffix=""){
+		   std::string prefix="{",std::string suffix="}"){
 	o << prefix;
 	if(start!=end)o << *start; start++;
 	for(InputIterator i=start;i!=end;i++)
@@ -52,7 +52,7 @@ write_list(InputIterator start,InputIterator end,
 template<class InputIterator> std::string list2string(
 	InputIterator start,InputIterator end,
 	std::string delim=" ",
-	std::string prefix="",std::string suffix="")
+	std::string prefix="{",std::string suffix="}")
 {
 	std::ostringstream ret;
 	write_list(start,end,ret,delim,prefix,suffix);
@@ -78,7 +78,7 @@ namespace std {
 template<typename charT, typename traits, typename _FIRST, typename _SECOND > basic_ostream<charT, traits>&
 operator<<(basic_ostream<charT, traits> &out, const pair<_FIRST,_SECOND> &s)
 {
-	return out << "<" << s.first << "|" << s.second << ">";
+	return out << s.first << ":" << s.second;
 }
 
 /// Streaming output for std::map
@@ -86,12 +86,7 @@ template<typename charT, typename traits,
 typename _Key, typename _Tp, typename _Compare, typename _Alloc > basic_ostream<charT, traits>&
 operator<<(basic_ostream<charT, traits> &out,const map<_Key,_Tp,_Compare,_Alloc>& s)
 {
-	typename map<_Key,_Tp,_Compare,_Alloc>::const_iterator i=s.begin();
-	if(i!=s.end()){
-		out << i->first << ": " << i->second;
-		for(i++;i!=s.end();i++)
-			out << std::endl << i->first << ": " << i->second;
-	}
+	isis::util::write_list(s.begin(),s.end(),out,"\n","","");
 	return out;
 }
 	
