@@ -248,10 +248,11 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer() 
                 optimizerScaleRegularStepGradient[i] = 1.0 / 1000.0;
             }
             m_RegularStepGradientDescentOptimizer->SetMaximumStepLength(0.1);
-            m_RegularStepGradientDescentOptimizer->SetMinimumStepLength(0.0001);
+            m_RegularStepGradientDescentOptimizer->SetMinimumStepLength(0.00001);
             m_RegularStepGradientDescentOptimizer->SetScales(optimizerScaleRegularStepGradient);
             m_RegularStepGradientDescentOptimizer->SetNumberOfIterations(UserOptions.NumberOfIterations);
-            m_RegularStepGradientDescentOptimizer->SetRelaxationFactor(0.8);
+            m_RegularStepGradientDescentOptimizer->SetRelaxationFactor(0.9);
+            m_RegularStepGradientDescentOptimizer->SetGradientMagnitudeTolerance(0.00001);
             m_RegularStepGradientDescentOptimizer->SetMinimize(true);
         }
 
@@ -265,17 +266,17 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer() 
 
         if (transform.VERSORRIGID or transform.QUATERNIONRIGID or transform.CENTEREDEULER3DTRANSFORM) {
 
-            optimizerScaleVersorRigid3D[3] = 1.0;
-            optimizerScaleVersorRigid3D[4] = 1.0;
-            optimizerScaleVersorRigid3D[5] = 1.0;
-            for (unsigned int i = 0; i < m_NumberOfParameters/2; i++) {
-                optimizerScaleVersorRigid3D[i] = 1.0 / 10.0;
+            optimizerScaleVersorRigid3D[0] = 1.0;
+            optimizerScaleVersorRigid3D[1] = 1.0;
+            optimizerScaleVersorRigid3D[2] = 1.0;
+            for (unsigned int i = 3; i < m_NumberOfParameters; i++) {
+                optimizerScaleVersorRigid3D[i] = 1.0 / 1000.0;
             }
             m_VersorRigid3DTransformOptimizer->SetMaximumStepLength(0.1);
-            m_VersorRigid3DTransformOptimizer->SetMinimumStepLength(0.00001);
+            m_VersorRigid3DTransformOptimizer->SetMinimumStepLength(0.0001);
             m_VersorRigid3DTransformOptimizer->SetScales(optimizerScaleVersorRigid3D);
             m_VersorRigid3DTransformOptimizer->SetNumberOfIterations(UserOptions.NumberOfIterations);
-            m_VersorRigid3DTransformOptimizer->SetRelaxationFactor(0.99);
+            m_VersorRigid3DTransformOptimizer->SetRelaxationFactor(0.9);
             m_VersorRigid3DTransformOptimizer->MinimizeOn();
 
         }
