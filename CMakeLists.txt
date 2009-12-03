@@ -1,12 +1,11 @@
-cmake_minimum_required(VERSION 2.4)
+cmake_minimum_required(VERSION 2.6)
 
 # the ISIS project
 project(isis)
 
-# add path for new modules
-# set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
-# 	"${CMAKE_SOURCE_DIR}/cmake/Modules")
-
+###############################################################################
+#Global options
+###############################################################################
 FIND_PACKAGE(Boost COMPONENTS filesystem regex system)
 include_directories(${Boost_INCLUDE_DIR}  lib)
 
@@ -21,6 +20,11 @@ OPTION(BUILD_ITK "Build the ITK stuff." OFF)
 OPTION(RUNTIME_LOG "Enable runtime logging" ON)
 OPTION(DEBUG_LOG "Enable debug logging" ON)
 
+SET(ISIS_INSTALL_BIN_DIR "${CMAKE_BINARY_DIR}/bin/")
+
+###############################################################################
+#Global definitions/compiler flags
+###############################################################################
 if(RUNTIME_LOG)
 	add_definitions(-D_ENABLE_DATA_LOG=1)
 	add_definitions(-D_ENABLE_CORE_LOG=1)
@@ -37,7 +41,7 @@ else(DEBUG_LOG)
 	add_definitions(-D_ENABLE_CORE_DEBUG=0)
 endif(DEBUG_LOG)
 
-
+#If we do a static build at least the plugins will be dynamic, so we need -fPIC
 if (NOT BUILD_SHARED_LIBS)
 	IF("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
 		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC"  )
@@ -48,9 +52,7 @@ if (NOT BUILD_SHARED_LIBS)
 	ENDIF("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
 endif(NOT BUILD_SHARED_LIBS)
 	
-add_subdirectory(lib)
-
-SET(ISIS_INSTALL_BIN_DIR "${CMAKE_BINARY_DIR}/bin/")
+add_definitions(-DSOURCE_ROOT="${CMAKE_HOME_DIRECTORY}")
 
 # Set the revision number if this dir is a svn working copy.
 # The revision number will be stored in SVN_REVISION.
@@ -72,11 +74,16 @@ IF (NOT SVN_REVISION)
 	ENDIF (SVNVERSION)
 ENDIF (NOT SVN_REVISION)
 
-
 IF (SVN_REVISION)
   message(STATUS "SVN Revision: ${SVN_REVISION}")
   add_definitions(-D_SVN_REVISION=${SVN_REVISION})
 endif(SVN_REVISION)
+
+###############################################################################
+#Subdirs
+###############################################################################
+
+add_subdirectory(lib)
 
 IF(BUILD_APPLICATIONS)
 	add_subdirectory(apps)

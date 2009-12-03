@@ -1,13 +1,5 @@
-cmake_policy(SET CMP0005 OLD) #make it complain about escaped Preprocessor definition
-add_definitions(-DDL_SUFFIX=\\"${CMAKE_SHARED_LIBRARY_SUFFIX}\\")
-add_definitions(-DDL_PREFIX=\\"${CMAKE_SHARED_LIBRARY_PREFIX}\\")
 
-
-if(BUILD_SHARED_LIBS)
-    add_library(extitk SHARED isisTransformMerger.cpp)
-else(BUILD_SHARED_LIBS)
-    add_library(extitk STATIC isisTransformMerger.cpp)
-ENDIF(BUILD_SHARED_LIBS)
+add_library(extitk SHARED isisTransformMerger.cpp)
 
 set_target_properties(extitk PROPERTIES 
     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}

@@ -20,18 +20,8 @@ ELSE(ITK_FOUND)
     "ITK not found. Please set ITK_DIR.")
 ENDIF(ITK_FOUND)
 
-IF(CMAKE_BUILD_TYPE MATCHES "Debug")
-  ADD_DEFINITIONS(-DDEBUG)
-ENDIF()
-
-#add definitions, compiler switches, etc.
-#ADD_DEFINITIONS(-Wall -O2)
-
-
 #the executables
-ADD_EXECUTABLE(isisreg3d
-	isisreg3D.cxx
-	)
+ADD_EXECUTABLE(isisreg3d isisreg3D.cxx)
 
 set_target_properties(isisreg3d PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${ISIS_INSTALL_BIN_DIR}
@@ -39,4 +29,3 @@ set_target_properties(isisreg3d PROPERTIES
 
 # link versus ITK library
 TARGET_LINK_LIBRARIES(isisreg3d  ITKIO ITKSpatialObject ITKNumerics ITKStatistics extitk viaio)
-
