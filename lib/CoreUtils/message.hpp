@@ -18,6 +18,7 @@
 #include <ctime>
 #include <list>
 #include <iostream>
+#include <boost/filesystem/path.hpp>
 
 namespace isis{
 /*! \addtogroup util
@@ -57,7 +58,8 @@ public:
 
 class Message: public std::ostringstream{
 public:
-	std::string object,file;
+	std::string object;
+	boost::filesystem::path file;
 	std::list<std::string> subjects;
 	time_t timeStamp;
 	int line;
@@ -65,6 +67,7 @@ public:
 	MessageHandlerBase *commitTo;
 	Message(std::string object,std::string file,int line,LogLevel level,MessageHandlerBase *commitTo);
 	Message(const Message &src);
+	~Message();
 	std::string merge()const;
 	std::string strTime()const;
 	template<typename T> Message &operator << (T val){
@@ -77,7 +80,7 @@ public:
 		*((std::ostringstream*)this) << "{s}";
 		return *this;
 	}
-  
+	//@todo obsolete - still there for backward compatibility
 	Message &operator << (Message & (*op)(Message& os)){
 		return (*op)(*this);
 	}
@@ -94,14 +97,6 @@ public:
 	void commit(const _internal::Message &mesg);
 	static void setStream( std::ostream &_o);
 };
-
-class DefaultMsgPrintNeq : public DefaultMsgPrint {
-	std::string last;
-public:
-	DefaultMsgPrintNeq(LogLevel level):DefaultMsgPrint(level){}
-	void commit(const _internal::Message &mesg);
-};
-
 
 template<class MODULE>class MessageQueue : public _internal::MessageHandlerBase {
 	std::list<_internal::Message> msg;

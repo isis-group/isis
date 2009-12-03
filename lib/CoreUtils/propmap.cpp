@@ -74,23 +74,22 @@ void PropMap::make_unique (const util::PropMap& second, PropMap::key_list ignore
 }
 
 void PropMap::join(const isis::util::PropMap& second, bool overwrite, PropMap::key_list ignore) {
-	MAKE_LOG(CoreDebug);
 	LOG(CoreDebug,info)
 		<< "Comparing " << list2string(this->begin(),this->end()) << " and "
-		<< list2string(second.begin(),second.end()) << std::endl;
+		<< list2string(second.begin(),second.end());
 	BOOST_FOREACH(const_reference ref,second){
 		if(ignore.find(ref.first)!=ignore.end()){//skip any prop from the ignore-list
-			LOG(CoreDebug,verbose_info) << "Ignoring " << ref << std::endl;
+			LOG(CoreDebug,verbose_info) << "Ignoring " << ref;
 			continue;
 		}
 		iterator found=find(ref.first);
 		if(found != this->end()){ // if its allready here
 			if(found->second.empty() || overwrite){
-				LOG(CoreDebug,verbose_info) << "Replacing " << MSubject(*found) << " by " << MSubject(ref.second) << std::endl;
+				LOG(CoreDebug,verbose_info) << "Replacing " << MSubject(*found) << " by " << MSubject(ref.second);
 				found->second=ref.second;
 			}
 		} else {
-			LOG(CoreDebug,verbose_info) << "Inserting " << ref << std::endl;
+			LOG(CoreDebug,verbose_info) << "Inserting " << ref;
 			insert(ref);
 		}
 	}

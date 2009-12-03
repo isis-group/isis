@@ -74,13 +74,11 @@ public:
 	 * If _ENABLE_DATA_DEBUG is true an error message will be send (but it will still crash).
 	 */
 	template<typename TYPE> TYPE &voxel(size_t firstDim,size_t secondDim=0,size_t thirdDim=0,size_t fourthDim=0){
-		MAKE_LOG(DataDebug);
 		const size_t idx[]={firstDim,secondDim,thirdDim,fourthDim};
 		if(!rangeCheck(idx)){
 			LOG(DataDebug,isis::util::error)
 				<< "Index " << firstDim << "|" << secondDim << "|" << thirdDim << "|" << fourthDim
-				<< " is out of range (" << sizeToString() << ")"
-				<< std::endl;
+				<< " is out of range (" << sizeToString() << ")";
 		}
 		util::TypePtr<TYPE> &ret=asTypePtr<TYPE>();
 		return ret[dim2Index(idx)];
@@ -90,13 +88,11 @@ public:
 	 * \copydetails Chunk::voxel
 	 */
 	template<typename TYPE> TYPE voxel(size_t firstDim,size_t secondDim=0,size_t thirdDim=0,size_t fourthDim=0)const{
-		MAKE_LOG(DataDebug);
 		const size_t idx[]={firstDim,secondDim,thirdDim,fourthDim};
 		if(!rangeCheck(idx)){
 			LOG(DataDebug,isis::util::error)
 			<< "Index " << firstDim << "|" << secondDim << "|" << thirdDim << "|" << fourthDim
-			<< " is out of range (" << sizeToString() << ")"
-			<< std::endl;
+			<< " is out of range (" << sizeToString() << ")";
 		}
 		const util::TypePtr<TYPE> &ret=getTypePtr<TYPE>();
 		return ret[dim2Index(idx)];

@@ -1,6 +1,7 @@
 #list all source files here
 
 add_library(utils vector.cpp type_base.cpp types.cpp property.cpp propmap.cpp message.cpp)
+target_link_libraries(utils ${Boost_LIBRARIES})
 
 set_target_properties(utils PROPERTIES 
     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}

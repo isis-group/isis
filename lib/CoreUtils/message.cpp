@@ -16,6 +16,7 @@
 #include <sys/types.h>
 #include <signal.h>
 #include <unistd.h>
+#include <boost/filesystem/path.hpp>
 
 namespace isis{ namespace util{
 	
@@ -52,6 +53,15 @@ Message::Message(string _object,string _file,int _line,LogLevel _level,MessageHa
 Message::Message(const Message &src)
 : ::std::ostringstream(src.str()),object(src.object),file(src.file),subjects(src.subjects),timeStamp(src.timeStamp),line(src.line),commitTo(src.commitTo)
 {}
+Message::~Message()
+{
+	if(shouldCommit()){
+		commitTo->commit(*this);
+		str("");
+		clear();
+		commitTo->requestStop(level);
+	}
+}
 
   
 string Message::merge()const{
@@ -67,19 +77,11 @@ string Message::merge()const{
 }
 
 void DefaultMsgPrint::commit(const Message &mesg){
-	*o << "[" << mesg.file << ":" << mesg.line << "|" << mesg.object << "]\t" << mesg.merge() << std::endl;
+	*o << "[" << mesg.file.leaf() << ":" << mesg.line << "|" << mesg.object << "]\t" << mesg.merge() << std::endl;
 }
 
 void DefaultMsgPrint::setStream(::std::ostream &_o){
 	o = &_o;
-}
-
-void DefaultMsgPrintNeq::commit(const Message &mesg){
-	const string out(mesg.merge());
-	if(last!=out){
-		*o << "[" << mesg.strTime() << "|" << mesg.file << ":" << mesg.line << "::" << mesg.object << "]\t" <<  out << std::endl;
-		last=out;
-	}
 }
 
 bool Message::shouldCommit()const{
@@ -94,14 +96,7 @@ LogLevel _internal::MessageHandlerBase::m_stop_below=error;
 
 /// @cond _hidden
 namespace std{
-isis::util::_internal::Message& endl(isis::util::_internal::Message& __os) {
-	if(__os.shouldCommit()){
-		__os.commitTo->commit(__os);
-		__os.str("");
-		__os.clear();
-		__os.commitTo->requestStop(__os.level);
-	}
-	return __os;
-}
+// @todo obsolete - still there for backward compatibility
+isis::util::_internal::Message& endl(isis::util::_internal::Message& __os) {return __os;}
 }
 /// @endcond

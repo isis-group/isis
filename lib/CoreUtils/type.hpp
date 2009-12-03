@@ -79,8 +79,7 @@ public:
 	
 	TypeBase* clone() const
 	{
-		MAKE_LOG(CoreDebug);
-		LOG(CoreDebug,verbose_info)	<< "Creating cloned copy of " << toString(true) << std::endl;
+		LOG(CoreDebug,verbose_info)	<< "Creating cloned copy of " << toString(true);
 		return new Type<TYPE>(*this);
 	}
 	
@@ -104,16 +103,14 @@ public:
 	/// Default delete-functor for c-arrays (uses free()).
 	struct BasicDeleter{
 		virtual void operator()(TYPE *p){
-			MAKE_LOG(CoreDebug);
-			LOG(CoreDebug,info) << "Freeing pointer " << p << " (" << TypePtr<TYPE>::staticName() << ") " << std::endl;
+			LOG(CoreDebug,info) << "Freeing pointer " << p << " (" << TypePtr<TYPE>::staticName() << ") ";
 			free(p);
 		};
 	};
 	/// Default delete-functor for arrays of objects (uses delete[]).
 	struct ObjectArrayDeleter{
 		virtual void operator()(TYPE *p){
-			MAKE_LOG(CoreDebug);
-			LOG(CoreDebug,info) << "Deleting object array at " << p << " (" << TypePtr<TYPE>::staticName() << ") " << std::endl;
+			LOG(CoreDebug,info) << "Deleting object array at " << p << " (" << TypePtr<TYPE>::staticName() << ") ";
 			delete[] p;
 		};
 	};
@@ -151,9 +148,8 @@ public:
 	/// Copies the data pointed to into another TypePtr of the same type
 	void deepCopy(TypePtr<TYPE> &dst)
 	{
-		MAKE_LOG(CoreLog);
 		if(m_len!=dst.len())
-			LOG(CoreLog,error) << "Source and destination do not have the same size, using the smaller" << std::endl;
+			LOG(CoreLog,error) << "Source and destination do not have the same size, using the smaller";
 		boost::shared_ptr<TYPE> &pDst=(boost::shared_ptr<TYPE>)dst;
 		std::copy(
 			m_val.get(),
@@ -211,8 +207,7 @@ public:
 
 	TypePtrBase* clone() const
 	{
-		MAKE_LOG(CoreDebug);
-		LOG(CoreDebug,verbose_info)	<< "Creating cloned copy of TypePtr<" << typeName() << ">" << std::endl;
+		LOG(CoreDebug,verbose_info)	<< "Creating cloned copy of TypePtr<" << typeName() << ">";
 		return new TypePtr<TYPE>(*this);
 	}
 

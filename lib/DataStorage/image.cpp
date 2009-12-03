@@ -22,11 +22,9 @@ namespace _internal{
 	
 bool image_chunk_order::operator() ( const data::Chunk& a, const data::Chunk& b )const
 {
-	MAKE_LOG(DataDebug);
-
 	//@todo exception ??
 	if(!(a.hasProperty("indexOrigin") && a.hasProperty("indexOrigin"))){
-		LOG(DataDebug,util::error) << "The chunk has no position, it can not be sorted into the image." << std::endl;
+		LOG(DataDebug,util::error) << "The chunk has no position, it can not be sorted into the image.";
 		return false;
 	}
 
@@ -46,16 +44,15 @@ Image::Image (_internal::image_chunk_order lt ) :set ( lt ),PropertyObject(neede
 
 
 bool Image::insertChunk ( const Chunk &chunk ) {
-	MAKE_LOG(DataLog);
 	if(not set.empty() && set.begin()->volume() != chunk.volume()){
 		LOG(DataLog,util::error)
-			<< "Cannot insert chunk, because its volume doesn't fit with the volume of the chunks allready in this image." << std::endl;
+			<< "Cannot insert chunk, because its volume doesn't fit with the volume of the chunks allready in this image.";
 		return false;
 	}
 	if(not chunk.sufficient()){
 		const util::PropMap::key_list missing=chunk.missing();
 		LOG(DataLog,util::error)
-			<< "Cannot insert chunk. Missing properties: " << util::list2string(missing.begin(),missing.end(),", ","<",">") << std::endl;
+			<< "Cannot insert chunk. Missing properties: " << util::list2string(missing.begin(),missing.end(),", ","<",">");
 		return false;
 	}
 	if(set.insert(chunk).second){
@@ -66,11 +63,9 @@ bool Image::insertChunk ( const Chunk &chunk ) {
 
 
 bool Image::reIndex() {
-	MAKE_LOG(DataLog);
-	MAKE_LOG(DataDebug);
 	if(set.empty()){
 		clean=true;
-		LOG(DataLog,util::warning) << "Reindexing an empty image." << std::endl;
+		LOG(DataLog,util::warning) << "Reindexing an empty image.";
 		return true;
 	}
 	
@@ -94,7 +89,7 @@ bool Image::reIndex() {
 		if(lookup.size()>1){
 			LOG(DataLog,util::error)
 			<< "Cannot handle multiple Chunks, if they have more than "
-			<< Chunk::n_dims-1 << " dimensions" << std::endl;
+			<< Chunk::n_dims-1 << " dimensions";
 			return false;
 		}
 		//if there is only one chunk, its ok - the image will consist only of this one, 
@@ -116,17 +111,17 @@ bool Image::reIndex() {
 		BOOST_FOREACH(const util::PropMap::diff_map::value_type &ref,difference)
 			uniques.insert(ref.first);
 	}
-	LOG(DataDebug,util::info) << uniques.size() << " Chunk-unique properties found in the Image" << std::endl;
-	LOG(DataDebug,util::verbose_info) << util::list2string(uniques.begin(),uniques.end(),", ") << std::endl;
+	LOG(DataDebug,util::info) << uniques.size() << " Chunk-unique properties found in the Image";
+	LOG(DataDebug,util::verbose_info) << util::list2string(uniques.begin(),uniques.end(),", ");
 
 	BOOST_FOREACH(const util::PropMap::key_type &ref,uniques)
 		common.erase(ref);
 
 	properties.join(common);
-	LOG(DataDebug,util::info) << common.size() << " common properties saved into the image" << std::endl;
-	LOG(DataDebug,util::verbose_info) << util::list2string(common.begin(),common.end(),", ") << std::endl;
+	LOG(DataDebug,util::info) << common.size() << " common properties saved into the image";
+	LOG(DataDebug,util::verbose_info) << util::list2string(common.begin(),common.end(),", ");
 	
-	LOG(DataDebug,util::verbose_info) << "It now has: " << util::list2string(properties.begin(),properties.end(),",") << std::endl;
+	LOG(DataDebug,util::verbose_info) << "It now has: " << util::list2string(properties.begin(),properties.end(),",");
 
 	//get indexOrigin from the first chunk
 	setProperty("indexOrigin",chunksBegin()->getPropertyValue("indexOrigin"));
@@ -138,20 +133,19 @@ bool Image::reIndex() {
 
 std::pair<size_t,size_t> Image::commonGet (size_t first,size_t second,size_t third,size_t fourth) const
 {
-	MAKE_LOG(DataDebug);
 	if(not clean){
 		LOG(DataDebug,util::error)
-		<< "Getting data from a non indexed image will result in undefined behavior. Run reIndex first." << std::endl;
+		<< "Getting data from a non indexed image will result in undefined behavior. Run reIndex first.";
 	}
 	if(set.empty()){
 		LOG(DataDebug,util::error)
-		<< "Getting data from a empty image will result in undefined behavior." << std::endl;
+		<< "Getting data from a empty image will result in undefined behavior.";
 	}
 	
 	const size_t idx[]={first,second,third,fourth};
 	if(!rangeCheck(idx)){
 		LOG(DataDebug,isis::util::error)
-		<< "Index " << util::list2string(idx,idx+4,"|") << " is out of range (" << sizeToString() << ")" 	<< std::endl;
+		<< "Index " << util::list2string(idx,idx+4,"|") << " is out of range (" << sizeToString() << ")";
 	}
 	
 	const size_t index=dim2Index(idx);
@@ -170,10 +164,9 @@ Chunk& Image::getChunkAt(size_t at)
 }
 	
 Chunk& Image::getChunk (size_t first,size_t second,size_t third,size_t fourth) {
-	MAKE_LOG(DataDebug);
 	if(not clean){
 		LOG(DataDebug,util::info)
-		<< "Image is not clean. Running reIndex ..." << std::endl;
+		<< "Image is not clean. Running reIndex ...";
 		reIndex();
 	}
 	const size_t index=commonGet(first,second,third,fourth).first;
@@ -187,16 +180,14 @@ const Chunk& Image::getChunk (size_t first,size_t second,size_t third,size_t fou
 
 size_t Image::getChunkStride ( size_t base_stride )
 {
-	MAKE_LOG(DataLog);
-	MAKE_LOG(DataDebug);
 	size_t ret;
 	if(set.empty()){
 		LOG(DataLog,util::error)
-		<< "Trying to get chunk stride in an empty image" << std::endl;
+		<< "Trying to get chunk stride in an empty image";
 		return 0;
 	} else if (lookup.empty()) {
 		LOG(DataDebug,util::error)
-		<< "Lookup table for chunks is empty. Do reIndex() first!" << std::endl;
+		<< "Lookup table for chunks is empty. Do reIndex() first!";
 		return 0;
 	} else if(lookup.size()>3*base_stride) {
 		/* there can't be any stride with less than 3*base_stride chunks (which would actually be an invalid image)
@@ -223,13 +214,13 @@ size_t Image::getChunkStride ( size_t base_stride )
 
 			LOG(DataDebug,util::verbose_info)
 			<< "Distance between chunk " << util::MSubject(i) << " and " << util::MSubject(i+base_stride)
-			<< " is " << dist.len() << std::endl;
+			<< " is " << dist.len();
 			
 			if(dist.sqlen() > dist1.sqlen()*4){// found an dimensional break - leave
 				ret=i+1;
 				LOG(DataDebug,util::info)
 				<< "Distance between chunk " << util::MSubject(i) << " and " << util::MSubject(i+base_stride)
-				<< " is more then twice the first distance, assuming dimensional break at " << ret << std::endl;
+				<< " is more then twice the first distance, assuming dimensional break at " << ret;
 				return ret; 
 			}
 		}
@@ -237,7 +228,7 @@ size_t Image::getChunkStride ( size_t base_stride )
 	//we didn't find any break, so we assume its a linear image |c c ... c|
 	ret=lookup.size();
 	LOG(DataDebug,util::info)
-	<< "No dimensional break found, assuming it to be at the end (" << ret << ")" << std::endl;
+	<< "No dimensional break found, assuming it to be at the end (" << ret << ")";
 	return ret;
 }
 

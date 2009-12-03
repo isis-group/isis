@@ -57,12 +57,11 @@ public:
 	 * \return Type\<T\>() otherwhise.
 	 */
 	template<typename T> util::Type<T> getProperty(const util::PropMap::key_type &key)const{
-		MAKE_LOG(DataLog);
 		const util::PropMap::mapped_type &value=getPropertyValue(key);
 		if(value.empty()){
 			const util::Type<T> dummy=T();
 			LOG(DataLog,util::error)
-				<< "Requested Property " << key << " is not set! Returning " << dummy.toString(true) << std::endl;
+				<< "Requested Property " << key << " is not set! Returning " << dummy.toString(true);
 			return dummy;
 		}
 		else

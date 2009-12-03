@@ -44,7 +44,6 @@ template<typename TYPE> TYPE __cast_to(Type<TYPE> *dest,const TYPE& value){
 class GenericType{
 protected:
 	template<typename T> const T m_cast_to(T defaultVal) const{
-		MAKE_LOG(CoreDebug);
 		if (typeID() == T::staticId()) { // ok its exactly the same type - no fiddling necessary
 			return *reinterpret_cast<const T*>(this);
 		} else {			
@@ -54,7 +53,7 @@ protected:
 			} else {
 				LOG(CoreDebug,error) 
 					<< "Cannot cast " << typeName() << " to " << T::staticName()
-					<< ". Returning \"" << defaultVal.toString() << "\"." << std::endl;
+					<< ". Returning \"" << defaultVal.toString() << "\".";
 				return defaultVal;
 			}
 		}
@@ -151,11 +150,10 @@ public:
 	* \return value of any requested type parsed from toString(false).
 	*/
 	template<class T> T as()const{
-		MAKE_LOG(CoreLog);
 		if(typeID()==Type<T>::staticId()){
 			LOG(CoreLog,info)
 			<< "Doing dynamic cast instead of useless lexical cast from " << toString(true)
-			<< " to " << Type<T>::staticName() << std::endl;
+			<< " to " << Type<T>::staticName();
 			return this->cast_to_Type<T>();
 		}
 		return Type<T>(this->toString(false));

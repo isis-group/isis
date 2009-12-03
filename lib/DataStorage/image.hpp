@@ -112,10 +112,8 @@ public:
 	 */
 	template <typename T> T& voxel(size_t first,size_t second=0,size_t third=0,size_t fourth=0)
 	{
-		MAKE_LOG(DataDebug);
 		if(not clean){
-			LOG(DataDebug,util::info)
-			<< "Image is not clean. Running reIndex ..." << std::endl;
+			LOG(DataDebug,util::info) << "Image is not clean. Running reIndex ...";
 			reIndex();
 		}
 		

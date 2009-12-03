@@ -17,12 +17,11 @@ namespace _internal{
 	
 ChunkBase::ChunkBase ( size_t firstDim, size_t secondDim, size_t thirdDim, size_t fourthDim ):PropertyObject(needed)
 {
-	MAKE_LOG(DataLog);
 	const size_t idx[]={firstDim,secondDim,thirdDim,fourthDim};
 	init(idx);
 	if(!NDimensional<4>::volume())
 		LOG(DataLog,util::error)
-		<< "Size " << fourthDim << "|" << thirdDim << "|" << secondDim << "|" << firstDim << " is invalid" << std::endl;
+		<< "Size " << fourthDim << "|" << thirdDim << "|" << secondDim << "|" << firstDim << " is invalid";
 }
 
 ChunkBase::~ChunkBase() { }

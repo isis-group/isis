@@ -27,19 +27,17 @@ namespace isis{
 namespace util{namespace _internal{
 	
 template<class MODULE> class Log{
-	const char *file,*object;
 	inline static MessageHandlerBase* &handler(){
 		static MessageHandlerBase *msg;
 		return msg;
 	}
+	Log();//dont do this
 public:
-	Log(const char *_file,const char *_object):file(_file),object(_object){ }
-
 	template<class HANDLE_CLASS> static void enable(LogLevel enable){
 		Log<MODULE>::handler()= enable ? new HANDLE_CLASS(enable):0;
 	}
-	Message send(int line,LogLevel level)const{
-		return Message(std::string(object),std::string(file),line, level,Log<MODULE>::handler());
+	static Message send(const char file[],const char object[],int line,LogLevel level){
+		return Message(std::string(object),std::string(file),line, level,handler());
 	}
 };
 
@@ -48,14 +46,14 @@ public:
 }
 /// @endcond
 
-#define MAKE_LOG(MODULE)\
-const isis::util::_internal::Log<MODULE>  __logger_ ## MODULE (__FILE__,__PRETTY_FUNCTION__)
+// @todo obsolete - still there for backward compatibility
+#define MAKE_LOG(MODULE);
 
 #define ENABLE_LOG(MODULE,HANDLE_CLASS,set)\
 if(!MODULE::use_rel);else isis::util::_internal::Log<MODULE>::enable<HANDLE_CLASS>(set)
 
 #define LOG(MODULE,LEVEL)\
-if(!MODULE::use_rel);else __logger_ ## MODULE.send(__LINE__,LEVEL)
+if(!MODULE::use_rel);else isis::util::_internal::Log<MODULE>::send(__FILE__,__PRETTY_FUNCTION__,__LINE__,LEVEL)
 
 
 #endif
