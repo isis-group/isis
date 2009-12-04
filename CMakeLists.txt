@@ -6,7 +6,7 @@ project(isis)
 ###############################################################################
 #Global options
 ###############################################################################
-FIND_PACKAGE(Boost COMPONENTS filesystem regex system)
+FIND_PACKAGE(Boost COMPONENTS filesystem regex system )
 include_directories(${Boost_INCLUDE_DIR}  lib)
 
 OPTION(BUILD_APPLICATIONS "Build the isis application directory." OFF)
@@ -28,17 +28,21 @@ SET(ISIS_INSTALL_BIN_DIR "${CMAKE_BINARY_DIR}/bin/")
 if(RUNTIME_LOG)
 	add_definitions(-D_ENABLE_DATA_LOG=1)
 	add_definitions(-D_ENABLE_CORE_LOG=1)
+	add_definitions(-D_ENABLE_IMAGEIO_LOG=1)
 else(RUNTIME_LOG)
 	add_definitions(-D_ENABLE_DATA_LOG=0)
 	add_definitions(-D_ENABLE_CORE_LOG=0)
+	add_definitions(-D_ENABLE_IMAGEIO_LOG=0)
 endif(RUNTIME_LOG)
 
 if(DEBUG_LOG)
 	add_definitions(-D_ENABLE_DATA_DEBUG=1)
 	add_definitions(-D_ENABLE_CORE_DEBUG=1)
+	add_definitions(-D_ENABLE_IMAGEIO_DEBUG=1)
 else(DEBUG_LOG)
 	add_definitions(-D_ENABLE_DATA_DEBUG=0)
 	add_definitions(-D_ENABLE_CORE_DEBUG=0)
+	add_definitions(-D_ENABLE_IMAGEIO_DEBUG=0)
 endif(DEBUG_LOG)
 
 #If we do a static build at least the plugins will be dynamic, so we need -fPIC
