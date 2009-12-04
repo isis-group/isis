@@ -220,8 +220,10 @@ operator<<(basic_ostream<charT, traits> &out,const isis::util::_internal::Generi
 /// /// Streaming output for Type referencing classes
 template<typename charT, typename traits,typename TYPE_TYPE> basic_ostream<charT, traits>&
 operator<<(basic_ostream<charT, traits> &out,const isis::util::_internal::TypeReference<TYPE_TYPE> &s){
-	if(!s.empty())
-		out << s->toString(true);
+	out << 	(s.empty() ?
+				std::string("\xd8"): //ASCII code empty set
+				s->toString(true)
+			);
 	return out;
 }
 }

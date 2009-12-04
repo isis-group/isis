@@ -37,7 +37,7 @@ public:
 		Log<MODULE>::handler()= enable ? new HANDLE_CLASS(enable):0;
 	}
 	static Message send(const char file[],const char object[],int line,LogLevel level){
-		return Message(std::string(object),std::string(file),line, level,handler());
+		return Message(object,file,line, level,handler());
 	}
 };
 

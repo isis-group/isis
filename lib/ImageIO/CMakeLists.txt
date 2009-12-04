@@ -1,8 +1,10 @@
 add_library(isisImageFormat_Nifti SHARED imageFormat_Nifti.cpp)
 add_library(isisImageFormat_Null SHARED imageFormat_Null.cpp)
 
+find_library(LIB_NIFTI niftiio)
+
 target_link_libraries(isisImageFormat_Null utils data)
-target_link_libraries(isisImageFormat_Nifti utils data)
+target_link_libraries(isisImageFormat_Nifti utils data ${LIB_NIFTI})
 
 set_target_properties(isisImageFormat_Nifti PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}

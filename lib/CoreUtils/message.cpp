@@ -77,7 +77,8 @@ string Message::merge()const{
 }
 
 void DefaultMsgPrint::commit(const Message &mesg){
-	*o << "[" << mesg.file.leaf() << ":" << mesg.line << "|" << mesg.object << "]\t" << mesg.merge() << std::endl;
+	*o << LogLevelNames[mesg.level] << " [" << mesg.file.leaf() << ":" << mesg.line << "|" << mesg.object << "]\t" <<
+mesg.merge() << std::endl;
 }
 
 void DefaultMsgPrint::setStream(::std::ostream &_o){

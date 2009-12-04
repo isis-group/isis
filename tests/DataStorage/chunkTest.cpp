@@ -76,9 +76,10 @@ BOOST_AUTO_TEST_CASE (chunk_data_test2)//Access Chunk elements via linear index 
 
 	util::write_list(
 		sample,sample+ch.volume(),o,
-		"|",util::Type<int>(ch.volume()).toString(false)+"#"
+		"|",
+		util::Type<int>(ch.volume()).toString(false)+"#",""
 	);
-	BOOST_CHECK(o.str() == ch.getTypePtr<float>().toString());
+ 	BOOST_CHECK(o.str() == ch.getTypePtr<float>().toString());
 }
 
 BOOST_AUTO_TEST_CASE (chunk_copy_test)//Copy chunks
