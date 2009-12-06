@@ -37,7 +37,7 @@ VDictEntry TYPTransform[] = { {"Rigid", 0}, {"Affine", 1}, {"BSplineDeformable",
 
 VDictEntry TYPInterpolator[] = { {"Linear", 0}, {"BSpline", 1}, {"NearestNeighbor", 2}, {NULL}};
 
-VDictEntry TYPOptimizer[] = { {"VersorRigid", 0}, {"RegularStepGradientDescent", 1}, {"LBFGSB", 2}, {"Amoeba", 3}, {
+VDictEntry TYPOptimizer[] = { {"VersorRigid", 0}, {"RegularStepGradientDescent", 1},{"ConjugateGradient", 2}, {"LBFGSB", 3}, {"Amoeba", 4}, {"Powell", 5}, {
         NULL}
 };
 
@@ -234,12 +234,6 @@ int main(
             optimizer = 1;
         }
 
-        if (transform == 0 and optimizer != 0) {
-            std::cerr
-                << "\nIt is recommended using the rigid transform in connection with the versor rigid optimizer!\n"
-                << std::endl;
-        }
-
         if (transform == 2 and optimizer != 2) {
             std::cerr << "\nIt is recommended using the BSpline transform in connection with the LBFGSB optimizer!\n"
                       << std::endl;
@@ -312,11 +306,17 @@ int main(
             registrationFactory->SetOptimizer(RegistrationFactoryType::RegularStepGradientDescentOptimizer);
             break;
         case 2:
-            registrationFactory->SetOptimizer(RegistrationFactoryType::LBFGSBOptimizer);
+            registrationFactory->SetOptimizer(RegistrationFactoryType::ConjugateGradientOptimizer);
             break;
         case 3:
-            registrationFactory->SetOptimizer(RegistrationFactoryType::AmoebaOptimizer);
+            registrationFactory->SetOptimizer(RegistrationFactoryType::LBFGSBOptimizer);
             break;
+		case 4:
+			registrationFactory->SetOptimizer(RegistrationFactoryType::AmoebaOptimizer);
+			break;
+		case 5:
+			registrationFactory->SetOptimizer(RegistrationFactoryType::PowellOptimizer);
+			break;
         }
 
         if (transform_filename_in and counter == 0) {
@@ -392,7 +392,7 @@ int main(
         registrationFactory->UserOptions.PRINTRESULTS = true;
         registrationFactory->UserOptions.NumberOfThreads = number_threads;
         registrationFactory->UserOptions.MattesMutualInitializeSeed = initial_seed;
-	registrationFactory->UserOptions.SHOWITERATIONSTATUS = true;
+		registrationFactory->UserOptions.SHOWITERATIONSTATUS = true;
         if (!initialize)
             registrationFactory->UserOptions.INITIALIZEOFF = true;
 

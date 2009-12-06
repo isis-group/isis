@@ -28,7 +28,8 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::Reset(
     optimizer.VERSORRIGID3D = false;
     optimizer.LBFGSBOPTIMIZER = false;
     optimizer.AMOEBA = false;
-    optimizer.LEVENBERGMARQUARDT = false;
+	optimizer.POWELL = false;
+	optimizer.CONJUGATEGRADIENT = false;
 
     transform.VERSORRIGID = false;
     transform.QUATERNIONRIGID = false;
@@ -48,7 +49,8 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::Reset(
     interpolator.NEARESTNEIGHBOR = false;
 
     m_FixedImageIsBigger = false;
-
+	m_InitialTransformIsSet = false;
+	
     UserOptions.PRINTRESULTS = false;
     UserOptions.NumberOfIterations = 1000;
     UserOptions.NumberOfBins = 50;
@@ -208,6 +210,16 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetOptimizer(
         m_AmoebaOptimizer = AmoebaOptimizerType::New();
         m_RegistrationObject->SetOptimizer(m_AmoebaOptimizer);
         break;
+	case PowellOptimizer:
+		optimizer.POWELL = true;
+		m_PowellOptimizer = PowellOptimizerType::New();
+		m_RegistrationObject->SetOptimizer(m_PowellOptimizer);
+		break;
+	case ConjugateGradientOptimizer:
+		optimizer.CONJUGATEGRADIENT = true;
+		m_ConjugateGradientOptimizer = ConjugateGradientOptimizerType::New();
+		m_RegistrationObject->SetOptimizer(m_ConjugateGradientOptimizer);
+		break;
 
     }
 }
@@ -232,6 +244,36 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::UpdateParameters(
 template<class TFixedImageType, class TMovingImageType>
 void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer() {
 
+	if(optimizer.CONJUGATEGRADIENT)
+	{
+		ConjugateGradientOptimizerType::ScalesType optimizerScaleConjugateGradient(m_NumberOfParameters);
+		if (transform.VERSORRIGID or transform.QUATERNIONRIGID or transform.CENTEREDEULER3DTRANSFORM
+                or transform.CENTEREDAFFINE or transform.AFFINE or transform.BSPLINEDEFORMABLETRANSFORM) {
+            //...for the rigid transform
+            //number of parameters are dependent on the dimension of the images (2D: 4 parameter, 3D: 6 parameters)
+			if(transform.VERSORRIGID or transform.QUATERNIONRIGID or transform.CENTEREDEULER3DTRANSFORM)
+			{
+				optimizerScaleConjugateGradient[0] = 1.0;
+				optimizerScaleConjugateGradient[1] = 1.0;
+				optimizerScaleConjugateGradient[2] = 1.0;
+				for (unsigned int i = 3; i < m_NumberOfParameters; i++) {
+					optimizerScaleConjugateGradient[i] = 1.0 / 1000.0;
+				}
+			}
+			if(transform.BSPLINEDEFORMABLETRANSFORM or transform.AFFINE or transform.CENTEREDAFFINE)
+			{
+				optimizerScaleConjugateGradient.Fill(1.0);
+			}
+		    m_ConjugateGradientOptimizer->SetScales(optimizerScaleConjugateGradient);
+            m_ConjugateGradientOptimizer->SetMinimize(true);
+	
+		}
+		ConjugateGradientOptimizerType::ParametersType parameters(m_NumberOfParameters);
+		parameters.Fill(0.0);
+		m_ConjugateGradientOptimizer->SetInitialPosition(parameters);
+		std::cout << m_ConjugateGradientOptimizer->GetInitialPosition() << std::endl;
+	}
+	
     if (optimizer.REGULARSTEPGRADIENTDESCENT) {
         //setting up the regular step gradient descent optimizer...
         RegularStepGradientDescentOptimizerType::ScalesType optimizerScaleRegularStepGradient(m_NumberOfParameters);
@@ -240,13 +282,19 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer() 
                 or transform.CENTEREDAFFINE or transform.AFFINE or transform.BSPLINEDEFORMABLETRANSFORM) {
             //...for the rigid transform
             //number of parameters are dependent on the dimension of the images (2D: 4 parameter, 3D: 6 parameters)
-
-            optimizerScaleRegularStepGradient[0] = 1.0;
-            optimizerScaleRegularStepGradient[1] = 1.0;
-            optimizerScaleRegularStepGradient[2] = 1.0;
-            for (unsigned int i = 3; i < m_NumberOfParameters; i++) {
-                optimizerScaleRegularStepGradient[i] = 1.0 / 1000.0;
-            }
+			if(transform.VERSORRIGID or transform.QUATERNIONRIGID or transform.CENTEREDEULER3DTRANSFORM)
+			{
+				optimizerScaleRegularStepGradient[0] = 1.0;
+				optimizerScaleRegularStepGradient[1] = 1.0;
+				optimizerScaleRegularStepGradient[2] = 1.0;
+				for (unsigned int i = 3; i < m_NumberOfParameters; i++) {
+					optimizerScaleRegularStepGradient[i] = 1.0 / 1000.0;
+				}
+			}
+			if(transform.BSPLINEDEFORMABLETRANSFORM or transform.AFFINE or transform.CENTEREDAFFINE)
+			{
+				optimizerScaleRegularStepGradient.Fill(1.0);
+			}
             m_RegularStepGradientDescentOptimizer->SetMaximumStepLength(0.1);
             m_RegularStepGradientDescentOptimizer->SetMinimumStepLength(0.00001);
             m_RegularStepGradientDescentOptimizer->SetScales(optimizerScaleRegularStepGradient);
@@ -254,6 +302,10 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer() 
             m_RegularStepGradientDescentOptimizer->SetRelaxationFactor(0.9);
             m_RegularStepGradientDescentOptimizer->SetGradientMagnitudeTolerance(0.00001);
             m_RegularStepGradientDescentOptimizer->SetMinimize(true);
+			if(transform.BSPLINEDEFORMABLETRANSFORM)
+			{
+				m_RegularStepGradientDescentOptimizer->SetMaximumStepLength(1.0);
+			}
         }
 
         if (metric.VIOLAWELLSMUTUALINFORMATION or metric.MUTUALINFORMATIONHISTOGRAM) {
@@ -302,6 +354,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer() 
         m_LBFGSBOptimizer->SetMaximumNumberOfIterations(UserOptions.NumberOfIterations);
         m_LBFGSBOptimizer->SetMaximumNumberOfEvaluations(30);
         m_LBFGSBOptimizer->SetMaximumNumberOfCorrections(12);
+		m_LBFGSBOptimizer->SetMinimize(true);
 
     }
     if (optimizer.AMOEBA) {
@@ -317,15 +370,10 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer() 
             m_AmoebaOptimizer->MaximizeOn();
         }
     }
-
-    if (optimizer.LEVENBERGMARQUARDT) {
-        LevenbergMarquardtOptimizerType::ScalesType optimizerScaleLevenbergMarquardt(m_NumberOfParameters);
-        for (unsigned int i = 0; i < m_NumberOfParameters; i++) {
-            optimizerScaleLevenbergMarquardt[i] = 1.0 / 1000.0;
-        }
-        m_LevenbergMarquardtOptimizer->SetScales(optimizerScaleLevenbergMarquardt);
-
-    }
+	if(optimizer.POWELL)
+	{
+		
+	};
 
 }
 
@@ -336,7 +384,6 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpTransform() 
     if (!UserOptions.INITIALIZEOFF) {
 
         if (transform.VERSORRIGID) {
-		std::cout << "dhsjdhfsk" << std::endl;
             m_RigidInitializer = RigidCenteredTransformInitializerType::New();
             m_RigidInitializer->SetTransform(m_VersorRigid3DTransform);
             m_RigidInitializer->SetFixedImage(m_FixedImage);
@@ -404,7 +451,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpTransform() 
         m_BSplineTransform->SetGridSpacing(bsplineSpacing);
         m_BSplineTransform->SetGridOrigin(bsplineOrigin);
         m_BSplineTransform->SetGridRegion(bsplineRegion);
-        m_BSplineTransform->SetGridDirection(bsplineDirection);
+		m_BSplineTransform->SetGridDirection(bsplineDirection);
 
         typedef typename BSplineTransformType::ParametersType BSplineParametersType;
 
@@ -414,6 +461,11 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpTransform() 
         bsplineParameters.Fill(0.0);
 
         m_BSplineTransform->SetParameters(bsplineParameters);
+		if(m_InitialTransformIsSet)
+		{
+			m_BSplineTransform->SetBulkTransform(m_BulkTransform);
+		}
+		
         m_RegistrationObject->SetInitialTransformParameters(m_BSplineTransform->GetParameters());
 
     }
@@ -453,6 +505,12 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpMetric() {
 
         m_MattesMutualInformationMetric->SetNumberOfHistogramBins(UserOptions.NumberOfBins);
         m_MattesMutualInformationMetric->ReinitializeSeed(UserOptions.MattesMutualInitializeSeed);
+		
+		if(transform.BSPLINEDEFORMABLETRANSFORM)
+		{
+			m_MattesMutualInformationMetric->SetUseCachingOfBSplineWeights(true);
+		}
+
 
         //multi threading approach
         //m_MattesMutualInformationMetric->SetNumberOfThreads(UserOptions.NumberOfThreads);
@@ -600,10 +658,14 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetInitialTransfo
     TransformBasePointer initialTransform) {
     const char* initialTransformName = initialTransform->GetNameOfClass();
     if (!strcmp(initialTransformName, "AffineTransform") and transform.BSPLINEDEFORMABLETRANSFORM) {
-        m_BSplineTransform->SetBulkTransform(static_cast<AffineTransformType*> (initialTransform));
+        //m_BSplineTransform->SetBulkTransform(static_cast<AffineTransformType*> (initialTransform));
+		
     }
     if (!strcmp(initialTransformName, "VersorRigid3DTransform") and transform.BSPLINEDEFORMABLETRANSFORM) {
-        m_BSplineTransform->SetBulkTransform(static_cast<VersorRigid3DTransformType*> (initialTransform));
+		m_InitialTransformIsSet = true;
+		m_BulkTransform = TransformType::New();
+        m_BulkTransform = static_cast<VersorRigid3DTransformType*> (initialTransform);
+		
     }
     if (!strcmp(initialTransformName, "CenteredAffineTransform") and transform.BSPLINEDEFORMABLETRANSFORM) {
         m_BSplineTransform->SetBulkTransform(static_cast<CenteredAffineTransformType*> (initialTransform));
@@ -614,6 +676,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetInitialTransfo
         m_CenteredAffineTransform->SetTranslation(
             (static_cast<VersorRigid3DTransformType*> (initialTransform)->GetTranslation()));
         m_CenteredAffineTransform->SetMatrix((static_cast<VersorRigid3DTransformType*> (initialTransform)->GetMatrix()));
+		m_RegistrationObject->SetInitialTransformParameters(m_CenteredAffineTransform->GetParameters());
 
     }
     if (!strcmp(initialTransformName, "VersorRigid3DTransform") and transform.AFFINE) {
@@ -621,12 +684,14 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetInitialTransfo
         m_AffineTransform->SetTranslation(
             (static_cast<VersorRigid3DTransformType*> (initialTransform)->GetTranslation()));
         m_AffineTransform->SetMatrix((static_cast<VersorRigid3DTransformType*> (initialTransform)->GetMatrix()));
+		m_RegistrationObject->SetInitialTransformParameters(m_AffineTransform->GetParameters());
 
     }
     if (!strcmp(initialTransformName, "VersorRigid3DTransform") and transform.VERSORRIGID) {
         m_VersorRigid3DTransform->SetTranslation(
             (static_cast<VersorRigid3DTransformType*> (initialTransform)->GetTranslation()));
         m_VersorRigid3DTransform->SetMatrix((static_cast<VersorRigid3DTransformType*> (initialTransform)->GetMatrix()));
+		m_RegistrationObject->SetInitialTransformParameters(m_VersorRigid3DTransform->GetParameters());
 
     }
 }

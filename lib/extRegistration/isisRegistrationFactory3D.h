@@ -35,10 +35,12 @@
 
 //optimizer inlcudes
 #include "itkRegularStepGradientDescentOptimizer.h"
+#include "itkConjugateGradientOptimizer.h"
 #include "itkVersorRigid3DTransformOptimizer.h"
 #include "itkLBFGSBOptimizer.h"
 #include "itkAmoebaOptimizer.h"
-#include "itkLevenbergMarquardtOptimizer.h"
+#include "itkPowellOptimizer.h"
+
 
 //interpolator includes
 #include "itkLinearInterpolateImageFunction.h"
@@ -135,6 +137,7 @@ public:
 	//transform typedefs
 	typedef itk::TransformBase* TransformBasePointer; //not allowed to be a itk::SmartPointer because of static_cast usage
 	typedef const itk::TransformBase* ConstTransformBasePointer;
+	typedef itk::Transform<double, 3, 3> TransformType;
 
 	typedef itk::VersorRigid3DTransform<double> VersorRigid3DTransformType;
 	typedef itk::QuaternionRigidTransform<double> QuaternionRigidTransformType;
@@ -151,8 +154,9 @@ public:
 	typedef itk::VersorRigid3DTransformOptimizer VersorRigid3DTransformOptimizerType;
 	typedef itk::LBFGSBOptimizer LBFGSBOptimizerType;
 	typedef itk::AmoebaOptimizer AmoebaOptimizerType;
-	typedef itk::LevenbergMarquardtOptimizer LevenbergMarquardtOptimizerType;
-
+	typedef itk::PowellOptimizer PowellOptimizerType;
+	typedef itk::ConjugateGradientOptimizer ConjugateGradientOptimizerType;
+	
 	//metric typedefs
 	typedef itk::MattesMutualInformationImageToImageMetric<TFixedImageType, TMovingImageType>
 	        MattesMutualInformationMetricType;
@@ -206,7 +210,7 @@ public:
 
 	enum eOptimizerType
 	{
-		RegularStepGradientDescentOptimizer, VersorRigidOptimizer, LBFGSBOptimizer, AmoebaOptimizer
+		RegularStepGradientDescentOptimizer, ConjugateGradientOptimizer, VersorRigidOptimizer, LBFGSBOptimizer, AmoebaOptimizer, PowellOptimizer
 
 	};
 
@@ -306,7 +310,8 @@ private:
 		bool VERSORRIGID3D;
 		bool LBFGSBOPTIMIZER;
 		bool AMOEBA;
-		bool LEVENBERGMARQUARDT;
+		bool POWELL;
+		bool CONJUGATEGRADIENT;
 
 	} optimizer;
 
@@ -340,6 +345,7 @@ private:
 	MovingImageRegionType m_MovingImageRegion;
 
 	bool m_FixedImageIsBigger;
+	bool m_InitialTransformIsSet;
 
 	unsigned int m_NumberOfParameters;
 	
@@ -370,8 +376,9 @@ private:
 	VersorRigid3DTransformOptimizerType::Pointer m_VersorRigid3DTransformOptimizer;
 	LBFGSBOptimizerType::Pointer m_LBFGSBOptimizer;
 	AmoebaOptimizerType::Pointer m_AmoebaOptimizer;
-	LevenbergMarquardtOptimizerType::Pointer m_LevenbergMarquardtOptimizer;
-
+	PowellOptimizerType::Pointer m_PowellOptimizer;
+	ConjugateGradientOptimizerType::Pointer m_ConjugateGradientOptimizer;
+	
 	//transform
 	VersorRigid3DTransformType::Pointer m_VersorRigid3DTransform;
 	QuaternionRigidTransformType::Pointer m_QuaternionRigidTransform;
@@ -381,6 +388,8 @@ private:
 	typename CenteredAffineTransformType::Pointer m_CenteredAffineTransform;
 
 	typename BSplineTransformType::Pointer m_BSplineTransform;
+	
+	TransformType::Pointer m_BulkTransform;
 
 	//metric
 	typename MattesMutualInformationMetricType::Pointer m_MattesMutualInformationMetric;
