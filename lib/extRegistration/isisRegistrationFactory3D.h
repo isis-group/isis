@@ -35,12 +35,10 @@
 
 //optimizer inlcudes
 #include "itkRegularStepGradientDescentOptimizer.h"
-#include "itkConjugateGradientOptimizer.h"
 #include "itkVersorRigid3DTransformOptimizer.h"
 #include "itkLBFGSBOptimizer.h"
 #include "itkAmoebaOptimizer.h"
 #include "itkPowellOptimizer.h"
-
 
 //interpolator includes
 #include "itkLinearInterpolateImageFunction.h"
@@ -155,8 +153,7 @@ public:
 	typedef itk::LBFGSBOptimizer LBFGSBOptimizerType;
 	typedef itk::AmoebaOptimizer AmoebaOptimizerType;
 	typedef itk::PowellOptimizer PowellOptimizerType;
-	typedef itk::ConjugateGradientOptimizer ConjugateGradientOptimizerType;
-	
+
 	//metric typedefs
 	typedef itk::MattesMutualInformationImageToImageMetric<TFixedImageType, TMovingImageType>
 	        MattesMutualInformationMetricType;
@@ -184,9 +181,9 @@ public:
 
 	typedef typename itk::CenteredTransformInitializer<AffineTransformType, TFixedImageType, TMovingImageType>
 	        AffineCenteredTransformInitializerType;
-	
-	typedef typename itk::LandmarkBasedTransformInitializer<VersorRigid3DTransformType, TFixedImageType, TMovingImageType> 
-		RigidLandmarkBasedTransformInitializerType;
+
+	typedef typename itk::LandmarkBasedTransformInitializer<VersorRigid3DTransformType, TFixedImageType,
+	        TMovingImageType> RigidLandmarkBasedTransformInitializerType;
 
 	enum eTransformType
 	{
@@ -210,7 +207,7 @@ public:
 
 	enum eOptimizerType
 	{
-		RegularStepGradientDescentOptimizer, ConjugateGradientOptimizer, VersorRigidOptimizer, LBFGSBOptimizer, AmoebaOptimizer, PowellOptimizer
+		RegularStepGradientDescentOptimizer, VersorRigidOptimizer, LBFGSBOptimizer, AmoebaOptimizer, PowellOptimizer
 
 	};
 
@@ -256,7 +253,7 @@ public:
 	    FixedImagePointer);
 	void SetMovingImage(
 	    MovingImagePointer);
-	    
+
 	//parameter-set methods
 	void SetUpOptimizer(
 	    void);
@@ -268,12 +265,14 @@ public:
 	void SetInitialTransform(
 	    TransformBasePointer);
 
-	void SetMovingPointContainer(typename RigidLandmarkBasedTransformInitializerType::LandmarkPointContainer);
-	void SetFixedPointContainer(typename RigidLandmarkBasedTransformInitializerType::LandmarkPointContainer);
-	
+	void SetMovingPointContainer(
+	    typename RigidLandmarkBasedTransformInitializerType::LandmarkPointContainer);
+	void SetFixedPointContainer(
+	    typename RigidLandmarkBasedTransformInitializerType::LandmarkPointContainer);
+
 	//getter methods
 	RegistrationMethodPointer GetRegistrationObject(
-	    void) ;
+	    void);
 	OutputImagePointer GetRegisteredImage(
 	    void);
 	ConstTransformBasePointer GetTransform(
@@ -286,7 +285,8 @@ public:
 	    void);
 	void CheckImageSizes(
 	    void);
-	void SetFixedImageMask(typename MaskObjectType::Pointer);
+	void SetFixedImageMask(
+	    typename MaskObjectType::Pointer);
 
 	RegistrationFactory3D();
 	virtual ~RegistrationFactory3D() {
@@ -311,7 +311,6 @@ private:
 		bool LBFGSBOPTIMIZER;
 		bool AMOEBA;
 		bool POWELL;
-		bool CONJUGATEGRADIENT;
 
 	} optimizer;
 
@@ -330,10 +329,10 @@ private:
 		bool BSPLINE;
 		bool NEARESTNEIGHBOR;
 	} interpolator;
-	
+
 	void SetFixedImageMask(
 	    void);
-	    
+
 	DeformationFieldPointer m_DeformationField;
 	FixedImagePointer m_FixedImage;
 	MovingImagePointer m_MovingImage;
@@ -348,7 +347,7 @@ private:
 	bool m_InitialTransformIsSet;
 
 	unsigned int m_NumberOfParameters;
-	
+
 	IterationObserver::Pointer m_observer;
 
 	//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -363,7 +362,7 @@ private:
 
 	typename RigidCenteredTransformInitializerType::Pointer m_RigidInitializer;
 	typename AffineCenteredTransformInitializerType::Pointer m_AffineInitializer;
-	
+
 	typename RigidLandmarkBasedTransformInitializerType::Pointer m_RigidLandmarkInitializer;
 	typename RigidLandmarkBasedTransformInitializerType::LandmarkPointContainer m_MovingPointContainer;
 	typename RigidLandmarkBasedTransformInitializerType::LandmarkPointContainer m_FixedPointContainer;
@@ -377,8 +376,7 @@ private:
 	LBFGSBOptimizerType::Pointer m_LBFGSBOptimizer;
 	AmoebaOptimizerType::Pointer m_AmoebaOptimizer;
 	PowellOptimizerType::Pointer m_PowellOptimizer;
-	ConjugateGradientOptimizerType::Pointer m_ConjugateGradientOptimizer;
-	
+
 	//transform
 	VersorRigid3DTransformType::Pointer m_VersorRigid3DTransform;
 	QuaternionRigidTransformType::Pointer m_QuaternionRigidTransform;
@@ -388,7 +386,7 @@ private:
 	typename CenteredAffineTransformType::Pointer m_CenteredAffineTransform;
 
 	typename BSplineTransformType::Pointer m_BSplineTransform;
-	
+
 	TransformType::Pointer m_BulkTransform;
 
 	//metric

@@ -26,7 +26,6 @@
 
 #include "boost/progress.hpp"
 #include "CoreUtils/log.hpp"
-#include "CoreUtils/message.hpp"
 
 //via command parser include
 #include "viaio/option.h"
@@ -39,8 +38,8 @@ VDictEntry TYPTransform[] = { {"Rigid", 0}, {"Affine", 1}, {"BSplineDeformable",
 
 VDictEntry TYPInterpolator[] = { {"Linear", 0}, {"BSpline", 1}, {"NearestNeighbor", 2}, {NULL}};
 
-VDictEntry TYPOptimizer[] = { {"VersorRigid", 0}, {"RegularStepGradientDescent", 1}, {"ConjugateGradient", 2}, {
-    "LBFGSB", 3}, {"Amoeba", 4}, {"Powell", 5}, {NULL}};
+VDictEntry TYPOptimizer[] = { {"VersorRigid", 0}, {"RegularStepGradientDescent", 1}, {"LBFGSB", 2}, {"Amoeba", 3}, {
+    "Powell", 4}, {NULL}};
 
 //command line parser options
 static VString ref_filename = NULL;
@@ -304,15 +303,12 @@ int main(
 			registrationFactory->SetOptimizer(RegistrationFactoryType::RegularStepGradientDescentOptimizer);
 			break;
 			case 2:
-			registrationFactory->SetOptimizer(RegistrationFactoryType::ConjugateGradientOptimizer);
-			break;
-			case 3:
 			registrationFactory->SetOptimizer(RegistrationFactoryType::LBFGSBOptimizer);
 			break;
-			case 4:
+			case 3:
 			registrationFactory->SetOptimizer(RegistrationFactoryType::AmoebaOptimizer);
 			break;
-			case 5:
+			case 4:
 			registrationFactory->SetOptimizer(RegistrationFactoryType::PowellOptimizer);
 			break;
 		}
