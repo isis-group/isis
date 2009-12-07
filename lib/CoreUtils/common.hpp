@@ -41,7 +41,10 @@ write_list(InputIterator start,InputIterator end,
 		   std::string delim=" ",
 		   std::string prefix="{",std::string suffix="}"){
 	o << prefix;
-	if(start!=end)o << *start; start++;
+	if(start!=end){
+		o << *start;
+		start++;
+	}
 	for(InputIterator i=start;i!=end;i++)
 		o << delim << *i;
 	o << suffix;

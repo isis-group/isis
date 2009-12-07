@@ -18,12 +18,12 @@ namespace isis{ namespace data { namespace _internal {
 	
 PropertyObject::PropertyObject(){}
 
-PropertyObject::PropertyObject ( const util::PropMap::key_type needed[] ) {
-	for(size_t i=0;i<sizeof(needed)/sizeof(util::PropMap::key_type);i++)
+PropertyObject::PropertyObject ( const char* needed[] ) {
+	const size_t len=sizeof(needed)/sizeof(util::PropMap::key_type);
+	LOG(DataDebug,util::verbose_info)	<< "Adding " << len << " needed properties ("<< util::list2string(needed,needed+len) << ")";
+	for(size_t i=0;i<len;i++)
 		addNeeded(needed[i]);
 }
-
-// PropertyObject::PropertyObject() {}
 
 void PropertyObject::addNeeded ( const std::string& key )
 {

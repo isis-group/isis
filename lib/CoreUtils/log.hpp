@@ -46,9 +46,6 @@ public:
 }
 /// @endcond
 
-// @todo obsolete - still there for backward compatibility
-#define MAKE_LOG(MODULE);
-
 #define ENABLE_LOG(MODULE,HANDLE_CLASS,set)\
 if(!MODULE::use_rel);else isis::util::_internal::Log<MODULE>::enable<HANDLE_CLASS>(set)
 

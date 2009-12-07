@@ -34,7 +34,7 @@ namespace data{
 namespace _internal{
 class ChunkBase :public NDimensional<4>,public PropertyObject{
 	protected:
-		static const isis::util::PropMap::key_type needed[];
+		static const char* needed[];
 	public:
 		enum dimensions{read=0,phase,slice,time,n_dims};
 		static const dimensions dimension[n_dims];

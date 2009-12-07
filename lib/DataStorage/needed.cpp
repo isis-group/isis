@@ -8,14 +8,14 @@
  */
 
 // Stuff needed for every Chunk
-const isis::util::PropMap::key_type isis::data::_internal::ChunkBase::needed[]=
+const char* isis::data::_internal::ChunkBase::needed[]=
 {
 	"indexOrigin",
 	"acquisitionNumber"
 };
 
 // Stuff needed for any Image
-const isis::util::PropMap::key_type isis::data::Image::needed[]=
+const char* isis::data::Image::needed[]=
 {
 	"voxelSize",
 	"readVec",

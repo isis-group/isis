@@ -28,7 +28,7 @@ namespace util{
 /// Generic class for type aware variables
 template<typename TYPE> class Type: public _internal::TypeBase{
 	TYPE m_val;
-	static const std::string m_typeName;
+	static const char m_typeName[];
 	static const unsigned short m_typeID;
 public:
 	/**
@@ -95,8 +95,6 @@ public:
  */
 template<typename TYPE> class TypePtr: public _internal::TypePtrBase{
 	boost::shared_ptr<TYPE> m_val;
-	static const std::string m_typeName;
-	static const unsigned short m_typeID;
 	size_t m_len;
 	template<typename T> TypePtr(const Type<T>& value); // Dont do this
 public:
@@ -182,9 +180,15 @@ public:
 		return staticId();
 	}
 	/// @copydoc Type::staticID()
-	static unsigned short staticId(){return m_typeID;}
+	static unsigned short staticId()
+	{
+		return Type<TYPE>::staticId() <<2;
+	}
 	/// @copydoc Type::staticName()
-	static std::string staticName(){return m_typeName;}
+	static std::string staticName()
+	{
+		return std::string(Type<TYPE>::staticName())+"*";
+	}
 	
 	/**
 	 * Reference element at at given index.

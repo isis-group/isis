@@ -61,7 +61,7 @@ private:
 	commonGet(size_t first,size_t second,size_t third,size_t fourth)const;
 
 protected:
-	static const isis::util::PropMap::key_type needed[];
+	static const char* needed[];
 
 	/**
 	 * Search for a dimensional break in all stored chunks.

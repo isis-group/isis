@@ -33,7 +33,7 @@ public:
 	 * \endcode
 	 * \param needed list of properties which will be added to the PropertyMap and flagged as emtpy and needed.
 	 */
-	PropertyObject(const util::PropMap::key_type needed[]);
+	PropertyObject(const char* needed[]);
 	/**
 	 * Sets a given property to a given value.
 	 * If the property is allready set, it will be reset (but setting a different type will fail).
