@@ -4,6 +4,7 @@
  *  Created on: October 15, 2009
  *      Author: tuerke
  */
+#include <boost/progress.hpp>
 
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
@@ -26,6 +27,9 @@
 #include "viaio/option.h"
 #include "viaio/mu.h" //this is required for VNumber
 //command line parser options
+
+using boost::progress_display;
+using boost::progress_timer;
 
 VDictEntry TYPInterpolator[] = { {"Linear", 0}, {"BSpline", 1}, {"NearestNeighbor", 2}, {NULL}};
 
@@ -56,6 +60,7 @@ options[] = {
 
 };
 
+
 #include "itkCommand.h"
 class ProcessUpdate : public itk::Command
 {
@@ -63,17 +68,10 @@ public:
     typedef ProcessUpdate Self;
     typedef itk::Command Superclass;
     typedef itk::SmartPointer<Self> Pointer;
-    itkNewMacro( Self )
-    ;
-    void ShowProgressBar(
-        float progress) const {
-        std::cout << progress * 100 << "%    \r" << std::flush;
-    }
-
+    itkNewMacro( Self );
+    progress_display display;
 protected:
-    ProcessUpdate() {
-    }
-    ;
+    ProcessUpdate():display(101) {};
 public:
     typedef const itk::ProcessObject * ProcessPointer;
 
@@ -84,13 +82,11 @@ public:
 
     void Execute(
         const itk::Object * object, const itk::EventObject & event) {
-        ProcessPointer filter = dynamic_cast<ProcessPointer> (object);
         if (!(itk::ProgressEvent().CheckEvent(&event))) {
             return;
         }
 
-        ShowProgressBar(filter->GetProgress());
-
+        ++display;
     }
 
 };
@@ -98,9 +94,9 @@ public:
 int main(
 
     int argc, char* argv[]) {
+	// show revision information string constant
+	std::cout << "Revision: " << SVN_REVISION << std::endl << std::flush;
 
-    // show revision information string constant
-    std::cout << "Revision: " << SVN_REVISION << std::endl;
 
     // DANGER! Kids don't try this at home! VParseCommand modifies the values of argc and argv!!!
     if (!VParseCommand(VNumber(options), options, &argc, argv) || !VIdentifyFiles(VNumber(options), options, "in",
@@ -188,6 +184,7 @@ int main(
         std::cout << "No transform specified!!" << std::endl;
         return EXIT_FAILURE;
     }
+    progress_timer time;
     reader->SetFileName(in_filename);
     reader->Update();
     //if template file is specified by the user
@@ -424,7 +421,7 @@ int main(
         fmriWriter->Update();
 
     }
-    std::cout << "\nDone.    " << std::endl;
+    std::cout << "Done.    " << std::endl;
 
     return 0;
 }
