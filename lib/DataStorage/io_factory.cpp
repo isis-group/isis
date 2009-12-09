@@ -87,10 +87,7 @@ unsigned int IOFactory::findPlugins(std::string path)
 
 std::list<std::string> IOFactory::getSuffixes(const FileFormatPtr& reader)
 {
-	const boost::sregex_token_iterator token_begin=boost::make_regex_token_iterator(reader->suffixes(), boost::regex("\\s+"), -1);
-	const boost::sregex_token_iterator token_end;
-
-	return std::list<std::string>(token_begin,token_end);
+	return util::string2list<std::string>(reader->suffixes(),boost::regex("\\s+"));
 }
 
 IOFactory& IOFactory::get()

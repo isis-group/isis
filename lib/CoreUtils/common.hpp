@@ -18,12 +18,9 @@
 #include <map>
 #include <string>
 #include <sstream>
+#include <boost/regex.hpp>
+#include <boost/lexical_cast.hpp>
 
-
-/*! \addtogroup util
-*  Additional documentation for group `mygrp'
-*  @{
-*/
 namespace isis { namespace util {
 
 /**
@@ -61,7 +58,53 @@ template<class InputIterator> std::string list2string(
 	write_list(start,end,ret,delim,prefix,suffix);
 	return ret.str();
 }
-	
+
+/**
+ * Common tokenizer.
+ * Splits source into tokens and tries to lexically cast them to TARGET.
+ * If that fails, boost::bad_lexical_cast is thrown.
+ * \param source the source string to be split up
+ * \param seperator regular expression to delimit the tokens (defaults to \s+)
+ * \param prefix regular expression for text to be removed from the string before it is split up
+ * \param suffix regular expression for text to be removed from the string before it is split up
+ * \returns a list of the casted tokens
+ */
+template<typename TARGET> std::list<TARGET> string2list(
+	std::string source,
+	const boost::regex seperator=boost::regex("\\s+"),
+	const boost::regex prefix=boost::regex(),
+	const boost::regex postfix=boost::regex())
+{
+	std::list<TARGET> ret;
+	assert(not seperator.empty());
+
+	if(not prefix.empty())
+		source=boost::regex_replace(source,prefix,"",boost::format_first_only|boost::match_default);
+	if(not postfix.empty())
+		source=boost::regex_replace(source,postfix,"",boost::format_first_only|boost::match_default);
+
+	boost::sregex_token_iterator i=boost::make_regex_token_iterator(source, seperator, -1);
+	const boost::sregex_token_iterator token_end;
+
+	while(i != token_end)
+		ret.push_back(boost::lexical_cast<TARGET>(*i++));
+
+	return ret;
+}
+
+/**
+ * Common tokenizer (simple version).
+ * Splits source into tokens and tries to lexically cast them to TARGET.
+ * If that fails, boost::bad_lexical_cast is thrown.
+ * \param source the source string to be split up
+ * \param seperator string to delimit the tokens (defaults to " ")
+ * \returns a list of the casted tokens
+ */
+template<typename TARGET> std::list<TARGET> string2list(std::string source,	const char seperator[]=" ")
+{
+	return string2list<TARGET>(source,boost::regex(seperator));
+}
+														
 /// @cond _hidden
 struct CoreLog{
 	enum{
@@ -94,5 +137,4 @@ operator<<(basic_ostream<charT, traits> &out,const map<_Key,_Tp,_Compare,_Alloc>
 }
 	
 }
-/** @} */
 #endif //CORE_COMMON_HPP

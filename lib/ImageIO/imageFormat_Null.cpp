@@ -39,7 +39,8 @@ public:
 
 		std::cout
 		<<  "If I was a real writer, I would now write an image with the sequence number "
-		<< image.getPropertyValue("sequenceNumber") << " and the size " << image.sizeToString() << " to " << filename << std::endl;
+		<< image.getPropertyValue("sequenceNumber")->toString(false) << " and the size "
+		<< image.sizeToString() << " to " << filename << std::endl;
 		
 		for(int i=0;i<10;i++)
 			if(image.voxel<short>(0,0,0,i) != i+snum)return false;

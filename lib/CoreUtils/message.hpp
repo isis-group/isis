@@ -37,7 +37,7 @@ class MSubject : public std::string{
 };
 
 enum LogLevel{error=0,warning,info,verbose_info};
-static const std::string LogLevelNames[]={"error","warning","info","verbose_info"};
+static const char* LogLevelNames[]={"error","warning","info","verbose_info"};
 
 /// @cond _internal
 namespace _internal{
