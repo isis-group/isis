@@ -38,7 +38,7 @@ VDictEntry TYPTransform[] = { {"Rigid", 0}, {"Affine", 1}, {"BSplineDeformable",
 
 VDictEntry TYPInterpolator[] = { {"Linear", 0}, {"BSpline", 1}, {"NearestNeighbor", 2}, {NULL}};
 
-VDictEntry TYPOptimizer[] = { {"VersorRigid", 0}, {"RegularStepGradientDescent", 1}, {"LBFGSB", 2}, {"Amoeba", 3}, {
+VDictEntry TYPOptimizer[] = { {"RegularStepGradientDescent", 0}, {"VersorRigid", 1}, {"LBFGSB", 2}, {"Amoeba", 3}, {
     "Powell", 4}, {NULL}};
 
 //command line parser options
@@ -297,10 +297,10 @@ int main(
 
 		switch (optimizer) {
 			case 0:
-			registrationFactory->SetOptimizer(RegistrationFactoryType::VersorRigidOptimizer);
+			registrationFactory->SetOptimizer(RegistrationFactoryType::RegularStepGradientDescentOptimizer);
 			break;
 			case 1:
-			registrationFactory->SetOptimizer(RegistrationFactoryType::RegularStepGradientDescentOptimizer);
+			registrationFactory->SetOptimizer(RegistrationFactoryType::VersorRigidOptimizer);
 			break;
 			case 2:
 			registrationFactory->SetOptimizer(RegistrationFactoryType::LBFGSBOptimizer);
