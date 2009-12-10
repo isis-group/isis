@@ -18,11 +18,13 @@ namespace isis{ namespace data { namespace _internal {
 	
 PropertyObject::PropertyObject(){}
 
-PropertyObject::PropertyObject ( const char* needed[] ) {
-	const size_t len=sizeof(needed)/sizeof(util::PropMap::key_type);
-	LOG(DataDebug,util::verbose_info)	<< "Adding " << len << " needed properties ("<< util::list2string(needed,needed+len) << ")";
-	for(size_t i=0;i<len;i++)
-		addNeeded(needed[i]);
+
+void PropertyObject::addNeededFromString(const std::string& needed)
+{
+	const std::list<std::string> needList=util::string2list<std::string>(needed);
+	LOG(DataDebug,util::verbose_info)	<< "Adding " << util::list2string(needList.begin(),needList.end()) << " as needed";
+	BOOST_FOREACH(std::list<std::string>::const_reference ref,needList)
+		addNeeded(ref);
 }
 
 void PropertyObject::addNeeded ( const std::string& key )

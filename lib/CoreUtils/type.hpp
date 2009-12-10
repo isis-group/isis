@@ -53,6 +53,7 @@ public:
 		return staticId();
 	}
 
+	/// \returns true if this and second contain the same value of the same type
 	virtual bool eq(const TypeBase &second)const{
 		if(second.is<TYPE>()){
 			const TYPE sec= second.cast_to_Type<TYPE>();
@@ -76,7 +77,7 @@ public:
 	 * \return the stored value
 	 */
 	operator TYPE()const{return m_val;}
-	
+
 	TypeBase* clone() const
 	{
 		LOG(CoreDebug,verbose_info)	<< "Creating cloned copy of " << toString(true);

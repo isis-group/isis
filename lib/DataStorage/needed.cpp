@@ -8,18 +8,16 @@
  */
 
 // Stuff needed for every Chunk
-const char* isis::data::_internal::ChunkBase::needed[]=
-{
-	"indexOrigin",
-	"acquisitionNumber"
-};
+const char* isis::data::_internal::ChunkBase::needed="\
+	indexOrigin\
+	acquisitionNumber\
+";
 
 // Stuff needed for any Image
-const char* isis::data::Image::needed[]=
-{
-	"voxelSize",
-	"readVec",
-	"phaseVec",
-	"sliceVec"
-};
+const char* isis::data::Image::needed="\
+	voxelSize\
+	readVec\
+	phaseVec\
+	sliceVec\
+";
 

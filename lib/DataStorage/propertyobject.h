@@ -21,19 +21,15 @@ class PropertyObject {
 	static const util::PropMap::mapped_type emptyProp;//dummy to be able to return an empty Property
 protected:
 	util::PropMap properties;
+	/**
+	 * Make Properties given by a space separated list needed.
+	 * \param needed string made of space serparated property-names which
+	 * will (if neccessary) be added to the PropertyMap and flagged as needed.
+	 */
+	void addNeededFromString(const std::string &needed);
 public:
 	/// Create an PropertyObject without any property.
 	PropertyObject();
-	/**
-	 * Create an PropertyObject and make the given properties needed.
-	 * As this adds needed but empty properties, the resulting object will be insufficient.
-	 * \code
-	 * const isis::util::PropMap::key_type needed[]={"Prop1","Prop2"};
-	 * assert(PropertyObject(needed).sufficient()==false);
-	 * \endcode
-	 * \param needed list of properties which will be added to the PropertyMap and flagged as emtpy and needed.
-	 */
-	PropertyObject(const char* needed[]);
 	/**
 	 * Sets a given property to a given value.
 	 * If the property is allready set, it will be reset (but setting a different type will fail).

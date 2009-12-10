@@ -19,8 +19,8 @@ BOOST_AUTO_TEST_CASE (imageLoadtest)
 {
 	ENABLE_LOG(util::CoreLog,util::DefaultMsgPrint,util::warning);
 	ENABLE_LOG(util::CoreDebug,util::DefaultMsgPrint,util::warning);
-	ENABLE_LOG(data::DataLog,util::DefaultMsgPrint,util::info);
-	ENABLE_LOG(data::DataDebug,util::DefaultMsgPrint,util::info);
+	ENABLE_LOG(data::DataLog,util::DefaultMsgPrint,util::warning);
+	ENABLE_LOG(data::DataDebug,util::DefaultMsgPrint,util::warning);
 	
 	data::ImageList images=data::IOFactory::load("test.null.gz", "");
 

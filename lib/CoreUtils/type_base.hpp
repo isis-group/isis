@@ -160,25 +160,31 @@ public:
 	}
 
 	/**
-	* Dynamically cast the TypeBase up to its actual Type\<T\>. Constant version.
-	* Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
-	* \returns a copy of the stored value.
-	* \returns T() if T is not the actual type.
-	*/
+	 * Dynamically cast the TypeBase up to its actual Type\<T\>. Constant version.
+	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
+	 * \returns a copy of the stored value.
+	 * \returns T() if T is not the actual type.
+	 */
 	template<typename T> const Type<T> cast_to_Type() const{
 		return m_cast_to<Type<T> >(Type<T>(T()));
 	}
 	/**
-	* Dynamically cast the TypeBase up to its actual Type\<T\>. Referenced version.
-	* Will throw std::bad_cast if T is not the actual type.
-	* Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
-	* \returns a reference of the stored value.
-	*/
+	 * Dynamically cast the TypeBase up to its actual Type\<T\>. Referenced version.
+	 * Will throw std::bad_cast if T is not the actual type.
+	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
+	 * \returns a reference of the stored value.
+	 */
 	template<typename T> Type<T>& cast_to_Type(){
 		return m_cast_to<Type<T> >();
 	}
 	virtual bool eq(const TypeBase &second)const=0;
 
+	/**
+	* Create a copy of this.
+	* Creates a new Type/TypePtr an stores a copy of its value there.
+	* Makes TypeBase-pointers copyable without knowing their type.
+	* \returns a TypeBase-pointer to a newly created Type/TypePtr.
+	*/
 	virtual TypeBase* clone()const=0;
 };
 

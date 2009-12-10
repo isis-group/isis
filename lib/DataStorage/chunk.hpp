@@ -33,17 +33,17 @@ namespace data{
 
 namespace _internal{
 class ChunkBase :public NDimensional<4>,public PropertyObject{
-	protected:
-		static const char* needed[];
-	public:
-		enum dimensions{read=0,phase,slice,time,n_dims};
-		static const dimensions dimension[n_dims];
-		typedef isis::util::_internal::TypeReference <ChunkBase > Reference;
+protected:
+	static const char* needed;
+public:
+	enum dimensions{read=0,phase,slice,time,n_dims};
+	static const dimensions dimension[n_dims];
+	typedef isis::util::_internal::TypeReference <ChunkBase > Reference;
 
-		ChunkBase(size_t firstDim,size_t secondDim,size_t thirdDim,size_t fourthDim);
-		virtual ~ChunkBase(); //needed to make it polymorphic
+	ChunkBase(size_t firstDim,size_t secondDim,size_t thirdDim,size_t fourthDim);
+	virtual ~ChunkBase(); //needed to make it polymorphic
 
-		isis::util::fvector4 size()const;
+	isis::util::fvector4 size()const;
 };
 }
 	

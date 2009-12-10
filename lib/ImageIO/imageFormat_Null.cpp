@@ -24,6 +24,7 @@ public:
 			for(int c=0;c<images;c++){
 				data::MemChunk<short> ch(3,3,3);
 				ch.setProperty("indexOrigin",util::fvector4(0,0,0,i));
+				ch.setProperty("acquisitionNumber",c);
 				ch.setProperty("sequenceNumber",c);
 				for(int x=0;x<3;x++)
 					ch.voxel<short>(x,x,x)=c+i;

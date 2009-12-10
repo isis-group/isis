@@ -36,8 +36,9 @@ bool image_chunk_order::operator() ( const data::Chunk& a, const data::Chunk& b 
 
 }
 	
-Image::Image (_internal::image_chunk_order lt ) :set ( lt ),PropertyObject(needed),clean(true)
+Image::Image (_internal::image_chunk_order lt ) :set ( lt ),clean(true)
 {
+	addNeededFromString(needed);
 	const size_t idx[]={0,0,0,0};
 	init(idx);
 }
@@ -52,7 +53,7 @@ bool Image::insertChunk ( const Chunk &chunk ) {
 	if(not chunk.sufficient()){
 		const util::PropMap::key_list missing=chunk.missing();
 		LOG(DataLog,util::error)
-			<< "Cannot insert chunk. Missing properties: " << util::list2string(missing.begin(),missing.end(),", ","<",">");
+			<< "Cannot insert chunk. Missing properties: " << util::list2string(missing.begin(),missing.end());
 		return false;
 	}
 	if(set.insert(chunk).second){
