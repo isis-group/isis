@@ -136,9 +136,10 @@ bool Image::reIndex() {
 			LOG(DataDebug,util::info)
 				<< "used the distance between chunk 0 and "	<< size[2]
 				<< " as sliceVec " << getPropertyValue("sliceVec");
-		} else if(lookup[0]->hasProperty("readVec") and lookup[0]->hasProperty("phaseVec")){
-			const util::fvector4 read=lookup[0]->getProperty<util::fvector4>("readVec");
-			const util::fvector4 phase=lookup[0]->getProperty<util::fvector4>("phaseVec");
+		} else if(hasProperty("readVec") and hasProperty("phaseVec")){
+			//if we have read- and phase- vector, assume sliceVec to be ortogonal to them
+			const util::fvector4 read=getProperty<util::fvector4>("readVec");
+			const util::fvector4 phase=getProperty<util::fvector4>("phaseVec");
 			const util::fvector4 cross(
 				read[1]*phase[2]-read[2]*phase[1],
 				read[2]*phase[0]-read[0]*phase[2],
@@ -146,7 +147,7 @@ bool Image::reIndex() {
 			);
 			setProperty("sliceVec",cross);
 			LOG(DataDebug,util::info)
-				<< "used the cross product between readVec and phaseVec of the first chunk as sliceVec"
+				<< "used the cross product between readVec and phaseVec as sliceVec"
 				<< getPropertyValue("sliceVec");
 		} else
 			LOG(DataLog,util::warning) << "Cannot compute the missing sliceVec";

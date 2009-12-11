@@ -16,6 +16,7 @@
 #include "property.hpp"
 #include "propmap.hpp"
 #include "vector.hpp"
+#include <stdint.h>
 
 namespace isis{ namespace util{
 
@@ -30,14 +31,14 @@ namespace isis{ namespace util{
   template<> const char Type<TYPE>::m_typeName[]=#NAME;		\
   template<> const unsigned short Type<TYPE>::m_typeID=ID;
   
-DEF_TYPE(char,s8bit,0x1);
-DEF_TYPE(unsigned char,u8bit,0x2);
+DEF_TYPE(int8_t,s8bit,0x1);
+DEF_TYPE(uint8_t,u8bit,0x2);
 
-DEF_TYPE(short,s16bit,0x3);
-DEF_TYPE(unsigned short,u16bit,0x4);
+DEF_TYPE(int16_t,s16bit,0x3);
+DEF_TYPE(uint16_t,u16bit,0x4);
 
-DEF_TYPE(int,s32bit,0x5);
-DEF_TYPE(unsigned int,u32bit,0x6);
+DEF_TYPE(int32_t,s32bit,0x5);
+DEF_TYPE(uint32_t,u32bit,0x6);
 
 DEF_TYPE(float,float,0x7);
 DEF_TYPE(double,double,0x8);

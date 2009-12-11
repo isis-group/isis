@@ -40,8 +40,14 @@ PropertyObject::getPropertyValue ( const std::string& key ) const
 	return found!=properties.end() ? found->second: emptyProp;
 }
 
-bool PropertyObject::hasProperty ( const std::string& key )const {
+bool PropertyObject::hasProperty ( const std::string& key )const
+{
 	return (not getPropertyValue(key).empty());
+}
+
+void PropertyObject::delProperty(const std::string& key)
+{
+	properties.erase(key);
 }
 
 bool PropertyObject::sufficient()const

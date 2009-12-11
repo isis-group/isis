@@ -65,6 +65,8 @@ public:
 	}
 	/// \returns true is the given property does exist and is not empty.
 	bool hasProperty(const util::PropMap::key_type &key)const;
+	/// Removes the given property if its there.
+	void delProperty(const util::PropMap::key_type &key);
 	/**
 	 * Adds a property as needed.
 	 * If the given property allready exists, it is just flagged as needed.
