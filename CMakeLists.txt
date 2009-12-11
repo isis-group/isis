@@ -20,6 +20,9 @@ OPTION(BUILD_ITK "Build the ITK stuff." OFF)
 OPTION(RUNTIME_LOG "Enable runtime logging" ON)
 OPTION(DEBUG_LOG "Enable debug logging" ON)
 
+OPTION(IOPLUGIN_NIFTI "Enable Nifti-IO Plugin" ON)
+OPTION(IOPLUGIN_Null "Enable Null-IO Plugin" ON)
+
 SET(ISIS_INSTALL_BIN_DIR "${CMAKE_BINARY_DIR}/bin/")
 
 ###############################################################################
