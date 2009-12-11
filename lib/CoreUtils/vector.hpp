@@ -200,7 +200,7 @@ class fvector4 :public FixedVector<float,4>{
 public:
 	fvector4();
 	fvector4(const FixedVector<float,4> &src);
-	fvector4(float first,float second,float third,float fourth);
+	fvector4(float first,float second,float third=0,float fourth=0);
 };
 }
 /** @} */

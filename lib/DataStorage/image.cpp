@@ -66,7 +66,7 @@ bool Image::insertChunk ( const Chunk &chunk ) {
 bool Image::reIndex() {
 	if(set.empty()){
 		clean=true;
-		LOG(DataLog,util::warning) << "Reindexing an empty image.";
+		LOG(DataLog,util::warning) << "Reindexing an empty image is useless.";
 		return true;
 	}
 	
@@ -126,6 +126,31 @@ bool Image::reIndex() {
 
 	//get indexOrigin from the first chunk
 	setProperty("indexOrigin",chunksBegin()->getPropertyValue("indexOrigin"));
+
+	//try to calculate slice vector if its missing
+	if(not hasProperty("sliceVec")){
+		if(chunk_dims==2 and size[2]>1){ //if we have at least two slides we can use their distance-vector
+			const util::fvector4 thisV=lookup[0]->getProperty<util::fvector4>("indexOrigin");
+			const util::fvector4 nextV=lookup[size[2]]->getProperty<util::fvector4>("indexOrigin");
+ 			setProperty("sliceVec",util::fvector4(nextV-thisV));
+			LOG(DataDebug,util::info)
+				<< "used the distance between chunk 0 and "	<< size[2]
+				<< " as sliceVec " << getPropertyValue("sliceVec");
+		} else if(lookup[0]->hasProperty("readVec") and lookup[0]->hasProperty("phaseVec")){
+			const util::fvector4 read=lookup[0]->getProperty<util::fvector4>("readVec");
+			const util::fvector4 phase=lookup[0]->getProperty<util::fvector4>("phaseVec");
+			const util::fvector4 cross(
+				read[1]*phase[2]-read[2]*phase[1],
+				read[2]*phase[0]-read[0]*phase[2],
+				read[0]*phase[1]-read[1]*phase[0]
+			);
+			setProperty("sliceVec",cross);
+			LOG(DataDebug,util::info)
+				<< "used the cross product between readVec and phaseVec of the first chunk as sliceVec"
+				<< getPropertyValue("sliceVec");
+		} else
+			LOG(DataLog,util::warning) << "Cannot compute the missing sliceVec";
+	}
 	
 	init(size);
 	clean=true;
@@ -271,7 +296,13 @@ ImageList::ImageList(ChunkList src)
 		}
 		if(buff->chunksBegin()!=buff->chunksEnd()){
 			buff->reIndex();
-			push_back(buff);
+			if(buff->sufficient())
+				push_back(buff);
+			else {
+				const util::PropMap::key_list missing=buff->missing();
+				LOG(DataLog,util::error)
+					<< "Cannot insert image. Missing properties: " << util::list2string(missing.begin(),missing.end());
+			}
 		}
 	}
 }

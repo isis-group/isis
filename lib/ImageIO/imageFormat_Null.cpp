@@ -14,7 +14,7 @@ public:
 		return "Null";
 	}
   
-	virtual data::ChunkList load ( std::string filename, std::string dialect ){
+	data::ChunkList load ( std::string filename, std::string dialect ){
 		
 		const size_t images=5;
 		const size_t timesteps=10;
@@ -26,6 +26,9 @@ public:
 				ch.setProperty("indexOrigin",util::fvector4(0,0,0,i));
 				ch.setProperty("acquisitionNumber",c);
 				ch.setProperty("sequenceNumber",c);
+				ch.setProperty("readVec",util::fvector4(1,0));
+				ch.setProperty("phaseVec",util::fvector4(0,1));
+				ch.setProperty("voxelSize",util::fvector4(1,1,1));
 				for(int x=0;x<3;x++)
 					ch.voxel<short>(x,x,x)=c+i;
 				chunks.push_back(ch);

@@ -39,8 +39,8 @@ private:
 protected:
 	/**
 	 * load a data file with given filename and dialect
-	 * @params filename file to open
-	 * @params dialect dialect of the fileformat to load
+	 * @param filename file to open
+	 * @param dialect dialect of the fileformat to load
 	 * @return list of chunks (part of an image)
 	 */
 	ChunkList loadFile(const boost::filesystem::path& filename, const std::string& dialect);

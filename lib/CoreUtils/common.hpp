@@ -64,7 +64,7 @@ template<class InputIterator> std::string list2string(
  * Splits source into tokens and tries to lexically cast them to TARGET.
  * If that fails, boost::bad_lexical_cast is thrown.
  * \param source the source string to be split up
- * \param seperator regular expression to delimit the tokens (defaults to \s+)
+ * \param separator regular expression to delimit the tokens (defaults to \s+)
  * \param prefix regular expression for text to be removed from the string before it is split up 
  * ("^" if not given, will be added at the beginning)
  * \param suffix regular expression for text to be removed from the string before it is split up 
@@ -103,7 +103,7 @@ template<typename TARGET> std::list<TARGET> string2list(
  * If that fails, boost::bad_lexical_cast is thrown.
  * Before the string is split up leading and rear separators will be cut.
  * \param source the source string to be split up
- * \param seperator string to delimit the tokens
+ * \param separator string to delimit the tokens
  * \returns a list of the casted tokens
  */
 template<typename TARGET> std::list<TARGET> string2list(
@@ -119,12 +119,12 @@ template<typename TARGET> std::list<TARGET> string2list(
  * If that fails, boost::bad_lexical_cast is thrown.
  * Before the string is split up leading and rear separators will be cut.
  * \param source the source string to be split up
- * \param seperator string to delimit the tokens
+ * \param separator string to delimit the tokens
  * \returns a list of the casted tokens
  */
-template<typename TARGET> std::list<TARGET> string2list(std::string source,	const char seperator[])
+template<typename TARGET> std::list<TARGET> string2list(std::string source,	const char separator[])
 {
-	return string2list<TARGET>(source,boost::regex(seperator));
+	return string2list<TARGET>(source,boost::regex(separator));
 }
 														
 /// @cond _hidden
