@@ -5,10 +5,10 @@
 
 using isis::data::DataLog;
 
-bool isis::image_io::FileFormat::write(const isis::data::ImageList& images, std::string filename, std::string dialect)
+bool isis::image_io::FileFormat::write(const isis::data::ImageList& images, const std::string& filename,const std::string& dialect)
 {
 	boost::filesystem::path path(filename);
-	filename=path.leaf();
+	std::string file=path.leaf();
 	path.remove_leaf();
 	bool ret=true;
 	
@@ -20,7 +20,7 @@ bool isis::image_io::FileFormat::write(const isis::data::ImageList& images, std:
 			continue;
 		}
 		std::string snum=ref->getPropertyValue("sequenceNumber")->toString();
-		std::string unique_name=std::string("S")+snum+"_"+filename;
+		std::string unique_name=std::string("S")+snum+"_"+file;
 		LOG(DataLog,util::info) 	<< "Writing image to " <<  path/unique_name;
 		ret&=write(*ref,(path/unique_name).string(),dialect);
 	}
