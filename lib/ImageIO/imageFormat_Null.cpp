@@ -14,7 +14,7 @@ public:
 		return "Null";
 	}
   
-	data::ChunkList load ( std::string filename, std::string dialect ){
+	data::ChunkList load (const std::string& filename,const std::string& dialect ){
 		
 		const size_t images=5;
 		const size_t timesteps=10;
@@ -37,7 +37,7 @@ public:
 		return chunks;//return data::ChunkList();
 	}
 	
-	bool write(const data::Image &image,std::string filename,std::string dialect ){
+	bool write(const data::Image &image,const std::string& filename,const std::string& dialect ){
 		if(image.size() != util::fvector4(3,3,3,10))return false;
 		const int snum=image.getProperty<int>("sequenceNumber");
 
