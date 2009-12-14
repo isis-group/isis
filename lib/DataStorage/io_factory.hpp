@@ -74,8 +74,8 @@ protected:
 	 *
 	 * @return true if registration was successful, false otherwise
 	 * */
-	bool registerFormat(FileFormatPtr plugin);
-	unsigned int findPlugins(std::string path);
+	bool registerFormat(const FileFormatPtr plugin);
+	unsigned int findPlugins(const std::string& path);
 	FileFormatList getFormatInterface(const std::string& filename, const std::string& dialect);
 private:
 	std::map<std::string, FileFormatList> io_suffix;

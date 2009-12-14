@@ -25,7 +25,7 @@ IOFactory::IOFactory()
 	findPlugins(std::string(BUILD_PATH));
 }
 
-bool IOFactory::registerFormat(FileFormatPtr plugin)
+bool IOFactory::registerFormat(const FileFormatPtr plugin)
 {
 	if(!plugin)return false;
 
@@ -42,7 +42,7 @@ bool IOFactory::registerFormat(FileFormatPtr plugin)
 	return true;
 }
 
-unsigned int IOFactory::findPlugins(std::string path)
+unsigned int IOFactory::findPlugins(const std::string& path)
 {
 	boost::filesystem::path p(path);
 	if (!exists(p)){
@@ -100,7 +100,14 @@ data::ChunkList IOFactory::loadFile(const boost::filesystem::path& filename, con
 {
 	FileFormatList formatReader = getFormatInterface(filename.string(), dialect);
 	
-	if(true == formatReader.empty()){//no suitable plugin
+	if (false == boost::filesystem::exists(filename))//file to open does not exist
+	{
+		LOG(DataLog, util::error)
+				<< "File does not exist at given place: " << filename;
+		return data::ChunkList();
+	}
+
+	if(true == formatReader.empty()){//no suitable plugin for this file type and dialect
 		LOG(DataLog,util::error)
 				<< "Missing plugin to open file: " << filename << " with dialect: " << dialect;
 		return data::ChunkList();
