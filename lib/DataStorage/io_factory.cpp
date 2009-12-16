@@ -134,10 +134,10 @@ data::ChunkList IOFactory::loadFile(const boost::filesystem::path& filename, con
 
 IOFactory::FileFormatList IOFactory::getFormatInterface(const std::string& filename, const std::string& dialect)
 {
-	size_t pos = filename.find_first_of(".", 1);
-	if (std::string::npos == pos){
+	boost::filesystem::path fname(filename);
+	std::string ext = extension(fname);
+	if (ext.empty() ){
 		return FileFormatList();}
-	std::string ext = filename.substr(pos);
 
 	if(true == dialect.empty()){//give back whole list of plugins for this file extension
 		return io_suffix[ext];
