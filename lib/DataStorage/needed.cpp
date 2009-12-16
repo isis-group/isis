@@ -3,7 +3,7 @@
 
 /*
  * Add needed properties for Property-objects.
- * Objects which lack any property will be rejected by the system.
+ * Objects which lack any of these properties will be rejected by the system.
  * see PropertyObject::sufficient()
  */
 

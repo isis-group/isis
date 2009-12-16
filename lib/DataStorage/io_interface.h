@@ -15,19 +15,19 @@
 
 #ifdef __cplusplus
 #include <string>
-#include <DataStorage/image.hpp>
+#include "DataStorage/image.hpp"
 
 namespace isis{ namespace image_io{
 class FileFormat {
 public:
 	virtual std::string name()=0;
 	virtual std::string suffixes()=0;
-	virtual std::string dialects()=0;
+	virtual std::string dialects(){return std::string();};
 	virtual size_t maxDim()=0;
 	virtual bool tainted(){return true;}
-	virtual data::ChunkList load(const std::string& filename,const std::string& dialect)=0;
-	virtual bool write(const data::Image &image,const std::string& filename,const std::string& dialect)=0;
-	virtual bool write(const data::ImageList &images,const std::string& filename,const std::string& dialect);
+	virtual data::ChunkList load(std::string filename,std::string dialect)=0;
+	virtual bool write(const data::Image &image,std::string filename,std::string dialect)=0;
+	virtual bool write(const data::ImageList &images,std::string filename,std::string dialect);
 };
 }}
 #else

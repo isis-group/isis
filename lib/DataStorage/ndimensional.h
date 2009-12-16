@@ -19,6 +19,7 @@
 #include <boost/static_assert.hpp>
 #include <string>
 #include "CoreUtils/common.hpp"
+#include "CoreUtils/vector.hpp"
 
 namespace isis{ namespace data{ namespace _internal{
 /// @cond _hidden
@@ -96,6 +97,11 @@ public:
 	/// generates a string representing the size
 	std::string sizeToString(std::string delim="x")const{
 		return util::list2string(dim,dim+DIMS,delim);
+	}
+
+	/// generates a FixedVector\<DIMS\> representing the size
+	util::FixedVector<size_t,DIMS> sizeToVector()const{
+		return util::FixedVector<size_t,DIMS>(dim);
 	}
 
 	/// get the lowest and higest relevant (size>1) dimension

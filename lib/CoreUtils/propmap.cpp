@@ -21,10 +21,8 @@ bool _internal::nocase_less::operator() (const std::string& a, const std::string
 
 bool PropMap::valid() const {
 	//iterate through the whole map and return false as soon as we find something needed _and_ empty
- 	BOOST_FOREACH(const_reference ref,*this)
-		if(ref.second.needed() && ref.second.empty())
-			return false;
-	return true;
+	const const_iterator found=std::find_if(begin(),end(),invalidP());
+	return found==end();
 }
 
 
@@ -96,13 +94,14 @@ void PropMap::join(const isis::util::PropMap& second, bool overwrite, PropMap::k
 }
 
 
-PropMap::key_list PropMap::missing() const{
-	PropMap::key_list ret;
- 	BOOST_FOREACH(const_reference ref,*this){
-		if(ref.second.needed() && ref.second.empty())
-			ret.insert(ref.first);
-	}
-	return ret;
+const PropMap::key_list PropMap::keys()const
+{
+	return genKeyList<trueP>();
+}
+
+
+const PropMap::key_list PropMap::missing() const{
+	return genKeyList<invalidP>();
 }
 
 

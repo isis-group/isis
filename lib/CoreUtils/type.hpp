@@ -77,7 +77,8 @@ public:
 	 * \return the stored value
 	 */
 	operator TYPE()const{return m_val;}
-
+	operator TYPE&(){return m_val;}
+	
 	TypeBase* clone() const
 	{
 		LOG(CoreDebug,verbose_info)	<< "Creating cloned copy of " << toString(true);
@@ -92,7 +93,7 @@ public:
  * The class is designed for arrays, but you can also "point" to an single element
  * by just use "1" for the length.
  * The pointers are reference counted and will be deleted automatically by a customizable deleter.
- * The copy is cheap, thus the copy of a TypePtr will refernece the same data,
+ * The copy is cheap, thus the copy of a TypePtr will reference the same data.
  */
 template<typename TYPE> class TypePtr: public _internal::TypePtrBase{
 	boost::shared_ptr<TYPE> m_val;

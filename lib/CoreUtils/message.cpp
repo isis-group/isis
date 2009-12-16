@@ -86,7 +86,9 @@ void DefaultMsgPrint::setStream(::std::ostream &_o){
 }
 
 bool Message::shouldCommit()const{
-	return (commitTo && commitTo->level >= level);
+	if(commitTo)
+		return (commitTo->level >= level);
+	else return false;
 }
 
 ::std::ostream *DefaultMsgPrint::o=&::std::cout;

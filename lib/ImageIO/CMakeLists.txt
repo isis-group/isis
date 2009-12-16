@@ -26,5 +26,15 @@ if(IOPLUGIN_NULL)
 	set_target_properties(isisImageFormat_Null PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 endif(IOPLUGIN_NULL)
 
+if(IOPLUGIN_DICOM)
+	add_library(isisImageFormat_Dicom SHARED imageFormat_Dicom.cpp)
+	target_link_libraries(isisImageFormat_Dicom utils data dcmdata dcmimgle ofstd z)
+	
+	set_target_properties(isisImageFormat_Dicom PROPERTIES
+	LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+	LINK_FLAGS "--no-undefined")
+	set_target_properties(isisImageFormat_Dicom PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+endif(IOPLUGIN_DICOM)
+	
 message(STATUS "Installing plugins to ${CMAKE_BINARY_DIR}")
 

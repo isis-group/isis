@@ -15,6 +15,7 @@
 #include "image.hpp"
 #include "CoreUtils/vector.hpp"
 #include <boost/foreach.hpp>
+#include "CoreUtils/property.hpp"
 
 namespace isis{ namespace data{
 
@@ -44,11 +45,24 @@ Image::Image (_internal::image_chunk_order lt ) :set ( lt ),clean(true)
 }
 
 
-bool Image::insertChunk ( const Chunk &chunk ) {
-	if(not set.empty() && set.begin()->volume() != chunk.volume()){
-		LOG(DataLog,util::error)
-			<< "Cannot insert chunk, because its volume doesn't fit with the volume of the chunks allready in this image.";
-		return false;
+bool Image::insertChunk ( const Chunk &chunk )
+{
+	if(not set.empty()){
+		//if our first chunk and the incoming chunk do have different size, skip it
+		if(set.begin()->sizeToVector() != chunk.sizeToVector()){
+			LOG(DataDebug,util::info)
+				<< "Ignoring chunk with different size. (" << chunk.sizeToString() << "!=" << set.begin()->sizeToString() << ")";
+			return false;
+		}
+
+		//if our first chunk and the incoming chunk do have sequenceNumber and it differs, skip it
+		const util::PropertyValue baseSeq=set.begin()->getPropertyValue("sequenceNumber");
+		const util::PropertyValue insSeq=chunk.getPropertyValue("sequenceNumber");
+		if(not (baseSeq.empty() or insSeq.empty() or (baseSeq==insSeq))){ 
+			LOG(DataDebug,util::info)
+				<< "Ignoring chunk because its sequenceNumber doesn't fit (" << insSeq->toString(false) << "!=" << baseSeq->toString(false) << ")";
+			return false;
+		}
 	}
 	if(not chunk.sufficient()){
 		const util::PropMap::key_list missing=chunk.missing();
@@ -121,10 +135,16 @@ bool Image::reIndex() {
 	properties.join(common);
 	LOG(DataDebug,util::info) << common.size() << " common properties saved into the image";
 	LOG(DataDebug,util::verbose_info) << util::list2string(common.begin(),common.end(),", ");
-	
 	LOG(DataDebug,util::verbose_info) << "It now has: " << util::list2string(properties.begin(),properties.end(),",");
 
-	//get indexOrigin from the first chunk
+	//remove common props from the chunks
+	for(size_t i=0;i!=lookup.size();i++)
+		BOOST_FOREACH(const util::PropMap::value_type &ref,common)
+			getChunkAt(i).delProperty(ref.first);
+	LOG(DataDebug,util::info) << common.size() << " common properties removed from " << set.size() << " chunks";
+
+
+	//get indexOrigin from the geometrically first chunk
 	setProperty("indexOrigin",chunksBegin()->getPropertyValue("indexOrigin"));
 
 	//try to calculate slice vector if its missing
@@ -229,14 +249,14 @@ size_t Image::getChunkStride ( size_t base_stride )
 		 */
 		
 		// get the distance between first and second chunk for comparision
-		util::fvector4 thisV=lookup[0]->getProperty<util::fvector4>("indexOrigin");
-		util::fvector4 nextV=lookup[base_stride]->getProperty<util::fvector4>("indexOrigin");
+		const util::fvector4 thisV=lookup[0]->getProperty<util::fvector4>("indexOrigin");
+		const util::fvector4 nextV=lookup[base_stride]->getProperty<util::fvector4>("indexOrigin");
 		const util::fvector4 dist1 =nextV-thisV;
 		
 		// compare every follwing distance to that
 		for(size_t i=base_stride;i<lookup.size()-base_stride;i+=base_stride){
-			util::fvector4 thisV=lookup[i]->getProperty<util::fvector4>("indexOrigin");
-			util::fvector4 nextV=lookup[i+base_stride]->getProperty<util::fvector4>("indexOrigin");
+			const util::fvector4 thisV=lookup[i]->getProperty<util::fvector4>("indexOrigin");
+			const util::fvector4 nextV=lookup[i+base_stride]->getProperty<util::fvector4>("indexOrigin");
 			const util::fvector4 dist =nextV-thisV;
 
 			LOG(DataDebug,util::verbose_info)

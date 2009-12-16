@@ -5,7 +5,7 @@
 
 using isis::data::DataLog;
 
-bool isis::image_io::FileFormat::write(const isis::data::ImageList& images, const std::string& filename,const std::string& dialect)
+bool isis::image_io::FileFormat::write(const isis::data::ImageList& images, std::string filename,std::string dialect)
 {
 	boost::filesystem::path path(filename);
 	std::string file=path.leaf();

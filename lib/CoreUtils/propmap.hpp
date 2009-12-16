@@ -20,6 +20,7 @@
 #include "common.hpp"
 #include "property.hpp"
 #include <set>
+#include <algorithm>
 
 namespace isis{ 
 /*! \addtogroup util
@@ -37,19 +38,50 @@ struct nocase_less{
 /// @endcond
 	
 class PropMap : public std::map<std::string,PropertyValue,_internal::nocase_less>{
+	struct trueP{
+		bool operator()(const_reference ref)const{return true;}
+	};
+	struct empty{
+		bool operator()(const_reference ref)const{return ref.second.empty();}
+	};
+	struct needed{
+		bool operator()(const_reference ref)const{return ref.second.needed();}
+	};
+	struct invalidP{
+		bool operator()(const_reference ref)const{return ref.second.needed() && ref.second.empty();}
+	};
+	struct validP{
+		bool operator()(const_reference ref)const{return not invalidP().operator()(ref);}
+	};
+	
 public:
 	typedef std::set<key_type,_internal::nocase_less> key_list;
 	typedef std::map<key_type,std::pair<mapped_type,mapped_type>,_internal::nocase_less> diff_map;
+	template<class Predicate> struct insertKey{
+		key_list &out;
+		const Predicate pred;
+		insertKey(key_list &_out):out(_out),pred(){}
+		void operator()(const_reference ref){
+			if(pred(ref))
+				out.insert(out.end(),ref.first);
+		};
+	};
 	/**
 	* Check if every needed property is set.
 	* \returns false if there is any needed and empty property, true otherwhise.
 	*/
 	bool valid()const;
+	template<class Predicate> const key_list genKeyList()const{
+		key_list k;
+		std::for_each(begin(),end(),insertKey<Predicate>(k));
+		return k;
+	}
+	const key_list keys()const;
 	/**
 	* Get a list of missing properties.
 	* \returns a list of all needed and empty properties.
 	*/
-	key_list missing()const;
+	const key_list missing()const;
 	/**
 	 * Get a difference map of this and the given PropMap.
 	 * Creates a map out of the Name of differencing properties and their difference, which is a std::pair\<PropertyValue,PropertyValue\>.
