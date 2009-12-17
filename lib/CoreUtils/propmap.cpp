@@ -30,60 +30,82 @@ PropMap::diff_map PropMap::diff(const PropMap& other,key_list ignore) const{
 	
 	//insert everything that is in this, but not in second or is on both but differs
  	BOOST_FOREACH(const_reference ref,*this){
-		//find the closest match for ref.first in ignore (use the comparison-functor of PropMap)
+		//find the closest match for ref.first in ignore (use the key-comparison-functor of PropMap)
 		if (continousFind(ignoreIt, ignore.end(),ref.first, key_comp()))
 			continue; //skip if ref.first == *ignore
 		
-		const_iterator found=other.find(ref.first);
-		if(found == other.end())// if its not in second 
-			ret.insert(std::make_pair( // add (propertyname|(value1|[empty]))
-				ref.first,
-				std::make_pair(ref.second,PropertyValue())
-			));
-		else { //if it is in second as well
-			const PropertyValue &first=found->second,&second = ref.second;
-			if(!(first.empty() || second.empty() || first==second)) // if they are not empty, but not equal
-				ret.insert(std::make_pair( // add (propertyname|(value1|value2))
+		//find the closest match for ref.first in other (use the value-comparison-functor of PropMap)
+		if (continousFind(otherIt, other.end(),ref, value_comp()))
+		{ //otherIt->first == ref.first - so its the same property
+			const PropertyValue &first=ref.second,&second = otherIt->second;
+			if(!(first.empty() || second.empty() || first==second)) // if they are not both empty, but not equal
+				ret.insert(// add (propertyname|(value1|value2))
+					ret.end(),		// we know it has to be at the end
+					std::make_pair(
+						ref.first,		//the key
+						std::make_pair(first,second) //pair of both values
+					)
+				);
+		}else // if ref is not in the other map
+			ret.insert(// add (propertyname|(value1|[empty]))
+				ret.end(),		// we know it has to be at the end
+				std::make_pair(
 					ref.first,
-					std::make_pair(first,second)
-				));
-		}
+					std::make_pair(ref.second,PropertyValue())
+				)
+			);
 	}
 	//insert everything that is in second but not in this
- 	BOOST_FOREACH(const_reference ref,other){
-		const_iterator found=find(ref.first);
-		if(found == end()) // if its not in ref
-			ret.insert(std::make_pair( // add (propertyname|([empty]|value2))
-				ref.first,
-				std::make_pair(PropertyValue(),ref.second)
-			));
+	const_iterator thisIt=begin();
+	BOOST_FOREACH(const_reference ref,other){
+		if (not continousFind(thisIt, end(),ref, value_comp()))//there is nothing in this which has the same key as ref
+			ret.insert(
+				std::make_pair( // add (propertyname|([empty]|value2))
+					ref.first,
+					std::make_pair(PropertyValue(),ref.second)
+				)
+			);
 	}
 	return ret;
 }
 
 void PropMap::make_unique (const util::PropMap& other, PropMap::key_list ignore ) {
+	key_list::const_iterator ignoreIt= ignore.begin();
+	iterator thisIt=begin();
+	
 	//remove everything that is also in second and equal
 	BOOST_FOREACH(const_reference ref,other){
-		if(ignore.find(ref.first)==ignore.end())
-			continue;
-		iterator found=find(ref.first);
-		if(found != other.end() && found->second.operator==(ref.second))
-			erase(found);
+		//find the closest match for ref.first in ignore (use the comparison-functor of PropMap)
+		if (continousFind(ignoreIt, ignore.end(),ref.first, key_comp()))
+			continue; //skip if ref.first == *ignore
+			
+		//find the closest match for ref.first in this (use the value-comparison-functor of PropMap)
+		if (
+			continousFind(thisIt, end(),ref, value_comp()) //ref.first == otherIt->first  - so its the same property
+			and thisIt->second.operator==(ref.second) //if the values of this prop are equal
+		)
+			erase(thisIt);
 	}
 }
 
-void PropMap::join(const isis::util::PropMap& other, bool overwrite, PropMap::key_list ignore) {
+PropMap::key_list PropMap::join(const isis::util::PropMap& other, bool overwrite, PropMap::key_list ignore) {
+	key_list::const_iterator ignoreIt= ignore.begin();
+	key_list rejects;
+	iterator thisIt=begin();
+	
 	BOOST_FOREACH(const_reference ref,other){
-		if(ignore.find(ref.first)!=ignore.end()){//skip any prop from the ignore-list
-			LOG(CoreDebug,verbose_info) << "Ignoring " << ref;
-			continue;
-		}
-		iterator found=find(ref.first);
-		if(found != this->end()){ // if its allready here
-			if(found->second.empty() || overwrite){
-				LOG(CoreDebug,verbose_info) << "Replacing " << MSubject(*found) << " by " << MSubject(ref.second);
-				found->second=ref.second;
-			}
+		//find the closest match for ref.first in ignore (use the comparison-functor of PropMap)
+		if (continousFind(ignoreIt, ignore.end(),ref.first, key_comp()))
+			continue; //skip if ref.first == *ignore
+
+		if(continousFind(thisIt, end(),ref, value_comp()))
+		{ // if its allready here
+			if(thisIt->second.empty() || overwrite){
+				LOG(CoreDebug,verbose_info) << "Replacing " << MSubject(*thisIt) << " by " << MSubject(ref.second);
+				thisIt->second=ref.second;
+			} else
+				rejects.insert(rejects.end(),ref.first);
+
 		} else {
 			LOG(CoreDebug,verbose_info) << "Inserting " << ref;
 			insert(ref);

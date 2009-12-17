@@ -96,7 +96,7 @@ public:
 	/// Remove everything that is also in second and equal.
 	void make_unique(const PropMap &second,key_list ignore=key_list());
 	/// Add Properties from another PropMap
-	void join(const PropMap &second,bool overwrite=false,key_list ignore=key_list());
+	PropMap::key_list join(const isis::util::PropMap& other, bool overwrite = false, isis::util::PropMap::key_list ignore = key_list());
 	/**
 	 * "Print" the PropMap.
 	 * Will send the name and the result of PropertyValue->toString(label) to the given ostream.
