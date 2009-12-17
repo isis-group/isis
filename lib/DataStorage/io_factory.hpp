@@ -78,7 +78,7 @@ protected:
 	unsigned int findPlugins(const std::string& path);
 	FileFormatList getFormatInterface(const std::string& filename, const std::string& dialect);
 private:
-	std::map<std::string, FileFormatList,util::_internal::nocase_less> io_suffix;
+	std::map<std::string, FileFormatList,util::caselessStringLess> io_suffix;
 	IOFactory();//shall not be created directly
 	IOFactory& operator =(IOFactory&); //dont do that
 };

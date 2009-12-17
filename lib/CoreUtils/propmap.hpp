@@ -29,15 +29,11 @@ namespace isis{
  */
 namespace util{
 
-/// @cond _hidden
-namespace _internal {
-struct nocase_less{
-	bool operator() (const std::string& a, const std::string& b) const;
-};
-}
-/// @endcond
-	
-class PropMap : public std::map<std::string,PropertyValue,_internal::nocase_less>{
+class PropMap : public std::map<std::string,PropertyValue,caselessStringLess>{
+public:
+	typedef std::set<key_type,caselessStringLess> key_list;
+	typedef std::map<key_type,std::pair<mapped_type,mapped_type>,caselessStringLess> diff_map;
+private:
 	struct trueP{
 		bool operator()(const_reference ref)const{return true;}
 	};
@@ -53,10 +49,6 @@ class PropMap : public std::map<std::string,PropertyValue,_internal::nocase_less
 	struct validP{
 		bool operator()(const_reference ref)const{return not invalidP().operator()(ref);}
 	};
-	
-public:
-	typedef std::set<key_type,_internal::nocase_less> key_list;
-	typedef std::map<key_type,std::pair<mapped_type,mapped_type>,_internal::nocase_less> diff_map;
 	template<class Predicate> struct insertKey{
 		key_list &out;
 		const Predicate pred;
@@ -66,16 +58,18 @@ public:
 				out.insert(out.end(),ref.first);
 		};
 	};
-	/**
-	* Check if every needed property is set.
-	* \returns false if there is any needed and empty property, true otherwhise.
-	*/
-	bool valid()const;
+protected:
 	template<class Predicate> const key_list genKeyList()const{
 		key_list k;
 		std::for_each(begin(),end(),insertKey<Predicate>(k));
 		return k;
 	}
+public:
+	/**
+	* Check if every needed property is set.
+	* \returns false if there is any needed and empty property, true otherwhise.
+	*/
+	bool valid()const;
 	const key_list keys()const;
 	/**
 	* Get a list of missing properties.
