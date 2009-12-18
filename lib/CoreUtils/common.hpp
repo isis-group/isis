@@ -145,7 +145,7 @@ continousFind(ForwardIterator &current,const ForwardIterator end,const T& compar
 	//find the first iterator which is does not compare less
 	current=std::lower_bound( current, end, compare, compOp);
 	if (current == end //if we're at the end
-		and compOp(compare, *current) //or compare is less than that iterator
+		or compOp(compare, *current) //or compare is less than that iterator
 		)
 			return false;//we didn't find a match
 		else

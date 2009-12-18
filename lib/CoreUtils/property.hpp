@@ -76,13 +76,14 @@ public:
 	 * Properties are equal to Values if, and only if:
 	 * - the property is not empty
 	 * - the property contains the value type T
-	 * - both stored value is equal to the given value
+	 * - stored value is equal to the given value
 	 * \returns (this->cast_to_type\<T\>() == second) if the property contains a value of type T, false otherwise.
 	 */
 	template<typename T> bool operator ==(const T &second)const{
-		if(get()->is<T>())
-			return second == get()->cast_to_Type<T>();
-		else
+		if(get()->is<T>()){
+			const T& cmp=get()->cast_to_Type<T>();
+			return second == cmp;
+		} else
 			return false;
 	}
 };

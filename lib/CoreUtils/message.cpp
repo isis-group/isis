@@ -72,12 +72,12 @@ string Message::merge()const{
 		ret.replace(found,3,object);
 	found=0;
 	while((found=ret.find("{s}",found))!=string::npos)
-		ret.replace(found,3,*(subj++));
+		ret.replace(found,3, std::string("\"")+*(subj++)+"\"");
 	return ret;
 }
 
 void DefaultMsgPrint::commit(const Message &mesg){
-	*o << LogLevelNames[mesg.level] << " [" << mesg.file.leaf() << ":" << mesg.line << "|" << mesg.object << "]\t" <<
+	*o << LogLevelNames[mesg.level] << " [" << mesg.file.leaf() << ":" << mesg.line << "]\t" <<
 mesg.merge() << std::endl;
 }
 

@@ -24,7 +24,7 @@ bool PropertyValue::operator== ( const util::PropertyValue& second )const {
 
 
 bool PropertyValue::operator== ( const _internal::TypeBase& second )const {
-	return get()->eq(second);
+	return !empty() && get()->eq(second);
 }
 
 

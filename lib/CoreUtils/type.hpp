@@ -56,8 +56,7 @@ public:
 	/// \returns true if this and second contain the same value of the same type
 	virtual bool eq(const TypeBase &second)const{
 		if(second.is<TYPE>()){
-			const TYPE sec= second.cast_to_Type<TYPE>();
-			return m_val == sec;
+			return m_val == (TYPE)second.cast_to_Type<TYPE>();
 		} else
 			return  false;
 	}
@@ -76,7 +75,7 @@ public:
 	 * In this case the function returns int which is then also implicitely converted to float.
 	 * \return the stored value
 	 */
-	operator TYPE()const{return m_val;}
+	operator const TYPE&()const{return m_val;}
 	operator TYPE&(){return m_val;}
 	
 	TypeBase* clone() const

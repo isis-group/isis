@@ -101,16 +101,20 @@ PropMap::key_list PropMap::join(const isis::util::PropMap& other, bool overwrite
 		if(continousFind(thisIt, end(),ref, value_comp()))
 		{ // if its allready here
 			if(thisIt->second.empty() || overwrite){
-				LOG(CoreDebug,verbose_info) << "Replacing " << MSubject(*thisIt) << " by " << MSubject(ref.second);
+				LOG(CoreDebug,info) << "Replacing property " << MSubject(*thisIt) << " by " << MSubject(ref.second) << ".";
 				thisIt->second=ref.second;
-			} else
+			} else if(not (thisIt->second == ref.second)){
+				LOG(CoreDebug,info)
+					<< "Rejecting property " << MSubject(ref) << "."
+					<< " because its allready set to "<< MSubject(thisIt->second) << ".";
 				rejects.insert(rejects.end(),ref.first);
-
+			}
 		} else {
-			LOG(CoreDebug,verbose_info) << "Inserting " << ref;
+			LOG(CoreDebug,info) << "Inserting property " << MSubject(ref) << ".";
 			insert(ref);
 		}
 	}
+	return rejects;
 }
 
 
