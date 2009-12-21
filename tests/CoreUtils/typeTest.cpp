@@ -8,17 +8,19 @@
  *      Author: proeger
  */
 
+// This might crash on MacOS. See http://old.nabble.com/-Boost.Test--Error:-Non-aligned-pointer-being-freed-td24335733.html
+
 #define BOOST_TEST_MODULE TypeTest
 #include <boost/test/included/unit_test.hpp>
 #include <string>
-#include <CoreUtils/type.hpp>
+#include "CoreUtils/type.hpp"
 
 namespace isis{namespace test{
 	
 using util::Type;
 
 // TestCase object instantiation
-BOOST_AUTO_TEST_CASE(type_init_test) {
+BOOST_AUTO_TEST_CASE(test_type_init) {
 
 	Type<int> tInt(42);		// integer
 	Type<std::string> tStr("Hello World"); // string
@@ -44,7 +46,7 @@ BOOST_AUTO_TEST_CASE(type_init_test) {
 	Type<int> x(42);
 	Type<int> y(x.toString(false));
 	
-	BOOST_CHECK((int)x == (int)y);
+	BOOST_CHECK_EQUAL((int)x, (int)y);
 	
 	Type<float> f(42.2);
 	try {
@@ -69,12 +71,9 @@ BOOST_AUTO_TEST_CASE(type_toString_test) {
 	Type<float> tFloat(3.1415);
 	Type<std::string> tString("Hello World");
 
-	// let's see if the string representation is correct. Remember, that compare
-	// returns 0 if everything is fine. So we need to inverse the result for the
-	// ASSERT test.
-	BOOST_CHECK(!tInt.toString().compare("42"));
-	BOOST_CHECK(!tFloat.toString().compare("3.1415"));
-	BOOST_CHECK(!tString.toString().compare("Hello World"));
+	BOOST_CHECK_EQUAL(tInt.toString(),"42");
+	BOOST_CHECK_EQUAL(tFloat.toString(),"3.1415");
+	BOOST_CHECK_EQUAL(tString.toString(),"Hello World");
 
 }
 
@@ -97,8 +96,8 @@ BOOST_AUTO_TEST_CASE(test_type_operators) {
 
 	// for operations Type<T> should automatically cast to it's internal type and do the operations on it
 	Type<int> tInt1(21), tInt2(21);
-	BOOST_CHECK(tInt1+tInt2 == Type<int>(42));
-	BOOST_CHECK(tInt1*2 == 42);
-	BOOST_CHECK(42 - tInt1 == tInt2);
+	BOOST_CHECK_EQUAL(tInt1+tInt2, Type<int>(42));
+	BOOST_CHECK_EQUAL(tInt1*2, 42);
+	BOOST_CHECK_EQUAL(42 - tInt1, tInt2);
 }
 }}

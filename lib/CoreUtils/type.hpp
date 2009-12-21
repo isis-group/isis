@@ -98,15 +98,23 @@ template<typename TYPE> class TypePtr: public _internal::TypePtrBase{
 	boost::shared_ptr<TYPE> m_val;
 	size_t m_len;
 	template<typename T> TypePtr(const Type<T>& value); // Dont do this
+	/// Proxy-Deleter to encapsulate the real deleter/shared_ptr when creating shared_ptr for parts of a shared_ptr
 	class DelProxy : public boost::shared_ptr<TYPE>{
 	public:
+		/**
+		 * Create a proxy for a given master shared_ptr
+		 * This increments the use_count of the master and thus keeps the 
+		 * master from being deleted while parts of it are still in use.
+		 */
 		DelProxy(const TypePtr<TYPE> &master): boost::shared_ptr<TYPE>(master){
 			LOG(CoreDebug,util::verbose_info) << "Creating DelProxy for " << this->get();
 		}
+		/// decrement the use_count of the master when a specific part is not referenced anymore
 		void operator()(TYPE *at){
 			LOG(CoreDebug,util::verbose_info)
-			<< "Deletion for " << this->get() << " called from splice "	<< at
+			<< "Deletion for " << this->get() << " called from splice at offset "	<< at-this->get()
 			<< ", current use_count: " << this->use_count();
+			this->reset();//actually not needed, but we keep it here to keep obfuscation low
 		}
 	};
 public:

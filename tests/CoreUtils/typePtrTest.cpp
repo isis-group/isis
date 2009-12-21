@@ -7,7 +7,7 @@
 
 #define BOOST_TEST_MODULE TypePtrTest
 #include <boost/test/included/unit_test.hpp>
-#include <CoreUtils/type.hpp>
+#include "CoreUtils/type.hpp"
 
 namespace isis{namespace test{
 
