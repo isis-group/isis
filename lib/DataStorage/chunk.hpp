@@ -23,13 +23,7 @@
 #include "propertyobject.h"
 #include "CoreUtils/vector.hpp"
 
-namespace isis{ 
-/*! \addtogroup data
-*  Additional documentation for group `mygrp'
-*  @{
-*/
-
-namespace data{
+namespace isis{namespace data{
 
 namespace _internal{
 class ChunkBase :public NDimensional<4>,public PropertyObject{
@@ -49,7 +43,7 @@ public:
 	
 /**
  * Main class for four-dimensional random-access data blocks.
- * Like in TypePtr, the copy of a Chunk will refernece the same data.
+ * Like in TypePtr, the copy of a Chunk will reference the same data.
  * (If you want to make a memory based deep copy of a Chunk create a MemChunk from it)
  */
 class Chunk : public _internal::ChunkBase, public util::_internal::TypeReference<util::_internal::TypePtrBase>{
@@ -116,9 +110,7 @@ struct chunk_comarison : public std::binary_function< Chunk, Chunk, bool>{
 
 typedef std::list<Chunk> ChunkList;
 
-/**
- * Chunk class for memory-based buffers
- */
+/// Chunk class for memory-based buffers
 template<typename TYPE> class MemChunk : public Chunk{
 public:
 	MemChunk(size_t firstDim,size_t secondDim=1,size_t thirdDim=1,size_t fourthDim=1):
@@ -138,8 +130,5 @@ public:
 		getTypePtr<TYPE>()=rep;
 	}
 };
-
-}
-/** @} */
-}
+}}
 #endif // CHUNK_H

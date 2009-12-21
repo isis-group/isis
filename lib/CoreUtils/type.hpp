@@ -98,6 +98,17 @@ template<typename TYPE> class TypePtr: public _internal::TypePtrBase{
 	boost::shared_ptr<TYPE> m_val;
 	size_t m_len;
 	template<typename T> TypePtr(const Type<T>& value); // Dont do this
+	class DelProxy : public boost::shared_ptr<TYPE>{
+	public:
+		DelProxy(const TypePtr<TYPE> &master): boost::shared_ptr<TYPE>(master){
+			LOG(CoreDebug,util::verbose_info) << "Creating DelProxy for " << this->get();
+		}
+		void operator()(TYPE *at){
+			LOG(CoreDebug,util::verbose_info)
+			<< "Deletion for " << this->get() << " called from splice "	<< at
+			<< ", current use_count: " << this->use_count();
+		}
+	};
 public:
 	/// Default delete-functor for c-arrays (uses free()).
 	struct BasicDeleter{
@@ -137,6 +148,12 @@ public:
 
 	template<typename D> TypePtr(TYPE* ptr,size_t len,D d):
 	m_val(ptr,d),m_len(len)	{}
+
+	/**
+	 * Contructor for empty pointer.
+	 * length will be 0 and every attempt to dereference it will raise an exception.
+	 */
+	TypePtr():m_len(0)	{}
 	
 	/// \returns the length of the data pointed to
 	size_t len()const
@@ -148,7 +165,7 @@ public:
 	void deepCopy(TypePtr<TYPE> &dst)
 	{
 		if(m_len!=dst.len())
-			LOG(CoreLog,error) << "Source and destination do not have the same size, using the smaller";
+			LOG(CoreLog,warning) << "Source and destination do not have the same size, using the smaller";
 		boost::shared_ptr<TYPE> &pDst=(boost::shared_ptr<TYPE>)dst;
 		std::copy(
 			m_val.get(),
@@ -208,14 +225,31 @@ public:
 	 * (using the given deleter) if required.
 	 * \return boost::shared_ptr\<TYPE\> handling same data as the object.
 	 */
-	operator boost::shared_ptr<TYPE>(){return m_val;}
+	operator boost::shared_ptr<TYPE>&(){return m_val;}
+	operator const boost::shared_ptr<TYPE>&()const{return m_val;}
 
 	TypePtrBase* clone() const
 	{
 		LOG(CoreDebug,verbose_info)	<< "Creating cloned copy of TypePtr<" << typeName() << ">";
 		return new TypePtr<TYPE>(*this);
 	}
+	std::vector<TypePtr<TYPE> > splice(size_t size){
+		if(size>=len()){
+			LOG(CoreDebug,warning)
+				<< "splicing data of the size " << len() << " up into blocks of the size is kind of useless ..." << size;
+		}
+		const size_t fullSplices=len()/size;
+		const size_t lastSize=len()%size;//rest of the division - size of the last splice
+		const size_t splices=fullSplices + (lastSize?1:0);
 
+		std::vector<TypePtr<TYPE> > ret(splices);
+		DelProxy proxy(*this);
+		for(size_t i=0;i<fullSplices;i++)
+			ret[i]=TypePtr(m_val.get()+i*size,size,proxy);
+		if(lastSize)
+			ret.back()=TypePtr(m_val.get()+fullSplices*size,lastSize,proxy);
+		return ret;
+	}
 };
 
 }

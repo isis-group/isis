@@ -64,10 +64,10 @@ template<class InputIterator> std::string list2string(
  * Splits source into tokens and tries to lexically cast them to TARGET.
  * If that fails, boost::bad_lexical_cast is thrown.
  * \param source the source string to be split up
- * \param separator regular expression to delimit the tokens (defaults to \s+)
+ * \param separator regular expression to delimit the tokens (defaults to \\s+)
  * \param prefix regular expression for text to be removed from the string before it is split up 
  * ("^" if not given, will be added at the beginning)
- * \param suffix regular expression for text to be removed from the string before it is split up 
+ * \param postfix regular expression for text to be removed from the string before it is split up
  * ("$" if not given, will be added at the end)
  * \returns a list of the casted tokens
  */
@@ -150,6 +150,22 @@ continousFind(ForwardIterator &current,const ForwardIterator end,const T& compar
 			return false;//we didn't find a match
 		else
 			return true;//not(current <> compare) makes compare == current
+}
+/**
+* Continously searches in an sorted list using std::less.
+* It starts at current and increments it until the referenced value is not less than the compare-value anymore.
+* Than it returns.
+* \param current the current-position-iterator for the sorted list.
+* This value is changed directly, so after the function returns is references the first entry of the list
+* which does not compare less than compare or, if such a value does not exit in the list, it will be equal to end.
+* \param end the end of the list
+* \param compare the compare-value
+* \returns true if the value current currently refers to is equal to compare
+*/
+template<typename ForwardIterator, typename T> bool
+continousFind(ForwardIterator &current,const ForwardIterator end,const T& compare)
+{
+	return continousFind(current,end,compare,std::less<T>());
 }
 
 ///Caseless less-compare for std::string
