@@ -38,7 +38,9 @@ PropMap::diff_map PropMap::diff(const PropMap& other,key_list ignore) const{
 		if (continousFind(otherIt, other.end(),ref, value_comp()))
 		{ //otherIt->first == ref.first - so its the same property
 			const PropertyValue &first=ref.second,&second = otherIt->second;
-			if(!(first.empty() || second.empty() || first==second)) // if they are not both empty, but not equal
+			if( not(first.empty() and second.empty())
+				and not(first==second)
+			) // if they are not both empty, but not equal
 				ret.insert(// add (propertyname|(value1|value2))
 					ret.end(),		// we know it has to be at the end
 					std::make_pair(
@@ -57,7 +59,10 @@ PropMap::diff_map PropMap::diff(const PropMap& other,key_list ignore) const{
 	}
 	//insert everything that is in second but not in this
 	const_iterator thisIt=begin();
+	ignoreIt= ignore.begin();
 	BOOST_FOREACH(const_reference ref,other){
+		if (continousFind(ignoreIt, ignore.end(),ref.first, key_comp()))
+			continue; //skip if ref.first == *ignore
 		if (not continousFind(thisIt, end(),ref, value_comp()))//there is nothing in this which has the same key as ref
 			ret.insert(
 				std::make_pair( // add (propertyname|([empty]|value2))
