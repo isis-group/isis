@@ -102,8 +102,9 @@ template<typename TYPE_TYPE> class TypeReference:public boost::scoped_ptr<TYPE_T
 protected:
 	//dont use this directly
 	TypeReference(TYPE_TYPE *t):boost::scoped_ptr<TYPE_TYPE>(t){}
-	TypeReference(){}
 public:
+	///Default contructor. Creates an empty reference
+	TypeReference(){}
 	/**
 	* Copy constructor
 	* This operator creates a copy of the referenced Type-Object.
@@ -186,9 +187,13 @@ public:
 	* \returns a TypeBase-pointer to a newly created Type/TypePtr.
 	*/
 	virtual TypeBase* clone()const=0;
+	virtual ~TypeBase();
 };
 
 class TypePtrBase : public GenericType{
+protected:
+	size_t m_len;
+	TypePtrBase(size_t len=0);
 public:
 	typedef TypeReference<TypePtrBase> Reference;
 	/**
@@ -209,8 +214,12 @@ public:
 	template<typename T> TypePtr<T>& cast_to_TypePtr() throw(std::bad_cast){
 		return m_cast_to<TypePtr<T> >();
 	}
-
+	/// \returns the length of the data pointed to
+	size_t len()const;
+	
+	virtual std::vector<Reference> splice(size_t size)const=0;
 	virtual TypePtrBase* clone()const=0;
+	virtual ~TypePtrBase();
 };
 
 }

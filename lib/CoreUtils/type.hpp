@@ -96,14 +96,14 @@ public:
  */
 template<typename TYPE> class TypePtr: public _internal::TypePtrBase{
 	boost::shared_ptr<TYPE> m_val;
-	size_t m_len;
 	template<typename T> TypePtr(const Type<T>& value); // Dont do this
 	/// Proxy-Deleter to encapsulate the real deleter/shared_ptr when creating shared_ptr for parts of a shared_ptr
+public:
 	class DelProxy : public boost::shared_ptr<TYPE>{
 	public:
 		/**
 		 * Create a proxy for a given master shared_ptr
-		 * This increments the use_count of the master and thus keeps the 
+		 * This increments the use_count of the master and thus keeps the
 		 * master from being deleted while parts of it are still in use.
 		 */
 		DelProxy(const TypePtr<TYPE> &master): boost::shared_ptr<TYPE>(master){
@@ -117,7 +117,6 @@ template<typename TYPE> class TypePtr: public _internal::TypePtrBase{
 			this->reset();//actually not needed, but we keep it here to keep obfuscation low
 		}
 	};
-public:
 	/// Default delete-functor for c-arrays (uses free()).
 	struct BasicDeleter{
 		virtual void operator()(TYPE *p){
@@ -133,6 +132,11 @@ public:
 		};
 	};
 	/**
+	* Contructor for empty pointer.
+	* length will be 0 and every attempt to dereference it will raise an exception.
+	*/
+	TypePtr(){}
+	/**
 	 * Creates TypePtr from a pointer of type TYPE.
 	 * The pointers are automatically deleted by an instance of BasicDeleter and should not be used outside once used here.
 	 * If ptr is a pointer to C++ objects (delete[] needed) you must use 
@@ -143,7 +147,7 @@ public:
 	 * this is just here for child classes which may want to check)
 	 */
 	TypePtr(TYPE* ptr,size_t len):
-	m_val(ptr,BasicDeleter()),m_len(len){}
+	m_val(ptr,BasicDeleter()),_internal::TypePtrBase(len){}
 	/**
 	 * Creates TypePtr from a pointer of type TYPE.
 	 * The pointers are automatically deleted by an copy of d and should not be used outside once used here.
@@ -155,20 +159,10 @@ public:
 	 */
 
 	template<typename D> TypePtr(TYPE* ptr,size_t len,D d):
-	m_val(ptr,d),m_len(len)	{}
+	m_val(ptr,d),_internal::TypePtrBase(len)	{}
 
-	/**
-	 * Contructor for empty pointer.
-	 * length will be 0 and every attempt to dereference it will raise an exception.
-	 */
-	TypePtr():m_len(0)	{}
-	
-	/// \returns the length of the data pointed to
-	size_t len()const
-	{
-		return m_len;
-	}
-	
+	virtual ~TypePtr(){}
+
 	/// Copies the data pointed to into another TypePtr of the same type
 	void deepCopy(TypePtr<TYPE> &dst)
 	{
@@ -241,7 +235,7 @@ public:
 		LOG(CoreDebug,verbose_info)	<< "Creating cloned copy of TypePtr<" << typeName() << ">";
 		return new TypePtr<TYPE>(*this);
 	}
-	std::vector<TypePtr<TYPE> > splice(size_t size){
+	std::vector<Reference> splice(size_t size)const{
 		if(size>=len()){
 			LOG(CoreDebug,warning)
 				<< "splicing data of the size " << len() << " up into blocks of the size is kind of useless ..." << size;
@@ -250,12 +244,12 @@ public:
 		const size_t lastSize=len()%size;//rest of the division - size of the last splice
 		const size_t splices=fullSplices + (lastSize?1:0);
 
-		std::vector<TypePtr<TYPE> > ret(splices);
+		std::vector<Reference> ret(splices);
 		DelProxy proxy(*this);
 		for(size_t i=0;i<fullSplices;i++)
-			ret[i]=TypePtr(m_val.get()+i*size,size,proxy);
+			ret[i].reset(new TypePtr(m_val.get()+i*size,size,proxy));
 		if(lastSize)
-			ret.back()=TypePtr(m_val.get()+fullSplices*size,lastSize,proxy);
+			ret.back().reset(new TypePtr(m_val.get()+fullSplices*size,lastSize,proxy));
 		return ret;
 	}
 };
