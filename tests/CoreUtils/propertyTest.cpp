@@ -16,15 +16,15 @@ namespace isis{namespace test{
 	
 BOOST_AUTO_TEST_CASE(property_init_test)
 {
-	ENABLE_LOG(util::CoreLog,util::DefaultMsgPrint,util::info);
-	ENABLE_LOG(util::CoreDebug,util::DefaultMsgPrint,util::verbose_info);
+/*	ENABLE_LOG(util::CoreLog,util::DefaultMsgPrint,util::info);
+	ENABLE_LOG(util::CoreDebug,util::DefaultMsgPrint,util::verbose_info);*/
 	
 	//	default constructor
 	util::PropertyValue propZero;
 
 	//	initializer
 	util::PropertyValue propA = std::string("Property01");
-	BOOST_CHECK(propA->toString().compare("Property01") == 0);
+	BOOST_CHECK_EQUAL(propA->toString(),"Property01");
 
 	//	default: not needed
 	BOOST_CHECK(!propA.needed());
@@ -34,18 +34,16 @@ BOOST_AUTO_TEST_CASE(property_init_test)
 
 BOOST_AUTO_TEST_CASE(property_copy_test)
 {
-	ENABLE_LOG(util::CoreLog,util::DefaultMsgPrint,util::info);
-	ENABLE_LOG(util::CoreDebug,util::DefaultMsgPrint,util::verbose_info);
 
 	// Test copy operator
 	util::PropertyValue propA = 5;
 	util::PropertyValue propB = propA;
-	BOOST_CHECK(propB == 5);
+	BOOST_CHECK_EQUAL(propB, 5);
 
 	//check for deep copy (change of propA shall not change propB)
 	propA = 6;
-	BOOST_CHECK(propA == 6);
-	BOOST_CHECK(propB == 5);
+	BOOST_CHECK_EQUAL(propA, 6);
+	BOOST_CHECK_EQUAL(propB, 5);
 }
 
 }}
