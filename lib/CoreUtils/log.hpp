@@ -37,7 +37,7 @@ public:
 		Log<MODULE>::handler().reset(enable ? new HANDLE_CLASS(enable):0);
 	}
 	static Message send(const char file[],const char object[],int line,LogLevel level){
-		return Message(object,file,line, level,handler());
+		return Message(object,MODULE::name(),file,line, level,handler());
 	}
 };
 
@@ -47,10 +47,12 @@ public:
 /// @endcond
 
 #define ENABLE_LOG(MODULE,HANDLE_CLASS,set)\
-if(!MODULE::use_rel);else isis::util::_internal::Log<MODULE>::enable<HANDLE_CLASS>(set)
+if(!MODULE::use);else isis::util::_internal::Log<MODULE>::enable<HANDLE_CLASS>(set)
 
 #define LOG(MODULE,LEVEL)\
-if(!MODULE::use_rel);else isis::util::_internal::Log<MODULE>::send(__FILE__,__PRETTY_FUNCTION__,__LINE__,LEVEL)
+if(!MODULE::use);else isis::util::_internal::Log<MODULE>::send(__FILE__,__PRETTY_FUNCTION__,__LINE__,LEVEL)
 
+#define LOG_IF(PRED,MODULE,LEVEL)\
+if(!(MODULE::use and (PRED)));else isis::util::_internal::Log<MODULE>::send(__FILE__,__PRETTY_FUNCTION__,__LINE__,LEVEL)
 
 #endif

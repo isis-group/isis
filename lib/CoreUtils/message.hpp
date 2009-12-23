@@ -38,7 +38,7 @@ class MSubject : public std::string{
 };
 
 enum LogLevel{error=0,warning,info,verbose_info};
-static const char* LogLevelNames[]={"error","warning","info","verbose_info"};
+static const char* LogLevelNames[]={"error","warning","info","verbose"};
 
 /// @cond _internal
 namespace _internal{
@@ -59,15 +59,15 @@ public:
 };
 
 class Message: public std::ostringstream{
-public:
-	std::string object;
-	boost::filesystem::path file;
-	std::list<std::string> subjects;
-	time_t timeStamp;
-	int line;
-	LogLevel m_level;
 	boost::weak_ptr<MessageHandlerBase> commitTo;
-	Message(std::string object,std::string file,int line,LogLevel m_level,boost::weak_ptr<MessageHandlerBase> commitTo);
+public:
+	std::string m_object,m_module;
+	boost::filesystem::path m_file;
+	std::list<std::string> m_subjects;
+	time_t m_timeStamp;
+	int m_line;
+	LogLevel m_level;
+	Message(std::string object,std::string module,std::string file,int line,LogLevel m_level,boost::weak_ptr<MessageHandlerBase> commitTo);
 	Message(const Message &src);
 	~Message();
 	std::string merge()const;
@@ -77,7 +77,7 @@ public:
 		return *this;
 	}
 	Message &operator << (const MSubject &subj){
-		subjects.push_back(subj);
+		m_subjects.push_back(subj);
 		*((std::ostringstream*)this) << "{s}";
 		return *this;
 	}

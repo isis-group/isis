@@ -24,8 +24,8 @@ namespace isis{
 
 namespace image_io{
 /// @cond _hidden
-	struct ImageIoLog{enum {use_rel = _ENABLE_IMAGEIO_LOG};};
-	struct ImageIoDebug{enum {use_rel = _ENABLE_IMAGEIO_DEBUG};};
+	struct ImageIoLog{static const char* name(){return "ImageIO";};enum {use = _ENABLE_IMAGEIO_LOG};};
+	struct ImageIoDebug{static const char* name(){return "ImageIO";};enum {use= _ENABLE_IMAGEIO_DEBUG};};
 /// @endcond
 
 } //namespace image_io

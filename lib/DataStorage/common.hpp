@@ -22,10 +22,10 @@ namespace isis{
 
 namespace data{
 /// @cond _hidden
-	struct DataLog{enum {use_rel = _ENABLE_DATA_LOG};};
-	struct DataDebug{enum {use_rel = _ENABLE_DATA_DEBUG};};
+	struct DataLog{static const char* name(){return "Data";};enum {use = _ENABLE_DATA_LOG};};
+	struct DataDebug{static const char* name(){return "Data";};enum {use= _ENABLE_DATA_DEBUG};};
 /// @endcond
-enum dimensions{timeDim=0,sliceDim,phaseDim,readDim};
+// enum dimensions{timeDim=0,sliceDim,phaseDim,readDim};
 }
 /** @} */
 }

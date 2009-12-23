@@ -177,16 +177,8 @@ struct caselessStringLess{
 };
 
 /// @cond _hidden
-struct CoreLog{
-	enum{
-		use_rel = _ENABLE_CORE_LOG
-	};
-};
-struct CoreDebug{
-	enum{
-		use_rel = _ENABLE_CORE_DEBUG
-	};
-};
+	struct CoreLog{static const char* name(){return "Core";};enum {use = _ENABLE_CORE_LOG};};
+	struct CoreDebug{static const char* name(){return "Core";};enum {use= _ENABLE_CORE_DEBUG};};
 /// @endcond
 }}
 

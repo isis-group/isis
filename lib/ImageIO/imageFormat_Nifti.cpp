@@ -74,8 +74,8 @@ public:
 		data::ChunkList chunkListFromNifti;
 		util::fvector4 dimensions(ni->dim[1], ni->ndim >= 2 ? ni->dim[2] : 1, ni->ndim >= 3 ? ni->dim[3] : 1, ni->ndim
 		        >= 4 ? ni->dim[4] : 1);
-		LOG(ImageIoLog, isis::util::info)
-		<<	"size of chunk " << dimensions << "/" << ni->ndim << std::endl;
+		LOG(ImageIoLog, util::info)
+		<<	"size of chunk " << dimensions << "/" << ni->ndim;
 
 		//copy ni->data to ChunkList
 		switch(ni->datatype) {
@@ -94,7 +94,7 @@ public:
 				<< "dims at all " << dimensions;
 				util::fvector4 offsets(ni->qoffset_x, ni->qoffset_y, ni->qoffset_z, 0);
 				LOG(ImageIoLog, util::info)
-				<< "Offset values from nifti" << offsets << std::endl;
+					<< "Offset values from nifti" << offsets;
 				ch.setProperty("indexOrigin", util::fvector4(ni->qoffset_x, ni->qoffset_y, ni->qoffset_z, 0));
 				//TODO
 				//ch.setProperty("acquisitionTime", );
@@ -127,7 +127,7 @@ public:
 				<< "dims at all " << dimensions;
 				util::fvector4 offsets(ni->qoffset_x, ni->qoffset_y, ni->qoffset_z, 0);
 				LOG(ImageIoLog, util::info)
-				<< "Offset values from nifti" << offsets << std::endl;
+				<< "Offset values from nifti" << offsets;
 				ch.setProperty("indexOrigin", util::fvector4(ni->qoffset_x, ni->qoffset_y, ni->qoffset_z, 0));
 				//TODO
 				//ch.setProperty("acquisitionTime", );
@@ -159,12 +159,12 @@ public:
 			break;
 			default:
 			LOG(ImageIoDebug, isis::util::error)
-			<< "Unsupported datatype " << ni->datatype << std::endl;
+				<< "Unsupported datatype " << ni->datatype;
 			return data::ChunkList();
 			break;
 		}
 		LOG(ImageIoDebug, isis::util::info)
-		<< "datatype load from nifti " << ni->datatype << std::endl;
+			<< "datatype load from nifti " << ni->datatype;
 
 		nifti_image_free(ni);
 		return chunkListFromNifti;

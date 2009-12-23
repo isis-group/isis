@@ -20,9 +20,9 @@ OPTION(BUILD_ITK "Build the ITK stuff." OFF)
 OPTION(RUNTIME_LOG "Enable runtime logging" ON)
 OPTION(DEBUG_LOG "Enable debug logging" ON)
 
-OPTION(IOPLUGIN_NIFTI "Enable Nifti-IO Plugin" ON)
+OPTION(IOPLUGIN_NIFTI "Enable Nifti-IO Plugin" OFF)
 OPTION(IOPLUGIN_NULL "Enable Null-IO Plugin" ON)
-OPTION(IOPLUGIN_DICOM "Enable Dicom-IO Plugin" ON)
+OPTION(IOPLUGIN_DICOM "Enable Dicom-IO Plugin" OFF)
 
 SET(ISIS_INSTALL_BIN_DIR "${CMAKE_BINARY_DIR}/bin/")
 

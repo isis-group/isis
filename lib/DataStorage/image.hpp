@@ -57,22 +57,18 @@ private:
 	 */
 	inline std::pair<size_t,size_t> commonGet (size_t first,size_t second,size_t third,size_t fourth) const
 	{
-		if(not clean){
-			LOG(DataDebug,util::error)
-			<< "Getting data from a non indexed image will result in undefined behavior. Run reIndex first.";
-		}
-		if(set.empty()){
-			LOG(DataDebug,util::error)
-			<< "Getting data from a empty image will result in undefined behavior.";
-		}
-		
 		const size_t idx[]={first,second,third,fourth};
-		if(!rangeCheck(idx)){
-			LOG(DataDebug,isis::util::error)
+		LOG_IF(not clean,DataDebug,util::error)
+			<< "Getting data from a non indexed image will result in undefined behavior. Run reIndex first.";
+			
+		LOG_IF(set.empty(),DataDebug,util::error)
+			<< "Getting data from a empty image will result in undefined behavior.";
+			
+		LOG_IF(!rangeCheck(idx),DataDebug,isis::util::error)
 			<< "Index " << util::list2string(idx,idx+4,"|") << " is out of range (" << sizeToString() << ")";
-		}
 		
 		const size_t index=dim2Index(idx);
+
 		return std::make_pair(index/chunkVolume,index%chunkVolume);
 	}
 	
