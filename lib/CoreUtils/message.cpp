@@ -46,8 +46,9 @@ string Message::strTime()const{
 	return result;
 }
 
-Message::Message(string _object,string _file,int _line,LogLevel _level,MessageHandlerBase *_commitTo)
-:object(_object),file(_file),line(_line),level(_level),commitTo(_commitTo){
+Message::Message(string _object,string _file,int _line,LogLevel level,boost::weak_ptr<MessageHandlerBase> _commitTo)
+:object(_object),file(_file),line(_line),m_level(level),commitTo(_commitTo)
+{
 	time(&timeStamp);
 }
 Message::Message(const Message &src)
@@ -56,10 +57,10 @@ Message::Message(const Message &src)
 Message::~Message()
 {
 	if(shouldCommit()){
-		commitTo->commit(*this);
+		commitTo.lock()->commit(*this);
 		str("");
 		clear();
-		commitTo->requestStop(level);
+		commitTo.lock()->requestStop(m_level);
 	}
 }
 
@@ -77,7 +78,7 @@ string Message::merge()const{
 }
 
 void DefaultMsgPrint::commit(const Message &mesg){
-	*o << LogLevelNames[mesg.level] << " [" << mesg.file.leaf() << ":" << mesg.line << "]\t" <<
+	*o << LogLevelNames[mesg.m_level] << " [" << mesg.file.leaf() << ":" << mesg.line << "]\t" <<
 mesg.merge() << std::endl;
 }
 
@@ -86,8 +87,8 @@ void DefaultMsgPrint::setStream(::std::ostream &_o){
 }
 
 bool Message::shouldCommit()const{
-	if(commitTo)
-		return (commitTo->level >= level);
+	if(not commitTo.expired())
+		return (commitTo.lock()->m_level >= m_level);
 	else return false;
 }
 

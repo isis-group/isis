@@ -26,15 +26,15 @@ namespace isis{
  */
 namespace util{namespace _internal{
 	
-template<class MODULE> class Log{
-	inline static MessageHandlerBase* &handler(){
-		static MessageHandlerBase *msg;
+template<class MODULE> class Log{	
+	static boost::shared_ptr<MessageHandlerBase> &handler(){
+		static boost::shared_ptr<MessageHandlerBase> msg;
 		return msg;
 	}
 	Log();//dont do this
 public:
 	template<class HANDLE_CLASS> static void enable(LogLevel enable){
-		Log<MODULE>::handler()= enable ? new HANDLE_CLASS(enable):0;
+		Log<MODULE>::handler().reset(enable ? new HANDLE_CLASS(enable):0);
 	}
 	static Message send(const char file[],const char object[],int line,LogLevel level){
 		return Message(object,file,line, level,handler());

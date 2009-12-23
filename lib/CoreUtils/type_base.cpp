@@ -18,7 +18,7 @@ bool GenericType::isSameType ( const GenericType& second ) const {
 	return typeID() == second.typeID();
 }
 
-TypePtrBase::TypePtrBase(size_t len): m_len(len) {}
+TypePtrBase::TypePtrBase(size_t length): m_len(length) {}
 
 size_t TypePtrBase::len() const { return m_len;}
 

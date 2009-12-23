@@ -28,6 +28,7 @@ public:
 	virtual data::ChunkList load(std::string filename,std::string dialect)=0;
 	virtual bool write(const data::Image &image,std::string filename,std::string dialect)=0;
 	virtual bool write(const data::ImageList &images,std::string filename,std::string dialect);
+	virtual ~FileFormat(){}
 };
 }}
 #else

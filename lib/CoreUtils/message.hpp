@@ -19,6 +19,7 @@
 #include <list>
 #include <iostream>
 #include <boost/filesystem/path.hpp>
+#include <boost/weak_ptr.hpp>
 
 namespace isis{
 /*! \addtogroup util
@@ -48,10 +49,10 @@ class Message;
 class MessageHandlerBase{
 	static LogLevel m_stop_below;
 protected:
-	MessageHandlerBase(LogLevel _level):level(_level){}
+	MessageHandlerBase(LogLevel level):m_level(level){}
 	virtual ~MessageHandlerBase(){}
 public:
-	LogLevel level;
+	LogLevel m_level;
 	virtual void commit(const Message &msg)=0;
 	static void stopBelow(LogLevel =error);
 	bool requestStop(LogLevel _level);
@@ -64,15 +65,14 @@ public:
 	std::list<std::string> subjects;
 	time_t timeStamp;
 	int line;
-	LogLevel level;
-	MessageHandlerBase *commitTo;
-	Message(std::string object,std::string file,int line,LogLevel level,MessageHandlerBase *commitTo);
+	LogLevel m_level;
+	boost::weak_ptr<MessageHandlerBase> commitTo;
+	Message(std::string object,std::string file,int line,LogLevel m_level,boost::weak_ptr<MessageHandlerBase> commitTo);
 	Message(const Message &src);
 	~Message();
 	std::string merge()const;
 	std::string strTime()const;
 	template<typename T> Message &operator << (T val){
-		if(commitTo)
 		*((std::ostringstream*)this) << val;
 		return *this;
 	}
@@ -80,10 +80,6 @@ public:
 		subjects.push_back(subj);
 		*((std::ostringstream*)this) << "{s}";
 		return *this;
-	}
-	//@todo obsolete - still there for backward compatibility
-	Message &operator << (Message & (*op)(Message& os)){
-		return (*op)(*this);
 	}
 	bool shouldCommit()const;
 };
@@ -117,9 +113,4 @@ public:
 }
 /** @} */
 }
-/// @cond _hidden
-namespace std{
-	isis::util::_internal::Message& endl(isis::util::_internal::Message& __os);
-}
-/// @endcond
 #endif //MESSAGE_H

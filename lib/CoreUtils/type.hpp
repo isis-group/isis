@@ -119,14 +119,14 @@ public:
 	};
 	/// Default delete-functor for c-arrays (uses free()).
 	struct BasicDeleter{
-		virtual void operator()(TYPE *p){
+		void operator()(TYPE *p){
 			LOG(CoreDebug,info) << "Freeing pointer " << p << " (" << TypePtr<TYPE>::staticName() << ") ";
 			free(p);
 		};
 	};
 	/// Default delete-functor for arrays of objects (uses delete[]).
 	struct ObjectArrayDeleter{
-		virtual void operator()(TYPE *p){
+		void operator()(TYPE *p){
 			LOG(CoreDebug,info) << "Deleting object array at " << p << " (" << TypePtr<TYPE>::staticName() << ") ";
 			delete[] p;
 		};
@@ -146,8 +146,8 @@ public:
 	 * \param len the length of the used array (TypePtr does NOT check for length, 
 	 * this is just here for child classes which may want to check)
 	 */
-	TypePtr(TYPE* ptr,size_t len):
-	m_val(ptr,BasicDeleter()),_internal::TypePtrBase(len){}
+	TypePtr(TYPE* ptr,size_t length):
+	m_val(ptr,BasicDeleter()),_internal::TypePtrBase(length){}
 	/**
 	 * Creates TypePtr from a pointer of type TYPE.
 	 * The pointers are automatically deleted by an copy of d and should not be used outside once used here.
@@ -158,8 +158,8 @@ public:
 	 * \param d the deleter to be used when the data shall be deleted ( d() is called then )
 	 */
 
-	template<typename D> TypePtr(TYPE* ptr,size_t len,D d):
-	m_val(ptr,d),_internal::TypePtrBase(len)	{}
+	template<typename D> TypePtr(TYPE* ptr,size_t length,D d):
+	m_val(ptr,d),_internal::TypePtrBase(length)	{}
 
 	virtual ~TypePtr(){}
 

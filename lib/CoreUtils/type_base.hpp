@@ -88,6 +88,7 @@ public:
 
 	/// \returns true if type of this and second are equal
 	bool isSameType(const GenericType &second)const;
+	virtual ~GenericType(){}
 };
 
 /**

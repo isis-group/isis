@@ -24,12 +24,10 @@ namespace isis{ namespace data
 /// @cond _hidden
 namespace _internal{
 struct image_chunk_order: chunk_comarison{
-	virtual bool operator() ( const Chunk& a, const Chunk& b )const;
+	bool operator() ( const Chunk& a, const Chunk& b )const;
 };
 }
 /// @endcond
-
-class Image;
 
 class Image:
 	public _internal::NDimensional<4>,
@@ -57,9 +55,28 @@ private:
 	 * Additionally an error will be sent if DataDebug is enabled.
 	 * \returns a std::pair\<chunk-index,voxel-index\>
 	 */
-	std::pair<size_t,size_t>
-	commonGet(size_t first,size_t second,size_t third,size_t fourth)const;
-
+	inline std::pair<size_t,size_t> commonGet (size_t first,size_t second,size_t third,size_t fourth) const
+	{
+		if(not clean){
+			LOG(DataDebug,util::error)
+			<< "Getting data from a non indexed image will result in undefined behavior. Run reIndex first.";
+		}
+		if(set.empty()){
+			LOG(DataDebug,util::error)
+			<< "Getting data from a empty image will result in undefined behavior.";
+		}
+		
+		const size_t idx[]={first,second,third,fourth};
+		if(!rangeCheck(idx)){
+			LOG(DataDebug,isis::util::error)
+			<< "Index " << util::list2string(idx,idx+4,"|") << " is out of range (" << sizeToString() << ")";
+		}
+		
+		const size_t index=dim2Index(idx);
+		return std::make_pair(index/chunkVolume,index%chunkVolume);
+	}
+	
+	
 protected:
 	static const char* needed;
 

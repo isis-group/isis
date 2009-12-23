@@ -9,16 +9,17 @@ const size_t slice_size=256;
 
 int main()
 {
-	ENABLE_LOG(data::DataLog,util::DefaultMsgPrint,util::info);
-	ENABLE_LOG(data::DataDebug,util::DefaultMsgPrint,util::info);
+	ENABLE_LOG(data::DataLog,util::DefaultMsgPrint,util::warning);
+	ENABLE_LOG(data::DataDebug,util::DefaultMsgPrint,util::warning);
 	boost::timer timer;
 	data::Image img;
 
-	timer.restart();
+	timer.restart();unsigned short acq=0;
 	for(size_t tstep=0;tstep< tsteps;tstep++){
 		for(size_t slice=0;slice< slices;slice++){
 			data::MemChunk<short> chk(slice_size,slice_size);
 			chk.setProperty("indexOrigin",util::fvector4(0,0,slice,tstep));
+			chk.setProperty("acquisitionNumber",++acq);
 			if(!img.insertChunk(chk))
 				std::cout << "Inserting Chunk " << slice << " failed" << std::endl;
 		}
@@ -33,9 +34,10 @@ int main()
 	for(size_t tstep=0;tstep< tsteps;tstep++)
 		for(size_t slice=0;slice< slices;slice++)
 			for(size_t phase=0;phase< slice_size;phase++)
-				for(size_t read=0;read< slice_size;read++)
-					img.voxel<short>(read,phase,slice,tstep)=42;
-	
+				for(size_t read=0;read< slice_size;read++){
+					short &ref=img.voxel<short>(read,phase,slice,tstep);
+					ref=42;
+				}
 	std::cout << tsteps*slices*slice_size*slice_size << " voxel set to 42 in " << timer.elapsed() << " sec" << std::endl;
 	
 	return 0;

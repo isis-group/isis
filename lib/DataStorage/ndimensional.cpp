@@ -10,7 +10,7 @@
 //
 //
 
-#include "ndimensional.h"
+#include "ndimensional.hpp"
 
 namespace isis{ namespace data{ namespace _internal{
 

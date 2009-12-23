@@ -10,7 +10,7 @@
 //
 //
 
-#include "propertyobject.h"
+#include "propertyobject.hpp"
 #include <boost/foreach.hpp>
 
 namespace isis{ namespace data { namespace _internal {

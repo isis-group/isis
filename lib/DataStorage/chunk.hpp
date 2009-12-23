@@ -19,8 +19,8 @@
 #include "common.hpp"
 #include <string.h>
 #include <list>
-#include "ndimensional.h"
-#include "propertyobject.h"
+#include "ndimensional.hpp"
+#include "propertyobject.hpp"
 #include "CoreUtils/vector.hpp"
 
 namespace isis{namespace data{
@@ -104,6 +104,7 @@ namespace _internal{
 
 struct chunk_comarison : public std::binary_function< Chunk, Chunk, bool>{
 	virtual bool operator() (const Chunk& a, const Chunk& b)const=0;
+	virtual ~chunk_comarison(){}
 };
 }
 /// @endcond
