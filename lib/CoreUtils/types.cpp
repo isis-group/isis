@@ -40,12 +40,17 @@ DEF_TYPE(uint16_t,u16bit,0x4);
 DEF_TYPE(int32_t,s32bit,0x5);
 DEF_TYPE(uint32_t,u32bit,0x6);
 
-DEF_TYPE(float,float,0x7);
-DEF_TYPE(double,double,0x8);
+// DEF_TYPE(int64_t,s64bit,0x7);
+// DEF_TYPE(uint64_t,u64bit,0x8);
+// @fixme int64_t is the same as time_t - baaaaaaaad
+
+DEF_TYPE(float,float,0x10);
+DEF_TYPE(double,double,0x11);
 
 DEF_TYPE(std::string,string,0x20);
 DEF_TYPE(PropMap,PropertyMap,0xA0);
 DEF_TYPE(fvector4,fvector4,0xA1);
+DEF_TYPE(time_t,time,0xA2);
 }}
 
 /// @endcond

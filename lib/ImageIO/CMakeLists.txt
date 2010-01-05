@@ -28,7 +28,7 @@ endif(IOPLUGIN_NULL)
 
 if(IOPLUGIN_DICOM)
 	add_library(isisImageFormat_Dicom SHARED imageFormat_Dicom.cpp)
-	target_link_libraries(isisImageFormat_Dicom utils data dcmdata dcmimgle ofstd z)
+	target_link_libraries(isisImageFormat_Dicom utils data dcmdata dcmimgle ofstd z ${Boost_LIBRARIES})
 	
 	set_target_properties(isisImageFormat_Dicom PROPERTIES
 	LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}

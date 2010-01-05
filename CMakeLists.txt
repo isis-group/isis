@@ -6,7 +6,7 @@ project(isis)
 ###############################################################################
 #Global options
 ###############################################################################
-FIND_PACKAGE(Boost COMPONENTS filesystem regex system )
+FIND_PACKAGE(Boost COMPONENTS filesystem regex system date_time)
 include_directories(${Boost_INCLUDE_DIR}  lib)
 
 OPTION(BUILD_APPLICATIONS "Build the isis application directory." OFF)

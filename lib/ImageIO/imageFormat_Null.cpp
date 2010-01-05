@@ -26,6 +26,7 @@ public:
 				ch.setProperty("indexOrigin",util::fvector4(0,0,0,i));
 				ch.setProperty("acquisitionNumber",c);
 				ch.setProperty("sequenceNumber",c);
+				ch.setProperty("performingPhysician",std::string("Niemand"));
 				ch.setProperty("readVec",util::fvector4(1,0));
 				ch.setProperty("phaseVec",util::fvector4(0,1));
 				ch.setProperty("voxelSize",util::fvector4(1,1,1));

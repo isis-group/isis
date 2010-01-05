@@ -128,7 +128,7 @@ data::ChunkList IOFactory::loadFile(const boost::filesystem::path& filename, con
 		}
 	}
 	LOG(DataLog,util::error)
-		<< "Could not open file: " << filename; //@todo error message missing
+		<< "Failed not read file: " << filename; //@todo error message missing
 	return data::ChunkList();//no plugin of proposed list could load file
 }
 

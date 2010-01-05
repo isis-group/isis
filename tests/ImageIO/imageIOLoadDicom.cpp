@@ -12,6 +12,7 @@
 #include "DataStorage/image.hpp"
 #include "DataStorage/io_factory.hpp"
 #include "CoreUtils/log.hpp"
+#include "ImageIO/common.hpp"
 
 namespace isis{namespace test{
 	
@@ -21,9 +22,11 @@ namespace isis{namespace test{
 		ENABLE_LOG(util::CoreDebug,util::DefaultMsgPrint,util::warning);
 		ENABLE_LOG(data::DataLog,util::DefaultMsgPrint,util::warning);
 		ENABLE_LOG(data::DataDebug,util::DefaultMsgPrint,util::warning);
+		ENABLE_LOG(image_io::ImageIoLog,util::DefaultMsgPrint,util::info);
+		ENABLE_LOG(image_io::ImageIoDebug,util::DefaultMsgPrint,util::info);
 		
 		data::ImageList
-		images=data::IOFactory::load("/tmp/AA4T090129.MR.AS_PHASE.1.1.2009.01.29.12.39.34.203125.33139806.IMA","");
+		images=data::IOFactory::load("/tmp/test.ima","");
 		
 		// the null-loader shall generate 5 3x3x3x10 images
 		BOOST_CHECK(images.size() == 5);

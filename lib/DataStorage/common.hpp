@@ -25,7 +25,7 @@ namespace data{
 	struct DataLog{static const char* name(){return "Data";};enum {use = _ENABLE_DATA_LOG};};
 	struct DataDebug{static const char* name(){return "Data";};enum {use= _ENABLE_DATA_DEBUG};};
 /// @endcond
-// enum dimensions{timeDim=0,sliceDim,phaseDim,readDim};
+	enum dimensions{timeDim=0,sliceDim,phaseDim,readDim};
 }
 /** @} */
 }
