@@ -11,7 +11,6 @@ if(IOPLUGIN_NIFTI)
 	set_target_properties(isisImageFormat_Nifti PROPERTIES
 		LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 		LINK_FLAGS "--no-undefined")
-	set_target_properties(isisImageFormat_Nifti PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 endif(IOPLUGIN_NIFTI)
 
 
@@ -22,18 +21,24 @@ if(IOPLUGIN_NULL)
 	set_target_properties(isisImageFormat_Null PROPERTIES
 		LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 		LINK_FLAGS "--no-undefined")
-
-	set_target_properties(isisImageFormat_Null PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 endif(IOPLUGIN_NULL)
 
 if(IOPLUGIN_DICOM)
-	add_library(isisImageFormat_Dicom SHARED imageFormat_Dicom.cpp)
-	target_link_libraries(isisImageFormat_Dicom utils data dcmdata dcmimgle ofstd z ${Boost_LIBRARIES})
+	find_library(LIB_DCMIMGLE dcmimgle)
+	find_library(LIB_DCMDATA dcmdata)
+	find_library(LIB_OFSTD ofstd)
+	find_library(LIB_Z z)
+	
+	find_path(INCPATH_DCMTK "dcmtk/dcmdata/dcfilefo.h")
+	include_directories(${INCPATHDCMTK})
+		
+	add_library(isisImageFormat_Dicom SHARED imageFormat_Dicom.cpp imageFormat_DicomParser.cpp)
+	target_link_libraries(isisImageFormat_Dicom utils data
+		${LIB_DCMDATA} ${LIB_DCMIMGLE} ${LIB_OFSTD} ${LIB_Z} ${Boost_LIBRARIES})
 	
 	set_target_properties(isisImageFormat_Dicom PROPERTIES
-	LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
-	LINK_FLAGS "--no-undefined")
-	set_target_properties(isisImageFormat_Dicom PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+		LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+		LINK_FLAGS "--no-undefined")
 endif(IOPLUGIN_DICOM)
 	
 message(STATUS "Installing plugins to ${CMAKE_BINARY_DIR}")
