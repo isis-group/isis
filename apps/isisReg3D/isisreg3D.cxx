@@ -226,11 +226,11 @@ int main(
 		}
 
 		//check combinations of components
-		if (optimizer == 0 and transform != 0) {
+		if (optimizer == 1 and transform != 0) {
 			std::cerr
 			<< "\nInappropriate combination of transform and optimizer! Setting optimizer to RegularStepGradientDescent.\n"
 			<< std::endl;
-			optimizer = 1;
+			optimizer = 0;
 		}
 
 		if (transform == 2 and optimizer != 2) {
