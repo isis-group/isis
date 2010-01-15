@@ -188,6 +188,14 @@ public:
 		std::copy(CONTAINER::begin(),CONTAINER::end(),out);
 	}
 
+	/// copy the elements to somthing designed after the output iterator model
+	template<class InputIterator> void copyFrom(InputIterator start,InputIterator end)
+	{
+		LOG_IF(std::distance(start,end)>SIZE,CoreLog,error)
+			<< "Copying " << std::distance(start,end) << " Elements into a vector of the size " << SIZE;
+		std::copy(start,end,CONTAINER::begin());
+	}
+
 	/// write the elements formated to basic_ostream
 	template<typename charT, typename traits> void writeTo(std::basic_ostream<charT, traits> &out)const
 	{
@@ -195,13 +203,23 @@ public:
 	}
 
 };
-
-class fvector4 :public FixedVector<float,4>{
+template<typename TYPE> 
+class vector4 :public FixedVector<TYPE,4>{
 public:
-	fvector4();
-	fvector4(const FixedVector<float,4> &src);
-	fvector4(float first,float second,float third=0,float fourth=0);
+	vector4(){}
+	vector4(const FixedVector<TYPE,4> &src) : FixedVector< float, 4 > ( src ) {}
+	vector4(TYPE first,TYPE second,TYPE third=0,TYPE fourth=0)
+	{
+		this->operator[](3)=fourth;
+		this->operator[](2)=third;
+		this->operator[](1)=second;
+		this->operator[](0)=first;
+	}
 };
+
+typedef vector4<float> fvector4;
+typedef vector4<double> dvector4;
+typedef vector4<int32_t> ivector4;
 }
 /** @} */
 }

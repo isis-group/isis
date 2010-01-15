@@ -289,10 +289,17 @@ ImageList::ImageList(ChunkList src)
 	while(!src.empty()){
 		value_type buff(new Image);
 		for(ChunkList::iterator i=src.begin();i!=src.end();){
-			if(buff->insertChunk(*i))
+			if(not i->sufficient()){
+				const util::PropMap::key_list missing=i->missing();
+				LOG(DataLog,util::error)
+					<< "Ignoring invalid chunk. Missing properties: " << util::list2string(missing.begin(),missing.end());
 				src.erase(i++);
-			else
-				i++;
+			} else {
+				if(buff->insertChunk(*i))
+					src.erase(i++);
+				else
+					i++;
+			}
 		}
 		if(buff->chunksBegin()!=buff->chunksEnd()){
 			buff->reIndex();

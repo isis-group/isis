@@ -28,11 +28,14 @@
 namespace isis{ namespace image_io{
 	
 class ImageFormat_Dicom: public FileFormat{
-	void dcmObject2PropMap(DcmObject* master_obj,util::PropMap &map);
-	void parseAS(DcmElement* elem,const std::string &name,util::PropMap &map);
-	void parseDA(DcmElement* elem,const std::string &name,util::PropMap &map);
-	void parseTM(DcmElement* elem,const std::string &name,util::PropMap &map);
+	static void parseAS(DcmElement* elem,const std::string &name,util::PropMap &map);
+	static void parseDA(DcmElement* elem,const std::string &name,util::PropMap &map);
+	static void parseTM(DcmElement* elem,const std::string &name,util::PropMap &map);
 public:
+	static void parseOrientation(DcmElement* elem, const std::string& name, isis::util::PropMap& map);
+	static void parseScalar(DcmElement* elem, const std::string& name, isis::util::PropMap& map);
+	static void parseVector(DcmElement* elem, const std::string& name, isis::util::PropMap& map);
+	static void dcmObject2PropMap(DcmObject* master_obj,util::PropMap &map);
 	std::string suffixes();
 	std::string name();
 

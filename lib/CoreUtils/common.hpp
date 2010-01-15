@@ -118,8 +118,10 @@ template<typename TARGET> std::list<TARGET> string2list(
  * Splits source into tokens and tries to lexically cast them to TARGET.
  * If that fails, boost::bad_lexical_cast is thrown.
  * Before the string is split up leading and rear separators will be cut.
+ *
  * \param source the source string to be split up
  * \param separator string to delimit the tokens
+ * Note that this still is put into an regualar expression, so "\\" will cause an runtime error. (Use "\\\\" instead)
  * \returns a list of the casted tokens
  */
 template<typename TARGET> std::list<TARGET> string2list(std::string source,	const char separator[])

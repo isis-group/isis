@@ -122,7 +122,7 @@ data::ChunkList IOFactory::loadFile(const boost::filesystem::path& filename, con
 		
 		const data::ChunkList loadedChunks = it->load(filename.string(), dialect);
 		if (not loadedChunks.empty()){//load succesfully
-			LOG(DataLog,util::verbose_info)
+			LOG(DataLog,util::info)
 				<< "loaded " << loadedChunks.size() << " Chunks from " <<  filename;
 			return loadedChunks;
 		}

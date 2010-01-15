@@ -47,10 +47,14 @@ DEF_TYPE(uint32_t,u32bit,0x6);
 DEF_TYPE(float,float,0x10);
 DEF_TYPE(double,double,0x11);
 
-DEF_TYPE(std::string,string,0x20);
-DEF_TYPE(PropMap,PropertyMap,0xA0);
-DEF_TYPE(fvector4,fvector4,0xA1);
-DEF_TYPE(time_t,time,0xA2);
+DEF_TYPE(fvector4,fvector4,0xA0);
+DEF_TYPE(dvector4,dvector4,0xA1);
+DEF_TYPE(ivector4,ivector4,0xA2);
+
+DEF_TYPE(std::string,string,0xB0);
+DEF_TYPE(PropMap,PropertyMap,0xB1);
+DEF_TYPE(time_t,time,0xB2);
+
 }}
 
 /// @endcond
