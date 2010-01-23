@@ -39,8 +39,8 @@ public:
 	std::string suffixes();
 	std::string name();
 
-	data::ChunkList load( std::string filename, std::string dialect );
-	bool write(const data::Image &image,std::string filename,std::string dialect );
+	data::ChunkList load( const std::string& filename, const std::string& dialect );
+	bool write(const data::Image &image,const std::string& filename,const std::string& dialect );
 
 	bool tainted();
 	size_t maxDim();

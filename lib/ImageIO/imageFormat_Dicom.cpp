@@ -67,7 +67,7 @@ std::string ImageFormat_Dicom::name(){return "Dicom";}
 
 
 
-data::ChunkList ImageFormat_Dicom::load( std::string filename, std::string dialect )
+data::ChunkList ImageFormat_Dicom::load( const std::string& filename, const std::string& dialect )
 {
 	boost::shared_ptr<data::Chunk> chunk;
 	
@@ -83,7 +83,7 @@ data::ChunkList ImageFormat_Dicom::load( std::string filename, std::string diale
 	return data::ChunkList();
 }
 
-bool ImageFormat_Dicom::write(const data::Image &image,std::string filename,std::string dialect )
+bool ImageFormat_Dicom::write(const data::Image &image,const std::string& filename,const std::string& dialect )
 {
 	LOG(ImageIoLog,util::error)
 		<< "writing dicom files is not yet supportet";
