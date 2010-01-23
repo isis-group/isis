@@ -102,9 +102,9 @@ public:
 /// @cond _internal
 namespace _internal{
 
-struct chunk_comarison : public std::binary_function< Chunk, Chunk, bool>{
+struct chunk_comparison : public std::binary_function< Chunk, Chunk, bool>{
 	virtual bool operator() (const Chunk& a, const Chunk& b)const=0;
-	virtual ~chunk_comarison(){}
+	virtual ~chunk_comparison(){}
 };
 }
 /// @endcond
