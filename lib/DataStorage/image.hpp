@@ -23,7 +23,7 @@ namespace isis{ namespace data
 {
 /// @cond _hidden
 namespace _internal{
-struct image_chunk_order: chunk_comarison{
+struct image_chunk_order: chunk_comparison{
 	bool operator() ( const Chunk& a, const Chunk& b )const;
 };
 }
@@ -43,6 +43,8 @@ private:
 	std::vector<ChunkIterator> lookup;
 	bool clean;
 	size_t chunkVolume;
+	util::fvector4 fieldOfViewVec;
+
 
 	/** 
 	 * Computes chunk- and voxel- indices.
@@ -207,6 +209,11 @@ public:
 	ChunkIterator chunksEnd();
 
 	isis::util::fvector4 size()const;
+
+	util::fvector4 getFOVVec()const;
+	template <typename T> T minValueInImage()const;
+	template <typename T> T maxValueInImage()const;
+
 };
 
 class ImageList : public std::list< boost::shared_ptr<Image> >

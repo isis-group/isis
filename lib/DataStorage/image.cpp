@@ -284,6 +284,22 @@ util::fvector4 Image::size()const
 	return util::fvector4(dimSize(0),dimSize(1),dimSize(2),dimSize(3));
 }
 
+util::fvector4 Image::getFOVVec()const
+{
+	return fieldOfViewVec;
+}
+
+template <typename T> T Image::minValueInImage()const
+{
+	return 0;
+}
+
+template <typename T> T Image::maxValueInImage()const
+{
+	return 0;
+}
+
+
 ImageList::ImageList(ChunkList src)
 {
 	while(!src.empty()){
