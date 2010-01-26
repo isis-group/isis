@@ -56,7 +56,8 @@ namespace isis {
 			UserOptions.PixelDensity = 0.01;
 			UserOptions.USEOTSUTHRESHOLDING = false;
 			UserOptions.BSplineGridSize = 5;
-			UserOptions.INITIALIZEOFF = false;
+			UserOptions.INITIALIZECENTEROFF = false;
+			UserOptions.INITIALIZEMASSOFF = false;
 			UserOptions.NumberOfThreads = 1;
 			UserOptions.MattesMutualInitializeSeed = 1;
 			UserOptions.SHOWITERATIONSTATUS = false;
@@ -344,14 +345,17 @@ namespace isis {
 		void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpTransform() {
 
 			//initialize transform
-			if (!UserOptions.INITIALIZEOFF) {
+			if (!UserOptions.INITIALIZEMASSOFF or !UserOptions.INITIALIZECENTEROFF) {
 
 				if (transform.VERSORRIGID) {
 					m_RigidInitializer = RigidCenteredTransformInitializerType::New();
 					m_RigidInitializer->SetTransform(m_VersorRigid3DTransform);
 					m_RigidInitializer->SetFixedImage(m_FixedImage);
 					m_RigidInitializer->SetMovingImage(m_MovingImage);
-					m_RigidInitializer->MomentsOn();
+					if(!UserOptions.INITIALIZECENTEROFF)
+						m_RigidInitializer->GeometryOn();
+					if(!UserOptions.INITIALIZEMASSOFF)
+						m_RigidInitializer->MomentsOn();
 
 					m_RigidInitializer->InitializeTransform();
 				}
@@ -361,6 +365,10 @@ namespace isis {
 					m_AffineInitializer->SetFixedImage(m_FixedImage);
 					m_AffineInitializer->SetMovingImage(m_MovingImage);
 					m_AffineInitializer->GeometryOn();
+					if(!UserOptions.INITIALIZECENTEROFF)
+						m_AffineInitializer->GeometryOn();
+					if(!UserOptions.INITIALIZEMASSOFF)
+						m_AffineInitializer->MomentsOn();
 					m_AffineInitializer->InitializeTransform();
 				}
 			}

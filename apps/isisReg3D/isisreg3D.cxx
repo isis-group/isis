@@ -59,7 +59,8 @@ static VArgVector optimizerType;
 static VBoolean in_found, ref_found, pointset_found;
 static VShort number_threads = 1;
 static VShort initial_seed = 1;
-static VBoolean initialize = false;
+static VBoolean initialize_center = false;
+static VBoolean initialize_mass = false;
 static VString mask_filename = NULL;
 
 static VOptionDescRec
@@ -97,8 +98,11 @@ static VOptionDescRec
             {"gridSize", VShortRepn, 1, &grid_size, VOptionalOpt, 0,
                 "Grid size used for the BSplineDeformable transform."},
 
-            {"prealign", VBooleanRepn, 1, &initialize, VOptionalOpt, 0,
+            {"prealign_center", VBooleanRepn, 1, &initialize_center, VOptionalOpt, 0,
                 "Using an initializer to align the image centers"},
+            {"prealign_mass", VBooleanRepn, 1, &initialize_mass, VOptionalOpt, 0,
+                                "Using an initializer to align the center of mass"},
+
             //component inputs
             {"metric", VShortRepn, 1, (VPointer) &metricType, VOptionalOpt, TYPMetric, "Type of the metric"}, {
                 "transform", VShortRepn, 0, (VPointer) &transformType, VOptionalOpt, TYPTransform,
@@ -375,8 +379,10 @@ int main(
 		registrationFactory->UserOptions.NumberOfThreads = number_threads;
 		registrationFactory->UserOptions.MattesMutualInitializeSeed = initial_seed;
 		registrationFactory->UserOptions.SHOWITERATIONSTATUS = true;
-		if (!initialize)
-		registrationFactory->UserOptions.INITIALIZEOFF = true;
+		if (!initialize_center)
+			registrationFactory->UserOptions.INITIALIZECENTEROFF = true;
+		if (!initialize_mass)
+					registrationFactory->UserOptions.INITIALIZEMASSOFF = true;
 
 		registrationFactory->SetFixedImage(fixedReader->GetOutput());
 		registrationFactory->SetMovingImage(movingReader->GetOutput());

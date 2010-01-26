@@ -226,7 +226,8 @@ public:
 		float PixelDensity;
 		bool PRINTRESULTS;
 		bool USEOTSUTHRESHOLDING; //using an otsu threshold filter to create a mask which is designed to restrict the region given to the metric
-		bool INITIALIZEOFF;
+		bool INITIALIZEMASSOFF;
+		bool INITIALIZECENTEROFF;
 		bool SHOWITERATIONSTATUS;
 		bool USEMASK;
 		bool LANDMARKINITIALIZE;
