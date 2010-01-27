@@ -31,7 +31,7 @@ struct image_chunk_order: chunk_comparison{
 
 class Image:
 	public _internal::NDimensional<4>,
-	public _internal::PropertyObject
+	public util::PropMap
 {
 public:
 	typedef std::set<Chunk,_internal::image_chunk_order> ChunkSet;
@@ -203,7 +203,7 @@ public:
 	 * \param key the name of the property to search for
 	 * \param unique when true empty or consecutive duplicates wont be added
 	 */
-	std::list<util::PropMap::mapped_type> getChunksProperties(const util::PropMap::key_type &key,bool unique=false)const;
+	std::list<util::PropertyValue> getChunksProperties(const std::string &key,bool unique=false)const;
 
 	ChunkIterator chunksBegin();
 	ChunkIterator chunksEnd();

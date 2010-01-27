@@ -23,7 +23,7 @@ using util::Type;
 BOOST_AUTO_TEST_CASE(test_type_init) {
 
 	Type<int> tInt(42);		// integer
-	Type<std::string> tStr("Hello World"); // string
+	Type<std::string> tStr(std::string("Hello World")); // string
 	// implicit conversion from double -> float
 	Type<float> tFlt(3.1415);
 	bool catched = false;
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(type_toString_test) {
 	// create some test dummies
 	Type<int> tInt(42);
 	Type<float> tFloat(3.1415);
-	Type<std::string> tString("Hello World");
+	Type<std::string> tString(std::string("Hello World"));
 
 	BOOST_CHECK_EQUAL(tInt.toString(),"42");
 	BOOST_CHECK_EQUAL(tFloat.toString(),"3.1415");
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(test_type_is) {
 	// create some test dummies
 	Type<int> tInt(42);
 	Type<float> tFloat(3.1415);
-	Type<std::string> tString("Hello World");
+	Type<std::string> tString(std::string("Hello World"));
 
 	// see if the typeid contains the value expected.
 	BOOST_CHECK(tInt.is(typeid(int)));

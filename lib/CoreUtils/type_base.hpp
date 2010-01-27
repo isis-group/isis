@@ -20,6 +20,9 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 
+#include "types.hpp"
+
+
 /*! \addtogroup util
 *  Additional documentation for group `mygrp'
 *  @{
@@ -177,6 +180,7 @@ public:
 	 * \returns a reference of the stored value.
 	 */
 	template<typename T> Type<T>& cast_to_Type(){
+		check_type<T>();
 		return m_cast_to<Type<T> >();
 	}
 	virtual bool eq(const TypeBase &second)const=0;

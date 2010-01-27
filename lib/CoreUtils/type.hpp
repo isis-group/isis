@@ -31,13 +31,19 @@ template<typename TYPE> class Type: public _internal::TypeBase{
 	static const char m_typeName[];
 	static const unsigned short m_typeID;
 public:
+	Type()
+	{
+		check_type<TYPE>();
+	}
 	/**
 	 * Create a Type from any type of value-type.
 	 * If the type of the parameter is not the same as the content type of the object, the system tries to do a type conversion.
 	 * If that fails, boost::bad_lexical_cast is thrown.
 	 */
-	template<typename T> Type(const T& value):
-	m_val(__cast_to(this,value)){}
+	template<typename T> Type(const T& value):m_val(__cast_to(this,value))
+	{
+		check_type<TYPE>();
+	}
 	virtual bool is(const std::type_info & t)const{
 		return t==typeid(TYPE);
 	}
@@ -56,7 +62,8 @@ public:
 	/// \returns true if this and second contain the same value of the same type
 	virtual bool eq(const TypeBase &second)const{
 		if(second.is<TYPE>()){
-			return m_val == (TYPE)second.cast_to_Type<TYPE>();
+			const TYPE &otherVal=(TYPE)second.cast_to_Type<TYPE>();
+			return m_val == otherVal;
 		} else
 			return  false;
 	}

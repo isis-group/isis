@@ -64,7 +64,7 @@ bool Image::insertChunk ( const Chunk &chunk )
 			return false;
 		}
 	}
-	if(not chunk.sufficient()){
+	if(not chunk.valid()){
 		const util::PropMap::key_list missing=chunk.missing();
 		LOG(DataLog,util::error)
 			<< "Cannot insert chunk. Missing properties: " << util::list2string(missing.begin(),missing.end());
@@ -119,33 +119,28 @@ bool Image::reIndex() {
 
 	//Clean up the properties 
 	//@todo might fail if the image contains a prop that differs to that in the Chunks (which is equal in the chunks)
-	util::PropMap common= set.begin()->propMap();
-	std::set<util::PropMap::key_type> uniques;
+	util::PropMap common;
+	std::set<std::string> uniques;
+	set.begin()->toCommonUnique(common,uniques,true);
+	
 	for(ChunkIterator i= ++chunksBegin();i!=chunksEnd();i++){
-		const util::PropMap::diff_map difference=common.diff(i->propMap());
-		BOOST_FOREACH(const util::PropMap::diff_map::value_type &ref,difference)
-			uniques.insert(ref.first);
+		i->toCommonUnique(common,uniques,true);
 	}
 	LOG(DataDebug,util::info) << uniques.size() << " Chunk-unique properties found in the Image";
 	LOG(DataDebug,util::verbose_info) << util::list2string(uniques.begin(),uniques.end(),", ");
 
-	BOOST_FOREACH(const util::PropMap::key_type &ref,uniques)
-		common.erase(ref);
-
-	properties.join(common);
-	LOG(DataDebug,util::info) << common.size() << " common properties saved into the image";
-	LOG(DataDebug,util::verbose_info) << util::list2string(common.begin(),common.end(),", ");
-	LOG(DataDebug,util::verbose_info) << "It now has: " << util::list2string(properties.begin(),properties.end(),",");
+	join(common);
+	LOG(DataDebug,util::verbose_info) << "common properties saved into the image" << common;
+	LOG(DataDebug,util::verbose_info) << "It now has: " << static_cast<PropMap>(*this);
 
 	//remove common props from the chunks
 	for(size_t i=0;i!=lookup.size();i++)
-		BOOST_FOREACH(const util::PropMap::value_type &ref,common)
-			getChunkAt(i).delProperty(ref.first);
-	LOG(DataDebug,util::info) << common.size() << " common properties removed from " << set.size() << " chunks";
+		getChunkAt(i).make_unique(common);
+	LOG(DataDebug,util::verbose_info) << "common properties removed from " << set.size() << " chunks: " << common;
 
 
 	//get indexOrigin from the geometrically first chunk
-	setProperty("indexOrigin",chunksBegin()->getPropertyValue("indexOrigin"));
+	setPropertyValue("indexOrigin",chunksBegin()->getPropertyValue("indexOrigin"));
 
 	//try to calculate slice vector if its missing
 	if(not hasProperty("sliceVec")){
@@ -305,7 +300,7 @@ ImageList::ImageList(ChunkList src)
 	while(!src.empty()){
 		value_type buff(new Image);
 		for(ChunkList::iterator i=src.begin();i!=src.end();){
-			if(not i->sufficient()){
+			if(not i->valid()){
 				const util::PropMap::key_list missing=i->missing();
 				LOG(DataLog,util::error)
 					<< "Ignoring invalid chunk. Missing properties: " << util::list2string(missing.begin(),missing.end());
@@ -319,7 +314,7 @@ ImageList::ImageList(ChunkList src)
 		}
 		if(buff->chunksBegin()!=buff->chunksEnd()){
 			buff->reIndex();
-			if(buff->sufficient())
+			if(buff->valid())
 				push_back(buff);
 			else {
 				const util::PropMap::key_list missing=buff->missing();

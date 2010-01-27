@@ -32,14 +32,14 @@ BOOST_AUTO_TEST_CASE (chunk_property_test)
 	data::MemChunk<float> ch(4,3,2,1);
 
 	//an basic Chunk must be invalid
-	BOOST_CHECK(not ch.sufficient());
+	BOOST_CHECK(not ch.valid());
 	BOOST_CHECK(not ch.hasProperty("indexOrigin"));
 
 	//with an position its valid
 	util::fvector4 pos(1,1,1,1);
 	ch.setProperty("indexOrigin",pos);
 	ch.setProperty("acquisitionNumber",0);
-	BOOST_CHECK(ch.sufficient());
+	BOOST_CHECK(ch.valid());
 
 	//properties shall not be case sensitive
 	BOOST_CHECK(ch.hasProperty("indexorigin"));

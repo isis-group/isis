@@ -29,42 +29,130 @@ namespace isis{
  */
 namespace util{
 
-class PropMap : public std::map<std::string,PropertyValue,caselessStringLess>{
+class PropMap : protected std::map<std::string,PropertyValue,caselessStringLess>{
 public:
-	typedef std::set<key_type,caselessStringLess> key_list;
-	typedef std::map<key_type,std::pair<mapped_type,mapped_type>,caselessStringLess> diff_map;
+	typedef std::map<std::string,PropertyValue,caselessStringLess> base_type;
+	typedef std::set<std::string,caselessStringLess> key_list;
+	typedef std::map<std::string,std::pair<PropertyValue,PropertyValue>,caselessStringLess> diff_map;
 private:
+	typedef std::list<std::string> propPath;
+	typedef propPath::const_iterator propPathIterator;
+	
+	static const char pathSeperator[];
+	static const util::PropertyValue emptyProp;//dummy to be able to return an empty Property
+
+	/////////////////////////////////////////////////////////////////////////////////////////
+	// internal functors
+	/////////////////////////////////////////////////////////////////////////////////////////
 	struct trueP{
 		bool operator()(const_reference ref)const{return true;}
 	};
-	struct empty{
+	struct emptyP{
 		bool operator()(const_reference ref)const{return ref.second.empty();}
 	};
-	struct needed{
+	struct neededP{
 		bool operator()(const_reference ref)const{return ref.second.needed();}
 	};
 	struct invalidP{
 		bool operator()(const_reference ref)const{return ref.second.needed() && ref.second.empty();}
 	};
-	struct validP{
-		bool operator()(const_reference ref)const{return not invalidP().operator()(ref);}
+	struct treeInvalidP{
+		bool operator()(const_reference ref)const{
+			if(ref.second->is<PropMap>()){
+				const PropMap &sub=ref.second->cast_to_Type<PropMap>();
+				return not sub.valid();
+			} else
+				return ref.second.needed() && ref.second.empty();
+		}
 	};
-	template<class Predicate> struct insertKey{
-		key_list &out;
-		const Predicate pred;
-		insertKey(key_list &_out):out(_out),pred(){}
+	///Walks the whole tree and inserts any key into out for which the given scalar predicate is true.
+	template<class Predicate> struct walkTree{
+		key_list &m_out;
+		const std::string &m_prefix;
+		walkTree(key_list &out,const std::string &prefix):m_out(out),m_prefix(prefix){}
+		walkTree(key_list &out):m_out(out),m_prefix(std::string()){}
 		void operator()(const_reference ref){
-			if(pred(ref))
-				out.insert(out.end(),ref.first);
+			if((not ref.second.empty()) and ref.second->is<PropMap>()){
+				PropMap &sub=ref.second->cast_to_Type<PropMap>();
+				std::for_each(sub.begin(),sub.end(),walkTree<Predicate>(m_out));
+			} else {
+				if(Predicate()(ref))
+					m_out.insert(m_out.end(),(m_prefix!="" ? m_prefix+"/":"")+ref.first);
+			}
 		};
 	};
+
+	/////////////////////////////////////////////////////////////////////////////////////////
+	// internal tool-backends
+	/////////////////////////////////////////////////////////////////////////////////////////
+	void joinTree(const isis::util::PropMap& other, bool overwrite, std::string prefix, PropMap::key_list &rejects);
+	void diffTree(const PropMap& other,PropMap::diff_map &ret,std::string prefix) const;
+	static PropertyValue& fetchProperty(
+		util::PropMap &root,
+		const propPathIterator at,
+		const propPathIterator pathEnd);
+	static const PropertyValue* searchBranch(
+		const util::PropMap &root,
+		const propPathIterator at,
+		const propPathIterator pathEnd);
+	bool recursiveRemove(
+		util::PropMap &root,
+		const propPathIterator at,
+		const propPathIterator pathEnd);
 protected:
+	/////////////////////////////////////////////////////////////////////////////////////////
+	// rw-backends
+	/////////////////////////////////////////////////////////////////////////////////////////
+	/**
+	* Find the property referenced by the path-key.
+	* \param key the \"path\" to the property
+	* \returns a pointer to the PropertyValue, NULL if the property was not found
+	*/
+	const PropertyValue* findPropVal(const std::string &key)const;
+	/// create a list of keys for every entry for which the given scalar predicate is true.
 	template<class Predicate> const key_list genKeyList()const{
 		key_list k;
-		std::for_each(begin(),end(),insertKey<Predicate>(k));
+		std::for_each(begin(),end(),walkTree<Predicate>(k));
 		return k;
 	}
+	/**
+	* Make Properties given by a space separated list needed.
+	* \param needed string made of space serparated property-names which
+	* will (if neccessary) be added to the PropertyMap and flagged as needed.
+	*/
+	void addNeededFromString(const std::string &needed);
+	/// \returns true if a given property exists (also if its empty)
+	bool exists(const std::string& key)const;
 public:
+	/////////////////////////////////////////////////////////////////////////////////////////
+	// constructors
+	/////////////////////////////////////////////////////////////////////////////////////////
+	PropMap(const base_type &src);
+	PropMap();
+
+	bool operator==(const PropMap &src)const;
+
+	/////////////////////////////////////////////////////////////////////////////////////////
+	// Common rw-accessors
+	/////////////////////////////////////////////////////////////////////////////////////////
+	/**
+	* Find the property referenced by the path-key, create it if its not there.
+	* \param key the \"path\" to the property
+	* \returns a reference to the PropertyValue
+	*/
+	PropertyValue& operator[](const std::string& key);
+	bool remove(const std::string& key);
+	/**
+	* Adds a property as needed.
+	* If the given property allready exists, it is just flagged as needed.
+	*/
+	void addNeeded(const std::string &key);
+	/// \returns true is the given property does exist and is not empty.
+	bool hasProperty(const std::string &key)const;
+
+	////////////////////////////////////////////////////////////////////////////////////////
+	// tools
+	/////////////////////////////////////////////////////////////////////////////////////////
 	/**
 	* Check if every needed property is set.
 	* \returns false if there is any needed and empty property, true otherwhise.
@@ -92,11 +180,59 @@ public:
 	 * \param ignore a list of properties to ignore when generating the difference
 	 * \return a map of property names and value-pairs
 	 */
-	diff_map diff(const PropMap &second,key_list ignore=key_list())const;
+	diff_map diff(const PropMap &second)const;
 	/// Remove everything that is also in second and equal.
-	void make_unique(const PropMap &second,key_list ignore=key_list());
+	void make_unique(const isis::util::PropMap& other);
 	/// Add Properties from another PropMap
-	PropMap::key_list join(const isis::util::PropMap& other, bool overwrite = false, isis::util::PropMap::key_list ignore = key_list());
+	PropMap::key_list join(const isis::util::PropMap& other, bool overwrite = false);
+
+	void toCommonUnique(PropMap& common,std::set<std::string> &uniques,bool init)const;
+	size_t linearize(base_type &out,std::string key_prefix="")const;
+	
+
+	//////////////////////////////////////////////////////////////////////////////////////
+	// Additional get/set - Functions
+	//////////////////////////////////////////////////////////////////////////////////////
+	/**
+	* Sets a given property to a given value.
+	* If the property is allready set, it will be reset (but setting a different type will fail).
+	* If the property does not exist it will be replaced.
+	* \param key the name of the property to be set
+	* \param val the value the property should be set to
+	*/
+	PropertyValue& setPropertyValue(const std::string &key,const PropertyValue &val);
+	//@todo make shure the type specific behaviour is as documented
+	template<typename T> T& setProperty(const std::string &key,const T &val){
+		PropertyValue &ret= operator[](key)=val;
+		return ret->cast_to_Type<T>();
+	}
+	/**
+	* Get the given property.
+	* \returns a reference of the stored PropertyValue
+	*/
+	const util::PropertyValue &getPropertyValue(const std::string &key)const;
+	/**
+	* Get the value of the given Property.
+	* If DataLog is enabled and the stored type is not T an error will be send.
+	* \returns a Type\<T\> containing a copy of the value stored for given property if the type of the stored property is T.
+	* \return Type\<T\>() otherwhise.
+	*/
+	template<typename T> util::Type<T> getPropertyType(const std::string &key)const{
+		const PropertyValue &value=getPropertyValue(key);
+		if(value.empty()){
+			const util::Type<T> dummy=T();
+			LOG(CoreLog,util::error)
+			<< "Requested Property " << key << " is not set! Returning " << dummy.toString(true);
+			return dummy;
+		}
+		else
+			return value->cast_to_Type<T>();
+	}
+	template<typename T> T getProperty(const std::string &key)const{
+		return (T)getPropertyType<T>(key);
+	}
+	bool renameProperty(std::string oldname,std::string newname);
+	
 	/**
 	 * "Print" the PropMap.
 	 * Will send the name and the result of PropertyValue->toString(label) to the given ostream.
@@ -104,11 +240,22 @@ public:
 	 * \param out the output stream to use
 	 * \param label print the type of the property (see Type::toString())
 	 */
-	std::ostream& print(std::ostream &out,bool label=false);
+	std::ostream& print(std::ostream& out, bool label = false)const;
 };
 
 }
 /** @} */
 }
 
+namespace std {
+/// Streaming output for PropMap
+template<typename charT, typename traits>
+basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits> &out,const isis::util::PropMap& s)
+{
+	isis::util::PropMap::base_type buff;
+	s.linearize(buff);
+	isis::util::write_list(buff.begin(),buff.end(),out);
+	return out;
+}
+}
 #endif

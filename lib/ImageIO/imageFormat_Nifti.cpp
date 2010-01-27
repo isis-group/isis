@@ -269,7 +269,7 @@ private:
 				}
 			}
 
-			std::cout << ch.propMap() << std::endl;
+			std::cout << static_cast<util::PropMap>(ch)<< std::endl;
 			chunkList.push_back(ch);
 		}
 		return chunkList;

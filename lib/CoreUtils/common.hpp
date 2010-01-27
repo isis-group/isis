@@ -193,13 +193,12 @@ operator<<(basic_ostream<charT, traits> &out, const pair<_FIRST,_SECOND> &s)
 }
 
 /// Streaming output for std::map
-template<typename charT, typename traits,
-typename _Key, typename _Tp, typename _Compare, typename _Alloc > basic_ostream<charT, traits>&
-operator<<(basic_ostream<charT, traits> &out,const map<_Key,_Tp,_Compare,_Alloc>& s)
+template<typename charT, typename traits, typename _Key, typename _Tp, typename _Compare, typename _Alloc >
+basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits> &out,const map<_Key,_Tp,_Compare,_Alloc>& s)
 {
 	isis::util::write_list(s.begin(),s.end(),out,"\n","","");
 	return out;
 }
-	
+
 }
 #endif //CORE_COMMON_HPP

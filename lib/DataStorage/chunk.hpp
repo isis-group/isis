@@ -20,13 +20,12 @@
 #include <string.h>
 #include <list>
 #include "ndimensional.hpp"
-#include "propertyobject.hpp"
 #include "CoreUtils/vector.hpp"
 
 namespace isis{namespace data{
 
 namespace _internal{
-class ChunkBase :public NDimensional<4>,public PropertyObject{
+class ChunkBase :public NDimensional<4>,public util::PropMap{
 protected:
 	static const char* needed;
 public:

@@ -24,12 +24,38 @@ namespace isis{namespace test{
 		map1["Test2"]=5;
 		map1["Test3"]=util::fvector4(1,1,1,1);
 		map1["Test4"]=std::string("Hallo");
+		map1["sub/Test1"]=1;
+		map1["sub/Test2"]=2;
 		
 		BOOST_CHECK_EQUAL(map1["Test1"],6.4);
 		BOOST_CHECK_EQUAL(map1["Test2"],5);
 		BOOST_CHECK_EQUAL(map1["Test3"],util::fvector4(1,1,1,1));
 		BOOST_CHECK_EQUAL(map1["Test4"],std::string("Hallo"));
-		BOOST_CHECK(map1["Test5"].empty());
+		BOOST_CHECK(map1["sub"]->is<util::PropMap>());
+		util::PropMap &ref=map1["sub"]->cast_to_Type<util::PropMap>();
+		BOOST_CHECK_EQUAL(ref["Test1"],1);
+		BOOST_CHECK_EQUAL(ref["Test2"],2);
+		BOOST_CHECK(map1["new"].empty());
+	}
+
+	BOOST_AUTO_TEST_CASE(propMap_remove_test)
+	{
+		util::PropMap map;
+		map["Test1"]=6.4;
+		map["Test2"]=5;
+		map["Test3"]=util::fvector4(1,1,1,1);
+		map["Test4"]=std::string("Hallo");
+		map["sub/Test1"]=1;
+		map["sub/Test2"]=2;
+		BOOST_CHECK(map.remove("Test1"));
+		BOOST_CHECK(map.remove("Test2"));
+		BOOST_CHECK(map.remove("Test3"));
+		BOOST_CHECK(map.remove("Test4"));
+
+		BOOST_CHECK(map.remove("sub/Test1"));
+		BOOST_CHECK(not map["sub"].empty()); //the submap must still be there
+		BOOST_CHECK(map.remove("sub/Test2"));
+		BOOST_CHECK(map["sub"].empty()); //not anymore (this will create an "normal" empty entry)
 	}
 
 	BOOST_AUTO_TEST_CASE(propMap_join_test)

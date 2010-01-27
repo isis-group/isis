@@ -2,9 +2,6 @@
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-#include <boost/date_time/gregorian/conversion.hpp>
-#include <boost/date_time/posix_time/conversion.hpp>
-
 namespace isis { namespace image_io {
 
 namespace _internal{
@@ -89,15 +86,14 @@ void ImageFormat_Dicom::parseDA(DcmElement* elem,const std::string &name,util::P
 	elem->getOFString(buff, 0);
 	
 	if (boost::regex_match(buff.c_str(), results, reg)) {
-		boost::gregorian::date date(
+		const boost::gregorian::date date(
 			boost::lexical_cast<int16_t>(results.str(1)), //year
 			boost::lexical_cast<int16_t>(results.str(2)), //month
 			boost::lexical_cast<int16_t>(results.str(3)) //day of month
 		);
 		LOG(ImageIoDebug, util::verbose_info)
 			<< "Parsed date for " << name << "(" <<  buff << ")" << " as " << date;
-		tm time = boost::gregorian::to_tm(date);
-		map[name] = mktime(&time);
+		map[name] = date;
 	} else
 		LOG(ImageIoLog, util::warning)
 		<< "Cannot parse Date string \"" << buff << "\" in the field \"" << name << "\"";
@@ -152,8 +148,8 @@ void ImageFormat_Dicom::parseTM(DcmElement* elem,const std::string &name,util::P
 	if (ok) {
 		LOG(ImageIoDebug, util::verbose_info)
 			<< "Parsed time for " << name << "(" <<  buff << ")" << " as " << time;
-		tm tm_time = boost::posix_time::to_tm(time);
-		map[name] = mktime(&tm_time);
+		map[name] = boost::posix_time::ptime(boost::gregorian::date(1400,1,1),time);
+		//although TM is defined as time of day we dont have a day here, so we fake one
 	} else
 		LOG(ImageIoLog, util::warning)
 			<< "Cannot parse Time string \"" << buff << "\" in the field \"" << name << "\"";
@@ -164,16 +160,28 @@ void ImageFormat_Dicom::parseOrientation(DcmElement* elem,const std::string &nam
 	// The ImageOrientationPatient is a pair of two 3vectors
 	// first describes read-direction in scanner space
 	// dsecond describes phase-direction in scanner space
-	util::dvector4 readDir,phaseDir;
-	std::list<double> tokens=_internal::dcmtkListString2list<double>(elem);
+	util::fvector4 readVec,phaseVec;
+	std::list<float> tokens=_internal::dcmtkListString2list<float>(elem);
 	LOG_IF(tokens.size()!=6,ImageIoDebug,util::error)
 		<< util::MSubject(name) << " does not contain six elements as it should";
-	std::list<double>::const_iterator token=tokens.begin();
+	std::list<float>::const_iterator token=tokens.begin();
 	for(int i=0;i<3 and token!=tokens.end();i++,token++)
-		readDir[i]=*token;
+		readVec[i]=*token;
 	for(int i=0;i<3 and token!=tokens.end();i++,token++)
-		phaseDir[i]=*token;
-	std::cout << readDir.dot(phaseDir) << std::endl;
+		phaseVec[i]=*token;
+	LOG_IF(readVec.dot(phaseVec)>0.01,ImageIoLog,util::info)
+		<< "The cosine between the columns and the rows of the image is bigger than 0.01";
+	map["readVec"]=readVec;
+	map["phaseVec"]=phaseVec;
+	util::fvector4 sliceVec(
+		readVec[1]*phaseVec[2]+readVec[2]*phaseVec[1],
+		readVec[2]*phaseVec[0]+readVec[0]*phaseVec[2],
+		readVec[0]*phaseVec[1]+readVec[1]*phaseVec[0]
+	);
+	map["sliceVec"]=sliceVec;
+	LOG(ImageIoDebug,util::info) << "readVec : " << readVec;
+	LOG(ImageIoDebug,util::info) << "phaseVec: " << phaseVec;
+	LOG(ImageIoDebug,util::info) << "sliceVec: " << sliceVec;
 }
 
 void ImageFormat_Dicom::parseScalar(DcmElement* elem,const std::string &name, util::PropMap &map)
@@ -279,14 +287,13 @@ void ImageFormat_Dicom::parseVector(DcmElement* elem,const std::string &name, ut
 			}
 		}break;
 		case EVR_IS: {
+			elem->getOFStringArray(buff);
 			if(len<=4){
-				elem->getOFStringArray(buff);
 				std::list<int> tokens=util::string2list<int>(std::string(buff.c_str()),"\\\\");
 				util::ivector4 vector;
 				vector.copyFrom(tokens.begin(),tokens.end());
 				map[name] = vector;
 			} else {
-				elem->getOFStringArray(buff);
 				LOG(ImageIoLog,util::error) << "Cannot store " << util::MSubject(std::make_pair(name,buff)) << " its to long";
 			}
 		}break;
@@ -321,13 +328,13 @@ void ImageFormat_Dicom::parseVector(DcmElement* elem,const std::string &name, ut
 			map[name] = boost::lexical_cast<std::string>(buff);
 		}break;
 		case EVR_DS:{
+			elem->getOFStringArray(buff);
 			if(len<=4){
 				std::list<double> tokens=util::string2list<double>(std::string(buff.c_str()),"\\\\");
 				util::dvector4 vector;
 				vector.copyFrom(tokens.begin(),tokens.end());
 				map[name] = vector;
 			} else {
-				elem->getOFStringArray(buff);
 				LOG(ImageIoLog,util::error) << "Cannot store " << util::MSubject(std::make_pair(name,buff)) << " its to long";
 			}
 		}break;

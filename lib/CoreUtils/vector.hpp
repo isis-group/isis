@@ -14,7 +14,7 @@
 #define VECTOR_HPP
 
 #include "CoreUtils/log.hpp"
-#include "CoreUtils/type.hpp"
+// #include "CoreUtils/type.hpp"
 #include <algorithm>
 #include <ostream>
 #include <strings.h>
@@ -49,7 +49,6 @@ public:
 	typedef typename CONTAINER::const_iterator const_iterator;
 	typedef FixedVector<TYPE,SIZE,CONTAINER> this_class;
 public:
-
 	/// Generic operations
 	template<typename OP> this_class binary_op(const this_class &src)const
 	{
@@ -182,8 +181,11 @@ public:
 		else *this = *this / d;
 	}
 
+	/////////////////////////////////////////////////////////////////////////
+	// copy stuff
+	/////////////////////////////////////////////////////////////////////////
 	/// copy the elements to somthing designed after the output iterator model
-	template<class OutputIterator> void copyTo(OutputIterator out)
+	template<class OutputIterator> void copyTo(OutputIterator out)const
 	{
 		std::copy(CONTAINER::begin(),CONTAINER::end(),out);
 	}
@@ -195,7 +197,10 @@ public:
 			<< "Copying " << std::distance(start,end) << " Elements into a vector of the size " << SIZE;
 		std::copy(start,end,CONTAINER::begin());
 	}
-
+	template<typename TYPE2,typename CONTAINER2> FixedVector(const FixedVector<TYPE2,SIZE,CONTAINER2> &src){
+		src.copyTo(CONTAINER::begin());
+	}
+	
 	/// write the elements formated to basic_ostream
 	template<typename charT, typename traits> void writeTo(std::basic_ostream<charT, traits> &out)const
 	{
@@ -207,7 +212,7 @@ template<typename TYPE>
 class vector4 :public FixedVector<TYPE,4>{
 public:
 	vector4(){}
-	vector4(const FixedVector<TYPE,4> &src) : FixedVector< float, 4 > ( src ) {}
+	template<typename TYPE2,typename CONTAINER2> vector4(const FixedVector<TYPE2,4,CONTAINER2> &src) : FixedVector< TYPE, 4> ( src ) {}
 	vector4(TYPE first,TYPE second,TYPE third=0,TYPE fourth=0)
 	{
 		this->operator[](3)=fourth;
