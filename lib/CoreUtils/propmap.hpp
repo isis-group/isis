@@ -177,7 +177,6 @@ public:
 	 * - If a Property is set in both and equal, it wont be added
 	 * - If a Property is empty in both, it wont be added
 	 * \param second the "other" PropMap to compare with
-	 * \param ignore a list of properties to ignore when generating the difference
 	 * \return a map of property names and value-pairs
 	 */
 	diff_map diff(const PropMap &second)const;

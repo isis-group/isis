@@ -18,6 +18,8 @@ namespace isis{ namespace util{
 	
 class PropMap; // predef PropMap
 
+namespace _internal{
+
 typedef boost::mpl::vector<
 int8_t,uint8_t,int16_t,uint16_t,int32_t,uint32_t,int64_t,uint64_t,float,double
 ,fvector4,dvector4,ivector4,std::string
@@ -44,11 +46,17 @@ struct self_join {
 		boost::mpl::for_each<types>(fak2<T1>());
 	}
 };
+}
 
+/**
+ * Templated pseudo struct to check for availability of a type at compile time.
+ * Instanciating this with any datatype will cause the compiler to check if this datatype is in the list of the supported types.
+ * If it isn't a compile-error will be raised.
+ */
 template< typename T > struct check_type
 {
 	BOOST_MPL_ASSERT_MSG(
-	(boost::mpl::contains<types,T>::value)
+	(boost::mpl::contains<_internal::types,T>::value)
 	, TYPE_IS_NOT_KNOWN
 	, (T)
 	);

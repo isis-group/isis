@@ -26,33 +26,32 @@ namespace isis{ namespace util{
  */
 
 	
-#define DEF_TYPE(TYPE,NAME,ID)  \
-  template<> const char Type<TYPE>::m_typeName[]=#NAME;		\
-  template<> const unsigned short Type<TYPE>::m_typeID=ID;
+#define DEF_TYPE(TYPE,NAME)  \
+  template<> const char Type<TYPE>::m_typeName[]=#NAME;
   
-DEF_TYPE(int8_t,s8bit,0x1);
-DEF_TYPE(uint8_t,u8bit,0x2);
+DEF_TYPE(int8_t,s8bit);
+DEF_TYPE(uint8_t,u8bit);
 
-DEF_TYPE(int16_t,s16bit,0x3);
-DEF_TYPE(uint16_t,u16bit,0x4);
+DEF_TYPE(int16_t,s16bit);
+DEF_TYPE(uint16_t,u16bit);
 
-DEF_TYPE(int32_t,s32bit,0x5);
-DEF_TYPE(uint32_t,u32bit,0x6);
+DEF_TYPE(int32_t,s32bit);
+DEF_TYPE(uint32_t,u32bit);
 
-DEF_TYPE(int64_t,s64bit,0x7);
-DEF_TYPE(uint64_t,u64bit,0x8);
+DEF_TYPE(int64_t,s64bit);
+DEF_TYPE(uint64_t,u64bit);
 
-DEF_TYPE(float,float,0x10);
-DEF_TYPE(double,double,0x11);
+DEF_TYPE(float,float);
+DEF_TYPE(double,double);
 
-DEF_TYPE(fvector4,fvector4,0xA0);
-DEF_TYPE(dvector4,dvector4,0xA1);
-DEF_TYPE(ivector4,ivector4,0xA2);
+DEF_TYPE(fvector4,fvector4);
+DEF_TYPE(dvector4,dvector4);
+DEF_TYPE(ivector4,ivector4);
 
-DEF_TYPE(std::string,string,0xB0);
-DEF_TYPE(PropMap,PropertyMap,0xB1);
-DEF_TYPE(boost::posix_time::ptime,timestamp,0xB2);
-DEF_TYPE(boost::gregorian::date,date,0xB3);
+DEF_TYPE(std::string,string);
+DEF_TYPE(PropMap,PropertyMap);
+DEF_TYPE(boost::posix_time::ptime,timestamp);
+DEF_TYPE(boost::gregorian::date,date);
 }}
 
 /// @endcond

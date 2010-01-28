@@ -29,7 +29,6 @@ namespace util{
 template<typename TYPE> class Type: public _internal::TypeBase{
 	TYPE m_val;
 	static const char m_typeName[];
-	static const unsigned short m_typeID;
 public:
 	Type()
 	{
@@ -68,7 +67,14 @@ public:
 			return  false;
 	}
 
-	static unsigned short staticId(){return m_typeID;}
+	/// \returns an unique id representing the type
+	static unsigned short staticId()
+	{
+		// make sure we the typeId won't run into the id-range of the TypePtr
+		BOOST_MPL_ASSERT_RELATION( _internal::TypeId<TYPE>::value, <, 0xFF );
+		return _internal::TypeId<TYPE>::value;
+	}
+	/// \returns the name of the type
 	static std::string staticName(){return m_typeName;}
 	
 	/**
@@ -150,7 +156,7 @@ public:
 	 * TypePtr(ptr,len,TypePtr\<TYPE\>::ObjectArrayDeleter())!
 	 * The usual dereferencing pointer interface ("*" and "->") is supported.
 	 * \param ptr the pointer to the used array
-	 * \param len the length of the used array (TypePtr does NOT check for length, 
+	 * \param length the length of the used array (TypePtr does NOT check for length,
 	 * this is just here for child classes which may want to check)
 	 */
 	TypePtr(TYPE* ptr,size_t length):
@@ -161,7 +167,7 @@ public:
 	 * The usual dereferencing pointer interface ("*" and "->") is supported.
 	 * D must implement operator()(TYPE *p).
 	 * \param ptr the pointer to the used array
-	 * \param len the length of the used array (TypePtr does NOT check for length,
+	 * \param length the length of the used array (TypePtr does NOT check for length,
 	 * \param d the deleter to be used when the data shall be deleted ( d() is called then )
 	 */
 
@@ -206,10 +212,10 @@ public:
 	virtual unsigned short typeID()const{
 		return staticId();
 	}
-	/// @copydoc Type::staticID()
+	/// @copydoc Type::staticId()
 	static unsigned short staticId()
 	{
-		return Type<TYPE>::staticId() <<2;
+		return Type<TYPE>::staticId() <<8;
 	}
 	/// @copydoc Type::staticName()
 	static std::string staticName()
