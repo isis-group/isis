@@ -27,9 +27,11 @@ namespace isis{ namespace util{namespace _internal{
 	
 class TypeBase;
 class TypeConverterBase {
-	public:
-		virtual void convert(const TypeBase& src, TypeBase &dst){};
-		static boost::shared_ptr<TypeConverterBase> create(){return boost::shared_ptr<TypeConverterBase>();}
+public:
+	virtual void convert(const TypeBase& src, TypeBase &dst){};
+	static boost::shared_ptr<TypeConverterBase> create(){return boost::shared_ptr<TypeConverterBase>();}
+public:
+	virtual ~TypeConverterBase(){}
 };
 	
 class TypeConverterMap : public std::map< int ,std::map<int, boost::shared_ptr<TypeConverterBase> > >

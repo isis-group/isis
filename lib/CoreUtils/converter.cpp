@@ -30,7 +30,10 @@ namespace isis{ namespace util{ namespace _internal{
 /////////////////////////////////////////////////////////////////////////////
 // general converter version -- does nothing
 /////////////////////////////////////////////////////////////////////////////
-template<bool NUMERIC,bool SAME,typename SRC, typename DST> class TypeConverter : public TypeConverterBase{};
+template<bool NUMERIC,bool SAME,typename SRC, typename DST> class TypeConverter : public TypeConverterBase{
+public:
+	virtual ~TypeConverter(){}
+};
 
 /////////////////////////////////////////////////////////////////////////////
 // trivial version -- for conversion of the same type
@@ -51,6 +54,7 @@ public:
 		const SRC &srcVal=src.cast_to_Type<SRC>();
 		dstVal = srcVal;
 	}
+	virtual ~TypeConverter(){}
 };
 template<typename SRC> class TypeConverter<false,true,SRC,SRC> : public TypeConverterBase{
 	TypeConverter(){
@@ -67,6 +71,7 @@ template<typename SRC> class TypeConverter<false,true,SRC,SRC> : public TypeConv
 			const SRC &srcVal=src.cast_to_Type<SRC>();
 			dstVal = srcVal;
 		}
+	virtual ~TypeConverter(){}
 };
 
 
@@ -103,6 +108,7 @@ public:
 			<< "Automatic numeric conversion of " << MSubject(src.toString(true)) << " to " << dst.typeName() << " failed: " << e.what();
 		}
 	}
+	virtual ~TypeConverter(){}
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -113,37 +119,44 @@ template<typename DST> class TypeConverter<false,false,std::string,DST> : public
 		LOG(CoreDebug,verbose_info)
 		<< "Creating from-string converter for " << Type<DST>::staticName();
 	};
-	public:
-		static boost::shared_ptr<TypeConverterBase> create(){
-			TypeConverter<false,false,std::string,DST> *ret=new TypeConverter<false,false,std::string,DST>;
-			return boost::shared_ptr<TypeConverterBase>(ret);
-		}
-		void convert(const TypeBase& src, TypeBase& dst){
-			DST &dstVal=dst.cast_to_Type<DST>();
-			const std::string &srcVal=src.cast_to_Type<std::string>();
-			dstVal = boost::lexical_cast<DST>(srcVal);
-		}
+public:
+	static boost::shared_ptr<TypeConverterBase> create(){
+		TypeConverter<false,false,std::string,DST> *ret=new TypeConverter<false,false,std::string,DST>;
+		return boost::shared_ptr<TypeConverterBase>(ret);
+	}
+	void convert(const TypeBase& src, TypeBase& dst){
+		DST &dstVal=dst.cast_to_Type<DST>();
+		const std::string &srcVal=src.cast_to_Type<std::string>();
+		dstVal = boost::lexical_cast<DST>(srcVal);
+	}
+	virtual ~TypeConverter(){}
 };
 template<typename SRC> class TypeConverter<false,false,SRC,std::string> : public TypeConverterBase{
 	TypeConverter(){
 		LOG(CoreDebug,verbose_info)
 		<< "Creating to-string converter for " << Type<SRC>::staticName();
 	};
-	public:
-		static boost::shared_ptr<TypeConverterBase> create(){
-			TypeConverter<false,false,SRC,std::string> *ret=new TypeConverter<false,false,SRC,std::string>;
-			return boost::shared_ptr<TypeConverterBase>(ret);
-		}
-		void convert(const TypeBase& src, TypeBase& dst){
-			std::string &dstVal=dst.cast_to_Type<std::string>();
-			const SRC &srcVal=src.cast_to_Type<SRC>();
-			dstVal = boost::lexical_cast<std::string>(srcVal);
-		}
+public:
+	static boost::shared_ptr<TypeConverterBase> create(){
+		TypeConverter<false,false,SRC,std::string> *ret=new TypeConverter<false,false,SRC,std::string>;
+		return boost::shared_ptr<TypeConverterBase>(ret);
+	}
+	void convert(const TypeBase& src, TypeBase& dst){
+		std::string &dstVal=dst.cast_to_Type<std::string>();
+		const SRC &srcVal=src.cast_to_Type<SRC>();
+		dstVal = boost::lexical_cast<std::string>(srcVal);
+	}
+	virtual ~TypeConverter(){}
 };
 // @todo we cannot parse this stuff yet
-template<> class TypeConverter<false,false,std::string,PropMap> : public TypeConverterBase{};
-template<typename TYPE>
-class TypeConverter<false,false,std::string,vector4<TYPE> > :public TypeConverterBase{};
+template<> class TypeConverter<false,false,std::string,PropMap> : public TypeConverterBase{
+public:
+	virtual ~TypeConverter(){}
+};
+template<typename TYPE> class TypeConverter<false,false,std::string,vector4<TYPE> > :public TypeConverterBase{
+public:
+	virtual ~TypeConverter(){}
+};
 
 template<typename SRC> struct inner_add {
 	std::map<int, boost::shared_ptr<TypeConverterBase> > &m_subMap;
@@ -174,4 +187,4 @@ TypeConverterMap::TypeConverterMap()
 	<< "conversion map for " << size() << " types created";
 }
 
-} } }
+}}}

@@ -89,25 +89,25 @@ private:
 	void diffTree(const PropMap& other,PropMap::diff_map &ret,std::string prefix) const;
 	static PropertyValue& fetchProperty(
 		util::PropMap &root,
-		const propPathIterator at,
-		const propPathIterator pathEnd);
+		const propPathIterator at,const propPathIterator pathEnd
+	);
 	static const PropertyValue* searchBranch(
 		const util::PropMap &root,
-		const propPathIterator at,
-		const propPathIterator pathEnd);
+		const propPathIterator at,const propPathIterator pathEnd
+	);
 	bool recursiveRemove(
 		util::PropMap &root,
-		const propPathIterator at,
-		const propPathIterator pathEnd);
+		const propPathIterator at,const propPathIterator pathEnd
+	);
 protected:
 	/////////////////////////////////////////////////////////////////////////////////////////
 	// rw-backends
 	/////////////////////////////////////////////////////////////////////////////////////////
 	/**
-	* Find the property referenced by the path-key.
-	* \param key the \"path\" to the property
-	* \returns a pointer to the PropertyValue, NULL if the property was not found
-	*/
+	 * Find the property referenced by the path-key.
+	 * \param key the \"path\" to the property
+	 * \returns a pointer to the PropertyValue, NULL if the property was not found
+	 */
 	const PropertyValue* findPropVal(const std::string &key)const;
 	/// create a list of keys for every entry for which the given scalar predicate is true.
 	template<class Predicate> const key_list genKeyList()const{

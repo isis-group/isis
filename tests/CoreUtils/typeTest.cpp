@@ -24,7 +24,7 @@ using util::_internal::TypeBase;
 // TestCase object instantiation
 BOOST_AUTO_TEST_CASE(test_type_init) {
 
-	ENABLE_LOG(util::CoreDebug,util::DefaultMsgPrint,util::verbose_info);
+	ENABLE_LOG(util::CoreDebug,util::DefaultMsgPrint,util::info);
 	ENABLE_LOG(util::CoreLog,util::DefaultMsgPrint,util::info);
 	
 	Type<int> tInt(42);		// integer
@@ -114,11 +114,10 @@ BOOST_AUTO_TEST_CASE(type_conversion_test){
 	TypeBase *fRef1= &tFloat1;
 	TypeBase *fRef2= &tFloat2;
 
-	std::cout << iRef->as<double>() << std::endl;
-	std::cout << fRef1->as<int>() << std::endl;
-	std::cout << fRef2->as<int>() << std::endl;
-
-	std::cout << fRef2->as<std::string>() << std::endl;
+	BOOST_CHECK_EQUAL(iRef->as<double>(),42);
+	BOOST_CHECK_EQUAL(fRef1->as<int>(), (int)round(tFloat1));
+	BOOST_CHECK_EQUAL(fRef2->as<int>(), (int)round(tFloat2));
+	BOOST_CHECK_EQUAL(fRef2->as<std::string>(),"3.54150009");
 }
 
 }}
