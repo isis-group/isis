@@ -18,6 +18,12 @@
 
 #include <string>
 
+// @todo we need to know this for lexical_cast (toString)
+#include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+
+
+
 namespace isis{ 
 /*! \addtogroup util
  *  Additional documentation for group `mygrp'

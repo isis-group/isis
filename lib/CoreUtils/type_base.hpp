@@ -21,6 +21,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include "types.hpp"
+#include "converter.hpp"
 
 
 /*! \addtogroup util
@@ -136,6 +137,11 @@ public:
 };
 
 class TypeBase : public GenericType{
+	static _internal::TypeConverterMap& converters(){
+		static _internal::TypeConverterMap ret;
+		return ret;
+	}
+	
 public:
 	typedef TypeReference<TypeBase> Reference;
 
@@ -157,11 +163,22 @@ public:
 	template<class T> T as()const{
 		if(typeID()==Type<T>::staticId()){
 			LOG(CoreLog,info)
-			<< "Doing dynamic cast instead of useless lexical cast from " << toString(true)
+			<< "Doing reinterpret_cast instead of useless conversion from " << toString(true)
 			<< " to " << Type<T>::staticName();
-			return this->cast_to_Type<T>();
+			return *reinterpret_cast<const T*>(this);
+		} else {
+			TypeConverterMap::mapped_type::mapped_type conv=converters()[typeID()][Type<T>::staticId()];
+			if(conv){
+				Type<T> ret;
+				conv->convert(*this,ret);
+				return ret;
+			} else {
+				LOG(CoreLog,warning)
+					<< "I dont know any direct conversion from " << MSubject(toString(true)) << " to "
+					<< MSubject(Type<T>::staticName()) << " trying lexical cast...";
+				return Type<T>(this->toString(false));
+			}
 		}
-		return Type<T>(this->toString(false));
 	}
 
 	/**

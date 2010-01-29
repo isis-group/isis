@@ -14,14 +14,19 @@
 #include <boost/test/included/unit_test.hpp>
 #include <string>
 #include "CoreUtils/type.hpp"
+#include <boost/numeric/conversion/converter.hpp>
 
 namespace isis{namespace test{
 	
 using util::Type;
+using util::_internal::TypeBase;
 
 // TestCase object instantiation
 BOOST_AUTO_TEST_CASE(test_type_init) {
 
+	ENABLE_LOG(util::CoreDebug,util::DefaultMsgPrint,util::verbose_info);
+	ENABLE_LOG(util::CoreLog,util::DefaultMsgPrint,util::info);
+	
 	Type<int> tInt(42);		// integer
 	Type<std::string> tStr(std::string("Hello World")); // string
 	// implicit conversion from double -> float
@@ -100,4 +105,20 @@ BOOST_AUTO_TEST_CASE(test_type_operators) {
 	BOOST_CHECK_EQUAL(tInt1*2, 42);
 	BOOST_CHECK_EQUAL(42 - tInt1, tInt2);
 }
+
+BOOST_AUTO_TEST_CASE(type_conversion_test){
+	Type<int> tInt(42);
+	Type<float> tFloat1(3.1415);
+	Type<float> tFloat2(3.5415);
+	TypeBase *iRef= &tInt;
+	TypeBase *fRef1= &tFloat1;
+	TypeBase *fRef2= &tFloat2;
+
+	std::cout << iRef->as<double>() << std::endl;
+	std::cout << fRef1->as<int>() << std::endl;
+	std::cout << fRef2->as<int>() << std::endl;
+
+	std::cout << fRef2->as<std::string>() << std::endl;
+}
+
 }}
