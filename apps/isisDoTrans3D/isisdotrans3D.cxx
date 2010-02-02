@@ -4,7 +4,6 @@
  *  Created on: October 15, 2009
  *      Author: tuerke
  */
-#include <boost/progress.hpp>
 
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
@@ -17,6 +16,7 @@
 
 #include "extITK/isisTimeStepExtractionFilter.h"
 #include "extITK/isisTransformMerger.hpp"
+#include "extITK/isisIterationObserver.h"
 
 #include "itkResampleImageFilter.h"
 #include "itkWarpImageFilter.h"
@@ -30,9 +30,6 @@
 #include "viaio/mu.h" //this is required for VNumber
 //command line parser options
 
-using boost::progress_display;
-using boost::progress_timer;
-
 VDictEntry TYPInterpolator[] = { {"Linear", 0}, {"BSpline", 1}, {"NearestNeighbor", 2}, {NULL}};
 
 static VString in_filename = NULL;
@@ -44,6 +41,7 @@ static VBoolean in_found, out_found, trans_found;
 static VShort interpolator_type = 0;
 static VArgVector resolution;
 static VBoolean fmri;
+static VBoolean use_inverse = false;
 
 static VOptionDescRec options[] = {
 //requiered inputs
@@ -56,43 +54,13 @@ static VOptionDescRec options[] = {
         &template_filename, VOptionalOpt, 0, "The template image"}, {"res", VFloatRepn, 0, (VPointer) &resolution,
         VOptionalOpt, 0, "The output resolution. One value for isotrop output"}, {"fmri", VBooleanRepn, 1, &fmri,
         VOptionalOpt, 0, "Input and output image file are functional data"}, {"vtrans", VStringRepn, 1,
-        &vtrans_filename, VOptionalOpt, 0, "Vector deformation field"}
+        &vtrans_filename, VOptionalOpt, 0, "Vector deformation field"}, {"use_inverse", VBooleanRepn, 1, &use_inverse,
+	VOptionalOpt, 0, "Using the inverse of the transform"}
 
 };
 
 #include "itkCommand.h"
-class ProcessUpdate : public itk::Command
-{
-public:
-	typedef ProcessUpdate Self;
-	typedef itk::Command Superclass;
-	typedef itk::SmartPointer<Self> Pointer;
-	itkNewMacro( Self )
-	;
-	progress_display display;
-protected:
-	ProcessUpdate() :
-		display(101) {
-	}
-	;
-public:
-	typedef const itk::ProcessObject * ProcessPointer;
 
-	void Execute(
-	    itk::Object *caller, const itk::EventObject & event) {
-		Execute((const itk::Object *) caller, event);
-	}
-
-	void Execute(
-	    const itk::Object * object, const itk::EventObject & event) {
-		if(!(itk::ProgressEvent().CheckEvent(&event))) {
-			return;
-		}
-
-		++display;
-	}
-
-};
 
 int main(
 
@@ -143,6 +111,8 @@ int main(
 	typedef itk::TileImageFilter<OutputImageType, FMRIOutputType> TileImageFitlerType;
 
 	typedef const itk::Transform<double, Dimension, Dimension>* ConstTransformPointer;
+	typedef itk::Transform<double, Dimension, Dimension>* TransformPointer;
+	itk::Transform<double, Dimension, Dimension>::ParametersType parameters;
 
 	typedef itk::LinearInterpolateImageFunction<OutputImageType, double> LinearInterpolatorType;
 	typedef itk::NearestNeighborInterpolateImageFunction<OutputImageType, double> NearestNeighborInterpolatorType;
@@ -157,7 +127,7 @@ int main(
 	WarpImageFilterType::Pointer warper = WarpImageFilterType::New();
 	CastImageFilterType::Pointer caster = CastImageFilterType::New();
 
-	ProcessUpdate::Pointer progressObserver = ProcessUpdate::New();
+	isis::extitk::ProcessUpdate::Pointer progressObserver = isis::extitk::ProcessUpdate::New();
 
 	TimeStepExtractionFilterType::Pointer timeStepExtractionFilter = TimeStepExtractionFilterType::New();
 	isis::extitk::TransformMerger* transformMerger = new isis::extitk::TransformMerger;
@@ -181,7 +151,9 @@ int main(
 	OutputImageType::SpacingType fmriOutputSpacing;
 	OutputImageType::DirectionType fmriOutputDirection;
 	OutputImageType::PointType fmriOutputOrigin;
-
+	
+	TransformPointer transform;
+		
 	if(!trans_filename.number and !vtrans_filename) {
 		std::cout << "No transform specified!!" << std::endl;
 		return EXIT_FAILURE;
@@ -193,7 +165,13 @@ int main(
 	if(template_filename) {
 		templateReader->SetFileName(template_filename);
 		templateReader->Update();
+		outputDirection = templateReader->GetOutput()->GetDirection();
+		outputOrigin = templateReader->GetOutput()->GetOrigin();
 	}
+	if(!template_filename) {
+		outputDirection = reader->GetOutput()->GetDirection();
+		outputOrigin = reader->GetOutput()->GetOrigin();
+	    }
 	if(trans_filename.number) {
 		unsigned int number_trans = trans_filename.number;
 		if(number_trans > 1) {
@@ -219,7 +197,39 @@ int main(
 			itk::TransformFileReader::TransformListType::const_iterator ti;
 			ti = transformList->begin();
 			//setting up the resample object
-			resampler->SetTransform(static_cast<ConstTransformPointer> ((*ti).GetPointer()));
+			transform = static_cast<TransformPointer> ((*ti).GetPointer());
+			parameters = transform->GetParameters();
+			if(use_inverse) {
+			    std::cout << transform->GetParameters() << std::endl;
+			    std::cout << transform->GetFixedParameters() << std::endl;
+			    std::cout << outputDirection << std::endl;
+			    /*
+			    for(unsigned int i = 0; i < Dimension; i++)
+			    {
+				for(unsigned int j = 0; j < Dimension; j++)
+				{
+				    if(outputDirection[i][j]) {
+					std::cout << outputDirection[i][j] << std::endl;
+					parameters[j] *= outputDirection[i][j];
+					parameters[j+Dimension] *= outputDirection[i][j] * -1;
+				    }
+				}
+			    }
+			    */
+			    //parameters[0] *= -1;
+			    //parameters[1] *= -1;
+			    //parameters[2] *= -1;
+			    parameters[3] *= -1;
+			    //parameters[4] *= -1;
+			    parameters[5] *= -1;
+			    transform->SetParameters(parameters);
+			    resampler->SetTransform(transform);
+			    std::cout << resampler->GetTransform()->GetParameters() << std::endl;
+			    std::cout << resampler->GetTransform()->GetFixedParameters() << std::endl;
+			}
+			if(!use_inverse) {
+			    resampler->SetTransform(static_cast<ConstTransformPointer> ((*ti).GetPointer()));
+			}
 		}
 
 	}
@@ -277,17 +287,6 @@ int main(
 
 		}
 	}
-	//reading the transform from a file
-
-
-	if(!template_filename) {
-		outputDirection = reader->GetOutput()->GetDirection();
-		outputOrigin = reader->GetOutput()->GetOrigin();
-	} else {
-		outputDirection = templateReader->GetOutput()->GetDirection();
-		outputOrigin = templateReader->GetOutput()->GetOrigin();
-	}
-
 	//setting up the interpolator
 	switch(interpolator_type) {
 	case 0:

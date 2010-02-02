@@ -272,7 +272,7 @@ namespace isis {
 					}
 				}
 
-				if (metric.VIOLAWELLSMUTUALINFORMATION or metric.MUTUALINFORMATIONHISTOGRAM) {
+				if (metric.VIOLAWELLSMUTUALINFORMATION or metric.MUTUALINFORMATIONHISTOGRAM or metric.MEANSQUARE) {
 					m_RegularStepGradientDescentOptimizer->MaximizeOn();
 				}
 
@@ -794,7 +794,7 @@ namespace isis {
 
 			if(UserOptions.SHOWITERATIONSTATUS)
 			{
-				m_observer = IterationObserver::New();
+				m_observer = isis::extitk::IterationObserver::New();
 				m_RegistrationObject->GetOptimizer()->AddObserver(itk::IterationEvent(), m_observer );
 			}
 

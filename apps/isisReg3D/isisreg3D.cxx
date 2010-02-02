@@ -10,6 +10,7 @@
 
 #include "extRegistration/isisRegistrationFactory3D.h"
 #include "extITK/isisTransformMerger.hpp"
+#include "extITK/isisIterationObserver.h"
 
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
@@ -24,8 +25,10 @@
 #include "itkLandmarkBasedTransformInitializer.h"
 #include "itkVersorRigid3DTransform.h"
 
+#include "itkMedianImageFilter.h"
+#include "itkDiscreteGaussianImageFilter.h"
+
 #include "boost/progress.hpp"
-#include "CoreUtils/log.hpp"
 
 //via command parser include
 #include "viaio/option.h"
@@ -62,6 +65,7 @@ static VShort initial_seed = 1;
 static VBoolean initialize_center = false;
 static VBoolean initialize_mass = false;
 static VString mask_filename = NULL;
+static VShort smooth = 0;
 
 static VOptionDescRec
         options[] = {
@@ -102,6 +106,7 @@ static VOptionDescRec
                 "Using an initializer to align the image centers"},
             {"prealign_mass", VBooleanRepn, 1, &initialize_mass, VOptionalOpt, 0,
                                 "Using an initializer to align the center of mass"},
+	    {"smooth", VShortRepn, 1, &smooth, VOptionalOpt, 0, "Applying a smoothing filter to the fixed and moving image before the registration process"},
 
             //component inputs
             {"metric", VShortRepn, 1, (VPointer) &metricType, VOptionalOpt, TYPMetric, "Type of the metric"}, {
@@ -112,15 +117,12 @@ static VOptionDescRec
 
         };
 
-using namespace isis::util;
-
 // This is the main function
 int main(
     int argc, char* argv[]) {
-	ENABLE_LOG(CoreLog, DefaultMsgPrint, info)
-;	// show revision information string constant
-	std::cout << "Revision: " << SVN_REVISION << std::endl;
 
+    // show revision information string constant
+	std::cout << "Revision: " << SVN_REVISION << std::endl;
 	// DANGER! Kids don't try this at home! VParseCommand modifies the values of argc and argv!!!
 	if (!VParseCommand(VNumber(options), options, &argc, argv) || !VIdentifyFiles(VNumber(options), options, "in",
 					&argc, argv, 0)) {
@@ -172,6 +174,9 @@ int main(
 	const itk::TransformBase* tmpConstTransformPointer;
 	typedef itk::TransformBase* TransformBasePointerType;
 
+	typedef itk::MedianImageFilter<FixedImageType, FixedImageType> FixedFilterType;
+	typedef itk::MedianImageFilter<MovingImageType, MovingImageType> MovingFilterType;
+
 	FixedImageReaderType::Pointer fixedReader = FixedImageReaderType::New();
 	MovingImageReaderType::Pointer movingReader = MovingImageReaderType::New();
 	MaskImageReaderType::Pointer maskReader = MaskImageReaderType::New();
@@ -181,13 +186,48 @@ int main(
 	itk::TransformFileReader::Pointer transformReader = itk::TransformFileReader::New();
 
 	ImageMaskSpatialObjectType::Pointer mask = ImageMaskSpatialObjectType::New();
+	FixedImageType::Pointer fixedImage = FixedImageType::New();
+	MovingImageType::Pointer movingImage = MovingImageType::New();
+	
+	FixedFilterType::Pointer fixedFilter = FixedFilterType::New();
+	MovingFilterType::Pointer movingFilter = MovingFilterType::New();
 
 	fixedReader->SetFileName(ref_filename);
 	movingReader->SetFileName(in_filename);
 
 	fixedReader->Update();
 	movingReader->Update();
-
+	
+	if(!smooth) {
+	    fixedImage = fixedReader->GetOutput();
+	    movingImage = movingReader->GetOutput();
+	}
+	
+	if(smooth) {
+	    fixedFilter->SetNumberOfThreads(number_threads);
+	    movingFilter->SetNumberOfThreads(number_threads);
+	    std::cout << "applying filter to the fixed image" << std::endl;
+	    isis::extitk::ProcessUpdate::Pointer progressObserver = isis::extitk::ProcessUpdate::New();
+	    FixedImageType::SizeType fixedIndexRadius;
+	    MovingImageType::SizeType movingIndexRadius;
+	    fixedIndexRadius.Fill(smooth);
+	    movingIndexRadius.Fill(smooth);
+	    fixedFilter->SetInput(fixedReader->GetOutput());
+	    movingFilter->SetInput(movingReader->GetOutput());
+	    fixedFilter->SetRadius(fixedIndexRadius);
+	    movingFilter->SetRadius(movingIndexRadius);
+	    fixedFilter->AddObserver(itk::ProgressEvent(), progressObserver);
+	    fixedFilter->Update();
+	    std::cout << "applying filter to the moving image" << std::endl;
+	    progressObserver->CreateAnother();
+	    movingFilter->AddObserver(itk::ProgressEvent(), progressObserver);
+	    movingFilter->Update();
+	    fixedImage = fixedFilter->GetOutput();
+	    movingImage = movingFilter->GetOutput();
+	
+	
+	}
+	
 	RegistrationFactoryType::Pointer registrationFactory = RegistrationFactoryType::New();
 	isis::extitk::TransformMerger* transformMerger = new isis::extitk::TransformMerger;
 
@@ -211,7 +251,7 @@ int main(
 			optimizer = 0;
 		}
 
-		std::cout << "setting up the registration object..." << std::endl;
+		std::cout << std::endl << "setting up the registration object..." << std::endl;
 		registrationFactory->Reset();
 
 		//check pixel density
@@ -384,8 +424,8 @@ int main(
 		if (!initialize_mass)
 					registrationFactory->UserOptions.INITIALIZEMASSOFF = true;
 
-		registrationFactory->SetFixedImage(fixedReader->GetOutput());
-		registrationFactory->SetMovingImage(movingReader->GetOutput());
+		registrationFactory->SetFixedImage(fixedImage);
+		registrationFactory->SetMovingImage(movingImage);
 
 		std::cout << "starting the registration..." << std::endl;
 

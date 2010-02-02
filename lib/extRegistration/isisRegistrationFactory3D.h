@@ -10,7 +10,7 @@
 
 #include "itkImageRegistrationMethod.h"
 
-#include "extRegistration/isisIterationObserver.h"
+#include "extITK/isisIterationObserver.h"
 
 //transform includes
 
@@ -349,7 +349,7 @@ private:
 
 	unsigned int m_NumberOfParameters;
 
-	IterationObserver::Pointer m_observer;
+	isis::extitk::IterationObserver::Pointer m_observer;
 
 	//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

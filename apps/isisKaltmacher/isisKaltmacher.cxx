@@ -23,7 +23,7 @@
 #include "itkNormalizedMutualInformationHistogramImageToImageMetric.h"
 #include "itkLinearInterpolateImageFunction.h"
 
-#include "extRegistration/isisIterationObserver.h"
+#include "extITK/isisIterationObserver.h"
 #include <iostream>
 #include "itkMeanImageFilter.h"
 #include "itkMedianImageFilter.h"
@@ -131,7 +131,7 @@ int main(int argc, char* argv[])
 	DiscreteGaussianImageFilterType::Pointer discreteFilter1 = DiscreteGaussianImageFilterType::New();
 	DiscreteGaussianImageFilterType::Pointer discreteFilter2 = DiscreteGaussianImageFilterType::New();
 	
-	isis::IterationObserver::Pointer observer = isis::IterationObserver::New();
+	isis::extitk::IterationObserver::Pointer observer = isis::extitk::IterationObserver::New();
 
 	fixedReader->SetFileName(ref_filename);
 	movingReader->SetFileName(in_filename);

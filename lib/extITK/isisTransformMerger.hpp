@@ -36,7 +36,7 @@ public:
     typedef itk::AffineTransform<double, 3> AffineTransformType;
     typedef itk::BSplineDeformableTransform<double, 3, 3> BSplineDeformableTransformType;
 	
-	typedef itk::AddImageFilter<DeformationFieldType, DeformationFieldType, DeformationFieldType> AddImageFilterType;
+    typedef itk::AddImageFilter<DeformationFieldType, DeformationFieldType, DeformationFieldType> AddImageFilterType;
 
 
     TransformMerger();
