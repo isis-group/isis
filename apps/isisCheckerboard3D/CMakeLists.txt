@@ -26,4 +26,4 @@ set_target_properties(isischeckerboard3d PROPERTIES
     COMPILE_DEFINITIONS "SVN_REVISION=${SVN_REVISION}")
 
 # link versus ITK library
-TARGET_LINK_LIBRARIES(isischeckerboard3d  ITKIO ITKCommon viaio)
+TARGET_LINK_LIBRARIES(isischeckerboard3d  ITKIO ITKCommon viaio gslcblas)

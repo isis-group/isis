@@ -36,4 +36,4 @@ set_target_properties(isisdotrans3d PROPERTIES
     COMPILE_DEFINITIONS "SVN_REVISION=${SVN_REVISION}")
 
 # link versus ITK library
-TARGET_LINK_LIBRARIES(isisdotrans3d  ITKIO ITKCommon extitk viaio)
+TARGET_LINK_LIBRARIES(isisdotrans3d  ITKIO ITKCommon extitk viaio gslcblas)

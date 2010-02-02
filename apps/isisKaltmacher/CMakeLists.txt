@@ -39,5 +39,5 @@ set_target_properties(isisKaltmacher PROPERTIES
     COMPILE_DEFINITIONS "SVN_REVISION=${SVN_REVISION}")
 
 # link versus ITK library
-TARGET_LINK_LIBRARIES(isisKaltmacher ITKIO ITKSpatialObject ITKNumerics ITKStatistics extitk viaio)
+TARGET_LINK_LIBRARIES(isisKaltmacher ITKIO ITKSpatialObject ITKNumerics ITKStatistics extitk viaio gslcblas)
 
