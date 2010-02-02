@@ -173,10 +173,10 @@ public:
 				conv->convert(*this,ret);
 				return ret;
 			} else {
-				LOG(CoreLog,warning)
-					<< "I dont know any direct conversion from " << MSubject(toString(true)) << " to "
-					<< MSubject(Type<T>::staticName()) << " trying lexical cast...";
-				return Type<T>(this->toString(false));
+				LOG(CoreLog,error)
+					<< "I dont know any conversion from " << MSubject(toString(true)) << " to "
+					<< MSubject(Type<T>::staticName()) << " returning " << Type<T>();
+				return Type<T>();
 			}
 		}
 	}

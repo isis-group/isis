@@ -39,14 +39,14 @@ public:
 // trivial version -- for conversion of the same type
 /////////////////////////////////////////////////////////////////////////////
 // @todo template<bool NUMERIC,typename SRC> class TypeConverter<NUMERIC,SRC,SRC> wont work because its ambigous
-template<typename SRC> class TypeConverter<true,true,SRC,SRC> : public TypeConverterBase{
+template<bool NUMERIC,typename SRC, typename DST> class TypeConverter<NUMERIC,true,SRC,DST> : public TypeConverterBase{
 	TypeConverter(){
 		LOG(CoreDebug,verbose_info)
-		<< "Creating trivial numeric converter for " << Type<SRC>::staticName();
+		<< "Creating trivial converter for " << Type<SRC>::staticName();
 	};
 public:
 	static boost::shared_ptr<TypeConverterBase> create(){
-		TypeConverter<true,true,SRC,SRC> *ret=new TypeConverter<true,true,SRC,SRC>;
+		TypeConverter<NUMERIC,true,SRC,DST> *ret=new TypeConverter<NUMERIC,true,SRC,DST>;
 		return boost::shared_ptr<TypeConverterBase>(ret);
 	}
 	void convert(const TypeBase& src, TypeBase& dst){
@@ -54,23 +54,6 @@ public:
 		const SRC &srcVal=src.cast_to_Type<SRC>();
 		dstVal = srcVal;
 	}
-	virtual ~TypeConverter(){}
-};
-template<typename SRC> class TypeConverter<false,true,SRC,SRC> : public TypeConverterBase{
-	TypeConverter(){
-		LOG(CoreDebug,verbose_info)
-		<< "Creating trivial converter for " << Type<SRC>::staticName();
-	};
-	public:
-		static boost::shared_ptr<TypeConverterBase> create(){
-			TypeConverter<false,true,SRC,SRC> *ret=new TypeConverter<false,true,SRC,SRC>;
-			return boost::shared_ptr<TypeConverterBase>(ret);
-		}
-		void convert(const TypeBase& src, TypeBase& dst){
-			SRC &dstVal=dst.cast_to_Type<SRC>();
-			const SRC &srcVal=src.cast_to_Type<SRC>();
-			dstVal = srcVal;
-		}
 	virtual ~TypeConverter(){}
 };
 
@@ -111,6 +94,45 @@ public:
 	virtual ~TypeConverter(){}
 };
 
+/////////////////////////////////////////////////////////////////////////////
+// vector4 version -- uses TypeConverter on every element
+/////////////////////////////////////////////////////////////////////////////
+template<typename SRC, typename DST > class TypeConverter<false,false,vector4<SRC>,vector4<DST> > : public TypeConverterBase{
+	boost::shared_ptr<TypeConverterBase> m_conv;
+	TypeConverter(boost::shared_ptr<TypeConverterBase> elem_conv):m_conv(elem_conv){
+		LOG(CoreDebug,verbose_info)
+		<< "Creating vector converter from "
+		<< Type<vector4<SRC> >::staticName() << " to " << Type<vector4<DST> >::staticName();
+	};
+public:
+	static boost::shared_ptr<TypeConverterBase> create(){
+		typedef boost::mpl::and_<boost::is_arithmetic<SRC>,boost::is_arithmetic<DST> > is_num;
+		typedef boost::is_same<SRC,DST> is_same;
+		boost::shared_ptr<TypeConverterBase> elem_conv=
+			TypeConverter<is_num::value,is_same::value,SRC,DST>::create();
+		
+		if(elem_conv){
+			TypeConverter<false,false,vector4<SRC>,vector4<DST> > *ret=new TypeConverter<false,false,vector4<SRC>,vector4<DST> >(elem_conv);
+			return boost::shared_ptr<TypeConverterBase>(ret);
+		} else {
+			return boost::shared_ptr<TypeConverterBase>();
+		}
+
+	}
+	void convert(const TypeBase& src, TypeBase& dst){
+		vector4<DST> &dstVal=dst.cast_to_Type<vector4<DST> >();
+		const vector4<SRC> &srcVal=src.cast_to_Type<vector4<SRC> >();
+
+		for(int i=0;i<4;i++){//slow and ugly, but flexible
+			Type<DST> dst;
+			m_conv->convert(Type<SRC>(srcVal[i]),dst);
+			dstVal[i]=(DST)dst;
+		}
+	}
+	virtual ~TypeConverter(){}
+};
+	
+	
 /////////////////////////////////////////////////////////////////////////////
 // string version -- uses lexical_cast to convert from/to string
 /////////////////////////////////////////////////////////////////////////////
