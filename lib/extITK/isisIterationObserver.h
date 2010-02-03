@@ -75,12 +75,12 @@ public:
 		if(const itk::VersorRigid3DTransformOptimizer* optimizer =
 						dynamic_cast<const itk::VersorRigid3DTransformOptimizer*> ( object ) )
 		{
-//			std::cout << optimizer->GetCurrentIteration() << " = ";
-//			std::cout << optimizer->GetValue() << " : ";
-//			std::cout << optimizer->GetCurrentPosition() << std::endl;
+			std::cout << optimizer->GetCurrentIteration() << " = ";
+			std::cout << optimizer->GetValue() << " : ";
+			std::cout << optimizer->GetCurrentPosition() << std::endl;
 
-			std::cout << optimizer->GetCurrentIteration() << "\t";
-			std::cout << optimizer->GetValue() << std::endl;
+// 			std::cout << optimizer->GetCurrentIteration() << "\t";
+// 			std::cout << optimizer->GetValue() << std::endl;
 
 		}
 	}

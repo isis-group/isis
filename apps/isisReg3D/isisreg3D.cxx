@@ -66,6 +66,7 @@ static VBoolean initialize_center = false;
 static VBoolean initialize_mass = false;
 static VString mask_filename = NULL;
 static VShort smooth = 0;
+static VBoolean use_inverse = false;
 
 static VOptionDescRec
         options[] = {
@@ -107,6 +108,7 @@ static VOptionDescRec
             {"prealign_mass", VBooleanRepn, 1, &initialize_mass, VOptionalOpt, 0,
                                 "Using an initializer to align the center of mass"},
 	    {"smooth", VShortRepn, 1, &smooth, VOptionalOpt, 0, "Applying a smoothing filter to the fixed and moving image before the registration process"},
+	    {"get_inverse", VBooleanRepn, 1, &use_inverse, VOptionalOpt, 0, "Getting the inverse transform"},
 
             //component inputs
             {"metric", VShortRepn, 1, (VPointer) &metricType, VOptionalOpt, TYPMetric, "Type of the metric"}, {
@@ -180,6 +182,8 @@ int main(
 	FixedImageReaderType::Pointer fixedReader = FixedImageReaderType::New();
 	MovingImageReaderType::Pointer movingReader = MovingImageReaderType::New();
 	MaskImageReaderType::Pointer maskReader = MaskImageReaderType::New();
+	
+	itk::AffineTransform<double, Dimension>::Pointer tmpTransform = itk::AffineTransform<double, Dimension>::New();
 
 	itk::TransformFileWriter::Pointer transformWriter = itk::TransformFileWriter::New();
 	VectorWriterType::Pointer vectorWriter = VectorWriterType::New();
@@ -430,8 +434,9 @@ int main(
 		std::cout << "starting the registration..." << std::endl;
 
 		registrationFactory->StartRegistration();
-		tmpConstTransformPointer = registrationFactory->GetTransform();
-		transformMerger->push_back(const_cast<itk::TransformBase*>(tmpConstTransformPointer));
+		if(use_inverse) tmpTransform->SetParameters(registrationFactory->GetRegistrationObject()->GetTransform()->GetInverseTransform()->GetParameters());		
+		if(!use_inverse) tmpTransform->SetParameters(registrationFactory->GetRegistrationObject()->GetTransform()->GetParameters());
+		transformMerger->push_back(tmpTransform);
 
 	}//end repetition
 	transformMerger->setTemplateImage(fixedReader->GetOutput());
@@ -439,7 +444,7 @@ int main(
 	//safe the gained transform to a user specific filename
 	if (out_filename) {
 
-		transformWriter->SetInput(tmpConstTransformPointer);
+		transformWriter->SetInput(tmpTransform);
 		transformWriter->SetFileName(out_filename);
 		transformWriter->Update();
 	}

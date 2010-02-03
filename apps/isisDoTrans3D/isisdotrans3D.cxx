@@ -151,9 +151,9 @@ int main(
 	OutputImageType::SpacingType fmriOutputSpacing;
 	OutputImageType::DirectionType fmriOutputDirection;
 	OutputImageType::PointType fmriOutputOrigin;
-	
-	TransformPointer transform;
-		
+	//transform object used for inverse transform
+	itk::MatrixOffsetTransformBase<double, Dimension, Dimension>::Pointer transform = itk::MatrixOffsetTransformBase<double, Dimension, Dimension>::New();
+ 			
 	if(!trans_filename.number and !vtrans_filename) {
 		std::cout << "No transform specified!!" << std::endl;
 		return EXIT_FAILURE;
@@ -197,35 +197,11 @@ int main(
 			itk::TransformFileReader::TransformListType::const_iterator ti;
 			ti = transformList->begin();
 			//setting up the resample object
-			transform = static_cast<TransformPointer> ((*ti).GetPointer());
-			parameters = transform->GetParameters();
+			transform->SetParameters(static_cast<TransformPointer>((*ti).GetPointer())->GetInverseTransform()->GetParameters());
 			if(use_inverse) {
-			    std::cout << transform->GetParameters() << std::endl;
-			    std::cout << transform->GetFixedParameters() << std::endl;
-			    std::cout << outputDirection << std::endl;
-			    /*
-			    for(unsigned int i = 0; i < Dimension; i++)
-			    {
-				for(unsigned int j = 0; j < Dimension; j++)
-				{
-				    if(outputDirection[i][j]) {
-					std::cout << outputDirection[i][j] << std::endl;
-					parameters[j] *= outputDirection[i][j];
-					parameters[j+Dimension] *= outputDirection[i][j] * -1;
-				    }
-				}
-			    }
-			    */
-			    //parameters[0] *= -1;
-			    //parameters[1] *= -1;
-			    //parameters[2] *= -1;
-			    parameters[3] *= -1;
-			    //parameters[4] *= -1;
-			    parameters[5] *= -1;
-			    transform->SetParameters(parameters);
+			    transform->SetParameters(static_cast<TransformPointer>((*ti).GetPointer())->GetInverseTransform()->GetParameters());
 			    resampler->SetTransform(transform);
-			    std::cout << resampler->GetTransform()->GetParameters() << std::endl;
-			    std::cout << resampler->GetTransform()->GetFixedParameters() << std::endl;
+	
 			}
 			if(!use_inverse) {
 			    resampler->SetTransform(static_cast<ConstTransformPointer> ((*ti).GetPointer()));
