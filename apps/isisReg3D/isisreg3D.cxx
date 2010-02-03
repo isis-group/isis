@@ -27,6 +27,7 @@
 
 #include "itkMedianImageFilter.h"
 #include "itkDiscreteGaussianImageFilter.h"
+#include "itkRecursiveGaussianImageFilter.h"
 
 #include "boost/progress.hpp"
 
@@ -178,6 +179,8 @@ int main(
 
 	typedef itk::MedianImageFilter<FixedImageType, FixedImageType> FixedFilterType;
 	typedef itk::MedianImageFilter<MovingImageType, MovingImageType> MovingFilterType;
+	
+	typedef itk::RecursiveGaussianImageFilter<FixedImageType, FixedImageType> GaussianFilterType;
 
 	FixedImageReaderType::Pointer fixedReader = FixedImageReaderType::New();
 	MovingImageReaderType::Pointer movingReader = MovingImageReaderType::New();
@@ -208,28 +211,72 @@ int main(
 	}
 	
 	if(smooth) {
-	    fixedFilter->SetNumberOfThreads(number_threads);
-	    movingFilter->SetNumberOfThreads(number_threads);
-	    std::cout << "applying filter to the fixed image" << std::endl;
-	    isis::extitk::ProcessUpdate::Pointer progressObserver = isis::extitk::ProcessUpdate::New();
-	    FixedImageType::SizeType fixedIndexRadius;
-	    MovingImageType::SizeType movingIndexRadius;
-	    fixedIndexRadius.Fill(smooth);
-	    movingIndexRadius.Fill(smooth);
-	    fixedFilter->SetInput(fixedReader->GetOutput());
-	    movingFilter->SetInput(movingReader->GetOutput());
-	    fixedFilter->SetRadius(fixedIndexRadius);
-	    movingFilter->SetRadius(movingIndexRadius);
-	    fixedFilter->AddObserver(itk::ProgressEvent(), progressObserver);
-	    fixedFilter->Update();
-	    std::cout << "applying filter to the moving image" << std::endl;
-	    progressObserver->CreateAnother();
-	    movingFilter->AddObserver(itk::ProgressEvent(), progressObserver);
-	    movingFilter->Update();
-	    fixedImage = fixedFilter->GetOutput();
-	    movingImage = movingFilter->GetOutput();
-	
-	
+// 	    fixedFilter->SetNumberOfThreads(number_threads);
+// 	    movingFilter->SetNumberOfThreads(number_threads);
+// 	    std::cout << "applying filter to the fixed image" << std::endl;
+// 	    isis::extitk::ProcessUpdate::Pointer progressObserver = isis::extitk::ProcessUpdate::New();
+// 	    FixedImageType::SizeType fixedIndexRadius;
+// 	    MovingImageType::SizeType movingIndexRadius;
+// 	    fixedIndexRadius.Fill(smooth);
+// 	    movingIndexRadius.Fill(smooth);
+// 	    fixedFilter->SetInput(fixedReader->GetOutput());
+// 	    movingFilter->SetInput(movingReader->GetOutput());
+// 	    fixedFilter->SetRadius(fixedIndexRadius);
+// 	    movingFilter->SetRadius(movingIndexRadius);
+// 	    fixedFilter->AddObserver(itk::ProgressEvent(), progressObserver);
+// 	    fixedFilter->Update();
+// 	    std::cout << "applying filter to the moving image" << std::endl;
+// 	    progressObserver->CreateAnother();
+// 	    movingFilter->AddObserver(itk::ProgressEvent(), progressObserver);
+// 	    movingFilter->Update();
+// 	    fixedImage = fixedFilter->GetOutput();
+// 	    movingImage = movingFilter->GetOutput();
+	    GaussianFilterType::Pointer fixedGaussianFilterX = GaussianFilterType::New();
+	    GaussianFilterType::Pointer fixedGaussianFilterY = GaussianFilterType::New();
+	    GaussianFilterType::Pointer fixedGaussianFilterZ = GaussianFilterType::New();
+	    fixedGaussianFilterX->SetNumberOfThreads(number_threads);
+	    fixedGaussianFilterY->SetNumberOfThreads(number_threads);
+	    fixedGaussianFilterZ->SetNumberOfThreads(number_threads);
+	    fixedGaussianFilterX->SetInput(fixedReader->GetOutput());
+	    fixedGaussianFilterY->SetInput(fixedGaussianFilterX->GetOutput());
+	    fixedGaussianFilterZ->SetInput(fixedGaussianFilterY->GetOutput());
+	    fixedGaussianFilterX->SetDirection(0);
+	    fixedGaussianFilterY->SetDirection(1);
+	    fixedGaussianFilterZ->SetDirection(2);
+	    fixedGaussianFilterX->SetOrder(GaussianFilterType::ZeroOrder);
+	    fixedGaussianFilterY->SetOrder(GaussianFilterType::ZeroOrder);
+	    fixedGaussianFilterZ->SetOrder(GaussianFilterType::ZeroOrder);
+	    fixedGaussianFilterX->SetNormalizeAcrossScale(false);
+	    fixedGaussianFilterY->SetNormalizeAcrossScale(false);
+	    fixedGaussianFilterZ->SetNormalizeAcrossScale(false);
+	    fixedGaussianFilterX->SetSigma(smooth);
+	    fixedGaussianFilterY->SetSigma(smooth);
+	    fixedGaussianFilterZ->SetSigma(smooth);
+	    fixedGaussianFilterZ->Update();
+	    fixedImage = fixedGaussianFilterZ->GetOutput();
+	    GaussianFilterType::Pointer movingGaussianFilterX = GaussianFilterType::New();
+	    GaussianFilterType::Pointer movingGaussianFilterY = GaussianFilterType::New();
+	    GaussianFilterType::Pointer movingGaussianFilterZ = GaussianFilterType::New();
+	    movingGaussianFilterX->SetNumberOfThreads(number_threads);
+	    movingGaussianFilterY->SetNumberOfThreads(number_threads);
+	    movingGaussianFilterZ->SetNumberOfThreads(number_threads);
+	    movingGaussianFilterX->SetInput(movingReader->GetOutput());
+	    movingGaussianFilterY->SetInput(movingGaussianFilterX->GetOutput());
+	    movingGaussianFilterZ->SetInput(movingGaussianFilterY->GetOutput());
+	    movingGaussianFilterX->SetDirection(0);
+	    movingGaussianFilterY->SetDirection(1);
+	    movingGaussianFilterZ->SetDirection(2);
+	    movingGaussianFilterX->SetOrder(GaussianFilterType::ZeroOrder);
+	    movingGaussianFilterY->SetOrder(GaussianFilterType::ZeroOrder);
+	    movingGaussianFilterZ->SetOrder(GaussianFilterType::ZeroOrder);
+	    movingGaussianFilterX->SetNormalizeAcrossScale(false);
+	    movingGaussianFilterY->SetNormalizeAcrossScale(false);
+	    movingGaussianFilterZ->SetNormalizeAcrossScale(false);
+	    movingGaussianFilterX->SetSigma(smooth);
+	    movingGaussianFilterY->SetSigma(smooth);
+	    movingGaussianFilterZ->SetSigma(smooth);
+	    movingGaussianFilterZ->Update();
+	    movingImage = movingGaussianFilterZ->GetOutput();	     
 	}
 	
 	RegistrationFactoryType::Pointer registrationFactory = RegistrationFactoryType::New();
@@ -435,7 +482,9 @@ int main(
 
 		registrationFactory->StartRegistration();
 		if(use_inverse) tmpTransform->SetParameters(registrationFactory->GetRegistrationObject()->GetTransform()->GetInverseTransform()->GetParameters());		
-		if(!use_inverse) tmpTransform->SetParameters(registrationFactory->GetRegistrationObject()->GetTransform()->GetParameters());
+		
+		if(!use_inverse) tmpConstTransformPointer = registrationFactory->GetTransform();
+		
 		transformMerger->push_back(tmpTransform);
 
 	}//end repetition
@@ -444,7 +493,8 @@ int main(
 	//safe the gained transform to a user specific filename
 	if (out_filename) {
 
-		transformWriter->SetInput(tmpTransform);
+		if(use_inverse) transformWriter->SetInput(tmpTransform);
+		if(!use_inverse) transformWriter->SetInput(tmpConstTransformPointer);
 		transformWriter->SetFileName(out_filename);
 		transformWriter->Update();
 	}

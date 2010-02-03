@@ -14,8 +14,8 @@ GradientMagnitudeSegmentationFilter<TInputImage, TOutputImage>::GradientMagnitud
 
 	m_OutputImage = OutputImageType::New();
 
-	m_Smoothing = SmoothingFilterType::New();
-	m_GradientMagnitude = GradientFilterType::New();
+	m_SmoothingFilter = SmoothingFilterType::New();
+	m_GradientMagnitudeFilter = GradientFilterType::New();
 	m_MinMaxFilter = MinMaxFilterType::New();
 
 	//standard parameters for smoothingfilter
@@ -89,17 +89,17 @@ void GradientMagnitudeSegmentationFilter<TInputImage, TOutputImage>::GenerateDat
 	this->CalculateMinMax();
 
 	//smoothing filter
-	m_Smoothing->SetInput(this->GetInput());
-	m_Smoothing->SetTimeStep(m_SmoothingTimeStep);
-	m_Smoothing->SetNumberOfIterations(m_SmoothingNumberOfIterations);
-	m_Smoothing->SetConductanceParameter(m_SmoothingConductanceParameter);
+	m_SmoothingFilter->SetInput(this->GetInput());
+	m_SmoothingFilter->SetTimeStep(m_SmoothingTimeStep);
+	m_SmoothingFilter->SetNumberOfIterations(m_SmoothingNumberOfIterations);
+	m_SmoothingFilter->SetConductanceParameter(m_SmoothingConductanceParameter);
 
 	//gradient filter
-	m_GradientMagnitude->SetInput(m_Smoothing->GetOutput());
-	m_GradientMagnitude->SetSigma(m_Sigma);
+	m_GradientMagnitudeFilter->SetInput(m_SmoothingFilter->GetOutput());
+	m_GradientMagnitudeFilter->SetSigma(m_Sigma);
 
-	m_GradientMagnitude->Update();
-	m_OutputImage = m_GradientMagnitude->GetOutput();
+	m_GradientMagnitudeFilter->Update();
+	m_OutputImage = m_GradientMagnitudeFilter->GetOutput();
 	m_OutputImage->Update();
 
 	if (m_UseThresholdMethod) {

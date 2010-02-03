@@ -128,8 +128,8 @@ private:
 	InputSpacingType m_InputSpacing;
 	OutputSpacingType m_OutputSpacing;
 
-	typename SmoothingFilterType::Pointer m_Smoothing;
-	typename GradientFilterType::Pointer m_GradientMagnitude;
+	typename SmoothingFilterType::Pointer m_SmoothingFilter;
+	typename GradientFilterType::Pointer m_GradientMagnitudeFilter;
 
 	typename MinMaxFilterType::Pointer m_MinMaxFilter;
 
