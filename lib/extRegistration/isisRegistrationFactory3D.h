@@ -15,6 +15,7 @@
 //transform includes
 
 //rigid:
+#include "itkTranslationTransform.h"
 #include "itkVersorRigid3DTransform.h"
 #include "itkQuaternionRigidTransform.h"
 #include "itkCenteredEuler3DTransform.h"
@@ -137,6 +138,7 @@ public:
 	typedef const itk::TransformBase* ConstTransformBasePointer;
 	typedef itk::Transform<double, 3, 3> TransformType;
 
+	typedef itk::TranslationTransform<double, 3> TranslationTransformType;
 	typedef itk::VersorRigid3DTransform<double> VersorRigid3DTransformType;
 	typedef itk::QuaternionRigidTransform<double> QuaternionRigidTransformType;
 	typedef itk::CenteredEuler3DTransform<double> CenteredEuler3DTransformType;
@@ -187,9 +189,8 @@ public:
 
 	enum eTransformType
 	{
+		    TranslationTransform,
 		    VersorRigid3DTransform,
-		    QuaternionRigidTransform,
-		    CenteredEuler3DTransform,
 		    AffineTransform,
 		    CenteredAffineTransform,
 		    BSplineDeformableTransform,
@@ -297,9 +298,8 @@ private:
 
 	struct
 	{
+		bool TRANSLATION;
 		bool VERSORRIGID;
-		bool QUATERNIONRIGID;
-		bool CENTEREDEULER3DTRANSFORM;
 		bool AFFINE;
 		bool CENTEREDAFFINE;
 		bool BSPLINEDEFORMABLETRANSFORM;
@@ -379,6 +379,7 @@ private:
 	PowellOptimizerType::Pointer m_PowellOptimizer;
 
 	//transform
+	TranslationTransformType::Pointer m_TranslationTransform;
 	VersorRigid3DTransformType::Pointer m_VersorRigid3DTransform;
 	QuaternionRigidTransformType::Pointer m_QuaternionRigidTransform;
 	CenteredEuler3DTransformType::Pointer m_CenteredEuler3DTransform;

@@ -30,9 +30,8 @@ namespace isis {
 			optimizer.AMOEBA = false;
 			optimizer.POWELL = false;
 
+			transform.TRANSLATION = false;
 			transform.VERSORRIGID = false;
-			transform.QUATERNIONRIGID = false;
-			transform.CENTEREDEULER3DTRANSFORM = false;
 			transform.AFFINE = false;
 			transform.CENTEREDAFFINE = false;
 			transform.BSPLINEDEFORMABLETRANSFORM = false;
@@ -147,22 +146,17 @@ namespace isis {
 		void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetTransform(
 				eTransformType e_transform) {
 			switch (e_transform) {
+			    
+				case TranslationTransform:
+				transform.TRANSLATION = true;
+				m_TranslationTransform = TranslationTransformType::New();
+				m_RegistrationObject->SetTransform(m_TranslationTransform);
+				break;
+				
 				case VersorRigid3DTransform:
 				transform.VERSORRIGID = true;
 				m_VersorRigid3DTransform = VersorRigid3DTransformType::New();
 				m_RegistrationObject->SetTransform(m_VersorRigid3DTransform);
-				break;
-
-				case QuaternionRigidTransform:
-				transform.QUATERNIONRIGID = true;
-				m_QuaternionRigidTransform = QuaternionRigidTransformType::New();
-				m_RegistrationObject->SetTransform(m_QuaternionRigidTransform);
-				break;
-
-				case CenteredEuler3DTransform:
-				transform.CENTEREDEULER3DTRANSFORM = true;
-				m_CenteredEuler3DTransform = CenteredEuler3DTransformType::New();
-				m_RegistrationObject->SetTransform(m_CenteredEuler3DTransform);
 				break;
 
 				case AffineTransform:
@@ -242,11 +236,10 @@ namespace isis {
 				//setting up the regular step gradient descent optimizer...
 				RegularStepGradientDescentOptimizerType::ScalesType optimizerScaleRegularStepGradient(m_NumberOfParameters);
 
-				if (transform.VERSORRIGID or transform.QUATERNIONRIGID or transform.CENTEREDEULER3DTRANSFORM
-						or transform.CENTEREDAFFINE or transform.AFFINE or transform.BSPLINEDEFORMABLETRANSFORM) {
+				if (transform.VERSORRIGID or transform.CENTEREDAFFINE or transform.AFFINE or transform.BSPLINEDEFORMABLETRANSFORM) {
 					//...for the rigid transform
 					//number of parameters are dependent on the dimension of the images (2D: 4 parameter, 3D: 6 parameters)
-					if(transform.VERSORRIGID or transform.QUATERNIONRIGID or transform.CENTEREDEULER3DTRANSFORM)
+					if(transform.VERSORRIGID)
 					{
 						optimizerScaleRegularStepGradient[0] = 1.0;
 						optimizerScaleRegularStepGradient[1] = 1.0;
@@ -255,7 +248,7 @@ namespace isis {
 							optimizerScaleRegularStepGradient[i] = 1.0 / 1000.0;
 						}
 					}
-					if(transform.BSPLINEDEFORMABLETRANSFORM or transform.AFFINE or transform.CENTEREDAFFINE)
+					if(transform.BSPLINEDEFORMABLETRANSFORM or transform.AFFINE or transform.CENTEREDAFFINE or transform.TRANSLATION)
 					{
 						optimizerScaleRegularStepGradient.Fill(1.0);
 					}
@@ -280,7 +273,7 @@ namespace isis {
 			if (optimizer.VERSORRIGID3D) {
 				VersorRigid3DTransformOptimizerType::ScalesType optimizerScaleVersorRigid3D(m_NumberOfParameters);
 
-				if (transform.VERSORRIGID or transform.QUATERNIONRIGID or transform.CENTEREDEULER3DTRANSFORM) {
+				if (transform.VERSORRIGID) {
 
 					optimizerScaleVersorRigid3D[0] = 1.0;
 					optimizerScaleVersorRigid3D[1] = 1.0;
@@ -452,13 +445,9 @@ namespace isis {
 				m_NumberOfParameters = m_VersorRigid3DTransform->GetNumberOfParameters();
 				m_RegistrationObject->SetInitialTransformParameters(m_VersorRigid3DTransform->GetParameters());
 			}
-			if (transform.CENTEREDEULER3DTRANSFORM) {
-				m_NumberOfParameters = m_CenteredEuler3DTransform->GetNumberOfParameters();
-				m_RegistrationObject->SetInitialTransformParameters(m_CenteredEuler3DTransform->GetParameters());
-			}
-			if (transform.QUATERNIONRIGID) {
-				m_NumberOfParameters = m_QuaternionRigidTransform->GetNumberOfParameters();
-				m_RegistrationObject->SetInitialTransformParameters(m_QuaternionRigidTransform->GetParameters());
+			if (transform.TRANSLATION) {
+				m_NumberOfParameters = m_TranslationTransform->GetNumberOfParameters();
+				m_RegistrationObject->SetInitialTransformParameters(m_TranslationTransform->GetParameters());
 			}
 		}
 

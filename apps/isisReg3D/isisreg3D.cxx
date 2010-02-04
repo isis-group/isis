@@ -37,8 +37,7 @@
 VDictEntry TYPMetric[] = { {"MattesMutualInformation", 0}, {"MutualInformationHistogram", 1}, {"NormalizedCorrelation",
     2}, {"MeanSquare", 3}, {NULL}};
 
-VDictEntry TYPTransform[] = { {"Rigid", 0}, {"Affine", 1}, {"BSplineDeformable", 2}, {"CenteredAffine", 3}, {
-    "QuaternionRigid", 4}, {"EulerRigid", 5}, {NULL}};
+VDictEntry TYPTransform[] = { {"Rigid", 0}, {"Affine", 1}, {"BSplineDeformable", 2}, {"Translation", 3}, {"CenteredAffine", 4}, {NULL}};
 
 VDictEntry TYPInterpolator[] = { {"Linear", 0}, {"BSpline", 1}, {"NearestNeighbor", 2}, {NULL}};
 
@@ -66,7 +65,7 @@ static VShort initial_seed = 1;
 static VBoolean initialize_center = false;
 static VBoolean initialize_mass = false;
 static VString mask_filename = NULL;
-static VShort smooth = 0;
+static VFloat smooth = 0;
 static VBoolean use_inverse = false;
 
 static VOptionDescRec
@@ -108,7 +107,7 @@ static VOptionDescRec
                 "Using an initializer to align the image centers"},
             {"prealign_mass", VBooleanRepn, 1, &initialize_mass, VOptionalOpt, 0,
                                 "Using an initializer to align the center of mass"},
-	    {"smooth", VShortRepn, 1, &smooth, VOptionalOpt, 0, "Applying a smoothing filter to the fixed and moving image before the registration process"},
+	    {"smooth", VFloatRepn, 1, &smooth, VOptionalOpt, 0, "Applying a smoothing filter to the fixed and moving image before the registration process"},
 	    {"get_inverse", VBooleanRepn, 1, &use_inverse, VOptionalOpt, 0, "Getting the inverse transform"},
 
             //component inputs
@@ -211,26 +210,6 @@ int main(
 	}
 	
 	if(smooth) {
-// 	    fixedFilter->SetNumberOfThreads(number_threads);
-// 	    movingFilter->SetNumberOfThreads(number_threads);
-// 	    std::cout << "applying filter to the fixed image" << std::endl;
-// 	    isis::extitk::ProcessUpdate::Pointer progressObserver = isis::extitk::ProcessUpdate::New();
-// 	    FixedImageType::SizeType fixedIndexRadius;
-// 	    MovingImageType::SizeType movingIndexRadius;
-// 	    fixedIndexRadius.Fill(smooth);
-// 	    movingIndexRadius.Fill(smooth);
-// 	    fixedFilter->SetInput(fixedReader->GetOutput());
-// 	    movingFilter->SetInput(movingReader->GetOutput());
-// 	    fixedFilter->SetRadius(fixedIndexRadius);
-// 	    movingFilter->SetRadius(movingIndexRadius);
-// 	    fixedFilter->AddObserver(itk::ProgressEvent(), progressObserver);
-// 	    fixedFilter->Update();
-// 	    std::cout << "applying filter to the moving image" << std::endl;
-// 	    progressObserver->CreateAnother();
-// 	    movingFilter->AddObserver(itk::ProgressEvent(), progressObserver);
-// 	    movingFilter->Update();
-// 	    fixedImage = fixedFilter->GetOutput();
-// 	    movingImage = movingFilter->GetOutput();
 	    GaussianFilterType::Pointer fixedGaussianFilterX = GaussianFilterType::New();
 	    GaussianFilterType::Pointer fixedGaussianFilterY = GaussianFilterType::New();
 	    GaussianFilterType::Pointer fixedGaussianFilterZ = GaussianFilterType::New();
@@ -252,6 +231,7 @@ int main(
 	    fixedGaussianFilterX->SetSigma(smooth);
 	    fixedGaussianFilterY->SetSigma(smooth);
 	    fixedGaussianFilterZ->SetSigma(smooth);
+	    std::cout << "smoothing the fixed image..." << std::endl;
 	    fixedGaussianFilterZ->Update();
 	    fixedImage = fixedGaussianFilterZ->GetOutput();
 	    GaussianFilterType::Pointer movingGaussianFilterX = GaussianFilterType::New();
@@ -275,6 +255,7 @@ int main(
 	    movingGaussianFilterX->SetSigma(smooth);
 	    movingGaussianFilterY->SetSigma(smooth);
 	    movingGaussianFilterZ->SetSigma(smooth);
+	    std::cout << "smoothing the moving image..." << std::endl;
 	    movingGaussianFilterZ->Update();
 	    movingImage = movingGaussianFilterZ->GetOutput();	     
 	}
@@ -346,13 +327,7 @@ int main(
 			registrationFactory->SetTransform(RegistrationFactoryType::BSplineDeformableTransform);
 			break;
 			case 3:
-			registrationFactory->SetTransform(RegistrationFactoryType::CenteredAffineTransform);
-			break;
-			case 4:
-			registrationFactory->SetTransform(RegistrationFactoryType::QuaternionRigidTransform);
-			break;
-			case 5:
-			registrationFactory->SetTransform(RegistrationFactoryType::CenteredEuler3DTransform);
+			registrationFactory->SetTransform(RegistrationFactoryType::TranslationTransform);
 			break;
 		}
 
