@@ -197,7 +197,6 @@ int main(
 			itk::TransformFileReader::TransformListType::const_iterator ti;
 			ti = transformList->begin();
 			//setting up the resample object
-			transform->SetParameters(static_cast<TransformPointer>((*ti).GetPointer())->GetInverseTransform()->GetParameters());
 			if(use_inverse) {
 			    transform->SetParameters(static_cast<TransformPointer>((*ti).GetPointer())->GetInverseTransform()->GetParameters());
 			    resampler->SetTransform(transform);
