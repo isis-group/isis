@@ -637,7 +637,6 @@ namespace isis {
 
 			}
 			if (!strcmp(initialTransformName, "VersorRigid3DTransform") and transform.AFFINE) {
-
 				m_AffineTransform->SetTranslation(
 						(static_cast<VersorRigid3DTransformType*> (initialTransform)->GetTranslation()));
 				m_AffineTransform->SetMatrix((static_cast<VersorRigid3DTransformType*> (initialTransform)->GetMatrix()));

@@ -394,6 +394,8 @@ int main(
 
 		}
 		if (counter != 0) {
+			registrationFactory->UserOptions.INITIALIZECENTEROFF = true;
+			registrationFactory->UserOptions.INITIALIZEMASSOFF = true;
 			registrationFactory->SetInitialTransform(const_cast<TransformBasePointerType> (tmpConstTransformPointer));
 
 		}
