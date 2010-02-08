@@ -24,11 +24,11 @@ const util::PropertyValue PropMap::emptyProp;//dummy to be able to return an emp
 ///////////////////////////////////////////////////////////////////
 
 PropMap::PropMap(const isis::util::PropMap::base_type& src):
-std::map< std::string, PropertyValue, caselessStringLess >(src){}
+std::map< std::string, PropertyValue, _internal::caselessStringLess >(src){}
 
 bool PropMap::operator==(const PropMap& src)const
 {
-	const std::map< std::string, PropertyValue, caselessStringLess > &other=src,&me=*this;
+	const std::map< std::string, PropertyValue, _internal::caselessStringLess > &other=src,&me=*this;
 	return me==other;
 }
 
@@ -57,7 +57,7 @@ PropertyValue& PropMap::fetchProperty(
 			return fetchProperty(inserted,next,pathEnd); // and continue there
 		}
 	} else { //if its the leaf
-		std::map<std::string,PropertyValue,caselessStringLess> &ref=root;
+		std::map<std::string,PropertyValue,_internal::caselessStringLess> &ref=root;
 		return ref[*at]; // (create and) return that entry
 	}
 }
@@ -262,6 +262,17 @@ size_t PropMap::linearize(isis::util::PropMap::base_type& out, std::string key_p
 	}
 	
 }
+
+bool PropMap::transform( std::string from,  std::string to, int dstId,bool delSource) {
+	LOG_IF(from==to,CoreDebug,error) << "Sorry source and destination shall not be the same";
+	const PropertyValue *found=findPropVal(from);
+	if(found and not found->empty() and found->transformTo(operator[](to),dstId)){
+		if(delSource)remove(from);
+		return true;
+	}
+	return false;
+}
+
 
 const PropMap::key_list PropMap::keys()const
 {

@@ -135,4 +135,26 @@ namespace isis{namespace test{
 		BOOST_CHECK_EQUAL(result["Test5"].second,map2["Test5"]);
 		
 	}
+	BOOST_AUTO_TEST_CASE(propMap_transform_test){
+		util::PropMap map;
+		map["Test1"]=6.4;
+		map["Test2"]=5;
+		map["Test3"]=util::fvector4(1,1,1,1);
+		map["Test4"]=std::string("Hallo");
+		map["sub/Test1"]=1;
+		map["sub/Test2"]=2;
+
+		BOOST_CHECK(map.transform<float>("sub/Test1","sub/Test1float"));
+		BOOST_CHECK(map.transform<int>("Test1","Test1int"));
+		BOOST_CHECK(map.transform<util::ivector4>("Test3","Test3int"));
+
+		BOOST_CHECK(map["sub/Test1float"]->is<float>());
+		BOOST_CHECK(map["Test1int"]->is<int>());
+		BOOST_CHECK(map["Test3int"]->is<util::ivector4>());
+
+		BOOST_CHECK_EQUAL(map["sub/Test1float"],(float)1);
+		BOOST_CHECK_EQUAL(map["sub/Test1float"],1);// this will do an automatic transform back to int for comparison
+		BOOST_CHECK_EQUAL(map["Test1int"],6);
+		BOOST_CHECK_EQUAL(map["Test3int"],util::ivector4(1,1,1,1));
+	}
 }}

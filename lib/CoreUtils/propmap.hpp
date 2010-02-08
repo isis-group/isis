@@ -29,11 +29,11 @@ namespace isis{
  */
 namespace util{
 
-class PropMap : protected std::map<std::string,PropertyValue,caselessStringLess>{
+class PropMap : protected std::map<std::string,PropertyValue,_internal::caselessStringLess>{
 public:
-	typedef std::map<std::string,PropertyValue,caselessStringLess> base_type;
-	typedef std::set<std::string,caselessStringLess> key_list;
-	typedef std::map<std::string,std::pair<PropertyValue,PropertyValue>,caselessStringLess> diff_map;
+	typedef std::map<std::string,PropertyValue,_internal::caselessStringLess> base_type;
+	typedef std::set<std::string,_internal::caselessStringLess> key_list;
+	typedef std::map<std::string,std::pair<PropertyValue,PropertyValue>,_internal::caselessStringLess> diff_map;
 private:
 	typedef std::list<std::string> propPath;
 	typedef propPath::const_iterator propPathIterator;
@@ -187,8 +187,13 @@ public:
 
 	void toCommonUnique(PropMap& common,std::set<std::string> &uniques,bool init)const;
 	size_t linearize(base_type &out,std::string key_prefix="")const;
+	bool transform(std::string from, std::string to, int dstId, bool delSource = true);
+	template<typename DST> bool transform(std::string from, std::string to, bool delSource = true)
+	{
+		check_type<DST>();
+		transform(from,to,Type<DST>::staticId(),delSource);
+	}
 	
-
 	//////////////////////////////////////////////////////////////////////////////////////
 	// Additional get/set - Functions
 	//////////////////////////////////////////////////////////////////////////////////////

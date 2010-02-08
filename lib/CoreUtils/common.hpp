@@ -153,17 +153,19 @@ continousFind(ForwardIterator &current,const ForwardIterator end,const T& compar
 		else
 			return true;//not(current <> compare) makes compare == current
 }
+
+namespace _internal{
 /**
-* Continously searches in an sorted list using std::less.
-* It starts at current and increments it until the referenced value is not less than the compare-value anymore.
-* Than it returns.
-* \param current the current-position-iterator for the sorted list.
-* This value is changed directly, so after the function returns is references the first entry of the list
-* which does not compare less than compare or, if such a value does not exit in the list, it will be equal to end.
-* \param end the end of the list
-* \param compare the compare-value
-* \returns true if the value current currently refers to is equal to compare
-*/
+ * Continously searches in an sorted list using std::less.
+ * It starts at current and increments it until the referenced value is not less than the compare-value anymore.
+ * Than it returns.
+ * \param current the current-position-iterator for the sorted list.
+ * This value is changed directly, so after the function returns is references the first entry of the list
+ * which does not compare less than compare or, if such a value does not exit in the list, it will be equal to end.
+ * \param end the end of the list
+ * \param compare the compare-value
+ * \returns true if the value current currently refers to is equal to compare
+ */
 template<typename ForwardIterator, typename T> bool
 continousFind(ForwardIterator &current,const ForwardIterator end,const T& compare)
 {
@@ -177,7 +179,7 @@ struct caselessStringLess{
 		return (strcasecmp (a.c_str ( ), b.c_str ( )) < 0);
 	}
 };
-
+}
 /// @cond _hidden
 	struct CoreLog{static const char* name(){return "Core";};enum {use = _ENABLE_CORE_LOG};};
 	struct CoreDebug{static const char* name(){return "Core";};enum {use= _ENABLE_CORE_DEBUG};};

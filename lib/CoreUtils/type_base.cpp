@@ -25,4 +25,15 @@ size_t TypePtrBase::len() const { return m_len;}
 TypePtrBase::~TypePtrBase() {}
 TypeBase::~TypeBase() {}
 
+
+TypeConverterMap& TypeBase::converters() {
+	static _internal::TypeConverterMap ret;
+	return ret;
+}
+
+TypeBase::Converter TypeBase::getConverterTo(int id)const {
+	return converters()[typeID()][id];
+}
+
+
 }}}

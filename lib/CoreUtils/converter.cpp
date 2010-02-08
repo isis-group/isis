@@ -27,10 +27,22 @@
 
 namespace isis{ namespace util{ namespace _internal{
 
+//Define generator - this can be global because its using convert internally
+template<typename SRC,typename DST> class TypeGenerator: public TypeConverterBase{
+public:
+	void generate(const boost::scoped_ptr<TypeBase>& src, boost::scoped_ptr<TypeBase>& dst){
+		LOG_IF(dst.get(),CoreDebug,warning) <<
+			"Generating into existing value " << dst->toString(true);
+		Type<DST> *ref=new Type<DST>;
+		convert(src->cast_to_Type<SRC>(),*ref);
+		dst.reset(ref);
+	}
+};
+
 /////////////////////////////////////////////////////////////////////////////
 // general converter version -- does nothing
 /////////////////////////////////////////////////////////////////////////////
-template<bool NUMERIC,bool SAME,typename SRC, typename DST> class TypeConverter : public TypeConverterBase{
+template<bool NUMERIC,bool SAME,typename SRC, typename DST> class TypeConverter : public TypeGenerator<SRC,DST>{
 public:
 	virtual ~TypeConverter(){}
 };
@@ -38,8 +50,7 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 // trivial version -- for conversion of the same type
 /////////////////////////////////////////////////////////////////////////////
-// @todo template<bool NUMERIC,typename SRC> class TypeConverter<NUMERIC,SRC,SRC> wont work because its ambigous
-template<bool NUMERIC,typename SRC, typename DST> class TypeConverter<NUMERIC,true,SRC,DST> : public TypeConverterBase{
+template<bool NUMERIC,typename SRC, typename DST> class TypeConverter<NUMERIC,true,SRC,DST> : public TypeGenerator<SRC,DST>{
 	TypeConverter(){
 		LOG(CoreDebug,verbose_info)
 		<< "Creating trivial converter for " << Type<SRC>::staticName();
@@ -61,7 +72,7 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 // Numeric version -- uses boost::numeric_cast
 /////////////////////////////////////////////////////////////////////////////
-template<typename SRC, typename DST> class TypeConverter<true,false,SRC,DST> : public TypeConverterBase{
+template<typename SRC, typename DST> class TypeConverter<true,false,SRC,DST> : public TypeGenerator<SRC,DST>{
 	TypeConverter(){
 		LOG(CoreDebug,verbose_info)
 			<< "Creating numeric converter from "
@@ -97,7 +108,7 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 // vector4 version -- uses TypeConverter on every element
 /////////////////////////////////////////////////////////////////////////////
-template<typename SRC, typename DST > class TypeConverter<false,false,vector4<SRC>,vector4<DST> > : public TypeConverterBase{
+template<typename SRC, typename DST > class TypeConverter<false,false,vector4<SRC>,vector4<DST> >: public TypeGenerator<vector4<SRC>,vector4<DST> >{
 	boost::shared_ptr<TypeConverterBase> m_conv;
 	TypeConverter(boost::shared_ptr<TypeConverterBase> elem_conv):m_conv(elem_conv){
 		LOG(CoreDebug,verbose_info)
@@ -136,7 +147,7 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 // string version -- uses lexical_cast to convert from/to string
 /////////////////////////////////////////////////////////////////////////////
-template<typename DST> class TypeConverter<false,false,std::string,DST> : public TypeConverterBase{
+template<typename DST> class TypeConverter<false,false,std::string,DST> : public TypeGenerator<std::string,DST>{
 	TypeConverter(){
 		LOG(CoreDebug,verbose_info)
 		<< "Creating from-string converter for " << Type<DST>::staticName();
@@ -153,7 +164,7 @@ public:
 	}
 	virtual ~TypeConverter(){}
 };
-template<typename SRC> class TypeConverter<false,false,SRC,std::string> : public TypeConverterBase{
+template<typename SRC> class TypeConverter<false,false,SRC,std::string> : public TypeGenerator<SRC,std::string>{
 	TypeConverter(){
 		LOG(CoreDebug,verbose_info)
 		<< "Creating to-string converter for " << Type<SRC>::staticName();
@@ -171,11 +182,11 @@ public:
 	virtual ~TypeConverter(){}
 };
 // @todo we cannot parse this stuff yet
-template<> class TypeConverter<false,false,std::string,PropMap> : public TypeConverterBase{
+template<> class TypeConverter<false,false,std::string,PropMap>: public TypeGenerator<std::string,PropMap>{
 public:
 	virtual ~TypeConverter(){}
 };
-template<typename TYPE> class TypeConverter<false,false,std::string,vector4<TYPE> > :public TypeConverterBase{
+template<typename TYPE> class TypeConverter<false,false,std::string,vector4<TYPE> >:public TypeGenerator<std::string,vector4<TYPE> >{
 public:
 	virtual ~TypeConverter(){}
 };

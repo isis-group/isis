@@ -137,14 +137,12 @@ public:
 };
 
 class TypeBase : public GenericType{
-	static _internal::TypeConverterMap& converters(){
-		static _internal::TypeConverterMap ret;
-		return ret;
-	}
-	
+	static _internal::TypeConverterMap& converters();	
 public:
 	typedef TypeReference<TypeBase> Reference;
+	typedef TypeConverterMap::mapped_type::mapped_type Converter;
 
+	Converter getConverterTo(int typeId)const;
 	/**
 	* Interpret the value as value of any (other) type.
 	* This is a runtime-based cast via string. The value is converted into a string, which is then parsed as 
@@ -167,7 +165,7 @@ public:
 			<< " to " << Type<T>::staticName();
 			return *reinterpret_cast<const T*>(this);
 		} else {
-			TypeConverterMap::mapped_type::mapped_type conv=converters()[typeID()][Type<T>::staticId()];
+			Converter conv=getConverterTo(Type<T>::staticId());
 			if(conv){
 				Type<T> ret;
 				conv->convert(*this,ret);

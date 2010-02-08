@@ -21,6 +21,7 @@
 #define CONVERTER_HPP
 
 #include <boost/shared_ptr.hpp>
+#include <boost/scoped_ptr.hpp>
 #include "log.hpp"
 
 namespace isis{ namespace util{namespace _internal{
@@ -29,6 +30,7 @@ class TypeBase;
 class TypeConverterBase {
 public:
 	virtual void convert(const TypeBase& src, TypeBase &dst){};
+	virtual void generate(const boost::scoped_ptr<TypeBase>& src, boost::scoped_ptr<TypeBase>& dst)=0;
 	static boost::shared_ptr<TypeConverterBase> create(){return boost::shared_ptr<TypeConverterBase>();}
 public:
 	virtual ~TypeConverterBase(){}

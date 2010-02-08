@@ -86,9 +86,19 @@ public:
 		if(get()->is<T>()){
 			const T& cmp=get()->cast_to_Type<T>();
 			return second == cmp;
-		} else
-			return false;
+		} else {
+			PropertyValue dst;
+			LOG(CoreDebug,info)
+				<< *this << " is not " << Type<T>::staticName() << " trying to transform.";
+			if(transformTo(dst,Type<T>::staticId()))
+				return dst==second;
+			else
+				LOG(CoreLog,error)
+				<< "Transformation of " << *this << " to " << Type<T>::staticName() << " failed.";
+		} 
+		return false;
 	}
+	bool transformTo(PropertyValue &dst,int typeId)const;
 };
 
 }
