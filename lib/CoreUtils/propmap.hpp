@@ -59,7 +59,7 @@ private:
 	};
 	struct treeInvalidP{
 		bool operator()(const_reference ref)const{
-			if(ref.second->is<PropMap>()){
+			if(not ref.second.empty() && ref.second->is<PropMap>()){
 				const PropMap &sub=ref.second->cast_to_Type<PropMap>();
 				return not sub.valid();
 			} else

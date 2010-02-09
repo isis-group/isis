@@ -243,8 +243,8 @@ void PropMap::joinTree(const isis::util::PropMap& other, bool overwrite, std::st
 				rejects.insert(rejects.end(),prefix+otherIt->first);
 			}
 		} else {
-			LOG(CoreDebug,info) << "Inserting property " << MSubject(*otherIt) << ".";
-			insert(*otherIt);
+			std::pair<const_iterator,bool> inserted=insert(*otherIt);
+			LOG_IF(inserted.second,CoreDebug,info) << "Inserted property " << MSubject(*inserted.first) << ".";
 		}
 	}
 }
