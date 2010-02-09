@@ -59,11 +59,13 @@ private:
 	};
 	struct treeInvalidP{
 		bool operator()(const_reference ref)const{
-			if(not ref.second.empty() && ref.second->is<PropMap>()){
+			if(ref.second.empty()){
+				return ref.second.needed();
+			} else if(ref.second->is<PropMap>()){
 				const PropMap &sub=ref.second->cast_to_Type<PropMap>();
 				return not sub.valid();
 			} else
-				return ref.second.needed() && ref.second.empty();
+				return false;
 		}
 	};
 	///Walks the whole tree and inserts any key into out for which the given scalar predicate is true.

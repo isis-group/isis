@@ -2,6 +2,7 @@
 #include <dcmtk/dcmdata/dcdict.h>
 #include <dcmtk/dcmimgle/dcmimage.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include "common.hpp"
 
 namespace isis{ namespace image_io{
 
@@ -66,39 +67,26 @@ std::string ImageFormat_Dicom::suffixes(){return std::string(".ima");}
 std::string ImageFormat_Dicom::name(){return "Dicom";}
 
 
-bool ImageFormat_Dicom::hasAndTell(const std::string& name, const isis::util::PropMap& object, isis::util::LogLevel level) {
-	if(object.hasProperty(name)){
-		return true;
-	} else {
-		LOG(ImageIoLog,level) << "Missing DicomTag " << util::MSubject(name);
-		return false;
-	}
-}
-
 void ImageFormat_Dicom::sanitise(isis::util::PropMap& object, string dialect) {
-	util::fvector4 voxelSize,indexOrigin;
+	util::fvector4 voxelSize;
 
 	// Fix voxelSize
-	if(hasAndTell("PixelSpacing",object,util::warning)){
+	if(hasOrTell("PixelSpacing",object,util::warning)){
 		voxelSize = object.getProperty<util::dvector4>("PixelSpacing");
 		object.remove("PixelSpacing");
 	} else {
 		voxelSize[0]=1;voxelSize[1]=1;
 	}
-	if(hasAndTell("SliceThickness",object,util::warning)){
+	if(hasOrTell("SliceThickness",object,util::warning)){
 		voxelSize[2]=object.getProperty<double>("SliceThickness");
 	}
 	object.setProperty("voxelSize",voxelSize);
 	
 	// Fix indexOrigin/ImagePositionPatient
-	if(hasAndTell("ImagePositionPatient",object,util::warning)){ //index origin
-		indexOrigin=object.getProperty<util::dvector4>("ImagePositionPatient");
-		//we must explizitly cast to util::dvector4 because the compiler can not figure that out here
-		object.setProperty("indexOrigin",indexOrigin);
-		object.remove("ImagePositionPatient");
-	}
+	transformOrTell<util::fvector4>("ImagePositionPatient","indexOrigin",object,util::warning);
 
-	if(hasAndTell("SeriesTime",object,util::warning) && hasAndTell("SeriesDate",object,util::warning)){
+	// compute the "sequenceStart"
+	if(hasOrTell("SeriesTime",object,util::warning) && hasOrTell("SeriesDate",object,util::warning)){
 		const boost::posix_time::ptime seriesTime=object.getProperty<boost::posix_time::ptime>("SeriesTime");
 		const boost::gregorian::date seriesDate=object.getProperty<boost::gregorian::date>("SeriesDate");
 		boost::posix_time::ptime sequenceStart(seriesDate,seriesTime.time_of_day());
@@ -108,9 +96,8 @@ void ImageFormat_Dicom::sanitise(isis::util::PropMap& object, string dialect) {
 		object.remove("SeriesDate");
 	}
 
-	if(not object.renameProperty("SeriesNumber","seriesNumber"))
-		LOG(ImageIoLog,util::warning) << "Missing DicomTag " << util::MSubject("SeriesNumber");
-	
+	// make sure "seriesNumber" is there
+	hasOrTell("seriesNumber",object,util::warning);
 	
 }
 
@@ -124,7 +111,7 @@ data::ChunkList ImageFormat_Dicom::load( const std::string& filename, const std:
 		sanitise(*chunk,"");
 		return data::ChunkList(1,*chunk);
 	} else {
-		delete dcfile;//not chunk was created, so we have to deal with the dcfile on our own
+		delete dcfile;//no chunk was created, so we have to deal with the dcfile on our own
 		LOG(ImageIoLog,util::error)
 		<< "Failed to create a chunk from " << util::MSubject(filename);
 	}

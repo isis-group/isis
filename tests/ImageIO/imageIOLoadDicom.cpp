@@ -25,8 +25,7 @@ namespace isis{namespace test{
 		ENABLE_LOG(image_io::ImageIoLog,util::DefaultMsgPrint,util::info);
 		ENABLE_LOG(image_io::ImageIoDebug,util::DefaultMsgPrint,util::info);
 		
-		data::ImageList
-		images=data::IOFactory::load("/tmp/test.ima","");
+		data::ImageList	images=data::IOFactory::load("/tmp/test.ima","");
 		
 		// the null-loader shall generate 5 3x3x3x10 images
 		BOOST_CHECK(images.size() == 1);

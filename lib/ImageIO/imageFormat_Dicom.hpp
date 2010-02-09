@@ -23,7 +23,6 @@
 #include <DataStorage/io_interface.h>
 #include <dcmtk/config/cfunix.h> //@todo add switch for windows if needed
 #include <dcmtk/dcmdata/dcfilefo.h>
-#include "common.hpp"
 
 namespace isis{ namespace image_io{
 	
@@ -31,7 +30,6 @@ class ImageFormat_Dicom: public FileFormat{
 	static void parseAS(DcmElement* elem,const std::string &name,util::PropMap &map);
 	static void parseDA(DcmElement* elem,const std::string &name,util::PropMap &map);
 	static void parseTM(DcmElement* elem,const std::string &name,util::PropMap &map);
-	static bool hasAndTell(const std::string& name, const isis::util::PropMap& object, isis::util::LogLevel level);
 public:
 	static void parseOrientation(DcmElement* elem, const std::string& name, isis::util::PropMap& map);
 	static void parseScalar(DcmElement* elem, const std::string& name, isis::util::PropMap& map);

@@ -18,7 +18,25 @@
 #include "DataStorage/image.hpp"
 
 namespace isis{ namespace image_io{
+
+/// Base class for image-io-plugins
 class FileFormat {
+protected:
+	/**
+	 * Check if a given property exists in the given PropMap.
+	 * If the property doesn't exist a message will be sent to ImageIoLog using the given loglevel.
+	 * \returns object.hasProperty(name)
+	 */
+	static bool hasOrTell(const std::string& name, const util::PropMap& object, util::LogLevel level);
+	/**
+	 * Transform a given property into another and remove the original in the given PropMap.
+	 * If the property doesn't exist a message will be sent to ImageIoLog using the given loglevel.
+	 * \returns true if the property existed and was transformed.
+	 */
+	template<typename TYPE> static bool
+	transformOrTell(const std::string& from,const std::string& to, util::PropMap& object, util::LogLevel level){
+		return hasOrTell(from,object,level) and object.transform<TYPE>(from,to);
+	}
 public:
 	virtual std::string name()=0;
 	virtual std::string suffixes()=0;
