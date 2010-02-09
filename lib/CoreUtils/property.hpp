@@ -33,7 +33,6 @@ namespace util{
  * There is intentionally no "uneqal" (!=) because for this class "not equal" does NOT mean "unequal".
  * @author Enrico Reimer
  */
-
 class PropertyValue:public _internal::TypeBase::Reference{
 	bool m_needed;
 public:
@@ -45,7 +44,9 @@ public:
 	 * \param _needed flag if this PropertyValue is needed an thus not allowed to be empty (a.k.a. undefined)
 	 */ 
 	template<typename T> PropertyValue(const T& ref,bool _needed = false):
-	_internal::TypeBase::Reference(new Type<T>(ref)),m_needed(_needed){ }
+	_internal::TypeBase::Reference(new Type<T>(ref)),m_needed(_needed){
+		check_type<T>();
+	}
 	/**
 	 * Empty constructor.
 	 * Creates an empty property value. So PropertyValue().empty() will allways be true.
@@ -54,6 +55,7 @@ public:
 	PropertyValue(bool _needed = false);
 	/// Accessor for the needed flag
 	bool &needed();
+	///\copydoc needed
 	bool needed()const;
 
 	/**
@@ -78,26 +80,32 @@ public:
 	 * Equality to a Value of type T.
 	 * Properties are equal to Values if, and only if:
 	 * - the property is not empty
-	 * - the property contains the value type T
-	 * - stored value is equal to the given value
-	 * \returns (this->cast_to_type\<T\>() == second) if the property contains a value of type T, false otherwise.
+	 * - the property contains the value type T or is convertible into it
+	 * - stored/converted value is equal to the given value
+	 * \warning because of rounding in the conversion the following will be true.
+	 * \code PropertyValue(4.5)==5 \endcode
+	 * If CoreDebug is enabled and its loglevel is at least warning, a message will be send to the logger.
+	 * \returns (this->cast_to_type\<T\>() == second) if the property contains a value of type T.
+	 * \returns converted_property == second if its convertible
+	 * \return false otherwise
 	 */
 	template<typename T> bool operator ==(const T &second)const{
 		if(get()->is<T>()){
 			const T& cmp=get()->cast_to_Type<T>();
 			return second == cmp;
-		} else {
+		} else if(not empty()){
 			PropertyValue dst;
-			LOG(CoreDebug,info)
-				<< *this << " is not " << Type<T>::staticName() << " trying to transform.";
+			LOG(CoreDebug,warning)
+				<< *this << " is not " << Type<T>::staticName() << " trying to convert.";
 			if(transformTo(dst,Type<T>::staticId()))
 				return dst==second;
 			else
 				LOG(CoreLog,error)
-				<< "Transformation of " << *this << " to " << Type<T>::staticName() << " failed.";
+				<< "Conversion of " << *this << " to " << Type<T>::staticName() << " failed.";
 		} 
 		return false;
 	}
+	/// Converts the value into the requested type and stores it in the referenced PropertyValue.	
 	bool transformTo(PropertyValue &dst,int typeId)const;
 };
 

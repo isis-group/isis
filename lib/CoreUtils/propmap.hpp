@@ -29,6 +29,7 @@ namespace isis{
  */
 namespace util{
 
+/// A mapping tree to store properties (keys / values)
 class PropMap : protected std::map<std::string,PropertyValue,_internal::caselessStringLess>{
 public:
 	typedef std::map<std::string,PropertyValue,_internal::caselessStringLess> base_type;
@@ -85,27 +86,23 @@ private:
 	/////////////////////////////////////////////////////////////////////////////////////////
 	// internal tool-backends
 	/////////////////////////////////////////////////////////////////////////////////////////
+	/// internal recursion-function for join
 	void joinTree(const isis::util::PropMap& other, bool overwrite, std::string prefix, PropMap::key_list &rejects);
+	/// internal recursion-function for diff
 	void diffTree(const PropMap& other,PropMap::diff_map &ret,std::string prefix) const;
-	static PropertyValue& fetchProperty(
-		util::PropMap &root,
-		const propPathIterator at,const propPathIterator pathEnd
-	);
-	static const PropertyValue* searchBranch(
-		const util::PropMap &root,
-		const propPathIterator at,const propPathIterator pathEnd
-	);
-	bool recursiveRemove(
-		util::PropMap &root,
-		const propPathIterator at,const propPathIterator pathEnd
-	);
+	/// internal helper for operator[]
+	static PropertyValue& fetchProperty(util::PropMap &root,const propPathIterator at,const propPathIterator pathEnd);
+	/// internal helper for findPropVal
+	static const PropertyValue* searchBranch(const util::PropMap &root,const propPathIterator at,const propPathIterator pathEnd);
+	/// internal recursion-function for remove
+	bool recursiveRemove(util::PropMap &root,const propPathIterator at,const propPathIterator pathEnd);
 protected:
 	/////////////////////////////////////////////////////////////////////////////////////////
 	// rw-backends
 	/////////////////////////////////////////////////////////////////////////////////////////
 	/**
 	 * Find the property referenced by the path-key.
-	 * \param key the \"path\" to the property
+	 * \param key the "path" to the property
 	 * \returns a pointer to the PropertyValue, NULL if the property was not found
 	 */
 	const PropertyValue* findPropVal(const std::string &key)const;
@@ -137,7 +134,7 @@ public:
 	/////////////////////////////////////////////////////////////////////////////////////////
 	/**
 	* Find the property referenced by the path-key, create it if its not there.
-	* \param key the \"path\" to the property
+	* \param key the "path" to the property
 	* \returns a reference to the PropertyValue
 	*/
 	PropertyValue& operator[](const std::string& key);
@@ -182,12 +179,50 @@ public:
 	diff_map diff(const PropMap &second)const;
 	/// Remove everything that is also in second and equal.
 	void make_unique(const isis::util::PropMap& other);
-	/// Add Properties from another PropMap
+	/**
+	* Add Properties from another PropMap.
+	* \param other the other PropMap
+	* \param overwrite if existing properties shall be replaced
+	*/
 	PropMap::key_list join(const isis::util::PropMap& other, bool overwrite = false);
 
+	/**
+	* Get common and unique properties from the map.
+	* For every entry of the map this checks if it is common/unique and removes/adds it accordingly.
+	* This is done by:
+	* - generating a difference (using diff) between the current common and the map
+	* - the resulting diff_map contains all newly unique properties (properties which has been in common, but are not euqual in the map)
+	* - these newly diffent properties are removed from common and added to unique.
+	* - if init is true uniques is cleared and common is replaced by a copy of the map (shall be done at first step/map)
+	* \param common reference of the common-map
+	* \param uniques reference of the unique-map
+	* \param init if initialisation shall be done instead of normal seperation
+	*/
 	void toCommonUnique(PropMap& common,std::set<std::string> &uniques,bool init)const;
+
+	///copy the tree into a flat key/property-map
 	size_t linearize(base_type &out,std::string key_prefix="")const;
+
+	/**
+	 * Transform an existing property into another.
+	 * Converts the value of the given property into the requested type and stores it with the given new key.
+	 * \param from the key of the property to be transformed
+	 * \param to the key for the new property
+	 * \param dstId the type-id of the new property value
+	 * \param delSource if the original property shall be deleted after the tramsformation was done
+	 * \returns true if the transformation was done
+	 */
 	bool transform(std::string from, std::string to, int dstId, bool delSource = true);
+
+	/**
+	* Transform an existing property into another (statically typed version).
+	* Converts the value of the given property into the requested type and stores it with the given new key.
+	* A compile-time check is done to test if the requested type is available.
+	* \param from the key of the property to be transformed
+	* \param to the key for the new property
+	* \param delSource if the original property shall be deleted after the tramsformation was done
+	* \returns true if the transformation was done
+	*/
 	template<typename DST> bool transform(std::string from, std::string to, bool delSource = true)
 	{
 		check_type<DST>();
