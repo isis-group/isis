@@ -5,9 +5,7 @@
 #include "common.hpp"
 
 namespace isis{ namespace image_io{
-
 namespace _internal{
-
 class DicomChunk : public data::Chunk{
 	struct Deleter{
 		DcmFileFormat *m_dcfile;
@@ -30,7 +28,7 @@ class DicomChunk : public data::Chunk{
 		data::Chunk(dat,del,width,height,1,1)
 	{
 		DcmDataset* dcdata=del.m_dcfile->getDataset();
-		util::PropMap &dcmMap = setProperty("dicomTag",util::PropMap());
+		util::PropMap &dcmMap = setProperty(ImageFormat_Dicom::dicomTagTreeName,util::PropMap());
 		ImageFormat_Dicom::dcmObject2PropMap(dcdata,dcmMap);
 	}
 public:
@@ -63,41 +61,53 @@ public:
 };
 }
 
+using boost::posix_time::ptime;
+using boost::gregorian::date;
+
+const char ImageFormat_Dicom::dicomTagTreeName[]="DICOM";
+
 std::string ImageFormat_Dicom::suffixes(){return std::string(".ima");}
 std::string ImageFormat_Dicom::name(){return "Dicom";}
 
 
 void ImageFormat_Dicom::sanitise(isis::util::PropMap& object, string dialect) {
 	util::fvector4 voxelSize;
+	const std::string prefix=std::string(ImageFormat_Dicom::dicomTagTreeName)+"/";
 
 	// Fix voxelSize
-	if(hasOrTell("PixelSpacing",object,util::warning)){
-		voxelSize = object.getProperty<util::dvector4>("PixelSpacing");
-		object.remove("PixelSpacing");
+	if(hasOrTell(prefix+"PixelSpacing",object,util::info)){
+		voxelSize = object[prefix+"PixelSpacing"]->as<util::fvector4>();
+		object.remove(prefix+"PixelSpacing");
 	} else {
+		LOG(ImageIoLog,util::warning) << "PixelSpacing not found, assuming <1,1>";
 		voxelSize[0]=1;voxelSize[1]=1;
 	}
-	if(hasOrTell("SliceThickness",object,util::warning)){
-		voxelSize[2]=object.getProperty<double>("SliceThickness");
-	}
+	if(hasOrTell(prefix+"SliceThickness",object,util::warning)){
+		voxelSize[2]=object[prefix+"SliceThickness"]->as<float>();
+		object.remove(prefix+"SliceThickness");
+	} else {
+		LOG(ImageIoLog,util::warning) << "SliceThickness not found, assuming 1";
+		voxelSize[2]=1;
+	}		
 	object.setProperty("voxelSize",voxelSize);
 	
 	// Fix indexOrigin/ImagePositionPatient
-	transformOrTell<util::fvector4>("ImagePositionPatient","indexOrigin",object,util::warning);
+	transformOrTell<util::fvector4>(prefix+"ImagePositionPatient","indexOrigin",object,util::warning);
 
 	// compute the "sequenceStart"
-	if(hasOrTell("SeriesTime",object,util::warning) && hasOrTell("SeriesDate",object,util::warning)){
-		const boost::posix_time::ptime seriesTime=object.getProperty<boost::posix_time::ptime>("SeriesTime");
-		const boost::gregorian::date seriesDate=object.getProperty<boost::gregorian::date>("SeriesDate");
-		boost::posix_time::ptime sequenceStart(seriesDate,seriesTime.time_of_day());
+	if(hasOrTell(prefix+"SeriesTime",object,util::warning) && hasOrTell(prefix+"SeriesDate",object,util::warning)){
+		const ptime seriesTime=object[prefix+"SeriesTime"]->as<ptime>();
+		const date seriesDate=object[prefix+"SeriesDate"]->as<date>();
+		const ptime sequenceStart(seriesDate,seriesTime.time_of_day());
+		LOG(ImageIoDebug,util::verbose_info) << "Computed sequenceStart as " <<sequenceStart;
 		
 		object.setProperty("sequenceStart",sequenceStart);
-		object.remove("SeriesTime");
-		object.remove("SeriesDate");
+		object.remove(prefix+"SeriesTime");
+		object.remove(prefix+"SeriesDate");
 	}
 
 	// make sure "seriesNumber" is there
-	hasOrTell("seriesNumber",object,util::warning);
+	hasOrTell(prefix+"seriesNumber",object,util::warning);
 	
 }
 

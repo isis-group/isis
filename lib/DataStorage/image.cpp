@@ -117,6 +117,9 @@ bool Image::reIndex() {
 			size[i]= getChunkStride(size[i-1])/size[i-1] ?:1;
 	}
 
+	//get indexOrigin from the geometrically first chunk
+	setPropertyValue("indexOrigin",chunksBegin()->getPropertyValue("indexOrigin"));
+
 	//Clean up the properties 
 	//@todo might fail if the image contains a prop that differs to that in the Chunks (which is equal in the chunks)
 	util::PropMap common;
@@ -137,10 +140,6 @@ bool Image::reIndex() {
 	for(size_t i=0;i!=lookup.size();i++)
 		getChunkAt(i).make_unique(common);
 	LOG(DataDebug,util::verbose_info) << "common properties removed from " << set.size() << " chunks: " << common;
-
-
-	//get indexOrigin from the geometrically first chunk
-	setPropertyValue("indexOrigin",chunksBegin()->getPropertyValue("indexOrigin"));
 
 	//try to calculate slice vector if its missing
 	if(not hasProperty("sliceVec")){

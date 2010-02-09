@@ -31,6 +31,7 @@ class ImageFormat_Dicom: public FileFormat{
 	static void parseDA(DcmElement* elem,const std::string &name,util::PropMap &map);
 	static void parseTM(DcmElement* elem,const std::string &name,util::PropMap &map);
 public:
+	static const char dicomTagTreeName[];
 	static void parseOrientation(DcmElement* elem, const std::string& name, isis::util::PropMap& map);
 	static void parseScalar(DcmElement* elem, const std::string& name, isis::util::PropMap& map);
 	static void parseVector(DcmElement* elem, const std::string& name, isis::util::PropMap& map);

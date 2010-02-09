@@ -160,10 +160,10 @@ public:
 	*/
 	template<class T> T as()const{
 		if(typeID()==Type<T>::staticId()){
-			LOG(CoreLog,info)
+			LOG(CoreDebug,verbose_info)
 			<< "Doing reinterpret_cast instead of useless conversion from " << toString(true)
 			<< " to " << Type<T>::staticName();
-			return *reinterpret_cast<const T*>(this);
+			return *reinterpret_cast<const Type<T>*>(this);
 		} else {
 			Converter conv=getConverterTo(Type<T>::staticId());
 			if(conv){

@@ -16,6 +16,7 @@
 #ifdef __cplusplus
 #include <string>
 #include "DataStorage/image.hpp"
+#include "ImageIO/common.hpp"
 
 namespace isis{ namespace image_io{
 
@@ -34,8 +35,13 @@ protected:
 	 * \returns true if the property existed and was transformed.
 	 */
 	template<typename TYPE> static bool
-	transformOrTell(const std::string& from,const std::string& to, util::PropMap& object, util::LogLevel level){
-		return hasOrTell(from,object,level) and object.transform<TYPE>(from,to);
+	transformOrTell(const std::string& from,const std::string& to, util::PropMap& object, util::LogLevel level)
+	{
+		if(hasOrTell(from,object,level) and object.transform<TYPE>(from,to)){
+			LOG(ImageIoDebug,util::verbose_info) << "Transformed " << from << " into " << object[to];
+			return true;
+		}
+		return false;
 	}
 public:
 	virtual std::string name()=0;

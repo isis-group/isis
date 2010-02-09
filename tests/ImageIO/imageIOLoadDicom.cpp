@@ -22,10 +22,10 @@ namespace isis{namespace test{
 		ENABLE_LOG(util::CoreDebug,util::DefaultMsgPrint,util::warning);
 		ENABLE_LOG(data::DataLog,util::DefaultMsgPrint,util::warning);
 		ENABLE_LOG(data::DataDebug,util::DefaultMsgPrint,util::warning);
-		ENABLE_LOG(image_io::ImageIoLog,util::DefaultMsgPrint,util::info);
-		ENABLE_LOG(image_io::ImageIoDebug,util::DefaultMsgPrint,util::info);
+		ENABLE_LOG(image_io::ImageIoLog,util::DefaultMsgPrint,util::verbose_info);
+		ENABLE_LOG(image_io::ImageIoDebug,util::DefaultMsgPrint,util::verbose_info);
 		
-		data::ImageList	images=data::IOFactory::load("/tmp/test.ima","");
+		data::ImageList	images=data::IOFactory::load("/SCR/isis_build/testDicom.ima","");
 		
 		// the null-loader shall generate 5 3x3x3x10 images
 		BOOST_CHECK(images.size() == 1);

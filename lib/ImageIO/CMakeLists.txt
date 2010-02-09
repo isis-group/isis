@@ -6,7 +6,7 @@ if(IOPLUGIN_NIFTI)
 
 	include_directories(${INCPATH_NIFTI} ${INCPATH_ZNZ})
 	add_library(isisImageFormat_Nifti SHARED imageFormat_Nifti.cpp)
-	target_link_libraries(isisImageFormat_Nifti utils data ${LIB_NIFTIIO} ${LIB_ZNZ})
+	target_link_libraries(isisImageFormat_Nifti ${LIB_NIFTIIO} ${LIB_ZNZ})
 
 	set_target_properties(isisImageFormat_Nifti PROPERTIES
 		LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
@@ -16,7 +16,7 @@ endif(IOPLUGIN_NIFTI)
 
 if(IOPLUGIN_NULL)
 	add_library(isisImageFormat_Null SHARED imageFormat_Null.cpp)
-	target_link_libraries(isisImageFormat_Null utils data)
+	target_link_libraries(isisImageFormat_Null)
 
 	set_target_properties(isisImageFormat_Null PROPERTIES
 		LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
@@ -33,8 +33,7 @@ if(IOPLUGIN_DICOM)
 	include_directories(${INCPATHDCMTK})
 		
 	add_library(isisImageFormat_Dicom SHARED imageFormat_Dicom.cpp imageFormat_DicomParser.cpp)
-	target_link_libraries(isisImageFormat_Dicom utils data
-		${LIB_DCMDATA} ${LIB_DCMIMGLE} ${LIB_OFSTD} ${LIB_Z} ${Boost_LIBRARIES})
+	target_link_libraries(isisImageFormat_Dicom ${LIB_DCMDATA} ${LIB_DCMIMGLE} ${LIB_OFSTD} ${LIB_Z})
 	
 	set_target_properties(isisImageFormat_Dicom PROPERTIES
 		LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}

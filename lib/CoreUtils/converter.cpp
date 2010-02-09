@@ -53,7 +53,7 @@ public:
 template<bool NUMERIC,typename SRC, typename DST> class TypeConverter<NUMERIC,true,SRC,DST> : public TypeGenerator<SRC,DST>{
 	TypeConverter(){
 		LOG(CoreDebug,verbose_info)
-		<< "Creating trivial converter for " << Type<SRC>::staticName();
+		<< "Creating trivial copy converter for " << Type<SRC>::staticName();
 	};
 public:
 	static boost::shared_ptr<TypeConverterBase> create(){

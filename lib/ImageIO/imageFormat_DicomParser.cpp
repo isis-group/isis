@@ -358,6 +358,7 @@ void ImageFormat_Dicom::parseVector(DcmElement* elem,const std::string &name, ut
 			<< buff;
 		}break;
 	}
+	LOG(ImageIoDebug,util::verbose_info) << "Parsed " << name << " as " << map[name];
 }
 
 
