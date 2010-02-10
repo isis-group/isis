@@ -94,9 +94,6 @@ void ImageFormat_Dicom::sanitise(isis::util::PropMap& object, string dialect) {
 	}		
 	object.setProperty("voxelSize",voxelSize);
 	
-	// Fix indexOrigin/ImagePositionPatient
-	transformOrTell<util::fvector4>(prefix+"ImagePositionPatient","indexOrigin",object,util::warning);
-
 	// compute the "sequenceStart"
 	if(hasOrTell(prefix+"SeriesTime",object,util::warning) && hasOrTell(prefix+"SeriesDate",object,util::warning)){
 		const ptime seriesTime=object[prefix+"SeriesTime"]->as<ptime>();
@@ -109,12 +106,20 @@ void ImageFormat_Dicom::sanitise(isis::util::PropMap& object, string dialect) {
 		object.remove(prefix+"SeriesDate");
 	}
 
-	// make sure "seriesNumber" is there
-	hasOrTell(prefix+"seriesNumber",object,util::warning);
-	
+	// make sure "sequenceNumber" and "acquisitionNumber" are there
+	transformOrTell<u_int16_t>(prefix+"SeriesNumber","sequenceNumber",object,util::warning);
+	transformOrTell<u_int32_t>(prefix+"AcquisitionNumber","acquisitionNumber",object,util::error);
+
+	// Fix indexOrigin/ImagePositionPatient
+	transformOrTell<util::fvector4>(prefix+"ImagePositionPatient","indexOrigin",object,util::warning);
+
+	//get the orientation down here
+	transformOrTell<util::fvector4>(prefix+"readVec","readVec",object,util::error);
+	transformOrTell<util::fvector4>(prefix+"phaseVec","phaseVec",object,util::error);
+	transformOrTell<util::fvector4>(prefix+"sliceVec","sliceVec",object,util::error);
 }
 
-data::ChunkList ImageFormat_Dicom::load( const std::string& filename, const std::string& dialect )
+int ImageFormat_Dicom::load(data::ChunkList &chunks, const std::string& filename, const std::string& dialect )
 {
 	boost::shared_ptr<data::Chunk> chunk;
 	
@@ -122,13 +127,14 @@ data::ChunkList ImageFormat_Dicom::load( const std::string& filename, const std:
 	if(dcfile->loadFile(filename.c_str()).good() and (chunk =_internal::DicomChunk::makeSingleMonochrome(filename,dcfile))){
 		//we got a chunk from the file
 		sanitise(*chunk,"");
-		return data::ChunkList(1,*chunk);
+		chunks.push_back(*chunk);
+		return 1;
 	} else {
 		delete dcfile;//no chunk was created, so we have to deal with the dcfile on our own
 		LOG(ImageIoLog,util::error)
 		<< "Failed to create a chunk from " << util::MSubject(filename);
 	}
-	return data::ChunkList();
+	return 0;
 }
 
 bool ImageFormat_Dicom::write(const data::Image &image,const std::string& filename,const std::string& dialect )

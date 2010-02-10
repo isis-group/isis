@@ -40,7 +40,7 @@ public:
 	std::string suffixes();
 	std::string name();
 
-	data::ChunkList load( const std::string& filename, const std::string& dialect );
+	int load(data::ChunkList &chunks, const std::string& filename, const std::string& dialect );
 	bool write(const data::Image &image,const std::string& filename,const std::string& dialect );
 
 	bool tainted();

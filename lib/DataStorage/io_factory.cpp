@@ -111,7 +111,7 @@ IOFactory& IOFactory::get()
 	return ret;
 }
 
-data::ChunkList IOFactory::loadFile(const boost::filesystem::path& filename, const std::string& dialect)
+int IOFactory::loadFile(ChunkList &ret,const boost::filesystem::path& filename, const std::string& dialect)
 {
 	FileFormatList formatReader = getFormatInterface(filename.string(), dialect);
 	
@@ -119,13 +119,13 @@ data::ChunkList IOFactory::loadFile(const boost::filesystem::path& filename, con
 	{
 		LOG(DataLog, util::error)
 				<< "File does not exist at given place: " << filename;
-		return data::ChunkList();
+		return 0;
 	}
 
 	if(true == formatReader.empty()){//no suitable plugin for this file type and dialect
 		LOG(DataLog,util::error)
 				<< "Missing plugin to open file: " << filename << " with dialect: " << dialect;
-		return data::ChunkList();
+		return 0;
 	}
 
 	BOOST_FOREACH(FileFormatList::const_reference it,formatReader){
@@ -135,16 +135,16 @@ data::ChunkList IOFactory::loadFile(const boost::filesystem::path& filename, con
 					std::string("") : std::string(" with dialect: ") + dialect
 				);
 		
-		const data::ChunkList loadedChunks = it->load(filename.string(), dialect);
-		if (not loadedChunks.empty()){//load succesfully
+		const int loadedChunks = it->load(ret,filename.string(), dialect);
+		if (loadedChunks){//load succesfully
 			LOG(DataLog,util::info)
-				<< "loaded " << loadedChunks.size() << " Chunks from " <<  filename;
+				<< "loaded " << loadedChunks << " Chunks from " <<  filename;
 			return loadedChunks;
 		}
 	}
 	LOG(DataLog,util::error)
 		<< "Failed not read file: " << filename; //@todo error message missing
-	return data::ChunkList();//no plugin of proposed list could load file
+	return 0;//no plugin of proposed list could load file
 }
 
 IOFactory::FileFormatList IOFactory::getFormatInterface(const std::string& filename, const std::string& dialect)
@@ -170,26 +170,26 @@ IOFactory::FileFormatList IOFactory::getFormatInterface(const std::string& filen
 data::ImageList IOFactory::load(const std::string& path, const std::string& dialect)
 {
 	const boost::filesystem::path p(path);
-	const ChunkList chunks =boost::filesystem::is_directory(p) ?
-		get().loadPath(p,dialect):
-		get().loadFile(p,dialect);
+	ChunkList chunks;
+	const int loaded =boost::filesystem::is_directory(p) ?
+		get().loadPath(chunks,p,dialect):
+		get().loadFile(chunks,p,dialect);
 	const data::ImageList images(chunks);
 	LOG(DataLog,util::info)
-		<< "Loaded " << images.size() << " images from " << p;
+		<< "Loaded " << images.size() << " images ("<< loaded << " chunks) from " << p;
 	return images;
 }
 
-ChunkList IOFactory::loadPath(const boost::filesystem::path& path, const std::string& dialect)
+int IOFactory::loadPath(ChunkList &ret,const boost::filesystem::path& path, const std::string& dialect)
 {
-	ChunkList ret;
+	int loaded=0;
 	for (boost::filesystem::directory_iterator itr(path); itr!=boost::filesystem::directory_iterator(); ++itr)	{
 		if(boost::filesystem::is_directory(*itr))continue;
-		const ChunkList buff=loadFile(itr->path(),dialect);
-		ret.insert(ret.end(),buff.begin(),buff.end());
+		loaded+=loadFile(ret,itr->path(),dialect);
 	}
 	LOG(DataDebug,util::info)
-		<< "Got " << ret.size() << " Chunks from loading directory " << path;
-	return ret;
+		<< "Got " << loaded << " Chunks from loading directory " << path;
+	return loaded;
 }
 
 bool IOFactory::write(const isis::data::ImageList& images, const std::string& filename, const std::string& dialect)

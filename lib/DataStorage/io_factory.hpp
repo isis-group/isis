@@ -43,8 +43,8 @@ protected:
 	 * @param dialect dialect of the fileformat to load
 	 * @return list of chunks (part of an image)
 	 */
-	ChunkList loadFile(const boost::filesystem::path& filename, const std::string& dialect);
-	ChunkList loadPath(const boost::filesystem::path& path, const std::string& dialect);
+	int loadFile(ChunkList& ret,const boost::filesystem::path& filename, const std::string& dialect);
+	int loadPath(ChunkList& ret,const boost::filesystem::path& path, const std::string& dialect);
 	
 
 public:

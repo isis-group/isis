@@ -14,12 +14,11 @@ public:
 		return "Null";
 	}
   
-	data::ChunkList load (const std::string& filename,const std::string& dialect ){
+	int load (data::ChunkList &chunks,const std::string& filename,const std::string& dialect ){
 		
 		const size_t images=5;
 		const size_t timesteps=10;
-
-		data::ChunkList chunks;
+		
 		for(int i=0;i<timesteps;i++){
 			for(int c=0;c<images;c++){
 				data::MemChunk<short> ch(3,3,3);
@@ -35,7 +34,7 @@ public:
 				chunks.push_back(ch);
 			}
 		}
-		return chunks;//return data::ChunkList();
+		return timesteps*images;//return data::ChunkList();
 	}
 	
 	bool write(const data::Image &image,const std::string& filename,const std::string& dialect ){

@@ -69,12 +69,13 @@ public:
 	}
 
 //	isis::data::ChunkList load(std::string filename,std::string dialect)
-	isis::data::ChunkList load(const std::string& filename, const std::string& dialect)
+	int load(data::ChunkList &ret,const std::string& filename, const std::string& dialect)
 	{
 		//read the file with the function from nifti1_io.h
 		nifti_image* ni = nifti_image_read(filename.c_str(), true);
 		if (NULL == ni){
-			return isis::data::ChunkList();}
+			return 0;
+		}
 
 		//initialize chunkList and read size from ni
 		data::ChunkList chunkListFromNifti;
@@ -88,7 +89,8 @@ public:
 		// TODO: at the moment scaling not supported due to data type changes
 		if (1.0 != scale){
 			LOG(ImageIoDebug, isis::util::error)	<< "Scaling is not supported at the moment. Scale Factor:  " << scale;
-			return isis::data::ChunkList();}
+			return 0;
+		}
 
 		switch(ni->datatype)
 		{
@@ -112,14 +114,15 @@ public:
 			break;
 		default:
 			LOG(ImageIoDebug, isis::util::error) << "Unsupported datatype " << ni->datatype;
-			return data::ChunkList();
+			return 0;
 			break;
 		}
 
 		LOG(ImageIoDebug, isis::util::info) << "datatype load from nifti " << ni->datatype;
 		//clean up the function from nifti1_io.h
 		nifti_image_free(ni);
-		return chunkListFromNifti;
+		std::copy(chunkListFromNifti.begin(),chunkListFromNifti.end(),ret.end());
+		return chunkListFromNifti.size();
 	}
 
 	size_t maxDim() {
