@@ -28,7 +28,7 @@ struct pluginDeleter{
 		LOG(DataDebug,util::info) << "Releasing plugin " << m_pluginName << " (was loaded at " << m_dlHandle << ")";
 		delete format;
 		if(dlclose(m_dlHandle)!=0)
-			LOG(DataLog,util::error) 
+			LOG(DataLog,util::warning)
 				<< "Failed to release plugin " << m_pluginName << " (was loaded at " << m_dlHandle << ")";
 	}
 };
