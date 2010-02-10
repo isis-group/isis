@@ -12,12 +12,12 @@ class DicomChunk : public data::Chunk{
 		DicomImage *m_img;
 		std::string m_filename;
 		Deleter(DcmFileFormat *dcfile,DicomImage *img,std::string filename):m_dcfile(dcfile),m_img(img),m_filename(filename){}
-		void operator ()(void *){
+		void operator ()(void *at){
 			LOG_IF(not m_dcfile, ImageIoLog,util::error)
 				<< "Trying to close non existing dicom file";
 			LOG_IF(not m_img, ImageIoLog,util::error)
 				<< "Trying to close non existing dicom image";
-			LOG(ImageIoDebug,util::info)	<< "Closing dicom-file " << util::MSubject(m_filename);
+			LOG(ImageIoDebug,util::info)	<< "Closing mapped dicom-file " << util::MSubject(m_filename) << " (pixeldata was at " << at << ")";
 			delete m_img;
 			delete m_dcfile;
 		}
@@ -27,6 +27,9 @@ class DicomChunk : public data::Chunk{
 		size_t width,size_t height):
 		data::Chunk(dat,del,width,height,1,1)
 	{
+		LOG(ImageIoDebug,util::info)
+		<< "Mapping greyscale pixeldata of " << del.m_filename << " at "
+		<< dat << " (" << util::TypePtr<TYPE>::staticName() << ")" ;
 		DcmDataset* dcdata=del.m_dcfile->getDataset();
 		util::PropMap &dcmMap = setProperty(ImageFormat_Dicom::dicomTagTreeName,util::PropMap());
 		ImageFormat_Dicom::dcmObject2PropMap(dcdata,dcmMap);

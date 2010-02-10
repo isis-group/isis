@@ -10,4 +10,20 @@
    fun:_ZN5boost9unit_test14unit_test_mainEPFPNS0_10test_suiteEiPPcEiS4_                                                                                                            
    fun:main                                                                                                                                                                         
 }
-                                                                                                                                                                           
+{
+   <dlopen leak -- see http://www.linuxquestions.org/questions/programming-9/dlopen-and-dlclose-memory-leak.-730926>
+   Memcheck:Leak
+   fun:calloc
+   obj:/lib/libdl-2.7.so
+   fun:dlopen
+   fun:_ZN4isis4data9IOFactory11findPluginsERKSs
+   fun:_ZN4isis4data9IOFactoryC1Ev
+   fun:_ZN4isis4data9IOFactory3getEv
+   fun:_ZN4isis4data9IOFactory4loadERKSsS3_
+   fun:_ZN4isis4test14imageDicomtest11test_methodEv
+   fun:_ZN4isis4testL22imageDicomtest_invokerEv
+   fun:_ZN5boost9unit_test9ut_detail7invokerINS1_6unusedEE6invokeIPFvvEEES3_RT_
+   fun:_ZN5boost9unit_test9ut_detail16callback0_impl_tINS1_6unusedEPFvvEE6invokeEv
+   fun:_ZNK5boost9unit_test9callback0INS0_9ut_detail6unusedEEclEv
+}
+                                                                                                                                                               

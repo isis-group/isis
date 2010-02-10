@@ -71,9 +71,9 @@ private:
 	///Walks the whole tree and inserts any key into out for which the given scalar predicate is true.
 	template<class Predicate> struct walkTree{
 		key_list &m_out;
-		const std::string &m_prefix;
+		const std::string m_prefix;
 		walkTree(key_list &out,const std::string &prefix):m_out(out),m_prefix(prefix){}
-		walkTree(key_list &out):m_out(out),m_prefix(std::string()){}
+		walkTree(key_list &out):m_out(out){}
 		void operator()(const_reference ref){
 			if((not ref.second.empty()) and ref.second->is<PropMap>()){
 				PropMap &sub=ref.second->cast_to_Type<PropMap>();

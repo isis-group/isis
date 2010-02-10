@@ -20,6 +20,19 @@
 
 namespace isis{ namespace data{
 
+struct pluginDeleter{
+	void *m_dlHandle;
+	std::string m_pluginName;
+	pluginDeleter(void *dlHandle,std::string pluginName):m_dlHandle(dlHandle),m_pluginName(pluginName){}
+	void operator()(image_io::FileFormat *format){
+		LOG(DataDebug,util::info) << "Releasing plugin " << m_pluginName << " (was loaded at " << m_dlHandle << ")";
+		delete format;
+		if(dlclose(m_dlHandle)!=0)
+			LOG(DataLog,util::error) 
+				<< "Failed to release plugin " << m_pluginName << " (was loaded at " << m_dlHandle << ")";
+	}
+};
+	
 IOFactory::IOFactory()
 {
 	findPlugins(std::string(BUILD_PATH));
@@ -32,9 +45,9 @@ bool IOFactory::registerFormat(const FileFormatPtr plugin)
 	io_formats.push_back(plugin);
 	std::list<std::string> suffixes=getSuffixes(plugin);
 	LOG(DataLog,util::info)
-		<< "Registering " << (plugin->tainted() ? "tainted " :"") << "io-plugin \"" 
+		<< "Registering " << (plugin->tainted() ? "tainted " :"") << "io-plugin "
 		<< util::MSubject(plugin->name())
-		<< "\" with " << suffixes.size() << " supported suffixes";
+		<< " with " << suffixes.size() << " supported suffixes";
 
 	BOOST_FOREACH(std::string &it,suffixes)
 		io_suffix[it].push_back(plugin);
@@ -64,15 +77,17 @@ unsigned int IOFactory::findPlugins(const std::string& path)
 			if(handle){
 				image_io::FileFormat* (*factory_func)() = (image_io::FileFormat* (*)())dlsym(handle,"factory");
 				if (factory_func){
-					FileFormatPtr io_class(factory_func());
+					FileFormatPtr io_class(factory_func(),pluginDeleter(handle,pluginName));
 					if(registerFormat(io_class))
 						ret++;
 					else
 						LOG(DataLog,util::error) << "failed to register plugin " << util::MSubject(pluginName);
 					  
-				} else
+				} else {
 					LOG(DataLog,util::error)
 						<< "could not get format factory function: " << util::MSubject(dlerror());
+					dlclose(handle);
+				}
 			} else
 				LOG(DataLog,util::error)
 					<< "Could not load library: " << util::MSubject(dlerror());

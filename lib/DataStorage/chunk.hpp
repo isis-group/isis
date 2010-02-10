@@ -58,7 +58,7 @@ protected:
 	 */
 	template<typename TYPE,typename D> Chunk(TYPE* src,D d,size_t firstDim,size_t secondDim,size_t thirdDim,size_t fourthDim):
 	_internal::ChunkBase(firstDim,secondDim,thirdDim,fourthDim),
-	util::_internal::TypeReference<util::_internal::TypePtrBase>(new util::TypePtr<TYPE>(src,volume()))
+	util::_internal::TypeReference<util::_internal::TypePtrBase>(new util::TypePtr<TYPE>(src,volume(),d))
 	{}
 public:
 	/**

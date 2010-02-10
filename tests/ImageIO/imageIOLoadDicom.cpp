@@ -22,8 +22,8 @@ namespace isis{namespace test{
 		ENABLE_LOG(util::CoreDebug,util::DefaultMsgPrint,util::warning);
 		ENABLE_LOG(data::DataLog,util::DefaultMsgPrint,util::warning);
 		ENABLE_LOG(data::DataDebug,util::DefaultMsgPrint,util::warning);
-		ENABLE_LOG(image_io::ImageIoLog,util::DefaultMsgPrint,util::verbose_info);
-		ENABLE_LOG(image_io::ImageIoDebug,util::DefaultMsgPrint,util::verbose_info);
+		ENABLE_LOG(image_io::ImageIoLog,util::DefaultMsgPrint,util::warning);
+		ENABLE_LOG(image_io::ImageIoDebug,util::DefaultMsgPrint,util::warning);
 		
 		data::ImageList	images=data::IOFactory::load("/SCR/isis_build/testDicom.ima","");
 		
