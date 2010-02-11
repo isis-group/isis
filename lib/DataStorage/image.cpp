@@ -127,7 +127,7 @@ bool Image::reIndex() {
 	set.begin()->toCommonUnique(common,uniques,true);
 	
 	for(ChunkIterator i= ++chunksBegin();i!=chunksEnd();i++){
-		i->toCommonUnique(common,uniques,true);
+		i->toCommonUnique(common,uniques,false);
 	}
 	LOG(DataDebug,util::info) << uniques.size() << " Chunk-unique properties found in the Image";
 	LOG(DataDebug,util::verbose_info) << util::list2string(uniques.begin(),uniques.end(),", ");

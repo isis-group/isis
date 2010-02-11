@@ -74,11 +74,45 @@ std::string ImageFormat_Dicom::suffixes(){return std::string(".ima");}
 std::string ImageFormat_Dicom::name(){return "Dicom";}
 
 
-void ImageFormat_Dicom::sanitise(isis::util::PropMap& object, string dialect) {
-	util::fvector4 voxelSize;
-	const std::string prefix=std::string(ImageFormat_Dicom::dicomTagTreeName)+"/";
+ptime ImageFormat_Dicom::genTimeStamp(const date& date, const ptime& time) {
+	return ptime(date,time.time_of_day());
+}
 
-	// Fix voxelSize
+
+void ImageFormat_Dicom::sanitise(isis::util::PropMap& object, string dialect) {
+	const std::string prefix=std::string(ImageFormat_Dicom::dicomTagTreeName)+"/";
+	
+	// compute sequenceStart and acquisitionTime
+	if(hasOrTell(prefix+"SeriesTime",object,util::warning) && hasOrTell(prefix+"SeriesDate",object,util::warning)){
+		const ptime sequenceStart = genTimeStamp(object[prefix+"SeriesDate"]->as<date>(),object[prefix+"SeriesTime"]->as<ptime>());
+
+		// compute acquisitionTime
+		if(hasOrTell(prefix+"AcquisitionTime",object,util::warning) and hasOrTell(prefix+"AcquisitionDate",object,util::warning)){
+			const ptime acTime = genTimeStamp(object[prefix+"AcquisitionDate"]->as<date>(),object[prefix+"AcquisitionTime"]->as<ptime>());
+			const boost::posix_time::time_duration acDist=acTime-sequenceStart;
+			const float fAcDist=float(acDist.ticks()) / acDist.ticks_per_second();
+			LOG(ImageIoDebug,util::verbose_info) << "Computed acquisitionTime as " <<fAcDist;
+			object.setProperty("acquisitionTime",fAcDist);
+			object.remove(prefix+"AcquisitionTime");
+			object.remove(prefix+"AcquisitionDate");
+		}
+      
+		LOG(ImageIoDebug,util::verbose_info) << "Computed sequenceStart as " <<sequenceStart;
+		
+		object.setProperty("sequenceStart",sequenceStart);
+		object.remove(prefix+"SeriesTime");
+		object.remove(prefix+"SeriesDate");
+	}
+
+	transformOrTell<u_int16_t>  (prefix+"SeriesNumber",     "sequenceNumber",     object,util::warning);
+	transformOrTell<std::string>(prefix+"SeriesDescription","sequenceDescription",object,util::warning);
+	transformOrTell<std::string>(prefix+"PatientsName",     "subjectName",        object,util::warning);
+	transformOrTell<date>       (prefix+"PatientsBirthDate","subjectBirth",       object,util::warning);
+	// @todo sex is missing
+	transformOrTell<u_int16_t>  (prefix+"PatientsWeight",   "subjectWeigth",      object,util::warning);
+	
+	// compute voxelSize
+	util::fvector4 voxelSize;
 	if(hasOrTell(prefix+"PixelSpacing",object,util::info)){
 		voxelSize = object[prefix+"PixelSpacing"]->as<util::fvector4>();
 		object.remove(prefix+"PixelSpacing");
@@ -94,30 +128,24 @@ void ImageFormat_Dicom::sanitise(isis::util::PropMap& object, string dialect) {
 		voxelSize[2]=1;
 	}		
 	object.setProperty("voxelSize",voxelSize);
-	
-	// compute the "sequenceStart"
-	if(hasOrTell(prefix+"SeriesTime",object,util::warning) && hasOrTell(prefix+"SeriesDate",object,util::warning)){
-		const ptime seriesTime=object[prefix+"SeriesTime"]->as<ptime>();
-		const date seriesDate=object[prefix+"SeriesDate"]->as<date>();
-		const ptime sequenceStart(seriesDate,seriesTime.time_of_day());
-		LOG(ImageIoDebug,util::verbose_info) << "Computed sequenceStart as " <<sequenceStart;
-		
-		object.setProperty("sequenceStart",sequenceStart);
-		object.remove(prefix+"SeriesTime");
-		object.remove(prefix+"SeriesDate");
+
+	// Compute voxel gap
+	const float nan=std::numeric_limits<float>::quiet_NaN();
+	util::fvector4 voxelGap(nan,nan,nan,nan);
+	if(hasOrTell(prefix+"RepetitionTime",object,util::warning)){
+		voxelGap[4]=object[prefix+"RepetitionTime"]->as<float>();
+		object.remove(prefix+"RepetitionTime");
 	}
+	object.setProperty("voxelGap",voxelGap);
 
-	// make sure "sequenceNumber" and "acquisitionNumber" are there
-	transformOrTell<u_int16_t>(prefix+"SeriesNumber","sequenceNumber",object,util::warning);
-	transformOrTell<u_int32_t>(prefix+"AcquisitionNumber","acquisitionNumber",object,util::error);
-
-	// Fix indexOrigin/ImagePositionPatient
-	transformOrTell<util::fvector4>(prefix+"ImagePositionPatient","indexOrigin",object,util::warning);
-
-	//get the orientation down here
-	transformOrTell<util::fvector4>(prefix+"readVec","readVec",object,util::error);
-	transformOrTell<util::fvector4>(prefix+"phaseVec","phaseVec",object,util::error);
-	transformOrTell<util::fvector4>(prefix+"sliceVec","sliceVec",object,util::error);
+	transformOrTell<float>         (prefix+"EchoTime",                "echoTime",           object,util::warning);
+	transformOrTell<std::string>   (prefix+"PerformingPhysiciansName","performingPhysician",object,util::warning);
+	transformOrTell<u_int16_t>     (prefix+"NumberOfAverages",        "numberOfAverages",   object,util::warning);
+	transformOrTell<util::fvector4>(prefix+"readVec",                 "readVec",            object,util::error);
+	transformOrTell<util::fvector4>(prefix+"phaseVec",                "phaseVec",           object,util::error);
+	transformOrTell<util::fvector4>(prefix+"sliceVec",                "sliceVec",           object,util::error);
+	transformOrTell<util::fvector4>(prefix+"ImagePositionPatient",    "indexOrigin",        object,util::warning);
+	transformOrTell<u_int32_t>     (prefix+"InstanceNumber",          "acquisitionNumber",  object,util::error);
 }
 
 int ImageFormat_Dicom::load(data::ChunkList &chunks, const std::string& filename, const std::string& dialect )

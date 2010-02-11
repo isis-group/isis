@@ -23,6 +23,7 @@
 #include "DataStorage/io_interface.h"
 #include <dcmtk/config/cfunix.h> //@todo add switch for windows if needed
 #include <dcmtk/dcmdata/dcfilefo.h>
+#include <boost/date_time/posix_time/posix_time_types.hpp>
 
 namespace isis{ namespace image_io{
 	
@@ -30,6 +31,7 @@ class ImageFormat_Dicom: public FileFormat{
 	static void parseAS(DcmElement* elem,const std::string &name,util::PropMap &map);
 	static void parseDA(DcmElement* elem,const std::string &name,util::PropMap &map);
 	static void parseTM(DcmElement* elem,const std::string &name,util::PropMap &map);
+	static boost::posix_time::ptime genTimeStamp(const boost::gregorian::date &date,const boost::posix_time::ptime &time);
 public:
 	static const char dicomTagTreeName[];
 	static const char unknownTagName[];

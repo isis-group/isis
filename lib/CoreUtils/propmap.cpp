@@ -159,7 +159,7 @@ void PropMap::diffTree(const PropMap& other,PropMap::diff_map &ret,std::string p
 			) {
 				PropMap &thisMap=first->cast_to_Type<PropMap>();
 				PropMap &refMap=second->cast_to_Type<PropMap>();
-				diffTree(other,ret,pathname+"/");
+				thisMap.diffTree(refMap,ret,pathname+"/");
 			} else if( not(first.empty() and second.empty())and not(first==second)){ // if they are not both empty, but not equal
 				ret.insert(// add (propertyname|(value1|value2))
 					ret.end(),		// we know it has to be at the end
@@ -227,7 +227,7 @@ void PropMap::joinTree(const isis::util::PropMap& other, bool overwrite, std::st
 		if(continousFind(thisIt, end(),*otherIt, value_comp()))
 		{ // if its allready here
 			if(thisIt->second.empty()){
-				LOG(CoreDebug,info) << "Replacing empty property " << MSubject(*thisIt) << " by " << MSubject(otherIt->second);
+				LOG(CoreDebug,info) << "Replacing empty property " << MSubject(thisIt->first) << " by " << MSubject(otherIt->second);
 				thisIt->second=otherIt->second;
 			} else if(thisIt->second->is<PropMap>() && otherIt->second->is<PropMap>()){
 				PropMap &thisMap=thisIt->second->cast_to_Type<PropMap>();
@@ -266,11 +266,16 @@ size_t PropMap::linearize(isis::util::PropMap::base_type& out, std::string key_p
 bool PropMap::transform( std::string from,  std::string to, int dstId,bool delSource) {
 	LOG_IF(from==to,CoreDebug,error) << "Sorry source and destination shall not be the same";
 	const PropertyValue *found=findPropVal(from);
-	if(found and not found->empty() and found->transformTo(operator[](to),dstId)){
-		if(delSource)remove(from);
-		return true;
+	bool ret=false;
+	if(found and not found->empty()){
+		if((*found)->typeID()==dstId){
+			setPropertyValue(to,*found);
+			ret = true;
+		} else 
+			ret=found->transformTo(operator[](to),dstId);
 	}
-	return false;
+	if(ret and delSource)remove(from);
+	return ret;
 }
 
 
@@ -344,7 +349,7 @@ void PropMap::toCommonUnique(PropMap& common,std::set<std::string> &uniques,bool
 		const util::PropMap::diff_map difference=common.diff(*this);
 		BOOST_FOREACH(const util::PropMap::diff_map::value_type &ref,difference){
 			uniques.insert(ref.first);
-			common.remove(ref.first);
+			if(not ref.second.first.empty())common.remove(ref.first);//if there is something in common, remove it
 		}	
 	}
 }
