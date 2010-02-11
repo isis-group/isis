@@ -2,6 +2,8 @@
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include "common.hpp"
+#include "dcmtk/dcmdata/dcdict.h"
+#include "dcmtk/dcmdata/dcdicent.h"
 
 namespace isis { namespace image_io {
 
@@ -33,7 +35,7 @@ template<typename T> std::list<T> dcmtkListString2list(DcmElement *elem){
 void ImageFormat_Dicom::parseAS(DcmElement* elem,const std::string &name,util::PropMap &map)
 {
 	bool ok = true;
-	long duration;
+	u_int16_t duration;
 	OFString buff;
 	elem->getOFString(buff, 0);
 	
@@ -264,79 +266,75 @@ void ImageFormat_Dicom::parseVector(DcmElement* elem,const std::string &name, ut
 	size_t len=elem->getVM();
 	switch (elem->getVR()) { 
 		case EVR_FL: {
+			Float32 *buff;
+			elem->getFloat32Array(buff);
 			if(len<=4){
-				Float32 *buff;
-				elem->getFloat32Array(buff);
 				util::fvector4 vector;
 				vector.copyFrom(buff,buff+len);
 				map[name] = vector;//if Float32 is float its fine, if not we will get an linker error here
 			} else {
-				elem->getOFStringArray(buff);
-				LOG(ImageIoLog,util::error) << "Cannot store " << util::MSubject(std::make_pair(name,buff)) << " its to long";
+				map[name]=util::dlist(buff,buff+len);
 			}
 		}break;
 		case EVR_FD: {
+			Float64 *buff;
+			elem->getFloat64Array(buff);
 			if(len<=4){
-				Float64 *buff;
-				elem->getFloat64Array(buff);
 				util::dvector4 vector;
 				vector.copyFrom(buff,buff+len);
 				map[name] = vector;//if Float64 is double its fine, if not we will get an linker error here
 			} else {
-				elem->getOFStringArray(buff);
-				LOG(ImageIoLog,util::error) << "Cannot store " << util::MSubject(std::make_pair(name,buff)) << " its to long";
+				map[name]=util::dlist(buff,buff+len);
 			}
 		}break;
 		case EVR_IS: {
 			elem->getOFStringArray(buff);
+			const util::ilist tokens=util::string2list<int>(std::string(buff.c_str()),"\\\\");
 			if(len<=4){
-				std::list<int> tokens=util::string2list<int>(std::string(buff.c_str()),"\\\\");
 				util::ivector4 vector;
 				vector.copyFrom(tokens.begin(),tokens.end());
 				map[name] = vector;
 			} else {
-				LOG(ImageIoLog,util::error) << "Cannot store " << util::MSubject(std::make_pair(name,buff)) << " its to long";
+				map[name] = tokens;
 			}
 		}break;
 		case EVR_SL: {
+			Sint32 *buff;
+			elem->getSint32Array(buff);
 			if(len<=4){
-				Sint32 *buff;
-				elem->getSint32Array(buff);
 				util::ivector4 vector;
 				vector.copyFrom(buff,buff+len);
 				map[name] = vector;
 			} else {
-				elem->getOFStringArray(buff);
-				LOG(ImageIoLog,util::error) << "Cannot store " << util::MSubject(std::make_pair(name,buff)) << " its to long";
+				map[name]=util::ilist(buff,buff+len);
 			}
 		}break;
 		case EVR_US: {
+			Uint16 *buff;
+			elem->getUint16Array(buff);
 			if(len<=4){
-				Uint16 *buff;
-				elem->getUint16Array(buff);
 				util::ivector4 vector;
 				vector.copyFrom(buff,buff+len);
 				map[name] = vector;
 			} else {
-				elem->getOFStringArray(buff);
-				LOG(ImageIoLog,util::error) << "Cannot store " << util::MSubject(std::make_pair(name,buff)) << " its to long";
+				map[name]=util::ilist(buff,buff+len);
 			}
 		}break;
 		case EVR_CS: // Code String (string)
 		case EVR_SH: //short string
 		case EVR_ST:{ //short text
 			elem->getOFStringArray(buff);
-			map[name] = boost::lexical_cast<std::string>(buff);
+			map[name] = std::string(buff.c_str());
 		}break;
 		case EVR_DS:{
 			elem->getOFStringArray(buff);
+			std::list<double> tokens=util::string2list<double>(std::string(buff.c_str()),"\\\\");
 			if(len<=4){
-				std::list<double> tokens=util::string2list<double>(std::string(buff.c_str()),"\\\\");
 				util::dvector4 vector;
 				vector.copyFrom(tokens.begin(),tokens.end());
 				map[name] = vector;
 			} else {
-				LOG(ImageIoLog,util::error) << "Cannot store " << util::MSubject(std::make_pair(name,buff)) << " its to long";
+				map[name]=tokens;
 			}
 		}break;
 		case EVR_AS:
@@ -365,7 +363,15 @@ void ImageFormat_Dicom::parseVector(DcmElement* elem,const std::string &name, ut
 void ImageFormat_Dicom::dcmObject2PropMap(DcmObject* master_obj, util::PropMap &map)
 {
 	for (DcmObject* obj = master_obj->nextInContainer(NULL);obj;obj = master_obj->nextInContainer(obj)) {
-		std::string name(const_cast<DcmTag&>(obj->getTag()).getTagName());
+		const DcmTag &tag=const_cast<DcmTag&>(obj->getTag());
+		std::string name;
+		const DcmDataDictionary& globalDataDict = dcmDataDict.rdlock();
+		const DcmDictEntry *dictRef = globalDataDict.findEntry(tag, tag.getPrivateCreator());
+		if (dictRef) name=dictRef->getTagName();
+		else 
+			name = std::string(unknownTagName) + tag.toString().c_str();
+		
+		dcmDataDict.unlock();
 
 		if (name == "PixelData")
 			continue;//skip the image data

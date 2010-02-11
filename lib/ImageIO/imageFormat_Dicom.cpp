@@ -68,6 +68,7 @@ using boost::posix_time::ptime;
 using boost::gregorian::date;
 
 const char ImageFormat_Dicom::dicomTagTreeName[]="DICOM";
+const char ImageFormat_Dicom::unknownTagName[]="Unknown Tag";
 
 std::string ImageFormat_Dicom::suffixes(){return std::string(".ima");}
 std::string ImageFormat_Dicom::name(){return "Dicom";}
@@ -151,7 +152,7 @@ size_t ImageFormat_Dicom::maxDim(){return 2;}
 isis::image_io::FileFormat* factory(){
 	if (not dcmDataDict.isDictionaryLoaded()){
 		LOG(isis::image_io::ImageIoLog,isis::util::error)
-			<< "No data dictionary loaded, check environment variable ";
+			<< "No data dictionary loaded, check environment variable "; //set DCMDICTPATH or fix DCM_DICT_DEFAULT_PATH in cfunix.h of dcmtk
 		return NULL;
 	}	
 	return new isis::image_io::ImageFormat_Dicom();

@@ -48,6 +48,10 @@ DEF_TYPE(fvector4,fvector4);
 DEF_TYPE(dvector4,dvector4);
 DEF_TYPE(ivector4,ivector4);
 
+DEF_TYPE(ilist,list<int>);
+DEF_TYPE(dlist,list<double>);
+DEF_TYPE(slist,list<string>);
+
 DEF_TYPE(std::string,string);
 DEF_TYPE(PropMap,PropertyMap);
 DEF_TYPE(boost::posix_time::ptime,timestamp);

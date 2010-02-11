@@ -20,7 +20,7 @@
 #ifndef IMAGEFORMAT_DICOM_HPP
 #define IMAGEFORMAT_DICOM_HPP
 
-#include <DataStorage/io_interface.h>
+#include "DataStorage/io_interface.h"
 #include <dcmtk/config/cfunix.h> //@todo add switch for windows if needed
 #include <dcmtk/dcmdata/dcfilefo.h>
 
@@ -32,6 +32,7 @@ class ImageFormat_Dicom: public FileFormat{
 	static void parseTM(DcmElement* elem,const std::string &name,util::PropMap &map);
 public:
 	static const char dicomTagTreeName[];
+	static const char unknownTagName[];
 	static void parseOrientation(DcmElement* elem, const std::string& name, isis::util::PropMap& map);
 	static void parseScalar(DcmElement* elem, const std::string& name, isis::util::PropMap& map);
 	static void parseVector(DcmElement* elem, const std::string& name, isis::util::PropMap& map);

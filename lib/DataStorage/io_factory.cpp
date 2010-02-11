@@ -67,6 +67,7 @@ unsigned int IOFactory::findPlugins(const std::string& path)
 		return 0;
 	}
 
+	LOG(DataLog,util::info)	<< "Scanning " << util::MSubject(p)	<< " for plugins";
 	boost::regex pluginFilter(std::string("^")+DL_PREFIX+"isisImageFormat_"+"[[:word:]]+"+DL_SUFFIX+"$");
 	unsigned int ret=0;
 	for (boost::filesystem::directory_iterator itr(p); itr!=boost::filesystem::directory_iterator(); ++itr)	{
@@ -92,7 +93,7 @@ unsigned int IOFactory::findPlugins(const std::string& path)
 				LOG(DataLog,util::error)
 					<< "Could not load library: " << util::MSubject(dlerror());
 		} else {
-			LOG(DataLog,util::info)
+			LOG(DataLog,util::verbose_info)
 				<< "Ignoring " << util::MSubject(itr->path())
 				<< " because it doesn't match " << pluginFilter.str();
 		}
@@ -129,7 +130,7 @@ int IOFactory::loadFile(ChunkList &ret,const boost::filesystem::path& filename, 
 	}
 
 	BOOST_FOREACH(FileFormatList::const_reference it,formatReader){
-		LOG(DataDebug,util::info)
+		LOG(DataDebug,util::verbose_info)
 			<< "plugin to load file " <<  filename << ": " << it->name()
 			<< 	(dialect.empty() ?
 					std::string("") : std::string(" with dialect: ") + dialect
@@ -138,7 +139,7 @@ int IOFactory::loadFile(ChunkList &ret,const boost::filesystem::path& filename, 
 		const int loadedChunks = it->load(ret,filename.string(), dialect);
 		if (loadedChunks){//load succesfully
 			LOG(DataLog,util::info)
-				<< "loaded " << loadedChunks << " Chunks from " <<  filename;
+				<< it->name() << " loaded " << loadedChunks << " Chunks from " <<  filename;
 			return loadedChunks;
 		}
 	}
@@ -167,7 +168,7 @@ IOFactory::FileFormatList IOFactory::getFormatInterface(const std::string& filen
 }
 
 
-data::ImageList IOFactory::load(const std::string& path, const std::string& dialect)
+data::ImageList IOFactory::load(const std::string& path, std::string dialect)
 {
 	const boost::filesystem::path p(path);
 	ChunkList chunks;

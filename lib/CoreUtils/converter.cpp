@@ -190,6 +190,10 @@ template<typename TYPE> class TypeConverter<false,false,std::string,vector4<TYPE
 public:
 	virtual ~TypeConverter(){}
 };
+template<typename TYPE> class TypeConverter<false,false,std::string,std::list<TYPE> >:public TypeGenerator<std::string,vector4<TYPE> >{
+	public:
+		virtual ~TypeConverter(){}
+};
 
 template<typename SRC> struct inner_add {
 	std::map<int, boost::shared_ptr<TypeConverterBase> > &m_subMap;

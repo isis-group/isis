@@ -1,7 +1,7 @@
-#include <DataStorage/io_interface.h>
-#include <boost/foreach.hpp>
-#include <CoreUtils/log.hpp>
-#include "boost/filesystem.hpp"
+#include "DataStorage/io_interface.h"
+#include "boost/foreach.hpp"
+#include "CoreUtils/log.hpp"
+#include <boost/filesystem.hpp>
 #include "ImageIO/common.hpp"
 
 namespace isis{ namespace image_io{

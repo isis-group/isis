@@ -61,7 +61,7 @@ PropertyValue& PropMap::fetchProperty(
 		return ref[*at]; // (create and) return that entry
 	}
 }
-const isis::util::PropertyValue* PropMap::searchBranch(
+const PropertyValue* PropMap::searchBranch(
 	const PropMap& root,
 	const propPathIterator at,const propPathIterator pathEnd)
 {
@@ -253,12 +253,12 @@ void PropMap::joinTree(const isis::util::PropMap& other, bool overwrite, std::st
 size_t PropMap::linearize(isis::util::PropMap::base_type& out, std::string key_prefix) const
 {
 	for(const_iterator i=begin();i!=end();i++){
+		std::string key= (key_prefix.empty() ? "":key_prefix+pathSeperator)+i->first;
 		if((not i->second.empty()) and i->second->is<PropMap>()){
-			if(not key_prefix.empty())key_prefix+=pathSeperator;
 			util::PropMap &sub=i->second->cast_to_Type<util::PropMap>();
-			sub.linearize(out,key_prefix);
+			sub.linearize(out,key);
 		} else
-			out.insert(std::make_pair(key_prefix+i->first,i->second));
+			out.insert(std::make_pair(key,i->second));
 	}
 	
 }

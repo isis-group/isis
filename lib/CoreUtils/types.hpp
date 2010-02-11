@@ -17,12 +17,17 @@ namespace isis{ namespace util{
 	
 class PropMap; // predef PropMap
 
+typedef std::list<int> ilist;
+typedef std::list<double> dlist;
+typedef std::list<std::string> slist;
+
 namespace _internal{
 
 typedef boost::mpl::vector<
 int8_t,uint8_t,int16_t,uint16_t,int32_t,uint32_t,int64_t,uint64_t
 ,float,double
 ,fvector4,dvector4,ivector4,std::string
+,ilist,dlist,slist
 ,PropMap
 ,boost::posix_time::ptime,boost::gregorian::date
 > types;

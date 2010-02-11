@@ -201,6 +201,12 @@ basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits> &out,const
 	isis::util::write_list(s.begin(),s.end(),out,"\n","","");
 	return out;
 }
+template<typename charT, typename traits, typename _Tp, typename _Alloc >
+basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits> &out,const list<_Tp,_Alloc>& s)
+{
+	isis::util::write_list(s.begin(),s.end(),out);
+	return out;
+}
 
 }
 #endif //CORE_COMMON_HPP
