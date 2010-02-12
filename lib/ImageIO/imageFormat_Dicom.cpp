@@ -141,9 +141,22 @@ void ImageFormat_Dicom::sanitise(isis::util::PropMap& object, string dialect) {
 	transformOrTell<float>         (prefix+"EchoTime",                "echoTime",           object,util::warning);
 	transformOrTell<std::string>   (prefix+"PerformingPhysiciansName","performingPhysician",object,util::warning);
 	transformOrTell<u_int16_t>     (prefix+"NumberOfAverages",        "numberOfAverages",   object,util::warning);
-	transformOrTell<util::fvector4>(prefix+"readVec",                 "readVec",            object,util::error);
-	transformOrTell<util::fvector4>(prefix+"phaseVec",                "phaseVec",           object,util::error);
-	transformOrTell<util::fvector4>(prefix+"sliceVec",                "sliceVec",           object,util::error);
+
+	if(hasOrTell(prefix+"ImageOrientationPatient",object,util::error)){
+		util::dlist buff=object[prefix+"ImageOrientationPatient"]->as<util::dlist>();
+		if(buff.size()==6){
+			util::fvector4 read,phase;
+			util::dlist::iterator b=buff.begin();
+			for(int i=0;i<3;i++)read[i]=*b++;
+			for(int i=0;i<3;i++)phase[i]=*b++;
+			object.setProperty("readVec" ,read);
+			object.setProperty("phaseVec",phase);
+			object.remove(prefix+"ImageOrientationPatient");
+		} else {
+			LOG(ImageIoLog,util::error) << "Could not extract read- and phaseVector from " << object[prefix+"ImageOrientationPatient"];
+		}
+	}
+
 	transformOrTell<util::fvector4>(prefix+"ImagePositionPatient",    "indexOrigin",        object,util::warning);
 	transformOrTell<u_int32_t>     (prefix+"InstanceNumber",          "acquisitionNumber",  object,util::error);
 }

@@ -35,9 +35,9 @@ class ImageFormat_Dicom: public FileFormat{
 public:
 	static const char dicomTagTreeName[];
 	static const char unknownTagName[];
-	static void parseOrientation(DcmElement* elem, const std::string& name, isis::util::PropMap& map);
 	static void parseScalar(DcmElement* elem, const std::string& name, isis::util::PropMap& map);
 	static void parseVector(DcmElement* elem, const std::string& name, isis::util::PropMap& map);
+	static void parseList(DcmElement* elem, const std::string& name, isis::util::PropMap& map);
 	static void dcmObject2PropMap(DcmObject* master_obj,util::PropMap &map);
 	static void sanitise(util::PropMap& object, string dialect);
 	std::string suffixes();

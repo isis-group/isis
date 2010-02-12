@@ -141,30 +141,48 @@ bool Image::reIndex() {
 		getChunkAt(i).make_unique(common);
 	LOG(DataDebug,util::verbose_info) << "common properties removed from " << set.size() << " chunks: " << common;
 
-	//try to calculate slice vector if its missing
-	if(not hasProperty("sliceVec")){
-		if(chunk_dims==2 and size[2]>1){ //if we have at least two slides we can use their distance-vector
-			const util::fvector4 thisV=lookup[0]->getProperty<util::fvector4>("indexOrigin");
-			const util::fvector4 nextV=lookup[size[2]]->getProperty<util::fvector4>("indexOrigin");
- 			setProperty("sliceVec",util::fvector4(nextV-thisV));
+	//if we have at least two slides
+	if(chunk_dims==2 and size[2]>1){ 
+		const util::fvector4 thisV=lookup[0]->getProperty<util::fvector4>("indexOrigin");
+		const util::fvector4 nextV=lookup[size[2]-1]->getProperty<util::fvector4>("indexOrigin");
+		const util::fvector4 distVec= (nextV-thisV).norm(); //we could use their distance-vector as sliceVector
+		if(hasProperty("sliceVec")){
+			const util::fvector4 sliceVec=getProperty<util::fvector4>("sliceVec");
+			LOG_IF(distVec!=sliceVec,DataLog,util::warning)
+				<< "The existing sliceVec " << sliceVec
+				<< " differs from the distance vector between chunk 0 and " << size[2]-1
+				<< " " << distVec;
+		} else {
 			LOG(DataDebug,util::info)
-				<< "used the distance between chunk 0 and "	<< size[2]
-				<< " as sliceVec " << getPropertyValue("sliceVec");
-		} else if(hasProperty("readVec") and hasProperty("phaseVec")){
-			//if we have read- and phase- vector, assume sliceVec to be ortogonal to them
-			const util::fvector4 read=getProperty<util::fvector4>("readVec");
-			const util::fvector4 phase=getProperty<util::fvector4>("phaseVec");
-			const util::fvector4 cross(
-				read[1]*phase[2]-read[2]*phase[1],
-				read[2]*phase[0]-read[0]*phase[2],
-				read[0]*phase[1]-read[1]*phase[0]
-			);
-			setProperty("sliceVec",cross);
+				<< "used the distance between chunk 0 and "	<< size[2]-1
+				<< " to synthesize the missing sliceVec as " << distVec;
+			setProperty("sliceVec",distVec);
+		}
+	}
+	//if we have read- and phase- vector
+	if(hasProperty("readVec") and hasProperty("phaseVec")){
+		util::fvector4 &read=operator[]("readVec")->cast_to_Type<util::fvector4>();
+		util::fvector4 &phase=operator[]("phaseVec")->cast_to_Type<util::fvector4>();
+		read.norm();
+		phase.norm();
+		const util::fvector4 crossVec =util::fvector4( //we could use their cross-product as sliceVector
+			read[1]*phase[2]-read[2]*phase[1],
+			read[2]*phase[0]-read[0]*phase[2],
+			read[0]*phase[1]-read[1]*phase[0]
+		);
+		if(hasProperty("sliceVec")){
+			const util::fvector4 sliceVec=getProperty<util::fvector4>("sliceVec");
+			LOG_IF(crossVec!=sliceVec,DataLog,util::warning)
+				<< "The existing sliceVec " << sliceVec
+				<< " differs from the cross product of the read- and phase vector " << crossVec;
+		} else {
 			LOG(DataDebug,util::info)
 				<< "used the cross product between readVec and phaseVec as sliceVec"
 				<< getPropertyValue("sliceVec");
-		} else
-			LOG(DataLog,util::warning) << "Cannot compute the missing sliceVec";
+			LOG_IF(read.dot(phase)>0.01,DataLog,util::warning)
+				<< "The cosine between the columns and the rows of the image is bigger than 0.01";
+			setProperty("sliceVec",crossVec);
+		}
 	}
 	
 	init(size);

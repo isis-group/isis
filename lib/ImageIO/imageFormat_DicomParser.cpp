@@ -158,35 +158,6 @@ void ImageFormat_Dicom::parseTM(DcmElement* elem,const std::string &name,util::P
 			<< "Cannot parse Time string \"" << buff << "\" in the field \"" << name << "\"";
 }
 
-void ImageFormat_Dicom::parseOrientation(DcmElement* elem,const std::string &name,util::PropMap &map)
-{
-	// The ImageOrientationPatient is a pair of two 3vectors
-	// first describes read-direction in scanner space
-	// dsecond describes phase-direction in scanner space
-	util::fvector4 readVec,phaseVec;
-	std::list<float> tokens=_internal::dcmtkListString2list<float>(elem);
-	LOG_IF(tokens.size()!=6,ImageIoDebug,util::error)
-		<< util::MSubject(name) << " does not contain six elements as it should";
-	std::list<float>::const_iterator token=tokens.begin();
-	for(int i=0;i<3 and token!=tokens.end();i++,token++)
-		readVec[i]=*token;
-	for(int i=0;i<3 and token!=tokens.end();i++,token++)
-		phaseVec[i]=*token;
-	LOG_IF(readVec.dot(phaseVec)>0.01,ImageIoLog,util::info)
-		<< "The cosine between the columns and the rows of the image is bigger than 0.01";
-	map["readVec"]=readVec;
-	map["phaseVec"]=phaseVec;
-	util::fvector4 sliceVec(
-		readVec[1]*phaseVec[2]+readVec[2]*phaseVec[1],
-		readVec[2]*phaseVec[0]+readVec[0]*phaseVec[2],
-		readVec[0]*phaseVec[1]+readVec[1]*phaseVec[0]
-	);
-	map["sliceVec"]=sliceVec;
-	LOG(ImageIoDebug,util::info) << "readVec : " << readVec;
-	LOG(ImageIoDebug,util::info) << "phaseVec: " << phaseVec;
-	LOG(ImageIoDebug,util::info) << "sliceVec: " << sliceVec;
-}
-
 void ImageFormat_Dicom::parseScalar(DcmElement* elem,const std::string &name, util::PropMap &map)
 {
 	OFString buff;
@@ -268,74 +239,47 @@ void ImageFormat_Dicom::parseVector(DcmElement* elem,const std::string &name, ut
 		case EVR_FL: {
 			Float32 *buff;
 			elem->getFloat32Array(buff);
-			if(len<=4){
-				util::fvector4 vector;
-				vector.copyFrom(buff,buff+len);
-				map[name] = vector;//if Float32 is float its fine, if not we will get an linker error here
-			} else {
-				map[name]=util::dlist(buff,buff+len);
-			}
+			util::fvector4 vector;
+			vector.copyFrom(buff,buff+len);
+			map[name] = vector;//if Float32 is float its fine, if not we will get an linker error here
 		}break;
 		case EVR_FD: {
 			Float64 *buff;
 			elem->getFloat64Array(buff);
-			if(len<=4){
-				util::dvector4 vector;
-				vector.copyFrom(buff,buff+len);
-				map[name] = vector;//if Float64 is double its fine, if not we will get an linker error here
-			} else {
-				map[name]=util::dlist(buff,buff+len);
-			}
+			util::dvector4 vector;
+			vector.copyFrom(buff,buff+len);
+			map[name] = vector;//if Float64 is double its fine, if not we will get an linker error here
 		}break;
 		case EVR_IS: {
-			elem->getOFStringArray(buff);
-			const util::ilist tokens=util::string2list<int>(std::string(buff.c_str()),"\\\\");
-			if(len<=4){
-				util::ivector4 vector;
-				vector.copyFrom(tokens.begin(),tokens.end());
-				map[name] = vector;
-			} else {
-				map[name] = tokens;
-			}
+			const util::ilist tokens=_internal::dcmtkListString2list<int>(elem);
+			util::ivector4 vector;
+			vector.copyFrom(tokens.begin(),tokens.end());
+			map[name] = vector;
 		}break;
 		case EVR_SL: {
 			Sint32 *buff;
 			elem->getSint32Array(buff);
-			if(len<=4){
-				util::ivector4 vector;
-				vector.copyFrom(buff,buff+len);
-				map[name] = vector;
-			} else {
-				map[name]=util::ilist(buff,buff+len);
-			}
+			util::ivector4 vector;
+			vector.copyFrom(buff,buff+len);
+			map[name] = vector;
 		}break;
 		case EVR_US: {
 			Uint16 *buff;
 			elem->getUint16Array(buff);
-			if(len<=4){
-				util::ivector4 vector;
-				vector.copyFrom(buff,buff+len);
-				map[name] = vector;
-			} else {
-				map[name]=util::ilist(buff,buff+len);
-			}
+			util::ivector4 vector;
+			vector.copyFrom(buff,buff+len);
+			map[name] = vector;
 		}break;
 		case EVR_CS: // Code String (string)
 		case EVR_SH: //short string
 		case EVR_ST:{ //short text
-			elem->getOFStringArray(buff);
-			map[name] = std::string(buff.c_str());
+			map[name] = _internal::dcmtkListString2list<std::string>(elem);
 		}break;
 		case EVR_DS:{
-			elem->getOFStringArray(buff);
-			std::list<double> tokens=util::string2list<double>(std::string(buff.c_str()),"\\\\");
-			if(len<=4){
-				util::dvector4 vector;
-				vector.copyFrom(tokens.begin(),tokens.end());
-				map[name] = vector;
-			} else {
-				map[name]=tokens;
-			}
+			const util::dlist tokens=_internal::dcmtkListString2list<double>(elem);
+			util::dvector4 vector;
+			vector.copyFrom(tokens.begin(),tokens.end());
+			map[name] = vector;
 		}break;
 		case EVR_AS:
 		case EVR_DA:
@@ -356,7 +300,65 @@ void ImageFormat_Dicom::parseVector(DcmElement* elem,const std::string &name, ut
 			<< buff;
 		}break;
 	}
-	LOG(ImageIoDebug,util::verbose_info) << "Parsed " << name << " as " << map[name];
+	LOG(ImageIoDebug,util::verbose_info) << "Parsed the vector " << name << " as " << map[name];
+}
+
+void ImageFormat_Dicom::parseList(DcmElement* elem,const std::string &name, util::PropMap &map)
+{
+	OFString buff;
+	size_t len=elem->getVM();
+	switch (elem->getVR()) {
+		case EVR_FL: {
+			Float32 *buff;
+			elem->getFloat32Array(buff);
+			map[name]=util::dlist(buff,buff+len);
+		}break;
+		case EVR_FD: {
+			Float64 *buff;
+			elem->getFloat64Array(buff);
+			map[name]=util::dlist(buff,buff+len);
+		}break;
+		case EVR_IS: {
+			map[name] = _internal::dcmtkListString2list<int>(elem);
+		}break;
+		case EVR_SL: {
+			Sint32 *buff;
+			elem->getSint32Array(buff);
+			map[name]=util::ilist(buff,buff+len);
+		}break;
+		case EVR_US: {
+			Uint16 *buff;
+			elem->getUint16Array(buff);
+			map[name]=util::ilist(buff,buff+len);
+		}break;
+		case EVR_CS: // Code String (string)
+		case EVR_SH: //short string
+		case EVR_ST:{ //short text
+			map[name] = _internal::dcmtkListString2list<string>(elem);
+		}break;
+		case EVR_DS:{
+			map[name]=_internal::dcmtkListString2list<double>(elem);
+		}break;
+		case EVR_AS:
+		case EVR_DA:
+		case EVR_TM:
+		case EVR_SS:
+		case EVR_UL:
+		case EVR_AE: //Application Entity (string)
+		case EVR_LT: //long text
+		case EVR_LO: //long string
+		case EVR_UT: //Unlimited Text
+		case EVR_UI: //Unique Identifier [0-9\.]
+		case EVR_PN:
+		default: {
+			elem->getOFStringArray(buff);
+			LOG(ImageIoLog, util::info) << "Implement me "
+			<< name << "("
+			<< const_cast<DcmTag&>(elem->getTag()).getVRName() << "):"
+			<< buff;
+		}break;
+	}
+	LOG(ImageIoDebug,util::verbose_info) << "Parsed the list " << name << " as " << map[name];
 }
 
 
@@ -383,13 +385,18 @@ void ImageFormat_Dicom::dcmObject2PropMap(DcmObject* master_obj, util::PropMap &
 			//@todo special handling needed
 		} else if (name == "MedComHistoryInformation") {
 			//@todo special handling needed
-		} else if (name == "ImageOrientationPatient") {
-			parseOrientation(dynamic_cast<DcmElement*>(obj),name,map);
 		} else if (obj->isLeaf()) {
 			DcmElement* elem = dynamic_cast<DcmElement*>(obj);
 			const size_t mult=obj->getVM();
-			if(mult==1)parseScalar(elem,name,map);
-			else if(mult>1)parseVector(elem,name,map);
+			if(mult==0)
+				LOG(ImageIoLog,util::info) << "Skipping empty Dicom-Tag " << name;
+			else if(mult==1)
+				parseScalar(elem,name,map);
+			else if(mult<=4)
+				parseVector(elem,name,map);
+			else
+				parseList(elem,name,map); // for any other value
+			
 		} else {
 			map[name] = util::PropMap();
 			dcmObject2PropMap(obj, map[name]->cast_to_Type<util::PropMap>());

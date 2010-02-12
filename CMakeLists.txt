@@ -92,6 +92,7 @@ endif(SVN_REVISION)
 ###############################################################################
 
 add_subdirectory(lib)
+add_subdirectory(tools)
 
 IF(BUILD_APPLICATIONS)
 	add_subdirectory(apps)

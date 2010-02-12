@@ -227,7 +227,7 @@ void PropMap::joinTree(const isis::util::PropMap& other, bool overwrite, std::st
 		if(continousFind(thisIt, end(),*otherIt, value_comp()))
 		{ // if its allready here
 			if(thisIt->second.empty()){
-				LOG(CoreDebug,info) << "Replacing empty property " << MSubject(thisIt->first) << " by " << MSubject(otherIt->second);
+				LOG(CoreDebug,verbose_info) << "Replacing empty property " << MSubject(thisIt->first) << " by " << MSubject(otherIt->second);
 				thisIt->second=otherIt->second;
 			} else if(thisIt->second->is<PropMap>() && otherIt->second->is<PropMap>()){
 				PropMap &thisMap=thisIt->second->cast_to_Type<PropMap>();
@@ -244,7 +244,7 @@ void PropMap::joinTree(const isis::util::PropMap& other, bool overwrite, std::st
 			}
 		} else {
 			std::pair<const_iterator,bool> inserted=insert(*otherIt);
-			LOG_IF(inserted.second,CoreDebug,info) << "Inserted property " << MSubject(*inserted.first) << ".";
+			LOG_IF(inserted.second,CoreDebug,verbose_info) << "Inserted property " << MSubject(*inserted.first) << ".";
 		}
 	}
 }
@@ -359,7 +359,7 @@ std::ostream& PropMap::print( std::ostream& out,bool label)const {
 	base_type buff;
 	linearize(buff);
 	for(base_type::const_iterator i=buff.begin();i!=buff.end();i++)
-		out << i->first << ": " << i->second->toString(label) << std::endl;
+		out << i->first << ":" << i->second.toString(label) << std::endl;
 	return out;
 }
 

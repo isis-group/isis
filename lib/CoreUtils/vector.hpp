@@ -174,11 +174,12 @@ public:
 	 * 
 	 * If len() is equal to zero std::invalid_argument will be thrown, and this wont be changed.
 	 */
-	void norm()throw(std::invalid_argument)
+	const this_class& norm()throw(std::invalid_argument)
 	{
 		const TYPE d= len();
 		if(d==0)throw(std::invalid_argument("Trying to normalize a vector of length 0"));
 		else *this = *this / d;
+		return *this;
 	}
 
 	/////////////////////////////////////////////////////////////////////////

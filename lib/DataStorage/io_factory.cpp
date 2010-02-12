@@ -137,11 +137,8 @@ int IOFactory::loadFile(ChunkList &ret,const boost::filesystem::path& filename, 
 				);
 		
 		const int loadedChunks = it->load(ret,filename.string(), dialect);
-		if (loadedChunks){//load succesfully
-			LOG(DataLog,util::info)
-				<< it->name() << " loaded " << loadedChunks << " Chunks from " <<  filename;
+		if (loadedChunks)
 			return loadedChunks;
-		}
 	}
 	LOG(DataLog,util::error)
 		<< "Failed not read file: " << filename; //@todo error message missing
@@ -188,8 +185,6 @@ int IOFactory::loadPath(ChunkList &ret,const boost::filesystem::path& path, cons
 		if(boost::filesystem::is_directory(*itr))continue;
 		loaded+=loadFile(ret,itr->path(),dialect);
 	}
-	LOG(DataDebug,util::info)
-		<< "Got " << loaded << " Chunks from loading directory " << path;
 	return loaded;
 }
 

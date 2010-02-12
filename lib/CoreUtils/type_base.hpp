@@ -134,6 +134,12 @@ public:
 	bool empty()const{
 		return this->get()==NULL;
 	}
+	const std::string toString(bool label=false)const{
+		if(empty())
+			return std::string("\xd8"); //ASCII code empty set
+		else
+			return this->get()->toString(label);
+	}
 };
 
 class TypeBase : public GenericType{
@@ -255,11 +261,7 @@ operator<<(basic_ostream<charT, traits> &out,const isis::util::_internal::Generi
 /// /// Streaming output for Type referencing classes
 template<typename charT, typename traits,typename TYPE_TYPE> basic_ostream<charT, traits>&
 operator<<(basic_ostream<charT, traits> &out,const isis::util::_internal::TypeReference<TYPE_TYPE> &s){
-	out << 	(s.empty() ?
-				std::string("\xd8"): //ASCII code empty set
-				s->toString(true)
-			);
-	return out;
+	return out << s.toString(true);
 }
 }
 
