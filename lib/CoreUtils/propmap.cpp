@@ -15,7 +15,6 @@
 
 namespace isis{ namespace util{ 
 
-const char PropMap::pathSeperator[] = "/";
 const util::PropertyValue PropMap::emptyProp;//dummy to be able to return an empty Property
 
 
@@ -358,8 +357,13 @@ void PropMap::toCommonUnique(PropMap& common,std::set<std::string> &uniques,bool
 std::ostream& PropMap::print( std::ostream& out,bool label)const {
 	base_type buff;
 	linearize(buff);
+	size_t key_len=0;
 	for(base_type::const_iterator i=buff.begin();i!=buff.end();i++)
-		out << i->first << ":" << i->second.toString(label) << std::endl;
+		if(key_len < i->first.length())
+			key_len = i->first.length();
+
+	for(base_type::const_iterator i=buff.begin();i!=buff.end();i++)
+		out << i->first << std::string(key_len-i->first.length(),' ')+":" << i->second.toString(label) << std::endl;
 	return out;
 }
 

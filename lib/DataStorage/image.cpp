@@ -134,12 +134,11 @@ bool Image::reIndex() {
 
 	join(common);
 	LOG(DataDebug,util::verbose_info) << "common properties saved into the image" << common;
-	LOG(DataDebug,util::verbose_info) << "It now has: " << static_cast<PropMap>(*this);
 
 	//remove common props from the chunks
 	for(size_t i=0;i!=lookup.size();i++)
 		getChunkAt(i).make_unique(common);
-	LOG(DataDebug,util::verbose_info) << "common properties removed from " << set.size() << " chunks: " << common;
+	LOG(DataDebug,util::info) << "common properties removed from " << set.size() << " chunks: " << common;
 
 	//if we have at least two slides
 	if(chunk_dims==2 and size[2]>1){ 

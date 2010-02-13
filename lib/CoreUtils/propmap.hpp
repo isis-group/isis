@@ -39,7 +39,7 @@ private:
 	typedef std::list<std::string> propPath;
 	typedef propPath::const_iterator propPathIterator;
 	
-	static const char pathSeperator[];
+	static const char pathSeperator = '/';
 	static const util::PropertyValue emptyProp;//dummy to be able to return an empty Property
 
 	/////////////////////////////////////////////////////////////////////////////////////////

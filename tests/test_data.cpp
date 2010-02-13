@@ -6,7 +6,7 @@
 using namespace isis::data;
 using namespace isis::util;
 
-namespace test{
+namespace isis{ namespace test{
 struct SpeakingDeleter{
 	std::string m_name;
 	SpeakingDeleter(std::string name):m_name(name){}
@@ -75,4 +75,4 @@ int main(){
 	std::cout << "cp.voxel(0,0,0,5):" << cp.voxel<short>(0,0,0,5) << std::endl;
 	std::cout << "list.begin()->getTypePtr<short>().toString():" << list.begin()->getTypePtr<short>().toString() << std::endl;
 }
-}
+}}

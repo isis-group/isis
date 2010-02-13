@@ -125,7 +125,7 @@ int IOFactory::loadFile(ChunkList &ret,const boost::filesystem::path& filename, 
 
 	if(true == formatReader.empty()){//no suitable plugin for this file type and dialect
 		LOG(DataLog,util::error)
-				<< "Missing plugin to open file: " << filename << " with dialect: " << dialect;
+				<< "Missing plugin to open file: " << filename << (dialect.empty()? "":std::string(" with dialect: ") + dialect);
 		return 0;
 	}
 
@@ -174,7 +174,7 @@ data::ImageList IOFactory::load(const std::string& path, std::string dialect)
 		get().loadFile(chunks,p,dialect);
 	const data::ImageList images(chunks);
 	LOG(DataLog,util::info)
-		<< "Loaded " << images.size() << " images ("<< loaded << " chunks) from " << p;
+		<< "Generated " << images.size() << " images out of "<< loaded << " chunks from " << (boost::filesystem::is_directory(p) ? "directory ":"" ) << p;
 	return images;
 }
 

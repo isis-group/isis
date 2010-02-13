@@ -36,10 +36,7 @@ template<typename TYPE> class Type: public _internal::TypeBase{
 	TYPE m_val;
 	static const char m_typeName[];
 public:
-	Type()
-	{
-		check_type<TYPE>();
-	}
+	Type(){check_type<TYPE>();}
 	/**
 	 * Create a Type from any type of value-type.
 	 * If the type of the parameter is not the same as the content type of the object, the system tries to do a type conversion.
@@ -257,7 +254,7 @@ public:
 	std::vector<Reference> splice(size_t size)const{
 		if(size>=len()){
 			LOG(CoreDebug,warning)
-				<< "splicing data of the size " << len() << " up into blocks of the size is kind of useless ..." << size;
+				<< "splicing data of the size " << len() << " up into blocks of the size " << size << " is kind of useless ...";
 		}
 		const size_t fullSplices=len()/size;
 		const size_t lastSize=len()%size;//rest of the division - size of the last splice

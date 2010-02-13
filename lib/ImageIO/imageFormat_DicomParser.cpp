@@ -22,7 +22,7 @@ template<typename ST,typename DT> bool try_cast(const ST &source,DT &dest)
 template<typename T> std::list<T> dcmtkListString2list(DcmElement *elem){
 	OFString buff;
 	elem->getOFStringArray(buff);
-	return util::string2list<T>(std::string(buff.c_str()),"\\\\");
+	return util::string2list<T>(std::string(buff.c_str()),'\\');
 }
 
 }

@@ -114,19 +114,29 @@ template<typename TARGET> std::list<TARGET> string2list(
 }
 															
 /**
- * Simple tokenizer (char version).
+ * Very Simple tokenizer.
  * Splits source into tokens and tries to lexically cast them to TARGET.
  * If that fails, boost::bad_lexical_cast is thrown.
- * Before the string is split up leading and rear separators will be cut.
+ * Leading and trailing seperators are ignored.
  *
  * \param source the source string to be split up
  * \param separator string to delimit the tokens
- * Note that this still is put into an regualar expression, so "\\" will cause an runtime error. (Use "\\\\" instead)
  * \returns a list of the casted tokens
  */
-template<typename TARGET> std::list<TARGET> string2list(std::string source,	const char separator[])
+//@todo test
+template<typename TARGET> std::list<TARGET> string2list(const std::string &source,	char separator)
 {
-	return string2list<TARGET>(source,boost::regex(separator));
+	std::list<TARGET> ret;
+	for(
+	  size_t next=source.find_first_not_of(separator);
+	  next!=std::string::npos;
+	  next=source.find_first_not_of(separator,next)
+	){
+	  const size_t start=next;
+	  next=source.find(separator,start);
+	  ret.push_back(boost::lexical_cast<TARGET>(source.substr(start,next-start)));
+	}
+	return ret;
 }
 
 /**
