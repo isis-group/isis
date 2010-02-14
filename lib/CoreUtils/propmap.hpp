@@ -141,6 +141,7 @@ public:
 	*/
 	PropertyValue& operator[](const std::string& key);
 	bool remove(const std::string& key);
+	bool remove(const isis::util::PropMap& removeMap);
 	/**
 	* Adds a property as needed.
 	* If the given property allready exists, it is just flagged as needed.
@@ -180,7 +181,7 @@ public:
 	 */
 	diff_map diff(const PropMap &second)const;
 	/// Remove everything that is also in second and equal.
-	void make_unique(const isis::util::PropMap& other);
+	void make_unique(const isis::util::PropMap& other,bool removeNeeded=false);
 	/**
 	* Add Properties from another PropMap.
 	* \param other the other PropMap

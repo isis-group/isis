@@ -137,7 +137,7 @@ bool Image::reIndex() {
 
 	//remove common props from the chunks
 	for(size_t i=0;i!=lookup.size();i++)
-		getChunkAt(i).make_unique(common);
+		getChunkAt(i).remove(common);
 	LOG(DataDebug,util::info) << "common properties removed from " << set.size() << " chunks: " << common;
 
 	//if we have at least two slides

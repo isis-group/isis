@@ -121,6 +121,34 @@ bool PropMap::remove(const std::string& key) {
 	return recursiveRemove(*this,path.begin(),path.end());
 }
 
+bool PropMap::remove(const isis::util::PropMap& removeMap)
+{
+	iterator thisIt=begin();
+	bool ret=true;
+	
+	//remove everything that is also in second and equal (or also empty)
+	for(const_iterator otherIt=removeMap.begin();otherIt!=removeMap.end();otherIt++){
+		//find the closest match for otherIt->first in this (use the value-comparison-functor of PropMap)
+		if (continousFind(thisIt, end(),*otherIt, value_comp())) //thisIt->first == otherIt->first  - so its the same property
+		{
+			if(not thisIt->second.empty() and thisIt->second->is<PropMap>()){ //this is a subtrees
+				if(not otherIt->second.empty() and otherIt->second->is<PropMap>()){
+					PropMap &mySub=thisIt->second->cast_to_Type<PropMap>();
+					PropMap &otherSub=otherIt->second->cast_to_Type<PropMap>();
+					ret&=mySub.remove(otherSub);
+				} else{
+					LOG(CoreDebug,warning) << "Not deleting subtree " << MSubject(thisIt->first) << " because its no subtree in the removal map";
+					ret=false;
+				}
+			} else {
+				LOG(CoreDebug,verbose_info) << "Removing " << MSubject(*thisIt) << " as requested";
+				erase(thisIt++); // so delete this (they are equal - kind of)
+			}
+		}
+	}
+	return ret;
+}
+
 bool PropMap::exists(const std::string& key)const {
 	return findPropVal(key)!=NULL;
 }
@@ -191,22 +219,39 @@ void PropMap::diffTree(const PropMap& other,PropMap::diff_map &ret,std::string p
 	}
 }
 
-void PropMap::make_unique (const util::PropMap& other ) {
+void PropMap::make_unique (const util::PropMap& other,bool removeNeeded) {
 	iterator thisIt=begin();
 	
-	//remove everything that is also in second and equal
+	//remove everything that is also in second and equal (or also empty)
 	for(const_iterator otherIt=other.begin();otherIt!=other.end();otherIt++){
 		//find the closest match for otherIt->first in this (use the value-comparison-functor of PropMap)
-		if (
-			continousFind(thisIt, end(),*otherIt, value_comp()) //thisIt->first == otherIt->first  - so its the same property
-			and thisIt->second.operator==(otherIt->second) //if the values of this prop are equal (they are not equal if they are empty)
-		){
-			if(thisIt->second->is<PropMap>() && otherIt->second->is<PropMap>()){
-				PropMap &thisMap=thisIt->second->cast_to_Type<PropMap>();
-				PropMap &refMap=otherIt->second->cast_to_Type<PropMap>();
-				thisMap.make_unique(refMap);
-			} else
-				erase(thisIt);
+		if (continousFind(thisIt, end(),*otherIt, value_comp())) //thisIt->first == otherIt->first  - so its the same property
+		{
+			if(not removeNeeded and thisIt->second.needed()){//Skip needed
+			  thisIt++;
+			  continue;
+			}
+			if(thisIt->second.empty()){ //this is empty
+				if(otherIt->second.empty()){ //the other is empty
+					erase(thisIt++); // so delete this (they are equal - kind of)
+				} else{
+					LOG(CoreDebug,verbose_info) << "Keeping the empty " << thisIt->first << " because its is not empty in the other (" << *otherIt << ")";
+					thisIt++;
+				}
+			} else if(not otherIt->second.empty()){ // if the other is not empty as well
+				if(thisIt->second.operator==(otherIt->second)){ //delete this, if they are equal
+					LOG(CoreDebug,verbose_info) << "Removing " << *thisIt << " because its equal with the other (" << *otherIt << ")";
+					erase(thisIt++); // so delete this (they are equal - kind of)
+				} else if(thisIt->second->is<PropMap>() && otherIt->second->is<PropMap>()){ //but maybe they are subtrees
+					PropMap &thisMap=thisIt->second->cast_to_Type<PropMap>();
+					PropMap &otherMap=otherIt->second->cast_to_Type<PropMap>();
+					thisMap.make_unique(otherMap);
+					thisIt++;
+				}
+			} else {//only the other is empty
+				  LOG(CoreDebug,verbose_info) << "Keeping " << *thisIt << " because the other is empty";
+				  thisIt++;
+			}
 		}
 	}
 }

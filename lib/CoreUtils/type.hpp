@@ -96,7 +96,6 @@ public:
 	
 	TypeBase* clone() const
 	{
-		LOG(CoreDebug,verbose_info)	<< "Creating cloned copy of " << toString(true);
 		return new Type<TYPE>(*this);
 	}
 	
@@ -248,7 +247,6 @@ public:
 
 	TypePtrBase* clone() const
 	{
-		LOG(CoreDebug,verbose_info)	<< "Creating cloned copy of TypePtr<" << typeName() << ">";
 		return new TypePtr<TYPE>(*this);
 	}
 	std::vector<Reference> splice(size_t size)const{
