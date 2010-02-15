@@ -140,22 +140,44 @@ bool Image::reIndex() {
 		getChunkAt(i).remove(common);
 	LOG(DataDebug,util::info) << "common properties removed from " << set.size() << " chunks: " << common;
 
-	//if we have at least two slides
-	if(chunk_dims==2 and size[2]>1){ 
+	//////////////////////////////////////////////////////////////////////////////////////////////////
+	//reconstruct some redundant information, if its missing
+	//////////////////////////////////////////////////////////////////////////////////////////////////
+		
+	//if we have at least two slides (and have slides at all)
+	if(chunk_dims==2 and size[2]>1){
+
 		const util::fvector4 thisV=lookup[0]->getProperty<util::fvector4>("indexOrigin");
-		const util::fvector4 nextV=lookup[size[2]-1]->getProperty<util::fvector4>("indexOrigin");
-		const util::fvector4 distVec= (nextV-thisV).norm(); //we could use their distance-vector as sliceVector
+		const util::fvector4 nextV=lookup[1]->getProperty<util::fvector4>("indexOrigin");
+		const util::fvector4 lastV=lookup[size[2]-1]->getProperty<util::fvector4>("indexOrigin");
+
+		//check the slice vector
+		const util::fvector4 distVecNorm= (lastV-thisV).norm();
 		if(hasProperty("sliceVec")){
 			const util::fvector4 sliceVec=getProperty<util::fvector4>("sliceVec");
-			LOG_IF(distVec!=sliceVec,DataLog,util::warning)
+			LOG_IF(distVecNorm!=sliceVec,DataLog,util::warning)
 				<< "The existing sliceVec " << sliceVec
 				<< " differs from the distance vector between chunk 0 and " << size[2]-1
-				<< " " << distVec;
+				<< " " << distVecNorm;
 		} else {
 			LOG(DataDebug,util::info)
 				<< "used the distance between chunk 0 and "	<< size[2]-1
-				<< " to synthesize the missing sliceVec as " << distVec;
-			setProperty("sliceVec",distVec);
+				<< " to synthesize the missing sliceVec as " << distVecNorm;
+			setProperty("sliceVec",distVecNorm);
+		}
+
+		//check the slice distance
+		const float sliceDist=(nextV-thisV).len();
+		util::fvector4 &voxelGap=getPropertyValue("voxelGap")->cast_to_Type<util::fvector4>();
+		if(voxelGap[2]!=-std::numeric_limits<float>::infinity()){
+			LOG_IF(voxelGap[2]!=sliceDist,DataLog,util::warning)
+				<< "The existing slice distance (voxelGap[2]) " << voxelGap[2]
+				<< " differs from the distance between chunk 0 and 1 " << sliceDist;
+		} else {
+			voxelGap[2]=sliceDist;
+			LOG(DataDebug,util::info)
+				<< "used the distance between chunk 0 and 1 to synthesize the missing slice distance (voxelGap[2]) as "
+				<< sliceDist;
 		}
 	}
 	//if we have read- and phase- vector

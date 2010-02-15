@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 	std::cout << "Got " << images.size() << " Images" << std::endl;
 	BOOST_FOREACH(ImageList::const_reference ref,images){
 		std::cout << "======Image " << ++count1 << "======Metadata======" << std::endl;
-		ref->print(std::cout,true) << std::endl;
+		ref->print(std::cout,true);
 		for(Image::ChunkIterator c=ref->chunksBegin();c!=ref->chunksEnd();c++){
 			std::cout << "======Image " <<count1 << "==Chunk " << ++count2 << "======Metadata======" << std::endl;
 			c->print(std::cout,true);

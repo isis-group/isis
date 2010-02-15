@@ -98,8 +98,16 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////
 	// Accessors
 	////////////////////////////////////////////////////////////////////////////////////
-	TYPE operator [](size_t idx)const{return CONTAINER::begin()[idx];}
-	TYPE& operator [](size_t idx){return CONTAINER::begin()[idx];}
+	TYPE operator [](size_t idx)const 
+	{
+		LOG_IF(idx>=SIZE,CoreDebug,error) << "Index " << idx << " exceeds the size of the vector (" << SIZE << ")";
+		return CONTAINER::begin()[idx];
+	}
+	TYPE& operator [](size_t idx)
+	{
+		LOG_IF(idx>=SIZE,CoreDebug,error) << "Index " << idx << " exceeds the size of the vector (" << SIZE << ")";
+		return CONTAINER::begin()[idx];
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////
 	// Comparison

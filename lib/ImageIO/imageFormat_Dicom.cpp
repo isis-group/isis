@@ -81,8 +81,14 @@ ptime ImageFormat_Dicom::genTimeStamp(const date& date, const ptime& time) {
 
 void ImageFormat_Dicom::sanitise(isis::util::PropMap& object, string dialect) {
 	const std::string prefix=std::string(ImageFormat_Dicom::dicomTagTreeName)+"/";
+	const float invalid_float=-std::numeric_limits<float>::infinity();
 	
-	// compute sequenceStart and acquisitionTime
+
+	/////////////////////////////////////////////////////////////////////////////////
+	// Transform known DICOM-Tags into default-isis-properties
+	/////////////////////////////////////////////////////////////////////////////////
+	
+	// compute sequenceStart and acquisitionTime (have a look at table C.10.8 in the standart)
 	if(hasOrTell(prefix+"SeriesTime",object,util::warning) && hasOrTell(prefix+"SeriesDate",object,util::warning)){
 		const ptime sequenceStart = genTimeStamp(object[prefix+"SeriesDate"]->as<date>(),object[prefix+"SeriesTime"]->as<ptime>());
 
@@ -112,33 +118,30 @@ void ImageFormat_Dicom::sanitise(isis::util::PropMap& object, string dialect) {
 	transformOrTell<u_int16_t>  (prefix+"PatientsWeight",   "subjectWeigth",      object,util::warning);
 	
 	// compute voxelSize
-	util::fvector4 voxelSize;
-	if(hasOrTell(prefix+"PixelSpacing",object,util::info)){
-		voxelSize = object[prefix+"PixelSpacing"]->as<util::fvector4>();
-		object.remove(prefix+"PixelSpacing");
-	} else {
-		LOG(ImageIoLog,util::warning) << "PixelSpacing not found, assuming <1,1>";
-		voxelSize[0]=1;voxelSize[1]=1;
+	{
+		util::fvector4 voxelSize(invalid_float,invalid_float,invalid_float,invalid_float);
+		if(hasOrTell(prefix+"PixelSpacing",object,util::error)){
+			voxelSize = object[prefix+"PixelSpacing"]->as<util::fvector4>();
+			object.remove(prefix+"PixelSpacing");
+		}
+		if(hasOrTell(prefix+"SliceThickness",object,util::warning)){
+			voxelSize[2]=object[prefix+"SliceThickness"]->as<float>();
+			object.remove(prefix+"SliceThickness");
+		}
+		if(hasOrTell(prefix+"EchoTime",object,util::warning)){
+			voxelSize[3]=object[prefix+"EchoTime"]->as<float>();
+			object.remove(prefix+"EchoTime");
+		}
+		object.setProperty("voxelSize",voxelSize);
 	}
-	if(hasOrTell(prefix+"SliceThickness",object,util::warning)){
-		voxelSize[2]=object[prefix+"SliceThickness"]->as<float>();
-		object.remove(prefix+"SliceThickness");
-	} else {
-		LOG(ImageIoLog,util::warning) << "SliceThickness not found, assuming 1";
-		voxelSize[2]=1;
-	}		
-	object.setProperty("voxelSize",voxelSize);
-
 	// Compute voxel gap
-	const float nan=std::numeric_limits<float>::quiet_NaN();
-	util::fvector4 voxelGap(nan,nan,nan,nan);
 	if(hasOrTell(prefix+"RepetitionTime",object,util::warning)){
-		voxelGap[4]=object[prefix+"RepetitionTime"]->as<float>();
+		util::fvector4 voxelGap(invalid_float,invalid_float,invalid_float,invalid_float);
+		voxelGap[3]=object[prefix+"RepetitionTime"]->as<float>()/1000;
 		object.remove(prefix+"RepetitionTime");
+		object.setProperty("voxelGap",voxelGap);
 	}
-	object.setProperty("voxelGap",voxelGap);
 
-	transformOrTell<float>         (prefix+"EchoTime",                "echoTime",           object,util::warning);
 	transformOrTell<std::string>   (prefix+"PerformingPhysiciansName","performingPhysician",object,util::warning);
 	transformOrTell<u_int16_t>     (prefix+"NumberOfAverages",        "numberOfAverages",   object,util::warning);
 
@@ -159,6 +162,21 @@ void ImageFormat_Dicom::sanitise(isis::util::PropMap& object, string dialect) {
 
 	transformOrTell<util::fvector4>(prefix+"ImagePositionPatient",    "indexOrigin",        object,util::warning);
 	transformOrTell<u_int32_t>     (prefix+"InstanceNumber",          "acquisitionNumber",  object,util::error);
+
+	////////////////////////////////////////////////////////////////
+	// Do some sanity checks on redundant tags
+	////////////////////////////////////////////////////////////////
+
+	if(object.hasProperty(prefix+"Unknown Tag(0019,1015)")){
+		const util::fvector4 &org=object["indexOrigin"]->cast_to_Type<util::fvector4>();
+		const util::PropertyValue &comp=object.getPropertyValue(prefix+"Unknown Tag(0019,1015)");
+		if(comp==org) // will use the more lazy comparison because org is not a Type
+			object.remove(prefix+"Unknown Tag(0019,1015)");
+		else 
+			LOG(ImageIoDebug,util::warning)
+			<< prefix+"Unknown Tag(0019,1015):" << comp << " differs from indexOrigin:"
+			<< org << ", won't remove it";
+	}
 }
 
 int ImageFormat_Dicom::load(data::ChunkList &chunks, const std::string& filename, const std::string& dialect )
