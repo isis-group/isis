@@ -57,7 +57,7 @@ static VFloat pixel_density = 0.01;
 static VShort grid_size = 5;
 static VShort metricType = 0;
 static VArgVector transformType;
-static VShort interpolatorType = 0;
+static VArgVector interpolatorType;
 static VArgVector optimizerType;
 static VBoolean in_found, ref_found, pointset_found;
 static VShort number_threads = 1;
@@ -113,7 +113,7 @@ static VOptionDescRec
             //component inputs
             {"metric", VShortRepn, 1, (VPointer) &metricType, VOptionalOpt, TYPMetric, "Type of the metric"}, {
                 "transform", VShortRepn, 0, (VPointer) &transformType, VOptionalOpt, TYPTransform,
-                "Type of the transform"}, {"interpolator", VShortRepn, 1, (VPointer) &interpolatorType, VOptionalOpt,
+                "Type of the transform"}, {"interpolator", VShortRepn, 0, (VPointer) &interpolatorType, VOptionalOpt,
                 TYPInterpolator, "Type of interpolator"}, {"optimizer", VShortRepn, 0, (VPointer) &optimizerType,
                 VOptionalOpt, TYPOptimizer, "Type of optimizer"}
 
@@ -146,6 +146,7 @@ int main(
 
 	VShort transform;
 	VShort optimizer;
+	VShort interpolator;
 
 	typedef itk::Image<InputPixelType, Dimension> FixedImageType;
 	typedef itk::Image<InputPixelType, Dimension> MovingImageType;
@@ -282,6 +283,11 @@ int main(
 		} else {
 			optimizer = 0;
 		}
+		if (interpolatorType.number) {
+			 interpolator = ((VShort*) interpolatorType.vector)[counter];
+		} else {
+		    interpolator = 0;
+		}
 
 		std::cout << std::endl << "setting up the registration object..." << std::endl;
 		registrationFactory->Reset();
@@ -350,8 +356,8 @@ int main(
 		}
 
 		//interpolator setup
-		std::cout << "used interpolator: " << TYPInterpolator[interpolatorType].keyword << std::endl;
-		switch (interpolatorType) {
+		std::cout << "used interpolator: " << TYPInterpolator[interpolator].keyword << std::endl;
+		switch (interpolator) {
 			case 0:
 			registrationFactory->SetInterpolator(RegistrationFactoryType::LinearInterpolator);
 			break;

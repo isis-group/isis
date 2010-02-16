@@ -9,6 +9,7 @@
 
 #include "isisTimeStepExtractionFilter.h"
 #include "itkImageBase.h"
+#include <iterator>
 
 namespace isis { namespace extitk {
 

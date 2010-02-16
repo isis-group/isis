@@ -791,6 +791,7 @@ namespace isis {
 			} catch (itk::ExceptionObject & err) {
 				std::cerr << "isRegistrationFactory3D: Exception caught: " << std::endl << err << std::endl;
 			}
+			 
 			if (UserOptions.PRINTRESULTS) {
 				this->PrintResults();
 			}
