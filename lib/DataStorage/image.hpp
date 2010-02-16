@@ -208,8 +208,6 @@ public:
 	ChunkIterator chunksBegin();
 	ChunkIterator chunksEnd();
 
-	isis::util::fvector4 size()const;
-
 	util::fvector4 getFOVVec()const;
 	template <typename T> T minValueInImage()const;
 	template <typename T> T maxValueInImage()const;

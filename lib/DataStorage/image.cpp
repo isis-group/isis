@@ -24,15 +24,46 @@ namespace _internal{
 bool image_chunk_order::operator() ( const data::Chunk& a, const data::Chunk& b )const
 {
 	//@todo exception ??
-	if(!(a.hasProperty("indexOrigin") && a.hasProperty("indexOrigin"))){
-		LOG(DataDebug,util::error) << "The chunk has no position, it can not be sorted into the image.";
-		return false;
-	}
+	LOG_IF(not a.hasProperty("indexOrigin"),DataDebug,util::error)
+		<< "The chunk has no position, it can not be sorted into the image.";
+	LOG_IF(not a.hasProperty("acquisitionNumber"),DataDebug,util::warning)
+		<< "The chunk has no acquisitionNumber, it may not be sorted into the image.";
 
 	const util::fvector4 &posA=a.getProperty<util::fvector4>("indexOrigin");
 	const util::fvector4 &posB=b.getProperty<util::fvector4>("indexOrigin");
-	
-	return posA.lexical_less_reverse(posB);
+
+	if(posA.lexical_less_reverse(posB)){ //if chunk is "under" the other - put it there
+		LOG(DataDebug,util::verbose_info)
+		<< "Successfully sorted chunks by position"
+		<< " ("<< posA << " below " << posB << ")";
+		return true;
+	} 
+	if(posA==posB) { //if the chunks have the same position, check if they can be sorted by time
+		if(a.hasProperty("acquisitionTime") and b.hasProperty("acquisitionTime")){
+			const float aTime=a.getProperty<u_int32_t>("acquisitionTime");
+			const float bTime=b.getProperty<u_int32_t>("acquisitionTime");
+			if(aTime< bTime){
+				LOG(DataDebug,util::verbose_info)
+				<< "Fallback sorted chunks by time"
+				<< " ("<< aTime << " before " << bTime << ")";
+				return true;
+			}else if(bTime<aTime){
+				return false;
+			}
+		}
+		//if acquisitionTime is equal as well (or missing) fall back to acquisitionNumber
+		const u_int32_t aNumber=a.getProperty<u_int32_t>("acquisitionNumber");
+		const u_int32_t bNumber=b.getProperty<u_int32_t>("acquisitionNumber");
+		if(aNumber<bNumber){
+			//if they at least have different acquisitionNumber
+			LOG(DataDebug,util::verbose_info)
+			<< "Fallback sorted chunks by acquisition order"
+			<< " ("<< aNumber << " before " << aNumber << ")";
+			return true;
+		}
+		LOG_IF(aNumber==bNumber,DataDebug,util::error)<<"The Chunks cannot be sorted, won't insert";
+	}
+	return false;
 }
 
 }
@@ -311,11 +342,6 @@ std::list<util::PropMap::mapped_type> Image::getChunksProperties(const util::Pro
 Image::ChunkIterator Image::chunksBegin(){return set.begin();}
 Image::ChunkIterator Image::chunksEnd(){return set.end();}
 
-
-util::fvector4 Image::size()const
-{
-	return util::fvector4(dimSize(0),dimSize(1),dimSize(2),dimSize(3));
-}
 
 util::fvector4 Image::getFOVVec()const
 {

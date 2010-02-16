@@ -38,7 +38,7 @@ public:
 	}
 	
 	bool write(const data::Image &image,const std::string& filename,const std::string& dialect ){
-		if(image.size() != util::fvector4(3,3,3,10))return false;
+		if(image.sizeToVector() != util::fvector4(3,3,3,10))return false;
 		const int snum=image.getProperty<int>("sequenceNumber");
 
 		std::cout

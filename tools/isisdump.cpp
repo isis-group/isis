@@ -10,8 +10,8 @@ int main(int argc, char *argv[])
 	
 	ENABLE_LOG(isis::image_io::ImageIoDebug,DefaultMsgPrint,warning);
 	ENABLE_LOG(isis::image_io::ImageIoLog,DefaultMsgPrint,warning);
-	ENABLE_LOG(CoreDebug,DefaultMsgPrint,verbose_info);
-	ENABLE_LOG(CoreLog,DefaultMsgPrint,verbose_info);
+	ENABLE_LOG(CoreDebug,DefaultMsgPrint,warning);
+	ENABLE_LOG(CoreLog,DefaultMsgPrint,warning);
 	ENABLE_LOG(DataDebug,DefaultMsgPrint,warning);
 	ENABLE_LOG(DataLog,DefaultMsgPrint,warning);
 	
@@ -19,10 +19,10 @@ int main(int argc, char *argv[])
 	unsigned short count1=0,count2=0;
 	std::cout << "Got " << images.size() << " Images" << std::endl;
 	BOOST_FOREACH(ImageList::const_reference ref,images){
-		std::cout << "======Image " << ++count1 << "======Metadata======" << std::endl;
+		std::cout << "======Image #" << ++count1 << ref->sizeToString() << "======Metadata======" << std::endl;
 		ref->print(std::cout,true);
 		for(Image::ChunkIterator c=ref->chunksBegin();c!=ref->chunksEnd();c++){
-			std::cout << "======Image " <<count1 << "==Chunk " << ++count2 << "======Metadata======" << std::endl;
+			std::cout << "======Image #" <<count1 << "==Chunk #" << ++count2 << c->sizeToString() << "======Metadata======" << std::endl;
 			c->print(std::cout,true);
 		}
 	}
