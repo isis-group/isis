@@ -111,16 +111,33 @@ bool Image::insertChunk ( const Chunk &chunk )
 bool Image::reIndex() {
 	if(set.empty()){
 		clean=true;
-		LOG(DataLog,util::warning) << "Reindexing an empty image is useless.";
+		LOG(DataDebug,util::warning) << "Reindexing an empty image is useless.";
 		return true;
 	}
 	
 	//redo lookup table
-	lookup.resize(set.size());
-	size_t idx=0;
-	for(std::set<Chunk,_internal::image_chunk_order>::iterator it=set.begin();it!=set.end();it++,idx++)
-		lookup[idx]=it;
+	size_t idx=0,timesteps=1;
+	const size_t chunks=set.size();
+	lookup.resize(chunks);
 	
+	//check for timesteps (first n chunks with same position)
+	if (chunks>1) {
+		for(ChunkSet::iterator it=set.begin();it!=set.end();timesteps++){
+			const util::fvector4 &here=it->getProperty<util::fvector4>("indexOrigin");
+			const util::fvector4 &next=(++it)->getProperty<util::fvector4>("indexOrigin");
+			
+			if(here!=next)
+				break;
+		}
+		LOG_IF(chunks%timesteps,DataDebug,util::error)
+		<< "The number timesteps does not fit the number of chunks. Reindexing will fail.";
+		LOG(DataDebug,util::error) << "Found " << timesteps << " timesteps in " << chunks << " chunks";
+	}
+	//sort in the chunks (and reorder them, so the timesteps become 4th dimension)
+	for(ChunkSet::iterator it=set.begin();it!=set.end();it++,idx++){
+		const size_t i=(idx * chunks/timesteps)%(chunks-1);
+		lookup[i]=it;
+	}
 	//get primary attributes from first chunk
 	const unsigned short chunk_dims=chunksBegin()->dimRange().second+1;
 	chunkVolume = chunksBegin()->volume();
@@ -129,7 +146,7 @@ bool Image::reIndex() {
 	size_t size[Chunk::n_dims];
 	for(unsigned short i=0;i<chunk_dims;i++)
 		size[i]=chunksBegin()->dimSize(i);
-
+		
 	//if there are many chunks, they must leave at least on dimension to the image to sort them in
 	if(chunk_dims>=Image::n_dims){
 		if(lookup.size()>1){
