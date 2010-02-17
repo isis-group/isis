@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 		ref->print(std::cout,true);
 		for(Image::ChunkIterator c=ref->chunksBegin();c!=ref->chunksEnd();c++){
 			std::cout << "======Image #" <<count1 << "==Chunk #" << ++count2 << c->sizeToString() << "======Metadata======" << std::endl;
-//			c->print(std::cout,true);
+			c->print(std::cout,true);
 		}
 	}
 	return 0;

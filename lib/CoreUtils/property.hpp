@@ -95,7 +95,7 @@ public:
 			return second == cmp;
 		} else if(not empty()){
 			PropertyValue dst;
-			LOG(CoreDebug,warning)
+			LOG(CoreDebug,info)
 				<< *this << " is not " << Type<T>::staticName() << " trying to convert.";
 			if(transformTo(dst,Type<T>::staticId()))
 				return dst==second;

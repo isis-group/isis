@@ -131,12 +131,14 @@ bool Image::reIndex() {
 		}
 		LOG_IF(chunks%timesteps,DataDebug,util::error)
 		<< "The number timesteps does not fit the number of chunks. Reindexing will fail.";
-		LOG(DataDebug,util::error) << "Found " << timesteps << " timesteps in " << chunks << " chunks";
+		LOG(DataDebug,util::info) << "Found " << timesteps << " timesteps in " << chunks << " chunks";
 	}
-	//sort in the chunks (and reorder them, so the timesteps become 4th dimension)
+	//sort in the chunks (assume the chunkset to be an Matrix where m represents the timesteps, then transpose it )
+	const size_t chunksets=chunks/timesteps;
 	for(ChunkSet::iterator it=set.begin();it!=set.end();it++,idx++){
-		const size_t i=(idx * chunks/timesteps)%(chunks-1);
-		lookup[i]=it;
+		const size_t i= idx%timesteps;
+		const size_t j= idx/timesteps;
+		lookup[i*timesteps+j]=it;
 	}
 	//get primary attributes from first chunk
 	const unsigned short chunk_dims=chunksBegin()->dimRange().second+1;
@@ -238,16 +240,19 @@ bool Image::reIndex() {
 			read[1]*phase[2]-read[2]*phase[1],
 			read[2]*phase[0]-read[0]*phase[2],
 			read[0]*phase[1]-read[1]*phase[0]
-		);
+		); 
 		if(hasProperty("sliceVec")){
 			const util::fvector4 sliceVec=getProperty<util::fvector4>("sliceVec");
 			LOG_IF(crossVec!=sliceVec,DataLog,util::warning)
 				<< "The existing sliceVec " << sliceVec
 				<< " differs from the cross product of the read- and phase vector " << crossVec;
 		} else {
-			LOG(DataDebug,util::info)
+			// We dont know anything about the slice-direction
+			// we just guess its along the positive cross-product between read- and phase direction
+			// so at leats warn the user if we do that long shot
+			LOG(DataLog,util::warning)
 				<< "used the cross product between readVec and phaseVec as sliceVec"
-				<< getPropertyValue("sliceVec");
+				<< getPropertyValue("sliceVec") << ". That might be wrong!";
 			LOG_IF(read.dot(phase)>0.01,DataLog,util::warning)
 				<< "The cosine between the columns and the rows of the image is bigger than 0.01";
 			setProperty("sliceVec",crossVec);

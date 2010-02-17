@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE (imageLoadtest)
 	
 	short cnt=0;
 	BOOST_FOREACH(data::ImageList::value_type &ref,images){
-		BOOST_CHECK(ref->size() == util::fvector4(3,3,3,10));
+		BOOST_CHECK(ref->sizeToVector() == util::fvector4(3,3,3,10));
 		for(int i=0;i<10;i++)
 			BOOST_CHECK(ref->voxel<short>(0,0,0,i) == i+cnt);
 		cnt++;

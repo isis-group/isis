@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE (imageList_chunk_test)
 
 	short cnt=0;
 	BOOST_FOREACH(data::ImageList::value_type &ref,list){
-		BOOST_CHECK(ref->size() == util::fvector4(3,3,3,timesteps));
+		BOOST_CHECK(ref->sizeToVector() == util::fvector4(3,3,3,timesteps));
 		for(int i=0;i<timesteps;i++)
 			BOOST_CHECK(ref->voxel<float>(0,0,0,i) == i+cnt);
 		cnt++;
