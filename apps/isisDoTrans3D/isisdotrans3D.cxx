@@ -51,7 +51,7 @@ static VOptionDescRec options[] = {
     //non-required inputs
     {"trans", VStringRepn, 0, &trans_filename, &trans_found, 0, "the transform filename"}, {"interpolator", VShortRepn,
         1, &interpolator_type, VOptionalOpt, 0, "The interpolator used to resample the image"}, {"tmp", VStringRepn, 1,
-        &template_filename, VOptionalOpt, 0, "The template image"}, {"res", VFloatRepn, 0, (VPointer) &resolution,
+        &template_filename, VOptionalOpt, 0, "The template image"}, {"reso", VFloatRepn, 0, (VPointer) &resolution,
         VOptionalOpt, 0, "The output resolution. One value for isotrop output"}, {"fmri", VBooleanRepn, 1, &fmri,
         VOptionalOpt, 0, "Input and output image file are functional data"}, {"vtrans", VStringRepn, 1,
         &vtrans_filename, VOptionalOpt, 0, "Vector deformation field"}, {"use_inverse", VBooleanRepn, 1, &use_inverse,
