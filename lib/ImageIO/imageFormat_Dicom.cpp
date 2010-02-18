@@ -135,12 +135,17 @@ void ImageFormat_Dicom::sanitise(isis::util::PropMap& object, string dialect) {
 		object.setProperty("voxelSize",voxelSize);
 	}
 	// Compute voxel gap
+	util::fvector4 voxelGap(invalid_float,invalid_float,invalid_float,invalid_float);
 	if(hasOrTell(prefix+"RepetitionTime",object,util::warning)){
-		util::fvector4 voxelGap(invalid_float,invalid_float,invalid_float,invalid_float);
 		voxelGap[3]=object[prefix+"RepetitionTime"]->as<float>()/1000;
 		object.remove(prefix+"RepetitionTime");
-		object.setProperty("voxelGap",voxelGap);
 	}
+	if(hasOrTell(prefix+"SpacingBetweenSlices",object,util::info)){
+		voxelGap[2]=object[prefix+"SpacingBetweenSlices"]->as<float>();
+		object.remove(prefix+"SpacingBetweenSlices");
+	}
+	if(voxelGap!=util::fvector4(invalid_float,invalid_float,invalid_float,invalid_float))
+	  object.setProperty("voxelGap",voxelGap);
 
 	transformOrTell<std::string>   (prefix+"PerformingPhysiciansName","performingPhysician",object,util::warning);
 	transformOrTell<u_int16_t>     (prefix+"NumberOfAverages",        "numberOfAverages",   object,util::warning);
@@ -187,8 +192,13 @@ int ImageFormat_Dicom::load(data::ChunkList &chunks, const std::string& filename
 	if(dcfile->loadFile(filename.c_str()).good() and (chunk =_internal::DicomChunk::makeSingleMonochrome(filename,dcfile))){
 		//we got a chunk from the file
 		sanitise(*chunk,"");
-		chunks.push_back(*chunk);
-		return 1;
+/*		const util::slist iType=chunk->getProperty<util::slist>("ImageType");
+		if(std::find(iType.begin(),iType.end(),"MOSAIC")!=iType.end()){ // if its a mosaic
+			
+		} else {*/
+			chunks.push_back(*chunk);
+			return 1;
+// 		}
 	} else {
 		delete dcfile;//no chunk was created, so we have to deal with the dcfile on our own
 		LOG(ImageIoLog,util::error)

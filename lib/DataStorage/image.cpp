@@ -40,8 +40,8 @@ bool image_chunk_order::operator() ( const data::Chunk& a, const data::Chunk& b 
 	} 
 	if(posA==posB) { //if the chunks have the same position, check if they can be sorted by time
 		if(a.hasProperty("acquisitionTime") and b.hasProperty("acquisitionTime")){
-			const float aTime=a.getProperty<u_int32_t>("acquisitionTime");
-			const float bTime=b.getProperty<u_int32_t>("acquisitionTime");
+			const float aTime=a.getProperty<float>("acquisitionTime");
+			const float bTime=b.getProperty<float>("acquisitionTime");
 			if(aTime< bTime){
 				LOG(DataDebug,util::verbose_info)
 				<< "Fallback sorted chunks by time"
@@ -119,13 +119,14 @@ bool Image::reIndex() {
 	}
 	
 	//redo lookup table
-	size_t idx=0,timesteps=1;
+	size_t timesteps=1;
 	const size_t chunks=set.size();
 	lookup.resize(chunks);
 	
 	//check for timesteps (first n chunks with same position)
 	if (chunks>1) {
-		for(ChunkSet::iterator it=set.begin();it!=set.end();timesteps++){
+		ChunkSet::iterator it=set.begin();
+		for(int i=0; i<(chunks-1); timesteps++,i++){
 			const util::fvector4 &here=it->getProperty<util::fvector4>("indexOrigin");
 			const util::fvector4 &next=(++it)->getProperty<util::fvector4>("indexOrigin");
 			if(here!=next)break;
@@ -134,22 +135,34 @@ bool Image::reIndex() {
 		<< "The number timesteps does not fit the number of chunks. Reindexing will fail.";
 		LOG(DataDebug,util::info) << "Found " << timesteps << " chunks per position assuming them as timesteps";
 	}
-	//sort in the chunks (assume the chunkset to be an Matrix where m represents the timesteps, then transpose it )
-	const size_t chunksets=chunks/timesteps;
-	for(ChunkSet::iterator it=set.begin();it!=set.end();it++,idx++){
-		const size_t i= idx%timesteps;
-		const size_t j= idx/timesteps;
-		lookup[i*timesteps+j]=it;
+	if(chunks>timesteps and chunks%timesteps==0){
+		//sort in the chunks (assume the chunkset to be an Matrix where m represents the timesteps, then transpose it )
+		size_t idx=0;
+		for(ChunkSet::iterator it=set.begin();it!=set.end();it++,idx++){
+			const size_t i= idx%timesteps;
+			const size_t j= idx/timesteps;
+			lookup[i*timesteps+j]=it;
+		}
+	} else {
+		size_t idx=0;
+		ChunkSet::iterator it=set.begin();
+		while(it!=set.end())
+			lookup[idx++]=it++;
 	}
+	
 	//get primary attributes from first chunk
-	const unsigned short chunk_dims=chunksBegin()->dimRange().second+1;
-	chunkVolume = chunksBegin()->volume();
+	const Chunk &first=*set.begin();
+	const unsigned short chunk_dims=first.dimRange().second+1;
+	chunkVolume = first.volume();
 
 	//copy sizes of the chunks to to the first chunk_dims sizes of the image
 	size_t size[Chunk::n_dims];
 	for(unsigned short i=0;i<chunk_dims;i++)
-		size[i]=chunksBegin()->dimSize(i);
-		
+		size[i]=first.dimSize(i);
+
+	//get indexOrigin from the geometrically first chunk
+	setPropertyValue("indexOrigin",first.getPropertyValue("indexOrigin"));
+
 	//if there are many chunks, they must leave at least on dimension to the image to sort them in
 	if(chunk_dims>=Image::n_dims){
 		if(lookup.size()>1){
@@ -167,10 +180,7 @@ bool Image::reIndex() {
 		for(unsigned short i=chunk_dims+1;i<Image::n_dims;i++)//if there are dimensions left figure out their size
 			size[i]= getChunkStride(size[i-1])/size[i-1] ?:1;
 	}
-
-	//get indexOrigin from the geometrically first chunk
-	setPropertyValue("indexOrigin",chunksBegin()->getPropertyValue("indexOrigin"));
-
+	
 	//Clean up the properties 
 	//@todo might fail if the image contains a prop that differs to that in the Chunks (which is equal in the chunks)
 	util::PropMap common;
@@ -195,45 +205,50 @@ bool Image::reIndex() {
 	//reconstruct some redundant information, if its missing
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 		
-	//if we have at least two slides (and have slides at all)
-	if(chunk_dims==2 and size[2]>1){
-
+	//if we have at least two slides (and have slides (with different positions) at all)
+	if(	chunk_dims==2 and size[2]>1 and lookup[0]->hasProperty("indexOrigin"))
+	{
 		const util::fvector4 thisV=lookup[0]->getProperty<util::fvector4>("indexOrigin");
-		const util::fvector4 nextV=lookup[1]->getProperty<util::fvector4>("indexOrigin");
-		const util::fvector4 lastV=lookup[size[2]-1]->getProperty<util::fvector4>("indexOrigin");
-
-		//check the slice vector
-		const util::fvector4 distVecNorm= (lastV-thisV).norm();
-		if(hasProperty("sliceVec")){
-			const util::fvector4 sliceVec=getProperty<util::fvector4>("sliceVec");
-			LOG_IF(distVecNorm!=sliceVec,DataLog,util::warning)
-				<< "The existing sliceVec " << sliceVec
-				<< " differs from the distance vector between chunk 0 and " << size[2]-1
-				<< " " << distVecNorm;
-		} else {
-			LOG(DataDebug,util::info)
-				<< "used the distance between chunk 0 and "	<< size[2]-1
-				<< " to synthesize the missing sliceVec as " << distVecNorm;
-			setProperty("sliceVec",distVecNorm);
-		}
-
-		const util::fvector4 &voxeSize=getProperty<util::fvector4>("voxelSize");
-		const float sliceDist=(nextV-thisV).len()-voxeSize[2];
-		if(sliceDist>0){
-			const float inf=std::numeric_limits<float>::infinity();
-			if(not hasProperty("voxelGap")){
-				setProperty("voxelGap",util::fvector4(inf,inf,inf,inf));
-			}
-			util::fvector4 &voxelGap=operator[]("voxelGap")->cast_to_Type<util::fvector4>(); //if there is no voxelGap yet, we create it
-			if(voxelGap[2]!=inf){
-				LOG_IF(voxelGap[2]!=sliceDist,DataLog,util::warning)
-					<< "The existing slice distance (voxelGap[2]) " << voxelGap[2]
-					<< " differs from the distance between chunk 0 and 1 " << sliceDist;
+		if(lookup[size[2]-1]->hasProperty("indexOrigin")){
+			const util::fvector4 lastV=lookup[size[2]-1]->getProperty<util::fvector4>("indexOrigin");
+			//check the slice vector
+			util::fvector4 distVecNorm=lastV-thisV;
+			LOG_IF(distVecNorm.len()==0,DataLog,util::error)
+				<< "The distance between the the first and the last chunk is zero. Thats bad, because I'm going to normalize it.";
+			distVecNorm.norm();
+			if(hasProperty("sliceVec")){
+				const util::fvector4 sliceVec=getProperty<util::fvector4>("sliceVec");
+				LOG_IF(distVecNorm!=sliceVec,DataLog,util::warning)
+					<< "The existing sliceVec " << sliceVec
+					<< " differs from the distance vector between chunk 0 and " << size[2]-1
+					<< " " << distVecNorm;
 			} else {
-				voxelGap[2]=sliceDist;
 				LOG(DataDebug,util::info)
-					<< "used the distance between chunk 0 and 1 to synthesize the missing slice distance (voxelGap[2]) as "
-					<< sliceDist;
+					<< "used the distance between chunk 0 and "	<< size[2]-1
+					<< " to synthesize the missing sliceVec as " << distVecNorm;
+				setProperty("sliceVec",distVecNorm);
+			}
+		}
+		const util::fvector4 &voxeSize=getProperty<util::fvector4>("voxelSize");
+		if(lookup[1]->hasProperty("indexOrigin")){
+			const util::fvector4 nextV=lookup[1]->getProperty<util::fvector4>("indexOrigin");
+			const float sliceDist=(nextV-thisV).len()-voxeSize[2];
+			if(sliceDist>0){
+				const float inf=std::numeric_limits<float>::infinity();
+				if(not hasProperty("voxelGap")){
+					setProperty("voxelGap",util::fvector4(inf,inf,inf,inf));
+				}
+				util::fvector4 &voxelGap=operator[]("voxelGap")->cast_to_Type<util::fvector4>(); //if there is no voxelGap yet, we create it
+				if(voxelGap[2]!=inf){
+					LOG_IF(voxelGap[2]!=sliceDist,DataLog,util::warning)
+						<< "The existing slice distance (voxelGap[2]) " << voxelGap[2]
+						<< " differs from the distance between chunk 0 and 1 " << sliceDist;
+				} else {
+					voxelGap[2]=sliceDist;
+					LOG(DataDebug,util::info)
+						<< "used the distance between chunk 0 and 1 to synthesize the missing slice distance (voxelGap[2]) as "
+						<< sliceDist;
+				}
 			}
 		}
 	}
@@ -241,8 +256,12 @@ bool Image::reIndex() {
 	if(hasProperty("readVec") and hasProperty("phaseVec")){
 		util::fvector4 &read=operator[]("readVec")->cast_to_Type<util::fvector4>();
 		util::fvector4 &phase=operator[]("phaseVec")->cast_to_Type<util::fvector4>();
+
 		read.norm();
 		phase.norm();
+		
+		LOG_IF(read.dot(phase)>0.01,DataLog,util::warning)<< "The cosine between the columns and the rows of the image is bigger than 0.01";
+
 		const util::fvector4 crossVec =util::fvector4( //we could use their cross-product as sliceVector
 			read[1]*phase[2]-read[2]*phase[1],
 			read[2]*phase[0]-read[0]*phase[2],
@@ -256,12 +275,10 @@ bool Image::reIndex() {
 		} else {
 			// We dont know anything about the slice-direction
 			// we just guess its along the positive cross-product between read- and phase direction
-			// so at leats warn the user if we do that long shot
+			// so at least warn the user if we do that long shot
 			LOG(DataLog,util::warning)
-				<< "used the cross product between readVec and phaseVec as sliceVec"
-				<< getPropertyValue("sliceVec") << ". That might be wrong!";
-			LOG_IF(read.dot(phase)>0.01,DataLog,util::warning)
-				<< "The cosine between the columns and the rows of the image is bigger than 0.01";
+				<< "used the cross product between readVec and phaseVec as sliceVec:"
+				<< crossVec << ". That might be wrong!";
 			setProperty("sliceVec",crossVec);
 		}
 	}
