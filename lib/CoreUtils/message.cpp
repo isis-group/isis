@@ -77,8 +77,9 @@ std::string Message::merge()const{
 }
 
 bool Message::shouldCommit()const{
-	if(not commitTo.expired())
-		return (commitTo.lock()->m_level >= m_level);
+	const boost::shared_ptr<MessageHandlerBase> buff(commitTo.lock());
+	if(buff)
+		return (buff->m_level >= m_level);
 	else return false;
 }
 

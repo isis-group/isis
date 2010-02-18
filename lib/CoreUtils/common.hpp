@@ -20,6 +20,7 @@
 #include <sstream>
 #include <boost/regex.hpp>
 #include <boost/lexical_cast.hpp>
+#include <set>
 
 namespace isis { namespace util {
 
@@ -211,8 +212,16 @@ basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits> &out,const
 	isis::util::write_list(s.begin(),s.end(),out,"\n","","");
 	return out;
 }
+///Streaming output for std::list
 template<typename charT, typename traits, typename _Tp, typename _Alloc >
 basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits> &out,const list<_Tp,_Alloc>& s)
+{
+	isis::util::write_list(s.begin(),s.end(),out);
+	return out;
+}
+///Streaming output for std::set
+template<typename charT, typename traits, typename _Tp, typename _Alloc >
+basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits> &out,const set<_Tp,_Alloc>& s)
 {
 	isis::util::write_list(s.begin(),s.end(),out);
 	return out;

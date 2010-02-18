@@ -61,7 +61,7 @@ bool image_chunk_order::operator() ( const data::Chunk& a, const data::Chunk& b 
 			<< " ("<< aNumber << " before " << aNumber << ")";
 			return true;
 		}
-		LOG_IF(aNumber==bNumber,DataDebug,util::error)<<"The Chunks cannot be sorted, won't insert";
+		LOG_IF(aNumber==bNumber,DataDebug,util::warning)<<"The Chunks cannot be sorted, won't insert";
 	}
 	return false;
 }
@@ -78,6 +78,11 @@ Image::Image (_internal::image_chunk_order lt ) :set ( lt ),clean(true)
 
 bool Image::insertChunk ( const Chunk &chunk )
 {
+	if(not chunk.valid()){
+		LOG(DataLog,util::error)
+			<< "Cannot insert chunk. Missing properties: " << chunk.missing();
+		return false;
+	}
 	if(not set.empty()){
 		//if our first chunk and the incoming chunk do have different size, skip it
 		if(set.begin()->sizeToVector() != chunk.sizeToVector()){
@@ -87,19 +92,17 @@ bool Image::insertChunk ( const Chunk &chunk )
 		}
 
 		//if our first chunk and the incoming chunk do have sequenceNumber and it differs, skip it
-		const util::PropertyValue baseSeq=set.begin()->getPropertyValue("sequenceNumber");
-		const util::PropertyValue insSeq=chunk.getPropertyValue("sequenceNumber");
-		if(not (baseSeq.empty() or insSeq.empty() or (baseSeq==insSeq))){ 
-			LOG(DataDebug,util::info)
-				<< "Ignoring chunk because its sequenceNumber doesn't fit (" << insSeq->toString(false) << "!=" << baseSeq->toString(false) << ")";
-			return false;
+		if(set.begin()->hasProperty("sequenceNumber") and chunk.hasProperty("sequenceNumber")){
+			const util::PropertyValue baseSeq=set.begin()->getPropertyValue("sequenceNumber");
+			const util::PropertyValue insSeq=chunk.getPropertyValue("sequenceNumber");
+			if(not (baseSeq.empty() or insSeq.empty() or (baseSeq==insSeq))){ 
+				LOG(DataDebug,util::info)
+					<< "Ignoring chunk because its sequenceNumber doesn't fit (" << insSeq->toString(false) << "!=" << baseSeq->toString(false) << ")";
+				return false;
+			}
 		}
-	}
-	if(not chunk.valid()){
-		const util::PropMap::key_list missing=chunk.missing();
-		LOG(DataLog,util::error)
-			<< "Cannot insert chunk. Missing properties: " << util::list2string(missing.begin(),missing.end());
-		return false;
+	} else {
+		LOG(DataDebug,util::verbose_info) << "Inserting 1st chunk";
 	}
 	if(set.insert(chunk).second){
 		clean=false;
@@ -125,13 +128,11 @@ bool Image::reIndex() {
 		for(ChunkSet::iterator it=set.begin();it!=set.end();timesteps++){
 			const util::fvector4 &here=it->getProperty<util::fvector4>("indexOrigin");
 			const util::fvector4 &next=(++it)->getProperty<util::fvector4>("indexOrigin");
-			
-			if(here!=next)
-				break;
+			if(here!=next)break;
 		}
 		LOG_IF(chunks%timesteps,DataDebug,util::error)
 		<< "The number timesteps does not fit the number of chunks. Reindexing will fail.";
-		LOG(DataDebug,util::info) << "Found " << timesteps << " timesteps in " << chunks << " chunks";
+		LOG(DataDebug,util::info) << "Found " << timesteps << " chunks per position assuming them as timesteps";
 	}
 	//sort in the chunks (assume the chunkset to be an Matrix where m represents the timesteps, then transpose it )
 	const size_t chunksets=chunks/timesteps;
@@ -183,12 +184,12 @@ bool Image::reIndex() {
 	LOG(DataDebug,util::verbose_info) << util::list2string(uniques.begin(),uniques.end(),", ");
 
 	join(common);
-	LOG(DataDebug,util::verbose_info) << "common properties saved into the image" << common;
+	LOG_IF(not common.empty(), DataDebug,util::verbose_info) << "common properties saved into the image" << common;
 
 	//remove common props from the chunks
 	for(size_t i=0;i!=lookup.size();i++)
 		getChunkAt(i).remove(common);
-	LOG(DataDebug,util::info) << "common properties removed from " << set.size() << " chunks: " << common;
+	LOG_IF(not common.empty(), DataDebug,util::info) << "common properties removed from " << set.size() << " chunks: " << common;
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	//reconstruct some redundant information, if its missing
@@ -216,18 +217,24 @@ bool Image::reIndex() {
 			setProperty("sliceVec",distVecNorm);
 		}
 
-		//check the slice distance
-		const float sliceDist=(nextV-thisV).len();
-		util::fvector4 &voxelGap=getPropertyValue("voxelGap")->cast_to_Type<util::fvector4>();
-		if(voxelGap[2]!=-std::numeric_limits<float>::infinity()){
-			LOG_IF(voxelGap[2]!=sliceDist,DataLog,util::warning)
-				<< "The existing slice distance (voxelGap[2]) " << voxelGap[2]
-				<< " differs from the distance between chunk 0 and 1 " << sliceDist;
-		} else {
-			voxelGap[2]=sliceDist;
-			LOG(DataDebug,util::info)
-				<< "used the distance between chunk 0 and 1 to synthesize the missing slice distance (voxelGap[2]) as "
-				<< sliceDist;
+		const util::fvector4 &voxeSize=getProperty<util::fvector4>("voxelSize");
+		const float sliceDist=(nextV-thisV).len()-voxeSize[2];
+		if(sliceDist>0){
+			const float inf=std::numeric_limits<float>::infinity();
+			if(not hasProperty("voxelGap")){
+				setProperty("voxelGap",util::fvector4(inf,inf,inf,inf));
+			}
+			util::fvector4 &voxelGap=operator[]("voxelGap")->cast_to_Type<util::fvector4>(); //if there is no voxelGap yet, we create it
+			if(voxelGap[2]!=inf){
+				LOG_IF(voxelGap[2]!=sliceDist,DataLog,util::warning)
+					<< "The existing slice distance (voxelGap[2]) " << voxelGap[2]
+					<< " differs from the distance between chunk 0 and 1 " << sliceDist;
+			} else {
+				voxelGap[2]=sliceDist;
+				LOG(DataDebug,util::info)
+					<< "used the distance between chunk 0 and 1 to synthesize the missing slice distance (voxelGap[2]) as "
+					<< sliceDist;
+			}
 		}
 	}
 	//if we have read- and phase- vector
@@ -259,6 +266,7 @@ bool Image::reIndex() {
 		}
 	}
 	
+	LOG_IF(not valid(),DataLog,util::warning)<< "The image is not valid after reindexing. Missing properties: " << missing();
 	init(size);
 	clean=true;
 	return true;
@@ -294,14 +302,12 @@ size_t Image::getChunkStride ( size_t base_stride )
 {
 	size_t ret;
 	if(set.empty()){
-		LOG(DataLog,util::error)
-		<< "Trying to get chunk stride in an empty image";
+		LOG(DataLog,util::error)<< "Trying to get chunk stride in an empty image";
 		return 0;
 	} else if (lookup.empty()) {
-		LOG(DataDebug,util::error)
-		<< "Lookup table for chunks is empty. Do reIndex() first!";
+		LOG(DataDebug,util::error)<< "Lookup table for chunks is empty. Do reIndex() first!";
 		return 0;
-	} else if(lookup.size()>3*base_stride) {
+	} else if(lookup.size()>=4*base_stride) {
 		/* there can't be any stride with less than 3*base_stride chunks (which would actually be an invalid image)
 		 * _____
 		 * |c c| has no stride/dimensional break
@@ -336,11 +342,19 @@ size_t Image::getChunkStride ( size_t base_stride )
 				return ret; 
 			}
 		}
+	} else 	if(lookup.size()%base_stride){
+		LOG(DataLog,util::error) 
+			<< "The amount of chunks (" << lookup.size()
+			<< ") is not divisible by the block size of the dimension below (" << base_stride
+			<< "). Maybe the image is incomplete.";
+		LOG(DataLog,util::warning)
+			<< "Ignoring "	<< 	lookup.size()%base_stride << " chunks.";
+		return lookup.size()/base_stride;
 	}
 	//we didn't find any break, so we assume its a linear image |c c ... c|
 	ret=lookup.size();
 	LOG(DataDebug,util::info)
-	<< "No dimensional break found, assuming it to be at the end (" << ret << ")";
+		<< "No dimensional break found, assuming it to be at the end (" << ret << ")";
 	return ret;
 }
 

@@ -19,6 +19,7 @@
 
 #include "common.hpp"
 #include "property.hpp"
+#include "log.hpp"
 #include <set>
 #include <algorithm>
 
@@ -158,6 +159,8 @@ public:
 	* \returns false if there is any needed and empty property, true otherwhise.
 	*/
 	bool valid()const;
+	/// \returns true if the PropMap is empty, false otherwhise
+	bool empty()const;
 	const key_list keys()const;
 	/**
 	* Get a list of missing properties.
@@ -259,16 +262,20 @@ public:
 	* \returns a Type\<T\> containing a copy of the value stored for given property if the type of the stored property is T.
 	* \return Type\<T\>() otherwhise.
 	*/
-	template<typename T> util::Type<T> getPropertyType(const std::string &key)const{
+	template<typename T> Type<T> getPropertyType(const std::string &key)const{
 		const PropertyValue &value=getPropertyValue(key);
 		if(value.empty()){
 			const util::Type<T> dummy=T();
-			LOG(CoreLog,util::error)
+			LOG(CoreLog,error)
 			<< "Requested Property " << key << " is not set! Returning " << dummy.toString(true);
 			return dummy;
 		}
-		else
+		else {
+			LOG_IF(not value->is<T>(),CoreDebug,error)
+			  << "The type of the Property " << key << " is " << value->typeName() 
+			  << " but you requested " << Type<T>::staticName() << " this will raise an exception.";
 			return value->cast_to_Type<T>();
+		}
 	}
 	template<typename T> T getProperty(const std::string &key)const{
 		return (T)getPropertyType<T>(key);

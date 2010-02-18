@@ -164,6 +164,11 @@ bool PropMap::valid() const
 	return found==end();
 }
 
+bool PropMap::empty() const
+{
+  return base_type::empty();
+}
+
 PropMap::diff_map PropMap::diff(const PropMap& other) const{
 	PropMap::diff_map ret;
 	diffTree(other,ret,"");
@@ -346,7 +351,7 @@ void PropMap::addNeeded(const std::string& key)
 void PropMap::addNeededFromString(const std::string& needed)
 {
 	const std::list<std::string> needList=util::string2list<std::string>(needed);
-	LOG(CoreDebug,util::verbose_info)	<< "Adding " << util::list2string(needList.begin(),needList.end()) << " as needed";
+	LOG(CoreDebug,util::verbose_info)	<< "Adding " << needed << " as needed";
 	BOOST_FOREACH(std::list<std::string>::const_reference ref,needList)
 		addNeeded(ref);
 }
@@ -359,7 +364,13 @@ bool PropMap::hasProperty(const std::string& key) const {
 
 const isis::util::PropertyValue& PropMap::getPropertyValue(const std::string& key) const {
 	const PropertyValue* found=findPropVal(key);
-	return found ? *found: emptyProp;
+	if(not found){
+		LOG(CoreDebug,util::error)
+		<< "Requested Property " << key << " is not set! Returning empty property.";
+		return emptyProp;
+	}
+	else
+		return *found;
 }
 
 
