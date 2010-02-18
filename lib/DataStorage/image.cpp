@@ -58,7 +58,7 @@ bool image_chunk_order::operator() ( const data::Chunk& a, const data::Chunk& b 
 			//if they at least have different acquisitionNumber
 			LOG(DataDebug,util::verbose_info)
 			<< "Fallback sorted chunks by acquisition order"
-			<< " ("<< aNumber << " before " << aNumber << ")";
+			<< " ("<< aNumber << " before " << bNumber << ")";
 			return true;
 		}
 		LOG_IF(aNumber==bNumber,DataDebug,util::warning)<<"The Chunks cannot be sorted, won't insert";
@@ -136,12 +136,14 @@ bool Image::reIndex() {
 		LOG(DataDebug,util::info) << "Found " << timesteps << " chunks per position assuming them as timesteps";
 	}
 	if(chunks>timesteps and chunks%timesteps==0){
+		const size_t chunksets=chunks/timesteps;
 		//sort in the chunks (assume the chunkset to be an Matrix where m represents the timesteps, then transpose it )
 		size_t idx=0;
 		for(ChunkSet::iterator it=set.begin();it!=set.end();it++,idx++){
 			const size_t i= idx%timesteps;
 			const size_t j= idx/timesteps;
-			lookup[i*timesteps+j]=it;
+			lookup[i*chunksets+j]=it;
+			LOG(DataDebug,util::verbose_info) << "Putting " << idx << " at " << i*chunksets+j;;
 		}
 	} else {
 		size_t idx=0;
@@ -349,7 +351,7 @@ size_t Image::getChunkStride ( size_t base_stride )
 
 			LOG(DataDebug,util::verbose_info)
 			<< "Distance between chunk " << util::MSubject(i) << " and " << util::MSubject(i+base_stride)
-			<< " is " << dist.len();
+			<< " is " << dist.len() << ". Distance between 0 and 1 was " << dist1.len();
 			
 			if(dist.sqlen() > dist1.sqlen()*4){// found an dimensional break - leave
 				ret=i+1;

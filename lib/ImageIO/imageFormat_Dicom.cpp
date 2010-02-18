@@ -128,25 +128,23 @@ void ImageFormat_Dicom::sanitise(isis::util::PropMap& object, string dialect) {
 			voxelSize[2]=object[prefix+"SliceThickness"]->as<float>();
 			object.remove(prefix+"SliceThickness");
 		}
-		if(hasOrTell(prefix+"EchoTime",object,util::warning)){
-			voxelSize[3]=object[prefix+"EchoTime"]->as<float>();
-			object.remove(prefix+"EchoTime");
-		}
 		object.setProperty("voxelSize",voxelSize);
 	}
 	// Compute voxel gap
-	util::fvector4 voxelGap(invalid_float,invalid_float,invalid_float,invalid_float);
-	if(hasOrTell(prefix+"RepetitionTime",object,util::warning)){
-		voxelGap[3]=object[prefix+"RepetitionTime"]->as<float>()/1000;
-		object.remove(prefix+"RepetitionTime");
+	{
+		util::fvector4 voxelGap(invalid_float,invalid_float,invalid_float,invalid_float);
+		if(hasOrTell(prefix+"RepetitionTime",object,util::warning)){
+			voxelGap[3]=object[prefix+"RepetitionTime"]->as<float>()/1000;
+			object.remove(prefix+"RepetitionTime");
+		}
+		if(hasOrTell(prefix+"SpacingBetweenSlices",object,util::info)){
+			voxelGap[2]=object[prefix+"SpacingBetweenSlices"]->as<float>();
+			object.remove(prefix+"SpacingBetweenSlices");
+		}
+		if(voxelGap!=util::fvector4(invalid_float,invalid_float,invalid_float,invalid_float))
+		  object.setProperty("voxelGap",voxelGap);
 	}
-	if(hasOrTell(prefix+"SpacingBetweenSlices",object,util::info)){
-		voxelGap[2]=object[prefix+"SpacingBetweenSlices"]->as<float>();
-		object.remove(prefix+"SpacingBetweenSlices");
-	}
-	if(voxelGap!=util::fvector4(invalid_float,invalid_float,invalid_float,invalid_float))
-	  object.setProperty("voxelGap",voxelGap);
-
+	
 	transformOrTell<std::string>   (prefix+"PerformingPhysiciansName","performingPhysician",object,util::warning);
 	transformOrTell<u_int16_t>     (prefix+"NumberOfAverages",        "numberOfAverages",   object,util::warning);
 
