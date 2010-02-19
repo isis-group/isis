@@ -255,6 +255,7 @@ public:
 	virtual TypePtrBase* cloneToNew(void *const address,size_t len=0)const=0;
 	virtual size_t bytes_per_elem()const=0;
 	virtual ~TypePtrBase();
+	virtual void copyRange(size_t start,size_t end,TypePtrBase &dst,size_t dst_start)const=0;
 };
 
 }

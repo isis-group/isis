@@ -191,6 +191,20 @@ public:
 		);
 	}
 	
+	void copyRange(size_t start,size_t end,TypePtrBase &dst,size_t dst_start)const{
+		assert(start<=end);
+		LOG_IF(not dst.is<TYPE>(),CoreDebug,error) 
+			<< "Copying into a TypePtr of different type. Its " << dst.typeName() << " not " << typeName();
+		LOG_IF(end>=len(),CoreLog,error) 
+			<< "End of the range ("<< end << ") is behind the len of this TypePtr ("<< len() << ")";
+		LOG_IF(end>=dst.len(),CoreLog,error) 
+			<< "End of the range ("<< end << ") is behind the len of the destination ("<< dst.len() << ")";
+			
+		TYPE &dest= dst.cast_to_TypePtr<TYPE>()[dst_start];
+		const TYPE &src= operator[](start) ;
+		memcpy(&dest,&src,(end-start)*sizeof(TYPE));
+	}
+	
 	/// @copydoc Type::is()
 	virtual bool is(const std::type_info & t)const{
 		return t==typeid(TYPE);
