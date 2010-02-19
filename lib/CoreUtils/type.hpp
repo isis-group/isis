@@ -161,7 +161,7 @@ public:
 	 * \param length the length of the used array (TypePtr does NOT check for length,
 	 * this is just here for child classes which may want to check)
 	 */
-	TypePtr(TYPE* ptr,size_t length):
+	TypePtr(TYPE* const ptr,size_t length):
 	m_val(ptr,BasicDeleter()),_internal::TypePtrBase(length){}
 	/**
 	 * Creates TypePtr from a pointer of type TYPE.
@@ -169,7 +169,7 @@ public:
 	 * The usual dereferencing pointer interface ("*" and "->") is supported.
 	 * D must implement operator()(TYPE *p).
 	 * \param ptr the pointer to the used array
-	 * \param length the length of the used array (TypePtr does NOT check for length,
+	 * \param length the length of the used array in elements (TypePtr does NOT check for length),
 	 * \param d the deleter to be used when the data shall be deleted ( d() is called then )
 	 */
 
@@ -248,6 +248,12 @@ public:
 	TypePtrBase* clone() const
 	{
 		return new TypePtr<TYPE>(*this);
+	}
+	TypePtrBase* cloneToNew(void* const address, size_t size) const{ //@todo version for deleter maybe
+		return new TypePtr<TYPE>((TYPE*const)address,size);
+	}
+	size_t bytes_per_elem() const{
+		return sizeof(TYPE);
 	}
 	std::vector<Reference> splice(size_t size)const{
 		if(size>=len()){

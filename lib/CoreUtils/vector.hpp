@@ -189,6 +189,24 @@ public:
 		else *this = *this / d;
 		return *this;
 	}
+	
+	/// compute the product of all elements
+	TYPE product()
+	{
+		TYPE ret=1;
+		for(iterator i=CONTAINER::begin();i!=CONTAINER::end();i++)
+		  ret*=*i;
+		return ret;
+	}
+
+	/// compute the sum of all elements
+	TYPE sum()
+	{
+		TYPE ret=0;
+		for(iterator i=CONTAINER::begin();i!=CONTAINER::end();i++)
+		  ret+=*i;
+		return ret;
+	}
 
 	/////////////////////////////////////////////////////////////////////////
 	// copy stuff

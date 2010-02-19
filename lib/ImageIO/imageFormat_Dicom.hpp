@@ -48,6 +48,7 @@ public:
 
 	bool tainted();
 	size_t maxDim();
+    void readMosaic(const data::Chunk& source, data::ChunkList &dest);
 };
 }}
 

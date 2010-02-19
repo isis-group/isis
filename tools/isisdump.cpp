@@ -8,7 +8,7 @@ using isis::util::DefaultMsgPrint;
 int main(int argc, char *argv[])
 {
 	
-	ENABLE_LOG(isis::image_io::ImageIoDebug,DefaultMsgPrint,warning);
+	ENABLE_LOG(isis::image_io::ImageIoDebug,DefaultMsgPrint,info);
 	ENABLE_LOG(isis::image_io::ImageIoLog,DefaultMsgPrint,warning);
 	ENABLE_LOG(CoreDebug,DefaultMsgPrint,warning);
 	ENABLE_LOG(CoreLog,DefaultMsgPrint,warning);

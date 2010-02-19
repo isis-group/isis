@@ -244,7 +244,16 @@ public:
 	size_t len()const;
 	
 	virtual std::vector<Reference> splice(size_t size)const=0;
+	/// Create a TypePtr of the same type pointing at the same address.
 	virtual TypePtrBase* clone()const=0;
+	/**
+	 * Create a TypePtr of the same type pointing at the given address.
+	 * \param address memory address that should be managed by this TypePtr. 
+	 * It will be deleted automatically, so you should not directly use it anymore.
+	 * \param len length of this memory block in elements of the given TYPE (default is the size of the original)
+	 */
+	virtual TypePtrBase* cloneToNew(void *const address,size_t len=0)const=0;
+	virtual size_t bytes_per_elem()const=0;
 	virtual ~TypePtrBase();
 };
 

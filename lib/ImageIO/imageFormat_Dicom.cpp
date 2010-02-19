@@ -1,8 +1,9 @@
 #include "imageFormat_Dicom.hpp"
+#include "common.hpp"
+
 #include <dcmtk/dcmdata/dcdict.h>
 #include <dcmtk/dcmimgle/dcmimage.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
-#include "common.hpp"
 
 namespace isis{ namespace image_io{
 namespace _internal{
@@ -182,6 +183,36 @@ void ImageFormat_Dicom::sanitise(isis::util::PropMap& object, string dialect) {
 	}
 }
 
+void ImageFormat_Dicom::readMosaic(const data::Chunk& source, data::ChunkList& dest)
+{
+	// prepare some needed parameters
+  	const std::string prefix=std::string(ImageFormat_Dicom::dicomTagTreeName)+"/";
+	util::slist iType=source.getProperty<util::slist>(prefix+"ImageType");
+	std::replace(iType.begin(),iType.end(),std::string("MOSAIC"),std::string("WAS_MOSAIC"));
+	
+	if(not hasOrTell(prefix+"Unknown Tag(0019,100a)",source,util::error))
+	  return;	// whoa, we dont have the number of images in the Mosaic - get out of here
+// 	source.remove(prefix+"Unknown Tag(0019,100a)"); // we dont need that anymore
+	
+	// All is fine, lets start
+	const u_int16_t images=source.getPropertyValue(prefix+"Unknown Tag(0019,100a)")->as<u_int16_t>();
+	util::ivector4 size=source.sizeToVector();
+	const u_int16_t matrixSize = std::ceil(std::sqrt(images));
+	size[0]/=matrixSize;size[1]/=matrixSize;size[2]*=images;
+	assert(size[3]==1);
+	LOG(ImageIoDebug,util::info) << "Decomposing a "<< source.sizeToVector() <<" mosaic-image into a " << size << " image";
+	
+	void *const addr = malloc(size.product()*source.bytes_per_voxel());
+	boost::shared_ptr<data::Chunk> newChunk=source.cloneToNew(addr,size[0],size[1],size[2],size[3]);
+	std::cout << newChunk->typeName() <<std::endl;
+
+/*	for(size_t slice=0;slice<size[2];slice++){
+		source.voxel<>();
+	}*/
+// 	128,matrixSize,128,matrixSize
+}
+
+
 int ImageFormat_Dicom::load(data::ChunkList &chunks, const std::string& filename, const std::string& dialect )
 {
 	boost::shared_ptr<data::Chunk> chunk;
@@ -190,13 +221,15 @@ int ImageFormat_Dicom::load(data::ChunkList &chunks, const std::string& filename
 	if(dcfile->loadFile(filename.c_str()).good() and (chunk =_internal::DicomChunk::makeSingleMonochrome(filename,dcfile))){
 		//we got a chunk from the file
 		sanitise(*chunk,"");
-/*		const util::slist iType=chunk->getProperty<util::slist>("ImageType");
+		const util::slist iType=chunk->getProperty<util::slist>(std::string(ImageFormat_Dicom::dicomTagTreeName)+"/"+"ImageType");
 		if(std::find(iType.begin(),iType.end(),"MOSAIC")!=iType.end()){ // if its a mosaic
-			
-		} else {*/
+			LOG(ImageIoLog,util::verbose_info) << "This seems to be an mosaic image, will decompose it";
+			readMosaic(*chunk,chunks);
+		} else {
+			std::cout << iType << std::endl;
 			chunks.push_back(*chunk);
 			return 1;
-// 		}
+		}
 	} else {
 		delete dcfile;//no chunk was created, so we have to deal with the dcfile on our own
 		LOG(ImageIoLog,util::error)

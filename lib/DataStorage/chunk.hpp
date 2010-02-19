@@ -60,6 +60,7 @@ protected:
 	_internal::ChunkBase(firstDim,secondDim,thirdDim,fourthDim),
 	util::_internal::TypeReference<util::_internal::TypePtrBase>(new util::TypePtr<TYPE>(src,volume(),d))
 	{}
+	Chunk(util::_internal::TypePtrBase* src,size_t firstDim,size_t secondDim,size_t thirdDim,size_t fourthDim);
 public:
 	/**
 	 * Gets a reference to the element at a given index.
@@ -96,6 +97,10 @@ public:
 	template<typename TYPE> const util::TypePtr<TYPE>& getTypePtr()const{
 		return operator*().cast_to_TypePtr<TYPE>();
 	}
+	boost::shared_ptr<Chunk> cloneToNew(void *const address,size_t firstDim=0,size_t secondDim=0,size_t thirdDim=0,size_t fourthDim=0)const;
+	size_t bytes_per_voxel()const;
+	std::string typeName()const;
+	unsigned short typeID()const;
 };
 
 /// @cond _internal
