@@ -18,7 +18,7 @@ class DicomChunk : public data::Chunk{
 				<< "Trying to close non existing dicom file";
 			LOG_IF(not m_img, ImageIoLog,util::error)
 				<< "Trying to close non existing dicom image";
-			LOG(ImageIoDebug,util::info)	<< "Closing mapped dicom-file " << util::MSubject(m_filename) << " (pixeldata was at " << at << ")";
+			LOG(ImageIoDebug,util::verbose_info)	<< "Closing mapped dicom-file " << util::MSubject(m_filename) << " (pixeldata was at " << at << ")";
 			delete m_img;
 			delete m_dcfile;
 		}
@@ -28,7 +28,7 @@ class DicomChunk : public data::Chunk{
 		size_t width,size_t height):
 		data::Chunk(dat,del,width,height,1,1)
 	{
-		LOG(ImageIoDebug,util::info)
+		LOG(ImageIoDebug,util::verbose_info)
 		<< "Mapping greyscale pixeldata of " << del.m_filename << " at "
 		<< dat << " (" << util::TypePtr<TYPE>::staticName() << ")" ;
 		DcmDataset* dcdata=del.m_dcfile->getDataset();
@@ -192,7 +192,6 @@ void ImageFormat_Dicom::readMosaic(const data::Chunk& source, data::ChunkList& d
 	
 	if(not hasOrTell(prefix+"Unknown Tag(0019,100a)",source,util::error))
 	  return;	// whoa, we dont have the number of images in the Mosaic - get out of here
-// 	source.remove(prefix+"Unknown Tag(0019,100a)"); // we dont need that anymore
 	
 	// All is fine, lets start
 	const u_int16_t images=source.getPropertyValue(prefix+"Unknown Tag(0019,100a)")->as<u_int16_t>();
@@ -204,12 +203,32 @@ void ImageFormat_Dicom::readMosaic(const data::Chunk& source, data::ChunkList& d
 	
 	void *const addr = malloc(size.product()*source.bytes_per_voxel());
 	boost::shared_ptr<data::Chunk> newChunk=source.cloneToNew(addr,size[0],size[1],size[2],size[3]);
-	std::cout << newChunk->typeName() <<std::endl;
-
-/*	for(size_t slice=0;slice<size[2];slice++){
-		source.voxel<>();
-	}*/
-// 	128,matrixSize,128,matrixSize
+	
+	for(size_t slice=0;slice<size[2];slice++){
+		for(size_t phase=0;phase<size[1];phase++){
+				const size_t dpos[]={0,phase,slice,0};
+				const size_t column=slice%matrixSize;
+				const size_t row=slice/matrixSize;
+				const size_t sstart[]={column*size[0],row*size[1]+phase,0,0};
+				const size_t send[]={sstart[0]+size[0]-1,row*size[1]+phase,0,0};
+				source.copyRange(sstart,send,*newChunk,dpos);
+		}
+	}
+	
+	// fix the properties
+	static_cast<util::PropMap&>(*newChunk)=static_cast<const util::PropMap&>(source); //copy _only_ the Properties of source
+	newChunk->remove(prefix+"Unknown Tag(0019,100a)"); // we dont need that anymore
+	newChunk->setProperty(prefix+"ImageType",iType);
+	
+	//remove the additional mosaic offset
+	//eg. if there is a 10x10 Mosaic, substract the half size of 9 Images from the indexOrigin
+	util::fvector4 &origin=newChunk->getPropertyValue("indexOrigin")->cast_to_Type<util::fvector4>();
+	util::fvector4 fovCorr=newChunk->fovAsVector()/2*(matrixSize-1);
+	util::fvector4 offset = (newChunk->getProperty<util::fvector4>("readVec")*fovCorr[0]) + (newChunk->getProperty<util::fvector4>("phaseVec")*fovCorr[1]);
+	
+	origin= origin+ offset;
+	LOG(ImageIoDebug,util::info) << "New origin: " << newChunk->getPropertyValue("indexOrigin");
+	dest.push_back(*newChunk);
 }
 
 
@@ -226,10 +245,9 @@ int ImageFormat_Dicom::load(data::ChunkList &chunks, const std::string& filename
 			LOG(ImageIoLog,util::verbose_info) << "This seems to be an mosaic image, will decompose it";
 			readMosaic(*chunk,chunks);
 		} else {
-			std::cout << iType << std::endl;
 			chunks.push_back(*chunk);
-			return 1;
 		}
+		return chunks.size();
 	} else {
 		delete dcfile;//no chunk was created, so we have to deal with the dcfile on our own
 		LOG(ImageIoLog,util::error)

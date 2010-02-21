@@ -130,8 +130,8 @@ int IOFactory::loadFile(ChunkList &ret,const boost::filesystem::path& filename, 
 	}
 
 	BOOST_FOREACH(FileFormatList::const_reference it,formatReader){
-		LOG(DataDebug,util::verbose_info)
-			<< "plugin to load file " <<  filename << ": " << it->name()
+		LOG(DataDebug,util::info)
+			<< "plugin to load file " <<  util::MSubject(filename) << ": " << it->name()
 			<< 	(dialect.empty() ?
 					std::string("") : std::string(" with dialect: ") + dialect
 				);

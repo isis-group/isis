@@ -105,6 +105,8 @@ public:
 	void copyRange(const size_t source_start[],const size_t source_end[], isis::data::Chunk& dst,const size_t destination[])const;
 	void copyLine(size_t secondDimS, size_t thirdDimS, size_t fourthDimS, isis::data::Chunk& dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD)const;
 	void copySlice(size_t thirdDimS, size_t fourthDimS, isis::data::Chunk& dst, size_t thirdDimD, size_t fourthDimD)const;
+	
+	util::fvector4 fovAsVector()const;
 };
 
 /// @cond _internal

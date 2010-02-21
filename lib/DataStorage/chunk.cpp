@@ -11,6 +11,7 @@
 //
 
 #include "chunk.hpp"
+#include <limits>
 
 namespace isis{ namespace data{
 namespace _internal{
@@ -88,15 +89,33 @@ void Chunk::copyRange(const size_t source_start[], const size_t source_end[], Ch
 			<< "Copy end " << util::FixedVector<size_t,4>(source_end)
 			<< " is out of range (" << sizeToString() << ") at the source chunk";
 	}
-	if(!rangeCheck(destination)){
+	if(!dst.rangeCheck(destination)){
 		LOG(DataDebug,isis::util::error)
 			<< "Index " << util::FixedVector<size_t,4>(destination)
 			<< " is out of range (" << sizeToString() << ") at the destination chunk";
 	}
+	LOG(DataDebug,isis::util::verbose_info) 
+	<< "Copying range from " << util::FixedVector<size_t,4>(source_start) << " to " << util::FixedVector<size_t,4>(source_end) 
+	<< " to " << util::FixedVector<size_t,4>(destination);
 	const size_t sstart=dim2Index(source_start);
 	const size_t send=dim2Index(source_end);
 	const size_t dstart=dst.dim2Index(destination);
 	get()->copyRange(sstart,send,*dst,dstart);
+}
+
+util::fvector4 Chunk::fovAsVector()const
+{
+	LOG_IF(not hasProperty("voxelSize"),DataDebug,util::error) << "Property voxelSize is missing in chunk, cannot compute FOV";
+	const util::fvector4 voxelSize=getProperty<util::fvector4>("voxelSize");
+	const util::fvector4 voxels=sizeToVector();
+	util::fvector4 gapSize;
+	if(hasProperty("voxelGap")){
+		const util::fvector4 voxelGap=getProperty<util::fvector4>("voxelGap");
+		for(int i=0;i<4;i++)
+		  if(voxels[i]>1 && voxelGap[i]!= -std::numeric_limits<float>::infinity())
+			gapSize[i]=(voxels[i]-1)*voxelSize[i];
+	}
+	return voxelSize * voxels + gapSize;
 }
 
 
