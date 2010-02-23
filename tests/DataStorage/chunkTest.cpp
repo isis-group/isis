@@ -18,13 +18,15 @@ BOOST_AUTO_TEST_CASE (chunk_init_test)
 {
 	ENABLE_LOG(CoreLog,util::DefaultMsgPrint,util::warning);
 	ENABLE_LOG(CoreDebug,util::DefaultMsgPrint,util::warning);
+	ENABLE_LOG(data::DataLog,util::DefaultMsgPrint,util::warning);
+	ENABLE_LOG(data::DataDebug,util::DefaultMsgPrint,util::warning);
 
 	data::MemChunk<float> ch(4,3,2,1);
-	BOOST_CHECK(ch.volume()==1*2*3*4);
-	BOOST_CHECK(ch.dimSize(data::MemChunk<float>::read)==4);
-	BOOST_CHECK(ch.dimSize(data::MemChunk<float>::phase)==3);
-	BOOST_CHECK(ch.dimSize(data::MemChunk<float>::slice)==2);
-	BOOST_CHECK(ch.dimSize(data::MemChunk<float>::time)==1);
+	BOOST_CHECK_EQUAL(ch.volume(),1*2*3*4);
+	BOOST_CHECK_EQUAL(ch.dimSize(data::readDim),4);
+	BOOST_CHECK_EQUAL(ch.dimSize(data::phaseDim),3);
+	BOOST_CHECK_EQUAL(ch.dimSize(data::sliceDim),2);
+	BOOST_CHECK_EQUAL(ch.dimSize(data::timeDim),1);
 }
 
 BOOST_AUTO_TEST_CASE (chunk_property_test)
@@ -50,16 +52,16 @@ BOOST_AUTO_TEST_CASE (chunk_property_test)
 
 BOOST_AUTO_TEST_CASE (chunk_data_test1)//Access Chunk elements via dimensional index
 {
-	data::MemChunk<float> ch(4,3,2,1);
+	data::MemChunk<float> ch(4,4,4,4);
 
 	for(size_t i=0;i<ch.dimSize(data::readDim);i++)
-		ch.voxel<float>(0,0,0,i)=i;
+		ch.voxel<float>(i,i,i,i)=i;
 	for(size_t i=0;i<ch.dimSize(data::readDim);i++)
-		BOOST_CHECK(ch.voxel<float>(0,0,0,i)==i);
+		BOOST_CHECK_EQUAL(ch.voxel<float>(i,i,i,i),i);
 
 	data::Chunk ch2 = ch;
 	for(size_t i=0;i<ch.dimSize(data::readDim);i++)
-		BOOST_CHECK(ch2.voxel<float>(0,0,0,i)==i);
+		BOOST_CHECK_EQUAL(ch2.voxel<float>(i,i,i,i),i);
 }
 
 BOOST_AUTO_TEST_CASE (chunk_data_test2)//Access Chunk elements via linear index (threat it as TypePtr)
@@ -80,7 +82,7 @@ BOOST_AUTO_TEST_CASE (chunk_data_test2)//Access Chunk elements via linear index 
 		"|",
 		util::Type<int>(ch.volume()).toString(false)+"#",""
 	);
- 	BOOST_CHECK(o.str() == ch.getTypePtr<float>().toString());
+ 	BOOST_CHECK_EQUAL(o.str(),ch.getTypePtr<float>().toString());
 }
 
 BOOST_AUTO_TEST_CASE (chunk_copy_test)//Copy chunks
@@ -94,14 +96,14 @@ BOOST_AUTO_TEST_CASE (chunk_copy_test)//Copy chunks
 	//but it should of course be the of the same type and contain the same data
 	BOOST_CHECK(ch1->isSameType(*ch2));
 	BOOST_CHECK(ch1->is<float>());
-	BOOST_CHECK(ch1.volume()==ch2.volume());
+	BOOST_CHECK_EQUAL(ch1.volume(),ch2.volume());
 	for(size_t i=0;i<ch2.volume();i++)
-		BOOST_CHECK(ch2.getTypePtr<float>()[i]==i);
+		BOOST_CHECK_EQUAL(ch2.getTypePtr<float>()[i],i);
 
 	//cloning chunks is a cheap copy, thus any copied chunk shares data
 	for(size_t i=0;i<ch2.volume();i++){
 		ch1.asTypePtr<float>()[i]=0;
-		BOOST_CHECK(ch2.getTypePtr<float>()[i]==0);
+		BOOST_CHECK_EQUAL(ch2.getTypePtr<float>()[i],0);
 	}
 }
 }}

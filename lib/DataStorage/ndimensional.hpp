@@ -52,11 +52,12 @@ template<unsigned short DIMS> class NDimensional{
 	size_t dim[DIMS];
 protected:
 	NDimensional(){}
+	static const size_t n_dims=DIMS;
 public:
 	/**
 	 * Initializes the size-vector.
 	 * This must be done before anything else, or behaviour will be undefined.
-	 * \param d array with sizes to use
+	 * \param d array with sizes to use. (d[0] is most iterating element / lowest dimension)
 	 */
 	void init(const size_t d[DIMS]){
 		std::copy(d,d+DIMS,dim);

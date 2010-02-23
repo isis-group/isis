@@ -29,8 +29,7 @@ class ChunkBase :public NDimensional<4>,public util::PropMap{
 protected:
 	static const char* needed;
 public:
-	enum dimensions{read=0,phase,slice,time,n_dims};
-	static const dimensions dimension[n_dims];
+// 	static const dimensions dimension[n_dims]={readDim,phaseDim,sliceDim,timeDim};
 	typedef isis::util::_internal::TypeReference <ChunkBase > Reference;
 
 	ChunkBase(size_t firstDim,size_t secondDim,size_t thirdDim,size_t fourthDim);
@@ -65,15 +64,13 @@ public:
 	/**
 	 * Gets a reference to the element at a given index.
 	 * If index is invalid, behaviour is undefined. Most probably it will crash.
-	 * If _ENABLE_DATA_DEBUG is true an error message will be send (but it will still crash).
+	 * If _ENABLE_DATA_DEBUG is true an error message will be send (but it will _not_ stop).
 	 */
 	template<typename TYPE> TYPE &voxel(size_t firstDim,size_t secondDim=0,size_t thirdDim=0,size_t fourthDim=0){
 		const size_t idx[]={firstDim,secondDim,thirdDim,fourthDim};
-		if(!rangeCheck(idx)){
-			LOG(DataDebug,isis::util::error)
-				<< "Index " << firstDim << "|" << secondDim << "|" << thirdDim << "|" << fourthDim
-				<< " is out of range (" << sizeToString() << ")";
-		}
+		LOG_IF(not rangeCheck(idx),DataDebug,isis::util::error)
+			<< "Index " << util::ivector4(firstDim,secondDim,thirdDim,fourthDim)
+			<< " is out of range " << sizeToString();
 		util::TypePtr<TYPE> &ret=asTypePtr<TYPE>();
 		return ret[dim2Index(idx)];
 	}

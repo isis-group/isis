@@ -32,9 +32,6 @@ util::fvector4 ChunkBase::size()const
 {
 	return util::fvector4(dimSize(0),dimSize(1),dimSize(2),dimSize(3));
 }
-
-
-const ChunkBase::dimensions ChunkBase::dimension[ChunkBase::n_dims]={ChunkBase::read,ChunkBase::phase,ChunkBase::slice,ChunkBase::time};
 }
 
 Chunk::Chunk(util::_internal::TypePtrBase* src,size_t firstDim,size_t secondDim,size_t thirdDim,size_t fourthDim):
@@ -79,24 +76,18 @@ void Chunk::copySlice(size_t thirdDimS, size_t fourthDimS, Chunk& dst, size_t th
 
 void Chunk::copyRange(const size_t source_start[], const size_t source_end[], Chunk& dst,const size_t destination[]) const
 {
-	if(!rangeCheck(source_start)){
-		LOG(DataDebug,isis::util::error) 
-			<< "Copy start " << util::FixedVector<size_t,4>(source_start)
-			<< " is out of range (" << sizeToString() << ") at the source chunk";
-	}
-	if(!rangeCheck(source_end)){
-		LOG(DataDebug,isis::util::error) 
-			<< "Copy end " << util::FixedVector<size_t,4>(source_end)
-			<< " is out of range (" << sizeToString() << ") at the source chunk";
-	}
-	if(!dst.rangeCheck(destination)){
-		LOG(DataDebug,isis::util::error)
-			<< "Index " << util::FixedVector<size_t,4>(destination)
-			<< " is out of range (" << sizeToString() << ") at the destination chunk";
-	}
+	LOG_IF(not rangeCheck(source_start),DataDebug,isis::util::error) 
+		<< "Copy start " << util::FixedVector<size_t,4>(source_start)
+		<< " is out of range (" << sizeToString() << ") at the source chunk";
+	LOG_IF(not rangeCheck(source_end),DataDebug,isis::util::error) 
+		<< "Copy end " << util::FixedVector<size_t,4>(source_end)
+		<< " is out of range (" << sizeToString() << ") at the source chunk";
+	LOG_IF(not dst.rangeCheck(destination),DataDebug,isis::util::error)
+		<< "Index " << util::FixedVector<size_t,4>(destination)
+		<< " is out of range (" << sizeToString() << ") at the destination chunk";
 	LOG(DataDebug,isis::util::verbose_info) 
-	<< "Copying range from " << util::FixedVector<size_t,4>(source_start) << " to " << util::FixedVector<size_t,4>(source_end) 
-	<< " to " << util::FixedVector<size_t,4>(destination);
+		<< "Copying range from " << util::FixedVector<size_t,4>(source_start) << " to " << util::FixedVector<size_t,4>(source_end) 
+		<< " to " << util::FixedVector<size_t,4>(destination);
 	const size_t sstart=dim2Index(source_start);
 	const size_t send=dim2Index(source_end);
 	const size_t dstart=dst.dim2Index(destination);

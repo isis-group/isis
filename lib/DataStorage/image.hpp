@@ -36,7 +36,6 @@ class Image:
 public:
 	typedef std::set<Chunk,_internal::image_chunk_order> ChunkSet;
 	typedef ChunkSet::iterator ChunkIterator;
-	enum dimensions{read=0,phase,slice,time,n_dims};
 	
 private:
 	ChunkSet set;
