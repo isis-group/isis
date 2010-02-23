@@ -181,6 +181,13 @@ void ImageFormat_Dicom::sanitise(isis::util::PropMap& object, string dialect) {
 			<< prefix+"Unknown Tag(0019,1015):" << comp << " differs from indexOrigin:"
 			<< org << ", won't remove it";
 	}
+	if(object.hasProperty(prefix+"Unknown Tag(0051,100c)")){
+		std::string fov= object.getProperty<std::string>(prefix+"Unknown Tag(0051,100c)");
+		float read,phase;
+		if(std::sscanf(fov.c_str(),"FoV %f*%f",&read,&phase)==2){
+			object.setProperty("fov",util::fvector4(read,phase,invalid_float,invalid_float));
+		}
+	}
 }
 
 void ImageFormat_Dicom::readMosaic(const data::Chunk& source, data::ChunkList& dest)
@@ -223,11 +230,18 @@ void ImageFormat_Dicom::readMosaic(const data::Chunk& source, data::ChunkList& d
 	//remove the additional mosaic offset
 	//eg. if there is a 10x10 Mosaic, substract the half size of 9 Images from the indexOrigin
 	util::fvector4 &origin=newChunk->getPropertyValue("indexOrigin")->cast_to_Type<util::fvector4>();
-	util::fvector4 fovCorr=newChunk->fovAsVector()/2*(matrixSize-1);
+	util::fvector4 fovCorr=newChunk->getFoV()/2*(matrixSize-1);
 	util::fvector4 offset = (newChunk->getProperty<util::fvector4>("readVec")*fovCorr[0]) + (newChunk->getProperty<util::fvector4>("phaseVec")*fovCorr[1]);
 	
 	origin= origin+ offset;
 	LOG(ImageIoDebug,util::info) << "New origin: " << newChunk->getPropertyValue("indexOrigin");
+	
+	if(newChunk->hasProperty("fov")){
+		util::fvector4 &ref=newChunk->getPropertyValue("fov")->cast_to_Type<util::fvector4>();
+		ref[0]/=matrixSize;
+		ref[1]/=matrixSize;
+		LOG(ImageIoDebug,util::info) << "New fov: " << newChunk->getPropertyValue("fov");
+	}
 	dest.push_back(*newChunk);
 }
 

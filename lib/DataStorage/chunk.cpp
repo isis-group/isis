@@ -94,12 +94,16 @@ void Chunk::copyRange(const size_t source_start[], const size_t source_end[], Ch
 	get()->copyRange(sstart,send,*dst,dstart);
 }
 
-util::fvector4 Chunk::fovAsVector()const
+util::fvector4 Chunk::getFoV()const
 {
 	LOG_IF(not hasProperty("voxelSize"),DataDebug,util::error) << "Property voxelSize is missing in chunk, cannot compute FOV";
 	const util::fvector4 voxelSize=getProperty<util::fvector4>("voxelSize");
-	const util::fvector4 voxels=sizeToVector();
+	return getFoV(voxelSize);
+}
+util::fvector4 Chunk::getFoV(const util::fvector4 &voxelSize)const
+{
 	util::fvector4 gapSize;
+	const util::fvector4 voxels=sizeToVector();
 	if(hasProperty("voxelGap")){
 		const util::fvector4 voxelGap=getProperty<util::fvector4>("voxelGap");
 		for(int i=0;i<4;i++)

@@ -285,6 +285,17 @@ bool Image::reIndex() {
 		}
 	}
 	
+	if(hasProperty("fov")){
+		const util::fvector4 &prop=getPropertyValue("fov")->cast_to_Type<util::fvector4>();
+		const util::fvector4 &chunkFoV=chunksBegin()->getFoV(getProperty<util::fvector4>("voxelSize"));
+		bool ok=true;
+		for(int i=0;i<4;i++)
+			if(prop[i]>0 and prop[i]!=chunkFoV[i])
+				ok=false;
+		LOG_IF(not ok,DataLog,util::warning)
+				<< "The calculated field of view differs from the stored " << prop << "/" << chunkFoV;
+
+	}
 	LOG_IF(not valid(),DataLog,util::warning)<< "The image is not valid after reindexing. Missing properties: " << missing();
 	init(size);
 	clean=true;
@@ -397,11 +408,6 @@ std::list<util::PropMap::mapped_type> Image::getChunksProperties(const util::Pro
 Image::ChunkIterator Image::chunksBegin(){return set.begin();}
 Image::ChunkIterator Image::chunksEnd(){return set.end();}
 
-
-util::fvector4 Image::getFOVVec()const
-{
-	return fieldOfViewVec;
-}
 
 template <typename T> T Image::minValueInImage()const
 {

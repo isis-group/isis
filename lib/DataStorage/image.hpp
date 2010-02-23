@@ -42,7 +42,6 @@ private:
 	std::vector<ChunkIterator> lookup;
 	bool clean;
 	size_t chunkVolume;
-	util::fvector4 fieldOfViewVec;
 
 
 	/** 
@@ -207,7 +206,6 @@ public:
 	ChunkIterator chunksBegin();
 	ChunkIterator chunksEnd();
 
-	util::fvector4 getFOVVec()const;
 	template <typename T> T minValueInImage()const;
 	template <typename T> T maxValueInImage()const;
 
