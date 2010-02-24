@@ -329,7 +329,7 @@ private:
 	template<typename T>
 	bool copyDataToNifti(const data::Image& image, nifti_image& ni)
 	{
-		ni.data = malloc(sizeof(T)*image.volume());
+		ni.data = malloc(image.bytes_per_voxel()*image.volume());
 
 		data::Image::ChunkIterator it = image.chunksBegin();
 		data::ChunkList list(image.chunksBegin(),image.chunksEnd());
@@ -347,7 +347,7 @@ private:
 				}
 			}
 		}
-		ni.nbyper = sizeof(T);
+		ni.nbyper = image.bytes_per_voxel();
 		//min / max due to T in image but for nifti everything is float
 		ni.cal_min = 0.0;
 		ni.cal_max = 0.0;

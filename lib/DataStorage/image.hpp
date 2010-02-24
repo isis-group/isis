@@ -36,6 +36,7 @@ class Image:
 public:
 	typedef std::set<Chunk,_internal::image_chunk_order> ChunkSet;
 	typedef ChunkSet::iterator ChunkIterator;
+	typedef ChunkSet::const_iterator ConstChunkIterator;
 	
 private:
 	ChunkSet set;
@@ -202,9 +203,15 @@ public:
 	 * \param unique when true empty or consecutive duplicates wont be added
 	 */
 	std::list<util::PropertyValue> getChunksProperties(const std::string &key,bool unique=false)const;
+	
+	/// get the size of every voxel (in bytes)
+	size_t bytes_per_voxel()const;
 
 	ChunkIterator chunksBegin();
 	ChunkIterator chunksEnd();
+
+	ConstChunkIterator chunksBegin()const;
+	ConstChunkIterator chunksEnd()const;
 
 	template <typename T> T minValueInImage()const;
 	template <typename T> T maxValueInImage()const;
