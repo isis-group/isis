@@ -18,6 +18,7 @@
 #include <set>
 #include <boost/shared_ptr.hpp>
 #include <vector>
+#include <boost/foreach.hpp>
 
 namespace isis{ namespace data
 {
@@ -213,9 +214,17 @@ public:
 	ConstChunkIterator chunksBegin()const;
 	ConstChunkIterator chunksEnd()const;
 
-	template <typename T> T minValueInImage()const;
-	template <typename T> T maxValueInImage()const;
-
+	template <typename T> T getMinMax(T &min, T &max)const
+	{
+		min=std::numeric_limits<T>::max();
+		max=std::numeric_limits<T>::min();
+		BOOST_FOREACH(const Chunk &ch,set){
+			T cMin,cMax;
+			ch.getMinMax(min,max);
+			if(min>cMin)min=cMin;
+			if(max<cMax)max=cMax;
+		}
+	}
 };
 
 class ImageList : public std::list< boost::shared_ptr<Image> >

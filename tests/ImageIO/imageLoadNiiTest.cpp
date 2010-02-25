@@ -24,9 +24,9 @@ int main(int argc, char *argv[]){
 	ENABLE_LOG(isis::image_io::ImageIoDebug,isis::util::DefaultMsgPrint,isis::util::info);
 	ENABLE_LOG(isis::image_io::ImageIoLog,isis::util::DefaultMsgPrint,isis::util::info);
 
-	isis::data::ImageList img = isis::data::IOFactory::load("/tmp/data.nii", "");
+	isis::data::ImageList img = isis::data::IOFactory::load("/scr/feige1/tmp/data.nii", "");
 
 	/*/SCR/Programming2/hellrung/isis/Debug/tests/ImageIO/*/
-	isis::data::IOFactory::write(img, "/tmp/nifti_write_test.nii", "");
+	isis::data::IOFactory::write(img, "/tmp/delme.nii", "");
 	return EXIT_SUCCESS;
 }

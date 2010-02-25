@@ -418,7 +418,7 @@ size_t Image::bytes_per_voxel() const
 	size_t size=set.begin()->bytes_per_voxel();
 	BOOST_FOREACH(const Chunk &ref,set){
 		LOG_IF(size!=ref.bytes_per_voxel(),DataDebug,util::error)
-			<< "Not all voxels have the same bype size. The result might be wrong.";
+			<< "Not all voxels have the same byte size. The result might be wrong.";
 	}
 	return size;
 }
@@ -428,16 +428,6 @@ Image::ChunkIterator Image::chunksEnd(){return set.end();}
 
 isis::data::Image::ConstChunkIterator Image::chunksBegin() const{return set.begin();}
 isis::data::Image::ConstChunkIterator Image::chunksEnd() const{return set.end();}
-
-template <typename T> T Image::minValueInImage()const
-{
-	return T();
-}
-
-template <typename T> T Image::maxValueInImage()const
-{
-	return T();
-}
 
 
 ImageList::ImageList(ChunkList src)

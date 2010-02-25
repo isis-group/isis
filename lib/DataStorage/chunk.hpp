@@ -105,6 +105,11 @@ public:
 	
 	util::fvector4 getFoV()const;
 	util::fvector4 getFoV(const isis::util::fvector4 &voxelSize)const;
+	
+	template<typename T> void getMinMax(T &min,T &max)const
+	{
+		return operator*().getMinMax(min,max);
+	}
 };
 
 /// @cond _internal

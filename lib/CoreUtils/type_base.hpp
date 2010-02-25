@@ -226,10 +226,10 @@ public:
 	* Dynamically cast the TypeBase up to its actual TypePtr\<T\>. Constant version.
 	* Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
 	* \returns a copy of the pointer.
-	* \returns TypePtr\<T\\>(NULL) if T is not the actual type.
+	* \returns TypePtr\<T\\>(NULL,0) if T is not the actual type.
 	*/
 	template<typename T> const TypePtr<T> cast_to_TypePtr() const{
-		return m_cast_to<TypePtr<T> >(TypePtr<T>((T*)0));
+		return m_cast_to<TypePtr<T> >(TypePtr<T>((T*)0,0));
 	}
 	/**
 	* Dynamically cast the TypeBase up to its actual TypePtr\<T\>. Referenced version.
@@ -256,6 +256,19 @@ public:
 	virtual size_t bytes_per_elem()const=0;
 	virtual ~TypePtrBase();
 	virtual void copyRange(size_t start,size_t end,TypePtrBase &dst,size_t dst_start)const=0;
+	template<typename T> void getMinMax(T &min,T &max)const
+	{
+		LOG_IF(TypePtr<T>::staticId() != this->typeID(), CoreDebug,error) << "Given type of min/max" 
+		<< Type<T>::staticName() 
+		<< " does not fit type of the data (" << typeName() << ")";
+		const TypePtr<T> &me=this->cast_to_TypePtr<T>();
+		min=std::numeric_limits<T>::max();
+		max=std::numeric_limits<T>::min();
+		for(size_t i=0;i<len();i++){
+			if(max<me[i])max=me[i];
+			if(min>me[i])min=me[i];
+		}
+	}
 };
 
 }

@@ -36,6 +36,7 @@ template<typename TYPE> class Type: public _internal::TypeBase{
 	TYPE m_val;
 	static const char m_typeName[];
 public:
+	static const int id = _internal::TypeId<TYPE>::value;
 	Type(){check_type<TYPE>();}
 	/**
 	 * Create a Type from any type of value-type.
@@ -73,9 +74,9 @@ public:
 	/// \returns an unique id representing the type
 	static unsigned short staticId()
 	{
-		// make sure we the typeId won't run into the id-range of the TypePtr
-		BOOST_MPL_ASSERT_RELATION( _internal::TypeId<TYPE>::value, <, 0xFF );
-		return _internal::TypeId<TYPE>::value;
+		// make sure the typeId won't run into the id-range of the TypePtr
+		BOOST_MPL_ASSERT_RELATION( id, <, 0xFF );
+		return id;
 	}
 	/// \returns the name of the type
 	static std::string staticName(){return m_typeName;}
@@ -112,8 +113,9 @@ public:
 template<typename TYPE> class TypePtr: public _internal::TypePtrBase{
 	boost::shared_ptr<TYPE> m_val;
 	template<typename T> TypePtr(const Type<T>& value); // Dont do this
-	/// Proxy-Deleter to encapsulate the real deleter/shared_ptr when creating shared_ptr for parts of a shared_ptr
 public:
+	static const int id = _internal::TypeId<TYPE>::value << 8;
+	/// Proxy-Deleter to encapsulate the real deleter/shared_ptr when creating shared_ptr for parts of a shared_ptr
 	class DelProxy : public boost::shared_ptr<TYPE>{
 	public:
 		/**
@@ -232,7 +234,7 @@ public:
 	/// @copydoc Type::staticId()
 	static unsigned short staticId()
 	{
-		return Type<TYPE>::staticId() <<8;
+		return id;
 	}
 	/// @copydoc Type::staticName()
 	static std::string staticName()

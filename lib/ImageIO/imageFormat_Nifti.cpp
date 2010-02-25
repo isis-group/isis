@@ -92,7 +92,7 @@ class ImageFormat_Nifti : public FileFormat
 	};
 
 public:
-	enum vectordirection {readDir=0,phaseDir,timeDir,centerVec,voxelSizeVec};
+	enum vectordirection {readDir=0,phaseDir,sliceDir,centerVec,voxelSizeVec};
 
 	std::string suffixes() {
 		return std::string(".nii.gz .nii .hdr");}
@@ -209,27 +209,21 @@ public:
 
 		// copy the data to the nifti image
 		LOG(ImageIoLog, isis::util::info) << image.getChunk(0,0,0,0)->typeName();
-		if ("s8bit*" == image.getChunk(0,0,0,0)->typeName()) {
-			ni.datatype = DT_INT8;}
-		else if ("u8bit*" == image.getChunk(0,0,0,0)->typeName()) {
-			ni.datatype = DT_UINT8;}
-		else if ("s16bit*" == image.getChunk(0,0,0,0)->typeName()) {
-			ni.datatype = DT_INT16;
-			copyDataToNifti<signed short>(image, ni);}
-		else if ("u16bit*" == image.getChunk(0,0,0,0)->typeName()) {
-			ni.datatype = DT_UINT16;
-			copyDataToNifti<unsigned short>(image, ni);}
-		else if ("s32bit*" == image.getChunk(0,0,0,0)->typeName()) {
-			ni.datatype = DT_INT32;}
-		else if ("u32bit*" == image.getChunk(0,0,0,0)->typeName()) {
-			ni.datatype = DT_UINT32;}
-		else if ("float*" == image.getChunk(0,0,0,0)->typeName()) {
-			ni.datatype = DT_FLOAT32;}
-		else if ("double*" == image.getChunk(0,0,0,0)->typeName()) {
-			ni.datatype = DT_FLOAT64;}
-		else {
-			LOG(ImageIoLog, util::error) << "Nifti write: Datatype cannot be written!";}
+		switch(image.getChunk(0,0,0,0)->typeID()){
+		case util::TypePtr<int8_t>::id:   ni.datatype = DT_INT8;   copyDataToNifti<int8_t>(image, ni);   break;
+		case util::TypePtr<u_int8_t>::id: ni.datatype = DT_UINT8;  copyDataToNifti<u_int8_t>(image, ni); break;
 
+		case util::TypePtr<int16_t>::id:  ni.datatype = DT_INT16;  copyDataToNifti<int16_t>(image, ni);  break;
+		case util::TypePtr<u_int16_t>::id:ni.datatype = DT_UINT16; copyDataToNifti<u_int16_t>(image, ni);break;
+		
+		case util::TypePtr<int32_t>::id:  ni.datatype = DT_INT32;  copyDataToNifti<int32_t>(image, ni);  break;
+		case util::TypePtr<u_int32_t>::id:ni.datatype = DT_UINT32; copyDataToNifti<u_int16_t>(image, ni);break;
+		
+		case util::TypePtr<float>::id:    ni.datatype = DT_FLOAT32;copyDataToNifti<float>(image, ni);    break;
+		case util::TypePtr<double>::id:   ni.datatype = DT_FLOAT64;copyDataToNifti<double>(image, ni);   break;
+		default:
+			LOG(ImageIoLog, util::error) << "Datatype " << util::TypePtr<float>::staticName() << " cannot be written!";
+		}
 		//now really write the nifti file with the function from nifti1_io.h
 		errno=0; //reset errno
 		nifti_image_write(&ni); //write the image - in case of a failure errno should be set
@@ -263,11 +257,11 @@ private:
 			retChunk.setProperty("sequenceNumber", 1);
 			retChunk.setProperty("readVec", getVector(ni, readDir));
 			retChunk.setProperty("phaseVec", getVector(ni, phaseDir));
-			retChunk.setProperty("sliceVec", getVector(ni, timeDir));
+			retChunk.setProperty("sliceVec", getVector(ni, sliceDir));
 			retChunk.setProperty("voxelSize",getVector(ni, voxelSizeVec));
 			retChunk.setProperty("centerVec",getVector(ni, centerVec));
-			retChunk.setProperty<std::string>("study/description", std::string(ni.descrip) );
-			retChunk.setProperty<std::string>("series/description", std::string(ni.intent_name) );
+			retChunk.setProperty("study/description", std::string(ni.descrip) );
+			retChunk.setProperty("series/description", std::string(ni.intent_name) );
 
 			//just some LOGS
 			LOG(ImageIoLog, util::info) << "dims at all " << dimensions;
@@ -275,7 +269,7 @@ private:
 			LOG(ImageIoLog,util::info) << "FOV read/phase/slice/voxelsize:"
 			<< getVector(ni, readDir)
 			<< " / " << getVector(ni, phaseDir)
-			<< " / " << getVector(ni, timeDir)
+			<< " / " << getVector(ni, sliceDir)
 			<< getVector(ni, voxelSizeVec);
 		}
 	}
@@ -292,17 +286,17 @@ private:
 			case phaseDir:
 			div = ni.dy;
 			break;
-			case timeDir:
+			case sliceDir:
 			div = ni.dz;
 			break;
-			case voxelSizeVec://read size of voxels
-			return util::fvector4(ni.pixdim[1], ni.pixdim[2], ni.pixdim[3], ni.pixdim[4]);
+			case voxelSizeVec://read size of voxels pixdim+1 is dx ... pixdim+4=dt
+			return util::FixedVector<float,4>(ni.pixdim+1);
 			break;
 			case centerVec:
-			if(ni.xyz_units==NIFTI_UNITS_METER) {
-				div = 1.0/1.0e3;}
-			if(ni.xyz_units==NIFTI_UNITS_MICRON) {
-				div = 1.0/1.0e-3;}
+				switch(ni.xyz_units){
+					case NIFTI_UNITS_METER:div = 1.0/1.0e3;break;
+					case NIFTI_UNITS_MICRON:div = 1.0/1.0e-3;break;
+				}
 			break;
 			default:
 			break;
@@ -310,18 +304,28 @@ private:
 
 		if(ni.nifti_type>0) { // only for non-ANALYZE
 			//      RotMatrix scaleMat;//method 2
-			if(ni.qform_code>0) {// just tranform to the nominal space of the scanner
-				LOG(ImageIoLog,util::info) << "Reading orientation from qform";
-				for(int i=0;i<3;i++) {
-					retVec[i] =ni.qto_xyz.m[i][dir]/div;}
-			} else if(ni.sform_code>0) { // method 3
-				LOG(ImageIoLog,util::info) << "Reading orientation from sform";
-				for(int i=0;i<3;i++) {
-					retVec[i] =ni.sto_xyz.m[i][dir]/div;}
+			util::fvector4 qto,sto;
+			//get qto 
+			for(int i=0;i<3;i++) {
+				qto[i] =ni.qto_xyz.m[i][dir]/div;}
+			LOG(ImageIoDebug,util::info) << "Orientation red from qto_xyz:" << dir+1 << " is " << qto;
+			//get sto
+			for(int i=0;i<3;i++) {
+				sto[i] =ni.sto_xyz.m[i][dir]/div;}
+			LOG(ImageIoDebug,util::info) << "Orientation red from sto_xyz:" << dir+1 << " is " << sto;
+			
+			//use one of them
+			if(ni.qform_code>0){// just tranform to the nominal space of the scanner
+				retVec=qto;
+				LOG_IF(qto!=sto and ni.sform_code>0,ImageIoLog,util::warning)
+				<< "sto_xyz:" << dir+1 << " (" << sto << ") differs from qto_xyz:" 
+				<< dir+1 << " ("<< qto << "). But I'll ignore it anyway because qform_code>0.";
+			} else if(ni.sform_code>0){ // method 3
+				retVec=sto;
 			} else {
 				LOG(ImageIoLog,util::error)
-				<< "can't read orientation Vector from direction: " << dir;
-				return util::fvector4();}
+					<< "can't read orientation Vector for direction: " << dir+1;
+			}
 		}
 		return retVec;
 	}
@@ -349,12 +353,10 @@ private:
 		}
 		ni.nbyper = image.bytes_per_voxel();
 		//min / max due to T in image but for nifti everything is float
-		ni.cal_min = 0.0;
-		ni.cal_max = 0.0;
-		if ( true == image.hasProperty("minValue") ) {
-			ni.cal_min = static_cast<float> (image.getProperty<T>("minValue"));}
-		if ( true == image.hasProperty("maxValue") ) {
-			ni.cal_max = static_cast<float> (image.getProperty<T>("maxValue"));}
+		T min,max;
+		image.getMinMax(min,max);
+		ni.cal_min = min;
+		ni.cal_max = max;
 	}
 
 	bool copyHeaderToNifti(const data::Image& image, nifti_image& ni)
@@ -412,7 +414,7 @@ private:
 		//create space tranformation matrices - transforms the space when reading _NOT_ the data
 		//TODO something is going wrong with the rotation matrix, maybe scaling - not clear
 		ni.sform_code=ni.qform_code=NIFTI_XFORM_SCANNER_ANAT;//set scanner aligned space from nifti1.h
-		LOG(ImageIoLog, util::info) << "ReadVec " << readVec * ni.pixdim[1] << "  phaseVec" <<phaseVec * ni.pixdim[2]<< "sliceVec" << sliceVec* ni.pixdim[3];
+		LOG(ImageIoLog, util::info) << "ReadVec " << readVec << "  phaseVec" <<phaseVec << "sliceVec" << sliceVec;
 		//util::fvector4 offsets = image.getProperty<util::fvector4>("offsetVec");
 		//		ni.qoffset_x = offsets[0];
 		//		ni.qoffset_y = offsets[1];
