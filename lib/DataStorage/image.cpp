@@ -286,12 +286,12 @@ bool Image::reIndex() {
 
 		// now we can define the sliceOrientation
 		std::string orientation = "axial";
-		if ((fabs(sliceVec[1]) >= fabs(sliceVec[0])) and (fabs(sliceVec[1]) >= fabs(sliceVec[2]))){
+		if ((fabs(crossVec[1]) >= fabs(crossVec[0])) and (fabs(crossVec[1]) >= fabs(crossVec[2]))){
 			orientation = "coronal";}
-		if ((fabs(sliceVec[0]) >= fabs(sliceVec[1])) and (fabs(sliceVec[0]) >= fabs(sliceVec[2]))){
+		if ((fabs(crossVec[0]) >= fabs(crossVec[1])) and (fabs(crossVec[0]) >= fabs(crossVec[2]))){
 			orientation = "sagittal";}
-		retChunk.setProperty<std::string>("sliceOrientation", orientation);
-		LOG(ImageIoDebug, util::info) << "sliceOrientation: " << orientation;
+		setProperty<std::string>("sliceOrientation", orientation);
+		LOG(DataDebug, util::info) << "sliceOrientation: " << orientation;
 	}
 	
 	if(hasProperty("fov")){
