@@ -330,6 +330,8 @@ private:
 	void SetFixedImageMask(
 	    void);
 
+
+
 	DeformationFieldPointer m_DeformationField;
 	FixedImagePointer m_FixedImage;
 	MovingImagePointer m_MovingImage;

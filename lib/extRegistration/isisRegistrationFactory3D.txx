@@ -264,11 +264,12 @@ namespace isis {
 						m_RegularStepGradientDescentOptimizer->SetMaximumStepLength(1.0);
 					}
 				}
-
-				if (metric.VIOLAWELLSMUTUALINFORMATION or metric.MUTUALINFORMATIONHISTOGRAM or metric.MEANSQUARE) {
-					m_RegularStepGradientDescentOptimizer->MaximizeOn();
+				
+				if (metric.MEANSQUARE or metric.MATTESMUTUALINFORMATION or metric.VIOLAWELLSMUTUALINFORMATION or metric.MUTUALINFORMATIONHISTOGRAM) {
+					m_RegularStepGradientDescentOptimizer->MinimizeOn();
 				}
 
+				
 			}
 			if (optimizer.VERSORRIGID3D) {
 				VersorRigid3DTransformOptimizerType::ScalesType optimizerScaleVersorRigid3D(m_NumberOfParameters);
@@ -286,9 +287,13 @@ namespace isis {
 					m_VersorRigid3DTransformOptimizer->SetScales(optimizerScaleVersorRigid3D);
 					m_VersorRigid3DTransformOptimizer->SetNumberOfIterations(UserOptions.NumberOfIterations);
 					m_VersorRigid3DTransformOptimizer->SetRelaxationFactor(0.9);
-					m_VersorRigid3DTransformOptimizer->MinimizeOn();
 
 				}
+			
+				if (metric.MEANSQUARE or metric.MATTESMUTUALINFORMATION or metric.VIOLAWELLSMUTUALINFORMATION or metric.MUTUALINFORMATIONHISTOGRAM) {
+					m_VersorRigid3DTransformOptimizer->MinimizeOn();
+				}
+
 
 			}
 
@@ -309,10 +314,13 @@ namespace isis {
 				m_LBFGSBOptimizer->SetCostFunctionConvergenceFactor(1.e8);
 				m_LBFGSBOptimizer->SetProjectedGradientTolerance(1e-9);
 				m_LBFGSBOptimizer->SetMaximumNumberOfIterations(UserOptions.NumberOfIterations);
-				m_LBFGSBOptimizer->SetMaximumNumberOfEvaluations(30);
-				m_LBFGSBOptimizer->SetMaximumNumberOfCorrections(12);
-				m_LBFGSBOptimizer->SetMinimize(true);
-
+				m_LBFGSBOptimizer->SetMaximumNumberOfEvaluations(500);
+				m_LBFGSBOptimizer->SetMaximumNumberOfCorrections(24);
+				if (metric.MEANSQUARE or metric.MATTESMUTUALINFORMATION or metric.VIOLAWELLSMUTUALINFORMATION or metric.MUTUALINFORMATIONHISTOGRAM) {
+					m_LBFGSBOptimizer->MinimizeOn();
+					m_LBFGSBOptimizer->MaximizeOff();
+				}
+				
 			}
 			if (optimizer.AMOEBA) {
 				AmoebaOptimizerType::ParametersType simplexDelta(m_NumberOfParameters);
@@ -322,8 +330,10 @@ namespace isis {
 				m_AmoebaOptimizer->SetMaximumNumberOfIterations(UserOptions.NumberOfIterations);
 				m_AmoebaOptimizer->SetParametersConvergenceTolerance(1e-10);
 				m_AmoebaOptimizer->SetFunctionConvergenceTolerance(1e-10);
-
-				if (metric.VIOLAWELLSMUTUALINFORMATION or metric.MUTUALINFORMATIONHISTOGRAM) {
+				if (metric.MEANSQUARE or metric.MATTESMUTUALINFORMATION or metric.VIOLAWELLSMUTUALINFORMATION or metric.MUTUALINFORMATIONHISTOGRAM) {
+					m_AmoebaOptimizer->MinimizeOn();
+				}
+				if (metric.NORMALIZEDCORRELATION) {
 					m_AmoebaOptimizer->MaximizeOn();
 				}
 			}

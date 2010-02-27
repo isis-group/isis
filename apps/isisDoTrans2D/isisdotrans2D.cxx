@@ -84,7 +84,7 @@ int main(
 	}
 
 	//typedef section
-	typedef unsigned short PixelType;
+	typedef unsigned char PixelType;
 	const unsigned int Dimension = 2;
 	const unsigned int fmriDimension = 3;
 

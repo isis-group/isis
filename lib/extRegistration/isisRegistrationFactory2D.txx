@@ -251,15 +251,15 @@ namespace isis {
 					m_RegularStepGradientDescentOptimizer->SetNumberOfIterations(UserOptions.NumberOfIterations);
 					m_RegularStepGradientDescentOptimizer->SetRelaxationFactor(0.9);
 					m_RegularStepGradientDescentOptimizer->SetGradientMagnitudeTolerance(0.00001);
-					m_RegularStepGradientDescentOptimizer->SetMinimize(true);
-					if(transform.BSPLINEDEFORMABLETRANSFORM)
-					{
-						m_RegularStepGradientDescentOptimizer->SetMaximumStepLength(1.0);
-					}
+// 					if(transform.BSPLINEDEFORMABLETRANSFORM)
+// 					{
+// 						m_RegularStepGradientDescentOptimizer->SetMaximumStepLength(1.0);
+// 					}
 				}
 
-				if (metric.VIOLAWELLSMUTUALINFORMATION or metric.MUTUALINFORMATIONHISTOGRAM or metric.MEANSQUARE) {
-					m_RegularStepGradientDescentOptimizer->MaximizeOn();
+				
+				if (metric.MEANSQUARE or metric.MATTESMUTUALINFORMATION or metric.VIOLAWELLSMUTUALINFORMATION or metric.MUTUALINFORMATIONHISTOGRAM) {
+					m_RegularStepGradientDescentOptimizer->MinimizeOn();
 				}
 
 			}
@@ -282,9 +282,12 @@ namespace isis {
 				m_LBFGSBOptimizer->SetCostFunctionConvergenceFactor(1.e8);
 				m_LBFGSBOptimizer->SetProjectedGradientTolerance(1e-9);
 				m_LBFGSBOptimizer->SetMaximumNumberOfIterations(UserOptions.NumberOfIterations);
-				m_LBFGSBOptimizer->SetMaximumNumberOfEvaluations(30);
-				m_LBFGSBOptimizer->SetMaximumNumberOfCorrections(12);
-				m_LBFGSBOptimizer->SetMinimize(true);
+				m_LBFGSBOptimizer->SetMaximumNumberOfEvaluations(500);
+				m_LBFGSBOptimizer->SetMaximumNumberOfCorrections(24);
+				if (metric.MEANSQUARE or metric.MATTESMUTUALINFORMATION or metric.VIOLAWELLSMUTUALINFORMATION or metric.MUTUALINFORMATIONHISTOGRAM) {
+					m_LBFGSBOptimizer->MinimizeOn();
+				}
+				
 
 			}
 			if (optimizer.AMOEBA) {
@@ -295,10 +298,11 @@ namespace isis {
 				m_AmoebaOptimizer->SetMaximumNumberOfIterations(UserOptions.NumberOfIterations);
 				m_AmoebaOptimizer->SetParametersConvergenceTolerance(1e-10);
 				m_AmoebaOptimizer->SetFunctionConvergenceTolerance(1e-10);
-
-				if (metric.VIOLAWELLSMUTUALINFORMATION or metric.MUTUALINFORMATIONHISTOGRAM) {
-					m_AmoebaOptimizer->MaximizeOn();
+				if (metric.MEANSQUARE or metric.MATTESMUTUALINFORMATION or metric.VIOLAWELLSMUTUALINFORMATION or metric.MUTUALINFORMATIONHISTOGRAM) {
+					m_AmoebaOptimizer->MinimizeOn();
 				}
+				
+				
 			}
 			if(optimizer.POWELL)
 			{
@@ -394,7 +398,6 @@ namespace isis {
 
 				BSplineParametersType bsplineParameters(m_NumberOfParameters);
 				bsplineParameters.Fill(0.0);
-				
 				
 				m_BSplineTransform->SetParameters(bsplineParameters);
 				m_BSplineTransform->SetBulkTransform(m_BulkTransform);
@@ -685,8 +688,7 @@ namespace isis {
 		}
 
 		template<class TFixedImageType, class TMovingImageType>
-		void RegistrationFactory2D<TFixedImageType, TMovingImageType>::SetFixedImageMask(
-				void) {
+		void RegistrationFactory2D<TFixedImageType, TMovingImageType>::SetFixedImageMask(void) {
 
 			if (metric.MATTESMUTUALINFORMATION) {
 				m_MattesMutualInformationMetric->SetFixedImageMask(m_MovingImageMaskObject);
@@ -712,10 +714,10 @@ namespace isis {
 				void) {
 			std::cout << "Results of registration: " << std::endl << std::endl;
 			if (transform.RIGID) {
-				std::cout << "Versor x: " << m_RegistrationObject->GetLastTransformParameters()[0] << std::endl;
-				std::cout << "Versor y: " << m_RegistrationObject->GetLastTransformParameters()[1] << std::endl;
-				std::cout << "Translation x: " << m_RegistrationObject->GetLastTransformParameters()[3] << std::endl;
-				std::cout << "Translation y: " << m_RegistrationObject->GetLastTransformParameters()[4] << std::endl;
+				std::cout << "Translation x: " << m_RegistrationObject->GetLastTransformParameters()[1] << std::endl;
+				std::cout << "Translation y: " << m_RegistrationObject->GetLastTransformParameters()[2] << std::endl;
+				std::cout << "Rotation x: " << m_RegistrationObject->GetLastTransformParameters()[0] << std::endl;
+				std::cout << "Rotation y: " << m_RegistrationObject->GetLastTransformParameters()[3] << std::endl;
 			}
 			if (optimizer.REGULARSTEPGRADIENTDESCENT) {
 				std::cout << "Iterations: " << m_RegularStepGradientDescentOptimizer->GetCurrentIteration() << std::endl;

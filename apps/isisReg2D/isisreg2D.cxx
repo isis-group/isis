@@ -140,8 +140,7 @@ int main(
 	}
 
 	typedef unsigned char MaskPixelType;
-	typedef signed short InputPixelType;
-	typedef signed short OutputPixelType;
+	typedef unsigned char InputPixelType;
 	const unsigned int Dimension = 2;
 
 	VShort transform;
