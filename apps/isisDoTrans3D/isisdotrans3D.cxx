@@ -15,7 +15,7 @@
 #include "itkWindowedSincInterpolateImageFunction.h"
 
 #include "extITK/isisTimeStepExtractionFilter.h"
-#include "extITK/isisTransformMerger.hpp"
+#include "extITK/isisTransformMerger3D.hpp"
 #include "extITK/isisIterationObserver.h"
 
 #include "itkResampleImageFilter.h"
@@ -42,6 +42,7 @@ static VShort interpolator_type = 0;
 static VArgVector resolution;
 static VBoolean fmri;
 static VBoolean use_inverse = false;
+static VShort number_threads = 1;
 
 static VOptionDescRec options[] = {
 //requiered inputs
@@ -55,7 +56,7 @@ static VOptionDescRec options[] = {
         VOptionalOpt, 0, "The output resolution. One value for isotrop output"}, {"fmri", VBooleanRepn, 1, &fmri,
         VOptionalOpt, 0, "Input and output image file are functional data"}, {"vtrans", VStringRepn, 1,
         &vtrans_filename, VOptionalOpt, 0, "Vector deformation field"}, {"use_inverse", VBooleanRepn, 1, &use_inverse,
-	VOptionalOpt, 0, "Using the inverse of the transform"}
+	VOptionalOpt, 0, "Using the inverse of the transform"}, {"j" , VShortRepn, 1, &number_threads, VOptionalOpt, 0 ,"Number of threads"}
 
 };
 
@@ -131,7 +132,7 @@ int main(
 	isis::extitk::ProcessUpdate::Pointer progressObserver = isis::extitk::ProcessUpdate::New();
 
 	TimeStepExtractionFilterType::Pointer timeStepExtractionFilter = TimeStepExtractionFilterType::New();
-	isis::extitk::TransformMerger* transformMerger = new isis::extitk::TransformMerger;
+	isis::extitk::TransformMerger3D* transformMerger = new isis::extitk::TransformMerger3D;
 
 	DeformationFieldReaderType::Pointer deformationFieldReader = DeformationFieldReaderType::New();
 	ImageReaderType::Pointer reader = ImageReaderType::New();
@@ -161,6 +162,8 @@ int main(
 		std::cout << "No transform specified!!" << std::endl;
 		return EXIT_FAILURE;
 	}
+	resampler->SetNumberOfThreads(number_threads);
+	warper->SetNumberOfThreads(number_threads);
 	progress_timer time;
 	if(!fmri) {
 	    reader->SetFileName(in_filename);

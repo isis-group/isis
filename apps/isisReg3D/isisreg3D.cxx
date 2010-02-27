@@ -9,7 +9,7 @@
 #include "itkImageMaskSpatialObject.h"
 
 #include "extRegistration/isisRegistrationFactory3D.h"
-#include "extITK/isisTransformMerger.hpp"
+#include "extITK/isisTransformMerger3D.hpp"
 #include "extITK/isisIterationObserver.h"
 
 #include "itkImageFileReader.h"
@@ -262,7 +262,7 @@ int main(
 	}
 	
 	RegistrationFactoryType::Pointer registrationFactory = RegistrationFactoryType::New();
-	isis::extitk::TransformMerger* transformMerger = new isis::extitk::TransformMerger;
+	isis::extitk::TransformMerger3D* transformMerger = new isis::extitk::TransformMerger3D;
 
 	//analyse transform vector
 	unsigned int repetition = transformType.number;
@@ -453,10 +453,8 @@ int main(
 		registrationFactory->UserOptions.NumberOfThreads = number_threads;
 		registrationFactory->UserOptions.MattesMutualInitializeSeed = initial_seed;
 		registrationFactory->UserOptions.SHOWITERATIONSTATUS = true;
-		if (!initialize_center)
-			registrationFactory->UserOptions.INITIALIZECENTEROFF = true;
-		if (!initialize_mass)
-					registrationFactory->UserOptions.INITIALIZEMASSOFF = true;
+		if (!initialize_center) registrationFactory->UserOptions.INITIALIZECENTEROFF = true;
+		if (!initialize_mass) registrationFactory->UserOptions.INITIALIZEMASSOFF = true;
 
 		registrationFactory->SetFixedImage(fixedImage);
 		registrationFactory->SetMovingImage(movingImage);

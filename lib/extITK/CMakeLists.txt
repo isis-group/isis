@@ -1,5 +1,5 @@
 
-add_library(extitk SHARED isisTransformMerger.cpp)
+add_library(extitk SHARED isisTransformMerger3D.cpp isisTransformMerger2D.cpp)
 
 set_target_properties(extitk PROPERTIES 
     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
