@@ -61,6 +61,7 @@ namespace isis {
 			UserOptions.SHOWITERATIONSTATUS = false;
 			UserOptions.USEMASK = false;
 			UserOptions.LANDMARKINITIALIZE = false;
+			UserOptions.CoarseFactor = 1;
 
 			m_NumberOfParameters = 0;
 		}
@@ -245,8 +246,8 @@ namespace isis {
 					{
 						optimizerScaleRegularStepGradient.Fill(1.0);
 					}
-					m_RegularStepGradientDescentOptimizer->SetMaximumStepLength(0.1);
-					m_RegularStepGradientDescentOptimizer->SetMinimumStepLength(0.00001);
+					m_RegularStepGradientDescentOptimizer->SetMaximumStepLength(0.1 * UserOptions.CoarseFactor);
+					m_RegularStepGradientDescentOptimizer->SetMinimumStepLength(0.00001 * UserOptions.CoarseFactor);
 					m_RegularStepGradientDescentOptimizer->SetScales(optimizerScaleRegularStepGradient);
 					m_RegularStepGradientDescentOptimizer->SetNumberOfIterations(UserOptions.NumberOfIterations);
 					m_RegularStepGradientDescentOptimizer->SetRelaxationFactor(0.9);
@@ -438,13 +439,14 @@ namespace isis {
 						* UserOptions.PixelDensity);
 
 				m_MattesMutualInformationMetric->SetNumberOfHistogramBins(UserOptions.NumberOfBins);
-				m_MattesMutualInformationMetric->ReinitializeSeed(UserOptions.MattesMutualInitializeSeed);
+// 				m_MattesMutualInformationMetric->ReinitializeSeed(UserOptions.MattesMutualInitializeSeed);
 
 				if(transform.BSPLINEDEFORMABLETRANSFORM)
 				{
 					m_MattesMutualInformationMetric->SetUseCachingOfBSplineWeights(true);
 				}
-
+				
+				
 				//multi threading approach
 				//m_MattesMutualInformationMetric->SetNumberOfThreads(UserOptions.NumberOfThreads);
 
@@ -505,6 +507,7 @@ namespace isis {
 				m_MeanSquareMetric->SetFixedImage(m_FixedImage);
 				m_MeanSquareMetric->SetMovingImage(m_MovingImage);
 				m_MeanSquareMetric->SetFixedImageRegion(m_FixedImageRegion);
+	
 			}
 
 		}

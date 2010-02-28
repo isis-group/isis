@@ -62,6 +62,7 @@ namespace isis {
 			UserOptions.SHOWITERATIONSTATUS = false;
 			UserOptions.USEMASK = false;
 			UserOptions.LANDMARKINITIALIZE = false;
+			UserOptions.CoarseFactor = 1;
 
 			m_NumberOfParameters = 0;
 		}
@@ -252,8 +253,8 @@ namespace isis {
 					{
 						optimizerScaleRegularStepGradient.Fill(1.0);
 					}
-					m_RegularStepGradientDescentOptimizer->SetMaximumStepLength(0.1);
-					m_RegularStepGradientDescentOptimizer->SetMinimumStepLength(0.00001);
+					m_RegularStepGradientDescentOptimizer->SetMaximumStepLength(0.1 * UserOptions.CoarseFactor);
+					m_RegularStepGradientDescentOptimizer->SetMinimumStepLength(0.00001 * UserOptions.CoarseFactor);
 					m_RegularStepGradientDescentOptimizer->SetScales(optimizerScaleRegularStepGradient);
 					m_RegularStepGradientDescentOptimizer->SetNumberOfIterations(UserOptions.NumberOfIterations);
 					m_RegularStepGradientDescentOptimizer->SetRelaxationFactor(0.9);
@@ -282,8 +283,8 @@ namespace isis {
 					for (unsigned int i = 3; i < m_NumberOfParameters; i++) {
 						optimizerScaleVersorRigid3D[i] = 1.0 / 1000.0;
 					}
-					m_VersorRigid3DTransformOptimizer->SetMaximumStepLength(0.1);
-					m_VersorRigid3DTransformOptimizer->SetMinimumStepLength(0.0001);
+					m_VersorRigid3DTransformOptimizer->SetMaximumStepLength(0.1 * UserOptions.CoarseFactor);
+					m_VersorRigid3DTransformOptimizer->SetMinimumStepLength(0.0001 *  UserOptions.CoarseFactor);
 					m_VersorRigid3DTransformOptimizer->SetScales(optimizerScaleVersorRigid3D);
 					m_VersorRigid3DTransformOptimizer->SetNumberOfIterations(UserOptions.NumberOfIterations);
 					m_VersorRigid3DTransformOptimizer->SetRelaxationFactor(0.9);

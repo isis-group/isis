@@ -226,6 +226,7 @@ public:
 		unsigned int BSplineGridSize;
 		unsigned int NumberOfThreads;
 		unsigned int MattesMutualInitializeSeed;
+		float CoarseFactor;
 		float PixelDensity;
 		bool PRINTRESULTS;
 		bool USEOTSUTHRESHOLDING; //using an otsu threshold filter to create a mask which is designed to restrict the region given to the metric

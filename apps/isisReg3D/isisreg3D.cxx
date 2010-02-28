@@ -67,6 +67,7 @@ static VBoolean initialize_mass = false;
 static VString mask_filename = NULL;
 static VFloat smooth = 0;
 static VBoolean use_inverse = false;
+static VFloat coarse_factor = 1;
 
 static VOptionDescRec
         options[] = {
@@ -99,7 +100,7 @@ static VOptionDescRec
                 "The density of pixels the metric uses. 1 denotes the metric uses all pixels. Has to be > 0. Only operative with a MattesMutualInformation metric"},
 
             {"j", VShortRepn, 1, &number_threads, VOptionalOpt, 0, "Number of threads used for the registration"},
-
+	    {"cf", VFloatRepn, 1, &coarse_factor, VOptionalOpt, 0, "Coarse factor. Multiple of the max and min step length of the optimizer. Standard is 1"},
             {"gridSize", VShortRepn, 1, &grid_size, VOptionalOpt, 0,
                 "Grid size used for the BSplineDeformable transform."},
 
@@ -444,7 +445,7 @@ int main(
 			registrationFactory->SetMovingPointContainer( movingPointsContainer );
 
 		}
-
+		registrationFactory->UserOptions.CoarseFactor = coarse_factor;
 		registrationFactory->UserOptions.NumberOfIterations = number_of_iterations;
 		registrationFactory->UserOptions.NumberOfBins = number_of_bins;
 		registrationFactory->UserOptions.PixelDensity = pixel_density;
