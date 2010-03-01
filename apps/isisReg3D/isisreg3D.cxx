@@ -463,10 +463,13 @@ int main(
 		std::cout << "starting the registration..." << std::endl;
 
 		registrationFactory->StartRegistration();
-		if(use_inverse) tmpTransform->SetParameters(registrationFactory->GetRegistrationObject()->GetTransform()->GetInverseTransform()->GetParameters());		
+		if(use_inverse) {
+		  tmpTransform->SetParameters(registrationFactory->GetRegistrationObject()->GetTransform()->GetInverseTransform()->GetParameters());		
+		}
 		
-		if(!use_inverse) tmpConstTransformPointer = registrationFactory->GetTransform();
-		
+		if(!use_inverse) {
+		  tmpConstTransformPointer = registrationFactory->GetTransform();
+		}
 		transformMerger->push_back(tmpTransform);
 
 	}//end repetition

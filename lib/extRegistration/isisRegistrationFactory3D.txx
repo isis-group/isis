@@ -432,14 +432,9 @@ namespace isis {
 
 				BSplineParametersType bsplineParameters(m_NumberOfParameters);
 				bsplineParameters.Fill(0.0);
-				
-				
 				m_BSplineTransform->SetParameters(bsplineParameters);
-				m_BSplineTransform->SetBulkTransform(m_BulkTransform);
-// 				m_BSplineTransform->SetTranslation(m_BulkTransform->GetTranslation());
 				
 				m_RegistrationObject->SetInitialTransformParameters(m_BSplineTransform->GetParameters());
-				
 
 			}
 
@@ -626,18 +621,16 @@ namespace isis {
 				TransformBasePointer initialTransform) {
 			const char* initialTransformName = initialTransform->GetNameOfClass();
 			if (!strcmp(initialTransformName, "AffineTransform") and transform.BSPLINEDEFORMABLETRANSFORM) {
-				m_BulkTransform = static_cast<AffineTransformType*> (initialTransform);
-
+			  
+				m_BSplineTransform->SetBulkTransform(dynamic_cast<AffineTransformType*>(initialTransform));
 			}
 			if (!strcmp(initialTransformName, "VersorRigid3DTransform") and transform.BSPLINEDEFORMABLETRANSFORM) {
-				
-				m_BulkTransform = static_cast<VersorRigid3DTransformType*> (initialTransform);
-				m_BSplineTransform->SetBulkTransform(static_cast<VersorRigid3DTransformType*> (initialTransform));
+				m_BSplineTransform->SetBulkTransform(dynamic_cast<VersorRigid3DTransformType*> (initialTransform));
 				
 
 			}
 			if (!strcmp(initialTransformName, "CenteredAffineTransform") and transform.BSPLINEDEFORMABLETRANSFORM) {
-				m_BSplineTransform->SetBulkTransform(static_cast<CenteredAffineTransformType*> (initialTransform));
+				m_BSplineTransform->SetBulkTransform(dynamic_cast<CenteredAffineTransformType*> (initialTransform));
 			}
 
 			if (!strcmp(initialTransformName, "VersorRigid3DTransform") and transform.CENTEREDAFFINE) {
@@ -797,13 +790,12 @@ namespace isis {
 				m_observer = isis::extitk::IterationObserver::New();
 				m_RegistrationObject->GetOptimizer()->AddObserver(itk::IterationEvent(), m_observer );
 			}
-
+						
 			try {
 				m_RegistrationObject->StartRegistration();
 			} catch (itk::ExceptionObject & err) {
 				std::cerr << "isRegistrationFactory3D: Exception caught: " << std::endl << err << std::endl;
 			}
-			 
 			if (UserOptions.PRINTRESULTS) {
 				this->PrintResults();
 			}
