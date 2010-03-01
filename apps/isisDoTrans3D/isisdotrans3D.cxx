@@ -212,6 +212,7 @@ int main(
 			//setting up the resample object
 			if(use_inverse) {
 			    transform->SetParameters(static_cast<TransformPointer>((*ti).GetPointer())->GetInverseTransform()->GetParameters());
+			    transform->SetFixedParameters(static_cast<TransformPointer>((*ti).GetPointer())->GetInverseTransform()->GetFixedParameters());
 			    resampler->SetTransform(transform);
 	
 			}
