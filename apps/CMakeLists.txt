@@ -10,4 +10,5 @@ IF(BUILD_APPLICATIONS_3D)
 ENDIF(BUILD_APPLICATIONS_3D)
 
 add_subdirectory(isisCheckerboard3D)
+add_subdirectory(isisDoTrans3D_float)
 #add_subdirectory(isisKaltmacher)
