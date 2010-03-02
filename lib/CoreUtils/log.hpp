@@ -28,7 +28,7 @@ namespace util{namespace _internal{
 	
 template<class MODULE> class Log{	
 	static boost::shared_ptr<MessageHandlerBase> &handler(){
-		static boost::shared_ptr<MessageHandlerBase> msg;
+		static boost::shared_ptr<MessageHandlerBase> msg(new DefaultMsgPrint(warning));
 		return msg;
 	}
 	Log();//dont do this
