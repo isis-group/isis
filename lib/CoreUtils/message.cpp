@@ -101,6 +101,7 @@ void DefaultMsgPrint::commit(const _internal::Message &mesg){
 }
 
 void DefaultMsgPrint::setStream(::std::ostream &_o){
+	o->flush();
 	o = &_o;
 }
 

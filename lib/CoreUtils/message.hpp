@@ -50,12 +50,12 @@ class MessageHandlerBase{
 	static LogLevel m_stop_below;
 protected:
 	MessageHandlerBase(LogLevel level):m_level(level){}
-	virtual ~MessageHandlerBase(){}
 public:
 	LogLevel m_level;
 	virtual void commit(const Message &msg)=0;
 	static void stopBelow(LogLevel =error);
 	bool requestStop(LogLevel _level);
+	virtual ~MessageHandlerBase(){}
 };
 
 class Message: public std::ostringstream{
@@ -86,6 +86,12 @@ public:
 }
 /// @endcond
 
+/**
+ * Default message output class.
+ * Will print any issued message to the given output stream in the format: 	"LOG_MODULE_NAME:LOG_LEVEL_NAME[LOCATION] MESSAGE"
+ * The default output stream is std::cout. But can be set using setStream.
+ * Location is the calling Object/Method if compiled without debug infos (NDEBUG is set) or FILENAME:LINE_NUMER if compiled with debug infos.
+ */
 class DefaultMsgPrint : public _internal::MessageHandlerBase {
 protected:
 	static std::ostream *o;
