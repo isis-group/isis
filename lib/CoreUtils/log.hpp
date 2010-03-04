@@ -17,6 +17,8 @@
 #include <boost/scoped_ptr.hpp>
 #include "message.hpp"
 #include "common.hpp"
+#include "singletons.hpp"
+#include <limits.h>
 
 /// @cond _internal
 namespace isis{ 
@@ -28,8 +30,8 @@ namespace util{namespace _internal{
 	
 template<class MODULE> class Log{	
 	static boost::shared_ptr<MessageHandlerBase> &handler(){
-		static boost::shared_ptr<MessageHandlerBase> msg(new DefaultMsgPrint(warning));
-		return msg;
+		return Singletons::get<boost::shared_ptr<MessageHandlerBase>,INT_MAX>(
+			boost::shared_ptr<MessageHandlerBase>(new DefaultMsgPrint(warning)));
 	}
 	Log();//dont do this
 public:

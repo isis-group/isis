@@ -17,6 +17,7 @@
 #include "common.hpp"
 #include <boost/regex.hpp>
 #include <boost/foreach.hpp>
+#include "CoreUtils/singletons.hpp"
 
 namespace isis{ namespace data{
 
@@ -108,8 +109,7 @@ std::list<std::string> IOFactory::getSuffixes(const FileFormatPtr& reader)
 
 IOFactory& IOFactory::get()
 {
-	static IOFactory ret;
-	return ret;
+	return util::Singletons::get<IOFactory,0>();
 }
 
 int IOFactory::loadFile(ChunkList &ret,const boost::filesystem::path& filename, const std::string& dialect)

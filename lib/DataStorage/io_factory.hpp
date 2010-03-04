@@ -66,6 +66,7 @@ public:
 
 	static IOFactory &get();
 protected:
+	IOFactory();//shall not be created directly
 	FileFormatList io_formats;
 
 	/*
@@ -79,7 +80,6 @@ protected:
 	FileFormatList getFormatInterface(const std::string& filename, const std::string& dialect);
 private:
 	std::map<std::string, FileFormatList,util::_internal::caselessStringLess> io_suffix;
-	IOFactory();//shall not be created directly
 	IOFactory& operator =(IOFactory&); //dont do that
 };
 

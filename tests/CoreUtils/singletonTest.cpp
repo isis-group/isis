@@ -3,7 +3,7 @@
 
 using namespace isis::util;
 
-template<int NUMBER> class SingleTest:public _internal::Singleton{
+template<int NUMBER> class SingleTest{
 public:
 	SingleTest(){
 		std::cout << "Creating SingleTest<" << NUMBER << ">" << std::endl;

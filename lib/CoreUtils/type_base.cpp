@@ -11,6 +11,7 @@
 //
 
 #include "type_base.hpp"
+#include "singletons.hpp"
 
 namespace isis{ namespace util{ namespace _internal{
 
@@ -27,8 +28,7 @@ TypeBase::~TypeBase() {}
 
 
 TypeConverterMap& TypeBase::converters() {
-	static _internal::TypeConverterMap ret;
-	return ret;
+	return Singletons::get<_internal::TypeConverterMap,0>();
 }
 
 TypeBase::Converter TypeBase::getConverterTo(int id)const {
