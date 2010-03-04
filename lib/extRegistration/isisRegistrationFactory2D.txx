@@ -317,7 +317,24 @@ namespace isis {
 
 			//initialize transform
 			if (!UserOptions.INITIALIZEMASSOFF or !UserOptions.INITIALIZECENTEROFF) {
-
+				  if (transform.TRANSLATION) {
+					m_Rigid2DTransform = Rigid2DTransformType::New();
+					m_RigidInitializer = RigidCenteredTransformInitializerType::New();
+					m_RigidInitializer->SetTransform(m_Rigid2DTransform);
+					m_RigidInitializer->SetFixedImage(m_FixedImage);
+					m_RigidInitializer->SetMovingImage(m_MovingImage);
+					if(!UserOptions.INITIALIZECENTEROFF)
+						m_RigidInitializer->GeometryOn();
+					if(!UserOptions.INITIALIZEMASSOFF)
+						m_RigidInitializer->MomentsOn();
+					m_RigidInitializer->InitializeTransform();
+					Rigid2DTransformType::ParametersType parameters(FixedImageDimension);
+					parameters[0] = m_Rigid2DTransform->GetTranslation()[0];
+					parameters[1] = m_Rigid2DTransform->GetTranslation()[1];
+					m_TranslationTransform->SetParameters(parameters);
+					
+				}
+				   
 				if (transform.RIGID) {
 					m_RigidInitializer = RigidCenteredTransformInitializerType::New();
 					m_RigidInitializer->SetTransform(m_Rigid2DTransform);

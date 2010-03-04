@@ -185,7 +185,7 @@ public:
 
 	typedef typename itk::CenteredTransformInitializer<AffineTransformType, TFixedImageType, TMovingImageType>
 	        AffineCenteredTransformInitializerType;
-
+	
 	typedef typename itk::LandmarkBasedTransformInitializer<VersorRigid3DTransformType, TFixedImageType,
 	        TMovingImageType> RigidLandmarkBasedTransformInitializerType;
 

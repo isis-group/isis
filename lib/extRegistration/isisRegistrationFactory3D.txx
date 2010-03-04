@@ -350,7 +350,25 @@ namespace isis {
 
 			//initialize transform
 			if (!UserOptions.INITIALIZEMASSOFF or !UserOptions.INITIALIZECENTEROFF) {
-
+				if (transform.TRANSLATION) {
+					m_VersorRigid3DTransform = VersorRigid3DTransformType::New();
+					m_RigidInitializer = RigidCenteredTransformInitializerType::New();
+					m_RigidInitializer->SetTransform(m_VersorRigid3DTransform);
+					m_RigidInitializer->SetFixedImage(m_FixedImage);
+					m_RigidInitializer->SetMovingImage(m_MovingImage);
+					if(!UserOptions.INITIALIZECENTEROFF)
+						m_RigidInitializer->GeometryOn();
+					if(!UserOptions.INITIALIZEMASSOFF)
+						m_RigidInitializer->MomentsOn();
+					m_RigidInitializer->InitializeTransform();
+					VersorRigid3DTransformType::ParametersType parameters(FixedImageDimension);
+					parameters[0] = m_VersorRigid3DTransform->GetTranslation()[0];
+					parameters[1] = m_VersorRigid3DTransform->GetTranslation()[1];
+					parameters[2] = m_VersorRigid3DTransform->GetTranslation()[2];
+					m_TranslationTransform->SetParameters(parameters);
+				}
+			    
+			    
 				if (transform.VERSORRIGID) {
 					m_RigidInitializer = RigidCenteredTransformInitializerType::New();
 					m_RigidInitializer->SetTransform(m_VersorRigid3DTransform);
