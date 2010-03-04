@@ -25,7 +25,7 @@ class Singletons{
 	template<typename T> T* create(int priority){
 		BOOST_MPL_ASSERT((boost::is_base_of< _internal::Singleton, T>));
 		T* ret=new T;
-		map.insert(std::make_pair(priority,static_cast<_internal::Singleton*>(ret)));
+		map.insert(map.find(priority), std::make_pair(priority,static_cast<_internal::Singleton*>(ret)));
 		return ret;
 	}
 	template<typename T> static T* request(int priority){

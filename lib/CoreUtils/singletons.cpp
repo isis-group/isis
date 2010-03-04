@@ -3,15 +3,16 @@
 
 namespace isis{ namespace util{
 
-	Singletons& Singletons::getMaster()
+Singletons& Singletons::getMaster()
 {
 	static Singletons me;
 	return me;
 }
 Singletons::~Singletons()
 {
-	BOOST_FOREACH(prioMap::const_reference ref,map){
-		delete ref.second;
+	while(not map.empty()){
+		delete map.begin()->second;
+		map.erase(map.begin());
 	}
 }
 
