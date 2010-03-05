@@ -99,10 +99,15 @@ public:
 	std::string typeName()const;
 	unsigned short typeID()const;
 	
-	void copyRange(const size_t source_start[],const size_t source_end[], isis::data::Chunk& dst,const size_t destination[])const;
-	void copyLine(size_t secondDimS, size_t thirdDimS, size_t fourthDimS, isis::data::Chunk& dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD)const;
+	void copyRange(const size_t source_start[],const size_t source_end[], Chunk& dst,const size_t destination[])const;
+	void copyLine(size_t secondDimS, size_t thirdDimS, size_t fourthDimS, Chunk& dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD)const;
 	void copySlice(size_t thirdDimS, size_t fourthDimS, isis::data::Chunk& dst, size_t thirdDimD, size_t fourthDimD)const;
 	
+	bool memcmpRange(size_t start,size_t end,const Chunk& dst,size_t destination)const;
+	bool memcmpRange(const size_t source_start[],const size_t source_end[],const Chunk& dst,const size_t destination[])const;
+	bool memcmpLine(size_t secondDimS, size_t thirdDimS, size_t fourthDimS,const Chunk& dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD)const;
+	bool memcmpSlice(size_t thirdDimS, size_t fourthDimS,const Chunk& dst, size_t thirdDimD, size_t fourthDimD)const;
+
 	util::fvector4 getFoV()const;
 	util::fvector4 getFoV(const isis::util::fvector4 &voxelSize)const;
 	

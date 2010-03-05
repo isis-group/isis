@@ -94,6 +94,45 @@ void Chunk::copyRange(const size_t source_start[], const size_t source_end[], Ch
 	get()->copyRange(sstart,send,*dst,dstart);
 }
 
+bool Chunk::memcmpRange(size_t start, size_t end, const isis::data::Chunk& dst, size_t destination) const
+{
+	return get()->memcmp(start,end,*dst,destination);
+}
+bool Chunk::memcmpRange(const size_t source_start[], const size_t source_end[],const Chunk& dst,const size_t destination[]) const
+{
+	LOG_IF(not rangeCheck(source_start),DataDebug,isis::util::error)
+		<< "memcmp start " << util::FixedVector<size_t,4>(source_start)
+		<< " is out of range (" << sizeToString() << ") at the first chunk";
+	LOG_IF(not rangeCheck(source_end),DataDebug,isis::util::error)
+		<< "memcmp end " << util::FixedVector<size_t,4>(source_end)
+		<< " is out of range (" << sizeToString() << ") at the first chunk";
+	LOG_IF(not dst.rangeCheck(destination),DataDebug,isis::util::error)
+		<< "Index " << util::FixedVector<size_t,4>(destination)
+		<< " is out of range (" << sizeToString() << ") at the second chunk";
+	LOG(DataDebug,isis::util::verbose_info)
+		<< "Comparing range from " << util::FixedVector<size_t,4>(source_start) << " to " << util::FixedVector<size_t,4>(source_end)
+		<< " and " << util::FixedVector<size_t,4>(destination);
+	const size_t sstart=dim2Index(source_start);
+	const size_t send=dim2Index(source_end);
+	const size_t dstart=dst.dim2Index(destination);
+	return memcmpRange(sstart,send,dst,dstart);
+}
+bool Chunk::memcmpLine(size_t secondDimS, size_t thirdDimS, size_t fourthDimS,const Chunk& dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD) const
+{
+	const size_t idx1[]={0,secondDimS,thirdDimS,fourthDimS};
+	const size_t idx2[]={0,secondDimD,thirdDimD,fourthDimD};
+	const size_t idx3[]={sizeToVector()[0]-1,secondDimD,thirdDimD,fourthDimD};
+	return memcmpRange(idx1,idx2,dst,idx3);
+}
+bool Chunk::memcmpSlice(size_t thirdDimS, size_t fourthDimS,const Chunk& dst, size_t thirdDimD, size_t fourthDimD) const
+{
+	const size_t idx1[]={0,0,thirdDimS,fourthDimS};
+	const size_t idx2[]={0,0,thirdDimD,fourthDimD};
+	const size_t idx3[]={sizeToVector()[0]-1,sizeToVector()[1]-1,thirdDimD,fourthDimD};
+	return memcmpRange(idx1,idx2,dst,idx3);
+}
+
+
 util::fvector4 Chunk::getFoV()const
 {
 	LOG_IF(not hasProperty("voxelSize"),DataDebug,util::error) << "Property voxelSize is missing in chunk, cannot compute FOV";

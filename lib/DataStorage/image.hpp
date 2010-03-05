@@ -225,6 +225,7 @@ public:
 			if(max<cMax)max=cMax;
 		}
 	}
+	bool memcmp(const Image &comp)const;
 };
 
 class ImageList : public std::list< boost::shared_ptr<Image> >

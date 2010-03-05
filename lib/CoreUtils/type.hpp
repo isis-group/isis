@@ -15,6 +15,7 @@
 
 #include "log.hpp"
 #include "type_base.hpp"
+#include "string.h"
 
 #include <string>
 
@@ -113,6 +114,10 @@ public:
 template<typename TYPE> class TypePtr: public _internal::TypePtrBase{
 	boost::shared_ptr<TYPE> m_val;
 	template<typename T> TypePtr(const Type<T>& value); // Dont do this
+protected:
+	const boost::weak_ptr<void> address()const{
+		return boost::weak_ptr<void>(m_val);
+	}
 public:
 	static const int id = _internal::TypeId<TYPE>::value << 8;
 	/// Proxy-Deleter to encapsulate the real deleter/shared_ptr when creating shared_ptr for parts of a shared_ptr
@@ -250,7 +255,7 @@ public:
 	TYPE& operator[](size_t idx){
 		return (m_val.get())[idx];
 	}
-	TYPE operator[](size_t idx)const{
+	const TYPE &operator[](size_t idx)const{
 		return (m_val.get())[idx];
 	}
 	/**

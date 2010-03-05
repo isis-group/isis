@@ -220,6 +220,7 @@ class TypePtrBase : public GenericType{
 protected:
 	size_t m_len;
 	TypePtrBase(size_t len=0);
+	virtual const boost::weak_ptr<void> address()const=0;
 public:
 	typedef TypeReference<TypePtrBase> Reference;
 	/**
@@ -269,6 +270,8 @@ public:
 			if(min>me[i])min=me[i];
 		}
 	}
+	bool memcmp(size_t start,size_t end,const TypePtrBase &dst,size_t dst_start)const;
+	bool memcmp(const TypePtrBase& comp)const;
 };
 
 }

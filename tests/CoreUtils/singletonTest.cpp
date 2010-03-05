@@ -1,6 +1,8 @@
 #include "CoreUtils/singletons.hpp"
 #include <iostream>
 
+
+namespace isis{ namespace test{
 using namespace isis::util;
 
 template<int NUMBER> class SingleTest{
@@ -23,3 +25,4 @@ int main(){
 	if((void*)&s1== (void*)&Singletons::get<SingleTest<3>,5>()) // this should be deleted before SingleTest<2> 
 		std::cout << "request for SingleTest<3> gets Singleton1" << std::endl;
 }
+}}

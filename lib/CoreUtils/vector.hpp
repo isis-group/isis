@@ -249,6 +249,15 @@ public:
 	}
 };
 
+template<typename TYPE, size_t SIZE,typename CONTAINER1,typename CONTAINER2>
+FixedVector<TYPE,SIZE> minVector(const FixedVector<TYPE,SIZE,CONTAINER1> &first,const FixedVector<TYPE,SIZE,CONTAINER2> &second)
+{
+	FixedVector<TYPE,SIZE> ret(first);
+	for(size_t i=0;i<SIZE;i++)
+		if(ret[i]>second[i])ret[i]=second[i];
+	return ret;
+}
+
 typedef vector4<float> fvector4;
 typedef vector4<double> dvector4;
 typedef vector4<int32_t> ivector4;

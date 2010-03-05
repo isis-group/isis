@@ -460,5 +460,30 @@ ImageList::ImageList(ChunkList src)
 	}
 }
 
+bool Image::memcmp(const isis::data::Image& comp) const
+{
+	LOG_IF(not (clean and comp.clean),DataDebug,util::error)
+		<< "Comparing unindexed images will cause you trouble, run reIndex()!";
+	if(sizeToVector() != comp.sizeToVector()){
+		LOG(DataLog,util::info) << "Size of images differs (" << sizeToVector() << "/"
+		<< comp.sizeToVector() << "). Returning false";
+		return false;
+	}
+	util::ivector4 compVect(util::minVector(chunksBegin()->sizeToVector(),comp.chunksBegin()->sizeToVector()));
+	util::ivector4 start;
+	const size_t increment=compVect.product();
+	for(size_t i=0;i<volume();i+=increment){
+		const size_t nexti=i+increment-1;
+		const std::pair<size_t,size_t> c1pair1(i/chunkVolume,i%chunkVolume);
+		const std::pair<size_t,size_t> c1pair2(nexti/chunkVolume,nexti%chunkVolume);
+		const std::pair<size_t,size_t> c2pair1(i/comp.chunkVolume,i%comp.chunkVolume);
+		assert(c1pair1.first == c1pair2.first);
+		const Chunk &c1=getChunkAt(c1pair1.first);
+		const Chunk &c2=comp.getChunkAt(c2pair1.first);
+		if(not c1.memcmpRange(c1pair1.second,c1pair2.second,c2,c2pair1.second))
+			return false;
+	}
+	return true;
+}
 
 }}

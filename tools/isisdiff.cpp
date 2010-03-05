@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
-	std::cout << "Got " << images1.size() << " Images from " << argv[1] << " and " << argv[2] << std::endl;
+// 	std::cout << "Got " << images1.size() << " Images from " << argv[1] << " and " << argv[2] << std::endl;
 
 	ImageList::const_iterator i,j;
 	int count;
@@ -34,21 +34,17 @@ int main(int argc, char *argv[])
 			<< argv[2] << ":" << count  << " differ:" << std::endl
 			<< diff	<< std::endl;
 		}
-		if(first.sizeToVector() == second.sizeToVector()){
+		if(first.sizeToVector() != second.sizeToVector()){
 			std::cout 
 			<< "Image sizes of " << argv[1] << ":" << count << " and "
 			<< argv[2] << ":" << count  << " differ:" 
 			<< first.sizeToString()	<< "/" << second.sizeToString() << std::endl;
 			ret++;
 		}
-	}
-	/*	BOOST_FOREACH(ImageList::const_reference ref,images){
-		std::cout << "======Image #" << ++count1 << ref->sizeToString() << "======Metadata======" << std::endl;
-		ref->print(std::cout,true);
-		for(Image::ChunkIterator c=ref->chunksBegin();c!=ref->chunksEnd();c++){
-			std::cout << "======Image #" <<count1 << "==Chunk #" << ++count2 << c->sizeToString() << "======Metadata======" << std::endl;
-			c->print(std::cout,true);
+		if(not first.memcmp(second)){
+			std::cout << "Image data differ" << std::endl;
+			ret++;
 		}
-	}*/
+	}
 	return ret;
 }
