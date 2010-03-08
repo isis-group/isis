@@ -5,31 +5,8 @@ PROJECT(isisDoTrans2D)
 
 cmake_policy(SET CMP0003 NEW)
 
-#if you don't want the full compiler output, remove the following line
-#SET(CMAKE_VERBOSE_MAKEFILE ON)
-
-# look for itk package
-FIND_PACKAGE(ITK)
-IF(ITK_FOUND)
-  INCLUDE(${ITK_USE_FILE})
-ELSE(ITK_FOUND)
-  MESSAGE(FATAL_ERROR
-    "ITK not found. Please set ITK_DIR.")
-ENDIF(ITK_FOUND)
-
-
-IF(CMAKE_BUILD_TYPE MATCHES "Debug")
-  ADD_DEFINITIONS(-DDEBUG)
-ENDIF()
-
-#add definitions, compiler switches, etc.
-#ADD_DEFINITIONS(-Wall -O2)
-
-
 #the executables
-ADD_EXECUTABLE(isisdotrans2d
-	isisdotrans2D.cxx
-	)
+ADD_EXECUTABLE(isisdotrans2d isisdotrans2D.cxx)
 	
 set_target_properties(isisdotrans2d PROPERTIES 
     RUNTIME_OUTPUT_DIRECTORY ${ISIS_INSTALL_BIN_DIR}

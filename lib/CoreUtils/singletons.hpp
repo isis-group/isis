@@ -51,7 +51,7 @@ public:
 	 * Get a singleton of type T and priority PRIO.
 	 * If called the first time this creates a singleton of type T with the priority PRIO.
 	 * In any other case it just returns the same object which was created at the first call.
-	 * Singletons created using this are deleted based on the following rules:
+	 * Singletons created by this function are automatically deleted based on the following rules:
 	 * - singletons are deleted _after_ the programm ends
 	 * - singletons not deleted before any singleton of a lower priority
 	 * - singletons of the same priority are deleted in the opposite order they where created. (LIFO)

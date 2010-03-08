@@ -9,16 +9,15 @@ project(isis)
 FIND_PACKAGE(Boost REQUIRED COMPONENTS filesystem regex system date_time)
 include_directories(${Boost_INCLUDE_DIR}  lib)
 
-# OPTION(BUILD_APPLICATIONS "Build the isis application directory." OFF)
-OPTION(BUILD_APPLICATIONS_2D "Support for 2d images" ON)
-OPTION(BUILD_APPLICATIONS_3D "Support for 3d images" ON)
+OPTION(BUILD_APPLICATIONS "Build the isis application directory" OFF)
 
-OPTION(BUILD_TESTS "Build the isis tests directory." ON)
-OPTION(BUILD_SHARED_LIBS "Build isis with shared libraries" OFF)
+OPTION(BUILD_TESTS "Build the tests" OFF)
+OPTION(BUILD_SHARED_LIBS "Build isis with shared libraries" ON)
 
-OPTION(BUILD_COREUTILS "Build the isis coreutils." ON)
-OPTION(BUILD_DATA_IO "Build the isis data and io modules." ON)
-OPTION(BUILD_ITK "Build the ITK stuff." OFF)
+OPTION(BUILD_COREUTILS "Build the isis coreutils" ON)
+OPTION(BUILD_DATA_IO "Build the isis data and io modules" ON)
+
+OPTION(HAVE_ITK "Enable ITK-support" OFF)
 
 OPTION(RUNTIME_LOG "Enable runtime logging" ON)
 OPTION(DEBUG_LOG "Enable debug logging" ON)
@@ -97,12 +96,19 @@ endif(SVN_REVISION)
 add_subdirectory(lib)
 add_subdirectory(tools)
 
-IF(BUILD_APPLICATIONS_3D OR BUILD_APPLICATIONS_2D)
-	add_subdirectory(apps)
-ENDIF(BUILD_APPLICATIONS_3D OR BUILD_APPLICATIONS_2D)
+IF(HAVE_ITK)
+# look for itk package
+	FIND_PACKAGE(ITK)
+	IF(ITK_FOUND)
+		INCLUDE(${ITK_USE_FILE})
+	ELSE(ITK_FOUND)
+		MESSAGE(FATAL_ERROR	"ITK not found. Please set ITK_DIR.")
+	ENDIF(ITK_FOUND)
+ENDIF(HAVE_ITK)
 
-variable_requires(BUILD_APPLICATIONS_2D  BUILD_APPLICATIONS_2D BUILD_ITK)
-variable_requires(BUILD_APPLICATIONS_3D  BUILD_APPLICATIONS_3D BUILD_ITK)
+IF(BUILD_APPLICATIONS)
+	add_subdirectory(apps)
+ENDIF(BUILD_APPLICATIONS)
 
 IF(BUILD_TESTS)
     add_subdirectory(tests)
