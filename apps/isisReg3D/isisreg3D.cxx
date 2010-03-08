@@ -41,7 +41,7 @@ VDictEntry TYPTransform[] = { {"Rigid", 0}, {"Affine", 1}, {"BSplineDeformable",
 
 VDictEntry TYPInterpolator[] = { {"Linear", 0}, {"BSpline", 1}, {"NearestNeighbor", 2}, {NULL}};
 
-VDictEntry TYPOptimizer[] = { {"RegularStepGradientDescent", 0}, {"VersorRigid", 1}, {"LBFGSB", 2}, {"Amoeba", 3}, {
+VDictEntry TYPOptimizer[] = { {"RegularStepGradientDescent", 1}, {"VersorRigid", 0}, {"LBFGSB", 2}, {"Amoeba", 3}, {
     "Powell", 4}, {NULL}};
 
 //command line parser options
@@ -321,6 +321,10 @@ int main(
 			<< std::endl;
 		}
 
+		if (transform == 0 and optimizer != 1) {
+			std::cerr << "\nIt is recommended using the VersorRigid transform in connection with the VersorRigid optimizer!\n"
+			<< std::endl;
+		}
 		//transform setup
 		std::cout << "used transform: " << TYPTransform[transform].keyword << std::endl;
 		switch (transform) {
