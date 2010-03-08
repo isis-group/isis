@@ -54,7 +54,7 @@ static VString transform_filename_in = NULL;
 static VShort number_of_bins = 50;
 static VShort number_of_iterations = 1000;
 static VFloat pixel_density = 0.01;
-static VShort grid_size = 5;
+static VArgVector grid_size;
 static VShort metricType = 0;
 static VArgVector transformType;
 static VArgVector interpolatorType;
@@ -101,7 +101,7 @@ static VOptionDescRec
 
             {"j", VShortRepn, 1, &number_threads, VOptionalOpt, 0, "Number of threads used for the registration"},
 
-            {"gridSize", VShortRepn, 1, &grid_size, VOptionalOpt, 0,
+            {"gridSize", VShortRepn, 0, (VPointer) &grid_size, VOptionalOpt, 0,
                 "Grid size used for the BSplineDeformable transform."},
             {"cf", VFloatRepn, 1, &coarse_factor, VOptionalOpt, 0, 
 		"Coarse factor. Multiple of the max and min step length of the optimizer. Standard is 1"},
@@ -252,8 +252,10 @@ int main(
 
 	//analyse transform vector
 	unsigned int repetition = transformType.number;
+	unsigned int gridSize;
 	if (!repetition)
 	repetition = 1;
+	
 	//analyse optimizer vector
 
 	boost::progress_timer time_used;
@@ -274,6 +276,13 @@ int main(
 		} else {
 		    interpolator = 0;
 		}
+		if (grid_size.number) {
+			  gridSize = ((VShort*) grid_size.vector)[counter];
+		} else {
+		    gridSize = 5;
+		}
+	
+		std::cout << "gridSize: " << gridSize << std::endl;
 
 		std::cout << std::endl << "setting up the registration object..." << std::endl;
 		registrationFactory->Reset();
@@ -288,9 +297,9 @@ int main(
 		}
 
 		//check grid size
-		if (grid_size <= 4) {
+		if (gridSize <= 4) {
 			std::cerr << "\ngrid size has to be bigger than 4...setting grid size to 5\n" << std::endl;
-			grid_size = 5;
+			gridSize = 5;
 		}
 
 		if (transform == 2 and optimizer != 1) {
@@ -423,7 +432,7 @@ int main(
 		registrationFactory->UserOptions.NumberOfIterations = number_of_iterations;
 		registrationFactory->UserOptions.NumberOfBins = number_of_bins;
 		registrationFactory->UserOptions.PixelDensity = pixel_density;
-		registrationFactory->UserOptions.BSplineGridSize = grid_size;
+		registrationFactory->UserOptions.BSplineGridSize = gridSize;
 		registrationFactory->UserOptions.PRINTRESULTS = true;
 		registrationFactory->UserOptions.NumberOfThreads = number_threads;
 		registrationFactory->UserOptions.MattesMutualInitializeSeed = initial_seed;

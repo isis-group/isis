@@ -13,8 +13,8 @@ add_subdirectory(DataStorage)
 add_subdirectory(ImageIO)
 ENDIF(BUILD_DATA_IO)
 
-IF(BUILD_ITK)
+IF(HAVE_ITK)
 add_subdirectory(extITK)
-ENDIF(BUILD_ITK)
+ENDIF(HAVE_ITK)
 
 # add_subdirectory(ExternalLibraryAdapter)

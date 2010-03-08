@@ -13,6 +13,7 @@ IF(BUILD_APPLICATIONS_3D)
 	add_subdirectory(isisReg3D)
 	add_subdirectory(isisDoTrans3D)
 	add_subdirectory(isisCheckerboard3D)
+	#add_subdirectory(isisDoTrans3D_float)
 ENDIF(BUILD_APPLICATIONS_3D)
 
 #add_subdirectory(isisDoTrans3D_float)

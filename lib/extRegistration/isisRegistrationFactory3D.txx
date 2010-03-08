@@ -432,13 +432,12 @@ namespace isis {
 				for (unsigned int r = 0; r < FixedImageDimension; r++) {
 					bsplineSpacing[r] *= static_cast<double> (fixedImageSize[r] - 1) / static_cast<double> (gridSizeOnImage[r]
 							- 1);
-				}
-
+				}				
 				BSplineDirectionType bsplineDirection = m_FixedImage->GetDirection();
 				BSplineSpacingType gridOriginOffset = bsplineDirection * bsplineSpacing;
-
+								
 				bsplineOrigin = bsplineOrigin - gridOriginOffset;
-
+				
 				m_BSplineTransform->SetGridSpacing(bsplineSpacing);
 				m_BSplineTransform->SetGridOrigin(bsplineOrigin);
 				m_BSplineTransform->SetGridRegion(bsplineRegion);
@@ -447,7 +446,6 @@ namespace isis {
 				typedef typename BSplineTransformType::ParametersType BSplineParametersType;
 
 				m_NumberOfParameters = m_BSplineTransform->GetNumberOfParameters();
-
 				BSplineParametersType bsplineParameters(m_NumberOfParameters);
 				bsplineParameters.Fill(0.0);
 				m_BSplineTransform->SetParameters(bsplineParameters);

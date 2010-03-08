@@ -280,7 +280,7 @@ namespace isis {
 				m_LBFGSBOptimizer->SetLowerBound(lowerBound);
 				m_LBFGSBOptimizer->SetUpperBound(upperBound);
 
-				m_LBFGSBOptimizer->SetCostFunctionConvergenceFactor(1.e8);
+				m_LBFGSBOptimizer->SetCostFunctionConvergenceFactor(1.e1);
 				m_LBFGSBOptimizer->SetProjectedGradientTolerance(1e-9);
 				m_LBFGSBOptimizer->SetMaximumNumberOfIterations(UserOptions.NumberOfIterations);
 				m_LBFGSBOptimizer->SetMaximumNumberOfEvaluations(500);
@@ -610,13 +610,15 @@ namespace isis {
 		void RegistrationFactory2D<TFixedImageType, TMovingImageType>::SetInitialTransform(
 				TransformBasePointer initialTransform) {
 			const char* initialTransformName = initialTransform->GetNameOfClass();
+			if (!strcmp(initialTransformName, "BSplineDeformableTransform") and transform.BSPLINEDEFORMABLETRANSFORM) {
+				m_BSplineTransform->SetBulkTransform(static_cast<BSplineTransformType*> (initialTransform));
+
+			}
 			if (!strcmp(initialTransformName, "AffineTransform") and transform.BSPLINEDEFORMABLETRANSFORM) {
-				m_BulkTransform = static_cast<AffineTransformType*> (initialTransform);
+				m_BSplineTransform->SetBulkTransform(static_cast<AffineTransformType*> (initialTransform));
 
 			}
 			if (!strcmp(initialTransformName, "Rigid2DTransform") and transform.BSPLINEDEFORMABLETRANSFORM) {
-				
-				m_BulkTransform = static_cast<Rigid2DTransformType*> (initialTransform);
 				m_BSplineTransform->SetBulkTransform(static_cast<Rigid2DTransformType*> (initialTransform));
 				
 
