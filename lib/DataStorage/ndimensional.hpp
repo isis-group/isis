@@ -52,8 +52,8 @@ template<unsigned short DIMS> class NDimensional{
 	size_t dim[DIMS];
 protected:
 	NDimensional(){}
-	static const size_t n_dims=DIMS;
 public:
+	static const size_t n_dims=DIMS;
 	/**
 	 * Initializes the size-vector.
 	 * This must be done before anything else, or behaviour will be undefined.

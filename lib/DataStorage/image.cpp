@@ -170,7 +170,7 @@ bool Image::reIndex() {
 		if(lookup.size()>1){
 			LOG(DataLog,util::error)
 			<< "Cannot handle multiple Chunks, if they have more than "
-			<< Chunk::n_dims-1 << " dimensions";
+			<< Image::n_dims-1 << " dimensions";
 			return false;
 		}
 		//if there is only one chunk, its ok - the image will consist only of this one, 
