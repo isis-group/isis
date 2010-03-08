@@ -6,9 +6,11 @@
 
 namespace isis{ namespace util{
 
-class Singletons;
-
-
+/**
+ * Static class to handle singletons.
+ * This class can be used to create singletons with a specified priority.
+ * It keeps track of them and deletes the automatically based of their priority.
+ */
 class Singletons{
 	class SingletonBase:public boost::noncopyable{
 	public:
@@ -45,9 +47,24 @@ class Singletons{
 	}
 	static Singletons& getMaster();
 public:
+	/**
+	 * Get a singleton of type T and priority PRIO.
+	 * If called the first time this creates a singleton of type T with the priority PRIO.
+	 * In any other case it just returns the same object which was created at the first call.
+	 * Singletons created using this are deleted based on the following rules:
+	 * - singletons are deleted _after_ the programm ends
+	 * - singletons not deleted before any singleton of a lower priority
+	 * - singletons of the same priority are deleted in the opposite order they where created. (LIFO)
+	 *
+	 * \return allways a reference to the same object of type T.
+	 */
 	template<typename T,int PRIO> static T& get(){
 		return *static_cast<T*>(request<T>(PRIO));
 	}
+	/**
+	 * \copydoc get()
+	 * \param initValue value to be forwarded to the constructor of T if its called.
+	 */
 	template<typename T,int PRIO,typename T2> static T& get(const T2 &initValue){
 		return *static_cast<T*>(request<T>(PRIO,initValue));
 	}

@@ -3,7 +3,6 @@
 
 
 namespace isis{ namespace test{
-using namespace isis::util;
 
 template<int NUMBER> class SingleTest{
 public:
@@ -14,7 +13,9 @@ public:
 		std::cout << "Deleting SingleTest<" << NUMBER << ">" << std::endl;
 	}
 };
-
+}}
+using namespace isis::util;
+using namespace isis::test;
 int main(){
 	SingleTest<1> &s1= Singletons::get<SingleTest<1>,10>();
 	if(&s1!= &Singletons::get<SingleTest<1>,0>())
@@ -22,7 +23,6 @@ int main(){
 
 	if((void*)&s1== (void*)&Singletons::get<SingleTest<2>,5>())
 		std::cout << "request for SingleTest<2> gets Singleton1" << std::endl;
-	if((void*)&s1== (void*)&Singletons::get<SingleTest<3>,5>()) // this should be deleted before SingleTest<2> 
+	if((void*)&s1== (void*)&Singletons::get<SingleTest<3>,5>()) // this should be deleted before SingleTest<2>
 		std::cout << "request for SingleTest<3> gets Singleton1" << std::endl;
 }
-}}

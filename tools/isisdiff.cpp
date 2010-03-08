@@ -3,7 +3,6 @@
 
 using namespace isis::data;
 using namespace isis::util;
-using isis::util::DefaultMsgPrint;
 
 int main(int argc, char *argv[])
 {
@@ -19,8 +18,6 @@ int main(int argc, char *argv[])
 		std::cout << "Amount of found images in " << argv[1] << " and " << argv[2] << " differs" << std::endl;
 		return -1;
 	}
-
-// 	std::cout << "Got " << images1.size() << " Images from " << argv[1] << " and " << argv[2] << std::endl;
 
 	ImageList::const_iterator i,j;
 	int count;
@@ -40,8 +37,7 @@ int main(int argc, char *argv[])
 			<< argv[2] << ":" << count  << " differ:" 
 			<< first.sizeToString()	<< "/" << second.sizeToString() << std::endl;
 			ret++;
-		}
-		if(not first.memcmp(second)){
+		}else if(not first.memcmp(second)){
 			std::cout << "Image data differ" << std::endl;
 			ret++;
 		}

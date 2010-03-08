@@ -94,7 +94,7 @@ void DefaultMsgPrint::commit(const _internal::Message &mesg){
 	#ifndef NDEBUG //if with debug-info
 	   << "[" << mesg.m_file.leaf() << ":" << mesg.m_line << "] " //print the file and the line
 	#else
-	   << "[" << mesg.m_object << ":" << mesg.m_line << "] " //print the object/method
+	   << "[" << mesg.m_object << "] " //print the object/method
 	#endif //NDEBUG
 	   << mesg.merge()
 	   << std::endl;

@@ -23,6 +23,7 @@ typedef std::list<std::string> slist;
 
 namespace _internal{
 
+/// the supported types as mpl-vector
 typedef boost::mpl::vector<
 int8_t,uint8_t,int16_t,uint16_t,int32_t,uint32_t,int64_t,uint64_t
 ,float,double
@@ -32,6 +33,11 @@ int8_t,uint8_t,int16_t,uint16_t,int32_t,uint32_t,int64_t,uint64_t
 ,boost::posix_time::ptime,boost::gregorian::date
 > types;
 
+/**
+ * Templated pseudo struct to generate the id of a supported type.
+ * The id is stored in TypeId\<T\>::value.
+ * This is a compile-time-constant, so it can be used as a template parameter and has no impact at the runtime.
+ */
 template<class T> struct TypeId{
 	typedef typename boost::mpl::distance<
 	typename boost::mpl::begin<types>::type,
@@ -43,8 +49,8 @@ template<class T> struct TypeId{
 
 /**
  * Templated pseudo struct to check for availability of a type at compile time.
- * Instanciating this with any datatype will cause the compiler to check if this datatype is in the list of the supported types.
- * If it isn't a compile-error will be raised.
+ * Instanciating this with any datatype (eg: check_type\<short\>() ) will cause the 
+ * compiler to raise an error if this datatype is not in the list of the supported types.
  */
 template< typename T > struct check_type
 {

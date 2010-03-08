@@ -39,6 +39,7 @@ private:
 protected:
 	/**
 	 * load a data file with given filename and dialect
+	 * @param ret ChunkList to store the loaded chunks in
 	 * @param filename file to open
 	 * @param dialect dialect of the fileformat to load
 	 * @return list of chunks (part of an image)
