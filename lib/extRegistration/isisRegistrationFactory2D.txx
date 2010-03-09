@@ -662,7 +662,7 @@ namespace isis {
 				void) {
 
 			for (int i = 0; i < FixedImageDimension; i++) {
-				if (m_FixedImageRegion.GetSize()[i] > m_MovingImageRegion.GetSize()[i]) {
+				if (m_FixedImageRegion.GetSize()[i] * m_FixedImage->GetSpacing()[i] > m_MovingImageRegion.GetSize()[i] * m_MovingImage->GetSpacing()[i]) {
 
 					m_FixedImageIsBigger = true;
 				}
