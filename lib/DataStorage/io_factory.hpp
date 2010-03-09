@@ -36,7 +36,7 @@ public:
 	typedef std::list<FileFormatPtr> FileFormatList;
 private:
 	typedef std::map<std::string, FileFormatPtr> FormatFormatMap;
-protected:
+public:
 	/**
 	 * load a data file with given filename and dialect
 	 * @param ret ChunkList to store the loaded chunks in
@@ -46,9 +46,6 @@ protected:
 	 */
 	int loadFile(ChunkList& ret,const boost::filesystem::path& filename, const std::string& dialect);
 	int loadPath(ChunkList& ret,const boost::filesystem::path& path, const std::string& dialect);
-	
-
-public:
 	/**
 	 * get all file suffixes a plugin suggests to handle
 	 * @param reader the plugin to ask

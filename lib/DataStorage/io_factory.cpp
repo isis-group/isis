@@ -36,7 +36,7 @@ struct pluginDeleter{
 	
 IOFactory::IOFactory()
 {
-	findPlugins(std::string(BUILD_PATH));
+	findPlugins(std::string(PLUGIN_PATH));
 }
 
 bool IOFactory::registerFormat(const FileFormatPtr plugin)
@@ -148,7 +148,7 @@ int IOFactory::loadFile(ChunkList &ret,const boost::filesystem::path& filename, 
 IOFactory::FileFormatList IOFactory::getFormatInterface(const std::string& filename, const std::string& dialect)
 {
 	boost::filesystem::path fname(filename);
-	std::string ext = extension(fname);
+	std::string ext = boost::filesystem::extension(fname);
 	if (ext.empty() ){
 		return FileFormatList();}
 

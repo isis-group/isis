@@ -1,6 +1,8 @@
 # the ISIS library module
 
-add_definitions(-DBUILD_PATH="${PROJECT_BINARY_DIR}")
+SET(PLUGIN_PATH ${PROJECT_BINARY_DIR} CACHE PATH "Path where the plugins shall be installed")
+
+add_definitions(-DPLUGIN_PATH="${PLUGIN_PATH}")
 add_definitions(-DDL_SUFFIX="${CMAKE_SHARED_LIBRARY_SUFFIX}")
 add_definitions(-DDL_PREFIX="${CMAKE_SHARED_LIBRARY_PREFIX}")
 

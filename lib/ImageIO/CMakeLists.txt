@@ -28,6 +28,20 @@ if(IOPLUGIN_NULL)
 		LINK_FLAGS "--no-undefined")
 endif(IOPLUGIN_NULL)
 
+if(IOPLUGIN_GZ)
+	FIND_LIBRARY(LIB_Z "z")
+	FIND_PATH(INCPATH_GZIP "zlib.h")
+	INCLUDE_DIRECTORIES(${GZIP_INC})
+
+	add_library(isisImageFormat_gz_proxy SHARED isisImageFormat_gz_proxy.cpp)
+	target_link_libraries(isisImageFormat_gz_proxy ${LINK_PLUGINS_AGAINST} ${LIB_Z})
+
+	set_target_properties(isisImageFormat_gz_proxy PROPERTIES
+		LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+		LINK_FLAGS "--no-undefined")
+endif(IOPLUGIN_GZ)
+
+
 if(IOPLUGIN_DICOM)
 	find_library(LIB_DCMIMGLE dcmimgle)
 	find_library(LIB_DCMDATA dcmdata)

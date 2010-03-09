@@ -6,6 +6,11 @@ using namespace isis::util;
 
 int main(int argc, char *argv[])
 {
+/*	ENABLE_LOG(isis::image_io::ImageIoDebug,DefaultMsgPrint,info);
+	ENABLE_LOG(isis::image_io::ImageIoLog,DefaultMsgPrint,info);
+	ENABLE_LOG(DataDebug,DefaultMsgPrint,info);
+	ENABLE_LOG(DataLog,DefaultMsgPrint,info);
+	*/
 	int ret=0;
 	if(argc<3){
 		std::cout << "Call " << argv[0] << " <first dataset> <second dataset>"<< std::endl;
