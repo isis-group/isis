@@ -141,7 +141,9 @@ public:
 	* \returns a reference to the PropertyValue
 	*/
 	PropertyValue& operator[](const std::string& key);
+	/// remove the property adressed by the key
 	bool remove(const std::string& key);
+	/// remove every property which is also in the given map (regardless of the value)
 	bool remove(const isis::util::PropMap& removeMap);
 	/**
 	* Adds a property as needed.

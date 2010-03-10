@@ -126,12 +126,12 @@ bool PropMap::remove(const isis::util::PropMap& removeMap)
 	iterator thisIt=begin();
 	bool ret=true;
 	
-	//remove everything that is also in second and equal (or also empty)
+	//remove everything that is also in second 
 	for(const_iterator otherIt=removeMap.begin();otherIt!=removeMap.end();otherIt++){
 		//find the closest match for otherIt->first in this (use the value-comparison-functor of PropMap)
 		if (continousFind(thisIt, end(),*otherIt, value_comp())) //thisIt->first == otherIt->first  - so its the same property
 		{
-			if(not thisIt->second.empty() and thisIt->second->is<PropMap>()){ //this is a subtrees
+			if(not thisIt->second.empty() and thisIt->second->is<PropMap>()){ //this is a subtree
 				if(not otherIt->second.empty() and otherIt->second->is<PropMap>()){
 					PropMap &mySub=thisIt->second->cast_to_Type<PropMap>();
 					PropMap &otherSub=otherIt->second->cast_to_Type<PropMap>();

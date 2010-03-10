@@ -47,6 +47,10 @@ public:
 	_internal::TypeBase::Reference(new Type<T>(ref)),m_needed(_needed){
 		check_type<T>();
 	}
+	template<typename T> PropertyValue(const Type<T>& ref,bool _needed = false):
+	_internal::TypeBase::Reference(new Type<T>(ref)),m_needed(_needed){
+		check_type<T>();
+	}
 	/**
 	 * Empty constructor.
 	 * Creates an empty property value. So PropertyValue().empty() will allways be true.

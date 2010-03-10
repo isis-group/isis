@@ -59,7 +59,15 @@ template<class InputIterator> std::string list2string(
 	write_list(start,end,ret,delim,prefix,suffix);
 	return ret.str();
 }
-
+/// do lexical_cast\<T\> on the elements of a list and return them
+template<typename T,typename InputIterator> std::list<T> list2list(InputIterator start,InputIterator end)
+{
+	std::list<T> ret;
+	for(;start!=end;start++)
+		ret.push_back(boost::lexical_cast<T>(*start));
+	return ret;
+}
+													  
 /**
  * Generic tokenizer.
  * Splits source into tokens and tries to lexically cast them to TARGET.

@@ -192,6 +192,7 @@ public:
 	 * \returns T() if T is not the actual type.
 	 */
 	template<typename T> const Type<T> cast_to_Type() const{
+		check_type<T>();
 		return m_cast_to<Type<T> >(Type<T>(T()));
 	}
 	/**

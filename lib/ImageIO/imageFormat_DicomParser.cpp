@@ -361,11 +361,96 @@ void ImageFormat_Dicom::parseList(DcmElement* elem,const std::string &name, util
 	LOG(ImageIoDebug,util::verbose_info) << "Parsed the list " << name << " as " << map[name];
 }
 
+void ImageFormat_Dicom::parseCSA(DcmElement *elem, isis::util::PropMap& map)
+{
+		Uint8 *array;
+		elem->getUint8Array(array);
+		const size_t len=elem->getLength();
+		std::ofstream dump("/tmp/dump.txt");
+		dump.write((char*)array,len);
+		dump.close();
+		for(std::string::size_type pos=0x10;pos<(len-sizeof(Sint32));){
+			pos+=parseCSAEntry(array+pos,map);
+		}
+}
+size_t ImageFormat_Dicom::parseCSAEntry(Uint8 *at, isis::util::PropMap& map){
+	size_t pos=0;
+	const char *const name=(char*)at+pos;pos+=0x40;
+	/*Sint32 &vm=*((Sint32*)array+pos);*/pos+=sizeof(Sint32);
+	const char *const vr=(char*)at+pos;pos+=0x4;
+	/*Sint32 syngodt=endian<Uint8,Uint32>(array+pos);*/pos+=sizeof(Sint32);
+	const Sint32 nitems=endian<Uint8,Uint32>(at+pos);pos+=sizeof(Sint32);
+
+	if(nitems){
+		pos+=sizeof(Sint32); //77
+		Sint32 len=0;
+		util::slist ret;
+		for(unsigned short n=0;n<nitems;n++){
+			len=endian<Uint8,Uint32>(at+pos);pos+=sizeof(Sint32);//the length of this element
+			pos+=3*sizeof(Sint32); //whatever
+			if(!len)continue;
+			std::string insert((char*)at+pos);
+			const std::string::size_type start =insert.find_first_not_of(' ');
+			const std::string::size_type end =insert.find(' ',start); //strip spaces
+			ret.push_back(insert.substr(start,end-start));//store the text if there is some
+			pos+=(
+					(len+sizeof(Sint32)-1)/sizeof(Sint32)
+				)*
+				sizeof(Sint32);//increment pos by len aligned to sizeof(Sint32)*/
+		}
+		if(ret.size()==1){
+			if(parseCSAValue(ret.front(),name,vr,map))
+				LOG(ImageIoDebug,util::info) << "Found entry " << name << ":" << map[name] << " in CSA header";
+		} else if(ret.size()>1){
+			if(parseCSAValueList(ret,name,vr,map))
+				LOG(ImageIoDebug,util::info) << "Found entry " << name << ":" << map[name] << " in CSA header";
+		}
+	} else {
+		LOG(ImageIoDebug,util::info) << "Skipping empty CSA entry " << name;
+		pos+=sizeof(Sint32);
+	}
+	return pos;
+}
+
+bool ImageFormat_Dicom::parseCSAValue(const std::string &val, const std::string &name,const char *const vr, isis::util::PropMap& map)
+{
+	if(strcasecmp(vr,"IS")==0){
+		map[name] = boost::lexical_cast<int>(val);
+	} else if(strcasecmp(vr,"UL")==0){
+		map[name] = boost::lexical_cast<u_int32_t>(val);
+	} else if(strcasecmp(vr,"LO")==0 or strcasecmp(vr,"SH")==0){
+		map[name] = val;
+	} else if(strcasecmp(vr,"DS")==0 or strcasecmp(vr,"FD")==0){
+		map[name] = boost::lexical_cast<double>(val);
+	} else if(strcasecmp(vr,"US")==0){
+		map[name] = boost::lexical_cast<u_int16_t>(val);
+	} else {
+		LOG(ImageIoLog,util::error) << "Dont know how to parse data of type " << util::MSubject(vr);
+		return false;
+	}
+	return true;
+}
+bool ImageFormat_Dicom::parseCSAValueList(const util::slist &val,const std::string &name,const char *const vr, isis::util::PropMap& map)
+{
+	if(strcasecmp(vr,"IS")==0 or strcasecmp(vr,"US")==0){
+		map[name] = util::list2list<int32_t>(val.begin(),val.end());
+	} else if(strcasecmp(vr,"UL")==0){
+		map[name] = val; // @todo we dont have an unsigned int list
+	} else if(strcasecmp(vr,"LO")==0 or strcasecmp(vr,"SH")==0){
+		map[name] = val;
+	} else if(strcasecmp(vr,"DS")==0 or strcasecmp(vr,"FD")==0){
+		map[name] = util::list2list<double>(val.begin(),val.end());
+	} else {
+		LOG(ImageIoLog,util::error) << "Dont know how to parse " << util::MSubject(vr);
+		return false;
+	}
+	return true;
+}
 
 void ImageFormat_Dicom::dcmObject2PropMap(DcmObject* master_obj, util::PropMap &map)
 {
 	for (DcmObject* obj = master_obj->nextInContainer(NULL);obj;obj = master_obj->nextInContainer(obj)) {
-		const DcmTag &tag=const_cast<DcmTag&>(obj->getTag());
+		const DcmTag &tag=obj->getTag();
 		std::string name;
 		const DcmDataDictionary& globalDataDict = dcmDataDict.rdlock();
 		const DcmDictEntry *dictRef = globalDataDict.findEntry(tag, tag.getPrivateCreator());
@@ -378,9 +463,9 @@ void ImageFormat_Dicom::dcmObject2PropMap(DcmObject* master_obj, util::PropMap &
 		if (name == "PixelData")
 			continue;//skip the image data
 		else if (name == "CSAImageHeaderInfo") {
-			map["CSAImageHeaderInfo"] = util::PropMap();
-			util::Type<util::PropMap> &csa = map["CSAImageHeaderInfo"]->cast_to_Type<util::PropMap>();
-			//@todo special handling needed
+			util::PropMap &csaMap = map.setProperty("CSAImageHeaderInfo",util::PropMap());
+			DcmElement* elem = dynamic_cast<DcmElement*>(obj);
+			parseCSA(elem,csaMap);
 		} else if (name == "CSASeriesHeaderInfo") {
 			//@todo special handling needed
 		} else if (name == "MedComHistoryInformation") {
