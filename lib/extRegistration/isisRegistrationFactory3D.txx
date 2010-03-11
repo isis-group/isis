@@ -779,7 +779,7 @@ namespace isis {
 			}
 			if (optimizer.LBFGSBOPTIMIZER) {
 				std::cout << "Iterations: " << m_LBFGSBOptimizer->GetCurrentIteration() << std::endl;
-				std::cout << "Metric value: " << m_LBFGSBOptimizer->GetValue() << std::endl;
+				std::cout << "Metric value: " << m_RegistrationObject->GetMetric()->GetValue(m_RegistrationObject->GetLastTransformParameters()) << std::endl;
 
 			}
 			if (optimizer.AMOEBA) {
