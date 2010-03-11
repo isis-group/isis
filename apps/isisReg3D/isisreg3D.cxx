@@ -9,7 +9,6 @@
 #include "itkImageMaskSpatialObject.h"
 
 #include "extRegistration/isisRegistrationFactory3D.h"
-#include "extITK/isisTransformMerger3D.hpp"
 #include "extITK/isisIterationObserver.h"
 
 #include "itkImageFileReader.h"
@@ -265,7 +264,6 @@ int main(
 	}
 	
 	RegistrationFactoryType::Pointer registrationFactory = RegistrationFactoryType::New();
-	isis::extitk::TransformMerger3D* transformMerger = new isis::extitk::TransformMerger3D;
 
 	//analyse transform vector
 	unsigned int repetition = transformType.number;
@@ -477,10 +475,9 @@ int main(
 		if(!use_inverse) {
 		  tmpConstTransformPointer = registrationFactory->GetTransform();
 		}
-		transformMerger->push_back(tmpTransform);
+		//transformMerger->push_back(tmpTransform);
 
 	}//end repetition
-	transformMerger->setTemplateImage(fixedReader->GetOutput());
 
 	//safe the gained transform to a user specific filename
 	if (out_filename) {
@@ -493,15 +490,7 @@ int main(
 
 	if (vout_filename) {
 		std::cout << "creating vector deformation field..." << std::endl;
-		if (repetition > 1)
-		{
-			transformMerger->merge();
-			vectorWriter->SetInput(transformMerger->getTransform());
-		}
-		else
-		{
-			vectorWriter->SetInput(registrationFactory->GetTransformVectorField());
-		}
+		vectorWriter->SetInput(registrationFactory->GetTransformVectorField());
 		vectorWriter->SetFileName(vout_filename);
 		vectorWriter->Update();
 

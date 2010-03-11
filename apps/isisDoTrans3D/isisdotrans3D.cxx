@@ -312,12 +312,14 @@ int main(
 			warper->AddObserver(itk::ProgressEvent(), progressObserver);
 			warper->SetOutputDirection(outputDirection);
 			warper->SetOutputOrigin(outputOrigin);
-			//warper->SetOutputSize(outputSize);
+			warper->SetOutputSize(outputSize);
 			warper->SetOutputSpacing(outputSpacing);
 			warper->SetInput(reader->GetOutput());
 			if(trans_filename.number == 0) {
 				warper->SetDeformationField(deformationFieldReader->GetOutput());
 			}
+			
+			warper->Update();
 			writer->SetInput(warper->GetOutput());
 			writer->Update();
 		}
