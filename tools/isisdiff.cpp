@@ -6,9 +6,9 @@ using namespace isis::util;
 
 int main(int argc, char *argv[])
 {
-	ENABLE_LOG(DataDebug,DefaultMsgPrint,error);
-	ENABLE_LOG(DataLog,DefaultMsgPrint,error);
-	ENABLE_LOG(isis::image_io::ImageIoDebug,DefaultMsgPrint,verbose_info);
+/*	ENABLE_LOG(DataDebug,DefaultMsgPrint,verbose_info);
+	ENABLE_LOG(DataLog,DefaultMsgPrint,verbose_info);*/
+// 	ENABLE_LOG(isis::image_io::ImageIoDebug,DefaultMsgPrint,verbose_info);
 
 	int ret=0;
 	if(argc<3){
@@ -30,6 +30,7 @@ int main(int argc, char *argv[])
 		PropMap::diff_map diff=first.diff(second);
 		if(argc>3){
 			slist ignore=string2list<std::string>(std::string(argv[3]),',');
+			ignore.push_back("source");
 			BOOST_FOREACH(slist::const_reference ref,ignore){
 				diff.erase(ref);
 			}
@@ -49,9 +50,14 @@ int main(int argc, char *argv[])
 			<< argv[2] << ":" << count  << " differ:" 
 			<< first.sizeToString()	<< "/" << second.sizeToString() << std::endl;
 			ret++;
-		}else if(not first.memcmp(second)){
-			std::cout << "Image data differ" << std::endl;
-			ret++;
+		} else {
+			size_t voxels=first.cmp(second);
+			if(voxels != 0){
+				std::cout << voxels
+				<< " of " << first.sizeToVector().product() << " voxels in " << argv[1] << ":" << count << " and "
+				<< argv[2] << ":" << count  << " differ" << std::endl;
+				ret++;
+			}
 		}
 	}
 	return ret;

@@ -94,11 +94,11 @@ void Chunk::copyRange(const size_t source_start[], const size_t source_end[], Ch
 	get()->copyRange(sstart,send,*dst,dstart);
 }
 
-bool Chunk::memcmpRange(size_t start, size_t end, const isis::data::Chunk& dst, size_t destination) const
+size_t Chunk::cmpRange(size_t start, size_t end, const isis::data::Chunk& dst, size_t destination) const
 {
-	return get()->memcmp(start,end,*dst,destination);
+	return get()->cmp(start,end,*dst,destination);
 }
-bool Chunk::memcmpRange(const size_t source_start[], const size_t source_end[],const Chunk& dst,const size_t destination[]) const
+size_t Chunk::cmpRange(const size_t source_start[], const size_t source_end[],const Chunk& dst,const size_t destination[]) const
 {
 	LOG_IF(not rangeCheck(source_start),DataDebug,isis::util::error)
 		<< "memcmp start " << util::FixedVector<size_t,4>(source_start)
@@ -115,21 +115,21 @@ bool Chunk::memcmpRange(const size_t source_start[], const size_t source_end[],c
 	const size_t sstart=dim2Index(source_start);
 	const size_t send=dim2Index(source_end);
 	const size_t dstart=dst.dim2Index(destination);
-	return memcmpRange(sstart,send,dst,dstart);
+	return cmpRange(sstart,send,dst,dstart);
 }
-bool Chunk::memcmpLine(size_t secondDimS, size_t thirdDimS, size_t fourthDimS,const Chunk& dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD) const
+size_t Chunk::cmpLine(size_t secondDimS, size_t thirdDimS, size_t fourthDimS,const Chunk& dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD) const
 {
 	const size_t idx1[]={0,secondDimS,thirdDimS,fourthDimS};
 	const size_t idx2[]={0,secondDimD,thirdDimD,fourthDimD};
 	const size_t idx3[]={sizeToVector()[0]-1,secondDimD,thirdDimD,fourthDimD};
-	return memcmpRange(idx1,idx2,dst,idx3);
+	return cmpRange(idx1,idx2,dst,idx3);
 }
-bool Chunk::memcmpSlice(size_t thirdDimS, size_t fourthDimS,const Chunk& dst, size_t thirdDimD, size_t fourthDimD) const
+size_t Chunk::cmpSlice(size_t thirdDimS, size_t fourthDimS,const Chunk& dst, size_t thirdDimD, size_t fourthDimD) const
 {
 	const size_t idx1[]={0,0,thirdDimS,fourthDimS};
 	const size_t idx2[]={0,0,thirdDimD,fourthDimD};
 	const size_t idx3[]={sizeToVector()[0]-1,sizeToVector()[1]-1,thirdDimD,fourthDimD};
-	return memcmpRange(idx1,idx2,dst,idx3);
+	return cmpRange(idx1,idx2,dst,idx3);
 }
 
 

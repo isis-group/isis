@@ -22,6 +22,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/mpl/assert.hpp>
 #include <set>
+#include <cmath>
 
 namespace isis { namespace util {
 

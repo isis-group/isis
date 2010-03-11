@@ -146,7 +146,7 @@ void ImageFormat_Dicom::sanitise(isis::util::PropMap& object, string dialect) {
 		  object.setProperty("voxelGap",voxelGap);
 	}
 	
-	transformOrTell<std::string>   (prefix+"PerformingPhysiciansName","performingPhysician",object,util::warning);
+	transformOrTell<std::string>   (prefix+"PerformingPhysiciansName","performingPhysician",object,util::info);
 	transformOrTell<u_int16_t>     (prefix+"NumberOfAverages",        "numberOfAverages",   object,util::warning);
 
 	if(hasOrTell(prefix+"ImageOrientationPatient",object,util::error)){

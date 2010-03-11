@@ -415,11 +415,16 @@ bool ImageFormat_Dicom::parseCSAValue(const std::string &val, const std::string 
 		map[name] = boost::lexical_cast<int>(val);
 	} else if(strcasecmp(vr,"UL")==0){
 		map[name] = boost::lexical_cast<u_int32_t>(val);
-	} else if(strcasecmp(vr,"LO")==0 or strcasecmp(vr,"SH")==0 or strcasecmp(vr,"UN")==0 or strcasecmp(vr,"ST")==0){
+	} else if(
+		strcasecmp(vr,"CS")==0 or
+		strcasecmp(vr,"LO")==0 or strcasecmp(vr,"SH")==0 or
+		strcasecmp(vr,"UN")==0 or strcasecmp(vr,"ST")==0){
 		map[name] = val;
 	} else if(strcasecmp(vr,"DS")==0 or strcasecmp(vr,"FD")==0){
 		map[name] = boost::lexical_cast<double>(val);
 	} else if(strcasecmp(vr,"US")==0){
+		map[name] = boost::lexical_cast<u_int16_t>(val);
+	} else if(strcasecmp(vr,"SS")==0){
 		map[name] = boost::lexical_cast<u_int16_t>(val);
 	} else {
 		LOG(ImageIoLog,util::error) << "Dont know how to parse data of type " << util::MSubject(vr);
@@ -429,7 +434,7 @@ bool ImageFormat_Dicom::parseCSAValue(const std::string &val, const std::string 
 }
 bool ImageFormat_Dicom::parseCSAValueList(const util::slist &val,const std::string &name,const char *const vr, isis::util::PropMap& map)
 {
-	if(strcasecmp(vr,"IS")==0 or strcasecmp(vr,"US")==0){
+	if(strcasecmp(vr,"IS")==0 or strcasecmp(vr,"US")==0 or strcasecmp(vr,"SS")==0){
 		map[name] = util::list2list<int32_t>(val.begin(),val.end());
 	} else if(strcasecmp(vr,"UL")==0){
 		map[name] = val; // @todo we dont have an unsigned int list

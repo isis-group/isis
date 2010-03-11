@@ -477,14 +477,15 @@ ImageList::ImageList(ChunkList src)
 	}
 }
 
-bool Image::memcmp(const isis::data::Image& comp) const
+size_t Image::cmp(const isis::data::Image& comp) const
 {
+	size_t ret=0;
 	LOG_IF(not (clean and comp.clean),DataDebug,util::error)
 		<< "Comparing unindexed images will cause you trouble, run reIndex()!";
 	if(sizeToVector() != comp.sizeToVector()){
-		LOG(DataLog,util::info) << "Size of images differs (" << sizeToVector() << "/"
-		<< comp.sizeToVector() << "). Returning false";
-		return false;
+		LOG(DataLog,util::warning) << "Size of images differs (" << sizeToVector() << "/"
+		<< comp.sizeToVector() << "). Adding difference to the result.";
+		ret+= (sizeToVector() - comp.sizeToVector()).product();
 	}
 	util::ivector4 compVect(util::minVector(chunksBegin()->sizeToVector(),comp.chunksBegin()->sizeToVector()));
 	util::ivector4 start;
@@ -495,12 +496,15 @@ bool Image::memcmp(const isis::data::Image& comp) const
 		const std::pair<size_t,size_t> c1pair2(nexti/chunkVolume,nexti%chunkVolume);
 		const std::pair<size_t,size_t> c2pair1(i/comp.chunkVolume,i%comp.chunkVolume);
 		assert(c1pair1.first == c1pair2.first);
+		LOG(DataDebug,util::verbose_info) << "Comparing chunks at " << c1pair1.first << " and "	<< c2pair1.first;
 		const Chunk &c1=getChunkAt(c1pair1.first);
 		const Chunk &c2=comp.getChunkAt(c2pair1.first);
-		if(not c1.memcmpRange(c1pair1.second,c1pair2.second,c2,c2pair1.second))
-			return false;
+		LOG(DataDebug,util::verbose_info)
+		<< "Start positions are " << c1pair1.second << " and " << c2pair1.second
+		<< " and the length is " << c1pair2.second-c1pair1.second;
+		ret+=c1.cmpRange(c1pair1.second,c1pair2.second,c2,c2pair1.second);
 	}
-	return true;
+	return ret;
 }
 
 }}

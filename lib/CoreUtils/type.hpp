@@ -212,6 +212,28 @@ public:
 		const TYPE &src= operator[](start) ;
 		memcpy(&dest,&src,length*sizeof(TYPE));
 	}
+	size_t cmp(size_t start, size_t end, const isis::util::_internal::TypePtrBase& dst, size_t dst_start) const{
+		assert(start<=end);
+		size_t ret=0;
+		size_t length=end-start;
+		if(dst.typeID()!=typeID()){
+			LOG(CoreLog,error)
+				<< "Comparing to a TypePtr of different type(" << dst.typeName() << ", not " << typeName()
+				<< "). Assuming all voxels to be different";
+				return length;
+		}
+		LOG_IF(end>=len(),CoreLog,error)
+		<< "End of the range ("<< end << ") is behind the end of this TypePtr ("<< len() << ")";
+		LOG_IF(length+dst_start>=dst.len(),CoreLog,error)
+		<< "End of the range ("<< length+dst_start << ") is behind the end of the destination ("<< dst.len() << ")";
+
+		const TypePtr<TYPE> &compare = dst.cast_to_TypePtr<TYPE>();
+		for(size_t i=start;i<end;i++){
+			if(operator[](i)!=compare[i])
+				ret++;
+		}
+		return ret;
+	}
 	
 	/// @copydoc Type::is()
 	virtual bool is(const std::type_info & t)const{

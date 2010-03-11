@@ -271,8 +271,8 @@ public:
 			if(min>me[i])min=me[i];
 		}
 	}
-	bool memcmp(size_t start,size_t end,const TypePtrBase &dst,size_t dst_start)const;
-	bool memcmp(const TypePtrBase& comp)const;
+	virtual size_t cmp(size_t start,size_t end,const TypePtrBase &dst,size_t dst_start)const=0;
+	size_t cmp(const TypePtrBase& comp)const;
 };
 
 }
