@@ -51,7 +51,7 @@ static VString vout_filename = NULL;
 static VString pointset_filename = NULL;
 static VString transform_filename_in = NULL;
 static VShort number_of_bins = 50;
-static VShort number_of_iterations = 1000;
+static VArgVector number_of_iterations;
 static VFloat pixel_density = 0.01;
 static VShort grid_size = 5;
 static VShort metricType = 0;
@@ -85,7 +85,7 @@ static VOptionDescRec
             //parameter inputs
             {"bins", VShortRepn, 1, &number_of_bins, VOptionalOpt, 0,
                 "Number of bins used by the MattesMutualInformationMetric to calculate the image histogram"},
-            {"iter", VShortRepn, 1, &number_of_iterations, VOptionalOpt, 0,
+            {"iter", VShortRepn, 0, (VPointer) &number_of_iterations, VOptionalOpt, 0,
                 "Maximum number of iteration used by the optimizer"},
             {"seed", VShortRepn, 1, &initial_seed, VOptionalOpt, 0,
                 "The initialize seed for the MattesMutualInformationMetric"},
@@ -149,6 +149,7 @@ int main(
 	VShort transform;
 	VShort optimizer;
 	VShort interpolator;
+	VShort niteration;
 
 	typedef itk::Image<InputPixelType, Dimension> FixedImageType;
 	typedef itk::Image<InputPixelType, Dimension> MovingImageType;
@@ -273,7 +274,14 @@ int main(
 
 	boost::progress_timer time_used;
 	for (unsigned int counter = 0; counter < repetition; counter++) {
-
+		
+		if (number_of_iterations.number == repetition) {
+		      niteration = ((VShort*) number_of_iterations.vector)[counter];
+		} else if (number_of_iterations.number and number_of_iterations.number < repetition) {
+		      niteration = ((VShort*) number_of_iterations.vector)[0];
+		} else {
+		      niteration = 1000;
+		}
 		if (transformType.number) {
 			transform = ((VShort*) transformType.vector)[counter];
 		} else {
@@ -451,7 +459,7 @@ int main(
 		}
 		registrationFactory->UserOptions.CoarseFactor = coarse_factor;
 		registrationFactory->UserOptions.BSplineBound = bspline_bound;
-		registrationFactory->UserOptions.NumberOfIterations = number_of_iterations;
+		registrationFactory->UserOptions.NumberOfIterations = niteration;
 		registrationFactory->UserOptions.NumberOfBins = number_of_bins;
 		registrationFactory->UserOptions.PixelDensity = pixel_density;
 		registrationFactory->UserOptions.BSplineGridSize = grid_size;
