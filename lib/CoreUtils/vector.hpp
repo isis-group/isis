@@ -142,6 +142,20 @@ public:
 	bool operator!=(const this_class &src)const{
 		return !operator==(src);
 	}
+	/**
+	* Fuzzy comparison.
+	* Will raise a compiler error when not used with floating point vectors.
+	* \returns true if the difference between the two types is significantly small compared to the values.
+	*/
+	bool fuzzyEqual(const this_class &other)const{
+		const_iterator b =other.begin();
+		for(const_iterator a=CONTAINER::begin();a!=CONTAINER::end();++a,++b){
+			if(not util::fuzzyEqual(*a,*b))
+				return false;
+		}
+		return true;
+	}
+
 
 
 	////////////////////////////////////////////////////////////////////////////////////
@@ -235,6 +249,7 @@ public:
 	}
 
 };
+
 template<typename TYPE> 
 class vector4 :public FixedVector<TYPE,4>{
 public:

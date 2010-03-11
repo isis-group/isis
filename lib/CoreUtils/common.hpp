@@ -20,6 +20,7 @@
 #include <sstream>
 #include <boost/regex.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/mpl/assert.hpp>
 #include <set>
 
 namespace isis { namespace util {
@@ -67,7 +68,7 @@ template<typename T,typename InputIterator> std::list<T> list2list(InputIterator
 		ret.push_back(boost::lexical_cast<T>(*start));
 	return ret;
 }
-													  
+
 /**
  * Generic tokenizer.
  * Splits source into tokens and tries to lexically cast them to TARGET.
@@ -173,6 +174,18 @@ continousFind(ForwardIterator &current,const ForwardIterator end,const T& compar
 			return true;//not(current <> compare) makes compare == current
 }
 
+/**
+ * Fuzzy comparison between floating point values.
+ * Will raise a compiler error when not used with floating point types.
+ * \returns true if the difference between the two types is significantly small compared to the values.
+ */
+template<typename T> bool fuzzyEqual(T a,T b){
+	BOOST_MPL_ASSERT((boost::is_float<T>));
+	if(a==b)return true;
+	const T dist=std::fabs(a-b);
+	const T base=std::min(a,b)*std::numeric_limits<T>::epsilon()*5e1;
+	return  dist < base;
+}
 namespace _internal{
 /**
  * Continously searches in an sorted list using std::less.

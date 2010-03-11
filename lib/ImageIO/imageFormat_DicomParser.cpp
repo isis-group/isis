@@ -366,9 +366,6 @@ void ImageFormat_Dicom::parseCSA(DcmElement *elem, isis::util::PropMap& map)
 		Uint8 *array;
 		elem->getUint8Array(array);
 		const size_t len=elem->getLength();
-		std::ofstream dump("/tmp/dump.txt");
-		dump.write((char*)array,len);
-		dump.close();
 		for(std::string::size_type pos=0x10;pos<(len-sizeof(Sint32));){
 			pos+=parseCSAEntry(array+pos,map);
 		}
@@ -418,7 +415,7 @@ bool ImageFormat_Dicom::parseCSAValue(const std::string &val, const std::string 
 		map[name] = boost::lexical_cast<int>(val);
 	} else if(strcasecmp(vr,"UL")==0){
 		map[name] = boost::lexical_cast<u_int32_t>(val);
-	} else if(strcasecmp(vr,"LO")==0 or strcasecmp(vr,"SH")==0){
+	} else if(strcasecmp(vr,"LO")==0 or strcasecmp(vr,"SH")==0 or strcasecmp(vr,"UN")==0 or strcasecmp(vr,"ST")==0){
 		map[name] = val;
 	} else if(strcasecmp(vr,"DS")==0 or strcasecmp(vr,"FD")==0){
 		map[name] = boost::lexical_cast<double>(val);
@@ -436,7 +433,7 @@ bool ImageFormat_Dicom::parseCSAValueList(const util::slist &val,const std::stri
 		map[name] = util::list2list<int32_t>(val.begin(),val.end());
 	} else if(strcasecmp(vr,"UL")==0){
 		map[name] = val; // @todo we dont have an unsigned int list
-	} else if(strcasecmp(vr,"LO")==0 or strcasecmp(vr,"SH")==0){
+	} else if(strcasecmp(vr,"LO")==0 or strcasecmp(vr,"SH")==0 or strcasecmp(vr,"UN")==0 or strcasecmp(vr,"ST")==0){
 		map[name] = val;
 	} else if(strcasecmp(vr,"DS")==0 or strcasecmp(vr,"FD")==0){
 		map[name] = util::list2list<double>(val.begin(),val.end());
@@ -467,7 +464,9 @@ void ImageFormat_Dicom::dcmObject2PropMap(DcmObject* master_obj, util::PropMap &
 			DcmElement* elem = dynamic_cast<DcmElement*>(obj);
 			parseCSA(elem,csaMap);
 		} else if (name == "CSASeriesHeaderInfo") {
-			//@todo special handling needed
+			util::PropMap &csaMap = map.setProperty("CSASeriesHeaderInfo",util::PropMap());
+			DcmElement* elem = dynamic_cast<DcmElement*>(obj);
+			parseCSA(elem,csaMap);
 		} else if (name == "MedComHistoryInformation") {
 			//@todo special handling needed
 		} else if (obj->isLeaf()) {

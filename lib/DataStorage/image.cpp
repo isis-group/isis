@@ -84,10 +84,21 @@ bool Image::insertChunk ( const Chunk &chunk )
 		return false;
 	}
 	if(not set.empty()){
+		const Chunk &first=*set.begin();
 		//if our first chunk and the incoming chunk do have different size, skip it
-		if(set.begin()->sizeToVector() != chunk.sizeToVector()){
+		if(first.sizeToVector() != chunk.sizeToVector()){
 			LOG(DataDebug,util::info)
 				<< "Ignoring chunk with different size. (" << chunk.sizeToString() << "!=" << set.begin()->sizeToString() << ")";
+			return false;
+		}
+		if(not (first.getPropertyValue("readVec") == chunk.getPropertyValue("readVec"))){
+			LOG(DataDebug,util::info)
+				<< "Ignoring chunk with different readVec. (" << chunk.getPropertyValue("readVec") << "!=" << first.getPropertyValue("readVec") << ")";
+			return false;
+		}
+		if(not (first.getPropertyValue("phaseVec") == chunk.getPropertyValue("phaseVec"))){
+			LOG(DataDebug,util::info)
+				<< "Ignoring chunk with different phaseVec. (" << chunk.getPropertyValue("phaseVec") << "!=" << first.getPropertyValue("phaseVec") << ")";
 			return false;
 		}
 
@@ -208,7 +219,7 @@ bool Image::reIndex() {
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 		
 	//if we have at least two slides (and have slides (with different positions) at all)
-	if(	chunk_dims==2 and size[2]>1 and lookup[0]->hasProperty("indexOrigin"))
+	if(chunk_dims==2 and size[2]>1 and lookup[0]->hasProperty("indexOrigin"))
 	{
 		const util::fvector4 thisV=lookup[0]->getProperty<util::fvector4>("indexOrigin");
 		if(lookup[size[2]-1]->hasProperty("indexOrigin")){
@@ -242,9 +253,15 @@ bool Image::reIndex() {
 				}
 				util::fvector4 &voxelGap=operator[]("voxelGap")->cast_to_Type<util::fvector4>(); //if there is no voxelGap yet, we create it
 				if(voxelGap[2]!=inf){
-					LOG_IF(voxelGap[2]!=sliceDist,DataLog,util::warning)
-						<< "The existing slice distance (voxelGap[2]) " << voxelGap[2]
-						<< " differs from the distance between chunk 0 and 1 " << sliceDist;
+					if(not util::fuzzyEqual(voxelGap[2],sliceDist)){
+						const float dist=std::fabs(voxelGap[2]-sliceDist);
+						const float base=std::min(voxelGap[2],sliceDist)*std::numeric_limits<float>::epsilon();
+						LOG_IF(not util::fuzzyEqual(voxelGap[2],sliceDist),DataLog,util::warning)
+							<< "The existing slice distance (voxelGap[2]) " << voxelGap[2]
+							<< " differs from the distance between chunk 0 and 1, which is " << sliceDist 
+							<< "\nchunk 1 is from " << lookup[0]->getPropertyValue("source") 
+							<< " and chunk 2 is from " << lookup[1]->getPropertyValue("source");
+					}
 				} else {
 					voxelGap[2]=sliceDist;
 					LOG(DataDebug,util::info)
@@ -271,7 +288,7 @@ bool Image::reIndex() {
 		); 
 		if(hasProperty("sliceVec")){
 			const util::fvector4 sliceVec=getProperty<util::fvector4>("sliceVec");
-			LOG_IF(crossVec!=sliceVec,DataLog,util::warning)
+			LOG_IF(not crossVec.fuzzyEqual(sliceVec),DataLog,util::warning)
 				<< "The existing sliceVec " << sliceVec
 				<< " differs from the cross product of the read- and phase vector " << crossVec;
 		} else {

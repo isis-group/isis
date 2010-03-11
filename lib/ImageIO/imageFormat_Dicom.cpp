@@ -118,7 +118,7 @@ void ImageFormat_Dicom::sanitise(isis::util::PropMap& object, string dialect) {
 	// @todo sex is missing
 	transformOrTell<u_int16_t>  (prefix+"PatientsWeight",   "subjectWeigth",      object,util::warning);
 	
-	// compute voxelSize
+	// compute voxelSize and gap
 	{
 		util::fvector4 voxelSize(invalid_float,invalid_float,invalid_float,invalid_float);
 		if(hasOrTell(prefix+"PixelSpacing",object,util::error)){
@@ -130,9 +130,7 @@ void ImageFormat_Dicom::sanitise(isis::util::PropMap& object, string dialect) {
 			object.remove(prefix+"SliceThickness");
 		}
 		object.setProperty("voxelSize",voxelSize);
-	}
-	// Compute voxel gap
-	{
+
 		util::fvector4 voxelGap(invalid_float,invalid_float,invalid_float,invalid_float);
 		if(hasOrTell(prefix+"RepetitionTime",object,util::warning)){
 			voxelGap[3]=object[prefix+"RepetitionTime"]->as<float>()/1000;
@@ -140,6 +138,8 @@ void ImageFormat_Dicom::sanitise(isis::util::PropMap& object, string dialect) {
 		}
 		if(hasOrTell(prefix+"SpacingBetweenSlices",object,util::info)){
 			voxelGap[2]=object[prefix+"SpacingBetweenSlices"]->as<float>();
+			if(voxelSize[2]!=invalid_float)
+				voxelGap[2]-=voxelSize[2]; //SpacingBetweenSlices is the distance between the centers of the slices - so substract the slice SliceThickness here
 			object.remove(prefix+"SpacingBetweenSlices");
 		}
 		if(voxelGap!=util::fvector4(invalid_float,invalid_float,invalid_float,invalid_float))
@@ -197,11 +197,19 @@ void ImageFormat_Dicom::readMosaic(const data::Chunk& source, data::ChunkList& d
 	util::slist iType=source.getProperty<util::slist>(prefix+"ImageType");
 	std::replace(iType.begin(),iType.end(),std::string("MOSAIC"),std::string("WAS_MOSAIC"));
 	
-	if(not hasOrTell(prefix+"Unknown Tag(0019,100a)",source,util::error))
-	  return;	// whoa, we dont have the number of images in the Mosaic - get out of here
+	
+	std::string NumberOfImagesInMosaicProp;
+	if(source.hasProperty(prefix+"Unknown Tag(0019,100a)")){
+		NumberOfImagesInMosaicProp=prefix+"Unknown Tag(0019,100a)";
+	} else if(source.hasProperty(prefix+"CSAImageHeaderInfo/NumberOfImagesInMosaic")){
+		NumberOfImagesInMosaicProp=prefix+"CSAImageHeaderInfo/NumberOfImagesInMosaic";
+	} else {
+		LOG(ImageIoLog,util::error)	<< "Could not determine the number of images in the mosaic";
+		return;
+	}
 	
 	// All is fine, lets start
-	const u_int16_t images=source.getPropertyValue(prefix+"Unknown Tag(0019,100a)")->as<u_int16_t>();
+	u_int16_t images=source.getPropertyValue(NumberOfImagesInMosaicProp)->as<u_int16_t>();
 	util::ivector4 size=source.sizeToVector();
 	const u_int16_t matrixSize = std::ceil(std::sqrt(images));
 	size[0]/=matrixSize;size[1]/=matrixSize;size[2]*=images;
@@ -224,7 +232,7 @@ void ImageFormat_Dicom::readMosaic(const data::Chunk& source, data::ChunkList& d
 	
 	// fix the properties
 	static_cast<util::PropMap&>(*newChunk)=static_cast<const util::PropMap&>(source); //copy _only_ the Properties of source
-	newChunk->remove(prefix+"Unknown Tag(0019,100a)"); // we dont need that anymore
+	newChunk->remove(NumberOfImagesInMosaicProp); // we dont need that anymore
 	newChunk->setProperty(prefix+"ImageType",iType);
 	
 	//remove the additional mosaic offset
@@ -254,6 +262,7 @@ int ImageFormat_Dicom::load(data::ChunkList &chunks, const std::string& filename
 	if(dcfile->loadFile(filename.c_str()).good() and (chunk =_internal::DicomChunk::makeSingleMonochrome(filename,dcfile))){
 		//we got a chunk from the file
 		sanitise(*chunk,"");
+		chunk->setProperty("source",filename);
 		const util::slist iType=chunk->getProperty<util::slist>(std::string(ImageFormat_Dicom::dicomTagTreeName)+"/"+"ImageType");
 		if(std::find(iType.begin(),iType.end(),"MOSAIC")!=iType.end()){ // if its a mosaic
 			LOG(ImageIoLog,util::verbose_info) << "This seems to be an mosaic image, will decompose it";
