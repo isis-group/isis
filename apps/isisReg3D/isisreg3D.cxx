@@ -68,6 +68,7 @@ static VString mask_filename = NULL;
 static VFloat smooth = 0;
 static VBoolean use_inverse = false;
 static VFloat coarse_factor = 1;
+static VFloat bspline_bound = 100.0;
 
 static VOptionDescRec
         options[] = {
@@ -101,6 +102,7 @@ static VOptionDescRec
 
             {"j", VShortRepn, 1, &number_threads, VOptionalOpt, 0, "Number of threads used for the registration"},
 	    {"cf", VFloatRepn, 1, &coarse_factor, VOptionalOpt, 0, "Coarse factor. Multiple of the max and min step length of the optimizer. Standard is 1"},
+	    {"bound", VFloatRepn, 1, &bspline_bound, VOptionalOpt, 0, "max/min value of the bepline deformation."},
             {"gridSize", VShortRepn, 1, &grid_size, VOptionalOpt, 0,
                 "Grid size used for the BSplineDeformable transform."},
 
@@ -450,6 +452,7 @@ int main(
 
 		}
 		registrationFactory->UserOptions.CoarseFactor = coarse_factor;
+		registrationFactory->UserOptions.BSplineBound = bspline_bound;
 		registrationFactory->UserOptions.NumberOfIterations = number_of_iterations;
 		registrationFactory->UserOptions.NumberOfBins = number_of_bins;
 		registrationFactory->UserOptions.PixelDensity = pixel_density;

@@ -224,6 +224,7 @@ public:
 		unsigned int NumberOfIterations;
 		unsigned int NumberOfBins;
 		unsigned int BSplineGridSize;
+		float BSplineBound;
 		unsigned int NumberOfThreads;
 		unsigned int MattesMutualInitializeSeed;
 		float CoarseFactor;

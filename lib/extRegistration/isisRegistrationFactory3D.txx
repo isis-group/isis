@@ -55,6 +55,7 @@ namespace isis {
 			UserOptions.PixelDensity = 0.01;
 			UserOptions.USEOTSUTHRESHOLDING = false;
 			UserOptions.BSplineGridSize = 5;
+			UserOptions.BSplineBound = 100;
 			UserOptions.INITIALIZECENTEROFF = false;
 			UserOptions.INITIALIZEMASSOFF = false;
 			UserOptions.NumberOfThreads = 1;
@@ -304,9 +305,9 @@ namespace isis {
 				LBFGSBOptimizerType::BoundValueType lowerBound(m_NumberOfParameters);
 				LBFGSBOptimizerType::BoundValueType upperBound(m_NumberOfParameters);
 				
-				boundSelect.Fill(0);
-				lowerBound.Fill(0.0);
-				upperBound.Fill(0.0);
+				boundSelect.Fill(2);
+				lowerBound.Fill(-UserOptions.BSplineBound);
+				upperBound.Fill(UserOptions.BSplineBound);
 
 				m_LBFGSBOptimizer->SetBoundSelection(boundSelect);
 				m_LBFGSBOptimizer->SetLowerBound(lowerBound);
@@ -425,7 +426,7 @@ namespace isis {
 				bsplineRegion.SetSize(totalGridSize);
 				BSplineSpacingType bsplineSpacing = m_FixedImage->GetSpacing();
 
-				BSplineOriginType bsplineOrigin = m_FixedImage->GetOrigin();
+				
 
 				typename FixedImageType::SizeType fixedImageSize = m_FixedImage->GetBufferedRegion().GetSize();
 
@@ -434,8 +435,9 @@ namespace isis {
 							- 1);
 				}				
 				BSplineDirectionType bsplineDirection = m_FixedImage->GetDirection();
+				
 				BSplineSpacingType gridOriginOffset = bsplineDirection * bsplineSpacing;
-								
+				BSplineOriginType bsplineOrigin = m_FixedImage->GetOrigin();
 				bsplineOrigin = bsplineOrigin - gridOriginOffset;
 				
 				m_BSplineTransform->SetGridSpacing(bsplineSpacing);
