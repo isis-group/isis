@@ -13,9 +13,7 @@ if(IOPLUGIN_NIFTI)
 	add_library(isisImageFormat_Nifti SHARED imageFormat_Nifti.cpp)
 	target_link_libraries(isisImageFormat_Nifti ${LIB_NIFTIIO} ${LIB_ZNZ} ${LINK_PLUGINS_AGAINST})
 
-	set_target_properties(isisImageFormat_Nifti PROPERTIES
-		LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
-		LINK_FLAGS "--no-undefined")
+	set_target_properties(isisImageFormat_Nifti PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PLUGIN_PATH})
 endif(IOPLUGIN_NIFTI)
 
 
@@ -23,9 +21,7 @@ if(IOPLUGIN_NULL)
 	add_library(isisImageFormat_Null SHARED imageFormat_Null.cpp)
 	target_link_libraries(isisImageFormat_Null ${LINK_PLUGINS_AGAINST})
 
-	set_target_properties(isisImageFormat_Null PROPERTIES
-		LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
-		LINK_FLAGS "--no-undefined")
+	set_target_properties(isisImageFormat_Null PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PLUGIN_PATH})
 endif(IOPLUGIN_NULL)
 
 if(IOPLUGIN_GZ)
@@ -36,9 +32,7 @@ if(IOPLUGIN_GZ)
 	add_library(isisImageFormat_gz_proxy SHARED isisImageFormat_gz_proxy.cpp)
 	target_link_libraries(isisImageFormat_gz_proxy ${LINK_PLUGINS_AGAINST} ${LIB_Z})
 
-	set_target_properties(isisImageFormat_gz_proxy PROPERTIES
-		LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
-		LINK_FLAGS "--no-undefined")
+	set_target_properties(isisImageFormat_gz_proxy PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PLUGIN_PATH})
 endif(IOPLUGIN_GZ)
 
 
@@ -49,15 +43,13 @@ if(IOPLUGIN_DICOM)
 	find_library(LIB_Z z)
 	
 	find_path(INCPATH_DCMTK "dcmtk/dcmdata/dcfilefo.h")
-	include_directories(${INCPATHDCMTK})
+	include_directories(${INCPATH_DCMTK})
 		
 	add_library(isisImageFormat_Dicom SHARED imageFormat_Dicom.cpp imageFormat_DicomParser.cpp)
 	target_link_libraries(isisImageFormat_Dicom ${LIB_DCMDATA} ${LIB_DCMIMGLE} ${LIB_OFSTD} ${LIB_Z} ${LINK_PLUGINS_AGAINST})
 	
-	set_target_properties(isisImageFormat_Dicom PROPERTIES
-		LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
-		LINK_FLAGS "--no-undefined")
+	set_target_properties(isisImageFormat_Dicom PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PLUGIN_PATH})
 endif(IOPLUGIN_DICOM)
 	
-message(STATUS "Installing plugins to ${CMAKE_BINARY_DIR}")
+message(STATUS "Installing plugins to ${PLUGIN_PATH}")
 

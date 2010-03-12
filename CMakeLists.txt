@@ -27,8 +27,6 @@ OPTION(IOPLUGIN_NULL "Enable Null-IO plugin" ON)
 OPTION(IOPLUGIN_DICOM "Enable Dicom-IO plugin" OFF)
 OPTION(IOPLUGIN_GZ "Enable proxy plugin for compressed files" ON)
 
-SET(ISIS_INSTALL_BIN_DIR "${CMAKE_BINARY_DIR}/bin/")
-
 ###############################################################################
 #Global definitions/compiler flags
 ###############################################################################
@@ -90,22 +88,16 @@ IF (SVN_REVISION)
   add_definitions(-D_SVN_REVISION=${SVN_REVISION})
 endif(SVN_REVISION)
 
+IF(HAVE_ITK)
+	FIND_PACKAGE(ITK REQUIRED)
+ENDIF(HAVE_ITK)
+
 ###############################################################################
 #Subdirs
 ###############################################################################
 
 add_subdirectory(lib)
 add_subdirectory(tools)
-
-IF(HAVE_ITK)
-# look for itk package
-	FIND_PACKAGE(ITK)
-	IF(ITK_FOUND)
-		INCLUDE(${ITK_USE_FILE})
-	ELSE(ITK_FOUND)
-		MESSAGE(FATAL_ERROR	"ITK not found. Please set ITK_DIR.")
-	ENDIF(ITK_FOUND)
-ENDIF(HAVE_ITK)
 
 IF(BUILD_APPLICATIONS)
 	add_subdirectory(apps)

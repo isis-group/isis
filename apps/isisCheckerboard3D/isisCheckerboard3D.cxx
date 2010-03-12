@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
 {
 	
 	// show revision information string constant
-    std::cout << "Revision: " << SVN_REVISION << std::endl;
+    std::cout << "Revision: " << _SVN_REVISION << std::endl;
 
 
     // DANGER! Kids don't try this at home! VParseCommand modifies the values of argc and argv!!!

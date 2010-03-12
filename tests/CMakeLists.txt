@@ -1,5 +1,5 @@
 
-FIND_PACKAGE(Boost COMPONENTS unit_test_framework filesystem regex system)
+FIND_PACKAGE(Boost REQUIRED COMPONENTS unit_test_framework filesystem regex system)
 include_directories(${Boost_INCLUDE_DIR}  lib)
 
 IF(BUILD_COREUTILS)
