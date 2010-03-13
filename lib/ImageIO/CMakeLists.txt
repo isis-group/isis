@@ -1,8 +1,3 @@
-if (NOT BUILD_SHARED_LIBS)
-	SET(LINK_PLUGINS_AGAINST data)
-endif(NOT BUILD_SHARED_LIBS)
-	
-
 if(IOPLUGIN_NIFTI)
 	find_library(LIB_NIFTIIO niftiio)
 	find_library(LIB_ZNZ znz)
@@ -11,7 +6,7 @@ if(IOPLUGIN_NIFTI)
 
 	include_directories(${INCPATH_NIFTI} ${INCPATH_ZNZ})
 	add_library(isisImageFormat_Nifti SHARED imageFormat_Nifti.cpp)
-	target_link_libraries(isisImageFormat_Nifti ${LIB_NIFTIIO} ${LIB_ZNZ} ${LINK_PLUGINS_AGAINST})
+	target_link_libraries(isisImageFormat_Nifti ${LIB_NIFTIIO} ${LIB_ZNZ} ${ISIS_DATA_LIBS})
 
 	set_target_properties(isisImageFormat_Nifti PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PLUGIN_PATH})
 endif(IOPLUGIN_NIFTI)
@@ -19,7 +14,7 @@ endif(IOPLUGIN_NIFTI)
 
 if(IOPLUGIN_NULL)
 	add_library(isisImageFormat_Null SHARED imageFormat_Null.cpp)
-	target_link_libraries(isisImageFormat_Null ${LINK_PLUGINS_AGAINST})
+	target_link_libraries(isisImageFormat_Null ${ISIS_DATA_LIBS})
 
 	set_target_properties(isisImageFormat_Null PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PLUGIN_PATH})
 endif(IOPLUGIN_NULL)
@@ -30,7 +25,7 @@ if(IOPLUGIN_GZ)
 	INCLUDE_DIRECTORIES(${GZIP_INC})
 
 	add_library(isisImageFormat_gz_proxy SHARED isisImageFormat_gz_proxy.cpp)
-	target_link_libraries(isisImageFormat_gz_proxy ${LINK_PLUGINS_AGAINST} ${LIB_Z})
+	target_link_libraries(isisImageFormat_gz_proxy ${LIB_Z} ${ISIS_DATA_LIBS})
 
 	set_target_properties(isisImageFormat_gz_proxy PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PLUGIN_PATH})
 endif(IOPLUGIN_GZ)
@@ -46,7 +41,7 @@ if(IOPLUGIN_DICOM)
 	include_directories(${INCPATH_DCMTK})
 		
 	add_library(isisImageFormat_Dicom SHARED imageFormat_Dicom.cpp imageFormat_DicomParser.cpp)
-	target_link_libraries(isisImageFormat_Dicom ${LIB_DCMDATA} ${LIB_DCMIMGLE} ${LIB_OFSTD} ${LIB_Z} ${LINK_PLUGINS_AGAINST})
+	target_link_libraries(isisImageFormat_Dicom ${LIB_DCMDATA} ${LIB_DCMIMGLE} ${LIB_OFSTD} ${LIB_Z} ${ISIS_DATA_LIBS})
 	
 	set_target_properties(isisImageFormat_Dicom PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PLUGIN_PATH})
 endif(IOPLUGIN_DICOM)

@@ -27,9 +27,9 @@ namespace _internal{
 typedef boost::mpl::vector<
 int8_t,uint8_t,int16_t,uint16_t,int32_t,uint32_t,int64_t,uint64_t
 ,float,double
-,fvector4,dvector4,ivector4,std::string
+,fvector4,dvector4,ivector4
 ,ilist,dlist,slist
-,PropMap
+,PropMap,std::string
 ,boost::posix_time::ptime,boost::gregorian::date
 > types;
 
