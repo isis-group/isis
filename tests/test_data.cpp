@@ -15,6 +15,7 @@ struct SpeakingDeleter{
 		free(p);
 	};
 };
+}}//namespace test isis
 
 int main(){
 	ENABLE_LOG(CoreDebug,DefaultMsgPrint,info);
@@ -24,11 +25,11 @@ int main(){
 	
 	IOFactory::get();//get the IO Factory
 	IOFactory::get().print_formats(std::cout);//do it again - it should not cause reinit
-	IOFactory::get().loadFile("test.null.gz", "");
-	IOFactory::get().loadFile("test.null", "");
-	IOFactory::get().loadFile("test.null", "dia1");
-	IOFactory::get().loadFile("test.null", "dia2");
-	IOFactory::get().loadFile("test.xxx", "");//returns that plugin is missing
+	IOFactory::get().load("test.null", "");
+	IOFactory::get().load("test.null", "");
+	IOFactory::get().load("test.null", "dia1");
+	IOFactory::get().load("test.null", "dia2");
+	IOFactory::get().load("test.xxx", "");//returns that plugin is missing
 	
 // 	iUtil::DefaultMsgPrint::stopBelow(warning); 
 	
@@ -55,7 +56,7 @@ int main(){
 	int i_=f;//this wont throw an exception because it only does an implizit conversions from Type<float>=>float and float=>int
 	std::cout << "Type<float>(5.4) is " << f.toString(true) << " int from that is " << i_ << std::endl;
 
-	TypePtr<int> p((int*)calloc(5,sizeof(int)),5,SpeakingDeleter("Rolf"));
+	TypePtr<int> p((int*)calloc(5,sizeof(int)),5,isis::test::SpeakingDeleter("Rolf"));
 	std::cout << "p.toString():" <<  p.toString() << std::endl;
 
 	const short x[]={1,2,3,4};
@@ -67,7 +68,7 @@ int main(){
 	{
 		MemChunk<short> a(1,1,1,10);
 		list.push_back(a);
-		a.getTypePtr<short>()[5]=5;
+		a.asTypePtr<short>()[5]=5;
 		std::cout << "a.voxel<short>(0,0,0,5):" << a.voxel<short>(0,0,0,5) << std::endl;
 		a.voxel<short>(3,0,0,5)=3;//fail (may crash or not)
 	}
@@ -75,4 +76,3 @@ int main(){
 	std::cout << "cp.voxel(0,0,0,5):" << cp.voxel<short>(0,0,0,5) << std::endl;
 	std::cout << "list.begin()->getTypePtr<short>().toString():" << list.begin()->getTypePtr<short>().toString() << std::endl;
 }
-}}
