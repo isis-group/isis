@@ -395,12 +395,16 @@ size_t ImageFormat_Dicom::parseCSAEntry(Uint8 *at, isis::util::PropMap& map){
 				)*
 				sizeof(Sint32);//increment pos by len aligned to sizeof(Sint32)*/
 		}
-		if(ret.size()==1){
-			if(parseCSAValue(ret.front(),name,vr,map))
-				LOG(ImageIoDebug,util::info) << "Found entry " << name << ":" << map[name] << " in CSA header";
-		} else if(ret.size()>1){
-			if(parseCSAValueList(ret,name,vr,map))
-				LOG(ImageIoDebug,util::info) << "Found entry " << name << ":" << map[name] << " in CSA header";
+		try{
+			if(ret.size()==1){
+				if(parseCSAValue(ret.front(),name,vr,map))
+					LOG(ImageIoDebug,util::info) << "Found entry " << name << ":" << map[name] << " in CSA header";
+			} else if(ret.size()>1){
+				if(parseCSAValueList(ret,name,vr,map))
+					LOG(ImageIoDebug,util::info) << "Found entry " << name << ":" << map[name] << " in CSA header";
+			}
+		} catch (boost::bad_lexical_cast e){
+			LOG(ImageIoLog,util::error) << "Failed to parse CSA entry " << std::make_pair(name,ret) << " as " << vr << " (" << e.what() << ")";
 		}
 	} else {
 		LOG(ImageIoDebug,util::info) << "Skipping empty CSA entry " << name;
@@ -427,7 +431,7 @@ bool ImageFormat_Dicom::parseCSAValue(const std::string &val, const std::string 
 	} else if(strcasecmp(vr,"SS")==0){
 		map[name] = boost::lexical_cast<u_int16_t>(val);
 	} else {
-		LOG(ImageIoLog,util::error) << "Dont know how to parse data of type " << util::MSubject(vr);
+		LOG(ImageIoLog,util::error) << "Dont know how to parse CSA entry " << std::make_pair(name,val) << " type is " << util::MSubject(vr);
 		return false;
 	}
 	return true;
@@ -438,12 +442,12 @@ bool ImageFormat_Dicom::parseCSAValueList(const util::slist &val,const std::stri
 		map[name] = util::list2list<int32_t>(val.begin(),val.end());
 	} else if(strcasecmp(vr,"UL")==0){
 		map[name] = val; // @todo we dont have an unsigned int list
-	} else if(strcasecmp(vr,"LO")==0 or strcasecmp(vr,"SH")==0 or strcasecmp(vr,"UN")==0 or strcasecmp(vr,"ST")==0){
+	} else if(strcasecmp(vr,"LO")==0 or strcasecmp(vr,"SH")==0 or strcasecmp(vr,"UN")==0 or strcasecmp(vr,"ST")==0 or strcasecmp(vr,"SL")==0){
 		map[name] = val;
 	} else if(strcasecmp(vr,"DS")==0 or strcasecmp(vr,"FD")==0){
 		map[name] = util::list2list<double>(val.begin(),val.end());
 	} else {
-		LOG(ImageIoLog,util::error) << "Dont know how to parse " << util::MSubject(vr);
+		LOG(ImageIoLog,util::error) << "Dont know how to parse CSA entry " << std::make_pair(name,val) << " type is " << util::MSubject(vr);
 		return false;
 	}
 	return true;

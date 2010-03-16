@@ -9,7 +9,7 @@ namespace isis{ namespace util{
 /**
  * Static class to handle singletons.
  * This class can be used to create singletons with a specified priority.
- * It keeps track of them and deletes the automatically based of their priority.
+ * It keeps track of them and deletes them automatically based of their priority.
  */
 class Singletons{
 	class SingletonBase:public boost::noncopyable{
@@ -53,7 +53,7 @@ public:
 	 * In any other case it just returns the same object which was created at the first call.
 	 * Singletons created by this function are automatically deleted based on the following rules:
 	 * - singletons are deleted _after_ the programm ends
-	 * - singletons not deleted before any singleton of a lower priority
+	 * - singletons are not deleted before any singleton of a lower priority
 	 * - singletons of the same priority are deleted in the opposite order they where created. (LIFO)
 	 *
 	 * \return allways a reference to the same object of type T.

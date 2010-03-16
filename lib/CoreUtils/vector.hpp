@@ -204,7 +204,10 @@ public:
 		return *this;
 	}
 	
-	/// compute the product of all elements
+	/**
+	 * Compute the product of all elements.
+	 * \returns \f[ \prod_{i=0}^{SIZE-1} this_i \f]
+	 */
 	TYPE product()
 	{
 		TYPE ret=1;
@@ -213,7 +216,10 @@ public:
 		return ret;
 	}
 
-	/// compute the sum of all elements
+	/**
+	 * Compute the sum of all elements.
+	 * \returns \f[ \sum_{i=0}^{SIZE-1} this_i \f]
+	 */
 	TYPE sum()
 	{
 		TYPE ret=0;
