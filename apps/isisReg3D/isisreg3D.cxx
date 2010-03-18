@@ -202,6 +202,7 @@ int main(
 	FixedFilterType::Pointer fixedFilter = FixedFilterType::New();
 	MovingFilterType::Pointer movingFilter = MovingFilterType::New();
 
+	tmpConstTransformPointer = NULL;
 	fixedReader->SetFileName(ref_filename);
 	movingReader->SetFileName(in_filename);
 
@@ -267,13 +268,13 @@ int main(
 	RegistrationFactoryType::Pointer registrationFactory = RegistrationFactoryType::New();
 
 	//analyse transform vector
-	unsigned int repetition = transformType.number;
+	int repetition = transformType.number;
 	if (!repetition)
 	repetition = 1;
 	//analyse optimizer vector
 
 	boost::progress_timer time_used;
-	for (unsigned int counter = 0; counter < repetition; counter++) {
+	for (int counter = 0; counter < repetition; counter++) {
 		
 		if (number_of_iterations.number == repetition) {
 		      niteration = ((VShort*) number_of_iterations.vector)[counter];
