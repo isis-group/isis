@@ -173,6 +173,10 @@ data::ImageList IOFactory::load(const std::string& path, std::string dialect)
 		get().loadPath(chunks,p,dialect):
 		get().loadFile(chunks,p,dialect);
 	const data::ImageList images(chunks);
+	BOOST_FOREACH(data::ImageList::const_reference ref,images){
+		if(not ref->hasProperty("source"))
+			ref->setProperty("source",p.string());
+	}
 	LOG(DataLog,util::info)
 		<< "Generated " << images.size() << " images out of "<< loaded << " chunks from " << (boost::filesystem::is_directory(p) ? "directory ":"" ) << p;
 	return images;

@@ -44,7 +44,7 @@ public:
  * Like in TypePtr, the copy of a Chunk will reference the same data.
  * (If you want to make a memory based deep copy of a Chunk create a MemChunk from it)
  */
-class Chunk : public _internal::ChunkBase, public util::_internal::TypeReference<util::_internal::TypePtrBase>{
+class Chunk : public _internal::ChunkBase, public util::_internal::TypePtrBase::Reference{
 protected:
 	/**
 	 * Creates an data-block from existing data.
@@ -55,11 +55,11 @@ protected:
 	 * \param thirdDim size in the third dimension (usually slice-encoded dim)
 	 * \param fourthDim size in the fourth dimension
 	 */
-	template<typename TYPE,typename D> Chunk(TYPE* src,D d,size_t firstDim,size_t secondDim,size_t thirdDim,size_t fourthDim):
+	template<typename TYPE,typename D> Chunk(TYPE* src,D d,size_t firstDim,size_t secondDim=1,size_t thirdDim=1,size_t fourthDim=1):
 	_internal::ChunkBase(firstDim,secondDim,thirdDim,fourthDim),
 	util::_internal::TypeReference<util::_internal::TypePtrBase>(new util::TypePtr<TYPE>(src,volume(),d))
 	{}
-	Chunk(util::_internal::TypePtrBase* src,size_t firstDim,size_t secondDim,size_t thirdDim,size_t fourthDim);
+	Chunk(const util::_internal::TypePtrBase::Reference &src,size_t firstDim,size_t secondDim=1,size_t thirdDim=1,size_t fourthDim=1);
 public:
 	/**
 	 * Gets a reference to the element at a given index.
@@ -94,7 +94,8 @@ public:
 	template<typename TYPE> const util::TypePtr<TYPE>& getTypePtr()const{
 		return operator*().cast_to_TypePtr<TYPE>();
 	}
-	boost::shared_ptr<Chunk> cloneToNew(void *const address,size_t firstDim=0,size_t secondDim=0,size_t thirdDim=0,size_t fourthDim=0)const;
+	Chunk cloneToMem(size_t firstDim=0,size_t secondDim=0,size_t thirdDim=0,size_t fourthDim=0)const;
+ 	Chunk copyToMem()const;
 	size_t bytes_per_voxel()const;
 	std::string typeName()const;
 	unsigned short typeID()const;

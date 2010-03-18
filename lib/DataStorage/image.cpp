@@ -258,9 +258,7 @@ bool Image::reIndex() {
 						const float base=std::min(voxelGap[2],sliceDist)*std::numeric_limits<float>::epsilon();
 						LOG_IF(not util::fuzzyEqual(voxelGap[2],sliceDist),DataLog,util::warning)
 							<< "The existing slice distance (voxelGap[2]) " << voxelGap[2]
-							<< " differs from the distance between chunk 0 and 1, which is " << sliceDist 
-							<< "\nchunk 1 is from " << lookup[0]->getPropertyValue("source") 
-							<< " and chunk 2 is from " << lookup[1]->getPropertyValue("source");
+							<< " differs from the distance between chunk 0 and 1, which is " << sliceDist;
 					}
 				} else {
 					voxelGap[2]=sliceDist;
@@ -316,8 +314,12 @@ bool Image::reIndex() {
 		const util::fvector4 &chunkFoV=chunksBegin()->getFoV(getProperty<util::fvector4>("voxelSize"));
 		bool ok=true;
 		for(int i=0;i<4;i++)
-			if(prop[i]>0 and prop[i]!=chunkFoV[i])
-				ok=false;
+			if(prop[i]>0){
+				if(prop[i]!=chunkFoV[i])
+					ok=false;
+			}else{
+				//@todo compute missing FoVs
+			}
 		LOG_IF(not ok,DataLog,util::warning)
 				<< "The calculated field of view differs from the stored " << prop << "/" << chunkFoV;
 

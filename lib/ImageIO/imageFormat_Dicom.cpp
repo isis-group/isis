@@ -216,8 +216,7 @@ void ImageFormat_Dicom::readMosaic(const data::Chunk& source, data::ChunkList& d
 	assert(size[3]==1);
 	LOG(ImageIoDebug,util::info) << "Decomposing a "<< source.sizeToVector() <<" mosaic-image into a " << size << " image";
 	
-	void *const addr = malloc(size.product()*source.bytes_per_voxel());
-	boost::shared_ptr<data::Chunk> newChunk=source.cloneToNew(addr,size[0],size[1],size[2],size[3]);
+	boost::shared_ptr<data::Chunk> newChunk(new data::Chunk(source.cloneToMem(size[0],size[1],size[2],size[3])));
 	
 	for(size_t slice=0;slice<size[2];slice++){
 		for(size_t phase=0;phase<size[1];phase++){

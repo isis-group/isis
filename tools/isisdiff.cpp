@@ -6,10 +6,9 @@ using namespace isis::util;
 
 int main(int argc, char *argv[])
 {
-/*	ENABLE_LOG(DataDebug,DefaultMsgPrint,verbose_info);
-	ENABLE_LOG(DataLog,DefaultMsgPrint,verbose_info);*/
-// 	ENABLE_LOG(isis::image_io::ImageIoDebug,DefaultMsgPrint,verbose_info);
-
+	ENABLE_LOG(isis::image_io::ImageIoDebug,DefaultMsgPrint,warning);
+	ENABLE_LOG(DataLog,DefaultMsgPrint,error);
+	
 	int ret=0;
 	if(argc<3){
 		std::cout << "Call " << argv[0] << " <first dataset> <second dataset> <comma seperated properties to ignore>"<< std::endl;
@@ -25,12 +24,13 @@ int main(int argc, char *argv[])
 
 	ImageList::const_iterator i,j;
 	int count;
+	slist ignore=string2list<std::string>(std::string(argv[3]),',');
+	ignore.push_back("source");
+	
 	for(i=images1.begin(),j=images2.begin(),count=0;i!=images1.end();i++,j++,count++){
 		const Image &first=**i,&second=**j;
 		PropMap::diff_map diff=first.diff(second);
 		if(argc>3){
-			slist ignore=string2list<std::string>(std::string(argv[3]),',');
-			ignore.push_back("source");
 			BOOST_FOREACH(slist::const_reference ref,ignore){
 				diff.erase(ref);
 			}

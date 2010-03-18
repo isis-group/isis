@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE(typePtr_init_test) {
 BOOST_AUTO_TEST_CASE(typePtr_clone_test) {	
 	Deleter::deleted=false;
 	{
-		util::_internal::TypePtrBase *outer;
+		util::_internal::TypePtrBase::Reference outer;
 		{
 			util::TypePtr<int> inner((int*)calloc(5,sizeof(int)),5,Deleter());
 			
@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(typePtr_clone_test) {
 			boost::shared_ptr<int> &dummy=inner; //get the smart_pointer inside, because TypePtr does not have/need use_count
 			BOOST_CHECK_EQUAL(dummy.use_count(),1);
 			
-			outer=inner.clone();//now we have two
+			outer=inner;//now we have two
 			BOOST_CHECK_EQUAL(dummy.use_count(),2);
 			
 			//and both reference the same data
@@ -78,7 +78,6 @@ BOOST_AUTO_TEST_CASE(typePtr_clone_test) {
 		//now again its only one (inner is gone)
 		boost::shared_ptr<int> &dummy=outer->cast_to_TypePtr<int>();
 		BOOST_CHECK_EQUAL(dummy.use_count(),1);
-		delete outer;
 	}
 	//data should be deleted by now (outer is gone)
 	BOOST_CHECK(Deleter::deleted);

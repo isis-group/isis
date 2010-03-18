@@ -36,6 +36,11 @@ namespace util{
 template<typename TYPE> class Type: public _internal::TypeBase{
 	TYPE m_val;
 	static const char m_typeName[];
+protected:
+	TypeBase* clone() const
+	{
+		return new Type<TYPE>(*this);
+	}
 public:
 	static const int id = _internal::TypeId<TYPE>::value;
 	Type(){check_type<TYPE>();}
@@ -96,11 +101,6 @@ public:
 	operator const TYPE&()const{return m_val;}
 	operator TYPE&(){return m_val;}
 	
-	TypeBase* clone() const
-	{
-		return new Type<TYPE>(*this);
-	}
-	
 	virtual ~Type(){}
 };
 
@@ -117,6 +117,10 @@ template<typename TYPE> class TypePtr: public _internal::TypePtrBase{
 protected:
 	const boost::weak_ptr<void> address()const{
 		return boost::weak_ptr<void>(m_val);
+	}
+	TypePtrBase* clone() const
+	{
+		return new TypePtr(*this);
 	}
 public:
 	static const int id = _internal::TypeId<TYPE>::value << 8;
@@ -289,12 +293,8 @@ public:
 	operator boost::shared_ptr<TYPE>&(){return m_val;}
 	operator const boost::shared_ptr<TYPE>&()const{return m_val;}
 
-	TypePtrBase* clone() const
-	{
-		return new TypePtr<TYPE>(*this);
-	}
-	TypePtrBase* cloneToNew(void* const address, size_t size) const{ //@todo version for deleter maybe
-		return new TypePtr<TYPE>((TYPE*const)address,size);
+	TypePtrBase::Reference cloneToMem(size_t length) const{
+		return TypePtrBase::Reference(new TypePtr((TYPE*)malloc(length*sizeof(TYPE)),length));
 	}
 	size_t bytes_per_elem() const{
 		return sizeof(TYPE);

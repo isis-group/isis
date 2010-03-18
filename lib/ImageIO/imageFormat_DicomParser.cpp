@@ -415,8 +415,8 @@ size_t ImageFormat_Dicom::parseCSAEntry(Uint8 *at, isis::util::PropMap& map){
 
 bool ImageFormat_Dicom::parseCSAValue(const std::string &val, const std::string &name,const char *const vr, isis::util::PropMap& map)
 {
-	if(strcasecmp(vr,"IS")==0){
-		map[name] = boost::lexical_cast<int>(val);
+	if(strcasecmp(vr,"IS")==0 or strcasecmp(vr,"SL")==0){
+		map[name] = boost::lexical_cast<int32_t>(val);
 	} else if(strcasecmp(vr,"UL")==0){
 		map[name] = boost::lexical_cast<u_int32_t>(val);
 	} else if(
@@ -429,7 +429,7 @@ bool ImageFormat_Dicom::parseCSAValue(const std::string &val, const std::string 
 	} else if(strcasecmp(vr,"US")==0){
 		map[name] = boost::lexical_cast<u_int16_t>(val);
 	} else if(strcasecmp(vr,"SS")==0){
-		map[name] = boost::lexical_cast<u_int16_t>(val);
+		map[name] = boost::lexical_cast<int16_t>(val);
 	} else {
 		LOG(ImageIoLog,util::error) << "Dont know how to parse CSA entry " << std::make_pair(name,val) << " type is " << util::MSubject(vr);
 		return false;
@@ -438,7 +438,8 @@ bool ImageFormat_Dicom::parseCSAValue(const std::string &val, const std::string 
 }
 bool ImageFormat_Dicom::parseCSAValueList(const util::slist &val,const std::string &name,const char *const vr, isis::util::PropMap& map)
 {
-	if(strcasecmp(vr,"IS")==0 or strcasecmp(vr,"US")==0 or strcasecmp(vr,"SS")==0){
+	if(	strcasecmp(vr,"IS")==0 or strcasecmp(vr,"SL")==0 or
+		strcasecmp(vr,"US")==0 or strcasecmp(vr,"SS")==0){
 		map[name] = util::list2list<int32_t>(val.begin(),val.end());
 	} else if(strcasecmp(vr,"UL")==0){
 		map[name] = val; // @todo we dont have an unsigned int list

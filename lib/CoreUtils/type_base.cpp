@@ -40,5 +40,16 @@ size_t TypePtrBase::cmp(const TypePtrBase& comp)const{
 	return len()-comp.len() + cmp(0,std::min(len(),comp.len())-1,comp,0);
 }
 
+TypePtrBase::Reference TypePtrBase::cloneToMem() const
+{
+	return cloneToMem(len());
+}
+
+TypePtrBase::Reference TypePtrBase::copyToMem() const
+{
+	TypePtrBase::Reference ret=cloneToMem();
+	copyRange(0,len()-1,*ret,0);
+	return ret;
+}
 
 }}}

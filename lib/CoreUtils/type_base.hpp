@@ -104,6 +104,8 @@ public:
 * Because of that, the contructors of this class are protected.
 */
 template<typename TYPE_TYPE> class TypeReference:public boost::scoped_ptr<TYPE_TYPE>{
+	template<typename TT> friend class TypePtr; //allow Type and TypePtr to use the protected contructor below
+	template<typename TT> friend class Type;
 protected:
 	//dont use this directly
 	TypeReference(TYPE_TYPE *t):boost::scoped_ptr<TYPE_TYPE>(t){}
@@ -129,6 +131,17 @@ public:
 	TypeReference<TYPE_TYPE>& operator=(const TypeReference<TYPE_TYPE> &src)
 	{
 		reset(src.empty() ? 0:src->clone());
+		return *this;
+	}
+	/**
+	 * Copy operator
+	 * This operator replaces the current content by a copy of src.
+	 * \returns reference to the (just changed) target
+	 */
+	TypeReference<TYPE_TYPE>& operator=(const TYPE_TYPE &src)
+	{
+		reset(src.clone());
+		return *this;
 	}
 	/// \returns true if "contained" type has no value (a.k.a. is undefined)
 	bool empty()const{
@@ -143,7 +156,16 @@ public:
 };
 
 class TypeBase : public GenericType{
-	static _internal::TypeConverterMap& converters();	
+	static _internal::TypeConverterMap& converters();
+	friend class TypeReference<TypeBase>;
+protected:
+	/**
+	* Create a copy of this.
+	* Creates a new Type/TypePtr an stores a copy of its value there.
+	* Makes TypeBase-pointers copyable without knowing their type.
+	* \returns a TypeBase-pointer to a newly created Type/TypePtr.
+	*/
+	virtual TypeBase* clone()const=0;
 public:
 	typedef TypeReference<TypeBase> Reference;
 	typedef TypeConverterMap::mapped_type::mapped_type Converter;
@@ -207,21 +229,17 @@ public:
 	}
 	virtual bool eq(const TypeBase &second)const=0;
 
-	/**
-	* Create a copy of this.
-	* Creates a new Type/TypePtr an stores a copy of its value there.
-	* Makes TypeBase-pointers copyable without knowing their type.
-	* \returns a TypeBase-pointer to a newly created Type/TypePtr.
-	*/
-	virtual TypeBase* clone()const=0;
 	virtual ~TypeBase();
 };
 
 class TypePtrBase : public GenericType{
+	friend class TypeReference<TypePtrBase>;
 protected:
 	size_t m_len;
 	TypePtrBase(size_t len=0);
 	virtual const boost::weak_ptr<void> address()const=0;
+	/// Create a TypePtr of the same type pointing at the same address.
+	virtual TypePtrBase* clone()const=0;
 public:
 	typedef TypeReference<TypePtrBase> Reference;
 	/**
@@ -246,18 +264,21 @@ public:
 	size_t len()const;
 	
 	virtual std::vector<Reference> splice(size_t size)const=0;
-	/// Create a TypePtr of the same type pointing at the same address.
-	virtual TypePtrBase* clone()const=0;
+
+	/// Create a TypePtr of the same type pointing at a new address (newly allocated memory).
+	TypePtrBase::Reference cloneToMem()const;
+	TypePtrBase::Reference copyToMem()const;
 	/**
-	 * Create a TypePtr of the same type pointing at the given address.
-	 * \param address memory address that should be managed by this TypePtr. 
-	 * It will be deleted automatically, so you should not directly use it anymore.
-	 * \param len length of this memory block in elements of the given TYPE (default is the size of the original)
+	 * \copydoc cloneToMem
+	 * \param len length of the new memory block in elements of the given TYPE
 	 */
-	virtual TypePtrBase* cloneToNew(void *const address,size_t len=0)const=0;
+	virtual TypePtrBase::Reference cloneToMem(size_t length)const=0;
+	
 	virtual size_t bytes_per_elem()const=0;
 	virtual ~TypePtrBase();
 	virtual void copyRange(size_t start,size_t end,TypePtrBase &dst,size_t dst_start)const=0;
+// 	TypePtrBase::Reference copyToMem() const;
+	
 	template<typename T> void getMinMax(T &min,T &max)const
 	{
 		LOG_IF(TypePtr<T>::staticId() != this->typeID(), CoreDebug,error) << "Given type of min/max" 
