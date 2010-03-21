@@ -3,6 +3,10 @@
 
 #include <map>
 #include <boost/noncopyable.hpp>
+#include <boost/shared_ptr.hpp>
+#include <string>
+#include <iostream>
+#include <typeinfo>
 
 namespace isis{ namespace util{
 
@@ -12,37 +16,20 @@ namespace isis{ namespace util{
  * It keeps track of them and deletes them automatically based of their priority.
  */
 class Singletons{
-	class SingletonBase:public boost::noncopyable{
-	public:
-		virtual ~SingletonBase(){};
-	};
-	template<typename BASE> class Singleton:public BASE,public SingletonBase{
-	public:
-		Singleton(){}
-		template<typename T> Singleton(const T &init):BASE(init){}
-	};
+	class SingletonBase:public boost::noncopyable{};
+	template<typename BASE> class Singleton:public SingletonBase,public BASE{};
 	
-	typedef std::multimap<int,SingletonBase* > prioMap;
+	typedef std::multimap<int,boost::shared_ptr<SingletonBase> > prioMap;
 	prioMap map;
-	Singletons(){};
+	Singletons();
 	~Singletons();
-	template<typename T,typename T2> Singleton<T>* create(int priority,const T2 &initValue){
-		Singleton<T>* ret=new Singleton<T>(initValue);
-		map.insert(map.find(priority), std::make_pair(priority,static_cast<SingletonBase*>(ret)));
+	template<typename T> boost::shared_ptr<Singleton<T> > create(int priority){
+		const boost::shared_ptr<Singleton<T> > ret(new Singleton<T>);
+		map.insert(map.find(priority), std::make_pair(priority,boost::static_pointer_cast<SingletonBase>(ret)));
 		return ret;
 	}
-	template<typename T> Singleton<T>* create(int priority){
-		Singleton<T>* ret=new Singleton<T>;
-		map.insert(map.find(priority), std::make_pair(priority,static_cast<SingletonBase*>(ret)));
-		return ret;
-	}
-	//@todo what happens to primitve static variables in static functions - will we get a dead reference here as well ?
-	template<typename T> static Singleton<T>* request(int priority){
-		static Singleton<T>* s=getMaster().create<T>(priority);
-		return s;
-	}
-	template<typename T,typename T2> static Singleton<T>* request(int priority,const T2 &initValue){
-		static Singleton<T>* s=getMaster().create<T>(priority,initValue);
+	template<typename T> static boost::weak_ptr<Singleton<T> > request(int priority){
+		static boost::weak_ptr<Singleton<T> > s=getMaster().create<T>(priority);
 		return s;
 	}
 	static Singletons& getMaster();
@@ -56,10 +43,10 @@ public:
 	 * - singletons are not deleted before any singleton of a lower priority
 	 * - singletons of the same priority are deleted in the opposite order they where created. (LIFO)
 	 *
-	 * \return allways a reference to the same object of type T.
+	 * \return allways a shared pointer to the same object of type T.
 	 */
-	template<typename T,int PRIO> static T& get(){
-		return *static_cast<T*>(request<T>(PRIO));
+	template<typename T,int PRIO> static boost::shared_ptr<Singleton<T> > get(){
+		return request<T>(PRIO).lock();
 	}
 	/**
 	 * \copydoc get()

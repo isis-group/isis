@@ -9,11 +9,11 @@ using isis::util::DefaultMsgPrint;
 int main(int argc, char *argv[])
 {
 	
-/*	ENABLE_LOG(isis::image_io::ImageIoDebug,DefaultMsgPrint,warning);
-	ENABLE_LOG(isis::image_io::ImageIoLog,DefaultMsgPrint,warning);
-	ENABLE_LOG(CoreDebug,DefaultMsgPrint,warning);
-	ENABLE_LOG(CoreLog,DefaultMsgPrint,warning);
-	ENABLE_LOG(DataDebug,DefaultMsgPrint,warning);
+/*	ENABLE_LOG(isis::image_io::ImageIoDebug,DefaultMsgPrint,info);
+	ENABLE_LOG(isis::image_io::ImageIoLog,DefaultMsgPrint,info);*/
+	ENABLE_LOG(CoreDebug,DefaultMsgPrint,info);
+	ENABLE_LOG(CoreLog,DefaultMsgPrint,info);
+/*	ENABLE_LOG(DataDebug,DefaultMsgPrint,warning);
 	ENABLE_LOG(DataLog,DefaultMsgPrint,warning);
 */
 	

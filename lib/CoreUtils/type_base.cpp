@@ -28,7 +28,7 @@ TypeBase::~TypeBase() {}
 
 
 TypeConverterMap& TypeBase::converters() {
-	return Singletons::get<_internal::TypeConverterMap,0>();
+	return *Singletons::get<_internal::TypeConverterMap,0>();
 }
 
 TypeBase::Converter TypeBase::getConverterTo(int id)const {
@@ -51,5 +51,23 @@ TypePtrBase::Reference TypePtrBase::copyToMem() const
 	copyRange(0,len()-1,*ret,0);
 	return ret;
 }
+void TypePtrBase::copyRange(size_t start,size_t end,TypePtrBase &dst,size_t dst_start)const
+{
+	assert(start<=end);
+	const size_t length=end-start;
+	LOG_IF(not dst.isSameType(*this),CoreDebug,error)
+		<< "Copying into a TypePtr of different type. Its " << dst.typeName() << " not " << typeName();
+	LOG_IF(end>=len(),CoreLog,error)
+		<< "End of the range ("<< end << ") is behind the end of this TypePtr ("<< len() << ")";
+	LOG_IF(length+dst_start>=dst.len(),CoreLog,error)
+		<< "End of the range ("<< length+dst_start << ") is behind the end of the destination ("<< dst.len() << ")";
+	boost::shared_ptr<void> daddr=dst.address().lock();
+	boost::shared_ptr<void> saddr=address().lock();
+
+	const void* const src= (int8_t*)saddr.get()+(bytes_per_elem()*start);
+	void *const dest= (int8_t*)daddr.get()+(bytes_per_elem()*dst_start);
+	memcpy(dest,src,length*bytes_per_elem());
+}
+
 
 }}}

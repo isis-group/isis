@@ -187,6 +187,8 @@ template<typename T> bool fuzzyEqual(T a,T b){
 	const T base=std::min(a,b)*std::numeric_limits<T>::epsilon()*5e1;
 	return  dist < base;
 }
+
+/// @cond _internal
 namespace _internal{
 /**
  * Continously searches in an sorted list using std::less.
@@ -213,6 +215,7 @@ struct caselessStringLess{
 	}
 };
 }
+/// @endcond
 /// @cond _hidden
 	struct CoreLog{static const char* name(){return "Core";};enum {use = _ENABLE_CORE_LOG};};
 	struct CoreDebug{static const char* name(){return "Core";};enum {use= _ENABLE_CORE_DEBUG};};

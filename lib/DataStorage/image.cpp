@@ -204,10 +204,10 @@ bool Image::reIndex() {
 		i->toCommonUnique(common,uniques,false);
 	}
 	LOG(DataDebug,util::info) << uniques.size() << " Chunk-unique properties found in the Image";
-	LOG(DataDebug,util::verbose_info) << util::list2string(uniques.begin(),uniques.end(),", ");
+	LOG_IF(uniques.size(),DataDebug,util::verbose_info) << util::list2string(uniques.begin(),uniques.end(),", ");
 
 	join(common);
-	LOG_IF(not common.empty(), DataDebug,util::verbose_info) << "common properties saved into the image" << common;
+	LOG_IF(not common.empty(), DataDebug,util::verbose_info) << "common properties saved into the image " << common;
 
 	//remove common props from the chunks
 	for(size_t i=0;i!=lookup.size();i++)

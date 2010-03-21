@@ -21,6 +21,7 @@ typedef std::list<int> ilist;
 typedef std::list<double> dlist;
 typedef std::list<std::string> slist;
 
+/// @cond _internal
 namespace _internal{
 
 /// the supported types as mpl-vector
@@ -46,7 +47,7 @@ template<class T> struct TypeId{
 	static const int value=type::value;
 };
 }
-
+/// @endcond
 /**
  * Templated pseudo struct to check for availability of a type at compile time.
  * Instanciating this with any datatype (eg: check_type\<short\>() ) will cause the 

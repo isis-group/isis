@@ -28,18 +28,19 @@ namespace isis{
  */
 namespace util{namespace _internal{
 	
-template<class MODULE> class Log{	
-	static boost::shared_ptr<MessageHandlerBase> &handler(){
-		return Singletons::get<boost::shared_ptr<MessageHandlerBase>,INT_MAX>(
-			boost::shared_ptr<MessageHandlerBase>(new DefaultMsgPrint(warning)));
+template<class MODULE> class Log{
+	friend class util::Singletons;
+	boost::shared_ptr<MessageHandlerBase> m_handle;
+	static boost::shared_ptr<MessageHandlerBase> &getHandle(){
+		return Singletons::get<Log<MODULE>,INT_MAX>()->m_handle;
 	}
-	Log();//dont do this
+	Log():m_handle(new DefaultMsgPrint(warning)){}
 public:
 	template<class HANDLE_CLASS> static void enable(LogLevel enable){
-		Log<MODULE>::handler().reset(enable ? new HANDLE_CLASS(enable):0);
+		getHandle().reset(enable ? new HANDLE_CLASS(enable):0);
 	}
 	static Message send(const char file[],const char object[],int line,LogLevel level){
-		return Message(object,MODULE::name(),file,line, level,handler());
+		return Message(object,MODULE::name(),file,line, level,getHandle());
 	}
 };
 

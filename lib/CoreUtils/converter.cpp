@@ -25,6 +25,7 @@
 #include <boost/type_traits/is_arithmetic.hpp>
 #include <boost/mpl/and.hpp>
 
+/// @cond _internal
 namespace isis{ namespace util{ namespace _internal{
 
 //Define generator - this can be global because its using convert internally
@@ -226,7 +227,7 @@ struct outer_add {
 		);
 	}
 };
-
+/// @endcond
 
 TypeConverterMap::TypeConverterMap()
 {

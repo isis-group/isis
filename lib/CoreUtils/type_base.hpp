@@ -270,14 +270,13 @@ public:
 	TypePtrBase::Reference copyToMem()const;
 	/**
 	 * \copydoc cloneToMem
-	 * \param len length of the new memory block in elements of the given TYPE
+	 * \param length length of the new memory block in elements of the given TYPE
 	 */
 	virtual TypePtrBase::Reference cloneToMem(size_t length)const=0;
 	
 	virtual size_t bytes_per_elem()const=0;
 	virtual ~TypePtrBase();
-	virtual void copyRange(size_t start,size_t end,TypePtrBase &dst,size_t dst_start)const=0;
-// 	TypePtrBase::Reference copyToMem() const;
+	void copyRange(size_t start,size_t end,TypePtrBase &dst,size_t dst_start)const;
 	
 	template<typename T> void getMinMax(T &min,T &max)const
 	{

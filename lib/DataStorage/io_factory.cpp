@@ -21,6 +21,7 @@
 
 namespace isis{ namespace data{
 
+namespace _internal{
 struct pluginDeleter{
 	void *m_dlHandle;
 	std::string m_pluginName;
@@ -28,12 +29,14 @@ struct pluginDeleter{
 	void operator()(image_io::FileFormat *format){
 		LOG(DataDebug,util::info) << "Releasing plugin " << m_pluginName << " (was loaded at " << m_dlHandle << ")";
 		delete format;
-		if(dlclose(m_dlHandle)!=0)
+		// @todo closing an plugin may break the deletion of the singletons created in there
+/*		if(dlclose(m_dlHandle)!=0) 
 			LOG(DataLog,util::warning)
-				<< "Failed to release plugin " << m_pluginName << " (was loaded at " << m_dlHandle << ")";
+				<< "Failed to release plugin " << m_pluginName << " (was loaded at " << m_dlHandle << ")";*/
 	}
 };
-	
+}
+
 IOFactory::IOFactory()
 {
 	findPlugins(std::string(PLUGIN_PATH));
@@ -79,7 +82,7 @@ unsigned int IOFactory::findPlugins(const std::string& path)
 			if(handle){
 				image_io::FileFormat* (*factory_func)() = (image_io::FileFormat* (*)())dlsym(handle,"factory");
 				if (factory_func){
-					FileFormatPtr io_class(factory_func(),pluginDeleter(handle,pluginName));
+					FileFormatPtr io_class(factory_func(),_internal::pluginDeleter(handle,pluginName));
 					if(registerFormat(io_class))
 						ret++;
 					else
@@ -109,7 +112,7 @@ std::list<std::string> IOFactory::getSuffixes(const FileFormatPtr& reader)
 
 IOFactory& IOFactory::get()
 {
-	return util::Singletons::get<IOFactory,0>();
+	return *util::Singletons::get<IOFactory,0>();
 }
 
 int IOFactory::loadFile(ChunkList &ret,const boost::filesystem::path& filename, const std::string& dialect)

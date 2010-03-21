@@ -189,32 +189,25 @@ public:
 
 	virtual ~TypePtr(){}
 
-	/// Copies the data pointed to into another TypePtr of the same type
-	void deepCopy(TypePtr<TYPE> &dst)
-	{
-		if(m_len!=dst.len())
-			LOG(CoreLog,warning) << "Source and destination do not have the same size, using the smaller";
-		boost::shared_ptr<TYPE> &pDst=(boost::shared_ptr<TYPE>)dst;
-		std::copy(
-			m_val.get(),
-			m_val.get()+std::min(m_len,dst.len()),
-			pDst.get()
-		);
-	}
-	
-	void copyRange(size_t start,size_t end,TypePtrBase &dst,size_t dst_start)const{
+	void copyFromMem(size_t start,size_t end,const TYPE* const src){
 		assert(start<=end);
-		size_t length=end-start;
-		LOG_IF(not dst.is<TYPE>(),CoreDebug,error) 
-			<< "Copying into a TypePtr of different type. Its " << dst.typeName() << " not " << typeName();
-		LOG_IF(end>=len(),CoreLog,error) 
+		const size_t length=end-start;
+		LOG_IF(end>=len(),CoreLog,error)
 			<< "End of the range ("<< end << ") is behind the end of this TypePtr ("<< len() << ")";
-		LOG_IF(length+dst_start>=dst.len(),CoreLog,error) 
-			<< "End of the range ("<< length+dst_start << ") is behind the end of the destination ("<< dst.len() << ")";
-			
-		TYPE &dest= dst.cast_to_TypePtr<TYPE>()[dst_start];
-		const TYPE &src= operator[](start) ;
-		memcpy(&dest,&src,length*sizeof(TYPE));
+
+		TYPE &dest= this->operator[](start);
+		LOG(CoreDebug,info) << "Copying " << length*sizeof(TYPE) << " bytes of " << typeName() << " from "<< src << " to " << &dest;
+		
+		memcpy(&dest,src,length*sizeof(TYPE));
+	}
+	void copyToMem(size_t start,size_t end,const TYPE* const dst)const{
+		assert(start<=end);
+		const size_t length=end-start;
+		LOG_IF(end>=len(),CoreLog,error)
+		<< "End of the range ("<< end << ") is behind the end of this TypePtr ("<< len() << ")";
+		
+		const TYPE &source= this->operator[](start);
+		memcpy(dst,&source,length*sizeof(TYPE));
 	}
 	size_t cmp(size_t start, size_t end, const isis::util::_internal::TypePtrBase& dst, size_t dst_start) const{
 		assert(start<=end);
@@ -232,6 +225,7 @@ public:
 		<< "End of the range ("<< length+dst_start << ") is behind the end of the destination ("<< dst.len() << ")";
 
 		const TypePtr<TYPE> &compare = dst.cast_to_TypePtr<TYPE>();
+		std::cout << "Comparing " << dst.typeName() << " at " << &operator[](0) << " and " << &compare[0] << std::endl;
 		for(size_t i=start;i<end;i++){
 			if(operator[](i)!=compare[i])
 				ret++;

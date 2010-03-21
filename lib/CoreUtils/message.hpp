@@ -50,12 +50,12 @@ class MessageHandlerBase{
 	static LogLevel m_stop_below;
 protected:
 	MessageHandlerBase(LogLevel level):m_level(level){}
+	virtual ~MessageHandlerBase(){}
 public:
 	LogLevel m_level;
 	virtual void commit(const Message &msg)=0;
 	static void stopBelow(LogLevel =error);
 	bool requestStop(LogLevel _level);
-	virtual ~MessageHandlerBase(){}
 };
 
 class Message: public std::ostringstream{
@@ -97,23 +97,9 @@ protected:
 	static std::ostream *o;
 public:
 	DefaultMsgPrint(LogLevel level):_internal::MessageHandlerBase(level){}
+	virtual ~DefaultMsgPrint(){}
 	void commit(const _internal::Message &mesg);
 	static void setStream( std::ostream &_o);
-};
-
-template<class MODULE>class MessageQueue : public _internal::MessageHandlerBase {
-	std::list<_internal::Message> msg;
-public:
-	MessageQueue(LogLevel level):msg(),_internal::MessageHandlerBase(level){}
-	~MessageQueue(){
-		for(std::list<_internal::Message>::iterator i=msg.begin();i!=msg.end();i++){
-		std::cout << i->str() << std::endl;
-		}
-	}
-	void commit(const _internal::Message &mesg){
-		std::cout << "Flushing " << mesg.str() << std::endl;
-		msg.push_back(mesg);//@needs to be mutexed
-	}
 };
 
 }
