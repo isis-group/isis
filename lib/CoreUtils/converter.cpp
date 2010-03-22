@@ -187,7 +187,11 @@ template<> class TypeConverter<false,false,std::string,PropMap>: public TypeGene
 public:
 	virtual ~TypeConverter(){}
 };
-template<> class TypeConverter<false,false,std::string,rgb_color >:public TypeGenerator<std::string,rgb_color >{ //string => color
+template<> class TypeConverter<false,false,std::string,rgb_color24 >:public TypeGenerator<std::string,rgb_color24 >{ //string => color
+	public:
+		virtual ~TypeConverter(){}
+};
+template<> class TypeConverter<false,false,std::string,rgb_color48 >:public TypeGenerator<std::string,rgb_color48 >{ //string => color
 	public:
 		virtual ~TypeConverter(){}
 };
