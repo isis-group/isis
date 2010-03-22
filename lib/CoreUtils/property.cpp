@@ -21,7 +21,10 @@ bool PropertyValue::needed()const {	return m_needed;}
 bool PropertyValue::operator== ( const util::PropertyValue& second )const {
 	return !second.empty() && operator==(*second);
 }
-
+bool PropertyValue::operator!= ( const util::PropertyValue& second )const {
+	return not((second.empty() and empty()) or operator==(second));
+}
+	
 
 bool PropertyValue::operator== ( const _internal::TypeBase& second )const {
 	return !empty() && get()->eq(second);

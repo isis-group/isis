@@ -91,26 +91,24 @@ bool Image::insertChunk ( const Chunk &chunk )
 				<< "Ignoring chunk with different size. (" << chunk.sizeToString() << "!=" << set.begin()->sizeToString() << ")";
 			return false;
 		}
-		if(not (first.getPropertyValue("readVec") == chunk.getPropertyValue("readVec"))){
+		if(first.getPropertyValue("readVec") != chunk.getPropertyValue("readVec")){
 			LOG(DataDebug,util::info)
 				<< "Ignoring chunk with different readVec. (" << chunk.getPropertyValue("readVec") << "!=" << first.getPropertyValue("readVec") << ")";
 			return false;
 		}
-		if(not (first.getPropertyValue("phaseVec") == chunk.getPropertyValue("phaseVec"))){
+		if(first.getPropertyValue("phaseVec") != chunk.getPropertyValue("phaseVec")){
 			LOG(DataDebug,util::info)
 				<< "Ignoring chunk with different phaseVec. (" << chunk.getPropertyValue("phaseVec") << "!=" << first.getPropertyValue("phaseVec") << ")";
 			return false;
 		}
 
 		//if our first chunk and the incoming chunk do have sequenceNumber and it differs, skip it
-		if(set.begin()->hasProperty("sequenceNumber") and chunk.hasProperty("sequenceNumber")){
-			const util::PropertyValue baseSeq=set.begin()->getPropertyValue("sequenceNumber");
-			const util::PropertyValue insSeq=chunk.getPropertyValue("sequenceNumber");
-			if(not (baseSeq.empty() or insSeq.empty() or (baseSeq==insSeq))){ 
-				LOG(DataDebug,util::info)
-					<< "Ignoring chunk because its sequenceNumber doesn't fit (" << insSeq->toString(false) << "!=" << baseSeq->toString(false) << ")";
-				return false;
-			}
+		if(first.getPropertyValue("sequenceNumber") != chunk.getPropertyValue("sequenceNumber")){
+			LOG(DataDebug,util::info)
+				<< "Ignoring chunk because its sequenceNumber doesn't fit (" 
+				<< first.getPropertyValue("sequenceNumber") << "!=" << chunk.getPropertyValue("sequenceNumber") 
+				<< ")";
+			return false;
 		}
 	} else {
 		LOG(DataDebug,util::verbose_info) << "Inserting 1st chunk";

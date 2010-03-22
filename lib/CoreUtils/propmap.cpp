@@ -365,7 +365,7 @@ bool PropMap::hasProperty(const std::string& key) const {
 const isis::util::PropertyValue& PropMap::getPropertyValue(const std::string& key) const {
 	const PropertyValue* found=findPropVal(key);
 	if(not found){
-		LOG(CoreDebug,util::error)
+		LOG(CoreDebug,util::info)
 		<< "Requested Property " << key << " is not set! Returning empty property.";
 		return emptyProp;
 	}

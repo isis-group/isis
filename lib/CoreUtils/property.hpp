@@ -72,6 +72,15 @@ public:
 	 */
 	bool operator ==(const PropertyValue &second)const;
 	/**
+	 * Unequality to another PropertyValue.
+	 * Properties are unequal if:
+	 * - not both properties are empty
+	 * - or both properties contain the different value of same type T
+	 * - or they contain different types
+	 * \returns not(*this == second) and not(this->empty() and second.empty()).
+	 */
+	bool operator !=(const PropertyValue &second)const;
+	/**
 	 * Equality to another Type-Object.
 	 * Properties are equal to Type-Object if, and only if:
 	 * - the property is not empty

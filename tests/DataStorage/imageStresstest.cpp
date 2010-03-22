@@ -9,8 +9,6 @@ const size_t slice_size=256;
 
 int main()
 {
-	ENABLE_LOG(data::DataLog,util::DefaultMsgPrint,util::warning);
-	ENABLE_LOG(data::DataDebug,util::DefaultMsgPrint,util::warning);
 	boost::timer timer;
 	data::Image img;
 
