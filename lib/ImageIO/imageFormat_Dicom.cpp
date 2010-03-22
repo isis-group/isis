@@ -273,7 +273,7 @@ int ImageFormat_Dicom::load(data::ChunkList &chunks, const std::string& filename
 	} else {
 		delete dcfile;//no chunk was created, so we have to deal with the dcfile on our own
 		LOG(ImageIoLog,util::error)
-		<< "Failed to create a chunk from " << util::MSubject(filename);
+			<< "Failed to create a chunk from " << util::MSubject(filename);
 	}
 	return 0;
 }

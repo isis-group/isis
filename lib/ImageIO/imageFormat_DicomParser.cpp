@@ -398,10 +398,10 @@ size_t ImageFormat_Dicom::parseCSAEntry(Uint8 *at, isis::util::PropMap& map){
 		try{
 			if(ret.size()==1){
 				if(parseCSAValue(ret.front(),name,vr,map))
-					LOG(ImageIoDebug,util::info) << "Found entry " << name << ":" << map[name] << " in CSA header";
+					LOG(ImageIoDebug,util::verbose_info) << "Found entry " << name << ":" << map[name] << " in CSA header";
 			} else if(ret.size()>1){
 				if(parseCSAValueList(ret,name,vr,map))
-					LOG(ImageIoDebug,util::info) << "Found entry " << name << ":" << map[name] << " in CSA header";
+					LOG(ImageIoDebug,util::verbose_info) << "Found entry " << name << ":" << map[name] << " in CSA header";
 			}
 		} catch (boost::bad_lexical_cast e){
 			LOG(ImageIoLog,util::error) << "Failed to parse CSA entry " << std::make_pair(name,ret) << " as " << vr << " (" << e.what() << ")";
@@ -454,7 +454,7 @@ bool ImageFormat_Dicom::parseCSAValueList(const util::slist &val,const std::stri
 	return true;
 }
 
-void ImageFormat_Dicom::dcmObject2PropMap(DcmObject* master_obj, util::PropMap &map)
+void ImageFormat_Dicom::dcmObject2PropMap(DcmObject* master_obj, isis::util::PropMap& map)
 {
 	for (DcmObject* obj = master_obj->nextInContainer(NULL);obj;obj = master_obj->nextInContainer(obj)) {
 		const DcmTag &tag=obj->getTag();

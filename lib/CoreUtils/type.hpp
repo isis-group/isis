@@ -225,7 +225,7 @@ public:
 		<< "End of the range ("<< length+dst_start << ") is behind the end of the destination ("<< dst.len() << ")";
 
 		const TypePtr<TYPE> &compare = dst.cast_to_TypePtr<TYPE>();
-		std::cout << "Comparing " << dst.typeName() << " at " << &operator[](0) << " and " << &compare[0] << std::endl;
+		LOG(CoreDebug,verbose_info) << "Comparing " << dst.typeName() << " at " << &operator[](0) << " and " << &compare[0];
 		for(size_t i=start;i<end;i++){
 			if(operator[](i)!=compare[i])
 				ret++;

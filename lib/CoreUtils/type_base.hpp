@@ -276,6 +276,12 @@ public:
 	
 	virtual size_t bytes_per_elem()const=0;
 	virtual ~TypePtrBase();
+	/**
+	 * Copy a range of elements to another TypePtr of the same type.
+	 * \param start first element in this to be copied
+	 * \param end last element in this to be copied
+	 * \param dst_start starting element in dst to be overwritten
+	 */
 	void copyRange(size_t start,size_t end,TypePtrBase &dst,size_t dst_start)const;
 	
 	template<typename T> void getMinMax(T &min,T &max)const
