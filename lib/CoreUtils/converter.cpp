@@ -183,17 +183,21 @@ public:
 	virtual ~TypeConverter(){}
 };
 // @todo we cannot parse this stuff yet
-template<> class TypeConverter<false,false,std::string,PropMap>: public TypeGenerator<std::string,PropMap>{
+template<> class TypeConverter<false,false,std::string,PropMap>: public TypeGenerator<std::string,PropMap>{ //string => PropMap
 public:
 	virtual ~TypeConverter(){}
 };
-template<typename TYPE> class TypeConverter<false,false,std::string,vector4<TYPE> >:public TypeGenerator<std::string,vector4<TYPE> >{
-public:
-	virtual ~TypeConverter(){}
-};
-template<typename TYPE> class TypeConverter<false,false,std::string,std::list<TYPE> >:public TypeGenerator<std::string,vector4<TYPE> >{
+template<> class TypeConverter<false,false,std::string,rgb_color >:public TypeGenerator<std::string,rgb_color >{ //string => color
 	public:
 		virtual ~TypeConverter(){}
+};
+template<typename TYPE> class TypeConverter<false,false,std::string,vector4<TYPE> >:public TypeGenerator<std::string,vector4<TYPE> >{ //string => vector4
+public:
+	virtual ~TypeConverter(){}
+};
+template<typename TYPE> class TypeConverter<false,false,std::string,std::list<TYPE> >:public TypeGenerator<std::string,vector4<TYPE> >{ //string => list
+public:
+	virtual ~TypeConverter(){}
 };
 
 

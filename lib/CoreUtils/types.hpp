@@ -1,7 +1,7 @@
 #ifndef TYPES_HPP_INCLUDED
 #define TYPES_HPP_INCLUDED
 
-#include <boost/mpl/vector.hpp>
+#include <boost/mpl/vector/vector30.hpp>
 #include <boost/mpl/distance.hpp>
 #include <boost/mpl/find.hpp>
 #include <stdint.h>
@@ -11,6 +11,7 @@
 #include <boost/date_time/gregorian/gregorian_types.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include "vector.hpp"
+#include "color.hpp"
 
 
 namespace isis{ namespace util{
@@ -25,9 +26,10 @@ typedef std::list<std::string> slist;
 namespace _internal{
 
 /// the supported types as mpl-vector
-typedef boost::mpl::vector<
+typedef boost::mpl::vector21< //increase this if a type is added (if <30 consider including vector40 above)
 int8_t,uint8_t,int16_t,uint16_t,int32_t,uint32_t,int64_t,uint64_t
 ,float,double
+,rgb_color
 ,fvector4,dvector4,ivector4
 ,ilist,dlist,slist
 ,PropMap,std::string

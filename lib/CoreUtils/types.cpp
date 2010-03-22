@@ -44,6 +44,8 @@ DEF_TYPE(uint64_t,u64bit);
 DEF_TYPE(float,float);
 DEF_TYPE(double,double);
 
+DEF_TYPE(rgb_color,color);
+
 DEF_TYPE(fvector4,fvector4);
 DEF_TYPE(dvector4,dvector4);
 DEF_TYPE(ivector4,ivector4);
