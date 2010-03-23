@@ -33,15 +33,18 @@ endif(IOPLUGIN_GZ)
 
 if(IOPLUGIN_DICOM)
 	find_library(LIB_DCMIMGLE dcmimgle)
+	find_library(LIB_DCMIMAGE dcmimage)
 	find_library(LIB_DCMDATA dcmdata)
 	find_library(LIB_OFSTD ofstd)
 	find_library(LIB_Z z)
+	find_library(LIB_TIFF tiff)
+	find_library(LIB_PNG png12)
 	
 	find_path(INCPATH_DCMTK "dcmtk/dcmdata/dcfilefo.h")
 	include_directories(${INCPATH_DCMTK})
 		
 	add_library(isisImageFormat_Dicom SHARED imageFormat_Dicom.cpp imageFormat_DicomParser.cpp)
-	target_link_libraries(isisImageFormat_Dicom ${LIB_DCMDATA} ${LIB_DCMIMGLE} ${LIB_OFSTD} ${LIB_Z} ${ISIS_DATA_LIBS})
+	target_link_libraries(isisImageFormat_Dicom ${LIB_DCMDATA} ${LIB_DCMIMGLE} ${LIB_OFSTD} ${LIB_Z} ${ISIS_DATA_LIBS} ${LIB_DCMIMAGE} ${LIB_TIFF} ${LIB_PNG})
 	
 	set_target_properties(isisImageFormat_Dicom PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PLUGIN_PATH})
 endif(IOPLUGIN_DICOM)

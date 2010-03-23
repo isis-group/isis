@@ -7,6 +7,7 @@ using namespace isis::util;
 int main(int argc, char *argv[])
 {
 	ENABLE_LOG(DataLog,DefaultMsgPrint,error);
+	ENABLE_LOG(isis::image_io::ImageIoLog,DefaultMsgPrint,error);
 	
 	int ret=0;
 	if(argc<3){

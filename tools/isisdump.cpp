@@ -9,13 +9,13 @@ using isis::util::DefaultMsgPrint;
 int main(int argc, char *argv[])
 {
 	
-/*	ENABLE_LOG(isis::image_io::ImageIoDebug,DefaultMsgPrint,info);
-	ENABLE_LOG(isis::image_io::ImageIoLog,DefaultMsgPrint,info);
-	ENABLE_LOG(CoreDebug,DefaultMsgPrint,info);
+// 	ENABLE_LOG(isis::image_io::ImageIoDebug,DefaultMsgPrint,info);
+	ENABLE_LOG(isis::image_io::ImageIoLog,DefaultMsgPrint,error);
+/*	ENABLE_LOG(CoreDebug,DefaultMsgPrint,info);
 	ENABLE_LOG(CoreLog,DefaultMsgPrint,info);
-	ENABLE_LOG(DataDebug,DefaultMsgPrint,warning);
-	ENABLE_LOG(DataLog,DefaultMsgPrint,warning);
-*/
+	ENABLE_LOG(DataDebug,DefaultMsgPrint,warning);*/
+	ENABLE_LOG(DataLog,DefaultMsgPrint,error);
+
 	
 	ImageList images=IOFactory::load(argv[1]);
 	unsigned short count1=0,count2=0;
@@ -27,10 +27,10 @@ int main(int argc, char *argv[])
 		std::cout << "======Image #" << ++count1 << ref->sizeToString() << "======Metadata======" << std::endl;
 		ref->print(std::cout,true);
 		for(Image::ChunkIterator c=ref->chunksBegin();c!=ref->chunksEnd();c++){
-			std::cout << "======Image #" <<count1 << "==Chunk #" << ++count2 << c->sizeToString() << "======Metadata======" << std::endl;
+			std::cout << "======Image #" <<count1 << "==Chunk #" << ++count2 << c->sizeToString() << c->typeName() << "======Metadata======" << std::endl;
 			c->print(std::cout,true);
 			if(dump.is_open()){
-				dump << "======Image #" <<count1 << "==Chunk #" << ++count2 << c->sizeToString() << "======Voxel Data======" << std::endl;
+				dump << "======Image #" <<count1 << "==Chunk #" << ++count2 << c->sizeToString() << c->typeName() << "======Voxel Data======" << std::endl;
 				dump << c->toString() << std::endl;
 			}
 		}

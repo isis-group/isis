@@ -3,6 +3,7 @@
 
 #include <dcmtk/dcmdata/dcdict.h>
 #include <dcmtk/dcmimgle/dcmimage.h>
+#include <dcmtk/dcmimage/diregist.h> //for color support
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace isis{ namespace image_io{
@@ -29,37 +30,74 @@ class DicomChunk : public data::Chunk{
 		data::Chunk(dat,del,width,height,1,1)
 	{
 		LOG(ImageIoDebug,util::verbose_info)
-		<< "Mapping greyscale pixeldata of " << del.m_filename << " at "
-		<< dat << " (" << util::TypePtr<TYPE>::staticName() << ")" ;
-		DcmDataset* dcdata=del.m_dcfile->getDataset();
-		util::PropMap &dcmMap = setProperty(ImageFormat_Dicom::dicomTagTreeName,util::PropMap());
-		ImageFormat_Dicom::dcmObject2PropMap(dcdata,dcmMap);
+			<< "Mapping greyscale pixeldata of " << del.m_filename << " at "
+			<< dat << " (" << util::TypePtr<TYPE>::staticName() << ")" ;
+	}
+	template<typename TYPE>
+	static data::Chunk* copyColor(TYPE* source,size_t width,size_t height){
+		data::Chunk *ret=new data::MemChunk<util::color<TYPE> >(width,height);
+		util::TypePtr<util::color<TYPE> > &dest=ret->asTypePtr<util::color<TYPE> >();
+		const size_t pixels = dest.len();
+		for(size_t i=0;i<pixels;i++){
+			util::color<TYPE> &dvoxel = dest[i];
+			dvoxel.r=source[i];
+			dvoxel.g=source[i+pixels];
+			dvoxel.b=source[i+2*pixels];
+		}
+		return ret;
 	}
 public:
-	static boost::shared_ptr<data::Chunk> makeSingleMonochrome(std::string filename,DcmFileFormat *dcfile){
+	static boost::shared_ptr<data::Chunk> makeChunk(std::string filename,DcmFileFormat *dcfile){
 		boost::shared_ptr<data::Chunk> ret;
 		
 		DicomImage *img=new DicomImage(dcfile,EXS_Unknown);
-		if(img->isMonochrome()){
-			Deleter del(dcfile,img,filename);
-			const DiPixel *pix=img->getInterData();
+		if(img->getStatus()==EIS_Normal){
+			const DiPixel *const  pix=img->getInterData();
 			const unsigned long width=img->getWidth(),height=img->getHeight();
-			if(pix)switch(pix->getRepresentation()){
-				case EPR_Uint8: ret.reset(new DicomChunk((uint8_t*) pix->getData(),del,width,height));break;
-				case EPR_Sint8: ret.reset(new DicomChunk((int8_t*)  pix->getData(),del,width,height));break;
-				case EPR_Uint16:ret.reset(new DicomChunk((uint16_t*)pix->getData(),del,width,height));break;
-				case EPR_Sint16:ret.reset(new DicomChunk((int16_t*) pix->getData(),del,width,height));break;
-				case EPR_Uint32:ret.reset(new DicomChunk((uint32_t*)pix->getData(),del,width,height));break;
-				case EPR_Sint32:ret.reset(new DicomChunk((int32_t*) pix->getData(),del,width,height));break;
+			const void * const data=pix->getData();
+			DcmDataset* dcdata=dcfile->getDataset();
+			if(pix){
+				if(img->isMonochrome()){ //try to load image directly from the raw monochrome dicom-data
+					Deleter del(dcfile,img,filename);
+					switch(pix->getRepresentation()){
+						case EPR_Uint8: ret.reset(new DicomChunk((uint8_t*) data,del,width,height));break;
+						case EPR_Sint8: ret.reset(new DicomChunk((int8_t*)  data,del,width,height));break;
+						case EPR_Uint16:ret.reset(new DicomChunk((uint16_t*)data,del,width,height));break;
+						case EPR_Sint16:ret.reset(new DicomChunk((int16_t*) data,del,width,height));break;
+						case EPR_Uint32:ret.reset(new DicomChunk((uint32_t*)data,del,width,height));break;
+						case EPR_Sint32:ret.reset(new DicomChunk((int32_t*) data,del,width,height));break;
+						default:
+							LOG(ImageIoLog,util::error)<< "Unsupported datatype for monochrome images"; //@todo tell the user which datatype it is
+					}
+					if(ret){
+						util::PropMap &dcmMap = ret->setProperty(ImageFormat_Dicom::dicomTagTreeName,util::PropMap());
+						ImageFormat_Dicom::dcmObject2PropMap(dcdata,dcmMap);
+						return ret;// get out of here - the source image must not be deleted if we created a chunk linked to it
+					}
+				} else if(pix->getPlanes()==3){ //try to load data as color image
+					switch(pix->getRepresentation()){
+						case EPR_Uint8: ret.reset(copyColor((Uint8* )data,width,height));break;
+						case EPR_Uint16:ret.reset(copyColor((Uint16*)data,width,height));break;
+						default:
+							LOG(ImageIoLog,util::error)<< "Unsupported datatype for color images"; //@todo tell the user which datatype it is
+					}
+					if(ret){
+						util::PropMap &dcmMap = ret->setProperty(ImageFormat_Dicom::dicomTagTreeName,util::PropMap());
+						ImageFormat_Dicom::dcmObject2PropMap(dcdata,dcmMap);
+					}
+				} else {
+					LOG(ImageIoLog,util::error)
+						<< util::MSubject(filename) << " doest not have a supported pixel type. Won't load it";
+				}
 			} else {
 				LOG(ImageIoLog,util::error)
-					<< "Didn't get any pixel data from " << util::MSubject(filename);
+				<< "Didn't get any pixel data from " << util::MSubject(filename);
 			}
-		} else {
-			LOG(ImageIoLog,util::error)
-				<< util::MSubject(filename) << " is not an monochrome image. Won't load it";
 			delete img;
+		} else {
+			LOG(ImageIoLog,util::error) << "Failed to load image from " << filename << " (" << DicomImage::getString(img->getStatus()) << ")";
 		}
+		delete dcfile;		
 		return ret;
 	}
 };
@@ -121,7 +159,7 @@ void ImageFormat_Dicom::sanitise(isis::util::PropMap& object, string dialect) {
 	// compute voxelSize and gap
 	{
 		util::fvector4 voxelSize(invalid_float,invalid_float,invalid_float,invalid_float);
-		if(hasOrTell(prefix+"PixelSpacing",object,util::error)){
+		if(hasOrTell(prefix+"PixelSpacing",object,util::warning)){
 			voxelSize = object[prefix+"PixelSpacing"]->as<util::fvector4>();
 			object.remove(prefix+"PixelSpacing");
 		}
@@ -149,7 +187,7 @@ void ImageFormat_Dicom::sanitise(isis::util::PropMap& object, string dialect) {
 	transformOrTell<std::string>   (prefix+"PerformingPhysiciansName","performingPhysician",object,util::info);
 	transformOrTell<u_int16_t>     (prefix+"NumberOfAverages",        "numberOfAverages",   object,util::warning);
 
-	if(hasOrTell(prefix+"ImageOrientationPatient",object,util::error)){
+	if(hasOrTell(prefix+"ImageOrientationPatient",object,util::info)){
 		util::dlist buff=object[prefix+"ImageOrientationPatient"]->as<util::dlist>();
 		if(buff.size()==6){
 			util::fvector4 read,phase;
@@ -162,10 +200,21 @@ void ImageFormat_Dicom::sanitise(isis::util::PropMap& object, string dialect) {
 		} else {
 			LOG(ImageIoLog,util::error) << "Could not extract read- and phaseVector from " << object[prefix+"ImageOrientationPatient"];
 		}
+	} else {
+		LOG(ImageIoLog,util::warning)<< "Making up read and phase vector, because the image lacks this information";
+		object.setProperty("readVec" ,util::fvector4(1,0,0));
+		object.setProperty("phaseVec",util::fvector4(0,1,0));
 	}
 
-	transformOrTell<util::fvector4>(prefix+"ImagePositionPatient",    "indexOrigin",        object,util::warning);
-	transformOrTell<u_int32_t>     (prefix+"InstanceNumber",          "acquisitionNumber",  object,util::error);
+	object.setProperty("indexOrigin",util::fvector4());
+	if(hasOrTell(prefix+"ImagePositionPatient",object,util::info))
+	{
+		object["indexOrigin"]=object.getPropertyValue(prefix+"ImagePositionPatient")->as<util::fvector4>();
+	}else{
+		object["indexOrigin"]=util::fvector4();
+		LOG(ImageIoLog,util::warning)<< "Making up indexOrigin, because the image lacks this information";
+	}
+	transformOrTell<u_int32_t>(prefix+"InstanceNumber","acquisitionNumber",object,util::error);
 
 	////////////////////////////////////////////////////////////////
 	// Do some sanity checks on redundant tags
@@ -258,22 +307,24 @@ int ImageFormat_Dicom::load(data::ChunkList &chunks, const std::string& filename
 	boost::shared_ptr<data::Chunk> chunk;
 	
 	DcmFileFormat *dcfile=new DcmFileFormat;
-	if(dcfile->loadFile(filename.c_str()).good() and (chunk =_internal::DicomChunk::makeSingleMonochrome(filename,dcfile))){
-		//we got a chunk from the file
-		sanitise(*chunk,"");
-		chunk->setProperty("source",filename);
-		const util::slist iType=chunk->getProperty<util::slist>(std::string(ImageFormat_Dicom::dicomTagTreeName)+"/"+"ImageType");
-		if(std::find(iType.begin(),iType.end(),"MOSAIC")!=iType.end()){ // if its a mosaic
-			LOG(ImageIoLog,util::verbose_info) << "This seems to be an mosaic image, will decompose it";
-			readMosaic(*chunk,chunks);
-		} else {
-			chunks.push_back(*chunk);
+	OFCondition loaded=dcfile->loadFile(filename.c_str());
+	if(loaded.good()){
+		if(chunk =_internal::DicomChunk::makeChunk(filename,dcfile)){
+			//we got a chunk from the file
+			sanitise(*chunk,"");
+			chunk->setProperty("source",filename);
+			const util::slist iType=chunk->getProperty<util::slist>(std::string(ImageFormat_Dicom::dicomTagTreeName)+"/"+"ImageType");
+			if(std::find(iType.begin(),iType.end(),"MOSAIC")!=iType.end()){ // if its a mosaic
+				LOG(ImageIoLog,util::verbose_info) << "This seems to be an mosaic image, will decompose it";
+				readMosaic(*chunk,chunks);
+			} else {
+				chunks.push_back(*chunk);
+			}
+			return 1;
 		}
-		return chunks.size();
 	} else {
-		delete dcfile;//no chunk was created, so we have to deal with the dcfile on our own
 		LOG(ImageIoLog,util::error)
-			<< "Failed to create a chunk from " << util::MSubject(filename);
+			<< "Failed to open file " << util::MSubject(filename) << ":" << loaded.text();
 	}
 	return 0;
 }
