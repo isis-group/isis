@@ -42,8 +42,12 @@ protected:
 		return new Type<TYPE>(*this);
 	}
 public:
-	static const int id = _internal::TypeId<TYPE>::value;
-	Type(){check_type<TYPE>();}
+	static const int staticID = _internal::TypeId<TYPE>::value;
+	BOOST_MPL_ASSERT_RELATION( staticID, <, 0xFF );
+	Type()
+	{
+		check_type<TYPE>();
+	}
 	/**
 	 * Create a Type from any type of value-type.
 	 * If the type of the parameter is not the same as the content type of the object, the system tries to do a type conversion.
@@ -65,7 +69,7 @@ public:
 		return staticName();
 	}
 	virtual unsigned short typeID()const{
-		return staticId();
+		return staticID;
 	}
 
 	/// \returns true if this and second contain the same value of the same type
@@ -77,13 +81,6 @@ public:
 			return  false;
 	}
 
-	/// \returns an unique id representing the type
-	static unsigned short staticId()
-	{
-		// make sure the typeId won't run into the id-range of the TypePtr
-		BOOST_MPL_ASSERT_RELATION( id, <, 0xFF );
-		return id;
-	}
 	/// \returns the name of the type
 	static std::string staticName(){return m_typeName;}
 	
@@ -123,7 +120,7 @@ protected:
 		return new TypePtr(*this);
 	}
 public:
-	static const int id = _internal::TypeId<TYPE>::value << 8;
+	static const int staticID = _internal::TypeId<TYPE>::value << 8;
 	/// Proxy-Deleter to encapsulate the real deleter/shared_ptr when creating shared_ptr for parts of a shared_ptr
 	class DelProxy : public boost::shared_ptr<TYPE>{
 	public:
@@ -254,12 +251,7 @@ public:
 	}
 	/// @copydoc Type::typeID()
 	virtual unsigned short typeID()const{
-		return staticId();
-	}
-	/// @copydoc Type::staticId()
-	static unsigned short staticId()
-	{
-		return id;
+		return staticID;
 	}
 	/// @copydoc Type::staticName()
 	static std::string staticName()

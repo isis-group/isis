@@ -221,7 +221,7 @@ template<typename SRC> struct inner_add {
 		boost::shared_ptr<TypeConverterBase> conv=
 			TypeConverter<is_num::value,is_same::value,SRC,DST>::create();
 		//and insert it into the to-conversion-map of SRC
-		m_subMap.insert(m_subMap.end(),std::make_pair(Type<DST>::staticId(),conv));
+		m_subMap.insert(m_subMap.end(),std::make_pair(Type<DST>::staticID,conv));
 	}
 };
 
@@ -231,7 +231,7 @@ struct outer_add {
 	outer_add(std::map< int ,std::map<int, boost::shared_ptr<TypeConverterBase> > > &map):m_map(map){}
 	template<typename SRC> void operator()(SRC){//will be called by the mpl::for_each in TypeConverterMap() for any SRC out of "types"
 		boost::mpl::for_each<types>(// create a functor for from-SRC-conversion and call its ()-operator for any DST out of "types"
-			inner_add<SRC>(m_map[Type<SRC>::staticId()])
+			inner_add<SRC>(m_map[Type<SRC>().typeID()])
 		);
 	}
 };

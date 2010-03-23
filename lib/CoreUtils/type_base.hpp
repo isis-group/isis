@@ -48,7 +48,7 @@ template<typename TYPE> TYPE __cast_to(Type<TYPE> *dest,const TYPE& value){
 class GenericType{
 protected:
 	template<typename T> const T m_cast_to(T defaultVal) const{
-		if (typeID() == T::staticId()) { // ok its exactly the same type - no fiddling necessary
+		if (typeID()==T::staticID) { // ok its exactly the same type - no fiddling necessary
 			return *reinterpret_cast<const T*>(this);
 		} else {			
 			const T* const ret=dynamic_cast<const T* >(this);
@@ -63,7 +63,7 @@ protected:
 		}
 	}
 	template<typename T> T& m_cast_to() throw(std::invalid_argument){
-		if (typeID() == T::staticId()) { // ok its exactly the same type - no fiddling necessary
+		if (typeID()==T::staticID) { // ok its exactly the same type - no fiddling necessary
 			return *reinterpret_cast<T*>(this);
 		} else {
 			T* const ret=dynamic_cast<T* >(this); //@todo have a look at http://lists.apple.com/archives/Xcode-users/2005/Dec/msg00061.html and http://www.mailinglistarchive.com/xcode-users@lists.apple.com/msg15790.html
@@ -187,13 +187,13 @@ public:
 	* \return value of any requested type parsed from toString(false).
 	*/
 	template<class T> T as()const{
-		if(typeID()==Type<T>::staticId()){
+		if(typeID()==Type<T>::staticID){
 			LOG(CoreDebug,verbose_info)
 			<< "Doing reinterpret_cast instead of useless conversion from " << toString(true)
 			<< " to " << Type<T>::staticName();
 			return *reinterpret_cast<const Type<T>*>(this);
 		} else {
-			Converter conv=getConverterTo(Type<T>::staticId());
+			Converter conv=getConverterTo(Type<T>::staticID);
 			if(conv){
 				Type<T> ret;
 				conv->convert(*this,ret);
@@ -286,7 +286,7 @@ public:
 	
 	template<typename T> void getMinMax(T &min,T &max)const
 	{
-		LOG_IF(TypePtr<T>::staticId() != this->typeID(), CoreDebug,error) << "Given type of min/max" 
+		LOG_IF(TypePtr<T>::staticID != this->typeID(), CoreDebug,error) << "Given type of min/max" 
 		<< Type<T>::staticName() 
 		<< " does not fit type of the data (" << typeName() << ")";
 		const TypePtr<T> &me=this->cast_to_TypePtr<T>();

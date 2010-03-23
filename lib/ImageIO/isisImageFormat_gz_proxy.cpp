@@ -161,7 +161,6 @@ public:
 		
 	}
 	bool tainted(){return false;}//internal plugins are not tainted
-	size_t maxDim(){return 4;}
 };
 }}
 isis::image_io::FileFormat* factory(){

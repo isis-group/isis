@@ -65,7 +65,6 @@ public:
 	bool write(const data::Image &image,const std::string& filename,const std::string& dialect );
 
 	bool tainted();
-	size_t maxDim();
     void readMosaic(const data::Chunk& source, data::ChunkList &dest);
 };
 }}

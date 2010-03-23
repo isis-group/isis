@@ -110,7 +110,7 @@ public:
 			PropertyValue dst;
 			LOG(CoreDebug,info)
 				<< *this << " is not " << Type<T>::staticName() << " trying to convert.";
-			if(transformTo(dst,Type<T>::staticId()))
+			if(transformTo(dst,Type<T>::staticID))
 				return dst==second;
 			else
 				LOG(CoreLog,error)

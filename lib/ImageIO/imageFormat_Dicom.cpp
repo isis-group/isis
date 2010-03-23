@@ -337,7 +337,6 @@ bool ImageFormat_Dicom::write(const data::Image &image,const std::string& filena
 }
 	
 bool ImageFormat_Dicom::tainted(){return false;}//internal plugins are not tainted
-size_t ImageFormat_Dicom::maxDim(){return 2;}
 }}
 
 isis::image_io::FileFormat* factory(){

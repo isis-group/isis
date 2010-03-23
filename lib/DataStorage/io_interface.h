@@ -47,7 +47,6 @@ public:
 	virtual std::string name()=0;
 	virtual std::string suffixes()=0;
 	virtual std::string dialects(){return std::string();};
-	virtual size_t maxDim()=0;
 	virtual bool tainted(){return true;}
 	virtual int load(data::ChunkList &chunks,const std::string& filename,const std::string& dialect)=0;
 	virtual bool write(const data::Image &image,const std::string& filename,const std::string& dialect)=0;
