@@ -49,5 +49,6 @@ if(IOPLUGIN_DICOM)
 	set_target_properties(isisImageFormat_Dicom PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PLUGIN_PATH})
 endif(IOPLUGIN_DICOM)
 	
+
 message(STATUS "Installing plugins to ${PLUGIN_PATH}")
 

@@ -18,6 +18,7 @@ OPTION(BUILD_COREUTILS "Build the isis coreutils" ON)
 OPTION(BUILD_DATA_IO "Build the isis data and io modules" ON)
 
 OPTION(HAVE_ITK "Enable ITK-support" OFF)
+OPTION(HAVE_VTK "Enable VTK-support" OFF)
 
 OPTION(RUNTIME_LOG "Enable runtime logging" ON)
 OPTION(DEBUG_LOG "Enable debug logging" ON)
@@ -91,6 +92,10 @@ endif(SVN_REVISION)
 IF(HAVE_ITK)
 	FIND_PACKAGE(ITK REQUIRED)
 ENDIF(HAVE_ITK)
+
+IF(HAVE_VTK)
+	FIND_PACKAGE(VTK REQUIRED)
+ENDIF(HAVE_VTK)
 
 ###############################################################################
 #Subdirs

@@ -27,4 +27,4 @@ IF(HAVE_ITK)
 	 add_subdirectory(extITK)
 ENDIF(HAVE_ITK)
 
-# add_subdirectory(ExternalLibraryAdapter)
+add_subdirectory(ExternalLibraryAdapter)
