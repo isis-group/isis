@@ -27,12 +27,10 @@ struct pluginDeleter{
 	std::string m_pluginName;
 	pluginDeleter(void *dlHandle,std::string pluginName):m_dlHandle(dlHandle),m_pluginName(pluginName){}
 	void operator()(image_io::FileFormat *format){
-		LOG(Debug,info) << "Releasing plugin " << m_pluginName << " (was loaded at " << m_dlHandle << ")";
 		delete format;
-		// @todo closing an plugin may break the deletion of the singletons created in there
-/*		if(dlclose(m_dlHandle)!=0) 
-			LOG(Runtime,warning)
-				<< "Failed to release plugin " << m_pluginName << " (was loaded at " << m_dlHandle << ")";*/
+		if(dlclose(m_dlHandle)!=0) 
+			std::cerr << "Failed to release plugin " << m_pluginName << " (was loaded at " << m_dlHandle << ")"; 
+			//we cannot use LOG here, because the loggers are gone allready
 	}
 };
 }
@@ -112,7 +110,7 @@ std::list<std::string> IOFactory::getSuffixes(const FileFormatPtr& reader)
 
 IOFactory& IOFactory::get()
 {
-	return *util::Singletons::get<IOFactory,0>();
+	return *util::Singletons::get<IOFactory,INT_MAX>();
 }
 
 int IOFactory::loadFile(ChunkList &ret,const boost::filesystem::path& filename, const std::string& dialect)
@@ -121,14 +119,12 @@ int IOFactory::loadFile(ChunkList &ret,const boost::filesystem::path& filename, 
 	
 	if (false == boost::filesystem::exists(filename))//file to open does not exist
 	{
-		LOG(Runtime, error)
-				<< "File does not exist at given place: " << filename;
+		LOG(Runtime, error)<< "File does not exist at given place: " << filename;
 		return 0;
 	}
 
 	if(true == formatReader.empty()){//no suitable plugin for this file type and dialect
-		LOG(Runtime,error)
-				<< "Missing plugin to open file: " << filename << (dialect.empty()? "":std::string(" with dialect: ") + dialect);
+		LOG(Runtime,error)<< "Missing plugin to open file: " << filename << (dialect.empty()? "":std::string(" with dialect: ") + dialect);
 		return 0;
 	}
 
