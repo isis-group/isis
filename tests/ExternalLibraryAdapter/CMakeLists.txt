@@ -1,0 +1,3 @@
+
+add_executable(vtkAdapterTest vtkAdapterTest.cpp)
+target_link_libraries(vtkAdapterTest data vtkAdapter vtkIO)
