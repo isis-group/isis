@@ -39,18 +39,24 @@
 //external includes 
 #include "boost/smart_ptr.hpp"
 
-namespace isis {
+namespace isis { namespace adapter {
     
     
 class VTKAdapter : public vtkImageData {
-    
+       
 public:
     //copy constructor for one isis image
     VTKAdapter(const boost::shared_ptr<isis::data::Image>);
+    //copy constructor for isis image list
     VTKAdapter(const isis::data::ImageList&);
     
+private:
+  
+    util::fvector4 dimensions;
+   
+	
 };
   
     
-} // end namespace isis
+}}// end namespace 
 #endif //VTKADAPTER_HPP_

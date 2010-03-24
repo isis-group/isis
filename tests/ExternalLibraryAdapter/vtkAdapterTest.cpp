@@ -20,11 +20,12 @@ namespace isis{namespace test{
 		ENABLE_LOG(isis::ImageIoLog,isis::util::DefaultMsgPrint,isis::info);
 
 		//load an image and store it into the vtkAdapter
-		isis::data::ImageList imgList = isis::data::IOFactory::load("/scr/feige1/tmp/data.nii", "");
+		data::ImageList imgList = isis::data::IOFactory::load("/scr/feige1/tmp/data.nii", "");
+		BOOST_CHECK(not imgList.empty());
 		//forward the first image of the list as a single image
-		isis::VTKAdapter vtkimg(imgList.front());
+		adapter::VTKAdapter vtkimg(imgList.front());
 		//forward the whole imagelist
-		isis::VTKAdapter vtkimgList(imgList);
+		adapter::VTKAdapter vtkimgList(imgList);
 			
 	}
 }}//end namespace 
