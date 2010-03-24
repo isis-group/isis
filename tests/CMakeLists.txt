@@ -19,3 +19,6 @@ IF(HAVE_VTK)
     include(${VTK_USE_FILE})
     add_subdirectory(ExternalLibraryAdapter)
 ENDIF(HAVE_VTK)
+
+add_executable(test_logger test_logger.cpp)
+target_link_libraries(test_logger utils ${Boost_LIBRARIES})

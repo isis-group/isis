@@ -97,7 +97,7 @@ public:
 	 * - stored/converted value is equal to the given value
 	 * \warning because of rounding in the conversion the following will be true.
 	 * \code PropertyValue(4.5)==5 \endcode
-	 * If CoreDebug is enabled and its loglevel is at least warning, a message will be send to the logger.
+	 * If Debug is enabled and its loglevel is at least warning, a message will be send to the logger.
 	 * \returns (this->cast_to_type\<T\>() == second) if the property contains a value of type T.
 	 * \returns converted_property == second if its convertible
 	 * \return false otherwise
@@ -108,12 +108,12 @@ public:
 			return second == cmp;
 		} else if(not empty()){
 			PropertyValue dst;
-			LOG(CoreDebug,info)
+			LOG(Debug,info)
 				<< *this << " is not " << Type<T>::staticName() << " trying to convert.";
 			if(transformTo(dst,Type<T>::staticID))
 				return dst==second;
 			else
-				LOG(CoreLog,error)
+				LOG(Runtime,error)
 				<< "Conversion of " << *this << " to " << Type<T>::staticName() << " failed.";
 		} 
 		return false;

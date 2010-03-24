@@ -22,6 +22,7 @@
 
 #include "types.hpp"
 #include "converter.hpp"
+#include "common.hpp"
 
 
 /*! \addtogroup util
@@ -55,7 +56,7 @@ protected:
 			if(ret){
 				return *ret;
 			} else {
-				LOG(CoreDebug,error) 
+				LOG(Debug,error) 
 					<< "Cannot cast " << typeName() << " to " << T::staticName()
 					<< ". Returning \"" << defaultVal.toString() << "\".";
 				return defaultVal;
@@ -188,7 +189,7 @@ public:
 	*/
 	template<class T> T as()const{
 		if(typeID()==Type<T>::staticID){
-			LOG(CoreDebug,verbose_info)
+			LOG(Debug,verbose_info)
 			<< "Doing reinterpret_cast instead of useless conversion from " << toString(true)
 			<< " to " << Type<T>::staticName();
 			return *reinterpret_cast<const Type<T>*>(this);
@@ -199,7 +200,7 @@ public:
 				conv->convert(*this,ret);
 				return ret;
 			} else {
-				LOG(CoreLog,error)
+				LOG(Runtime,error)
 					<< "I dont know any conversion from " << MSubject(toString(true)) << " to "
 					<< MSubject(Type<T>::staticName()) << " returning " << Type<T>();
 				return Type<T>();
@@ -286,7 +287,7 @@ public:
 	
 	template<typename T> void getMinMax(T &min,T &max)const
 	{
-		LOG_IF(TypePtr<T>::staticID != this->typeID(), CoreDebug,error) << "Given type of min/max" 
+		LOG_IF(TypePtr<T>::staticID != this->typeID(), Debug,error) << "Given type of min/max" 
 		<< Type<T>::staticName() 
 		<< " does not fit type of the data (" << typeName() << ")";
 		const TypePtr<T> &me=this->cast_to_TypePtr<T>();

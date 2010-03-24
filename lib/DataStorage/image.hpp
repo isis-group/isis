@@ -54,19 +54,19 @@ private:
 	 * - the image is empty
 	 * - the coordinates are not in the image
 	 *
-	 * Additionally an error will be sent if DataDebug is enabled.
+	 * Additionally an error will be sent if Debug is enabled.
 	 * \returns a std::pair\<chunk-index,voxel-index\>
 	 */
 	inline std::pair<size_t,size_t> commonGet (size_t first,size_t second,size_t third,size_t fourth) const
 	{
 		const size_t idx[]={first,second,third,fourth};
-		LOG_IF(not clean,DataDebug,util::error)
+		LOG_IF(not clean,Debug,error)
 			<< "Getting data from a non indexed image will result in undefined behavior. Run reIndex first.";
 			
-		LOG_IF(set.empty(),DataDebug,util::error)
+		LOG_IF(set.empty(),Debug,error)
 			<< "Getting data from a empty image will result in undefined behavior.";
 			
-		LOG_IF(!rangeCheck(idx),DataDebug,isis::util::error)
+		LOG_IF(!rangeCheck(idx),Debug,isis::error)
 			<< "Index " << util::list2string(idx,idx+4,"|") << " is out of range (" << sizeToString() << ")";
 		
 		const size_t index=dim2Index(idx);
@@ -128,7 +128,7 @@ public:
 	template <typename T> T& voxel(size_t first,size_t second=0,size_t third=0,size_t fourth=0)
 	{
 		if(not clean){
-			LOG(DataDebug,util::info) << "Image is not clean. Running reIndex ...";
+			LOG(Debug,info) << "Image is not clean. Running reIndex ...";
 			reIndex();
 		}
 		

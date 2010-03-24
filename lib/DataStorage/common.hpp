@@ -13,6 +13,9 @@
 #ifndef DATA_COMMON_HPP
 #define DATA_COMMON_HPP
 
+#include "CoreUtils/log_modules.hpp"
+#include "CoreUtils/log.hpp"
+
 namespace isis{ 
 
 /*! \addtogroup data
@@ -21,11 +24,14 @@ namespace isis{
  */
 
 namespace data{
-/// @cond _hidden
-	struct DataLog{static const char* name(){return "Data";};enum {use = _ENABLE_DATA_LOG};};
-	struct DataDebug{static const char* name(){return "Data";};enum {use= _ENABLE_DATA_DEBUG};};
-/// @endcond
+	typedef DataLog Runtime;
+	typedef DataDebug Debug;
 	enum dimensions{readDim=0,phaseDim,sliceDim,timeDim};
+
+	template<typename HANDLE> void enable_log(LogLevel level){
+		ENABLE_LOG(Runtime,HANDLE,level);
+		ENABLE_LOG(Debug,HANDLE,level);
+	}
 }
 /** @} */
 }

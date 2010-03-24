@@ -13,8 +13,7 @@
 #ifndef VECTOR_HPP
 #define VECTOR_HPP
 
-#include "CoreUtils/log.hpp"
-// #include "CoreUtils/type.hpp"
+#include "CoreUtils/common.hpp"
 #include <algorithm>
 #include <ostream>
 #include <strings.h>
@@ -100,12 +99,12 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////
 	TYPE operator [](size_t idx)const 
 	{
-		LOG_IF(idx>=SIZE,CoreDebug,error) << "Index " << idx << " exceeds the size of the vector (" << SIZE << ")";
+		LOG_IF(idx>=SIZE,Debug,error) << "Index " << idx << " exceeds the size of the vector (" << SIZE << ")";
 		return CONTAINER::begin()[idx];
 	}
 	TYPE& operator [](size_t idx)
 	{
-		LOG_IF(idx>=SIZE,CoreDebug,error) << "Index " << idx << " exceeds the size of the vector (" << SIZE << ")";
+		LOG_IF(idx>=SIZE,Debug,error) << "Index " << idx << " exceeds the size of the vector (" << SIZE << ")";
 		return CONTAINER::begin()[idx];
 	}
 
@@ -240,7 +239,7 @@ public:
 	/// copy the elements to somthing designed after the output iterator model
 	template<class InputIterator> void copyFrom(InputIterator start,InputIterator end)
 	{
-		LOG_IF(std::distance(start,end)>SIZE,CoreLog,error)
+		LOG_IF(std::distance(start,end)>SIZE,Runtime,error)
 			<< "Copying " << std::distance(start,end) << " Elements into a vector of the size " << SIZE;
 		std::copy(start,end,CONTAINER::begin());
 	}

@@ -68,7 +68,7 @@ public:
 	 */
 	template<typename TYPE> TYPE &voxel(size_t firstDim,size_t secondDim=0,size_t thirdDim=0,size_t fourthDim=0){
 		const size_t idx[]={firstDim,secondDim,thirdDim,fourthDim};
-		LOG_IF(not rangeCheck(idx),DataDebug,isis::util::error)
+		LOG_IF(not rangeCheck(idx),Debug,isis::error)
 			<< "Index " << util::ivector4(firstDim,secondDim,thirdDim,fourthDim)
 			<< " is out of range " << sizeToString();
 		util::TypePtr<TYPE> &ret=asTypePtr<TYPE>();
@@ -81,7 +81,7 @@ public:
 	template<typename TYPE> TYPE voxel(size_t firstDim,size_t secondDim=0,size_t thirdDim=0,size_t fourthDim=0)const{
 		const size_t idx[]={firstDim,secondDim,thirdDim,fourthDim};
 		if(!rangeCheck(idx)){
-			LOG(DataDebug,isis::util::error)
+			LOG(Debug,isis::error)
 			<< "Index " << firstDim << "|" << secondDim << "|" << thirdDim << "|" << fourthDim
 			<< " is out of range (" << sizeToString() << ")";
 		}

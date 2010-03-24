@@ -22,7 +22,7 @@ ChunkBase::ChunkBase ( size_t firstDim, size_t secondDim, size_t thirdDim, size_
 	init(idx);
 	addNeededFromString(needed);
 	if(!NDimensional<4>::volume())
-		LOG(DataLog,util::error)
+		LOG(Runtime,error)
 		<< "Size " << fourthDim << "|" << thirdDim << "|" << secondDim << "|" << firstDim << " is invalid";
 }
 
@@ -84,16 +84,16 @@ void Chunk::copySlice(size_t thirdDimS, size_t fourthDimS, Chunk& dst, size_t th
 
 void Chunk::copyRange(const size_t source_start[], const size_t source_end[], Chunk& dst,const size_t destination[]) const
 {
-	LOG_IF(not rangeCheck(source_start),DataDebug,isis::util::error) 
+	LOG_IF(not rangeCheck(source_start),Debug,isis::error) 
 		<< "Copy start " << util::FixedVector<size_t,4>(source_start)
 		<< " is out of range (" << sizeToString() << ") at the source chunk";
-	LOG_IF(not rangeCheck(source_end),DataDebug,isis::util::error) 
+	LOG_IF(not rangeCheck(source_end),Debug,isis::error) 
 		<< "Copy end " << util::FixedVector<size_t,4>(source_end)
 		<< " is out of range (" << sizeToString() << ") at the source chunk";
-	LOG_IF(not dst.rangeCheck(destination),DataDebug,isis::util::error)
+	LOG_IF(not dst.rangeCheck(destination),Debug,isis::error)
 		<< "Index " << util::FixedVector<size_t,4>(destination)
 		<< " is out of range (" << sizeToString() << ") at the destination chunk";
-	LOG(DataDebug,isis::util::verbose_info) 
+	LOG(Debug,isis::verbose_info) 
 		<< "Copying range from " << util::FixedVector<size_t,4>(source_start) << " to " << util::FixedVector<size_t,4>(source_end) 
 		<< " to " << util::FixedVector<size_t,4>(destination);
 	const size_t sstart=dim2Index(source_start);
@@ -108,16 +108,16 @@ size_t Chunk::cmpRange(size_t start, size_t end, const isis::data::Chunk& dst, s
 }
 size_t Chunk::cmpRange(const size_t source_start[], const size_t source_end[],const Chunk& dst,const size_t destination[]) const
 {
-	LOG_IF(not rangeCheck(source_start),DataDebug,isis::util::error)
+	LOG_IF(not rangeCheck(source_start),Debug,isis::error)
 		<< "memcmp start " << util::FixedVector<size_t,4>(source_start)
 		<< " is out of range (" << sizeToString() << ") at the first chunk";
-	LOG_IF(not rangeCheck(source_end),DataDebug,isis::util::error)
+	LOG_IF(not rangeCheck(source_end),Debug,isis::error)
 		<< "memcmp end " << util::FixedVector<size_t,4>(source_end)
 		<< " is out of range (" << sizeToString() << ") at the first chunk";
-	LOG_IF(not dst.rangeCheck(destination),DataDebug,isis::util::error)
+	LOG_IF(not dst.rangeCheck(destination),Debug,isis::error)
 		<< "Index " << util::FixedVector<size_t,4>(destination)
 		<< " is out of range (" << sizeToString() << ") at the second chunk";
-	LOG(DataDebug,isis::util::verbose_info)
+	LOG(Debug,isis::verbose_info)
 		<< "Comparing range from " << util::FixedVector<size_t,4>(source_start) << " to " << util::FixedVector<size_t,4>(source_end)
 		<< " and " << util::FixedVector<size_t,4>(destination);
 	const size_t sstart=dim2Index(source_start);
@@ -143,7 +143,7 @@ size_t Chunk::cmpSlice(size_t thirdDimS, size_t fourthDimS,const Chunk& dst, siz
 
 util::fvector4 Chunk::getFoV()const
 {
-	LOG_IF(not hasProperty("voxelSize"),DataDebug,util::error) << "Property voxelSize is missing in chunk, cannot compute FOV";
+	LOG_IF(not hasProperty("voxelSize"),Debug,error) << "Property voxelSize is missing in chunk, cannot compute FOV";
 	const util::fvector4 voxelSize=getProperty<util::fvector4>("voxelSize");
 	return getFoV(voxelSize);
 }

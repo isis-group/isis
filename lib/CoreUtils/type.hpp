@@ -43,9 +43,9 @@ protected:
 	}
 public:
 	static const int staticID = _internal::TypeId<TYPE>::value;
-	BOOST_MPL_ASSERT_RELATION( staticID, <, 0xFF );
 	Type()
 	{
+		BOOST_MPL_ASSERT_RELATION( staticID, <, 0xFF );
 		check_type<TYPE>();
 	}
 	/**
@@ -55,6 +55,7 @@ public:
 	 */
 	template<typename T> Type(const T& value):m_val(__cast_to(this,value))
 	{
+		BOOST_MPL_ASSERT_RELATION( staticID, <, 0xFF );
 		check_type<TYPE>();
 	}
 	virtual bool is(const std::type_info & t)const{
@@ -130,11 +131,11 @@ public:
 		 * master from being deleted while parts of it are still in use.
 		 */
 		DelProxy(const TypePtr<TYPE> &master): boost::shared_ptr<TYPE>(master){
-			LOG(CoreDebug,util::verbose_info) << "Creating DelProxy for " << this->get();
+			LOG(Debug,verbose_info) << "Creating DelProxy for " << this->get();
 		}
 		/// decrement the use_count of the master when a specific part is not referenced anymore
 		void operator()(TYPE *at){
-			LOG(CoreDebug,util::verbose_info)
+			LOG(Debug,verbose_info)
 			<< "Deletion for " << this->get() << " called from splice at offset "	<< at-this->get()
 			<< ", current use_count: " << this->use_count();
 			this->reset();//actually not needed, but we keep it here to keep obfuscation low
@@ -143,14 +144,14 @@ public:
 	/// Default delete-functor for c-arrays (uses free()).
 	struct BasicDeleter{
 		void operator()(TYPE *p){
-			LOG(CoreDebug,info) << "Freeing pointer " << p << " (" << TypePtr<TYPE>::staticName() << ") ";
+			LOG(Debug,info) << "Freeing pointer " << p << " (" << TypePtr<TYPE>::staticName() << ") ";
 			free(p);
 		};
 	};
 	/// Default delete-functor for arrays of objects (uses delete[]).
 	struct ObjectArrayDeleter{
 		void operator()(TYPE *p){
-			LOG(CoreDebug,info) << "Deleting object array at " << p << " (" << TypePtr<TYPE>::staticName() << ") ";
+			LOG(Debug,info) << "Deleting object array at " << p << " (" << TypePtr<TYPE>::staticName() << ") ";
 			delete[] p;
 		};
 	};
@@ -189,18 +190,18 @@ public:
 	void copyFromMem(size_t start,size_t end,const TYPE* const src){
 		assert(start<=end);
 		const size_t length=end-start;
-		LOG_IF(end>=len(),CoreLog,error)
+		LOG_IF(end>=len(),Runtime,error)
 			<< "End of the range ("<< end << ") is behind the end of this TypePtr ("<< len() << ")";
 
 		TYPE &dest= this->operator[](start);
-		LOG(CoreDebug,info) << "Copying " << length*sizeof(TYPE) << " bytes of " << typeName() << " from "<< src << " to " << &dest;
+		LOG(Debug,info) << "Copying " << length*sizeof(TYPE) << " bytes of " << typeName() << " from "<< src << " to " << &dest;
 		
 		memcpy(&dest,src,length*sizeof(TYPE));
 	}
 	void copyToMem(size_t start,size_t end,const TYPE* const dst)const{
 		assert(start<=end);
 		const size_t length=end-start;
-		LOG_IF(end>=len(),CoreLog,error)
+		LOG_IF(end>=len(),Runtime,error)
 		<< "End of the range ("<< end << ") is behind the end of this TypePtr ("<< len() << ")";
 		
 		const TYPE &source= this->operator[](start);
@@ -211,18 +212,18 @@ public:
 		size_t ret=0;
 		size_t length=end-start;
 		if(dst.typeID()!=typeID()){
-			LOG(CoreLog,error)
+			LOG(Runtime,error)
 				<< "Comparing to a TypePtr of different type(" << dst.typeName() << ", not " << typeName()
 				<< "). Assuming all voxels to be different";
 				return length;
 		}
-		LOG_IF(end>=len(),CoreLog,error)
+		LOG_IF(end>=len(),Runtime,error)
 		<< "End of the range ("<< end << ") is behind the end of this TypePtr ("<< len() << ")";
-		LOG_IF(length+dst_start>=dst.len(),CoreLog,error)
+		LOG_IF(length+dst_start>=dst.len(),Runtime,error)
 		<< "End of the range ("<< length+dst_start << ") is behind the end of the destination ("<< dst.len() << ")";
 
 		const TypePtr<TYPE> &compare = dst.cast_to_TypePtr<TYPE>();
-		LOG(CoreDebug,verbose_info) << "Comparing " << dst.typeName() << " at " << &operator[](0) << " and " << &compare[0];
+		LOG(Debug,verbose_info) << "Comparing " << dst.typeName() << " at " << &operator[](0) << " and " << &compare[0];
 		for(size_t i=start;i<end;i++){
 			if(operator[](i)!=compare[i])
 				ret++;
@@ -287,7 +288,7 @@ public:
 	}
 	std::vector<Reference> splice(size_t size)const{
 		if(size>=len()){
-			LOG(CoreDebug,warning)
+			LOG(Debug,warning)
 				<< "splicing data of the size " << len() << " up into blocks of the size " << size << " is kind of useless ...";
 		}
 		const size_t fullSplices=len()/size;

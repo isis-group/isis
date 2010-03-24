@@ -12,12 +12,12 @@ namespace isis{namespace test{
 	BOOST_AUTO_TEST_CASE (VTKAdapterTest)
 	{
 
-		ENABLE_LOG(util::CoreLog,util::DefaultMsgPrint,util::warning);
-		ENABLE_LOG(util::CoreDebug,util::DefaultMsgPrint,util::warning);
-		ENABLE_LOG(data::DataLog,util::DefaultMsgPrint,util::warning);
-		ENABLE_LOG(data::DataDebug,util::DefaultMsgPrint,util::warning);
-		ENABLE_LOG(isis::image_io::ImageIoDebug,isis::util::DefaultMsgPrint,isis::util::info);
-		ENABLE_LOG(isis::image_io::ImageIoLog,isis::util::DefaultMsgPrint,isis::util::info);
+		ENABLE_LOG(CoreLog,util::DefaultMsgPrint,warning);
+		ENABLE_LOG(CoreDebug,util::DefaultMsgPrint,warning);
+		ENABLE_LOG(DataLog,util::DefaultMsgPrint,warning);
+		ENABLE_LOG(DataDebug,util::DefaultMsgPrint,warning);
+		ENABLE_LOG(isis::ImageIoDebug,isis::util::DefaultMsgPrint,isis::info);
+		ENABLE_LOG(isis::ImageIoLog,isis::util::DefaultMsgPrint,isis::info);
 
 		//load an image and store it into the vtkAdapter
 		isis::data::ImageList imgList = isis::data::IOFactory::load("/scr/feige1/tmp/data.nii", "");

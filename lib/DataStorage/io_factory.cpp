@@ -27,11 +27,11 @@ struct pluginDeleter{
 	std::string m_pluginName;
 	pluginDeleter(void *dlHandle,std::string pluginName):m_dlHandle(dlHandle),m_pluginName(pluginName){}
 	void operator()(image_io::FileFormat *format){
-		LOG(DataDebug,util::info) << "Releasing plugin " << m_pluginName << " (was loaded at " << m_dlHandle << ")";
+		LOG(Debug,info) << "Releasing plugin " << m_pluginName << " (was loaded at " << m_dlHandle << ")";
 		delete format;
 		// @todo closing an plugin may break the deletion of the singletons created in there
 /*		if(dlclose(m_dlHandle)!=0) 
-			LOG(DataLog,util::warning)
+			LOG(Runtime,warning)
 				<< "Failed to release plugin " << m_pluginName << " (was loaded at " << m_dlHandle << ")";*/
 	}
 };
@@ -48,7 +48,7 @@ bool IOFactory::registerFormat(const FileFormatPtr plugin)
 
 	io_formats.push_back(plugin);
 	std::list<std::string> suffixes=getSuffixes(plugin);
-	LOG(DataLog,util::info)
+	LOG(Runtime,info)
 		<< "Registering " << (plugin->tainted() ? "tainted " :"") << "io-plugin "
 		<< util::MSubject(plugin->name())
 		<< " with " << suffixes.size() << " supported suffixes";
@@ -63,15 +63,15 @@ unsigned int IOFactory::findPlugins(const std::string& path)
 {
 	boost::filesystem::path p(path);
 	if (!exists(p)){
-		LOG(DataLog,util::warning) << util::MSubject(p.native_file_string()) << " not found";
+		LOG(Runtime,warning) << util::MSubject(p.native_file_string()) << " not found";
 		return 0;
 	}
 	if(!boost::filesystem::is_directory(p)){
-		LOG(DataLog,util::warning) << util::MSubject(p.native_file_string()) << " is no directory";
+		LOG(Runtime,warning) << util::MSubject(p.native_file_string()) << " is no directory";
 		return 0;
 	}
 
-	LOG(DataLog,util::info)	<< "Scanning " << util::MSubject(p)	<< " for plugins";
+	LOG(Runtime,info)	<< "Scanning " << util::MSubject(p)	<< " for plugins";
 	boost::regex pluginFilter(std::string("^")+DL_PREFIX+"isisImageFormat_"+"[[:word:]]+"+DL_SUFFIX+"$");
 	unsigned int ret=0;
 	for (boost::filesystem::directory_iterator itr(p); itr!=boost::filesystem::directory_iterator(); ++itr)	{
@@ -86,18 +86,18 @@ unsigned int IOFactory::findPlugins(const std::string& path)
 					if(registerFormat(io_class))
 						ret++;
 					else
-						LOG(DataLog,util::error) << "failed to register plugin " << util::MSubject(pluginName);
+						LOG(Runtime,error) << "failed to register plugin " << util::MSubject(pluginName);
 					  
 				} else {
-					LOG(DataLog,util::error)
+					LOG(Runtime,error)
 						<< "could not get format factory function: " << util::MSubject(dlerror());
 					dlclose(handle);
 				}
 			} else
-				LOG(DataLog,util::error)
+				LOG(Runtime,error)
 					<< "Could not load library: " << util::MSubject(dlerror());
 		} else {
-			LOG(DataLog,util::verbose_info)
+			LOG(Runtime,verbose_info)
 				<< "Ignoring " << util::MSubject(itr->path())
 				<< " because it doesn't match " << pluginFilter.str();
 		}
@@ -121,19 +121,19 @@ int IOFactory::loadFile(ChunkList &ret,const boost::filesystem::path& filename, 
 	
 	if (false == boost::filesystem::exists(filename))//file to open does not exist
 	{
-		LOG(DataLog, util::error)
+		LOG(Runtime, error)
 				<< "File does not exist at given place: " << filename;
 		return 0;
 	}
 
 	if(true == formatReader.empty()){//no suitable plugin for this file type and dialect
-		LOG(DataLog,util::error)
+		LOG(Runtime,error)
 				<< "Missing plugin to open file: " << filename << (dialect.empty()? "":std::string(" with dialect: ") + dialect);
 		return 0;
 	}
 
 	BOOST_FOREACH(FileFormatList::const_reference it,formatReader){
-		LOG(DataDebug,util::info)
+		LOG(Debug,info)
 			<< "plugin to load file " <<  util::MSubject(filename) << ": " << it->name()
 			<< 	(dialect.empty() ?
 					std::string("") : std::string(" with dialect: ") + dialect
@@ -143,7 +143,7 @@ int IOFactory::loadFile(ChunkList &ret,const boost::filesystem::path& filename, 
 		if (loadedChunks)
 			return loadedChunks;
 	}
-	LOG(DataLog,util::error)
+	LOG(Runtime,error)
 		<< "Failed to read file: " << filename; //@todo error message missing
 	return 0;//no plugin of proposed list could load file
 }
@@ -180,7 +180,7 @@ data::ImageList IOFactory::load(const std::string& path, std::string dialect)
 		if(not ref->hasProperty("source"))
 			ref->setProperty("source",p.string());
 	}
-	LOG(DataLog,util::info)
+	LOG(Runtime,info)
 		<< "Generated " << images.size() << " images out of "<< loaded << " chunks from " << (boost::filesystem::is_directory(p) ? "directory ":"" ) << p;
 	return images;
 }
@@ -200,13 +200,13 @@ bool IOFactory::write(const isis::data::ImageList& images, const std::string& fi
 	FileFormatList formatWriter = get().getFormatInterface(filename, dialect);
 	
 	if(formatWriter.empty()){//no suitable plugin
-		LOG(DataLog,util::error)
+		LOG(Runtime,error)
 		<< "Missing plugin to write file: " << filename << " with dialect: " << dialect;
 		return false;
 	}
 	
 	BOOST_FOREACH(FileFormatList::const_reference it,formatWriter) {
-		LOG(DataDebug,util::info)
+		LOG(Debug,info)
 			<< "plugin to write to " <<  filename << ": " << it->name()
 			<< 	(dialect.empty() ?
 					std::string(""):
@@ -214,14 +214,14 @@ bool IOFactory::write(const isis::data::ImageList& images, const std::string& fi
 				);
 		
 		if (it->write(images,filename, dialect)){//succesfully written
-			LOG(DataDebug,util::info) << images.size() << " images written using " <<  it->name(); 
+			LOG(Debug,info) << images.size() << " images written using " <<  it->name(); 
 			return true;
 		} else
-			LOG(DataLog,util::error)
+			LOG(Runtime,error)
 			<< " could not write " <<  images.size()
 			<< " images using " <<  it->name();
 	}
-	LOG(DataLog,util::error)
+	LOG(Runtime,error)
 		<< "Could not write to: " << filename; //@todo error message missing
 	return false;
 }

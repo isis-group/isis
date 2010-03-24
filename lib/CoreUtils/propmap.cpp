@@ -46,7 +46,7 @@ PropertyValue& PropMap::fetchProperty(
 	if(next!=pathEnd){//we are not at the end of the path (aka the leaf)
 		if(found!=root.end()){//and we found the entry
 			util::PropertyValue &ref=found->second;
-			LOG_IF(not ref->is<util::PropMap>(),CoreLog,util::error)
+			LOG_IF(not ref->is<util::PropMap>(),Runtime,error)
 			<< util::MSubject(found->first) << " is a leaf, but requested as a branch in "
 			<< util::MSubject(util::list2string(at,pathEnd,"/")) << " programm will stop";
 			return fetchProperty(ref->cast_to_Type<util::PropMap>(),next,pathEnd); //continue there
@@ -69,7 +69,7 @@ const PropertyValue* PropMap::searchBranch(
 	if(next!=pathEnd){//we are not at the end of the path (aka the leaf)
 		if(found!=root.end()){//and we found the entry
 			const util::PropertyValue &ref=found->second;
-			LOG_IF(not ref->is<util::PropMap>(),CoreLog,util::error)
+			LOG_IF(not ref->is<util::PropMap>(),Runtime,error)
 			<< util::MSubject(found->first) << " is a leaf, but requested as a branch in "
 			<< util::MSubject(util::list2string(at,pathEnd,"/")) << " programm will stop";
 			return searchBranch(ref->cast_to_Type<util::PropMap>(),next,pathEnd); //continue there
@@ -95,7 +95,7 @@ bool PropMap::recursiveRemove(PropMap& root,const propPathIterator at, const pro
 			} else
 				root.erase(found);
 		} else {
-			LOG(CoreLog,util::warning)<< "Entry " << util::MSubject(*at) << " not found, skipping it";
+			LOG(Runtime,warning)<< "Entry " << util::MSubject(*at) << " not found, skipping it";
 			ret=false;
 		}
 	}
@@ -137,11 +137,11 @@ bool PropMap::remove(const isis::util::PropMap& removeMap)
 					PropMap &otherSub=otherIt->second->cast_to_Type<PropMap>();
 					ret&=mySub.remove(otherSub);
 				} else{
-					LOG(CoreDebug,warning) << "Not deleting subtree " << MSubject(thisIt->first) << " because its no subtree in the removal map";
+					LOG(Debug,warning) << "Not deleting subtree " << MSubject(thisIt->first) << " because its no subtree in the removal map";
 					ret=false;
 				}
 			} else {
-				LOG(CoreDebug,verbose_info) << "Removing " << MSubject(*thisIt) << " as requested";
+				LOG(Debug,verbose_info) << "Removing " << MSubject(*thisIt) << " as requested";
 				erase(thisIt++); // so delete this (they are equal - kind of)
 			}
 		}
@@ -240,12 +240,12 @@ void PropMap::make_unique (const util::PropMap& other,bool removeNeeded) {
 				if(otherIt->second.empty()){ //the other is empty
 					erase(thisIt++); // so delete this (they are equal - kind of)
 				} else{
-					LOG(CoreDebug,verbose_info) << "Keeping the empty " << thisIt->first << " because its is not empty in the other (" << *otherIt << ")";
+					LOG(Debug,verbose_info) << "Keeping the empty " << thisIt->first << " because its is not empty in the other (" << *otherIt << ")";
 					thisIt++;
 				}
 			} else if(not otherIt->second.empty()){ // if the other is not empty as well
 				if(thisIt->second.operator==(otherIt->second)){ //delete this, if they are equal
-					LOG(CoreDebug,verbose_info) << "Removing " << *thisIt << " because its equal with the other (" << *otherIt << ")";
+					LOG(Debug,verbose_info) << "Removing " << *thisIt << " because its equal with the other (" << *otherIt << ")";
 					erase(thisIt++); // so delete this (they are equal - kind of)
 				} else if(thisIt->second->is<PropMap>() && otherIt->second->is<PropMap>()){ //but maybe they are subtrees
 					PropMap &thisMap=thisIt->second->cast_to_Type<PropMap>();
@@ -254,7 +254,7 @@ void PropMap::make_unique (const util::PropMap& other,bool removeNeeded) {
 					thisIt++;
 				}
 			} else {//only the other is empty
-				  LOG(CoreDebug,verbose_info) << "Keeping " << *thisIt << " because the other is empty";
+				  LOG(Debug,verbose_info) << "Keeping " << *thisIt << " because the other is empty";
 				  thisIt++;
 			}
 		}
@@ -276,24 +276,24 @@ void PropMap::joinTree(const isis::util::PropMap& other, bool overwrite, std::st
 		if(continousFind(thisIt, end(),*otherIt, value_comp()))
 		{ // if its allready here
 			if(thisIt->second.empty()){
-				LOG(CoreDebug,verbose_info) << "Replacing empty property " << MSubject(thisIt->first) << " by " << MSubject(otherIt->second);
+				LOG(Debug,verbose_info) << "Replacing empty property " << MSubject(thisIt->first) << " by " << MSubject(otherIt->second);
 				thisIt->second=otherIt->second;
 			} else if(thisIt->second->is<PropMap>() && otherIt->second->is<PropMap>()){
 				PropMap &thisMap=thisIt->second->cast_to_Type<PropMap>();
 				PropMap &refMap=otherIt->second->cast_to_Type<PropMap>();
 				thisMap.joinTree(refMap,overwrite,prefix+thisIt->first+"/",rejects);
 			} else if(overwrite) {
-				LOG(CoreDebug,info) << "Replacing property " << MSubject(*thisIt) << " by " << MSubject(otherIt->second);
+				LOG(Debug,info) << "Replacing property " << MSubject(*thisIt) << " by " << MSubject(otherIt->second);
 				thisIt->second=otherIt->second;
 			} else if(not (thisIt->second == otherIt->second)){
-				LOG(CoreDebug,info)
+				LOG(Debug,info)
 					<< "Rejecting property " << MSubject(*otherIt)
 					<< " because "<< MSubject(thisIt->second) << " is allready there";
 				rejects.insert(rejects.end(),prefix+otherIt->first);
 			}
 		} else {
 			std::pair<const_iterator,bool> inserted=insert(*otherIt);
-			LOG_IF(inserted.second,CoreDebug,verbose_info) << "Inserted property " << MSubject(*inserted.first) << ".";
+			LOG_IF(inserted.second,Debug,verbose_info) << "Inserted property " << MSubject(*inserted.first) << ".";
 		}
 	}
 }
@@ -313,7 +313,7 @@ size_t PropMap::linearize(isis::util::PropMap::base_type& out, std::string key_p
 }
 
 bool PropMap::transform( std::string from,  std::string to, int dstId,bool delSource) {
-	LOG_IF(from==to,CoreDebug,error) << "Sorry source and destination shall not be the same";
+	LOG_IF(from==to,Debug,error) << "Sorry source and destination shall not be the same";
 	const PropertyValue *found=findPropVal(from);
 	bool ret=false;
 	if(found and not found->empty()){
@@ -351,7 +351,7 @@ void PropMap::addNeeded(const std::string& key)
 void PropMap::addNeededFromString(const std::string& needed)
 {
 	const std::list<std::string> needList=util::string2list<std::string>(needed);
-	LOG(CoreDebug,util::verbose_info)	<< "Adding " << needed << " as needed";
+	LOG(Debug,verbose_info)	<< "Adding " << needed << " as needed";
 	BOOST_FOREACH(std::list<std::string>::const_reference ref,needList)
 		addNeeded(ref);
 }
@@ -365,7 +365,7 @@ bool PropMap::hasProperty(const std::string& key) const {
 const isis::util::PropertyValue& PropMap::getPropertyValue(const std::string& key) const {
 	const PropertyValue* found=findPropVal(key);
 	if(not found){
-		LOG(CoreDebug,util::info)
+		LOG(Debug,info)
 		<< "Requested Property " << key << " is not set! Returning empty property.";
 		return emptyProp;
 	}
@@ -383,12 +383,12 @@ PropertyValue& PropMap::setPropertyValue(const std::string& key, const PropertyV
 bool PropMap::renameProperty(std::string oldname,std::string newname) {
 	const PropertyValue* found=findPropVal(oldname);
 	if(found){
-		LOG_IF(hasProperty(newname),CoreLog,warning)
+		LOG_IF(hasProperty(newname),Runtime,warning)
 			<< "Overwriting " << std::make_pair(newname,getPropertyValue(newname)) << " with " << *found;
 		operator[](newname)=*found;
 		return remove(oldname);
 	} else {
-		LOG(CoreLog,warning)
+		LOG(Runtime,warning)
 			<< "Cannot rename " << oldname << " it does not exist";
 		return false;
 	}

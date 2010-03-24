@@ -16,8 +16,8 @@ namespace isis{namespace test{
 	
 	BOOST_AUTO_TEST_CASE(propMap_init_test)
 	{
-		ENABLE_LOG(util::CoreDebug,util::DefaultMsgPrint,util::warning);
-		ENABLE_LOG(util::CoreLog,util::DefaultMsgPrint,util::warning);
+		ENABLE_LOG(CoreDebug,util::DefaultMsgPrint,warning);
+		ENABLE_LOG(CoreLog,util::DefaultMsgPrint,warning);
 		
 		util::PropMap map1;
 		map1["Test1"]=6.4;

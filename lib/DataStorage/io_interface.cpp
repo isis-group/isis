@@ -15,24 +15,24 @@ bool FileFormat::write(const isis::data::ImageList& images, const std::string& f
 	
 	BOOST_FOREACH(data::ImageList::const_reference ref,images){
 		if(not ref->hasProperty("sequenceNumber")){
-			LOG(ImageIoLog,util::error)
+			LOG(Runtime,error)
 			<< "sequenceNumber is missing, so I can't generate a unique filename. Won't write...";
 			ret=false;
 			continue;
 		}
 		std::string snum=ref->getPropertyValue("sequenceNumber")->toString();
 		std::string unique_name=std::string("S")+snum+"_"+file;
-		LOG(ImageIoLog,util::info) 	<< "Writing image to " <<  path/unique_name;
+		LOG(Runtime,info) 	<< "Writing image to " <<  path/unique_name;
 		ret&=write(*ref,(path/unique_name).string(),dialect);
 	}
 	return ret;
 }
 
-bool FileFormat::hasOrTell(const std::string& name, const isis::util::PropMap& object, isis::util::LogLevel level) {
+bool FileFormat::hasOrTell(const std::string& name, const isis::util::PropMap& object, isis::LogLevel level) {
 	if(object.hasProperty(name)){
 		return true;
 	} else {
-		LOG(ImageIoLog,level) << "Missing property " << util::MSubject(name);
+		LOG(Runtime,level) << "Missing property " << util::MSubject(name);
 		return false;
 	}
 }

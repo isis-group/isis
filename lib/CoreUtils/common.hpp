@@ -23,6 +23,8 @@
 #include <boost/mpl/assert.hpp>
 #include <set>
 #include <cmath>
+#include "log.hpp"
+#include "log_modules.hpp"
 
 namespace isis { namespace util {
 
@@ -216,11 +218,23 @@ struct caselessStringLess{
 };
 }
 /// @endcond
-/// @cond _hidden
-	struct CoreLog{static const char* name(){return "Core";};enum {use = _ENABLE_CORE_LOG};};
-	struct CoreDebug{static const char* name(){return "Core";};enum {use= _ENABLE_CORE_DEBUG};};
-/// @endcond
-}}
+typedef CoreDebug Debug;
+typedef CoreLog Runtime;
+
+template<typename HANDLE> void enable_log(LogLevel level){
+	ENABLE_LOG(CoreLog,HANDLE,level);
+	ENABLE_LOG(CoreDebug,HANDLE,level);
+}
+}//util
+template<typename HANDLE> void enable_log_global(LogLevel level){
+	ENABLE_LOG(CoreLog,HANDLE,level);
+	ENABLE_LOG(CoreDebug,HANDLE,level);
+	ENABLE_LOG(ImageIoLog,HANDLE,level);
+	ENABLE_LOG(ImageIoDebug,HANDLE,level);
+	ENABLE_LOG(DataLog,HANDLE,level);
+	ENABLE_LOG(DataDebug,HANDLE,level);
+}
+}//isis
 
 namespace std {
 /// Streaming output for std::pair

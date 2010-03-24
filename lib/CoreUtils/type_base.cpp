@@ -36,7 +36,7 @@ TypeBase::Converter TypeBase::getConverterTo(int id)const {
 }
 
 size_t TypePtrBase::cmp(const TypePtrBase& comp)const{
-	LOG_IF(len()!=comp.len(),CoreLog,info) << "Comparing data of different length. The difference will be added to the retuned value.";
+	LOG_IF(len()!=comp.len(),Runtime,info) << "Comparing data of different length. The difference will be added to the retuned value.";
 	return len()-comp.len() + cmp(0,std::min(len(),comp.len())-1,comp,0);
 }
 
@@ -55,11 +55,11 @@ void TypePtrBase::copyRange(size_t start,size_t end,TypePtrBase &dst,size_t dst_
 {
 	assert(start<=end);
 	const size_t length=end-start+1;
-	LOG_IF(not dst.isSameType(*this),CoreDebug,error)
+	LOG_IF(not dst.isSameType(*this),Debug,error)
 		<< "Copying into a TypePtr of different type. Its " << dst.typeName() << " not " << typeName();
-	LOG_IF(end>=len(),CoreLog,error)
+	LOG_IF(end>=len(),Runtime,error)
 		<< "End of the range ("<< end << ") is behind the end of this TypePtr ("<< len() << ")";
-	LOG_IF(length+dst_start>dst.len(),CoreLog,error)
+	LOG_IF(length+dst_start>dst.len(),Runtime,error)
 		<< "End of the range ("<< length+dst_start << ") is behind the end of the destination ("<< dst.len() << ")";
 	boost::shared_ptr<void> daddr=dst.address().lock();
 	boost::shared_ptr<void> saddr=address().lock();

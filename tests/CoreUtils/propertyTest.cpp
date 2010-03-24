@@ -16,8 +16,8 @@ namespace isis{namespace test{
 	
 BOOST_AUTO_TEST_CASE(property_init_test)
 {
-/*	ENABLE_LOG(util::CoreLog,util::DefaultMsgPrint,util::info);
-	ENABLE_LOG(util::CoreDebug,util::DefaultMsgPrint,util::verbose_info);*/
+/*	ENABLE_LOG(CoreLog,util::DefaultMsgPrint,info);
+	ENABLE_LOG(CoreDebug,util::DefaultMsgPrint,verbose_info);*/
 	
 	//	default constructor
 	util::PropertyValue propZero;

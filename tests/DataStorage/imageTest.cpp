@@ -15,11 +15,11 @@ namespace isis{namespace test{
 /* create an image */
 BOOST_AUTO_TEST_CASE (image_init_test)
 {
-	ENABLE_LOG(util::CoreLog,util::DefaultMsgPrint,util::error);
-	ENABLE_LOG(util::CoreDebug,util::DefaultMsgPrint,util::error);
-	ENABLE_LOG(data::DataLog,util::DefaultMsgPrint,util::error);
-	ENABLE_LOG(data::DataDebug,util::DefaultMsgPrint,util::error);
-// 	util::DefaultMsgPrint::stopBelow(util::warning);
+	ENABLE_LOG(CoreLog,util::DefaultMsgPrint,error);
+	ENABLE_LOG(CoreDebug,util::DefaultMsgPrint,error);
+	ENABLE_LOG(DataLog,util::DefaultMsgPrint,error);
+	ENABLE_LOG(DataDebug,util::DefaultMsgPrint,error);
+// 	util::DefaultMsgPrint::stopBelow(warning);
 	
 	data::MemChunk<float> ch(4,4);
 	data::Image img;

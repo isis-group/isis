@@ -22,8 +22,8 @@ struct Deleter{
 bool Deleter::deleted=false;
 	
 BOOST_AUTO_TEST_CASE(typePtr_init_test) {
-	ENABLE_LOG(util::CoreDebug,util::DefaultMsgPrint,util::verbose_info);
-	ENABLE_LOG(util::CoreLog,util::DefaultMsgPrint,util::verbose_info);
+	ENABLE_LOG(CoreDebug,util::DefaultMsgPrint,verbose_info);
+	ENABLE_LOG(CoreLog,util::DefaultMsgPrint,verbose_info);
 	
 	BOOST_CHECK(not Deleter::deleted);
 	{

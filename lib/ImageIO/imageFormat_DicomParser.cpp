@@ -57,17 +57,17 @@ void ImageFormat_Dicom::parseAS(DcmElement* elem,const std::string &name,util::P
 				duration *= 365.2425; //mean length of a year
 				break;
 			default:
-				LOG(ImageIoLog, util::warning)
+				LOG(Runtime, warning)
 				<< "Missing age-type-letter, assuming days";
 		}
 		
 		map[name] = duration;
 		
-		LOG(ImageIoDebug, util::verbose_info)
+		LOG(Debug, verbose_info)
 		<< "Parsed age for " << name << "(" <<  buff << ")"
 		<< " as " << duration << " days";
 	} else
-		LOG(ImageIoLog, util::warning)
+		LOG(Runtime, warning)
 		<< "Cannot parse age string \"" << buff << "\" in the field \"" << name << "\"";
 }
 
@@ -94,11 +94,11 @@ void ImageFormat_Dicom::parseDA(DcmElement* elem,const std::string &name,util::P
 			boost::lexical_cast<int16_t>(results.str(2)), //month
 			boost::lexical_cast<int16_t>(results.str(3)) //day of month
 		);
-		LOG(ImageIoDebug, util::verbose_info)
+		LOG(Debug, verbose_info)
 			<< "Parsed date for " << name << "(" <<  buff << ")" << " as " << date;
 		map[name] = date;
 	} else
-		LOG(ImageIoLog, util::warning)
+		LOG(Runtime, warning)
 		<< "Cannot parse Date string \"" << buff << "\" in the field \"" << name << "\"";
 }
 
@@ -149,12 +149,12 @@ void ImageFormat_Dicom::parseTM(DcmElement* elem,const std::string &name,util::P
 	}
 
 	if (ok) {
-		LOG(ImageIoDebug, util::verbose_info)
+		LOG(Debug, verbose_info)
 			<< "Parsed time for " << name << "(" <<  buff << ")" << " as " << time;
 		map[name] = boost::posix_time::ptime(boost::gregorian::date(1400,1,1),time);
 		//although TM is defined as time of day we dont have a day here, so we fake one
 	} else
-		LOG(ImageIoLog, util::warning)
+		LOG(Runtime, warning)
 			<< "Cannot parse Time string \"" << buff << "\" in the field \"" << name << "\"";
 }
 
@@ -223,7 +223,7 @@ void ImageFormat_Dicom::parseScalar(DcmElement* elem,const std::string &name, ut
 		}break;
 		default: {
 			elem->getOFString(buff, 0);
-			LOG(ImageIoLog, util::info) << "Implement me "
+			LOG(Runtime, info) << "Implement me "
 			<< name << "("
 			<< const_cast<DcmTag&>(elem->getTag()).getVRName() << "):"
 			<< buff;
@@ -294,13 +294,13 @@ void ImageFormat_Dicom::parseVector(DcmElement* elem,const std::string &name, ut
 		case EVR_PN:
 		default: {
 			elem->getOFStringArray(buff);
-			LOG(ImageIoLog, util::info) << "Implement me "
+			LOG(Runtime, info) << "Implement me "
 			<< name << "("
 			<< const_cast<DcmTag&>(elem->getTag()).getVRName() << "):"
 			<< buff;
 		}break;
 	}
-	LOG(ImageIoDebug,util::verbose_info) << "Parsed the vector " << name << " as " << map[name];
+	LOG(Debug,verbose_info) << "Parsed the vector " << name << " as " << map[name];
 }
 
 void ImageFormat_Dicom::parseList(DcmElement* elem,const std::string &name, util::PropMap &map)
@@ -352,13 +352,13 @@ void ImageFormat_Dicom::parseList(DcmElement* elem,const std::string &name, util
 		case EVR_PN:
 		default: {
 			elem->getOFStringArray(buff);
-			LOG(ImageIoLog, util::info) << "Implement me "
+			LOG(Runtime, info) << "Implement me "
 			<< name << "("
 			<< const_cast<DcmTag&>(elem->getTag()).getVRName() << "):"
 			<< buff;
 		}break;
 	}
-	LOG(ImageIoDebug,util::verbose_info) << "Parsed the list " << name << " as " << map[name];
+	LOG(Debug,verbose_info) << "Parsed the list " << name << " as " << map[name];
 }
 
 void ImageFormat_Dicom::parseCSA(DcmElement *elem, isis::util::PropMap& map)
@@ -398,16 +398,16 @@ size_t ImageFormat_Dicom::parseCSAEntry(Uint8 *at, isis::util::PropMap& map){
 		try{
 			if(ret.size()==1){
 				if(parseCSAValue(ret.front(),name,vr,map))
-					LOG(ImageIoDebug,util::verbose_info) << "Found entry " << name << ":" << map[name] << " in CSA header";
+					LOG(Debug,verbose_info) << "Found entry " << name << ":" << map[name] << " in CSA header";
 			} else if(ret.size()>1){
 				if(parseCSAValueList(ret,name,vr,map))
-					LOG(ImageIoDebug,util::verbose_info) << "Found entry " << name << ":" << map[name] << " in CSA header";
+					LOG(Debug,verbose_info) << "Found entry " << name << ":" << map[name] << " in CSA header";
 			}
 		} catch (boost::bad_lexical_cast e){
-			LOG(ImageIoLog,util::error) << "Failed to parse CSA entry " << std::make_pair(name,ret) << " as " << vr << " (" << e.what() << ")";
+			LOG(Runtime,error) << "Failed to parse CSA entry " << std::make_pair(name,ret) << " as " << vr << " (" << e.what() << ")";
 		}
 	} else {
-		LOG(ImageIoDebug,util::info) << "Skipping empty CSA entry " << name;
+		LOG(Debug,info) << "Skipping empty CSA entry " << name;
 		pos+=sizeof(Sint32);
 	}
 	return pos;
@@ -431,7 +431,7 @@ bool ImageFormat_Dicom::parseCSAValue(const std::string &val, const std::string 
 	} else if(strcasecmp(vr,"SS")==0){
 		map[name] = boost::lexical_cast<int16_t>(val);
 	} else {
-		LOG(ImageIoLog,util::error) << "Dont know how to parse CSA entry " << std::make_pair(name,val) << " type is " << util::MSubject(vr);
+		LOG(Runtime,error) << "Dont know how to parse CSA entry " << std::make_pair(name,val) << " type is " << util::MSubject(vr);
 		return false;
 	}
 	return true;
@@ -448,7 +448,7 @@ bool ImageFormat_Dicom::parseCSAValueList(const util::slist &val,const std::stri
 	} else if(strcasecmp(vr,"DS")==0 or strcasecmp(vr,"FD")==0){
 		map[name] = util::list2list<double>(val.begin(),val.end());
 	} else {
-		LOG(ImageIoLog,util::error) << "Dont know how to parse CSA entry " << std::make_pair(name,val) << " type is " << util::MSubject(vr);
+		LOG(Runtime,error) << "Dont know how to parse CSA entry " << std::make_pair(name,val) << " type is " << util::MSubject(vr);
 		return false;
 	}
 	return true;
@@ -483,7 +483,7 @@ void ImageFormat_Dicom::dcmObject2PropMap(DcmObject* master_obj, isis::util::Pro
 			DcmElement* elem = dynamic_cast<DcmElement*>(obj);
 			const size_t mult=obj->getVM();
 			if(mult==0)
-				LOG(ImageIoLog,util::info) << "Skipping empty Dicom-Tag " << name;
+				LOG(Runtime,info) << "Skipping empty Dicom-Tag " << name;
 			else if(mult==1)
 				parseScalar(elem,name,map);
 			else if(mult<=4)

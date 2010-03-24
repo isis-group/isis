@@ -17,10 +17,10 @@ BOOST_AUTO_TEST_CASE (imageList_chunk_test)
 {
 	const size_t images=5;
 	const size_t timesteps=10;
-	ENABLE_LOG(util::CoreLog,util::DefaultMsgPrint,util::warning);
-	ENABLE_LOG(util::CoreDebug,util::DefaultMsgPrint,util::warning);
-	ENABLE_LOG(data::DataLog,util::DefaultMsgPrint,util::info);
-	ENABLE_LOG(data::DataDebug,util::DefaultMsgPrint,util::info);
+	ENABLE_LOG(CoreLog,util::DefaultMsgPrint,warning);
+	ENABLE_LOG(CoreDebug,util::DefaultMsgPrint,warning);
+	ENABLE_LOG(DataLog,util::DefaultMsgPrint,info);
+	ENABLE_LOG(DataDebug,util::DefaultMsgPrint,info);
 	
 	data::ChunkList chunks;
 	for(int i=0;i<timesteps;i++){

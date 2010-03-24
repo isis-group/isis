@@ -17,10 +17,10 @@ namespace isis{namespace test{
 
 BOOST_AUTO_TEST_CASE (imageLoadtest)
 {
-	ENABLE_LOG(util::CoreLog,util::DefaultMsgPrint,util::warning);
-	ENABLE_LOG(util::CoreDebug,util::DefaultMsgPrint,util::warning);
-	ENABLE_LOG(data::DataLog,util::DefaultMsgPrint,util::warning);
-	ENABLE_LOG(data::DataDebug,util::DefaultMsgPrint,util::warning);
+	ENABLE_LOG(CoreLog,util::DefaultMsgPrint,warning);
+	ENABLE_LOG(CoreDebug,util::DefaultMsgPrint,warning);
+	ENABLE_LOG(DataLog,util::DefaultMsgPrint,warning);
+	ENABLE_LOG(DataDebug,util::DefaultMsgPrint,warning);
 	
 
 	// just to make sure the wanted file exists

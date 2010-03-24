@@ -26,6 +26,7 @@ namespace isis{
  *  Additional documentation for group `mygrp'
  *  @{
  */
+enum LogLevel{error=1,warning,info,verbose_info};
 namespace util{
 
 class MSubject : public std::string{
@@ -37,11 +38,10 @@ class MSubject : public std::string{
 		}
 };
 
-enum LogLevel{error=1,warning,info,verbose_info};
-static const char* LogLevelNames[]={"no_log","error","warning","info","verbose"};
-
 /// @cond _internal
 namespace _internal{
+
+static const char* LogLevelNames[]={"no_log","error","warning","info","verbose"};
 
 template<class MODULE> class Log;
 class Message;

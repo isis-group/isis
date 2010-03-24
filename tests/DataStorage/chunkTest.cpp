@@ -10,16 +10,14 @@
 #include "DataStorage/chunk.hpp"
 
 namespace isis{namespace test{
-using util::CoreLog;
-using util::CoreDebug;
 
 /* create an image */
 BOOST_AUTO_TEST_CASE (chunk_init_test)
 {
-	ENABLE_LOG(CoreLog,util::DefaultMsgPrint,util::warning);
-	ENABLE_LOG(CoreDebug,util::DefaultMsgPrint,util::warning);
-	ENABLE_LOG(data::DataLog,util::DefaultMsgPrint,util::warning);
-	ENABLE_LOG(data::DataDebug,util::DefaultMsgPrint,util::warning);
+	ENABLE_LOG(CoreLog,util::DefaultMsgPrint,warning);
+	ENABLE_LOG(CoreDebug,util::DefaultMsgPrint,warning);
+	ENABLE_LOG(DataLog,util::DefaultMsgPrint,warning);
+	ENABLE_LOG(DataDebug,util::DefaultMsgPrint,warning);
 
 	data::MemChunk<float> ch(4,3,2,1);
 	BOOST_CHECK_EQUAL(ch.volume(),1*2*3*4);

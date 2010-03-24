@@ -35,14 +35,14 @@ PropertyValue::PropertyValue ( bool _needed ) : m_needed(_needed ) {}
 
 
 bool PropertyValue::transformTo(PropertyValue& dst, int typeId)const {
-	LOG_IF(empty(),CoreDebug,error)<< "Cannot transform an empty property. Program will stop.";
+	LOG_IF(empty(),Debug,error)<< "Cannot transform an empty property. Program will stop.";
 	_internal::TypeBase &src=operator*();
 	_internal::TypeBase::Converter conv=src.getConverterTo(typeId);
 	if(conv){
 		conv->generate(*this,dst);
 		return true;
 	} else
-		LOG(CoreLog,error)
+		LOG(Runtime,error)
 			<< "Cannot transform " << src.toString(true) << " no converter available";
 	// @todo we need a typeId to typeName mapping
 	return false;

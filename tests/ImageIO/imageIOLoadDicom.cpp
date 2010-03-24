@@ -18,12 +18,12 @@ namespace isis{namespace test{
 	
 	BOOST_AUTO_TEST_CASE (imageDicomtest)
 	{
-		ENABLE_LOG(util::CoreLog,util::DefaultMsgPrint,util::warning);
-		ENABLE_LOG(util::CoreDebug,util::DefaultMsgPrint,util::warning);
-		ENABLE_LOG(data::DataLog,util::DefaultMsgPrint,util::warning);
-		ENABLE_LOG(data::DataDebug,util::DefaultMsgPrint,util::warning);
-		ENABLE_LOG(image_io::ImageIoLog,util::DefaultMsgPrint,util::warning);
-		ENABLE_LOG(image_io::ImageIoDebug,util::DefaultMsgPrint,util::warning);
+		ENABLE_LOG(CoreLog,util::DefaultMsgPrint,warning);
+		ENABLE_LOG(CoreDebug,util::DefaultMsgPrint,warning);
+		ENABLE_LOG(DataLog,util::DefaultMsgPrint,warning);
+		ENABLE_LOG(DataDebug,util::DefaultMsgPrint,warning);
+		ENABLE_LOG(ImageIoLog,util::DefaultMsgPrint,warning);
+		ENABLE_LOG(ImageIoDebug,util::DefaultMsgPrint,warning);
 		
 		data::ImageList	images=data::IOFactory::load("/SCR/isis_build/testDicom.ima","");
 		

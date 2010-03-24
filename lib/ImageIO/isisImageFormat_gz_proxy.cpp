@@ -37,17 +37,17 @@ private:
 				in.read(buf, 2048*1024)
 			) {
 				if (gzwrite(out, buf, len) != len) {
-					LOG(ImageIoLog,util::error) << "Failed to compress using gzip " << gzerror(out, &err);
+					LOG(ImageIoLog,error) << "Failed to compress using gzip " << gzerror(out, &err);
 					return false;
 				}
 			}
 			if (in.bad()) {
-				LOG(ImageIoLog,util::error) << "Failed to read input ";
+				LOG(ImageIoLog,error) << "Failed to read input ";
 				return false;
 			}
 		}
 		catch(...) {
-			LOG(ImageIoLog,util::error) << "Failed to read input ";
+			LOG(ImageIoLog,error) << "Failed to read input ";
 			delete[]  buf;
 			throw;
 		}
@@ -58,17 +58,17 @@ private:
 	bool file_compress(std::string infile, std::string outfile) {
 		std::ifstream in(infile.c_str(), std::ios::binary);
 		if (in == NULL) {
-			LOG(ImageIoLog,util::error) << "Failed to open " << infile.c_str();
+			LOG(ImageIoLog,error) << "Failed to open " << infile.c_str();
 			return false;
 		}
 		gzFile out = gzopen(outfile.c_str(), "wb");
 		if (out == NULL) {
-			LOG(ImageIoLog,util::error) << "gzopen " << outfile << " failed";
+			LOG(ImageIoLog,error) << "gzopen " << outfile << " failed";
 			return false;
 		}
 		bool ret=gz_compress(in, out);
 		if (gzclose(out) != Z_OK) {
-			LOG(ImageIoLog,util::warning) << "gzclose " << outfile << " failed";
+			LOG(ImageIoLog,warning) << "gzclose " << outfile << " failed";
 			return false;
 		}
 		else return ret;
@@ -88,20 +88,20 @@ private:
 			) {
 				if (len < 0)
 				{
-					LOG(ImageIoLog,util::error) << "Failed to read compressed data " << gzerror(in, &err);
+					LOG(ImageIoLog,error) << "Failed to read compressed data " << gzerror(in, &err);
 					return false;
 				}
 				else {
 					out.write(buf,len);
 					if (out.bad()) {
-						LOG(ImageIoLog,util::error) << "Failed to write uncompressed data ";
+						LOG(ImageIoLog,error) << "Failed to write uncompressed data ";
 						return false;
 					}
 				}
 			}
 		}
 		catch(...) {
-			LOG(ImageIoLog,util::error) << "Uncompress failed";
+			LOG(ImageIoLog,error) << "Uncompress failed";
 			delete[] buf;
 			throw;
 		}
@@ -112,17 +112,17 @@ private:
 	bool file_uncompress(std::string infile,std::string outfile) {
 		gzFile in = gzopen(infile.c_str(), "rb");
 		if (in == NULL) {
-			LOG(ImageIoLog,util::error) << "gzopen " << infile << " failed";
+			LOG(ImageIoLog,error) << "gzopen " << infile << " failed";
 			return false;
 		}
 		std::ofstream out(outfile.c_str(), std::ios::binary);
 		if (out.bad()) {
-			LOG(ImageIoLog,util::error) << "Failed to read data from " << infile;
+			LOG(ImageIoLog,error) << "Failed to read data from " << infile;
 			return false;
 		}
 		bool ret=gz_uncompress(in, out);
 		if (gzclose(in) != Z_OK) {
-			LOG(ImageIoLog,util::error) << "gclose " << outfile << " failed";
+			LOG(ImageIoLog,error) << "gclose " << outfile << " failed";
 			return false;
 		}
 		return ret;
@@ -140,7 +140,7 @@ public:
 
 	int load (data::ChunkList &chunks,const std::string& filename,const std::string& dialect ){
 		const std::string tmpfile=tempfilename(filename);
-		LOG(ImageIoDebug,util::info) <<  "tmpfile=" << tmpfile;
+		LOG(ImageIoDebug,info) <<  "tmpfile=" << tmpfile;
 		
 		if(file_uncompress(filename,tmpfile)) {
 			boost::filesystem::path fname(tmpfile);
@@ -155,7 +155,7 @@ public:
 
 	bool write(const data::Image &image,const std::string& filename,const std::string& dialect ){
 		const std::string tmpfile=tempfilename(filename);
-		LOG(ImageIoLog,util::error) <<  "Compressed write is not yet implemented";
+		LOG(ImageIoLog,error) <<  "Compressed write is not yet implemented";
 		
 		return -1;
 		

@@ -17,12 +17,12 @@
 
 int main(int argc, char *argv[]){
 
-	ENABLE_LOG(isis::data::DataDebug,isis::util::DefaultMsgPrint,isis::util::info);
-	ENABLE_LOG(isis::data::DataLog,isis::util::DefaultMsgPrint,isis::util::info);
-	ENABLE_LOG(isis::util::CoreDebug,isis::util::DefaultMsgPrint,isis::util::info);
-	ENABLE_LOG(isis::util::CoreLog,isis::util::DefaultMsgPrint,isis::util::info);
-	ENABLE_LOG(isis::image_io::ImageIoDebug,isis::util::DefaultMsgPrint,isis::util::info);
-	ENABLE_LOG(isis::image_io::ImageIoLog,isis::util::DefaultMsgPrint,isis::util::info);
+	ENABLE_LOG(isis::DataDebug,isis::util::DefaultMsgPrint,isis::info);
+	ENABLE_LOG(isis::DataLog,isis::util::DefaultMsgPrint,isis::info);
+	ENABLE_LOG(isis::CoreDebug,isis::util::DefaultMsgPrint,isis::info);
+	ENABLE_LOG(isis::CoreLog,isis::util::DefaultMsgPrint,isis::info);
+	ENABLE_LOG(isis::ImageIoDebug,isis::util::DefaultMsgPrint,isis::info);
+	ENABLE_LOG(isis::ImageIoLog,isis::util::DefaultMsgPrint,isis::info);
 
 	isis::data::ImageList img = isis::data::IOFactory::load("/scr/feige1/tmp/data.nii", "");
 

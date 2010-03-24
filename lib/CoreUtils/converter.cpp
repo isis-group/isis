@@ -32,7 +32,7 @@ namespace isis{ namespace util{ namespace _internal{
 template<typename SRC,typename DST> class TypeGenerator: public TypeConverterBase{
 public:
 	void generate(const boost::scoped_ptr<TypeBase>& src, boost::scoped_ptr<TypeBase>& dst){
-		LOG_IF(dst.get(),CoreDebug,warning) <<
+		LOG_IF(dst.get(),Debug,warning) <<
 			"Generating into existing value " << dst->toString(true);
 		Type<DST> *ref=new Type<DST>;
 		convert(src->cast_to_Type<SRC>(),*ref);
@@ -53,7 +53,7 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 template<bool NUMERIC,typename SRC, typename DST> class TypeConverter<NUMERIC,true,SRC,DST> : public TypeGenerator<SRC,DST>{
 	TypeConverter(){
-		LOG(CoreDebug,verbose_info)
+		LOG(Debug,verbose_info)
 		<< "Creating trivial copy converter for " << Type<SRC>::staticName();
 	};
 public:
@@ -75,7 +75,7 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 template<typename SRC, typename DST> class TypeConverter<true,false,SRC,DST> : public TypeGenerator<SRC,DST>{
 	TypeConverter(){
-		LOG(CoreDebug,verbose_info)
+		LOG(Debug,verbose_info)
 			<< "Creating numeric converter from "
 			<< Type<SRC>::staticName() << " to " << Type<DST>::staticName();
 	};
@@ -99,7 +99,7 @@ public:
 		}
 		catch ( boost::numeric::bad_numeric_cast const& e)
 		{
-			LOG(CoreLog,error)
+			LOG(Runtime,error)
 			<< "Automatic numeric conversion of " << MSubject(src.toString(true)) << " to " << dst.typeName() << " failed: " << e.what();
 		}
 	}
@@ -112,7 +112,7 @@ public:
 template<typename SRC, typename DST > class TypeConverter<false,false,vector4<SRC>,vector4<DST> >: public TypeGenerator<vector4<SRC>,vector4<DST> >{
 	boost::shared_ptr<TypeConverterBase> m_conv;
 	TypeConverter(boost::shared_ptr<TypeConverterBase> elem_conv):m_conv(elem_conv){
-		LOG(CoreDebug,verbose_info)
+		LOG(Debug,verbose_info)
 		<< "Creating vector converter from "
 		<< Type<vector4<SRC> >::staticName() << " to " << Type<vector4<DST> >::staticName();
 	};
@@ -150,7 +150,7 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 template<typename DST> class TypeConverter<false,false,std::string,DST> : public TypeGenerator<std::string,DST>{
 	TypeConverter(){
-		LOG(CoreDebug,verbose_info)
+		LOG(Debug,verbose_info)
 		<< "Creating from-string converter for " << Type<DST>::staticName();
 	};
 public:
@@ -167,7 +167,7 @@ public:
 };
 template<typename SRC> class TypeConverter<false,false,SRC,std::string> : public TypeGenerator<SRC,std::string>{
 	TypeConverter(){
-		LOG(CoreDebug,verbose_info)
+		LOG(Debug,verbose_info)
 		<< "Creating to-string converter for " << Type<SRC>::staticName();
 	};
 public:
@@ -240,7 +240,7 @@ struct outer_add {
 TypeConverterMap::TypeConverterMap()
 {
 	boost::mpl::for_each<types>(outer_add(*this));
-	LOG(CoreDebug,info)
+	LOG(Debug,info)
 	<< "conversion map for " << size() << " types created";
 }
 

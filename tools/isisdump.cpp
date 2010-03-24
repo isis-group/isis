@@ -2,31 +2,25 @@
 #include <boost/foreach.hpp>
 #include <fstream>
 
-using namespace isis::data;
-using namespace isis::util;
-using isis::util::DefaultMsgPrint;
+using namespace isis;
 
 int main(int argc, char *argv[])
 {
 	
-// 	ENABLE_LOG(isis::image_io::ImageIoDebug,DefaultMsgPrint,info);
-	ENABLE_LOG(isis::image_io::ImageIoLog,DefaultMsgPrint,error);
-/*	ENABLE_LOG(CoreDebug,DefaultMsgPrint,info);
-	ENABLE_LOG(CoreLog,DefaultMsgPrint,info);
-	ENABLE_LOG(DataDebug,DefaultMsgPrint,warning);*/
-	ENABLE_LOG(DataLog,DefaultMsgPrint,error);
+	ENABLE_LOG(ImageIoLog,util::DefaultMsgPrint,error);
+	ENABLE_LOG(DataLog,util::DefaultMsgPrint,error);
 
 	
-	ImageList images=IOFactory::load(argv[1]);
+	data::ImageList images=data::IOFactory::load(argv[1]);
 	unsigned short count1=0,count2=0;
 	std::cout << "Got " << images.size() << " Images" << std::endl;
 	std::ofstream dump;
 	if(argc>2)
 		dump.open(argv[2]);
-	BOOST_FOREACH(ImageList::const_reference ref,images){
+	BOOST_FOREACH(data::ImageList::const_reference ref,images){
 		std::cout << "======Image #" << ++count1 << ref->sizeToString() << "======Metadata======" << std::endl;
 		ref->print(std::cout,true);
-		for(Image::ChunkIterator c=ref->chunksBegin();c!=ref->chunksEnd();c++){
+		for(data::Image::ChunkIterator c=ref->chunksBegin();c!=ref->chunksEnd();c++){
 			std::cout << "======Image #" <<count1 << "==Chunk #" << ++count2 << c->sizeToString() << c->typeName() << "======Metadata======" << std::endl;
 			c->print(std::cout,true);
 			if(dump.is_open()){

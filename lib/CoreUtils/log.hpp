@@ -16,7 +16,6 @@
 #include <string>
 #include <boost/scoped_ptr.hpp>
 #include "message.hpp"
-#include "common.hpp"
 #include "singletons.hpp"
 #include <limits.h>
 

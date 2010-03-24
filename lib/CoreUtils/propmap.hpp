@@ -260,7 +260,7 @@ public:
 	const util::PropertyValue &getPropertyValue(const std::string &key)const;
 	/**
 	* Get the value of the given Property.
-	* If DataLog is enabled and the stored type is not T an error will be send.
+	* If Log is enabled and the stored type is not T an error will be send.
 	* \returns a Type\<T\> containing a copy of the value stored for given property if the type of the stored property is T.
 	* \return Type\<T\>() otherwhise.
 	*/
@@ -268,12 +268,12 @@ public:
 		const PropertyValue &value=getPropertyValue(key);
 		if(value.empty()){
 			const util::Type<T> dummy=T();
-			LOG(CoreLog,error)
+			LOG(Runtime,error)
 			<< "Requested Property " << key << " is not set! Returning " << dummy.toString(true);
 			return dummy;
 		}
 		else {
-			LOG_IF(not value->is<T>(),CoreDebug,error)
+			LOG_IF(not value->is<T>(),Debug,error)
 			  << "The type of the Property " << key << " is " << value->typeName() 
 			  << " but you requested " << Type<T>::staticName() << " this will raise an exception.";
 			return value->cast_to_Type<T>();

@@ -13,8 +13,11 @@
  *      Author: hellrung
  */
 
-#ifndef COMMON_HPP_
-#define COMMON_HPP_
+#ifndef IMAGEIO_COMMON_HPP
+#define IMAGEIO_COMMON_HPP
+
+#include "CoreUtils/log_modules.hpp"
+#include "CoreUtils/log.hpp"
 
 /*! \addtogroup image_io
 *  Additional documentation for group `mygrp'
@@ -23,11 +26,13 @@
 namespace isis{
 
 namespace image_io{
-/// @cond _hidden
-	struct ImageIoLog{static const char* name(){return "ImageIO";};enum {use = _ENABLE_IMAGEIO_LOG};};
-	struct ImageIoDebug{static const char* name(){return "ImageIO";};enum {use= _ENABLE_IMAGEIO_DEBUG};};
-/// @endcond
+typedef ImageIoLog Runtime;
+typedef ImageIoDebug Debug;
 
+template<typename HANDLE> void enable_log(LogLevel level){
+	ENABLE_LOG(Runtime,HANDLE,level);
+	ENABLE_LOG(Debug,HANDLE,level);
+}
 } //namespace image_io
 
 } //namespace isis

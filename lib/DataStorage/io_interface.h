@@ -25,20 +25,20 @@ class FileFormat {
 protected:
 	/**
 	 * Check if a given property exists in the given PropMap.
-	 * If the property doesn't exist a message will be sent to ImageIoLog using the given loglevel.
+	 * If the property doesn't exist a message will be sent to Log using the given loglevel.
 	 * \returns object.hasProperty(name)
 	 */
-	static bool hasOrTell(const std::string& name, const util::PropMap& object, util::LogLevel level);
+	static bool hasOrTell(const std::string& name, const util::PropMap& object, LogLevel level);
 	/**
 	 * Transform a given property into another and remove the original in the given PropMap.
-	 * If the property doesn't exist a message will be sent to ImageIoLog using the given loglevel.
+	 * If the property doesn't exist a message will be sent to Log using the given loglevel.
 	 * \returns true if the property existed and was transformed.
 	 */
 	template<typename TYPE> static bool
-	transformOrTell(const std::string& from,const std::string& to, util::PropMap& object, util::LogLevel level)
+	transformOrTell(const std::string& from,const std::string& to, util::PropMap& object, LogLevel level)
 	{
 		if(hasOrTell(from,object,level) and object.transform<TYPE>(from,to)){
-			LOG(ImageIoDebug,util::verbose_info) << "Transformed " << from << " into " << object[to];
+			LOG(Debug,verbose_info) << "Transformed " << from << " into " << object[to];
 			return true;
 		}
 		return false;
