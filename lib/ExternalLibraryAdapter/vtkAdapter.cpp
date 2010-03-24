@@ -1,8 +1,15 @@
+#include "vtkAdapter.hpp"
 
+namespace isis{
+    
+VTKAdapter::VTKAdapter(const boost::shared_ptr<isis::data::Image> src )
+    : vtkImageData()
+{
+}
 
-//local includes
+VTKAdapter::VTKAdapter(const isis::data::ImageList& src)
+    : vtkImageData()
+{
+}
 
-
-
-//vtk includes
-#include "vtkImageData.h"
+} //end namespace isis

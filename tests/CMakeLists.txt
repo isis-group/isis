@@ -11,6 +11,11 @@ IF(BUILD_DATA_IO)
 	add_subdirectory(ImageIO)
 ENDIF(BUILD_DATA_IO)
 
-IF(BUILD_ITK)
+IF(HAVE_ITK)
 	add_subdirectory(extRegistration)
-ENDIF(BUILD_ITK)
+ENDIF(HAVE_ITK)
+
+IF(HAVE_VTK)
+    include(${VTK_USE_FILE})
+    add_subdirectory(ExternalLibraryAdapter)
+ENDIF(HAVE_VTK)
