@@ -4,6 +4,7 @@
 #include <map>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
 #include <string>
 #include <iostream>
 #include <typeinfo>
