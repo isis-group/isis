@@ -144,7 +144,48 @@ public:
 	virtual ~TypeConverter(){}
 };
 	
-	
+/////////////////////////////////////////////////////////////////////////////
+// list version -- uses TypeConverter on every element
+/////////////////////////////////////////////////////////////////////////////
+template<typename SRC, typename DST > class TypeConverter<false,false,std::list<SRC>,std::list<DST> >: public TypeGenerator<std::list<SRC>,std::list<DST> >{
+	boost::shared_ptr<TypeConverterBase> m_conv;
+	TypeConverter(boost::shared_ptr<TypeConverterBase> elem_conv):m_conv(elem_conv){
+		LOG(Debug,verbose_info)
+		<< "Creating list converter from "
+		<< Type<std::list<SRC> >::staticName() << " to " << Type<std::list<DST> >::staticName();
+	};
+public:
+	static boost::shared_ptr<TypeConverterBase> create(){
+		typedef boost::mpl::and_<boost::is_arithmetic<SRC>,boost::is_arithmetic<DST> > is_num;
+		typedef boost::is_same<SRC,DST> is_same;
+		boost::shared_ptr<TypeConverterBase> elem_conv=
+		TypeConverter<is_num::value,is_same::value,SRC,DST>::create();
+
+		if(elem_conv){
+			TypeConverter<false,false,std::list<SRC>,std::list<DST> > *ret=new TypeConverter<false,false,std::list<SRC>,std::list<DST> >(elem_conv);
+			return boost::shared_ptr<TypeConverterBase>(ret);
+		} else {
+			return boost::shared_ptr<TypeConverterBase>();
+		}
+
+	}
+	void convert(const TypeBase& src, TypeBase& dst){
+		std::list<DST> &dstVal=dst.cast_to_Type<std::list<DST> >();
+		LOG_IF(not dstVal.empty(),CoreLog,warning)
+			<< "Storing into non empty list while conversion from "
+			<< Type<std::list<SRC> >::staticName() << " to " << Type<std::list<DST> >::staticName();
+		const std::list<SRC> &srcVal=src.cast_to_Type<std::list<SRC> >();
+
+		for(typename std::list<SRC>::const_iterator i=srcVal.begin();i!=srcVal.end();i++){//slow and ugly, but flexible
+			Type<DST> dst;
+			m_conv->convert(Type<SRC>(*i),dst);
+			dstVal.push_back((DST)dst);
+		}
+	}
+	virtual ~TypeConverter(){}
+};
+
+
 /////////////////////////////////////////////////////////////////////////////
 // string version -- uses lexical_cast to convert from/to string
 /////////////////////////////////////////////////////////////////////////////
@@ -182,6 +223,52 @@ public:
 	}
 	virtual ~TypeConverter(){}
 };
+
+
+/////////////////////////////////////////////////////////////////////////////
+// string => list/vector version -- uses util::string2list
+/////////////////////////////////////////////////////////////////////////////
+template<typename DST> class TypeConverter<false,false,std::string,std::list<DST> >:public TypeGenerator<std::string,std::list<DST> >{ //string => list
+	TypeConverter(){
+		LOG(Debug,verbose_info)
+		<< "Creating from-string converter for " << Type<std::list<DST> >::staticName();
+	};
+public:
+	static boost::shared_ptr<TypeConverterBase> create(){
+		TypeConverter<false,false,std::string,std::list<DST> > *ret=new TypeConverter<false,false,std::string,std::list<DST> >;
+		return boost::shared_ptr<TypeConverterBase>(ret);
+	}
+	void convert(const TypeBase& src, TypeBase& dst){
+		std::list<DST> &dstVal=dst.cast_to_Type<std::list<DST> >();
+		LOG_IF(not dstVal.empty(),CoreLog,warning)
+			<< "Storing into non empty list while conversion from "
+			<< Type<std::string>::staticName() << " to " << Type<std::list<DST> >::staticName();
+		const std::string &srcVal=src.cast_to_Type<std::string>();
+		const std::list<DST> buff=util::string2list<DST>(srcVal,boost::regex("[\\s,;]+"));
+		std::copy(buff.begin(),buff.end(),dstVal.end());
+	}
+	virtual ~TypeConverter(){}
+};
+template<typename DST> class TypeConverter<false,false,std::string,vector4<DST> >:public TypeGenerator<std::string,vector4<DST> >{ //string => vector4
+TypeConverter(){
+	LOG(Debug,verbose_info)
+		<< "Creating from-string converter for " << Type<vector4<DST> >::staticName();
+};
+public:
+	static boost::shared_ptr<TypeConverterBase> create(){
+		TypeConverter<false,false,std::string,vector4<DST> > *ret=new TypeConverter<false,false,std::string,vector4<DST> >;
+		return boost::shared_ptr<TypeConverterBase>(ret);
+	}
+	void convert(const TypeBase& src, TypeBase& dst){
+		vector4<DST> &dstVal=dst.cast_to_Type<vector4<DST> >();
+		const std::string &srcVal=src.cast_to_Type<std::string>();
+		const std::list<DST> buff=string2list<DST>(srcVal,boost::regex("[\\s,;]+"));
+		dstVal.copyFrom(buff.begin(),buff.end());
+	}
+	virtual ~TypeConverter(){}
+};
+
+
 // @todo we cannot parse this stuff yet
 template<> class TypeConverter<false,false,std::string,PropMap>: public TypeGenerator<std::string,PropMap>{ //string => PropMap
 public:
@@ -195,15 +282,6 @@ template<> class TypeConverter<false,false,std::string,rgb_color48 >:public Type
 	public:
 		virtual ~TypeConverter(){}
 };
-template<typename TYPE> class TypeConverter<false,false,std::string,vector4<TYPE> >:public TypeGenerator<std::string,vector4<TYPE> >{ //string => vector4
-public:
-	virtual ~TypeConverter(){}
-};
-template<typename TYPE> class TypeConverter<false,false,std::string,std::list<TYPE> >:public TypeGenerator<std::string,vector4<TYPE> >{ //string => list
-public:
-	virtual ~TypeConverter(){}
-};
-
 
 ////////////////////////////////////////////////////////////////////////
 //OK, thats about the foreplay. Now we get to the dirty stuff.
