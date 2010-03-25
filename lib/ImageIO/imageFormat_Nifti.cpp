@@ -205,8 +205,8 @@ public:
 		}
 
 		// copy the data to the nifti image
-		LOG(ImageIoLog, isis::info) << image.getChunk(0,0,0,0)->typeName();
-		switch(image.getChunk(0,0,0,0)->typeID()){
+		LOG(ImageIoLog, isis::info) << image.getChunk(0,0,0,0).typeName();
+		switch(image.getChunk(0,0,0,0).typeID()){
 		case util::TypePtr<int8_t>::staticID:   ni.datatype = DT_INT8;   copyDataToNifti<int8_t>(image, ni);   break;
 		case util::TypePtr<u_int8_t>::staticID: ni.datatype = DT_UINT8;  copyDataToNifti<u_int8_t>(image, ni); break;
 

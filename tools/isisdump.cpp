@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 			c->print(std::cout,true);
 			if(dump.is_open()){
 				dump << "======Image #" <<count1 << "==Chunk #" << ++count2 << c->sizeToString() << c->typeName() << "======Voxel Data======" << std::endl;
-				dump << c->toString() << std::endl;
+				dump << c->getTypePtrBase().toString() << std::endl;
 			}
 		}
 	}

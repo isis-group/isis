@@ -44,7 +44,7 @@ public:
  * Like in TypePtr, the copy of a Chunk will reference the same data.
  * (If you want to make a memory based deep copy of a Chunk create a MemChunk from it)
  */
-class Chunk : public _internal::ChunkBase, public util::_internal::TypePtrBase::Reference{
+class Chunk : public _internal::ChunkBase, protected util::_internal::TypePtrBase::Reference{
 protected:
 	/**
 	 * Creates an data-block from existing data.
@@ -88,11 +88,17 @@ public:
 		const util::TypePtr<TYPE> &ret=getTypePtr<TYPE>();
 		return ret[dim2Index(idx)];
 	}
-	template<typename TYPE> util::TypePtr<TYPE> &asTypePtr(){
-		return operator*().cast_to_TypePtr<TYPE>();
+	util::_internal::TypePtrBase& asTypePtrBase(){
+		return operator*();
 	}
-	template<typename TYPE> const util::TypePtr<TYPE>& getTypePtr()const{
-		return operator*().cast_to_TypePtr<TYPE>();
+	const util::_internal::TypePtrBase& getTypePtrBase()const{
+		return operator*();
+	}
+	template<typename TYPE> util::TypePtr<TYPE> &asTypePtr(){
+		return asTypePtrBase().cast_to_TypePtr<TYPE>();
+	}
+	template<typename TYPE> const util::TypePtr<TYPE> getTypePtr()const{
+		return getTypePtrBase().cast_to_TypePtr<TYPE>();
 	}
 	Chunk cloneToMem(size_t firstDim=0,size_t secondDim=0,size_t thirdDim=0,size_t fourthDim=0)const;
  	Chunk copyToMem()const;
