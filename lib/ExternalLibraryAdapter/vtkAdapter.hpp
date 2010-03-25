@@ -32,29 +32,33 @@
 //local includes
 #include "DataStorage/image.hpp"
 #include "CoreUtils/log.hpp"
+#include "CoreUtils/common.hpp"
 
 //vtk includes
-#include "vtkImageData.h"
-
+#include <vtkImageImport.h>
+#include <vtkImageData.h>
 //external includes 
 #include "boost/smart_ptr.hpp"
+#include <list>
 
 namespace isis { namespace adapter {
     
+class VTKAdapter : public vtkImageImport{
     
-class VTKAdapter : public vtkImageData {
-       
+    typedef vtkImageImport Superclass;   
 public:
-    //copy constructor for one isis image
-    VTKAdapter(const boost::shared_ptr<isis::data::Image>);
-    //copy constructor for isis image list
-    VTKAdapter(const isis::data::ImageList&);
     
-private:
+    static std::list<Superclass*> makeVtkImageList(const boost::shared_ptr<data::Image>);
+private:   
+    //hold the image
+    static boost::shared_ptr<data::Image> m_ImageISIS;
+protected:
+     //should not be loaded directly
+    VTKAdapter();
+    VTKAdapter(const VTKAdapter&){};  
   
-    util::fvector4 dimensions;
-   
-	
+    
+    
 };
   
     
