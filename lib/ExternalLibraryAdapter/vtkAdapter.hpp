@@ -35,7 +35,6 @@
 #include "CoreUtils/common.hpp"
 
 //vtk includes
-#include <vtkImageImport.h>
 #include <vtkImageData.h>
 //external includes 
 #include "boost/smart_ptr.hpp"
@@ -43,18 +42,18 @@
 
 namespace isis { namespace adapter {
     
-class VTKAdapter : public vtkImageImport{
-    
-    typedef vtkImageImport Superclass;   
+class VTKAdapter{
 public:
     
-    static std::list<Superclass*> makeVtkImageList(const boost::shared_ptr<data::Image>);
+    static std::list<vtkImageData*> makeVtkImageList(const boost::shared_ptr<data::Image>);
 private:   
     //hold the image
     boost::shared_ptr<data::Image> m_ImageISIS;
-    VTKAdapter(const boost::shared_ptr<data::Image>);
+    std::list<vtkImageData*> m_vtkImageList;
+    
 protected:
      //should not be loaded directly
+    VTKAdapter(const boost::shared_ptr<data::Image>);
     VTKAdapter(){};
     VTKAdapter(const VTKAdapter&){};  
   

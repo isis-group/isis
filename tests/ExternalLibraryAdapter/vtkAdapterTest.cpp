@@ -10,6 +10,7 @@
 
 #include <vtkImageImport.h>
 #include <vtkImageViewer.h>
+#include <vtkImageData.h>
 
 namespace isis{namespace test{
   
@@ -28,14 +29,16 @@ namespace isis{namespace test{
 		//load an image and store it into the vtkAdapter
 		data::ImageList imgList = isis::data::IOFactory::load("/SCR/rhenium/Images/nifti/S5_FLASH_3D_3Echoes_1.nii", "");
 		BOOST_CHECK(not imgList.empty());
-		std::list<vtkImageImport*> vtkList = adapter::VTKAdapter::makeVtkImageList(imgList.front());
+		
+		std::list<vtkImageData*> vtkList = adapter::VTKAdapter::makeVtkImageList(imgList.front());
 		vtkImageViewer* viewer = vtkImageViewer::New();
-		viewer->SetColorLevel(127.5);
-		viewer->SetColorWindow(255);
-		viewer->SetSize(200,200);
-		viewer->SetInputConnection(vtkList.front()->GetOutputPort());
+		viewer->SetInput(vtkList.front());
+		viewer->SetColorWindow(20.0);
+		viewer->SetColorLevel(0.0);
 		viewer->Render();
 		sleep(10);
+		
+		
 	}
 }}//end namespace 
 		
