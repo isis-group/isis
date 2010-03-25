@@ -26,7 +26,7 @@ namespace isis{namespace test{
 		//ENABLE_LOG(isis::ImageIoLog,isis::util::DefaultMsgPrint,isis::info);
 		
 		//load an image and store it into the vtkAdapter
-		data::ImageList imgList = isis::data::IOFactory::load("/scr/feige1/tmp/data.nii", "");
+		data::ImageList imgList = isis::data::IOFactory::load("/SCR/rhenium/Images/nifti/S5_FLASH_3D_3Echoes_1.nii", "");
 		BOOST_CHECK(not imgList.empty());
 		std::list<vtkImageImport*> vtkList = adapter::VTKAdapter::makeVtkImageList(imgList.front());
 		vtkImageViewer* viewer = vtkImageViewer::New();

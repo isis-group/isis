@@ -51,16 +51,17 @@ public:
     static std::list<Superclass*> makeVtkImageList(const boost::shared_ptr<data::Image>);
 private:   
     //hold the image
-    static boost::shared_ptr<data::Image> m_ImageISIS;
+    boost::shared_ptr<data::Image> m_ImageISIS;
+    VTKAdapter(const boost::shared_ptr<data::Image>);
 protected:
      //should not be loaded directly
-    VTKAdapter();
+    VTKAdapter(){};
     VTKAdapter(const VTKAdapter&){};  
   
-    
-    
+   
 };
   
+
     
 }}// end namespace 
 #endif //VTKADAPTER_HPP_
