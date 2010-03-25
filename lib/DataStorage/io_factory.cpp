@@ -119,17 +119,17 @@ int IOFactory::loadFile(ChunkList &ret,const boost::filesystem::path& filename, 
 	
 	if (false == boost::filesystem::exists(filename))//file to open does not exist
 	{
-		LOG(Runtime, error)<< "File does not exist at given place: " << filename;
+		LOG(ImageIoLog, error)<< "File does not exist at given place: " << filename;
 		return 0;
 	}
 
 	if(true == formatReader.empty()){//no suitable plugin for this file type and dialect
-		LOG(Runtime,error)<< "Missing plugin to open file: " << filename << (dialect.empty()? "":std::string(" with dialect: ") + dialect);
+		LOG(ImageIoLog,error)<< "Missing plugin to open file: " << filename << (dialect.empty()? "":std::string(" with dialect: ") + dialect);
 		return 0;
 	}
 
 	BOOST_FOREACH(FileFormatList::const_reference it,formatReader){
-		LOG(Debug,info)
+		LOG(ImageIoDebug,info)
 			<< "plugin to load file " <<  util::MSubject(filename) << ": " << it->name()
 			<< 	(dialect.empty() ?
 					std::string("") : std::string(" with dialect: ") + dialect
@@ -139,7 +139,7 @@ int IOFactory::loadFile(ChunkList &ret,const boost::filesystem::path& filename, 
 		if (loadedChunks)
 			return loadedChunks;
 	}
-	LOG(Runtime,error)
+	LOG(ImageIoLog,error)
 		<< "Failed to read file: " << filename; //@todo error message missing
 	return 0;//no plugin of proposed list could load file
 }

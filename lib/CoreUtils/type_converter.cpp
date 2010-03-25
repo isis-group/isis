@@ -17,7 +17,7 @@
 
 */
 
-#include "converter.hpp"
+#include "type_converter.hpp"
 #include "type_base.hpp"
 #include "propmap.hpp" // we must have all types here and PropMap was only forward-declared in types.hpp
 #include <boost/mpl/for_each.hpp>
