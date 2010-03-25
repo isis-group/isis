@@ -225,7 +225,7 @@ public:
 		const TypePtr<TYPE> &compare = dst.cast_to_TypePtr<TYPE>();
 		LOG(Debug,verbose_info) << "Comparing " << dst.typeName() << " at " << &operator[](0) << " and " << &compare[0];
 		for(size_t i=start;i<end;i++){
-			if(operator[](i)!=compare[i])
+			if(not (operator[](i)==compare[i]))
 				ret++;
 		}
 		return ret;
