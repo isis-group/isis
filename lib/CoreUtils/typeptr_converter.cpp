@@ -21,9 +21,9 @@
 
 #include "type_converter.hpp"
 #include "type_base.hpp"
+#include "numeric_convert.hpp"
 #include "propmap.hpp" // we must have all types here and PropMap was only forward-declared in types.hpp
 #include <boost/mpl/for_each.hpp>
-#include <boost/numeric/conversion/cast.hpp>
 #include <boost/type_traits/is_arithmetic.hpp>
 #include <boost/mpl/and.hpp>
 
@@ -70,6 +70,27 @@ template<bool NUMERIC,typename SRC, typename DST> class TypePtrConverter<NUMERIC
 		}
 		virtual ~TypePtrConverter(){}
 };
+
+/////////////////////////////////////////////////////////////////////////////
+// Numeric version -- uses numeric_convert
+/////////////////////////////////////////////////////////////////////////////
+template<typename SRC, typename DST> class TypePtrConverter<true,false,SRC,DST> : public TypePtrGenerator<SRC,DST>{
+	TypePtrConverter(){
+		LOG(Debug,verbose_info)
+		<< "Creating numeric converter from "
+		<< TypePtr<SRC>::staticName() << " to " << TypePtr<DST>::staticName();
+	};
+	public:
+		static boost::shared_ptr<TypePtrConverterBase> create(){
+			TypePtrConverter<true,false,SRC,DST> *ret=new TypePtrConverter<true,false,SRC,DST>;
+			return boost::shared_ptr<TypePtrConverterBase>(ret);
+		}
+		void convert(const TypePtrBase& src, TypePtrBase& dst){
+			numeric_convert(src.cast_to_TypePtr<SRC>(),dst.cast_to_TypePtr<DST>());
+		}
+		virtual ~TypePtrConverter(){}
+};
+
 
 ////////////////////////////////////////////////////////////////////////
 //OK, thats about the foreplay. Now we get to the dirty stuff.
