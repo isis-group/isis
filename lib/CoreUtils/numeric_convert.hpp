@@ -10,8 +10,9 @@
 namespace isis{namespace util{
 namespace _internal{
 	template<typename SRC, typename DST> static void numeric_convert_impl(const SRC* src, DST* dst, size_t count,double scale,double offset) {
-		LOG(Debug,info) << "generic scaling convert " << TypePtr<SRC>::staticName() << "=>" << TypePtr<DST>::staticName();
-		LOG(Debug,info) << "scale/offset=" << scale << "/" << offset;
+		LOG(Debug,info)
+			<< "using generic scaling convert " << Type<SRC>::staticName() << "=>" << Type<DST>::staticName()
+			<< " with scale/offset " << scale << "/" << offset;
 		static boost::numeric::converter<
 			DST,double,
 			boost::numeric::conversion_traits<DST,double>,
@@ -19,10 +20,10 @@ namespace _internal{
 			boost::numeric::RoundEven<double>
 		> converter;
 		for(size_t i=0;i<count;i++)
-			dst[i]=converter(src[0]*scale+offset);
+			dst[i]=converter(src[i]*scale+offset);
 	}
 	template<typename SRC, typename DST> static void numeric_convert_impl(const SRC* src, DST* dst, size_t count) {
-		LOG(Debug,info) << "generic convert " << TypePtr<SRC>::staticName() << "=>" << TypePtr<DST>::staticName();
+		LOG(Debug,info) << "using generic convert " << Type<SRC>::staticName() << " => " << Type<DST>::staticName() << " without scaling";
 		static boost::numeric::converter<
 			DST,SRC,
 			boost::numeric::conversion_traits<DST,SRC>,
@@ -30,7 +31,7 @@ namespace _internal{
 			boost::numeric::RoundEven<SRC>
 		> converter;
 		for(size_t i=0;i<count;i++)
-			dst[i]=converter(src[0]);
+			dst[i]=converter(src[i]);
 	}
 }
 	
@@ -60,9 +61,9 @@ template<typename SRC,typename DST> void numeric_convert(const TypePtr<SRC> &src
 	bool doScale = (scaleopt!=noscale && std::numeric_limits<DST>::is_integer);
 
 	if(doScale) {
-		const double domain_min=std::numeric_limits<DST>::min();//negative value domain of this dst
-		const double domain_max =std::numeric_limits<DST>::max();//positive value domain of this dst
-		double minval,maxval;
+		const DST domain_min=std::numeric_limits<DST>::min();//negative value domain of this dst
+		const DST domain_max =std::numeric_limits<DST>::max();//positive value domain of this dst
+		SRC minval,maxval;
 		src.getMinMax(minval,maxval);
 
 		LOG(Debug,info) << "src Range:" << minval << "=>" << maxval;
@@ -107,8 +108,6 @@ template<typename SRC,typename DST> void numeric_convert(const TypePtr<SRC> &src
 		doScale=(scale!=1. || offset);
 		offset*=scale;//calc offset for dst
 	}
-	if(doScale)LOG(Debug,info) << "converting with scale/offset=" << scale << "/" << offset;
-	else LOG(Debug,info) << "converting without scaling";
 	if(doScale)
 		_internal::numeric_convert_impl(&src[0],&dst[0], srcsize,scale,offset);
 	else

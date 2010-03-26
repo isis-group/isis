@@ -90,6 +90,18 @@ void TypePtrBase::copyRange(size_t start,size_t end,TypePtrBase &dst,size_t dst_
 	
 	memcpy(dest+doffset,src+soffset,blength);
 }
+bool TypePtrBase::copyTo(TypePtrBase& dst) const
+{
+	const Converter& conv=getConverterTo(dst.typeID());
+	if(conv){
+		conv->convert(*this,dst);
+		return true;
+	} else {
+		LOG(Runtime,error)
+		<< "I dont know any conversion from " << MSubject(typeName()) << " to " << MSubject(dst.typeName());
+		return false;
+	}
+}
 
 
 }}}

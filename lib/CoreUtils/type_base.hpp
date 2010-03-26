@@ -271,9 +271,32 @@ public:
 	
 	virtual std::vector<Reference> splice(size_t size)const=0;
 
-	/// Create a TypePtr of the same type pointing at a new address (newly allocated memory).
+	/** Create a TypePtr of the same type pointing at a newly allocated memory.
+	 * This will not copy contents of this TypePtr, just its type and length.
+	 * \returns a reference to the newly created TypePtr
+	 */
 	TypePtrBase::Reference cloneToMem()const;
+	/**
+	 * Copy this to a new TypePtr using newly allocated memory.
+	 * This copies the contents of this TypePtr, its type and its length.
+	 * \returns a reference to the newly created TypePtr
+	 */
 	TypePtrBase::Reference copyToMem()const;
+
+	/// Copy (or Convert) data from this to another TypePtr of maybe another type and the same length.
+	bool copyTo(TypePtrBase &dst)const;
+	/**
+	 * Copy this to a new TypePtr\<T\> using newly allocated memory.
+	 * This will create a new TypePtr of type T and the length of this.
+	 * The memory will be allocated and the data of this will be copy-converted to T.
+	 * If the conversion fails, the data of the newly created TypePtr will be undefined.
+	 * \returns a the newly created TypePtr
+	 */
+	template<typename T> TypePtr<T> copyToNew()const{
+		TypePtr<T> ret((T*)malloc(sizeof(T)*len()),len());
+		copyTo(ret);
+		return ret;
+	}
 	/**
 	 * \copydoc cloneToMem
 	 * \param length length of the new memory block in elements of the given TYPE

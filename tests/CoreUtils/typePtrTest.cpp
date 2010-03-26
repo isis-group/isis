@@ -8,6 +8,7 @@
 #define BOOST_TEST_MODULE TypePtrTest
 #include <boost/test/included/unit_test.hpp>
 #include "CoreUtils/type.hpp"
+#include <cmath>
 
 namespace isis{namespace test{
 
@@ -22,8 +23,7 @@ struct Deleter{
 bool Deleter::deleted=false;
 	
 BOOST_AUTO_TEST_CASE(typePtr_init_test) {
-	ENABLE_LOG(CoreDebug,util::DefaultMsgPrint,verbose_info);
-	ENABLE_LOG(CoreLog,util::DefaultMsgPrint,verbose_info);
+// 	util::enable_log<util::DefaultMsgPrint>(verbose_info);
 	
 	BOOST_CHECK(not Deleter::deleted);
 	{
@@ -144,5 +144,32 @@ BOOST_AUTO_TEST_CASE(typePtr_splice_test) {
 	}
 	//now that all splices are gone the original data shall be deleted
  	BOOST_CHECK(Deleter::deleted);
+}
+
+BOOST_AUTO_TEST_CASE(typePtr_conversion_test) {
+	const float init[]={-2,-1.8,-1.5,-1.3,-0.6,-0.2,2,1.8,1.5,1.3,0.6,0.2};
+	util::TypePtr<float> floatArray((float*)malloc(sizeof(float)*12),12);
+
+	//without scaling
+	floatArray.copyFromMem(init,12);
+	for(int i=0;i<12;i++)
+		BOOST_CHECK_EQUAL(floatArray[i],init[i]);
+	util::TypePtr<int> intArray=floatArray.copyToNew<int>();
+	for(int i=0;i<12;i++)
+		BOOST_CHECK_EQUAL(intArray[i],round(init[i]));
+
+	//with scaling
+	const double scale = std::min(std::numeric_limits< short >::max()/2e5,std::numeric_limits< short >::min()/-2e5);
+	for(int i=0;i<12;i++)
+		floatArray[i]=init[i]*1e5;
+	util::TypePtr<short> shortArray=floatArray.copyToNew<short>();
+	for(int i=0;i<12;i++)
+		BOOST_CHECK_EQUAL(shortArray[i],round(init[i]*1e5*scale));
+
+	//with offset and scale
+	const double uscale = std::numeric_limits< unsigned short >::max()/4e5;
+	util::TypePtr<unsigned short> ushortArray=floatArray.copyToNew<unsigned short>();
+	for(int i=0;i<12;i++)
+		BOOST_CHECK_EQUAL(ushortArray[i],round(init[i]*1e5*uscale+32767.5));
 }
 }}

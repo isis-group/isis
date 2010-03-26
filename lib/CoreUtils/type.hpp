@@ -42,7 +42,7 @@ protected:
 		return new Type<TYPE>(*this);
 	}
 public:
-	static const int staticID = _internal::TypeId<TYPE>::value;
+	static const unsigned short staticID = _internal::TypeId<TYPE>::value;
 	Type()
 	{
 		BOOST_MPL_ASSERT_RELATION( staticID, <, 0xFF );
@@ -121,7 +121,7 @@ protected:
 		return new TypePtr(*this);
 	}
 public:
-	static const int staticID = _internal::TypeId<TYPE>::value << 8;
+	static const unsigned short staticID = _internal::TypeId<TYPE>::value << 8;
 	/// Proxy-Deleter to encapsulate the real deleter/shared_ptr when creating shared_ptr for parts of a shared_ptr
 	class DelProxy : public boost::shared_ptr<TYPE>{
 	public:
@@ -182,27 +182,27 @@ public:
 	 * \param d the deleter to be used when the data shall be deleted ( d() is called then )
 	 */
 
-	template<typename D> TypePtr(TYPE* ptr,size_t length,D d):
+	template<typename D> TypePtr(TYPE* const ptr,size_t length,D d):
 	m_val(ptr,d),_internal::TypePtrBase(length)	{}
 
 	virtual ~TypePtr(){}
 
-	void copyFromMem(size_t start,size_t end,const TYPE* const src){
-		assert(start<=end);
-		const size_t length=end-start;
-		LOG_IF(end>=len(),Runtime,error)
-			<< "End of the range ("<< end << ") is behind the end of this TypePtr ("<< len() << ")";
+	/// Copy elements from raw memory
+	void copyFromMem(const TYPE* const src,size_t length){
+		LOG_IF(length>len(),Runtime,error)
+		<< "Amount of the elements to copy from memory ("<< length << ") exceeds the length of the array ("<< len() << ")";
 
-		TYPE &dest= this->operator[](start);
+		TYPE &dest= this->operator[](0);
 		LOG(Debug,info) << "Copying " << length*sizeof(TYPE) << " bytes of " << typeName() << " from "<< src << " to " << &dest;
 		
 		memcpy(&dest,src,length*sizeof(TYPE));
 	}
+	/// Copy elements within a range [start,end] to raw memory
 	void copyToMem(size_t start,size_t end,const TYPE* const dst)const{
 		assert(start<=end);
-		const size_t length=end-start;
+		const size_t length=end-start+1;
 		LOG_IF(end>=len(),Runtime,error)
-		<< "End of the range ("<< end << ") is behind the end of this TypePtr ("<< len() << ")";
+			<< "End of the range ("<< end << ") is behind the end of this TypePtr ("<< len() << ")";
 		
 		const TYPE &source= this->operator[](start);
 		memcpy(dst,&source,length*sizeof(TYPE));

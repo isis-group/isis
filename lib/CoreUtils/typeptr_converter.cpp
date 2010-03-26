@@ -35,7 +35,7 @@ template<typename SRC,typename DST> class TypePtrGenerator: public TypePtrConver
 	public:
 		void generate(const boost::scoped_ptr<TypePtrBase>& src, boost::scoped_ptr<TypePtrBase>& dst)const{
 			LOG_IF(dst.get(),Debug,warning) <<
-			"Generating into existing value " << dst->toString(true);
+				"Generating into existing value " << dst->toString(true);
 			TypePtr<DST> *ref=new TypePtr<DST>;
 			convert(src->cast_to_TypePtr<SRC>(),*ref);
 			dst.reset(ref);
@@ -66,7 +66,7 @@ template<bool NUMERIC,typename SRC, typename DST> class TypePtrConverter<NUMERIC
 		void convert(const TypePtrBase& src, TypePtrBase& dst)const{
 			TypePtr<SRC> &dstVal=dst.cast_to_TypePtr<SRC>();
 			const SRC *srcPtr=&src.cast_to_TypePtr<SRC>()[0];
-			dstVal.copyFromMem(0,src.len(),srcPtr);
+			dstVal.copyFromMem(srcPtr,src.len());
 		}
 		virtual ~TypePtrConverter(){}
 };
