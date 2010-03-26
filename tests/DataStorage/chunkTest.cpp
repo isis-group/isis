@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE (chunk_copy_test)//Copy chunks
 
 	data::Chunk ch2=ch1;//This shall clone the underlying TypePtr-Object
 
-	//but it should of course be the of the same type and contain the same data
+	//but it should of course of the same type and contain the same data
 	BOOST_CHECK(ch1.getTypePtrBase().isSameType(ch2.getTypePtrBase()));
 	BOOST_CHECK(ch1.getTypePtrBase().is<float>());
 	BOOST_CHECK_EQUAL(ch1.volume(),ch2.volume());
@@ -103,5 +103,18 @@ BOOST_AUTO_TEST_CASE (chunk_copy_test)//Copy chunks
 		ch1.asTypePtr<float>()[i]=0;
 		BOOST_CHECK_EQUAL(ch2.getTypePtr<float>()[i],0);
 	}
+}
+BOOST_AUTO_TEST_CASE (memchunk_copy_test)//Copy chunks
+{
+	data::MemChunk<float> ch1(4,3,2,1);
+	for(size_t i=0;i<ch1.volume();i++)
+		ch1.asTypePtr<float>()[i]=i;
+	
+	data::MemChunk<short> ch2(ch1);//This shall deep copy the chunk and convert the float data to short
+	
+	//it should of course have the same size
+	BOOST_CHECK_EQUAL(ch1.volume(),ch2.volume());
+	for(size_t i=0;i<ch2.volume();i++)
+		BOOST_CHECK_EQUAL(ch2.asTypePtr<short>()[i],i);
 }
 }}

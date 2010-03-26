@@ -289,10 +289,10 @@ public:
 	 * Copy this to a new TypePtr\<T\> using newly allocated memory.
 	 * This will create a new TypePtr of type T and the length of this.
 	 * The memory will be allocated and the data of this will be copy-converted to T.
-	 * If the conversion fails, the data of the newly created TypePtr will be undefined.
+	 * If the conversion fails, an error will be send to CoreLog and the data of the newly created TypePtr will be undefined.
 	 * \returns a the newly created TypePtr
 	 */
-	template<typename T> TypePtr<T> copyToNew()const{
+	template<typename T> const TypePtr<T> copyToNew()const{
 		TypePtr<T> ret((T*)malloc(sizeof(T)*len()),len());
 		copyTo(ret);
 		return ret;

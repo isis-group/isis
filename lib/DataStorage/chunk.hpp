@@ -148,12 +148,8 @@ public:
 	/// Creates a deep copy of the given Chunk
 	MemChunk(const Chunk &ref):Chunk(ref)
 	{
-		util::TypePtr<TYPE> rep(
-			(TYPE*)malloc(sizeof(TYPE)*ref.volume()),ref.volume(),
-			typename ::isis::util::TypePtr<TYPE>::BasicDeleter()
-		);
-		ref.getTypePtr<TYPE>().deepCopy(rep);
-		getTypePtr<TYPE>()=rep;
+		//get rid of ref's TypePtr and make my own from it  (use the reset-function of the scoped_ptr Chunk is made of)
+		util::_internal::TypePtrBase::Reference::reset(new util::TypePtr<TYPE>(ref.getTypePtrBase().copyToNew<TYPE>()));
 	}
 };
 }}

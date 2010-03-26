@@ -39,13 +39,13 @@ enum autoscaleOption {noscale, autoscale,noupscale};
 
 /**
  * Converts data from 'src' to the type of 'dst' and stores them there.
- * If the value range of src does not fit into the domain of dst they will be scaled using the following rulllles:
+ * If the value range of src does not fit into the domain of dst they will be scaled using the following rules:
  * - will scale "around 0" if 0 is part of the source value range.
  * - elsewise values will be offset towards 0.
- * - if destination is unsigned values will be offset to be positive domain if necessary.
+ * - if destination is unsigned values will be offset to be in positive domain if necessary.
  * - if destination is floating point no scaling is done at all.
  * If dst is shorter than src, no conversion is done.
- * If src is shorter than dst a waring is send to CoreLog.
+ * If src is shorter than dst a warning is send to CoreLog.
  */
 template<typename SRC,typename DST> void numeric_convert(const TypePtr<SRC> &src,TypePtr<DST> &dst,autoscaleOption scaleopt=noupscale){
 	if(src.len()>dst.len()){
