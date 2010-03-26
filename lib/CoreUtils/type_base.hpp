@@ -22,6 +22,7 @@
 
 #include "types.hpp"
 #include "type_converter.hpp"
+#include "typeptr_converter.h"
 #include "common.hpp"
 
 
@@ -157,7 +158,7 @@ public:
 };
 
 class TypeBase : public GenericType{
-	static _internal::TypeConverterMap& converters();
+	static const TypeConverterMap& converters();
 	friend class TypeReference<TypeBase>;
 protected:
 	/**
@@ -171,7 +172,7 @@ public:
 	typedef TypeReference<TypeBase> Reference;
 	typedef TypeConverterMap::mapped_type::mapped_type Converter;
 
-	Converter getConverterTo(int typeId)const;
+	const Converter& getConverterTo(unsigned short id)const;
 	/**
 	* Interpret the value as value of any (other) type.
 	* This is a runtime-based cast via string. The value is converted into a string, which is then parsed as 
@@ -194,7 +195,7 @@ public:
 			<< " to " << Type<T>::staticName();
 			return *reinterpret_cast<const Type<T>*>(this);
 		} else {
-			Converter conv=getConverterTo(Type<T>::staticID);
+			const Converter& conv=getConverterTo(Type<T>::staticID);
 			if(conv){
 				Type<T> ret;
 				conv->convert(*this,ret);
@@ -235,6 +236,7 @@ public:
 
 class TypePtrBase : public GenericType{
 	friend class TypeReference<TypePtrBase>;
+	static const TypePtrConverterMap& converters();
 protected:
 	size_t m_len;
 	TypePtrBase(size_t len=0);
@@ -243,6 +245,9 @@ protected:
 	virtual TypePtrBase* clone()const=0;
 public:
 	typedef TypeReference<TypePtrBase> Reference;
+	typedef TypePtrConverterMap::mapped_type::mapped_type Converter;
+	
+	const Converter& getConverterTo(unsigned short id)const;
 	/**
 	* Dynamically cast the TypeBase up to its actual TypePtr\<T\>. Constant version.
 	* Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.

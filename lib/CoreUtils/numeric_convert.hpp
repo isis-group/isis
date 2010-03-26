@@ -1,36 +1,121 @@
-/*
-    <one line to give the program's name and a brief idea of what it does.>
-    Copyright (C) <year>  <name of author>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-*/
-
 #ifndef NUMERIC_CONVERT_HPP
 #define NUMERIC_CONVERT_HPP
 
 #include <limits>
+#include <assert.h>
+#include <boost/numeric/conversion/converter.hpp>
+#include "common.hpp"
+#include "type.hpp"
+
 namespace isis{namespace util{
-	template<typename T> class TypePtr;
 namespace _internal{
-	template<typename SRC,typename DST> void numeric_convert(const TypePtr<SRC> &src,TypePtr<DST> &dst){
-		double max,min;
-		src.getMinMax(min,max);
-		const double range_min=std::numeric_limits<DST>::min();
-		const double range_max=std::numeric_limits<DST>::max();
+	template<typename SRC, typename DST> static void numeric_convert_impl(const SRC* src, DST* dst, size_t count,double scale,double offset) {
+		LOG(Debug,info) << "generic scaling convert " << TypePtr<SRC>::staticName() << "=>" << TypePtr<DST>::staticName();
+		LOG(Debug,info) << "scale/offset=" << scale << "/" << offset;
+		static boost::numeric::converter<
+			DST,double,
+			boost::numeric::conversion_traits<DST,double>,
+			boost::numeric::def_overflow_handler,
+			boost::numeric::RoundEven<double>
+		> converter;
+		for(size_t i=0;i<count;i++)
+			dst[i]=converter(src[0]*scale+offset);
 	}
-}}}
+	template<typename SRC, typename DST> static void numeric_convert_impl(const SRC* src, DST* dst, size_t count) {
+		LOG(Debug,info) << "generic convert " << TypePtr<SRC>::staticName() << "=>" << TypePtr<DST>::staticName();
+		static boost::numeric::converter<
+			DST,SRC,
+			boost::numeric::conversion_traits<DST,SRC>,
+			boost::numeric::def_overflow_handler,
+			boost::numeric::RoundEven<SRC>
+		> converter;
+		for(size_t i=0;i<count;i++)
+			dst[i]=converter(src[0]);
+	}
+}
+	
+enum autoscaleOption {noscale, autoscale,noupscale};
+
+/**
+ * Converts data from 'src' to the type of 'dst' and stores them there.
+ * If the value range of src does not fit into the domain of dst they will be scaled using the following rulllles:
+ * - will scale "around 0" if 0 is part of the source value range.
+ * - elsewise values will be offset towards 0.
+ * - if destination is unsigned values will be offset to be positive domain if necessary.
+ * - if destination is floating point no scaling is done at all.
+ * If dst is shorter than src, no conversion is done.
+ * If src is shorter than dst a waring is send to CoreLog.
+ */
+template<typename SRC,typename DST> void numeric_convert(const TypePtr<SRC> &src,TypePtr<DST> &dst,autoscaleOption scaleopt=noupscale){
+	if(src.len()>dst.len()){
+		LOG(Runtime,error) << "The " << src.len() << " elements of src wont fit into the destination with the size " << dst.len();
+		return;
+	}
+	LOG_IF(src.len()<dst.len(),Runtime,warning) << "Source is shorter than destination. Will only convert " << src.len() << " values";
+	if(src.len()==0)return;
+
+	double scale=1.0;
+	double offset=0.0;
+	size_t srcsize = src.len();
+	bool doScale = (scaleopt!=noscale && std::numeric_limits<DST>::is_integer);
+
+	if(doScale) {
+		const double domain_min=std::numeric_limits<DST>::min();//negative value domain of this dst
+		const double domain_max =std::numeric_limits<DST>::max();//positive value domain of this dst
+		double minval,maxval;
+		src.getMinMax(minval,maxval);
+
+		LOG(Debug,info) << "src Range:" << minval << "=>" << maxval;
+		LOG(Debug,info) << "dst Domain:" << domain_min << "=>" << domain_max;
+
+		assert(domain_min<=0 && domain_max>=0); //I think we can assume this
+		assert(domain_min<domain_max);//we also should assume this
+
+		//set offset for src
+		//if all src is completly on positive domain, or if there is no negative domain use minval
+		//else if src is completly on negative dmain, or if there is no positive domain use maxval
+		//elsewise leave it at 0 and scale both sides
+		if(minval>0 || !domain_min){
+			if(maxval>domain_max) // if the values completely fit into the domain we dont have to offset them
+				offset=-minval;
+		} else if(maxval<0 || !domain_max){
+			if(minval<domain_min) // if the values completely fit into the domain we dont have to offset them
+				offset=-maxval;
+		}
+
+		//calculate range of values which will be on postive/negative domain when offset is applied
+		const double range_max =maxval+offset; //allways >=0
+		const double range_min=minval+offset; //allways <=0
+
+		//set scaling factor to fit src-range into dst domain
+		//some compilers dont make x/0 = inf, so we use std::numeric_limits<double>::max() instead, in this case
+		const double scale_max =
+		range_max ? domain_max/range_max :
+		std::numeric_limits<double>::max();
+		const double scale_min=
+		range_min ? domain_min/ range_min:
+		std::numeric_limits<double>::max();
+		LOG(Debug,info) << "scale_min/scale_max=" << scale_min << "/" << scale_max;
+
+		scale = std::min(scale_max?:std::numeric_limits<double>::max(),scale_min?:std::numeric_limits<double>::max());//get the smaller scaling factor which is not zero so the bigger range will fit into his domain
+		if(scale<1){
+			LOG(Runtime,warning) << "Downscaling your values by Factor " << scale << " you might lose information.";
+		} else if(scaleopt==noupscale){
+			if(scale>1)LOG(Runtime,info) << "upscale not given, clamping scale " << scale << " to 1";
+			scale=1;
+		}
+		doScale=(scale!=1. || offset);
+		offset*=scale;//calc offset for dst
+	}
+	if(doScale)LOG(Debug,info) << "converting with scale/offset=" << scale << "/" << offset;
+	else LOG(Debug,info) << "converting without scaling";
+	if(doScale)
+		_internal::numeric_convert_impl(&src[0],&dst[0], srcsize,scale,offset);
+	else
+		_internal::numeric_convert_impl(&src[0],&dst[0], srcsize);
+}
+
+}}
 
 
 #endif // NUMERIC_CONVERT_HPP

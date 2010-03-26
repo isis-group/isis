@@ -27,12 +27,28 @@ TypePtrBase::~TypePtrBase() {}
 TypeBase::~TypeBase() {}
 
 
-TypeConverterMap& TypeBase::converters() {
+const TypeConverterMap& TypeBase::converters() {
 	return *Singletons::get<_internal::TypeConverterMap,0>();
 }
 
-TypeBase::Converter TypeBase::getConverterTo(int id)const {
-	return converters()[typeID()][id];
+const TypePtrConverterMap& TypePtrBase::converters(){
+	return *Singletons::get<_internal::TypePtrConverterMap,0>();
+}
+
+
+const TypeBase::Converter& TypeBase::getConverterTo(unsigned short id)const {
+	const TypeConverterMap::const_iterator f1=converters().find(typeID());
+	assert(f1!=converters().end());
+	const TypeConverterMap::mapped_type::const_iterator f2=f1->second.find(id);
+	assert(f2!=f1->second.end());
+	return f2->second;
+}
+const TypePtrBase::Converter& TypePtrBase::getConverterTo(unsigned short id)const {
+	const TypePtrConverterMap::const_iterator f1=converters().find(typeID());
+	assert(f1!=converters().end());
+	const TypePtrConverterMap::mapped_type::const_iterator f2=f1->second.find(id);
+	assert(f2!=f1->second.end());
+	return f2->second;
 }
 
 size_t TypePtrBase::cmp(const TypePtrBase& comp)const{
