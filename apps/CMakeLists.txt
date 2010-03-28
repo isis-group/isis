@@ -7,6 +7,7 @@ else(HAVE_ITK)
 	message(FATAL_ERROR "You will need HAVE_ITK to build the apps")
 endif(HAVE_ITK)
 
+
 IF(BUILD_APPLICATIONS_2D)
 	add_subdirectory(isisReg2D)
 	add_subdirectory(isisDoTrans2D)
