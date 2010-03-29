@@ -34,8 +34,6 @@ public:
 
 	ChunkBase(size_t firstDim,size_t secondDim,size_t thirdDim,size_t fourthDim);
 	virtual ~ChunkBase(); //needed to make it polymorphic
-
-	isis::util::fvector4 size()const;
 };
 }
 	

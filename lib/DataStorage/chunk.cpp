@@ -28,10 +28,6 @@ ChunkBase::ChunkBase ( size_t firstDim, size_t secondDim, size_t thirdDim, size_
 
 ChunkBase::~ChunkBase() { }
 
-util::fvector4 ChunkBase::size()const
-{
-	return util::fvector4(dimSize(0),dimSize(1),dimSize(2),dimSize(3));
-}
 }
 
 Chunk::Chunk(const util::_internal::TypePtrBase::Reference &src, size_t firstDim, size_t secondDim, size_t thirdDim, size_t fourthDim):

@@ -52,8 +52,8 @@ std::list<vtkImageData*> VTKAdapter::makeVtkImageList(const boost::shared_ptr<is
 	}
     LOG(DataDebug, info) << "datatype: " << myAdapter->m_ImageISIS->chunksBegin()->typeName();
     //Set extend (offsetx, x,  offsety, y, offsetz, z);
-    vtkImage->SetDimensions(myAdapter->m_ImageISIS->chunksBegin()->size()[0], 
-			    myAdapter->m_ImageISIS->chunksBegin()->size()[1],
+    vtkImage->SetDimensions(myAdapter->m_ImageISIS->chunksBegin()->sizeToVector()[0], 
+			    myAdapter->m_ImageISIS->chunksBegin()->sizeToVector()[1],
 			    1);
     vtkImage->SetSpacing(1,1,1);
     vtkImage->SetNumberOfScalarComponents(1);
@@ -61,9 +61,9 @@ std::list<vtkImageData*> VTKAdapter::makeVtkImageList(const boost::shared_ptr<is
     vtkImage->AllocateScalars();
     short* ptr = static_cast<short*>(vtkImage->GetScalarPointer());
     
-    for (unsigned int x = 0; x <  myAdapter->m_ImageISIS->chunksBegin()->size()[0]; x++)
+    for (unsigned int x = 0; x <  myAdapter->m_ImageISIS->chunksBegin()->sizeToVector()[0]; x++)
 	{
-	    for (unsigned int y = 0; y <  myAdapter->m_ImageISIS->chunksBegin()->size()[1]; y++)
+	    for (unsigned int y = 0; y <  myAdapter->m_ImageISIS->chunksBegin()->sizeToVector()[1]; y++)
 	    {
 	      
 		*ptr++ =  myAdapter->m_ImageISIS->chunksBegin()->voxel<short>(x,y,100,0);
