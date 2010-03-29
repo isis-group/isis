@@ -36,6 +36,8 @@
 
 //vtk includes
 #include <vtkImageData.h>
+#include <vtkImageImport.h>
+
 //external includes 
 #include "boost/smart_ptr.hpp"
 #include <list>
@@ -44,20 +46,22 @@ namespace isis { namespace adapter {
     
 class VTKAdapter{
 public:
-    
-    static std::list<vtkImageData*> makeVtkImageList(const boost::shared_ptr<data::Image>);
+    static std::list<vtkImageImport*> makeVtkImageImportList(const boost::shared_ptr<data::Image>);
+    static std::list<vtkImageData*> makeVtkImageDataList(const boost::shared_ptr<data::Image>);
 private:   
-    //hold the image
-    boost::shared_ptr<data::Image> m_ImageISIS;
-    std::list<vtkImageData*> m_vtkImageList;
+    
+    static bool checkChunkDataType(const boost::shared_ptr<data::Image>);
     
 protected:
      //should not be loaded directly
     VTKAdapter(const boost::shared_ptr<data::Image>);
-    VTKAdapter(){};
     VTKAdapter(const VTKAdapter&){};  
   
-   
+private:
+    boost::shared_ptr<data::Image> m_ImageISIS;
+    std::list<vtkImageData*> m_vtkImageDataList;
+    std::list<vtkImageImport*> m_vtkImageImportList;
+    
 };
   
 

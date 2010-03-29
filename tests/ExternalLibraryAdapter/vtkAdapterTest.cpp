@@ -35,14 +35,14 @@ namespace isis{namespace test{
 		data::ImageList imgList = isis::data::IOFactory::load("/home/erik/workspace/data.nii", "");
 		
 		BOOST_CHECK(not imgList.empty());
-		std::list<vtkImageData*> vtkList = adapter::VTKAdapter::makeVtkImageList(imgList.front());
+		std::list<vtkImageImport*> vtkImageImportList = adapter::VTKAdapter::makeVtkImageImportList(imgList.front());
+		BOOST_CHECK(not vtkImageImportList.empty());
+		//finally show one axial slice of the vtkImage, z=100
 		vtkImageViewer* viewer = vtkImageViewer::New();
-		viewer->SetInput(vtkList.front());
-		viewer->SetSize(200,200);
+		viewer->SetZSlice(100);
+		viewer->SetInputConnection(vtkImageImportList.front()->GetOutputPort());
 		viewer->Render();
-		sleep(10);
-		
-		
+		sleep(5);		
 	}
 }}//end namespace 
 		

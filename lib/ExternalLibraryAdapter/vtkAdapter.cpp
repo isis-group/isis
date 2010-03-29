@@ -1,35 +1,50 @@
 #include "vtkAdapter.hpp"
-#include <vtkImageData.h>
-#include <vtkImageImport.h>
-#include <vtkImageViewer.h>
-
+#include <vtkXMLImageDataWriter.h>
 
 namespace isis{ namespace adapter{
     
 VTKAdapter::VTKAdapter(const boost::shared_ptr<isis::data::Image> src)
-    : m_ImageISIS(src), m_vtkImageList()
+    : m_ImageISIS(src), m_vtkImageDataList(), m_vtkImageImportList()
 {}
 
+//return a list of vtkImageImport type pointer
+std::list<vtkImageImport*> VTKAdapter::makeVtkImageImportList(const boost::shared_ptr<data::Image> src)
+{
+  VTKAdapter* myAdapter = new VTKAdapter(src);
+  vtkImageImport* importer = vtkImageImport::New();
+  const util::fvector4 dimensions(myAdapter->m_ImageISIS->sizeToVector());
+   //go through all the chunks and check for consistent datatype
+  if(not checkChunkDataType(myAdapter->m_ImageISIS)) { 
+    LOG(data::Runtime, error) << "Inconsistent chunk datatype!"; 
+    //TODO exception handling
+  }
+  //TODO handling of 4th dimension, metadata, datatype, amount of chunks
+  importer->SetImportVoidPointer(&myAdapter->m_ImageISIS->voxel<short>(0,0,0,0));
+  importer->SetWholeExtent(0,dimensions[0]-1,0,dimensions[1]-1,0,dimensions[2]-1);
+  importer->SetDataExtentToWholeExtent();
+  importer->SetDataScalarTypeToShort();
+  importer->Update();
+    
+  myAdapter->m_vtkImageImportList.push_back(importer);
+  return myAdapter->m_vtkImageImportList;
+}
 
-std::list<vtkImageData*> VTKAdapter::makeVtkImageList(const boost::shared_ptr<isis::data::Image> src)
+
+
+//return a list of vtkImageData type pointer
+std::list<vtkImageData*> VTKAdapter::makeVtkImageDataList(const boost::shared_ptr<data::Image> src)
 {
     VTKAdapter* myAdapter = new VTKAdapter(src);
     vtkImageData* vtkImage = vtkImageData::New();
-    vtkImageImport* importer = vtkImageImport::New();
+    
     const util::fvector4 dimensions(myAdapter->m_ImageISIS->sizeToVector());
-    unsigned int firstTypeID = myAdapter->m_ImageISIS->chunksBegin()->typeID();
-    unsigned int chunkCounter = 0;
+    
     //go through all the chunks and check for consistent datatype
-    for (data::Image::ChunkIterator ci = myAdapter->m_ImageISIS->chunksBegin();ci != myAdapter->m_ImageISIS->chunksEnd(); *ci++)
-    {
-	chunkCounter++;
-	if(not ci->typeID() == firstTypeID)
-	{
-	    LOG(data::Runtime, error) << "Inconsistent chunk datatype!";
-	    //TODO exception handle in constructor ??
-	}
+    if(not checkChunkDataType(myAdapter->m_ImageISIS)) { 
+      LOG(data::Runtime, error) << "Inconsistent chunk datatype!"; 
+      //TODO exception handling
     }
-    LOG(DataDebug, info) << "chunkCounter: " << chunkCounter;
+    
     //set the datatype for the vtkImage object
     LOG(DataDebug, info) << "dim4: " << dimensions[3];
     switch(myAdapter->m_ImageISIS->chunksBegin()->typeID()){
@@ -54,29 +69,38 @@ std::list<vtkImageData*> VTKAdapter::makeVtkImageList(const boost::shared_ptr<is
 	}
     LOG(DataDebug, info) << "datatype: " << myAdapter->m_ImageISIS->chunksBegin()->typeName();
     //Set extend (offsetx, x,  offsety, y, offsetz, z);
-    vtkImage->SetDimensions(myAdapter->m_ImageISIS->chunksBegin()->sizeToVector()[0], 
-			    myAdapter->m_ImageISIS->chunksBegin()->sizeToVector()[1],
-			    1);
+    //TODO handling of 4th dimension, metadata, datatype, amount of chunks
+    vtkImage->SetDimensions(dimensions[0], 
+			    dimensions[1],
+			    dimensions[2]);
+    vtkImage->SetWholeExtent(0,dimensions[0]-1,0,dimensions[1]-1,0,dimensions[2]-1);
+    
     vtkImage->SetSpacing(1,1,1);
     vtkImage->SetNumberOfScalarComponents(1);
     vtkImage->SetOrigin(0,0,0);
     vtkImage->AllocateScalars();
-        
-    importer->SetImportVoidPointer(&myAdapter->m_ImageISIS->voxel<short>(0,0,0,0));
-    importer->SetWholeExtent(1,myAdapter->m_ImageISIS->chunksBegin()->sizeToVector()[0],1,myAdapter->m_ImageISIS->chunksBegin()->sizeToVector()[1],1,myAdapter->m_ImageISIS->chunksBegin()->sizeToVector()[2]);
-    importer->SetDataExtentToWholeExtent();
-    importer->SetDataScalarTypeToShort();
+    short* scalarPtr = static_cast<short*>(vtkImage->GetScalarPointer());
+    scalarPtr = &myAdapter->m_ImageISIS->voxel<short>(0,0,0,0);
+    vtkImage->Update();
     
-    vtkImageViewer* viewer = vtkImageViewer::New();
-    viewer->SetInputConnection(importer->GetOutputPort());
-    viewer->SetZSlice(1);
-    viewer->Render();
-    sleep(5);
-    myAdapter->m_vtkImageList.push_back(vtkImage);
-    return myAdapter->m_vtkImageList;
+       
+  
+    myAdapter->m_vtkImageDataList.push_back(vtkImage);
+    return myAdapter->m_vtkImageDataList;
 }
 
-
+bool VTKAdapter::checkChunkDataType(const boost::shared_ptr<data::Image> image)
+{
+  unsigned int firstTypeID = image->chunksBegin()->typeID();
+  unsigned int chunkCounter = 0;
+  for (data::Image::ChunkIterator ci = image->chunksBegin();ci != image->chunksEnd(); *ci++)
+  {
+      chunkCounter++;
+      if(not ci->typeID() == firstTypeID) return false;   
+  }
+  LOG(DataDebug, info) << "chunkCounter: " << chunkCounter;
+  return true;
+}
 
 
 }} //end namespace
