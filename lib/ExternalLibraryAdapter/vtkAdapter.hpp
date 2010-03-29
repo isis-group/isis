@@ -44,9 +44,18 @@
 
 namespace isis { namespace adapter {
     
+/**
+  * VTKAdapter is able of taking an isis Image object and return either a list of vtkImageData* or vtkImageImport*.
+  */
 class VTKAdapter{
 public:
+  /**
+    * Gets a std::list of vtkImageImport*.
+    */
     static std::list<vtkImageImport*> makeVtkImageImportList(const boost::shared_ptr<data::Image>);
+  /**
+    * Gets a std::list of vtkImageData*.
+    */
     static std::list<vtkImageData*> makeVtkImageDataList(const boost::shared_ptr<data::Image>);
 private:   
     
