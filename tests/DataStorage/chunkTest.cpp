@@ -27,6 +27,16 @@ BOOST_AUTO_TEST_CASE (chunk_init_test)
 	BOOST_CHECK_EQUAL(ch.dimSize(data::timeDim),1);
 }
 
+BOOST_AUTO_TEST_CASE (chunk_mem_init_test)
+{
+	const short data[3*3]={0,1,2,3,4,5,6,7,8};
+	data::MemChunk<short> ch(data,3,3);
+	BOOST_CHECK_EQUAL(ch.volume(),3*3);
+	for(int i=0;i<3;i++)
+		for(int j=0;j<3;j++)
+			BOOST_CHECK_EQUAL(ch.voxel<short>(i,j),i+j*3);
+}
+
 BOOST_AUTO_TEST_CASE (chunk_property_test)
 {
 	data::MemChunk<float> ch(4,3,2,1);

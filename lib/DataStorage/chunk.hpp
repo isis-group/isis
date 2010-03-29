@@ -137,13 +137,23 @@ typedef std::list<Chunk> ChunkList;
 /// Chunk class for memory-based buffers
 template<typename TYPE> class MemChunk : public Chunk{
 public:
+	/// Create an empty MemChunk with the given size
 	MemChunk(size_t firstDim,size_t secondDim=1,size_t thirdDim=1,size_t fourthDim=1):
 	Chunk(
 		(TYPE*)malloc(sizeof(TYPE)*fourthDim*thirdDim*secondDim*firstDim),
 		typename ::isis::util::TypePtr<TYPE>::BasicDeleter(),
-		  firstDim,secondDim,thirdDim,fourthDim
+		firstDim,secondDim,thirdDim,fourthDim
 	){}
-	/// Creates a deep copy of the given Chunk
+	/// Create a MemChunk as copy of a given raw memory block (no range check will be done)
+	MemChunk(const TYPE*const org,size_t firstDim,size_t secondDim=1,size_t thirdDim=1,size_t fourthDim=1):
+	Chunk(
+		(TYPE*)malloc(sizeof(TYPE)*fourthDim*thirdDim*secondDim*firstDim),
+		typename ::isis::util::TypePtr<TYPE>::BasicDeleter(),
+		firstDim,secondDim,thirdDim,fourthDim
+	){
+		asTypePtr<TYPE>().copyFromMem(org,volume());
+	}
+	/// Create a deep copy of a given Chunk (automatic conversion will be used if datatype does not fit)
 	MemChunk(const Chunk &ref):Chunk(ref)
 	{
 		//get rid of ref's TypePtr and make my own from it  (use the reset-function of the scoped_ptr Chunk is made of)
