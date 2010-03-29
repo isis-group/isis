@@ -13,6 +13,7 @@
 #include <vtkImageData.h>
 #include <vtkImageWriter.h>
 #include <vtkPolyDataWriter.h>
+#include <vtkSmartPointer.h>
 
 namespace isis{namespace test{
   
@@ -35,14 +36,23 @@ namespace isis{namespace test{
 		data::ImageList imgList = isis::data::IOFactory::load("/home/erik/workspace/data.nii", "");
 		
 		BOOST_CHECK(not imgList.empty());
-		std::list<vtkImageImport*> vtkImageImportList = adapter::VTKAdapter::makeVtkImageImportList(imgList.front());
+		std::list< vtkSmartPointer<vtkImageImport> > vtkImageImportList = adapter::VTKAdapter::makeVtkImageImportList(imgList.front());
+		std::list< vtkSmartPointer<vtkImageData> > vtkImageImageDataList = adapter::VTKAdapter::makeVtkImageDataList(imgList.front());
 		BOOST_CHECK(not vtkImageImportList.empty());
+		BOOST_CHECK(not vtkImageImageDataList.empty());
 		//finally show one axial slice of the vtkImage, z=100
-		vtkImageViewer* viewer = vtkImageViewer::New();
-		viewer->SetZSlice(100);
-		viewer->SetInputConnection(vtkImageImportList.front()->GetOutputPort());
-		viewer->Render();
-		sleep(5);		
+		vtkImageViewer* viewer1 = vtkImageViewer::New();
+		vtkImageViewer* viewer2 = vtkImageViewer::New();
+		LOG(DataDebug,info) << "Showing vtkImageImport object";
+		viewer1->SetZSlice(100);
+		viewer1->SetInputConnection(vtkImageImportList.front()->GetOutputPort());
+		viewer1->Render();
+		sleep(3);
+		LOG(DataDebug,info) << "Showing vtkImageData object";
+		viewer2->SetZSlice(100);
+		viewer2->SetInput(vtkImageImageDataList.front());
+		viewer2->Render();
+		sleep(3);
 	}
 }}//end namespace 
 		

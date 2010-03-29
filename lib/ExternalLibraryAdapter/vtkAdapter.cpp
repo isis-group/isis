@@ -8,7 +8,7 @@ VTKAdapter::VTKAdapter(const boost::shared_ptr<isis::data::Image> src)
 {}
 
 //return a list of vtkImageImport type pointer
-std::list<vtkImageImport*> VTKAdapter::makeVtkImageImportList(const boost::shared_ptr<data::Image> src)
+std::list< vtkSmartPointer<vtkImageImport> > VTKAdapter::makeVtkImageImportList(const boost::shared_ptr<data::Image> src)
 {
   VTKAdapter* myAdapter = new VTKAdapter(src);
   vtkImageImport* importer = vtkImageImport::New();
@@ -32,11 +32,11 @@ std::list<vtkImageImport*> VTKAdapter::makeVtkImageImportList(const boost::share
 
 
 //return a list of vtkImageData type pointer
-std::list<vtkImageData*> VTKAdapter::makeVtkImageDataList(const boost::shared_ptr<data::Image> src)
+std::list< vtkSmartPointer<vtkImageData> > VTKAdapter::makeVtkImageDataList(const boost::shared_ptr<data::Image> src)
 {
     VTKAdapter* myAdapter = new VTKAdapter(src);
     vtkImageData* vtkImage = vtkImageData::New();
-    
+    vtkImageImport* importer = vtkImageImport::New();
     const util::fvector4 dimensions(myAdapter->m_ImageISIS->sizeToVector());
     
     //go through all the chunks and check for consistent datatype
@@ -68,6 +68,11 @@ std::list<vtkImageData*> VTKAdapter::makeVtkImageDataList(const boost::shared_pt
 	    //TODO  exception handle in constructor ??
 	}
     LOG(DataDebug, info) << "datatype: " << myAdapter->m_ImageISIS->chunksBegin()->typeName();
+    importer->SetImportVoidPointer(&myAdapter->m_ImageISIS->voxel<short>(0,0,0,0));
+    importer->SetWholeExtent(0,dimensions[0]-1,0,dimensions[1]-1,0,dimensions[2]-1);
+    importer->SetDataExtentToWholeExtent();
+    importer->SetDataScalarTypeToShort();
+    importer->Update();
     //Set extend (offsetx, x,  offsety, y, offsetz, z);
     //TODO handling of 4th dimension, metadata, datatype, amount of chunks
     vtkImage->SetDimensions(dimensions[0], 
@@ -79,15 +84,16 @@ std::list<vtkImageData*> VTKAdapter::makeVtkImageDataList(const boost::shared_pt
     vtkImage->SetNumberOfScalarComponents(1);
     vtkImage->SetOrigin(0,0,0);
     vtkImage->AllocateScalars();
-    short* scalarPtr = static_cast<short*>(vtkImage->GetScalarPointer());
-    scalarPtr = &myAdapter->m_ImageISIS->voxel<short>(0,0,0,0);
     vtkImage->Update();
-    
+    vtkImage = importer->GetOutput();
        
   
     myAdapter->m_vtkImageDataList.push_back(vtkImage);
     return myAdapter->m_vtkImageDataList;
 }
+
+
+//private functions
 
 bool VTKAdapter::checkChunkDataType(const boost::shared_ptr<data::Image> image)
 {

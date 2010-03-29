@@ -37,6 +37,7 @@
 //vtk includes
 #include <vtkImageData.h>
 #include <vtkImageImport.h>
+#include <vtkSmartPointer.h>
 
 //external includes 
 #include "boost/smart_ptr.hpp"
@@ -52,11 +53,11 @@ public:
   /**
     * Gets a std::list of vtkImageImport*.
     */
-    static std::list<vtkImageImport*> makeVtkImageImportList(const boost::shared_ptr<data::Image>);
+    static std::list< vtkSmartPointer<vtkImageImport> > makeVtkImageImportList(const boost::shared_ptr<data::Image>);
   /**
     * Gets a std::list of vtkImageData*.
     */
-    static std::list<vtkImageData*> makeVtkImageDataList(const boost::shared_ptr<data::Image>);
+    static std::list< vtkSmartPointer< vtkImageData> > makeVtkImageDataList(const boost::shared_ptr<data::Image>);
 private:   
     
     static bool checkChunkDataType(const boost::shared_ptr<data::Image>);
@@ -68,8 +69,8 @@ protected:
   
 private:
     boost::shared_ptr<data::Image> m_ImageISIS;
-    std::list<vtkImageData*> m_vtkImageDataList;
-    std::list<vtkImageImport*> m_vtkImageImportList;
+    std::list< vtkSmartPointer< vtkImageData> > m_vtkImageDataList;
+    std::list< vtkSmartPointer<vtkImageImport> > m_vtkImageImportList;
     
 };
   
