@@ -1,6 +1,8 @@
 #include "vtkAdapter.hpp"
-#include "vtkImageData.h"
-#include "vtkImageImport.h"
+#include <vtkImageData.h>
+#include <vtkImageImport.h>
+#include <vtkImageViewer.h>
+
 
 namespace isis{ namespace adapter{
     
@@ -59,19 +61,17 @@ std::list<vtkImageData*> VTKAdapter::makeVtkImageList(const boost::shared_ptr<is
     vtkImage->SetNumberOfScalarComponents(1);
     vtkImage->SetOrigin(0,0,0);
     vtkImage->AllocateScalars();
-    short* ptr = static_cast<short*>(vtkImage->GetScalarPointer());
+        
+    importer->SetImportVoidPointer(&myAdapter->m_ImageISIS->voxel<short>(0,0,0,0));
+    importer->SetWholeExtent(1,myAdapter->m_ImageISIS->chunksBegin()->sizeToVector()[0],1,myAdapter->m_ImageISIS->chunksBegin()->sizeToVector()[1],1,myAdapter->m_ImageISIS->chunksBegin()->sizeToVector()[2]);
+    importer->SetDataExtentToWholeExtent();
+    importer->SetDataScalarTypeToShort();
     
-    for (unsigned int x = 0; x <  myAdapter->m_ImageISIS->chunksBegin()->sizeToVector()[0]; x++)
-	{
-	    for (unsigned int y = 0; y <  myAdapter->m_ImageISIS->chunksBegin()->sizeToVector()[1]; y++)
-	    {
-	      
-		*ptr++ =  myAdapter->m_ImageISIS->chunksBegin()->voxel<short>(x,y,100,0);
-		std::cout << x << "," << y << ":" << *ptr << "_";
-
-	    }
-	}
-    
+    vtkImageViewer* viewer = vtkImageViewer::New();
+    viewer->SetInputConnection(importer->GetOutputPort());
+    viewer->SetZSlice(1);
+    viewer->Render();
+    sleep(5);
     myAdapter->m_vtkImageList.push_back(vtkImage);
     return myAdapter->m_vtkImageList;
 }
