@@ -4,30 +4,8 @@
 namespace isis{ namespace adapter{
     
 VTKAdapter::VTKAdapter(const boost::shared_ptr<isis::data::Image> src)
-    : m_ImageISIS(src), m_vtkImageDataList(), m_vtkImageImportList()
+    : m_ImageISIS(src), m_vtkImageDataList()
 {}
-
-//return a list of vtkImageImport type pointer
-std::list< vtkSmartPointer<vtkImageImport> > VTKAdapter::makeVtkImageImportList(const boost::shared_ptr<data::Image> src)
-{
-	VTKAdapter* myAdapter = new VTKAdapter(src);
-	vtkImageImport* importer = vtkImageImport::New();
-	const util::fvector4 dimensions(myAdapter->m_ImageISIS->sizeToVector());
-	//go through all the chunks and check for consistent datatype
-	if(not checkChunkDataType(myAdapter->m_ImageISIS)) { 
-		LOG(data::Runtime, error) << "Inconsistent chunk datatype!"; 
-		//TODO exception handling
-	}
-	importer->SetImportVoidPointer(&myAdapter->m_ImageISIS->voxel<short>(0,0,0,0));
-	importer->SetWholeExtent(0,dimensions[0]-1,0,dimensions[1]-1,0,dimensions[2]-1);
-	importer->SetDataExtentToWholeExtent();
-	importer->SetDataScalarTypeToShort();
-	importer->Update();
-
-	myAdapter->m_vtkImageImportList.push_back(importer);
-	return myAdapter->m_vtkImageImportList;
-}
-
 
 
 //return a list of vtkImageData type pointer

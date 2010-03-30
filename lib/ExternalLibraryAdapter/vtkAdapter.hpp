@@ -60,10 +60,6 @@ public:
 		AlongZ
 	};
 	/**
-	* Gets a std::list of vtkImageImport*.
-	*/
-	static std::list< vtkSmartPointer<vtkImageImport> > makeVtkImageImportList(const boost::shared_ptr<data::Image>);
-	/**
 	* Gets a std::list of vtkImageData*.
 	*/
 	static std::list< vtkSmartPointer< vtkImageData> > makeVtkImageDataList(const boost::shared_ptr<data::Image>, const ChunkArrangement& = NoArrangement);
@@ -79,7 +75,6 @@ protected:
 private:
 	boost::shared_ptr<data::Image> m_ImageISIS;
 	std::list< vtkSmartPointer< vtkImageData> > m_vtkImageDataList;
-	std::list< vtkSmartPointer<vtkImageImport> > m_vtkImageImportList;	
 		
 };
   
