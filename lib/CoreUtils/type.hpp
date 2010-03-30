@@ -144,14 +144,16 @@ public:
 	/// Default delete-functor for c-arrays (uses free()).
 	struct BasicDeleter{
 		void operator()(TYPE *p){
-			LOG(Debug,info) << "Freeing pointer " << p << " (" << TypePtr<TYPE>::staticName() << ") ";
+			//we have to cast the pointer to void* here, because in case of u_int8_t it will try to print the "string"
+			LOG(Debug,info) << "Freeing pointer " << (void*)p << " (" << TypePtr<TYPE>::staticName() << ") ";
 			free(p);
 		};
 	};
 	/// Default delete-functor for arrays of objects (uses delete[]).
 	struct ObjectArrayDeleter{
 		void operator()(TYPE *p){
-			LOG(Debug,info) << "Deleting object array at " << p << " (" << TypePtr<TYPE>::staticName() << ") ";
+			//we have to cast the pointer to void* here, because in case of u_int8_t it will try to print the "string"
+			LOG(Debug,info) << "Deleting object array at " << (void*)p << " (" << TypePtr<TYPE>::staticName() << ") ";
 			delete[] p;
 		};
 	};

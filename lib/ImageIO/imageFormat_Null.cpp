@@ -21,16 +21,19 @@ public:
 		
 		for(int i=0;i<timesteps;i++){
 			for(int c=0;c<images;c++){
-				data::MemChunk<short> ch(3,3,3);
+				data::MemChunk<u_int8_t> ch(50,50,50);
 				ch.setProperty("indexOrigin",util::fvector4(0,0,0,i));
 				ch.setProperty("acquisitionNumber",c);
 				ch.setProperty("sequenceNumber",c);
-				ch.setProperty("performingPhysician",std::string("Niemand"));
+				ch.setProperty("performingPhysician",std::string("Dr. Jon Doe"));
 				ch.setProperty("readVec",util::fvector4(1,0));
 				ch.setProperty("phaseVec",util::fvector4(0,1));
 				ch.setProperty("voxelSize",util::fvector4(1,1,1));
-				for(int x=0;x<3;x++)
-					ch.voxel<short>(x,x,x)=c+i;
+				ch.voxel<u_int8_t>(0,0)=c;
+				for(int x=10;x<40;x++)
+					for(int y=10;y<40;y++)
+						for(int z=10;z<40;z++)
+							ch.voxel<u_int8_t>(x,y,z)=i*20;
 				chunks.push_back(ch);
 			}
 		}
@@ -38,15 +41,11 @@ public:
 	}
 	
 	bool write(const data::Image &image,const std::string& filename,const std::string& dialect ){
-		if(image.sizeToVector() != util::fvector4(3,3,3,10))return false;
+		if(image.sizeToVector() != util::fvector4(50,50,50,10))return false;
 		const int snum=image.getProperty<int>("sequenceNumber");
 
-		std::cout
-		<<  "If I was a real writer, I would now write an image with the sequence number "
-		<< snum << " and the size "	<< image.sizeToString() << " to " << filename << std::endl;
-		
 		for(int i=0;i<10;i++)
-			if(image.voxel<short>(0,0,0,i) != i+snum)return false;
+			if(image.voxel<u_int8_t>(0,0) != snum)return false;
 		return true;
 	}
 	bool tainted(){return false;}//internal plugins are not tainted
