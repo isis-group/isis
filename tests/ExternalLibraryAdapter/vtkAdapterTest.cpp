@@ -8,7 +8,6 @@
 #include "DataStorage/io_factory.hpp"
 #include "ExternalLibraryAdapter/vtkAdapter.hpp"
 
-#include <vtkImageImport.h>
 #include <vtkImageViewer.h>
 #include <vtkImageData.h>
 #include <vtkImageWriter.h>
@@ -31,26 +30,21 @@ namespace isis{namespace test{
 		// just to make sure the wanted file exists
 		FILE* f = fopen("test.null", "w");
 		fclose(f);
+		vtkImageViewer* viewer1 = vtkImageViewer::New();
+		vtkImageViewer* viewer2 = vtkImageViewer::New();
 		//load an image and store it into the vtkAdapter
 // 		data::ImageList imgList = isis::data::IOFactory::load("test.null", "");
 		data::ImageList imgList = isis::data::IOFactory::load("/home/erik/workspace/data.nii", "");
 		BOOST_CHECK(not imgList.empty());
-		std::list< vtkSmartPointer<vtkImageImport> > vtkImageImportList = adapter::VTKAdapter::makeVtkImageImportList(imgList.front());
 		std::list< vtkSmartPointer<vtkImageData> > vtkImageImageDataList = adapter::VTKAdapter::makeVtkImageDataList(imgList.front());
-		BOOST_CHECK(not vtkImageImportList.empty());
 		BOOST_CHECK(not vtkImageImageDataList.empty());
-		//finally show one axial slice of the vtkImage, z=100
-		vtkImageViewer* viewer1 = vtkImageViewer::New();
-		vtkImageViewer* viewer2 = vtkImageViewer::New();
-		LOG(DataDebug,info) << "Showing vtkImageImport object";
-		viewer1->SetZSlice(100);
-		viewer1->SetInputConnection(vtkImageImportList.front()->GetOutputPort());
+		//finally show one axial slice of the vtkImage, z=zdimension/2
+		
+		
+		LOG(DataDebug,info) << "Showing vtkImageData object. z=zdimension/2 = " << vtkImageImageDataList.front()->GetDimensions()[2] / 2;
+		viewer1->SetZSlice(vtkImageImageDataList.front()->GetDimensions()[2] / 2);
+		viewer1->SetInput(vtkImageImageDataList.front());
 		viewer1->Render();
-		sleep(3);
-		LOG(DataDebug,info) << "Showing vtkImageData object";
-		viewer2->SetZSlice(100);
-		viewer2->SetInput(vtkImageImageDataList.front());
-		viewer2->Render();
 		sleep(3);
 
 		//load a 4d image
@@ -59,9 +53,12 @@ namespace isis{namespace test{
 		BOOST_CHECK(not imgListTime.empty());
 		std::list< vtkSmartPointer<vtkImageData> > vtkImageImageDataListTime = adapter::VTKAdapter::makeVtkImageDataList(imgListTime.front());
 		BOOST_CHECK(not vtkImageImageDataListTime.empty());
-		LOG(DataDebug, info) << vtkImageImageDataListTime.size();
-		
-		
+		LOG(DataDebug,info) << "Showing first of " << vtkImageImageDataListTime.size() << " objects. z=zdimension/2 = " << vtkImageImageDataListTime.front()->GetDimensions()[2] / 2;
+		viewer2->SetZSlice(vtkImageImageDataListTime.front()->GetDimensions()[2] / 2);
+		viewer2->SetInput(vtkImageImageDataListTime.front());
+		viewer2->Render();
+		sleep(3);
+				
 	}
 }}//end namespace 
 		

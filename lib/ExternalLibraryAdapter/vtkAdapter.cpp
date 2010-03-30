@@ -37,6 +37,8 @@ std::list< vtkSmartPointer<vtkImageData> > VTKAdapter::makeVtkImageDataList(cons
 	vtkImageData* vtkImage = vtkImageData::New();
 	vtkImageImport* importer = vtkImageImport::New();
 	const util::fvector4 dimensions(myAdapter->m_ImageISIS->sizeToVector());
+	const util::fvector4 indexOrigin(myAdapter->m_ImageISIS->getProperty<util::fvector4>("indexOrigin"));
+	const util::fvector4 spacing(myAdapter->m_ImageISIS->getProperty<util::fvector4>("voxelSize"));
 	LOG(DataDebug, info) << dimensions;
 	//go through all the chunks and check for consistent datatype
 	if(not checkChunkDataType(myAdapter->m_ImageISIS)) { 
@@ -47,6 +49,7 @@ std::list< vtkSmartPointer<vtkImageData> > VTKAdapter::makeVtkImageDataList(cons
 	//set the datatype for the vtkImage object
 	LOG(DataDebug, info) << "dim4: " << dimensions[3];
 	LOG(DataDebug, info) << "datatype: " << myAdapter->m_ImageISIS->chunksBegin()->typeName();
+	//TODO check datatypes
 	switch(myAdapter->m_ImageISIS->chunksBegin()->typeID()){
 		case util::TypePtr<int8_t>::staticID: vtkImage->SetScalarTypeToChar(); importer->SetDataScalarTypeToUnsignedChar();break;
 		
@@ -70,6 +73,8 @@ std::list< vtkSmartPointer<vtkImageData> > VTKAdapter::makeVtkImageDataList(cons
 	
 	importer->SetWholeExtent(0,dimensions[0]-1,0,dimensions[1]-1,0,dimensions[2]-1);
 	importer->SetDataExtentToWholeExtent();
+	vtkImage->SetOrigin(indexOrigin[0],indexOrigin[1],indexOrigin[2]);
+	vtkImage->SetSpacing(spacing[0],spacing[1],spacing[2]);
 	//go through every timestep (dimensions[3] and add the chunk to the image list 
 	for (unsigned int dim=0;dim<dimensions[3];dim++)
 	{
