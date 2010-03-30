@@ -43,7 +43,7 @@
 #include "boost/smart_ptr.hpp"
 #include <vector>
 
-//TODO handling of 4th dimension, metadata, datatype, amount of chunks
+//TODO chunk handling
 
 namespace isis { namespace adapter {
     
