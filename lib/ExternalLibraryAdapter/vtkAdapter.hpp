@@ -41,7 +41,7 @@
 
 //external includes 
 #include "boost/smart_ptr.hpp"
-#include <list>
+#include <vector>
 
 //TODO handling of 4th dimension, metadata, datatype, amount of chunks
 
@@ -52,6 +52,7 @@ namespace isis { namespace adapter {
   */
 class VTKAdapter{
 public:
+	typedef std::vector< vtkSmartPointer< vtkImageData > > ImageVector;
 	enum ChunkArrangement 
 	{
 		NoArrangement,
@@ -62,7 +63,7 @@ public:
 	/**
 	* Gets a std::list of vtkImageData*.
 	*/
-	static std::list< vtkSmartPointer< vtkImageData> > makeVtkImageDataList(const boost::shared_ptr<data::Image>, const ChunkArrangement& = NoArrangement);
+	static ImageVector makeVtkImageDataList(const boost::shared_ptr<data::Image>, const ChunkArrangement& = NoArrangement);
 private:   
     
 	static bool checkChunkDataType(const boost::shared_ptr<data::Image>);
@@ -74,7 +75,7 @@ protected:
   
 private:
 	boost::shared_ptr<data::Image> m_ImageISIS;
-	std::list< vtkSmartPointer< vtkImageData> > m_vtkImageDataList;
+	ImageVector m_vtkImageDataVector;
 		
 };
   

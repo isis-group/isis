@@ -4,12 +4,12 @@
 namespace isis{ namespace adapter{
     
 VTKAdapter::VTKAdapter(const boost::shared_ptr<isis::data::Image> src)
-    : m_ImageISIS(src), m_vtkImageDataList()
+    : m_ImageISIS(src), m_vtkImageDataVector()
 {}
 
 
 //return a list of vtkImageData type pointer
-std::list< vtkSmartPointer<vtkImageData> > VTKAdapter::makeVtkImageDataList(const boost::shared_ptr<data::Image> src, const VTKAdapter::ChunkArrangement& arrangement)
+VTKAdapter::ImageVector VTKAdapter::makeVtkImageDataList(const boost::shared_ptr<data::Image> src, const VTKAdapter::ChunkArrangement& arrangement)
 {
 	VTKAdapter* myAdapter = new VTKAdapter(src);
 	vtkImageData* vtkImage = vtkImageData::New();
@@ -59,10 +59,10 @@ std::list< vtkSmartPointer<vtkImageData> > VTKAdapter::makeVtkImageDataList(cons
 		importer->SetImportVoidPointer(&myAdapter->m_ImageISIS->voxel<short>(0,0,0,dim));
 		importer->Update();
 		vtkImage = importer->GetOutput();
-		myAdapter->m_vtkImageDataList.push_back(vtkImage);
+		myAdapter->m_vtkImageDataVector.push_back(vtkImage);
 	}
 	
-	return myAdapter->m_vtkImageDataList;
+	return myAdapter->m_vtkImageDataVector;
 }
 
 
