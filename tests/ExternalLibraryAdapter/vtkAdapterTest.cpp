@@ -29,12 +29,11 @@ namespace isis{namespace test{
 		//ENABLE_LOG(isis::ImageIoDebug,isis::util::DefaultMsgPrint,isis::info);
 		//ENABLE_LOG(isis::ImageIoLog,isis::util::DefaultMsgPrint,isis::info);
 		// just to make sure the wanted file exists
-// 		FILE* f = fopen("test.null", "w");
-// 		fclose(f);
+		FILE* f = fopen("test.null", "w");
+		fclose(f);
 		//load an image and store it into the vtkAdapter
 // 		data::ImageList imgList = isis::data::IOFactory::load("test.null", "");
 		data::ImageList imgList = isis::data::IOFactory::load("/home/erik/workspace/data.nii", "");
-		
 		BOOST_CHECK(not imgList.empty());
 		std::list< vtkSmartPointer<vtkImageImport> > vtkImageImportList = adapter::VTKAdapter::makeVtkImageImportList(imgList.front());
 		std::list< vtkSmartPointer<vtkImageData> > vtkImageImageDataList = adapter::VTKAdapter::makeVtkImageDataList(imgList.front());
@@ -53,6 +52,16 @@ namespace isis{namespace test{
 		viewer2->SetInput(vtkImageImageDataList.front());
 		viewer2->Render();
 		sleep(3);
+
+		//load a 4d image
+		data::ImageList imgListTime = isis::data::IOFactory::load("/home/erik/workspace/timeseries.nii", "");
+// 		data::ImageList imgListTime = isis::data::IOFactory::load("test.null", "");
+		BOOST_CHECK(not imgListTime.empty());
+		std::list< vtkSmartPointer<vtkImageData> > vtkImageImageDataListTime = adapter::VTKAdapter::makeVtkImageDataList(imgListTime.front());
+		BOOST_CHECK(not vtkImageImageDataListTime.empty());
+		LOG(DataDebug, info) << vtkImageImageDataListTime.size();
+		
+		
 	}
 }}//end namespace 
 		

@@ -52,6 +52,13 @@ namespace isis { namespace adapter {
   */
 class VTKAdapter{
 public:
+	enum ChunkArrangement 
+	{
+		NoArrangement,
+		AlongX,
+		AlongY,
+		AlongZ
+	};
 	/**
 	* Gets a std::list of vtkImageImport*.
 	*/
@@ -59,7 +66,7 @@ public:
 	/**
 	* Gets a std::list of vtkImageData*.
 	*/
-	static std::list< vtkSmartPointer< vtkImageData> > makeVtkImageDataList(const boost::shared_ptr<data::Image>);
+	static std::list< vtkSmartPointer< vtkImageData> > makeVtkImageDataList(const boost::shared_ptr<data::Image>, const ChunkArrangement& = NoArrangement);
 private:   
     
 	static bool checkChunkDataType(const boost::shared_ptr<data::Image>);
@@ -72,8 +79,8 @@ protected:
 private:
 	boost::shared_ptr<data::Image> m_ImageISIS;
 	std::list< vtkSmartPointer< vtkImageData> > m_vtkImageDataList;
-	std::list< vtkSmartPointer<vtkImageImport> > m_vtkImageImportList;
-    
+	std::list< vtkSmartPointer<vtkImageImport> > m_vtkImageImportList;	
+		
 };
   
 
