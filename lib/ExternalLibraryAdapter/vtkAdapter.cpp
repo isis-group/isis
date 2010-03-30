@@ -1,5 +1,4 @@
 #include "vtkAdapter.hpp"
-#include <vtkXMLImageDataWriter.h>
 
 namespace isis{ namespace adapter{
     
@@ -9,7 +8,7 @@ VTKAdapter::VTKAdapter(const boost::shared_ptr<isis::data::Image> src)
 
 
 //return a list of vtkImageData type pointer
-VTKAdapter::ImageVector VTKAdapter::makeVtkImageDataList(const boost::shared_ptr<data::Image> src, const VTKAdapter::ChunkArrangement& arrangement)
+VTKAdapter::ImageVector VTKAdapter::makeVtkImageDataList(const boost::shared_ptr<data::Image> src, const AdapterBase::ChunkArrangement& arrangement)
 {
 	VTKAdapter* myAdapter = new VTKAdapter(src);
 	vtkImageData* vtkImage = vtkImageData::New();
@@ -23,9 +22,7 @@ VTKAdapter::ImageVector VTKAdapter::makeVtkImageDataList(const boost::shared_ptr
 		LOG(data::Runtime, error) << "Inconsistent chunk datatype!"; 
 		//TODO exception handling
 	}
-	
 	//set the datatype for the vtkImage object
-	LOG(DataDebug, info) << "dim4: " << dimensions[3];
 	LOG(DataDebug, info) << "datatype: " << myAdapter->m_ImageISIS->chunksBegin()->typeName();
 	//TODO check datatypes
 	switch(myAdapter->m_ImageISIS->chunksBegin()->typeID()){
@@ -80,22 +77,5 @@ VTKAdapter::ImageVector VTKAdapter::makeVtkImageDataList(const boost::shared_ptr
 	
 	return myAdapter->m_vtkImageDataVector;
 }
-
-
-//private functions
-
-bool VTKAdapter::checkChunkDataType(const boost::shared_ptr<data::Image> image)
-{
-	unsigned int firstTypeID = image->chunksBegin()->typeID();
-	unsigned int chunkCounter = 0;
-	for (data::Image::ChunkIterator ci = image->chunksBegin();ci != image->chunksEnd(); *ci++)
-	{
-		chunkCounter++;
-		if(not ci->typeID() == firstTypeID) return false;   
-	}
-	LOG(DataDebug, info) << "chunkCounter: " << chunkCounter;
-	return true;
-}
-
 
 }} //end namespace

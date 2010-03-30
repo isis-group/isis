@@ -22,53 +22,51 @@
  *
  * Description:
  *
- *  Created on: Mar,24 2009
+ *  Created on: Mar,30 2009
  *      Author: tuerke	
  ******************************************************************/
+#ifndef ADAPTERBASE_HPP_
+#define ADAPTERBASE_HPP_
 
-#ifndef VTKADAPTER_HPP_
-#define VTKADAPTER_HPP_
-
-#include "AdapterBase.hpp"
-
-//vtk includes
-#include <vtkImageData.h>
-#include <vtkImageImport.h>
-#include <vtkSmartPointer.h>
+//internal includes 
+//local includes
+#include "DataStorage/image.hpp"
+#include "CoreUtils/log.hpp"
+#include "CoreUtils/common.hpp"
 
 //external includes 
 #include <boost/smart_ptr.hpp>
-#include <vector>
 
-//TODO chunk handling
 
-namespace isis { namespace adapter {
-    
-/**
-  * VTKAdapter is able of taking an isis Image object and return either a list of vtkImageData* or vtkImageImport*.
-  */
-class VTKAdapter : public AdapterBase{
+namespace isis {namespace adapter{
+	
+class AdapterBase {
 public:
-	typedef std::vector< vtkSmartPointer< vtkImageData > > ImageVector;
-	
-	/**
-	* Gets a std::list of vtkImageData*.
-	*/
-	static ImageVector makeVtkImageDataList(const boost::shared_ptr<data::Image>, const ChunkArrangement& = NoArrangement);
-private:   
-	boost::shared_ptr<data::Image> m_ImageISIS;
+	enum ChunkArrangement 
+	{
+		NoArrangement,
+		AlongX,
+		AlongY,
+		AlongZ
+	};
 protected:
-	//should not be loaded directly
-	VTKAdapter(const boost::shared_ptr<data::Image>);
-	VTKAdapter(const VTKAdapter&){};  
-  
-private:
-	
-	ImageVector m_vtkImageDataVector;
-		
+	static bool checkChunkDataType(const boost::shared_ptr<data::Image>);
 };
-  
+	
 
-    
-}}// end namespace 
-#endif //VTKADAPTER_HPP_
+//implementations	
+bool AdapterBase::checkChunkDataType(const boost::shared_ptr<data::Image> image)
+{
+	unsigned int firstTypeID = image->chunksBegin()->typeID();
+	unsigned int chunkCounter = 0;
+	for (data::Image::ChunkIterator ci = image->chunksBegin();ci != image->chunksEnd(); *ci++)
+	{
+		chunkCounter++;
+		if(not ci->typeID() == firstTypeID) return false;   
+	}
+	LOG(DataDebug, info) << "chunkCounter: " << chunkCounter;
+	return true;
+}
+	
+}} //end namespace
+#endif
