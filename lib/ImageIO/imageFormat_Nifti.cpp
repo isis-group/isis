@@ -319,6 +319,9 @@ private:
 				<< dir+1 << " ("<< qto << "). But I'll ignore it anyway because qform_code>0.";
 			} else if(ni.sform_code>0){ // method 3
 				retVec=sto;
+			} else if(ni.sform_code==0 and ni.qform_code==0) {
+				retVec=qto;
+				LOG(ImageIoLog, info) << "sform_code and qform_code are 0. Trying to use qto_xyz info!";
 			} else {
 				LOG(ImageIoLog,error)
 					<< "can't read orientation Vector for direction: " << dir+1;
