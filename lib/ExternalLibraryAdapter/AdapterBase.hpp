@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * Author: Erik T�rke, tuerke@cbs.mpg.de, 2009
+ * Author: Erik Tuerke, tuerke@cbs.mpg.de, 2009
  *
  * vtkAdapter.cpp
  *
@@ -35,21 +35,22 @@
 #include "CoreUtils/common.hpp"
 
 //external includes 
-#include <boost/smart_ptr.hpp>
+#include <boost/smart_ptr.hpp> 
+#include <vector>
 
 
-namespace isis {namespace adapter{
+namespace isis {namespace adapter {namespace _internal{
 	
 class AdapterBase {
 public:
 	enum ChunkArrangement 
 	{
-		NoArrangement,
-		AlongX,
-		AlongY,
-		AlongZ
+		Auto,AlongX,AlongY,AlongZ,NoArrangement
 	};
 protected:
+	/**
+	  * Go through all the chunks and test for type consistence
+	  */
 	static bool checkChunkDataType(const boost::shared_ptr<data::Image>);
 };
 	
@@ -68,5 +69,5 @@ bool AdapterBase::checkChunkDataType(const boost::shared_ptr<data::Image> image)
 	return true;
 }
 	
-}} //end namespace
+}}} //end namespace
 #endif

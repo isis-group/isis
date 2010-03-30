@@ -6,9 +6,8 @@ VTKAdapter::VTKAdapter(const boost::shared_ptr<isis::data::Image> src)
     : m_ImageISIS(src), m_vtkImageDataVector()
 {}
 
-
 //return a list of vtkImageData type pointer
-VTKAdapter::ImageVector VTKAdapter::makeVtkImageDataList(const boost::shared_ptr<data::Image> src, const AdapterBase::ChunkArrangement& arrangement)
+VTKAdapter::ImageVector VTKAdapter::makeVtkImageDataList(const boost::shared_ptr<data::Image> src, const ChunkArrangement& arrangement)
 {
 	VTKAdapter* myAdapter = new VTKAdapter(src);
 	vtkImageData* vtkImage = vtkImageData::New();
@@ -46,7 +45,7 @@ VTKAdapter::ImageVector VTKAdapter::makeVtkImageDataList(const boost::shared_ptr
 			//TODO  exception handle in constructor ??
 	}
 	
-	importer->SetWholeExtent(0,dimensions[0]-1,0,dimensions[1]-1,0,dimensions[2]-1);
+	importer->SetWholeExtent(0,dimensions[0]-1,0,dimensions[1]-1,0,dimensions[2]-1); //TODO what is exactly defined by the whole extend????????????
 	importer->SetDataExtentToWholeExtent();
 	vtkImage->SetOrigin(indexOrigin[0],indexOrigin[1],indexOrigin[2]);
 	vtkImage->SetSpacing(spacing[0],spacing[1],spacing[2]);

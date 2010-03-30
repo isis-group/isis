@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * Author: Erik T�rke, tuerke@cbs.mpg.de, 2009
+ * Author: Erik Tuerke, tuerke@cbs.mpg.de, 2009
  *
  * vtkAdapter.cpp
  *
@@ -36,34 +36,28 @@
 #include <vtkImageImport.h>
 #include <vtkSmartPointer.h>
 
-//external includes 
-#include <boost/smart_ptr.hpp>
-#include <vector>
-
 //TODO chunk handling
 
 namespace isis { namespace adapter {
     
 /**
-  * VTKAdapter is able of taking an isis Image object and return either a list of vtkImageData* or vtkImageImport*.
+  * VTKAdapter is able of taking an isis image object and return a vector of vtkSmartpointers on vtkImageData objects.
   */
-class VTKAdapter : public AdapterBase{
+class VTKAdapter : public _internal::AdapterBase{
 public:
 	typedef std::vector< vtkSmartPointer< vtkImageData > > ImageVector;
 	
 	/**
-	* Gets a std::list of vtkImageData*.
+	* Gets a std::vector of vtkSmartpointers on vtkImageData objects.
 	*/
-	static ImageVector makeVtkImageDataList(const boost::shared_ptr<data::Image>, const ChunkArrangement& = NoArrangement);
+	static ImageVector makeVtkImageDataList(const boost::shared_ptr<data::Image>, const ChunkArrangement& = Auto);
 private:   
 	boost::shared_ptr<data::Image> m_ImageISIS;
 protected:
 	//should not be loaded directly
 	VTKAdapter(const boost::shared_ptr<data::Image>);
 	VTKAdapter(const VTKAdapter&){};  
-  
 private:
-	
 	ImageVector m_vtkImageDataVector;
 		
 };
