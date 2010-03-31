@@ -289,10 +289,10 @@ template<> class TypeConverter<false,false,std::string,rgb_color48 >:public Type
 
 	
 ///generate a TypeConverter for conversions from SRC to any type from the "types" list
-template<typename SRC> struct inner_add {
+template<typename SRC> struct inner_TypeConverter {
 	std::map<int, boost::shared_ptr<const TypeConverterBase> > &m_subMap;
-	inner_add(std::map<int, boost::shared_ptr<const TypeConverterBase> > &subMap):m_subMap(subMap){}
-	template<typename DST> void operator()(DST){ //will be called by the mpl::for_each in outer_add for any DST out of "types"
+	inner_TypeConverter(std::map<int, boost::shared_ptr<const TypeConverterBase> > &subMap):m_subMap(subMap){}
+	template<typename DST> void operator()(DST){ //will be called by the mpl::for_each in outer_TypeConverter for any DST out of "types"
 		//create a converter based on the type traits and the types of SRC and DST
 		typedef boost::mpl::and_<boost::is_arithmetic<SRC>,boost::is_arithmetic<DST> > is_num;
 		typedef boost::is_same<SRC,DST> is_same;
@@ -304,12 +304,12 @@ template<typename SRC> struct inner_add {
 };
 
 ///generate a TypeConverter for conversions from any SRC from the "types" list
-struct outer_add {
+struct outer_TypeConverter {
 	std::map< int ,std::map<int, boost::shared_ptr<const TypeConverterBase> > > &m_map;
-	outer_add(std::map< int ,std::map<int, boost::shared_ptr<const TypeConverterBase> > > &map):m_map(map){}
+	outer_TypeConverter(std::map< int ,std::map<int, boost::shared_ptr<const TypeConverterBase> > > &map):m_map(map){}
 	template<typename SRC> void operator()(SRC){//will be called by the mpl::for_each in TypeConverterMap() for any SRC out of "types"
 		boost::mpl::for_each<types>(// create a functor for from-SRC-conversion and call its ()-operator for any DST out of "types"
-			inner_add<SRC>(m_map[Type<SRC>().typeID()])
+			inner_TypeConverter<SRC>(m_map[Type<SRC>().typeID()])
 		);
 	}
 };
@@ -317,7 +317,7 @@ struct outer_add {
 
 TypeConverterMap::TypeConverterMap()
 {
-	boost::mpl::for_each<types>(outer_add(*this));
+	boost::mpl::for_each<types>(outer_TypeConverter(*this));
 	LOG(Debug,info)
 	<< "conversion map for " << size() << " types created";
 }
