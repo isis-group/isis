@@ -30,7 +30,7 @@ namespace util{
  * PropertyValue may store a value of any type (defined in types.cpp) and are equal-compareable.
  * If they dont have a value they are empty. Empty PropertyValues are never equal to anything (not even to empty PropertyValues).
  * They only store a value but no name, because they will get a name when they are stored (in PropMap).
- * There is intentionally no "uneqal" (!=) because for this class "not equal" does NOT mean "unequal".
+ * Note, that for this class "not equal" (not ==) does NOT mean "unequal" (!=) - check the documentation of the respective operators.
  * @author Enrico Reimer
  */
 class PropertyValue:public _internal::TypeBase::Reference{
@@ -74,7 +74,7 @@ public:
 	/**
 	 * Unequality to another PropertyValue.
 	 * Properties are unequal if:
-	 * - not both properties are empty
+	 * - only one of both properties is empty
 	 * - or both properties contain the different value of same type T
 	 * - or they contain different types
 	 * \returns not(*this == second) and not(this->empty() and second.empty()).

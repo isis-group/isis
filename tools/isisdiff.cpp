@@ -1,5 +1,6 @@
 #include "DataStorage/io_factory.hpp"
 #include <boost/foreach.hpp>
+#include "CoreUtils/progparameter.hpp"
 
 using namespace isis;
 
@@ -7,7 +8,7 @@ int main(int argc, char *argv[])
 {
 	ENABLE_LOG(isis::DataLog,util::DefaultMsgPrint,error);
 	ENABLE_LOG(isis::ImageIoLog,util::DefaultMsgPrint,error);
-	
+
 	int ret=0;
 	if(argc<3){
 		std::cout << "Call " << argv[0] << " <first dataset> <second dataset> <comma seperated properties to ignore>"<< std::endl;

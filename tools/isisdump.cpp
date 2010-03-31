@@ -1,22 +1,33 @@
 #include "DataStorage/io_factory.hpp"
 #include <boost/foreach.hpp>
 #include <fstream>
+#include "CoreUtils/progparameter.hpp"
 
 using namespace isis;
 
 int main(int argc, char *argv[])
 {
-	
-	ENABLE_LOG(ImageIoLog,util::DefaultMsgPrint,error);
-	ENABLE_LOG(DataLog,util::DefaultMsgPrint,error);
+	util::enable_log<util::DefaultMsgPrint>(info);
 
+	util::ParameterMap params;
+	params["in"]=std::string();
+	params["dump"]=std::string();
+	params["dump"].needed()=false;
+	params.parse(argc,argv);
+	if(not params.isComplete()){
+		std::cout << "Missing parameters:" << std::endl;
+		params.printNeeded();
+		std::cout << "Valid parameters are " << std::endl;
+		params.printAll();
+		exit(0);
+	}
 	
-	data::ImageList images=data::IOFactory::load(argv[1]);
+	data::ImageList images=data::IOFactory::load(params["in"]->as<std::string>());
 	unsigned short count1=0,count2=0;
 	std::cout << "Got " << images.size() << " Images" << std::endl;
 	std::ofstream dump;
 	if(argc>2)
-		dump.open(argv[2]);
+		dump.open(params["dump"]->as<std::string>().c_str());
 	BOOST_FOREACH(data::ImageList::const_reference ref,images){
 		std::cout << "======Image #" << ++count1 << ref->sizeToString() << "======Metadata======" << std::endl;
 		ref->print(std::cout,true);

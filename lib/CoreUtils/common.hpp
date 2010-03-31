@@ -251,6 +251,22 @@ basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits> &out,const
 	isis::util::write_list(s.begin(),s.end(),out,"\n","","");
 	return out;
 }
+
+/// Formatted streaming output for std::map\<string,...\>
+template<typename charT, typename traits, typename _Tp, typename _Compare, typename _Alloc >
+basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits> &out,const map<std::string,_Tp,_Compare,_Alloc>& s)
+{
+	size_t key_len=0;
+	typedef typename map<std::string,_Tp,_Compare,_Alloc>::const_iterator m_iterator;
+	for(m_iterator i=s.begin();i!=s.end();i++)
+		if(key_len < i->first.length())
+			key_len = i->first.length();
+	
+	for(m_iterator i=s.begin();i!=s.end();i++)
+		out << make_pair(i->first+ std::string(key_len-i->first.length(),' '),i->second) << std::endl;
+	return out;
+}
+
 ///Streaming output for std::list
 template<typename charT, typename traits, typename _Tp, typename _Alloc >
 basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits> &out,const list<_Tp,_Alloc>& s)

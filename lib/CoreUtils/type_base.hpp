@@ -173,10 +173,10 @@ public:
 	typedef TypeConverterMap::mapped_type::mapped_type Converter;
 
 	const Converter& getConverterTo(unsigned short id)const;
+	static bool convert(const TypeBase &from,TypeBase &to);
 	/**
 	* Interpret the value as value of any (other) type.
-	* This is a runtime-based cast via string. The value is converted into a string, which is then parsed as 
-	* the requestet type.
+	* This is a runtime-based cast via automatic conversion.
 	* \code
 	* TypeBase *mephisto=new Type<std::string>("666");
 	* int devil=mephisto->as<int>();
@@ -195,17 +195,8 @@ public:
 			<< " to " << Type<T>::staticName();
 			return *reinterpret_cast<const Type<T>*>(this);
 		} else {
-			const Converter& conv=getConverterTo(Type<T>::staticID);
-			if(conv){
-				Type<T> ret;
-				conv->convert(*this,ret);
-				return ret;
-			} else {
-				LOG(Runtime,error)
-					<< "I dont know any conversion from " << MSubject(toString(true)) << " to "
-					<< MSubject(Type<T>::staticName()) << " returning " << Type<T>();
-				return Type<T>();
-			}
+			Type<T> ret;
+			convert(*this,ret);
 		}
 	}
 

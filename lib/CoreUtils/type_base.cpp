@@ -43,6 +43,21 @@ const TypeBase::Converter& TypeBase::getConverterTo(unsigned short id)const {
 	assert(f2!=f1->second.end());
 	return f2->second;
 }
+bool TypeBase::convert(const TypeBase& from, TypeBase &to)
+{
+	const Converter& conv=from.getConverterTo(to.typeID());
+	if(conv){
+		conv->convert(from,to);
+		return true;
+	} else {
+		LOG(Runtime,error)
+			<< "I dont know any conversion from "
+			<< MSubject(from.toString(true)) << " to " << MSubject(to.typeName());
+		return false;
+	}
+	
+}
+
 const TypePtrBase::Converter& TypePtrBase::getConverterTo(unsigned short id)const {
 	const TypePtrConverterMap::const_iterator f1=converters().find(typeID());
 	assert(f1!=converters().end());
