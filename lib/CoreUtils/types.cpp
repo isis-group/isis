@@ -56,6 +56,7 @@ DEF_TYPE(dlist,list<double>);
 DEF_TYPE(slist,list<string>);
 
 DEF_TYPE(std::string,string);
+DEF_TYPE(Selection,Selection);
 DEF_TYPE(PropMap,PropertyMap);
 DEF_TYPE(boost::posix_time::ptime,timestamp);
 DEF_TYPE(boost::gregorian::date,date);
