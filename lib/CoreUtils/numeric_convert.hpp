@@ -69,7 +69,6 @@ template<typename SRC,typename DST> void numeric_convert(const TypePtr<SRC> &src
 		LOG(Debug,info) << "src Range:" << minval << "=>" << maxval;
 		LOG(Debug,info) << "dst Domain:" << domain_min << "=>" << domain_max;
 
-		assert(domain_min<=0 && domain_max>=0); //I think we can assume this
 		assert(domain_min<domain_max);//we also should assume this
 
 		//set offset for src

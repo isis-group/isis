@@ -318,8 +318,7 @@ struct outer_TypeConverter {
 TypeConverterMap::TypeConverterMap()
 {
 	boost::mpl::for_each<types>(outer_TypeConverter(*this));
-	LOG(Debug,info)
-	<< "conversion map for " << size() << " types created";
+	LOG(Debug,info) << "conversion map for " << size() << " types created";
 }
 
 }}}
