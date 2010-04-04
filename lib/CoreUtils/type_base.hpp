@@ -197,6 +197,7 @@ public:
 		} else {
 			Type<T> ret;
 			convert(*this,ret);
+			return ret;
 		}
 	}
 
