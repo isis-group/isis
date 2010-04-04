@@ -28,7 +28,9 @@ namespace isis{ namespace util{
 	
 #define DEF_TYPE(TYPE,NAME)  \
   template<> const char Type<TYPE>::m_typeName[]=#NAME;
-  
+
+DEF_TYPE(bool,boolean);
+
 DEF_TYPE(int8_t,s8bit);
 DEF_TYPE(uint8_t,u8bit);
 

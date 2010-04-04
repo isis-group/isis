@@ -210,7 +210,7 @@ void ImageFormat_Dicom::sanitise(isis::util::PropMap& object, string dialect) {
 	if(hasOrTell(prefix+"ImagePositionPatient",object,info))
 	{
 		object["indexOrigin"]=object.getPropertyValue(prefix+"ImagePositionPatient")->as<util::fvector4>();
-	}else{
+	} else {
 		object["indexOrigin"]=util::fvector4();
 		LOG(Runtime,warning)<< "Making up indexOrigin, because the image lacks this information";
 	}

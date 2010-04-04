@@ -226,6 +226,50 @@ public:
 
 
 /////////////////////////////////////////////////////////////////////////////
+// string/bool version -- uses decision based on text
+/////////////////////////////////////////////////////////////////////////////
+template<> class TypeConverter<false,false,std::string,bool> : public TypeGenerator<std::string,bool>{
+	TypeConverter(){
+		LOG(Debug,verbose_info)
+		<< "Creating special from-string converter for " << Type<bool>::staticName();
+	};
+public:
+	static boost::shared_ptr<const TypeConverterBase> create(){
+		TypeConverter<false,false,std::string,bool> *ret=new TypeConverter<false,false,std::string,bool>;
+		return boost::shared_ptr<const TypeConverterBase>(ret);
+	}
+	void convert(const TypeBase& src, TypeBase& dst)const{
+		bool &dstVal=dst.cast_to_Type<bool>();
+		const char *srcVal=((std::string)src.cast_to_Type<std::string>()).c_str();
+		if(strcasecmp (srcVal, "TRUE") ==0 or strcasecmp (srcVal, "YES") ==0){
+			dstVal=true;
+		} else if(strcasecmp (srcVal, "FALSE") ==0 or strcasecmp (srcVal, "NO") ==0){
+			dstVal=false;
+		}
+		LOG(Runtime,error) << src.toString(true) << " is ambiguous while converting to " << Type<bool>::staticName();
+	}
+	virtual ~TypeConverter(){}
+};
+template<> class TypeConverter<false,false,bool,std::string> : public TypeGenerator<bool,std::string>{
+	TypeConverter(){
+		LOG(Debug,verbose_info)
+		<< "Creating special to-string converter for " << Type<bool>::staticName();
+	};
+public:
+	static boost::shared_ptr<const TypeConverterBase> create(){
+		TypeConverter<false,false,bool,std::string> *ret=new TypeConverter<false,false,bool,std::string>;
+		return boost::shared_ptr<const TypeConverterBase>(ret);
+	}
+	void convert(const TypeBase& src, TypeBase& dst)const{
+		std::string &dstVal=dst.cast_to_Type<std::string>();
+		const bool &srcVal=src.cast_to_Type<bool>();
+		dstVal= srcVal ? "true":"false";
+	}
+	virtual ~TypeConverter(){}
+};
+
+	
+/////////////////////////////////////////////////////////////////////////////
 // string => list/vector version -- uses util::string2list
 /////////////////////////////////////////////////////////////////////////////
 template<typename DST> class TypeConverter<false,false,std::string,std::list<DST> >:public TypeGenerator<std::string,std::list<DST> >{ //string => list

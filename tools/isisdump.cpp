@@ -7,7 +7,7 @@ using namespace isis;
 
 int main(int argc, char *argv[])
 {
-	util::enable_log<util::DefaultMsgPrint>(info);
+	util::enable_log<util::DefaultMsgPrint>(verbose_info);
 
 	util::ParameterMap params;
 	params["in"]=std::string();
