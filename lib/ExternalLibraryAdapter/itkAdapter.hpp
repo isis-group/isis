@@ -37,12 +37,13 @@
 namespace isis{ namespace adapter {
 
 /**
-  * ITKAdapter is able of taking an isis image object and return an itkImage object.
+  * ITKAdapter is capable of taking an isis image object and return an itkImage object.
   */
 
 class ITKAdapter : public _internal::AdapterBase  {
 public:
-	template<typename T,unsigned short dim> static itk::SmartPointer<itk::Image<T,dim> > makeItkImage(const boost::shared_ptr<data::Image>, const ChunkArrangement& = NoArrangement);
+	template<typename T,unsigned short dim> static itk::SmartPointer<itk::Image<T,dim> > 
+		makeItkImage(const boost::shared_ptr<data::Image>, const ChunkArrangement& = NoArrangement);
 	
 protected:
 	//should not be loaded directly
