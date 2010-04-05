@@ -22,47 +22,35 @@
  *
  * Description:
  *
- *  Created on: Mar,24 2009
+ *  Created on: Mar,30 2009
  *      Author: tuerke	
  ******************************************************************/
-
-#ifndef VTKADAPTER_HPP_
-#define VTKADAPTER_HPP_
+#ifndef ITKADAPTER_HPP_
+#define ITKADAPTER_HPP_
 
 #include "AdapterBase.hpp"
 
-//vtk includes
-#include <vtkImageData.h>
-#include <vtkImageImport.h>
-#include <vtkSmartPointer.h>
+//itk includes
+#include <itkSmartPointer.h>
+#include <itkImage.h>
 
-//TODO chunk handling
+namespace isis{ namespace adapter {
 
-namespace isis { namespace adapter {
-    
 /**
-  * VTKAdapter is able of taking an isis image object and return a vector of vtkSmartpointers on vtkImageData objects.
+  * ITKAdapter is able of taking an isis image object and return an itkImage object.
   */
-class VTKAdapter : public _internal::AdapterBase{
+
+class ITKAdapter : public _internal::AdapterBase  {
 public:
-	typedef std::vector< vtkSmartPointer< vtkImageData > > ImageVector;
+	template<typename T,unsigned short dim> static itk::SmartPointer<itk::Image<T,dim> > makeItkImage(const boost::shared_ptr<data::Image>, const ChunkArrangement& = NoArrangement);
 	
-	/**
-	* Gets a std::vector of vtkSmartpointers on vtkImageData objects.
-	*/
-	static ImageVector makeVtkImageDataList(const boost::shared_ptr<data::Image>, const ChunkArrangement& = NoArrangement);
-private:   
-	boost::shared_ptr<data::Image> m_ImageISIS;
 protected:
 	//should not be loaded directly
-	VTKAdapter(const boost::shared_ptr<data::Image>);
-	VTKAdapter(const VTKAdapter&){};  
-private:
-	ImageVector m_vtkImageDataVector;
-		
+	ITKAdapter(const boost::shared_ptr<data::Image>);
+	ITKAdapter(const ITKAdapter&){};  
 };
-  
 
-    
-}}// end namespace 
-#endif //VTKADAPTER_HPP_
+
+
+}}// end namespace
+#endif
