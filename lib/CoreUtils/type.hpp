@@ -62,7 +62,16 @@ public:
 		return t==typeid(TYPE);
 	}
 	virtual std::string toString(bool labeled=false)const{
-		std::string ret=boost::lexical_cast<std::string>(m_val);
+		const Converter &conv=getConverterTo(Type<std::string>::staticID);
+		std::string ret;
+		if(conv){
+			Type<std::string> buff;
+			conv->convert(*this,buff);
+			ret=buff;
+		} else {
+			LOG(Debug,warning) << "Missing conversion from " << typeName() << " to string falling back to boost::lexical_cast<std::string>";
+			ret=boost::lexical_cast<std::string>(m_val);
+		}
 		if(labeled)ret+="("+staticName()+")";
 		return ret;
 	}
