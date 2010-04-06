@@ -44,6 +44,15 @@ bool Selection::operator==(const Selection &ref)const
 {
 	return m_set==ref.m_set and ent_map == ref.ent_map;
 }
+bool Selection::operator==(const char ref[]) const
+{
+	return strcasecmp (((std::string)*this).c_str(), ref)  ==0;
+}
+bool Selection::operator==(const int ref) const
+{
+	return ((int)*this)==ref;
+}
+
 
 std::list<std::string> Selection::getEntries()const
 {

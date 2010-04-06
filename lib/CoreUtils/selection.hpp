@@ -26,6 +26,8 @@ public:
 	operator const int()const;
 	operator const std::string()const;
 	bool operator==(const Selection &ref)const;
+	bool operator==(const char ref[])const;
+	bool operator==(const int ref)const;
 	
 	std::list<std::string> getEntries()const;
 };
