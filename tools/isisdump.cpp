@@ -11,6 +11,7 @@ int main(int argc, char *argv[])
 
 	util::ParameterMap params;
 	params["in"]=std::string();
+	params["dCore"]=util::Selection("error,warning,info,verbose_info");
 	params["dump"]=std::string();
 	params["dump"].needed()=false;
 	params.parse(argc,argv);

@@ -241,9 +241,9 @@ public:
 	void convert(const TypeBase& src, TypeBase& dst)const{
 		bool &dstVal=dst.cast_to_Type<bool>();
 		const char *srcVal=((std::string)src.cast_to_Type<std::string>()).c_str();
-		if(strcasecmp (srcVal, "TRUE") ==0 or strcasecmp (srcVal, "YES") ==0){
+		if(strcasecmp (srcVal, "TRUE") ==0 or strcasecmp (srcVal, "Y") ==0 or strcasecmp (srcVal, "YES") ==0){
 			dstVal=true;
-		} else if(strcasecmp (srcVal, "FALSE") ==0 or strcasecmp (srcVal, "NO") ==0){
+		} else if(strcasecmp (srcVal, "FALSE") ==0 or strcasecmp (srcVal, "N") ==0 or strcasecmp (srcVal, "NO") ==0){
 			dstVal=false;
 		}
 		LOG(Runtime,error) << src.toString(true) << " is ambiguous while converting to " << Type<bool>::staticName();

@@ -48,7 +48,7 @@ PropertyValue& PropMap::fetchProperty(
 			util::PropertyValue &ref=found->second;
 			LOG_IF(not ref->is<util::PropMap>(),Runtime,error)
 			<< util::MSubject(found->first) << " is a leaf, but requested as a branch in "
-			<< util::MSubject(util::list2string(at,pathEnd,"/")) << " programm will stop";
+			<< util::MSubject(util::list2string(at,pathEnd,"/")) << " program will stop";
 			return fetchProperty(ref->cast_to_Type<util::PropMap>(),next,pathEnd); //continue there
 		} else { // if we should create a sub-map
 			//insert a empty branch (aka PropMap) at "*at" (and fetch the reference of that)
@@ -71,7 +71,7 @@ const PropertyValue* PropMap::searchBranch(
 			const util::PropertyValue &ref=found->second;
 			LOG_IF(not ref->is<util::PropMap>(),Runtime,error)
 			<< util::MSubject(found->first) << " is a leaf, but requested as a branch in "
-			<< util::MSubject(util::list2string(at,pathEnd,"/")) << " programm will stop";
+			<< util::MSubject(util::list2string(at,pathEnd,"/")) << " program will stop";
 			return searchBranch(ref->cast_to_Type<util::PropMap>(),next,pathEnd); //continue there
 		}
 	} else if(found!=root.end()){// if its the leaf and we found the entry

@@ -22,3 +22,6 @@ ENDIF(HAVE_VTK)
 
 add_executable(test_logger test_logger.cpp)
 target_link_libraries(test_logger utils ${Boost_LIBRARIES})
+
+add_executable(test_parameter test_parameter.cpp)
+target_link_libraries(test_parameter utils ${Boost_LIBRARIES})

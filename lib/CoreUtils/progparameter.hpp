@@ -33,6 +33,16 @@ public:
 	ProgParameter();
 	template<typename T> ProgParameter(const T& ref,bool _needed = true):PropertyValue(ref,_needed){}
 	bool parse(const isis::util::Type< std::string >& props);
+	const std::string &description()const;
+	void setDescription(const std::string &desc);
+	template<typename T> operator const T&()const{
+		LOG_IF(empty(),isis::CoreDebug,isis::error) << "Program parameters must not be empty. Please set it to any value.";
+		return get()->cast_to_Type<T>();
+	}
+	operator const bool&()const{ // prevent the impleicit bool-conversion of scoped_ptr from beeing used
+		LOG_IF(empty(),isis::CoreDebug,isis::error) << "Program parameters must not be empty. Please set it to any value.";
+		return get()->cast_to_Type<bool>();
+	}
 };
 
 class ParameterMap: public std::map<std::string,ProgParameter>{
@@ -42,7 +52,9 @@ class ParameterMap: public std::map<std::string,ProgParameter>{
 	struct notneededP{
 		bool operator()(const_reference ref)const{return not ref.second.needed();}
 	};
+	bool parsed;
 public:
+	ParameterMap();
 	bool parse(int argc, char** argv);
 	bool isComplete()const;
 	void printAll()const;
@@ -51,4 +63,19 @@ public:
 	
 }}
 
+namespace std {
+/// Streaming output for ProgParameter - classes
+template<typename charT, typename traits> basic_ostream<charT, traits>&
+operator<<(basic_ostream<charT, traits> &out,const isis::util::ProgParameter &s){
+	const std::string &desc=s.description();
+	if(not desc.empty()){
+		out << desc << ", ";
+	}
+	LOG_IF(s.empty(),isis::CoreDebug,isis::error) << "Program parameters must not be empty. Please set it to any value.";
+	assert(not s.empty());
+	out << "default=\"" << s.toString(false)<< "\", type=" << s->typeName();
+	if(s.needed())out << " (needed)";
+	return out;
+}
+}
 #endif // PROGPARAMETER_HPP

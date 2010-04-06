@@ -27,11 +27,28 @@ isis::util::ProgParameter::ProgParameter()
 bool isis::util::ProgParameter::parse(const Type<std::string> &props)
 {
 	_internal::TypeBase &me = **this;
-	const bool ret=_internal::TypeBase::convert(props,me);
+	bool ret=false;
+	if(((std::string)props).empty()){
+		if(me.is<bool>()){
+			me.cast_to_Type<bool>()=true;
+			ret=true;
+		}
+	} else {
+		ret=_internal::TypeBase::convert(props,me);
+	}
 	LOG_IF(ret,Debug,info) << "Parsed " << MSubject(props.toString()) << " as " << *this;
 	return ret;
 }
+const std::string& isis::util::ProgParameter::description()const
+{
+	return m_description;
+}
+void isis::util::ProgParameter::setDescription(const std::string& desc)
+{
+	m_description=desc;
+}
 
+isis::util::ParameterMap::ParameterMap():parsed(false){}
 
 bool isis::util::ParameterMap::parse(int argc, char** argv)
 {
@@ -41,7 +58,8 @@ bool isis::util::ParameterMap::parse(int argc, char** argv)
 		if(argv[i][0]=='-'){
 			if(begin)end=i;
 			else begin=i;
-		} else if(i>=argc-1 and begin)end=argc;
+		}
+		if(i>=argc-1 and begin)end=argc;
 		if(end){
 			std::string pName(argv[begin]);
 			pName.erase(0,pName.find_first_not_of('-'));
@@ -63,15 +81,16 @@ bool isis::util::ParameterMap::parse(int argc, char** argv)
 			end=0;
 		}
 	}
-
+	return (parsed=ret);
 }
 bool isis::util::ParameterMap::isComplete()const
 {
+	LOG_IF(not parsed,Debug,error) << "You did not run parse() yet. This is very likely an error";
 	return std::find_if(begin(),end(),neededP())==end();
 }
 void isis::util::ParameterMap::printAll()const
 {
-	std::cout << *this << std::endl;
+	std::cout << *this;
 }
 void isis::util::ParameterMap::printNeeded()const
 {
@@ -82,6 +101,6 @@ void isis::util::ParameterMap::printNeeded()const
 		at=std::find_if(at,needed.end(),notneededP())
 	)
 		needed.erase(at++);
-	std::cout << needed << std::endl;
+	std::cout << needed;
 }
 
