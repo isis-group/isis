@@ -105,13 +105,16 @@ public:
 * This class is designed as base class for specialisations, it should not be used directly.
 * Because of that, the contructors of this class are protected.
 */
-template<typename TYPE_TYPE> class TypeReference:public boost::scoped_ptr<TYPE_TYPE>{
+template<typename TYPE_TYPE> class TypeReference:protected boost::scoped_ptr<TYPE_TYPE>{
 	template<typename TT> friend class TypePtr; //allow Type and TypePtr to use the protected contructor below
 	template<typename TT> friend class Type;
 protected:
 	//dont use this directly
 	TypeReference(TYPE_TYPE *t):boost::scoped_ptr<TYPE_TYPE>(t){}
 public:
+	///reexport parts of scoped_ptr's interface
+	TYPE_TYPE* operator->() const{return boost::scoped_ptr<TYPE_TYPE>::operator->();}
+	TYPE_TYPE& operator*() const{return boost::scoped_ptr<TYPE_TYPE>::operator*();}
 	///Default contructor. Creates an empty reference
 	TypeReference(){}
 	/**

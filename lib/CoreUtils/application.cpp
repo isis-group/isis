@@ -48,7 +48,7 @@ bool Application::init(int argc, char** argv,bool exitOnError)
 {
 	bool err=false;
 	if(parameters.parse(argc,argv)){
-		if(parameters["help"]){
+		if(parameters["help"]){ 
 			printHelp();
 			exit(0);
 		}

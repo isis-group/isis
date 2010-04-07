@@ -39,9 +39,14 @@ public:
 		LOG_IF(empty(),isis::CoreDebug,isis::error) << "Program parameters must not be empty. Please set it to any value.";
 		return get()->cast_to_Type<T>();
 	}
-	operator const bool&()const{ // prevent the impleicit bool-conversion of scoped_ptr from beeing used
+	operator const int()const{
 		LOG_IF(empty(),isis::CoreDebug,isis::error) << "Program parameters must not be empty. Please set it to any value.";
-		return get()->cast_to_Type<bool>();
+		if(get()->is<bool>()) //hack to make if(ProgParameter) possible
+			return get()->cast_to_Type<bool>();
+		else if(get()->is<Selection>()) //use the implicit cast of selection to int
+			return ((Selection)get()->cast_to_Type<Selection>());
+		else
+			return get()->cast_to_Type<int>();
 	}
 };
 
