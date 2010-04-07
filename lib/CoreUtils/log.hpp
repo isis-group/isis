@@ -36,7 +36,10 @@ template<class MODULE> class Log{
 	Log():m_handle(new DefaultMsgPrint(warning)){}
 public:
 	template<class HANDLE_CLASS> static void enable(LogLevel enable){
-		getHandle().reset(enable ? new HANDLE_CLASS(enable):0);
+		setHandler(boost::shared_ptr<MessageHandlerBase>(enable ? new HANDLE_CLASS(enable):0));
+	}
+	static void setHandler(boost::shared_ptr<MessageHandlerBase> handler){
+		getHandle()=handler;
 	}
 	static Message send(const char file[],const char object[],int line,LogLevel level){
 		return Message(object,MODULE::name(),file,line, level,getHandle());

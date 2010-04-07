@@ -35,7 +35,7 @@ public:
 	bool parse(const isis::util::Type< std::string >& props);
 	const std::string &description()const;
 	void setDescription(const std::string &desc);
-	template<typename T> operator const T&()const{
+	template<typename T> operator const T()const{
 		LOG_IF(empty(),isis::CoreDebug,isis::error) << "Program parameters must not be empty. Please set it to any value.";
 		return get()->cast_to_Type<T>();
 	}
