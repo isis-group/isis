@@ -223,6 +223,28 @@ public:
 	virtual ~TypeConverter(){}
 };
 
+/////////////////////////////////////////////////////////////////////////////
+// special version to convert from string to a given selection 
+// (lexical_cast doesnt work here, because it creates a temporary buffer)
+/////////////////////////////////////////////////////////////////////////////
+template<> class TypeConverter<false,false,std::string,Selection> : public TypeGenerator<std::string,Selection>{
+	TypeConverter(){
+		LOG(Debug,verbose_info)
+		<< "Creating special from-string converter for " << Type<Selection>::staticName();
+	};
+	public:
+		static boost::shared_ptr<const TypeConverterBase> create(){
+			TypeConverter<false,false,std::string,Selection> *ret=new TypeConverter<false,false,std::string,Selection>;
+			return boost::shared_ptr<const TypeConverterBase>(ret);
+		}
+		void convert(const TypeBase& src, TypeBase& dst)const{
+			Selection &dstVal=dst.cast_to_Type<Selection>();
+			const std::string &srcVal=src.cast_to_Type<std::string>();
+			dstVal.set(srcVal.c_str());
+		}
+		virtual ~TypeConverter(){}
+};
+
 
 /////////////////////////////////////////////////////////////////////////////
 // string/bool version -- uses decision based on text

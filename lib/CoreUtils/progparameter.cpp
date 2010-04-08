@@ -90,7 +90,7 @@ bool isis::util::ParameterMap::isComplete()const
 }
 void isis::util::ParameterMap::printAll()const
 {
-	std::cout << *this;
+	std::cout << *this << std::endl;
 }
 void isis::util::ParameterMap::printNeeded()const
 {
@@ -101,6 +101,6 @@ void isis::util::ParameterMap::printNeeded()const
 		at=std::find_if(at,needed.end(),notneededP())
 	)
 		needed.erase(at++);
-	std::cout << needed;
+	std::cout << needed << std::endl;
 }
 

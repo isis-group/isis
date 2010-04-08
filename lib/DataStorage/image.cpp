@@ -446,7 +446,7 @@ Image::ChunkIterator Image::chunksEnd(){return set.end();}
 isis::data::Image::ConstChunkIterator Image::chunksBegin() const{return set.begin();}
 isis::data::Image::ConstChunkIterator Image::chunksEnd() const{return set.end();}
 
-
+ImageList::ImageList(){}
 ImageList::ImageList(ChunkList src)
 {
 	while(!src.empty()){

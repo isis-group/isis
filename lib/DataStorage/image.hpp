@@ -231,12 +231,11 @@ public:
 class ImageList : public std::list< boost::shared_ptr<Image> >
 {
 public:
-
+	ImageList();
 	/**
 	 * Create a number of images out of a Chunk list.
 	 */
 	ImageList(ChunkList src);
-
 };
 }}
 

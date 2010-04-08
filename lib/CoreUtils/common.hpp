@@ -262,8 +262,11 @@ basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits> &out,const
 		if(key_len < i->first.length())
 			key_len = i->first.length();
 	
-	for(m_iterator i=s.begin();i!=s.end();i++)
-		out << make_pair(i->first+ std::string(key_len-i->first.length(),' '),i->second) << std::endl;
+	for(m_iterator i=s.begin();i!=s.end();){
+		out << make_pair(i->first+ std::string(key_len-i->first.length(),' '),i->second);
+		if(++i !=s.end())
+			out << std::endl;
+	}
 	return out;
 }
 

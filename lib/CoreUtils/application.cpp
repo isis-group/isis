@@ -73,7 +73,7 @@ bool Application::init(int argc, char** argv,bool exitOnError)
 		std::cout << "Exiting..." << std::endl;
 		exit(1);
 	}
-	return err;
+	return not err;
 }
 void Application::printHelp()const
 {

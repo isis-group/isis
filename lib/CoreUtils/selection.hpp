@@ -39,15 +39,6 @@ basic_ostream<charT,traits> &operator<<(basic_ostream<charT,traits> &out,const i
 {
 	return out << (std::string)s;
 }
-
-template<typename charT, typename traits>
-basic_istream<charT,traits> &operator>>(basic_istream<charT,traits> &in, isis::util::Selection &s)
-{
-	std::string dummy;
-	in >> dummy;
-	s.set(dummy.c_str());
-	return in;
-}
 }
 
 #endif //SELECTION_HPP_INCLUDED
