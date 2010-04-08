@@ -362,11 +362,13 @@ int main(
 			resampler->SetOutputOrigin(fmriOutputOrigin);
 		}
 		if(vtrans_filename) {
+			//warper->AddObserver(itk::ProgressEvent(), progressObserver);
 			warper->SetOutputDirection(fmriOutputDirection);
 			warper->SetOutputOrigin(fmriOutputOrigin);
-			//warper->SetOutputSize(fmriOutputSize);
+			warper->SetOutputSize(fmriOutputSize);
 			warper->SetOutputSpacing(fmriOutputSpacing);
 			warper->SetInput(reader->GetOutput());
+			
 			if(trans_filename.number == 0) {
 				warper->SetDeformationField(deformationFieldReader->GetOutput());
 			}
@@ -386,18 +388,17 @@ int main(
 			std::cout << "Resampling timestep: " << timestep << "...\r" << std::flush;
 			timeStepExtractionFilter->SetRequestedTimeStep(timestep);
 			timeStepExtractionFilter->Update();
-			if(trans_filename.number) {
-				tmpImage = timeStepExtractionFilter->GetOutput();
+			tmpImage = timeStepExtractionFilter->GetOutput();
 // 					std::cout << tmpImage << std::endl;
-				tmpImage->SetDirection(reader->GetOutput()->GetDirection());
-				tmpImage->SetOrigin(reader->GetOutput()->GetOrigin());
-
+			tmpImage->SetDirection(reader->GetOutput()->GetDirection());
+			tmpImage->SetOrigin(reader->GetOutput()->GetOrigin());
+			if(trans_filename.number) {
 				resampler->SetInput(tmpImage);
 				resampler->Update();
 				tileImage = resampler->GetOutput();
 			}
 			if(vtrans_filename) {
-				warper->SetInput(timeStepExtractionFilter->GetOutput());
+				warper->SetInput(tmpImage);
 				warper->Update();
 				tileImage = warper->GetOutput();
 			}

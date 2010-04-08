@@ -22,10 +22,11 @@ IF(BUILD_DATA_IO)
 	MESSAGE(STATUS "ISIS_DATA_LIBS is ${ISIS_DATA_LIBS}")
 	add_subdirectory(ImageIO)
 ENDIF(BUILD_DATA_IO)
-# 
-# IF(HAVE_ITK)
-# 	 add_subdirectory(extITK)
-# 	 include(${ITK_USE_FILE})
-# ENDIF(HAVE_ITK)
+
+IF(HAVE_ITK)
+	 add_subdirectory(extITK)
+	 include(${ITK_USE_FILE})
+	 include_directories(${ITK_INCLUDE_DIRS} itk)
+ENDIF(HAVE_ITK)
 
 add_subdirectory(ExternalLibraryAdapter)

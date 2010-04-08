@@ -174,7 +174,7 @@ int main(
 
 	typedef itk::ImageFileWriter<DeformationFieldType> VectorWriterType;
 
-	const itk::TransformBase* tmpConstTransformPointer;
+	const itk::TransformBase* tmpConstTransformPointer = NULL;
 	typedef itk::TransformBase* TransformBasePointerType;
 
 	typedef itk::MedianImageFilter<FixedImageType, FixedImageType> FixedFilterType;
