@@ -36,7 +36,7 @@ bool isis::util::ProgParameter::parse(const Type<std::string> &props)
 	} else {
 		ret=_internal::TypeBase::convert(props,me);
 	}
-	LOG_IF(ret,Debug,info) << "Parsed " << MSubject(props.toString()) << " as " << *this;
+	LOG_IF(ret,Debug,info) << "Parsed " << MSubject(props.toString()) << " as " << me.toString(true);
 	return ret;
 }
 const std::string& isis::util::ProgParameter::description()const

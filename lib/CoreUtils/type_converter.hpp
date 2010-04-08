@@ -29,7 +29,7 @@ namespace isis{ namespace util{namespace _internal{
 class TypeBase;
 class TypeConverterBase {
 public:
-	virtual void convert(const TypeBase& src, TypeBase &dst)const{};
+	virtual void convert(const TypeBase& src, TypeBase &dst)const=0;
 	virtual void generate(const boost::scoped_ptr<TypeBase>& src, boost::scoped_ptr<TypeBase>& dst)const=0;
 	static boost::shared_ptr<const TypeConverterBase> create(){return boost::shared_ptr<const TypeConverterBase>();}
 public:

@@ -47,7 +47,6 @@ template<bool NUMERIC,bool SAME,typename SRC, typename DST> class TypeConverter 
 public:
 	virtual ~TypeConverter(){}
 };
-
 /////////////////////////////////////////////////////////////////////////////
 // trivial version -- for conversion of the same type
 /////////////////////////////////////////////////////////////////////////////
@@ -219,7 +218,7 @@ public:
 	void convert(const TypeBase& src, TypeBase& dst)const{
 		std::string &dstVal=dst.cast_to_Type<std::string>();
 		const SRC &srcVal=src.cast_to_Type<SRC>();
-		dstVal = boost::lexical_cast<std::string>(srcVal);
+		dstVal = boost::lexical_cast<std::string,SRC>(srcVal);
 	}
 	virtual ~TypeConverter(){}
 };
@@ -285,11 +284,12 @@ public:
 	void convert(const TypeBase& src, TypeBase& dst)const{
 		std::list<DST> &dstVal=dst.cast_to_Type<std::list<DST> >();
 		LOG_IF(not dstVal.empty(),CoreLog,warning)
-			<< "Storing into non empty list while conversion from "
-			<< Type<std::string>::staticName() << " to " << Type<std::list<DST> >::staticName();
+			<< "Conversion from " << Type<std::string>::staticName()
+			<< " into non empty list  " << Type<std::list<DST> >::staticName()
+			<< " previous content will be lost";
 		const std::string &srcVal=src.cast_to_Type<std::string>();
 		const std::list<DST> buff=util::string2list<DST>(srcVal,boost::regex("[\\s,;]+"));
-		std::copy(buff.begin(),buff.end(),dstVal.end());
+		dstVal.assign(buff.begin(),buff.end());
 	}
 	virtual ~TypeConverter(){}
 };

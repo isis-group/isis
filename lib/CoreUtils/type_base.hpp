@@ -49,21 +49,6 @@ template<typename TYPE> TYPE __cast_to(Type<TYPE> *dest,const TYPE& value){
 /// @cond _internal
 class GenericType{
 protected:
-	template<typename T> const T m_cast_to(T defaultVal) const{
-		if (typeID()==T::staticID) { // ok its exactly the same type - no fiddling necessary
-			return *reinterpret_cast<const T*>(this);
-		} else {			
-			const T* const ret=dynamic_cast<const T* >(this);
-			if(ret){
-				return *ret;
-			} else {
-				LOG(Debug,error) 
-					<< "Cannot cast " << typeName() << " to " << T::staticName()
-					<< ". Returning \"" << defaultVal.toString() << "\".";
-				return defaultVal;
-			}
-		}
-	}
 	template<typename T> T& m_cast_to() throw(std::invalid_argument){
 		if (typeID()==T::staticID) { // ok its exactly the same type - no fiddling necessary
 			return *reinterpret_cast<T*>(this);
@@ -77,7 +62,20 @@ protected:
 			return *ret;
 		}
 	}
-
+	template<typename T> const T& m_cast_to()const throw(std::invalid_argument){
+		if (typeID()==T::staticID) { // ok its exactly the same type - no fiddling necessary
+			return *reinterpret_cast<const T*>(this);
+		} else {
+			const T* const ret=dynamic_cast<const T* >(this); //@todo have a look at http://lists.apple.com/archives/Xcode-users/2005/Dec/msg00061.html and http://www.mailinglistarchive.com/xcode-users@lists.apple.com/msg15790.html
+			if(ret == NULL){
+				std::stringstream msg;
+				msg << "cannot cast " << typeName() << " at " << this << " to " << T::staticName();
+				throw(std::invalid_argument(msg.str()));
+			}
+			return *ret;
+		}
+	}
+	
 public:
 	/// \returns true if the stored value is of type T.
 	template<typename T> bool is()const{return is(typeid(T));}
@@ -206,13 +204,13 @@ public:
 
 	/**
 	 * Dynamically cast the TypeBase up to its actual Type\<T\>. Constant version.
+	 * Will throw std::bad_cast if T is not the actual type.
 	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
-	 * \returns a copy of the stored value.
-	 * \returns T() if T is not the actual type.
+	 * \returns a constant reference of the stored value.
 	 */
-	template<typename T> const Type<T> cast_to_Type() const{
+	template<typename T> const Type<T>& cast_to_Type() const{
 		check_type<T>();
-		return m_cast_to<Type<T> >(Type<T>(T()));
+		return m_cast_to<Type<T> >();
 	}
 	/**
 	 * Dynamically cast the TypeBase up to its actual Type\<T\>. Referenced version.
@@ -245,12 +243,12 @@ public:
 	const Converter& getConverterTo(unsigned short id)const;
 	/**
 	* Dynamically cast the TypeBase up to its actual TypePtr\<T\>. Constant version.
+	* Will throw std::bad_cast if T is not the actual type.
 	* Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
-	* \returns a copy of the pointer.
-	* \returns TypePtr\<T\\>(NULL,0) if T is not the actual type.
+	* \returns a constant reference of the pointer.
 	*/
-	template<typename T> const TypePtr<T> cast_to_TypePtr() const{
-		return m_cast_to<TypePtr<T> >(TypePtr<T>((T*)0,0));
+	template<typename T> const TypePtr<T>& cast_to_TypePtr() const{
+		return m_cast_to<TypePtr<T> >();
 	}
 	/**
 	* Dynamically cast the TypeBase up to its actual TypePtr\<T\>. Referenced version.
