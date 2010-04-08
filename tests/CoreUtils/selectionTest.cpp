@@ -19,11 +19,6 @@ BOOST_AUTO_TEST_CASE(test_selection_set) {
 	BOOST_CHECK(sel.set("Val1")); //should NOT fail
 	BOOST_CHECK_EQUAL(sel,"Val1");
 	BOOST_CHECK_EQUAL(sel,1);
-
-	std::istringstream testStream("Val2");
-	testStream >> sel;
-	BOOST_CHECK_EQUAL(sel,"Val2");
-	BOOST_CHECK_EQUAL(sel,2);
 }
 BOOST_AUTO_TEST_CASE(test_selection_copy) {
 	util::Selection sel("Val1,Val2,Val3");
