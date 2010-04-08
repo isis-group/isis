@@ -33,7 +33,7 @@ public:
 				for(int x=10;x<40;x++)
 					for(int y=10;y<40;y++)
 						for(int z=10;z<40;z++)
-							ch.voxel<u_int8_t>(x,y,z)=i*20;
+							ch.voxel<u_int8_t>(x,y,z)=255-i*20;
 				chunks.push_back(ch);
 			}
 		}

@@ -27,10 +27,11 @@ namespace isis{ namespace data {
 
 class IOApplication:public util::Application
 {
-	public:
-		data::ImageList images;
-		IOApplication(const char name[],bool have_input=true,bool have_output=true);
-		virtual bool init(int argc, char** argv, bool exitOnError = true);
+	bool m_input,m_output;
+public:
+	data::ImageList images;
+	IOApplication(const char name[],bool have_input=true,bool have_output=true);
+	virtual bool init(int argc, char** argv, bool exitOnError = true);
 };
 	
 }}

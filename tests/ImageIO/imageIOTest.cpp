@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE (imageLoadtest)
 		BOOST_CHECK_EQUAL(ref->voxel<u_int8_t>(0,0), cnt);
 		for(int i=0;i<10;i++)
 			for(int j=10;j<40;j++)
-				BOOST_CHECK_EQUAL(ref->voxel<u_int8_t>(j,j,j,i), i*20);
+				BOOST_CHECK_EQUAL(ref->voxel<u_int8_t>(j,j,j,i), 255-i*20);
 		cnt++;
 	}
 	BOOST_CHECK(data::IOFactory::write(images,"test.null",""));
