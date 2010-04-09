@@ -35,6 +35,7 @@ namespace isis {
 			transform.AFFINE = false;
 			transform.CENTEREDAFFINE = false;
 			transform.BSPLINEDEFORMABLETRANSFORM = false;
+			transform.SCALE = false;
 
 			metric.MATTESMUTUALINFORMATION = false;
 			metric.NORMALIZEDCORRELATION = false;
@@ -178,7 +179,12 @@ namespace isis {
 				m_BSplineTransform = BSplineTransformType::New();
 				m_RegistrationObject->SetTransform(m_BSplineTransform);
 				break;
-
+				
+				case ScaleTransform:
+				transform.SCALE = true;
+				m_ScaleTransform = ScaleTransformType::New();
+				m_RegistrationObject->SetTransform(m_ScaleTransform);
+				break;
 			}
 		}
 
@@ -473,6 +479,11 @@ namespace isis {
 				m_NumberOfParameters = m_TranslationTransform->GetNumberOfParameters();
 				m_RegistrationObject->SetInitialTransformParameters(m_TranslationTransform->GetParameters());
 			}
+			if (transform.SCALE) {
+				m_NumberOfParameters = m_ScaleTransform->GetNumberOfParameters();
+				m_RegistrationObject->SetInitialTransformParameters(m_ScaleTransform->GetParameters());
+			}
+			    
 		}
 
 		template<class TFixedImageType, class TMovingImageType>
@@ -673,6 +684,7 @@ namespace isis {
 				m_RegistrationObject->SetInitialTransformParameters(m_VersorRigid3DTransform->GetParameters());
 
 			}
+			
 		}
 		/*
 		 this method checks the images sizes of the fixed and the moving image.

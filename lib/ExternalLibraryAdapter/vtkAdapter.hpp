@@ -29,7 +29,7 @@
 #ifndef VTKADAPTER_HPP_
 #define VTKADAPTER_HPP_
 
-#include "AdapterBase.hpp"
+#include "ExternalLibraryAdapterBase.hpp"
 
 //vtk includes
 #include <vtkImageData.h>
@@ -43,20 +43,20 @@ namespace isis { namespace adapter {
 /**
   * VTKAdapter is able of taking an isis image object and return a vector of vtkSmartpointers on vtkImageData objects.
   */
-class VTKAdapter : public _internal::AdapterBase{
+class vtkAdapter : public _internal::ExternalLibraryAdapterBase{
 public:
 	typedef std::vector< vtkSmartPointer< vtkImageData > > ImageVector;
 	
 	/**
 	* Gets a std::vector of vtkSmartpointers on vtkImageData objects.
 	*/
-	static ImageVector makeVtkImageDataList(const boost::shared_ptr<data::Image>, const ChunkArrangement& = NoArrangement);
+	static ImageVector makeVtkImageDataList(const boost::shared_ptr<data::Image>);
 private:   
 	boost::shared_ptr<data::Image> m_ImageISIS;
 protected:
 	//should not be loaded directly
-	VTKAdapter(const boost::shared_ptr<data::Image>);
-	VTKAdapter(const VTKAdapter&){};  
+	vtkAdapter(const boost::shared_ptr<data::Image>);
+	vtkAdapter(const vtkAdapter&){};  
 private:
 	ImageVector m_vtkImageDataVector;
 		

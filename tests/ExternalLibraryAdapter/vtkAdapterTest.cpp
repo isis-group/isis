@@ -35,7 +35,7 @@ namespace isis{namespace test{
 // 		data::ImageList imgList = isis::data::IOFactory::load("test.null", "");
 		data::ImageList imgList = isis::data::IOFactory::load("/home/erik/workspace/data.nii", "");
 		BOOST_CHECK(not imgList.empty());
-		adapter::VTKAdapter::ImageVector vtkImageImageDataVector = adapter::VTKAdapter::makeVtkImageDataList(imgList.front());
+		adapter::vtkAdapter::ImageVector vtkImageImageDataVector = adapter::vtkAdapter::makeVtkImageDataList(imgList.front());
 		BOOST_CHECK(not vtkImageImageDataVector.empty());
 		
 		//finally show one axial slice of the vtkImage, z=zdimension/2
@@ -61,7 +61,7 @@ namespace isis{namespace test{
 		data::ImageList imgList = isis::data::IOFactory::load("/home/erik/workspace/timeseries.nii", "");
 // 		data::ImageList imgListTime = isis::data::IOFactory::load("test.null", "");
 		BOOST_CHECK(not imgList.empty());
-		adapter::VTKAdapter::ImageVector vtkImageImageDataVectorTime = adapter::VTKAdapter::makeVtkImageDataList(imgList.front());
+		adapter::vtkAdapter::ImageVector vtkImageImageDataVectorTime = adapter::vtkAdapter::makeVtkImageDataList(imgList.front());
 		BOOST_CHECK(not vtkImageImageDataVectorTime.empty());
 		LOG(DataDebug,info) << "Showing first of " << vtkImageImageDataVectorTime.size() << " objects. z=zdimension/2 = " << vtkImageImageDataVectorTime.front()->GetDimensions()[2] / 2;
 		viewer->SetZSlice(vtkImageImageDataVectorTime.front()->GetDimensions()[2] / 2);

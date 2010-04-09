@@ -36,7 +36,7 @@
 VDictEntry TYPMetric[] = { {"MattesMutualInformation", 0}, {"MutualInformationHistogram", 1}, {"NormalizedCorrelation",
     2}, {"MeanSquare", 3}, {NULL}};
 
-VDictEntry TYPTransform[] = { {"Rigid", 0}, {"Affine", 1}, {"BSplineDeformable", 2}, {"Translation", 3}, {"CenteredAffine", 4}, {NULL}};
+VDictEntry TYPTransform[] = { {"Rigid", 0}, {"Affine", 1}, {"BSplineDeformable", 2}, {"Translation", 3}, {"Scale", 4}, {"CenteredAffine",5}, {NULL}};
 
 VDictEntry TYPInterpolator[] = { {"Linear", 0}, {"BSpline", 1}, {"NearestNeighbor", 2}, {NULL}};
 
@@ -348,6 +348,12 @@ int main(
 			break;
 			case 3:
 			registrationFactory->SetTransform(RegistrationFactoryType::TranslationTransform);
+			break;
+			case 4:
+			registrationFactory->SetTransform(RegistrationFactoryType::ScaleTransform);
+			break;
+			case 5:
+			registrationFactory->SetTransform(RegistrationFactoryType::CenteredAffineTransform);
 			break;
 		}
 
