@@ -20,6 +20,12 @@ struct Deleter{
 	};
 };
 
+class ReferenceTest:public util::TypePtr<int>::Reference{
+public:
+	ReferenceTest():util::TypePtr<int>::Reference(new util::TypePtr<int>((int*)calloc(5,sizeof(int)),5,Deleter())){} 
+	//we have to wrap this into a class, because you cannot directly create a Reference of a pointer
+};
+
 bool Deleter::deleted=false;
 	
 BOOST_AUTO_TEST_CASE(typePtr_init_test) {
@@ -91,8 +97,7 @@ BOOST_AUTO_TEST_CASE(typePtr_Reference_test) {
 		// default constructor must create an empty pointer-ref
 		BOOST_CHECK(outer.empty());
 		{
-			util::TypePtr<int>::Reference inner;
-			inner.reset(new util::TypePtr<int>((int*)calloc(5,sizeof(int)),5,Deleter()));
+			ReferenceTest inner;
 			BOOST_CHECK(not inner.empty());
 			
 			// for now we have only one pointer referencing the data
