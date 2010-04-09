@@ -28,7 +28,11 @@
 #ifndef ITKADAPTER_HPP_
 #define ITKADAPTER_HPP_
 
-#include "ExternalLibraryAdapterBase.hpp"
+#include "DataStorage/image.hpp"
+#include "CoreUtils/log.hpp"
+
+//external includes 
+#include <boost/shared_ptr.hpp>
 
 //itk includes
 #include <itkSmartPointer.h>
@@ -40,7 +44,7 @@ namespace isis{ namespace adapter {
   * ITKAdapter is capable of taking an isis image object and return an itkImage object.
   */
 
-class itkAdapter : public _internal::ExternalLibraryAdapterBase  {
+class itkAdapter {
 public:
 	template<typename T,unsigned short dim> static itk::SmartPointer<itk::Image<T,dim> > 
 		makeItkImage(const boost::shared_ptr<data::Image>);

@@ -12,6 +12,7 @@
 #include <vtkImageWriter.h>
 #include <vtkPolyDataWriter.h>
 #include <vtkSmartPointer.h>
+#include <vtkPointData.h>
 
 namespace isis{namespace test{
   
@@ -33,42 +34,19 @@ namespace isis{namespace test{
 		
 		//load an image and store it into the vtkAdapter
 // 		data::ImageList imgList = isis::data::IOFactory::load("test.null", "");
-		data::ImageList imgList = isis::data::IOFactory::load("/home/erik/workspace/data.nii", "");
+		data::ImageList imgList = isis::data::IOFactory::load("/home/raid/tuerke/workspace/data.nii", "");
 		BOOST_CHECK(not imgList.empty());
-		adapter::vtkAdapter::ImageVector vtkImageImageDataVector = adapter::vtkAdapter::makeVtkImageDataList(imgList.front());
-		BOOST_CHECK(not vtkImageImageDataVector.empty());
+		vtkImageData* vtkImage = adapter::vtkAdapter::makeVtkImageObject(imgList.front());
+		BOOST_CHECK(not vtkImage);
 		
 		//finally show one axial slice of the vtkImage, z=zdimension/2
-		LOG(DataDebug,info) << "Showing vtkImageData object. z=zdimension/2 = " << vtkImageImageDataVector.front()->GetDimensions()[2] / 2;
-		viewer->SetZSlice(vtkImageImageDataVector.front()->GetDimensions()[2] / 2);
-		viewer->SetInput(vtkImageImageDataVector.front());
+		LOG(DataDebug,info) << "Showing vtkImageData object. z=zdimension/2 = " << vtkImage->GetDimensions()[2] / 2;
+		viewer->SetZSlice(vtkImage->GetDimensions()[2] / 2);
+		viewer->SetInput(vtkImage);
 		viewer->Render();
 		sleep(3);
 	}
 	
-	BOOST_AUTO_TEST_CASE (VTKAdapterTest4D)
-	{
-
-		ENABLE_LOG(CoreLog,util::DefaultMsgPrint,warning);
-		ENABLE_LOG(CoreDebug,util::DefaultMsgPrint,warning);
-		ENABLE_LOG(DataLog,util::DefaultMsgPrint,warning);
-		ENABLE_LOG(DataDebug,util::DefaultMsgPrint,warning);
-		ENABLE_LOG(data::Runtime,util::DefaultMsgPrint,error);
-		ENABLE_LOG(DataDebug,util::DefaultMsgPrint,info);
-		
-		vtkImageViewer* viewer = vtkImageViewer::New();
-		//load a 4d image
-		data::ImageList imgList = isis::data::IOFactory::load("/home/erik/workspace/timeseries.nii", "");
-// 		data::ImageList imgListTime = isis::data::IOFactory::load("test.null", "");
-		BOOST_CHECK(not imgList.empty());
-		adapter::vtkAdapter::ImageVector vtkImageImageDataVectorTime = adapter::vtkAdapter::makeVtkImageDataList(imgList.front());
-		BOOST_CHECK(not vtkImageImageDataVectorTime.empty());
-		LOG(DataDebug,info) << "Showing first of " << vtkImageImageDataVectorTime.size() << " objects. z=zdimension/2 = " << vtkImageImageDataVectorTime.front()->GetDimensions()[2] / 2;
-		viewer->SetZSlice(vtkImageImageDataVectorTime.front()->GetDimensions()[2] / 2);
-		viewer->SetInput(vtkImageImageDataVectorTime.front());
-		viewer->Render();
-		sleep(3);
-	}
 	
 }}//end namespace 
 		
