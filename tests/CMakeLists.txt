@@ -1,6 +1,7 @@
 
 FIND_PACKAGE(Boost REQUIRED COMPONENTS unit_test_framework filesystem regex system)
 include_directories(${Boost_INCLUDE_DIR}  lib)
+include_directories(${ITK_INCLUDE_DIRS})
 
 IF(BUILD_COREUTILS)
 	add_subdirectory(CoreUtils)

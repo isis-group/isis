@@ -49,17 +49,21 @@ class itkAdapter {
 public:
 	template<typename T,unsigned short dim> static itk::SmartPointer<itk::Image<T,dim> >
 		makeItkImageObject(const boost::shared_ptr<data::Image> src) {
-			
+		
+		typedef itk::Image<T, dim> MyImageType;    
 		itkAdapter* myAdapter = new itkAdapter(src);
-		typename itk::Image<T, dim>::Pointer itkImage = itk::Image<T, dim>::New();
+		typename MyImageType::Pointer itkImage = MyImageType::New();
+		typename MyImageType::SpacingType itkSpacing;
 		typename itk::ImportImageContainer<unsigned long, T>::Pointer importer = itk::ImportImageContainer<unsigned long, T>::New();
 		const util::fvector4 dimensions(myAdapter->m_ImageISIS->sizeToVector());
 		const util::fvector4 indexOrigin(myAdapter->m_ImageISIS->getProperty<util::fvector4>("indexOrigin"));
 		const util::fvector4 spacing(myAdapter->m_ImageISIS->getProperty<util::fvector4>("voxelSize"));
-		
+		itkSpacing = (spacing[0], spacing[1], spacing[2]);
 		importer->Initialize();
 		importer->Reserve(dimensions[0]*dimensions[1]*dimensions[2]*dimensions[3]);
-	
+						
+		itkImage->SetSpacing(itkSpacing);
+		itkImage->SetPixelContainer(importer);
 		return itkImage;
 	};
 	

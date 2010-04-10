@@ -1,7 +1,6 @@
 OPTION(BUILD_APPLICATIONS_2D "Support for 2d images" ON)
 OPTION(BUILD_APPLICATIONS_3D "Support for 3d images" ON)
 
-
 IF(BUILD_APPLICATIONS_2D)
 	add_subdirectory(isisReg2D)
 	add_subdirectory(isisDoTrans2D)

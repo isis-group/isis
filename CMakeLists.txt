@@ -47,14 +47,14 @@ endif(DEBUG_LOG)
 #If we do a static build at least the plugins will be dynamic, so we need -fPIC
 if (NOT BUILD_SHARED_LIBS)
 	IF("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
-		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC"  )
+		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC" )
 		SET(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -fPIC"  )
 		message(STATUS "Using -fPIC also for static build, because we'll need it for the plugins on ${CMAKE_SYSTEM_PROCESSOR}")
 	elseif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
 		message(STATUS "Assuming -fPIC will not be necessary for ${CMAKE_SYSTEM_PROCESSOR}")
 	ENDIF("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
 endif(NOT BUILD_SHARED_LIBS)
-	
+
 add_definitions(-DSOURCE_ROOT="${CMAKE_HOME_DIRECTORY}")
 
 # Set the revision number if this dir is a svn working copy.
@@ -84,13 +84,11 @@ endif(SVN_REVISION)
 
 IF(HAVE_ITK)
 	FIND_PACKAGE(ITK REQUIRED)
-# 	include(${USE_ITK_FILE})
-	include_directories(${ITK_INCLUDE_DIRS})
+	include(${USE_ITK_FILE})
 ENDIF(HAVE_ITK)
 
 IF(HAVE_VTK)
 	FIND_PACKAGE(VTK REQUIRED)
-# 	include_directories(${VTK_INCLUDE_DIRS})
 	include(${USE_VTK_FILE})
 ENDIF(HAVE_VTK)
 
