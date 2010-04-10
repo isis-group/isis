@@ -92,6 +92,12 @@ IF(HAVE_VTK)
 	include(${USE_VTK_FILE})
 ENDIF(HAVE_VTK)
 
+# If ITK AND VTK are used together we have to increase the number of maximal 
+# template recursion otherwise there will be an overflow in the Boost library.
+IF(ITK_FOUND AND VTK_FOUND)
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-depth-60")
+ENDIF(ITK_FOUND AND VTK_FOUND)
+
 ###############################################################################
 #Subdirs
 ###############################################################################
