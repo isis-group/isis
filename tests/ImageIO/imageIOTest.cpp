@@ -39,4 +39,6 @@ BOOST_AUTO_TEST_CASE (imageLoadtest)
 	}
 	BOOST_CHECK(data::IOFactory::write(images,"test.null",""));
 }
+
+
 }}
