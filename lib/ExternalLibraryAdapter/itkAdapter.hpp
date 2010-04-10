@@ -16,13 +16,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * Author: Erik Tuerke, tuerke@cbs.mpg.de, 2009
+ * Author: Erik Tuerke, tuerke@cbs.mpg.de, 2010
  *
  * vtkAdapter.cpp
  *
  * Description:
  *
- *  Created on: Mar,30 2009
+ *  Created on: Mar,30 2010
  *      Author: tuerke	
  ******************************************************************/
 #ifndef ITKADAPTER_HPP_
@@ -37,6 +37,7 @@
 //itk includes
 #include <itkSmartPointer.h>
 #include <itkImage.h>
+#include <itkImportImageContainer.h>
 
 namespace isis{ namespace adapter {
 
@@ -46,16 +47,35 @@ namespace isis{ namespace adapter {
 
 class itkAdapter {
 public:
-	template<typename T,unsigned short dim> static itk::SmartPointer<itk::Image<T,dim> > 
-		makeItkImage(const boost::shared_ptr<data::Image>);
+	template<typename T,unsigned short dim> static itk::SmartPointer<itk::Image<T,dim> >
+		makeItkImageObject(const boost::shared_ptr<data::Image> src) {
+			
+		itkAdapter* myAdapter = new itkAdapter(src);
+		typename itk::Image<T, dim>::Pointer itkImage = itk::Image<T, dim>::New();
+		typename itk::ImportImageContainer<unsigned long, T>::Pointer importer = itk::ImportImageContainer<unsigned long, T>::New();
+		const util::fvector4 dimensions(myAdapter->m_ImageISIS->sizeToVector());
+		const util::fvector4 indexOrigin(myAdapter->m_ImageISIS->getProperty<util::fvector4>("indexOrigin"));
+		const util::fvector4 spacing(myAdapter->m_ImageISIS->getProperty<util::fvector4>("voxelSize"));
+		
+		importer->Initialize();
+		importer->Reserve(dimensions[0]*dimensions[1]*dimensions[2]*dimensions[3]);
+	
+		return itkImage;
+	};
 	
 protected:
 	//should not be loaded directly
 	itkAdapter(const boost::shared_ptr<data::Image>);
 	itkAdapter(const itkAdapter&){};  
+private:
+	boost::shared_ptr<data::Image> m_ImageISIS;
+		
 };
 
-
+itkAdapter::itkAdapter(const boost::shared_ptr<isis::data::Image> src)
+	:m_ImageISIS(src)
+{}
 
 }}// end namespace
+
 #endif

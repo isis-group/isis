@@ -84,10 +84,14 @@ endif(SVN_REVISION)
 
 IF(HAVE_ITK)
 	FIND_PACKAGE(ITK REQUIRED)
+# 	include(${USE_ITK_FILE})
+	include_directories(${ITK_INCLUDE_DIRS})
 ENDIF(HAVE_ITK)
 
 IF(HAVE_VTK)
 	FIND_PACKAGE(VTK REQUIRED)
+# 	include_directories(${VTK_INCLUDE_DIRS})
+	include(${USE_VTK_FILE})
 ENDIF(HAVE_VTK)
 
 ###############################################################################

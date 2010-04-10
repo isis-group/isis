@@ -1,12 +1,6 @@
 OPTION(BUILD_APPLICATIONS_2D "Support for 2d images" ON)
 OPTION(BUILD_APPLICATIONS_3D "Support for 3d images" ON)
 
-if(HAVE_ITK)
-	include(${ITK_USE_FILE})
-else(HAVE_ITK)
-	message(FATAL_ERROR "You will need HAVE_ITK to build the apps")
-endif(HAVE_ITK)
-
 
 IF(BUILD_APPLICATIONS_2D)
 	add_subdirectory(isisReg2D)

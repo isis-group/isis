@@ -24,7 +24,7 @@ IF(BUILD_DATA_IO)
 ENDIF(BUILD_DATA_IO)
 
 IF(HAVE_ITK)
-	 include_directories(${ITK_INCLUDE_DIRS} itk)
+# 	 include_directories(${ITK_INCLUDE_DIRS} itk)
 	 add_subdirectory(extITK)
 ENDIF(HAVE_ITK)
 

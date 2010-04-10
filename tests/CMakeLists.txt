@@ -15,10 +15,9 @@ IF(HAVE_ITK)
 	add_subdirectory(extRegistration)
 ENDIF(HAVE_ITK)
 
-IF(HAVE_VTK)
-    include(${VTK_USE_FILE})
+IF(HAVE_VTK OR HAVE_ITK)
     add_subdirectory(ExternalLibraryAdapter)
-ENDIF(HAVE_VTK)
+ENDIF(HAVE_VTK OR HAVE_ITK)
 
 add_executable(test_logger test_logger.cpp)
 target_link_libraries(test_logger utils ${Boost_LIBRARIES})
