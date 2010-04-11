@@ -320,11 +320,10 @@ bool Image::reIndex() {
 				}
 		}
 		const util::fvector4 &calcFoV=getFoV(getProperty<util::fvector4>("voxelSize"),voxelGap);
-		bool ok=false;
+		bool ok=true;
 		for(size_t i=0;i<n_dims;i++){
 			if(propFoV[i]!=-std::numeric_limits<float>::infinity()){
-				if(not util::fuzzyEqual(propFoV[i],calcFoV[i]))
-					ok=false;
+				ok&=util::fuzzyEqual(propFoV[i],calcFoV[i]);
 			} else 
 				propFoV[i]=calcFoV[i];
 		}
