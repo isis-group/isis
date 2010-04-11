@@ -113,9 +113,6 @@ public:
 	size_t cmpLine(size_t secondDimS, size_t thirdDimS, size_t fourthDimS,const Chunk& dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD)const;
 	size_t cmpSlice(size_t thirdDimS, size_t fourthDimS,const Chunk& dst, size_t thirdDimD, size_t fourthDimD)const;
 
-	util::fvector4 getFoV()const;
-	util::fvector4 getFoV(const isis::util::fvector4 &voxelSize)const;
-	
 	template<typename T> void getMinMax(T &min,T &max)const
 	{
 		return operator*().getMinMax(min,max);

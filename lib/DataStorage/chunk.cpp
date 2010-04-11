@@ -136,26 +136,5 @@ size_t Chunk::cmpSlice(size_t thirdDimS, size_t fourthDimS,const Chunk& dst, siz
 	return cmpRange(idx1,idx2,dst,idx3);
 }
 
-
-util::fvector4 Chunk::getFoV()const
-{
-	LOG_IF(not hasProperty("voxelSize"),Debug,error) << "Property voxelSize is missing in chunk, cannot compute FOV";
-	const util::fvector4 voxelSize=getProperty<util::fvector4>("voxelSize");
-	return getFoV(voxelSize);
-}
-util::fvector4 Chunk::getFoV(const util::fvector4 &voxelSize)const
-{
-	util::fvector4 gapSize;
-	const util::fvector4 voxels=sizeToVector();
-	if(hasProperty("voxelGap")){
-		const util::fvector4 voxelGap=getProperty<util::fvector4>("voxelGap");
-		for(int i=0;i<4;i++)
-		  if(voxels[i]>1 && voxelGap[i]!= -std::numeric_limits<float>::infinity())
-			gapSize[i]=(voxels[i]-1)*voxelSize[i];
-	}
-	return voxelSize * voxels + gapSize;
-}
-
-
 }}
 

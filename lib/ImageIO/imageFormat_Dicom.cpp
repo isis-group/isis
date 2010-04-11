@@ -283,11 +283,15 @@ void ImageFormat_Dicom::readMosaic(const data::Chunk& source, data::ChunkList& d
 	newChunk->remove(NumberOfImagesInMosaicProp); // we dont need that anymore
 	newChunk->setProperty(prefix+"ImageType",iType);
 	
-	//remove the additional mosaic offset
+	//remove the additional mosaic offset and recalc the fov if given
 	//eg. if there is a 10x10 Mosaic, substract the half size of 9 Images from the indexOrigin
 	util::fvector4 &origin=newChunk->getPropertyValue("indexOrigin")->cast_to_Type<util::fvector4>();
-	util::fvector4 fovCorr=newChunk->getFoV()/2*(matrixSize-1);
-	util::fvector4 offset = (newChunk->getProperty<util::fvector4>("readVec")*fovCorr[0]) + (newChunk->getProperty<util::fvector4>("phaseVec")*fovCorr[1]);
+	const util::fvector4 voxelSize=newChunk->getProperty<util::fvector4>("voxelSize");
+	util::fvector4 voxelGap;
+	if(newChunk->hasProperty("voxelGap"))
+		voxelGap=newChunk->getProperty<util::fvector4>("voxelGap");
+	const util::fvector4 fovCorr=newChunk->getFoV(voxelSize,voxelGap)/2*(matrixSize-1);
+	const util::fvector4 offset = (newChunk->getProperty<util::fvector4>("readVec")*fovCorr[0]) + (newChunk->getProperty<util::fvector4>("phaseVec")*fovCorr[1]);
 	
 	origin= origin+ offset;
 	LOG(Debug,info) << "New origin: " << newChunk->getPropertyValue("indexOrigin");
@@ -296,6 +300,8 @@ void ImageFormat_Dicom::readMosaic(const data::Chunk& source, data::ChunkList& d
 		util::fvector4 &ref=newChunk->getPropertyValue("fov")->cast_to_Type<util::fvector4>();
 		ref[0]/=matrixSize;
 		ref[1]/=matrixSize;
+		LOG_IF(ref[2]!=0,Runtime,warning) << "Overriding nonzero slice FoV in mosaic image";
+		ref[2]=newChunk->getFoV(voxelSize,voxelGap)[2];
 		LOG(Debug,info) << "New fov: " << newChunk->getPropertyValue("fov");
 	}
 	dest.push_back(*newChunk);

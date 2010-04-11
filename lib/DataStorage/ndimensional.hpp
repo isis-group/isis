@@ -115,6 +115,13 @@ public:
 		}
 		return ret;
 	}
+	util::FixedVector<float,DIMS> getFoV(const util::FixedVector<float,DIMS> &voxelSize,const util::FixedVector<float,DIMS> &voxelGap)const
+	{
+		LOG_IF(volume()==0,DataLog,warning) << "Calculating FoV of empty data";
+		const util::FixedVector<size_t,DIMS> voxels=sizeToVector();
+		const util::fvector4 gapSize=voxelGap*(voxels-1);
+		return voxelSize * voxels + gapSize;
+	}
 };
 
 }}}

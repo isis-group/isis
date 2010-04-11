@@ -212,6 +212,8 @@ bool Image::reIndex() {
 		getChunkAt(i).remove(common);
 	LOG_IF(not common.empty(), Debug,verbose_info) << "common properties removed from " << set.size() << " chunks: " << common;
 
+	init(size);
+
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	//reconstruct some redundant information, if its missing
 	//////////////////////////////////////////////////////////////////////////////////////////////////
@@ -306,24 +308,31 @@ bool Image::reIndex() {
 		setProperty<std::string>("sliceOrientation", orientation);
 		LOG(Debug, info) << "sliceOrientation: " << orientation;
 	}
-	
 	if(hasProperty("fov")){
-		const util::fvector4 &prop=getPropertyValue("fov")->cast_to_Type<util::fvector4>();
-		const util::fvector4 &chunkFoV=chunksBegin()->getFoV(getProperty<util::fvector4>("voxelSize"));
-		bool ok=true;
-		for(int i=0;i<4;i++)
-			if(prop[i]>0){
-				if(prop[i]!=chunkFoV[i])
+		util::fvector4 &propFoV=getPropertyValue("fov")->cast_to_Type<util::fvector4>();
+		util::fvector4 voxelGap;
+		if(hasProperty("voxelGap")){
+			voxelGap=getProperty<util::fvector4>("voxelGap");
+			for(size_t i=0;i<n_dims;i++)
+				if(voxelGap[i]==-std::numeric_limits<float>::infinity()){
+					LOG(Runtime,info) << "Ignoring unknown voxel gap in direction " << i;
+					voxelGap[i]=0;
+				}
+		}
+		const util::fvector4 &calcFoV=getFoV(getProperty<util::fvector4>("voxelSize"),voxelGap);
+		bool ok=false;
+		for(size_t i=0;i<n_dims;i++){
+			if(propFoV[i]!=-std::numeric_limits<float>::infinity()){
+				if(not util::fuzzyEqual(propFoV[i],calcFoV[i]))
 					ok=false;
-			}else{
-				//@todo compute missing FoVs
-			}
+			} else 
+				propFoV[i]=calcFoV[i];
+		}
 		LOG_IF(not ok,Runtime,warning)
-				<< "The calculated field of view differs from the stored " << prop << "/" << chunkFoV;
+			<< "The calculated field of view differs from the stored " << propFoV << "/" << calcFoV;
 
 	}
 	LOG_IF(not valid(),Runtime,warning)<< "The image is not valid after reindexing. Missing properties: " << missing();
-	init(size);
 	clean=true;
 	return true;
 }

@@ -64,9 +64,9 @@ bool Application::init(int argc, char** argv,bool exitOnError)
 
 	setLog<CoreDebug>(LLMap[parameters["dCore"]]);
 	setLog<CoreLog>(LLMap[parameters["dCore"]]);
-	setLog<DataDebug>(LLMap[parameters["dCore"]]);
-	setLog<DataLog>(LLMap[parameters["dCore"]]);
-	setLog<ImageIoDebug>(LLMap[parameters["dCore"]]);
+	setLog<DataDebug>(LLMap[parameters["dData"]]);
+	setLog<DataLog>(LLMap[parameters["dData"]]);
+	setLog<ImageIoDebug>(LLMap[parameters["dImageIO"]]);
 	setLog<ImageIoLog>(LLMap[parameters["dImageIO"]]);
 	
 	if(err and exitOnError){
