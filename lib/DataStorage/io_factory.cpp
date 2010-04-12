@@ -110,7 +110,7 @@ std::list<std::string> IOFactory::getSuffixes(const FileFormatPtr& reader)
 
 IOFactory& IOFactory::get()
 {
-	return *util::Singletons::get<IOFactory,INT_MAX>();
+	return util::Singletons::get<IOFactory,INT_MAX>();
 }
 
 int IOFactory::loadFile(ChunkList &ret,const boost::filesystem::path& filename, const std::string& dialect)

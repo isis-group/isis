@@ -28,11 +28,11 @@ TypeBase::~TypeBase() {}
 
 
 const TypeConverterMap& TypeBase::converters() {
-	return *Singletons::get<_internal::TypeConverterMap,0>();
+	return Singletons::get<_internal::TypeConverterMap,0>();
 }
 
 const TypePtrConverterMap& TypePtrBase::converters(){
-	return *Singletons::get<_internal::TypePtrConverterMap,0>();
+	return Singletons::get<_internal::TypePtrConverterMap,0>();
 }
 
 

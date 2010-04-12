@@ -20,18 +20,18 @@ class Singletons{
 	class SingletonBase:public boost::noncopyable{};
 	template<typename BASE> class Singleton:public SingletonBase,public BASE{};
 	
-	typedef std::multimap<int,boost::shared_ptr<SingletonBase> > prioMap;
+	typedef std::multimap<int,SingletonBase*const> prioMap;
 	prioMap map;
 	Singletons();
 	~Singletons();
-	template<typename T> boost::shared_ptr<Singleton<T> > create(int priority){
-		const boost::shared_ptr<Singleton<T> > ret(new Singleton<T>);
-		map.insert(map.find(priority), std::make_pair(priority,boost::static_pointer_cast<SingletonBase>(ret)));
+	template<typename T> Singleton<T> *const create(int priority){
+		Singleton<T> * const ret(new Singleton<T>);
+		map.insert(map.find(priority), std::make_pair(priority,ret));
 		return ret;
 	}
-	template<typename T> static boost::weak_ptr<Singleton<T> > request(int priority){
-		static boost::weak_ptr<Singleton<T> > s=getMaster().create<T>(priority);
-		return s;
+	template<typename T> static Singleton<T>& request(int priority){
+		static Singleton<T> *s=getMaster().create<T>(priority);
+		return *s;
 	}
 	static Singletons& getMaster();
 public:
@@ -46,8 +46,8 @@ public:
 	 *
 	 * \return allways a shared pointer to the same object of type T.
 	 */
-	template<typename T,int PRIO> static boost::shared_ptr<Singleton<T> > get(){
-		return request<T>(PRIO).lock();
+	template<typename T,int PRIO> static Singleton<T> &get(){
+		return request<T>(PRIO);
 	}
 	/**
 	 * \copydoc get()

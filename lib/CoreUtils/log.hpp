@@ -31,7 +31,7 @@ template<class MODULE> class Log{
 	friend class util::Singletons;
 	boost::shared_ptr<MessageHandlerBase> m_handle;
 	static boost::shared_ptr<MessageHandlerBase> &getHandle(){
-		return Singletons::get<Log<MODULE>,INT_MAX-1>()->m_handle;
+		return Singletons::get<Log<MODULE>,INT_MAX-1>().m_handle;
 	}
 	Log():m_handle(new DefaultMsgPrint(warning)){}
 public:
