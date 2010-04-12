@@ -84,7 +84,7 @@ int main(
 	}
 
 	//typedef section
-	typedef unsigned char PixelType;
+	typedef unsigned short PixelType;
 	const unsigned int Dimension = 2;
 	const unsigned int fmriDimension = 3;
 
@@ -211,7 +211,7 @@ int main(
 			ti = transformList->begin();
 			//setting up the resample object
 			if(use_inverse) {
-			    transform->SetParameters(static_cast<TransformPointer>((*ti).GetPointer())->GetInverseTransform()->GetParameters());
+// 			    transform->SetParameters(static_cast<TransformPointer>((*ti).GetPointer())->GetInverseTransform()->GetParameters());
 			    resampler->SetTransform(transform);
 	
 			}
@@ -311,7 +311,7 @@ int main(
 			warper->AddObserver(itk::ProgressEvent(), progressObserver);
 			warper->SetOutputDirection(outputDirection);
 			warper->SetOutputOrigin(outputOrigin);
-			//warper->SetOutputSize(outputSize);
+			warper->SetOutputSize(outputSize);
 			warper->SetOutputSpacing(outputSpacing);
 			warper->SetInput(reader->GetOutput());
 			if(trans_filename.number == 0) {
@@ -361,7 +361,7 @@ int main(
 		if(vtrans_filename) {
 			warper->SetOutputDirection(fmriOutputDirection);
 			warper->SetOutputOrigin(fmriOutputOrigin);
-			//warper->SetOutputSize(fmriOutputSize);
+			warper->SetOutputSize(fmriOutputSize);
 			warper->SetOutputSpacing(fmriOutputSpacing);
 			warper->SetInput(reader->GetOutput());
 			if(trans_filename.number == 0) {

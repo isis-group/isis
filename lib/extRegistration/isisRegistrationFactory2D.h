@@ -21,6 +21,7 @@
 //affine:
 #include "itkAffineTransform.h"
 #include "itkCenteredAffineTransform.h"
+#include "itkSimilarity2DTransform.h"
 
 //non-linear
 #include "itkBSplineDeformableTransform.h"
@@ -134,6 +135,7 @@ public:
 	typedef itk::TransformBase* TransformBasePointer; //not allowed to be a itk::SmartPointer because of static_cast usage
 	typedef const itk::TransformBase* ConstTransformBasePointer;
 	typedef itk::Transform<double, FixedImageDimension, FixedImageDimension> TransformType;
+	typedef itk::Similarity2DTransform<double> Similarity2DTransformType;
 
 	typedef itk::TranslationTransform<double, FixedImageDimension> TranslationTransformType;
 	typedef itk::Rigid2DTransform<double> Rigid2DTransformType;
@@ -191,6 +193,7 @@ public:
 		    AffineTransform,
 		    CenteredAffineTransform,
 		    BSplineDeformableTransform,
+		    ScaleTransform
 
 	};
 
@@ -301,6 +304,7 @@ private:
 		bool AFFINE;
 		bool CENTEREDAFFINE;
 		bool BSPLINEDEFORMABLETRANSFORM;
+		bool SCALE;
 	} transform;
 
 	struct Optimizer
@@ -382,7 +386,8 @@ private:
 
 	typename AffineTransformType::Pointer m_AffineTransform;
 	typename CenteredAffineTransformType::Pointer m_CenteredAffineTransform;
-
+	typename Similarity2DTransformType::Pointer m_SimilarityTransform;
+	
 	typename BSplineTransformType::Pointer m_BSplineTransform;
 
 	typename BulkTransformType::Pointer m_BulkTransform;

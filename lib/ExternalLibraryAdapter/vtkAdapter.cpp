@@ -27,38 +27,38 @@ vtkImageData* vtkAdapter::makeVtkImageObject(const boost::shared_ptr<data::Image
 	switch(myAdapter->m_ImageISIS->chunksBegin()->typeID()){
 		case util::TypePtr<int8_t>::staticID: 
 			importer->SetDataScalarTypeToUnsignedChar();
-			importer->SetImportVoidPointer(&myAdapter->m_ImageISIS->voxel<signed char>(0,0,0,dim4));
-			vtkImage->SetScalarTypeToSignedChar(); 
+			importer->SetImportVoidPointer(&myAdapter->m_ImageISIS->voxel<int8_t>(0,0,0,dim4));
+			vtkImage->SetScalarTypeToChar(); 
 			break;
 		
 		case util::TypePtr<u_int8_t>::staticID: 
 			importer->SetDataScalarTypeToUnsignedChar();
 			vtkImage->SetScalarTypeToUnsignedChar();
-			importer->SetImportVoidPointer(&myAdapter->m_ImageISIS->voxel<unsigned char>(0,0,0,dim4));
+			importer->SetImportVoidPointer(&myAdapter->m_ImageISIS->voxel<u_int8_t>(0,0,0,dim4));
 			break;
 		
 		case util::TypePtr<int16_t>::staticID: 
 			importer->SetDataScalarTypeToShort();
 			vtkImage->SetScalarTypeToShort();
-			importer->SetImportVoidPointer(&myAdapter->m_ImageISIS->voxel<signed short>(0,0,0,dim4));
+			importer->SetImportVoidPointer(&myAdapter->m_ImageISIS->voxel<int16_t>(0,0,0,dim4));
 			break;
 			
 		case util::TypePtr<u_int16_t>::staticID: 
 			importer->SetDataScalarTypeToUnsignedShort();
 			vtkImage->SetScalarTypeToUnsignedShort();
-			importer->SetImportVoidPointer(&myAdapter->m_ImageISIS->voxel<unsigned short>(0,0,0,dim4));
+			importer->SetImportVoidPointer(&myAdapter->m_ImageISIS->voxel<u_int16_t>(0,0,0,dim4));
 			break;
 		
 		case util::TypePtr<int32_t>::staticID: 
 			importer->SetDataScalarTypeToInt();
 			vtkImage->SetScalarTypeToInt();
-			importer->SetImportVoidPointer(&myAdapter->m_ImageISIS->voxel<signed int>(0,0,0,dim4));
+			importer->SetImportVoidPointer(&myAdapter->m_ImageISIS->voxel<int32_t>(0,0,0,dim4));
 			break;
 			
 		case util::TypePtr<u_int32_t>::staticID: 
 			importer->SetDataScalarTypeToInt();
 			vtkImage->SetScalarTypeToUnsignedInt();
-			importer->SetImportVoidPointer(&myAdapter->m_ImageISIS->voxel<unsigned int>(0,0,0,dim4));
+			importer->SetImportVoidPointer(&myAdapter->m_ImageISIS->voxel<u_int32_t>(0,0,0,dim4));
 			break;
 			
 		case util::TypePtr<float>::staticID: 

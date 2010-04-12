@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 2.6)
 
 
-IF(HAVE_ITK)
+IF(ITK_FOUND)
 	add_library(itkAdapter SHARED itkAdapter.cpp)
 	target_link_libraries(itkAdapter utils data )
-ENDIF(HAVE_ITK)
+ENDIF(ITK_FOUND)
 
-IF(HAVE_VTK)
+IF(VTK_FOUND)
 	add_library(vtkAdapter SHARED vtkAdapter.cpp)
 	target_link_libraries(vtkAdapter utils data )
-ENDIF(HAVE_VTK)
+ENDIF(VTK_FOUND)

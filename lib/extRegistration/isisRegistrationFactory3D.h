@@ -23,7 +23,8 @@
 //affine:
 #include "itkAffineTransform.h"
 #include "itkCenteredAffineTransform.h"
-#include "itkScaleTransform.h"
+#include "itkScaleSkewVersor3DTransform.h"
+
 
 //non-linear
 #include "itkBSplineDeformableTransform.h"
@@ -147,7 +148,7 @@ public:
 	typedef itk::AffineTransform<double, FixedImageDimension> AffineTransformType;
 
 	typedef itk::CenteredAffineTransform<double, FixedImageDimension> CenteredAffineTransformType;
-	typedef itk::ScaleTransform<double, FixedImageDimension> ScaleTransformType;
+	typedef itk::ScaleSkewVersor3DTransform<double> ScaleSkewVersor3DTransformType;
 	
 	typedef itk::Transform<double, 3, 3> BulkTransformType;
 
@@ -393,7 +394,7 @@ private:
 	CenteredEuler3DTransformType::Pointer m_CenteredEuler3DTransform;
 
 	typename AffineTransformType::Pointer m_AffineTransform;
-	typename ScaleTransformType::Pointer m_ScaleTransform;
+	typename ScaleSkewVersor3DTransformType::Pointer m_ScaleSkewTransform;
 	typename CenteredAffineTransformType::Pointer m_CenteredAffineTransform;
 
 	typename BSplineTransformType::Pointer m_BSplineTransform;

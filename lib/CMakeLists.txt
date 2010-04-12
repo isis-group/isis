@@ -23,8 +23,8 @@ IF(BUILD_DATA_IO)
 	add_subdirectory(ImageIO)
 ENDIF(BUILD_DATA_IO)
 
-IF(HAVE_ITK)
+IF(ITK_FOUND)
 	 add_subdirectory(extITK)
-ENDIF(HAVE_ITK)
+ENDIF(ITK_FOUND)
 
 add_subdirectory(ExternalLibraryAdapter)

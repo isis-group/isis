@@ -12,7 +12,7 @@
 
 namespace isis{namespace test{
   
-	BOOST_AUTO_TEST_CASE (VTKAdapterTest3D)
+	BOOST_AUTO_TEST_CASE (ITKAdapterTest)
 	{
 
 		ENABLE_LOG(CoreLog,util::DefaultMsgPrint,warning);
@@ -25,13 +25,18 @@ namespace isis{namespace test{
 		//ENABLE_LOG(isis::ImageIoLog,isis::util::DefaultMsgPrint,isis::info);
 		// just to make sure the wanted file exists
 		FILE* f = fopen("test.null", "w");
-		fclose(f);		
+		fclose(f);
+		typedef itk::Image<int, 3> MyImageType;
+		itk::ImageFileWriter<MyImageType>::Pointer writer = itk::ImageFileWriter<MyImageType>::New();
 		//load an image and store it into the vtkAdapter
-		data::ImageList imgList = isis::data::IOFactory::load("test.null", "");
+// 		data::ImageList imgList = isis::data::IOFactory::load("test.null", "");
+		data::ImageList imgList = isis::data::IOFactory::load("/home/raid/tuerke/workspace/data.nii", "");
 		BOOST_CHECK(not imgList.empty());
-		itk::Image<unsigned short, 3>::Pointer itkImage = itk::Image<unsigned short, 3>::New();
-		itkImage = adapter::itkAdapter::makeItkImageObject<unsigned short, 3>(imgList.front());
-				
+		MyImageType::Pointer itkImage = MyImageType::New();
+		itkImage = adapter::itkAdapter::makeItkImageObject<MyImageType>(imgList.front());
+		writer->SetInput(itkImage);
+		writer->SetFileName("itkAdapterTest_output.nii");
+		writer->Update();				
 	}
 	
 	

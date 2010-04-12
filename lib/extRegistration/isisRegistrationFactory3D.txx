@@ -182,8 +182,8 @@ namespace isis {
 				
 				case ScaleTransform:
 				transform.SCALE = true;
-				m_ScaleTransform = ScaleTransformType::New();
-				m_RegistrationObject->SetTransform(m_ScaleTransform);
+				m_ScaleSkewTransform = ScaleSkewVersor3DTransformType::New();
+				m_RegistrationObject->SetTransform(m_ScaleSkewTransform);
 				break;
 			}
 		}
@@ -260,6 +260,30 @@ namespace isis {
 					{
 						optimizerScaleRegularStepGradient.Fill(1.0);
 					}
+					if(transform.SCALE)
+					{
+						//rotation
+						optimizerScaleRegularStepGradient[0] = 0.0;
+						optimizerScaleRegularStepGradient[1] = 0.0;
+						optimizerScaleRegularStepGradient[2] = 0.0;
+						//translation
+						optimizerScaleRegularStepGradient[3] = 0.0;
+						optimizerScaleRegularStepGradient[4] = 0.0;
+						optimizerScaleRegularStepGradient[5] = 0.0;
+						//scaling
+						optimizerScaleRegularStepGradient[6] = 1.0;
+						optimizerScaleRegularStepGradient[7] = 1.0;
+						optimizerScaleRegularStepGradient[8] = 1.0;
+						//skew
+						optimizerScaleRegularStepGradient[9] = 0.0;
+						optimizerScaleRegularStepGradient[10] = 0.0;
+						optimizerScaleRegularStepGradient[11] = 0.0;
+						optimizerScaleRegularStepGradient[12] = 0.0;
+						optimizerScaleRegularStepGradient[13] = 0.0;
+						optimizerScaleRegularStepGradient[14] = 0.0;
+						
+						
+					}
 					m_RegularStepGradientDescentOptimizer->SetMaximumStepLength(0.1 * UserOptions.CoarseFactor);
 					m_RegularStepGradientDescentOptimizer->SetMinimumStepLength(0.00001 * UserOptions.CoarseFactor);
 					m_RegularStepGradientDescentOptimizer->SetScales(optimizerScaleRegularStepGradient);
@@ -290,13 +314,34 @@ namespace isis {
 					for (unsigned int i = 3; i < m_NumberOfParameters; i++) {
 						optimizerScaleVersorRigid3D[i] = 1.0 / 1000.0;
 					}
-					m_VersorRigid3DTransformOptimizer->SetMaximumStepLength(0.1 * UserOptions.CoarseFactor);
-					m_VersorRigid3DTransformOptimizer->SetMinimumStepLength(0.0001 *  UserOptions.CoarseFactor);
-					m_VersorRigid3DTransformOptimizer->SetScales(optimizerScaleVersorRigid3D);
-					m_VersorRigid3DTransformOptimizer->SetNumberOfIterations(UserOptions.NumberOfIterations);
-					m_VersorRigid3DTransformOptimizer->SetRelaxationFactor(0.9);
-
 				}
+				if(transform.SCALE) {
+					//rotation
+					optimizerScaleVersorRigid3D[0] = 0.0;
+					optimizerScaleVersorRigid3D[1] = 0.0;
+					optimizerScaleVersorRigid3D[2] = 0.0;
+					//translation
+					optimizerScaleVersorRigid3D[3] = 0.0;
+					optimizerScaleVersorRigid3D[4] = 0.0;
+					optimizerScaleVersorRigid3D[5] = 0.0;
+					//scaling
+					optimizerScaleVersorRigid3D[6] = 1.0;
+					optimizerScaleVersorRigid3D[7] = 1.0;
+					optimizerScaleVersorRigid3D[8] = 1.0;
+					//skew
+					optimizerScaleVersorRigid3D[9] = 0.0;
+					optimizerScaleVersorRigid3D[10] = 0.0;
+					optimizerScaleVersorRigid3D[11] = 0.0;
+					optimizerScaleVersorRigid3D[12] = 0.0;
+					optimizerScaleVersorRigid3D[13] = 0.0;
+					optimizerScaleVersorRigid3D[14] = 0.0;
+					
+				}
+				m_VersorRigid3DTransformOptimizer->SetMaximumStepLength(0.1 * UserOptions.CoarseFactor);
+				m_VersorRigid3DTransformOptimizer->SetMinimumStepLength(0.0001 *  UserOptions.CoarseFactor);
+				m_VersorRigid3DTransformOptimizer->SetScales(optimizerScaleVersorRigid3D);
+				m_VersorRigid3DTransformOptimizer->SetNumberOfIterations(UserOptions.NumberOfIterations);
+				m_VersorRigid3DTransformOptimizer->SetRelaxationFactor(0.9);
 			
 				if (metric.MEANSQUARE or metric.MATTESMUTUALINFORMATION or metric.VIOLAWELLSMUTUALINFORMATION or metric.MUTUALINFORMATIONHISTOGRAM) {
 					m_VersorRigid3DTransformOptimizer->MinimizeOn();
@@ -480,8 +525,8 @@ namespace isis {
 				m_RegistrationObject->SetInitialTransformParameters(m_TranslationTransform->GetParameters());
 			}
 			if (transform.SCALE) {
-				m_NumberOfParameters = m_ScaleTransform->GetNumberOfParameters();
-				m_RegistrationObject->SetInitialTransformParameters(m_ScaleTransform->GetParameters());
+				m_NumberOfParameters = m_ScaleSkewTransform->GetNumberOfParameters();
+				m_RegistrationObject->SetInitialTransformParameters(m_ScaleSkewTransform->GetParameters());
 			}
 			    
 		}
@@ -683,6 +728,12 @@ namespace isis {
 				m_VersorRigid3DTransform->SetMatrix((static_cast<VersorRigid3DTransformType*> (initialTransform)->GetMatrix()));
 				m_RegistrationObject->SetInitialTransformParameters(m_VersorRigid3DTransform->GetParameters());
 
+			}
+			if (!strcmp(initialTransformName, "VersorRigid3DTransform") and transform.SCALE) {
+				m_ScaleSkewTransform->SetTranslation(
+						(static_cast<VersorRigid3DTransformType*> (initialTransform)->GetTranslation()));
+// 				m_ScaleSkewTransform->SetMatrix((static_cast<VersorRigid3DTransformType*> (initialTransform)->GetMatrix()));
+				m_RegistrationObject->SetInitialTransformParameters(m_VersorRigid3DTransform->GetParameters());
 			}
 			
 		}

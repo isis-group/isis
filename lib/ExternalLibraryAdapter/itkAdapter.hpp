@@ -37,7 +37,10 @@
 //itk includes
 #include <itkSmartPointer.h>
 #include <itkImage.h>
-#include <itkImportImageContainer.h>
+#include <itkImportImageFilter.h>
+#include <itkIntensityWindowingImageFilter.h>
+#include <itkRescaleIntensityImageFilter.h>
+#include <itkNumericTraits.h>
 
 namespace isis{ namespace adapter {
 
@@ -47,35 +50,107 @@ namespace isis{ namespace adapter {
 
 class itkAdapter {
 public:
-	template<typename T,unsigned short dim> static itk::SmartPointer<itk::Image<T,dim> >
+	template<typename TImage> static itk::SmartPointer<TImage>
 		makeItkImageObject(const boost::shared_ptr<data::Image> src) {
-		
-		typedef itk::Image<T, dim> MyImageType;    
+		typedef TImage OutputImageType;
 		itkAdapter* myAdapter = new itkAdapter(src);
-		typename MyImageType::Pointer itkImage = MyImageType::New();
-		typename MyImageType::SpacingType itkSpacing;
-		typename itk::ImportImageContainer<unsigned long, T>::Pointer importer = itk::ImportImageContainer<unsigned long, T>::New();
-		const util::fvector4 dimensions(myAdapter->m_ImageISIS->sizeToVector());
-		const util::fvector4 indexOrigin(myAdapter->m_ImageISIS->getProperty<util::fvector4>("indexOrigin"));
-		const util::fvector4 spacing(myAdapter->m_ImageISIS->getProperty<util::fvector4>("voxelSize"));
-		itkSpacing = (spacing[0], spacing[1], spacing[2]);
-		importer->Initialize();
-		importer->Reserve(dimensions[0]*dimensions[1]*dimensions[2]*dimensions[3]);
-						
-		itkImage->SetSpacing(itkSpacing);
-		itkImage->SetPixelContainer(importer);
-		return itkImage;
-	};
-	
+		switch(myAdapter->m_ImageISIS->chunksBegin()->typeID()){
+		    case util::TypePtr<int8_t>::staticID:
+			    return myAdapter->internCreate<int8_t,OutputImageType>();
+			    break;
+			    
+		    case util::TypePtr<u_int8_t>::staticID: 
+			    return myAdapter->internCreate<u_int8_t,OutputImageType>();
+			    break;
+		    
+		    case util::TypePtr<int16_t>::staticID: 
+			    return myAdapter->internCreate<int16_t,OutputImageType>();
+			    break;
+			    
+		    case util::TypePtr<u_int16_t>::staticID: 
+			    return myAdapter->internCreate<u_int16_t,OutputImageType>();
+			    break;
+		    
+		    case util::TypePtr<int32_t>::staticID: 
+			    return myAdapter->internCreate<int32_t,OutputImageType>();
+			    break;
+			    
+		    case util::TypePtr<u_int32_t>::staticID: 
+			    return myAdapter->internCreate<u_int32_t,OutputImageType>();
+			    break;
+			    
+		    case util::TypePtr<float>::staticID: 
+			    return myAdapter->internCreate<float,OutputImageType>();
+			    break;
+		    
+		    case util::TypePtr<double>::staticID: 
+			    return myAdapter->internCreate<double,OutputImageType>();
+			    break;
+		}
+	}
 protected:
 	//should not be loaded directly
 	itkAdapter(const boost::shared_ptr<data::Image>);
 	itkAdapter(const itkAdapter&){};  
 private:
-	boost::shared_ptr<data::Image> m_ImageISIS;
 		
+	boost::shared_ptr<data::Image> m_ImageISIS;
+	
+	template<typename TInput, typename TOutput> typename TOutput::Pointer internCreate(){
+		typedef itk::Image<TInput, TOutput::ImageDimension> InputImageType;
+		typedef TOutput OutputImageType;
+		typedef itk::ImportImageFilter<typename InputImageType::PixelType, OutputImageType::ImageDimension> MyImporterType;
+// 		typedef itk::IntensityWindowingImageFilter<InputImageType, OutputImageType> MyRescaleType;
+		typedef itk::RescaleIntensityImageFilter<InputImageType, OutputImageType> MyRescaleType;
+		typename MyImporterType::Pointer importer = MyImporterType::New();
+		typename MyRescaleType::Pointer rescaler = MyRescaleType::New();
+		typename OutputImageType::Pointer outputImage = OutputImageType::New();
+		typename InputImageType::Pointer inputImage = InputImageType::New();
+		typename OutputImageType::SpacingType itkSpacing;
+		typename OutputImageType::PointType itkOrigin;
+		typename OutputImageType::DirectionType itkDirection;
+		typename OutputImageType::SizeType itkSize;
+		typename OutputImageType::RegionType itkRegion;
+		const util::fvector4 dimensions(this->m_ImageISIS->sizeToVector());
+		const util::fvector4 indexOrigin(this->m_ImageISIS->getProperty<util::fvector4>("indexOrigin"));
+		const util::fvector4 spacing(this->m_ImageISIS->getProperty<util::fvector4>("voxelSize"));
+		const util::fvector4 readVec = this->m_ImageISIS->getProperty<util::fvector4>("readVec");
+		const util::fvector4 phaseVec = this->m_ImageISIS->getProperty<util::fvector4>("phaseVec");
+		const util::fvector4 sliceVec = this->m_ImageISIS->getProperty<util::fvector4>("sliceVec");
+		for (unsigned short i = 0; i<3; i++) {
+		    itkSize[i] = dimensions[i];
+		    itkSpacing[i] = spacing[i];
+		    itkOrigin[i] = indexOrigin[i];
+		    itkDirection[i][0] = readVec[i];
+		    itkDirection[i][1] = phaseVec[i];
+		    itkDirection[i][2] = sliceVec[i];
+		}
+		itkRegion.SetSize(itkSize);
+		importer->SetRegion(itkRegion);
+		importer->SetSpacing(itkSpacing);
+		importer->SetOrigin(itkOrigin);
+		importer->SetDirection(itkDirection);
+		importer->SetImportPointer(&this->m_ImageISIS->voxel<typename InputImageType::PixelType>(0,0,0,0), itkSize[0], false);
+		rescaler->SetInput(importer->GetOutput());
+		typename InputImageType::PixelType minIn, maxIn;
+		typename OutputImageType::PixelType minOut, maxOut;
+// 		maxIn=itk::NumericTraits<typename InputImageType::PixelType>::max();
+// 		minIn=itk::NumericTraits<typename InputImageType::PixelType>::min();
+		minOut=itk::NumericTraits<typename OutputImageType::PixelType>::min();
+		maxOut=itk::NumericTraits<typename OutputImageType::PixelType>::max();
+		this->m_ImageISIS->getMinMax<typename InputImageType::PixelType>(minIn, maxIn);
+		std::cout << "minIn: " << minIn << std::endl;
+		std::cout << "maxIn: " << maxIn << std::endl;
+		std::cout << "minOut: " << minOut << std::endl;
+		std::cout << "maxOut: " << maxOut << std::endl;
+		rescaler->SetOutputMinimum(minOut);
+		rescaler->SetOutputMaximum(maxOut);
+		rescaler->Update();
+		return rescaler->GetOutput();
+	}	
 };
 
 }}// end namespace
+
 
 #endif

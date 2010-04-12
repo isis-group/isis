@@ -34,6 +34,7 @@ namespace isis {
 			transform.AFFINE = false;
 			transform.CENTEREDAFFINE = false;
 			transform.BSPLINEDEFORMABLETRANSFORM = false;
+			transform.SCALE = false;
 
 			metric.MATTESMUTUALINFORMATION = false;
 			metric.NORMALIZEDCORRELATION = false;
@@ -177,6 +178,12 @@ namespace isis {
 				m_RegistrationObject->SetTransform(m_BSplineTransform);
 				break;
 
+				case ScaleTransform:
+				transform.SCALE = true;
+				m_SimilarityTransform = Similarity2DTransformType::New();
+				m_RegistrationObject->SetTransform(m_SimilarityTransform);
+				break;
+				
 			}
 		}
 
@@ -231,7 +238,7 @@ namespace isis {
 				//setting up the regular step gradient descent optimizer...
 				RegularStepGradientDescentOptimizerType::ScalesType optimizerScaleRegularStepGradient(m_NumberOfParameters);
 
-				if (transform.RIGID or transform.CENTEREDAFFINE or transform.AFFINE or transform.BSPLINEDEFORMABLETRANSFORM) {
+				if (transform.RIGID or transform.CENTEREDAFFINE or transform.AFFINE or transform.BSPLINEDEFORMABLETRANSFORM or transform.SCALE) {
 					//...for the rigid transform
 					//number of parameters are dependent on the dimension of the images (2D: 4 parameter, 3D: 6 parameters)
 					if(transform.RIGID)
@@ -241,6 +248,16 @@ namespace isis {
 						for (unsigned int i = 2; i < m_NumberOfParameters; i++) {
 							optimizerScaleRegularStepGradient[i] = 1.0 / 1000.0;
 						}
+					}
+					if(transform.SCALE)
+					{
+						//scale
+						optimizerScaleRegularStepGradient[0] = 1.0;
+						//rotation
+						optimizerScaleRegularStepGradient[1] = 0.00001;
+						//translation
+						optimizerScaleRegularStepGradient[2] = 0.00001;
+						optimizerScaleRegularStepGradient[3] = 0.00001;
 					}
 					if(transform.BSPLINEDEFORMABLETRANSFORM or transform.AFFINE or transform.CENTEREDAFFINE or transform.TRANSLATION)
 					{
@@ -443,6 +460,11 @@ namespace isis {
 				m_NumberOfParameters = m_TranslationTransform->GetNumberOfParameters();
 				m_RegistrationObject->SetInitialTransformParameters(m_TranslationTransform->GetParameters());
 			}
+			if (transform.SCALE) {
+				m_NumberOfParameters = m_SimilarityTransform->GetNumberOfParameters();
+				m_RegistrationObject->SetInitialTransformParameters(m_SimilarityTransform->GetParameters());
+			}
+			
 		}
 
 		template<class TFixedImageType, class TMovingImageType>
@@ -623,6 +645,10 @@ namespace isis {
 				
 
 			}
+			if (!strcmp(initialTransformName, "Similarity2DTransform") and transform.BSPLINEDEFORMABLETRANSFORM) {
+				m_BSplineTransform->SetBulkTransform(static_cast<Similarity2DTransformType*> (initialTransform));
+				
+			}
 			if (!strcmp(initialTransformName, "CenteredAffineTransform") and transform.BSPLINEDEFORMABLETRANSFORM) {
 				m_BSplineTransform->SetBulkTransform(static_cast<CenteredAffineTransformType*> (initialTransform));
 			}
@@ -648,6 +674,12 @@ namespace isis {
 				m_Rigid2DTransform->SetMatrix((static_cast<Rigid2DTransformType*> (initialTransform)->GetMatrix()));
 				m_RegistrationObject->SetInitialTransformParameters(m_Rigid2DTransform->GetParameters());
 
+			}
+			if (!strcmp(initialTransformName, "Rigid2DTransform") and transform.SCALE) {
+				m_SimilarityTransform->SetTranslation(
+						(static_cast<Rigid2DTransformType*> (initialTransform)->GetTranslation()));
+				m_SimilarityTransform->SetMatrix((static_cast<Rigid2DTransformType*> (initialTransform)->GetMatrix()));
+				m_RegistrationObject->SetInitialTransformParameters(m_SimilarityTransform->GetParameters());
 			}
 		}
 		/*

@@ -37,7 +37,7 @@
 VDictEntry TYPMetric[] = { {"MattesMutualInformation", 0}, {"MutualInformationHistogram", 1}, {"NormalizedCorrelation",
     2}, {"MeanSquare", 3}, {NULL}};
 
-VDictEntry TYPTransform[] = { {"Rigid", 0}, {"Affine", 1}, {"BSplineDeformable", 2}, {"Translation", 3}, {"CenteredAffine", 4}, {NULL}};
+VDictEntry TYPTransform[] = { {"Rigid", 0}, {"Affine", 1}, {"BSplineDeformable", 2}, {"Translation", 3}, {"Scale", 4}, {NULL}};
 
 VDictEntry TYPInterpolator[] = { {"Linear", 0}, {"BSpline", 1}, {"NearestNeighbor", 2}, {NULL}};
 
@@ -144,7 +144,7 @@ int main(
 	}
 
 	typedef unsigned char MaskPixelType;
-	typedef unsigned char InputPixelType;
+	typedef unsigned short InputPixelType;
 	const unsigned int Dimension = 2;
 
 	VShort transform;
@@ -322,6 +322,9 @@ int main(
 			case 3:
 			registrationFactory->SetTransform(RegistrationFactoryType::TranslationTransform);
 			break;
+			case 4:
+			registrationFactory->SetTransform(RegistrationFactoryType::ScaleTransform);
+			break;
 		}
 
 		//metric setup
@@ -446,7 +449,7 @@ int main(
 		std::cout << "starting the registration..." << std::endl;
 
 		registrationFactory->StartRegistration();
-		if(use_inverse) tmpTransform->SetParameters(registrationFactory->GetRegistrationObject()->GetTransform()->GetInverseTransform()->GetParameters());		
+// 		if(use_inverse) tmpTransform->SetParameters(registrationFactory->GetRegistrationObject()->GetTransform()->GetInverseTransform()->GetParameters());		
 		
 		if(!use_inverse) tmpConstTransformPointer = registrationFactory->GetTransform();
 		

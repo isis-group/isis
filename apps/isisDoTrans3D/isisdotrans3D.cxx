@@ -149,7 +149,7 @@ int main(
 	OutputImageType::SizeType outputSize;
 	OutputImageType::PointType outputOrigin;
 	OutputImageType::DirectionType outputDirection;
-
+	
 	OutputImageType::SizeType fmriOutputSize;
 	OutputImageType::SpacingType fmriOutputSpacing;
 	OutputImageType::DirectionType fmriOutputDirection;
