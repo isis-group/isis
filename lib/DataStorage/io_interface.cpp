@@ -37,4 +37,5 @@ bool FileFormat::hasOrTell(const std::string& name, const isis::util::PropMap& o
 	}
 }
 
+const float FileFormat::invalid_float=-std::numeric_limits<float>::infinity();
 }}

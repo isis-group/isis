@@ -44,6 +44,7 @@ protected:
 		return false;
 	}
 public:
+	static const float invalid_float;
 	virtual std::string name()=0;
 	virtual std::string suffixes()=0;
 	virtual std::string dialects(){return std::string();};

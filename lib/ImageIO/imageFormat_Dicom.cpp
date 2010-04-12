@@ -120,8 +120,6 @@ ptime ImageFormat_Dicom::genTimeStamp(const date& date, const ptime& time) {
 
 void ImageFormat_Dicom::sanitise(isis::util::PropMap& object, string dialect) {
 	const std::string prefix=std::string(ImageFormat_Dicom::dicomTagTreeName)+"/";
-	const float invalid_float=-std::numeric_limits<float>::infinity();
-	
 
 	/////////////////////////////////////////////////////////////////////////////////
 	// Transform known DICOM-Tags into default-isis-properties
@@ -162,6 +160,7 @@ void ImageFormat_Dicom::sanitise(isis::util::PropMap& object, string dialect) {
 		if(hasOrTell(prefix+"PixelSpacing",object,warning)){
 			voxelSize = object[prefix+"PixelSpacing"]->as<util::fvector4>();
 			object.remove(prefix+"PixelSpacing");
+			std::swap(voxelSize[0],voxelSize[1]); // the values are row-spacing (size in phase dir) /column spacing (size in read dir)
 		}
 		if(hasOrTell(prefix+"SliceThickness",object,warning)){
 			voxelSize[2]=object[prefix+"SliceThickness"]->as<float>();
@@ -230,7 +229,7 @@ void ImageFormat_Dicom::sanitise(isis::util::PropMap& object, string dialect) {
 			<< prefix+"Unknown Tag(0019,1015):" << comp << " differs from indexOrigin:"
 			<< org << ", won't remove it";
 	}
-	if(object.hasProperty(prefix+"Unknown Tag(0051,100c)")){
+	if(object.hasProperty(prefix+"Unknown Tag(0051,100c)")){ //@todo siemens only
 		std::string fov= object.getProperty<std::string>(prefix+"Unknown Tag(0051,100c)");
 		float read,phase;
 		if(std::sscanf(fov.c_str(),"FoV %f*%f",&read,&phase)==2){
@@ -300,7 +299,7 @@ void ImageFormat_Dicom::readMosaic(const data::Chunk& source, data::ChunkList& d
 		util::fvector4 &ref=newChunk->getPropertyValue("fov")->cast_to_Type<util::fvector4>();
 		ref[0]/=matrixSize;
 		ref[1]/=matrixSize;
-		LOG_IF(ref[2]!=0,Runtime,warning) << "Overriding nonzero slice FoV in mosaic image";
+		LOG_IF(ref[2]!=invalid_float,Runtime,warning) << "Overriding defined slice FoV in mosaic image";
 		ref[2]=newChunk->getFoV(voxelSize,voxelGap)[2];
 		LOG(Debug,info) << "New fov: " << newChunk->getPropertyValue("fov");
 	}

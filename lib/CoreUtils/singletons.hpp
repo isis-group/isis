@@ -31,6 +31,7 @@ class Singletons{
 	}
 	template<typename T> static Singleton<T>& request(int priority){
 		static Singleton<T> *s=getMaster().create<T>(priority);
+		//ok this might become a dead ref as well. But its no complex object, and therefore won't be "destructed".
 		return *s;
 	}
 	static Singletons& getMaster();
@@ -44,17 +45,10 @@ public:
 	 * - singletons are not deleted before any singleton of a lower priority
 	 * - singletons of the same priority are deleted in the opposite order they where created. (LIFO)
 	 *
-	 * \return allways a shared pointer to the same object of type T.
+	 * \return allways a reference to the same object of type T.
 	 */
 	template<typename T,int PRIO> static Singleton<T> &get(){
 		return request<T>(PRIO);
-	}
-	/**
-	 * \copydoc get()
-	 * \param initValue value to be forwarded to the constructor of T if its called.
-	 */
-	template<typename T,int PRIO,typename T2> static T& get(const T2 &initValue){
-		return *static_cast<T*>(request<T>(PRIO,initValue));
 	}
 };
 }}
