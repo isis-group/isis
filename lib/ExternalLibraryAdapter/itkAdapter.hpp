@@ -125,6 +125,12 @@ private:
 		    itkDirection[i][1] = phaseVec[i];
 		    itkDirection[i][2] = sliceVec[i];
 		}
+		if (OutputImageType::ImageDimension==4)
+		{
+		    itkSpacing[3] = spacing[3];
+		    itkSize[3] = dimensions[3];
+		    itkDirection[3][3] = 1; //ensures determinant is not 0
+		}
 		itkRegion.SetSize(itkSize);
 		importer->SetRegion(itkRegion);
 		importer->SetSpacing(itkSpacing);
@@ -134,6 +140,7 @@ private:
 		rescaler->SetInput(importer->GetOutput());
 		typename InputImageType::PixelType minIn, maxIn;
 		typename OutputImageType::PixelType minOut, maxOut;
+		//TODO usefull rescaling
 // 		maxIn=itk::NumericTraits<typename InputImageType::PixelType>::max();
 // 		minIn=itk::NumericTraits<typename InputImageType::PixelType>::min();
 		minOut=itk::NumericTraits<typename OutputImageType::PixelType>::min();

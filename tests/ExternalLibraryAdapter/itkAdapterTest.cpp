@@ -26,11 +26,11 @@ namespace isis{namespace test{
 		// just to make sure the wanted file exists
 		FILE* f = fopen("test.null", "w");
 		fclose(f);
-		typedef itk::Image<int, 3> MyImageType;
+		typedef itk::Image<int, 4> MyImageType;
 		itk::ImageFileWriter<MyImageType>::Pointer writer = itk::ImageFileWriter<MyImageType>::New();
 		//load an image and store it into the vtkAdapter
 // 		data::ImageList imgList = isis::data::IOFactory::load("test.null", "");
-		data::ImageList imgList = isis::data::IOFactory::load("/home/raid/tuerke/workspace/data.nii", "");
+		data::ImageList imgList = isis::data::IOFactory::load("/home/raid/tuerke/workspace/data_fmrt.nii", "");
 		BOOST_CHECK(not imgList.empty());
 		MyImageType::Pointer itkImage = MyImageType::New();
 		itkImage = adapter::itkAdapter::makeItkImageObject<MyImageType>(imgList.front());

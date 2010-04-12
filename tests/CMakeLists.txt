@@ -4,7 +4,7 @@ include_directories(${Boost_INCLUDE_DIR}  lib)
 include_directories(${ITK_INCLUDE_DIRS})
 
 IF(BUILD_COREUTILS)
-	add_subdirectory(CoreUtils)
+# 	add_subdirectory(CoreUtils)
 ENDIF(BUILD_COREUTILS)
 
 IF(BUILD_DATA_IO)
