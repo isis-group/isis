@@ -34,7 +34,7 @@ namespace isis{namespace test{
 		
 		//load an image and store it into the vtkAdapter
 // 		data::ImageList imgList = isis::data::IOFactory::load("test.null", "");
-		data::ImageList imgList = isis::data::IOFactory::load("/home/raid/tuerke/workspace/data.nii", "");
+		data::ImageList imgList = isis::data::IOFactory::load("/scr/kastanie1/DATA/isis/data.nii", "");
 		BOOST_CHECK(not imgList.empty());
 		vtkImageData* vtkImage = adapter::vtkAdapter::makeVtkImageObject(imgList.front());
 		BOOST_CHECK(not vtkImage);

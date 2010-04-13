@@ -32,7 +32,7 @@ namespace isis{namespace test{
 		itk::ImageFileReader<MyImageType>::Pointer reader = itk::ImageFileReader<MyImageType>::New();
 		//load an image and store it into the vtkAdapter
 // 		data::ImageList imgList = isis::data::IOFactory::load("test.null", "");
-		data::ImageList imgList = isis::data::IOFactory::load("/home/raid/tuerke/workspace/data.nii", "");		
+		data::ImageList imgList = isis::data::IOFactory::load("/scr/kastanie1/DATA/isis/data.nii", "");	
 		BOOST_CHECK(not imgList.empty());
 		MyImageType::Pointer itkImage = MyImageType::New();
 		MyImageType::IndexType index;
