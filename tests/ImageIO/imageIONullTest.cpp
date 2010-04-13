@@ -15,31 +15,22 @@ using namespace isis;
 #include <boost/test/included/unit_test.hpp>
 #include <boost/filesystem.hpp>
 #include <iostream>
-
-// // Fixture
-// struct Fixture{
-// 	Fixture() {BOOST_TEST_MESSAGE("Setup Fixture");}
-// 	~Fixture() {BOOST_TEST_MESSAGE("Teardown Fixture");}
-// 
-// 	// data object shared between the test cases
-// 	data::ImageList images;
-// };
+#include <string>
 
 BOOST_AUTO_TEST_SUITE (imageIONull_BaseTests)
 
-BOOST_AUTO_TEST_CASE (loadImages)
+BOOST_AUTO_TEST_CASE (loadsaveImages)
 {
 	data::ImageList images;
-	std::ofstream file("test.null");
-
 	data::enable_log<util::DefaultMsgPrint>(error);
 	
-// The factory assumes that there is valid file before calling the appropriate plugin
-	
-	FILE* f = std::fopen("test.null","w");
-	std::fclose(f);
+// The factory assumes that there is a valid file before
+// calling the appropriate plugin
+	std::string tmpfile = ((std::string)tmpnam(NULL)) + ".null";
+	std::ofstream file(tmpfile.c_str());
+
 // 	load images from file
-	images = data::IOFactory::load("test.null", "");
+	images = data::IOFactory::load(tmpfile, "");
 
 	// the null-loader shall generate 5 50x50x50x10 images
 	BOOST_CHECK(images.size() == 5);
@@ -56,16 +47,11 @@ BOOST_AUTO_TEST_CASE (loadImages)
 		cnt++;
 	}
 
-	boost::filesystem::path p("./test.null");
+// remove temporary file
+	boost::filesystem::path p(tmpfile);
 	boost::filesystem::remove(p);
 
 }
-
-// BOOST_AUTO_TEST_CASE (saveImages)
-// {
-// // 	Try to write image to disk. This shouldn't work since it's the Null plugin.
-// 	BOOST_CHECK(data::IOFactory::write(images,"test.null",""));
-// }
 
 BOOST_AUTO_TEST_SUITE_END ()
 
