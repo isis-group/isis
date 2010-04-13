@@ -100,7 +100,6 @@ private:
 		typedef itk::Image<TInput, TOutput::ImageDimension> InputImageType;
 		typedef TOutput OutputImageType;
 		typedef itk::ImportImageFilter<typename InputImageType::PixelType, OutputImageType::ImageDimension> MyImporterType;
-// 		typedef itk::IntensityWindowingImageFilter<InputImageType, OutputImageType> MyRescaleType;
 		typedef itk::RescaleIntensityImageFilter<InputImageType, OutputImageType> MyRescaleType;
 		typename MyImporterType::Pointer importer = MyImporterType::New();
 		typename MyRescaleType::Pointer rescaler = MyRescaleType::New();
@@ -120,11 +119,21 @@ private:
 		for (unsigned short i = 0; i<3; i++) {
 		    itkSize[i] = dimensions[i];
 		    itkSpacing[i] = spacing[i];
-		    itkOrigin[i] = indexOrigin[i];
-		    itkDirection[i][0] = readVec[i];
+		    itkDirection[i][0] = readVec[i]; 
 		    itkDirection[i][1] = phaseVec[i];
 		    itkDirection[i][2] = sliceVec[i];
 		}
+		//TODO why the hell negates the itkNiftio some seemingly arbitrary elements of the orientation?????
+		itkOrigin[0] = -indexOrigin[0];
+		itkOrigin[1] = -indexOrigin[1];
+		itkOrigin[2] = indexOrigin[2];
+		itkDirection[0][0] = -readVec[0];
+		itkDirection[0][1] = -phaseVec[0];
+		itkDirection[0][2] = -sliceVec[0];
+		itkDirection[1][0] = -readVec[1];
+		itkDirection[1][1] = -phaseVec[1];
+		itkDirection[1][2] = -sliceVec[1];
+				
 		if (OutputImageType::ImageDimension==4)
 		{
 		    itkSpacing[3] = spacing[3];
@@ -136,22 +145,13 @@ private:
 		importer->SetSpacing(itkSpacing);
 		importer->SetOrigin(itkOrigin);
 		importer->SetDirection(itkDirection);
-		importer->SetImportPointer(&this->m_ImageISIS->voxel<typename InputImageType::PixelType>(0,0,0,0), itkSize[0], false);
+		importer->SetImportPointer(&this->m_ImageISIS->voxel<typename InputImageType::PixelType>(0,0,0,0), itkSize[0], false);		
 		rescaler->SetInput(importer->GetOutput());
 		typename InputImageType::PixelType minIn, maxIn;
 		typename OutputImageType::PixelType minOut, maxOut;
-		//TODO usefull rescaling
-// 		maxIn=itk::NumericTraits<typename InputImageType::PixelType>::max();
-// 		minIn=itk::NumericTraits<typename InputImageType::PixelType>::min();
-		minOut=itk::NumericTraits<typename OutputImageType::PixelType>::min();
-		maxOut=itk::NumericTraits<typename OutputImageType::PixelType>::max();
 		this->m_ImageISIS->getMinMax<typename InputImageType::PixelType>(minIn, maxIn);
-		std::cout << "minIn: " << minIn << std::endl;
-		std::cout << "maxIn: " << maxIn << std::endl;
-		std::cout << "minOut: " << minOut << std::endl;
-		std::cout << "maxOut: " << maxOut << std::endl;
-		rescaler->SetOutputMinimum(minOut);
-		rescaler->SetOutputMaximum(maxOut);
+		rescaler->SetOutputMinimum(minIn);
+		rescaler->SetOutputMaximum(maxIn);
 		rescaler->Update();
 		return rescaler->GetOutput();
 	}	

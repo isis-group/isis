@@ -8,6 +8,7 @@
 
 #include <itkImage.h>
 #include <itkImageFileWriter.h>
+#include <itkImageFileReader.h>
 #include <itkSmartPointer.h>
 
 namespace isis{namespace test{
@@ -26,17 +27,19 @@ namespace isis{namespace test{
 		// just to make sure the wanted file exists
 		FILE* f = fopen("test.null", "w");
 		fclose(f);
-		typedef itk::Image<int, 4> MyImageType;
+		typedef itk::Image<float, 3> MyImageType;
 		itk::ImageFileWriter<MyImageType>::Pointer writer = itk::ImageFileWriter<MyImageType>::New();
+		itk::ImageFileReader<MyImageType>::Pointer reader = itk::ImageFileReader<MyImageType>::New();
 		//load an image and store it into the vtkAdapter
 // 		data::ImageList imgList = isis::data::IOFactory::load("test.null", "");
-		data::ImageList imgList = isis::data::IOFactory::load("/home/raid/tuerke/workspace/data_fmrt.nii", "");
+		data::ImageList imgList = isis::data::IOFactory::load("/home/raid/tuerke/workspace/data.nii", "");		
 		BOOST_CHECK(not imgList.empty());
 		MyImageType::Pointer itkImage = MyImageType::New();
+		MyImageType::IndexType index;
 		itkImage = adapter::itkAdapter::makeItkImageObject<MyImageType>(imgList.front());
 		writer->SetInput(itkImage);
 		writer->SetFileName("itkAdapterTest_output.nii");
-		writer->Update();				
+		writer->Update();		
 	}
 	
 	
