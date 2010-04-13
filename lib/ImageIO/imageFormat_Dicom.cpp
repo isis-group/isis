@@ -215,6 +215,19 @@ void ImageFormat_Dicom::sanitise(isis::util::PropMap& object, string dialect) {
 	}
 	transformOrTell<u_int32_t>(prefix+"InstanceNumber","acquisitionNumber",object,error);
 
+	if(hasOrTell(prefix+"PatientsSex",object,warning))
+	{
+		util::Selection isisGender("male,female,other");
+		switch(object[prefix+"PatientsSex"]->as<std::string>()[0]){
+			case 'M':isisGender.set("male");break;
+			case 'F':isisGender.set("female");break;
+			case 'O':isisGender.set("other");break;
+			default:
+				LOG(Runtime,error) << "Dicom gender code " << util::MSubject(object[prefix+"ImageOrientationPatient"])<<  " not known";
+		}
+		object["subjectGender"]=isisGender;
+		object.remove(prefix+"PatientsSex");
+	}
 	////////////////////////////////////////////////////////////////
 	// Do some sanity checks on redundant tags
 	////////////////////////////////////////////////////////////////
