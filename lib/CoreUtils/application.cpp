@@ -70,7 +70,7 @@ bool Application::init(int argc, char** argv,bool exitOnError)
 		{
 		    std::string pref;
 		    if(iP->second.needed()) {pref = " Required.";}
-		    if(!iP->second.needed()) {pref = " Default: " + iP->second.toString();};
+		    if(not iP->second.needed() and not iP->second->is<dlist>()) {pref = " Default: " + iP->second.toString();};
 		    std::cout << "\t-" << iP->first << " <" << iP->second->typeName() << ">" << std::endl;
 		    if(iP->second->is<Selection>()) {
 			const Selection &ref=iP->second->cast_to_Type<Selection>();
