@@ -18,15 +18,7 @@ namespace isis{namespace test{
   
 	BOOST_AUTO_TEST_CASE (VTKAdapterTest3D)
 	{
-
-		ENABLE_LOG(CoreLog,util::DefaultMsgPrint,warning);
-		ENABLE_LOG(CoreDebug,util::DefaultMsgPrint,warning);
-		ENABLE_LOG(DataLog,util::DefaultMsgPrint,warning);
-		ENABLE_LOG(DataDebug,util::DefaultMsgPrint,warning);
-		ENABLE_LOG(data::Runtime,util::DefaultMsgPrint,error);
-		ENABLE_LOG(DataDebug,util::DefaultMsgPrint,info);
-		//ENABLE_LOG(isis::ImageIoDebug,isis::util::DefaultMsgPrint,isis::info);
-		//ENABLE_LOG(isis::ImageIoLog,isis::util::DefaultMsgPrint,isis::info);
+		data::enable_log<util::DefaultMsgPrint>(error);
 		// just to make sure the wanted file exists
 		FILE* f = fopen("test.null", "w");
 		fclose(f);

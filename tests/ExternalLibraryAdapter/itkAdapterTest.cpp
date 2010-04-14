@@ -15,22 +15,12 @@ namespace isis{namespace test{
   
 	BOOST_AUTO_TEST_CASE (ITKAdapterTest)
 	{
-
-		ENABLE_LOG(CoreLog,util::DefaultMsgPrint,warning);
-		ENABLE_LOG(CoreDebug,util::DefaultMsgPrint,warning);
-		ENABLE_LOG(DataLog,util::DefaultMsgPrint,warning);
-		ENABLE_LOG(DataDebug,util::DefaultMsgPrint,warning);
-		ENABLE_LOG(data::Runtime,util::DefaultMsgPrint,error);
-		ENABLE_LOG(DataDebug,util::DefaultMsgPrint,info);
-		//ENABLE_LOG(isis::ImageIoDebug,isis::util::DefaultMsgPrint,isis::info);
-		//ENABLE_LOG(isis::ImageIoLog,isis::util::DefaultMsgPrint,isis::info);
+		data::enable_log<util::DefaultMsgPrint>(error);
 		// just to make sure the wanted file exists
 		FILE* f = fopen("test.null", "w");
 		fclose(f);
-		typedef itk::Image<float, 3> MyImageType;
+		typedef itk::Image<short, 3> MyImageType;
 		itk::ImageFileWriter<MyImageType>::Pointer writer = itk::ImageFileWriter<MyImageType>::New();
-		itk::ImageFileReader<MyImageType>::Pointer reader = itk::ImageFileReader<MyImageType>::New();
-		//load an image and store it into the vtkAdapter
 // 		data::ImageList imgList = isis::data::IOFactory::load("test.null", "");
 		data::ImageList imgList = isis::data::IOFactory::load("/scr/kastanie1/DATA/isis/data.nii", "");	
 		BOOST_CHECK(not imgList.empty());

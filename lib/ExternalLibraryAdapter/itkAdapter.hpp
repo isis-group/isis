@@ -51,40 +51,40 @@ namespace isis{ namespace adapter {
 class itkAdapter {
 public:
 	template<typename TImage> static itk::SmartPointer<TImage>
-		makeItkImageObject(const boost::shared_ptr<data::Image> src) {
+		makeItkImageObject(const boost::shared_ptr<data::Image> src, bool behaveAsItkReader=true) {
 		typedef TImage OutputImageType;
 		itkAdapter* myAdapter = new itkAdapter(src);
 		switch(myAdapter->m_ImageISIS->chunksBegin()->typeID()){
 		    case util::TypePtr<int8_t>::staticID:
-			    return myAdapter->internCreate<int8_t,OutputImageType>();
+			    return myAdapter->internCreate<int8_t,OutputImageType>(behaveAsItkReader);
 			    break;
 			    
 		    case util::TypePtr<u_int8_t>::staticID: 
-			    return myAdapter->internCreate<u_int8_t,OutputImageType>();
+			    return myAdapter->internCreate<u_int8_t,OutputImageType>(behaveAsItkReader);
 			    break;
 		    
 		    case util::TypePtr<int16_t>::staticID: 
-			    return myAdapter->internCreate<int16_t,OutputImageType>();
+			    return myAdapter->internCreate<int16_t,OutputImageType>(behaveAsItkReader);
 			    break;
 			    
 		    case util::TypePtr<u_int16_t>::staticID: 
-			    return myAdapter->internCreate<u_int16_t,OutputImageType>();
+			    return myAdapter->internCreate<u_int16_t,OutputImageType>(behaveAsItkReader);
 			    break;
 		    
 		    case util::TypePtr<int32_t>::staticID: 
-			    return myAdapter->internCreate<int32_t,OutputImageType>();
+			    return myAdapter->internCreate<int32_t,OutputImageType>(behaveAsItkReader);
 			    break;
 			    
 		    case util::TypePtr<u_int32_t>::staticID: 
-			    return myAdapter->internCreate<u_int32_t,OutputImageType>();
+			    return myAdapter->internCreate<u_int32_t,OutputImageType>(behaveAsItkReader);
 			    break;
 			    
 		    case util::TypePtr<float>::staticID: 
-			    return myAdapter->internCreate<float,OutputImageType>();
+			    return myAdapter->internCreate<float,OutputImageType>(behaveAsItkReader);
 			    break;
 		    
 		    case util::TypePtr<double>::staticID: 
-			    return myAdapter->internCreate<double,OutputImageType>();
+			    return myAdapter->internCreate<double,OutputImageType>(behaveAsItkReader);
 			    break;
 		}
 	}
@@ -96,7 +96,7 @@ private:
 		
 	boost::shared_ptr<data::Image> m_ImageISIS;
 	
-	template<typename TInput, typename TOutput> typename TOutput::Pointer internCreate(){
+	template<typename TInput, typename TOutput> typename TOutput::Pointer internCreate(bool behaveAsItkReader){
 		typedef itk::Image<TInput, TOutput::ImageDimension> InputImageType;
 		typedef TOutput OutputImageType;
 		typedef itk::ImportImageFilter<typename InputImageType::PixelType, OutputImageType::ImageDimension> MyImporterType;
@@ -117,6 +117,7 @@ private:
 		const util::fvector4 phaseVec = this->m_ImageISIS->getProperty<util::fvector4>("phaseVec");
 		const util::fvector4 sliceVec = this->m_ImageISIS->getProperty<util::fvector4>("sliceVec");
 		for (unsigned short i = 0; i<3; i++) {
+		    itkOrigin[i] = indexOrigin[i];
 		    itkSize[i] = dimensions[i];
 		    itkSpacing[i] = spacing[i];
 		    itkDirection[i][0] = readVec[i]; 
@@ -124,16 +125,17 @@ private:
 		    itkDirection[i][2] = sliceVec[i];
 		}
 		//TODO why the hell negates the itkNiftio some seemingly arbitrary elements of the orientation?????
-		itkOrigin[0] = -indexOrigin[0];
-		itkOrigin[1] = -indexOrigin[1];
-		itkOrigin[2] = indexOrigin[2];
-		itkDirection[0][0] = -readVec[0];
-		itkDirection[0][1] = -phaseVec[0];
-		itkDirection[0][2] = -sliceVec[0];
-		itkDirection[1][0] = -readVec[1];
-		itkDirection[1][1] = -phaseVec[1];
-		itkDirection[1][2] = -sliceVec[1];
-				
+		if(behaveAsItkReader) {
+		    itkOrigin[0] = -indexOrigin[0];
+		    itkOrigin[1] = -indexOrigin[1];
+		    itkOrigin[2] = indexOrigin[2];
+		    itkDirection[0][0] = -readVec[0];
+		    itkDirection[0][1] = -phaseVec[0];
+		    itkDirection[0][2] = -sliceVec[0];
+		    itkDirection[1][0] = -readVec[1];
+		    itkDirection[1][1] = -phaseVec[1];
+		    itkDirection[1][2] = -sliceVec[1];
+		}
 		if (OutputImageType::ImageDimension==4)
 		{
 		    itkSpacing[3] = spacing[3];
