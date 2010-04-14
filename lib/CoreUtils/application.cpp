@@ -57,10 +57,16 @@ bool Application::init(int argc, char** argv,bool exitOnError)
 		err=true;
 	}
 	if(not parameters.isComplete()){
-		std::cout << "Missing parameters:"<< std::endl;
-		std::cout << "Usage: " << this->m_name << " <options>, where <options> includes:" << std::endl;
 		ParameterMap::iterator iP;
-		for (iP = parameters.begin(); iP != parameters.end(); ++iP)
+		std::cout << "Missing parameters: ";
+		for (iP = parameters.begin(); iP != parameters.end(); iP++)
+		{
+		    if(iP->second.needed()){std::cout << iP->first << "  ";}
+		}
+		std::cout << std::endl;
+		std::cout << "Usage: " << this->m_name << " <options>, where <options> includes:" << std::endl;
+		
+		for (iP = parameters.begin(); iP != parameters.end(); iP++)
 		{
 		    std::string pref;
 		    if(iP->second.needed()) {pref = " Required.";}
@@ -68,7 +74,7 @@ bool Application::init(int argc, char** argv,bool exitOnError)
 		    std::cout << "\t-" << iP->first << " <" << iP->second->typeName() << ">" << std::endl;
 		    if(iP->second->is<Selection>()) {
 			const Selection &ref=iP->second->cast_to_Type<Selection>();
-			std::cout << "\t\tSelection is " <<  ref.getEntries() << std::endl;
+			std::cout << "\t\tOptions are: " <<  ref.getEntries() << std::endl;
 		    }
 		    std::cout << "\t\t" << iP->second.description() << pref << std::endl;	
 		}
