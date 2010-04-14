@@ -17,6 +17,8 @@ using namespace isis;
 #include <iostream>
 #include <string>
 
+namespace isis{namespace test{
+    
 BOOST_AUTO_TEST_SUITE (imageIONull_BaseTests)
 
 BOOST_AUTO_TEST_CASE (loadsaveImages)
@@ -55,5 +57,6 @@ BOOST_AUTO_TEST_CASE (loadsaveImages)
 
 BOOST_AUTO_TEST_SUITE_END ()
 
+}}
 
 

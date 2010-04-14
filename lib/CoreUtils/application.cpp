@@ -64,9 +64,13 @@ bool Application::init(int argc, char** argv,bool exitOnError)
 		{
 		    std::string pref;
 		    if(iP->second.needed()) {pref = " Required.";}
-		    if(!iP->second.needed()) {pref = " Default: " + iP->second.toString();}
-		    std::cout << "\t-" << iP->first << std::endl;
-		    std::cout << "\t\t" << iP->second.description() << pref << std::endl;		    
+		    if(!iP->second.needed()) {pref = " Default: " + iP->second.toString();};
+		    std::cout << "\t-" << iP->first << " <" << iP->second->typeName() << ">" << std::endl;
+		    if(iP->second->is<Selection>()) {
+			const Selection &ref=iP->second->cast_to_Type<Selection>();
+			std::cout << "\t\tSelection is " <<  ref.getEntries() << std::endl;
+		    }
+		    std::cout << "\t\t" << iP->second.description() << pref << std::endl;	
 		}
 		err=true;
 	}
