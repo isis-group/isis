@@ -25,7 +25,6 @@ namespace isis{namespace test{
 		data::ImageList imgList = isis::data::IOFactory::load("/scr/kastanie1/DATA/isis/data.nii", "");	
 		BOOST_CHECK(not imgList.empty());
 		MyImageType::Pointer itkImage = MyImageType::New();
-		MyImageType::IndexType index;
 		itkImage = adapter::itkAdapter::makeItkImageObject<MyImageType>(imgList.front());
 		writer->SetInput(itkImage);
 		writer->SetFileName("itkAdapterTest_output.nii");

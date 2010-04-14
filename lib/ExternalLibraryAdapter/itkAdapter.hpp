@@ -51,7 +51,7 @@ namespace isis{ namespace adapter {
 class itkAdapter {
 public:
 	template<typename TImage> static itk::SmartPointer<TImage>
-		makeItkImageObject(const boost::shared_ptr<data::Image> src, bool behaveAsItkReader=true) {
+		makeItkImageObject(const boost::shared_ptr<data::Image> src, const bool behaveAsItkReader=true) {
 		typedef TImage OutputImageType;
 		itkAdapter* myAdapter = new itkAdapter(src);
 		switch(myAdapter->m_ImageISIS->chunksBegin()->typeID()){
@@ -96,7 +96,7 @@ private:
 		
 	boost::shared_ptr<data::Image> m_ImageISIS;
 	
-	template<typename TInput, typename TOutput> typename TOutput::Pointer internCreate(bool behaveAsItkReader){
+	template<typename TInput, typename TOutput> typename TOutput::Pointer internCreate(const bool behaveAsItkReader){
 		typedef itk::Image<TInput, TOutput::ImageDimension> InputImageType;
 		typedef TOutput OutputImageType;
 		typedef itk::ImportImageFilter<typename InputImageType::PixelType, OutputImageType::ImageDimension> MyImporterType;

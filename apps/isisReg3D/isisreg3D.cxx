@@ -5,34 +5,41 @@
  *      Author: tuerke
  */
 
-#include "itkWarpImageFilter.h"
-#include "itkImageMaskSpatialObject.h"
+#include <itkWarpImageFilter.h>
+#include <itkImageMaskSpatialObject.h>
 
-#include "extRegistration/isisRegistrationFactory3D.h"
-#include "extITK/isisIterationObserver.h"
+#include <extRegistration/isisRegistrationFactory3D.h>
+#include <extITK/isisIterationObserver.h>
 
-#include "itkImageFileReader.h"
-#include "itkImageFileWriter.h"
-#include "itkImage.h"
+#include <itkImageFileReader.h>
+#include <itkImageFileWriter.h>
+#include <itkImage.h>
 
-#include "itkTransformFileWriter.h"
-#include "itkTransformFileReader.h"
+#include <itkTransformFileWriter.h>
+#include <itkTransformFileReader.h>
 
 #include <fstream>
-#include "boost/algorithm/string.hpp"
+#include <boost/algorithm/string.hpp>
 
-#include "itkLandmarkBasedTransformInitializer.h"
-#include "itkVersorRigid3DTransform.h"
+#include <itkLandmarkBasedTransformInitializer.h>
+#include <itkVersorRigid3DTransform.h>
 
-#include "itkMedianImageFilter.h"
-#include "itkDiscreteGaussianImageFilter.h"
-#include "itkRecursiveGaussianImageFilter.h"
+#include <itkMedianImageFilter.h>
+#include <itkDiscreteGaussianImageFilter.h>
+#include <itkRecursiveGaussianImageFilter.h>
 
-#include "boost/progress.hpp"
+#include <boost/progress.hpp>
 
 //via command parser include
-#include "viaio/option.h"
-#include "viaio/mu.h" //this is required for VNumber
+#include <viaio/option.h>
+#include <viaio/mu.h> //this is required for VNumber
+
+//isis includes
+#include "CoreUtils/log.hpp"
+#include "DataStorage/io_factory.hpp"
+#include "DataStorage/image.hpp"
+#include "ExternalLibraryAdapter/itkAdapter.hpp"
+
 VDictEntry TYPMetric[] = { {"MattesMutualInformation", 0}, {"MutualInformationHistogram", 1}, {"NormalizedCorrelation",
     2}, {"MeanSquare", 3}, {NULL}};
 
@@ -124,7 +131,6 @@ static VOptionDescRec
 // This is the main function
 int main(
     int argc, char* argv[]) {
-
     // show revision information string constant
 	std::cout << "Revision: " << _SVN_REVISION << std::endl;
 	// DANGER! Kids don't try this at home! VParseCommand modifies the values of argc and argv!!!
@@ -156,8 +162,6 @@ int main(
 	typedef itk::Image<MaskPixelType, Dimension> MaskImageType;
 	typedef itk::ImageMaskSpatialObject<Dimension> ImageMaskSpatialObjectType;
 
-	typedef itk::ImageFileReader<FixedImageType> FixedImageReaderType;
-	typedef itk::ImageFileReader<MovingImageType> MovingImageReaderType;
 	typedef itk::ImageFileReader<MaskImageType> MaskImageReaderType;
 
 	typedef isis::registration::RegistrationFactory3D<FixedImageType, MovingImageType> RegistrationFactoryType;
@@ -185,8 +189,6 @@ int main(
 	
 	typedef itk::RecursiveGaussianImageFilter<FixedImageType, FixedImageType> GaussianFilterType;
 
-	FixedImageReaderType::Pointer fixedReader = FixedImageReaderType::New();
-	MovingImageReaderType::Pointer movingReader = MovingImageReaderType::New();
 	MaskImageReaderType::Pointer maskReader = MaskImageReaderType::New();
 	
 	itk::AffineTransform<double, Dimension>::Pointer tmpTransform = itk::AffineTransform<double, Dimension>::New();
@@ -203,15 +205,13 @@ int main(
 	MovingFilterType::Pointer movingFilter = MovingFilterType::New();
 
 	tmpConstTransformPointer = NULL;
-	fixedReader->SetFileName(ref_filename);
-	movingReader->SetFileName(in_filename);
-
-	fixedReader->Update();
-	movingReader->Update();
+	isis::data::ImageList refList = isis::data::IOFactory::load(ref_filename, "");	
+	isis::data::ImageList inList = isis::data::IOFactory::load(in_filename, "");	
+	
 	
 	if(!smooth) {
-	    fixedImage = fixedReader->GetOutput();
-	    movingImage = movingReader->GetOutput();
+	    fixedImage = isis::adapter::itkAdapter::makeItkImageObject<FixedImageType>(refList.front());
+	    movingImage = isis::adapter::itkAdapter::makeItkImageObject<MovingImageType>(inList.front());
 	}
 	
 	if(smooth) {
@@ -221,7 +221,7 @@ int main(
 	    fixedGaussianFilterX->SetNumberOfThreads(number_threads);
 	    fixedGaussianFilterY->SetNumberOfThreads(number_threads);
 	    fixedGaussianFilterZ->SetNumberOfThreads(number_threads);
-	    fixedGaussianFilterX->SetInput(fixedReader->GetOutput());
+	    fixedGaussianFilterX->SetInput(isis::adapter::itkAdapter::makeItkImageObject<FixedImageType>(refList.front()));
 	    fixedGaussianFilterY->SetInput(fixedGaussianFilterX->GetOutput());
 	    fixedGaussianFilterZ->SetInput(fixedGaussianFilterY->GetOutput());
 	    fixedGaussianFilterX->SetDirection(0);
@@ -245,7 +245,7 @@ int main(
 	    movingGaussianFilterX->SetNumberOfThreads(number_threads);
 	    movingGaussianFilterY->SetNumberOfThreads(number_threads);
 	    movingGaussianFilterZ->SetNumberOfThreads(number_threads);
-	    movingGaussianFilterX->SetInput(movingReader->GetOutput());
+	    movingGaussianFilterX->SetInput(isis::adapter::itkAdapter::makeItkImageObject<MovingImageType>(inList.front()));
 	    movingGaussianFilterY->SetInput(movingGaussianFilterX->GetOutput());
 	    movingGaussianFilterZ->SetInput(movingGaussianFilterY->GetOutput());
 	    movingGaussianFilterX->SetDirection(0);
