@@ -58,7 +58,16 @@ bool Application::init(int argc, char** argv,bool exitOnError)
 	}
 	if(not parameters.isComplete()){
 		std::cout << "Missing parameters:"<< std::endl;
-		parameters.printNeeded();
+		std::cout << "Usage: " << this->m_name << " <options>, where <options> includes:" << std::endl;
+		ParameterMap::iterator iP;
+		for (iP = parameters.begin(); iP != parameters.end(); ++iP)
+		{
+		    std::string pref;
+		    if(iP->second.needed()) {pref = " Required.";}
+		    if(!iP->second.needed()) {pref = " Default: " + iP->second.toString();}
+		    std::cout << "\t-" << iP->first << std::endl;
+		    std::cout << "\t\t" << iP->second.description() << pref << std::endl;		    
+		}
 		err=true;
 	}
 
