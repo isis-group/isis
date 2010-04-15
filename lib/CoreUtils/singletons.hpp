@@ -3,8 +3,6 @@
 
 #include <map>
 #include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/weak_ptr.hpp>
 #include <string>
 #include <iostream>
 #include <typeinfo>
@@ -17,13 +15,16 @@ namespace isis{ namespace util{
  * It keeps track of them and deletes them automatically based of their priority.
  */
 class Singletons{
-	class SingletonBase:public boost::noncopyable{};
+	class SingletonBase:public boost::noncopyable{
+	public:
+		virtual ~SingletonBase();
+	};
 	template<typename BASE> class Singleton:public SingletonBase,public BASE{};
 	
 	typedef std::multimap<int,SingletonBase*const> prioMap;
 	prioMap map;
 	Singletons();
-	~Singletons();
+	virtual ~Singletons();
 	template<typename T> Singleton<T> *const create(int priority){
 		Singleton<T> * const ret(new Singleton<T>);
 		map.insert(map.find(priority), std::make_pair(priority,ret));

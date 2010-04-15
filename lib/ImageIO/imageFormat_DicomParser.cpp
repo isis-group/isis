@@ -404,7 +404,7 @@ size_t ImageFormat_Dicom::parseCSAEntry(Uint8 *at, isis::util::PropMap& map){
 					LOG(Debug,verbose_info) << "Found entry " << name << ":" << map[name] << " in CSA header";
 			}
 		} catch (boost::bad_lexical_cast e){
-			LOG(Runtime,error) << "Failed to parse CSA entry " << std::make_pair(name,ret) << " as " << vr << " (" << e.what() << ")";
+			LOG(Runtime,warning) << "Failed to parse CSA entry " << std::make_pair(name,ret) << " as " << vr << " (" << e.what() << ")";
 		}
 	} else {
 		LOG(Debug,info) << "Skipping empty CSA entry " << name;

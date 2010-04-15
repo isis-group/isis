@@ -10,9 +10,12 @@ Singletons& Singletons::getMaster()
 }
 Singletons::~Singletons()
 {
-	while(not map.empty())
+	while(not map.empty()){
+		delete map.begin()->second;
 		map.erase(map.begin());
+	}
 }
 Singletons::Singletons(){}
+Singletons::SingletonBase::~SingletonBase(){}
 
 }}
