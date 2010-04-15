@@ -27,7 +27,7 @@ public:
 	/**
 	 * Default constructor. 
 	 * Creates a selection with the given options.
-	 * \param entries comma separated of the options as a string
+	 * \param entries comma separated list of the options as a string
 	 */
 	Selection(const char *entries);
 	/// Fallback contructor to enable creation of empty selections

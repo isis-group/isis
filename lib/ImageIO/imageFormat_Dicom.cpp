@@ -168,7 +168,7 @@ void ImageFormat_Dicom::sanitise(isis::util::PropMap& object, string dialect) {
 		}
 		object.setProperty("voxelSize",voxelSize);
 
-		util::fvector4 voxelGap(invalid_float,invalid_float,invalid_float,invalid_float);
+		util::fvector4 voxelGap; //find a more robust way to determine inplane voxelGap
 		if(hasOrTell(prefix+"RepetitionTime",object,warning)){
 			voxelGap[3]=object[prefix+"RepetitionTime"]->as<float>()/1000;
 			object.remove(prefix+"RepetitionTime");
@@ -205,7 +205,6 @@ void ImageFormat_Dicom::sanitise(isis::util::PropMap& object, string dialect) {
 		object.setProperty("phaseVec",util::fvector4(0,1,0));
 	}
 
-	object.setProperty("indexOrigin",util::fvector4());
 	if(hasOrTell(prefix+"ImagePositionPatient",object,info))
 	{
 		object["indexOrigin"]=object.getPropertyValue(prefix+"ImagePositionPatient")->as<util::fvector4>();
