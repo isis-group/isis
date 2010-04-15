@@ -167,14 +167,14 @@ int main(
 	//transform object used for inverse transform
 	itk::MatrixOffsetTransformBase<double, Dimension, Dimension>::Pointer transform = itk::MatrixOffsetTransformBase<double, Dimension, Dimension>::New();
  			
-	if(!trans_filename.number and !vtrans_filename) {
+	if(not trans_filename.number and not vtrans_filename) {
 		std::cout << "No transform specified!!" << std::endl;
 		return EXIT_FAILURE;
 	}
 	resampler->SetNumberOfThreads(number_threads);
 	warper->SetNumberOfThreads(number_threads);
 	progress_timer time;
-	if(!fmri) {
+	if(not fmri) {
 	    isis::data::ImageList inList = isis::data::IOFactory::load(in_filename, "");	
 	    inputImage = isis::adapter::itkAdapter::makeItkImageObject<InputImageType>(inList.front());
 	}
@@ -189,7 +189,7 @@ int main(
 		outputDirection = templateImage->GetDirection();
 		outputOrigin = templateImage->GetOrigin();
 	}
-	if(!template_filename) {
+	if(not template_filename) {
 		outputDirection = inputImage->GetDirection();
 		outputOrigin = inputImage->GetOrigin();
 		
@@ -224,7 +224,7 @@ int main(
 			    transform->SetFixedParameters(static_cast<TransformPointer>((*ti).GetPointer())->GetInverseTransform()->GetFixedParameters());
 			    resampler->SetTransform(transform);
 			}
-			if(!use_inverse) {
+			if(not use_inverse) {
 			    resampler->SetTransform(static_cast<ConstTransformPointer> ((*ti).GetPointer()));	 
 			}
 		}
@@ -246,12 +246,12 @@ int main(
 			}
 		}
 	}
-	if(!resolution.number) {
+	if(not resolution.number) {
 		if(template_filename) {
 			outputSpacing = templateImage->GetSpacing();
 			outputSize = templateImage->GetLargestPossibleRegion().GetSize();
 		}
-		if(!template_filename) {
+		if(not template_filename) {
 			outputSpacing = inputImage->GetSpacing();
 			outputSize = inputImage->GetLargestPossibleRegion().GetSize();
 		}
@@ -263,10 +263,10 @@ int main(
 			        * templateImage->GetSpacing()[i];
 		}
 	}
-	if(resolution.number and !template_filename) {
+	if(resolution.number and not template_filename) {
 		for(unsigned int i = 0; i < 3; i++) {
 			//output spacing = (moving size / output resolution) * moving resolution
-			if(!fmri) {
+			if(not fmri) {
 				outputSize[i] = ((inputImage->GetLargestPossibleRegion().GetSize()[i]) / outputSpacing[i])
 				        * inputImage->GetSpacing()[i];
 			}
@@ -291,9 +291,9 @@ int main(
 		warper->SetInterpolator(nearestNeighborInterpolator);
 		break;
 	}
-	if(!fmri) {
+	if(not fmri) {
 		writer->SetFileName(out_filename);
-		if(!vtrans_filename and trans_filename.number == 1) {
+		if(not vtrans_filename and trans_filename.number == 1) {
 			resampler->AddObserver(itk::ProgressEvent(), progressObserver);
 			resampler->SetInput(inputImage);
 			resampler->SetOutputSpacing(outputSpacing);
@@ -330,7 +330,7 @@ int main(
 				fmriOutputSpacing[i] = outputSpacing[i];
 				fmriOutputSize[i] = outputSize[i];
 			} else {
-				if(!template_filename) {
+				if(not template_filename) {
 				    fmriOutputSpacing[i] = fmriImage->GetSpacing()[i];
 				    fmriOutputSize[i] = fmriImage->GetLargestPossibleRegion().GetSize()[i];
 				}
@@ -339,7 +339,7 @@ int main(
 				    fmriOutputSize[i] = templateImage->GetLargestPossibleRegion().GetSize()[i];
 				}
 			}
-			if(!template_filename) {
+			if(not template_filename) {
 				fmriOutputOrigin[i] = fmriImage->GetOrigin()[i];
 				for(unsigned int j = 0; j < 3; j++) {
 					fmriOutputDirection[j][i] = fmriImage->GetDirection()[j][i];
@@ -372,8 +372,8 @@ int main(
 		const unsigned int numberOfTimeSteps = fmriImage->GetLargestPossibleRegion().GetSize()[3];
 		OutputImageType::Pointer tileImage;
 		std::cout << std::endl;
-		reader->SetFileName(in_filename);
-		reader->Update();
+		isis::data::ImageList inList = isis::data::IOFactory::load(in_filename, "");	
+		inputImage = isis::adapter::itkAdapter::makeItkImageObject<InputImageType>(inList.front());
 		for(unsigned int timestep = 0; timestep < numberOfTimeSteps; timestep++) {
 			std::cout << "Resampling timestep: " << timestep << "...\r" << std::flush;
 			timeStepExtractionFilter->SetRequestedTimeStep(timestep);

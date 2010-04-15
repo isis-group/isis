@@ -23,10 +23,14 @@
 namespace isis{namespace data{
 IOApplication::IOApplication(const char name[], bool have_input, bool have_output):Application(name),m_input(have_input),m_output(have_output)
 {
-	if(have_input)
+	if(have_input){
 		parameters["in"]=std::string();
-	if(have_output)
+		parameters["in"].setDescription("input file or dataset");
+	}
+	if(have_output){
 		parameters["out"]=std::string();
+		parameters["out"].setDescription("output file");
+	}
 }
 bool IOApplication::init(int argc, char** argv, bool exitOnError)
 {

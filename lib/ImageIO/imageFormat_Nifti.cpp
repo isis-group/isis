@@ -249,7 +249,7 @@ private:
 		{
 			util::fvector4 offsets(ni.qoffset_x, ni.qoffset_y, ni.qoffset_z, 0);
 			//retChunk.setProperty("acquisitionTime", );
-			retChunk.setProperty("indexOrigin",offsets);
+			retChunk.setProperty("indexOrigin", util::fvector4(ni.qoffset_x, ni.qoffset_y, ni.qoffset_z, 0));
 			retChunk.setProperty("acquisitionNumber", t);
 			retChunk.setProperty("sequenceNumber", 1);
 			retChunk.setProperty("readVec", getVector(ni, readDir));
@@ -384,8 +384,8 @@ private:
 
 		util::fvector4 phaseVec = image.getProperty<util::fvector4>("phaseVec");
 		util::fvector4 sliceVec = image.getProperty<util::fvector4>("sliceVec");
-//		util::fvector4 centerVec = image.getProperty<util::fvector4>("centerVec");
-//		LOG(ImageIoLog, info) << centerVec;
+		util::fvector4 centerVec = image.getProperty<util::fvector4>("centerVec");
+		LOG(ImageIoLog, info) << centerVec;
 		util::fvector4 voxelSizeVector = image.getProperty<util::fvector4>("voxelSize");
 		ni.dx = ni.pixdim[1] = voxelSizeVector[0];
 		ni.dy = ni.pixdim[2] = voxelSizeVector[1];
@@ -423,7 +423,7 @@ private:
 			ni.qto_xyz.m[0][y]=readVec[y];//rot[0][y];
 			ni.qto_xyz.m[1][y]=phaseVec[y];//rot[1][y];
 			ni.qto_xyz.m[2][y]=sliceVec[y];//rot[2][y];
-//			ni.qto_xyz.m[y][3]=centerVec[y];
+			ni.qto_xyz.m[y][3]=centerVec[y];
 		}
 
 		memcpy(ni.sto_xyz.m,ni.qto_xyz.m,sizeof(ni.sto_xyz.m));
