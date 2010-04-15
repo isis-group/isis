@@ -9,8 +9,6 @@
 #include "DataStorage/io_factory.hpp"
 #include "CoreUtils/log.hpp"
 
-using namespace isis;
-
 #define BOOST_TEST_MODULE "imageIONiiTest"
 #include <boost/test/included/unit_test.hpp>
 #include <boost/filesystem.hpp>
@@ -18,13 +16,16 @@ using namespace isis;
 #include <string>
 
 namespace isis{namespace test{
+
+using namespace isis;
     
 BOOST_AUTO_TEST_SUITE (imageIONii_NullTests)
 
 BOOST_AUTO_TEST_CASE(loadsaveImage)
 {
 	data::ImageList images;
-	data::enable_log<util::DefaultMsgPrint>(error);
+	data::enable_log<util::DefaultMsgPrint>(warning);
+	util::DefaultMsgPrint::stopBelow(error);
 
 //  The factory assumes that there is valid file before
 //  calling the appropriate plugin.
@@ -34,12 +35,11 @@ BOOST_AUTO_TEST_CASE(loadsaveImage)
 	std::ofstream file(tmpfile.c_str());
 
 	// 	load images from file
-	images = data::IOFactory::load(tmpfile,"");
+	images = data::IOFactory::load(
+			"/scr/mrincoming7t/2009/KC8T090609.SEPT/nifti/S2_MPRAGE_p2_fs.nii","");
 
-	std::cout << "Writing Image to " << niifile << std::endl;
 //	write images to file(s)
-	data::IOFactory::write(images,niifile,"");
-
+	data::IOFactory::write(images ,niifile,"");
 
 }
 
