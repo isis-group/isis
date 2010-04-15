@@ -373,6 +373,7 @@ void ImageFormat_Dicom::parseCSA(DcmElement *elem, isis::util::PropMap& map)
 size_t ImageFormat_Dicom::parseCSAEntry(Uint8 *at, isis::util::PropMap& map){
 	size_t pos=0;
 	const char *const name=(char*)at+pos;pos+=0x40;
+	assert(name[0]);
 	/*Sint32 &vm=*((Sint32*)array+pos);*/pos+=sizeof(Sint32);
 	const char *const vr=(char*)at+pos;pos+=0x4;
 	/*Sint32 syngodt=endian<Uint8,Uint32>(array+pos);*/pos+=sizeof(Sint32);
@@ -380,16 +381,19 @@ size_t ImageFormat_Dicom::parseCSAEntry(Uint8 *at, isis::util::PropMap& map){
 
 	if(nitems){
 		pos+=sizeof(Sint32); //77
-		Sint32 len=0;
 		util::slist ret;
 		for(unsigned short n=0;n<nitems;n++){
-			len=endian<Uint8,Uint32>(at+pos);pos+=sizeof(Sint32);//the length of this element
+			Sint32 len=endian<Uint8,Uint32>(at+pos);pos+=sizeof(Sint32);//the length of this element
 			pos+=3*sizeof(Sint32); //whatever
 			if(!len)continue;
 			std::string insert((char*)at+pos);
-			const std::string::size_type start =insert.find_first_not_of(' ');
-			const std::string::size_type end =insert.find(' ',start); //strip spaces
-			ret.push_back(insert.substr(start,end-start));//store the text if there is some
+			if(insert.empty()){
+				LOG(Runtime,info) << "Skipping empty string for CSA entry " << name;
+			} else {
+				const std::string::size_type start =insert.find_first_not_of(' ');
+				const std::string::size_type end =insert.find(' ',start); //strip spaces
+				ret.push_back(insert.substr(start,end-start));//store the text if there is some
+			}
 			pos+=(
 					(len+sizeof(Sint32)-1)/sizeof(Sint32)
 				)*
