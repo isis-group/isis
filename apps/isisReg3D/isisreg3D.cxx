@@ -8,18 +8,12 @@
 #include <itkWarpImageFilter.h>
 #include <itkImageMaskSpatialObject.h>
 
-#include <extRegistration/isisRegistrationFactory3D.h>
-#include <extITK/isisIterationObserver.h>
-
 #include <itkImageFileReader.h>
 #include <itkImageFileWriter.h>
 #include <itkImage.h>
 
 #include <itkTransformFileWriter.h>
 #include <itkTransformFileReader.h>
-
-#include <fstream>
-#include <boost/algorithm/string.hpp>
 
 #include <itkLandmarkBasedTransformInitializer.h>
 #include <itkVersorRigid3DTransform.h>
@@ -28,6 +22,8 @@
 #include <itkDiscreteGaussianImageFilter.h>
 #include <itkRecursiveGaussianImageFilter.h>
 
+#include <fstream>
+#include <boost/algorithm/string.hpp>
 #include <boost/progress.hpp>
 
 //via command parser include
@@ -39,6 +35,9 @@
 #include "DataStorage/io_factory.hpp"
 #include "DataStorage/image.hpp"
 #include "ExternalLibraryAdapter/itkAdapter.hpp"
+
+#include "extRegistration/isisRegistrationFactory3D.h"
+#include "extITK/isisIterationObserver.h"
 
 VDictEntry TYPMetric[] = { {"MattesMutualInformation", 0}, {"MutualInformationHistogram", 1}, {"NormalizedCorrelation",
     2}, {"MeanSquare", 3}, {NULL}};
@@ -205,9 +204,9 @@ int main(
 	MovingFilterType::Pointer movingFilter = MovingFilterType::New();
 
 	tmpConstTransformPointer = NULL;
+	
 	isis::data::ImageList refList = isis::data::IOFactory::load(ref_filename, "");	
 	isis::data::ImageList inList = isis::data::IOFactory::load(in_filename, "");	
-	
 	
 	if(!smooth) {
 	    fixedImage = isis::adapter::itkAdapter::makeItkImageObject<FixedImageType>(refList.front());
@@ -318,7 +317,7 @@ int main(
 		}
 
 		//check combinations of components
-		if (optimizer == 1 and transform != 0) {
+		if (optimizer == 0 and transform != 0) {
 			std::cerr
 			<< "\nInappropriate combination of transform and optimizer! Setting optimizer to RegularStepGradientDescent.\n"
 			<< std::endl;
@@ -330,8 +329,8 @@ int main(
 			<< std::endl;
 		}
 
-		if (transform == 0 and optimizer != 1) {
-			std::cerr << "\nIt is recommended using the VersorRigid transform in connection with the VersorRigid optimizer!\n"
+		if (transform == 0 and optimizer != 0) {
+			std::cerr << "\nInappropriate combination of transform and optimizer! Setting optimizer to VersorRigid3D.\n"
 			<< std::endl;
 		}
 		//transform setup
@@ -393,10 +392,10 @@ int main(
 
 		switch (optimizer) {
 			case 0:
-			registrationFactory->SetOptimizer(RegistrationFactoryType::RegularStepGradientDescentOptimizer);
+			registrationFactory->SetOptimizer(RegistrationFactoryType::VersorRigidOptimizer);
 			break;
 			case 1:
-			registrationFactory->SetOptimizer(RegistrationFactoryType::VersorRigidOptimizer);
+			registrationFactory->SetOptimizer(RegistrationFactoryType::RegularStepGradientDescentOptimizer);
 			break;
 			case 2:
 			registrationFactory->SetOptimizer(RegistrationFactoryType::LBFGSBOptimizer);

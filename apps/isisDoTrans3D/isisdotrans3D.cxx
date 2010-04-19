@@ -14,10 +14,6 @@
 #include <itkLinearInterpolateImageFunction.h>
 #include <itkWindowedSincInterpolateImageFunction.h>
 
-#include <extITK/isisTimeStepExtractionFilter.h>
-#include <extITK/isisTransformMerger3D.hpp>
-#include <extITK/isisIterationObserver.h>
-
 #include <itkResampleImageFilter.h>
 #include <itkWarpImageFilter.h>
 #include <itkCastImageFilter.h>
@@ -31,6 +27,10 @@
 #include "DataStorage/io_factory.hpp"
 #include "DataStorage/image.hpp"
 #include "ExternalLibraryAdapter/itkAdapter.hpp"
+
+#include "extITK/isisTimeStepExtractionFilter.h"
+#include "extITK/isisTransformMerger3D.hpp"
+#include "extITK/isisIterationObserver.h"
 
 //via command parser include
 #include <viaio/option.h>
@@ -197,7 +197,7 @@ int main(
 	if(trans_filename.number) {
 		unsigned int number_trans = trans_filename.number;
 		if(number_trans > 1) {
-
+			std::cout << "More than one transform is set. This is not possible, yet!" << std::endl;
 			for(unsigned int i = 0; i < number_trans; i++) {
 				itk::TransformFileReader::TransformListType* transformList =
 				        new itk::TransformFileReader::TransformListType;
@@ -207,7 +207,7 @@ int main(
 				itk::TransformFileReader::TransformListType::const_iterator ti = transformList->begin();
 				transformMerger->push_back((*ti).GetPointer());
 			}
-			transformMerger->setTemplateImage(templateReader->GetOutput());
+			transformMerger->setTemplateImage<InputImageType>(templateImage);
 			transformMerger->merge();
 			warper->SetDeformationField(transformMerger->getTransform());
 		}

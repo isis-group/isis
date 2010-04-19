@@ -46,8 +46,24 @@ public:
 
     DeformationFieldType::Pointer getTransform(
         void);
+	//here we setting up the temporaryDeformationField_ and deformationField_. The properties are defined be the templateImage which is specified by the setTemplateImage method,
+	template <typename TImage> void setTemplateImage(const TImage* templateImage)
+	{
+		imageRegion_ = templateImage->GetLargestPossibleRegion();
+		deformationField_ = DeformationFieldType::New();
+		deformationField_->SetRegions(imageRegion_.GetSize());
+		deformationField_->SetOrigin(templateImage->GetOrigin());
+		deformationField_->SetSpacing(templateImage->GetSpacing());
+		deformationField_->SetDirection(templateImage->GetDirection());
+		deformationField_->Allocate();
 
-    void setTemplateImage(itk::ImageBase<2>::Pointer);
+		temporaryDeformationField_ = DeformationFieldType::New();
+		temporaryDeformationField_->SetRegions(imageRegion_.GetSize());
+		temporaryDeformationField_->SetOrigin(templateImage->GetOrigin());
+		temporaryDeformationField_->SetSpacing(templateImage->GetSpacing());
+		temporaryDeformationField_->SetDirection(templateImage->GetDirection());
+		temporaryDeformationField_->Allocate();
+	}
 
 private:
     unsigned int transformType_;

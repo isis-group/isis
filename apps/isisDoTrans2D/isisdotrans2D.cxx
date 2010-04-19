@@ -5,29 +5,38 @@
  *      Author: tuerke
  */
 
-#include "itkImageFileReader.h"
-#include "itkImageFileWriter.h"
-#include "itkImageSeriesWriter.h"
+#include <itkImageFileReader.h>
+#include <itkImageFileWriter.h>
+#include <itkImageSeriesWriter.h>
 
-#include "itkNearestNeighborInterpolateImageFunction.h"
-#include "itkBSplineInterpolateImageFunction.h"
-#include "itkLinearInterpolateImageFunction.h"
-#include "itkWindowedSincInterpolateImageFunction.h"
+#include <itkNearestNeighborInterpolateImageFunction.h>
+#include <itkBSplineInterpolateImageFunction.h>
+#include <itkLinearInterpolateImageFunction.h>
+#include <itkWindowedSincInterpolateImageFunction.h>
+
+#include <itkResampleImageFilter.h>
+#include <itkWarpImageFilter.h>
+#include <itkCastImageFilter.h>
+
+#include <itkTileImageFilter.h>
+
+#include <itkTransformFileReader.h>
+//via command parser include
+#include "viaio/option.h"
+#include "viaio/mu.h" //this is required for VNumber
+
+//isis includes 
+#include "CoreUtils/log.hpp"
+#include "DataStorage/io_factory.hpp"
+#include "DataStorage/image.hpp"
+#include "ExternalLibraryAdapter/itkAdapter.hpp"
 
 #include "extITK/isisTimeStepExtractionFilter.h"
 #include "extITK/isisTransformMerger2D.hpp"
 #include "extITK/isisIterationObserver.h"
 
-#include "itkResampleImageFilter.h"
-#include "itkWarpImageFilter.h"
-#include "itkCastImageFilter.h"
 
-#include "itkTileImageFilter.h"
 
-#include "itkTransformFileReader.h"
-//via command parser include
-#include "viaio/option.h"
-#include "viaio/mu.h" //this is required for VNumber
 //command line parser options
 
 VDictEntry TYPInterpolator[] = { {"Linear", 0}, {"BSpline", 1}, {"NearestNeighbor", 2}, {NULL}};
@@ -60,7 +69,7 @@ static VOptionDescRec options[] = {
 
 };
 
-#include "itkCommand.h"
+
 #include <boost/concept_check.hpp>
 
 
@@ -154,7 +163,12 @@ int main(
 	OutputImageType::SpacingType fmriOutputSpacing;
 	OutputImageType::DirectionType fmriOutputDirection;
 	OutputImageType::PointType fmriOutputOrigin;
+	
 	InputImageType::Pointer tmpImage = InputImageType::New();
+	FMRIInputType::Pointer fmriImage = FMRIInputType::New();
+	InputImageType::Pointer inputImage = InputImageType::New();
+	InputImageType::Pointer templateImage = InputImageType::New();
+	
 	//transform object used for inverse transform
 	itk::MatrixOffsetTransformBase<double, Dimension, Dimension>::Pointer transform = itk::MatrixOffsetTransformBase<double, Dimension, Dimension>::New();
  			
@@ -166,29 +180,28 @@ int main(
 	warper->SetNumberOfThreads(number_threads);
 	progress_timer time;
 	if(!fmri) {
-	    reader->SetFileName(in_filename);
-	    reader->Update();
+	    isis::data::ImageList inList = isis::data::IOFactory::load(in_filename, "");	
+	    inputImage = isis::adapter::itkAdapter::makeItkImageObject<InputImageType>(inList.front());
 	}
 	if(fmri) {
-	    fmriReader->SetFileName(in_filename);
-	    fmriReader->Update();
+	    isis::data::ImageList inList = isis::data::IOFactory::load(in_filename, "");	
+	    fmriImage = isis::adapter::itkAdapter::makeItkImageObject<FMRIInputType>(inList.front());
 	}
 	//if template file is specified by the user
 	if(template_filename) {
-		templateReader->SetFileName(template_filename);
-		templateReader->Update();
-		outputDirection = templateReader->GetOutput()->GetDirection();
-		outputOrigin = templateReader->GetOutput()->GetOrigin();
+	    isis::data::ImageList inList = isis::data::IOFactory::load(template_filename, "");	
+	    templateImage = isis::adapter::itkAdapter::makeItkImageObject<InputImageType>(inList.front());
+	    outputDirection = templateImage->GetDirection();
+	    outputOrigin = templateImage->GetOrigin();
 	}
 	if(!template_filename) {
-		outputDirection = reader->GetOutput()->GetDirection();
-		outputOrigin = reader->GetOutput()->GetOrigin();
+	    outputDirection = inputImage->GetDirection();
+	    outputOrigin = inputImage->GetOrigin();
 		
 	    }
 	if(trans_filename.number) {
 		unsigned int number_trans = trans_filename.number;
 		if(number_trans > 1) {
-
 			for(unsigned int i = 0; i < number_trans; i++) {
 				itk::TransformFileReader::TransformListType* transformList =
 				        new itk::TransformFileReader::TransformListType;
@@ -198,7 +211,7 @@ int main(
 				itk::TransformFileReader::TransformListType::const_iterator ti = transformList->begin();
 				transformMerger->push_back((*ti).GetPointer());
 			}
-			transformMerger->setTemplateImage(templateReader->GetOutput());
+			transformMerger->setTemplateImage<InputImageType>(templateImage);
 			transformMerger->merge();
 			warper->SetDeformationField(transformMerger->getTransform());
 		}
@@ -246,20 +259,20 @@ int main(
 
 	if(!resolution.number) {
 		if(template_filename) {
-			outputSpacing = templateReader->GetOutput()->GetSpacing();
-			outputSize = templateReader->GetOutput()->GetLargestPossibleRegion().GetSize();
+			outputSpacing = templateImage->GetSpacing();
+			outputSize = templateImage->GetLargestPossibleRegion().GetSize();
 		}
 		if(!template_filename) {
-			outputSpacing = reader->GetOutput()->GetSpacing();
-			outputSize = reader->GetOutput()->GetLargestPossibleRegion().GetSize();
+			outputSpacing = inputImage->GetSpacing();
+			outputSize = inputImage->GetLargestPossibleRegion().GetSize();
 		}
 	}
 
 	if(resolution.number and template_filename) {
 		for(unsigned int i = 0; i < Dimension; i++) {
 			//output spacing = (template size / output resolution) * template resolution
-			outputSize[i] = ((templateReader->GetOutput()->GetLargestPossibleRegion().GetSize()[i]) / outputSpacing[i])
-			        * templateReader->GetOutput()->GetSpacing()[i];
+			outputSize[i] = ((templateImage->GetLargestPossibleRegion().GetSize()[i]) / outputSpacing[i])
+			        * templateImage->GetSpacing()[i];
 		}
 	}
 	
@@ -267,12 +280,12 @@ int main(
 		for(unsigned int i = 0; i < Dimension; i++) {
 			//output spacing = (moving size / output resolution) * moving resolution
 			if(!fmri) {
-				outputSize[i] = ((reader->GetOutput()->GetLargestPossibleRegion().GetSize()[i]) / outputSpacing[i])
-				        * reader->GetOutput()->GetSpacing()[i];
+				outputSize[i] = ((inputImage->GetLargestPossibleRegion().GetSize()[i]) / outputSpacing[i])
+				        * inputImage->GetSpacing()[i];
 			}
 			if(fmri) {
-				outputSize[i] = ((fmriReader->GetOutput()->GetLargestPossibleRegion().GetSize()[i]) / outputSpacing[i])
-				        * fmriReader->GetOutput()->GetSpacing()[i];
+				outputSize[i] = ((fmriImage->GetLargestPossibleRegion().GetSize()[i]) / outputSpacing[i])
+				        * fmriImage->GetSpacing()[i];
 			}
 
 		}
@@ -298,8 +311,7 @@ int main(
 		writer->SetFileName(out_filename);
 		if(!vtrans_filename and trans_filename.number == 1) {
 			resampler->AddObserver(itk::ProgressEvent(), progressObserver);
-			tmpImage = reader->GetOutput();
-			resampler->SetInput(reader->GetOutput());
+			resampler->SetInput(inputImage);
 			resampler->SetOutputSpacing(outputSpacing);
 			resampler->SetSize(outputSize);
 			resampler->SetOutputOrigin(outputOrigin);
@@ -313,7 +325,7 @@ int main(
 			warper->SetOutputOrigin(outputOrigin);
 			warper->SetOutputSize(outputSize);
 			warper->SetOutputSpacing(outputSpacing);
-			warper->SetInput(reader->GetOutput());
+			warper->SetInput(inputImage);
 			if(trans_filename.number == 0) {
 				warper->SetDeformationField(deformationFieldReader->GetOutput());
 			}
@@ -325,11 +337,11 @@ int main(
 
 	if(fmri) {
 		
-		timeStepExtractionFilter->SetInput(fmriReader->GetOutput());
+		timeStepExtractionFilter->SetInput(fmriImage);
 		fmriWriter->SetFileName(out_filename);
 		if(template_filename) {
- 			fmriOutputOrigin = templateReader->GetOutput()->GetOrigin();
- 			fmriOutputDirection = templateReader->GetOutput()->GetDirection();			
+ 			fmriOutputOrigin = templateImage->GetOrigin();
+ 			fmriOutputDirection = templateImage->GetDirection();			
 		}
 		for(unsigned int i = 0; i < Dimension; i++) {
 			if(resolution.number) {
@@ -337,18 +349,18 @@ int main(
 				fmriOutputSize[i] = outputSize[i];
 			} else {
 				if(!template_filename) {
-				    fmriOutputSpacing[i] = fmriReader->GetOutput()->GetSpacing()[i];
-				    fmriOutputSize[i] = fmriReader->GetOutput()->GetLargestPossibleRegion().GetSize()[i];
+				    fmriOutputSpacing[i] = fmriImage->GetSpacing()[i];
+				    fmriOutputSize[i] = fmriImage->GetLargestPossibleRegion().GetSize()[i];
 				}
 				if(template_filename) {
-				    fmriOutputSpacing[i] = templateReader->GetOutput()->GetSpacing()[i];
-				    fmriOutputSize[i] = templateReader->GetOutput()->GetLargestPossibleRegion().GetSize()[i];
+				    fmriOutputSpacing[i] = templateImage->GetSpacing()[i];
+				    fmriOutputSize[i] = templateImage->GetLargestPossibleRegion().GetSize()[i];
 				}
 			}
 			if(!template_filename) {
-				fmriOutputOrigin[i] = fmriReader->GetOutput()->GetOrigin()[i];
+				fmriOutputOrigin[i] = fmriImage->GetOrigin()[i];
 				for(unsigned int j = 0; j < Dimension; j++) {
-					fmriOutputDirection[j][i] = fmriReader->GetOutput()->GetDirection()[j][i];
+					fmriOutputDirection[j][i] = fmriImage->GetDirection()[j][i];
 				}
 			}
 		}
@@ -363,7 +375,7 @@ int main(
 			warper->SetOutputOrigin(fmriOutputOrigin);
 			warper->SetOutputSize(fmriOutputSize);
 			warper->SetOutputSpacing(fmriOutputSpacing);
-			warper->SetInput(reader->GetOutput());
+			warper->SetInput(inputImage);
 			if(trans_filename.number == 0) {
 				warper->SetDeformationField(deformationFieldReader->GetOutput());
 			}
@@ -373,7 +385,7 @@ int main(
 		layout[0] = 1;
 		layout[1] = 1;
 		layout[2] = 0;
-		const unsigned int numberOfTimeSteps = fmriReader->GetOutput()->GetLargestPossibleRegion().GetSize()[2];
+		const unsigned int numberOfTimeSteps = fmriImage->GetLargestPossibleRegion().GetSize()[2];
 		OutputImageType::Pointer tileImage;
 		std::cout << std::endl;
 		reader->SetFileName(in_filename);
@@ -384,10 +396,8 @@ int main(
 			timeStepExtractionFilter->Update();
 			if(trans_filename.number) {
 				tmpImage = timeStepExtractionFilter->GetOutput();
-// 					std::cout << tmpImage << std::endl;
-				tmpImage->SetDirection(reader->GetOutput()->GetDirection());
-				tmpImage->SetOrigin(reader->GetOutput()->GetOrigin());
-
+				tmpImage->SetDirection(inputImage->GetDirection());
+				tmpImage->SetOrigin(inputImage->GetOrigin());
 				resampler->SetInput(tmpImage);
 				resampler->Update();
 				tileImage = resampler->GetOutput();

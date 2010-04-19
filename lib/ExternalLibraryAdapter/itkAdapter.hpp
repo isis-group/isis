@@ -35,7 +35,6 @@
 #include <boost/shared_ptr.hpp>
 
 //itk includes
-#include <itkSmartPointer.h>
 #include <itkImage.h>
 #include <itkImportImageFilter.h>
 #include <itkIntensityWindowingImageFilter.h>
@@ -50,7 +49,7 @@ namespace isis{ namespace adapter {
 
 class itkAdapter {
 public:
-	template<typename TImage> static itk::SmartPointer<TImage>
+	template<typename TImage> static TImage*
 		makeItkImageObject(const boost::shared_ptr<data::Image> src, const bool behaveAsItkReader=true) {
 		typedef TImage OutputImageType;
 		itkAdapter* myAdapter = new itkAdapter(src);
@@ -96,7 +95,7 @@ private:
 		
 	boost::shared_ptr<data::Image> m_ImageISIS;
 	
-	template<typename TInput, typename TOutput> typename TOutput::Pointer internCreate(const bool behaveAsItkReader){
+	template<typename TInput, typename TOutput> TOutput* internCreate(const bool behaveAsItkReader){
 		typedef itk::Image<TInput, TOutput::ImageDimension> InputImageType;
 		typedef TOutput OutputImageType;
 		typedef itk::ImportImageFilter<typename InputImageType::PixelType, OutputImageType::ImageDimension> MyImporterType;

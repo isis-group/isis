@@ -5,35 +5,41 @@
  *      Author: tuerke
  */
 
-#include "itkWarpImageFilter.h"
-#include "itkImageMaskSpatialObject.h"
+#include <itkWarpImageFilter.h>
+#include <itkImageMaskSpatialObject.h>
+
+#include <itkImageFileReader.h>
+#include <itkImageFileWriter.h>
+#include <itkImage.h>
+
+#include <itkTransformFileWriter.h>
+#include <itkTransformFileReader.h>
+
+#include <fstream>
+#include <boost/algorithm/string.hpp>
+
+#include <itkLandmarkBasedTransformInitializer.h>
+#include <itkRigid2DTransform.h>
+
+#include <itkMedianImageFilter.h>
+#include <itkDiscreteGaussianImageFilter.h>
+#include <itkRecursiveGaussianImageFilter.h>
+
+//via command parser include
+#include <viaio/option.h>
+#include <viaio/mu.h> //this is required for VNumber
+
+//isis includes
+#include "CoreUtils/log.hpp"
+#include "DataStorage/io_factory.hpp"
+#include "DataStorage/image.hpp"
+#include "ExternalLibraryAdapter/itkAdapter.hpp"
 
 #include "extRegistration/isisRegistrationFactory2D.h"
 #include "extITK/isisTransformMerger2D.hpp"
 #include "extITK/isisIterationObserver.h"
 
-#include "itkImageFileReader.h"
-#include "itkImageFileWriter.h"
-#include "itkImage.h"
 
-#include "itkTransformFileWriter.h"
-#include "itkTransformFileReader.h"
-
-#include <fstream>
-#include "boost/algorithm/string.hpp"
-
-#include "itkLandmarkBasedTransformInitializer.h"
-#include "itkRigid2DTransform.h"
-
-#include "itkMedianImageFilter.h"
-#include "itkDiscreteGaussianImageFilter.h"
-#include "itkRecursiveGaussianImageFilter.h"
-
-#include "boost/progress.hpp"
-
-//via command parser include
-#include "viaio/option.h"
-#include "viaio/mu.h" //this is required for VNumber
 VDictEntry TYPMetric[] = { {"MattesMutualInformation", 0}, {"MutualInformationHistogram", 1}, {"NormalizedCorrelation",
     2}, {"MeanSquare", 3}, {NULL}};
 
@@ -199,15 +205,14 @@ int main(
 	FixedFilterType::Pointer fixedFilter = FixedFilterType::New();
 	MovingFilterType::Pointer movingFilter = MovingFilterType::New();
 
-	fixedReader->SetFileName(ref_filename);
-	movingReader->SetFileName(in_filename);
-
-	fixedReader->Update();
-	movingReader->Update();
+	tmpConstTransformPointer=NULL;
+	
+	isis::data::ImageList refList = isis::data::IOFactory::load(ref_filename, "");	
+	isis::data::ImageList inList = isis::data::IOFactory::load(in_filename, "");	
 	
 	if(!smooth) {
-	    fixedImage = fixedReader->GetOutput();
-	    movingImage = movingReader->GetOutput();
+	    fixedImage = isis::adapter::itkAdapter::makeItkImageObject<FixedImageType>(refList.front());
+	    movingImage = isis::adapter::itkAdapter::makeItkImageObject<MovingImageType>(inList.front());
 	}
 	
 	if(smooth) {
@@ -215,7 +220,7 @@ int main(
 	    GaussianFilterType::Pointer fixedGaussianFilterY = GaussianFilterType::New();
 	    fixedGaussianFilterX->SetNumberOfThreads(number_threads);
 	    fixedGaussianFilterY->SetNumberOfThreads(number_threads);
-	    fixedGaussianFilterX->SetInput(fixedReader->GetOutput());
+	    fixedGaussianFilterX->SetInput(isis::adapter::itkAdapter::makeItkImageObject<FixedImageType>(refList.front()));
 	    fixedGaussianFilterY->SetInput(fixedGaussianFilterX->GetOutput());
 	    fixedGaussianFilterX->SetDirection(0);
 	    fixedGaussianFilterY->SetDirection(1);
@@ -232,7 +237,7 @@ int main(
 	    GaussianFilterType::Pointer movingGaussianFilterY = GaussianFilterType::New();
 	    movingGaussianFilterX->SetNumberOfThreads(number_threads);
 	    movingGaussianFilterY->SetNumberOfThreads(number_threads);
-	    movingGaussianFilterX->SetInput(movingReader->GetOutput());
+	    movingGaussianFilterX->SetInput(isis::adapter::itkAdapter::makeItkImageObject<MovingImageType>(inList.front()));
 	    movingGaussianFilterY->SetInput(movingGaussianFilterX->GetOutput());
 	    movingGaussianFilterX->SetDirection(0);
 	    movingGaussianFilterY->SetDirection(1);
@@ -456,7 +461,7 @@ int main(
 		transformMerger->push_back(tmpTransform);
 
 	}//end repetition
-	transformMerger->setTemplateImage(fixedReader->GetOutput());
+	transformMerger->setTemplateImage<FixedImageType>(fixedImage);
 
 	//safe the gained transform to a user specific filename
 	if (out_filename) {
