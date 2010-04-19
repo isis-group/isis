@@ -24,24 +24,32 @@
 #include <boost/scoped_ptr.hpp>
 #include "log.hpp"
 
-namespace isis{ namespace util{namespace _internal{
-	
+namespace isis
+{
+namespace util
+{
+namespace _internal
+{
+
 class TypePtrBase;
-class TypePtrConverterBase {
-	public:
-		virtual void convert(const TypePtrBase& src, TypePtrBase &dst)const{};
-		virtual void generate(const boost::scoped_ptr<TypePtrBase>& src, boost::scoped_ptr<TypePtrBase>& dst)const=0;
-		static boost::shared_ptr<const TypePtrConverterBase> create(){return boost::shared_ptr<const TypePtrConverterBase>();}
-	public:
-		virtual ~TypePtrConverterBase(){}
+class TypePtrConverterBase
+{
+public:
+	virtual void convert( const TypePtrBase& src, TypePtrBase &dst )const {};
+	virtual void generate( const boost::scoped_ptr<TypePtrBase>& src, boost::scoped_ptr<TypePtrBase>& dst )const = 0;
+	static boost::shared_ptr<const TypePtrConverterBase> create() {return boost::shared_ptr<const TypePtrConverterBase>();}
+public:
+	virtual ~TypePtrConverterBase() {}
 };
 
-class TypePtrConverterMap : public std::map< int ,std::map<int, boost::shared_ptr<const TypePtrConverterBase> > >
+class TypePtrConverterMap : public std::map< int , std::map<int, boost::shared_ptr<const TypePtrConverterBase> > >
 {
-	public:
-		TypePtrConverterMap();
+public:
+	TypePtrConverterMap();
 };
-	
-}}}
+
+}
+}
+}
 
 #endif // TYPEPTR_CONVERTER_H

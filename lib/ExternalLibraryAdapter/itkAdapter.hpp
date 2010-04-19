@@ -23,7 +23,7 @@
  * Description:
  *
  *  Created on: Mar,30 2010
- *      Author: tuerke	
+ *      Author: tuerke
  ******************************************************************/
 #ifndef ITKADAPTER_HPP_
 #define ITKADAPTER_HPP_
@@ -31,7 +31,7 @@
 #include "DataStorage/image.hpp"
 #include "CoreUtils/log.hpp"
 
-//external includes 
+//external includes
 #include <boost/shared_ptr.hpp>
 
 //itk includes
@@ -41,61 +41,59 @@
 #include <itkRescaleIntensityImageFilter.h>
 #include <itkNumericTraits.h>
 
-namespace isis{ namespace adapter {
+namespace isis
+{
+namespace adapter
+{
 
 /**
   * ITKAdapter is capable of taking an isis image object and return an itkImage object.
   */
 
-class itkAdapter {
+class itkAdapter
+{
 public:
 	template<typename TImage> static TImage*
-		makeItkImageObject(const boost::shared_ptr<data::Image> src, const bool behaveAsItkReader=true) {
+	makeItkImageObject( const boost::shared_ptr<data::Image> src, const bool behaveAsItkReader = true ) {
 		typedef TImage OutputImageType;
-		itkAdapter* myAdapter = new itkAdapter(src);
-		switch(myAdapter->m_ImageISIS->chunksBegin()->typeID()){
-		    case util::TypePtr<int8_t>::staticID:
-			    return myAdapter->internCreate<int8_t,OutputImageType>(behaveAsItkReader);
-			    break;
-			    
-		    case util::TypePtr<u_int8_t>::staticID: 
-			    return myAdapter->internCreate<u_int8_t,OutputImageType>(behaveAsItkReader);
-			    break;
-		    
-		    case util::TypePtr<int16_t>::staticID: 
-			    return myAdapter->internCreate<int16_t,OutputImageType>(behaveAsItkReader);
-			    break;
-			    
-		    case util::TypePtr<u_int16_t>::staticID: 
-			    return myAdapter->internCreate<u_int16_t,OutputImageType>(behaveAsItkReader);
-			    break;
-		    
-		    case util::TypePtr<int32_t>::staticID: 
-			    return myAdapter->internCreate<int32_t,OutputImageType>(behaveAsItkReader);
-			    break;
-			    
-		    case util::TypePtr<u_int32_t>::staticID: 
-			    return myAdapter->internCreate<u_int32_t,OutputImageType>(behaveAsItkReader);
-			    break;
-			    
-		    case util::TypePtr<float>::staticID: 
-			    return myAdapter->internCreate<float,OutputImageType>(behaveAsItkReader);
-			    break;
-		    
-		    case util::TypePtr<double>::staticID: 
-			    return myAdapter->internCreate<double,OutputImageType>(behaveAsItkReader);
-			    break;
+		itkAdapter* myAdapter = new itkAdapter( src );
+
+		switch ( myAdapter->m_ImageISIS->chunksBegin()->typeID() ) {
+		case util::TypePtr<int8_t>::staticID:
+			return myAdapter->internCreate<int8_t, OutputImageType>( behaveAsItkReader );
+			break;
+		case util::TypePtr<u_int8_t>::staticID:
+			return myAdapter->internCreate<u_int8_t, OutputImageType>( behaveAsItkReader );
+			break;
+		case util::TypePtr<int16_t>::staticID:
+			return myAdapter->internCreate<int16_t, OutputImageType>( behaveAsItkReader );
+			break;
+		case util::TypePtr<u_int16_t>::staticID:
+			return myAdapter->internCreate<u_int16_t, OutputImageType>( behaveAsItkReader );
+			break;
+		case util::TypePtr<int32_t>::staticID:
+			return myAdapter->internCreate<int32_t, OutputImageType>( behaveAsItkReader );
+			break;
+		case util::TypePtr<u_int32_t>::staticID:
+			return myAdapter->internCreate<u_int32_t, OutputImageType>( behaveAsItkReader );
+			break;
+		case util::TypePtr<float>::staticID:
+			return myAdapter->internCreate<float, OutputImageType>( behaveAsItkReader );
+			break;
+		case util::TypePtr<double>::staticID:
+			return myAdapter->internCreate<double, OutputImageType>( behaveAsItkReader );
+			break;
 		}
 	}
 protected:
 	//should not be loaded directly
-	itkAdapter(const boost::shared_ptr<data::Image>);
-	itkAdapter(const itkAdapter&){};  
+	itkAdapter( const boost::shared_ptr<data::Image> );
+	itkAdapter( const itkAdapter& ) {};
 private:
-		
+
 	boost::shared_ptr<data::Image> m_ImageISIS;
-	
-	template<typename TInput, typename TOutput> TOutput* internCreate(const bool behaveAsItkReader){
+
+	template<typename TInput, typename TOutput> TOutput* internCreate( const bool behaveAsItkReader ) {
 		typedef itk::Image<TInput, TOutput::ImageDimension> InputImageType;
 		typedef TOutput OutputImageType;
 		typedef itk::ImportImageFilter<typename InputImageType::PixelType, OutputImageType::ImageDimension> MyImporterType;
@@ -109,56 +107,60 @@ private:
 		typename OutputImageType::DirectionType itkDirection;
 		typename OutputImageType::SizeType itkSize;
 		typename OutputImageType::RegionType itkRegion;
-		const util::fvector4 dimensions(this->m_ImageISIS->sizeToVector());
-		const util::fvector4 indexOrigin(this->m_ImageISIS->getProperty<util::fvector4>("indexOrigin"));
-		const util::fvector4 spacing(this->m_ImageISIS->getProperty<util::fvector4>("voxelSize"));
-		const util::fvector4 readVec = this->m_ImageISIS->getProperty<util::fvector4>("readVec");
-		const util::fvector4 phaseVec = this->m_ImageISIS->getProperty<util::fvector4>("phaseVec");
-		const util::fvector4 sliceVec = this->m_ImageISIS->getProperty<util::fvector4>("sliceVec");
-		for (unsigned short i = 0; i<3; i++) {
-		    itkOrigin[i] = indexOrigin[i];
-		    itkSize[i] = dimensions[i];
-		    itkSpacing[i] = spacing[i];
-		    itkDirection[i][0] = readVec[i]; 
-		    itkDirection[i][1] = phaseVec[i];
-		    itkDirection[i][2] = sliceVec[i];
+		const util::fvector4 dimensions( this->m_ImageISIS->sizeToVector() );
+		const util::fvector4 indexOrigin( this->m_ImageISIS->getProperty<util::fvector4>( "indexOrigin" ) );
+		const util::fvector4 spacing( this->m_ImageISIS->getProperty<util::fvector4>( "voxelSize" ) );
+		const util::fvector4 readVec = this->m_ImageISIS->getProperty<util::fvector4>( "readVec" );
+		const util::fvector4 phaseVec = this->m_ImageISIS->getProperty<util::fvector4>( "phaseVec" );
+		const util::fvector4 sliceVec = this->m_ImageISIS->getProperty<util::fvector4>( "sliceVec" );
+
+		for ( unsigned short i = 0; i < 3; i++ ) {
+			itkOrigin[i] = indexOrigin[i];
+			itkSize[i] = dimensions[i];
+			itkSpacing[i] = spacing[i];
+			itkDirection[i][0] = readVec[i];
+			itkDirection[i][1] = phaseVec[i];
+			itkDirection[i][2] = sliceVec[i];
 		}
+
 		//TODO why the hell negates the itkNiftio some seemingly arbitrary elements of the orientation?????
-		if(behaveAsItkReader) {
-		    itkOrigin[0] = -indexOrigin[0];
-		    itkOrigin[1] = -indexOrigin[1];
-		    itkOrigin[2] = indexOrigin[2];
-		    itkDirection[0][0] = -readVec[0];
-		    itkDirection[0][1] = -phaseVec[0];
-		    itkDirection[0][2] = -sliceVec[0];
-		    itkDirection[1][0] = -readVec[1];
-		    itkDirection[1][1] = -phaseVec[1];
-		    itkDirection[1][2] = -sliceVec[1];
+		if ( behaveAsItkReader ) {
+			itkOrigin[0] = -indexOrigin[0];
+			itkOrigin[1] = -indexOrigin[1];
+			itkOrigin[2] = indexOrigin[2];
+			itkDirection[0][0] = -readVec[0];
+			itkDirection[0][1] = -phaseVec[0];
+			itkDirection[0][2] = -sliceVec[0];
+			itkDirection[1][0] = -readVec[1];
+			itkDirection[1][1] = -phaseVec[1];
+			itkDirection[1][2] = -sliceVec[1];
 		}
-		if (OutputImageType::ImageDimension==4)
-		{
-		    itkSpacing[3] = spacing[3];
-		    itkSize[3] = dimensions[3];
-		    itkDirection[3][3] = 1; //ensures determinant is not 0
+
+		if ( OutputImageType::ImageDimension == 4 ) {
+			itkSpacing[3] = spacing[3];
+			itkSize[3] = dimensions[3];
+			itkDirection[3][3] = 1; //ensures determinant is not 0
 		}
-		itkRegion.SetSize(itkSize);
-		importer->SetRegion(itkRegion);
-		importer->SetSpacing(itkSpacing);
-		importer->SetOrigin(itkOrigin);
-		importer->SetDirection(itkDirection);
-		importer->SetImportPointer(&this->m_ImageISIS->voxel<typename InputImageType::PixelType>(0,0,0,0), itkSize[0], false);		
-		rescaler->SetInput(importer->GetOutput());
+
+		itkRegion.SetSize( itkSize );
+		importer->SetRegion( itkRegion );
+		importer->SetSpacing( itkSpacing );
+		importer->SetOrigin( itkOrigin );
+		importer->SetDirection( itkDirection );
+		importer->SetImportPointer( &this->m_ImageISIS->voxel<typename InputImageType::PixelType>( 0, 0, 0, 0 ), itkSize[0], false );
+		rescaler->SetInput( importer->GetOutput() );
 		typename InputImageType::PixelType minIn, maxIn;
 		typename OutputImageType::PixelType minOut, maxOut;
-		this->m_ImageISIS->getMinMax<typename InputImageType::PixelType>(minIn, maxIn);
-		rescaler->SetOutputMinimum(minIn);
-		rescaler->SetOutputMaximum(maxIn);
+		this->m_ImageISIS->getMinMax<typename InputImageType::PixelType>( minIn, maxIn );
+		rescaler->SetOutputMinimum( minIn );
+		rescaler->SetOutputMaximum( maxIn );
 		rescaler->Update();
 		return rescaler->GetOutput();
-	}	
+	}
 };
 
-}}// end namespace
+}
+}// end namespace
 
 
 #endif

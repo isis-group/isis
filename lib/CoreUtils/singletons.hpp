@@ -7,31 +7,36 @@
 #include <iostream>
 #include <typeinfo>
 
-namespace isis{ namespace util{
+namespace isis
+{
+namespace util
+{
 
 /**
  * Static class to handle singletons.
  * This class can be used to create singletons with a specified priority.
  * It keeps track of them and deletes them automatically based of their priority.
  */
-class Singletons{
-	class SingletonBase:public boost::noncopyable{
+class Singletons
+{
+	class SingletonBase: public boost::noncopyable
+	{
 	public:
 		virtual ~SingletonBase();
 	};
-	template<typename BASE> class Singleton:public SingletonBase,public BASE{};
-	
-	typedef std::multimap<int,SingletonBase*const> prioMap;
+	template<typename BASE> class Singleton: public SingletonBase, public BASE {};
+
+	typedef std::multimap<int, SingletonBase*const> prioMap;
 	prioMap map;
 	Singletons();
 	virtual ~Singletons();
-	template<typename T> Singleton<T> *const create(int priority){
-		Singleton<T> * const ret(new Singleton<T>);
-		map.insert(map.find(priority), std::make_pair(priority,ret));
+	template<typename T> Singleton<T> *const create( int priority ) {
+		Singleton<T> * const ret( new Singleton<T> );
+		map.insert( map.find( priority ), std::make_pair( priority, ret ) );
 		return ret;
 	}
-	template<typename T> static Singleton<T>& request(int priority){
-		static Singleton<T> *s=getMaster().create<T>(priority);
+	template<typename T> static Singleton<T>& request( int priority ) {
+		static Singleton<T> *s = getMaster().create<T>( priority );
 		//ok this might become a dead ref as well. But its no complex object, and therefore won't be "destructed".
 		return *s;
 	}
@@ -48,9 +53,10 @@ public:
 	 *
 	 * \return allways a reference to the same object of type T.
 	 */
-	template<typename T,int PRIO> static Singleton<T> &get(){
-		return request<T>(PRIO);
+	template<typename T, int PRIO> static Singleton<T> &get() {
+		return request<T>( PRIO );
 	}
 };
-}}
+}
+}
 #endif //SINGLETONS_HPP_INCLUDED

@@ -18,17 +18,21 @@
 
 #include "itkOtsuThresholdImageFilter.h"
 
-namespace isis { namespace extitk {
+namespace isis
+{
+namespace extitk
+{
 
 template<class TInputImage, class TOutputImage>
-class ITK_EXPORT GradientMagnitudeSegmentationFilter: public itk::ImageToImageFilter<
-		TInputImage, TOutputImage> {
+class ITK_EXPORT GradientMagnitudeSegmentationFilter: public itk::ImageToImageFilter <
+		TInputImage, TOutputImage >
+{
 public:
 
 	itkStaticConstMacro( InputImageDimension, unsigned int,
-			TInputImage::ImageDimension );
+						 TInputImage::ImageDimension );
 	itkStaticConstMacro( OutputImageDimension, unsigned int,
-			TOutputImage::ImageDimension );
+						 TOutputImage::ImageDimension );
 
 	//standard typedefs
 	typedef GradientMagnitudeSegmentationFilter Self;
@@ -70,17 +74,17 @@ public:
 	typedef typename InputImageType::ConstPointer InputImageConstPointer;
 	typedef typename OutputImageType::Pointer OutputImagePointer;
 
-	typedef typename itk::CurvatureAnisotropicDiffusionImageFilter<
-			InputImageType, OutputImageType> SmoothingFilterType;
+	typedef typename itk::CurvatureAnisotropicDiffusionImageFilter <
+	InputImageType, OutputImageType > SmoothingFilterType;
 
-	typedef typename itk::GradientMagnitudeRecursiveGaussianImageFilter<
-			OutputImageType, OutputImageType> GradientFilterType;
+	typedef typename itk::GradientMagnitudeRecursiveGaussianImageFilter <
+	OutputImageType, OutputImageType > GradientFilterType;
 
 	typedef typename itk::MinimumMaximumImageCalculator<InputImageType>
-			MinMaxFilterType;
+	MinMaxFilterType;
 
-	typedef typename itk::OtsuThresholdImageFilter<OutputImageType,
-			OutputImageType> OtsuThresholdFilterType;
+	typedef typename itk::OtsuThresholdImageFilter < OutputImageType,
+	OutputImageType > OtsuThresholdFilterType;
 
 	itkSetMacro( Sigma, float )
 	;
@@ -99,11 +103,11 @@ public:
 	}
 	void GenerateData();
 	virtual void GenerateInputRequestedRegion()
-			throw (itk::InvalidRequestedRegionError);
+	throw ( itk::InvalidRequestedRegionError );
 
 private:
 
-	void CalculateMinMax(void);
+	void CalculateMinMax( void );
 
 	typename OtsuThresholdFilterType::Pointer m_OtsuThresholdFilter;
 

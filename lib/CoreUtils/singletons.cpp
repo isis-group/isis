@@ -1,7 +1,10 @@
 #include "singletons.hpp"
 #include <boost/foreach.hpp>
 
-namespace isis{ namespace util{
+namespace isis
+{
+namespace util
+{
 
 Singletons& Singletons::getMaster()
 {
@@ -10,12 +13,12 @@ Singletons& Singletons::getMaster()
 }
 Singletons::~Singletons()
 {
-	while(not map.empty()){
+	while ( not map.empty() ) {
 		delete map.begin()->second;
-		map.erase(map.begin());
+		map.erase( map.begin() );
 	}
 }
-Singletons::Singletons(){}
-Singletons::SingletonBase::~SingletonBase(){}
+Singletons::Singletons() {}
+Singletons::SingletonBase::~SingletonBase() {}
 
 }}

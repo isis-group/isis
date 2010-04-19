@@ -1,0 +1,40 @@
+# artistic style configuration for AStyel version 1.23
+# 
+# ISIS project
+#
+# Date: 19.04.2010
+# Author: ISIS project team
+
+
+# indent using tab characters
+indent=force-tab
+
+#  Break brackets from class and function declarations, but attach brackets to  
+#  pre-block  command  statements.
+brackets=linux
+
+# Indent  multi-line preprocessor definitions ending with a backslash.
+indent-preprocessor
+
+# Indent a minimal # spaces in a continuous conditional belonging to a conditional 
+# header.
+min-conditional-indent=0
+
+# nsert empty lines around header blocks (e.g. ’if’, ’while’...).
+break-blocks
+
+# Insert space paddings around operators.
+pad-oper
+
+# Insert space padding around parenthesis on the inside only.
+pad-paren-in
+
+# Delete empty lines within a function or method.
+delete-empty-lines
+
+# Don't break blocks residing completely on one line.
+--keep-one-line-blocks
+
+# Convert non-indenting tabs to the appropriate number of spaces.
+--convert-tabs
+ 

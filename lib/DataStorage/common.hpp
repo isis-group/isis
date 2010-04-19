@@ -16,22 +16,25 @@
 #include "CoreUtils/log_modules.hpp"
 #include "CoreUtils/log.hpp"
 
-namespace isis{ 
+namespace isis
+{
 
 /*! \addtogroup data
  *  Additional documentation for group `mygrp'
  *  @{
  */
 
-namespace data{
-	typedef DataLog Runtime;
-	typedef DataDebug Debug;
-	enum dimensions{readDim=0,phaseDim,sliceDim,timeDim};
+namespace data
+{
+typedef DataLog Runtime;
+typedef DataDebug Debug;
+enum dimensions {readDim = 0, phaseDim, sliceDim, timeDim};
 
-	template<typename HANDLE> void enable_log(LogLevel level){
-		ENABLE_LOG(Runtime,HANDLE,level);
-		ENABLE_LOG(Debug,HANDLE,level);
-	}
+template<typename HANDLE> void enable_log( LogLevel level )
+{
+	ENABLE_LOG( Runtime, HANDLE, level );
+	ENABLE_LOG( Debug, HANDLE, level );
+}
 }
 /** @} */
 }

@@ -10,55 +10,60 @@
 #include "selection.hpp"
 #include <boost/foreach.hpp>
 
-namespace isis { namespace util {
-	
-Selection::Selection(const char *entries):m_set(0)
+namespace isis
 {
-int id=1;
-BOOST_FOREACH(const std::string &ref,string2list<std::string>(std::string(entries),','))
-	ent_map[ref]=id++;
-}
-Selection::Selection():m_set(0){}
+namespace util
+{
 
-Selection::operator const int()const{return m_set;}
+Selection::Selection( const char *entries ): m_set( 0 )
+{
+	int id = 1;
+	BOOST_FOREACH( const std::string &ref, string2list<std::string>( std::string( entries ), ',' ) )
+	ent_map[ref] = id++;
+}
+Selection::Selection(): m_set( 0 ) {}
+
+Selection::operator const int()const {return m_set;}
 Selection::operator const std::string()const
 {
-	BOOST_FOREACH(map_type::const_reference ref,ent_map){
-		if(ref.second==m_set)
+	BOOST_FOREACH( map_type::const_reference ref, ent_map ) {
+		if ( ref.second == m_set )
 			return ref.first;
 	}
-	return std::string("<<NOT_SET>>");
+	return std::string( "<<NOT_SET>>" );
 }
-	
-bool Selection::set(const char* entry)
+
+bool Selection::set( const char* entry )
 {
-	map_type::const_iterator found=ent_map.find(entry);
-	if(found!=ent_map.end()){
-		m_set=found->second;
+	map_type::const_iterator found = ent_map.find( entry );
+
+	if ( found != ent_map.end() ) {
+		m_set = found->second;
 	} else {
-		LOG(Runtime,error) << "Failed to set " << MSubject(entry) << ", valid values are " << getEntries();
+		LOG( Runtime, error ) << "Failed to set " << MSubject( entry ) << ", valid values are " << getEntries();
 	}
 }
-	
-bool Selection::operator==(const Selection &ref)const
+
+bool Selection::operator==( const Selection &ref )const
 {
-	return m_set==ref.m_set and ent_map == ref.ent_map;
+	return m_set == ref.m_set and ent_map == ref.ent_map;
 }
-bool Selection::operator==(const char ref[]) const
+bool Selection::operator==( const char ref[] ) const
 {
-	return strcasecmp (((std::string)*this).c_str(), ref)  ==0;
+	return strcasecmp ( ( ( std::string )*this ).c_str(), ref )  == 0;
 }
-bool Selection::operator==(const int ref) const
+bool Selection::operator==( const int ref ) const
 {
-	return ((int)*this)==ref;
+	return ( ( int )*this ) == ref;
 }
 
 
 std::list<std::string> Selection::getEntries()const
 {
 	std::list<std::string> ret;
-	BOOST_FOREACH(map_type::const_reference ref,ent_map)
-		ret.push_back(ref.first);
+	BOOST_FOREACH( map_type::const_reference ref, ent_map )
+	ret.push_back( ref.first );
 	return ret;
 }
-}}
+}
+}

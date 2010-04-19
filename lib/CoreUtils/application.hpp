@@ -23,24 +23,29 @@
 #include "progparameter.hpp"
 
 
-namespace isis{namespace util{
+namespace isis
+{
+namespace util
+{
 
 class Application
 {
 	std::string m_name;
 	static const LogLevel LLMap[];
 protected:
-	virtual boost::shared_ptr<_internal::MessageHandlerBase> getLogHandler(std::string module, isis::LogLevel level)const;	
+	virtual boost::shared_ptr<_internal::MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;
 public:
 	ParameterMap parameters;
-	Application(const char name[]);
-	virtual bool init(int argc, char** argv, bool exitOnError = true);
+	Application( const char name[] );
+	virtual bool init( int argc, char** argv, bool exitOnError = true );
 	virtual void printHelp()const;
-	template<typename MODULE> void setLog(LogLevel level){
-		if(!MODULE::use);else _internal::Log<MODULE>::setHandler(getLogHandler(MODULE::name(),level));
+	template<typename MODULE> void setLog( LogLevel level ) {
+		if ( !MODULE::use );
+		else _internal::Log<MODULE>::setHandler( getLogHandler( MODULE::name(), level ) );
 	}
 };
 
 
-}}
+}
+}
 #endif // APPLICATION_HPP

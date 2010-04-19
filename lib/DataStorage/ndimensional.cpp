@@ -12,7 +12,12 @@
 
 #include "ndimensional.hpp"
 
-namespace isis{ namespace data{ namespace _internal{
+namespace isis
+{
+namespace data
+{
+namespace _internal
+{
 
 
 }}}
