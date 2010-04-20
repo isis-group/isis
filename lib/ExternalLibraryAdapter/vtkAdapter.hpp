@@ -23,7 +23,7 @@
  * Description:
  *
  *  Created on: Mar,24 2010
- *      Author: tuerke	
+ *      Author: tuerke
  ******************************************************************/
 
 #ifndef VTKADAPTER_HPP_
@@ -32,7 +32,7 @@
 #include "DataStorage/image.hpp"
 #include "CoreUtils/log.hpp"
 
-//external includes 
+//external includes
 #include <boost/shared_ptr.hpp>
 
 //vtk includes
@@ -43,28 +43,33 @@
 
 //TODO chunk handling
 
-namespace isis { namespace adapter {
-    
+namespace isis
+{
+namespace adapter
+{
+
 /**
   * VTKAdapter is able of taking an isis image object and return a vector of vtkSmartpointers on vtkImageData objects.
   */
-class vtkAdapter {
+class vtkAdapter
+{
 public:
 	/**
 	* Gets a std::vector of vtkSmartpointers on vtkImageData objects.
 	*/
-	static vtkImageData* makeVtkImageObject(const boost::shared_ptr<data::Image>, unsigned int dim4=0);
-private:   
+	static vtkImageData* makeVtkImageObject( const boost::shared_ptr<data::Image>, unsigned int dim4 = 0 );
+private:
 	boost::shared_ptr<data::Image> m_ImageISIS;
 protected:
 	//should not be loaded directly
-	vtkAdapter(const boost::shared_ptr<data::Image>);
-	vtkAdapter(const vtkAdapter&){};  
+	vtkAdapter( const boost::shared_ptr<data::Image> );
+	vtkAdapter( const vtkAdapter& ) {};
 
-		
+
 };
-  
 
-    
-}}// end namespace 
+
+
+}
+}// end namespace
 #endif //VTKADAPTER_HPP_

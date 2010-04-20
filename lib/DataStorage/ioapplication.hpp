@@ -23,17 +23,21 @@
 #include "CoreUtils/application.hpp"
 #include "DataStorage/image.hpp"
 
-namespace isis{ namespace data {
-
-class IOApplication:public util::Application
+namespace isis
 {
-	bool m_input,m_output;
+namespace data
+{
+
+class IOApplication: public util::Application
+{
+	bool m_input, m_output;
 public:
 	data::ImageList images;
-	IOApplication(const char name[],bool have_input=true,bool have_output=true);
-	virtual bool init(int argc, char** argv, bool exitOnError = true);
+	IOApplication( const char name[], bool have_input = true, bool have_output = true );
+	virtual bool init( int argc, char** argv, bool exitOnError = true );
 };
-	
-}}
+
+}
+}
 
 #endif // DATA_IOAPPLICATION_HPP

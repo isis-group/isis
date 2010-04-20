@@ -20,25 +20,28 @@
 #include <vector>
 #include <boost/foreach.hpp>
 
-namespace isis{ namespace data
+namespace isis
+{
+namespace data
 {
 /// @cond _hidden
-namespace _internal{
-struct image_chunk_order: chunk_comparison{
+namespace _internal
+{
+struct image_chunk_order: chunk_comparison {
 	bool operator() ( const Chunk& a, const Chunk& b )const;
 };
 }
 /// @endcond
 
 class Image:
-	public _internal::NDimensional<4>,
-	public util::PropMap
+		public _internal::NDimensional<4>,
+		public util::PropMap
 {
 public:
-	typedef std::set<Chunk,_internal::image_chunk_order> ChunkSet;
+	typedef std::set<Chunk, _internal::image_chunk_order> ChunkSet;
 	typedef ChunkSet::iterator ChunkIterator;
 	typedef ChunkSet::const_iterator ConstChunkIterator;
-	
+
 private:
 	ChunkSet set;
 	std::vector<ChunkIterator> lookup;
@@ -46,7 +49,7 @@ private:
 	size_t chunkVolume;
 
 
-	/** 
+	/**
 	 * Computes chunk- and voxel- indices.
 	 * The returned chunk-index applies to the lookup-table (getChunkAt), and the voxel-index to this chunk.
 	 * Behaviour will be undefined if:
@@ -57,58 +60,53 @@ private:
 	 * Additionally an error will be sent if Debug is enabled.
 	 * \returns a std::pair\<chunk-index,voxel-index\>
 	 */
-	inline std::pair<size_t,size_t> commonGet (size_t first,size_t second,size_t third,size_t fourth) const
-	{
-		const size_t idx[]={first,second,third,fourth};
-		LOG_IF(not clean,Debug,error)
-			<< "Getting data from a non indexed image will result in undefined behavior. Run reIndex first.";
-			
-		LOG_IF(set.empty(),Debug,error)
-			<< "Getting data from a empty image will result in undefined behavior.";
-			
-		LOG_IF(!rangeCheck(idx),Debug,isis::error)
-			<< "Index " << util::list2string(idx,idx+4,"|") << " is out of range (" << sizeToString() << ")";
-		
-		const size_t index=dim2Index(idx);
-
-		return std::make_pair(index/chunkVolume,index%chunkVolume);
+	inline std::pair<size_t, size_t> commonGet ( size_t first, size_t second, size_t third, size_t fourth ) const {
+		const size_t idx[] = {first, second, third, fourth};
+		LOG_IF( not clean, Debug, error )
+		<< "Getting data from a non indexed image will result in undefined behavior. Run reIndex first.";
+		LOG_IF( set.empty(), Debug, error )
+		<< "Getting data from a empty image will result in undefined behavior.";
+		LOG_IF( !rangeCheck( idx ), Debug, isis::error )
+		<< "Index " << util::list2string( idx, idx + 4, "|" ) << " is out of range (" << sizeToString() << ")";
+		const size_t index = dim2Index( idx );
+		return std::make_pair( index / chunkVolume, index % chunkVolume );
 	}
-	
-	
+
+
 protected:
 	static const char* needed;
 
 	/**
 	 * Search for a dimensional break in all stored chunks.
-	 * This function searches for two chunks whose (geometrical) distance is more than twice 
-	 * the distance between the first and the second chunk. It wll assume a dimensional break 
-	 * at this position. 
-	 * 
-	 * Normally chunks are beneath each other (like characters in a text) so their distance is 
-	 * more or less constant. But if there is a dimensional break (analogous to the linebreak 
-	 * in a text) the distance between this particular chunks/characters is bigger than twice 
+	 * This function searches for two chunks whose (geometrical) distance is more than twice
+	 * the distance between the first and the second chunk. It wll assume a dimensional break
+	 * at this position.
+	 *
+	 * Normally chunks are beneath each other (like characters in a text) so their distance is
+	 * more or less constant. But if there is a dimensional break (analogous to the linebreak
+	 * in a text) the distance between this particular chunks/characters is bigger than twice
 	 * the normal distance
-	 * 
-	 * For example for an image of 2D-chunks (slices) getChunkStride(1) will 
-	 * get the number of slices (size of third dim) and  getChunkStride(slices) 
+	 *
+	 * For example for an image of 2D-chunks (slices) getChunkStride(1) will
+	 * get the number of slices (size of third dim) and  getChunkStride(slices)
 	 * will get the number of timesteps
-	 * \param base_stride the base_stride for the iteration between chunks (1 for the first 
+	 * \param base_stride the base_stride for the iteration between chunks (1 for the first
 	 * dimension, one "line" for the second and soon...)
 	 * \returns the length of this chunk-"line" / the stride
 	 */
-	size_t getChunkStride(size_t base_stride=1);
-	
+	size_t getChunkStride( size_t base_stride = 1 );
+
 	///Access a chunk via index (and the lookup table)
-	Chunk& getChunkAt(size_t at);
+	Chunk& getChunkAt( size_t at );
 	///Access a chunk via index (and the lookup table)
-	const Chunk& getChunkAt(size_t at)const;
+	const Chunk& getChunkAt( size_t at )const;
 
 public:
 	/**
 	 * Creates an empty Image object.
-	 * \param lt copmarison functor used to sort the chunks 
+	 * \param lt copmarison functor used to sort the chunks
 	 */
-	Image(_internal::image_chunk_order lt=_internal::image_chunk_order());
+	Image( _internal::image_chunk_order lt = _internal::image_chunk_order() );
 	/**
 	 * This method returns a reference to the voxel value at the given coordinates.
 	 *
@@ -125,16 +123,17 @@ public:
 	 * \returns A reference to the addressed voxel value. Reading and writing access
 	 * is provided.
 	 */
-	template <typename T> T& voxel(size_t first,size_t second=0,size_t third=0,size_t fourth=0)
-	{
-		if(not clean){
-			LOG(Debug,info) << "Image is not clean. Running reIndex ...";
+	template <typename T> T& voxel( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 ) {
+		if ( not clean ) {
+			LOG( Debug, info ) << "Image is not clean. Running reIndex ...";
 			reIndex();
 		}
-		
-		const std::pair<size_t,size_t> index=commonGet(first,second,third,fourth);
-		util::TypePtr<T> &data=getChunkAt(index.first).asTypePtr<T>();
-		return data[index.second];		
+
+		const std::pair<size_t, size_t> index = commonGet( first, second, third, fourth );
+
+		util::TypePtr<T> &data = getChunkAt( index.first ).asTypePtr<T>();
+
+		return data[index.second];
 	}
 
 	/**
@@ -150,26 +149,25 @@ public:
 	 *
 	 * \returns A reference to the addressed voxel value. Only reading access is provided
 	 */
-	template <typename T> T voxel(size_t first,size_t second=0,size_t third=0,size_t fourth=0)const
-	{
-		const std::pair<size_t,size_t> index=commonGet(first,second,third,fourth);
-		const util::TypePtr<T> &data=(lookup[index.first])->getTypePtr<T>();
+	template <typename T> T voxel( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const {
+		const std::pair<size_t, size_t> index = commonGet( first, second, third, fourth );
+		const util::TypePtr<T> &data = ( lookup[index.first] )->getTypePtr<T>();
 		return data[index.second];
 	}
 
 	/**
 	 * Get the chunk that contains the voxel at the given coordinates.
-	 * 
+	 *
 	 * If the image is not clean, behaviour is undefined. (See Image::commonGet).
 	 *
 	 * \param first The first coordinate in voxel space. Usually the x value / the read-encoded position.
 	 * \param second The second coordinate in voxel space. Usually the y value / the phase-encoded position.
 	 * \param third The third coordinate in voxel space. Ususally the z value / the slice-encoded position.
 	 * \param fourth The fourth coordinate in voxel space. Usually the time value.
-	 * \returns a copy of the chunk that contains the voxel at the given coordinates. 
+	 * \returns a copy of the chunk that contains the voxel at the given coordinates.
 	 * (Reminder: Chunk-copies are cheap, so the data are NOT copied)
 	 */
-	const Chunk& getChunk(size_t first,size_t second=0,size_t third=0,size_t fourth=0)const;
+	const Chunk& getChunk( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const;
 	/**
 	 * Get the chunk that contains the voxel at the given coordinates.
 	 * If the image is not clean Image::reIndex() will be run.
@@ -180,8 +178,8 @@ public:
 	 * \param fourth The fourth coordinate in voxel space. Usually the time value.
 	 * \returns a reference of the chunk that contains the voxel at the given coordinates.
 	 */
-	Chunk& getChunk(size_t first,size_t second=0,size_t third=0,size_t fourth=0);
-					   
+	Chunk& getChunk( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 );
+
 	/**
 	 * Insert a Chunk into the Image.
 	 * The insertion is sorted and unique. So the Chunk will be inserted behind a geometrically "lower" Chunk if there is one.
@@ -190,11 +188,11 @@ public:
 	 * \param chunk The Chunk to be inserted
 	 * \returns true if the Chunk was inserted, false otherwise.
 	 */
-	bool insertChunk(const Chunk &chunk);
+	bool insertChunk( const Chunk &chunk );
 	/**
 	 * (Re)computes the image layout and metadata.
 	 * The image will be "clean" on success.
-	 * \returns true if the image was successfully reindexed, false otherwise. 
+	 * \returns true if the image was successfully reindexed, false otherwise.
 	 */
 	bool reIndex();
 
@@ -203,8 +201,8 @@ public:
 	 * \param key the name of the property to search for
 	 * \param unique when true empty or consecutive duplicates wont be added
 	 */
-	std::list<util::PropertyValue> getChunksProperties(const std::string &key,bool unique=false)const;
-	
+	std::list<util::PropertyValue> getChunksProperties( const std::string &key, bool unique = false )const;
+
 	/// get the size of every voxel (in bytes)
 	size_t bytes_per_voxel()const;
 
@@ -214,18 +212,19 @@ public:
 	ConstChunkIterator chunksBegin()const;
 	ConstChunkIterator chunksEnd()const;
 
-	template <typename T> T getMinMax(T &min, T &max)const
-	{
-		min=std::numeric_limits<T>::max();
-		max=std::numeric_limits<T>::min();
-		BOOST_FOREACH(const Chunk &ch,set){
-			T cMin,cMax;
-			ch.getMinMax(min,max);
-			if(min>cMin)min=cMin;
-			if(max<cMax)max=cMax;
+	template <typename T> T getMinMax( T &min, T &max )const {
+		min = std::numeric_limits<T>::max();
+		max = std::numeric_limits<T>::min();
+		BOOST_FOREACH( const Chunk &ch, set ) {
+			T cMin, cMax;
+			ch.getMinMax( min, max );
+
+			if ( min > cMin )min = cMin;
+
+			if ( max < cMax )max = cMax;
 		}
 	}
-	size_t cmp(const Image &comp)const;
+	size_t cmp( const Image &comp )const;
 };
 
 class ImageList : public std::list< boost::shared_ptr<Image> >
@@ -235,8 +234,9 @@ public:
 	/**
 	 * Create a number of images out of a Chunk list.
 	 */
-	ImageList(ChunkList src);
+	ImageList( ChunkList src );
 };
-}}
+}
+}
 
 #endif // IMAGE_H

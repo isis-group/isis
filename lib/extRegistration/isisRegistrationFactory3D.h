@@ -66,8 +66,10 @@
 
 #include "itkPointSet.h"
 
-namespace isis {
-namespace registration {
+namespace isis
+{
+namespace registration
+{
 
 template<class TFixedImageType, class TMovingImageType>
 class RegistrationFactory3D : public itk::LightObject
@@ -149,7 +151,7 @@ public:
 
 	typedef itk::CenteredAffineTransform<double, FixedImageDimension> CenteredAffineTransformType;
 	typedef itk::ScaleSkewVersor3DTransform<double> ScaleSkewVersor3DTransformType;
-	
+
 	typedef itk::Transform<double, 3, 3> BulkTransformType;
 
 	typedef typename itk::BSplineDeformableTransform<CoordinateRepType, FixedImageDimension, 3> BSplineTransformType;
@@ -163,19 +165,19 @@ public:
 
 	//metric typedefs
 	typedef itk::MattesMutualInformationImageToImageMetric<TFixedImageType, TMovingImageType>
-	        MattesMutualInformationMetricType;
+	MattesMutualInformationMetricType;
 
 	typedef typename itk::NormalizedCorrelationImageToImageMetric<TFixedImageType, TMovingImageType>
-	        NormalizedCorrelationMetricType;
+	NormalizedCorrelationMetricType;
 
 	typedef typename itk::MutualInformationImageToImageMetric<TFixedImageType, TMovingImageType>
-	        ViolaWellsMutualInformationMetricType;
+	ViolaWellsMutualInformationMetricType;
 
 	typedef typename itk::MeanSquaresImageToImageMetric<TFixedImageType, TMovingImageType>
-	        MeanSquareImageToImageMetricType;
+	MeanSquareImageToImageMetricType;
 
 	typedef typename itk::MutualInformationHistogramImageToImageMetric<TFixedImageType, TMovingImageType>
-	        MutualInformationHistogramMetricType;
+	MutualInformationHistogramMetricType;
 	//additional typedefs
 	typedef typename itk::NormalizeImageFilter<TFixedImageType, TFixedImageType> FixedNormalizeImageFilterType;
 
@@ -184,47 +186,42 @@ public:
 	typedef typename itk::DiscreteGaussianImageFilter<TFixedImageType, TFixedImageType> DiscreteGaussianImageFitlerType;
 
 	typedef typename itk::CenteredTransformInitializer<VersorRigid3DTransformType, TFixedImageType, TMovingImageType>
-	        RigidCenteredTransformInitializerType;
+	RigidCenteredTransformInitializerType;
 
 	typedef typename itk::CenteredTransformInitializer<AffineTransformType, TFixedImageType, TMovingImageType>
-	        AffineCenteredTransformInitializerType;
-	
-	typedef typename itk::LandmarkBasedTransformInitializer<VersorRigid3DTransformType, TFixedImageType,
-	        TMovingImageType> RigidLandmarkBasedTransformInitializerType;
+	AffineCenteredTransformInitializerType;
 
-	enum eTransformType
-	{
-		    TranslationTransform,
-		    VersorRigid3DTransform,
-		    AffineTransform,
-		    CenteredAffineTransform,
-		    BSplineDeformableTransform,
-		    ScaleTransform
+	typedef typename itk::LandmarkBasedTransformInitializer < VersorRigid3DTransformType, TFixedImageType,
+	TMovingImageType > RigidLandmarkBasedTransformInitializerType;
+
+	enum eTransformType {
+		TranslationTransform,
+		VersorRigid3DTransform,
+		AffineTransform,
+		CenteredAffineTransform,
+		BSplineDeformableTransform,
+		ScaleTransform
 
 	};
 
-	enum eMetricType
-	{
-		    MattesMutualInformationMetric,
-		    ViolaWellsMutualInformationMetric,
-		    NormalizedCorrelationMetric,
-		    MeanSquareMetric,
-		    MutualInformationHistogramMetric
+	enum eMetricType {
+		MattesMutualInformationMetric,
+		ViolaWellsMutualInformationMetric,
+		NormalizedCorrelationMetric,
+		MeanSquareMetric,
+		MutualInformationHistogramMetric
 	};
 
-	enum eOptimizerType
-	{
+	enum eOptimizerType {
 		RegularStepGradientDescentOptimizer, VersorRigidOptimizer, LBFGSBOptimizer, AmoebaOptimizer, PowellOptimizer
 
 	};
 
-	enum eInterpolationType
-	{
+	enum eInterpolationType {
 		LinearInterpolator, BSplineInterpolator, NearestNeighborInterpolator
 	};
 
-	struct
-	{
+	struct {
 		unsigned int NumberOfIterations;
 		unsigned int NumberOfBins;
 		unsigned int BSplineGridSize;
@@ -243,60 +240,60 @@ public:
 	} UserOptions;
 
 	void Reset(
-	    void);
+		void );
 	void UpdateParameters(
-	    void);
+		void );
 	void StartRegistration(
-	    void);
+		void );
 
 	//setter methods
 	void SetTransform(
-	    eTransformType);
+		eTransformType );
 	void SetMetric(
-	    eMetricType);
+		eMetricType );
 	void SetOptimizer(
-	    eOptimizerType);
+		eOptimizerType );
 	void SetInterpolator(
-	    eInterpolationType);
+		eInterpolationType );
 
 	void SetFixedImage(
-	    FixedImagePointer);
+		FixedImagePointer );
 	void SetMovingImage(
-	    MovingImagePointer);
+		MovingImagePointer );
 
 	//parameter-set methods
 	void SetUpOptimizer(
-	    void);
+		void );
 	void SetUpTransform(
-	    void);
+		void );
 	void SetUpMetric(
-	    void);
+		void );
 
 	void SetInitialTransform(
-	    TransformBasePointer);
+		TransformBasePointer );
 
 	void SetMovingPointContainer(
-	    typename RigidLandmarkBasedTransformInitializerType::LandmarkPointContainer);
+		typename RigidLandmarkBasedTransformInitializerType::LandmarkPointContainer );
 	void SetFixedPointContainer(
-	    typename RigidLandmarkBasedTransformInitializerType::LandmarkPointContainer);
+		typename RigidLandmarkBasedTransformInitializerType::LandmarkPointContainer );
 
 	//getter methods
 	RegistrationMethodPointer GetRegistrationObject(
-	    void);
+		void );
 	OutputImagePointer GetRegisteredImage(
-	    void);
+		void );
 	ConstTransformBasePointer GetTransform(
-	    void);
+		void );
 
 	DeformationFieldPointer GetTransformVectorField(
-	    void);
+		void );
 
 	void PrintResults(
-	    void);
+		void );
 	void CheckImageSizes(
-	    void);
+		void );
 	void SetFixedImageMask(
-	    typename MaskObjectType::Pointer);
+		typename MaskObjectType::Pointer );
 
 	RegistrationFactory3D();
 	virtual ~RegistrationFactory3D() {
@@ -304,8 +301,7 @@ public:
 
 private:
 
-	struct
-	{
+	struct {
 		bool TRANSLATION;
 		bool VERSORRIGID;
 		bool AFFINE;
@@ -314,8 +310,7 @@ private:
 		bool SCALE;
 	} transform;
 
-	struct Optimizer
-	{
+	struct Optimizer {
 		bool REGULARSTEPGRADIENTDESCENT;
 		bool VERSORRIGID3D;
 		bool LBFGSBOPTIMIZER;
@@ -324,8 +319,7 @@ private:
 
 	} optimizer;
 
-	struct Metric
-	{
+	struct Metric {
 		bool MATTESMUTUALINFORMATION;
 		bool NORMALIZEDCORRELATION;
 		bool VIOLAWELLSMUTUALINFORMATION;
@@ -333,15 +327,14 @@ private:
 		bool MUTUALINFORMATIONHISTOGRAM;
 	} metric;
 
-	struct Interpolator
-	{
+	struct Interpolator {
 		bool LINEAR;
 		bool BSPLINE;
 		bool NEARESTNEIGHBOR;
 	} interpolator;
 
 	void SetFixedImageMask(
-	    void);
+		void );
 
 	DeformationFieldPointer m_DeformationField;
 	FixedImagePointer m_FixedImage;

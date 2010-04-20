@@ -12,7 +12,10 @@
 #include "itkExtractImageFilter.h"
 #include "itkSmartPointer.h"
 
-namespace isis { namespace extitk {
+namespace isis
+{
+namespace extitk
+{
 /** \class TimeStepExtractionFilter
  * \brief Filtertype for extracting a n-1 dimensional image
  *
@@ -20,13 +23,14 @@ namespace isis { namespace extitk {
  */
 
 template<class TInputImage, class TOutputImage>
-class ITK_EXPORT TimeStepExtractionFilter: public itk::ImageToImageFilter<
-		TInputImage, TOutputImage> {
+class ITK_EXPORT TimeStepExtractionFilter: public itk::ImageToImageFilter <
+		TInputImage, TOutputImage >
+{
 public:
 	itkStaticConstMacro( InputImageDimension, unsigned int,
-			TInputImage::ImageDimension );
+						 TInputImage::ImageDimension );
 	itkStaticConstMacro( OutputImageDimension, unsigned int,
-			TOutputImage::ImageDimension );
+						 TOutputImage::ImageDimension );
 
 	typedef TInputImage InputImageType;
 	typedef TOutputImage OutputImageType;
@@ -61,7 +65,7 @@ public:
 	;
 	itkSetMacro( RequestedTimeRangeEnd, unsigned int )
 	;
-	void Update(void);
+	void Update( void );
 	typename OutputImageType::Pointer GetOutput() const;
 protected:
 	TimeStepExtractionFilter();
@@ -69,14 +73,14 @@ protected:
 	}
 
 	typedef itk::ExtractImageFilter<InputImageType, OutputImageType>
-			ExtractFilterType;
+	ExtractFilterType;
 
 	typename ExtractFilterType::Pointer m_ExtractFilter;
 
 
 
 private:
-	TimeStepExtractionFilter(const Self&);
+	TimeStepExtractionFilter( const Self& );
 
 	typename InputImageType::Pointer m_InputImage;
 	typename OutputImageType::Pointer m_OutputImage;

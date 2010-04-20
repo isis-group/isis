@@ -15,34 +15,30 @@
 #include <iostream>
 #include <string>
 
-namespace isis{namespace test{
+namespace isis
+{
+namespace test
+{
 
-using namespace isis;
-    
-BOOST_AUTO_TEST_SUITE (imageIONii_NullTests)
+BOOST_AUTO_TEST_SUITE ( imageIONii_NullTests )
 
-BOOST_AUTO_TEST_CASE(loadsaveImage)
+BOOST_AUTO_TEST_CASE( loadsaveImage )
 {
 	data::ImageList images;
-	data::enable_log<util::DefaultMsgPrint>(warning);
-	util::DefaultMsgPrint::stopBelow(error);
-
+	data::enable_log<util::DefaultMsgPrint>( error );
 //  The factory assumes that there is valid file before
 //  calling the appropriate plugin.
-//	We will use the Null plugin to get some image data
-	std::string tmpfile = ((std::string)tmpnam(NULL)) + ".null";
-	std::string niifile = ((std::string)tmpnam(NULL)) + ".nii";
-	std::ofstream file(tmpfile.c_str());
-
-	// 	load images from file
-	images = data::IOFactory::load(
-			"/scr/mrincoming7t/2009/KC8T090609.SEPT/nifti/S2_MPRAGE_p2_fs.nii","");
-
-//	write images to file(s)
-	data::IOFactory::write(images ,niifile,"");
-
+//  We will use the Null plugin to get some image data
+	std::string tmpfile = ( ( std::string )tmpnam( NULL ) ) + ".null";
+	std::string niifile = ( ( std::string )tmpnam( NULL ) ) + ".nii";
+	std::ofstream file( tmpfile.c_str() );
+	//  load images from file
+	images = data::IOFactory::load( tmpfile, "" );
+//  write images to file(s)
+	data::IOFactory::write( images, niifile, "" );
 }
 
 BOOST_AUTO_TEST_SUITE_END()
 
-}}
+}
+}

@@ -24,23 +24,31 @@
 #include <boost/scoped_ptr.hpp>
 #include "log.hpp"
 
-namespace isis{ namespace util{namespace _internal{
-	
+namespace isis
+{
+namespace util
+{
+namespace _internal
+{
+
 class TypeBase;
-class TypeConverterBase {
+class TypeConverterBase
+{
 public:
-	virtual void convert(const TypeBase& src, TypeBase &dst)const=0;
-	virtual void generate(const boost::scoped_ptr<TypeBase>& src, boost::scoped_ptr<TypeBase>& dst)const=0;
-	static boost::shared_ptr<const TypeConverterBase> create(){return boost::shared_ptr<const TypeConverterBase>();}
+	virtual void convert( const TypeBase& src, TypeBase &dst )const = 0;
+	virtual void generate( const boost::scoped_ptr<TypeBase>& src, boost::scoped_ptr<TypeBase>& dst )const = 0;
+	static boost::shared_ptr<const TypeConverterBase> create() {return boost::shared_ptr<const TypeConverterBase>();}
 public:
-	virtual ~TypeConverterBase(){}
+	virtual ~TypeConverterBase() {}
 };
-	
-class TypeConverterMap : public std::map< int ,std::map<int, boost::shared_ptr<const TypeConverterBase> > >
+
+class TypeConverterMap : public std::map< int , std::map<int, boost::shared_ptr<const TypeConverterBase> > >
 {
 public:
 	TypeConverterMap();
 };
 
-}}}
+}
+}
+}
 #endif // CONVERTER_HPP

@@ -26,7 +26,10 @@
 #include "log.hpp"
 #include "log_modules.hpp"
 
-namespace isis { namespace util {
+namespace isis
+{
+namespace util
+{
 
 /**
 Write a list of elements to a std::basic_ostream
@@ -37,38 +40,44 @@ Write a list of elements to a std::basic_ostream
 \param prefix will be send to the stream as start (default: "")
 \param suffix will be send to the stream at the end (default: "")
 */
-template<class InputIterator,typename _CharT, typename _Traits> std::basic_ostream<_CharT, _Traits> &
-write_list(InputIterator start,InputIterator end,
-		   std::basic_ostream<_CharT, _Traits> &o,
-		   const std::string delim=",",
-		   const std::string prefix="{",const std::string suffix="}"){
+template<class InputIterator, typename _CharT, typename _Traits> std::basic_ostream<_CharT, _Traits> &
+write_list( InputIterator start, InputIterator end,
+			std::basic_ostream<_CharT, _Traits> &o,
+			const std::string delim = ",",
+			const std::string prefix = "{", const std::string suffix = "}" )
+{
 	o << prefix;
-	if(start!=end){
+
+	if ( start != end ) {
 		o << *start;
 		start++;
 	}
-	for(InputIterator i=start;i!=end;i++)
+
+	for ( InputIterator i = start; i != end; i++ )
 		o << delim << *i;
+
 	o << suffix;
 	return o;
 }
 
 /// use write_list to create a string from a list
 template<class InputIterator> std::string list2string(
-	InputIterator start,InputIterator end,
-	const std::string delim=",",
-	const std::string prefix="{",const std::string suffix="}")
+	InputIterator start, InputIterator end,
+	const std::string delim = ",",
+	const std::string prefix = "{", const std::string suffix = "}" )
 {
 	std::ostringstream ret;
-	write_list(start,end,ret,delim,prefix,suffix);
+	write_list( start, end, ret, delim, prefix, suffix );
 	return ret.str();
 }
 /// do lexical_cast\<T\> on the elements of a list and return them
-template<typename T,typename InputIterator> std::list<T> list2list(InputIterator start,InputIterator end)
+template<typename T, typename InputIterator> std::list<T> list2list( InputIterator start, InputIterator end )
 {
 	std::list<T> ret;
-	for(;start!=end;start++)
-		ret.push_back(boost::lexical_cast<T>(*start));
+
+	for ( ; start != end; start++ )
+		ret.push_back( boost::lexical_cast<T>( *start ) );
+
 	return ret;
 }
 
@@ -78,35 +87,38 @@ template<typename T,typename InputIterator> std::list<T> list2list(InputIterator
  * If that fails, boost::bad_lexical_cast is thrown.
  * \param source the source string to be split up
  * \param separator regular expression to delimit the tokens (defaults to \\s+)
- * \param prefix regular expression for text to be removed from the string before it is split up 
+ * \param prefix regular expression for text to be removed from the string before it is split up
  * ("^" if not given, will be added at the beginning)
  * \param postfix regular expression for text to be removed from the string before it is split up
  * ("$" if not given, will be added at the end)
  * \returns a list of the casted tokens
  */
 template<typename TARGET> std::list<TARGET> string2list(
-	std::string source,	const boost::regex separator,
-	boost::regex prefix,boost::regex postfix)
+	std::string source, const boost::regex separator,
+	boost::regex prefix, boost::regex postfix )
 {
 	std::list<TARGET> ret;
-	assert(not separator.empty());
+	assert( not separator.empty() );
 
-	if(not prefix.empty()){
-		if(prefix.str()[0] != '^')
-			prefix=boost::regex(std::string("^")+prefix.str(),prefix.flags());
-		source=boost::regex_replace(source,prefix,"",boost::format_first_only|boost::match_default);
+	if ( not prefix.empty() ) {
+		if ( prefix.str()[0] != '^' )
+			prefix = boost::regex( std::string( "^" ) + prefix.str(), prefix.flags() );
+
+		source = boost::regex_replace( source, prefix, "", boost::format_first_only | boost::match_default );
 	}
-	if(not postfix.empty()){
-		if(postfix.str()[postfix.size()-1] != '$')
-			postfix=boost::regex(postfix.str()+"$",postfix.flags());
-		
-		source=boost::regex_replace(source,postfix,"",boost::format_first_only|boost::match_default);
+
+	if ( not postfix.empty() ) {
+		if ( postfix.str()[postfix.size()-1] != '$' )
+			postfix = boost::regex( postfix.str() + "$", postfix.flags() );
+
+		source = boost::regex_replace( source, postfix, "", boost::format_first_only | boost::match_default );
 	}
-	boost::sregex_token_iterator i=boost::make_regex_token_iterator(source, separator, -1);
+
+	boost::sregex_token_iterator i = boost::make_regex_token_iterator( source, separator, -1 );
 	const boost::sregex_token_iterator token_end;
 
-	while(i != token_end)
-		ret.push_back(boost::lexical_cast<TARGET>(*i++));
+	while ( i != token_end )
+		ret.push_back( boost::lexical_cast<TARGET>( *i++ ) );
 
 	return ret;
 }
@@ -121,11 +133,11 @@ template<typename TARGET> std::list<TARGET> string2list(
  */
 template<typename TARGET> std::list<TARGET> string2list(
 	std::string source,
-	const boost::regex separator=boost::regex("\\s+"))
+	const boost::regex separator = boost::regex( "\\s+" ) )
 {
-	return string2list<TARGET>(source,separator,separator,separator);
+	return string2list<TARGET>( source, separator, separator, separator );
 }
-															
+
 /**
  * Very Simple tokenizer.
  * Splits source into tokens and tries to lexically cast them to TARGET.
@@ -137,18 +149,20 @@ template<typename TARGET> std::list<TARGET> string2list(
  * \returns a list of the casted tokens
  */
 //@todo test
-template<typename TARGET> std::list<TARGET> string2list(const std::string &source,	char separator)
+template<typename TARGET> std::list<TARGET> string2list( const std::string &source,  char separator )
 {
 	std::list<TARGET> ret;
-	for(
-	  size_t next=source.find_first_not_of(separator);
-	  next!=std::string::npos;
-	  next=source.find_first_not_of(separator,next)
-	){
-	  const size_t start=next;
-	  next=source.find(separator,start);
-	  ret.push_back(boost::lexical_cast<TARGET>(source.substr(start,next-start)));
+
+	for (
+		size_t next = source.find_first_not_of( separator );
+		next != std::string::npos;
+		next = source.find_first_not_of( separator, next )
+	) {
+		const size_t start = next;
+		next = source.find( separator, start );
+		ret.push_back( boost::lexical_cast<TARGET>( source.substr( start, next - start ) ) );
 	}
+
 	return ret;
 }
 
@@ -156,8 +170,8 @@ template<typename TARGET> std::list<TARGET> string2list(const std::string &sourc
  * Continously searches in an sorted list using the given less-than comparison.
  * It starts at current and increments it until the referenced value is not less than the compare-value anymore.
  * Than it returns.
- * \param current the current-position-iterator for the sorted list. 
- * This value is changed directly, so after the function returns is references the first entry of the list 
+ * \param current the current-position-iterator for the sorted list.
+ * This value is changed directly, so after the function returns is references the first entry of the list
  * which does not compare less than compare or, if such a value does not exit in the list, it will be equal to end.
  * \param end the end of the list
  * \param compare the compare-value
@@ -165,16 +179,17 @@ template<typename TARGET> std::list<TARGET> string2list(const std::string &sourc
  * \returns true if the value current currently refers to is equal to compare
  */
 template<typename ForwardIterator, typename T, typename CMP> bool
-continousFind(ForwardIterator &current,const ForwardIterator end,const T& compare, CMP compOp)
+continousFind( ForwardIterator &current, const ForwardIterator end, const T& compare, CMP compOp )
 {
 	//find the first iterator which is does not compare less
-	current=std::lower_bound( current, end, compare, compOp);
-	if (current == end //if we're at the end
-		or compOp(compare, *current) //or compare is less than that iterator
-		)
-			return false;//we didn't find a match
-		else
-			return true;//not(current <> compare) makes compare == current
+	current = std::lower_bound( current, end, compare, compOp );
+
+	if ( current == end //if we're at the end
+		 or compOp( compare, *current ) //or compare is less than that iterator
+	   )
+		return false;//we didn't find a match
+	else
+		return true;//not(current <> compare) makes compare == current
 }
 
 /**
@@ -182,16 +197,20 @@ continousFind(ForwardIterator &current,const ForwardIterator end,const T& compar
  * Will raise a compiler error when not used with floating point types.
  * \returns true if the difference between the two types is significantly small compared to the values.
  */
-template<typename T> bool fuzzyEqual(T a,T b){
-	BOOST_MPL_ASSERT((boost::is_float<T>));
-	if(a==b)return true;
-	const T dist=std::fabs(a-b);
-	const T base=std::min(a,b)*std::numeric_limits<T>::epsilon()*5e1;
+template<typename T> bool fuzzyEqual( T a, T b )
+{
+	BOOST_MPL_ASSERT( ( boost::is_float<T> ) );
+
+	if ( a == b )return true;
+
+	const T dist = std::fabs( a - b );
+	const T base = std::min( a, b ) * std::numeric_limits<T>::epsilon() * 5e1;
 	return  dist < base;
 }
 
 /// @cond _internal
-namespace _internal{
+namespace _internal
+{
 /**
  * Continously searches in an sorted list using std::less.
  * It starts at current and increments it until the referenced value is not less than the compare-value anymore.
@@ -204,16 +223,15 @@ namespace _internal{
  * \returns true if the value current currently refers to is equal to compare
  */
 template<typename ForwardIterator, typename T> bool
-continousFind(ForwardIterator &current,const ForwardIterator end,const T& compare)
+continousFind( ForwardIterator &current, const ForwardIterator end, const T& compare )
 {
-	return continousFind(current,end,compare,std::less<T>());
+	return continousFind( current, end, compare, std::less<T>() );
 }
 
 ///Caseless less-compare for std::string
-struct caselessStringLess{
-	bool operator() (const std::string& a, const std::string& b) const
-	{
-		return (strcasecmp (a.c_str ( ), b.c_str ( )) < 0);
+struct caselessStringLess {
+	bool operator() ( const std::string& a, const std::string& b ) const {
+		return ( strcasecmp ( a.c_str ( ), b.c_str ( ) ) < 0 );
 	}
 };
 }
@@ -221,67 +239,73 @@ struct caselessStringLess{
 typedef CoreDebug Debug;
 typedef CoreLog Runtime;
 
-template<typename HANDLE> void enable_log(LogLevel level){
-	ENABLE_LOG(CoreLog,HANDLE,level);
-	ENABLE_LOG(CoreDebug,HANDLE,level);
+template<typename HANDLE> void enable_log( LogLevel level )
+{
+	ENABLE_LOG( CoreLog, HANDLE, level );
+	ENABLE_LOG( CoreDebug, HANDLE, level );
 }
 }//util
-template<typename HANDLE> void enable_log_global(LogLevel level){
-	ENABLE_LOG(CoreLog,HANDLE,level);
-	ENABLE_LOG(CoreDebug,HANDLE,level);
-	ENABLE_LOG(ImageIoLog,HANDLE,level);
-	ENABLE_LOG(ImageIoDebug,HANDLE,level);
-	ENABLE_LOG(DataLog,HANDLE,level);
-	ENABLE_LOG(DataDebug,HANDLE,level);
+template<typename HANDLE> void enable_log_global( LogLevel level )
+{
+	ENABLE_LOG( CoreLog, HANDLE, level );
+	ENABLE_LOG( CoreDebug, HANDLE, level );
+	ENABLE_LOG( ImageIoLog, HANDLE, level );
+	ENABLE_LOG( ImageIoDebug, HANDLE, level );
+	ENABLE_LOG( DataLog, HANDLE, level );
+	ENABLE_LOG( DataDebug, HANDLE, level );
 }
 }//isis
 
-namespace std {
+namespace std
+{
 /// Streaming output for std::pair
 template<typename charT, typename traits, typename _FIRST, typename _SECOND > basic_ostream<charT, traits>&
-operator<<(basic_ostream<charT, traits> &out, const pair<_FIRST,_SECOND> &s)
+operator<<( basic_ostream<charT, traits> &out, const pair<_FIRST, _SECOND> &s )
 {
 	return out << s.first << ":" << s.second;
 }
 
 /// Streaming output for std::map
 template<typename charT, typename traits, typename _Key, typename _Tp, typename _Compare, typename _Alloc >
-basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits> &out,const map<_Key,_Tp,_Compare,_Alloc>& s)
+basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const map<_Key, _Tp, _Compare, _Alloc>& s )
 {
-	isis::util::write_list(s.begin(),s.end(),out,"\n","","");
+	isis::util::write_list( s.begin(), s.end(), out, "\n", "", "" );
 	return out;
 }
 
 /// Formatted streaming output for std::map\<string,...\>
 template<typename charT, typename traits, typename _Tp, typename _Compare, typename _Alloc >
-basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits> &out,const map<std::string,_Tp,_Compare,_Alloc>& s)
+basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const map<std::string, _Tp, _Compare, _Alloc>& s )
 {
-	size_t key_len=0;
-	typedef typename map<std::string,_Tp,_Compare,_Alloc>::const_iterator m_iterator;
-	for(m_iterator i=s.begin();i!=s.end();i++)
-		if(key_len < i->first.length())
+	size_t key_len = 0;
+	typedef typename map<std::string, _Tp, _Compare, _Alloc>::const_iterator m_iterator;
+
+	for ( m_iterator i = s.begin(); i != s.end(); i++ )
+		if ( key_len < i->first.length() )
 			key_len = i->first.length();
-	
-	for(m_iterator i=s.begin();i!=s.end();){
-		out << make_pair(i->first+ std::string(key_len-i->first.length(),' '),i->second);
-		if(++i !=s.end())
+
+	for ( m_iterator i = s.begin(); i != s.end(); ) {
+		out << make_pair( i->first + std::string( key_len - i->first.length(), ' ' ), i->second );
+
+		if ( ++i != s.end() )
 			out << std::endl;
 	}
+
 	return out;
 }
 
 ///Streaming output for std::list
 template<typename charT, typename traits, typename _Tp, typename _Alloc >
-basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits> &out,const list<_Tp,_Alloc>& s)
+basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const list<_Tp, _Alloc>& s )
 {
-	isis::util::write_list(s.begin(),s.end(),out);
+	isis::util::write_list( s.begin(), s.end(), out );
 	return out;
 }
 ///Streaming output for std::set
 template<typename charT, typename traits, typename _Tp, typename _Alloc >
-basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits> &out,const set<_Tp,_Alloc>& s)
+basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const set<_Tp, _Alloc>& s )
 {
-	isis::util::write_list(s.begin(),s.end(),out);
+	isis::util::write_list( s.begin(), s.end(), out );
 	return out;
 }
 

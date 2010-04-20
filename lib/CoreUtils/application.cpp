@@ -20,78 +20,86 @@
 #include "application.hpp"
 #include <boost/foreach.hpp>
 
-namespace isis{namespace util{
-
-const LogLevel Application::LLMap[]={LogLevel(0),error,warning,info,verbose_info}; //uhh I'm soo devious
-	
-Application::Application(const char name[]):m_name(name)
+namespace isis
 {
-	Selection dbg_levels("error,warning,info,verbose_info");
-	dbg_levels.set("warning");
-	parameters["dCore"]=dbg_levels;
-	parameters["dCore"].setDescription("Debugging level for the Core module");
+namespace util
+{
 
-	parameters["dData"]=dbg_levels;
-	parameters["dData"].setDescription("Debugging level for the Data module");
-	
-	parameters["dImageIO"]=dbg_levels;
-	parameters["dImageIO"].setDescription("Debugging level for the ImageIO module");
-	
-	parameters["help"]=false;
-	parameters["help"].setDescription("Print help");
+const LogLevel Application::LLMap[] = {LogLevel( 0 ), error, warning, info, verbose_info}; //uhh I'm soo devious
 
-	BOOST_FOREACH(ParameterMap::reference ref,parameters) //none of these is needed
-		ref.second.needed()=false;
+Application::Application( const char name[] ): m_name( name )
+{
+	Selection dbg_levels( "error,warning,info,verbose_info" );
+	dbg_levels.set( "warning" );
+	parameters["dCore"] = dbg_levels;
+	parameters["dCore"].setDescription( "Debugging level for the Core module" );
+	parameters["dData"] = dbg_levels;
+	parameters["dData"].setDescription( "Debugging level for the Data module" );
+	parameters["dImageIO"] = dbg_levels;
+	parameters["dImageIO"].setDescription( "Debugging level for the ImageIO module" );
+	parameters["help"] = false;
+	parameters["help"].setDescription( "Print help" );
+	BOOST_FOREACH( ParameterMap::reference ref, parameters ) //none of these is needed
+	ref.second.needed() = false;
 }
 
-bool Application::init(int argc, char** argv,bool exitOnError)
+bool Application::init( int argc, char** argv, bool exitOnError )
 {
-	bool err=false;
-	if(parameters.parse(argc,argv)){
-		if(parameters["help"]){ 
+	bool err = false;
+
+	if ( parameters.parse( argc, argv ) ) {
+		if ( parameters["help"] ) {
 			printHelp();
-			exit(0);
+			exit( 0 );
 		}
 	} else {
-		LOG(Runtime,error) << "Failed to parse the command line";
-		err=true;
-	}
-	if(not parameters.isComplete()){
-		ParameterMap::iterator iP;
-		std::cout << "Missing parameters: ";
-		for (iP = parameters.begin(); iP != parameters.end(); iP++)
-		{
-		    if(iP->second.needed()){std::cout << iP->first << "  ";}
-		}
-		std::cout << std::endl;
-		std::cout << "Usage: " << this->m_name << " <options>, where <options> includes:" << std::endl;
-		
-		for (iP = parameters.begin(); iP != parameters.end(); iP++)
-		{
-		    std::string pref;
-		    if(iP->second.needed()) {pref = " Required.";}
-		    if(not iP->second.needed() and not iP->second->is<dlist>()) {pref = " Default: " + iP->second.toString();};
-		    std::cout << "\t-" << iP->first << " <" << iP->second->typeName() << ">" << std::endl;
-		    if(iP->second->is<Selection>()) {
-			const Selection &ref=iP->second->cast_to_Type<Selection>();
-			std::cout << "\t\tOptions are: " <<  ref.getEntries() << std::endl;
-		    }
-		    std::cout << "\t\t" << iP->second.description() << pref << std::endl;	
-		}
-		err=true;
+		LOG( Runtime, error ) << "Failed to parse the command line";
+		err = true;
 	}
 
-	setLog<CoreDebug>(LLMap[parameters["dCore"]]);
-	setLog<CoreLog>(LLMap[parameters["dCore"]]);
-	setLog<DataDebug>(LLMap[parameters["dData"]]);
-	setLog<DataLog>(LLMap[parameters["dData"]]);
-	setLog<ImageIoDebug>(LLMap[parameters["dImageIO"]]);
-	setLog<ImageIoLog>(LLMap[parameters["dImageIO"]]);
-	
-	if(err and exitOnError){
-		std::cout << "Exiting..." << std::endl;
-		exit(1);
+	if ( not parameters.isComplete() ) {
+		ParameterMap::iterator iP;
+		std::cout << "Missing parameters: ";
+
+		for ( iP = parameters.begin(); iP != parameters.end(); iP++ ) {
+			if ( iP->second.needed() ) {std::cout << iP->first << "  ";}
+		}
+
+		std::cout << std::endl;
+		std::cout << "Usage: " << this->m_name << " <options>, where <options> includes:" << std::endl;
+
+		for ( iP = parameters.begin(); iP != parameters.end(); iP++ ) {
+			std::string pref;
+
+			if ( iP->second.needed() ) {pref = " Required.";}
+
+			if ( not iP->second.needed() and not iP->second->is<dlist>() ) {pref = " Default: " + iP->second.toString();};
+
+			std::cout << "\t-" << iP->first << " <" << iP->second->typeName() << ">" << std::endl;
+
+			if ( iP->second->is<Selection>() ) {
+				const Selection &ref = iP->second->cast_to_Type<Selection>();
+				std::cout << "\t\tOptions are: " <<  ref.getEntries() << std::endl;
+			}
+
+			std::cout << "\t\t" << iP->second.description() << pref << std::endl;
+		}
+
+		err = true;
 	}
+
+	setLog<CoreDebug>( LLMap[parameters["dCore"]] );
+	setLog<CoreLog>( LLMap[parameters["dCore"]] );
+	setLog<DataDebug>( LLMap[parameters["dData"]] );
+	setLog<DataLog>( LLMap[parameters["dData"]] );
+	setLog<ImageIoDebug>( LLMap[parameters["dImageIO"]] );
+	setLog<ImageIoLog>( LLMap[parameters["dImageIO"]] );
+
+	if ( err and exitOnError ) {
+		std::cout << "Exiting..." << std::endl;
+		exit( 1 );
+	}
+
 	return not err;
 }
 void Application::printHelp()const
@@ -100,9 +108,10 @@ void Application::printHelp()const
 	parameters.printAll();
 }
 
-boost::shared_ptr< _internal::MessageHandlerBase > Application::getLogHandler(std::string module, isis::LogLevel level)const
+boost::shared_ptr< _internal::MessageHandlerBase > Application::getLogHandler( std::string module, isis::LogLevel level )const
 {
-	return boost::shared_ptr< _internal::MessageHandlerBase >(level ? new util::DefaultMsgPrint(level):0);
+	return boost::shared_ptr< _internal::MessageHandlerBase >( level ? new util::DefaultMsgPrint( level ) : 0 );
 }
 
-}}
+}
+}

@@ -25,48 +25,53 @@
 #include <dcmtk/dcmdata/dcfilefo.h>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
-namespace isis{ namespace image_io{
-	
-class ImageFormat_Dicom: public FileFormat{
-	static void parseAS(DcmElement* elem,const std::string &name,util::PropMap &map);
-	static void parseDA(DcmElement* elem,const std::string &name,util::PropMap &map);
-	static void parseTM(DcmElement* elem,const std::string &name,util::PropMap &map);
-	static boost::posix_time::ptime genTimeStamp(const boost::gregorian::date &date,const boost::posix_time::ptime &time);
-	template<typename BASE,typename DST> static DST endian(const BASE *b)
-	{
-		DST ret=0;
-	#if __BYTE_ORDER == __LITTLE_ENDIAN
-		for(short i=0;i<(short)sizeof(DST);i++)
-	#elif __BYTE_ORDER == __BIG_ENDIAN
-		for(short i=(short)sizeof(DST)-1;i>=0;i--)
-	#else
-		#error "Sorry your endianess is not supported. What the heck are you comiling on ??"
-	#endif
-			ret+=b[i]<<i*8;
-			
+namespace isis
+{
+namespace image_io
+{
+
+class ImageFormat_Dicom: public FileFormat
+{
+	static void parseAS( DcmElement* elem, const std::string &name, util::PropMap &map );
+	static void parseDA( DcmElement* elem, const std::string &name, util::PropMap &map );
+	static void parseTM( DcmElement* elem, const std::string &name, util::PropMap &map );
+	static boost::posix_time::ptime genTimeStamp( const boost::gregorian::date &date, const boost::posix_time::ptime &time );
+	template<typename BASE, typename DST> static DST endian( const BASE *b ) {
+		DST ret = 0;
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+
+		for ( short i = 0; i < ( short )sizeof( DST ); i++ )
+#elif __BYTE_ORDER == __BIG_ENDIAN
+		for ( short i = ( short )sizeof( DST ) - 1; i >= 0; i-- )
+#else
+#error "Sorry your endianess is not supported. What the heck are you comiling on ??"
+#endif
+			ret += b[i] << i * 8;
+
 		return ret;
 	}
-	static size_t parseCSAEntry(Uint8 *at, isis::util::PropMap& map);
-	static bool parseCSAValue(const std::string &val, const std::string& name, const char*const vr, isis::util::PropMap& map);
-	static bool parseCSAValueList(const isis::util::slist& val, const std::string& name, const char*const vr, isis::util::PropMap& map);
+	static size_t parseCSAEntry( Uint8 *at, isis::util::PropMap& map );
+	static bool parseCSAValue( const std::string &val, const std::string& name, const char*const vr, isis::util::PropMap& map );
+	static bool parseCSAValueList( const isis::util::slist& val, const std::string& name, const char*const vr, isis::util::PropMap& map );
 public:
 	static const char dicomTagTreeName[];
 	static const char unknownTagName[];
-	static void parseCSA(DcmElement* elem, isis::util::PropMap& map);
-	static void parseScalar(DcmElement* elem, const std::string& name, isis::util::PropMap& map);
-	static void parseVector(DcmElement* elem, const std::string& name, isis::util::PropMap& map);
-	static void parseList(DcmElement* elem, const std::string& name, isis::util::PropMap& map);
-	static void dcmObject2PropMap(DcmObject* master_obj,util::PropMap &map);
-	static void sanitise(util::PropMap& object, string dialect);
+	static void parseCSA( DcmElement* elem, isis::util::PropMap& map );
+	static void parseScalar( DcmElement* elem, const std::string& name, isis::util::PropMap& map );
+	static void parseVector( DcmElement* elem, const std::string& name, isis::util::PropMap& map );
+	static void parseList( DcmElement* elem, const std::string& name, isis::util::PropMap& map );
+	static void dcmObject2PropMap( DcmObject* master_obj, util::PropMap &map );
+	static void sanitise( util::PropMap& object, string dialect );
 	std::string suffixes();
 	std::string name();
 
-	int load(data::ChunkList &chunks, const std::string& filename, const std::string& dialect );
-	bool write(const data::Image &image,const std::string& filename,const std::string& dialect );
+	int load( data::ChunkList &chunks, const std::string& filename, const std::string& dialect );
+	bool write( const data::Image &image, const std::string& filename, const std::string& dialect );
 
 	bool tainted();
-    void readMosaic(const data::Chunk& source, data::ChunkList &dest);
+	void readMosaic( const data::Chunk& source, data::ChunkList &dest );
 };
-}}
+}
+}
 
 #endif // IMAGEFORMAT_DICOM_HPP

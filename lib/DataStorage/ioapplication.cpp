@@ -20,34 +20,44 @@
 #include "ioapplication.hpp"
 #include "io_factory.hpp"
 
-namespace isis{namespace data{
-IOApplication::IOApplication(const char name[], bool have_input, bool have_output):Application(name),m_input(have_input),m_output(have_output)
+namespace isis
 {
-	if(have_input){
-		parameters["in"]=std::string();
-		parameters["in"].setDescription("input file or dataset");
+namespace data
+{
+IOApplication::IOApplication( const char name[], bool have_input, bool have_output ): Application( name ), m_input( have_input ), m_output( have_output )
+{
+	if ( have_input ) {
+		parameters["in"] = std::string();
+		parameters["in"].setDescription( "input file or dataset" );
 	}
-	if(have_output){
-		parameters["out"]=std::string();
+
+	if ( have_output ) {
+		parameters["out"] = std::string();
+		parameters["out"].setDescription( "output file" );
+	}
 		parameters["out"].setDescription("output file");
 	}
 }
-bool IOApplication::init(int argc, char** argv, bool exitOnError)
+bool IOApplication::init( int argc, char** argv, bool exitOnError )
 {
-	if(not isis::util::Application::init(argc, argv, exitOnError))
+	if ( not isis::util::Application::init( argc, argv, exitOnError ) )
 		return false;
-	if(m_input){
-		std::string input=parameters["in"];
-		images=data::IOFactory::load(input);
 
-		if(images.empty()){
-			if(exitOnError)
-				exit(1);
+	if ( m_input ) {
+		std::string input = parameters["in"];
+		images = data::IOFactory::load( input );
+
+		if ( images.empty() ) {
+			if ( exitOnError )
+				exit( 1 );
+
 			return false;
-		} 
+		}
 	}
+
 	return true;
 }
-	
-}}
+
+}
+}
 

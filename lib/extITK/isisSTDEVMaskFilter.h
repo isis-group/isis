@@ -17,18 +17,22 @@
 #include <algorithm>
 #include <cmath>
 
-namespace isis { namespace extitk {
+namespace isis
+{
+namespace extitk
+{
 
 template<class TInputImage, class TOutputImage>
-class ITK_EXPORT STDEVMaskFilter: public itk::ImageToImageFilter<TInputImage,
-		TOutputImage> {
+class ITK_EXPORT STDEVMaskFilter: public itk::ImageToImageFilter < TInputImage,
+		TOutputImage >
+{
 public:
 
 	STDEVMaskFilter();
 	itkStaticConstMacro( InputImageDimension, unsigned int,
-			TInputImage::ImageDimension);
+						 TInputImage::ImageDimension );
 	itkStaticConstMacro( OutputImageDimension, unsigned int,
-			TOutputImage::ImageDimension);
+						 TOutputImage::ImageDimension );
 
 	//Standard typedefs
 	typedef STDEVMaskFilter Self;
@@ -71,24 +75,24 @@ public:
 	;
 
 	typedef typename itk::NumericTraits<OutputPixelType>::AccumulateType
-			SumType;
+	SumType;
 	typedef typename itk::NumericTraits<SumType>::RealType MeanType;
 
 	typedef typename itk::ImageLinearConstIteratorWithIndex<InputImageType>
-			IteratorType;
+	IteratorType;
 
-	virtual void Update(void);
+	virtual void Update( void );
 
-	OutputImagePointer GetOutput(void);
+	OutputImagePointer GetOutput( void );
 
 	virtual ~STDEVMaskFilter() {
 	}
 
 private:
 
-	STDEVMaskFilter(const Self&);
+	STDEVMaskFilter( const Self& );
 
-	void SetOutputParameters(void);
+	void SetOutputParameters( void );
 
 	InputImageConstPointer m_InputImage;
 	OutputImagePointer m_OutputImage;

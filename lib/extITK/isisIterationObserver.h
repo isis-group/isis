@@ -35,7 +35,9 @@
 using boost::progress_display;
 using boost::progress_timer;
 
-namespace isis { namespace extitk
+namespace isis
+{
+namespace extitk
 {
 
 class IterationObserver : public itk::Command
@@ -45,43 +47,37 @@ public:
 	typedef IterationObserver Self;
 	typedef itk::Command Superclass;
 	typedef itk::SmartPointer<Self> Pointer;
-	itkNewMacro( Self);
+	itkNewMacro( Self );
 
 protected:
 
-	IterationObserver()	{}
+	IterationObserver() {}
 
 public:
 
-	void Execute(itk::Object *caller, const itk::EventObject & event)
-	{
-		Execute((const itk::Object *) caller, event);
+	void Execute( itk::Object *caller, const itk::EventObject & event ) {
+		Execute( ( const itk::Object * ) caller, event );
 	}
 
-	void Execute(const itk::Object * object, const itk::EventObject & event)
-	{
-		if(!itk::IterationEvent().CheckEvent(&event))
-		{
+	void Execute( const itk::Object * object, const itk::EventObject & event ) {
+		if ( !itk::IterationEvent().CheckEvent( &event ) ) {
 			return;
 		}
-		if(const itk::RegularStepGradientDescentOptimizer* optimizer =
-						dynamic_cast<const itk::RegularStepGradientDescentOptimizer*> ( object ) )
-		{
 
+		if ( const itk::RegularStepGradientDescentOptimizer* optimizer =
+				 dynamic_cast<const itk::RegularStepGradientDescentOptimizer*> ( object ) ) {
 			std::cout << optimizer->GetCurrentIteration() << " = ";
 			std::cout << optimizer->GetValue() << " : ";
 			std::cout << optimizer->GetCurrentPosition() << std::endl;
 		}
-		if(const itk::VersorRigid3DTransformOptimizer* optimizer =
-						dynamic_cast<const itk::VersorRigid3DTransformOptimizer*> ( object ) )
-		{
+
+		if ( const itk::VersorRigid3DTransformOptimizer* optimizer =
+				 dynamic_cast<const itk::VersorRigid3DTransformOptimizer*> ( object ) ) {
 			std::cout << optimizer->GetCurrentIteration() << " = ";
 			std::cout << optimizer->GetValue() << " : ";
 			std::cout << optimizer->GetCurrentPosition() << std::endl;
-
-// 			std::cout << optimizer->GetCurrentIteration() << "\t";
-// 			std::cout << optimizer->GetValue() << std::endl;
-
+//          std::cout << optimizer->GetCurrentIteration() << "\t";
+//          std::cout << optimizer->GetValue() << std::endl;
 		}
 	}
 
@@ -98,20 +94,20 @@ public:
 	progress_display display;
 protected:
 	ProcessUpdate() :
-		display(101) {
+			display( 101 ) {
 	}
 	;
 public:
 	typedef const itk::ProcessObject * ProcessPointer;
 
 	void Execute(
-	    itk::Object *caller, const itk::EventObject & event) {
-		Execute((const itk::Object *) caller, event);
+		itk::Object *caller, const itk::EventObject & event ) {
+		Execute( ( const itk::Object * ) caller, event );
 	}
 
 	void Execute(
-	    const itk::Object * object, const itk::EventObject & event) {
-		if(!(itk::ProgressEvent().CheckEvent(&event))) {
+		const itk::Object * object, const itk::EventObject & event ) {
+		if ( !( itk::ProgressEvent().CheckEvent( &event ) ) ) {
 			return;
 		}
 
