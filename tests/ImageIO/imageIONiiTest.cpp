@@ -5,7 +5,6 @@
  *      Author: Thomas Proeger
  */
 
-#include "DataStorage/image.hpp"
 #include "DataStorage/io_factory.hpp"
 #include "CoreUtils/log.hpp"
 
@@ -20,7 +19,7 @@ namespace isis
 namespace test
 {
 
-BOOST_AUTO_TEST_SUITE ( imageIONii_NullTests )
+BOOST_AUTO_TEST_SUITE ( imageIONii_BaseTests )
 
 BOOST_AUTO_TEST_CASE( loadsaveImage )
 {
