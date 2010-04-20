@@ -1,4 +1,4 @@
-# artistic style configuration for AStyel version 1.23
+# artistic style configuration for AStyle version 1.24
 # 
 # ISIS project
 #
@@ -15,6 +15,9 @@ brackets=linux
 
 # Indent  multi-line preprocessor definitions ending with a backslash.
 indent-preprocessor
+
+# Indent line comments that start in column one.
+indent-col1-comments
 
 # Indent a minimal # spaces in a continuous conditional belonging to a conditional 
 # header.
@@ -37,4 +40,7 @@ delete-empty-lines
 
 # Convert non-indenting tabs to the appropriate number of spaces.
 --convert-tabs
- 
+
+# Attach a pointer or reference operator (* or &) to either
+# the operator type (left), middle, or operator name (right).
+align-pointer=name
