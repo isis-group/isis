@@ -308,7 +308,7 @@ int main(
 		//check combinations of components
 		if ( optimizer == 0 and transform != 0 ) {
 			std::cerr
-				<< "\nInappropriate combination of transform and optimizer! Setting optimizer to RegularStepGradientDescent.\n"
+				<< "\nInappropriate combination of transform and optimizer! Setting optimizer to VersorRigidOptimizer.\n"
 				<< std::endl;
 			optimizer = 0;
 		}
@@ -318,9 +318,10 @@ int main(
 					  << std::endl;
 		}
 
-		if ( transform == 0 and optimizer != 0 ) {
-			std::cerr << "\nInappropriate combination of transform and optimizer! Setting optimizer to VersorRigid3D.\n"
+		if ( transform != 0 and optimizer == 0 ) {
+			std::cerr << "\nInappropriate combination of transform and optimizer! Setting optimizer to RegularStepGradientDescentOptimizer.\n"
 					  << std::endl;
+			optimizer = 1;
 		}
 
 		//transform setup

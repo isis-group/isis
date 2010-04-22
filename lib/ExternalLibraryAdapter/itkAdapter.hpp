@@ -107,6 +107,7 @@ private:
 		typename OutputImageType::DirectionType itkDirection;
 		typename OutputImageType::SizeType itkSize;
 		typename OutputImageType::RegionType itkRegion;
+		//getting the required metadata from the isis image
 		const util::fvector4 dimensions( this->m_ImageISIS->sizeToVector() );
 		const util::fvector4 indexOrigin( this->m_ImageISIS->getProperty<util::fvector4>( "indexOrigin" ) );
 		const util::fvector4 spacing( this->m_ImageISIS->getProperty<util::fvector4>( "voxelSize" ) );
@@ -124,6 +125,12 @@ private:
 		}
 
 		//TODO why the hell negates the itkNiftio some seemingly arbitrary elements of the orientation?????
+		//matrix will be transformed this way:
+		/*
+		-1 -1 -1 -1
+		-1 -1 -1 -1
+		 1  1  1  1
+		 */
 		if ( behaveAsItkReader ) {
 			itkOrigin[0] = -indexOrigin[0];
 			itkOrigin[1] = -indexOrigin[1];
@@ -136,10 +143,11 @@ private:
 			itkDirection[1][2] = -sliceVec[1];
 		}
 
+		//if the user requests a 4d image we need to set these parameters
 		if ( OutputImageType::ImageDimension == 4 ) {
 			itkSpacing[3] = spacing[3];
 			itkSize[3] = dimensions[3];
-			itkDirection[3][3] = 1; //ensures determinant is not 0
+			itkDirection[3][3] = 1; //ensures determinant is unequal 0
 		}
 
 		itkRegion.SetSize( itkSize );
