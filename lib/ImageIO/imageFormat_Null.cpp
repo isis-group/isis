@@ -29,9 +29,9 @@ public:
 				ch.setProperty( "acquisitionNumber", c );
 				ch.setProperty( "sequenceNumber", c );
 				ch.setProperty( "performingPhysician", std::string( "Dr. Jon Doe" ) );
-				ch.setProperty( "readVec", util::fvector4( 1, 0 ) );
-				ch.setProperty( "phaseVec", util::fvector4( 0, 1 ) );
-				ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1 ) );
+				ch.setProperty( "readVec", util::fvector4(   1./sqrt(2), 1./sqrt(2) ) ); //rotated by pi/4 (45°)
+				ch.setProperty( "phaseVec", util::fvector4( -1./sqrt(2), 1./sqrt(2) ) );
+				ch.setProperty( "voxelSize", util::fvector4( 1, 2, 3 ) );
 				ch.voxel<u_int8_t>( 0, 0 ) = c;
 
 				for ( int x = 10; x < 40; x++ )
