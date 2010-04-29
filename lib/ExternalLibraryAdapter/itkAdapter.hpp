@@ -55,7 +55,7 @@ class itkAdapter
 {
 public:
 	/**
-	  * Convert a isis image object in an itk image.
+	  * Converts an isis image object in an itk image.
 	  * \param behaveAsItkReader if set to true, the orientation matrix will be transformed like <br>
 	  * -1 -1 -1 -1 <br>
 	  * -1 -1 -1 -1 <br>
@@ -96,7 +96,18 @@ public:
 			break;
 		}
 	}
-
+	/**
+	  * Converts an itk image object in an isis image object.
+	  * \param behaveAsItkWriter if set to true, the orientation matrix will be transformed like <br>
+	  * -1 -1 -1 -1 <br>
+	  * -1 -1 -1 -1 <br>
+	  *  1  1  1  1 <br>
+	  *  to meet the itk intern data representation requirements.<br>
+	  *  If you used the makeItkImageObject with
+	  *  behaveAsItkReader=true, behaveAsItkWriter should also be true here to preserve the right orientation. <br>
+	  *  If set to false, orientation matrix will not be changed.
+	  *  \returns an isis::data::ImageList.
+	  */
 	template<typename TImage> static data::ImageList
 	makeIsisImageObject( const typename TImage::Pointer src, const bool behaveAsItkWriter = true ) {
 		typename TImage::PointType indexOrigin = src->GetOrigin();
@@ -119,6 +130,8 @@ public:
 			indexOrigin[1] = -indexOrigin[1];
 		}
 
+		std::cout << imageSize << std::endl;
+		std::cout << imageSpacing << std::endl;
 		boost::shared_ptr<data::MemChunk<typename TImage::PixelType > >
 		retChunk( new data::MemChunk<typename TImage::PixelType >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) );
 		retChunk->setProperty( "indexOrigin", util::fvector4( indexOrigin[0], indexOrigin[1], indexOrigin[2], indexOrigin[3] ) );
