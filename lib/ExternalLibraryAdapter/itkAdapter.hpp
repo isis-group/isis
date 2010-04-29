@@ -96,22 +96,57 @@ public:
 			break;
 		}
 	}
+
 	template<typename TImage> static data::ImageList
 	makeIsisImageObject( const typename TImage::Pointer src, const bool behaveAsItkWriter = true ) {
-		typename TImage::IndexType index;
-		util::TypePtr<const typename TImage::PixelType> dummy();
-		index.Fill( 0 );
-		std::cout << &src->GetPixel( index ) << std::endl;
+		typename TImage::PointType indexOrigin = src->GetOrigin();
+		typename TImage::SizeType imageSize = src->GetBufferedRegion().GetSize();
+		typename TImage::SpacingType imageSpacing = src->GetSpacing();
+		typename TImage::DirectionType imageDirection = src->GetDirection();
+
+		if ( TImage::ImageDimension < 4 ) {
+			imageSize[3] = 1;
+		}
+
+		if ( behaveAsItkWriter ) {
+			imageDirection[0][0] = -imageDirection[0][0];
+			imageDirection[0][1] = -imageDirection[0][1];
+			imageDirection[0][2] = -imageDirection[0][2];
+			imageDirection[1][0] = -imageDirection[1][0];
+			imageDirection[1][1] = -imageDirection[1][1];
+			imageDirection[1][2] = -imageDirection[1][2];
+			indexOrigin[0] = -indexOrigin[0];
+			indexOrigin[1] = -indexOrigin[1];
+		}
+
 		boost::shared_ptr<data::MemChunk<typename TImage::PixelType > >
-		retChunk( new data::MemChunk<typename TImage::PixelType >( src->GetBufferPointer(), 352, 512, 160, 1 ) );
-		retChunk->setProperty( "indexOrigin", util::fvector4( 0, 0, 0, 0 ) );
-		retChunk->setProperty( "phaseVec", util::fvector4( 1, 0, 0, 0 ) );
-		retChunk->setProperty( "readVec", util::fvector4( 0, 1, 0, 0 ) );
-		retChunk->setProperty( "sliceVec", util::fvector4( 0, 0, 1, 0 ) );
-		retChunk->setProperty( "voxelSize", util::fvector4( 1, 1, 1, 1 ) );
-		retChunk->setProperty( "centerVec", util::fvector4( 0, 0, 0, 0 ) );
-		retChunk->setProperty( "sequenceNumber", 0 );
-		retChunk->setProperty( "acquisitionNumber", 0 );
+		retChunk( new data::MemChunk<typename TImage::PixelType >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) );
+		retChunk->setProperty( "indexOrigin", util::fvector4( indexOrigin[0], indexOrigin[1], indexOrigin[2], indexOrigin[3] ) );
+		retChunk->setProperty( "readVec", util::fvector4( imageDirection[0][0], imageDirection[0][1], imageDirection[0][2], 0 ) );
+		retChunk->setProperty( "phaseVec", util::fvector4( imageDirection[1][0], imageDirection[1][1], imageDirection[1][2], 0 ) );
+		retChunk->setProperty( "sliceVec", util::fvector4( imageDirection[2][0], imageDirection[2][1], imageDirection[2][2], 0 ) );
+		retChunk->setProperty( "voxelSize", util::fvector4( imageSpacing[0], imageSpacing[1], imageSpacing[2], imageSpacing[3] ) );
+		retChunk->setProperty( "centerVec", util::fvector4( indexOrigin[0], indexOrigin[1], indexOrigin[2], indexOrigin[3] ) );
+		itk::MetaDataDictionary myItkDict = src->GetMetaDataDictionary();
+
+		if ( myItkDict.HasKey( "sequenceNumber" ) ) {
+			std::string sequenceNumber;
+			itk::ExposeMetaData<std::string>( myItkDict, "sequenceNumber", sequenceNumber );
+			retChunk->setProperty( "sequenceNumber", atoi( sequenceNumber.c_str() ) );
+		} else {
+			retChunk->setProperty( "sequenceNumber", 1 );
+		}
+
+		if ( myItkDict.HasKey( "acquisitionNumber" ) ) {
+			std::string acquisitionNumber;
+			itk::ExposeMetaData<std::string>( myItkDict, "acquisitionNumber", acquisitionNumber );
+			retChunk->setProperty( "acquisitionNumber", atoi( acquisitionNumber.c_str() ) );
+		} else {
+			for ( unsigned int t = 0; t < imageSize[3]; t++ ) {
+				retChunk->setProperty( "acquisitionNumber", t );
+			}
+		}
+
 		data::ChunkList chunkList;
 		chunkList.push_back( *retChunk );
 		data::ImageList isisImageList( chunkList );

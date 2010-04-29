@@ -16,7 +16,7 @@ namespace isis
 namespace test
 {
 
-BOOST_AUTO_TEST_CASE ( ISISToITKTest )
+BOOST_AUTO_TEST_CASE ( ISIS_to_ITK )
 {
 	data::enable_log<util::DefaultMsgPrint>( error );
 	//just to make sure the wanted file exists
@@ -30,12 +30,12 @@ BOOST_AUTO_TEST_CASE ( ISISToITKTest )
 	MyImageType::Pointer itkImage = MyImageType::New();
 	itkImage = adapter::itkAdapter::makeItkImageObject<MyImageType>( imgList.front() );
 	writer->SetInput( itkImage );
-	writer->SetFileName( "itkAdapterTest_output.nii" );
+	writer->SetFileName( "ISIS_to_ITK.nii" );
 	writer->Update();
 }
 
 
-BOOST_AUTO_TEST_CASE ( ITKToISISTest )
+BOOST_AUTO_TEST_CASE ( ITK_to_ISIS )
 {
 	data::enable_log<util::DefaultMsgPrint>( error );
 	typedef itk::Image<short, 3> MyImageType;
@@ -44,9 +44,19 @@ BOOST_AUTO_TEST_CASE ( ITKToISISTest )
 	reader->Update();
 	data::ImageList isisImageList;
 	isisImageList = isis::adapter::itkAdapter::makeIsisImageObject<MyImageType>( reader->GetOutput() );
-	data::IOFactory::write( isisImageList, "itkAdapterTest_output_fromISIS.nii", "" );
+	data::IOFactory::write( isisImageList, "ITK_to_ISIS.nii", "" );
 }
 
+BOOST_AUTO_TEST_CASE ( ISIS_to_ITK_to_ISIS )
+{
+	data::enable_log<util::DefaultMsgPrint>( error );
+	typedef itk::Image<short, 3> MyImageType;
+	MyImageType::Pointer itkImage = MyImageType::New();
+	data::ImageList isisImageList1 = isis::data::IOFactory::load( "/scr/kastanie1/DATA/isis/data.nii", "" );
+	itkImage = adapter::itkAdapter::makeItkImageObject<MyImageType>( isisImageList1.front() );
+	data::ImageList isisImageList2 = isis::adapter::itkAdapter::makeIsisImageObject<MyImageType>( itkImage );
+	data::IOFactory::write( isisImageList2, "ISIS_to_ITK_to_ISIS.nii", "" );
+}
 
 }
 }//end namespace
