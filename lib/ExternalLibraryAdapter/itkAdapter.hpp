@@ -129,9 +129,7 @@ public:
 			indexOrigin[0] = -indexOrigin[0];
 			indexOrigin[1] = -indexOrigin[1];
 		}
-
-		std::cout << imageSize << std::endl;
-		std::cout << imageSpacing << std::endl;
+		
 		boost::shared_ptr<data::MemChunk<typename TImage::PixelType > >
 		retChunk( new data::MemChunk<typename TImage::PixelType >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) );
 		retChunk->setProperty( "indexOrigin", util::fvector4( indexOrigin[0], indexOrigin[1], indexOrigin[2], indexOrigin[3] ) );

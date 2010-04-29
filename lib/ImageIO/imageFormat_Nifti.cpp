@@ -374,11 +374,13 @@ private:
 		}
 		T *refNii = ( T* ) ni.data;
 
-		for ( int z = 0; z < image.sizeToVector()[2]; z++ ) {
-			for ( int y = 0; y < image.sizeToVector()[1]; y++ ) {
-				for ( int x = 0; x < image.sizeToVector()[0]; x++ ) {
-					*refNii = image.voxel<T>( x, y, z );
-					refNii++;
+		for ( int t = 0; t < image.sizeToVector()[3]; t++ ) {
+			for ( int z = 0; z < image.sizeToVector()[2]; z++ ) {
+				for ( int y = 0; y < image.sizeToVector()[1]; y++ ) {
+					for ( int x = 0; x < image.sizeToVector()[0]; x++ ) {
+						*refNii = image.voxel<T>( x, y, z, t );
+						refNii++;
+					}
 				}
 			}
 		}
