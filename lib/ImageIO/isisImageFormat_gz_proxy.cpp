@@ -1,5 +1,6 @@
 #include "DataStorage/io_interface.h"
 #include "DataStorage/io_factory.hpp"
+#include "CoreUtils/tmpfile.h"
 #include <stdio.h>
 #include <fstream>
 #include <zlib.h>
@@ -14,132 +15,91 @@ namespace image_io
 class ImageFormat_CompProxy: public FileFormat
 {
 private:
-	static std::string tempfile() {
-		std::string result;
-		const char* ptr = tmpnam( NULL );
-
-		if ( ptr ) result = ptr;
-
-		//@todo find a solution for windows here
-		return result;
-	}
-	static std::string tempfilename( std::string filename ) {
-		boost::filesystem::path fname( filename );
-		const std::string unzipped_suffix = boost::filesystem::extension( boost::filesystem::basename( fname ) );
-		return tempfile() + unzipped_suffix;
-	}
-
-	bool gz_compress( std::ifstream &in, gzFile out ) {
-		char *buf = new char[2048*1024];
+	void gz_compress( std::ifstream &in, gzFile out ) {
+		char buf[2048*1024];
 		int len;
-		int err;
-		bool ret = true;
 
-		try {
-			for (
-				in.read( buf, 2048*1024 );
-				( len = in.gcount() );
-				in.read( buf, 2048*1024 )
-			) {
-				if ( gzwrite( out, buf, len ) != len ) {
-					LOG( ImageIoLog, error ) << "Failed to compress using gzip " << gzerror( out, &err );
-					return false;
+		for (
+			in.read( buf, 2048*1024 );
+			( len = in.gcount() );
+			in.read( buf, 2048*1024 )
+		) {
+			if ( gzwrite( out, buf, len ) != len ) {
+				int err;
+				const char *z_err=gzerror( out, &err );
+				// If an error occurred in the file system and not in the compression library, err is set to Z_ERRNO
+				if(err==Z_ERRNO){
+					throwSystemError(errno,"Failed to compress file");
+				} else {
+					throwGenericError("Failed to compress file");
 				}
 			}
-
-			if ( in.bad() ) {
-				LOG( ImageIoLog, error ) << "Failed to read input ";
-				return false;
-			}
-		} catch ( ... ) {
-			LOG( ImageIoLog, error ) << "Failed to read input ";
-			delete[]  buf;
-			throw;
 		}
-
-		delete buf;
-		return ret;
 	}
 
-	bool file_compress( std::string infile, std::string outfile ) {
-		std::ifstream in( infile.c_str(), std::ios::binary );
-
-		if ( in == NULL ) {
-			LOG( ImageIoLog, error ) << "Failed to open " << infile.c_str();
-			return false;
-		}
+	void file_compress( std::string infile, std::string outfile ) {
+		std::ifstream in;
+		in.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+		in.open( infile.c_str(), std::ios::binary);
 
 		gzFile out = gzopen( outfile.c_str(), "wb" );
 
 		if ( out == NULL ) {
-			LOG( ImageIoLog, error ) << "gzopen " << outfile << " failed";
-			return false;
+			if(errno)
+				throwSystemError(errno);
+			else //zlib says, that if errno is zero there was insufficient memory
+				throwGenericError("insufficient memory for compression");
 		}
 
-		bool ret = gz_compress( in, out );
+		gz_compress( in, out );
 
-		if ( gzclose( out ) != Z_OK ) {
+		if ( gzclose( out ) != Z_OK )
 			LOG( ImageIoLog, warning ) << "gzclose " << outfile << " failed";
-			return false;
-		} else return ret;
 	}
 
-	bool gz_uncompress( gzFile in, std::ofstream &out ) {
-		char *buf = new char[2048*1024];
+	void gz_uncompress( gzFile in, std::ofstream &out ) {
+		char buf[2048*1024];
 		int len;
-		int err;
 
-		try {
-			for (
-				len = gzread( in, buf, 2048 * 1024 );
-				len;
-				len = gzread( in, buf, 2048 * 1024 )
-			) {
-				if ( len < 0 ) {
-					LOG( ImageIoLog, error ) << "Failed to read compressed data " << gzerror( in, &err );
-					return false;
+		for (
+			len = gzread( in, buf, 2048 * 1024 );
+			len;
+			len = gzread( in, buf, 2048 * 1024 )
+		) {
+			if ( len < 0 ) {
+				int err;
+				const char *z_err=gzerror( out, &err );
+				// If an error occurred in the file system and not in the compression library, err is set to Z_ERRNO
+				if(err==Z_ERRNO){
+					throwSystemError(errno,"Failed to read compressed file");
 				} else {
-					out.write( buf, len );
-
-					if ( out.bad() ) {
-						LOG( ImageIoLog, error ) << "Failed to write uncompressed data ";
-						return false;
-					}
+					throwGenericError("Failed to read compressed file");
 				}
+			} else {
+				out.write( buf, len );
 			}
-		} catch ( ... ) {
-			LOG( ImageIoLog, error ) << "Uncompress failed";
-			delete[] buf;
-			throw;
 		}
-
-		delete[] buf;
-		return true;
 	}
 
-	bool file_uncompress( std::string infile, std::string outfile ) {
+	void file_uncompress( std::string infile, std::string outfile ) {
 		gzFile in = gzopen( infile.c_str(), "rb" );
 
 		if ( in == NULL ) {
-			LOG( ImageIoLog, error ) << "gzopen " << infile << " failed";
-			return false;
+			if(errno)
+				throwSystemError(errno);
+			else //zlib says, that if errno is zero there was insufficient memory
+				throwGenericError("insufficient memory for compression");
 		}
 
-		std::ofstream out( outfile.c_str(), std::ios::binary );
+		std::ofstream out;
+		out.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+		out.open( outfile.c_str(), std::ios::binary );
 
-		if ( out.bad() ) {
-			LOG( ImageIoLog, error ) << "Failed to read data from " << infile;
-			return false;
-		}
-
-		bool ret = gz_uncompress( in, out );
+		gz_uncompress( in, out );
 
 		if ( gzclose( in ) != Z_OK ) {
-			LOG( ImageIoLog, error ) << "gclose " << outfile << " failed";
-			return false;
+			LOG( ImageIoLog, warning ) << "gclose " << outfile << " failed";
 		}
-
-		return ret;
 	}
 
 
@@ -152,24 +112,17 @@ public:
 	    }*/
 	std::string name() {return "compression proxy for other formats";}
 
-	int load ( data::ChunkList &chunks, const std::string& filename, const std::string& dialect ) {
-		const std::string tmpfile = tempfilename( filename );
+	int load ( data::ChunkList &chunks, const std::string& filename, const std::string& dialect ) throw(std::runtime_error&){
+		const std::string unzipped_suffix = boost::filesystem::extension( boost::filesystem::basename( filename ) );
+		util::TmpFile tmpfile("",unzipped_suffix);
 		LOG( ImageIoDebug, info ) <<  "tmpfile=" << tmpfile;
 
-		if ( file_uncompress( filename, tmpfile ) ) {
-			boost::filesystem::path fname( tmpfile );
-			int result = data::IOFactory::get().loadFile( chunks, fname, dialect );
-			boost::filesystem::remove( fname );
-			return result;
-		} else {
-			return -1;
-		}
+		file_uncompress( filename, tmpfile.string() );
+		return data::IOFactory::get().loadFile( chunks, tmpfile, dialect );
 	}
 
-	bool write( const data::Image &image, const std::string& filename, const std::string& dialect ) {
-		const std::string tmpfile = tempfilename( filename );
-		LOG( ImageIoLog, error ) <<  "Compressed write is not yet implemented";
-		return -1;
+	void write( const data::Image &image, const std::string& filename, const std::string& dialect )throw(std::runtime_error&) {
+		throw(std::runtime_error("Compressed write is not yet implemented"));
 	}
 	bool tainted() {return false;}//internal plugins are not tainted
 };

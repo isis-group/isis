@@ -146,7 +146,7 @@ public:
 	/// Create an empty MemChunk with the given size
 	MemChunk( size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 ):
 			Chunk(
-				( TYPE* )malloc( sizeof( TYPE )*fourthDim*thirdDim*secondDim*firstDim ),
+				( TYPE* )calloc(fourthDim*thirdDim*secondDim*firstDim,sizeof( TYPE ) ),
 				typename ::isis::util::TypePtr<TYPE>::BasicDeleter(),
 				firstDim, secondDim, thirdDim, fourthDim
 			) {}

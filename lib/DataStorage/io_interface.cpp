@@ -9,26 +9,29 @@ namespace isis
 namespace image_io
 {
 
-bool FileFormat::write( const isis::data::ImageList& images, const std::string& filename, const std::string& dialect )
+void FileFormat::write( const isis::data::ImageList& images, const std::string& filename, const std::string& dialect ) throw(std::runtime_error&)
 {
 	boost::filesystem::path path( filename );
 	std::string file = path.leaf();
 	path.remove_leaf();
 	bool ret = true;
-	BOOST_FOREACH( data::ImageList::const_reference ref, images ) {
-		if ( not ref->hasProperty( "sequenceNumber" ) ) {
-			LOG( Runtime, error )
-			<< "sequenceNumber is missing, so I can't generate a unique filename. Won't write...";
-			ret = false;
-			continue;
-		}
+	if(images.size()>1){
+		BOOST_FOREACH( data::ImageList::const_reference ref, images ) {
+			if ( not ref->hasProperty( "sequenceNumber" ) ) {
+				LOG( Runtime, error )
+				<< "sequenceNumber is missing, so I can't generate a unique filename. Won't write...";
+				ret = false;
+				continue;
+			}
 
-		std::string snum = ref->getPropertyValue( "sequenceNumber" )->toString();
-		std::string unique_name = std::string( "S" ) + snum + "_" + file;
-		LOG( Runtime, info )   << "Writing image to " <<  path / unique_name;
-		ret &= write( *ref, ( path / unique_name ).string(), dialect );
+			std::string snum = ref->getPropertyValue( "sequenceNumber" )->toString();
+			std::string unique_name = std::string( "S" ) + snum + "_" + file;
+			LOG( Runtime, info )   << "Writing image to " <<  path / unique_name;
+			write( *ref, ( path / unique_name ).string(), dialect );
+		}
+	} else {
+		write( *images.front(), ( path / file ).string(), dialect );
 	}
-	return ret;
 }
 
 bool FileFormat::hasOrTell( const std::string& name, const isis::util::PropMap& object, isis::LogLevel level )
@@ -39,6 +42,16 @@ bool FileFormat::hasOrTell( const std::string& name, const isis::util::PropMap& 
 		LOG( Runtime, level ) << "Missing property " << util::MSubject( name );
 		return false;
 	}
+}
+
+void FileFormat::throwGenericError(std::string desc)
+{
+	throw(std::runtime_error(desc));
+}
+
+void FileFormat::throwSystemError(int err, std::string desc)
+{
+	throw(boost::system::system_error(err,boost::system::get_system_category(),desc));
 }
 
 const float FileFormat::invalid_float = -std::numeric_limits<float>::infinity();

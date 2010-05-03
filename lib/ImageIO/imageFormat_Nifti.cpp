@@ -112,7 +112,7 @@ public:
 	/***********************
 	 * load file
 	 ************************/
-	int load( data::ChunkList &retList, const std::string& filename, const std::string& dialect ) {
+	int load( data::ChunkList &retList, const std::string& filename, const std::string& dialect )  throw(std::runtime_error&){
 		//read the file with the function from nifti1_io.h
 		nifti_image* ni = nifti_image_read( filename.c_str(), true );
 
@@ -174,7 +174,7 @@ public:
 	/***********************
 	 * write file
 	 ************************/
-	bool write( const data::Image &image, const std::string& filename, const std::string& dialect ) {
+	void write( const data::Image &image, const std::string& filename, const std::string& dialect ) throw(std::runtime_error&) {
 		LOG( ImageIoDebug, isis::info ) << "Write Nifti.";
 		boost::filesystem::path boostFilename( filename );
 		//default init for nifti image
@@ -243,21 +243,15 @@ public:
 			copyDataToNifti<double>( image, ni );
 			break;
 		default:
-			LOG( ImageIoLog, error ) << "Datatype " << util::TypePtr<float>::staticName() << " cannot be written!";
+			throwGenericError("Datatype " + util::TypePtr<float>::staticName() + " cannot be written!");
 		}
 
 		//now really write the nifti file with the function from nifti1_io.h
 		errno = 0; //reset errno
 		nifti_image_write( &ni ); //write the image - in case of a failure errno should be set
 
-		if ( errno ) {
-			//not succesfully written
-			LOG( ImageIoLog, error ) << "Could not write to " << filename << "(" << strerror( errno ) << ")";
-			boost::filesystem::remove( boostFilename );
-			return false;
-		}
-
-		return true; // everything seems to be fine
+		if ( errno )
+			throwSystemError(errno);
 	}
 
 	/****************************************
@@ -309,8 +303,8 @@ private:
 		util::FixedVector<float, 4> voxel_size( ni.pixdim + 1 );
 		voxel_size=voxel_size* units;
 		if(dir == voxelSizeVec)
-			return voxel_size; 
-		
+			return voxel_size;
+
 		if ( ni.nifti_type > 0 ) { // only for non-ANALYZE
 			//      RotMatrix scaleMat;//method 2
 			util::fvector4 qto, sto;
@@ -338,8 +332,8 @@ private:
 			} else if ( ni.sform_code > 0 ) { // method 3
 				retVec = sto*voxelSizeVec;
 			} else if ( ni.sform_code == 0 and ni.qform_code == 0 ) {
-				retVec = qto*voxelSizeVec;
 				LOG( ImageIoLog, info ) << "sform_code and qform_code are 0. Trying to use qto_xyz info!";
+				retVec = qto*voxelSizeVec;
 			} else {
 				LOG( ImageIoLog, error )
 				<< "can't read orientation Vector for direction: " << dir + 1;
