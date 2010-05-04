@@ -154,6 +154,13 @@ public:
 			this->reset();//actually not needed, but we keep it here to keep obfuscation low
 		}
 	};
+	/// delete-functor which does nothing (in case someone else manages the data).
+	struct NonDeleter {
+		void operator()( TYPE *p ) {
+			//we have to cast the pointer to void* here, because in case of u_int8_t it will try to print the "string"
+			LOG( Debug, info ) << "Not freeing pointer " << ( void* )p << " (" << TypePtr<TYPE>::staticName() << ") ";
+		};
+	};
 	/// Default delete-functor for c-arrays (uses free()).
 	struct BasicDeleter {
 		void operator()( TYPE *p ) {
@@ -189,7 +196,8 @@ public:
 			m_val( ptr, BasicDeleter() ), _internal::TypePtrBase( length ) {}
 	/**
 	 * Creates TypePtr from a pointer of type TYPE.
-	 * The pointers are automatically deleted by an copy of d and should not be used outside once used here.
+	 * The pointers are automatically deleted by an copy of d and should not be used outside once used here
+	 * (this does not apply, if d does not delete).
 	 * The usual dereferencing pointer interface ("*" and "->") is supported.
 	 * D must implement operator()(TYPE *p).
 	 * \param ptr the pointer to the used array

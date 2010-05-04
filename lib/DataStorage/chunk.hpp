@@ -124,6 +124,9 @@ public:
 	template<typename T> void getMinMax( T &min, T &max )const {
 		return operator*().getMinMax( min, max );
 	}
+	template<typename T> size_t convertTo(T *dst,size_t len)const{
+		getTypePtrBase().convertTo(dst);
+	}
 };
 
 /// @cond _internal

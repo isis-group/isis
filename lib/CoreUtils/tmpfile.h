@@ -41,6 +41,7 @@ public:
 	 * \param suffix string to be appended to the filename
 	 */
 	TmpFile( std::string prefix = "", std::string sufix = "" );
+	///Will delete the temporary file if its still there.
 	~TmpFile();
 };
 }

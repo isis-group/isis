@@ -112,7 +112,7 @@ void TypePtrBase::copyRange( size_t start, size_t end, TypePtrBase &dst, size_t 
 	const size_t blength = length * bytes_per_elem();//length in bytes
 	memcpy( dest + doffset, src + soffset, blength );
 }
-bool TypePtrBase::copyTo( TypePtrBase& dst ) const
+bool TypePtrBase::convertTo( TypePtrBase& dst ) const
 {
 	const Converter& conv = getConverterTo( dst.typeID() );
 
@@ -125,7 +125,6 @@ bool TypePtrBase::copyTo( TypePtrBase& dst ) const
 		return false;
 	}
 }
-
 
 }
 }
