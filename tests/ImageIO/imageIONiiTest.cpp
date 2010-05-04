@@ -5,8 +5,12 @@
  *      Author: Thomas Proeger
  */
 
+#include "DataStorage/image.hpp"
 #include "DataStorage/io_factory.hpp"
 #include "CoreUtils/log.hpp"
+#include "CoreUtils/tmpfile.h"
+
+using namespace isis;
 
 #define BOOST_TEST_MODULE "imageIONiiTest"
 #include <boost/test/included/unit_test.hpp>
@@ -19,22 +23,22 @@ namespace isis
 namespace test
 {
 
-BOOST_AUTO_TEST_SUITE ( imageIONii_BaseTests )
+BOOST_AUTO_TEST_SUITE ( imageIONii_NullTests )
 
 BOOST_AUTO_TEST_CASE( loadsaveImage )
 {
 	data::ImageList images;
-	data::enable_log<util::DefaultMsgPrint>( error );
-//  The factory assumes that there is valid file before
-//  calling the appropriate plugin.
-//  We will use the Null plugin to get some image data
-	std::string tmpfile = ( ( std::string )tmpnam( NULL ) ) + ".null";
-	std::string niifile = ( ( std::string )tmpnam( NULL ) ) + ".nii";
-	std::ofstream file( tmpfile.c_str() );
-	//  load images from file
-	images = data::IOFactory::load( tmpfile, "" );
-//  write images to file(s)
-	data::IOFactory::write( images, niifile, "" );
+	image_io::enable_log<util::DefaultMsgPrint>( info );
+	//  We will use the Null plugin to get some image data
+	util::TmpFile nullfile("",".null"),niifile("",".nii");
+	// the null-loader shall generate 5 3x3x3x10 images
+	images = data::IOFactory::load( nullfile.string(), "" );
+
+	//  write images to file(s)
+	if ( data::IOFactory::write( images, niifile.string(), "" ) )
+		std::cout << "Wrote Image to " << niifile << std::endl;
+
+	data::IOFactory::load( niifile.string(), "" );
 }
 
 BOOST_AUTO_TEST_SUITE_END()

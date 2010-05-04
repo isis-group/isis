@@ -15,6 +15,7 @@
 
 #ifdef __cplusplus
 #include <string>
+#include <boost/system/system_error.hpp>
 #include "DataStorage/image.hpp"
 #include "ImageIO/common.hpp"
 
@@ -48,14 +49,41 @@ protected:
 		return false;
 	}
 public:
+	static void throwGenericError( std::string desc );
+	static void throwSystemError( int err, std::string desc = "" );
 	static const float invalid_float;
+	/// \return the name of the plugin
 	virtual std::string name() = 0;
+	/// \return the file-suffixes the plugin supports
 	virtual std::string suffixes() = 0;
+	/// \return the dialects the plugin supports
 	virtual std::string dialects() {return std::string();};
+	/// \return if the plugin is not part of the official distribution
 	virtual bool tainted() {return true;}
-	virtual int load( data::ChunkList &chunks, const std::string& filename, const std::string& dialect ) = 0;
-	virtual bool write( const data::Image &image, const std::string& filename, const std::string& dialect ) = 0;
-	virtual bool write( const data::ImageList &images, const std::string& filename, const std::string& dialect );
+	/**
+	 * Load data into the given chunk list.
+	 * I case of an error std::runtime_error will be thrown.
+	 * \param chunks the chunk list where the loaded chunks shall be added to
+	 * \param filename the name of the file to load from (the system does NOT check if this file exists)
+	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
+	 * \returns the amount of loaded chunks.
+	 */
+	virtual int load( data::ChunkList &chunks, const std::string& filename, const std::string& dialect ) throw( std::runtime_error& ) = 0;
+	/**
+	 * Write a single image to a file.
+	 * I case of an error std::runtime_error will be thrown.
+	 * \param filename the name of the file to write (the system does NOT check if this file exists/is writeable)
+	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
+	 */
+	virtual void write( const data::Image &image, const std::string& filename, const std::string& dialect ) throw( std::runtime_error& ) = 0;
+	/**
+	 * Write a multiple images.
+	 * I case of an error std::runtime_error will be thrown.
+	 * The default implementation will call write( const data::Image &, const std::string&, const std::string&) for every image using a generated unique filename.
+	 * \param filename the name to be used as base for the filename generation if neccessary.
+	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
+	 */
+	virtual void write( const data::ImageList &images, const std::string& filename, const std::string& dialect ) throw( std::runtime_error& );
 	virtual ~FileFormat() {}
 };
 }

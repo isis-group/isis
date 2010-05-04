@@ -27,8 +27,8 @@
  ******************************************************************/
 
 //LOCAL INCLUDES
-#include <DataStorage/io_interface.h>
-#include <CoreUtils/type.hpp>
+#include "DataStorage/io_interface.h"
+#include "CoreUtils/type.hpp"
 #include "common.hpp"
 #include "CoreUtils/vector.hpp"
 
@@ -37,6 +37,7 @@
 #include <string>
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
+#include <boost/assert.hpp>
 
 namespace isis
 {
@@ -82,14 +83,14 @@ class ImageFormat_Nifti : public FileFormat
 		void operator ()( void *at ) {
 			LOG_IF( NULL == m_pNiImage, ImageIoLog, error )
 			<<  "Trying to close non-existing nifti file: " << util::MSubject( m_filename );
-			LOG( ImageIoDebug, info ) << "Closing Nifti-Chunk file" << util::MSubject( m_filename );
+			LOG( ImageIoDebug, info ) << "Closing Nifti-Chunk file " << util::MSubject( m_filename );
 			//clean up with the function from nifti1_io.h
 			nifti_image_free( m_pNiImage );
 		}
 	};
 
 public:
-	enum vectordirection {readDir = 0, phaseDir, sliceDir, centerVec, voxelSizeVec};
+	enum vectordirection {readDir = 0, phaseDir, sliceDir, indexOrigin, voxelSizeVec};
 
 	std::string suffixes() {
 		return std::string( ".nii.gz .nii .hdr" );
@@ -111,22 +112,20 @@ public:
 	/***********************
 	 * load file
 	 ************************/
-	int load( data::ChunkList &retList, const std::string& filename, const std::string& dialect ) {
+	int load( data::ChunkList &retList, const std::string& filename, const std::string& dialect )  throw( std::runtime_error& ) {
 		//read the file with the function from nifti1_io.h
+		errno = 0;
 		nifti_image* ni = nifti_image_read( filename.c_str(), true );
 
-		if ( NULL == ni ) {
-			return 0;
-		}
+		if ( not ni )
+			throwSystemError( errno );
 
 		// 0.0 would mean "not in use" - so for better handling use a 1.0
 		float scale = ni->scl_slope ? ni->scl_slope : 1.0;
 
 		// TODO: at the moment scaling not supported due to data type changes
-		if ( 1.0 != scale ) {
-			LOG( ImageIoDebug, isis::error ) << "Scaling is not supported at the moment. Scale Factor:  " << scale;
-			return 0;
-		}
+		if ( 1.0 != scale )
+			throwGenericError( std::string( "Scaling is not supported at the moment. Scale Factor: " ) + util::Type<float>( scale ).toString() );
 
 		LOG( ImageIoDebug, isis::info ) << "datatype to load from nifti " << ni->datatype;
 		boost::shared_ptr<data::Chunk> retChunk;
@@ -158,22 +157,21 @@ public:
 			retChunk.reset( new _internal::NiftiChunk( static_cast<double*>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ) );
 			break;
 		default:
-			LOG( ImageIoDebug, isis::error ) << "Unsupported datatype " << ni->datatype;
-			return 0;
+			throwGenericError( std::string( "Unsupported datatype " ) + util::Type<int>( ni->datatype ).toString() );
 		}
 
 		// don't forget to take the properties with
 		copyHeaderFromNifti( *retChunk, *ni );
 		// push the completed NiftiChunk into the list
 		retList.push_back( *retChunk );
-		return retList.size();
+		return retChunk ? 1 : 0;
 	}
 
 
 	/***********************
 	 * write file
 	 ************************/
-	bool write( const data::Image &image, const std::string& filename, const std::string& dialect ) {
+	void write( const data::Image &image, const std::string& filename, const std::string& dialect ) throw( std::runtime_error& ) {
 		LOG( ImageIoDebug, isis::info ) << "Write Nifti.";
 		boost::filesystem::path boostFilename( filename );
 		//default init for nifti image
@@ -242,21 +240,15 @@ public:
 			copyDataToNifti<double>( image, ni );
 			break;
 		default:
-			LOG( ImageIoLog, error ) << "Datatype " << util::TypePtr<float>::staticName() << " cannot be written!";
+			throwGenericError( "Datatype " + util::TypePtr<float>::staticName() + " cannot be written!" );
 		}
 
 		//now really write the nifti file with the function from nifti1_io.h
 		errno = 0; //reset errno
 		nifti_image_write( &ni ); //write the image - in case of a failure errno should be set
 
-		if ( errno ) {
-			//not succesfully written
-			LOG( ImageIoLog, error ) << "Could not write to " << filename << "(" << strerror( errno ) << ")";
-			boost::filesystem::remove( boostFilename );
-			return false;
-		}
-
-		return true; // everything seems to be fine
+		if ( errno )
+			throwSystemError( errno );
 	}
 
 	/****************************************
@@ -274,14 +266,13 @@ private:
 			//retChunk.setProperty("acquisitionTime", );
 			retChunk.setProperty( "indexOrigin", util::fvector4( ni.qoffset_x, ni.qoffset_y, ni.qoffset_z, 0 ) );
 			retChunk.setProperty( "acquisitionNumber", t );
-			retChunk.setProperty( "sequenceNumber", 1 );
+			retChunk.setProperty<u_int16_t>( "sequenceNumber", 1 );
 			retChunk.setProperty( "readVec", getVector( ni, readDir ) );
 			retChunk.setProperty( "phaseVec", getVector( ni, phaseDir ) );
 			retChunk.setProperty( "sliceVec", getVector( ni, sliceDir ) );
 			retChunk.setProperty( "voxelSize", getVector( ni, voxelSizeVec ) );
-			retChunk.setProperty( "centerVec", getVector( ni, centerVec ) );
-			retChunk.setProperty( "study/description", std::string( ni.descrip ) );
-			retChunk.setProperty( "series/description", std::string( ni.intent_name ) );
+			retChunk.setProperty( "nifti/studyDescription", std::string( ni.descrip ) );
+			retChunk.setProperty( "seriesDescription", std::string( ni.intent_name ) );
 			//just some LOGS
 			LOG( ImageIoLog, info ) << "dims at all " << dimensions;
 			LOG( ImageIoLog, info ) << "Offset values from nifti" << offsets;
@@ -295,36 +286,24 @@ private:
 
 	util::fvector4 getVector( const nifti_image& ni, const enum vectordirection& dir ) {
 		util::fvector4 retVec( 0, 0, 0, 0 );
-		float div = 1.0; // factor for read (dx) /phase (dy) /slice (dz) vectors
+		float units; // conversion-factor to mm
 
-		switch ( dir ) {
-		case readDir:
-			div = ni.dx;
+		switch ( ni.xyz_units ) {
+		case NIFTI_UNITS_METER:
+			units = 1.0e3;
 			break;
-		case phaseDir:
-			div = ni.dy;
-			break;
-		case sliceDir:
-			div = ni.dz;
-			break;
-		case voxelSizeVec://read size of voxels pixdim+1 is dx ... pixdim+4=dt
-			return util::FixedVector<float, 4>( ni.pixdim + 1 );
-			break;
-		case centerVec:
-
-			switch ( ni.xyz_units ) {
-			case NIFTI_UNITS_METER:
-				div = 1.0 / 1.0e3;
-				break;
-			case NIFTI_UNITS_MICRON:
-				div = 1.0 / 1.0e-3;
-				break;
-			}
-
+		case NIFTI_UNITS_MICRON:
+			units = 1.0e-3;
 			break;
 		default:
-			break;
+			units = 1;
 		}
+
+		util::FixedVector<float, 4> voxel_size( ni.pixdim + 1 );
+		voxel_size = voxel_size * units;
+
+		if ( dir == voxelSizeVec )
+			return voxel_size;
 
 		if ( ni.nifti_type > 0 ) { // only for non-ANALYZE
 			//      RotMatrix scaleMat;//method 2
@@ -332,14 +311,14 @@ private:
 
 			//get qto
 			for ( int i = 0; i < 3; i++ ) {
-				qto[i] = ni.qto_xyz.m[i][dir] / div;
+				qto[i] = ni.qto_xyz.m[i][dir];
 			}
 
 			LOG( ImageIoDebug, info ) << "Orientation red from qto_xyz:" << dir + 1 << " is " << qto;
 
 			//get sto
 			for ( int i = 0; i < 3; i++ ) {
-				sto[i] = ni.sto_xyz.m[i][dir] / div;
+				sto[i] = ni.sto_xyz.m[i][dir];
 			}
 
 			LOG( ImageIoDebug, info ) << "Orientation red from sto_xyz:" << dir + 1 << " is " << sto;
@@ -347,14 +326,14 @@ private:
 			//use one of them
 			if ( ni.qform_code > 0 ) {// just tranform to the nominal space of the scanner
 				retVec = qto;
-				LOG_IF( qto != sto and ni.sform_code > 0, ImageIoLog, warning )
-				<< "sto_xyz:" << dir + 1 << " (" << sto << ") differs from qto_xyz:"
-				<< dir + 1 << " (" << qto << "). But I'll ignore it anyway because qform_code>0.";
+				/*              LOG_IF( qto != sto and ni.sform_code > 0, ImageIoLog, warning )
+				                << "sto_xyz:" << dir + 1 << " (" << sto << ") differs from qto_xyz:"
+				                << dir + 1 << " (" << qto << "). But I'll ignore it anyway because qform_code>0.";*/
 			} else if ( ni.sform_code > 0 ) { // method 3
-				retVec = sto;
+				retVec = sto * voxelSizeVec;
 			} else if ( ni.sform_code == 0 and ni.qform_code == 0 ) {
-				retVec = qto;
 				LOG( ImageIoLog, info ) << "sform_code and qform_code are 0. Trying to use qto_xyz info!";
+				retVec = qto * voxelSizeVec;
 			} else {
 				LOG( ImageIoLog, error )
 				<< "can't read orientation Vector for direction: " << dir + 1;
@@ -367,18 +346,15 @@ private:
 	template<typename T>
 	bool copyDataToNifti( const data::Image& image, nifti_image& ni ) {
 		ni.data = malloc( image.bytes_per_voxel() * image.volume() );
-		data::Image::ChunkIterator it = image.chunksBegin();
-		data::ChunkList list( image.chunksBegin(), image.chunksEnd() );
-		unsigned short i = 0;
-		BOOST_FOREACH( const data::Chunk &ref, list ) {
-		}
 		T *refNii = ( T* ) ni.data;
 
-		for ( int z = 0; z < image.sizeToVector()[2]; z++ ) {
-			for ( int y = 0; y < image.sizeToVector()[1]; y++ ) {
-				for ( int x = 0; x < image.sizeToVector()[0]; x++ ) {
-					*refNii = image.voxel<T>( x, y, z );
-					refNii++;
+		for ( int t = 0; t < image.sizeToVector()[3]; t++ ) {
+			for ( int z = 0; z < image.sizeToVector()[2]; z++ ) {
+				for ( int y = 0; y < image.sizeToVector()[1]; y++ ) {
+					for ( int x = 0; x < image.sizeToVector()[0]; x++ ) {
+						*refNii = image.voxel<T>( x, y, z, t );
+						refNii++;
+					}
 				}
 			}
 		}
@@ -393,6 +369,7 @@ private:
 
 	bool copyHeaderToNifti( const data::Image& image, nifti_image& ni ) {
 		//all the other information for the nifti header
+		BOOST_ASSERT( data::Image::n_dims == 4 );
 		ni.scl_slope = 1.0;
 		ni.scl_inter = 0.0;// TODO: ? http://209.85.135.104/search?q=cache:AxBp5gn9GzoJ:nifti.nimh.nih.gov/board/read.php%3Ff%3D1%26i%3D57%26t%3D57+nifti-1+scl_slope&hl=en&ct=clnk&cd=1&client=iceweasel-a
 		ni.freq_dim = 1;
@@ -402,7 +379,7 @@ private:
 		ni.time_units = NIFTI_UNITS_MSEC;
 		util::fvector4 dimensions = image.sizeToVector();
 		LOG( ImageIoLog, info ) << dimensions;
-		ni.ndim = ni.dim[0] = dimensions[3] > 1 ? 4 : 3;
+		ni.ndim = ni.dim[0] = image.relevantDims();
 		ni.nx = ni.dim[1] = dimensions[0];
 		ni.ny = ni.dim[2] = dimensions[1];
 		ni.nz = ni.dim[3] = dimensions[2];
@@ -411,8 +388,8 @@ private:
 		util::fvector4 readVec = image.getProperty<util::fvector4>( "readVec" );
 		util::fvector4 phaseVec = image.getProperty<util::fvector4>( "phaseVec" );
 		util::fvector4 sliceVec = image.getProperty<util::fvector4>( "sliceVec" );
-		util::fvector4 centerVec = image.getProperty<util::fvector4>( "centerVec" );
-		LOG( ImageIoLog, info ) << centerVec;
+		util::fvector4 indexOrigin = image.getProperty<util::fvector4>( "indexOrigin" );
+		LOG( ImageIoLog, info ) << indexOrigin;
 		util::fvector4 voxelSizeVector = image.getProperty<util::fvector4>( "voxelSize" );
 		ni.dx = ni.pixdim[1] = voxelSizeVector[0];
 		ni.dy = ni.pixdim[2] = voxelSizeVector[1];
@@ -429,17 +406,9 @@ private:
 			snprintf( ni.intent_name, 16, "%s", descrip.c_str() );
 		}
 
-		//      //special case centervec
-		//      util::fvector4 centerVec(0,0,0,1);
-		//      util::fvector4 FOV(192, 192, 110, 0);
-		//      //diagonale trougth the image in "normal" space
-		//      util::fvector4 ivector = readVec*(FOV[readDir]-ni.dx)+
-		//              phaseVec*(FOV[phaseDir]-ni.dy)+
-		//              sliceVec*(FOV[timeDir]-ni.dz);
-		//      centerVec = centerVec + ivector/2;
 		//the rotation matrix
 		//create space tranformation matrices - transforms the space when reading _NOT_ the data
-		//TODO something is going wrong with the rotation matrix, maybe scaling - not clear
+		// thus ni.qto_xyz describes the orientation of the scanner space in the image space, not the orientation of image in the scanner space
 		ni.sform_code = ni.qform_code = NIFTI_XFORM_SCANNER_ANAT;//set scanner aligned space from nifti1.h
 		LOG( ImageIoLog, info ) << "ReadVec " << readVec << "  phaseVec" << phaseVec << "sliceVec" << sliceVec;
 
@@ -448,19 +417,19 @@ private:
 		//      ni.qoffset_y = offsets[1];
 		//      ni.qoffset_z = offsets[2];
 		for ( int y = 0; y < 3; y++ ) {
-			ni.qto_xyz.m[0][y] = readVec[y];//rot[0][y];
-			ni.qto_xyz.m[1][y] = phaseVec[y];//rot[1][y];
-			ni.qto_xyz.m[2][y] = sliceVec[y];//rot[2][y];
-			ni.qto_xyz.m[y][3] = centerVec[y];
+			ni.qto_xyz.m[y][0] = readVec[y];//rot[0][y];
+			ni.qto_xyz.m[y][1] = phaseVec[y];//rot[1][y];
+			ni.qto_xyz.m[y][2] = sliceVec[y];//rot[2][y];
+			ni.qto_xyz.m[y][3] = indexOrigin[y];
 		}
 
 		memcpy( ni.sto_xyz.m, ni.qto_xyz.m, sizeof( ni.sto_xyz.m ) );
 
 		//add scaling to the sform
 		for ( int y = 0; y < 3; y++ ) {
-			ni.sto_xyz.m[0][y] *= ni.pixdim[1+y];
-			ni.sto_xyz.m[1][y] *= ni.pixdim[1+y];
-			ni.sto_xyz.m[2][y] *= ni.pixdim[1+y];
+			ni.sto_xyz.m[0][y] *= voxelSizeVector[y];
+			ni.sto_xyz.m[1][y] *= voxelSizeVector[y];
+			ni.sto_xyz.m[2][y] *= voxelSizeVector[y];
 		}
 
 		//generate matching quaternions

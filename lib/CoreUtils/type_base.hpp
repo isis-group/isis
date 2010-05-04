@@ -287,7 +287,15 @@ public:
 	TypePtrBase::Reference copyToMem()const;
 
 	/// Copy (or Convert) data from this to another TypePtr of maybe another type and the same length.
-	bool copyTo( TypePtrBase &dst )const;
+	bool convertTo( TypePtrBase &dst )const;
+
+	/// Copy (or Convert) data from this to memory of maybe another type and the same length.
+	template<typename T> bool convertTo( T *dst,size_t len ) const
+	{
+		TypePtr<T> dest(dst,len,TypePtr<T>::NonDeleter());
+		return convertTo(dest);
+	}
+
 	/**
 	 * Copy this to a new TypePtr\<T\> using newly allocated memory.
 	 * This will create a new TypePtr of type T and the length of this.
@@ -297,7 +305,7 @@ public:
 	 */
 	template<typename T> const TypePtr<T> copyToNew()const {
 		TypePtr<T> ret( ( T* )malloc( sizeof( T )*len() ), len() );
-		copyTo( ret );
+		convertTo( ret );
 		return ret;
 	}
 	/**

@@ -109,14 +109,15 @@ public:
 		return util::FixedVector<size_t, DIMS>( dim );
 	}
 
-	/// get the lowest and higest relevant (size>1) dimension
-	std::pair<size_t, size_t> dimRange()const {
-		std::pair<size_t, size_t> ret( -1, -1 );
+	/// get amount of relevant dimensions (last dim with size>1)
+	size_t relevantDims()const {
+		size_t ret = 0;
 
-		for ( unsigned short i = 0; i < DIMS; i++ ) {
-			if ( dim[i] > 1 && ret.first == -1 )ret.first = i;
-
-			if ( dim[DIMS-i-1] > 1  && ret.second == -1 )ret.second = DIMS - i - 1;
+		for ( unsigned short i = DIMS; i; i-- ) {
+			if ( dim[i-1] > 1 ) {
+				ret = i;
+				break;
+			}
 		}
 
 		return ret;

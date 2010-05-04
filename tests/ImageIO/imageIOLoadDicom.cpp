@@ -28,7 +28,6 @@ BOOST_AUTO_TEST_CASE ( imageDicomtest )
 	ENABLE_LOG( ImageIoLog, util::DefaultMsgPrint, warning );
 	ENABLE_LOG( ImageIoDebug, util::DefaultMsgPrint, warning );
 	data::ImageList images = data::IOFactory::load( "/SCR/isis_build/testDicom.ima", "" );
-	// the null-loader shall generate 5 3x3x3x10 images
 	BOOST_CHECK( images.size() == 1 );
 	short cnt = 0;
 	/*      BOOST_FOREACH(data::ImageList::value_type &ref,images){

@@ -184,7 +184,7 @@ bool Image::reIndex()
 
 	//get primary attributes from first chunk
 	const Chunk &first = *set.begin();
-	const unsigned short chunk_dims = first.dimRange().second + 1;
+	const unsigned short chunk_dims = first.relevantDims();
 	chunkVolume = first.volume();
 	//copy sizes of the chunks to to the first chunk_dims sizes of the image
 	size_t size[Chunk::n_dims];
@@ -313,7 +313,8 @@ bool Image::reIndex()
 										);
 
 		if ( hasProperty( "sliceVec" ) ) {
-			const util::fvector4 sliceVec = getProperty<util::fvector4>( "sliceVec" );
+			util::fvector4 &sliceVec = operator[]( "sliceVec" )->cast_to_Type<util::fvector4>(); //get the slice vector
+			sliceVec.norm(); // norm it
 			LOG_IF( not crossVec.fuzzyEqual( sliceVec ), Runtime, warning )
 			<< "The existing sliceVec " << sliceVec
 			<< " differs from the cross product of the read- and phase vector " << crossVec;

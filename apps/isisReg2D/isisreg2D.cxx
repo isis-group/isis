@@ -60,13 +60,13 @@ static VString vout_filename = NULL;
 static VString pointset_filename = NULL;
 static VString transform_filename_in = NULL;
 static VShort number_of_bins = 50;
-static VShort number_of_iterations = 1000;
+static VArgVector number_of_iterations;
 static VFloat pixel_density = 0.01;
 static VArgVector grid_size;
-static VShort metricType = 0;
 static VArgVector transformType;
 static VArgVector interpolatorType;
 static VArgVector optimizerType;
+static VArgVector metricType;
 static VBoolean in_found, ref_found, pointset_found;
 static VShort number_threads = 1;
 static VShort initial_seed = 1;
@@ -76,6 +76,8 @@ static VString mask_filename = NULL;
 static VFloat smooth = 0;
 static VBoolean use_inverse = false;
 static VFloat coarse_factor = 1;
+static VFloat bspline_bound = 100.0;
+static VBoolean verbose = false;
 
 static VOptionDescRec
 options[] = {
@@ -119,6 +121,7 @@ options[] = {
 	 "Using an initializer to align the image centers"},
 	{"prealign_mass", VBooleanRepn, 1, &initialize_mass, VOptionalOpt, 0,
 	 "Using an initializer to align the center of mass"},
+	{"verbose", VBooleanRepn, 1, &verbose, VOptionalOpt, 0, "printing the optimizer values of each iteration"},
 	{"smooth", VFloatRepn, 1, &smooth, VOptionalOpt, 0, "Applying a smoothing filter to the fixed and moving image before the registration process"},
 	{"get_inverse", VBooleanRepn, 1, &use_inverse, VOptionalOpt, 0, "Getting the inverse transform"},
 
@@ -158,6 +161,9 @@ int main(
 	VShort transform;
 	VShort optimizer;
 	VShort interpolator;
+	VShort metric;
+	VShort niteration;
+	VShort gridSize;
 	typedef itk::Image<InputPixelType, Dimension> FixedImageType;
 	typedef itk::Image<InputPixelType, Dimension> MovingImageType;
 	typedef itk::Image<MaskPixelType, Dimension> MaskImageType;
@@ -193,7 +199,9 @@ int main(
 	tmpConstTransformPointer = NULL;
 	isis::data::ImageList refList = isis::data::IOFactory::load( ref_filename, "" );
 	isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "" );
-
+    LOG_IF( refList.empty(), isis::DataLog, isis::error ) << "Reference image is empty!";
+	LOG_IF( inList.empty(), isis::DataLog, isis::error ) << "Input image is empty!";
+	
 	if ( !smooth ) {
 		fixedImage = isis::adapter::itkAdapter::makeItkImageObject<FixedImageType>( refList.front() );
 		movingImage = isis::adapter::itkAdapter::makeItkImageObject<MovingImageType>( inList.front() );
@@ -240,7 +248,7 @@ int main(
 	isis::extitk::TransformMerger2D* transformMerger = new isis::extitk::TransformMerger2D;
 	//analyse transform vector
 	unsigned int repetition = transformType.number;
-	unsigned int gridSize;
+	unsigned int bsplineCounter = 0;
 
 	if ( !repetition )
 		repetition = 1;
@@ -249,31 +257,57 @@ int main(
 	boost::progress_timer time_used;
 
 	for ( unsigned int counter = 0; counter < repetition; counter++ ) {
+		//transform is the master for determining the number of repetitions
 		if ( transformType.number ) {
 			transform = ( ( VShort* ) transformType.vector )[counter];
 		} else {
 			transform = 0;
 		}
 
-		if ( optimizerType.number ) {
+		if ( ( counter + 1 ) <= optimizerType.number and optimizerType.number ) {
 			optimizer = ( ( VShort* ) optimizerType.vector )[counter];
+		} else if ( ( counter + 1 ) > optimizerType.number and optimizerType.number ) {
+			optimizer = ( ( VShort* ) optimizerType.vector )[optimizerType.number-1];
 		} else {
 			optimizer = 0;
 		}
 
-		if ( interpolatorType.number ) {
+		if ( ( counter + 1 ) <= metricType.number and metricType.number ) {
+			metric = ( ( VShort* ) metricType.vector )[counter];
+		} else if ( ( counter + 1 ) > metricType.number and metricType.number ) {
+			metric = ( ( VShort* ) metricType.vector )[metricType.number-1];
+		} else {
+			metric = 0;
+		}
+
+		if ( ( counter + 1 ) <= interpolatorType.number and interpolatorType.number ) {
 			interpolator = ( ( VShort* ) interpolatorType.vector )[counter];
+		} else if ( ( counter + 1 ) > interpolatorType.number and interpolatorType.number ) {
+			interpolator = ( ( VShort* ) interpolatorType.vector )[interpolatorType.number-1];
 		} else {
 			interpolator = 0;
 		}
 
-		if ( grid_size.number ) {
-			gridSize = ( ( VShort* ) grid_size.vector )[counter];
+		if ( ( counter + 1 ) <= number_of_iterations.number and number_of_iterations.number ) {
+			niteration = ( ( VShort* ) number_of_iterations.vector )[counter];
+		} else if ( ( counter + 1 ) > number_of_iterations.number and number_of_iterations.number ) {
+			niteration = ( ( VShort* ) number_of_iterations.vector )[number_of_iterations.number-1];
+		} else {
+			niteration = 500;
+		}
+
+		if ( ( bsplineCounter + 1 ) <= grid_size.number and grid_size.number ) {
+			gridSize = ( ( VShort* ) grid_size.vector )[bsplineCounter];
+		} else if ( ( bsplineCounter + 1 ) > grid_size.number and grid_size.number ) {
+			gridSize = ( ( VShort* ) grid_size.vector )[grid_size.number-1];
 		} else {
 			gridSize = 5;
 		}
 
-		std::cout << "gridSize: " << gridSize << std::endl;
+		if ( transform == 2 ) {
+			bsplineCounter++;
+		}
+
 		std::cout << std::endl << "setting up the registration object..." << std::endl;
 		registrationFactory->Reset();
 
@@ -320,9 +354,9 @@ int main(
 		}
 
 		//metric setup
-		std::cout << "used metric: " << TYPMetric[metricType].keyword << std::endl;
+		std::cout << "used metric: " << TYPMetric[metric].keyword << std::endl;
 
-		switch ( metricType ) {
+		switch ( metric ) {
 		case 0:
 			registrationFactory->SetMetric( RegistrationFactoryType::MattesMutualInformationMetric );
 			break;
@@ -422,14 +456,20 @@ int main(
 		}
 
 		registrationFactory->UserOptions.CoarseFactor = coarse_factor;
-		registrationFactory->UserOptions.NumberOfIterations = number_of_iterations;
+		registrationFactory->UserOptions.NumberOfIterations = niteration;
 		registrationFactory->UserOptions.NumberOfBins = number_of_bins;
 		registrationFactory->UserOptions.PixelDensity = pixel_density;
 		registrationFactory->UserOptions.BSplineGridSize = gridSize;
+
+		if ( verbose ) {
+			registrationFactory->UserOptions.SHOWITERATIONSTATUS = true;
+		} else {
+			registrationFactory->UserOptions.SHOWITERATIONSTATUS = false;
+		}
+
 		registrationFactory->UserOptions.PRINTRESULTS = true;
 		registrationFactory->UserOptions.NumberOfThreads = number_threads;
 		registrationFactory->UserOptions.MattesMutualInitializeSeed = initial_seed;
-		registrationFactory->UserOptions.SHOWITERATIONSTATUS = true;
 
 		if ( !initialize_center ) registrationFactory->UserOptions.INITIALIZECENTEROFF = true;
 

@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.6)
 
-
 IF(ITK_FOUND)
-	add_library(itkAdapter SHARED itkAdapter.cpp)
+	add_library(itkAdapter SHARED itkAdapter.hpp)
+	set_target_properties(itkAdapter PROPERTIES LINKER_LANGUAGE C)
 	target_link_libraries(itkAdapter utils data )
 ENDIF(ITK_FOUND)
 

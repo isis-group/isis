@@ -127,30 +127,21 @@ IOFactory& IOFactory::get()
 int IOFactory::loadFile( ChunkList &ret, const boost::filesystem::path& filename, const std::string& dialect )
 {
 	FileFormatList formatReader = getFormatInterface( filename.string(), dialect );
-
-	if ( false == boost::filesystem::exists( filename ) ) { //file to open does not exist
-		LOG( ImageIoLog, error ) << "File does not exist at given place: " << filename;
-		return 0;
-	}
-
-	if ( true == formatReader.empty() ) {//no suitable plugin for this file type and dialect
-		LOG( ImageIoLog, error ) << "Missing plugin to open file: " << filename << ( dialect.empty() ? "" : std::string( " with dialect: " ) + dialect );
-		return 0;
-	}
-
 	BOOST_FOREACH( FileFormatList::const_reference it, formatReader ) {
 		LOG( ImageIoDebug, info )
 		<< "plugin to load file " <<  util::MSubject( filename ) << ": " << it->name()
 		<<  ( dialect.empty() ?
 			  std::string( "" ) : std::string( " with dialect: " ) + dialect
 			);
-		const int loadedChunks = it->load( ret, filename.string(), dialect );
 
-		if ( loadedChunks )
-			return loadedChunks;
+		try {
+			return it->load( ret, filename.string(), dialect );
+		} catch ( std::runtime_error &e ) {
+			LOG( Runtime, error )
+			<< "Failed to load " <<  filename << " using " <<  it->name() << " (" << e.what() << ")";
+		}
 	}
-	LOG( ImageIoLog, error )
-	<< "Failed to read file: " << filename; //@todo error message missing
+	LOG( Runtime, error ) << "No plugin found to load: " << filename; //@todo error message missing
 	return 0;//no plugin of proposed list could load file
 }
 
@@ -213,13 +204,6 @@ int IOFactory::loadPath( ChunkList &ret, const boost::filesystem::path& path, co
 bool IOFactory::write( const isis::data::ImageList& images, const std::string& filename, const std::string& dialect )
 {
 	FileFormatList formatWriter = get().getFormatInterface( filename, dialect );
-
-	if ( formatWriter.empty() ) {//no suitable plugin
-		LOG( Runtime, error )
-		<< "Missing plugin to write file: " << filename << " with dialect: " << dialect;
-		return false;
-	}
-
 	BOOST_FOREACH( FileFormatList::const_reference it, formatWriter ) {
 		LOG( Debug, info )
 		<< "plugin to write to " <<  filename << ": " << it->name()
@@ -228,16 +212,17 @@ bool IOFactory::write( const isis::data::ImageList& images, const std::string& f
 			  std::string( " using dialect: " ) + dialect
 			);
 
-		if ( it->write( images, filename, dialect ) ) {//succesfully written
+		try {
+			it->write( images, filename, dialect );
 			LOG( Debug, info ) << images.size() << " images written using " <<  it->name();
 			return true;
-		} else
+		} catch ( std::runtime_error &e ) {
 			LOG( Runtime, error )
-			<< " could not write " <<  images.size()
-			<< " images using " <<  it->name();
+			<< "Failed to write " <<  images.size()
+			<< " images using " <<  it->name() << " (" << e.what() << ")";
+		}
 	}
-	LOG( Runtime, error )
-	<< "Could not write to: " << filename; //@todo error message missing
+	LOG( Runtime, error ) << "No plugin found to write to: " << filename; //@todo error message missing
 	return false;
 }
 

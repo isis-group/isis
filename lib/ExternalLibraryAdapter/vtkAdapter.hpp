@@ -40,7 +40,6 @@
 #include <vtkImageImport.h>
 #include <vtkSmartPointer.h>
 
-
 //TODO chunk handling
 
 namespace isis
