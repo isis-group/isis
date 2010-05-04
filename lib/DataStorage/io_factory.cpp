@@ -128,11 +128,6 @@ int IOFactory::loadFile( ChunkList &ret, const boost::filesystem::path& filename
 {
 	FileFormatList formatReader = getFormatInterface( filename.string(), dialect );
 
-	if ( true == formatReader.empty() ) {//no suitable plugin for this file type and dialect
-		LOG( ImageIoLog, error ) << "Missing plugin to open file: " << filename << ( dialect.empty() ? "" : std::string( " with dialect: " ) + dialect );
-		return 0;
-	}
-
 	BOOST_FOREACH( FileFormatList::const_reference it, formatReader ) {
 		LOG( ImageIoDebug, info )
 		<< "plugin to load file " <<  util::MSubject( filename ) << ": " << it->name()

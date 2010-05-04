@@ -114,20 +114,18 @@ public:
 	 ************************/
 	int load( data::ChunkList &retList, const std::string& filename, const std::string& dialect )  throw(std::runtime_error&){
 		//read the file with the function from nifti1_io.h
+		errno=0;
 		nifti_image* ni = nifti_image_read( filename.c_str(), true );
 
-		if ( NULL == ni ) {
-			return 0;
-		}
+		if(not ni)
+			throwSystemError(errno);
 
 		// 0.0 would mean "not in use" - so for better handling use a 1.0
 		float scale = ni->scl_slope ? ni->scl_slope : 1.0;
 
 		// TODO: at the moment scaling not supported due to data type changes
-		if ( 1.0 != scale ) {
-			LOG( ImageIoDebug, isis::error ) << "Scaling is not supported at the moment. Scale Factor:  " << scale;
-			return 0;
-		}
+		if(1.0 != scale)
+			throwGenericError(std::string("Scaling is not supported at the moment. Scale Factor: ") + util::Type<float>(scale).toString());
 
 		LOG( ImageIoDebug, isis::info ) << "datatype to load from nifti " << ni->datatype;
 		boost::shared_ptr<data::Chunk> retChunk;
@@ -159,15 +157,14 @@ public:
 			retChunk.reset( new _internal::NiftiChunk( static_cast<double*>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ) );
 			break;
 		default:
-			LOG( ImageIoDebug, isis::error ) << "Unsupported datatype " << ni->datatype;
-			return 0;
+			throwGenericError(std::string("Unsupported datatype ") + util::Type<int>(ni->datatype).toString());
 		}
 
 		// don't forget to take the properties with
 		copyHeaderFromNifti( *retChunk, *ni );
 		// push the completed NiftiChunk into the list
 		retList.push_back( *retChunk );
-		return retList.size();
+		return retChunk ? 1:0;
 	}
 
 
