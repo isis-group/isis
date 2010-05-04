@@ -8,6 +8,7 @@
 #include "DataStorage/image.hpp"
 #include "DataStorage/io_factory.hpp"
 #include "CoreUtils/log.hpp"
+#include "CoreUtils/tmpfile.h"
 
 using namespace isis;
 
@@ -29,16 +30,15 @@ BOOST_AUTO_TEST_CASE( loadsaveImage )
 	data::ImageList images;
 	image_io::enable_log<util::DefaultMsgPrint>( info );
 	//  We will use the Null plugin to get some image data
-	std::string nullfile = ( ( std::string )tmpnam( NULL ) ) + ".null";
-	std::string niifile = ( ( std::string )tmpnam( NULL ) ) + ".nii";
+	util::TmpFile nullfile("",".null"),niifile("",".nii");
 	// the null-loader shall generate 5 3x3x3x10 images
-	images = data::IOFactory::load( nullfile, "" );
+	images = data::IOFactory::load( nullfile.string(), "" );
 
 	//  write images to file(s)
-	if ( data::IOFactory::write( images, "/tmp/delme.nii", "" ) )
+	if ( data::IOFactory::write( images, niifile.string(), "" ) )
 		std::cout << "Wrote Image to " << niifile << std::endl;
 
-	data::IOFactory::load( "/tmp/delme.nii", "" );
+	data::IOFactory::load( niifile.string(), "" );
 }
 
 BOOST_AUTO_TEST_SUITE_END()

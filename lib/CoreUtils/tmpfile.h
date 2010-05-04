@@ -28,7 +28,7 @@ namespace util
 {
 /** Class to automatically create and handle a temporary file.
  * The file will be created by the constructor and deleted by the destructor.
- * If its not there anymore an warning will be send.
+ * If its not there anymore, a warning will be send.
  * This inherits from boost::filesystem::path and thus can be used as such.
  */
 class TmpFile: public boost::filesystem::path
