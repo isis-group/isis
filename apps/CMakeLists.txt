@@ -15,3 +15,7 @@ ENDIF(BUILD_APPLICATIONS_3D)
 
 #add_subdirectory(isisDoTrans3D_float)
 #add_subdirectory(isisKaltmacher)
+
+if(${CMAKE_PROJECT_NAME}_HAVE_QT4)
+	add_subdirectory(isisPropertyViewer)
+endif(${CMAKE_PROJECT_NAME}_HAVE_QT4)

@@ -199,9 +199,9 @@ int main(
 	tmpConstTransformPointer = NULL;
 	isis::data::ImageList refList = isis::data::IOFactory::load( ref_filename, "" );
 	isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "" );
-    LOG_IF( refList.empty(), isis::DataLog, isis::error ) << "Reference image is empty!";
+	LOG_IF( refList.empty(), isis::DataLog, isis::error ) << "Reference image is empty!";
 	LOG_IF( inList.empty(), isis::DataLog, isis::error ) << "Input image is empty!";
-	
+
 	if ( !smooth ) {
 		fixedImage = isis::adapter::itkAdapter::makeItkImageObject<FixedImageType>( refList.front() );
 		movingImage = isis::adapter::itkAdapter::makeItkImageObject<MovingImageType>( inList.front() );
