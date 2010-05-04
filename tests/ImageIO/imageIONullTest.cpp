@@ -27,7 +27,6 @@ BOOST_AUTO_TEST_CASE ( loadsaveImages )
 {
 	data::ImageList images;
 	data::enable_log<util::DefaultMsgPrint>( error );
-
 	images = data::IOFactory::load( "nix.null" );
 	// the null-loader shall generate 5 50x50x50x10 images
 	BOOST_CHECK( images.size() == 5 );

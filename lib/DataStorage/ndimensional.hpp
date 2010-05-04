@@ -111,14 +111,15 @@ public:
 
 	/// get amount of relevant dimensions (last dim with size>1)
 	size_t relevantDims()const {
-		size_t ret=0;
+		size_t ret = 0;
 
 		for ( unsigned short i = DIMS; i; i-- ) {
-			if ( dim[i-1] > 1 ){
+			if ( dim[i-1] > 1 ) {
 				ret = i;
 				break;
 			}
 		}
+
 		return ret;
 	}
 	util::FixedVector<float, DIMS> getFoV( const util::FixedVector<float, DIMS> &voxelSize, const util::FixedVector<float, DIMS> &voxelGap )const {

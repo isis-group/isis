@@ -57,7 +57,7 @@ public:
 	//the ownership of the DcmFileFormat-pointer shall be transfered to this function, because it has to decide if it should be deleted
 	static boost::shared_ptr<data::Chunk> makeChunk( std::string filename, std::auto_ptr<DcmFileFormat> dcfile ) {
 		boost::shared_ptr<data::Chunk> ret;
-		std::auto_ptr<DicomImage> img(new DicomImage( dcfile.get(), EXS_Unknown));
+		std::auto_ptr<DicomImage> img( new DicomImage( dcfile.get(), EXS_Unknown ) );
 
 		if ( img->getStatus() == EIS_Normal ) {
 			const DiPixel *const  pix = img->getInterData();
@@ -89,14 +89,13 @@ public:
 						ret.reset( new DicomChunk( ( int32_t* ) data, del, width, height ) );
 						break;
 					default:
-						FileFormat::throwGenericError("Unsupported datatype for monochrome images"); //@todo tell the user which datatype it is
+						FileFormat::throwGenericError( "Unsupported datatype for monochrome images" ); //@todo tell the user which datatype it is
 					}
 
 					if ( ret ) {
 						//OK, the source image and file pointer are managed by the chunk, we must release them
 						img.release();
 						dcfile.release();
-
 						util::PropMap &dcmMap = ret->setProperty( ImageFormat_Dicom::dicomTagTreeName, util::PropMap() );
 						ImageFormat_Dicom::dcmObject2PropMap( dcdata, dcmMap );
 					}
@@ -109,7 +108,7 @@ public:
 						ret.reset( copyColor( ( Uint16* )data, width, height ) );
 						break;
 					default:
-						FileFormat::throwGenericError("Unsupported datatype for color images"); //@todo tell the user which datatype it is
+						FileFormat::throwGenericError( "Unsupported datatype for color images" ); //@todo tell the user which datatype it is
 					}
 
 					if ( ret ) {
@@ -117,14 +116,15 @@ public:
 						ImageFormat_Dicom::dcmObject2PropMap( dcdata, dcmMap );
 					}
 				} else {
-					FileFormat::throwGenericError("Unsupported pixel type.");
+					FileFormat::throwGenericError( "Unsupported pixel type." );
 				}
 			} else {
-				FileFormat::throwGenericError("Didn't get any pixel data");
+				FileFormat::throwGenericError( "Didn't get any pixel data" );
 			}
 		} else {
-			FileFormat::throwGenericError(std::string("Failed to open image: ") + DicomImage::getString( img->getStatus() )  +")");
+			FileFormat::throwGenericError( std::string( "Failed to open image: " ) + DicomImage::getString( img->getStatus() )  + ")" );
 		}
+
 		return ret;
 	}
 };
@@ -310,7 +310,7 @@ void ImageFormat_Dicom::readMosaic( const data::Chunk& source, data::ChunkList& 
 	} else if ( source.hasProperty( prefix + "CSAImageHeaderInfo/NumberOfImagesInMosaic" ) ) {
 		NumberOfImagesInMosaicProp = prefix + "CSAImageHeaderInfo/NumberOfImagesInMosaic";
 	} else {
-		FileFormat::throwGenericError("Could not determine the number of images in the mosaic");
+		FileFormat::throwGenericError( "Could not determine the number of images in the mosaic" );
 	}
 
 	// All is fine, lets start
@@ -366,10 +366,10 @@ void ImageFormat_Dicom::readMosaic( const data::Chunk& source, data::ChunkList& 
 }
 
 
-int ImageFormat_Dicom::load( data::ChunkList &chunks, const std::string& filename, const std::string& dialect )throw(std::runtime_error&)
+int ImageFormat_Dicom::load( data::ChunkList &chunks, const std::string& filename, const std::string& dialect )throw( std::runtime_error& )
 {
 	boost::shared_ptr<data::Chunk> chunk;
-	std::auto_ptr<DcmFileFormat> dcfile(new DcmFileFormat);
+	std::auto_ptr<DcmFileFormat> dcfile( new DcmFileFormat );
 	OFCondition loaded = dcfile->loadFile( filename.c_str() );
 
 	if ( loaded.good() ) {
@@ -389,15 +389,15 @@ int ImageFormat_Dicom::load( data::ChunkList &chunks, const std::string& filenam
 			return 1;
 		}
 	} else {
-		FileFormat::throwGenericError(std::string("Failed to open file: ") + loaded.text());
+		FileFormat::throwGenericError( std::string( "Failed to open file: " ) + loaded.text() );
 	}
 
 	return 0;
 }
 
-void ImageFormat_Dicom::write( const data::Image &image, const std::string& filename, const std::string& dialect ) throw(std::runtime_error&)
+void ImageFormat_Dicom::write( const data::Image &image, const std::string& filename, const std::string& dialect ) throw( std::runtime_error& )
 {
-	throw(std::runtime_error("writing dicom files is not yet supportet"));
+	throw( std::runtime_error( "writing dicom files is not yet supportet" ) );
 }
 
 bool ImageFormat_Dicom::tainted() {return false;}//internal plugins are not tainted

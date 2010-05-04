@@ -127,19 +127,18 @@ IOFactory& IOFactory::get()
 int IOFactory::loadFile( ChunkList &ret, const boost::filesystem::path& filename, const std::string& dialect )
 {
 	FileFormatList formatReader = getFormatInterface( filename.string(), dialect );
-
 	BOOST_FOREACH( FileFormatList::const_reference it, formatReader ) {
 		LOG( ImageIoDebug, info )
 		<< "plugin to load file " <<  util::MSubject( filename ) << ": " << it->name()
 		<<  ( dialect.empty() ?
 			  std::string( "" ) : std::string( " with dialect: " ) + dialect
 			);
-		try{
+
+		try {
 			return it->load( ret, filename.string(), dialect );
-		}
-		catch(std::runtime_error &e){
+		} catch ( std::runtime_error &e ) {
 			LOG( Runtime, error )
-			<< "Failed to load " <<  filename << " using " <<  it->name() << " ("<< e.what() << ")";
+			<< "Failed to load " <<  filename << " using " <<  it->name() << " (" << e.what() << ")";
 		}
 	}
 	LOG( Runtime, error ) << "No plugin found to load: " << filename; //@todo error message missing
@@ -198,13 +197,13 @@ int IOFactory::loadPath( ChunkList &ret, const boost::filesystem::path& path, co
 
 		loaded += loadFile( ret, itr->path(), dialect );
 	}
+
 	return loaded;
 }
 
 bool IOFactory::write( const isis::data::ImageList& images, const std::string& filename, const std::string& dialect )
 {
 	FileFormatList formatWriter = get().getFormatInterface( filename, dialect );
-
 	BOOST_FOREACH( FileFormatList::const_reference it, formatWriter ) {
 		LOG( Debug, info )
 		<< "plugin to write to " <<  filename << ": " << it->name()
@@ -213,15 +212,14 @@ bool IOFactory::write( const isis::data::ImageList& images, const std::string& f
 			  std::string( " using dialect: " ) + dialect
 			);
 
-		try{
+		try {
 			it->write( images, filename, dialect );
 			LOG( Debug, info ) << images.size() << " images written using " <<  it->name();
 			return true;
-		}
-		catch(std::runtime_error &e){
+		} catch ( std::runtime_error &e ) {
 			LOG( Runtime, error )
 			<< "Failed to write " <<  images.size()
-			<< " images using " <<  it->name() << " ("<< e.what() << ")";
+			<< " images using " <<  it->name() << " (" << e.what() << ")";
 		}
 	}
 	LOG( Runtime, error ) << "No plugin found to write to: " << filename; //@todo error message missing

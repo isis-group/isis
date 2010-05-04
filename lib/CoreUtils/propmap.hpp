@@ -236,7 +236,7 @@ public:
 	*/
 	template<typename DST> bool transform( std::string from, std::string to, bool delSource = true ) {
 		check_type<DST>();
-		transform( from, to, Type<DST>::staticID, delSource );
+		return transform( from, to, Type<DST>::staticID, delSource );
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////

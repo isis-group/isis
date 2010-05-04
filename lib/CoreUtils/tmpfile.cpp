@@ -23,25 +23,27 @@
 #include "CoreUtils/common.hpp"
 #include <fstream>
 #include <boost/filesystem/operations.hpp>
-namespace isis{
-namespace util{
-		
-TmpFile::TmpFile(std::string prefix, std::string sufix)
+namespace isis
+{
+namespace util
+{
+
+TmpFile::TmpFile( std::string prefix, std::string sufix )
 {
 	// @todo critical block - should be locked
-	boost::filesystem::path dummy(tmpnam( NULL ));
-	boost::filesystem::path::operator=(dummy.branch_path() / boost::filesystem::path(prefix+dummy.leaf()+sufix));
-	LOG(Debug,info) << "Creating temporary file " << string();
-	std::ofstream(string().c_str());
+	boost::filesystem::path dummy( tmpnam( NULL ) );
+	boost::filesystem::path::operator=( dummy.branch_path() / boost::filesystem::path( prefix + dummy.leaf() + sufix ) );
+	LOG( Debug, info ) << "Creating temporary file " << string();
+	std::ofstream( string().c_str() );
 }
 
 TmpFile::~TmpFile()
 {
-	if(boost::filesystem::exists(*this))
-	{
-		boost::filesystem::remove(*this);
-	}else{
-		LOG(Debug,warning) << "Temporary file " << string() << " does not exist, won't delete it";
+	if ( boost::filesystem::exists( *this ) ) {
+		boost::filesystem::remove( *this );
+	} else {
+		LOG( Debug, warning ) << "Temporary file " << string() << " does not exist, won't delete it";
 	}
 }
-}}
+}
+}

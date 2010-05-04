@@ -49,8 +49,8 @@ protected:
 		return false;
 	}
 public:
-	static void throwGenericError(std::string desc);
-	static void throwSystemError(int err,std::string desc="");
+	static void throwGenericError( std::string desc );
+	static void throwSystemError( int err, std::string desc = "" );
 	static const float invalid_float;
 	/// \return the name of the plugin
 	virtual std::string name() = 0;
@@ -68,14 +68,14 @@ public:
 	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
 	 * \returns the amount of loaded chunks.
 	 */
-	virtual int load( data::ChunkList &chunks, const std::string& filename, const std::string& dialect ) throw(std::runtime_error&) = 0;
+	virtual int load( data::ChunkList &chunks, const std::string& filename, const std::string& dialect ) throw( std::runtime_error& ) = 0;
 	/**
 	 * Write a single image to a file.
 	 * I case of an error std::runtime_error will be thrown.
 	 * \param filename the name of the file to write (the system does NOT check if this file exists/is writeable)
 	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
 	 */
-	virtual void write( const data::Image &image, const std::string& filename, const std::string& dialect ) throw(std::runtime_error&) = 0;
+	virtual void write( const data::Image &image, const std::string& filename, const std::string& dialect ) throw( std::runtime_error& ) = 0;
 	/**
 	 * Write a multiple images.
 	 * I case of an error std::runtime_error will be thrown.
@@ -83,7 +83,7 @@ public:
 	 * \param filename the name to be used as base for the filename generation if neccessary.
 	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
 	 */
-	virtual void write( const data::ImageList &images, const std::string& filename, const std::string& dialect ) throw(std::runtime_error&);
+	virtual void write( const data::ImageList &images, const std::string& filename, const std::string& dialect ) throw( std::runtime_error& );
 	virtual ~FileFormat() {}
 };
 }

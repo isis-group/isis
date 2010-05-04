@@ -56,6 +56,7 @@ class itkAdapter
 public:
 	/**
 	  * Converts an isis image object in an itk image.
+	  * \param src boost sharedpointer of the isisImage
 	  * \param behaveAsItkReader if set to true, the orientation matrix will be transformed like <br>
 	  * -1 -1 -1 -1 <br>
 	  * -1 -1 -1 -1 <br>
@@ -98,6 +99,7 @@ public:
 	}
 	/**
 	  * Converts an itk image object in an isis image object.
+	  * \param src itk smartpointer of the itkImage
 	  * \param behaveAsItkWriter if set to true, the orientation matrix will be transformed like <br>
 	  * -1 -1 -1 -1 <br>
 	  * -1 -1 -1 -1 <br>
@@ -129,7 +131,7 @@ public:
 			indexOrigin[0] = -indexOrigin[0];
 			indexOrigin[1] = -indexOrigin[1];
 		}
-		
+
 		boost::shared_ptr<data::MemChunk<typename TImage::PixelType > >
 		retChunk( new data::MemChunk<typename TImage::PixelType >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) );
 		retChunk->setProperty( "indexOrigin", util::fvector4( indexOrigin[0], indexOrigin[1], indexOrigin[2], indexOrigin[3] ) );

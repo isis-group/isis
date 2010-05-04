@@ -161,18 +161,21 @@ int main(
 
 	if ( not fmri ) {
 		isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "" );
+		LOG_IF( inList.empty(), isis::DataLog, isis::error ) << "Input image is empty!";
 		inputImage = isis::adapter::itkAdapter::makeItkImageObject<InputImageType>( inList.front() );
 	}
 
 	if ( fmri ) {
 		isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "" );
+		LOG_IF( inList.empty(), isis::DataLog, isis::error ) << "Input image is empty!";
 		fmriImage = isis::adapter::itkAdapter::makeItkImageObject<FMRIInputType>( inList.front() );
 	}
 
 	//if template file is specified by the user
 	if ( template_filename ) {
-		isis::data::ImageList inList = isis::data::IOFactory::load( template_filename, "" );
-		templateImage = isis::adapter::itkAdapter::makeItkImageObject<InputImageType>( inList.front() );
+		isis::data::ImageList tmpList = isis::data::IOFactory::load( template_filename, "" );
+		LOG_IF( tmpList.empty(), isis::DataLog, isis::error ) << "Template image is empty!";
+		templateImage = isis::adapter::itkAdapter::makeItkImageObject<InputImageType>( tmpList.front() );
 		outputDirection = templateImage->GetDirection();
 		outputOrigin = templateImage->GetOrigin();
 	}

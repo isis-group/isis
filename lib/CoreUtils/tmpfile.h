@@ -22,8 +22,10 @@
 #include <string>
 #include <boost/filesystem/path.hpp>
 
-namespace isis{
-namespace util{
+namespace isis
+{
+namespace util
+{
 /** Class to automatically create and handle a temporary file.
  * The file will be created by the constructor and deleted by the destructor.
  * If its not there anymore an warning will be send.
@@ -38,7 +40,7 @@ public:
 	 * \param prefix string to be inserted between the path and the actual filename
 	 * \param suffix string to be appended to the filename
 	 */
-	TmpFile(std::string prefix="",std::string sufix="");
+	TmpFile( std::string prefix = "", std::string sufix = "" );
 	~TmpFile();
 };
 }

@@ -112,20 +112,20 @@ public:
 	/***********************
 	 * load file
 	 ************************/
-	int load( data::ChunkList &retList, const std::string& filename, const std::string& dialect )  throw(std::runtime_error&){
+	int load( data::ChunkList &retList, const std::string& filename, const std::string& dialect )  throw( std::runtime_error& ) {
 		//read the file with the function from nifti1_io.h
-		errno=0;
+		errno = 0;
 		nifti_image* ni = nifti_image_read( filename.c_str(), true );
 
-		if(not ni)
-			throwSystemError(errno);
+		if ( not ni )
+			throwSystemError( errno );
 
 		// 0.0 would mean "not in use" - so for better handling use a 1.0
 		float scale = ni->scl_slope ? ni->scl_slope : 1.0;
 
 		// TODO: at the moment scaling not supported due to data type changes
-		if(1.0 != scale)
-			throwGenericError(std::string("Scaling is not supported at the moment. Scale Factor: ") + util::Type<float>(scale).toString());
+		if ( 1.0 != scale )
+			throwGenericError( std::string( "Scaling is not supported at the moment. Scale Factor: " ) + util::Type<float>( scale ).toString() );
 
 		LOG( ImageIoDebug, isis::info ) << "datatype to load from nifti " << ni->datatype;
 		boost::shared_ptr<data::Chunk> retChunk;
@@ -157,21 +157,21 @@ public:
 			retChunk.reset( new _internal::NiftiChunk( static_cast<double*>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ) );
 			break;
 		default:
-			throwGenericError(std::string("Unsupported datatype ") + util::Type<int>(ni->datatype).toString());
+			throwGenericError( std::string( "Unsupported datatype " ) + util::Type<int>( ni->datatype ).toString() );
 		}
 
 		// don't forget to take the properties with
 		copyHeaderFromNifti( *retChunk, *ni );
 		// push the completed NiftiChunk into the list
 		retList.push_back( *retChunk );
-		return retChunk ? 1:0;
+		return retChunk ? 1 : 0;
 	}
 
 
 	/***********************
 	 * write file
 	 ************************/
-	void write( const data::Image &image, const std::string& filename, const std::string& dialect ) throw(std::runtime_error&) {
+	void write( const data::Image &image, const std::string& filename, const std::string& dialect ) throw( std::runtime_error& ) {
 		LOG( ImageIoDebug, isis::info ) << "Write Nifti.";
 		boost::filesystem::path boostFilename( filename );
 		//default init for nifti image
@@ -240,7 +240,7 @@ public:
 			copyDataToNifti<double>( image, ni );
 			break;
 		default:
-			throwGenericError("Datatype " + util::TypePtr<float>::staticName() + " cannot be written!");
+			throwGenericError( "Datatype " + util::TypePtr<float>::staticName() + " cannot be written!" );
 		}
 
 		//now really write the nifti file with the function from nifti1_io.h
@@ -248,7 +248,7 @@ public:
 		nifti_image_write( &ni ); //write the image - in case of a failure errno should be set
 
 		if ( errno )
-			throwSystemError(errno);
+			throwSystemError( errno );
 	}
 
 	/****************************************
@@ -287,19 +287,22 @@ private:
 	util::fvector4 getVector( const nifti_image& ni, const enum vectordirection& dir ) {
 		util::fvector4 retVec( 0, 0, 0, 0 );
 		float units; // conversion-factor to mm
+
 		switch ( ni.xyz_units ) {
-			case NIFTI_UNITS_METER:
-				units = 1.0e3;
-				break;
-			case NIFTI_UNITS_MICRON:
-				units = 1.0e-3;
-				break;
-			default:
-				units=1;
+		case NIFTI_UNITS_METER:
+			units = 1.0e3;
+			break;
+		case NIFTI_UNITS_MICRON:
+			units = 1.0e-3;
+			break;
+		default:
+			units = 1;
 		}
+
 		util::FixedVector<float, 4> voxel_size( ni.pixdim + 1 );
-		voxel_size=voxel_size* units;
-		if(dir == voxelSizeVec)
+		voxel_size = voxel_size * units;
+
+		if ( dir == voxelSizeVec )
 			return voxel_size;
 
 		if ( ni.nifti_type > 0 ) { // only for non-ANALYZE
@@ -323,14 +326,14 @@ private:
 			//use one of them
 			if ( ni.qform_code > 0 ) {// just tranform to the nominal space of the scanner
 				retVec = qto;
-/*				LOG_IF( qto != sto and ni.sform_code > 0, ImageIoLog, warning )
-				<< "sto_xyz:" << dir + 1 << " (" << sto << ") differs from qto_xyz:"
-				<< dir + 1 << " (" << qto << "). But I'll ignore it anyway because qform_code>0.";*/
+				/*              LOG_IF( qto != sto and ni.sform_code > 0, ImageIoLog, warning )
+				                << "sto_xyz:" << dir + 1 << " (" << sto << ") differs from qto_xyz:"
+				                << dir + 1 << " (" << qto << "). But I'll ignore it anyway because qform_code>0.";*/
 			} else if ( ni.sform_code > 0 ) { // method 3
-				retVec = sto*voxelSizeVec;
+				retVec = sto * voxelSizeVec;
 			} else if ( ni.sform_code == 0 and ni.qform_code == 0 ) {
 				LOG( ImageIoLog, info ) << "sform_code and qform_code are 0. Trying to use qto_xyz info!";
-				retVec = qto*voxelSizeVec;
+				retVec = qto * voxelSizeVec;
 			} else {
 				LOG( ImageIoLog, error )
 				<< "can't read orientation Vector for direction: " << dir + 1;
@@ -366,7 +369,7 @@ private:
 
 	bool copyHeaderToNifti( const data::Image& image, nifti_image& ni ) {
 		//all the other information for the nifti header
-		BOOST_ASSERT(data::Image::n_dims == 4);
+		BOOST_ASSERT( data::Image::n_dims == 4 );
 		ni.scl_slope = 1.0;
 		ni.scl_inter = 0.0;// TODO: ? http://209.85.135.104/search?q=cache:AxBp5gn9GzoJ:nifti.nimh.nih.gov/board/read.php%3Ff%3D1%26i%3D57%26t%3D57+nifti-1+scl_slope&hl=en&ct=clnk&cd=1&client=iceweasel-a
 		ni.freq_dim = 1;
