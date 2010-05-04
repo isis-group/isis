@@ -21,36 +21,49 @@
  *
  *****************************************************************/
 
-#include <DataStorage/io_factory.hpp>
-#include <CoreUtils/log.hpp>
+#include "DataStorage/io_factory.hpp"
+#include "CoreUtils/log.hpp"
 
-#define BOOST_TEST_MODULE "imageIOVistaTest"
-#include <boost/test/included/unit_test.hpp>
+//#define BOOST_TEST_MODULE "imageIOVistaTest"
+//#include <boost/test/included/unit_test.hpp>
 #include <string>
 #include <iostream>
 
-namespace isis {
+using namespace isis;
 
-namespace test {
+//BOOST_AUTO_TEST_SUITE( imageIOVista_BaseTests )
 
-BOOST_AUTO_TEST_SUITE(imageIOVista_BaseTests)
+//BOOST_AUTO_TEST_CASE( loadsaveTest )
 
-BOOST_AUTO_TEST_CASE(loadsaveTest)
+int main(int argc, char** argv)
 {
+	data::enable_log<util::DefaultMsgPrint>(warning);
+	image_io::enable_log<util::DefaultMsgPrint>(warning);
+
 	data::ImageList images;
-	data::enable_log<util::DefaultMsgPrint>(error);
-//	load the defautl NULL file
+	//  load the defautl NULL file
 	std::string tmpfile = ( ( std::string )tmpnam( NULL ) ) + ".null";
-	std::ostream(tmpfile);
+	std::string vtmpfile = ( ( std::string )tmpnam( NULL ) ) + ".v";
+	fopen(tmpfile.c_str(),"w");
+	//  load images from temp file
+	images = data::IOFactory::get().load( "/scr/kastanie1/DATA/isis/data_fmrt.nii", "" );
 
-//	load images from temp file
-	images = data::IOFactory::get().load(tmpfile, "");
+	// the null-loader shall generate 5 50x50x50x10 images
+	//BOOST_CHECK( images.size() == 5 );
 
-//	TODO write images to a vista file.
+//	print attributes
+//	((data::ImageList::const_reference) images.front())->print(std::cout,true);
 
-}
+	// get first image and write it to disk
+//	data::ImageList::const_reference first = images.front();
+	data::IOFactory::write(images,vtmpfile,"");
+
+	return 0;
 
 
-}
+
+//BOOST_AUTO_TEST_SUITE_END()
+
+
 
 }
