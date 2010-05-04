@@ -36,11 +36,9 @@ namespace image_io
 class ImageFormat_Vista: public FileFormat
 {
 public:
-	ImageFormat_Vista();
-	virtual ~ImageFormat_Vista();
 
 	std::string name() { return "de.mpg.cbs.isis.vista"; }
-	std::string suffixes() {return "v v.gz";}
+	std::string suffixes() {return ".v";}
 	int load( data::ChunkList &chunks, const std::string &filename,
 			  const std::string &dialect );
 	bool write( const data::Image &image, const std::string &filename,
@@ -49,7 +47,6 @@ public:
 };
 
 }
-
-}
+}//namespace image_io isis
 
 #endif /* IMAGEFORMAT_VISTA_H_ */
