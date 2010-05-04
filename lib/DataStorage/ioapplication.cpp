@@ -36,6 +36,9 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 		parameters["out"].setDescription( "output file" );
 	}
 }
+
+IOApplication::~IOApplication(){}
+
 bool IOApplication::init( int argc, char** argv, bool exitOnError )
 {
 	if ( not isis::util::Application::init( argc, argv, exitOnError ) )
