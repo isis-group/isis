@@ -28,7 +28,6 @@ void isisPropertyViewer::on_action_Open_activated()
 		LOG_IF( inputImageList.empty(), isis::DataLog, isis::error ) << "Input image list is empty!";
 
 		if ( not inputImageList.empty() ) {
-			this->ui.treeWidget->clear();
 			isis::data::ImageList::const_iterator imageIterator;
 			for ( imageIterator = inputImageList.begin(); imageIterator != inputImageList.end(); imageIterator++ ) {
 				addImageToTree( *imageIterator, fileName );
@@ -39,6 +38,12 @@ void isisPropertyViewer::on_action_Open_activated()
 		}
 	}
 }
+
+void isisPropertyViewer::on_action_Clear_activated()
+{
+	this->ui.treeWidget->clear();
+}	
+	
 
 void isisPropertyViewer::addImageToTree( const boost::shared_ptr<isis::data::Image> image, const QString& fileName )
 {
