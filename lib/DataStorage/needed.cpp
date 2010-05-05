@@ -11,6 +11,7 @@
 const char* isis::data::_internal::ChunkBase::needed = "\
 	indexOrigin\
 	acquisitionNumber\
+	voxelSize\
 ";
 
 // Stuff needed for any Image
