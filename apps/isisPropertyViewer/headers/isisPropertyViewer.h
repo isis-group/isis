@@ -20,9 +20,11 @@ private slots:
 	void on_action_Open_activated();
 		
 private:
+     typedef std::set<std::string, isis::util::_internal::caselessStringLess> PropKeyListType;
+	 PropKeyListType m_keyList;
      Ui::isisPropertyViewer ui;
-	 void addToTree(const boost::shared_ptr<isis::data::Image> image) const;
-	 
+	 void addImageToTree(const boost::shared_ptr<isis::data::Image> image, const QString& );
+	 void addChildToItem( QTreeWidgetItem*, const QString&, const QString& ) const;
 	
 	 
 };

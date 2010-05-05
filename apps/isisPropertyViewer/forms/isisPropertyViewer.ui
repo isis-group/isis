@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>280</width>
+    <width>553</width>
     <height>406</height>
    </rect>
   </property>
@@ -17,9 +17,23 @@
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QTreeWidget" name="treeWidget">
+      <property name="columnCount">
+       <number>2</number>
+      </property>
+      <attribute name="headerDefaultSectionSize">
+       <number>200</number>
+      </attribute>
+      <attribute name="headerDefaultSectionSize">
+       <number>200</number>
+      </attribute>
       <column>
        <property name="text">
         <string notr="true">1</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string notr="true">2</string>
        </property>
       </column>
      </widget>
@@ -31,7 +45,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>280</width>
+     <width>553</width>
      <height>22</height>
     </rect>
    </property>
