@@ -14,11 +14,16 @@ class isisPropertyViewer : public QMainWindow
 
 public:
     isisPropertyViewer(QMainWindow *parent = 0);
-	 
+	Qt::ItemFlags flags(const QModelIndex &index) const;
+	
+
 private slots:
 	void on_action_Close_activated();
 	void on_action_Open_activated();
 	void on_action_Clear_activated();
+	void edit_item(QTreeWidgetItem*, int);
+signals:
+	void itemDoubleClicked();
 	
 private:
      typedef std::set<std::string, isis::util::_internal::caselessStringLess> PropKeyListType;
@@ -26,7 +31,6 @@ private:
      Ui::isisPropertyViewer ui;
 	 void addImageToTree(const boost::shared_ptr<isis::data::Image> image, const QString& );
 	 void addChildToItem( QTreeWidgetItem*, const QString&, const QString& ) const;
-	 
 	
 	 
 };

@@ -17,12 +17,12 @@
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QTreeWidget" name="treeWidget">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
       <property name="columnCount">
        <number>2</number>
       </property>
-      <attribute name="headerDefaultSectionSize">
-       <number>200</number>
-      </attribute>
       <attribute name="headerDefaultSectionSize">
        <number>200</number>
       </attribute>
