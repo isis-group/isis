@@ -18,15 +18,13 @@ namespace test
 /* create an image */
 BOOST_AUTO_TEST_CASE ( image_init_test )
 {
-	ENABLE_LOG( CoreLog, util::DefaultMsgPrint, error );
-	ENABLE_LOG( CoreDebug, util::DefaultMsgPrint, error );
-	ENABLE_LOG( DataLog, util::DefaultMsgPrint, error );
-	ENABLE_LOG( DataDebug, util::DefaultMsgPrint, error );
+	util::enable_log<util::DefaultMsgPrint>(error);
+	data::enable_log<util::DefaultMsgPrint>(error);
 //  util::DefaultMsgPrint::stopBelow(warning);
 	data::MemChunk<float> ch( 4, 4 );
 	data::Image img;
 	// inserting insufficient Chunk should fail
-	BOOST_CHECK( !img.insertChunk( ch ) );
+	BOOST_CHECK( not img.insertChunk( ch ) );
 	// but inserting a proper Chunk should work
 	ch.setProperty( "indexOrigin", util::fvector4( 0, 0, 2, 0 ) );
 	ch.setProperty<u_int32_t>( "acquisitionNumber", 2 );
