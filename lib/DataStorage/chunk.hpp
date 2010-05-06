@@ -128,7 +128,7 @@ public:
 		getTypePtrBase().convertTo( dst );
 	}
 
-	Chunk &operator=(const Chunk&ref);
+	Chunk &operator=( const Chunk&ref );
 };
 
 /// @cond _internal
@@ -166,21 +166,21 @@ public:
 	}
 	/// Create a deep copy of a given Chunk (automatic conversion will be used if datatype does not fit)
 	MemChunk( const Chunk &ref ): Chunk( ref ) {
-		operator=(ref);
+		operator=( ref );
 	}
 	/// Create a deep copy of a given MemChunk of the same type (default copy constructor)
 	MemChunk( const MemChunk<TYPE> &ref ): Chunk( ref ) {
-		operator=(ref);
+		operator=( ref );
 	}
-	MemChunk &operator=( const MemChunk<TYPE> &ref ){
-		_internal::ChunkBase::operator=(static_cast<const _internal::ChunkBase&>(ref)); //copy the metadate of ref
+	MemChunk &operator=( const MemChunk<TYPE> &ref ) {
+		_internal::ChunkBase::operator=( static_cast<const _internal::ChunkBase&>( ref ) ); //copy the metadate of ref
 		//get rid of my TypePtr and make a new copying the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
 		util::_internal::TypePtrBase::Reference::reset( new util::TypePtr<TYPE>(
-			static_cast<const Chunk&>(ref).getTypePtrBase().copyToMem()->cast_to_TypePtr<TYPE>()
-		) );
+					static_cast<const Chunk&>( ref ).getTypePtrBase().copyToMem()->cast_to_TypePtr<TYPE>()
+				) );
 	}
-	MemChunk &operator=(const Chunk &ref){
-		_internal::ChunkBase::operator=(static_cast<const _internal::ChunkBase&>(ref)); //copy the metadate of ref
+	MemChunk &operator=( const Chunk &ref ) {
+		_internal::ChunkBase::operator=( static_cast<const _internal::ChunkBase&>( ref ) ); //copy the metadate of ref
 		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
 		util::_internal::TypePtrBase::Reference::reset( new util::TypePtr<TYPE>( ref.getTypePtrBase().copyToNew<TYPE>() ) );
 	}

@@ -18,8 +18,8 @@ namespace test
 /* create an image */
 BOOST_AUTO_TEST_CASE ( image_init_test )
 {
-	util::enable_log<util::DefaultMsgPrint>(error);
-	data::enable_log<util::DefaultMsgPrint>(error);
+	util::enable_log<util::DefaultMsgPrint>( error );
+	data::enable_log<util::DefaultMsgPrint>( error );
 //  util::DefaultMsgPrint::stopBelow(warning);
 	data::MemChunk<float> ch( 4, 4 );
 	data::Image img;
@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 	// but inserting a proper Chunk should work
 	ch.setProperty( "indexOrigin", util::fvector4( 0, 0, 2, 0 ) );
 	ch.setProperty<u_int32_t>( "acquisitionNumber", 2 );
-	ch.setProperty( "voxelSize", util::fvector4(1,1,1,0) );
+	ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 	BOOST_CHECK( img.insertChunk( ch ) );
 	//inserting the same chunk twice should fail
 	BOOST_CHECK( not img.insertChunk( ch ) );
@@ -36,13 +36,13 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 	ch = data::MemChunk<float>( 4, 4 );
 	ch.setProperty( "indexOrigin", util::fvector4( 0, 0, 0, 0 ) );
 	ch.setProperty<u_int32_t>( "acquisitionNumber", 0 );
-	ch.setProperty( "voxelSize", util::fvector4(1,1,1,0) );
+	ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 	BOOST_CHECK( img.insertChunk( ch ) );
 	// Chunks should be inserted based on their position (lowest first)
 	ch = data::MemChunk<float>( 4, 4 );
 	ch.setProperty( "indexOrigin", util::fvector4( 0, 0, 1, 0 ) );
 	ch.setProperty<u_int32_t>( "acquisitionNumber", 1 );
-	ch.setProperty( "voxelSize", util::fvector4(1,1,1,0) );
+	ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 	BOOST_CHECK( img.insertChunk( ch ) );
 	//threat image as a list of sorted chunks
 	//Image-Chunk-List should be copyable into other lists (and its order should be correct)
@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 	ch = data::MemChunk<float>( 4, 4 );
 	ch.setProperty( "indexOrigin", util::fvector4( 0, 0, 0, 1 ) );
 	ch.setProperty<u_int32_t>( "acquisitionNumber", 4 );
-	ch.setProperty( "voxelSize", util::fvector4(1,1,1,0) );
+	ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 	BOOST_CHECK( img.insertChunk( ch ) );
 	data::Image::ChunkIterator it = img.chunksEnd();
 	//as all other chunks where timestep 0 this must be at the end

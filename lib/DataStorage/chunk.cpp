@@ -149,10 +149,10 @@ size_t Chunk::cmpSlice( size_t thirdDimS, size_t fourthDimS, const Chunk& dst, s
 	const size_t idx3[] = {sizeToVector()[0] - 1, sizeToVector()[1] - 1, thirdDimD, fourthDimD};
 	return cmpRange( idx1, idx2, dst, idx3 );
 }
-Chunk& Chunk::operator=(const isis::data::Chunk& ref)
+Chunk& Chunk::operator=( const isis::data::Chunk& ref )
 {
-	_internal::ChunkBase::operator=(static_cast<const _internal::ChunkBase&>(ref)); //copy the metadate of ref
-	util::_internal::TypePtrBase::Reference::operator=(static_cast<const util::_internal::TypePtrBase::Reference&>(ref)); // copy the reference of ref's data
+	_internal::ChunkBase::operator=( static_cast<const _internal::ChunkBase&>( ref ) ); //copy the metadate of ref
+	util::_internal::TypePtrBase::Reference::operator=( static_cast<const util::_internal::TypePtrBase::Reference&>( ref ) ); // copy the reference of ref's data
 }
 
 }

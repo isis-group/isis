@@ -13,26 +13,27 @@ class isisPropertyViewer : public QMainWindow
 	Q_OBJECT
 
 public:
-    isisPropertyViewer(QMainWindow *parent = 0);
-	Qt::ItemFlags flags(const QModelIndex &index) const;
-	
+	isisPropertyViewer( QMainWindow *parent = 0 );
+	Qt::ItemFlags flags( const QModelIndex &index ) const;
+
 
 private slots:
 	void on_action_Close_activated();
 	void on_action_Open_activated();
 	void on_action_Clear_activated();
-	void edit_item(QTreeWidgetItem*, int);
+	void edit_item( QTreeWidgetItem*, int );
 signals:
 	void itemDoubleClicked();
-	
+
 private:
-     typedef std::set<std::string, isis::util::_internal::caselessStringLess> PropKeyListType;
-	 PropKeyListType m_keyList;
-     Ui::isisPropertyViewer ui;
-	 void addImageToTree(const boost::shared_ptr<isis::data::Image> image, const QString& );
-	 void addChildToItem( QTreeWidgetItem*, const QString&, const QString& ) const;
-	
-	 
+	typedef std::set<std::string, isis::util::_internal::caselessStringLess> PropKeyListType;
+	PropKeyListType m_keyList;
+	Ui::isisPropertyViewer ui;
+	void createTree( const boost::shared_ptr<isis::data::Image>, const QString& );
+	void addPropToTree( const boost::shared_ptr<isis::data::Image>, const PropKeyListType::const_iterator&, QTreeWidgetItem* );
+	void addChildToItem( QTreeWidgetItem*, const QString&, const QString& ) const;
+
+
 };
- 
+
 #endif

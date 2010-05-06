@@ -37,7 +37,7 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 	}
 }
 
-IOApplication::~IOApplication(){}
+IOApplication::~IOApplication() {}
 
 bool IOApplication::init( int argc, char** argv, bool exitOnError )
 {

@@ -86,7 +86,7 @@ template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &s
 		if ( minval > 0 || !domain_min ) {
 			if ( maxval > domain_max ) // if the values completely fit into the domain we dont have to offset them
 				offset = -minval;
-		} else if ( (0-maxval)>0 || !domain_max ) {
+		} else if ( ( 0 - maxval ) > 0 || !domain_max ) {
 			if ( minval < domain_min ) // if the values completely fit into the domain we dont have to offset them
 				offset = -maxval;
 		}
