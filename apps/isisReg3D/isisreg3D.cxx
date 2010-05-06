@@ -72,7 +72,7 @@ static VBoolean in_found, ref_found, pointset_found;
 static VShort number_threads = 1;
 static VShort initial_seed = 1;
 static VBoolean initialize_center = false;
-static VBoolean initialize_mass = false;
+static VBoolean initialize_mass = true;
 static VString mask_filename = NULL;
 static VFloat smooth = 0;
 static VBoolean use_inverse = false;
@@ -89,8 +89,8 @@ options[] = {
 	//non-required inputs
 	{"mask", VStringRepn, 1, &mask_filename, VOptionalOpt, 0, "the mask filename"},
 	{"pointset", VStringRepn, 1, &pointset_filename, &pointset_found, 0, "the pointset filename"},
-	{"out", VStringRepn, 1, &out_filename, VOptionalOpt, 0, "the output transform filename"},
-	{"vout", VStringRepn, 1, &vout_filename, VOptionalOpt, 0, "the output vector image filename"},
+	{"itktrans", VStringRepn, 1, &out_filename, VOptionalOpt, 0, "the itk output transform filename"},
+	{"trans", VStringRepn, 1, &vout_filename, VOptionalOpt, 0, "the output vector image filename. Has to be of type nifti."},
 	{
 		"tin", VStringRepn, 1, &transform_filename_in, VOptionalOpt, 0,
 		"filename of the transform used as an initial transform"
@@ -456,6 +456,8 @@ int main(
 		}
 
 		if ( transform_filename_in and counter == 0 ) {
+			initialize_mass = false;
+			initialize_center = false;
 			transformReader->SetFileName( transform_filename_in );
 			transformReader->Update();
 			itk::TransformFileReader::TransformListType *transformList = transformReader->GetTransformList();
