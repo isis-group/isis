@@ -16,12 +16,15 @@
 
 //rigid:
 #include "itkTranslationTransform.h"
-#include "itkRigid2DTransform.h"
+#include "itkVersorRigid3DTransform.h"
+#include "itkQuaternionRigidTransform.h"
+#include "itkCenteredEuler3DTransform.h"
 
 //affine:
 #include "itkAffineTransform.h"
 #include "itkCenteredAffineTransform.h"
-#include "itkSimilarity2DTransform.h"
+#include "itkScaleSkewVersor3DTransform.h"
+
 
 //non-linear
 #include "itkBSplineDeformableTransform.h"
@@ -35,6 +38,7 @@
 
 //optimizer inlcudes
 #include "itkRegularStepGradientDescentOptimizer.h"
+#include "itkVersorRigid3DTransformOptimizer.h"
 #include "itkLBFGSBOptimizer.h"
 #include "itkAmoebaOptimizer.h"
 #include "itkPowellOptimizer.h"
@@ -68,14 +72,14 @@ namespace registration
 {
 
 template<class TFixedImageType, class TMovingImageType>
-class RegistrationFactory2D : public itk::LightObject
+class RegistrationFactory3D : public itk::LightObject
 {
 public:
 
 	itkStaticConstMacro( FixedImageDimension, unsigned int, TFixedImageType::ImageDimension );
 	itkStaticConstMacro( MovingImageDimension, unsigned int, TFixedImageType::ImageDimension );
 
-	typedef RegistrationFactory2D Self;
+	typedef RegistrationFactory3D Self;
 	typedef itk::SmartPointer<Self> Pointer;
 	typedef itk::SmartPointer<const Self> ConstPointer;
 
@@ -136,23 +140,25 @@ public:
 	//transform typedefs
 	typedef itk::TransformBase* TransformBasePointer; //not allowed to be a itk::SmartPointer because of static_cast usage
 	typedef const itk::TransformBase* ConstTransformBasePointer;
-	typedef itk::Transform<double, FixedImageDimension, FixedImageDimension> TransformType;
-	typedef itk::Similarity2DTransform<double> Similarity2DTransformType;
+	typedef itk::Transform<double, 3, 3> TransformType;
 
-	typedef itk::TranslationTransform<double, FixedImageDimension> TranslationTransformType;
-	typedef itk::Rigid2DTransform<double> Rigid2DTransformType;
-
+	typedef itk::TranslationTransform<double, 3> TranslationTransformType;
+	typedef itk::VersorRigid3DTransform<double> VersorRigid3DTransformType;
+	typedef itk::QuaternionRigidTransform<double> QuaternionRigidTransformType;
+	typedef itk::CenteredEuler3DTransform<double> CenteredEuler3DTransformType;
 
 	typedef itk::AffineTransform<double, FixedImageDimension> AffineTransformType;
 
 	typedef itk::CenteredAffineTransform<double, FixedImageDimension> CenteredAffineTransformType;
+	typedef itk::ScaleSkewVersor3DTransform<double> ScaleSkewVersor3DTransformType;
 
-	typedef itk::Transform<double, FixedImageDimension, FixedImageDimension> BulkTransformType;
+	typedef itk::Transform<double, 3, 3> BulkTransformType;
 
 	typedef typename itk::BSplineDeformableTransform<CoordinateRepType, FixedImageDimension, 3> BSplineTransformType;
 
 	//optimizer typedefs
 	typedef itk::RegularStepGradientDescentOptimizer RegularStepGradientDescentOptimizerType;
+	typedef itk::VersorRigid3DTransformOptimizer VersorRigid3DTransformOptimizerType;
 	typedef itk::LBFGSBOptimizer LBFGSBOptimizerType;
 	typedef itk::AmoebaOptimizer AmoebaOptimizerType;
 	typedef itk::PowellOptimizer PowellOptimizerType;
@@ -179,18 +185,18 @@ public:
 
 	typedef typename itk::DiscreteGaussianImageFilter<TFixedImageType, TFixedImageType> DiscreteGaussianImageFitlerType;
 
-	typedef typename itk::CenteredTransformInitializer<Rigid2DTransformType, TFixedImageType, TMovingImageType>
+	typedef typename itk::CenteredTransformInitializer<VersorRigid3DTransformType, TFixedImageType, TMovingImageType>
 	RigidCenteredTransformInitializerType;
 
 	typedef typename itk::CenteredTransformInitializer<AffineTransformType, TFixedImageType, TMovingImageType>
 	AffineCenteredTransformInitializerType;
 
-	typedef typename itk::LandmarkBasedTransformInitializer < Rigid2DTransformType, TFixedImageType,
-			TMovingImageType > RigidLandmarkBasedTransformInitializerType;
+	typedef typename itk::LandmarkBasedTransformInitializer < VersorRigid3DTransformType, TFixedImageType,
+	TMovingImageType > RigidLandmarkBasedTransformInitializerType;
 
 	enum eTransformType {
 		TranslationTransform,
-		Rigid2DTransform,
+		VersorRigid3DTransform,
 		AffineTransform,
 		CenteredAffineTransform,
 		BSplineDeformableTransform,
@@ -207,7 +213,7 @@ public:
 	};
 
 	enum eOptimizerType {
-		RegularStepGradientDescentOptimizer, LBFGSBOptimizer, AmoebaOptimizer, PowellOptimizer
+		RegularStepGradientDescentOptimizer, VersorRigidOptimizer, LBFGSBOptimizer, AmoebaOptimizer, PowellOptimizer
 
 	};
 
@@ -219,6 +225,7 @@ public:
 		unsigned int NumberOfIterations;
 		unsigned int NumberOfBins;
 		unsigned int BSplineGridSize;
+		float BSplineBound;
 		unsigned int NumberOfThreads;
 		unsigned int MattesMutualInitializeSeed;
 		float CoarseFactor;
@@ -288,15 +295,15 @@ public:
 	void SetFixedImageMask(
 		typename MaskObjectType::Pointer );
 
-	RegistrationFactory2D();
-	virtual ~RegistrationFactory2D() {
+	RegistrationFactory3D();
+	virtual ~RegistrationFactory3D() {
 	}
 
 private:
 
 	struct {
 		bool TRANSLATION;
-		bool RIGID;
+		bool VERSORRIGID;
 		bool AFFINE;
 		bool CENTEREDAFFINE;
 		bool BSPLINEDEFORMABLETRANSFORM;
@@ -305,6 +312,7 @@ private:
 
 	struct Optimizer {
 		bool REGULARSTEPGRADIENTDESCENT;
+		bool VERSORRIGID3D;
 		bool LBFGSBOPTIMIZER;
 		bool AMOEBA;
 		bool POWELL;
@@ -327,8 +335,6 @@ private:
 
 	void SetFixedImageMask(
 		void );
-
-
 
 	DeformationFieldPointer m_DeformationField;
 	FixedImagePointer m_FixedImage;
@@ -369,21 +375,24 @@ private:
 
 	//optimizer
 	RegularStepGradientDescentOptimizerType::Pointer m_RegularStepGradientDescentOptimizer;
+	VersorRigid3DTransformOptimizerType::Pointer m_VersorRigid3DTransformOptimizer;
 	LBFGSBOptimizerType::Pointer m_LBFGSBOptimizer;
 	AmoebaOptimizerType::Pointer m_AmoebaOptimizer;
 	PowellOptimizerType::Pointer m_PowellOptimizer;
 
 	//transform
-	typename TranslationTransformType::Pointer m_TranslationTransform;
-	Rigid2DTransformType::Pointer m_Rigid2DTransform;
+	TranslationTransformType::Pointer m_TranslationTransform;
+	VersorRigid3DTransformType::Pointer m_VersorRigid3DTransform;
+	QuaternionRigidTransformType::Pointer m_QuaternionRigidTransform;
+	CenteredEuler3DTransformType::Pointer m_CenteredEuler3DTransform;
 
 	typename AffineTransformType::Pointer m_AffineTransform;
+	typename ScaleSkewVersor3DTransformType::Pointer m_ScaleSkewTransform;
 	typename CenteredAffineTransformType::Pointer m_CenteredAffineTransform;
-	typename Similarity2DTransformType::Pointer m_SimilarityTransform;
 
 	typename BSplineTransformType::Pointer m_BSplineTransform;
 
-	typename BulkTransformType::Pointer m_BulkTransform;
+	BulkTransformType::Pointer m_BulkTransform;
 
 	//metric
 	typename MattesMutualInformationMetricType::Pointer m_MattesMutualInformationMetric;
@@ -411,7 +420,7 @@ private:
 } //end namespace isis
 
 #if ITK_TEMPLATE_TXX
-# include "isisRegistrationFactory2D.txx"
+# include "isisRegistrationFactory3D.txx"
 #endif
 
 #endif /* ISISREGISTRATIONFACTORY_H_ */
