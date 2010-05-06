@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE( loadsaveImage )
 	data::ImageList images;
 	image_io::enable_log<util::DefaultMsgPrint>( info );
 	//  We will use the Null plugin to get some image data
-	util::TmpFile nullfile("",".null"),niifile("",".nii");
+	util::TmpFile nullfile( "", ".null" ), niifile( "", ".nii" );
 	// the null-loader shall generate 5 3x3x3x10 images
 	images = data::IOFactory::load( nullfile.string(), "" );
 

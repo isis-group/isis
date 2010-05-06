@@ -124,9 +124,11 @@ public:
 	template<typename T> void getMinMax( T &min, T &max )const {
 		return operator*().getMinMax( min, max );
 	}
-	template<typename T> size_t convertTo(T *dst,size_t len)const{
-		getTypePtrBase().convertTo(dst);
+	template<typename T> size_t convertTo( T *dst, size_t len )const {
+		getTypePtrBase().convertTo( dst );
 	}
+
+	Chunk &operator=(const Chunk&ref);
 };
 
 /// @cond _internal
@@ -150,21 +152,36 @@ public:
 	MemChunk( size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 ):
 			Chunk(
 				( TYPE* )calloc( fourthDim*thirdDim*secondDim*firstDim, sizeof( TYPE ) ),
-				typename ::isis::util::TypePtr<TYPE>::BasicDeleter(),
+				typename util::TypePtr<TYPE>::BasicDeleter(),
 				firstDim, secondDim, thirdDim, fourthDim
 			) {}
 	/// Create a MemChunk as copy of a given raw memory block (no range check will be done)
 	MemChunk( const TYPE*const org, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 ):
 			Chunk(
 				( TYPE* )malloc( sizeof( TYPE )*fourthDim*thirdDim*secondDim*firstDim ),
-				typename ::isis::util::TypePtr<TYPE>::BasicDeleter(),
+				typename util::TypePtr<TYPE>::BasicDeleter(),
 				firstDim, secondDim, thirdDim, fourthDim
 			) {
 		asTypePtr<TYPE>().copyFromMem( org, volume() );
 	}
 	/// Create a deep copy of a given Chunk (automatic conversion will be used if datatype does not fit)
 	MemChunk( const Chunk &ref ): Chunk( ref ) {
-		//get rid of ref's TypePtr and make my own from it  (use the reset-function of the scoped_ptr Chunk is made of)
+		operator=(ref);
+	}
+	/// Create a deep copy of a given MemChunk of the same type (default copy constructor)
+	MemChunk( const MemChunk<TYPE> &ref ): Chunk( ref ) {
+		operator=(ref);
+	}
+	MemChunk &operator=( const MemChunk<TYPE> &ref ){
+		_internal::ChunkBase::operator=(static_cast<const _internal::ChunkBase&>(ref)); //copy the metadate of ref
+		//get rid of my TypePtr and make a new copying the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
+		util::_internal::TypePtrBase::Reference::reset( new util::TypePtr<TYPE>(
+			static_cast<const Chunk&>(ref).getTypePtrBase().copyToMem()->cast_to_TypePtr<TYPE>()
+		) );
+	}
+	MemChunk &operator=(const Chunk &ref){
+		_internal::ChunkBase::operator=(static_cast<const _internal::ChunkBase&>(ref)); //copy the metadate of ref
+		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
 		util::_internal::TypePtrBase::Reference::reset( new util::TypePtr<TYPE>( ref.getTypePtrBase().copyToNew<TYPE>() ) );
 	}
 };

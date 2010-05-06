@@ -290,10 +290,9 @@ public:
 	bool convertTo( TypePtrBase &dst )const;
 
 	/// Copy (or Convert) data from this to memory of maybe another type and the same length.
-	template<typename T> bool convertTo( T *dst,size_t len ) const
-	{
-		TypePtr<T> dest(dst,len,TypePtr<T>::NonDeleter());
-		return convertTo(dest);
+	template<typename T> bool convertTo( T *dst, size_t len ) const {
+		TypePtr<T> dest( dst, len, TypePtr<T>::NonDeleter() );
+		return convertTo( dest );
 	}
 
 	/**
