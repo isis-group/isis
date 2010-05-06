@@ -39,14 +39,19 @@ namespace _internal
 template<typename SRC, typename DST> class TypePtrGenerator: public TypePtrConverterBase
 {
 public:
-	void generate( const boost::scoped_ptr<TypePtrBase>& src, boost::scoped_ptr<TypePtrBase>& dst )const {
+	void generate( const boost::scoped_ptr<TypePtrBase>& src, boost::scoped_ptr<TypePtrBase>& dst, const TypeBase &min, const TypeBase &max )const {
 		LOG_IF( dst.get(), Debug, warning ) <<
-		"Generating into existing value " << dst->toString( true );
+											"Generating into existing value " << dst->toString( true );
 		TypePtr<DST> *ref = new TypePtr<DST>;
-		convert( src->cast_to_TypePtr<SRC>(), *ref );
+		convert( src->cast_to_TypePtr<SRC>(), *ref, min, max );
 		dst.reset( ref );
 	}
 };
+void TypePtrConverterBase::convert( const TypePtrBase& src, TypePtrBase& dst, const TypeBase& min, const TypeBase& max ) const
+{
+	LOG( Debug, error ) << "Empty conversion was called as conversion from " << src.typeName() << " to " << dst.typeName() << " this is most likely an error.";
+}
+
 
 /////////////////////////////////////////////////////////////////////////////
 // general converter version -- does nothing
@@ -64,14 +69,14 @@ template<bool NUMERIC, typename SRC, typename DST> class TypePtrConverter<NUMERI
 {
 	TypePtrConverter() {
 		LOG( Debug, verbose_info )
-		<< "Creating trivial copy converter for " << TypePtr<SRC>::staticName();
+				<< "Creating trivial copy converter for " << TypePtr<SRC>::staticName();
 	};
 public:
 	static boost::shared_ptr<const TypePtrConverterBase> create() {
 		TypePtrConverter<NUMERIC, true, SRC, DST> *ret = new TypePtrConverter<NUMERIC, true, SRC, DST>;
 		return boost::shared_ptr<const TypePtrConverterBase>( ret );
 	}
-	void convert( const TypePtrBase& src, TypePtrBase& dst )const {
+	void convert( const TypePtrBase& src, TypePtrBase& dst, const TypeBase &min, const TypeBase &max )const {
 		TypePtr<SRC> &dstVal = dst.cast_to_TypePtr<SRC>();
 		const SRC *srcPtr = &src.cast_to_TypePtr<SRC>()[0];
 		dstVal.copyFromMem( srcPtr, src.len() );
@@ -86,16 +91,16 @@ template<typename SRC, typename DST> class TypePtrConverter<true, false, SRC, DS
 {
 	TypePtrConverter() {
 		LOG( Debug, verbose_info )
-		<< "Creating numeric converter from "
-		<< TypePtr<SRC>::staticName() << " to " << TypePtr<DST>::staticName();
+				<< "Creating numeric converter from "
+				<< TypePtr<SRC>::staticName() << " to " << TypePtr<DST>::staticName();
 	};
 public:
 	static boost::shared_ptr<const TypePtrConverterBase> create() {
 		TypePtrConverter<true, false, SRC, DST> *ret = new TypePtrConverter<true, false, SRC, DST>;
 		return boost::shared_ptr<const TypePtrConverterBase>( ret );
 	}
-	void convert( const TypePtrBase& src, TypePtrBase& dst )const {
-		numeric_convert( src.cast_to_TypePtr<SRC>(), dst.cast_to_TypePtr<DST>() );
+	void convert( const TypePtrBase& src, TypePtrBase& dst, const TypeBase &min, const TypeBase &max )const {
+		numeric_convert( src.cast_to_TypePtr<SRC>(), dst.cast_to_TypePtr<DST>(), min, max );
 	}
 	virtual ~TypePtrConverter() {}
 };
@@ -136,7 +141,7 @@ TypePtrConverterMap::TypePtrConverterMap()
 {
 	boost::mpl::for_each<types>( outer_TypePtrConverter( *this ) );
 	LOG( Debug, info )
-	<< "conversion map for " << size() << " array-types created";
+			<< "conversion map for " << size() << " array-types created";
 }
 
 }

@@ -23,8 +23,10 @@ static VBoolean in_found, out_found;
 static VOptionDescRec
 options[] = {
 	//requiered inputs
-	{"in", VStringRepn, 0, ( VPointer ) &in_filename, &in_found, 0, "the input image filenames"}, {"out", VStringRepn, 1,
-			&out_filename, &out_found, 0, "the output image filename"}, {"patterns", VShortRepn, 1, &number_patterns, VOptionalOpt, 0, "Number of patterns"}
+	{"in", VStringRepn, 0, ( VPointer ) &in_filename, &in_found, 0, "the input image filenames"}, {
+		"out", VStringRepn, 1,
+		&out_filename, &out_found, 0, "the output image filename"
+	}, {"patterns", VShortRepn, 1, &number_patterns, VOptionalOpt, 0, "Number of patterns"}
 };
 
 int main( int argc, char* argv[] )

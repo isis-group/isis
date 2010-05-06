@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_CASE ( chunk_init_test )
 	ENABLE_LOG( DataLog, util::DefaultMsgPrint, warning );
 	ENABLE_LOG( DataDebug, util::DefaultMsgPrint, warning );
 	data::MemChunk<float> ch( 4, 3, 2, 1 );
-	BOOST_CHECK_EQUAL( ch.volume(), 1*2*3*4 );
+	BOOST_CHECK_EQUAL( ch.volume(), 1 * 2 * 3 * 4 );
 	BOOST_CHECK_EQUAL( ch.dimSize( data::readDim ), 4 );
 	BOOST_CHECK_EQUAL( ch.dimSize( data::phaseDim ), 3 );
 	BOOST_CHECK_EQUAL( ch.dimSize( data::sliceDim ), 2 );
@@ -33,11 +33,11 @@ BOOST_AUTO_TEST_CASE ( chunk_mem_init_test )
 {
 	const short data[3*3] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
 	data::MemChunk<short> ch( data, 3, 3 );
-	BOOST_CHECK_EQUAL( ch.volume(), 3*3 );
+	BOOST_CHECK_EQUAL( ch.volume(), 3 * 3 );
 
 	for ( int i = 0; i < 3; i++ )
 		for ( int j = 0; j < 3; j++ )
-			BOOST_CHECK_EQUAL( ch.voxel<short>( i, j ), i + j*3 );
+			BOOST_CHECK_EQUAL( ch.voxel<short>( i, j ), i + j * 3 );
 }
 
 BOOST_AUTO_TEST_CASE ( chunk_property_test )
@@ -50,6 +50,7 @@ BOOST_AUTO_TEST_CASE ( chunk_property_test )
 	util::fvector4 pos( 1, 1, 1, 1 );
 	ch.setProperty( "indexOrigin", pos );
 	ch.setProperty( "acquisitionNumber", 0 );
+	ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 	BOOST_CHECK( ch.valid() );
 	//properties shall not be case sensitive
 	BOOST_CHECK( ch.hasProperty( "indexorigin" ) );

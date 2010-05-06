@@ -34,17 +34,17 @@ struct image_chunk_order: chunk_comparison {
 /// @endcond
 
 class Image:
-		public _internal::NDimensional<4>,
-		public util::PropMap
+	public _internal::NDimensional<4>,
+	public util::PropMap
 {
 public:
 	typedef std::set<Chunk, _internal::image_chunk_order> ChunkSet;
 	typedef ChunkSet::iterator ChunkIterator;
 	typedef ChunkSet::const_iterator ConstChunkIterator;
-
-private:
+protected:
 	ChunkSet set;
 	std::vector<ChunkIterator> lookup;
+private:
 	bool clean;
 	size_t chunkVolume;
 
@@ -63,11 +63,11 @@ private:
 	inline std::pair<size_t, size_t> commonGet ( size_t first, size_t second, size_t third, size_t fourth ) const {
 		const size_t idx[] = {first, second, third, fourth};
 		LOG_IF( not clean, Debug, error )
-		<< "Getting data from a non indexed image will result in undefined behavior. Run reIndex first.";
+				<< "Getting data from a non indexed image will result in undefined behavior. Run reIndex first.";
 		LOG_IF( set.empty(), Debug, error )
-		<< "Getting data from a empty image will result in undefined behavior.";
+				<< "Getting data from a empty image will result in undefined behavior.";
 		LOG_IF( !rangeCheck( idx ), Debug, isis::error )
-		<< "Index " << util::list2string( idx, idx + 4, "|" ) << " is out of range (" << sizeToString() << ")";
+				<< "Index " << util::list2string( idx, idx + 4, "|" ) << " is out of range (" << sizeToString() << ")";
 		const size_t index = dim2Index( idx );
 		return std::make_pair( index / chunkVolume, index % chunkVolume );
 	}
@@ -212,19 +212,25 @@ public:
 	ConstChunkIterator chunksBegin()const;
 	ConstChunkIterator chunksEnd()const;
 
-	template <typename T> T getMinMax( T &min, T &max )const {
-		min = std::numeric_limits<T>::max();
-		max = std::numeric_limits<T>::min();
-		BOOST_FOREACH( const Chunk &ch, set ) {
-			T cMin, cMax;
-			ch.getMinMax( min, max );
+	void getMinMax( util::_internal::TypeBase& min, util::_internal::TypeBase& max, bool init = true )const;
+	size_t cmp( const Image &comp )const;
+};
 
-			if ( min > cMin )min = cMin;
+template<typename T> class MemImage: public Image
+{
+public:
+	MemImage( const Image &src ): Image( src ) { // ok we just copied the whole image
+		// the chunks references are useless
+		lookup.clear();
+		set.clear();
+		util::Type<double> min, max; // @todo they should actually be of the most relevant type of the chunks within src
+		src.getMinMax( min, max );
 
-			if ( max < cMax )max = cMax;
+		//we want copies, and we want them to be of type T
+		for( ConstChunkIterator i = src.chunksBegin(); i != src.chunksEnd(); ++i )      {
+			insertChunk( MemChunk<T>( *i, min, max ) );
 		}
 	}
-	size_t cmp( const Image &comp )const;
 };
 
 class ImageList : public std::list< boost::shared_ptr<Image> >

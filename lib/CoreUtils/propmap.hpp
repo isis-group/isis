@@ -272,12 +272,12 @@ public:
 		if ( value.empty() ) {
 			const util::Type<T> dummy = T();
 			LOG( Runtime, error )
-			<< "Requested Property " << key << " is not set! Returning " << dummy.toString( true );
+					<< "Requested Property " << key << " is not set! Returning " << dummy.toString( true );
 			return dummy;
 		} else {
 			LOG_IF( not value->is<T>(), Debug, error )
-			<< "The type of the Property " << key << " is " << value->typeName()
-			<< " but you requested " << Type<T>::staticName() << " this will raise an exception.";
+					<< "The type of the Property " << key << " is " << value->typeName()
+					<< " but you requested " << Type<T>::staticName() << " this will raise an exception.";
 			return value->cast_to_Type<T>();
 		}
 	}

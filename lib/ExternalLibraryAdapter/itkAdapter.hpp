@@ -213,6 +213,7 @@ private:
 
 		//TODO why the hell negates the itkNiftio some seemingly arbitrary elements of the orientation?????
 		//matrix will be transformed this way:
+
 		/*
 		-1 -1 -1 -1
 		-1 -1 -1 -1

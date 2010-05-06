@@ -41,7 +41,8 @@
 
 
 VDictEntry TYPMetric[] = { {"MattesMutualInformation", 0}, {"MutualInformationHistogram", 1}, {"NormalizedCorrelation",
-			2}, {"MeanSquare", 3}, {NULL}
+		2
+	}, {"MeanSquare", 3}, {NULL}
 };
 
 VDictEntry TYPTransform[] = { {"Rigid", 0}, {"Affine", 1}, {"BSplineDeformable", 2}, {"Translation", 3}, {"Scale", 4}, {NULL}};
@@ -49,7 +50,8 @@ VDictEntry TYPTransform[] = { {"Rigid", 0}, {"Affine", 1}, {"BSplineDeformable",
 VDictEntry TYPInterpolator[] = { {"Linear", 0}, {"BSpline", 1}, {"NearestNeighbor", 2}, {NULL}};
 
 VDictEntry TYPOptimizer[] = { {"RegularStepGradientDescent", 0}, {"LBFGSB", 1}, {"Amoeba", 2}, {
-		"Powell", 3}, {NULL}
+		"Powell", 3
+	}, {NULL}
 };
 
 //command line parser options
@@ -90,15 +92,23 @@ options[] = {
 	{"pointset", VStringRepn, 1, &pointset_filename, &pointset_found, 0, "the pointset filename"},
 	{"out", VStringRepn, 1, &out_filename, VOptionalOpt, 0, "the output transform filename"},
 	{"vout", VStringRepn, 1, &vout_filename, VOptionalOpt, 0, "the output vector image filename"},
-	{"tin", VStringRepn, 1, &transform_filename_in, VOptionalOpt, 0,
-	 "filename of the transform used as an initial transform"},
+	{
+		"tin", VStringRepn, 1, &transform_filename_in, VOptionalOpt, 0,
+		"filename of the transform used as an initial transform"
+	},
 	//parameter inputs
-	{"bins", VShortRepn, 1, &number_of_bins, VOptionalOpt, 0,
-	 "Number of bins used by the MattesMutualInformationMetric to calculate the image histogram"},
-	{"iter", VShortRepn, 1, &number_of_iterations, VOptionalOpt, 0,
-	 "Maximum number of iteration used by the optimizer"},
-	{"seed", VShortRepn, 1, &initial_seed, VOptionalOpt, 0,
-	 "The initialize seed for the MattesMutualInformationMetric"},
+	{
+		"bins", VShortRepn, 1, &number_of_bins, VOptionalOpt, 0,
+		"Number of bins used by the MattesMutualInformationMetric to calculate the image histogram"
+	},
+	{
+		"iter", VShortRepn, 1, &number_of_iterations, VOptionalOpt, 0,
+		"Maximum number of iteration used by the optimizer"
+	},
+	{
+		"seed", VShortRepn, 1, &initial_seed, VOptionalOpt, 0,
+		"The initialize seed for the MattesMutualInformationMetric"
+	},
 
 	{
 		"pd",
@@ -107,20 +117,29 @@ options[] = {
 		&pixel_density,
 		VOptionalOpt,
 		0,
-		"The density of pixels the metric uses. 1 denotes the metric uses all pixels. Has to be > 0. Only operative with a MattesMutualInformation metric"},
+		"The density of pixels the metric uses. 1 denotes the metric uses all pixels. Has to be > 0. Only operative with a MattesMutualInformation metric"
+	},
 
 	{"j", VShortRepn, 1, &number_threads, VOptionalOpt, 0, "Number of threads used for the registration"},
 
-	{"gridSize", VShortRepn, 0, ( VPointer ) &grid_size, VOptionalOpt, 0,
-	 "Grid size used for the BSplineDeformable transform."},
-	{"cf", VFloatRepn, 1, &coarse_factor, VOptionalOpt, 0,
-	 "Coarse factor. Multiple of the max and min step length of the optimizer. Standard is 1"},
+	{
+		"gridSize", VShortRepn, 0, ( VPointer ) &grid_size, VOptionalOpt, 0,
+		"Grid size used for the BSplineDeformable transform."
+	},
+	{
+		"cf", VFloatRepn, 1, &coarse_factor, VOptionalOpt, 0,
+		"Coarse factor. Multiple of the max and min step length of the optimizer. Standard is 1"
+	},
 
 
-	{"prealign_center", VBooleanRepn, 1, &initialize_center, VOptionalOpt, 0,
-	 "Using an initializer to align the image centers"},
-	{"prealign_mass", VBooleanRepn, 1, &initialize_mass, VOptionalOpt, 0,
-	 "Using an initializer to align the center of mass"},
+	{
+		"prealign_center", VBooleanRepn, 1, &initialize_center, VOptionalOpt, 0,
+		"Using an initializer to align the image centers"
+	},
+	{
+		"prealign_mass", VBooleanRepn, 1, &initialize_mass, VOptionalOpt, 0,
+		"Using an initializer to align the center of mass"
+	},
 	{"verbose", VBooleanRepn, 1, &verbose, VOptionalOpt, 0, "printing the optimizer values of each iteration"},
 	{"smooth", VFloatRepn, 1, &smooth, VOptionalOpt, 0, "Applying a smoothing filter to the fixed and moving image before the registration process"},
 	{"get_inverse", VBooleanRepn, 1, &use_inverse, VOptionalOpt, 0, "Getting the inverse transform"},
@@ -128,9 +147,12 @@ options[] = {
 	//component inputs
 	{"metric", VShortRepn, 1, ( VPointer ) &metricType, VOptionalOpt, TYPMetric, "Type of the metric"}, {
 		"transform", VShortRepn, 0, ( VPointer ) &transformType, VOptionalOpt, TYPTransform,
-		"Type of the transform"}, {"interpolator", VShortRepn, 0, ( VPointer ) &interpolatorType, VOptionalOpt,
-							   TYPInterpolator, "Type of interpolator"}, {"optimizer", VShortRepn, 0, ( VPointer ) &optimizerType,
-									   VOptionalOpt, TYPOptimizer, "Type of optimizer"}
+		"Type of the transform"
+	}, {"interpolator", VShortRepn, 0, ( VPointer ) &interpolatorType, VOptionalOpt,
+		TYPInterpolator, "Type of interpolator"
+	   }, {"optimizer", VShortRepn, 0, ( VPointer ) &optimizerType,
+		   VOptionalOpt, TYPOptimizer, "Type of optimizer"
+		  }
 
 };
 

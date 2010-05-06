@@ -20,7 +20,6 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 {
 	util::enable_log<util::DefaultMsgPrint>( error );
 	data::enable_log<util::DefaultMsgPrint>( error );
-//  util::DefaultMsgPrint::stopBelow(warning);
 	data::MemChunk<float> ch( 4, 4 );
 	data::Image img;
 	// inserting insufficient Chunk should fail
@@ -50,7 +49,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 	//@todo equality test
 	std::list<data::Chunk> list( img.chunksBegin(), img.chunksEnd() );
 	unsigned short i = 0;
-	BOOST_FOREACH( const data::Chunk &ref, list ) {
+	BOOST_FOREACH( const data::Chunk & ref, list ) {
 		BOOST_CHECK( ref.getPropertyValue( "indexOrigin" ) == util::fvector4( 0, 0, i, 0 ) );
 		BOOST_CHECK( ref.getPropertyValue( "acquisitionNumber" ) == i++ );
 	}
@@ -58,7 +57,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 	//List of the properties shall be as if every chunk of the image was asked for the property
 	i = 0;
 	std::list<util::PropertyValue> origins = img.getChunksProperties( "indexOrigin" );
-	BOOST_FOREACH( const util::PropertyValue &ref, origins ) {
+	BOOST_FOREACH( const util::PropertyValue & ref, origins ) {
 		BOOST_CHECK( ref == util::fvector4( 0, 0, i++, 0 ) );
 	}
 	// Check for insertion in two dimensions
@@ -76,44 +75,21 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 BOOST_AUTO_TEST_CASE ( image_chunk_test )
 {
 	u_int32_t acNum = 0;
-	data::MemChunk<float> ch11( 3, 3 );
-	data::MemChunk<float> ch12( 3, 3 );
-	data::MemChunk<float> ch13( 3, 3 );
-	data::MemChunk<float> ch21( 3, 3 );
-	data::MemChunk<float> ch22( 3, 3 );
-	data::MemChunk<float> ch23( 3, 3 );
+	std::vector<std::vector<data::MemChunk<float> > > ch( 3, std::vector<data::MemChunk<float> >( 3, data::MemChunk<float>( 3, 3 ) ) );
 	data::Image img;
-	const util::fvector4 vSize( 1, 1, 1, 0 );
-	ch11.setProperty( "indexOrigin", util::fvector4( 0, 0, 0, 0 ) );
-	ch12.setProperty( "indexOrigin", util::fvector4( 0, 0, 1, 0 ) );
-	ch13.setProperty( "indexOrigin", util::fvector4( 0, 0, 2, 0 ) );
-	ch21.setProperty( "indexOrigin", util::fvector4( 0, 0, 0, 1 ) );
-	ch22.setProperty( "indexOrigin", util::fvector4( 0, 0, 1, 1 ) );
-	ch23.setProperty( "indexOrigin", util::fvector4( 0, 0, 2, 1 ) );
-	ch11.setProperty( "acquisitionNumber", acNum++ );
-	ch12.setProperty( "acquisitionNumber", acNum++ );
-	ch13.setProperty( "acquisitionNumber", acNum++ );
-	ch21.setProperty( "acquisitionNumber", acNum++ );
-	ch22.setProperty( "acquisitionNumber", acNum++ );
-	ch23.setProperty( "acquisitionNumber", acNum++ );
-	ch11.setProperty( "voxelSize", vSize );
-	ch12.setProperty( "voxelSize", vSize );
-	ch13.setProperty( "voxelSize", vSize );
-	ch21.setProperty( "voxelSize", vSize );
-	ch22.setProperty( "voxelSize", vSize );
-	ch23.setProperty( "voxelSize", vSize );
-	ch11.voxel<float>( 0, 0 ) = 42;
-	ch12.voxel<float>( 1, 1 ) = 42;
-	ch13.voxel<float>( 2, 2 ) = 42;
-	ch21.voxel<float>( 0, 0 ) = 42;
-	ch22.voxel<float>( 1, 1 ) = 42;
-	ch23.voxel<float>( 2, 2 ) = 42;
-	BOOST_CHECK( img.insertChunk( ch11 ) );
-	BOOST_CHECK( img.insertChunk( ch12 ) );
-	BOOST_CHECK( img.insertChunk( ch13 ) );
-	BOOST_CHECK( img.insertChunk( ch21 ) );
-	BOOST_CHECK( img.insertChunk( ch22 ) );
-	BOOST_CHECK( img.insertChunk( ch23 ) );
+
+	for( int i = 0; i < 3; i++ )
+		for( int j = 0; j < 3; j++ ) {
+			ch[i][j].setProperty( "indexOrigin", util::fvector4( 0, 0, j, i ) );
+			ch[i][j].setProperty( "acquisitionNumber", acNum++ );
+			ch[i][j].setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
+			ch[i][j].voxel<float>( j, j ) = 42;
+			BOOST_CHECK( img.insertChunk( ch[i][j] ) );
+		}
+
+	img.reIndex();
+	BOOST_CHECK_EQUAL( img.volume(), 9 * 9 );
+	BOOST_CHECK_EQUAL( img.sizeToVector(), util::ivector4( 3, 3, 3, 3 ) );
 	const data::Chunk &ref11 = img.getChunk( 0, 0, 0 );
 	const data::Chunk &ref12 = img.getChunk( 1, 1, 1 );
 	const data::Chunk &ref13 = img.getChunk( 2, 2, 2 );
@@ -138,55 +114,85 @@ BOOST_AUTO_TEST_CASE ( image_chunk_test )
 	BOOST_CHECK_EQUAL( ref22.voxel<float>( 1, 1 ), 42 );
 	BOOST_CHECK_EQUAL( ref23.voxel<float>( 2, 2 ), 42 );
 	BOOST_CHECK_EQUAL( ref23.voxel<float>( 2, 2 ), 42 );
-	BOOST_CHECK_EQUAL( img.volume(), 6*9 );
-	BOOST_CHECK_EQUAL( img.sizeToVector(), util::ivector4( 3, 3, 3, 2 ) );
 }
 
 BOOST_AUTO_TEST_CASE ( image_voxel_test )
 {
-//  //  TODO test the const and non-const version of voxel,
-//  //
-//  //  get a voxel from inside and outside the image
-//  data::MemChunk<float> ch11(3,3);
-//  data::MemChunk<float> ch12(3,3);
-//  data::MemChunk<float> ch13(3,3);
-//  data::Image img;
-//
-//  ch11.setProperty("indexOrigin",util::fvector4(0,0,0,0));
-//  ch11.setProperty<u_int32_t>("acquisitionNumber",0);
-//  ch12.setProperty("indexOrigin",util::fvector4(0,0,1,0));
-//  ch12.setProperty<u_int32_t>("acquisitionNumber",1);
-//  ch13.setProperty("indexOrigin",util::fvector4(0,0,2,0));
-//  ch13.setProperty<u_int32_t>("acquisitionNumber",2);
-//
-//  ch11.voxel<float>(0,0)=42.0;
-//  ch12.voxel<float>(1,1)=42.0;
-//  ch13.voxel<float>(2,2)=42;
-//
-//  BOOST_CHECK(img.insertChunk(ch11));
-//  BOOST_CHECK(img.insertChunk(ch12));
-//  BOOST_CHECK(img.insertChunk(ch13));
-//
-//  BOOST_CHECK(img.voxel<float>(0,0,0,0)==42);
-//  BOOST_CHECK(img.voxel<float>(1,1,1,0)==42);
-//  BOOST_CHECK(img.voxel<float>(2,2,2,0)==42);
-//
-//  /// check for setting voxel data
-//  img.voxel<float>(2,2,2,0)=23;
-//  BOOST_CHECK(img.voxel<float>(2,2,2,0)==23);
+	//  get a voxel from inside and outside the image
+	std::vector<data::MemChunk<float> > ch( 3, data::MemChunk<float>( 3, 3 ) );
+	data::Image img;
+
+	for( int i = 0; i < 3; i++ ) {
+		ch[i].setProperty( "indexOrigin", util::fvector4( 0, 0, i, 0 ) );
+		ch[i].setProperty<u_int32_t>( "acquisitionNumber", i );
+		ch[i].setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
+	}
+
+	ch[0].voxel<float>( 0, 0 ) = 42.0;
+	ch[1].voxel<float>( 1, 1 ) = 42.0;
+	ch[2].voxel<float>( 2, 2 ) = 42;
+
+	for( int i = 0; i < 3; i++ ) {
+		BOOST_CHECK( img.insertChunk( ch[i] ) );
+	}
+
+	for( int i = 0; i < 3; i++ ) {
+		BOOST_CHECK( img.voxel<float>( i, i, i, 0 ) == 42 );
+	}
+
+	/// check for setting voxel data
+	img.voxel<float>( 2, 2, 2, 0 ) = 23;
+	BOOST_CHECK( img.voxel<float>( 2, 2, 2, 0 ) == 23 );
 }
 
-BOOST_AUTO_TEST_CASE( image_getChunk_test )
+BOOST_AUTO_TEST_CASE( image_minmax_test )
 {
-//  TODO test the getChunk function,
-//
-//  retrieve a voxel from inside and outside the chunk
-}
+	std::vector<std::vector<data::MemChunk<float> > > ch( 3, std::vector<data::MemChunk<float> >( 3, data::MemChunk<float>( 3, 3 ) ) );
+	data::Image img;
+	unsigned short acNum = 0;
+	const util::fvector4 vSize( 1, 1, 1, 0 );
 
-BOOST_AUTO_TEST_CASE( image_insertChunk_test )
-{
-//  TODO test the insertChunk function
-//
-//  insert a valid and non-valid list of chunks
+	for( int i = 0; i < 3; i++ )
+		for( int j = 0; j < 3; j++ ) {
+			ch[i][j].setProperty( "indexOrigin", util::fvector4( 0, 0, j, i ) );
+			ch[i][j].setProperty( "acquisitionNumber", acNum++ );
+			ch[i][j].setProperty( "voxelSize", vSize );
+			ch[i][j].voxel<float>( j, j ) = i * j;
+			BOOST_CHECK( img.insertChunk( ch[i][j] ) );
+		}
+
+	img.reIndex();
+	util::Type<unsigned short> min, max;
+	img.getMinMax( min, max );
+	BOOST_CHECK_EQUAL( min, 0 );
+	BOOST_CHECK_EQUAL( max, 4 );
+	//this should be 0,0 because the first chunk only has zeros
+	img.getChunk( 0, 0, 0, 0 ).getMinMax( min, max );
+	BOOST_CHECK_EQUAL( min, 0 );
+	BOOST_CHECK_EQUAL( max, 0 );
 }
-}}
+BOOST_AUTO_TEST_CASE( memimage_test )
+{
+	std::vector<std::vector<data::MemChunk<float> > > ch( 3, std::vector<data::MemChunk<float> >( 3, data::MemChunk<float>( 3, 3 ) ) );
+	data::Image img;
+	unsigned short acNum = 0;
+	const util::fvector4 vSize( 1, 1, 1, 0 );
+
+	for( int i = 0; i < 3; i++ )
+		for( int j = 0; j < 3; j++ ) {
+			ch[i][j].setProperty( "indexOrigin", util::fvector4( 0, 0, j, i ) );
+			ch[i][j].setProperty( "acquisitionNumber", acNum++ );
+			ch[i][j].setProperty( "voxelSize", vSize );
+			ch[i][j].voxel<float>( j, j ) = i * j * 1000;
+			BOOST_CHECK( img.insertChunk( ch[i][j] ) );
+		}
+
+	img.reIndex();
+	data::MemImage<u_int8_t> img2( img );
+	util::Type<u_int8_t> min, max;
+	img2.getMinMax( min, max );
+	BOOST_CHECK_EQUAL( ( u_int8_t )min, 0 );
+	BOOST_CHECK_EQUAL( ( u_int8_t )max, 255 );
+}
+}
+}

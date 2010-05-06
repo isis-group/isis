@@ -65,16 +65,16 @@ void ImageFormat_Dicom::parseAS( DcmElement* elem, const std::string &name, util
 			break;
 		default:
 			LOG( Runtime, warning )
-			<< "Missing age-type-letter, assuming days";
+					<< "Missing age-type-letter, assuming days";
 		}
 
 		map[name] = duration;
 		LOG( Debug, verbose_info )
-		<< "Parsed age for " << name << "(" <<  buff << ")"
-		<< " as " << duration << " days";
+				<< "Parsed age for " << name << "(" <<  buff << ")"
+				<< " as " << duration << " days";
 	} else
 		LOG( Runtime, warning )
-		<< "Cannot parse age string \"" << buff << "\" in the field \"" << name << "\"";
+				<< "Cannot parse age string \"" << buff << "\" in the field \"" << name << "\"";
 }
 
 /**
@@ -101,11 +101,11 @@ void ImageFormat_Dicom::parseDA( DcmElement* elem, const std::string &name, util
 			boost::lexical_cast<int16_t>( results.str( 3 ) ) //day of month
 		);
 		LOG( Debug, verbose_info )
-		<< "Parsed date for " << name << "(" <<  buff << ")" << " as " << date;
+				<< "Parsed date for " << name << "(" <<  buff << ")" << " as " << date;
 		map[name] = date;
 	} else
 		LOG( Runtime, warning )
-		<< "Cannot parse Date string \"" << buff << "\" in the field \"" << name << "\"";
+				<< "Cannot parse Date string \"" << buff << "\" in the field \"" << name << "\"";
 }
 
 /**
@@ -156,12 +156,12 @@ void ImageFormat_Dicom::parseTM( DcmElement* elem, const std::string &name, util
 
 	if ( ok ) {
 		LOG( Debug, verbose_info )
-		<< "Parsed time for " << name << "(" <<  buff << ")" << " as " << time;
+				<< "Parsed time for " << name << "(" <<  buff << ")" << " as " << time;
 		map[name] = boost::posix_time::ptime( boost::gregorian::date( 1400, 1, 1 ), time );
 		//although TM is defined as time of day we dont have a day here, so we fake one
 	} else
 		LOG( Runtime, warning )
-		<< "Cannot parse Time string \"" << buff << "\" in the field \"" << name << "\"";
+				<< "Cannot parse Time string \"" << buff << "\" in the field \"" << name << "\"";
 }
 
 void ImageFormat_Dicom::parseScalar( DcmElement* elem, const std::string &name, util::PropMap &map )
@@ -243,9 +243,9 @@ void ImageFormat_Dicom::parseScalar( DcmElement* elem, const std::string &name, 
 	default: {
 		elem->getOFString( buff, 0 );
 		LOG( Runtime, info ) << "Implement me "
-		<< name << "("
-		<< const_cast<DcmTag&>( elem->getTag() ).getVRName() << "):"
-		<< buff;
+							 << name << "("
+							 << const_cast<DcmTag&>( elem->getTag() ).getVRName() << "):"
+							 << buff;
 	}
 	break;
 	}
@@ -323,9 +323,9 @@ void ImageFormat_Dicom::parseVector( DcmElement* elem, const std::string &name, 
 	default: {
 		elem->getOFStringArray( buff );
 		LOG( Runtime, info ) << "Implement me "
-		<< name << "("
-		<< const_cast<DcmTag&>( elem->getTag() ).getVRName() << "):"
-		<< buff;
+							 << name << "("
+							 << const_cast<DcmTag&>( elem->getTag() ).getVRName() << "):"
+							 << buff;
 	}
 	break;
 	}
@@ -391,9 +391,9 @@ void ImageFormat_Dicom::parseList( DcmElement* elem, const std::string &name, ut
 	default: {
 		elem->getOFStringArray( buff );
 		LOG( Runtime, info ) << "Implement me "
-		<< name << "("
-		<< const_cast<DcmTag&>( elem->getTag() ).getVRName() << "):"
-		<< buff;
+							 << name << "("
+							 << const_cast<DcmTag&>( elem->getTag() ).getVRName() << "):"
+							 << buff;
 	}
 	break;
 	}

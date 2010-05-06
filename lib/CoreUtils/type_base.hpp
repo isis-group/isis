@@ -201,8 +201,8 @@ public:
 	template<class T> T as()const {
 		if ( typeID() == Type<T>::staticID ) {
 			LOG( Debug, verbose_info )
-			<< "Doing reinterpret_cast instead of useless conversion from " << toString( true )
-			<< " to " << Type<T>::staticName();
+					<< "Doing reinterpret_cast instead of useless conversion from " << toString( true )
+					<< " to " << Type<T>::staticName();
 			return *reinterpret_cast<const Type<T>*>( this );
 		} else {
 			Type<T> ret;
@@ -234,6 +234,9 @@ public:
 	virtual bool eq( const TypeBase &second )const = 0;
 
 	virtual ~TypeBase();
+
+	virtual bool operator >( const _internal::TypeBase &ref )const = 0;
+	virtual bool operator <( const _internal::TypeBase &ref )const = 0;
 };
 
 class TypePtrBase : public GenericType
@@ -287,9 +290,10 @@ public:
 	TypePtrBase::Reference copyToMem()const;
 
 	/// Copy (or Convert) data from this to another TypePtr of maybe another type and the same length.
-	bool convertTo( TypePtrBase &dst )const;
+	virtual bool convertTo( TypePtrBase& dst )const = 0;
+	bool convertTo( TypePtrBase& dst, const TypeBase& min, const TypeBase& max )const;
 
-	/// Copy (or Convert) data from this to memory of maybe another type and the same length.
+	/// Copy (or Convert) data from this to memory of maybe another type and the given length.
 	template<typename T> bool convertTo( T *dst, size_t len ) const {
 		TypePtr<T> dest( dst, len, TypePtr<T>::NonDeleter() );
 		return convertTo( dest );
@@ -308,6 +312,18 @@ public:
 		return ret;
 	}
 	/**
+	 * Copy this to a new TypePtr\<T\> using newly allocated memory.
+	 * This will create a new TypePtr of type T and the length of this.
+	 * The memory will be allocated and the data of this will be copy-converted to T using min/max as value range.
+	 * If the conversion fails, an error will be send to CoreLog and the data of the newly created TypePtr will be undefined.
+	 * \returns a the newly created TypePtr
+	 */
+	template<typename T> const TypePtr<T> copyToNew( const TypeBase &min, const TypeBase &max )const {
+		TypePtr<T> ret( ( T* )malloc( sizeof( T )*len() ), len() );
+		convertTo( ret, min, max );
+		return ret;
+	}
+	/**
 	 * \copydoc cloneToMem
 	 * \param length length of the new memory block in elements of the given TYPE
 	 */
@@ -323,20 +339,7 @@ public:
 	 */
 	void copyRange( size_t start, size_t end, TypePtrBase &dst, size_t dst_start )const;
 
-	template<typename T> void getMinMax( T &min, T &max )const {
-		LOG_IF( TypePtr<T>::staticID != this->typeID(), Debug, error ) << "Given type of min/max"
-		<< Type<T>::staticName()
-		<< " does not fit type of the data (" << typeName() << ")";
-		const TypePtr<T> &me = this->cast_to_TypePtr<T>();
-		min = std::numeric_limits<T>::max();
-		max = std::numeric_limits<T>::min();
-
-		for ( size_t i = 0; i < len(); i++ ) {
-			if ( max < me[i] )max = me[i];
-
-			if ( min > me[i] )min = me[i];
-		}
-	}
+	virtual void getMinMax( TypeBase &min, TypeBase &max, bool init = true )const = 0;
 	virtual size_t cmp( size_t start, size_t end, const TypePtrBase &dst, size_t dst_start )const = 0;
 	size_t cmp( const TypePtrBase& comp )const;
 };

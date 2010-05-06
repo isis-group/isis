@@ -60,8 +60,8 @@ protected:
 	 * \param fourthDim size in the fourth dimension
 	 */
 	template<typename TYPE, typename D> Chunk( TYPE* src, D d, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 ):
-			_internal::ChunkBase( firstDim, secondDim, thirdDim, fourthDim ),
-			util::_internal::TypeReference<util::_internal::TypePtrBase>( new util::TypePtr<TYPE>( src, volume(), d ) ) {}
+		_internal::ChunkBase( firstDim, secondDim, thirdDim, fourthDim ),
+		util::_internal::TypeReference<util::_internal::TypePtrBase>( new util::TypePtr<TYPE>( src, volume(), d ) ) {}
 	Chunk( const util::_internal::TypePtrBase::Reference &src, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 );
 public:
 	/**
@@ -72,8 +72,8 @@ public:
 	template<typename TYPE> TYPE &voxel( size_t firstDim, size_t secondDim = 0, size_t thirdDim = 0, size_t fourthDim = 0 ) {
 		const size_t idx[] = {firstDim, secondDim, thirdDim, fourthDim};
 		LOG_IF( not rangeCheck( idx ), Debug, isis::error )
-		<< "Index " << util::ivector4( firstDim, secondDim, thirdDim, fourthDim )
-		<< " is out of range " << sizeToString();
+				<< "Index " << util::ivector4( firstDim, secondDim, thirdDim, fourthDim )
+				<< " is out of range " << sizeToString();
 		util::TypePtr<TYPE> &ret = asTypePtr<TYPE>();
 		return ret[dim2Index( idx )];
 	}
@@ -86,8 +86,8 @@ public:
 
 		if ( !rangeCheck( idx ) ) {
 			LOG( Debug, isis::error )
-			<< "Index " << firstDim << "|" << secondDim << "|" << thirdDim << "|" << fourthDim
-			<< " is out of range (" << sizeToString() << ")";
+					<< "Index " << firstDim << "|" << secondDim << "|" << thirdDim << "|" << fourthDim
+					<< " is out of range (" << sizeToString() << ")";
 		}
 
 		const util::TypePtr<TYPE> &ret = getTypePtr<TYPE>();
@@ -121,9 +121,7 @@ public:
 	size_t cmpLine( size_t secondDimS, size_t thirdDimS, size_t fourthDimS, const Chunk& dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD )const;
 	size_t cmpSlice( size_t thirdDimS, size_t fourthDimS, const Chunk& dst, size_t thirdDimD, size_t fourthDimD )const;
 
-	template<typename T> void getMinMax( T &min, T &max )const {
-		return operator*().getMinMax( min, max );
-	}
+	void getMinMax( util::_internal::TypeBase &min, util::_internal::TypeBase &max, bool init = true )const;
 	template<typename T> size_t convertTo( T *dst, size_t len )const {
 		getTypePtrBase().convertTo( dst );
 	}
@@ -150,23 +148,29 @@ template<typename TYPE> class MemChunk : public Chunk
 public:
 	/// Create an empty MemChunk with the given size
 	MemChunk( size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 ):
-			Chunk(
-				( TYPE* )calloc( fourthDim*thirdDim*secondDim*firstDim, sizeof( TYPE ) ),
-				typename util::TypePtr<TYPE>::BasicDeleter(),
-				firstDim, secondDim, thirdDim, fourthDim
-			) {}
+		Chunk(
+			( TYPE* )calloc( fourthDim*thirdDim*secondDim*firstDim, sizeof( TYPE ) ),
+			typename util::TypePtr<TYPE>::BasicDeleter(),
+			firstDim, secondDim, thirdDim, fourthDim
+		) {}
 	/// Create a MemChunk as copy of a given raw memory block (no range check will be done)
 	MemChunk( const TYPE*const org, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 ):
-			Chunk(
-				( TYPE* )malloc( sizeof( TYPE )*fourthDim*thirdDim*secondDim*firstDim ),
-				typename util::TypePtr<TYPE>::BasicDeleter(),
-				firstDim, secondDim, thirdDim, fourthDim
-			) {
+		Chunk(
+			( TYPE* )malloc( sizeof( TYPE )*fourthDim*thirdDim*secondDim*firstDim ),
+			typename util::TypePtr<TYPE>::BasicDeleter(),
+			firstDim, secondDim, thirdDim, fourthDim
+		) {
 		asTypePtr<TYPE>().copyFromMem( org, volume() );
 	}
 	/// Create a deep copy of a given Chunk (automatic conversion will be used if datatype does not fit)
 	MemChunk( const Chunk &ref ): Chunk( ref ) {
 		operator=( ref );
+	}
+	/// Create a deep copy of a given Chunk (automatic conversion with min/max will be used if datatype does not fit)
+	MemChunk( const Chunk &ref, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max ): Chunk( ref ) {
+		_internal::ChunkBase::operator=( static_cast<const _internal::ChunkBase&>( ref ) ); //copy the metadate of ref
+		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
+		util::_internal::TypePtrBase::Reference::reset( new util::TypePtr<TYPE>( ref.getTypePtrBase().copyToNew<TYPE>( min, max ) ) );
 	}
 	/// Create a deep copy of a given MemChunk of the same type (default copy constructor)
 	MemChunk( const MemChunk<TYPE> &ref ): Chunk( ref ) {

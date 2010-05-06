@@ -249,7 +249,7 @@ public:
 	/// copy the elements to somthing designed after the output iterator model
 	template<class InputIterator> void copyFrom( InputIterator start, InputIterator end ) {
 		LOG_IF( std::distance( start, end ) > SIZE, Runtime, error )
-		<< "Copying " << std::distance( start, end ) << " Elements into a vector of the size " << SIZE;
+				<< "Copying " << std::distance( start, end ) << " Elements into a vector of the size " << SIZE;
 		std::copy( start, end, CONTAINER::begin() );
 	}
 	template<typename TYPE2, typename CONTAINER2> FixedVector( const FixedVector<TYPE2, SIZE, CONTAINER2> &src ) {

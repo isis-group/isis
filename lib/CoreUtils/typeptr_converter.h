@@ -31,12 +31,13 @@ namespace util
 namespace _internal
 {
 
+class TypeBase;
 class TypePtrBase;
 class TypePtrConverterBase
 {
 public:
-	virtual void convert( const TypePtrBase& src, TypePtrBase &dst )const {};
-	virtual void generate( const boost::scoped_ptr<TypePtrBase>& src, boost::scoped_ptr<TypePtrBase>& dst )const = 0;
+	virtual void convert( const TypePtrBase& src, TypePtrBase &dst, const TypeBase &min, const TypeBase &max )const;
+	virtual void generate( const boost::scoped_ptr<TypePtrBase>& src, boost::scoped_ptr<TypePtrBase>& dst, const TypeBase &min, const TypeBase &max )const = 0;
 	static boost::shared_ptr<const TypePtrConverterBase> create() {return boost::shared_ptr<const TypePtrConverterBase>();}
 public:
 	virtual ~TypePtrConverterBase() {}

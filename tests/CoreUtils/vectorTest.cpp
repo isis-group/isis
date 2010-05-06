@@ -27,9 +27,9 @@ BOOST_AUTO_TEST_CASE( vector_init_test )
 	float* start = &test[0];
 	const float compare1[] = {0, 0, 0, 0};
 	const float compare2[] = {42, 42, 42, 42};
-	BOOST_CHECK( memcmp( start, compare1, sizeof( float )*4 ) == 0 );
+	BOOST_CHECK( memcmp( start, compare1, sizeof( float ) * 4 ) == 0 );
 	test.fill( 42 );
-	BOOST_CHECK( memcmp( start, compare2, sizeof( float )*4 ) == 0 );
+	BOOST_CHECK( memcmp( start, compare2, sizeof( float ) * 4 ) == 0 );
 }
 
 BOOST_AUTO_TEST_CASE( vector_output_test )
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE( vector_op_test )
 	BOOST_CHECK_EQUAL( ( test1 + test2 ), test2 ); //0+42 == 42
 	BOOST_CHECK_EQUAL( test1 - test2, -test2 ); //0-42= -42
 	BOOST_CHECK_EQUAL( test2 - test1, test2 ); // 42-0 = 42
-	BOOST_CHECK_EQUAL( test2 + test2, test2*2 ); // 42+42 = 42*2
+	BOOST_CHECK_EQUAL( test2 + test2, test2 * 2 ); // 42+42 = 42*2
 }
 }
 }

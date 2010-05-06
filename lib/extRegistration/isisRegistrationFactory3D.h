@@ -192,7 +192,7 @@ public:
 	AffineCenteredTransformInitializerType;
 
 	typedef typename itk::LandmarkBasedTransformInitializer < VersorRigid3DTransformType, TFixedImageType,
-	TMovingImageType > RigidLandmarkBasedTransformInitializerType;
+			TMovingImageType > RigidLandmarkBasedTransformInitializerType;
 
 	enum eTransformType {
 		TranslationTransform,

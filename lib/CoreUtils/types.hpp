@@ -50,8 +50,8 @@ bool
 template<class T> struct TypeId {
 	typedef typename boost::mpl::distance <
 	typename boost::mpl::begin<types>::type,
-	typename boost::mpl::find<types, T>::type
-	>::type type;
+			 typename boost::mpl::find<types, T>::type
+			 >::type type;
 	static const int value = type::value;
 };
 }

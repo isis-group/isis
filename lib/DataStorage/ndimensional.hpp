@@ -32,13 +32,13 @@ namespace _internal
 template<unsigned short DIM> size_t __dimStride( const size_t dim[] )
 {
 	BOOST_STATIC_ASSERT( DIM > 0 );//Make sure recursion terminates
-	return __dimStride < DIM - 1 > ( dim )*dim[DIM-1];
+	return __dimStride < DIM - 1 > ( dim ) * dim[DIM-1];
 }
 
 template<unsigned short DIM> size_t __dim2Index( const size_t d[], const size_t dim[] )
 {
 	BOOST_STATIC_ASSERT( DIM > 0 );//Make sure recursion terminates
-	return d[DIM]*__dimStride<DIM>( dim ) + __dim2Index < DIM - 1 > ( d, dim );
+	return d[DIM] * __dimStride<DIM>( dim ) + __dim2Index < DIM - 1 > ( d, dim );
 }
 
 template<unsigned short DIM> bool __rangeCheck( const size_t d[], const size_t dim[] )
@@ -47,7 +47,7 @@ template<unsigned short DIM> bool __rangeCheck( const size_t d[], const size_t d
 }
 
 template<> inline size_t __dimStride<0>( const size_t dim[] ) {return 1;}
-template<> inline size_t __dim2Index<0>( const size_t d[], const size_t dim[] ) {return d[0]*__dimStride<0>( dim );}
+template<> inline size_t __dim2Index<0>( const size_t d[], const size_t dim[] ) {return d[0] * __dimStride<0>( dim );}
 template<> inline bool   __rangeCheck<0>( const size_t d[], const size_t dim[] ) {return d[0] < dim[0];}
 
 /// @endcond

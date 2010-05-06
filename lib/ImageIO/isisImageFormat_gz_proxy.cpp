@@ -20,9 +20,9 @@ private:
 		int len;
 
 		for (
-			in.read( buf, 2048*1024 );
+			in.read( buf, 2048 * 1024 );
 			( len = in.gcount() );
-			in.read( buf, 2048*1024 )
+			in.read( buf, 2048 * 1024 )
 		) {
 			if ( gzwrite( out, buf, len ) != len ) {
 				int err;
