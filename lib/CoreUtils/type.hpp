@@ -202,8 +202,8 @@ public:
 		/// decrement the use_count of the master when a specific part is not referenced anymore
 		void operator()( TYPE *at ) {
 			LOG( Debug, verbose_info )
-					<< "Deletion for " << this->get() << " called from splice at offset "   << at - this->get()
-					<< ", current use_count: " << this->use_count();
+			<< "Deletion for " << this->get() << " called from splice at offset "   << at - this->get()
+			<< ", current use_count: " << this->use_count();
 			this->reset();//actually not needed, but we keep it here to keep obfuscation low
 		}
 	};
@@ -246,7 +246,7 @@ public:
 	 * this is just here for child classes which may want to check)
 	 */
 	TypePtr( TYPE* const ptr, size_t length ):
-		_internal::TypePtrBase( length ), m_val( ptr, BasicDeleter() ) {}
+			_internal::TypePtrBase( length ), m_val( ptr, BasicDeleter() ) {}
 	/**
 	 * Creates TypePtr from a pointer of type TYPE.
 	 * The pointers are automatically deleted by an copy of d and should not be used outside once used here
@@ -259,14 +259,14 @@ public:
 	 */
 
 	template<typename D> TypePtr( TYPE* const ptr, size_t length, D d ):
-		_internal::TypePtrBase( length ), m_val( ptr, d ) {}
+			_internal::TypePtrBase( length ), m_val( ptr, d ) {}
 
 	virtual ~TypePtr() {}
 
 	/// Copy elements from raw memory
 	void copyFromMem( const TYPE* const src, size_t length ) {
 		LOG_IF( length > len(), Runtime, error )
-				<< "Amount of the elements to copy from memory (" << length << ") exceeds the length of the array (" << len() << ")";
+		<< "Amount of the elements to copy from memory (" << length << ") exceeds the length of the array (" << len() << ")";
 		TYPE &dest = this->operator[]( 0 );
 		LOG( Debug, info ) << "Copying " << length*sizeof( TYPE ) << " bytes of " << typeName() << " from " << src << " to " << &dest;
 		memcpy( &dest, src, length * sizeof( TYPE ) );
@@ -276,7 +276,7 @@ public:
 		assert( start <= end );
 		const size_t length = end - start + 1;
 		LOG_IF( end >= len(), Runtime, error )
-				<< "End of the range (" << end << ") is behind the end of this TypePtr (" << len() << ")";
+		<< "End of the range (" << end << ") is behind the end of this TypePtr (" << len() << ")";
 		const TYPE &source = this->operator[]( start );
 		memcpy( dst, &source, length * sizeof( TYPE ) );
 	}
@@ -287,15 +287,15 @@ public:
 
 		if ( dst.typeID() != typeID() ) {
 			LOG( Runtime, error )
-					<< "Comparing to a TypePtr of different type(" << dst.typeName() << ", not " << typeName()
-					<< "). Assuming all voxels to be different";
+			<< "Comparing to a TypePtr of different type(" << dst.typeName() << ", not " << typeName()
+			<< "). Assuming all voxels to be different";
 			return length;
 		}
 
 		LOG_IF( end >= len(), Runtime, error )
-				<< "End of the range (" << end << ") is behind the end of this TypePtr (" << len() << ")";
+		<< "End of the range (" << end << ") is behind the end of this TypePtr (" << len() << ")";
 		LOG_IF( length + dst_start >= dst.len(), Runtime, error )
-				<< "End of the range (" << length + dst_start << ") is behind the end of the destination (" << dst.len() << ")";
+		<< "End of the range (" << length + dst_start << ") is behind the end of the destination (" << dst.len() << ")";
 		const TypePtr<TYPE> &compare = dst.cast_to_TypePtr<TYPE>();
 		LOG( Debug, verbose_info ) << "Comparing " << dst.typeName() << " at " << &operator[]( 0 ) << " and " << &compare[0];
 
@@ -373,12 +373,12 @@ public:
 	void getMinMax ( _internal::TypeBase& min, _internal::TypeBase& max, bool init = true ) const {
 		assert( min.typeID() == max.typeID() );
 
-		if( len() == 0 ) {
+		if ( len() == 0 ) {
 			LOG( Runtime, warning ) << "Skipping computation of min/max on an empty TypePtr";
 			return;
 		}
 
-		if( init ) { // they haven't been set yet
+		if ( init ) { // they haven't been set yet
 			const Type<TYPE> el( this->operator[]( 0 ) );
 			_internal::TypeBase::convert( el, min );
 			_internal::TypeBase::convert( el, max );
@@ -386,11 +386,11 @@ public:
 
 		const std::pair<Type<TYPE>, Type<TYPE> > result = _internal::getMinMaxImpl<TYPE, boost::is_arithmetic<TYPE>::value>()( *this );
 
-		if( min > result.first ) {
+		if ( min > result.first ) {
 			_internal::TypeBase::convert( result.first, min );
 		}
 
-		if( max < result.second ) {
+		if ( max < result.second ) {
 			_internal::TypeBase::convert( result.second, max );
 		}
 	}
@@ -398,7 +398,7 @@ public:
 	std::vector<Reference> splice( size_t size )const {
 		if ( size >= len() ) {
 			LOG( Debug, warning )
-					<< "splicing data of the size " << len() << " up into blocks of the size " << size << " is kind of useless ...";
+			<< "splicing data of the size " << len() << " up into blocks of the size " << size << " is kind of useless ...";
 		}
 
 		const size_t fullSplices = len() / size;

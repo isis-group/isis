@@ -7,7 +7,7 @@
 
 #define BOOST_TEST_MODULE RegistrationFactory3DTests;
 #include "boost/test/included/unit_test.hpp"
-#include "extRegistration/isisRegistrationFactory3D.h"
+#include "extRegistration/isisRegistrationFactory3D.hpp"
 
 namespace isis
 {

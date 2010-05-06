@@ -31,7 +31,7 @@ public:
 	TestHandler( LogLevel level ): util::_internal::MessageHandlerBase( level ) {}
 	virtual ~TestHandler() {}
 	void commit( const util::_internal::Message &mesg ) {
-		if( mesg.str() == "Automatic numeric conversion of {s} to u16bit failed: bad numeric conversion: negative overflow" )
+		if ( mesg.str() == "Automatic numeric conversion of {s} to u16bit failed: bad numeric conversion: negative overflow" )
 			hit++;
 		else
 			std::cout << "Unexpected error " << mesg.merge();

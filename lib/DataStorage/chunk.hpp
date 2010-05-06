@@ -60,8 +60,8 @@ protected:
 	 * \param fourthDim size in the fourth dimension
 	 */
 	template<typename TYPE, typename D> Chunk( TYPE* src, D d, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 ):
-		_internal::ChunkBase( firstDim, secondDim, thirdDim, fourthDim ),
-		util::_internal::TypeReference<util::_internal::TypePtrBase>( new util::TypePtr<TYPE>( src, volume(), d ) ) {}
+			_internal::ChunkBase( firstDim, secondDim, thirdDim, fourthDim ),
+			util::_internal::TypeReference<util::_internal::TypePtrBase>( new util::TypePtr<TYPE>( src, volume(), d ) ) {}
 	Chunk( const util::_internal::TypePtrBase::Reference &src, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 );
 public:
 	/**
@@ -72,8 +72,8 @@ public:
 	template<typename TYPE> TYPE &voxel( size_t firstDim, size_t secondDim = 0, size_t thirdDim = 0, size_t fourthDim = 0 ) {
 		const size_t idx[] = {firstDim, secondDim, thirdDim, fourthDim};
 		LOG_IF( not rangeCheck( idx ), Debug, isis::error )
-				<< "Index " << util::ivector4( firstDim, secondDim, thirdDim, fourthDim )
-				<< " is out of range " << sizeToString();
+		<< "Index " << util::ivector4( firstDim, secondDim, thirdDim, fourthDim )
+		<< " is out of range " << sizeToString();
 		util::TypePtr<TYPE> &ret = asTypePtr<TYPE>();
 		return ret[dim2Index( idx )];
 	}
@@ -86,8 +86,8 @@ public:
 
 		if ( !rangeCheck( idx ) ) {
 			LOG( Debug, isis::error )
-					<< "Index " << firstDim << "|" << secondDim << "|" << thirdDim << "|" << fourthDim
-					<< " is out of range (" << sizeToString() << ")";
+			<< "Index " << firstDim << "|" << secondDim << "|" << thirdDim << "|" << fourthDim
+			<< " is out of range (" << sizeToString() << ")";
 		}
 
 		const util::TypePtr<TYPE> &ret = getTypePtr<TYPE>();
@@ -148,18 +148,18 @@ template<typename TYPE> class MemChunk : public Chunk
 public:
 	/// Create an empty MemChunk with the given size
 	MemChunk( size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 ):
-		Chunk(
-			( TYPE* )calloc( fourthDim*thirdDim*secondDim*firstDim, sizeof( TYPE ) ),
-			typename util::TypePtr<TYPE>::BasicDeleter(),
-			firstDim, secondDim, thirdDim, fourthDim
-		) {}
+			Chunk(
+				( TYPE* )calloc( fourthDim*thirdDim*secondDim*firstDim, sizeof( TYPE ) ),
+				typename util::TypePtr<TYPE>::BasicDeleter(),
+				firstDim, secondDim, thirdDim, fourthDim
+			) {}
 	/// Create a MemChunk as copy of a given raw memory block (no range check will be done)
 	MemChunk( const TYPE*const org, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 ):
-		Chunk(
-			( TYPE* )malloc( sizeof( TYPE )*fourthDim*thirdDim*secondDim*firstDim ),
-			typename util::TypePtr<TYPE>::BasicDeleter(),
-			firstDim, secondDim, thirdDim, fourthDim
-		) {
+			Chunk(
+				( TYPE* )malloc( sizeof( TYPE )*fourthDim*thirdDim*secondDim*firstDim ),
+				typename util::TypePtr<TYPE>::BasicDeleter(),
+				firstDim, secondDim, thirdDim, fourthDim
+			) {
 		asTypePtr<TYPE>().copyFromMem( org, volume() );
 	}
 	/// Create a deep copy of a given Chunk (automatic conversion will be used if datatype does not fit)

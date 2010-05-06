@@ -39,7 +39,7 @@ template<typename SRC, typename DST> class TypeGenerator: public TypeConverterBa
 public:
 	void generate( const boost::scoped_ptr<TypeBase>& src, boost::scoped_ptr<TypeBase>& dst )const {
 		LOG_IF( dst.get(), Debug, warning ) <<
-											"Generating into existing value " << dst->toString( true );
+		"Generating into existing value " << dst->toString( true );
 		Type<DST> *ref = new Type<DST>;
 		convert( src->cast_to_Type<SRC>(), *ref );
 		dst.reset( ref );
@@ -61,7 +61,7 @@ template<bool NUMERIC, typename SRC, typename DST> class TypeConverter<NUMERIC, 
 {
 	TypeConverter() {
 		LOG( Debug, verbose_info )
-				<< "Creating trivial copy converter for " << Type<SRC>::staticName();
+		<< "Creating trivial copy converter for " << Type<SRC>::staticName();
 	};
 public:
 	static boost::shared_ptr<const TypeConverterBase> create() {
@@ -84,8 +84,8 @@ template<typename SRC, typename DST> class TypeConverter<true, false, SRC, DST> 
 {
 	TypeConverter() {
 		LOG( Debug, verbose_info )
-				<< "Creating numeric converter from "
-				<< Type<SRC>::staticName() << " to " << Type<DST>::staticName();
+		<< "Creating numeric converter from "
+		<< Type<SRC>::staticName() << " to " << Type<DST>::staticName();
 	};
 public:
 	static boost::shared_ptr<const TypeConverterBase> create() {
@@ -96,16 +96,16 @@ public:
 		try {
 			typedef boost::numeric::converter <
 			DST, SRC,
-			   boost::numeric::conversion_traits<DST, SRC>,
-			   boost::numeric::def_overflow_handler,
-			   boost::numeric::RoundEven<SRC>
-			   > converter;
+			boost::numeric::conversion_traits<DST, SRC>,
+			boost::numeric::def_overflow_handler,
+			boost::numeric::RoundEven<SRC>
+			> converter;
 			DST &dstVal = dst.cast_to_Type<DST>();
 			const SRC &srcVal = src.cast_to_Type<SRC>();
 			dstVal = converter::convert( srcVal );
 		} catch ( boost::numeric::bad_numeric_cast const& e ) {
 			LOG( Runtime, error )
-					<< "Automatic numeric conversion of " << MSubject( src.toString( true ) ) << " to " << dst.typeName() << " failed: " << e.what();
+			<< "Automatic numeric conversion of " << MSubject( src.toString( true ) ) << " to " << dst.typeName() << " failed: " << e.what();
 		}
 	}
 	virtual ~TypeConverter() {}
@@ -119,8 +119,8 @@ template<typename SRC, typename DST > class TypeConverter<false, false, vector4<
 	boost::shared_ptr<const TypeConverterBase> m_conv;
 	TypeConverter( boost::shared_ptr<const TypeConverterBase> elem_conv ): m_conv( elem_conv ) {
 		LOG( Debug, verbose_info )
-				<< "Creating vector converter from "
-				<< Type<vector4<SRC> >::staticName() << " to " << Type<vector4<DST> >::staticName();
+		<< "Creating vector converter from "
+		<< Type<vector4<SRC> >::staticName() << " to " << Type<vector4<DST> >::staticName();
 	};
 public:
 	static boost::shared_ptr<const TypeConverterBase> create() {
@@ -157,8 +157,8 @@ template<typename SRC, typename DST > class TypeConverter<false, false, std::lis
 	boost::shared_ptr<const TypeConverterBase> m_conv;
 	TypeConverter( boost::shared_ptr<const TypeConverterBase> elem_conv ): m_conv( elem_conv ) {
 		LOG( Debug, verbose_info )
-				<< "Creating list converter from "
-				<< Type<std::list<SRC> >::staticName() << " to " << Type<std::list<DST> >::staticName();
+		<< "Creating list converter from "
+		<< Type<std::list<SRC> >::staticName() << " to " << Type<std::list<DST> >::staticName();
 	};
 public:
 	static boost::shared_ptr<const TypeConverterBase> create() {
@@ -177,8 +177,8 @@ public:
 	void convert( const TypeBase& src, TypeBase& dst )const {
 		std::list<DST> &dstVal = dst.cast_to_Type<std::list<DST> >();
 		LOG_IF( not dstVal.empty(), CoreLog, warning )
-				<< "Storing into non empty list while conversion from "
-				<< Type<std::list<SRC> >::staticName() << " to " << Type<std::list<DST> >::staticName();
+		<< "Storing into non empty list while conversion from "
+		<< Type<std::list<SRC> >::staticName() << " to " << Type<std::list<DST> >::staticName();
 		const std::list<SRC> &srcVal = src.cast_to_Type<std::list<SRC> >();
 
 		for ( typename std::list<SRC>::const_iterator i = srcVal.begin(); i != srcVal.end(); i++ ) {//slow and ugly, but flexible
@@ -198,7 +198,7 @@ template<typename DST> class TypeConverter<false, false, std::string, DST> : pub
 {
 	TypeConverter() {
 		LOG( Debug, verbose_info )
-				<< "Creating from-string converter for " << Type<DST>::staticName();
+		<< "Creating from-string converter for " << Type<DST>::staticName();
 	};
 public:
 	static boost::shared_ptr<const TypeConverterBase> create() {
@@ -216,7 +216,7 @@ template<typename SRC> class TypeConverter<false, false, SRC, std::string> : pub
 {
 	TypeConverter() {
 		LOG( Debug, verbose_info )
-				<< "Creating to-string converter for " << Type<SRC>::staticName();
+		<< "Creating to-string converter for " << Type<SRC>::staticName();
 	};
 public:
 	static boost::shared_ptr<const TypeConverterBase> create() {
@@ -239,7 +239,7 @@ template<> class TypeConverter<false, false, std::string, Selection> : public Ty
 {
 	TypeConverter() {
 		LOG( Debug, verbose_info )
-				<< "Creating special from-string converter for " << Type<Selection>::staticName();
+		<< "Creating special from-string converter for " << Type<Selection>::staticName();
 	};
 public:
 	static boost::shared_ptr<const TypeConverterBase> create() {
@@ -262,7 +262,7 @@ template<> class TypeConverter<false, false, std::string, bool> : public TypeGen
 {
 	TypeConverter() {
 		LOG( Debug, verbose_info )
-				<< "Creating special from-string converter for " << Type<bool>::staticName();
+		<< "Creating special from-string converter for " << Type<bool>::staticName();
 	};
 public:
 	static boost::shared_ptr<const TypeConverterBase> create() {
@@ -287,7 +287,7 @@ template<> class TypeConverter<false, false, bool, std::string> : public TypeGen
 {
 	TypeConverter() {
 		LOG( Debug, verbose_info )
-				<< "Creating special to-string converter for " << Type<bool>::staticName();
+		<< "Creating special to-string converter for " << Type<bool>::staticName();
 	};
 public:
 	static boost::shared_ptr<const TypeConverterBase> create() {
@@ -310,7 +310,7 @@ template<typename DST> class TypeConverter<false, false, std::string, std::list<
 {
 	TypeConverter() {
 		LOG( Debug, verbose_info )
-				<< "Creating from-string converter for " << Type<std::list<DST> >::staticName();
+		<< "Creating from-string converter for " << Type<std::list<DST> >::staticName();
 	};
 public:
 	static boost::shared_ptr<const TypeConverterBase> create() {
@@ -320,9 +320,9 @@ public:
 	void convert( const TypeBase& src, TypeBase& dst )const {
 		std::list<DST> &dstVal = dst.cast_to_Type<std::list<DST> >();
 		LOG_IF( not dstVal.empty(), CoreLog, warning )
-				<< "Conversion from " << Type<std::string>::staticName()
-				<< " into non empty list  " << Type<std::list<DST> >::staticName()
-				<< " previous content will be lost";
+		<< "Conversion from " << Type<std::string>::staticName()
+		<< " into non empty list  " << Type<std::list<DST> >::staticName()
+		<< " previous content will be lost";
 		const std::string &srcVal = src.cast_to_Type<std::string>();
 		const std::list<DST> buff = util::string2list<DST>( srcVal, boost::regex( "[\\s,;]+" ) );
 		dstVal.assign( buff.begin(), buff.end() );
@@ -333,7 +333,7 @@ template<typename DST> class TypeConverter<false, false, std::string, vector4<DS
 {
 	TypeConverter() {
 		LOG( Debug, verbose_info )
-				<< "Creating from-string converter for " << Type<vector4<DST> >::staticName();
+		<< "Creating from-string converter for " << Type<vector4<DST> >::staticName();
 	};
 public:
 	static boost::shared_ptr<const TypeConverterBase> create() {

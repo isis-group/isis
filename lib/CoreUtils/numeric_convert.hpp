@@ -16,14 +16,14 @@ namespace _internal
 template<typename SRC, typename DST> static void numeric_convert_impl( const SRC* src, DST* dst, size_t count, double scale, double offset )
 {
 	LOG( Debug, info )
-			<< "using generic scaling convert " << Type<SRC>::staticName() << "=>" << Type<DST>::staticName()
-			<< " with scale/offset " << scale << "/" << offset;
+	<< "using generic scaling convert " << Type<SRC>::staticName() << "=>" << Type<DST>::staticName()
+	<< " with scale/offset " << scale << "/" << offset;
 	static boost::numeric::converter <
 	DST, double,
-	   boost::numeric::conversion_traits<DST, double>,
-	   boost::numeric::def_overflow_handler,
-	   boost::numeric::RoundEven<double>
-	   > converter;
+	boost::numeric::conversion_traits<DST, double>,
+	boost::numeric::def_overflow_handler,
+	boost::numeric::RoundEven<double>
+	> converter;
 
 	for ( size_t i = 0; i < count; i++ )
 		dst[i] = converter( src[i] * scale + offset );
@@ -33,10 +33,10 @@ template<typename SRC, typename DST> static void numeric_convert_impl( const SRC
 	LOG( Debug, info ) << "using generic convert " << Type<SRC>::staticName() << " => " << Type<DST>::staticName() << " without scaling";
 	static boost::numeric::converter <
 	DST, SRC,
-	   boost::numeric::conversion_traits<DST, SRC>,
-	   boost::numeric::def_overflow_handler,
-	   boost::numeric::RoundEven<SRC>
-	   > converter;
+	boost::numeric::conversion_traits<DST, SRC>,
+	boost::numeric::def_overflow_handler,
+	boost::numeric::RoundEven<SRC>
+	> converter;
 
 	for ( size_t i = 0; i < count; i++ )
 		dst[i] = converter( src[i] );
@@ -76,16 +76,16 @@ template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &s
 		const DST domain_max = std::numeric_limits<DST>::max();//positive value domain of this dst
 		Type<SRC> minval, maxval;
 
-		if( min > max ) {
+		if ( min > max ) {
 			LOG( Debug, info ) << "Computing source range on my own";
 			src.getMinMax( minval, maxval );
 		} else {
 			LOG_IF( min.typeID() != Type<SRC>::staticID, Debug, info )
-					<< "The given minimum for src Range is not of the same type as the data ("
-					<< min.typeName() << "!=" << Type<SRC>::staticName() << ")";
+			<< "The given minimum for src Range is not of the same type as the data ("
+			<< min.typeName() << "!=" << Type<SRC>::staticName() << ")";
 			LOG_IF( max.typeID() != Type<SRC>::staticID, Debug, info )
-					<< "The given maximum for src Range is not of the same type as the data ("
-					<< max.typeName() << "!=" << Type<SRC>::staticName() << ")";
+			<< "The given maximum for src Range is not of the same type as the data ("
+			<< max.typeName() << "!=" << Type<SRC>::staticName() << ")";
 			minval = min.as<SRC>();
 			maxval = max.as<SRC>();
 		}

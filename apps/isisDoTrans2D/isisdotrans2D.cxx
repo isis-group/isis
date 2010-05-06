@@ -66,15 +66,15 @@ static VOptionDescRec options[] = {
 		1, &interpolator_type, VOptionalOpt, 0, "The interpolator used to resample the image"
 	}, {"ref", VStringRepn, 1,
 		&template_filename, VOptionalOpt, 0, "The template image"
-	}, {"reso", VFloatRepn, 0, ( VPointer ) &resolution,
-		VOptionalOpt, 0, "The output resolution. One value for isotrop output"
-	}, {"fmri", VBooleanRepn, 1, &fmri,
-		VOptionalOpt, 0, "Input and output image file are functional data"
-	}, {"vtrans", VStringRepn, 1,
-		&vtrans_filename, VOptionalOpt, 0, "Vector deformation field"
-	}, {"use_inverse", VBooleanRepn, 1, &use_inverse,
-		VOptionalOpt, 0, "Using the inverse of the transform"
-	}, {"j" , VShortRepn, 1, &number_threads, VOptionalOpt, 0 , "Number of threads"}
+	   }, {"reso", VFloatRepn, 0, ( VPointer ) &resolution,
+		   VOptionalOpt, 0, "The output resolution. One value for isotrop output"
+		  }, {"fmri", VBooleanRepn, 1, &fmri,
+			  VOptionalOpt, 0, "Input and output image file are functional data"
+			 }, {"vtrans", VStringRepn, 1,
+				 &vtrans_filename, VOptionalOpt, 0, "Vector deformation field"
+				}, {"use_inverse", VBooleanRepn, 1, &use_inverse,
+					VOptionalOpt, 0, "Using the inverse of the transform"
+				   }, {"j" , VShortRepn, 1, &number_threads, VOptionalOpt, 0 , "Number of threads"}
 
 };
 

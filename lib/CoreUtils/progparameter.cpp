@@ -77,8 +77,8 @@ bool isis::util::ParameterMap::parse( int argc, char** argv )
 					found->second.needed() = false;//remove needed flag, because the value is set (aka "not needed anymore")
 				} else {
 					LOG( Runtime, error )
-							<< "Failed to parse parameter " << MSubject( list2string( argv + begin, argv + end, " ", "", "" ) ) << " for "
-							<< found->first << "(" << found->second->typeName() << ")";
+					<< "Failed to parse parameter " << MSubject( list2string( argv + begin, argv + end, " ", "", "" ) ) << " for "
+					<< found->first << "(" << found->second->typeName() << ")";
 					ret = false;
 				}
 			} else {

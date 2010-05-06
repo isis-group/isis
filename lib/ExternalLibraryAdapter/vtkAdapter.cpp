@@ -6,7 +6,7 @@ namespace adapter
 {
 
 vtkAdapter::vtkAdapter( const boost::shared_ptr<isis::data::Image> src )
-	: m_ImageISIS( src )
+		: m_ImageISIS( src )
 {}
 
 //return a list of vtkImageData type pointer

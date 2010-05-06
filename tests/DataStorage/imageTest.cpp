@@ -78,8 +78,8 @@ BOOST_AUTO_TEST_CASE ( image_chunk_test )
 	std::vector<std::vector<data::MemChunk<float> > > ch( 3, std::vector<data::MemChunk<float> >( 3, data::MemChunk<float>( 3, 3 ) ) );
 	data::Image img;
 
-	for( int i = 0; i < 3; i++ )
-		for( int j = 0; j < 3; j++ ) {
+	for ( int i = 0; i < 3; i++ )
+		for ( int j = 0; j < 3; j++ ) {
 			ch[i][j].setProperty( "indexOrigin", util::fvector4( 0, 0, j, i ) );
 			ch[i][j].setProperty( "acquisitionNumber", acNum++ );
 			ch[i][j].setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE ( image_voxel_test )
 	std::vector<data::MemChunk<float> > ch( 3, data::MemChunk<float>( 3, 3 ) );
 	data::Image img;
 
-	for( int i = 0; i < 3; i++ ) {
+	for ( int i = 0; i < 3; i++ ) {
 		ch[i].setProperty( "indexOrigin", util::fvector4( 0, 0, i, 0 ) );
 		ch[i].setProperty<u_int32_t>( "acquisitionNumber", i );
 		ch[i].setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
@@ -132,11 +132,11 @@ BOOST_AUTO_TEST_CASE ( image_voxel_test )
 	ch[1].voxel<float>( 1, 1 ) = 42.0;
 	ch[2].voxel<float>( 2, 2 ) = 42;
 
-	for( int i = 0; i < 3; i++ ) {
+	for ( int i = 0; i < 3; i++ ) {
 		BOOST_CHECK( img.insertChunk( ch[i] ) );
 	}
 
-	for( int i = 0; i < 3; i++ ) {
+	for ( int i = 0; i < 3; i++ ) {
 		BOOST_CHECK( img.voxel<float>( i, i, i, 0 ) == 42 );
 	}
 
@@ -152,8 +152,8 @@ BOOST_AUTO_TEST_CASE( image_minmax_test )
 	unsigned short acNum = 0;
 	const util::fvector4 vSize( 1, 1, 1, 0 );
 
-	for( int i = 0; i < 3; i++ )
-		for( int j = 0; j < 3; j++ ) {
+	for ( int i = 0; i < 3; i++ )
+		for ( int j = 0; j < 3; j++ ) {
 			ch[i][j].setProperty( "indexOrigin", util::fvector4( 0, 0, j, i ) );
 			ch[i][j].setProperty( "acquisitionNumber", acNum++ );
 			ch[i][j].setProperty( "voxelSize", vSize );
@@ -178,8 +178,8 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 	unsigned short acNum = 0;
 	const util::fvector4 vSize( 1, 1, 1, 0 );
 
-	for( int i = 0; i < 3; i++ )
-		for( int j = 0; j < 3; j++ ) {
+	for ( int i = 0; i < 3; i++ )
+		for ( int j = 0; j < 3; j++ ) {
 			ch[i][j].setProperty( "indexOrigin", util::fvector4( 0, 0, j, i ) );
 			ch[i][j].setProperty( "acquisitionNumber", acNum++ );
 			ch[i][j].setProperty( "voxelSize", vSize );

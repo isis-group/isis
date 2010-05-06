@@ -201,8 +201,8 @@ public:
 	template<class T> T as()const {
 		if ( typeID() == Type<T>::staticID ) {
 			LOG( Debug, verbose_info )
-					<< "Doing reinterpret_cast instead of useless conversion from " << toString( true )
-					<< " to " << Type<T>::staticName();
+			<< "Doing reinterpret_cast instead of useless conversion from " << toString( true )
+			<< " to " << Type<T>::staticName();
 			return *reinterpret_cast<const Type<T>*>( this );
 		} else {
 			Type<T> ret;

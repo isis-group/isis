@@ -51,7 +51,7 @@ bool PropertyValue::transformTo( PropertyValue& dst, int typeId )const
 		return true;
 	} else
 		LOG( Runtime, error )
-				<< "Cannot transform " << src.toString( true ) << " no converter available";
+		<< "Cannot transform " << src.toString( true ) << " no converter available";
 
 	// @todo we need a typeId to typeName mapping
 	return false;

@@ -5,7 +5,7 @@
  *      Author: tuerke
  */
 
-#include "isisRegistrationFactory3D.h"
+#include "isisRegistrationFactory3D.hpp"
 
 namespace isis
 {

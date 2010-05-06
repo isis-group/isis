@@ -5,7 +5,7 @@
  *      Author: tuerke
  */
 
-#include "isisRegistrationFactory2D.h"
+#include "isisRegistrationFactory2D.hpp"
 
 namespace isis
 {
@@ -46,6 +46,7 @@ void RegistrationFactory2D<TFixedImageType, TMovingImageType>::Reset(
 	m_InitialTransformIsSet = false;
 	UserOptions.PRINTRESULTS = false;
 	UserOptions.NumberOfIterations = 1000;
+	UserOptions.BSplineBound = 100;
 	UserOptions.NumberOfBins = 50;
 	UserOptions.PixelDensity = 0.01;
 	UserOptions.USEOTSUTHRESHOLDING = false;
@@ -271,9 +272,9 @@ void RegistrationFactory2D<TFixedImageType, TMovingImageType>::SetUpOptimizer()
 		LBFGSBOptimizerType::BoundSelectionType boundSelect( m_NumberOfParameters );
 		LBFGSBOptimizerType::BoundValueType lowerBound( m_NumberOfParameters );
 		LBFGSBOptimizerType::BoundValueType upperBound( m_NumberOfParameters );
-		boundSelect.Fill( 0 );
-		lowerBound.Fill( 0.0 );
-		upperBound.Fill( 0.0 );
+		boundSelect.Fill( 2 );
+		lowerBound.Fill( -UserOptions.BSplineBound );
+		upperBound.Fill( UserOptions.BSplineBound );
 		m_LBFGSBOptimizer->SetBoundSelection( boundSelect );
 		m_LBFGSBOptimizer->SetLowerBound( lowerBound );
 		m_LBFGSBOptimizer->SetUpperBound( upperBound );

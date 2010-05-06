@@ -1,11 +1,11 @@
 
 #include <QtGui>
-#include "isisPropertyViewer.h"
+#include "isisPropertyViewer.hpp"
 
 #include <stdlib.h>
 
 isisPropertyViewer::isisPropertyViewer( QMainWindow *parent )
-	: QMainWindow( parent )
+		: QMainWindow( parent )
 {
 	ui.setupUi( this );
 	//connect itemDoubleClicked

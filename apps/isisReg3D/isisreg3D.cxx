@@ -36,12 +36,12 @@
 #include "DataStorage/image.hpp"
 #include "ExternalLibraryAdapter/itkAdapter.hpp"
 
-#include "extRegistration/isisRegistrationFactory3D.h"
+#include "extRegistration/isisRegistrationFactory3D.hpp"
 #include "extITK/isisIterationObserver.h"
 
 VDictEntry TYPMetric[] = { {"MattesMutualInformation", 0}, {"MutualInformationHistogram", 1}, {"NormalizedCorrelation",
-		2
-	}, {"MeanSquare", 3}, {NULL}
+			2
+																								  }, {"MeanSquare", 3}, {NULL}
 };
 
 VDictEntry TYPTransform[] = { {"Rigid", 0}, {"Affine", 1}, {"BSplineDeformable", 2}, {"Translation", 3}, {"Scale", 4}, {"CenteredAffine", 5}, {NULL}};
@@ -361,8 +361,8 @@ int main(
 		//check combinations of components
 		if ( optimizer != 0 and transform == 0 ) {
 			std::cerr
-					<< "\nInappropriate combination of transform and optimizer! Setting optimizer to VersorRigidOptimizer.\n"
-					<< std::endl;
+				<< "\nInappropriate combination of transform and optimizer! Setting optimizer to VersorRigidOptimizer.\n"
+				<< std::endl;
 			optimizer = 0;
 		}
 

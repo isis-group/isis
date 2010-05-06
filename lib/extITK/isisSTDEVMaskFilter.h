@@ -24,7 +24,7 @@ namespace extitk
 
 template<class TInputImage, class TOutputImage>
 class ITK_EXPORT STDEVMaskFilter: public itk::ImageToImageFilter < TInputImage,
-	TOutputImage >
+		TOutputImage >
 {
 public:
 

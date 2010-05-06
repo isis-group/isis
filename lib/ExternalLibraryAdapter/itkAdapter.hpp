@@ -95,6 +95,9 @@ public:
 		case util::TypePtr<double>::staticID:
 			return myAdapter->internCreateItk<double, OutputImageType>( behaveAsItkReader );
 			break;
+		default:
+			LOG( DataLog, error ) << "Unknown pixel data type";
+			return 0;
 		}
 	}
 	/**
@@ -245,7 +248,7 @@ private:
 		importer->SetDirection( itkDirection );
 		importer->SetImportPointer( &this->m_ImageISIS->voxel<typename InputImageType::PixelType>( 0, 0, 0, 0 ), itkSize[0], false );
 		rescaler->SetInput( importer->GetOutput() );
-        util::Type<typename InputImageType::PixelType> minIn, maxIn;
+		util::Type<typename InputImageType::PixelType> minIn, maxIn;
 		this->m_ImageISIS->getMinMax( minIn, maxIn );
 		rescaler->SetOutputMinimum( minIn );
 		rescaler->SetOutputMaximum( maxIn );
