@@ -25,10 +25,8 @@ ChunkBase::ChunkBase ( size_t firstDim, size_t secondDim, size_t thirdDim, size_
 	const size_t idx[] = {firstDim, secondDim, thirdDim, fourthDim};
 	init( idx );
 	addNeededFromString( needed );
-
-	if ( !NDimensional<4>::volume() )
-		LOG( Debug, warning )
-				<< "Size " << fourthDim << "|" << thirdDim << "|" << secondDim << "|" << firstDim << " is invalid";
+	LOG_IF( NDimensional<4>::volume() == 0, Debug, warning )
+			<< "Size " << fourthDim << "|" << thirdDim << "|" << secondDim << "|" << firstDim << " is invalid";
 }
 
 ChunkBase::~ChunkBase() { }
@@ -157,6 +155,7 @@ Chunk& Chunk::operator=( const isis::data::Chunk& ref )
 {
 	_internal::ChunkBase::operator=( static_cast<const _internal::ChunkBase&>( ref ) ); //copy the metadate of ref
 	util::_internal::TypePtrBase::Reference::operator=( static_cast<const util::_internal::TypePtrBase::Reference&>( ref ) ); // copy the reference of ref's data
+	return *this;
 }
 
 }

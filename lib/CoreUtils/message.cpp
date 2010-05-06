@@ -24,6 +24,7 @@ namespace util
 {
 namespace _internal
 {
+const char* LogLevelNames[] = {"no_log", "error", "warning", "info", "verbose"};
 
 void MessageHandlerBase::stopBelow( LogLevel stop )
 {
@@ -51,14 +52,13 @@ std::string Message::strTime()const
 }
 
 Message::Message( std::string object, std::string module, std::string file, int line, LogLevel level, boost::weak_ptr<MessageHandlerBase> _commitTo )
-	: m_object( object ), m_module( module ), m_file( file ), m_line( line ), m_level( level ), commitTo( _commitTo )
+	: commitTo( _commitTo ), m_object( object ), m_module( module ), m_file( file ), m_line( line ), m_level( level )
 {
 	time( &m_timeStamp );
 }
 Message::Message( const Message &src ) //we need a custom copy-constructor, because the copy-contructor of ostringstream is private
 	: std::ostringstream( src.str() ),
-	  m_object( src.m_object ), m_module( src.m_module ), m_file( src.m_file ), m_subjects( src.m_subjects ), m_timeStamp( src.m_timeStamp ), m_line( src.m_line ),
-	  commitTo( src.commitTo )
+	  commitTo( src.commitTo ), m_object( src.m_object ), m_module( src.m_module ), m_file( src.m_file ), m_subjects( src.m_subjects ), m_timeStamp( src.m_timeStamp ), m_line( src.m_line )
 {}
 
 Message::~Message()

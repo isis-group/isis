@@ -151,7 +151,7 @@ bool Image::reIndex()
 	if ( chunks > 1 ) {
 		ChunkSet::iterator it = set.begin();
 
-		for ( int i = 0; i < ( chunks - 1 ); timesteps++, i++ ) {
+		for ( size_t i = 0; i < ( chunks - 1 ); timesteps++, i++ ) {
 			const util::fvector4 &here = it->getProperty<util::fvector4>( "indexOrigin" );
 			const util::fvector4 &next = ( ++it )->getProperty<util::fvector4>( "indexOrigin" );
 
@@ -283,8 +283,6 @@ bool Image::reIndex()
 
 				if ( voxelGap[2] != inf ) {
 					if ( not util::fuzzyEqual( voxelGap[2], sliceDist ) ) {
-						const float dist = std::fabs( voxelGap[2] - sliceDist );
-						const float base = std::min( voxelGap[2], sliceDist ) * std::numeric_limits<float>::epsilon();
 						LOG_IF( not util::fuzzyEqual( voxelGap[2], sliceDist ), Runtime, warning )
 								<< "The existing slice distance (voxelGap[2]) " << voxelGap[2]
 								<< " differs from the distance between chunk 0 and 1, which is " << sliceDist;

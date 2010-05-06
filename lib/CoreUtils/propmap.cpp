@@ -324,7 +324,7 @@ void PropMap::joinTree( const isis::util::PropMap& other, bool overwrite, std::s
 }
 
 
-size_t PropMap::linearize( isis::util::PropMap::base_type& out, std::string key_prefix ) const
+void PropMap::linearize( isis::util::PropMap::base_type& out, std::string key_prefix ) const
 {
 	for ( const_iterator i = begin(); i != end(); i++ ) {
 		std::string key = ( key_prefix.empty() ? "" : key_prefix + pathSeperator ) + i->first;

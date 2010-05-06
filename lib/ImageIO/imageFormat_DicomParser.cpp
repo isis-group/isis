@@ -41,7 +41,6 @@ template<typename T> std::list<T> dcmtkListString2list( DcmElement *elem )
  */
 void ImageFormat_Dicom::parseAS( DcmElement* elem, const std::string &name, util::PropMap &map )
 {
-	bool ok = true;
 	u_int16_t duration;
 	OFString buff;
 	elem->getOFString( buff, 0 );
@@ -141,7 +140,7 @@ void ImageFormat_Dicom::parseTM( DcmElement* elem, const std::string &name, util
 		shift++;
 	}
 
-	if ( buff.size() > 4 + shift && buff.at( 4 + shift ) != ':' ) {
+	if ( ( buff.size() > size_t( 4 + shift ) ) && ( buff.at( 4 + shift ) != ':' ) ) {
 		buff.insert( 4 + shift, 1, ':' );
 		shift++;
 	}
@@ -455,11 +454,13 @@ size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, isis::util::PropMap& map )
 
 		try {
 			if ( ret.size() == 1 ) {
-				if ( parseCSAValue( ret.front(), name, vr, map ) )
+				if ( parseCSAValue( ret.front(), name, vr, map ) ) {
 					LOG( Debug, verbose_info ) << "Found entry " << name << ":" << map[name] << " in CSA header";
+				}
 			} else if ( ret.size() > 1 ) {
-				if ( parseCSAValueList( ret, name, vr, map ) )
+				if ( parseCSAValueList( ret, name, vr, map ) ) {
 					LOG( Debug, verbose_info ) << "Found entry " << name << ":" << map[name] << " in CSA header";
+				}
 			}
 		} catch ( boost::bad_lexical_cast e ) {
 			LOG( Runtime, warning ) << "Failed to parse CSA entry " << std::make_pair( name, ret ) << " as " << vr << " (" << e.what() << ")";

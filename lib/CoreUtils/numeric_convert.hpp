@@ -98,10 +98,10 @@ template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &s
 		//else if src is completly on negative dmain, or if there is no positive domain use maxval
 		//elsewise leave it at 0 and scale both sides
 		if ( minval > 0 || !domain_min ) {
-			if ( maxval > domain_max ) // if the values completely fit into the domain we dont have to offset them
+			if ( ( maxval - domain_max ) > 0 ) // if the values completely fit into the domain we dont have to offset them
 				offset = -minval;
 		} else if ( ( 0 - maxval ) > 0 || !domain_max ) {
-			if ( minval < domain_min ) // if the values completely fit into the domain we dont have to offset them
+			if ( ( domain_min - minval ) > 0  ) // if the values completely fit into the domain we dont have to offset them
 				offset = -maxval;
 		}
 
@@ -122,9 +122,10 @@ template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &s
 		if ( scale < 1 ) {
 			LOG( Runtime, warning ) << "Downscaling your values by Factor " << scale << " you might lose information.";
 		} else if ( scaleopt == noupscale ) {
-			if ( scale > 1 )LOG( Runtime, info ) << "upscale not given, clamping scale " << scale << " to 1";
-
-			scale = 1;
+			if ( scale > 1 ) {
+				LOG( Runtime, info ) << "upscale not given, clamping scale " << scale << " to 1";
+				scale = 1;
+			}
 		}
 
 		doScale = ( scale != 1. || offset );

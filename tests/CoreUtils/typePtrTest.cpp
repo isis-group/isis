@@ -215,7 +215,6 @@ BOOST_AUTO_TEST_CASE( typePtr_minmax_test )
 	{
 		util::enable_log<TestHandler>( error );
 		util::Type<u_int16_t> min, max;
-		bool error = false;
 		floatArray.getMinMax( min, max );
 		BOOST_CHECK_EQUAL( TestHandler::hit, 4 );
 	}

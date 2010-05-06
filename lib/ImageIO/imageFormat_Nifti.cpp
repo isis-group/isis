@@ -343,14 +343,14 @@ private:
 	}
 
 	template<typename T>
-	bool copyDataToNifti( const data::Image& image, nifti_image& ni ) {
+	void copyDataToNifti( const data::Image& image, nifti_image& ni ) {
 		ni.data = malloc( image.bytes_per_voxel() * image.volume() );
 		T *refNii = ( T* ) ni.data;
 
-		for ( int t = 0; t < image.sizeToVector()[3]; t++ ) {
-			for ( int z = 0; z < image.sizeToVector()[2]; z++ ) {
-				for ( int y = 0; y < image.sizeToVector()[1]; y++ ) {
-					for ( int x = 0; x < image.sizeToVector()[0]; x++ ) {
+		for ( size_t t = 0; t < image.sizeToVector()[3]; t++ ) {
+			for ( size_t z = 0; z < image.sizeToVector()[2]; z++ ) {
+				for ( size_t y = 0; y < image.sizeToVector()[1]; y++ ) {
+					for ( size_t x = 0; x < image.sizeToVector()[0]; x++ ) {
 						*refNii = image.voxel<T>( x, y, z, t );
 						refNii++;
 					}
@@ -366,7 +366,7 @@ private:
 		ni.cal_max = max;
 	}
 
-	bool copyHeaderToNifti( const data::Image& image, nifti_image& ni ) {
+	void copyHeaderToNifti( const data::Image& image, nifti_image& ni ) {
 		//all the other information for the nifti header
 		BOOST_ASSERT( data::Image::n_dims == 4 );
 		ni.scl_slope = 1.0;

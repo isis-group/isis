@@ -26,8 +26,8 @@ BOOST_AUTO_TEST_CASE ( imageList_chunk_test )
 	ENABLE_LOG( DataDebug, util::DefaultMsgPrint, info );
 	data::ChunkList chunks;
 
-	for ( int i = 0; i < timesteps; i++ ) {
-		for ( int c = 0; c < images; c++ ) {
+	for ( size_t i = 0; i < timesteps; i++ ) {
+		for ( size_t c = 0; c < images; c++ ) {
 			data::MemChunk<float> ch( 3, 3, 3 );
 			ch.setProperty( "indexOrigin", util::fvector4( 0, 0, 0, i ) );
 			ch.voxel<float>( 0, 0, 0 ) = c + i;
@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE ( imageList_chunk_test )
 	BOOST_FOREACH( data::ImageList::value_type & ref, list ) {
 		BOOST_CHECK( ref->sizeToVector() == util::fvector4( 3, 3, 3, timesteps ) );
 
-		for ( int i = 0; i < timesteps; i++ )
+		for ( size_t i = 0; i < timesteps; i++ )
 			BOOST_CHECK( ref->voxel<float>( 0, 0, 0, i ) == i + cnt );
 
 		cnt++;

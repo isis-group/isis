@@ -122,7 +122,7 @@ public:
 	size_t cmpSlice( size_t thirdDimS, size_t fourthDimS, const Chunk& dst, size_t thirdDimD, size_t fourthDimD )const;
 
 	void getMinMax( util::_internal::TypeBase &min, util::_internal::TypeBase &max, bool init = true )const;
-	template<typename T> size_t convertTo( T *dst, size_t len )const {
+	template<typename T> void convertTo( T *dst, size_t len )const {
 		getTypePtrBase().convertTo( dst );
 	}
 
@@ -182,11 +182,13 @@ public:
 		util::_internal::TypePtrBase::Reference::reset( new util::TypePtr<TYPE>(
 					static_cast<const Chunk&>( ref ).getTypePtrBase().copyToMem()->cast_to_TypePtr<TYPE>()
 				) );
+		return *this;
 	}
 	MemChunk &operator=( const Chunk &ref ) {
 		_internal::ChunkBase::operator=( static_cast<const _internal::ChunkBase&>( ref ) ); //copy the metadate of ref
 		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
 		util::_internal::TypePtrBase::Reference::reset( new util::TypePtr<TYPE>( ref.getTypePtrBase().copyToNew<TYPE>() ) );
+		return *this;
 	}
 };
 }

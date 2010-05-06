@@ -212,7 +212,7 @@ public:
 	void toCommonUnique( PropMap& common, std::set<std::string> &uniques, bool init )const;
 
 	///copy the tree into a flat key/property-map
-	size_t linearize( base_type &out, std::string key_prefix = "" )const;
+	void linearize( base_type &out, std::string key_prefix = "" )const;
 
 	/**
 	 * Transform an existing property into another.

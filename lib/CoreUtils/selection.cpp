@@ -39,8 +39,10 @@ bool Selection::set( const char* entry )
 
 	if ( found != ent_map.end() ) {
 		m_set = found->second;
+		return true;
 	} else {
 		LOG( Runtime, error ) << "Failed to set " << MSubject( entry ) << ", valid values are " << getEntries();
+		return false;
 	}
 }
 

@@ -246,7 +246,7 @@ public:
 	 * this is just here for child classes which may want to check)
 	 */
 	TypePtr( TYPE* const ptr, size_t length ):
-		m_val( ptr, BasicDeleter() ), _internal::TypePtrBase( length ) {}
+		_internal::TypePtrBase( length ), m_val( ptr, BasicDeleter() ) {}
 	/**
 	 * Creates TypePtr from a pointer of type TYPE.
 	 * The pointers are automatically deleted by an copy of d and should not be used outside once used here
@@ -259,7 +259,7 @@ public:
 	 */
 
 	template<typename D> TypePtr( TYPE* const ptr, size_t length, D d ):
-		m_val( ptr, d ), _internal::TypePtrBase( length ) {}
+		_internal::TypePtrBase( length ), m_val( ptr, d ) {}
 
 	virtual ~TypePtr() {}
 
