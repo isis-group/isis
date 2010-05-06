@@ -206,7 +206,12 @@ public:
 			return *reinterpret_cast<const Type<T>*>( this );
 		} else {
 			Type<T> ret;
-			convert( *this, ret );
+			if(not convert( *this, ret ) ) {
+				LOG(Debug,error)
+				<< "Interpretation of " << toString(true) << " as " << Type<T>::staticName()
+				<< " failed. Returning " << Type<T>().toString() << ".";
+				return T();
+			} else
 			return ret;
 		}
 	}

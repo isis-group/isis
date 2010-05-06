@@ -107,6 +107,12 @@ BOOST_AUTO_TEST_CASE( test_type_operators )
 	BOOST_CHECK_EQUAL( 42 - tInt1, tInt2 );
 }
 
+BOOST_AUTO_TEST_CASE( type_comparison_test )
+{
+	BOOST_CHECK( Type<u_int8_t>( (u_int8_t)200 ) < Type<int16_t>( (int16_t)1000 ) );
+	BOOST_CHECK( Type<u_int8_t>( (u_int8_t)200 ) > Type<int16_t>( (int16_t)-1 ) );
+}
+
 BOOST_AUTO_TEST_CASE( type_conversion_test )
 {
 	Type<int> tInt( 42 );

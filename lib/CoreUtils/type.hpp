@@ -53,10 +53,14 @@ template<typename T, bool isNumber> struct type_greater {
 	}
 };
 template<typename T> struct type_less<T, true> {
-	bool operator()( const Type<T> &first, const TypeBase &second )const {return ( T )first < second.as<T>();}
+	bool operator()( const Type<T> &first, const TypeBase &second )const {
+		return ( T )first < second.as<T>();
+	}
 };
 template<typename T> struct type_greater<T, true> {
-	bool operator()( const Type<T> &first, const TypeBase &second )const {return ( T )first > second.as<T>();}
+	bool operator()( const Type<T> &first, const TypeBase &second )const {
+		return ( T )first > second.as<T>();
+	}
 };
 template<typename T, bool isNumber> struct getMinMaxImpl {
 	std::pair<T, T> operator()( const TypePtr<T> &ref ) const {
@@ -110,15 +114,23 @@ public:
 	virtual std::string toString( bool labeled = false )const {
 		const Converter &conv = getConverterTo( Type<std::string>::staticID );
 		std::string ret;
+		bool fallback = false;
 
 		if ( conv ) {
 			Type<std::string> buff;
-			conv->convert( *this, buff );
+
+			if( conv->convert( *this, buff ) != boost::numeric::cInRange ) {
+				LOG( Debug, error ) << "Automatic conversion from " << typeName() << " to string failed. Falling back to boost::lexical_cast<std::string>";
+				fallback = true;
+			} else
 			ret = buff;
 		} else {
-			LOG( Debug, warning ) << "Missing conversion from " << typeName() << " to string falling back to boost::lexical_cast<std::string>";
-			ret = boost::lexical_cast<std::string>( m_val );
+			LOG( Debug, error ) << "Missing conversion from " << typeName() << " to string. Falling back to boost::lexical_cast<std::string>";
+			fallback = true;
 		}
+
+		if( fallback )
+			ret = boost::lexical_cast<std::string>( m_val );
 
 		if ( labeled )ret += "(" + staticName() + ")";
 
