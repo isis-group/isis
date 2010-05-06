@@ -7,7 +7,7 @@
 #ifndef __TIMESTEPEXTRACTIONFILTER_TXX
 #define __TIMESTEPEXTRACTIONFILTER_TXX
 
-#include "isisTimeStepExtractionFilter.h"
+#include "isisTimeStepExtractionFilter.hpp"
 #include "itkImageBase.h"
 #include <iterator>
 

@@ -37,7 +37,7 @@
 #include "ExternalLibraryAdapter/itkAdapter.hpp"
 
 #include "extRegistration/isisRegistrationFactory3D.hpp"
-#include "extITK/isisIterationObserver.h"
+#include "extITK/isisIterationObserver.hpp"
 
 VDictEntry TYPMetric[] = { {"MattesMutualInformation", 0}, {"MutualInformationHistogram", 1}, {"NormalizedCorrelation",
 			2

@@ -28,9 +28,9 @@
 #include "DataStorage/image.hpp"
 #include "ExternalLibraryAdapter/itkAdapter.hpp"
 
-#include "extITK/isisTimeStepExtractionFilter.h"
+#include "extITK/isisTimeStepExtractionFilter.hpp"
 #include "extITK/isisTransformMerger3D.hpp"
-#include "extITK/isisIterationObserver.h"
+#include "extITK/isisIterationObserver.hpp"
 
 //via command parser include
 #include <viaio/option.h>

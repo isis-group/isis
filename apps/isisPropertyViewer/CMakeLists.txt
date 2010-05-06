@@ -6,10 +6,6 @@ file (GLOB UI_FILES forms/*.ui)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/headers)
 
-find_package(Qt4 REQUIRED) # find and setup Qt4 for this project
-
-include(${QT_USE_FILE})
-
 #setup qt
 set(QT_USE_QTUITOOLS TRUE)
 

@@ -37,7 +37,7 @@
 
 #include "extRegistration/isisRegistrationFactory2D.hpp"
 #include "extITK/isisTransformMerger2D.hpp"
-#include "extITK/isisIterationObserver.h"
+#include "extITK/isisIterationObserver.hpp"
 
 
 VDictEntry TYPMetric[] = { {"MattesMutualInformation", 0}, {"MutualInformationHistogram", 1}, {"NormalizedCorrelation",

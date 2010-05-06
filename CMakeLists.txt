@@ -95,6 +95,12 @@ IF(${CMAKE_PROJECT_NAME}_HAVE_VTK)
 	include(${USE_VTK_FILE})
 ENDIF(${CMAKE_PROJECT_NAME}_HAVE_VTK)
 
+IF(${CMAKE_PROJECT_NAME}_HAVE_VTK)
+	find_package(Qt4 REQUIRED)
+	include(${QT_USE_FILE})
+ENDIF(${CMAKE_PROJECT_NAME}_HAVE_VTK)
+
+
 # If ITK AND VTK are used together we have to increase the number of maximal
 # template recursion otherwise there will be an overflow in the Boost library.
 IF(ITK_FOUND OR VTK_FOUND)

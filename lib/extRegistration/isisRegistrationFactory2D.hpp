@@ -10,7 +10,7 @@
 
 #include "itkImageRegistrationMethod.h"
 
-#include "extITK/isisIterationObserver.h"
+#include "extITK/isisIterationObserver.hpp"
 
 //transform includes
 
