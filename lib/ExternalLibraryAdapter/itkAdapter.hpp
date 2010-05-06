@@ -213,6 +213,7 @@ private:
 
 		//TODO why the hell negates the itkNiftio some seemingly arbitrary elements of the orientation?????
 		//matrix will be transformed this way:
+
 		/*
 		-1 -1 -1 -1
 		-1 -1 -1 -1
@@ -244,8 +245,8 @@ private:
 		importer->SetDirection( itkDirection );
 		importer->SetImportPointer( &this->m_ImageISIS->voxel<typename InputImageType::PixelType>( 0, 0, 0, 0 ), itkSize[0], false );
 		rescaler->SetInput( importer->GetOutput() );
-		typename InputImageType::PixelType minIn, maxIn;
-		this->m_ImageISIS->getMinMax<typename InputImageType::PixelType>( minIn, maxIn );
+        util::Type<typename InputImageType::PixelType> minIn, maxIn;
+		this->m_ImageISIS->getMinMax( minIn, maxIn );
 		rescaler->SetOutputMinimum( minIn );
 		rescaler->SetOutputMaximum( maxIn );
 		rescaler->Update();

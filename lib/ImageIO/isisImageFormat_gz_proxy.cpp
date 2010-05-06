@@ -20,13 +20,13 @@ private:
 		int len;
 
 		for (
-			in.read( buf, 2048*1024 );
+			in.read( buf, 2048 * 1024 );
 			( len = in.gcount() );
-			in.read( buf, 2048*1024 )
+			in.read( buf, 2048 * 1024 )
 		) {
 			if ( gzwrite( out, buf, len ) != len ) {
 				int err;
-				const char *z_err = gzerror( out, &err );
+				gzerror( out, &err );
 
 				// If an error occurred in the file system and not in the compression library, err is set to Z_ERRNO
 				if ( err == Z_ERRNO ) {
@@ -53,8 +53,9 @@ private:
 
 		gz_compress( in, out );
 
-		if ( gzclose( out ) != Z_OK )
+		if ( gzclose( out ) != Z_OK ) {
 			LOG( ImageIoLog, warning ) << "gzclose " << outfile << " failed";
+		}
 	}
 
 	void gz_uncompress( gzFile in, std::ofstream &out ) {
@@ -68,7 +69,7 @@ private:
 		) {
 			if ( len < 0 ) {
 				int err;
-				const char *z_err = gzerror( out, &err );
+				gzerror( out, &err );
 
 				// If an error occurred in the file system and not in the compression library, err is set to Z_ERRNO
 				if ( err == Z_ERRNO ) {

@@ -18,7 +18,7 @@ namespace util
 Selection::Selection( const char *entries ): m_set( 0 )
 {
 	int id = 1;
-	BOOST_FOREACH( const std::string &ref, string2list<std::string>( std::string( entries ), ',' ) )
+	BOOST_FOREACH( const std::string & ref, string2list<std::string>( std::string( entries ), ',' ) )
 	ent_map[ref] = id++;
 }
 Selection::Selection(): m_set( 0 ) {}
@@ -39,8 +39,10 @@ bool Selection::set( const char* entry )
 
 	if ( found != ent_map.end() ) {
 		m_set = found->second;
+		return true;
 	} else {
 		LOG( Runtime, error ) << "Failed to set " << MSubject( entry ) << ", valid values are " << getEntries();
+		return false;
 	}
 }
 
@@ -50,11 +52,11 @@ bool Selection::operator==( const Selection &ref )const
 }
 bool Selection::operator==( const char ref[] ) const
 {
-	return strcasecmp ( ( ( std::string )*this ).c_str(), ref )  == 0;
+	return strcasecmp ( ( ( std::string ) * this ).c_str(), ref )  == 0;
 }
 bool Selection::operator==( const int ref ) const
 {
-	return ( ( int )*this ) == ref;
+	return ( ( int ) * this ) == ref;
 }
 
 

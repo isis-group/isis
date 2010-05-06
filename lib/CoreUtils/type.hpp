@@ -18,6 +18,7 @@
 #include "string.h"
 
 #include <string>
+#include <functional>
 
 // @todo we need to know this for lexical_cast (toString)
 #include <boost/date_time/gregorian/gregorian.hpp>
@@ -33,6 +34,51 @@ namespace isis
  */
 namespace util
 {
+
+template<class TYPE > class Type;
+
+
+namespace _internal
+{
+template<typename T, bool isNumber> struct type_less {
+	bool operator()( const Type<T> &first, const TypeBase &second )const {
+		LOG( Debug, error ) << "less comparison of " << Type<T>::staticName() << " is not supportet";
+		return false;
+	}
+};
+template<typename T, bool isNumber> struct type_greater {
+	bool operator()( const Type<T> &first, const TypeBase &second )const {
+		LOG( Debug, error ) << "greater than comparison of " << Type<T>::staticName() << " is not supportet";
+		return false;
+	}
+};
+template<typename T> struct type_less<T, true> {
+	bool operator()( const Type<T> &first, const TypeBase &second )const {return ( T )first < second.as<T>();}
+};
+template<typename T> struct type_greater<T, true> {
+	bool operator()( const Type<T> &first, const TypeBase &second )const {return ( T )first > second.as<T>();}
+};
+template<typename T, bool isNumber> struct getMinMaxImpl {
+	std::pair<T, T> operator()( const TypePtr<T> &ref ) const {
+		LOG( Debug, error ) << "min/max comparison of " << Type<T>::staticName() << " is not supportet";
+		return std::pair<T, T>();
+	}
+};
+template<typename T> struct getMinMaxImpl<T, true> {
+	std::pair<T, T> operator()( const TypePtr<T> &ref ) const {
+		std::pair<T, T> result;
+
+		for ( size_t i = 0; i < ref.len(); i++ ) {
+			if ( result.second < ref[i] )result.second = ref[i];
+
+			if ( result.first > ref[i] )result.first = ref[i];
+		}
+
+		return result;
+	}
+};
+
+}
 
 /// Generic class for type aware variables
 template<typename TYPE> class Type: public _internal::TypeBase
@@ -111,6 +157,13 @@ public:
 	operator const TYPE&()const {return m_val;}
 	operator TYPE&() {return m_val;}
 
+	bool operator >( const _internal::TypeBase &ref )const {
+		return _internal::type_greater<TYPE, boost::is_arithmetic<TYPE>::value >()( *this, ref );
+	}
+	bool operator <( const _internal::TypeBase &ref )const {
+		return _internal::type_less<TYPE, boost::is_arithmetic<TYPE>::value >()( *this, ref );
+	}
+
 	virtual ~Type() {}
 };
 
@@ -149,8 +202,8 @@ public:
 		/// decrement the use_count of the master when a specific part is not referenced anymore
 		void operator()( TYPE *at ) {
 			LOG( Debug, verbose_info )
-			<< "Deletion for " << this->get() << " called from splice at offset "   << at - this->get()
-			<< ", current use_count: " << this->use_count();
+					<< "Deletion for " << this->get() << " called from splice at offset "   << at - this->get()
+					<< ", current use_count: " << this->use_count();
 			this->reset();//actually not needed, but we keep it here to keep obfuscation low
 		}
 	};
@@ -193,7 +246,7 @@ public:
 	 * this is just here for child classes which may want to check)
 	 */
 	TypePtr( TYPE* const ptr, size_t length ):
-			m_val( ptr, BasicDeleter() ), _internal::TypePtrBase( length ) {}
+		_internal::TypePtrBase( length ), m_val( ptr, BasicDeleter() ) {}
 	/**
 	 * Creates TypePtr from a pointer of type TYPE.
 	 * The pointers are automatically deleted by an copy of d and should not be used outside once used here
@@ -206,26 +259,26 @@ public:
 	 */
 
 	template<typename D> TypePtr( TYPE* const ptr, size_t length, D d ):
-			m_val( ptr, d ), _internal::TypePtrBase( length ) {}
+		_internal::TypePtrBase( length ), m_val( ptr, d ) {}
 
 	virtual ~TypePtr() {}
 
 	/// Copy elements from raw memory
 	void copyFromMem( const TYPE* const src, size_t length ) {
 		LOG_IF( length > len(), Runtime, error )
-		<< "Amount of the elements to copy from memory (" << length << ") exceeds the length of the array (" << len() << ")";
+				<< "Amount of the elements to copy from memory (" << length << ") exceeds the length of the array (" << len() << ")";
 		TYPE &dest = this->operator[]( 0 );
 		LOG( Debug, info ) << "Copying " << length*sizeof( TYPE ) << " bytes of " << typeName() << " from " << src << " to " << &dest;
-		memcpy( &dest, src, length*sizeof( TYPE ) );
+		memcpy( &dest, src, length * sizeof( TYPE ) );
 	}
 	/// Copy elements within a range [start,end] to raw memory
 	void copyToMem( size_t start, size_t end, const TYPE* const dst )const {
 		assert( start <= end );
 		const size_t length = end - start + 1;
 		LOG_IF( end >= len(), Runtime, error )
-		<< "End of the range (" << end << ") is behind the end of this TypePtr (" << len() << ")";
+				<< "End of the range (" << end << ") is behind the end of this TypePtr (" << len() << ")";
 		const TYPE &source = this->operator[]( start );
-		memcpy( dst, &source, length*sizeof( TYPE ) );
+		memcpy( dst, &source, length * sizeof( TYPE ) );
 	}
 	size_t cmp( size_t start, size_t end, const isis::util::_internal::TypePtrBase& dst, size_t dst_start ) const {
 		assert( start <= end );
@@ -234,15 +287,15 @@ public:
 
 		if ( dst.typeID() != typeID() ) {
 			LOG( Runtime, error )
-			<< "Comparing to a TypePtr of different type(" << dst.typeName() << ", not " << typeName()
-			<< "). Assuming all voxels to be different";
+					<< "Comparing to a TypePtr of different type(" << dst.typeName() << ", not " << typeName()
+					<< "). Assuming all voxels to be different";
 			return length;
 		}
 
 		LOG_IF( end >= len(), Runtime, error )
-		<< "End of the range (" << end << ") is behind the end of this TypePtr (" << len() << ")";
+				<< "End of the range (" << end << ") is behind the end of this TypePtr (" << len() << ")";
 		LOG_IF( length + dst_start >= dst.len(), Runtime, error )
-		<< "End of the range (" << length + dst_start << ") is behind the end of the destination (" << dst.len() << ")";
+				<< "End of the range (" << length + dst_start << ") is behind the end of the destination (" << dst.len() << ")";
 		const TypePtr<TYPE> &compare = dst.cast_to_TypePtr<TYPE>();
 		LOG( Debug, verbose_info ) << "Comparing " << dst.typeName() << " at " << &operator[]( 0 ) << " and " << &compare[0];
 
@@ -307,15 +360,45 @@ public:
 	operator const boost::shared_ptr<TYPE>&()const {return m_val;}
 
 	TypePtrBase::Reference cloneToMem( size_t length ) const {
-		return TypePtrBase::Reference( new TypePtr( ( TYPE* )malloc( length*sizeof( TYPE ) ), length ) );
+		return TypePtrBase::Reference( new TypePtr( ( TYPE* )malloc( length * sizeof( TYPE ) ), length ) );
 	}
 	size_t bytes_per_elem() const {
 		return sizeof( TYPE );
 	}
+	bool convertTo( TypePtrBase& dst )const {
+		Type<TYPE> min, max;
+		getMinMax( min, max );
+		return TypePtrBase::convertTo( dst, min, max );
+	}
+	void getMinMax ( _internal::TypeBase& min, _internal::TypeBase& max, bool init = true ) const {
+		assert( min.typeID() == max.typeID() );
+
+		if( len() == 0 ) {
+			LOG( Runtime, warning ) << "Skipping computation of min/max on an empty TypePtr";
+			return;
+		}
+
+		if( init ) { // they haven't been set yet
+			const Type<TYPE> el( this->operator[]( 0 ) );
+			_internal::TypeBase::convert( el, min );
+			_internal::TypeBase::convert( el, max );
+		}
+
+		const std::pair<Type<TYPE>, Type<TYPE> > result = _internal::getMinMaxImpl<TYPE, boost::is_arithmetic<TYPE>::value>()( *this );
+
+		if( min > result.first ) {
+			_internal::TypeBase::convert( result.first, min );
+		}
+
+		if( max < result.second ) {
+			_internal::TypeBase::convert( result.second, max );
+		}
+	}
+
 	std::vector<Reference> splice( size_t size )const {
 		if ( size >= len() ) {
 			LOG( Debug, warning )
-			<< "splicing data of the size " << len() << " up into blocks of the size " << size << " is kind of useless ...";
+					<< "splicing data of the size " << len() << " up into blocks of the size " << size << " is kind of useless ...";
 		}
 
 		const size_t fullSplices = len() / size;
@@ -329,10 +412,10 @@ public:
 		DelProxy proxy( *this );
 
 		for ( size_t i = 0; i < fullSplices; i++ )
-			ret[i].reset( new TypePtr( m_val.get() + i*size, size, proxy ) );
+			ret[i].reset( new TypePtr( m_val.get() + i * size, size, proxy ) );
 
 		if ( lastSize )
-			ret.back().reset( new TypePtr( m_val.get() + fullSplices*size, lastSize, proxy ) );
+			ret.back().reset( new TypePtr( m_val.get() + fullSplices * size, lastSize, proxy ) );
 
 		return ret;
 	}

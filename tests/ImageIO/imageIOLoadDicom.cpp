@@ -29,7 +29,6 @@ BOOST_AUTO_TEST_CASE ( imageDicomtest )
 	ENABLE_LOG( ImageIoDebug, util::DefaultMsgPrint, warning );
 	data::ImageList images = data::IOFactory::load( "/SCR/isis_build/testDicom.ima", "" );
 	BOOST_CHECK( images.size() == 1 );
-	short cnt = 0;
 	/*      BOOST_FOREACH(data::ImageList::value_type &ref,images){
 	            BOOST_CHECK(ref->size() == util::fvector4(3,3,3,10));
 	            for(int i=0;i<10;i++)

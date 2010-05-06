@@ -54,7 +54,7 @@ class NiftiChunk : public data::Chunk
 {
 public:
 	template<typename T, typename D> NiftiChunk( T* src, D del, size_t width, size_t height, size_t slices, size_t timesteps ) :
-			data::Chunk( src, del, width, height, slices, timesteps ) {
+		data::Chunk( src, del, width, height, slices, timesteps ) {
 		LOG( ImageIoDebug, info ) << "create NiftiChunk";
 	}
 
@@ -77,12 +77,12 @@ class ImageFormat_Nifti : public FileFormat
 		std::string m_filename;
 		//constructor
 		Deleter( nifti_image *ni, const std::string& filename ) :
-				m_pNiImage( ni ), m_filename( filename ) {}
+			m_pNiImage( ni ), m_filename( filename ) {}
 
 		//the most important operator
 		void operator ()( void *at ) {
 			LOG_IF( NULL == m_pNiImage, ImageIoLog, error )
-			<<  "Trying to close non-existing nifti file: " << util::MSubject( m_filename );
+					<<  "Trying to close non-existing nifti file: " << util::MSubject( m_filename );
 			LOG( ImageIoDebug, info ) << "Closing Nifti-Chunk file " << util::MSubject( m_filename );
 			//clean up with the function from nifti1_io.h
 			nifti_image_free( m_pNiImage );
@@ -114,11 +114,10 @@ public:
 	 ************************/
 	int load( data::ChunkList &retList, const std::string& filename, const std::string& dialect )  throw( std::runtime_error& ) {
 		//read the file with the function from nifti1_io.h
-		errno = 0;
 		nifti_image* ni = nifti_image_read( filename.c_str(), true );
 
 		if ( not ni )
-			throwSystemError( errno );
+			throwGenericError( "nifti_image_read(" + filename + ") failed" );
 
 		// 0.0 would mean "not in use" - so for better handling use a 1.0
 		float scale = ni->scl_slope ? ni->scl_slope : 1.0;
@@ -277,10 +276,10 @@ private:
 			LOG( ImageIoLog, info ) << "dims at all " << dimensions;
 			LOG( ImageIoLog, info ) << "Offset values from nifti" << offsets;
 			LOG( ImageIoLog, info ) << "FOV read/phase/slice/voxelsize:"
-			<< getVector( ni, readDir )
-			<< " / " << getVector( ni, phaseDir )
-			<< " / " << getVector( ni, sliceDir )
-			<< getVector( ni, voxelSizeVec );
+									<< getVector( ni, readDir )
+									<< " / " << getVector( ni, phaseDir )
+									<< " / " << getVector( ni, sliceDir )
+									<< getVector( ni, voxelSizeVec );
 		}
 	}
 
@@ -336,7 +335,7 @@ private:
 				retVec = qto * voxelSizeVec;
 			} else {
 				LOG( ImageIoLog, error )
-				<< "can't read orientation Vector for direction: " << dir + 1;
+						<< "can't read orientation Vector for direction: " << dir + 1;
 			}
 		}
 
@@ -344,14 +343,14 @@ private:
 	}
 
 	template<typename T>
-	bool copyDataToNifti( const data::Image& image, nifti_image& ni ) {
+	void copyDataToNifti( const data::Image& image, nifti_image& ni ) {
 		ni.data = malloc( image.bytes_per_voxel() * image.volume() );
 		T *refNii = ( T* ) ni.data;
 
-		for ( int t = 0; t < image.sizeToVector()[3]; t++ ) {
-			for ( int z = 0; z < image.sizeToVector()[2]; z++ ) {
-				for ( int y = 0; y < image.sizeToVector()[1]; y++ ) {
-					for ( int x = 0; x < image.sizeToVector()[0]; x++ ) {
+		for ( size_t t = 0; t < image.sizeToVector()[3]; t++ ) {
+			for ( size_t z = 0; z < image.sizeToVector()[2]; z++ ) {
+				for ( size_t y = 0; y < image.sizeToVector()[1]; y++ ) {
+					for ( size_t x = 0; x < image.sizeToVector()[0]; x++ ) {
 						*refNii = image.voxel<T>( x, y, z, t );
 						refNii++;
 					}
@@ -361,13 +360,13 @@ private:
 
 		ni.nbyper = image.bytes_per_voxel();
 		//min / max due to T in image but for nifti everything is float
-		T min, max;
+		util::Type<T> min, max;
 		image.getMinMax( min, max );
 		ni.cal_min = min;
 		ni.cal_max = max;
 	}
 
-	bool copyHeaderToNifti( const data::Image& image, nifti_image& ni ) {
+	void copyHeaderToNifti( const data::Image& image, nifti_image& ni ) {
 		//all the other information for the nifti header
 		BOOST_ASSERT( data::Image::n_dims == 4 );
 		ni.scl_slope = 1.0;

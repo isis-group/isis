@@ -23,6 +23,22 @@ struct Deleter {
 	};
 };
 
+// Handlers must not be local classes
+class TestHandler : public util::_internal::MessageHandlerBase
+{
+public:
+	static int hit;
+	TestHandler( LogLevel level ): util::_internal::MessageHandlerBase( level ) {}
+	virtual ~TestHandler() {}
+	void commit( const util::_internal::Message &mesg ) {
+		if( mesg.str() == "Automatic numeric conversion of {s} to u16bit failed: bad numeric conversion: negative overflow" )
+			hit++;
+		else
+			std::cout << "Unexpected error " << mesg.merge();
+	}
+};
+int TestHandler::hit = 0;
+
 class ReferenceTest: public util::TypePtr<int>::Reference
 {
 public:
@@ -147,7 +163,7 @@ BOOST_AUTO_TEST_CASE( typePtr_splice_test )
 BOOST_AUTO_TEST_CASE( typePtr_conversion_test )
 {
 	const float init[] = { -2, -1.8, -1.5, -1.3, -0.6, -0.2, 2, 1.8, 1.5, 1.3, 0.6, 0.2};
-	util::TypePtr<float> floatArray( ( float* )malloc( sizeof( float )*12 ), 12 );
+	util::TypePtr<float> floatArray( ( float* )malloc( sizeof( float ) * 12 ), 12 );
 	//without scaling
 	floatArray.copyFromMem( init, 12 );
 
@@ -168,14 +184,40 @@ BOOST_AUTO_TEST_CASE( typePtr_conversion_test )
 	util::TypePtr<short> shortArray = floatArray.copyToNew<short>();
 
 	for ( int i = 0; i < 12; i++ )
-		BOOST_CHECK_EQUAL( shortArray[i], round( init[i]*1e5*scale ) );
+		BOOST_CHECK_EQUAL( shortArray[i], round( init[i] * 1e5 * scale ) );
 
 	//with offset and scale
 	const double uscale = std::numeric_limits< unsigned short >::max() / 4e5;
 	util::TypePtr<unsigned short> ushortArray = floatArray.copyToNew<unsigned short>();
 
 	for ( int i = 0; i < 12; i++ )
-		BOOST_CHECK_EQUAL( ushortArray[i], round( init[i]*1e5*uscale + 32767.5 ) );
+		BOOST_CHECK_EQUAL( ushortArray[i], round( init[i] * 1e5 * uscale + 32767.5 ) );
+}
+
+BOOST_AUTO_TEST_CASE( typePtr_minmax_test )
+{
+	const float init[] = { -1.8, -1.5, -1.3, -0.6, -0.2, 1.8, 1.5, 1.3, 0.6, 0.2};
+	util::TypePtr<float> floatArray( ( float* )malloc( sizeof( float ) * 10 ), 10 );
+	//without scaling
+	floatArray.copyFromMem( init, 10 );
+	{
+		util::Type<float> min, max;
+		floatArray.getMinMax( min, max );
+		BOOST_CHECK_EQUAL( min, -1.8f );
+		BOOST_CHECK_EQUAL( max, 1.8f );
+	}
+	{
+		util::Type<int> min, max;
+		floatArray.getMinMax( min, max );
+		BOOST_CHECK_EQUAL( min, -2 );
+		BOOST_CHECK_EQUAL( max, 2 );
+	}
+	{
+		util::enable_log<TestHandler>( error );
+		util::Type<u_int16_t> min, max;
+		floatArray.getMinMax( min, max );
+		BOOST_CHECK_EQUAL( TestHandler::hit, 4 );
+	}
 }
 }
 }

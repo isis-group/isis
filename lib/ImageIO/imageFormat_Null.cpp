@@ -22,8 +22,8 @@ public:
 		const size_t images = 5;
 		const size_t timesteps = 10;
 
-		for ( int i = 0; i < timesteps; i++ ) {
-			for ( int c = 0; c < images; c++ ) {
+		for ( size_t i = 0; i < timesteps; i++ ) {
+			for ( size_t c = 0; c < images; c++ ) {
 				data::MemChunk<u_int8_t> ch( 50, 50, 50 );
 				ch.setProperty( "indexOrigin", util::fvector4( 0, 0, 0, i ) );
 				ch.setProperty<u_int32_t>( "acquisitionNumber", i );
@@ -43,7 +43,7 @@ public:
 			}
 		}
 
-		return timesteps*images;//return data::ChunkList();
+		return timesteps * images; //return data::ChunkList();
 	}
 
 	void write( const data::Image &image, const std::string& filename, const std::string& dialect )  throw( std::runtime_error& ) {

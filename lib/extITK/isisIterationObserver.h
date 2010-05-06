@@ -94,7 +94,7 @@ public:
 	progress_display display;
 protected:
 	ProcessUpdate() :
-			display( 101 ) {
+		display( 101 ) {
 	}
 	;
 public:

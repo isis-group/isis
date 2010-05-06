@@ -24,7 +24,7 @@ namespace extitk
 
 template<class TInputImage, class TOutputImage>
 class ITK_EXPORT TimeStepExtractionFilter: public itk::ImageToImageFilter <
-		TInputImage, TOutputImage >
+	TInputImage, TOutputImage >
 {
 public:
 	itkStaticConstMacro( InputImageDimension, unsigned int,

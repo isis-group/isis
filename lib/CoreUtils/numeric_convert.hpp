@@ -16,14 +16,14 @@ namespace _internal
 template<typename SRC, typename DST> static void numeric_convert_impl( const SRC* src, DST* dst, size_t count, double scale, double offset )
 {
 	LOG( Debug, info )
-	<< "using generic scaling convert " << Type<SRC>::staticName() << "=>" << Type<DST>::staticName()
-	<< " with scale/offset " << scale << "/" << offset;
+			<< "using generic scaling convert " << Type<SRC>::staticName() << "=>" << Type<DST>::staticName()
+			<< " with scale/offset " << scale << "/" << offset;
 	static boost::numeric::converter <
 	DST, double,
-	boost::numeric::conversion_traits<DST, double>,
-	boost::numeric::def_overflow_handler,
-	boost::numeric::RoundEven<double>
-	> converter;
+	   boost::numeric::conversion_traits<DST, double>,
+	   boost::numeric::def_overflow_handler,
+	   boost::numeric::RoundEven<double>
+	   > converter;
 
 	for ( size_t i = 0; i < count; i++ )
 		dst[i] = converter( src[i] * scale + offset );
@@ -33,10 +33,10 @@ template<typename SRC, typename DST> static void numeric_convert_impl( const SRC
 	LOG( Debug, info ) << "using generic convert " << Type<SRC>::staticName() << " => " << Type<DST>::staticName() << " without scaling";
 	static boost::numeric::converter <
 	DST, SRC,
-	boost::numeric::conversion_traits<DST, SRC>,
-	boost::numeric::def_overflow_handler,
-	boost::numeric::RoundEven<SRC>
-	> converter;
+	   boost::numeric::conversion_traits<DST, SRC>,
+	   boost::numeric::def_overflow_handler,
+	   boost::numeric::RoundEven<SRC>
+	   > converter;
 
 	for ( size_t i = 0; i < count; i++ )
 		dst[i] = converter( src[i] );
@@ -55,7 +55,7 @@ enum autoscaleOption {noscale, autoscale, noupscale};
  * If dst is shorter than src, no conversion is done.
  * If src is shorter than dst a warning is send to CoreLog.
  */
-template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &src, TypePtr<DST> &dst, autoscaleOption scaleopt = noupscale )
+template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &src, TypePtr<DST> &dst, const _internal::TypeBase &min, const _internal::TypeBase &max, autoscaleOption scaleopt = noupscale )
 {
 	if ( src.len() > dst.len() ) {
 		LOG( Runtime, error ) << "The " << src.len() << " elements of src wont fit into the destination with the size " << dst.len();
@@ -74,8 +74,22 @@ template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &s
 	if ( doScale ) {
 		const DST domain_min = std::numeric_limits<DST>::min();//negative value domain of this dst
 		const DST domain_max = std::numeric_limits<DST>::max();//positive value domain of this dst
-		SRC minval, maxval;
-		src.getMinMax( minval, maxval );
+		Type<SRC> minval, maxval;
+
+		if( min > max ) {
+			LOG( Debug, info ) << "Computing source range on my own";
+			src.getMinMax( minval, maxval );
+		} else {
+			LOG_IF( min.typeID() != Type<SRC>::staticID, Debug, info )
+					<< "The given minimum for src Range is not of the same type as the data ("
+					<< min.typeName() << "!=" << Type<SRC>::staticName() << ")";
+			LOG_IF( max.typeID() != Type<SRC>::staticID, Debug, info )
+					<< "The given maximum for src Range is not of the same type as the data ("
+					<< max.typeName() << "!=" << Type<SRC>::staticName() << ")";
+			minval = min.as<SRC>();
+			maxval = max.as<SRC>();
+		}
+
 		LOG( Debug, info ) << "src Range:" << minval << "=>" << maxval;
 		LOG( Debug, info ) << "dst Domain:" << domain_min << "=>" << domain_max;
 		assert( domain_min < domain_max );//we also should assume this
@@ -84,10 +98,10 @@ template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &s
 		//else if src is completly on negative dmain, or if there is no positive domain use maxval
 		//elsewise leave it at 0 and scale both sides
 		if ( minval > 0 || !domain_min ) {
-			if ( maxval > domain_max ) // if the values completely fit into the domain we dont have to offset them
+			if ( ( maxval - domain_max ) > 0 ) // if the values completely fit into the domain we dont have to offset them
 				offset = -minval;
-		} else if ( (0-maxval)>0 || !domain_max ) {
-			if ( minval < domain_min ) // if the values completely fit into the domain we dont have to offset them
+		} else if ( ( 0 - maxval ) > 0 || !domain_max ) {
+			if ( ( domain_min - minval ) > 0  ) // if the values completely fit into the domain we dont have to offset them
 				offset = -maxval;
 		}
 
@@ -108,9 +122,10 @@ template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &s
 		if ( scale < 1 ) {
 			LOG( Runtime, warning ) << "Downscaling your values by Factor " << scale << " you might lose information.";
 		} else if ( scaleopt == noupscale ) {
-			if ( scale > 1 )LOG( Runtime, info ) << "upscale not given, clamping scale " << scale << " to 1";
-
-			scale = 1;
+			if ( scale > 1 ) {
+				LOG( Runtime, info ) << "upscale not given, clamping scale " << scale << " to 1";
+				scale = 1;
+			}
 		}
 
 		doScale = ( scale != 1. || offset );

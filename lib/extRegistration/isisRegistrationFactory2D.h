@@ -186,7 +186,7 @@ public:
 	AffineCenteredTransformInitializerType;
 
 	typedef typename itk::LandmarkBasedTransformInitializer < Rigid2DTransformType, TFixedImageType,
-	TMovingImageType > RigidLandmarkBasedTransformInitializerType;
+			TMovingImageType > RigidLandmarkBasedTransformInitializerType;
 
 	enum eTransformType {
 		TranslationTransform,

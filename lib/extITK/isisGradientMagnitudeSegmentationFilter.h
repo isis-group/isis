@@ -25,7 +25,7 @@ namespace extitk
 
 template<class TInputImage, class TOutputImage>
 class ITK_EXPORT GradientMagnitudeSegmentationFilter: public itk::ImageToImageFilter <
-		TInputImage, TOutputImage >
+	TInputImage, TOutputImage >
 {
 public:
 
@@ -84,7 +84,7 @@ public:
 	MinMaxFilterType;
 
 	typedef typename itk::OtsuThresholdImageFilter < OutputImageType,
-	OutputImageType > OtsuThresholdFilterType;
+			OutputImageType > OtsuThresholdFilterType;
 
 	itkSetMacro( Sigma, float )
 	;

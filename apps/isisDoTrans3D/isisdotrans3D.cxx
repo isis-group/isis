@@ -53,17 +53,26 @@ static VShort number_threads = 1;
 
 static VOptionDescRec options[] = {
 //requiered inputs
-	{"in", VStringRepn, 1, &in_filename, &in_found, 0, "the input image filename"}, {"out", VStringRepn, 1,
-			&out_filename, &out_found, 0, "the output image filename"},
+	{"in", VStringRepn, 1, &in_filename, &in_found, 0, "the input image filename"}, {
+		"out", VStringRepn, 1,
+		&out_filename, &out_found, 0, "the output image filename"
+	},
 
 	//non-required inputs
-	{"trans", VStringRepn, 0, &trans_filename, &trans_found, 0, "the transform filename"}, {"interpolator", VShortRepn,
-			1, &interpolator_type, VOptionalOpt, 0, "The interpolator used to resample the image"}, {"ref", VStringRepn, 1,
-					&template_filename, VOptionalOpt, 0, "The template image"}, {"reso", VFloatRepn, 0, ( VPointer ) &resolution,
-							VOptionalOpt, 0, "The output resolution. One value for isotrop output"}, {"fmri", VBooleanRepn, 1, &fmri,
-									VOptionalOpt, 0, "Input and output image file are functional data"}, {"vtrans", VStringRepn, 1,
-											&vtrans_filename, VOptionalOpt, 0, "Vector deformation field"}, {"use_inverse", VBooleanRepn, 1, &use_inverse,
-													VOptionalOpt, 0, "Using the inverse of the transform"}, {"j" , VShortRepn, 1, &number_threads, VOptionalOpt, 0 , "Number of threads"}
+	{"trans", VStringRepn, 0, &trans_filename, &trans_found, 0, "the transform filename"}, {
+		"interpolator", VShortRepn,
+		1, &interpolator_type, VOptionalOpt, 0, "The interpolator used to resample the image"
+	}, {"ref", VStringRepn, 1,
+		&template_filename, VOptionalOpt, 0, "The template image"
+	}, {"reso", VFloatRepn, 0, ( VPointer ) &resolution,
+		VOptionalOpt, 0, "The output resolution. One value for isotrop output"
+	}, {"fmri", VBooleanRepn, 1, &fmri,
+		VOptionalOpt, 0, "Input and output image file are functional data"
+	}, {"vtrans", VStringRepn, 1,
+		&vtrans_filename, VOptionalOpt, 0, "Vector deformation field"
+	}, {"use_inverse", VBooleanRepn, 1, &use_inverse,
+		VOptionalOpt, 0, "Using the inverse of the transform"
+	}, {"j" , VShortRepn, 1, &number_threads, VOptionalOpt, 0 , "Number of threads"}
 
 };
 

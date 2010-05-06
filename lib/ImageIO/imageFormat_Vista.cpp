@@ -34,7 +34,7 @@ namespace image_io
 {
 
 
-bool ImageFormat_Vista::write( const data::Image &image, const std::string &filename, const std::string &dialect )
+void ImageFormat_Vista::write( const data::Image &image, const std::string &filename, const std::string &dialect ) throw( std::runtime_error& ) 
 {
 
 	//  All vista images a organized in an attribue list. Let's create an empty one:
@@ -125,10 +125,9 @@ bool ImageFormat_Vista::write( const data::Image &image, const std::string &file
 
 	free( vimages );
 	fclose( f );
-	return true;
 }
 
-int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filename, const std::string &dialect )
+int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error& )
 {
 }
 

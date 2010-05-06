@@ -42,7 +42,7 @@ Application::Application( const char name[] ): m_name( name )
 	BOOST_FOREACH( ParameterMap::reference ref, parameters ) //none of these is needed
 	ref.second.needed() = false;
 }
-Application::~Application(){}
+Application::~Application() {}
 
 bool Application::init( int argc, char** argv, bool exitOnError )
 {
