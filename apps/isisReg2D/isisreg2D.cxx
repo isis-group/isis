@@ -269,8 +269,8 @@ int main(
 	RegistrationFactoryType::Pointer registrationFactory = RegistrationFactoryType::New();
 	isis::extitk::TransformMerger2D* transformMerger = new isis::extitk::TransformMerger2D;
 	//analyse transform vector
-	unsigned int repetition = transformType.number;
-	unsigned int bsplineCounter = 0;
+	int repetition = transformType.number;
+	int bsplineCounter = 0;
 
 	if ( !repetition )
 		repetition = 1;
@@ -278,7 +278,7 @@ int main(
 	//analyse optimizer vector
 	boost::progress_timer time_used;
 
-	for ( unsigned int counter = 0; counter < repetition; counter++ ) {
+	for ( int counter = 0; counter < repetition; counter++ ) {
 		//transform is the master for determining the number of repetitions
 		if ( transformType.number ) {
 			transform = ( ( VShort* ) transformType.vector )[counter];

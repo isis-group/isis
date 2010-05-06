@@ -278,8 +278,8 @@ int main(
 	RegistrationFactoryType::Pointer registrationFactory = RegistrationFactoryType::New();
 	//analyse transform vector
 	//transform is the master for determining the number of repetitions
-	unsigned int repetition = transformType.number;
-	unsigned int bsplineCounter = 0;
+	int repetition = transformType.number;
+	int bsplineCounter = 0;
 
 	if ( !repetition )
 		repetition = 1;
