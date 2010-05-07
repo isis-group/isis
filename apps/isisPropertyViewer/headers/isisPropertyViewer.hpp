@@ -13,7 +13,7 @@ class isisPropertyViewer : public QMainWindow
 	Q_OBJECT
 
 public:
-	isisPropertyViewer( QMainWindow *parent = 0 );
+	isisPropertyViewer( const isis::util::slist&, QMainWindow *parent = 0 );
 	Qt::ItemFlags flags( const QModelIndex &index ) const;
 
 
@@ -32,6 +32,7 @@ private:
 	void createTree( const boost::shared_ptr<isis::data::Image>, const QString& );
 	void addPropToTree( const boost::shared_ptr<isis::data::Image>, const PropKeyListType::const_iterator&, QTreeWidgetItem* );
 	void addChildToItem( QTreeWidgetItem*, const QString&, const QString& ) const;
+	void addFileToTree( const QString&);
 
 
 };

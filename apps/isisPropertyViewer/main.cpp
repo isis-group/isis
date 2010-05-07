@@ -1,10 +1,17 @@
 #include <QApplication>
 #include "isisPropertyViewer.hpp"
 
+#include "CoreUtils/application.hpp"
+
+
 int main( int argc, char *argv[] )
 {
-	QApplication app( argc, argv );
-	isisPropertyViewer isisPropertyViewerWindow;
+	isis::util::QtApplication app( "isisPropertyViewer", argc, argv );
+	app.parameters["in"] = isis::util::slist();
+	app.parameters["in"].needed() = false;
+	app.init( argc, argv );
+	isis::util::slist fileList = app.parameters["in"];
+	isisPropertyViewer isisPropertyViewerWindow( fileList );
 	isisPropertyViewerWindow.show();
 	return app.exec();
 }

@@ -4,7 +4,7 @@
 
 #include <stdlib.h>
 
-isisPropertyViewer::isisPropertyViewer( QMainWindow *parent )
+isisPropertyViewer::isisPropertyViewer( const isis::util::slist &fileList, QMainWindow *parent )
 		: QMainWindow( parent )
 {
 	ui.setupUi( this );
@@ -14,6 +14,11 @@ isisPropertyViewer::isisPropertyViewer( QMainWindow *parent )
 	QStringList header;
 	header << tr( "Property" ) << tr( "Value" );
 	this->ui.treeWidget->setHeaderLabels( header );
+	
+	for (isis::util::slist::const_iterator fileIterator = fileList.begin(); fileIterator != fileList.end(); fileIterator++)
+	{
+		addFileToTree( tr(fileIterator->c_str()) );
+	}
 }
 
 Qt::ItemFlags isisPropertyViewer::flags( const QModelIndex &index ) const
@@ -33,7 +38,18 @@ void isisPropertyViewer::on_action_Close_activated()
 void isisPropertyViewer::on_action_Open_activated()
 {
 	QString fileName = QFileDialog::getOpenFileName( this, tr( "Open Image" ), QDir::currentPath(), "*.nii *.v" );
+	addFileToTree( fileName );
+	
+}
 
+void isisPropertyViewer::on_action_Clear_activated()
+{
+	this->ui.treeWidget->clear();
+}
+
+
+void isisPropertyViewer::addFileToTree( const QString &fileName)
+{
 	if ( not fileName.isEmpty() ) {
 		this->setStatusTip( fileName );
 		isis::data::ImageList inputImageList = isis::data::IOFactory::load( fileName.toStdString(), "" );
@@ -52,12 +68,6 @@ void isisPropertyViewer::on_action_Open_activated()
 		}
 	}
 }
-
-void isisPropertyViewer::on_action_Clear_activated()
-{
-	this->ui.treeWidget->clear();
-}
-
 
 void isisPropertyViewer::createTree( const boost::shared_ptr<isis::data::Image> image, const QString& fileName )
 {
