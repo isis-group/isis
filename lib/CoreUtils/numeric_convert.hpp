@@ -76,7 +76,7 @@ template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &s
 		const DST domain_max = std::numeric_limits<DST>::max();//positive value domain of this dst
 		Type<SRC> minval, maxval;
 
-		if ( min > max ) {
+		if ( min.gt(max) ) {
 			LOG( Debug, info ) << "Computing source range on my own";
 			src.getMinMax( minval, maxval );
 		} else {

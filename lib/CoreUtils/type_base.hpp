@@ -236,12 +236,13 @@ public:
 		check_type<T>();
 		return m_cast_to<Type<T> >();
 	}
-	virtual bool eq( const TypeBase &second )const = 0;
+	virtual bool operator==( const TypeBase &second )const = 0;
 
 	virtual ~TypeBase();
 
-	virtual bool operator >( const _internal::TypeBase &ref )const = 0;
-	virtual bool operator <( const _internal::TypeBase &ref )const = 0;
+	virtual bool gt( const _internal::TypeBase &ref )const = 0;
+	virtual bool lt( const _internal::TypeBase &ref )const = 0;
+	virtual bool eq( const _internal::TypeBase &ref )const = 0;
 };
 
 class TypePtrBase : public GenericType
