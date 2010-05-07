@@ -24,7 +24,7 @@ using util::fvector4;
 BOOST_AUTO_TEST_CASE( vector_init_test )
 {
 	fvector4 test;
-	float* start = &test[0];
+	float *start = &test[0];
 	const float compare1[] = {0, 0, 0, 0};
 	const float compare2[] = {42, 42, 42, 42};
 	BOOST_CHECK( memcmp( start, compare1, sizeof( float ) * 4 ) == 0 );

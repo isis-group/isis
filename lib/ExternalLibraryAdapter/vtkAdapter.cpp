@@ -10,11 +10,11 @@ vtkAdapter::vtkAdapter( const boost::shared_ptr<isis::data::Image> src )
 {}
 
 //return a list of vtkImageData type pointer
-vtkImageData* vtkAdapter::makeVtkImageObject( const boost::shared_ptr<data::Image> src, unsigned int dim4 )
+vtkImageData *vtkAdapter::makeVtkImageObject( const boost::shared_ptr<data::Image> src, unsigned int dim4 )
 {
-	vtkAdapter* myAdapter = new vtkAdapter( src );
-	vtkImageData* vtkImage = vtkImageData::New();
-	vtkImageImport* importer = vtkImageImport::New();
+	vtkAdapter *myAdapter = new vtkAdapter( src );
+	vtkImageData *vtkImage = vtkImageData::New();
+	vtkImageImport *importer = vtkImageImport::New();
 	const util::fvector4 dimensions( myAdapter->m_ImageISIS->sizeToVector() );
 	const util::fvector4 indexOrigin( myAdapter->m_ImageISIS->getProperty<util::fvector4>( "indexOrigin" ) );
 	const util::fvector4 spacing( myAdapter->m_ImageISIS->getProperty<util::fvector4>( "voxelSize" ) );

@@ -35,35 +35,24 @@ using namespace isis;
 
 //BOOST_AUTO_TEST_CASE( loadsaveTest )
 
-int main(int argc, char** argv)
+int main( int argc, char **argv )
 {
-	data::enable_log<util::DefaultMsgPrint>(warning);
-	image_io::enable_log<util::DefaultMsgPrint>(warning);
-
+	data::enable_log<util::DefaultMsgPrint>( warning );
+	image_io::enable_log<util::DefaultMsgPrint>( warning );
 	data::ImageList images;
 	//  load the defautl NULL file
 	std::string tmpfile = ( ( std::string )tmpnam( NULL ) ) + ".null";
 	std::string vtmpfile = ( ( std::string )tmpnam( NULL ) ) + ".v";
-	fopen(tmpfile.c_str(),"w");
+	fopen( tmpfile.c_str(), "w" );
 	//  load images from temp file
 	images = data::IOFactory::get().load( "/scr/kastanie1/DATA/isis/data_fmrt.nii", "" );
-
 	// the null-loader shall generate 5 50x50x50x10 images
 	//BOOST_CHECK( images.size() == 5 );
-
-//	print attributes
-//	((data::ImageList::const_reference) images.front())->print(std::cout,true);
-
+	//  print attributes
+	//  ((data::ImageList::const_reference) images.front())->print(std::cout,true);
 	// get first image and write it to disk
-//	data::ImageList::const_reference first = images.front();
-	data::IOFactory::write(images,vtmpfile,"");
-
+	//  data::ImageList::const_reference first = images.front();
+	data::IOFactory::write( images, vtmpfile, "" );
 	return 0;
-
-
-
-//BOOST_AUTO_TEST_SUITE_END()
-
-
-
+	//BOOST_AUTO_TEST_SUITE_END()
 }

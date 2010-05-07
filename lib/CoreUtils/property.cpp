@@ -17,21 +17,21 @@ namespace isis
 namespace util
 {
 
-bool& PropertyValue::needed() { return m_needed;}
+bool &PropertyValue::needed() { return m_needed;}
 bool PropertyValue::needed()const { return m_needed;}
 
 
-bool PropertyValue::operator== ( const util::PropertyValue& second )const
+bool PropertyValue::operator== ( const util::PropertyValue &second )const
 {
 	return !second.empty() && operator==( *second );
 }
-bool PropertyValue::operator!= ( const util::PropertyValue& second )const
+bool PropertyValue::operator!= ( const util::PropertyValue &second )const
 {
 	return not( ( second.empty() and empty() ) or operator==( second ) );
 }
 
 
-bool PropertyValue::operator== ( const _internal::TypeBase& second )const
+bool PropertyValue::operator== ( const _internal::TypeBase &second )const
 {
 	return !empty() && get()->eq( second );
 }
@@ -40,7 +40,7 @@ bool PropertyValue::operator== ( const _internal::TypeBase& second )const
 PropertyValue::PropertyValue ( bool _needed ) : m_needed( _needed ) {}
 
 
-bool PropertyValue::transformTo( PropertyValue& dst, int typeId )const
+bool PropertyValue::transformTo( PropertyValue &dst, int typeId )const
 {
 	LOG_IF( empty(), Debug, error ) << "Cannot transform an empty property. Program will stop.";
 	_internal::TypeBase &src = operator*();

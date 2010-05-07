@@ -662,45 +662,45 @@ template<class TFixedImageType, class TMovingImageType>
 void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetInitialTransform(
 	TransformBasePointer initialTransform )
 {
-	const char* initialTransformName = initialTransform->GetNameOfClass();
+	const char *initialTransformName = initialTransform->GetNameOfClass();
 
 	if ( !strcmp( initialTransformName, "AffineTransform" ) and transform.BSPLINEDEFORMABLETRANSFORM ) {
-		m_BSplineTransform->SetBulkTransform( dynamic_cast<AffineTransformType*>( initialTransform ) );
+		m_BSplineTransform->SetBulkTransform( dynamic_cast<AffineTransformType *>( initialTransform ) );
 	}
 
 	if ( !strcmp( initialTransformName, "VersorRigid3DTransform" ) and transform.BSPLINEDEFORMABLETRANSFORM ) {
-		m_BSplineTransform->SetBulkTransform( dynamic_cast<VersorRigid3DTransformType*> ( initialTransform ) );
+		m_BSplineTransform->SetBulkTransform( dynamic_cast<VersorRigid3DTransformType *> ( initialTransform ) );
 	}
 
 	if ( !strcmp( initialTransformName, "CenteredAffineTransform" ) and transform.BSPLINEDEFORMABLETRANSFORM ) {
-		m_BSplineTransform->SetBulkTransform( dynamic_cast<CenteredAffineTransformType*> ( initialTransform ) );
+		m_BSplineTransform->SetBulkTransform( dynamic_cast<CenteredAffineTransformType *> ( initialTransform ) );
 	}
 
 	if ( !strcmp( initialTransformName, "VersorRigid3DTransform" ) and transform.CENTEREDAFFINE ) {
 		m_CenteredAffineTransform->SetTranslation(
-			( static_cast<VersorRigid3DTransformType*> ( initialTransform )->GetTranslation() ) );
-		m_CenteredAffineTransform->SetMatrix( ( static_cast<VersorRigid3DTransformType*> ( initialTransform )->GetMatrix() ) );
+			( static_cast<VersorRigid3DTransformType *> ( initialTransform )->GetTranslation() ) );
+		m_CenteredAffineTransform->SetMatrix( ( static_cast<VersorRigid3DTransformType *> ( initialTransform )->GetMatrix() ) );
 		m_RegistrationObject->SetInitialTransformParameters( m_CenteredAffineTransform->GetParameters() );
 	}
 
 	if ( !strcmp( initialTransformName, "VersorRigid3DTransform" ) and transform.AFFINE ) {
 		m_AffineTransform->SetTranslation(
-			( static_cast<VersorRigid3DTransformType*> ( initialTransform )->GetTranslation() ) );
-		m_AffineTransform->SetMatrix( ( static_cast<VersorRigid3DTransformType*> ( initialTransform )->GetMatrix() ) );
+			( static_cast<VersorRigid3DTransformType *> ( initialTransform )->GetTranslation() ) );
+		m_AffineTransform->SetMatrix( ( static_cast<VersorRigid3DTransformType *> ( initialTransform )->GetMatrix() ) );
 		m_RegistrationObject->SetInitialTransformParameters( m_AffineTransform->GetParameters() );
 	}
 
 	if ( !strcmp( initialTransformName, "VersorRigid3DTransform" ) and transform.VERSORRIGID ) {
 		m_VersorRigid3DTransform->SetTranslation(
-			( static_cast<VersorRigid3DTransformType*> ( initialTransform )->GetTranslation() ) );
-		m_VersorRigid3DTransform->SetMatrix( ( static_cast<VersorRigid3DTransformType*> ( initialTransform )->GetMatrix() ) );
+			( static_cast<VersorRigid3DTransformType *> ( initialTransform )->GetTranslation() ) );
+		m_VersorRigid3DTransform->SetMatrix( ( static_cast<VersorRigid3DTransformType *> ( initialTransform )->GetMatrix() ) );
 		m_RegistrationObject->SetInitialTransformParameters( m_VersorRigid3DTransform->GetParameters() );
 	}
 
 	if ( !strcmp( initialTransformName, "VersorRigid3DTransform" ) and transform.SCALE ) {
 		m_ScaleSkewTransform->SetTranslation(
-			( static_cast<VersorRigid3DTransformType*> ( initialTransform )->GetTranslation() ) );
-//              m_ScaleSkewTransform->SetMatrix((static_cast<VersorRigid3DTransformType*> (initialTransform)->GetMatrix()));
+			( static_cast<VersorRigid3DTransformType *> ( initialTransform )->GetTranslation() ) );
+		//              m_ScaleSkewTransform->SetMatrix((static_cast<VersorRigid3DTransformType*> (initialTransform)->GetMatrix()));
 		m_RegistrationObject->SetInitialTransformParameters( m_VersorRigid3DTransform->GetParameters() );
 	}
 }
@@ -839,7 +839,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::StartRegistration
 
 	try {
 		m_RegistrationObject->StartRegistration();
-	} catch ( itk::ExceptionObject & err ) {
+	} catch ( itk::ExceptionObject &err ) {
 		std::cerr << "isRegistrationFactory3D: Exception caught: " << std::endl << err << std::endl;
 	}
 

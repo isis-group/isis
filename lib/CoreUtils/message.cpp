@@ -24,7 +24,7 @@ namespace util
 {
 namespace _internal
 {
-const char* LogLevelNames[] = {"no_log", "error", "warning", "info", "verbose"};
+const char *LogLevelNames[] = {"no_log", "error", "warning", "info", "verbose"};
 
 void MessageHandlerBase::stopBelow( LogLevel stop )
 {

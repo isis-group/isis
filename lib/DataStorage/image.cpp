@@ -25,7 +25,7 @@ namespace data
 namespace _internal
 {
 
-bool image_chunk_order::operator() ( const data::Chunk& a, const data::Chunk& b )const
+bool image_chunk_order::operator() ( const data::Chunk &a, const data::Chunk &b )const
 {
 	//@todo exception ??
 	LOG_IF( not a.hasProperty( "indexOrigin" ), Debug, error )
@@ -171,8 +171,8 @@ bool Image::reIndex()
 		for ( ChunkSet::iterator it = set.begin(); it != set.end(); it++, idx++ ) {
 			const size_t i = idx % timesteps;
 			const size_t j = idx / timesteps;
-			lookup[i*chunksets+j] = it;
-			LOG( Debug, verbose_info ) << "Putting " << idx << " at " << i*chunksets + j;;
+			lookup[i *chunksets+j] = it;
+			LOG( Debug, verbose_info ) << "Putting " << idx << " at " << i *chunksets + j;;
 		}
 	} else {
 		size_t idx = 0;
@@ -375,18 +375,18 @@ bool Image::reIndex()
 	return true;
 }
 
-const Chunk& Image::getChunkAt( size_t at )const
+const Chunk &Image::getChunkAt( size_t at )const
 {
 	return *( lookup[at] );
 }
-Chunk& Image::getChunkAt( size_t at )
+Chunk &Image::getChunkAt( size_t at )
 {
 	//@todo we must cast away the const here because std::set has no non-const iterators
-	Chunk &ret = const_cast<Chunk&>( *( lookup[at] ) );
+	Chunk &ret = const_cast<Chunk &>( *( lookup[at] ) );
 	return ret;
 }
 
-Chunk& Image::getChunk ( size_t first, size_t second, size_t third, size_t fourth )
+Chunk &Image::getChunk ( size_t first, size_t second, size_t third, size_t fourth )
 {
 	if ( not clean ) {
 		LOG( Debug, info )
@@ -399,7 +399,7 @@ Chunk& Image::getChunk ( size_t first, size_t second, size_t third, size_t fourt
 	return getChunkAt( index );
 }
 
-const Chunk& Image::getChunk ( size_t first, size_t second, size_t third, size_t fourth ) const
+const Chunk &Image::getChunk ( size_t first, size_t second, size_t third, size_t fourth ) const
 {
 	const size_t index = commonGet( first, second, third, fourth ).first;
 	return getChunkAt( index );
@@ -465,7 +465,7 @@ size_t Image::getChunkStride ( size_t base_stride )
 	return ret;
 }
 
-std::list<util::PropMap::mapped_type> Image::getChunksProperties( const util::PropMap::key_type& key, bool unique )const
+std::list<util::PropMap::mapped_type> Image::getChunksProperties( const util::PropMap::key_type &key, bool unique )const
 {
 	std::list<util::PropertyValue > ret;
 
@@ -534,14 +534,14 @@ ImageList::ImageList( ChunkList src )
 	}
 }
 
-void Image::getMinMax ( util::_internal::TypeBase& min, util::_internal::TypeBase& max, bool init ) const
+void Image::getMinMax ( util::_internal::TypeBase &min, util::_internal::TypeBase &max, bool init ) const
 {
 	BOOST_FOREACH( const Chunk & ch, set ) {
 		ch.getMinMax( min, max, init );
 		init = false;
 	}
 }
-size_t Image::cmp( const isis::data::Image& comp ) const
+size_t Image::cmp( const isis::data::Image &comp ) const
 {
 	size_t ret = 0;
 	LOG_IF( not ( clean and comp.clean ), Debug, error )

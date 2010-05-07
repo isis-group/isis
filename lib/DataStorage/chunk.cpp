@@ -59,7 +59,7 @@ Chunk Chunk::cloneToMem( size_t firstDim, size_t secondDim, size_t thirdDim, siz
 Chunk Chunk::copyToMem()const
 {
 	Chunk ret( *this );
-	static_cast<util::_internal::TypePtrBase::Reference&>( ret ) = get()->copyToMem();
+	static_cast<util::_internal::TypePtrBase::Reference &>( ret ) = get()->copyToMem();
 	return ret;
 }
 size_t Chunk::bytes_per_voxel()const
@@ -75,14 +75,14 @@ unsigned short Chunk::typeID()const
 	return get()->typeID();
 }
 
-void Chunk::copyLine( size_t secondDimS, size_t thirdDimS, size_t fourthDimS, Chunk& dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD ) const
+void Chunk::copyLine( size_t secondDimS, size_t thirdDimS, size_t fourthDimS, Chunk &dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD ) const
 {
 	const size_t idx1[] = {0, secondDimS, thirdDimS, fourthDimS};
 	const size_t idx2[] = {0, secondDimD, thirdDimD, fourthDimD};
 	const size_t idx3[] = {sizeToVector()[0] - 1, secondDimD, thirdDimD, fourthDimD};
 	copyRange( idx1, idx2, dst, idx3 );
 }
-void Chunk::copySlice( size_t thirdDimS, size_t fourthDimS, Chunk& dst, size_t thirdDimD, size_t fourthDimD ) const
+void Chunk::copySlice( size_t thirdDimS, size_t fourthDimS, Chunk &dst, size_t thirdDimD, size_t fourthDimD ) const
 {
 	const size_t idx1[] = {0, 0, thirdDimS, fourthDimS};
 	const size_t idx2[] = {0, 0, thirdDimD, fourthDimD};
@@ -90,7 +90,7 @@ void Chunk::copySlice( size_t thirdDimS, size_t fourthDimS, Chunk& dst, size_t t
 	copyRange( idx1, idx2, dst, idx3 );
 }
 
-void Chunk::copyRange( const size_t source_start[], const size_t source_end[], Chunk& dst, const size_t destination[] ) const
+void Chunk::copyRange( const size_t source_start[], const size_t source_end[], Chunk &dst, const size_t destination[] ) const
 {
 	LOG_IF( not rangeCheck( source_start ), Debug, isis::error )
 			<< "Copy start " << util::FixedVector<size_t, 4>( source_start )
@@ -110,11 +110,11 @@ void Chunk::copyRange( const size_t source_start[], const size_t source_end[], C
 	get()->copyRange( sstart, send, *dst, dstart );
 }
 
-size_t Chunk::cmpRange( size_t start, size_t end, const isis::data::Chunk& dst, size_t destination ) const
+size_t Chunk::cmpRange( size_t start, size_t end, const isis::data::Chunk &dst, size_t destination ) const
 {
 	return get()->cmp( start, end, *dst, destination );
 }
-size_t Chunk::cmpRange( const size_t source_start[], const size_t source_end[], const Chunk& dst, const size_t destination[] ) const
+size_t Chunk::cmpRange( const size_t source_start[], const size_t source_end[], const Chunk &dst, const size_t destination[] ) const
 {
 	LOG_IF( not rangeCheck( source_start ), Debug, isis::error )
 			<< "memcmp start " << util::FixedVector<size_t, 4>( source_start )
@@ -133,28 +133,28 @@ size_t Chunk::cmpRange( const size_t source_start[], const size_t source_end[], 
 	const size_t dstart = dst.dim2Index( destination );
 	return cmpRange( sstart, send, dst, dstart );
 }
-size_t Chunk::cmpLine( size_t secondDimS, size_t thirdDimS, size_t fourthDimS, const Chunk& dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD ) const
+size_t Chunk::cmpLine( size_t secondDimS, size_t thirdDimS, size_t fourthDimS, const Chunk &dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD ) const
 {
 	const size_t idx1[] = {0, secondDimS, thirdDimS, fourthDimS};
 	const size_t idx2[] = {0, secondDimD, thirdDimD, fourthDimD};
 	const size_t idx3[] = {sizeToVector()[0] - 1, secondDimD, thirdDimD, fourthDimD};
 	return cmpRange( idx1, idx2, dst, idx3 );
 }
-size_t Chunk::cmpSlice( size_t thirdDimS, size_t fourthDimS, const Chunk& dst, size_t thirdDimD, size_t fourthDimD ) const
+size_t Chunk::cmpSlice( size_t thirdDimS, size_t fourthDimS, const Chunk &dst, size_t thirdDimD, size_t fourthDimD ) const
 {
 	const size_t idx1[] = {0, 0, thirdDimS, fourthDimS};
 	const size_t idx2[] = {0, 0, thirdDimD, fourthDimD};
 	const size_t idx3[] = {sizeToVector()[0] - 1, sizeToVector()[1] - 1, thirdDimD, fourthDimD};
 	return cmpRange( idx1, idx2, dst, idx3 );
 }
-void Chunk::getMinMax ( util::_internal::TypeBase& min, util::_internal::TypeBase& max, bool init ) const
+void Chunk::getMinMax ( util::_internal::TypeBase &min, util::_internal::TypeBase &max, bool init ) const
 {
 	return operator*().getMinMax( min, max, init );
 }
-Chunk& Chunk::operator=( const isis::data::Chunk& ref )
+Chunk &Chunk::operator=( const isis::data::Chunk &ref )
 {
-	_internal::ChunkBase::operator=( static_cast<const _internal::ChunkBase&>( ref ) ); //copy the metadate of ref
-	util::_internal::TypePtrBase::Reference::operator=( static_cast<const util::_internal::TypePtrBase::Reference&>( ref ) ); // copy the reference of ref's data
+	_internal::ChunkBase::operator=( static_cast<const _internal::ChunkBase &>( ref ) ); //copy the metadate of ref
+	util::_internal::TypePtrBase::Reference::operator=( static_cast<const util::_internal::TypePtrBase::Reference &>( ref ) ); // copy the reference of ref's data
 	return *this;
 }
 

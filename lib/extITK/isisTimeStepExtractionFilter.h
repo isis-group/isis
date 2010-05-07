@@ -80,7 +80,7 @@ protected:
 
 
 private:
-	TimeStepExtractionFilter( const Self& );
+	TimeStepExtractionFilter( const Self & );
 
 	typename InputImageType::Pointer m_InputImage;
 	typename OutputImageType::Pointer m_OutputImage;

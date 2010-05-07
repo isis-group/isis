@@ -90,7 +90,7 @@ public:
 
 private:
 
-	STDEVMaskFilter( const Self& );
+	STDEVMaskFilter( const Self & );
 
 	void SetOutputParameters( void );
 

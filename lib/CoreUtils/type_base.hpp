@@ -41,11 +41,11 @@ template<typename TYPE> class TypePtr;
 /// @cond _hidden
 namespace _internal
 {
-template<typename TYPE, typename T> TYPE __cast_to( Type<TYPE> *dest, const T& value )
+template<typename TYPE, typename T> TYPE __cast_to( Type<TYPE> *dest, const T &value )
 {
 	return boost::lexical_cast<TYPE>( value );
 }
-template<typename TYPE> TYPE __cast_to( Type<TYPE> *dest, const TYPE& value )
+template<typename TYPE> TYPE __cast_to( Type<TYPE> *dest, const TYPE &value )
 {
 	return value;
 }
@@ -55,11 +55,11 @@ template<typename TYPE> TYPE __cast_to( Type<TYPE> *dest, const TYPE& value )
 class GenericType
 {
 protected:
-	template<typename T> T& m_cast_to() throw( std::invalid_argument ) {
+	template<typename T> T &m_cast_to() throw( std::invalid_argument ) {
 		if ( typeID() == T::staticID ) { // ok its exactly the same type - no fiddling necessary
-			return *reinterpret_cast<T*>( this );
+			return *reinterpret_cast<T *>( this );
 		} else {
-			T* const ret = dynamic_cast<T* >( this ); //@todo have a look at http://lists.apple.com/archives/Xcode-users/2005/Dec/msg00061.html and http://www.mailinglistarchive.com/xcode-users@lists.apple.com/msg15790.html
+			T *const ret = dynamic_cast<T * >( this ); //@todo have a look at http://lists.apple.com/archives/Xcode-users/2005/Dec/msg00061.html and http://www.mailinglistarchive.com/xcode-users@lists.apple.com/msg15790.html
 
 			if ( ret == NULL ) {
 				std::stringstream msg;
@@ -70,11 +70,11 @@ protected:
 			return *ret;
 		}
 	}
-	template<typename T> const T& m_cast_to()const throw( std::invalid_argument ) {
+	template<typename T> const T &m_cast_to()const throw( std::invalid_argument ) {
 		if ( typeID() == T::staticID ) { // ok its exactly the same type - no fiddling necessary
-			return *reinterpret_cast<const T*>( this );
+			return *reinterpret_cast<const T *>( this );
 		} else {
-			const T* const ret = dynamic_cast<const T* >( this ); //@todo have a look at http://lists.apple.com/archives/Xcode-users/2005/Dec/msg00061.html and http://www.mailinglistarchive.com/xcode-users@lists.apple.com/msg15790.html
+			const T *const ret = dynamic_cast<const T * >( this ); //@todo have a look at http://lists.apple.com/archives/Xcode-users/2005/Dec/msg00061.html and http://www.mailinglistarchive.com/xcode-users@lists.apple.com/msg15790.html
 
 			if ( ret == NULL ) {
 				std::stringstream msg;
@@ -89,7 +89,7 @@ protected:
 public:
 	/// \returns true if the stored value is of type T.
 	template<typename T> bool is()const {return is( typeid( T ) );}
-	virtual bool is( const std::type_info & t )const = 0;
+	virtual bool is( const std::type_info &t )const = 0;
 
 	/// \returns the value represented as text.
 	virtual std::string toString( bool labeled = false )const = 0;
@@ -122,8 +122,8 @@ protected:
 	TypeReference( TYPE_TYPE *t ): boost::scoped_ptr<TYPE_TYPE>( t ) {}
 public:
 	///reexport parts of scoped_ptr's interface
-	TYPE_TYPE* operator->() const {return boost::scoped_ptr<TYPE_TYPE>::operator->();}
-	TYPE_TYPE& operator*() const {return boost::scoped_ptr<TYPE_TYPE>::operator*();}
+	TYPE_TYPE *operator->() const {return boost::scoped_ptr<TYPE_TYPE>::operator->();}
+	TYPE_TYPE &operator*() const {return boost::scoped_ptr<TYPE_TYPE>::operator*();}
 	///Default contructor. Creates an empty reference
 	TypeReference() {}
 	/**
@@ -168,7 +168,7 @@ public:
 
 class TypeBase : public GenericType
 {
-	static const TypeConverterMap& converters();
+	static const TypeConverterMap &converters();
 	friend class TypeReference<TypeBase>;
 protected:
 	/**
@@ -177,12 +177,12 @@ protected:
 	* Makes TypeBase-pointers copyable without knowing their type.
 	* \returns a TypeBase-pointer to a newly created Type/TypePtr.
 	*/
-	virtual TypeBase* clone()const = 0;
+	virtual TypeBase *clone()const = 0;
 public:
 	typedef TypeReference<TypeBase> Reference;
 	typedef TypeConverterMap::mapped_type::mapped_type Converter;
 
-	const Converter& getConverterTo( unsigned short id )const;
+	const Converter &getConverterTo( unsigned short id )const;
 	static bool convert( const TypeBase &from, TypeBase &to );
 	/**
 	* Interpret the value as value of any (other) type.
@@ -242,18 +242,18 @@ public:
 class TypePtrBase : public GenericType
 {
 	friend class TypeReference<TypePtrBase>;
-	static const TypePtrConverterMap& converters();
+	static const TypePtrConverterMap &converters();
 protected:
 	size_t m_len;
 	TypePtrBase( size_t len = 0 );
 	virtual const boost::weak_ptr<void> address()const = 0;
 	/// Create a TypePtr of the same type pointing at the same address.
-	virtual TypePtrBase* clone()const = 0;
+	virtual TypePtrBase *clone()const = 0;
 public:
 	typedef TypeReference<TypePtrBase> Reference;
 	typedef TypePtrConverterMap::mapped_type::mapped_type Converter;
 
-	const Converter& getConverterTo( unsigned short id )const;
+	const Converter &getConverterTo( unsigned short id )const;
 	/**
 	* Dynamically cast the TypeBase up to its actual TypePtr\<T\>. Constant version.
 	* Will throw std::bad_cast if T is not the actual type.
@@ -290,8 +290,8 @@ public:
 	TypePtrBase::Reference copyToMem()const;
 
 	/// Copy (or Convert) data from this to another TypePtr of maybe another type and the same length.
-	virtual bool convertTo( TypePtrBase& dst )const = 0;
-	bool convertTo( TypePtrBase& dst, const TypeBase& min, const TypeBase& max )const;
+	virtual bool convertTo( TypePtrBase &dst )const = 0;
+	bool convertTo( TypePtrBase &dst, const TypeBase &min, const TypeBase &max )const;
 
 	/// Copy (or Convert) data from this to memory of maybe another type and the given length.
 	template<typename T> bool convertTo( T *dst, size_t len ) const {
@@ -307,7 +307,7 @@ public:
 	 * \returns a the newly created TypePtr
 	 */
 	template<typename T> const TypePtr<T> copyToNew()const {
-		TypePtr<T> ret( ( T* )malloc( sizeof( T )*len() ), len() );
+		TypePtr<T> ret( ( T * )malloc( sizeof( T )*len() ), len() );
 		convertTo( ret );
 		return ret;
 	}
@@ -319,7 +319,7 @@ public:
 	 * \returns a the newly created TypePtr
 	 */
 	template<typename T> const TypePtr<T> copyToNew( const TypeBase &min, const TypeBase &max )const {
-		TypePtr<T> ret( ( T* )malloc( sizeof( T )*len() ), len() );
+		TypePtr<T> ret( ( T * )malloc( sizeof( T )*len() ), len() );
 		convertTo( ret, min, max );
 		return ret;
 	}
@@ -341,7 +341,7 @@ public:
 
 	virtual void getMinMax( TypeBase &min, TypeBase &max, bool init = true )const = 0;
 	virtual size_t cmp( size_t start, size_t end, const TypePtrBase &dst, size_t dst_start )const = 0;
-	size_t cmp( const TypePtrBase& comp )const;
+	size_t cmp( const TypePtrBase &comp )const;
 };
 
 }

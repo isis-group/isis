@@ -32,9 +32,9 @@ namespace _internal
 class ChunkBase : public NDimensional<4>, public util::PropMap
 {
 protected:
-	static const char* needed;
+	static const char *needed;
 public:
-//  static const dimensions dimension[n_dims]={readDim,phaseDim,sliceDim,timeDim};
+	//  static const dimensions dimension[n_dims]={readDim,phaseDim,sliceDim,timeDim};
 	typedef isis::util::_internal::TypeReference <ChunkBase > Reference;
 
 	ChunkBase( size_t firstDim, size_t secondDim, size_t thirdDim, size_t fourthDim );
@@ -59,7 +59,7 @@ protected:
 	 * \param thirdDim size in the third dimension (usually slice-encoded dim)
 	 * \param fourthDim size in the fourth dimension
 	 */
-	template<typename TYPE, typename D> Chunk( TYPE* src, D d, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 ):
+	template<typename TYPE, typename D> Chunk( TYPE *src, D d, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 ):
 		_internal::ChunkBase( firstDim, secondDim, thirdDim, fourthDim ),
 		util::_internal::TypeReference<util::_internal::TypePtrBase>( new util::TypePtr<TYPE>( src, volume(), d ) ) {}
 	Chunk( const util::_internal::TypePtrBase::Reference &src, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 );
@@ -94,10 +94,10 @@ public:
 
 		return ret[dim2Index( idx )];
 	}
-	util::_internal::TypePtrBase& asTypePtrBase() {
+	util::_internal::TypePtrBase &asTypePtrBase() {
 		return operator*();
 	}
-	const util::_internal::TypePtrBase& getTypePtrBase()const {
+	const util::_internal::TypePtrBase &getTypePtrBase()const {
 		return operator*();
 	}
 	template<typename TYPE> util::TypePtr<TYPE> &asTypePtr() {
@@ -112,21 +112,21 @@ public:
 	std::string typeName()const;
 	unsigned short typeID()const;
 
-	void copyRange( const size_t source_start[], const size_t source_end[], Chunk& dst, const size_t destination[] )const;
-	void copyLine( size_t secondDimS, size_t thirdDimS, size_t fourthDimS, Chunk& dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD )const;
-	void copySlice( size_t thirdDimS, size_t fourthDimS, isis::data::Chunk& dst, size_t thirdDimD, size_t fourthDimD )const;
+	void copyRange( const size_t source_start[], const size_t source_end[], Chunk &dst, const size_t destination[] )const;
+	void copyLine( size_t secondDimS, size_t thirdDimS, size_t fourthDimS, Chunk &dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD )const;
+	void copySlice( size_t thirdDimS, size_t fourthDimS, isis::data::Chunk &dst, size_t thirdDimD, size_t fourthDimD )const;
 
-	size_t cmpRange( size_t start, size_t end, const Chunk& dst, size_t destination )const;
-	size_t cmpRange( const size_t source_start[], const size_t source_end[], const Chunk& dst, const size_t destination[] )const;
-	size_t cmpLine( size_t secondDimS, size_t thirdDimS, size_t fourthDimS, const Chunk& dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD )const;
-	size_t cmpSlice( size_t thirdDimS, size_t fourthDimS, const Chunk& dst, size_t thirdDimD, size_t fourthDimD )const;
+	size_t cmpRange( size_t start, size_t end, const Chunk &dst, size_t destination )const;
+	size_t cmpRange( const size_t source_start[], const size_t source_end[], const Chunk &dst, const size_t destination[] )const;
+	size_t cmpLine( size_t secondDimS, size_t thirdDimS, size_t fourthDimS, const Chunk &dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD )const;
+	size_t cmpSlice( size_t thirdDimS, size_t fourthDimS, const Chunk &dst, size_t thirdDimD, size_t fourthDimD )const;
 
 	void getMinMax( util::_internal::TypeBase &min, util::_internal::TypeBase &max, bool init = true )const;
 	template<typename T> void convertTo( T *dst, size_t len )const {
 		getTypePtrBase().convertTo( dst );
 	}
 
-	Chunk &operator=( const Chunk&ref );
+	Chunk &operator=( const Chunk &ref );
 };
 
 /// @cond _internal
@@ -134,7 +134,7 @@ namespace _internal
 {
 
 struct chunk_comparison : public std::binary_function< Chunk, Chunk, bool> {
-	virtual bool operator() ( const Chunk& a, const Chunk& b )const = 0;
+	virtual bool operator() ( const Chunk &a, const Chunk &b )const = 0;
 	virtual ~chunk_comparison() {}
 };
 }
@@ -149,14 +149,14 @@ public:
 	/// Create an empty MemChunk with the given size
 	MemChunk( size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 ):
 		Chunk(
-			( TYPE* )calloc( fourthDim*thirdDim*secondDim*firstDim, sizeof( TYPE ) ),
+			( TYPE * )calloc( fourthDim *thirdDim *secondDim *firstDim, sizeof( TYPE ) ),
 			typename util::TypePtr<TYPE>::BasicDeleter(),
 			firstDim, secondDim, thirdDim, fourthDim
 		) {}
 	/// Create a MemChunk as copy of a given raw memory block (no range check will be done)
-	MemChunk( const TYPE*const org, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 ):
+	MemChunk( const TYPE *const org, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 ):
 		Chunk(
-			( TYPE* )malloc( sizeof( TYPE )*fourthDim*thirdDim*secondDim*firstDim ),
+			( TYPE * )malloc( sizeof( TYPE )*fourthDim *thirdDim *secondDim *firstDim ),
 			typename util::TypePtr<TYPE>::BasicDeleter(),
 			firstDim, secondDim, thirdDim, fourthDim
 		) {
@@ -168,7 +168,7 @@ public:
 	}
 	/// Create a deep copy of a given Chunk (automatic conversion with min/max will be used if datatype does not fit)
 	MemChunk( const Chunk &ref, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max ): Chunk( ref ) {
-		_internal::ChunkBase::operator=( static_cast<const _internal::ChunkBase&>( ref ) ); //copy the metadate of ref
+		_internal::ChunkBase::operator=( static_cast<const _internal::ChunkBase &>( ref ) ); //copy the metadate of ref
 		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
 		util::_internal::TypePtrBase::Reference::reset( new util::TypePtr<TYPE>( ref.getTypePtrBase().copyToNew<TYPE>( min, max ) ) );
 	}
@@ -177,15 +177,15 @@ public:
 		operator=( ref );
 	}
 	MemChunk &operator=( const MemChunk<TYPE> &ref ) {
-		_internal::ChunkBase::operator=( static_cast<const _internal::ChunkBase&>( ref ) ); //copy the metadate of ref
+		_internal::ChunkBase::operator=( static_cast<const _internal::ChunkBase &>( ref ) ); //copy the metadate of ref
 		//get rid of my TypePtr and make a new copying the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
 		util::_internal::TypePtrBase::Reference::reset( new util::TypePtr<TYPE>(
-					static_cast<const Chunk&>( ref ).getTypePtrBase().copyToMem()->cast_to_TypePtr<TYPE>()
+					static_cast<const Chunk &>( ref ).getTypePtrBase().copyToMem()->cast_to_TypePtr<TYPE>()
 				) );
 		return *this;
 	}
 	MemChunk &operator=( const Chunk &ref ) {
-		_internal::ChunkBase::operator=( static_cast<const _internal::ChunkBase&>( ref ) ); //copy the metadate of ref
+		_internal::ChunkBase::operator=( static_cast<const _internal::ChunkBase &>( ref ) ); //copy the metadate of ref
 		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
 		util::_internal::TypePtrBase::Reference::reset( new util::TypePtr<TYPE>( ref.getTypePtrBase().copyToNew<TYPE>() ) );
 		return *this;

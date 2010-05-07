@@ -153,7 +153,7 @@ options[] = {
 
 // This is the main function
 int main(
-	int argc, char* argv[] )
+	int argc, char *argv[] )
 {
 	// show revision information string constant
 	std::cout << "Revision: " << _SVN_REVISION << std::endl;
@@ -198,8 +198,8 @@ int main(
 	typedef itk::LandmarkBasedTransformInitializer<VersorRigid3DTransformType, FixedImageType, MovingImageType>
 	LandmarkBasedTransformInitializerType;
 	typedef itk::ImageFileWriter<DeformationFieldType> VectorWriterType;
-	const itk::TransformBase* tmpConstTransformPointer;
-	typedef itk::TransformBase* TransformBasePointerType;
+	const itk::TransformBase *tmpConstTransformPointer;
+	typedef itk::TransformBase *TransformBasePointerType;
 	typedef itk::MedianImageFilter<FixedImageType, FixedImageType> FixedFilterType;
 	typedef itk::MedianImageFilter<MovingImageType, MovingImageType> MovingFilterType;
 	typedef itk::RecursiveGaussianImageFilter<FixedImageType, FixedImageType> GaussianFilterType;
@@ -290,47 +290,47 @@ int main(
 	for ( int counter = 0; counter < repetition; counter++ ) {
 		//transform is the master for determining the number of repetitions
 		if ( transformType.number ) {
-			transform = ( ( VShort* ) transformType.vector )[counter];
+			transform = ( ( VShort * ) transformType.vector )[counter];
 		} else {
 			transform = 0;
 		}
 
 		if ( ( counter + 1 ) <= optimizerType.number and optimizerType.number ) {
-			optimizer = ( ( VShort* ) optimizerType.vector )[counter];
+			optimizer = ( ( VShort * ) optimizerType.vector )[counter];
 		} else if ( ( counter + 1 ) > optimizerType.number and optimizerType.number ) {
-			optimizer = ( ( VShort* ) optimizerType.vector )[optimizerType.number-1];
+			optimizer = ( ( VShort * ) optimizerType.vector )[optimizerType.number-1];
 		} else {
 			optimizer = 0;
 		}
 
 		if ( ( counter + 1 ) <= metricType.number and metricType.number ) {
-			metric = ( ( VShort* ) metricType.vector )[counter];
+			metric = ( ( VShort * ) metricType.vector )[counter];
 		} else if ( ( counter + 1 ) > metricType.number and metricType.number ) {
-			metric = ( ( VShort* ) metricType.vector )[metricType.number-1];
+			metric = ( ( VShort * ) metricType.vector )[metricType.number-1];
 		} else {
 			metric = 0;
 		}
 
 		if ( ( counter + 1 ) <= interpolatorType.number and interpolatorType.number ) {
-			interpolator = ( ( VShort* ) interpolatorType.vector )[counter];
+			interpolator = ( ( VShort * ) interpolatorType.vector )[counter];
 		} else if ( ( counter + 1 ) > interpolatorType.number and interpolatorType.number ) {
-			interpolator = ( ( VShort* ) interpolatorType.vector )[interpolatorType.number-1];
+			interpolator = ( ( VShort * ) interpolatorType.vector )[interpolatorType.number-1];
 		} else {
 			interpolator = 0;
 		}
 
 		if ( ( counter + 1 ) <= number_of_iterations.number and number_of_iterations.number ) {
-			niteration = ( ( VShort* ) number_of_iterations.vector )[counter];
+			niteration = ( ( VShort * ) number_of_iterations.vector )[counter];
 		} else if ( ( counter + 1 ) > number_of_iterations.number and number_of_iterations.number ) {
-			niteration = ( ( VShort* ) number_of_iterations.vector )[number_of_iterations.number-1];
+			niteration = ( ( VShort * ) number_of_iterations.vector )[number_of_iterations.number-1];
 		} else {
 			niteration = 500;
 		}
 
 		if ( ( bsplineCounter + 1 ) <= grid_size.number and grid_size.number ) {
-			gridSize = ( ( VShort* ) grid_size.vector )[bsplineCounter];
+			gridSize = ( ( VShort * ) grid_size.vector )[bsplineCounter];
 		} else if ( ( bsplineCounter + 1 ) > grid_size.number and grid_size.number ) {
-			gridSize = ( ( VShort* ) grid_size.vector )[grid_size.number-1];
+			gridSize = ( ( VShort * ) grid_size.vector )[grid_size.number-1];
 		} else {
 			gridSize = 5;
 		}

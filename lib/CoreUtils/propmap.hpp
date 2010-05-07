@@ -93,13 +93,13 @@ private:
 	// internal tool-backends
 	/////////////////////////////////////////////////////////////////////////////////////////
 	/// internal recursion-function for join
-	void joinTree( const isis::util::PropMap& other, bool overwrite, std::string prefix, PropMap::key_list &rejects );
+	void joinTree( const isis::util::PropMap &other, bool overwrite, std::string prefix, PropMap::key_list &rejects );
 	/// internal recursion-function for diff
-	void diffTree( const PropMap& other, PropMap::diff_map &ret, std::string prefix ) const;
+	void diffTree( const PropMap &other, PropMap::diff_map &ret, std::string prefix ) const;
 	/// internal helper for operator[]
-	static PropertyValue& fetchProperty( util::PropMap &root, const propPathIterator at, const propPathIterator pathEnd );
+	static PropertyValue &fetchProperty( util::PropMap &root, const propPathIterator at, const propPathIterator pathEnd );
 	/// internal helper for findPropVal
-	static const PropertyValue* searchBranch( const util::PropMap &root, const propPathIterator at, const propPathIterator pathEnd );
+	static const PropertyValue *searchBranch( const util::PropMap &root, const propPathIterator at, const propPathIterator pathEnd );
 	/// internal recursion-function for remove
 	bool recursiveRemove( util::PropMap &root, const propPathIterator at, const propPathIterator pathEnd );
 protected:
@@ -111,7 +111,7 @@ protected:
 	 * \param key the "path" to the property
 	 * \returns a pointer to the PropertyValue, NULL if the property was not found
 	 */
-	const PropertyValue* findPropVal( const std::string &key )const;
+	const PropertyValue *findPropVal( const std::string &key )const;
 	/// create a list of keys for every entry for which the given scalar predicate is true.
 	template<class Predicate> const key_list genKeyList()const {
 		key_list k;
@@ -125,7 +125,7 @@ protected:
 	*/
 	void addNeededFromString( const std::string &needed );
 	/// \returns true if a given property exists (also if its empty)
-	bool exists( const std::string& key )const;
+	bool exists( const std::string &key )const;
 public:
 	/////////////////////////////////////////////////////////////////////////////////////////
 	// constructors
@@ -143,11 +143,11 @@ public:
 	* \param key the "path" to the property
 	* \returns a reference to the PropertyValue
 	*/
-	PropertyValue& operator[]( const std::string& key );
+	PropertyValue &operator[]( const std::string &key );
 	/// remove the property adressed by the key
-	bool remove( const std::string& key );
+	bool remove( const std::string &key );
 	/// remove every property which is also in the given map (regardless of the value)
-	bool remove( const isis::util::PropMap& removeMap );
+	bool remove( const isis::util::PropMap &removeMap );
 	/**
 	* Adds a property as needed.
 	* If the given property allready exists, it is just flagged as needed.
@@ -189,13 +189,13 @@ public:
 	 */
 	diff_map diff( const PropMap &second )const;
 	/// Remove everything that is also in second and equal.
-	void make_unique( const isis::util::PropMap& other, bool removeNeeded = false );
+	void make_unique( const isis::util::PropMap &other, bool removeNeeded = false );
 	/**
 	* Add Properties from another PropMap.
 	* \param other the other PropMap
 	* \param overwrite if existing properties shall be replaced
 	*/
-	PropMap::key_list join( const isis::util::PropMap& other, bool overwrite = false );
+	PropMap::key_list join( const isis::util::PropMap &other, bool overwrite = false );
 
 	/**
 	* Get common and unique properties from the map.
@@ -209,7 +209,7 @@ public:
 	* \param uniques reference of the unique-map
 	* \param init if initialisation shall be done instead of normal seperation
 	*/
-	void toCommonUnique( PropMap& common, std::set<std::string> &uniques, bool init )const;
+	void toCommonUnique( PropMap &common, std::set<std::string> &uniques, bool init )const;
 
 	///copy the tree into a flat key/property-map
 	void linearize( base_type &out, std::string key_prefix = "" )const;
@@ -249,9 +249,9 @@ public:
 	* \param key the name of the property to be set
 	* \param val the value the property should be set to
 	*/
-	PropertyValue& setPropertyValue( const std::string &key, const PropertyValue &val );
+	PropertyValue &setPropertyValue( const std::string &key, const PropertyValue &val );
 	//@todo make shure the type specific behaviour is as documented
-	template<typename T> T& setProperty( const std::string &key, const T &val ) {
+	template<typename T> T &setProperty( const std::string &key, const T &val ) {
 		PropertyValue &ret = operator[]( key ) = val;
 		return ret->cast_to_Type<T>();
 	}
@@ -293,7 +293,7 @@ public:
 	 * \param out the output stream to use
 	 * \param label print the type of the property (see Type::toString())
 	 */
-	std::ostream& print( std::ostream& out, bool label = false )const;
+	std::ostream &print( std::ostream &out, bool label = false )const;
 };
 
 }
@@ -304,7 +304,7 @@ namespace std
 {
 /// Streaming output for PropMap
 template<typename charT, typename traits>
-basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::PropMap& s )
+basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::PropMap &s )
 {
 	isis::util::PropMap::base_type buff;
 	s.linearize( buff );

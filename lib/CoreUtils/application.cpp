@@ -44,7 +44,7 @@ Application::Application( const char name[] ): m_name( name )
 }
 Application::~Application() {}
 
-bool Application::init( int argc, char** argv, bool exitOnError )
+bool Application::init( int argc, char **argv, bool exitOnError )
 {
 	bool err = false;
 

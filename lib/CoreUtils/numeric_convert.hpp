@@ -13,7 +13,7 @@ namespace util
 {
 namespace _internal
 {
-template<typename SRC, typename DST> static void numeric_convert_impl( const SRC* src, DST* dst, size_t count, double scale, double offset )
+template<typename SRC, typename DST> static void numeric_convert_impl( const SRC *src, DST *dst, size_t count, double scale, double offset )
 {
 	LOG( Debug, info )
 			<< "using generic scaling convert " << Type<SRC>::staticName() << "=>" << Type<DST>::staticName()
@@ -28,7 +28,7 @@ template<typename SRC, typename DST> static void numeric_convert_impl( const SRC
 	for ( size_t i = 0; i < count; i++ )
 		dst[i] = converter( src[i] * scale + offset );
 }
-template<typename SRC, typename DST> static void numeric_convert_impl( const SRC* src, DST* dst, size_t count )
+template<typename SRC, typename DST> static void numeric_convert_impl( const SRC *src, DST *dst, size_t count )
 {
 	LOG( Debug, info ) << "using generic convert " << Type<SRC>::staticName() << " => " << Type<DST>::staticName() << " without scaling";
 	static boost::numeric::converter <

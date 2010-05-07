@@ -34,9 +34,8 @@ namespace image_io
 {
 
 
-void ImageFormat_Vista::write( const data::Image &image, const std::string &filename, const std::string &dialect ) throw( std::runtime_error& ) 
+void ImageFormat_Vista::write( const data::Image &image, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & )
 {
-
 	//  All vista images a organized in an attribue list. Let's create an empty one:
 	VAttrList attrList = VCreateAttrList();
 	//  One or more VImages need to be written to disk.
@@ -90,9 +89,8 @@ void ImageFormat_Vista::write( const data::Image &image, const std::string &file
 
 			for( chIter = image.chunksBegin(); chIter != image.chunksEnd(); chIter++ ) {
 				// next timestep
-
 				// put the chunk in a mem chunk to get type convertion right
-				data::MemChunk<VShort> chunk(*chIter);
+				data::MemChunk<VShort> chunk( *chIter );
 
 				for( int z = 0; z < dims[2]; z++ ) {
 					for( int y = 0; y < dims[1]; y++ ) {
@@ -102,12 +100,13 @@ void ImageFormat_Vista::write( const data::Image &image, const std::string &file
 						}
 					}
 				}
+
 				t++;
 			}
 		}
 
-	// 3D image data
-	// dims[3] > 1 ?
+		// 3D image data
+		// dims[3] > 1 ?
 	} else {
 		LOG( image_io::Runtime, error ) << "No support for 3D images, yet";
 	}
@@ -127,7 +126,7 @@ void ImageFormat_Vista::write( const data::Image &image, const std::string &file
 	fclose( f );
 }
 
-int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error& )
+int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & )
 {
 }
 

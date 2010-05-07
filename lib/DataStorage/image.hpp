@@ -28,7 +28,7 @@ namespace data
 namespace _internal
 {
 struct image_chunk_order: chunk_comparison {
-	bool operator() ( const Chunk& a, const Chunk& b )const;
+	bool operator() ( const Chunk &a, const Chunk &b )const;
 };
 }
 /// @endcond
@@ -74,7 +74,7 @@ private:
 
 
 protected:
-	static const char* needed;
+	static const char *needed;
 
 	/**
 	 * Search for a dimensional break in all stored chunks.
@@ -97,9 +97,9 @@ protected:
 	size_t getChunkStride( size_t base_stride = 1 );
 
 	///Access a chunk via index (and the lookup table)
-	Chunk& getChunkAt( size_t at );
+	Chunk &getChunkAt( size_t at );
 	///Access a chunk via index (and the lookup table)
-	const Chunk& getChunkAt( size_t at )const;
+	const Chunk &getChunkAt( size_t at )const;
 
 public:
 	/**
@@ -123,7 +123,7 @@ public:
 	 * \returns A reference to the addressed voxel value. Reading and writing access
 	 * is provided.
 	 */
-	template <typename T> T& voxel( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 ) {
+	template <typename T> T &voxel( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 ) {
 		if ( not clean ) {
 			LOG( Debug, info ) << "Image is not clean. Running reIndex ...";
 			reIndex();
@@ -167,7 +167,7 @@ public:
 	 * \returns a copy of the chunk that contains the voxel at the given coordinates.
 	 * (Reminder: Chunk-copies are cheap, so the data are NOT copied)
 	 */
-	const Chunk& getChunk( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const;
+	const Chunk &getChunk( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const;
 	/**
 	 * Get the chunk that contains the voxel at the given coordinates.
 	 * If the image is not clean Image::reIndex() will be run.
@@ -178,7 +178,7 @@ public:
 	 * \param fourth The fourth coordinate in voxel space. Usually the time value.
 	 * \returns a reference of the chunk that contains the voxel at the given coordinates.
 	 */
-	Chunk& getChunk( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 );
+	Chunk &getChunk( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 );
 
 	/**
 	 * Insert a Chunk into the Image.
@@ -212,7 +212,7 @@ public:
 	ConstChunkIterator chunksBegin()const;
 	ConstChunkIterator chunksEnd()const;
 
-	void getMinMax( util::_internal::TypeBase& min, util::_internal::TypeBase& max, bool init = true )const;
+	void getMinMax( util::_internal::TypeBase &min, util::_internal::TypeBase &max, bool init = true )const;
 	size_t cmp( const Image &comp )const;
 };
 

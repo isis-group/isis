@@ -47,7 +47,7 @@ public:
 		dst.reset( ref );
 	}
 };
-void TypePtrConverterBase::convert( const TypePtrBase& src, TypePtrBase& dst, const TypeBase& min, const TypeBase& max ) const
+void TypePtrConverterBase::convert( const TypePtrBase &src, TypePtrBase &dst, const TypeBase &min, const TypeBase &max ) const
 {
 	LOG( Debug, error ) << "Empty conversion was called as conversion from " << src.typeName() << " to " << dst.typeName() << " this is most likely an error.";
 }
@@ -76,7 +76,7 @@ public:
 		TypePtrConverter<NUMERIC, true, SRC, DST> *ret = new TypePtrConverter<NUMERIC, true, SRC, DST>;
 		return boost::shared_ptr<const TypePtrConverterBase>( ret );
 	}
-	void convert( const TypePtrBase& src, TypePtrBase& dst, const TypeBase &min, const TypeBase &max )const {
+	void convert( const TypePtrBase &src, TypePtrBase &dst, const TypeBase &min, const TypeBase &max )const {
 		TypePtr<SRC> &dstVal = dst.cast_to_TypePtr<SRC>();
 		const SRC *srcPtr = &src.cast_to_TypePtr<SRC>()[0];
 		dstVal.copyFromMem( srcPtr, src.len() );
@@ -99,7 +99,7 @@ public:
 		TypePtrConverter<true, false, SRC, DST> *ret = new TypePtrConverter<true, false, SRC, DST>;
 		return boost::shared_ptr<const TypePtrConverterBase>( ret );
 	}
-	void convert( const TypePtrBase& src, TypePtrBase& dst, const TypeBase &min, const TypeBase &max )const {
+	void convert( const TypePtrBase &src, TypePtrBase &dst, const TypeBase &min, const TypeBase &max )const {
 		numeric_convert( src.cast_to_TypePtr<SRC>(), dst.cast_to_TypePtr<DST>(), min, max );
 	}
 	virtual ~TypePtrConverter() {}

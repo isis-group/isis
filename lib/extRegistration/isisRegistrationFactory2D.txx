@@ -256,10 +256,10 @@ void RegistrationFactory2D<TFixedImageType, TMovingImageType>::SetUpOptimizer()
 			m_RegularStepGradientDescentOptimizer->SetNumberOfIterations( UserOptions.NumberOfIterations );
 			m_RegularStepGradientDescentOptimizer->SetRelaxationFactor( 0.9 );
 			m_RegularStepGradientDescentOptimizer->SetGradientMagnitudeTolerance( 0.00001 );
-//                  if(transform.BSPLINEDEFORMABLETRANSFORM)
-//                  {
-//                      m_RegularStepGradientDescentOptimizer->SetMaximumStepLength(1.0);
-//                  }
+			//                  if(transform.BSPLINEDEFORMABLETRANSFORM)
+			//                  {
+			//                      m_RegularStepGradientDescentOptimizer->SetMaximumStepLength(1.0);
+			//                  }
 		}
 
 		if ( metric.MEANSQUARE or metric.MATTESMUTUALINFORMATION or metric.VIOLAWELLSMUTUALINFORMATION or metric.MUTUALINFORMATIONHISTOGRAM ) {
@@ -408,7 +408,7 @@ void RegistrationFactory2D<TFixedImageType, TMovingImageType>::SetUpTransform()
 		bsplineParameters.Fill( 0.0 );
 		m_BSplineTransform->SetParameters( bsplineParameters );
 		m_BSplineTransform->SetBulkTransform( m_BulkTransform );
-//              m_BSplineTransform->SetTranslation(m_BulkTransform->GetTranslation());
+		//              m_BSplineTransform->SetTranslation(m_BulkTransform->GetTranslation());
 		m_RegistrationObject->SetInitialTransformParameters( m_BSplineTransform->GetParameters() );
 	}
 
@@ -449,7 +449,7 @@ void RegistrationFactory2D<TFixedImageType, TMovingImageType>::SetUpMetric()
 		m_MattesMutualInformationMetric->SetNumberOfSpatialSamples( m_FixedImageRegion.GetNumberOfPixels()
 				* UserOptions.PixelDensity );
 		m_MattesMutualInformationMetric->SetNumberOfHistogramBins( UserOptions.NumberOfBins );
-//              m_MattesMutualInformationMetric->ReinitializeSeed(UserOptions.MattesMutualInitializeSeed);
+		//              m_MattesMutualInformationMetric->ReinitializeSeed(UserOptions.MattesMutualInitializeSeed);
 
 		if ( transform.BSPLINEDEFORMABLETRANSFORM ) {
 			m_MattesMutualInformationMetric->SetUseCachingOfBSplineWeights( true );
@@ -591,53 +591,53 @@ template<class TFixedImageType, class TMovingImageType>
 void RegistrationFactory2D<TFixedImageType, TMovingImageType>::SetInitialTransform(
 	TransformBasePointer initialTransform )
 {
-	const char* initialTransformName = initialTransform->GetNameOfClass();
+	const char *initialTransformName = initialTransform->GetNameOfClass();
 
 	if ( !strcmp( initialTransformName, "BSplineDeformableTransform" ) and transform.BSPLINEDEFORMABLETRANSFORM ) {
-		m_BSplineTransform->SetBulkTransform( static_cast<BSplineTransformType*> ( initialTransform ) );
+		m_BSplineTransform->SetBulkTransform( static_cast<BSplineTransformType *> ( initialTransform ) );
 	}
 
 	if ( !strcmp( initialTransformName, "AffineTransform" ) and transform.BSPLINEDEFORMABLETRANSFORM ) {
-		m_BSplineTransform->SetBulkTransform( static_cast<AffineTransformType*> ( initialTransform ) );
+		m_BSplineTransform->SetBulkTransform( static_cast<AffineTransformType *> ( initialTransform ) );
 	}
 
 	if ( !strcmp( initialTransformName, "Rigid2DTransform" ) and transform.BSPLINEDEFORMABLETRANSFORM ) {
-		m_BSplineTransform->SetBulkTransform( static_cast<Rigid2DTransformType*> ( initialTransform ) );
+		m_BSplineTransform->SetBulkTransform( static_cast<Rigid2DTransformType *> ( initialTransform ) );
 	}
 
 	if ( !strcmp( initialTransformName, "Similarity2DTransform" ) and transform.BSPLINEDEFORMABLETRANSFORM ) {
-		m_BSplineTransform->SetBulkTransform( static_cast<Similarity2DTransformType*> ( initialTransform ) );
+		m_BSplineTransform->SetBulkTransform( static_cast<Similarity2DTransformType *> ( initialTransform ) );
 	}
 
 	if ( !strcmp( initialTransformName, "CenteredAffineTransform" ) and transform.BSPLINEDEFORMABLETRANSFORM ) {
-		m_BSplineTransform->SetBulkTransform( static_cast<CenteredAffineTransformType*> ( initialTransform ) );
+		m_BSplineTransform->SetBulkTransform( static_cast<CenteredAffineTransformType *> ( initialTransform ) );
 	}
 
 	if ( !strcmp( initialTransformName, "Rigid2DTransform" ) and transform.CENTEREDAFFINE ) {
 		m_CenteredAffineTransform->SetTranslation(
-			( static_cast<Rigid2DTransformType*> ( initialTransform )->GetTranslation() ) );
-		m_CenteredAffineTransform->SetMatrix( ( static_cast<Rigid2DTransformType*> ( initialTransform )->GetMatrix() ) );
+			( static_cast<Rigid2DTransformType *> ( initialTransform )->GetTranslation() ) );
+		m_CenteredAffineTransform->SetMatrix( ( static_cast<Rigid2DTransformType *> ( initialTransform )->GetMatrix() ) );
 		m_RegistrationObject->SetInitialTransformParameters( m_CenteredAffineTransform->GetParameters() );
 	}
 
 	if ( !strcmp( initialTransformName, "Rigid2DTransform" ) and transform.AFFINE ) {
 		m_AffineTransform->SetTranslation(
-			( static_cast<Rigid2DTransformType*> ( initialTransform )->GetTranslation() ) );
-		m_AffineTransform->SetMatrix( ( static_cast<Rigid2DTransformType*> ( initialTransform )->GetMatrix() ) );
+			( static_cast<Rigid2DTransformType *> ( initialTransform )->GetTranslation() ) );
+		m_AffineTransform->SetMatrix( ( static_cast<Rigid2DTransformType *> ( initialTransform )->GetMatrix() ) );
 		m_RegistrationObject->SetInitialTransformParameters( m_AffineTransform->GetParameters() );
 	}
 
 	if ( !strcmp( initialTransformName, "Rigid2DTransform" ) and transform.RIGID ) {
 		m_Rigid2DTransform->SetTranslation(
-			( static_cast<Rigid2DTransformType*> ( initialTransform )->GetTranslation() ) );
-		m_Rigid2DTransform->SetMatrix( ( static_cast<Rigid2DTransformType*> ( initialTransform )->GetMatrix() ) );
+			( static_cast<Rigid2DTransformType *> ( initialTransform )->GetTranslation() ) );
+		m_Rigid2DTransform->SetMatrix( ( static_cast<Rigid2DTransformType *> ( initialTransform )->GetMatrix() ) );
 		m_RegistrationObject->SetInitialTransformParameters( m_Rigid2DTransform->GetParameters() );
 	}
 
 	if ( !strcmp( initialTransformName, "Rigid2DTransform" ) and transform.SCALE ) {
 		m_SimilarityTransform->SetTranslation(
-			( static_cast<Rigid2DTransformType*> ( initialTransform )->GetTranslation() ) );
-		m_SimilarityTransform->SetMatrix( ( static_cast<Rigid2DTransformType*> ( initialTransform )->GetMatrix() ) );
+			( static_cast<Rigid2DTransformType *> ( initialTransform )->GetTranslation() ) );
+		m_SimilarityTransform->SetMatrix( ( static_cast<Rigid2DTransformType *> ( initialTransform )->GetMatrix() ) );
 		m_RegistrationObject->SetInitialTransformParameters( m_SimilarityTransform->GetParameters() );
 	}
 }
@@ -768,7 +768,7 @@ void RegistrationFactory2D<TFixedImageType, TMovingImageType>::StartRegistration
 
 	try {
 		m_RegistrationObject->StartRegistration();
-	} catch ( itk::ExceptionObject & err ) {
+	} catch ( itk::ExceptionObject &err ) {
 		std::cerr << "isRegistrationFactory2D: Exception caught: " << std::endl << err << std::endl;
 	}
 

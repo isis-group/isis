@@ -52,7 +52,7 @@ static VBoolean use_inverse = false;
 static VShort number_threads = 1;
 
 static VOptionDescRec options[] = {
-//requiered inputs
+	//requiered inputs
 	{"in", VStringRepn, 1, &in_filename, &in_found, 0, "the input image filename"}, {
 		"out", VStringRepn, 1,
 		&out_filename, &out_found, 0, "the output image filename"
@@ -64,22 +64,22 @@ static VOptionDescRec options[] = {
 		1, &interpolator_type, VOptionalOpt, 0, "The interpolator used to resample the image"
 	}, {"ref", VStringRepn, 1,
 		&template_filename, VOptionalOpt, 0, "The template image"
-	}, {"reso", VFloatRepn, 0, ( VPointer ) &resolution,
-		VOptionalOpt, 0, "The output resolution. One value for isotrop output"
-	}, {"fmri", VBooleanRepn, 1, &fmri,
-		VOptionalOpt, 0, "Input and output image file are functional data"
-	}, {"vtrans", VStringRepn, 1,
-		&vtrans_filename, VOptionalOpt, 0, "Vector deformation field"
-	}, {"use_inverse", VBooleanRepn, 1, &use_inverse,
-		VOptionalOpt, 0, "Using the inverse of the transform"
-	}, {"j" , VShortRepn, 1, &number_threads, VOptionalOpt, 0 , "Number of threads"}
+	   }, {"reso", VFloatRepn, 0, ( VPointer ) &resolution,
+		   VOptionalOpt, 0, "The output resolution. One value for isotrop output"
+		  }, {"fmri", VBooleanRepn, 1, &fmri,
+			  VOptionalOpt, 0, "Input and output image file are functional data"
+			 }, {"vtrans", VStringRepn, 1,
+				 &vtrans_filename, VOptionalOpt, 0, "Vector deformation field"
+				}, {"use_inverse", VBooleanRepn, 1, &use_inverse,
+					VOptionalOpt, 0, "Using the inverse of the transform"
+				   }, {"j" , VShortRepn, 1, &number_threads, VOptionalOpt, 0 , "Number of threads"}
 
 };
 
 #include <boost/concept_check.hpp>
 int main(
 
-	int argc, char* argv[] )
+	int argc, char *argv[] )
 {
 	// show revision information string constant
 	std::cout << "Revision: " << _SVN_REVISION << std::endl << std::flush;
@@ -134,7 +134,7 @@ int main(
 	CastImageFilterType::Pointer caster = CastImageFilterType::New();
 	isis::extitk::ProcessUpdate::Pointer progressObserver = isis::extitk::ProcessUpdate::New();
 	TimeStepExtractionFilterType::Pointer timeStepExtractionFilter = TimeStepExtractionFilterType::New();
-	isis::extitk::TransformMerger3D* transformMerger = new isis::extitk::TransformMerger3D;
+	isis::extitk::TransformMerger3D *transformMerger = new isis::extitk::TransformMerger3D;
 	DeformationFieldReaderType::Pointer deformationFieldReader = DeformationFieldReaderType::New();
 	ImageReaderType::Pointer reader = ImageReaderType::New();
 	ImageReaderType::Pointer templateReader = ImageReaderType::New();
@@ -201,7 +201,7 @@ int main(
 			std::cout << "More than one transform is set. This is not possible, yet!" << std::endl;
 
 			for ( unsigned int i = 0; i < number_trans; i++ ) {
-				itk::TransformFileReader::TransformListType* transformList =
+				itk::TransformFileReader::TransformListType *transformList =
 					new itk::TransformFileReader::TransformListType;
 				transformFileReader->SetFileName( ( ( VStringConst * ) trans_filename.vector )[i] );
 				transformFileReader->Update();
@@ -408,7 +408,7 @@ int main(
 			timeStepExtractionFilter->SetRequestedTimeStep( timestep );
 			timeStepExtractionFilter->Update();
 			tmpImage = timeStepExtractionFilter->GetOutput();
-//                  std::cout << tmpImage << std::endl;
+			//                  std::cout << tmpImage << std::endl;
 			tmpImage->SetDirection( inputImage->GetDirection() );
 			tmpImage->SetOrigin( inputImage->GetOrigin() );
 

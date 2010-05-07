@@ -6,7 +6,7 @@ namespace isis
 namespace util
 {
 
-Singletons& Singletons::getMaster()
+Singletons &Singletons::getMaster()
 {
 	static Singletons me;
 	return me;

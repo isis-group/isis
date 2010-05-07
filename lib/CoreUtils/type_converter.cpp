@@ -68,7 +68,7 @@ public:
 		TypeConverter<NUMERIC, true, SRC, DST> *ret = new TypeConverter<NUMERIC, true, SRC, DST>;
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
-	void convert( const TypeBase& src, TypeBase& dst )const {
+	void convert( const TypeBase &src, TypeBase &dst )const {
 		SRC &dstVal = dst.cast_to_Type<SRC>();
 		const SRC &srcVal = src.cast_to_Type<SRC>();
 		dstVal = srcVal;
@@ -92,7 +92,7 @@ public:
 		TypeConverter<true, false, SRC, DST> *ret = new TypeConverter<true, false, SRC, DST>;
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
-	void convert( const TypeBase& src, TypeBase& dst )const {
+	void convert( const TypeBase &src, TypeBase &dst )const {
 		try {
 			typedef boost::numeric::converter <
 			DST, SRC,
@@ -103,7 +103,7 @@ public:
 			DST &dstVal = dst.cast_to_Type<DST>();
 			const SRC &srcVal = src.cast_to_Type<SRC>();
 			dstVal = converter::convert( srcVal );
-		} catch ( boost::numeric::bad_numeric_cast const& e ) {
+		} catch ( boost::numeric::bad_numeric_cast const &e ) {
 			LOG( Runtime, error )
 					<< "Automatic numeric conversion of " << MSubject( src.toString( true ) ) << " to " << dst.typeName() << " failed: " << e.what();
 		}
@@ -136,7 +136,7 @@ public:
 			return boost::shared_ptr<const TypeConverterBase>();
 		}
 	}
-	void convert( const TypeBase& src, TypeBase& dst )const {
+	void convert( const TypeBase &src, TypeBase &dst )const {
 		vector4<DST> &dstVal = dst.cast_to_Type<vector4<DST> >();
 		const vector4<SRC> &srcVal = src.cast_to_Type<vector4<SRC> >();
 
@@ -174,7 +174,7 @@ public:
 			return boost::shared_ptr<const TypeConverterBase>();
 		}
 	}
-	void convert( const TypeBase& src, TypeBase& dst )const {
+	void convert( const TypeBase &src, TypeBase &dst )const {
 		std::list<DST> &dstVal = dst.cast_to_Type<std::list<DST> >();
 		LOG_IF( not dstVal.empty(), CoreLog, warning )
 				<< "Storing into non empty list while conversion from "
@@ -205,7 +205,7 @@ public:
 		TypeConverter<false, false, std::string, DST> *ret = new TypeConverter<false, false, std::string, DST>;
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
-	void convert( const TypeBase& src, TypeBase& dst )const {
+	void convert( const TypeBase &src, TypeBase &dst )const {
 		DST &dstVal = dst.cast_to_Type<DST>();
 		const std::string &srcVal = src.cast_to_Type<std::string>();
 		dstVal = boost::lexical_cast<DST>( srcVal );
@@ -223,7 +223,7 @@ public:
 		TypeConverter<false, false, SRC, std::string> *ret = new TypeConverter<false, false, SRC, std::string>;
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
-	void convert( const TypeBase& src, TypeBase& dst )const {
+	void convert( const TypeBase &src, TypeBase &dst )const {
 		std::string &dstVal = dst.cast_to_Type<std::string>();
 		const SRC &srcVal = src.cast_to_Type<SRC>();
 		dstVal = boost::lexical_cast<std::string, SRC>( srcVal );
@@ -246,7 +246,7 @@ public:
 		TypeConverter<false, false, std::string, Selection> *ret = new TypeConverter<false, false, std::string, Selection>;
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
-	void convert( const TypeBase& src, TypeBase& dst )const {
+	void convert( const TypeBase &src, TypeBase &dst )const {
 		Selection &dstVal = dst.cast_to_Type<Selection>();
 		const std::string &srcVal = src.cast_to_Type<std::string>();
 		dstVal.set( srcVal.c_str() );
@@ -269,7 +269,7 @@ public:
 		TypeConverter<false, false, std::string, bool> *ret = new TypeConverter<false, false, std::string, bool>;
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
-	void convert( const TypeBase& src, TypeBase& dst )const {
+	void convert( const TypeBase &src, TypeBase &dst )const {
 		bool &dstVal = dst.cast_to_Type<bool>();
 		const char *srcVal = ( ( std::string )src.cast_to_Type<std::string>() ).c_str();
 
@@ -294,7 +294,7 @@ public:
 		TypeConverter<false, false, bool, std::string> *ret = new TypeConverter<false, false, bool, std::string>;
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
-	void convert( const TypeBase& src, TypeBase& dst )const {
+	void convert( const TypeBase &src, TypeBase &dst )const {
 		std::string &dstVal = dst.cast_to_Type<std::string>();
 		const bool &srcVal = src.cast_to_Type<bool>();
 		dstVal = srcVal ? "true" : "false";
@@ -317,7 +317,7 @@ public:
 		TypeConverter<false, false, std::string, std::list<DST> > *ret = new TypeConverter<false, false, std::string, std::list<DST> >;
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
-	void convert( const TypeBase& src, TypeBase& dst )const {
+	void convert( const TypeBase &src, TypeBase &dst )const {
 		std::list<DST> &dstVal = dst.cast_to_Type<std::list<DST> >();
 		LOG_IF( not dstVal.empty(), CoreLog, warning )
 				<< "Conversion from " << Type<std::string>::staticName()
@@ -340,7 +340,7 @@ public:
 		TypeConverter<false, false, std::string, vector4<DST> > *ret = new TypeConverter<false, false, std::string, vector4<DST> >;
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
-	void convert( const TypeBase& src, TypeBase& dst )const {
+	void convert( const TypeBase &src, TypeBase &dst )const {
 		vector4<DST> &dstVal = dst.cast_to_Type<vector4<DST> >();
 		const std::string &srcVal = src.cast_to_Type<std::string>();
 		const std::list<DST> buff = string2list<DST>( srcVal, boost::regex( "[\\s,;]+" ) );

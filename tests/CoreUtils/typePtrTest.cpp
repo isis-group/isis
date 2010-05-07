@@ -42,7 +42,7 @@ int TestHandler::hit = 0;
 class ReferenceTest: public util::TypePtr<int>::Reference
 {
 public:
-	ReferenceTest(): util::TypePtr<int>::Reference( new util::TypePtr<int>( ( int* )calloc( 5, sizeof( int ) ), 5, Deleter() ) ) {}
+	ReferenceTest(): util::TypePtr<int>::Reference( new util::TypePtr<int>( ( int * )calloc( 5, sizeof( int ) ), 5, Deleter() ) ) {}
 	//we have to wrap this into a class, because you cannot directly create a Reference of a pointer
 };
 
@@ -50,7 +50,7 @@ bool Deleter::deleted = false;
 
 BOOST_AUTO_TEST_CASE( typePtr_init_test )
 {
-//  util::enable_log<util::DefaultMsgPrint>(verbose_info);
+	//  util::enable_log<util::DefaultMsgPrint>(verbose_info);
 	BOOST_CHECK( not Deleter::deleted );
 	{
 		util::TypePtr<int> outer;
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE( typePtr_init_test )
 		BOOST_CHECK( not ( boost::shared_ptr<int> )outer );
 		BOOST_CHECK_EQUAL( ( ( boost::shared_ptr<int> )outer ).use_count(), 0 );
 		{
-			util::TypePtr<int> inner( ( int* )calloc( 5, sizeof( int ) ), 5, Deleter() );
+			util::TypePtr<int> inner( ( int * )calloc( 5, sizeof( int ) ), 5, Deleter() );
 			// for now we have only one pointer referencing the data
 			boost::shared_ptr<int> &dummy = inner; //get the smart_pointer inside, because TypePtr does not have/need use_count
 			BOOST_CHECK_EQUAL( dummy.use_count(), 1 );
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE( typePtr_clone_test )
 	{
 		util::_internal::TypePtrBase::Reference outer;
 		{
-			util::TypePtr<int> inner( ( int* )calloc( 5, sizeof( int ) ), 5, Deleter() );
+			util::TypePtr<int> inner( ( int * )calloc( 5, sizeof( int ) ), 5, Deleter() );
 			// for now we have only one TypePtr referencing the data
 			boost::shared_ptr<int> &dummy = inner; //get the smart_pointer inside, because TypePtr does not have/need use_count
 			BOOST_CHECK_EQUAL( dummy.use_count(), 1 );
@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_CASE( typePtr_splice_test )
 	{
 		std::vector<util::_internal::TypePtrBase::Reference> outer;
 		{
-			util::TypePtr<int> inner( ( int* )calloc( 5, sizeof( int ) ), 5, Deleter() );
+			util::TypePtr<int> inner( ( int * )calloc( 5, sizeof( int ) ), 5, Deleter() );
 			// for now we have only one pointer referencing the data
 			boost::shared_ptr<int> &dummy = inner; //get the smart_pointer inside, because TypePtr does not have/need use_count
 			BOOST_CHECK_EQUAL( dummy.use_count(), 1 );
@@ -163,7 +163,7 @@ BOOST_AUTO_TEST_CASE( typePtr_splice_test )
 BOOST_AUTO_TEST_CASE( typePtr_conversion_test )
 {
 	const float init[] = { -2, -1.8, -1.5, -1.3, -0.6, -0.2, 2, 1.8, 1.5, 1.3, 0.6, 0.2};
-	util::TypePtr<float> floatArray( ( float* )malloc( sizeof( float ) * 12 ), 12 );
+	util::TypePtr<float> floatArray( ( float * )malloc( sizeof( float ) * 12 ), 12 );
 	//without scaling
 	floatArray.copyFromMem( init, 12 );
 
@@ -197,7 +197,7 @@ BOOST_AUTO_TEST_CASE( typePtr_conversion_test )
 BOOST_AUTO_TEST_CASE( typePtr_minmax_test )
 {
 	const float init[] = { -1.8, -1.5, -1.3, -0.6, -0.2, 1.8, 1.5, 1.3, 0.6, 0.2};
-	util::TypePtr<float> floatArray( ( float* )malloc( sizeof( float ) * 10 ), 10 );
+	util::TypePtr<float> floatArray( ( float * )malloc( sizeof( float ) * 10 ), 10 );
 	//without scaling
 	floatArray.copyFromMem( init, 10 );
 	{

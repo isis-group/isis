@@ -34,7 +34,7 @@ class ProgParameter: public PropertyValue
 	std::string m_description;
 public:
 	ProgParameter();
-	template<typename T> ProgParameter( const T& ref, bool _needed = true ): PropertyValue( ref, _needed ) {}
+	template<typename T> ProgParameter( const T &ref, bool _needed = true ): PropertyValue( ref, _needed ) {}
 	bool parse( const isis::util::Type< std::string >& props );
 	const std::string &description()const;
 	void setDescription( const std::string &desc );
@@ -65,7 +65,7 @@ class ParameterMap: public std::map<std::string, ProgParameter>
 	bool parsed;
 public:
 	ParameterMap();
-	bool parse( int argc, char** argv );
+	bool parse( int argc, char **argv );
 	bool isComplete()const;
 	void printAll()const;
 	void printNeeded()const;

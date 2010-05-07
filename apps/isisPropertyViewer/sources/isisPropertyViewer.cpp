@@ -9,7 +9,7 @@ isisPropertyViewer::isisPropertyViewer( QMainWindow *parent )
 {
 	ui.setupUi( this );
 	//connect itemDoubleClicked
-	QObject::connect( this->ui.treeWidget, SIGNAL( itemDoubleClicked( QTreeWidgetItem*, int ) ), this, SLOT( edit_item( QTreeWidgetItem*, int ) ) );
+	QObject::connect( this->ui.treeWidget, SIGNAL( itemDoubleClicked( QTreeWidgetItem *, int ) ), this, SLOT( edit_item( QTreeWidgetItem *, int ) ) );
 	this->ui.treeWidget->setColumnCount( 2 );
 	QStringList header;
 	header << tr( "Property" ) << tr( "Value" );
@@ -59,14 +59,14 @@ void isisPropertyViewer::on_action_Clear_activated()
 }
 
 
-void isisPropertyViewer::createTree( const boost::shared_ptr<isis::data::Image> image, const QString& fileName )
+void isisPropertyViewer::createTree( const boost::shared_ptr<isis::data::Image> image, const QString &fileName )
 {
 	QString headerProp, headerVal;
 	QStringList header;
 	headerProp.sprintf( "Image" );
 	headerVal = fileName;
 	header << headerProp << headerVal;
-	QTreeWidgetItem* headItem = new QTreeWidgetItem( header );
+	QTreeWidgetItem *headItem = new QTreeWidgetItem( header );
 	this->ui.treeWidget->addTopLevelItem( headItem );
 	m_keyList = image->keys();
 
@@ -86,7 +86,7 @@ void isisPropertyViewer::createTree( const boost::shared_ptr<isis::data::Image> 
 			headerProp.sprintf( "Chunk" );
 			headerVal.sprintf( "%d", chunkCounter );
 			header << headerProp << headerVal;
-			QTreeWidgetItem* chunkItem = new QTreeWidgetItem( header );
+			QTreeWidgetItem *chunkItem = new QTreeWidgetItem( header );
 			headItem->addChild( chunkItem );
 
 			for ( PropKeyListType::const_iterator propIterator = m_keyList.begin(); propIterator != m_keyList.end(); propIterator++ ) {
@@ -102,22 +102,22 @@ void isisPropertyViewer::createTree( const boost::shared_ptr<isis::data::Image> 
 	addChildToItem( headItem, tr( "chunks" ), chunkString );
 }
 
-void isisPropertyViewer::addChildToItem( QTreeWidgetItem* item, const QString& prop, const QString& val ) const
+void isisPropertyViewer::addChildToItem( QTreeWidgetItem *item, const QString &prop, const QString &val ) const
 {
 	QStringList stringList;
 	stringList << prop << val;
-	QTreeWidgetItem* newItem = new QTreeWidgetItem( stringList );
+	QTreeWidgetItem *newItem = new QTreeWidgetItem( stringList );
 	item->addChild( newItem );
 }
 
-void isisPropertyViewer::addPropToTree( const boost::shared_ptr<isis::data::Image> image, const PropKeyListType::const_iterator &propIterator, QTreeWidgetItem* currentHeadItem )
+void isisPropertyViewer::addPropToTree( const boost::shared_ptr<isis::data::Image> image, const PropKeyListType::const_iterator &propIterator, QTreeWidgetItem *currentHeadItem )
 {
 	LOG_IF( image->getPropertyValue( *propIterator ).empty(), isis::CoreLog, isis::error ) << "Property " << *propIterator << " is empty";
 
 	if ( not image->getPropertyValue( *propIterator ).empty() ) {
 		if ( image->getPropertyValue( *propIterator )->is<isis::util::fvector4>() ) {
 			std::vector<QString> stringVec;
-			QTreeWidgetItem* vectorItem = new QTreeWidgetItem( QStringList( tr( propIterator->c_str() ) ) );
+			QTreeWidgetItem *vectorItem = new QTreeWidgetItem( QStringList( tr( propIterator->c_str() ) ) );
 			currentHeadItem->addChild( vectorItem );
 
 			for ( unsigned short dim = 0; dim < 4; dim++ ) {
@@ -138,7 +138,7 @@ void isisPropertyViewer::addPropToTree( const boost::shared_ptr<isis::data::Imag
 	}
 };
 
-void isisPropertyViewer::edit_item( QTreeWidgetItem* item, int val )
+void isisPropertyViewer::edit_item( QTreeWidgetItem *item, int val )
 {
 	QMessageBox::information( this, "isisPropertyViewer", "Edit mode not yet implemented!" );
 }

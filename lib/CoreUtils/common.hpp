@@ -179,7 +179,7 @@ template<typename TARGET> std::list<TARGET> string2list( const std::string &sour
  * \returns true if the value current currently refers to is equal to compare
  */
 template<typename ForwardIterator, typename T, typename CMP> bool
-continousFind( ForwardIterator &current, const ForwardIterator end, const T& compare, CMP compOp )
+continousFind( ForwardIterator &current, const ForwardIterator end, const T &compare, CMP compOp )
 {
 	//find the first iterator which is does not compare less
 	current = std::lower_bound( current, end, compare, compOp );
@@ -223,14 +223,14 @@ namespace _internal
  * \returns true if the value current currently refers to is equal to compare
  */
 template<typename ForwardIterator, typename T> bool
-continousFind( ForwardIterator &current, const ForwardIterator end, const T& compare )
+continousFind( ForwardIterator &current, const ForwardIterator end, const T &compare )
 {
 	return continousFind( current, end, compare, std::less<T>() );
 }
 
 ///Caseless less-compare for std::string
 struct caselessStringLess {
-	bool operator() ( const std::string& a, const std::string& b ) const {
+	bool operator() ( const std::string &a, const std::string &b ) const {
 		return ( strcasecmp ( a.c_str ( ), b.c_str ( ) ) < 0 );
 	}
 };

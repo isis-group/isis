@@ -134,8 +134,8 @@ public:
 	typedef itk::NearestNeighborInterpolateImageFunction<TMovingImageType, double> NearestNeighborInterpolatorType;
 
 	//transform typedefs
-	typedef itk::TransformBase* TransformBasePointer; //not allowed to be a itk::SmartPointer because of static_cast usage
-	typedef const itk::TransformBase* ConstTransformBasePointer;
+	typedef itk::TransformBase *TransformBasePointer; //not allowed to be a itk::SmartPointer because of static_cast usage
+	typedef const itk::TransformBase *ConstTransformBasePointer;
 	typedef itk::Transform<double, FixedImageDimension, FixedImageDimension> TransformType;
 	typedef itk::Similarity2DTransform<double> Similarity2DTransformType;
 

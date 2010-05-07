@@ -68,7 +68,7 @@ public:
 	template<typename TImage> static typename TImage::Pointer
 	makeItkImageObject( const boost::shared_ptr<data::Image> src, const bool behaveAsItkReader = true ) {
 		typedef TImage OutputImageType;
-		itkAdapter* myAdapter = new itkAdapter( src );
+		itkAdapter *myAdapter = new itkAdapter( src );
 
 		switch ( src->chunksBegin()->typeID() ) {
 		case util::TypePtr<int8_t>::staticID:
@@ -172,7 +172,7 @@ public:
 protected:
 	//should not be loaded directly
 	itkAdapter( const boost::shared_ptr<data::Image> src ) : m_ImageISIS( src ) {};
-	itkAdapter( const itkAdapter& ) {};
+	itkAdapter( const itkAdapter & ) {};
 	itkAdapter() {};
 private:
 
@@ -245,7 +245,7 @@ private:
 		importer->SetDirection( itkDirection );
 		importer->SetImportPointer( &this->m_ImageISIS->voxel<typename InputImageType::PixelType>( 0, 0, 0, 0 ), itkSize[0], false );
 		rescaler->SetInput( importer->GetOutput() );
-        util::Type<typename InputImageType::PixelType> minIn, maxIn;
+		util::Type<typename InputImageType::PixelType> minIn, maxIn;
 		this->m_ImageISIS->getMinMax( minIn, maxIn );
 		rescaler->SetOutputMinimum( minIn );
 		rescaler->SetOutputMaximum( maxIn );

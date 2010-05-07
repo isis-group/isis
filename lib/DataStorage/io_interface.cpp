@@ -9,7 +9,7 @@ namespace isis
 namespace image_io
 {
 
-void FileFormat::write( const isis::data::ImageList& images, const std::string& filename, const std::string& dialect ) throw( std::runtime_error& )
+void FileFormat::write( const isis::data::ImageList &images, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & )
 {
 	boost::filesystem::path path( filename );
 	std::string file = path.leaf();
@@ -35,7 +35,7 @@ void FileFormat::write( const isis::data::ImageList& images, const std::string& 
 	}
 }
 
-bool FileFormat::hasOrTell( const std::string& name, const isis::util::PropMap& object, isis::LogLevel level )
+bool FileFormat::hasOrTell( const std::string &name, const isis::util::PropMap &object, isis::LogLevel level )
 {
 	if ( object.hasProperty( name ) ) {
 		return true;

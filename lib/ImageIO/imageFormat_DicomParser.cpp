@@ -39,7 +39,7 @@ template<typename T> std::list<T> dcmtkListString2list( DcmElement *elem )
  * where nnn shall contain the number of days for D, weeks for W, months for M, or years for Y.
  * Example - "018M" would represent an age of 18 months.
  */
-void ImageFormat_Dicom::parseAS( DcmElement* elem, const std::string &name, util::PropMap &map )
+void ImageFormat_Dicom::parseAS( DcmElement *elem, const std::string &name, util::PropMap &map )
 {
 	u_int16_t duration;
 	OFString buff;
@@ -85,7 +85,7 @@ void ImageFormat_Dicom::parseAS( DcmElement* elem, const std::string &name, util
  * For reasons of backward compatibility with versions of this standard prior to V3.0,
  * it is recommended that implementations also support a string of characters of the format yyyy.mm.dd for this VR.
  */
-void ImageFormat_Dicom::parseDA( DcmElement* elem, const std::string &name, util::PropMap &map )
+void ImageFormat_Dicom::parseDA( DcmElement *elem, const std::string &name, util::PropMap &map )
 {
 	//@todo if we drop support for old yyyy.mm.dd this would be much easier
 	boost::regex reg( "^([[:digit:]]{4})\\.?([[:digit:]]{2})\\.?([[:digit:]]{2})$" );
@@ -126,7 +126,7 @@ void ImageFormat_Dicom::parseDA( DcmElement* elem, const std::string &name, util
  * For reasons of backward compatibility with versions of this standard prior to V3.0, it is
  * recommended that implementations also support a string of characters of the format hh:mm:ss.frac for this VR.
  */
-void ImageFormat_Dicom::parseTM( DcmElement* elem, const std::string &name, util::PropMap &map )
+void ImageFormat_Dicom::parseTM( DcmElement *elem, const std::string &name, util::PropMap &map )
 {
 	short shift = 0;
 	OFString buff;
@@ -163,7 +163,7 @@ void ImageFormat_Dicom::parseTM( DcmElement* elem, const std::string &name, util
 				<< "Cannot parse Time string \"" << buff << "\" in the field \"" << name << "\"";
 }
 
-void ImageFormat_Dicom::parseScalar( DcmElement* elem, const std::string &name, util::PropMap &map )
+void ImageFormat_Dicom::parseScalar( DcmElement *elem, const std::string &name, util::PropMap &map )
 {
 	OFString buff;
 
@@ -243,14 +243,14 @@ void ImageFormat_Dicom::parseScalar( DcmElement* elem, const std::string &name, 
 		elem->getOFString( buff, 0 );
 		LOG( Runtime, info ) << "Implement me "
 							 << name << "("
-							 << const_cast<DcmTag&>( elem->getTag() ).getVRName() << "):"
+							 << const_cast<DcmTag &>( elem->getTag() ).getVRName() << "):"
 							 << buff;
 	}
 	break;
 	}
 }
 
-void ImageFormat_Dicom::parseVector( DcmElement* elem, const std::string &name, util::PropMap &map )
+void ImageFormat_Dicom::parseVector( DcmElement *elem, const std::string &name, util::PropMap &map )
 {
 	OFString buff;
 	size_t len = elem->getVM();
@@ -323,7 +323,7 @@ void ImageFormat_Dicom::parseVector( DcmElement* elem, const std::string &name, 
 		elem->getOFStringArray( buff );
 		LOG( Runtime, info ) << "Implement me "
 							 << name << "("
-							 << const_cast<DcmTag&>( elem->getTag() ).getVRName() << "):"
+							 << const_cast<DcmTag &>( elem->getTag() ).getVRName() << "):"
 							 << buff;
 	}
 	break;
@@ -332,7 +332,7 @@ void ImageFormat_Dicom::parseVector( DcmElement* elem, const std::string &name, 
 	LOG( Debug, verbose_info ) << "Parsed the vector " << name << " as " << map[name];
 }
 
-void ImageFormat_Dicom::parseList( DcmElement* elem, const std::string &name, util::PropMap &map )
+void ImageFormat_Dicom::parseList( DcmElement *elem, const std::string &name, util::PropMap &map )
 {
 	OFString buff;
 	size_t len = elem->getVM();
@@ -391,7 +391,7 @@ void ImageFormat_Dicom::parseList( DcmElement* elem, const std::string &name, ut
 		elem->getOFStringArray( buff );
 		LOG( Runtime, info ) << "Implement me "
 							 << name << "("
-							 << const_cast<DcmTag&>( elem->getTag() ).getVRName() << "):"
+							 << const_cast<DcmTag &>( elem->getTag() ).getVRName() << "):"
 							 << buff;
 	}
 	break;
@@ -400,7 +400,7 @@ void ImageFormat_Dicom::parseList( DcmElement* elem, const std::string &name, ut
 	LOG( Debug, verbose_info ) << "Parsed the list " << name << " as " << map[name];
 }
 
-void ImageFormat_Dicom::parseCSA( DcmElement *elem, isis::util::PropMap& map )
+void ImageFormat_Dicom::parseCSA( DcmElement *elem, isis::util::PropMap &map )
 {
 	Uint8 *array;
 	elem->getUint8Array( array );
@@ -410,15 +410,15 @@ void ImageFormat_Dicom::parseCSA( DcmElement *elem, isis::util::PropMap& map )
 		pos += parseCSAEntry( array + pos, map );
 	}
 }
-size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, isis::util::PropMap& map )
+size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, isis::util::PropMap &map )
 {
 	size_t pos = 0;
-	const char *const name = ( char* )at + pos;
+	const char *const name = ( char * )at + pos;
 	pos += 0x40;
 	assert( name[0] );
 	/*Sint32 &vm=*((Sint32*)array+pos);*/
 	pos += sizeof( Sint32 );
-	const char *const vr = ( char* )at + pos;
+	const char *const vr = ( char * )at + pos;
 	pos += 0x4;
 	/*Sint32 syngodt=endian<Uint8,Uint32>(array+pos);*/
 	pos += sizeof( Sint32 );
@@ -436,7 +436,7 @@ size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, isis::util::PropMap& map )
 
 			if ( !len )continue;
 
-			std::string insert( ( char* )at + pos );
+			std::string insert( ( char * )at + pos );
 
 			if ( insert.empty() ) {
 				LOG( Runtime, info ) << "Skipping empty string for CSA entry " << name;
@@ -473,7 +473,7 @@ size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, isis::util::PropMap& map )
 	return pos;
 }
 
-bool ImageFormat_Dicom::parseCSAValue( const std::string &val, const std::string &name, const char *const vr, isis::util::PropMap& map )
+bool ImageFormat_Dicom::parseCSAValue( const std::string &val, const std::string &name, const char *const vr, isis::util::PropMap &map )
 {
 	if ( strcasecmp( vr, "IS" ) == 0 or strcasecmp( vr, "SL" ) == 0 ) {
 		map[name] = boost::lexical_cast<int32_t>( val );
@@ -497,7 +497,7 @@ bool ImageFormat_Dicom::parseCSAValue( const std::string &val, const std::string
 
 	return true;
 }
-bool ImageFormat_Dicom::parseCSAValueList( const util::slist &val, const std::string &name, const char *const vr, isis::util::PropMap& map )
+bool ImageFormat_Dicom::parseCSAValueList( const util::slist &val, const std::string &name, const char *const vr, isis::util::PropMap &map )
 {
 	if ( strcasecmp( vr, "IS" ) == 0 or strcasecmp( vr, "SL" ) == 0 or
 		 strcasecmp( vr, "US" ) == 0 or strcasecmp( vr, "SS" ) == 0 ) {
@@ -516,12 +516,12 @@ bool ImageFormat_Dicom::parseCSAValueList( const util::slist &val, const std::st
 	return true;
 }
 
-void ImageFormat_Dicom::dcmObject2PropMap( DcmObject* master_obj, isis::util::PropMap& map )
+void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, isis::util::PropMap &map )
 {
-	for ( DcmObject* obj = master_obj->nextInContainer( NULL ); obj; obj = master_obj->nextInContainer( obj ) ) {
+	for ( DcmObject *obj = master_obj->nextInContainer( NULL ); obj; obj = master_obj->nextInContainer( obj ) ) {
 		const DcmTag &tag = obj->getTag();
 		std::string name;
-		const DcmDataDictionary& globalDataDict = dcmDataDict.rdlock();
+		const DcmDataDictionary &globalDataDict = dcmDataDict.rdlock();
 		const DcmDictEntry *dictRef = globalDataDict.findEntry( tag, tag.getPrivateCreator() );
 
 		if ( dictRef ) name = dictRef->getTagName();
@@ -534,16 +534,16 @@ void ImageFormat_Dicom::dcmObject2PropMap( DcmObject* master_obj, isis::util::Pr
 			continue;//skip the image data
 		else if ( name == "CSAImageHeaderInfo" ) {
 			util::PropMap &csaMap = map.setProperty( "CSAImageHeaderInfo", util::PropMap() );
-			DcmElement* elem = dynamic_cast<DcmElement*>( obj );
+			DcmElement *elem = dynamic_cast<DcmElement *>( obj );
 			parseCSA( elem, csaMap );
 		} else if ( name == "CSASeriesHeaderInfo" ) {
 			util::PropMap &csaMap = map.setProperty( "CSASeriesHeaderInfo", util::PropMap() );
-			DcmElement* elem = dynamic_cast<DcmElement*>( obj );
+			DcmElement *elem = dynamic_cast<DcmElement *>( obj );
 			parseCSA( elem, csaMap );
 		} else if ( name == "MedComHistoryInformation" ) {
 			//@todo special handling needed
 		} else if ( obj->isLeaf() ) {
-			DcmElement* elem = dynamic_cast<DcmElement*>( obj );
+			DcmElement *elem = dynamic_cast<DcmElement *>( obj );
 			const size_t mult = obj->getVM();
 
 			if ( mult == 0 )

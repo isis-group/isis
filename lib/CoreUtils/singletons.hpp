@@ -26,7 +26,7 @@ class Singletons
 	};
 	template<typename BASE> class Singleton: public SingletonBase, public BASE {};
 
-	typedef std::multimap<int, SingletonBase*const> prioMap;
+	typedef std::multimap<int, SingletonBase *const> prioMap;
 	prioMap map;
 	Singletons();
 	virtual ~Singletons();
@@ -40,7 +40,7 @@ class Singletons
 		//ok this might become a dead ref as well. But its no complex object, and therefore won't be "destructed".
 		return *s;
 	}
-	static Singletons& getMaster();
+	static Singletons &getMaster();
 public:
 	/**
 	 * Get a singleton of type T and priority PRIO.

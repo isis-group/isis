@@ -86,7 +86,7 @@ template<typename TYPE> class Type: public _internal::TypeBase
 	TYPE m_val;
 	static const char m_typeName[];
 protected:
-	TypeBase* clone() const {
+	TypeBase *clone() const {
 		return new Type<TYPE>( *this );
 	}
 public:
@@ -100,11 +100,11 @@ public:
 	 * If the type of the parameter is not the same as the content type of the object, the system tries to do a type conversion.
 	 * If that fails, boost::bad_lexical_cast is thrown.
 	 */
-	template<typename T> Type( const T& value ): m_val( __cast_to( this, value ) ) {
+	template<typename T> Type( const T &value ): m_val( __cast_to( this, value ) ) {
 		BOOST_MPL_ASSERT_RELATION( staticID, < , 0xFF );
 		check_type<TYPE>();
 	}
-	virtual bool is( const std::type_info & t )const {
+	virtual bool is( const std::type_info &t )const {
 		return t == typeid( TYPE );
 	}
 	virtual std::string toString( bool labeled = false )const {
@@ -182,7 +182,7 @@ protected:
 	const boost::weak_ptr<void> address()const {
 		return boost::weak_ptr<void>( m_val );
 	}
-	TypePtrBase* clone() const {
+	TypePtrBase *clone() const {
 		return new TypePtr( *this );
 	}
 public:
@@ -211,14 +211,14 @@ public:
 	struct NonDeleter {
 		void operator()( TYPE *p ) {
 			//we have to cast the pointer to void* here, because in case of u_int8_t it will try to print the "string"
-			LOG( Debug, info ) << "Not freeing pointer " << ( void* )p << " (" << TypePtr<TYPE>::staticName() << ") ";
+			LOG( Debug, info ) << "Not freeing pointer " << ( void * )p << " (" << TypePtr<TYPE>::staticName() << ") ";
 		};
 	};
 	/// Default delete-functor for c-arrays (uses free()).
 	struct BasicDeleter {
 		void operator()( TYPE *p ) {
 			//we have to cast the pointer to void* here, because in case of u_int8_t it will try to print the "string"
-			LOG( Debug, info ) << "Freeing pointer " << ( void* )p << " (" << TypePtr<TYPE>::staticName() << ") ";
+			LOG( Debug, info ) << "Freeing pointer " << ( void * )p << " (" << TypePtr<TYPE>::staticName() << ") ";
 			free( p );
 		};
 	};
@@ -226,7 +226,7 @@ public:
 	struct ObjectArrayDeleter {
 		void operator()( TYPE *p ) {
 			//we have to cast the pointer to void* here, because in case of u_int8_t it will try to print the "string"
-			LOG( Debug, info ) << "Deleting object array at " << ( void* )p << " (" << TypePtr<TYPE>::staticName() << ") ";
+			LOG( Debug, info ) << "Deleting object array at " << ( void * )p << " (" << TypePtr<TYPE>::staticName() << ") ";
 			delete[] p;
 		};
 	};
@@ -245,7 +245,7 @@ public:
 	 * \param length the length of the used array (TypePtr does NOT check for length,
 	 * this is just here for child classes which may want to check)
 	 */
-	TypePtr( TYPE* const ptr, size_t length ):
+	TypePtr( TYPE *const ptr, size_t length ):
 		_internal::TypePtrBase( length ), m_val( ptr, BasicDeleter() ) {}
 	/**
 	 * Creates TypePtr from a pointer of type TYPE.
@@ -258,21 +258,21 @@ public:
 	 * \param d the deleter to be used when the data shall be deleted ( d() is called then )
 	 */
 
-	template<typename D> TypePtr( TYPE* const ptr, size_t length, D d ):
+	template<typename D> TypePtr( TYPE *const ptr, size_t length, D d ):
 		_internal::TypePtrBase( length ), m_val( ptr, d ) {}
 
 	virtual ~TypePtr() {}
 
 	/// Copy elements from raw memory
-	void copyFromMem( const TYPE* const src, size_t length ) {
+	void copyFromMem( const TYPE *const src, size_t length ) {
 		LOG_IF( length > len(), Runtime, error )
 				<< "Amount of the elements to copy from memory (" << length << ") exceeds the length of the array (" << len() << ")";
 		TYPE &dest = this->operator[]( 0 );
-		LOG( Debug, info ) << "Copying " << length*sizeof( TYPE ) << " bytes of " << typeName() << " from " << src << " to " << &dest;
+		LOG( Debug, info ) << "Copying " << length *sizeof( TYPE ) << " bytes of " << typeName() << " from " << src << " to " << &dest;
 		memcpy( &dest, src, length * sizeof( TYPE ) );
 	}
 	/// Copy elements within a range [start,end] to raw memory
-	void copyToMem( size_t start, size_t end, const TYPE* const dst )const {
+	void copyToMem( size_t start, size_t end, const TYPE *const dst )const {
 		assert( start <= end );
 		const size_t length = end - start + 1;
 		LOG_IF( end >= len(), Runtime, error )
@@ -280,7 +280,7 @@ public:
 		const TYPE &source = this->operator[]( start );
 		memcpy( dst, &source, length * sizeof( TYPE ) );
 	}
-	size_t cmp( size_t start, size_t end, const isis::util::_internal::TypePtrBase& dst, size_t dst_start ) const {
+	size_t cmp( size_t start, size_t end, const isis::util::_internal::TypePtrBase &dst, size_t dst_start ) const {
 		assert( start <= end );
 		size_t ret = 0;
 		size_t length = end - start;
@@ -308,7 +308,7 @@ public:
 	}
 
 	/// @copydoc Type::is()
-	virtual bool is( const std::type_info & t )const {
+	virtual bool is( const std::type_info &t )const {
 		return t == typeid( TYPE );
 	}
 	/// @copydoc Type::toString()
@@ -316,7 +316,7 @@ public:
 		std::string ret;
 
 		if ( m_len ) {
-			const TYPE* ptr = m_val.get();
+			const TYPE *ptr = m_val.get();
 
 			for ( size_t i = 0; i < m_len - 1; i++ )
 				ret += Type<TYPE>( ptr[i] ).toString( false ) + "|";
@@ -344,7 +344,7 @@ public:
 	 * If index is invalid, behaviour is undefined. Probably it will crash.
 	 * \return reference to element at at given index.
 	 */
-	TYPE& operator[]( size_t idx ) {
+	TYPE &operator[]( size_t idx ) {
 		return ( m_val.get() )[idx];
 	}
 	const TYPE &operator[]( size_t idx )const {
@@ -360,17 +360,17 @@ public:
 	operator const boost::shared_ptr<TYPE>&()const {return m_val;}
 
 	TypePtrBase::Reference cloneToMem( size_t length ) const {
-		return TypePtrBase::Reference( new TypePtr( ( TYPE* )malloc( length * sizeof( TYPE ) ), length ) );
+		return TypePtrBase::Reference( new TypePtr( ( TYPE * )malloc( length * sizeof( TYPE ) ), length ) );
 	}
 	size_t bytes_per_elem() const {
 		return sizeof( TYPE );
 	}
-	bool convertTo( TypePtrBase& dst )const {
+	bool convertTo( TypePtrBase &dst )const {
 		Type<TYPE> min, max;
 		getMinMax( min, max );
 		return TypePtrBase::convertTo( dst, min, max );
 	}
-	void getMinMax ( _internal::TypeBase& min, _internal::TypeBase& max, bool init = true ) const {
+	void getMinMax ( _internal::TypeBase &min, _internal::TypeBase &max, bool init = true ) const {
 		assert( min.typeID() == max.typeID() );
 
 		if( len() == 0 ) {
