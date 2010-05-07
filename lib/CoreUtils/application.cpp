@@ -59,33 +59,10 @@ bool Application::init( int argc, char** argv, bool exitOnError )
 	}
 
 	if ( not parameters.isComplete() ) {
-		ParameterMap::iterator iP;
 		std::cout << "Missing parameters: ";
-
-		for ( iP = parameters.begin(); iP != parameters.end(); iP++ ) {
+		for ( ParameterMap::iterator iP = parameters.begin(); iP != parameters.end(); iP++ ) {
 			if ( iP->second.needed() ) {std::cout << iP->first << "  ";}
 		}
-
-		std::cout << std::endl;
-		std::cout << "Usage: " << this->m_name << " <options>, where <options> includes:" << std::endl;
-
-		for ( iP = parameters.begin(); iP != parameters.end(); iP++ ) {
-			std::string pref;
-
-			if ( iP->second.needed() ) {pref = " Required.";}
-
-			if ( not iP->second.needed() and not iP->second->is<dlist>() ) {pref = " Default: " + iP->second.toString();};
-
-			std::cout << "\t-" << iP->first << " <" << iP->second->typeName() << ">" << std::endl;
-
-			if ( iP->second->is<Selection>() ) {
-				const Selection &ref = iP->second->cast_to_Type<Selection>();
-				std::cout << "\t\tOptions are: " <<  ref.getEntries() << std::endl;
-			}
-
-			std::cout << "\t\t" << iP->second.description() << pref << std::endl;
-		}
-
 		err = true;
 	}
 
@@ -97,16 +74,34 @@ bool Application::init( int argc, char** argv, bool exitOnError )
 	setLog<ImageIoLog>( LLMap[parameters["dImageIO"]] );
 
 	if ( err and exitOnError ) {
+		printHelp();
 		std::cout << "Exiting..." << std::endl;
 		exit( 1 );
 	}
 
 	return not err;
 }
-void Application::printHelp()const
+void Application::printHelp()
 {
-	std::cout << m_name << " --- Valid parameters:" << std::endl;
-	parameters.printAll();
+	std::cout << std::endl;
+	std::cout << "Usage: " << this->m_name << " <options>, where <options> includes:" << std::endl;
+	for ( ParameterMap::iterator iP = parameters.begin(); iP != parameters.end(); iP++ ) {
+		std::string pref;
+
+		if ( iP->second.needed() ) {pref = " Required.";}
+
+		if ( not iP->second.needed() and not iP->second->is<dlist>() ) {pref = " Default: " + iP->second.toString();};
+
+		std::cout << "\t-" << iP->first << " <" << iP->second->typeName() << ">" << std::endl;
+
+		if ( iP->second->is<Selection>() ) {
+			const Selection &ref = iP->second->cast_to_Type<Selection>();
+			std::cout << "\t\tOptions are: " <<  ref.getEntries() << std::endl;
+		}
+
+		std::cout << "\t\t" << iP->second.description() << pref << std::endl;
+	}
+	//parameters.printAll();
 }
 
 boost::shared_ptr< _internal::MessageHandlerBase > Application::getLogHandler( std::string module, isis::LogLevel level )const

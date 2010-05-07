@@ -39,7 +39,7 @@ public:
 	Application( const char name[] );
 	virtual ~Application();
 	virtual bool init( int argc, char** argv, bool exitOnError = true );
-	virtual void printHelp()const;
+	virtual void printHelp();
 	template<typename MODULE> void setLog( LogLevel level ) {
 		if ( !MODULE::use );
 		else _internal::Log<MODULE>::setHandler( getLogHandler( MODULE::name(), level ) );
