@@ -56,11 +56,9 @@ namespace util {
 class QtApplication : public Application, public QApplication
 {
 public:	
+	using Application::init;
 	QtApplication( const char name[], int& argc, char** argv)
 		: Application( name ), QApplication( argc, argv ){}
-	virtual bool init( int argc, char** argv, bool exitOnError = true ) 
-		{ return Application::init( argc, argv ); }
-
 };
 }}
 #endif
