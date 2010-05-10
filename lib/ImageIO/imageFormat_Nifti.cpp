@@ -359,11 +359,7 @@ private:
 		}
 
 		ni.nbyper = image.bytes_per_voxel();
-		//min / max due to T in image but for nifti everything is float
-		util::Type<T> min, max;
-		image.getMinMax( min, max );
-		ni.cal_min = min;
-		ni.cal_max = max;
+		image.getMinMax( ni.cal_min, ni.cal_max );
 	}
 
 	void copyHeaderToNifti( const data::Image& image, nifti_image& ni ) {

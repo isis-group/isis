@@ -74,21 +74,18 @@ template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &s
 	if ( doScale ) {
 		const DST domain_min = std::numeric_limits<DST>::min();//negative value domain of this dst
 		const DST domain_max = std::numeric_limits<DST>::max();//positive value domain of this dst
-		Type<SRC> minval, maxval;
+		double minval, maxval;
 
-		if ( min.gt(max) ) {
-			LOG( Debug, info ) << "Computing source range on my own";
-			src.getMinMax( minval, maxval );
-		} else {
-			LOG_IF( min.typeID() != Type<SRC>::staticID, Debug, info )
+		LOG_IF( min.typeID() != Type<SRC>::staticID, Debug, info )
 			<< "The given minimum for src Range is not of the same type as the data ("
 			<< min.typeName() << "!=" << Type<SRC>::staticName() << ")";
-			LOG_IF( max.typeID() != Type<SRC>::staticID, Debug, info )
+		LOG_IF( max.typeID() != Type<SRC>::staticID, Debug, info )
 			<< "The given maximum for src Range is not of the same type as the data ("
 			<< max.typeName() << "!=" << Type<SRC>::staticName() << ")";
-			minval = min.as<SRC>();
-			maxval = max.as<SRC>();
-		}
+
+		minval = min.as<double>();
+		maxval = max.as<double>();
+		assert(minval < maxval);
 
 		LOG( Debug, info ) << "src Range:" << minval << "=>" << maxval;
 		LOG( Debug, info ) << "dst Domain:" << domain_min << "=>" << domain_max;

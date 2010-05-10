@@ -212,7 +212,15 @@ public:
 	ConstChunkIterator chunksBegin()const;
 	ConstChunkIterator chunksEnd()const;
 
-	void getMinMax( util::_internal::TypeBase& min, util::_internal::TypeBase& max, bool init = true )const;
+	template<typename T> void getMinMax( T& min, T& max )const
+	{
+		util::check_type<T>();// works only for T from _internal::types
+		util::_internal::TypeBase::Reference _min,_max;
+		getMinMax(_min,_max);
+		min=_min->as<T>();
+		max=_max->as<T>();
+	}
+	void getMinMax( util::_internal::TypeBase::Reference& min, util::_internal::TypeBase::Reference& max )const;
 	size_t cmp( const Image &comp )const;
 };
 
@@ -223,7 +231,8 @@ public:
 		// the chunks references are useless
 		lookup.clear();
 		set.clear();
-		util::Type<double> min, max; // @todo they should actually be of the most relevant type of the chunks within src
+		
+		T min,max;
 		src.getMinMax( min, max );
 
 		//we want copies, and we want them to be of type T

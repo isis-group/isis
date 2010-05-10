@@ -162,14 +162,23 @@ BOOST_AUTO_TEST_CASE( image_minmax_test )
 		}
 
 	img.reIndex();
-	util::Type<unsigned short> min, max;
-	img.getMinMax( min, max );
-	BOOST_CHECK_EQUAL( min, 0 );
-	BOOST_CHECK_EQUAL( max, 4 );
-	//this should be 0,0 because the first chunk only has zeros
-	img.getChunk( 0, 0, 0, 0 ).getMinMax( min, max );
-	BOOST_CHECK_EQUAL( min, 0 );
-	BOOST_CHECK_EQUAL( max, 0 );
+	{
+		util::_internal::TypeBase::Reference min, max;
+		img.getMinMax( min, max );
+		BOOST_CHECK(min->is<float>());
+		BOOST_CHECK(max->is<float>());
+		BOOST_CHECK_EQUAL( min->as<float>(), 0 );
+		BOOST_CHECK_EQUAL( max->as<float>(), 4 );
+	}
+	{
+		util::_internal::TypeBase::Reference min, max;
+		//this should be 0,0 because the first chunk only has zeros
+		img.getChunk( 0, 0, 0, 0 ).getMinMax( min, max );
+		BOOST_CHECK(min->is<float>());
+		BOOST_CHECK(max->is<float>());
+		BOOST_CHECK_EQUAL( min->as<float>(), 0 );
+		BOOST_CHECK_EQUAL( max->as<float>(), 0 );
+	}
 }
 BOOST_AUTO_TEST_CASE( memimage_test )
 {
@@ -189,10 +198,12 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 
 	img.reIndex();
 	data::MemImage<u_int8_t> img2( img );
-	util::Type<u_int8_t> min, max;
+	util::_internal::TypeBase::Reference min, max;
 	img2.getMinMax( min, max );
-	BOOST_CHECK_EQUAL( ( u_int8_t )min, 0 );
-	BOOST_CHECK_EQUAL( ( u_int8_t )max, 255 );
+	BOOST_CHECK(min->is<u_int8_t>());
+	BOOST_CHECK(max->is<u_int8_t>());
+	BOOST_CHECK_EQUAL( min->as<u_int8_t>(), 0 );
+	BOOST_CHECK_EQUAL( max->as<u_int8_t>(), 255 );
 }
 }
 }

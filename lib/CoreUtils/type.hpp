@@ -422,33 +422,26 @@ public:
 		return sizeof( TYPE );
 	}
 	bool convertTo( TypePtrBase& dst )const {
-		Type<TYPE> min, max;
+		_internal::TypeBase::Reference min, max;
 		getMinMax( min, max );
-		return TypePtrBase::convertTo( dst, min, max );
+		assert(not (min.empty() or max.empty()));
+		return TypePtrBase::convertTo( dst, *min, *max );
 	}
-	void getMinMax ( _internal::TypeBase& min, _internal::TypeBase& max, bool init = true ) const {
-		assert( min.typeID() == max.typeID() );
+	/// \copydoc TypePtrBase::getMinMax
+	void getMinMax ( _internal::TypeBase::Reference &min, _internal::TypeBase::Reference& max) const {
 
 		if ( len() == 0 ) {
 			LOG( Runtime, warning ) << "Skipping computation of min/max on an empty TypePtr";
 			return;
 		}
 
-		if ( init ) { // they haven't been set yet
-			const Type<TYPE> el( this->operator[]( 0 ) );
-			_internal::TypeBase::convert( el, min );
-			_internal::TypeBase::convert( el, max );
-		}
-
 		const std::pair<Type<TYPE>, Type<TYPE> > result = _internal::getMinMaxImpl<TYPE, boost::is_arithmetic<TYPE>::value>()( *this );
 
-		if ( min.gt(result.first) ) {
-			_internal::TypeBase::convert( result.first, min );
-		}
+		if ( min.empty() or min->gt(result.first) ) 
+			min=result.first;
 
-		if ( max.lt(result.second) ) {
-			_internal::TypeBase::convert( result.second, max );
-		}
+		if ( max.empty() or max->lt(result.second) )
+			max=result.second;
 	}
 
 	std::vector<Reference> splice( size_t size )const {
