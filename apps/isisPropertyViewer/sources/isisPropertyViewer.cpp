@@ -14,10 +14,9 @@ isisPropertyViewer::isisPropertyViewer( const isis::util::slist &fileList, QMain
 	QStringList header;
 	header << tr( "Property" ) << tr( "Value" );
 	this->ui.treeWidget->setHeaderLabels( header );
-	
-	for (isis::util::slist::const_iterator fileIterator = fileList.begin(); fileIterator != fileList.end(); fileIterator++)
-	{
-		addFileToTree( tr(fileIterator->c_str()) );
+
+	for ( isis::util::slist::const_iterator fileIterator = fileList.begin(); fileIterator != fileList.end(); fileIterator++ ) {
+		addFileToTree( tr( fileIterator->c_str() ) );
 	}
 }
 
@@ -39,7 +38,6 @@ void isisPropertyViewer::on_action_Open_activated()
 {
 	QString fileName = QFileDialog::getOpenFileName( this, tr( "Open Image" ), QDir::currentPath(), "*.nii *.v" );
 	addFileToTree( fileName );
-	
 }
 
 void isisPropertyViewer::on_action_Clear_activated()
@@ -48,7 +46,7 @@ void isisPropertyViewer::on_action_Clear_activated()
 }
 
 
-void isisPropertyViewer::addFileToTree( const QString &fileName)
+void isisPropertyViewer::addFileToTree( const QString &fileName )
 {
 	if ( not fileName.isEmpty() ) {
 		this->setStatusTip( fileName );

@@ -46,21 +46,25 @@ public:
 	}
 };
 
-}}
+}
+}
 #ifdef _HAVE_QT4
 #include <QApplication>
 
-namespace isis {
-namespace util {
-	
+namespace isis
+{
+namespace util
+{
+
 class QtApplication : public Application, public QApplication
 {
-public:	
+public:
 	using Application::init;
-	QtApplication( const char name[], int& argc, char** argv)
-		: Application( name ), QApplication( argc, argv ){}
+	QtApplication( const char name[], int& argc, char** argv )
+			: Application( name ), QApplication( argc, argv ) {}
 };
-}}
+}
+}
 #endif
 
 #endif // APPLICATION_HPP

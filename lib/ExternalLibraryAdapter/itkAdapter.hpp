@@ -1,6 +1,6 @@
 /****************************************************************
  *
- * <Copyright information>
+ * Copyright (C) 2010 Max Planck Institute for Human Cognitive and Brain Sciences, Leipzig
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,13 +18,9 @@
  *
  * Author: Erik Tuerke, tuerke@cbs.mpg.de, 2010
  *
- * vtkAdapter.cpp
- *
- * Description:
- *
- *  Created on: Mar,30 2010
- *      Author: tuerke
- ******************************************************************/
+ *****************************************************************/
+
+
 #ifndef ITKADAPTER_HPP_
 #define ITKADAPTER_HPP_
 

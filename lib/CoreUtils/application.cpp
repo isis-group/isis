@@ -60,9 +60,11 @@ bool Application::init( int argc, char** argv, bool exitOnError )
 
 	if ( not parameters.isComplete() ) {
 		std::cout << "Missing parameters: ";
+
 		for ( ParameterMap::iterator iP = parameters.begin(); iP != parameters.end(); iP++ ) {
 			if ( iP->second.needed() ) {std::cout << iP->first << "  ";}
 		}
+
 		err = true;
 	}
 
@@ -85,17 +87,24 @@ void Application::printHelp()const
 {
 	std::cout << std::endl;
 	std::cout << "Usage: " << this->m_name << " <options>, where <options> includes:" << std::endl;
+
 	for ( ParameterMap::const_iterator iP = parameters.begin(); iP != parameters.end(); iP++ ) {
 		std::string pref;
+
 		if ( iP->second.needed() ) {pref = " Required.";}
+
 		if ( not iP->second.needed() and not iP->second->is<dlist>() ) {pref = " Default: " + iP->second.toString();};
+
 		std::cout << "\t-" << iP->first << " <" << iP->second->typeName() << ">" << std::endl;
+
 		if ( iP->second->is<Selection>() ) {
 			const Selection &ref = iP->second->cast_to_Type<Selection>();
 			std::cout << "\t\tOptions are: " <<  ref.getEntries() << std::endl;
 		}
+
 		std::cout << "\t\t" << iP->second.description() << pref << std::endl;
 	}
+
 	//parameters.printAll();
 }
 
