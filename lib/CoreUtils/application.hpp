@@ -44,8 +44,14 @@ public:
 		if ( !MODULE::use );
 		else _internal::Log<MODULE>::setHandler( getLogHandler( MODULE::name(), level ) );
 	}
+	//get the version of the coreutils
+	static const std::string getCoreVersion( void )
+	{	
+		char version[20];
+		sprintf(version, "%d.%d.%d@%d", _ISIS_VERSION_MAJOR, _ISIS_VERSION_MINOR, _ISIS_VERSION_PATCH, _SVN_REVISION);
+		return std::string(version);
+	}
 };
-
 }
 }
 #ifdef _HAVE_QT4
@@ -66,5 +72,6 @@ public:
 }
 }
 #endif
+
 
 #endif // APPLICATION_HPP

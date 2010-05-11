@@ -50,6 +50,8 @@
 #include "DataStorage/io_factory.hpp"
 #include "DataStorage/image.hpp"
 #include "ExternalLibraryAdapter/itkAdapter.hpp"
+#include "CoreUtils/application.hpp"
+#include "CoreUtils/version.hpp"
 
 #include "extRegistration/isisRegistrationFactory2D.hpp"
 #include "extITK/isisTransformMerger2D.hpp"
@@ -177,6 +179,8 @@ int main(
 	int argc, char* argv[] )
 {
 	// show revision information string constant
+	std::cout << "Core Version: " << isis::util::Application::getCoreVersion() << std::endl;
+	std::cout << "App Version: " << isis::util::getVersion() << std::endl;
 	std::cout << "Revision: " << _SVN_REVISION << std::endl;
 
 	// DANGER! Kids don't try this at home! VParseCommand modifies the values of argc and argv!!!

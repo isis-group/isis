@@ -3,6 +3,16 @@ cmake_minimum_required(VERSION 2.6)
 # the ISIS project
 project(ISIS)
 
+#set isis version number
+SET(${CMAKE_PROJECT_NAME}_VERSION_MAJOR "0")
+SET(${CMAKE_PROJECT_NAME}_VERSION_MINOR "1")
+SET(${CMAKE_PROJECT_NAME}_VERSION_PATCH "0")
+
+add_definitions(-D_ISIS_VERSION_MAJOR=${${CMAKE_PROJECT_NAME}_VERSION_MAJOR})
+add_definitions(-D_ISIS_VERSION_MINOR=${${CMAKE_PROJECT_NAME}_VERSION_MINOR})
+add_definitions(-D_ISIS_VERSION_PATCH=${${CMAKE_PROJECT_NAME}_VERSION_PATCH})
+
+
 ###############################################################################
 #Global options
 ###############################################################################
@@ -77,8 +87,6 @@ IF (NOT SVN_REVISION)
 		ENDIF (NOT EXPORTED)
 	ENDIF (SVNVERSION)
 ENDIF (NOT SVN_REVISION)
-
-
 
 IF (SVN_REVISION)
   message(STATUS "SVN Revision: ${SVN_REVISION}")

@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 2.6)
 
 IF(ITK_FOUND)
 	add_library(itkAdapter SHARED itkAdapter.hpp)
+	# use add_library with hpp files as well
 	set_target_properties(itkAdapter PROPERTIES LINKER_LANGUAGE C)
 	target_link_libraries(itkAdapter utils data )
 ENDIF(ITK_FOUND)

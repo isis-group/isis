@@ -113,5 +113,9 @@ boost::shared_ptr< _internal::MessageHandlerBase > Application::getLogHandler( s
 	return boost::shared_ptr< _internal::MessageHandlerBase >( level ? new util::DefaultMsgPrint( level ) : 0 );
 }
 
+//non-memberfunction
+
+
+
 }
 }
