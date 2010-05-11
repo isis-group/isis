@@ -15,7 +15,7 @@ QT4_WRAP_UI(isisPropertyViewer_UIS_H ${UI_FILES})
 
 add_executable(isisPropertyViewer ${CPP_FILES} ${isisPropertyViewer_UIS_H} ${isisPropertyViewer_moc_files})
 
-target_link_libraries(isisPropertyViewer ${QT_LIBRARIES} data)
+target_link_libraries(isisPropertyViewer ${QT_LIBRARIES} data util)
 
 
 
