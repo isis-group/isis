@@ -43,7 +43,7 @@ template<typename SRC, typename DST> static void numeric_convert_impl( const SRC
 }
 }
 
-enum autoscaleOption {noscale, autoscale, noupscale};
+enum autoscaleOption {noscale, autoscale, noupscale, upscale};
 
 /**
  * Converts data from 'src' to the type of 'dst' and stores them there.
@@ -55,7 +55,7 @@ enum autoscaleOption {noscale, autoscale, noupscale};
  * If dst is shorter than src, no conversion is done.
  * If src is shorter than dst a warning is send to CoreLog.
  */
-template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &src, TypePtr<DST> &dst, const _internal::TypeBase &min, const _internal::TypeBase &max, autoscaleOption scaleopt = noupscale )
+template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &src, TypePtr<DST> &dst, const _internal::TypeBase &min, const _internal::TypeBase &max, autoscaleOption scaleopt = autoscale )
 {
 	if ( src.len() > dst.len() ) {
 		LOG( Runtime, error ) << "The " << src.len() << " elements of src wont fit into the destination with the size " << dst.len();
@@ -69,26 +69,25 @@ template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &s
 	double scale = 1.0;
 	double offset = 0.0;
 	size_t srcsize = src.len();
-	bool doScale = ( scaleopt != noscale && std::numeric_limits<DST>::is_integer );
+	bool doScale = ( scaleopt != noscale && std::numeric_limits<DST>::is_integer ); //only do scale if scaleopt!=noscale and the target is an integer (scaling into float is useless)
+	if(scaleopt==autoscale && std::numeric_limits<SRC>::is_integer)
+		scaleopt=noupscale; //dont scale up if SRC is an integer
 
 	if ( doScale ) {
 		const DST domain_min = std::numeric_limits<DST>::min();//negative value domain of this dst
 		const DST domain_max = std::numeric_limits<DST>::max();//positive value domain of this dst
-		Type<SRC> minval, maxval;
+		double minval, maxval;
 
-		if ( min > max ) {
-			LOG( Debug, info ) << "Computing source range on my own";
-			src.getMinMax( minval, maxval );
-		} else {
-			LOG_IF( min.typeID() != Type<SRC>::staticID, Debug, info )
+		LOG_IF( min.typeID() != Type<SRC>::staticID, Debug, info )
 			<< "The given minimum for src Range is not of the same type as the data ("
 			<< min.typeName() << "!=" << Type<SRC>::staticName() << ")";
-			LOG_IF( max.typeID() != Type<SRC>::staticID, Debug, info )
+		LOG_IF( max.typeID() != Type<SRC>::staticID, Debug, info )
 			<< "The given maximum for src Range is not of the same type as the data ("
 			<< max.typeName() << "!=" << Type<SRC>::staticName() << ")";
-			minval = min.as<SRC>();
-			maxval = max.as<SRC>();
-		}
+
+		minval = min.as<double>();
+		maxval = max.as<double>();
+		assert(minval < maxval);
 
 		LOG( Debug, info ) << "src Range:" << minval << "=>" << maxval;
 		LOG( Debug, info ) << "dst Domain:" << domain_min << "=>" << domain_max;

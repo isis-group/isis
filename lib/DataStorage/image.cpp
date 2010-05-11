@@ -534,12 +534,14 @@ ImageList::ImageList( ChunkList src )
 	}
 }
 
-void Image::getMinMax ( util::_internal::TypeBase& min, util::_internal::TypeBase& max, bool init ) const
+void Image::getMinMax ( util::_internal::TypeBase::Reference& min, util::_internal::TypeBase::Reference& max) const
 {
-	BOOST_FOREACH( const Chunk & ch, set ) {
-		ch.getMinMax( min, max, init );
-		init = false;
-	}
+	LOG_IF(not min.empty(),Debug,warning) << "Running getMinMax using non empty min. It will be reset.";
+	LOG_IF(not max.empty(),Debug,warning) << "Running getMinMax using non empty max. It will be reset.";
+	min=util::_internal::TypeBase::Reference();
+	max=util::_internal::TypeBase::Reference();
+	BOOST_FOREACH( const Chunk & ch, set ) 
+		ch.getMinMax( min, max );
 }
 size_t Image::cmp( const isis::data::Image& comp ) const
 {

@@ -206,7 +206,12 @@ public:
 			return *reinterpret_cast<const Type<T>*>( this );
 		} else {
 			Type<T> ret;
-			convert( *this, ret );
+			if(not convert( *this, ret ) ) {
+				LOG(Debug,error)
+				<< "Interpretation of " << toString(true) << " as " << Type<T>::staticName()
+				<< " failed. Returning " << Type<T>().toString() << ".";
+				return T();
+			} else
 			return ret;
 		}
 	}
@@ -231,12 +236,13 @@ public:
 		check_type<T>();
 		return m_cast_to<Type<T> >();
 	}
-	virtual bool eq( const TypeBase &second )const = 0;
+	virtual bool operator==( const TypeBase &second )const = 0;
 
 	virtual ~TypeBase();
 
-	virtual bool operator >( const _internal::TypeBase &ref )const = 0;
-	virtual bool operator <( const _internal::TypeBase &ref )const = 0;
+	virtual bool gt( const _internal::TypeBase &ref )const = 0;
+	virtual bool lt( const _internal::TypeBase &ref )const = 0;
+	virtual bool eq( const _internal::TypeBase &ref )const = 0;
 };
 
 class TypePtrBase : public GenericType
@@ -318,7 +324,7 @@ public:
 	 * If the conversion fails, an error will be send to CoreLog and the data of the newly created TypePtr will be undefined.
 	 * \returns a the newly created TypePtr
 	 */
-	template<typename T> const TypePtr<T> copyToNew( const TypeBase &min, const TypeBase &max )const {
+	template<typename T> const TypePtr<T> copyToNew( const _internal::TypeBase &min, const _internal::TypeBase &max )const {
 		TypePtr<T> ret( ( T* )malloc( sizeof( T )*len() ), len() );
 		convertTo( ret, min, max );
 		return ret;
@@ -339,7 +345,22 @@ public:
 	 */
 	void copyRange( size_t start, size_t end, TypePtrBase &dst, size_t dst_start )const;
 
-	virtual void getMinMax( TypeBase &min, TypeBase &max, bool init = true )const = 0;
+	/** 
+	 * Get minimum/maximum from a TypePtr.
+	 * The parameters are reverences to the current maximum/minimum found.
+	 * max will be replaced by a value from the array if:
+	 * - max is empty
+	 * - max is less than that value from the array
+	 * 
+	 * min will be replaced by a value from the array if:
+	 * - min is empty
+	 * - min is greater than that value from the array
+	 * 
+	 * Note, that min/max will also adopt the type of the value.
+	 * \param max TypeBase::Reference for the current greatest value
+	 * \param min TypeBase::Reference for the current lowest value
+	 */
+	virtual void getMinMax( TypeBase::Reference &min, TypeBase::Reference& max )const = 0;
 	virtual size_t cmp( size_t start, size_t end, const TypePtrBase &dst, size_t dst_start )const = 0;
 	size_t cmp( const TypePtrBase& comp )const;
 };
