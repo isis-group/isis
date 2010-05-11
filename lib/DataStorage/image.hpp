@@ -232,12 +232,12 @@ public:
 		lookup.clear();
 		set.clear();
 		
-		T min,max;
+		util::_internal::TypeBase::Reference min,max;
 		src.getMinMax( min, max );
 
 		//we want copies, and we want them to be of type T
 		for ( ConstChunkIterator i = src.chunksBegin(); i != src.chunksEnd(); ++i )      {
-			insertChunk( MemChunk<T>( *i, min, max ) );
+			insertChunk( MemChunk<T>( *i, *min, *max ) );
 		}
 	}
 };

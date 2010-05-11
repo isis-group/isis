@@ -167,7 +167,7 @@ public:
 		operator=( ref );
 	}
 	/// Create a deep copy of a given Chunk (automatic conversion with min/max will be used if datatype does not fit)
-	MemChunk( const Chunk &ref, const TYPE min, const TYPE max ): Chunk( ref ) {
+	MemChunk( const Chunk &ref, const util::_internal::TypeBase &min, const  util::_internal::TypeBase &max ): Chunk( ref ) {
 		_internal::ChunkBase::operator=( static_cast<const _internal::ChunkBase&>( ref ) ); //copy the metadate of ref
 		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
 		util::_internal::TypePtrBase::Reference::reset( new util::TypePtr<TYPE>( ref.getTypePtrBase().copyToNew<TYPE>( min, max ) ) );

@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 	ch.setProperty( "indexOrigin", util::fvector4( 0, 0, 2, 0 ) );
 	ch.setProperty<u_int32_t>( "acquisitionNumber", 2 );
 	ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
-	BOOST_CHECK( img.insertChunk( ch ) );
+	BOOST_REQUIRE( img.insertChunk( ch ) );
 	//inserting the same chunk twice should fail
 	BOOST_CHECK( not img.insertChunk( ch ) );
 	// but inserting another Chunk should work
@@ -36,13 +36,13 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 	ch.setProperty( "indexOrigin", util::fvector4( 0, 0, 0, 0 ) );
 	ch.setProperty<u_int32_t>( "acquisitionNumber", 0 );
 	ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
-	BOOST_CHECK( img.insertChunk( ch ) );
+	BOOST_REQUIRE( img.insertChunk( ch ) );
 	// Chunks should be inserted based on their position (lowest first)
 	ch = data::MemChunk<float>( 4, 4 );
 	ch.setProperty( "indexOrigin", util::fvector4( 0, 0, 1, 0 ) );
 	ch.setProperty<u_int32_t>( "acquisitionNumber", 1 );
 	ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
-	BOOST_CHECK( img.insertChunk( ch ) );
+	BOOST_REQUIRE( img.insertChunk( ch ) );
 	//threat image as a list of sorted chunks
 	//Image-Chunk-List should be copyable into other lists (and its order should be correct)
 	//Note: this ordering is not allways geometric correct
@@ -50,8 +50,8 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 	std::list<data::Chunk> list( img.chunksBegin(), img.chunksEnd() );
 	unsigned short i = 0;
 	BOOST_FOREACH( const data::Chunk & ref, list ) {
-		BOOST_CHECK( ref.getPropertyValue( "indexOrigin" ) == util::fvector4( 0, 0, i, 0 ) );
-		BOOST_CHECK( ref.getPropertyValue( "acquisitionNumber" ) == i++ );
+		BOOST_REQUIRE( ref.getPropertyValue( "indexOrigin" ) == util::fvector4( 0, 0, i, 0 ) );
+		BOOST_REQUIRE( ref.getPropertyValue( "acquisitionNumber" ) == i++ );
 	}
 	//Get a list of properties from the chunks in the image
 	//List of the properties shall be as if every chunk of the image was asked for the property
@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 	ch.setProperty( "indexOrigin", util::fvector4( 0, 0, 0, 1 ) );
 	ch.setProperty<u_int32_t>( "acquisitionNumber", 4 );
 	ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
-	BOOST_CHECK( img.insertChunk( ch ) );
+	BOOST_REQUIRE( img.insertChunk( ch ) );
 	data::Image::ChunkIterator it = img.chunksEnd();
 	//as all other chunks where timestep 0 this must be at the end
 	BOOST_CHECK( ( --it )->getPropertyValue( "indexOrigin" ) == util::fvector4( 0, 0, 0, 1 ) );
@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE ( image_chunk_test )
 			ch[i][j].setProperty( "acquisitionNumber", acNum++ );
 			ch[i][j].setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 			ch[i][j].voxel<float>( j, j ) = 42;
-			BOOST_CHECK( img.insertChunk( ch[i][j] ) );
+			BOOST_REQUIRE( img.insertChunk( ch[i][j] ) );
 		}
 
 	img.reIndex();
@@ -133,7 +133,7 @@ BOOST_AUTO_TEST_CASE ( image_voxel_test )
 	ch[2].voxel<float>( 2, 2 ) = 42;
 
 	for ( int i = 0; i < 3; i++ ) {
-		BOOST_CHECK( img.insertChunk( ch[i] ) );
+		BOOST_REQUIRE( img.insertChunk( ch[i] ) );
 	}
 
 	for ( int i = 0; i < 3; i++ ) {
@@ -158,7 +158,7 @@ BOOST_AUTO_TEST_CASE( image_minmax_test )
 			ch[i][j].setProperty( "acquisitionNumber", acNum++ );
 			ch[i][j].setProperty( "voxelSize", vSize );
 			ch[i][j].voxel<float>( j, j ) = i * j;
-			BOOST_CHECK( img.insertChunk( ch[i][j] ) );
+			BOOST_REQUIRE( img.insertChunk( ch[i][j] ) );
 		}
 
 	img.reIndex();
@@ -193,17 +193,36 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 			ch[i][j].setProperty( "acquisitionNumber", acNum++ );
 			ch[i][j].setProperty( "voxelSize", vSize );
 			ch[i][j].voxel<float>( j, j ) = i * j * 1000;
-			BOOST_CHECK( img.insertChunk( ch[i][j] ) );
+			BOOST_REQUIRE( img.insertChunk( ch[i][j] ) );
 		}
-
 	img.reIndex();
-	data::MemImage<u_int8_t> img2( img );
-	util::_internal::TypeBase::Reference min, max;
-	img2.getMinMax( min, max );
-	BOOST_CHECK(min->is<u_int8_t>());
-	BOOST_CHECK(max->is<u_int8_t>());
-	BOOST_CHECK_EQUAL( min->as<u_int8_t>(), 0 );
-	BOOST_CHECK_EQUAL( max->as<u_int8_t>(), 255 );
+
+	{
+		util::_internal::TypeBase::Reference min, max;
+		img.getMinMax( min, max );
+		BOOST_CHECK(min->is<float>());
+		BOOST_CHECK(max->is<float>());
+		BOOST_CHECK_EQUAL( min->as<float>(), 0 );
+		BOOST_CHECK_EQUAL( max->as<float>(), 2*2*1000 );
+	}
+	{ // Conversion to u_int8_t (will downscale [0-255])
+		data::MemImage<u_int8_t> img2( img );
+		util::_internal::TypeBase::Reference min, max;
+		img2.getMinMax( min, max );
+		BOOST_CHECK(min->is<u_int8_t>());
+		BOOST_CHECK(max->is<u_int8_t>());
+		BOOST_CHECK_EQUAL( min->as<u_int8_t>(), 0 );
+		BOOST_CHECK_EQUAL( max->as<u_int8_t>(), 255 );
+	}
+	{ // Conversion to int16_t (will upscale [0-32k])
+		data::MemImage<int16_t> img2( img );
+		util::_internal::TypeBase::Reference min, max;
+		img2.getMinMax( min, max );
+		BOOST_CHECK(min->is<int16_t>());
+		BOOST_CHECK(max->is<int16_t>());
+		BOOST_CHECK_EQUAL( min->as<int16_t>(), 0 );
+		BOOST_CHECK_EQUAL( max->as<int16_t>(), std::numeric_limits<int16_t>::max() );
+	}
 }
 }
 }
