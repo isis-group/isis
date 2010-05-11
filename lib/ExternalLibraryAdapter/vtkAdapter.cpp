@@ -45,8 +45,7 @@ vtkImageData* vtkAdapter::makeVtkImageObject( const boost::shared_ptr<data::Imag
 
 	//set the datatype for the vtkImage object
 	//TODO check datatypes
-	importer->SetWholeExtent( 0, dimensions[0] - 1, 0, dimensions[1] - 1, 0, dimensions[2] - 1 ); //TODO what is exactly defined by the whole extend????????????
-	importer->SetDataExtentToWholeExtent();
+	
 	vtkImage->SetOrigin( indexOrigin[0], indexOrigin[1], indexOrigin[2] );
 	vtkImage->SetSpacing( spacing[0], spacing[1], spacing[2] );
 	//go through every timestep (dimensions[3] and add the chunk to the image list
@@ -96,6 +95,8 @@ vtkImageData* vtkAdapter::makeVtkImageObject( const boost::shared_ptr<data::Imag
 
 	importer->Update();
 	vtkImage = importer->GetOutput();
+	importer->SetWholeExtent( 0, dimensions[0] - 1, 0, dimensions[1] - 1, 0, dimensions[2] - 1 ); //TODO what is exactly defined by the whole extend????????????
+	importer->SetDataExtentToWholeExtent();
 	return vtkImage;
 }
 

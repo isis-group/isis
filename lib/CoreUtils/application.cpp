@@ -104,18 +104,12 @@ void Application::printHelp()const
 
 		std::cout << "\t\t" << iP->second.description() << pref << std::endl;
 	}
-
-	//parameters.printAll();
 }
 
 boost::shared_ptr< _internal::MessageHandlerBase > Application::getLogHandler( std::string module, isis::LogLevel level )const
 {
 	return boost::shared_ptr< _internal::MessageHandlerBase >( level ? new util::DefaultMsgPrint( level ) : 0 );
 }
-
-//non-memberfunction
-
-
 
 }
 }
