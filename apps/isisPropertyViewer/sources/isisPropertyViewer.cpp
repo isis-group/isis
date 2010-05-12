@@ -77,7 +77,6 @@ void isisPropertyViewer::addFileToTree( const QString &fileName )
 
 		std::cout << "Loaded " << inputImageList.size() << " Images" << std::endl;
 		BOOST_FOREACH(isis::data::ImageList::const_reference ref, inputImageList) {
-			std::cout << ref->getPropertyValue("indexOrigin").toString() << std::endl;
 			createTree( ref, fileName );
 			m_propHolder.addPropMapFromImage( ref, fileName );
 		}
