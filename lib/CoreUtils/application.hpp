@@ -21,7 +21,8 @@
 #define APPLICATION_HPP
 
 #include "progparameter.hpp"
-#define STR(s) std::string(#s)
+#define STR(s) _xstr_(s)
+#define _xstr_(s) std::string(#s)
 
 
 namespace isis
@@ -48,7 +49,7 @@ public:
 	//get the version of the coreutils
 	static const std::string getCoreVersion( void )
 	{	
-		return STR(_ISIS_VERSION_MAJOR) + STR(_ISIS_VERSION_MINOR) + STR(_ISIS_VERSION_PATCH) + STR(_ISIS_SVN_REVISION);
+		return STR(_ISIS_VERSION_MAJOR) + "." + STR(_ISIS_VERSION_MINOR) + "." + STR(_ISIS_VERSION_PATCH) + ".r" + STR(_ISIS_SVN_REVISION);
 	}
 };
 }
@@ -73,5 +74,6 @@ public:
 #endif
 
 #undef STR
+#undef _xstr_
 
 #endif // APPLICATION_HPP
