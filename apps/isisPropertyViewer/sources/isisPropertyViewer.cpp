@@ -29,6 +29,7 @@
 isisPropertyViewer::isisPropertyViewer( const isis::util::slist &fileList, QMainWindow *parent )
 		: QMainWindow( parent )
 {
+// 	isis::util::DefaultMsgPrint::stopBelow( isis::warning );
 	ui.setupUi( this );
 	//connect itemDoubleClicked
 	QObject::connect( this->ui.treeWidget, SIGNAL( itemDoubleClicked( QTreeWidgetItem*, int ) ), this, SLOT( edit_item( QTreeWidgetItem*, int ) ) );
@@ -74,13 +75,11 @@ void isisPropertyViewer::addFileToTree( const QString &fileName )
 		this->setStatusTip( fileName );
 		isis::data::ImageList inputImageList = isis::data::IOFactory::load( fileName.toStdString(), "" );
 
-		if ( not inputImageList.empty() ) {
-			isis::data::ImageList::const_iterator imageIterator;
-
-			for ( imageIterator = inputImageList.begin(); imageIterator != inputImageList.end(); imageIterator++ ) {
-				createTree( *imageIterator, fileName );
-				m_propHolder->addPropMapFromImage( *imageIterator, fileName );
-			}
+		std::cout << "Loaded " << inputImageList.size() << " Images" << std::endl;
+		BOOST_FOREACH(isis::data::ImageList::const_reference ref, inputImageList) {
+			std::cout << ref->getPropertyValue("indexOrigin").toString() << std::endl;
+			createTree( ref, fileName );
+			m_propHolder.addPropMapFromImage( ref, fileName );
 		}
 
 		if ( inputImageList.empty() ) {
@@ -88,6 +87,8 @@ void isisPropertyViewer::addFileToTree( const QString &fileName )
 			QMessageBox::information( this, "Error", "Input image list is empty!" );
 		}
 	}
+	else std::cout << "is leer" << std::endl;
+		
 }
 
 void isisPropertyViewer::createTree( const boost::shared_ptr<isis::data::Image> image, const QString& fileName )

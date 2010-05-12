@@ -35,7 +35,7 @@ private:
 	void addPropToTree( const boost::shared_ptr<isis::data::Image>, const PropKeyListType::const_iterator&, QTreeWidgetItem* );
 	void addChildToItem( QTreeWidgetItem*, const QString&, const QString& ) const;
 	void addFileToTree( const QString& );
-	boost::shared_ptr<PropertyHolder> m_propHolder;
+	PropertyHolder m_propHolder;
 
 
 };
