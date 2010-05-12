@@ -183,6 +183,14 @@ public:
 	typedef TypeConverterMap::mapped_type::mapped_type Converter;
 
 	const Converter& getConverterTo( unsigned short id )const;
+	/**
+	 * Convert the content of one Type to another.
+	 * This will use the automatic conversion system to transform the value one Type-Object into another.
+	 * The types of both objects can be unknown.
+	 * \param from the Type-object containing the value which should be converted
+	 * \param to the Type-object which will contain the converted value if conversion was successfull
+	 * \returns false if the conversion failed for any reason, true otherwise
+	 */
 	static bool convert( const TypeBase &from, TypeBase &to );
 	/**
 	* Interpret the value as value of any (other) type.

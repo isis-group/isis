@@ -2,12 +2,13 @@
 #include "isisPropertyViewer.hpp"
 
 #include "CoreUtils/application.hpp"
+#include <ExternalLibraryAdapter/qt4/qtapplication.hpp>
 
 
 int main( int argc, char *argv[] )
 {
 	std::cout << "Core Version: " << isis::util::Application::getCoreVersion() << std::endl;
-	isis::util::QtApplication app( "isisPropertyViewer", argc, argv );
+	isis::qt4::QtApplication app( "isisPropertyViewer");
 	app.parameters["in"] = isis::util::slist();
 	app.parameters["in"].needed() = false;
 	app.parameters["in"].setDescription( "Input file list." );
@@ -15,5 +16,5 @@ int main( int argc, char *argv[] )
 	isis::util::slist fileList = app.parameters["in"];
 	isisPropertyViewer isisPropertyViewerWindow( fileList );
 	isisPropertyViewerWindow.show();
-	return app.exec();
+	return app.getQApplication().exec();
 }

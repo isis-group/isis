@@ -17,35 +17,29 @@
 
 */
 
-#ifndef APPLICATION_HPP
-#define APPLICATION_HPP
+#ifndef APPLICATION_H
+#define APPLICATION_H
 
-#include "progparameter.hpp"
+#include <QApplication>
+#include "CoreUtils/application.hpp"
+#include <boost/scoped_ptr.hpp>
 
 namespace isis
 {
-namespace util
+namespace qt4
 {
 
-class Application
+class QtApplication : public util::Application
 {
-	std::string m_name;
-	static const LogLevel LLMap[];
-protected:
-	virtual boost::shared_ptr<_internal::MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;
+	int m_argc; //we need local copies here, so we can give references to QApplication
+	char** m_argv;
+	boost::scoped_ptr<QApplication> m_qapp;
 public:
-	ParameterMap parameters;
-	Application( const char name[] );
-	virtual ~Application();
-	virtual bool init( int argc, char** argv, bool exitOnError = true );
-	virtual void printHelp()const;
-	template<typename MODULE> void setLog( LogLevel level ) {
-		if ( !MODULE::use );
-		else _internal::Log<MODULE>::setHandler( getLogHandler( MODULE::name(), level ) );
-	}
-	//get the version of the coreutils
-	static const std::string getCoreVersion( void );
+	QApplication &getQApplication();
+	QtApplication( const char name[]);
+    virtual bool init(int argc, char** argv, bool exitOnError = true);
 };
 }
 }
-#endif // APPLICATION_HPP
+
+#endif // APPLICATION_H

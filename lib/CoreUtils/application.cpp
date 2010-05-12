@@ -20,6 +20,9 @@
 #include "application.hpp"
 #include <boost/foreach.hpp>
 
+#define STR(s) _xstr_(s)
+#define _xstr_(s) std::string(#s)
+
 namespace isis
 {
 namespace util
@@ -110,6 +113,13 @@ boost::shared_ptr< _internal::MessageHandlerBase > Application::getLogHandler( s
 {
 	return boost::shared_ptr< _internal::MessageHandlerBase >( level ? new util::DefaultMsgPrint( level ) : 0 );
 }
+const std::string Application::getCoreVersion(void )
+{
+	return STR(_ISIS_VERSION_MAJOR) + "." + STR(_ISIS_VERSION_MINOR) + "." + STR(_ISIS_VERSION_PATCH) + ".r" + STR(_ISIS_SVN_REVISION);
+}
 
 }
 }
+#undef STR
+#undef _xstr_
+

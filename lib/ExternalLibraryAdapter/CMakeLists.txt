@@ -1,12 +1,16 @@
 
 IF(ITK_FOUND)
-	add_library(itkAdapter SHARED itkAdapter.hpp)
+	add_library(isisAdapter_itk SHARED itkAdapter.hpp)
 	# use add_library with hpp files as well
-	set_target_properties(itkAdapter PROPERTIES LINKER_LANGUAGE C)
-	target_link_libraries(itkAdapter utils data )
+	set_target_properties(isisAdapter_itk PROPERTIES LINKER_LANGUAGE C)
+	target_link_libraries(isisAdapter_itk utils data )
 ENDIF(ITK_FOUND)
 
 IF(VTK_FOUND)
-	add_library(vtkAdapter SHARED vtkAdapter.cpp)
-	target_link_libraries(vtkAdapter utils data )
+	add_library(isisAdapter_vtk SHARED vtkAdapter.cpp)
+	target_link_libraries(isisAdapter_vtk utils data )
 ENDIF(VTK_FOUND)
+
+if(${CMAKE_PROJECT_NAME}_HAVE_QT4)
+	add_subdirectory(qt4)
+endif(${CMAKE_PROJECT_NAME}_HAVE_QT4)
