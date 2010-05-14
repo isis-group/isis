@@ -42,6 +42,7 @@
 #include "CoreUtils/log.hpp"
 #include "DataStorage/io_factory.hpp"
 #include "DataStorage/image.hpp"
+#include "CoreUtils/application.hpp"
 #include "ExternalLibraryAdapter/itkAdapter.hpp"
 
 #include "extITK/isisTimeStepExtractionFilter.hpp"
@@ -98,7 +99,7 @@ int main(
 	int argc, char* argv[] )
 {
 	// show revision information string constant
-	std::cout << "Revision: " << _SVN_REVISION << std::endl << std::flush;
+	std::cout << "Core Version: " << isis::util::Application::getCoreVersion() << std::endl;	
 
 	// DANGER! Kids don't try this at home! VParseCommand modifies the values of argc and argv!!!
 	if ( !VParseCommand( VNumber( options ), options, &argc, argv ) || !VIdentifyFiles( VNumber( options ), options, "in",

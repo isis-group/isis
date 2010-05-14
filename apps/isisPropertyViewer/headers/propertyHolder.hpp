@@ -32,10 +32,12 @@ class PropertyHolder
 {
 public:
 	bool addPropMapFromImage( const boost::shared_ptr< isis::data::Image>, const QString& );
-
-private:
 	std::map<std::string, isis::util::PropMap> m_propHolderMap;
+	std::map<std::string, bool> m_propChanged;
+	void saveIt( void );
 	
+
+
 };
 
 

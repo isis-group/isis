@@ -21,10 +21,37 @@
  *****************************************************************/
 
 #include "propertyHolder.hpp"
+#include "DataStorage/io_factory.hpp"
 
 bool PropertyHolder::addPropMapFromImage( const boost::shared_ptr<isis::data::Image> image, const QString& filename )
 {
 	isis::util::PropMap tmpPropMap = *image;
 	m_propHolderMap[filename.toStdString()] = tmpPropMap;
+	m_propChanged[filename.toStdString()] = false;
 	return true;
+}
+
+void PropertyHolder::saveIt( void )
+{
+	for ( std::map<std::string, bool>::iterator boolIter = m_propChanged.begin(); boolIter != m_propChanged.end(); boolIter++)
+	{
+		
+		if (boolIter->second)
+		{
+			isis::data::ImageList imageList = isis::data::IOFactory::load( boolIter->first , "");
+			isis::data::ImageList tmpImageList;
+			BOOST_FOREACH(isis::data::ImageList::reference image, imageList)
+			{
+				const isis::util::PropMap& tmpMap(m_propHolderMap.find(boolIter->first)->second) ;
+				static_cast<isis::util::PropMap&>(*image)=tmpMap;
+				tmpImageList.push_back(image);
+			}
+			std::string fileName = boolIter->first;
+			size_t pos = fileName.find(".");
+			fileName.insert(pos, std::string(".chg"));
+			isis::data::IOFactory::write( tmpImageList, fileName, "");
+			m_propChanged.find(boolIter->first)->second = false;
+		}
+	}
+	
 }
