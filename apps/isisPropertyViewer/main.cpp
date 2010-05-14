@@ -8,7 +8,7 @@
 int main( int argc, char *argv[] )
 {
 	std::cout << "Core Version: " << isis::util::Application::getCoreVersion() << std::endl;
-	isis::qt4::QtApplication app( "isisPropertyViewer");
+	isis::qt4::QtApplication app( "isisPropertyViewer" );
 	app.parameters["in"] = isis::util::slist();
 	app.parameters["in"].needed() = false;
 	app.parameters["in"].setDescription( "Input file list." );

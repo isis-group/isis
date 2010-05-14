@@ -203,8 +203,8 @@ BOOST_AUTO_TEST_CASE( typePtr_minmax_test )
 	{
 		util::_internal::TypeBase::Reference min, max;
 		floatArray.getMinMax( min, max );
-		BOOST_CHECK(min->is<float>());
-		BOOST_CHECK(max->is<float>());
+		BOOST_CHECK( min->is<float>() );
+		BOOST_CHECK( max->is<float>() );
 		BOOST_CHECK_EQUAL( min->as<float>(), -1.8f );
 		BOOST_CHECK_EQUAL( max->as<float>(), 1.8f );
 	}

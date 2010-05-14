@@ -101,18 +101,18 @@ public:
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
 	boost::numeric::range_check_result convert( const TypeBase& src, TypeBase& dst )const {
-			typedef boost::numeric::converter <
-			DST, SRC,
-			boost::numeric::conversion_traits<DST, SRC>,
-		   NumericOverflowHandler,
-			boost::numeric::RoundEven<SRC>
-			> converter;
-			DST &dstVal = dst.cast_to_Type<DST>();
-			const SRC &srcVal = src.cast_to_Type<SRC>();
+		typedef boost::numeric::converter <
+		DST, SRC,
+		boost::numeric::conversion_traits<DST, SRC>,
+		NumericOverflowHandler,
+		boost::numeric::RoundEven<SRC>
+		> converter;
+		DST &dstVal = dst.cast_to_Type<DST>();
+		const SRC &srcVal = src.cast_to_Type<SRC>();
 		NumericOverflowHandler::result = boost::numeric::cInRange;
-			dstVal = converter::convert( srcVal );
+		dstVal = converter::convert( srcVal );
 		return NumericOverflowHandler::result;
-		}
+	}
 	virtual ~TypeConverter() {}
 };
 
@@ -150,7 +150,7 @@ public:
 			Type<DST> dst;
 			const boost::numeric::range_check_result result = m_conv->convert( Type<SRC>( srcVal[i] ), dst );
 
-			if( result != boost::numeric::cInRange )
+			if ( result != boost::numeric::cInRange )
 				ret = result;
 
 			dstVal[i] = ( DST )dst;
@@ -198,7 +198,7 @@ public:
 			Type<DST> dst;
 			const boost::numeric::range_check_result result = m_conv->convert( Type<SRC>( *i ), dst );
 
-			if( result != boost::numeric::cInRange )
+			if ( result != boost::numeric::cInRange )
 				ret = result;
 
 			dstVal.push_back( ( DST )dst );
@@ -271,7 +271,7 @@ public:
 		Selection &dstVal = dst.cast_to_Type<Selection>();
 		const std::string &srcVal = src.cast_to_Type<std::string>();
 
-		if( dstVal.set( srcVal.c_str() ) )
+		if ( dstVal.set( srcVal.c_str() ) )
 			return boost::numeric::cInRange;
 		else
 			return boost::numeric::cPosOverflow; //if the string is not "part" of the selection we count this as positive overflow

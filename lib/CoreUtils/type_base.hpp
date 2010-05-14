@@ -214,13 +214,14 @@ public:
 			return *reinterpret_cast<const Type<T>*>( this );
 		} else {
 			Type<T> ret;
-			if(not convert( *this, ret ) ) {
-				LOG(Debug,error)
-				<< "Interpretation of " << toString(true) << " as " << Type<T>::staticName()
+
+			if ( not convert( *this, ret ) ) {
+				LOG( Debug, error )
+				<< "Interpretation of " << toString( true ) << " as " << Type<T>::staticName()
 				<< " failed. Returning " << Type<T>().toString() << ".";
 				return T();
 			} else
-			return ret;
+				return ret;
 		}
 	}
 
@@ -353,17 +354,17 @@ public:
 	 */
 	void copyRange( size_t start, size_t end, TypePtrBase &dst, size_t dst_start )const;
 
-	/** 
+	/**
 	 * Get minimum/maximum from a TypePtr.
 	 * The parameters are reverences to the current maximum/minimum found.
 	 * max will be replaced by a value from the array if:
 	 * - max is empty
 	 * - max is less than that value from the array
-	 * 
+	 *
 	 * min will be replaced by a value from the array if:
 	 * - min is empty
 	 * - min is greater than that value from the array
-	 * 
+	 *
 	 * Note, that min/max will also adopt the type of the value.
 	 * \param max TypeBase::Reference for the current greatest value
 	 * \param min TypeBase::Reference for the current lowest value

@@ -36,8 +36,8 @@ class QtApplication : public util::Application
 	boost::scoped_ptr<QApplication> m_qapp;
 public:
 	QApplication &getQApplication();
-	QtApplication( const char name[]);
-    virtual bool init(int argc, char** argv, bool exitOnError = true);
+	QtApplication( const char name[] );
+	virtual bool init( int argc, char** argv, bool exitOnError = true );
 };
 }
 }

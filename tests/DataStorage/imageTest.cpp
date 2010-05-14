@@ -165,8 +165,8 @@ BOOST_AUTO_TEST_CASE( image_minmax_test )
 	{
 		util::_internal::TypeBase::Reference min, max;
 		img.getMinMax( min, max );
-		BOOST_CHECK(min->is<float>());
-		BOOST_CHECK(max->is<float>());
+		BOOST_CHECK( min->is<float>() );
+		BOOST_CHECK( max->is<float>() );
 		BOOST_CHECK_EQUAL( min->as<float>(), 0 );
 		BOOST_CHECK_EQUAL( max->as<float>(), 4 );
 	}
@@ -174,8 +174,8 @@ BOOST_AUTO_TEST_CASE( image_minmax_test )
 		util::_internal::TypeBase::Reference min, max;
 		//this should be 0,0 because the first chunk only has zeros
 		img.getChunk( 0, 0, 0, 0 ).getMinMax( min, max );
-		BOOST_CHECK(min->is<float>());
-		BOOST_CHECK(max->is<float>());
+		BOOST_CHECK( min->is<float>() );
+		BOOST_CHECK( max->is<float>() );
 		BOOST_CHECK_EQUAL( min->as<float>(), 0 );
 		BOOST_CHECK_EQUAL( max->as<float>(), 0 );
 	}
@@ -195,13 +195,13 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 			ch[i][j].voxel<float>( j, j ) = i * j * 1000;
 			BOOST_REQUIRE( img.insertChunk( ch[i][j] ) );
 		}
-	img.reIndex();
 
+	img.reIndex();
 	{
 		util::_internal::TypeBase::Reference min, max;
 		img.getMinMax( min, max );
-		BOOST_CHECK(min->is<float>());
-		BOOST_CHECK(max->is<float>());
+		BOOST_CHECK( min->is<float>() );
+		BOOST_CHECK( max->is<float>() );
 		BOOST_CHECK_EQUAL( min->as<float>(), 0 );
 		BOOST_CHECK_EQUAL( max->as<float>(), 2*2*1000 );
 	}
@@ -209,8 +209,8 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 		data::MemImage<u_int8_t> img2( img );
 		util::_internal::TypeBase::Reference min, max;
 		img2.getMinMax( min, max );
-		BOOST_CHECK(min->is<u_int8_t>());
-		BOOST_CHECK(max->is<u_int8_t>());
+		BOOST_CHECK( min->is<u_int8_t>() );
+		BOOST_CHECK( max->is<u_int8_t>() );
 		BOOST_CHECK_EQUAL( min->as<u_int8_t>(), 0 );
 		BOOST_CHECK_EQUAL( max->as<u_int8_t>(), 255 );
 	}
@@ -218,8 +218,8 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 		data::MemImage<int16_t> img2( img );
 		util::_internal::TypeBase::Reference min, max;
 		img2.getMinMax( min, max );
-		BOOST_CHECK(min->is<int16_t>());
-		BOOST_CHECK(max->is<int16_t>());
+		BOOST_CHECK( min->is<int16_t>() );
+		BOOST_CHECK( max->is<int16_t>() );
 		BOOST_CHECK_EQUAL( min->as<int16_t>(), 0 );
 		BOOST_CHECK_EQUAL( max->as<int16_t>(), std::numeric_limits<int16_t>::max() );
 	}

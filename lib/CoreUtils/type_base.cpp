@@ -57,15 +57,15 @@ bool TypeBase::convert( const TypeBase& from, TypeBase &to )
 	const Converter& conv = from.getConverterTo( to.typeID() );
 
 	if ( conv ) {
-		switch( conv->convert( from, to ) ) {
+		switch ( conv->convert( from, to ) ) {
 		case boost::numeric::cPosOverflow:
-			LOG(Runtime,error) << "Positive overflow when converting " << from.toString(true) << " to " << to.typeName() << ".";
+			LOG( Runtime, error ) << "Positive overflow when converting " << from.toString( true ) << " to " << to.typeName() << ".";
 			break;
-		case boost::numeric::cNegOverflow: 
-			LOG(Runtime,error) << "Negative overflow when converting " << from.toString(true) << " to " << to.typeName() << ".";
+		case boost::numeric::cNegOverflow:
+			LOG( Runtime, error ) << "Negative overflow when converting " << from.toString( true ) << " to " << to.typeName() << ".";
 			break;
 		case boost::numeric::cInRange:
-		return true;
+			return true;
 			break;
 		}
 	} else {
@@ -73,8 +73,9 @@ bool TypeBase::convert( const TypeBase& from, TypeBase &to )
 		<< "I dont know any conversion from "
 		<< MSubject( from.toString( true ) ) << " to " << MSubject( to.typeName() );
 	}
-		return false;
-	}
+
+	return false;
+}
 
 const TypePtrBase::Converter& TypePtrBase::getConverterTo( unsigned short id )const
 {

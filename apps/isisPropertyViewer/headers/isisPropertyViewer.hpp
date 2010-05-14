@@ -34,7 +34,7 @@ private:
 	PropKeyListType m_keyList;
 	Ui::isisPropertyViewer ui;
 	void createTree( const boost::shared_ptr<isis::data::Image>, const QString& );
-    void addPropToTree( const boost::shared_ptr<isis::data::Image>, PropKeyListType::const_reference, QTreeWidgetItem* );
+	void addPropToTree( const boost::shared_ptr<isis::data::Image>, PropKeyListType::const_reference, QTreeWidgetItem* );
 	void addChildToItem( QTreeWidgetItem*, const QString&, const QString&, const QString& ) const;
 	void addFileToTree( const QString& );
 	void updateTree( void );

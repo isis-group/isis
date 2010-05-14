@@ -147,7 +147,7 @@ size_t Chunk::cmpSlice( size_t thirdDimS, size_t fourthDimS, const Chunk& dst, s
 	const size_t idx3[] = {sizeToVector()[0] - 1, sizeToVector()[1] - 1, thirdDimD, fourthDimD};
 	return cmpRange( idx1, idx2, dst, idx3 );
 }
-void Chunk::getMinMax ( util::_internal::TypeBase::Reference& min, util::_internal::TypeBase::Reference& max) const
+void Chunk::getMinMax ( util::_internal::TypeBase::Reference& min, util::_internal::TypeBase::Reference& max ) const
 {
 	return operator*().getMinMax( min, max );
 }

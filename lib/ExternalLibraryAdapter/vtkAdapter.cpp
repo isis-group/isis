@@ -45,7 +45,6 @@ vtkImageData* vtkAdapter::makeVtkImageObject( const boost::shared_ptr<data::Imag
 
 	//set the datatype for the vtkImage object
 	//TODO check datatypes
-	
 	vtkImage->SetOrigin( indexOrigin[0], indexOrigin[1], indexOrigin[2] );
 	vtkImage->SetSpacing( spacing[0], spacing[1], spacing[2] );
 	//go through every timestep (dimensions[3] and add the chunk to the image list

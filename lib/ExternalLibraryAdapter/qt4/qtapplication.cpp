@@ -19,25 +19,26 @@
 
 #include "qtapplication.hpp"
 
-isis::qt4::QtApplication::QtApplication(const char name[]):
-	Application(name)
+isis::qt4::QtApplication::QtApplication( const char name[] ):
+		Application( name )
 {}
 
 QApplication& isis::qt4::QtApplication::getQApplication()
 {
-	LOG_IF(not m_qapp,util::Debug,error) << "The QApplication was not yet created, you should run init() before using getQApplication.";
+	LOG_IF( not m_qapp, util::Debug, error ) << "The QApplication was not yet created, you should run init() before using getQApplication.";
 	return *m_qapp;
 }
-bool isis::qt4::QtApplication::init(int argc, char** argv, bool exitOnError)
+bool isis::qt4::QtApplication::init( int argc, char** argv, bool exitOnError )
 {
-	if(m_qapp){
-		LOG(util::Debug,error) << "The QApplication allready exists. This should not happen. I'll not touch it";
-	} else{
+	if ( m_qapp ) {
+		LOG( util::Debug, error ) << "The QApplication allready exists. This should not happen. I'll not touch it";
+	} else {
 		m_argc = argc; // create local copies
 		m_argv = argv;
-		m_qapp.reset(new QApplication(m_argc,m_argv));
+		m_qapp.reset( new QApplication( m_argc, m_argv ) );
 	}
-    return util::Application::init(argc, argv, exitOnError);
+
+	return util::Application::init( argc, argv, exitOnError );
 }
 
 

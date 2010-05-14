@@ -70,25 +70,23 @@ template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &s
 	double offset = 0.0;
 	size_t srcsize = src.len();
 	bool doScale = ( scaleopt != noscale && std::numeric_limits<DST>::is_integer ); //only do scale if scaleopt!=noscale and the target is an integer (scaling into float is useless)
-	if(scaleopt==autoscale && std::numeric_limits<SRC>::is_integer)
-		scaleopt=noupscale; //dont scale up if SRC is an integer
+
+	if ( scaleopt == autoscale && std::numeric_limits<SRC>::is_integer )
+		scaleopt = noupscale; //dont scale up if SRC is an integer
 
 	if ( doScale ) {
 		const DST domain_min = std::numeric_limits<DST>::min();//negative value domain of this dst
 		const DST domain_max = std::numeric_limits<DST>::max();//positive value domain of this dst
 		double minval, maxval;
-
 		LOG_IF( min.typeID() != Type<SRC>::staticID, Debug, info )
-			<< "The given minimum for src Range is not of the same type as the data ("
-			<< min.typeName() << "!=" << Type<SRC>::staticName() << ")";
+		<< "The given minimum for src Range is not of the same type as the data ("
+		<< min.typeName() << "!=" << Type<SRC>::staticName() << ")";
 		LOG_IF( max.typeID() != Type<SRC>::staticID, Debug, info )
-			<< "The given maximum for src Range is not of the same type as the data ("
-			<< max.typeName() << "!=" << Type<SRC>::staticName() << ")";
-
+		<< "The given maximum for src Range is not of the same type as the data ("
+		<< max.typeName() << "!=" << Type<SRC>::staticName() << ")";
 		minval = min.as<double>();
 		maxval = max.as<double>();
-		assert(minval < maxval);
-
+		assert( minval < maxval );
 		LOG( Debug, info ) << "src Range:" << minval << "=>" << maxval;
 		LOG( Debug, info ) << "dst Domain:" << domain_min << "=>" << domain_max;
 		assert( domain_min < domain_max );//we also should assume this

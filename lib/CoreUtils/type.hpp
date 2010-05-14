@@ -39,67 +39,74 @@ template<class TYPE > class Type;
 
 namespace _internal
 {
-template<typename T, bool isNumber> class type_compare{
+template<typename T, bool isNumber> class type_compare
+{
 public:
 	bool operator()( const Type<T> &first, const TypeBase &second )const {
 		LOG( Debug, error ) << "comparison of " << Type<T>::staticName() << " is not supportet";
 		return false;
 	}
 };
-template<typename T> class type_compare<T,true>{
+template<typename T> class type_compare<T, true>
+{
 protected:
-	virtual bool posOverflow(const Type<T> &first, const Type<T> &second)const{return false;} //default to false
-	virtual bool negOverflow(const Type<T> &first, const Type<T> &second)const{return false;} //default to false
-	virtual bool inRange(const Type<T> &first, const Type<T> &second)const{return false;} //default to false
+	virtual bool posOverflow( const Type<T> &first, const Type<T> &second )const {return false;} //default to false
+	virtual bool negOverflow( const Type<T> &first, const Type<T> &second )const {return false;} //default to false
+	virtual bool inRange( const Type<T> &first, const Type<T> &second )const {return false;} //default to false
 public:
 	bool operator()( const Type<T> &first, const TypeBase &second )const {
 		// ask second for a converter from itself to Type<T>
-		const TypeBase::Converter conv=second.getConverterTo( Type<T>::staticID );
-		if(conv){
+		const TypeBase::Converter conv = second.getConverterTo( Type<T>::staticID );
+
+		if ( conv ) {
 			//try to convert second into T and handle results
 			Type<T> buff;
-			switch( conv->convert( second, buff ) ) {
+
+			switch ( conv->convert( second, buff ) ) {
 			case boost::numeric::cPosOverflow:
-				LOG(Debug,info) << "Positive overflow when converting " << second.toString(true) << " to " << Type<T>::staticName() << ".";
-				return posOverflow(first,buff);
+				LOG( Debug, info ) << "Positive overflow when converting " << second.toString( true ) << " to " << Type<T>::staticName() << ".";
+				return posOverflow( first, buff );
 			case boost::numeric::cNegOverflow:
-				LOG(Debug,info) << "Negative overflow when converting " << second.toString(true) << " to " << Type<T>::staticName() << ".";
-				return negOverflow(first,buff);
+				LOG( Debug, info ) << "Negative overflow when converting " << second.toString( true ) << " to " << Type<T>::staticName() << ".";
+				return negOverflow( first, buff );
 			case boost::numeric::cInRange:
-				return inRange(first,buff);
+				return inRange( first, buff );
 			}
 		} else {
-			LOG(Debug,error) << "No conversion of " << second.typeName() << " to " << Type<T>::staticName() << " available";
+			LOG( Debug, error ) << "No conversion of " << second.typeName() << " to " << Type<T>::staticName() << " available";
 			return false;
 		}
 	}
 };
 
-template<typename T, bool isNumber> class type_less : public type_compare<T,isNumber>{};// we are goint to specialize this for numeric T below
-template<typename T, bool isNumber> class type_greater : public type_compare<T,isNumber>{};
-template<typename T, bool isNumber> class type_eq : public type_compare<T,isNumber>{
+template<typename T, bool isNumber> class type_less : public type_compare<T, isNumber> {};// we are goint to specialize this for numeric T below
+template<typename T, bool isNumber> class type_greater : public type_compare<T, isNumber> {};
+template<typename T, bool isNumber> class type_eq : public type_compare<T, isNumber>
+{
 protected:
-	bool inRange(const Type<T> &first, const Type<T> &second)const{
-		return (T)first == (T)second;
+	bool inRange( const Type<T> &first, const Type<T> &second )const {
+		return ( T )first == ( T )second;
 	}
 };
 
-template<typename T> class type_less<T, true> : public type_compare<T,true>{
+template<typename T> class type_less<T, true> : public type_compare<T, true>
+{
 protected:
-	bool posOverflow(const Type<T> &first, const Type<T> &second)const{
+	bool posOverflow( const Type<T> &first, const Type<T> &second )const {
 		return true; //getting an positive overflow when trying to convert second into T, obviously means first is less
 	}
-	bool inRange(const Type<T> &first, const Type<T> &second)const{
-		return (T)first < (T)second;
+	bool inRange( const Type<T> &first, const Type<T> &second )const {
+		return ( T )first < ( T )second;
 	}
 };
-template<typename T> class type_greater<T, true> : public type_compare<T,true>{
+template<typename T> class type_greater<T, true> : public type_compare<T, true>
+{
 protected:
-	bool negOverflow(const Type<T> &first, const Type<T> &second)const{
+	bool negOverflow( const Type<T> &first, const Type<T> &second )const {
 		return true; //getting an negative overflow when trying to convert second into T, obviously means first is greater
 	}
-	bool inRange(const Type<T> &first, const Type<T> &second)const{
-		return (T)first > (T)second;
+	bool inRange( const Type<T> &first, const Type<T> &second )const {
+		return ( T )first > ( T )second;
 	}
 };
 
@@ -160,17 +167,17 @@ public:
 		if ( conv ) {
 			Type<std::string> buff;
 
-			if( conv->convert( *this, buff ) != boost::numeric::cInRange ) {
+			if ( conv->convert( *this, buff ) != boost::numeric::cInRange ) {
 				LOG( Debug, error ) << "Automatic conversion from " << typeName() << " to string failed. Falling back to boost::lexical_cast<std::string>";
 				fallback = true;
 			} else
-			ret = buff;
+				ret = buff;
 		} else {
 			LOG( Debug, error ) << "Missing conversion from " << typeName() << " to string. Falling back to boost::lexical_cast<std::string>";
 			fallback = true;
 		}
 
-		if( fallback )
+		if ( fallback )
 			ret = boost::lexical_cast<std::string>( m_val );
 
 		if ( labeled )ret += "(" + staticName() + ")";
@@ -424,12 +431,11 @@ public:
 	bool convertTo( TypePtrBase& dst )const {
 		_internal::TypeBase::Reference min, max;
 		getMinMax( min, max );
-		assert(not (min.empty() or max.empty()));
+		assert( not ( min.empty() or max.empty() ) );
 		return TypePtrBase::convertTo( dst, *min, *max );
 	}
 	/// \copydoc TypePtrBase::getMinMax
-	void getMinMax ( _internal::TypeBase::Reference &min, _internal::TypeBase::Reference& max) const {
-
+	void getMinMax ( _internal::TypeBase::Reference &min, _internal::TypeBase::Reference& max ) const {
 		if ( len() == 0 ) {
 			LOG( Runtime, warning ) << "Skipping computation of min/max on an empty TypePtr";
 			return;
@@ -437,11 +443,11 @@ public:
 
 		const std::pair<Type<TYPE>, Type<TYPE> > result = _internal::getMinMaxImpl<TYPE, boost::is_arithmetic<TYPE>::value>()( *this );
 
-		if ( min.empty() or min->gt(result.first) ) 
-			min=result.first;
+		if ( min.empty() or min->gt( result.first ) )
+			min = result.first;
 
-		if ( max.empty() or max->lt(result.second) )
-			max=result.second;
+		if ( max.empty() or max->lt( result.second ) )
+			max = result.second;
 	}
 
 	std::vector<Reference> splice( size_t size )const {

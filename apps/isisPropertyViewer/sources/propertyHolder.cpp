@@ -6,16 +6,16 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 3
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- * 
+ *
  * Author: Erik Tuerke, tuerke@cbs.mpg.de, 2010
  *
  *****************************************************************/
@@ -33,25 +33,20 @@ bool PropertyHolder::addPropMapFromImage( const boost::shared_ptr<isis::data::Im
 
 void PropertyHolder::saveIt( void )
 {
-	for ( std::map<std::string, bool>::iterator boolIter = m_propChanged.begin(); boolIter != m_propChanged.end(); boolIter++)
-	{
-		
-		if (boolIter->second)
-		{
-			isis::data::ImageList imageList = isis::data::IOFactory::load( boolIter->first , "");
+	for ( std::map<std::string, bool>::iterator boolIter = m_propChanged.begin(); boolIter != m_propChanged.end(); boolIter++ ) {
+		if ( boolIter->second ) {
+			isis::data::ImageList imageList = isis::data::IOFactory::load( boolIter->first , "" );
 			isis::data::ImageList tmpImageList;
-			BOOST_FOREACH(isis::data::ImageList::reference image, imageList)
-			{
-				const isis::util::PropMap& tmpMap(m_propHolderMap.find(boolIter->first)->second) ;
-				static_cast<isis::util::PropMap&>(*image)=tmpMap;
-				tmpImageList.push_back(image);
+			BOOST_FOREACH( isis::data::ImageList::reference image, imageList ) {
+				const isis::util::PropMap& tmpMap( m_propHolderMap.find( boolIter->first )->second ) ;
+				static_cast<isis::util::PropMap&>( *image ) = tmpMap;
+				tmpImageList.push_back( image );
 			}
 			std::string fileName = boolIter->first;
-			size_t pos = fileName.find(".");
-			fileName.insert(pos, std::string(".chg"));
-			isis::data::IOFactory::write( tmpImageList, fileName, "");
-			m_propChanged.find(boolIter->first)->second = false;
+			size_t pos = fileName.find( "." );
+			fileName.insert( pos, std::string( ".chg" ) );
+			isis::data::IOFactory::write( tmpImageList, fileName, "" );
+			m_propChanged.find( boolIter->first )->second = false;
 		}
 	}
-	
 }

@@ -72,7 +72,7 @@ void isisPropertyViewer::on_actionSave_activated()
 {
 	std::cout << "saving" << std::endl;
 	m_propHolder.saveIt();
-	this->ui.actionSave->setEnabled(false);
+	this->ui.actionSave->setEnabled( false );
 }
 
 void isisPropertyViewer::addFileToTree( const QString &fileName )
@@ -102,12 +102,9 @@ void isisPropertyViewer::createTree( const boost::shared_ptr<isis::data::Image> 
 	QTreeWidgetItem* headItem = new QTreeWidgetItem( header );
 	this->ui.treeWidget->addTopLevelItem( headItem );
 	m_keyList = image->keys();
-
-	BOOST_FOREACH( PropKeyListType::const_reference ref, m_keyList) 
-	{
+	BOOST_FOREACH( PropKeyListType::const_reference ref, m_keyList ) {
 		addPropToTree( image, ref, headItem );
 	}
-
 	unsigned short chunkCounter = 0;
 
 	//go through all the chunks
@@ -122,8 +119,7 @@ void isisPropertyViewer::createTree( const boost::shared_ptr<isis::data::Image> 
 			header << headerProp << headerVal;
 			QTreeWidgetItem* chunkItem = new QTreeWidgetItem( header );
 			headItem->addChild( chunkItem );
-			BOOST_FOREACH( PropKeyListType::const_reference ref, m_keyList )
-			{
+			BOOST_FOREACH( PropKeyListType::const_reference ref, m_keyList ) {
 				addPropToTree( image, ref, chunkItem );
 			}
 		}
@@ -184,8 +180,7 @@ void isisPropertyViewer::edit_item( QTreeWidgetItem* item, int val )
 		QString val = QInputDialog::getText( this, item->parent()->text( 0 ), item->text( 0 ), QLineEdit::Normal, item->text( 1 ), &ok );
 		QString count = "";
 
-		if ( ok ) 
-		{
+		if ( ok ) {
 			std::string currentFileName;
 
 			// get the most parent item
@@ -193,6 +188,7 @@ void isisPropertyViewer::edit_item( QTreeWidgetItem* item, int val )
 				tmpItem = tmpItem->parent();
 				count = tmpItem->text( 0 );
 			}
+
 			m_propHolder.m_propChanged.find( tmpItem->text( 1 ).toStdString() )->second = true;
 			currentFileName = tmpItem->text( 1 ).toStdString();
 			isis::util::PropMap& tmpPropMap = m_propHolder.m_propHolderMap.find( currentFileName )->second;
@@ -205,7 +201,6 @@ void isisPropertyViewer::edit_item( QTreeWidgetItem* item, int val )
 
 			std::string propName = tmpItem->text( 0 ).toStdString();
 			const isis::util::PropertyValue &tmpProp = m_propHolder.m_propHolderMap.find( currentFileName )->second.getPropertyValue( propName );
-			
 
 			if ( not tmpProp->is<isis::util::fvector4>() ) {
 				isis::util::Type<std::string> myVal( val.toStdString() );
@@ -230,11 +225,10 @@ void isisPropertyViewer::edit_item( QTreeWidgetItem* item, int val )
 
 				m_propHolder.m_propHolderMap.find( currentFileName )->second.setPropertyValue( propName, *tmpVector );
 			}
-			item->setText(1,val);
-			this->ui.actionSave->setEnabled(true);
+
+			item->setText( 1, val );
+			this->ui.actionSave->setEnabled( true );
 		}
-		
-		
 	}
 }
 
