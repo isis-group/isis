@@ -6,6 +6,11 @@ project(ISIS)
 ###############################################################################
 #Global options
 ###############################################################################
+
+# set project specific module path
+SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
+  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
+
 FIND_PACKAGE(Boost REQUIRED COMPONENTS filesystem regex system date_time)
 include_directories(${Boost_INCLUDE_DIR}  lib)
 
@@ -23,6 +28,24 @@ OPTION(${CMAKE_PROJECT_NAME}_HAVE_QT4 "Enable Qt4-support" OFF)
 
 OPTION(${CMAKE_PROJECT_NAME}_RUNTIME_LOG "Enable runtime logging" ON)
 OPTION(${CMAKE_PROJECT_NAME}_DEBUG_LOG "Enable debug logging" ON)
+
+OPTION(${CMAKE_PROJECT_NAME}_BUILD_DOC "Build the Doxygen documentation for the core libraries" OFF)
+
+################################################################################
+# ISIS project version number
+################################################################################
+# set the ISIS version
+SET(ISIS_VERSION_MAJOR "0")
+SET(ISIS_VERSION_MINOR "0")
+SET(ISIS_VERSION_PATCH "1")
+
+SET(ISIS_VERSION 
+  ${ISIS_VERSION_MAJOR}.${ISIS_VERSION_MINOR}.${ISIS_VERSION_PATCH})
+
+# build doc
+IF(${CMAKE_PROJECT_NAME}_BUILD_DOC)
+  INCLUDE(UseDoxygen)
+ENDIF(${CMAKE_PROJECT_NAME}_BUILD_DOC)
 
 ###############################################################################
 #Global definitions/compiler flags
@@ -72,8 +95,6 @@ IF (NOT SVN_REVISION)
 		ENDIF (NOT EXPORTED)
 	ENDIF (SVNVERSION)
 ENDIF (NOT SVN_REVISION)
-
-
 
 IF (SVN_REVISION)
   message(STATUS "SVN Revision: ${SVN_REVISION}")
