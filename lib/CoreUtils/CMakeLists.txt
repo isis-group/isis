@@ -4,3 +4,4 @@ add_library(utils tmpfile.cpp application.cpp selection.cpp progparameter.cpp nu
 target_link_libraries(utils ${Boost_LIBRARIES})
 
 set_target_properties(utils PROPERTIES LINK_FLAGS "--no-undefined")
+

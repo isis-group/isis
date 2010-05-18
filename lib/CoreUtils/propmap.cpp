@@ -25,7 +25,7 @@ const util::PropertyValue PropMap::emptyProp;//dummy to be able to return an emp
 ///////////////////////////////////////////////////////////////////
 
 PropMap::PropMap( const isis::util::PropMap::base_type &src ):
-	std::map< std::string, PropertyValue, _internal::caselessStringLess >( src ) {}
+		std::map< std::string, PropertyValue, _internal::caselessStringLess >( src ) {}
 
 bool PropMap::operator==( const PropMap &src )const
 {
@@ -51,8 +51,8 @@ PropertyValue &PropMap::fetchProperty(
 		if ( found != root.end() ) {//and we found the entry
 			util::PropertyValue &ref = found->second;
 			LOG_IF( not ref->is<util::PropMap>(), Runtime, error )
-					<< util::MSubject( found->first ) << " is a leaf, but requested as a branch in "
-					<< util::MSubject( util::list2string( at, pathEnd, "/" ) ) << " program will stop";
+			<< util::MSubject( found->first ) << " is a leaf, but requested as a branch in "
+			<< util::MSubject( util::list2string( at, pathEnd, "/" ) ) << " program will stop";
 			return fetchProperty( ref->cast_to_Type<util::PropMap>(), next, pathEnd ); //continue there
 		} else { // if we should create a sub-map
 			//insert a empty branch (aka PropMap) at "*at" (and fetch the reference of that)
@@ -76,8 +76,8 @@ const PropertyValue *PropMap::searchBranch(
 		if ( found != root.end() ) {//and we found the entry
 			const util::PropertyValue &ref = found->second;
 			LOG_IF( not ref->is<util::PropMap>(), Runtime, error )
-					<< util::MSubject( found->first ) << " is a leaf, but requested as a branch in "
-					<< util::MSubject( util::list2string( at, pathEnd, "/" ) ) << " program will stop";
+			<< util::MSubject( found->first ) << " is a leaf, but requested as a branch in "
+			<< util::MSubject( util::list2string( at, pathEnd, "/" ) ) << " program will stop";
 			return searchBranch( ref->cast_to_Type<util::PropMap>(), next, pathEnd ); //continue there
 		}
 	} else if ( found != root.end() ) {// if its the leaf and we found the entry
@@ -312,8 +312,8 @@ void PropMap::joinTree( const isis::util::PropMap &other, bool overwrite, std::s
 				thisIt->second = otherIt->second;
 			} else if ( not ( thisIt->second == otherIt->second ) ) {
 				LOG( Debug, info )
-						<< "Rejecting property " << MSubject( *otherIt )
-						<< " because " << MSubject( thisIt->second ) << " is allready there";
+				<< "Rejecting property " << MSubject( *otherIt )
+				<< " because " << MSubject( thisIt->second ) << " is allready there";
 				rejects.insert( rejects.end(), prefix + otherIt->first );
 			}
 		} else {
@@ -399,7 +399,7 @@ const isis::util::PropertyValue &PropMap::getPropertyValue( const std::string &k
 
 	if ( not found ) {
 		LOG( Debug, info )
-				<< "Requested Property " << key << " is not set! Returning empty property.";
+		<< "Requested Property " << key << " is not set! Returning empty property.";
 		return emptyProp;
 	} else
 		return *found;
@@ -418,12 +418,12 @@ bool PropMap::renameProperty( std::string oldname, std::string newname )
 
 	if ( found ) {
 		LOG_IF( hasProperty( newname ), Runtime, warning )
-				<< "Overwriting " << std::make_pair( newname, getPropertyValue( newname ) ) << " with " << *found;
+		<< "Overwriting " << std::make_pair( newname, getPropertyValue( newname ) ) << " with " << *found;
 		operator[]( newname ) = *found;
 		return remove( oldname );
 	} else {
 		LOG( Runtime, warning )
-				<< "Cannot rename " << oldname << " it does not exist";
+		<< "Cannot rename " << oldname << " it does not exist";
 		return false;
 	}
 }

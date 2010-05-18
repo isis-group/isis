@@ -57,14 +57,24 @@ bool TypeBase::convert( const TypeBase &from, TypeBase &to )
 	const Converter &conv = from.getConverterTo( to.typeID() );
 
 	if ( conv ) {
-		conv->convert( from, to );
-		return true;
+		switch ( conv->convert( from, to ) ) {
+		case boost::numeric::cPosOverflow:
+			LOG( Runtime, error ) << "Positive overflow when converting " << from.toString( true ) << " to " << to.typeName() << ".";
+			break;
+		case boost::numeric::cNegOverflow:
+			LOG( Runtime, error ) << "Negative overflow when converting " << from.toString( true ) << " to " << to.typeName() << ".";
+			break;
+		case boost::numeric::cInRange:
+			return true;
+			break;
+		}
 	} else {
 		LOG( Runtime, error )
-				<< "I dont know any conversion from "
-				<< MSubject( from.toString( true ) ) << " to " << MSubject( to.typeName() );
-		return false;
+		<< "I dont know any conversion from "
+		<< MSubject( from.toString( true ) ) << " to " << MSubject( to.typeName() );
 	}
+
+	return false;
 }
 
 const TypePtrBase::Converter &TypePtrBase::getConverterTo( unsigned short id )const
@@ -98,11 +108,11 @@ void TypePtrBase::copyRange( size_t start, size_t end, TypePtrBase &dst, size_t 
 	assert( start <= end );
 	const size_t length = end - start + 1;
 	LOG_IF( not dst.isSameType( *this ), Debug, error )
-			<< "Copying into a TypePtr of different type. Its " << dst.typeName() << " not " << typeName();
+	<< "Copying into a TypePtr of different type. Its " << dst.typeName() << " not " << typeName();
 	LOG_IF( end >= len(), Runtime, error )
-			<< "End of the range (" << end << ") is behind the end of this TypePtr (" << len() << ")";
+	<< "End of the range (" << end << ") is behind the end of this TypePtr (" << len() << ")";
 	LOG_IF( length + dst_start > dst.len(), Runtime, error )
-			<< "End of the range (" << length + dst_start << ") is behind the end of the destination (" << dst.len() << ")";
+	<< "End of the range (" << length + dst_start << ") is behind the end of the destination (" << dst.len() << ")";
 	boost::shared_ptr<void> daddr = dst.address().lock();
 	boost::shared_ptr<void> saddr = address().lock();
 	const size_t soffset = bytes_per_elem() * start; //source offset in bytes
@@ -123,7 +133,7 @@ bool TypePtrBase::convertTo( TypePtrBase &dst, const TypeBase &min, const TypeBa
 		return true;
 	} else {
 		LOG( Runtime, error )
-				<< "I dont know any conversion from " << MSubject( typeName() ) << " to " << MSubject( dst.typeName() );
+		<< "I dont know any conversion from " << MSubject( typeName() ) << " to " << MSubject( dst.typeName() );
 		return false;
 	}
 }

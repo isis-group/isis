@@ -55,29 +55,29 @@ protected:
 
 public:
 
-	void Execute( itk::Object *caller, const itk::EventObject &event ) {
+	void Execute( itk::Object *caller, const itk::EventObject & event ) {
 		Execute( ( const itk::Object * ) caller, event );
 	}
 
-	void Execute( const itk::Object *object, const itk::EventObject &event ) {
+	void Execute( const itk::Object * object, const itk::EventObject & event ) {
 		if ( !itk::IterationEvent().CheckEvent( &event ) ) {
 			return;
 		}
 
-		if ( const itk::RegularStepGradientDescentOptimizer *optimizer =
-				 dynamic_cast<const itk::RegularStepGradientDescentOptimizer *> ( object ) ) {
+		if ( const itk::RegularStepGradientDescentOptimizer* optimizer =
+				 dynamic_cast<const itk::RegularStepGradientDescentOptimizer*> ( object ) ) {
 			std::cout << optimizer->GetCurrentIteration() << " = ";
 			std::cout << optimizer->GetValue() << " : ";
 			std::cout << optimizer->GetCurrentPosition() << std::endl;
 		}
 
-		if ( const itk::VersorRigid3DTransformOptimizer *optimizer =
-				 dynamic_cast<const itk::VersorRigid3DTransformOptimizer *> ( object ) ) {
+		if ( const itk::VersorRigid3DTransformOptimizer* optimizer =
+				 dynamic_cast<const itk::VersorRigid3DTransformOptimizer*> ( object ) ) {
 			std::cout << optimizer->GetCurrentIteration() << " = ";
 			std::cout << optimizer->GetValue() << " : ";
 			std::cout << optimizer->GetCurrentPosition() << std::endl;
-			//          std::cout << optimizer->GetCurrentIteration() << "\t";
-			//          std::cout << optimizer->GetValue() << std::endl;
+//          std::cout << optimizer->GetCurrentIteration() << "\t";
+//          std::cout << optimizer->GetValue() << std::endl;
 		}
 	}
 
@@ -94,19 +94,19 @@ public:
 	progress_display display;
 protected:
 	ProcessUpdate() :
-		display( 101 ) {
+			display( 101 ) {
 	}
 	;
 public:
-	typedef const itk::ProcessObject *ProcessPointer;
+	typedef const itk::ProcessObject * ProcessPointer;
 
 	void Execute(
-		itk::Object *caller, const itk::EventObject &event ) {
+		itk::Object *caller, const itk::EventObject & event ) {
 		Execute( ( const itk::Object * ) caller, event );
 	}
 
 	void Execute(
-		const itk::Object *object, const itk::EventObject &event ) {
+		const itk::Object * object, const itk::EventObject & event ) {
 		if ( !( itk::ProgressEvent().CheckEvent( &event ) ) ) {
 			return;
 		}

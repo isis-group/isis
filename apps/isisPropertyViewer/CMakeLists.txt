@@ -6,10 +6,6 @@ file (GLOB UI_FILES forms/*.ui)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/headers)
 
-find_package(Qt4 REQUIRED) # find and setup Qt4 for this project
-
-include(${QT_USE_FILE})
-
 #setup qt
 set(QT_USE_QTUITOOLS TRUE)
 
@@ -19,7 +15,7 @@ QT4_WRAP_UI(isisPropertyViewer_UIS_H ${UI_FILES})
 
 add_executable(isisPropertyViewer ${CPP_FILES} ${isisPropertyViewer_UIS_H} ${isisPropertyViewer_moc_files})
 
-target_link_libraries(isisPropertyViewer ${QT_LIBRARIES} data)
+target_link_libraries(isisPropertyViewer ${QT_LIBRARIES} data util isisAdapter_qt4)
 
 
 

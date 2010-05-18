@@ -31,7 +31,7 @@ public:
 	TestHandler( LogLevel level ): util::_internal::MessageHandlerBase( level ) {}
 	virtual ~TestHandler() {}
 	void commit( const util::_internal::Message &mesg ) {
-		if( mesg.str() == "Automatic numeric conversion of {s} to u16bit failed: bad numeric conversion: negative overflow" )
+		if ( mesg.str() == "Automatic numeric conversion of {s} to u16bit failed: bad numeric conversion: negative overflow" )
 			hit++;
 		else
 			std::cout << "Unexpected error " << mesg.merge();
@@ -201,22 +201,12 @@ BOOST_AUTO_TEST_CASE( typePtr_minmax_test )
 	//without scaling
 	floatArray.copyFromMem( init, 10 );
 	{
-		util::Type<float> min, max;
+		util::_internal::TypeBase::Reference min, max;
 		floatArray.getMinMax( min, max );
-		BOOST_CHECK_EQUAL( min, -1.8f );
-		BOOST_CHECK_EQUAL( max, 1.8f );
-	}
-	{
-		util::Type<int> min, max;
-		floatArray.getMinMax( min, max );
-		BOOST_CHECK_EQUAL( min, -2 );
-		BOOST_CHECK_EQUAL( max, 2 );
-	}
-	{
-		util::enable_log<TestHandler>( error );
-		util::Type<u_int16_t> min, max;
-		floatArray.getMinMax( min, max );
-		BOOST_CHECK_EQUAL( TestHandler::hit, 4 );
+		BOOST_CHECK( min->is<float>() );
+		BOOST_CHECK( max->is<float>() );
+		BOOST_CHECK_EQUAL( min->as<float>(), -1.8f );
+		BOOST_CHECK_EQUAL( max->as<float>(), 1.8f );
 	}
 }
 }

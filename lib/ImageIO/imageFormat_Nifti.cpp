@@ -54,7 +54,7 @@ class NiftiChunk : public data::Chunk
 {
 public:
 	template<typename T, typename D> NiftiChunk( T *src, D del, size_t width, size_t height, size_t slices, size_t timesteps ) :
-		data::Chunk( src, del, width, height, slices, timesteps ) {
+			data::Chunk( src, del, width, height, slices, timesteps ) {
 		LOG( ImageIoDebug, info ) << "create NiftiChunk";
 	}
 
@@ -77,12 +77,12 @@ class ImageFormat_Nifti : public FileFormat
 		std::string m_filename;
 		//constructor
 		Deleter( nifti_image *ni, const std::string &filename ) :
-			m_pNiImage( ni ), m_filename( filename ) {}
+				m_pNiImage( ni ), m_filename( filename ) {}
 
 		//the most important operator
 		void operator ()( void *at ) {
 			LOG_IF( NULL == m_pNiImage, ImageIoLog, error )
-					<<  "Trying to close non-existing nifti file: " << util::MSubject( m_filename );
+			<<  "Trying to close non-existing nifti file: " << util::MSubject( m_filename );
 			LOG( ImageIoDebug, info ) << "Closing Nifti-Chunk file " << util::MSubject( m_filename );
 			//clean up with the function from nifti1_io.h
 			nifti_image_free( m_pNiImage );
@@ -276,10 +276,10 @@ private:
 			LOG( ImageIoLog, info ) << "dims at all " << dimensions;
 			LOG( ImageIoLog, info ) << "Offset values from nifti" << offsets;
 			LOG( ImageIoLog, info ) << "FOV read/phase/slice/voxelsize:"
-									<< getVector( ni, readDir )
-									<< " / " << getVector( ni, phaseDir )
-									<< " / " << getVector( ni, sliceDir )
-									<< getVector( ni, voxelSizeVec );
+			<< getVector( ni, readDir )
+			<< " / " << getVector( ni, phaseDir )
+			<< " / " << getVector( ni, sliceDir )
+			<< getVector( ni, voxelSizeVec );
 		}
 	}
 
@@ -335,7 +335,7 @@ private:
 				retVec = qto * voxelSizeVec;
 			} else {
 				LOG( ImageIoLog, error )
-						<< "can't read orientation Vector for direction: " << dir + 1;
+				<< "can't read orientation Vector for direction: " << dir + 1;
 			}
 		}
 
@@ -359,11 +359,7 @@ private:
 		}
 
 		ni.nbyper = image.bytes_per_voxel();
-		//min / max due to T in image but for nifti everything is float
-		util::Type<T> min, max;
-		image.getMinMax( min, max );
-		ni.cal_min = min;
-		ni.cal_max = max;
+		image.getMinMax( ni.cal_min, ni.cal_max );
 	}
 
 	void copyHeaderToNifti( const data::Image &image, nifti_image &ni ) {

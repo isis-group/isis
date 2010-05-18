@@ -20,6 +20,9 @@
 #include "application.hpp"
 #include <boost/foreach.hpp>
 
+#define STR(s) _xstr_(s)
+#define _xstr_(s) std::string(#s)
+
 namespace isis
 {
 namespace util
@@ -59,31 +62,10 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 	}
 
 	if ( not parameters.isComplete() ) {
-		ParameterMap::iterator iP;
 		std::cout << "Missing parameters: ";
 
-		for ( iP = parameters.begin(); iP != parameters.end(); iP++ ) {
+		for ( ParameterMap::iterator iP = parameters.begin(); iP != parameters.end(); iP++ ) {
 			if ( iP->second.needed() ) {std::cout << iP->first << "  ";}
-		}
-
-		std::cout << std::endl;
-		std::cout << "Usage: " << this->m_name << " <options>, where <options> includes:" << std::endl;
-
-		for ( iP = parameters.begin(); iP != parameters.end(); iP++ ) {
-			std::string pref;
-
-			if ( iP->second.needed() ) {pref = " Required.";}
-
-			if ( not iP->second.needed() and not iP->second->is<dlist>() ) {pref = " Default: " + iP->second.toString();};
-
-			std::cout << "\t-" << iP->first << " <" << iP->second->typeName() << ">" << std::endl;
-
-			if ( iP->second->is<Selection>() ) {
-				const Selection &ref = iP->second->cast_to_Type<Selection>();
-				std::cout << "\t\tOptions are: " <<  ref.getEntries() << std::endl;
-			}
-
-			std::cout << "\t\t" << iP->second.description() << pref << std::endl;
 		}
 
 		err = true;
@@ -97,6 +79,7 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 	setLog<ImageIoLog>( LLMap[parameters["dImageIO"]] );
 
 	if ( err and exitOnError ) {
+		printHelp();
 		std::cout << "Exiting..." << std::endl;
 		exit( 1 );
 	}
@@ -105,14 +88,38 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 }
 void Application::printHelp()const
 {
-	std::cout << m_name << " --- Valid parameters:" << std::endl;
-	parameters.printAll();
+	std::cout << std::endl;
+	std::cout << "Usage: " << this->m_name << " <options>, where <options> includes:" << std::endl;
+
+	for ( ParameterMap::const_iterator iP = parameters.begin(); iP != parameters.end(); iP++ ) {
+		std::string pref;
+
+		if ( iP->second.needed() ) {pref = " Required.";}
+
+		if ( not iP->second.needed() and not iP->second->is<dlist>() ) {pref = " Default: " + iP->second.toString();};
+
+		std::cout << "\t-" << iP->first << " <" << iP->second->typeName() << ">" << std::endl;
+
+		if ( iP->second->is<Selection>() ) {
+			const Selection &ref = iP->second->cast_to_Type<Selection>();
+			std::cout << "\t\tOptions are: " <<  ref.getEntries() << std::endl;
+		}
+
+		std::cout << "\t\t" << iP->second.description() << pref << std::endl;
+	}
 }
 
 boost::shared_ptr< _internal::MessageHandlerBase > Application::getLogHandler( std::string module, isis::LogLevel level )const
 {
 	return boost::shared_ptr< _internal::MessageHandlerBase >( level ? new util::DefaultMsgPrint( level ) : 0 );
 }
+const std::string Application::getCoreVersion( void )
+{
+	return STR( _ISIS_VERSION_MAJOR ) + "." + STR( _ISIS_VERSION_MINOR ) + "." + STR( _ISIS_VERSION_PATCH ) + ".r" + STR( _ISIS_SVN_REVISION );
+}
 
 }
 }
+#undef STR
+#undef _xstr_
+

@@ -19,51 +19,26 @@
  * Author: Erik Tuerke, tuerke@cbs.mpg.de, 2010
  *
  *****************************************************************/
+#ifndef PROPERTYHOLDER_HPP
+#define PROPERTYHOLDER_HPP
 
-
-#ifndef VTKADAPTER_HPP_
-#define VTKADAPTER_HPP_
-
-#include "DataStorage/image.hpp"
-#include "CoreUtils/log.hpp"
-
-//external includes
+#include <map>
 #include <boost/shared_ptr.hpp>
+#include "CoreUtils/propmap.hpp"
+#include "DataStorage/image.hpp"
+#include "ui_isisPropertyViewer.h"
 
-//vtk includes
-#include <vtkImageData.h>
-#include <vtkImageImport.h>
-#include <vtkSmartPointer.h>
-
-//TODO chunk handling
-
-namespace isis
-{
-namespace adapter
-{
-
-/**
-  * VTKAdapter is able of taking an isis image object and return a vector of vtkSmartpointers on vtkImageData objects.
-  */
-class vtkAdapter
+class PropertyHolder
 {
 public:
-	/**
-	* Gets a std::vector of vtkSmartpointers on vtkImageData objects.
-	*/
-	static vtkImageData *makeVtkImageObject( const boost::shared_ptr<data::Image>, unsigned int dim4 = 0 );
-private:
-	boost::shared_ptr<data::Image> m_ImageISIS;
-protected:
-	//should not be loaded directly
-	vtkAdapter( const boost::shared_ptr<data::Image> );
-	vtkAdapter( const vtkAdapter & ) {};
+	bool addPropMapFromImage( const boost::shared_ptr< isis::data::Image>, const QString& );
+	std::map<std::string, isis::util::PropMap> m_propHolderMap;
+	std::map<std::string, bool> m_propChanged;
+	void saveIt( void );
+
 
 
 };
 
 
-
-}
-}// end namespace
-#endif //VTKADAPTER_HPP_
+#endif

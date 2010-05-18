@@ -1,6 +1,6 @@
 /****************************************************************
  *
- * <Copyright information>
+ * Copyright (C) 2010 Max Planck Institute for Human Cognitive and Brain Sciences, Leipzig
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,13 +18,9 @@
  *
  * Author: Erik Tuerke, tuerke@cbs.mpg.de, 2010
  *
- * vtkAdapter.cpp
- *
- * Description:
- *
- *  Created on: Mar,30 2010
- *      Author: tuerke
- ******************************************************************/
+ *****************************************************************/
+
+
 #ifndef ITKADAPTER_HPP_
 #define ITKADAPTER_HPP_
 
@@ -68,7 +64,7 @@ public:
 	template<typename TImage> static typename TImage::Pointer
 	makeItkImageObject( const boost::shared_ptr<data::Image> src, const bool behaveAsItkReader = true ) {
 		typedef TImage OutputImageType;
-		itkAdapter *myAdapter = new itkAdapter( src );
+		itkAdapter* myAdapter = new itkAdapter( src );
 
 		switch ( src->chunksBegin()->typeID() ) {
 		case util::TypePtr<int8_t>::staticID:
@@ -95,6 +91,9 @@ public:
 		case util::TypePtr<double>::staticID:
 			return myAdapter->internCreateItk<double, OutputImageType>( behaveAsItkReader );
 			break;
+		default:
+			LOG( DataLog, error ) << "Unknown pixel data type";
+			return 0;
 		}
 	}
 	/**
@@ -172,7 +171,7 @@ public:
 protected:
 	//should not be loaded directly
 	itkAdapter( const boost::shared_ptr<data::Image> src ) : m_ImageISIS( src ) {};
-	itkAdapter( const itkAdapter & ) {};
+	itkAdapter( const itkAdapter& ) {};
 	itkAdapter() {};
 private:
 
@@ -245,7 +244,7 @@ private:
 		importer->SetDirection( itkDirection );
 		importer->SetImportPointer( &this->m_ImageISIS->voxel<typename InputImageType::PixelType>( 0, 0, 0, 0 ), itkSize[0], false );
 		rescaler->SetInput( importer->GetOutput() );
-		util::Type<typename InputImageType::PixelType> minIn, maxIn;
+		typename InputImageType::PixelType minIn, maxIn;
 		this->m_ImageISIS->getMinMax( minIn, maxIn );
 		rescaler->SetOutputMinimum( minIn );
 		rescaler->SetOutputMaximum( maxIn );

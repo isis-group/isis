@@ -46,16 +46,16 @@ int main( int argc, char *argv[] )
 
 		if ( not diff.empty() ) {
 			std::cout
-					<< "Metadata of " << files.front() << ":" << count << " and "
-					<< files.back() << ":" << count  << " differ:" << std::endl
-					<< diff << std::endl;
+				<< "Metadata of " << files.front() << ":" << count << " and "
+				<< files.back() << ":" << count  << " differ:" << std::endl
+				<< diff << std::endl;
 		}
 
 		if ( first.sizeToVector() != second.sizeToVector() ) {
 			std::cout
-					<< "Image sizes of " << files.front() << ":" << count << " and "
-					<< files.back() << ":" << count  << " differ:"
-					<< first.sizeToString() << "/" << second.sizeToString() << std::endl;
+				<< "Image sizes of " << files.front() << ":" << count << " and "
+				<< files.back() << ":" << count  << " differ:"
+				<< first.sizeToString() << "/" << second.sizeToString() << std::endl;
 			ret++;
 		} else {
 			size_t voxels = first.cmp( second );

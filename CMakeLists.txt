@@ -3,6 +3,16 @@ cmake_minimum_required(VERSION 2.6)
 # the ISIS project
 project(ISIS)
 
+#set isis version number
+SET(${CMAKE_PROJECT_NAME}_VERSION_MAJOR "0")
+SET(${CMAKE_PROJECT_NAME}_VERSION_MINOR "1")
+SET(${CMAKE_PROJECT_NAME}_VERSION_PATCH "0")
+
+add_definitions(-D_ISIS_VERSION_MAJOR=${${CMAKE_PROJECT_NAME}_VERSION_MAJOR})
+add_definitions(-D_ISIS_VERSION_MINOR=${${CMAKE_PROJECT_NAME}_VERSION_MINOR})
+add_definitions(-D_ISIS_VERSION_PATCH=${${CMAKE_PROJECT_NAME}_VERSION_PATCH})
+
+
 ###############################################################################
 #Global options
 ###############################################################################
@@ -30,6 +40,10 @@ OPTION(${CMAKE_PROJECT_NAME}_RUNTIME_LOG "Enable runtime logging" ON)
 OPTION(${CMAKE_PROJECT_NAME}_DEBUG_LOG "Enable debug logging" ON)
 
 OPTION(${CMAKE_PROJECT_NAME}_BUILD_DOC "Build the Doxygen documentation for the core libraries" OFF)
+OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI "Enable Nifti-IO plugin" OFF)
+OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL "Enable Null-IO plugin" ON)
+OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM "Enable Dicom-IO plugin" OFF)
+OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ "Enable proxy plugin for compressed files" ON)
 
 ################################################################################
 # ISIS project version number
@@ -98,7 +112,7 @@ ENDIF (NOT SVN_REVISION)
 
 IF (SVN_REVISION)
   message(STATUS "SVN Revision: ${SVN_REVISION}")
-  add_definitions(-D_SVN_REVISION=${SVN_REVISION})
+  add_definitions(-D_ISIS_SVN_REVISION=${SVN_REVISION})
 endif(SVN_REVISION)
 
 IF(${CMAKE_PROJECT_NAME}_HAVE_ITK)
@@ -110,6 +124,12 @@ IF(${CMAKE_PROJECT_NAME}_HAVE_VTK)
 	FIND_PACKAGE(VTK REQUIRED)
 	include(${USE_VTK_FILE})
 ENDIF(${CMAKE_PROJECT_NAME}_HAVE_VTK)
+
+IF(${CMAKE_PROJECT_NAME}_HAVE_QT4)
+	add_definitions(-D_HAVE_QT4=${CMAKE_PROJECT_NAME}_HAVE_QT4)
+	find_package(Qt4 REQUIRED)
+	include(${QT_USE_FILE})
+ENDIF(${CMAKE_PROJECT_NAME}_HAVE_QT4)
 
 # If ITK AND VTK are used together we have to increase the number of maximal
 # template recursion otherwise there will be an overflow in the Boost library.

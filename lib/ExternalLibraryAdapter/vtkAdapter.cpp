@@ -1,3 +1,25 @@
+/****************************************************************
+ *
+ * Copyright (C) 2010 Max Planck Institute for Human Cognitive and Brain Sciences, Leipzig
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ *
+ * Author: Erik Tuerke, tuerke@cbs.mpg.de, 2010
+ *
+ *****************************************************************/
+
 #include "vtkAdapter.hpp"
 
 namespace isis
@@ -6,7 +28,7 @@ namespace adapter
 {
 
 vtkAdapter::vtkAdapter( const boost::shared_ptr<isis::data::Image> src )
-	: m_ImageISIS( src )
+		: m_ImageISIS( src )
 {}
 
 //return a list of vtkImageData type pointer
@@ -23,8 +45,6 @@ vtkImageData *vtkAdapter::makeVtkImageObject( const boost::shared_ptr<data::Imag
 
 	//set the datatype for the vtkImage object
 	//TODO check datatypes
-	importer->SetWholeExtent( 0, dimensions[0] - 1, 0, dimensions[1] - 1, 0, dimensions[2] - 1 ); //TODO what is exactly defined by the whole extend????????????
-	importer->SetDataExtentToWholeExtent();
 	vtkImage->SetOrigin( indexOrigin[0], indexOrigin[1], indexOrigin[2] );
 	vtkImage->SetSpacing( spacing[0], spacing[1], spacing[2] );
 	//go through every timestep (dimensions[3] and add the chunk to the image list
@@ -74,6 +94,8 @@ vtkImageData *vtkAdapter::makeVtkImageObject( const boost::shared_ptr<data::Imag
 
 	importer->Update();
 	vtkImage = importer->GetOutput();
+	importer->SetWholeExtent( 0, dimensions[0] - 1, 0, dimensions[1] - 1, 0, dimensions[2] - 1 ); //TODO what is exactly defined by the whole extend????????????
+	importer->SetDataExtentToWholeExtent();
 	return vtkImage;
 }
 

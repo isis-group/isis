@@ -21,7 +21,6 @@
 #include "type_base.hpp"
 #include "propmap.hpp" // we must have all types here and PropMap was only forward-declared in types.hpp
 #include <boost/mpl/for_each.hpp>
-#include <boost/numeric/conversion/converter.hpp>
 #include <boost/type_traits/is_arithmetic.hpp>
 #include <boost/mpl/and.hpp>
 
@@ -39,7 +38,7 @@ template<typename SRC, typename DST> class TypeGenerator: public TypeConverterBa
 public:
 	void generate( const boost::scoped_ptr<TypeBase>& src, boost::scoped_ptr<TypeBase>& dst )const {
 		LOG_IF( dst.get(), Debug, warning ) <<
-											"Generating into existing value " << dst->toString( true );
+		"Generating into existing value " << dst->toString( true );
 		Type<DST> *ref = new Type<DST>;
 		convert( src->cast_to_Type<SRC>(), *ref );
 		dst.reset( ref );
@@ -61,17 +60,18 @@ template<bool NUMERIC, typename SRC, typename DST> class TypeConverter<NUMERIC, 
 {
 	TypeConverter() {
 		LOG( Debug, verbose_info )
-				<< "Creating trivial copy converter for " << Type<SRC>::staticName();
+		<< "Creating trivial copy converter for " << Type<SRC>::staticName();
 	};
 public:
 	static boost::shared_ptr<const TypeConverterBase> create() {
 		TypeConverter<NUMERIC, true, SRC, DST> *ret = new TypeConverter<NUMERIC, true, SRC, DST>;
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
-	void convert( const TypeBase &src, TypeBase &dst )const {
+	boost::numeric::range_check_result convert( const TypeBase& src, TypeBase& dst )const {
 		SRC &dstVal = dst.cast_to_Type<SRC>();
 		const SRC &srcVal = src.cast_to_Type<SRC>();
 		dstVal = srcVal;
+		return boost::numeric::cInRange;
 	}
 	virtual ~TypeConverter() {}
 };
@@ -80,33 +80,38 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 // Numeric version -- uses boost::numeric_cast
 /////////////////////////////////////////////////////////////////////////////
+struct NumericOverflowHandler {
+	static boost::numeric::range_check_result result;
+	void operator() ( boost::numeric::range_check_result r ) { // throw bad_numeric_conversion derived
+		result = r;
+	}
+};
+boost::numeric::range_check_result NumericOverflowHandler::result = boost::numeric::cInRange;
+
 template<typename SRC, typename DST> class TypeConverter<true, false, SRC, DST> : public TypeGenerator<SRC, DST>
 {
 	TypeConverter() {
 		LOG( Debug, verbose_info )
-				<< "Creating numeric converter from "
-				<< Type<SRC>::staticName() << " to " << Type<DST>::staticName();
+		<< "Creating numeric converter from "
+		<< Type<SRC>::staticName() << " to " << Type<DST>::staticName();
 	};
 public:
 	static boost::shared_ptr<const TypeConverterBase> create() {
 		TypeConverter<true, false, SRC, DST> *ret = new TypeConverter<true, false, SRC, DST>;
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
-	void convert( const TypeBase &src, TypeBase &dst )const {
-		try {
-			typedef boost::numeric::converter <
-			DST, SRC,
-			   boost::numeric::conversion_traits<DST, SRC>,
-			   boost::numeric::def_overflow_handler,
-			   boost::numeric::RoundEven<SRC>
-			   > converter;
-			DST &dstVal = dst.cast_to_Type<DST>();
-			const SRC &srcVal = src.cast_to_Type<SRC>();
-			dstVal = converter::convert( srcVal );
-		} catch ( boost::numeric::bad_numeric_cast const &e ) {
-			LOG( Runtime, error )
-					<< "Automatic numeric conversion of " << MSubject( src.toString( true ) ) << " to " << dst.typeName() << " failed: " << e.what();
-		}
+	boost::numeric::range_check_result convert( const TypeBase& src, TypeBase& dst )const {
+		typedef boost::numeric::converter <
+		DST, SRC,
+		boost::numeric::conversion_traits<DST, SRC>,
+		NumericOverflowHandler,
+		boost::numeric::RoundEven<SRC>
+		> converter;
+		DST &dstVal = dst.cast_to_Type<DST>();
+		const SRC &srcVal = src.cast_to_Type<SRC>();
+		NumericOverflowHandler::result = boost::numeric::cInRange;
+		dstVal = converter::convert( srcVal );
+		return NumericOverflowHandler::result;
 	}
 	virtual ~TypeConverter() {}
 };
@@ -119,8 +124,8 @@ template<typename SRC, typename DST > class TypeConverter<false, false, vector4<
 	boost::shared_ptr<const TypeConverterBase> m_conv;
 	TypeConverter( boost::shared_ptr<const TypeConverterBase> elem_conv ): m_conv( elem_conv ) {
 		LOG( Debug, verbose_info )
-				<< "Creating vector converter from "
-				<< Type<vector4<SRC> >::staticName() << " to " << Type<vector4<DST> >::staticName();
+		<< "Creating vector converter from "
+		<< Type<vector4<SRC> >::staticName() << " to " << Type<vector4<DST> >::staticName();
 	};
 public:
 	static boost::shared_ptr<const TypeConverterBase> create() {
@@ -136,15 +141,22 @@ public:
 			return boost::shared_ptr<const TypeConverterBase>();
 		}
 	}
-	void convert( const TypeBase &src, TypeBase &dst )const {
+	boost::numeric::range_check_result convert( const TypeBase& src, TypeBase& dst )const {
 		vector4<DST> &dstVal = dst.cast_to_Type<vector4<DST> >();
 		const vector4<SRC> &srcVal = src.cast_to_Type<vector4<SRC> >();
+		boost::numeric::range_check_result ret = boost::numeric::cInRange;
 
 		for ( int i = 0; i < 4; i++ ) {//slow and ugly, but flexible
 			Type<DST> dst;
-			m_conv->convert( Type<SRC>( srcVal[i] ), dst );
+			const boost::numeric::range_check_result result = m_conv->convert( Type<SRC>( srcVal[i] ), dst );
+
+			if ( result != boost::numeric::cInRange )
+				ret = result;
+
 			dstVal[i] = ( DST )dst;
 		}
+
+		return ret;
 	}
 	virtual ~TypeConverter() {}
 };
@@ -157,8 +169,8 @@ template<typename SRC, typename DST > class TypeConverter<false, false, std::lis
 	boost::shared_ptr<const TypeConverterBase> m_conv;
 	TypeConverter( boost::shared_ptr<const TypeConverterBase> elem_conv ): m_conv( elem_conv ) {
 		LOG( Debug, verbose_info )
-				<< "Creating list converter from "
-				<< Type<std::list<SRC> >::staticName() << " to " << Type<std::list<DST> >::staticName();
+		<< "Creating list converter from "
+		<< Type<std::list<SRC> >::staticName() << " to " << Type<std::list<DST> >::staticName();
 	};
 public:
 	static boost::shared_ptr<const TypeConverterBase> create() {
@@ -174,18 +186,25 @@ public:
 			return boost::shared_ptr<const TypeConverterBase>();
 		}
 	}
-	void convert( const TypeBase &src, TypeBase &dst )const {
+	boost::numeric::range_check_result convert( const TypeBase& src, TypeBase& dst )const {
 		std::list<DST> &dstVal = dst.cast_to_Type<std::list<DST> >();
 		LOG_IF( not dstVal.empty(), CoreLog, warning )
-				<< "Storing into non empty list while conversion from "
-				<< Type<std::list<SRC> >::staticName() << " to " << Type<std::list<DST> >::staticName();
+		<< "Storing into non empty list while conversion from "
+		<< Type<std::list<SRC> >::staticName() << " to " << Type<std::list<DST> >::staticName();
 		const std::list<SRC> &srcVal = src.cast_to_Type<std::list<SRC> >();
+		boost::numeric::range_check_result ret = boost::numeric::cInRange;
 
 		for ( typename std::list<SRC>::const_iterator i = srcVal.begin(); i != srcVal.end(); i++ ) {//slow and ugly, but flexible
 			Type<DST> dst;
-			m_conv->convert( Type<SRC>( *i ), dst );
+			const boost::numeric::range_check_result result = m_conv->convert( Type<SRC>( *i ), dst );
+
+			if ( result != boost::numeric::cInRange )
+				ret = result;
+
 			dstVal.push_back( ( DST )dst );
 		}
+
+		return ret;
 	}
 	virtual ~TypeConverter() {}
 };
@@ -198,17 +217,18 @@ template<typename DST> class TypeConverter<false, false, std::string, DST> : pub
 {
 	TypeConverter() {
 		LOG( Debug, verbose_info )
-				<< "Creating from-string converter for " << Type<DST>::staticName();
+		<< "Creating from-string converter for " << Type<DST>::staticName();
 	};
 public:
 	static boost::shared_ptr<const TypeConverterBase> create() {
 		TypeConverter<false, false, std::string, DST> *ret = new TypeConverter<false, false, std::string, DST>;
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
-	void convert( const TypeBase &src, TypeBase &dst )const {
+	boost::numeric::range_check_result convert( const TypeBase& src, TypeBase& dst )const {
 		DST &dstVal = dst.cast_to_Type<DST>();
 		const std::string &srcVal = src.cast_to_Type<std::string>();
 		dstVal = boost::lexical_cast<DST>( srcVal );
+		return boost::numeric::cInRange; //@todo handle bad casts
 	}
 	virtual ~TypeConverter() {}
 };
@@ -216,17 +236,18 @@ template<typename SRC> class TypeConverter<false, false, SRC, std::string> : pub
 {
 	TypeConverter() {
 		LOG( Debug, verbose_info )
-				<< "Creating to-string converter for " << Type<SRC>::staticName();
+		<< "Creating to-string converter for " << Type<SRC>::staticName();
 	};
 public:
 	static boost::shared_ptr<const TypeConverterBase> create() {
 		TypeConverter<false, false, SRC, std::string> *ret = new TypeConverter<false, false, SRC, std::string>;
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
-	void convert( const TypeBase &src, TypeBase &dst )const {
+	boost::numeric::range_check_result convert( const TypeBase& src, TypeBase& dst )const {
 		std::string &dstVal = dst.cast_to_Type<std::string>();
 		const SRC &srcVal = src.cast_to_Type<SRC>();
 		dstVal = boost::lexical_cast<std::string, SRC>( srcVal );
+		return boost::numeric::cInRange; // this should allways be ok
 	}
 	virtual ~TypeConverter() {}
 };
@@ -239,17 +260,21 @@ template<> class TypeConverter<false, false, std::string, Selection> : public Ty
 {
 	TypeConverter() {
 		LOG( Debug, verbose_info )
-				<< "Creating special from-string converter for " << Type<Selection>::staticName();
+		<< "Creating special from-string converter for " << Type<Selection>::staticName();
 	};
 public:
 	static boost::shared_ptr<const TypeConverterBase> create() {
 		TypeConverter<false, false, std::string, Selection> *ret = new TypeConverter<false, false, std::string, Selection>;
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
-	void convert( const TypeBase &src, TypeBase &dst )const {
+	boost::numeric::range_check_result convert( const TypeBase& src, TypeBase& dst )const {
 		Selection &dstVal = dst.cast_to_Type<Selection>();
 		const std::string &srcVal = src.cast_to_Type<std::string>();
-		dstVal.set( srcVal.c_str() );
+
+		if ( dstVal.set( srcVal.c_str() ) )
+			return boost::numeric::cInRange;
+		else
+			return boost::numeric::cPosOverflow; //if the string is not "part" of the selection we count this as positive overflow
 	}
 	virtual ~TypeConverter() {}
 };
@@ -262,14 +287,14 @@ template<> class TypeConverter<false, false, std::string, bool> : public TypeGen
 {
 	TypeConverter() {
 		LOG( Debug, verbose_info )
-				<< "Creating special from-string converter for " << Type<bool>::staticName();
+		<< "Creating special from-string converter for " << Type<bool>::staticName();
 	};
 public:
 	static boost::shared_ptr<const TypeConverterBase> create() {
 		TypeConverter<false, false, std::string, bool> *ret = new TypeConverter<false, false, std::string, bool>;
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
-	void convert( const TypeBase &src, TypeBase &dst )const {
+	boost::numeric::range_check_result convert( const TypeBase& src, TypeBase& dst )const {
 		bool &dstVal = dst.cast_to_Type<bool>();
 		const char *srcVal = ( ( std::string )src.cast_to_Type<std::string>() ).c_str();
 
@@ -277,9 +302,12 @@ public:
 			dstVal = true;
 		} else if ( strcasecmp ( srcVal, "FALSE" ) == 0 or strcasecmp ( srcVal, "N" ) == 0 or strcasecmp ( srcVal, "NO" ) == 0 ) {
 			dstVal = false;
+		} else {
+			LOG( Runtime, warning ) << src.toString( true ) << " is ambiguous while converting to " << Type<bool>::staticName();
+			return boost::numeric::cPosOverflow;
 		}
 
-		LOG( Runtime, error ) << src.toString( true ) << " is ambiguous while converting to " << Type<bool>::staticName();
+		return boost::numeric::cInRange;
 	}
 	virtual ~TypeConverter() {}
 };
@@ -287,17 +315,18 @@ template<> class TypeConverter<false, false, bool, std::string> : public TypeGen
 {
 	TypeConverter() {
 		LOG( Debug, verbose_info )
-				<< "Creating special to-string converter for " << Type<bool>::staticName();
+		<< "Creating special to-string converter for " << Type<bool>::staticName();
 	};
 public:
 	static boost::shared_ptr<const TypeConverterBase> create() {
 		TypeConverter<false, false, bool, std::string> *ret = new TypeConverter<false, false, bool, std::string>;
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
-	void convert( const TypeBase &src, TypeBase &dst )const {
+	boost::numeric::range_check_result convert( const TypeBase& src, TypeBase& dst )const {
 		std::string &dstVal = dst.cast_to_Type<std::string>();
 		const bool &srcVal = src.cast_to_Type<bool>();
 		dstVal = srcVal ? "true" : "false";
+		return boost::numeric::cInRange;
 	}
 	virtual ~TypeConverter() {}
 };
@@ -310,22 +339,23 @@ template<typename DST> class TypeConverter<false, false, std::string, std::list<
 {
 	TypeConverter() {
 		LOG( Debug, verbose_info )
-				<< "Creating from-string converter for " << Type<std::list<DST> >::staticName();
+		<< "Creating from-string converter for " << Type<std::list<DST> >::staticName();
 	};
 public:
 	static boost::shared_ptr<const TypeConverterBase> create() {
 		TypeConverter<false, false, std::string, std::list<DST> > *ret = new TypeConverter<false, false, std::string, std::list<DST> >;
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
-	void convert( const TypeBase &src, TypeBase &dst )const {
+	boost::numeric::range_check_result convert( const TypeBase& src, TypeBase& dst )const {
 		std::list<DST> &dstVal = dst.cast_to_Type<std::list<DST> >();
 		LOG_IF( not dstVal.empty(), CoreLog, warning )
-				<< "Conversion from " << Type<std::string>::staticName()
-				<< " into non empty list  " << Type<std::list<DST> >::staticName()
-				<< " previous content will be lost";
+		<< "Conversion from " << Type<std::string>::staticName()
+		<< " into non empty list  " << Type<std::list<DST> >::staticName()
+		<< " previous content will be lost";
 		const std::string &srcVal = src.cast_to_Type<std::string>();
 		const std::list<DST> buff = util::string2list<DST>( srcVal, boost::regex( "[\\s,;]+" ) );
 		dstVal.assign( buff.begin(), buff.end() );
+		return boost::numeric::cInRange;  //@todo handle bad casts
 	}
 	virtual ~TypeConverter() {}
 };
@@ -333,18 +363,19 @@ template<typename DST> class TypeConverter<false, false, std::string, vector4<DS
 {
 	TypeConverter() {
 		LOG( Debug, verbose_info )
-				<< "Creating from-string converter for " << Type<vector4<DST> >::staticName();
+		<< "Creating from-string converter for " << Type<vector4<DST> >::staticName();
 	};
 public:
 	static boost::shared_ptr<const TypeConverterBase> create() {
 		TypeConverter<false, false, std::string, vector4<DST> > *ret = new TypeConverter<false, false, std::string, vector4<DST> >;
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
-	void convert( const TypeBase &src, TypeBase &dst )const {
+	boost::numeric::range_check_result convert( const TypeBase& src, TypeBase& dst )const {
 		vector4<DST> &dstVal = dst.cast_to_Type<vector4<DST> >();
 		const std::string &srcVal = src.cast_to_Type<std::string>();
 		const std::list<DST> buff = string2list<DST>( srcVal, boost::regex( "[\\s,;]+" ) );
 		dstVal.copyFrom( buff.begin(), buff.end() );
+		return boost::numeric::cInRange; //@todo handle bad casts
 	}
 	virtual ~TypeConverter() {}
 };

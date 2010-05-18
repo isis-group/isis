@@ -107,6 +107,36 @@ BOOST_AUTO_TEST_CASE( test_type_operators )
 	BOOST_CHECK_EQUAL( 42 - tInt1, tInt2 );
 }
 
+BOOST_AUTO_TEST_CASE( type_comparison_test )
+{
+	Type<u_int8_t> _200( ( u_int8_t )200 );
+	Type<int16_t> _1000( ( int16_t )1000 );
+	Type<float> _200komma4( 200.4f );
+	Type<float> _200komma6( 200.6f );
+	Type<int16_t> _minus1( ( int16_t ) - 1 );
+	Type<float> fucking_much( std::numeric_limits<float>::max() );
+	Type<double> even_more( std::numeric_limits<double>::max() );
+	// this should use implicit conversion to the inner type and compare them
+	BOOST_CHECK( _200 < _1000 );
+	BOOST_CHECK( _200 > _minus1 );
+	BOOST_CHECK( _200.lt( _1000 ) ) ;
+	BOOST_CHECK( _200.gt( _minus1 ) ) ;
+	//200.4 will be rounded to 200
+	BOOST_CHECK( not _200.lt( _200komma4 ) ) ;
+	BOOST_CHECK( _200.eq( _200komma4 ) ) ;
+	//200.6 will be rounded to 201
+	BOOST_CHECK( _200.lt( _200komma6 ) ) ;
+	// kompares 200.4 to 200f
+	BOOST_CHECK( not _200komma4.eq( _200 ) ) ;
+	BOOST_CHECK( _200komma4.gt( _200 ) ) ;
+	// kompares 200.4 to 200f
+	BOOST_CHECK( _200komma4.lt( _1000 ) );
+	// push the limits
+	BOOST_CHECK( _1000.lt( fucking_much ) );
+	BOOST_CHECK( fucking_much.gt( _1000 ) );
+	BOOST_CHECK( fucking_much.lt( even_more ) );
+}
+
 BOOST_AUTO_TEST_CASE( type_conversion_test )
 {
 	Type<int> tInt( 42 );

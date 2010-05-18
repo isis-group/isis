@@ -37,27 +37,79 @@ namespace util
 
 template<class TYPE > class Type;
 
-
 namespace _internal
 {
-template<typename T, bool isNumber> struct type_less {
+template<typename T, bool isNumber> class type_compare
+{
+public:
 	bool operator()( const Type<T> &first, const TypeBase &second )const {
-		LOG( Debug, error ) << "less comparison of " << Type<T>::staticName() << " is not supportet";
+		LOG( Debug, error ) << "comparison of " << Type<T>::staticName() << " is not supportet";
 		return false;
 	}
 };
-template<typename T, bool isNumber> struct type_greater {
+template<typename T> class type_compare<T, true>
+{
+protected:
+	virtual bool posOverflow( const Type<T> &first, const Type<T> &second )const {return false;} //default to false
+	virtual bool negOverflow( const Type<T> &first, const Type<T> &second )const {return false;} //default to false
+	virtual bool inRange( const Type<T> &first, const Type<T> &second )const {return false;} //default to false
+public:
 	bool operator()( const Type<T> &first, const TypeBase &second )const {
-		LOG( Debug, error ) << "greater than comparison of " << Type<T>::staticName() << " is not supportet";
-		return false;
+		// ask second for a converter from itself to Type<T>
+		const TypeBase::Converter conv = second.getConverterTo( Type<T>::staticID );
+
+		if ( conv ) {
+			//try to convert second into T and handle results
+			Type<T> buff;
+
+			switch ( conv->convert( second, buff ) ) {
+			case boost::numeric::cPosOverflow:
+				LOG( Debug, info ) << "Positive overflow when converting " << second.toString( true ) << " to " << Type<T>::staticName() << ".";
+				return posOverflow( first, buff );
+			case boost::numeric::cNegOverflow:
+				LOG( Debug, info ) << "Negative overflow when converting " << second.toString( true ) << " to " << Type<T>::staticName() << ".";
+				return negOverflow( first, buff );
+			case boost::numeric::cInRange:
+				return inRange( first, buff );
+			}
+		} else {
+			LOG( Debug, error ) << "No conversion of " << second.typeName() << " to " << Type<T>::staticName() << " available";
+			return false;
+		}
 	}
 };
-template<typename T> struct type_less<T, true> {
-	bool operator()( const Type<T> &first, const TypeBase &second )const {return ( T )first < second.as<T>();}
+
+template<typename T, bool isNumber> class type_less : public type_compare<T, isNumber> {};// we are goint to specialize this for numeric T below
+template<typename T, bool isNumber> class type_greater : public type_compare<T, isNumber> {};
+template<typename T, bool isNumber> class type_eq : public type_compare<T, isNumber>
+{
+protected:
+	bool inRange( const Type<T> &first, const Type<T> &second )const {
+		return ( T )first == ( T )second;
+	}
 };
-template<typename T> struct type_greater<T, true> {
-	bool operator()( const Type<T> &first, const TypeBase &second )const {return ( T )first > second.as<T>();}
+
+template<typename T> class type_less<T, true> : public type_compare<T, true>
+{
+protected:
+	bool posOverflow( const Type<T> &first, const Type<T> &second )const {
+		return true; //getting an positive overflow when trying to convert second into T, obviously means first is less
+	}
+	bool inRange( const Type<T> &first, const Type<T> &second )const {
+		return ( T )first < ( T )second;
+	}
 };
+template<typename T> class type_greater<T, true> : public type_compare<T, true>
+{
+protected:
+	bool negOverflow( const Type<T> &first, const Type<T> &second )const {
+		return true; //getting an negative overflow when trying to convert second into T, obviously means first is greater
+	}
+	bool inRange( const Type<T> &first, const Type<T> &second )const {
+		return ( T )first > ( T )second;
+	}
+};
+
 template<typename T, bool isNumber> struct getMinMaxImpl {
 	std::pair<T, T> operator()( const TypePtr<T> &ref ) const {
 		LOG( Debug, error ) << "min/max comparison of " << Type<T>::staticName() << " is not supportet";
@@ -86,7 +138,7 @@ template<typename TYPE> class Type: public _internal::TypeBase
 	TYPE m_val;
 	static const char m_typeName[];
 protected:
-	TypeBase *clone() const {
+	TypeBase* clone() const {
 		return new Type<TYPE>( *this );
 	}
 public:
@@ -100,25 +152,33 @@ public:
 	 * If the type of the parameter is not the same as the content type of the object, the system tries to do a type conversion.
 	 * If that fails, boost::bad_lexical_cast is thrown.
 	 */
-	template<typename T> Type( const T &value ): m_val( __cast_to( this, value ) ) {
+	template<typename T> Type( const T& value ): m_val( __cast_to( this, value ) ) {
 		BOOST_MPL_ASSERT_RELATION( staticID, < , 0xFF );
 		check_type<TYPE>();
 	}
-	virtual bool is( const std::type_info &t )const {
+	virtual bool is( const std::type_info & t )const {
 		return t == typeid( TYPE );
 	}
 	virtual std::string toString( bool labeled = false )const {
 		const Converter &conv = getConverterTo( Type<std::string>::staticID );
 		std::string ret;
+		bool fallback = false;
 
 		if ( conv ) {
 			Type<std::string> buff;
-			conv->convert( *this, buff );
-			ret = buff;
+
+			if ( conv->convert( *this, buff ) != boost::numeric::cInRange ) {
+				LOG( Debug, error ) << "Automatic conversion from " << typeName() << " to string failed. Falling back to boost::lexical_cast<std::string>";
+				fallback = true;
+			} else
+				ret = buff;
 		} else {
-			LOG( Debug, warning ) << "Missing conversion from " << typeName() << " to string falling back to boost::lexical_cast<std::string>";
-			ret = boost::lexical_cast<std::string>( m_val );
+			LOG( Debug, error ) << "Missing conversion from " << typeName() << " to string. Falling back to boost::lexical_cast<std::string>";
+			fallback = true;
 		}
+
+		if ( fallback )
+			ret = boost::lexical_cast<std::string>( m_val );
 
 		if ( labeled )ret += "(" + staticName() + ")";
 
@@ -132,7 +192,7 @@ public:
 	}
 
 	/// \returns true if this and second contain the same value of the same type
-	virtual bool eq( const TypeBase &second )const {
+	virtual bool operator==( const TypeBase &second )const {
 		if ( second.is<TYPE>() ) {
 			const TYPE &otherVal = ( TYPE )second.cast_to_Type<TYPE>();
 			return m_val == otherVal;
@@ -157,11 +217,14 @@ public:
 	operator const TYPE&()const {return m_val;}
 	operator TYPE&() {return m_val;}
 
-	bool operator >( const _internal::TypeBase &ref )const {
+	bool gt( const _internal::TypeBase &ref )const {
 		return _internal::type_greater<TYPE, boost::is_arithmetic<TYPE>::value >()( *this, ref );
 	}
-	bool operator <( const _internal::TypeBase &ref )const {
+	bool lt( const _internal::TypeBase &ref )const {
 		return _internal::type_less<TYPE, boost::is_arithmetic<TYPE>::value >()( *this, ref );
+	}
+	bool eq( const _internal::TypeBase &ref )const {
+		return _internal::type_eq<TYPE, boost::is_arithmetic<TYPE>::value >()( *this, ref );
 	}
 
 	virtual ~Type() {}
@@ -182,7 +245,7 @@ protected:
 	const boost::weak_ptr<void> address()const {
 		return boost::weak_ptr<void>( m_val );
 	}
-	TypePtrBase *clone() const {
+	TypePtrBase* clone() const {
 		return new TypePtr( *this );
 	}
 public:
@@ -202,8 +265,8 @@ public:
 		/// decrement the use_count of the master when a specific part is not referenced anymore
 		void operator()( TYPE *at ) {
 			LOG( Debug, verbose_info )
-					<< "Deletion for " << this->get() << " called from splice at offset "   << at - this->get()
-					<< ", current use_count: " << this->use_count();
+			<< "Deletion for " << this->get() << " called from splice at offset "   << at - this->get()
+			<< ", current use_count: " << this->use_count();
 			this->reset();//actually not needed, but we keep it here to keep obfuscation low
 		}
 	};
@@ -211,14 +274,14 @@ public:
 	struct NonDeleter {
 		void operator()( TYPE *p ) {
 			//we have to cast the pointer to void* here, because in case of u_int8_t it will try to print the "string"
-			LOG( Debug, info ) << "Not freeing pointer " << ( void * )p << " (" << TypePtr<TYPE>::staticName() << ") ";
+			LOG( Debug, info ) << "Not freeing pointer " << ( void* )p << " (" << TypePtr<TYPE>::staticName() << ") ";
 		};
 	};
 	/// Default delete-functor for c-arrays (uses free()).
 	struct BasicDeleter {
 		void operator()( TYPE *p ) {
 			//we have to cast the pointer to void* here, because in case of u_int8_t it will try to print the "string"
-			LOG( Debug, info ) << "Freeing pointer " << ( void * )p << " (" << TypePtr<TYPE>::staticName() << ") ";
+			LOG( Debug, info ) << "Freeing pointer " << ( void* )p << " (" << TypePtr<TYPE>::staticName() << ") ";
 			free( p );
 		};
 	};
@@ -226,7 +289,7 @@ public:
 	struct ObjectArrayDeleter {
 		void operator()( TYPE *p ) {
 			//we have to cast the pointer to void* here, because in case of u_int8_t it will try to print the "string"
-			LOG( Debug, info ) << "Deleting object array at " << ( void * )p << " (" << TypePtr<TYPE>::staticName() << ") ";
+			LOG( Debug, info ) << "Deleting object array at " << ( void* )p << " (" << TypePtr<TYPE>::staticName() << ") ";
 			delete[] p;
 		};
 	};
@@ -245,8 +308,8 @@ public:
 	 * \param length the length of the used array (TypePtr does NOT check for length,
 	 * this is just here for child classes which may want to check)
 	 */
-	TypePtr( TYPE *const ptr, size_t length ):
-		_internal::TypePtrBase( length ), m_val( ptr, BasicDeleter() ) {}
+	TypePtr( TYPE* const ptr, size_t length ):
+			_internal::TypePtrBase( length ), m_val( ptr, BasicDeleter() ) {}
 	/**
 	 * Creates TypePtr from a pointer of type TYPE.
 	 * The pointers are automatically deleted by an copy of d and should not be used outside once used here
@@ -258,44 +321,44 @@ public:
 	 * \param d the deleter to be used when the data shall be deleted ( d() is called then )
 	 */
 
-	template<typename D> TypePtr( TYPE *const ptr, size_t length, D d ):
-		_internal::TypePtrBase( length ), m_val( ptr, d ) {}
+	template<typename D> TypePtr( TYPE* const ptr, size_t length, D d ):
+			_internal::TypePtrBase( length ), m_val( ptr, d ) {}
 
 	virtual ~TypePtr() {}
 
 	/// Copy elements from raw memory
-	void copyFromMem( const TYPE *const src, size_t length ) {
+	void copyFromMem( const TYPE* const src, size_t length ) {
 		LOG_IF( length > len(), Runtime, error )
-				<< "Amount of the elements to copy from memory (" << length << ") exceeds the length of the array (" << len() << ")";
+		<< "Amount of the elements to copy from memory (" << length << ") exceeds the length of the array (" << len() << ")";
 		TYPE &dest = this->operator[]( 0 );
-		LOG( Debug, info ) << "Copying " << length *sizeof( TYPE ) << " bytes of " << typeName() << " from " << src << " to " << &dest;
+		LOG( Debug, info ) << "Copying " << length*sizeof( TYPE ) << " bytes of " << typeName() << " from " << src << " to " << &dest;
 		memcpy( &dest, src, length * sizeof( TYPE ) );
 	}
 	/// Copy elements within a range [start,end] to raw memory
-	void copyToMem( size_t start, size_t end, const TYPE *const dst )const {
+	void copyToMem( size_t start, size_t end, const TYPE* const dst )const {
 		assert( start <= end );
 		const size_t length = end - start + 1;
 		LOG_IF( end >= len(), Runtime, error )
-				<< "End of the range (" << end << ") is behind the end of this TypePtr (" << len() << ")";
+		<< "End of the range (" << end << ") is behind the end of this TypePtr (" << len() << ")";
 		const TYPE &source = this->operator[]( start );
 		memcpy( dst, &source, length * sizeof( TYPE ) );
 	}
-	size_t cmp( size_t start, size_t end, const isis::util::_internal::TypePtrBase &dst, size_t dst_start ) const {
+	size_t cmp( size_t start, size_t end, const isis::util::_internal::TypePtrBase& dst, size_t dst_start ) const {
 		assert( start <= end );
 		size_t ret = 0;
 		size_t length = end - start;
 
 		if ( dst.typeID() != typeID() ) {
 			LOG( Runtime, error )
-					<< "Comparing to a TypePtr of different type(" << dst.typeName() << ", not " << typeName()
-					<< "). Assuming all voxels to be different";
+			<< "Comparing to a TypePtr of different type(" << dst.typeName() << ", not " << typeName()
+			<< "). Assuming all voxels to be different";
 			return length;
 		}
 
 		LOG_IF( end >= len(), Runtime, error )
-				<< "End of the range (" << end << ") is behind the end of this TypePtr (" << len() << ")";
+		<< "End of the range (" << end << ") is behind the end of this TypePtr (" << len() << ")";
 		LOG_IF( length + dst_start >= dst.len(), Runtime, error )
-				<< "End of the range (" << length + dst_start << ") is behind the end of the destination (" << dst.len() << ")";
+		<< "End of the range (" << length + dst_start << ") is behind the end of the destination (" << dst.len() << ")";
 		const TypePtr<TYPE> &compare = dst.cast_to_TypePtr<TYPE>();
 		LOG( Debug, verbose_info ) << "Comparing " << dst.typeName() << " at " << &operator[]( 0 ) << " and " << &compare[0];
 
@@ -308,7 +371,7 @@ public:
 	}
 
 	/// @copydoc Type::is()
-	virtual bool is( const std::type_info &t )const {
+	virtual bool is( const std::type_info & t )const {
 		return t == typeid( TYPE );
 	}
 	/// @copydoc Type::toString()
@@ -316,7 +379,7 @@ public:
 		std::string ret;
 
 		if ( m_len ) {
-			const TYPE *ptr = m_val.get();
+			const TYPE* ptr = m_val.get();
 
 			for ( size_t i = 0; i < m_len - 1; i++ )
 				ret += Type<TYPE>( ptr[i] ).toString( false ) + "|";
@@ -344,7 +407,7 @@ public:
 	 * If index is invalid, behaviour is undefined. Probably it will crash.
 	 * \return reference to element at at given index.
 	 */
-	TYPE &operator[]( size_t idx ) {
+	TYPE& operator[]( size_t idx ) {
 		return ( m_val.get() )[idx];
 	}
 	const TYPE &operator[]( size_t idx )const {
@@ -360,45 +423,37 @@ public:
 	operator const boost::shared_ptr<TYPE>&()const {return m_val;}
 
 	TypePtrBase::Reference cloneToMem( size_t length ) const {
-		return TypePtrBase::Reference( new TypePtr( ( TYPE * )malloc( length * sizeof( TYPE ) ), length ) );
+		return TypePtrBase::Reference( new TypePtr( ( TYPE* )malloc( length * sizeof( TYPE ) ), length ) );
 	}
 	size_t bytes_per_elem() const {
 		return sizeof( TYPE );
 	}
-	bool convertTo( TypePtrBase &dst )const {
-		Type<TYPE> min, max;
+	bool convertTo( TypePtrBase& dst )const {
+		_internal::TypeBase::Reference min, max;
 		getMinMax( min, max );
-		return TypePtrBase::convertTo( dst, min, max );
+		assert( not ( min.empty() or max.empty() ) );
+		return TypePtrBase::convertTo( dst, *min, *max );
 	}
-	void getMinMax ( _internal::TypeBase &min, _internal::TypeBase &max, bool init = true ) const {
-		assert( min.typeID() == max.typeID() );
-
-		if( len() == 0 ) {
+	/// \copydoc TypePtrBase::getMinMax
+	void getMinMax ( _internal::TypeBase::Reference &min, _internal::TypeBase::Reference& max ) const {
+		if ( len() == 0 ) {
 			LOG( Runtime, warning ) << "Skipping computation of min/max on an empty TypePtr";
 			return;
 		}
 
-		if( init ) { // they haven't been set yet
-			const Type<TYPE> el( this->operator[]( 0 ) );
-			_internal::TypeBase::convert( el, min );
-			_internal::TypeBase::convert( el, max );
-		}
-
 		const std::pair<Type<TYPE>, Type<TYPE> > result = _internal::getMinMaxImpl<TYPE, boost::is_arithmetic<TYPE>::value>()( *this );
 
-		if( min > result.first ) {
-			_internal::TypeBase::convert( result.first, min );
-		}
+		if ( min.empty() or min->gt( result.first ) )
+			min = result.first;
 
-		if( max < result.second ) {
-			_internal::TypeBase::convert( result.second, max );
-		}
+		if ( max.empty() or max->lt( result.second ) )
+			max = result.second;
 	}
 
 	std::vector<Reference> splice( size_t size )const {
 		if ( size >= len() ) {
 			LOG( Debug, warning )
-					<< "splicing data of the size " << len() << " up into blocks of the size " << size << " is kind of useless ...";
+			<< "splicing data of the size " << len() << " up into blocks of the size " << size << " is kind of useless ...";
 		}
 
 		const size_t fullSplices = len() / size;

@@ -1,16 +1,32 @@
-/*
- * isisRegistrationFactory.h
+/****************************************************************
  *
- *  Created on: Jul 13, 2009
- *      Author: tuerke
- */
+ * Copyright (C) 2010 Max Planck Institute for Human Cognitive and Brain Sciences, Leipzig
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ *
+ * Author: Erik Tuerke, tuerke@cbs.mpg.de, 2010
+ *
+ *****************************************************************/
+
 
 #ifndef ISISREGISTRATIONFACTORY_H_
 #define ISISREGISTRATIONFACTORY_H_
 
 #include "itkImageRegistrationMethod.h"
 
-#include "extITK/isisIterationObserver.h"
+#include "extITK/isisIterationObserver.hpp"
 
 //transform includes
 
@@ -138,8 +154,8 @@ public:
 	typedef itk::NearestNeighborInterpolateImageFunction<TMovingImageType, double> NearestNeighborInterpolatorType;
 
 	//transform typedefs
-	typedef itk::TransformBase *TransformBasePointer; //not allowed to be a itk::SmartPointer because of static_cast usage
-	typedef const itk::TransformBase *ConstTransformBasePointer;
+	typedef itk::TransformBase* TransformBasePointer; //not allowed to be a itk::SmartPointer because of static_cast usage
+	typedef const itk::TransformBase* ConstTransformBasePointer;
 	typedef itk::Transform<double, 3, 3> TransformType;
 
 	typedef itk::TranslationTransform<double, 3> TranslationTransformType;
@@ -192,7 +208,7 @@ public:
 	AffineCenteredTransformInitializerType;
 
 	typedef typename itk::LandmarkBasedTransformInitializer < VersorRigid3DTransformType, TFixedImageType,
-			TMovingImageType > RigidLandmarkBasedTransformInitializerType;
+	TMovingImageType > RigidLandmarkBasedTransformInitializerType;
 
 	enum eTransformType {
 		TranslationTransform,

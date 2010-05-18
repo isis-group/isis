@@ -47,11 +47,11 @@ public:
 	 * \param _needed flag if this PropertyValue is needed an thus not allowed to be empty (a.k.a. undefined)
 	 */
 	template<typename T> PropertyValue( const T &ref, bool _needed = false ):
-		_internal::TypeBase::Reference( new Type<T>( ref ) ), m_needed( _needed ) {
+			_internal::TypeBase::Reference( new Type<T>( ref ) ), m_needed( _needed ) {
 		check_type<T>();
 	}
 	template<typename T> PropertyValue( const Type<T>& ref, bool _needed = false ):
-		_internal::TypeBase::Reference( new Type<T>( ref ) ), m_needed( _needed ) {
+			_internal::TypeBase::Reference( new Type<T>( ref ) ), m_needed( _needed ) {
 		check_type<T>();
 	}
 	/**
@@ -112,13 +112,13 @@ public:
 		} else if ( not empty() ) {
 			PropertyValue dst;
 			LOG( Debug, info )
-					<< *this << " is not " << Type<T>::staticName() << " trying to convert.";
+			<< *this << " is not " << Type<T>::staticName() << " trying to convert.";
 
 			if ( transformTo( dst, Type<T>::staticID ) )
 				return dst == second;
 			else
 				LOG( Runtime, error )
-						<< "Conversion of " << *this << " to " << Type<T>::staticName() << " failed.";
+				<< "Conversion of " << *this << " to " << Type<T>::staticName() << " failed.";
 		}
 
 		return false;
