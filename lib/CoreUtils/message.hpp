@@ -34,7 +34,7 @@ namespace util
 class MSubject : public std::string
 {
 public:
-	template<typename T> MSubject( const T &cont ) {
+	template<typename T> MSubject( const T& cont ) {
 		std::ostringstream text;
 		text << cont;
 		assign( text.str() );
@@ -45,7 +45,7 @@ public:
 namespace _internal
 {
 
-extern const char *LogLevelNames[];
+extern const char* LogLevelNames[];
 
 template<class MODULE> class Log;
 class Message;
@@ -79,12 +79,12 @@ public:
 	std::string merge()const;
 	std::string strTime()const;
 	template<typename T> Message &operator << ( T val ) {
-		*( ( std::ostringstream * )this ) << val;
+		*( ( std::ostringstream* )this ) << val;
 		return *this;
 	}
 	Message &operator << ( const MSubject &subj ) {
 		m_subjects.push_back( subj );
-		*( ( std::ostringstream * )this ) << "{s}";
+		*( ( std::ostringstream* )this ) << "{s}";
 		return *this;
 	}
 	bool shouldCommit()const;

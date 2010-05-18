@@ -36,7 +36,7 @@ int main( int argc, char *argv[] )
 	//will get you int() ("0")
 	int fail = map2["Test3"];
 	//will raise bad_cast (Because "Hallo" cannot lexically be casted to "3"
-	//  fail=map["Test3"]->as<int>();
+//  fail=map["Test3"]->as<int>();
 	//will be ok ("3" can be lexically casted to int)
 	map2["Test3"] = std::string( "3" );
 	int ok = map2["Test3"]->as<int>();

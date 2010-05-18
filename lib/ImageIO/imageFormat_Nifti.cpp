@@ -53,14 +53,14 @@ namespace _internal
 class NiftiChunk : public data::Chunk
 {
 public:
-	template<typename T, typename D> NiftiChunk( T *src, D del, size_t width, size_t height, size_t slices, size_t timesteps ) :
+	template<typename T, typename D> NiftiChunk( T* src, D del, size_t width, size_t height, size_t slices, size_t timesteps ) :
 			data::Chunk( src, del, width, height, slices, timesteps ) {
 		LOG( ImageIoDebug, info ) << "create NiftiChunk";
 	}
 
 private:
-	NiftiChunk( const NiftiChunk & ); // no standard copy constructor
-	NiftiChunk &operator=( const NiftiChunk & ); // no copy operator
+	NiftiChunk( const NiftiChunk& ); // no standard copy constructor
+	NiftiChunk& operator=( const NiftiChunk& ); // no copy operator
 };// class NiftiChunk
 }//namespace _internal
 
@@ -76,7 +76,7 @@ class ImageFormat_Nifti : public FileFormat
 		nifti_image *m_pNiImage;
 		std::string m_filename;
 		//constructor
-		Deleter( nifti_image *ni, const std::string &filename ) :
+		Deleter( nifti_image *ni, const std::string& filename ) :
 				m_pNiImage( ni ), m_filename( filename ) {}
 
 		//the most important operator
@@ -112,9 +112,9 @@ public:
 	/***********************
 	 * load file
 	 ************************/
-	int load( data::ChunkList &retList, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
+	int load( data::ChunkList &retList, const std::string& filename, const std::string& dialect )  throw( std::runtime_error& ) {
 		//read the file with the function from nifti1_io.h
-		nifti_image *ni = nifti_image_read( filename.c_str(), true );
+		nifti_image* ni = nifti_image_read( filename.c_str(), true );
 
 		if ( not ni )
 			throwGenericError( "nifti_image_read(" + filename + ") failed" );
@@ -132,28 +132,28 @@ public:
 
 		switch ( ni->datatype ) {
 		case DT_UINT8:
-			retChunk.reset( new _internal::NiftiChunk( static_cast<uint8_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ) );
+			retChunk.reset( new _internal::NiftiChunk( static_cast<uint8_t*>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ) );
 			break;
 		case DT_INT8:
-			retChunk.reset( new _internal::NiftiChunk( static_cast<int8_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ) );
+			retChunk.reset( new _internal::NiftiChunk( static_cast<int8_t*>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ) );
 			break;
 		case DT_INT16:
-			retChunk.reset( new _internal::NiftiChunk( static_cast<int16_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ) );
+			retChunk.reset( new _internal::NiftiChunk( static_cast<int16_t*>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ) );
 			break;
 		case DT_UINT16:
-			retChunk.reset( new _internal::NiftiChunk( static_cast<uint16_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ) );
+			retChunk.reset( new _internal::NiftiChunk( static_cast<uint16_t*>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ) );
 			break;
 		case DT_UINT32:
-			retChunk.reset( new _internal::NiftiChunk( static_cast<uint32_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ) );
+			retChunk.reset( new _internal::NiftiChunk( static_cast<uint32_t*>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ) );
 			break;
 		case DT_INT32:
-			retChunk.reset( new _internal::NiftiChunk( static_cast<int32_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ) );
+			retChunk.reset( new _internal::NiftiChunk( static_cast<int32_t*>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ) );
 			break;
 		case DT_FLOAT32:
-			retChunk.reset( new _internal::NiftiChunk( static_cast<float *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ) );
+			retChunk.reset( new _internal::NiftiChunk( static_cast<float*>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ) );
 			break;
 		case DT_FLOAT64:
-			retChunk.reset( new _internal::NiftiChunk( static_cast<double *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ) );
+			retChunk.reset( new _internal::NiftiChunk( static_cast<double*>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ) );
 			break;
 		default:
 			throwGenericError( std::string( "Unsupported datatype " ) + util::Type<int>( ni->datatype ).toString() );
@@ -170,7 +170,7 @@ public:
 	/***********************
 	 * write file
 	 ************************/
-	void write( const data::Image &image, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) {
+	void write( const data::Image &image, const std::string& filename, const std::string& dialect ) throw( std::runtime_error& ) {
 		LOG( ImageIoDebug, isis::info ) << "Write Nifti.";
 		boost::filesystem::path boostFilename( filename );
 		//default init for nifti image
@@ -179,22 +179,22 @@ public:
 		ni.nu = ni.nv = ni.nw = 1;
 		ni.datatype = DT_UNKNOWN;
 		ni.data = NULL;
-		ni.fname = const_cast<char *>( filename.c_str() );
+		ni.fname = const_cast<char*>( filename.c_str() );
 		// get dim info from image
 		util::fvector4 dimensions = image.sizeToVector();
 		//set the props from the image to the nifti file
 		copyHeaderToNifti( image, ni );
 		// set filename for resulting image(s) due to Analyze vs. Nifti
-		ni.fname = const_cast<char *>( filename.c_str() ); // header name
+		ni.fname = const_cast<char*>( filename.c_str() ); // header name
 		boost::filesystem::path imgname;
 
 		if ( "hdr" == extension( boostFilename ) ) {
 			ni.nifti_type = 0; // that's ANALYZE ID
 			imgname  =  change_extension( boostFilename, ".img" );
-			ni.iname = const_cast<char *>( imgname.string().c_str() );
+			ni.iname = const_cast<char*>( imgname.string().c_str() );
 		} else {
 			ni.nifti_type = 1; // that's NIFTI ID
-			ni.iname = const_cast<char *>( filename.c_str() );
+			ni.iname = const_cast<char*>( filename.c_str() );
 		}
 
 		// FSL compatibility
@@ -255,7 +255,7 @@ public:
 	 ****************************************/
 private:
 
-	void copyHeaderFromNifti( data::Chunk &retChunk, const nifti_image &ni ) {
+	void copyHeaderFromNifti( data::Chunk& retChunk, const nifti_image& ni ) {
 		util::fvector4 dimensions( ni.dim[1], ni.ndim >= 2 ? ni.dim[2] : 1,
 								   ni.ndim >= 3 ? ni.dim[3] : 1, ni.ndim >= 4 ? ni.dim[4] : 1 );
 		LOG( ImageIoLog, info ) << "size of chunk " << dimensions << "/" << ni.ndim;
@@ -283,7 +283,7 @@ private:
 		}
 	}
 
-	util::fvector4 getVector( const nifti_image &ni, const enum vectordirection &dir ) {
+	util::fvector4 getVector( const nifti_image& ni, const enum vectordirection& dir ) {
 		util::fvector4 retVec( 0, 0, 0, 0 );
 		float units; // conversion-factor to mm
 
@@ -343,9 +343,9 @@ private:
 	}
 
 	template<typename T>
-	void copyDataToNifti( const data::Image &image, nifti_image &ni ) {
+	void copyDataToNifti( const data::Image& image, nifti_image& ni ) {
 		ni.data = malloc( image.bytes_per_voxel() * image.volume() );
-		T *refNii = ( T * ) ni.data;
+		T *refNii = ( T* ) ni.data;
 
 		for ( size_t t = 0; t < image.sizeToVector()[3]; t++ ) {
 			for ( size_t z = 0; z < image.sizeToVector()[2]; z++ ) {
@@ -362,7 +362,7 @@ private:
 		image.getMinMax( ni.cal_min, ni.cal_max );
 	}
 
-	void copyHeaderToNifti( const data::Image &image, nifti_image &ni ) {
+	void copyHeaderToNifti( const data::Image& image, nifti_image& ni ) {
 		//all the other information for the nifti header
 		BOOST_ASSERT( data::Image::n_dims == 4 );
 		ni.scl_slope = 1.0;
@@ -443,7 +443,7 @@ private:
 }//namespace image_io isis
 
 
-isis::image_io::FileFormat *factory()
+isis::image_io::FileFormat* factory()
 {
 	return new isis::image_io::ImageFormat_Nifti();
 }
