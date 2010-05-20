@@ -115,7 +115,7 @@ boost::shared_ptr< _internal::MessageHandlerBase > Application::getLogHandler( s
 }
 const std::string Application::getCoreVersion( void )
 {
-	return STR( _ISIS_VERSION_MAJOR ) + "." + STR( _ISIS_VERSION_MINOR ) + "." + STR( _ISIS_VERSION_PATCH ) + ".r" + STR( _ISIS_SVN_REVISION );
+	return STR( _ISIS_VERSION_MAJOR ) + "." + STR( _ISIS_VERSION_MINOR ) + "." + STR( _ISIS_VERSION_PATCH ) + " (" + STR( _ISIS_SVN_REVISION ) + ")";
 }
 
 }

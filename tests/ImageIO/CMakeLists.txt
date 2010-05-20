@@ -19,3 +19,8 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI)
     add_executable(imageIONiiTest imageIONiiTest.cpp)
     target_link_libraries(imageIONiiTest utils data isisImageFormat_Nifti)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI)
+
+if(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA)
+    add_executable(imageIOVistaTest imageIOVistaTest.cpp)
+    target_link_libraries(imageIOVistaTest utils data isisImageFormat_Vista)
+endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA)

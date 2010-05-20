@@ -40,26 +40,13 @@ OPTION(${CMAKE_PROJECT_NAME}_RUNTIME_LOG "Enable runtime logging" ON)
 OPTION(${CMAKE_PROJECT_NAME}_DEBUG_LOG "Enable debug logging" ON)
 
 OPTION(${CMAKE_PROJECT_NAME}_BUILD_DOC "Build the Doxygen documentation for the core libraries" OFF)
-OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI "Enable Nifti-IO plugin" OFF)
-OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL "Enable Null-IO plugin" ON)
-OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM "Enable Dicom-IO plugin" OFF)
-OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ "Enable proxy plugin for compressed files" ON)
 
 ################################################################################
 # ISIS project version number
-################################################################################
-# set the ISIS version
-SET(ISIS_VERSION_MAJOR "0")
-SET(ISIS_VERSION_MINOR "0")
-SET(ISIS_VERSION_PATCH "1")
+################################################################################)
 
-SET(ISIS_VERSION 
-  ${ISIS_VERSION_MAJOR}.${ISIS_VERSION_MINOR}.${ISIS_VERSION_PATCH})
-
-# build doc
-IF(${CMAKE_PROJECT_NAME}_BUILD_DOC)
-  INCLUDE(UseDoxygen)
-ENDIF(${CMAKE_PROJECT_NAME}_BUILD_DOC)
+SET(ISIS_VERSION
+  ${${CMAKE_PROJECT_NAME}_VERSION_MAJOR}.${${CMAKE_PROJECT_NAME}_VERSION_MINOR}.${${CMAKE_PROJECT_NAME}_VERSION_PATCH})
 
 ###############################################################################
 #Global definitions/compiler flags
@@ -104,6 +91,7 @@ IF (NOT SVN_REVISION)
 		string(REGEX MATCH "exported" EXPORTED "${OUT}")
 		IF (NOT EXPORTED)
 			string(REGEX MATCH "^[0-9]+" SVN_REVISION "${OUT}") #@todo wont work with more complex revisions/modified sources
+			SET(SVN_REVISION r${SVN_REVISION})
 		ELSE (NOT EXPORTED)
 			set(SVN_REVISION "exported")
 		ENDIF (NOT EXPORTED)
@@ -136,6 +124,11 @@ ENDIF(${CMAKE_PROJECT_NAME}_HAVE_QT4)
 IF(ITK_FOUND OR VTK_FOUND)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-depth-60")
 ENDIF(ITK_FOUND OR VTK_FOUND)
+
+# configure documentation
+IF(${CMAKE_PROJECT_NAME}_BUILD_DOC)
+  INCLUDE(UseDoxygen)
+ENDIF(${CMAKE_PROJECT_NAME}_BUILD_DOC)
 
 ###############################################################################
 #Subdirs

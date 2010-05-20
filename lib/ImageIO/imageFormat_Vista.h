@@ -24,6 +24,9 @@
 #ifndef IMAGEFORMAT_VISTA_H_
 #define IMAGEFORMAT_VISTA_H_
 
+// global includes
+#include <viaio/VImage.h>
+
 // local includes
 #include <DataStorage/io_interface.h>
 
@@ -44,6 +47,25 @@ public:
 	void write( const data::Image &image, const std::string &filename,
 				const std::string &dialect ) throw( std::runtime_error & );
 
+private:
+
+	/**
+	 * This function copies all chunk header informations to the appropriate
+	 * vista image attribute values.
+	 *
+	 * @param chunk A reference to chunk that provides the metadata.
+	 * @param image The target image. Alle metadata will be copied to the
+	 * corresponding header attributes.
+	 */
+	void copyHeaderToVista(const data::Chunk& chunk, VImage& image);
+
+	/**
+	 * This function copies all metadata from Vista image header attributes to
+	 * the corresponding fields in the target Vista image.
+	 * @param image The target chunk where all data will be copied to.
+	 * @oaram chunk The source image that provides the Vista metadata attributes.
+	 */
+	void copyHeaderFromVista(const VImage& image, data::Chunk& chunk);
 };
 
 }
