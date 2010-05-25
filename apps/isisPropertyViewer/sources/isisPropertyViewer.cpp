@@ -31,6 +31,8 @@ isisPropertyViewer::isisPropertyViewer( const isis::util::slist &fileList, QMain
 {
 //  isis::util::DefaultMsgPrint::stopBelow( isis::warning );
 	ui.setupUi( this );
+	this->ui.actionSave->setEnabled( false );
+	this->ui.actionSaveAs->setEnabled( false );
 	//connect itemDoubleClicked
 	QObject::connect( this->ui.treeWidget, SIGNAL( itemDoubleClicked( QTreeWidgetItem*, int ) ), this, SLOT( edit_item( QTreeWidgetItem*, int ) ) );
 	this->ui.treeWidget->setColumnCount( 3 );
@@ -70,9 +72,19 @@ void isisPropertyViewer::on_action_Clear_activated()
 
 void isisPropertyViewer::on_actionSave_activated()
 {
-	std::cout << "saving" << std::endl;
-	m_propHolder.saveIt();
+	m_propHolder.saveIt( "" , false );
 	this->ui.actionSave->setEnabled( false );
+	this->ui.actionSaveAs->setEnabled( false );
+}
+
+void  isisPropertyViewer::on_actionSaveAs_activated()
+{
+	QString fileName = QFileDialog::getSaveFileName( this, tr( "Save Image As" ), QDir::currentPath(), "*.nii *.v" );
+	if( not fileName.toStdString().empty() ) {
+		m_propHolder.saveIt( fileName , true );
+		this->ui.actionSave->setEnabled( false );
+		this->ui.actionSaveAs->setEnabled( false );
+	}
 }
 
 void isisPropertyViewer::addFileToTree( const QString &fileName )
@@ -173,7 +185,7 @@ void isisPropertyViewer::addPropToTree( const boost::shared_ptr<isis::data::Imag
 void isisPropertyViewer::edit_item( QTreeWidgetItem* item, int val )
 {
 	//only edit value columns
-	if ( val == 1 ) {
+	if ( val == 1 and (not item->text(2).toStdString().empty() ) ) {
 //      QMessageBox::information( this, "isisPropertyViewer", "Edit mode not yet implemented!"
 		bool ok;
 		QTreeWidgetItem* tmpItem = item;
@@ -228,6 +240,7 @@ void isisPropertyViewer::edit_item( QTreeWidgetItem* item, int val )
 
 			item->setText( 1, val );
 			this->ui.actionSave->setEnabled( true );
+			this->ui.actionSaveAs->setEnabled( true );
 		}
 	}
 }

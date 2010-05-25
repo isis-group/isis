@@ -31,10 +31,10 @@ bool PropertyHolder::addPropMapFromImage( const boost::shared_ptr<isis::data::Im
 	return true;
 }
 
-void PropertyHolder::saveIt( void )
+void PropertyHolder::saveIt( const QString& fileNameAs, const bool SaveAs )
 {
 	for ( std::map<std::string, bool>::iterator boolIter = m_propChanged.begin(); boolIter != m_propChanged.end(); boolIter++ ) {
-		if ( boolIter->second ) {
+		if ( boolIter->second ) {		
 			isis::data::ImageList imageList = isis::data::IOFactory::load( boolIter->first , "" );
 			isis::data::ImageList tmpImageList;
 			BOOST_FOREACH( isis::data::ImageList::reference image, imageList ) {
@@ -42,10 +42,14 @@ void PropertyHolder::saveIt( void )
 				static_cast<isis::util::PropMap&>( *image ) = tmpMap;
 				tmpImageList.push_back( image );
 			}
-			std::string fileName = boolIter->first;
-			size_t pos = fileName.find( "." );
-			fileName.insert( pos, std::string( ".chg" ) );
-			isis::data::IOFactory::write( tmpImageList, fileName, "" );
+			if (not SaveAs){
+				std::string fileName = boolIter->first;
+				size_t pos = fileName.find( "." );
+				fileName.insert( pos, std::string( ".chg" ) );
+				isis::data::IOFactory::write( tmpImageList, fileName, "" );
+			} else {
+				isis::data::IOFactory::write( tmpImageList, fileNameAs.toStdString(), "" );
+			}
 			m_propChanged.find( boolIter->first )->second = false;
 		}
 	}

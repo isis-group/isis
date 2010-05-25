@@ -55,6 +55,7 @@
     </property>
     <addaction name="action_Open"/>
     <addaction name="actionSave"/>
+    <addaction name="actionSaveAs"/>
     <addaction name="action_Clear"/>
     <addaction name="action_Close"/>
    </widget>
@@ -81,7 +82,12 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Save</string>
+    <string>&amp;Save</string>
+   </property>
+  </action>
+  <action name="actionSaveAs">
+   <property name="text">
+    <string>Save &amp;As...</string>
    </property>
   </action>
  </widget>

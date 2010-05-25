@@ -34,7 +34,7 @@ public:
 	bool addPropMapFromImage( const boost::shared_ptr< isis::data::Image>, const QString& );
 	std::map<std::string, isis::util::PropMap> m_propHolderMap;
 	std::map<std::string, bool> m_propChanged;
-	void saveIt( void );
+	void saveIt( const QString&, const bool SaveAs );
 
 
 
