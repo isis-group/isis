@@ -24,6 +24,7 @@ private slots:
 	void on_action_Open_activated();
 	void on_action_Clear_activated();
 	void on_actionSave_activated();
+	void on_actionSaveAs_activated();
 	void edit_item( QTreeWidgetItem*, int );
 signals:
 	void itemDoubleClicked();
