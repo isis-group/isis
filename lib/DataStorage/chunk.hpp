@@ -153,7 +153,16 @@ public:
 				typename util::TypePtr<TYPE>::BasicDeleter(),
 				firstDim, secondDim, thirdDim, fourthDim
 			) {}
-	/// Create a MemChunk as copy of a given raw memory block (no range check will be done)
+	/**
+	 * Create a MemChunk as copy of a given raw memory block 
+	 * This will create a MemChunk of the given size and fill it with the data at the given address.
+	 * No range check will be done.
+	 * \param org pointer to the raw data which shall be copied
+	 * \param firstDim
+	 * \param secondDim
+	 * \param thirdDim
+	 * \param fourthDim size of the resulting image
+	 */
 	MemChunk( const TYPE*const org, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 ):
 			Chunk(
 				( TYPE* )malloc( sizeof( TYPE )*fourthDim*thirdDim*secondDim*firstDim ),

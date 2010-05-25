@@ -81,7 +81,7 @@ private:
 		void operator()( const_reference ref ) {
 			if ( ( not ref.second.empty() ) and ref.second->is<PropMap>() ) {
 				PropMap &sub = ref.second->cast_to_Type<PropMap>();
-				std::for_each( sub.begin(), sub.end(), walkTree<Predicate>( m_out ) );
+				std::for_each( sub.begin(), sub.end(), walkTree<Predicate>( m_out, ref.first ) );
 			} else {
 				if ( Predicate()( ref ) )
 					m_out.insert( m_out.end(), ( m_prefix != "" ? m_prefix + "/" : "" ) + ref.first );
