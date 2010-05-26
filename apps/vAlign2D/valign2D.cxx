@@ -57,9 +57,7 @@
 #include "extITK/isisIterationObserver.hpp"
 
 
-VDictEntry TYPMetric[] = { {"MattesMutualInformation", 0}, {"MutualInformationHistogram", 1}, {"NormalizedCorrelation",
-			2
-																								  }, {"MeanSquare", 3}, {NULL}
+VDictEntry TYPMetric[] = { {"MattesMutualInformation", 0}, {"MutualInformationHistogram", 1}, {"NormalizedCorrelation",2}, {"MeanSquare", 3}, {NULL}
 };
 
 VDictEntry TYPTransform[] = { {"Rigid", 0}, {"Affine", 1}, {"BSplineDeformable", 2}, {"Translation", 3}, {"Scale", 4}, {NULL}};
@@ -119,7 +117,7 @@ options[] = {
 		"Number of bins used by the MattesMutualInformationMetric to calculate the image histogram"
 	},
 	{
-		"iter", VShortRepn, 1, &number_of_iterations, VOptionalOpt, 0,
+		"iter", VShortRepn, 0, &number_of_iterations, VOptionalOpt, 0,
 		"Maximum number of iteration used by the optimizer"
 	},
 	{
@@ -162,7 +160,7 @@ options[] = {
 	{"get_inverse", VBooleanRepn, 1, &use_inverse, VOptionalOpt, 0, "Getting the inverse transform"},
 
 	//component inputs
-	{"metric", VShortRepn, 1, ( VPointer ) &metricType, VOptionalOpt, TYPMetric, "Type of the metric"}, {
+	{"metric", VShortRepn, 0, ( VPointer ) &metricType, VOptionalOpt, TYPMetric, "Type of the metric"}, {
 		"transform", VShortRepn, 0, ( VPointer ) &transformType, VOptionalOpt, TYPTransform,
 		"Type of the transform"
 	}, {"interpolator", VShortRepn, 0, ( VPointer ) &interpolatorType, VOptionalOpt,
@@ -195,7 +193,7 @@ int main(
 	}
 
 	typedef unsigned char MaskPixelType;
-	typedef unsigned short InputPixelType;
+	typedef short InputPixelType;
 	const unsigned int Dimension = 2;
 	VShort transform;
 	VShort optimizer;
@@ -236,14 +234,15 @@ int main(
 	FixedFilterType::Pointer fixedFilter = FixedFilterType::New();
 	MovingFilterType::Pointer movingFilter = MovingFilterType::New();
 	tmpConstTransformPointer = NULL;
-	isis::data::ImageList refList = isis::data::IOFactory::load( ref_filename, "" );
-	isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "" );
-	LOG_IF( refList.empty(), isis::DataLog, isis::error ) << "Reference image is empty!";
-	LOG_IF( inList.empty(), isis::DataLog, isis::error ) << "Input image is empty!";
-
+	
+	movingReader->SetFileName(in_filename);
+	fixedReader->SetFileName(ref_filename);
+	movingReader->Update();
+	fixedReader->Update();
+	
 	if ( !smooth ) {
-		fixedImage = isis::adapter::itkAdapter::makeItkImageObject<FixedImageType>( refList.front() );
-		movingImage = isis::adapter::itkAdapter::makeItkImageObject<MovingImageType>( inList.front() );
+		fixedImage = fixedReader->GetOutput();
+		movingImage = movingReader->GetOutput();
 	}
 
 	if ( smooth ) {
@@ -251,7 +250,7 @@ int main(
 		GaussianFilterType::Pointer fixedGaussianFilterY = GaussianFilterType::New();
 		fixedGaussianFilterX->SetNumberOfThreads( number_threads );
 		fixedGaussianFilterY->SetNumberOfThreads( number_threads );
-		fixedGaussianFilterX->SetInput( isis::adapter::itkAdapter::makeItkImageObject<FixedImageType>( refList.front() ) );
+		fixedGaussianFilterX->SetInput( fixedReader->GetOutput() );
 		fixedGaussianFilterY->SetInput( fixedGaussianFilterX->GetOutput() );
 		fixedGaussianFilterX->SetDirection( 0 );
 		fixedGaussianFilterY->SetDirection( 1 );
@@ -268,7 +267,7 @@ int main(
 		GaussianFilterType::Pointer movingGaussianFilterY = GaussianFilterType::New();
 		movingGaussianFilterX->SetNumberOfThreads( number_threads );
 		movingGaussianFilterY->SetNumberOfThreads( number_threads );
-		movingGaussianFilterX->SetInput( isis::adapter::itkAdapter::makeItkImageObject<MovingImageType>( inList.front() ) );
+		movingGaussianFilterX->SetInput( movingReader->GetOutput() );
 		movingGaussianFilterY->SetInput( movingGaussianFilterX->GetOutput() );
 		movingGaussianFilterX->SetDirection( 0 );
 		movingGaussianFilterY->SetDirection( 1 );
