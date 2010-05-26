@@ -66,6 +66,12 @@ private:
 	 * @oaram chunk The source image that provides the Vista metadata attributes.
 	 */
 	void copyHeaderFromVista(const VImage& image, data::Chunk& chunk);
+
+	/**
+	 * This function creates a MemChunk with the correct type and adds it to the
+	 * end of the Chunk list.
+	 */
+	template <typename TInput> void addChunk(data::ChunkList &chunks, VImage image);
 };
 
 }

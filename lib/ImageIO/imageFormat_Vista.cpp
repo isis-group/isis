@@ -262,8 +262,6 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 		throwGenericError( s );
 	}
 
-	boost::shared_ptr<data::Chunk> chunk_sp;
-
 	image_io::enable_log<util::DefaultMsgPrint>( warning );
 	LOG(image_io::Runtime,info) << "found " << nimages << " images.";
 
@@ -271,52 +269,27 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 	if ( nimages == 1 ) {
 		switch( VPixelRepn( images[0] ) ) {
 		case VBitRepn:
-			chunk_sp.reset( new data::MemChunk<bool>( static_cast<bool*>( images[0]->data),
-							VImageNBands( images[0] ),
-							VImageNRows( images[0] ),
-							VImageNColumns( images[0] ) ) );
+			addChunk<VBit>(chunks,images[0]);
 			break;
 		case VUByteRepn:
-			chunk_sp.reset( new data::MemChunk<uint8_t>( static_cast<uint8_t*>(images[0]->data),
-							VImageNBands( images[0] ),
-							VImageNRows( images[0] ),
-							VImageNColumns( images[0] ) ) );
+			addChunk<VUByte>(chunks,images[0]);
 			break;
 		case VSByteRepn:
-			chunk_sp.reset( new data::MemChunk<int8_t>( static_cast<int8_t*>(images[0]->data),
-							VImageNBands( images[0] ),
-							VImageNRows( images[0] ),
-							VImageNColumns( images[0] ) ) );
+			addChunk<VSByte>(chunks,images[0]);
 			break;
 		case VShortRepn:
-			chunk_sp.reset( new data::MemChunk<int16_t>( static_cast<int16_t*>(images[0]->data),
-							VImageNBands( images[0] ),
-							VImageNRows( images[0] ),
-							VImageNColumns( images[0] ) ) );
+			addChunk<VShort>(chunks,images[0]);
 			break;
 		case VLongRepn:
-			chunk_sp.reset( new data::MemChunk<int64_t>( static_cast<int64_t*>(images[0]->data),
-							VImageNBands( images[0] ),
-							VImageNRows( images[0] ),
-							VImageNColumns( images[0] ) ) );
+			addChunk<VLong>(chunks,images[0]);
 			break;
 		case VFloatRepn:
-			chunk_sp.reset( new data::MemChunk<float>( static_cast<float*>(images[0]->data),
-							VImageNBands( images[0] ),
-							VImageNRows( images[0] ),
-							VImageNColumns( images[0] ) ) );
+			addChunk<VFloat>(chunks,images[0]);
 			break;
 		case VDoubleRepn:
-			chunk_sp.reset( new data::MemChunk<double>( static_cast<double*>(images[0]->data),
-							VImageNBands( images[0] ),
-							VImageNRows( images[0] ),
-							VImageNColumns( images[0] ) ) );
+			addChunk<VDouble>(chunks,images[0]);
 		}// switch(VPixelRepn(images[0]))
 
-		// copy header information
-		copyHeaderFromVista( images[0], *chunk_sp );
-		// add chunk to chunk list
-		chunks.push_back( *chunk_sp );
 	}
 	// found serveral images -> assume that this is functional data
 	else {
@@ -326,8 +299,13 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 	return nimages;
 }
 
-void ImageFormat_Vista::copyHeaderToVista( const data::Chunk &chunk, VImage &image )
+void ImageFormat_Vista::copyHeaderToVista( const data::Chunk &chunk, VImage image )
 {
+	// get attribute list from image
+	VAttrList list = VImageAttrList(image);
+	VAttrListPosn posn;
+
+
 }
 
 void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &chunk )
@@ -434,6 +412,20 @@ void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &c
 
 	// set acquisitionNumber
 	chunk.setProperty("acquisitionNumber",0);
+}
+
+template <typename TInput> void ImageFormat_Vista::addChunk(data::ChunkList &chunks, VImage image) {
+
+	boost::shared_ptr<data::MemChunk<TInput> > chunk_sp(
+			new data::MemChunk<TInput>( static_cast<TInput*>( image->data),
+					VImageNColumns( image ),
+					VImageNRows( image ),
+					VImageNBands( image ) ) );
+
+	// copy header information
+	copyHeaderFromVista( image, *chunk_sp );
+	// add chunk to chunk list
+	chunks.push_back( *chunk_sp );
 }
 
 }//namespace image_io

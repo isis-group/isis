@@ -122,7 +122,7 @@ ENDIF(${CMAKE_PROJECT_NAME}_HAVE_QT4)
 # If ITK AND VTK are used together we have to increase the number of maximal
 # template recursion otherwise there will be an overflow in the Boost library.
 IF(ITK_FOUND OR VTK_FOUND)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-depth-60")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-depth-100")
 ENDIF(ITK_FOUND OR VTK_FOUND)
 
 # configure documentation
