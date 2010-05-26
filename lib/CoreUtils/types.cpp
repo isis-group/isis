@@ -34,6 +34,8 @@ namespace util
 
 DEF_TYPE( bool, boolean );
 
+DEF_TYPE( char, char );
+
 DEF_TYPE( int8_t, s8bit );
 DEF_TYPE( uint8_t, u8bit );
 
