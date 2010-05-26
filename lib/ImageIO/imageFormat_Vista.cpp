@@ -42,6 +42,8 @@ throw( std::runtime_error & )
 	VAttrList attrList = VCreateAttrList();
 	//  One or more VImages need to be written to disk.
 	VImage *vimages;
+    // count number of images that where created with malloc
+	int nimages = 0;
 	//  get size for each dimension
 	util::ivector4 dims = image.sizeToVector();
 	//  create a vista image container according to the isis image configuration
@@ -50,6 +52,7 @@ throw( std::runtime_error & )
 	//  when we have got a 4D-image, this image provides functional data information
 	if( dims[3] > 1 ) {
 		vimages = ( VImage * )malloc( sizeof( VImage ) * dims[2] );
+		nimages = dims[2];
 		// since we need to convert and reorganize the data, we will create a
 		// temporary buffer who stores short values.
 		// get the first chunk
@@ -114,13 +117,14 @@ throw( std::runtime_error & )
 	} else {
 		// save 3D data to ONE vista image
 		vimages = ( VImage * )malloc( sizeof( VImage ) );
+		nimages = 1;
 
 		data::Chunk chunk = image.getChunk(0);
 		// choose data type
 		switch( chunk.typeID() ) {
 
 		// VBit
-		case util::Type<VBit>::staticID:
+		case util::TypePtr<VBit>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VBitRepn );
 			for( int z = 0; z < dims[2]; z++ ) {
 				for( int y = 0; y < dims[1]; y++ ) {
@@ -133,7 +137,7 @@ throw( std::runtime_error & )
 			break;
 
 		// VUByte
-		case util::Type<VUByte>::staticID:
+		case util::TypePtr<VUByte>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VUByteRepn );
 			for( int z = 0; z < dims[2]; z++ ) {
 				for( int y = 0; y < dims[1]; y++ ) {
@@ -146,7 +150,7 @@ throw( std::runtime_error & )
 			break;
 
 		// VSByte
-		case util::Type<VSByte>::staticID:
+		case util::TypePtr<VSByte>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VSByteRepn );
 			for( int z = 0; z < dims[2]; z++ ) {
 				for( int y = 0; y < dims[1]; y++ ) {
@@ -159,7 +163,7 @@ throw( std::runtime_error & )
 			break;
 
 		// VShort
-		case util::Type<VShort>::staticID:
+		case util::TypePtr<VShort>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VShortRepn );
 			for( int z = 0; z < dims[2]; z++ ) {
 				for( int y = 0; y < dims[1]; y++ ) {
@@ -172,7 +176,7 @@ throw( std::runtime_error & )
 			break;
 
 		// VLong
-		case util::Type<VLong>::staticID:
+		case util::TypePtr<VLong>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VLongRepn );
 			for( int z = 0; z < dims[2]; z++ ) {
 				for( int y = 0; y < dims[1]; y++ ) {
@@ -185,7 +189,7 @@ throw( std::runtime_error & )
 			break;
 
 		// VFloat
-		case util::Type<VFloat>::staticID:
+		case util::TypePtr<VFloat>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VFloatRepn );
 			for( int z = 0; z < dims[2]; z++ ) {
 				for( int y = 0; y < dims[1]; y++ ) {
@@ -198,7 +202,7 @@ throw( std::runtime_error & )
 			break;
 
 		// VDouble
-		case util::Type<VDouble>::staticID:
+		case util::TypePtr<VDouble>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VDoubleRepn);
 			for( int z = 0; z < dims[2]; z++ ) {
 				for( int y = 0; y < dims[1]; y++ ) {
@@ -229,7 +233,7 @@ throw( std::runtime_error & )
 			<< "Error writing image data.";
 
 	//  cleanup
-	for( int z = 0; z < dims[2]; z++ )
+	for( int z = 0; z < nimages; z++ )
 		VDestroyImage( vimages[z] );
 
 	free( vimages );
