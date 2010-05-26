@@ -121,7 +121,7 @@ int main(
 	}
 
 	//typedef section
-	typedef unsigned short PixelType;
+	typedef unsigned char PixelType;
 	const unsigned int Dimension = 2;
 	const unsigned int fmriDimension = 3;
 	typedef itk::Vector<float, Dimension> VectorType;
@@ -191,22 +191,22 @@ int main(
 	progress_timer time;
 
 	if ( !fmri ) {
-		isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "" );
-		LOG_IF( inList.empty(), isis::DataLog, isis::error ) << "Input image is empty!";
-		inputImage = isis::adapter::itkAdapter::makeItkImageObject<InputImageType>( inList.front() );
+		reader->SetFileName( in_filename );
+		reader->Update();
+		inputImage = reader->GetOutput();
 	}
 
 	if ( fmri ) {
-		isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "" );
-		LOG_IF( inList.empty(), isis::DataLog, isis::error ) << "Input image is empty!";
-		fmriImage = isis::adapter::itkAdapter::makeItkImageObject<FMRIInputType>( inList.front() );
+		fmriReader->SetFileName( in_filename );
+		fmriReader->Update();
+		fmriImage = fmriReader->GetOutput();
 	}
 
 	//if template file is specified by the user
 	if ( template_filename ) {
-		isis::data::ImageList tmpList = isis::data::IOFactory::load( template_filename, "" );
-		LOG_IF( tmpList.empty(), isis::DataLog, isis::error ) << "Template image is empty!";
-		templateImage = isis::adapter::itkAdapter::makeItkImageObject<InputImageType>( tmpList.front() );
+		templateReader->SetFileName( template_filename );
+		templateReader->Update();
+		templateImage = templateReader->GetOutput();
 		outputDirection = templateImage->GetDirection();
 		outputOrigin = templateImage->GetOrigin();
 	}
