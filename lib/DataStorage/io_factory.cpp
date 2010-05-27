@@ -53,11 +53,12 @@ bool IOFactory::registerFormat( const FileFormatPtr plugin )
 	io_formats.push_back( plugin );
 	std::list<std::string> suffixes = getSuffixes( plugin );
 	LOG( Runtime, info )
-	<< "Registering " << ( plugin->tainted() ? "tainted " : "" ) << "io-plugin "
-	<< util::MSubject( plugin->name() )
-	<< " with " << suffixes.size() << " supported suffixes";
-	BOOST_FOREACH( std::string & it, suffixes )
-	io_suffix[it].push_back( plugin );
+			<< "Registering " << ( plugin->tainted() ? "tainted " : "" ) << "io-plugin "
+			<< util::MSubject( plugin->name() )
+			<< " with " << suffixes.size() << " supported suffixes";
+	BOOST_FOREACH( std::string & it, suffixes ) {
+		io_suffix[it].push_back( plugin );
+	}
 	return true;
 }
 
@@ -98,16 +99,16 @@ unsigned int IOFactory::findPlugins( const std::string &path )
 						LOG( Runtime, error ) << "failed to register plugin " << util::MSubject( pluginName );
 				} else {
 					LOG( Runtime, error )
-					<< "could not get format factory function: " << util::MSubject( dlerror() );
+							<< "could not get format factory function: " << util::MSubject( dlerror() );
 					dlclose( handle );
 				}
 			} else
 				LOG( Runtime, error )
-				<< "Could not load library: " << util::MSubject( dlerror() );
+						<< "Could not load library: " << util::MSubject( dlerror() );
 		} else {
 			LOG( Runtime, verbose_info )
-			<< "Ignoring " << util::MSubject( itr->path() )
-			<< " because it doesn't match " << pluginFilter.str();
+					<< "Ignoring " << util::MSubject( itr->path() )
+					<< " because it doesn't match " << pluginFilter.str();
 		}
 	}
 
@@ -124,31 +125,35 @@ IOFactory &IOFactory::get()
 	return util::Singletons::get<IOFactory, INT_MAX>();
 }
 
-int IOFactory::loadFile( ChunkList &ret, const boost::filesystem::path &filename, const std::string &dialect )
+int IOFactory::loadFile( isis::data::ChunkList &ret, const boost::filesystem::path &filename, std::string suffix_override, std::string dialect )
 {
-	FileFormatList formatReader = getFormatInterface( filename.string(), dialect );
+	FileFormatList formatReader = getFormatInterface( filename.string(), suffix_override, dialect );
 	BOOST_FOREACH( FileFormatList::const_reference it, formatReader ) {
 		LOG( ImageIoDebug, info )
-		<< "plugin to load file " <<  util::MSubject( filename ) << ": " << it->name()
-		<<  ( dialect.empty() ?
-			  std::string( "" ) : std::string( " with dialect: " ) + dialect
-			);
+				<< "plugin to load file " <<  util::MSubject( filename ) << ": " << it->name()
+				<<  ( dialect.empty() ?
+					  std::string( "" ) : std::string( " with dialect: " ) + dialect
+					);
 
 		try {
 			return it->load( ret, filename.string(), dialect );
 		} catch ( std::runtime_error &e ) {
 			LOG( Runtime, error )
-			<< "Failed to load " <<  filename << " using " <<  it->name() << " ( " << e.what() << " )";
+					<< "Failed to load " <<  filename << " using " <<  it->name() << " ( " << e.what() << " )";
 		}
 	}
 	LOG( Runtime, error ) << "No plugin found to load: " << filename; //@todo error message missing
 	return 0;//no plugin of proposed list could load file
 }
 
-IOFactory::FileFormatList IOFactory::getFormatInterface( const std::string &filename, const std::string &dialect )
+IOFactory::FileFormatList IOFactory::getFormatInterface( std::string filename, std::string suffix_override, std::string dialect )
 {
-	boost::filesystem::path fname( filename );
-	std::string ext = boost::filesystem::extension( fname );
+	std::string ext;
+
+	if( suffix_override.empty() ) {
+		boost::filesystem::path fname( filename );
+		ext = boost::filesystem::extension( fname );
+	} else ext = suffix_override;
 
 	if ( ext.empty() ) {
 		return FileFormatList();
@@ -171,31 +176,31 @@ IOFactory::FileFormatList IOFactory::getFormatInterface( const std::string &file
 }
 
 
-data::ImageList IOFactory::load( const std::string &path, std::string dialect )
+data::ImageList IOFactory::load( const std::string &path, std::string suffix_override, std::string dialect )
 {
 	const boost::filesystem::path p( path );
 	ChunkList chunks;
 	const int loaded = boost::filesystem::is_directory( p ) ?
-					   get().loadPath( chunks, p, dialect ) :
-					   get().loadFile( chunks, p, dialect );
+					   get().loadPath( chunks, p, suffix_override, dialect ) :
+					   get().loadFile( chunks, p, suffix_override, dialect );
 	const data::ImageList images( chunks );
 	BOOST_FOREACH( data::ImageList::const_reference ref, images ) {
 		if ( not ref->hasProperty( "source" ) )
 			ref->setProperty( "source", p.string() );
 	}
 	LOG( Runtime, info )
-	<< "Generated " << images.size() << " images out of " << loaded << " chunks from " << ( boost::filesystem::is_directory( p ) ? "directory " : "" ) << p;
+			<< "Generated " << images.size() << " images out of " << loaded << " chunks from " << ( boost::filesystem::is_directory( p ) ? "directory " : "" ) << p;
 	return images;
 }
 
-int IOFactory::loadPath( ChunkList &ret, const boost::filesystem::path &path, const std::string &dialect )
+int IOFactory::loadPath( isis::data::ChunkList &ret, const boost::filesystem::path &path, std::string suffix_override, std::string dialect )
 {
 	int loaded = 0;
 
 	for ( boost::filesystem::directory_iterator itr( path ); itr != boost::filesystem::directory_iterator(); ++itr )  {
 		if ( boost::filesystem::is_directory( *itr ) )continue;
 
-		loaded += loadFile( ret, itr->path(), dialect );
+		loaded += loadFile( ret, itr->path(), suffix_override, dialect );
 	}
 
 	return loaded;
@@ -206,11 +211,11 @@ bool IOFactory::write( const isis::data::ImageList &images, const std::string &f
 	FileFormatList formatWriter = get().getFormatInterface( filename, dialect );
 	BOOST_FOREACH( FileFormatList::const_reference it, formatWriter ) {
 		LOG( Debug, info )
-		<< "plugin to write to " <<  filename << ": " << it->name()
-		<<  ( dialect.empty() ?
-			  std::string( "" ) :
-			  std::string( " using dialect: " ) + dialect
-			);
+				<< "plugin to write to " <<  filename << ": " << it->name()
+				<<  ( dialect.empty() ?
+					  std::string( "" ) :
+					  std::string( " using dialect: " ) + dialect
+					);
 
 		try {
 			it->write( images, filename, dialect );
@@ -218,8 +223,8 @@ bool IOFactory::write( const isis::data::ImageList &images, const std::string &f
 			return true;
 		} catch ( std::runtime_error &e ) {
 			LOG( Runtime, error )
-			<< "Failed to write " <<  images.size()
-			<< " images using " <<  it->name() << " (" << e.what() << ")";
+					<< "Failed to write " <<  images.size()
+					<< " images using " <<  it->name() << " (" << e.what() << ")";
 		}
 	}
 	LOG( Runtime, error ) << "No plugin found to write to: " << filename; //@todo error message missing

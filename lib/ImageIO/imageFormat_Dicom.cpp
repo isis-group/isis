@@ -21,9 +21,9 @@ class DicomChunk : public data::Chunk
 		Deleter( DcmFileFormat *dcfile, DicomImage *img, std::string filename ): m_dcfile( dcfile ), m_img( img ), m_filename( filename ) {}
 		void operator ()( void *at ) {
 			LOG_IF( not m_dcfile, Runtime, error )
-			<< "Trying to close non existing dicom file";
+					<< "Trying to close non existing dicom file";
 			LOG_IF( not m_img, Runtime, error )
-			<< "Trying to close non existing dicom image";
+					<< "Trying to close non existing dicom image";
 			LOG( Debug, verbose_info ) << "Closing mapped dicom-file " << util::MSubject( m_filename ) << " (pixeldata was at " << at << ")";
 			delete m_img;
 			delete m_dcfile;
@@ -32,10 +32,10 @@ class DicomChunk : public data::Chunk
 	template<typename TYPE> DicomChunk(
 		TYPE *dat, Deleter del,
 		size_t width, size_t height ):
-			data::Chunk( dat, del, width, height, 1, 1 ) {
+		data::Chunk( dat, del, width, height, 1, 1 ) {
 		LOG( Debug, verbose_info )
-		<< "Mapping greyscale pixeldata of " << del.m_filename << " at "
-		<< dat << " (" << util::TypePtr<TYPE>::staticName() << ")" ;
+				<< "Mapping greyscale pixeldata of " << del.m_filename << " at "
+				<< dat << " (" << util::TypePtr<TYPE>::staticName() << ")" ;
 	}
 	template<typename TYPE>
 	static data::Chunk *copyColor( TYPE *source, size_t width, size_t height ) {
@@ -136,7 +136,7 @@ using boost::gregorian::date;
 const char ImageFormat_Dicom::dicomTagTreeName[] = "DICOM";
 const char ImageFormat_Dicom::unknownTagName[] = "Unknown Tag";
 
-std::string ImageFormat_Dicom::suffixes() {return std::string( ".ima" );}
+std::string ImageFormat_Dicom::suffixes() {return std::string( ".ima .dcm" );}
 std::string ImageFormat_Dicom::name() {return "Dicom";}
 
 
@@ -283,8 +283,8 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 			object.remove( prefix + "Unknown Tag(0019,1015)" );
 		else
 			LOG( Debug, warning )
-			<< prefix + "Unknown Tag(0019,1015):" << comp << " differs from indexOrigin:"
-			<< org << ", won't remove it";
+					<< prefix + "Unknown Tag(0019,1015):" << comp << " differs from indexOrigin:"
+					<< org << ", won't remove it";
 	}
 
 	if ( object.hasProperty( prefix + "Unknown Tag(0051,100c)" ) ) { //@todo siemens only
@@ -408,7 +408,7 @@ isis::image_io::FileFormat *factory()
 {
 	if ( not dcmDataDict.isDictionaryLoaded() ) {
 		LOG( isis::image_io::Runtime, isis::error )
-		<< "No data dictionary loaded, check environment variable "; //set DCMDICTPATH or fix DCM_DICT_DEFAULT_PATH in cfunix.h of dcmtk
+				<< "No data dictionary loaded, check environment variable "; //set DCMDICTPATH or fix DCM_DICT_DEFAULT_PATH in cfunix.h of dcmtk
 		return NULL;
 	}
 

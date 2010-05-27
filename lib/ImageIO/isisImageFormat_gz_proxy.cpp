@@ -118,7 +118,7 @@ public:
 		util::TmpFile tmpfile( "", unzipped_suffix );
 		LOG( ImageIoDebug, info ) <<  "tmpfile=" << tmpfile;
 		file_uncompress( filename, tmpfile.string() );
-		return data::IOFactory::get().loadFile( chunks, tmpfile, dialect );
+		return data::IOFactory::get().loadFile( chunks, tmpfile, "", dialect );
 	}
 
 	void write( const data::Image &image, const std::string &filename, const std::string &dialect )throw( std::runtime_error & ) {

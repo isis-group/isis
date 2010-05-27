@@ -29,12 +29,17 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 	if ( have_input ) {
 		parameters["in"] = std::string();
 		parameters["in"].setDescription( "input file or dataset" );
+		parameters["rf"] = std::string();
+		parameters["rf"].needed() = false;
+		parameters["rf"].setDescription( "Override automatic detection of file suffix for reading with given value" );
 	}
 
 	if ( have_output ) {
 		parameters["out"] = std::string();
 		parameters["out"].setDescription( "output file" );
-		parameters["out"].setDescription( "output file" );
+		parameters["wf"] = std::string();
+		parameters["wf"].needed() = false;
+		parameters["wf"].setDescription( "Override automatic detection of file suffix for writing with given value" );
 	}
 }
 
@@ -47,7 +52,8 @@ bool IOApplication::init( int argc, char **argv, bool exitOnError )
 
 	if ( m_input ) {
 		std::string input = parameters["in"];
-		images = data::IOFactory::load( input );
+		std::string rf = parameters["rf"];
+		images = data::IOFactory::load( input, rf );
 
 		if ( images.empty() ) {
 			if ( exitOnError )
