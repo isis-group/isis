@@ -57,7 +57,7 @@ private:
 	 * @param image The target image. Alle metadata will be copied to the
 	 * corresponding header attributes.
 	 */
-	void copyHeaderToVista(const data::Chunk& chunk, VImage& image);
+	void copyHeaderToVista(const data::Image& image, VImage& vimage);
 
 	/**
 	 * This function copies all metadata from Vista image header attributes to

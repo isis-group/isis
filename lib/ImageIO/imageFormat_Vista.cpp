@@ -26,6 +26,7 @@
 
 // global includes
 #include <list>
+#include <sstream>
 
 namespace isis
 {
@@ -77,6 +78,9 @@ throw( std::runtime_error & )
 					}
 				}
 
+				// copy header information
+				copyHeaderToVista(image,vimages[z]);
+
 				VAppendAttr( attrList, "image", NULL, VImageRepn, vimages[z] );
 			}
 		}
@@ -86,6 +90,10 @@ throw( std::runtime_error & )
 			for( int z = 0; z < dims[2]; z++ ) {
 				vimages[z] = VCreateImage( dims[3], dims[1], dims[0],
 										   VShortRepn );
+
+				// copy header information
+				copyHeaderToVista(image,vimages[z]);
+
 				VAppendAttr( attrList, "image", NULL, VImageRepn, vimages[z] );
 			}
 
@@ -115,6 +123,7 @@ throw( std::runtime_error & )
 		// dims[3] > 1 ?
 		// 3D image data
 	} else {
+
 		// save 3D data to ONE vista image
 		vimages = ( VImage * )malloc( sizeof( VImage ) );
 		nimages = 1;
@@ -221,6 +230,9 @@ throw( std::runtime_error & )
 			return;
 		}
 
+		// copy header information
+		copyHeaderToVista(image, vimages[0]);
+
 		VAppendAttr( attrList, "image", NULL, VImageRepn, vimages[0] );
 
 	}
@@ -299,12 +311,48 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 	return nimages;
 }
 
-void ImageFormat_Vista::copyHeaderToVista( const data::Chunk &chunk, VImage image )
+void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage& vimage )
 {
 	// get attribute list from image
-	VAttrList list = VImageAttrList(image);
-	VAttrListPosn posn;
+	VAttrList list = VImageAttrList(vimage);
 
+	// ********** MANDATORY attributes **********
+
+	// get voxel
+    util::fvector4 voxels = image.getProperty<util::fvector4>("voxelSize");
+    std::stringstream vstr;
+    vstr << voxels[2] << " " << voxels[1] << " " << voxels[0];
+    VAppendAttr(list, "voxel",NULL,VStringRepn,vstr.str().c_str());
+
+    // ********** Vista group **********
+    // POLICY: Append ALL properties from the 'Vista' Propmap to the end of the
+    // attribute list.
+    util::PropertyValue pval = image.getPropertyValue("Vista");
+    if((not pval.empty()) and pval->is<util::PropMap>()) {
+    	// convert it to a property map
+    	util::PropMap &pmap = pval->cast_to_Type<util::PropMap>();
+    	util::PropMap::key_list klist = pmap.keys();
+    	util::PropMap::key_list::const_iterator kiter;
+    	for( kiter = klist.begin(); kiter != klist.end(); kiter++) {
+
+    		util::PropertyValue pv = pmap.getPropertyValue(*kiter);
+
+    		// VBit -> VBit (char *)
+    		if(pv->is<VBit>()) {
+    			VAppendAttr(list, (*kiter).c_str(), NULL, VBitRepn,
+    					(VBit)pv->cast_to_Type<VBit>());
+    			continue;
+    		}
+
+    		// VString -> std::string
+    		if(pv->is<std::string>()) {
+    			VAppendAttr(list, (*kiter).c_str(), NULL, VStringRepn,
+    					((std::string)pv->cast_to_Type<std::string>()).c_str());
+    			continue;
+    		}
+    	}
+
+    }
 
 }
 
