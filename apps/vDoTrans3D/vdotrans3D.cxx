@@ -100,6 +100,9 @@ int main(
 {
 	// show revision information string constant
 	std::cout << "Core Version: " << isis::util::Application::getCoreVersion() << std::endl;
+	
+	ENABLE_LOG( isis::DataDebug, isis::util::DefaultMsgPrint, isis::error );
+	ENABLE_LOG( isis::DataLog, isis::util::DefaultMsgPrint, isis::error );
 
 	// DANGER! Kids don't try this at home! VParseCommand modifies the values of argc and argv!!!
 	if ( !VParseCommand( VNumber( options ), options, &argc, argv ) || !VIdentifyFiles( VNumber( options ), options, "in",
@@ -324,6 +327,7 @@ int main(
 	}
 
 	if ( not fmri ) {
+		
 		writer->SetFileName( out_filename );
 
 		if ( not vtrans_filename and trans_filename.number == 1 ) {
@@ -333,8 +337,10 @@ int main(
 			resampler->SetSize( outputSize );
 			resampler->SetOutputOrigin( outputOrigin );
 			resampler->SetOutputDirection( outputDirection );
-			writer->SetInput( resampler->GetOutput() );
-			writer->Update();
+			resampler->Update();
+			isis::data::ImageList imgList = isis::adapter::itkAdapter::makeIsisImageObject<OutputImageType>(resampler->GetOutput(), true);
+			isis::data::IOFactory::write(imgList, out_filename, "");
+			
 		}
 
 		if ( vtrans_filename or trans_filename.number > 1 ) {
@@ -350,8 +356,8 @@ int main(
 			}
 
 			warper->Update();
-			writer->SetInput( warper->GetOutput() );
-			writer->Update();
+			isis::data::ImageList imgList = isis::adapter::itkAdapter::makeIsisImageObject<OutputImageType>(warper->GetOutput(), true);
+			isis::data::IOFactory::write(imgList, out_filename, "");
 		}
 	}
 
@@ -448,8 +454,8 @@ int main(
 
 		tileImageFilter->SetLayout( layout );
 		tileImageFilter->Update();
-		fmriWriter->SetInput( tileImageFilter->GetOutput() );
-		fmriWriter->Update();
+		isis::data::ImageList imgList = isis::adapter::itkAdapter::makeIsisImageObject<FMRIOutputType>(tileImageFilter->GetOutput(), true);
+		isis::data::IOFactory::write(imgList, out_filename, "");
 	}
 
 	std::cout << std::endl << "Done.    " << std::endl;
