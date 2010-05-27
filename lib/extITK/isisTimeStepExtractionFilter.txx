@@ -61,7 +61,7 @@ void TimeStepExtractionFilter<TInputImage, TOutputImage>::Update()
 
 		try {
 			m_ExtractFilter->Update();
-		} catch ( itk::ExceptionObject & err ) {
+		} catch ( itk::ExceptionObject &err ) {
 			std::cerr << "ExceptionObject caught !" << std::endl;
 			std::cerr << err << std::endl;
 		}
@@ -85,7 +85,7 @@ void TimeStepExtractionFilter<TInputImage, TOutputImage>::Update()
 
 			try {
 				m_ExtractFilter->Update();
-			} catch ( itk::ExceptionObject & err ) {
+			} catch ( itk::ExceptionObject &err ) {
 				std::cerr << "ExceptionObject caught !" << std::endl;
 				std::cerr << err << std::endl;
 			}

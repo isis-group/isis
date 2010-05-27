@@ -41,18 +41,18 @@ bool isis::util::ProgParameter::parse( const Type<std::string> &props )
 	LOG_IF( ret, Debug, info ) << "Parsed " << MSubject( props.toString() ) << " as " << me.toString( true );
 	return ret;
 }
-const std::string& isis::util::ProgParameter::description()const
+const std::string &isis::util::ProgParameter::description()const
 {
 	return m_description;
 }
-void isis::util::ProgParameter::setDescription( const std::string& desc )
+void isis::util::ProgParameter::setDescription( const std::string &desc )
 {
 	m_description = desc;
 }
 
 isis::util::ParameterMap::ParameterMap(): parsed( false ) {}
 
-bool isis::util::ParameterMap::parse( int argc, char** argv )
+bool isis::util::ParameterMap::parse( int argc, char **argv )
 {
 	int begin = 0, end = 0;
 	bool ret = true;

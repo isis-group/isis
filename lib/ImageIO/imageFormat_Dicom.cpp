@@ -30,7 +30,7 @@ class DicomChunk : public data::Chunk
 		}
 	};
 	template<typename TYPE> DicomChunk(
-		TYPE* dat, Deleter del,
+		TYPE *dat, Deleter del,
 		size_t width, size_t height ):
 			data::Chunk( dat, del, width, height, 1, 1 ) {
 		LOG( Debug, verbose_info )
@@ -38,7 +38,7 @@ class DicomChunk : public data::Chunk
 		<< dat << " (" << util::TypePtr<TYPE>::staticName() << ")" ;
 	}
 	template<typename TYPE>
-	static data::Chunk* copyColor( TYPE* source, size_t width, size_t height ) {
+	static data::Chunk *copyColor( TYPE *source, size_t width, size_t height ) {
 		data::Chunk *ret = new data::MemChunk<util::color<TYPE> >( width, height );
 		util::TypePtr<util::color<TYPE> > &dest = ret->asTypePtr<util::color<TYPE> >();
 		const size_t pixels = dest.len();
@@ -62,8 +62,8 @@ public:
 		if ( img->getStatus() == EIS_Normal ) {
 			const DiPixel *const  pix = img->getInterData();
 			const unsigned long width = img->getWidth(), height = img->getHeight();
-			const void * const data = pix->getData();
-			DcmDataset* dcdata = dcfile->getDataset();
+			const void *const data = pix->getData();
+			DcmDataset *dcdata = dcfile->getDataset();
 
 			if ( pix ) {
 				if ( img->isMonochrome() ) { //try to load image directly from the raw monochrome dicom-data
@@ -71,22 +71,22 @@ public:
 
 					switch ( pix->getRepresentation() ) {
 					case EPR_Uint8:
-						ret.reset( new DicomChunk( ( uint8_t* ) data, del, width, height ) );
+						ret.reset( new DicomChunk( ( uint8_t * ) data, del, width, height ) );
 						break;
 					case EPR_Sint8:
-						ret.reset( new DicomChunk( ( int8_t* )  data, del, width, height ) );
+						ret.reset( new DicomChunk( ( int8_t * )  data, del, width, height ) );
 						break;
 					case EPR_Uint16:
-						ret.reset( new DicomChunk( ( uint16_t* )data, del, width, height ) );
+						ret.reset( new DicomChunk( ( uint16_t * )data, del, width, height ) );
 						break;
 					case EPR_Sint16:
-						ret.reset( new DicomChunk( ( int16_t* ) data, del, width, height ) );
+						ret.reset( new DicomChunk( ( int16_t * ) data, del, width, height ) );
 						break;
 					case EPR_Uint32:
-						ret.reset( new DicomChunk( ( uint32_t* )data, del, width, height ) );
+						ret.reset( new DicomChunk( ( uint32_t * )data, del, width, height ) );
 						break;
 					case EPR_Sint32:
-						ret.reset( new DicomChunk( ( int32_t* ) data, del, width, height ) );
+						ret.reset( new DicomChunk( ( int32_t * ) data, del, width, height ) );
 						break;
 					default:
 						FileFormat::throwGenericError( "Unsupported datatype for monochrome images" ); //@todo tell the user which datatype it is
@@ -102,10 +102,10 @@ public:
 				} else if ( pix->getPlanes() == 3 ) { //try to load data as color image
 					switch ( pix->getRepresentation() ) {
 					case EPR_Uint8:
-						ret.reset( copyColor( ( Uint8* )data, width, height ) );
+						ret.reset( copyColor( ( Uint8 * )data, width, height ) );
 						break;
 					case EPR_Uint16:
-						ret.reset( copyColor( ( Uint16* )data, width, height ) );
+						ret.reset( copyColor( ( Uint16 * )data, width, height ) );
 						break;
 					default:
 						FileFormat::throwGenericError( "Unsupported datatype for color images" ); //@todo tell the user which datatype it is
@@ -140,13 +140,13 @@ std::string ImageFormat_Dicom::suffixes() {return std::string( ".ima" );}
 std::string ImageFormat_Dicom::name() {return "Dicom";}
 
 
-ptime ImageFormat_Dicom::genTimeStamp( const date& date, const ptime& time )
+ptime ImageFormat_Dicom::genTimeStamp( const date &date, const ptime &time )
 {
 	return ptime( date, time.time_of_day() );
 }
 
 
-void ImageFormat_Dicom::sanitise( isis::util::PropMap& object, string dialect )
+void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 {
 	const std::string prefix = std::string( ImageFormat_Dicom::dicomTagTreeName ) + "/";
 	/////////////////////////////////////////////////////////////////////////////////
@@ -297,7 +297,7 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap& object, string dialect )
 	}
 }
 
-void ImageFormat_Dicom::readMosaic( const data::Chunk& source, data::ChunkList& dest )
+void ImageFormat_Dicom::readMosaic( const data::Chunk &source, data::ChunkList &dest )
 {
 	// prepare some needed parameters
 	const std::string prefix = std::string( ImageFormat_Dicom::dicomTagTreeName ) + "/";
@@ -329,14 +329,14 @@ void ImageFormat_Dicom::readMosaic( const data::Chunk& source, data::ChunkList& 
 			const size_t dpos[] = {0, phase, slice, 0};
 			const size_t column = slice % matrixSize;
 			const size_t row = slice / matrixSize;
-			const size_t sstart[] = {column*size[0], row*size[1] + phase, 0, 0};
-			const size_t send[] = {sstart[0] + size[0] - 1, row*size[1] + phase, 0, 0};
+			const size_t sstart[] = {column *size[0], row *size[1] + phase, 0, 0};
+			const size_t send[] = {sstart[0] + size[0] - 1, row *size[1] + phase, 0, 0};
 			source.copyRange( sstart, send, *newChunk, dpos );
 		}
 	}
 
 	// fix the properties
-	static_cast<util::PropMap&>( *newChunk ) = static_cast<const util::PropMap&>( source ); //copy _only_ the Properties of source
+	static_cast<util::PropMap &>( *newChunk ) = static_cast<const util::PropMap &>( source ); //copy _only_ the Properties of source
 	newChunk->remove( NumberOfImagesInMosaicProp ); // we dont need that anymore
 	newChunk->setProperty( prefix + "ImageType", iType );
 	//remove the additional mosaic offset and recalc the fov if given
@@ -366,7 +366,7 @@ void ImageFormat_Dicom::readMosaic( const data::Chunk& source, data::ChunkList& 
 }
 
 
-int ImageFormat_Dicom::load( data::ChunkList &chunks, const std::string& filename, const std::string& dialect )throw( std::runtime_error& )
+int ImageFormat_Dicom::load( data::ChunkList &chunks, const std::string &filename, const std::string &dialect )throw( std::runtime_error & )
 {
 	boost::shared_ptr<data::Chunk> chunk;
 	std::auto_ptr<DcmFileFormat> dcfile( new DcmFileFormat );
@@ -395,7 +395,7 @@ int ImageFormat_Dicom::load( data::ChunkList &chunks, const std::string& filenam
 	return 0;
 }
 
-void ImageFormat_Dicom::write( const data::Image &image, const std::string& filename, const std::string& dialect ) throw( std::runtime_error& )
+void ImageFormat_Dicom::write( const data::Image &image, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & )
 {
 	throw( std::runtime_error( "writing dicom files is not yet supportet" ) );
 }
@@ -404,7 +404,7 @@ bool ImageFormat_Dicom::tainted() {return false;}//internal plugins are not tain
 }
 }
 
-isis::image_io::FileFormat* factory()
+isis::image_io::FileFormat *factory()
 {
 	if ( not dcmDataDict.isDictionaryLoaded() ) {
 		LOG( isis::image_io::Runtime, isis::error )

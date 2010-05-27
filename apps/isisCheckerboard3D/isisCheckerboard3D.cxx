@@ -29,7 +29,7 @@ options[] = {
 	}, {"patterns", VShortRepn, 1, &number_patterns, VOptionalOpt, 0, "Number of patterns"}
 };
 
-int main( int argc, char* argv[] )
+int main( int argc, char *argv[] )
 {
 	// show revision information string constant
 //  std::cout << "Core Version: " << isis::util::Application::getCoreVersion() << std::endl;
@@ -85,8 +85,8 @@ int main( int argc, char* argv[] )
 		patterns[i] = number_patterns;
 	}
 
-	reader1->SetFileName( ( ( VString* ) in_filename.vector )[0] );
-	reader2->SetFileName( ( ( VString* ) in_filename.vector )[1] );
+	reader1->SetFileName( ( ( VString * ) in_filename.vector )[0] );
+	reader2->SetFileName( ( ( VString * ) in_filename.vector )[1] );
 	reader1->Update();
 	reader2->Update();
 	checkerBoard->SetInput1( reader1->GetOutput() );

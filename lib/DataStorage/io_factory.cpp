@@ -61,7 +61,7 @@ bool IOFactory::registerFormat( const FileFormatPtr plugin )
 	return true;
 }
 
-unsigned int IOFactory::findPlugins( const std::string& path )
+unsigned int IOFactory::findPlugins( const std::string &path )
 {
 	boost::filesystem::path p( path );
 
@@ -114,17 +114,17 @@ unsigned int IOFactory::findPlugins( const std::string& path )
 	return ret;
 }
 
-std::list<std::string> IOFactory::getSuffixes( const FileFormatPtr& reader )
+std::list<std::string> IOFactory::getSuffixes( const FileFormatPtr &reader )
 {
 	return util::string2list<std::string>( reader->suffixes(), boost::regex( "\\s+" ) );
 }
 
-IOFactory& IOFactory::get()
+IOFactory &IOFactory::get()
 {
 	return util::Singletons::get<IOFactory, INT_MAX>();
 }
 
-int IOFactory::loadFile( ChunkList &ret, const boost::filesystem::path& filename, const std::string& dialect )
+int IOFactory::loadFile( ChunkList &ret, const boost::filesystem::path &filename, const std::string &dialect )
 {
 	FileFormatList formatReader = getFormatInterface( filename.string(), dialect );
 	BOOST_FOREACH( FileFormatList::const_reference it, formatReader ) {
@@ -145,7 +145,7 @@ int IOFactory::loadFile( ChunkList &ret, const boost::filesystem::path& filename
 	return 0;//no plugin of proposed list could load file
 }
 
-IOFactory::FileFormatList IOFactory::getFormatInterface( const std::string& filename, const std::string& dialect )
+IOFactory::FileFormatList IOFactory::getFormatInterface( const std::string &filename, const std::string &dialect )
 {
 	boost::filesystem::path fname( filename );
 	std::string ext = boost::filesystem::extension( fname );
@@ -171,7 +171,7 @@ IOFactory::FileFormatList IOFactory::getFormatInterface( const std::string& file
 }
 
 
-data::ImageList IOFactory::load( const std::string& path, std::string dialect )
+data::ImageList IOFactory::load( const std::string &path, std::string dialect )
 {
 	const boost::filesystem::path p( path );
 	ChunkList chunks;
@@ -188,7 +188,7 @@ data::ImageList IOFactory::load( const std::string& path, std::string dialect )
 	return images;
 }
 
-int IOFactory::loadPath( ChunkList &ret, const boost::filesystem::path& path, const std::string& dialect )
+int IOFactory::loadPath( ChunkList &ret, const boost::filesystem::path &path, const std::string &dialect )
 {
 	int loaded = 0;
 
@@ -201,7 +201,7 @@ int IOFactory::loadPath( ChunkList &ret, const boost::filesystem::path& path, co
 	return loaded;
 }
 
-bool IOFactory::write( const isis::data::ImageList& images, const std::string& filename, const std::string& dialect )
+bool IOFactory::write( const isis::data::ImageList &images, const std::string &filename, const std::string &dialect )
 {
 	FileFormatList formatWriter = get().getFormatInterface( filename, dialect );
 	BOOST_FOREACH( FileFormatList::const_reference it, formatWriter ) {

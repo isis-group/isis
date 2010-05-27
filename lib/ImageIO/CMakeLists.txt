@@ -1,3 +1,12 @@
+###############################################################################
+# add global options
+###############################################################################
+OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI "Enable Nifti-IO plugin" OFF)
+OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL "Enable Null-IO plugin" ON)
+OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM "Enable Dicom-IO plugin" OFF)
+OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA "Enable Vista-IO plugin" OFF)
+OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ "Enable proxy plugin for compressed files" ON)
+
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI)
 	find_library(LIB_NIFTIIO niftiio)
 	find_library(LIB_ZNZ znz)
@@ -10,6 +19,76 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI)
 
 	set_target_properties(isisImageFormat_Nifti PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PLUGIN_PATH})
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI)
+
+if(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA)
+
+    # This code snipped was taken from the lipsia source package.
+
+    # - FindVIA.cmake
+    #
+    # Author: Thomas Proeger
+    #
+    # Find the header files and libraries for the libvia and libvia-dev packages
+    #
+    # This find package exports the following variables:
+    # VIA_INCLUDE_DIR         - directory for via.h viadata.h
+    # VIAIO_INCLUDE_DIR       - directory for VImage.h, option.h, etc. pp
+    # VIA_LIBRARY             - libvia
+    # VIAIO_LIBRARY           - libviaio
+    # VX_LIBRARY              - libvx
+    #
+
+    # INCLUDE directories
+    FIND_PATH(VIA_INCLUDE_DIR
+        NAMES via.h
+        PATH_SUFFIXES via
+        DOC "The include directory containing via.h"
+        )
+
+    FIND_PATH(VIAIO_INCLUDE_DIR
+        NAMES VImage.h
+        PATH_SUFFIXES viaio
+        DOC "The include directory containing VImage.h and option.h"
+        )
+
+    # LIBRARY files
+    FIND_LIBRARY(VIA_LIBRARY
+        NAMES via libvia
+        DOC "The library file libvia.so"
+    )
+
+    FIND_LIBRARY(VIAIO_LIBRARY
+        NAMES viaio libviaio
+        DOC "The library file libviaio.so"
+    )
+
+    FIND_LIBRARY(VX_LIBRARY
+        NAMES vx libvx
+        DOC "The library file libvx.so"
+    )
+
+    # these variables are only visible in 'advanced mode'
+    MARK_AS_ADVANCED(VIA_INCLUDE_DIR
+        VIAIO_INCLUDE_DIR
+        VIA_LIBRARY
+        VIAIO_LIBRARY
+        VX_LIBRARY
+    )
+
+    # if via components found configure build environment
+    if(VIA_INCLUDE_DIR AND VIAIO_INCLUDE_DIR
+        AND VIA_LIBRARY AND VIAIO_LIBRARY)
+
+        INCLUDE_DIRECTORIES(${VIA_INCLUDE_DIR} ${VIAIO_INCLUDE_DIR})
+        ADD_LIBRARY(isisImageFormat_Vista SHARED imageFormat_Vista.cpp)
+        TARGET_LINK_LIBRARIES(isisImageFormat_Vista ${VIAIO_LIBRARY})
+        SET_TARGET_PROPERTIES(isisImageFormat_Vista PROPERTIES
+            LIBRARY_OUTPUT_DIRECTORY ${PLUGIN_PATH})
+
+    endif(VIA_INCLUDE_DIR AND VIAIO_INCLUDE_DIR
+        AND VIA_LIBRARY AND VIAIO_LIBRARY)
+
+endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA)
 
 
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL)

@@ -39,6 +39,6 @@ int main()
 					ref = 42;
 				}
 
-	std::cout << tsteps*slices*slice_size*slice_size << " voxel set to 42 in " << timer.elapsed() << " sec" << std::endl;
+	std::cout << tsteps *slices *slice_size *slice_size << " voxel set to 42 in " << timer.elapsed() << " sec" << std::endl;
 	return 0;
 }

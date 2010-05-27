@@ -113,7 +113,7 @@ public:
 	    }*/
 	std::string name() {return "compression proxy for other formats";}
 
-	int load ( data::ChunkList &chunks, const std::string& filename, const std::string& dialect ) throw( std::runtime_error& ) {
+	int load ( data::ChunkList &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) {
 		const std::string unzipped_suffix = boost::filesystem::extension( boost::filesystem::basename( filename ) );
 		util::TmpFile tmpfile( "", unzipped_suffix );
 		LOG( ImageIoDebug, info ) <<  "tmpfile=" << tmpfile;
@@ -121,14 +121,14 @@ public:
 		return data::IOFactory::get().loadFile( chunks, tmpfile, dialect );
 	}
 
-	void write( const data::Image &image, const std::string& filename, const std::string& dialect )throw( std::runtime_error& ) {
+	void write( const data::Image &image, const std::string &filename, const std::string &dialect )throw( std::runtime_error & ) {
 		throw( std::runtime_error( "Compressed write is not yet implemented" ) );
 	}
 	bool tainted() {return false;}//internal plugins are not tainted
 };
 }
 }
-isis::image_io::FileFormat* factory()
+isis::image_io::FileFormat *factory()
 {
 	return new isis::image_io::ImageFormat_CompProxy();
 }

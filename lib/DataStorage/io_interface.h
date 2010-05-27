@@ -33,14 +33,14 @@ protected:
 	 * If the property doesn't exist a message will be sent to Log using the given loglevel.
 	 * \returns object.hasProperty(name)
 	 */
-	static bool hasOrTell( const std::string& name, const util::PropMap& object, LogLevel level );
+	static bool hasOrTell( const std::string &name, const util::PropMap &object, LogLevel level );
 	/**
 	 * Transform a given property into another and remove the original in the given PropMap.
 	 * If the property doesn't exist a message will be sent to Log using the given loglevel.
 	 * \returns true if the property existed and was transformed.
 	 */
 	template<typename TYPE> static bool
-	transformOrTell( const std::string& from, const std::string& to, util::PropMap& object, LogLevel level ) {
+	transformOrTell( const std::string &from, const std::string &to, util::PropMap &object, LogLevel level ) {
 		if ( hasOrTell( from, object, level ) and object.transform<TYPE>( from, to ) ) {
 			LOG( Debug, verbose_info ) << "Transformed " << from << " into " << object[to];
 			return true;
@@ -68,14 +68,14 @@ public:
 	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
 	 * \returns the amount of loaded chunks.
 	 */
-	virtual int load( data::ChunkList &chunks, const std::string& filename, const std::string& dialect ) throw( std::runtime_error& ) = 0;
+	virtual int load( data::ChunkList &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) = 0;
 	/**
 	 * Write a single image to a file.
 	 * I case of an error std::runtime_error will be thrown.
 	 * \param filename the name of the file to write (the system does NOT check if this file exists/is writeable)
 	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
 	 */
-	virtual void write( const data::Image &image, const std::string& filename, const std::string& dialect ) throw( std::runtime_error& ) = 0;
+	virtual void write( const data::Image &image, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) = 0;
 	/**
 	 * Write a multiple images.
 	 * I case of an error std::runtime_error will be thrown.
@@ -83,7 +83,7 @@ public:
 	 * \param filename the name to be used as base for the filename generation if neccessary.
 	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
 	 */
-	virtual void write( const data::ImageList &images, const std::string& filename, const std::string& dialect ) throw( std::runtime_error& );
+	virtual void write( const data::ImageList &images, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & );
 	virtual ~FileFormat() {}
 };
 }
@@ -98,9 +98,9 @@ extern "C" {
 #endif
 
 #if defined(__STDC__) || defined(__cplusplus)
-	extern isis::image_io::FileFormat* factory();
+	extern isis::image_io::FileFormat *factory();
 #else
-	extern FileFormat* factory();
+	extern FileFormat *factory();
 #endif
 
 #ifdef __cplusplus

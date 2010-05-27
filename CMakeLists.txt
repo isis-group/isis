@@ -16,6 +16,11 @@ add_definitions(-D_ISIS_VERSION_PATCH=${${CMAKE_PROJECT_NAME}_VERSION_PATCH})
 ###############################################################################
 #Global options
 ###############################################################################
+
+# set project specific module path
+SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
+  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
+
 FIND_PACKAGE(Boost REQUIRED COMPONENTS filesystem regex system date_time)
 include_directories(${Boost_INCLUDE_DIR}  lib)
 
@@ -34,10 +39,14 @@ OPTION(${CMAKE_PROJECT_NAME}_HAVE_QT4 "Enable Qt4-support" OFF)
 OPTION(${CMAKE_PROJECT_NAME}_RUNTIME_LOG "Enable runtime logging" ON)
 OPTION(${CMAKE_PROJECT_NAME}_DEBUG_LOG "Enable debug logging" ON)
 
-OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI "Enable Nifti-IO plugin" OFF)
-OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL "Enable Null-IO plugin" ON)
-OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM "Enable Dicom-IO plugin" OFF)
-OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ "Enable proxy plugin for compressed files" ON)
+OPTION(${CMAKE_PROJECT_NAME}_BUILD_DOC "Build the Doxygen documentation for the core libraries" OFF)
+
+################################################################################
+# ISIS project version number
+################################################################################)
+
+SET(ISIS_VERSION
+  ${${CMAKE_PROJECT_NAME}_VERSION_MAJOR}.${${CMAKE_PROJECT_NAME}_VERSION_MINOR}.${${CMAKE_PROJECT_NAME}_VERSION_PATCH})
 
 ###############################################################################
 #Global definitions/compiler flags
@@ -82,6 +91,7 @@ IF (NOT SVN_REVISION)
 		string(REGEX MATCH "exported" EXPORTED "${OUT}")
 		IF (NOT EXPORTED)
 			string(REGEX MATCH "^[0-9]+" SVN_REVISION "${OUT}") #@todo wont work with more complex revisions/modified sources
+			SET(SVN_REVISION r${SVN_REVISION})
 		ELSE (NOT EXPORTED)
 			set(SVN_REVISION "exported")
 		ENDIF (NOT EXPORTED)
@@ -109,12 +119,16 @@ IF(${CMAKE_PROJECT_NAME}_HAVE_QT4)
 	include(${QT_USE_FILE})
 ENDIF(${CMAKE_PROJECT_NAME}_HAVE_QT4)
 
-
 # If ITK AND VTK are used together we have to increase the number of maximal
 # template recursion otherwise there will be an overflow in the Boost library.
 IF(ITK_FOUND OR VTK_FOUND)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-depth-60")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-depth-100")
 ENDIF(ITK_FOUND OR VTK_FOUND)
+
+# configure documentation
+IF(${CMAKE_PROJECT_NAME}_BUILD_DOC)
+  INCLUDE(UseDoxygen)
+ENDIF(${CMAKE_PROJECT_NAME}_BUILD_DOC)
 
 ###############################################################################
 #Subdirs

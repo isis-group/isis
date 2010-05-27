@@ -34,8 +34,8 @@ template<typename TYPE, size_t SIZE> class array
 {
 protected:
 	TYPE cont[SIZE];
-	typedef TYPE* iterator;
-	typedef const TYPE* const_iterator;
+	typedef TYPE *iterator;
+	typedef const TYPE *const_iterator;
 	iterator begin() {return cont;}
 	const_iterator begin()const {return cont;}
 	iterator end() {return cont + SIZE;}
@@ -101,7 +101,7 @@ public:
 		LOG_IF( idx >= SIZE, Debug, error ) << "Index " << idx << " exceeds the size of the vector (" << SIZE << ")";
 		return CONTAINER::begin()[idx];
 	}
-	TYPE& operator []( size_t idx ) {
+	TYPE &operator []( size_t idx ) {
 		LOG_IF( idx >= SIZE, Debug, error ) << "Index " << idx << " exceeds the size of the vector (" << SIZE << ")";
 		return CONTAINER::begin()[idx];
 	}
@@ -203,7 +203,7 @@ public:
 	 *
 	 * If len() is equal to zero std::invalid_argument will be thrown, and this wont be changed.
 	 */
-	const this_class& norm()throw( std::invalid_argument ) {
+	const this_class &norm()throw( std::invalid_argument ) {
 		const TYPE d = len();
 
 		if ( d == 0 )throw( std::invalid_argument( "Trying to normalize a vector of length 0" ) );

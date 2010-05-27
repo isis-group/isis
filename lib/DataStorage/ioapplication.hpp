@@ -35,7 +35,7 @@ public:
 	data::ImageList images;
 	IOApplication( const char name[], bool have_input = true, bool have_output = true );
 	virtual ~IOApplication();
-	virtual bool init( int argc, char** argv, bool exitOnError = true );
+	virtual bool init( int argc, char **argv, bool exitOnError = true );
 };
 
 }

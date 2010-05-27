@@ -37,7 +37,7 @@ public:
 	ParameterMap parameters;
 	Application( const char name[] );
 	virtual ~Application();
-	virtual bool init( int argc, char** argv, bool exitOnError = true );
+	virtual bool init( int argc, char **argv, bool exitOnError = true );
 	virtual void printHelp()const;
 	template<typename MODULE> void setLog( LogLevel level ) {
 		if ( !MODULE::use );

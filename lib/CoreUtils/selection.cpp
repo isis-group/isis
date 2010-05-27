@@ -33,7 +33,7 @@ Selection::operator const std::string()const
 	return std::string( "<<NOT_SET>>" );
 }
 
-bool Selection::set( const char* entry )
+bool Selection::set( const char *entry )
 {
 	map_type::const_iterator found = ent_map.find( entry );
 

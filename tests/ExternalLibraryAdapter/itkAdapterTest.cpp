@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_CASE ( ISIS_to_ITK )
 {
 	data::enable_log<util::DefaultMsgPrint>( error );
 	//just to make sure the wanted file exists
-	FILE* f = fopen( "test.null", "w" );
+	FILE *f = fopen( "test.null", "w" );
 	fclose( f );
 	typedef itk::Image<short, 4> MyImageType;
 	itk::ImageFileWriter<MyImageType>::Pointer writer = itk::ImageFileWriter<MyImageType>::New();

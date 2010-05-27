@@ -30,7 +30,7 @@ namespace std
 template<typename charT, typename traits, typename T>
 basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::color<T>& s )
 {
-	const T* const begin = &s.r;
+	const T *const begin = &s.r;
 	isis::util::write_list( begin, begin + 3, out );
 	return out;
 }

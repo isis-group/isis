@@ -35,7 +35,7 @@ namespace isis
 namespace extitk
 {
 
-typedef itk::TransformBase* TransformBasePointer;
+typedef itk::TransformBase *TransformBasePointer;
 
 class TransformMerger3D : public std::list<TransformBasePointer>
 {
@@ -67,7 +67,7 @@ public:
 
 
 	//here we setting up the temporaryDeformationField_ and deformationField_. The properties are defined be the templateImage which is specified by the setTemplateImage method,
-	template <typename TImage> void setTemplateImage( TImage* templateImage ) {
+	template <typename TImage> void setTemplateImage( TImage *templateImage ) {
 		imageRegion_ = templateImage->GetLargestPossibleRegion();
 		deformationField_ = DeformationFieldType::New();
 		deformationField_->SetRegions( imageRegion_.GetSize() );

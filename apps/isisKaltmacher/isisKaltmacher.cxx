@@ -60,7 +60,7 @@ options[] = {
 	{"radius", VFloatRepn, 1, &radius, VOptionalOpt, 0, ""}
 };
 
-int main( int argc, char* argv[] )
+int main( int argc, char *argv[] )
 {
 	// show revision information string constant
 	std::cout << "Revision: " << SVN_REVISION << std::endl;
@@ -116,7 +116,7 @@ int main( int argc, char* argv[] )
 	//  Transformation
 	itk::TransformFileWriter::Pointer transformWriter = itk::TransformFileWriter::New();
 
-	const itk::TransformBase* tmpTransform;
+	const itk::TransformBase *tmpTransform;
 
 	ImageFileReaderType::Pointer fixedReader = ImageFileReaderType::New();
 
@@ -218,7 +218,7 @@ int main( int argc, char* argv[] )
 		transform->GetNumberOfParameters() );
 
 	for ( unsigned int i = 0; i < 6; i++ ) {
-		optimizerScale[i] = ( ( VFloat* ) scales.vector )[i];
+		optimizerScale[i] = ( ( VFloat * ) scales.vector )[i];
 	}
 
 	optimizer->SetScales( optimizerScale );

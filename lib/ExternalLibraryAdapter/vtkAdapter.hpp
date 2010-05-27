@@ -51,13 +51,13 @@ public:
 	/**
 	* Gets a std::vector of vtkSmartpointers on vtkImageData objects.
 	*/
-	static vtkImageData* makeVtkImageObject( const boost::shared_ptr<data::Image>, unsigned int dim4 = 0 );
+	static vtkImageData *makeVtkImageObject( const boost::shared_ptr<data::Image>, unsigned int dim4 = 0 );
 private:
 	boost::shared_ptr<data::Image> m_ImageISIS;
 protected:
 	//should not be loaded directly
 	vtkAdapter( const boost::shared_ptr<data::Image> );
-	vtkAdapter( const vtkAdapter& ) {};
+	vtkAdapter( const vtkAdapter & ) {};
 
 
 };

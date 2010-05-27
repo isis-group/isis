@@ -34,12 +34,13 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 	if ( have_output ) {
 		parameters["out"] = std::string();
 		parameters["out"].setDescription( "output file" );
+		parameters["out"].setDescription( "output file" );
 	}
 }
 
 IOApplication::~IOApplication() {}
 
-bool IOApplication::init( int argc, char** argv, bool exitOnError )
+bool IOApplication::init( int argc, char **argv, bool exitOnError )
 {
 	if ( not isis::util::Application::init( argc, argv, exitOnError ) )
 		return false;
