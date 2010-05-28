@@ -563,10 +563,10 @@ size_t Image::cmp( const isis::data::Image &comp ) const
 	return ret;
 }
 
-Image::orientation Image::getMainOrientation()
+Image::orientation Image::getMainOrientation()const
 {
-	util::fvector4 &read = operator[]( "readVec" )->cast_to_Type<util::fvector4>();
-	util::fvector4 &phase = operator[]( "phaseVec" )->cast_to_Type<util::fvector4>();
+	util::fvector4 read = getProperty<util::fvector4>("readVec");
+	util::fvector4 phase = getProperty<util::fvector4>("phaseVec");
 	read.norm();
 	phase.norm();
 	LOG_IF( read.dot( phase ) > 0.01, Runtime, warning ) << "The cosine between the columns and the rows of the image is bigger than 0.01";
