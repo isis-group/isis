@@ -25,20 +25,20 @@ namespace data
 namespace _internal
 {
 
-bool image_chunk_order::operator() ( const data::Chunk& a, const data::Chunk& b )const
+bool image_chunk_order::operator() ( const data::Chunk &a, const data::Chunk &b )const
 {
 	//@todo exception ??
 	LOG_IF( not a.hasProperty( "indexOrigin" ), Debug, error )
-	<< "The chunk has no position, it can not be sorted into the image.";
+			<< "The chunk has no position, it can not be sorted into the image.";
 	LOG_IF( not a.hasProperty( "acquisitionNumber" ), Debug, warning )
-	<< "The chunk has no acquisitionNumber, it may not be sorted into the image.";
+			<< "The chunk has no acquisitionNumber, it may not be sorted into the image.";
 	const util::fvector4 &posA = a.getProperty<util::fvector4>( "indexOrigin" );
 	const util::fvector4 &posB = b.getProperty<util::fvector4>( "indexOrigin" );
 
 	if ( posA.lexical_less_reverse( posB ) ) { //if chunk is "under" the other - put it there
 		LOG( Debug, verbose_info )
-		<< "Successfully sorted chunks by position"
-		<< " (" << posA << " below " << posB << ")";
+				<< "Successfully sorted chunks by position"
+				<< " (" << posA << " below " << posB << ")";
 		return true;
 	}
 
@@ -49,8 +49,8 @@ bool image_chunk_order::operator() ( const data::Chunk& a, const data::Chunk& b 
 
 			if ( aTime < bTime ) {
 				LOG( Debug, verbose_info )
-				<< "Fallback sorted chunks by time"
-				<< " (" << aTime << " before " << bTime << ")";
+						<< "Fallback sorted chunks by time"
+						<< " (" << aTime << " before " << bTime << ")";
 				return true;
 			} else if ( bTime < aTime ) {
 				return false;
@@ -64,8 +64,8 @@ bool image_chunk_order::operator() ( const data::Chunk& a, const data::Chunk& b 
 		if ( aNumber < bNumber ) {
 			//if they at least have different acquisitionNumber
 			LOG( Debug, verbose_info )
-			<< "Fallback sorted chunks by acquisition order"
-			<< " (" << aNumber << " before " << bNumber << ")";
+					<< "Fallback sorted chunks by acquisition order"
+					<< " (" << aNumber << " before " << bNumber << ")";
 			return true;
 		}
 
@@ -89,7 +89,7 @@ bool Image::insertChunk ( const Chunk &chunk )
 {
 	if ( not chunk.valid() ) {
 		LOG( Runtime, error )
-		<< "Cannot insert chunk. Missing properties: " << chunk.missing();
+				<< "Cannot insert chunk. Missing properties: " << chunk.missing();
 		return false;
 	}
 
@@ -99,28 +99,28 @@ bool Image::insertChunk ( const Chunk &chunk )
 		//if our first chunk and the incoming chunk do have different size, skip it
 		if ( first.sizeToVector() != chunk.sizeToVector() ) {
 			LOG( Debug, info )
-			<< "Ignoring chunk with different size. (" << chunk.sizeToString() << "!=" << set.begin()->sizeToString() << ")";
+					<< "Ignoring chunk with different size. (" << chunk.sizeToString() << "!=" << set.begin()->sizeToString() << ")";
 			return false;
 		}
 
 		if ( first.getPropertyValue( "readVec" ) != chunk.getPropertyValue( "readVec" ) ) {
 			LOG( Debug, info )
-			<< "Ignoring chunk with different readVec. (" << chunk.getPropertyValue( "readVec" ) << "!=" << first.getPropertyValue( "readVec" ) << ")";
+					<< "Ignoring chunk with different readVec. (" << chunk.getPropertyValue( "readVec" ) << "!=" << first.getPropertyValue( "readVec" ) << ")";
 			return false;
 		}
 
 		if ( first.getPropertyValue( "phaseVec" ) != chunk.getPropertyValue( "phaseVec" ) ) {
 			LOG( Debug, info )
-			<< "Ignoring chunk with different phaseVec. (" << chunk.getPropertyValue( "phaseVec" ) << "!=" << first.getPropertyValue( "phaseVec" ) << ")";
+					<< "Ignoring chunk with different phaseVec. (" << chunk.getPropertyValue( "phaseVec" ) << "!=" << first.getPropertyValue( "phaseVec" ) << ")";
 			return false;
 		}
 
 		//if our first chunk and the incoming chunk do have sequenceNumber and it differs, skip it
 		if ( first.getPropertyValue( "sequenceNumber" ) != chunk.getPropertyValue( "sequenceNumber" ) ) {
 			LOG( Debug, info )
-			<< "Ignoring chunk because its sequenceNumber doesn't fit ("
-			<< first.getPropertyValue( "sequenceNumber" ) << "!=" << chunk.getPropertyValue( "sequenceNumber" )
-			<< ")";
+					<< "Ignoring chunk because its sequenceNumber doesn't fit ("
+					<< first.getPropertyValue( "sequenceNumber" ) << "!=" << chunk.getPropertyValue( "sequenceNumber" )
+					<< ")";
 			return false;
 		}
 	} else {
@@ -159,7 +159,7 @@ bool Image::reIndex()
 		}
 
 		LOG_IF( chunks % timesteps, Debug, error )
-		<< "The number timesteps does not fit the number of chunks. Reindexing will fail.";
+				<< "The number timesteps does not fit the number of chunks. Reindexing will fail.";
 		LOG( Debug, info ) << "Found " << timesteps << " chunks per position assuming them as timesteps";
 	}
 
@@ -171,8 +171,8 @@ bool Image::reIndex()
 		for ( ChunkSet::iterator it = set.begin(); it != set.end(); it++, idx++ ) {
 			const size_t i = idx % timesteps;
 			const size_t j = idx / timesteps;
-			lookup[i*chunksets+j] = it;
-			LOG( Debug, verbose_info ) << "Putting " << idx << " at " << i*chunksets + j;;
+			lookup[i *chunksets+j] = it;
+			LOG( Debug, verbose_info ) << "Putting " << idx << " at " << i *chunksets + j;;
 		}
 	} else {
 		size_t idx = 0;
@@ -199,8 +199,8 @@ bool Image::reIndex()
 	if ( chunk_dims >= Image::n_dims ) {
 		if ( lookup.size() > 1 ) {
 			LOG( Runtime, error )
-			<< "Cannot handle multiple Chunks, if they have more than "
-			<< Image::n_dims - 1 << " dimensions";
+					<< "Cannot handle multiple Chunks, if they have more than "
+					<< Image::n_dims - 1 << " dimensions";
 			return false;
 		}
 
@@ -249,19 +249,19 @@ bool Image::reIndex()
 			//check the slice vector
 			util::fvector4 distVecNorm = lastV - thisV;
 			LOG_IF( distVecNorm.len() == 0, Runtime, error )
-			<< "The distance between the the first and the last chunk is zero. Thats bad, because I'm going to normalize it.";
+					<< "The distance between the the first and the last chunk is zero. Thats bad, because I'm going to normalize it.";
 			distVecNorm.norm();
 
 			if ( hasProperty( "sliceVec" ) ) {
 				const util::fvector4 sliceVec = getProperty<util::fvector4>( "sliceVec" );
 				LOG_IF( distVecNorm != sliceVec, Runtime, warning )
-				<< "The existing sliceVec " << sliceVec
-				<< " differs from the distance vector between chunk 0 and " << size[2] - 1
-				<< " " << distVecNorm;
+						<< "The existing sliceVec " << sliceVec
+						<< " differs from the distance vector between chunk 0 and " << size[2] - 1
+						<< " " << distVecNorm;
 			} else {
 				LOG( Debug, info )
-				<< "used the distance between chunk 0 and " << size[2] - 1
-				<< " to synthesize the missing sliceVec as " << distVecNorm;
+						<< "used the distance between chunk 0 and " << size[2] - 1
+						<< " to synthesize the missing sliceVec as " << distVecNorm;
 				setProperty( "sliceVec", distVecNorm );
 			}
 		}
@@ -284,14 +284,14 @@ bool Image::reIndex()
 				if ( voxelGap[2] != inf ) {
 					if ( not util::fuzzyEqual( voxelGap[2], sliceDist ) ) {
 						LOG_IF( not util::fuzzyEqual( voxelGap[2], sliceDist ), Runtime, warning )
-						<< "The existing slice distance (voxelGap[2]) " << voxelGap[2]
-						<< " differs from the distance between chunk 0 and 1, which is " << sliceDist;
+								<< "The existing slice distance (voxelGap[2]) " << voxelGap[2]
+								<< " differs from the distance between chunk 0 and 1, which is " << sliceDist;
 					}
 				} else {
 					voxelGap[2] = sliceDist;
 					LOG( Debug, info )
-					<< "used the distance between chunk 0 and 1 to synthesize the missing slice distance (voxelGap[2]) as "
-					<< sliceDist;
+							<< "used the distance between chunk 0 and 1 to synthesize the missing slice distance (voxelGap[2]) as "
+							<< sliceDist;
 				}
 			}
 		}
@@ -314,15 +314,15 @@ bool Image::reIndex()
 			util::fvector4 &sliceVec = operator[]( "sliceVec" )->cast_to_Type<util::fvector4>(); //get the slice vector
 			sliceVec.norm(); // norm it
 			LOG_IF( not crossVec.fuzzyEqual( sliceVec ), Runtime, warning )
-			<< "The existing sliceVec " << sliceVec
-			<< " differs from the cross product of the read- and phase vector " << crossVec;
+					<< "The existing sliceVec " << sliceVec
+					<< " differs from the cross product of the read- and phase vector " << crossVec;
 		} else {
 			// We dont know anything about the slice-direction
 			// we just guess its along the positive cross-product between read- and phase direction
 			// so at least warn the user if we do that long shot
 			LOG( Runtime, warning )
-			<< "used the cross product between readVec and phaseVec as sliceVec:"
-			<< crossVec << ". That might be wrong!";
+					<< "used the cross product between readVec and phaseVec as sliceVec:"
+					<< crossVec << ". That might be wrong!";
 			setProperty( "sliceVec", crossVec );
 		}
 
@@ -367,7 +367,7 @@ bool Image::reIndex()
 		}
 
 		LOG_IF( not ok, Runtime, warning )
-		<< "The calculated field of view differs from the stored " << propFoV << "/" << calcFoV;
+				<< "The calculated field of view differs from the stored " << propFoV << "/" << calcFoV;
 	}
 
 	LOG_IF( not valid(), Runtime, warning ) << "The image is not valid after reindexing. Missing properties: " << missing();
@@ -375,22 +375,22 @@ bool Image::reIndex()
 	return true;
 }
 
-const Chunk& Image::getChunkAt( size_t at )const
+const Chunk &Image::getChunkAt( size_t at )const
 {
 	return *( lookup[at] );
 }
-Chunk& Image::getChunkAt( size_t at )
+Chunk &Image::getChunkAt( size_t at )
 {
 	//@todo we must cast away the const here because std::set has no non-const iterators
-	Chunk &ret = const_cast<Chunk&>( *( lookup[at] ) );
+	Chunk &ret = const_cast<Chunk &>( *( lookup[at] ) );
 	return ret;
 }
 
-Chunk& Image::getChunk ( size_t first, size_t second, size_t third, size_t fourth )
+Chunk &Image::getChunk ( size_t first, size_t second, size_t third, size_t fourth )
 {
 	if ( not clean ) {
 		LOG( Debug, info )
-		<< "Image is not clean. Running reIndex ...";
+				<< "Image is not clean. Running reIndex ...";
 		reIndex();
 	}
 
@@ -399,7 +399,7 @@ Chunk& Image::getChunk ( size_t first, size_t second, size_t third, size_t fourt
 	return getChunkAt( index );
 }
 
-const Chunk& Image::getChunk ( size_t first, size_t second, size_t third, size_t fourth ) const
+const Chunk &Image::getChunk ( size_t first, size_t second, size_t third, size_t fourth ) const
 {
 	const size_t index = commonGet( first, second, third, fourth ).first;
 	return getChunkAt( index );
@@ -437,35 +437,35 @@ size_t Image::getChunkStride ( size_t base_stride )
 			const util::fvector4 nextV = lookup[i+base_stride]->getProperty<util::fvector4>( "indexOrigin" );
 			const util::fvector4 dist = nextV - thisV;
 			LOG( Debug, verbose_info )
-			<< "Distance between chunk " << util::MSubject( i ) << " and " << util::MSubject( i + base_stride )
-			<< " is " << dist.len() << ". Distance between 0 and 1 was " << dist1.len();
+					<< "Distance between chunk " << util::MSubject( i ) << " and " << util::MSubject( i + base_stride )
+					<< " is " << dist.len() << ". Distance between 0 and 1 was " << dist1.len();
 
 			if ( dist.sqlen() > dist1.sqlen() * 4 ) { // found an dimensional break - leave
 				ret = i + 1;
 				LOG( Debug, info )
-				<< "Distance between chunk " << util::MSubject( i ) << " and " << util::MSubject( i + base_stride )
-				<< " is more then twice the first distance, assuming dimensional break at " << ret;
+						<< "Distance between chunk " << util::MSubject( i ) << " and " << util::MSubject( i + base_stride )
+						<< " is more then twice the first distance, assuming dimensional break at " << ret;
 				return ret;
 			}
 		}
 	} else  if ( lookup.size() % base_stride ) {
 		LOG( Runtime, error )
-		<< "The amount of chunks (" << lookup.size()
-		<< ") is not divisible by the block size of the dimension below (" << base_stride
-		<< "). Maybe the image is incomplete.";
+				<< "The amount of chunks (" << lookup.size()
+				<< ") is not divisible by the block size of the dimension below (" << base_stride
+				<< "). Maybe the image is incomplete.";
 		LOG( Runtime, warning )
-		<< "Ignoring "  <<  lookup.size() % base_stride << " chunks.";
+				<< "Ignoring "  <<  lookup.size() % base_stride << " chunks.";
 		return lookup.size() / base_stride;
 	}
 
 	//we didn't find any break, so we assume its a linear image |c c ... c|
 	ret = lookup.size();
 	LOG( Debug, info )
-	<< "No dimensional break found, assuming it to be at the end (" << ret << ")";
+			<< "No dimensional break found, assuming it to be at the end (" << ret << ")";
 	return ret;
 }
 
-std::list<util::PropMap::mapped_type> Image::getChunksProperties( const util::PropMap::key_type& key, bool unique )const
+std::list<util::PropMap::mapped_type> Image::getChunksProperties( const util::PropMap::key_type &key, bool unique )const
 {
 	std::list<util::PropertyValue > ret;
 
@@ -489,7 +489,7 @@ size_t Image::bytes_per_voxel() const
 	size_t size = set.begin()->bytes_per_voxel();
 	BOOST_FOREACH( const Chunk & ref, set ) {
 		LOG_IF( size != ref.bytes_per_voxel(), Debug, error )
-		<< "Not all voxels have the same byte size. The result might be wrong.";
+				<< "Not all voxels have the same byte size. The result might be wrong.";
 	}
 	return size;
 }
@@ -510,7 +510,7 @@ ImageList::ImageList( ChunkList src )
 			if ( not i->valid() ) {
 				const util::PropMap::key_list missing = i->missing();
 				LOG( Runtime, error )
-				<< "Ignoring invalid chunk. Missing properties: " << util::list2string( missing.begin(), missing.end() );
+						<< "Ignoring invalid chunk. Missing properties: " << util::list2string( missing.begin(), missing.end() );
 				src.erase( i++ );
 			} else {
 				if ( buff->insertChunk( *i ) )
@@ -528,13 +528,13 @@ ImageList::ImageList( ChunkList src )
 			else {
 				const util::PropMap::key_list missing = buff->missing();
 				LOG( Runtime, error )
-				<< "Cannot insert image. Missing properties: " << util::list2string( missing.begin(), missing.end() );
+						<< "Cannot insert image. Missing properties: " << util::list2string( missing.begin(), missing.end() );
 			}
 		}
 	}
 }
 
-void Image::getMinMax ( util::_internal::TypeBase::Reference& min, util::_internal::TypeBase::Reference& max ) const
+void Image::getMinMax ( util::_internal::TypeBase::Reference &min, util::_internal::TypeBase::Reference &max ) const
 {
 	LOG_IF( not min.empty(), Debug, warning ) << "Running getMinMax using non empty min. It will be reset.";
 	LOG_IF( not max.empty(), Debug, warning ) << "Running getMinMax using non empty max. It will be reset.";
@@ -543,15 +543,15 @@ void Image::getMinMax ( util::_internal::TypeBase::Reference& min, util::_intern
 	BOOST_FOREACH( const Chunk & ch, set )
 	ch.getMinMax( min, max );
 }
-size_t Image::cmp( const isis::data::Image& comp ) const
+size_t Image::cmp( const isis::data::Image &comp ) const
 {
 	size_t ret = 0;
 	LOG_IF( not ( clean and comp.clean ), Debug, error )
-	<< "Comparing unindexed images will cause you trouble, run reIndex()!";
+			<< "Comparing unindexed images will cause you trouble, run reIndex()!";
 
 	if ( sizeToVector() != comp.sizeToVector() ) {
 		LOG( Runtime, warning ) << "Size of images differs (" << sizeToVector() << "/"
-		<< comp.sizeToVector() << "). Adding difference to the result.";
+								<< comp.sizeToVector() << "). Adding difference to the result.";
 		ret += ( sizeToVector() - comp.sizeToVector() ).product();
 	}
 
@@ -569,12 +569,46 @@ size_t Image::cmp( const isis::data::Image& comp ) const
 		const Chunk &c1 = getChunkAt( c1pair1.first );
 		const Chunk &c2 = comp.getChunkAt( c2pair1.first );
 		LOG( Debug, verbose_info )
-		<< "Start positions are " << c1pair1.second << " and " << c2pair1.second
-		<< " and the length is " << c1pair2.second - c1pair1.second;
+				<< "Start positions are " << c1pair1.second << " and " << c2pair1.second
+				<< " and the length is " << c1pair2.second - c1pair1.second;
 		ret += c1.cmpRange( c1pair1.second, c1pair2.second, c2, c2pair1.second );
 	}
 
 	return ret;
+}
+
+Image::orientation Image::getMainOrientation()
+{
+	const util::fvector4 &slice = getProperty<util::fvector4>( "sliceVec" );
+	const util::fvector4 x( 1, 0 ), y( 0, 1 ), z( 0, 0, 1 );
+	float a_axial = std::acos( slice.dot( z ) / slice.len() ) / M_PI;
+	float a_sagittal = std::acos( slice.dot( x ) / slice.len() ) / M_PI;
+	float a_coronal = std::acos( slice.dot( y ) / slice.len() ) / M_PI;
+	bool a_inverse = false, s_inverse = false, c_inverse = false;
+
+	if( a_axial > .5 ) {
+		a_axial = std::abs( a_axial - 1 );
+		a_inverse = true;
+	}
+
+	if( a_sagittal > .5 ) {
+		a_sagittal = std::abs( a_sagittal - 1 );
+		s_inverse = true;
+	}
+
+	if( a_coronal > .5 ) {
+		a_coronal = std::abs( a_coronal - 1 );
+		c_inverse = true;
+	}
+
+	if( a_axial <= .25 )
+		return a_inverse ? reversed_axial : axial;
+	else if( a_sagittal <= 25 )
+		return s_inverse ? reversed_sagittal : sagittal;
+	else if( a_coronal <= .25 )
+		return c_inverse ? reversed_coronal : coronal;
+	else
+		assert( false ); //as x,y and z are ortogonal this can't happen
 }
 
 }

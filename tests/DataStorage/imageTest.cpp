@@ -180,6 +180,21 @@ BOOST_AUTO_TEST_CASE( image_minmax_test )
 		BOOST_CHECK_EQUAL( max->as<float>(), 0 );
 	}
 }
+BOOST_AUTO_TEST_CASE( orientation_test )
+{
+	data::MemChunk<float> ch( 3, 3, 3 );
+	data::Image img;
+	unsigned short acNum = 0;
+	ch.setProperty( "indexOrigin", util::fvector4( 0, 0, 0 ) );
+	ch.setProperty( "readVec", util::fvector4( 1, 0 ) );
+	ch.setProperty( "phaseVec", util::fvector4( 0, 1 ) );
+	ch.setProperty( "acquisitionNumber", 0 );
+	ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
+	BOOST_REQUIRE( img.insertChunk( ch ) );
+	img.reIndex();
+	BOOST_CHECK_EQUAL( img.getMainOrientation(), data::Image::axial );
+}
+
 BOOST_AUTO_TEST_CASE( memimage_test )
 {
 	std::vector<std::vector<data::MemChunk<float> > > ch( 3, std::vector<data::MemChunk<float> >( 3, data::MemChunk<float>( 3, 3 ) ) );
@@ -203,9 +218,10 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 		BOOST_CHECK( min->is<float>() );
 		BOOST_CHECK( max->is<float>() );
 		BOOST_CHECK_EQUAL( min->as<float>(), 0 );
-		BOOST_CHECK_EQUAL( max->as<float>(), 2*2*1000 );
+		BOOST_CHECK_EQUAL( max->as<float>(), 2 * 2 * 1000 );
 	}
-	{ // Conversion to u_int8_t (will downscale [0-255])
+	{
+		// Conversion to u_int8_t (will downscale [0-255])
 		data::MemImage<u_int8_t> img2( img );
 		util::_internal::TypeBase::Reference min, max;
 		img2.getMinMax( min, max );
@@ -214,7 +230,8 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 		BOOST_CHECK_EQUAL( min->as<u_int8_t>(), 0 );
 		BOOST_CHECK_EQUAL( max->as<u_int8_t>(), 255 );
 	}
-	{ // Conversion to int16_t (will upscale [0-32k])
+	{
+		// Conversion to int16_t (will upscale [0-32k])
 		data::MemImage<int16_t> img2( img );
 		util::_internal::TypeBase::Reference min, max;
 		img2.getMinMax( min, max );
