@@ -327,8 +327,43 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage& vim
     vstr << voxels[2] << " " << voxels[1] << " " << voxels[0];
     VAppendAttr(list, "voxel",NULL,VStringRepn,vstr.str().c_str());
 
-    // copy orientation vector
+    // copy orientation vectors
+    util::fvector4 readVec = image.getProperty<util::fvector4>("readVec");
+    util::fvector4 phaseVec = image.getProperty<util::fvector4>("phaseVec");
+    util::fvector4 sliceVec = image.getProperty<util::fvector4>("sliceVec");
 
+    // set readVec -> columnVec
+    vstr.str("");vstr << readVec[0] << " " << readVec[1] << " " << readVec[2];
+    VAppendAttr(list, "columnVec", NULL, VStringRepn, vstr.str().c_str());
+
+    // set phase -> rowVec
+    vstr.str("");vstr << phaseVec[0] << " " << phaseVec[1] << " " << phaseVec[2];
+    VAppendAttr(list, "rowVec", NULL, VStringRepn, vstr.str().c_str());
+
+    // set sliceVec -> sliceVec
+    vstr.str("");vstr << sliceVec[0] << " " << sliceVec[1] << " " << sliceVec[2];
+    VAppendAttr(list, "sliceVec", NULL, VStringRepn, vstr.str().c_str());
+
+    // index origin
+    util::fvector4 indexOrigin = image.getProperty<util::fvector4>("indexOrigin");
+    vstr.str("");vstr << indexOrigin[0] << " " << indexOrigin[1] << " " << indexOrigin[2];
+    VAppendAttr(list, "indexOrigin", NULL, VStringRepn, vstr.str().c_str());
+
+    // set slice orientation according to the image orientation
+    switch(image.getMainOrientation()) {
+    case data::Image::axial:
+    case data::Image::reversed_axial:
+    	VAppendAttr(list,"orientation", NULL, VStringRepn, "axial");
+    	break;
+    case data::Image::sagittal:
+    case data::Image::reversed_sagittal:
+    	VAppendAttr(list,"orientation", NULL, VStringRepn, "sagittal");
+    	break;
+    case data::Image::coronal:
+    case data::Image::reversed_coronal:
+    	VAppendAttr(list,"orientation", NULL, VStringRepn, "coronal");
+    	break;
+    }
 
     // ********** Vista group **********
     // POLICY: Append ALL properties from the 'Vista' Propmap to the end of the
@@ -350,6 +385,48 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage& vim
     			continue;
     		}
 
+    		// VUByte -> VUByte (char *)
+			if(pv->is<VUByte>()) {
+				VAppendAttr(list, (*kiter).c_str(), NULL, VUByteRepn,
+						(VUByte)pv->cast_to_Type<VUByte>());
+				continue;
+			}
+
+    		// VSByte -> VSByte (char *)
+			if(pv->is<VSByte>()) {
+				VAppendAttr(list, (*kiter).c_str(), NULL, VSByteRepn,
+						(VSByte)pv->cast_to_Type<VSByte>());
+				continue;
+			}
+
+    		// VShort -> VShort (char *)
+			if(pv->is<VShort>()) {
+				VAppendAttr(list, (*kiter).c_str(), NULL, VShortRepn,
+						(VShort)pv->cast_to_Type<VShort>());
+				continue;
+			}
+
+    		// VLong -> VLong (char *)
+			if(pv->is<VLong>()) {
+				VAppendAttr(list, (*kiter).c_str(), NULL, VLongRepn,
+						(VLong)pv->cast_to_Type<VLong>());
+				continue;
+			}
+
+    		// VFloat -> VFloat (char *)
+			if(pv->is<VFloat>()) {
+				VAppendAttr(list, (*kiter).c_str(), NULL, VFloatRepn,
+						(VFloat)pv->cast_to_Type<VFloat>());
+				continue;
+			}
+
+    		// VDouble -> VDouble (char *)
+			if(pv->is<VDouble>()) {
+				VAppendAttr(list, (*kiter).c_str(), NULL, VDoubleRepn,
+						(VDouble)pv->cast_to_Type<VDouble>());
+				continue;
+			}
+
     		// VString -> std::string
     		if(pv->is<std::string>()) {
     			VAppendAttr(list, (*kiter).c_str(), NULL, VStringRepn,
@@ -357,9 +434,7 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage& vim
     			continue;
     		}
     	}
-
     }
-
 }
 
 void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &chunk )
@@ -388,14 +463,15 @@ void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &c
 
 		// MANDATORY: orientation --> readVector, phaseVector, sliceVector
 		// create default read, phase, slice vector values according to attribute
-		// "orientation" in vista header.
-		if(strcmp(name,"orientation") == 0){
+		// "orientation" in vista header. This should only be done if the vectors
+		// weren't defined otherwise.
+		if((strcmp(name,"orientation") == 0) and (not chunk.hasProperty("readVec"))){
 			VGetAttrValue(&posn,NULL,VStringRepn,&val);
 
 			//TODO remove "orientation" in internal representation
 			chunk.setProperty<std::string>(propname,std::string((VString)val));
 
-			// Axial is the reference
+			// axial is the reference
 			if(strcmp((const char*)val,"axial") == 0) {
 				chunk.setProperty("readVec", util::fvector4(1,0,0,0));
 				chunk.setProperty("phaseVec", util::fvector4(0,1,0,0));
@@ -416,7 +492,36 @@ void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &c
 			}
 		}
 
-		//
+		// columnVec -> readVec, overwrite old values
+		if(strcmp(name, "columnVec") == 0) {
+			util::fvector4 readVec;
+			VGetAttrValue(&posn,NULL,VStringRepn,&val);
+			const std::list<float> tokens = util::string2list<float>((const char*)val,' ');
+			readVec.copyFrom<std::list<float>::const_iterator>(tokens.begin(),tokens.end());
+			chunk.setProperty<util::fvector4>("readVec",readVec);
+			continue;
+		}
+
+		// rowVec -> phaseVec, overwrite old values
+		if(strcmp(name, "rowVec") == 0) {
+			util::fvector4 phaseVec;
+			VGetAttrValue(&posn,NULL,VStringRepn,&val);
+			const std::list<float> tokens = util::string2list<float>((const char*)val,' ');
+			phaseVec.copyFrom<std::list<float>::const_iterator>(tokens.begin(),tokens.end());
+			chunk.setProperty<util::fvector4>("phaseVec",phaseVec);
+			continue;
+		}
+
+		// sliceVec -> sliceVec, overwrite old values
+		if(strcmp(name, "sliceVec") == 0) {
+			util::fvector4 sliceVec;
+			VGetAttrValue(&posn,NULL,VStringRepn,&val);
+			const std::list<float> tokens = util::string2list<float>((const char*)val,' ');
+			sliceVec.copyFrom<std::list<float>::const_iterator>(tokens.begin(),tokens.end());
+			chunk.setProperty<util::fvector4>("sliceVec",sliceVec);
+			continue;
+		}
+
 		switch(VGetAttrRepn(&posn)) {
 
 		case VBitRepn:
@@ -449,6 +554,14 @@ void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &c
 		}
 	}
 
+	//if not set yet, set read, phase and slice vector.
+	// DEFAULT: axial
+	if(not chunk.hasProperty("readVec")) {
+		chunk.setProperty("readVec", util::fvector4(1,0,0,0));
+		chunk.setProperty("phaseVec", util::fvector4(0,1,0,0));
+		chunk.setProperty("sliceVec", util::fvector4(0,0,1,0));
+	}
+
 	// set default index origin according to the image geometry
 	util::fvector4 dims = chunk.sizeToVector();
 	util::fvector4 voxels = chunk.getProperty<util::fvector4>("voxelSize");
@@ -458,6 +571,8 @@ void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &c
 			-((dims[1]-1)*voxels[1])/2,
 			-((dims[2]-1)*voxels[2])/2,
 			0);
+
+
 	// multiply indexOrigin with read, phase and slice vector
 	util::fvector4 iOrig(
 			((util::fvector4)chunk.getProperty<util::fvector4>("readVec")).dot(ioTmp),

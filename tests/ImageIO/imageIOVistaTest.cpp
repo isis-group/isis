@@ -45,14 +45,14 @@ int main( int argc, char **argv )
 	// std::string vtmpfile = ( ( std::string )tmpnam( NULL ) ) + ".v";
 	// fopen( tmpfile.c_str(), "w" );
 	//  load images from temp file
-	images = data::IOFactory::get().load( "/scr/kastanie1/DATA/isis/1st_mdeft.v", "" );
+	images = data::IOFactory::get().load( "/scr/kastanie1/DATA/isis/data1.nii", "" );
 	// the null-loader shall generate 5 50x50x50x10 images
 	//BOOST_CHECK( images.size() == 5 );
 	//  print attributes
 	//  ((data::ImageList::const_reference) images.front())->print(std::cout,true);
 	// get first image and write it to disk
 	//  data::ImageList::const_reference first = images.front();
-	data::IOFactory::write( images, "/tmp/1st_mdeft.v", "" );
+	data::IOFactory::write( images, "/tmp/data1.v", "" );
 	return 0;
 	//BOOST_AUTO_TEST_SUITE_END()
 }
