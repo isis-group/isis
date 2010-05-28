@@ -325,20 +325,6 @@ bool Image::reIndex()
 					<< crossVec << ". That might be wrong!";
 			setProperty( "sliceVec", crossVec );
 		}
-
-		// now we can define the sliceOrientation
-		std::string orientation = "axial";
-
-		if ( ( fabs( crossVec[1] ) >= fabs( crossVec[0] ) ) and ( fabs( crossVec[1] ) >= fabs( crossVec[2] ) ) ) {
-			orientation = "coronal";
-		}
-
-		if ( ( fabs( crossVec[0] ) >= fabs( crossVec[1] ) ) and ( fabs( crossVec[0] ) >= fabs( crossVec[2] ) ) ) {
-			orientation = "sagittal";
-		}
-
-		setProperty<std::string>( "sliceOrientation", orientation );
-		LOG( Debug, info ) << "sliceOrientation: " << orientation;
 	}
 
 	if ( hasProperty( "fov" ) ) {
@@ -579,11 +565,20 @@ size_t Image::cmp( const isis::data::Image &comp ) const
 
 Image::orientation Image::getMainOrientation()
 {
-	const util::fvector4 &slice = getProperty<util::fvector4>( "sliceVec" );
+	util::fvector4 &read = operator[]( "readVec" )->cast_to_Type<util::fvector4>();
+	util::fvector4 &phase = operator[]( "phaseVec" )->cast_to_Type<util::fvector4>();
+	read.norm();
+	phase.norm();
+	LOG_IF( read.dot( phase ) > 0.01, Runtime, warning ) << "The cosine between the columns and the rows of the image is bigger than 0.01";
+	const util::fvector4 crossVec = util::fvector4( //we could use their cross-product as sliceVector
+										read[1] * phase[2] - read[2] * phase[1],
+										read[2] * phase[0] - read[0] * phase[2],
+										read[0] * phase[1] - read[1] * phase[0]
+									);
 	const util::fvector4 x( 1, 0 ), y( 0, 1 ), z( 0, 0, 1 );
-	float a_axial = std::acos( slice.dot( z ) / slice.len() ) / M_PI;
-	float a_sagittal = std::acos( slice.dot( x ) / slice.len() ) / M_PI;
-	float a_coronal = std::acos( slice.dot( y ) / slice.len() ) / M_PI;
+	float a_axial = std::acos( crossVec.dot( z ) / crossVec.len() ) / M_PI;
+	float a_sagittal = std::acos( crossVec.dot( x ) / crossVec.len() ) / M_PI;
+	float a_coronal = std::acos( crossVec.dot( y ) / crossVec.len() ) / M_PI;
 	bool a_inverse = false, s_inverse = false, c_inverse = false;
 
 	if( a_axial > .5 ) {
