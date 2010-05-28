@@ -76,6 +76,7 @@ public:
 			LOG( Debug, error ) << "No conversion of " << second.typeName() << " to " << Type<T>::staticName() << " available";
 			return false;
 		}
+		return false;
 	}
 };
 

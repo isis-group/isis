@@ -300,6 +300,9 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 			break;
 		case VDoubleRepn:
 			addChunk<VDouble>(chunks,images[0]);
+		default:
+			LOG( image_io::Runtime, error )
+				<< "No Vista datatype found. Input image is broken. Abort.";
 		}// switch(VPixelRepn(images[0]))
 
 	}
@@ -323,6 +326,9 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage& vim
     std::stringstream vstr;
     vstr << voxels[2] << " " << voxels[1] << " " << voxels[0];
     VAppendAttr(list, "voxel",NULL,VStringRepn,vstr.str().c_str());
+
+    // copy orientation vector
+
 
     // ********** Vista group **********
     // POLICY: Append ALL properties from the 'Vista' Propmap to the end of the
@@ -365,8 +371,6 @@ void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &c
 	for(VFirstAttr(attributes,&posn);VAttrExists(&posn);VNextAttr(&posn)){
 		const char* name = VGetAttrName(&posn);
 		VPointer val;
-		// set all vista specific properties in a extra group.
-		std::string propname = std::string("Vista/") + name;
 
 		// MANDATORY: voxel --> voxelSize
 		// it's a vector with 3 elements
@@ -378,6 +382,9 @@ void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &c
 					util::fvector4(*iter++,*iter++,*iter++,0));
 			continue;
 		}
+
+		// set all vista specific properties in a extra group.
+		std::string propname = std::string("Vista/") + name;
 
 		// MANDATORY: orientation --> readVector, phaseVector, sliceVector
 		// create default read, phase, slice vector values according to attribute
@@ -409,6 +416,7 @@ void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &c
 			}
 		}
 
+		//
 		switch(VGetAttrRepn(&posn)) {
 
 		case VBitRepn:
