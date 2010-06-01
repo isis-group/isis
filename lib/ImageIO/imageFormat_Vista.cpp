@@ -453,8 +453,8 @@ void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &c
 			VGetAttrValue(&posn,NULL,VStringRepn,&val);
 			std::list<float> flist = util::string2list<float>(std::string((char *)val));
 			std::list<float>::const_iterator iter = flist.begin();
-			chunk.setProperty("voxelSize",
-					util::fvector4(*iter++,*iter++,*iter++,0));
+			float x = *iter++, y = *iter++, z = *iter;
+			chunk.setProperty("voxelSize",util::fvector4(x, y, z, 0));
 			continue;
 		}
 
