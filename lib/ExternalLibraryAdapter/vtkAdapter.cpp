@@ -91,11 +91,12 @@ vtkImageData *vtkAdapter::makeVtkImageObject( const boost::shared_ptr<data::Imag
 		importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<double>( 0, 0, 0, dim4 ) );
 		break;
 	}
-
+	importer->SetWholeExtent( 0, dimensions[0] - 1, 0, dimensions[1] - 1, 0, dimensions[2] - 1 );
+	importer->SetDataExtentToWholeExtent();
 	importer->Update();
 	vtkImage = importer->GetOutput();
-	importer->SetWholeExtent( 0, dimensions[0] - 1, 0, dimensions[1] - 1, 0, dimensions[2] - 1 ); //TODO what is exactly defined by the whole extend????????????
-	importer->SetDataExtentToWholeExtent();
+	vtkImage->SetOrigin( indexOrigin[0], indexOrigin[1], indexOrigin[2] );
+	vtkImage->SetSpacing( spacing[0], spacing[1], spacing[2] );
 	return vtkImage;
 }
 
