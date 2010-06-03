@@ -220,7 +220,6 @@ private:
 		if ( behaveAsItkReader ) {
 			itkOrigin[0] = -indexOrigin[0];
 			itkOrigin[1] = -indexOrigin[1];
-			itkOrigin[2] = indexOrigin[2];
 			itkDirection[0][0] = -readVec[0];
 			itkDirection[0][1] = -phaseVec[0];
 			itkDirection[0][2] = -sliceVec[0];

@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * Author: Thomas Pröger, proeger@cbs.mpg.de, 2010
+ * Author: Thomas Pr��ger, proeger@cbs.mpg.de, 2010
  *
  *****************************************************************/
 
@@ -483,13 +483,13 @@ void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &c
 			if(strcmp((const char*)val,"sagittal") == 0) {
 				chunk.setProperty("readVec", util::fvector4(0,1,0,0));
 				chunk.setProperty("phaseVec", util::fvector4(0,0,1,0));
-				chunk.setProperty("sliceVec", util::fvector4(-1,0,0,0));
+				chunk.setProperty("sliceVec", util::fvector4(1,0,0,0));
 				continue;
 			}
 			if(strcmp((const char*)val,"coronal") == 0) {
 				chunk.setProperty("readVec", util::fvector4(1,0,0,0));
 				chunk.setProperty("phaseVec", util::fvector4(0,0,1,0));
-				chunk.setProperty("sliceVec", util::fvector4(0,-1,0,0));
+				chunk.setProperty("sliceVec", util::fvector4(0,1,0,0));
 				continue;
 			}
 		}

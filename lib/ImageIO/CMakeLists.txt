@@ -21,7 +21,6 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI)
 
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA)
-
     # This code snipped was taken from the lipsia source package.
 
     # - FindVIA.cmake
