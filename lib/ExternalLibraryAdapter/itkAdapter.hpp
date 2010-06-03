@@ -134,11 +134,10 @@ public:
 		boost::shared_ptr<data::MemChunk<typename TImage::PixelType > >
 		retChunk( new data::MemChunk<typename TImage::PixelType >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) );
 		retChunk->setProperty( "indexOrigin", util::fvector4( indexOrigin[0], indexOrigin[1], indexOrigin[2], indexOrigin[3] ) );
-		retChunk->setProperty( "readVec", util::fvector4( imageDirection[0][0], imageDirection[0][1], imageDirection[0][2], 0 ) );
-		retChunk->setProperty( "phaseVec", util::fvector4( imageDirection[1][0], imageDirection[1][1], imageDirection[1][2], 0 ) );
-		retChunk->setProperty( "sliceVec", util::fvector4( imageDirection[2][0], imageDirection[2][1], imageDirection[2][2], 0 ) );
+		retChunk->setProperty( "readVec", util::fvector4( imageDirection[0][0], imageDirection[1][0], imageDirection[2][0], 0 ) );
+		retChunk->setProperty( "phaseVec", util::fvector4( imageDirection[0][1], imageDirection[1][1], imageDirection[2][1], 0 ) );
+		retChunk->setProperty( "sliceVec", util::fvector4( imageDirection[0][2], imageDirection[1][2], imageDirection[2][2], 0 ) );
 		retChunk->setProperty( "voxelSize", util::fvector4( imageSpacing[0], imageSpacing[1], imageSpacing[2], imageSpacing[3] ) );
-		retChunk->setProperty( "centerVec", util::fvector4( indexOrigin[0], indexOrigin[1], indexOrigin[2], indexOrigin[3] ) );
 		itk::MetaDataDictionary myItkDict = src->GetMetaDataDictionary();
 
 		if ( myItkDict.HasKey( "sequenceNumber" ) ) {

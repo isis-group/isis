@@ -17,7 +17,7 @@
 
 */
 
-#include "ioapplication.hpp"
+#include "io_application.hpp"
 #include "io_factory.hpp"
 
 namespace isis

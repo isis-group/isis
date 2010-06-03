@@ -1,2 +1,2 @@
 ADD_EXECUTABLE(isischeckerboard3d isisCheckerboard3D.cxx)
-TARGET_LINK_LIBRARIES(isischeckerboard3d  ITKIO ITKCommon viaio gslcblas)
+TARGET_LINK_LIBRARIES(isischeckerboard3d  ITKIO ITKCommon viaio)

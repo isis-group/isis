@@ -226,7 +226,8 @@ throw( std::runtime_error & )
 		// default error
 		default:
 			LOG(image_io::Runtime,error)
-				<< "Can't map image type to vista type. Abort [" << chunk.typeID() << "/" << util::Type<VFloat>::staticID << "]" ;
+				<< "Can't map image type to vista type. Abort ["
+				<< chunk.typeID() << "/" << util::Type<VFloat>::staticID << "]" ;
 			return;
 		}
 
@@ -253,7 +254,8 @@ throw( std::runtime_error & )
 }
 
 
-int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filename, const std::string &dialect ) throw ( std::runtime_error & )
+int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filename,
+		const std::string &dialect ) throw ( std::runtime_error & )
 {
 	// open input file
 	FILE *ip;
@@ -324,7 +326,7 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage& vim
 	// get voxel
     util::fvector4 voxels = image.getProperty<util::fvector4>("voxelSize");
     std::stringstream vstr;
-    vstr << voxels[2] << " " << voxels[1] << " " << voxels[0];
+    vstr << voxels[0] << " " << voxels[1] << " " << voxels[2];
     VAppendAttr(list, "voxel",NULL,VStringRepn,vstr.str().c_str());
 
     // copy orientation vectors
@@ -468,7 +470,7 @@ void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &c
 		if((strcmp(name,"orientation") == 0) and (not chunk.hasProperty("readVec"))){
 			VGetAttrValue(&posn,NULL,VStringRepn,&val);
 
-			//TODO remove "orientation" in internal representation
+			//TODO remove "orientation" in Vista group
 			chunk.setProperty<std::string>(propname,std::string((VString)val));
 
 			// axial is the reference
@@ -479,8 +481,8 @@ void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &c
 				continue;
 			}
 			if(strcmp((const char*)val,"sagittal") == 0) {
-				chunk.setProperty("readVec", util::fvector4(0,0,1,0));
-				chunk.setProperty("phaseVec", util::fvector4(0,1,0,0));
+				chunk.setProperty("readVec", util::fvector4(0,1,0,0));
+				chunk.setProperty("phaseVec", util::fvector4(0,0,1,0));
 				chunk.setProperty("sliceVec", util::fvector4(-1,0,0,0));
 				continue;
 			}
@@ -492,7 +494,7 @@ void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &c
 			}
 		}
 
-		// columnVec -> readVec, overwrite old values
+		// OPTIONAL: columnVec -> readVec, overwrite old values
 		if(strcmp(name, "columnVec") == 0) {
 			util::fvector4 readVec;
 			VGetAttrValue(&posn,NULL,VStringRepn,&val);
@@ -502,7 +504,7 @@ void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &c
 			continue;
 		}
 
-		// rowVec -> phaseVec, overwrite old values
+		// OPTIONAL: rowVec -> phaseVec, overwrite old values
 		if(strcmp(name, "rowVec") == 0) {
 			util::fvector4 phaseVec;
 			VGetAttrValue(&posn,NULL,VStringRepn,&val);
@@ -512,7 +514,7 @@ void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &c
 			continue;
 		}
 
-		// sliceVec -> sliceVec, overwrite old values
+		// OPTIONAL: sliceVec -> sliceVec, overwrite old values
 		if(strcmp(name, "sliceVec") == 0) {
 			util::fvector4 sliceVec;
 			VGetAttrValue(&posn,NULL,VStringRepn,&val);
@@ -522,6 +524,17 @@ void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &c
 			continue;
 		}
 
+		// OPTIONAL: indexOrigina -> indexOrigin
+		if(strcmp(name, "indexOrigin") == 0){
+			VGetAttrValue(&posn,NULL,VStringRepn,&val);
+			std::list<float> flist = util::string2list<float>(std::string((char *)val));
+			std::list<float>::const_iterator iter = flist.begin();
+			float x = *iter++, y = *iter++, z = *iter;
+			chunk.setProperty("indexOrigin",util::fvector4(x, y, z, 0));
+			continue;
+		}
+
+		// traverse through attributes
 		switch(VGetAttrRepn(&posn)) {
 
 		case VBitRepn:
@@ -554,6 +567,9 @@ void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &c
 		}
 	}
 
+	// AFTERMATH
+	// set missing values according to default rules
+
 	//if not set yet, set read, phase and slice vector.
 	// DEFAULT: axial
 	if(not chunk.hasProperty("readVec")) {
@@ -563,25 +579,26 @@ void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &c
 	}
 
 	// set default index origin according to the image geometry
-	util::fvector4 dims = chunk.sizeToVector();
-	util::fvector4 voxels = chunk.getProperty<util::fvector4>("voxelSize");
-	// calculate index origin according to axial
-	util::fvector4 ioTmp(
-			-((dims[0]-1)*voxels[0])/2,
-			-((dims[1]-1)*voxels[1])/2,
-			-((dims[2]-1)*voxels[2])/2,
-			0);
+	if(not chunk.hasProperty("indexOrigin")) {
+		util::fvector4 dims = chunk.sizeToVector();
+		util::fvector4 voxels = chunk.getProperty<util::fvector4>("voxelSize");
+		// calculate index origin according to axial
+		util::fvector4 ioTmp(
+				-((dims[0]-1)*voxels[0])/2,
+				-((dims[1]-1)*voxels[1])/2,
+				-((dims[2]-1)*voxels[2])/2,
+				0);
 
+		// multiply indexOrigin with read, phase and slice vector
+		util::fvector4 iOrig(
+				((util::fvector4)chunk.getProperty<util::fvector4>("readVec")).dot(ioTmp),
+				((util::fvector4)chunk.getProperty<util::fvector4>("phaseVec")).dot(ioTmp),
+				((util::fvector4)chunk.getProperty<util::fvector4>("sliceVec")).dot(ioTmp),
+				0);
+		chunk.setProperty("indexOrigin",iOrig);
+	}
 
-	// multiply indexOrigin with read, phase and slice vector
-	util::fvector4 iOrig(
-			((util::fvector4)chunk.getProperty<util::fvector4>("readVec")).dot(ioTmp),
-			((util::fvector4)chunk.getProperty<util::fvector4>("phaseVec")).dot(ioTmp),
-			((util::fvector4)chunk.getProperty<util::fvector4>("sliceVec")).dot(ioTmp),
-			0);
-	chunk.setProperty("indexOrigin",iOrig);
-
-	// set acquisitionNumber
+	// set acquisitionNumber. This values is always missing
 	chunk.setProperty("acquisitionNumber",0);
 }
 

@@ -177,7 +177,7 @@ int main(
 
 	ENABLE_LOG( isis::DataDebug, isis::util::DefaultMsgPrint, isis::error );
 	ENABLE_LOG( isis::DataLog, isis::util::DefaultMsgPrint, isis::error );
-	
+
 	// DANGER! Kids don't try this at home! VParseCommand modifies the values of argc and argv!!!
 	if ( !VParseCommand( VNumber( options ), options, &argc, argv ) || !VIdentifyFiles( VNumber( options ), options, "in",
 			&argc, argv, 0 ) ) {
