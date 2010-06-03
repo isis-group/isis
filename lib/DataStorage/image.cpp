@@ -89,7 +89,7 @@ bool Image::insertChunk ( const Chunk &chunk )
 {
 	if ( not chunk.valid() ) {
 		LOG( Runtime, error )
-				<< "Cannot insert chunk. Missing properties: " << chunk.missing();
+				<< "Cannot insert chunk. Missing properties: " << chunk.getMissing();
 		return false;
 	}
 
@@ -356,7 +356,7 @@ bool Image::reIndex()
 				<< "The calculated field of view differs from the stored " << propFoV << "/" << calcFoV;
 	}
 
-	LOG_IF( not valid(), Runtime, warning ) << "The image is not valid after reindexing. Missing properties: " << missing();
+	LOG_IF( not valid(), Runtime, warning ) << "The image is not valid after reindexing. Missing properties: " << getMissing();
 	clean = true;
 	return true;
 }
@@ -451,7 +451,7 @@ size_t Image::getChunkStride ( size_t base_stride )
 	return ret;
 }
 
-std::list<util::PropMap::mapped_type> Image::getChunksProperties( const util::PropMap::key_type &key, bool unique )const
+std::list<util::PropertyValue> Image::getChunksProperties( const util::PropMap::key_type &key, bool unique )const
 {
 	std::list<util::PropertyValue > ret;
 
@@ -494,7 +494,7 @@ ImageList::ImageList( ChunkList src )
 
 		for ( ChunkList::iterator i = src.begin(); i != src.end(); ) {
 			if ( not i->valid() ) {
-				const util::PropMap::key_list missing = i->missing();
+				const util::PropMap::key_list missing = i->getMissing();
 				LOG( Runtime, error )
 						<< "Ignoring invalid chunk. Missing properties: " << util::list2string( missing.begin(), missing.end() );
 				src.erase( i++ );
@@ -512,7 +512,7 @@ ImageList::ImageList( ChunkList src )
 			if ( buff->valid() )
 				push_back( buff );
 			else {
-				const util::PropMap::key_list missing = buff->missing();
+				const util::PropMap::key_list missing = buff->getMissing();
 				LOG( Runtime, error )
 						<< "Cannot insert image. Missing properties: " << util::list2string( missing.begin(), missing.end() );
 			}

@@ -19,7 +19,7 @@
 
 #include "type_converter.hpp"
 #include "type_base.hpp"
-#include "propmap.hpp" // we must have all types here and PropMap was only forward-declared in types.hpp
+#include "type.hpp"
 #include <boost/mpl/for_each.hpp>
 #include <boost/type_traits/is_arithmetic.hpp>
 #include <boost/mpl/and.hpp>
@@ -382,11 +382,6 @@ public:
 
 
 // @todo we cannot parse this stuff yet
-template<> class TypeConverter<false, false, std::string, PropMap>: public TypeGenerator<std::string, PropMap>  //string => PropMap
-{
-public:
-	virtual ~TypeConverter() {}
-};
 template<> class TypeConverter<false, false, std::string, rgb_color24 >: public TypeGenerator<std::string, rgb_color24 >  //string => color
 {
 public:

@@ -31,62 +31,82 @@ namespace isis
  */
 namespace util
 {
+class PropMap;
+namespace _internal{
+template<typename BRANCH_TYPE,typename LEAF_TYPE> class treeNode{
+	BRANCH_TYPE m_branch;
+	LEAF_TYPE m_leaf;
+public:
+	bool empty()const{
+		return m_branch.empty() and m_leaf.empty();
+	}
+	bool is_leaf()const{
+		LOG_IF(not (m_branch.empty() or m_leaf.empty()),Debug,error) << "There is a non empty leaf at a branch. This should not be.";
+		return m_branch.empty();
+	}
+	const BRANCH_TYPE &getBranch()const{
+		return m_branch;
+	}
+	BRANCH_TYPE &getBranch(){
+		return m_branch;
+	}
+	LEAF_TYPE &getLeaf(){
+		assert(is_leaf());
+		return m_leaf;
+	}
+	const LEAF_TYPE &getLeaf()const{
+		assert(is_leaf());
+		return m_leaf;
+	}
+	bool operator==(const treeNode& ref)const{
+		return m_branch == ref.m_branch and m_leaf == ref.m_leaf;
+	}
+};
+}
 
 /// A mapping tree to store properties (keys / values)
-class PropMap : protected std::map<std::string, PropertyValue, _internal::caselessStringLess>
+class PropMap : protected std::map<std::string, _internal::treeNode<PropMap,PropertyValue>, _internal::caselessStringLess>
 {
 public:
-	typedef std::map<std::string, PropertyValue, _internal::caselessStringLess> base_type;
-	typedef std::set<std::string, _internal::caselessStringLess> key_list;
-	typedef std::map<std::string, std::pair<PropertyValue, PropertyValue>, _internal::caselessStringLess> diff_map;
+	typedef std::map<key_type, mapped_type, key_compare> base_type;
+	typedef std::set<key_type, key_compare> key_list;
+	typedef std::map<key_type, std::pair<mapped_type, mapped_type>, key_compare> diff_map;
+	typedef std::map< std::string, PropertyValue,_internal::caselessStringLess > flat_map;
 private:
-	typedef std::list<std::string> propPath;
+	typedef std::list<key_type> propPath;
 	typedef propPath::const_iterator propPathIterator;
 
 	static const char pathSeperator = '/';
 	static const util::PropertyValue emptyProp;//dummy to be able to return an empty Property
 
+
+	/////////////////////////////////////////////////////////////////////////////////////////
+	// internal predicats
+	/////////////////////////////////////////////////////////////////////////////////////////
+	/// allways true
+	struct trueP {	bool operator()( const_reference ref )const;};
+	/// true when entry is a leaf, needed and empty
+	struct invalidP {	bool operator()( const_reference ref )const;};
+	/// true when entry is a leaf, needed and empty of entry is a invalid branch
+	struct treeInvalidP {	bool operator()( const_reference ref )const;};
 	/////////////////////////////////////////////////////////////////////////////////////////
 	// internal functors
 	/////////////////////////////////////////////////////////////////////////////////////////
-	struct trueP {
-		bool operator()( const_reference ref )const {return true;}
-	};
-	struct emptyP {
-		bool operator()( const_reference ref )const {return ref.second.empty();}
-	};
-	struct neededP {
-		bool operator()( const_reference ref )const {return ref.second.needed();}
-	};
-	struct invalidP {
-		bool operator()( const_reference ref )const {return ref.second.needed() && ref.second.empty();}
-	};
-	struct treeInvalidP {
-		bool operator()( const_reference ref )const {
-			if ( ref.second.empty() ) {
-				return ref.second.needed();
-			} else if ( ref.second->is<PropMap>() ) {
-				const PropMap &sub = ref.second->cast_to_Type<PropMap>();
-				return not sub.valid();
-			} else
-				return false;
-		}
-	};
 	///Walks the whole tree and inserts any key into out for which the given scalar predicate is true.
 	template<class Predicate> struct walkTree {
 		key_list &m_out;
 		const std::string m_prefix;
 		walkTree( key_list &out, const std::string &prefix ): m_out( out ), m_prefix( prefix ) {}
 		walkTree( key_list &out ): m_out( out ) {}
-		void operator()( const_reference ref ) {
-			if ( ( not ref.second.empty() ) and ref.second->is<PropMap>() ) {
-				PropMap &sub = ref.second->cast_to_Type<PropMap>();
-				std::for_each( sub.begin(), sub.end(), walkTree<Predicate>( m_out, ref.first ) );
-			} else {
+		void operator()( const_reference ref ) const{
+			if ( ref.second.is_leaf() ){
 				if ( Predicate()( ref ) )
 					m_out.insert( m_out.end(), ( m_prefix != "" ? m_prefix + "/" : "" ) + ref.first );
+			} else {
+				const PropMap &sub = ref.second.getBranch();
+				std::for_each( sub.begin(), sub.end(), walkTree<Predicate>( m_out, ref.first ) );
 			}
-		};
+		}
 	};
 
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -97,7 +117,7 @@ private:
 	/// internal recursion-function for diff
 	void diffTree( const PropMap& other, PropMap::diff_map &ret, std::string prefix ) const;
 	/// internal helper for operator[]
-	static PropertyValue& fetchProperty( util::PropMap &root, const propPathIterator at, const propPathIterator pathEnd );
+	static mapped_type& fetchNode( util::PropMap &root, const propPathIterator at, const propPathIterator pathEnd );
 	/// internal helper for findPropVal
 	static const PropertyValue* searchBranch( const util::PropMap &root, const propPathIterator at, const propPathIterator pathEnd );
 	/// internal recursion-function for remove
@@ -124,8 +144,6 @@ protected:
 	* will (if neccessary) be added to the PropertyMap and flagged as needed.
 	*/
 	void addNeededFromString( const std::string &needed );
-	/// \returns true if a given property exists (also if its empty)
-	bool exists( const std::string& key )const;
 public:
 	/////////////////////////////////////////////////////////////////////////////////////////
 	// constructors
@@ -166,12 +184,12 @@ public:
 	bool valid()const;
 	/// \returns true if the PropMap is empty, false otherwhise
 	bool empty()const;
-	const key_list keys()const;
+	const key_list getKeys()const;
 	/**
 	* Get a list of missing properties.
 	* \returns a list of all needed and empty properties.
 	*/
-	const key_list missing()const;
+	const key_list getMissing()const;
 	/**
 	 * Get a difference map of this and the given PropMap.
 	 * Creates a map out of the Name of differencing properties and their difference, which is a std::pair\<PropertyValue,PropertyValue\>.
@@ -187,7 +205,7 @@ public:
 	 * \param second the "other" PropMap to compare with
 	 * \return a map of property names and value-pairs
 	 */
-	diff_map diff( const PropMap &second )const;
+	diff_map getDifference( const PropMap &second )const;
 	/// Remove everything that is also in second and equal.
 	void make_unique( const isis::util::PropMap& other, bool removeNeeded = false );
 	/**
@@ -212,7 +230,7 @@ public:
 	void toCommonUnique( PropMap& common, std::set<std::string> &uniques, bool init )const;
 
 	///copy the tree into a flat key/property-map
-	void linearize( base_type &out, std::string key_prefix = "" )const;
+	void linearize( flat_map& out, std::string key_prefix = "" )const;
 
 	/**
 	 * Transform an existing property into another.
@@ -266,7 +284,7 @@ public:
 	* \returns a Type\<T\> containing a copy of the value stored for given property if the type of the stored property is T.
 	* \return Type\<T\>() otherwhise.
 	*/
-	template<typename T> Type<T> getPropertyType( const std::string &key )const {
+/*	template<typename T> Type<T> getPropertyType( const std::string &key )const {
 		const PropertyValue &value = getPropertyValue( key );
 
 		if ( value.empty() ) {
@@ -280,10 +298,12 @@ public:
 			<< " but you requested " << Type<T>::staticName() << " this will raise an exception.";
 			return value->cast_to_Type<T>();
 		}
-	}
+	}*/
 	template<typename T> T getProperty( const std::string &key )const {
-		return ( T )getPropertyType<T>( key );
+// 		return ( T )getPropertyType<T>( key );
 	}
+	PropMap& propertyBranch(const std::string &key);
+	const PropMap& getPropertyBranch(const std::string &key)const;
 	bool renameProperty( std::string oldname, std::string newname );
 
 	/**
@@ -302,11 +322,21 @@ public:
 
 namespace std
 {
+/// Streaming output for PropMap::node
+template<typename charT, typename traits,typename BRANCH_TYPE, typename LEAF_TYPE>
+basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::_internal::treeNode<BRANCH_TYPE,LEAF_TYPE>& s )
+{
+	if(s.is_leaf())
+		out << s.getLeaf();
+	else
+		out << "[[Subtree with " << s.getBranch().getKeys().size() << " elements]]";
+	return out;
+}
 /// Streaming output for PropMap
 template<typename charT, typename traits>
 basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::PropMap& s )
 {
-	isis::util::PropMap::base_type buff;
+	isis::util::PropMap::flat_map buff;
 	s.linearize( buff );
 	isis::util::write_list( buff.begin(), buff.end(), out );
 	return out;

@@ -96,8 +96,7 @@ public:
 						//OK, the source image and file pointer are managed by the chunk, we must release them
 						img.release();
 						dcfile.release();
-						util::PropMap &dcmMap = ret->setProperty( ImageFormat_Dicom::dicomTagTreeName, util::PropMap() );
-						ImageFormat_Dicom::dcmObject2PropMap( dcdata, dcmMap );
+						ImageFormat_Dicom::dcmObject2PropMap( dcdata, ret->propertyBranch( ImageFormat_Dicom::dicomTagTreeName ) );
 					}
 				} else if ( pix->getPlanes() == 3 ) { //try to load data as color image
 					switch ( pix->getRepresentation() ) {
@@ -112,8 +111,7 @@ public:
 					}
 
 					if ( ret ) {
-						util::PropMap &dcmMap = ret->setProperty( ImageFormat_Dicom::dicomTagTreeName, util::PropMap() );
-						ImageFormat_Dicom::dcmObject2PropMap( dcdata, dcmMap );
+						ImageFormat_Dicom::dcmObject2PropMap( dcdata, ret->propertyBranch( ImageFormat_Dicom::dicomTagTreeName ) );
 					}
 				} else {
 					FileFormat::throwGenericError( "Unsupported pixel type." );

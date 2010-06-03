@@ -22,7 +22,6 @@
 #include "type_converter.hpp"
 #include "type_base.hpp"
 #include "numeric_convert.hpp"
-#include "propmap.hpp" // we must have all types here and PropMap was only forward-declared in types.hpp
 #include <boost/mpl/for_each.hpp>
 #include <boost/type_traits/is_arithmetic.hpp>
 #include <boost/mpl/and.hpp>

@@ -533,13 +533,11 @@ void ImageFormat_Dicom::dcmObject2PropMap( DcmObject* master_obj, isis::util::Pr
 		if ( name == "PixelData" )
 			continue;//skip the image data
 		else if ( name == "CSAImageHeaderInfo" ) {
-			util::PropMap &csaMap = map.setProperty( "CSAImageHeaderInfo", util::PropMap() );
 			DcmElement* elem = dynamic_cast<DcmElement*>( obj );
-			parseCSA( elem, csaMap );
+			parseCSA( elem, map.propertyBranch( "CSAImageHeaderInfo" ) );
 		} else if ( name == "CSASeriesHeaderInfo" ) {
-			util::PropMap &csaMap = map.setProperty( "CSASeriesHeaderInfo", util::PropMap() );
 			DcmElement* elem = dynamic_cast<DcmElement*>( obj );
-			parseCSA( elem, csaMap );
+			parseCSA( elem, map.propertyBranch( "CSASeriesHeaderInfo" ) );
 		} else if ( name == "MedComHistoryInformation" ) {
 			//@todo special handling needed
 		} else if ( obj->isLeaf() ) {
@@ -555,8 +553,7 @@ void ImageFormat_Dicom::dcmObject2PropMap( DcmObject* master_obj, isis::util::Pr
 			else
 				parseList( elem, name, map ); // for any other value
 		} else {
-			map[name] = util::PropMap();
-			dcmObject2PropMap( obj, map[name]->cast_to_Type<util::PropMap>() );
+			dcmObject2PropMap( obj, map.propertyBranch(name) );
 		}
 	}
 }
