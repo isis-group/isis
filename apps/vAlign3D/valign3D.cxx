@@ -239,15 +239,16 @@ int main(
 	LOG_IF( refList.empty(), isis::DataLog, isis::error ) << "Reference image is empty!";
 	LOG_IF( inList.empty(), isis::DataLog, isis::error ) << "Input image is empty!";
 
-	std::cout << refList.front()->getProperty<isis::util::fvector4>("readVec") << std::endl;
-	std::cout << refList.front()->getProperty<isis::util::fvector4>("phaseVec") << std::endl;
-	std::cout << refList.front()->getProperty<isis::util::fvector4>("sliceVec") << std::endl;
+	// TODO DEBUG
 	std::cout << refList.front()->getProperty<isis::util::fvector4>("indexOrigin") << std::endl;
 
 	if ( !smooth ) {
-		fixedImage = isis::adapter::itkAdapter::makeItkImageObject<FixedImageType>( refList.front() );
+		fixedImage = isis::adapter::itkAdapter::makeItkImageObject<FixedImageType>( refList.front());
 		movingImage = isis::adapter::itkAdapter::makeItkImageObject<MovingImageType>( inList.front() );
 	}
+
+	// TODO DEBUG
+	std::cout << fixedImage->GetOrigin() << std::endl;
 
 	if ( smooth ) {
 		GaussianFilterType::Pointer fixedGaussianFilterX = GaussianFilterType::New();

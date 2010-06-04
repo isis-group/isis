@@ -467,7 +467,7 @@ void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &c
 		// create default read, phase, slice vector values according to attribute
 		// "orientation" in vista header. This should only be done if the vectors
 		// weren't defined otherwise.
-		if((strcmp(name,"orientation") == 0) and (not chunk.hasProperty("readVec"))){
+		if((strcmp(name,"orientation") == 0) and (not chunk.hasProperty("readVec")) ){
 			VGetAttrValue(&posn,NULL,VStringRepn,&val);
 
 			//TODO remove "orientation" in Vista group
@@ -475,21 +475,21 @@ void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &c
 
 			// axial is the reference
 			if(strcmp((const char*)val,"axial") == 0) {
-				chunk.setProperty("readVec", util::fvector4(1,0,0,0));
-				chunk.setProperty("phaseVec", util::fvector4(0,1,0,0));
+				chunk.setProperty("readVec", util::fvector4(-1,0,0,0));
+				chunk.setProperty("phaseVec", util::fvector4(0,-1,0,0));
 				chunk.setProperty("sliceVec", util::fvector4(0,0,1,0));
 				continue;
 			}
 			if(strcmp((const char*)val,"sagittal") == 0) {
-				chunk.setProperty("readVec", util::fvector4(0,1,0,0));
-				chunk.setProperty("phaseVec", util::fvector4(0,0,1,0));
+				chunk.setProperty("readVec", util::fvector4(0,-1,0,0));
+				chunk.setProperty("phaseVec", util::fvector4(0,0,-1,0));
 				chunk.setProperty("sliceVec", util::fvector4(1,0,0,0));
 				continue;
 			}
 			if(strcmp((const char*)val,"coronal") == 0) {
-				chunk.setProperty("readVec", util::fvector4(1,0,0,0));
-				chunk.setProperty("phaseVec", util::fvector4(0,0,1,0));
-				chunk.setProperty("sliceVec", util::fvector4(0,1,0,0));
+				chunk.setProperty("readVec", util::fvector4(-1,0,0,0));
+				chunk.setProperty("phaseVec", util::fvector4(0,0,-1,0));
+				chunk.setProperty("sliceVec", util::fvector4(0,-1,0,0));
 				continue;
 			}
 		}
@@ -584,8 +584,8 @@ void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &c
 		util::fvector4 voxels = chunk.getProperty<util::fvector4>("voxelSize");
 		// calculate index origin according to axial
 		util::fvector4 ioTmp(
-				-((dims[0]-1)*voxels[0])/2,
-				-((dims[1]-1)*voxels[1])/2,
+				((dims[0]-1)*voxels[0])/2,
+				((dims[1]-1)*voxels[1])/2,
 				-((dims[2]-1)*voxels[2])/2,
 				0);
 
