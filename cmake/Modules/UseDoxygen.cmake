@@ -48,7 +48,7 @@ find_package(Doxygen)
 
 if(DOXYGEN_FOUND)
 	find_file(DOXYFILE_IN "Doxyfile.in"
-			PATHS "${CMAKE_MODULE_PATH}" "${CMAKE_ROOT}/Modules/"
+			PATHS "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules" "${CMAKE_ROOT}/Modules/"
 			NO_DEFAULT_PATH)
 	include(FindPackageHandleStandardArgs)
 	find_package_handle_standard_args(DOXYFILE_IN DEFAULT_MSG "DOXYFILE_IN")
