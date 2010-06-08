@@ -275,14 +275,14 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 
 	if ( object.hasProperty( prefix + "Unknown Tag(0019,1015)" ) ) {
 		const util::fvector4 org = object.getProperty<util::fvector4>("indexOrigin");
-		const util::PropertyValue &comp = object.propertyValue( prefix + "Unknown Tag(0019,1015)" );
+		const util::fvector4 comp = object.getProperty<util::fvector4>( prefix + "Unknown Tag(0019,1015)" );
 
-		if ( comp == org ) // will use the more lazy comparison because org is not a Type
+		if ( comp.fuzzyEqual( org ))
 			object.remove( prefix + "Unknown Tag(0019,1015)" );
 		else
 			LOG( Debug, warning )
-					<< prefix + "Unknown Tag(0019,1015):" << comp << " differs from indexOrigin:"
-					<< org << ", won't remove it";
+					<< prefix + "Unknown Tag(0019,1015):" << object.propertyValue(prefix + "Unknown Tag(0019,1015)")
+					<< " differs from indexOrigin:" << object.propertyValue("indexOrigin") << ", won't remove it";
 	}
 
 	if ( object.hasProperty( prefix + "Unknown Tag(0051,100c)" ) ) { //@todo siemens only

@@ -116,9 +116,6 @@ public:
 
 			if ( transformTo( dst, Type<T>::staticID ) )
 				return dst == second;
-			else
-				LOG( Runtime, error )
-				<< "Conversion of " << *this << " to " << Type<T>::staticName() << " failed.";
 		}
 
 		return false;

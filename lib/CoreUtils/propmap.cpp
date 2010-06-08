@@ -92,9 +92,6 @@ const PropMap::mapped_type* PropMap::findEntry(
 	if ( next != pathEnd ) {//we are not at the end of the path (aka the leaf)
 		if ( found != root.end() ) {//and we found the entry
 			const mapped_type &ref = found->second;
-			LOG_IF( not ref.is_leaf(), Runtime, error )
-			<< util::MSubject( found->first ) << " is a leaf, but requested as a branch in "
-			<< util::MSubject( util::list2string( at, pathEnd, "/" ) ) << " program will stop";
 			return findEntry( ref.getBranch(), next, pathEnd ); //continue there
 		}
 	} else if ( found != root.end() ) {// if its the leaf and we found the entry
@@ -118,7 +115,7 @@ bool PropMap::recursiveRemove( PropMap& root, const propPathIterator at, const p
 				ret = recursiveRemove( ref.getBranch(), next, pathEnd );
 
 				if ( ref.getBranch().empty() )
-					root.erase( found );
+					root.erase( found ); // remove the now empty branch
 			} else
 				root.erase( found );
 		} else {
@@ -192,8 +189,10 @@ bool PropMap::remove( const isis::util::PropMap& removeMap )
 					PropMap &mySub = thisIt->second.getBranch();
 					const PropMap &otherSub = otherIt->second.getBranch();
 					ret &= mySub.remove( otherSub );
+					if(mySub.empty())// delete my branch, if its empty
+						erase( thisIt++ ); 
 				} else {
-					LOG( Debug, warning ) << "Not deleting subtree " << MSubject( thisIt->first ) << " because its no subtree in the removal map";
+					LOG( Debug, warning ) << "Not deleting branch " << MSubject( thisIt->first ) << " because its no subtree in the removal map";
 					ret = false;
 				}
 			} else { // this is a leaf
@@ -496,14 +495,12 @@ bool PropMap::invalidP::operator()(const std::pair< const std::string, _internal
 }
 bool PropMap::treeInvalidP::operator()(const std::pair< const std::string, _internal::treeNode< PropMap, PropertyValue > >& ref) const
 {
-	if ( ref.second.getLeaf().empty() ) {
-		return ref.second.getLeaf().needed();
-	} else if ( not ref.second.is_leaf() ) {
+	if ( ref.second.is_leaf() ) {
+		const PropertyValue &val = ref.second.getLeaf();
+		return val.needed() and val.empty();
+	} else  {
 		return not ref.second.getBranch().valid();
-	} else
-		return false;
+	}
 }
 
-
-}
-}
+}}

@@ -69,9 +69,10 @@ bool image_chunk_order::operator() ( const data::Chunk &a, const data::Chunk &b 
 			return true;
 		}
 
-		LOG_IF( aNumber == bNumber, Debug, warning ) << "The Chunks cannot be sorted, won't insert";
+		LOG_IF( aNumber == bNumber, Debug, warning )
+		<< "The Chunks from \""<< a.propertyValue("source") << "\" and \""
+		<< b.propertyValue("source") << "\" seem to be equal, won't insert";
 	}
-
 	return false;
 }
 

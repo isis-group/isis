@@ -36,12 +36,13 @@ namespace _internal
 template<typename SRC, typename DST> class TypeGenerator: public TypeConverterBase
 {
 public:
-	void generate( const boost::scoped_ptr<TypeBase>& src, boost::scoped_ptr<TypeBase>& dst )const {
+	boost::numeric::range_check_result generate( const boost::scoped_ptr<TypeBase>& src, boost::scoped_ptr<TypeBase>& dst )const {
 		LOG_IF( dst.get(), Debug, warning ) <<
 		"Generating into existing value " << dst->toString( true );
 		Type<DST> *ref = new Type<DST>;
-		convert( src->cast_to_Type<SRC>(), *ref );
+		const boost::numeric::range_check_result result=convert( src->cast_to_Type<SRC>(), *ref );
 		dst.reset( ref );
+		return result;
 	}
 };
 
