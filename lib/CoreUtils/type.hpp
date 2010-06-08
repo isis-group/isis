@@ -78,9 +78,10 @@ public:
 		}
 		return false;
 	}
+	virtual ~type_compare(){}
 };
 
-template<typename T, bool isNumber> class type_less : public type_compare<T, isNumber> {};// we are goint to specialize this for numeric T below
+template<typename T, bool isNumber> class type_less : public type_compare<T, isNumber> {};// we are going to specialize this for numeric T below
 template<typename T, bool isNumber> class type_greater : public type_compare<T, isNumber> {};
 template<typename T, bool isNumber> class type_eq : public type_compare<T, isNumber>
 {

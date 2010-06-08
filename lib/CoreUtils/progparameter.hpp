@@ -51,7 +51,7 @@ public:
 	 * (The value is used as default value if the parameter never gets to parse any other value)
 	 * \param needed mark this parameter as needed
 	 */
-	template<typename T> ProgParameter( const T& ref, bool needed = true ): PropertyValue( ref, _needed ) {}
+	template<typename T> ProgParameter( const T& ref, bool needed = true ): PropertyValue( ref, needed ) {}
 	/**
 	 * Parse the given string as value into this parameter.
 	 * The parsing is done by automatic type-conversion from std::string to the type of the parameter.
