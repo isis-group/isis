@@ -35,10 +35,29 @@ protected:
 	virtual boost::shared_ptr<_internal::MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;
 public:
 	ParameterMap parameters;
+	/**
+	 * Default Constructor.
+	 * Creates the application and its parameter map.
+	 * No programm parameter is parsed here. To do that use init()
+	 * \param name name of the application. 
+	 */
 	Application( const char name[] );
 	virtual ~Application();
+
+	/**
+	 * Initializes the programm parameter map using argc/argv.
+	 * For every entry in parameters an corresponding command line parameter is searched and parsed.
+	 * A command line parameter corresponds to an entry of parameters if it string-equals caseless to this entry and is preceded by "-".
+	 * \param argc ammount of command line parameters in argv
+	 * \param argv array of const char[] containing the command line parameters
+	 */
 	virtual bool init( int argc, char **argv, bool exitOnError = true );
+	/**
+	 * Virtual function to display a short help text.
+	 * Ths usually shall print the programm name plus all entries of parameters with their description.
+	 */
 	virtual void printHelp()const;
+	/// Set the logging level for the specified module
 	template<typename MODULE> void setLog( LogLevel level ) {
 		if ( !MODULE::use );
 		else _internal::Log<MODULE>::setHandler( getLogHandler( MODULE::name(), level ) );

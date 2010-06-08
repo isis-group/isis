@@ -9,6 +9,7 @@ namespace isis
 namespace util
 {
 
+///Class to store a rgb tripel of type T.
 template<typename T> struct color {
 	T r, g, b;
 	bool operator==( const color &other )const {
@@ -24,9 +25,9 @@ typedef color<u_int16_t> rgb_color48;
 }
 }
 
-///Streaming output
 namespace std
 {
+///Streaming output for color using isis::util::write_list
 template<typename charT, typename traits, typename T>
 basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::color<T>& s )
 {
