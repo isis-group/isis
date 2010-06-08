@@ -20,8 +20,6 @@ namespace isis
 namespace util
 {
 
-class PropMap; // predef PropMap
-
 typedef std::list<int> ilist;
 typedef std::list<double> dlist;
 typedef std::list<std::string> slist;
@@ -31,14 +29,14 @@ namespace _internal
 {
 
 /// the supported types as mpl-vector
-typedef boost::mpl::vector25 < //increase this if a type is added (if >30 consider including vector40 above)
+typedef boost::mpl::vector24 < //increase this if a type is added (if >30 consider including vector40 above)
 bool, char
 , int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t
 , float, double
 , rgb_color24, rgb_color48
 , fvector4, dvector4, ivector4
 , ilist, dlist, slist
-, PropMap, std::string, Selection
+, std::string, Selection
 , boost::posix_time::ptime, boost::gregorian::date
 > types;
 
@@ -50,8 +48,8 @@ bool, char
 template<class T> struct TypeId {
 	typedef typename boost::mpl::distance <
 	typename boost::mpl::begin<types>::type,
-	typename boost::mpl::find<types, T>::type
-	>::type type;
+			 typename boost::mpl::find<types, T>::type
+			 >::type type;
 	static const int value = type::value;
 };
 }

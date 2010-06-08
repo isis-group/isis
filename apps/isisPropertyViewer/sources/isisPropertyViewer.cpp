@@ -114,7 +114,7 @@ void isisPropertyViewer::createTree( const boost::shared_ptr<isis::data::Image> 
 	header << headerProp << headerVal;
 	QTreeWidgetItem *headItem = new QTreeWidgetItem( header );
 	this->ui.treeWidget->addTopLevelItem( headItem );
-	m_keyList = image->keys();
+	m_keyList = image->getKeys();
 	BOOST_FOREACH( PropKeyListType::const_reference ref, m_keyList ) {
 		addPropToTree( image, ref, headItem );
 	}
@@ -122,7 +122,7 @@ void isisPropertyViewer::createTree( const boost::shared_ptr<isis::data::Image> 
 
 	//go through all the chunks
 	for ( isis::data::Image::ChunkIterator chunkIterator = image->chunksBegin(); chunkIterator != image->chunksEnd(); chunkIterator++ ) {
-		m_keyList = chunkIterator->keys();
+		m_keyList = chunkIterator->getKeys();
 
 		if ( not m_keyList.empty() ) {
 			QString headerProp, headerVal;
@@ -155,10 +155,10 @@ void isisPropertyViewer::addChildToItem( QTreeWidgetItem *item, const QString &p
 
 void isisPropertyViewer::addPropToTree( const boost::shared_ptr<isis::data::Image> image, PropKeyListType::const_reference propIterator, QTreeWidgetItem *currentHeadItem )
 {
-	LOG_IF( image->getPropertyValue( propIterator ).empty(), isis::CoreLog, isis::error ) << "Property " << propIterator << " is empty";
+	LOG_IF( image->propertyValue( propIterator ).empty(), isis::CoreLog, isis::error ) << "Property " << propIterator << " is empty";
 
-	if ( not image->getPropertyValue( propIterator ).empty() ) {
-		if ( image->getPropertyValue( propIterator )->is<isis::util::fvector4>() ) {
+	if ( not image->propertyValue( propIterator ).empty() ) {
+		if ( image->propertyValue( propIterator )->is<isis::util::fvector4>() ) {
 			std::vector<QString> stringVec;
 			QTreeWidgetItem *vectorItem = new QTreeWidgetItem( QStringList( tr( propIterator.c_str() ) ) );
 			currentHeadItem->addChild( vectorItem );
@@ -175,8 +175,8 @@ void isisPropertyViewer::addPropToTree( const boost::shared_ptr<isis::data::Imag
 			addChildToItem( vectorItem, tr( "t" ), stringVec[3], tr( "float" ) );
 		} else {
 			addChildToItem( currentHeadItem, tr( propIterator.c_str() ),
-							tr( image->getPropertyValue( propIterator ).toString( false ).c_str() ),
-							tr( image->getPropertyValue( propIterator )->typeName().c_str() ) );
+							tr( image->propertyValue( propIterator )->toString( false ).c_str() ),
+							tr( image->propertyValue( propIterator )->typeName().c_str() ) );
 		}
 	} else {
 		addChildToItem( currentHeadItem, tr( propIterator.c_str() ), tr( "empty" ) , tr( "none" ) );
@@ -213,13 +213,13 @@ void isisPropertyViewer::edit_item( QTreeWidgetItem *item, int val )
 			}
 
 			std::string propName = tmpItem->text( 0 ).toStdString();
-			const isis::util::PropertyValue &tmpProp = m_propHolder.m_propHolderMap.find( currentFileName )->second.getPropertyValue( propName );
+			const isis::util::PropertyValue &tmpProp = m_propHolder.m_propHolderMap.find( currentFileName )->second.propertyValue( propName );
 
 			if ( not tmpProp->is<isis::util::fvector4>() ) {
 				isis::util::Type<std::string> myVal( val.toStdString() );
 				isis::util::_internal::TypeBase::convert( myVal, *tmpProp );
 			} else {
-				isis::util::fvector4 &tmpVector = tmpPropMap[propName]->cast_to_Type<isis::util::fvector4>();
+				isis::util::fvector4 &tmpVector = tmpPropMap.propertyValue( propName )->cast_to_Type<isis::util::fvector4>();
 
 				//TODO no method to get line of the current child item???
 				if ( item->text( 0 ).toStdString() == "x" ) {
@@ -236,7 +236,7 @@ void isisPropertyViewer::edit_item( QTreeWidgetItem *item, int val )
 					std::cout << "tmpVector" << tmpVector << std::endl;
 				}
 
-				m_propHolder.m_propHolderMap.find( currentFileName )->second.setPropertyValue( propName, tmpVector );
+				m_propHolder.m_propHolderMap.find( currentFileName )->second.propertyValue( propName ) = tmpVector ;
 			}
 
 			item->setText( 1, val );

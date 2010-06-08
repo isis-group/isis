@@ -50,8 +50,8 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 	std::list<data::Chunk> list( img.chunksBegin(), img.chunksEnd() );
 	unsigned short i = 0;
 	BOOST_FOREACH( const data::Chunk & ref, list ) {
-		BOOST_REQUIRE( ref.getPropertyValue( "indexOrigin" ) == util::fvector4( 0, 0, i, 0 ) );
-		BOOST_REQUIRE( ref.getPropertyValue( "acquisitionNumber" ) == i++ );
+		BOOST_REQUIRE( ref.propertyValue( "indexOrigin" ) == util::fvector4( 0, 0, i, 0 ) );
+		BOOST_REQUIRE( ref.propertyValue( "acquisitionNumber" ) == i++ );
 	}
 	//Get a list of properties from the chunks in the image
 	//List of the properties shall be as if every chunk of the image was asked for the property
@@ -68,8 +68,8 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 	BOOST_REQUIRE( img.insertChunk( ch ) );
 	data::Image::ChunkIterator it = img.chunksEnd();
 	//as all other chunks where timestep 0 this must be at the end
-	BOOST_CHECK( ( --it )->getPropertyValue( "indexOrigin" ) == util::fvector4( 0, 0, 0, 1 ) );
-	BOOST_CHECK( ( it )->getPropertyValue( "acquisitionNumber" ) == int( 4 ) );
+	BOOST_CHECK( ( --it )->propertyValue( "indexOrigin" ) == util::fvector4( 0, 0, 0, 1 ) );
+	BOOST_CHECK( ( it )->propertyValue( "acquisitionNumber" ) == int( 4 ) );
 }
 
 BOOST_AUTO_TEST_CASE ( image_chunk_test )
@@ -97,17 +97,17 @@ BOOST_AUTO_TEST_CASE ( image_chunk_test )
 	const data::Chunk &ref22 = img.getChunk( 1, 1, 1, 1 );
 	const data::Chunk &ref21 = img.getChunk( 0, 0, 0, 1 );
 	const data::Chunk &ref23 = img.getChunk( 2, 2, 2, 1 );
-	BOOST_CHECK_EQUAL( ref11.getPropertyValue( "indexOrigin" ), util::fvector4( 0, 0, 0, 0 ) );
-	BOOST_CHECK_EQUAL( ref12.getPropertyValue( "indexOrigin" ), util::fvector4( 0, 0, 1, 0 ) );
-	BOOST_CHECK_EQUAL( ref13.getPropertyValue( "indexOrigin" ), util::fvector4( 0, 0, 2, 0 ) );
-	BOOST_CHECK_EQUAL( ref11.getPropertyValue( "acquisitionNumber" ), 0 );
-	BOOST_CHECK_EQUAL( ref12.getPropertyValue( "acquisitionNumber" ), 1 );
-	BOOST_CHECK_EQUAL( ref13.getPropertyValue( "acquisitionNumber" ), 2 );
-	BOOST_CHECK_EQUAL( ref21.getPropertyValue( "acquisitionNumber" ), 3 );
-	BOOST_CHECK_EQUAL( ref22.getPropertyValue( "acquisitionNumber" ), 4 );
-	BOOST_CHECK_EQUAL( ref23.getPropertyValue( "acquisitionNumber" ), 5 );
-	BOOST_CHECK_EQUAL( ref22.getPropertyValue( "indexOrigin" ), util::fvector4( 0, 0, 1, 1 ) );
-	BOOST_CHECK( not ( ref22.getPropertyValue( "indexOrigin" ) == util::fvector4( 0, 0, 1, 0 ) ) );
+	BOOST_CHECK_EQUAL( ref11.propertyValue( "indexOrigin" ), util::fvector4( 0, 0, 0, 0 ) );
+	BOOST_CHECK_EQUAL( ref12.propertyValue( "indexOrigin" ), util::fvector4( 0, 0, 1, 0 ) );
+	BOOST_CHECK_EQUAL( ref13.propertyValue( "indexOrigin" ), util::fvector4( 0, 0, 2, 0 ) );
+	BOOST_CHECK_EQUAL( ref11.propertyValue( "acquisitionNumber" ), 0 );
+	BOOST_CHECK_EQUAL( ref12.propertyValue( "acquisitionNumber" ), 1 );
+	BOOST_CHECK_EQUAL( ref13.propertyValue( "acquisitionNumber" ), 2 );
+	BOOST_CHECK_EQUAL( ref21.propertyValue( "acquisitionNumber" ), 3 );
+	BOOST_CHECK_EQUAL( ref22.propertyValue( "acquisitionNumber" ), 4 );
+	BOOST_CHECK_EQUAL( ref23.propertyValue( "acquisitionNumber" ), 5 );
+	BOOST_CHECK_EQUAL( ref22.propertyValue( "indexOrigin" ), util::fvector4( 0, 0, 1, 1 ) );
+	BOOST_CHECK( not ( ref22.propertyValue( "indexOrigin" ) == util::fvector4( 0, 0, 1, 0 ) ) );
 	BOOST_CHECK_EQUAL( ref11.voxel<float>( 0, 0 ), 42 );
 	BOOST_CHECK_EQUAL( ref12.voxel<float>( 1, 1 ), 42 );
 	BOOST_CHECK_EQUAL( ref13.voxel<float>( 2, 2 ), 42 );

@@ -64,7 +64,7 @@ public:
 	template<typename TImage> static typename TImage::Pointer
 	makeItkImageObject( const boost::shared_ptr<data::Image> src, const bool behaveAsItkReader = true ) {
 		typedef TImage OutputImageType;
-		itkAdapter* myAdapter = new itkAdapter( src );
+		itkAdapter *myAdapter = new itkAdapter( src );
 
 		switch ( src->chunksBegin()->typeID() ) {
 		case util::TypePtr<int8_t>::staticID:
@@ -170,7 +170,7 @@ public:
 protected:
 	//should not be loaded directly
 	itkAdapter( const boost::shared_ptr<data::Image> src ) : m_ImageISIS( src ) {};
-	itkAdapter( const itkAdapter& ) {};
+	itkAdapter( const itkAdapter & ) {};
 	itkAdapter() {};
 private:
 
@@ -249,11 +249,11 @@ private:
 		rescaler->Update();
 		outputImage = rescaler->GetOutput();
 		//since itk properties do not match the isis properties we need to define metaproperties to prevent data loss
-		propKeyList  = m_ImageISIS->keys();
+		propKeyList  = m_ImageISIS->getKeys();
 		PropKeyListType::const_iterator propIter;
 
 		for ( propIter = propKeyList.begin(); propIter != propKeyList.end(); propIter++ ) {
-			itk::EncapsulateMetaData<std::string>( myItkDict, *propIter, m_ImageISIS->getPropertyValue( *propIter ).toString() );
+			itk::EncapsulateMetaData<std::string>( myItkDict, *propIter, m_ImageISIS->getProperty<std::string>( *propIter ) );
 		}
 
 		outputImage->SetMetaDataDictionary( myItkDict );

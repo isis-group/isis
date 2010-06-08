@@ -142,7 +142,7 @@ public:
 	 * \returns reference to the (just changed) target
 	 */
 	TypeReference<TYPE_TYPE>& operator=( const TypeReference<TYPE_TYPE> &src ) {
-		reset( src.empty() ? 0 : src->clone() );
+		boost::scoped_ptr<TYPE_TYPE>::reset( src.empty() ? 0 : src->clone() );
 		return *this;
 	}
 	/**
@@ -151,12 +151,12 @@ public:
 	 * \returns reference to the (just changed) target
 	 */
 	TypeReference<TYPE_TYPE>& operator=( const TYPE_TYPE &src ) {
-		reset( src.clone() );
+		boost::scoped_ptr<TYPE_TYPE>::reset( src.clone() );
 		return *this;
 	}
 	/// \returns true if "contained" type has no value (a.k.a. is undefined)
 	bool empty()const {
-		return this->get() == NULL;
+		return boost::scoped_ptr<TYPE_TYPE>::get() == NULL;
 	}
 	const std::string toString( bool label = false )const {
 		if ( empty() )
@@ -209,16 +209,16 @@ public:
 	template<class T> T as()const {
 		if ( typeID() == Type<T>::staticID ) {
 			LOG( Debug, verbose_info )
-			<< "Doing reinterpret_cast instead of useless conversion from " << toString( true )
-			<< " to " << Type<T>::staticName();
+					<< "Doing reinterpret_cast instead of useless conversion from " << toString( true )
+					<< " to " << Type<T>::staticName();
 			return *reinterpret_cast<const Type<T>*>( this );
 		} else {
 			Type<T> ret;
 
 			if ( not convert( *this, ret ) ) {
 				LOG( Debug, error )
-				<< "Interpretation of " << toString( true ) << " as " << Type<T>::staticName()
-				<< " failed. Returning " << Type<T>().toString() << ".";
+						<< "Interpretation of " << toString( true ) << " as " << Type<T>::staticName()
+						<< " failed. Returning " << Type<T>().toString() << ".";
 				return T();
 			} else
 				return ret;
@@ -369,7 +369,7 @@ public:
 	 * \param max TypeBase::Reference for the current greatest value
 	 * \param min TypeBase::Reference for the current lowest value
 	 */
-	virtual void getMinMax( TypeBase::Reference &min, TypeBase::Reference& max )const = 0;
+	virtual void getMinMax( TypeBase::Reference &min, TypeBase::Reference &max )const = 0;
 	virtual size_t cmp( size_t start, size_t end, const TypePtrBase &dst, size_t dst_start )const = 0;
 	size_t cmp( const TypePtrBase &comp )const;
 };

@@ -13,8 +13,6 @@
 /// @cond _hidden
 
 #include "type.hpp"
-#include "property.hpp"
-#include "propmap.hpp"
 #include "types.hpp"
 
 namespace isis
@@ -64,7 +62,6 @@ DEF_TYPE( slist, list<string> );
 
 DEF_TYPE( std::string, string );
 DEF_TYPE( Selection, selection );
-DEF_TYPE( PropMap, PropertyMap );
 DEF_TYPE( boost::posix_time::ptime, timestamp );
 DEF_TYPE( boost::gregorian::date, date );
 }

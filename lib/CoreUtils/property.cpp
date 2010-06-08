@@ -47,11 +47,19 @@ bool PropertyValue::transformTo( PropertyValue &dst, int typeId )const
 	_internal::TypeBase::Converter conv = src.getConverterTo( typeId );
 
 	if ( conv ) {
-		conv->generate( *this, dst );
-		return true;
+		switch( conv->generate( *this, dst ) ) {
+		case boost::numeric::cPosOverflow:
+			LOG( Runtime, warning ) << "Conversion of " << *this << " failed with positive overflow";
+			return false;
+		case boost::numeric::cNegOverflow:
+			LOG( Runtime, warning ) << "Conversion of " << *this << " failed with negative overflow";
+			return false;
+		case boost::numeric::cInRange:
+			return true;
+		}
 	} else
 		LOG( Runtime, error )
-		<< "Cannot transform " << src.toString( true ) << " no converter available";
+				<< "Cannot transform " << src.toString( true ) << " no converter available";
 
 	// @todo we need a typeId to typeName mapping
 	return false;

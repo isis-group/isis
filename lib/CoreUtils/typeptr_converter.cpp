@@ -22,7 +22,6 @@
 #include "type_converter.hpp"
 #include "type_base.hpp"
 #include "numeric_convert.hpp"
-#include "propmap.hpp" // we must have all types here and PropMap was only forward-declared in types.hpp
 #include <boost/mpl/for_each.hpp>
 #include <boost/type_traits/is_arithmetic.hpp>
 #include <boost/mpl/and.hpp>
@@ -41,7 +40,7 @@ template<typename SRC, typename DST> class TypePtrGenerator: public TypePtrConve
 public:
 	void generate( const boost::scoped_ptr<TypePtrBase>& src, boost::scoped_ptr<TypePtrBase>& dst, const TypeBase &min, const TypeBase &max )const {
 		LOG_IF( dst.get(), Debug, warning ) <<
-		"Generating into existing value " << dst->toString( true );
+											"Generating into existing value " << dst->toString( true );
 		TypePtr<DST> *ref = new TypePtr<DST>;
 		convert( src->cast_to_TypePtr<SRC>(), *ref, min, max );
 		dst.reset( ref );
@@ -69,7 +68,7 @@ template<bool NUMERIC, typename SRC, typename DST> class TypePtrConverter<NUMERI
 {
 	TypePtrConverter() {
 		LOG( Debug, verbose_info )
-		<< "Creating trivial copy converter for " << TypePtr<SRC>::staticName();
+				<< "Creating trivial copy converter for " << TypePtr<SRC>::staticName();
 	};
 public:
 	static boost::shared_ptr<const TypePtrConverterBase> create() {
@@ -91,8 +90,8 @@ template<typename SRC, typename DST> class TypePtrConverter<true, false, SRC, DS
 {
 	TypePtrConverter() {
 		LOG( Debug, verbose_info )
-		<< "Creating numeric converter from "
-		<< TypePtr<SRC>::staticName() << " to " << TypePtr<DST>::staticName();
+				<< "Creating numeric converter from "
+				<< TypePtr<SRC>::staticName() << " to " << TypePtr<DST>::staticName();
 	};
 public:
 	static boost::shared_ptr<const TypePtrConverterBase> create() {
@@ -141,7 +140,7 @@ TypePtrConverterMap::TypePtrConverterMap()
 {
 	boost::mpl::for_each<types>( outer_TypePtrConverter( *this ) );
 	LOG( Debug, info )
-	<< "conversion map for " << size() << " array-types created";
+			<< "conversion map for " << size() << " array-types created";
 }
 
 }
