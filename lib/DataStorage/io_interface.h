@@ -42,7 +42,7 @@ protected:
 	template<typename TYPE> static bool
 	transformOrTell( const std::string &from, const std::string &to, util::PropMap &object, LogLevel level ) {
 		if ( hasOrTell( from, object, level ) and object.transform<TYPE>( from, to ) ) {
-			LOG( Debug, verbose_info ) << "Transformed " << from << " into " << object[to];
+			LOG( Debug, verbose_info ) << "Transformed " << from << " into " << object.propertyValue(to);
 			return true;
 		}
 

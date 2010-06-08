@@ -96,7 +96,7 @@ public:
 						//OK, the source image and file pointer are managed by the chunk, we must release them
 						img.release();
 						dcfile.release();
-						ImageFormat_Dicom::dcmObject2PropMap( dcdata, ret->propertyBranch( ImageFormat_Dicom::dicomTagTreeName ) );
+						ImageFormat_Dicom::dcmObject2PropMap( dcdata, ret->branch( ImageFormat_Dicom::dicomTagTreeName ) );
 					}
 				} else if ( pix->getPlanes() == 3 ) { //try to load data as color image
 					switch ( pix->getRepresentation() ) {
@@ -111,7 +111,7 @@ public:
 					}
 
 					if ( ret ) {
-						ImageFormat_Dicom::dcmObject2PropMap( dcdata, ret->propertyBranch( ImageFormat_Dicom::dicomTagTreeName ) );
+						ImageFormat_Dicom::dcmObject2PropMap( dcdata, ret->branch( ImageFormat_Dicom::dicomTagTreeName ) );
 					}
 				} else {
 					FileFormat::throwGenericError( "Unsupported pixel type." );
@@ -153,11 +153,11 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 
 	// compute sequenceStart and acquisitionTime (have a look at table C.10.8 in the standart)
 	if ( hasOrTell( prefix + "SeriesTime", object, warning ) && hasOrTell( prefix + "SeriesDate", object, warning ) ) {
-		const ptime sequenceStart = genTimeStamp( object[prefix+"SeriesDate"]->as<date>(), object[prefix+"SeriesTime"]->as<ptime>() );
+		const ptime sequenceStart = genTimeStamp( object.getProperty<date>(prefix+"SeriesDate"), object.getProperty<ptime>(prefix+"SeriesTime") );
 
 		// compute acquisitionTime
 		if ( hasOrTell( prefix + "AcquisitionTime", object, warning ) and hasOrTell( prefix + "AcquisitionDate", object, warning ) ) {
-			const ptime acTime = genTimeStamp( object[prefix+"AcquisitionDate"]->as<date>(), object[prefix+"AcquisitionTime"]->as<ptime>() );
+			const ptime acTime = genTimeStamp( object.getProperty<date>(prefix+"AcquisitionDate"), object.getProperty<ptime>(prefix+"AcquisitionTime") );
 			const boost::posix_time::time_duration acDist = acTime - sequenceStart;
 			const float fAcDist = float( acDist.ticks() ) / acDist.ticks_per_second();
 			LOG( Debug, verbose_info ) << "Computed acquisitionTime as " << fAcDist;
@@ -183,13 +183,13 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 		util::fvector4 voxelSize( invalid_float, invalid_float, invalid_float, invalid_float );
 
 		if ( hasOrTell( prefix + "PixelSpacing", object, warning ) ) {
-			voxelSize = object[prefix+"PixelSpacing"]->as<util::fvector4>();
+			voxelSize = object.getProperty<util::fvector4>(prefix+"PixelSpacing");
 			object.remove( prefix + "PixelSpacing" );
 			std::swap( voxelSize[0], voxelSize[1] ); // the values are row-spacing (size in phase dir) /column spacing (size in read dir)
 		}
 
 		if ( hasOrTell( prefix + "SliceThickness", object, warning ) ) {
-			voxelSize[2] = object[prefix+"SliceThickness"]->as<float>();
+			voxelSize[2] = object.getProperty<float>(prefix+"SliceThickness");
 			object.remove( prefix + "SliceThickness" );
 		}
 
@@ -197,12 +197,12 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 		util::fvector4 voxelGap; //find a more robust way to determine inplane voxelGap
 
 		if ( hasOrTell( prefix + "RepetitionTime", object, warning ) ) {
-			voxelGap[3] = object[prefix+"RepetitionTime"]->as<float>() / 1000;
+			voxelGap[3] = object.getProperty<float>(prefix+"RepetitionTime") / 1000;
 			object.remove( prefix + "RepetitionTime" );
 		}
 
 		if ( hasOrTell( prefix + "SpacingBetweenSlices", object, info ) ) {
-			voxelGap[2] = object[prefix+"SpacingBetweenSlices"]->as<float>();
+			voxelGap[2] = object.getProperty<float>(prefix+"SpacingBetweenSlices");
 
 			if ( voxelSize[2] != invalid_float )
 				voxelGap[2] -= voxelSize[2]; //SpacingBetweenSlices is the distance between the centers of the slices - so substract the slice SliceThickness here
@@ -217,7 +217,7 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 	transformOrTell<u_int16_t>     ( prefix + "NumberOfAverages",        "numberOfAverages",   object, warning );
 
 	if ( hasOrTell( prefix + "ImageOrientationPatient", object, info ) ) {
-		util::dlist buff = object[prefix+"ImageOrientationPatient"]->as<util::dlist>();
+		util::dlist buff = object.getProperty<util::dlist>(prefix+"ImageOrientationPatient");
 
 		if ( buff.size() == 6 ) {
 			util::fvector4 read, phase;
@@ -231,7 +231,7 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 			object.setProperty( "phaseVec", phase );
 			object.remove( prefix + "ImageOrientationPatient" );
 		} else {
-			LOG( Runtime, error ) << "Could not extract read- and phaseVector from " << object[prefix+"ImageOrientationPatient"];
+			LOG( Runtime, error ) << "Could not extract read- and phaseVector from " << object.propertyValue(prefix+"ImageOrientationPatient");
 		}
 	} else {
 		LOG( Runtime, warning ) << "Making up read and phase vector, because the image lacks this information";
@@ -240,9 +240,9 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 	}
 
 	if ( hasOrTell( prefix + "ImagePositionPatient", object, info ) ) {
-		object["indexOrigin"] = object.getPropertyValue( prefix + "ImagePositionPatient" )->as<util::fvector4>();
+		object.setProperty("indexOrigin", object.getProperty<util::fvector4>( prefix + "ImagePositionPatient" ));
 	} else {
-		object["indexOrigin"] = util::fvector4();
+		object.setProperty("indexOrigin", util::fvector4());
 		LOG( Runtime, warning ) << "Making up indexOrigin, because the image lacks this information";
 	}
 
@@ -251,7 +251,7 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 	if ( hasOrTell( prefix + "PatientsSex", object, warning ) ) {
 		util::Selection isisGender( "male,female,other" );
 
-		switch ( object[prefix+"PatientsSex"]->as<std::string>()[0] ) {
+		switch ( object.getProperty<std::string>(prefix+"PatientsSex")[0] ) {
 		case 'M':
 			isisGender.set( "male" );
 			break;
@@ -262,10 +262,10 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 			isisGender.set( "other" );
 			break;
 		default:
-			LOG( Runtime, error ) << "Dicom gender code " << util::MSubject( object[prefix+"ImageOrientationPatient"] ) <<  " not known";
+			LOG( Runtime, error ) << "Dicom gender code " << util::MSubject( object.propertyValue(prefix+"ImageOrientationPatient") ) <<  " not known";
 		}
 
-		object["subjectGender"] = isisGender;
+		object.propertyValue("subjectGender") = isisGender;
 		object.remove( prefix + "PatientsSex" );
 	}
 
@@ -274,8 +274,8 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 	////////////////////////////////////////////////////////////////
 
 	if ( object.hasProperty( prefix + "Unknown Tag(0019,1015)" ) ) {
-		const util::fvector4 &org = object["indexOrigin"]->cast_to_Type<util::fvector4>();
-		const util::PropertyValue &comp = object.getPropertyValue( prefix + "Unknown Tag(0019,1015)" );
+		const util::fvector4 org = object.getProperty<util::fvector4>("indexOrigin");
+		const util::PropertyValue &comp = object.propertyValue( prefix + "Unknown Tag(0019,1015)" );
 
 		if ( comp == org ) // will use the more lazy comparison because org is not a Type
 			object.remove( prefix + "Unknown Tag(0019,1015)" );
@@ -312,7 +312,7 @@ void ImageFormat_Dicom::readMosaic( const data::Chunk &source, data::ChunkList &
 	}
 
 	// All is fine, lets start
-	u_int16_t images = source.getPropertyValue( NumberOfImagesInMosaicProp )->as<u_int16_t>();
+	u_int16_t images = source.getProperty<u_int16_t>( NumberOfImagesInMosaicProp );
 	util::FixedVector<size_t, 4> size = source.sizeToVector();
 	const u_int16_t matrixSize = std::ceil( std::sqrt( images ) );
 	size[0] /= matrixSize;
@@ -339,7 +339,7 @@ void ImageFormat_Dicom::readMosaic( const data::Chunk &source, data::ChunkList &
 	newChunk->setProperty( prefix + "ImageType", iType );
 	//remove the additional mosaic offset and recalc the fov if given
 	//eg. if there is a 10x10 Mosaic, substract the half size of 9 Images from the indexOrigin
-	util::fvector4 &origin = newChunk->getPropertyValue( "indexOrigin" )->cast_to_Type<util::fvector4>();
+	util::fvector4 &origin = newChunk->propertyValue( "indexOrigin" )->cast_to_Type<util::fvector4>();
 	const util::fvector4 voxelSize = newChunk->getProperty<util::fvector4>( "voxelSize" );
 	util::fvector4 voxelGap;
 
@@ -349,15 +349,15 @@ void ImageFormat_Dicom::readMosaic( const data::Chunk &source, data::ChunkList &
 	const util::fvector4 fovCorr = newChunk->getFoV( voxelSize, voxelGap ) / 2 * ( matrixSize - 1 );
 	const util::fvector4 offset = ( newChunk->getProperty<util::fvector4>( "readVec" ) * fovCorr[0] ) + ( newChunk->getProperty<util::fvector4>( "phaseVec" ) * fovCorr[1] );
 	origin = origin + offset;
-	LOG( Debug, info ) << "New origin: " << newChunk->getPropertyValue( "indexOrigin" );
+	LOG( Debug, info ) << "New origin: " << newChunk->propertyValue( "indexOrigin" );
 
 	if ( newChunk->hasProperty( "fov" ) ) {
-		util::fvector4 &ref = newChunk->getPropertyValue( "fov" )->cast_to_Type<util::fvector4>();
+		util::fvector4 &ref = newChunk->propertyValue( "fov" )->cast_to_Type<util::fvector4>();
 		ref[0] /= matrixSize;
 		ref[1] /= matrixSize;
 		LOG_IF( ref[2] != invalid_float, Runtime, warning ) << "Overriding defined slice FoV in mosaic image";
 		ref[2] = newChunk->getFoV( voxelSize, voxelGap )[2];
-		LOG( Debug, info ) << "New fov: " << newChunk->getPropertyValue( "fov" );
+		LOG( Debug, info ) << "New fov: " << newChunk->propertyValue( "fov" );
 	}
 
 	dest.push_back( *newChunk );

@@ -25,8 +25,7 @@ void FileFormat::write( const isis::data::ImageList &images, const std::string &
 				continue;
 			}
 
-			std::string snum = ref->getPropertyValue( "sequenceNumber" )->toString();
-			std::string unique_name = std::string( "S" ) + snum + "_" + file;
+			std::string unique_name = std::string( "S" ) + ref->getProperty<std::string>( "sequenceNumber" ) + "_" + file;
 			LOG( Runtime, info )   << "Writing image to " <<  path / unique_name;
 			write( *ref, ( path / unique_name ).string(), dialect );
 		}

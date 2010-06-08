@@ -103,23 +103,23 @@ bool Image::insertChunk ( const Chunk &chunk )
 			return false;
 		}
 
-		if ( first.getPropertyValue( "readVec" ) != chunk.getPropertyValue( "readVec" ) ) {
+		if ( first.propertyValue( "readVec" ) != chunk.propertyValue( "readVec" ) ) {
 			LOG( Debug, info )
-					<< "Ignoring chunk with different readVec. (" << chunk.getPropertyValue( "readVec" ) << "!=" << first.getPropertyValue( "readVec" ) << ")";
+					<< "Ignoring chunk with different readVec. (" << chunk.propertyValue( "readVec" ) << "!=" << first.propertyValue( "readVec" ) << ")";
 			return false;
 		}
 
-		if ( first.getPropertyValue( "phaseVec" ) != chunk.getPropertyValue( "phaseVec" ) ) {
+		if ( first.propertyValue( "phaseVec" ) != chunk.propertyValue( "phaseVec" ) ) {
 			LOG( Debug, info )
-					<< "Ignoring chunk with different phaseVec. (" << chunk.getPropertyValue( "phaseVec" ) << "!=" << first.getPropertyValue( "phaseVec" ) << ")";
+					<< "Ignoring chunk with different phaseVec. (" << chunk.propertyValue( "phaseVec" ) << "!=" << first.propertyValue( "phaseVec" ) << ")";
 			return false;
 		}
 
 		//if our first chunk and the incoming chunk do have sequenceNumber and it differs, skip it
-		if ( first.getPropertyValue( "sequenceNumber" ) != chunk.getPropertyValue( "sequenceNumber" ) ) {
+		if ( first.propertyValue( "sequenceNumber" ) != chunk.propertyValue( "sequenceNumber" ) ) {
 			LOG( Debug, info )
 					<< "Ignoring chunk because its sequenceNumber doesn't fit ("
-					<< first.getPropertyValue( "sequenceNumber" ) << "!=" << chunk.getPropertyValue( "sequenceNumber" )
+					<< first.propertyValue( "sequenceNumber" ) << "!=" << chunk.propertyValue( "sequenceNumber" )
 					<< ")";
 			return false;
 		}
@@ -193,7 +193,7 @@ bool Image::reIndex()
 		size[i] = first.dimSize( i );
 
 	//get indexOrigin from the geometrically first chunk
-	setPropertyValue( "indexOrigin", first.getPropertyValue( "indexOrigin" ) );
+	propertyValue( "indexOrigin")=first.propertyValue( "indexOrigin" );
 
 	//if there are many chunks, they must leave at least on dimension to the image to sort them in
 	if ( chunk_dims >= Image::n_dims ) {
@@ -262,7 +262,7 @@ bool Image::reIndex()
 				LOG( Debug, info )
 						<< "used the distance between chunk 0 and " << size[2] - 1
 						<< " to synthesize the missing sliceVec as " << distVecNorm;
-				setProperty( "sliceVec", distVecNorm );
+				propertyValue( "sliceVec")=distVecNorm;
 			}
 		}
 
@@ -279,7 +279,7 @@ bool Image::reIndex()
 					setProperty( "voxelGap", util::fvector4( inf, inf, inf, inf ) );
 				}
 
-				util::fvector4 &voxelGap = operator[]( "voxelGap" )->cast_to_Type<util::fvector4>(); //if there is no voxelGap yet, we create it
+				util::fvector4 &voxelGap = propertyValue( "voxelGap" )->cast_to_Type<util::fvector4>(); //if there is no voxelGap yet, we create it
 
 				if ( voxelGap[2] != inf ) {
 					if ( not util::fuzzyEqual( voxelGap[2], sliceDist ) ) {
@@ -299,8 +299,8 @@ bool Image::reIndex()
 
 	//if we have read- and phase- vector
 	if ( hasProperty( "readVec" ) and hasProperty( "phaseVec" ) ) {
-		util::fvector4 &read = operator[]( "readVec" )->cast_to_Type<util::fvector4>();
-		util::fvector4 &phase = operator[]( "phaseVec" )->cast_to_Type<util::fvector4>();
+		util::fvector4 &read = propertyValue( "readVec" )->cast_to_Type<util::fvector4>();
+		util::fvector4 &phase = propertyValue( "phaseVec" )->cast_to_Type<util::fvector4>();
 		read.norm();
 		phase.norm();
 		LOG_IF( read.dot( phase ) > 0.01, Runtime, warning ) << "The cosine between the columns and the rows of the image is bigger than 0.01";
@@ -311,7 +311,7 @@ bool Image::reIndex()
 										);
 
 		if ( hasProperty( "sliceVec" ) ) {
-			util::fvector4 &sliceVec = operator[]( "sliceVec" )->cast_to_Type<util::fvector4>(); //get the slice vector
+			util::fvector4 &sliceVec = propertyValue( "sliceVec" )->cast_to_Type<util::fvector4>(); //get the slice vector
 			sliceVec.norm(); // norm it
 			LOG_IF( not crossVec.fuzzyEqual( sliceVec ), Runtime, warning )
 					<< "The existing sliceVec " << sliceVec
@@ -328,7 +328,7 @@ bool Image::reIndex()
 	}
 
 	if ( hasProperty( "fov" ) ) {
-		util::fvector4 &propFoV = getPropertyValue( "fov" )->cast_to_Type<util::fvector4>();
+		util::fvector4 &propFoV = propertyValue( "fov" )->cast_to_Type<util::fvector4>();
 		util::fvector4 voxelGap;
 
 		if ( hasProperty( "voxelGap" ) ) {
@@ -456,7 +456,7 @@ std::list<util::PropertyValue> Image::getChunksProperties( const util::PropMap::
 	std::list<util::PropertyValue > ret;
 
 	for ( ChunkSet::const_iterator i = set.begin(); i != set.end(); i++ ) {
-		const util::PropertyValue &prop = i->getPropertyValue( key );
+		const util::PropertyValue &prop = i->propertyValue( key );
 
 		if ( unique && prop.empty() ) //if unique is requested and the property is empty
 			continue; //skip it

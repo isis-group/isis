@@ -67,7 +67,7 @@ void ImageFormat_Dicom::parseAS( DcmElement* elem, const std::string &name, util
 			<< "Missing age-type-letter, assuming days";
 		}
 
-		map[name] = duration;
+		map.propertyValue(name) = duration;
 		LOG( Debug, verbose_info )
 		<< "Parsed age for " << name << "(" <<  buff << ")"
 		<< " as " << duration << " days";
@@ -101,7 +101,7 @@ void ImageFormat_Dicom::parseDA( DcmElement* elem, const std::string &name, util
 		);
 		LOG( Debug, verbose_info )
 		<< "Parsed date for " << name << "(" <<  buff << ")" << " as " << date;
-		map[name] = date;
+		map.propertyValue(name) = date;
 	} else
 		LOG( Runtime, warning )
 		<< "Cannot parse Date string \"" << buff << "\" in the field \"" << name << "\"";
@@ -156,7 +156,7 @@ void ImageFormat_Dicom::parseTM( DcmElement* elem, const std::string &name, util
 	if ( ok ) {
 		LOG( Debug, verbose_info )
 		<< "Parsed time for " << name << "(" <<  buff << ")" << " as " << time;
-		map[name] = boost::posix_time::ptime( boost::gregorian::date( 1400, 1, 1 ), time );
+		map.propertyValue(name) = boost::posix_time::ptime( boost::gregorian::date( 1400, 1, 1 ), time );
 		//although TM is defined as time of day we dont have a day here, so we fake one
 	} else
 		LOG( Runtime, warning )
@@ -183,47 +183,47 @@ void ImageFormat_Dicom::parseScalar( DcmElement* elem, const std::string &name, 
 	case EVR_FL: {
 		Float32 buff;
 		elem->getFloat32( buff );
-		map[name] = buff;//if Float32 is float its fine, if not we will get an linker error here
+		map.propertyValue(name) = buff;//if Float32 is float its fine, if not we will get an linker error here
 	}
 	break;
 	case EVR_FD: {
 		Float64 buff;
 		elem->getFloat64( buff );
-		map[name] = buff;//if Float64 is double its fine, if not we will get an linker error here
+		map.propertyValue(name) = buff;//if Float64 is double its fine, if not we will get an linker error here
 	}
 	break;
 	case EVR_DS: { //Decimal String (can be floating point)
 		elem->getOFString( buff, 0 );
-		map[name] = boost::lexical_cast<double>( buff );
+		map.propertyValue(name) = boost::lexical_cast<double>( buff );
 	}
 	break;
 	case EVR_SL: { //signed long
 		Sint32 buff;
 		elem->getSint32( buff );
-		map[name] = buff;
+		map.propertyValue(name) = buff;
 	}
 	break;
 	case EVR_SS: { //signed short
 		Sint16 buff;
 		elem->getSint16( buff );
-		map[name] = buff;
+		map.propertyValue(name) = buff;
 	}
 	break;
 	case EVR_UL: { //unsigned long
 		Uint32 buff;
 		elem->getUint32( buff );
-		map[name] = buff;
+		map.propertyValue(name) = buff;
 	}
 	break;
 	case EVR_US: { //unsigned short
 		Uint16 buff;
 		elem->getUint16( buff );
-		map[name] = buff;
+		map.propertyValue(name) = buff;
 	}
 	break;
 	case EVR_IS: { //integer string
 		elem->getOFString( buff, 0 );
-		map[name] = boost::lexical_cast<int32_t>( buff );
+		map.propertyValue(name) = boost::lexical_cast<int32_t>( buff );
 	}
 	break;
 	case EVR_AE: //Application Entity (string)
@@ -236,7 +236,7 @@ void ImageFormat_Dicom::parseScalar( DcmElement* elem, const std::string &name, 
 	case EVR_UI: //Unique Identifier [0-9\.]
 	case EVR_PN: { //Person Name
 		elem->getOFString( buff, 0 );
-		map[name] = boost::lexical_cast<std::string>( buff );
+		map.propertyValue(name) = boost::lexical_cast<std::string>( buff );
 	}
 	break;
 	default: {
@@ -261,7 +261,7 @@ void ImageFormat_Dicom::parseVector( DcmElement* elem, const std::string &name, 
 		elem->getFloat32Array( buff );
 		util::fvector4 vector;
 		vector.copyFrom( buff, buff + len );
-		map[name] = vector;//if Float32 is float its fine, if not we will get an linker error here
+		map.propertyValue(name) = vector;//if Float32 is float its fine, if not we will get an linker error here
 	}
 	break;
 	case EVR_FD: {
@@ -269,14 +269,14 @@ void ImageFormat_Dicom::parseVector( DcmElement* elem, const std::string &name, 
 		elem->getFloat64Array( buff );
 		util::dvector4 vector;
 		vector.copyFrom( buff, buff + len );
-		map[name] = vector;//if Float64 is double its fine, if not we will get an linker error here
+		map.propertyValue(name) = vector;//if Float64 is double its fine, if not we will get an linker error here
 	}
 	break;
 	case EVR_IS: {
 		const util::ilist tokens = _internal::dcmtkListString2list<int>( elem );
 		util::ivector4 vector;
 		vector.copyFrom( tokens.begin(), tokens.end() );
-		map[name] = vector;
+		map.propertyValue(name) = vector;
 	}
 	break;
 	case EVR_SL: {
@@ -284,7 +284,7 @@ void ImageFormat_Dicom::parseVector( DcmElement* elem, const std::string &name, 
 		elem->getSint32Array( buff );
 		util::ivector4 vector;
 		vector.copyFrom( buff, buff + len );
-		map[name] = vector;
+		map.propertyValue(name) = vector;
 	}
 	break;
 	case EVR_US: {
@@ -292,20 +292,20 @@ void ImageFormat_Dicom::parseVector( DcmElement* elem, const std::string &name, 
 		elem->getUint16Array( buff );
 		util::ivector4 vector;
 		vector.copyFrom( buff, buff + len );
-		map[name] = vector;
+		map.propertyValue(name) = vector;
 	}
 	break;
 	case EVR_CS: // Code String (string)
 	case EVR_SH: //short string
 	case EVR_ST: { //short text
-		map[name] = _internal::dcmtkListString2list<std::string>( elem );
+		map.propertyValue(name) = _internal::dcmtkListString2list<std::string>( elem );
 	}
 	break;
 	case EVR_DS: {
 		const util::dlist tokens = _internal::dcmtkListString2list<double>( elem );
 		util::dvector4 vector;
 		vector.copyFrom( tokens.begin(), tokens.end() );
-		map[name] = vector;
+		map.propertyValue(name) = vector;
 	}
 	break;
 	case EVR_AS:
@@ -329,7 +329,7 @@ void ImageFormat_Dicom::parseVector( DcmElement* elem, const std::string &name, 
 	break;
 	}
 
-	LOG( Debug, verbose_info ) << "Parsed the vector " << name << " as " << map[name];
+	LOG( Debug, verbose_info ) << "Parsed the vector " << name << " as " << map.propertyValue(name);
 }
 
 void ImageFormat_Dicom::parseList( DcmElement* elem, const std::string &name, util::PropMap &map )
@@ -341,39 +341,39 @@ void ImageFormat_Dicom::parseList( DcmElement* elem, const std::string &name, ut
 	case EVR_FL: {
 		Float32 *buff;
 		elem->getFloat32Array( buff );
-		map[name] = util::dlist( buff, buff + len );
+		map.propertyValue(name) = util::dlist( buff, buff + len );
 	}
 	break;
 	case EVR_FD: {
 		Float64 *buff;
 		elem->getFloat64Array( buff );
-		map[name] = util::dlist( buff, buff + len );
+		map.propertyValue(name) = util::dlist( buff, buff + len );
 	}
 	break;
 	case EVR_IS: {
-		map[name] = _internal::dcmtkListString2list<int>( elem );
+		map.propertyValue(name) = _internal::dcmtkListString2list<int>( elem );
 	}
 	break;
 	case EVR_SL: {
 		Sint32 *buff;
 		elem->getSint32Array( buff );
-		map[name] = util::ilist( buff, buff + len );
+		map.propertyValue(name) = util::ilist( buff, buff + len );
 	}
 	break;
 	case EVR_US: {
 		Uint16 *buff;
 		elem->getUint16Array( buff );
-		map[name] = util::ilist( buff, buff + len );
+		map.propertyValue(name) = util::ilist( buff, buff + len );
 	}
 	break;
 	case EVR_CS: // Code String (string)
 	case EVR_SH: //short string
 	case EVR_ST: { //short text
-		map[name] = _internal::dcmtkListString2list<string>( elem );
+		map.propertyValue(name) = _internal::dcmtkListString2list<string>( elem );
 	}
 	break;
 	case EVR_DS: {
-		map[name] = _internal::dcmtkListString2list<double>( elem );
+		map.propertyValue(name) = _internal::dcmtkListString2list<double>( elem );
 	}
 	break;
 	case EVR_AS:
@@ -397,7 +397,7 @@ void ImageFormat_Dicom::parseList( DcmElement* elem, const std::string &name, ut
 	break;
 	}
 
-	LOG( Debug, verbose_info ) << "Parsed the list " << name << " as " << map[name];
+	LOG( Debug, verbose_info ) << "Parsed the list " << name << " as " << map.propertyValue(name);
 }
 
 void ImageFormat_Dicom::parseCSA( DcmElement *elem, isis::util::PropMap& map )
@@ -455,11 +455,11 @@ size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, isis::util::PropMap& map )
 		try {
 			if ( ret.size() == 1 ) {
 				if ( parseCSAValue( ret.front(), name, vr, map ) ) {
-					LOG( Debug, verbose_info ) << "Found entry " << name << ":" << map[name] << " in CSA header";
+					LOG( Debug, verbose_info ) << "Found entry " << name << ":" << map.propertyValue(name) << " in CSA header";
 				}
 			} else if ( ret.size() > 1 ) {
 				if ( parseCSAValueList( ret, name, vr, map ) ) {
-					LOG( Debug, verbose_info ) << "Found entry " << name << ":" << map[name] << " in CSA header";
+					LOG( Debug, verbose_info ) << "Found entry " << name << ":" << map.propertyValue(name) << " in CSA header";
 				}
 			}
 		} catch ( boost::bad_lexical_cast e ) {
@@ -476,20 +476,20 @@ size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, isis::util::PropMap& map )
 bool ImageFormat_Dicom::parseCSAValue( const std::string &val, const std::string &name, const char *const vr, isis::util::PropMap& map )
 {
 	if ( strcasecmp( vr, "IS" ) == 0 or strcasecmp( vr, "SL" ) == 0 ) {
-		map[name] = boost::lexical_cast<int32_t>( val );
+		map.propertyValue(name) = boost::lexical_cast<int32_t>( val );
 	} else if ( strcasecmp( vr, "UL" ) == 0 ) {
-		map[name] = boost::lexical_cast<u_int32_t>( val );
+		map.propertyValue(name) = boost::lexical_cast<u_int32_t>( val );
 	} else if (
 		strcasecmp( vr, "CS" ) == 0 or
 		strcasecmp( vr, "LO" ) == 0 or strcasecmp( vr, "SH" ) == 0 or
 		strcasecmp( vr, "UN" ) == 0 or strcasecmp( vr, "ST" ) == 0 ) {
-		map[name] = val;
+		map.propertyValue(name) = val;
 	} else if ( strcasecmp( vr, "DS" ) == 0 or strcasecmp( vr, "FD" ) == 0 ) {
-		map[name] = boost::lexical_cast<double>( val );
+		map.propertyValue(name) = boost::lexical_cast<double>( val );
 	} else if ( strcasecmp( vr, "US" ) == 0 ) {
-		map[name] = boost::lexical_cast<u_int16_t>( val );
+		map.propertyValue(name) = boost::lexical_cast<u_int16_t>( val );
 	} else if ( strcasecmp( vr, "SS" ) == 0 ) {
-		map[name] = boost::lexical_cast<int16_t>( val );
+		map.propertyValue(name) = boost::lexical_cast<int16_t>( val );
 	} else {
 		LOG( Runtime, error ) << "Dont know how to parse CSA entry " << std::make_pair( name, val ) << " type is " << util::MSubject( vr );
 		return false;
@@ -501,13 +501,13 @@ bool ImageFormat_Dicom::parseCSAValueList( const util::slist &val, const std::st
 {
 	if ( strcasecmp( vr, "IS" ) == 0 or strcasecmp( vr, "SL" ) == 0 or
 		 strcasecmp( vr, "US" ) == 0 or strcasecmp( vr, "SS" ) == 0 ) {
-		map[name] = util::list2list<int32_t>( val.begin(), val.end() );
+		map.propertyValue(name) = util::list2list<int32_t>( val.begin(), val.end() );
 	} else if ( strcasecmp( vr, "UL" ) == 0 ) {
-		map[name] = val; // @todo we dont have an unsigned int list
+		map.propertyValue(name) = val; // @todo we dont have an unsigned int list
 	} else if ( strcasecmp( vr, "LO" ) == 0 or strcasecmp( vr, "SH" ) == 0 or strcasecmp( vr, "UN" ) == 0 or strcasecmp( vr, "ST" ) == 0 or strcasecmp( vr, "SL" ) == 0 ) {
-		map[name] = val;
+		map.propertyValue(name) = val;
 	} else if ( strcasecmp( vr, "DS" ) == 0 or strcasecmp( vr, "FD" ) == 0 ) {
-		map[name] = util::list2list<double>( val.begin(), val.end() );
+		map.propertyValue(name) = util::list2list<double>( val.begin(), val.end() );
 	} else {
 		LOG( Runtime, error ) << "Dont know how to parse CSA entry " << std::make_pair( name, val ) << " type is " << util::MSubject( vr );
 		return false;
@@ -534,10 +534,10 @@ void ImageFormat_Dicom::dcmObject2PropMap( DcmObject* master_obj, isis::util::Pr
 			continue;//skip the image data
 		else if ( name == "CSAImageHeaderInfo" ) {
 			DcmElement* elem = dynamic_cast<DcmElement*>( obj );
-			parseCSA( elem, map.propertyBranch( "CSAImageHeaderInfo" ) );
+			parseCSA( elem, map.branch( "CSAImageHeaderInfo" ) );
 		} else if ( name == "CSASeriesHeaderInfo" ) {
 			DcmElement* elem = dynamic_cast<DcmElement*>( obj );
-			parseCSA( elem, map.propertyBranch( "CSASeriesHeaderInfo" ) );
+			parseCSA( elem, map.branch( "CSASeriesHeaderInfo" ) );
 		} else if ( name == "MedComHistoryInformation" ) {
 			//@todo special handling needed
 		} else if ( obj->isLeaf() ) {
@@ -553,7 +553,7 @@ void ImageFormat_Dicom::dcmObject2PropMap( DcmObject* master_obj, isis::util::Pr
 			else
 				parseList( elem, name, map ); // for any other value
 		} else {
-			dcmObject2PropMap( obj, map.propertyBranch(name) );
+			dcmObject2PropMap( obj, map.branch(name) );
 		}
 	}
 }
