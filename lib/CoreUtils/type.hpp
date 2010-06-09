@@ -337,7 +337,7 @@ public:
 		memcpy( &dest, src, length * sizeof( TYPE ) );
 	}
 	/// Copy elements within a range [start,end] to raw memory
-	void copyToMem( size_t start, size_t end, const TYPE* const dst )const {
+	void copyToMem( size_t start, size_t end, TYPE* const dst )const {
 		assert( start <= end );
 		const size_t length = end - start + 1;
 		LOG_IF( end >= len(), Runtime, error )

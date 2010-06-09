@@ -344,15 +344,20 @@ private:
 
 	template<typename T>
 	void copyDataToNifti( const data::Image& image, nifti_image& ni ) {
+		
 		ni.data = malloc( image.bytes_per_voxel() * image.volume() );
 		T *refNii = ( T* ) ni.data;
-
-		for ( size_t t = 0; t < image.sizeToVector()[3]; t++ ) {
-			for ( size_t z = 0; z < image.sizeToVector()[2]; z++ ) {
-				for ( size_t y = 0; y < image.sizeToVector()[1]; y++ ) {
-					for ( size_t x = 0; x < image.sizeToVector()[0]; x++ ) {
-						*refNii = image.voxel<T>( x, y, z, t );
-						refNii++;
+		const util::FixedVector<size_t,4> csize=image.getChunk(0,0).sizeToVector();
+		const util::FixedVector<size_t,4> isize=image.sizeToVector();
+		
+		for ( size_t t = 0; t < isize[3]; t+=csize[3] ) {
+			for ( size_t z = 0; z < isize[2]; z+=csize[2] ) {
+				for ( size_t y = 0; y < isize[1]; y+=csize[1] ) {
+					for ( size_t x = 0; x < isize[0]; x+=csize[0] ) {
+						const size_t dim[]={x,y,z,t};
+						const data::Chunk ch=image.getChunk(x,y,z,t);
+						T* target=refNii+image.dim2Index(dim);
+						ch.getTypePtr<T>().copyToMem(0,ch.volume()-1,target);
 					}
 				}
 			}
