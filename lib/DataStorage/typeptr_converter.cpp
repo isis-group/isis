@@ -17,11 +17,12 @@
 
 */
 
-#include "typeptr_converter.h"
+#include "typeptr_converter.hpp"
 
-#include "type_converter.hpp"
-#include "type_base.hpp"
+// #include "type_converter.hpp"
+#include "typeptr_base.hpp"
 #include "numeric_convert.hpp"
+#include "CoreUtils/types.hpp"
 #include <boost/mpl/for_each.hpp>
 #include <boost/type_traits/is_arithmetic.hpp>
 #include <boost/mpl/and.hpp>
@@ -29,7 +30,7 @@
 /// @cond _internal
 namespace isis
 {
-namespace util
+namespace data
 {
 namespace _internal
 {
@@ -38,7 +39,7 @@ namespace _internal
 template<typename SRC, typename DST> class TypePtrGenerator: public TypePtrConverterBase
 {
 public:
-	void generate( const boost::scoped_ptr<TypePtrBase>& src, boost::scoped_ptr<TypePtrBase>& dst, const TypeBase &min, const TypeBase &max )const {
+	void generate( const boost::scoped_ptr<TypePtrBase>& src, boost::scoped_ptr<TypePtrBase>& dst, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max )const {
 		LOG_IF( dst.get(), Debug, warning ) <<
 											"Generating into existing value " << dst->toString( true );
 		TypePtr<DST> *ref = new TypePtr<DST>;
@@ -46,7 +47,7 @@ public:
 		dst.reset( ref );
 	}
 };
-void TypePtrConverterBase::convert( const TypePtrBase &src, TypePtrBase &dst, const TypeBase &min, const TypeBase &max ) const
+void TypePtrConverterBase::convert( const TypePtrBase &src, TypePtrBase &dst, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max ) const
 {
 	LOG( Debug, error ) << "Empty conversion was called as conversion from " << src.typeName() << " to " << dst.typeName() << " this is most likely an error.";
 }
@@ -75,7 +76,7 @@ public:
 		TypePtrConverter<NUMERIC, true, SRC, DST> *ret = new TypePtrConverter<NUMERIC, true, SRC, DST>;
 		return boost::shared_ptr<const TypePtrConverterBase>( ret );
 	}
-	void convert( const TypePtrBase &src, TypePtrBase &dst, const TypeBase &min, const TypeBase &max )const {
+	void convert( const TypePtrBase &src, TypePtrBase &dst, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max )const {
 		TypePtr<SRC> &dstVal = dst.cast_to_TypePtr<SRC>();
 		const SRC *srcPtr = &src.cast_to_TypePtr<SRC>()[0];
 		dstVal.copyFromMem( srcPtr, src.len() );
@@ -98,7 +99,7 @@ public:
 		TypePtrConverter<true, false, SRC, DST> *ret = new TypePtrConverter<true, false, SRC, DST>;
 		return boost::shared_ptr<const TypePtrConverterBase>( ret );
 	}
-	void convert( const TypePtrBase &src, TypePtrBase &dst, const TypeBase &min, const TypeBase &max )const {
+	void convert( const TypePtrBase &src, TypePtrBase &dst, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max )const {
 		numeric_convert( src.cast_to_TypePtr<SRC>(), dst.cast_to_TypePtr<DST>(), min, max );
 	}
 	virtual ~TypePtrConverter() {}
@@ -129,7 +130,7 @@ struct outer_TypePtrConverter {
 	std::map< int , std::map<int, boost::shared_ptr<const TypePtrConverterBase> > > &m_map;
 	outer_TypePtrConverter( std::map< int , std::map<int, boost::shared_ptr<const TypePtrConverterBase> > > &map ): m_map( map ) {}
 	template<typename SRC> void operator()( SRC ) {//will be called by the mpl::for_each in TypePtrConverterMap() for any SRC out of "types"
-		boost::mpl::for_each<types>( // create a functor for from-SRC-conversion and call its ()-operator for any DST out of "types"
+		boost::mpl::for_each<util::_internal::types>( // create a functor for from-SRC-conversion and call its ()-operator for any DST out of "types"
 			inner_TypePtrConverter<SRC>( m_map[TypePtr<SRC>().typeID()] )
 		);
 	}
@@ -138,7 +139,7 @@ struct outer_TypePtrConverter {
 
 TypePtrConverterMap::TypePtrConverterMap()
 {
-	boost::mpl::for_each<types>( outer_TypePtrConverter( *this ) );
+	boost::mpl::for_each<util::_internal::types>( outer_TypePtrConverter( *this ) );
 	LOG( Debug, info )
 			<< "conversion map for " << size() << " array-types created";
 }

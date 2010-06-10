@@ -206,7 +206,7 @@ public:
 		LOG( ImageIoLog, isis::info ) << image.getChunk( 0, 0, 0, 0 ).typeName();
 
 		switch ( image.getChunk( 0, 0, 0, 0 ).typeID() ) {
-		case util::TypePtr<int8_t>::staticID:
+		case data::TypePtr<int8_t>::staticID:
 			if (0 == strcasecmp(dialect.c_str(), "fsl") ){ // fsl not compatible with int8, convert to uint8
 				data::MemImage<u_int8_t> fslCopy(image);
 				ni.datatype = DT_UINT8;
@@ -216,15 +216,15 @@ public:
 			ni.datatype = DT_INT8;
 			copyDataToNifti<int8_t>( image, ni );
 			break;
-		case util::TypePtr<u_int8_t>::staticID:
+		case data::TypePtr<u_int8_t>::staticID:
 			ni.datatype = DT_UINT8;
 			copyDataToNifti<u_int8_t>( image, ni );
 			break;
-		case util::TypePtr<int16_t>::staticID:
+		case data::TypePtr<int16_t>::staticID:
 			ni.datatype = DT_INT16;
 			copyDataToNifti<int16_t>( image, ni );
 			break;
-		case util::TypePtr<u_int16_t>::staticID:
+		case data::TypePtr<u_int16_t>::staticID:
 			if (0 == strcasecmp(dialect.c_str(), "fsl") ){
 				image.print(std::cout);
 				data::MemImage<u_int16_t> fslCopy(image);
@@ -236,11 +236,11 @@ public:
 			ni.datatype = DT_UINT16;
 			copyDataToNifti<u_int16_t>( image, ni );
 			break;
-		case util::TypePtr<int32_t>::staticID:
+		case data::TypePtr<int32_t>::staticID:
 			ni.datatype = DT_INT32;
 			copyDataToNifti<int32_t>( image, ni );
 			break;
-		case util::TypePtr<u_int32_t>::staticID:
+		case data::TypePtr<u_int32_t>::staticID:
 			if (0 == strcasecmp(dialect.c_str(), "fsl") ){
 				data::MemImage<int32_t> fslCopy(image);
 				ni.datatype = DT_INT32;
@@ -250,16 +250,16 @@ public:
 			ni.datatype = DT_UINT32;
 			copyDataToNifti<u_int16_t>( image, ni );
 			break;
-		case util::TypePtr<float>::staticID:
+		case data::TypePtr<float>::staticID:
 			ni.datatype = DT_FLOAT32;
 			copyDataToNifti<float>( image, ni );
 			break;
-		case util::TypePtr<double>::staticID:
+		case data::TypePtr<double>::staticID:
 			ni.datatype = DT_FLOAT64;
 			copyDataToNifti<double>( image, ni );
 			break;
 		default:
-			throwGenericError( "Datatype " + util::TypePtr<float>::staticName() + " cannot be written!" );
+			throwGenericError( "Datatype " + data::TypePtr<float>::staticName() + " cannot be written!" );
 		}
 
 		//now really write the nifti file with the function from nifti1_io.h

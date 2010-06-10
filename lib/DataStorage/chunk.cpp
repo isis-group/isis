@@ -33,9 +33,9 @@ ChunkBase::~ChunkBase() { }
 
 }
 
-Chunk::Chunk( const util::_internal::TypePtrBase::Reference &src, size_t firstDim, size_t secondDim, size_t thirdDim, size_t fourthDim ):
+Chunk::Chunk( const _internal::TypePtrBase::Reference &src, size_t firstDim, size_t secondDim, size_t thirdDim, size_t fourthDim ):
 		_internal::ChunkBase( firstDim, secondDim, thirdDim, fourthDim ),
-		util::_internal::TypePtrBase::Reference( src )
+		_internal::TypePtrBase::Reference( src )
 {
 	assert( ( *this )->len() == volume() );
 }
@@ -52,14 +52,14 @@ Chunk Chunk::cloneToMem( size_t firstDim, size_t secondDim, size_t thirdDim, siz
 
 	if ( fourthDim )newSize[3] = fourthDim;
 
-	const util::_internal::TypePtrBase::Reference
+	const _internal::TypePtrBase::Reference
 	cloned( get()->cloneToMem( newSize.product() ) );
 	return Chunk( cloned, newSize[0], newSize[1], newSize[2], newSize[3] );
 }
 Chunk Chunk::copyToMem()const
 {
 	Chunk ret( *this );
-	static_cast<util::_internal::TypePtrBase::Reference&>( ret ) = get()->copyToMem();
+	static_cast<_internal::TypePtrBase::Reference&>( ret ) = get()->copyToMem();
 	return ret;
 }
 size_t Chunk::bytes_per_voxel()const
@@ -154,7 +154,7 @@ void Chunk::getMinMax ( util::_internal::TypeBase::Reference& min, util::_intern
 Chunk& Chunk::operator=( const isis::data::Chunk& ref )
 {
 	_internal::ChunkBase::operator=( static_cast<const _internal::ChunkBase&>( ref ) ); //copy the metadate of ref
-	util::_internal::TypePtrBase::Reference::operator=( static_cast<const util::_internal::TypePtrBase::Reference&>( ref ) ); // copy the reference of ref's data
+	_internal::TypePtrBase::Reference::operator=( static_cast<const _internal::TypePtrBase::Reference&>( ref ) ); // copy the reference of ref's data
 	return *this;
 }
 

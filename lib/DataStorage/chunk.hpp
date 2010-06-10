@@ -13,7 +13,7 @@
 #ifndef CHUNK_H
 #define CHUNK_H
 
-#include "CoreUtils/type.hpp"
+#include "typeptr.hpp"
 #include "CoreUtils/log.hpp"
 #include "CoreUtils/propmap.hpp"
 #include "common.hpp"
@@ -47,7 +47,7 @@ public:
  * Like in TypePtr, the copy of a Chunk will reference the same data.
  * (If you want to make a memory based deep copy of a Chunk create a MemChunk from it)
  */
-class Chunk : public _internal::ChunkBase, protected util::_internal::TypePtrBase::Reference
+class Chunk : public _internal::ChunkBase, protected _internal::TypePtrBase::Reference
 {
 protected:
 	/**
@@ -61,8 +61,8 @@ protected:
 	 */
 	template<typename TYPE, typename D> Chunk( TYPE* src, D d, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 ):
 			_internal::ChunkBase( firstDim, secondDim, thirdDim, fourthDim ),
-			util::_internal::TypeReference<util::_internal::TypePtrBase>( new util::TypePtr<TYPE>( src, volume(), d ) ) {}
-	Chunk( const util::_internal::TypePtrBase::Reference &src, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 );
+			util::_internal::TypeReference<_internal::TypePtrBase>( new TypePtr<TYPE>( src, volume(), d ) ) {}
+	Chunk( const _internal::TypePtrBase::Reference &src, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 );
 public:
 	/**
 	 * Gets a reference to the element at a given index.
@@ -74,7 +74,7 @@ public:
 		LOG_IF( not rangeCheck( idx ), Debug, isis::error )
 		<< "Index " << util::ivector4( firstDim, secondDim, thirdDim, fourthDim )
 		<< " is out of range " << sizeToString();
-		util::TypePtr<TYPE> &ret = asTypePtr<TYPE>();
+		TypePtr<TYPE> &ret = asTypePtr<TYPE>();
 		return ret[dim2Index( idx )];
 	}
 	/**
@@ -90,20 +90,20 @@ public:
 			<< " is out of range (" << sizeToString() << ")";
 		}
 
-		const util::TypePtr<TYPE> &ret = getTypePtr<TYPE>();
+		const TypePtr<TYPE> &ret = getTypePtr<TYPE>();
 
 		return ret[dim2Index( idx )];
 	}
-	util::_internal::TypePtrBase& asTypePtrBase() {
+	_internal::TypePtrBase& asTypePtrBase() {
 		return operator*();
 	}
-	const util::_internal::TypePtrBase& getTypePtrBase()const {
+	const _internal::TypePtrBase& getTypePtrBase()const {
 		return operator*();
 	}
-	template<typename TYPE> util::TypePtr<TYPE> &asTypePtr() {
+	template<typename TYPE> TypePtr<TYPE> &asTypePtr() {
 		return asTypePtrBase().cast_to_TypePtr<TYPE>();
 	}
-	template<typename TYPE> const util::TypePtr<TYPE> getTypePtr()const {
+	template<typename TYPE> const TypePtr<TYPE> getTypePtr()const {
 		return getTypePtrBase().cast_to_TypePtr<TYPE>();
 	}
 	Chunk cloneToMem( size_t firstDim = 0, size_t secondDim = 0, size_t thirdDim = 0, size_t fourthDim = 0 )const;
@@ -150,7 +150,7 @@ public:
 	MemChunk( size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 ):
 			Chunk(
 				( TYPE* )calloc( fourthDim*thirdDim*secondDim*firstDim, sizeof( TYPE ) ),
-				typename util::TypePtr<TYPE>::BasicDeleter(),
+				typename TypePtr<TYPE>::BasicDeleter(),
 				firstDim, secondDim, thirdDim, fourthDim
 			) {}
 	/**
@@ -166,7 +166,7 @@ public:
 	MemChunk( const TYPE*const org, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 ):
 			Chunk(
 				( TYPE* )malloc( sizeof( TYPE )*fourthDim*thirdDim*secondDim*firstDim ),
-				typename util::TypePtr<TYPE>::BasicDeleter(),
+				typename TypePtr<TYPE>::BasicDeleter(),
 				firstDim, secondDim, thirdDim, fourthDim
 			) {
 		asTypePtr<TYPE>().copyFromMem( org, volume() );
@@ -179,7 +179,7 @@ public:
 	MemChunk( const Chunk &ref, const util::_internal::TypeBase &min, const  util::_internal::TypeBase &max ): Chunk( ref ) {
 		_internal::ChunkBase::operator=( static_cast<const _internal::ChunkBase&>( ref ) ); //copy the metadate of ref
 		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		util::_internal::TypePtrBase::Reference::reset( new util::TypePtr<TYPE>( ref.getTypePtrBase().copyToNew<TYPE>( min, max ) ) );
+		_internal::TypePtrBase::Reference::reset( new TypePtr<TYPE>( ref.getTypePtrBase().copyToNew<TYPE>( min, max ) ) );
 	}
 	/// Create a deep copy of a given MemChunk of the same type (default copy constructor)
 	MemChunk( const MemChunk<TYPE> &ref ): Chunk( ref ) {
@@ -188,7 +188,7 @@ public:
 	MemChunk &operator=( const MemChunk<TYPE> &ref ) {
 		_internal::ChunkBase::operator=( static_cast<const _internal::ChunkBase&>( ref ) ); //copy the metadate of ref
 		//get rid of my TypePtr and make a new copying the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		util::_internal::TypePtrBase::Reference::reset( new util::TypePtr<TYPE>(
+		_internal::TypePtrBase::Reference::reset( new TypePtr<TYPE>(
 					static_cast<const Chunk&>( ref ).getTypePtrBase().copyToMem()->cast_to_TypePtr<TYPE>()
 				) );
 		return *this;
@@ -196,7 +196,7 @@ public:
 	MemChunk &operator=( const Chunk &ref ) {
 		_internal::ChunkBase::operator=( static_cast<const _internal::ChunkBase&>( ref ) ); //copy the metadate of ref
 		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		util::_internal::TypePtrBase::Reference::reset( new util::TypePtr<TYPE>( ref.getTypePtrBase().copyToNew<TYPE>() ) );
+		_internal::TypePtrBase::Reference::reset( new TypePtr<TYPE>( ref.getTypePtrBase().copyToNew<TYPE>() ) );
 		return *this;
 	}
 };

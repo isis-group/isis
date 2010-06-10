@@ -133,7 +133,7 @@ public:
 
 		const std::pair<size_t, size_t> index = commonGet( first, second, third, fourth );
 
-		util::TypePtr<T> &data = getChunkAt( index.first ).asTypePtr<T>();
+		TypePtr<T> &data = getChunkAt( index.first ).asTypePtr<T>();
 
 		return data[index.second];
 	}
@@ -153,7 +153,7 @@ public:
 	 */
 	template <typename T> T voxel( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const {
 		const std::pair<size_t, size_t> index = commonGet( first, second, third, fourth );
-		const util::TypePtr<T> &data = ( lookup[index.first] )->getTypePtr<T>();
+		const TypePtr<T> &data = ( lookup[index.first] )->getTypePtr<T>();
 		return data[index.second];
 	}
 

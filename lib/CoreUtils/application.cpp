@@ -42,8 +42,9 @@ Application::Application( const char name[] ): m_name( name )
 	parameters["dImageIO"].setDescription( "Debugging level for the ImageIO module" );
 	parameters["help"] = false;
 	parameters["help"].setDescription( "Print help" );
-	BOOST_FOREACH( ParameterMap::reference ref, parameters ) //none of these is needed
-	ref.second.needed() = false;
+	BOOST_FOREACH( ParameterMap::reference ref, parameters ){ //none of these is needed
+		ref.second.needed() = false;
+	}
 }
 Application::~Application() {}
 
