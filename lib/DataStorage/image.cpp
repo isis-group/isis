@@ -234,7 +234,7 @@ bool Image::reIndex()
 
 	//remove common props from the chunks
 	for ( size_t i = 0; i != lookup.size(); i++ )
-		getChunkAt( i ).remove( common );
+		getChunkAt( i ).remove( common, true );
 
 	LOG_IF( not common.empty(), Debug, verbose_info ) << "common properties removed from " << set.size() << " chunks: " << common;
 	init( size );

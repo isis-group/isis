@@ -179,7 +179,7 @@ bool PropMap::remove( const std::string &key )
 	return recursiveRemove( *this, path.begin(), path.end() );
 }
 
-bool PropMap::remove( const isis::util::PropMap &removeMap )
+bool PropMap::remove( const isis::util::PropMap &removeMap, bool keep_needed )
 {
 	iterator thisIt = begin();
 	bool ret = true;
@@ -200,7 +200,7 @@ bool PropMap::remove( const isis::util::PropMap &removeMap )
 					LOG( Debug, warning ) << "Not deleting branch " << MSubject( thisIt->first ) << " because its no subtree in the removal map";
 					ret = false;
 				}
-			} else { // this is a leaf
+			} else if( not( thisIt->second.getLeaf().needed() and keep_needed ) ) { // this is a leaf
 				LOG( Debug, verbose_info ) << "Removing " << MSubject( *thisIt ) << " as requested";
 				erase( thisIt++ ); // so delete this (they are equal - kind of)
 			}

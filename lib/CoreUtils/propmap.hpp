@@ -194,7 +194,7 @@ public:
 	/// remove the property/branch adressed by the key
 	bool remove( const std::string &key );
 	/// remove every property which is also in the given map (regardless of the value)
-	bool remove( const isis::util::PropMap &removeMap );
+	bool remove( const isis::util::PropMap &removeMap, bool keep_needed = false );
 	/// \returns true is the given property does exist and is not empty.
 	bool hasProperty( const std::string &key )const;
 	/// \returns true is the given branch does exist and is not empty.
