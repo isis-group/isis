@@ -228,8 +228,7 @@ throw( std::runtime_error & )
 			// default error
 		default:
 			LOG( image_io::Runtime, error )
-					<< "Can't map image type to vista type. Abort ["
-					<< chunk.typeID() << "/" << util::Type<VFloat>::staticID << "]" ;
+					<< "Can't map image type " << chunk.typeName() << "("<< chunk.typeID() << ") to vista type. Aborting" ;
 			return;
 		}
 

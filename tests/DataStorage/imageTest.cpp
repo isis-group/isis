@@ -184,7 +184,6 @@ BOOST_AUTO_TEST_CASE( orientation_test )
 {
 	data::MemChunk<float> ch( 3, 3, 3 );
 	data::Image img;
-	unsigned short acNum = 0;
 	ch.setProperty( "indexOrigin", util::fvector4( 0, 0, 0 ) );
 	ch.setProperty( "readVec", util::fvector4( 1, 0 ) );
 	ch.setProperty( "phaseVec", util::fvector4( 0, 1 ) );
@@ -204,6 +203,8 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 
 	for ( int i = 0; i < 3; i++ )
 		for ( int j = 0; j < 3; j++ ) {
+			ch[i][j].setProperty( "readVec", util::fvector4( 1, 0 ) );
+			ch[i][j].setProperty( "phaseVec", util::fvector4( 0, 1 ) );
 			ch[i][j].setProperty( "indexOrigin", util::fvector4( 0, 0, j, i ) );
 			ch[i][j].setProperty( "acquisitionNumber", acNum++ );
 			ch[i][j].setProperty( "voxelSize", vSize );
@@ -223,6 +224,8 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 	{
 		// Conversion to u_int8_t (will downscale [0-255])
 		data::MemImage<u_int8_t> img2( img );
+		BOOST_CHECK(img2.reIndex());
+		BOOST_CHECK_EQUAL(static_cast<util::PropMap>(img), static_cast<util::PropMap>(img2));
 		util::_internal::TypeBase::Reference min, max;
 		img2.getMinMax( min, max );
 		BOOST_CHECK( min->is<u_int8_t>() );
@@ -233,6 +236,8 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 	{
 		// Conversion to int16_t (will upscale [0-32k])
 		data::MemImage<int16_t> img2( img );
+		BOOST_CHECK(img2.reIndex());
+		BOOST_CHECK_EQUAL(static_cast<util::PropMap>(img), static_cast<util::PropMap>(img2));
 		util::_internal::TypeBase::Reference min, max;
 		img2.getMinMax( min, max );
 		BOOST_CHECK( min->is<int16_t>() );
