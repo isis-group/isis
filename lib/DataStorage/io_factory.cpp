@@ -208,7 +208,7 @@ int IOFactory::loadPath( isis::data::ChunkList &ret, const boost::filesystem::pa
 
 bool IOFactory::write( const isis::data::ImageList &images, const std::string &filename, const std::string &dialect )
 {
-	FileFormatList formatWriter = get().getFormatInterface( filename, dialect );
+	FileFormatList formatWriter = get().getFormatInterface( filename, "", dialect );
 	BOOST_FOREACH( FileFormatList::const_reference it, formatWriter ) {
 		LOG( Debug, info )
 				<< "plugin to write to " <<  filename << ": " << it->name()

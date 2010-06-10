@@ -43,6 +43,7 @@ public:
 	 * load a data file with given filename and dialect
 	 * @param ret ChunkList to store the loaded chunks in
 	 * @param filename file to open
+	 * @param suffix_override override the given suffix with this one (especially if there's no suffix)
 	 * @param dialect dialect of the fileformat to load
 	 * @return list of chunks (part of an image)
 	 */
