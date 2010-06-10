@@ -207,6 +207,12 @@ public:
 
 		switch ( image.getChunk( 0, 0, 0, 0 ).typeID() ) {
 		case util::TypePtr<int8_t>::staticID:
+			if (0 == strcasecmp(dialect.c_str(), "fsl") ){ // fsl not compatible with int8, convert to uint8
+				data::MemImage<u_int8_t> fslCopy(image);
+				ni.datatype = DT_UINT8;
+				copyDataToNifti<u_int8_t>(fslCopy, ni);
+				break;
+			}
 			ni.datatype = DT_INT8;
 			copyDataToNifti<int8_t>( image, ni );
 			break;
@@ -219,6 +225,14 @@ public:
 			copyDataToNifti<int16_t>( image, ni );
 			break;
 		case util::TypePtr<u_int16_t>::staticID:
+			if (0 == strcasecmp(dialect.c_str(), "fsl") ){
+				image.print(std::cout);
+				data::MemImage<u_int16_t> fslCopy(image);
+				fslCopy.print(std::cout << "Copy"<< std::endl);
+				ni.datatype = DT_INT16;
+				copyDataToNifti<int16_t>(fslCopy, ni);
+				break;
+			}
 			ni.datatype = DT_UINT16;
 			copyDataToNifti<u_int16_t>( image, ni );
 			break;
@@ -227,6 +241,12 @@ public:
 			copyDataToNifti<int32_t>( image, ni );
 			break;
 		case util::TypePtr<u_int32_t>::staticID:
+			if (0 == strcasecmp(dialect.c_str(), "fsl") ){
+				data::MemImage<int32_t> fslCopy(image);
+				ni.datatype = DT_INT32;
+				copyDataToNifti<int32_t>(image, ni);
+				break;
+			}
 			ni.datatype = DT_UINT32;
 			copyDataToNifti<u_int16_t>( image, ni );
 			break;
@@ -263,15 +283,24 @@ private:
 		for ( int t = 0; t < dimensions[3]; t++ ) {
 			util::fvector4 offsets( ni.qoffset_x, ni.qoffset_y, ni.qoffset_z, 0 );
 			//retChunk.setProperty("acquisitionTime", );
-			retChunk.setProperty( "indexOrigin", util::fvector4( ni.qoffset_x, ni.qoffset_y, ni.qoffset_z, 0 ) );
 			retChunk.setProperty( "acquisitionNumber", t );
 			retChunk.setProperty<u_int16_t>( "sequenceNumber", 1 );
-			retChunk.setProperty( "readVec", getVector( ni, readDir ) );
-			retChunk.setProperty( "phaseVec", getVector( ni, phaseDir ) );
+			// in nifti everything should be relative to RAS, in isis we use LPS coordinates - normally change read/phase dir and sign of indexOrigin
+			//TODO: has to be tested with different niftis - don't trust them!!!!!!!!!
+			retChunk.setProperty( "indexOrigin", util::fvector4( -ni.qoffset_x, -ni.qoffset_y, -ni.qoffset_z, 0 ) );
+			util::fvector4 readVec = getVector( ni, readDir ) * util::fvector4(-1, -1 , -1 , -1);
+			util::fvector4 phaseVec = getVector( ni, phaseDir ) * util::fvector4(-1, -1 , -1 , -1);
+			retChunk.setProperty( "readVec",  readVec );
+			retChunk.setProperty( "phaseVec", phaseVec );
 			retChunk.setProperty( "sliceVec", getVector( ni, sliceDir ) );
 			retChunk.setProperty( "voxelSize", getVector( ni, voxelSizeVec ) );
-			retChunk.setProperty( "nifti/studyDescription", std::string( ni.descrip ) );
-			retChunk.setProperty( "seriesDescription", std::string( ni.intent_name ) );
+			retChunk.setProperty( "sequenceDescription", std::string( ni.descrip ) );
+			retChunk.setProperty( "StudyDescription", std::string( ni.intent_name ) );
+			if ( (2 == ni.freq_dim) and (1 == ni.phase_dim) ){
+				retChunk.setProperty<std::string>("InPlanePhaseEncodingDirection", "ROW");}
+			else if ( (1 == ni.freq_dim) and (2 == ni.phase_dim) ){
+				retChunk.setProperty<std::string>("InPlanePhaseEncodingDirection", "COL");}
+			retChunk.setProperty( "voxelGap", util::fvector4());// not extra included in Nifti, so set to zero
 			//just some LOGS
 			LOG( ImageIoLog, info ) << "dims at all " << dimensions;
 			LOG( ImageIoLog, info ) << "Offset values from nifti" << offsets;
@@ -310,14 +339,14 @@ private:
 
 			//get qto
 			for ( int i = 0; i < 3; i++ ) {
-				qto[i] = ni.qto_xyz.m[i][dir];
+				qto[i] = ni.qto_xyz.m[i][dir]/voxel_size[dir];
 			}
 
 			LOG( ImageIoDebug, info ) << "Orientation red from qto_xyz:" << dir + 1 << " is " << qto;
 
 			//get sto
 			for ( int i = 0; i < 3; i++ ) {
-				sto[i] = ni.sto_xyz.m[i][dir];
+				sto[i] = ni.sto_xyz.m[i][dir]/voxel_size[dir];
 			}
 
 			LOG( ImageIoDebug, info ) << "Orientation red from sto_xyz:" << dir + 1 << " is " << sto;
@@ -325,14 +354,11 @@ private:
 			//use one of them
 			if ( ni.qform_code > 0 ) {// just tranform to the nominal space of the scanner
 				retVec = qto;
-				/*              LOG_IF( qto != sto and ni.sform_code > 0, ImageIoLog, warning )
-				                << "sto_xyz:" << dir + 1 << " (" << sto << ") differs from qto_xyz:"
-				                << dir + 1 << " (" << qto << "). But I'll ignore it anyway because qform_code>0.";*/
 			} else if ( ni.sform_code > 0 ) { // method 3
-				retVec = sto * voxelSizeVec;
-			} else if ( ni.sform_code == 0 and ni.qform_code == 0 ) {
+				retVec = sto;
+			} else if ( ni.sform_code == 0 and ni.qform_code == 0 ) { // it seems to be an ANALYZE7.5 file
 				LOG( ImageIoLog, info ) << "sform_code and qform_code are 0. Trying to use qto_xyz info!";
-				retVec = qto * voxelSizeVec;
+				retVec = qto;
 			} else {
 				LOG( ImageIoLog, error )
 				<< "can't read orientation Vector for direction: " << dir + 1;
@@ -363,6 +389,7 @@ private:
 			}
 		}
 
+		// data dependent information added
 		ni.nbyper = image.bytes_per_voxel();
 		image.getMinMax( ni.cal_min, ni.cal_max );
 	}
@@ -372,9 +399,27 @@ private:
 		BOOST_ASSERT( data::Image::n_dims == 4 );
 		ni.scl_slope = 1.0;
 		ni.scl_inter = 0.0;// TODO: ? http://209.85.135.104/search?q=cache:AxBp5gn9GzoJ:nifti.nimh.nih.gov/board/read.php%3Ff%3D1%26i%3D57%26t%3D57+nifti-1+scl_slope&hl=en&ct=clnk&cd=1&client=iceweasel-a
-		ni.freq_dim = 1;
-		ni.phase_dim = 2;
-		ni.slice_dim = 3;
+
+		if (image.hasProperty( "InPlanePhaseEncodingDirection") ){
+			std::string phaseEncoding = (image.getProperty<std::string>("InPlanePhaseEncodingDirection") );
+			if ("ROW" == phaseEncoding.c_str()){
+				ni.freq_dim = 2;
+				ni.phase_dim = 1;
+			}
+			if ("COL" == phaseEncoding.c_str()){
+				ni.freq_dim = 1;
+				ni.phase_dim = 2;
+			}
+			else{
+				ni.freq_dim = 0;
+				ni.phase_dim = 0;
+			}
+		}
+		else{
+			ni.freq_dim = 1;
+			ni.phase_dim = 2;
+			ni.slice_dim = 3;
+		}
 		ni.xyz_units = NIFTI_UNITS_MM;
 		ni.time_units = NIFTI_UNITS_MSEC;
 		util::fvector4 dimensions = image.sizeToVector();
@@ -385,24 +430,26 @@ private:
 		ni.nz = ni.dim[3] = dimensions[2];
 		ni.nt = ni.dim[4] = dimensions[3];
 		ni.nvox = image.volume();
-		util::fvector4 readVec = image.getProperty<util::fvector4>( "readVec" );
-		util::fvector4 phaseVec = image.getProperty<util::fvector4>( "phaseVec" );
+		//orientation in isis LPS - but in nifti everything relative to RAS - so let's change read/phase direction and sign of indexOrigin
+		util::fvector4 readVec = -image.getProperty<util::fvector4>( "readVec" );
+		util::fvector4 phaseVec = -image.getProperty<util::fvector4>( "phaseVec" );
 		util::fvector4 sliceVec = image.getProperty<util::fvector4>( "sliceVec" );
-		util::fvector4 indexOrigin = image.getProperty<util::fvector4>( "indexOrigin" );
+		util::fvector4 indexOrigin = -image.getProperty<util::fvector4>( "indexOrigin" );
 		LOG( ImageIoLog, info ) << indexOrigin;
 		util::fvector4 voxelSizeVector = image.getProperty<util::fvector4>( "voxelSize" );
-		ni.dx = ni.pixdim[1] = voxelSizeVector[0];
-		ni.dy = ni.pixdim[2] = voxelSizeVector[1];
-		ni.dz = ni.pixdim[3] = voxelSizeVector[2];
+		util::fvector4 voxelGap = image.getProperty<util::fvector4>( "voxelGap" );
+		ni.dx = ni.pixdim[1] = voxelSizeVector[0]+voxelGap[0];
+		ni.dy = ni.pixdim[2] = voxelSizeVector[1]+voxelGap[1];
+		ni.dz = ni.pixdim[3] = voxelSizeVector[2]+voxelGap[2];
 		ni.dt = ni.pixdim[4] = voxelSizeVector[3];
 
-		if ( true == image.hasProperty( "study/description" ) ) {
-			std::string descrip = ( image.getProperty<std::string>( "study/description" ) );
+		if ( true == image.hasProperty( "sequenceDescription" ) ) {
+			std::string descrip = ( image.getProperty<std::string>( "sequenceDescription" ) );
 			snprintf( ni.descrip, 80, "%s", descrip.c_str() );
 		}
 
-		if ( true == image.hasProperty( "series/description" ) ) {
-			std::string descrip = ( image.getProperty<std::string>( "series/description" ) );
+		if ( true == image.hasProperty( "StudyDescription" ) ) {
+			std::string descrip = ( image.getProperty<std::string>( "StudyDescription" ) );
 			snprintf( ni.intent_name, 16, "%s", descrip.c_str() );
 		}
 
@@ -412,14 +459,11 @@ private:
 		ni.sform_code = ni.qform_code = NIFTI_XFORM_SCANNER_ANAT;//set scanner aligned space from nifti1.h
 		LOG( ImageIoLog, info ) << "ReadVec " << readVec << "  phaseVec" << phaseVec << "sliceVec" << sliceVec;
 
-		//util::fvector4 offsets = image.getProperty<util::fvector4>("offsetVec");
-		//      ni.qoffset_x = offsets[0];
-		//      ni.qoffset_y = offsets[1];
-		//      ni.qoffset_z = offsets[2];
+
 		for ( int y = 0; y < 3; y++ ) {
-			ni.qto_xyz.m[y][0] = readVec[y];//rot[0][y];
-			ni.qto_xyz.m[y][1] = phaseVec[y];//rot[1][y];
-			ni.qto_xyz.m[y][2] = sliceVec[y];//rot[2][y];
+			ni.qto_xyz.m[y][0] = readVec[y];
+			ni.qto_xyz.m[y][1] = phaseVec[y];
+			ni.qto_xyz.m[y][2] = sliceVec[y];
 			ni.qto_xyz.m[y][3] = indexOrigin[y];
 		}
 
@@ -427,9 +471,9 @@ private:
 
 		//add scaling to the sform
 		for ( int y = 0; y < 3; y++ ) {
-			ni.sto_xyz.m[0][y] *= voxelSizeVector[y];
-			ni.sto_xyz.m[1][y] *= voxelSizeVector[y];
-			ni.sto_xyz.m[2][y] *= voxelSizeVector[y];
+			ni.sto_xyz.m[0][y] *= voxelSizeVector[y]+voxelGap[y];
+			ni.sto_xyz.m[1][y] *= voxelSizeVector[y]+voxelGap[y];
+			ni.sto_xyz.m[2][y] *= voxelSizeVector[y]+voxelGap[y];
 		}
 
 		//generate matching quaternions
