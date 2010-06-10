@@ -194,7 +194,7 @@ public:
 	/**
 	 * (Re)computes the image layout and metadata.
 	 * The image will be "clean" on success.
-	 * \returns true if the image was successfully reindexed, false otherwise.
+	 * \returns true if the image was successfully reindexed and is valid, false otherwise.
 	 */
 	bool reIndex();
 

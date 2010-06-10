@@ -69,7 +69,7 @@ bool image_chunk_order::operator() ( const data::Chunk &a, const data::Chunk &b 
 			return true;
 		}
 
-		LOG_IF( aNumber == bNumber, Debug, warning )
+		LOG_IF( aNumber == bNumber, Runtime, warning )
 				<< "The Chunks from \"" << a.propertyValue( "source" ) << "\" and \""
 				<< b.propertyValue( "source" ) << "\" seem to be equal, won't insert";
 	}
@@ -105,20 +105,21 @@ bool Image::insertChunk ( const Chunk &chunk )
 			return false;
 		}
 
-		if ( first.propertyValue( "readVec" ) != chunk.propertyValue( "readVec" ) ) {
+
+		if ( first.hasProperty("readVec") and chunk.hasProperty("readVec") and first.propertyValue( "readVec" ) != chunk.propertyValue( "readVec" ) ) {
 			LOG( Debug, info )
 					<< "Ignoring chunk with different readVec. (" << chunk.propertyValue( "readVec" ) << "!=" << first.propertyValue( "readVec" ) << ")";
 			return false;
 		}
 
-		if ( first.propertyValue( "phaseVec" ) != chunk.propertyValue( "phaseVec" ) ) {
+		if ( first.hasProperty("phaseVec") and chunk.hasProperty("phaseVec") and first.propertyValue( "phaseVec" ) != chunk.propertyValue( "phaseVec" ) ) {
 			LOG( Debug, info )
 					<< "Ignoring chunk with different phaseVec. (" << chunk.propertyValue( "phaseVec" ) << "!=" << first.propertyValue( "phaseVec" ) << ")";
 			return false;
 		}
 
 		//if our first chunk and the incoming chunk do have sequenceNumber and it differs, skip it
-		if ( first.propertyValue( "sequenceNumber" ) != chunk.propertyValue( "sequenceNumber" ) ) {
+		if ( first.hasProperty("sequenceNumber") and chunk.hasProperty("sequenceNumber") and first.propertyValue( "sequenceNumber" ) != chunk.propertyValue( "sequenceNumber" ) ) {
 			LOG( Debug, info )
 					<< "Ignoring chunk because its sequenceNumber doesn't fit ("
 					<< first.propertyValue( "sequenceNumber" ) << "!=" << chunk.propertyValue( "sequenceNumber" )
@@ -359,8 +360,7 @@ bool Image::reIndex()
 	}
 
 	LOG_IF( not valid(), Runtime, warning ) << "The image is not valid after reindexing. Missing properties: " << getMissing();
-	clean = true;
-	return true;
+	return clean = valid();
 }
 
 const Chunk &Image::getChunkAt( size_t at )const
@@ -567,6 +567,7 @@ size_t Image::cmp( const isis::data::Image &comp ) const
 
 Image::orientation Image::getMainOrientation()const
 {
+	LOG_IF(not valid() or not clean,Debug,warning) << "You should not run this on non clean image. Run reIndex first.";
 	util::fvector4 read = getProperty<util::fvector4>( "readVec" );
 	util::fvector4 phase = getProperty<util::fvector4>( "phaseVec" );
 	read.norm();

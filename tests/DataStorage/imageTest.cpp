@@ -27,6 +27,9 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 	// but inserting a proper Chunk should work
 	ch.setProperty( "indexOrigin", util::fvector4( 0, 0, 2, 0 ) );
 	ch.setProperty<u_int32_t>( "acquisitionNumber", 2 );
+	ch.setProperty( "readVec", util::fvector4( 1, 0 ) );
+	ch.setProperty( "phaseVec", util::fvector4( 0, 1 ) );
+
 	ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 	BOOST_REQUIRE( img.insertChunk( ch ) );
 	//inserting the same chunk twice should fail
@@ -80,6 +83,8 @@ BOOST_AUTO_TEST_CASE ( image_chunk_test )
 
 	for ( int i = 0; i < 3; i++ )
 		for ( int j = 0; j < 3; j++ ) {
+			ch[i][j].setProperty( "readVec", util::fvector4( 1, 0 ) );
+			ch[i][j].setProperty( "phaseVec", util::fvector4( 0, 1 ) );
 			ch[i][j].setProperty( "indexOrigin", util::fvector4( 0, 0, j, i ) );
 			ch[i][j].setProperty( "acquisitionNumber", acNum++ );
 			ch[i][j].setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
@@ -87,7 +92,7 @@ BOOST_AUTO_TEST_CASE ( image_chunk_test )
 			BOOST_REQUIRE( img.insertChunk( ch[i][j] ) );
 		}
 
-	img.reIndex();
+	BOOST_REQUIRE(img.reIndex());
 	BOOST_CHECK_EQUAL( img.volume(), 9 * 9 );
 	BOOST_CHECK_EQUAL( img.sizeToVector(), util::ivector4( 3, 3, 3, 3 ) );
 	const data::Chunk &ref11 = img.getChunk( 0, 0, 0 );
@@ -133,9 +138,12 @@ BOOST_AUTO_TEST_CASE ( image_voxel_test )
 	ch[2].voxel<float>( 2, 2 ) = 42;
 
 	for ( int i = 0; i < 3; i++ ) {
+		ch[i].setProperty( "readVec", util::fvector4( 1, 0 ) );
+		ch[i].setProperty( "phaseVec", util::fvector4( 0, 1 ) );
 		BOOST_REQUIRE( img.insertChunk( ch[i] ) );
 	}
 
+	BOOST_REQUIRE(img.reIndex());
 	for ( int i = 0; i < 3; i++ ) {
 		BOOST_CHECK( img.voxel<float>( i, i, i, 0 ) == 42 );
 	}
@@ -154,6 +162,8 @@ BOOST_AUTO_TEST_CASE( image_minmax_test )
 
 	for ( int i = 0; i < 3; i++ )
 		for ( int j = 0; j < 3; j++ ) {
+			ch[i][j].setProperty( "readVec", util::fvector4( 1, 0 ) );
+			ch[i][j].setProperty( "phaseVec", util::fvector4( 0, 1 ) );
 			ch[i][j].setProperty( "indexOrigin", util::fvector4( 0, 0, j, i ) );
 			ch[i][j].setProperty( "acquisitionNumber", acNum++ );
 			ch[i][j].setProperty( "voxelSize", vSize );
@@ -161,7 +171,7 @@ BOOST_AUTO_TEST_CASE( image_minmax_test )
 			BOOST_REQUIRE( img.insertChunk( ch[i][j] ) );
 		}
 
-	img.reIndex();
+	BOOST_REQUIRE(img.reIndex());
 	{
 		util::_internal::TypeBase::Reference min, max;
 		img.getMinMax( min, max );
@@ -190,7 +200,7 @@ BOOST_AUTO_TEST_CASE( orientation_test )
 	ch.setProperty( "acquisitionNumber", 0 );
 	ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 	BOOST_REQUIRE( img.insertChunk( ch ) );
-	img.reIndex();
+	BOOST_REQUIRE(img.reIndex());
 	BOOST_CHECK_EQUAL( img.getMainOrientation(), data::Image::axial );
 }
 
@@ -212,7 +222,7 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 			BOOST_REQUIRE( img.insertChunk( ch[i][j] ) );
 		}
 
-	img.reIndex();
+	BOOST_REQUIRE(img.reIndex());
 	{
 		util::_internal::TypeBase::Reference min, max;
 		img.getMinMax( min, max );
@@ -224,7 +234,7 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 	{
 		// Conversion to u_int8_t (will downscale [0-255])
 		data::MemImage<u_int8_t> img2( img );
-		BOOST_CHECK(img2.reIndex());
+		BOOST_REQUIRE(img2.reIndex());
 		BOOST_CHECK_EQUAL(static_cast<util::PropMap>(img), static_cast<util::PropMap>(img2));
 		util::_internal::TypeBase::Reference min, max;
 		img2.getMinMax( min, max );
@@ -236,7 +246,7 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 	{
 		// Conversion to int16_t (will upscale [0-32k])
 		data::MemImage<int16_t> img2( img );
-		BOOST_CHECK(img2.reIndex());
+		BOOST_REQUIRE(img2.reIndex());
 		BOOST_CHECK_EQUAL(static_cast<util::PropMap>(img), static_cast<util::PropMap>(img2));
 		util::_internal::TypeBase::Reference min, max;
 		img2.getMinMax( min, max );

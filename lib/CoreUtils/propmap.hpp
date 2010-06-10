@@ -298,7 +298,8 @@ public:
 	 * If the requested type is not equal to type the property is stored with, an automatic conversion is done.
 	 */
 	template<typename T> T getProperty( const std::string &key )const {
-		return propertyValue( key )->as<T>();
+		const PropertyValue &ref=propertyValue( key );
+		return ref.empty() ? T():ref->as<T>();
 	}
 	/**
 	 * Rename a given property/branch.

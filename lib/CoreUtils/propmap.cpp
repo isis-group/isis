@@ -140,7 +140,7 @@ const PropertyValue &PropMap::propertyValue( const std::string &key )const
 	if( ref and ref->is_leaf() ) {
 		return ref->getLeaf();
 	} else {
-		LOG( Runtime, warning ) << "Property " << key << " not found. Returning empty property.";
+		LOG( Debug, warning ) << "Property " << key << " not found. Returning empty property.";
 		return emptyEntry.getLeaf();
 	}
 }
