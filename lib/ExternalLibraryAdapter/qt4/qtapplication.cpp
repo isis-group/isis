@@ -18,40 +18,28 @@
 */
 
 #include "qtapplication.hpp"
-#include "common.hpp"
 
-namespace isis{
-namespace qt4 {
-
-QtApplication::QtApplication( const char name[] ):
+isis::qt4::QtApplication::QtApplication( const char name[] ):
 		Application( name )
-{
-	util::Selection dbg_levels( "error,warning,info,verbose_info" );
-	dbg_levels.set( "warning" );
-	parameters["dQt4"] = dbg_levels;
-	parameters["dQt4"].setDescription( "Debugging level for the qt4 adapter module" );
-}
+{}
 
-QApplication& QtApplication::getQApplication()
+QApplication& isis::qt4::QtApplication::getQApplication()
 {
-	LOG_IF( not m_qapp, Debug, error ) << "The QApplication was not yet created, you should run init() before using getQApplication.";
+	LOG_IF( not m_qapp, util::Debug, error ) << "The QApplication was not yet created, you should run init() before using getQApplication.";
 	return *m_qapp;
 }
-bool QtApplication::init( int argc, char** argv, bool exitOnError )
+bool isis::qt4::QtApplication::init( int argc, char** argv, bool exitOnError )
 {
-	bool ret=util::Application::init( argc, argv, exitOnError );// run init of the base first - will fill parameters
-	setLog<Debug>( LLMap[parameters["dQt4"]] );
-	setLog<Runtime>( LLMap[parameters["dQt4"]] );
-
 	if ( m_qapp ) {
-		LOG( Debug, error ) << "The QApplication allready exists. This should not happen. I'll not touch it";
+		LOG( util::Debug, error ) << "The QApplication allready exists. This should not happen. I'll not touch it";
 	} else {
 		m_argc = argc; // create local copies
 		m_argv = argv;
 		m_qapp.reset( new QApplication( m_argc, m_argv ) );
 	}
-	return ret;
+
+	return util::Application::init( argc, argv, exitOnError );
 }
 
 
-}}
+

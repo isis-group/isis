@@ -7,7 +7,7 @@
 
 #define BOOST_TEST_MODULE TypePtrTest
 #include <boost/test/included/unit_test.hpp>
-#include "DataStorage//typeptr.hpp"
+#include "DataStorage/typeptr.hpp"
 #include <cmath>
 
 namespace isis

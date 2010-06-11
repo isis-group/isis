@@ -13,18 +13,11 @@
 #ifndef ISISTYPE_HPP
 #define ISISTYPE_HPP
 
-#include "log.hpp"
 #include "type_base.hpp"
 #include "string.h"
 
 #include <string>
 #include <functional>
-
-// @todo we need to know this for lexical_cast (toString)
-#include <boost/date_time/gregorian/gregorian.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
-
-
 
 namespace isis
 {
