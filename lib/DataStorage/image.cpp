@@ -119,6 +119,14 @@ bool Image::insertChunk ( const Chunk &chunk )
 		}
 
 		//if our first chunk and the incoming chunk do have sequenceNumber and it differs, skip it
+		if ( first.hasProperty("coilChannelMask") and chunk.hasProperty("coilChannelMask") and first.propertyValue( "coilChannelMask" ) != chunk.propertyValue( "coilChannelMask" ) ) {
+			LOG( Debug, info )
+					<< "Ignoring chunk because its coilChannelMask doesn't fit ("
+					<< first.propertyValue( "coilChannelMask" ) << "!=" << chunk.propertyValue( "coilChannelMask" )
+					<< ")";
+			return false;
+		}
+		//if our first chunk and the incoming chunk do have sequenceNumber and it differs, skip it
 		if ( first.hasProperty("sequenceNumber") and chunk.hasProperty("sequenceNumber") and first.propertyValue( "sequenceNumber" ) != chunk.propertyValue( "sequenceNumber" ) ) {
 			LOG( Debug, info )
 					<< "Ignoring chunk because its sequenceNumber doesn't fit ("

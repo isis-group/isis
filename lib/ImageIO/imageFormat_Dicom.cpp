@@ -269,6 +269,8 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 		object.remove( prefix + "PatientsSex" );
 	}
 
+	transformOrTell<u_int32_t>( prefix + "CSAImageHeaderInfo/UsedChannelMask", "coilChannelMask", object, info );
+
 	////////////////////////////////////////////////////////////////
 	// Do some sanity checks on redundant tags
 	////////////////////////////////////////////////////////////////
