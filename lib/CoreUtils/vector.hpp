@@ -216,10 +216,10 @@ public:
 	 * Compute the product of all elements.
 	 * \returns \f[ \prod_{i=0}^{SIZE-1} this_i \f]
 	 */
-	TYPE product() {
+	TYPE product()const {
 		TYPE ret = 1;
 
-		for ( iterator i = CONTAINER::begin(); i != CONTAINER::end(); i++ )
+		for ( const_iterator i = CONTAINER::begin(); i != CONTAINER::end(); i++ )
 			ret *= *i;
 
 		return ret;

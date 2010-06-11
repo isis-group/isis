@@ -170,6 +170,7 @@ public:
 	 * (Reminder: Chunk-copies are cheap, so the data are NOT copied)
 	 */
 	const Chunk &getChunk( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const;
+	
 	/**
 	 * Get the chunk that contains the voxel at the given coordinates.
 	 * If the image is not clean Image::reIndex() will be run.
@@ -181,6 +182,30 @@ public:
 	 * \returns a reference of the chunk that contains the voxel at the given coordinates.
 	 */
 	Chunk &getChunk( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 );
+
+	/**
+	 * Get the chunk that contains the voxel at the given coordinates in the given type.
+	 * If the accordant chunk has type T a cheap copy is returned. 
+	 * Otherwise a MemChunk of the requested type is created from it. 
+	 * In this case min and max are used as value range for the conversion.
+	 *
+	 * \param min The minimum of the value-range of the image (use getMinMax to get this).
+	 * \param max The maximum of the value-range of the image (use getMinMax to get this).
+	 * \param first The first coordinate in voxel space. Usually the x value.
+	 * \param second The second coordinate in voxel space. Usually the y value.
+	 * \param third The third coordinate in voxel space. Ususally the z value.
+	 * \param fourth The fourth coordinate in voxel space. Usually the time value.
+	 * \returns a chunk contains the (maybe converted) voxel value at the given coordinates.
+	 */
+	template<typename TYPE> Chunk getChunkAs(TYPE min,TYPE max,size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0)const
+	{
+		const Chunk &ref=getChunk(first,second,third,fourth);
+		if(TypePtr<TYPE>::staticID==ref.typeID()){ //OK its the right type - just return that
+			return ref;
+		} else { //we have to to a conversion
+			return MemChunk<TYPE>(ref,util::Type<TYPE>(min),util::Type<TYPE>(max));
+		}
+	}
 
 	/**
 	 * Insert a Chunk into the Image.
@@ -236,11 +261,13 @@ public:
 		set.clear();
 		util::_internal::TypeBase::Reference min, max;
 		src.getMinMax( min, max );
+		LOG(Debug,info) << "Computed value range of the source image: ["<< min << ".." << max << "]";
 
 		//we want copies, and we want them to be of type T
 		for ( ConstChunkIterator i = src.chunksBegin(); i != src.chunksEnd(); ++i )      {
 			insertChunk( MemChunk<T>( *i, *min, *max ) );
 		}
+		reIndex();
 	}
 };
 

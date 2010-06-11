@@ -23,11 +23,7 @@
 #include "CoreUtils/type_base.hpp"
 #include "typeptr_converter.hpp"
 
-namespace isis{ namespace data{
-
-template<typename TYPE> class TypePtr;
-
-namespace _internal{
+namespace isis{ namespace data{ namespace _internal{
 
 class TypePtrBase : public util::_internal::GenericType
 {

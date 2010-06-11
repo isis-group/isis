@@ -230,8 +230,8 @@ public:
 
 			if ( 0 == strcasecmp( dialect.c_str(), "fsl" ) ) {
 				image.print( std::cout );
-				data::MemImage<u_int16_t> fslCopy( image );
-				fslCopy.print( std::cout << "Copy" << std::endl );
+				data::MemImage<int16_t> fslCopy( image );
+				fslCopy.print( std::cout << "Copy (" << fslCopy.getChunk(0,0,0,0).typeName() << ")" << std::endl );
 				ni.datatype = DT_INT16;
 				copyDataToNifti<int16_t>( fslCopy, ni );
 				break;
@@ -411,12 +411,12 @@ private:
 		if ( image.hasProperty( "InPlanePhaseEncodingDirection" ) ) {
 			std::string phaseEncoding = ( image.getProperty<std::string>( "InPlanePhaseEncodingDirection" ) );
 
-			if ( "ROW" == phaseEncoding.c_str() ) {
+			if ( phaseEncoding == "ROW" ) {
 				ni.freq_dim = 2;
 				ni.phase_dim = 1;
 			}
 
-			if ( "COL" == phaseEncoding.c_str() ) {
+			if ( phaseEncoding == "COL") {
 				ni.freq_dim = 1;
 				ni.phase_dim = 2;
 			} else {

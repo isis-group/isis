@@ -71,9 +71,10 @@ template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &s
 	size_t srcsize = src.len();
 	bool doScale = ( scaleopt != noscale && std::numeric_limits<DST>::is_integer ); //only do scale if scaleopt!=noscale and the target is an integer (scaling into float is useless)
 
-	if ( scaleopt == autoscale && std::numeric_limits<SRC>::is_integer )
+	if ( scaleopt == autoscale && std::numeric_limits<SRC>::is_integer ){
+		LOG(Debug,verbose_info) << "Won't upscale, because the source datatype is discrete (" << util::Type<SRC>::staticName() << ")";
 		scaleopt = noupscale; //dont scale up if SRC is an integer
-
+	}
 	if ( doScale ) {
 		const DST domain_min = std::numeric_limits<DST>::min();//negative value domain of this dst
 		const DST domain_max = std::numeric_limits<DST>::max();//positive value domain of this dst

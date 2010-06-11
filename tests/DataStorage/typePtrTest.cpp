@@ -50,7 +50,6 @@ bool Deleter::deleted = false;
 
 BOOST_AUTO_TEST_CASE( typePtr_init_test )
 {
-	//  util::enable_log<util::DefaultMsgPrint>(verbose_info);
 	BOOST_CHECK( not Deleter::deleted );
 	{
 		data::TypePtr<int> outer;
@@ -164,19 +163,20 @@ BOOST_AUTO_TEST_CASE( typePtr_conversion_test )
 {
 	const float init[] = { -2, -1.8, -1.5, -1.3, -0.6, -0.2, 2, 1.8, 1.5, 1.3, 0.6, 0.2};
 	data::TypePtr<float> floatArray( ( float * )malloc( sizeof( float ) * 12 ), 12 );
-	//without scaling
+	//with automatic upscaling into integer
 	floatArray.copyFromMem( init, 12 );
 
 	for ( int i = 0; i < 12; i++ )
-		BOOST_CHECK_EQUAL( floatArray[i], init[i] );
+		BOOST_REQUIRE_EQUAL( floatArray[i], init[i] );
 
 	data::TypePtr<int> intArray = floatArray.copyToNew<int>();
+	double scale= ( (double)std::numeric_limits<int>::max())/2;
 
-	for ( int i = 0; i < 12; i++ )
-		BOOST_CHECK_EQUAL( intArray[i], round( init[i] ) );
+	for ( int i = 0; i < 12; i++ ) // Conversion from float to integer will scale up to maximum, to map the fraction as exact as possible
+		BOOST_CHECK_EQUAL( intArray[i], round( init[i]*scale ) );
 
-	//with scaling
-	const double scale = std::min( std::numeric_limits< short >::max() / 2e5, std::numeric_limits< short >::min() / -2e5 );
+	//with automatic downscaling because of range overflow
+	scale = std::min( std::numeric_limits< short >::max() / 2e5, std::numeric_limits< short >::min() / -2e5 );
 
 	for ( int i = 0; i < 12; i++ )
 		floatArray[i] = init[i] * 1e5;

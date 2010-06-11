@@ -123,112 +123,50 @@ throw( std::runtime_error & )
 		// save 3D data to ONE vista image
 		vimages = ( VImage * )malloc( sizeof( VImage ) );
 		nimages = 1;
-		data::Chunk chunk = image.getChunk( 0 );
 
 		// choose data type
-		switch( chunk.typeID() ) {
+		switch( image.getChunk(0,0,0,0).typeID() ) {
 			// VBit
 		case data::TypePtr<VBit>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VBitRepn );
-
-			for( int z = 0; z < dims[2]; z++ ) {
-				for( int y = 0; y < dims[1]; y++ ) {
-					for( int x = 0; x < dims[0]; x++ ) {
-						VPixel( vimages[0], z, y, x, VBit )
-						= chunk.voxel<VBit>( x, y, z, 0 );
-					}
-				}
-			}
-
+			copyImageToVista<VBit>(image,vimages[0]);
 			break;
 			// VUByte
 		case data::TypePtr<VUByte>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VUByteRepn );
-
-			for( int z = 0; z < dims[2]; z++ ) {
-				for( int y = 0; y < dims[1]; y++ ) {
-					for( int x = 0; x < dims[0]; x++ ) {
-						VPixel( vimages[0], z, y, x, VUByte )
-						= chunk.voxel<VUByte>( x, y, z, 0 );
-					}
-				}
-			}
-
+			copyImageToVista<VUByte>(image,vimages[0]);
 			break;
 			// VSByte
 		case data::TypePtr<VSByte>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VSByteRepn );
-
-			for( int z = 0; z < dims[2]; z++ ) {
-				for( int y = 0; y < dims[1]; y++ ) {
-					for( int x = 0; x < dims[0]; x++ ) {
-						VPixel( vimages[0], z, y, x, VSByte ) =
-							chunk.voxel<VSByte>( x, y, z, 0 );
-					}
-				}
-			}
-
+			copyImageToVista<VSByte>(image,vimages[0]);
 			break;
 			// VShort
+		case data::TypePtr<u_int16_t>::staticID:
+			LOG(Runtime,warning) << "Vista does not support " << util::Type<u_int16_t>::staticName() << " falling back to " << util::Type<VShort>::staticName();
 		case data::TypePtr<VShort>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VShortRepn );
-
-			for( int z = 0; z < dims[2]; z++ ) {
-				for( int y = 0; y < dims[1]; y++ ) {
-					for( int x = 0; x < dims[0]; x++ ) {
-						VPixel( vimages[0], z, y, x, VShort ) =
-							chunk.voxel<VShort>( x, y, z, 0 );
-					}
-				}
-			}
-
+			copyImageToVista<VShort>(image,vimages[0]);
 			break;
 			// VLong
 		case data::TypePtr<VLong>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VLongRepn );
-
-			for( int z = 0; z < dims[2]; z++ ) {
-				for( int y = 0; y < dims[1]; y++ ) {
-					for( int x = 0; x < dims[0]; x++ ) {
-						VPixel( vimages[0], z, y, x, VLong )
-						= chunk.voxel<VLong>( x, y, z, 0 );
-					}
-				}
-			}
-
+			copyImageToVista<VLong>(image,vimages[0]);
 			break;
 			// VFloat
 		case data::TypePtr<VFloat>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VFloatRepn );
-
-			for( int z = 0; z < dims[2]; z++ ) {
-				for( int y = 0; y < dims[1]; y++ ) {
-					for( int x = 0; x < dims[0]; x++ ) {
-						VPixel( vimages[0], z, y, x, VFloat )
-						= chunk.voxel<VFloat>( x, y, z, 0 );
-					}
-				}
-			}
-
+			copyImageToVista<VFloat>(image,vimages[0]);
 			break;
 			// VDouble
 		case data::TypePtr<VDouble>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VDoubleRepn );
-
-			for( int z = 0; z < dims[2]; z++ ) {
-				for( int y = 0; y < dims[1]; y++ ) {
-					for( int x = 0; x < dims[0]; x++ ) {
-						VPixel( vimages[0], z, y, x, VDouble )
-						= chunk.voxel<VDouble>( x, y, z, 0 );
-					}
-				}
-			}
-
+			copyImageToVista<VDouble>(image,vimages[0]);
 			break;
 			// default error
 		default:
 			LOG( image_io::Runtime, error )
-					<< "Can't map image type " << chunk.typeName() << "(" << chunk.typeID() << ") to vista type. Aborting" ;
+					<< "Can't map image type " << image.getChunk(0).typeName() << "(" << image.getChunk(0).typeID() << ") to vista type. Aborting" ;
 			return;
 		}
 
