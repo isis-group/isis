@@ -28,7 +28,7 @@ namespace adapter
 {
 
 vtkAdapter::vtkAdapter( const boost::shared_ptr<isis::data::Image> src )
-		: m_ImageISIS( src )
+	: m_ImageISIS( src )
 {}
 
 //return a list of vtkImageData type pointer
@@ -50,47 +50,48 @@ vtkImageData *vtkAdapter::makeVtkImageObject( const boost::shared_ptr<data::Imag
 	//go through every timestep (dimensions[3] and add the chunk to the image list
 
 	switch ( myAdapter->m_ImageISIS->chunksBegin()->typeID() ) {
-	case util::TypePtr<int8_t>::staticID:
+	case data::TypePtr<int8_t>::staticID:
 		importer->SetDataScalarTypeToUnsignedChar();
 		importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<int8_t>( 0, 0, 0, dim4 ) );
 		vtkImage->SetScalarTypeToChar();
 		break;
-	case util::TypePtr<u_int8_t>::staticID:
+	case data::TypePtr<u_int8_t>::staticID:
 		importer->SetDataScalarTypeToUnsignedChar();
 		vtkImage->SetScalarTypeToUnsignedChar();
 		importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<u_int8_t>( 0, 0, 0, dim4 ) );
 		break;
-	case util::TypePtr<int16_t>::staticID:
+	case data::TypePtr<int16_t>::staticID:
 		importer->SetDataScalarTypeToShort();
 		vtkImage->SetScalarTypeToShort();
 		importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<int16_t>( 0, 0, 0, dim4 ) );
 		break;
-	case util::TypePtr<u_int16_t>::staticID:
+	case data::TypePtr<u_int16_t>::staticID:
 		importer->SetDataScalarTypeToUnsignedShort();
 		vtkImage->SetScalarTypeToUnsignedShort();
 		importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<u_int16_t>( 0, 0, 0, dim4 ) );
 		break;
-	case util::TypePtr<int32_t>::staticID:
+	case data::TypePtr<int32_t>::staticID:
 		importer->SetDataScalarTypeToInt();
 		vtkImage->SetScalarTypeToInt();
 		importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<int32_t>( 0, 0, 0, dim4 ) );
 		break;
-	case util::TypePtr<u_int32_t>::staticID:
+	case data::TypePtr<u_int32_t>::staticID:
 		importer->SetDataScalarTypeToInt();
 		vtkImage->SetScalarTypeToUnsignedInt();
 		importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<u_int32_t>( 0, 0, 0, dim4 ) );
 		break;
-	case util::TypePtr<float>::staticID:
+	case data::TypePtr<float>::staticID:
 		importer->SetDataScalarTypeToFloat();
 		vtkImage->SetScalarTypeToFloat();
 		importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<float>( 0, 0, 0, dim4 ) );
 		break;
-	case util::TypePtr<double>::staticID:
+	case data::TypePtr<double>::staticID:
 		importer->SetDataScalarTypeToDouble();
 		vtkImage->SetScalarTypeToDouble();
 		importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<double>( 0, 0, 0, dim4 ) );
 		break;
 	}
+
 	importer->SetWholeExtent( 0, dimensions[0] - 1, 0, dimensions[1] - 1, 0, dimensions[2] - 1 );
 	importer->SetDataExtentToWholeExtent();
 	importer->Update();

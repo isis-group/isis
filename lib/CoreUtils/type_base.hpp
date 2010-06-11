@@ -13,16 +13,13 @@
 #ifndef ISISTYPE_BASE_HPP
 #define ISISTYPE_BASE_HPP
 
-#include "log.hpp"
-#include <stdexcept>
-#include <cstdlib>
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include "types.hpp"
 #include "type_converter.hpp"
-#include "typeptr_converter.h"
+#include "generic_type.hpp"
 #include "common.hpp"
 
 
@@ -34,9 +31,6 @@ namespace isis
 {
 namespace util
 {
-
-template<typename TYPE> class Type;
-template<typename TYPE> class TypePtr;
 
 /// @cond _hidden
 namespace _internal
@@ -52,119 +46,6 @@ template<typename TYPE> TYPE __cast_to( Type<TYPE> *dest, const TYPE &value )
 /// @endcond
 
 /// @cond _internal
-class GenericType
-{
-protected:
-	template<typename T> T &m_cast_to() throw( std::invalid_argument ) {
-		if ( typeID() == T::staticID ) { // ok its exactly the same type - no fiddling necessary
-			return *reinterpret_cast<T *>( this );
-		} else {
-			T *const ret = dynamic_cast<T * >( this ); //@todo have a look at http://lists.apple.com/archives/Xcode-users/2005/Dec/msg00061.html and http://www.mailinglistarchive.com/xcode-users@lists.apple.com/msg15790.html
-
-			if ( ret == NULL ) {
-				std::stringstream msg;
-				msg << "cannot cast " << typeName() << " at " << this << " to " << T::staticName();
-				throw( std::invalid_argument( msg.str() ) );
-			}
-
-			return *ret;
-		}
-	}
-	template<typename T> const T &m_cast_to()const throw( std::invalid_argument ) {
-		if ( typeID() == T::staticID ) { // ok its exactly the same type - no fiddling necessary
-			return *reinterpret_cast<const T *>( this );
-		} else {
-			const T *const ret = dynamic_cast<const T * >( this ); //@todo have a look at http://lists.apple.com/archives/Xcode-users/2005/Dec/msg00061.html and http://www.mailinglistarchive.com/xcode-users@lists.apple.com/msg15790.html
-
-			if ( ret == NULL ) {
-				std::stringstream msg;
-				msg << "cannot cast " << typeName() << " at " << this << " to " << T::staticName();
-				throw( std::invalid_argument( msg.str() ) );
-			}
-
-			return *ret;
-		}
-	}
-
-public:
-	/// \returns true if the stored value is of type T.
-	template<typename T> bool is()const {return is( typeid( T ) );}
-	virtual bool is( const std::type_info &t )const = 0;
-
-	/// \returns the value represented as text.
-	virtual std::string toString( bool labeled = false )const = 0;
-
-	/// \returns the name of its actual type
-	virtual std::string typeName()const = 0;
-
-	/// \returns the id of its actual type
-	virtual unsigned short typeID()const = 0;
-
-	/// \returns true if type of this and second are equal
-	bool isSameType( const GenericType &second )const;
-	virtual ~GenericType() {}
-};
-
-/**
-* Base class to store and handle references to Type and TypePtr objects.
-* The values are refernced as smart pointers to their base class.
-* So the references are counted and data are automatically deleted if necessary.
-* The usual dereferencing pointer interface ("*" and "->") is supported.
-* This class is designed as base class for specialisations, it should not be used directly.
-* Because of that, the contructors of this class are protected.
-*/
-template<typename TYPE_TYPE> class TypeReference: protected boost::scoped_ptr<TYPE_TYPE>
-{
-	template<typename TT> friend class TypePtr; //allow Type and TypePtr to use the protected contructor below
-	template<typename TT> friend class Type;
-protected:
-	//dont use this directly
-	TypeReference( TYPE_TYPE *t ): boost::scoped_ptr<TYPE_TYPE>( t ) {}
-public:
-	///reexport parts of scoped_ptr's interface
-	TYPE_TYPE *operator->() const {return boost::scoped_ptr<TYPE_TYPE>::operator->();}
-	TYPE_TYPE &operator*() const {return boost::scoped_ptr<TYPE_TYPE>::operator*();}
-	///Default contructor. Creates an empty reference
-	TypeReference() {}
-	/**
-	* Copy constructor
-	* This operator creates a copy of the referenced Type-Object.
-	* So its NO cheap copy. (At least not if the copy-operator contained type is not cheap)
-	*/
-	TypeReference( const TypeReference &src ) {
-		operator=( src );
-	}
-	/**
-	 * Copy operator
-	 * This operator replaces the current content by a copy of the content of src.
-	 * So its NO cheap copy. (At least not if the copy-operator contained type is not cheap)
-	 * If the source is empty the target will drop its content. Thus it will become empty as well.
-	 * \returns reference to the (just changed) target
-	 */
-	TypeReference<TYPE_TYPE>& operator=( const TypeReference<TYPE_TYPE> &src ) {
-		boost::scoped_ptr<TYPE_TYPE>::reset( src.empty() ? 0 : src->clone() );
-		return *this;
-	}
-	/**
-	 * Copy operator
-	 * This operator replaces the current content by a copy of src.
-	 * \returns reference to the (just changed) target
-	 */
-	TypeReference<TYPE_TYPE>& operator=( const TYPE_TYPE &src ) {
-		boost::scoped_ptr<TYPE_TYPE>::reset( src.clone() );
-		return *this;
-	}
-	/// \returns true if "contained" type has no value (a.k.a. is undefined)
-	bool empty()const {
-		return boost::scoped_ptr<TYPE_TYPE>::get() == NULL;
-	}
-	const std::string toString( bool label = false )const {
-		if ( empty() )
-			return std::string( "\xd8" ); //ASCII code empty set
-		else
-			return this->get()->toString( label );
-	}
-};
 
 class TypeBase : public GenericType
 {
@@ -254,125 +135,6 @@ public:
 	virtual bool eq( const _internal::TypeBase &ref )const = 0;
 };
 
-class TypePtrBase : public GenericType
-{
-	friend class TypeReference<TypePtrBase>;
-	static const TypePtrConverterMap &converters();
-protected:
-	size_t m_len;
-	TypePtrBase( size_t len = 0 );
-	virtual const boost::weak_ptr<void> address()const = 0;
-	/// Create a TypePtr of the same type pointing at the same address.
-	virtual TypePtrBase *clone()const = 0;
-public:
-	typedef TypeReference<TypePtrBase> Reference;
-	typedef TypePtrConverterMap::mapped_type::mapped_type Converter;
-
-	const Converter &getConverterTo( unsigned short id )const;
-	/**
-	* Dynamically cast the TypeBase up to its actual TypePtr\<T\>. Constant version.
-	* Will throw std::bad_cast if T is not the actual type.
-	* Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
-	* \returns a constant reference of the pointer.
-	*/
-	template<typename T> const TypePtr<T>& cast_to_TypePtr() const {
-		return m_cast_to<TypePtr<T> >();
-	}
-	/**
-	* Dynamically cast the TypeBase up to its actual TypePtr\<T\>. Referenced version.
-	* Will throw std::bad_cast if T is not the actual type.
-	* Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
-	* \returns a reference of the pointer.
-	*/
-	template<typename T> TypePtr<T>& cast_to_TypePtr() throw( std::bad_cast ) {
-		return m_cast_to<TypePtr<T> >();
-	}
-	/// \returns the length of the data pointed to
-	size_t len()const;
-
-	virtual std::vector<Reference> splice( size_t size )const = 0;
-
-	/** Create a TypePtr of the same type pointing at a newly allocated memory.
-	 * This will not copy contents of this TypePtr, just its type and length.
-	 * \returns a reference to the newly created TypePtr
-	 */
-	TypePtrBase::Reference cloneToMem()const;
-	/**
-	 * Copy this to a new TypePtr using newly allocated memory.
-	 * This copies the contents of this TypePtr, its type and its length.
-	 * \returns a reference to the newly created TypePtr
-	 */
-	TypePtrBase::Reference copyToMem()const;
-
-	/// Copy (or Convert) data from this to another TypePtr of maybe another type and the same length.
-	virtual bool convertTo( TypePtrBase &dst )const = 0;
-	bool convertTo( TypePtrBase &dst, const TypeBase &min, const TypeBase &max )const;
-
-	/// Copy (or Convert) data from this to memory of maybe another type and the given length.
-	template<typename T> bool convertTo( T *dst, size_t len ) const {
-		TypePtr<T> dest( dst, len, TypePtr<T>::NonDeleter() );
-		return convertTo( dest );
-	}
-
-	/**
-	 * Copy this to a new TypePtr\<T\> using newly allocated memory.
-	 * This will create a new TypePtr of type T and the length of this.
-	 * The memory will be allocated and the data of this will be copy-converted to T.
-	 * If the conversion fails, an error will be send to CoreLog and the data of the newly created TypePtr will be undefined.
-	 * \returns a the newly created TypePtr
-	 */
-	template<typename T> const TypePtr<T> copyToNew()const {
-		TypePtr<T> ret( ( T * )malloc( sizeof( T )*len() ), len() );
-		convertTo( ret );
-		return ret;
-	}
-	/**
-	 * Copy this to a new TypePtr\<T\> using newly allocated memory.
-	 * This will create a new TypePtr of type T and the length of this.
-	 * The memory will be allocated and the data of this will be copy-converted to T using min/max as value range.
-	 * If the conversion fails, an error will be send to CoreLog and the data of the newly created TypePtr will be undefined.
-	 * \returns a the newly created TypePtr
-	 */
-	template<typename T> const TypePtr<T> copyToNew( const _internal::TypeBase &min, const _internal::TypeBase &max )const {
-		TypePtr<T> ret( ( T * )malloc( sizeof( T )*len() ), len() );
-		convertTo( ret, min, max );
-		return ret;
-	}
-	/**
-	 * \copydoc cloneToMem
-	 * \param length length of the new memory block in elements of the given TYPE
-	 */
-	virtual TypePtrBase::Reference cloneToMem( size_t length )const = 0;
-
-	virtual size_t bytes_per_elem()const = 0;
-	virtual ~TypePtrBase();
-	/**
-	 * Copy a range of elements to another TypePtr of the same type.
-	 * \param start first element in this to be copied
-	 * \param end last element in this to be copied
-	 * \param dst_start starting element in dst to be overwritten
-	 */
-	void copyRange( size_t start, size_t end, TypePtrBase &dst, size_t dst_start )const;
-
-	/**
-	 * Get minimum/maximum from a TypePtr.
-	 * The parameters are reverences to the current maximum/minimum found.
-	 * max will be replaced by a value from the array if:
-	 * - max is empty
-	 * - max is less than that value from the array
-	 *
-	 * min will be replaced by a value from the array if:
-	 * - min is empty
-	 * - min is greater than that value from the array
-	 *
-	 * Note, that min/max will also adopt the type of the value.
-	 * \param max TypeBase::Reference for the current greatest value
-	 * \param min TypeBase::Reference for the current lowest value
-	 */
-	virtual void getMinMax( TypeBase::Reference &min, TypeBase::Reference &max )const = 0;
-	virtual size_t cmp( size_t start, size_t end, const TypePtrBase &dst, size_t dst_start )const = 0;
-	size_t cmp( const TypePtrBase &comp )const;
-};
 
 }
 /// @endcond

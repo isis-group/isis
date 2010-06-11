@@ -128,7 +128,7 @@ throw( std::runtime_error & )
 		// choose data type
 		switch( chunk.typeID() ) {
 			// VBit
-		case util::TypePtr<VBit>::staticID:
+		case data::TypePtr<VBit>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VBitRepn );
 
 			for( int z = 0; z < dims[2]; z++ ) {
@@ -142,7 +142,7 @@ throw( std::runtime_error & )
 
 			break;
 			// VUByte
-		case util::TypePtr<VUByte>::staticID:
+		case data::TypePtr<VUByte>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VUByteRepn );
 
 			for( int z = 0; z < dims[2]; z++ ) {
@@ -156,7 +156,7 @@ throw( std::runtime_error & )
 
 			break;
 			// VSByte
-		case util::TypePtr<VSByte>::staticID:
+		case data::TypePtr<VSByte>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VSByteRepn );
 
 			for( int z = 0; z < dims[2]; z++ ) {
@@ -170,7 +170,7 @@ throw( std::runtime_error & )
 
 			break;
 			// VShort
-		case util::TypePtr<VShort>::staticID:
+		case data::TypePtr<VShort>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VShortRepn );
 
 			for( int z = 0; z < dims[2]; z++ ) {
@@ -184,7 +184,7 @@ throw( std::runtime_error & )
 
 			break;
 			// VLong
-		case util::TypePtr<VLong>::staticID:
+		case data::TypePtr<VLong>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VLongRepn );
 
 			for( int z = 0; z < dims[2]; z++ ) {
@@ -198,7 +198,7 @@ throw( std::runtime_error & )
 
 			break;
 			// VFloat
-		case util::TypePtr<VFloat>::staticID:
+		case data::TypePtr<VFloat>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VFloatRepn );
 
 			for( int z = 0; z < dims[2]; z++ ) {
@@ -212,7 +212,7 @@ throw( std::runtime_error & )
 
 			break;
 			// VDouble
-		case util::TypePtr<VDouble>::staticID:
+		case data::TypePtr<VDouble>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VDoubleRepn );
 
 			for( int z = 0; z < dims[2]; z++ ) {
@@ -228,7 +228,7 @@ throw( std::runtime_error & )
 			// default error
 		default:
 			LOG( image_io::Runtime, error )
-					<< "Can't map image type " << chunk.typeName() << "("<< chunk.typeID() << ") to vista type. Aborting" ;
+					<< "Can't map image type " << chunk.typeName() << "(" << chunk.typeID() << ") to vista type. Aborting" ;
 			return;
 		}
 

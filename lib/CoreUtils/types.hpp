@@ -5,7 +5,6 @@
 #include <boost/mpl/distance.hpp>
 #include <boost/mpl/find.hpp>
 #include <stdint.h>
-#include <boost/mpl/for_each.hpp>
 #include <boost/mpl/contains.hpp>
 
 #include <boost/date_time/gregorian/gregorian_types.hpp>

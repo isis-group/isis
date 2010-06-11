@@ -5,18 +5,18 @@
 #include <assert.h>
 #include <boost/numeric/conversion/converter.hpp>
 #include "common.hpp"
-#include "type.hpp"
+#include "typeptr.hpp"
 
 namespace isis
 {
-namespace util
+namespace data
 {
 namespace _internal
 {
 template<typename SRC, typename DST> static void numeric_convert_impl( const SRC *src, DST *dst, size_t count, double scale, double offset )
 {
 	LOG( Debug, info )
-	<< "using generic scaling convert " << Type<SRC>::staticName() << "=>" << Type<DST>::staticName()
+	<< "using generic scaling convert " << TypePtr<SRC>::staticName() << "=>" << TypePtr<DST>::staticName()
 	<< " with scale/offset " << scale << "/" << offset;
 	static boost::numeric::converter <
 	DST, double,
@@ -30,7 +30,7 @@ template<typename SRC, typename DST> static void numeric_convert_impl( const SRC
 }
 template<typename SRC, typename DST> static void numeric_convert_impl( const SRC *src, DST *dst, size_t count )
 {
-	LOG( Debug, info ) << "using generic convert " << Type<SRC>::staticName() << " => " << Type<DST>::staticName() << " without scaling";
+	LOG( Debug, info ) << "using generic convert " << TypePtr<SRC>::staticName() << " => " << TypePtr<DST>::staticName() << " without scaling";
 	static boost::numeric::converter <
 	DST, SRC,
 	boost::numeric::conversion_traits<DST, SRC>,
@@ -55,7 +55,7 @@ enum autoscaleOption {noscale, autoscale, noupscale, upscale};
  * If dst is shorter than src, no conversion is done.
  * If src is shorter than dst a warning is send to CoreLog.
  */
-template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &src, TypePtr<DST> &dst, const _internal::TypeBase &min, const _internal::TypeBase &max, autoscaleOption scaleopt = autoscale )
+template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &src, TypePtr<DST> &dst, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale )
 {
 	if ( src.len() > dst.len() ) {
 		LOG( Runtime, error ) << "The " << src.len() << " elements of src wont fit into the destination with the size " << dst.len();
@@ -78,12 +78,12 @@ template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &s
 		const DST domain_min = std::numeric_limits<DST>::min();//negative value domain of this dst
 		const DST domain_max = std::numeric_limits<DST>::max();//positive value domain of this dst
 		double minval, maxval;
-		LOG_IF( min.typeID() != Type<SRC>::staticID, Debug, info )
-		<< "The given minimum for src Range is not of the same type as the data ("
-		<< min.typeName() << "!=" << Type<SRC>::staticName() << ")";
-		LOG_IF( max.typeID() != Type<SRC>::staticID, Debug, info )
-		<< "The given maximum for src Range is not of the same type as the data ("
-		<< max.typeName() << "!=" << Type<SRC>::staticName() << ")";
+
+		LOG_IF( min.typeID() != util::Type<SRC>::staticID, Debug, info )
+		<< "The given minimum for src Range is not of the same type as the data ("	<< min.typeName() << "!=" << util::Type<SRC>::staticName() << ")";
+		LOG_IF( max.typeID() != util::Type<SRC>::staticID, Debug, info )
+		<< "The given maximum for src Range is not of the same type as the data ("	<< max.typeName() << "!=" << util::Type<SRC>::staticName() << ")";
+
 		minval = min.as<double>();
 		maxval = max.as<double>();
 		assert( minval < maxval );

@@ -67,28 +67,28 @@ public:
 		itkAdapter *myAdapter = new itkAdapter( src );
 
 		switch ( src->chunksBegin()->typeID() ) {
-		case util::TypePtr<int8_t>::staticID:
+		case data::TypePtr<int8_t>::staticID:
 			return myAdapter->internCreateItk<int8_t, OutputImageType>( behaveAsItkReader );
 			break;
-		case util::TypePtr<u_int8_t>::staticID:
+		case data::TypePtr<u_int8_t>::staticID:
 			return myAdapter->internCreateItk<u_int8_t, OutputImageType>( behaveAsItkReader );
 			break;
-		case util::TypePtr<int16_t>::staticID:
+		case data::TypePtr<int16_t>::staticID:
 			return myAdapter->internCreateItk<int16_t, OutputImageType>( behaveAsItkReader );
 			break;
-		case util::TypePtr<u_int16_t>::staticID:
+		case data::TypePtr<u_int16_t>::staticID:
 			return myAdapter->internCreateItk<u_int16_t, OutputImageType>( behaveAsItkReader );
 			break;
-		case util::TypePtr<int32_t>::staticID:
+		case data::TypePtr<int32_t>::staticID:
 			return myAdapter->internCreateItk<int32_t, OutputImageType>( behaveAsItkReader );
 			break;
-		case util::TypePtr<u_int32_t>::staticID:
+		case data::TypePtr<u_int32_t>::staticID:
 			return myAdapter->internCreateItk<u_int32_t, OutputImageType>( behaveAsItkReader );
 			break;
-		case util::TypePtr<float>::staticID:
+		case data::TypePtr<float>::staticID:
 			return myAdapter->internCreateItk<float, OutputImageType>( behaveAsItkReader );
 			break;
-		case util::TypePtr<double>::staticID:
+		case data::TypePtr<double>::staticID:
 			return myAdapter->internCreateItk<double, OutputImageType>( behaveAsItkReader );
 			break;
 		default:

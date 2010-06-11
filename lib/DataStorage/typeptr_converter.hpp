@@ -22,22 +22,22 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
-#include "log.hpp"
+#include <map>
+#include "CoreUtils/type_base.hpp"
 
 namespace isis
 {
-namespace util
+namespace data
 {
 namespace _internal
 {
 
-class TypeBase;
 class TypePtrBase;
 class TypePtrConverterBase
 {
 public:
-	virtual void convert( const TypePtrBase &src, TypePtrBase &dst, const TypeBase &min, const TypeBase &max )const;
-	virtual void generate( const boost::scoped_ptr<TypePtrBase>& src, boost::scoped_ptr<TypePtrBase>& dst, const TypeBase &min, const TypeBase &max )const = 0;
+	virtual void convert( const TypePtrBase &src, TypePtrBase &dst, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max )const;
+	virtual void generate( const boost::scoped_ptr<TypePtrBase>& src, boost::scoped_ptr<TypePtrBase>& dst, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max )const = 0;
 	static boost::shared_ptr<const TypePtrConverterBase> create() {return boost::shared_ptr<const TypePtrConverterBase>();}
 public:
 	virtual ~TypePtrConverterBase() {}
