@@ -240,15 +240,39 @@ int main(
 	LOG_IF( inList.empty(), isis::DataLog, isis::error ) << "Input image is empty!";
 
 	// TODO DEBUG
-	std::cout << refList.front()->getProperty<isis::util::fvector4>("indexOrigin") << std::endl;
-
+	// use makeItkImageObject with "false" -> no ITK nifti default transformation
 	if ( !smooth ) {
 		fixedImage = isis::adapter::itkAdapter::makeItkImageObject<FixedImageType>( refList.front());
-		movingImage = isis::adapter::itkAdapter::makeItkImageObject<MovingImageType>( inList.front() );
-	}
+		movingImage = isis::adapter::itkAdapter::makeItkImageObject<MovingImageType>( inList.front());
 
-	// TODO DEBUG
-	std::cout << fixedImage->GetOrigin() << std::endl;
+		// TODO DEBUG
+		std::cout << "********** Fixed Image **********" << std::endl;
+		std::cout << fixedImage->GetDirection();
+		std::cout << "index origin: ";
+		std::cout << fixedImage->GetOrigin() << std::endl;
+
+		FixedImageType::PointType fpoint;
+		FixedImageType::SizeType fsize = fixedImage->GetLargestPossibleRegion().GetSize();
+		FixedImageType::IndexType findex = {{fsize[0],fsize[1],fsize[2]}};
+		fixedImage->TransformIndexToPhysicalPoint(findex,fpoint);
+		std::cout << "diagonal point:" << fpoint << std::endl;
+		std::cout << "size: " << fsize << std::endl;
+		std::cout << "spacing: " << fixedImage->GetSpacing() << std::endl << std::endl;
+
+		std::cout << "********** Moving Image **********" << std::endl;
+		std::cout << movingImage->GetDirection();
+		std::cout << "index origin: ";
+		std::cout << movingImage->GetOrigin() << std::endl;
+
+		MovingImageType::PointType mpoint;
+		FixedImageType::SizeType msize = movingImage->GetLargestPossibleRegion().GetSize();
+		FixedImageType::IndexType mindex = {{msize[0],msize[1],msize[2]}};
+		movingImage->TransformIndexToPhysicalPoint(mindex,mpoint);
+		std::cout << "diagonal point:" << mpoint << std::endl;
+		std::cout << "size: " << msize << std::endl;
+		std::cout << "spacing: " << movingImage->GetSpacing() << std::endl;
+
+	}
 
 	if ( smooth ) {
 		GaussianFilterType::Pointer fixedGaussianFilterX = GaussianFilterType::New();

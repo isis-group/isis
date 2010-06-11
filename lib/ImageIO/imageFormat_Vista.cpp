@@ -579,15 +579,21 @@ void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &c
 		util::fvector4 voxels = chunk.getProperty<util::fvector4>( "voxelSize" );
 		// calculate index origin according to axial
 		util::fvector4 ioTmp(
-			( ( dims[0] - 1 )*voxels[0] ) / 2,
-			( ( dims[1] - 1 )*voxels[1] ) / 2,
-			-( ( dims[2] - 1 )*voxels[2] ) / 2,
+			- ( ( dims[0] - 1 )*voxels[0] ) / 2,
+			- ( ( dims[1] - 1 )*voxels[1] ) / 2,
+			- ( ( dims[2] - 1 )*voxels[2] ) / 2,
 			0 );
+		util::fvector4 readV = chunk.getProperty<util::fvector4>( "readVec");
+		util::fvector4 phaseV = chunk.getProperty<util::fvector4>( "phaseVec");
+		util::fvector4 sliceV = chunk.getProperty<util::fvector4>( "sliceVec");
 		// multiply indexOrigin with read, phase and slice vector
 		util::fvector4 iOrig(
-			( ( util::fvector4 )chunk.getProperty<util::fvector4>( "readVec" ) ).dot( ioTmp ),
-			( ( util::fvector4 )chunk.getProperty<util::fvector4>( "phaseVec" ) ).dot( ioTmp ),
-			( ( util::fvector4 )chunk.getProperty<util::fvector4>( "sliceVec" ) ).dot( ioTmp ),
+			readV[0] * ioTmp[0] + phaseV[0] * ioTmp[1] + sliceV[0] * ioTmp[2],
+			readV[1] * ioTmp[0] + phaseV[1] * ioTmp[1] + sliceV[1] * ioTmp[2],
+			readV[2] * ioTmp[0] + phaseV[2] * ioTmp[1] + sliceV[2] * ioTmp[2],
+//			( ( util::fvector4 )chunk.getProperty<util::fvector4>( "readVec" ) ).dot( ioTmp ),
+//			( ( util::fvector4 )chunk.getProperty<util::fvector4>( "phaseVec" ) ).dot( ioTmp ),
+//			( ( util::fvector4 )chunk.getProperty<util::fvector4>( "sliceVec" ) ).dot( ioTmp ),
 			0 );
 		chunk.setProperty( "indexOrigin", iOrig );
 	}
