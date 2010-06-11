@@ -573,16 +573,17 @@ Image::orientation Image::getMainOrientation()const
 	read.norm();
 	phase.norm();
 	LOG_IF( read.dot( phase ) > 0.01, Runtime, warning ) << "The cosine between the columns and the rows of the image is bigger than 0.01";
-	const util::fvector4 crossVec = util::fvector4( //we could use their cross-product as sliceVector
+	const util::fvector4 crossVec = util::fvector4( 
 										read[1] * phase[2] - read[2] * phase[1],
 										read[2] * phase[0] - read[0] * phase[2],
 										read[0] * phase[1] - read[1] * phase[0]
 									);
 	const util::fvector4 x( 1, 0 ), y( 0, 1 ), z( 0, 0, 1 );
-	float a_axial = std::acos( crossVec.dot( z ) / crossVec.len() ) / M_PI;
-	float a_sagittal = std::acos( crossVec.dot( x ) / crossVec.len() ) / M_PI;
-	float a_coronal = std::acos( crossVec.dot( y ) / crossVec.len() ) / M_PI;
+	float a_axial = std::acos( crossVec.dot( z ) ) / M_PI;
+	float a_sagittal = std::acos( crossVec.dot( x )  ) / M_PI;
+	float a_coronal = std::acos( crossVec.dot( y )  ) / M_PI;
 	bool a_inverse = false, s_inverse = false, c_inverse = false;
+	LOG(Debug,info) << "Angles to vectors are " << a_sagittal << " to x, " << a_coronal << " to y and " << a_axial << " to z";
 
 	if( a_axial > .5 ) {
 		a_axial = std::abs( a_axial - 1 );
@@ -601,7 +602,7 @@ Image::orientation Image::getMainOrientation()const
 
 	if( a_axial <= .25 )
 		return a_inverse ? reversed_axial : axial;
-	else if( a_sagittal <= 25 )
+	else if( a_sagittal <= .25 )
 		return s_inverse ? reversed_sagittal : sagittal;
 	else if( a_coronal <= .25 )
 		return c_inverse ? reversed_coronal : coronal;
