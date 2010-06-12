@@ -16,7 +16,6 @@
 #include "CoreUtils/common.hpp"
 #include <algorithm>
 #include <ostream>
-#include <strings.h>
 #include <numeric>
 #include <cmath>
 
@@ -141,6 +140,7 @@ public:
 	}
 	///\returns true if this is equal to src
 	bool operator==( const this_class &src )const {
+		#pragma warning(suppress: 4996)
 		return std::equal( CONTAINER::begin(), CONTAINER::end(), src.begin() );
 	}
 	///\returns false if this is equal to src
@@ -203,7 +203,7 @@ public:
 	 *
 	 * If len() is equal to zero std::invalid_argument will be thrown, and this wont be changed.
 	 */
-	const this_class &norm()throw( std::invalid_argument ) {
+	const this_class &norm()throw( ... ) {
 		const TYPE d = len();
 
 		if ( d == 0 )throw( std::invalid_argument( "Trying to normalize a vector of length 0" ) );

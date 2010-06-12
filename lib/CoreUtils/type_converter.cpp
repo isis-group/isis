@@ -194,7 +194,7 @@ public:
 	}
 	boost::numeric::range_check_result convert( const TypeBase &src, TypeBase &dst )const {
 		std::list<DST> &dstVal = dst.cast_to_Type<std::list<DST> >();
-		LOG_IF( not dstVal.empty(), CoreLog, warning )
+		LOG_IF( ! dstVal.empty(), CoreLog, warning )
 				<< "Storing into non empty list while conversion from "
 				<< Type<std::list<SRC> >::staticName() << " to " << Type<std::list<DST> >::staticName();
 		const std::list<SRC> &srcVal = src.cast_to_Type<std::list<SRC> >();
@@ -302,11 +302,11 @@ public:
 	}
 	boost::numeric::range_check_result convert( const TypeBase &src, TypeBase &dst )const {
 		bool &dstVal = dst.cast_to_Type<bool>();
-		const char *srcVal = ( ( std::string )src.cast_to_Type<std::string>() ).c_str();
+		const std::string srcVal = boost::algorithm::to_lower_copy<std::string>(src.cast_to_Type<std::string>());
 
-		if ( strcasecmp ( srcVal, "TRUE" ) == 0 or strcasecmp ( srcVal, "Y" ) == 0 or strcasecmp ( srcVal, "YES" ) == 0 ) {
+		if (  srcVal == "true" || srcVal == "y" || srcVal == "yes" ) {
 			dstVal = true;
-		} else if ( strcasecmp ( srcVal, "FALSE" ) == 0 or strcasecmp ( srcVal, "N" ) == 0 or strcasecmp ( srcVal, "NO" ) == 0 ) {
+		} else if ( srcVal == "false" || srcVal == "n" || srcVal == "no" ) {
 			dstVal = false;
 		} else {
 			LOG( Runtime, warning ) << src.toString( true ) << " is ambiguous while converting to " << Type<bool>::staticName();
@@ -354,7 +354,7 @@ public:
 	}
 	boost::numeric::range_check_result convert( const TypeBase &src, TypeBase &dst )const {
 		std::list<DST> &dstVal = dst.cast_to_Type<std::list<DST> >();
-		LOG_IF( not dstVal.empty(), CoreLog, warning )
+		LOG_IF( ! dstVal.empty(), CoreLog, warning )
 				<< "Conversion from " << Type<std::string>::staticName()
 				<< " into non empty list  " << Type<std::list<DST> >::staticName()
 				<< " previous content will be lost";

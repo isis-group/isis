@@ -1,6 +1,6 @@
 #ifndef COLOR_HPP_INCLUDED
 #define COLOR_HPP_INCLUDED
-#include <stdint.h>
+
 #include <ostream>
 #include "common.hpp"
 
@@ -16,12 +16,12 @@ template<typename T> struct color {
 		return r == other.r && g == other.g && b == other.b;
 	}
 	bool operator!=( const color &other )const {
-		return not operator==( other );
+		return ! operator==( other );
 	}
 };
 
-typedef color<u_int8_t> rgb_color24;
-typedef color<u_int16_t> rgb_color48;
+typedef color<uint8_t> rgb_color24;
+typedef color<uint16_t> rgb_color48;
 }
 }
 

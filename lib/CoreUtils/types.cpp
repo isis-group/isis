@@ -14,6 +14,7 @@
 
 #include "type.hpp"
 #include "types.hpp"
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace isis
 {
@@ -31,8 +32,6 @@ namespace util
 	template<> const char Type<TYPE>::m_typeName[]=#NAME;
 
 DEF_TYPE( bool, boolean );
-
-DEF_TYPE( char, char );
 
 DEF_TYPE( int8_t, s8bit );
 DEF_TYPE( uint8_t, u8bit );
@@ -56,7 +55,7 @@ DEF_TYPE( fvector4, fvector4 );
 DEF_TYPE( dvector4, dvector4 );
 DEF_TYPE( ivector4, ivector4 );
 
-DEF_TYPE( ilist, list<int> );
+DEF_TYPE( ilist, list<int32_t> );
 DEF_TYPE( dlist, list<double> );
 DEF_TYPE( slist, list<string> );
 

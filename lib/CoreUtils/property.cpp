@@ -27,7 +27,7 @@ bool PropertyValue::operator== ( const util::PropertyValue &second )const
 }
 bool PropertyValue::operator!= ( const util::PropertyValue &second )const
 {
-	return not( ( second.empty() and empty() ) or operator==( second ) );
+	return !( ( second.empty() && empty() ) || operator==( second ) );
 }
 
 

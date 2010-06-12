@@ -61,7 +61,7 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 		err = true;
 	}
 
-	if ( not parameters.isComplete() ) {
+	if ( ! parameters.isComplete() ) {
 		std::cout << "Missing parameters: ";
 
 		for ( ParameterMap::iterator iP = parameters.begin(); iP != parameters.end(); iP++ ) {
@@ -78,13 +78,13 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 	setLog<ImageIoDebug>( LLMap[parameters["dImageIO"]] );
 	setLog<ImageIoLog>( LLMap[parameters["dImageIO"]] );
 
-	if ( err and exitOnError ) {
+	if ( err && exitOnError ) {
 		printHelp();
 		std::cout << "Exiting..." << std::endl;
 		exit( 1 );
 	}
 
-	return not err;
+	return ! err;
 }
 void Application::printHelp()const
 {
@@ -96,7 +96,7 @@ void Application::printHelp()const
 
 		if ( iP->second.needed() ) {pref = " Required.";}
 
-		if ( not iP->second.needed() and not iP->second->is<dlist>() ) {pref = " Default: " + iP->second.toString();};
+		if ( ! iP->second.needed() && ! iP->second->is<dlist>() ) {pref = " Default: " + iP->second.toString();};
 
 		std::cout << "\t-" << iP->first << " <" << iP->second->typeName() << ">" << std::endl;
 

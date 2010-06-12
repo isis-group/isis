@@ -19,6 +19,12 @@
 #include "singletons.hpp"
 #include <limits.h>
 
+#ifndef __GNU_C__
+#pragma message("Using __FUNCTION__ instead of __PRETTY_FUNCTION__ - logging will not contain full function names")
+#define __PRETTY_FUNCTION__	__FUNCTION__ 
+#endif
+
+
 /// @cond _internal
 namespace isis
 {
@@ -64,6 +70,6 @@ public:
 	if(!MODULE::use);else isis::util::_internal::Log<MODULE>::send(__FILE__,__PRETTY_FUNCTION__,__LINE__,LEVEL)
 
 #define LOG_IF(PRED,MODULE,LEVEL)\
-	if(!(MODULE::use and (PRED)));else isis::util::_internal::Log<MODULE>::send(__FILE__,__PRETTY_FUNCTION__,__LINE__,LEVEL)
+	if(!(MODULE::use && (PRED)));else isis::util::_internal::Log<MODULE>::send(__FILE__,__PRETTY_FUNCTION__,__LINE__,LEVEL)
 
 #endif

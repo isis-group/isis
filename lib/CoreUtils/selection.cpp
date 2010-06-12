@@ -48,11 +48,11 @@ bool Selection::set( const char *entry )
 
 bool Selection::operator==( const Selection &ref )const
 {
-	return m_set == ref.m_set and ent_map == ref.ent_map;
+	return m_set == ref.m_set && ent_map == ref.ent_map;
 }
 bool Selection::operator==( const char ref[] ) const
 {
-	return strcasecmp ( ( ( std::string ) * this ).c_str(), ref )  == 0;
+	return boost::algorithm::to_lower_copy<std::string>(*this)==boost::algorithm::to_lower_copy(std::string(ref));
 }
 bool Selection::operator==( const int ref ) const
 {

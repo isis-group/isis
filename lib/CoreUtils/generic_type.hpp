@@ -35,7 +35,7 @@ namespace _internal{
 class GenericType
 {
 protected:
-	template<typename T> T &m_cast_to() throw( std::invalid_argument ) {
+	template<typename T> T &m_cast_to() throw( ... ) {
 		if ( typeID() == T::staticID ) { // ok its exactly the same type - no fiddling necessary
 			return *reinterpret_cast<T *>( this );
 		} else {
@@ -50,7 +50,7 @@ protected:
 			return *ret;
 		}
 	}
-	template<typename T> const T &m_cast_to()const throw( std::invalid_argument ) {
+	template<typename T> const T &m_cast_to()const throw( ... ) {
 		if ( typeID() == T::staticID ) { // ok its exactly the same type - no fiddling necessary
 			return *reinterpret_cast<const T *>( this );
 		} else {

@@ -20,6 +20,7 @@
 #include <iostream>
 #include <boost/filesystem/path.hpp>
 #include <boost/weak_ptr.hpp>
+#include "boost/date_time/posix_time/posix_time_types.hpp"
 
 namespace isis
 {
@@ -70,7 +71,7 @@ public:
 	std::string m_object, m_module;
 	boost::filesystem::path m_file;
 	std::list<std::string> m_subjects;
-	time_t m_timeStamp;
+	boost::posix_time::ptime m_timeStamp;
 	int m_line;
 	LogLevel m_level;
 	Message( std::string object, std::string module, std::string file, int line, LogLevel m_level, boost::weak_ptr<MessageHandlerBase> commitTo );

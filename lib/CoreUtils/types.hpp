@@ -4,8 +4,11 @@
 #include <boost/mpl/vector/vector30.hpp>
 #include <boost/mpl/distance.hpp>
 #include <boost/mpl/find.hpp>
-#include <stdint.h>
 #include <boost/mpl/contains.hpp>
+
+#ifndef _MSC_VER
+#include <stdint.h>
+#endif
 
 #include <boost/date_time/gregorian/gregorian_types.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
@@ -19,7 +22,7 @@ namespace isis
 namespace util
 {
 
-typedef std::list<int> ilist;
+typedef std::list<int32_t> ilist;
 typedef std::list<double> dlist;
 typedef std::list<std::string> slist;
 
@@ -28,14 +31,14 @@ namespace _internal
 {
 
 /// the supported types as mpl-vector
-typedef boost::mpl::vector24 < //increase this if a type is added (if >30 consider including vector40 above)
-bool, char
+typedef boost::mpl::vector23 < //increase this if a type is added (if >30 consider including vector40 above)
+  bool
 , int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t
 , float, double
 , rgb_color24, rgb_color48
 , fvector4, dvector4, ivector4
 , ilist, dlist, slist
-, std::string, Selection
+, std::string, isis::util::Selection
 , boost::posix_time::ptime, boost::gregorian::date
 > types;
 
@@ -46,9 +49,9 @@ bool, char
  */
 template<class T> struct TypeId {
 	typedef typename boost::mpl::distance <
-	typename boost::mpl::begin<types>::type,
-			 typename boost::mpl::find<types, T>::type
-			 >::type type;
+		typename boost::mpl::begin<types>::type,
+		typename boost::mpl::find<types, T>::type
+	>::type type;
 	static const int value = type::value;
 };
 }

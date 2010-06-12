@@ -51,6 +51,7 @@ public:
 	 * (The value is used as default value if the parameter never gets to parse any other value)
 	 * \param needed mark this parameter as needed
 	 */
+	ProgParameter( const ProgParameter& ref): PropertyValue( static_cast<const PropertyValue&>(ref) ) {}
 	template<typename T> ProgParameter( const T& ref, bool needed = true ): PropertyValue( ref, needed ) {}
 	/**
 	 * Parse the given string as value into this parameter.
@@ -88,7 +89,7 @@ public:
 		else if ( get()->is<Selection>() ) //use the implicit cast of selection to int
 			return ( ( Selection )get()->cast_to_Type<Selection>() );
 		else
-			return get()->cast_to_Type<int>();
+			return get()->cast_to_Type<int32_t>();
 	}
 };
 
@@ -96,13 +97,13 @@ public:
  * Container for ProgParameter.
  * Handles instances of ProgParameter for every expected programm parameter and sets them by reading an argc/argv pair.
  */
-class ParameterMap: public std::map<std::string, ProgParameter>
+class ParameterMap: public std::map<std::string, ProgParameter, _internal::caselessStringLess>
 {
 	struct neededP {
 		bool operator()( const_reference ref )const {return ref.second.needed();}
 	};
 	struct notneededP {
-		bool operator()( const_reference ref )const {return not ref.second.needed();}
+		bool operator()( const_reference ref )const {return !ref.second.needed();}
 	};
 	bool parsed;
 public:
@@ -133,12 +134,12 @@ operator<<( basic_ostream<charT, traits> &out, const isis::util::ProgParameter &
 {
 	const std::string &desc = s.description();
 
-	if ( not desc.empty() ) {
+	if ( ! desc.empty() ) {
 		out << desc << ", ";
 	}
 
 	LOG_IF( s.empty(), isis::CoreDebug, isis::error ) << "Program parameters must not be empty. Please set it to any value.";
-	assert( not s.empty() );
+	assert( !s.empty() );
 	out << "default=\"" << s.toString( false ) << "\", type=" << s->typeName();
 
 	if ( s.needed() )out << " (needed)";
