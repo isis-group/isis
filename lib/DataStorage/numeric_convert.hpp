@@ -109,13 +109,13 @@ template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &s
 		//set scaling factor to fit src-range into dst domain
 		//some compilers dont make x/0 = inf, so we use std::numeric_limits<double>::max() instead, in this case
 		const double scale_max =
-			range_max ? domain_max / range_max :
+			range_max==0 ? domain_max / range_max :
 			std::numeric_limits<double>::max();
 		const double scale_min =
 			range_min ? domain_min / range_min :
 			std::numeric_limits<double>::max();
 		LOG( Debug, info ) << "scale_min/scale_max=" << scale_min << "/" << scale_max;
-		scale = std::min( scale_max ? : std::numeric_limits<double>::max(), scale_min ? : std::numeric_limits<double>::max() );//get the smaller scaling factor which is not zero so the bigger range will fit into his domain
+		scale = std::min( scale_max ? scale_max : std::numeric_limits<double>::max(), scale_min ? scale_min : std::numeric_limits<double>::max() );//get the smaller scaling factor which is not zero so the bigger range will fit into his domain
 
 		if ( scale < 1 ) {
 			LOG( Runtime, warning ) << "Downscaling your values by Factor " << scale << " you might lose information.";

@@ -96,7 +96,7 @@ public:
 		} else {
 			Type<T> ret;
 
-			if ( not convert( *this, ret ) ) {
+			if ( ! convert( *this, ret ) ) {
 				LOG( Debug, error )
 						<< "Interpretation of " << toString( true ) << " as " << Type<T>::staticName()
 						<< " failed. Returning " << Type<T>().toString() << ".";

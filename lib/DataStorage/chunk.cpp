@@ -92,13 +92,13 @@ void Chunk::copySlice( size_t thirdDimS, size_t fourthDimS, Chunk &dst, size_t t
 
 void Chunk::copyRange( const size_t source_start[], const size_t source_end[], Chunk &dst, const size_t destination[] ) const
 {
-	LOG_IF( not rangeCheck( source_start ), Debug, isis::error )
+	LOG_IF( ! rangeCheck( source_start ), Debug, isis::error )
 			<< "Copy start " << util::FixedVector<size_t, 4>( source_start )
 			<< " is out of range (" << sizeToString() << ") at the source chunk";
-	LOG_IF( not rangeCheck( source_end ), Debug, isis::error )
+	LOG_IF( ! rangeCheck( source_end ), Debug, isis::error )
 			<< "Copy end " << util::FixedVector<size_t, 4>( source_end )
 			<< " is out of range (" << sizeToString() << ") at the source chunk";
-	LOG_IF( not dst.rangeCheck( destination ), Debug, isis::error )
+	LOG_IF( ! dst.rangeCheck( destination ), Debug, isis::error )
 			<< "Index " << util::FixedVector<size_t, 4>( destination )
 			<< " is out of range (" << sizeToString() << ") at the destination chunk";
 	LOG( Debug, isis::verbose_info )
@@ -116,13 +116,13 @@ size_t Chunk::cmpRange( size_t start, size_t end, const isis::data::Chunk &dst, 
 }
 size_t Chunk::cmpRange( const size_t source_start[], const size_t source_end[], const Chunk &dst, const size_t destination[] ) const
 {
-	LOG_IF( not rangeCheck( source_start ), Debug, isis::error )
+	LOG_IF( ! rangeCheck( source_start ), Debug, isis::error )
 			<< "memcmp start " << util::FixedVector<size_t, 4>( source_start )
 			<< " is out of range (" << sizeToString() << ") at the first chunk";
-	LOG_IF( not rangeCheck( source_end ), Debug, isis::error )
+	LOG_IF( ! rangeCheck( source_end ), Debug, isis::error )
 			<< "memcmp end " << util::FixedVector<size_t, 4>( source_end )
 			<< " is out of range (" << sizeToString() << ") at the first chunk";
-	LOG_IF( not dst.rangeCheck( destination ), Debug, isis::error )
+	LOG_IF( ! dst.rangeCheck( destination ), Debug, isis::error )
 			<< "Index " << util::FixedVector<size_t, 4>( destination )
 			<< " is out of range (" << sizeToString() << ") at the second chunk";
 	LOG( Debug, isis::verbose_info )

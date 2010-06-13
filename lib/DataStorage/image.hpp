@@ -64,7 +64,7 @@ private:
 	 */
 	inline std::pair<size_t, size_t> commonGet ( size_t first, size_t second, size_t third, size_t fourth ) const {
 		const size_t idx[] = {first, second, third, fourth};
-		LOG_IF( not clean, Debug, error )
+		LOG_IF( ! clean, Debug, error )
 				<< "Getting data from a non indexed image will result in undefined behavior. Run reIndex first.";
 		LOG_IF( set.empty(), Debug, error )
 				<< "Getting data from a empty image will result in undefined behavior.";
@@ -126,7 +126,7 @@ public:
 	 * is provided.
 	 */
 	template <typename T> T &voxel( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 ) {
-		if ( not clean ) {
+		if ( ! clean ) {
 			LOG( Debug, info ) << "Image is not clean. Running reIndex ...";
 			reIndex();
 		}

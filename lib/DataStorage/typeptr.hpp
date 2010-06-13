@@ -185,7 +185,7 @@ public:
 		LOG( Debug, verbose_info ) << "Comparing " << dst.typeName() << " at " << &operator[]( 0 ) << " and " << &compare[0];
 
 		for ( size_t i = start; i < end; i++ ) {
-			if ( not ( operator[]( i ) == compare[i] ) )
+			if ( ! ( operator[]( i ) == compare[i] ) )
 				ret++;
 		}
 
@@ -253,7 +253,7 @@ public:
 	bool convertTo( TypePtrBase& dst )const {
 		util::_internal::TypeBase::Reference min, max;
 		getMinMax( min, max );
-		assert( not ( min.empty() or max.empty() ) );
+		assert( ! ( min.empty() || max.empty() ) );
 		return TypePtrBase::convertTo( dst, *min, *max );
 	}
 	/// \copydoc TypePtrBase::getMinMax
@@ -265,10 +265,10 @@ public:
 
 		const std::pair<util::Type<TYPE>, util::Type<TYPE> > result = _internal::getMinMaxImpl<TYPE, boost::is_arithmetic<TYPE>::value>()( *this );
 
-		if ( min.empty() or min->gt( result.first ) )
+		if ( min.empty() || min->gt( result.first ) )
 			min = result.first;
 
-		if ( max.empty() or max->lt( result.second ) )
+		if ( max.empty() || max->lt( result.second ) )
 			max = result.second;
 	}
 

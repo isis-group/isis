@@ -55,7 +55,7 @@ public:
 	* Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
 	* \returns a reference of the pointer.
 	*/
-	template<typename T> TypePtr<T>& cast_to_TypePtr() throw( std::bad_cast ) {
+	template<typename T> TypePtr<T>& cast_to_TypePtr() {
 		return m_cast_to<TypePtr<T> >();
 	}
 	/// \returns the length of the data pointed to

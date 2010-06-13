@@ -218,7 +218,7 @@ template<typename T> bool fuzzyEqual( T a, T b )
 	if ( a == b )return true;
 
 	const T dist = std::fabs( a - b );
-	const T base = std::min( a, b ) * std::numeric_limits<T>::epsilon() * 5e1;
+	const T base = std::min( a, b ) * std::numeric_limits<T>::epsilon() * T(5e1);
 	return  dist < base;
 }
 

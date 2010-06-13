@@ -12,15 +12,15 @@ endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM)
 
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL)
     add_executable(imageIONullTest imageIONullTest.cpp)
-    target_link_libraries(imageIONullTest utils data isisImageFormat_Null)
+    target_link_libraries(imageIONullTest utils data)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL)
 
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI)
     add_executable(imageIONiiTest imageIONiiTest.cpp)
-    target_link_libraries(imageIONiiTest utils data isisImageFormat_Nifti)
+    target_link_libraries(imageIONiiTest utils data)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI)
 
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA)
     add_executable(imageIOVistaTest imageIOVistaTest.cpp)
-    target_link_libraries(imageIOVistaTest utils data isisImageFormat_Vista)
+    target_link_libraries(imageIOVistaTest utils data)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA)

@@ -19,6 +19,9 @@
 #include <numeric>
 #include <cmath>
 
+#pragma warning(push)
+#pragma warning(disable:4996)
+
 namespace isis
 {
 /*! \addtogroup util
@@ -139,10 +142,7 @@ public:
 		return false;
 	}
 	///\returns true if this is equal to src
-	bool operator==( const this_class &src )const {
-		#pragma warning(suppress: 4996)
-		return std::equal( CONTAINER::begin(), CONTAINER::end(), src.begin() );
-	}
+	bool operator==( const this_class &src )const {return std::equal( CONTAINER::begin(), CONTAINER::end(), src.begin() );}
 	///\returns false if this is equal to src
 	bool operator!=( const this_class &src )const {
 		return !operator==( src );
@@ -156,7 +156,7 @@ public:
 		const_iterator b = other.begin();
 
 		for ( const_iterator a = CONTAINER::begin(); a != CONTAINER::end(); ++a, ++b ) {
-			if ( not util::fuzzyEqual( *a, *b ) )
+			if ( ! util::fuzzyEqual( *a, *b ) )
 				return false;
 		}
 
@@ -322,5 +322,5 @@ operator<<( basic_ostream<charT, traits> &out, const ::isis::util::FixedVector<T
 	return out;
 }
 }
-
+#pragma warning(push)
 #endif //VECTOR_HPP

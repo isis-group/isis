@@ -46,7 +46,7 @@ public:
 namespace _internal
 {
 
-extern const char* LogLevelNames[];
+const char* const logLevelNames(LogLevel level);
 
 template<class MODULE> class Log;
 class Message;
