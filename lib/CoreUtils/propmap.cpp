@@ -422,7 +422,8 @@ void PropMap::addNeeded( const std::string &key )
 
 void PropMap::addNeededFromString( const std::string &needed )
 {
-	const std::list<std::string> needList = util::string2list<std::string>( needed );
+	const std::list<std::string> needList = util::string2list<std::string>( needed ); 
+	//@todo util::string2list<std::string>( needed,' ' ) would be faster but less robust
 	LOG( Debug, verbose_info ) << "Adding " << needed << " as needed";
 	BOOST_FOREACH( std::list<std::string>::const_reference ref, needList )
 	addNeeded( ref );

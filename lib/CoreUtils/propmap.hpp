@@ -32,7 +32,7 @@ namespace util
 {
 namespace _internal
 {
-	class treeNode;
+	class treeNode; //predeclare treeNode -- we'll need it in PropMap
 }
 /// A mapping tree to store properties (keys / values)
 class PropMap : protected std::map<std::string, _internal::treeNode, _internal::caselessStringLess>
@@ -63,21 +63,7 @@ private:
 	// internal functors
 	/////////////////////////////////////////////////////////////////////////////////////////
 	///Walks the whole tree and inserts any key into out for which the given scalar predicate is true.
-	template<class Predicate> struct walkTree {
-		key_list &m_out;
-		const std::string m_prefix;
-		walkTree( key_list &out, const std::string &prefix ): m_out( out ), m_prefix( prefix ) {}
-		walkTree( key_list &out ): m_out( out ) {}
-		void operator()( const_reference ref ) const {
-			if ( ref.second.is_leaf() ) {
-				if ( Predicate()( ref ) )
-					m_out.insert( m_out.end(), ( m_prefix != "" ? m_prefix + "/" : "" ) + ref.first );
-			} else {
-				const PropMap &sub = ref.second.getBranch();
-				std::for_each( sub.begin(), sub.end(), walkTree<Predicate>( m_out, ref.first ) );
-			}
-		}
-	};
+	template<class Predicate> struct walkTree;
 
 	/////////////////////////////////////////////////////////////////////////////////////////
 	// internal tool-backends
@@ -286,30 +272,19 @@ public:
 /** @} */
 }
 
-namespace std
+namespace std ///predeclare streaming output -- we'll need it in treeNode
 {
 /// Streaming output for PropMap::node
 template<typename charT, typename traits>
-basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::_internal::treeNode& s )
-{
-	if( s.is_leaf() )
-		out << s.getLeaf();
-	else
-		out << "[[Subtree with " << s.getBranch().getKeys().size() << " elements]]";
-
-	return out;
-}
+	basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::_internal::treeNode& s );
 /// Streaming output for PropMap
 template<typename charT, typename traits>
-basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::PropMap &s )
-{
-	isis::util::PropMap::flat_map buff;
-	s.linearize( buff );
-	isis::util::write_list( buff.begin(), buff.end(), out );
-	return out;
+	basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::PropMap &s );
 }
-}
-namespace isis{ namespace util{ namespace _internal
+
+
+// OK, lets define treeNode
+namespace isis{ namespace util{ namespace _internal 
 {
 class treeNode
 {
@@ -346,6 +321,50 @@ public:
 		return o.str();
 	}
 };
-}}}
+}
+	
+// and now we can define walkTree (needs treeNode to be defined)
+template<class Predicate> struct PropMap::walkTree {
+	key_list &m_out;
+	const std::string m_prefix;
+	walkTree( key_list &out, const std::string &prefix ): m_out( out ), m_prefix( prefix ) {}
+	walkTree( key_list &out ): m_out( out ) {}
+	void operator()( const_reference ref ) const {
+		if ( ref.second.is_leaf() ) {
+			if ( Predicate()( ref ) )
+				m_out.insert( m_out.end(), ( m_prefix != "" ? m_prefix + "/" : "" ) + ref.first );
+		} else {
+			const PropMap &sub = ref.second.getBranch();
+			std::for_each( sub.begin(), sub.end(), walkTree<Predicate>( m_out, ref.first ) );
+		}
+	}
+};
+	
+}}
+
+// and finally define the streaming output for treeNode
+namespace std
+{
+	/// Streaming output for PropMap::node
+	template<typename charT, typename traits>
+	basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::_internal::treeNode& s )
+	{
+		if( s.is_leaf() )
+			out << s.getLeaf();
+		else
+			out << "[[Subtree with " << s.getBranch().getKeys().size() << " elements]]";
+		
+		return out;
+	}
+	/// Streaming output for PropMap
+	template<typename charT, typename traits>
+	basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::PropMap &s )
+	{
+		isis::util::PropMap::flat_map buff;
+		s.linearize( buff );
+		isis::util::write_list( buff.begin(), buff.end(), out );
+		return out;
+	}
+}
 
 #endif

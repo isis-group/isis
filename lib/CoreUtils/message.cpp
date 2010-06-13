@@ -37,7 +37,7 @@ bool MessageHandlerBase::requestStop( LogLevel _level )
 {
 	if ( m_stop_below > _level ){
 #ifdef WIN32
-		LOG(Debug,error) << "Sorry stopping is not supportted on Win32";
+		LOG(Debug,error) << "Sorry stopping is not supported on Win32";
 		return false;
 #else
 		return kill( getpid(), SIGTSTP ) == 0;

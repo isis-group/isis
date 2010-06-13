@@ -203,7 +203,7 @@ public:
 	 *
 	 * If len() is equal to zero std::invalid_argument will be thrown, and this wont be changed.
 	 */
-	const this_class &norm()throw( ... ) {
+	const this_class &norm()throw( std::invalid_argument ) {
 		const TYPE d = len();
 
 		if ( d == 0 )throw( std::invalid_argument( "Trying to normalize a vector of length 0" ) );
