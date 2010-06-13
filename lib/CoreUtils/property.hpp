@@ -109,7 +109,7 @@ public:
 		if ( get()->is<T>() ) {
 			const T &cmp = get()->cast_to_Type<T>();
 			return second == cmp;
-		} else if ( not empty() ) {
+		} else if ( ! empty() ) {
 			PropertyValue dst;
 			LOG( Debug, info )
 					<< *this << " is not " << Type<T>::staticName() << " trying to convert.";

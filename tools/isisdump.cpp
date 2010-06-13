@@ -12,7 +12,7 @@ int main( int argc, char *argv[] )
 	app.parameters["chunks"].needed() = false;
 	app.parameters["chunks"].setDescription( "print also data of the chunks" );
 
-	if ( not app.init( argc, argv ) )
+	if ( ! app.init( argc, argv ) )
 		return 1;
 
 	unsigned short count1 = 0, count2 = 0;

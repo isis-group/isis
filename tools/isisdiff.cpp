@@ -13,7 +13,7 @@ int main( int argc, char *argv[] )
 	app.parameters["in"] = util::slist();
 	app.parameters["in"].setDescription( "The two files (or directories) which you want to compare" );
 
-	if ( not app.init( argc, argv ) )
+	if ( ! app.init( argc, argv ) )
 		return 1;
 
 	int ret = 0;
@@ -44,7 +44,7 @@ int main( int argc, char *argv[] )
 		diff.erase( ref );
 		ret += diff.size();
 
-		if ( not diff.empty() ) {
+		if ( ! diff.empty() ) {
 			std::cout
 					<< "Metadata of " << files.front() << ":" << count << " and "
 					<< files.back() << ":" << count  << " differ:" << std::endl

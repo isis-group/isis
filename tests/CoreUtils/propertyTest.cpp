@@ -34,13 +34,13 @@ BOOST_AUTO_TEST_CASE( property_init_test )
 BOOST_AUTO_TEST_CASE( property_copy_test )
 {
 	// Test copy operator
-	util::PropertyValue propA = 5;
+	util::PropertyValue propA = (int32_t)5;
 	util::PropertyValue propB = propA;
-	BOOST_CHECK_EQUAL( propB, 5 );
+	BOOST_CHECK_EQUAL( propB, (int32_t)5 );
 	//check for deep copy (change of propA shall not change propB)
-	propA = 6;
-	BOOST_CHECK_EQUAL( propA, 6 );
-	BOOST_CHECK_EQUAL( propB, 5 );
+	propA = (int32_t)6;
+	BOOST_CHECK_EQUAL( propA, (int32_t)6 );
+	BOOST_CHECK_EQUAL( propB, (int32_t)5 );
 }
 
 }
