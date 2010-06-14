@@ -44,12 +44,12 @@ BOOST_AUTO_TEST_CASE ( chunk_property_test )
 {
 	data::MemChunk<float> ch( 4, 3, 2, 1 );
 	//an basic Chunk must be invalid
-	BOOST_CHECK( not ch.valid() );
-	BOOST_CHECK( not ch.hasProperty( "indexOrigin" ) );
+	BOOST_CHECK( !ch.valid() );
+	BOOST_CHECK( !ch.hasProperty( "indexOrigin" ) );
 	//with an position its valid
 	util::fvector4 pos( 1, 1, 1, 1 );
 	ch.setProperty( "indexOrigin", pos );
-	ch.setProperty( "acquisitionNumber", 0 );
+	ch.setProperty<int32_t>( "acquisitionNumber", 0 );
 	ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 	BOOST_CHECK( ch.valid() );
 	//properties shall not be case sensitive
@@ -78,7 +78,9 @@ BOOST_AUTO_TEST_CASE ( chunk_data_test2 )//Access Chunk elements via linear inde
 {
 	data::MemChunk<float> ch( 4, 3, 2, 1 );
 	std::ostringstream o;
-	unsigned short sample[ch.volume()];
+	const size_t vol=4*3*2*1;
+	BOOST_REQUIRE_EQUAL(vol,ch.volume());
+	unsigned short sample[vol];
 
 	for ( size_t i = 0; i < ch.volume(); i++ ) {
 		ch.asTypePtr<float>()[i] = i;
@@ -91,7 +93,7 @@ BOOST_AUTO_TEST_CASE ( chunk_data_test2 )//Access Chunk elements via linear inde
 	util::write_list(
 		sample, sample + ch.volume(), o,
 		"|",
-		util::Type<int>( ch.volume() ).toString( false ) + "#", ""
+		util::Type<int32_t>( ch.volume() ).toString( false ) + "#", ""
 	);
 	BOOST_CHECK_EQUAL( o.str(), ch.getTypePtr<float>().toString() );
 }

@@ -11,7 +11,11 @@
 //
 
 #include "io_factory.hpp"
+#ifdef WIN32
+#include <windows.h> 
+#else
 #include <dlfcn.h>
+#endif
 #include <iostream>
 #include "CoreUtils/log.hpp"
 #include "common.hpp"
@@ -32,8 +36,11 @@ struct pluginDeleter {
 	pluginDeleter( void *dlHandle, std::string pluginName ): m_dlHandle( dlHandle ), m_pluginName( pluginName ) {}
 	void operator()( image_io::FileFormat *format ) {
 		delete format;
-
+#ifdef WIN32
+		if(!FreeLibrary( (HINSTANCE)m_dlHandle ))
+#else
 		if ( dlclose( m_dlHandle ) != 0 )
+#endif
 			std::cerr << "Failed to release plugin " << m_pluginName << " (was loaded at " << m_dlHandle << ")";
 
 		//we cannot use LOG here, because the loggers are gone allready
@@ -85,10 +92,19 @@ unsigned int IOFactory::findPlugins( const std::string &path )
 
 		if ( boost::regex_match( itr->path().leaf(), pluginFilter ) ) {
 			const std::string pluginName = itr->path().string();
+#ifdef WIN32
+			HINSTANCE handle=LoadLibrary( pluginName.c_str() ); 
+#else
 			void *handle = dlopen( pluginName.c_str(), RTLD_NOW );
+#endif
 
 			if ( handle ) {
+#ifdef WIN32
+				image_io::FileFormat* ( *factory_func )() = ( image_io::FileFormat * ( * )() )GetProcAddress( handle, "factory");
+#else
 				image_io::FileFormat* ( *factory_func )() = ( image_io::FileFormat * ( * )() )dlsym( handle, "factory" );
+#endif
+
 
 				if ( factory_func ) {
 					FileFormatPtr io_class( factory_func(), _internal::pluginDeleter( handle, pluginName ) );
@@ -98,13 +114,24 @@ unsigned int IOFactory::findPlugins( const std::string &path )
 					else
 						LOG( Runtime, error ) << "failed to register plugin " << util::MSubject( pluginName );
 				} else {
+#ifdef WIN32
 					LOG( Runtime, error )
-							<< "could not get format factory function: " << util::MSubject( dlerror() );
+							<< "could not get format factory function from " << util::MSubject( pluginName );
+					FreeLibrary( handle );
+#else
+					LOG( Runtime, error )
+							<< "could not get format factory function from " << util::MSubject( pluginName ) << ":" << util::MSubject( dlerror() );
 					dlclose( handle );
+#endif
 				}
 			} else
+#ifdef WIN32
 				LOG( Runtime, error )
-						<< "Could not load library: " << util::MSubject( dlerror() );
+				<< "Could not load library " << pluginName;
+#else
+				LOG( Runtime, error )
+				<< "Could not load library " << pluginName << ":" << util::MSubject( dlerror() );
+#endif
 		} else {
 			LOG( Runtime, verbose_info )
 					<< "Ignoring " << util::MSubject( itr->path() )
@@ -185,7 +212,7 @@ data::ImageList IOFactory::load( const std::string &path, std::string suffix_ove
 					   get().loadFile( chunks, p, suffix_override, dialect );
 	const data::ImageList images( chunks );
 	BOOST_FOREACH( data::ImageList::const_reference ref, images ) {
-		if ( not ref->hasProperty( "source" ) )
+		if ( ! ref->hasProperty( "source" ) )
 			ref->setProperty( "source", p.string() );
 	}
 	LOG( Runtime, info )

@@ -112,7 +112,7 @@ bool PropMap::recursiveRemove( PropMap &root, const propPathIterator at, const p
 		if ( found != root.end() ) {
 			mapped_type &ref = found->second;
 
-			if ( not ref.is_leaf() ) {
+			if ( ! ref.is_leaf() ) {
 				ret = recursiveRemove( ref.getBranch(), next, pathEnd );
 
 				if ( ref.getBranch().empty() )
@@ -137,7 +137,7 @@ const PropertyValue &PropMap::propertyValue( const std::string &key )const
 	const propPath path = util::string2list<std::string>( key, pathSeperator );
 	const mapped_type *ref = findEntry( *this, path.begin(), path.end() );
 
-	if( ref and ref->is_leaf() ) {
+	if( ref && ref->is_leaf() ) {
 		return ref->getLeaf();
 	} else {
 		LOG( Debug, warning ) << "Property " << key << " not found. Returning empty property.";
@@ -149,7 +149,7 @@ PropertyValue &PropMap::propertyValue( const std::string &key )
 {
 	const propPath path = util::string2list<std::string>( key, pathSeperator );
 	mapped_type &n = fetchEntry( *this, path.begin(), path.end() );
-	LOG_IF( not n.is_leaf(), Debug, error ) << "Using branch " << key << " as PropertyValue";
+	LOG_IF( ! n.is_leaf(), Debug, error ) << "Using branch " << key << " as PropertyValue";
 	return n.getLeaf();
 }
 
@@ -158,7 +158,7 @@ const PropMap &PropMap::branch( const std::string &key ) const
 	const propPath path = util::string2list<std::string>( key, pathSeperator );
 	const mapped_type *ref = findEntry( *this, path.begin(), path.end() );
 
-	if( not ref ) {
+	if( ! ref ) {
 		LOG( Runtime, warning ) << "Trying to access non existing branch " << key << ".";
 		return emptyEntry.getBranch();
 	} else {
@@ -188,8 +188,8 @@ bool PropMap::remove( const isis::util::PropMap &removeMap, bool keep_needed )
 	for ( const_iterator otherIt = removeMap.begin(); otherIt != removeMap.end(); otherIt++ ) {
 		//find the closest match for otherIt->first in this (use the value-comparison-functor of PropMap)
 		if ( continousFind( thisIt, end(), *otherIt, value_comp() ) ) { //thisIt->first == otherIt->first - so its the same property or propmap
-			if ( not thisIt->second.is_leaf() ) { //this is a branch
-				if ( not otherIt->second.is_leaf() ) { // recurse if its a branch in the removal map as well
+			if ( ! thisIt->second.is_leaf() ) { //this is a branch
+				if ( ! otherIt->second.is_leaf() ) { // recurse if its a branch in the removal map as well
 					PropMap &mySub = thisIt->second.getBranch();
 					const PropMap &otherSub = otherIt->second.getBranch();
 					ret &= mySub.remove( otherSub );
@@ -200,7 +200,7 @@ bool PropMap::remove( const isis::util::PropMap &removeMap, bool keep_needed )
 					LOG( Debug, warning ) << "Not deleting branch " << MSubject( thisIt->first ) << " because its no subtree in the removal map";
 					ret = false;
 				}
-			} else if( not( thisIt->second.getLeaf().needed() and keep_needed ) ) { // this is a leaf
+			} else if( !( thisIt->second.getLeaf().needed() && keep_needed ) ) { // this is a leaf
 				LOG( Debug, verbose_info ) << "Removing " << MSubject( *thisIt ) << " as requested";
 				erase( thisIt++ ); // so delete this (they are equal - kind of)
 			}
@@ -245,11 +245,11 @@ void PropMap::diffTree( const PropMap &other, PropMap::diff_map &ret, std::strin
 		if ( continousFind( otherIt, other.end(), *thisIt, value_comp() ) ) { //otherIt->first == thisIt->first - so its the same property
 			const mapped_type &first = thisIt->second, &second = otherIt->second;
 
-			if ( not ( first.is_leaf() or second.is_leaf() ) ) { // if both are a branch
+			if ( ! ( first.is_leaf() || second.is_leaf() ) ) { // if both are a branch
 				const PropMap &thisMap = first.getBranch();
 				const PropMap &refMap = second.getBranch();
 				thisMap.diffTree( refMap, ret, pathname + "/" );
-			} else if ( not ( first == second )  ) { // if they are not equal
+			} else if ( ! ( first == second )  ) { // if they are not equal
 				const PropertyValue firstVal = first.is_leaf() ? first.getLeaf() : PropertyValue( Type<std::string>( first.toString() ) );
 				const PropertyValue secondVal = second.is_leaf() ? second.getLeaf() : PropertyValue( Type<std::string>( second.toString() ) );
 				ret.insert( // add (propertyname|(value1|value2))
@@ -278,7 +278,7 @@ void PropMap::diffTree( const PropMap &other, PropMap::diff_map &ret, std::strin
 	for ( otherIt = other.begin(); otherIt != other.end(); otherIt++ ) {
 		const std::string pathname = prefix + otherIt->first;
 
-		if ( not continousFind( thisIt, end(), *otherIt, value_comp() ) ) { //there is nothing in this which has the same key as ref
+		if ( ! continousFind( thisIt, end(), *otherIt, value_comp() ) ) { //there is nothing in this which has the same key as ref
 			const PropertyValue secondVal = otherIt->second.is_leaf() ? otherIt->second.getLeaf() : PropertyValue( Type<std::string>( otherIt->second.toString() ) );
 			ret.insert(
 				std::make_pair( // add (propertyname|([empty]|value2))
@@ -298,7 +298,7 @@ void PropMap::make_unique ( const util::PropMap &other, bool removeNeeded )
 	for ( const_iterator otherIt = other.begin(); otherIt != other.end(); otherIt++ ) {
 		//find the closest match for otherIt->first in this (use the value-comparison-functor of PropMap)
 		if ( continousFind( thisIt, end(), *otherIt, value_comp() ) ) { //thisIt->first == otherIt->first  - so its the same property
-			if ( not removeNeeded and thisIt->second.getLeaf().needed() ) {//Skip needed
+			if ( ! removeNeeded && thisIt->second.getLeaf().needed() ) {//Skip needed
 				thisIt++;
 				continue;
 			}
@@ -310,11 +310,11 @@ void PropMap::make_unique ( const util::PropMap &other, bool removeNeeded )
 					LOG( Debug, verbose_info ) << "Keeping the empty " << thisIt->first << " because its is not empty in the other (" << *otherIt << ")";
 					thisIt++;
 				}
-			} else if ( not otherIt->second.empty() ) { // if the other is not empty as well
+			} else if ( ! otherIt->second.empty() ) { // if the other is not empty as well
 				if ( thisIt->second == otherIt->second ) { //delete this, if they are equal
 					LOG( Debug, verbose_info ) << "Removing " << *thisIt << " because its equal with the other (" << *otherIt << ")";
 					erase( thisIt++ ); // so delete this (they are equal - kind of)
-				} else if ( not ( thisIt->second.is_leaf() or otherIt->second.is_leaf() ) ) { //but maybe they are branches
+				} else if ( ! ( thisIt->second.is_leaf() || otherIt->second.is_leaf() ) ) { //but maybe they are branches
 					PropMap &thisMap = thisIt->second.getBranch();
 					const PropMap &otherMap = otherIt->second.getBranch();
 					thisMap.make_unique( otherMap );
@@ -345,14 +345,14 @@ void PropMap::joinTree( const isis::util::PropMap &other, bool overwrite, std::s
 			if ( thisIt->second.empty() ) { // if ours is empty
 				LOG( Debug, verbose_info ) << "Replacing empty property " << MSubject( thisIt->first ) << " by " << MSubject( otherIt->second );
 				thisIt->second = otherIt->second;
-			} else if ( not ( thisIt->second.is_leaf() or otherIt->second.is_leaf() ) ) { // if both are a subtree
+			} else if ( ! ( thisIt->second.is_leaf() || otherIt->second.is_leaf() ) ) { // if both are a subtree
 				PropMap &thisMap = thisIt->second.getBranch();
 				const PropMap &refMap = otherIt->second.getBranch();
 				thisMap.joinTree( refMap, overwrite, prefix + thisIt->first + "/", rejects ); //recursion
 			} else if ( overwrite ) { // otherwise replace ours by the other (if we shall overwrite)
 				LOG( Debug, info ) << "Replacing property " << MSubject( *thisIt ) << " by " << MSubject( otherIt->second );
 				thisIt->second = otherIt->second;
-			} else if ( not ( thisIt->second == otherIt->second ) ) { // otherwise put the other into rejected if its not equal to our
+			} else if ( ! ( thisIt->second == otherIt->second ) ) { // otherwise put the other into rejected if its not equal to our
 				LOG( Debug, info )
 						<< "Rejecting property " << MSubject( *otherIt )
 						<< " because " << MSubject( thisIt->second ) << " is allready there";
@@ -385,7 +385,7 @@ bool PropMap::transform( std::string from,  std::string to, int dstId, bool delS
 	const PropertyValue &found = propertyValue( from );
 	bool ret = false;
 
-	if( not found.empty() ) {
+	if( ! found.empty() ) {
 		if ( found->typeID() == dstId ) {
 			propertyValue( to ) = found ;
 			ret = true;
@@ -393,7 +393,7 @@ bool PropMap::transform( std::string from,  std::string to, int dstId, bool delS
 			ret = found.transformTo( propertyValue( to ), dstId );
 	}
 
-	if ( ret and delSource )remove( from );
+	if ( ret && delSource )remove( from );
 
 	return ret;
 }
@@ -422,7 +422,8 @@ void PropMap::addNeeded( const std::string &key )
 
 void PropMap::addNeededFromString( const std::string &needed )
 {
-	const std::list<std::string> needList = util::string2list<std::string>( needed );
+	const std::list<std::string> needList = util::string2list<std::string>( needed ); 
+	//@todo util::string2list<std::string>( needed,' ' ) would be faster but less robust
 	LOG( Debug, verbose_info ) << "Adding " << needed << " as needed";
 	BOOST_FOREACH( std::list<std::string>::const_reference ref, needList )
 	addNeeded( ref );
@@ -433,14 +434,14 @@ bool PropMap::hasProperty( const std::string &key ) const
 {
 	const propPath path = util::string2list<std::string>( key, pathSeperator );
 	const mapped_type *ref = findEntry( *this, path.begin(), path.end() );
-	return ( ref and ref->is_leaf() and not ref->getLeaf().empty() );
+	return ( ref && ref->is_leaf() && ! ref->getLeaf().empty() );
 }
 /// \returns true if a leaf exists at the given path and the property is not empty
 bool PropMap::hasBranch( const std::string &key ) const
 {
 	const propPath path = util::string2list<std::string>( key, pathSeperator );
 	const mapped_type *ref = findEntry( *this, path.begin(), path.end() );
-	return ( ref and not ref->is_leaf()  );
+	return ( ref && ! ref->is_leaf()  );
 }
 
 bool PropMap::rename( std::string oldname, std::string newname )
@@ -449,7 +450,7 @@ bool PropMap::rename( std::string oldname, std::string newname )
 	const mapped_type *new_e = findEntry( newname );
 
 	if ( old_e ) {
-		LOG_IF( new_e and not new_e->empty(), Runtime, warning )
+		LOG_IF( new_e && ! new_e->empty(), Runtime, warning )
 				<< "Overwriting " << std::make_pair( newname, *new_e ) << " with " << *old_e;
 		fetchEntry( newname ) = *old_e;
 		return remove( oldname );
@@ -471,7 +472,7 @@ void PropMap::toCommonUnique( PropMap &common, std::set<std::string> &uniques, b
 		BOOST_FOREACH( const diff_map::value_type & ref, difference ) {
 			uniques.insert( ref.first );
 
-			if ( not ref.second.first.empty() )common.remove( ref.first );//if there is something in common, remove it
+			if ( ! ref.second.first.empty() )common.remove( ref.first );//if there is something in common, remove it
 		}
 	}
 }
@@ -492,21 +493,21 @@ std::ostream &PropMap::print( std::ostream &out, bool label )const
 	return out;
 }
 
-bool PropMap::trueP::operator()( const std::pair< const std::string, _internal::treeNode< PropMap, PropertyValue > >& ref ) const
+bool PropMap::trueP::operator()( const PropMap::value_type& ref ) const
 {
 	return true;
 }
-bool PropMap::invalidP::operator()( const std::pair< const std::string, _internal::treeNode< PropMap, PropertyValue > >& ref ) const
+bool PropMap::invalidP::operator()( const PropMap::value_type& ref ) const
 {
 	return ref.second.getLeaf().needed() && ref.second.getLeaf().empty();
 }
-bool PropMap::treeInvalidP::operator()( const std::pair< const std::string, _internal::treeNode< PropMap, PropertyValue > >& ref ) const
+bool PropMap::treeInvalidP::operator()( const PropMap::value_type& ref ) const
 {
 	if ( ref.second.is_leaf() ) {
 		const PropertyValue &val = ref.second.getLeaf();
-		return val.needed() and val.empty();
+		return val.needed() && val.empty();
 	} else  {
-		return not ref.second.getBranch().valid();
+		return ! ref.second.getBranch().valid();
 	}
 }
 

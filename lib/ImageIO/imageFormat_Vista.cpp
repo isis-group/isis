@@ -129,7 +129,7 @@ throw( std::runtime_error & )
 			// VBit
 		case data::TypePtr<VBit>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VBitRepn );
-			copyImageToVista<VBit>(image,vimages[0]);
+			copyImageToVista<uint8_t>(image,vimages[0]);
 			break;
 			// VUByte
 		case data::TypePtr<VUByte>::staticID:
@@ -220,7 +220,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 	if ( nimages == 1 ) {
 		switch( VPixelRepn( images[0] ) ) {
 		case VBitRepn:
-			addChunk<VBit>( chunks, images[0] );
+			addChunk<uint8_t>( chunks, images[0] );
 			break;
 		case VUByteRepn:
 			addChunk<VUByte>( chunks, images[0] );
@@ -316,7 +316,7 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 			// VBit -> VBit (char *)
 			if( pv->is<VBit>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VBitRepn,
-							 ( VBit )pv->cast_to_Type<VBit>() );
+							 ( VBit )pv->cast_to_Type<uint8_t>() );
 				continue;
 			}
 

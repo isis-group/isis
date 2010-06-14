@@ -18,7 +18,7 @@ void FileFormat::write( const isis::data::ImageList &images, const std::string &
 
 	if ( images.size() > 1 ) {
 		BOOST_FOREACH( data::ImageList::const_reference ref, images ) {
-			if ( not ref->hasProperty( "sequenceNumber" ) ) {
+			if ( ! ref->hasProperty( "sequenceNumber" ) ) {
 				LOG( Runtime, error )
 						<< "sequenceNumber is missing, so I can't generate a unique filename. Won't write...";
 				ret = false;

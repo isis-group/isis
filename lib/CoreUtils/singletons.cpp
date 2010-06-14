@@ -13,7 +13,7 @@ Singletons &Singletons::getMaster()
 }
 Singletons::~Singletons()
 {
-	while ( not map.empty() ) {
+	while ( !map.empty() ) {
 		delete map.begin()->second;
 		map.erase( map.begin() );
 	}

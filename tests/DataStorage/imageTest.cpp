@@ -6,6 +6,7 @@
  */
 
 #define BOOST_TEST_MODULE ImageTest
+#define NOMINMAX 1
 #include <boost/test/included/unit_test.hpp>
 #include <boost/foreach.hpp>
 #include "DataStorage/image.hpp"
@@ -23,27 +24,27 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 	data::MemChunk<float> ch( 4, 4 );
 	data::Image img;
 	// inserting insufficient Chunk should fail
-	BOOST_CHECK( not img.insertChunk( ch ) );
+	BOOST_CHECK( ! img.insertChunk( ch ) );
 	// but inserting a proper Chunk should work
 	ch.setProperty( "indexOrigin", util::fvector4( 0, 0, 2, 0 ) );
-	ch.setProperty<u_int32_t>( "acquisitionNumber", 2 );
+	ch.setProperty<uint32_t>( "acquisitionNumber", 2 );
 	ch.setProperty( "readVec", util::fvector4( 1, 0 ) );
 	ch.setProperty( "phaseVec", util::fvector4( 0, 1 ) );
 
 	ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 	BOOST_REQUIRE( img.insertChunk( ch ) );
 	//inserting the same chunk twice should fail
-	BOOST_CHECK( not img.insertChunk( ch ) );
+	BOOST_CHECK( ! img.insertChunk( ch ) );
 	// but inserting another Chunk should work
 	ch = data::MemChunk<float>( 4, 4 );
 	ch.setProperty( "indexOrigin", util::fvector4( 0, 0, 0, 0 ) );
-	ch.setProperty<u_int32_t>( "acquisitionNumber", 0 );
+	ch.setProperty<uint32_t>( "acquisitionNumber", 0 );
 	ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 	BOOST_REQUIRE( img.insertChunk( ch ) );
 	// Chunks should be inserted based on their position (lowest first)
 	ch = data::MemChunk<float>( 4, 4 );
 	ch.setProperty( "indexOrigin", util::fvector4( 0, 0, 1, 0 ) );
-	ch.setProperty<u_int32_t>( "acquisitionNumber", 1 );
+	ch.setProperty<uint32_t>( "acquisitionNumber", 1 );
 	ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 	BOOST_REQUIRE( img.insertChunk( ch ) );
 	//threat image as a list of sorted chunks
@@ -66,18 +67,18 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 	// Check for insertion in two dimensions
 	ch = data::MemChunk<float>( 4, 4 );
 	ch.setProperty( "indexOrigin", util::fvector4( 0, 0, 0, 1 ) );
-	ch.setProperty<u_int32_t>( "acquisitionNumber", 4 );
+	ch.setProperty<uint32_t>( "acquisitionNumber", 4 );
 	ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 	BOOST_REQUIRE( img.insertChunk( ch ) );
 	data::Image::ChunkIterator it = img.chunksEnd();
 	//as all other chunks where timestep 0 this must be at the end
 	BOOST_CHECK( ( --it )->propertyValue( "indexOrigin" ) == util::fvector4( 0, 0, 0, 1 ) );
-	BOOST_CHECK( ( it )->propertyValue( "acquisitionNumber" ) == int( 4 ) );
+	BOOST_CHECK( ( it )->propertyValue( "acquisitionNumber" ) == (int32_t)4  );
 }
 
 BOOST_AUTO_TEST_CASE ( image_chunk_test )
 {
-	u_int32_t acNum = 0;
+	uint32_t acNum = 0;
 	std::vector<std::vector<data::MemChunk<float> > > ch( 3, std::vector<data::MemChunk<float> >( 3, data::MemChunk<float>( 3, 3 ) ) );
 	data::Image img;
 
@@ -105,14 +106,14 @@ BOOST_AUTO_TEST_CASE ( image_chunk_test )
 	BOOST_CHECK_EQUAL( ref11.propertyValue( "indexOrigin" ), util::fvector4( 0, 0, 0, 0 ) );
 	BOOST_CHECK_EQUAL( ref12.propertyValue( "indexOrigin" ), util::fvector4( 0, 0, 1, 0 ) );
 	BOOST_CHECK_EQUAL( ref13.propertyValue( "indexOrigin" ), util::fvector4( 0, 0, 2, 0 ) );
-	BOOST_CHECK_EQUAL( ref11.propertyValue( "acquisitionNumber" ), 0 );
-	BOOST_CHECK_EQUAL( ref12.propertyValue( "acquisitionNumber" ), 1 );
-	BOOST_CHECK_EQUAL( ref13.propertyValue( "acquisitionNumber" ), 2 );
-	BOOST_CHECK_EQUAL( ref21.propertyValue( "acquisitionNumber" ), 3 );
-	BOOST_CHECK_EQUAL( ref22.propertyValue( "acquisitionNumber" ), 4 );
-	BOOST_CHECK_EQUAL( ref23.propertyValue( "acquisitionNumber" ), 5 );
+	BOOST_CHECK_EQUAL( ref11.propertyValue( "acquisitionNumber" ), (int32_t)0 );
+	BOOST_CHECK_EQUAL( ref12.propertyValue( "acquisitionNumber" ), (int32_t)1 );
+	BOOST_CHECK_EQUAL( ref13.propertyValue( "acquisitionNumber" ), (int32_t)2 );
+	BOOST_CHECK_EQUAL( ref21.propertyValue( "acquisitionNumber" ), (int32_t)3 );
+	BOOST_CHECK_EQUAL( ref22.propertyValue( "acquisitionNumber" ), (int32_t)4 );
+	BOOST_CHECK_EQUAL( ref23.propertyValue( "acquisitionNumber" ), (int32_t)5 );
 	BOOST_CHECK_EQUAL( ref22.propertyValue( "indexOrigin" ), util::fvector4( 0, 0, 1, 1 ) );
-	BOOST_CHECK( not ( ref22.propertyValue( "indexOrigin" ) == util::fvector4( 0, 0, 1, 0 ) ) );
+	BOOST_CHECK( ! ( ref22.propertyValue( "indexOrigin" ) == util::fvector4( 0, 0, 1, 0 ) ) );
 	BOOST_CHECK_EQUAL( ref11.voxel<float>( 0, 0 ), 42 );
 	BOOST_CHECK_EQUAL( ref12.voxel<float>( 1, 1 ), 42 );
 	BOOST_CHECK_EQUAL( ref13.voxel<float>( 2, 2 ), 42 );
@@ -129,7 +130,7 @@ BOOST_AUTO_TEST_CASE ( image_voxel_test )
 
 	for ( int i = 0; i < 3; i++ ) {
 		ch[i].setProperty( "indexOrigin", util::fvector4( 0, 0, i, 0 ) );
-		ch[i].setProperty<u_int32_t>( "acquisitionNumber", i );
+		ch[i].setProperty<uint32_t>( "acquisitionNumber", i );
 		ch[i].setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 	}
 
@@ -197,7 +198,7 @@ BOOST_AUTO_TEST_CASE( orientation_test )
 	ch.setProperty( "indexOrigin", util::fvector4( 0, 0, 0 ) );
 	ch.setProperty( "readVec", util::fvector4( 1, 0 ) );
 	ch.setProperty( "phaseVec", util::fvector4( 0, 1 ) );
-	ch.setProperty( "acquisitionNumber", 0 );
+	ch.setProperty( "acquisitionNumber", (int32_t)0 );
 	ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 	BOOST_REQUIRE( img.insertChunk( ch ) );
 	BOOST_REQUIRE(img.reIndex());
@@ -232,16 +233,16 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 		BOOST_CHECK_EQUAL( max->as<float>(), 2 * 2 * 1000 );
 	}
 	{
-		// Conversion to u_int8_t (will downscale [0-255])
-		data::MemImage<u_int8_t> img2( img );
+		// Conversion to uint8_t (will downscale [0-255])
+		data::MemImage<uint8_t> img2( img );
 		BOOST_REQUIRE(img2.reIndex());
 		BOOST_CHECK_EQUAL(static_cast<util::PropMap>(img), static_cast<util::PropMap>(img2));
 		util::_internal::TypeBase::Reference min, max;
 		img2.getMinMax( min, max );
-		BOOST_CHECK( min->is<u_int8_t>() );
-		BOOST_CHECK( max->is<u_int8_t>() );
-		BOOST_CHECK_EQUAL( min->as<u_int8_t>(), 0 );
-		BOOST_CHECK_EQUAL( max->as<u_int8_t>(), 255 );
+		BOOST_CHECK( min->is<uint8_t>() );
+		BOOST_CHECK( max->is<uint8_t>() );
+		BOOST_CHECK_EQUAL( min->as<uint8_t>(), 0 );
+		BOOST_CHECK_EQUAL( max->as<uint8_t>(), 255 );
 	}
 	{
 		// Conversion to int16_t (will upscale [0-32k])

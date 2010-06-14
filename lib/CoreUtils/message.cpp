@@ -12,11 +12,17 @@
 
 #include "message.hpp"
 #include "common.hpp"
-#include <sys/time.h>
 #include <sys/types.h>
-#include <signal.h>
-#include <unistd.h>
 #include <boost/filesystem/path.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp> //we need the to_string functions for the automatic conversion
+
+#ifndef WIN32
+#include <signal.h>
+#endif
+
+#ifndef __PRETTY_FUNCTION__
+#pragma message("Using __FUNCTION__ instead of __PRETTY_FUNCTION__ - logging will not contain full function names")
+#endif
 
 namespace isis
 {
@@ -24,7 +30,16 @@ namespace util
 {
 namespace _internal
 {
-const char* LogLevelNames[] = {"no_log", "error", "warning", "info", "verbose"};
+const char* const logLevelNames(LogLevel level)
+{
+	switch(level){
+		case error: return "error";
+		case warning: return "warning";
+		case info: return "info";
+		case verbose_info: return "verbose";
+	}
+	return "//no_log//";
+}
 
 void MessageHandlerBase::stopBelow( LogLevel stop )
 {
@@ -33,32 +48,42 @@ void MessageHandlerBase::stopBelow( LogLevel stop )
 
 bool MessageHandlerBase::requestStop( LogLevel _level )
 {
-	if ( m_stop_below > _level )
+	if ( m_stop_below > _level ){
+#ifdef WIN32
+		LOG(Debug,error) << "Sorry stopping is not supported on Win32";
+		return false;
+#else
 		return kill( getpid(), SIGTSTP ) == 0;
-	else
+#endif
+	} else
 		return false;
 }
 
 std::string Message::strTime()const
 {
-	char buffer[11];
-	tm r = {0};
-	strftime( buffer, sizeof( buffer ), "%X", localtime_r( &m_timeStamp, &r ) );
-	struct timeval tv;
-	gettimeofday( &tv, 0 );
-	char result[100] = {0};
-	std::sprintf( result, "%s.%03ld", buffer, ( long )tv.tv_usec / 1000 );
-	return result;
+	return boost::posix_time::to_simple_string(m_timeStamp);
 }
 
 Message::Message( std::string object, std::string module, std::string file, int line, LogLevel level, boost::weak_ptr<MessageHandlerBase> _commitTo )
-		: commitTo( _commitTo ), m_object( object ), m_module( module ), m_file( file ), m_line( line ), m_level( level )
-{
-	time( &m_timeStamp );
-}
+	: commitTo( _commitTo ), 
+	  m_object( object ), 
+	  m_module( module ), 
+	  m_file( file ),
+	  m_timeStamp(boost::posix_time::second_clock::universal_time()),
+	  m_line( line ),
+	  m_level( level )
+{}
+
 Message::Message( const Message &src ) //we need a custom copy-constructor, because the copy-contructor of ostringstream is private
-		: std::ostringstream( src.str() ),
-		commitTo( src.commitTo ), m_object( src.m_object ), m_module( src.m_module ), m_file( src.m_file ), m_subjects( src.m_subjects ), m_timeStamp( src.m_timeStamp ), m_line( src.m_line )
+	: std::ostringstream( src.str() ),
+	  commitTo( src.commitTo ), 
+	  m_object( src.m_object ), 
+	  m_module( src.m_module ), 
+	  m_file( src.m_file ),
+	  m_subjects( src.m_subjects ), 
+	  m_timeStamp( src.m_timeStamp ),
+	  m_line( src.m_line ),
+	  m_level( src.m_level )
 {}
 
 Message::~Message()
@@ -91,6 +116,9 @@ std::string Message::merge()const
 
 bool Message::shouldCommit()const
 {
+	if(str().empty())
+		return false;
+
 	const boost::shared_ptr<MessageHandlerBase> buff( commitTo.lock() );
 
 	if ( buff )
@@ -106,14 +134,14 @@ LogLevel MessageHandlerBase::m_stop_below = error;
 std::ostream *DefaultMsgPrint::o = &::std::cerr;
 void DefaultMsgPrint::commit( const _internal::Message &mesg )
 {
-	*o << mesg.m_module << ":" << _internal::LogLevelNames[mesg.m_level]
+	*o << mesg.m_module << ":" << _internal::logLevelNames(mesg.m_level);
 #ifndef NDEBUG //if with debug-info
-	<< "[" << mesg.m_file.leaf() << ":" << mesg.m_line << "] " //print the file and the line
+	*o << "[" << mesg.m_file.leaf() << ":" << mesg.m_line << "] "; //print the file and the line
 #else
-	<< "[" << mesg.m_object << "] " //print the object/method
+	*o << "[" << mesg.m_object << "] "; //print the object/method
 #endif //NDEBUG
-	<< mesg.merge()
-	<< std::endl;
+	*o << mesg.merge(); //print the message itself
+	*o << std::endl;
 }
 
 void DefaultMsgPrint::setStream( ::std::ostream &_o )

@@ -25,6 +25,24 @@
 #include <cmath>
 #include "log.hpp"
 #include "log_modules.hpp"
+#include <boost/algorithm/string/case_conv.hpp>
+
+#ifdef _MSC_VER
+typedef boost::int8_t   int8_t;
+typedef boost::int16_t  int16_t;
+typedef boost::int32_t  int32_t;
+typedef boost::uint8_t  uint8_t;
+typedef boost::uint16_t uint16_t;
+typedef boost::uint32_t uint32_t;
+typedef boost::int64_t  int64_t;
+typedef boost::uint64_t uint64_t;
+#define DISABLE_WARN(NUM)	#pragma warning(disable:4244)
+#define DISABLE_WARN_LINE(NUM) #pragma warning(suppress:4996)
+#else
+#include <stdint.h>
+#define DISABLE_WARN(NUM)
+#define DISABLE_WARN_LINE(NUM)
+#endif
 
 namespace isis
 {
@@ -98,16 +116,16 @@ template<typename TARGET> std::list<TARGET> string2list(
 	boost::regex prefix, boost::regex postfix )
 {
 	std::list<TARGET> ret;
-	assert( not separator.empty() );
+	assert( ! separator.empty() );
 
-	if ( not prefix.empty() ) {
+	if ( ! prefix.empty() ) {
 		if ( prefix.str()[0] != '^' )
 			prefix = boost::regex( std::string( "^" ) + prefix.str(), prefix.flags() );
 
 		source = boost::regex_replace( source, prefix, "", boost::format_first_only | boost::match_default );
 	}
 
-	if ( not postfix.empty() ) {
+	if ( ! postfix.empty() ) {
 		if ( postfix.str()[postfix.size()-1] != '$' )
 			postfix = boost::regex( postfix.str() + "$", postfix.flags() );
 
@@ -185,7 +203,7 @@ continousFind( ForwardIterator &current, const ForwardIterator end, const T& com
 	current = std::lower_bound( current, end, compare, compOp );
 
 	if ( current == end //if we're at the end
-		 or compOp( compare, *current ) //or compare is less than that iterator
+		 || compOp( compare, *current ) //or compare is less than that iterator
 	   )
 		return false;//we didn't find a match
 	else
@@ -204,7 +222,7 @@ template<typename T> bool fuzzyEqual( T a, T b )
 	if ( a == b )return true;
 
 	const T dist = std::fabs( a - b );
-	const T base = std::min( a, b ) * std::numeric_limits<T>::epsilon() * 5e1;
+	const T base = std::min( a, b ) * std::numeric_limits<T>::epsilon() * T(5e1);
 	return  dist < base;
 }
 
@@ -231,7 +249,7 @@ continousFind( ForwardIterator &current, const ForwardIterator end, const T& com
 ///Caseless less-compare for std::string
 struct caselessStringLess {
 	bool operator() ( const std::string& a, const std::string& b ) const {
-		return ( strcasecmp ( a.c_str ( ), b.c_str ( ) ) < 0 );
+		return boost::algorithm::to_lower_copy(a) < boost::algorithm::to_lower_copy(b);
 	}
 };
 }

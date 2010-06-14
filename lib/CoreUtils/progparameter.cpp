@@ -13,7 +13,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program.  If !, see <http://www.gnu.org/licenses/>.
 
 */
 
@@ -63,7 +63,7 @@ bool isis::util::ParameterMap::parse( int argc, char **argv )
 			else begin = i;
 		}
 
-		if ( i >= argc - 1 and begin )end = argc;
+		if ( i >= argc - 1 && begin )end = argc;
 
 		if ( end ) {
 			std::string pName( argv[begin] );
@@ -94,7 +94,7 @@ bool isis::util::ParameterMap::parse( int argc, char **argv )
 }
 bool isis::util::ParameterMap::isComplete()const
 {
-	LOG_IF( not parsed, Debug, error ) << "You did not run parse() yet. This is very likely an error";
+	LOG_IF( ! parsed, Debug, error ) << "You did not run parse() yet. This is very likely an error";
 	return std::find_if( begin(), end(), neededP() ) == end();
 }
 void isis::util::ParameterMap::printAll()const
@@ -103,10 +103,10 @@ void isis::util::ParameterMap::printAll()const
 }
 void isis::util::ParameterMap::printNeeded()const
 {
-	std::map<key_type, mapped_type> needed( *this );
+	std::map<key_type, mapped_type,key_compare> needed( *this );
 
 	for (
-		std::map<key_type, mapped_type>::iterator at = std::find_if( needed.begin(), needed.end(), notneededP() );
+		std::map<key_type, mapped_type,key_compare>::iterator at = std::find_if( needed.begin(), needed.end(), notneededP() );
 		at != needed.end();
 		at = std::find_if( at, needed.end(), notneededP() )
 	)

@@ -8,7 +8,7 @@ int main( int argc, char **argv )
 {
 	data::IOApplication app("isis data converter", true, true);
 
-	if (not app.init(argc, argv )) {
+	if (! app.init(argc, argv )) {
 		return EXIT_FAILURE;
 	}
 

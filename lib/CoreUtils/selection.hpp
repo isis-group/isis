@@ -23,7 +23,7 @@ namespace util
  */
 class Selection
 {
-	typedef std::map<std::string, int, _internal::caselessStringLess> map_type;
+	typedef std::map<std::string, unsigned short, _internal::caselessStringLess> map_type;
 	map_type ent_map;
 	int m_set;
 public:

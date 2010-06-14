@@ -15,7 +15,6 @@
 
 #include <map>
 #include <string>
-#include <strings.h>
 
 #include "common.hpp"
 #include "property.hpp"
@@ -31,48 +30,12 @@ namespace isis
  */
 namespace util
 {
-class PropMap;
 namespace _internal
 {
-template<typename BRANCH_TYPE, typename LEAF_TYPE> class treeNode
-{
-	BRANCH_TYPE m_branch;
-	LEAF_TYPE m_leaf;
-public:
-	bool empty()const {
-		return m_branch.empty() and m_leaf.empty();
-	}
-	bool is_leaf()const {
-		LOG_IF( not ( m_branch.empty() or m_leaf.empty() ), Debug, error ) << "There is a non empty leaf at a branch. This should not be.";
-		return m_branch.empty();
-	}
-	const BRANCH_TYPE &getBranch()const {
-		return m_branch;
-	}
-	BRANCH_TYPE &getBranch() {
-		return m_branch;
-	}
-	LEAF_TYPE &getLeaf() {
-		assert( is_leaf() );
-		return m_leaf;
-	}
-	const LEAF_TYPE &getLeaf()const {
-		assert( is_leaf() );
-		return m_leaf;
-	}
-	bool operator==( const treeNode &ref )const {
-		return m_branch == ref.m_branch and m_leaf == ref.m_leaf;
-	}
-	std::string toString()const {
-		std::ostringstream o;
-		o << *this;
-		return o.str();
-	}
-};
+	class treeNode; //predeclare treeNode -- we'll need it in PropMap
 }
-
 /// A mapping tree to store properties (keys / values)
-class PropMap : protected std::map<std::string, _internal::treeNode<PropMap, PropertyValue>, _internal::caselessStringLess>
+class PropMap : protected std::map<std::string, _internal::treeNode, _internal::caselessStringLess>
 {
 public:
 	typedef std::map<key_type, mapped_type, key_compare> base_type;
@@ -100,21 +63,7 @@ private:
 	// internal functors
 	/////////////////////////////////////////////////////////////////////////////////////////
 	///Walks the whole tree and inserts any key into out for which the given scalar predicate is true.
-	template<class Predicate> struct walkTree {
-		key_list &m_out;
-		const std::string m_prefix;
-		walkTree( key_list &out, const std::string &prefix ): m_out( out ), m_prefix( prefix ) {}
-		walkTree( key_list &out ): m_out( out ) {}
-		void operator()( const_reference ref ) const {
-			if ( ref.second.is_leaf() ) {
-				if ( Predicate()( ref ) )
-					m_out.insert( m_out.end(), ( m_prefix != "" ? m_prefix + "/" : "" ) + ref.first );
-			} else {
-				const PropMap &sub = ref.second.getBranch();
-				std::for_each( sub.begin(), sub.end(), walkTree<Predicate>( m_out, ref.first ) );
-			}
-		}
-	};
+	template<class Predicate> struct walkTree;
 
 	/////////////////////////////////////////////////////////////////////////////////////////
 	// internal tool-backends
@@ -319,32 +268,103 @@ public:
 	 */
 	std::ostream &print( std::ostream &out, bool label = false )const;
 };
-
 }
 /** @} */
 }
 
-namespace std
+namespace std ///predeclare streaming output -- we'll need it in treeNode
 {
 /// Streaming output for PropMap::node
-template<typename charT, typename traits, typename BRANCH_TYPE, typename LEAF_TYPE>
-basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::_internal::treeNode<BRANCH_TYPE, LEAF_TYPE>& s )
-{
-	if( s.is_leaf() )
-		out << s.getLeaf();
-	else
-		out << "[[Subtree with " << s.getBranch().getKeys().size() << " elements]]";
-
-	return out;
-}
+template<typename charT, typename traits>
+	basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::_internal::treeNode& s );
 /// Streaming output for PropMap
 template<typename charT, typename traits>
-basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::PropMap &s )
+	basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::PropMap &s );
+}
+
+
+// OK, lets define treeNode
+namespace isis{ namespace util{ namespace _internal 
 {
-	isis::util::PropMap::flat_map buff;
-	s.linearize( buff );
-	isis::util::write_list( buff.begin(), buff.end(), out );
-	return out;
+class treeNode
+{
+	PropMap m_branch;
+	PropertyValue m_leaf;
+public:
+	bool empty()const {
+		return m_branch.empty() && m_leaf.empty();
+	}
+	bool is_leaf()const {
+		LOG_IF( ! ( m_branch.empty() || m_leaf.empty() ), Debug, error ) << "There is a non empty leaf at a branch. This should not be.";
+		return m_branch.empty();
+	}
+	const PropMap &getBranch()const {
+		return m_branch;
+	}
+	PropMap &getBranch() {
+		return m_branch;
+	}
+	PropertyValue &getLeaf() {
+		assert( is_leaf() );
+		return m_leaf;
+	}
+	const PropertyValue &getLeaf()const {
+		assert( is_leaf() );
+		return m_leaf;
+	}
+	bool operator==( const treeNode &ref )const {
+		return m_branch == ref.m_branch && m_leaf == ref.m_leaf;
+	}
+	std::string toString()const {
+		std::ostringstream o;
+		o << *this;
+		return o.str();
+	}
+};
 }
+	
+// and now we can define walkTree (needs treeNode to be defined)
+template<class Predicate> struct PropMap::walkTree {
+	key_list &m_out;
+	const std::string m_prefix;
+	walkTree( key_list &out, const std::string &prefix ): m_out( out ), m_prefix( prefix ) {}
+	walkTree( key_list &out ): m_out( out ) {}
+	void operator()( const_reference ref ) const {
+		if ( ref.second.is_leaf() ) {
+			if ( Predicate()( ref ) )
+				m_out.insert( m_out.end(), ( m_prefix != "" ? m_prefix + "/" : "" ) + ref.first );
+		} else {
+			const PropMap &sub = ref.second.getBranch();
+			std::for_each( sub.begin(), sub.end(), walkTree<Predicate>( m_out, ref.first ) );
+		}
+	}
+};
+	
+}}
+
+// and finally define the streaming output for treeNode
+namespace std
+{
+	/// Streaming output for PropMap::node
+	template<typename charT, typename traits>
+	basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::_internal::treeNode& s )
+	{
+		if( s.is_leaf() )
+			out << s.getLeaf();
+		else
+			out << "[[Subtree with " << s.getBranch().getKeys().size() << " elements]]";
+		
+		return out;
+	}
+	/// Streaming output for PropMap
+	template<typename charT, typename traits>
+	basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::PropMap &s )
+	{
+		isis::util::PropMap::flat_map buff;
+		s.linearize( buff );
+		isis::util::write_list( buff.begin(), buff.end(), out );
+		return out;
+	}
 }
+
 #endif

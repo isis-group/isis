@@ -98,9 +98,17 @@ extern "C" {
 #endif
 
 #if defined(__STDC__) || defined(__cplusplus)
-	extern isis::image_io::FileFormat *factory();
+	#ifdef WIN32
+		extern __declspec( dllexport ) isis::image_io::FileFormat *factory();
+	#else
+		extern isis::image_io::FileFormat *factory();
+	#endif
 #else
-	extern FileFormat *factory();
+	#ifdef WIN32
+		extern __declspec( dllexport ) FileFormat *factory();
+	#else
+		extern FileFormat *factory();
+	#endif
 #endif
 
 #ifdef __cplusplus

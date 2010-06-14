@@ -46,7 +46,7 @@ void TypePtrBase::copyRange( size_t start, size_t end, TypePtrBase &dst, size_t 
 {
 	assert( start <= end );
 	const size_t length = end - start + 1;
-	LOG_IF( not dst.isSameType( *this ), Debug, error )
+	LOG_IF( ! dst.isSameType( *this ), Debug, error )
 	<< "Copying into a TypePtr of different type. Its " << dst.typeName() << " not " << typeName();
 	LOG_IF( end >= len(), Runtime, error )
 	<< "End of the range (" << end << ") is behind the end of this TypePtr (" << len() << ")";

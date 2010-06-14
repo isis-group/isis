@@ -35,35 +35,13 @@ namespace _internal{
 class GenericType
 {
 protected:
-	template<typename T> T &m_cast_to() throw( std::invalid_argument ) {
-		if ( typeID() == T::staticID ) { // ok its exactly the same type - no fiddling necessary
-			return *reinterpret_cast<T *>( this );
-		} else {
-			T *const ret = dynamic_cast<T * >( this ); //@todo have a look at http://lists.apple.com/archives/Xcode-users/2005/Dec/msg00061.html and http://www.mailinglistarchive.com/xcode-users@lists.apple.com/msg15790.html
-
-			if ( ret == NULL ) {
-				std::stringstream msg;
-				msg << "cannot cast " << typeName() << " at " << this << " to " << T::staticName();
-				throw( std::invalid_argument( msg.str() ) );
-			}
-
-			return *ret;
-		}
+	template<typename T> T &m_cast_to() {
+		LOG_IF(typeID() != T::staticID,Debug,error) << "using " << typeName() << " at " << this << " as " << T::staticName();
+		return *reinterpret_cast<T *>( this );
 	}
-	template<typename T> const T &m_cast_to()const throw( std::invalid_argument ) {
-		if ( typeID() == T::staticID ) { // ok its exactly the same type - no fiddling necessary
-			return *reinterpret_cast<const T *>( this );
-		} else {
-			const T *const ret = dynamic_cast<const T * >( this ); //@todo have a look at http://lists.apple.com/archives/Xcode-users/2005/Dec/msg00061.html and http://www.mailinglistarchive.com/xcode-users@lists.apple.com/msg15790.html
-
-			if ( ret == NULL ) {
-				std::stringstream msg;
-				msg << "cannot cast " << typeName() << " at " << this << " to " << T::staticName();
-				throw( std::invalid_argument( msg.str() ) );
-			}
-
-			return *ret;
-		}
+	template<typename T> const T &m_cast_to()const {
+		LOG_IF(typeID() != T::staticID,Debug,error) << "using " << typeName() << " at " << this << " as " << T::staticName();
+		return *reinterpret_cast<const T *>( this );
 	}
 
 public:

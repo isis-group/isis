@@ -16,9 +16,13 @@
 #include "CoreUtils/common.hpp"
 #include <algorithm>
 #include <ostream>
-#include <strings.h>
 #include <numeric>
 #include <cmath>
+
+#ifdef _MSC_VER //disable warning 4996 in VC90
+#pragma warning(push)
+#pragma warning(disable:4996)
+#endif
 
 namespace isis
 {
@@ -140,9 +144,7 @@ public:
 		return false;
 	}
 	///\returns true if this is equal to src
-	bool operator==( const this_class &src )const {
-		return std::equal( CONTAINER::begin(), CONTAINER::end(), src.begin() );
-	}
+	bool operator==( const this_class &src )const {return std::equal( CONTAINER::begin(), CONTAINER::end(), src.begin() );}
 	///\returns false if this is equal to src
 	bool operator!=( const this_class &src )const {
 		return !operator==( src );
@@ -156,7 +158,7 @@ public:
 		const_iterator b = other.begin();
 
 		for ( const_iterator a = CONTAINER::begin(); a != CONTAINER::end(); ++a, ++b ) {
-			if ( not util::fuzzyEqual( *a, *b ) )
+			if ( ! util::fuzzyEqual( *a, *b ) )
 				return false;
 		}
 
@@ -322,5 +324,7 @@ operator<<( basic_ostream<charT, traits> &out, const ::isis::util::FixedVector<T
 	return out;
 }
 }
-
+#ifdef _MSC_VER
+#pragma warning(push)
+#endif
 #endif //VECTOR_HPP

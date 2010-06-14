@@ -3,9 +3,9 @@
 
 using namespace isis;
 
-const size_t slices = 100;
-const size_t tsteps = 100;
-const size_t slice_size = 256;
+const size_t slices = 128;
+const size_t tsteps = 128;
+const size_t slice_size = 128;
 
 int main()
 {
@@ -17,8 +17,11 @@ int main()
 	for ( size_t tstep = 0; tstep < tsteps; tstep++ ) {
 		for ( size_t slice = 0; slice < slices; slice++ ) {
 			data::MemChunk<short> chk( slice_size, slice_size );
+			chk.setProperty( "readVec", util::fvector4( 1, 0 ) );
+			chk.setProperty( "phaseVec", util::fvector4( 0, 1 ) );
 			chk.setProperty( "indexOrigin", util::fvector4( 0, 0, slice, tstep ) );
 			chk.setProperty( "acquisitionNumber", ++acq );
+			chk.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 
 			if ( !img.insertChunk( chk ) )
 				std::cout << "Inserting Chunk " << slice << " failed" << std::endl;

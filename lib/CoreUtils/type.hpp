@@ -128,11 +128,13 @@ public:
 	 * If the type of the parameter is not the same as the content type of the object, the system tries to do a type conversion.
 	 * If that fails, boost::bad_lexical_cast is thrown.
 	 */
-	template<typename T> Type( const T &value ): m_val( __cast_to( this, value ) ) {
+	template<typename T> Type( const T &value ){
+		m_val = __cast_to( this, value );
 		BOOST_MPL_ASSERT_RELATION( staticID, < , 0xFF );
 		check_type<TYPE>();
 	}
 	virtual bool is( const std::type_info &t )const {
+		check_type<TYPE>();
 		return t == typeid( TYPE );
 	}
 	virtual std::string toString( bool labeled = false )const {
