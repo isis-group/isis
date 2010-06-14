@@ -15,7 +15,9 @@ int main( int argc, char **argv )
 	if (app.images.size() == 0){
 		LOG(isis::image_io::Runtime, error) << "No images found. Abort";
 	}
-	data::IOFactory::get().write(app.images, app.parameters["out"]->as<std::string>(), "");
+
+	data::IOFactory::get().write(app.images, app.parameters["out"]->as<std::string>(),"" );
+
 
 	return EXIT_SUCCESS;
 }

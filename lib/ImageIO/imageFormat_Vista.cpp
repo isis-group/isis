@@ -517,9 +517,9 @@ void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &c
 		util::fvector4 voxels = chunk.getProperty<util::fvector4>( "voxelSize" );
 		// calculate index origin according to axial
 		util::fvector4 ioTmp(
-			- ( ( dims[0] - 1 )*voxels[0] ) / 2,
-			- ( ( dims[1] - 1 )*voxels[1] ) / 2,
-			- ( ( dims[2] - 1 )*voxels[2] ) / 2,
+			 ( ( dims[0] - 1 )*voxels[0] ) / 2,
+			 ( ( dims[1] - 1 )*voxels[1] ) / 2,
+			 ( ( dims[2] - 1 )*voxels[2] ) / 2,
 			0 );
 		util::fvector4 readV = chunk.getProperty<util::fvector4>( "readVec");
 		util::fvector4 phaseV = chunk.getProperty<util::fvector4>( "phaseVec");

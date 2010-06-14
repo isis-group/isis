@@ -130,6 +130,13 @@ public:
 			indexOrigin[0] = -indexOrigin[0];
 			indexOrigin[1] = -indexOrigin[1];
 		}
+		//since itk uses the nifti coordinate system, the origin has to be
+		//shifted to the opposite corner
+		for ( unsigned int i = 0; i < 3; i++ )
+		{
+			indexOrigin[i] = -indexOrigin[i];
+		}
+
 
 		boost::shared_ptr<data::MemChunk<typename TImage::PixelType > >
 		retChunk( new data::MemChunk<typename TImage::PixelType >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) );
@@ -209,8 +216,9 @@ private:
 			itkDirection[i][2] = sliceVec[i];
 		}
 
-		//TODO why the hell negates the itkNiftio some seemingly arbitrary elements of the orientation?????
+
 		//matrix will be transformed this way:
+
 
 		/*
 		-1 -1 -1 -1
@@ -226,6 +234,13 @@ private:
 			itkDirection[1][0] = -readVec[1];
 			itkDirection[1][1] = -phaseVec[1];
 			itkDirection[1][2] = -sliceVec[1];
+		}
+
+		//since itk uses the nifti coordinate system, the origin has to be
+		//shifted to the opposite corner
+		for ( unsigned int i = 0; i < 3; i++ )
+		{
+			itkOrigin[i] = -itkOrigin[i];
 		}
 
 		//if the user requests a 4d image we need to set these parameters
