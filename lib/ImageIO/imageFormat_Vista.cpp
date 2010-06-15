@@ -407,22 +407,22 @@ void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &c
 
 			// axial is the reference
 			if( strcmp( ( const char * )val, "axial" ) == 0 ) {
-				chunk.setProperty( "readVec", util::fvector4( -1, 0, 0, 0 ) );
-				chunk.setProperty( "phaseVec", util::fvector4( 0, -1, 0, 0 ) );
+				chunk.setProperty( "readVec", util::fvector4( 1, 0, 0, 0 ) );
+				chunk.setProperty( "phaseVec", util::fvector4( 0, 1, 0, 0 ) );
 				chunk.setProperty( "sliceVec", util::fvector4( 0, 0, 1, 0 ) );
 				continue;
 			}
 
 			if( strcmp( ( const char * )val, "sagittal" ) == 0 ) {
-				chunk.setProperty( "readVec", util::fvector4( 0, -1, 0, 0 ) );
-				chunk.setProperty( "phaseVec", util::fvector4( 0, 0, -1, 0 ) );
+				chunk.setProperty( "readVec", util::fvector4( 0, 1, 0, 0 ) );
+				chunk.setProperty( "phaseVec", util::fvector4( 0, 0, 1, 0 ) );
 				chunk.setProperty( "sliceVec", util::fvector4( 1, 0, 0, 0 ) );
 				continue;
 			}
 
 			if( strcmp( ( const char * )val, "coronal" ) == 0 ) {
-				chunk.setProperty( "readVec", util::fvector4( -1, 0, 0, 0 ) );
-				chunk.setProperty( "phaseVec", util::fvector4( 0, 0, -1, 0 ) );
+				chunk.setProperty( "readVec", util::fvector4( 1, 0, 0, 0 ) );
+				chunk.setProperty( "phaseVec", util::fvector4( 0, 0, 1, 0 ) );
 				chunk.setProperty( "sliceVec", util::fvector4( 0, -1, 0, 0 ) );
 				continue;
 			}
@@ -458,7 +458,7 @@ void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &c
 			continue;
 		}
 
-		// OPTIONAL: indexOrigina -> indexOrigin
+		// OPTIONAL: indexOrigin -> indexOrigin
 		if( strcmp( name, "indexOrigin" ) == 0 ) {
 			VGetAttrValue( &posn, NULL, VStringRepn, &val );
 			std::list<float> flist = util::string2list<float>( std::string( ( char * )val ) );
@@ -517,9 +517,9 @@ void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &c
 		util::fvector4 voxels = chunk.getProperty<util::fvector4>( "voxelSize" );
 		// calculate index origin according to axial
 		util::fvector4 ioTmp(
-			 ( ( dims[0] - 1 )*voxels[0] ) / 2,
-			 ( ( dims[1] - 1 )*voxels[1] ) / 2,
-			 ( ( dims[2] - 1 )*voxels[2] ) / 2,
+			 -( ( dims[0] - 1 )*voxels[0] ) / 2,
+			 -( ( dims[1] - 1 )*voxels[1] ) / 2,
+			 -( ( dims[2] - 1 )*voxels[2] ) / 2,
 			0 );
 		util::fvector4 readV = chunk.getProperty<util::fvector4>( "readVec");
 		util::fvector4 phaseV = chunk.getProperty<util::fvector4>( "phaseVec");
