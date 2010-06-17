@@ -130,12 +130,19 @@ public:
 			indexOrigin[0] = -indexOrigin[0];
 			indexOrigin[1] = -indexOrigin[1];
 		}
-		//since itk uses the nifti coordinate system, the origin has to be
-		//shifted to the opposite corner
-		for ( unsigned int i = 0; i < 3; i++ )
-		{
-			indexOrigin[i] = -indexOrigin[i];
-		}
+
+
+
+//		//since itk uses the nifti coordinate system, the read and phase vectors
+//		//have to be inverted and the index origin must be transformed
+//		//according to the new orientation information.
+//		for ( unsigned int i = 0; i < 2; i++ )
+//		{
+//			indexOrigin[i] = -indexOrigin[i];
+//			for (unsigned int j = 0; j < 3; j++) {
+//				imageDirection [j][i] = -imageDirection [j][i];
+//			}
+//		}
 
 
 		boost::shared_ptr<data::MemChunk<typename TImage::PixelType > >
@@ -170,8 +177,6 @@ public:
 		data::ImageList isisImageList( chunkList );
 		return isisImageList;
 	}
-
-
 
 
 protected:
@@ -236,12 +241,16 @@ private:
 			itkDirection[1][2] = -sliceVec[1];
 		}
 
-		//since itk uses the nifti coordinate system, the origin has to be
-		//shifted to the opposite corner
-		for ( unsigned int i = 0; i < 3; i++ )
-		{
-			itkOrigin[i] = -itkOrigin[i];
-		}
+//		//since itk uses the nifti coordinate system, the read and phase vectors
+//		//have to be inverted and the index origin must be transformed
+//		//according to the new orientation information.
+//		for ( unsigned int i = 0; i < 2; i++ )
+//		{
+//			itkOrigin[i] = -itkOrigin[i];
+//			for (unsigned int j = 0; j < 3; j++) {
+//				itkDirection [j][i] = -itkDirection [j][i];
+//			}
+//		}
 
 		//if the user requests a 4d image we need to set these parameters
 		if ( OutputImageType::ImageDimension == 4 ) {

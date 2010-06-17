@@ -242,8 +242,8 @@ int main(
 	// TODO DEBUG
 	// use makeItkImageObject with "false" -> no ITK nifti default transformation
 	if ( !smooth ) {
-		fixedImage = isis::adapter::itkAdapter::makeItkImageObject<FixedImageType>( refList.front());
-		movingImage = isis::adapter::itkAdapter::makeItkImageObject<MovingImageType>( inList.front());
+		fixedImage = isis::adapter::itkAdapter::makeItkImageObject<FixedImageType>( refList.front(),false);
+		movingImage = isis::adapter::itkAdapter::makeItkImageObject<MovingImageType>( inList.front(),false);
 
 		// TODO DEBUG
 		std::cout << "********** Fixed Image **********" << std::endl;

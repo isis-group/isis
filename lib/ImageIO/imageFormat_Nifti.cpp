@@ -293,7 +293,7 @@ private:
 			retChunk.setProperty<u_int16_t>( "sequenceNumber", 1 );
 			// in nifti everything should be relative to RAS, in isis we use LPS coordinates - normally change read/phase dir and sign of indexOrigin
 			//TODO: has to be tested with different niftis - don't trust them!!!!!!!!!
-			retChunk.setProperty( "indexOrigin", util::fvector4( -ni.qoffset_x, -ni.qoffset_y, -ni.qoffset_z, 0 ) );
+			retChunk.setProperty( "indexOrigin", util::fvector4( -ni.qoffset_x, -ni.qoffset_y, ni.qoffset_z, 0 ) );
 			util::fvector4 readVec = getVector( ni, readDir ) * util::fvector4( -1, -1 , -1 , -1 );
 			util::fvector4 phaseVec = getVector( ni, phaseDir ) * util::fvector4( -1, -1 , -1 , -1 );
 			retChunk.setProperty( "readVec",  readVec );
@@ -444,6 +444,8 @@ private:
 		util::fvector4 phaseVec = -image.getProperty<util::fvector4>( "phaseVec" );
 		util::fvector4 sliceVec = image.getProperty<util::fvector4>( "sliceVec" );
 		util::fvector4 indexOrigin = -image.getProperty<util::fvector4>( "indexOrigin" );
+		// don't switch the z-AXIS!!!
+		indexOrigin[2] = -indexOrigin[2];
 		LOG( ImageIoLog, info ) << indexOrigin;
 		util::fvector4 voxelSizeVector = image.getProperty<util::fvector4>( "voxelSize" );
 		util::fvector4 voxelGap = image.getProperty<util::fvector4>( "voxelGap" );

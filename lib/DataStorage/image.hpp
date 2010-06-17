@@ -19,6 +19,7 @@
 #include <boost/shared_ptr.hpp>
 #include <vector>
 #include <boost/foreach.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
 
 namespace isis
 {
@@ -249,6 +250,20 @@ public:
 	void getMinMax( util::_internal::TypeBase::Reference &min, util::_internal::TypeBase::Reference &max )const;
 	size_t cmp( const Image &comp )const;
 	orientation getMainOrientation()const;
+	/**
+	 * Transforms the image coordinate system into an other system by multiplying
+	 * the orientation matrix with a user defined transformation matrix. Additionally,
+	 * the index origin will be transformed into the new coordinate system. This
+	 * function only changes the
+	 *
+	 * <b>IMPORTANT!<\b>: If you call this function with a matrix other than the
+	 * identidy matrix, it's not guaranteed that the image is still in ISIS space
+	 * according to the DICOM conventions. Eventuelly some ISIS algorithms depending
+	 * on correct image orientations won't work as expected. Use this method with
+	 * caution!
+	 */
+	void transformCoords(boost::numeric::ublas::matrix<float> transform);
+
 };
 
 template<typename T> class MemImage: public Image
