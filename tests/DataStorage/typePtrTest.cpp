@@ -184,6 +184,7 @@ BOOST_AUTO_TEST_CASE( typePtr_conversion_test )
 		floatArray[i] = init[i] * 1e5;
 
 	data::TypePtr<short> shortArray = floatArray.copyToNew<short>();
+	data::TypePtr<uint8_t> byteArray = shortArray.copyToNew<uint8_t>();
 
 	for ( int i = 0; i < 12; i++ )
 		BOOST_CHECK_EQUAL( shortArray[i], ceil( init[i] * 1e5 * scale -.5 ) );

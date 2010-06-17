@@ -17,7 +17,7 @@ template<typename SRC, typename DST> static void numeric_convert_impl( const SRC
 {
 	LOG( Debug, info )
 	<< "using generic scaling convert " << TypePtr<SRC>::staticName() << "=>" << TypePtr<DST>::staticName()
-	<< " with scale/offset " << scale << "/" << offset;
+	<< " with scale/offset " << std::fixed << scale << "/" << offset;
 	static boost::numeric::converter <
 	DST, double,
 	boost::numeric::conversion_traits<DST, double>,
@@ -25,8 +25,9 @@ template<typename SRC, typename DST> static void numeric_convert_impl( const SRC
 	boost::numeric::RoundEven<double>
 	> converter;
 
-	for ( size_t i = 0; i < count; i++ )
+	for ( size_t i = 0; i < count; i++ ){
 		dst[i] = converter( src[i] * scale + offset );
+	}
 }
 template<typename SRC, typename DST> static void numeric_convert_impl( const SRC *src, DST *dst, size_t count )
 {
@@ -109,12 +110,12 @@ template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &s
 		//set scaling factor to fit src-range into dst domain
 		//some compilers dont make x/0 = inf, so we use std::numeric_limits<double>::max() instead, in this case
 		const double scale_max =
-			range_max==0 ? domain_max / range_max :
+			range_max != 0 ? domain_max / range_max :
 			std::numeric_limits<double>::max();
 		const double scale_min =
-			range_min ? domain_min / range_min :
+			range_min != 0 ? domain_min / range_min :
 			std::numeric_limits<double>::max();
-		LOG( Debug, info ) << "scale_min/scale_max=" << scale_min << "/" << scale_max;
+		LOG( Debug, info ) << "scale_min/scale_max=" << std::fixed << scale_min << "/" << scale_max;
 		scale = std::min( scale_max ? scale_max : std::numeric_limits<double>::max(), scale_min ? scale_min : std::numeric_limits<double>::max() );//get the smaller scaling factor which is not zero so the bigger range will fit into his domain
 
 		if ( scale < 1 ) {
