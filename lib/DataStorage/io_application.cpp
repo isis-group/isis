@@ -60,6 +60,16 @@ bool IOApplication::init( int argc, char **argv, bool exitOnError )
 				exit( 1 );
 
 			return false;
+		} else {
+			for(ImageList::const_iterator a=images.begin();a!=images.end();a++){
+				for(ImageList::const_iterator b=a;(++b)!=images.end();){
+					const util::PropMap &aref=**a,bref=**b;
+					LOG_IF(aref.getDifference(bref).empty(),Runtime,warning) << "The metadata of the images from "
+					<< aref.propertyValue("source").toString(false)<< ":" << std::distance<ImageList::const_iterator>(images.begin(),a)
+					<< " and " << bref.propertyValue("source").toString(false)<< ":" << std::distance<ImageList::const_iterator>(images.begin(),b)
+					<< " are equal. Maybe they are duplicates.";
+				}
+			}
 		}
 	}
 

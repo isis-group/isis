@@ -73,9 +73,9 @@ bool image_chunk_order::operator() ( const data::Chunk &a, const data::Chunk &b 
 			return true;
 		}
 
-		LOG_IF( aNumber == bNumber, Runtime, warning )
-				<< "The Chunks from \"" << a.propertyValue( "source" ) << "\" and \""
-				<< b.propertyValue( "source" ) << "\" seem to be equal, won't insert";
+		LOG_IF( aNumber == bNumber, Runtime, info )
+				<< "The Chunks from \"" << a.propertyValue( "source" ).toString(false) << "\" and \""
+				<< b.propertyValue( "source" ).toString(false) << "\" seem to be equal, won't insert";
 	}
 
 	return false;

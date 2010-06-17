@@ -249,7 +249,6 @@ public:
 	void getMinMax( util::_internal::TypeBase::Reference &min, util::_internal::TypeBase::Reference &max )const;
 	size_t cmp( const Image &comp )const;
 	orientation getMainOrientation()const;
-
 };
 
 template<typename T> class MemImage: public Image
