@@ -8,6 +8,8 @@
 #define BOOST_TEST_MODULE ImageTest
 #define NOMINMAX 1
 #include <boost/test/included/unit_test.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/io.hpp>
 #include <boost/foreach.hpp>
 #include "DataStorage/image.hpp"
 
@@ -256,6 +258,34 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 		BOOST_CHECK_EQUAL( min->as<int16_t>(), 0 );
 		BOOST_CHECK_EQUAL( max->as<int16_t>(), std::numeric_limits<int16_t>::max() );
 	}
-}
-}
-}
+} // END memimage_test
+
+BOOST_AUTO_TEST_CASE (transformCoords_test) {
+
+	// dummy image
+	data::Image img;
+
+	// set orientation axial in DCIOM space
+	img.setProperty( "readVec", util::fvector4( 1, 0, 0, 0 ) );
+	img.setProperty( "phaseVec", util::fvector4( 0, 1, 0, 0 ) );
+	img.setProperty( "sliceVec", util::fvector4( 0, 0, 1, 0 ) );
+
+	// set index origin to DICOM space index origin
+	img.setProperty("indexOrigin", util::fvector4(-1, -2, -3, 0));
+
+	// Transformation: DICOM -> Nifti
+	boost::numeric::ublas::matrix<float> T(4,4);
+	T(0,0) = -1;T(0,1) = 0;T(0,2) = 0;
+	T(1,0) = 0;T(1,1) = -1;T(1,2) = 0;
+	T(2,0) = 0;T(2,1) = 0;T(2,2) = 1;
+
+	std::cout << "Transformation Matrix:" << T << std::endl;
+
+
+
+
+} // END transformCoords_test
+
+
+} // END namespace test
+} // END namespace isis
