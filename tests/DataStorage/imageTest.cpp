@@ -275,14 +275,12 @@ BOOST_AUTO_TEST_CASE (transformCoords_test) {
 
 	// Transformation: DICOM -> Nifti
 	boost::numeric::ublas::matrix<float> T(4,4);
-	T(0,0) = -1;T(0,1) = 0;T(0,2) = 0;
-	T(1,0) = 0;T(1,1) = -1;T(1,2) = 0;
-	T(2,0) = 0;T(2,1) = 0;T(2,2) = 1;
+	T(0,0) = -1;T(0,1) = 0;T(0,2) = 0;T(0,3) = 0;
+	T(1,0) = 0;T(1,1) = -1;T(1,2) = 0;T(1,3) = 0;
+	T(2,0) = 0;T(2,1) = 0;T(2,2) = 1;T(2,3) = 0;
+	T(3,0) = 0;T(3,1) = 0;T(3,2) = 1;T(3,3) = 0;
 
 	std::cout << "Transformation Matrix:" << T << std::endl;
-
-
-
 
 } // END transformCoords_test
 
