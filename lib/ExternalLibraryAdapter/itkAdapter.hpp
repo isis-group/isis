@@ -30,6 +30,7 @@
 
 //external includes
 #include <boost/shared_ptr.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
 
 //itk includes
 #include <itkImage.h>
@@ -131,19 +132,7 @@ public:
 			indexOrigin[1] = -indexOrigin[1];
 		}
 
-
-
-//		//since itk uses the nifti coordinate system, the read and phase vectors
-//		//have to be inverted and the index origin must be transformed
-//		//according to the new orientation information.
-//		for ( unsigned int i = 0; i < 2; i++ )
-//		{
-//			indexOrigin[i] = -indexOrigin[i];
-//			for (unsigned int j = 0; j < 3; j++) {
-//				imageDirection [j][i] = -imageDirection [j][i];
-//			}
-//		}
-
+		// TODO use MemImage instead of MemChunk.
 
 		boost::shared_ptr<data::MemChunk<typename TImage::PixelType > >
 		retChunk( new data::MemChunk<typename TImage::PixelType >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) );
@@ -175,18 +164,33 @@ public:
 		data::ChunkList chunkList;
 		chunkList.push_back( *retChunk );
 		data::ImageList isisImageList( chunkList );
+
+		//declare transformation matrix T (NIFTI -> DICOM)
+		// -1  1  0
+		//  0 -1  0
+		//  0  0  1
+		boost::numeric::ublas::matrix<float> T(3,3);
+		T(0,0) = -1;T(0,1) = 0;T(0,2) = 0;
+		T(1,0) = 0;T(1,1) = -1;T(1,2) = 0;
+		T(2,0) = 0;T(2,1) = 0;T(2,2) = 1;
+		// apply transformation to local isis image copy
+		for(data::ImageList::iterator iter = isisImageList.begin();iter != isisImageList.end(); iter++){
+			(*iter)->transformCoords(T);
+		}
+
 		return isisImageList;
 	}
 
 
 protected:
 	//should not be loaded directly
-	itkAdapter( const boost::shared_ptr<data::Image> src ) : m_ImageISIS( src ) {};
+	itkAdapter( const boost::shared_ptr<data::Image> src ) : m_ImageISIS( *src ) {};
 	itkAdapter( const itkAdapter & ) {};
 	itkAdapter() {};
 private:
 
-	boost::shared_ptr<data::Image> m_ImageISIS;
+//	boost::shared_ptr<data::Image> m_ImageISIS;
+	data::Image m_ImageISIS;
 
 	template<typename TInput, typename TOutput> typename TOutput::Pointer internCreateItk( const bool behaveAsItkReader ) {
 		typedef itk::Image<TInput, TOutput::ImageDimension> InputImageType;
@@ -204,13 +208,28 @@ private:
 		typename OutputImageType::RegionType itkRegion;
 		PropKeyListType propKeyList;
 		itk::MetaDataDictionary myItkDict;
+
+		// since ITK uses a dialect of the Nifti image space, we need to transform
+		// the image metadata into a nifti coordinate system
+
+		//declare transformation matrix T (NIFTI -> DICOM)
+		// -1  1  0
+		//  0 -1  0
+		//  0  0  1
+		boost::numeric::ublas::matrix<float> T(3,3);
+		T(0,0) = -1;T(0,1) = 0;T(0,2) = 0;
+		T(1,0) = 0;T(1,1) = -1;T(1,2) = 0;
+		T(2,0) = 0;T(2,1) = 0;T(2,2) = 1;
+		// apply transformation to local isis image copy
+		m_ImageISIS.transformCoords(T);
+
 		//getting the required metadata from the isis image
-		const util::fvector4 dimensions( m_ImageISIS->sizeToVector() );
-		const util::fvector4 indexOrigin( m_ImageISIS->getProperty<util::fvector4>( "indexOrigin" ) );
-		const util::fvector4 spacing( m_ImageISIS->getProperty<util::fvector4>( "voxelSize" ) );
-		const util::fvector4 readVec = m_ImageISIS->getProperty<util::fvector4>( "readVec" );
-		const util::fvector4 phaseVec = m_ImageISIS->getProperty<util::fvector4>( "phaseVec" );
-		const util::fvector4 sliceVec = m_ImageISIS->getProperty<util::fvector4>( "sliceVec" );
+		const util::fvector4 dimensions( m_ImageISIS.sizeToVector() );
+		const util::fvector4 indexOrigin( m_ImageISIS.getProperty<util::fvector4>( "indexOrigin" ) );
+		const util::fvector4 spacing( m_ImageISIS.getProperty<util::fvector4>( "voxelSize" ) );
+		const util::fvector4 readVec = m_ImageISIS.getProperty<util::fvector4>( "readVec" );
+		const util::fvector4 phaseVec = m_ImageISIS.getProperty<util::fvector4>( "phaseVec" );
+		const util::fvector4 sliceVec = m_ImageISIS.getProperty<util::fvector4>( "sliceVec" );
 
 		for ( unsigned short i = 0; i < 3; i++ ) {
 			itkOrigin[i] = indexOrigin[i];
@@ -221,10 +240,8 @@ private:
 			itkDirection[i][2] = sliceVec[i];
 		}
 
-
-		//matrix will be transformed this way:
-
-
+		// To mimic the behavior of the itk nifti image io plugin the
+		// orientation matrix will be transformed this way:
 		/*
 		-1 -1 -1 -1
 		-1 -1 -1 -1
@@ -241,17 +258,6 @@ private:
 			itkDirection[1][2] = -sliceVec[1];
 		}
 
-//		//since itk uses the nifti coordinate system, the read and phase vectors
-//		//have to be inverted and the index origin must be transformed
-//		//according to the new orientation information.
-//		for ( unsigned int i = 0; i < 2; i++ )
-//		{
-//			itkOrigin[i] = -itkOrigin[i];
-//			for (unsigned int j = 0; j < 3; j++) {
-//				itkDirection [j][i] = -itkDirection [j][i];
-//			}
-//		}
-
 		//if the user requests a 4d image we need to set these parameters
 		if ( OutputImageType::ImageDimension == 4 ) {
 			itkSpacing[3] = spacing[3];
@@ -264,20 +270,20 @@ private:
 		importer->SetSpacing( itkSpacing );
 		importer->SetOrigin( itkOrigin );
 		importer->SetDirection( itkDirection );
-		importer->SetImportPointer( &this->m_ImageISIS->voxel<typename InputImageType::PixelType>( 0, 0, 0, 0 ), itkSize[0], false );
+		importer->SetImportPointer( &this->m_ImageISIS.voxel<typename InputImageType::PixelType>( 0, 0, 0, 0 ), itkSize[0], false );
 		rescaler->SetInput( importer->GetOutput() );
 		typename InputImageType::PixelType minIn, maxIn;
-		this->m_ImageISIS->getMinMax( minIn, maxIn );
+		this->m_ImageISIS.getMinMax( minIn, maxIn );
 		rescaler->SetOutputMinimum( minIn );
 		rescaler->SetOutputMaximum( maxIn );
 		rescaler->Update();
 		outputImage = rescaler->GetOutput();
 		//since itk properties do not match the isis properties we need to define metaproperties to prevent data loss
-		propKeyList  = m_ImageISIS->getKeys();
+		propKeyList  = m_ImageISIS.getKeys();
 		PropKeyListType::const_iterator propIter;
 
 		for ( propIter = propKeyList.begin(); propIter != propKeyList.end(); propIter++ ) {
-			itk::EncapsulateMetaData<std::string>( myItkDict, *propIter, m_ImageISIS->getProperty<std::string>( *propIter ) );
+			itk::EncapsulateMetaData<std::string>( myItkDict, *propIter, m_ImageISIS.getProperty<std::string>( *propIter ) );
 		}
 
 		outputImage->SetMetaDataDictionary( myItkDict );

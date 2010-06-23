@@ -339,7 +339,7 @@ int main(
 			resampler->SetOutputDirection( outputDirection );
 			resampler->Update();
 
-			isis::data::ImageList imgList = isis::adapter::itkAdapter::makeIsisImageObject<OutputImageType>(resampler->GetOutput(), true);
+			isis::data::ImageList imgList = isis::adapter::itkAdapter::makeIsisImageObject<OutputImageType>(resampler->GetOutput());
 			isis::data::IOFactory::write(imgList, out_filename, "");
 
 			// DEBUG
@@ -361,7 +361,7 @@ int main(
 			}
 
 			warper->Update();
-			isis::data::ImageList imgList = isis::adapter::itkAdapter::makeIsisImageObject<OutputImageType>(warper->GetOutput(), true);
+			isis::data::ImageList imgList = isis::adapter::itkAdapter::makeIsisImageObject<OutputImageType>(warper->GetOutput());
 			isis::data::IOFactory::write(imgList, out_filename, "");
 		}
 	}
@@ -459,7 +459,7 @@ int main(
 
 		tileImageFilter->SetLayout( layout );
 		tileImageFilter->Update();
-		isis::data::ImageList imgList = isis::adapter::itkAdapter::makeIsisImageObject<FMRIOutputType>(tileImageFilter->GetOutput(), true);
+		isis::data::ImageList imgList = isis::adapter::itkAdapter::makeIsisImageObject<FMRIOutputType>(tileImageFilter->GetOutput());
 		isis::data::IOFactory::write(imgList, out_filename, "");
 	}
 

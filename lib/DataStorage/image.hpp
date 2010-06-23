@@ -20,6 +20,7 @@
 #include <vector>
 #include <boost/foreach.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/io.hpp>
 
 namespace isis
 {
@@ -258,9 +259,9 @@ public:
 	 *
 	 * <b>IMPORTANT!<\b>: If you call this function with a matrix other than the
 	 * identidy matrix, it's not guaranteed that the image is still in ISIS space
-	 * according to the DICOM conventions. Eventuelly some ISIS algorithms depending
-	 * on correct image orientations won't work as expected. Use this method with
-	 * caution!
+	 * according to the DICOM conventions. Eventuelly some ISIS algorithms that
+	 * depend on correct image orientations won't work as expected. Use this method
+	 * with caution!
 	 */
 	void transformCoords(boost::numeric::ublas::matrix<float> transform);
 
