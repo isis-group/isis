@@ -38,6 +38,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
 #include <boost/assert.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
 
 namespace isis
 {
@@ -170,9 +171,25 @@ public:
 	/***********************
 	 * write file
 	 ************************/
-	void write( const data::Image &image, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) {
+	void write( const data::Image &imageOrig, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) {
 		LOG( ImageIoDebug, isis::info ) << "Write Nifti.";
 		boost::filesystem::path boostFilename( filename );
+		//copy of our image due to changing it by transformCoords
+		isis::data::Image image(imageOrig);
+		//orientation in isis LPS - but in nifti everything relative to RAS - so let's change read/phase direction and sign of indexOrigin
+		//now we try to transform
+		boost::numeric::ublas::matrix<float> matrix(3,3);
+		matrix(0,0)=-1;
+		matrix(0,1)= 0;
+		matrix(0,2)= 0;
+		matrix(1,0)= 0;
+		matrix(1,1)=-1;
+		matrix(1,2)= 0;
+		matrix(2,0)= 0;
+		matrix(2,1)= 0;
+		matrix(2,2)=+1;
+		image.transformCoords(matrix);
+
 		//default init for nifti image
 		nifti_image ni;
 		memset( &ni, 0, sizeof( nifti_image ) ); //set everything to zero - default value for "not used"
@@ -293,12 +310,24 @@ private:
 			retChunk.setProperty<u_int16_t>( "sequenceNumber", 1 );
 			// in nifti everything should be relative to RAS, in isis we use LPS coordinates - normally change read/phase dir and sign of indexOrigin
 			//TODO: has to be tested with different niftis - don't trust them!!!!!!!!!
-			retChunk.setProperty( "indexOrigin", util::fvector4( -ni.qoffset_x, -ni.qoffset_y, ni.qoffset_z, 0 ) );
-			util::fvector4 readVec = getVector( ni, readDir ) * util::fvector4( -1, -1 , -1 , -1 );
-			util::fvector4 phaseVec = getVector( ni, phaseDir ) * util::fvector4( -1, -1 , -1 , -1 );
-			retChunk.setProperty( "readVec",  readVec );
-			retChunk.setProperty( "phaseVec", phaseVec );
+			retChunk.setProperty( "indexOrigin", util::fvector4( ni.qoffset_x, ni.qoffset_y, ni.qoffset_z, 0 ) );
+			retChunk.setProperty( "readVec",  getVector(ni, readDir) );
+			retChunk.setProperty( "phaseVec", getVector(ni, phaseDir) );
 			retChunk.setProperty( "sliceVec", getVector( ni, sliceDir ) );
+
+			//now we try to transform
+			boost::numeric::ublas::matrix<float> matrix(3,3);
+			matrix(0,0)=-1;
+			matrix(0,1)= 0;
+			matrix(0,2)= 0;
+			matrix(1,0)= 0;
+			matrix(1,1)=-1;
+			matrix(1,2)= 0;
+			matrix(2,0)= 0;
+			matrix(2,1)= 0;
+			matrix(2,2)=+1;
+			retChunk.transformCoords(matrix);
+
 			retChunk.setProperty( "voxelSize", getVector( ni, voxelSizeVec ) );
 			retChunk.setProperty( "sequenceDescription", std::string( ni.descrip ) );
 			retChunk.setProperty( "StudyDescription", std::string( ni.intent_name ) );
@@ -439,13 +468,14 @@ private:
 		ni.nz = ni.dim[3] = dimensions[2];
 		ni.nt = ni.dim[4] = dimensions[3];
 		ni.nvox = image.volume();
-		//orientation in isis LPS - but in nifti everything relative to RAS - so let's change read/phase direction and sign of indexOrigin
-		util::fvector4 readVec = -image.getProperty<util::fvector4>( "readVec" );
-		util::fvector4 phaseVec = -image.getProperty<util::fvector4>( "phaseVec" );
+
+		util::fvector4 readVec = image.getProperty<util::fvector4>( "readVec" );
+		util::fvector4 phaseVec = image.getProperty<util::fvector4>( "phaseVec" );
 		util::fvector4 sliceVec = image.getProperty<util::fvector4>( "sliceVec" );
-		util::fvector4 indexOrigin = -image.getProperty<util::fvector4>( "indexOrigin" );
+		util::fvector4 indexOrigin = image.getProperty<util::fvector4>( "indexOrigin" );
+
 		// don't switch the z-AXIS!!!
-		indexOrigin[2] = -indexOrigin[2];
+		//indexOrigin[2] = -indexOrigin[2];
 		LOG( ImageIoLog, info ) << indexOrigin;
 		util::fvector4 voxelSizeVector = image.getProperty<util::fvector4>( "voxelSize" );
 		util::fvector4 voxelGap = image.getProperty<util::fvector4>( "voxelGap" );
