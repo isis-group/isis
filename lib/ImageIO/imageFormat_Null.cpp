@@ -25,7 +25,7 @@ public:
 		for ( size_t i = 0; i < timesteps; i++ ) {
 			for ( size_t c = 0; c < images; c++ ) {
 				data::MemChunk<uint8_t> ch( 50, 50, 50 );
-				ch.setProperty( "indexOrigin", util::fvector4( 0, 0, 0, (float)i ) );
+				ch.setProperty( "indexOrigin", util::fvector4( 1, 2, 3, (float)i ) );
 				ch.setProperty<uint32_t>( "acquisitionNumber", i );
 				ch.setProperty<uint16_t>( "sequenceNumber", c );
 				ch.setProperty( "performingPhysician", std::string( "Dr. Jon Doe" ) );

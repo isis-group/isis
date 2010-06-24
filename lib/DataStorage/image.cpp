@@ -624,11 +624,10 @@ Image::orientation Image::getMainOrientation()const
 	else
 		assert( false );
         return axial; //will never be reached
-    }
+}
 
 void Image::transformCoords(boost::numeric::ublas::matrix<float> transform)
 {
-
 	// create boost::numeric::ublast matrix from orientation vectors
 	boost::numeric::ublas::matrix<float> orient(3,3);
 	util::fvector4 read = getProperty<util::fvector4>("readVec");
@@ -638,23 +637,23 @@ void Image::transformCoords(boost::numeric::ublas::matrix<float> transform)
 
 	// copy orientation vectors into matrix columns
 	// readVec
-	for(unsigned i = 0;i<3;i++){
+	for(unsigned i = 0;i<3;i++) {
 		orient(i,0) = read[i];
 	}
 
 	// phaseVec
-	for(unsigned i = 0;i<3;i++){
+	for(unsigned i = 0;i<3;i++) {
 		orient(i,1) = phase[i];
 	}
 
 	// sliceVec
-	for(unsigned i = 0;i<3;i++){
+	for(unsigned i = 0;i<3;i++) {
 		orient(i,2) = slice[i];
 	}
 
 	// copy index origin
 	boost::numeric::ublas::vector<float> o(3);
-	for (unsigned i = 0;i < 3;i++){
+	for (unsigned i = 0;i < 3;i++) {
 		o(i) = origin[i];
 	}
 
@@ -663,32 +662,32 @@ void Image::transformCoords(boost::numeric::ublas::matrix<float> transform)
 
 	// calculate new orientation matrix --> O_new = O * T
 	boost::numeric::ublas::matrix<float> new_orient=
-			boost::numeric::ublas::prod(orient,transform);
+	boost::numeric::ublas::prod(orient,transform);
 
 	// transform index origin into new coordinate space.
 	// o_new -> O_new * (O^-1 * o)
 	boost::numeric::ublas::vector<float> new_o =
-			boost::numeric::ublas::prod(new_orient,
-					(boost::numeric::ublas::vector<float>)boost::numeric::ublas::prod(
+	boost::numeric::ublas::prod(new_orient,
+			(boost::numeric::ublas::vector<float>)boost::numeric::ublas::prod(
 					(boost::numeric::ublas::matrix<float>)boost::numeric::ublas::trans(orient),o));
 
 	// write origin back to attributes
-	for(unsigned i=0;i<3;i++){
+	for(unsigned i=0;i<3;i++) {
 		origin[i] = new_o(i);
 	}
 
 	// readVec
-	for(unsigned i=0;i<3;i++){
+	for(unsigned i=0;i<3;i++) {
 		read[i] = new_orient(i,0);
 	}
 
 	// phaseVec
-	for(unsigned i=0;i<3;i++){
+	for(unsigned i=0;i<3;i++) {
 		phase[i] = new_orient(i,1);
 	}
 
 	// sliceVec
-	for(unsigned i=0;i<3;i++){
+	for(unsigned i=0;i<3;i++) {
 		slice[i] = new_orient(i,2);
 	}
 
