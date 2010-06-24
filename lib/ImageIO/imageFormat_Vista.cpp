@@ -529,9 +529,6 @@ void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &c
 			readV[0] * ioTmp[0] + phaseV[0] * ioTmp[1] + sliceV[0] * ioTmp[2],
 			readV[1] * ioTmp[0] + phaseV[1] * ioTmp[1] + sliceV[1] * ioTmp[2],
 			readV[2] * ioTmp[0] + phaseV[2] * ioTmp[1] + sliceV[2] * ioTmp[2],
-//			( ( util::fvector4 )chunk.getProperty<util::fvector4>( "readVec" ) ).dot( ioTmp ),
-//			( ( util::fvector4 )chunk.getProperty<util::fvector4>( "phaseVec" ) ).dot( ioTmp ),
-//			( ( util::fvector4 )chunk.getProperty<util::fvector4>( "sliceVec" ) ).dot( ioTmp ),
 			0 );
 		chunk.setProperty( "indexOrigin", iOrig );
 	}

@@ -624,13 +624,12 @@ Image::orientation Image::getMainOrientation()const
 	else
 		assert( false );
         return axial; //will never be reached
-    }
+}
 
 void Image::transformCoords(boost::numeric::ublas::matrix<float> transform)
 {
-
 	// create boost::numeric::ublast matrix from orientation vectors
-	boost::numeric::ublas::matrix<float> orient(4,4);
+	boost::numeric::ublas::matrix<float> orient(3,3);
 	util::fvector4 read = getProperty<util::fvector4>("readVec");
 	util::fvector4 phase = getProperty<util::fvector4>("phaseVec");
 	util::fvector4 slice = getProperty<util::fvector4>("sliceVec");
@@ -638,65 +637,64 @@ void Image::transformCoords(boost::numeric::ublas::matrix<float> transform)
 
 	// copy orientation vectors into matrix columns
 	// readVec
-	for(unsigned i = 0;i<4;i++){
-		orient(0,i) = read[i];
+	for(unsigned i = 0;i<3;i++) {
+		orient(i,0) = read[i];
 	}
 
 	// phaseVec
-	for(unsigned i = 0;i<4;i++){
-		orient(1,i) = phase[i];
+	for(unsigned i = 0;i<3;i++) {
+		orient(i,1) = phase[i];
 	}
 
 	// sliceVec
-	for(unsigned i = 0;i<4;i++){
-		orient(2,i) = slice[i];
+	for(unsigned i = 0;i<3;i++) {
+		orient(i,2) = slice[i];
 	}
 
 	// copy index origin
-	boost::numeric::ublas::vector<float> o(4);
-	for (unsigned i = 0;i < 4;i++){
+	boost::numeric::ublas::vector<float> o(3);
+	for (unsigned i = 0;i < 3;i++) {
 		o(i) = origin[i];
 	}
 
-	// since the orientation matrix is 4x4 orthogonal matrix it holds that
+	// since the orientation matrix is 3x3 orthogonal matrix it holds that
 	// orient * orient^T = I, where I is the identity matrix.
 
 	// calculate new orientation matrix --> O_new = O * T
 	boost::numeric::ublas::matrix<float> new_orient=
-			boost::numeric::ublas::prod(orient,transform);
+	boost::numeric::ublas::prod(orient,transform);
 
 	// transform index origin into new coordinate space.
 	// o_new -> O_new * (O^-1 * o)
 	boost::numeric::ublas::vector<float> new_o =
-			boost::numeric::ublas::prod(new_orient,
-					(boost::numeric::ublas::vector<float>)boost::numeric::ublas::prod(
+	boost::numeric::ublas::prod(new_orient,
+			(boost::numeric::ublas::vector<float>)boost::numeric::ublas::prod(
 					(boost::numeric::ublas::matrix<float>)boost::numeric::ublas::trans(orient),o));
 
 	// write origin back to attributes
-	for(unsigned i;i<4;i++){
+	for(unsigned i=0;i<3;i++) {
 		origin[i] = new_o(i);
 	}
 
 	// readVec
-	for(unsigned i;i<4;i++){
-		read[i] = new_orient(0,i);
+	for(unsigned i=0;i<3;i++) {
+		read[i] = new_orient(i,0);
 	}
 
 	// phaseVec
-	for(unsigned i;i<4;i++){
-		phase[i] = new_orient(1,i);
+	for(unsigned i=0;i<3;i++) {
+		phase[i] = new_orient(i,1);
 	}
 
 	// sliceVec
-	for(unsigned i;i<4;i++){
-		slice[i] = new_orient(2,i);
+	for(unsigned i=0;i<3;i++) {
+		slice[i] = new_orient(i,2);
 	}
 
 	setProperty<util::fvector4>("indexOrigin",origin);
 	setProperty<util::fvector4>("readVec",read);
 	setProperty<util::fvector4>("phaseVec",phase);
 	setProperty<util::fvector4>("sliceVec",slice);
-
 
 }
 
