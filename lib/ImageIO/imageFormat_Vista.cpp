@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * Author: Thomas Pr��ger, proeger@cbs.mpg.de, 2010
+ * Author: Thomas Pröger, proeger@cbs.mpg.de, 2010
  *
  *****************************************************************/
 
@@ -205,7 +205,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 
 	VAttrList list;
 	VImage *images;
-	int nimages;
+	unsigned nimages;
 
 	// read images from file stream
 	if( ( nimages = VReadImages( ip, &list, &images ) ) == 0 ) {
@@ -244,10 +244,51 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 					<< "No Vista datatype found. Input image is broken. Abort.";
 		}// switch(VPixelRepn(images[0]))
 	}
-	// found serveral images -> assume that this is functional data
+	// found serveral images -> assume that this is a functional data set.
 	else {
-		LOG( image_io::Runtime, error ) << "No support for 4D input, yet";
+		// number of images that where actual copied; ncopy <= nimages. In functional
+		// data images, the the number of images copied corresponds to the number of
+		// slices copied.
+		unsigned ncopy = 0;
+
+		// create and empty MemChunk of type short to store the image data
+		data::MemChunk<short>* mchunk =
+				new data::MemChunk<short>(VImageNColumns(images[0]),
+										VImageNRows(images[0]),
+										nimages,
+										VImageNBands(images[0]));
+
+		// iterate over images and compose a 4-D chunk from all short images.
+		for(unsigned k = 0;k < nimages; k++){
+
+			// functional vista data should be short data. If not skip it.
+			if (VPixelRepn(images[k]) != VShortRepn)
+				continue;
+
+			// found an additional image to insert into image
+			ncopy++;
+
+			// copy image voxelwise into MemChunk
+			for(unsigned b = 0;b<(unsigned)VImageNBands(images[k]);b++){
+				for(unsigned r = 0;r<(unsigned)VImageNRows(images[k]);r++){
+					for(unsigned c = 0;c<(unsigned)VImageNColumns(images[k]);c++){
+						mchunk->voxel<VShort>(c,r,ncopy-1,b)
+								= VPixel(images[k],b,r,c,VShort);
+					}
+				}
+			} // END copy voxel
+
+		} // END iterate over images
+
+		// copy header information from first image in the image list.
+		copyHeaderFromVista(images[0],*mchunk);
+		chunks.push_back(*mchunk);
 	}
+
+	//  cleanup, free memory, close file handle
+	fclose(ip);
+	for( unsigned z = 0; z < nimages; z++ )
+		VDestroyImage( images[z] );
 
 	return nimages;
 }
@@ -539,11 +580,11 @@ void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &c
 
 template <typename TInput> void ImageFormat_Vista::addChunk( data::ChunkList &chunks, VImage image )
 {
-	boost::shared_ptr<data::MemChunk<TInput> > chunk_sp(
-		new data::MemChunk<TInput>( static_cast<TInput *>( image->data ),
+	data::MemChunk<TInput>* chunk_sp
+		= new data::MemChunk<TInput>( static_cast<TInput *>( image->data ),
 									VImageNColumns( image ),
 									VImageNRows( image ),
-									VImageNBands( image ) ) );
+									VImageNBands( image ) );
 	// copy header information
 	copyHeaderFromVista( image, *chunk_sp );
 	// add chunk to chunk list
