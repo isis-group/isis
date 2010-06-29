@@ -89,13 +89,13 @@ static VBoolean in_found, ref_found, pointset_found;
 static VShort number_threads = 1;
 static VShort initial_seed = 1;
 static VBoolean initialize_center = false;
-static VBoolean initialize_mass = true;
+static VBoolean initialize_mass = false;
 static VString mask_filename = NULL;
 static VFloat smooth = 0;
 static VBoolean use_inverse = false;
 static VFloat coarse_factor = 1;
 static VFloat bspline_bound = 100.0;
-static VBoolean verbose = false;
+static VBoolean verbose = true;
 
 static VOptionDescRec
 options[] = {
@@ -233,7 +233,9 @@ int main(
 	MovingImageType::Pointer movingImage = MovingImageType::New();
 	FixedFilterType::Pointer fixedFilter = FixedFilterType::New();
 	MovingFilterType::Pointer movingFilter = MovingFilterType::New();
-	tmpConstTransformPointer = NULL;
+	tmpConstTransformPointer = 0;
+	isis::adapter::itkAdapter *fixedAdapter = new isis::adapter::itkAdapter;
+	isis::adapter::itkAdapter *movingAdapter = new isis::adapter::itkAdapter;
 	isis::data::ImageList refList = isis::data::IOFactory::load( ref_filename, "" );
 	isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "" );
 	LOG_IF( refList.empty(), isis::DataLog, isis::error ) << "Reference image is empty!";
@@ -242,8 +244,8 @@ int main(
 	// TODO DEBUG
 	// use makeItkImageObject with "false" -> no ITK nifti default transformation
 	if ( !smooth ) {
-		fixedImage = isis::adapter::itkAdapter::makeItkImageObject<FixedImageType>( refList.front());
-		movingImage = isis::adapter::itkAdapter::makeItkImageObject<MovingImageType>( inList.front());
+		fixedImage = fixedAdapter->makeItkImageObject<FixedImageType>( refList.front());
+		movingImage = movingAdapter->makeItkImageObject<MovingImageType>( inList.front());
 
 		// TODO DEBUG
 		std::cout << "********** Fixed Image **********" << std::endl;
@@ -281,7 +283,7 @@ int main(
 		fixedGaussianFilterX->SetNumberOfThreads( number_threads );
 		fixedGaussianFilterY->SetNumberOfThreads( number_threads );
 		fixedGaussianFilterZ->SetNumberOfThreads( number_threads );
-		fixedGaussianFilterX->SetInput( isis::adapter::itkAdapter::makeItkImageObject<FixedImageType>( refList.front() ) );
+		fixedGaussianFilterX->SetInput( fixedAdapter->makeItkImageObject<FixedImageType>( refList.front() ) );
 		fixedGaussianFilterY->SetInput( fixedGaussianFilterX->GetOutput() );
 		fixedGaussianFilterZ->SetInput( fixedGaussianFilterY->GetOutput() );
 		fixedGaussianFilterX->SetDirection( 0 );
@@ -305,7 +307,7 @@ int main(
 		movingGaussianFilterX->SetNumberOfThreads( number_threads );
 		movingGaussianFilterY->SetNumberOfThreads( number_threads );
 		movingGaussianFilterZ->SetNumberOfThreads( number_threads );
-		movingGaussianFilterX->SetInput( isis::adapter::itkAdapter::makeItkImageObject<MovingImageType>( inList.front() ) );
+		movingGaussianFilterX->SetInput( movingAdapter->makeItkImageObject<MovingImageType>( inList.front() ) );
 		movingGaussianFilterY->SetInput( movingGaussianFilterX->GetOutput() );
 		movingGaussianFilterZ->SetInput( movingGaussianFilterY->GetOutput() );
 		movingGaussianFilterX->SetDirection( 0 );
@@ -409,12 +411,12 @@ int main(
 		}
 
 		//check combinations of components
-		if ( optimizer != 0 and transform == 0 ) {
-			std::cerr
-				<< "\nInappropriate combination of transform and optimizer! Setting optimizer to VersorRigidOptimizer.\n"
-				<< std::endl;
-			optimizer = 0;
-		}
+//		if ( optimizer != 0 and transform == 0 ) {
+//			std::cerr
+//				<< "\nInappropriate combination of transform and optimizer! Setting optimizer to VersorRigidOptimizer.\n"
+//				<< std::endl;
+//			optimizer = 0;
+//		}
 
 		if ( transform == 2 and optimizer != 2 ) {
 			std::cerr << "\nIt is recommended using the BSpline transform in connection with the LBFGSB optimizer!\n"

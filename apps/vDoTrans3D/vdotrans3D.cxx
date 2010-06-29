@@ -176,6 +176,8 @@ int main(
 	FMRIInputType::Pointer fmriImage = FMRIInputType::New();
 	InputImageType::Pointer inputImage = InputImageType::New();
 	InputImageType::Pointer templateImage = InputImageType::New();
+	isis::adapter::itkAdapter* fixedAdapter = new isis::adapter::itkAdapter;
+	isis::adapter::itkAdapter* movingAdapter = new isis::adapter::itkAdapter;
 	//transform object used for inverse transform
 	itk::MatrixOffsetTransformBase<double, Dimension, Dimension>::Pointer transform = itk::MatrixOffsetTransformBase<double, Dimension, Dimension>::New();
 
@@ -191,20 +193,20 @@ int main(
 	if ( not fmri ) {
 		isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "" );
 		LOG_IF( inList.empty(), isis::DataLog, isis::error ) << "Input image is empty!";
-		inputImage = isis::adapter::itkAdapter::makeItkImageObject<InputImageType>( inList.front() );
+		inputImage = movingAdapter->makeItkImageObject<InputImageType>( inList.front() );
 	}
 
 	if ( fmri ) {
 		isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "" );
 		LOG_IF( inList.empty(), isis::DataLog, isis::error ) << "Input image is empty!";
-		fmriImage = isis::adapter::itkAdapter::makeItkImageObject<FMRIInputType>( inList.front() );
+		fmriImage = movingAdapter->makeItkImageObject<FMRIInputType>( inList.front() );
 	}
 
 	//if template file is specified by the user
 	if ( template_filename ) {
 		isis::data::ImageList tmpList = isis::data::IOFactory::load( template_filename, "" );
 		LOG_IF( tmpList.empty(), isis::DataLog, isis::error ) << "Template image is empty!";
-		templateImage = isis::adapter::itkAdapter::makeItkImageObject<InputImageType>( tmpList.front() );
+		templateImage = fixedAdapter->makeItkImageObject<InputImageType>( tmpList.front() );
 		outputDirection = templateImage->GetDirection();
 		outputOrigin = templateImage->GetOrigin();
 	}
@@ -339,7 +341,7 @@ int main(
 			resampler->SetOutputDirection( outputDirection );
 			resampler->Update();
 
-			isis::data::ImageList imgList = isis::adapter::itkAdapter::makeIsisImageObject<OutputImageType>(resampler->GetOutput());
+			isis::data::ImageList imgList = movingAdapter->makeIsisImageObject<OutputImageType>(resampler->GetOutput());
 			isis::data::IOFactory::write(imgList, out_filename, "");
 
 			// DEBUG
@@ -361,7 +363,7 @@ int main(
 			}
 
 			warper->Update();
-			isis::data::ImageList imgList = isis::adapter::itkAdapter::makeIsisImageObject<OutputImageType>(warper->GetOutput());
+			isis::data::ImageList imgList = movingAdapter->makeIsisImageObject<OutputImageType>(warper->GetOutput());
 			isis::data::IOFactory::write(imgList, out_filename, "");
 		}
 	}
@@ -429,7 +431,7 @@ int main(
 		OutputImageType::Pointer tileImage;
 		std::cout << std::endl;
 		isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "" );
-		inputImage = isis::adapter::itkAdapter::makeItkImageObject<InputImageType>( inList.front() );
+		inputImage = movingAdapter->makeItkImageObject<InputImageType>( inList.front() );
 
 		for ( unsigned int timestep = 0; timestep < numberOfTimeSteps; timestep++ ) {
 			std::cout << "Resampling timestep: " << timestep << "...\r" << std::flush;
@@ -459,7 +461,7 @@ int main(
 
 		tileImageFilter->SetLayout( layout );
 		tileImageFilter->Update();
-		isis::data::ImageList imgList = isis::adapter::itkAdapter::makeIsisImageObject<FMRIOutputType>(tileImageFilter->GetOutput());
+		isis::data::ImageList imgList = movingAdapter->makeIsisImageObject<FMRIOutputType>(tileImageFilter->GetOutput());
 		isis::data::IOFactory::write(imgList, out_filename, "");
 	}
 

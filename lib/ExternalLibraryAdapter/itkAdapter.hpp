@@ -51,6 +51,7 @@ namespace adapter
 class itkAdapter
 {
 public:
+	itkAdapter() : m_TypeID(0) {};
 	/**
 	  * Converts an isis image object in an itk image.
 	  * \param src boost sharedpointer of the isisImage
@@ -62,35 +63,35 @@ public:
 	  *  If set to false, orientation matrix will not be changed.
 	  *  \returns an itk smartpointer on the itkImage object
 	  */
-	template<typename TImage> static typename TImage::Pointer
+	template<typename TImage> typename TImage::Pointer
 	makeItkImageObject( const boost::shared_ptr<data::Image> src, const bool behaveAsItkReader = true ) {
 		typedef TImage OutputImageType;
-		itkAdapter *myAdapter = new itkAdapter( src );
-
-		switch ( src->chunksBegin()->typeID() ) {
+		m_ImageISIS = *src;
+		m_TypeID = m_ImageISIS.chunksBegin()->typeID();
+		switch ( m_TypeID ) {
 		case data::TypePtr<int8_t>::staticID:
-			return myAdapter->internCreateItk<int8_t, OutputImageType>( behaveAsItkReader );
+			return this->internCreateItk<int8_t, OutputImageType>( behaveAsItkReader );
 			break;
 		case data::TypePtr<u_int8_t>::staticID:
-			return myAdapter->internCreateItk<u_int8_t, OutputImageType>( behaveAsItkReader );
+			return this->internCreateItk<u_int8_t, OutputImageType>( behaveAsItkReader );
 			break;
 		case data::TypePtr<int16_t>::staticID:
-			return myAdapter->internCreateItk<int16_t, OutputImageType>( behaveAsItkReader );
+			return this->internCreateItk<int16_t, OutputImageType>( behaveAsItkReader );
 			break;
 		case data::TypePtr<u_int16_t>::staticID:
-			return myAdapter->internCreateItk<u_int16_t, OutputImageType>( behaveAsItkReader );
+			return this->internCreateItk<u_int16_t, OutputImageType>( behaveAsItkReader );
 			break;
 		case data::TypePtr<int32_t>::staticID:
-			return myAdapter->internCreateItk<int32_t, OutputImageType>( behaveAsItkReader );
+			return this->internCreateItk<int32_t, OutputImageType>( behaveAsItkReader );
 			break;
 		case data::TypePtr<u_int32_t>::staticID:
-			return myAdapter->internCreateItk<u_int32_t, OutputImageType>( behaveAsItkReader );
+			return this->internCreateItk<u_int32_t, OutputImageType>( behaveAsItkReader );
 			break;
 		case data::TypePtr<float>::staticID:
-			return myAdapter->internCreateItk<float, OutputImageType>( behaveAsItkReader );
+			return this->internCreateItk<float, OutputImageType>( behaveAsItkReader );
 			break;
 		case data::TypePtr<double>::staticID:
-			return myAdapter->internCreateItk<double, OutputImageType>( behaveAsItkReader );
+			return this->internCreateItk<double, OutputImageType>( behaveAsItkReader );
 			break;
 		default:
 			LOG( DataLog, error ) << "Unknown pixel data type";
@@ -110,87 +111,57 @@ public:
 	  *  If set to false, orientation matrix will not be changed.
 	  *  \returns an isis::data::ImageList.
 	  */
-	template<typename TImage> static data::ImageList
+	template<typename TImage> data::ImageList
 	makeIsisImageObject( const typename TImage::Pointer src, const bool behaveAsItkWriter = true ) {
-		typename TImage::PointType indexOrigin = src->GetOrigin();
-		typename TImage::SizeType imageSize = src->GetBufferedRegion().GetSize();
-		typename TImage::SpacingType imageSpacing = src->GetSpacing();
-		typename TImage::DirectionType imageDirection = src->GetDirection();
 
-		if ( TImage::ImageDimension < 4 ) {
-			imageSize[3] = 1;
-		}
-
-		if ( behaveAsItkWriter ) {
-			imageDirection[0][0] = -imageDirection[0][0];
-			imageDirection[0][1] = -imageDirection[0][1];
-			imageDirection[0][2] = -imageDirection[0][2];
-			imageDirection[1][0] = -imageDirection[1][0];
-			imageDirection[1][1] = -imageDirection[1][1];
-			imageDirection[1][2] = -imageDirection[1][2];
-			indexOrigin[0] = -indexOrigin[0];
-			indexOrigin[1] = -indexOrigin[1];
-		}
-
-		// TODO use MemImage instead of MemChunk.
-
-		boost::shared_ptr<data::MemChunk<typename TImage::PixelType > >
-		retChunk( new data::MemChunk<typename TImage::PixelType >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) );
-		retChunk->setProperty( "indexOrigin", util::fvector4( indexOrigin[0], indexOrigin[1], indexOrigin[2], indexOrigin[3] ) );
-		retChunk->setProperty( "readVec", util::fvector4( imageDirection[0][0], imageDirection[1][0], imageDirection[2][0], 0 ) );
-		retChunk->setProperty( "phaseVec", util::fvector4( imageDirection[0][1], imageDirection[1][1], imageDirection[2][1], 0 ) );
-		retChunk->setProperty( "sliceVec", util::fvector4( imageDirection[0][2], imageDirection[1][2], imageDirection[2][2], 0 ) );
-		retChunk->setProperty( "voxelSize", util::fvector4( imageSpacing[0], imageSpacing[1], imageSpacing[2], imageSpacing[3] ) );
-		itk::MetaDataDictionary myItkDict = src->GetMetaDataDictionary();
-
-		if ( myItkDict.HasKey( "sequenceNumber" ) ) {
-			std::string sequenceNumber;
-			itk::ExposeMetaData<std::string>( myItkDict, "sequenceNumber", sequenceNumber );
-			retChunk->setProperty( "sequenceNumber", atoi( sequenceNumber.c_str() ) );
-		} else {
-			retChunk->setProperty( "sequenceNumber", 1 );
-		}
-
-		if ( myItkDict.HasKey( "acquisitionNumber" ) ) {
-			std::string acquisitionNumber;
-			itk::ExposeMetaData<std::string>( myItkDict, "acquisitionNumber", acquisitionNumber );
-			retChunk->setProperty( "acquisitionNumber", atoi( acquisitionNumber.c_str() ) );
-		} else {
-			for ( unsigned int t = 0; t < imageSize[3]; t++ ) {
-				retChunk->setProperty( "acquisitionNumber", t );
+		if( m_TypeID )
+		{
+			switch (m_TypeID) {
+			case data::TypePtr<int8_t>::staticID:
+				return this->internCreateISIS<TImage, int8_t>( src, behaveAsItkWriter );
+				break;
+			case data::TypePtr<u_int8_t>::staticID:
+				return this->internCreateISIS<TImage, u_int8_t>( src, behaveAsItkWriter );
+				break;
+			case data::TypePtr<int16_t>::staticID:
+				return this->internCreateISIS<TImage, int16_t>( src, behaveAsItkWriter );
+				break;
+			case data::TypePtr<u_int16_t>::staticID:
+				return this->internCreateISIS<TImage, u_int16_t>( src, behaveAsItkWriter );
+				break;
+			case data::TypePtr<int32_t>::staticID:
+				return this->internCreateISIS<TImage, int32_t>( src, behaveAsItkWriter );
+				break;
+			case data::TypePtr<u_int32_t>::staticID:
+				return this->internCreateISIS<TImage, u_int32_t>( src, behaveAsItkWriter );
+				break;
+			case data::TypePtr<float>::staticID:
+				return this->internCreateISIS<TImage, float>( src, behaveAsItkWriter );
+				break;
+			case data::TypePtr<double>::staticID:
+				return this->internCreateISIS<TImage, double>( src, behaveAsItkWriter );
+				break;
+			default:
+				return this->internCreateISIS<TImage, typename TImage::PixelType>( src, behaveAsItkWriter );
+				break;
 			}
 		}
-
-		data::ChunkList chunkList;
-		chunkList.push_back( *retChunk );
-		data::ImageList isisImageList( chunkList );
-
-		//declare transformation matrix T (NIFTI -> DICOM)
-		// -1  1  0
-		//  0 -1  0
-		//  0  0  1
-		boost::numeric::ublas::matrix<float> T(3,3);
-		T(0,0) = -1;T(0,1) = 0;T(0,2) = 0;
-		T(1,0) = 0;T(1,1) = -1;T(1,2) = 0;
-		T(2,0) = 0;T(2,1) = 0;T(2,2) = 1;
-		// apply transformation to local isis image copy
-		for(data::ImageList::iterator iter = isisImageList.begin();iter != isisImageList.end(); iter++){
-			(*iter)->transformCoords(T);
+		else
+		{
+			return this->internCreateISIS<TImage, typename TImage::PixelType>( src, behaveAsItkWriter );
 		}
-
-		return isisImageList;
 	}
-
 
 protected:
 	//should not be loaded directly
 	itkAdapter( const boost::shared_ptr<data::Image> src ) : m_ImageISIS( *src ) {};
 	itkAdapter( const itkAdapter & ) {};
-	itkAdapter() {};
+
 private:
 
 //	boost::shared_ptr<data::Image> m_ImageISIS;
 	data::Image m_ImageISIS;
+	unsigned short m_TypeID;
 
 	template<typename TInput, typename TOutput> typename TOutput::Pointer internCreateItk( const bool behaveAsItkReader ) {
 		typedef itk::Image<TInput, TOutput::ImageDimension> InputImageType;
@@ -285,9 +256,88 @@ private:
 		for ( propIter = propKeyList.begin(); propIter != propKeyList.end(); propIter++ ) {
 			itk::EncapsulateMetaData<std::string>( myItkDict, *propIter, m_ImageISIS.getProperty<std::string>( *propIter ) );
 		}
-
 		outputImage->SetMetaDataDictionary( myItkDict );
 		return outputImage;
+	}
+
+	template<typename TImageITK, typename TOutputISIS> data::ImageList internCreateISIS( const typename TImageITK::Pointer src, const bool behaveAsItkWriter )
+	{
+
+		typename TImageITK::PointType indexOrigin = src->GetOrigin();
+		typename TImageITK::SizeType imageSize = src->GetBufferedRegion().GetSize();
+		typename TImageITK::SpacingType imageSpacing = src->GetSpacing();
+		typename TImageITK::DirectionType imageDirection = src->GetDirection();
+
+		if ( TImageITK::ImageDimension < 4 ) {
+			imageSize[3] = 1;
+		}
+
+		if ( behaveAsItkWriter ) {
+			imageDirection[0][0] = -imageDirection[0][0];
+			imageDirection[0][1] = -imageDirection[0][1];
+			imageDirection[0][2] = -imageDirection[0][2];
+			imageDirection[1][0] = -imageDirection[1][0];
+			imageDirection[1][1] = -imageDirection[1][1];
+			imageDirection[1][2] = -imageDirection[1][2];
+			indexOrigin[0] = -indexOrigin[0];
+			indexOrigin[1] = -indexOrigin[1];
+		}
+
+		// TODO use MemImage instead of MemChunk.
+
+
+		boost::shared_ptr<data::MemChunk< typename TImageITK::PixelType > >
+			retChunk( new data::MemChunk< typename TImageITK::PixelType  >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) ) ;
+
+		retChunk->setProperty( "indexOrigin", util::fvector4( indexOrigin[0], indexOrigin[1], indexOrigin[2], indexOrigin[3] ) );
+		retChunk->setProperty( "readVec", util::fvector4( imageDirection[0][0], imageDirection[1][0], imageDirection[2][0], 0 ) );
+		retChunk->setProperty( "phaseVec", util::fvector4( imageDirection[0][1], imageDirection[1][1], imageDirection[2][1], 0 ) );
+		retChunk->setProperty( "sliceVec", util::fvector4( imageDirection[0][2], imageDirection[1][2], imageDirection[2][2], 0 ) );
+		retChunk->setProperty( "voxelSize", util::fvector4( imageSpacing[0], imageSpacing[1], imageSpacing[2], imageSpacing[3] ) );
+		itk::MetaDataDictionary myItkDict = src->GetMetaDataDictionary();
+
+		if ( myItkDict.HasKey( "sequenceNumber" ) ) {
+			std::string sequenceNumber;
+			itk::ExposeMetaData<std::string>( myItkDict, "sequenceNumber", sequenceNumber );
+			retChunk->setProperty( "sequenceNumber", atoi( sequenceNumber.c_str() ) );
+		} else {
+			retChunk->setProperty( "sequenceNumber", 1 );
+		}
+
+		if ( myItkDict.HasKey( "acquisitionNumber" ) ) {
+			std::string acquisitionNumber;
+			itk::ExposeMetaData<std::string>( myItkDict, "acquisitionNumber", acquisitionNumber );
+			retChunk->setProperty( "acquisitionNumber", atoi( acquisitionNumber.c_str() ) );
+		} else {
+			for ( unsigned int t = 0; t < imageSize[3]; t++ ) {
+				retChunk->setProperty( "acquisitionNumber", t );
+			}
+		}
+
+		//do not try to grasp that in a sober state!!
+		data::ChunkList chunkList;
+		chunkList.push_back( *retChunk );
+		data::ImageList isisImageList( chunkList );
+		data::Image origImage ( *isisImageList.front().get() );
+		boost::shared_ptr< data::MemImage< TOutputISIS > > retImage (
+				new data::MemImage<TOutputISIS>  (origImage) );
+		data::ImageList retList;
+		retList.push_back( retImage );
+
+		//declare transformation matrix T (NIFTI -> DICOM)
+		// -1  1  0
+		//  0 -1  0
+		//  0  0  1
+		boost::numeric::ublas::matrix<float> T(3,3);
+		T(0,0) = -1;T(0,1) = 0;T(0,2) = 0;
+		T(1,0) = 0;T(1,1) = -1;T(1,2) = 0;
+		T(2,0) = 0;T(2,1) = 0;T(2,2) = 1;
+		// apply transformation to local isis image copy
+		for(data::ImageList::iterator iter = isisImageList.begin();iter != isisImageList.end(); iter++){
+			(*iter)->transformCoords(T);
+		}
+		return retList;
+
 	}
 };
 
