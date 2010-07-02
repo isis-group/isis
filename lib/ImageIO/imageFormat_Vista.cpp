@@ -213,77 +213,103 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 		throwGenericError( s );
 	}
 
+	// enable "warning" log level
 	image_io::enable_log<util::DefaultMsgPrint>( warning );
 	LOG( image_io::Runtime, info ) << "found " << nimages << " images.";
 
-	// found one image -> write it right into one chunk
-	if ( nimages == 1 ) {
-		switch( VPixelRepn( images[0] ) ) {
-		case VBitRepn:
-			addChunk<uint8_t>( chunks, images[0] );
-			break;
-		case VUByteRepn:
-			addChunk<VUByte>( chunks, images[0] );
-			break;
-		case VSByteRepn:
-			addChunk<VSByte>( chunks, images[0] );
-			break;
-		case VShortRepn:
-			addChunk<VShort>( chunks, images[0] );
-			break;
-		case VLongRepn:
-			addChunk<VLong>( chunks, images[0] );
-			break;
-		case VFloatRepn:
-			addChunk<VFloat>( chunks, images[0] );
-			break;
-		case VDoubleRepn:
-			addChunk<VDouble>( chunks, images[0] );
-		default:
-			LOG( image_io::Runtime, error )
-					<< "No Vista datatype found. Input image is broken. Abort.";
-		}// switch(VPixelRepn(images[0]))
-	}
-	// found serveral images -> assume that this is a functional data set.
-	else {
-		// number of images that where actual copied; ncopy <= nimages. In functional
-		// data images, the the number of images copied corresponds to the number of
-		// slices copied.
-		unsigned ncopy = 0;
+	/* interpred the image data structure according to the given dialects:
+	 *
+	 * FUNCTIONAL: The vista image contains functional data. In this case there
+	 * 			   are a number of VShort images which represents the slices of
+	 *             the functional image data. This dialect will create a 4-D image.
+	 * MAPS:	   The vista image contains data which represents statistical
+	 * 			   maps. In this case there a number of 3D VFloat images which
+	 * 			   represents the mapping layers.
+	 * ANATOMICAL: The vista images contains presumably a number of anatomical
+	 * 			   images. Each image will be saved in a seperate isis image
+	 *             with the according data type.
+	 */
 
-		// create and empty MemChunk of type short to store the image data
-		data::MemChunk<short>* mchunk =
-				new data::MemChunk<short>(VImageNColumns(images[0]),
-										VImageNRows(images[0]),
-										nimages,
-										VImageNBands(images[0]));
+	 // FUNCTIONAL -> copy every subimage into one chunk, splice the chunk
+	 // along the z-direction -> add all resulting chunks to the chunk list.
+	 if(dialect == "functional"){
 
-		// iterate over images and compose a 4-D chunk from all short images.
-		for(unsigned k = 0;k < nimages; k++){
+	 }
+	 else if(dialect == "map"){
 
-			// functional vista data should be short data. If not skip it.
-			if (VPixelRepn(images[k]) != VShortRepn)
-				continue;
+	 }
+	 // default: ANATOMICAL -> copy every image into a separate isis image.
+	 else {
+		 for(unsigned k=0;k<nimages;k++){
+			 switch( VPixelRepn( images[k] ) ) {
+				case VBitRepn:
+					addChunk<uint8_t>( chunks, images[k] );
+					break;
+				case VUByteRepn:
+					addChunk<VUByte>( chunks, images[k] );
+					break;
+				case VSByteRepn:
+					addChunk<VSByte>( chunks, images[k] );
+					break;
+				case VShortRepn:
+					addChunk<VShort>( chunks, images[k] );
+					break;
+				case VLongRepn:
+					addChunk<VLong>( chunks, images[k] );
+					break;
+				case VFloatRepn:
+					addChunk<VFloat>( chunks, images[k] );
+					break;
+				case VDoubleRepn:
+					addChunk<VDouble>( chunks, images[k] );
+				default:
+					LOG( image_io::Runtime, error )
+							<< "No Vista datatype found. Input image is broken. Abort.";
+				}// switch(VPixelRepn(images[k]))
+		 }
+	 } // END else
 
-			// found an additional image to insert into image
-			ncopy++;
 
-			// copy image voxelwise into MemChunk
-			for(unsigned b = 0;b<(unsigned)VImageNBands(images[k]);b++){
-				for(unsigned r = 0;r<(unsigned)VImageNRows(images[k]);r++){
-					for(unsigned c = 0;c<(unsigned)VImageNColumns(images[k]);c++){
-						mchunk->voxel<VShort>(c,r,ncopy-1,b)
-								= VPixel(images[k],b,r,c,VShort);
-					}
-				}
-			} // END copy voxel
+//	// found serveral images -> assume that this is a functional data set.
+//
+//		// number of images that where actual copied; ncopy <= nimages. In functional
+//		// data images, the the number of images copied corresponds to the number of
+//		// slices copied.
+//		unsigned ncopy = 0;
+//
+//		// create and empty MemChunk of type short to store the image data
+//		data::MemChunk<short>* mchunk =
+//				new data::MemChunk<short>(VImageNColumns(images[0]),
+//										VImageNRows(images[0]),
+//										nimages,
+//										VImageNBands(images[0]));
+//
+//		// iterate over images and compose a 4-D chunk from all short images.
+//		for(unsigned k = 0;k < nimages; k++){
+//
+//			// functional vista data should be short data. If not skip it.
+//			if (VPixelRepn(images[k]) != VShortRepn)
+//				continue;
+//
+//			// found an additional image to insert into image
+//			ncopy++;
+//
+//			// copy image voxelwise into MemChunk
+//			for(unsigned b = 0;b<(unsigned)VImageNBands(images[k]);b++){
+//				for(unsigned r = 0;r<(unsigned)VImageNRows(images[k]);r++){
+//					for(unsigned c = 0;c<(unsigned)VImageNColumns(images[k]);c++){
+//						mchunk->voxel<VShort>(c,r,ncopy-1,b)
+//								= VPixel(images[k],b,r,c,VShort);
+//					}
+//				}
+//			} // END copy voxel
+//
+//		} // END iterate over images
+//
+//		// copy header information from first image in the image list.
+//		copyHeaderFromVista(images[0],*mchunk);
+//		chunks.push_back(*mchunk);
 
-		} // END iterate over images
-
-		// copy header information from first image in the image list.
-		copyHeaderFromVista(images[0],*mchunk);
-		chunks.push_back(*mchunk);
-	}
 
 	//  cleanup, free memory, close file handle
 	fclose(ip);
@@ -589,6 +615,25 @@ template <typename TInput> void ImageFormat_Vista::addChunk( data::ChunkList &ch
 	copyHeaderFromVista( image, *chunk_sp );
 	// add chunk to chunk list
 	chunks.push_back( *chunk_sp );
+}
+
+template <typename T> bool ImageFormat_Vista::copyImageToVista(const data::Image& image, VImage& vimage)
+{
+	T min,max;
+	image.getMinMax<T>(min,max);
+	const util::FixedVector<size_t, 4> csize = image.getChunk( 0, 0 ).sizeToVector();
+	const util::FixedVector<size_t, 4> isize = image.sizeToVector();
+	LOG_IF(isize[3]>1,Debug,error) << "Vista cannot store 4D-Data in one VImage.";
+
+	for ( size_t z = 0; z < isize[2]; z += csize[2] ) {
+		for ( size_t y = 0; y < isize[1]; y += csize[1] ) {
+			for ( size_t x = 0; x < isize[0]; x += csize[0] ) {
+				data::Chunk ch=image.getChunkAs<T>( min,max,x, y, z, 0 );
+				ch.getTypePtr<T>().copyToMem(0,csize.product()-1,&VPixel( vimage, z, y, x, T ));
+			}
+		}
+	}
+	return true;
 }
 
 }//namespace image_io
