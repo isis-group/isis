@@ -61,7 +61,7 @@ VDictEntry TYPMetric[] = { {"MattesMutualInformation", 0}, {"MutualInformationHi
 																								  }, {"MeanSquare", 3}, {NULL}
 };
 
-VDictEntry TYPTransform[] = { {"Rigid", 0}, {"Affine", 1}, {"BSplineDeformable", 2}, {"Translation", 3}, {"Scale", 4}, {"CenteredAffine", 5}, {NULL}};
+VDictEntry TYPTransform[] = { {"VersorRigid", 0}, {"Affine", 1}, {"BSplineDeformable", 2}, {"Translation", 3}, {"Scale", 4}, {"CenteredAffine", 5}, {NULL}};
 
 VDictEntry TYPInterpolator[] = { {"Linear", 0}, {"BSpline", 1}, {"NearestNeighbor", 2}, {NULL}};
 
