@@ -61,9 +61,8 @@ bool isis::util::ParameterMap::parse( int argc, char **argv )
 		if ( argv[i][0] == '-' ) {
 			if ( begin )end = i;
 			else begin = i;
-		}
-
-		if ( i >= argc - 1 && begin )end = argc;
+		} else if ( i >= argc - 1 && begin ) //if argv[i] is not parameter - check if its the end
+			end = argc;
 
 		if ( end ) {
 			std::string pName( argv[begin] );

@@ -12,8 +12,7 @@ int main( int argc, char *argv[] )
 	app.parameters["chunks"].needed() = false;
 	app.parameters["chunks"].setDescription( "print also data of the chunks" );
 
-	if ( ! app.init( argc, argv ) )
-		return 1;
+	app.init( argc, argv ); // will exit if there is a problem
 
 	unsigned short count1 = 0, count2 = 0;
 	std::cout << "Got " << app.images.size() << " Images" << std::endl;

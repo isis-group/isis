@@ -47,7 +47,7 @@ IOApplication::~IOApplication() {}
 
 bool IOApplication::init( int argc, char **argv, bool exitOnError )
 {
-	if ( ! isis::util::Application::init( argc, argv, exitOnError ) )
+	if ( ! util::Application::init( argc, argv, exitOnError ) )
 		return false;
 
 	if ( m_input ) {
