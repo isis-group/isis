@@ -191,10 +191,10 @@ template<typename TInput, typename TOutput> typename TOutput::Pointer itkAdapter
 	outputImage = rescaler->GetOutput();
 	//since itk properties do not match the isis properties we need to define metaproperties to prevent data loss
 	propKeyList  = m_ImageISIS.getKeys();
-	PropKeyListType::const_iterator propIter;
 
-	for ( propIter = propKeyList.begin(); propIter != propKeyList.end(); propIter++ ) {
-		itk::EncapsulateMetaData<std::string>( myItkDict, *propIter, m_ImageISIS.getProperty<std::string>( *propIter ) );
+	BOOST_FOREACH( PropKeyListType::const_reference ref, propKeyList)
+	{
+		itk::EncapsulateMetaData<std::string>( myItkDict, ref, m_ImageISIS.getProperty<std::string>( ref ) );
 	}
 	m_AquistionNumber = m_ImageISIS.getProperty<int>("aquisitionNumber");
 	m_SequenceNumber = m_ImageISIS.getProperty<int>("sequenceNumber");
@@ -258,9 +258,8 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	data::ChunkList chunkList;
 	chunkList.push_back( *retChunk );
 	data::ImageList isisImageList( chunkList );
-	data::Image origImage ( *isisImageList.front().get() );
 	boost::shared_ptr< data::MemImage< TOutputISIS > > retImage (
-			new data::MemImage<TOutputISIS>  (origImage) );
+			new data::MemImage<TOutputISIS>  (*isisImageList.front().get()) );
 	data::ImageList retList;
 	retList.push_back( retImage );
 
@@ -273,8 +272,9 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	T(1,0) = 0;T(1,1) = -1;T(1,2) = 0;
 	T(2,0) = 0;T(2,1) = 0;T(2,2) = 1;
 	// apply transformation to local isis image copy
-	for(data::ImageList::iterator iter = isisImageList.begin();iter != isisImageList.end(); iter++){
-		(*iter)->transformCoords(T);
+	BOOST_FOREACH(data::ImageList::const_reference ref, isisImageList)
+	{
+		ref->transformCoords(T);
 	}
 	return retList;
 
