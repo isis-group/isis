@@ -29,6 +29,10 @@ namespace isis
 namespace data
 {
 
+	class Chunk;
+	typedef std::list<Chunk> ChunkList;
+
+
 namespace _internal
 {
 class ChunkBase : public NDimensional<4>, public util::PropMap
@@ -129,7 +133,8 @@ public:
 	}
 
 	Chunk &operator=( const Chunk &ref );
-
+	ChunkList splice(dimensions atDim);
+	
 	/**
 	 * Transforms the image coordinate system into an other system by multiplying
 	 * the orientation matrix with a user defined transformation matrix. Additionally,
@@ -156,8 +161,6 @@ struct chunk_comparison : public std::binary_function< Chunk, Chunk, bool> {
 };
 }
 /// @endcond
-
-typedef std::list<Chunk> ChunkList;
 
 /// Chunk class for memory-based buffers
 template<typename TYPE> class MemChunk : public Chunk

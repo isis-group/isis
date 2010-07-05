@@ -61,6 +61,13 @@ public:
 	/// \returns the length of the data pointed to
 	size_t len()const;
 
+	/**
+	* Split up into cheap copies of given length.
+	* This will create TypePtr's which will point at elements within this data block.
+	* - They will have a distance of size and therefore have the have the same length (exept the last one which will point an the rest).
+	* - They will use a special proxy-reference-counting (If at least one of them is still used, the whole original TypePtr will be kept).
+	* \returns a vector of ceil(len()/size) not intersecting TypePtrBase::Reference's of the length<=size.
+	*/
 	virtual std::vector<Reference> splice( size_t size )const = 0;
 
 	/** Create a TypePtr of the same type pointing at a newly allocated memory.

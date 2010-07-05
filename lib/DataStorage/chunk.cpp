@@ -11,6 +11,7 @@
 //
 
 #include "chunk.hpp"
+#include <boost/foreach.hpp>
 #include <limits>
 
 
@@ -232,6 +233,29 @@ void Chunk::transformCoords(boost::numeric::ublas::matrix<float> transform)
 	setProperty<util::fvector4>("sliceVec",slice);
 
 }
+
+ChunkList Chunk::splice ( dimensions atDim )
+{
+	//@todo should be locking
+	ChunkList ret;
+	typedef std::vector<_internal::TypePtrBase::Reference> TypePtrList;
+	const util::FixedVector<size_t,4> wholesize=sizeToVector();
+	util::FixedVector<size_t,4> spliceSize;spliceSize.fill(1); //init size of one chunk-splice to 1x1x1x1
+
+	//copy the relevant dimensional sizes from wholesize (in case of readDim we copy only the first element of wholesize - making lines)
+	spliceSize.copyFrom(&wholesize[0],&wholesize[atDim+1]);
+
+	//get the spliced TypePtr's (the volume of the requested dims is the split-size - in case of readDim it is the length of one line)
+	const TypePtrList pointers=this->asTypePtrBase().splice(spliceSize.product());
+
+	//create new Chunks from this TypePtr's
+	BOOST_FOREACH(TypePtrList::const_reference ref,pointers)
+	{
+		ret.push_back(Chunk(ref,spliceSize[0],spliceSize[1],spliceSize[2],spliceSize[3]));
+	}
+	return ret;
+}
+
 
 }
 }

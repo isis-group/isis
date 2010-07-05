@@ -101,7 +101,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////
 	// Accessors
 	////////////////////////////////////////////////////////////////////////////////////
-	TYPE operator []( size_t idx )const {
+	const TYPE &operator []( size_t idx )const {
 		LOG_IF( idx >= SIZE, Debug, error ) << "Index " << idx << " exceeds the size of the vector (" << SIZE << ")";
 		return CONTAINER::begin()[idx];
 	}
