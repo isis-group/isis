@@ -39,6 +39,7 @@
 #include <boost/foreach.hpp>
 #include <boost/assert.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
+#include <boost/regex.hpp>
 
 namespace isis
 {
@@ -348,6 +349,38 @@ private:
 									<< " / " << getVector( ni, sliceDir )
 									<< getVector( ni, voxelSizeVec );
 		}
+		//check repetition time
+		//check description for TR=[[:digit:]]ms.
+		boost::regex descriptionRegex( ".*TR=([[:digit:]]{1,})ms.*" );
+		boost::cmatch results;
+		u_int16_t tr = 0;
+		std::string description = ni.descrip;
+		if ( boost::regex_match( ni.descrip, results,  descriptionRegex) )
+		{
+			tr = boost::lexical_cast<u_int16_t>( results.str(1));
+		}
+		//if "TR=" was found in description and differs from pixdim[dim]
+		if( tr && (!tr == ni.pixdim[ni.ndim+1]) )
+		{
+			LOG( ImageIoLog, warning ) << "TR=" << tr << " was found in description but differs from pixdim[4]= "
+					<< ni.pixdim[ni.ndim+1] << ". This seems to be a nifti coming from SPM. Setting repetitionTime to " << tr
+					<< " ms. During conversion this value can be changed by using the parameter -tr";
+			retChunk.setProperty<u_int16_t>( "repetitionTime", tr);
+		}
+		//if "TR=" was not found in description pixdimg[dim] == 0 a warning calls attention to use parameter -tr to change repetitionTime.
+		if( !tr && !ni.pixdim[ni.ndim+1] )
+		{
+			LOG( ImageIoLog, warning ) << "Repetition time seems to be invalid. To set the repetition time during conversion use the parameter -tr ";
+			retChunk.setProperty<u_int16_t>( "repetitionTime", 0 );
+		}
+
+		if( !tr && ni.pixdim[ni.ndim+1] )
+		{
+			retChunk.setProperty<u_int16_t>( "repetitionTime", ni.pixdim[ni.ndim+1] );
+		}
+
+
+
 	}
 
 	util::fvector4 getVector( const nifti_image &ni, const enum vectordirection &dir ) {
@@ -492,6 +525,11 @@ private:
 		if ( true == image.hasProperty( "StudyDescription" ) ) {
 			std::string descrip = ( image.getProperty<std::string>( "StudyDescription" ) );
 			snprintf( ni.intent_name, 16, "%s", descrip.c_str() );
+		}
+		if ( image.hasProperty( "repetitionTime") )
+		{
+			LOG( ImageIoLog, info) << "Setting pixdim[" << ni.ndim << "] to " << image.getProperty<u_int16_t>( "repetitionTime" );
+			ni.dt = ni.pixdim[ni.ndim+1] = image.getProperty<u_int16_t>( "repetitionTime" );
 		}
 
 		//the rotation matrix
