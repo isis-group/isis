@@ -239,7 +239,17 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 		// Conversion to uint8_t (will downscale [0-255])
 		data::MemImage<uint8_t> img2( img );
 		BOOST_REQUIRE(img2.reIndex());
+
+		//Check if the metadata were copied correct
 		BOOST_CHECK_EQUAL(static_cast<util::PropMap>(img), static_cast<util::PropMap>(img2));
+		for ( int i = 0; i < 3; i++ )
+			for ( int j = 0; j < 3; j++ ) {
+				const util::PropMap &c1=img.getChunk(0,0,i,j);
+				const util::PropMap &c2=img2.getChunk(0,0,i,j);
+				BOOST_REQUIRE(c1.valid());
+				BOOST_CHECK(c2.valid());
+				BOOST_CHECK_EQUAL(c1,c2);
+			}
 		util::_internal::TypeBase::Reference min, max;
 		img2.getMinMax( min, max );
 		BOOST_CHECK( min->is<uint8_t>() );
