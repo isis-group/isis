@@ -28,7 +28,7 @@ namespace data
 {
 typedef DataLog Runtime;
 typedef DataDebug Debug;
-enum dimensions {readDim = 0, phaseDim, sliceDim, timeDim};
+enum dimensions {readDim = 0, phaseDim, sliceDim, timeDim,n_dims};
 
 template<typename HANDLE> void enable_log( LogLevel level )
 {

@@ -234,10 +234,14 @@ void Chunk::transformCoords(boost::numeric::ublas::matrix<float> transform)
 
 }
 
-ChunkList Chunk::splice ( dimensions atDim )
+ChunkList Chunk::splice ( dimensions atDim,util::fvector4 voxelSize,util::fvector4 voxelGap )
 {
-	//@todo should be locking
 	ChunkList ret;
+	if(atDim>=n_dims-2){
+		LOG(Debug,error) << "Splicing at the top dimension is impossible";
+		return ret;
+	}
+	//@todo should be locking
 	typedef std::vector<_internal::TypePtrBase::Reference> TypePtrList;
 	const util::FixedVector<size_t,4> wholesize=sizeToVector();
 	util::FixedVector<size_t,4> spliceSize;spliceSize.fill(1); //init size of one chunk-splice to 1x1x1x1
@@ -248,10 +252,28 @@ ChunkList Chunk::splice ( dimensions atDim )
 	//get the spliced TypePtr's (the volume of the requested dims is the split-size - in case of readDim it is the length of one line)
 	const TypePtrList pointers=this->asTypePtrBase().splice(spliceSize.product());
 
+
+	const util::fvector4 indexOrigin=this->propertyValue("indexOrigin")->cast_to_Type<util::fvector4>();
+	util::fvector4 offset;
+	switch(atDim) // init offset with the given direction
+	{
+	case readDim :offset=this->propertyValue("readVec")->cast_to_Type<util::fvector4>();break;
+	case phaseDim:offset=this->propertyValue("phaseVec")->cast_to_Type<util::fvector4>();break;
+	case sliceDim:offset=this->propertyValue("sliceVec")->cast_to_Type<util::fvector4>();break;
+	case timeDim :offset=util::fvector4(0,0,0,1);
+	}
+	assert(offset.sqlen()==1); // it should be norm here
+	offset=offset*(voxelSize[atDim+1]+voxelGap[atDim+1]); // scale it with the voxel-voxel distance at the next higher dimension
+	unsigned int cnt= 0;
+
 	//create new Chunks from this TypePtr's
 	BOOST_FOREACH(TypePtrList::const_reference ref,pointers)
 	{
-		ret.push_back(Chunk(ref,spliceSize[0],spliceSize[1],spliceSize[2],spliceSize[3]));
+		Chunk spliced(ref,spliceSize[0],spliceSize[1],spliceSize[2],spliceSize[3]);
+		static_cast<util::PropMap &>( spliced )= static_cast<util::PropMap &>( *this );//copy the metadate of ref
+		spliced.setProperty<util::fvector4>("indexOrigin",indexOrigin+(offset*cnt++));
+		//@todo acquisitionNumber is not reset here (and should not be) - this might cause trouble if we try to insert this chunks into an image
+		ret.push_back(spliced);
 	}
 	return ret;
 }
