@@ -9,9 +9,10 @@ using namespace isis;
 int main( int argc, char *argv[] )
 {
 	data::IOApplication app( "isis data dumper", true, false );
+	// ********* Parameters *********
 	app.parameters["chunks"] = false;
 	app.parameters["chunks"].needed() = false;
-	app.parameters["chunks"].setDescription( "print also data of the chunks" );
+	app.parameters["chunks"].setDescription( "print detailed data about the chunks" );
 
 	app.init( argc, argv ); // will exit if there is a problem
 

@@ -222,9 +222,9 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 	 * FUNCTIONAL: The vista image contains functional data. In this case there
 	 * 			   are a number of VShort images which represents the slices of
 	 *             the functional image data. This dialect will create a 4-D image.
-	 * MAPS:	   The vista image contains data which represents statistical
-	 * 			   maps. In this case there a number of 3D VFloat images which
-	 * 			   represents the mapping layers.
+	 * MAP:	   The vista image contains data which represents a statistical
+	 * 			   map. In this case the first 3D VFloat images will be loaded
+	 * 			   which represents the mapping layer.
 	 * ANATOMICAL: The vista images contains presumably a number of anatomical
 	 * 			   images. Each image will be saved in a seperate isis image
 	 *             with the according data type.
@@ -232,13 +232,41 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 
 	 // FUNCTIONAL -> copy every subimage into one chunk, splice the chunk
 	 // along the z-direction -> add all resulting chunks to the chunk list.
-	 if(dialect == "functional"){
+	 if(dialect == std::string("functional")){
 
 	 }
-	 else if(dialect == "map"){
+	 // MAP -> the vista image should contain a single 3D VFloat image. Hence the
+	 // first image found will be saved in a float MemChunk add added to the ChunkList.
+	 else if(dialect == std::string("map")){
+
+		 VImage img = 0;
+
+		 // print a warning message when there are more than one image.
+		 if(nimages >= 1){
+			 LOG( image_io::Runtime, warning)
+					 << "Multiple images found. Will use the first VFloat image.";
+
+		 }
+
+		 // have a look for the first float image
+		 for(unsigned k=0;k<nimages;k++){
+			 if(VPixelRepn(images[k])){
+				 img = images[k];
+				 break;
+			 }
+		 }
+
+		 // if no image found -> abort loading process.
+		 if(img == 0){
+			 LOG( image_io::Runtime, error )
+					 << "No float images found. Abort.";
+		 }
+
+		addChunk<VFloat>(chunks,img);
 
 	 }
-	 // default: ANATOMICAL -> copy every image into a separate isis image.
+	 // default: ANATOMICAL -> copy every image into a separate isis image with
+	 // the corresponding data type.
 	 else {
 		 for(unsigned k=0;k<nimages;k++){
 			 switch( VPixelRepn( images[k] ) ) {
@@ -323,7 +351,10 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 {
 	// get attribute list from image
 	VAttrList list = VImageAttrList( vimage );
+
 	// ********** MANDATORY attributes **********
+	// POLICY: copy all mandatory attributes
+
 	// get voxel
 	util::fvector4 voxels = image.getProperty<util::fvector4>( "voxelSize" );
 	std::stringstream vstr;
@@ -367,9 +398,18 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 		break;
 	}
 
+	// ********** OPTIONAL **********
+	// POLICY copy optional attributes
+
+	// repetition time
+	if(image.hasProperty("repetitionTime")){
+		VAppendAttr(list,"repetition", NULL, VShortRepn,
+				image.getProperty<VShort>("repetitionTime"));
+	}
+
 	// ********** Vista group **********
 	// POLICY: Append ALL properties from the 'Vista' Propmap to the end of the
-	// attribute list.
+	// vista attribute list.
 
 	if( image.hasBranch( "Vista" ) ) {
 		util::PropMap vista_branch = image.branch( "Vista" );
@@ -493,6 +533,13 @@ void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &c
 				chunk.setProperty( "sliceVec", util::fvector4( 0, -1, 0, 0 ) );
 				continue;
 			}
+		}
+
+		// OPTIONAL: "repetition_time" or "repetition" -> repetitionTime
+		if( (strcmp (name, "repetition" ) == 0) || (strcmp(name, "repetition_time" ) == 0)){
+			VGetAttrValue( &posn, NULL, VShortRepn, val );
+			chunk.setProperty<unsigned short>( "repetitionTime", *((unsigned short *)val));
+			continue;
 		}
 
 		// OPTIONAL: columnVec -> readVec, overwrite old values

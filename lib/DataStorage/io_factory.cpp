@@ -169,7 +169,8 @@ int IOFactory::loadFile( isis::data::ChunkList &ret, const boost::filesystem::pa
 					<< "Failed to load " <<  filename << " using " <<  it->name() << " ( " << e.what() << " )";
 		}
 	}
-	LOG( Runtime, error ) << "No plugin found to load: " << filename; //@todo error message missing
+	LOG( Runtime, error ) << "No plugin found that is able to load: " << filename
+			<< " with the dialect [" << dialect << "]"; //@todo error message missing
 	return 0;//no plugin of proposed list could load file
 }
 
@@ -210,11 +211,11 @@ data::ImageList IOFactory::load( const std::string &path, std::string suffix_ove
 	const int loaded = boost::filesystem::is_directory( p ) ?
 					   get().loadPath( chunks, p, suffix_override, dialect ) :
 					   get().loadFile( chunks, p, suffix_override, dialect );
-	const data::ImageList images( chunks );
-	BOOST_FOREACH( data::ImageList::const_reference ref, images ) {
-		if ( ! ref->hasProperty( "source" ) )
-			ref->setProperty( "source", p.string() );
+	BOOST_FOREACH(data::ChunkList::reference ref, chunks){
+		if ( ! ref.hasProperty( "source" ) )
+			ref.setProperty( "source", p.string() );
 	}
+	const data::ImageList images( chunks );
 	LOG( Runtime, info )
 			<< "Generated " << images.size() << " images out of " << loaded << " chunks from " << ( boost::filesystem::is_directory( p ) ? "directory " : "" ) << p;
 	return images;

@@ -41,6 +41,11 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 		parameters["wf"].needed() = false;
 		parameters["wf"].setDescription( "Override automatic detection of file suffix for writing with given value" );
 	}
+
+	parameters["dialect"] = std::string();
+	parameters["dialect"].needed() = false;
+	parameters["dialect"].setDescription(
+			"choose dialect of data set. The available dialects depend on the capabilities of IO plugins");
 }
 
 IOApplication::~IOApplication() {}
@@ -53,7 +58,8 @@ bool IOApplication::init( int argc, char **argv, bool exitOnError )
 	if ( m_input ) {
 		std::string input = parameters["in"];
 		std::string rf = parameters["rf"];
-		images = data::IOFactory::load( input, rf );
+		std::string dl = parameters["dialect"];
+		images = data::IOFactory::load( input, rf, dl);
 
 		if ( images.empty() ) {
 			if ( exitOnError )
