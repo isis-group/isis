@@ -237,7 +237,7 @@ void Chunk::transformCoords(boost::numeric::ublas::matrix<float> transform)
 ChunkList Chunk::splice ( dimensions atDim,util::fvector4 voxelSize,util::fvector4 voxelGap )
 {
 	ChunkList ret;
-	if(atDim>=n_dims-2){
+	if(atDim>=n_dims-1){
 		LOG(Debug,error) << "Splicing at the top dimension is impossible";
 		return ret;
 	}
@@ -247,7 +247,7 @@ ChunkList Chunk::splice ( dimensions atDim,util::fvector4 voxelSize,util::fvecto
 	util::FixedVector<size_t,4> spliceSize;spliceSize.fill(1); //init size of one chunk-splice to 1x1x1x1
 
 	//copy the relevant dimensional sizes from wholesize (in case of readDim we copy only the first element of wholesize - making lines)
-	spliceSize.copyFrom(&wholesize[0],&wholesize[atDim+1]);
+	spliceSize.copyFrom(&wholesize[0],&wholesize[atDim]);
 
 	//get the spliced TypePtr's (the volume of the requested dims is the split-size - in case of readDim it is the length of one line)
 	const TypePtrList pointers=this->asTypePtrBase().splice(spliceSize.product());
@@ -259,11 +259,23 @@ ChunkList Chunk::splice ( dimensions atDim,util::fvector4 voxelSize,util::fvecto
 	{
 	case readDim :offset=this->propertyValue("readVec")->cast_to_Type<util::fvector4>();break;
 	case phaseDim:offset=this->propertyValue("phaseVec")->cast_to_Type<util::fvector4>();break;
-	case sliceDim:offset=this->propertyValue("sliceVec")->cast_to_Type<util::fvector4>();break;
+	case sliceDim:
+		if(this->hasProperty("sliceVec"))
+			offset=this->propertyValue("sliceVec")->cast_to_Type<util::fvector4>();
+		else{
+				const util::fvector4 read=this->propertyValue("readVec")->cast_to_Type<util::fvector4>();
+				const util::fvector4 phase=this->propertyValue("phaseVec")->cast_to_Type<util::fvector4>();
+				assert(util::fuzzyEqual<float>(read.sqlen(),1));
+				assert(util::fuzzyEqual<float>(phase.sqlen(),1));
+				offset[0] = read[1] * phase[2] - read[2] * phase[1];
+				offset[1] = read[2] * phase[0] - read[0] * phase[2];
+				offset[2] = read[0] * phase[1] - read[1] * phase[0];
+		}
+		break;
 	case timeDim :offset=util::fvector4(0,0,0,1);
 	}
-	assert(offset.sqlen()==1); // it should be norm here
-	offset=offset*(voxelSize[atDim+1]+voxelGap[atDim+1]); // scale it with the voxel-voxel distance at the next higher dimension
+	assert(util::fuzzyEqual<float>(offset.sqlen(),1)); // it should be norm here
+	offset=offset*(voxelSize[atDim]+voxelGap[atDim]); // scale it with the voxel-voxel distance at the next higher dimension
 	unsigned int cnt= 0;
 
 	//create new Chunks from this TypePtr's
