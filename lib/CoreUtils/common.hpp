@@ -218,12 +218,18 @@ continousFind( ForwardIterator &current, const ForwardIterator end, const T& com
 template<typename T> bool fuzzyEqual( T a, T b )
 {
 	BOOST_MPL_ASSERT( ( boost::is_float<T> ) );
+	const T epsilon=std::numeric_limits<T>::epsilon();
 
-	if ( a == b )return true;
+	if ( a == b )
+		return true;
 
-	const T dist = std::fabs( a - b );
-	const T base = std::min( a, b ) * std::numeric_limits<T>::epsilon() * T(5e1);
-	return  dist < base;
+	if(a == 0 && std::fabs(b)< epsilon*epsilon)
+		return true;
+	if(b == 0 && std::fabs(a)< epsilon*epsilon)
+		return true;
+
+	const T dist_fac = std::max( a, b ) / std::min(a,b);
+	return  dist_fac < epsilon+1;
 }
 
 /// @cond _internal
