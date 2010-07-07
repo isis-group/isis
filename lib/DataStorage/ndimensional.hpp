@@ -67,8 +67,7 @@ public:
 	 */
 	void init( const size_t d[DIMS] ) {
 		std::copy( d, d + DIMS, dim );
-		LOG_IF(volume(),Runtime,error) << "Creating object with volume of 0";
-		//@todo make validity check
+		LOG_IF(volume()==0,Runtime,error) << "Creating object with volume of 0";
 	}
 	NDimensional( const NDimensional &src ) {//@todo default copier should do the job
 		init( src.dim );
