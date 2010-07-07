@@ -18,7 +18,7 @@
 #include <algorithm>
 #include <boost/static_assert.hpp>
 #include <string>
-#include "CoreUtils/common.hpp"
+#include "DataStorage/common.hpp"
 #include "CoreUtils/vector.hpp"
 
 namespace isis
@@ -67,6 +67,7 @@ public:
 	 */
 	void init( const size_t d[DIMS] ) {
 		std::copy( d, d + DIMS, dim );
+		LOG_IF(volume(),Runtime,error) << "Creating object with volume of 0";
 		//@todo make validity check
 	}
 	NDimensional( const NDimensional &src ) {//@todo default copier should do the job
