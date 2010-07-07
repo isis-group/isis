@@ -213,7 +213,7 @@ continousFind( ForwardIterator &current, const ForwardIterator end, const T& com
 /**
  * Fuzzy comparison between floating point values.
  * Will raise a compiler error when not used with floating point types.
- * \returns true if the difference between the two types is significantly small compared to the values.
+ * \returns true if the difference between the two values is significantly small compared to their values.
  */
 template<typename T> bool fuzzyEqual( T a, T b )
 {
@@ -223,13 +223,20 @@ template<typename T> bool fuzzyEqual( T a, T b )
 	if ( a == b )
 		return true;
 
+	if(a<0 && b>0){
+		b+=-a;
+		a=0;
+	} else if(a>0 && b<0){
+		a+=-b;
+		b=0;
+	}
 	if(a == 0 && std::fabs(b)< epsilon*epsilon)
 		return true;
 	if(b == 0 && std::fabs(a)< epsilon*epsilon)
 		return true;
 
-	const T dist_fac = std::max( a, b ) / std::min(a,b);
-	return  dist_fac < epsilon+1;
+	const T dist_fac = (std::max( a, b ) / std::min(a,b))-1;
+	return  dist_fac <= epsilon;
 }
 
 /// @cond _internal
