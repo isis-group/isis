@@ -242,6 +242,7 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 
 		//Check if the metadata were copied correct
 		BOOST_CHECK_EQUAL(static_cast<util::PropMap>(img), static_cast<util::PropMap>(img2));
+
 		for ( int i = 0; i < 3; i++ )
 			for ( int j = 0; j < 3; j++ ) {
 				const util::PropMap &c1=img.getChunk(0,0,i,j);
@@ -250,6 +251,7 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 				BOOST_CHECK(c2.valid());
 				BOOST_CHECK_EQUAL(c1,c2);
 			}
+
 		util::_internal::TypeBase::Reference min, max;
 		img2.getMinMax( min, max );
 		BOOST_CHECK( min->is<uint8_t>() );
@@ -344,6 +346,47 @@ BOOST_AUTO_TEST_CASE (transformCoords_test) {
 
 } // END transformCoords_test
 
+BOOST_AUTO_TEST_CASE (image_init_test_sizes)
+{
+	unsigned int nrX = 64;
+	unsigned int nrY = 64;
+	unsigned int nrS = 2;
+	unsigned int nrT = 20;
+
+	data::Image img;
+	for (unsigned int is = 0; is < nrS; is++){
+		for (unsigned int it = 0; it < nrT; it++){
+			data::MemChunk<float> ch(nrX, nrY);
+			ch.setProperty("indexOrigin", util::fvector4(0,0,is, it));
+			ch.setProperty("readVec", util::fvector4(17,0,0, 0));
+			ch.setProperty("phaseVec", util::fvector4(0,17,0,0));
+			ch.setProperty("sliceVec", util::fvector4(4,23,31, 23));
+			ch.setProperty("voxelSize", util::fvector4(3,3,3,0));
+			ch.setProperty<uint32_t>("acquisitionNumber", is+it*nrS);
+			ch.setProperty<uint16_t>("sequenceNumber", 1);
+
+
+			img.insertChunk(ch);
+		}
+	}
+
+	for (unsigned int ix = 0; ix < nrX; ix++){
+		for (unsigned int iy = 0; iy < nrY; iy++){
+			for (unsigned int is = 0; is < nrS; is++){
+				for (unsigned int it = 0; it < nrT; it++){
+					img.voxel<float>(ix, iy, is, it) = rand();
+				}
+			}
+		}
+	}
+
+
+	img.print(std::cout);
+	data::MemImage<uint16_t> copyImg(img);
+	copyImg.print(std::cout);
+
+
+}
 
 } // END namespace test
 } // END namespace isis
