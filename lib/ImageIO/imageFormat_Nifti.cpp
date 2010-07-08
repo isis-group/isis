@@ -164,14 +164,14 @@ public:
 		// don't forget to take the properties with
 		copyHeaderFromNifti( *retChunk, *ni );
 
-		if ( !strcasecmp( dialect.c_str(), "spm" ) )
-		{
-			boost::shared_ptr<data::MemChunk<int16_t> >
-				dst( new data::MemChunk<int16_t>( ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ) ) ;
-			retChunk->swapAlong( *dst, 0 );
-			retList.push_back( *dst );
-			return 1;
-		}
+//		if ( !strcasecmp( dialect.c_str(), "spm" ) )
+//		{
+//			boost::shared_ptr<data::MemChunk<int16_t> >
+//				dst( new data::MemChunk<int16_t>( ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ) ) ;
+//			retChunk->swapAlong( *dst, 0 );
+//			retList.push_back( *dst );
+//			return 1;
+//		}
 		// push the completed NiftiChunk into the list
 		retList.push_back( *retChunk );
 		return retChunk ? 1 : 0;
