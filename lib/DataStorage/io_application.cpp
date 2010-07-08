@@ -31,7 +31,7 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 		parameters["in"].setDescription( "input file or dataset" );
 		parameters["rf"] = std::string();
 		parameters["rf"].needed() = false;
-		parameters["rf"].setDescription( "Override automatic detection of file suffix for reading with given value" );
+		parameters["rf"].setDescription( "Override automatic detection of file suffix for reading with given value." );
 	}
 
 	if ( have_output ) {
@@ -39,13 +39,13 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 		parameters["out"].setDescription( "output file" );
 		parameters["wf"] = std::string();
 		parameters["wf"].needed() = false;
-		parameters["wf"].setDescription( "Override automatic detection of file suffix for writing with given value" );
+		parameters["wf"].setDescription( "Override automatic detection of file suffix for writing with given value." );
 	}
 
 	parameters["dialect"] = std::string();
 	parameters["dialect"].needed() = false;
 	parameters["dialect"].setDescription(
-			"choose dialect of data set. The available dialects depend on the capabilities of IO plugins");
+			"choose dialect of data set. The available dialects depend on the capabilities of IO plugins.");
 }
 
 IOApplication::~IOApplication() {}

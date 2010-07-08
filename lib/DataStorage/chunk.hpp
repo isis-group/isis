@@ -149,6 +149,13 @@ public:
 	 */
 	void transformCoords(boost::numeric::ublas::matrix<float> transform);
 
+	/**
+	 * Swaps the image along a dimension dim in image space. If convertTransform is true,
+	 * the transform will be converted in a way that the image is the same in physical space
+	 * as it was prior to swapping.
+	 */
+	bool swapAlong( Chunk&, const size_t dim=0, bool convertTransform=true );
+
 };
 
 /// @cond _internal

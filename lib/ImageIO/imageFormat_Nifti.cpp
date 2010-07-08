@@ -31,6 +31,7 @@
 #include "CoreUtils/type.hpp"
 #include "common.hpp"
 #include "CoreUtils/vector.hpp"
+#include "DataStorage/typeptr.hpp"
 
 //SYSTEM INCLUDES
 #include <nifti1_io.h>
@@ -99,7 +100,7 @@ public:
 	}
 
 	std::string dialects() {
-		return std::string( "fsl" );
+		return std::string( "fsl spm" );
 	}
 
 	std::string name() {
@@ -160,9 +161,17 @@ public:
 		default:
 			throwGenericError( std::string( "Unsupported datatype " ) + util::Type<int>( ni->datatype ).toString() );
 		}
-
 		// don't forget to take the properties with
 		copyHeaderFromNifti( *retChunk, *ni );
+
+		if ( !strcasecmp( dialect.c_str(), "spm" ) )
+		{
+			boost::shared_ptr<data::MemChunk<int16_t> >
+				dst( new data::MemChunk<int16_t>( ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ) ) ;
+			retChunk->swapAlong( *dst, 0 );
+			retList.push_back( *dst );
+			return 1;
+		}
 		// push the completed NiftiChunk into the list
 		retList.push_back( *retChunk );
 		return retChunk ? 1 : 0;
