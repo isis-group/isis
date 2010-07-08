@@ -8,8 +8,8 @@ int main( int argc, char **argv )
 {
 	data::IOApplication app("isis data converter", true, true);
 
-	app.parameters["tr"] = int16_t();
-	app.parameters["tr"] = -1;
+	app.parameters["tr"] = u_int16_t();
+	app.parameters["tr"] = 0;
 	app.parameters["tr"].needed() = false;
 	app.parameters["tr"].setDescription("Repetition time in ms.");
 
@@ -20,12 +20,12 @@ int main( int argc, char **argv )
 	if (app.images.size() == 0){
 		LOG(isis::image_io::Runtime, error) << "No images found. Abort";
 	}
-	if( app.parameters["tr"] >= 0)
+	if( app.parameters["tr"] > 0)
 	{
 		std::cout << "setting tr to " << app.parameters["tr"].toString() << "ms." << std::endl;
 		BOOST_FOREACH(data::ImageList::const_reference ref, app.images)
 		{
-			ref->setProperty<int16_t>("repetitionTime", app.parameters["tr"]);
+			ref->setProperty<u_int16_t>("repetitionTime", app.parameters["tr"]);
 		}
 	}
 
