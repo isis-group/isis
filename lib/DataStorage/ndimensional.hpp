@@ -69,6 +69,10 @@ public:
 		std::copy( d, d + DIMS, dim );
 		LOG_IF(volume()==0,Runtime,error) << "Creating object with volume of 0";
 	}
+	void init( const util::FixedVector<size_t, DIMS>& d ) {
+		d.copyTo(dim);
+		LOG_IF(volume()==0,Runtime,error) << "Creating object with volume of 0";
+	}
 	NDimensional( const NDimensional &src ) {//@todo default copier should do the job
 		init( src.dim );
 	}

@@ -52,7 +52,7 @@ bool image_chunk_order::operator() ( const data::Chunk &a, const data::Chunk &b 
 			const float bTime = b.getProperty<float>( "acquisitionTime" );
 
 			if ( aTime < bTime ) {
-				LOG( Debug, verbose_info )
+				LOG( Debug, info )
 						<< "Fallback sorted chunks by time"
 						<< " (" << aTime << " before " << bTime << ")";
 				return true;
@@ -67,7 +67,7 @@ bool image_chunk_order::operator() ( const data::Chunk &a, const data::Chunk &b 
 
 		if ( aNumber < bNumber ) {
 			//if they at least have different acquisitionNumber
-			LOG( Debug, verbose_info )
+			LOG( Debug, info )
 					<< "Fallback sorted chunks by acquisition order"
 					<< " (" << aNumber << " before " << bNumber << ")";
 			return true;
@@ -83,11 +83,9 @@ bool image_chunk_order::operator() ( const data::Chunk &a, const data::Chunk &b 
 
 }
 
-Image::Image ( _internal::image_chunk_order lt ) : set ( lt ), clean( true )
+Image::Image ( _internal::image_chunk_order lt ) : set ( lt ), clean( false )
 {
 	addNeededFromString( needed );
-	const size_t idx[] = {0, 0, 0, 0};
-	init( idx );
 }
 
 
@@ -98,6 +96,9 @@ bool Image::insertChunk ( const Chunk &chunk )
 				<< "Cannot insert chunk. Missing properties: " << chunk.getMissing();
 		return false;
 	}
+
+	LOG_IF(chunk.getProperty<util::fvector4>("indexOrigin")[3]!=0,Debug,warning)
+		<< " inserting chunk with nonzero at the 4th position - you shouldn't use the fourth dim for the time (use acquisitionTime)";
 
 	if ( ! set.empty() ) {
 		const Chunk &first = *set.begin();
@@ -202,11 +203,9 @@ bool Image::reIndex()
 	const unsigned short chunk_dims = first.relevantDims();
 	chunkVolume = first.volume();
 	//copy sizes of the chunks to to the first chunk_dims sizes of the image
-	size_t size[Chunk::n_dims];
 
-	for ( unsigned short i = 0; i < chunk_dims; i++ )
-		size[i] = first.dimSize( i );
-
+	util::FixedVector<size_t, n_dims> size; //storage for the size of the chunk structure
+	size.fill(1);
 	//get indexOrigin from the geometrically first chunk
 	propertyValue( "indexOrigin" ) = first.propertyValue( "indexOrigin" );
 
@@ -228,8 +227,9 @@ bool Image::reIndex()
 		size[chunk_dims] =  dummy_var_for_retarded_compilers ? dummy_var_for_retarded_compilers : 1;
 
 		for ( unsigned short i = chunk_dims + 1; i < Image::n_dims; i++ ){ //if there are dimensions left figure out their size
-			const size_t dummy_var_for_retarded_compilers=getChunkStride( size[i-1] ) / size[i-1];
-			size[i] = dummy_var_for_retarded_compilers ? dummy_var_for_retarded_compilers : 1;
+			const size_t dummy_var_for_retarded_compilers=getChunkStride( size.product() ) / size.product();
+			if(dummy_var_for_retarded_compilers)
+				size[i] =  dummy_var_for_retarded_compilers;
 		}
 	}
 
@@ -253,10 +253,26 @@ bool Image::reIndex()
 		getChunkAt( i ).remove( common, true );
 
 	LOG_IF( ! common.empty(), Debug, verbose_info ) << "common properties removed from " << set.size() << " chunks: " << common;
+
+	// add the chunk-size to the image-size
+	for ( unsigned short i = 0; i < chunk_dims; i++ )
+		size[i] = first.dimSize( i );
+
 	init( size );
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	//reconstruct some redundant information, if its missing
 	//////////////////////////////////////////////////////////////////////////////////////////////////
+	const std::string vectors[]={"readVec","phaseVec","sliceVec"};
+	BOOST_FOREACH(const std::string &ref,vectors){
+		if ( hasProperty( ref ) ){
+			util::PropertyValue &prop=propertyValue( ref );
+			LOG_IF(!prop->is<util::fvector4>(),Debug,error) << "Using " << prop->typeName() << " as " << util::Type<util::fvector4>::staticName();
+			util::fvector4 &vec = prop->cast_to_Type<util::fvector4>();
+			LOG_IF( vec.len() == 0, Runtime, error )
+					<< "The existing " << ref << " " << vec << " has the length zero. Thats bad, because I'm going to normalize it.";
+			vec.norm();
+		}
+	}
 
 	//if we have at least two slides (and have slides (with different positions) at all)
 	if ( chunk_dims == 2 && size[2] > 1 && lookup[0]->hasProperty( "indexOrigin" ) ) {
@@ -271,8 +287,8 @@ bool Image::reIndex()
 			distVecNorm.norm();
 
 			if ( hasProperty( "sliceVec" ) ) {
-				const util::fvector4 sliceVec = getProperty<util::fvector4>( "sliceVec" );
-				LOG_IF( distVecNorm != sliceVec, Runtime, warning )
+				const util::fvector4 sliceVec = getProperty<util::fvector4>("sliceVec" );
+				LOG_IF(! distVecNorm.fuzzyEqual(sliceVec), Runtime, warning )
 						<< "The existing sliceVec " << sliceVec
 						<< " differs from the distance vector between chunk 0 and " << size[2] - 1
 						<< " " << distVecNorm;
@@ -319,8 +335,7 @@ bool Image::reIndex()
 	if ( hasProperty( "readVec" ) && hasProperty( "phaseVec" ) ) {
 		util::fvector4 &read = propertyValue( "readVec" )->cast_to_Type<util::fvector4>();
 		util::fvector4 &phase = propertyValue( "phaseVec" )->cast_to_Type<util::fvector4>();
-		read.norm();
-		phase.norm();
+
 		LOG_IF( read.dot( phase ) > 0.01, Runtime, warning ) << "The cosine between the columns and the rows of the image is bigger than 0.01";
 		const util::fvector4 crossVec = util::fvector4( //we could use their cross-product as sliceVector
 											read[1] * phase[2] - read[2] * phase[1],
@@ -330,7 +345,6 @@ bool Image::reIndex()
 
 		if ( hasProperty( "sliceVec" ) ) {
 			util::fvector4 &sliceVec = propertyValue( "sliceVec" )->cast_to_Type<util::fvector4>(); //get the slice vector
-			sliceVec.norm(); // norm it
 			LOG_IF( ! crossVec.fuzzyEqual( sliceVec ), Runtime, warning )
 					<< "The existing sliceVec " << sliceVec
 					<< " differs from the cross product of the read- and phase vector " << crossVec;
@@ -410,8 +424,6 @@ const Chunk &Image::getChunk ( size_t first, size_t second, size_t third, size_t
 
 size_t Image::getChunkStride ( size_t base_stride )
 {
-	size_t ret;
-
 	if ( set.empty() ) {
 		LOG( Runtime, error ) << "Trying to get chunk stride in an empty image";
 		return 0;
@@ -430,25 +442,29 @@ size_t Image::getChunkStride ( size_t base_stride )
 		 * |c c| is the first reasonable case
 		 */
 		// get the distance between first and second chunk for comparision
-		const util::fvector4 thisV = lookup[0]->getProperty<util::fvector4>( "indexOrigin" );
+		const util::fvector4 firstV = lookup[0]->getProperty<util::fvector4>( "indexOrigin" );
 		const util::fvector4 nextV = lookup[base_stride]->getProperty<util::fvector4>( "indexOrigin" );
-		const util::fvector4 dist1 = nextV - thisV;
+		const util::fvector4 dist1 = nextV - firstV;
 
-		// compare every follwing distance to that
-		for ( size_t i = base_stride; i < lookup.size() - base_stride; i += base_stride ) {
+		if(dist1.sqlen()==0){ //if there is no geometric structure anymore - so asume its flat from here on
+				LOG(Debug,info) << "Distance between 0 and " << util::MSubject( base_stride ) 
+				<< " is zero. Assuming there are no dimensional breaks anymore. Returning the whole length ("<< lookup.size() << ")";
+				return lookup.size();
+		} else for ( size_t i = base_stride; i < lookup.size() - base_stride; i += base_stride ) { 	// compare every follwing distance to that
 			const util::fvector4 thisV = lookup[i]->getProperty<util::fvector4>( "indexOrigin" );
 			const util::fvector4 nextV = lookup[i+base_stride]->getProperty<util::fvector4>( "indexOrigin" );
-			const util::fvector4 dist = nextV - thisV;
+			const util::fvector4 distFirst = nextV - firstV;
+			const util::fvector4 distThis = nextV - thisV;
 			LOG( Debug, verbose_info )
 					<< "Distance between chunk " << util::MSubject( i ) << " and " << util::MSubject( i + base_stride )
-					<< " is " << dist.len() << ". Distance between 0 and 1 was " << dist1.len();
+					<< " is " << distThis.len() << ". Distance between 0 and " << util::MSubject( i + base_stride ) <<" is " << distFirst.len();
 
-			if ( dist.sqlen() > dist1.sqlen() * 4 ) { // found an dimensional break - leave
-				ret = i + 1;
+			if ( distFirst.sqlen() <= distThis.sqlen() ) { // found an dimensional break - leave
 				LOG( Debug, info )
-						<< "Distance between chunk " << util::MSubject( i ) << " and " << util::MSubject( i + base_stride )
-						<< " is more then twice the first distance, assuming dimensional break at " << ret;
-				return ret;
+						<< "Distance between chunk " << util::MSubject( i + base_stride )
+						<< " and 0 is not bigger than the distance between " << util::MSubject( i + base_stride )
+						<< " and "<< util::MSubject( i ) << ", assuming dimensional break at " << i + base_stride;
+				return i + base_stride;
 			}
 		}
 	} else  if ( lookup.size() % base_stride ) {
@@ -462,10 +478,9 @@ size_t Image::getChunkStride ( size_t base_stride )
 	}
 
 	//we didn't find any break, so we assume its a linear image |c c ... c|
-	ret = lookup.size();
 	LOG( Debug, info )
-			<< "No dimensional break found, assuming it to be at the end (" << ret << ")";
-	return ret;
+			<< "No dimensional break found, assuming it to be at the end (" << lookup.size() << ")";
+	return lookup.size();
 }
 
 std::list<util::PropertyValue> Image::getChunksProperties( const util::PropMap::key_type &key, bool unique )const
@@ -594,9 +609,9 @@ Image::orientation Image::getMainOrientation()const
 										read[0] * phase[1] - read[1] * phase[0]
 									);
 	const util::fvector4 x( 1, 0 ), y( 0, 1 ), z( 0, 0, 1 );
-	double a_axial = std::acos( crossVec.dot( z ) ) / M_PI;
-	double a_sagittal = std::acos( crossVec.dot( x )  ) / M_PI;
-	double a_coronal = std::acos( crossVec.dot( y )  ) / M_PI;
+	double a_axial    = std::acos( crossVec.dot( z ) ) / M_PI;
+	double a_sagittal = std::acos( crossVec.dot( x ) ) / M_PI;
+	double a_coronal  = std::acos( crossVec.dot( y ) ) / M_PI;
 	bool a_inverse = false, s_inverse = false, c_inverse = false;
 	LOG(Debug,info) << "Angles to vectors are " << a_sagittal << " to x, " << a_coronal << " to y and " << a_axial << " to z";
 

@@ -234,7 +234,7 @@ void Chunk::transformCoords(boost::numeric::ublas::matrix<float> transform)
 
 }
 
-ChunkList Chunk::splice ( dimensions atDim,util::fvector4 voxelSize,util::fvector4 voxelGap )
+ChunkList Chunk::splice ( dimensions atDim,util::fvector4 voxelDistance, int acquisitionNumberOffset )
 {
 	ChunkList ret;
 	if(atDim>=n_dims-1){
@@ -254,6 +254,8 @@ ChunkList Chunk::splice ( dimensions atDim,util::fvector4 voxelSize,util::fvecto
 
 
 	const util::fvector4 indexOrigin=this->propertyValue("indexOrigin")->cast_to_Type<util::fvector4>();
+	const uint32_t acquisitionNumber=this->propertyValue("acquisitionNumber")->cast_to_Type<uint32_t>();
+
 	util::fvector4 offset;
 	switch(atDim) // init offset with the given direction
 	{
@@ -275,7 +277,7 @@ ChunkList Chunk::splice ( dimensions atDim,util::fvector4 voxelSize,util::fvecto
 	case timeDim :offset=util::fvector4(0,0,0,1);
 	}
 	assert(util::fuzzyEqual<float>(offset.sqlen(),1)); // it should be norm here
-	offset=offset*(voxelSize[atDim]+voxelGap[atDim]); // scale it with the voxel-voxel distance at the next higher dimension
+	offset=offset*voxelDistance[atDim]; // scale it with the voxel-voxel distance at the next higher dimension
 	unsigned int cnt= 0;
 
 	//create new Chunks from this TypePtr's
@@ -283,7 +285,9 @@ ChunkList Chunk::splice ( dimensions atDim,util::fvector4 voxelSize,util::fvecto
 	{
 		Chunk spliced(ref,spliceSize[0],spliceSize[1],spliceSize[2],spliceSize[3]);
 		static_cast<util::PropMap &>( spliced )= static_cast<util::PropMap &>( *this );//copy the metadate of ref
-		spliced.setProperty<util::fvector4>("indexOrigin",indexOrigin+(offset*cnt++));
+		spliced.setProperty<util::fvector4>("indexOrigin",indexOrigin+(offset*cnt));
+		spliced.setProperty("acquisitionNumber",acquisitionNumber+(acquisitionNumberOffset*cnt));
+		cnt++;
 		//@todo acquisitionNumber is not reset here (and should not be) - this might cause trouble if we try to insert this chunks into an image
 		ret.push_back(spliced);
 	}

@@ -301,11 +301,11 @@ BOOST_AUTO_TEST_CASE (transformCoords_test) {
 
 	// **** OUTPUT ****
 	std::cout << "DICOM (axial) --> Nifti (axial)" << std::endl;
-	std::cout << img->getProperty<util::fvector4>("readVec") << std::endl;
-	std::cout << img->getProperty<util::fvector4>("phaseVec") << std::endl;
-	std::cout << img->getProperty<util::fvector4>("sliceVec") << std::endl;
+	std::cout << img->propertyValue("readVec") << std::endl;
+	std::cout << img->propertyValue("phaseVec") << std::endl;
+	std::cout << img->propertyValue("sliceVec") << std::endl;
 
-	std::cout << img->getProperty<util::fvector4>("indexOrigin") << std::endl;
+	std::cout << img->propertyValue("indexOrigin") << std::endl;
 
 	// **** SAGITTAL ****
 	// set orientation SAGITTAL in DCIOM space
@@ -319,11 +319,11 @@ BOOST_AUTO_TEST_CASE (transformCoords_test) {
 
 	// **** OUTPUT ****
 	std::cout << "DICOM (sagittal) --> Nifti (sagittal)" << std::endl;
-	std::cout << img->getProperty<util::fvector4>("readVec") << std::endl;
-	std::cout << img->getProperty<util::fvector4>("phaseVec") << std::endl;
-	std::cout << img->getProperty<util::fvector4>("sliceVec") << std::endl;
+	std::cout << img->propertyValue("readVec") << std::endl;
+	std::cout << img->propertyValue("phaseVec") << std::endl;
+	std::cout << img->propertyValue("sliceVec") << std::endl;
 
-	std::cout << img->getProperty<util::fvector4>("indexOrigin") << std::endl;
+	std::cout << img->propertyValue("indexOrigin") << std::endl;
 
 	// **** CORONAL ****
 	// set orientation CORONAL in DCIOM space
@@ -337,11 +337,11 @@ BOOST_AUTO_TEST_CASE (transformCoords_test) {
 
 	// **** OUTPUT ****
 	std::cout << "DICOM (coronal) --> Nifti (coronal)" << std::endl;
-	std::cout << img->getProperty<util::fvector4>("readVec") << std::endl;
-	std::cout << img->getProperty<util::fvector4>("phaseVec") << std::endl;
-	std::cout << img->getProperty<util::fvector4>("sliceVec") << std::endl;
+	std::cout << img->propertyValue("readVec") << std::endl;
+	std::cout << img->propertyValue("phaseVec") << std::endl;
+	std::cout << img->propertyValue("sliceVec") << std::endl;
 
-	std::cout << img->getProperty<util::fvector4>("indexOrigin") << std::endl;
+	std::cout << img->propertyValue("indexOrigin") << std::endl;
 
 
 } // END transformCoords_test
@@ -353,23 +353,34 @@ BOOST_AUTO_TEST_CASE (image_init_test_sizes)
 	unsigned int nrS = 2;
 	unsigned int nrT = 20;
 
+	static boost::numeric::converter <uint16_t, double,
+	boost::numeric::conversion_traits<uint16_t, double>,
+	boost::numeric::def_overflow_handler,
+	boost::numeric::RoundEven<double>
+	> converter;
+
+
 	data::Image img;
 	for (unsigned int is = 0; is < nrS; is++){
 		for (unsigned int it = 0; it < nrT; it++){
 			data::MemChunk<float> ch(nrX, nrY);
-			ch.setProperty("indexOrigin", util::fvector4(0,0,is, it));
-			ch.setProperty("readVec", util::fvector4(17,0,0, 0));
-			ch.setProperty("phaseVec", util::fvector4(0,17,0,0));
-			ch.setProperty("sliceVec", util::fvector4(4,23,31, 23));
-			ch.setProperty("voxelSize", util::fvector4(3,3,3,0));
+			ch.setProperty("indexOrigin", util::fvector4(0,0,is));
+			ch.setProperty("readVec", util::fvector4(17,0,0));
+			ch.setProperty("phaseVec", util::fvector4(0,17,0));
+			ch.setProperty("sliceVec", util::fvector4(4,23,31));
+			ch.setProperty("voxelSize", util::fvector4(3,3,3));
 			ch.setProperty<uint32_t>("acquisitionNumber", is+it*nrS);
 			ch.setProperty<uint16_t>("sequenceNumber", 1);
 
 
-			img.insertChunk(ch);
+			BOOST_REQUIRE(img.insertChunk(ch));
 		}
 	}
 
+	const size_t dummy[]={nrX,nrY,nrS,nrT};
+	const util::FixedVector<size_t,4> sizeVec(dummy);
+	img.reIndex();
+	BOOST_REQUIRE_EQUAL(img.sizeToVector(),sizeVec);
 	for (unsigned int ix = 0; ix < nrX; ix++){
 		for (unsigned int iy = 0; iy < nrY; iy++){
 			for (unsigned int is = 0; is < nrS; is++){
@@ -381,9 +392,24 @@ BOOST_AUTO_TEST_CASE (image_init_test_sizes)
 	}
 
 
-	img.print(std::cout);
+	float min,max;
+	img.getMinMax(min,max);
+	BOOST_REQUIRE_EQUAL(min,0);
+
+	double scale = std::numeric_limits<uint16_t>::max() / max;
 	data::MemImage<uint16_t> copyImg(img);
-	copyImg.print(std::cout);
+	copyImg.reIndex();
+
+	BOOST_REQUIRE_EQUAL(copyImg.sizeToVector(),sizeVec);
+	for (unsigned int ix = 0; ix < nrX; ix++){
+		for (unsigned int iy = 0; iy < nrY; iy++){
+			for (unsigned int is = 0; is < nrS; is++){
+				for (unsigned int it = 0; it < nrT; it++){
+					BOOST_CHECK_EQUAL( converter(img.voxel<float>(ix, iy, is, it)*scale) , copyImg.voxel<uint16_t>(ix,iy,is,it));
+				}
+			}
+		}
+	}
 
 
 }
