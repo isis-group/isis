@@ -369,27 +369,24 @@ private:
 			tr = boost::lexical_cast<u_int16_t>( results.str(1));
 		}
 		//if "TR=" was found in description and differs from pixdim[dim]
-		if( tr && (!tr == ni.pixdim[ni.ndim+1]) )
+		if( tr && (!tr == ni.pixdim[ni.ndim]) )
 		{
 			LOG( ImageIoLog, warning ) << "TR=" << tr << " was found in description but differs from pixdim[4]= "
-					<< ni.pixdim[ni.ndim+1] << ". This seems to be a nifti coming from SPM. Setting repetitionTime to " << tr
+					<< ni.pixdim[ni.ndim] << ". This seems to be a nifti coming from SPM. Setting repetitionTime to " << tr
 					<< " ms. During conversion this value can be changed by using the parameter -tr";
 			retChunk.setProperty<u_int16_t>( "repetitionTime", tr);
 		}
 		//if "TR=" was not found in description pixdimg[dim] == 0 a warning calls attention to use parameter -tr to change repetitionTime.
-		if( !tr && !ni.pixdim[ni.ndim+1] )
+		if( tr == 0 && ni.pixdim[ni.ndim] == 0 )
 		{
 			LOG( ImageIoLog, warning ) << "Repetition time seems to be invalid. To set the repetition time during conversion use the parameter -tr ";
 			retChunk.setProperty<u_int16_t>( "repetitionTime", 0 );
 		}
 
-		if( !tr && ni.pixdim[ni.ndim+1] )
+		if( !tr && ni.pixdim[ni.ndim] )
 		{
-			retChunk.setProperty<u_int16_t>( "repetitionTime", ni.pixdim[ni.ndim+1] );
+			retChunk.setProperty<u_int16_t>( "repetitionTime", ni.pixdim[ni.ndim] );
 		}
-
-
-
 	}
 
 	util::fvector4 getVector( const nifti_image &ni, const enum vectordirection &dir ) {
