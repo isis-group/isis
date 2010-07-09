@@ -109,7 +109,7 @@ bool TypePtrBase::swapAlong( TypePtrBase &dst, const size_t dim, const size_t di
 	else if ( dim == 2 ) {
 		for ( size_t direction=0; direction<dims[dim]; direction++)
 			{
-				mempcpy(dest + direction*dims[0]*dims[1]*bytes_per_elem(), src + (dims[dim]-direction-1)*dims[0]*dims[1]*bytes_per_elem(), bytes_per_elem()*dims[0]*dims[1]);
+				memcpy(dest + direction*dims[0]*dims[1]*bytes_per_elem(), src + (dims[dim]-direction-1)*dims[0]*dims[1]*bytes_per_elem(), bytes_per_elem()*dims[0]*dims[1]);
 			}
 		return 1;
 	}
