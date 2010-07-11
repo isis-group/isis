@@ -54,42 +54,35 @@ isis::util::ParameterMap::ParameterMap(): parsed( false ) {}
 
 bool isis::util::ParameterMap::parse( int argc, char **argv )
 {
-	int begin = 0, end = 0;
-	bool ret = true;
-
-	for ( int i = 1; i < argc; i++ ) { // scan through the command line, to find next parameter
-		if ( argv[i][0] == '-' ) {
-			if ( begin )end = i;
-			else begin = i;
-		} else if ( i >= argc - 1 && begin ) //if argv[i] is not parameter - check if its the end
-			end = argc;
-
-		if ( end ) {
-			std::string pName( argv[begin] );
+	parsed = true;
+	std::string pName;
+	
+	for ( int i = 1; i < argc; ) { // scan through the command line, to find next parameter
+		if ( argv[i][0] == '-' ) { //seems like we found a new parameter here
+			pName = argv[i];
 			pName.erase( 0, pName.find_first_not_of( '-' ) );
-			iterator found = find( pName );
-
-			if ( found != this->end() ) { //ok, we have a parameter with that name
-				assert( begin + 1 <= end ); //must be <= because we could have an empty property-list for this parameter
-
-				if ( found->second.parse( list2string( argv + begin + 1, argv + end, ",", "", "" ) ) ) {
-					found->second.needed() = false;//remove needed flag, because the value is set (aka "not needed anymore")
-				} else {
-					LOG( Runtime, error )
-					<< "Failed to parse parameter " << MSubject( list2string( argv + begin, argv + end, " ", "", "" ) ) << " for "
-					<< found->first << "(" << found->second->typeName() << ")";
-					ret = false;
-				}
-			} else {
-				LOG( Runtime, warning ) << "Ignoring unknown parameter " << MSubject( list2string( argv + begin, argv + end, " ", "", "" ) );
+			i++;
+		}
+		if(!pName.empty()){ // if we got a parameter before
+			const int begin=i;
+			while(i<argc && argv[i][0]!='-'){ //collect its properties, while there are some ..
+				i++;
 			}
-
-			begin = end;
-			end = 0;
+			iterator found = find( pName );
+			if(found==end()){
+				LOG(Runtime, warning ) << "Ignoring unknown parameter " << MSubject( std::string("-")+pName+" "+list2string( argv+begin, argv+i, " ", "", "" ) );
+			} else if ( found->second.parse( list2string( argv+begin, argv+i, ",", "", "" ) ) ) { // parse the collected properties
+				found->second.needed() = false;//remove needed flag, because the value is set (aka "not needed anymore")
+			} else {
+				LOG( Runtime, error )
+				<< "Failed to parse value(s) "
+				<< MSubject( list2string( argv+begin, argv+i, " ", "", "" ))
+				<< " for "	<< found->first << "(" << found->second->typeName() << ")";
+				parsed = false;
+			}
 		}
 	}
-
-	return ( parsed = ret );
+	return parsed ;
 }
 bool isis::util::ParameterMap::isComplete()const
 {

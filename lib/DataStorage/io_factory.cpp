@@ -21,6 +21,7 @@
 #include "common.hpp"
 #include <boost/regex.hpp>
 #include <boost/foreach.hpp>
+#include <boost/system/error_code.hpp>
 #include "CoreUtils/singletons.hpp"
 
 namespace isis
@@ -169,8 +170,13 @@ int IOFactory::loadFile( isis::data::ChunkList &ret, const boost::filesystem::pa
 					<< "Failed to load " <<  filename << " using " <<  it->name() << " ( " << e.what() << " )";
 		}
 	}
-	LOG( Runtime, error ) << "No plugin found that is able to load: " << filename
-			<< " with the dialect [" << dialect << "]"; //@todo error message missing
+	if(boost::filesystem::exists(filename)){
+		LOG( Runtime, error )
+			<< "No plugin found that is able to load: "
+			<< util::MSubject(filename) << (dialect.empty() ? std::string(" with the dialect [") + dialect + "]":"");
+	} else {
+		LOG(Runtime, error ) << util::MSubject( filename ) << " is no file or directory, and no plugin was found to load it.";
+	}
 	return 0;//no plugin of proposed list could load file
 }
 
@@ -224,7 +230,6 @@ data::ImageList IOFactory::load( const std::string &path, std::string suffix_ove
 int IOFactory::loadPath( isis::data::ChunkList &ret, const boost::filesystem::path &path, std::string suffix_override, std::string dialect )
 {
 	int loaded = 0;
-
 	for ( boost::filesystem::directory_iterator itr( path ); itr != boost::filesystem::directory_iterator(); ++itr )  {
 		if ( boost::filesystem::is_directory( *itr ) )continue;
 

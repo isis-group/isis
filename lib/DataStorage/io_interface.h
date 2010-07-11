@@ -77,7 +77,7 @@ public:
 	 */
 	virtual void write( const data::Image &image, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) = 0;
 	/**
-	 * Write a multiple images.
+	 * Write a image list.
 	 * I case of an error std::runtime_error will be thrown.
 	 * The default implementation will call write( const data::Image &, const std::string&, const std::string&) for every image using a generated unique filename.
 	 * \param filename the name to be used as base for the filename generation if neccessary.
