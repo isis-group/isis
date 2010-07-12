@@ -16,7 +16,7 @@ int main( int argc, char *argv[] )
 
 	app.init( argc, argv ); // will exit if there is a problem
 
-	unsigned short count1 = 0, count2 = 0;
+	unsigned short count1 = 0;
 	std::cout << "Got " << app.images.size() << " Images" << std::endl;
 	const unsigned short imageDigits=std::log10(app.images.size())+1;
 	std::cout.fill('0');
@@ -24,6 +24,7 @@ int main( int argc, char *argv[] )
 	BOOST_FOREACH( data::ImageList::const_reference ref, app.images ) {
 		std::cout << "======Image #" << std::setw(imageDigits)  << ++count1 << std::setw(0) << ref->sizeToString() << "======Metadata======" << std::endl;
 		ref->print( std::cout, true );
+		int count2=0;
 		if(app.parameters["chunks"]){
 			const unsigned short chunkDigits=std::log10(std::distance(ref->chunksBegin(),ref->chunksEnd()))+1;
 			for ( data::Image::ChunkIterator c = ref->chunksBegin(); c != ref->chunksEnd(); c++ ) {

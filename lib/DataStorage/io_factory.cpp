@@ -167,13 +167,13 @@ int IOFactory::loadFile( isis::data::ChunkList &ret, const boost::filesystem::pa
 			return it->load( ret, filename.string(), dialect );
 		} catch ( std::runtime_error &e ) {
 			LOG( Runtime, error )
-					<< "Failed to load " <<  filename << " using " <<  it->name() << " ( " << e.what() << " )";
+					<< "Failed to load " <<  filename << " using " <<  util::MSubject(it->name()) << " ( " << e.what() << " )";
 		}
 	}
 	if(boost::filesystem::exists(filename)){
 		LOG( Runtime, error )
 			<< "No plugin found that is able to load: "
-			<< util::MSubject(filename) << (dialect.empty() ? std::string(" with the dialect [") + dialect + "]":"");
+			<< util::MSubject(filename) << (!dialect.empty() ? std::string(" with the dialect [") + dialect + "]":"");
 	} else {
 		LOG(Runtime, error ) << util::MSubject( filename ) << " is no file or directory, and no plugin was found to load it.";
 	}

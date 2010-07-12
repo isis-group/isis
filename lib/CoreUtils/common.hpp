@@ -262,7 +262,9 @@ continousFind( ForwardIterator &current, const ForwardIterator end, const T& com
 ///Caseless less-compare for std::string
 struct caselessStringLess {
 	bool operator() ( const std::string& a, const std::string& b ) const {
-		return boost::algorithm::to_lower_copy(a) < boost::algorithm::to_lower_copy(b);
+		return strcasecmp(a.c_str(),b.c_str())<0;
+// 		return boost::algorithm::to_lower_copy(a) < boost::algorithm::to_lower_copy(b);
+		//@todo for WinXP maybe look at http://www.winehq.org/pipermail/wine-patches/2004-August/012083.html
 	}
 };
 }
