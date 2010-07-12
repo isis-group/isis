@@ -237,10 +237,22 @@ public:
 	// Additional get/set - Functions
 	//////////////////////////////////////////////////////////////////////////////////////
 	//@todo make sure the type specific behaviour is as documented
-	/// Set the given property to a given value/type.
-	template<typename T> T &setProperty( const std::string &key, const T &val ) {
-		PropertyValue &ret = propertyValue( key ) = val;
-		return ret->cast_to_Type<T>();
+	/**
+	 * Set the given property to a given value/type.
+	 * The needed flag (if set) will be kept.
+	 * If the property is already set to a value of another type an error is send to Runtime an nothing will be set.
+	 */
+	template<typename T> PropertyValue &setProperty( const std::string &key, const T &val ) {
+		PropertyValue &ret = propertyValue( key );
+		if(ret.empty()){
+			const bool needed=ret.needed();
+			(ret = val).needed()=needed;
+		} else if(ret->is<T>() ){
+			ret->cast_to_Type<T>()=val;
+		} else { // don't overwrite allready set properties with a different type
+			LOG(Runtime,error) << "Property " << MSubject(key) << " is allready set to " << MSubject(ret.toString(true)) << " won't override";
+		}
+		return ret;
 	}
 	/**
 	 * Request a property via the given key in the given type.

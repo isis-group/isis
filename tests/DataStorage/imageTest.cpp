@@ -364,6 +364,7 @@ BOOST_AUTO_TEST_CASE (image_init_test_sizes)
 		for (unsigned int it = 0; it < nrT; it++){
 			data::MemChunk<float> ch(nrX, nrY);
 			ch.setProperty("indexOrigin", util::fvector4(0,0,is));
+			BOOST_CHECK(ch.propertyValue("indexOrigin").needed());
 			ch.setProperty("readVec", util::fvector4(17,0,0));
 			ch.setProperty("phaseVec", util::fvector4(0,17,0));
 			ch.setProperty("sliceVec", util::fvector4(4,23,31));
@@ -395,6 +396,7 @@ BOOST_AUTO_TEST_CASE (image_init_test_sizes)
 	img.getMinMax(min,max);
 	BOOST_REQUIRE_EQUAL(min,0);
 
+// 	data::enable_log<util::DefaultMsgPrint>(verbose_info);
 	double scale = std::numeric_limits<uint16_t>::max() / max;
 	data::MemImage<uint16_t> copyImg(img);
 	copyImg.reIndex();
