@@ -77,7 +77,7 @@ private:
 	mapped_type &fetchEntry( const key_type &key );
 
 	static const mapped_type *findEntry( const util::PropMap &root, const propPathIterator at, const propPathIterator pathEnd );
-	const mapped_type *findEntry( const key_type &key );
+	const mapped_type *findEntry( const key_type &key )const;
 
 	/// internal recursion-function for remove
 	bool recursiveRemove( util::PropMap &root, const propPathIterator at, const propPathIterator pathEnd );
@@ -257,11 +257,9 @@ public:
 	/**
 	 * Request a property via the given key in the given type.
 	 * If the requested type is not equal to type the property is stored with, an automatic conversion is done.
+	 * If the property is not set yet T() is returned.
 	 */
-	template<typename T> T getProperty( const std::string &key )const {
-		const PropertyValue &ref=propertyValue( key );
-		return ref.empty() ? T():ref->as<T>();
-	}
+	template<typename T> T getProperty( const std::string &key )const;
 	/**
 	 * Rename a given property/branch.
 	 * This is implemented as copy+delete and can also be used between branches.
@@ -351,7 +349,20 @@ template<class Predicate> struct PropMap::walkTree {
 		}
 	}
 };
-	
+
+// as well as PropMap::getProperty ...
+template<typename T> T PropMap::getProperty(const std::string& key) const
+{
+	const mapped_type *entry=findEntry( key );
+	if(entry){
+		const PropertyValue &ref=entry->getLeaf();
+		if(!ref.empty())
+			return ref->as<T>();
+	}
+	LOG(Debug,warning) << "Returning " << Type<T>().toString(true) << " because property " << key << " does not exist";
+	return T();
+}
+
 }}
 
 // and finally define the streaming output for treeNode

@@ -72,7 +72,7 @@ PropMap::mapped_type &PropMap::fetchEntry(
 	}
 }
 
-const PropMap::mapped_type *PropMap::findEntry( const std::string &key )
+const PropMap::mapped_type *PropMap::findEntry( const std::string &key )const
 {
 	const propPath path = util::string2list<std::string>( key, pathSeperator );
 	return findEntry( *this, path.begin(), path.end() );
