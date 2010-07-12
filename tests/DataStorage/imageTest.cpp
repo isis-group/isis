@@ -350,7 +350,7 @@ BOOST_AUTO_TEST_CASE (image_init_test_sizes)
 {
 	unsigned int nrX = 64;
 	unsigned int nrY = 64;
-	unsigned int nrS = 2;
+	unsigned int nrS = 1;
 	unsigned int nrT = 20;
 
 	static boost::numeric::converter <uint16_t, double,
@@ -358,7 +358,6 @@ BOOST_AUTO_TEST_CASE (image_init_test_sizes)
 	boost::numeric::def_overflow_handler,
 	boost::numeric::RoundEven<double>
 	> converter;
-
 
 	data::Image img;
 	for (unsigned int is = 0; is < nrS; is++){

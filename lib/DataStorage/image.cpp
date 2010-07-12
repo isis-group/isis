@@ -163,7 +163,13 @@ bool Image::reIndex()
 	const size_t chunks = set.size();
 	lookup.resize( chunks );
 
-	//check for timesteps (first n chunks with same position)
+	util::FixedVector<size_t, n_dims> size; //storage for the size of the chunk structure
+	size.fill(1);
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	//// Non Geometric sorting (put chunks with the same geometric position at the highest dimension)
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	//check for chunks with same position
 	if ( chunks > 1 ) {
 		ChunkSet::iterator it = set.begin();
 
@@ -177,6 +183,7 @@ bool Image::reIndex()
 		LOG_IF( chunks % timesteps, Debug, error )
 				<< "The number timesteps does not fit the number of chunks. Reindexing will fail.";
 		LOG( Debug, info ) << "Found " << timesteps << " chunks per position assuming them as timesteps";
+		size[n_dims-1]=timesteps; //store non geometric amount at the end (timeDim)
 	}
 
 	if ( chunks > timesteps && chunks % timesteps == 0 ) {
@@ -198,14 +205,15 @@ bool Image::reIndex()
 			lookup[idx++] = it++;
 	}
 
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	//// geometric sorting (put chunks with distinct geometric position at the remaining dimensions)
+	///////////////////////////////////////////////////////////////////////////////////////////////////
 	//get primary attributes from first chunk
 	const Chunk &first = *set.begin();
 	const unsigned short chunk_dims = first.relevantDims();
 	chunkVolume = first.volume();
 	//copy sizes of the chunks to to the first chunk_dims sizes of the image
 
-	util::FixedVector<size_t, n_dims> size; //storage for the size of the chunk structure
-	size.fill(1);
 	//get indexOrigin from the geometrically first chunk
 	propertyValue( "indexOrigin" ) = first.propertyValue( "indexOrigin" );
 
@@ -225,8 +233,9 @@ bool Image::reIndex()
 		// check the chunks for at least one dimensional break - use that for the size of that dimension
 		const size_t dummy_var_for_retarded_compilers=getChunkStride();
 		size[chunk_dims] =  dummy_var_for_retarded_compilers ? dummy_var_for_retarded_compilers : 1;
+		const unsigned short sortDims = n_dims - (size[n_dims-1]>1?1:0); // dont use the uppermost dim, if the timesteps are allready there
 
-		for ( unsigned short i = chunk_dims + 1; i < Image::n_dims; i++ ){ //if there are dimensions left figure out their size
+		for ( unsigned short i = chunk_dims + 1; i < sortDims; i++ ){ //if there are dimensions left figure out their size
 			const size_t dummy_var_for_retarded_compilers=getChunkStride( size.product() ) / size.product();
 			if(dummy_var_for_retarded_compilers)
 				size[i] =  dummy_var_for_retarded_compilers;
@@ -448,8 +457,8 @@ size_t Image::getChunkStride ( size_t base_stride )
 
 		if(dist1.sqlen()==0){ //if there is no geometric structure anymore - so asume its flat from here on
 				LOG(Debug,info) << "Distance between 0 and " << util::MSubject( base_stride ) 
-				<< " is zero. Assuming there are no dimensional breaks anymore. Returning the whole length ("<< lookup.size() << ")";
-				return lookup.size();
+				<< " is zero. Assuming there are no dimensional breaks anymore. Returning 1";
+				return 1;
 		} else for ( size_t i = base_stride; i < lookup.size() - base_stride; i += base_stride ) { 	// compare every follwing distance to that
 			const util::fvector4 thisV = lookup[i]->getProperty<util::fvector4>( "indexOrigin" );
 			const util::fvector4 nextV = lookup[i+base_stride]->getProperty<util::fvector4>( "indexOrigin" );
