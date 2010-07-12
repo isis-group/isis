@@ -346,11 +346,11 @@ BOOST_AUTO_TEST_CASE (transformCoords_test) {
 
 } // END transformCoords_test
 
-BOOST_AUTO_TEST_CASE (image_init_test_sizes)
+BOOST_AUTO_TEST_CASE (image_init_test_sizes_and_values)
 {
 	unsigned int nrX = 64;
 	unsigned int nrY = 64;
-	unsigned int nrS = 1;
+	unsigned int nrS = 20;
 	unsigned int nrT = 20;
 
 	static boost::numeric::converter <uint16_t, double,
@@ -377,6 +377,7 @@ BOOST_AUTO_TEST_CASE (image_init_test_sizes)
 		}
 	}
 
+	 srand ( time(NULL) );
 	const size_t dummy[]={nrX,nrY,nrS,nrT};
 	const util::FixedVector<size_t,4> sizeVec(dummy);
 	img.reIndex();
@@ -413,7 +414,204 @@ BOOST_AUTO_TEST_CASE (image_init_test_sizes)
 	}
 
 
+
+
+
 }
+
+
+
+BOOST_AUTO_TEST_CASE (image_init_test_sizes)
+{
+	unsigned int nrX = 64;
+	unsigned int nrY = 64;
+	unsigned int nrS = 20;
+	unsigned int nrT = 20;
+
+	data::Image img;
+	for (unsigned int is = 0; is < nrS; is++){
+		for (unsigned int it = 0; it < nrT; it++){
+			data::MemChunk<float> ch(nrX, nrY);
+			ch.setProperty("indexOrigin", util::fvector4(0,0,is));
+			BOOST_CHECK(ch.propertyValue("indexOrigin").needed());
+			ch.setProperty("readVec", util::fvector4(17,0,0));
+			ch.setProperty("phaseVec", util::fvector4(0,17,0));
+			ch.setProperty("sliceVec", util::fvector4(4,23,31));
+			ch.setProperty("voxelSize", util::fvector4(3,3,3));
+			ch.setProperty<uint32_t>("acquisitionNumber", is+it*nrS);
+			ch.setProperty<uint16_t>("sequenceNumber", 1);
+
+
+			BOOST_REQUIRE(img.insertChunk(ch));
+		}
+	}
+
+
+	const size_t dummy[]={nrX,nrY,nrS,nrT};
+	const util::FixedVector<size_t,4> sizeVec(dummy);
+	img.reIndex();
+	BOOST_REQUIRE_EQUAL(img.sizeToVector(),sizeVec);
+
+
+	//***************************************************************
+	nrX = 64;
+	nrY = 1;
+	nrS = 20;
+	nrT = 20;
+
+	data::Image img2;
+	for (unsigned int is = 0; is < nrS; is++){
+		for (unsigned int it = 0; it < nrT; it++){
+			data::MemChunk<float> ch(nrX, nrY);
+			ch.setProperty("indexOrigin", util::fvector4(0,0,is));
+			BOOST_CHECK(ch.propertyValue("indexOrigin").needed());
+			ch.setProperty("readVec", util::fvector4(17,0,0));
+			ch.setProperty("phaseVec", util::fvector4(0,17,0));
+			ch.setProperty("sliceVec", util::fvector4(4,23,31));
+			ch.setProperty("voxelSize", util::fvector4(3,3,3));
+			ch.setProperty<uint32_t>("acquisitionNumber", is+it*nrS);
+			ch.setProperty<uint16_t>("sequenceNumber", 1);
+
+
+			BOOST_REQUIRE(img2.insertChunk(ch));
+		}
+	}
+
+
+	const size_t dummy2[]={nrX,nrY,nrS,nrT};
+	const util::FixedVector<size_t,4> sizeVec2(dummy2);
+	img2.reIndex();
+	BOOST_REQUIRE_EQUAL(img2.sizeToVector(),sizeVec2);
+
+	//***************************************************************
+	nrX = 1;
+	nrY = 64;
+	nrS = 20;
+	nrT = 20;
+
+	data::Image img3;
+	for (unsigned int is = 0; is < nrS; is++){
+		for (unsigned int it = 0; it < nrT; it++){
+			data::MemChunk<float> ch(nrX, nrY);
+			ch.setProperty("indexOrigin", util::fvector4(0,0,is));
+			BOOST_CHECK(ch.propertyValue("indexOrigin").needed());
+			ch.setProperty("readVec", util::fvector4(17,0,0));
+			ch.setProperty("phaseVec", util::fvector4(0,17,0));
+			ch.setProperty("sliceVec", util::fvector4(4,23,31));
+			ch.setProperty("voxelSize", util::fvector4(3,3,3));
+			ch.setProperty<uint32_t>("acquisitionNumber", is+it*nrS);
+			ch.setProperty<uint16_t>("sequenceNumber", 1);
+
+
+			BOOST_REQUIRE(img3.insertChunk(ch));
+		}
+	}
+
+
+	const size_t dummy3[]={nrX,nrY,nrS,nrT};
+	const util::FixedVector<size_t,4> sizeVec3(dummy3);
+	img3.reIndex();
+	BOOST_REQUIRE_EQUAL(img3.sizeToVector(),sizeVec3);
+
+	//***************************************************************
+	nrX = 64;
+	nrY = 64;
+	nrS = 1;
+	nrT = 20;
+
+	data::Image img4;
+	for (unsigned int is = 0; is < nrS; is++){
+		for (unsigned int it = 0; it < nrT; it++){
+			data::MemChunk<float> ch(nrX, nrY);
+			ch.setProperty("indexOrigin", util::fvector4(0,0,is));
+			BOOST_CHECK(ch.propertyValue("indexOrigin").needed());
+			ch.setProperty("readVec", util::fvector4(17,0,0));
+			ch.setProperty("phaseVec", util::fvector4(0,17,0));
+			ch.setProperty("sliceVec", util::fvector4(4,23,31));
+			ch.setProperty("voxelSize", util::fvector4(3,3,3));
+			ch.setProperty<uint32_t>("acquisitionNumber", is+it*nrS);
+			ch.setProperty<uint16_t>("sequenceNumber", 1);
+
+
+			BOOST_REQUIRE(img4.insertChunk(ch));
+		}
+	}
+
+
+	const size_t dummy4[]={nrX,nrY,nrS,nrT};
+	const util::FixedVector<size_t,4> sizeVec4(dummy4);
+	img4.reIndex();
+	BOOST_REQUIRE_EQUAL(img4.sizeToVector(),sizeVec4);
+
+
+	//***************************************************************
+	nrX = 64;
+	nrY = 64;
+	nrS = 20;
+	nrT = 1;
+
+	data::Image img5;
+	for (unsigned int is = 0; is < nrS; is++){
+		for (unsigned int it = 0; it < nrT; it++){
+			data::MemChunk<float> ch(nrX, nrY);
+			ch.setProperty("indexOrigin", util::fvector4(0,0,is));
+			BOOST_CHECK(ch.propertyValue("indexOrigin").needed());
+			ch.setProperty("readVec", util::fvector4(17,0,0));
+			ch.setProperty("phaseVec", util::fvector4(0,17,0));
+			ch.setProperty("sliceVec", util::fvector4(4,23,31));
+			ch.setProperty("voxelSize", util::fvector4(3,3,3));
+			ch.setProperty<uint32_t>("acquisitionNumber", is+it*nrS);
+			ch.setProperty<uint16_t>("sequenceNumber", 1);
+
+
+			BOOST_REQUIRE(img5.insertChunk(ch));
+		}
+	}
+
+
+	const size_t dummy5[]={nrX,nrY,nrS,nrT};
+	const util::FixedVector<size_t,4> sizeVec5(dummy5);
+	img5.reIndex();
+	BOOST_REQUIRE_EQUAL(img5.sizeToVector(),sizeVec5);
+
+	//***************************************************************
+	nrX = 0;
+	nrY = 0;
+	nrS = 0;
+	nrT = 0;
+
+	data::Image img6;
+	for (unsigned int is = 0; is < nrS; is++){
+		for (unsigned int it = 0; it < nrT; it++){
+			data::MemChunk<float> ch(nrX, nrY);
+			ch.setProperty("indexOrigin", util::fvector4(0,0,is));
+			BOOST_CHECK(ch.propertyValue("indexOrigin").needed());
+			ch.setProperty("readVec", util::fvector4(17,0,0));
+			ch.setProperty("phaseVec", util::fvector4(0,17,0));
+			ch.setProperty("sliceVec", util::fvector4(4,23,31));
+			ch.setProperty("voxelSize", util::fvector4(3,3,3));
+			ch.setProperty<uint32_t>("acquisitionNumber", is+it*nrS);
+			ch.setProperty<uint16_t>("sequenceNumber", 1);
+
+
+			BOOST_REQUIRE(img6.insertChunk(ch));
+		}
+	}
+
+
+	const size_t dummy6[]={nrX,nrY,nrS,nrT};
+	const util::FixedVector<size_t,4> sizeVec6(dummy6);
+	img6.reIndex();
+	BOOST_REQUIRE_EQUAL(img6.sizeToVector(),sizeVec6);
+
+
+
+
+
+}
+
+
+
 
 } // END namespace test
 } // END namespace isis
