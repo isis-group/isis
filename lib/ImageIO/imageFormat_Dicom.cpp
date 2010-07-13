@@ -270,35 +270,36 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 	}
 
 	transformOrTell<u_int32_t>( prefix + "CSAImageHeaderInfo/UsedChannelMask", "coilChannelMask", object, info );
-
 	// interpret DWI data
-	int32_t bValue;bool foundDiff=true;
-	if (object.hasProperty( prefix + "DiffusionBValue" )) { //in case someone actually used the right Tag
-		bValue=object.getProperty<int32_t>(prefix + "DiffusionBValue");
-		object.remove(prefix + "DiffusionBValue");
-	} else if (object.hasProperty( prefix + "Unknown Tag(0019,100c)" )) { //fallback for siemens
-		bValue=object.getProperty<int32_t>(prefix + "Unknown Tag(0019,100c)");
-		object.remove(prefix + "Unknown Tag(0019,100c)");
-	} else foundDiff=false;
+	int32_t bValue;
+	bool foundDiff = true;
+
+	if ( object.hasProperty( prefix + "DiffusionBValue" ) ) { //in case someone actually used the right Tag
+		bValue = object.getProperty<int32_t>( prefix + "DiffusionBValue" );
+		object.remove( prefix + "DiffusionBValue" );
+	} else if ( object.hasProperty( prefix + "Unknown Tag(0019,100c)" ) ) { //fallback for siemens
+		bValue = object.getProperty<int32_t>( prefix + "Unknown Tag(0019,100c)" );
+		object.remove( prefix + "Unknown Tag(0019,100c)" );
+	} else foundDiff = false;
 
 	// If we do have DWI here, create a property diffusionGradient (which defaults to 0,0,0,0)
-	if(foundDiff){
-		util::fvector4 &diff=object.setProperty("diffusionGradient",util::fvector4())->cast_to_Type<util::fvector4>(); 
-		if(bValue){ // if bValue is not zero multiply the diffusionGradient by it
-			if(object.hasProperty(prefix + "DiffusionGradientOrientation")){
-				diff=object.getProperty<util::fvector4>(prefix + "DiffusionGradientOrientation")*bValue;
-				object.remove(prefix + "DiffusionGradientOrientation");
-			} else if(object.hasProperty(prefix + "Unknown Tag(0019,100e)")){
-				diff=object.getProperty<util::fvector4>(prefix + "Unknown Tag(0019,100e)")*bValue;
-				object.remove(prefix + "Unknown Tag(0019,100e)");
+	if( foundDiff ) {
+		util::fvector4 &diff = object.setProperty( "diffusionGradient", util::fvector4() )->cast_to_Type<util::fvector4>();
+
+		if( bValue ) { // if bValue is not zero multiply the diffusionGradient by it
+			if( object.hasProperty( prefix + "DiffusionGradientOrientation" ) ) {
+				diff = object.getProperty<util::fvector4>( prefix + "DiffusionGradientOrientation" ) * bValue;
+				object.remove( prefix + "DiffusionGradientOrientation" );
+			} else if( object.hasProperty( prefix + "Unknown Tag(0019,100e)" ) ) {
+				diff = object.getProperty<util::fvector4>( prefix + "Unknown Tag(0019,100e)" ) * bValue;
+				object.remove( prefix + "Unknown Tag(0019,100e)" );
 			} else {
-				LOG(Runtime,error) << "Found no diffusion direction for DiffusionBValue " << util::MSubject(bValue);
+				LOG( Runtime, error ) << "Found no diffusion direction for DiffusionBValue " << util::MSubject( bValue );
 			}
 		}
 	}
+
 	//@todo fallback for GE/Philips
-
-
 	////////////////////////////////////////////////////////////////
 	// Do some sanity checks on redundant tags
 	////////////////////////////////////////////////////////////////

@@ -12,7 +12,7 @@
 
 #include "io_factory.hpp"
 #ifdef WIN32
-#include <windows.h> 
+#include <windows.h>
 #else
 #include <dlfcn.h>
 #endif
@@ -38,7 +38,8 @@ struct pluginDeleter {
 	void operator()( image_io::FileFormat *format ) {
 		delete format;
 #ifdef WIN32
-		if(!FreeLibrary( (HINSTANCE)m_dlHandle ))
+
+		if( !FreeLibrary( ( HINSTANCE )m_dlHandle ) )
 #else
 		if ( dlclose( m_dlHandle ) != 0 )
 #endif
@@ -94,18 +95,17 @@ unsigned int IOFactory::findPlugins( const std::string &path )
 		if ( boost::regex_match( itr->path().leaf(), pluginFilter ) ) {
 			const std::string pluginName = itr->path().string();
 #ifdef WIN32
-			HINSTANCE handle=LoadLibrary( pluginName.c_str() ); 
+			HINSTANCE handle = LoadLibrary( pluginName.c_str() );
 #else
 			void *handle = dlopen( pluginName.c_str(), RTLD_NOW );
 #endif
 
 			if ( handle ) {
 #ifdef WIN32
-				image_io::FileFormat* ( *factory_func )() = ( image_io::FileFormat * ( * )() )GetProcAddress( handle, "factory");
+				image_io::FileFormat* ( *factory_func )() = ( image_io::FileFormat * ( * )() )GetProcAddress( handle, "factory" );
 #else
 				image_io::FileFormat* ( *factory_func )() = ( image_io::FileFormat * ( * )() )dlsym( handle, "factory" );
 #endif
-
 
 				if ( factory_func ) {
 					FileFormatPtr io_class( factory_func(), _internal::pluginDeleter( handle, pluginName ) );
@@ -128,10 +128,11 @@ unsigned int IOFactory::findPlugins( const std::string &path )
 			} else
 #ifdef WIN32
 				LOG( Runtime, error )
-				<< "Could not load library " << pluginName;
+						<< "Could not load library " << pluginName;
+
 #else
 				LOG( Runtime, error )
-				<< "Could not load library " << pluginName << ":" << util::MSubject( dlerror() );
+						<< "Could not load library " << pluginName << ":" << util::MSubject( dlerror() );
 #endif
 		} else {
 			LOG( Runtime, verbose_info )
@@ -167,16 +168,18 @@ int IOFactory::loadFile( isis::data::ChunkList &ret, const boost::filesystem::pa
 			return it->load( ret, filename.string(), dialect );
 		} catch ( std::runtime_error &e ) {
 			LOG( Runtime, error )
-					<< "Failed to load " <<  filename << " using " <<  util::MSubject(it->name()) << " ( " << e.what() << " )";
+					<< "Failed to load " <<  filename << " using " <<  util::MSubject( it->name() ) << " ( " << e.what() << " )";
 		}
 	}
-	if(boost::filesystem::exists(filename)){
+
+	if( boost::filesystem::exists( filename ) ) {
 		LOG( Runtime, error )
-			<< "No plugin found that is able to load: "
-			<< util::MSubject(filename) << (!dialect.empty() ? std::string(" with the dialect [") + dialect + "]":"");
+				<< "No plugin found that is able to load: "
+				<< util::MSubject( filename ) << ( !dialect.empty() ? std::string( " with the dialect [" ) + dialect + "]" : "" );
 	} else {
-		LOG(Runtime, error ) << util::MSubject( filename ) << " is no file or directory, and no plugin was found to load it.";
+		LOG( Runtime, error ) << util::MSubject( filename ) << " is no file or directory, and no plugin was found to load it.";
 	}
+
 	return 0;//no plugin of proposed list could load file
 }
 
@@ -217,7 +220,7 @@ data::ImageList IOFactory::load( const std::string &path, std::string suffix_ove
 	const int loaded = boost::filesystem::is_directory( p ) ?
 					   get().loadPath( chunks, p, suffix_override, dialect ) :
 					   get().loadFile( chunks, p, suffix_override, dialect );
-	BOOST_FOREACH(data::ChunkList::reference ref, chunks){
+	BOOST_FOREACH( data::ChunkList::reference ref, chunks ) {
 		if ( ! ref.hasProperty( "source" ) )
 			ref.setProperty( "source", p.string() );
 	}
@@ -230,6 +233,7 @@ data::ImageList IOFactory::load( const std::string &path, std::string suffix_ove
 int IOFactory::loadPath( isis::data::ChunkList &ret, const boost::filesystem::path &path, std::string suffix_override, std::string dialect )
 {
 	int loaded = 0;
+
 	for ( boost::filesystem::directory_iterator itr( path ); itr != boost::filesystem::directory_iterator(); ++itr )  {
 		if ( boost::filesystem::is_directory( *itr ) )continue;
 

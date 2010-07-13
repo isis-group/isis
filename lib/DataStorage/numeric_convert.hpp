@@ -16,16 +16,16 @@ namespace _internal
 template<typename SRC, typename DST> static void numeric_convert_impl( const SRC *src, DST *dst, size_t count, double scale, double offset )
 {
 	LOG( Debug, info )
-	<< "using generic scaling convert " << TypePtr<SRC>::staticName() << "=>" << TypePtr<DST>::staticName()
-	<< " with scale/offset " << std::fixed << scale << "/" << offset;
+			<< "using generic scaling convert " << TypePtr<SRC>::staticName() << "=>" << TypePtr<DST>::staticName()
+			<< " with scale/offset " << std::fixed << scale << "/" << offset;
 	static boost::numeric::converter <
 	DST, double,
-	boost::numeric::conversion_traits<DST, double>,
-	boost::numeric::def_overflow_handler,
-	boost::numeric::RoundEven<double>
-	> converter;
+	   boost::numeric::conversion_traits<DST, double>,
+	   boost::numeric::def_overflow_handler,
+	   boost::numeric::RoundEven<double>
+	   > converter;
 
-	for ( size_t i = 0; i < count; i++ ){
+	for ( size_t i = 0; i < count; i++ ) {
 		dst[i] = converter( src[i] * scale + offset );
 	}
 }
@@ -34,10 +34,10 @@ template<typename SRC, typename DST> static void numeric_convert_impl( const SRC
 	LOG( Debug, info ) << "using generic convert " << TypePtr<SRC>::staticName() << " => " << TypePtr<DST>::staticName() << " without scaling";
 	static boost::numeric::converter <
 	DST, SRC,
-	boost::numeric::conversion_traits<DST, SRC>,
-	boost::numeric::def_overflow_handler,
-	boost::numeric::RoundEven<SRC>
-	> converter;
+	   boost::numeric::conversion_traits<DST, SRC>,
+	   boost::numeric::def_overflow_handler,
+	   boost::numeric::RoundEven<SRC>
+	   > converter;
 
 	for ( size_t i = 0; i < count; i++ )
 		dst[i] = converter( src[i] );
@@ -72,20 +72,19 @@ template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &s
 	size_t srcsize = src.len();
 	bool doScale = ( scaleopt != noscale && std::numeric_limits<DST>::is_integer ); //only do scale if scaleopt!=noscale and the target is an integer (scaling into float is useless)
 
-	if ( scaleopt == autoscale && std::numeric_limits<SRC>::is_integer ){
-		LOG(Debug,verbose_info) << "Won't upscale, because the source datatype is discrete (" << util::Type<SRC>::staticName() << ")";
+	if ( scaleopt == autoscale && std::numeric_limits<SRC>::is_integer ) {
+		LOG( Debug, verbose_info ) << "Won't upscale, because the source datatype is discrete (" << util::Type<SRC>::staticName() << ")";
 		scaleopt = noupscale; //dont scale up if SRC is an integer
 	}
+
 	if ( doScale ) {
 		const DST domain_min = std::numeric_limits<DST>::min();//negative value domain of this dst
 		const DST domain_max = std::numeric_limits<DST>::max();//positive value domain of this dst
 		double minval, maxval;
-
 		LOG_IF( min.typeID() != util::Type<SRC>::staticID, Debug, info )
-		<< "The given minimum for src Range is not of the same type as the data ("	<< min.typeName() << "!=" << util::Type<SRC>::staticName() << ")";
+				<< "The given minimum for src Range is not of the same type as the data ("  << min.typeName() << "!=" << util::Type<SRC>::staticName() << ")";
 		LOG_IF( max.typeID() != util::Type<SRC>::staticID, Debug, info )
-		<< "The given maximum for src Range is not of the same type as the data ("	<< max.typeName() << "!=" << util::Type<SRC>::staticName() << ")";
-
+				<< "The given maximum for src Range is not of the same type as the data ("  << max.typeName() << "!=" << util::Type<SRC>::staticName() << ")";
 		minval = min.as<double>();
 		maxval = max.as<double>();
 		assert( minval < maxval );

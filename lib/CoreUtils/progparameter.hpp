@@ -30,7 +30,7 @@ namespace util
 {
 /**
  * Container class for programm parameters.
- * This is used as container for programm parameters. 
+ * This is used as container for programm parameters.
  * It is derived from PropertyValue, and thus can store any known type.
  * Additionally it has a description and a function to parse and store strings into its current type.
  */
@@ -47,12 +47,12 @@ public:
 	ProgParameter();
 	/**
 	 * Create a programm parameter using a initial value/type.
-	 * \param ref the intial value/type the programm parameter should get 
+	 * \param ref the intial value/type the programm parameter should get
 	 * (The value is used as default value if the parameter never gets to parse any other value)
 	 * \param needed mark this parameter as needed
 	 */
-	ProgParameter( const ProgParameter& ref): PropertyValue( static_cast<const PropertyValue&>(ref) ) {}
-	template<typename T> ProgParameter( const T& ref, bool needed = true ): PropertyValue( ref, needed ) {}
+	ProgParameter( const ProgParameter &ref ): PropertyValue( static_cast<const PropertyValue &>( ref ) ) {}
+	template<typename T> ProgParameter( const T &ref, bool needed = true ): PropertyValue( ref, needed ) {}
 	/**
 	 * Parse the given string as value into this parameter.
 	 * The parsing is done by automatic type-conversion from std::string to the type of the parameter.
@@ -78,7 +78,7 @@ public:
 	 * - boolean parameters will be will be converted to a equivalent true/false value
 	 * - Selection will be converted to a equivalent integer value
 	 * - int will be used as itself
-	 * 
+	 *
 	 * In any other case a runtime error will be raised.
 	 */
 	operator const int()const {
@@ -111,7 +111,7 @@ public:
 	ParameterMap();
 	/**
 	 * parse a given argc/argv pair.
-	 * Reads and tokenizes argv, detecs the parameter names (names are preceded by a "-") and sends the values 
+	 * Reads and tokenizes argv, detecs the parameter names (names are preceded by a "-") and sends the values
 	 * (everything between one parameter name and the other) to the corresponding ProgParameter-objects to be parsed.
 	 */
 	bool parse( int argc, char **argv );

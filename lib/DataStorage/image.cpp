@@ -74,8 +74,8 @@ bool image_chunk_order::operator() ( const data::Chunk &a, const data::Chunk &b 
 		}
 
 		LOG_IF( aNumber == bNumber, Runtime, info )
-				<< "The Chunks from \"" << a.propertyValue( "source" ).toString(false) << "\" and \""
-				<< b.propertyValue( "source" ).toString(false) << "\" seem to be equal, won't insert";
+				<< "The Chunks from \"" << a.propertyValue( "source" ).toString( false ) << "\" and \""
+				<< b.propertyValue( "source" ).toString( false ) << "\" seem to be equal, won't insert";
 	}
 
 	return false;
@@ -97,8 +97,8 @@ bool Image::insertChunk ( const Chunk &chunk )
 		return false;
 	}
 
-	LOG_IF(chunk.getProperty<util::fvector4>("indexOrigin")[3]!=0,Debug,warning)
-		<< " inserting chunk with nonzero at the 4th position - you shouldn't use the fourth dim for the time (use acquisitionTime)";
+	LOG_IF( chunk.getProperty<util::fvector4>( "indexOrigin" )[3] != 0, Debug, warning )
+			<< " inserting chunk with nonzero at the 4th position - you shouldn't use the fourth dim for the time (use acquisitionTime)";
 
 	if ( ! set.empty() ) {
 		const Chunk &first = *set.begin();
@@ -110,29 +110,29 @@ bool Image::insertChunk ( const Chunk &chunk )
 			return false;
 		}
 
-
-		if ( first.hasProperty("readVec") && chunk.hasProperty("readVec") && first.propertyValue( "readVec" ) != chunk.propertyValue( "readVec" ) ) {
+		if ( first.hasProperty( "readVec" ) && chunk.hasProperty( "readVec" ) && first.propertyValue( "readVec" ) != chunk.propertyValue( "readVec" ) ) {
 			LOG( Debug, info )
 					<< "Ignoring chunk with different readVec. (" << chunk.propertyValue( "readVec" ) << "!=" << first.propertyValue( "readVec" ) << ")";
 			return false;
 		}
 
-		if ( first.hasProperty("phaseVec") && chunk.hasProperty("phaseVec") && first.propertyValue( "phaseVec" ) != chunk.propertyValue( "phaseVec" ) ) {
+		if ( first.hasProperty( "phaseVec" ) && chunk.hasProperty( "phaseVec" ) && first.propertyValue( "phaseVec" ) != chunk.propertyValue( "phaseVec" ) ) {
 			LOG( Debug, info )
 					<< "Ignoring chunk with different phaseVec. (" << chunk.propertyValue( "phaseVec" ) << "!=" << first.propertyValue( "phaseVec" ) << ")";
 			return false;
 		}
 
 		//if our first chunk and the incoming chunk do have sequenceNumber and it differs, skip it
-		if ( first.hasProperty("coilChannelMask") && chunk.hasProperty("coilChannelMask") && first.propertyValue( "coilChannelMask" ) != chunk.propertyValue( "coilChannelMask" ) ) {
+		if ( first.hasProperty( "coilChannelMask" ) && chunk.hasProperty( "coilChannelMask" ) && first.propertyValue( "coilChannelMask" ) != chunk.propertyValue( "coilChannelMask" ) ) {
 			LOG( Debug, info )
 					<< "Ignoring chunk because its coilChannelMask doesn't fit ("
 					<< first.propertyValue( "coilChannelMask" ) << "!=" << chunk.propertyValue( "coilChannelMask" )
 					<< ")";
 			return false;
 		}
+
 		//if our first chunk and the incoming chunk do have sequenceNumber and it differs, skip it
-		if ( first.hasProperty("sequenceNumber") && chunk.hasProperty("sequenceNumber") && first.propertyValue( "sequenceNumber" ) != chunk.propertyValue( "sequenceNumber" ) ) {
+		if ( first.hasProperty( "sequenceNumber" ) && chunk.hasProperty( "sequenceNumber" ) && first.propertyValue( "sequenceNumber" ) != chunk.propertyValue( "sequenceNumber" ) ) {
 			LOG( Debug, info )
 					<< "Ignoring chunk because its sequenceNumber doesn't fit ("
 					<< first.propertyValue( "sequenceNumber" ) << "!=" << chunk.propertyValue( "sequenceNumber" )
@@ -153,18 +153,16 @@ bool Image::insertChunk ( const Chunk &chunk )
 bool Image::reIndex()
 {
 	if ( set.empty() ) {
-		clean = true;
 		LOG( Debug, warning ) << "Reindexing an empty image is useless.";
-		return true;
+		return false;
 	}
 
 	//redo lookup table
 	size_t timesteps = 1;
 	const size_t chunks = set.size();
 	lookup.resize( chunks );
-
 	util::FixedVector<size_t, n_dims> size; //storage for the size of the chunk structure
-	size.fill(1);
+	size.fill( 1 );
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////
 	//// Non Geometric sorting (put chunks with the same geometric position at the highest dimension)
@@ -183,7 +181,7 @@ bool Image::reIndex()
 		LOG_IF( chunks % timesteps, Debug, error )
 				<< "The number timesteps does not fit the number of chunks. Reindexing will fail.";
 		LOG( Debug, info ) << "Found " << timesteps << " chunks per position assuming them as timesteps";
-		size[n_dims-1]=timesteps; //store non geometric amount at the end (timeDim)
+		size[n_dims-1] = timesteps; //store non geometric amount at the end (timeDim)
 	}
 
 	if ( chunks > timesteps && chunks % timesteps == 0 ) {
@@ -213,7 +211,6 @@ bool Image::reIndex()
 	const unsigned short chunk_dims = first.relevantDims();
 	chunkVolume = first.volume();
 	//copy sizes of the chunks to to the first chunk_dims sizes of the image
-
 	//get indexOrigin from the geometrically first chunk
 	propertyValue( "indexOrigin" ) = first.propertyValue( "indexOrigin" );
 
@@ -231,13 +228,14 @@ bool Image::reIndex()
 		//thus in this case voxel() equals set.begin()->voxel()
 	} else {// OK there is at least one dimension to sort in the chunks
 		// check the chunks for at least one dimensional break - use that for the size of that dimension
-		const size_t dummy_var_for_retarded_compilers=getChunkStride();
+		const size_t dummy_var_for_retarded_compilers = getChunkStride();
 		size[chunk_dims] =  dummy_var_for_retarded_compilers ? dummy_var_for_retarded_compilers : 1;
-		const unsigned short sortDims = n_dims - (size[n_dims-1]>1?1:0); // dont use the uppermost dim, if the timesteps are allready there
+		const unsigned short sortDims = n_dims - ( size[n_dims-1] > 1 ? 1 : 0 ); // dont use the uppermost dim, if the timesteps are allready there
 
-		for ( unsigned short i = chunk_dims + 1; i < sortDims; i++ ){ //if there are dimensions left figure out their size
-			const size_t dummy_var_for_retarded_compilers=getChunkStride( size.product() ) / size.product();
-			if(dummy_var_for_retarded_compilers)
+		for ( unsigned short i = chunk_dims + 1; i < sortDims; i++ ) { //if there are dimensions left figure out their size
+			const size_t dummy_var_for_retarded_compilers = getChunkStride( size.product() ) / size.product();
+
+			if( dummy_var_for_retarded_compilers )
 				size[i] =  dummy_var_for_retarded_compilers;
 		}
 	}
@@ -271,11 +269,11 @@ bool Image::reIndex()
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	//reconstruct some redundant information, if its missing
 	//////////////////////////////////////////////////////////////////////////////////////////////////
-	const std::string vectors[]={"readVec","phaseVec","sliceVec"};
-	BOOST_FOREACH(const std::string &ref,vectors){
-		if ( hasProperty( ref ) ){
-			util::PropertyValue &prop=propertyValue( ref );
-			LOG_IF(!prop->is<util::fvector4>(),Debug,error) << "Using " << prop->typeName() << " as " << util::Type<util::fvector4>::staticName();
+	const std::string vectors[] = {"readVec", "phaseVec", "sliceVec"};
+	BOOST_FOREACH( const std::string & ref, vectors ) {
+		if ( hasProperty( ref ) ) {
+			util::PropertyValue &prop = propertyValue( ref );
+			LOG_IF( !prop->is<util::fvector4>(), Debug, error ) << "Using " << prop->typeName() << " as " << util::Type<util::fvector4>::staticName();
 			util::fvector4 &vec = prop->cast_to_Type<util::fvector4>();
 			LOG_IF( vec.len() == 0, Runtime, error )
 					<< "The existing " << ref << " " << vec << " has the length zero. Thats bad, because I'm going to normalize it.";
@@ -296,8 +294,8 @@ bool Image::reIndex()
 			distVecNorm.norm();
 
 			if ( hasProperty( "sliceVec" ) ) {
-				const util::fvector4 sliceVec = getProperty<util::fvector4>("sliceVec" );
-				LOG_IF(! distVecNorm.fuzzyEqual(sliceVec), Runtime, warning )
+				const util::fvector4 sliceVec = getProperty<util::fvector4>( "sliceVec" );
+				LOG_IF( ! distVecNorm.fuzzyEqual( sliceVec ), Runtime, warning )
 						<< "The existing sliceVec " << sliceVec
 						<< " differs from the distance vector between chunk 0 and " << size[2] - 1
 						<< " " << distVecNorm;
@@ -344,7 +342,6 @@ bool Image::reIndex()
 	if ( hasProperty( "readVec" ) && hasProperty( "phaseVec" ) ) {
 		util::fvector4 &read = propertyValue( "readVec" )->cast_to_Type<util::fvector4>();
 		util::fvector4 &phase = propertyValue( "phaseVec" )->cast_to_Type<util::fvector4>();
-
 		LOG_IF( read.dot( phase ) > 0.01, Runtime, warning ) << "The cosine between the columns and the rows of the image is bigger than 0.01";
 		const util::fvector4 crossVec = util::fvector4( //we could use their cross-product as sliceVector
 											read[1] * phase[2] - read[2] * phase[1],
@@ -455,27 +452,27 @@ size_t Image::getChunkStride ( size_t base_stride )
 		const util::fvector4 nextV = lookup[base_stride]->getProperty<util::fvector4>( "indexOrigin" );
 		const util::fvector4 dist1 = nextV - firstV;
 
-		if(dist1.sqlen()==0){ //if there is no geometric structure anymore - so asume its flat from here on
-				LOG(Debug,info) << "Distance between 0 and " << util::MSubject( base_stride ) 
-				<< " is zero. Assuming there are no dimensional breaks anymore. Returning 1";
-				return 1;
-		} else for ( size_t i = base_stride; i < lookup.size() - base_stride; i += base_stride ) { 	// compare every follwing distance to that
-			const util::fvector4 thisV = lookup[i]->getProperty<util::fvector4>( "indexOrigin" );
-			const util::fvector4 nextV = lookup[i+base_stride]->getProperty<util::fvector4>( "indexOrigin" );
-			const util::fvector4 distFirst = nextV - firstV;
-			const util::fvector4 distThis = nextV - thisV;
-			LOG( Debug, verbose_info )
-					<< "Distance between chunk " << util::MSubject( i ) << " and " << util::MSubject( i + base_stride )
-					<< " is " << distThis.len() << ". Distance between 0 and " << util::MSubject( i + base_stride ) <<" is " << distFirst.len();
+		if( dist1.sqlen() == 0 ) { //if there is no geometric structure anymore - so asume its flat from here on
+			LOG( Debug, info ) << "Distance between 0 and " << util::MSubject( base_stride )
+							   << " is zero. Assuming there are no dimensional breaks anymore. Returning 1";
+			return 1;
+		} else for ( size_t i = base_stride; i < lookup.size() - base_stride; i += base_stride ) {  // compare every follwing distance to that
+				const util::fvector4 thisV = lookup[i]->getProperty<util::fvector4>( "indexOrigin" );
+				const util::fvector4 nextV = lookup[i+base_stride]->getProperty<util::fvector4>( "indexOrigin" );
+				const util::fvector4 distFirst = nextV - firstV;
+				const util::fvector4 distThis = nextV - thisV;
+				LOG( Debug, verbose_info )
+						<< "Distance between chunk " << util::MSubject( i ) << " and " << util::MSubject( i + base_stride )
+						<< " is " << distThis.len() << ". Distance between 0 and " << util::MSubject( i + base_stride ) << " is " << distFirst.len();
 
-			if ( distFirst.sqlen() <= distThis.sqlen() ) { // found an dimensional break - leave
-				LOG( Debug, info )
-						<< "Distance between chunk " << util::MSubject( i + base_stride )
-						<< " and 0 is not bigger than the distance between " << util::MSubject( i + base_stride )
-						<< " and "<< util::MSubject( i ) << ", assuming dimensional break at " << i + base_stride;
-				return i + base_stride;
+				if ( distFirst.sqlen() <= distThis.sqlen() ) { // found an dimensional break - leave
+					LOG( Debug, info )
+							<< "Distance between chunk " << util::MSubject( i + base_stride )
+							<< " and 0 is not bigger than the distance between " << util::MSubject( i + base_stride )
+							<< " and " << util::MSubject( i ) << ", assuming dimensional break at " << i + base_stride;
+					return i + base_stride;
+				}
 			}
-		}
 	} else  if ( lookup.size() % base_stride ) {
 		LOG( Runtime, error )
 				<< "The amount of chunks (" << lookup.size()
@@ -606,13 +603,13 @@ size_t Image::cmp( const isis::data::Image &comp ) const
 
 Image::orientation Image::getMainOrientation()const
 {
-	LOG_IF(! valid() || ! clean,Debug,warning) << "You should not run this on non clean image. Run reIndex first.";
+	LOG_IF( ! valid() || ! clean, Debug, warning ) << "You should not run this on non clean image. Run reIndex first.";
 	util::fvector4 read = getProperty<util::fvector4>( "readVec" );
 	util::fvector4 phase = getProperty<util::fvector4>( "phaseVec" );
 	read.norm();
 	phase.norm();
 	LOG_IF( read.dot( phase ) > 0.01, Runtime, warning ) << "The cosine between the columns and the rows of the image is bigger than 0.01";
-	const util::fvector4 crossVec = util::fvector4( 
+	const util::fvector4 crossVec = util::fvector4(
 										read[1] * phase[2] - read[2] * phase[1],
 										read[2] * phase[0] - read[0] * phase[2],
 										read[0] * phase[1] - read[1] * phase[0]
@@ -622,7 +619,7 @@ Image::orientation Image::getMainOrientation()const
 	double a_sagittal = std::acos( crossVec.dot( x ) ) / M_PI;
 	double a_coronal  = std::acos( crossVec.dot( y ) ) / M_PI;
 	bool a_inverse = false, s_inverse = false, c_inverse = false;
-	LOG(Debug,info) << "Angles to vectors are " << a_sagittal << " to x, " << a_coronal << " to y and " << a_axial << " to z";
+	LOG( Debug, info ) << "Angles to vectors are " << a_sagittal << " to x, " << a_coronal << " to y and " << a_axial << " to z";
 
 	if( a_axial > .5 ) {
 		a_axial = std::abs( a_axial - 1 );
@@ -647,79 +644,78 @@ Image::orientation Image::getMainOrientation()const
 		return c_inverse ? reversed_coronal : coronal;
 	else
 		assert( false );
-        return axial; //will never be reached
+
+	return axial; //will never be reached
 }
 
-void Image::transformCoords(boost::numeric::ublas::matrix<float> transform)
+void Image::transformCoords( boost::numeric::ublas::matrix<float> transform )
 {
 	// create boost::numeric::ublast matrix from orientation vectors
-	boost::numeric::ublas::matrix<float> orient(3,3);
-	util::fvector4 read = getProperty<util::fvector4>("readVec");
-	util::fvector4 phase = getProperty<util::fvector4>("phaseVec");
-	util::fvector4 slice = getProperty<util::fvector4>("sliceVec");
-	util::fvector4 origin = getProperty<util::fvector4>("indexOrigin");
+	boost::numeric::ublas::matrix<float> orient( 3, 3 );
+	util::fvector4 read = getProperty<util::fvector4>( "readVec" );
+	util::fvector4 phase = getProperty<util::fvector4>( "phaseVec" );
+	util::fvector4 slice = getProperty<util::fvector4>( "sliceVec" );
+	util::fvector4 origin = getProperty<util::fvector4>( "indexOrigin" );
 
 	// copy orientation vectors into matrix columns
 	// readVec
-	for(unsigned i = 0;i<3;i++) {
-		orient(i,0) = read[i];
+	for( unsigned i = 0; i < 3; i++ ) {
+		orient( i, 0 ) = read[i];
 	}
 
 	// phaseVec
-	for(unsigned i = 0;i<3;i++) {
-		orient(i,1) = phase[i];
+	for( unsigned i = 0; i < 3; i++ ) {
+		orient( i, 1 ) = phase[i];
 	}
 
 	// sliceVec
-	for(unsigned i = 0;i<3;i++) {
-		orient(i,2) = slice[i];
+	for( unsigned i = 0; i < 3; i++ ) {
+		orient( i, 2 ) = slice[i];
 	}
 
 	// copy index origin
-	boost::numeric::ublas::vector<float> o(3);
-	for (unsigned i = 0;i < 3;i++) {
-		o(i) = origin[i];
+	boost::numeric::ublas::vector<float> o( 3 );
+
+	for ( unsigned i = 0; i < 3; i++ ) {
+		o( i ) = origin[i];
 	}
 
 	// since the orientation matrix is 3x3 orthogonal matrix it holds that
 	// orient * orient^T = I, where I is the identity matrix.
-
 	// calculate new orientation matrix --> O_new = O * T
-	boost::numeric::ublas::matrix<float> new_orient=
-	boost::numeric::ublas::prod(orient,transform);
-
+	boost::numeric::ublas::matrix<float> new_orient =
+		boost::numeric::ublas::prod( orient, transform );
 	// transform index origin into new coordinate space.
 	// o_new -> O_new * (O^-1 * o)
 	boost::numeric::ublas::vector<float> new_o =
-	boost::numeric::ublas::prod(new_orient,
-			(boost::numeric::ublas::vector<float>)boost::numeric::ublas::prod(
-					(boost::numeric::ublas::matrix<float>)boost::numeric::ublas::trans(orient),o));
+		boost::numeric::ublas::prod( new_orient,
+									 ( boost::numeric::ublas::vector<float> )boost::numeric::ublas::prod(
+										 ( boost::numeric::ublas::matrix<float> )boost::numeric::ublas::trans( orient ), o ) );
 
 	// write origin back to attributes
-	for(unsigned i=0;i<3;i++) {
-		origin[i] = new_o(i);
+	for( unsigned i = 0; i < 3; i++ ) {
+		origin[i] = new_o( i );
 	}
 
 	// readVec
-	for(unsigned i=0;i<3;i++) {
-		read[i] = new_orient(i,0);
+	for( unsigned i = 0; i < 3; i++ ) {
+		read[i] = new_orient( i, 0 );
 	}
 
 	// phaseVec
-	for(unsigned i=0;i<3;i++) {
-		phase[i] = new_orient(i,1);
+	for( unsigned i = 0; i < 3; i++ ) {
+		phase[i] = new_orient( i, 1 );
 	}
 
 	// sliceVec
-	for(unsigned i=0;i<3;i++) {
-		slice[i] = new_orient(i,2);
+	for( unsigned i = 0; i < 3; i++ ) {
+		slice[i] = new_orient( i, 2 );
 	}
 
-	setProperty<util::fvector4>("indexOrigin",origin);
-	setProperty<util::fvector4>("readVec",read);
-	setProperty<util::fvector4>("phaseVec",phase);
-	setProperty<util::fvector4>("sliceVec",slice);
-
+	setProperty<util::fvector4>( "indexOrigin", origin );
+	setProperty<util::fvector4>( "readVec", read );
+	setProperty<util::fvector4>( "phaseVec", phase );
+	setProperty<util::fvector4>( "sliceVec", slice );
 }
 
 } // END namespace data

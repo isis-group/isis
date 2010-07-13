@@ -79,8 +79,8 @@ BOOST_AUTO_TEST_CASE ( chunk_data_test2 )//Access Chunk elements via linear inde
 {
 	data::MemChunk<float> ch( 4, 3, 2, 1 );
 	std::ostringstream o;
-	const size_t vol=4*3*2*1;
-	BOOST_REQUIRE_EQUAL(vol,ch.volume());
+	const size_t vol = 4 * 3 * 2 * 1;
+	BOOST_REQUIRE_EQUAL( vol, ch.volume() );
 	unsigned short sample[vol];
 
 	for ( size_t i = 0; i < ch.volume(); i++ ) {
@@ -123,14 +123,13 @@ BOOST_AUTO_TEST_CASE ( chunk_copy_test )//Copy chunks
 }
 BOOST_AUTO_TEST_CASE ( memchunk_copy_test )//Copy chunks
 {
-	static boost::numeric::converter <	short, double,
-	boost::numeric::conversion_traits<short, double>,
-	boost::numeric::def_overflow_handler,
-	boost::numeric::RoundEven<double>
-	> converter;
-
+	static boost::numeric::converter <  short, double,
+		   boost::numeric::conversion_traits<short, double>,
+		   boost::numeric::def_overflow_handler,
+		   boost::numeric::RoundEven<double>
+		   > converter;
 	data::MemChunk<float> ch1( 4, 3, 2, 1 );
-	ch1.setProperty("indexOrigin",util::fvector4(1,2,3,4));
+	ch1.setProperty( "indexOrigin", util::fvector4( 1, 2, 3, 4 ) );
 
 	for ( size_t i = 0; i < ch1.volume(); i++ )
 		ch1.asTypePtr<float>()[i] = i;
@@ -140,18 +139,16 @@ BOOST_AUTO_TEST_CASE ( memchunk_copy_test )//Copy chunks
 	//it should of course have the same size
 	BOOST_CHECK_EQUAL( ch1.volume(), ch2.volume() );
 	BOOST_CHECK_EQUAL( ch2.volume(), ch3.volume() );
-
 	//it should have the same properties
-	BOOST_REQUIRE( ch2.hasProperty("indexOrigin") );
-	BOOST_REQUIRE( ch3.hasProperty("indexOrigin") );
-	BOOST_CHECK_EQUAL( ch1.propertyValue("indexOrigin"), ch2.propertyValue("indexOrigin") );
-	BOOST_CHECK_EQUAL( ch2.propertyValue("indexOrigin"), ch3.propertyValue("indexOrigin") );
-
-	const float scale = float(std::numeric_limits< short >::max()) / (ch2.volume()-1);
+	BOOST_REQUIRE( ch2.hasProperty( "indexOrigin" ) );
+	BOOST_REQUIRE( ch3.hasProperty( "indexOrigin" ) );
+	BOOST_CHECK_EQUAL( ch1.propertyValue( "indexOrigin" ), ch2.propertyValue( "indexOrigin" ) );
+	BOOST_CHECK_EQUAL( ch2.propertyValue( "indexOrigin" ), ch3.propertyValue( "indexOrigin" ) );
+	const float scale = float( std::numeric_limits< short >::max() ) / ( ch2.volume() - 1 );
 
 	for ( size_t i = 0; i < ch2.volume(); i++ ) {
-		BOOST_CHECK_EQUAL( ch2.asTypePtr<short>()[i], converter(i*scale ));
-		BOOST_CHECK_EQUAL( ch3.asTypePtr<short>()[i], converter(i*scale ));
+		BOOST_CHECK_EQUAL( ch2.asTypePtr<short>()[i], converter( i * scale ) );
+		BOOST_CHECK_EQUAL( ch3.asTypePtr<short>()[i], converter( i * scale ) );
 	}
 
 	data::MemChunk<short> ch4( 1, 1 );
@@ -161,76 +158,79 @@ BOOST_AUTO_TEST_CASE ( memchunk_copy_test )//Copy chunks
 	//because MemChunk does deep copy changing ch3 should not change ch2
 	for ( size_t i = 0; i < ch3.volume(); i++ ) {
 		ch3.asTypePtr<short>()[i] = 200;
-		BOOST_CHECK_EQUAL( ch2.asTypePtr<short>()[i], converter(i*scale ) );
-		BOOST_CHECK_EQUAL( ch4.asTypePtr<short>()[i], converter(i*scale ) );
+		BOOST_CHECK_EQUAL( ch2.asTypePtr<short>()[i], converter( i * scale ) );
+		BOOST_CHECK_EQUAL( ch4.asTypePtr<short>()[i], converter( i * scale ) );
 	}
 }
 
 BOOST_AUTO_TEST_CASE ( chunk_splice_test )//Copy chunks
 {
 	data::MemChunk<float> ch1( 3, 3, 3, 3 );
-	ch1.setProperty("indexOrigin",util::fvector4(1,1,1,1));
-	ch1.setProperty("readVec",util::fvector4(1,0,0));
-	ch1.setProperty("phaseVec",util::fvector4(0,1,0));
+	ch1.setProperty( "indexOrigin", util::fvector4( 1, 1, 1, 1 ) );
+	ch1.setProperty( "readVec", util::fvector4( 1, 0, 0 ) );
+	ch1.setProperty( "phaseVec", util::fvector4( 0, 1, 0 ) );
 
 	for ( size_t i = 0; i < ch1.volume(); i++ )
 		ch1.asTypePtr<float>()[i] = i;
 
-	const data::ChunkList splices=ch1.splice(data::sliceDim,util::fvector4(1,1,1,1),util::fvector4(1,1,1,1));
-	unsigned short cnt=1;
-	BOOST_CHECK_EQUAL(splices.size(),3*3);
-	BOOST_FOREACH(data::ChunkList::const_reference ref,splices){
-		BOOST_CHECK_EQUAL(ref.getProperty<util::fvector4>("indexOrigin"),util::fvector4(1,1,cnt,1));
-		cnt+=2;
+	const data::ChunkList splices = ch1.splice( data::sliceDim, util::fvector4( 1, 1, 1, 1 ), util::fvector4( 1, 1, 1, 1 ) );
+	unsigned short cnt = 1;
+	BOOST_CHECK_EQUAL( splices.size(), 3 * 3 );
+	BOOST_FOREACH( data::ChunkList::const_reference ref, splices ) {
+		BOOST_CHECK_EQUAL( ref.getProperty<util::fvector4>( "indexOrigin" ), util::fvector4( 1, 1, cnt, 1 ) );
+		cnt += 2;
 	}
 }
 
 BOOST_AUTO_TEST_CASE ( chunk_swap_test )
 {
-	data::MemChunk<float> ch1( 3, 3, 3, 1);
-	ch1.setProperty("indexOrigin",util::fvector4(1,1,1,1));
-	ch1.setProperty("readVec",util::fvector4(1,0,0));
-	ch1.setProperty("phaseVec",util::fvector4(0,1,0));
-	ch1.setProperty("sliceVec",util::fvector4(0,0,1));
-	ch1.setProperty("dummyProp", std::string("dummy") );
-	for ( size_t i = 0; i < ch1.volume(); i++ )
-			ch1.asTypePtr<float>()[i] = i;
+	data::MemChunk<float> ch1( 3, 3, 3, 1 );
+	ch1.setProperty( "indexOrigin", util::fvector4( 1, 1, 1, 1 ) );
+	ch1.setProperty( "readVec", util::fvector4( 1, 0, 0 ) );
+	ch1.setProperty( "phaseVec", util::fvector4( 0, 1, 0 ) );
+	ch1.setProperty( "sliceVec", util::fvector4( 0, 0, 1 ) );
+	ch1.setProperty( "dummyProp", std::string( "dummy" ) );
 
-	data::MemChunk<float> ch2(3, 3, 3, 1);
-	data::MemChunk<float> ch3(3, 3, 3, 1);
+	for ( size_t i = 0; i < ch1.volume(); i++ )
+		ch1.asTypePtr<float>()[i] = i;
+
+	data::MemChunk<float> ch2( 3, 3, 3, 1 );
+	data::MemChunk<float> ch3( 3, 3, 3, 1 );
 
 	//transform will not be changed...
-	for ( size_t dim=0; dim<3; dim++ ) {
+	for ( size_t dim = 0; dim < 3; dim++ ) {
 		ch1.swapAlong( ch2, dim, false );
-		BOOST_CHECK_EQUAL( ch1.getProperty<util::fvector4>("indexOrigin"), ch2.getProperty<util::fvector4>("indexOrigin") );
-		BOOST_CHECK_EQUAL( ch1.getProperty<util::fvector4>("readVec"), ch2.getProperty<util::fvector4>("readVec") );
-		BOOST_CHECK_EQUAL( ch1.getProperty<util::fvector4>("phaseVec"), ch2.getProperty<util::fvector4>("phaseVec") );
-		BOOST_CHECK_EQUAL( ch1.getProperty<util::fvector4>("sliceVec"), ch2.getProperty<util::fvector4>("sliceVec") );
-		BOOST_CHECK_EQUAL( ch1.getProperty<std::string>("dummyProp"), ch2.getProperty<std::string>("dummyProp") );
+		BOOST_CHECK_EQUAL( ch1.getProperty<util::fvector4>( "indexOrigin" ), ch2.getProperty<util::fvector4>( "indexOrigin" ) );
+		BOOST_CHECK_EQUAL( ch1.getProperty<util::fvector4>( "readVec" ), ch2.getProperty<util::fvector4>( "readVec" ) );
+		BOOST_CHECK_EQUAL( ch1.getProperty<util::fvector4>( "phaseVec" ), ch2.getProperty<util::fvector4>( "phaseVec" ) );
+		BOOST_CHECK_EQUAL( ch1.getProperty<util::fvector4>( "sliceVec" ), ch2.getProperty<util::fvector4>( "sliceVec" ) );
+		BOOST_CHECK_EQUAL( ch1.getProperty<std::string>( "dummyProp" ), ch2.getProperty<std::string>( "dummyProp" ) );
 		ch2.swapAlong( ch3, dim, false );
-		for ( size_t i=0; i < ch1.volume(); i++ ) {
-			BOOST_CHECK_EQUAL( ch1.asTypePtr<float>()[i], ch3.asTypePtr<float>()[i] );
-		}
-	}
-	//transform will be changed
-	for ( size_t dim=0; dim<3; dim++ ) {
-		ch1.swapAlong( ch2, dim, true );
-		BOOST_CHECK_EQUAL( ch1.getProperty<util::fvector4>("indexOrigin")[dim], -ch2.getProperty<util::fvector4>("indexOrigin")[dim] );
-		BOOST_CHECK_EQUAL( ch1.getProperty<util::fvector4>("readVec")[dim], -ch2.getProperty<util::fvector4>("readVec")[dim] );
-		BOOST_CHECK_EQUAL( ch1.getProperty<util::fvector4>("phaseVec")[dim], -ch2.getProperty<util::fvector4>("phaseVec")[dim] );
-		BOOST_CHECK_EQUAL( ch1.getProperty<util::fvector4>("sliceVec")[dim], -ch2.getProperty<util::fvector4>("sliceVec")[dim] );
-		BOOST_CHECK_EQUAL( ch1.getProperty<std::string>("dummyProp"), ch2.getProperty<std::string>("dummyProp") );
-		ch2.swapAlong( ch3, dim, true );
-		BOOST_CHECK_EQUAL( ch1.getProperty<util::fvector4>("indexOrigin"), ch3.getProperty<util::fvector4>("indexOrigin") );
-		BOOST_CHECK_EQUAL( ch1.getProperty<util::fvector4>("readVec"), ch3.getProperty<util::fvector4>("readVec") );
-		BOOST_CHECK_EQUAL( ch1.getProperty<util::fvector4>("phaseVec"), ch3.getProperty<util::fvector4>("phaseVec") );
-		BOOST_CHECK_EQUAL( ch1.getProperty<util::fvector4>("sliceVec"), ch3.getProperty<util::fvector4>("sliceVec") );
-		BOOST_CHECK_EQUAL( ch1.getProperty<std::string>("dummyProp"), ch3.getProperty<std::string>("dummyProp") );
-		for ( size_t i=0; i < ch1.volume(); i++ ) {
+
+		for ( size_t i = 0; i < ch1.volume(); i++ ) {
 			BOOST_CHECK_EQUAL( ch1.asTypePtr<float>()[i], ch3.asTypePtr<float>()[i] );
 		}
 	}
 
+	//transform will be changed
+	for ( size_t dim = 0; dim < 3; dim++ ) {
+		ch1.swapAlong( ch2, dim, true );
+		BOOST_CHECK_EQUAL( ch1.getProperty<util::fvector4>( "indexOrigin" )[dim], -ch2.getProperty<util::fvector4>( "indexOrigin" )[dim] );
+		BOOST_CHECK_EQUAL( ch1.getProperty<util::fvector4>( "readVec" )[dim], -ch2.getProperty<util::fvector4>( "readVec" )[dim] );
+		BOOST_CHECK_EQUAL( ch1.getProperty<util::fvector4>( "phaseVec" )[dim], -ch2.getProperty<util::fvector4>( "phaseVec" )[dim] );
+		BOOST_CHECK_EQUAL( ch1.getProperty<util::fvector4>( "sliceVec" )[dim], -ch2.getProperty<util::fvector4>( "sliceVec" )[dim] );
+		BOOST_CHECK_EQUAL( ch1.getProperty<std::string>( "dummyProp" ), ch2.getProperty<std::string>( "dummyProp" ) );
+		ch2.swapAlong( ch3, dim, true );
+		BOOST_CHECK_EQUAL( ch1.getProperty<util::fvector4>( "indexOrigin" ), ch3.getProperty<util::fvector4>( "indexOrigin" ) );
+		BOOST_CHECK_EQUAL( ch1.getProperty<util::fvector4>( "readVec" ), ch3.getProperty<util::fvector4>( "readVec" ) );
+		BOOST_CHECK_EQUAL( ch1.getProperty<util::fvector4>( "phaseVec" ), ch3.getProperty<util::fvector4>( "phaseVec" ) );
+		BOOST_CHECK_EQUAL( ch1.getProperty<util::fvector4>( "sliceVec" ), ch3.getProperty<util::fvector4>( "sliceVec" ) );
+		BOOST_CHECK_EQUAL( ch1.getProperty<std::string>( "dummyProp" ), ch3.getProperty<std::string>( "dummyProp" ) );
+
+		for ( size_t i = 0; i < ch1.volume(); i++ ) {
+			BOOST_CHECK_EQUAL( ch1.asTypePtr<float>()[i], ch3.asTypePtr<float>()[i] );
+		}
+	}
 }
 }
 }

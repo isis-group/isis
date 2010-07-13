@@ -45,7 +45,7 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 	parameters["dialect"] = std::string();
 	parameters["dialect"].needed() = false;
 	parameters["dialect"].setDescription(
-			"choose dialect of data set. The available dialects depend on the capabilities of IO plugins.");
+		"choose dialect of data set. The available dialects depend on the capabilities of IO plugins." );
 }
 
 IOApplication::~IOApplication() {}
@@ -59,7 +59,7 @@ bool IOApplication::init( int argc, char **argv, bool exitOnError )
 		std::string input = parameters["in"];
 		std::string rf = parameters["rf"];
 		std::string dl = parameters["dialect"];
-		images = data::IOFactory::load( input, rf, dl);
+		images = data::IOFactory::load( input, rf, dl );
 
 		if ( images.empty() ) {
 			if ( exitOnError )
@@ -67,13 +67,13 @@ bool IOApplication::init( int argc, char **argv, bool exitOnError )
 
 			return false;
 		} else {
-			for(ImageList::const_iterator a=images.begin();a!=images.end();a++){
-				for(ImageList::const_iterator b=a;(++b)!=images.end();){
-					const util::PropMap &aref=**a,bref=**b;
-					LOG_IF(aref.getDifference(bref).empty(),Runtime,warning) << "The metadata of the images from "
-					<< aref.propertyValue("source").toString(false)<< ":" << std::distance<ImageList::const_iterator>(images.begin(),a)
-					<< " and " << bref.propertyValue("source").toString(false)<< ":" << std::distance<ImageList::const_iterator>(images.begin(),b)
-					<< " are equal. Maybe they are duplicates.";
+			for( ImageList::const_iterator a = images.begin(); a != images.end(); a++ ) {
+				for( ImageList::const_iterator b = a; ( ++b ) != images.end(); ) {
+					const util::PropMap &aref = **a, bref = **b;
+					LOG_IF( aref.getDifference( bref ).empty(), Runtime, warning ) << "The metadata of the images from "
+							<< aref.propertyValue( "source" ).toString( false ) << ":" << std::distance<ImageList::const_iterator>( images.begin(), a )
+							<< " and " << bref.propertyValue( "source" ).toString( false ) << ":" << std::distance<ImageList::const_iterator>( images.begin(), b )
+							<< " are equal. Maybe they are duplicates.";
 				}
 			}
 		}

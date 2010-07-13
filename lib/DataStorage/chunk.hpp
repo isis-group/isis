@@ -29,8 +29,8 @@ namespace isis
 namespace data
 {
 
-	class Chunk;
-	typedef std::list<Chunk> ChunkList;
+class Chunk;
+typedef std::list<Chunk> ChunkList;
 
 
 namespace _internal
@@ -133,9 +133,9 @@ public:
 	}
 
 	Chunk &operator=( const Chunk &ref );
-	ChunkList splice(dimensions atDim,util::fvector4 voxelSize,util::fvector4 voxelGap);
-	ChunkList splice(dimensions atDim, util::fvector4 indexOriginOffset, int acquisitionNumberOffset=1);
-	
+	ChunkList splice( dimensions atDim, util::fvector4 voxelSize, util::fvector4 voxelGap );
+	ChunkList splice( dimensions atDim, util::fvector4 indexOriginOffset, int acquisitionNumberOffset = 1 );
+
 	/**
 	 * Transforms the image coordinate system into an other system by multiplying
 	 * the orientation matrix with a user defined transformation matrix. Additionally,
@@ -148,14 +148,14 @@ public:
 	 * depend on correct image orientations won't work as expected. Use this method
 	 * with caution!
 	 */
-	void transformCoords(boost::numeric::ublas::matrix<float> transform);
+	void transformCoords( boost::numeric::ublas::matrix<float> transform );
 
 	/**
 	 * Swaps the image along a dimension dim in image space. If convertTransform is true,
 	 * the transform will be converted in a way that the image is the same in physical space
 	 * as it was prior to swapping.
 	 */
-	bool swapAlong( Chunk&, const size_t dim=0, bool convertTransform=true );
+	bool swapAlong( Chunk &, const size_t dim = 0, bool convertTransform = true );
 
 };
 
@@ -206,9 +206,9 @@ public:
 	/// Create a deep copy of a given Chunk (automatic conversion with min/max will be used if datatype does not fit)
 	MemChunk( const Chunk &ref, const util::_internal::TypeBase &min, const  util::_internal::TypeBase &max ): Chunk( ref ) {
 		_internal::ChunkBase::operator=( static_cast<const _internal::ChunkBase &>( ref ) ); //copy the metadate of ref
-		LOG(Debug,verbose_info)
-		<< "Copy converting a Chunk of size " << util::MSubject(ref.sizeToVector())
-		<< " and type " << ref.typeName() << " with the properties " << static_cast<const util::PropMap &>( ref ).getKeys();
+		LOG( Debug, verbose_info )
+				<< "Copy converting a Chunk of size " << util::MSubject( ref.sizeToVector() )
+				<< " and type " << ref.typeName() << " with the properties " << static_cast<const util::PropMap &>( ref ).getKeys();
 		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
 		_internal::TypePtrBase::Reference::reset( new TypePtr<TYPE>( ref.getTypePtrBase().copyToNew<TYPE>( min, max ) ) );
 	}

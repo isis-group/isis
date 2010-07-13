@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE ( imageLoadtest )
 	/*  util::enable_log<util::DefaultMsgPrint>(info);
 	    data::enable_log<util::DefaultMsgPrint>(info);*/
 	// just to make sure the wanted file exists
-	FILE* f = fopen( "test.null", "w" );
+	FILE *f = fopen( "test.null", "w" );
 	fclose( f );
 	data::ImageList images = data::IOFactory::load( "test.null", "" );
 	// the null-loader shall generate 5 50x50x50x10 images

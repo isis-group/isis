@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_SUITE ( imageIONii_NullTests )
 
 BOOST_AUTO_TEST_CASE( loadsaveImage )
 {
-// 	data::enable_log<util::DefaultMsgPrint>(info);
+	//  data::enable_log<util::DefaultMsgPrint>(info);
 	data::ImageList images;
 	image_io::enable_log<util::DefaultMsgPrint>( info );
 	//  We will use the Null plugin to get some image data

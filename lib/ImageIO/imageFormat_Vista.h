@@ -57,14 +57,14 @@ private:
 	 * @param image The target image. Alle metadata will be copied to the
 	 * corresponding header attributes.
 	 */
-	void copyHeaderToVista(const data::Image& image, VImage& vimage);
+	void copyHeaderToVista( const data::Image &image, VImage &vimage );
 
 	/**
 	 * Copies the whole itk image into a given vista image. This function is
 	 * templated over the pixel data type of the target vista image. Therefore
 	 * correct data types should be vista data types like VShort, VUByte, etc. .
 	 */
-	template <typename T> bool copyImageToVista(const data::Image& image, VImage& vimage);
+	template <typename T> bool copyImageToVista( const data::Image &image, VImage &vimage );
 
 	/**
 	 * This function copies all metadata from Vista image header attributes to
@@ -72,13 +72,13 @@ private:
 	 * @param image The target chunk where all data will be copied to.
 	 * @oaram chunk The source image that provides the Vista metadata attributes.
 	 */
-	void copyHeaderFromVista(const VImage& image, data::Chunk& chunk);
+	void copyHeaderFromVista( const VImage &image, data::Chunk &chunk );
 
 	/**
 	 * This function creates a MemChunk with the correct type and adds it to the
 	 * end of the Chunk list.
 	 */
-	template <typename TInput> void addChunk(data::ChunkList &chunks, VImage image);
+	template <typename TInput> void addChunk( data::ChunkList &chunks, VImage image );
 };
 
 }

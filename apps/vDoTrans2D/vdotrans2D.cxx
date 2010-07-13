@@ -71,7 +71,7 @@ static VBoolean use_inverse = false;
 static VShort number_threads = 1;
 
 static VOptionDescRec options[] = {
-//requiered inputs
+	//requiered inputs
 	{"in", VStringRepn, 1, &in_filename, &in_found, 0, "the input image filename"}, {
 		"out", VStringRepn, 1,
 		&out_filename, &out_found, 0, "the output image filename"
@@ -101,7 +101,7 @@ static VOptionDescRec options[] = {
 
 int main(
 
-	int argc, char* argv[] )
+	int argc, char *argv[] )
 {
 	// show revision information string constant
 	std::cout << "Core Version: " << isis::util::Application::getCoreVersion() << std::endl;
@@ -156,7 +156,7 @@ int main(
 	CastImageFilterType::Pointer caster = CastImageFilterType::New();
 	isis::extitk::ProcessUpdate::Pointer progressObserver = isis::extitk::ProcessUpdate::New();
 	TimeStepExtractionFilterType::Pointer timeStepExtractionFilter = TimeStepExtractionFilterType::New();
-	isis::extitk::TransformMerger2D* transformMerger = new isis::extitk::TransformMerger2D;
+	isis::extitk::TransformMerger2D *transformMerger = new isis::extitk::TransformMerger2D;
 	DeformationFieldReaderType::Pointer deformationFieldReader = DeformationFieldReaderType::New();
 	ImageReaderType::Pointer reader = ImageReaderType::New();
 	ImageReaderType::Pointer templateReader = ImageReaderType::New();
@@ -221,7 +221,7 @@ int main(
 
 		if ( number_trans > 1 ) {
 			for ( unsigned int i = 0; i < number_trans; i++ ) {
-				itk::TransformFileReader::TransformListType* transformList =
+				itk::TransformFileReader::TransformListType *transformList =
 					new itk::TransformFileReader::TransformListType;
 				transformFileReader->SetFileName( ( ( VStringConst * ) trans_filename.vector )[i] );
 				transformFileReader->Update();
@@ -244,7 +244,7 @@ int main(
 
 			//setting up the resample object
 			if ( use_inverse ) {
-//              transform->SetParameters(static_cast<TransformPointer>((*ti).GetPointer())->GetInverseTransform()->GetParameters());
+				//              transform->SetParameters(static_cast<TransformPointer>((*ti).GetPointer())->GetInverseTransform()->GetParameters());
 				resampler->SetTransform( transform );
 			}
 

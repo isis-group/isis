@@ -92,8 +92,8 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 // VC90 thinks bool is numeric - so tell him it isn't
 /////////////////////////////////////////////////////////////////////////////
-template<typename SRC> class TypePtrConverter<true, false, SRC, bool> : public TypePtrGenerator<SRC, bool>{virtual ~TypePtrConverter() {}};
-template<typename DST> class TypePtrConverter<true, false, bool, DST> : public TypePtrGenerator<bool, DST>{virtual ~TypePtrConverter() {}};
+template<typename SRC> class TypePtrConverter<true, false, SRC, bool> : public TypePtrGenerator<SRC, bool> {virtual ~TypePtrConverter() {}};
+template<typename DST> class TypePtrConverter<true, false, bool, DST> : public TypePtrGenerator<bool, DST> {virtual ~TypePtrConverter() {}};
 
 /////////////////////////////////////////////////////////////////////////////
 // Numeric version -- uses numeric_convert

@@ -32,7 +32,7 @@ namespace util
 {
 namespace _internal
 {
-	class treeNode; //predeclare treeNode -- we'll need it in PropMap
+class treeNode; //predeclare treeNode -- we'll need it in PropMap
 }
 /// A mapping tree to store properties (keys / values)
 class PropMap : protected std::map<std::string, _internal::treeNode, _internal::caselessStringLess>
@@ -244,14 +244,16 @@ public:
 	 */
 	template<typename T> PropertyValue &setProperty( const std::string &key, const T &val ) {
 		PropertyValue &ret = propertyValue( key );
-		if(ret.empty()){
-			const bool needed=ret.needed();
-			(ret = val).needed()=needed;
-		} else if(ret->is<T>() ){
-			ret->cast_to_Type<T>()=val;
+
+		if( ret.empty() ) {
+			const bool needed = ret.needed();
+			( ret = val ).needed() = needed;
+		} else if( ret->is<T>() ) {
+			ret->cast_to_Type<T>() = val;
 		} else { // don't overwrite allready set properties with a different type
-			LOG(Runtime,error) << "Property " << MSubject(key) << " is allready set to " << MSubject(ret.toString(true)) << " won't override";
+			LOG( Runtime, error ) << "Property " << MSubject( key ) << " is allready set to " << MSubject( ret.toString( true ) ) << " won't override";
 		}
+
 		return ret;
 	}
 	/**
@@ -286,15 +288,19 @@ namespace std ///predeclare streaming output -- we'll need it in treeNode
 {
 /// Streaming output for PropMap::node
 template<typename charT, typename traits>
-	basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::_internal::treeNode& s );
+basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::_internal::treeNode &s );
 /// Streaming output for PropMap
 template<typename charT, typename traits>
-	basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::PropMap &s );
+basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::PropMap &s );
 }
 
 
 // OK, lets define treeNode
-namespace isis{ namespace util{ namespace _internal 
+namespace isis
+{
+namespace util
+{
+namespace _internal
 {
 class treeNode
 {
@@ -332,7 +338,7 @@ public:
 	}
 };
 }
-	
+
 // and now we can define walkTree (needs treeNode to be defined)
 template<class Predicate> struct PropMap::walkTree {
 	key_list &m_out;
@@ -351,43 +357,47 @@ template<class Predicate> struct PropMap::walkTree {
 };
 
 // as well as PropMap::getProperty ...
-template<typename T> T PropMap::getProperty(const std::string& key) const
+template<typename T> T PropMap::getProperty( const std::string &key ) const
 {
-	const mapped_type *entry=findEntry( key );
-	if(entry){
-		const PropertyValue &ref=entry->getLeaf();
-		if(!ref.empty())
+	const mapped_type *entry = findEntry( key );
+
+	if( entry ) {
+		const PropertyValue &ref = entry->getLeaf();
+
+		if( !ref.empty() )
 			return ref->as<T>();
 	}
-	LOG(Debug,warning) << "Returning " << Type<T>().toString(true) << " because property " << key << " does not exist";
+
+	LOG( Debug, warning ) << "Returning " << Type<T>().toString( true ) << " because property " << key << " does not exist";
 	return T();
 }
 
-}}
+}
+}
 
 // and finally define the streaming output for treeNode
 namespace std
 {
-	/// Streaming output for PropMap::node
-	template<typename charT, typename traits>
-	basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::_internal::treeNode& s )
-	{
-		if( s.is_leaf() )
-			out << s.getLeaf();
-		else
-			out << "[[Subtree with " << s.getBranch().getKeys().size() << " elements]]";
-		
-		return out;
-	}
-	/// Streaming output for PropMap
-	template<typename charT, typename traits>
-	basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::PropMap &s )
-	{
-		isis::util::PropMap::flat_map buff;
-		s.linearize( buff );
-		isis::util::write_list( buff.begin(), buff.end(), out );
-		return out;
-	}
+/// Streaming output for PropMap::node
+template<typename charT, typename traits>
+basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::_internal::treeNode &s )
+{
+	if( s.is_leaf() )
+		out << s.getLeaf();
+	else
+		out << "[[Subtree with " << s.getBranch().getKeys().size() << " elements]]";
+
+	return out;
+}
+/// Streaming output for PropMap
+template<typename charT, typename traits>
+basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::PropMap &s )
+{
+	isis::util::PropMap::flat_map buff;
+	s.linearize( buff );
+	isis::util::write_list( buff.begin(), buff.end(), out );
+	return out;
+}
 }
 
 #endif

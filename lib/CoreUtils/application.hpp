@@ -39,7 +39,7 @@ public:
 	 * Default Constructor.
 	 * Creates the application and its parameter map.
 	 * No programm parameter is parsed here. To do that use init()
-	 * \param name name of the application. 
+	 * \param name name of the application.
 	 */
 	Application( const char name[] );
 	virtual ~Application();

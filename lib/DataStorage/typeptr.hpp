@@ -25,10 +25,13 @@
 #include "CoreUtils/type.hpp"
 #include "common.hpp"
 
-namespace isis{
-namespace data{
+namespace isis
+{
+namespace data
+{
 
-namespace _internal{
+namespace _internal
+{
 template<typename T, bool isNumber> struct getMinMaxImpl {
 	std::pair<T, T> operator()( const TypePtr<T> &ref ) const {
 		LOG( Debug, error ) << "min/max comparison of " << util::Type<T>::staticName() << " is not supportet";
@@ -67,7 +70,7 @@ protected:
 	const boost::weak_ptr<void> address()const {
 		return boost::weak_ptr<void>( m_val );
 	}
-	TypePtrBase* clone() const {
+	TypePtrBase *clone() const {
 		return new TypePtr( *this );
 	}
 public:
@@ -87,8 +90,8 @@ public:
 		/// decrement the use_count of the master when a specific part is not referenced anymore
 		void operator()( TYPE *at ) {
 			LOG( Debug, verbose_info )
-			<< "Deletion for " << this->get() << " called from splice at offset "   << at - this->get()
-			<< ", current use_count: " << this->use_count();
+					<< "Deletion for " << this->get() << " called from splice at offset "   << at - this->get()
+					<< ", current use_count: " << this->use_count();
 			this->reset();//actually not needed, but we keep it here to keep obfuscation low
 		}
 	};
@@ -96,14 +99,14 @@ public:
 	struct NonDeleter {
 		void operator()( TYPE *p ) {
 			//we have to cast the pointer to void* here, because in case of u_int8_t it will try to print the "string"
-			LOG( Debug, info ) << "Not freeing pointer " << ( void* )p << " (" << TypePtr<TYPE>::staticName() << ") ";
+			LOG( Debug, info ) << "Not freeing pointer " << ( void * )p << " (" << TypePtr<TYPE>::staticName() << ") ";
 		};
 	};
 	/// Default delete-functor for c-arrays (uses free()).
 	struct BasicDeleter {
 		void operator()( TYPE *p ) {
 			//we have to cast the pointer to void* here, because in case of u_int8_t it will try to print the "string"
-			LOG( Debug, info ) << "Freeing pointer " << ( void* )p << " (" << TypePtr<TYPE>::staticName() << ") ";
+			LOG( Debug, info ) << "Freeing pointer " << ( void * )p << " (" << TypePtr<TYPE>::staticName() << ") ";
 			free( p );
 		};
 	};
@@ -111,7 +114,7 @@ public:
 	struct ObjectArrayDeleter {
 		void operator()( TYPE *p ) {
 			//we have to cast the pointer to void* here, because in case of u_int8_t it will try to print the "string"
-			LOG( Debug, info ) << "Deleting object array at " << ( void* )p << " (" << TypePtr<TYPE>::staticName() << ") ";
+			LOG( Debug, info ) << "Deleting object array at " << ( void * )p << " (" << TypePtr<TYPE>::staticName() << ") ";
 			delete[] p;
 		};
 	};
@@ -130,8 +133,8 @@ public:
 	 * \param length the length of the used array (TypePtr does NOT check for length,
 	 * this is just here for child classes which may want to check)
 	 */
-	TypePtr( TYPE* const ptr, size_t length ):
-			_internal::TypePtrBase( length ), m_val( ptr, BasicDeleter() ) {}
+	TypePtr( TYPE *const ptr, size_t length ):
+		_internal::TypePtrBase( length ), m_val( ptr, BasicDeleter() ) {}
 	/**
 	 * Creates TypePtr from a pointer of type TYPE.
 	 * The pointers are automatically deleted by an copy of d and should not be used outside once used here
@@ -143,44 +146,44 @@ public:
 	 * \param d the deleter to be used when the data shall be deleted ( d() is called then )
 	 */
 
-	template<typename D> TypePtr( TYPE* const ptr, size_t length, D d ):
-			_internal::TypePtrBase( length ), m_val( ptr, d ) {}
+	template<typename D> TypePtr( TYPE *const ptr, size_t length, D d ):
+		_internal::TypePtrBase( length ), m_val( ptr, d ) {}
 
 	virtual ~TypePtr() {}
 
 	/// Copy elements from raw memory
-	void copyFromMem( const TYPE* const src, size_t length ) {
+	void copyFromMem( const TYPE *const src, size_t length ) {
 		LOG_IF( length > len(), Runtime, error )
-		<< "Amount of the elements to copy from memory (" << length << ") exceeds the length of the array (" << len() << ")";
+				<< "Amount of the elements to copy from memory (" << length << ") exceeds the length of the array (" << len() << ")";
 		TYPE &dest = this->operator[]( 0 );
-		LOG( Debug, info ) << "Copying " << length*sizeof( TYPE ) << " bytes of " << typeName() << " from " << src << " to " << &dest;
+		LOG( Debug, info ) << "Copying " << length *sizeof( TYPE ) << " bytes of " << typeName() << " from " << src << " to " << &dest;
 		memcpy( &dest, src, length * sizeof( TYPE ) );
 	}
 	/// Copy elements within a range [start,end] to raw memory
-	void copyToMem( size_t start, size_t end, TYPE* const dst )const {
+	void copyToMem( size_t start, size_t end, TYPE *const dst )const {
 		assert( start <= end );
 		const size_t length = end - start + 1;
 		LOG_IF( end >= len(), Runtime, error )
-		<< "End of the range (" << end << ") is behind the end of this TypePtr (" << len() << ")";
+				<< "End of the range (" << end << ") is behind the end of this TypePtr (" << len() << ")";
 		const TYPE &source = this->operator[]( start );
 		memcpy( dst, &source, length * sizeof( TYPE ) );
 	}
-	size_t cmp( size_t start, size_t end, const _internal::TypePtrBase& dst, size_t dst_start ) const {
+	size_t cmp( size_t start, size_t end, const _internal::TypePtrBase &dst, size_t dst_start ) const {
 		assert( start <= end );
 		size_t ret = 0;
 		size_t length = end - start;
 
 		if ( dst.typeID() != typeID() ) {
 			LOG( Runtime, error )
-			<< "Comparing to a TypePtr of different type(" << dst.typeName() << ", not " << typeName()
-			<< "). Assuming all voxels to be different";
+					<< "Comparing to a TypePtr of different type(" << dst.typeName() << ", not " << typeName()
+					<< "). Assuming all voxels to be different";
 			return length;
 		}
 
 		LOG_IF( end >= len(), Runtime, error )
-		<< "End of the range (" << end << ") is behind the end of this TypePtr (" << len() << ")";
+				<< "End of the range (" << end << ") is behind the end of this TypePtr (" << len() << ")";
 		LOG_IF( length + dst_start >= dst.len(), Runtime, error )
-		<< "End of the range (" << length + dst_start << ") is behind the end of the destination (" << dst.len() << ")";
+				<< "End of the range (" << length + dst_start << ") is behind the end of the destination (" << dst.len() << ")";
 		const TypePtr<TYPE> &compare = dst.cast_to_TypePtr<TYPE>();
 		LOG( Debug, verbose_info ) << "Comparing " << dst.typeName() << " at " << &operator[]( 0 ) << " and " << &compare[0];
 
@@ -193,7 +196,7 @@ public:
 	}
 
 	/// @copydoc Type::is()
-	virtual bool is( const std::type_info & t )const {
+	virtual bool is( const std::type_info &t )const {
 		return t == typeid( TYPE );
 	}
 	/// @copydoc Type::toString()
@@ -201,7 +204,7 @@ public:
 		std::string ret;
 
 		if ( m_len ) {
-			const TYPE* ptr = m_val.get();
+			const TYPE *ptr = m_val.get();
 
 			for ( size_t i = 0; i < m_len - 1; i++ )
 				ret += util::Type<TYPE>( ptr[i] ).toString( false ) + "|";
@@ -229,7 +232,7 @@ public:
 	 * If index is invalid, behaviour is undefined. Probably it will crash.
 	 * \return reference to element at at given index.
 	 */
-	TYPE& operator[]( size_t idx ) {
+	TYPE &operator[]( size_t idx ) {
 		return ( m_val.get() )[idx];
 	}
 	const TYPE &operator[]( size_t idx )const {
@@ -245,19 +248,19 @@ public:
 	operator const boost::shared_ptr<TYPE>&()const {return m_val;}
 
 	TypePtrBase::Reference cloneToMem( size_t length ) const {
-		return TypePtrBase::Reference( new TypePtr( ( TYPE* )malloc( length * sizeof( TYPE ) ), length ) );
+		return TypePtrBase::Reference( new TypePtr( ( TYPE * )malloc( length * sizeof( TYPE ) ), length ) );
 	}
 	size_t bytes_per_elem() const {
 		return sizeof( TYPE );
 	}
-	bool convertTo( TypePtrBase& dst )const {
+	bool convertTo( TypePtrBase &dst )const {
 		util::_internal::TypeBase::Reference min, max;
 		getMinMax( min, max );
 		assert( ! ( min.empty() || max.empty() ) );
 		return TypePtrBase::convertTo( dst, *min, *max );
 	}
 	/// \copydoc TypePtrBase::getMinMax
-	void getMinMax ( util::_internal::TypeBase::Reference &min, util::_internal::TypeBase::Reference& max ) const {
+	void getMinMax ( util::_internal::TypeBase::Reference &min, util::_internal::TypeBase::Reference &max ) const {
 		if ( len() == 0 ) {
 			LOG( Runtime, warning ) << "Skipping computation of min/max on an empty TypePtr";
 			return;
@@ -275,7 +278,7 @@ public:
 	std::vector<Reference> splice( size_t size )const {
 		if ( size >= len() ) {
 			LOG( Debug, warning )
-			<< "splicing data of the size " << len() << " up into blocks of the size " << size << " is kind of useless ...";
+					<< "splicing data of the size " << len() << " up into blocks of the size " << size << " is kind of useless ...";
 		}
 
 		const size_t fullSplices = len() / size;
@@ -300,5 +303,6 @@ public:
 
 };
 
-}}
+}
+}
 #endif // TYPEPTR_HPP

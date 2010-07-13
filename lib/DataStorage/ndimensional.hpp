@@ -67,11 +67,11 @@ public:
 	 */
 	void init( const size_t d[DIMS] ) {
 		std::copy( d, d + DIMS, dim );
-		LOG_IF(volume()==0,Runtime,error) << "Creating object with volume of 0";
+		LOG_IF( volume() == 0, Runtime, error ) << "Creating object with volume of 0";
 	}
 	void init( const util::FixedVector<size_t, DIMS>& d ) {
-		d.copyTo(dim);
-		LOG_IF(volume()==0,Runtime,error) << "Creating object with volume of 0";
+		d.copyTo( dim );
+		LOG_IF( volume() == 0, Runtime, error ) << "Creating object with volume of 0";
 	}
 	NDimensional( const NDimensional &src ) {//@todo default copier should do the job
 		init( src.dim );
@@ -127,7 +127,7 @@ public:
 		return ret;
 	}
 	util::FixedVector<float, DIMS> getFoV( const util::FixedVector<float, DIMS> &voxelSize, const util::FixedVector<float, DIMS> &voxelGap )const {
-		DISABLE_WARN(4244);
+		DISABLE_WARN( 4244 );
 		LOG_IF( volume() == 0, DataLog, warning ) << "Calculating FoV of empty data";
 		const util::FixedVector<size_t, DIMS> voxels = sizeToVector();
 		const util::fvector4 gapSize = voxelGap * ( voxels - 1 );

@@ -125,48 +125,48 @@ throw( std::runtime_error & )
 		nimages = 1;
 
 		// choose data type
-		switch( image.getChunk(0,0,0,0).typeID() ) {
+		switch( image.getChunk( 0, 0, 0, 0 ).typeID() ) {
 			// VBit
 		case data::TypePtr<VBit>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VBitRepn );
-			copyImageToVista<uint8_t>(image,vimages[0]);
+			copyImageToVista<uint8_t>( image, vimages[0] );
 			break;
 			// VUByte
 		case data::TypePtr<VUByte>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VUByteRepn );
-			copyImageToVista<VUByte>(image,vimages[0]);
+			copyImageToVista<VUByte>( image, vimages[0] );
 			break;
 			// VSByte
 		case data::TypePtr<VSByte>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VSByteRepn );
-			copyImageToVista<VSByte>(image,vimages[0]);
+			copyImageToVista<VSByte>( image, vimages[0] );
 			break;
 			// VShort
 		case data::TypePtr<u_int16_t>::staticID:
-			LOG(Runtime,warning) << "Vista does not support " << util::Type<u_int16_t>::staticName() << " falling back to " << util::Type<VShort>::staticName();
+			LOG( Runtime, warning ) << "Vista does not support " << util::Type<u_int16_t>::staticName() << " falling back to " << util::Type<VShort>::staticName();
 		case data::TypePtr<VShort>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VShortRepn );
-			copyImageToVista<VShort>(image,vimages[0]);
+			copyImageToVista<VShort>( image, vimages[0] );
 			break;
 			// VLong
 		case data::TypePtr<VLong>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VLongRepn );
-			copyImageToVista<VLong>(image,vimages[0]);
+			copyImageToVista<VLong>( image, vimages[0] );
 			break;
 			// VFloat
 		case data::TypePtr<VFloat>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VFloatRepn );
-			copyImageToVista<VFloat>(image,vimages[0]);
+			copyImageToVista<VFloat>( image, vimages[0] );
 			break;
 			// VDouble
 		case data::TypePtr<VDouble>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VDoubleRepn );
-			copyImageToVista<VDouble>(image,vimages[0]);
+			copyImageToVista<VDouble>( image, vimages[0] );
 			break;
 			// default error
 		default:
 			LOG( image_io::Runtime, error )
-					<< "Can't map image type " << image.getChunk(0).typeName() << "(" << image.getChunk(0).typeID() << ") to vista type. Aborting" ;
+					<< "Can't map image type " << image.getChunk( 0 ).typeName() << "(" << image.getChunk( 0 ).typeID() << ") to vista type. Aborting" ;
 			return;
 		}
 
@@ -216,131 +216,124 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 	// enable "warning" log level
 	image_io::enable_log<util::DefaultMsgPrint>( warning );
 	LOG( image_io::Runtime, info ) << "found " << nimages << " images.";
-
 	/* interpred the image data structure according to the given dialects:
 	 *
 	 * FUNCTIONAL: The vista image contains functional data. In this case there
-	 * 			   are a number of VShort images which represents the slices of
+	 *             are a number of VShort images which represents the slices of
 	 *             the functional image data. This dialect will create a 4-D image.
-	 * MAP:	   The vista image contains data which represents a statistical
-	 * 			   map. In this case the first 3D VFloat images will be loaded
-	 * 			   which represents the mapping layer.
+	 * MAP:    The vista image contains data which represents a statistical
+	 *             map. In this case the first 3D VFloat images will be loaded
+	 *             which represents the mapping layer.
 	 * ANATOMICAL: The vista images contains presumably a number of anatomical
-	 * 			   images. Each image will be saved in a seperate isis image
+	 *             images. Each image will be saved in a seperate isis image
 	 *             with the according data type.
 	 */
 
-	 // FUNCTIONAL -> copy every subimage into one chunk, splice the chunk
-	 // along the z-direction -> add all resulting chunks to the chunk list.
-	 if(dialect == std::string("functional")){
+	// FUNCTIONAL -> copy every subimage into one chunk, splice the chunk
+	// along the z-direction -> add all resulting chunks to the chunk list.
+	if( dialect == std::string( "functional" ) ) {
+	}
+	// MAP -> the vista image should contain a single 3D VFloat image. Hence the
+	// first image found will be saved in a float MemChunk add added to the ChunkList.
+	else if( dialect == std::string( "map" ) ) {
+		VImage img = 0;
 
-	 }
-	 // MAP -> the vista image should contain a single 3D VFloat image. Hence the
-	 // first image found will be saved in a float MemChunk add added to the ChunkList.
-	 else if(dialect == std::string("map")){
+		// print a warning message when there are more than one image.
+		if( nimages >= 1 ) {
+			LOG( image_io::Runtime, warning )
+					<< "Multiple images found. Will use the first VFloat image.";
+		}
 
-		 VImage img = 0;
+		// have a look for the first float image
+		for( unsigned k = 0; k < nimages; k++ ) {
+			if( VPixelRepn( images[k] ) ) {
+				img = images[k];
+				break;
+			}
+		}
 
-		 // print a warning message when there are more than one image.
-		 if(nimages >= 1){
-			 LOG( image_io::Runtime, warning)
-					 << "Multiple images found. Will use the first VFloat image.";
+		// if no image found -> abort loading process.
+		if( img == 0 ) {
+			LOG( image_io::Runtime, error )
+					<< "No float images found. Abort.";
+		}
 
-		 }
+		addChunk<VFloat>( chunks, img );
+	}
+	// default: ANATOMICAL -> copy every image into a separate isis image with
+	// the corresponding data type.
+	else {
+		for( unsigned k = 0; k < nimages; k++ ) {
+			switch( VPixelRepn( images[k] ) ) {
+			case VBitRepn:
+				addChunk<uint8_t>( chunks, images[k] );
+				break;
+			case VUByteRepn:
+				addChunk<VUByte>( chunks, images[k] );
+				break;
+			case VSByteRepn:
+				addChunk<VSByte>( chunks, images[k] );
+				break;
+			case VShortRepn:
+				addChunk<VShort>( chunks, images[k] );
+				break;
+			case VLongRepn:
+				addChunk<VLong>( chunks, images[k] );
+				break;
+			case VFloatRepn:
+				addChunk<VFloat>( chunks, images[k] );
+				break;
+			case VDoubleRepn:
+				addChunk<VDouble>( chunks, images[k] );
+			default:
+				LOG( image_io::Runtime, error )
+						<< "No Vista datatype found. Input image is broken. Abort.";
+			}// switch(VPixelRepn(images[k]))
+		}
+	} // END else
 
-		 // have a look for the first float image
-		 for(unsigned k=0;k<nimages;k++){
-			 if(VPixelRepn(images[k])){
-				 img = images[k];
-				 break;
-			 }
-		 }
-
-		 // if no image found -> abort loading process.
-		 if(img == 0){
-			 LOG( image_io::Runtime, error )
-					 << "No float images found. Abort.";
-		 }
-
-		addChunk<VFloat>(chunks,img);
-
-	 }
-	 // default: ANATOMICAL -> copy every image into a separate isis image with
-	 // the corresponding data type.
-	 else {
-		 for(unsigned k=0;k<nimages;k++){
-			 switch( VPixelRepn( images[k] ) ) {
-				case VBitRepn:
-					addChunk<uint8_t>( chunks, images[k] );
-					break;
-				case VUByteRepn:
-					addChunk<VUByte>( chunks, images[k] );
-					break;
-				case VSByteRepn:
-					addChunk<VSByte>( chunks, images[k] );
-					break;
-				case VShortRepn:
-					addChunk<VShort>( chunks, images[k] );
-					break;
-				case VLongRepn:
-					addChunk<VLong>( chunks, images[k] );
-					break;
-				case VFloatRepn:
-					addChunk<VFloat>( chunks, images[k] );
-					break;
-				case VDoubleRepn:
-					addChunk<VDouble>( chunks, images[k] );
-				default:
-					LOG( image_io::Runtime, error )
-							<< "No Vista datatype found. Input image is broken. Abort.";
-				}// switch(VPixelRepn(images[k]))
-		 }
-	 } // END else
-
-
-//	// found serveral images -> assume that this is a functional data set.
-//
-//		// number of images that where actual copied; ncopy <= nimages. In functional
-//		// data images, the the number of images copied corresponds to the number of
-//		// slices copied.
-//		unsigned ncopy = 0;
-//
-//		// create and empty MemChunk of type short to store the image data
-//		data::MemChunk<short>* mchunk =
-//				new data::MemChunk<short>(VImageNColumns(images[0]),
-//										VImageNRows(images[0]),
-//										nimages,
-//										VImageNBands(images[0]));
-//
-//		// iterate over images and compose a 4-D chunk from all short images.
-//		for(unsigned k = 0;k < nimages; k++){
-//
-//			// functional vista data should be short data. If not skip it.
-//			if (VPixelRepn(images[k]) != VShortRepn)
-//				continue;
-//
-//			// found an additional image to insert into image
-//			ncopy++;
-//
-//			// copy image voxelwise into MemChunk
-//			for(unsigned b = 0;b<(unsigned)VImageNBands(images[k]);b++){
-//				for(unsigned r = 0;r<(unsigned)VImageNRows(images[k]);r++){
-//					for(unsigned c = 0;c<(unsigned)VImageNColumns(images[k]);c++){
-//						mchunk->voxel<VShort>(c,r,ncopy-1,b)
-//								= VPixel(images[k],b,r,c,VShort);
-//					}
-//				}
-//			} // END copy voxel
-//
-//		} // END iterate over images
-//
-//		// copy header information from first image in the image list.
-//		copyHeaderFromVista(images[0],*mchunk);
-//		chunks.push_back(*mchunk);
-
-
+	//  // found serveral images -> assume that this is a functional data set.
+	//
+	//      // number of images that where actual copied; ncopy <= nimages. In functional
+	//      // data images, the the number of images copied corresponds to the number of
+	//      // slices copied.
+	//      unsigned ncopy = 0;
+	//
+	//      // create and empty MemChunk of type short to store the image data
+	//      data::MemChunk<short>* mchunk =
+	//              new data::MemChunk<short>(VImageNColumns(images[0]),
+	//                                      VImageNRows(images[0]),
+	//                                      nimages,
+	//                                      VImageNBands(images[0]));
+	//
+	//      // iterate over images and compose a 4-D chunk from all short images.
+	//      for(unsigned k = 0;k < nimages; k++){
+	//
+	//          // functional vista data should be short data. If not skip it.
+	//          if (VPixelRepn(images[k]) != VShortRepn)
+	//              continue;
+	//
+	//          // found an additional image to insert into image
+	//          ncopy++;
+	//
+	//          // copy image voxelwise into MemChunk
+	//          for(unsigned b = 0;b<(unsigned)VImageNBands(images[k]);b++){
+	//              for(unsigned r = 0;r<(unsigned)VImageNRows(images[k]);r++){
+	//                  for(unsigned c = 0;c<(unsigned)VImageNColumns(images[k]);c++){
+	//                      mchunk->voxel<VShort>(c,r,ncopy-1,b)
+	//                              = VPixel(images[k],b,r,c,VShort);
+	//                  }
+	//              }
+	//          } // END copy voxel
+	//
+	//      } // END iterate over images
+	//
+	//      // copy header information from first image in the image list.
+	//      copyHeaderFromVista(images[0],*mchunk);
+	//      chunks.push_back(*mchunk);
 	//  cleanup, free memory, close file handle
-	fclose(ip);
+	fclose( ip );
+
 	for( unsigned z = 0; z < nimages; z++ )
 		VDestroyImage( images[z] );
 
@@ -351,10 +344,8 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 {
 	// get attribute list from image
 	VAttrList list = VImageAttrList( vimage );
-
 	// ********** MANDATORY attributes **********
 	// POLICY: copy all mandatory attributes
-
 	// get voxel
 	util::fvector4 voxels = image.getProperty<util::fvector4>( "voxelSize" );
 	std::stringstream vstr;
@@ -402,9 +393,9 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 	// POLICY copy optional attributes
 
 	// repetition time
-	if(image.hasProperty("repetitionTime")){
-		VAppendAttr(list,"repetition", NULL, VShortRepn,
-				image.getProperty<VShort>("repetitionTime"));
+	if( image.hasProperty( "repetitionTime" ) ) {
+		VAppendAttr( list, "repetition", NULL, VShortRepn,
+					 image.getProperty<VShort>( "repetitionTime" ) );
 	}
 
 	// ********** Vista group **********
@@ -536,9 +527,9 @@ void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &c
 		}
 
 		// OPTIONAL: "repetition_time" or "repetition" -> repetitionTime
-		if( (strcmp (name, "repetition" ) == 0) || (strcmp(name, "repetition_time" ) == 0)){
+		if( ( strcmp ( name, "repetition" ) == 0 ) || ( strcmp( name, "repetition_time" ) == 0 ) ) {
 			VGetAttrValue( &posn, NULL, VShortRepn, val );
-			chunk.setProperty<unsigned short>( "repetitionTime", *((unsigned short *)val));
+			chunk.setProperty<unsigned short>( "repetitionTime", *( ( unsigned short * )val ) );
 			continue;
 		}
 
@@ -631,13 +622,13 @@ void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &c
 		util::fvector4 voxels = chunk.getProperty<util::fvector4>( "voxelSize" );
 		// calculate index origin according to axial
 		util::fvector4 ioTmp(
-			 -( ( dims[0] - 1 )*voxels[0] ) / 2,
-			 -( ( dims[1] - 1 )*voxels[1] ) / 2,
-			 -( ( dims[2] - 1 )*voxels[2] ) / 2,
+			-( ( dims[0] - 1 )*voxels[0] ) / 2,
+			-( ( dims[1] - 1 )*voxels[1] ) / 2,
+			-( ( dims[2] - 1 )*voxels[2] ) / 2,
 			0 );
-		util::fvector4 readV = chunk.getProperty<util::fvector4>( "readVec");
-		util::fvector4 phaseV = chunk.getProperty<util::fvector4>( "phaseVec");
-		util::fvector4 sliceV = chunk.getProperty<util::fvector4>( "sliceVec");
+		util::fvector4 readV = chunk.getProperty<util::fvector4>( "readVec" );
+		util::fvector4 phaseV = chunk.getProperty<util::fvector4>( "phaseVec" );
+		util::fvector4 sliceV = chunk.getProperty<util::fvector4>( "sliceVec" );
 		// multiply indexOrigin with read, phase and slice vector
 		util::fvector4 iOrig(
 			readV[0] * ioTmp[0] + phaseV[0] * ioTmp[1] + sliceV[0] * ioTmp[2],
@@ -654,32 +645,33 @@ void ImageFormat_Vista::copyHeaderFromVista( const VImage &image, data::Chunk &c
 template <typename TInput> void ImageFormat_Vista::addChunk( data::ChunkList &chunks, VImage image )
 {
 	data::MemChunk<TInput>* chunk_sp
-		= new data::MemChunk<TInput>( static_cast<TInput *>( image->data ),
-									VImageNColumns( image ),
-									VImageNRows( image ),
-									VImageNBands( image ) );
+	= new data::MemChunk<TInput>( static_cast<TInput *>( image->data ),
+								  VImageNColumns( image ),
+								  VImageNRows( image ),
+								  VImageNBands( image ) );
 	// copy header information
 	copyHeaderFromVista( image, *chunk_sp );
 	// add chunk to chunk list
 	chunks.push_back( *chunk_sp );
 }
 
-template <typename T> bool ImageFormat_Vista::copyImageToVista(const data::Image& image, VImage& vimage)
+template <typename T> bool ImageFormat_Vista::copyImageToVista( const data::Image &image, VImage &vimage )
 {
-	T min,max;
-	image.getMinMax<T>(min,max);
+	T min, max;
+	image.getMinMax<T>( min, max );
 	const util::FixedVector<size_t, 4> csize = image.getChunk( 0, 0 ).sizeToVector();
 	const util::FixedVector<size_t, 4> isize = image.sizeToVector();
-	LOG_IF(isize[3]>1,Debug,error) << "Vista cannot store 4D-Data in one VImage.";
+	LOG_IF( isize[3] > 1, Debug, error ) << "Vista cannot store 4D-Data in one VImage.";
 
 	for ( size_t z = 0; z < isize[2]; z += csize[2] ) {
 		for ( size_t y = 0; y < isize[1]; y += csize[1] ) {
 			for ( size_t x = 0; x < isize[0]; x += csize[0] ) {
-				data::Chunk ch=image.getChunkAs<T>( min,max,x, y, z, 0 );
-				ch.getTypePtr<T>().copyToMem(0,csize.product()-1,&VPixel( vimage, z, y, x, T ));
+				data::Chunk ch = image.getChunkAs<T>( min, max, x, y, z, 0 );
+				ch.getTypePtr<T>().copyToMem( 0, csize.product() - 1, &VPixel( vimage, z, y, x, T ) );
 			}
 		}
 	}
+
 	return true;
 }
 

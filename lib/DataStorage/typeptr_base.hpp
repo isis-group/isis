@@ -23,7 +23,12 @@
 #include "CoreUtils/type_base.hpp"
 #include "typeptr_converter.hpp"
 
-namespace isis{ namespace data{ namespace _internal{
+namespace isis
+{
+namespace data
+{
+namespace _internal
+{
 
 class TypePtrBase : public util::_internal::GenericType
 {
@@ -132,7 +137,7 @@ public:
 	 */
 	void copyRange( size_t start, size_t end, TypePtrBase &dst, size_t dst_start )const;
 
-	bool swapAlong( TypePtrBase& dst, const size_t dim, const size_t dims[]);
+	bool swapAlong( TypePtrBase &dst, const size_t dim, const size_t dims[] );
 	/**
 	 * Get minimum/maximum from a TypePtr.
 	 * The parameters are reverences to the current maximum/minimum found.
@@ -153,6 +158,8 @@ public:
 	size_t cmp( const TypePtrBase &comp )const;
 };
 
-}}}
+}
+}
+}
 
 #endif // TYPEPTRBASE_HPP

@@ -161,17 +161,17 @@ public:
 		default:
 			throwGenericError( std::string( "Unsupported datatype " ) + util::Type<int>( ni->datatype ).toString() );
 		}
+
 		// don't forget to take the properties with
 		copyHeaderFromNifti( *retChunk, *ni );
-
-//		if ( !strcasecmp( dialect.c_str(), "spm" ) )
-//		{
-//			boost::shared_ptr<data::MemChunk<int16_t> >
-//				dst( new data::MemChunk<int16_t>( ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ) ) ;
-//			retChunk->swapAlong( *dst, 0 );
-//			retList.push_back( *dst );
-//			return 1;
-//		}
+		//      if ( !strcasecmp( dialect.c_str(), "spm" ) )
+		//      {
+		//          boost::shared_ptr<data::MemChunk<int16_t> >
+		//              dst( new data::MemChunk<int16_t>( ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ) ) ;
+		//          retChunk->swapAlong( *dst, 0 );
+		//          retList.push_back( *dst );
+		//          return 1;
+		//      }
 		// push the completed NiftiChunk into the list
 		retList.push_back( *retChunk );
 		return retChunk ? 1 : 0;
@@ -185,21 +185,20 @@ public:
 		LOG( ImageIoDebug, isis::info ) << "Write Nifti.";
 		boost::filesystem::path boostFilename( filename );
 		//copy of our image due to changing it by transformCoords
-		isis::data::Image image(imageOrig);
+		isis::data::Image image( imageOrig );
 		//orientation in isis LPS - but in nifti everything relative to RAS - so let's change read/phase direction and sign of indexOrigin
 		//now we try to transform
-		boost::numeric::ublas::matrix<float> matrix(3,3);
-		matrix(0,0)=-1;
-		matrix(0,1)= 0;
-		matrix(0,2)= 0;
-		matrix(1,0)= 0;
-		matrix(1,1)=-1;
-		matrix(1,2)= 0;
-		matrix(2,0)= 0;
-		matrix(2,1)= 0;
-		matrix(2,2)=+1;
-		image.transformCoords(matrix);
-
+		boost::numeric::ublas::matrix<float> matrix( 3, 3 );
+		matrix( 0, 0 ) = -1;
+		matrix( 0, 1 ) = 0;
+		matrix( 0, 2 ) = 0;
+		matrix( 1, 0 ) = 0;
+		matrix( 1, 1 ) = -1;
+		matrix( 1, 2 ) = 0;
+		matrix( 2, 0 ) = 0;
+		matrix( 2, 1 ) = 0;
+		matrix( 2, 2 ) = +1;
+		image.transformCoords( matrix );
 		//default init for nifti image
 		nifti_image ni;
 		memset( &ni, 0, sizeof( nifti_image ) ); //set everything to zero - default value for "not used"
@@ -258,7 +257,7 @@ public:
 			if ( 0 == strcasecmp( dialect.c_str(), "fsl" ) ) {
 				image.print( std::cout );
 				data::MemImage<int16_t> fslCopy( image );
-				fslCopy.print( std::cout << "Copy (" << fslCopy.getChunk(0,0,0,0).typeName() << ")" << std::endl );
+				fslCopy.print( std::cout << "Copy (" << fslCopy.getChunk( 0, 0, 0, 0 ).typeName() << ")" << std::endl );
 				ni.datatype = DT_INT16;
 				copyDataToNifti<int16_t>( fslCopy, ni );
 				break;
@@ -321,23 +320,21 @@ private:
 			// in nifti everything should be relative to RAS, in isis we use LPS coordinates - normally change read/phase dir and sign of indexOrigin
 			//TODO: has to be tested with different niftis - don't trust them!!!!!!!!!
 			retChunk.setProperty( "indexOrigin", util::fvector4( ni.qoffset_x, ni.qoffset_y, ni.qoffset_z, 0 ) );
-			retChunk.setProperty( "readVec",  getVector(ni, readDir) );
-			retChunk.setProperty( "phaseVec", getVector(ni, phaseDir) );
+			retChunk.setProperty( "readVec",  getVector( ni, readDir ) );
+			retChunk.setProperty( "phaseVec", getVector( ni, phaseDir ) );
 			retChunk.setProperty( "sliceVec", getVector( ni, sliceDir ) );
-
 			//now we try to transform
-			boost::numeric::ublas::matrix<float> matrix(3,3);
-			matrix(0,0)=-1;
-			matrix(0,1)= 0;
-			matrix(0,2)= 0;
-			matrix(1,0)= 0;
-			matrix(1,1)=-1;
-			matrix(1,2)= 0;
-			matrix(2,0)= 0;
-			matrix(2,1)= 0;
-			matrix(2,2)=+1;
-			retChunk.transformCoords(matrix);
-
+			boost::numeric::ublas::matrix<float> matrix( 3, 3 );
+			matrix( 0, 0 ) = -1;
+			matrix( 0, 1 ) = 0;
+			matrix( 0, 2 ) = 0;
+			matrix( 1, 0 ) = 0;
+			matrix( 1, 1 ) = -1;
+			matrix( 1, 2 ) = 0;
+			matrix( 2, 0 ) = 0;
+			matrix( 2, 1 ) = 0;
+			matrix( 2, 2 ) = +1;
+			retChunk.transformCoords( matrix );
 			retChunk.setProperty( "voxelSize", getVector( ni, voxelSizeVec ) );
 			retChunk.setProperty( "sequenceDescription", std::string( ni.descrip ) );
 			retChunk.setProperty( "StudyDescription", std::string( ni.intent_name ) );
@@ -358,33 +355,33 @@ private:
 									<< " / " << getVector( ni, sliceDir )
 									<< getVector( ni, voxelSizeVec );
 		}
+
 		//check repetition time
 		//check description for TR=[[:digit:]]ms.
 		boost::regex descriptionRegex( ".*TR=([[:digit:]]{1,})ms.*" );
 		boost::cmatch results;
 		u_int16_t tr = 0;
 		std::string description = ni.descrip;
-		if ( boost::regex_match( ni.descrip, results,  descriptionRegex) )
-		{
-			tr = boost::lexical_cast<u_int16_t>( results.str(1));
+
+		if ( boost::regex_match( ni.descrip, results,  descriptionRegex ) ) {
+			tr = boost::lexical_cast<u_int16_t>( results.str( 1 ) );
 		}
+
 		//if "TR=" was found in description and differs from pixdim[dim]
-		if( tr && (!tr == ni.pixdim[ni.ndim]) )
-		{
+		if( tr && ( !tr == ni.pixdim[ni.ndim] ) ) {
 			LOG( ImageIoLog, warning ) << "TR=" << tr << " was found in description but differs from pixdim[4]= "
-					<< ni.pixdim[ni.ndim] << ". This seems to be a nifti coming from SPM. Setting repetitionTime to " << tr
-					<< " ms. During conversion this value can be changed by using the parameter -tr";
-			retChunk.setProperty<u_int16_t>( "repetitionTime", tr);
+									   << ni.pixdim[ni.ndim] << ". This seems to be a nifti coming from SPM. Setting repetitionTime to " << tr
+									   << " ms. During conversion this value can be changed by using the parameter -tr";
+			retChunk.setProperty<u_int16_t>( "repetitionTime", tr );
 		}
+
 		//if "TR=" was not found in description pixdimg[dim] == 0 a warning calls attention to use parameter -tr to change repetitionTime.
-		if( tr == 0 && ni.pixdim[ni.ndim] == 0 )
-		{
+		if( tr == 0 && ni.pixdim[ni.ndim] == 0 ) {
 			LOG( ImageIoLog, warning ) << "Repetition time seems to be invalid. To set the repetition time during conversion use the parameter -tr ";
 			retChunk.setProperty<u_int16_t>( "repetitionTime", 0 );
 		}
 
-		if( !tr && ni.pixdim[ni.ndim] )
-		{
+		if( !tr && ni.pixdim[ni.ndim] ) {
 			retChunk.setProperty<u_int16_t>( "repetitionTime", ni.pixdim[ni.ndim] );
 		}
 	}
@@ -484,7 +481,7 @@ private:
 				ni.phase_dim = 1;
 			}
 
-			if ( phaseEncoding == "COL") {
+			if ( phaseEncoding == "COL" ) {
 				ni.freq_dim = 1;
 				ni.phase_dim = 2;
 			} else {
@@ -507,12 +504,10 @@ private:
 		ni.nz = ni.dim[3] = dimensions[2];
 		ni.nt = ni.dim[4] = dimensions[3];
 		ni.nvox = image.volume();
-
 		util::fvector4 readVec = image.getProperty<util::fvector4>( "readVec" );
 		util::fvector4 phaseVec = image.getProperty<util::fvector4>( "phaseVec" );
 		util::fvector4 sliceVec = image.getProperty<util::fvector4>( "sliceVec" );
 		util::fvector4 indexOrigin = image.getProperty<util::fvector4>( "indexOrigin" );
-
 		// don't switch the z-AXIS!!!
 		//indexOrigin[2] = -indexOrigin[2];
 		LOG( ImageIoLog, info ) << indexOrigin;
@@ -532,9 +527,9 @@ private:
 			std::string descrip = ( image.getProperty<std::string>( "StudyDescription" ) );
 			snprintf( ni.intent_name, 16, "%s", descrip.c_str() );
 		}
-		if ( image.hasProperty( "repetitionTime") )
-		{
-			LOG( ImageIoLog, info) << "Setting pixdim[" << ni.ndim << "] to " << image.getProperty<u_int16_t>( "repetitionTime" );
+
+		if ( image.hasProperty( "repetitionTime" ) ) {
+			LOG( ImageIoLog, info ) << "Setting pixdim[" << ni.ndim << "] to " << image.getProperty<u_int16_t>( "repetitionTime" );
 			ni.dt = ni.pixdim[ni.ndim+1] = image.getProperty<u_int16_t>( "repetitionTime" );
 		}
 

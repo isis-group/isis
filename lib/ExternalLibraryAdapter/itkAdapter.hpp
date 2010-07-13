@@ -51,8 +51,10 @@ namespace adapter
 class itkAdapter
 {
 public:
-	itkAdapter() : m_TypeID(0) { m_AquistionNumber = -1;
-								 m_SequenceNumber = -1; };
+	itkAdapter() : m_TypeID( 0 ) {
+		m_AquistionNumber = -1;
+		m_SequenceNumber = -1;
+	};
 	/**
 	  * Converts an isis image object in an itk image.
 	  * \param src boost sharedpointer of the isisImage
@@ -90,7 +92,7 @@ protected:
 
 private:
 
-//	boost::shared_ptr<data::Image> m_ImageISIS;
+	//  boost::shared_ptr<data::Image> m_ImageISIS;
 	data::Image m_ImageISIS;
 	unsigned short m_TypeID;
 	int m_AquistionNumber;

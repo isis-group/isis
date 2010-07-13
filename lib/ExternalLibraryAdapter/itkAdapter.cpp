@@ -21,9 +21,11 @@
  *****************************************************************/
 
 #include "itkAdapter.hpp"
-namespace isis {
+namespace isis
+{
 
-namespace adapter {
+namespace adapter
+{
 
 template<typename TImage> typename TImage::Pointer
 itkAdapter::makeItkImageObject( const boost::shared_ptr<data::Image> src, const bool behaveAsItkReader )
@@ -31,6 +33,7 @@ itkAdapter::makeItkImageObject( const boost::shared_ptr<data::Image> src, const 
 	typedef TImage OutputImageType;
 	m_ImageISIS = *src;
 	m_TypeID = m_ImageISIS.chunksBegin()->typeID();
+
 	switch ( m_TypeID ) {
 	case data::TypePtr<int8_t>::staticID:
 		return this->internCreateItk<int8_t, OutputImageType>( behaveAsItkReader );
@@ -64,9 +67,8 @@ itkAdapter::makeItkImageObject( const boost::shared_ptr<data::Image> src, const 
 template<typename TImage> data::ImageList
 itkAdapter::makeIsisImageObject( const typename TImage::Pointer src, const bool behaveAsItkWriter )
 {
-	if( m_TypeID )
-	{
-		switch (m_TypeID) {
+	if( m_TypeID ) {
+		switch ( m_TypeID ) {
 		case data::TypePtr<int8_t>::staticID:
 			return this->internCreateISIS<TImage, int8_t>( src, behaveAsItkWriter );
 			break;
@@ -95,9 +97,7 @@ itkAdapter::makeIsisImageObject( const typename TImage::Pointer src, const bool 
 			return this->internCreateISIS<TImage, typename TImage::PixelType>( src, behaveAsItkWriter );
 			break;
 		}
-	}
-	else
-	{
+	} else {
 		return this->internCreateISIS<TImage, typename TImage::PixelType>( src, behaveAsItkWriter );
 	}
 }
@@ -119,21 +119,24 @@ template<typename TInput, typename TOutput> typename TOutput::Pointer itkAdapter
 	typename OutputImageType::RegionType itkRegion;
 	PropKeyListType propKeyList;
 	itk::MetaDataDictionary myItkDict;
-
 	// since ITK uses a dialect of the Nifti image space, we need to transform
 	// the image metadata into a nifti coordinate system
-
 	//declare transformation matrix T (NIFTI -> DICOM)
 	// -1  1  0
 	//  0 -1  0
 	//  0  0  1
-	boost::numeric::ublas::matrix<float> T(3,3);
-	T(0,0) = -1;T(0,1) = 0;T(0,2) = 0;
-	T(1,0) = 0;T(1,1) = -1;T(1,2) = 0;
-	T(2,0) = 0;T(2,1) = 0;T(2,2) = 1;
+	boost::numeric::ublas::matrix<float> T( 3, 3 );
+	T( 0, 0 ) = -1;
+	T( 0, 1 ) = 0;
+	T( 0, 2 ) = 0;
+	T( 1, 0 ) = 0;
+	T( 1, 1 ) = -1;
+	T( 1, 2 ) = 0;
+	T( 2, 0 ) = 0;
+	T( 2, 1 ) = 0;
+	T( 2, 2 ) = 1;
 	// apply transformation to local isis image copy
-	m_ImageISIS.transformCoords(T);
-
+	m_ImageISIS.transformCoords( T );
 	//getting the required metadata from the isis image
 	const util::fvector4 dimensions( m_ImageISIS.sizeToVector() );
 	const util::fvector4 indexOrigin( m_ImageISIS.getProperty<util::fvector4>( "indexOrigin" ) );
@@ -153,6 +156,7 @@ template<typename TInput, typename TOutput> typename TOutput::Pointer itkAdapter
 
 	// To mimic the behavior of the itk nifti image io plugin the
 	// orientation matrix will be transformed this way:
+
 	/*
 	-1 -1 -1 -1
 	-1 -1 -1 -1
@@ -191,20 +195,17 @@ template<typename TInput, typename TOutput> typename TOutput::Pointer itkAdapter
 	outputImage = rescaler->GetOutput();
 	//since itk properties do not match the isis properties we need to define metaproperties to prevent data loss
 	propKeyList  = m_ImageISIS.getKeys();
-
-	BOOST_FOREACH( PropKeyListType::const_reference ref, propKeyList)
-	{
+	BOOST_FOREACH( PropKeyListType::const_reference ref, propKeyList ) {
 		itk::EncapsulateMetaData<std::string>( myItkDict, ref, m_ImageISIS.getProperty<std::string>( ref ) );
 	}
-	m_AquistionNumber = m_ImageISIS.getProperty<int>("aquisitionNumber");
-	m_SequenceNumber = m_ImageISIS.getProperty<int>("sequenceNumber");
+	m_AquistionNumber = m_ImageISIS.getProperty<int>( "aquisitionNumber" );
+	m_SequenceNumber = m_ImageISIS.getProperty<int>( "sequenceNumber" );
 	outputImage->SetMetaDataDictionary( myItkDict );
 	return outputImage;
 }
 
 template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::internCreateISIS( const typename TImageITK::Pointer src, const bool behaveAsItkWriter )
 {
-
 	typename TImageITK::PointType indexOrigin = src->GetOrigin();
 	typename TImageITK::SizeType imageSize = src->GetBufferedRegion().GetSize();
 	typename TImageITK::SpacingType imageSpacing = src->GetSpacing();
@@ -226,11 +227,8 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	}
 
 	// TODO use MemImage instead of MemChunk.
-
-
 	boost::shared_ptr<data::MemChunk< typename TImageITK::PixelType > >
-		retChunk( new data::MemChunk< typename TImageITK::PixelType  >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) ) ;
-
+	retChunk( new data::MemChunk< typename TImageITK::PixelType  >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) ) ;
 	retChunk->setProperty( "indexOrigin", util::fvector4( indexOrigin[0], indexOrigin[1], indexOrigin[2], indexOrigin[3] ) );
 	retChunk->setProperty( "readVec", util::fvector4( imageDirection[0][0], imageDirection[1][0], imageDirection[2][0], 0 ) );
 	retChunk->setProperty( "phaseVec", util::fvector4( imageDirection[0][1], imageDirection[1][1], imageDirection[2][1], 0 ) );
@@ -259,25 +257,28 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	chunkList.push_back( *retChunk );
 	data::ImageList isisImageList( chunkList );
 	boost::shared_ptr< data::MemImage< TOutputISIS > > retImage (
-			new data::MemImage<TOutputISIS>  (*isisImageList.front().get()) );
+		new data::MemImage<TOutputISIS>  ( *isisImageList.front().get() ) );
 	data::ImageList retList;
 	retList.push_back( retImage );
-
 	//declare transformation matrix T (NIFTI -> DICOM)
 	// -1  1  0
 	//  0 -1  0
 	//  0  0  1
-	boost::numeric::ublas::matrix<float> T(3,3);
-	T(0,0) = -1;T(0,1) = 0;T(0,2) = 0;
-	T(1,0) = 0;T(1,1) = -1;T(1,2) = 0;
-	T(2,0) = 0;T(2,1) = 0;T(2,2) = 1;
+	boost::numeric::ublas::matrix<float> T( 3, 3 );
+	T( 0, 0 ) = -1;
+	T( 0, 1 ) = 0;
+	T( 0, 2 ) = 0;
+	T( 1, 0 ) = 0;
+	T( 1, 1 ) = -1;
+	T( 1, 2 ) = 0;
+	T( 2, 0 ) = 0;
+	T( 2, 1 ) = 0;
+	T( 2, 2 ) = 1;
 	// apply transformation to local isis image copy
-	BOOST_FOREACH(data::ImageList::const_reference ref, isisImageList)
-	{
-		ref->transformCoords(T);
+	BOOST_FOREACH( data::ImageList::const_reference ref, isisImageList ) {
+		ref->transformCoords( T );
 	}
 	return retList;
-
 }
 
 }

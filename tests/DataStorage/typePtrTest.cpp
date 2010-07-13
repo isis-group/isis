@@ -172,10 +172,10 @@ BOOST_AUTO_TEST_CASE( typePtr_conversion_test )
 		BOOST_REQUIRE_EQUAL( floatArray[i], init[i] );
 
 	data::TypePtr<int32_t> intArray = floatArray.copyToNew<int32_t>();
-	double scale= std::numeric_limits<int32_t>::max()/2.;
+	double scale = std::numeric_limits<int32_t>::max() / 2.;
 
 	for ( int i = 0; i < 12; i++ ) // Conversion from float to integer will scale up to maximum, to map the fraction as exact as possible
-		BOOST_CHECK_EQUAL( intArray[i], ceil( init[i]*scale -.5 ) );
+		BOOST_CHECK_EQUAL( intArray[i], ceil( init[i]*scale - .5 ) );
 
 	//with automatic downscaling because of range overflow
 	scale = std::min( std::numeric_limits< short >::max() / 2e5, std::numeric_limits< short >::min() / -2e5 );
@@ -187,14 +187,14 @@ BOOST_AUTO_TEST_CASE( typePtr_conversion_test )
 	data::TypePtr<uint8_t> byteArray = shortArray.copyToNew<uint8_t>();
 
 	for ( int i = 0; i < 12; i++ )
-		BOOST_CHECK_EQUAL( shortArray[i], ceil( init[i] * 1e5 * scale -.5 ) );
+		BOOST_CHECK_EQUAL( shortArray[i], ceil( init[i] * 1e5 * scale - .5 ) );
 
 	//with offset and scale
 	const double uscale = std::numeric_limits< unsigned short >::max() / 4e5;
 	data::TypePtr<unsigned short> ushortArray = floatArray.copyToNew<unsigned short>();
 
 	for ( int i = 0; i < 12; i++ )
-		BOOST_CHECK_EQUAL( ushortArray[i], ceil( init[i] * 1e5 * uscale + 32767.5 -.5 ) );
+		BOOST_CHECK_EQUAL( ushortArray[i], ceil( init[i] * 1e5 * uscale + 32767.5 - .5 ) );
 }
 
 BOOST_AUTO_TEST_CASE( typePtr_minmax_test )

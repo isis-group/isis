@@ -25,22 +25,25 @@
 #include "log.hpp"
 
 
-namespace isis{
-namespace data{template<typename TYPE> class TypePtr;}
-namespace util{
+namespace isis
+{
+namespace data {template<typename TYPE> class TypePtr;}
+namespace util
+{
 template<typename TYPE> class Type;
 
-namespace _internal{
+namespace _internal
+{
 
 class GenericType
 {
 protected:
 	template<typename T> T &m_cast_to() {
-		LOG_IF(typeID() != T::staticID,Debug,error) << "using " << typeName() << " at " << this << " as " << T::staticName();
+		LOG_IF( typeID() != T::staticID, Debug, error ) << "using " << typeName() << " at " << this << " as " << T::staticName();
 		return *reinterpret_cast<T *>( this );
 	}
 	template<typename T> const T &m_cast_to()const {
-		LOG_IF(typeID() != T::staticID,Debug,error) << "using " << typeName() << " at " << this << " as " << T::staticName();
+		LOG_IF( typeID() != T::staticID, Debug, error ) << "using " << typeName() << " at " << this << " as " << T::staticName();
 		return *reinterpret_cast<const T *>( this );
 	}
 
@@ -124,5 +127,7 @@ public:
 	}
 };
 
-}}}
+}
+}
+}
 #endif // GENERIC_TYPE_HPP

@@ -129,7 +129,10 @@ public:
 	template <typename T> T &voxel( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 ) {
 		if ( ! clean ) {
 			LOG( Debug, info ) << "Image is not clean. Running reIndex ...";
-			reIndex();
+
+			if( !reIndex() ) {
+				LOG( Runtime, error ) << "Reindexing failed -- undefined behavior ahead ...";
+			}
 		}
 
 		const std::pair<size_t, size_t> index = commonGet( first, second, third, fourth );
@@ -154,7 +157,7 @@ public:
 	 */
 	template <typename T> T voxel( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const {
 		const std::pair<size_t, size_t> index = commonGet( first, second, third, fourth );
-		const TypePtr<T> &data = ( lookup[index.first] )->getTypePtr<T>();
+		const TypePtr<T> &data = getChunkAt( index.first ).getTypePtr<T>();
 		return data[index.second];
 	}
 
@@ -171,7 +174,7 @@ public:
 	 * (Reminder: Chunk-copies are cheap, so the data are NOT copied)
 	 */
 	const Chunk &getChunk( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const;
-	
+
 	/**
 	 * Get the chunk that contains the voxel at the given coordinates.
 	 * If the image is not clean Image::reIndex() will be run.
@@ -186,8 +189,8 @@ public:
 
 	/**
 	 * Get the chunk that contains the voxel at the given coordinates in the given type.
-	 * If the accordant chunk has type T a cheap copy is returned. 
-	 * Otherwise a MemChunk of the requested type is created from it. 
+	 * If the accordant chunk has type T a cheap copy is returned.
+	 * Otherwise a MemChunk of the requested type is created from it.
 	 * In this case min and max are used as value range for the conversion.
 	 *
 	 * \param min The minimum of the value-range of the image (use getMinMax to get this).
@@ -198,13 +201,13 @@ public:
 	 * \param fourth The fourth coordinate in voxel space. Usually the time value.
 	 * \returns a chunk contains the (maybe converted) voxel value at the given coordinates.
 	 */
-	template<typename TYPE> Chunk getChunkAs(TYPE min,TYPE max,size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0)const
-	{
-		const Chunk &ref=getChunk(first,second,third,fourth);
-		if(TypePtr<TYPE>::staticID==ref.typeID()){ //OK its the right type - just return that
+	template<typename TYPE> Chunk getChunkAs( TYPE min, TYPE max, size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const {
+		const Chunk &ref = getChunk( first, second, third, fourth );
+
+		if( TypePtr<TYPE>::staticID == ref.typeID() ) { //OK its the right type - just return that
 			return ref;
 		} else { //we have to to a conversion
-			return MemChunk<TYPE>(ref,util::Type<TYPE>(min),util::Type<TYPE>(max));
+			return MemChunk<TYPE>( ref, util::Type<TYPE>( min ), util::Type<TYPE>( max ) );
 		}
 	}
 
@@ -262,7 +265,7 @@ public:
 	 * depend on correct image orientations won't work as expected. Use this method
 	 * with caution!
 	 */
-	void transformCoords(boost::numeric::ublas::matrix<float> transform);
+	void transformCoords( boost::numeric::ublas::matrix<float> transform );
 
 };
 
@@ -275,12 +278,13 @@ public:
 		set.clear();
 		util::_internal::TypeBase::Reference min, max;
 		src.getMinMax( min, max );
-		LOG(Debug,info) << "Computed value range of the source image: ["<< min << ".." << max << "]";
+		LOG( Debug, info ) << "Computed value range of the source image: [" << min << ".." << max << "]";
 
 		//we want copies, and we want them to be of type T
 		for ( ConstChunkIterator i = src.chunksBegin(); i != src.chunksEnd(); ++i )      {
 			insertChunk( MemChunk<T>( *i, *min, *max ) );
 		}
+
 		reIndex();
 	}
 };

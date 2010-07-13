@@ -422,7 +422,7 @@ void PropMap::addNeeded( const std::string &key )
 
 void PropMap::addNeededFromString( const std::string &needed )
 {
-	const std::list<std::string> needList = util::string2list<std::string>( needed ); 
+	const std::list<std::string> needList = util::string2list<std::string>( needed );
 	//@todo util::string2list<std::string>( needed,' ' ) would be faster but less robust
 	LOG( Debug, verbose_info ) << "Adding " << needed << " as needed";
 	BOOST_FOREACH( std::list<std::string>::const_reference ref, needList )
@@ -493,15 +493,15 @@ std::ostream &PropMap::print( std::ostream &out, bool label )const
 	return out;
 }
 
-bool PropMap::trueP::operator()( const PropMap::value_type& ref ) const
+bool PropMap::trueP::operator()( const PropMap::value_type &ref ) const
 {
 	return true;
 }
-bool PropMap::invalidP::operator()( const PropMap::value_type& ref ) const
+bool PropMap::invalidP::operator()( const PropMap::value_type &ref ) const
 {
 	return ref.second.getLeaf().needed() && ref.second.getLeaf().empty();
 }
-bool PropMap::treeInvalidP::operator()( const PropMap::value_type& ref ) const
+bool PropMap::treeInvalidP::operator()( const PropMap::value_type &ref ) const
 {
 	if ( ref.second.is_leaf() ) {
 		const PropertyValue &val = ref.second.getLeaf();

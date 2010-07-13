@@ -20,15 +20,15 @@
 #include "qtapplication.hpp"
 
 isis::qt4::QtApplication::QtApplication( const char name[] ):
-		Application( name )
+	Application( name )
 {}
 
-QApplication& isis::qt4::QtApplication::getQApplication()
+QApplication &isis::qt4::QtApplication::getQApplication()
 {
 	LOG_IF( not m_qapp, util::Debug, error ) << "The QApplication was not yet created, you should run init() before using getQApplication.";
 	return *m_qapp;
 }
-bool isis::qt4::QtApplication::init( int argc, char** argv, bool exitOnError )
+bool isis::qt4::QtApplication::init( int argc, char **argv, bool exitOnError )
 {
 	if ( m_qapp ) {
 		LOG( util::Debug, error ) << "The QApplication allready exists. This should not happen. I'll not touch it";

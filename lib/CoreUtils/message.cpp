@@ -30,14 +30,19 @@ namespace util
 {
 namespace _internal
 {
-const char* const logLevelNames(LogLevel level)
+const char *const logLevelNames( LogLevel level )
 {
-	switch(level){
-		case error: return "error";
-		case warning: return "warning";
-		case info: return "info";
-		case verbose_info: return "verbose";
+	switch( level ) {
+	case error:
+		return "error";
+	case warning:
+		return "warning";
+	case info:
+		return "info";
+	case verbose_info:
+		return "verbose";
 	}
+
 	return "//no_log//";
 }
 
@@ -48,9 +53,9 @@ void MessageHandlerBase::stopBelow( LogLevel stop )
 
 bool MessageHandlerBase::requestStop( LogLevel _level )
 {
-	if ( m_stop_below > _level ){
+	if ( m_stop_below > _level ) {
 #ifdef WIN32
-		LOG(Debug,error) << "Sorry stopping is not supported on Win32";
+		LOG( Debug, error ) << "Sorry stopping is not supported on Win32";
 		return false;
 #else
 		return kill( getpid(), SIGTSTP ) == 0;
@@ -61,26 +66,26 @@ bool MessageHandlerBase::requestStop( LogLevel _level )
 
 std::string Message::strTime()const
 {
-	return boost::posix_time::to_simple_string(m_timeStamp);
+	return boost::posix_time::to_simple_string( m_timeStamp );
 }
 
 Message::Message( std::string object, std::string module, std::string file, int line, LogLevel level, boost::weak_ptr<MessageHandlerBase> _commitTo )
-	: commitTo( _commitTo ), 
-	  m_object( object ), 
-	  m_module( module ), 
+	: commitTo( _commitTo ),
+	  m_object( object ),
+	  m_module( module ),
 	  m_file( file ),
-	  m_timeStamp(boost::posix_time::second_clock::universal_time()),
+	  m_timeStamp( boost::posix_time::second_clock::universal_time() ),
 	  m_line( line ),
 	  m_level( level )
 {}
 
 Message::Message( const Message &src ) //we need a custom copy-constructor, because the copy-contructor of ostringstream is private
 	: std::ostringstream( src.str() ),
-	  commitTo( src.commitTo ), 
-	  m_object( src.m_object ), 
-	  m_module( src.m_module ), 
+	  commitTo( src.commitTo ),
+	  m_object( src.m_object ),
+	  m_module( src.m_module ),
 	  m_file( src.m_file ),
-	  m_subjects( src.m_subjects ), 
+	  m_subjects( src.m_subjects ),
 	  m_timeStamp( src.m_timeStamp ),
 	  m_line( src.m_line ),
 	  m_level( src.m_level )
@@ -116,7 +121,7 @@ std::string Message::merge()const
 
 bool Message::shouldCommit()const
 {
-	if(str().empty())
+	if( str().empty() )
 		return false;
 
 	const boost::shared_ptr<MessageHandlerBase> buff( commitTo.lock() );
@@ -134,7 +139,7 @@ LogLevel MessageHandlerBase::m_stop_below = error;
 std::ostream *DefaultMsgPrint::o = &::std::cerr;
 void DefaultMsgPrint::commit( const _internal::Message &mesg )
 {
-	*o << mesg.m_module << ":" << _internal::logLevelNames(mesg.m_level);
+	*o << mesg.m_module << ":" << _internal::logLevelNames( mesg.m_level );
 #ifndef NDEBUG //if with debug-info
 	*o << "[" << mesg.m_file.leaf() << ":" << mesg.m_line << "] "; //print the file and the line
 #else

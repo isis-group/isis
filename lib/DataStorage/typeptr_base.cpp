@@ -3,7 +3,12 @@
 #include "typeptr_converter.hpp"
 #include "common.hpp"
 
-namespace isis{ namespace data{ namespace _internal{
+namespace isis
+{
+namespace data
+{
+namespace _internal
+{
 
 TypePtrBase::TypePtrBase( size_t length ): m_len( length ) {}
 
@@ -47,11 +52,11 @@ void TypePtrBase::copyRange( size_t start, size_t end, TypePtrBase &dst, size_t 
 	assert( start <= end );
 	const size_t length = end - start + 1;
 	LOG_IF( ! dst.isSameType( *this ), Debug, error )
-	<< "Copying into a TypePtr of different type. Its " << dst.typeName() << " not " << typeName();
+			<< "Copying into a TypePtr of different type. Its " << dst.typeName() << " not " << typeName();
 	LOG_IF( end >= len(), Runtime, error )
-	<< "End of the range (" << end << ") is behind the end of this TypePtr (" << len() << ")";
+			<< "End of the range (" << end << ") is behind the end of this TypePtr (" << len() << ")";
 	LOG_IF( length + dst_start > dst.len(), Runtime, error )
-	<< "End of the range (" << length + dst_start << ") is behind the end of the destination (" << dst.len() << ")";
+			<< "End of the range (" << length + dst_start << ") is behind the end of the destination (" << dst.len() << ")";
 	boost::shared_ptr<void> daddr = dst.address().lock();
 	boost::shared_ptr<void> saddr = address().lock();
 	const size_t soffset = bytes_per_elem() * start; //source offset in bytes
@@ -72,7 +77,7 @@ bool TypePtrBase::convertTo( TypePtrBase &dst, const util::_internal::TypeBase &
 		return true;
 	} else {
 		LOG( Runtime, error )
-		<< "I dont know any conversion from " << util::MSubject( typeName() ) << " to " << util::MSubject( dst.typeName() );
+				<< "I dont know any conversion from " << util::MSubject( typeName() ) << " to " << util::MSubject( dst.typeName() );
 		return false;
 	}
 }
@@ -83,40 +88,43 @@ bool TypePtrBase::swapAlong( TypePtrBase &dst, const size_t dim, const size_t di
 	boost::shared_ptr<void> saddr = address().lock();
 	const int8_t *const  src = ( int8_t * )saddr.get();
 	int8_t *const dest = ( int8_t * )daddr.get();
-	if ( dim == 0 )
-	{
-		size_t index_forward=0;
-		size_t index_y=0;
-		for (size_t z=0; z<dims[2];z++) {
-			for ( size_t y=0; y<dims[1];y++) {
+
+	if ( dim == 0 ) {
+		size_t index_forward = 0;
+		size_t index_y = 0;
+
+		for ( size_t z = 0; z < dims[2]; z++ ) {
+			for ( size_t y = 0; y < dims[1]; y++ ) {
 				index_y++;
-				for ( size_t direction=0; direction<dims[0]; direction++) {
-					memcpy(dest + index_forward * bytes_per_elem(), src + ((index_y * dims[0]) - direction - 1) * bytes_per_elem(), bytes_per_elem());
+
+				for ( size_t direction = 0; direction < dims[0]; direction++ ) {
+					memcpy( dest + index_forward * bytes_per_elem(), src + ( ( index_y * dims[0] ) - direction - 1 ) * bytes_per_elem(), bytes_per_elem() );
 					index_forward++;
 				}
 			}
 		}
+
 		return 1;
-	}
-	else if ( dim == 1 ) {
-		for ( size_t z=0; z<dims[2]; z++) {
-			for ( size_t direction=0; direction<dims[dim]; direction++) {
-				memcpy(dest + ((dims[0] * direction) + z * dims[0] * dims[1]) * bytes_per_elem(), src + ((dims[0] * (dims[1]-direction-1)) + z * dims[0] * dims[1]) * bytes_per_elem(), bytes_per_elem() * dims[0]);
+	} else if ( dim == 1 ) {
+		for ( size_t z = 0; z < dims[2]; z++ ) {
+			for ( size_t direction = 0; direction < dims[dim]; direction++ ) {
+				memcpy( dest + ( ( dims[0] * direction ) + z * dims[0] * dims[1] ) * bytes_per_elem(), src + ( ( dims[0] * ( dims[1] - direction - 1 ) ) + z * dims[0] * dims[1] ) * bytes_per_elem(), bytes_per_elem() * dims[0] );
 			}
 		}
+
 		return 1;
-	}
-	else if ( dim == 2 ) {
-		for ( size_t direction=0; direction<dims[dim]; direction++)
-			{
-				memcpy(dest + direction*dims[0]*dims[1]*bytes_per_elem(), src + (dims[dim]-direction-1)*dims[0]*dims[1]*bytes_per_elem(), bytes_per_elem()*dims[0]*dims[1]);
-			}
+	} else if ( dim == 2 ) {
+		for ( size_t direction = 0; direction < dims[dim]; direction++ ) {
+			memcpy( dest + direction * dims[0]*dims[1]*bytes_per_elem(), src + ( dims[dim] - direction - 1 )*dims[0]*dims[1]*bytes_per_elem(), bytes_per_elem()*dims[0]*dims[1] );
+		}
+
 		return 1;
-	}
-	else {
-		LOG(Runtime, error) << "Swapping along axis referred by " << dim << " is not possible!";
+	} else {
+		LOG( Runtime, error ) << "Swapping along axis referred by " << dim << " is not possible!";
 		return 0;
 	}
 }
 
-}}}
+}
+}
+}

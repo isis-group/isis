@@ -69,7 +69,7 @@ static VBoolean use_inverse = false;
 static VShort number_threads = 1;
 
 static VOptionDescRec options[] = {
-//requiered inputs
+	//requiered inputs
 	{"in", VStringRepn, 1, &in_filename, &in_found, 0, "the input image filename"}, {
 		"out", VStringRepn, 1,
 		&out_filename, &out_found, 0, "the output image filename"
@@ -96,11 +96,10 @@ static VOptionDescRec options[] = {
 #include <boost/concept_check.hpp>
 int main(
 
-	int argc, char* argv[] )
+	int argc, char *argv[] )
 {
 	// show revision information string constant
 	std::cout << "Core Version: " << isis::util::Application::getCoreVersion() << std::endl;
-
 	ENABLE_LOG( isis::DataDebug, isis::util::DefaultMsgPrint, isis::error );
 	ENABLE_LOG( isis::DataLog, isis::util::DefaultMsgPrint, isis::error );
 
@@ -154,7 +153,7 @@ int main(
 	CastImageFilterType::Pointer caster = CastImageFilterType::New();
 	isis::extitk::ProcessUpdate::Pointer progressObserver = isis::extitk::ProcessUpdate::New();
 	TimeStepExtractionFilterType::Pointer timeStepExtractionFilter = TimeStepExtractionFilterType::New();
-	isis::extitk::TransformMerger3D* transformMerger = new isis::extitk::TransformMerger3D;
+	isis::extitk::TransformMerger3D *transformMerger = new isis::extitk::TransformMerger3D;
 	DeformationFieldReaderType::Pointer deformationFieldReader = DeformationFieldReaderType::New();
 	ImageReaderType::Pointer reader = ImageReaderType::New();
 	ImageReaderType::Pointer templateReader = ImageReaderType::New();
@@ -176,8 +175,8 @@ int main(
 	FMRIInputType::Pointer fmriImage = FMRIInputType::New();
 	InputImageType::Pointer inputImage = InputImageType::New();
 	InputImageType::Pointer templateImage = InputImageType::New();
-	isis::adapter::itkAdapter* fixedAdapter = new isis::adapter::itkAdapter;
-	isis::adapter::itkAdapter* movingAdapter = new isis::adapter::itkAdapter;
+	isis::adapter::itkAdapter *fixedAdapter = new isis::adapter::itkAdapter;
+	isis::adapter::itkAdapter *movingAdapter = new isis::adapter::itkAdapter;
 	//transform object used for inverse transform
 	itk::MatrixOffsetTransformBase<double, Dimension, Dimension>::Pointer transform = itk::MatrixOffsetTransformBase<double, Dimension, Dimension>::New();
 
@@ -223,7 +222,7 @@ int main(
 			std::cout << "More than one transform is set. This is not possible, yet!" << std::endl;
 
 			for ( unsigned int i = 0; i < number_trans; i++ ) {
-				itk::TransformFileReader::TransformListType* transformList =
+				itk::TransformFileReader::TransformListType *transformList =
 					new itk::TransformFileReader::TransformListType;
 				transformFileReader->SetFileName( ( ( VStringConst * ) trans_filename.vector )[i] );
 				transformFileReader->Update();
@@ -329,7 +328,6 @@ int main(
 	}
 
 	if ( not fmri ) {
-
 		writer->SetFileName( out_filename );
 
 		if ( not vtrans_filename and trans_filename.number == 1 ) {
@@ -340,14 +338,11 @@ int main(
 			resampler->SetOutputOrigin( outputOrigin );
 			resampler->SetOutputDirection( outputDirection );
 			resampler->Update();
-
-			isis::data::ImageList imgList = movingAdapter->makeIsisImageObject<OutputImageType>(resampler->GetOutput());
-			isis::data::IOFactory::write(imgList, out_filename, "");
-
+			isis::data::ImageList imgList = movingAdapter->makeIsisImageObject<OutputImageType>( resampler->GetOutput() );
+			isis::data::IOFactory::write( imgList, out_filename, "" );
 			// DEBUG
-//			writer->SetInput(resampler->GetOutput());
-//			writer->Update();
-
+			//          writer->SetInput(resampler->GetOutput());
+			//          writer->Update();
 		}
 
 		if ( vtrans_filename or trans_filename.number > 1 ) {
@@ -363,8 +358,8 @@ int main(
 			}
 
 			warper->Update();
-			isis::data::ImageList imgList = movingAdapter->makeIsisImageObject<OutputImageType>(warper->GetOutput());
-			isis::data::IOFactory::write(imgList, out_filename, "");
+			isis::data::ImageList imgList = movingAdapter->makeIsisImageObject<OutputImageType>( warper->GetOutput() );
+			isis::data::IOFactory::write( imgList, out_filename, "" );
 		}
 	}
 
@@ -438,7 +433,7 @@ int main(
 			timeStepExtractionFilter->SetRequestedTimeStep( timestep );
 			timeStepExtractionFilter->Update();
 			tmpImage = timeStepExtractionFilter->GetOutput();
-//                  std::cout << tmpImage << std::endl;
+			//                  std::cout << tmpImage << std::endl;
 			tmpImage->SetDirection( inputImage->GetDirection() );
 			tmpImage->SetOrigin( inputImage->GetOrigin() );
 
@@ -461,8 +456,8 @@ int main(
 
 		tileImageFilter->SetLayout( layout );
 		tileImageFilter->Update();
-		isis::data::ImageList imgList = movingAdapter->makeIsisImageObject<FMRIOutputType>(tileImageFilter->GetOutput());
-		isis::data::IOFactory::write(imgList, out_filename, "");
+		isis::data::ImageList imgList = movingAdapter->makeIsisImageObject<FMRIOutputType>( tileImageFilter->GetOutput() );
+		isis::data::IOFactory::write( imgList, out_filename, "" );
 	}
 
 	std::cout << std::endl << "Done.    " << std::endl;

@@ -301,7 +301,7 @@ public:
 	}
 	boost::numeric::range_check_result convert( const TypeBase &src, TypeBase &dst )const {
 		bool &dstVal = dst.cast_to_Type<bool>();
-		const std::string srcVal = boost::algorithm::to_lower_copy<std::string>(src.cast_to_Type<std::string>());
+		const std::string srcVal = boost::algorithm::to_lower_copy<std::string>( src.cast_to_Type<std::string>() );
 
 		if (  srcVal == "true" || srcVal == "y" || srcVal == "yes" ) {
 			dstVal = true;

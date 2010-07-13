@@ -25,14 +25,14 @@ public:
 		for ( size_t i = 0; i < timesteps; i++ ) {
 			for ( size_t c = 0; c < images; c++ ) {
 				data::MemChunk<uint8_t> ch( 50, 50, 50 );
-				ch.setProperty( "indexOrigin", util::fvector4( 1, 2, 3, (float)i ) );
+				ch.setProperty( "indexOrigin", util::fvector4( 1, 2, 3, ( float )i ) );
 				ch.setProperty<uint32_t>( "acquisitionNumber", i );
 				ch.setProperty<uint16_t>( "sequenceNumber", c );
 				ch.setProperty( "performingPhysician", std::string( "Dr. Jon Doe" ) );
-				ch.setProperty( "readVec", util::fvector4(   (float)1 / sqrtf( 2 ), (float)1 / sqrtf( 2 ) ) ); //rotated by pi/4 (45°)
-				ch.setProperty( "phaseVec", util::fvector4( (float)-1 / sqrtf( 2 ), (float)1 / sqrtf( 2 ) ) );
+				ch.setProperty( "readVec", util::fvector4(   ( float )1 / sqrtf( 2 ), ( float )1 / sqrtf( 2 ) ) ); //rotated by pi/4 (45°)
+				ch.setProperty( "phaseVec", util::fvector4( ( float ) - 1 / sqrtf( 2 ), ( float )1 / sqrtf( 2 ) ) );
 				ch.setProperty( "voxelSize", util::fvector4( 1, 2, 3 ) );
-				ch.setProperty("repetitionTime", 1234);
+				ch.setProperty( "repetitionTime", 1234 );
 
 				for ( int x = 10; x < 40; x++ )
 					for ( int y = 10; y < 40; y++ )

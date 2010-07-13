@@ -36,7 +36,7 @@ typedef boost::uint16_t uint16_t;
 typedef boost::uint32_t uint32_t;
 typedef boost::int64_t  int64_t;
 typedef boost::uint64_t uint64_t;
-#define DISABLE_WARN(NUM)	#pragma warning(disable:4244)
+#define DISABLE_WARN(NUM)   #pragma warning(disable:4244)
 #define DISABLE_WARN_LINE(NUM) #pragma warning(suppress:4996)
 #else
 #include <stdint.h>
@@ -197,7 +197,7 @@ template<typename TARGET> std::list<TARGET> string2list( const std::string &sour
  * \returns true if the value current currently refers to is equal to compare
  */
 template<typename ForwardIterator, typename T, typename CMP> bool
-continousFind( ForwardIterator &current, const ForwardIterator end, const T& compare, CMP compOp )
+continousFind( ForwardIterator &current, const ForwardIterator end, const T &compare, CMP compOp )
 {
 	//find the first iterator which is does not compare less
 	current = std::lower_bound( current, end, compare, compOp );
@@ -218,24 +218,26 @@ continousFind( ForwardIterator &current, const ForwardIterator end, const T& com
 template<typename T> bool fuzzyEqual( T a, T b )
 {
 	BOOST_MPL_ASSERT( ( boost::is_float<T> ) );
-	const T epsilon=std::numeric_limits<T>::epsilon();
+	const T epsilon = std::numeric_limits<T>::epsilon();
 
 	if ( a == b )
 		return true;
 
-	if(a<0 && b>0){
-		b+=-a;
-		a=0;
-	} else if(a>0 && b<0){
-		a+=-b;
-		b=0;
+	if( a < 0 && b > 0 ) {
+		b += -a;
+		a = 0;
+	} else if( a > 0 && b < 0 ) {
+		a += -b;
+		b = 0;
 	}
-	if(a == 0 && std::fabs(b)< epsilon*epsilon)
-		return true;
-	if(b == 0 && std::fabs(a)< epsilon*epsilon)
+
+	if( a == 0 && std::fabs( b ) < epsilon * epsilon )
 		return true;
 
-	const T dist_fac = (std::max( a, b ) / std::min(a,b))-1;
+	if( b == 0 && std::fabs( a ) < epsilon * epsilon )
+		return true;
+
+	const T dist_fac = ( std::max( a, b ) / std::min( a, b ) ) - 1;
 	return  dist_fac <= epsilon;
 }
 
@@ -254,16 +256,16 @@ namespace _internal
  * \returns true if the value current currently refers to is equal to compare
  */
 template<typename ForwardIterator, typename T> bool
-continousFind( ForwardIterator &current, const ForwardIterator end, const T& compare )
+continousFind( ForwardIterator &current, const ForwardIterator end, const T &compare )
 {
 	return continousFind( current, end, compare, std::less<T>() );
 }
 
 ///Caseless less-compare for std::string
 struct caselessStringLess {
-	bool operator() ( const std::string& a, const std::string& b ) const {
-		return strcasecmp(a.c_str(),b.c_str())<0;
-// 		return boost::algorithm::to_lower_copy(a) < boost::algorithm::to_lower_copy(b);
+	bool operator() ( const std::string &a, const std::string &b ) const {
+		return strcasecmp( a.c_str(), b.c_str() ) < 0;
+		//      return boost::algorithm::to_lower_copy(a) < boost::algorithm::to_lower_copy(b);
 		//@todo for WinXP maybe look at http://www.winehq.org/pipermail/wine-patches/2004-August/012083.html
 	}
 };

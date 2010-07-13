@@ -28,9 +28,9 @@ int main()
 	if ( &s1 != &Singletons::get<SingleTest<1>, 0>() )
 		std::cerr << "Second request for SingleTest<1> differs" << std::endl;
 
-	if ( ( void* )&s1 == ( void* )&Singletons::get<SingleTest<2>, 5>() )
+	if ( ( void * )&s1 == ( void * )&Singletons::get<SingleTest<2>, 5>() )
 		std::cerr << "request for SingleTest<2> gets Singleton1" << std::endl;
 
-	if ( ( void* )&s1 == ( void* )&Singletons::get<SingleTest<3>, 5>() ) // this should be deleted before SingleTest<2>
+	if ( ( void * )&s1 == ( void * )&Singletons::get<SingleTest<3>, 5>() ) // this should be deleted before SingleTest<2>
 		std::cerr << "request for SingleTest<3> gets Singleton1" << std::endl;
 }

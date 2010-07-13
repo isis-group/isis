@@ -4,23 +4,24 @@
 
 using namespace isis;
 
-void dropDuplicate(data::ImageList &list){
+void dropDuplicate( data::ImageList &list )
+{
+	for( data::ImageList::iterator a = list.begin(); a != list.end(); a++ ) {
+		data::ImageList::iterator b = a;
+		b++;
 
-	for(data::ImageList::iterator a=list.begin();a!=list.end();a++){
-		data::ImageList::iterator b=a;b++;
-		while(b!=list.end()){
-			const util::PropMap &aref=**a,bref=**b;
-			if(aref.getDifference(bref).empty()){
+		while( b != list.end() ) {
+			const util::PropMap &aref = **a, bref = **b;
+
+			if( aref.getDifference( bref ).empty() ) {
 				std::cout << "Duplicate found in data from "
-				<< bref.propertyValue("source").toString(false) << ":" << std::distance(list.begin(),b)
-				<< ", dropping.." << std::endl;
-				list.erase(b++);
+						  << bref.propertyValue( "source" ).toString( false ) << ":" << std::distance( list.begin(), b )
+						  << ", dropping.." << std::endl;
+				list.erase( b++ );
 			} else
 				++b;
 		}
 	}
-
-
 }
 
 int main( int argc, char *argv[] )
@@ -45,9 +46,8 @@ int main( int argc, char *argv[] )
 
 	data::ImageList images1 = data::IOFactory::load( files.front() );
 	data::ImageList images2 = data::IOFactory::load( files.back() );
-
-	dropDuplicate(images1);
-	dropDuplicate(images2);
+	dropDuplicate( images1 );
+	dropDuplicate( images2 );
 
 	if ( images1.size() != images2.size() ) {
 		std::cout << "Amount of found images in " << files.front() << " and " << files.back() << " differs" << std::endl;

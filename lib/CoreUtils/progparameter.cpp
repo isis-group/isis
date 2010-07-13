@@ -56,32 +56,37 @@ bool isis::util::ParameterMap::parse( int argc, char **argv )
 {
 	parsed = true;
 	std::string pName;
-	
+
 	for ( int i = 1; i < argc; ) { // scan through the command line, to find next parameter
 		if ( argv[i][0] == '-' ) { //seems like we found a new parameter here
 			pName = argv[i];
 			pName.erase( 0, pName.find_first_not_of( '-' ) );
 			i++;
 		}
-		if(!pName.empty()){ // if we got a parameter before
-			const int begin=i;
-			while(i<argc && argv[i][0]!='-'){ //collect its properties, while there are some ..
+
+		if( !pName.empty() ) { // if we got a parameter before
+			const int begin = i;
+
+			while( i < argc && argv[i][0] != '-' ) { //collect its properties, while there are some ..
 				i++;
 			}
+
 			iterator found = find( pName );
-			if(found==end()){
-				LOG(Runtime, warning ) << "Ignoring unknown parameter " << MSubject( std::string("-")+pName+" "+list2string( argv+begin, argv+i, " ", "", "" ) );
-			} else if ( found->second.parse( list2string( argv+begin, argv+i, ",", "", "" ) ) ) { // parse the collected properties
+
+			if( found == end() ) {
+				LOG( Runtime, warning ) << "Ignoring unknown parameter " << MSubject( std::string( "-" ) + pName + " " + list2string( argv + begin, argv + i, " ", "", "" ) );
+			} else if ( found->second.parse( list2string( argv + begin, argv + i, ",", "", "" ) ) ) { // parse the collected properties
 				found->second.needed() = false;//remove needed flag, because the value is set (aka "not needed anymore")
 			} else {
 				LOG( Runtime, error )
-				<< "Failed to parse value(s) "
-				<< MSubject( list2string( argv+begin, argv+i, " ", "", "" ))
-				<< " for "	<< found->first << "(" << found->second->typeName() << ")";
+						<< "Failed to parse value(s) "
+						<< MSubject( list2string( argv + begin, argv + i, " ", "", "" ) )
+						<< " for "  << found->first << "(" << found->second->typeName() << ")";
 				parsed = false;
 			}
 		}
 	}
+
 	return parsed ;
 }
 bool isis::util::ParameterMap::isComplete()const
@@ -95,10 +100,10 @@ void isis::util::ParameterMap::printAll()const
 }
 void isis::util::ParameterMap::printNeeded()const
 {
-	std::map<key_type, mapped_type,key_compare> needed( *this );
+	std::map<key_type, mapped_type, key_compare> needed( *this );
 
 	for (
-		std::map<key_type, mapped_type,key_compare>::iterator at = std::find_if( needed.begin(), needed.end(), notneededP() );
+		std::map<key_type, mapped_type, key_compare>::iterator at = std::find_if( needed.begin(), needed.end(), notneededP() );
 		at != needed.end();
 		at = std::find_if( at, needed.end(), notneededP() )
 	)

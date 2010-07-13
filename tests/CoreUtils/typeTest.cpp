@@ -149,7 +149,7 @@ BOOST_AUTO_TEST_CASE( type_conversion_test )
 	TypeBase *fRef2 = &tFloat2;
 	TypeBase *vRef = &vec;
 	BOOST_CHECK_EQUAL( iRef->as<double>(), 42 );
-	BOOST_CHECK_EQUAL( fRef1->as<int32_t>(), ( int32_t )ceil( tFloat1 -.5 ) );
+	BOOST_CHECK_EQUAL( fRef1->as<int32_t>(), ( int32_t )ceil( tFloat1 - .5 ) );
 	BOOST_CHECK_EQUAL( fRef2->as<int32_t>(), ( int32_t )ceil( tFloat2 - .5 ) );
 	BOOST_CHECK_EQUAL( fRef2->as<std::string>(), "3.54150009" );
 	BOOST_CHECK_EQUAL( vRef->as<fvector4>(), fvector4( 1, 2, 3, 4 ) );

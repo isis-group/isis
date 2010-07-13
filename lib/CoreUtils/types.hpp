@@ -32,7 +32,7 @@ namespace _internal
 
 /// the supported types as mpl-vector
 typedef boost::mpl::vector23 < //increase this if a type is added (if >30 consider including vector40 above)
-  bool
+bool
 , int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t
 , float, double
 , rgb_color24, rgb_color48
@@ -49,9 +49,9 @@ typedef boost::mpl::vector23 < //increase this if a type is added (if >30 consid
  */
 template<class T> struct TypeId {
 	typedef typename boost::mpl::distance <
-		typename boost::mpl::begin<types>::type,
-		typename boost::mpl::find<types, T>::type
-	>::type type;
+	typename boost::mpl::begin<types>::type,
+			 typename boost::mpl::find<types, T>::type
+			 >::type type;
 	static const int value = type::value;
 };
 }

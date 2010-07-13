@@ -20,7 +20,7 @@
 #include <limits.h>
 
 #ifndef __GNU_C__
-#define __PRETTY_FUNCTION__	__FUNCTION__ 
+#define __PRETTY_FUNCTION__ __FUNCTION__
 #endif
 
 
