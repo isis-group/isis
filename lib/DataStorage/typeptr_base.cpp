@@ -82,7 +82,7 @@ bool TypePtrBase::convertTo( TypePtrBase &dst, const util::_internal::TypeBase &
 	}
 }
 
-bool TypePtrBase::swapAlong( TypePtrBase &dst, const size_t dim, const size_t dims[]  )
+bool TypePtrBase::swapAlong( TypePtrBase &dst, const size_t dim, const size_t dims[]  ) const
 {
 	boost::shared_ptr<void> daddr = dst.address().lock();
 	boost::shared_ptr<void> saddr = address().lock();

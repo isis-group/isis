@@ -246,6 +246,8 @@ int main(
 		fixedImage = fixedAdapter->makeItkImageObject<FixedImageType>( refList.front() );
 		movingImage = movingAdapter->makeItkImageObject<MovingImageType>( inList.front() );
 		// TODO DEBUG
+
+
 		//      std::cout << "********** Fixed Image **********" << std::endl;
 		//      std::cout << fixedImage->GetDirection();
 		//      std::cout << "index origin: ";
@@ -271,6 +273,7 @@ int main(
 		//      std::cout << "diagonal point:" << mpoint << std::endl;
 		//      std::cout << "size: " << msize << std::endl;
 		//      std::cout << "spacing: " << movingImage->GetSpacing() << std::endl;
+
 	}
 
 	if ( smooth ) {

@@ -155,7 +155,8 @@ public:
 	 * the transform will be converted in a way that the image is the same in physical space
 	 * as it was prior to swapping.
 	 */
-	bool swapAlong( Chunk &, const size_t dim = 0, bool convertTransform = true );
+
+	bool swapAlong( Chunk&, const size_t dim=0, bool convertTransform=true ) const;
 
 };
 

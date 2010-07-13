@@ -76,8 +76,8 @@ static VOptionDescRec options[] = {
 	},
 
 	//non-required inputs
-	{"itktrans", VStringRepn, 0, &trans_filename, &trans_found, 0, "the itk transform filename"}, {
-		"interpolator", VShortRepn,
+	{"itktrans", VStringRepn, 0, &trans_filename, &trans_found, 0, "the itk transform filename"},
+	{"interpolator", VShortRepn,
 		1, &interpolator_type, VOptionalOpt, 0, "The interpolator used to resample the image"
 	}, {"ref", VStringRepn, 1,
 		&template_filename, VOptionalOpt, 0, "The template image"

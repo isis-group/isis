@@ -137,7 +137,7 @@ public:
 	 */
 	void copyRange( size_t start, size_t end, TypePtrBase &dst, size_t dst_start )const;
 
-	bool swapAlong( TypePtrBase &dst, const size_t dim, const size_t dims[] );
+	bool swapAlong( TypePtrBase& dst, const size_t dim, const size_t dims[]) const;
 	/**
 	 * Get minimum/maximum from a TypePtr.
 	 * The parameters are reverences to the current maximum/minimum found.

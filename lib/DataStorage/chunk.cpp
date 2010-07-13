@@ -299,7 +299,7 @@ ChunkList Chunk::splice ( dimensions atDim, util::fvector4 indexOriginOffset, in
 	}
 	return ret;
 }
-bool Chunk::swapAlong(  Chunk &dst, const size_t dim, bool convertTransform )
+bool Chunk::swapAlong(  Chunk &dst, const size_t dim, bool convertTransform ) const 
 {
 	size_t dims[] = { dimSize( 0 ), dimSize( 1 ), dimSize( 2 ), dimSize( 3 ) };
 
