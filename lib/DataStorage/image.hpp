@@ -173,7 +173,7 @@ public:
 	 * \returns a copy of the chunk that contains the voxel at the given coordinates.
 	 * (Reminder: Chunk-copies are cheap, so the data are NOT copied)
 	 */
-	const Chunk &getChunk( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const;
+	const Chunk getChunk( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata=true )const;
 
 	/**
 	 * Get the chunk that contains the voxel at the given coordinates.
@@ -183,9 +183,10 @@ public:
 	 * \param second The second coordinate in voxel space. Usually the y value.
 	 * \param third The third coordinate in voxel space. Ususally the z value.
 	 * \param fourth The fourth coordinate in voxel space. Usually the time value.
-	 * \returns a reference of the chunk that contains the voxel at the given coordinates.
+	 * \returns a copy of the chunk that contains the voxel at the given coordinates.
+	 * (Reminder: Chunk-copies are cheap, so the data are NOT copied)
 	 */
-	Chunk &getChunk( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 );
+	Chunk getChunk( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata=true );
 
 	/**
 	 * Get the chunk that contains the voxel at the given coordinates in the given type.

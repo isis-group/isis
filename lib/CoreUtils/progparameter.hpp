@@ -81,16 +81,7 @@ public:
 	 *
 	 * In any other case a runtime error will be raised.
 	 */
-	operator const int()const {
-		LOG_IF( empty(), isis::CoreDebug, isis::error ) << "Program parameters must not be empty. Please set it to any value.";
-
-		if ( get()->is<bool>() ) //hack to make if(ProgParameter) possible
-			return get()->cast_to_Type<bool>();
-		else if ( get()->is<Selection>() ) //use the implicit cast of selection to int
-			return ( ( Selection )get()->cast_to_Type<Selection>() );
-		else
-			return get()->cast_to_Type<int32_t>();
-	}
+	operator const int()const;
 };
 
 /**

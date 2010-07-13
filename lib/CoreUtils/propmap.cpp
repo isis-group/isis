@@ -353,7 +353,7 @@ void PropMap::joinTree( const isis::util::PropMap &other, bool overwrite, std::s
 				LOG( Debug, info ) << "Replacing property " << MSubject( *thisIt ) << " by " << MSubject( otherIt->second );
 				thisIt->second = otherIt->second;
 			} else if ( ! ( thisIt->second == otherIt->second ) ) { // otherwise put the other into rejected if its not equal to our
-				LOG( Debug, info )
+				LOG( Debug, warning )
 						<< "Rejecting property " << MSubject( *otherIt )
 						<< " because " << MSubject( thisIt->second ) << " is allready there";
 				rejects.insert( rejects.end(), prefix + otherIt->first );

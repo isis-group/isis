@@ -257,7 +257,7 @@ bool Image::reIndex()
 
 	//remove common props from the chunks
 	for ( size_t i = 0; i != lookup.size(); i++ )
-		getChunkAt( i ).remove( common, true );
+		getChunkAt( i ).remove( common, false ); //this _won't keep needed properties - so from here on the chunks of the image are invalid
 
 	LOG_IF( ! common.empty(), Debug, verbose_info ) << "common properties removed from " << set.size() << " chunks: " << common;
 
@@ -409,23 +409,22 @@ Chunk &Image::getChunkAt( size_t at )
 	return ret;
 }
 
-Chunk &Image::getChunk ( size_t first, size_t second, size_t third, size_t fourth )
+Chunk Image::getChunk ( size_t first, size_t second, size_t third, size_t fourth, bool copy_metadata )
 {
 	if ( ! clean ) {
 		LOG( Debug, info )
 				<< "Image is not clean. Running reIndex ...";
 		reIndex();
 	}
-
-	const size_t index = commonGet( first, second, third, fourth ).first;
-
-	return getChunkAt( index );
+	return const_cast<const Image&>(*this).getChunk(first,second,third,fourth,copy_metadata); // use the const version
 }
 
-const Chunk &Image::getChunk ( size_t first, size_t second, size_t third, size_t fourth ) const
+const Chunk Image::getChunk ( size_t first, size_t second, size_t third, size_t fourth, bool copy_metadata ) const
 {
 	const size_t index = commonGet( first, second, third, fourth ).first;
-	return getChunkAt( index );
+	Chunk ret(getChunkAt( index )); // return a copy
+	if(copy_metadata)ret.join(*this); // copy all metadata from the image in here
+	return ret;
 }
 
 size_t Image::getChunkStride ( size_t base_stride )
