@@ -17,11 +17,13 @@
 #include <dlfcn.h>
 #endif
 #include <iostream>
+#include <vector>
 #include "CoreUtils/log.hpp"
 #include "common.hpp"
 #include <boost/regex.hpp>
 #include <boost/foreach.hpp>
 #include <boost/system/error_code.hpp>
+#include <boost/algorithm/string.hpp>
 #include "CoreUtils/singletons.hpp"
 
 namespace isis
@@ -157,6 +159,7 @@ IOFactory &IOFactory::get()
 int IOFactory::loadFile( isis::data::ChunkList &ret, const boost::filesystem::path &filename, std::string suffix_override, std::string dialect )
 {
 	FileFormatList formatReader = getFormatInterface( filename.string(), suffix_override, dialect );
+    size_t nimgs_old = ret.size();   // save number of chunks 
 	BOOST_FOREACH( FileFormatList::const_reference it, formatReader ) {
 		LOG( ImageIoDebug, info )
 				<< "plugin to load file " <<  util::MSubject( filename ) << ": " << it->name()
@@ -168,7 +171,8 @@ int IOFactory::loadFile( isis::data::ChunkList &ret, const boost::filesystem::pa
 			return it->load( ret, filename.string(), dialect );
 		} catch ( std::runtime_error &e ) {
 			LOG( Runtime, error )
-					<< "Failed to load " <<  filename << " using " <<  util::MSubject( it->name() ) << " ( " << e.what() << " )";
+					<< "Failed to load " <<  filename << " using " <<  it->name() << " ( " << e.what() << " )";
+            return ret.size() - nimgs_old;
 		}
 	}
 
@@ -204,9 +208,25 @@ IOFactory::FileFormatList IOFactory::getFormatInterface( std::string filename, s
 	FileFormatList reader;
 
 	for ( FileFormatList::const_iterator it = io_suffix[ext].begin(); it != io_suffix[ext].end(); it++ ) {
-		if ( std::string::npos != ( *it )->dialects().find( dialect ) ) {
+
+      std::vector<std::string> splitted;
+      std::string d ((*it)->dialects());
+      // this file format reader supports no dialects -> skip to the next candidate 
+      if(d.empty())
+        continue;
+
+      boost::algorithm::split(splitted, d, boost::algorithm::is_any_of(" "));
+ 
+      for(std::vector<std::string>::const_iterator iter = splitted.begin(); iter != splitted.end();iter++){
+        if(dialect == *iter) {
 			reader.push_back( *it );
+            break;
 		}
+	}
+
+//		if ( std::string::npos != ( *it )->dialects().find( dialect ) ) {
+//			reader.push_back( *it );
+//		}
 	}
 
 	return reader;

@@ -416,14 +416,17 @@ Chunk Image::getChunk ( size_t first, size_t second, size_t third, size_t fourth
 				<< "Image is not clean. Running reIndex ...";
 		reIndex();
 	}
-	return const_cast<const Image&>(*this).getChunk(first,second,third,fourth,copy_metadata); // use the const version
+
+	return const_cast<const Image &>( *this ).getChunk( first, second, third, fourth, copy_metadata ); // use the const version
 }
 
 const Chunk Image::getChunk ( size_t first, size_t second, size_t third, size_t fourth, bool copy_metadata ) const
 {
 	const size_t index = commonGet( first, second, third, fourth ).first;
-	Chunk ret(getChunkAt( index )); // return a copy
-	if(copy_metadata)ret.join(*this); // copy all metadata from the image in here
+	Chunk ret( getChunkAt( index ) ); // return a copy
+
+	if( copy_metadata )ret.join( *this ); // copy all metadata from the image in here
+
 	return ret;
 }
 
@@ -464,7 +467,7 @@ size_t Image::getChunkStride ( size_t base_stride )
 						<< "Distance between chunk " << util::MSubject( i ) << " and " << util::MSubject( i + base_stride )
 						<< " is " << distThis.len() << ". Distance between 0 and " << util::MSubject( i + base_stride ) << " is " << distFirst.len();
 
-				if ( distFirst.sqlen() <= distThis.sqlen() ) { // found an dimensional break - leave
+				if ( distFirst.sqlen() <= distThis.sqlen() ) { // the next chunk is nearer to the begin than to this => dimensional break => leave
 					LOG( Debug, info )
 							<< "Distance between chunk " << util::MSubject( i + base_stride )
 							<< " and 0 is not bigger than the distance between " << util::MSubject( i + base_stride )

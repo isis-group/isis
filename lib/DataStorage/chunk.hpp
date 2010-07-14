@@ -156,7 +156,7 @@ public:
 	 * as it was prior to swapping.
 	 */
 
-	bool swapAlong( Chunk&, const size_t dim=0, bool convertTransform=true ) const;
+	bool swapAlong( Chunk &, const size_t dim = 0, bool convertTransform = true ) const;
 
 };
 
