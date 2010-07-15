@@ -15,6 +15,7 @@
 #include "type.hpp"
 #include "types.hpp"
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/mpl/for_each.hpp>
 
 namespace isis
 {
@@ -63,6 +64,24 @@ DEF_TYPE( std::string, string );
 DEF_TYPE( Selection, selection );
 DEF_TYPE( boost::posix_time::ptime, timestamp );
 DEF_TYPE( boost::gregorian::date, date );
+
+namespace _internal{
+struct type_lister {
+	std::map< unsigned short, std::string > &m_map;
+	type_lister( std::map< unsigned short, std::string > &map ): m_map( map ) {}
+	template<typename SRC> void operator()( SRC ) {//will be called by the mpl::for_each
+			m_map.insert(std::make_pair(Type<SRC>::staticID,Type<SRC>::staticName()));
+	}
+};
+}
+
+std::map< unsigned short, std::string > getTypeMap()
+{
+	std::map< unsigned short, std::string > ret;
+	boost::mpl::for_each<_internal::types>( _internal::type_lister( ret ) );
+	return ret;
+}
+
 }
 }
 

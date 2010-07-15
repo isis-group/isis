@@ -52,7 +52,7 @@ template<class T> struct TypeId {
 	typename boost::mpl::begin<types>::type,
 			 typename boost::mpl::find<types, T>::type
 			 >::type type;
-	static const int value = type::value;
+	static const unsigned short value = type::value;
 };
 }
 /// @endcond
@@ -68,6 +68,8 @@ template< typename T > struct check_type {
 		, ( T )
 	);
 };
+
+std::map<unsigned short,std::string> getTypeMap();
 }
 }
 

@@ -58,7 +58,7 @@ public:
 	 */
 	static std::list<std::string> getSuffixes( const FileFormatPtr &reader );
 
-	static bool write( const ImageList &images, const std::string &path, const std::string &dialect );
+	static bool write( const ImageList &images, const std::string &path, std::string suffix_override, const std::string &dialect );
 
 	template<typename charT, typename traits> static void print_formats( std::basic_ostream<charT, traits> &out ) {
 		for ( std::list<FileFormatPtr>::const_iterator it = get().io_formats.begin(); it != get().io_formats.end(); it++ )

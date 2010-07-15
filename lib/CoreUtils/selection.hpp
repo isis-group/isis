@@ -11,6 +11,7 @@
 #define SELECTION_HPP_INCLUDED
 #include <map>
 #include "common.hpp"
+#include <boost/foreach.hpp>
 
 namespace isis
 {
@@ -33,6 +34,12 @@ public:
 	 * \param entries comma separated list of the options as a string
 	 */
 	Selection( const char *entries );
+	/**
+	 * Default constructor.
+	 * Creates a selection with the given options.
+	 * \param entries comma separated list of the options as a string
+	 */
+	template<typename T> Selection( const std::map<T,std::string> &map);
 	/// Fallback contructor to enable creation of empty selections
 	Selection();
 	/**
@@ -71,6 +78,16 @@ public:
 	/// \returns a list of all options
 	std::list<std::string> getEntries()const;
 };
+
+template<typename T> Selection::Selection(const std::map< T, std::string >& map)
+{
+	for(typename std::map< T, std::string >::const_iterator i=map.begin();i!=map.end();i++){
+		const map_type::value_type pair(i->second,i->first);
+		if(!ent_map.insert(pair).second)
+			LOG(Debug,error)<< "Entry " << util::MSubject(pair) << " could not be inserted";
+	}
+}
+
 }
 }
 

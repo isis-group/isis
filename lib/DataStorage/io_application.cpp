@@ -32,6 +32,10 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 		parameters["rf"] = std::string();
 		parameters["rf"].needed() = false;
 		parameters["rf"].setDescription( "Override automatic detection of file suffix for reading with given value." );
+		parameters["rdialect"] = std::string();
+		parameters["rdialect"].needed() = false;
+		parameters["rdialect"].setDescription(
+			"choose dialect for reading. The available dialects depend on the capabilities of IO plugins." );
 	}
 
 	if ( have_output ) {
@@ -40,12 +44,16 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 		parameters["wf"] = std::string();
 		parameters["wf"].needed() = false;
 		parameters["wf"].setDescription( "Override automatic detection of file suffix for writing with given value." );
+		parameters["wdialect"] = std::string();
+		parameters["wdialect"].needed() = false;
+		parameters["wdialect"].setDescription(
+			"choose dialect for writing. The available dialects depend on the capabilities of IO plugins." );
+		parameters["repn"] = util::Selection(util::getTypeMap());
+		parameters["repn"].needed() = false;
+		parameters["repn"].setDescription(
+			"representation in which the data shall be written (not implemented yet)." );
 	}
 
-	parameters["dialect"] = std::string();
-	parameters["dialect"].needed() = false;
-	parameters["dialect"].setDescription(
-		"choose dialect of data set. The available dialects depend on the capabilities of IO plugins." );
 }
 
 IOApplication::~IOApplication() {}
@@ -56,30 +64,46 @@ bool IOApplication::init( int argc, char **argv, bool exitOnError )
 		return false;
 
 	if ( m_input ) {
-		std::string input = parameters["in"];
-		std::string rf = parameters["rf"];
-		std::string dl = parameters["dialect"];
-		images = data::IOFactory::load( input, rf, dl );
-
-		if ( images.empty() ) {
-			if ( exitOnError )
-				exit( 1 );
-
-			return false;
-		} else {
-			for( ImageList::const_iterator a = images.begin(); a != images.end(); a++ ) {
-				for( ImageList::const_iterator b = a; ( ++b ) != images.end(); ) {
-					const util::PropMap &aref = **a, bref = **b;
-					LOG_IF( aref.getDifference( bref ).empty(), Runtime, warning ) << "The metadata of the images from "
-							<< aref.propertyValue( "source" ).toString( false ) << ":" << std::distance<ImageList::const_iterator>( images.begin(), a )
-							<< " and " << bref.propertyValue( "source" ).toString( false ) << ":" << std::distance<ImageList::const_iterator>( images.begin(), b )
-							<< " are equal. Maybe they are duplicates.";
-				}
-			}
-		}
 	}
 
 	return true;
+}
+size_t IOApplication::autoload(bool exitOnError)
+{
+	std::string input = parameters["in"];
+	std::string rf = parameters["rf"];
+	std::string dl = parameters["rdialect"];
+	images = data::IOFactory::load( input, rf, dl );
+
+	if ( images.empty() ) {
+		if ( exitOnError )
+			exit( 1 );
+
+		return false;
+	} else {
+		for( ImageList::const_iterator a = images.begin(); a != images.end(); a++ ) {
+			for( ImageList::const_iterator b = a; ( ++b ) != images.end(); ) {
+				const util::PropMap &aref = **a, bref = **b;
+				LOG_IF( aref.getDifference( bref ).empty(), Runtime, warning ) << "The metadata of the images from "
+						<< aref.propertyValue( "source" ).toString( false ) << ":" << std::distance<ImageList::const_iterator>( images.begin(), a )
+						<< " and " << bref.propertyValue( "source" ).toString( false ) << ":" << std::distance<ImageList::const_iterator>( images.begin(), b )
+						<< " are equal. Maybe they are duplicates.";
+			}
+		}
+	}
+}
+size_t IOApplication::autowrite(ImageList out_images,bool exitOnError)
+{
+	util::Selection repn=parameters["repn"];
+
+	LOG_IF(out_images.empty(),Runtime,warning) << "There are not images for writing.";
+
+	if (! IOFactory::write(out_images,parameters["out"],parameters["rf"],parameters["wdialect"]) ) {
+		if ( exitOnError )
+			exit( 1 );
+		return false;
+	} else
+		return true;
 }
 
 }

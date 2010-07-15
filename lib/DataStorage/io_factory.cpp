@@ -263,19 +263,19 @@ int IOFactory::loadPath( isis::data::ChunkList &ret, const boost::filesystem::pa
 	return loaded;
 }
 
-bool IOFactory::write( const isis::data::ImageList &images, const std::string &filename, const std::string &dialect )
+bool IOFactory::write( const isis::data::ImageList& images, const std::string& path, std::string suffix_override, const std::string& dialect )
 {
-	FileFormatList formatWriter = get().getFormatInterface( filename, "", dialect );
+	FileFormatList formatWriter = get().getFormatInterface( path, suffix_override, dialect );
 	BOOST_FOREACH( FileFormatList::const_reference it, formatWriter ) {
 		LOG( Debug, info )
-				<< "plugin to write to " <<  filename << ": " << it->name()
+				<< "plugin to write to " <<  path << ": " << it->name()
 				<<  ( dialect.empty() ?
 					  std::string( "" ) :
 					  std::string( " using dialect: " ) + dialect
 					);
 
 		try {
-			it->write( images, filename, dialect );
+			it->write( images, path, dialect );
 			LOG( Debug, info ) << images.size() << " images written using " <<  it->name();
 			return true;
 		} catch ( std::runtime_error &e ) {
@@ -284,7 +284,7 @@ bool IOFactory::write( const isis::data::ImageList &images, const std::string &f
 					<< " images using " <<  it->name() << " (" << e.what() << ")";
 		}
 	}
-	LOG( Runtime, error ) << "No plugin found to write to: " << filename; //@todo error message missing
+	LOG( Runtime, error ) << "No plugin found to write to: " << path; //@todo error message missing
 	return false;
 }
 

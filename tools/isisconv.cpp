@@ -27,6 +27,6 @@ int main( int argc, char **argv )
 		}
 	}
 
-	data::IOFactory::get().write( app.images, app.parameters["out"]->as<std::string>(), app.parameters["dialect"] );
+	app.autowrite(app.images);
 	return EXIT_SUCCESS;
 }
