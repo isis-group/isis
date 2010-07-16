@@ -243,12 +243,6 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	// TODO use MemImage instead of MemChunk.
 	boost::shared_ptr<data::MemChunk< typename TImageITK::PixelType > >
 	retChunk( new data::MemChunk< typename TImageITK::PixelType  >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) ) ;
-	retChunk->setProperty( "indexOrigin", util::fvector4( indexOrigin[0], indexOrigin[1], indexOrigin[2], indexOrigin[3] ) );
-	retChunk->setProperty( "readVec", util::fvector4( imageDirection[0][0], imageDirection[1][0], imageDirection[2][0], 0 ) );
-	retChunk->setProperty( "phaseVec", util::fvector4( imageDirection[0][1], imageDirection[1][1], imageDirection[2][1], 0 ) );
-	retChunk->setProperty( "sliceVec", util::fvector4( imageDirection[0][2], imageDirection[1][2], imageDirection[2][2], 0 ) );
-	retChunk->setProperty( "voxelSize", util::fvector4( imageSpacing[0], imageSpacing[1], imageSpacing[2], imageSpacing[3] ) );
-
 	if ( m_ITKDict.HasKey( "sequenceNumber" ) ) {
 		std::string sequenceNumber;
 		itk::ExposeMetaData<std::string>( m_ITKDict, "sequenceNumber", sequenceNumber );
@@ -269,7 +263,11 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 		itk::ExposeMetaData<util::fvector4>( m_ITKDict, "voxelGap", voxelGap );
 		retChunk->setProperty( "voxelGap", voxelGap );
 	}
-
+	retChunk->setProperty( "indexOrigin", util::fvector4( indexOrigin[0], indexOrigin[1], indexOrigin[2], indexOrigin[3] ) );
+	retChunk->setProperty( "readVec", util::fvector4( imageDirection[0][0], imageDirection[1][0], imageDirection[2][0], 0 ) );
+	retChunk->setProperty( "phaseVec", util::fvector4( imageDirection[0][1], imageDirection[1][1], imageDirection[2][1], 0 ) );
+	retChunk->setProperty( "sliceVec", util::fvector4( imageDirection[0][2], imageDirection[1][2], imageDirection[2][2], 0 ) );
+	retChunk->setProperty( "voxelSize", util::fvector4( imageSpacing[0], imageSpacing[1], imageSpacing[2], imageSpacing[3] ) );
 	//do not try to grasp that in a sober state!!
 	data::ChunkList chunkList;
 	chunkList.push_back( *retChunk );
@@ -277,6 +275,7 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	data::ImageList isisImageList( chunkList );
 	boost::shared_ptr< data::MemImage< TOutputISIS > > retImage (
 		new data::MemImage<TOutputISIS>  ( *isisImageList.front().get() ) );
+	static_cast<util::PropMap &> ( *retImage ) = static_cast <util::PropMap& > (*retChunk);
 	data::ImageList retList;
 //	std::cout << "prior: " << retImage->propertyValue("indexOrigin");
 	retList.push_back( retImage );
