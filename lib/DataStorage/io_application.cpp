@@ -73,7 +73,7 @@ size_t IOApplication::autoload(bool exitOnError)
 	std::string input = parameters["in"];
 	std::string rf = parameters["rf"];
 	std::string dl = parameters["rdialect"];
-	LOG(DataLog, info) << "loading " << parameters["in"] << " with rf: " << parameters["rf"] << " and rdialect: " << parameters["rdialect"];
+	LOG(DataLog, info) << "loading " << parameters["in"].toString(false) << " with rf: " << parameters["rf"].toString(false) << " and rdialect: " << parameters["rdialect"].toString(false);
 	images = data::IOFactory::load( input, rf, dl );
 
 	if ( images.empty() ) {
