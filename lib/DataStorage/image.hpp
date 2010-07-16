@@ -20,6 +20,7 @@
 #include <vector>
 #include <boost/foreach.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
+#include <stack>
 
 namespace isis
 {
@@ -47,6 +48,9 @@ public:
 protected:
 	ChunkSet set;
 	std::vector<ChunkIterator> lookup;
+	std::stack<boost::shared_ptr<sortComparator> > secondaryComp;
+	boost::shared_ptr<sortComparator> geometricComp;
+	std::list<std::string> sortProps;
 private:
 	bool clean;
 	size_t chunkVolume;
@@ -107,9 +111,8 @@ protected:
 public:
 	/**
 	 * Creates an empty Image object.
-	 * \param lt copmarison functor used to sort the chunks
 	 */
-	Image( _internal::image_chunk_order lt = _internal::image_chunk_order() );
+	Image();
 	/**
 	 * This method returns a reference to the voxel value at the given coordinates.
 	 *
@@ -161,7 +164,6 @@ public:
 		return data[index.second];
 	}
 
-	const util::fvector4 index2space( const size_t first, const size_t second = 0, const size_t third = 0, const size_t fourth = 0 ) const;
 	/**
 	 * Get the chunk that contains the voxel at the given coordinates.
 	 *
@@ -278,15 +280,12 @@ public:
 		// the chunks references are useless
 		lookup.clear();
 		set.clear();
-
 		util::_internal::TypeBase::Reference min, max;
 		src.getMinMax( min, max );
 		LOG( Debug, info ) << "Computed value range of the source image: [" << min << ".." << max << "]";
 
 		//we want copies, and we want them to be of type T
-		std::cout << "src: " << src.propertyValue("indexOrigin") << std::endl;
-		for ( ConstChunkIterator i = src.chunksBegin(); i != src.chunksEnd(); ++i ){
-			std::cout << "iter: " << i->propertyValue("indexOrigin") << std::endl;
+		for ( ConstChunkIterator i = src.chunksBegin(); i != src.chunksEnd(); ++i )      {
 			insertChunk( MemChunk<T>( *i, *min, *max ) );
 		}
 

@@ -26,64 +26,7 @@ namespace isis
 namespace data
 {
 
-namespace _internal
-{
-
-bool image_chunk_order::operator() ( const data::Chunk &a, const data::Chunk &b )const
-{
-	//@todo exception ??
-	LOG_IF( ! a.hasProperty( "indexOrigin" ), Debug, error )
-			<< "The chunk has no position, it can not be sorted into the image.";
-	LOG_IF( ! a.hasProperty( "acquisitionNumber" ), Debug, warning )
-			<< "The chunk has no acquisitionNumber, it may not be sorted into the image.";
-	const util::fvector4 &posA = a.getProperty<util::fvector4>( "indexOrigin" );
-	const util::fvector4 &posB = b.getProperty<util::fvector4>( "indexOrigin" );
-
-	if ( posA.lexical_less_reverse( posB ) ) { //if chunk is "under" the other - put it there
-		LOG( Debug, verbose_info )
-				<< "Successfully sorted chunks by position"
-				<< " (" << posA << " below " << posB << ")";
-		return true;
-	}
-
-	if ( posA == posB ) { //if the chunks have the same position, check if they can be sorted by time
-		if ( a.hasProperty( "acquisitionTime" ) && b.hasProperty( "acquisitionTime" ) ) {
-			const float aTime = a.getProperty<float>( "acquisitionTime" );
-			const float bTime = b.getProperty<float>( "acquisitionTime" );
-
-			if ( aTime < bTime ) {
-				LOG( Debug, info )
-						<< "Fallback sorted chunks by time"
-						<< " (" << aTime << " before " << bTime << ")";
-				return true;
-			} else if ( bTime < aTime ) {
-				return false;
-			}
-		}
-
-		//if acquisitionTime is equal as well (or missing) fall back to acquisitionNumber
-		const uint32_t aNumber = a.getProperty<uint32_t>( "acquisitionNumber" );
-		const uint32_t bNumber = b.getProperty<uint32_t>( "acquisitionNumber" );
-
-		if ( aNumber < bNumber ) {
-			//if they at least have different acquisitionNumber
-			LOG( Debug, info )
-					<< "Fallback sorted chunks by acquisition order"
-					<< " (" << aNumber << " before " << bNumber << ")";
-			return true;
-		}
-
-		LOG_IF( aNumber == bNumber, Runtime, info )
-				<< "The Chunks from \"" << a.propertyValue( "source" ).toString( false ) << "\" and \""
-				<< b.propertyValue( "source" ).toString( false ) << "\" seem to be equal, won't insert";
-	}
-
-	return false;
-}
-
-}
-
-Image::Image ( _internal::image_chunk_order lt ) : set ( lt ), clean( false )
+Image::Image ( ) : clean( false )
 {
 	addNeededFromString( needed );
 }
@@ -93,7 +36,7 @@ bool Image::insertChunk ( const Chunk &chunk )
 {
 	if ( ! chunk.valid() ) {
 		LOG( Runtime, error )
-				<< "Cannot insert chunk. Missing properties: " << chunk.getMissing();
+				<< "Cannot insert invalid chunk. Missing properties: " << chunk.getMissing();
 		return false;
 	}
 
@@ -602,38 +545,6 @@ size_t Image::cmp( const isis::data::Image &comp ) const
 
 	return ret;
 }
-const util::fvector4 Image::index2space(const size_t first, const size_t second, const size_t third, const size_t fourth ) const
-{
-	util::fvector4 read = getProperty<util::fvector4>("readVec");
-	util::fvector4 phase = getProperty<util::fvector4>("phaseVec");
-	util::fvector4 slice = getProperty<util::fvector4>("sliceVec");
-	util::fvector4 origin = getProperty<util::fvector4>("indexOrigin");
-	util::fvector4 voxel = getProperty<util::fvector4>("voxelSize");
-	std::cout << "read: " << read << std::endl;
-	std::cout << "phase: " << phase << std::endl;
-	std::cout << "slice: " << slice << std::endl;
-	std::cout << "voxelSize: " << voxel << std::endl;
-	std::vector<size_t> index;
-	index.push_back( first );
-	index.push_back( second );
-	index.push_back( third );
-	util::fvector4 spacePoint;
-	for ( size_t dim2=0; dim2<3; dim2++ )
-	{
-		spacePoint[dim2] = origin[dim2];
-		for ( size_t dim1=0; dim1<3;dim1++ )
-		{
-			switch( dim2 ) {
-			case 0: spacePoint[dim1] += read[dim1] * index[dim1] * voxel[dim1];
-				break;
-			case 1: spacePoint[dim1] += phase[dim1] * index[dim1] * voxel[dim1];
-				break;
-			case 2: spacePoint[dim1] += slice[dim1] * index[dim1] * voxel[dim1];
-			}
-		}
-	}
-	return spacePoint;
-}
 
 Image::orientation Image::getMainOrientation()const
 {
@@ -751,6 +662,54 @@ void Image::transformCoords( boost::numeric::ublas::matrix<float> transform )
 	setProperty<util::fvector4>( "phaseVec", phase );
 	setProperty<util::fvector4>( "sliceVec", slice );
 }
+
+Image::sortComparator::sortComparator(const std::string &prop_name):propertyName(prop_name){}
+Image::originComparator::originComparator(const std::string& prop_name): sortComparator(prop_name){}
+Image::timeComparator::timeComparator(const std::string& prop_name): sortComparator(prop_name){}
+
+bool Image::originComparator::operator()(const isis::data::Chunk& a, const isis::data::Chunk& b) const
+{
+/*	//@todo exception ??
+	if ( a.hasProperty( "acquisitionTime" ) && b.hasProperty( "acquisitionTime" ) ) {
+	LOG_IF( ! a.hasProperty( "indexOrigin" ), Debug, error )
+			<< "The chunk has no position, it can not be sorted into the image.";
+	LOG_IF( ! a.hasProperty( "acquisitionNumber" ), Debug, warning )
+			<< "The chunk has no acquisitionNumber, it may not be sorted into the image.";*/
+
+	assert(a.hasProperty( propertyName ));
+	assert(b.hasProperty( propertyName ));
+	
+	const util::fvector4 &posA = a.propertyValue(propertyName)->cast_to_Type<util::fvector4>();
+	const util::fvector4 &posB = b.propertyValue(propertyName)->cast_to_Type<util::fvector4>();
+
+	if ( posA.lexical_less_reverse( posB ) ) { //if chunk is "under" the other - put it there
+		LOG( Debug, verbose_info )
+				<< "Successfully sorted chunks by " << propertyName
+				<< " (" << posA << " below " << posB << ")";
+		return true;
+	}
+	return false;
+}
+
+bool Image::timeComparator::operator()(const isis::data::Chunk& a, const isis::data::Chunk& b) const
+{
+	assert(a.hasProperty( propertyName ));
+	assert(b.hasProperty( propertyName ));
+	const util::_internal::TypeBase aTime = *a.propertyValue(propertyName);
+	const util::_internal::TypeBase bTime = *b.propertyValue(propertyName);
+
+	if ( aTime.lt(bTime)) {
+		LOG( Debug, info )
+				<< "Fallback sorted chunks by " << propertyName
+				<< " (" << aTime << " before " << bTime << ")";
+		return true;
+	}
+
+	//if acquisitionTime is equal as well (or missing) fall back to acquisitionNumber
+// 	const uint32_t aNumber = a.getProperty<uint32_t>( "acquisitionNumber" );
+// 	const uint32_t bNumber = b.getProperty<uint32_t>( "acquisitionNumber" );
+}
+
 
 } // END namespace data
 } // END namespace isis
