@@ -285,14 +285,14 @@ ChunkList Chunk::splice ( dimensions atDim, util::fvector4 indexOriginOffset, in
 	//get the spliced TypePtr's (the volume of the requested dims is the split-size - in case of readDim it is the length of one line)
 	const TypePtrList pointers = this->asTypePtrBase().splice( spliceSize.product() );
 	const util::fvector4 indexOrigin = this->propertyValue( "indexOrigin" )->cast_to_Type<util::fvector4>();
-	const uint32_t acquisitionNumber = this->propertyValue( "acquisitionNumber" )->cast_to_Type<uint32_t>();
+	const int32_t acquisitionNumber = this->propertyValue( "acquisitionNumber" )->cast_to_Type<int32_t>();
 	unsigned int cnt = 0;
 	//create new Chunks from this TypePtr's
 	BOOST_FOREACH( TypePtrList::const_reference ref, pointers ) {
 		Chunk spliced( ref, spliceSize[0], spliceSize[1], spliceSize[2], spliceSize[3] );
 		static_cast<util::PropMap &>( spliced ) = static_cast<util::PropMap &>( *this ); //copy the metadate of ref
 		spliced.setProperty<util::fvector4>( "indexOrigin", indexOrigin + ( indexOriginOffset * cnt ) );
-		spliced.setProperty( "acquisitionNumber", acquisitionNumber + ( acquisitionNumberOffset * cnt ) );
+		spliced.setProperty<int32_t>( "acquisitionNumber", acquisitionNumber + ( acquisitionNumberOffset * cnt ) );
 		cnt++;
 		//@todo acquisitionNumber is not reset here (and should not be) - this might cause trouble if we try to insert this chunks into an image
 		ret.push_back( spliced );

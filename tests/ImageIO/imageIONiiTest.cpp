@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE( loadsaveImage )
 	images = data::IOFactory::load( nullfile.string(), "" );
 
 	//  write images to file(s)
-	if ( data::IOFactory::write( images, niifile.string(), "fsl" ) )
+	if ( data::IOFactory::write( images, "", niifile.string(), "fsl" ) )
 		std::cout << "Wrote Image to " << niifile << std::endl;
 
 	data::IOFactory::load( niifile.string(), "" );

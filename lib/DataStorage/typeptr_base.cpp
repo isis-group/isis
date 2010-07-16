@@ -88,7 +88,6 @@ bool TypePtrBase::swapAlong( TypePtrBase &dst, const size_t dim, const size_t di
 	boost::shared_ptr<void> saddr = address().lock();
 	const int8_t *const  src = ( int8_t * )saddr.get();
 	int8_t *const dest = ( int8_t * )daddr.get();
-
 	if ( dim == 0 ) {
 		size_t index_forward = 0;
 		size_t index_y = 0;
@@ -103,7 +102,6 @@ bool TypePtrBase::swapAlong( TypePtrBase &dst, const size_t dim, const size_t di
 				}
 			}
 		}
-
 		return 1;
 	} else if ( dim == 1 ) {
 		for ( size_t z = 0; z < dims[2]; z++ ) {
@@ -111,13 +109,11 @@ bool TypePtrBase::swapAlong( TypePtrBase &dst, const size_t dim, const size_t di
 				memcpy( dest + ( ( dims[0] * direction ) + z * dims[0] * dims[1] ) * bytes_per_elem(), src + ( ( dims[0] * ( dims[1] - direction - 1 ) ) + z * dims[0] * dims[1] ) * bytes_per_elem(), bytes_per_elem() * dims[0] );
 			}
 		}
-
 		return 1;
 	} else if ( dim == 2 ) {
 		for ( size_t direction = 0; direction < dims[dim]; direction++ ) {
 			memcpy( dest + direction * dims[0]*dims[1]*bytes_per_elem(), src + ( dims[dim] - direction - 1 )*dims[0]*dims[1]*bytes_per_elem(), bytes_per_elem()*dims[0]*dims[1] );
 		}
-
 		return 1;
 	} else {
 		LOG( Runtime, error ) << "Swapping along axis referred by " << dim << " is not possible!";

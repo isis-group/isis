@@ -602,6 +602,38 @@ size_t Image::cmp( const isis::data::Image &comp ) const
 
 	return ret;
 }
+const util::fvector4 Image::index2space(const size_t first, const size_t second, const size_t third, const size_t fourth ) const
+{
+	util::fvector4 read = getProperty<util::fvector4>("readVec");
+	util::fvector4 phase = getProperty<util::fvector4>("phaseVec");
+	util::fvector4 slice = getProperty<util::fvector4>("sliceVec");
+	util::fvector4 origin = getProperty<util::fvector4>("indexOrigin");
+	util::fvector4 voxel = getProperty<util::fvector4>("voxelSize");
+	std::cout << "read: " << read << std::endl;
+	std::cout << "phase: " << phase << std::endl;
+	std::cout << "slice: " << slice << std::endl;
+	std::cout << "voxelSize: " << voxel << std::endl;
+	std::vector<size_t> index;
+	index.push_back( first );
+	index.push_back( second );
+	index.push_back( third );
+	util::fvector4 spacePoint;
+	for ( size_t dim2=0; dim2<3; dim2++ )
+	{
+		spacePoint[dim2] = origin[dim2];
+		for ( size_t dim1=0; dim1<3;dim1++ )
+		{
+			switch( dim2 ) {
+			case 0: spacePoint[dim1] += read[dim1] * index[dim1] * voxel[dim1];
+				break;
+			case 1: spacePoint[dim1] += phase[dim1] * index[dim1] * voxel[dim1];
+				break;
+			case 2: spacePoint[dim1] += slice[dim1] * index[dim1] * voxel[dim1];
+			}
+		}
+	}
+	return spacePoint;
+}
 
 Image::orientation Image::getMainOrientation()const
 {

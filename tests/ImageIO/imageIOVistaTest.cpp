@@ -52,7 +52,7 @@ int main( int argc, char **argv )
 	//  ((data::ImageList::const_reference) images.front())->print(std::cout,true);
 	// get first image and write it to disk
 	//  data::ImageList::const_reference first = images.front();
-	data::IOFactory::write( images, "/tmp/data1.v", "" );
+	data::IOFactory::write( images, "", "/tmp/data1.v", "" );
 	return 0;
 	//BOOST_AUTO_TEST_SUITE_END()
 }

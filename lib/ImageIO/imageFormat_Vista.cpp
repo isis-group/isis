@@ -240,21 +240,30 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 		util::FixedVector<float, 3> v3;
 		VPointer val;
 		// index origin
-		util::PropertyValue ioprob;
+		util::fvector4 indexOrigin;
 
 		// traverse images and collect all VShort images.
+
 		for( unsigned k = 0; k < nimages; k++ ) {
 			// skip images with no VShort format
 			if( VPixelRepn( images[k] ) != VShortRepn ) {
 				VDestroyImage( images[k] );
 				continue;
 			}
-
+			LOG(isis::DataLog, info) << "current slice: " << k;
 			VistaChunk<VShort> vchunk( images[k] );
+			util::fvector4& ioprob = vchunk.propertyValue( "indexOrigin" )->cast_to_Type<util::fvector4>();
 			nloaded++;
 			// splice VistaChunk
-			data::ChunkList splices = vchunk.splice( data::phaseDim,
+			LOG(DataLog, info) << "splicing";
+			data::ChunkList splices = vchunk.splice( data::sliceDim,
 									  util::fvector4( 0, 0, 0, 0 ), util::fvector4( 0, 0, 0, 0 ) );
+			LOG(DataLog, info) << "finished splicing with " << splices.size();
+			LOG(DataLog, info) << splices.begin()->n_dims;
+			LOG(DataLog, info) << splices.begin()->dimSize(0);
+			LOG(DataLog, info) << splices.begin()->dimSize(1);
+			LOG(DataLog, info) << splices.begin()->dimSize(2);
+			LOG(DataLog, info) << splices.begin()->dimSize(3);
 			/******************** GET index origin ********************/
 			// the index origin of each slice depends on the slice orientation
 			// and voxel resolution. All chunks in the ChunkList splices are supposed
@@ -321,38 +330,48 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 
 			// if there is no index origin value set it default to the index origin
 			// from the first slice
-			if( ioprob.empty() ) {
-				ioprob = vchunk.getProperty<util::fvector4>( "indexOrigin" );
+
+			if( !k ) {
+				LOG(DataLog, info) << "ioprob is empty";
+
+				indexOrigin = vchunk.getProperty<util::fvector4>( "indexOrigin" );
 			}
 			// else: calculate the index origin according to the slice number and voxel
 			// resolution
 			else {
 				// sagittal (x,y,z) -> (z,x,y)
 				if( strcmp( orient, "sagittal" ) == 0 ) {
-					ioprob->as<util::fvector4>()[0] += ( nloaded - 1 ) * v3[2];
+					LOG(DataLog, info) << "computing ioprop with sagittal";
+					ioprob[0] += (nloaded - 1 ) * v3[2];
 				}
 				// coronal (x,y,z) -> (x,-z,y)
 				else if( strcmp( orient, "coronal" ) == 0 ) {
-					ioprob->as<util::fvector4>()[1] -= ( nloaded - 1 ) * v3[2];
+					LOG(DataLog, info) << "computing ioprop with coronal";
+					ioprob[1] -= (nloaded - 1 ) * v3[2];
 				}
 				// axial (x,y,z) -> (x,y,z)
 				else {
-					ioprob->as<util::fvector4>()[2] += ( nloaded - 1 ) * v3[2];
+					LOG(DataLog, info) << "computing ioprop with axial: += " <<  ( nloaded - 1 ) * v3[2];
+					ioprob[2] += (nloaded - 1 ) * v3[2];
 				}
 			}
 
 			/******************** SET acquisition number AND index origin ********************/
 			unsigned acq_number = 0;
-
 			for( data::ChunkList::iterator iter = splices.begin(); iter != splices.end(); iter++ ) {
-				iter->setProperty<unsigned>( "acquisitionNumber", acq_number++ );
-				iter->setProperty<util::fvector4>( "indexOrigin", ioprob->as<util::fvector4>() );
+				iter->setProperty<int32_t>( "acquisitionNumber", acq_number++ );
+				iter->setProperty<util::fvector4>( "indexOrigin", ioprob );
 			}
-
+			LOG(DataLog, info) << "adding " << splices.size() << " chunks to ChunkList";
 			/******************** add chunks to ChunkList ********************/
 			std::back_insert_iterator<data::ChunkList> dest_iter ( chunks );
 			std::copy( splices.begin(), splices.end(), dest_iter );
 		} // END for(unsigned k=0;k<nimages;k++)
+		BOOST_FOREACH( data::ChunkList::const_reference ref, chunks )
+		{
+			std::cout << "index Origin: " << ref.propertyValue("indexOrigin") << std::endl;
+			std::cout << "acqusitionNumber: " << ref.propertyValue("acquisitionNumber") << std::endl;
+		}
 	} // END if dialect == "functional"
 
 	// MAP -> the vista image should contain a single 3D VFloat image. Hence the

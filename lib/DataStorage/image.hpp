@@ -161,6 +161,7 @@ public:
 		return data[index.second];
 	}
 
+	const util::fvector4 index2space( const size_t first, const size_t second = 0, const size_t third = 0, const size_t fourth = 0 ) const;
 	/**
 	 * Get the chunk that contains the voxel at the given coordinates.
 	 *
@@ -277,12 +278,15 @@ public:
 		// the chunks references are useless
 		lookup.clear();
 		set.clear();
+
 		util::_internal::TypeBase::Reference min, max;
 		src.getMinMax( min, max );
 		LOG( Debug, info ) << "Computed value range of the source image: [" << min << ".." << max << "]";
 
 		//we want copies, and we want them to be of type T
-		for ( ConstChunkIterator i = src.chunksBegin(); i != src.chunksEnd(); ++i )      {
+		std::cout << "src: " << src.propertyValue("indexOrigin") << std::endl;
+		for ( ConstChunkIterator i = src.chunksBegin(); i != src.chunksEnd(); ++i ){
+			std::cout << "iter: " << i->propertyValue("indexOrigin") << std::endl;
 			insertChunk( MemChunk<T>( *i, *min, *max ) );
 		}
 

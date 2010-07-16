@@ -15,6 +15,7 @@ int main( int argc, char **argv )
 	if ( ! app.init( argc, argv ) ) {
 		return EXIT_FAILURE;
 	}
+	app.autoload();
 
 	if ( app.images.size() == 0 ) {
 		LOG( isis::image_io::Runtime, error ) << "No images found. Abort";

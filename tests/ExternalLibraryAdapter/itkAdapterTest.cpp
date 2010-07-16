@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE ( ITK_to_ISIS )
 	reader->Update();
 	data::ImageList isisImageList;
 	isisImageList = adapter->makeIsisImageObject<MyImageType>( reader->GetOutput() , false );
-	data::IOFactory::write( isisImageList, "ITK_to_ISIS.nii", "" );
+	data::IOFactory::write( isisImageList, "", "ITK_to_ISIS.nii", "" );
 }
 
 BOOST_AUTO_TEST_CASE ( ISIS_to_ITK_to_ISIS )
@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE ( ISIS_to_ITK_to_ISIS )
 	data::ImageList isisImageList1 = isis::data::IOFactory::load( "/scr/kastanie1/DATA/isis/data_fmrt.nii", "" );
 	itkImage = adapter->makeItkImageObject<MyImageType>( isisImageList1.front() );
 	data::ImageList isisImageList2 = adapter->makeIsisImageObject<MyImageType>( itkImage );
-	data::IOFactory::write( isisImageList2, "ISIS_to_ITK_to_ISIS.nii", "" );
+	data::IOFactory::write( isisImageList2, "", "ISIS_to_ITK_to_ISIS.nii", "" );
 }
 
 BOOST_AUTO_TEST_CASE ( ITK_to_ISIS_to_ITK )

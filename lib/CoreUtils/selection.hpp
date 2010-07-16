@@ -83,8 +83,9 @@ template<typename T> Selection::Selection(const std::map< T, std::string >& map)
 {
 	for(typename std::map< T, std::string >::const_iterator i=map.begin();i!=map.end();i++){
 		const map_type::value_type pair(i->second,i->first);
-		if(!ent_map.insert(pair).second)
+		if(!ent_map.insert(pair).second) {
 			LOG(Debug,error)<< "Entry " << util::MSubject(pair) << " could not be inserted";
+		}
 	}
 }
 

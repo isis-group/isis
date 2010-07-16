@@ -98,11 +98,10 @@ private:
 			// traverse through attribute list and set metadata
 			VAttrList attributes = VImageAttrList( image );
 			VAttrListPosn posn;
-
+			LOG(DataLog, info) << "copying Header from Vista";
 			for( VFirstAttr( attributes, &posn ); VAttrExists( &posn ); VNextAttr( &posn ) ) {
 				const char *name = VGetAttrName( &posn );
 				VPointer val;
-
 				// MANDATORY: voxel --> voxelSize
 				// it's a vector with 3 elements
 				if( strcmp( name, "voxel" ) == 0 ) {
@@ -260,9 +259,11 @@ private:
 					0 );
 				chunk.setProperty( "indexOrigin", iOrig );
 			}
-
 			// set acquisitionNumber. This values is always missing
-			chunk.setProperty( "acquisitionNumber", 0 );
+			chunk.setProperty<int32_t>( "acquisitionNumber", 0 );
+			chunk.setProperty<int32_t>( "sequenceNumber", 0 );
+			LOG(DataLog, info) << "finished copying header";
+
 		}
 
 	public:
@@ -270,8 +271,9 @@ private:
 		/**
 		 * Default constructor. Create a VistaChunk out of a vista image.
 		 */
+
 		VistaChunk( VImage image ):
-			data::Chunk( static_cast<TYPE *>( image->data ), VImageDeleter( image ),
+				data::Chunk( static_cast<TYPE *>( image->data ), VImageDeleter( image ),
 						 VImageNColumns( image ), VImageNRows( image ), VImageNBands( image ) ) {
 			copyHeaderFromVista( image, *this );
 		}
