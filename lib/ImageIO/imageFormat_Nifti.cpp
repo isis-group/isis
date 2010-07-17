@@ -257,7 +257,7 @@ public:
 			if ( 0 == strcasecmp( dialect.c_str(), "fsl" ) ) {
 				image.print( std::cout );
 				data::MemImage<int16_t> fslCopy( image );
-				fslCopy.print( std::cout << "Copy (" << fslCopy.chunksBegin()->typeName() << ")" << std::endl );
+				fslCopy.print( std::cout << "Copy (" << fslCopy.chunkAt(0).typeName() << ")" << std::endl );
 				ni.datatype = DT_INT16;
 				copyDataToNifti<int16_t>( fslCopy, ni );
 				break;

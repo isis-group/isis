@@ -29,28 +29,56 @@ namespace isis{
 namespace data{
 namespace _internal{
 
-struct sortComparator{
-	sortComparator(const std::string& prop_name);
-	std::string propertyName;
-	virtual bool operator() ( const Chunk &a, const Chunk &b )const=0;
-};
-struct originComparator:sortComparator{
-	originComparator(const std::string& prop_name);
-	bool operator() ( const Chunk &a, const Chunk &b )const;
-};
-struct timeComparator:sortComparator{
-	timeComparator(const std::string& prop_name);
-	bool operator() ( const Chunk &a, const Chunk &b )const;
-};
-
-
-class SortedChunkList:std::map<util::PropertyValue,std::map<util::PropertyValue,Chunk,sortComparator>,sortComparator>
+class SortedChunkList
 {
-protected:
-	std::stack<boost::shared_ptr<sortComparator> > secondarySort;
-	boost::shared_ptr<sortComparator> primarySort;
-	SortedChunkList();
+public:
+	struct sortComparator{
+		sortComparator(const std::string& prop_name);
+		std::string propertyName;
+		virtual bool operator() ( const util::PropertyValue &a, const util::PropertyValue &b )const=0;
+		virtual ~sortComparator();
+	};
+	struct scalarPropCompare:public sortComparator{
+		scalarPropCompare(const std::string& prop_name);
+        bool operator()(const isis::util::PropertyValue& a, const isis::util::PropertyValue& b) const;
+	};
+	struct fvectorCompare:public sortComparator{
+		fvectorCompare(const std::string& prop_name);
+        bool operator()(const isis::util::PropertyValue& a, const isis::util::PropertyValue& b) const;
+	};
+private:
+	typedef std::map<util::PropertyValue,boost::shared_ptr<Chunk>,scalarPropCompare> SecondaryMap;
+	typedef std::map<util::fvector4,SecondaryMap,fvectorCompare> PrimaryMap;
+	
+	std::stack<scalarPropCompare> secondarySort;
+	PrimaryMap chunks;
+
+	// low level finding
+	boost::shared_ptr<Chunk> secondaryFind(const util::PropertyValue &key, SecondaryMap& map);
+	SecondaryMap *primaryFind(const util::fvector4& key);
+
+	// low level inserting
+	std::pair<boost::shared_ptr<Chunk>,bool> secondaryInsert(SecondaryMap &map,const Chunk &ch);
+	std::pair<boost::shared_ptr<Chunk>,bool> primaryInsert(const Chunk &ch);
+
+	std::list<std::string> equalProps;
+public:
+	SortedChunkList(const std::string fvectorPropName,std::string comma_separated_equal_props);
+	
+	std::string getPrimarySortPropertyName()const;
+	std::string getSecondarySortPropertyName()const;
+
+	void addSecondarySort(const std::string &cmp);
+	bool popSecondarySort();
+	
+	bool insert(const Chunk &ch);
+	bool empty()const;
+	void clear();
+	
+	std::vector<boost::weak_ptr<Chunk> > getLookup();
+	bool isRectangular();
 };
+
 
 }}}
 
