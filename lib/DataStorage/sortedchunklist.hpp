@@ -99,7 +99,7 @@ public:
 	void clear();
 
 	/// \returns a ordered vector of pointers to the chunks in the list
-	std::vector<boost::weak_ptr<Chunk> > getLookup();
+	std::vector<boost::shared_ptr<Chunk> > getLookup();
 
 	/// \returns true if the list is rectangular (the amount of secondary sorted entries is equal across all primary entries)
 	bool isRectangular();

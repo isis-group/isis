@@ -37,7 +37,7 @@ public:
 
 protected:
 	_internal::SortedChunkList set;
-	std::vector<boost::weak_ptr<Chunk> > lookup;
+	std::vector<boost::shared_ptr<Chunk> > lookup;
 private:
 	bool clean;
 	size_t chunkVolume;

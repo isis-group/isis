@@ -19,9 +19,9 @@ int main()
 			data::MemChunk<short> chk( slice_size, slice_size );
 			chk.setProperty( "readVec", util::fvector4( 1, 0 ) );
 			chk.setProperty( "phaseVec", util::fvector4( 0, 1 ) );
-			chk.setProperty( "indexOrigin", util::fvector4( 0, 0, slice, tstep ) );
+			chk.setProperty( "indexOrigin", util::fvector4( 0, 0, slice ) );
 			chk.setProperty( "acquisitionNumber", ++acq );
-			chk.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
+			chk.setProperty( "voxelSize", util::fvector4( 1, 1, 1 ) );
 
 			if ( !img.insertChunk( chk ) )
 				std::cout << "Inserting Chunk " << slice << " failed" << std::endl;

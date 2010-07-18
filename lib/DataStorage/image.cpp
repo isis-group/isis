@@ -274,17 +274,17 @@ const Chunk &Image::chunkAt( size_t at )const
 {
 	LOG_IF( lookup.empty(), Debug, error ) << "The lookup table is empty. Run reIndex first.";
 	LOG_IF( at >= lookup.size(), Debug, error ) << "Index is out of the range of the lookup table (" << at << ">=" << lookup.size() << ").";
-	boost::weak_ptr<Chunk> ptr = lookup[at];
-	LOG_IF( ptr.expired(), Debug, error ) << "There is no chunk at " << at << ". This usually happens in incomplete images.";
-	return *ptr.lock();
+	const boost::shared_ptr<const Chunk> &ptr = lookup[at];
+	LOG_IF( ptr, Debug, error ) << "There is no chunk at " << at << ". This usually happens in incomplete images.";
+	return *ptr;
 }
 Chunk &Image::chunkAt( size_t at )
 {
 	LOG_IF( lookup.empty(), Debug, error ) << "The lookup table is empty. Run reIndex first.";
 	LOG_IF( at >= lookup.size(), Debug, error ) << "Index is out of the range of the lookup table (" << at << ">=" << lookup.size() << ").";
-	boost::weak_ptr<Chunk> ptr = lookup[at];
-	LOG_IF( ptr.expired(), Debug, error ) << "There is no chunk at " << at << ". This usually happens in incomplete images.";
-	return *ptr.lock();
+	boost::shared_ptr<Chunk> &ptr = lookup[at];
+	LOG_IF( ptr, Debug, error ) << "There is no chunk at " << at << ". This usually happens in incomplete images.";
+	return *ptr;
 }
 
 Chunk Image::getChunk ( size_t first, size_t second, size_t third, size_t fourth, bool copy_metadata )
@@ -382,8 +382,8 @@ std::list<util::PropertyValue> Image::getChunksProperties( const util::PropMap::
 	std::list<util::PropertyValue > ret;
 
 	if( clean ) {
-		BOOST_FOREACH( const boost::weak_ptr<Chunk> &ref, lookup ) {
-			const util::PropertyValue &prop = ref.lock()->propertyValue( key );
+		BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
+			const util::PropertyValue &prop = ref->propertyValue( key );
 
 			if ( unique && prop.empty() ) //if unique is requested and the property is empty
 				continue; //skip it
@@ -403,8 +403,8 @@ std::list<util::PropertyValue> Image::getChunksProperties( const util::PropMap::
 size_t Image::bytes_per_voxel() const
 {
 	size_t size = chunkAt( 0 ).bytes_per_voxel();
-	BOOST_FOREACH( const boost::weak_ptr<Chunk> &ref, lookup ) {
-		LOG_IF( size != ref.lock()->bytes_per_voxel(), Debug, error )
+	BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
+		LOG_IF( size != ref->bytes_per_voxel(), Debug, error )
 				<< "Not all voxels have the same byte size. The result might be wrong.";
 	}
 	return size;
@@ -450,8 +450,8 @@ void Image::getMinMax ( util::_internal::TypeBase::Reference &min, util::_intern
 	LOG_IF( ! max.empty(), Debug, warning ) << "Running getMinMax using non empty max. It will be reset.";
 	min = util::_internal::TypeBase::Reference();
 	max = util::_internal::TypeBase::Reference();
-	BOOST_FOREACH( const boost::weak_ptr<Chunk> &ref, lookup ) {
-		ref.lock()->getMinMax( min, max );
+	BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
+		ref->getMinMax( min, max );
 	}
 }
 size_t Image::cmp( const isis::data::Image &comp ) const

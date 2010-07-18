@@ -226,7 +226,7 @@ size_t SortedChunkList::getHorizontalSize()
 	else return chunks.begin()->second.size();
 }
 
-std::vector< boost::weak_ptr< Chunk > > SortedChunkList::getLookup()
+std::vector< boost::shared_ptr< Chunk > > SortedChunkList::getLookup()
 {
 	LOG_IF( !isRectangular(), Debug, error ) << "Running getLookup on an non rectangular chunk-list is not defined";
 
@@ -234,7 +234,7 @@ std::vector< boost::weak_ptr< Chunk > > SortedChunkList::getLookup()
 		PrimaryMap::iterator iP = chunks.begin();
 		const size_t horizontal = chunks.size();
 		const size_t vertical = iP->second.size();
-		std::vector< boost::weak_ptr< Chunk > > ret( horizontal * vertical );
+		std::vector< boost::shared_ptr< Chunk > > ret( horizontal * vertical );
 
 		for( size_t h = 0; h < horizontal; h++, iP++ ) { // outer loop iterates horizontaly (through the primary sorting)
 			assert( iP != chunks.end() );
@@ -242,14 +242,13 @@ std::vector< boost::weak_ptr< Chunk > > SortedChunkList::getLookup()
 
 			for( size_t v = 0; v < vertical; v++, iS++ ) { // inner loop iterates verticaly (through the secondary sorting)
 				assert( iS != iP->second.end() );
-				boost::weak_ptr<Chunk> ptr = iS->second;
-				ret[h+v *horizontal] = ptr; // insert horizontally - primary sorting is the fastest running index (read the sorting matrix horizontaly)
+				ret[h+v *horizontal] = iS->second; // insert horizontally - primary sorting is the fastest running index (read the sorting matrix horizontaly)
 			}
 		}
 
 		return ret;
 	} else
-		return std::vector< boost::weak_ptr< Chunk > >();
+		return std::vector< boost::shared_ptr< Chunk > >();
 }
 
 void SortedChunkList::forall_ptr( chunkPtrOperator &op )
