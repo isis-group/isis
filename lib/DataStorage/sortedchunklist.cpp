@@ -56,14 +56,26 @@ bool SortedChunkList::scalarPropCompare::operator()(const isis::util::PropertyVa
 		return false;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Chunk operators
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void SortedChunkList::chunkPtrOperator::operator()(boost::shared_ptr< Chunk >& ptr)
+{
+	operator()(const_cast<const boost::shared_ptr< Chunk >& >(ptr));
+}
+void SortedChunkList::chunkPtrOperator::operator()(const boost::shared_ptr< Chunk >& ptr)
+{
+	LOG(Debug,error) << "Empty chunk operation, you should at least override \"operator()(const boost::shared_ptr< Chunk >& ptr)\"";
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // SortedChunkList implementation
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // constructor
-SortedChunkList::SortedChunkList(const std::string fvectorPropName, std::string comma_separated_equal_props ):
-chunks(fvectorCompare(fvectorPropName)),equalProps(util::string2list<std::string>(comma_separated_equal_props,','))
+SortedChunkList::SortedChunkList(std::string fvectorPropName, std::string comma_separated_equal_props ):
+primarySort(fvectorPropName),chunks(primarySort),equalProps(util::string2list<std::string>(comma_separated_equal_props,','))
 {}
 
 
@@ -95,13 +107,13 @@ std::pair<boost::shared_ptr<Chunk>,bool> SortedChunkList::secondaryInsert(Second
 		assert(pos); // here it must have some content
 		return std::make_pair(pos,inserted);
 	} else{
-		LOG(Runtime, warning) << "Cannot insert chunk. It's lacking the property " << propName << " which is needed for primary sorting";
+		LOG(Runtime, warning) << "Cannot insert chunk. It's lacking the property " << util::MSubject( propName ) << " which is needed for primary sorting";
 		return std::pair<boost::shared_ptr<Chunk>,bool>(boost::shared_ptr<Chunk>(),false);
 	}
 }
 std::pair<boost::shared_ptr<Chunk>,bool> SortedChunkList::primaryInsert(const Chunk& ch)
 {
-	const std::string &propName = getPrimarySortPropertyName();
+	const std::string &propName = primarySort.propertyName;
 	LOG_IF(secondarySort.empty(),Debug,error) << "There is no known secondary sorting left. Chunksort will fail.";
 	
 	if(ch.hasProperty(propName)){
@@ -120,16 +132,15 @@ std::pair<boost::shared_ptr<Chunk>,bool> SortedChunkList::primaryInsert(const Ch
 			<< ". it should be " << util::Type<util::fvector4>::staticName();
 		}
 	} else
-		LOG(Runtime, warning) << "Cannot insert chunk. It's lacking the property " << propName << " which is needed for primary sorting";
+		LOG(Runtime, warning) << "Cannot insert chunk. It's lacking the property " << util::MSubject( propName ) << " which is needed for primary sorting";
 	return std::pair<boost::shared_ptr<Chunk>,bool>(boost::shared_ptr<Chunk>(),false);;
 }
 
 // high level insert
 bool SortedChunkList::insert(const Chunk& ch)
 {
-	const std::string prop1=getPrimarySortPropertyName();
-	const std::string prop2=getSecondarySortPropertyName();
-
+	LOG_IF(secondarySort.empty(),Debug,error) << "Inserting will fail without any secondary sort. Use chunks.addSecondarySort at least once.";
+	const std::string &prop1=primarySort.propertyName;
 	if(!empty())
 	{
 		// compare some attributes of the first chunk and the one which shall be inserted
@@ -148,43 +159,36 @@ bool SortedChunkList::insert(const Chunk& ch)
 			}
 		}
 		
-	}else
+	} else {
 		LOG( Debug, verbose_info ) << "Inserting 1st chunk";
+		std::stack<scalarPropCompare> backup=secondarySort;
 
+		while(!ch.hasProperty( secondarySort.top().propertyName )){
+			const std::string temp=secondarySort.top().propertyName;
+			if ( secondarySort.size()>1) {
+				secondarySort.pop();
+			} else {
+				LOG( Debug, warning )
+				<< "First chunk is missing the last secondary sort-property fallback (" << util::MSubject(temp) << "), won't insert.";
+				secondarySort=backup;
+				return false;
+			}
+		}
+		LOG( Debug, info )	<< "Using " << secondarySort.top().propertyName << " for secondary sorting, determined by the first chunk";
+	}
+	
+	const std::string &prop2=secondarySort.top().propertyName;
 	
 	std::pair<boost::shared_ptr<Chunk>,bool> inserted=primaryInsert(ch);
 	LOG_IF(inserted.first && !inserted.second,Debug,info)
-	<< "Not inserting chunk because there is allready one with the properties "
-	<< prop1 << ":" << ch.propertyValue(prop1) << " and " << ch.propertyValue(prop2);
+		<< "Not inserting chunk because there is allready one with the equal properties "
+		<< prop1 << ":" << ch.propertyValue(prop1) << " and " << prop2 << ":" << ch.propertyValue(prop2);
 	return inserted.second;
-}
-
-// tools
-std::string SortedChunkList::getPrimarySortPropertyName()const
-{
-	return chunks.key_comp().propertyName;
-}
-std::string SortedChunkList::getSecondarySortPropertyName()const
-{
-	LOG_IF(secondarySort.empty(),Debug,error) << "There is no known secondary sorting left. Chunksort will fail.";
-	return secondarySort.top().propertyName;
 }
 
 void SortedChunkList::addSecondarySort(const std::string& cmp)
 {
 	secondarySort.push(scalarPropCompare(cmp));
-}
-bool SortedChunkList::popSecondarySort()
-{
-	if(chunks.empty()){
-		if(secondarySort.size()>0){
-			secondarySort.pop();
-			return true;
-		} else
-			LOG(Debug,error) << "You can not remove the last secondary sorting algorithm.";
-	} else
-		LOG(Debug,error) << "You can not remove a secondary sorting algorithm if there are allready chunks in the list.";
-	return false;
 }
 bool SortedChunkList::empty()const
 {
@@ -196,20 +200,53 @@ void SortedChunkList::clear()
 }
 bool SortedChunkList::isRectangular()
 {
-
+	if(empty())return true;
+	size_t images=getHorizontalSize();
+	BOOST_FOREACH(PrimaryMap::reference outer,chunks){
+		if(outer.second.size()!=images)
+			return false;
+	}
+	return true;
+}
+size_t SortedChunkList::getHorizontalSize()
+{
+	if(empty())return 0;
+	else return chunks.begin()->second.size();
 }
 
 std::vector< boost::weak_ptr< Chunk > > SortedChunkList::getLookup()
 {
-	std::vector< boost::weak_ptr< Chunk > > ret;
-	if(chunks.size()==0)
+	LOG_IF(!isRectangular(),Debug,error) << "Running getLookup on an non rectangular chunk-list is not defined";
+
+	if(!empty()){
+		PrimaryMap::iterator iP=chunks.begin();
+		const size_t horizontal=chunks.size();
+		const size_t vertical=iP->second.size();
+
+		std::vector< boost::weak_ptr< Chunk > > ret(horizontal*vertical);
+		
+		for(size_t h=0;h<horizontal;h++,iP++){ // outer loop iterates horizontaly (through the primary sorting)
+			assert(iP!=chunks.end());
+			SecondaryMap::iterator iS=iP->second.begin();
+			for(size_t v=0;v<vertical;v++,iS++){ // inner loop iterates verticaly (through the secondary sorting)
+				assert(iS!=iP->second.end());
+				boost::weak_ptr<Chunk> ptr=iS->second;
+				ret[h+v*horizontal]=ptr; // insert horizontally - primary sorting is the fastest running index (read the sorting matrix horizontaly)
+			}
+		}
 		return ret;
-	ret.reserve(chunks.size());size_t cnt=0;
+	} else 
+		return std::vector< boost::weak_ptr< Chunk > >();
+}
+
+void SortedChunkList::forall_ptr(chunkPtrOperator& op)
+{
 	BOOST_FOREACH(PrimaryMap::reference outer,chunks){
 		BOOST_FOREACH(SecondaryMap::reference inner,outer.second){
-			ret.push_back(inner.second);
+			op(inner.second);
 		}
 	}
 }
+
 
 }}}

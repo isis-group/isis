@@ -251,7 +251,7 @@ public:
 		} else if( ret->is<T>() ) {
 			ret->cast_to_Type<T>() = val;
 		} else { // don't overwrite allready set properties with a different type
-			LOG( Runtime, error ) << "Property " << MSubject( key ) << " is allready set to " << MSubject( ret.toString( true ) ) << " won't override";
+			LOG( Runtime, error ) << "Property " << MSubject( key ) << " is allready set to " << MSubject( ret.toString( true ) ) << " won't override with " << MSubject( Type<T>(val).toString(true));
 		}
 
 		return ret;

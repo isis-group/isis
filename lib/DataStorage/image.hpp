@@ -37,11 +37,10 @@ public:
 
 protected:
 	_internal::SortedChunkList set;
+	std::vector<boost::weak_ptr<Chunk> > lookup;
 private:
 	bool clean;
 	size_t chunkVolume;
-	std::vector<boost::weak_ptr<Chunk> > lookup;
-
 
 	/**
 	 * Computes chunk- and voxel- indices.
@@ -261,19 +260,18 @@ template<typename T> class MemImage: public Image
 {
 public:
 	MemImage( const Image &src ): Image( src ) { // ok we just copied the whole image
-		// the chunks references are useless
-		set.clear();
-		util::_internal::TypeBase::Reference min, max;
-		src.getMinMax( min, max );
-		LOG( Debug, info ) << "Computed value range of the source image: [" << min << ".." << max << "]";
 
-		//we want copies, and we want them to be of type T
-/*		for ( ConstChunkIterator i = src.chunksBegin(); i != src.chunksEnd(); ++i )      {
-			insertChunk( MemChunk<T>( *i, *min, *max ) );
-		}
-
-		reIndex();*/
-#warning implement me
+		//we want copies of the chunks, and we want them to be of type T
+		struct :_internal::SortedChunkList::chunkPtrOperator{
+			util::_internal::TypeBase::Reference min, max;
+            void operator()(boost::shared_ptr< Chunk >& ptr){
+				ptr.reset(new MemChunk<T>( *ptr, *min, *max ));
+			}
+		}conv_op;
+		src.getMinMax( conv_op.min, conv_op.max );
+		LOG( Debug, info ) << "Computed value range of the source image: [" << conv_op.min << ".." << conv_op.max << "]";
+		set.forall_ptr(conv_op);
+		lookup=set.getLookup();// the lookup table still points to the old chunks
 	}
 };
 

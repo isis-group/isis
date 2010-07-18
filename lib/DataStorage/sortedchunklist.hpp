@@ -46,11 +46,16 @@ public:
 		fvectorCompare(const std::string& prop_name);
         bool operator()(const isis::util::PropertyValue& a, const isis::util::PropertyValue& b) const;
 	};
+	struct chunkPtrOperator{
+		virtual void operator()(boost::shared_ptr<Chunk> &ptr);
+		virtual void operator()(const boost::shared_ptr<Chunk> &ptr);
+	};
 private:
 	typedef std::map<util::PropertyValue,boost::shared_ptr<Chunk>,scalarPropCompare> SecondaryMap;
 	typedef std::map<util::fvector4,SecondaryMap,fvectorCompare> PrimaryMap;
 	
 	std::stack<scalarPropCompare> secondarySort;
+	fvectorCompare primarySort;
 	PrimaryMap chunks;
 
 	// low level finding
@@ -63,20 +68,41 @@ private:
 
 	std::list<std::string> equalProps;
 public:
-	SortedChunkList(const std::string fvectorPropName,std::string comma_separated_equal_props);
-	
-	std::string getPrimarySortPropertyName()const;
-	std::string getSecondarySortPropertyName()const;
 
+	//initialisation
+	/**
+	 * Creates a sorted list and sets primary sorting as well as properties which should be equal across all chunks.
+	 */
+	SortedChunkList(std::string fvectorPropName, std::string comma_separated_equal_props);
+
+	/**
+	 * Adds a property for secondary sorting.
+	 * At least one secondary sorting is needed.
+	 */
 	void addSecondarySort(const std::string &cmp);
-	bool popSecondarySort();
-	
+
+	// utils
+
+	///runs op on all entries of the list (the order is not defined)
+	void forall_ptr(chunkPtrOperator &op);
+
+	/// Tries to insert a chunk (a cheap copy of the chunk is done when inserted)
 	bool insert(const Chunk &ch);
+
+	/// \returns true if there is not chunk in the list
 	bool empty()const;
+
+	/// Empties the list.
 	void clear();
-	
+
+	/// \returns a ordered vector of pointers to the chunks in the list
 	std::vector<boost::weak_ptr<Chunk> > getLookup();
+
+	/// \returns true if the list is rectangular (the amount of secondary sorted entries is equal across all primary entries)
 	bool isRectangular();
+
+	/// \returns the amount secondary sorted entries
+	size_t getHorizontalSize();
 };
 
 

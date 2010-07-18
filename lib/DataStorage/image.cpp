@@ -47,6 +47,7 @@ bool Image::insertChunk ( const Chunk &chunk )
 
 	if ( set.insert( chunk ) ) {
 		clean = false;
+		lookup.clear();
 		return true;
 	} else return false;
 }
@@ -59,6 +60,8 @@ bool Image::reIndex()
 		return false;
 	}
 
+	LOG_IF(!set.isRectangular(), Runtime, error ) << "The image is incomplete. Reindex will probably fail";
+
 	//redo lookup table
 	size_t timesteps = 1;
 	lookup=set.getLookup();
@@ -66,19 +69,21 @@ bool Image::reIndex()
 	util::FixedVector<size_t, n_dims> size; //storage for the size of the chunk structure
 	size.fill( 1 );
 
+	//get primary attributes from first chunk - will be usefull
+	const Chunk &first = chunkAt(0);
+	const unsigned short chunk_dims = first.relevantDims();
+	chunkVolume = first.volume();
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////
 	//// geometric sorting (put chunks with distinct geometric position at the remaining dimensions)
 	///////////////////////////////////////////////////////////////////////////////////////////////////
-	//get primary attributes from first chunk
-	const Chunk &first = chunkAt(0);
-	const unsigned short chunk_dims = first.relevantDims();
-	chunkVolume = first.volume();
 	//copy sizes of the chunks to to the first chunk_dims sizes of the image
 	//get indexOrigin from the geometrically first chunk
 	propertyValue( "indexOrigin" ) = first.propertyValue( "indexOrigin" );
 
 	//if there are many chunks, they must leave at least on dimension to the image to sort them in
+	const unsigned short sortDims = n_dims - ( set.getHorizontalSize() > 1 ? 1 : 0 ); // dont use the uppermost dim, if the timesteps are already there
+	
 	if ( chunk_dims >= Image::n_dims ) {
 		if ( lookup.size() > 1 ) {
 			LOG( Runtime, error )
@@ -91,24 +96,22 @@ bool Image::reIndex()
 		//and commonGet will allways return <0,set.begin()->dim2Index()>
 		//thus in this case voxel() equals set.begin()->voxel()
 	} else {// OK there is at least one dimension to sort in the chunks
+		LOG(Debug,info) << "Computing strides for dimensions " << util::MSubject(chunk_dims+1 ) << " to " << util::MSubject(sortDims);
+
 		// check the chunks for at least one dimensional break - use that for the size of that dimension
-		const size_t dummy_var_for_retarded_compilers = getChunkStride();
-		size[chunk_dims] =  dummy_var_for_retarded_compilers ? dummy_var_for_retarded_compilers : 1;
-		const unsigned short sortDims = n_dims - ( size[n_dims-1] > 1 ? 1 : 0 ); // dont use the uppermost dim, if the timesteps are allready there
-
-		for ( unsigned short i = chunk_dims + 1; i < sortDims; i++ ) { //if there are dimensions left figure out their size
-			const size_t dummy_var_for_retarded_compilers = getChunkStride( size.product() ) / size.product();
-
-			if( dummy_var_for_retarded_compilers )
-				size[i] =  dummy_var_for_retarded_compilers;
+		for ( unsigned short i = chunk_dims; i < sortDims; i++ ) { //if there are dimensions left figure out their size
+			size[i] = getChunkStride( size.product() ) / size.product();
+			assert(size[i]!=0);
 		}
 	}
+	if(sortDims<n_dims) size[n_dims-1]=set.getHorizontalSize();// write timesteps into the uppermost dim, if there are some
+	assert(size.product() == lookup.size());
 
 	//Clean up the properties
 	//@todo might fail if the image contains a prop that differs to that in the Chunks (which is equal in the chunks)
 	util::PropMap common;
 	std::set<std::string> uniques;
-	chunkAt(0).toCommonUnique( common, uniques, true );
+	first.toCommonUnique( common, uniques, true );
 
 	for ( size_t i = 1; i < chunks; i++ ) {
 		chunkAt(i).toCommonUnique( common, uniques, false );
@@ -121,7 +124,7 @@ bool Image::reIndex()
 
 	//remove common props from the chunks
 	for ( size_t i = 0; i != lookup.size(); i++ )
-		chunkAt( i ).remove( common, false ); //this _won't keep needed properties - so from here on the chunks of the image are invalid
+		chunkAt(i).remove( common, false ); //this _won't keep needed properties - so from here on the chunks of the image are invalid
 
 	LOG_IF( ! common.empty(), Debug, verbose_info ) << "common properties removed from " << chunks << " chunks: " << common;
 
@@ -147,11 +150,11 @@ bool Image::reIndex()
 	}
 
 	//if we have at least two slides (and have slides (with different positions) at all)
-	if ( chunk_dims == 2 && size[2] > 1 && chunkAt(0).hasProperty( "indexOrigin" ) ) {
-		const util::fvector4 thisV = chunkAt(0).getProperty<util::fvector4>( "indexOrigin" );
-
-		if ( chunkAt(size[2] - 1).hasProperty( "indexOrigin" ) ) {
-			const util::fvector4 lastV = chunkAt(size[2] - 1).getProperty<util::fvector4>( "indexOrigin" );
+	if ( chunk_dims == 2 && size[2] > 1 && first.hasProperty( "indexOrigin" ) ) {
+		const util::fvector4 thisV = first.getProperty<util::fvector4>( "indexOrigin" );
+		const Chunk &last= chunkAt(size[2] - 1);
+		if ( last.hasProperty( "indexOrigin" ) ) {
+			const util::fvector4 lastV = last.getProperty<util::fvector4>( "indexOrigin" );
 			//check the slice vector
 			util::fvector4 distVecNorm = lastV - thisV;
 			LOG_IF( distVecNorm.len() == 0, Runtime, error )
@@ -174,8 +177,9 @@ bool Image::reIndex()
 
 		const util::fvector4 &voxeSize = getProperty<util::fvector4>( "voxelSize" );
 
-		if ( chunkAt(1).hasProperty( "indexOrigin" ) ) {
-			const util::fvector4 nextV = chunkAt(1).getProperty<util::fvector4>( "indexOrigin" );
+		const Chunk &next=chunkAt(1);
+		if ( next.hasProperty( "indexOrigin" ) ) {
+			const util::fvector4 nextV = next.getProperty<util::fvector4>( "indexOrigin" );
 			const float sliceDist = ( nextV - thisV ).len() - voxeSize[2];
 
 			if ( sliceDist > 0 ) {
@@ -270,15 +274,21 @@ bool Image::empty()const
 
 const Chunk &Image::chunkAt( size_t at )const
 {
-	assert(clean);
-	assert(!empty());
-	return *( lookup[at].lock() );
+	LOG_IF(lookup.empty(),Debug,error) << "The lookup table is empty. Run reIndex first.";
+	LOG_IF(at>=lookup.size(),Debug,error) << "Index is out of the range of the lookup table (" << at << ">=" << lookup.size() << ").";
+
+	boost::weak_ptr<Chunk> ptr=lookup[at];
+	LOG_IF(ptr.expired(),Debug,error) << "There is no chunk at " << at << ". This usually happens in incomplete images.";
+	return *ptr.lock();
 }
 Chunk &Image::chunkAt( size_t at )
 {
-	assert(clean);
-	assert(!empty());
-	return *( lookup[at].lock() );
+	LOG_IF(lookup.empty(),Debug,error) << "The lookup table is empty. Run reIndex first.";
+	LOG_IF(at>=lookup.size(),Debug,error) << "Index is out of the range of the lookup table (" << at << ">=" << lookup.size() << ").";
+
+	boost::weak_ptr<Chunk> ptr=lookup[at];
+	LOG_IF(ptr.expired(),Debug,error) << "There is no chunk at " << at << ". This usually happens in incomplete images.";
+	return *ptr.lock();
 }
 
 Chunk Image::getChunk ( size_t first, size_t second, size_t third, size_t fourth, bool copy_metadata )
@@ -303,19 +313,21 @@ const Chunk Image::getChunk ( size_t first, size_t second, size_t third, size_t 
 }
 std::vector< boost::shared_ptr< Chunk > > Image::getChunkList()
 {
+	if(!clean){
+		LOG( Debug, info )
+				<< "Image is not clean. Running reIndex ...";
+		reIndex();
+	}
 	return std::vector< boost::shared_ptr< Chunk > >(lookup.begin(),lookup.end());
 }
 
 
 size_t Image::getChunkStride ( size_t base_stride )
 {
-	if ( set.empty() ) {
-		LOG( Runtime, error ) << "Trying to get chunk stride in an empty image";
-		return 0;
-	} else if ( lookup.empty() ) {
-		LOG( Debug, error ) << "Lookup table for chunks is empty. Do reIndex() first!";
-		return 0;
-	} else if ( lookup.size() >= 4 * base_stride ) {
+	LOG_IF(set.empty(), Runtime, error ) << "Trying to get chunk stride in an empty image";
+	LOG_IF(lookup.empty(), Debug, error ) << "Lookup table for chunks is empty. Do reIndex() first!";
+
+	if ( lookup.size() >= 4 * base_stride ) {
 		/* there can't be any stride with less than 3*base_stride chunks (which would actually be an invalid image)
 		 * _____
 		 * |c c| has no stride/dimensional break
@@ -333,8 +345,8 @@ size_t Image::getChunkStride ( size_t base_stride )
 
 		if( dist1.sqlen() == 0 ) { //if there is no geometric structure anymore - so asume its flat from here on
 			LOG( Debug, info ) << "Distance between 0 and " << util::MSubject( base_stride )
-							   << " is zero. Assuming there are no dimensional breaks anymore. Returning 1";
-			return 1;
+							   << " is zero. Assuming there are no dimensional breaks anymore. Returning " << util::MSubject(base_stride);
+			return base_stride;
 		} else for ( size_t i = base_stride; i < lookup.size() - base_stride; i += base_stride ) {  // compare every follwing distance to that
 				const util::fvector4 thisV = chunkAt(i).getProperty<util::fvector4>( "indexOrigin" );
 				const util::fvector4 nextV = chunkAt(i+base_stride).getProperty<util::fvector4>( "indexOrigin" );
@@ -359,7 +371,7 @@ size_t Image::getChunkStride ( size_t base_stride )
 				<< "). Maybe the image is incomplete.";
 		LOG( Runtime, warning )
 				<< "Ignoring "  <<  lookup.size() % base_stride << " chunks.";
-		return lookup.size() / base_stride;
+		return lookup.size() - (lookup.size() % base_stride);
 	}
 
 	//we didn't find any break, so we assume its a linear image |c c ... c|
@@ -372,18 +384,21 @@ std::list<util::PropertyValue> Image::getChunksProperties( const util::PropMap::
 {
 	std::list<util::PropertyValue > ret;
 
-	BOOST_FOREACH(const boost::weak_ptr<Chunk> &ref,lookup) {
-		const util::PropertyValue &prop = ref.lock()->propertyValue( key );
+	if(clean){
+		BOOST_FOREACH(const boost::weak_ptr<Chunk> &ref,lookup) {
+			const util::PropertyValue &prop = ref.lock()->propertyValue( key );
 
-		if ( unique && prop.empty() ) //if unique is requested and the property is empty
-			continue; //skip it
-		else if ( unique && !( ret.empty() ||  prop == ret.back() ) )
-			//if unique is requested and the property is equal to the one added before
-			continue;//skip it
-		else
-			ret.push_back( prop );
+			if ( unique && prop.empty() ) //if unique is requested and the property is empty
+				continue; //skip it
+			else if ( unique && !( ret.empty() ||  prop == ret.back() ) )
+				//if unique is requested and the property is equal to the one added before
+				continue;//skip it
+			else
+				ret.push_back( prop );
+		}
+	} else {
+		LOG(Runtime,error) << "Cannot get chunk-properties from non clean images. Run reIndex first";
 	}
-
 	return ret;
 }
 
