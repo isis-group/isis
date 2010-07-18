@@ -51,7 +51,7 @@ namespace adapter
 class itkAdapter
 {
 public:
-	itkAdapter() : m_TypeID(0) {};
+	itkAdapter() : m_TypeID( 0 ) {};
 	/**
 	  * Converts an isis image object in an itk image.
 	  * \param src boost sharedpointer of the isisImage

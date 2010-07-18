@@ -340,7 +340,7 @@ int main(
 			resampler->SetOutputDirection( outputDirection );
 			resampler->Update();
 			isis::data::ImageList imgList = movingAdapter->makeIsisImageObject<OutputImageType>( resampler->GetOutput() );
-			isis::data::IOFactory::write( imgList, out_filename, "" ,"" );
+			isis::data::IOFactory::write( imgList, out_filename, "" , "" );
 			// DEBUG
 			//          writer->SetInput(resampler->GetOutput());
 			//          writer->Update();

@@ -48,12 +48,11 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 		parameters["wdialect"].needed() = false;
 		parameters["wdialect"].setDescription(
 			"choose dialect for writing. The available dialects depend on the capabilities of IO plugins." );
-		parameters["repn"] = util::Selection(util::getTypeMap());
+		parameters["repn"] = util::Selection( util::getTypeMap() );
 		parameters["repn"].needed() = false;
 		parameters["repn"].setDescription(
 			"representation in which the data shall be written (not implemented yet)." );
 	}
-
 }
 
 IOApplication::~IOApplication() {}
@@ -68,12 +67,12 @@ bool IOApplication::init( int argc, char **argv, bool exitOnError )
 
 	return true;
 }
-size_t IOApplication::autoload(bool exitOnError)
+size_t IOApplication::autoload( bool exitOnError )
 {
 	std::string input = parameters["in"];
 	std::string rf = parameters["rf"];
 	std::string dl = parameters["rdialect"];
-	LOG(DataLog, info) << "loading " << parameters["in"].toString(false) << " with rf: " << parameters["rf"].toString(false) << " and rdialect: " << parameters["rdialect"].toString(false);
+	LOG( DataLog, info ) << "loading " << parameters["in"].toString( false ) << " with rf: " << parameters["rf"].toString( false ) << " and rdialect: " << parameters["rdialect"].toString( false );
 	images = data::IOFactory::load( input, rf, dl );
 
 	if ( images.empty() ) {
@@ -93,15 +92,15 @@ size_t IOApplication::autoload(bool exitOnError)
 		}
 	}
 }
-size_t IOApplication::autowrite(ImageList out_images,bool exitOnError)
+size_t IOApplication::autowrite( ImageList out_images, bool exitOnError )
 {
-	util::Selection repn=parameters["repn"];
+	util::Selection repn = parameters["repn"];
+	LOG_IF( out_images.empty(), Runtime, warning ) << "There are not images for writing.";
 
-	LOG_IF(out_images.empty(),Runtime,warning) << "There are not images for writing.";
-
-	if (! IOFactory::write(out_images,parameters["out"],parameters["rf"],parameters["wdialect"]) ) {
+	if ( ! IOFactory::write( out_images, parameters["out"], parameters["rf"], parameters["wdialect"] ) ) {
 		if ( exitOnError )
 			exit( 1 );
+
 		return false;
 	} else
 		return true;

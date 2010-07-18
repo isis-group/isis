@@ -160,17 +160,6 @@ public:
 
 };
 
-/// @cond _internal
-namespace _internal
-{
-
-struct chunk_comparison : public std::binary_function< Chunk, Chunk, bool> {
-	virtual bool operator() ( const Chunk &a, const Chunk &b )const = 0;
-	virtual ~chunk_comparison() {}
-};
-}
-/// @endcond
-
 /// Chunk class for memory-based buffers
 template<typename TYPE> class MemChunk : public Chunk
 {

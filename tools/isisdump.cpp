@@ -24,9 +24,9 @@ int main( int argc, char *argv[] )
 		int count2 = 0;
 
 		if( app.parameters["chunks"] ) {
-			const unsigned short chunkDigits = std::log10( std::distance( ref->chunksBegin(), ref->chunksEnd() ) ) + 1;
-
-			for ( data::Image::ChunkIterator c = ref->chunksBegin(); c != ref->chunksEnd(); c++ ) {
+			std::vector<boost::shared_ptr<data::Chunk> > chunks = ref->getChunkList();
+			const unsigned short chunkDigits = std::log10( chunks.size() ) + 1;
+			BOOST_FOREACH( const boost::shared_ptr<data::Chunk> &c, chunks ) {
 				std::cout << "======Image #" << std::setw( imageDigits )  << count1 << std::setw( 0 ) << "==Chunk #" << std::setw( chunkDigits )  << ++count2 << std::setw( 0 ) << c->sizeToString() << c->typeName() << "======Metadata======" << std::endl;
 				c->print( std::cout, true );
 			}

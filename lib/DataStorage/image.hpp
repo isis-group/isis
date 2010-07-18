@@ -20,41 +20,31 @@
 #include <vector>
 #include <boost/foreach.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
+#include <stack>
+#include "sortedchunklist.hpp"
 
 namespace isis
 {
 namespace data
 {
-/// @cond _hidden
-namespace _internal
-{
-struct image_chunk_order: chunk_comparison {
-	bool operator() ( const Chunk &a, const Chunk &b )const;
-};
-}
-/// @endcond
 
 class Image:
 	public _internal::NDimensional<4>,
 	public util::PropMap
 {
 public:
-	typedef std::set<Chunk, _internal::image_chunk_order> ChunkSet;
-	typedef ChunkSet::iterator ChunkIterator;
-	typedef ChunkSet::const_iterator ConstChunkIterator;
 	enum orientation {axial, reversed_axial, sagittal, reversed_sagittal, coronal, reversed_coronal};
 
 protected:
-	ChunkSet set;
-	std::vector<ChunkIterator> lookup;
+	_internal::SortedChunkList set;
+	std::vector<boost::weak_ptr<Chunk> > lookup;
 private:
 	bool clean;
 	size_t chunkVolume;
 
-
 	/**
 	 * Computes chunk- and voxel- indices.
-	 * The returned chunk-index applies to the lookup-table (getChunkAt), and the voxel-index to this chunk.
+	 * The returned chunk-index applies to the lookup-table (chunkAt), and the voxel-index to this chunk.
 	 * Behaviour will be undefined if:
 	 * - the image is not clean (not indexed)
 	 * - the image is empty
@@ -98,18 +88,11 @@ protected:
 	 * \returns the length of this chunk-"line" / the stride
 	 */
 	size_t getChunkStride( size_t base_stride = 1 );
-
-	///Access a chunk via index (and the lookup table)
-	Chunk &getChunkAt( size_t at );
-	///Access a chunk via index (and the lookup table)
-	const Chunk &getChunkAt( size_t at )const;
-
 public:
 	/**
 	 * Creates an empty Image object.
-	 * \param lt copmarison functor used to sort the chunks
 	 */
-	Image( _internal::image_chunk_order lt = _internal::image_chunk_order() );
+	Image();
 	/**
 	 * This method returns a reference to the voxel value at the given coordinates.
 	 *
@@ -126,6 +109,11 @@ public:
 	 * \returns A reference to the addressed voxel value. Reading and writing access
 	 * is provided.
 	 */
+	///Access a chunk via index (and the lookup table)
+	Chunk &chunkAt( size_t at );
+	///Access a chunk via index (and the lookup table)
+	const Chunk &chunkAt( size_t at )const;
+
 	template <typename T> T &voxel( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 ) {
 		if ( ! clean ) {
 			LOG( Debug, info ) << "Image is not clean. Running reIndex ...";
@@ -137,7 +125,7 @@ public:
 
 		const std::pair<size_t, size_t> index = commonGet( first, second, third, fourth );
 
-		TypePtr<T> &data = getChunkAt( index.first ).asTypePtr<T>();
+		TypePtr<T> &data = chunkAt( index.first ).asTypePtr<T>();
 
 		return data[index.second];
 	}
@@ -157,11 +145,10 @@ public:
 	 */
 	template <typename T> T voxel( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const {
 		const std::pair<size_t, size_t> index = commonGet( first, second, third, fourth );
-		const TypePtr<T> &data = getChunkAt( index.first ).getTypePtr<T>();
+		const TypePtr<T> &data = chunkAt( index.first ).getTypePtr<T>();
 		return data[index.second];
 	}
 
-	const util::fvector4 index2space( const size_t first, const size_t second = 0, const size_t third = 0, const size_t fourth = 0 ) const;
 	/**
 	 * Get the chunk that contains the voxel at the given coordinates.
 	 *
@@ -188,6 +175,8 @@ public:
 	 * (Reminder: Chunk-copies are cheap, so the data are NOT copied)
 	 */
 	Chunk getChunk( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true );
+
+	std::vector<boost::shared_ptr<Chunk> > getChunkList();
 
 	/**
 	 * Get the chunk that contains the voxel at the given coordinates in the given type.
@@ -229,6 +218,8 @@ public:
 	 */
 	bool reIndex();
 
+	bool empty()const;
+
 	/**
 	 * Get a list of the properties of the chunks for the given key
 	 * \param key the name of the property to search for
@@ -238,12 +229,6 @@ public:
 
 	/// get the size of every voxel (in bytes)
 	size_t bytes_per_voxel()const;
-
-	ChunkIterator chunksBegin();
-	ChunkIterator chunksEnd();
-
-	ConstChunkIterator chunksBegin()const;
-	ConstChunkIterator chunksEnd()const;
 
 	template<typename T> void getMinMax( T &min, T &max )const {
 		util::check_type<T>();// works only for T from _internal::types
@@ -275,22 +260,17 @@ template<typename T> class MemImage: public Image
 {
 public:
 	MemImage( const Image &src ): Image( src ) { // ok we just copied the whole image
-		// the chunks references are useless
-		lookup.clear();
-		set.clear();
-
-		util::_internal::TypeBase::Reference min, max;
-		src.getMinMax( min, max );
-		LOG( Debug, info ) << "Computed value range of the source image: [" << min << ".." << max << "]";
-
-		//we want copies, and we want them to be of type T
-		std::cout << "src: " << src.propertyValue("indexOrigin") << std::endl;
-		for ( ConstChunkIterator i = src.chunksBegin(); i != src.chunksEnd(); ++i ){
-			std::cout << "iter: " << i->propertyValue("indexOrigin") << std::endl;
-			insertChunk( MemChunk<T>( *i, *min, *max ) );
-		}
-
-		reIndex();
+		//we want copies of the chunks, and we want them to be of type T
+		struct : _internal::SortedChunkList::chunkPtrOperator {
+			util::_internal::TypeBase::Reference min, max;
+			void operator()( boost::shared_ptr< Chunk >& ptr ) {
+				ptr.reset( new MemChunk<T>( *ptr, *min, *max ) );
+			}
+		} conv_op;
+		src.getMinMax( conv_op.min, conv_op.max );
+		LOG( Debug, info ) << "Computed value range of the source image: [" << conv_op.min << ".." << conv_op.max << "]";
+		set.forall_ptr( conv_op );
+		lookup = set.getLookup(); // the lookup table still points to the old chunks
 	}
 };
 

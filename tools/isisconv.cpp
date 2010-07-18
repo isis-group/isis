@@ -15,6 +15,7 @@ int main( int argc, char **argv )
 	if ( ! app.init( argc, argv ) ) {
 		return EXIT_FAILURE;
 	}
+
 	app.autoload();
 
 	if ( app.images.size() == 0 ) {
@@ -28,6 +29,6 @@ int main( int argc, char **argv )
 		}
 	}
 
-	app.autowrite(app.images);
+	app.autowrite( app.images );
 	return EXIT_SUCCESS;
 }

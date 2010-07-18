@@ -144,13 +144,11 @@ template<typename TInput, typename TOutput> typename TOutput::Pointer itkAdapter
 	const util::fvector4 readVec = m_ImageISIS.getProperty<util::fvector4>( "readVec" );
 	const util::fvector4 phaseVec = m_ImageISIS.getProperty<util::fvector4>( "phaseVec" );
 	const util::fvector4 sliceVec = m_ImageISIS.getProperty<util::fvector4>( "sliceVec" );
-
-//	std::cout << "indexOrigin: " << indexOrigin << std::endl;
-//	std::cout << "readVec: " << readVec << std::endl;
-//	std::cout << "phaseVec: " << phaseVec << std::endl;
-//	std::cout << "sliceVec: " << sliceVec << std::endl;
-//	std::cout << "spacing: " << spacing << std::endl;
-
+	//  std::cout << "indexOrigin: " << indexOrigin << std::endl;
+	//  std::cout << "readVec: " << readVec << std::endl;
+	//  std::cout << "phaseVec: " << phaseVec << std::endl;
+	//  std::cout << "sliceVec: " << sliceVec << std::endl;
+	//  std::cout << "spacing: " << spacing << std::endl;
 
 	for ( unsigned short i = 0; i < 3; i++ ) {
 		itkOrigin[i] = indexOrigin[i];
@@ -203,11 +201,9 @@ template<typename TInput, typename TOutput> typename TOutput::Pointer itkAdapter
 	//since itk properties do not match the isis properties we need to define metaproperties to prevent data loss
 	propKeyList  = m_ImageISIS.getKeys();
 	BOOST_FOREACH( PropKeyListType::const_reference ref, propKeyList ) {
-		if ( m_ImageISIS.propertyValue( ref )->is<util::fvector4>() )
-		{
+		if ( m_ImageISIS.propertyValue( ref )->is<util::fvector4>() ) {
 			itk::EncapsulateMetaData<util::fvector4>( m_ITKDict, ref, m_ImageISIS.getProperty<util::fvector4>( ref ) );
-		}
-		else {
+		} else {
 			itk::EncapsulateMetaData<std::string>( m_ITKDict, ref, m_ImageISIS.getProperty<std::string>( ref ) );
 		}
 	}
@@ -221,7 +217,6 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	typename TImageITK::SizeType imageSize = src->GetBufferedRegion().GetSize();
 	typename TImageITK::SpacingType imageSpacing = src->GetSpacing();
 	typename TImageITK::DirectionType imageDirection = src->GetDirection();
-
 
 	if ( TImageITK::ImageDimension < 4 ) {
 		imageSize[3] = 1;
@@ -237,18 +232,20 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 		indexOrigin[0] = -indexOrigin[0];
 		indexOrigin[1] = -indexOrigin[1];
 	}
-//	std::cout << "GNA: " << indexOrigin << std::endl;
-//	std::cout << "indexOrigin: " << indexOrigin << std::endl;
-//	std::cout << "itkDirection: " << imageDirection << std::endl;
+
+	//  std::cout << "GNA: " << indexOrigin << std::endl;
+	//  std::cout << "indexOrigin: " << indexOrigin << std::endl;
+	//  std::cout << "itkDirection: " << imageDirection << std::endl;
 	// TODO use MemImage instead of MemChunk.
 	boost::shared_ptr<data::MemChunk< typename TImageITK::PixelType > >
 	retChunk( new data::MemChunk< typename TImageITK::PixelType  >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) ) ;
+
 	if ( m_ITKDict.HasKey( "sequenceNumber" ) ) {
 		std::string sequenceNumber;
 		itk::ExposeMetaData<std::string>( m_ITKDict, "sequenceNumber", sequenceNumber );
 		retChunk->setProperty( "sequenceNumber", atoi( sequenceNumber.c_str() ) );
 	} else {
-		retChunk->setProperty( "sequenceNumber", 1);
+		retChunk->setProperty( "sequenceNumber", 1 );
 	}
 
 	if ( m_ITKDict.HasKey( "acquisitionNumber" ) ) {
@@ -258,11 +255,13 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	} else {
 		retChunk->setProperty( "acquisitionNumber",  imageSize[TImageITK::ImageDimension] );
 	}
+
 	if ( m_ITKDict.HasKey( "voxelGap" ) ) {
 		util::fvector4 voxelGap;
 		itk::ExposeMetaData<util::fvector4>( m_ITKDict, "voxelGap", voxelGap );
 		retChunk->setProperty( "voxelGap", voxelGap );
 	}
+
 	retChunk->setProperty( "indexOrigin", util::fvector4( indexOrigin[0], indexOrigin[1], indexOrigin[2], indexOrigin[3] ) );
 	retChunk->setProperty( "readVec", util::fvector4( imageDirection[0][0], imageDirection[1][0], imageDirection[2][0], 0 ) );
 	retChunk->setProperty( "phaseVec", util::fvector4( imageDirection[0][1], imageDirection[1][1], imageDirection[2][1], 0 ) );
@@ -271,15 +270,14 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	//do not try to grasp that in a sober state!!
 	data::ChunkList chunkList;
 	chunkList.push_back( *retChunk );
-//	std::cout << "prior: " << retChunk->propertyValue("indexOrigin");
+	//  std::cout << "prior: " << retChunk->propertyValue("indexOrigin");
 	data::ImageList isisImageList( chunkList );
 	boost::shared_ptr< data::MemImage< TOutputISIS > > retImage (
 		new data::MemImage<TOutputISIS>  ( *isisImageList.front().get() ) );
-	static_cast<util::PropMap &> ( *retImage ) = static_cast <util::PropMap& > (*retChunk);
+	static_cast<util::PropMap &> ( *retImage ) = static_cast <util::PropMap & > ( *retChunk );
 	data::ImageList retList;
-//	std::cout << "prior: " << retImage->propertyValue("indexOrigin");
+	//  std::cout << "prior: " << retImage->propertyValue("indexOrigin");
 	retList.push_back( retImage );
-
 	//declare transformation matrix T (NIFTI -> DICOM)
 	// -1  1  0
 	//  0 -1  0

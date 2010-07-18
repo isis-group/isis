@@ -241,7 +241,6 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 		VPointer val;
 		// index origin
 		util::fvector4 indexOrigin;
-
 		// traverse images and collect all VShort images.
 
 		for( unsigned k = 0; k < nimages; k++ ) {
@@ -250,20 +249,21 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 				VDestroyImage( images[k] );
 				continue;
 			}
-			LOG(isis::DataLog, info) << "current slice: " << k;
+
+			LOG( isis::DataLog, info ) << "current slice: " << k;
 			VistaChunk<VShort> vchunk( images[k] );
-			util::fvector4& ioprob = vchunk.propertyValue( "indexOrigin" )->cast_to_Type<util::fvector4>();
+			util::fvector4 &ioprob = vchunk.propertyValue( "indexOrigin" )->cast_to_Type<util::fvector4>();
 			nloaded++;
 			// splice VistaChunk
-			LOG(DataLog, info) << "splicing";
+			LOG( DataLog, info ) << "splicing";
 			data::ChunkList splices = vchunk.splice( data::sliceDim,
 									  util::fvector4( 0, 0, 0, 0 ), util::fvector4( 0, 0, 0, 0 ) );
-			LOG(DataLog, info) << "finished splicing with " << splices.size();
-			LOG(DataLog, info) << splices.begin()->n_dims;
-			LOG(DataLog, info) << splices.begin()->dimSize(0);
-			LOG(DataLog, info) << splices.begin()->dimSize(1);
-			LOG(DataLog, info) << splices.begin()->dimSize(2);
-			LOG(DataLog, info) << splices.begin()->dimSize(3);
+			LOG( DataLog, info ) << "finished splicing with " << splices.size();
+			LOG( DataLog, info ) << splices.begin()->n_dims;
+			LOG( DataLog, info ) << splices.begin()->dimSize( 0 );
+			LOG( DataLog, info ) << splices.begin()->dimSize( 1 );
+			LOG( DataLog, info ) << splices.begin()->dimSize( 2 );
+			LOG( DataLog, info ) << splices.begin()->dimSize( 3 );
 			/******************** GET index origin ********************/
 			// the index origin of each slice depends on the slice orientation
 			// and voxel resolution. All chunks in the ChunkList splices are supposed
@@ -327,13 +327,11 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 			// set index origin to the coordinates of the n'th slice according to
 			// the slice orientation. n is the index of the current subimage.
 			// It's defined by the current value of nloaded.
-
 			// if there is no index origin value set it default to the index origin
 			// from the first slice
 
 			if( !k ) {
-				LOG(DataLog, info) << "ioprob is empty";
-
+				LOG( DataLog, info ) << "ioprob is empty";
 				indexOrigin = vchunk.getProperty<util::fvector4>( "indexOrigin" );
 			}
 			// else: calculate the index origin according to the slice number and voxel
@@ -341,36 +339,38 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 			else {
 				// sagittal (x,y,z) -> (z,x,y)
 				if( strcmp( orient, "sagittal" ) == 0 ) {
-					LOG(DataLog, info) << "computing ioprop with sagittal";
-					ioprob[0] += (nloaded - 1 ) * v3[2];
+					LOG( DataLog, info ) << "computing ioprop with sagittal";
+					ioprob[0] += ( nloaded - 1 ) * v3[2];
 				}
 				// coronal (x,y,z) -> (x,-z,y)
 				else if( strcmp( orient, "coronal" ) == 0 ) {
-					LOG(DataLog, info) << "computing ioprop with coronal";
-					ioprob[1] -= (nloaded - 1 ) * v3[2];
+					LOG( DataLog, info ) << "computing ioprop with coronal";
+					ioprob[1] -= ( nloaded - 1 ) * v3[2];
 				}
 				// axial (x,y,z) -> (x,y,z)
 				else {
-					LOG(DataLog, info) << "computing ioprop with axial: += " <<  ( nloaded - 1 ) * v3[2];
-					ioprob[2] += (nloaded - 1 ) * v3[2];
+					LOG( DataLog, info ) << "computing ioprop with axial: += " <<  ( nloaded - 1 ) * v3[2];
+					ioprob[2] += ( nloaded - 1 ) * v3[2];
 				}
 			}
 
 			/******************** SET acquisition number AND index origin ********************/
 			unsigned acq_number = 0;
+
 			for( data::ChunkList::iterator iter = splices.begin(); iter != splices.end(); iter++ ) {
 				iter->setProperty<int32_t>( "acquisitionNumber", acq_number++ );
 				iter->setProperty<util::fvector4>( "indexOrigin", ioprob );
 			}
-			LOG(DataLog, info) << "adding " << splices.size() << " chunks to ChunkList";
+
+			LOG( DataLog, info ) << "adding " << splices.size() << " chunks to ChunkList";
 			/******************** add chunks to ChunkList ********************/
 			std::back_insert_iterator<data::ChunkList> dest_iter ( chunks );
 			std::copy( splices.begin(), splices.end(), dest_iter );
 		} // END for(unsigned k=0;k<nimages;k++)
-		BOOST_FOREACH( data::ChunkList::const_reference ref, chunks )
-		{
-			std::cout << "index Origin: " << ref.propertyValue("indexOrigin") << std::endl;
-			std::cout << "acqusitionNumber: " << ref.propertyValue("acquisitionNumber") << std::endl;
+
+		BOOST_FOREACH( data::ChunkList::const_reference ref, chunks ) {
+			std::cout << "index Origin: " << ref.propertyValue( "indexOrigin" ) << std::endl;
+			std::cout << "acqusitionNumber: " << ref.propertyValue( "acquisitionNumber" ) << std::endl;
 		}
 	} // END if dialect == "functional"
 

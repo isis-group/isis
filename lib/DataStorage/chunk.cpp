@@ -269,12 +269,6 @@ ChunkList Chunk::splice ( dimensions atDim, util::fvector4 voxelSize, util::fvec
 ChunkList Chunk::splice ( dimensions atDim, util::fvector4 indexOriginOffset, int acquisitionNumberOffset )
 {
 	ChunkList ret;
-
-	if( atDim >= n_dims - 1 ) {
-		LOG( Debug, error ) << "Splicing at the top dimension is impossible";
-		return ret;
-	}
-
 	//@todo should be locking
 	typedef std::vector<_internal::TypePtrBase::Reference> TypePtrList;
 	const util::FixedVector<size_t, 4> wholesize = sizeToVector();

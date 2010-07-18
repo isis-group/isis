@@ -65,12 +65,13 @@ DEF_TYPE( Selection, selection );
 DEF_TYPE( boost::posix_time::ptime, timestamp );
 DEF_TYPE( boost::gregorian::date, date );
 
-namespace _internal{
+namespace _internal
+{
 struct type_lister {
 	std::map< unsigned short, std::string > &m_map;
 	type_lister( std::map< unsigned short, std::string > &map ): m_map( map ) {}
 	template<typename SRC> void operator()( SRC ) {//will be called by the mpl::for_each
-			m_map.insert(std::make_pair(Type<SRC>::staticID,Type<SRC>::staticName()));
+		m_map.insert( std::make_pair( Type<SRC>::staticID, Type<SRC>::staticName() ) );
 	}
 };
 }

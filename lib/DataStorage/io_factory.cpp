@@ -159,7 +159,7 @@ IOFactory &IOFactory::get()
 int IOFactory::loadFile( isis::data::ChunkList &ret, const boost::filesystem::path &filename, std::string suffix_override, std::string dialect )
 {
 	FileFormatList formatReader = getFormatInterface( filename.string(), suffix_override, dialect );
-    size_t nimgs_old = ret.size();   // save number of chunks 
+	size_t nimgs_old = ret.size();   // save number of chunks
 	BOOST_FOREACH( FileFormatList::const_reference it, formatReader ) {
 		LOG( ImageIoDebug, info )
 				<< "plugin to load file " <<  util::MSubject( filename ) << ": " << it->name()
@@ -172,7 +172,7 @@ int IOFactory::loadFile( isis::data::ChunkList &ret, const boost::filesystem::pa
 		} catch ( std::runtime_error &e ) {
 			LOG( Runtime, error )
 					<< "Failed to load " <<  filename << " using " <<  it->name() << " ( " << e.what() << " )";
-            return ret.size() - nimgs_old;
+			return ret.size() - nimgs_old;
 		}
 	}
 
@@ -208,25 +208,25 @@ IOFactory::FileFormatList IOFactory::getFormatInterface( std::string filename, s
 	FileFormatList reader;
 
 	for ( FileFormatList::const_iterator it = io_suffix[ext].begin(); it != io_suffix[ext].end(); it++ ) {
+		std::vector<std::string> splitted;
+		std::string d ( ( *it )->dialects() );
 
-      std::vector<std::string> splitted;
-      std::string d ((*it)->dialects());
-      // this file format reader supports no dialects -> skip to the next candidate 
-      if(d.empty())
-        continue;
+		// this file format reader supports no dialects -> skip to the next candidate
+		if( d.empty() )
+			continue;
 
-      boost::algorithm::split(splitted, d, boost::algorithm::is_any_of(" "));
- 
-      for(std::vector<std::string>::const_iterator iter = splitted.begin(); iter != splitted.end();iter++){
-        if(dialect == *iter) {
-			reader.push_back( *it );
-            break;
+		boost::algorithm::split( splitted, d, boost::algorithm::is_any_of( " " ) );
+
+		for( std::vector<std::string>::const_iterator iter = splitted.begin(); iter != splitted.end(); iter++ ) {
+			if( dialect == *iter ) {
+				reader.push_back( *it );
+				break;
+			}
 		}
-	}
 
-//		if ( std::string::npos != ( *it )->dialects().find( dialect ) ) {
-//			reader.push_back( *it );
-//		}
+		//      if ( std::string::npos != ( *it )->dialects().find( dialect ) ) {
+		//          reader.push_back( *it );
+		//      }
 	}
 
 	return reader;
@@ -244,7 +244,7 @@ data::ImageList IOFactory::load( const std::string &path, std::string suffix_ove
 		if ( ! ref.hasProperty( "source" ) )
 			ref.setProperty( "source", p.string() );
 	}
-	LOG(DataLog, info) << "chunks in list: " << chunks.size();
+	LOG( DataLog, info ) << "chunks in list: " << chunks.size();
 	const data::ImageList images( chunks );
 	LOG( Runtime, info )
 			<< "Generated " << images.size() << " images out of " << loaded << " chunks from " << ( boost::filesystem::is_directory( p ) ? "directory " : "" ) << p;
@@ -264,7 +264,7 @@ int IOFactory::loadPath( isis::data::ChunkList &ret, const boost::filesystem::pa
 	return loaded;
 }
 
-bool IOFactory::write( const isis::data::ImageList& images, const std::string& path, std::string suffix_override, const std::string& dialect )
+bool IOFactory::write( const isis::data::ImageList &images, const std::string &path, std::string suffix_override, const std::string &dialect )
 {
 	FileFormatList formatWriter = get().getFormatInterface( path, suffix_override, dialect );
 	BOOST_FOREACH( FileFormatList::const_reference it, formatWriter ) {

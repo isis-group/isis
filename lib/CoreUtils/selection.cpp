@@ -18,10 +18,11 @@ namespace util
 Selection::Selection( const char *entries ): m_set( 0 )
 {
 	int id = 1;
-	BOOST_FOREACH( const std::string & ref, string2list<std::string>( std::string( entries ), ',' ) ){
-		const map_type::value_type pair(ref,id++);
-		if(!ent_map.insert(pair).second)
-			LOG(Debug,error)<< "Entry " << util::MSubject(pair) << " could not be inserted";
+	BOOST_FOREACH( const std::string & ref, string2list<std::string>( std::string( entries ), ',' ) ) {
+		const map_type::value_type pair( ref, id++ );
+
+		if( !ent_map.insert( pair ).second )
+			LOG( Debug, error ) << "Entry " << util::MSubject( pair ) << " could not be inserted";
 	}
 }
 Selection::Selection(): m_set( 0 ) {}

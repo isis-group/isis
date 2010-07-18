@@ -37,8 +37,8 @@ public:
 	virtual ~IOApplication();
 	virtual bool init( int argc, char **argv, bool exitOnError = true );
 
-	size_t autoload(bool exitOnError = false);
-	size_t autowrite(ImageList out_images,bool exitOnError = false);
+	size_t autoload( bool exitOnError = false );
+	size_t autowrite( ImageList out_images, bool exitOnError = false );
 };
 
 }
