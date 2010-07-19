@@ -52,6 +52,7 @@ public:
 	struct chunkPtrOperator {
 		virtual void operator()( boost::shared_ptr<Chunk> &ptr );
 		virtual void operator()( const boost::shared_ptr<Chunk> &ptr );
+		virtual ~chunkPtrOperator();
 	};
 private:
 	typedef std::map<util::PropertyValue, boost::shared_ptr<Chunk>, scalarPropCompare> SecondaryMap;

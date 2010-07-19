@@ -70,6 +70,7 @@ void SortedChunkList::chunkPtrOperator::operator()( const boost::shared_ptr< Chu
 {
 	LOG( Debug, error ) << "Empty chunk operation, you should at least override \"operator()(const boost::shared_ptr< Chunk >& ptr)\"";
 }
+SortedChunkList::chunkPtrOperator::~chunkPtrOperator(){}
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -133,8 +134,10 @@ std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::primaryInsert( const 
 			// run insert on that
 			return secondaryInsert( subMap, ch ); // insert ch into the right secondary map
 		} else {
-			LOG( Runtime, warning ) << "Cannot insert chunk. It's property " << propName << " has wrong type " << prop->typeName()
-									<< ". it should be " << util::Type<util::fvector4>::staticName();
+			LOG( Runtime, warning ) 
+			<< "Cannot insert chunk. It's property " 
+			<< propName << " has wrong type " << util::MSubject(prop->typeName())
+			<< " (should be " << util::MSubject(util::Type<util::fvector4>::staticName()) << ")";
 		}
 	} else
 		LOG( Runtime, warning ) << "Cannot insert chunk. It's lacking the property " << util::MSubject( propName ) << " which is needed for primary sorting";

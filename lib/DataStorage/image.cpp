@@ -62,7 +62,6 @@ bool Image::reIndex()
 
 	LOG_IF( !set.isRectangular(), Runtime, error ) << "The image is incomplete. Reindex will probably fail";
 	//redo lookup table
-	size_t timesteps = 1;
 	lookup = set.getLookup();
 	const size_t chunks = lookup.size();
 	util::FixedVector<size_t, n_dims> size; //storage for the size of the chunk structure
@@ -275,7 +274,7 @@ const Chunk &Image::chunkAt( size_t at )const
 	LOG_IF( lookup.empty(), Debug, error ) << "The lookup table is empty. Run reIndex first.";
 	LOG_IF( at >= lookup.size(), Debug, error ) << "Index is out of the range of the lookup table (" << at << ">=" << lookup.size() << ").";
 	const boost::shared_ptr<const Chunk> &ptr = lookup[at];
-	LOG_IF( ptr, Debug, error ) << "There is no chunk at " << at << ". This usually happens in incomplete images.";
+	LOG_IF( !ptr, Debug, error ) << "There is no chunk at " << at << ". This usually happens in incomplete images.";
 	return *ptr;
 }
 Chunk &Image::chunkAt( size_t at )
@@ -283,7 +282,7 @@ Chunk &Image::chunkAt( size_t at )
 	LOG_IF( lookup.empty(), Debug, error ) << "The lookup table is empty. Run reIndex first.";
 	LOG_IF( at >= lookup.size(), Debug, error ) << "Index is out of the range of the lookup table (" << at << ">=" << lookup.size() << ").";
 	boost::shared_ptr<Chunk> &ptr = lookup[at];
-	LOG_IF( ptr, Debug, error ) << "There is no chunk at " << at << ". This usually happens in incomplete images.";
+	LOG_IF( !ptr, Debug, error ) << "There is no chunk at " << at << ". This usually happens in incomplete images.";
 	return *ptr;
 }
 
@@ -292,7 +291,9 @@ Chunk Image::getChunk ( size_t first, size_t second, size_t third, size_t fourth
 	if ( ! clean ) {
 		LOG( Debug, info )
 				<< "Image is not clean. Running reIndex ...";
-		reIndex();
+		if( !reIndex() ) {
+			LOG( Runtime, error ) << "Reindexing failed -- undefined behavior ahead ...";
+		}
 	}
 
 	return const_cast<const Image &>( *this ).getChunk( first, second, third, fourth, copy_metadata ); // use the const version
@@ -312,7 +313,9 @@ std::vector< boost::shared_ptr< Chunk > > Image::getChunkList()
 	if( !clean ) {
 		LOG( Debug, info )
 				<< "Image is not clean. Running reIndex ...";
-		reIndex();
+		if( !reIndex() ) {
+			LOG( Runtime, error ) << "Reindexing failed -- undefined behavior ahead ...";
+		}
 	}
 
 	return std::vector< boost::shared_ptr< Chunk > >( lookup.begin(), lookup.end() );
@@ -431,14 +434,17 @@ ImageList::ImageList( ChunkList src )
 		}
 
 		if ( !buff->empty() ) {
-			buff->reIndex();
-
-			if ( buff->valid() )
-				push_back( buff );
-			else {
+			if ( buff->reIndex() ){
+				if ( buff->valid() )
+					push_back( buff );
+				else {
+					const util::PropMap::key_list missing = buff->getMissing();
+					LOG( Runtime, error )
+					<< "Cannot insert image. Missing properties: " << util::list2string( missing.begin(), missing.end() );
+				}
+			} else {
 				const util::PropMap::key_list missing = buff->getMissing();
-				LOG( Runtime, error )
-						<< "Cannot insert image. Missing properties: " << util::list2string( missing.begin(), missing.end() );
+				LOG( Runtime, error ) << "Cannot insert image. Indexing failed";
 			}
 		}
 	}

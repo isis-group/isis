@@ -47,7 +47,6 @@ public:
 	const Converter &getConverterTo( unsigned short id )const;
 	/**
 	* Dynamically cast the TypeBase up to its actual TypePtr\<T\>. Constant version.
-	* Will throw std::bad_cast if T is not the actual type.
 	* Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
 	* \returns a constant reference of the pointer.
 	*/
@@ -56,7 +55,6 @@ public:
 	}
 	/**
 	* Dynamically cast the TypeBase up to its actual TypePtr\<T\>. Referenced version.
-	* Will throw std::bad_cast if T is not the actual type.
 	* Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
 	* \returns a reference of the pointer.
 	*/
