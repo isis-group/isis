@@ -133,8 +133,8 @@ public:
 	}
 
 	Chunk &operator=( const Chunk &ref );
-	ChunkList splice( dimensions atDim, util::fvector4 voxelSize, util::fvector4 voxelGap );
-	ChunkList splice( dimensions atDim, util::fvector4 indexOriginOffset, int acquisitionNumberOffset = 1 );
+	ChunkList splice( dimensions atDim, int32_t acquisitionNumberOffset );
+	ChunkList splice( dimensions atDim );
 
 	/**
 	 * Transforms the image coordinate system into an other system by multiplying
