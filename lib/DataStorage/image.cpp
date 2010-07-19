@@ -189,9 +189,9 @@ bool Image::reIndex()
 				util::fvector4 &voxelGap = propertyValue( "voxelGap" )->cast_to_Type<util::fvector4>(); //if there is no voxelGap yet, we create it
 
 				if ( voxelGap[2] != inf ) {
-					if ( ! util::fuzzyEqual( voxelGap[2], sliceDist ) ) {
+					if ( ! util::fuzzyEqual( voxelGap[2], sliceDist,1e1 ) ) {
 						LOG_IF( ! util::fuzzyEqual( voxelGap[2], sliceDist ), Runtime, warning )
-								<< "The existing slice distance (voxelGap[2]) " << voxelGap[2]
+								<< "The existing slice distance (voxelGap[2]) " << util::MSubject( voxelGap[2] )
 								<< " differs from the distance between chunk 0 and 1, which is " << sliceDist;
 					}
 				} else {
@@ -412,8 +412,11 @@ size_t Image::bytes_per_voxel() const
 {
 	size_t size = chunkAt( 0 ).bytes_per_voxel();
 	BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
-		LOG_IF( size != ref->bytes_per_voxel(), Debug, error )
-				<< "Not all voxels have the same byte size. The result might be wrong.";
+		if(size < ref->bytes_per_voxel()){
+			size=ref->bytes_per_voxel();
+			LOG( Debug, warning )
+				<< "Not all voxels have the same byte size. Using the biggest (currently " << util::MSubject(size) << ").";
+		}
 	}
 	return size;
 }

@@ -102,7 +102,7 @@ public:
 	 * If the conversion fails, an error will be send to CoreLog and the data of the newly created TypePtr will be undefined.
 	 * \returns a the newly created TypePtr
 	 */
-	template<typename T> const TypePtr<T> copyToNew()const {
+	template<typename T> TypePtr<T> copyToNew()const {
 		TypePtr<T> ret( ( T * )malloc( sizeof( T )*len() ), len() );
 		convertTo( ret );
 		return ret;
@@ -114,7 +114,7 @@ public:
 	 * If the conversion fails, an error will be send to CoreLog and the data of the newly created TypePtr will be undefined.
 	 * \returns a the newly created TypePtr
 	 */
-	template<typename T> const TypePtr<T> copyToNew( const util::_internal::TypeBase &min, const util::_internal::TypeBase &max )const {
+	template<typename T> TypePtr<T> copyToNew( const util::_internal::TypeBase &min, const util::_internal::TypeBase &max )const {
 		TypePtr<T> ret( ( T * )malloc( sizeof( T )*len() ), len() );
 		convertTo( ret, min, max );
 		return ret;

@@ -12,15 +12,7 @@ int main( int argc, char **argv )
 	app.parameters["tr"].needed() = false;
 	app.parameters["tr"].setDescription( "Repetition time in ms." );
 
-	if ( ! app.init( argc, argv ) ) {
-		return EXIT_FAILURE;
-	}
-
-	app.autoload();
-
-	if ( app.images.size() == 0 ) {
-		LOG( isis::image_io::Runtime, error ) << "No images found. Abort";
-	}
+	app.init( argc, argv ); // will exit if there is a problem
 
 	if( app.parameters["tr"] > 0 ) {
 		std::cout << "setting tr to " << app.parameters["tr"].toString() << "ms." << std::endl;
@@ -28,7 +20,6 @@ int main( int argc, char **argv )
 			ref->setProperty<u_int16_t>( "repetitionTime", app.parameters["tr"] );
 		}
 	}
-
 	app.autowrite( app.images );
 	return EXIT_SUCCESS;
 }

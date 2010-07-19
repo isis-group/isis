@@ -193,7 +193,13 @@ public:
 	MemChunk( const Chunk &ref ): Chunk( ref ) {
 		operator=( ref );
 	}
-	/// Create a deep copy of a given Chunk (automatic conversion with min/max will be used if datatype does not fit)
+	/**
+	 * Create a deep copy of a given Chunk.
+	 * An automatic conversion used if datatype does not fit
+	 * \param ref the source chunk
+	 * \param min
+	 * \param max the value range of the source to used when the scaling for the conversion is computed
+	 */
 	MemChunk( const Chunk &ref, const util::_internal::TypeBase &min, const  util::_internal::TypeBase &max ): Chunk( ref ) {
 		_internal::ChunkBase::operator=( static_cast<const _internal::ChunkBase &>( ref ) ); //copy the metadate of ref
 		LOG( Debug, verbose_info )

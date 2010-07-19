@@ -176,7 +176,9 @@ public:
 	 */
 	Chunk getChunk( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true );
 
+	/// \returns a sorted list of pointers to the chunks of the image
 	std::vector<boost::shared_ptr<Chunk> > getChunkList();
+	/// \copydoc getChunkList
 	std::vector<boost::shared_ptr<const Chunk> > getChunkList()const;
 
 	/**
