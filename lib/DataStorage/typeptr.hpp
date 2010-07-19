@@ -195,10 +195,6 @@ public:
 		return ret;
 	}
 
-	/// @copydoc Type::is()
-	virtual bool is( const std::type_info &t )const {
-		return t == typeid( TYPE );
-	}
 	/// @copydoc Type::toString()
 	virtual std::string toString( bool labeled = false )const {
 		std::string ret;
@@ -302,6 +298,12 @@ public:
 	//
 
 };
+
+template<typename T> bool _internal::TypePtrBase::is()const {
+	util::check_type<T>();
+	return typeID()==TypePtr<T>::staticID;
+}
+	
 
 }
 }

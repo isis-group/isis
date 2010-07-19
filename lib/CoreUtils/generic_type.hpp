@@ -48,10 +48,6 @@ protected:
 	}
 
 public:
-	/// \returns true if the stored value is of type T.
-	template<typename T> bool is()const {return is( typeid( T ) );}
-	virtual bool is( const std::type_info &t )const = 0;
-
 	/// \returns the value represented as text.
 	virtual std::string toString( bool labeled = false )const = 0;
 

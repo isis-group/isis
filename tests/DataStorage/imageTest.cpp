@@ -60,10 +60,10 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 	std::vector<boost::shared_ptr<data::Chunk> > list = img.getChunkList();
 	BOOST_CHECK_EQUAL( list.size(), 3 ); // the should be 3 chunks in the list by now
 
-	for( size_t i = 0; i < list.size(); i++ ) {
+	for( unsigned int i = 0; i < list.size(); i++ ) {
 		BOOST_CHECK_EQUAL( list[i]->propertyValue( "indexOrigin" ), util::fvector4( 0, 0, i, 0 ) );
-		BOOST_CHECK_EQUAL( list[i]->propertyValue( "acquisitionNumber" ), (uint32_t)(2 - i) ); // AcqNumber and time are in the oposite direction
-		BOOST_CHECK_EQUAL( list[i]->propertyValue( "acquisitionTime" ), (float)(2 - i) );
+		BOOST_CHECK_EQUAL( list[i]->propertyValue( "acquisitionNumber" ), 2 - i ); // AcqNumber and time are in the oposite direction
+		BOOST_CHECK_EQUAL( list[i]->propertyValue( "acquisitionTime" ), 2 - i );
 	}
 
 	//Get a list of properties from the chunks in the image
@@ -276,7 +276,7 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 		BOOST_CHECK_EQUAL( max->as<uint8_t>(), 255 );
 	}
 	{
-		// Conversion to int16_t (will upscale [0-32k])
+		// Conversion to int16_t (will upscale [0-32k) )
 		data::MemImage<int16_t> img2( img );
 		BOOST_REQUIRE( img2.reIndex() );
 		BOOST_CHECK_EQUAL( static_cast<util::PropMap>( img ), static_cast<util::PropMap>( img2 ) );
@@ -292,7 +292,9 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 BOOST_AUTO_TEST_CASE ( transformCoords_test )
 {
 	// dummy image
-	boost::shared_ptr<data::Image> img = *( data::IOFactory::load( "nix.null" ).begin() );
+	data::ImageList images=data::IOFactory::load( "nix.null" );
+	BOOST_REQUIRE(!images.empty());
+	boost::shared_ptr<data::Image> img = *(images.begin());
 	//TODO rewrite this test to use BOST_UNIT_TEST_ASSERTS with the help of
 	// util::fuzzyEqual
 	// ************************************************************************

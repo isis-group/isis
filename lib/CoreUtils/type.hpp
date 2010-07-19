@@ -133,10 +133,6 @@ public:
 		BOOST_MPL_ASSERT_RELATION( staticID, < , 0xFF );
 		check_type<TYPE>();
 	}
-	virtual bool is( const std::type_info &t )const {
-		check_type<TYPE>();
-		return t == typeid( TYPE );
-	}
 	virtual std::string toString( bool labeled = false )const {
 		const Converter &conv = getConverterTo( Type<std::string>::staticID );
 		std::string ret;
@@ -208,6 +204,11 @@ public:
 	virtual ~Type() {}
 };
 
+template<typename T> bool _internal::TypeBase::is()const {
+	check_type<T>();
+	return typeID()==Type<T>::staticID;
+}
+	
 }
 /// @}
 }

@@ -9,6 +9,7 @@
  */
 
 // This might crash on MacOS. See http://old.nabble.com/-Boost.Test--Error:-Non-aligned-pointer-being-freed-td24335733.html
+// seems to work with XCode 3.2.3 and boost 1.42
 
 #define BOOST_TEST_MODULE TypeTest
 #define NOMINMAX 1
@@ -31,8 +32,8 @@ using util::_internal::TypeBase;
 // TestCase object instantiation
 BOOST_AUTO_TEST_CASE( test_type_init )
 {
-	ENABLE_LOG( CoreDebug, util::DefaultMsgPrint, info );
-	ENABLE_LOG( CoreLog, util::DefaultMsgPrint, info );
+//	ENABLE_LOG( CoreDebug, util::DefaultMsgPrint, info );
+//	ENABLE_LOG( CoreLog, util::DefaultMsgPrint, info );
 	Type<int32_t> tInt( 42 );   // integer
 	Type<std::string> tStr( std::string( "Hello World" ) ); // string
 	// implicit conversion from double -> float
@@ -93,9 +94,9 @@ BOOST_AUTO_TEST_CASE( test_type_is )
 	Type<float> tFloat( 3.1415 );
 	Type<std::string> tString( std::string( "Hello World" ) );
 	// see if the typeid contains the value expected.
-	BOOST_CHECK( tInt.is( typeid( int32_t ) ) );
-	BOOST_CHECK( tString.is( typeid( std::string ) ) );
-	BOOST_CHECK( tFloat.is( typeid( float ) ) );
+	BOOST_CHECK( tInt.is<int32_t>() );
+	BOOST_CHECK( tString.is<std::string>() );
+	BOOST_CHECK( tFloat.is<float>() );
 }
 
 // TestCase operators()
