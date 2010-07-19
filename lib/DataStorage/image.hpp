@@ -177,6 +177,7 @@ public:
 	Chunk getChunk( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true );
 
 	std::vector<boost::shared_ptr<Chunk> > getChunkList();
+	std::vector<boost::shared_ptr<const Chunk> > getChunkList()const;
 
 	/**
 	 * Get the chunk that contains the voxel at the given coordinates in the given type.

@@ -317,8 +317,13 @@ std::vector< boost::shared_ptr< Chunk > > Image::getChunkList()
 			LOG( Runtime, error ) << "Reindexing failed -- undefined behavior ahead ...";
 		}
 	}
+	return lookup;
+}
 
-	return std::vector< boost::shared_ptr< Chunk > >( lookup.begin(), lookup.end() );
+std::vector< boost::shared_ptr<const Chunk > > Image::getChunkList()const
+{
+	LOG_IF(!clean,Debug,error) << "You shouldn't do this on a non clean image. Run reIndex first.";
+	return std::vector< boost::shared_ptr<const Chunk > >(lookup.begin(),lookup.end());
 }
 
 
