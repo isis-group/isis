@@ -137,6 +137,7 @@ template<typename TInput, typename TOutput> typename TOutput::Pointer itkAdapter
 	T( 2, 2 ) = 1;
 	// apply transformation to local isis image copy
 	m_ImageISIS.transformCoords( T );
+
 	//getting the required metadata from the isis image
 	const util::fvector4 dimensions( m_ImageISIS.sizeToVector() );
 	const util::fvector4 indexOrigin( m_ImageISIS.getProperty<util::fvector4>( "indexOrigin" ) );
@@ -292,7 +293,7 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	T( 2, 1 ) = 0;
 	T( 2, 2 ) = 1;
 	// apply transformation to local isis image copy
-	BOOST_FOREACH( data::ImageList::const_reference ref, isisImageList ) {
+	BOOST_FOREACH( data::ImageList::const_reference ref, retList ) {
 		ref->transformCoords( T );
 	}
 	return retList;
