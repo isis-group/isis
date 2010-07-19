@@ -62,8 +62,8 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 
 	for( size_t i = 0; i < list.size(); i++ ) {
 		BOOST_CHECK_EQUAL( list[i]->propertyValue( "indexOrigin" ), util::fvector4( 0, 0, i, 0 ) );
-		BOOST_CHECK_EQUAL( list[i]->propertyValue( "acquisitionNumber" ), 2 - i ); // AcqNumber and time are in the oposite direction
-		BOOST_CHECK_EQUAL( list[i]->propertyValue( "acquisitionTime" ), 2 - i );
+		BOOST_CHECK_EQUAL( list[i]->propertyValue( "acquisitionNumber" ), (uint32_t)(2 - i) ); // AcqNumber and time are in the oposite direction
+		BOOST_CHECK_EQUAL( list[i]->propertyValue( "acquisitionTime" ), (float)(2 - i) );
 	}
 
 	//Get a list of properties from the chunks in the image
