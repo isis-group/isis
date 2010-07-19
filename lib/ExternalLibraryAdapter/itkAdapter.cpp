@@ -32,7 +32,7 @@ itkAdapter::makeItkImageObject( const boost::shared_ptr<data::Image> src, const 
 {
 	typedef TImage OutputImageType;
 	m_ImageISIS = *src;
-	m_TypeID = m_ImageISIS.chunksBegin()->typeID();
+	m_TypeID = m_ImageISIS.chunkAt(0).typeID();
 
 	switch ( m_TypeID ) {
 	case data::TypePtr<int8_t>::staticID:
@@ -274,7 +274,6 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	data::ImageList isisImageList( chunkList );
 	boost::shared_ptr< data::MemImage< TOutputISIS > > retImage (
 		new data::MemImage<TOutputISIS>  ( *isisImageList.front().get() ) );
-	static_cast<util::PropMap &> ( *retImage ) = static_cast <util::PropMap & > ( *retChunk );
 	data::ImageList retList;
 	//  std::cout << "prior: " << retImage->propertyValue("indexOrigin");
 	retList.push_back( retImage );

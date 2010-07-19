@@ -119,7 +119,7 @@ int main(
 	}
 
 	//typedef section
-	typedef short PixelType;
+	typedef float PixelType;
 	const unsigned int Dimension = 3;
 	const unsigned int fmriDimension = 4;
 	typedef itk::Vector<float, 3> VectorType;
@@ -201,6 +201,18 @@ int main(
 		LOG_IF( inList.empty(), isis::DataLog, isis::error ) << "Input image is empty!";
 		fmriImage = movingAdapter->makeItkImageObject<FMRIInputType>( inList.front() );
 	}
+
+	//temporary hack
+//	InputImageType::PointType originIn;
+//	originIn[0] = 95.625;
+//	originIn[1] = 95.625;
+//	originIn[2] = -57.5;
+//	inputImage->SetOrigin( originIn );
+//	FMRIInputType::PointType origin;
+//	origin[0] = 95.625;
+//	origin[1] = 95.625;
+//	origin[2] = -57.5;
+//	fmriImage->SetOrigin( origin );
 
 	//if template file is specified by the user
 	if ( template_filename ) {

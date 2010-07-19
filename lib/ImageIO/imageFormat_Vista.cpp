@@ -40,6 +40,7 @@ ImageFormat_Vista::write( const data::Image &image,
 						  const std::string &filename, const std::string &dialect )
 throw( std::runtime_error & )
 {
+
 	//  All vista images a organized in an attribue list. Let's create an empty one:
 	VAttrList attrList = VCreateAttrList();
 	//  One or more VImages need to be written to disk.
@@ -96,15 +97,14 @@ throw( std::runtime_error & )
 			}
 
 			// Iterate of set of chunks in the input image
-			isis::data::Image::ConstChunkIterator chIter;
+			std::vector< boost::shared_ptr< const data::Chunk> > chunkVector = image.getChunkList();
 			// count current timestep
 			int t = 0;
-
-			for( chIter = image.chunksBegin(); chIter != image.chunksEnd(); chIter++ ) {
+			BOOST_FOREACH(std::vector< boost::shared_ptr< const data::Chunk > >::const_reference ref, chunkVector)
+			{
 				// next timestep
 				// put the chunk in a mem chunk to get type convertion right
-				data::MemChunk<VShort> chunk( *chIter );
-
+				data::MemChunk<VShort> chunk( *ref );
 				for( int z = 0; z < dims[2]; z++ ) {
 					for( int y = 0; y < dims[1]; y++ ) {
 						for( int x = 0; x < dims[0]; x++ ) {
@@ -113,11 +113,9 @@ throw( std::runtime_error & )
 						}
 					}
 				}
-
 				t++;
 			}
 		}
-
 		// dims[3] > 1 ?
 		// 3D image data
 	} else {
@@ -600,8 +598,6 @@ template <typename T> bool ImageFormat_Vista::copyImageToVista( const data::Imag
 
 	return true;
 }
-
-
 
 }//namespace image_io
 }//namespace isis
