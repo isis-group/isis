@@ -117,6 +117,9 @@ public:
 	size_t bytes_per_voxel()const;
 	std::string typeName()const;
 	unsigned short typeID()const;
+	template<typename T> bool is()const{
+		return get()->is<T>();
+	}
 
 	void copyRange( const size_t source_start[], const size_t source_end[], Chunk &dst, const size_t destination[] )const;
 	void copyLine( size_t secondDimS, size_t thirdDimS, size_t fourthDimS, Chunk &dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD )const;

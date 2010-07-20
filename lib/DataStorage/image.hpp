@@ -200,16 +200,39 @@ public:
 	 * \param fourth The fourth coordinate in voxel space. Usually the time value.
 	 * \returns a chunk contains the (maybe converted) voxel value at the given coordinates.
 	 */
-	template<typename TYPE> Chunk getChunkAs( TYPE min, TYPE max, size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const {
+	template<typename TYPE> Chunk getChunkAs( const util::_internal::TypeBase &min, const  util::_internal::TypeBase &max, size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const {
 		const Chunk &ref = getChunk( first, second, third, fourth );
 
-		if( TypePtr<TYPE>::staticID == ref.typeID() ) { //OK its the right type - just return that
+		if( ref.is<TYPE>() ) { //OK its the right type - just return that
 			return ref;
 		} else { //we have to to a conversion
-			return MemChunk<TYPE>( ref, util::Type<TYPE>( min ), util::Type<TYPE>( max ) );
+			return MemChunk<TYPE>( ref, min, max );
 		}
 	}
-
+	/**
+	* Get the chunk that contains the voxel at the given coordinates in the given type.
+	* If the accordant chunk has type T a cheap copy is returned.
+	* Otherwise a MemChunk of the requested type is created from it.
+	* In this case the minimum and maximum values of the image are computed and used for the MemChunk constructor.
+	*
+	* \param first The first coordinate in voxel space. Usually the x value.
+	* \param second The second coordinate in voxel space. Usually the y value.
+	* \param third The third coordinate in voxel space. Ususally the z value.
+	* \param fourth The fourth coordinate in voxel space. Usually the time value.
+	* \returns a chunk contains the (maybe converted) voxel value at the given coordinates.
+	*/
+	template<typename TYPE> Chunk getChunkAs( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const {
+		const Chunk &ref = getChunk( first, second, third, fourth );
+		
+		if( ref.is<TYPE>() ) { //OK its the right type - just return that
+			return ref;
+		} else { //we have to to a conversion
+			util::_internal::TypeBase::Reference min, max;
+			getMinMax(min,max);
+			return MemChunk<TYPE>( ref, min, max );
+		}
+	}
+	
 	/**
 	 * Insert a Chunk into the Image.
 	 * The insertion is sorted and unique. So the Chunk will be inserted behind a geometrically "lower" Chunk if there is one.
