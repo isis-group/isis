@@ -149,6 +149,11 @@ public:
 		return data[index.second];
 	}
 
+
+	/**
+	 * Get the typeID of the chunk with biggest "type"
+	 */
+	unsigned short typeID() const;
 	/**
 	 * Get the chunk that contains the voxel at the given coordinates.
 	 *

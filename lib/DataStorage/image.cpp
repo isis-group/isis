@@ -549,6 +549,20 @@ Image::orientation Image::getMainOrientation()const
 	return axial; //will never be reached
 }
 
+unsigned short Image::typeID() const
+{
+	unsigned int mytypeID = chunkAt(0).typeID();
+	size_t tmpBytesPerVoxel=0;
+	BOOST_FOREACH( std::vector< boost::shared_ptr<const Chunk> >::const_reference chunkRef, getChunkList() )
+	{
+		if ( chunkRef->bytes_per_voxel() > tmpBytesPerVoxel ) {
+			tmpBytesPerVoxel = chunkRef->bytes_per_voxel();
+			mytypeID = chunkRef->typeID();
+		}
+	}
+	return mytypeID;
+}
+
 void Image::transformCoords( boost::numeric::ublas::matrix<float> transform )
 {
 	// create boost::numeric::ublast matrix from orientation vectors

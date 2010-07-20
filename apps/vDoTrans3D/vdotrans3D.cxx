@@ -197,7 +197,7 @@ int main(
 	}
 
 	if ( fmri ) {
-		isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "" );
+		isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "", "functional" );
 		LOG_IF( inList.empty(), isis::DataLog, isis::error ) << "Input image is empty!";
 		fmriImage = movingAdapter->makeItkImageObject<FMRIInputType>( inList.front() );
 	}

@@ -1,6 +1,5 @@
 #include "imageFormat_Dicom.hpp"
 #include "common.hpp"
-
 #include <dcmtk/dcmdata/dcdict.h>
 #include <dcmtk/dcmimgle/dcmimage.h>
 #include <dcmtk/dcmimage/diregist.h> //for color support

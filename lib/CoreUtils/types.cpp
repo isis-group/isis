@@ -13,6 +13,7 @@
 /// @cond _hidden
 
 #include "type.hpp"
+#include "DataStorage/typeptr.hpp"
 #include "types.hpp"
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/mpl/for_each.hpp>
@@ -74,12 +75,21 @@ struct type_lister {
 		m_map.insert( std::make_pair( Type<SRC>::staticID, Type<SRC>::staticName() ) );
 	}
 };
+
+struct typeptr_lister {
+	std::map< unsigned short, std::string > &m_map;
+	typeptr_lister( std::map< unsigned short, std::string > &map ): m_map( map ) {}
+	template<typename SRC> void operator()( SRC ) {//will be called by the mpl::for_each
+		m_map.insert( std::make_pair( data::TypePtr<SRC>::staticID, data::TypePtr<SRC>::staticName() ) );
+	}
+};
 }
 
 std::map< unsigned short, std::string > getTypeMap()
 {
 	std::map< unsigned short, std::string > ret;
 	boost::mpl::for_each<_internal::types>( _internal::type_lister( ret ) );
+	boost::mpl::for_each<_internal::types>( _internal::typeptr_lister( ret ) );
 	return ret;
 }
 

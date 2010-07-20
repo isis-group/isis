@@ -254,8 +254,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 			nloaded++;
 			// splice VistaChunk
 			LOG( DataLog, info ) << "splicing";
-			data::ChunkList splices = vchunk.splice( data::sliceDim,
-									  util::fvector4( 0, 0, 0, 0 ), util::fvector4( 0, 0, 0, 0 ) );
+			data::ChunkList splices = vchunk.splice( data::sliceDim );
 			LOG( DataLog, info ) << "finished splicing with " << splices.size();
 			LOG( DataLog, info ) << splices.begin()->n_dims;
 			LOG( DataLog, info ) << splices.begin()->dimSize( 0 );
@@ -366,10 +365,6 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 			std::copy( splices.begin(), splices.end(), dest_iter );
 		} // END for(unsigned k=0;k<nimages;k++)
 
-		BOOST_FOREACH( data::ChunkList::const_reference ref, chunks ) {
-			std::cout << "index Origin: " << ref.propertyValue( "indexOrigin" ) << std::endl;
-			std::cout << "acqusitionNumber: " << ref.propertyValue( "acquisitionNumber" ) << std::endl;
-		}
 	} // END if dialect == "functional"
 
 	// MAP -> the vista image should contain a single 3D VFloat image. Hence the
@@ -514,7 +509,8 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 			util::PropertyValue pv = vista_branch.propertyValue( *kiter );
 
 			// VBit -> VBit (char *)
-			if( pv->is<VBit>() ) {
+			BOOST_MPL_ASSERT_RELATION( sizeof(char), == , sizeof(uint8_t) );
+			if( pv->is<uint8_t>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VBitRepn,
 							 ( VBit )pv->cast_to_Type<uint8_t>() );
 				continue;

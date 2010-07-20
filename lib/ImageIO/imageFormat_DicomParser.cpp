@@ -439,7 +439,7 @@ size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, isis::util::PropMap &map )
 			std::string insert( ( char * )at + pos );
 
 			if ( insert.empty() ) {
-				LOG( Runtime, info ) << "Skipping empty string for CSA entry " << name;
+				LOG( Runtime, verbose_info ) << "Skipping empty string for CSA entry " << name;
 			} else {
 				const std::string::size_type start = insert.find_first_not_of( ' ' );
 				const std::string::size_type end = insert.find( ' ', start ); //strip spaces
@@ -466,7 +466,7 @@ size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, isis::util::PropMap &map )
 			LOG( Runtime, warning ) << "Failed to parse CSA entry " << std::make_pair( name, ret ) << " as " << vr << " (" << e.what() << ")";
 		}
 	} else {
-		LOG( Debug, info ) << "Skipping empty CSA entry " << name;
+		LOG( Debug, verbose_info ) << "Skipping empty CSA entry " << name;
 		pos += sizeof( Sint32 );
 	}
 
@@ -545,7 +545,7 @@ void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, isis::util::Pr
 			const size_t mult = obj->getVM();
 
 			if ( mult == 0 )
-				LOG( Runtime, info ) << "Skipping empty Dicom-Tag " << name;
+				LOG( Runtime, verbose_info ) << "Skipping empty Dicom-Tag " << name;
 			else if ( mult == 1 )
 				parseScalar( elem, name, map );
 			else if ( mult <= 4 )
