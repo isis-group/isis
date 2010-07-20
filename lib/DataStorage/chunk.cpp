@@ -231,12 +231,13 @@ void Chunk::transformCoords( boost::numeric::ublas::matrix<float> transform )
 	setProperty<util::fvector4>( "sliceVec", slice );
 }
 
-ChunkList Chunk::splice ( dimensions atDim, int32_t acquisitionNumberOffset )
+ChunkList Chunk::autoSplice ( int32_t acquisitionNumberOffset )
 {
 	if (!valid()) {
 		LOG(Runtime,error) << "Cannot splice invalid Chunk (missing properties are " << this->getMissing() << ")";
 		return ChunkList();
 	}
+	
 	util::fvector4 offset;
 	const util::fvector4 voxelSize = propertyValue( "voxelSize" )->cast_to_Type<util::fvector4>();
 	util::fvector4 voxelGap;
@@ -245,6 +246,10 @@ ChunkList Chunk::splice ( dimensions atDim, int32_t acquisitionNumberOffset )
 
 	const util::fvector4 distance = voxelSize + voxelGap;
 
+	int32_t atDim=relevantDims()-1;
+
+	LOG(Runtime,info) << "Splicing chunk at dimenstion " << atDim+1;
+	
 	switch( atDim ) { // init offset with the given direction
 	case readDim :
 		offset = this->propertyValue( "readVec" )->cast_to_Type<util::fvector4>();
@@ -271,7 +276,7 @@ ChunkList Chunk::splice ( dimensions atDim, int32_t acquisitionNumberOffset )
 		offset = util::fvector4( 0, 0, 0, 1 );
 	}
 
-	ChunkList ret=splice( atDim ); // do low level splice - get the chunks
+	ChunkList ret=splice( (dimensions)atDim ); // do low level splice - get the chunklist
 
 	// prepare some attributes
 	assert( util::fuzzyEqual<float>( offset.sqlen(), 1 ) ); // it should be norm here

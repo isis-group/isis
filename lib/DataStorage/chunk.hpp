@@ -133,7 +133,24 @@ public:
 	}
 
 	Chunk &operator=( const Chunk &ref );
-	ChunkList splice( dimensions atDim, int32_t acquisitionNumberOffset );
+
+	/**
+	 * Splices the chunk at the uppermost dimension and automatically sets indexOrigin and acquisitionNumber appropriately.
+	 * This automatically selects the upermost dimension of the chunk to be spliced and will compute the correct offsets
+	 * for indexOrigin and acquisitionNumberOffset which will be applied to the resulting splices.
+	 * E.g. splice\(1\) on a chunk of the size 512x512x128, the readVec 1,0,0, the phaseVec 0,1,0 and the indexOrigin 0,0,0 
+	 * will result in 128 chunks of the size 512x512x1, the readVec 1,0,0, the phaseVec 0,1,0 and the indexOrigin 0,0,0 to 0,0,128.
+	 * (If voxelSize is 1,1,1 and voxelGap is 0,0,0)
+	 */
+	ChunkList autoSplice(int32_t acquisitionNumberOffset=1);
+	
+	/**
+	 * Splices the chunk at the given dimension and all dimensions above.
+	 * As this will not set or use any property
+	 * - they have to be modified afterwards
+	 * - this can be done on chunks without any property (aka invalid Chunks)
+	 * E.g. splice\(phaseDim\) on a chunk of the size 512x512x128 will result in 512*128 chunks of the size 512x1x1
+	 */
 	ChunkList splice( dimensions atDim );
 
 	/**

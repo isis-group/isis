@@ -412,10 +412,10 @@ size_t Image::bytes_per_voxel() const
 {
 	size_t size = chunkAt( 0 ).bytes_per_voxel();
 	BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
+		LOG_IF(size != ref->bytes_per_voxel(), Debug, warning )
+			<< "Not all voxels have the same byte size ("<< size << "!=" << ref->bytes_per_voxel() << "). Using the biggest.";
 		if(size < ref->bytes_per_voxel()){
 			size=ref->bytes_per_voxel();
-			LOG( Debug, warning )
-				<< "Not all voxels have the same byte size. Using the biggest (currently " << util::MSubject(size) << ").";
 		}
 	}
 	return size;

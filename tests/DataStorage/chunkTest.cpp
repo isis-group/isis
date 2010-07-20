@@ -165,22 +165,22 @@ BOOST_AUTO_TEST_CASE ( memchunk_copy_test )//Copy chunks
 
 BOOST_AUTO_TEST_CASE ( chunk_splice_test )//Copy chunks
 {
-	data::MemChunk<float> ch1( 3, 3, 3, 3 );
-	ch1.setProperty( "indexOrigin", util::fvector4( 1, 1, 1, 1 ) );
+	data::MemChunk<float> ch1( 3, 3, 3 );
+	ch1.setProperty( "indexOrigin", util::fvector4( 1, 1, 1 ) );
 	ch1.setProperty( "readVec", util::fvector4( 1, 0, 0 ) );
 	ch1.setProperty( "phaseVec", util::fvector4( 0, 1, 0 ) );
-	ch1.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 1 ));
-	ch1.setProperty( "voxelGap", util::fvector4( 1, 1, 1, 1 ));
+	ch1.setProperty( "voxelSize", util::fvector4( 1, 1, 1 ));
+	ch1.setProperty( "voxelGap", util::fvector4( 1, 1, 1 ));
 	ch1.setProperty<int32_t>( "acquisitionNumber", 0);
 
 	for ( size_t i = 0; i < ch1.volume(); i++ )
 		ch1.asTypePtr<float>()[i] = i;
 
-	const data::ChunkList splices = ch1.splice( data::sliceDim, 1 );
+	const data::ChunkList splices = ch1.autoSplice( );
 	unsigned short cnt = 1;
-	BOOST_CHECK_EQUAL( splices.size(), 3 * 3 );
+	BOOST_CHECK_EQUAL( splices.size(), 3 );
 	BOOST_FOREACH( data::ChunkList::const_reference ref, splices ) {
-		BOOST_CHECK_EQUAL( ref.getProperty<util::fvector4>( "indexOrigin" ), util::fvector4( 1, 1, cnt, 1 ) );
+		BOOST_CHECK_EQUAL( ref.getProperty<util::fvector4>( "indexOrigin" ), util::fvector4( 1, 1, cnt ) );
 		cnt += 2;
 	}
 }
