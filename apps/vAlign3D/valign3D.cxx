@@ -247,8 +247,9 @@ int main(
 	if( not fmri ) {
 		inList = isis::data::IOFactory::load( in_filename, "", "" );
 	}
-	LOG_IF( refList.empty(), isis::DataLog, isis::error ) << "Reference image is empty!";
-	LOG_IF( inList.empty(), isis::DataLog, isis::error ) << "Input image is empty!";
+	LOG_IF( refList.empty(), isis::data::Runtime, isis::error ) << "Reference image is empty!";
+	LOG_IF( inList.empty(), isis::data::Runtime, isis::error ) << "Input image is empty!";
+	if(inList.empty()) std::cout << "image is empty! " << std::endl;
 
 
 	// TODO DEBUG

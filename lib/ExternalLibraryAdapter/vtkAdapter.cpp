@@ -49,7 +49,7 @@ vtkImageData *vtkAdapter::makeVtkImageObject( const boost::shared_ptr<data::Imag
 	vtkImage->SetSpacing( spacing[0], spacing[1], spacing[2] );
 	//go through every timestep (dimensions[3] and add the chunk to the image list
 
-	switch ( myAdapter->m_ImageISIS->chunksBegin()->typeID() ) {
+	switch ( myAdapter->m_ImageISIS->chunkAt(0)->typeID() ) {
 	case data::TypePtr<int8_t>::staticID:
 		importer->SetDataScalarTypeToUnsignedChar();
 		importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<int8_t>( 0, 0, 0, dim4 ) );

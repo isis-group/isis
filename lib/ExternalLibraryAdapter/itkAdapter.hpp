@@ -40,6 +40,8 @@
 #include <itkNumericTraits.h>
 #include <itkMetaDataObject.h>
 
+#include <vector>
+
 namespace isis
 {
 namespace adapter

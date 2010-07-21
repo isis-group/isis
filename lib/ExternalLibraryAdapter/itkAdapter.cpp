@@ -191,10 +191,23 @@ template<typename TInput, typename TOutput> typename TOutput::Pointer itkAdapter
 	importer->SetSpacing( itkSpacing );
 	importer->SetOrigin( itkOrigin );
 	importer->SetDirection( itkDirection );
-	importer->SetImportPointer( &this->m_ImageISIS.voxel<typename InputImageType::PixelType>( 0, 0, 0, 0 ), itkSize[0], false );
+
+	//temporary reorganisation of memory according to the chunk organisiation
+	void* targePtr = malloc(m_ImageISIS.bytes_per_voxel() * m_ImageISIS.volume());
+	typename InputImageType::PixelType* refTarget = ( typename InputImageType::PixelType* ) targePtr;
+	std::vector< boost::shared_ptr< data::Chunk> > chList = m_ImageISIS.getChunkList();
+	size_t chunkIndex = 0;
+
+	BOOST_FOREACH( boost::shared_ptr< data::Chunk> & ref, chList)
+	{
+		data::Chunk &chRef=*ref;
+		typename InputImageType::PixelType* target = refTarget + chunkIndex++ * chRef.volume();
+		chRef.getTypePtr<typename InputImageType::PixelType>().copyToMem(0, (chRef.volume() - 1), target );
+	}
+	importer->SetImportPointer( refTarget, itkSize[0], false );
 	rescaler->SetInput( importer->GetOutput() );
 	typename InputImageType::PixelType minIn, maxIn;
-	this->m_ImageISIS.getMinMax( minIn, maxIn );
+	m_ImageISIS.getMinMax( minIn, maxIn );
 	rescaler->SetOutputMinimum( minIn );
 	rescaler->SetOutputMaximum( maxIn );
 	rescaler->Update();

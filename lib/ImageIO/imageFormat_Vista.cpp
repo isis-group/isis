@@ -255,8 +255,9 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 			// splice VistaChunk
 			LOG( DataLog, info ) << "splicing";
 			data::ChunkList splices = vchunk.splice( data::sliceDim );
+
 			LOG( DataLog, info ) << "finished splicing with " << splices.size();
-			LOG( DataLog, info ) << splices.begin()->n_dims;
+			LOG( DataLog, info ) << data::Chunk::n_dims;
 			LOG( DataLog, info ) << splices.begin()->dimSize( 0 );
 			LOG( DataLog, info ) << splices.begin()->dimSize( 1 );
 			LOG( DataLog, info ) << splices.begin()->dimSize( 2 );
