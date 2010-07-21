@@ -31,6 +31,16 @@ namespace data
 class IOApplication: public util::Application
 {
 	bool m_input, m_output;
+	template< typename TYPE > ImageList convertTo( const ImageList& imageList )
+	{
+		ImageList retList;
+		BOOST_FOREACH( ImageList::const_reference listRef, imageList )
+		{
+			retList.push_back( boost::shared_ptr<Image> ( new MemImage<TYPE>( *listRef ) ) );
+		}
+		return retList;
+
+	}
 public:
 	data::ImageList images;
 	IOApplication( const char name[], bool have_input = true, bool have_output = true );

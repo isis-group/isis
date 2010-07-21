@@ -96,6 +96,7 @@ static VBoolean use_inverse = false;
 static VFloat coarse_factor = 1;
 static VFloat bspline_bound = 100.0;
 static VBoolean verbose = true;
+static VBoolean fmri = false;
 
 static VOptionDescRec
 options[] = {
@@ -153,6 +154,7 @@ options[] = {
 		"Using an initializer to align the center of mass"
 	},
 	{"verbose", VBooleanRepn, 1, &verbose, VOptionalOpt, 0, "printing the optimizer values of each iteration"},
+	{"fmri", VBooleanRepn, 1, &fmri, VOptionalOpt, 0, "Input image file contains functional data"},
 	{"smooth", VFloatRepn, 1, &smooth, VOptionalOpt, 0, "Applying a smoothing filter to the fixed and moving image before the registration process"},
 	{"get_inverse", VBooleanRepn, 1, &use_inverse, VOptionalOpt, 0, "Getting the inverse transform"},
 
@@ -217,6 +219,7 @@ int main(
 	typedef itk::LandmarkBasedTransformInitializer<VersorRigid3DTransformType, FixedImageType, MovingImageType>
 	LandmarkBasedTransformInitializerType;
 	typedef itk::ImageFileWriter<DeformationFieldType> VectorWriterType;
+	typedef itk::ImageFileWriter<MovingImageType> WriterType;
 	const itk::TransformBase *tmpConstTransformPointer;
 	typedef itk::TransformBase *TransformBasePointerType;
 	typedef itk::MedianImageFilter<FixedImageType, FixedImageType> FixedFilterType;
@@ -226,6 +229,7 @@ int main(
 	itk::AffineTransform<double, Dimension>::Pointer tmpTransform = itk::AffineTransform<double, Dimension>::New();
 	itk::TransformFileWriter::Pointer transformWriter = itk::TransformFileWriter::New();
 	VectorWriterType::Pointer vectorWriter = VectorWriterType::New();
+	WriterType::Pointer writer = WriterType::New();
 	itk::TransformFileReader::Pointer transformReader = itk::TransformFileReader::New();
 	ImageMaskSpatialObjectType::Pointer mask = ImageMaskSpatialObjectType::New();
 	FixedImageType::Pointer fixedImage = FixedImageType::New();
@@ -235,16 +239,26 @@ int main(
 	tmpConstTransformPointer = 0;
 	isis::adapter::itkAdapter *fixedAdapter = new isis::adapter::itkAdapter;
 	isis::adapter::itkAdapter *movingAdapter = new isis::adapter::itkAdapter;
-	isis::data::ImageList refList = isis::data::IOFactory::load( ref_filename, "" );
-	isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "" );
+	isis::data::ImageList refList = isis::data::IOFactory::load( ref_filename, "", "" );
+	isis::data::ImageList inList;
+	if( fmri ) {
+		inList = isis::data::IOFactory::load( in_filename, "", "functional");
+	}
+	if( not fmri ) {
+		inList = isis::data::IOFactory::load( in_filename, "", "" );
+	}
 	LOG_IF( refList.empty(), isis::DataLog, isis::error ) << "Reference image is empty!";
 	LOG_IF( inList.empty(), isis::DataLog, isis::error ) << "Input image is empty!";
+
 
 	// TODO DEBUG
 	// use makeItkImageObject with "false" -> no ITK nifti default transformation
 	if ( !smooth ) {
 		fixedImage = fixedAdapter->makeItkImageObject<FixedImageType>( refList.front() );
 		movingImage = movingAdapter->makeItkImageObject<MovingImageType>( inList.front() );
+		writer->SetFileName("test.nii");
+		writer->SetInput(movingImage);
+		writer->Update();
 		// TODO DEBUG
 		//      std::cout << "********** Fixed Image **********" << std::endl;
 		//      std::cout << fixedImage->GetDirection();
