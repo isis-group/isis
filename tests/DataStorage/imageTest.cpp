@@ -289,6 +289,83 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 	}
 } // END memimage_test
 
+BOOST_AUTO_TEST_CASE( typediamge_test )
+{
+	data::Image img;
+	unsigned short acNum = 0;
+	const util::fvector4 vSize( 1, 1, 1, 0 );
+
+	for ( int i = 0; i < 3; i++ )
+		for ( int j = 0; j < 3; j++ ) {
+			data::MemChunk<uint8_t> ch(3,3);
+			ch.setProperty( "readVec", util::fvector4( 1, 0 ) );
+			ch.setProperty( "phaseVec", util::fvector4( 0, 1 ) );
+			ch.setProperty( "indexOrigin", util::fvector4( 0, 0, j ) );
+			ch.setProperty( "acquisitionNumber", acNum++ );
+			ch.setProperty( "voxelSize", vSize );
+			ch.voxel<uint8_t>( j, j ) = std::numeric_limits<uint8_t>::max();
+			BOOST_REQUIRE( img.insertChunk( ch ) );
+		}
+
+	for (int i = 3; i < 10; i++ )
+		for ( int j = 0; j < 3; j++ ) {
+			data::MemChunk<int16_t> ch(3,3);
+			ch.setProperty( "readVec", util::fvector4( 1, 0 ) );
+			ch.setProperty( "phaseVec", util::fvector4( 0, 1 ) );
+			ch.setProperty( "indexOrigin", util::fvector4( 0, 0, j ) );
+			ch.setProperty( "acquisitionNumber", acNum++ );
+			ch.setProperty( "voxelSize", vSize );
+			ch.voxel<int16_t>( j, j ) = std::numeric_limits<int16_t>::max();
+			BOOST_REQUIRE( img.insertChunk( ch ) );
+		}
+
+	BOOST_REQUIRE( img.reIndex() );
+	{
+		util::TypeReference min, max;
+		img.getMinMax( min, max );
+		BOOST_CHECK( min->is<uint8_t>() );
+		BOOST_CHECK( max->is<int16_t>() );
+		BOOST_CHECK_EQUAL( min->as<int16_t>(), 0 );
+		BOOST_CHECK_EQUAL( max->as<int16_t>(), std::numeric_limits<int16_t>::max() );
+	}
+	{
+		// Conversion to uint8_t (will downscale [0-255])
+		data::enable_log<util::DefaultMsgPrint>( error );
+		data::TypedImage<uint8_t> img2( img );
+		data::enable_log<util::DefaultMsgPrint>( warning );
+		BOOST_REQUIRE( img2.reIndex() );
+		//Check if the metadata were copied correct
+		BOOST_CHECK_EQUAL( static_cast<util::PropMap>( img ), static_cast<util::PropMap>( img2 ) );
+
+		for ( int i = 0; i < 3; i++ ) 
+			for ( int j = 0; j < 3; j++ ) {
+				data::Chunk c1 = img.getChunk( 0, 0, j, i );
+				data::Chunk c2 = img2.getChunk( 0, 0, j, i );
+				BOOST_REQUIRE(c1.is<uint8_t>()); // this was 8bit
+				BOOST_REQUIRE(c2.is<uint8_t>()); // could be kept
+				// As TypedImage does cheap copy if possible this should still be the same memory
+				BOOST_CHECK_EQUAL((void*)&c1.voxel<uint8_t>(0,0),(void*)&c2.voxel<uint8_t>(0,0)); 
+			}
+
+		for ( int i = 3; i < 10; i++ ) 
+			for ( int j = 0; j < 3; j++ ) {
+				data::Chunk c1 = img.getChunk( 0, 0, j, i );
+				data::Chunk c2 = img2.getChunk( 0, 0, j, i );
+				BOOST_REQUIRE(c1.is<int16_t>()); // this was 16bit
+				BOOST_REQUIRE(c2.is<uint8_t>()); // not anymore
+				// Here we had to copy/convert the data - so not the same memory anymore
+				BOOST_CHECK((void*)&c1.voxel<int16_t>(0,0)!=(void*)&c2.voxel<uint8_t>(0,0));
+			}
+		util::TypeReference min, max;
+		img2.getMinMax( min, max );
+		BOOST_CHECK( min->is<uint8_t>() );
+		BOOST_CHECK( max->is<uint8_t>() );
+		BOOST_CHECK_EQUAL( min->as<uint8_t>(), 0 );
+		BOOST_CHECK_EQUAL( max->as<uint8_t>(), std::numeric_limits<uint8_t>::max() );
+	}
+
+} // END typedimage_test
+
 BOOST_AUTO_TEST_CASE ( transformCoords_test )
 {
 	// dummy image

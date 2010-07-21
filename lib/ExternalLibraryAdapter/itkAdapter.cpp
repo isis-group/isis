@@ -273,8 +273,8 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	chunkList.push_back( *retChunk );
 	//  std::cout << "prior: " << retChunk->propertyValue("indexOrigin");
 	data::ImageList isisImageList( chunkList );
-	boost::shared_ptr< data::MemImage< TOutputISIS > > retImage (
-		new data::MemImage<TOutputISIS>  ( *isisImageList.front().get() ) );
+	boost::shared_ptr< data::TypedImage< TOutputISIS > > retImage (
+		new data::TypedImage<TOutputISIS>  ( *isisImageList.front().get() ) );
 	data::ImageList retList;
 	//  std::cout << "prior: " << retImage->propertyValue("indexOrigin");
 	retList.push_back( retImage );

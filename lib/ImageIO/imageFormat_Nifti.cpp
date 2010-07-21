@@ -236,7 +236,7 @@ public:
 		case data::TypePtr<int8_t>::staticID:
 
 			if ( 0 == strcasecmp( dialect.c_str(), "fsl" ) ) { // fsl not compatible with int8, convert to uint8
-				data::MemImage<u_int8_t> fslCopy( image );
+				data::TypedImage<u_int8_t> fslCopy( image );
 				ni.datatype = DT_UINT8;
 				copyDataToNifti<u_int8_t>( fslCopy, ni );
 				break;
@@ -257,7 +257,7 @@ public:
 
 			if ( 0 == strcasecmp( dialect.c_str(), "fsl" ) ) {
 				image.print( std::cout );
-				data::MemImage<int16_t> fslCopy( image );
+				data::TypedImage<int16_t> fslCopy( image );
 				fslCopy.print( std::cout << "Copy (" << fslCopy.chunkAt( 0 ).typeName() << ")" << std::endl );
 				ni.datatype = DT_INT16;
 				copyDataToNifti<int16_t>( fslCopy, ni );
@@ -274,7 +274,7 @@ public:
 		case data::TypePtr<u_int32_t>::staticID:
 
 			if ( 0 == strcasecmp( dialect.c_str(), "fsl" ) ) {
-				data::MemImage<int32_t> fslCopy( image );
+				data::TypedImage<int32_t> fslCopy( image );
 				ni.datatype = DT_INT32;
 				copyDataToNifti<int32_t>( image, ni );
 				break;
