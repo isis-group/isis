@@ -47,7 +47,7 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 		parameters["wdialect"] = std::string();
 		parameters["wdialect"].needed() = false;
 		parameters["wdialect"].setDescription("choose dialect for writing. The available dialects depend on the capabilities of IO plugins." );
-		std::map<unsigned short, std::string> types=util::getTypeMap();
+		std::map<unsigned short, std::string> types=util::getTypeMap(true,false);
 
 		// remove some types which are useless as representation
 		// "(unsigned short)" is needed because otherwise erase would take the reference of a static constant which is only there during compile time

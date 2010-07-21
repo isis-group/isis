@@ -36,9 +36,9 @@ ChunkBase::~ChunkBase() { }
 
 }
 
-Chunk::Chunk( const _internal::TypePtrBase::Reference &src, size_t firstDim, size_t secondDim, size_t thirdDim, size_t fourthDim ):
+Chunk::Chunk( const TypePtrReference &src, size_t firstDim, size_t secondDim, size_t thirdDim, size_t fourthDim ):
 	_internal::ChunkBase( firstDim, secondDim, thirdDim, fourthDim ),
-	_internal::TypePtrBase::Reference( src )
+	TypePtrReference( src )
 {
 	assert( ( *this )->len() == volume() );
 }
@@ -55,14 +55,13 @@ Chunk Chunk::cloneToMem( size_t firstDim, size_t secondDim, size_t thirdDim, siz
 
 	if ( fourthDim )newSize[3] = fourthDim;
 
-	const _internal::TypePtrBase::Reference
-	cloned( get()->cloneToMem( newSize.product() ) );
+	const TypePtrReference cloned( get()->cloneToMem( newSize.product() ) );
 	return Chunk( cloned, newSize[0], newSize[1], newSize[2], newSize[3] );
 }
 Chunk Chunk::copyToMem()const
 {
 	Chunk ret( *this );
-	static_cast<_internal::TypePtrBase::Reference &>( ret ) = get()->copyToMem();
+	static_cast<TypePtrReference &>( ret ) = get()->copyToMem();
 	return ret;
 }
 size_t Chunk::bytes_per_voxel()const
@@ -150,14 +149,14 @@ size_t Chunk::cmpSlice( size_t thirdDimS, size_t fourthDimS, const Chunk &dst, s
 	const size_t idx3[] = {sizeToVector()[0] - 1, sizeToVector()[1] - 1, thirdDimD, fourthDimD};
 	return cmpRange( idx1, idx2, dst, idx3 );
 }
-void Chunk::getMinMax ( util::_internal::TypeBase::Reference &min, util::_internal::TypeBase::Reference &max ) const
+void Chunk::getMinMax ( util::TypeReference& min, util::TypeReference& max ) const
 {
 	return operator*().getMinMax( min, max );
 }
 Chunk &Chunk::operator=( const isis::data::Chunk &ref )
 {
 	_internal::ChunkBase::operator=( static_cast<const _internal::ChunkBase &>( ref ) ); //copy the metadate of ref
-	_internal::TypePtrBase::Reference::operator=( static_cast<const _internal::TypePtrBase::Reference &>( ref ) ); // copy the reference of ref's data
+	TypePtrReference::operator=( static_cast<const TypePtrReference &>( ref ) ); // copy the reference of ref's data
 	return *this;
 }
 
@@ -301,7 +300,7 @@ ChunkList Chunk::splice ( dimensions atDim )
 	ChunkList ret;
 	
 	//@todo should be locking
-	typedef std::vector<_internal::TypePtrBase::Reference> TypePtrList;
+	typedef std::vector<TypePtrReference> TypePtrList;
 	const util::FixedVector<size_t, n_dims> wholesize = sizeToVector();
 	util::FixedVector<size_t, n_dims> spliceSize;
 	spliceSize.fill( 1 ); //init size of one chunk-splice to 1x1x1x1

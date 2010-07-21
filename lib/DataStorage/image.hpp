@@ -227,7 +227,7 @@ public:
 		if( ref.is<TYPE>() ) { //OK its the right type - just return that
 			return ref;
 		} else { //we have to to a conversion
-			util::_internal::TypeBase::Reference min, max;
+			util::TypeReference min, max;
 			getMinMax(min,max);
 			return MemChunk<TYPE>( ref, min, max );
 		}
@@ -263,12 +263,12 @@ public:
 
 	template<typename T> void getMinMax( T &min, T &max )const {
 		util::check_type<T>();// works only for T from _internal::types
-		util::_internal::TypeBase::Reference _min, _max;
+		util::TypeReference _min, _max;
 		getMinMax( _min, _max );
 		min = _min->as<T>();
 		max = _max->as<T>();
 	}
-	void getMinMax( util::_internal::TypeBase::Reference &min, util::_internal::TypeBase::Reference &max )const;
+	void getMinMax( util::TypeReference& min, util::TypeReference& max )const;
 	size_t cmp( const Image &comp )const;
 	orientation getMainOrientation()const;
 	/**
@@ -293,7 +293,7 @@ public:
 	MemImage( const Image &src ): Image( src ) { // ok we just copied the whole image
 		//we want copies of the chunks, and we want them to be of type T
 		struct : _internal::SortedChunkList::chunkPtrOperator {
-			util::_internal::TypeBase::Reference min, max;
+			util::TypeReference min, max;
 			void operator()( boost::shared_ptr< Chunk >& ptr ) {
 				ptr.reset( new MemChunk<T>( *ptr, *min, *max ) );
 			}

@@ -137,8 +137,10 @@ public:
 	virtual bool eq( const _internal::TypeBase &ref )const = 0;
 };
 
-
 }
+
+typedef _internal::TypeBase::Reference TypeReference;
+
 /// @endcond
 }
 }

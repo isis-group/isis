@@ -53,7 +53,7 @@ public:
  * Like in TypePtr, the copy of a Chunk will reference the same data.
  * (If you want to make a memory based deep copy of a Chunk create a MemChunk from it)
  */
-class Chunk : public _internal::ChunkBase, protected _internal::TypePtrBase::Reference
+class Chunk : public _internal::ChunkBase, protected TypePtrReference
 {
 protected:
 	/**
@@ -68,7 +68,7 @@ protected:
 	template<typename TYPE, typename D> Chunk( TYPE *src, D d, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 ):
 		_internal::ChunkBase( firstDim, secondDim, thirdDim, fourthDim ),
 		util::_internal::TypeReference<_internal::TypePtrBase>( new TypePtr<TYPE>( src, volume(), d ) ) {}
-	Chunk( const _internal::TypePtrBase::Reference &src, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 );
+	Chunk( const TypePtrReference &src, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 );
 public:
 	/**
 	 * Gets a reference to the element at a given index.
@@ -130,7 +130,7 @@ public:
 	size_t cmpLine( size_t secondDimS, size_t thirdDimS, size_t fourthDimS, const Chunk &dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD )const;
 	size_t cmpSlice( size_t thirdDimS, size_t fourthDimS, const Chunk &dst, size_t thirdDimD, size_t fourthDimD )const;
 
-	void getMinMax( util::_internal::TypeBase::Reference &min, util::_internal::TypeBase::Reference &max )const;
+	void getMinMax( util::TypeReference &min, util::TypeReference &max )const;
 	template<typename T> void convertTo( T *dst, size_t len )const {
 		getTypePtrBase().convertTo( dst );
 	}
@@ -226,7 +226,7 @@ public:
 				<< "Copy converting a Chunk of size " << util::MSubject( ref.sizeToVector() )
 				<< " and type " << ref.typeName() << " with the properties " << static_cast<const util::PropMap &>( ref ).getKeys();
 		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		_internal::TypePtrBase::Reference::reset( new TypePtr<TYPE>( ref.getTypePtrBase().copyToNew<TYPE>( min, max ) ) );
+		TypePtrReference::reset( new TypePtr<TYPE>( ref.getTypePtrBase().copyToNew<TYPE>( min, max ) ) );
 	}
 	/// Create a deep copy of a given MemChunk of the same type (default copy constructor)
 	MemChunk( const MemChunk<TYPE> &ref ): Chunk( ref ) {
@@ -235,7 +235,7 @@ public:
 	MemChunk &operator=( const MemChunk<TYPE> &ref ) {
 		_internal::ChunkBase::operator=( static_cast<const _internal::ChunkBase &>( ref ) ); //copy the metadate of ref
 		//get rid of my TypePtr and make a new copying the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		_internal::TypePtrBase::Reference::reset( new TypePtr<TYPE>(
+		TypePtrReference::reset( new TypePtr<TYPE>(
 					static_cast<const Chunk &>( ref ).getTypePtrBase().copyToMem()->cast_to_TypePtr<TYPE>()
 				) );
 		return *this;
@@ -243,7 +243,7 @@ public:
 	MemChunk &operator=( const Chunk &ref ) {
 		_internal::ChunkBase::operator=( static_cast<const _internal::ChunkBase &>( ref ) ); //copy the metadate of ref
 		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		_internal::TypePtrBase::Reference::reset( new TypePtr<TYPE>( ref.getTypePtrBase().copyToNew<TYPE>() ) );
+		TypePtrReference::reset( new TypePtr<TYPE>( ref.getTypePtrBase().copyToNew<TYPE>() ) );
 		return *this;
 	}
 };

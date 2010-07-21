@@ -153,12 +153,15 @@ public:
 	 * \param max TypeBase::Reference for the current greatest value
 	 * \param min TypeBase::Reference for the current lowest value
 	 */
-	virtual void getMinMax( util::_internal::TypeBase::Reference &min, util::_internal::TypeBase::Reference &max )const = 0;
+	virtual void getMinMax( util::TypeReference &min, util::TypeReference &max )const = 0;
 	virtual size_t cmp( size_t start, size_t end, const TypePtrBase &dst, size_t dst_start )const = 0;
 	size_t cmp( const TypePtrBase &comp )const;
 };
 
 }
+
+typedef _internal::TypePtrBase::Reference TypePtrReference;
+
 }
 }
 

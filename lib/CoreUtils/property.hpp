@@ -35,7 +35,7 @@ namespace util
  * Note, that for this class "not equal" (not ==) does NOT mean "unequal" (!=) - check the documentation of the respective operators.
  * @author Enrico Reimer
  */
-class PropertyValue: public _internal::TypeBase::Reference
+class PropertyValue: public TypeReference
 {
 	bool m_needed;
 public:
@@ -47,11 +47,11 @@ public:
 	 * \param _needed flag if this PropertyValue is needed an thus not allowed to be empty (a.k.a. undefined)
 	 */
 	template<typename T> PropertyValue( const T &ref, bool _needed = false ):
-		_internal::TypeBase::Reference( new Type<T>( ref ) ), m_needed( _needed ) {
+		TypeReference( new Type<T>( ref ) ), m_needed( _needed ) {
 		check_type<T>();
 	}
 	template<typename T> PropertyValue( const Type<T>& ref, bool _needed = false ):
-		_internal::TypeBase::Reference( new Type<T>( ref ) ), m_needed( _needed ) {
+		TypeReference( new Type<T>( ref ) ), m_needed( _needed ) {
 		check_type<T>();
 	}
 	/**

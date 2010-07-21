@@ -458,12 +458,12 @@ ImageList::ImageList( ChunkList src )
 	}
 }
 
-void Image::getMinMax ( util::_internal::TypeBase::Reference &min, util::_internal::TypeBase::Reference &max ) const
+void Image::getMinMax ( util::TypeReference &min, util::TypeReference &max ) const
 {
 	LOG_IF( ! min.empty(), Debug, warning ) << "Running getMinMax using non empty min. It will be reset.";
 	LOG_IF( ! max.empty(), Debug, warning ) << "Running getMinMax using non empty max. It will be reset.";
-	min = util::_internal::TypeBase::Reference();
-	max = util::_internal::TypeBase::Reference();
+	min = util::TypeReference();
+	max = util::TypeReference();
 	BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
 		ref->getMinMax( min, max );
 	}

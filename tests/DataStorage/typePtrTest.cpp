@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE( typePtr_clone_test )
 {
 	Deleter::deleted = false;
 	{
-		data::_internal::TypePtrBase::Reference outer;
+		data::TypePtrReference outer;
 		{
 			data::TypePtr<int32_t> inner( ( int32_t * )calloc( 5, sizeof( int32_t ) ), 5, Deleter() );
 			// for now we have only one TypePtr referencing the data
@@ -137,7 +137,7 @@ BOOST_AUTO_TEST_CASE( typePtr_splice_test )
 {
 	Deleter::deleted = false;
 	{
-		std::vector<data::_internal::TypePtrBase::Reference> outer;
+		std::vector<data::TypePtrReference> outer;
 		{
 			data::TypePtr<int32_t> inner( ( int32_t * )calloc( 5, sizeof( int32_t ) ), 5, Deleter() );
 			// for now we have only one pointer referencing the data
@@ -204,7 +204,7 @@ BOOST_AUTO_TEST_CASE( typePtr_minmax_test )
 	//without scaling
 	floatArray.copyFromMem( init, 10 );
 	{
-		util::_internal::TypeBase::Reference min, max;
+		util::TypeReference min, max;
 		floatArray.getMinMax( min, max );
 		BOOST_CHECK( min->is<float>() );
 		BOOST_CHECK( max->is<float>() );

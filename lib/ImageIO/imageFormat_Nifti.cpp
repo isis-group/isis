@@ -447,7 +447,7 @@ private:
 	void copyDataToNifti( const data::Image &image, nifti_image &ni ) {
 		ni.data = malloc( image.bytes_per_voxel() * image.volume() );
 		T *refNii = ( T * ) ni.data;
-		util::_internal::TypeBase::Reference min, max;
+		util::TypeReference min, max;
 		image.getMinMax(min, max);
 		const util::FixedVector<size_t, 4> csize = image.getChunk( 0, 0 ).sizeToVector();
 		const util::FixedVector<size_t, 4> isize = image.sizeToVector();

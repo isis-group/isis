@@ -54,7 +54,6 @@ template<typename T> struct getMinMaxImpl<T, true> {
 
 }
 
-
 /**
  * Generic class for type (and length) - aware pointers.
  * The class is designed for arrays, but you can also "point" to an single element
@@ -250,13 +249,13 @@ public:
 		return sizeof( TYPE );
 	}
 	bool convertTo( TypePtrBase &dst )const {
-		util::_internal::TypeBase::Reference min, max;
+		util::TypeReference min, max;
 		getMinMax( min, max );
 		assert( ! ( min.empty() || max.empty() ) );
 		return TypePtrBase::convertTo( dst, *min, *max );
 	}
 	/// \copydoc TypePtrBase::getMinMax
-	void getMinMax ( util::_internal::TypeBase::Reference &min, util::_internal::TypeBase::Reference &max ) const {
+	void getMinMax ( util::TypeReference &min, util::TypeReference &max ) const {
 		if ( len() == 0 ) {
 			LOG( Runtime, warning ) << "Skipping computation of min/max on an empty TypePtr";
 			return;

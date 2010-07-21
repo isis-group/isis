@@ -70,19 +70,20 @@ namespace _internal
 {
 struct type_lister {
 	std::map< unsigned short, std::string > &m_map;
-	type_lister( std::map< unsigned short, std::string > &map ): m_map( map ) {}
+	bool m_withTypes,m_withTypePtrs;
+	type_lister( std::map< unsigned short, std::string > &map,bool withTypes,bool withTypePtrs ): m_map( map ),m_withTypes(withTypes),m_withTypePtrs(withTypePtrs) {}
 	template<typename SRC> void operator()( SRC ) {//will be called by the mpl::for_each
-		m_map.insert( std::make_pair( Type<SRC>::staticID, Type<SRC>::staticName() ) );
-		m_map.insert( std::make_pair( data::TypePtr<SRC>::staticID, data::TypePtr<SRC>::staticName() ) );
+		if(m_withTypes)m_map.insert( std::make_pair( Type<SRC>::staticID, Type<SRC>::staticName() ) );
+		if(m_withTypePtrs)m_map.insert( std::make_pair( data::TypePtr<SRC>::staticID, data::TypePtr<SRC>::staticName() ) );
 	}
 };
 
 }
 
-std::map< unsigned short, std::string > getTypeMap()
+std::map< unsigned short, std::string > getTypeMap(bool withTypes,bool withTypePtrs)
 {
 	std::map< unsigned short, std::string > ret;
-	boost::mpl::for_each<_internal::types>( _internal::type_lister( ret ) );
+	boost::mpl::for_each<_internal::types>( _internal::type_lister( ret,withTypes,withTypePtrs ) );
 	return ret;
 }
 
