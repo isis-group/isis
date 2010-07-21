@@ -50,8 +50,7 @@ public:
 		bool operator()( const isis::util::PropertyValue &a, const isis::util::PropertyValue &b ) const;
 	};
 	struct chunkPtrOperator {
-		virtual void operator()( boost::shared_ptr<Chunk> &ptr );
-		virtual void operator()( const boost::shared_ptr<Chunk> &ptr );
+		virtual boost::shared_ptr<Chunk> operator()( const boost::shared_ptr<Chunk> &ptr )=0;
 		virtual ~chunkPtrOperator();
 	};
 private:
@@ -87,8 +86,8 @@ public:
 
 	// utils
 
-	///runs op on all entries of the list (the order is not defined)
-	void forall_ptr( chunkPtrOperator &op );
+	///runs op on all entries of the list (the order is not defined) and replaces the entries by the return value
+	void transform( chunkPtrOperator &op );
 
 	/// Tries to insert a chunk (a cheap copy of the chunk is done when inserted)
 	bool insert( const Chunk &ch );

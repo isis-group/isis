@@ -41,6 +41,7 @@ protected:
 private:
 	bool clean;
 	size_t chunkVolume;
+	const boost::shared_ptr<Chunk> &chunkPtrAt( size_t at )const;
 
 	/**
 	 * Computes chunk- and voxel- indices.
@@ -88,6 +89,16 @@ protected:
 	 * \returns the length of this chunk-"line" / the stride
 	 */
 	size_t getChunkStride( size_t base_stride = 1 );
+	template<typename T> struct makeTypedChunk: _internal::SortedChunkList::chunkPtrOperator {
+		util::TypeReference min, max;
+		boost::shared_ptr<Chunk> operator()(const boost::shared_ptr< Chunk >& ptr){
+			return boost::shared_ptr<Chunk>( ptr->is<T>() ?
+				new Chunk(*ptr) : // replace by a cheap copy - type is right
+				new MemChunk<T>( *ptr, *min, *max ) // replace by a converted deep copy
+			);
+		}
+	};
+
 public:
 	/**
 	 * Creates an empty Image object.
@@ -221,15 +232,8 @@ public:
 	* \returns a chunk contains the (maybe converted) voxel value at the given coordinates.
 	*/
 	template<typename TYPE> Chunk getChunkAs( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const {
-		const Chunk &ref = getChunk( first, second, third, fourth );
-		
-		if( ref.is<TYPE>() ) { //OK its the right type - just return that
-			return ref;
-		} else { //we have to do a conversion
-			util::TypeReference min, max;
-			getMinMax(min,max);
-			return MemChunk<TYPE>( ref, min, max );
-		}
+		const boost::shared_ptr<Chunk> &ptr = chunkPtrAt( commonGet( first, second, third, fourth ).first);
+		return makeTypedChunk<TYPE>()(ptr);
 	}
 	
 	/**
@@ -293,13 +297,13 @@ public:
 		//we want copies of the chunks, and we want them to be of type T
 		struct : _internal::SortedChunkList::chunkPtrOperator {
 			util::TypeReference min, max;
-			void operator()( boost::shared_ptr< Chunk >& ptr ) {
-				ptr.reset( new MemChunk<T>( *ptr, *min, *max ) );
+			boost::shared_ptr<Chunk> operator()(const boost::shared_ptr< Chunk >& ptr){
+				return boost::shared_ptr<Chunk>( new MemChunk<T>( *ptr, *min, *max ) );
 			}
 		} conv_op;
 		src.getMinMax( conv_op.min, conv_op.max );
 		LOG( Debug, info ) << "Computed value range of the source image: [" << conv_op.min << ".." << conv_op.max << "]";
-		set.forall_ptr( conv_op );
+		set.transform( conv_op );
 		lookup = set.getLookup(); // the lookup table still points to the old chunks
 	}
 };
@@ -308,19 +312,10 @@ template<typename T> class TypedImage: public Image
 public:
 	TypedImage( const Image &src ): Image( src ) { // ok we just copied the whole image
 		//we want chunks, and we want them to be of type T
-		struct : _internal::SortedChunkList::chunkPtrOperator {
-			util::TypeReference min, max;
-			void operator()(boost::shared_ptr< Chunk >& ptr){
-				ptr.reset( ptr->is<T>() ?
-					new Chunk(*ptr) : // replace by a cheap copy - type is right
-					new MemChunk<T>( *ptr, *min, *max ) // replace by a converted deep copy
-				);
-			}
-		} conv_op;
-
+		makeTypedChunk<T> conv_op;
 		src.getMinMax( conv_op.min, conv_op.max );
 		LOG( Debug, info ) << "Computed value range of the source image: [" << conv_op.min << ".." << conv_op.max << "]";
-		set.forall_ptr( conv_op ); // apply op to all chunks
+		set.transform( conv_op ); // apply op to all chunks
 		lookup = set.getLookup(); // the lookup table still points to the old chunks
 	}
 };

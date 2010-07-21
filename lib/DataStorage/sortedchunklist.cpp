@@ -62,14 +62,6 @@ bool SortedChunkList::scalarPropCompare::operator()( const isis::util::PropertyV
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Chunk operators
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void SortedChunkList::chunkPtrOperator::operator()( boost::shared_ptr< Chunk >& ptr )
-{
-	operator()( const_cast<const boost::shared_ptr< Chunk >& >( ptr ) );
-}
-void SortedChunkList::chunkPtrOperator::operator()( const boost::shared_ptr< Chunk >& ptr )
-{
-	LOG( Debug, error ) << "Empty chunk operation, you should at least override \"operator()(const boost::shared_ptr< Chunk >& ptr)\"";
-}
 SortedChunkList::chunkPtrOperator::~chunkPtrOperator(){}
 
 
@@ -254,11 +246,11 @@ std::vector< boost::shared_ptr< Chunk > > SortedChunkList::getLookup()
 		return std::vector< boost::shared_ptr< Chunk > >();
 }
 
-void SortedChunkList::forall_ptr( chunkPtrOperator &op )
+void SortedChunkList::transform( chunkPtrOperator &op )
 {
 	BOOST_FOREACH( PrimaryMap::reference outer, chunks ) {
 		BOOST_FOREACH( SecondaryMap::reference inner, outer.second ) {
-			op( inner.second );
+			inner.second=op( inner.second );
 		}
 	}
 }

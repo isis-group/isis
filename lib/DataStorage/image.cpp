@@ -268,22 +268,22 @@ bool Image::empty()const
 	return set.empty();
 }
 
+const boost::shared_ptr< Chunk >& Image::chunkPtrAt(size_t at)const
+{
+	LOG_IF( lookup.empty(), Debug, error ) << "The lookup table is empty. Run reIndex first.";
+	LOG_IF( at >= lookup.size(), Debug, error ) << "Index is out of the range of the lookup table (" << at << ">=" << lookup.size() << ").";
+	const boost::shared_ptr<Chunk> &ptr = lookup[at];
+	LOG_IF( !ptr, Debug, error ) << "There is no chunk at " << at << ". This usually happens in incomplete images.";
+	return ptr;
+}
 
 const Chunk &Image::chunkAt( size_t at )const
 {
-	LOG_IF( lookup.empty(), Debug, error ) << "The lookup table is empty. Run reIndex first.";
-	LOG_IF( at >= lookup.size(), Debug, error ) << "Index is out of the range of the lookup table (" << at << ">=" << lookup.size() << ").";
-	const boost::shared_ptr<const Chunk> &ptr = lookup[at];
-	LOG_IF( !ptr, Debug, error ) << "There is no chunk at " << at << ". This usually happens in incomplete images.";
-	return *ptr;
+	return *chunkPtrAt(at);
 }
 Chunk &Image::chunkAt( size_t at )
 {
-	LOG_IF( lookup.empty(), Debug, error ) << "The lookup table is empty. Run reIndex first.";
-	LOG_IF( at >= lookup.size(), Debug, error ) << "Index is out of the range of the lookup table (" << at << ">=" << lookup.size() << ").";
-	boost::shared_ptr<Chunk> &ptr = lookup[at];
-	LOG_IF( !ptr, Debug, error ) << "There is no chunk at " << at << ". This usually happens in incomplete images.";
-	return *ptr;
+	return *chunkPtrAt(at);
 }
 
 Chunk Image::getChunk ( size_t first, size_t second, size_t third, size_t fourth, bool copy_metadata )
@@ -302,7 +302,7 @@ Chunk Image::getChunk ( size_t first, size_t second, size_t third, size_t fourth
 const Chunk Image::getChunk ( size_t first, size_t second, size_t third, size_t fourth, bool copy_metadata ) const
 {
 	const size_t index = commonGet( first, second, third, fourth ).first;
-	Chunk ret( chunkAt( index ) ); // return a copy
+	Chunk ret( chunkAt( index ) ); // return a cheap copy
 
 	if( copy_metadata )ret.join( *this ); // copy all metadata from the image in here
 
