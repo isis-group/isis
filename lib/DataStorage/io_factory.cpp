@@ -158,7 +158,15 @@ IOFactory &IOFactory::get()
 
 int IOFactory::loadFile( isis::data::ChunkList &ret, const boost::filesystem::path &filename, std::string suffix_override, std::string dialect )
 {
-	FileFormatList formatReader = getFormatInterface( filename.string(), suffix_override, dialect );
+	FileFormatList formatReader;
+	formatReader = getFormatInterface( filename.string(), suffix_override, dialect );
+	if (formatReader.empty())
+	{
+		formatReader = get().getFormatInterface( filename.string(), suffix_override, "" );
+		LOG( Debug, info ) << "No plugin found to read "
+				<< filename.string() << " with dialect " << dialect
+				<< "! Trying to omit the dialect...";
+	}
 	size_t nimgs_old = ret.size();   // save number of chunks
 	BOOST_FOREACH( FileFormatList::const_reference it, formatReader ) {
 		LOG( ImageIoDebug, info )
@@ -266,7 +274,15 @@ int IOFactory::loadPath( isis::data::ChunkList &ret, const boost::filesystem::pa
 
 bool IOFactory::write( const isis::data::ImageList &images, const std::string &path, std::string suffix_override, const std::string &dialect )
 {
-	FileFormatList formatWriter = get().getFormatInterface( path, suffix_override, dialect );
+	FileFormatList formatWriter;
+	formatWriter = get().getFormatInterface( path, suffix_override, dialect );
+	if(formatWriter.empty())
+	{
+		formatWriter = get().getFormatInterface( path, suffix_override, "" );
+		LOG( Debug, info ) << "No plugin found to write "
+				<< path << " with dialect " << dialect
+				<< "! Trying to omit the dialect...";
+	}
 	BOOST_FOREACH( FileFormatList::const_reference it, formatWriter ) {
 		LOG( Debug, info )
 				<< "plugin to write to " <<  path << ": " << it->name()
