@@ -277,9 +277,11 @@ const boost::shared_ptr< Chunk >& Image::chunkPtrAt(size_t at)const
 	return ptr;
 }
 
-const Chunk &Image::chunkAt( size_t at )const
+Chunk Image::getChunkAt( size_t at, bool copy_metadata )const
 {
-	return *chunkPtrAt(at);
+	Chunk ret(*chunkPtrAt(at));
+	if( copy_metadata )ret.join( *this ); // copy all metadata from the image in here
+	return ret;
 }
 Chunk &Image::chunkAt( size_t at )
 {
@@ -302,11 +304,7 @@ Chunk Image::getChunk ( size_t first, size_t second, size_t third, size_t fourth
 const Chunk Image::getChunk ( size_t first, size_t second, size_t third, size_t fourth, bool copy_metadata ) const
 {
 	const size_t index = commonGet( first, second, third, fourth ).first;
-	Chunk ret( chunkAt( index ) ); // return a cheap copy
-
-	if( copy_metadata )ret.join( *this ); // copy all metadata from the image in here
-
-	return ret;
+	return getChunkAt(index,copy_metadata);
 }
 std::vector< boost::shared_ptr< Chunk > > Image::getChunkList()
 {
@@ -410,7 +408,7 @@ std::list<util::PropertyValue> Image::getChunksProperties( const util::PropMap::
 
 size_t Image::bytes_per_voxel() const
 {
-	size_t size = chunkAt( 0 ).bytes_per_voxel();
+	size_t size = chunkPtrAt(0)->bytes_per_voxel();
 	BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
 		LOG_IF(size != ref->bytes_per_voxel(), Debug, warning )
 			<< "Not all voxels have the same byte size ("<< size << "!=" << ref->bytes_per_voxel() << "). Using the biggest.";
@@ -480,7 +478,7 @@ size_t Image::cmp( const isis::data::Image &comp ) const
 		ret += ( sizeToVector() - comp.sizeToVector() ).product();
 	}
 
-	util::ivector4 compVect( util::minVector( chunkAt( 0 ).sizeToVector(), comp.chunkAt( 0 ).sizeToVector() ) );
+	util::ivector4 compVect( util::minVector( chunkPtrAt( 0 )->sizeToVector(), comp.chunkPtrAt( 0 )->sizeToVector() ) );
 	util::ivector4 start;
 	const size_t increment = compVect.product();
 
@@ -491,8 +489,8 @@ size_t Image::cmp( const isis::data::Image &comp ) const
 		const std::pair<size_t, size_t> c2pair1( i / comp.chunkVolume, i % comp.chunkVolume );
 		assert( c1pair1.first == c1pair2.first );
 		LOG( Debug, verbose_info ) << "Comparing chunks at " << c1pair1.first << " and "   << c2pair1.first;
-		const Chunk &c1 = chunkAt( c1pair1.first );
-		const Chunk &c2 = comp.chunkAt( c2pair1.first );
+		const Chunk &c1 = *chunkPtrAt( c1pair1.first );
+		const Chunk &c2 = *(comp.chunkPtrAt( c2pair1.first ));
 		LOG( Debug, verbose_info )
 				<< "Start positions are " << c1pair1.second << " and " << c2pair1.second
 				<< " and the length is " << c1pair2.second - c1pair1.second;
@@ -551,9 +549,9 @@ Image::orientation Image::getMainOrientation()const
 
 unsigned short Image::typeID() const
 {
-	unsigned int mytypeID = chunkAt(0).typeID();
+	unsigned int mytypeID = chunkPtrAt(0)->typeID();
 	size_t tmpBytesPerVoxel=0;
-	BOOST_FOREACH( std::vector< boost::shared_ptr<const Chunk> >::const_reference chunkRef, getChunkList() )
+	BOOST_FOREACH( std::vector< boost::shared_ptr<const Chunk> >::const_reference chunkRef, lookup )
 	{
 		if ( chunkRef->bytes_per_voxel() > tmpBytesPerVoxel ) {
 			tmpBytesPerVoxel = chunkRef->bytes_per_voxel();

@@ -110,10 +110,6 @@ protected:
 	 * (run join on it using the image as parameter to insert all non-unique-metadata).
 	 */
 	Chunk &chunkAt( size_t at );
-	/// @copydoc chunkAt\( size_t at \)
-	const Chunk &chunkAt( size_t at )const;
-
-
 public:
 	/**
 	 * Creates an empty Image object.
@@ -166,7 +162,7 @@ public:
 	 */
 	template <typename T> T voxel( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const {
 		const std::pair<size_t, size_t> index = commonGet( first, second, third, fourth );
-		const TypePtr<T> &data = chunkAt( index.first ).getTypePtr<T>();
+		const TypePtr<T> &data = chunkPtrAt( index.first )->getTypePtr<T>();
 		return data[index.second];
 	}
 
@@ -175,6 +171,14 @@ public:
 	 * Get the typeID of the chunk with "biggest" type
 	 */
 	unsigned short typeID() const;
+
+	/**
+	 * Get a chunk via index (and the lookup table).
+	 * The returned chunk will be a cheap copy of the original chunk.
+	 * If copy_metadata is true the metadata of the image is copied into the chunk.
+	 */
+	Chunk getChunkAt( size_t at, bool copy_metadata = true )const;
+
 	/**
 	 * Get the chunk that contains the voxel at the given coordinates.
 	 *
@@ -202,7 +206,11 @@ public:
 	 */
 	Chunk getChunk( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true );
 
-	/// \returns a sorted list of pointers to the chunks of the image
+	/**
+	 * Get a sorted list of pointers to the chunks of the image.
+	 * Note: this chunks only have metadata which are unique to them - so they might be invalid.
+	 * (run join on copies of them using the image as parameter to insert all non-unique-metadata).
+	 */
 	std::vector<boost::shared_ptr<Chunk> > getChunkList();
 	/// \copydoc getChunkList
 	std::vector<boost::shared_ptr<const Chunk> > getChunkList()const;
@@ -311,6 +319,21 @@ public:
 	 */
 	void transformCoords( boost::numeric::ublas::matrix<float> transform );
 
+	/**
+	 * Copy all voxel data of the image into memory.
+	 * If neccessary a conversion into T is done using min/max of the image.
+	 */
+	template<typename T> void copyToMem(T *dst)const{
+		util::TypeReference min, max;
+		getMinMax(min,max);
+		// we could do this using makeTypedChunk - but this does not any additional temporary memory
+		BOOST_FOREACH(boost::shared_ptr<Chunk> &ref,lookup){ 
+			// wrap the raw memory at the "cursor" into an non-deleting TypePtr of the length of the chunk
+			TypePtr<T> dstPtr(dst,ref->volume(),TypePtr<T>::NonDeleter()); 
+			ref->getTypePtrBase().convertTo(dstPtr,min,max); // copy-convert the data into dstPtr
+			dst+=dstPtr.len();// increment the cursor
+		}
+	}
 };
 
 template<typename T> class MemImage: public Image
