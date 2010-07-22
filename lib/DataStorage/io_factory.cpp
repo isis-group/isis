@@ -163,7 +163,7 @@ int IOFactory::loadFile( isis::data::ChunkList &ret, const boost::filesystem::pa
 	if (formatReader.empty())
 	{
 		formatReader = get().getFormatInterface( filename.string(), suffix_override, "" );
-		LOG( Debug, info ) << "No plugin found to read "
+		LOG( DataLog, warning ) << "No plugin found to read "
 				<< filename.string() << " with dialect " << dialect
 				<< "! Trying to omit the dialect...";
 	}
@@ -279,7 +279,7 @@ bool IOFactory::write( const isis::data::ImageList &images, const std::string &p
 	if(formatWriter.empty())
 	{
 		formatWriter = get().getFormatInterface( path, suffix_override, "" );
-		LOG( Debug, info ) << "No plugin found to write "
+		LOG( DataLog, warning ) << "No plugin found to write "
 				<< path << " with dialect " << dialect
 				<< "! Trying to omit the dialect...";
 	}
