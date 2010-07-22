@@ -141,6 +141,11 @@ bool IOApplication::autowrite( const ImageList& out_images, bool exitOnError )
 		convertedList = convertTo<double>( out_images );
 		break;
 	default:
+		std::string oldRepn = util::getTypeMap()[out_images.front()->typeID()];
+		oldRepn.erase(oldRepn.size()-1, oldRepn.size());
+		LOG(DataLog, warning) << "Pixel representation " << parameters["repn"].toString()
+							<< " not yet supported. Retaining "
+							<< oldRepn << ".";
 		convertedList = out_images;
 		break;
 	}

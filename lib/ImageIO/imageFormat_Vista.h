@@ -111,7 +111,7 @@ private:
 					std::list<float> flist = util::string2list<float>( std::string( ( char * )val ) );
 					std::list<float>::const_iterator iter = flist.begin();
 					float x = *iter++, y = *iter++, z = *iter;
-					chunk.setProperty( "voxelSize", util::fvector4( x, y, z, 0 ) );
+					chunk.setProperty( "voxelSize", util::fvector4( x, y, z, 1 ) );
 					continue;
 				}
 
