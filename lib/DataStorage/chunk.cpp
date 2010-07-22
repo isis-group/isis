@@ -287,7 +287,7 @@ ChunkList Chunk::autoSplice ( int32_t acquisitionNumberOffset )
 		int32_t &acq=propertyValue( "acquisitionNumber" )->cast_to_Type<int32_t>();
 		
 		orig= orig + indexOriginOffset * cnt;
-		acq+= acquisitionNumberOffset * cnt;//@todo this might cause trouble if we try to insert this chunks into an image
+		acq= acquisitionNumberOffset + cnt;//@todo this might cause trouble if we try to insert this chunks into an image
 		
 		cnt++;
 	}

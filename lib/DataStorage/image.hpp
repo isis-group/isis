@@ -41,6 +41,12 @@ protected:
 private:
 	bool clean;
 	size_t chunkVolume;
+
+	/**
+	 * Get the pointer to the chunk in the internal lookup-table at position at.
+	 * The Chunk will only have metadata which are unique to it - so it might be invalid 
+	 * (run join on it using the image as parameter to insert all non-unique-metadata).
+	 */
 	const boost::shared_ptr<Chunk> &chunkPtrAt( size_t at )const;
 
 	/**
@@ -98,6 +104,15 @@ protected:
 			);
 		}
 	};
+	/**
+	 * Access a chunk via index (and the lookup table)
+	 * The Chunk will only have metadata which are unique to it - so it might be invalid
+	 * (run join on it using the image as parameter to insert all non-unique-metadata).
+	 */
+	Chunk &chunkAt( size_t at );
+	/// @copydoc chunkAt\( size_t at \)
+	const Chunk &chunkAt( size_t at )const;
+
 
 public:
 	/**
@@ -120,11 +135,6 @@ public:
 	 * \returns A reference to the addressed voxel value. Reading and writing access
 	 * is provided.
 	 */
-	///Access a chunk via index (and the lookup table)
-	Chunk &chunkAt( size_t at );
-	///Access a chunk via index (and the lookup table)
-	const Chunk &chunkAt( size_t at )const;
-
 	template <typename T> T &voxel( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 ) {
 		if ( ! clean ) {
 			LOG( Debug, info ) << "Image is not clean. Running reIndex ...";
@@ -162,7 +172,7 @@ public:
 
 
 	/**
-	 * Get the typeID of the chunk with biggest "type"
+	 * Get the typeID of the chunk with "biggest" type
 	 */
 	unsigned short typeID() const;
 	/**
@@ -252,6 +262,7 @@ public:
 	 */
 	bool reIndex();
 
+	/// \returns true if there is no chunk in the image
 	bool empty()const;
 
 	/**
@@ -264,6 +275,10 @@ public:
 	/// get the size of every voxel (in bytes)
 	size_t bytes_per_voxel()const;
 
+	/**
+	 * Get the maximum and the minimum voxel value of the image.
+	 * The results are stored as type T, if they dont fit an error ist send.
+	 */
 	template<typename T> void getMinMax( T &min, T &max )const {
 		util::check_type<T>();// works only for T from _internal::types
 		util::TypeReference _min, _max;
@@ -271,8 +286,16 @@ public:
 		min = _min->as<T>();
 		max = _max->as<T>();
 	}
+
+	/// Get the maximum and the minimum voxel value of the image and store them as Type-object in the given references.
 	void getMinMax( util::TypeReference& min, util::TypeReference& max )const;
+
+	/**
+	 * Compares the voxel-values of this image to the given.
+	 * \returns the amount of the different voxels
+	 */
 	size_t cmp( const Image &comp )const;
+	
 	orientation getMainOrientation()const;
 	/**
 	 * Transforms the image coordinate system into an other system by multiplying

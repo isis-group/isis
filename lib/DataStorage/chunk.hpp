@@ -144,8 +144,9 @@ public:
 	 * E.g. splice\(1\) on a chunk of the size 512x512x128, the readVec 1,0,0, the phaseVec 0,1,0 and the indexOrigin 0,0,0 
 	 * will result in 128 chunks of the size 512x512x1, the readVec 1,0,0, the phaseVec 0,1,0 and the indexOrigin 0,0,0 to 0,0,128.
 	 * (If voxelSize is 1,1,1 and voxelGap is 0,0,0)
+	 * (acquisitionNumber will be reset to a simple incrementing counter starting at acquisitionNumberOffset)
 	 */
-	ChunkList autoSplice(int32_t acquisitionNumberOffset=1);
+	ChunkList autoSplice(int32_t acquisitionNumberOffset=0);
 	
 	/**
 	 * Splices the chunk at the given dimension and all dimensions above.
