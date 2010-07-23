@@ -326,7 +326,7 @@ public:
 	template<typename T> void copyToMem(T *dst)const{
 		util::TypeReference min, max;
 		getMinMax(min,max);
-		// we could do this using makeTypedChunk - but this does not any additional temporary memory
+		// we could do this using makeTypedChunk - but this does not need any additional temporary memory
 		BOOST_FOREACH(boost::shared_ptr<Chunk> &ref,lookup){ 
 			// wrap the raw memory at the "cursor" into an non-deleting TypePtr of the length of the chunk
 			TypePtr<T> dstPtr(dst,ref->volume(),TypePtr<T>::NonDeleter()); 
@@ -334,6 +334,7 @@ public:
 			dst+=dstPtr.len();// increment the cursor
 		}
 	}
+	size_t spliceDownTo(dimensions dim);
 };
 
 template<typename T> class MemImage: public Image

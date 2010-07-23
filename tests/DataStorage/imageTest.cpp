@@ -22,72 +22,79 @@ namespace test
 /* create an image */
 BOOST_AUTO_TEST_CASE ( image_init_test )
 {
-	data::MemChunk<float> ch( 4, 4 );
-	data::Image img;
-	// inserting insufficient Chunk should fail
-	data::enable_log<util::DefaultMsgPrint>( ( LogLevel )0 );
-	BOOST_CHECK( ! img.insertChunk( ch ) );
-	data::enable_log<util::DefaultMsgPrint>( warning );
-	// but inserting a proper Chunk should work
-	ch.setProperty( "indexOrigin", util::fvector4( 0, 0, 2 ) );
-	ch.setProperty<uint32_t>( "acquisitionNumber", 0 );
-	ch.setProperty<float>( "acquisitionTime", 0 );
-	ch.setProperty( "readVec", util::fvector4( 1, 0 ) );
-	ch.setProperty( "phaseVec", util::fvector4( 0, 1 ) );
-	ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
-	BOOST_REQUIRE( img.insertChunk( ch ) );
-	//inserting the same chunk twice should fail
-	BOOST_CHECK( ! img.insertChunk( ch ) );
-	// but inserting another Chunk should work
-	ch = data::MemChunk<float>( 4, 4 );
-	ch.setProperty( "indexOrigin", util::fvector4( 0, 0, 0 ) );
-	ch.setProperty<uint32_t>( "acquisitionNumber", 2 );
-	ch.setProperty<float>( "acquisitionTime", 2 );
-	ch.setProperty( "readVec", util::fvector4( 1, 0 ) );
-	ch.setProperty( "phaseVec", util::fvector4( 0, 1 ) );
-	ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
-	BOOST_CHECK( img.insertChunk( ch ) );
-	// Chunks should be inserted based on their position (lowest first)
-	ch = data::MemChunk<float>( 4, 4 );
-	ch.setProperty( "indexOrigin", util::fvector4( 0, 0, 1 ) );
-	ch.setProperty<uint32_t>( "acquisitionNumber", 1 );
-	ch.setProperty<float>( "acquisitionTime", 1 );
-	ch.setProperty( "readVec", util::fvector4( 1, 0 ) );
-	ch.setProperty( "phaseVec", util::fvector4( 0, 1 ) );
-	ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
-	BOOST_REQUIRE( img.insertChunk( ch ) );
-	//Get a list of the sorted chunks
-	std::vector<boost::shared_ptr<data::Chunk> > list = img.getChunkList();
-	BOOST_CHECK_EQUAL( list.size(), 3 ); // the should be 3 chunks in the list by now
-
-	for( unsigned int i = 0; i < list.size(); i++ ) {
-		BOOST_CHECK_EQUAL( list[i]->propertyValue( "indexOrigin" ), util::fvector4( 0, 0, i, 0 ) );
-		BOOST_CHECK_EQUAL( list[i]->propertyValue( "acquisitionNumber" ), 2 - i ); // AcqNumber and time are in the oposite direction
-		BOOST_CHECK_EQUAL( list[i]->propertyValue( "acquisitionTime" ), 2 - i );
-	}
-
-	//Get a list of properties from the chunks in the image
-	//List of the properties shall be as if every chunk of the image was asked for the property
-	std::list<util::PropertyValue> origins = img.getChunksProperties( "indexOrigin" );
-	unsigned int i = 0;
-	BOOST_FOREACH( const util::PropertyValue & ref, origins ) {
-		BOOST_CHECK( ref == util::fvector4( 0, 0, i++, 0 ) );
-	}
-
-	// Check for insertion in two dimensions
-	for( int i = 0; i < 3; i++ ) {
-		ch = data::MemChunk<float>( 4, 4 );
-		ch.setProperty( "indexOrigin", util::fvector4( 0, 0, i, 0 ) );
-		ch.setProperty<uint32_t>( "acquisitionNumber", 3 + i );
-		ch.setProperty<uint32_t>( "acquisitionTime", 3 + i );
+	{
+		data::MemChunk<float> ch( 4, 4 );
+		data::Image img;
+		// inserting insufficient Chunk should fail
+		data::enable_log<util::DefaultMsgPrint>( ( LogLevel )0 );
+		BOOST_CHECK( ! img.insertChunk( ch ) );
+		data::enable_log<util::DefaultMsgPrint>( warning );
+		// but inserting a proper Chunk should work
+		ch.setProperty( "indexOrigin", util::fvector4( 0, 0, 2 ) );
+		ch.setProperty<uint32_t>( "acquisitionNumber", 0 );
+		ch.setProperty<float>( "acquisitionTime", 0 );
+		ch.setProperty( "readVec", util::fvector4( 1, 0 ) );
+		ch.setProperty( "phaseVec", util::fvector4( 0, 1 ) );
 		ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 		BOOST_REQUIRE( img.insertChunk( ch ) );
+		//inserting the same chunk twice should fail
+		BOOST_CHECK( ! img.insertChunk( ch ) );
+		// but inserting another Chunk should work
+		ch = data::MemChunk<float>( 4, 4 );
+		ch.setProperty( "indexOrigin", util::fvector4( 0, 0, 0 ) );
+		ch.setProperty<uint32_t>( "acquisitionNumber", 2 );
+		ch.setProperty<float>( "acquisitionTime", 2 );
+		ch.setProperty( "readVec", util::fvector4( 1, 0 ) );
+		ch.setProperty( "phaseVec", util::fvector4( 0, 1 ) );
+		ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
+		BOOST_CHECK( img.insertChunk( ch ) );
+		// Chunks should be inserted based on their position (lowest first)
+		ch = data::MemChunk<float>( 4, 4 );
+		ch.setProperty( "indexOrigin", util::fvector4( 0, 0, 1 ) );
+		ch.setProperty<uint32_t>( "acquisitionNumber", 1 );
+		ch.setProperty<float>( "acquisitionTime", 1 );
+		ch.setProperty( "readVec", util::fvector4( 1, 0 ) );
+		ch.setProperty( "phaseVec", util::fvector4( 0, 1 ) );
+		ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
+		BOOST_REQUIRE( img.insertChunk( ch ) );
+		//Get a list of the sorted chunks
+		std::vector<boost::shared_ptr<data::Chunk> > list = img.getChunkList();
+		BOOST_CHECK_EQUAL( list.size(), 3 ); // the should be 3 chunks in the list by now
+
+		for( unsigned int i = 0; i < list.size(); i++ ) {
+			BOOST_CHECK_EQUAL( list[i]->propertyValue( "indexOrigin" ), util::fvector4( 0, 0, i, 0 ) );
+			BOOST_CHECK_EQUAL( list[i]->propertyValue( "acquisitionNumber" ), 2 - i ); // AcqNumber and time are in the oposite direction
+			BOOST_CHECK_EQUAL( list[i]->propertyValue( "acquisitionTime" ), 2 - i );
+		}
+
+		//Get a list of properties from the chunks in the image
+		//List of the properties shall be as if every chunk of the image was asked for the property
+		std::list<util::PropertyValue> origins = img.getChunksProperties( "indexOrigin" );
+		unsigned int i = 0;
+		BOOST_FOREACH( const util::PropertyValue & ref, origins ) {
+			BOOST_CHECK( ref == util::fvector4( 0, 0, i++, 0 ) );
+		}
 	}
 
-	boost::shared_ptr<data::Chunk> ptr = img.getChunkList().back();
-	//as all other chunks where timestep < 4 this must be at the end
-	BOOST_CHECK_EQUAL( ptr->propertyValue( "indexOrigin" ), util::fvector4( 0, 0, 2 ) );
-	BOOST_CHECK_EQUAL( ptr->propertyValue( "acquisitionNumber" ), 5  );
+	{
+		// Check for insertion in two dimensions
+		data::Image img;
+		for( int i = 0; i < 3; i++ ) {
+			data::Chunk ch = data::MemChunk<float>( 4, 4 );
+			ch.setProperty( "indexOrigin", util::fvector4( 0, 0, i, 0 ) );
+			ch.setProperty<uint32_t>( "acquisitionNumber", 3 + i );
+			ch.setProperty<uint32_t>( "acquisitionTime", 3 + i );
+			ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
+			ch.setProperty( "readVec", util::fvector4( 1, 0 ) );
+			ch.setProperty( "phaseVec", util::fvector4( 0, 1 ) );
+			img.insertChunk( ch );
+		}
+
+		boost::shared_ptr<data::Chunk> ptr = img.getChunkList().back();
+		//as all other chunks where timestep < 4 this must be at the end
+		BOOST_CHECK_EQUAL( ptr->propertyValue( "indexOrigin" ), util::fvector4( 0, 0, 2 ) );
+		BOOST_CHECK_EQUAL( ptr->propertyValue( "acquisitionNumber" ), 5  );
+	}
 }
 
 BOOST_AUTO_TEST_CASE ( image_chunk_test )
@@ -500,7 +507,27 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
 	}
 }
 
+BOOST_AUTO_TEST_CASE ( image_splice_test)
+{
+	data::MemChunk<uint8_t> original(10,10,10,10);
+	data::Image img;
 
+	original.setProperty<int32_t>("acquisitionNumber",1);
+	original.setProperty<util::fvector4>("indexOrigin",util::fvector4());
+	original.setProperty<util::fvector4>("voxelSize",util::fvector4(1,1,1));
+	original.setProperty<util::fvector4>("readVec",util::fvector4(1,0,0));
+	original.setProperty<util::fvector4>("phaseVec",util::fvector4(0,1,0));
+	BOOST_REQUIRE(img.insertChunk(original));
+	BOOST_REQUIRE(img.reIndex());
+	BOOST_REQUIRE(!img.empty());
+
+	img.spliceDownTo(data::sliceDim);
+	std::vector<boost::shared_ptr<data::Chunk> > chunks=img.getChunkList();	BOOST_CHECK_EQUAL(chunks.size(),100);
+
+	for(size_t i=0;i<chunks.size();i++){
+		BOOST_CHECK_EQUAL(chunks[i]->getProperty<int32_t>("acquisitionNumber"),i+1);
+	}
+}
 
 BOOST_AUTO_TEST_CASE ( image_init_test_sizes )
 {

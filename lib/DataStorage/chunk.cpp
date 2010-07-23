@@ -230,7 +230,7 @@ void Chunk::transformCoords( boost::numeric::ublas::matrix<float> transform )
 	setProperty<util::fvector4>( "sliceVec", slice );
 }
 
-ChunkList Chunk::autoSplice ( int32_t acquisitionNumberOffset )
+ChunkList Chunk::autoSplice ( int32_t acquisitionNumberStride )const
 {
 	if (!valid()) {
 		LOG(Runtime,error) << "Cannot splice invalid Chunk (missing properties are " << this->getMissing() << ")";
@@ -247,8 +247,6 @@ ChunkList Chunk::autoSplice ( int32_t acquisitionNumberOffset )
 
 	int32_t atDim=relevantDims()-1;
 
-	LOG(Runtime,info) << "Splicing chunk at dimenstion " << atDim+1;
-	
 	switch( atDim ) { // init offset with the given direction
 	case readDim :
 		offset = this->propertyValue( "readVec" )->cast_to_Type<util::fvector4>();
@@ -275,19 +273,20 @@ ChunkList Chunk::autoSplice ( int32_t acquisitionNumberOffset )
 		offset = util::fvector4( 0, 0, 0, 1 );
 	}
 
-	ChunkList ret=splice( (dimensions)atDim ); // do low level splice - get the chunklist
-
 	// prepare some attributes
 	assert( util::fuzzyEqual<float>( offset.sqlen(), 1 ) ); // it should be norm here
 	const util::fvector4 indexOriginOffset=offset * distance[atDim];
 	size_t cnt=0;
-		
+
+	LOG(Runtime,info) << "Splicing chunk at dimenstion " << atDim+1 << " with indexOrigin stride " << indexOriginOffset << " and acquisitionNumberStride " << acquisitionNumberStride;
+	ChunkList ret=splice( (dimensions)atDim ); // do low level splice - get the chunklist
+
 	BOOST_FOREACH(ChunkList::reference ref,ret){ // adapt some metadata in them
 		util::fvector4 &orig = ref.propertyValue( "indexOrigin" )->cast_to_Type<util::fvector4>();
-		int32_t &acq=propertyValue( "acquisitionNumber" )->cast_to_Type<int32_t>();
+		int32_t &acq=ref.propertyValue( "acquisitionNumber" )->cast_to_Type<int32_t>();
 		
 		orig= orig + indexOriginOffset * cnt;
-		acq= acquisitionNumberOffset + cnt;//@todo this might cause trouble if we try to insert this chunks into an image
+		acq+= acquisitionNumberStride * cnt;//@todo this might cause trouble if we try to insert this chunks into an image
 		
 		cnt++;
 	}
@@ -295,7 +294,7 @@ ChunkList Chunk::autoSplice ( int32_t acquisitionNumberOffset )
 	return ret;
 }
 
-ChunkList Chunk::splice ( dimensions atDim )
+ChunkList Chunk::splice ( dimensions atDim )const
 {
 	ChunkList ret;
 	
@@ -309,12 +308,12 @@ ChunkList Chunk::splice ( dimensions atDim )
 	spliceSize.copyFrom( &wholesize[0], &wholesize[atDim] );
 	
 	//get the spliced TypePtr's (the volume of the requested dims is the split-size - in case of sliceDim it is rows*columns)
-	const TypePtrList pointers = this->asTypePtrBase().splice( spliceSize.product() );
+	const TypePtrList pointers = this->getTypePtrBase().splice( spliceSize.product() );
 	
 	//create new Chunks from this TypePtr's
 	BOOST_FOREACH( TypePtrList::const_reference ref, pointers ) {
 		Chunk spliced( ref, spliceSize[0], spliceSize[1], spliceSize[2], spliceSize[3] );
-		static_cast<util::PropMap &>( spliced ) = static_cast<util::PropMap &>( *this ); //copy the metadate of ref
+		static_cast<util::PropMap &>( spliced ) = static_cast<const util::PropMap &>( *this ); //copy the metadate of ref
 		ret.push_back( spliced ); // store splice for return
 	}
 	return ret;

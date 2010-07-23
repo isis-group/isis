@@ -146,7 +146,7 @@ public:
 	 * (If voxelSize is 1,1,1 and voxelGap is 0,0,0)
 	 * (acquisitionNumber will be reset to a simple incrementing counter starting at acquisitionNumberOffset)
 	 */
-	ChunkList autoSplice(int32_t acquisitionNumberOffset=0);
+	ChunkList autoSplice(int32_t acquisitionNumberStride=0)const;
 	
 	/**
 	 * Splices the chunk at the given dimension and all dimensions above.
@@ -155,7 +155,7 @@ public:
 	 * - this can be done on chunks without any property (aka invalid Chunks)
 	 * E.g. splice\(phaseDim\) on a chunk of the size 512x512x128 will result in 512*128 chunks of the size 512x1x1
 	 */
-	ChunkList splice( dimensions atDim );
+	ChunkList splice( dimensions atDim )const;
 
 	/**
 	 * Transforms the image coordinate system into an other system by multiplying

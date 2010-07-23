@@ -631,9 +631,49 @@ void Image::transformCoords( boost::numeric::ublas::matrix<float> transform )
 	setProperty<util::fvector4>( "sliceVec", slice );
 }
 
-// Image::sortComparator::sortComparator(const std::string &prop_name):propertyName(prop_name){}
-// Image::originComparator::originComparator(const std::string& prop_name): sortComparator(prop_name){}
-// Image::timeComparator::timeComparator(const std::string& prop_name): sortComparator(prop_name){}
+size_t Image::spliceDownTo(dimensions dim)
+{
+	size_t cnt=0;
+	util::FixedVector<size_t,4> size=sizeToVector();
+	for(int i=0;i<dim;i++)
+		size[i]=1;
+	
+	struct splicer{
+		dimensions m_dim;
+		Image &m_image;
+		size_t m_amount;
+		splicer(dimensions dim,size_t amount,Image &image):m_dim(dim),m_image(image),m_amount(amount){}
+		void operator()(const Chunk &ch)
+		{
+			const size_t topDim=ch.relevantDims()-1;
+			if(topDim>=m_dim){ // ok we still have to splice that
+				const size_t subSize=m_image.sizeToVector()[topDim];
+				assert(!(m_amount%subSize)); // there must not be any "remaining"
+				splicer sub(m_dim,m_amount/subSize,m_image);
+				BOOST_FOREACH(const Chunk &ref, ch.autoSplice(m_amount/subSize) ){
+					sub(ref);
+				}
+			} else { // seems like we're done - insert it into the image
+				assert(ch.relevantDims()==m_dim); // index of the higest dim>1 (ch.relevantDims()-1) shall be equal to the dim below the requested splicing (m_dim-1)
+				m_image.insertChunk(ch);
+			}
+		}
+	};
+
+	std::vector<boost::shared_ptr<Chunk> > buffer=lookup; // store the old lookup table
+	lookup.clear();set.clear(); // clear the image, so we can insert the splices
+	//static_cast<util::PropMap::base_type*>(this)->clear(); we can keep the common properties - they will be merged with thier own copies from the chunks on the next reIndex
+
+	splicer splice(dim,size.product(),*this);
+	BOOST_FOREACH(boost::shared_ptr<Chunk> &ref, buffer ){
+		ref->join(*this); //get back all properties
+		splice(*ref);
+	}
+
+	reIndex();
+	return lookup.size();
+}
+
 
 } // END namespace data
 } // END namespace isis
