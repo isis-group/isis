@@ -215,7 +215,7 @@ continousFind( ForwardIterator &current, const ForwardIterator end, const T &com
  * Will raise a compiler error when not used with floating point types.
  * \returns true if the difference between the two values is significantly small compared to their values.
  */
-template<typename T> bool fuzzyEqual( T a, T b, unsigned short boost=1 )
+template<typename T> bool fuzzyEqual( T a, T b, unsigned short boost = 1 )
 {
 	BOOST_MPL_ASSERT( ( boost::is_float<T> ) );
 	const T epsilon = std::numeric_limits<T>::epsilon();
@@ -238,7 +238,7 @@ template<typename T> bool fuzzyEqual( T a, T b, unsigned short boost=1 )
 		return true;
 
 	const T dist_fac = ( std::max( a, b ) / std::min( a, b ) ) - 1;
-	return  dist_fac <= epsilon*boost;
+	return  dist_fac <= epsilon * boost;
 }
 
 /// @cond _internal

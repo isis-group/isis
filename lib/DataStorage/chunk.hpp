@@ -113,11 +113,17 @@ public:
 		return getTypePtrBase().cast_to_TypePtr<TYPE>();
 	}
 	Chunk cloneToMem( size_t firstDim = 0, size_t secondDim = 0, size_t thirdDim = 0, size_t fourthDim = 0 )const;
-	Chunk copyToMem()const;
+
+	template<typename T> bool copyToMem( T *dst, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max )const {
+		// wrap the raw memory at into an non-deleting TypePtr of the length of the chunk
+		TypePtr<T> dstPtr( dst, volume(), TypePtr<T>::NonDeleter() );
+		return getTypePtrBase().convertTo( dstPtr, min, max ); // copy-convert the data into dstPtr
+	}
+
 	size_t bytes_per_voxel()const;
 	std::string typeName()const;
 	unsigned short typeID()const;
-	template<typename T> bool is()const{
+	template<typename T> bool is()const {
 		return get()->is<T>();
 	}
 
@@ -131,9 +137,6 @@ public:
 	size_t cmpSlice( size_t thirdDimS, size_t fourthDimS, const Chunk &dst, size_t thirdDimD, size_t fourthDimD )const;
 
 	void getMinMax( util::TypeReference &min, util::TypeReference &max )const;
-	template<typename T> void convertTo( T *dst, size_t len )const {
-		getTypePtrBase().convertTo( dst );
-	}
 
 	Chunk &operator=( const Chunk &ref );
 
@@ -141,13 +144,13 @@ public:
 	 * Splices the chunk at the uppermost dimension and automatically sets indexOrigin and acquisitionNumber appropriately.
 	 * This automatically selects the upermost dimension of the chunk to be spliced and will compute the correct offsets
 	 * for indexOrigin and acquisitionNumberOffset which will be applied to the resulting splices.
-	 * E.g. splice\(1\) on a chunk of the size 512x512x128, the readVec 1,0,0, the phaseVec 0,1,0 and the indexOrigin 0,0,0 
+	 * E.g. splice\(1\) on a chunk of the size 512x512x128, the readVec 1,0,0, the phaseVec 0,1,0 and the indexOrigin 0,0,0
 	 * will result in 128 chunks of the size 512x512x1, the readVec 1,0,0, the phaseVec 0,1,0 and the indexOrigin 0,0,0 to 0,0,128.
 	 * (If voxelSize is 1,1,1 and voxelGap is 0,0,0)
 	 * (acquisitionNumber will be reset to a simple incrementing counter starting at acquisitionNumberOffset)
 	 */
-	ChunkList autoSplice(int32_t acquisitionNumberStride=0)const;
-	
+	ChunkList autoSplice( int32_t acquisitionNumberStride = 0 )const;
+
 	/**
 	 * Splices the chunk at the given dimension and all dimensions above.
 	 * As this will not set or use any property
@@ -237,8 +240,8 @@ public:
 		_internal::ChunkBase::operator=( static_cast<const _internal::ChunkBase &>( ref ) ); //copy the metadate of ref
 		//get rid of my TypePtr and make a new copying the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
 		TypePtrReference::reset( new TypePtr<TYPE>(
-					static_cast<const Chunk &>( ref ).getTypePtrBase().copyToMem()->cast_to_TypePtr<TYPE>()
-				) );
+									 static_cast<const Chunk &>( ref ).getTypePtrBase().copyToMem()->cast_to_TypePtr<TYPE>()
+								 ) );
 		return *this;
 	}
 	MemChunk &operator=( const Chunk &ref ) {

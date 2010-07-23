@@ -50,7 +50,7 @@ public:
 		bool operator()( const isis::util::PropertyValue &a, const isis::util::PropertyValue &b ) const;
 	};
 	struct chunkPtrOperator {
-		virtual boost::shared_ptr<Chunk> operator()( const boost::shared_ptr<Chunk> &ptr )=0;
+		virtual boost::shared_ptr<Chunk> operator()( const boost::shared_ptr<Chunk> &ptr ) = 0;
 		virtual ~chunkPtrOperator();
 	};
 private:

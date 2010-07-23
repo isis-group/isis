@@ -204,11 +204,12 @@ public:
 	virtual ~Type() {}
 };
 
-template<typename T> bool _internal::TypeBase::is()const {
+template<typename T> bool _internal::TypeBase::is()const
+{
 	check_type<T>();
-	return typeID()==Type<T>::staticID;
+	return typeID() == Type<T>::staticID;
 }
-	
+
 }
 /// @}
 }

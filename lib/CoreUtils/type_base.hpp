@@ -62,7 +62,7 @@ protected:
 public:
 	typedef TypeReference<TypeBase> Reference;
 	typedef TypeConverterMap::mapped_type::mapped_type Converter;
-	
+
 	template<typename T> bool is()const;
 
 	const Converter &getConverterTo( unsigned short id )const;

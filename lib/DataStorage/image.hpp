@@ -44,7 +44,7 @@ private:
 
 	/**
 	 * Get the pointer to the chunk in the internal lookup-table at position at.
-	 * The Chunk will only have metadata which are unique to it - so it might be invalid 
+	 * The Chunk will only have metadata which are unique to it - so it might be invalid
 	 * (run join on it using the image as parameter to insert all non-unique-metadata).
 	 */
 	const boost::shared_ptr<Chunk> &chunkPtrAt( size_t at )const;
@@ -97,11 +97,11 @@ protected:
 	size_t getChunkStride( size_t base_stride = 1 );
 	template<typename T> struct makeTypedChunk: _internal::SortedChunkList::chunkPtrOperator {
 		util::TypeReference min, max;
-		boost::shared_ptr<Chunk> operator()(const boost::shared_ptr< Chunk >& ptr){
+		boost::shared_ptr<Chunk> operator()( const boost::shared_ptr< Chunk >& ptr ) {
 			return boost::shared_ptr<Chunk>( ptr->is<T>() ?
-				new Chunk(*ptr) : // replace by a cheap copy - type is right
-				new MemChunk<T>( *ptr, *min, *max ) // replace by a converted deep copy
-			);
+											 new Chunk( *ptr ) : // replace by a cheap copy - type is right
+											 new MemChunk<T>( *ptr, *min, *max ) // replace by a converted deep copy
+										   );
 		}
 	};
 	/**
@@ -231,6 +231,7 @@ public:
 	 */
 	template<typename TYPE> Chunk getChunkAs( const util::_internal::TypeBase &min, const  util::_internal::TypeBase &max, size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const {
 		const Chunk &ref = getChunk( first, second, third, fourth );
+
 		if( ref.is<TYPE>() ) { //OK its the right type - just return that
 			return ref;
 		} else { //we have to do a conversion
@@ -250,10 +251,10 @@ public:
 	* \returns a chunk contains the (maybe converted) voxel value at the given coordinates.
 	*/
 	template<typename TYPE> Chunk getChunkAs( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const {
-		const boost::shared_ptr<Chunk> &ptr = chunkPtrAt( commonGet( first, second, third, fourth ).first);
-		return makeTypedChunk<TYPE>()(ptr);
+		const boost::shared_ptr<Chunk> &ptr = chunkPtrAt( commonGet( first, second, third, fourth ).first );
+		return makeTypedChunk<TYPE>()( ptr );
 	}
-	
+
 	/**
 	 * Insert a Chunk into the Image.
 	 * The insertion is sorted and unique. So the Chunk will be inserted behind a geometrically "lower" Chunk if there is one.
@@ -296,14 +297,14 @@ public:
 	}
 
 	/// Get the maximum and the minimum voxel value of the image and store them as Type-object in the given references.
-	void getMinMax( util::TypeReference& min, util::TypeReference& max )const;
+	void getMinMax( util::TypeReference &min, util::TypeReference &max )const;
 
 	/**
 	 * Compares the voxel-values of this image to the given.
 	 * \returns the amount of the different voxels
 	 */
 	size_t cmp( const Image &comp )const;
-	
+
 	orientation getMainOrientation()const;
 	/**
 	 * Transforms the image coordinate system into an other system by multiplying
@@ -323,18 +324,19 @@ public:
 	 * Copy all voxel data of the image into memory.
 	 * If neccessary a conversion into T is done using min/max of the image.
 	 */
-	template<typename T> void copyToMem(T *dst)const{
+	template<typename T> void copyToMem( T *dst )const {
 		util::TypeReference min, max;
-		getMinMax(min,max);
+		getMinMax( min, max );
 		// we could do this using makeTypedChunk - but this does not need any additional temporary memory
-		BOOST_FOREACH(boost::shared_ptr<Chunk> &ref,lookup){ 
-			// wrap the raw memory at the "cursor" into an non-deleting TypePtr of the length of the chunk
-			TypePtr<T> dstPtr(dst,ref->volume(),TypePtr<T>::NonDeleter()); 
-			ref->getTypePtrBase().convertTo(dstPtr,min,max); // copy-convert the data into dstPtr
-			dst+=dstPtr.len();// increment the cursor
+		BOOST_FOREACH( boost::shared_ptr<Chunk> &ref, lookup ) {
+			if( !ref->copyToMem<T>( dst, *min, *max ) ) {
+				LOG( Runtime, error ) << "Failed to copy raw data of type " << ref->typeName() << " from image into memory of type " << TypePtr<T>::staticName();
+			}
+
+			dst += ref->volume(); // increment the cursor
 		}
 	}
-	size_t spliceDownTo(dimensions dim);
+	size_t spliceDownTo( dimensions dim );
 };
 
 template<typename T> class MemImage: public Image
@@ -344,7 +346,7 @@ public:
 		//we want copies of the chunks, and we want them to be of type T
 		struct : _internal::SortedChunkList::chunkPtrOperator {
 			util::TypeReference min, max;
-			boost::shared_ptr<Chunk> operator()(const boost::shared_ptr< Chunk >& ptr){
+			boost::shared_ptr<Chunk> operator()( const boost::shared_ptr< Chunk >& ptr ) {
 				return boost::shared_ptr<Chunk>( new MemChunk<T>( *ptr, *min, *max ) );
 			}
 		} conv_op;

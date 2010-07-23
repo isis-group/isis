@@ -40,7 +40,6 @@ ImageFormat_Vista::write( const data::Image &image,
 						  const std::string &filename, const std::string &dialect )
 throw( std::runtime_error & )
 {
-
 	//  All vista images a organized in an attribue list. Let's create an empty one:
 	VAttrList attrList = VCreateAttrList();
 	//  One or more VImages need to be written to disk.
@@ -100,11 +99,11 @@ throw( std::runtime_error & )
 			std::vector< boost::shared_ptr< const data::Chunk> > chunkVector = image.getChunkList();
 			// count current timestep
 			int t = 0;
-			BOOST_FOREACH(std::vector< boost::shared_ptr< const data::Chunk > >::const_reference ref, chunkVector)
-			{
+			BOOST_FOREACH( std::vector< boost::shared_ptr< const data::Chunk > >::const_reference ref, chunkVector ) {
 				// next timestep
 				// put the chunk in a mem chunk to get type convertion right
 				data::MemChunk<VShort> chunk( *ref );
+
 				for( int z = 0; z < dims[2]; z++ ) {
 					for( int y = 0; y < dims[1]; y++ ) {
 						for( int x = 0; x < dims[0]; x++ ) {
@@ -113,9 +112,11 @@ throw( std::runtime_error & )
 						}
 					}
 				}
+
 				t++;
 			}
 		}
+
 		// dims[3] > 1 ?
 		// 3D image data
 	} else {
@@ -255,7 +256,6 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 			// splice VistaChunk
 			LOG( DataLog, info ) << "splicing";
 			data::ChunkList splices = vchunk.splice( data::sliceDim );
-
 			LOG( DataLog, info ) << "finished splicing with " << splices.size();
 			LOG( DataLog, info ) << data::Chunk::n_dims;
 			LOG( DataLog, info ) << splices.begin()->dimSize( 0 );
@@ -365,7 +365,6 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 			std::back_insert_iterator<data::ChunkList> dest_iter ( chunks );
 			std::copy( splices.begin(), splices.end(), dest_iter );
 		} // END for(unsigned k=0;k<nimages;k++)
-
 	} // END if dialect == "functional"
 
 	// MAP -> the vista image should contain a single 3D VFloat image. Hence the
@@ -508,9 +507,9 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 
 		for( kiter = klist.begin(); kiter != klist.end(); kiter++ ) {
 			util::PropertyValue pv = vista_branch.propertyValue( *kiter );
-
 			// VBit -> VBit (char *)
-			BOOST_MPL_ASSERT_RELATION( sizeof(char), == , sizeof(uint8_t) );
+			BOOST_MPL_ASSERT_RELATION( sizeof( char ), == , sizeof( uint8_t ) );
+
 			if( pv->is<uint8_t>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VBitRepn,
 							 ( VBit )pv->cast_to_Type<uint8_t>() );

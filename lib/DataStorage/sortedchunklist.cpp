@@ -62,7 +62,7 @@ bool SortedChunkList::scalarPropCompare::operator()( const isis::util::PropertyV
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Chunk operators
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-SortedChunkList::chunkPtrOperator::~chunkPtrOperator(){}
+SortedChunkList::chunkPtrOperator::~chunkPtrOperator() {}
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -126,10 +126,10 @@ std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::primaryInsert( const 
 			// run insert on that
 			return secondaryInsert( subMap, ch ); // insert ch into the right secondary map
 		} else {
-			LOG( Runtime, warning ) 
-			<< "Cannot insert chunk. It's property " 
-			<< propName << " has wrong type " << util::MSubject(prop->typeName())
-			<< " (should be " << util::MSubject(util::Type<util::fvector4>::staticName()) << ")";
+			LOG( Runtime, warning )
+					<< "Cannot insert chunk. It's property "
+					<< propName << " has wrong type " << util::MSubject( prop->typeName() )
+					<< " (should be " << util::MSubject( util::Type<util::fvector4>::staticName() ) << ")";
 		}
 	} else
 		LOG( Runtime, warning ) << "Cannot insert chunk. It's lacking the property " << util::MSubject( propName ) << " which is needed for primary sorting";
@@ -250,7 +250,7 @@ void SortedChunkList::transform( chunkPtrOperator &op )
 {
 	BOOST_FOREACH( PrimaryMap::reference outer, chunks ) {
 		BOOST_FOREACH( SecondaryMap::reference inner, outer.second ) {
-			inner.second=op( inner.second );
+			inner.second = op( inner.second );
 		}
 	}
 }

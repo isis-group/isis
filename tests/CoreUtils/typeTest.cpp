@@ -32,8 +32,8 @@ using util::_internal::TypeBase;
 // TestCase object instantiation
 BOOST_AUTO_TEST_CASE( test_type_init )
 {
-//	ENABLE_LOG( CoreDebug, util::DefaultMsgPrint, info );
-//	ENABLE_LOG( CoreLog, util::DefaultMsgPrint, info );
+	//  ENABLE_LOG( CoreDebug, util::DefaultMsgPrint, info );
+	//  ENABLE_LOG( CoreLog, util::DefaultMsgPrint, info );
 	Type<int32_t> tInt( 42 );   // integer
 	Type<std::string> tStr( std::string( "Hello World" ) ); // string
 	// implicit conversion from double -> float

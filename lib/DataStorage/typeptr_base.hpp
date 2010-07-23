@@ -43,9 +43,9 @@ protected:
 public:
 	typedef util::_internal::TypeReference<TypePtrBase> Reference;
 	typedef TypePtrConverterMap::mapped_type::mapped_type Converter;
-	
+
 	template<typename T> bool is()const;
-	
+
 	const Converter &getConverterTo( unsigned short id )const;
 	/**
 	* Dynamically cast the TypeBase up to its actual TypePtr\<T\>. Constant version.

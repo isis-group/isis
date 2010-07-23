@@ -298,11 +298,12 @@ public:
 
 };
 
-template<typename T> bool _internal::TypePtrBase::is()const {
+template<typename T> bool _internal::TypePtrBase::is()const
+{
 	util::check_type<T>();
-	return typeID()==TypePtr<T>::staticID;
+	return typeID() == TypePtr<T>::staticID;
 }
-	
+
 
 }
 }

@@ -31,15 +31,12 @@ namespace data
 class IOApplication: public util::Application
 {
 	bool m_input, m_output;
-	template< typename TYPE > ImageList convertTo( const ImageList& imageList )
-	{
+	template< typename TYPE > ImageList convertTo( const ImageList &imageList ) {
 		ImageList retList;
-		BOOST_FOREACH( ImageList::const_reference listRef, imageList )
-		{
+		BOOST_FOREACH( ImageList::const_reference listRef, imageList ) {
 			retList.push_back( boost::shared_ptr<Image> ( new MemImage<TYPE>( *listRef ) ) );
 		}
 		return retList;
-
 	}
 public:
 	data::ImageList images;
@@ -48,7 +45,7 @@ public:
 	virtual bool init( int argc, char **argv, bool exitOnError = true );
 
 	bool autoload( bool exitOnError = false );
-	bool autowrite(const ImageList &out_images, bool exitOnError = false );
+	bool autowrite( const ImageList &out_images, bool exitOnError = false );
 };
 
 }

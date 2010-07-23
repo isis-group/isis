@@ -189,7 +189,7 @@ bool Image::reIndex()
 				util::fvector4 &voxelGap = propertyValue( "voxelGap" )->cast_to_Type<util::fvector4>(); //if there is no voxelGap yet, we create it
 
 				if ( voxelGap[2] != inf ) {
-					if ( ! util::fuzzyEqual( voxelGap[2], sliceDist,1e1 ) ) {
+					if ( ! util::fuzzyEqual( voxelGap[2], sliceDist, 1e1 ) ) {
 						LOG_IF( ! util::fuzzyEqual( voxelGap[2], sliceDist ), Runtime, warning )
 								<< "The existing slice distance (voxelGap[2]) " << util::MSubject( voxelGap[2] )
 								<< " differs from the distance between chunk 0 and 1, which is " << sliceDist;
@@ -268,7 +268,7 @@ bool Image::empty()const
 	return set.empty();
 }
 
-const boost::shared_ptr< Chunk >& Image::chunkPtrAt(size_t at)const
+const boost::shared_ptr< Chunk >& Image::chunkPtrAt( size_t at )const
 {
 	LOG_IF( lookup.empty(), Debug, error ) << "The lookup table is empty. Run reIndex first.";
 	LOG_IF( at >= lookup.size(), Debug, error ) << "Index is out of the range of the lookup table (" << at << ">=" << lookup.size() << ").";
@@ -279,13 +279,15 @@ const boost::shared_ptr< Chunk >& Image::chunkPtrAt(size_t at)const
 
 Chunk Image::getChunkAt( size_t at, bool copy_metadata )const
 {
-	Chunk ret(*chunkPtrAt(at));
+	Chunk ret( *chunkPtrAt( at ) );
+
 	if( copy_metadata )ret.join( *this ); // copy all metadata from the image in here
+
 	return ret;
 }
 Chunk &Image::chunkAt( size_t at )
 {
-	return *chunkPtrAt(at);
+	return *chunkPtrAt( at );
 }
 
 Chunk Image::getChunk ( size_t first, size_t second, size_t third, size_t fourth, bool copy_metadata )
@@ -293,6 +295,7 @@ Chunk Image::getChunk ( size_t first, size_t second, size_t third, size_t fourth
 	if ( ! clean ) {
 		LOG( Debug, info )
 				<< "Image is not clean. Running reIndex ...";
+
 		if( !reIndex() ) {
 			LOG( Runtime, error ) << "Reindexing failed -- undefined behavior ahead ...";
 		}
@@ -304,24 +307,26 @@ Chunk Image::getChunk ( size_t first, size_t second, size_t third, size_t fourth
 const Chunk Image::getChunk ( size_t first, size_t second, size_t third, size_t fourth, bool copy_metadata ) const
 {
 	const size_t index = commonGet( first, second, third, fourth ).first;
-	return getChunkAt(index,copy_metadata);
+	return getChunkAt( index, copy_metadata );
 }
 std::vector< boost::shared_ptr< Chunk > > Image::getChunkList()
 {
 	if( !clean ) {
 		LOG( Debug, info )
 				<< "Image is not clean. Running reIndex ...";
+
 		if( !reIndex() ) {
 			LOG( Runtime, error ) << "Reindexing failed -- undefined behavior ahead ...";
 		}
 	}
+
 	return lookup;
 }
 
 std::vector< boost::shared_ptr<const Chunk > > Image::getChunkList()const
 {
-	LOG_IF(!clean,Debug,error) << "You shouldn't do this on a non clean image. Run reIndex first.";
-	return std::vector< boost::shared_ptr<const Chunk > >(lookup.begin(),lookup.end());
+	LOG_IF( !clean, Debug, error ) << "You shouldn't do this on a non clean image. Run reIndex first.";
+	return std::vector< boost::shared_ptr<const Chunk > >( lookup.begin(), lookup.end() );
 }
 
 
@@ -408,12 +413,13 @@ std::list<util::PropertyValue> Image::getChunksProperties( const util::PropMap::
 
 size_t Image::bytes_per_voxel() const
 {
-	size_t size = chunkPtrAt(0)->bytes_per_voxel();
+	size_t size = chunkPtrAt( 0 )->bytes_per_voxel();
 	BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
-		LOG_IF(size != ref->bytes_per_voxel(), Debug, warning )
-			<< "Not all voxels have the same byte size ("<< size << "!=" << ref->bytes_per_voxel() << "). Using the biggest.";
-		if(size < ref->bytes_per_voxel()){
-			size=ref->bytes_per_voxel();
+		LOG_IF( size != ref->bytes_per_voxel(), Debug, warning )
+				<< "Not all voxels have the same byte size (" << size << "!=" << ref->bytes_per_voxel() << "). Using the biggest.";
+
+		if( size < ref->bytes_per_voxel() ) {
+			size = ref->bytes_per_voxel();
 		}
 	}
 	return size;
@@ -440,13 +446,13 @@ ImageList::ImageList( ChunkList src )
 		}
 
 		if ( !buff->empty() ) {
-			if ( buff->reIndex() ){
+			if ( buff->reIndex() ) {
 				if ( buff->valid() )
 					push_back( buff );
 				else {
 					const util::PropMap::key_list missing = buff->getMissing();
 					LOG( Runtime, error )
-					<< "Cannot insert image. Missing properties: " << util::list2string( missing.begin(), missing.end() );
+							<< "Cannot insert image. Missing properties: " << util::list2string( missing.begin(), missing.end() );
 				}
 			} else {
 				const util::PropMap::key_list missing = buff->getMissing();
@@ -490,7 +496,7 @@ size_t Image::cmp( const isis::data::Image &comp ) const
 		assert( c1pair1.first == c1pair2.first );
 		LOG( Debug, verbose_info ) << "Comparing chunks at " << c1pair1.first << " and "   << c2pair1.first;
 		const Chunk &c1 = *chunkPtrAt( c1pair1.first );
-		const Chunk &c2 = *(comp.chunkPtrAt( c2pair1.first ));
+		const Chunk &c2 = *( comp.chunkPtrAt( c2pair1.first ) );
 		LOG( Debug, verbose_info )
 				<< "Start positions are " << c1pair1.second << " and " << c2pair1.second
 				<< " and the length is " << c1pair2.second - c1pair1.second;
@@ -549,10 +555,9 @@ Image::orientation Image::getMainOrientation()const
 
 unsigned short Image::typeID() const
 {
-	unsigned int mytypeID = chunkPtrAt(0)->typeID();
-	size_t tmpBytesPerVoxel=0;
-	BOOST_FOREACH( std::vector< boost::shared_ptr<const Chunk> >::const_reference chunkRef, lookup )
-	{
+	unsigned int mytypeID = chunkPtrAt( 0 )->typeID();
+	size_t tmpBytesPerVoxel = 0;
+	BOOST_FOREACH( std::vector< boost::shared_ptr<const Chunk> >::const_reference chunkRef, lookup ) {
 		if ( chunkRef->bytes_per_voxel() > tmpBytesPerVoxel ) {
 			tmpBytesPerVoxel = chunkRef->bytes_per_voxel();
 			mytypeID = chunkRef->typeID();
@@ -631,45 +636,49 @@ void Image::transformCoords( boost::numeric::ublas::matrix<float> transform )
 	setProperty<util::fvector4>( "sliceVec", slice );
 }
 
-size_t Image::spliceDownTo(dimensions dim)
+size_t Image::spliceDownTo( dimensions dim )
 {
-	size_t cnt=0;
-	util::FixedVector<size_t,4> size=sizeToVector();
-	for(int i=0;i<dim;i++)
-		size[i]=1;
-	
-	struct splicer{
+	if( lookup[0]->relevantDims() < dim ) {
+		LOG( Debug, error ) << "The dimensionality of the chunks of this image is already below " << dim << " cannot splice it.";
+		return 0;
+	}
+
+	LOG_IF( lookup[0]->relevantDims() == dim, Debug, info ) << "Running useless splice, the dimensionality of the chunks of this image is already " << dim;
+	util::FixedVector<size_t, 4> size = sizeToVector();
+
+	for( int i = 0; i < dim; i++ )
+		size[i] = 1;
+
+	struct splicer {
 		dimensions m_dim;
 		Image &m_image;
 		size_t m_amount;
-		splicer(dimensions dim,size_t amount,Image &image):m_dim(dim),m_image(image),m_amount(amount){}
-		void operator()(const Chunk &ch)
-		{
-			const size_t topDim=ch.relevantDims()-1;
-			if(topDim>=m_dim){ // ok we still have to splice that
-				const size_t subSize=m_image.sizeToVector()[topDim];
-				assert(!(m_amount%subSize)); // there must not be any "remaining"
-				splicer sub(m_dim,m_amount/subSize,m_image);
-				BOOST_FOREACH(const Chunk &ref, ch.autoSplice(m_amount/subSize) ){
-					sub(ref);
+		splicer( dimensions dim, size_t amount, Image &image ): m_dim( dim ), m_image( image ), m_amount( amount ) {}
+		void operator()( const Chunk &ch ) {
+			const size_t topDim = ch.relevantDims() - 1;
+
+			if( topDim >= m_dim ) { // ok we still have to splice that
+				const size_t subSize = m_image.sizeToVector()[topDim];
+				assert( !( m_amount % subSize ) ); // there must not be any "remaining"
+				splicer sub( m_dim, m_amount / subSize, m_image );
+				BOOST_FOREACH( const Chunk & ref, ch.autoSplice( m_amount / subSize ) ) {
+					sub( ref );
 				}
 			} else { // seems like we're done - insert it into the image
-				assert(ch.relevantDims()==m_dim); // index of the higest dim>1 (ch.relevantDims()-1) shall be equal to the dim below the requested splicing (m_dim-1)
-				m_image.insertChunk(ch);
+				assert( ch.relevantDims() == m_dim ); // index of the higest dim>1 (ch.relevantDims()-1) shall be equal to the dim below the requested splicing (m_dim-1)
+				m_image.insertChunk( ch );
 			}
 		}
 	};
-
-	std::vector<boost::shared_ptr<Chunk> > buffer=lookup; // store the old lookup table
-	lookup.clear();set.clear(); // clear the image, so we can insert the splices
+	std::vector<boost::shared_ptr<Chunk> > buffer = lookup; // store the old lookup table
+	lookup.clear();
+	set.clear(); // clear the image, so we can insert the splices
 	//static_cast<util::PropMap::base_type*>(this)->clear(); we can keep the common properties - they will be merged with thier own copies from the chunks on the next reIndex
-
-	splicer splice(dim,size.product(),*this);
-	BOOST_FOREACH(boost::shared_ptr<Chunk> &ref, buffer ){
-		ref->join(*this); //get back all properties
-		splice(*ref);
+	splicer splice( dim, size.product(), *this );
+	BOOST_FOREACH( boost::shared_ptr<Chunk> &ref, buffer ) {
+		ref->join( *this ); //get back all properties
+		splice( *ref );
 	}
-
 	reIndex();
 	return lookup.size();
 }

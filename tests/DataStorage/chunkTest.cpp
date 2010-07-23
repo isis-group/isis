@@ -169,9 +169,9 @@ BOOST_AUTO_TEST_CASE ( chunk_splice_test )//Copy chunks
 	ch1.setProperty( "indexOrigin", util::fvector4( 1, 1, 1 ) );
 	ch1.setProperty( "readVec", util::fvector4( 1, 0, 0 ) );
 	ch1.setProperty( "phaseVec", util::fvector4( 0, 1, 0 ) );
-	ch1.setProperty( "voxelSize", util::fvector4( 1, 1, 1 ));
-	ch1.setProperty( "voxelGap", util::fvector4( 1, 1, 1 ));
-	ch1.setProperty<int32_t>( "acquisitionNumber", 0);
+	ch1.setProperty( "voxelSize", util::fvector4( 1, 1, 1 ) );
+	ch1.setProperty( "voxelGap", util::fvector4( 1, 1, 1 ) );
+	ch1.setProperty<int32_t>( "acquisitionNumber", 0 );
 
 	for ( size_t i = 0; i < ch1.volume(); i++ )
 		ch1.asTypePtr<float>()[i] = i;

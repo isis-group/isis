@@ -46,19 +46,17 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 		parameters["wf"].setDescription( "Override automatic detection of file suffix for writing with given value." );
 		parameters["wdialect"] = std::string();
 		parameters["wdialect"].needed() = false;
-		parameters["wdialect"].setDescription("choose dialect for writing. The available dialects depend on the capabilities of IO plugins." );
-		std::map<unsigned short, std::string> types=util::getTypeMap(true,false);
-
+		parameters["wdialect"].setDescription( "choose dialect for writing. The available dialects depend on the capabilities of IO plugins." );
+		std::map<unsigned short, std::string> types = util::getTypeMap( true, false );
 		// remove some types which are useless as representation
 		// "(unsigned short)" is needed because otherwise erase would take the reference of a static constant which is only there during compile time
-		types.erase((unsigned short)util::Type<util::Selection>::staticID); 
-		types.erase((unsigned short)util::Type<std::string>::staticID);
-		types.erase((unsigned short)util::Type<boost::posix_time::ptime>::staticID);
-		types.erase((unsigned short)util::Type<boost::gregorian::date>::staticID);
-		types.erase((unsigned short)util::Type<util::ilist>::staticID);
-		types.erase((unsigned short)util::Type<util::dlist>::staticID);
-		types.erase((unsigned short)util::Type<util::slist>::staticID);
-
+		types.erase( ( unsigned short )util::Type<util::Selection>::staticID );
+		types.erase( ( unsigned short )util::Type<std::string>::staticID );
+		types.erase( ( unsigned short )util::Type<boost::posix_time::ptime>::staticID );
+		types.erase( ( unsigned short )util::Type<boost::gregorian::date>::staticID );
+		types.erase( ( unsigned short )util::Type<util::ilist>::staticID );
+		types.erase( ( unsigned short )util::Type<util::dlist>::staticID );
+		types.erase( ( unsigned short )util::Type<util::slist>::staticID );
 		parameters["repn"] = util::Selection( types );
 		parameters["repn"].needed() = false;
 		parameters["repn"].setDescription(
@@ -74,8 +72,9 @@ bool IOApplication::init( int argc, char **argv, bool exitOnError )
 		return false;
 
 	if ( m_input ) {
-		return autoload(exitOnError);
+		return autoload( exitOnError );
 	}
+
 	return true;
 }
 bool IOApplication::autoload( bool exitOnError )
@@ -84,16 +83,16 @@ bool IOApplication::autoload( bool exitOnError )
 	std::string rf = parameters["rf"];
 	std::string dl = parameters["rdialect"];
 	LOG( Runtime, info )
-	<< "loading " << util::MSubject(input)
-	<< (rf.empty() ? "" : std::string(" using the format: ") + rf)
-	<< ((!rf.empty() && !dl.empty()) ? " and":"")
-	<< (dl.empty() ? "":std::string(" using the dialect: ") + dl);
-
+			<< "loading " << util::MSubject( input )
+			<< ( rf.empty() ? "" : std::string( " using the format: " ) + rf )
+			<< ( ( !rf.empty() && !dl.empty() ) ? " and" : "" )
+			<< ( dl.empty() ? "" : std::string( " using the dialect: " ) + dl );
 	images = data::IOFactory::load( input, rf, dl );
 
 	if ( images.empty() ) {
 		if ( exitOnError )
 			exit( 1 );
+
 		return false;
 	} else {
 		for( ImageList::const_iterator a = images.begin(); a != images.end(); a++ ) {
@@ -106,16 +105,18 @@ bool IOApplication::autoload( bool exitOnError )
 			}
 		}
 	}
+
 	return true;
 }
-bool IOApplication::autowrite( const ImageList& out_images, bool exitOnError )
+bool IOApplication::autowrite( const ImageList &out_images, bool exitOnError )
 {
 	const util::Selection repn = parameters["repn"];
 	const std::string output = parameters["out"];
 	const std::string wf = parameters["wf"];
 	const std::string dl = parameters["wdialect"];
 	ImageList convertedList;
-	switch ( (int)repn ) {
+
+	switch ( ( int )repn ) {
 	case util::Type<int8_t>::staticID:
 		convertedList = convertTo<int8_t>( out_images );
 		break;
@@ -142,25 +143,26 @@ bool IOApplication::autowrite( const ImageList& out_images, bool exitOnError )
 		break;
 	default:
 		std::string oldRepn = util::getTypeMap()[out_images.front()->typeID()];
-		oldRepn.erase(oldRepn.size()-1, oldRepn.size());
-		LOG(DataLog, warning) << "Pixel representation " << parameters["repn"].toString()
-							<< " not yet supported. Retaining "
-							<< oldRepn << ".";
+		oldRepn.erase( oldRepn.size() - 1, oldRepn.size() );
+		LOG( DataLog, warning ) << "Pixel representation " << parameters["repn"].toString()
+								<< " not yet supported. Retaining "
+								<< oldRepn << ".";
 		convertedList = out_images;
 		break;
 	}
 
 	LOG( Runtime, info )
-	<< "Writing " << out_images.size() << " images"
-// 	<< (repn ? std::string(" as ") + (std::string)repn : "")
-	<< " to " << util::MSubject(output)
-	<< (wf.empty() ? "" : std::string(" using the format: ") + wf)
-	<< ((!wf.empty() && !dl.empty()) ? " and":"")
-	<< (dl.empty() ? "":std::string(" using the dialect: ") + dl);
+			<< "Writing " << out_images.size() << " images"
+			//  << (repn ? std::string(" as ") + (std::string)repn : "")
+			<< " to " << util::MSubject( output )
+			<< ( wf.empty() ? "" : std::string( " using the format: " ) + wf )
+			<< ( ( !wf.empty() && !dl.empty() ) ? " and" : "" )
+			<< ( dl.empty() ? "" : std::string( " using the dialect: " ) + dl );
 
 	if ( ! IOFactory::write( convertedList, output, wf, dl ) ) {
 		if ( exitOnError )
 			exit( 1 );
+
 		return false;
 	} else
 		return true;

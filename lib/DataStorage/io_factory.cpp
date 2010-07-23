@@ -160,13 +160,14 @@ int IOFactory::loadFile( isis::data::ChunkList &ret, const boost::filesystem::pa
 {
 	FileFormatList formatReader;
 	formatReader = getFormatInterface( filename.string(), suffix_override, dialect );
-	if (formatReader.empty())
-	{
+
+	if ( formatReader.empty() ) {
 		formatReader = get().getFormatInterface( filename.string(), suffix_override, "" );
 		LOG( DataLog, warning ) << "No plugin found to read "
-				<< filename.string() << " with dialect " << dialect
-				<< "! Trying to omit the dialect...";
+								<< filename.string() << " with dialect " << dialect
+								<< "! Trying to omit the dialect...";
 	}
+
 	size_t nimgs_old = ret.size();   // save number of chunks
 	BOOST_FOREACH( FileFormatList::const_reference it, formatReader ) {
 		LOG( ImageIoDebug, info )
@@ -276,13 +277,14 @@ bool IOFactory::write( const isis::data::ImageList &images, const std::string &p
 {
 	FileFormatList formatWriter;
 	formatWriter = get().getFormatInterface( path, suffix_override, dialect );
-	if(formatWriter.empty())
-	{
+
+	if( formatWriter.empty() ) {
 		formatWriter = get().getFormatInterface( path, suffix_override, "" );
 		LOG( DataLog, warning ) << "No plugin found to write "
-				<< path << " with dialect " << dialect
-				<< "! Trying to omit the dialect...";
+								<< path << " with dialect " << dialect
+								<< "! Trying to omit the dialect...";
 	}
+
 	BOOST_FOREACH( FileFormatList::const_reference it, formatWriter ) {
 		LOG( Debug, info )
 				<< "plugin to write to " <<  path << ": " << it->name()

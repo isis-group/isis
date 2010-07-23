@@ -58,12 +58,12 @@ Chunk Chunk::cloneToMem( size_t firstDim, size_t secondDim, size_t thirdDim, siz
 	const TypePtrReference cloned( get()->cloneToMem( newSize.product() ) );
 	return Chunk( cloned, newSize[0], newSize[1], newSize[2], newSize[3] );
 }
-Chunk Chunk::copyToMem()const
+/*Chunk Chunk::copyToMem()const
 {
-	Chunk ret( *this );
-	static_cast<TypePtrReference &>( ret ) = get()->copyToMem();
-	return ret;
-}
+    Chunk ret( *this );
+    static_cast<TypePtrReference &>( ret ) = get()->copyToMem();
+    return ret;
+}*/
 size_t Chunk::bytes_per_voxel()const
 {
 	return get()->bytes_per_elem();
@@ -149,7 +149,7 @@ size_t Chunk::cmpSlice( size_t thirdDimS, size_t fourthDimS, const Chunk &dst, s
 	const size_t idx3[] = {sizeToVector()[0] - 1, sizeToVector()[1] - 1, thirdDimD, fourthDimD};
 	return cmpRange( idx1, idx2, dst, idx3 );
 }
-void Chunk::getMinMax ( util::TypeReference& min, util::TypeReference& max ) const
+void Chunk::getMinMax ( util::TypeReference &min, util::TypeReference &max ) const
 {
 	return operator*().getMinMax( min, max );
 }
@@ -232,20 +232,20 @@ void Chunk::transformCoords( boost::numeric::ublas::matrix<float> transform )
 
 ChunkList Chunk::autoSplice ( int32_t acquisitionNumberStride )const
 {
-	if (!valid()) {
-		LOG(Runtime,error) << "Cannot splice invalid Chunk (missing properties are " << this->getMissing() << ")";
+	if ( !valid() ) {
+		LOG( Runtime, error ) << "Cannot splice invalid Chunk (missing properties are " << this->getMissing() << ")";
 		return ChunkList();
 	}
-	
+
 	util::fvector4 offset;
 	const util::fvector4 voxelSize = propertyValue( "voxelSize" )->cast_to_Type<util::fvector4>();
 	util::fvector4 voxelGap;
-	if(hasProperty("voxelGap"))
+
+	if( hasProperty( "voxelGap" ) )
 		voxelGap = propertyValue( "voxelGap" )->cast_to_Type<util::fvector4>();
 
 	const util::fvector4 distance = voxelSize + voxelGap;
-
-	int32_t atDim=relevantDims()-1;
+	int32_t atDim = relevantDims() - 1;
 
 	switch( atDim ) { // init offset with the given direction
 	case readDim :
@@ -275,41 +275,32 @@ ChunkList Chunk::autoSplice ( int32_t acquisitionNumberStride )const
 
 	// prepare some attributes
 	assert( util::fuzzyEqual<float>( offset.sqlen(), 1 ) ); // it should be norm here
-	const util::fvector4 indexOriginOffset=offset * distance[atDim];
-	size_t cnt=0;
-
-	LOG(Runtime,info) << "Splicing chunk at dimenstion " << atDim+1 << " with indexOrigin stride " << indexOriginOffset << " and acquisitionNumberStride " << acquisitionNumberStride;
-	ChunkList ret=splice( (dimensions)atDim ); // do low level splice - get the chunklist
-
-	BOOST_FOREACH(ChunkList::reference ref,ret){ // adapt some metadata in them
+	const util::fvector4 indexOriginOffset = offset * distance[atDim];
+	size_t cnt = 0;
+	LOG( Runtime, info ) << "Splicing chunk at dimenstion " << atDim + 1 << " with indexOrigin stride " << indexOriginOffset << " and acquisitionNumberStride " << acquisitionNumberStride;
+	ChunkList ret = splice( ( dimensions )atDim ); // do low level splice - get the chunklist
+	BOOST_FOREACH( ChunkList::reference ref, ret ) { // adapt some metadata in them
 		util::fvector4 &orig = ref.propertyValue( "indexOrigin" )->cast_to_Type<util::fvector4>();
-		int32_t &acq=ref.propertyValue( "acquisitionNumber" )->cast_to_Type<int32_t>();
-		
-		orig= orig + indexOriginOffset * cnt;
-		acq+= acquisitionNumberStride * cnt;//@todo this might cause trouble if we try to insert this chunks into an image
-		
+		int32_t &acq = ref.propertyValue( "acquisitionNumber" )->cast_to_Type<int32_t>();
+		orig = orig + indexOriginOffset * cnt;
+		acq += acquisitionNumberStride * cnt; //@todo this might cause trouble if we try to insert this chunks into an image
 		cnt++;
 	}
-	
 	return ret;
 }
 
 ChunkList Chunk::splice ( dimensions atDim )const
 {
 	ChunkList ret;
-	
 	//@todo should be locking
 	typedef std::vector<TypePtrReference> TypePtrList;
 	const util::FixedVector<size_t, n_dims> wholesize = sizeToVector();
 	util::FixedVector<size_t, n_dims> spliceSize;
 	spliceSize.fill( 1 ); //init size of one chunk-splice to 1x1x1x1
-	
 	//copy the relevant dimensional sizes from wholesize (in case of sliceDim we copy only the first two elements of wholesize - making slices)
 	spliceSize.copyFrom( &wholesize[0], &wholesize[atDim] );
-	
 	//get the spliced TypePtr's (the volume of the requested dims is the split-size - in case of sliceDim it is rows*columns)
 	const TypePtrList pointers = this->getTypePtrBase().splice( spliceSize.product() );
-	
 	//create new Chunks from this TypePtr's
 	BOOST_FOREACH( TypePtrList::const_reference ref, pointers ) {
 		Chunk spliced( ref, spliceSize[0], spliceSize[1], spliceSize[2], spliceSize[3] );
