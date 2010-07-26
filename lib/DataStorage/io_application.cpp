@@ -26,6 +26,7 @@ namespace data
 {
 IOApplication::IOApplication( const char name[], bool have_input, bool have_output ): Application( name ), m_input( have_input ), m_output( have_output )
 {
+	data::IOFactory::setProgressFeedback(&feedback);
 	if ( have_input ) {
 		parameters["in"] = std::string();
 		parameters["in"].setDescription( "input file or dataset" );
@@ -65,7 +66,9 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 	}
 }
 
-IOApplication::~IOApplication() {}
+IOApplication::~IOApplication() {
+	data::IOFactory::setProgressFeedback(0);
+}
 
 bool IOApplication::init( int argc, char **argv, bool exitOnError )
 {

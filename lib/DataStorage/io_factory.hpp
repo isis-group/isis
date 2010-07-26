@@ -17,10 +17,12 @@
 
 #include <map>
 #include <string>
-#include "io_interface.h"
 #include <boost/shared_ptr.hpp>
 #include <boost/regex.hpp>
 #include <boost/filesystem.hpp>
+
+#include "io_interface.h"
+#include "CoreUtils/progressfeedback.hpp"
 
 //????
 #include "chunk.hpp"
@@ -38,6 +40,7 @@ public:
 	typedef std::list<FileFormatPtr> FileFormatList;
 private:
 	typedef std::map<std::string, FileFormatPtr> FormatFormatMap;
+	util::ProgressFeedback *m_feedback;
 public:
 	/**
 	 * load a data file with given filename and dialect
@@ -66,6 +69,8 @@ public:
 	}
 
 	static IOFactory &get();
+
+	static void setProgressFeedback(util::ProgressFeedback *feedback);
 protected:
 	IOFactory();//shall not be created directly
 	FileFormatList io_formats;

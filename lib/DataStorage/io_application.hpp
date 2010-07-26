@@ -21,6 +21,7 @@
 #define DATA_IOAPPLICATION_HPP
 
 #include "CoreUtils/application.hpp"
+#include "CoreUtils/progressfeedback.hpp"
 #include "DataStorage/image.hpp"
 
 namespace isis
@@ -38,6 +39,7 @@ class IOApplication: public util::Application
 		}
 		return retList;
 	}
+	util::ConsoleFeedback feedback;
 public:
 	data::ImageList images;
 	IOApplication( const char name[], bool have_input = true, bool have_output = true );

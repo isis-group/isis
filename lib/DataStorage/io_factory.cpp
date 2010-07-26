@@ -52,7 +52,7 @@ struct pluginDeleter {
 };
 }
 
-IOFactory::IOFactory()
+IOFactory::IOFactory():m_feedback(NULL)
 {
 	findPlugins( std::string( PLUGIN_PATH ) );
 }
@@ -264,12 +264,20 @@ int IOFactory::loadPath( isis::data::ChunkList &ret, const boost::filesystem::pa
 {
 	int loaded = 0;
 
-	for ( boost::filesystem::directory_iterator itr( path ); itr != boost::filesystem::directory_iterator(); ++itr )  {
-		if ( boost::filesystem::is_directory( *itr ) )continue;
-
-		loaded += loadFile( ret, itr->path(), suffix_override, dialect );
+	if(m_feedback){
+		const size_t length=std::distance(boost::filesystem::directory_iterator( path ),boost::filesystem::directory_iterator());//@todo this will also count directories
+		m_feedback->show(length,std::string("Reading ") + util::Type<std::string>(length).toString(false) + " files from " + path.string());
 	}
 
+	for (boost::filesystem::directory_iterator i( path ); i != boost::filesystem::directory_iterator(); ++i )  {
+		if ( boost::filesystem::is_directory( *i ) )continue;
+
+		loaded += loadFile( ret, *i, suffix_override, dialect );
+		if(m_feedback)
+			m_feedback->progress();
+	}
+	if(m_feedback)
+		m_feedback->close();
 	return loaded;
 }
 
@@ -305,6 +313,12 @@ bool IOFactory::write( const isis::data::ImageList &images, const std::string &p
 	}
 	LOG( Runtime, error ) << "No plugin found to write to: " << path; //@todo error message missing
 	return false;
+}
+void IOFactory::setProgressFeedback(util::ProgressFeedback* feedback)
+{
+	IOFactory &This=get();
+	if(This.m_feedback)This.m_feedback->close();
+	This.m_feedback=feedback;
 }
 
 
