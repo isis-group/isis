@@ -1,6 +1,6 @@
 # the ISIS library module
 
-SET(PLUGIN_PATH ${PROJECT_BINARY_DIR} CACHE PATH "Path where the plugins shall be installed")
+SET(ISIS_PLUGIN_PATH ${PROJECT_BINARY_DIR} CACHE PATH "Path where the plugins shall be installed")
 
 IF(${CMAKE_PROJECT_NAME}_BUILD_COREUTILS)
 	add_subdirectory(CoreUtils)
@@ -13,7 +13,7 @@ IF(${CMAKE_PROJECT_NAME}_BUILD_COREUTILS)
 ENDIF(${CMAKE_PROJECT_NAME}_BUILD_COREUTILS)
 
 IF(${CMAKE_PROJECT_NAME}_BUILD_DATA_IO)
-	add_definitions(-DPLUGIN_PATH="${PLUGIN_PATH}")
+	add_definitions(-DPLUGIN_PATH="${ISIS_PLUGIN_PATH}")
 	add_definitions(-DDL_SUFFIX="${CMAKE_SHARED_LIBRARY_SUFFIX}")
 	add_definitions(-DDL_PREFIX="${CMAKE_SHARED_LIBRARY_PREFIX}")
 
@@ -22,6 +22,9 @@ IF(${CMAKE_PROJECT_NAME}_BUILD_DATA_IO)
 	MESSAGE(STATUS "ISIS_DATA_LIBS is ${ISIS_DATA_LIBS}")
 	add_subdirectory(ImageIO)
 ENDIF(${CMAKE_PROJECT_NAME}_BUILD_DATA_IO)
+
+configure_file("../cmake/isis_corecfg.cmake.in" "isis_corecfg.cmake")
+
 
 IF(ITK_FOUND)
 	 add_subdirectory(extITK)
