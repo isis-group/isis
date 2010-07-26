@@ -58,27 +58,23 @@ throw( std::runtime_error & )
 		// since we need to convert and reorganize the data, we will create a
 		// temporary buffer who stores short values.
 		// get the first chunk
-		data::MemChunk<VShort> mchunk( image.getChunk( 0 ) );
-
 		// see if ALL the data is included in the first chunk.
 		// Otherwise, iterate over chunks and include the data.
-		if( mchunk.sizeToVector()[3] > 1 ) {
+		if( dims[3] > 1 ) {
 			// reorganize data: (x,y,z,t) -> z images with (x,y,t)
 			// in other words: there are z VImages necessary.
 			for( int z = 0; z < dims[2]; z++ ) {
 				vimages[z] = VCreateImage( dims[3], dims[1], dims[0],
 										   VShortRepn );
-
 				// get all data from the first chunk.
 				for( int x = 0; x < dims[0]; x++ ) {
 					for( int y = 0; y < dims[1]; y++ ) {
 						for( int t = 0; t < dims[3]; t++ ) {
 							VPixel( vimages[z], t, y, x, VShort )
-							= mchunk.voxel<VShort>( x, y, z, t );
+							= image.voxel<VShort>( x, y, z, t );
 						}
 					}
 				}
-
 				// copy header information
 				copyHeaderToVista( image, vimages[z] );
 				VAppendAttr( attrList, "image", NULL, VImageRepn, vimages[z] );
@@ -491,7 +487,7 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 
 	// repetition time
 	if( image.hasProperty( "repetitionTime" ) ) {
-		VAppendAttr( list, "repetition", NULL, VShortRepn,
+		VAppendAttr( list, "repetition_time", NULL, VShortRepn,
 					 image.getProperty<VShort>( "repetitionTime" ) );
 	}
 

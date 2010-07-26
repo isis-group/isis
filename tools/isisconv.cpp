@@ -10,7 +10,7 @@ int main( int argc, char **argv )
 	app.parameters["tr"] = u_int16_t();
 	app.parameters["tr"] = 0;
 	app.parameters["tr"].needed() = false;
-	app.parameters["tr"].setDescription( "Repetition time in ms." );
+	app.parameters["tr"].setDescription( "Repetition time in ms" );
 	app.init( argc, argv ); // will exit if there is a problem
 
 	if( app.parameters["tr"] > 0 ) {

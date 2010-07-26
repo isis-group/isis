@@ -31,11 +31,11 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 		parameters["in"].setDescription( "input file or dataset" );
 		parameters["rf"] = std::string();
 		parameters["rf"].needed() = false;
-		parameters["rf"].setDescription( "Override automatic detection of file suffix for reading with given value." );
+		parameters["rf"].setDescription( "Override automatic detection of file suffix for reading with given value" );
 		parameters["rdialect"] = std::string();
 		parameters["rdialect"].needed() = false;
 		parameters["rdialect"].setDescription(
-			"choose dialect for reading. The available dialects depend on the capabilities of IO plugins." );
+			"choose dialect for reading. The available dialects depend on the capabilities of IO plugins" );
 	}
 
 	if ( have_output ) {
@@ -43,11 +43,12 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 		parameters["out"].setDescription( "output file" );
 		parameters["wf"] = std::string();
 		parameters["wf"].needed() = false;
-		parameters["wf"].setDescription( "Override automatic detection of file suffix for writing with given value." );
+		parameters["wf"].setDescription( "Override automatic detection of file suffix for writing with given value" );
 		parameters["wdialect"] = std::string();
 		parameters["wdialect"].needed() = false;
-		parameters["wdialect"].setDescription( "choose dialect for writing. The available dialects depend on the capabilities of IO plugins." );
-		std::map<unsigned short, std::string> types = util::getTypeMap( true, false );
+		parameters["wdialect"].setDescription("choose dialect for writing. The available dialects depend on the capabilities of IO plugins" );
+		std::map<unsigned short, std::string> types=util::getTypeMap(true,false);
+
 		// remove some types which are useless as representation
 		// "(unsigned short)" is needed because otherwise erase would take the reference of a static constant which is only there during compile time
 		types.erase( ( unsigned short )util::Type<util::Selection>::staticID );
@@ -142,11 +143,14 @@ bool IOApplication::autowrite( const ImageList &out_images, bool exitOnError )
 		convertedList = convertTo<double>( out_images );
 		break;
 	default:
-		std::string oldRepn = util::getTypeMap()[out_images.front()->typeID()];
-		oldRepn.erase( oldRepn.size() - 1, oldRepn.size() );
-		LOG( DataLog, warning ) << "Pixel representation " << parameters["repn"].toString()
+		if( parameters["repn"].toString() != "<<NOT_SET>>" ) {
+			std::string oldRepn = util::getTypeMap()[out_images.front()->typeID()];
+			oldRepn.erase(oldRepn.size()-1, oldRepn.size());
+			LOG(DataLog, warning) << "Pixel representation " << parameters["repn"].toString()
 								<< " not yet supported. Retaining "
 								<< oldRepn << ".";
+		}
+
 		convertedList = out_images;
 		break;
 	}

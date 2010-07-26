@@ -32,7 +32,7 @@ itkAdapter::makeItkImageObject( const boost::shared_ptr<data::Image> src, const 
 {
 	typedef TImage OutputImageType;
 	m_ImageISIS = *src;
-	m_TypeID = m_ImageISIS.chunkAt(0).typeID();
+	m_TypeID = m_ImageISIS.getChunkAt(0).typeID();
 
 	switch ( m_TypeID ) {
 	case data::TypePtr<int8_t>::staticID:
