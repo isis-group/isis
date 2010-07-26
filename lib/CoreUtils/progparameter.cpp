@@ -31,7 +31,7 @@ bool isis::util::ProgParameter::parse( const Type<std::string> &props )
 
 	if ( ( ( std::string )props ).empty() ) {
 		if ( me.is<bool>() ) {
-			me.cast_to_Type<bool>() = true;
+			me.cast_to<bool>() = true;
 			ret = true;
 		}
 	} else {
@@ -117,9 +117,9 @@ isis::util::ProgParameter::operator const int() const
 	LOG_IF( empty(), isis::CoreDebug, isis::error ) << "Program parameters must not be empty. Please set it to any value.";
 
 	if ( get()->is<bool>() ) //hack to make if(ProgParameter) possible
-		return ( ( bool )get()->cast_to_Type<bool>() );
+		return ( get()->cast_to<bool>() );
 	else if ( get()->is<Selection>() ) //use the implicit cast of selection to int
-		return ( ( Selection )get()->cast_to_Type<Selection>() );
+		return ( get()->cast_to<Selection>() );
 	else
-		return get()->cast_to_Type<int32_t>();//@todo what if int is _NOT_ int32_t
+		return get()->cast_to<int32_t>();//@todo what if int is _NOT_ int32_t
 }

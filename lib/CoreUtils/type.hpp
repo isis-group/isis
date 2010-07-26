@@ -168,8 +168,7 @@ public:
 	/// \returns true if this and second contain the same value of the same type
 	virtual bool operator==( const TypeBase &second )const {
 		if ( second.is<TYPE>() ) {
-			const TYPE &otherVal = ( TYPE )second.cast_to_Type<TYPE>();
-			return m_val == otherVal;
+			return m_val == second.cast_to<TYPE>();
 		} else
 			return  false;
 	}
@@ -203,6 +202,23 @@ public:
 
 	virtual ~Type() {}
 };
+
+template<typename T> const Type<T>& _internal::TypeBase::cast_to_Type() const {
+	check_type<T>();
+	return m_cast_to<Type<T> >();
+}
+template<typename T> const T& _internal::TypeBase::cast_to() const {
+	const Type<T> &ret=cast_to_Type<T>();
+	return ret.operator const T&();
+}
+template<typename T> Type<T>& _internal::TypeBase::cast_to_Type() {
+	check_type<T>();
+	return m_cast_to<Type<T> >();
+}
+template<typename T> T& _internal::TypeBase::cast_to() {
+	Type<T> &ret=cast_to_Type<T>();
+	return ret.operator T&();
+}
 
 template<typename T> bool _internal::TypeBase::is()const
 {

@@ -70,7 +70,7 @@ public:
 	 */
 	template<typename T> operator const T()const {
 		LOG_IF( empty(), isis::CoreDebug, isis::error ) << "Program parameters must not be empty. Please set it to any value.";
-		return get()->cast_to_Type<T>();
+		return get()->cast_to<T>();
 	}
 	/**
 	 * special implicit conversion to be used in if/switch constructs

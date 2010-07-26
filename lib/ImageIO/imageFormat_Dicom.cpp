@@ -283,7 +283,7 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 
 	// If we do have DWI here, create a property diffusionGradient (which defaults to 0,0,0,0)
 	if( foundDiff ) {
-		util::fvector4 &diff = object.setProperty( "diffusionGradient", util::fvector4() )->cast_to_Type<util::fvector4>();
+		util::fvector4 &diff = object.setProperty( "diffusionGradient", util::fvector4() )->cast_to<util::fvector4>();
 
 		if( bValue ) { // if bValue is not zero multiply the diffusionGradient by it
 			if( object.hasProperty( prefix + "DiffusionGradientOrientation" ) ) {
@@ -369,7 +369,7 @@ void ImageFormat_Dicom::readMosaic( const data::Chunk &source, data::ChunkList &
 	newChunk->setProperty( prefix + "ImageType", iType );
 	//remove the additional mosaic offset and recalc the fov if given
 	//eg. if there is a 10x10 Mosaic, substract the half size of 9 Images from the indexOrigin
-	util::fvector4 &origin = newChunk->propertyValue( "indexOrigin" )->cast_to_Type<util::fvector4>();
+	util::fvector4 &origin = newChunk->propertyValue( "indexOrigin" )->cast_to<util::fvector4>();
 	const util::fvector4 voxelSize = newChunk->getProperty<util::fvector4>( "voxelSize" );
 	util::fvector4 voxelGap;
 
@@ -382,7 +382,7 @@ void ImageFormat_Dicom::readMosaic( const data::Chunk &source, data::ChunkList &
 	LOG( Debug, info ) << "New origin: " << newChunk->propertyValue( "indexOrigin" );
 
 	if ( newChunk->hasProperty( "fov" ) ) {
-		util::fvector4 &ref = newChunk->propertyValue( "fov" )->cast_to_Type<util::fvector4>();
+		util::fvector4 &ref = newChunk->propertyValue( "fov" )->cast_to<util::fvector4>();
 		ref[0] /= matrixSize;
 		ref[1] /= matrixSize;
 		LOG_IF( ref[2] != invalid_float, Runtime, warning ) << "Overriding defined slice FoV in mosaic image";

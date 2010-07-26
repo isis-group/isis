@@ -107,7 +107,7 @@ public:
 	 */
 	template<typename T> bool operator ==( const T &second )const {
 		if ( get()->is<T>() ) {
-			const T &cmp = get()->cast_to_Type<T>();
+			const T &cmp = get()->cast_to<T>();
 			return second == cmp;
 		} else if ( ! empty() ) {
 			PropertyValue dst;

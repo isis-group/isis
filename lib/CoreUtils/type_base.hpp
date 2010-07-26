@@ -114,20 +114,16 @@ public:
 	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
 	 * \returns a constant reference of the stored value.
 	 */
-	template<typename T> const Type<T>& cast_to_Type() const {
-		check_type<T>();
-		return m_cast_to<Type<T> >();
-	}
+	template<typename T> const Type<T>& cast_to_Type() const;
+	template<typename T> const T& cast_to() const;
 	/**
 	 * Dynamically cast the TypeBase up to its actual Type\<T\>. Referenced version.
 	 * Will throw std::bad_cast if T is not the actual type.
 	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
 	 * \returns a reference of the stored value.
 	 */
-	template<typename T> Type<T>& cast_to_Type() {
-		check_type<T>();
-		return m_cast_to<Type<T> >();
-	}
+	template<typename T> Type<T>& cast_to_Type();
+	template<typename T> T& cast_to();
 	virtual bool operator==( const TypeBase &second )const = 0;
 
 	virtual ~TypeBase();

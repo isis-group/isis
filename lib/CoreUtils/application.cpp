@@ -101,7 +101,7 @@ void Application::printHelp()const
 		std::cout << "\t-" << iP->first << " <" << iP->second->typeName() << ">" << std::endl;
 
 		if ( iP->second->is<Selection>() ) {
-			const Selection &ref = iP->second->cast_to_Type<Selection>();
+			const Selection &ref = iP->second->cast_to<Selection>();
 			std::cout << "\t\tOptions are: " <<  ref.getEntries() << std::endl;
 		}
 

@@ -58,12 +58,7 @@ Chunk Chunk::cloneToMem( size_t firstDim, size_t secondDim, size_t thirdDim, siz
 	const TypePtrReference cloned( get()->cloneToMem( newSize.product() ) );
 	return Chunk( cloned, newSize[0], newSize[1], newSize[2], newSize[3] );
 }
-/*Chunk Chunk::copyToMem()const
-{
-    Chunk ret( *this );
-    static_cast<TypePtrReference &>( ret ) = get()->copyToMem();
-    return ret;
-}*/
+
 size_t Chunk::bytes_per_voxel()const
 {
 	return get()->bytes_per_elem();
@@ -238,29 +233,29 @@ ChunkList Chunk::autoSplice ( int32_t acquisitionNumberStride )const
 	}
 
 	util::fvector4 offset;
-	const util::fvector4 voxelSize = propertyValue( "voxelSize" )->cast_to_Type<util::fvector4>();
+	const util::fvector4 voxelSize = propertyValue( "voxelSize" )->cast_to<util::fvector4>();
 	util::fvector4 voxelGap;
 
 	if( hasProperty( "voxelGap" ) )
-		voxelGap = propertyValue( "voxelGap" )->cast_to_Type<util::fvector4>();
+		voxelGap = propertyValue( "voxelGap" )->cast_to<util::fvector4>();
 
 	const util::fvector4 distance = voxelSize + voxelGap;
 	int32_t atDim = relevantDims() - 1;
 
 	switch( atDim ) { // init offset with the given direction
 	case readDim :
-		offset = this->propertyValue( "readVec" )->cast_to_Type<util::fvector4>();
+		offset = this->propertyValue( "readVec" )->cast_to<util::fvector4>();
 		break;
 	case phaseDim:
-		offset = this->propertyValue( "phaseVec" )->cast_to_Type<util::fvector4>();
+		offset = this->propertyValue( "phaseVec" )->cast_to<util::fvector4>();
 		break;
 	case sliceDim:
 
 		if( this->hasProperty( "sliceVec" ) )
-			offset = this->propertyValue( "sliceVec" )->cast_to_Type<util::fvector4>();
+			offset = this->propertyValue( "sliceVec" )->cast_to<util::fvector4>();
 		else {
-			const util::fvector4 read = this->propertyValue( "readVec" )->cast_to_Type<util::fvector4>();
-			const util::fvector4 phase = this->propertyValue( "phaseVec" )->cast_to_Type<util::fvector4>();
+			const util::fvector4 read = this->propertyValue( "readVec" )->cast_to<util::fvector4>();
+			const util::fvector4 phase = this->propertyValue( "phaseVec" )->cast_to<util::fvector4>();
 			assert( util::fuzzyEqual<float>( read.sqlen(), 1 ) );
 			assert( util::fuzzyEqual<float>( phase.sqlen(), 1 ) );
 			offset[0] = read[1] * phase[2] - read[2] * phase[1];
@@ -280,8 +275,8 @@ ChunkList Chunk::autoSplice ( int32_t acquisitionNumberStride )const
 	LOG( Runtime, info ) << "Splicing chunk at dimenstion " << atDim + 1 << " with indexOrigin stride " << indexOriginOffset << " and acquisitionNumberStride " << acquisitionNumberStride;
 	ChunkList ret = splice( ( dimensions )atDim ); // do low level splice - get the chunklist
 	BOOST_FOREACH( ChunkList::reference ref, ret ) { // adapt some metadata in them
-		util::fvector4 &orig = ref.propertyValue( "indexOrigin" )->cast_to_Type<util::fvector4>();
-		int32_t &acq = ref.propertyValue( "acquisitionNumber" )->cast_to_Type<int32_t>();
+		util::fvector4 &orig = ref.propertyValue( "indexOrigin" )->cast_to<util::fvector4>();
+		int32_t &acq = ref.propertyValue( "acquisitionNumber" )->cast_to<int32_t>();
 		orig = orig + indexOriginOffset * cnt;
 		acq += acquisitionNumberStride * cnt; //@todo this might cause trouble if we try to insert this chunks into an image
 		cnt++;

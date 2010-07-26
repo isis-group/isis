@@ -251,7 +251,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 
 			LOG( isis::DataLog, info ) << "current slice: " << k;
 			VistaChunk<VShort> vchunk( images[k] );
-			util::fvector4 &ioprob = vchunk.propertyValue( "indexOrigin" )->cast_to_Type<util::fvector4>();
+			util::fvector4 &ioprob = vchunk.propertyValue( "indexOrigin" )->cast_to<util::fvector4>();
 			nloaded++;
 			// splice VistaChunk
 			LOG( DataLog, info ) << "splicing";
@@ -512,56 +512,56 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 
 			if( pv->is<uint8_t>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VBitRepn,
-							 ( VBit )pv->cast_to_Type<uint8_t>() );
+							 ( VBit )pv->cast_to<uint8_t>() );
 				continue;
 			}
 
 			// VUByte -> VUByte (char *)
 			if( pv->is<VUByte>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VUByteRepn,
-							 ( VUByte )pv->cast_to_Type<VUByte>() );
+							 pv->cast_to<VUByte>() );
 				continue;
 			}
 
 			// VSByte -> VSByte (char *)
 			if( pv->is<VSByte>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VSByteRepn,
-							 ( VSByte )pv->cast_to_Type<VSByte>() );
+							 pv->cast_to<VSByte>() );
 				continue;
 			}
 
 			// VShort -> VShort (char *)
 			if( pv->is<VShort>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VShortRepn,
-							 ( VShort )pv->cast_to_Type<VShort>() );
+							 pv->cast_to<VShort>() );
 				continue;
 			}
 
 			// VLong -> VLong (char *)
 			if( pv->is<VLong>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VLongRepn,
-							 ( VLong )pv->cast_to_Type<VLong>() );
+							 pv->cast_to<VLong>() );
 				continue;
 			}
 
 			// VFloat -> VFloat (char *)
 			if( pv->is<VFloat>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VFloatRepn,
-							 ( VFloat )pv->cast_to_Type<VFloat>() );
+							 pv->cast_to<VFloat>() );
 				continue;
 			}
 
 			// VDouble -> VDouble (char *)
 			if( pv->is<VDouble>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VDoubleRepn,
-							 ( VDouble )pv->cast_to_Type<VDouble>() );
+							 pv->cast_to<VDouble>() );
 				continue;
 			}
 
 			// VString -> std::string
 			if( pv->is<std::string>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VStringRepn,
-							 ( ( std::string )pv->cast_to_Type<std::string>() ).c_str() );
+							 pv->cast_to<std::string>().c_str() );
 				continue;
 			}
 		}

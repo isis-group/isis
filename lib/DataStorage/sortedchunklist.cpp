@@ -37,8 +37,8 @@ SortedChunkList::scalarPropCompare::scalarPropCompare( const std::string &prop_n
 
 bool SortedChunkList::fvectorCompare::operator()( const isis::util::PropertyValue &a, const isis::util::PropertyValue &b ) const
 {
-	const util::fvector4 &posA = a->cast_to_Type<util::fvector4>();
-	const util::fvector4 &posB = b->cast_to_Type<util::fvector4>();
+	const util::fvector4 &posA = a->cast_to<util::fvector4>();
+	const util::fvector4 &posB = b->cast_to<util::fvector4>();
 
 	if ( posA.lexical_less_reverse( posB ) ) { //if chunk is "under" the other - put it there
 		LOG( Debug, verbose_info ) << "Successfully sorted chunks by " << propertyName  << " (" << posA << " below " << posB << ")";
@@ -119,7 +119,7 @@ std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::primaryInsert( const 
 		const util::PropertyValue &prop = ch.propertyValue( propName );
 
 		if( prop->is<util::fvector4>() ) {
-			const util::fvector4 &key = prop->cast_to_Type<util::fvector4>();
+			const util::fvector4 &key = prop->cast_to<util::fvector4>();
 			const scalarPropCompare &secondaryComp = secondarySort.top();
 			// get the reference of the secondary map for "key" (create and insert a new if neccessary)
 			SecondaryMap &subMap = chunks.insert( std::make_pair( key, SecondaryMap( secondaryComp ) ) ).first->second;

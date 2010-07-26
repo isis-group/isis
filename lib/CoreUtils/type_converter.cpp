@@ -73,8 +73,8 @@ public:
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
 	boost::numeric::range_check_result convert( const TypeBase &src, TypeBase &dst )const {
-		SRC &dstVal = dst.cast_to_Type<SRC>();
-		const SRC &srcVal = src.cast_to_Type<SRC>();
+		SRC &dstVal = dst.cast_to<SRC>();
+		const SRC &srcVal = src.cast_to<SRC>();
 		dstVal = srcVal;
 		return boost::numeric::cInRange;
 	}
@@ -112,8 +112,8 @@ public:
 		   NumericOverflowHandler,
 		   boost::numeric::RoundEven<SRC>
 		   > converter;
-		DST &dstVal = dst.cast_to_Type<DST>();
-		const SRC &srcVal = src.cast_to_Type<SRC>();
+		DST &dstVal = dst.cast_to<DST>();
+		const SRC &srcVal = src.cast_to<SRC>();
 		NumericOverflowHandler::result = boost::numeric::cInRange;
 		dstVal = converter::convert( srcVal );
 		return NumericOverflowHandler::result;
@@ -147,8 +147,8 @@ public:
 		}
 	}
 	boost::numeric::range_check_result convert( const TypeBase &src, TypeBase &dst )const {
-		vector4<DST> &dstVal = dst.cast_to_Type<vector4<DST> >();
-		const vector4<SRC> &srcVal = src.cast_to_Type<vector4<SRC> >();
+		vector4<DST> &dstVal = dst.cast_to<vector4<DST> >();
+		const vector4<SRC> &srcVal = src.cast_to<vector4<SRC> >();
 		boost::numeric::range_check_result ret = boost::numeric::cInRange;
 
 		for ( int i = 0; i < 4; i++ ) {//slow and ugly, but flexible
@@ -192,11 +192,11 @@ public:
 		}
 	}
 	boost::numeric::range_check_result convert( const TypeBase &src, TypeBase &dst )const {
-		std::list<DST> &dstVal = dst.cast_to_Type<std::list<DST> >();
+		std::list<DST> &dstVal = dst.cast_to<std::list<DST> >();
 		LOG_IF( ! dstVal.empty(), CoreLog, warning )
 				<< "Storing into non empty list while conversion from "
 				<< Type<std::list<SRC> >::staticName() << " to " << Type<std::list<DST> >::staticName();
-		const std::list<SRC> &srcVal = src.cast_to_Type<std::list<SRC> >();
+		const std::list<SRC> &srcVal = src.cast_to<std::list<SRC> >();
 		boost::numeric::range_check_result ret = boost::numeric::cInRange;
 
 		for ( typename std::list<SRC>::const_iterator i = srcVal.begin(); i != srcVal.end(); i++ ) {//slow and ugly, but flexible
@@ -230,8 +230,8 @@ public:
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
 	boost::numeric::range_check_result convert( const TypeBase &src, TypeBase &dst )const {
-		DST &dstVal = dst.cast_to_Type<DST>();
-		const std::string &srcVal = src.cast_to_Type<std::string>();
+		DST &dstVal = dst.cast_to<DST>();
+		const std::string &srcVal = src.cast_to<std::string>();
 		dstVal = boost::lexical_cast<DST>( srcVal );
 		return boost::numeric::cInRange; //@todo handle bad casts
 	}
@@ -249,8 +249,8 @@ public:
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
 	boost::numeric::range_check_result convert( const TypeBase &src, TypeBase &dst )const {
-		std::string &dstVal = dst.cast_to_Type<std::string>();
-		const SRC &srcVal = src.cast_to_Type<SRC>();
+		std::string &dstVal = dst.cast_to<std::string>();
+		const SRC &srcVal = src.cast_to<SRC>();
 		dstVal = boost::lexical_cast<std::string, SRC>( srcVal );
 		return boost::numeric::cInRange; // this should allways be ok
 	}
@@ -273,8 +273,8 @@ public:
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
 	boost::numeric::range_check_result convert( const TypeBase &src, TypeBase &dst )const {
-		Selection &dstVal = dst.cast_to_Type<Selection>();
-		const std::string &srcVal = src.cast_to_Type<std::string>();
+		Selection &dstVal = dst.cast_to<Selection>();
+		const std::string &srcVal = src.cast_to<std::string>();
 
 		if ( dstVal.set( srcVal.c_str() ) )
 			return boost::numeric::cInRange;
@@ -300,8 +300,8 @@ public:
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
 	boost::numeric::range_check_result convert( const TypeBase &src, TypeBase &dst )const {
-		bool &dstVal = dst.cast_to_Type<bool>();
-		const std::string srcVal = boost::algorithm::to_lower_copy<std::string>( src.cast_to_Type<std::string>() );
+		bool &dstVal = dst.cast_to<bool>();
+		const std::string srcVal = boost::algorithm::to_lower_copy<std::string>( src.cast_to<std::string>() );
 
 		if (  srcVal == "true" || srcVal == "y" || srcVal == "yes" ) {
 			dstVal = true;
@@ -328,8 +328,8 @@ public:
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
 	boost::numeric::range_check_result convert( const TypeBase &src, TypeBase &dst )const {
-		std::string &dstVal = dst.cast_to_Type<std::string>();
-		const bool &srcVal = src.cast_to_Type<bool>();
+		std::string &dstVal = dst.cast_to<std::string>();
+		const bool &srcVal = src.cast_to<bool>();
 		dstVal = srcVal ? "true" : "false";
 		return boost::numeric::cInRange;
 	}
@@ -352,12 +352,12 @@ public:
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
 	boost::numeric::range_check_result convert( const TypeBase &src, TypeBase &dst )const {
-		std::list<DST> &dstVal = dst.cast_to_Type<std::list<DST> >();
+		std::list<DST> &dstVal = dst.cast_to<std::list<DST> >();
 		LOG_IF( ! dstVal.empty(), CoreLog, warning )
 				<< "Conversion from " << Type<std::string>::staticName()
 				<< " into non empty list  " << Type<std::list<DST> >::staticName()
 				<< " previous content will be lost";
-		const std::string &srcVal = src.cast_to_Type<std::string>();
+		const std::string &srcVal = src.cast_to<std::string>();
 		const std::list<DST> buff = util::string2list<DST>( srcVal, boost::regex( "[\\s,;]+" ) );
 		dstVal.assign( buff.begin(), buff.end() );
 		return boost::numeric::cInRange;  //@todo handle bad casts
@@ -376,8 +376,8 @@ public:
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
 	boost::numeric::range_check_result convert( const TypeBase &src, TypeBase &dst )const {
-		vector4<DST> &dstVal = dst.cast_to_Type<vector4<DST> >();
-		const std::string &srcVal = src.cast_to_Type<std::string>();
+		vector4<DST> &dstVal = dst.cast_to<vector4<DST> >();
+		const std::string &srcVal = src.cast_to<std::string>();
 		const std::list<DST> buff = string2list<DST>( srcVal, boost::regex( "[\\s,;]+" ) );
 		dstVal.copyFrom( buff.begin(), buff.end() );
 		return boost::numeric::cInRange; //@todo handle bad casts
