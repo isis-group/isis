@@ -75,10 +75,11 @@ unsigned short Chunk::typeID()const
 void Chunk::copyLine( size_t secondDimS, size_t thirdDimS, size_t fourthDimS, Chunk &dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD ) const
 {
 	const size_t idx1[] = {0, secondDimS, thirdDimS, fourthDimS};
-	const size_t idx2[] = {0, secondDimD, thirdDimD, fourthDimD};
-	const size_t idx3[] = {sizeToVector()[0] - 1, secondDimD, thirdDimD, fourthDimD};
+	const size_t idx2[] = {sizeToVector()[1] - 1, secondDimS, thirdDimS, fourthDimS};
+	const size_t idx3[] = {0, secondDimD, thirdDimD, fourthDimD};
 	copyRange( idx1, idx2, dst, idx3 );
 }
+
 void Chunk::copySlice( size_t thirdDimS, size_t fourthDimS, Chunk &dst, size_t thirdDimD, size_t fourthDimD ) const
 {
 	const size_t idx1[] = {0, 0, thirdDimS, fourthDimS};
