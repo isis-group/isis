@@ -192,6 +192,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 {
 	// open input file
 	FILE *ip;
+	std::string myDialect = dialect;
 
 	if( !( ip = fopen( filename.c_str(), "r" ) ) ) {
 		std::string s;
@@ -225,10 +226,38 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 	 *             images. Each image will be saved in a seperate isis image
 	 *             with the according data type.
 	 */
+	if(myDialect.empty() and nimages > 1)
+	{
+		//test for functional data
+
+		size_t nShortRepn=0;
+		std::set<std::string> voxelSet;
+		for ( size_t k = 0; k < nimages; k++ )
+		{
+			if( VPixelRepn( images[k] ) == VShortRepn ) {
+				nShortRepn++;
+			}
+			VAttrList attributes = VImageAttrList( images[k] );
+			VAttrListPosn posn;
+			for( VFirstAttr( attributes, &posn ); VAttrExists( &posn ); VNextAttr( &posn ) ) {
+				const char *name = VGetAttrName( &posn );
+				VPointer val;
+				if( strcmp( name, "voxel" ) == 0 ) {
+					VGetAttrValue( &posn, NULL, VStringRepn, &val );
+					voxelSet.insert(std::string( ( char * )val ));
+				}
+			}
+		}
+		if ( nimages == nShortRepn && voxelSet.size() == 1 )
+		{
+			LOG(isis::DataDebug, warning) << "Assuming a functional vista image";
+			myDialect = "functional";
+		}
+	}
 
 	// FUNCTIONAL -> copy every subimage into one chunk, splice the chunk
 	// along the z-direction -> add all resulting chunks to the chunk list.
-	if( dialect == std::string( "functional" ) ) {
+	if( myDialect == std::string( "functional" ) ) {
 		char orient[100], voxelstr[100];
 		orient[0] = '\0';
 		voxelstr[0] = '\0';
@@ -365,7 +394,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 
 	// MAP -> the vista image should contain a single 3D VFloat image. Hence the
 	// first image found will be saved in a float MemChunk add added to the ChunkList.
-	else if( dialect == std::string( "map" ) ) {
+	else if( myDialect == std::string( "map" ) ) {
 		// print a warning message when there are more than one image.
 		if( nimages >= 1 ) {
 			LOG( image_io::Runtime, warning )
