@@ -602,7 +602,7 @@ void Image::transformCoords( boost::numeric::ublas::matrix<float> transform )
 	// orient * orient^T = I, where I is the identity matrix.
 	// calculate new orientation matrix --> O_new = O * T
 	boost::numeric::ublas::matrix<float> new_orient =
-		boost::numeric::ublas::prod( orient, transform );
+		boost::numeric::ublas::prod( transform, orient );
 	// transform index origin into new coordinate space.
 	// o_new -> O_new * (O^-1 * o)
 	boost::numeric::ublas::vector<float> new_o =

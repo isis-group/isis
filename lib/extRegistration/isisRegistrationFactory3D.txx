@@ -247,7 +247,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer()
 		//setting up the regular step gradient descent optimizer...
 		RegularStepGradientDescentOptimizerType::ScalesType optimizerScaleRegularStepGradient( m_NumberOfParameters );
 
-		if ( transform.VERSORRIGID or transform.CENTEREDAFFINE or transform.AFFINE or transform.BSPLINEDEFORMABLETRANSFORM ) {
+		if ( transform.SCALE or transform.VERSORRIGID or transform.CENTEREDAFFINE or transform.AFFINE or transform.BSPLINEDEFORMABLETRANSFORM ) {
 			//...for the rigid transform
 			//number of parameters are dependent on the dimension of the images (2D: 4 parameter, 3D: 6 parameters)
 			if ( transform.VERSORRIGID ) {
@@ -266,24 +266,24 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer()
 
 			if ( transform.SCALE ) {
 				//rotation
-				optimizerScaleRegularStepGradient[0] = 0.0;
-				optimizerScaleRegularStepGradient[1] = 0.0;
-				optimizerScaleRegularStepGradient[2] = 0.0;
+				optimizerScaleRegularStepGradient[0] = 0.001;
+				optimizerScaleRegularStepGradient[1] = 0.001;
+				optimizerScaleRegularStepGradient[2] = 0.001;
 				//translation
-				optimizerScaleRegularStepGradient[3] = 0.0;
-				optimizerScaleRegularStepGradient[4] = 0.0;
-				optimizerScaleRegularStepGradient[5] = 0.0;
+				optimizerScaleRegularStepGradient[3] = 0.01;
+				optimizerScaleRegularStepGradient[4] = 0.01;
+				optimizerScaleRegularStepGradient[5] = 0.01;
 				//scaling
-				optimizerScaleRegularStepGradient[6] = 1.0;
-				optimizerScaleRegularStepGradient[7] = 1.0;
-				optimizerScaleRegularStepGradient[8] = 1.0;
+				optimizerScaleRegularStepGradient[6] = 100.0;
+				optimizerScaleRegularStepGradient[7] = 100.0;
+				optimizerScaleRegularStepGradient[8] = 100.0;
 				//skew
-				optimizerScaleRegularStepGradient[9] = 0.0;
-				optimizerScaleRegularStepGradient[10] = 0.0;
-				optimizerScaleRegularStepGradient[11] = 0.0;
-				optimizerScaleRegularStepGradient[12] = 0.0;
-				optimizerScaleRegularStepGradient[13] = 0.0;
-				optimizerScaleRegularStepGradient[14] = 0.0;
+				optimizerScaleRegularStepGradient[9] = 0.01;
+				optimizerScaleRegularStepGradient[10] = 0.01;
+				optimizerScaleRegularStepGradient[11] = 0.01;
+				optimizerScaleRegularStepGradient[12] = 0.01;
+				optimizerScaleRegularStepGradient[13] = 0.01;
+				optimizerScaleRegularStepGradient[14] = 0.01;
 			}
 
 			m_RegularStepGradientDescentOptimizer->SetMaximumStepLength( 0.1 * UserOptions.CoarseFactor );
@@ -716,14 +716,20 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetInitialTransfo
 	if ( !strcmp( initialTransformName, "VersorRigid3DTransform" ) and transform.SCALE ) {
 		m_ScaleSkewTransform->SetTranslation(
 			( static_cast<VersorRigid3DTransformType *> ( initialTransform )->GetTranslation() ) );
+		m_ScaleSkewTransform->SetRotation(
+			( static_cast<VersorRigid3DTransformType *> ( initialTransform )->GetVersor() ) );
 		//              m_ScaleSkewTransform->SetMatrix((static_cast<VersorRigid3DTransformType*> (initialTransform)->GetMatrix()));
+		itk::Vector<double, 3> scaleVec;
+		scaleVec.Fill(0.8);
+		m_ScaleSkewTransform->SetScale(scaleVec);
 		m_RegistrationObject->SetInitialTransformParameters( m_VersorRigid3DTransform->GetParameters() );
 	}
+
 }
 /*
  this method checks the images sizes of the fixed and the moving image.
- if the fixed image size, in any direction, is bigger than the image size
- of the moving image in the respective direction, it will create a binary
+ if the fixed image size in any direction is bigger than the image size
+ of the moving image in the respective direction it will create a binary
  image which contains the intersection of both images
 
  */

@@ -55,6 +55,8 @@
 
 #include "extRegistration/isisRegistrationFactory3D.hpp"
 #include "extITK/isisIterationObserver.hpp"
+#include "extITK/isisTimeStepExtractionFilter.hpp"
+#include "extITK/isisScaleEstimateFilter.hpp"
 
 VDictEntry TYPMetric[] = { {"MattesMutualInformation", 0}, {"MutualInformationHistogram", 1}, {"NormalizedCorrelation",
 		2
@@ -225,6 +227,7 @@ int main(
 	typedef itk::MedianImageFilter<FixedImageType, FixedImageType> FixedFilterType;
 	typedef itk::MedianImageFilter<MovingImageType, MovingImageType> MovingFilterType;
 	typedef itk::RecursiveGaussianImageFilter<FixedImageType, FixedImageType> GaussianFilterType;
+//	typedef isis::extitk::TimeStepExtractionFilter<>
 	MaskImageReaderType::Pointer maskReader = MaskImageReaderType::New();
 	itk::AffineTransform<double, Dimension>::Pointer tmpTransform = itk::AffineTransform<double, Dimension>::New();
 	itk::TransformFileWriter::Pointer transformWriter = itk::TransformFileWriter::New();
@@ -241,6 +244,10 @@ int main(
 	isis::adapter::itkAdapter *movingAdapter = new isis::adapter::itkAdapter;
 	isis::data::ImageList refList = isis::data::IOFactory::load( ref_filename, "", "" );
 	isis::data::ImageList inList;
+
+	isis::extitk::ScaleEstimateFilter<FixedImageType, MovingImageType>* scaleFilter =
+			new isis::extitk::ScaleEstimateFilter<FixedImageType, MovingImageType>;
+
 	if( fmri ) {
 		inList = isis::data::IOFactory::load( in_filename, "", "functional");
 	}
@@ -249,7 +256,6 @@ int main(
 	}
 	LOG_IF( refList.empty(), isis::data::Runtime, isis::error ) << "Reference image is empty!";
 	LOG_IF( inList.empty(), isis::data::Runtime, isis::error ) << "Input image is empty!";
-	if(inList.empty()) std::cout << "image is empty! " << std::endl;
 
 
 	// TODO DEBUG
@@ -257,10 +263,18 @@ int main(
 	if ( !smooth ) {
 		fixedImage = fixedAdapter->makeItkImageObject<FixedImageType>( refList.front() );
 		movingImage = movingAdapter->makeItkImageObject<MovingImageType>( inList.front() );
-		writer->SetFileName("test.nii");
-		writer->SetInput(movingImage);
-		writer->Update();
-		// TODO DEBUG
+		scaleFilter->SetInputImage1(fixedImage);
+		scaleFilter->SetInputImage2(movingImage);
+		typedef itk::Vector<double, 3> ScaleType;
+		ScaleType scale = scaleFilter->EstimateScaling(isis::extitk::ScaleEstimateFilter<FixedImageType, MovingImageType>::isotropic);
+
+
+
+//		writer->SetFileName("test.nii");
+
+//		writer->SetInput(movingImage);
+//		writer->Update();
+//		// TODO DEBUG
 		//      std::cout << "********** Fixed Image **********" << std::endl;
 		//      std::cout << fixedImage->GetDirection();
 		//      std::cout << "index origin: ";
