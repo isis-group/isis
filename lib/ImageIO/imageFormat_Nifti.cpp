@@ -188,9 +188,6 @@ public:
 		isis::data::Image image( imageOrig );
 		//orientation in isis LPS - but in nifti everything relative to RAS - so let's change read/phase direction and sign of indexOrigin
 		//now we try to transform
-		std::cout << "read: " << image.propertyValue("readVec") << std::endl;
-		std::cout << "phase: " << image.propertyValue("phaseVec") << std::endl;
-		std::cout << "slice: " << image.propertyValue("sliceVec") << std::endl;
 		boost::numeric::ublas::matrix<float> matrix( 3, 3 );
 		matrix( 0, 0 ) = -1;
 		matrix( 0, 1 ) = 0;
@@ -202,9 +199,6 @@ public:
 		matrix( 2, 1 ) = 0;
 		matrix( 2, 2 ) = +1;
 		image.transformCoords( matrix );
-		std::cout << "read: " << image.propertyValue("readVec") << std::endl;
-		std::cout << "phase: " << image.propertyValue("phaseVec") << std::endl;
-		std::cout << "slice: " << image.propertyValue("sliceVec") << std::endl;
 		//default init for nifti image
 		nifti_image ni;
 		memset( &ni, 0, sizeof( nifti_image ) ); //set everything to zero - default value for "not used"
