@@ -35,6 +35,7 @@ OPTION(${CMAKE_PROJECT_NAME}_BUILD_DATA_IO "Build the isis data and io modules" 
 OPTION(${CMAKE_PROJECT_NAME}_HAVE_ITK "Enable ITK-support" OFF)
 OPTION(${CMAKE_PROJECT_NAME}_HAVE_VTK "Enable VTK-support" OFF)
 OPTION(${CMAKE_PROJECT_NAME}_HAVE_QT4 "Enable Qt4-support" OFF)
+OPTION(${CMAKE_PROJECT_NAME}_BUILD_PYTHON_LIBS "Build isis python libraries" OFF)
 
 OPTION(${CMAKE_PROJECT_NAME}_RUNTIME_LOG "Enable runtime logging" ON)
 OPTION(${CMAKE_PROJECT_NAME}_DEBUG_LOG "Enable debug logging" ON)
@@ -145,3 +146,12 @@ ENDIF(${CMAKE_PROJECT_NAME}_BUILD_APPLICATIONS)
 IF(${CMAKE_PROJECT_NAME}_BUILD_TESTS)
     add_subdirectory(tests)
 ENDIF(${CMAKE_PROJECT_NAME}_BUILD_TESTS)
+
+
+################################################################################
+#Python support
+################################################################################
+
+IF(${CMAKE_PROJECT_NAME}_BUILD_PYTHON_LIBS)
+    add_subdirectory(python)
+ENDIF(${CMAKE_PROJECT_NAME}_BUILD_PYTHON_LIBS)

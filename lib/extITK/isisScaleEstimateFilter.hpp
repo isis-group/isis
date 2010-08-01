@@ -24,8 +24,9 @@
 #define ISISSCALEESTIMATEFILTER_HPP_
 
 
-#include "itkOtsuThresholdImageCalculator.h"
-#include "itkImageSliceIteratorWithIndex.h"
+#include <itkOtsuThresholdImageCalculator.h>
+#include <itkRecursiveGaussianImageFilter.h>
+#include <itkImageMomentsCalculator.h>
 
 #include <boost/foreach.hpp>
 
@@ -37,33 +38,72 @@ namespace extitk{
 template<class InputImageType1, class InputImageType2>
 class ScaleEstimateFilter
 {
-	typedef itk::Vector<double, InputImageType1::ImageDimension> ScaleType;
+
 	typedef itk::OtsuThresholdImageCalculator<InputImageType1> OtsuCalculatorType1;
 	typedef itk::OtsuThresholdImageCalculator<InputImageType2> OtsuCalculatorType2;
 
-	typedef itk::ImageSliceIteratorWithIndex<InputImageType1> IteratorType1;
-	typedef itk::ImageSliceIteratorWithIndex<InputImageType2> IteratorType2;
+	typedef itk::RecursiveGaussianImageFilter<InputImageType1, InputImageType1> GaussianFilterType1;
+	typedef itk::RecursiveGaussianImageFilter<InputImageType2, InputImageType2> GaussianFilterType2;
+
+
+	typedef itk::ImageMomentsCalculator<InputImageType1> MomentsCalculatorType1;
+	typedef itk::ImageMomentsCalculator<InputImageType2> MomentsCalculatorType2;
 
 public:
 	ScaleEstimateFilter();
+	typedef itk::Vector<double, InputImageType1::ImageDimension> ScaleType;
 	enum scaling { isotropic, anisotropic };
 	void SetInputImage1(  const typename InputImageType1::Pointer img1 );
 	void SetInputImage2(  const typename InputImageType2::Pointer img2 );
 
-	ScaleType EstimateScaling( scaling );
+	void SetNumberOfThreads( const unsigned int& threads )
+		{
+			if( threads>0 ) { m_NumberOfThreads = threads; }
+			else { m_NumberOfThreads = 1; }
 
+	}
 
+	ScaleType EstimateScaling( scaling, const bool biggestExtent = false );
 
 private:
 	typename OtsuCalculatorType1::Pointer m_OtsuCalculator1;
 	typename OtsuCalculatorType1::Pointer m_OtsuCalculator2;
-	IteratorType1 m_Iterator1;
-	IteratorType2 m_Iterator2;
+
+	typename GaussianFilterType1::Pointer m_Filter1X;
+	typename GaussianFilterType1::Pointer m_Filter1Y;
+	typename GaussianFilterType1::Pointer m_Filter1Z;
+
+	typename GaussianFilterType2::Pointer m_Filter2X;
+	typename GaussianFilterType2::Pointer m_Filter2Y;
+	typename GaussianFilterType2::Pointer m_Filter2Z;
+
+	typename MomentsCalculatorType1::Pointer m_MomentsCalculator1;
+	typename MomentsCalculatorType2::Pointer m_MomentsCalculator2;
+
+	typedef itk::Vector<double, InputImageType1::ImageDimension> VectorType;
+	typedef itk::Vector<bool, InputImageType1::ImageDimension> SuspiciousType;
+
+	unsigned int m_NumberOfThreads;
+
 	typename InputImageType1::Pointer m_Image1;
 	typename InputImageType2::Pointer m_Image2;
-	ScaleType m_Extent1;
-	ScaleType m_Extent2;
+	typename InputImageType1::SizeType m_Size1;
+	typename InputImageType2::SizeType m_Size2;
+	typename InputImageType1::SpacingType m_Spacing1;
+	typename InputImageType2::SpacingType m_Spacing2;
+
+	typename InputImageType1::Pointer m_InternImage1;
+	typename InputImageType2::Pointer m_InternImage2;
+
 	ScaleType m_Scaling;
+	VectorType m_Moment1;
+	VectorType m_Moment2;
+	VectorType m_Extent1;
+	VectorType m_Extent2;
+	SuspiciousType m_Suspicious1;
+	SuspiciousType m_Suspicious2;
+
+	void filter();
 
 };
 } //end namespace extitk

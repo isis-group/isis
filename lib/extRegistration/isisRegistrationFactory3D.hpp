@@ -27,6 +27,7 @@
 #include "itkImageRegistrationMethod.h"
 
 #include "extITK/isisIterationObserver.hpp"
+#include "extITK/isisScaleEstimateFilter.hpp"
 
 //transform includes
 
@@ -141,6 +142,8 @@ public:
 	typedef itk::ImageRegistrationMethod<TFixedImageType, TMovingImageType> RegistrationMethodType;
 
 	typedef typename RegistrationMethodType::Pointer RegistrationMethodPointer;
+
+	typedef extitk::ScaleEstimateFilter<TFixedImageType, TMovingImageType> ScaleEstimateFilterType;
 
 	//resample filter and caster
 	typedef typename itk::ResampleImageFilter<MovingImageType, FixedImageType> ResampleFilterType;
@@ -428,6 +431,9 @@ private:
 
 	typename DiscreteGaussianImageFitlerType::Pointer m_FixedGaussianFilter;
 	typename DiscreteGaussianImageFitlerType::Pointer m_MovingGaussianFilter;
+
+	ScaleEstimateFilterType* m_ScaleEstimateFilter;
+	typename ScaleEstimateFilterType::ScaleType m_EstimatedScaling;
 
 };
 

@@ -185,6 +185,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetTransform(
 		break;
 	case ScaleTransform:
 		transform.SCALE = true;
+		m_ScaleEstimateFilter = new ScaleEstimateFilterType;
 		m_ScaleSkewTransform = ScaleSkewVersor3DTransformType::New();
 		m_RegistrationObject->SetTransform( m_ScaleSkewTransform );
 		break;
@@ -520,6 +521,12 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpTransform()
 	}
 
 	if ( transform.SCALE ) {
+		m_ScaleEstimateFilter->SetInputImage1( m_MovingImage );
+		m_ScaleEstimateFilter->SetInputImage2( m_FixedImage );
+		m_ScaleEstimateFilter->SetNumberOfThreads( UserOptions.NumberOfThreads );
+		m_EstimatedScaling = m_ScaleEstimateFilter->EstimateScaling( ScaleEstimateFilterType::isotropic );
+		m_ScaleSkewTransform->SetScale( m_EstimatedScaling );
+		UserOptions.NumberOfIterations = 0;
 		m_NumberOfParameters = m_ScaleSkewTransform->GetNumberOfParameters();
 		m_RegistrationObject->SetInitialTransformParameters( m_ScaleSkewTransform->GetParameters() );
 	}
@@ -719,10 +726,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetInitialTransfo
 		m_ScaleSkewTransform->SetRotation(
 			( static_cast<VersorRigid3DTransformType *> ( initialTransform )->GetVersor() ) );
 		//              m_ScaleSkewTransform->SetMatrix((static_cast<VersorRigid3DTransformType*> (initialTransform)->GetMatrix()));
-		itk::Vector<double, 3> scaleVec;
-		scaleVec.Fill(0.8);
-		m_ScaleSkewTransform->SetScale(scaleVec);
-		m_RegistrationObject->SetInitialTransformParameters( m_VersorRigid3DTransform->GetParameters() );
+		m_RegistrationObject->SetInitialTransformParameters( m_ScaleSkewTransform->GetParameters() );
 	}
 
 }

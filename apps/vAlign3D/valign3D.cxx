@@ -430,7 +430,7 @@ int main(
 					  << std::endl;
 		}
 
-		if ( transform != 0 and optimizer == 0 ) {
+		if ( (transform != 0 and transform != 4) and optimizer == 0 ) {
 			std::cerr << "\nInappropriate combination of transform and optimizer! Setting optimizer to RegularStepGradientDescentOptimizer.\n"
 					  << std::endl;
 			optimizer = 1;
