@@ -521,11 +521,12 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpTransform()
 	}
 
 	if ( transform.SCALE ) {
-		m_ScaleEstimateFilter->SetInputImage1( m_MovingImage );
 		m_ScaleEstimateFilter->SetInputImage2( m_FixedImage );
+		m_ScaleEstimateFilter->SetInputImage1( m_MovingImage );
 		m_ScaleEstimateFilter->SetNumberOfThreads( UserOptions.NumberOfThreads );
 		m_EstimatedScaling = m_ScaleEstimateFilter->EstimateScaling( ScaleEstimateFilterType::isotropic );
 		m_ScaleSkewTransform->SetScale( m_EstimatedScaling );
+		std::cout << m_EstimatedScaling << std::endl;
 		UserOptions.NumberOfIterations = 0;
 		m_NumberOfParameters = m_ScaleSkewTransform->GetNumberOfParameters();
 		m_RegistrationObject->SetInitialTransformParameters( m_ScaleSkewTransform->GetParameters() );

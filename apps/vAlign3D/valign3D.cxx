@@ -98,6 +98,7 @@ static VFloat coarse_factor = 1;
 static VFloat bspline_bound = 100.0;
 static VBoolean verbose = true;
 
+
 static VOptionDescRec
 options[] = {
 	//required inputs

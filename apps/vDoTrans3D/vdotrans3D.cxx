@@ -67,6 +67,7 @@ static VArgVector resolution;
 static VBoolean fmri;
 static VBoolean use_inverse = false;
 static VShort number_threads = 1;
+static VBoolean keep_res = false;
 
 static VOptionDescRec options[] = {
 	//requiered inputs
@@ -84,7 +85,9 @@ static VOptionDescRec options[] = {
 		&template_filename, VOptionalOpt, 0, "The template image"
 	   }, {"reso", VFloatRepn, 0, ( VPointer ) &resolution,
 		   VOptionalOpt, 0, "The output resolution. One value for isotrop output"
-		  }, {"fmri", VBooleanRepn, 1, &fmri,
+		  }, { "keep_reso", VBooleanRepn, 1, &keep_res, VOptionalOpt, 0, "Keep the resolution of the moving image"
+			},
+		  	  {"fmri", VBooleanRepn, 1, &fmri,
 			  VOptionalOpt, 0, "Input and output image file are functional data"
 			 }, {"trans", VStringRepn, 1,
 				 &vtrans_filename, VOptionalOpt, 0, "Vector deformation field"
@@ -181,7 +184,7 @@ int main(
 	//transform object used for inverse transform
 	itk::MatrixOffsetTransformBase<double, Dimension, Dimension>::Pointer transform = itk::MatrixOffsetTransformBase<double, Dimension, Dimension>::New();
 
-	if ( not trans_filename.number and not vtrans_filename ) {
+	if ( !trans_filename.number and !vtrans_filename ) {
 		std::cout << "No transform specified!!" << std::endl;
 		return EXIT_FAILURE;
 	}
@@ -190,7 +193,7 @@ int main(
 	warper->SetNumberOfThreads( number_threads );
 	progress_timer time;
 
-	if ( not fmri ) {
+	if ( !fmri ) {
 		isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "" );
 		LOG_IF( inList.empty(), isis::DataLog, isis::error ) << "Input image is empty!";
 		inputImage = movingAdapter->makeItkImageObject<InputImageType>( inList.front() );
@@ -223,7 +226,7 @@ int main(
 		outputOrigin = templateImage->GetOrigin();
 	}
 
-	if ( not template_filename ) {
+	if ( !template_filename ) {
 		outputDirection = inputImage->GetDirection();
 		outputOrigin = inputImage->GetOrigin();
 	}
@@ -263,7 +266,7 @@ int main(
 				resampler->SetTransform( transform );
 			}
 
-			if ( not use_inverse ) {
+			if ( !use_inverse ) {
 				resampler->SetTransform( static_cast<ConstTransformPointer> ( ( *ti ).GetPointer() ) );
 			}
 		}
@@ -289,19 +292,19 @@ int main(
 		}
 	}
 
-	if ( not resolution.number ) {
+	if ( !resolution.number ) {
 		if ( template_filename ) {
 			outputSpacing = templateImage->GetSpacing();
 			outputSize = templateImage->GetLargestPossibleRegion().GetSize();
 		}
 
-		if ( not template_filename ) {
+		if ( !template_filename ) {
 			outputSpacing = inputImage->GetSpacing();
 			outputSize = inputImage->GetLargestPossibleRegion().GetSize();
 		}
 	}
 
-	if ( resolution.number and template_filename ) {
+	if ( resolution.number && template_filename ) {
 		for ( unsigned int i = 0; i < 3; i++ ) {
 			//output spacing = (template size / output resolution) * template resolution
 			outputSize[i] = ( ( templateImage->GetLargestPossibleRegion().GetSize()[i] ) / outputSpacing[i] )
@@ -309,10 +312,10 @@ int main(
 		}
 	}
 
-	if ( resolution.number and not template_filename ) {
+	if ( resolution.number && !template_filename ) {
 		for ( unsigned int i = 0; i < 3; i++ ) {
 			//output spacing = (moving size / output resolution) * moving resolution
-			if ( not fmri ) {
+			if ( !fmri ) {
 				outputSize[i] = ( ( inputImage->GetLargestPossibleRegion().GetSize()[i] ) / outputSpacing[i] )
 								* inputImage->GetSpacing()[i];
 			}
@@ -340,10 +343,10 @@ int main(
 		break;
 	}
 
-	if ( not fmri ) {
+	if ( !fmri ) {
 		writer->SetFileName( out_filename );
 
-		if ( not vtrans_filename and trans_filename.number == 1 ) {
+		if ( !vtrans_filename && trans_filename.number == 1 ) {
 			resampler->AddObserver( itk::ProgressEvent(), progressObserver );
 			resampler->SetInput( inputImage );
 			resampler->SetOutputSpacing( outputSpacing );
@@ -390,18 +393,25 @@ int main(
 				fmriOutputSpacing[i] = outputSpacing[i];
 				fmriOutputSize[i] = outputSize[i];
 			} else {
-				if ( not template_filename ) {
+				if ( !template_filename ) {
 					fmriOutputSpacing[i] = fmriImage->GetSpacing()[i];
 					fmriOutputSize[i] = fmriImage->GetLargestPossibleRegion().GetSize()[i];
 				}
 
 				if ( template_filename ) {
-					fmriOutputSpacing[i] = templateImage->GetSpacing()[i];
+					if( keep_res )
+					{
+						fmriOutputSpacing[i] = fmriImage->GetSpacing()[i];
+					}
+					if ( !keep_res )
+					{
+						fmriOutputSpacing[i] = templateImage->GetSpacing()[i];
+					}
 					fmriOutputSize[i] = templateImage->GetLargestPossibleRegion().GetSize()[i];
 				}
 			}
 
-			if ( not template_filename ) {
+			if ( !template_filename ) {
 				fmriOutputOrigin[i] = fmriImage->GetOrigin()[i];
 
 				for ( unsigned int j = 0; j < 3; j++ ) {
