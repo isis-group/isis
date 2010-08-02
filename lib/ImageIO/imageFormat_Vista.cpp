@@ -471,7 +471,7 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 	// get voxel
 	util::fvector4 voxels = image.getProperty<util::fvector4>( "voxelSize" );
 	std::stringstream vstr;
-	vstr << voxels[0] << " " << voxels[1] << " " << voxels[2];
+	vstr << voxels[0] << " " << voxels[1] << " " << voxels[2] << " " << voxels[3];
 	VAppendAttr( list, "voxel", NULL, VStringRepn, vstr.str().c_str() );
 	// copy orientation vectors
 	util::fvector4 readVec = image.getProperty<util::fvector4>( "readVec" );

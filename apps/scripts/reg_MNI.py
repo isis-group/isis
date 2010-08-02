@@ -23,9 +23,9 @@ def usage():
 def registration():
     print "Starting registration of " + INPUT_IMAGE + " on " + MNI_BRAIN + "..."
     if ( scaling ):
-        os.system("valign3d -ref " + MNI_BRAIN + " -in " + INPUT_IMAGE + " -prealign_m  -transform 0 4 -optimizer 0 1 -iter 500 0 -trans tmp.nii > logreg.txt")
+        os.system("valign3d -ref " + MNI_BRAIN + " -in " + INPUT_IMAGE + " -prealign_m  -transform 0 4 -optimizer 0 1 -iter 10 0 -trans tmp.nii > logreg.txt")
     else:
-        os.system("valign3d -ref " + MNI_BRAIN + " -in " + INPUT_IMAGE + " -prealign_m  -v false -trans tmp.nii > logreg.txt")
+        os.system("valign3d -ref " + MNI_BRAIN + " -in " + INPUT_IMAGE + " -prealign_m -v false -iter 10 -trans tmp.nii > logreg.txt")
     print "Resampling..."
     if (fmri):
         if (len(iso)):       

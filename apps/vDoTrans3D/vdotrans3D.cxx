@@ -205,17 +205,6 @@ int main(
 		fmriImage = movingAdapter->makeItkImageObject<FMRIInputType>( inList.front() );
 	}
 
-	//temporary hack
-//	InputImageType::PointType originIn;
-//	originIn[0] = 95.625;
-//	originIn[1] = 95.625;
-//	originIn[2] = -57.5;
-//	inputImage->SetOrigin( originIn );
-//	FMRIInputType::PointType origin;
-//	origin[0] = 95.625;
-//	origin[1] = 95.625;
-//	origin[2] = -57.5;
-//	fmriImage->SetOrigin( origin );
 
 	//if template file is specified by the user
 	if ( template_filename ) {
@@ -388,7 +377,7 @@ int main(
 			fmriOutputDirection = templateImage->GetDirection();
 		}
 
-		for ( unsigned int i = 0; i < 3; i++ ) {
+		for ( unsigned int i = 0; i < 4; i++ ) {
 			if ( resolution.number ) {
 				fmriOutputSpacing[i] = outputSpacing[i];
 				fmriOutputSize[i] = outputSize[i];
@@ -419,7 +408,7 @@ int main(
 				}
 			}
 		}
-
+		if(fmriOutputSpacing[3] == 0) { fmriOutputSpacing[3] = 1; }
 		if ( trans_filename.number ) {
 			resampler->SetOutputDirection( fmriOutputDirection );
 			resampler->SetOutputSpacing( fmriOutputSpacing );

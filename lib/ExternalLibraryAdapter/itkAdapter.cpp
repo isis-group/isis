@@ -141,7 +141,8 @@ template<typename TInput, typename TOutput> typename TOutput::Pointer itkAdapter
 	//getting the required metadata from the isis image
 	const util::fvector4 dimensions( m_ImageISIS.sizeToVector() );
 	const util::fvector4 indexOrigin( m_ImageISIS.getProperty<util::fvector4>( "indexOrigin" ) );
-	const util::fvector4 spacing( m_ImageISIS.getProperty<util::fvector4>( "voxelSize" ) );
+	util::fvector4 spacing( m_ImageISIS.getProperty<util::fvector4>( "voxelSize" ) );
+	if(spacing[3] == 0) { spacing[3] = 1; }
 	const util::fvector4 readVec = m_ImageISIS.getProperty<util::fvector4>( "readVec" );
 	const util::fvector4 phaseVec = m_ImageISIS.getProperty<util::fvector4>( "phaseVec" );
 	const util::fvector4 sliceVec = m_ImageISIS.getProperty<util::fvector4>( "sliceVec" );
