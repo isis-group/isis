@@ -91,6 +91,9 @@ public:
 	TypeReference( const TypeReference &src ) {
 		operator=( src );
 	}
+	TypeReference( const TYPE_TYPE &src ) {
+		operator=( src );
+	}
 	/**
 	 * Copy operator
 	 * This operator replaces the current content by a copy of the content of src.

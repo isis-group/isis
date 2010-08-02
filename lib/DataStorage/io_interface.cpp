@@ -1,8 +1,9 @@
-#include "DataStorage/io_interface.h"
-#include "boost/foreach.hpp"
-#include "CoreUtils/log.hpp"
+#include <boost/foreach.hpp>
 #include <boost/filesystem.hpp>
+
+#include "CoreUtils/log.hpp"
 #include "ImageIO/common.hpp"
+#include "DataStorage/io_interface.h"
 
 namespace isis
 {

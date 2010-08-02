@@ -59,6 +59,24 @@ Chunk Chunk::cloneToMem( size_t firstDim, size_t secondDim, size_t thirdDim, siz
 	return Chunk( cloned, newSize[0], newSize[1], newSize[2], newSize[3] );
 }
 
+Chunk Chunk::makeOfTypeId(short unsigned int id)
+{
+	Chunk ret(*this);//cheap copy the chunk
+	if(typeID()!=id){ // if its not the same type - replace the internal TypePtr by a new returned from TypePtrBase::copyToNewById
+		static_cast<TypePtrReference&>(ret)=getTypePtrBase().copyToNewById(id);
+	}
+	return ret;
+}
+
+Chunk Chunk::makeOfTypeId(short unsigned int id, const isis::util::_internal::TypeBase& min, const isis::util::_internal::TypeBase& max)
+{
+	Chunk ret(*this);//cheap copy the chunk
+	if(typeID()!=id){// if its not the same type - replace the internal TypePtr by a new returned from TypePtrBase::copyToNewById
+		static_cast<TypePtrReference&>(ret)=getTypePtrBase().copyToNewById(id,min,max);
+	}
+	return ret;
+}
+
 size_t Chunk::bytes_per_voxel()const
 {
 	return get()->bytes_per_elem();

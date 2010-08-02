@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE ( chunk_property_test )
 	//an basic Chunk must be invalid
 	BOOST_CHECK( !ch.valid() );
 	BOOST_CHECK( !ch.hasProperty( "indexOrigin" ) );
-	//with an position its valid
+	//with an position and an orientation its valid
 	util::fvector4 pos( 1, 1, 1 );
 	ch.setProperty( "indexOrigin", pos );
 	BOOST_CHECK( !ch.valid() );
@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE ( chunk_property_test )
 	//properties shall not be case sensitive
 	BOOST_CHECK( ch.hasProperty( "indexorigin" ) );
 	// and of course the property shall be what it was set to
-	BOOST_CHECK( pos == ch.getProperty<util::fvector4>( "indexOrigin" ) );
+	BOOST_CHECK_EQUAL( pos, ch.getProperty<util::fvector4>( "indexOrigin" ) );
 }
 
 BOOST_AUTO_TEST_CASE ( chunk_data_test1 )//Access Chunk elements via dimensional index

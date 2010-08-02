@@ -43,12 +43,14 @@ namespace _internal
 template<typename SRC, typename DST> class TypePtrGenerator: public TypePtrConverterBase
 {
 public:
-	void generate( const boost::scoped_ptr<TypePtrBase>& src, boost::scoped_ptr<TypePtrBase>& dst, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max )const {
-		LOG_IF( dst.get(), Debug, warning ) <<
-											"Generating into existing value " << dst->toString( true );
-		TypePtr<DST> *ref = new TypePtr<DST>;
-		convert( src->cast_to_TypePtr<SRC>(), *ref, min, max );
-		dst.reset( ref );
+	void generate( const TypePtrBase& src, boost::scoped_ptr<TypePtrBase>& dst, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max )const {
+		LOG_IF( dst.get(), Debug, warning ) << "Generating into existing value " << dst->toString( true );
+
+		//Create new "stuff" in memory
+		TypePtr<DST> *newDat=new TypePtr<DST>(( DST * )malloc( sizeof( DST )*src.len() ), src.len());
+		dst.reset( newDat );
+		
+		convert( src, *dst, min, max );//and convert into that
 	}
 };
 void TypePtrConverterBase::convert( const TypePtrBase &src, TypePtrBase &dst, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max ) const
@@ -142,7 +144,7 @@ struct outer_TypePtrConverter {
 	outer_TypePtrConverter( std::map< int , std::map<int, boost::shared_ptr<const TypePtrConverterBase> > > &map ): m_map( map ) {}
 	template<typename SRC> void operator()( SRC ) {//will be called by the mpl::for_each in TypePtrConverterMap() for any SRC out of "types"
 		boost::mpl::for_each<util::_internal::types>( // create a functor for from-SRC-conversion and call its ()-operator for any DST out of "types"
-			inner_TypePtrConverter<SRC>( m_map[TypePtr<SRC>().typeID()] )
+			inner_TypePtrConverter<SRC>( m_map[TypePtr<SRC>::staticID] )
 		);
 	}
 };

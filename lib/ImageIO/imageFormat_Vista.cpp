@@ -55,6 +55,7 @@ throw( std::runtime_error & )
 	if( dims[3] > 1 ) {
 		vimages = ( VImage * )malloc( sizeof( VImage ) * dims[2] );
 		nimages = dims[2];
+
 		// since we need to convert and reorganize the data, we will create a
 		// temporary buffer who stores short values.
 		// get the first chunk
@@ -66,6 +67,7 @@ throw( std::runtime_error & )
 			for( int z = 0; z < dims[2]; z++ ) {
 				vimages[z] = VCreateImage( dims[3], dims[1], dims[0],
 										   VShortRepn );
+
 				// get all data from the first chunk.
 				for( int x = 0; x < dims[0]; x++ ) {
 					for( int y = 0; y < dims[1]; y++ ) {
@@ -75,6 +77,7 @@ throw( std::runtime_error & )
 						}
 					}
 				}
+
 				// copy header information
 				copyHeaderToVista( image, vimages[z] );
 				VAppendAttr( attrList, "image", NULL, VImageRepn, vimages[z] );

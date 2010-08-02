@@ -40,6 +40,15 @@ class IOApplication: public util::Application
 		return retList;
 	}
 	util::ConsoleFeedback feedback;
+	std::map<unsigned short, ImageList *> repnGenerators;
+	//  struct repnGeneratorGenerator {
+	//      std::map< unsigned short, ImageList* > &m_map;
+	//      repnGeneratorGenerator( std::map< unsigned short, ImageList* > &map): m_map( map ) {}
+	//      template<typename SRC> void operator()( SRC ) {//will be called by the mpl::for_each
+	//          m_map[TypePtr<SRC>::staticID]=&convertTo<SRC>;
+	//      }
+	//  };
+
 public:
 	data::ImageList images;
 	IOApplication( const char name[], bool have_input = true, bool have_output = true );

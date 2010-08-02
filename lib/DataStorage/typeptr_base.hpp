@@ -75,20 +75,8 @@ public:
 	*/
 	virtual std::vector<Reference> splice( size_t size )const = 0;
 
-	/** Create a TypePtr of the same type pointing at a newly allocated memory.
-	 * This will not copy contents of this TypePtr, just its type and length.
-	 * \returns a reference to the newly created TypePtr
-	 */
-	TypePtrBase::Reference cloneToMem()const;
-	/**
-	 * Copy this to a new TypePtr using newly allocated memory.
-	 * This copies the contents of this TypePtr, its type and its length.
-	 * \returns a reference to the newly created TypePtr
-	 */
-	TypePtrBase::Reference copyToMem()const;
-
 	/// Copy (or Convert) data from this to another TypePtr of maybe another type and the same length.
-	virtual bool convertTo( TypePtrBase &dst )const = 0;
+	bool convertTo( TypePtrBase &dst )const;
 	bool convertTo( TypePtrBase &dst, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max )const;
 
 	/// Copy (or Convert) data from this to memory of maybe another type and the given length.
@@ -97,18 +85,9 @@ public:
 		return convertTo( dest );
 	}
 
-	/**
-	 * Copy this to a new TypePtr\<T\> using newly allocated memory.
-	 * This will create a new TypePtr of type T and the length of this.
-	 * The memory will be allocated and the data of this will be copy-converted to T.
-	 * If the conversion fails, an error will be send to CoreLog and the data of the newly created TypePtr will be undefined.
-	 * \returns a the newly created TypePtr
-	 */
-	template<typename T> TypePtr<T> copyToNew()const {
-		TypePtr<T> ret( ( T * )malloc( sizeof( T )*len() ), len() );
-		convertTo( ret );
-		return ret;
-	}
+	Reference copyToNewById( unsigned short id) const;
+	Reference copyToNewById( unsigned short id, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max ) const;
+
 	/**
 	 * Copy this to a new TypePtr\<T\> using newly allocated memory.
 	 * This will create a new TypePtr of type T and the length of this.
@@ -117,12 +96,22 @@ public:
 	 * \returns a the newly created TypePtr
 	 */
 	template<typename T> TypePtr<T> copyToNew( const util::_internal::TypeBase &min, const util::_internal::TypeBase &max )const {
-		TypePtr<T> ret( ( T * )malloc( sizeof( T )*len() ), len() );
-		convertTo( ret, min, max );
-		return ret;
+		Reference ret=copyToNewById( TypePtr<T>::staticID,min,max);
+		return ret->cast_to_TypePtr<T>();
 	}
 	/**
-	 * \copydoc cloneToMem
+	 * Copy this to a new TypePtr\<T\> using newly allocated memory.
+	 * This will create a new TypePtr of type T and the length of this.
+	 * The memory will be allocated and the data of this will be copy-converted to T.
+	 * If the conversion fails, an error will be send to CoreLog and the data of the newly created TypePtr will be undefined.
+	 * \returns a the newly created TypePtr
+	 */
+	template<typename T> TypePtr<T> copyToNew()const {
+		Reference ret=copyToNewById( TypePtr<T>::staticID);
+		return ret->cast_to_TypePtr<T>();
+	}
+	/**
+	 * Create a new TypePtr, of the same type, but differnent size in memory.
 	 * \param length length of the new memory block in elements of the given TYPE
 	 */
 	virtual TypePtrBase::Reference cloneToMem( size_t length )const = 0;
@@ -136,6 +125,8 @@ public:
 	 * \param dst_start starting element in dst to be overwritten
 	 */
 	void copyRange( size_t start, size_t end, TypePtrBase &dst, size_t dst_start )const;
+
+	size_t use_count()const;
 
 	bool swapAlong( TypePtrBase &dst, const size_t dim, const size_t dims[] ) const;
 	/**

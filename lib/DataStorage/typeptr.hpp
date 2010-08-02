@@ -118,10 +118,12 @@ public:
 		};
 	};
 	/**
-	* Contructor for empty pointer.
-	* length will be 0 and every attempt to dereference it will raise an exception.
-	*/
-	TypePtr() {}
+	 * Contructor for empty pointer.
+	 * length will be 0 and every attempt to dereference it will raise an exception.
+	 */
+	TypePtr() {
+		LOG(Debug,warning) << "Creating an empty TypePtr of type " << util::MSubject( staticName() ) << " you should overwrite it with a usefull pointer before using it";
+	}
 	/**
 	 * Creates TypePtr from a pointer of type TYPE.
 	 * The pointers are automatically deleted by an instance of BasicDeleter and should not be used outside once used here.
@@ -247,12 +249,6 @@ public:
 	}
 	size_t bytes_per_elem() const {
 		return sizeof( TYPE );
-	}
-	bool convertTo( TypePtrBase &dst )const {
-		util::TypeReference min, max;
-		getMinMax( min, max );
-		assert( ! ( min.empty() || max.empty() ) );
-		return TypePtrBase::convertTo( dst, *min, *max );
 	}
 	/// \copydoc TypePtrBase::getMinMax
 	void getMinMax ( util::TypeReference &min, util::TypeReference &max ) const {

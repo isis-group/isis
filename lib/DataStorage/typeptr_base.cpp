@@ -36,17 +36,21 @@ size_t TypePtrBase::cmp( const TypePtrBase &comp )const
 	return len() - comp.len() + cmp( 0, std::min( len(), comp.len() ) - 1, comp, 0 );
 }
 
-TypePtrBase::Reference TypePtrBase::cloneToMem() const
+TypePtrBase::Reference TypePtrBase::copyToNewById( unsigned short id ) const
 {
-	return cloneToMem( len() );
+	util::TypeReference min, max;
+	getMinMax( min, max );
+	assert( ! ( min.empty() || max.empty() ) );
+	return copyToNewById(id,*min,*max);
+}
+TypePtrBase::Reference TypePtrBase::copyToNewById( unsigned short id, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max ) const
+{
+	const Converter &conv = getConverterTo( id );
+	boost::scoped_ptr<TypePtrBase> ret;
+	conv->generate( *this, ret, min, max );
+	return *ret;
 }
 
-TypePtrBase::Reference TypePtrBase::copyToMem() const
-{
-	TypePtrBase::Reference ret = cloneToMem();
-	copyRange( 0, len() - 1, *ret, 0 );
-	return ret;
-}
 void TypePtrBase::copyRange( size_t start, size_t end, TypePtrBase &dst, size_t dst_start )const
 {
 	assert( start <= end );
@@ -66,6 +70,13 @@ void TypePtrBase::copyRange( size_t start, size_t end, TypePtrBase &dst, size_t 
 	const size_t blength = length * bytes_per_elem();//length in bytes
 	memcpy( dest + doffset, src + soffset, blength );
 }
+
+bool TypePtrBase::convertTo( TypePtrBase &dst )const {
+	util::TypeReference min, max;
+	getMinMax( min, max );
+	assert( ! ( min.empty() || max.empty() ) );
+	return TypePtrBase::convertTo( dst, *min, *max );
+}
 bool TypePtrBase::convertTo( TypePtrBase &dst, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max ) const
 {
 	const Converter &conv = getConverterTo( dst.typeID() );
@@ -81,6 +92,11 @@ bool TypePtrBase::convertTo( TypePtrBase &dst, const util::_internal::TypeBase &
 		return false;
 	}
 }
+size_t TypePtrBase::use_count() const
+{
+	return address().use_count();
+}
+
 
 bool TypePtrBase::swapAlong( TypePtrBase &dst, const size_t dim, const size_t dims[]  ) const
 {

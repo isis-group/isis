@@ -179,7 +179,7 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 	transformOrTell<u_int16_t>  ( prefix + "PatientsWeight",   "subjectWeigth",      object, warning );
 	// compute voxelSize and gap
 	{
-		util::fvector4 voxelSize( invalid_float, invalid_float, invalid_float, invalid_float );
+		util::fvector4 voxelSize( invalid_float, invalid_float, invalid_float, 0 );
 
 		if ( hasOrTell( prefix + "PixelSpacing", object, warning ) ) {
 			voxelSize = object.getProperty<util::fvector4>( prefix + "PixelSpacing" );
@@ -195,10 +195,7 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 		object.setProperty( "voxelSize", voxelSize );
 		util::fvector4 voxelGap; //find a more robust way to determine inplane voxelGap
 
-		if ( hasOrTell( prefix + "RepetitionTime", object, warning ) ) {
-			voxelGap[3] = object.getProperty<float>( prefix + "RepetitionTime" ) / 1000;
-			object.remove( prefix + "RepetitionTime" );
-		}
+		if ( transformOrTell<uint16_t>( prefix + "RepetitionTime", "repetitionTime", object, warning ) );
 
 		if ( hasOrTell( prefix + "SpacingBetweenSlices", object, info ) ) {
 			voxelGap[2] = object.getProperty<float>( prefix + "SpacingBetweenSlices" );
@@ -209,11 +206,11 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 			object.remove( prefix + "SpacingBetweenSlices" );
 		}
 
-		if ( voxelGap != util::fvector4( invalid_float, invalid_float, invalid_float, invalid_float ) )
+		if ( voxelGap != util::fvector4( invalid_float, invalid_float, invalid_float, 0 ) )
 			object.setProperty( "voxelGap", voxelGap );
 	}
 	transformOrTell<std::string>   ( prefix + "PerformingPhysiciansName", "performingPhysician", object, info );
-	transformOrTell<u_int16_t>     ( prefix + "NumberOfAverages",        "numberOfAverages",   object, warning );
+	transformOrTell<uint16_t>     ( prefix + "NumberOfAverages",        "numberOfAverages",   object, warning );
 
 	if ( hasOrTell( prefix + "ImageOrientationPatient", object, info ) ) {
 		util::dlist buff = object.getProperty<util::dlist>( prefix + "ImageOrientationPatient" );

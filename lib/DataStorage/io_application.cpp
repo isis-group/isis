@@ -19,6 +19,7 @@
 
 #include "io_application.hpp"
 #include "io_factory.hpp"
+#include <boost/mpl/for_each.hpp>
 
 namespace isis
 {
@@ -26,7 +27,8 @@ namespace data
 {
 IOApplication::IOApplication( const char name[], bool have_input, bool have_output ): Application( name ), m_input( have_input ), m_output( have_output )
 {
-	data::IOFactory::setProgressFeedback(&feedback);
+	data::IOFactory::setProgressFeedback( &feedback );
+
 	if ( have_input ) {
 		parameters["in"] = std::string();
 		parameters["in"].setDescription( "input file or dataset" );
@@ -47,9 +49,8 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 		parameters["wf"].setDescription( "Override automatic detection of file suffix for writing with given value" );
 		parameters["wdialect"] = std::string();
 		parameters["wdialect"].needed() = false;
-		parameters["wdialect"].setDescription("choose dialect for writing. The available dialects depend on the capabilities of IO plugins" );
-		std::map<unsigned short, std::string> types=util::getTypeMap(true,false);
-
+		parameters["wdialect"].setDescription( "choose dialect for writing. The available dialects depend on the capabilities of IO plugins" );
+		std::map<unsigned short, std::string> types = util::getTypeMap( true, false );
 		// remove some types which are useless as representation
 		// "(unsigned short)" is needed because otherwise erase would take the reference of a static constant which is only there during compile time
 		types.erase( ( unsigned short )util::Type<util::Selection>::staticID );
@@ -63,11 +64,13 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 		parameters["repn"].needed() = false;
 		parameters["repn"].setDescription(
 			"Representation in which the data shall be written (not implemented yet)." );
+		//      boost::mpl::for_each<util::_internal::types>( repnGeneratorGenerator(repnGenerators) );
 	}
 }
 
-IOApplication::~IOApplication() {
-	data::IOFactory::setProgressFeedback(0);
+IOApplication::~IOApplication()
+{
+	data::IOFactory::setProgressFeedback( 0 );
 }
 
 bool IOApplication::init( int argc, char **argv, bool exitOnError )
@@ -96,8 +99,8 @@ bool IOApplication::autoload( bool exitOnError )
 	if ( images.empty() ) {
 		if ( exitOnError )
 			exit( 1 );
-
-		return false;
+		else
+			return false;
 	} else {
 		for( ImageList::const_iterator a = images.begin(); a != images.end(); a++ ) {
 			for( ImageList::const_iterator b = a; ( ++b ) != images.end(); ) {
@@ -146,12 +149,13 @@ bool IOApplication::autowrite( const ImageList &out_images, bool exitOnError )
 		convertedList = convertTo<double>( out_images );
 		break;
 	default:
+
 		if( parameters["repn"].toString() != "<<NOT_SET>>" ) {
 			std::string oldRepn = util::getTypeMap()[out_images.front()->typeID()];
-			oldRepn.erase(oldRepn.size()-1, oldRepn.size());
-			LOG(DataLog, warning) << "Pixel representation " << parameters["repn"].toString()
-								<< " not yet supported. Retaining "
-								<< oldRepn << ".";
+			oldRepn.erase( oldRepn.size() - 1, oldRepn.size() );
+			LOG( DataLog, warning ) << "Pixel representation " << parameters["repn"].toString()
+									<< " not yet supported. Retaining "
+									<< oldRepn << ".";
 		}
 
 		convertedList = out_images;
