@@ -636,6 +636,19 @@ void Image::transformCoords( boost::numeric::ublas::matrix<float> transform )
 	setProperty<util::fvector4>( "sliceVec", slice );
 }
 
+bool Image::makeOfTypeId( short unsigned int id )
+{
+	// get value range of the image for the conversion
+	util::TypeReference min, max;
+	getMinMax( min, max );
+	assert( ! ( min.empty() || max.empty() ) );
+
+	//we want all chunks to be of type id - so tell them
+	BOOST_FOREACH( boost::shared_ptr<Chunk> &ref, lookup ) {
+		ref->makeOfTypeId( id, *min, *max );
+	}
+}
+
 size_t Image::spliceDownTo( dimensions dim )
 {
 	if( lookup[0]->relevantDims() < dim ) {

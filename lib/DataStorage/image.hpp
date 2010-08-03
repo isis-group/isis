@@ -336,6 +336,14 @@ public:
 			dst += ref->volume(); // increment the cursor
 		}
 	}
+	/**
+	 * Ensure, the image has the type with the requested id.
+	 * If the typeId of any chunk is not equal to the requested id, the data of the chunk is replaced by an converted version.
+	 * The conversion is done using the value range of the image.
+	 * \returns false if there was an error
+	 */
+	bool makeOfTypeId( unsigned short id );
+
 	size_t spliceDownTo( dimensions dim );
 };
 

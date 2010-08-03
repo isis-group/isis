@@ -59,26 +59,30 @@ Chunk Chunk::cloneToMem( size_t firstDim, size_t secondDim, size_t thirdDim, siz
 	return Chunk( cloned, newSize[0], newSize[1], newSize[2], newSize[3] );
 }
 
-Chunk Chunk::makeOfTypeId( short unsigned int id )
+bool Chunk::makeOfTypeId( short unsigned int id )
 {
-	Chunk ret( *this ); //cheap copy the chunk
-
-	if( typeID() != id ) { // if its not the same type - replace the internal TypePtr by a new returned from TypePtrBase::copyToNewById
-		static_cast<TypePtrReference &>( ret ) = getTypePtrBase().copyToNewById( id );
+	if( typeID() != id ) {
+		util::TypeReference min, max;
+		getMinMax( min, max );
+		assert( ! ( min.empty() || max.empty() ) );
+		return makeOfTypeId( id, *min, *max );
 	}
 
-	return ret;
+	return true;
 }
 
-Chunk Chunk::makeOfTypeId( short unsigned int id, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max )
+bool Chunk::makeOfTypeId( short unsigned int id, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max )
 {
-	Chunk ret( *this ); //cheap copy the chunk
-
 	if( typeID() != id ) { // if its not the same type - replace the internal TypePtr by a new returned from TypePtrBase::copyToNewById
-		static_cast<TypePtrReference &>( ret ) = getTypePtrBase().copyToNewById( id, min, max );
+		TypePtrReference newPtr = getTypePtrBase().copyToNewById( id, min, max ); // create a new TypePtr of type id and store it in a TypePtrReference
+
+		if( newPtr.empty() ) // if the reference is empty the conversion failed
+			return false;
+
+		static_cast<TypePtrReference &>( *this ) = newPtr; // otherwise replace my own TypePtr with the new one
 	}
 
-	return ret;
+	return true;
 }
 
 size_t Chunk::bytes_per_voxel()const
