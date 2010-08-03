@@ -47,17 +47,14 @@ vtkImageData *vtkAdapter::makeVtkImageObject( const boost::shared_ptr<data::Imag
 	//TODO check datatypes
 	vtkImage->SetOrigin( indexOrigin[0], indexOrigin[1], indexOrigin[2] );
 	vtkImage->SetSpacing( spacing[0], spacing[1], spacing[2] );
-
-
-	void* targePtr = malloc(m_ImageISIS->bytes_per_voxel() * m_ImageISIS->volume());
-	uint8_t* refTarget = ( uint8_t* ) targePtr;
+	void *targePtr = malloc( m_ImageISIS->bytes_per_voxel() * m_ImageISIS->volume() );
+	uint8_t *refTarget = ( uint8_t * ) targePtr;
 	std::vector< boost::shared_ptr< data::Chunk> > chList = m_ImageISIS->getChunkList();
 	size_t chunkIndex = 0;
-	BOOST_FOREACH( boost::shared_ptr< data::Chunk> & ref, chList)
-	{
-		data::Chunk &chRef=*ref;
-		uint8_t* target = refTarget + chunkIndex++ * chRef.volume();
-		chRef.getTypePtr<uint8_t>().copyToMem(0, (chRef.volume() - 1), target );
+	BOOST_FOREACH( boost::shared_ptr< data::Chunk> & ref, chList ) {
+		data::Chunk &chRef = *ref;
+		uint8_t *target = refTarget + chunkIndex++ * chRef.volume();
+		chRef.getTypePtr<uint8_t>().copyToMem( 0, ( chRef.volume() - 1 ), target );
 	}
 
 	switch ( myAdapter->m_ImageISIS->typeID() ) {

@@ -40,30 +40,5 @@ bool PropertyValue::operator== ( const _internal::TypeBase &second )const
 PropertyValue::PropertyValue ( bool _needed ) : m_needed( _needed ) {}
 
 
-bool PropertyValue::transformTo( PropertyValue &dst, int typeId )const
-{
-	LOG_IF( empty(), Debug, error ) << "Cannot transform an empty property. Program will stop.";
-	_internal::TypeBase &src = operator*();
-	_internal::TypeBase::Converter conv = src.getConverterTo( typeId );
-
-	if ( conv ) {
-		switch( conv->generate( *this, dst ) ) {
-		case boost::numeric::cPosOverflow:
-			LOG( Runtime, warning ) << "Conversion of " << *this << " failed with positive overflow";
-			return false;
-		case boost::numeric::cNegOverflow:
-			LOG( Runtime, warning ) << "Conversion of " << *this << " failed with negative overflow";
-			return false;
-		case boost::numeric::cInRange:
-			return true;
-		}
-	} else
-		LOG( Runtime, error )
-				<< "Cannot transform " << src.toString( true ) << " no converter available";
-
-	// @todo we need a typeId to typeName mapping
-	return false;
-}
-
 }
 }

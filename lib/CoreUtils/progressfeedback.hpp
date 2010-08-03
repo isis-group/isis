@@ -24,7 +24,10 @@
 #include <boost/progress.hpp>
 #include <boost/scoped_ptr.hpp>
 
-namespace isis{ namespace util{
+namespace isis
+{
+namespace util
+{
 
 class ProgressFeedback
 {
@@ -33,27 +36,29 @@ public:
 	 * (Re)Set the progress display to the given maximum value and "show" it.
 	 * This will also reset the progress to 0.
 	 */
-	virtual void show(size_t max,std::string header="")=0;
+	virtual void show( size_t max, std::string header = "" ) = 0;
 	/**
 	 * Increment the "progress" by step "steps".
 	 * Behavior is undefined if show was not called before.
 	 */
-	virtual size_t progress(const std::string message="",size_t step=1)=0;
+	virtual size_t progress( const std::string message = "", size_t step = 1 ) = 0;
 	///Close/undisplay a progress display.
-	virtual void close()=0;
+	virtual void close() = 0;
 	/// get the current valued which represents 100%
-	virtual size_t getMax()=0;
+	virtual size_t getMax() = 0;
 	/// Increment the "progress" by one
-	ProgressFeedback& operator++();
+	ProgressFeedback &operator++();
 };
 
-class ConsoleFeedback:public ProgressFeedback{
+class ConsoleFeedback: public ProgressFeedback
+{
 	boost::scoped_ptr<boost::progress_display> disp;
 public:
-    void close();
-    size_t getMax();
-    size_t progress(const std::string message = "", size_t step = 1);
-    void show(size_t max, std::string header);
+	void close();
+	size_t getMax();
+	size_t progress( const std::string message = "", size_t step = 1 );
+	void show( size_t max, std::string header );
 };
-}}
+}
+}
 #endif // PROGRESSFEEDBACK_HPP

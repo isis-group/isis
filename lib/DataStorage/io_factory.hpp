@@ -70,7 +70,7 @@ public:
 
 	static IOFactory &get();
 
-	static void setProgressFeedback(util::ProgressFeedback *feedback);
+	static void setProgressFeedback( util::ProgressFeedback *feedback );
 protected:
 	IOFactory();//shall not be created directly
 	FileFormatList io_formats;

@@ -106,22 +106,22 @@ public:
 	 * \return false otherwise
 	 */
 	template<typename T> bool operator ==( const T &second )const {
-		if ( get()->is<T>() ) {
+		check_type<T>();
+
+		if ( get()->is<T>() ) { // If I'm of the same type as the comparator
 			const T &cmp = get()->cast_to<T>();
-			return second == cmp;
-		} else if ( ! empty() ) {
-			PropertyValue dst;
+			return second == cmp; //compare our values
+		} else if ( ! empty() ) { // otherwise try to make me T and compare that
 			LOG( Debug, info )
 					<< *this << " is not " << Type<T>::staticName() << " trying to convert.";
+			TypeReference dst = ( *this )->copyToNewById( Type<T>::staticID );
 
-			if ( transformTo( dst, Type<T>::staticID ) )
-				return dst == second;
+			if ( !dst.empty() )
+				return dst->cast_to<T>() == second;
 		}
 
 		return false;
 	}
-	/// Converts the value into the requested type and stores it in the referenced PropertyValue.
-	bool transformTo( PropertyValue &dst, int typeId )const;
 };
 
 }

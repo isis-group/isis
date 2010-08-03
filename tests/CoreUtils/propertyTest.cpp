@@ -43,5 +43,15 @@ BOOST_AUTO_TEST_CASE( property_copy_test )
 	BOOST_CHECK_EQUAL( propB, ( int32_t )5 );
 }
 
+BOOST_AUTO_TEST_CASE( property_compare_test )
+{
+	// trivial case - direct compare
+	BOOST_CHECK_EQUAL( util::PropertyValue( 5 ), 5 );
+	// using conversion - should be true, because 5.4 will be converted to int (and thus rounded to 5)
+	BOOST_CHECK_EQUAL( util::PropertyValue( 5.4 ), 5 );
+	// using conversion - should be false, because 5.5 will be converted to int (and thus rounded to 6)
+	BOOST_CHECK( !( util::PropertyValue( 5.5 ) == 5 ) );
+}
+
 }
 }

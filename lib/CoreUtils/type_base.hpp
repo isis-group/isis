@@ -66,6 +66,7 @@ public:
 	template<typename T> bool is()const;
 
 	const Converter &getConverterTo( unsigned short id )const;
+
 	/**
 	 * Convert the content of one Type to another.
 	 * This will use the automatic conversion system to transform the value one Type-Object into another.
@@ -75,6 +76,7 @@ public:
 	 * \returns false if the conversion failed for any reason, true otherwise
 	 */
 	static bool convert( const TypeBase &from, TypeBase &to );
+
 	/**
 	* Interpret the value as value of any (other) type.
 	* This is a runtime-based cast via automatic conversion.
@@ -90,22 +92,15 @@ public:
 	* \return value of any requested type parsed from toString(false).
 	*/
 	template<class T> T as()const {
-		if ( typeID() == Type<T>::staticID ) {
-			LOG( Debug, verbose_info )
-					<< "Doing reinterpret_cast instead of useless conversion from " << toString( true )
-					<< " to " << Type<T>::staticName();
-			return *reinterpret_cast<const Type<T>*>( this );
-		} else {
-			Type<T> ret;
+		Reference ret = copyToNewById( Type<T>::staticID );
 
-			if ( ! convert( *this, ret ) ) {
-				LOG( Debug, error )
-						<< "Interpretation of " << toString( true ) << " as " << Type<T>::staticName()
-						<< " failed. Returning " << Type<T>().toString() << ".";
-				return T();
-			} else
-				return ret;
-		}
+		if ( ret.empty() ) {
+			LOG( Debug, error )
+					<< "Interpretation of " << toString( true ) << " as " << Type<T>::staticName()
+					<< " failed. Returning " << Type<T>().toString() << ".";
+			return T();
+		} else
+			return ret->cast_to<T>();
 	}
 
 	/**
@@ -115,7 +110,8 @@ public:
 	 * \returns a constant reference of the stored value.
 	 */
 	template<typename T> const Type<T>& cast_to_Type() const;
-	template<typename T> const T& cast_to() const;
+	template<typename T> const T &cast_to() const;
+
 	/**
 	 * Dynamically cast the TypeBase up to its actual Type\<T\>. Referenced version.
 	 * Will throw std::bad_cast if T is not the actual type.
@@ -123,8 +119,10 @@ public:
 	 * \returns a reference of the stored value.
 	 */
 	template<typename T> Type<T>& cast_to_Type();
-	template<typename T> T& cast_to();
+	template<typename T> T &cast_to();
 	virtual bool operator==( const TypeBase &second )const = 0;
+
+	Reference copyToNewById( unsigned short id ) const;
 
 	virtual ~TypeBase();
 

@@ -7,26 +7,26 @@ using namespace isis::util;
 class _Application : public Application
 {
 public:
-	_Application(PyObject* p, const char name[]) : Application(name), self(p) {}
-	_Application(PyObject* p, const Application& base) : Application(base), self(p) {}
+	_Application( PyObject *p, const char name[] ) : Application( name ), self( p ) {}
+	_Application( PyObject *p, const Application &base ) : Application( base ), self( p ) {}
 
-	virtual bool init( int argc, boost::python::list pyargv, bool exitOnError = true )
-	{
-		char* argv[argc];
-		size_t n = boost::python::len(pyargv);
-		for(size_t i=0;i<n;i++) {
-			argv[i] = boost::python::extract<char*>(pyargv[i]);
+	virtual bool init( int argc, boost::python::list pyargv, bool exitOnError = true ) {
+		char *argv[argc];
+		size_t n = boost::python::len( pyargv );
+
+		for( size_t i = 0; i < n; i++ ) {
+			argv[i] = boost::python::extract<char *>( pyargv[i] );
 		}
-		return Application::init(argc, argv, exitOnError);
+
+		return Application::init( argc, argv, exitOnError );
 	}
 
-	PropertyValue getParameters( const std::string& key )
-	{
-		return static_cast<PropertyValue&>(parameters[key]);
+	PropertyValue getParameters( const std::string &key ) {
+		return static_cast<PropertyValue &>( parameters[key] );
 	}
 
 private:
-	PyObject* self;
+	PyObject *self;
 
 };
 

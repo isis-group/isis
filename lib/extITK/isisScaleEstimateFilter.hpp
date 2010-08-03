@@ -30,9 +30,11 @@
 
 #include <boost/foreach.hpp>
 
-namespace isis {
+namespace isis
+{
 
-namespace extitk{
+namespace extitk
+{
 
 
 template<class InputImageType1, class InputImageType2>
@@ -56,11 +58,9 @@ public:
 	void SetInputImage1(  const typename InputImageType1::Pointer img1 );
 	void SetInputImage2(  const typename InputImageType2::Pointer img2 );
 
-	void SetNumberOfThreads( const unsigned int& threads )
-		{
-			if( threads>0 ) { m_NumberOfThreads = threads; }
-			else { m_NumberOfThreads = 1; }
-
+	void SetNumberOfThreads( const unsigned int &threads ) {
+		if( threads > 0 ) { m_NumberOfThreads = threads; }
+		else { m_NumberOfThreads = 1; }
 	}
 
 	ScaleType EstimateScaling( scaling, const bool biggestExtent = false );

@@ -66,6 +66,32 @@ bool TypeBase::convert( const TypeBase &from, TypeBase &to )
 	return false;
 }
 
+TypeBase::Reference TypeBase::copyToNewById( short unsigned int id ) const
+{
+	boost::scoped_ptr<TypeBase> to;
+	const Converter &conv = getConverterTo( id );
+
+	if ( conv ) {
+		switch ( conv->generate( *this, to ) ) {
+		case boost::numeric::cPosOverflow:
+			LOG( Runtime, error ) << "Positive overflow when converting " << MSubject( toString( true ) ) << " to " << MSubject( getTypeMap( true, false )[id] ) << ".";
+			break;
+		case boost::numeric::cNegOverflow:
+			LOG( Runtime, error ) << "Negative overflow when converting " << MSubject( toString( true ) ) << " to " << MSubject( getTypeMap( true, false )[id] ) << ".";
+			break;
+		case boost::numeric::cInRange:
+			break;
+		}
+
+		return *to; // return the generated Type-Object - wrapping it into Reference
+	} else {
+		LOG( Runtime, error )
+				<< "I dont know any conversion from "
+				<< MSubject( toString( true ) ) << " to " << MSubject( getTypeMap( true, false )[id] );
+		return Reference(); // return an empty Reference
+	}
+}
+
 }
 }
 }

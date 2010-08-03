@@ -97,7 +97,7 @@ public:
 	/**
 	 * Copy operator
 	 * This operator replaces the current content by a copy of the content of src.
-	 * So its NO cheap copy. (At least not if the copy-operator contained type is not cheap)
+	 * So its NO cheap copy. (At least not if the copy-operator of the contained type is not cheap)
 	 * If the source is empty the target will drop its content. Thus it will become empty as well.
 	 * \returns reference to the (just changed) target
 	 */

@@ -43,13 +43,11 @@ namespace _internal
 template<typename SRC, typename DST> class TypePtrGenerator: public TypePtrConverterBase
 {
 public:
-	void generate( const TypePtrBase& src, boost::scoped_ptr<TypePtrBase>& dst, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max )const {
+	void generate( const TypePtrBase &src, boost::scoped_ptr<TypePtrBase>& dst, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max )const {
 		LOG_IF( dst.get(), Debug, warning ) << "Generating into existing value " << dst->toString( true );
-
 		//Create new "stuff" in memory
-		TypePtr<DST> *newDat=new TypePtr<DST>(( DST * )malloc( sizeof( DST )*src.len() ), src.len());
+		TypePtr<DST> *newDat = new TypePtr<DST>( ( DST * )malloc( sizeof( DST )*src.len() ), src.len() );
 		dst.reset( newDat );
-		
 		convert( src, *dst, min, max );//and convert into that
 	}
 };

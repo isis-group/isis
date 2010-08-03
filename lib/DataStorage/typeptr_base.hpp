@@ -85,7 +85,7 @@ public:
 		return convertTo( dest );
 	}
 
-	Reference copyToNewById( unsigned short id) const;
+	Reference copyToNewById( unsigned short id ) const;
 	Reference copyToNewById( unsigned short id, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max ) const;
 
 	/**
@@ -96,7 +96,7 @@ public:
 	 * \returns a the newly created TypePtr
 	 */
 	template<typename T> TypePtr<T> copyToNew( const util::_internal::TypeBase &min, const util::_internal::TypeBase &max )const {
-		Reference ret=copyToNewById( TypePtr<T>::staticID,min,max);
+		Reference ret = copyToNewById( TypePtr<T>::staticID, min, max );
 		return ret->cast_to_TypePtr<T>();
 	}
 	/**
@@ -107,7 +107,7 @@ public:
 	 * \returns a the newly created TypePtr
 	 */
 	template<typename T> TypePtr<T> copyToNew()const {
-		Reference ret=copyToNewById( TypePtr<T>::staticID);
+		Reference ret = copyToNewById( TypePtr<T>::staticID );
 		return ret->cast_to_TypePtr<T>();
 	}
 	/**

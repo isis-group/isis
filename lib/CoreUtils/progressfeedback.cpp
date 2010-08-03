@@ -20,7 +20,10 @@
 #include "progressfeedback.hpp"
 #include "common.hpp"
 
-namespace isis{ namespace util{
+namespace isis
+{
+namespace util
+{
 
 ProgressFeedback &ProgressFeedback::operator++()
 {
@@ -28,10 +31,10 @@ ProgressFeedback &ProgressFeedback::operator++()
 	return *this;
 }
 
-void ConsoleFeedback::show(size_t max, std::string header)
+void ConsoleFeedback::show( size_t max, std::string header )
 {
-	header+="\n";
-	disp.reset(new boost::progress_display(max,std::cout,header));
+	header += "\n";
+	disp.reset( new boost::progress_display( max, std::cout, header ) );
 }
 void ConsoleFeedback::close()
 {
@@ -39,14 +42,15 @@ void ConsoleFeedback::close()
 }
 size_t ConsoleFeedback::getMax()
 {
-	return disp ? disp->expected_count():0;
+	return disp ? disp->expected_count() : 0;
 }
-size_t ConsoleFeedback::progress(const std::string message, size_t step)
+size_t ConsoleFeedback::progress( const std::string message, size_t step )
 {
-	LOG_IF(!disp,Debug,error) << "Cannot call progress on a not displayed ConsoleFeedBack.";
-	LOG_IF(!message.empty(),Debug,warning) << "ConsoleFeedBack does ignore the message string";
-	disp->operator+=(step);
+	LOG_IF( !disp, Debug, error ) << "Cannot call progress on a not displayed ConsoleFeedBack.";
+	LOG_IF( !message.empty(), Debug, warning ) << "ConsoleFeedBack does ignore the message string";
+	disp->operator+=( step );
 }
 
 
-}}
+}
+}

@@ -381,16 +381,24 @@ void PropMap::linearize( flat_map &out, std::string key_prefix ) const
 
 bool PropMap::transform( std::string from,  std::string to, int dstId, bool delSource )
 {
-	LOG_IF( from == to, Debug, error ) << "Sorry source and destination shall not be the same";
 	const PropertyValue &found = propertyValue( from );
 	bool ret = false;
 
 	if( ! found.empty() ) {
+		util::TypeReference &dst = static_cast<util::TypeReference &>( propertyValue( to ) );
+
 		if ( found->typeID() == dstId ) {
-			propertyValue( to ) = found ;
-			ret = true;
-		} else
-			ret = found.transformTo( propertyValue( to ), dstId );
+			if( from != to ) {
+				dst = found ;
+				ret = true;
+			} else {
+				LOG( Debug, info ) << "Not transforming " << MSubject( found ) << " into same type at same place.";
+			}
+		} else {
+			LOG_IF( from == to, Debug, warning ) << "Transforming " << MSubject( found ) << " in place.";
+			dst = found->copyToNewById( dstId );
+			ret = !dst.empty();
+		}
 	}
 
 	if ( ret && delSource )remove( from );

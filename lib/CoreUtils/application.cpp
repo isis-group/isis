@@ -50,6 +50,7 @@ Application::~Application() {}
 bool Application::init( int argc, char **argv, bool exitOnError )
 {
 	bool err = false;
+
 	if ( parameters.parse( argc, argv ) ) {
 		if ( parameters["help"] ) {
 			printHelp();

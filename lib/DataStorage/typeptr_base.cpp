@@ -41,14 +41,22 @@ TypePtrBase::Reference TypePtrBase::copyToNewById( unsigned short id ) const
 	util::TypeReference min, max;
 	getMinMax( min, max );
 	assert( ! ( min.empty() || max.empty() ) );
-	return copyToNewById(id,*min,*max);
+	return copyToNewById( id, *min, *max );
 }
 TypePtrBase::Reference TypePtrBase::copyToNewById( unsigned short id, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max ) const
 {
 	const Converter &conv = getConverterTo( id );
-	boost::scoped_ptr<TypePtrBase> ret;
-	conv->generate( *this, ret, min, max );
-	return *ret;
+
+	if( conv ) {
+		boost::scoped_ptr<TypePtrBase> ret;
+		conv->generate( *this, ret, min, max );
+		return *ret;
+	} else {
+		LOG( Runtime, error )
+				<< "I dont know any conversion from "
+				<< util::MSubject( toString( true ) ) << " to " << util::MSubject( util::getTypeMap( false, true )[id] );
+		return Reference(); // return an empty Reference
+	}
 }
 
 void TypePtrBase::copyRange( size_t start, size_t end, TypePtrBase &dst, size_t dst_start )const
@@ -71,7 +79,8 @@ void TypePtrBase::copyRange( size_t start, size_t end, TypePtrBase &dst, size_t 
 	memcpy( dest + doffset, src + soffset, blength );
 }
 
-bool TypePtrBase::convertTo( TypePtrBase &dst )const {
+bool TypePtrBase::convertTo( TypePtrBase &dst )const
+{
 	util::TypeReference min, max;
 	getMinMax( min, max );
 	assert( ! ( min.empty() || max.empty() ) );

@@ -432,7 +432,7 @@ private:
 	typename DiscreteGaussianImageFitlerType::Pointer m_FixedGaussianFilter;
 	typename DiscreteGaussianImageFitlerType::Pointer m_MovingGaussianFilter;
 
-	ScaleEstimateFilterType* m_ScaleEstimateFilter;
+	ScaleEstimateFilterType *m_ScaleEstimateFilter;
 	typename ScaleEstimateFilterType::ScaleType m_EstimatedScaling;
 
 };

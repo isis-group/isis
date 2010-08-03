@@ -37,7 +37,7 @@ class TypePtrConverterBase
 {
 public:
 	virtual void convert( const TypePtrBase &src, TypePtrBase &dst, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max )const;
-	virtual void generate( const TypePtrBase& src, boost::scoped_ptr<TypePtrBase>& dst, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max )const = 0;
+	virtual void generate( const TypePtrBase &src, boost::scoped_ptr<TypePtrBase>& dst, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max )const = 0;
 	static boost::shared_ptr<const TypePtrConverterBase> create() {return boost::shared_ptr<const TypePtrConverterBase>();}
 public:
 	virtual ~TypePtrConverterBase() {}

@@ -289,7 +289,7 @@ private:
 	 * @param image The target image. Alle metadata will be copied to the
 	 * corresponding header attributes.
 	 */
-	void copyHeaderToVista( const data::Image& image, const util::PropMap& map, VImage &vimage, const bool functional);
+	void copyHeaderToVista( const data::Image &image, const util::PropMap &map, VImage &vimage, const bool functional );
 
 	/**
 	 * Copies the whole itk image into a given vista image. This function is

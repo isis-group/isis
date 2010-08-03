@@ -59,21 +59,25 @@ Chunk Chunk::cloneToMem( size_t firstDim, size_t secondDim, size_t thirdDim, siz
 	return Chunk( cloned, newSize[0], newSize[1], newSize[2], newSize[3] );
 }
 
-Chunk Chunk::makeOfTypeId(short unsigned int id)
+Chunk Chunk::makeOfTypeId( short unsigned int id )
 {
-	Chunk ret(*this);//cheap copy the chunk
-	if(typeID()!=id){ // if its not the same type - replace the internal TypePtr by a new returned from TypePtrBase::copyToNewById
-		static_cast<TypePtrReference&>(ret)=getTypePtrBase().copyToNewById(id);
+	Chunk ret( *this ); //cheap copy the chunk
+
+	if( typeID() != id ) { // if its not the same type - replace the internal TypePtr by a new returned from TypePtrBase::copyToNewById
+		static_cast<TypePtrReference &>( ret ) = getTypePtrBase().copyToNewById( id );
 	}
+
 	return ret;
 }
 
-Chunk Chunk::makeOfTypeId(short unsigned int id, const isis::util::_internal::TypeBase& min, const isis::util::_internal::TypeBase& max)
+Chunk Chunk::makeOfTypeId( short unsigned int id, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max )
 {
-	Chunk ret(*this);//cheap copy the chunk
-	if(typeID()!=id){// if its not the same type - replace the internal TypePtr by a new returned from TypePtrBase::copyToNewById
-		static_cast<TypePtrReference&>(ret)=getTypePtrBase().copyToNewById(id,min,max);
+	Chunk ret( *this ); //cheap copy the chunk
+
+	if( typeID() != id ) { // if its not the same type - replace the internal TypePtr by a new returned from TypePtrBase::copyToNewById
+		static_cast<TypePtrReference &>( ret ) = getTypePtrBase().copyToNewById( id, min, max );
 	}
+
 	return ret;
 }
 
@@ -108,16 +112,16 @@ void Chunk::copySlice( size_t thirdDimS, size_t fourthDimS, Chunk &dst, size_t t
 
 void Chunk::copyRange( const size_t source_start[], const size_t source_end[], Chunk &dst, const size_t destination[] ) const
 {
-	LOG_IF( ! rangeCheck( source_start ), Debug, isis::error )
+	LOG_IF( ! rangeCheck( source_start ), Debug, error )
 			<< "Copy start " << util::FixedVector<size_t, 4>( source_start )
 			<< " is out of range (" << sizeToString() << ") at the source chunk";
-	LOG_IF( ! rangeCheck( source_end ), Debug, isis::error )
+	LOG_IF( ! rangeCheck( source_end ), Debug, error )
 			<< "Copy end " << util::FixedVector<size_t, 4>( source_end )
 			<< " is out of range (" << sizeToString() << ") at the source chunk";
-	LOG_IF( ! dst.rangeCheck( destination ), Debug, isis::error )
+	LOG_IF( ! dst.rangeCheck( destination ), Debug, error )
 			<< "Index " << util::FixedVector<size_t, 4>( destination )
 			<< " is out of range (" << sizeToString() << ") at the destination chunk";
-	LOG( Debug, isis::verbose_info )
+	LOG( Debug, verbose_info )
 			<< "Copying range from " << util::FixedVector<size_t, 4>( source_start ) << " to " << util::FixedVector<size_t, 4>( source_end )
 			<< " to " << util::FixedVector<size_t, 4>( destination );
 	const size_t sstart = dim2Index( source_start );
@@ -126,22 +130,22 @@ void Chunk::copyRange( const size_t source_start[], const size_t source_end[], C
 	get()->copyRange( sstart, send, *dst, dstart );
 }
 
-size_t Chunk::cmpRange( size_t start, size_t end, const isis::data::Chunk &dst, size_t destination ) const
+size_t Chunk::cmpRange( size_t start, size_t end, const Chunk &dst, size_t destination ) const
 {
 	return get()->cmp( start, end, *dst, destination );
 }
 size_t Chunk::cmpRange( const size_t source_start[], const size_t source_end[], const Chunk &dst, const size_t destination[] ) const
 {
-	LOG_IF( ! rangeCheck( source_start ), Debug, isis::error )
+	LOG_IF( ! rangeCheck( source_start ), Debug, error )
 			<< "memcmp start " << util::FixedVector<size_t, 4>( source_start )
 			<< " is out of range (" << sizeToString() << ") at the first chunk";
-	LOG_IF( ! rangeCheck( source_end ), Debug, isis::error )
+	LOG_IF( ! rangeCheck( source_end ), Debug, error )
 			<< "memcmp end " << util::FixedVector<size_t, 4>( source_end )
 			<< " is out of range (" << sizeToString() << ") at the first chunk";
-	LOG_IF( ! dst.rangeCheck( destination ), Debug, isis::error )
+	LOG_IF( ! dst.rangeCheck( destination ), Debug, error )
 			<< "Index " << util::FixedVector<size_t, 4>( destination )
 			<< " is out of range (" << sizeToString() << ") at the second chunk";
-	LOG( Debug, isis::verbose_info )
+	LOG( Debug, verbose_info )
 			<< "Comparing range from " << util::FixedVector<size_t, 4>( source_start ) << " to " << util::FixedVector<size_t, 4>( source_end )
 			<< " and " << util::FixedVector<size_t, 4>( destination );
 	const size_t sstart = dim2Index( source_start );
@@ -167,7 +171,7 @@ void Chunk::getMinMax ( util::TypeReference &min, util::TypeReference &max ) con
 {
 	return operator*().getMinMax( min, max );
 }
-Chunk &Chunk::operator=( const isis::data::Chunk &ref )
+Chunk &Chunk::operator=( const Chunk &ref )
 {
 	_internal::ChunkBase::operator=( static_cast<const _internal::ChunkBase &>( ref ) ); //copy the metadate of ref
 	TypePtrReference::operator=( static_cast<const TypePtrReference &>( ref ) ); // copy the reference of ref's data
@@ -328,7 +332,7 @@ bool Chunk::swapAlong(  Chunk &dst, const size_t dim, bool convertTransform ) co
 	size_t dims[] = { dimSize( 0 ), dimSize( 1 ), dimSize( 2 ), dimSize( 3 ) };
 
 	if ( get()->swapAlong( *dst, dim, dims ) ) {
-		const isis::util::PropMap &tmpMap( *this );
+		const util::PropMap &tmpMap( *this );
 		static_cast<PropMap &>( dst ) = tmpMap;
 
 		if ( convertTransform ) {

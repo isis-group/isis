@@ -122,7 +122,7 @@ public:
 	 * length will be 0 and every attempt to dereference it will raise an exception.
 	 */
 	TypePtr() {
-		LOG(Debug,warning) << "Creating an empty TypePtr of type " << util::MSubject( staticName() ) << " you should overwrite it with a usefull pointer before using it";
+		LOG( Debug, warning ) << "Creating an empty TypePtr of type " << util::MSubject( staticName() ) << " you should overwrite it with a usefull pointer before using it";
 	}
 	/**
 	 * Creates TypePtr from a pointer of type TYPE.

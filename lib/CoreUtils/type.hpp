@@ -133,26 +133,16 @@ public:
 		BOOST_MPL_ASSERT_RELATION( staticID, < , 0xFF );
 		check_type<TYPE>();
 	}
-	virtual std::string toString( bool labeled = false )const {
-		const Converter &conv = getConverterTo( Type<std::string>::staticID );
+	std::string toString( bool labeled = false )const {
 		std::string ret;
-		bool fallback = false;
+		Reference ref = copyToNewById( Type<std::string>::staticID );
 
-		if ( conv ) {
-			Type<std::string> buff;
-
-			if ( conv->convert( *this, buff ) != boost::numeric::cInRange ) {
-				LOG( Debug, error ) << "Automatic conversion from " << typeName() << " to string failed. Falling back to boost::lexical_cast<std::string>";
-				fallback = true;
-			} else
-				ret = buff;
-		} else {
-			LOG( Debug, error ) << "Missing conversion from " << typeName() << " to string. Falling back to boost::lexical_cast<std::string>";
-			fallback = true;
-		}
-
-		if ( fallback )
+		if ( ref.empty() ) {
+			LOG( Debug, error ) << "Automatic conversion of " << *this << " to string failed. Falling back to boost::lexical_cast<std::string>";
 			ret = boost::lexical_cast<std::string>( m_val );
+		} else {
+			ret = ref->cast_to<std::string>();
+		}
 
 		if ( labeled )ret += "(" + staticName() + ")";
 
@@ -203,21 +193,25 @@ public:
 	virtual ~Type() {}
 };
 
-template<typename T> const Type<T>& _internal::TypeBase::cast_to_Type() const {
+template<typename T> const Type<T>& _internal::TypeBase::cast_to_Type() const
+{
 	check_type<T>();
 	return m_cast_to<Type<T> >();
 }
-template<typename T> const T& _internal::TypeBase::cast_to() const {
-	const Type<T> &ret=cast_to_Type<T>();
-	return ret.operator const T&();
+template<typename T> const T &_internal::TypeBase::cast_to() const
+{
+	const Type<T> &ret = cast_to_Type<T>();
+	return ret.operator const T & ();
 }
-template<typename T> Type<T>& _internal::TypeBase::cast_to_Type() {
+template<typename T> Type<T>& _internal::TypeBase::cast_to_Type()
+{
 	check_type<T>();
 	return m_cast_to<Type<T> >();
 }
-template<typename T> T& _internal::TypeBase::cast_to() {
-	Type<T> &ret=cast_to_Type<T>();
-	return ret.operator T&();
+template<typename T> T &_internal::TypeBase::cast_to()
+{
+	Type<T> &ret = cast_to_Type<T>();
+	return ret.operator T & ();
 }
 
 template<typename T> bool _internal::TypeBase::is()const

@@ -729,7 +729,6 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetInitialTransfo
 		//              m_ScaleSkewTransform->SetMatrix((static_cast<VersorRigid3DTransformType*> (initialTransform)->GetMatrix()));
 		m_RegistrationObject->SetInitialTransformParameters( m_ScaleSkewTransform->GetParameters() );
 	}
-
 }
 /*
  this method checks the images sizes of the fixed and the moving image.

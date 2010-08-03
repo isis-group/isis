@@ -256,7 +256,7 @@ public:
 		case data::TypePtr<u_int16_t>::staticID:
 
 			if ( 0 == strcasecmp( dialect.c_str(), "fsl" ) ) {
-//				image.print( std::cout );
+				//              image.print( std::cout );
 				data::TypedImage<int16_t> fslCopy( image );
 				ni.datatype = DT_INT16;
 				copyDataToNifti<int16_t>( fslCopy, ni );
@@ -547,7 +547,6 @@ private:
 			ni.qto_xyz.m[y][2] = sliceVec[y];
 			ni.qto_xyz.m[y][3] = indexOrigin[y];
 		}
-
 
 		memcpy( ni.sto_xyz.m, ni.qto_xyz.m, sizeof( ni.sto_xyz.m ) );
 

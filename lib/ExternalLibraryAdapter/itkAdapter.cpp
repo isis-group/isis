@@ -32,7 +32,7 @@ itkAdapter::makeItkImageObject( const boost::shared_ptr<data::Image> src, const 
 {
 	typedef TImage OutputImageType;
 	m_ImageISIS = *src;
-	m_TypeID = m_ImageISIS.getChunkAt(0).typeID();
+	m_TypeID = m_ImageISIS.getChunkAt( 0 ).typeID();
 
 	switch ( m_TypeID ) {
 	case data::TypePtr<int8_t>::staticID:
@@ -138,21 +138,24 @@ typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkRea
 	T( 2, 2 ) = 1;
 	// apply transformation to local isis image copy
 	m_ImageISIS.transformCoords( T );
-
 	//getting the required metadata from the isis image
 	const util::fvector4 dimensions( m_ImageISIS.sizeToVector() );
 	const util::fvector4 indexOrigin( m_ImageISIS.getProperty<util::fvector4>( "indexOrigin" ) );
 	util::fvector4 spacing( m_ImageISIS.getProperty<util::fvector4>( "voxelSize" ) );
-	if(spacing[3] == 0) { spacing[3] = 1; }
+
+	if( spacing[3] == 0 ) { spacing[3] = 1; }
+
 	const util::fvector4 readVec = m_ImageISIS.getProperty<util::fvector4>( "readVec" );
+
 	const util::fvector4 phaseVec = m_ImageISIS.getProperty<util::fvector4>( "phaseVec" );
+
 	const util::fvector4 sliceVec = m_ImageISIS.getProperty<util::fvector4>( "sliceVec" );
+
 	//  std::cout << "indexOrigin: " << indexOrigin << std::endl;
 	//  std::cout << "readVec: " << readVec << std::endl;
 	//  std::cout << "phaseVec: " << phaseVec << std::endl;
 	//  std::cout << "sliceVec: " << sliceVec << std::endl;
 	//  std::cout << "spacing: " << spacing << std::endl;
-
 	for ( unsigned short i = 0; i < 3; i++ ) {
 		itkOrigin[i] = indexOrigin[i];
 		itkSize[i] = dimensions[i];
@@ -193,18 +196,15 @@ typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkRea
 	importer->SetSpacing( itkSpacing );
 	importer->SetOrigin( itkOrigin );
 	importer->SetDirection( itkDirection );
-
 	//temporary reorganisation of memory according to the chunk organisiation
-	void* targePtr = malloc(m_ImageISIS.bytes_per_voxel() * m_ImageISIS.volume());
-	typename InputImageType::PixelType* refTarget = ( typename InputImageType::PixelType* ) targePtr;
+	void *targePtr = malloc( m_ImageISIS.bytes_per_voxel() * m_ImageISIS.volume() );
+	typename InputImageType::PixelType *refTarget = ( typename InputImageType::PixelType * ) targePtr;
 	std::vector< boost::shared_ptr< data::Chunk> > chList = m_ImageISIS.getChunkList();
 	size_t chunkIndex = 0;
-
-	BOOST_FOREACH( boost::shared_ptr< data::Chunk> & ref, chList)
-	{
-		data::Chunk &chRef=*ref;
-		typename InputImageType::PixelType* target = refTarget + chunkIndex++ * chRef.volume();
-		chRef.getTypePtr<typename InputImageType::PixelType>().copyToMem(0, (chRef.volume() - 1), target );
+	BOOST_FOREACH( boost::shared_ptr< data::Chunk> & ref, chList ) {
+		data::Chunk &chRef = *ref;
+		typename InputImageType::PixelType *target = refTarget + chunkIndex++ * chRef.volume();
+		chRef.getTypePtr<typename InputImageType::PixelType>().copyToMem( 0, ( chRef.volume() - 1 ), target );
 	}
 	importer->SetImportPointer( refTarget, itkSize[0], false );
 	rescaler->SetInput( importer->GetOutput() );

@@ -56,6 +56,7 @@ bool isis::util::ParameterMap::parse( int argc, char **argv )
 {
 	parsed = true;
 	std::string pName;
+
 	for ( int i = 1; i < argc; ) { // scan through the command line, to find next parameter
 		if ( argv[i][0] == '-' ) { //seems like we found a new parameter here
 			pName = argv[i];
@@ -65,11 +66,13 @@ bool isis::util::ParameterMap::parse( int argc, char **argv )
 
 		if( !pName.empty() ) { // if we got a parameter before
 			const int begin = i;
+
 			while( i < argc && argv[i][0] != '-' ) { //collect its properties, while there are some ..
 				i++;
 			}
 
 			iterator found = find( pName );
+
 			if( found == end() ) {
 				LOG( Runtime, warning ) << "Ignoring unknown parameter " << MSubject( std::string( "-" ) + pName + " " + list2string( argv + begin, argv + i, " ", "", "" ) );
 			} else if ( found->second.parse( list2string( argv + begin, argv + i, ",", "", "" ) ) ) { // parse the collected properties
@@ -83,6 +86,7 @@ bool isis::util::ParameterMap::parse( int argc, char **argv )
 			}
 		}
 	}
+
 	return parsed ;
 }
 bool isis::util::ParameterMap::isComplete()const
@@ -117,7 +121,7 @@ isis::util::ProgParameter::operator const int() const
 	else if ( get()->is<Selection>() ) //use the implicit cast of selection to int
 		return ( get()->cast_to<Selection>() );
 	else {
-		assert(get()->is<int32_t>());
+		assert( get()->is<int32_t>() );
 		return get()->cast_to<int32_t>();//@todo what if int is _NOT_ int32_t
 	}
 }

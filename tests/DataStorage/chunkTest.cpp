@@ -248,90 +248,108 @@ BOOST_AUTO_TEST_CASE ( chunk_copyLine_Test )
 	size_t cols = 17;
 	size_t slices = 14;
 	size_t steps = 10;
+	data::MemChunk<float> ch( cols, rows, slices, steps );
 
-	data::MemChunk<float> ch(cols, rows, slices, steps);
 	for ( size_t ix = 0; ix < rows; ix++ ) {
 		for ( size_t iy = 0; iy < cols; iy++ ) {
 			for ( size_t is = 0; is < slices; is++ ) {
 				for ( size_t it = 0; it < steps; it++ ) {
-					ch.voxel<float>( iy, ix, is, it ) = ix+iy+is+it;
-				}}}}
+					ch.voxel<float>( iy, ix, is, it ) = ix + iy + is + it;
+				}
+			}
+		}
+	}
 
-	data::MemChunk<float> chRow(1, cols);
-	data::MemChunk<float> chRowT(cols, 1);
+	data::MemChunk<float> chRow( 1, cols );
+	data::MemChunk<float> chRowT( cols, 1 );
 	size_t rowGet = 9;
 	size_t slGet = 7;
 	size_t stepGet = 1;
-	ch.copyLine(rowGet, slGet, stepGet, chRow, 0, 0, 0);
-	ch.copyLine(rowGet, slGet, stepGet, chRowT, 0, 0, 0);
-	for(size_t c = 0; c < cols; c++ ){
-		BOOST_CHECK_EQUAL(chRow.voxel<float>(0, c, 0, 0), rowGet+slGet+stepGet+c);
-		BOOST_CHECK_EQUAL(chRowT.voxel<float>(c, 0, 0, 0), rowGet+slGet+stepGet+c);
+	ch.copyLine( rowGet, slGet, stepGet, chRow, 0, 0, 0 );
+	ch.copyLine( rowGet, slGet, stepGet, chRowT, 0, 0, 0 );
+
+	for( size_t c = 0; c < cols; c++ ) {
+		BOOST_CHECK_EQUAL( chRow.voxel<float>( 0, c, 0, 0 ), rowGet + slGet + stepGet + c );
+		BOOST_CHECK_EQUAL( chRowT.voxel<float>( c, 0, 0, 0 ), rowGet + slGet + stepGet + c );
 	}
 
 	rows = 13;
 	cols = 17;
 	slices = 4;
 	steps = 1;
-	data::MemChunk<float> ch2( cols, rows, slices, steps);
+	data::MemChunk<float> ch2( cols, rows, slices, steps );
+
 	for ( size_t ix = 0; ix < rows; ix++ ) {
 		for ( size_t iy = 0; iy < cols; iy++ ) {
 			for ( size_t is = 0; is < slices; is++ ) {
 				for ( size_t it = 0; it < steps; it++ ) {
-					ch2.voxel<float>( iy, ix, is, it ) = ix+iy+is+it;
-				}}}}
+					ch2.voxel<float>( iy, ix, is, it ) = ix + iy + is + it;
+				}
+			}
+		}
+	}
 
-	data::MemChunk<float> chRow2(1, cols);
+	data::MemChunk<float> chRow2( 1, cols );
 	rowGet = 9;
 	slGet = 2;
 	stepGet = 0;
-	ch2.copyLine(rowGet, slGet, stepGet, chRow2, 0, 0, 0);
-	for(size_t c = 0; c < cols; c++ ){
-		BOOST_CHECK_EQUAL(chRow2.voxel<float>(0, c, 0, 0), rowGet+slGet+stepGet+c);
+	ch2.copyLine( rowGet, slGet, stepGet, chRow2, 0, 0, 0 );
+
+	for( size_t c = 0; c < cols; c++ ) {
+		BOOST_CHECK_EQUAL( chRow2.voxel<float>( 0, c, 0, 0 ), rowGet + slGet + stepGet + c );
 	}
 
 	rows = 1;
 	cols = 12;
 	slices = 4;
 	steps = 1;
-	data::MemChunk<float> ch3( cols, rows, slices, steps);
+	data::MemChunk<float> ch3( cols, rows, slices, steps );
+
 	for ( size_t ix = 0; ix < rows; ix++ ) {
 		for ( size_t iy = 0; iy < cols; iy++ ) {
 			for ( size_t is = 0; is < slices; is++ ) {
 				for ( size_t it = 0; it < steps; it++ ) {
-					ch3.voxel<float>( iy, ix, is, it ) = ix+iy+is+it;
-				}}}}
+					ch3.voxel<float>( iy, ix, is, it ) = ix + iy + is + it;
+				}
+			}
+		}
+	}
 
-	data::MemChunk<float> chRow3(1, cols);
+	data::MemChunk<float> chRow3( 1, cols );
 	rowGet = 0;
 	slGet = 2;
 	stepGet = 0;
-	ch3.copyLine(rowGet, slGet, stepGet, chRow3, 0, 0, 0);
-	for(size_t c = 0; c < cols; c++ ){
-		BOOST_CHECK_EQUAL(chRow3.voxel<float>(0, c, 0, 0), rowGet+slGet+stepGet+c);
+	ch3.copyLine( rowGet, slGet, stepGet, chRow3, 0, 0, 0 );
+
+	for( size_t c = 0; c < cols; c++ ) {
+		BOOST_CHECK_EQUAL( chRow3.voxel<float>( 0, c, 0, 0 ), rowGet + slGet + stepGet + c );
 	}
 
 	rows = 18;
 	cols = 1;
 	slices = 7;
 	steps = 11;
-	data::MemChunk<float> ch4( cols, rows, slices, steps);
+	data::MemChunk<float> ch4( cols, rows, slices, steps );
+
 	for ( size_t ix = 0; ix < rows; ix++ ) {
 		for ( size_t iy = 0; iy < cols; iy++ ) {
 			for ( size_t is = 0; is < slices; is++ ) {
 				for ( size_t it = 0; it < steps; it++ ) {
-					ch4.voxel<float>( iy, ix, is, it ) = ix+iy+is+it;
-				}}}}
+					ch4.voxel<float>( iy, ix, is, it ) = ix + iy + is + it;
+				}
+			}
+		}
+	}
 
-	data::MemChunk<float> chRow4(1, cols);
+	data::MemChunk<float> chRow4( 1, cols );
 	rowGet = 0;
 	slGet = 2;
 	stepGet = 0;
-	ch4.copyLine(rowGet, slGet, stepGet, chRow4, 0, 0, 0);
-	for(size_t c = 0; c < cols; c++ ){
-		BOOST_CHECK_EQUAL(chRow4.voxel<float>(0, c, 0, 0), rowGet+slGet+stepGet+c);
-	}
+	ch4.copyLine( rowGet, slGet, stepGet, chRow4, 0, 0, 0 );
 
+	for( size_t c = 0; c < cols; c++ ) {
+		BOOST_CHECK_EQUAL( chRow4.voxel<float>( 0, c, 0, 0 ), rowGet + slGet + stepGet + c );
+	}
 }
 
 

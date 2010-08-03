@@ -38,7 +38,7 @@ class TypeConverterBase
 {
 public:
 	virtual boost::numeric::range_check_result convert( const TypeBase &src, TypeBase &dst )const = 0;
-	virtual boost::numeric::range_check_result generate( const boost::scoped_ptr<TypeBase>& src, boost::scoped_ptr<TypeBase>& dst )const = 0;
+	virtual boost::numeric::range_check_result generate( const TypeBase &src, boost::scoped_ptr<TypeBase>& dst )const = 0;
 	static boost::shared_ptr<const TypeConverterBase> create() {return boost::shared_ptr<const TypeConverterBase>();}
 public:
 	virtual ~TypeConverterBase() {}
