@@ -229,6 +229,15 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 		} else {
 			LOG( Runtime, error ) << "Could not extract read- and phaseVector from " << object.propertyValue( prefix + "ImageOrientationPatient" );
 		}
+
+		if( object.hasProperty( prefix + "CSAImageHeaderInfo/SliceNormalVector" ) && !object.hasProperty( "sliceVec" ) ) {
+			LOG( Debug, info ) << "Extracting sliceVec from CSAImageHeaderInfo/SliceNormalVector " << object.propertyValue( prefix + "CSAImageHeaderInfo/SliceNormalVector" );
+			util::dlist list = object.getProperty<util::dlist >( prefix + "CSAImageHeaderInfo/SliceNormalVector" );
+			util::fvector4 vec;
+			vec.copyFrom( list.begin(), list.end() );
+			object.setProperty( "sliceVec", vec );
+			object.remove( prefix + "CSAImageHeaderInfo/SliceNormalVector" );
+		}
 	} else {
 		LOG( Runtime, warning ) << "Making up read and phase vector, because the image lacks this information";
 		object.setProperty( "readVec" , util::fvector4( 1, 0, 0 ) );

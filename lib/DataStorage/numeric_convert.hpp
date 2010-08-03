@@ -58,18 +58,14 @@ enum autoscaleOption {noscale, autoscale, noupscale, upscale};
  */
 template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &src, TypePtr<DST> &dst, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale )
 {
-	if ( src.len() > dst.len() ) {
-		LOG( Runtime, error ) << "The " << src.len() << " elements of src wont fit into the destination with the size " << dst.len();
-		return;
-	}
-
+	LOG_IF( src.len() > dst.len(), Runtime, error ) << "The " << src.len() << " elements of src wont fit into the destination. Will only convert " << dst.len() << " elements.";
 	LOG_IF( src.len() < dst.len(), Runtime, warning ) << "Source is shorter than destination. Will only convert " << src.len() << " values";
 
 	if ( src.len() == 0 )return;
 
 	double scale = 1.0;
 	double offset = 0.0;
-	size_t srcsize = src.len();
+	size_t size = std::min( src.len(), dst.len() );
 	bool doScale = ( scaleopt != noscale && std::numeric_limits<DST>::is_integer ); //only do scale if scaleopt!=noscale and the target is an integer (scaling into float is useless)
 
 	if ( scaleopt == autoscale && std::numeric_limits<SRC>::is_integer ) {
@@ -131,9 +127,9 @@ template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &s
 	}
 
 	if ( doScale )
-		_internal::numeric_convert_impl( &src[0], &dst[0], srcsize, scale, offset );
+		_internal::numeric_convert_impl( &src[0], &dst[0], size, scale, offset );
 	else
-		_internal::numeric_convert_impl( &src[0], &dst[0], srcsize );
+		_internal::numeric_convert_impl( &src[0], &dst[0], size );
 }
 
 }

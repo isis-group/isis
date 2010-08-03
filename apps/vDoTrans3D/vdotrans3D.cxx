@@ -85,13 +85,14 @@ static VOptionDescRec options[] = {
 	   }, {"reso", VFloatRepn, 0, ( VPointer ) &resolution,
 		   VOptionalOpt, 0, "The output resolution. One value for isotrop output"
 		  },
-		  	  {"fmri", VBooleanRepn, 1, &fmri,
-			  VOptionalOpt, 0, "Input and output image file are functional data"
-			 }, {"trans", VStringRepn, 1,
-				 &vtrans_filename, VOptionalOpt, 0, "Vector deformation field"
-				}, {"use_inverse", VBooleanRepn, 1, &use_inverse,
-					VOptionalOpt, 0, "Using the inverse of the transform"
-				   }, {"j" , VShortRepn, 1, &number_threads, VOptionalOpt, 0 , "Number of threads"}
+	{
+		"fmri", VBooleanRepn, 1, &fmri,
+		VOptionalOpt, 0, "Input and output image file are functional data"
+	}, {"trans", VStringRepn, 1,
+		&vtrans_filename, VOptionalOpt, 0, "Vector deformation field"
+	   }, {"use_inverse", VBooleanRepn, 1, &use_inverse,
+		   VOptionalOpt, 0, "Using the inverse of the transform"
+		  }, {"j" , VShortRepn, 1, &number_threads, VOptionalOpt, 0 , "Number of threads"}
 
 };
 
@@ -202,7 +203,6 @@ int main(
 		LOG_IF( inList.empty(), isis::DataLog, isis::error ) << "Input image is empty!";
 		fmriImage = movingAdapter->makeItkImageObject<FMRIInputType>( inList.front() );
 	}
-
 
 	//if template file is specified by the user
 	if ( template_filename ) {
@@ -399,7 +399,9 @@ int main(
 				}
 			}
 		}
-		if(fmriOutputSpacing[3] == 0) { fmriOutputSpacing[3] = 1; }
+
+		if( fmriOutputSpacing[3] == 0 ) { fmriOutputSpacing[3] = 1; }
+
 		if ( trans_filename.number ) {
 			resampler->SetOutputDirection( fmriOutputDirection );
 			resampler->SetOutputSpacing( fmriOutputSpacing );

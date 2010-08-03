@@ -89,8 +89,6 @@ bool TypePtrBase::convertTo( TypePtrBase &dst )const
 bool TypePtrBase::convertTo( TypePtrBase &dst, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max ) const
 {
 	const Converter &conv = getConverterTo( dst.typeID() );
-	LOG_IF( len() < dst.len(), Runtime, error ) << "The target is longer than the the source (" << dst.len() << ">" << len() << ")";
-	LOG_IF( len() > dst.len(), Debug, info ) << "The target is shorter than the the source (" << dst.len() << ">" << len() << "). Will only copy " << len() << " elements";
 
 	if ( conv ) {
 		conv->convert( *this, dst, min, max );

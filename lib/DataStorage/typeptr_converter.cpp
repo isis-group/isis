@@ -83,7 +83,9 @@ public:
 	void convert( const TypePtrBase &src, TypePtrBase &dst, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max )const {
 		TypePtr<SRC> &dstVal = dst.cast_to_TypePtr<SRC>();
 		const SRC *srcPtr = &src.cast_to_TypePtr<SRC>()[0];
-		dstVal.copyFromMem( srcPtr, src.len() );
+		LOG_IF( src.len() < dst.len(), Debug, info ) << "The target is longer than the the source (" << dst.len() << ">" << src.len() << "). Will only copy/convert " << src.len() << " elements";
+		LOG_IF( src.len() > dst.len(), Debug, error ) << "The target is shorter than the the source (" << dst.len() << "<" << src.len() << "). Will only copy/convert " << dst.len() << " elements";
+		dstVal.copyFromMem( srcPtr, std::min( src.len(), dstVal.len() ) );
 	}
 	virtual ~TypePtrConverter() {}
 };

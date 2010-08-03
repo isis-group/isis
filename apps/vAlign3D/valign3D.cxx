@@ -225,7 +225,7 @@ int main(
 	typedef itk::MedianImageFilter<FixedImageType, FixedImageType> FixedFilterType;
 	typedef itk::MedianImageFilter<MovingImageType, MovingImageType> MovingFilterType;
 	typedef itk::RecursiveGaussianImageFilter<FixedImageType, FixedImageType> GaussianFilterType;
-//	typedef isis::extitk::TimeStepExtractionFilter<>
+	//  typedef isis::extitk::TimeStepExtractionFilter<>
 	MaskImageReaderType::Pointer maskReader = MaskImageReaderType::New();
 	itk::AffineTransform<double, Dimension>::Pointer tmpTransform = itk::AffineTransform<double, Dimension>::New();
 	itk::TransformFileWriter::Pointer transformWriter = itk::TransformFileWriter::New();
@@ -245,18 +245,15 @@ int main(
 	LOG_IF( refList.empty(), isis::data::Runtime, isis::error ) << "Reference image is empty!";
 	LOG_IF( inList.empty(), isis::data::Runtime, isis::error ) << "Input image is empty!";
 
-
 	// TODO DEBUG
 	// use makeItkImageObject with "false" -> no ITK nifti default transformation
 	if ( !smooth ) {
 		fixedImage = fixedAdapter->makeItkImageObject<FixedImageType>( refList.front() );
 		movingImage = movingAdapter->makeItkImageObject<MovingImageType>( inList.front() );
-
-//		writer->SetFileName("test.nii");
-
-//		writer->SetInput(movingImage);
-//		writer->Update();
-//		// TODO DEBUG
+		//      writer->SetFileName("test.nii");
+		//      writer->SetInput(movingImage);
+		//      writer->Update();
+		//      // TODO DEBUG
 		//      std::cout << "********** Fixed Image **********" << std::endl;
 		//      std::cout << fixedImage->GetDirection();
 		//      std::cout << "index origin: ";
@@ -431,7 +428,7 @@ int main(
 					  << std::endl;
 		}
 
-		if ( (transform != 0 and transform != 4) and optimizer == 0 ) {
+		if ( ( transform != 0 and transform != 4 ) and optimizer == 0 ) {
 			std::cerr << "\nInappropriate combination of transform and optimizer! Setting optimizer to RegularStepGradientDescentOptimizer.\n"
 					  << std::endl;
 			optimizer = 1;
