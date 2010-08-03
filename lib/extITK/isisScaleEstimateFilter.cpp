@@ -127,7 +127,7 @@ ScaleEstimateFilter<InputImageType1, InputImageType2>::EstimateScaling( scaling 
 			{
 				indexIter1[direction]--;
 			}
-			if(indexIter1[direction] == m_Size1[direction])
+			if(static_cast<unsigned int>(indexIter1[direction]) == m_Size1[direction])
 			{
 				m_Suspicious1[direction] = true;
 //				std::cout << "image 1, direction " << direction << " is suspicious[positive]";
@@ -156,7 +156,7 @@ ScaleEstimateFilter<InputImageType1, InputImageType2>::EstimateScaling( scaling 
 			{
 				indexIter2[direction]--;
 			}
-			if(indexIter2[direction] == m_Size2[direction])
+			if(static_cast<unsigned int>(indexIter2[direction]) == m_Size2[direction])
 			{
 				m_Suspicious2[direction] = true;
 //				std::cout << "image 2, direction " << direction << " is suspicious[positive]";

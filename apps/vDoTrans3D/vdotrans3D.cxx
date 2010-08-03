@@ -67,7 +67,6 @@ static VArgVector resolution;
 static VBoolean fmri;
 static VBoolean use_inverse = false;
 static VShort number_threads = 1;
-static VBoolean keep_res = false;
 
 static VOptionDescRec options[] = {
 	//requiered inputs
@@ -85,8 +84,7 @@ static VOptionDescRec options[] = {
 		&template_filename, VOptionalOpt, 0, "The template image"
 	   }, {"reso", VFloatRepn, 0, ( VPointer ) &resolution,
 		   VOptionalOpt, 0, "The output resolution. One value for isotrop output"
-		  }, { "keep_reso", VBooleanRepn, 1, &keep_res, VOptionalOpt, 0, "Keep the resolution of the moving image"
-			},
+		  },
 		  	  {"fmri", VBooleanRepn, 1, &fmri,
 			  VOptionalOpt, 0, "Input and output image file are functional data"
 			 }, {"trans", VStringRepn, 1,
@@ -388,14 +386,7 @@ int main(
 				}
 
 				if ( template_filename ) {
-					if( keep_res )
-					{
-						fmriOutputSpacing[i] = fmriImage->GetSpacing()[i];
-					}
-					if ( !keep_res )
-					{
-						fmriOutputSpacing[i] = templateImage->GetSpacing()[i];
-					}
+					fmriOutputSpacing[i] = templateImage->GetSpacing()[i];
 					fmriOutputSize[i] = templateImage->GetLargestPossibleRegion().GetSize()[i];
 				}
 			}

@@ -61,9 +61,11 @@ throw( std::runtime_error & )
 		// get the first chunk
 		// see if ALL the data is included in the first chunk.
 		// Otherwise, iterate over chunks and include the data.
-		if( dims[3] > 1 ) {
+
+		if( static_cast<u_int32_t>(dims[3]) == image.getChunkList().size()) {
 			// reorganize data: (x,y,z,t) -> z images with (x,y,t)
 			// in other words: there are z VImages necessary.
+			data::TypedImage<VShort> shortImage( image );
 			for( int z = 0; z < dims[2]; z++ ) {
 				vimages[z] = VCreateImage( dims[3], dims[1], dims[0],
 										   VShortRepn );
@@ -73,13 +75,13 @@ throw( std::runtime_error & )
 					for( int y = 0; y < dims[1]; y++ ) {
 						for( int t = 0; t < dims[3]; t++ ) {
 							VPixel( vimages[z], t, y, x, VShort )
-							= image.voxel<VShort>( x, y, z, t );
+							= shortImage.voxel<VShort>( x, y, z, t );
 						}
 					}
 				}
 
 				// copy header information
-				copyHeaderToVista( image, vimages[z] );
+				copyHeaderToVista( image, static_cast<util::PropMap>(image), vimages[z], true );
 				VAppendAttr( attrList, "image", NULL, VImageRepn, vimages[z] );
 			}
 		}
@@ -90,7 +92,7 @@ throw( std::runtime_error & )
 				vimages[z] = VCreateImage( dims[3], dims[1], dims[0],
 										   VShortRepn );
 				// copy header information
-				copyHeaderToVista( image, vimages[z] );
+				copyHeaderToVista( image, static_cast<util::PropMap>(image.getChunkAt(z)), vimages[z], true );
 				VAppendAttr( attrList, "image", NULL, VImageRepn, vimages[z] );
 			}
 
@@ -170,7 +172,7 @@ throw( std::runtime_error & )
 		}
 
 		// copy header information
-		copyHeaderToVista( image, vimages[0] );
+		copyHeaderToVista( image, static_cast<util::PropMap>(image), vimages[0], false );
 		VAppendAttr( attrList, "image", NULL, VImageRepn, vimages[0] );
 	}
 
@@ -465,7 +467,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 	return nloaded;
 }
 
-void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vimage )
+void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, const util::PropMap& map, VImage &vimage, const bool functional )
 {
 	// get attribute list from image
 	VAttrList list = VImageAttrList( vimage );
@@ -474,7 +476,7 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 	// get voxel
 	util::fvector4 voxels = image.getProperty<util::fvector4>( "voxelSize" );
 	std::stringstream vstr;
-	vstr << voxels[0] << " " << voxels[1] << " " << voxels[2] << " " << voxels[3];
+	vstr << voxels[0] << " " << voxels[1] << " " << voxels[2];
 	VAppendAttr( list, "voxel", NULL, VStringRepn, vstr.str().c_str() );
 	// copy orientation vectors
 	util::fvector4 readVec = image.getProperty<util::fvector4>( "readVec" );
@@ -521,6 +523,14 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 	if( image.hasProperty( "repetitionTime" ) ) {
 		VAppendAttr( list, "repetition_time", NULL, VShortRepn,
 					 image.getProperty<VShort>( "repetitionTime" ) );
+	}
+	if( map.hasProperty( "acquisitionTime" ) ) {
+			VAppendAttr( list, "slice_time", NULL, VShortRepn,
+						 image.getProperty<VShort>( "acquisitionTime" ) );
+	}
+	if ( !map.hasProperty( "acquisitionTime" )  && functional )
+	{
+		//TODO interpolating slicetime??
 	}
 
 	// ********** Vista group **********

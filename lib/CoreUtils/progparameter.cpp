@@ -116,6 +116,8 @@ isis::util::ProgParameter::operator const int() const
 		return ( get()->cast_to<bool>() );
 	else if ( get()->is<Selection>() ) //use the implicit cast of selection to int
 		return ( get()->cast_to<Selection>() );
-	else
+	else {
+		assert(get()->is<int32_t>());
 		return get()->cast_to<int32_t>();//@todo what if int is _NOT_ int32_t
+	}
 }

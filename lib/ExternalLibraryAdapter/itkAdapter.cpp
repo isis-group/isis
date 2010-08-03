@@ -102,7 +102,8 @@ itkAdapter::makeIsisImageObject( const typename TImage::Pointer src, const bool 
 	}
 }
 
-template<typename TInput, typename TOutput> typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkReader )
+template<typename TInput, typename TOutput>
+typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkReader )
 {
 	typedef itk::Image<TInput, TOutput::ImageDimension> InputImageType;
 	typedef TOutput OutputImageType;
