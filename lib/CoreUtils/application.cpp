@@ -50,7 +50,7 @@ Application::~Application() {}
 bool Application::init( int argc, char **argv, bool exitOnError )
 {
 	bool err = false;
-
+	m_filename=argv[0];
 	if ( parameters.parse( argc, argv ) ) {
 		if ( parameters["help"] ) {
 			printHelp();
@@ -65,8 +65,9 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 		std::cout << "Missing parameters: ";
 
 		for ( ParameterMap::iterator iP = parameters.begin(); iP != parameters.end(); iP++ ) {
-			if ( iP->second.needed() ) {std::cout << iP->first << "  ";}
+			if ( iP->second.needed() ) {std::cerr << "-" << iP->first << "  ";}
 		}
+		std::cerr << std::endl;
 
 		err = true;
 	}
@@ -88,15 +89,15 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 }
 void Application::printHelp()const
 {
-	std::cout << std::endl;
-	std::cout << "Usage: " << this->m_name << " <options>, where <options> includes:" << std::endl;
+	std::cout << this->m_name << " (using isis core " << getCoreVersion() << ")" << std::endl;
+	std::cout << "Usage: " << this->m_filename << " <options>, where <options> includes:" << std::endl;
 
 	for ( ParameterMap::const_iterator iP = parameters.begin(); iP != parameters.end(); iP++ ) {
 		std::string pref;
 
 		if ( iP->second.needed() ) {pref = ". Required.";}
 
-		if ( ! iP->second.needed() && ! iP->second->is<dlist>() ) {pref = ". Default: " + iP->second.toString();};
+		if ( ! iP->second.needed() && ! iP->second->is<dlist>() ) {pref = " Default: \"" + iP->second.toString()+"\"";};
 
 		std::cout << "\t-" << iP->first << " <" << iP->second->typeName() << ">" << std::endl;
 
@@ -115,7 +116,7 @@ boost::shared_ptr< _internal::MessageHandlerBase > Application::getLogHandler( s
 }
 const std::string Application::getCoreVersion( void )
 {
-	return STR( _ISIS_VERSION_MAJOR ) + "." + STR( _ISIS_VERSION_MINOR ) + "." + STR( _ISIS_VERSION_PATCH ) + " (" + STR( _ISIS_SVN_REVISION ) + ")";
+	return STR( _ISIS_VERSION_MAJOR ) + "." + STR( _ISIS_VERSION_MINOR ) + "." + STR( _ISIS_VERSION_PATCH ) + " [" + STR( _ISIS_SVN_REVISION ) + "]";
 }
 
 }

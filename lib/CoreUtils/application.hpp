@@ -29,7 +29,8 @@ namespace util
 
 class Application
 {
-	std::string m_name;
+	const std::string m_name;
+	std::string m_filename;
 	static const LogLevel LLMap[];
 protected:
 	virtual boost::shared_ptr<_internal::MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;

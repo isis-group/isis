@@ -92,7 +92,7 @@ IF (NOT SVN_REVISION)
 		string(REGEX MATCH "exported" EXPORTED "${OUT}")
 		IF (NOT EXPORTED)
 			string(REGEX MATCH "^[0-9]+" SVN_REVISION "${OUT}") #@todo wont work with more complex revisions/modified sources
-			SET(SVN_REVISION r${SVN_REVISION})
+			SET(SVN_REVISION ${SVN_REVISION})
 		ELSE (NOT EXPORTED)
 			set(SVN_REVISION "exported")
 		ENDIF (NOT EXPORTED)
