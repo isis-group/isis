@@ -72,16 +72,7 @@ public:
 		LOG_IF( empty(), isis::CoreDebug, isis::error ) << "Program parameters must not be empty. Please set it to any value.";
 		return get()->cast_to<T>();
 	}
-	/**
-	 * special implicit conversion to be used in if/switch constructs
-	 * The allowed conversions types are
-	 * - boolean parameters will be will be converted to a equivalent true/false value
-	 * - Selection will be converted to a equivalent integer value
-	 * - int will be used as itself
-	 *
-	 * In any other case a runtime error will be raised.
-	 */
-	operator const int()const;
+	operator boost::scoped_ptr<_internal::TypeBase>::unspecified_bool_type()const;// implicit conversion to "bool" stolen from boost
 };
 
 /**

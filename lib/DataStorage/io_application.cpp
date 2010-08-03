@@ -27,8 +27,6 @@ namespace data
 {
 IOApplication::IOApplication( const char name[], bool have_input, bool have_output ): Application( name ), m_input( have_input ), m_output( have_output )
 {
-	data::IOFactory::setProgressFeedback( &feedback );
-
 	if ( have_input ) {
 		parameters["in"] = std::string();
 		parameters["in"].setDescription( "input file or dataset" );
@@ -64,7 +62,6 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 		parameters["repn"].needed() = false;
 		parameters["repn"].setDescription(
 			"Representation in which the data shall be written (not implemented yet)." );
-		//      boost::mpl::for_each<util::_internal::types>( repnGeneratorGenerator(repnGenerators) );
 	}
 }
 
@@ -94,6 +91,7 @@ bool IOApplication::autoload( bool exitOnError )
 			<< ( rf.empty() ? "" : std::string( " using the format: " ) + rf )
 			<< ( ( !rf.empty() && !dl.empty() ) ? " and" : "" )
 			<< ( dl.empty() ? "" : std::string( " using the dialect: " ) + dl );
+	data::IOFactory::setProgressFeedback( &feedback );
 	images = data::IOFactory::load( input, rf, dl );
 
 	if ( images.empty() ) {
@@ -169,6 +167,7 @@ bool IOApplication::autowrite( const ImageList &out_images, bool exitOnError )
 			<< ( wf.empty() ? "" : std::string( " using the format: " ) + wf )
 			<< ( ( !wf.empty() && !dl.empty() ) ? " and" : "" )
 			<< ( dl.empty() ? "" : std::string( " using the dialect: " ) + dl );
+	data::IOFactory::setProgressFeedback( &feedback );
 
 	if ( ! IOFactory::write( convertedList, output, wf, dl ) ) {
 		if ( exitOnError )

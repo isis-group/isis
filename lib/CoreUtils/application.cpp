@@ -71,12 +71,12 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 		err = true;
 	}
 
-	setLog<CoreDebug>( LLMap[parameters["dCore"]] );
-	setLog<CoreLog>( LLMap[parameters["dCore"]] );
-	setLog<DataDebug>( LLMap[parameters["dData"]] );
-	setLog<DataLog>( LLMap[parameters["dData"]] );
-	setLog<ImageIoDebug>( LLMap[parameters["dImageIO"]] );
-	setLog<ImageIoLog>( LLMap[parameters["dImageIO"]] );
+	setLog<CoreDebug>( LLMap[parameters["dCore"]->as<Selection>()] );
+	setLog<CoreLog>( LLMap[parameters["dCore"]->as<Selection>()] );
+	setLog<DataDebug>( LLMap[parameters["dData"]->as<Selection>()] );
+	setLog<DataLog>( LLMap[parameters["dData"]->as<Selection>()] );
+	setLog<ImageIoDebug>( LLMap[parameters["dImageIO"]->as<Selection>()] );
+	setLog<ImageIoLog>( LLMap[parameters["dImageIO"]->as<Selection>()] );
 
 	if ( err && exitOnError ) {
 		printHelp();

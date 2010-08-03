@@ -209,7 +209,7 @@ IOFactory::FileFormatList IOFactory::getFormatInterface( std::string filename, s
 		return FileFormatList();
 	}
 
-	if ( true == dialect.empty() ) {//give back whole list of plugins for this file extension
+	if ( true == dialect.empty() ) {//return whole list of plugins for this file extension
 		return io_suffix[ext];
 	}
 

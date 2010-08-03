@@ -35,19 +35,11 @@ class IOApplication: public util::Application
 	template< typename TYPE > ImageList convertTo( const ImageList &imageList ) {
 		ImageList retList;
 		BOOST_FOREACH( ImageList::const_reference listRef, imageList ) {
-			retList.push_back( boost::shared_ptr<Image> ( new MemImage<TYPE>( *listRef ) ) );
+			retList.push_back( boost::shared_ptr<Image> ( new TypedImage<TYPE>( *listRef ) ) );
 		}
 		return retList;
 	}
 	util::ConsoleFeedback feedback;
-	std::map<unsigned short, ImageList *> repnGenerators;
-	//  struct repnGeneratorGenerator {
-	//      std::map< unsigned short, ImageList* > &m_map;
-	//      repnGeneratorGenerator( std::map< unsigned short, ImageList* > &map): m_map( map ) {}
-	//      template<typename SRC> void operator()( SRC ) {//will be called by the mpl::for_each
-	//          m_map[TypePtr<SRC>::staticID]=&convertTo<SRC>;
-	//      }
-	//  };
 
 public:
 	data::ImageList images;

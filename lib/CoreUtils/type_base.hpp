@@ -92,6 +92,9 @@ public:
 	* \return value of any requested type parsed from toString(false).
 	*/
 	template<class T> T as()const {
+		if( is<T>() )
+			return cast_to<T>();
+
 		Reference ret = copyToNewById( Type<T>::staticID );
 
 		if ( ret.empty() ) {

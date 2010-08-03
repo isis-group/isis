@@ -175,7 +175,6 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 	transformOrTell<std::string>( prefix + "SeriesDescription", "sequenceDescription", object, warning );
 	transformOrTell<std::string>( prefix + "PatientsName",     "subjectName",        object, warning );
 	transformOrTell<date>       ( prefix + "PatientsBirthDate", "subjectBirth",       object, warning );
-	// @todo sex is missing
 	transformOrTell<u_int16_t>  ( prefix + "PatientsWeight",   "subjectWeigth",      object, warning );
 	// compute voxelSize and gap
 	{
@@ -442,7 +441,7 @@ isis::image_io::FileFormat *factory()
 {
 	if ( not dcmDataDict.isDictionaryLoaded() ) {
 		LOG( isis::image_io::Runtime, isis::error )
-				<< "No data dictionary loaded, check environment variable "; //set DCMDICTPATH or fix DCM_DICT_DEFAULT_PATH in cfunix.h of dcmtk
+				<< "No data dictionary loaded, check environment variable DCMDICTPATH"; //set DCMDICTPATH or fix DCM_DICT_DEFAULT_PATH in cfunix.h of dcmtk
 		return NULL;
 	}
 

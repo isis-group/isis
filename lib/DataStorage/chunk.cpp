@@ -121,9 +121,6 @@ void Chunk::copyRange( const size_t source_start[], const size_t source_end[], C
 	LOG_IF( ! dst.rangeCheck( destination ), Debug, error )
 			<< "Index " << util::FixedVector<size_t, 4>( destination )
 			<< " is out of range (" << sizeToString() << ") at the destination chunk";
-	LOG( Debug, verbose_info )
-			<< "Copying range from " << util::FixedVector<size_t, 4>( source_start ) << " to " << util::FixedVector<size_t, 4>( source_end )
-			<< " to " << util::FixedVector<size_t, 4>( destination );
 	const size_t sstart = dim2Index( source_start );
 	const size_t send = dim2Index( source_end );
 	const size_t dstart = dst.dim2Index( destination );

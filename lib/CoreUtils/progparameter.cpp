@@ -112,16 +112,11 @@ void isis::util::ParameterMap::printNeeded()const
 	std::cout << needed << std::endl;
 }
 
-isis::util::ProgParameter::operator const int() const
+isis::util::ProgParameter::operator boost::scoped_ptr<_internal::TypeBase>::unspecified_bool_type()const
 {
-	LOG_IF( empty(), isis::CoreDebug, isis::error ) << "Program parameters must not be empty. Please set it to any value.";
+	boost::scoped_ptr<_internal::TypeBase> dummy;
 
-	if ( get()->is<bool>() ) //hack to make if(ProgParameter) possible
-		return ( get()->cast_to<bool>() );
-	else if ( get()->is<Selection>() ) //use the implicit cast of selection to int
-		return ( get()->cast_to<Selection>() );
-	else {
-		assert( get()->is<int32_t>() );
-		return get()->cast_to<int32_t>();//@todo what if int is _NOT_ int32_t
-	}
+	if( ( *this )->cast_to<bool>() )dummy.reset( new Type<int16_t> );
+
+	return  dummy;
 }
