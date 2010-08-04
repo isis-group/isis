@@ -344,6 +344,10 @@ public:
 	 */
 	bool makeOfTypeId( unsigned short id );
 
+	/**
+	 * Automatically splice the given dimension and all dimensions above.
+	 * e.g. spliceDownTo(sliceDim) will result in an image made of slices (aka 2d-chunks).
+	 */
 	size_t spliceDownTo( dimensions dim );
 };
 

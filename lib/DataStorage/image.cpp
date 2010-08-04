@@ -655,7 +655,7 @@ bool Image::makeOfTypeId( short unsigned int id )
 	}
 }
 
-size_t Image::spliceDownTo( dimensions dim )
+size_t Image::spliceDownTo( dimensions dim ) //readDim = 0, phaseDim, sliceDim, timeDim
 {
 	if( lookup[0]->relevantDims() < dim ) {
 		LOG( Debug, error ) << "The dimensionality of the chunks of this image is already below " << dim << " cannot splice it.";

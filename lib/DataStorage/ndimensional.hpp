@@ -113,7 +113,10 @@ public:
 		return util::FixedVector<size_t, DIMS>( dim );
 	}
 
-	/// get amount of relevant dimensions (last dim with size>1)
+	/**
+	 * get amount of relevant dimensions (last dim with size>1)
+	 * e.g. on a slice (64x64x1x1) it will be 2
+	 */
 	size_t relevantDims()const {
 		size_t ret = 0;
 
