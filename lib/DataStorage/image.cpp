@@ -61,7 +61,7 @@ bool Image::reIndex()
 	}
 
 	if(!set.isRectangular()){
-		LOG(Runtime, error ) << "The image is incomplete. Aborting reindex.";
+		LOG(Debug, error ) << "The image is incomplete. Aborting reindex.";
 		return false;
 	}
 	//redo lookup table
@@ -431,23 +431,27 @@ size_t Image::bytes_per_voxel() const
 ImageList::ImageList() {}
 ImageList::ImageList( ChunkList src )
 {
+	for ( ChunkList::iterator i = src.begin(); i != src.end(); ) { 
+		if ( ! i->valid() ) { // drop invalid chunks
+			LOG( Runtime, error )
+					<< "Ignoring invalid chunk. Missing properties: " << i->getMissing();
+			src.erase( i++ );
+		} else
+			i++;
+	}
+
+	size_t errcnt=0;
 	while ( !src.empty() ) {
 		LOG(Debug,info) << src.size() << " Chunks left to be distributed.";
 		value_type buff( new Image );
 		size_t cnt=0;
 
-		for ( ChunkList::iterator i = src.begin(); i != src.end(); ) {
-			if ( ! i->valid() ) {
-				LOG( Runtime, error )
-						<< "Ignoring invalid chunk. Missing properties: " << i->getMissing();
+		for ( ChunkList::iterator i = src.begin(); i != src.end(); ) { // for all remaining chunks
+			if ( buff->insertChunk( *i ) ){
 				src.erase( i++ );
-			} else {
-				if ( buff->insertChunk( *i ) ){
-					src.erase( i++ );
-					cnt++;
-				} else
-					i++;
-			}
+				cnt++;
+			} else
+				i++;
 		}
 
 		if ( !buff->empty() ) {
@@ -460,12 +464,15 @@ ImageList::ImageList( ChunkList src )
 				} else {
 					LOG( Runtime, error )
 							<< "Cannot insert image. Missing properties: " << buff->getMissing();
+					errcnt+=cnt;
 				}
 			} else {
-				LOG( Runtime, error ) << "Cannot insert image. Indexing failed";
+				LOG( Runtime, error ) << "Cannot insert image. Indexing failed.";
+				errcnt+=cnt;
 			}
 		}
 	}
+	LOG_IF(errcnt,Runtime,warning) << "Dropped " << errcnt << " chunks because they didn't form valid images";
 }
 
 void Image::getMinMax ( util::TypeReference &min, util::TypeReference &max ) const

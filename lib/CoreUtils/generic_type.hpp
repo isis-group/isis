@@ -39,11 +39,13 @@ class GenericType
 {
 protected:
 	template<typename T> T &m_cast_to() {
-		LOG_IF( typeID() != T::staticID, Debug, error ) << "using " << typeName() << " at " << this << " as " << T::staticName();
+		LOG_IF( typeID() != T::staticID, Debug, error ) << "using " << typeName() << " at " << this << " as " << T::staticName() << " aborting ...";
+		assert(typeID() == T::staticID);
 		return *reinterpret_cast<T *>( this );
 	}
 	template<typename T> const T &m_cast_to()const {
-		LOG_IF( typeID() != T::staticID, Debug, error ) << "using " << typeName() << " at " << this << " as " << T::staticName();
+		LOG_IF( typeID() != T::staticID, Debug, error ) << "using " << typeName() << " at " << this << " as " << T::staticName() << " aborting ...";
+		assert(typeID() == T::staticID);
 		return *reinterpret_cast<const T *>( this );
 	}
 
