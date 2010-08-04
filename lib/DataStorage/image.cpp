@@ -60,7 +60,10 @@ bool Image::reIndex()
 		return false;
 	}
 
-	LOG_IF( !set.isRectangular(), Runtime, error ) << "The image is incomplete. Reindex will probably fail";
+	if(!set.isRectangular()){
+		LOG(Runtime, error ) << "The image is incomplete. Aborting reindex.";
+		return false;
+	}
 	//redo lookup table
 	lookup = set.getLookup();
 	const size_t chunks = lookup.size();
@@ -429,33 +432,36 @@ ImageList::ImageList() {}
 ImageList::ImageList( ChunkList src )
 {
 	while ( !src.empty() ) {
+		LOG(Debug,info) << src.size() << " Chunks left to be distributed.";
 		value_type buff( new Image );
+		size_t cnt=0;
 
 		for ( ChunkList::iterator i = src.begin(); i != src.end(); ) {
 			if ( ! i->valid() ) {
-				const util::PropMap::key_list missing = i->getMissing();
 				LOG( Runtime, error )
-						<< "Ignoring invalid chunk. Missing properties: " << util::list2string( missing.begin(), missing.end() );
+						<< "Ignoring invalid chunk. Missing properties: " << i->getMissing();
 				src.erase( i++ );
 			} else {
-				if ( buff->insertChunk( *i ) )
+				if ( buff->insertChunk( *i ) ){
 					src.erase( i++ );
-				else
+					cnt++;
+				} else
 					i++;
 			}
 		}
 
 		if ( !buff->empty() ) {
+			LOG(Debug,info) << "Reindexing image with " << cnt << " chunks.";
+
 			if ( buff->reIndex() ) {
-				if ( buff->valid() )
+				if ( buff->valid() ) {
 					push_back( buff );
-				else {
-					const util::PropMap::key_list missing = buff->getMissing();
+					LOG(Runtime,info) << "Image " << size() << " with size " << buff->sizeToString() <<  " done.";
+				} else {
 					LOG( Runtime, error )
-							<< "Cannot insert image. Missing properties: " << util::list2string( missing.begin(), missing.end() );
+							<< "Cannot insert image. Missing properties: " << buff->getMissing();
 				}
 			} else {
-				const util::PropMap::key_list missing = buff->getMissing();
 				LOG( Runtime, error ) << "Cannot insert image. Indexing failed";
 			}
 		}

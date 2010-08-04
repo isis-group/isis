@@ -65,9 +65,9 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 		std::cout << "Missing parameters: ";
 
 		for ( ParameterMap::iterator iP = parameters.begin(); iP != parameters.end(); iP++ ) {
-			if ( iP->second.needed() ) {std::cerr << "-" << iP->first << "  ";}
+			if ( iP->second.needed() ) {std::cout << "-" << iP->first << "  ";}
 		}
-		std::cerr << std::endl;
+		std::cout << std::endl;
 
 		err = true;
 	}
@@ -89,7 +89,7 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 }
 void Application::printHelp()const
 {
-	std::cout << this->m_name << " (using isis core " << getCoreVersion() << ")" << std::endl;
+	std::cout << this->m_name << " (using isis " << getCoreVersion() << ")" << std::endl;
 	std::cout << "Usage: " << this->m_filename << " <options>, where <options> includes:" << std::endl;
 
 	for ( ParameterMap::const_iterator iP = parameters.begin(); iP != parameters.end(); iP++ ) {

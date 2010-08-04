@@ -53,7 +53,7 @@ bool SortedChunkList::scalarPropCompare::operator()( const isis::util::PropertyV
 	const util::_internal::TypeBase &bTime = *b;
 
 	if ( aTime.lt( bTime ) ) {
-		LOG( Debug, info ) << "Successfully sorted chunks by " << propertyName << " (" << aTime.toString( false ) << " before " << bTime.toString( false ) << ")";
+		LOG( Debug, verbose_info ) << "Successfully sorted chunks by " << propertyName << " (" << aTime.toString( false ) << " before " << bTime.toString( false ) << ")";
 		return true;
 	} else
 		return false;
@@ -148,7 +148,7 @@ bool SortedChunkList::insert( const Chunk &ch )
 		Chunk &first = *( chunks.begin()->second.begin()->second );
 
 		if ( first.sizeToVector() != ch.sizeToVector() ) { // if they have different size - do not insert
-			LOG( Debug, info )
+			LOG( Debug, verbose_info )
 					<< "Ignoring chunk with different size. (" << ch.sizeToString() << "!=" << first.sizeToString() << ")";
 			return false;
 		}
@@ -156,7 +156,7 @@ bool SortedChunkList::insert( const Chunk &ch )
 		BOOST_FOREACH( std::string & ref, equalProps ) { // check all properties which where given to the constructor of the list
 			// if at least one of them has the property and they are not equal - do not insert
 			if ( ( first.hasProperty( ref ) || ch.hasProperty( ref ) ) && first.propertyValue( ref ) != ch.propertyValue( ref ) ) {
-				LOG( Debug, info )
+				LOG( Debug, verbose_info )
 						<< "Ignoring chunk with different " << ref << ". (" << ch.propertyValue( ref ) << "!=" << first.propertyValue( ref ) << ")";
 				return false;
 			}

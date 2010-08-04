@@ -162,10 +162,11 @@ int IOFactory::loadFile( isis::data::ChunkList &ret, const boost::filesystem::pa
 	formatReader = getFormatInterface( filename.string(), suffix_override, dialect );
 
 	if ( formatReader.empty() ) {
-		formatReader = get().getFormatInterface( filename.string(), suffix_override, "" );
-		LOG( DataLog, warning ) << "No plugin found to read "
-								<< filename.string() << " with dialect " << dialect
-								<< "! Trying to omit the dialect...";
+		if(suffix_override.empty())
+			LOG( Runtime, error ) << "No plugin found to read " << filename.string() << " with dialect " << dialect;
+		else
+			LOG(Runtime,error) << "No plugin supporting the requested suffix " << suffix_override << " was found";
+		return false;
 	}
 
 	size_t nimgs_old = ret.size();   // save number of chunks
@@ -253,7 +254,7 @@ data::ImageList IOFactory::load( const std::string &path, std::string suffix_ove
 		if ( ! ref.hasProperty( "source" ) )
 			ref.setProperty( "source", p.string() );
 	}
-	LOG( DataLog, info ) << "chunks in list: " << chunks.size();
+	LOG( Runtime, info ) << "chunks in list: " << chunks.size();
 	const data::ImageList images( chunks );
 	LOG( Runtime, info )
 			<< "Generated " << images.size() << " images out of " << loaded << " chunks from " << ( boost::filesystem::is_directory( p ) ? "directory " : "" ) << p;
