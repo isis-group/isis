@@ -60,6 +60,7 @@ throw( std::runtime_error & )
 		}
 		else {
 			LOG(data::Debug, warning) << "Chunk organization not supported yet.";
+			return;
 		}
 		vimages = ( VImage * )malloc( sizeof( VImage ) * dims[2] );
 		nimages = dims[2];
@@ -499,7 +500,17 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, const util:
 	}
 
 	if ( !map.hasProperty( "acquisitionTime" )  && functional ) {
-		//TODO interpolating slicetime??
+		if( image.hasProperty("repetitionTime"))
+		{
+			size_t tr = image.getProperty<size_t>("repetitionTime");
+			size_t ac = map.getProperty<size_t>("acquisitionNumber");
+			VShort sliceTime = ( (float)tr / image.sizeToVector()[2] ) * (ac-1);
+			VAppendAttr( list, "slice_time", NULL, VShortRepn, sliceTime );
+		}
+		else{
+			LOG(data::Debug, warning) << "Missing repetition time. Interpolation of slice time is not possible.";
+
+		}
 	}
 
 	// ********** Vista group **********
