@@ -49,19 +49,10 @@ throw( std::runtime_error & )
 	//  get size for each dimension
 	util::ivector4 dims = image.sizeToVector();
 	//  create a vista image container according to the isis image configuration
-
 	// 4D image data
 	//  when we have got a 4D-image, this image provides functional data information
 	if( dims[3] > 1 ) {
 		data::TypedImage<VShort> shortImage( image );
-		//splice the image to 2-d chunks
-		if ( shortImage.relevantDims() >=2 ) {
-			shortImage.spliceDownTo( data::sliceDim );
-		}
-		else {
-			LOG(data::Debug, warning) << "Chunk organization not supported yet.";
-			return;
-		}
 		vimages = ( VImage * )malloc( sizeof( VImage ) * dims[2] );
 		nimages = dims[2];
 		std::vector< boost::shared_ptr< data::Chunk > > chList = shortImage.getChunkList();
@@ -71,18 +62,15 @@ throw( std::runtime_error & )
 			for( int x = 0; x < dims[0]; x++ ) {
 				for( int y = 0; y < dims[1]; y++ ) {
 					for( int t = 0; t < dims[3]; t++ ) {
-
 						VPixel( vimages[z], t, y, x, VShort )
 						= shortImage.voxel<VShort>( x, y, z, t );
 					}
 				}
 			}
-			data::MemChunk<VShort> chunk( shortImage.getChunk(0,0,z,0) );
-			copyHeaderToVista( shortImage, static_cast<util::PropMap>( chunk ), vimages[z], true );
+//			data::MemChunk<VShort> chunk( shortImage.getChunk(0,0,z,0) );
+			copyHeaderToVista( shortImage, static_cast<util::PropMap>( shortImage.getChunkAt(0) ), vimages[z], true, z );
 			VAppendAttr( attrList, "image", NULL, VImageRepn, vimages[z] );
-			} //end image.relevantDims() == 4 )
-
-
+			}
 		// dims[3] > 1 ?
 		// 3D image data
 	} else {
@@ -434,7 +422,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 	return nloaded;
 }
 
-void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, const util::PropMap &map, VImage &vimage, const bool functional )
+void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, const util::PropMap &map, VImage &vimage, const bool functional, size_t slice )
 {
 	// get attribute list from image
 	VAttrList list = VImageAttrList( vimage );
@@ -489,22 +477,31 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, const util:
 	// repetition time
 	if( image.hasProperty( "repetitionTime" ) ) {
 		VAppendAttr( list, "repetition_time", NULL, VShortRepn,
-					 image.getProperty<VShort>( "repetitionTime" ) );
+					 image.getProperty<u_int16_t>( "repetitionTime" ) );
 		VAppendAttr( list, "repetitionTime", NULL, VShortRepn,
 							 image.getProperty<VShort>( "repetitionTime" ) );
 	}
 
-	if( map.hasProperty( "acquisitionTime" ) ) {
-		VAppendAttr( list, "slice_time", NULL, VShortRepn,
-					 map.getProperty<VShort>( "acquisitionTime" ) );
-	}
+//	if( map.hasProperty( "acquisitionTime" ) && functional ) {
+//		VAppendAttr( list, "slice_time", NULL, VShortRepn,
+//					 map.getProperty<int16_t>( "acquisitionTime" ) );
+//	}
 
-	if ( !map.hasProperty( "acquisitionTime" )  && functional ) {
-		if( image.hasProperty("repetitionTime"))
+	if ( functional ) {
+		if (map.hasProperty("DICOM/CSAImageHeaderInfo/MosaicRefAcqTimes"))
+		{
+			util::dlist sliceTimeList = map.getProperty<util::dlist>("DICOM/CSAImageHeaderInfo/MosaicRefAcqTimes");
+			std::vector<double> sliceTime;
+			BOOST_FOREACH(util::dlist::const_reference ref, sliceTimeList ) {
+				sliceTime.push_back(ref);
+			}
+			VAppendAttr( list, "slice_time", NULL, VShortRepn, static_cast<VShort>(sliceTime[slice]) );
+		}
+		else if( image.hasProperty("repetitionTime"))
 		{
 			size_t tr = image.getProperty<size_t>("repetitionTime");
 			size_t ac = map.getProperty<size_t>("acquisitionNumber");
-			VShort sliceTime = ( (float)tr / image.sizeToVector()[2] ) * (ac-1);
+			u_int16_t sliceTime = ( (float)tr / image.sizeToVector()[2] ) * (ac-1);
 			VAppendAttr( list, "slice_time", NULL, VShortRepn, sliceTime );
 		}
 		else{
