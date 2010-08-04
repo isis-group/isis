@@ -3,6 +3,8 @@
 
 using namespace isis::util;
 
+namespace isis { namespace python {
+
 // helper class application
 class _Application : public Application
 {
@@ -29,4 +31,5 @@ private:
 	PyObject *self;
 
 };
-
+}
+}

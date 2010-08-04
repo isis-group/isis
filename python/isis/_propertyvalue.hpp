@@ -3,6 +3,8 @@
 
 using namespace isis::util;
 
+namespace isis { namespace python {
+
 class _PropertyValue : public PropertyValue
 {
 public:
@@ -24,3 +26,5 @@ private:
 	PyObject *self;
 
 };
+}
+}

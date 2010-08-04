@@ -61,7 +61,7 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 		parameters["repn"] = util::Selection( types );
 		parameters["repn"].needed() = false;
 		parameters["repn"].setDescription(
-			"Representation in which the data shall be written (not implemented yet)." );
+			"Representation in which the data shall be written." );
 	}
 }
 

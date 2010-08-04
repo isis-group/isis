@@ -85,8 +85,8 @@ throw( std::runtime_error & )
 				VAppendAttr( attrList, "image", NULL, VImageRepn, vimages[z] );
 			}
 		}
-		// the 4th dimension ist distributed over the number of chunks
-		else {
+		// the third dimension ist distributed over the number of chunks
+		else if (static_cast<u_int32_t>(dims[2]) == image.getChunkList().size() or image.getChunkList().size() == 1) {
 			// allocate images
 			for( int z = 0; z < dims[2]; z++ ) {
 				vimages[z] = VCreateImage( dims[3], dims[1], dims[0],
@@ -113,7 +113,6 @@ throw( std::runtime_error & )
 						}
 					}
 				}
-
 				t++;
 			}
 		}
@@ -525,6 +524,8 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, const util:
 	if( image.hasProperty( "repetitionTime" ) ) {
 		VAppendAttr( list, "repetition_time", NULL, VShortRepn,
 					 image.getProperty<VShort>( "repetitionTime" ) );
+		VAppendAttr( list, "repetitionTime", NULL, VShortRepn,
+							 image.getProperty<VShort>( "repetitionTime" ) );
 	}
 
 	if( map.hasProperty( "acquisitionTime" ) ) {

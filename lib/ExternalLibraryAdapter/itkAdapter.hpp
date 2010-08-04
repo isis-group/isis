@@ -95,6 +95,9 @@ private:
 	data::Image m_ImageISIS;
 	unsigned short m_TypeID;
 	itk::MetaDataDictionary m_ITKDict;
+	std::vector< boost::shared_ptr<util::PropMap> > m_ChunkPropMapVector;
+	util::PropMap m_ImagePropMap;
+	size_t m_RelevantDim;
 
 	template<typename TInput, typename TOutput> typename TOutput::Pointer internCreateItk( const bool behaveAsItkReader );
 
