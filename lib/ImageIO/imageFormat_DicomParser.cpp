@@ -438,12 +438,17 @@ size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, isis::util::PropMap &map )
 
 			std::string insert( ( char * )at + pos );
 
-			if ( insert.empty() ) {
+			const std::string whitespaces(" \t\f\v\n\r");
+			const std::string::size_type start = insert.find_first_not_of( whitespaces );
+
+			if ( insert.empty() || start==std::string::npos ) {
 				LOG( Runtime, verbose_info ) << "Skipping empty string for CSA entry " << name;
 			} else {
-				const std::string::size_type start = insert.find_first_not_of( ' ' );
-				const std::string::size_type end = insert.find( ' ', start ); //strip spaces
-				ret.push_back( insert.substr( start, end - start ) );//store the text if there is some
+				const std::string::size_type end = insert.find_last_not_of( whitespaces ); //strip spaces
+				if(end==std::string::npos)
+					ret.push_back( insert.substr( start, insert.size()- start ) );//store the text if there is some
+				else
+					ret.push_back( insert.substr( start, end + 1 - start ) );//store the text if there is some
 			}
 
 			pos += (
@@ -455,11 +460,11 @@ size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, isis::util::PropMap &map )
 		try {
 			if ( ret.size() == 1 ) {
 				if ( parseCSAValue( ret.front(), name, vr, map ) ) {
-					LOG( Debug, verbose_info ) << "Found entry " << name << ":" << map.propertyValue( name ) << " in CSA header";
+					LOG( Debug, verbose_info ) << "Found scalar entry " << name << ":" << map.propertyValue( name ) << " in CSA header";
 				}
 			} else if ( ret.size() > 1 ) {
 				if ( parseCSAValueList( ret, name, vr, map ) ) {
-					LOG( Debug, verbose_info ) << "Found entry " << name << ":" << map.propertyValue( name ) << " in CSA header";
+					LOG( Debug, verbose_info ) << "Found list entry " << name << ":" << map.propertyValue( name ) << " in CSA header";
 				}
 			}
 		} catch ( boost::bad_lexical_cast e ) {
@@ -524,6 +529,7 @@ void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, isis::util::Pr
 		const DcmDataDictionary &globalDataDict = dcmDataDict.rdlock();
 		const DcmDictEntry *dictRef = globalDataDict.findEntry( tag, tag.getPrivateCreator() );
 
+		LOG(Debug,info) << "Parsing " << tag.toString();
 		if ( dictRef ) name = dictRef->getTagName();
 		else
 			name = std::string( unknownTagName ) + tag.toString().c_str();
@@ -540,6 +546,7 @@ void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, isis::util::Pr
 			parseCSA( elem, map.branch( "CSASeriesHeaderInfo" ) );
 		} else if ( name == "MedComHistoryInformation" ) {
 			//@todo special handling needed
+			LOG(Debug,info) << "Ignoring MedComHistoryInformation";
 		} else if ( obj->isLeaf() ) {
 			DcmElement *elem = dynamic_cast<DcmElement *>( obj );
 			const size_t mult = obj->getVM();
