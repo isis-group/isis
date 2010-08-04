@@ -53,69 +53,34 @@ throw( std::runtime_error & )
 	// 4D image data
 	//  when we have got a 4D-image, this image provides functional data information
 	if( dims[3] > 1 ) {
+		data::TypedImage<VShort> shortImage( image );
+		//splice the image to 2-d chunks
+		if ( shortImage.relevantDims() >=2 ) {
+			shortImage.spliceDownTo( data::sliceDim );
+		}
+		else {
+			LOG(data::Debug, warning) << "Chunk organization not supported yet.";
+		}
 		vimages = ( VImage * )malloc( sizeof( VImage ) * dims[2] );
 		nimages = dims[2];
-		// since we need to convert and reorganize the data, we will create a
-		// temporary buffer who stores short values.
-		// get the first chunk
-		// see if ALL the data is included in the first chunk.
-		// Otherwise, iterate over chunks and include the data.
+		std::vector< boost::shared_ptr< data::Chunk > > chList = shortImage.getChunkList();
+		for( int z = 0; z < dims[2]; z++ ) {
+			vimages[z] = VCreateImage( dims[3], dims[1], dims[0], VShortRepn );
 
-		if( static_cast<u_int32_t>( dims[3] ) == image.getChunkList().size() ) {
-			// reorganize data: (x,y,z,t) -> z images with (x,y,t)
-			// in other words: there are z VImages necessary.
-			data::TypedImage<VShort> shortImage( image );
+			for( int x = 0; x < dims[0]; x++ ) {
+				for( int y = 0; y < dims[1]; y++ ) {
+					for( int t = 0; t < dims[3]; t++ ) {
 
-			for( int z = 0; z < dims[2]; z++ ) {
-				vimages[z] = VCreateImage( dims[3], dims[1], dims[0],
-										   VShortRepn );
-
-				// get all data from the first chunk.
-				for( int x = 0; x < dims[0]; x++ ) {
-					for( int y = 0; y < dims[1]; y++ ) {
-						for( int t = 0; t < dims[3]; t++ ) {
-							VPixel( vimages[z], t, y, x, VShort )
-							= shortImage.voxel<VShort>( x, y, z, t );
-						}
+						VPixel( vimages[z], t, y, x, VShort )
+						= shortImage.voxel<VShort>( x, y, z, t );
 					}
 				}
-
-				// copy header information
-				copyHeaderToVista( image, static_cast<util::PropMap>( image ), vimages[z], true );
-				VAppendAttr( attrList, "image", NULL, VImageRepn, vimages[z] );
 			}
-		}
-		// the third dimension ist distributed over the number of chunks
-		else if (static_cast<u_int32_t>(dims[2]) == image.getChunkList().size() or image.getChunkList().size() == 1) {
-			// allocate images
-			for( int z = 0; z < dims[2]; z++ ) {
-				vimages[z] = VCreateImage( dims[3], dims[1], dims[0],
-										   VShortRepn );
-				// copy header information
-				copyHeaderToVista( image, static_cast<util::PropMap>( image.getChunkAt( z ) ), vimages[z], true );
-				VAppendAttr( attrList, "image", NULL, VImageRepn, vimages[z] );
-			}
+			data::MemChunk<VShort> chunk( shortImage.getChunk(0,0,z,0) );
+			copyHeaderToVista( shortImage, static_cast<util::PropMap>( chunk ), vimages[z], true );
+			VAppendAttr( attrList, "image", NULL, VImageRepn, vimages[z] );
+			} //end image.relevantDims() == 4 )
 
-			// Iterate of set of chunks in the input image
-			std::vector< boost::shared_ptr< const data::Chunk> > chunkVector = image.getChunkList();
-			// count current timestep
-			int t = 0;
-			BOOST_FOREACH( std::vector< boost::shared_ptr< const data::Chunk > >::const_reference ref, chunkVector ) {
-				// next timestep
-				// put the chunk in a mem chunk to get type convertion right
-				data::MemChunk<VShort> chunk( *ref );
-
-				for( int z = 0; z < dims[2]; z++ ) {
-					for( int y = 0; y < dims[1]; y++ ) {
-						for( int x = 0; x < dims[0]; x++ ) {
-							VPixel( vimages[z], t, y, x, VShort )
-							= chunk.voxel<VShort>( x, y, z, 0 );
-						}
-					}
-				}
-				t++;
-			}
-		}
 
 		// dims[3] > 1 ?
 		// 3D image data
@@ -496,7 +461,7 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, const util:
 	vstr << sliceVec[0] << " " << sliceVec[1] << " " << sliceVec[2];
 	VAppendAttr( list, "sliceVec", NULL, VStringRepn, vstr.str().c_str() );
 	// index origin
-	util::fvector4 indexOrigin = image.getProperty<util::fvector4>( "indexOrigin" );
+	util::fvector4 indexOrigin = map.getProperty<util::fvector4>( "indexOrigin" );
 	vstr.str( "" );
 	vstr << indexOrigin[0] << " " << indexOrigin[1] << " " << indexOrigin[2];
 	VAppendAttr( list, "indexOrigin", NULL, VStringRepn, vstr.str().c_str() );
@@ -530,7 +495,7 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, const util:
 
 	if( map.hasProperty( "acquisitionTime" ) ) {
 		VAppendAttr( list, "slice_time", NULL, VShortRepn,
-					 image.getProperty<VShort>( "acquisitionTime" ) );
+					 map.getProperty<VShort>( "acquisitionTime" ) );
 	}
 
 	if ( !map.hasProperty( "acquisitionTime" )  && functional ) {
