@@ -12,17 +12,23 @@ if (os.path.exists( "/usr/share/lipsia/mni_fsl.v" )):
 	MNI_BRAIN_FSL = "/usr/share/lipsia/mni_fsl.v"
 else:
 	MNI_BRAIN_FSL = "not found"
-dir_steps = "vdoecm_steps_" + strftime("%Y-%m-%d_%H:%M:%S")
-log_file = "vdoecm_steps_" + strftime("%Y-%m-%d_%H:%M:%S") + "/log.txt"
+dir_steps = "vpreecm_steps_" + strftime("%Y-%m-%d_%H:%M:%S")
+log_file = "vpreecm_steps_" + strftime("%Y-%m-%d_%H:%M:%S") + "/log.txt"
 	
 	
 
 def usage():
-	print "vdoecm is a little script that performs the preprocessing chain for vecm."
+	print "\nvpreecm is a little script that performs the preprocessing chain for vecm."
 	print "Usage:"
 	print "Needed parameters:"
-	print "-i or --in: deontes the input file whichh has to be preprocesed. Can be of file type dicom, vista or nifti."
-	print "-"
+	print "(-i or --in):\n\tDenotes the input file which has to be preprocesed. Can be of file type dicom, vista or nifti."
+	print "\nOptional parameters:"
+	print "(--mni):\n\tDenotes the MNI brain used for the registration. This only has to be set if the user wishes to take an other standard brain."
+	print "(-k or --keep):\n\tKeeps the files from all the steps in a folder named vpreecm_steps_{date}. If not set this folder will be deleted after the preprocessing."
+	print "(--tr):\n\tDenotes the repetition time. The repetition time only has to be set if the programm requested it."
+	print "(--slicetimefile):\n\t This is the file containing the acquisition time for each slice. This only has to pe set if the programm requested it."
+	print "(--scriptuse):\n\tIf you want to use vpreecm in a script you can add this parameter to avoid interruption of the preprocessing chain if you get a important warning from vpreecm."
+	print "\n"
 	
 	
 def getattributevalue(filename, attribute):
@@ -57,7 +63,7 @@ def attributecheck(filename, attribute):
 		return False
 
 
-def preprocess(input, tr, slicetimefile):
+def preprocess(input, tr, slicetimefile, scriptuse):
 	os.system("mkdir " + dir_steps)
 	tmpFile = input
 	#converting if not vista file
@@ -73,8 +79,6 @@ def preprocess(input, tr, slicetimefile):
 	if(not attributecheck(tmpFile, "repetition_time")):
 		print "No repetition time found. You have to specifiy the repetition time in seconds by using the parameter --tr !"
 		sys.exit(2)
-	else:
-		print "Repetition time available!"
 	
 	#check slicetime
 	if( int(getattributevalue(tmpFile, "repetition_time")[0]) < 4000 ):			
@@ -90,7 +94,8 @@ def preprocess(input, tr, slicetimefile):
 	else:
 		print "The repitition time (" + getattributevalue(tmpFile, "repetition_time")[0][:-1] + " ms) is too long for reliable slice time correction. Omitting slice time correction."
 		print "Keep in mind that your results may not be reliable as well!"
-		raw_input("Press any key to continue anyway...")
+		if (not scriptuse):
+			raw_input("Press any key to continue anyway...")
 		
 		
 		
@@ -111,7 +116,6 @@ def preprocess(input, tr, slicetimefile):
 	print "removing baseline drifts..."
 	os.system("vpreprocess -in " + tmpFile + " -fwhm 6 -low 0 -high 90 -out " + dir_steps + "/s5_baselinedrift.v")
 	tmpFile = dir_steps + "/s5_baselinedrift.v"
-	
 	os.system("cp " + tmpFile + " vecm_" + input)
 	
 	
@@ -128,8 +132,9 @@ def main(argv):
 	tr = -1
 	convert = False
 	keep = False
+	scriptuse = False
 	try:
-		opts, args = getopt(argv, "i:hks:", ["help", "input=", "keep", "tr=", "mni=", "slicetimefile="])
+		opts, args = getopt(argv, "i:hks:", ["scriptuse", "help", "input=", "keep", "tr=", "mni=", "slicetimefile="])
 	except GetoptError:
 		usage()
 		sys.exit(2)
@@ -148,6 +153,8 @@ def main(argv):
 			MNI_BRAIN_FSL = arg
 		if opt in ("--slicetimefile", "-s"):
 			slicetimefile = arg
+		if opt in ("--scriptuse"):
+			scriptuse = True	
 	residuals = "".join(args)
 	if( len(residuals) ):
 		print "Omitting: " + residuals
@@ -156,7 +163,7 @@ def main(argv):
 		print "Could not find the MNI brain. You have to specifiy it by using the parameter --mni."
 		sys.exit(2)
 	if(len(input)):
-		preprocess(input, tr, slicetimefile)
+		preprocess(input, tr, slicetimefile, scriptuse)
 	else:
 		print "You have to specify an input image file. Parameter is -i or --in."
 		sys.exit(2)
