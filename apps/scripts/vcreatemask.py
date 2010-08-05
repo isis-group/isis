@@ -12,7 +12,7 @@ def usage():
     print "(-i or --in):\n\tDenotes the input folder which containes the functional vista files."
     print "\nOptional parameters:"
     print "(-o or --output):\n\tDenotes the name of the mask which will be created."
-    print "(--maxvoxel:) \n\tDenotes the maximal amount of voxel the mask can contain. The script will automatically shrink the mask until this amount of voxels is reached."
+    print "(--maxvoxel:) \n\tDenotes the maximal amount of voxel the mask can contain. The script will automatically shrink the mask until this amount of voxels is reached. Default value is 50000"
     
     
 def end(inputfolder):

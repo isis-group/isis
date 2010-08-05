@@ -361,8 +361,6 @@ private:
 		boost::regex descriptionRegex( ".*TR=([[:digit:]]{1,})ms.*" );
 		boost::cmatch results;
 		u_int16_t tr = 0;
-		std::string description = ni.descrip;
-
 		if ( boost::regex_match( ni.descrip, results,  descriptionRegex ) ) {
 			tr = boost::lexical_cast<u_int16_t>( results.str( 1 ) );
 		}

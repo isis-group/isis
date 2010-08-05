@@ -26,6 +26,9 @@
 
 // global includes
 #include <viaio/VImage.h>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/regex.hpp>
+#include <boost/date_time/gregorian/gregorian.hpp>
 
 // local includes
 #include <DataStorage/io_interface.h>
@@ -99,6 +102,7 @@ private:
 			VAttrList attributes = VImageAttrList( image );
 			VAttrListPosn posn;
 			LOG( DataLog, info ) << "copying Header from Vista";
+			std::string time, date;
 
 			for( VFirstAttr( attributes, &posn ); VAttrExists( &posn ); VNextAttr( &posn ) ) {
 				const char *name = VGetAttrName( &posn );
@@ -157,6 +161,30 @@ private:
 					continue;
 				}
 
+				if ( strcmp ( name, "sex" ) == 0) {
+					VGetAttrValue( &posn, NULL, VStringRepn, &val );
+					util::Selection genderSelection( "female,male,other" );
+
+					if (std::string( (VString) val ) == "female") {
+						genderSelection.set("female");
+					}
+					if (std::string( (VString) val ) == std::string("male")) {
+						genderSelection.set("male");
+					}
+					if (std::string( (VString) val ) == "other") {
+						genderSelection.set("other");
+					}
+					chunk.setProperty<util::Selection>("subjectGender", genderSelection);
+					continue;
+				}
+
+				if ( strcmp ( name, "patient") == 0) {
+					VGetAttrValue( &posn, NULL, VStringRepn, &val );
+					std::string subjectName = std::string ((VString) val );
+					subjectName.resize(4);
+					chunk.setProperty<std::string>("subjectName", subjectName);
+					continue;
+				}
 				// OPTIONAL: columnVec -> readVec, overwrite old values
 				if( strcmp( name, "columnVec" ) == 0 ) {
 					util::fvector4 readVec;
@@ -196,6 +224,16 @@ private:
 					chunk.setProperty( "indexOrigin", util::fvector4( x, y, z, 0 ) );
 					continue;
 				}
+				if( strcmp( name, "date") == 0 ) {
+					VGetAttrValue( &posn, NULL, VStringRepn, &val );
+					date = std::string( ( VString ) val);
+					continue;
+				}
+				if( strcmp( name, "time") == 0) {
+					VGetAttrValue( &posn, NULL, VStringRepn, &val );
+					time = std::string( ( VString ) val);
+					continue;
+				}
 
 				// traverse through attributes
 				switch( VGetAttrRepn( &posn ) ) {
@@ -232,6 +270,38 @@ private:
 			// AFTERMATH
 			// set missing values according to default rules
 
+			if (time.size() &&  date.size())
+			{
+				bool found = false;
+				std::string day(""), month(""), year("");
+				boost::regex dateRegex( "^([[:digit:]]{1,2})\\ {1}([[:word:]]{3})\\ {1}([[:digit:]]{4}).*" );
+				boost::cmatch dateResults;
+				if ( boost::regex_match( date.c_str(), dateResults, dateRegex ) ) {
+					day = boost::lexical_cast<std::string>( dateResults.str( 1 ) );
+					month = boost::lexical_cast<std::string>( dateResults.str( 2 ) );
+					year = boost::lexical_cast<std::string>( dateResults.str( 3 ) );
+					found = true;
+				}
+				if( day.size() == 1 ) {
+					day.insert(0, std::string("0"));
+				}
+				size_t hours, minutes, seconds;
+				hours = minutes = seconds = 0;
+				boost::regex timeRegex( "^([[:digit:]]{2})\\:?([[:digit:]]{2})\\:?([[:digit:]]{2}).*" );
+				boost::cmatch timeResults;
+				if ( boost::regex_match( time.c_str(), timeResults, timeRegex ) ) {
+					hours = boost::lexical_cast<size_t>( timeResults[1] );
+					minutes = boost::lexical_cast<size_t>( timeResults[2] );
+					seconds = boost::lexical_cast<size_t>( timeResults[3] );
+				}
+				std::string isisDate = year + std::string("-") + month + std::string("-") + day;
+
+				boost::gregorian::date boostDate (boost::gregorian::from_simple_string(isisDate));
+				boost::posix_time::ptime isisTime( boostDate, boost::posix_time::time_duration(hours, minutes, seconds));
+				if ( found ) {
+					chunk.setProperty<boost::posix_time::ptime>("sequenceStart", isisTime);
+				}
+			}
 			//if not set yet, set read, phase and slice vector.
 			// DEFAULT: axial
 			if( not chunk.hasProperty( "readVec" ) ) {

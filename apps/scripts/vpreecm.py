@@ -70,9 +70,9 @@ def preprocess(input, tr, slicetimefile, scriptuse):
 	if ( not (string.find(input, ".v") != -1) ):
 		print "converting data to vista..."
 		if( tr == -1):
-			os.system("isisconv -in " + input + " -out " + dir_steps +  "/s1_converted.v")
+			os.system("vvinidi -in " + input + " -out " + dir_steps +  "/s1_converted.v")
 		else:
-			os.system("isisconv -in " + input + " -out " + dir_steps +  "/s1_converted.v -tr " + str(tr) )
+			os.system("vvinidi -in " + input + " -out " + dir_steps +  "/s1_converted.v -tr " + str(tr) )
 			
 		tmpFile = dir_steps +  "/s1_converted.v"
 	
@@ -116,7 +116,7 @@ def preprocess(input, tr, slicetimefile, scriptuse):
 	print "removing baseline drifts..."
 	os.system("vpreprocess -in " + tmpFile + " -fwhm 6 -low 0 -high 90 -out " + dir_steps + "/s5_baselinedrift.v")
 	tmpFile = dir_steps + "/s5_baselinedrift.v"
-	os.system("cp " + tmpFile + " vecm_" + input)
+	os.system("cp " + tmpFile + " vecm_" + input.rstrip("/") + ".v")
 	
 	
 
