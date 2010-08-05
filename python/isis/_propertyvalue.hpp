@@ -3,7 +3,10 @@
 
 using namespace isis::util;
 
-namespace isis { namespace python {
+namespace isis
+{
+namespace python
+{
 
 class _PropertyValue : public PropertyValue
 {

@@ -162,10 +162,11 @@ int IOFactory::loadFile( isis::data::ChunkList &ret, const boost::filesystem::pa
 	formatReader = getFormatInterface( filename.string(), suffix_override, dialect );
 
 	if ( formatReader.empty() ) {
-		if(suffix_override.empty())
+		if( suffix_override.empty() )
 			LOG( Runtime, error ) << "No plugin found to read " << filename.string() << " with dialect " << dialect;
 		else
-			LOG(Runtime,error) << "No plugin supporting the requested suffix " << suffix_override << " was found";
+			LOG( Runtime, error ) << "No plugin supporting the requested suffix " << suffix_override << " was found";
+
 		return false;
 	}
 

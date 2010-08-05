@@ -60,10 +60,11 @@ bool Image::reIndex()
 		return false;
 	}
 
-	if(!set.isRectangular()){
-		LOG(Debug, error ) << "The image is incomplete. Aborting reindex.";
+	if( !set.isRectangular() ) {
+		LOG( Debug, error ) << "The image is incomplete. Aborting reindex.";
 		return false;
 	}
+
 	//redo lookup table
 	lookup = set.getLookup();
 	const size_t chunks = lookup.size();
@@ -431,7 +432,7 @@ size_t Image::bytes_per_voxel() const
 ImageList::ImageList() {}
 ImageList::ImageList( ChunkList src )
 {
-	for ( ChunkList::iterator i = src.begin(); i != src.end(); ) { 
+	for ( ChunkList::iterator i = src.begin(); i != src.end(); ) {
 		if ( ! i->valid() ) { // drop invalid chunks
 			LOG( Runtime, error )
 					<< "Ignoring invalid chunk. Missing properties: " << i->getMissing();
@@ -440,14 +441,15 @@ ImageList::ImageList( ChunkList src )
 			i++;
 	}
 
-	size_t errcnt=0;
+	size_t errcnt = 0;
+
 	while ( !src.empty() ) {
-		LOG(Debug,info) << src.size() << " Chunks left to be distributed.";
+		LOG( Debug, info ) << src.size() << " Chunks left to be distributed.";
 		value_type buff( new Image );
-		size_t cnt=0;
+		size_t cnt = 0;
 
 		for ( ChunkList::iterator i = src.begin(); i != src.end(); ) { // for all remaining chunks
-			if ( buff->insertChunk( *i ) ){
+			if ( buff->insertChunk( *i ) ) {
 				src.erase( i++ );
 				cnt++;
 			} else
@@ -455,24 +457,25 @@ ImageList::ImageList( ChunkList src )
 		}
 
 		if ( !buff->empty() ) {
-			LOG(Debug,info) << "Reindexing image with " << cnt << " chunks.";
+			LOG( Debug, info ) << "Reindexing image with " << cnt << " chunks.";
 
 			if ( buff->reIndex() ) {
 				if ( buff->valid() ) {
 					push_back( buff );
-					LOG(Runtime,info) << "Image " << size() << " with size " << buff->sizeToString() <<  " done.";
+					LOG( Runtime, info ) << "Image " << size() << " with size " << buff->sizeToString() <<  " done.";
 				} else {
 					LOG( Runtime, error )
 							<< "Cannot insert image. Missing properties: " << buff->getMissing();
-					errcnt+=cnt;
+					errcnt += cnt;
 				}
 			} else {
 				LOG( Runtime, error ) << "Cannot insert image. Indexing failed.";
-				errcnt+=cnt;
+				errcnt += cnt;
 			}
 		}
 	}
-	LOG_IF(errcnt,Runtime,warning) << "Dropped " << errcnt << " chunks because they didn't form valid images";
+
+	LOG_IF( errcnt, Runtime, warning ) << "Dropped " << errcnt << " chunks because they didn't form valid images";
 }
 
 void Image::getMinMax ( util::TypeReference &min, util::TypeReference &max ) const
@@ -655,7 +658,6 @@ bool Image::makeOfTypeId( short unsigned int id )
 	util::TypeReference min, max;
 	getMinMax( min, max );
 	assert( ! ( min.empty() || max.empty() ) );
-
 	//we want all chunks to be of type id - so tell them
 	BOOST_FOREACH( boost::shared_ptr<Chunk> &ref, lookup ) {
 		ref->makeOfTypeId( id, *min, *max );

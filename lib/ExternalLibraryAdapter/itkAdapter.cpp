@@ -196,21 +196,20 @@ typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkRea
 	importer->SetSpacing( itkSpacing );
 	importer->SetOrigin( itkOrigin );
 	importer->SetDirection( itkDirection );
-	m_ImagePropMap = static_cast<util::PropMap>(m_ImageISIS);
-	m_RelevantDim = m_ImageISIS.getChunkAt(0).relevantDims();
-//	std::cout << "relevant dims: " << m_RelevantDim << std::endl;
+	m_ImagePropMap = static_cast<util::PropMap>( m_ImageISIS );
+	m_RelevantDim = m_ImageISIS.getChunkAt( 0 ).relevantDims();
+	//  std::cout << "relevant dims: " << m_RelevantDim << std::endl;
 	//reorganisation of memory according to the chunk organisiation
 	void *targePtr = malloc( m_ImageISIS.bytes_per_voxel() * m_ImageISIS.volume() );
 	typename InputImageType::PixelType *refTarget = ( typename InputImageType::PixelType * ) targePtr;
 	std::vector< boost::shared_ptr< data::Chunk> > chList = m_ImageISIS.getChunkList();
 	size_t chunkIndex = 0;
-
 	BOOST_FOREACH( boost::shared_ptr< data::Chunk> & ref, chList ) {
 		data::Chunk &chRef = *ref;
 		typename InputImageType::PixelType *target = refTarget + chunkIndex++ * chRef.volume();
 		chRef.getTypePtr<typename InputImageType::PixelType>().copyToMem( 0, ( chRef.volume() - 1 ), target );
-		boost::shared_ptr<util::PropMap> tmpMap ( new util::PropMap (static_cast<util::PropMap>(chRef)));
-		m_ChunkPropMapVector.push_back(tmpMap);
+		boost::shared_ptr<util::PropMap> tmpMap ( new util::PropMap ( static_cast<util::PropMap>( chRef ) ) );
+		m_ChunkPropMapVector.push_back( tmpMap );
 	}
 	importer->SetImportPointer( refTarget, itkSize[0], false );
 	rescaler->SetInput( importer->GetOutput() );
@@ -262,12 +261,12 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	boost::shared_ptr<data::MemChunk< typename TImageITK::PixelType > >
 	retChunk( new data::MemChunk< typename TImageITK::PixelType  >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) ) ;
 	//dummy join to allow creating this chunk
-	retChunk->join(m_ImagePropMap);
+	retChunk->join( m_ImagePropMap );
 
 	//since the acquisitionNumber is not stored in the PropMap of the image, we have
 	//to create a dummy acquisitionNumber
-	if ( !retChunk->hasProperty("acqisitionNumber") )
-		retChunk->setProperty( "acquisitionNumber", 1);
+	if ( !retChunk->hasProperty( "acqisitionNumber" ) )
+		retChunk->setProperty( "acquisitionNumber", 1 );
 
 	//do not try to grasp that in a sober state!!
 	//workaround to create a TypedImage out of a MemChunk
@@ -276,10 +275,8 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	data::ImageList isisImageList( chunkList );
 	boost::shared_ptr< data::TypedImage< TOutputISIS > > retImage (
 		new data::TypedImage<TOutputISIS>  ( *isisImageList.front().get() ) );
-
 	//this will splice down the image the same way it was handed over to the itkAdapter
-	retImage->spliceDownTo( static_cast<data::dimensions> (m_RelevantDim) );
-
+	retImage->spliceDownTo( static_cast<data::dimensions> ( m_RelevantDim ) );
 	//these are properties eventually manipulated by itk. So we can not take the
 	//parameters from the isis image which was handed over to the itkAdapter
 	retImage->setProperty( "indexOrigin", util::fvector4( indexOrigin[0], indexOrigin[1], indexOrigin[2], indexOrigin[3] ) );
@@ -288,23 +285,22 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	retImage->setProperty( "sliceVec", util::fvector4( imageDirection[0][2], imageDirection[1][2], imageDirection[2][2], 0 ) );
 	retImage->setProperty( "voxelSize", util::fvector4( imageSpacing[0], imageSpacing[1], imageSpacing[2], imageSpacing[3] ) );
 	//add the residual parameters to the image
-	retImage->join(m_ImagePropMap, false);
+	retImage->join( m_ImagePropMap, false );
 	std::vector< boost::shared_ptr< data::Chunk> > chList = retImage->getChunkList();
-	LOG_IF(chList.size() != m_ChunkPropMapVector.size(), data::Debug, warning ) << "The image size has changed. The chunk-specific metadata will be interpolated.";
-
+	LOG_IF( chList.size() != m_ChunkPropMapVector.size(), data::Debug, warning ) << "The image size has changed. The chunk-specific metadata will be interpolated.";
 	//iterate through the spliced chunks of the image and set all the chunk specific parameters
-	size_t chunkCounter=0;
-	BOOST_FOREACH(std::vector< boost::shared_ptr< data::Chunk > >::const_reference chRef, chList)
-	{
+	size_t chunkCounter = 0;
+	BOOST_FOREACH( std::vector< boost::shared_ptr< data::Chunk > >::const_reference chRef, chList ) {
 		//TODO if the number of chunks gained by the splice method differs from
 		//the size of the m_ChunkPropMapVector the size of the image was changed in itk.
 		//Thus we have to interpolate the parameters (sliceTime so far)
-		chRef->join(static_cast<util::PropMap&>(*retImage), false);
-		if( chunkCounter<=chList.size())
-			chRef->join(*m_ChunkPropMapVector[chunkCounter], false);
+		chRef->join( static_cast<util::PropMap &>( *retImage ), false );
+
+		if( chunkCounter <= chList.size() )
+			chRef->join( *m_ChunkPropMapVector[chunkCounter], false );
+
 		chunkCounter++;
 	}
-
 	data::ImageList retList;
 	retList.push_back( retImage );
 	//declare transformation matrix T (NIFTI -> DICOM)

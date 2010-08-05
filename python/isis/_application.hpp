@@ -3,7 +3,10 @@
 
 using namespace isis::util;
 
-namespace isis { namespace python {
+namespace isis
+{
+namespace python
+{
 
 // helper class application
 class _Application : public Application

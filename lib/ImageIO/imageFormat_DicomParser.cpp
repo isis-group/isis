@@ -400,17 +400,17 @@ void ImageFormat_Dicom::parseList( DcmElement *elem, const std::string &name, ut
 	LOG( Debug, verbose_info ) << "Parsed the list " << name << " as " << map.propertyValue( name );
 }
 
-void ImageFormat_Dicom::parseCSA( DcmElement *elem, isis::util::PropMap &map )
+void ImageFormat_Dicom::parseCSA( DcmElement *elem, isis::util::PropMap &map, const std::string &dialect )
 {
 	Uint8 *array;
 	elem->getUint8Array( array );
 	const size_t len = elem->getLength();
 
 	for ( std::string::size_type pos = 0x10; pos < ( len - sizeof( Sint32 ) ); ) {
-		pos += parseCSAEntry( array + pos, map );
+		pos += parseCSAEntry( array + pos, map, dialect );
 	}
 }
-size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, isis::util::PropMap &map )
+size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, isis::util::PropMap &map, const std::string &dialect )
 {
 	size_t pos = 0;
 	const char *const name = ( char * )at + pos;
@@ -436,19 +436,23 @@ size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, isis::util::PropMap &map )
 
 			if ( !len )continue;
 
-			std::string insert( ( char * )at + pos );
+			if( std::string( "MrPhoenixProtocol" ) != name  || dialect == "withPhoenixProtocol" ) {
+				std::string insert( ( char * )at + pos );
+				const std::string whitespaces( " \t\f\v\n\r" );
+				const std::string::size_type start = insert.find_first_not_of( whitespaces );
 
-			const std::string whitespaces(" \t\f\v\n\r");
-			const std::string::size_type start = insert.find_first_not_of( whitespaces );
+				if ( insert.empty() || start == std::string::npos ) {
+					LOG( Runtime, verbose_info ) << "Skipping empty string for CSA entry " << name;
+				} else {
+					const std::string::size_type end = insert.find_last_not_of( whitespaces ); //strip spaces
 
-			if ( insert.empty() || start==std::string::npos ) {
-				LOG( Runtime, verbose_info ) << "Skipping empty string for CSA entry " << name;
+					if( end == std::string::npos )
+						ret.push_back( insert.substr( start, insert.size() - start ) ); //store the text if there is some
+					else
+						ret.push_back( insert.substr( start, end + 1 - start ) );//store the text if there is some
+				}
 			} else {
-				const std::string::size_type end = insert.find_last_not_of( whitespaces ); //strip spaces
-				if(end==std::string::npos)
-					ret.push_back( insert.substr( start, insert.size()- start ) );//store the text if there is some
-				else
-					ret.push_back( insert.substr( start, end + 1 - start ) );//store the text if there is some
+				LOG( Runtime, info ) << "Skipping MrPhoenixProtocol as its not requested by the dialect";
 			}
 
 			pos += (
@@ -521,15 +525,15 @@ bool ImageFormat_Dicom::parseCSAValueList( const util::slist &val, const std::st
 	return true;
 }
 
-void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, isis::util::PropMap &map )
+void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, isis::util::PropMap &map, const std::string &dialect )
 {
 	for ( DcmObject *obj = master_obj->nextInContainer( NULL ); obj; obj = master_obj->nextInContainer( obj ) ) {
 		const DcmTag &tag = obj->getTag();
 		std::string name;
 		const DcmDataDictionary &globalDataDict = dcmDataDict.rdlock();
 		const DcmDictEntry *dictRef = globalDataDict.findEntry( tag, tag.getPrivateCreator() );
+		LOG( Debug, verbose_info ) << "Parsing " << tag.toString();
 
-		LOG(Debug,info) << "Parsing " << tag.toString();
 		if ( dictRef ) name = dictRef->getTagName();
 		else
 			name = std::string( unknownTagName ) + tag.toString().c_str();
@@ -540,13 +544,13 @@ void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, isis::util::Pr
 			continue;//skip the image data
 		else if ( name == "CSAImageHeaderInfo" ) {
 			DcmElement *elem = dynamic_cast<DcmElement *>( obj );
-			parseCSA( elem, map.branch( "CSAImageHeaderInfo" ) );
+			parseCSA( elem, map.branch( "CSAImageHeaderInfo" ), dialect );
 		} else if ( name == "CSASeriesHeaderInfo" ) {
 			DcmElement *elem = dynamic_cast<DcmElement *>( obj );
-			parseCSA( elem, map.branch( "CSASeriesHeaderInfo" ) );
+			parseCSA( elem, map.branch( "CSASeriesHeaderInfo" ), dialect );
 		} else if ( name == "MedComHistoryInformation" ) {
 			//@todo special handling needed
-			LOG(Debug,info) << "Ignoring MedComHistoryInformation";
+			LOG( Debug, info ) << "Ignoring MedComHistoryInformation";
 		} else if ( obj->isLeaf() ) {
 			DcmElement *elem = dynamic_cast<DcmElement *>( obj );
 			const size_t mult = obj->getVM();
@@ -560,7 +564,7 @@ void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, isis::util::Pr
 			else
 				parseList( elem, name, map ); // for any other value
 		} else {
-			dcmObject2PropMap( obj, map.branch( name ) );
+			dcmObject2PropMap( obj, map.branch( name ), dialect );
 		}
 	}
 }

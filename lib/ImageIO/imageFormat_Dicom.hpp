@@ -50,21 +50,22 @@ class ImageFormat_Dicom: public FileFormat
 
 		return ret;
 	}
-	static size_t parseCSAEntry( Uint8 *at, isis::util::PropMap &map );
+	static size_t parseCSAEntry( Uint8 *at, isis::util::PropMap &map, const std::string &dialect );
 	static bool parseCSAValue( const std::string &val, const std::string &name, const char *const vr, isis::util::PropMap &map );
 	static bool parseCSAValueList( const isis::util::slist &val, const std::string &name, const char *const vr, isis::util::PropMap &map );
 	void readMosaic( const data::Chunk &source, data::ChunkList &dest );
 public:
 	static const char dicomTagTreeName[];
 	static const char unknownTagName[];
-	static void parseCSA( DcmElement *elem, isis::util::PropMap &map );
+	static void parseCSA( DcmElement *elem, isis::util::PropMap &map, const std::string &dialect );
 	static void parseScalar( DcmElement *elem, const std::string &name, isis::util::PropMap &map );
 	static void parseVector( DcmElement *elem, const std::string &name, isis::util::PropMap &map );
 	static void parseList( DcmElement *elem, const std::string &name, isis::util::PropMap &map );
-	static void dcmObject2PropMap( DcmObject *master_obj, util::PropMap &map );
+	static void dcmObject2PropMap( DcmObject *master_obj, isis::util::PropMap &map, const std::string &dialect );
 	static void sanitise( util::PropMap &object, string dialect );
 	std::string suffixes();
 	std::string name();
+	std::string dialects();
 
 	int load( data::ChunkList &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & );
 	void write( const data::Image &image, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & );

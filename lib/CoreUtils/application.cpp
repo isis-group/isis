@@ -50,7 +50,8 @@ Application::~Application() {}
 bool Application::init( int argc, char **argv, bool exitOnError )
 {
 	bool err = false;
-	m_filename=argv[0];
+	m_filename = argv[0];
+
 	if ( parameters.parse( argc, argv ) ) {
 		if ( parameters["help"] ) {
 			printHelp();
@@ -67,8 +68,8 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 		for ( ParameterMap::iterator iP = parameters.begin(); iP != parameters.end(); iP++ ) {
 			if ( iP->second.needed() ) {std::cout << "-" << iP->first << "  ";}
 		}
-		std::cout << std::endl;
 
+		std::cout << std::endl;
 		err = true;
 	}
 
@@ -97,7 +98,7 @@ void Application::printHelp()const
 
 		if ( iP->second.needed() ) {pref = ". Required.";}
 
-		if ( ! iP->second.needed() && ! iP->second->is<dlist>() ) {pref = " Default: \"" + iP->second.toString()+"\"";};
+		if ( ! iP->second.needed() && ! iP->second->is<dlist>() ) {pref = " Default: \"" + iP->second.toString() + "\"";};
 
 		std::cout << "\t-" << iP->first << " <" << iP->second->typeName() << ">" << std::endl;
 

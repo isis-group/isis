@@ -54,7 +54,7 @@ class DicomChunk : public data::Chunk
 public:
 	//this uses auto_ptr by intention
 	//the ownership of the DcmFileFormat-pointer shall be transfered to this function, because it has to decide if it should be deleted
-	static boost::shared_ptr<data::Chunk> makeChunk( std::string filename, std::auto_ptr<DcmFileFormat> dcfile ) {
+	static boost::shared_ptr<data::Chunk> makeChunk( std::string filename, std::auto_ptr<DcmFileFormat> dcfile, const std::string &dialect ) {
 		boost::shared_ptr<data::Chunk> ret;
 		std::auto_ptr<DicomImage> img( new DicomImage( dcfile.get(), EXS_Unknown ) );
 
@@ -95,7 +95,7 @@ public:
 						//OK, the source image and file pointer are managed by the chunk, we must release them
 						img.release();
 						dcfile.release();
-						ImageFormat_Dicom::dcmObject2PropMap( dcdata, ret->branch( ImageFormat_Dicom::dicomTagTreeName ) );
+						ImageFormat_Dicom::dcmObject2PropMap( dcdata, ret->branch( ImageFormat_Dicom::dicomTagTreeName ), dialect );
 					}
 				} else if ( pix->getPlanes() == 3 ) { //try to load data as color image
 					switch ( pix->getRepresentation() ) {
@@ -110,7 +110,7 @@ public:
 					}
 
 					if ( ret ) {
-						ImageFormat_Dicom::dcmObject2PropMap( dcdata, ret->branch( ImageFormat_Dicom::dicomTagTreeName ) );
+						ImageFormat_Dicom::dcmObject2PropMap( dcdata, ret->branch( ImageFormat_Dicom::dicomTagTreeName ), dialect );
 					}
 				} else {
 					FileFormat::throwGenericError( "Unsupported pixel type." );
@@ -135,6 +135,8 @@ const char ImageFormat_Dicom::unknownTagName[] = "Unknown Tag";
 
 std::string ImageFormat_Dicom::suffixes() {return std::string( ".ima .dcm" );}
 std::string ImageFormat_Dicom::name() {return "Dicom";}
+std::string ImageFormat_Dicom::dialects() {return "withPhoenixProtocol";}
+
 
 
 ptime ImageFormat_Dicom::genTimeStamp( const date &date, const ptime &time )
@@ -320,6 +322,15 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 					<< " differs from indexOrigin:" << object.propertyValue( "indexOrigin" ) << ", won't remove it";
 	}
 
+	if(
+		object.hasProperty( prefix + "CSAImageHeaderInfo/MosaicRefAcqTimes" ) &&
+		object.hasProperty( prefix + "Unknown Tag(0019,1029)" ) &&
+		object.propertyValue( prefix + "Unknown Tag(0019,1029)" ) == object.propertyValue( prefix + "CSAImageHeaderInfo/MosaicRefAcqTimes" )
+	) {
+		LOG( Debug, info ) << "Removing redundand mosaic acquisition time - tag \"0019,1029\"";
+		object.remove( prefix + "Unknown Tag(0019,1029)" );
+	}
+
 	if ( object.hasProperty( prefix + "Unknown Tag(0051,100c)" ) ) { //@todo siemens only
 		std::string fov = object.getProperty<std::string>( prefix + "Unknown Tag(0051,100c)" );
 		float read, phase;
@@ -406,7 +417,7 @@ int ImageFormat_Dicom::load( data::ChunkList &chunks, const std::string &filenam
 	OFCondition loaded = dcfile->loadFile( filename.c_str() );
 
 	if ( loaded.good() ) {
-		if ( chunk = _internal::DicomChunk::makeChunk( filename, dcfile ) ) {
+		if ( chunk = _internal::DicomChunk::makeChunk( filename, dcfile, dialect ) ) {
 			//we got a chunk from the file
 			sanitise( *chunk, "" );
 			chunk->setProperty( "source", filename );

@@ -48,6 +48,7 @@ throw( std::runtime_error & )
 	int nimages = 0;
 	//  get size for each dimension
 	util::ivector4 dims = image.sizeToVector();
+
 	//  create a vista image container according to the isis image configuration
 	// 4D image data
 	//  when we have got a 4D-image, this image provides functional data information
@@ -56,6 +57,7 @@ throw( std::runtime_error & )
 		vimages = ( VImage * )malloc( sizeof( VImage ) * dims[2] );
 		nimages = dims[2];
 		std::vector< boost::shared_ptr< data::Chunk > > chList = shortImage.getChunkList();
+
 		for( int z = 0; z < dims[2]; z++ ) {
 			vimages[z] = VCreateImage( dims[3], dims[1], dims[0], VShortRepn );
 
@@ -67,10 +69,12 @@ throw( std::runtime_error & )
 					}
 				}
 			}
-//			data::MemChunk<VShort> chunk( shortImage.getChunk(0,0,z,0) );
-			copyHeaderToVista( shortImage, static_cast<util::PropMap>( shortImage.getChunkAt(0) ), vimages[z], true, z );
+
+			//          data::MemChunk<VShort> chunk( shortImage.getChunk(0,0,z,0) );
+			copyHeaderToVista( shortImage, static_cast<util::PropMap>( shortImage.getChunkAt( 0 ) ), vimages[z], true, z );
 			VAppendAttr( attrList, "image", NULL, VImageRepn, vimages[z] );
-			}
+		}
+
 		// dims[3] > 1 ?
 		// 3D image data
 	} else {
@@ -479,34 +483,29 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, const util:
 		VAppendAttr( list, "repetition_time", NULL, VShortRepn,
 					 image.getProperty<u_int16_t>( "repetitionTime" ) );
 		VAppendAttr( list, "repetitionTime", NULL, VShortRepn,
-							 image.getProperty<VShort>( "repetitionTime" ) );
+					 image.getProperty<VShort>( "repetitionTime" ) );
 	}
 
-//	if( map.hasProperty( "acquisitionTime" ) && functional ) {
-//		VAppendAttr( list, "slice_time", NULL, VShortRepn,
-//					 map.getProperty<int16_t>( "acquisitionTime" ) );
-//	}
+	//  if( map.hasProperty( "acquisitionTime" ) && functional ) {
+	//      VAppendAttr( list, "slice_time", NULL, VShortRepn,
+	//                   map.getProperty<int16_t>( "acquisitionTime" ) );
+	//  }
 
 	if ( functional ) {
-		if (map.hasProperty("DICOM/CSAImageHeaderInfo/MosaicRefAcqTimes"))
-		{
-			util::dlist sliceTimeList = map.getProperty<util::dlist>("DICOM/CSAImageHeaderInfo/MosaicRefAcqTimes");
+		if ( map.hasProperty( "DICOM/CSAImageHeaderInfo/MosaicRefAcqTimes" ) ) {
+			util::dlist sliceTimeList = map.getProperty<util::dlist>( "DICOM/CSAImageHeaderInfo/MosaicRefAcqTimes" );
 			std::vector<double> sliceTime;
-			BOOST_FOREACH(util::dlist::const_reference ref, sliceTimeList ) {
-				sliceTime.push_back(ref);
+			BOOST_FOREACH( util::dlist::const_reference ref, sliceTimeList ) {
+				sliceTime.push_back( ref );
 			}
-			VAppendAttr( list, "slice_time", NULL, VShortRepn, static_cast<VShort>(sliceTime[slice]) );
-		}
-		else if( image.hasProperty("repetitionTime"))
-		{
-			size_t tr = image.getProperty<size_t>("repetitionTime");
-			size_t ac = map.getProperty<size_t>("acquisitionNumber");
-			u_int16_t sliceTime = ( (float)tr / image.sizeToVector()[2] ) * (ac-1);
+			VAppendAttr( list, "slice_time", NULL, VShortRepn, static_cast<VShort>( sliceTime[slice] ) );
+		} else if( image.hasProperty( "repetitionTime" ) ) {
+			size_t tr = image.getProperty<size_t>( "repetitionTime" );
+			size_t ac = map.getProperty<size_t>( "acquisitionNumber" );
+			u_int16_t sliceTime = ( ( float )tr / image.sizeToVector()[2] ) * ( ac - 1 );
 			VAppendAttr( list, "slice_time", NULL, VShortRepn, sliceTime );
-		}
-		else{
-			LOG(data::Debug, warning) << "Missing repetition time. Interpolation of slice time is not possible.";
-
+		} else {
+			LOG( data::Debug, warning ) << "Missing repetition time. Interpolation of slice time is not possible.";
 		}
 	}
 
