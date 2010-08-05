@@ -4,6 +4,7 @@
 #include "_propertyvalue.hpp"
 
 using namespace boost::python;
+using namespace isis::python;
 
 BOOST_PYTHON_MODULE( coreutils )
 {
