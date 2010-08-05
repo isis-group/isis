@@ -33,6 +33,47 @@ Image::Image ( ) : set( "indexOrigin", "readVec,phaseVec,sliceVec,coilChannelMas
 	set.addSecondarySort( "acquisitionTime" );
 }
 
+Image::Image(const isis::data::Image& ref):set("","")/*SortedChunkList has no default constructor - lets just make an empty (and invalid) set*/ {
+	(*this)=ref; // set will be replaced here anyway
+}
+
+Image &Image::operator=(const isis::data::Image& ref)
+{
+	//deep copy bases
+	static_cast<util::PropMap&>(*this)=static_cast<const util::PropMap&>(ref);
+	static_cast<_internal::NDimensional< 4 >&>(*this)=static_cast<const _internal::NDimensional< 4 >&>(ref);
+
+	//deep copy members
+	chunkVolume=ref.chunkVolume;
+	clean=ref.clean;
+	set=ref.set;
+
+	//replace all chunks (in set) by cheap copies of them
+	struct : public _internal::SortedChunkList::chunkPtrOperator{
+        boost::shared_ptr< Chunk > operator()(const boost::shared_ptr< Chunk >& ptr){
+			return boost::shared_ptr< Chunk > (new Chunk(*ptr));
+		}
+	}replace;
+	set.transform(replace);
+	lookup=set.getLookup();
+	
+	return *this;
+}
+
+
+bool Image::checkMakeClean()
+{
+	if ( ! clean ) {
+		LOG( Debug, info )
+				<< "Image is not clean. Running reIndex ...";
+
+		if( !reIndex() ) {
+			LOG( Runtime, error ) << "Reindexing failed -- undefined behavior ahead ...";
+		}
+	}
+	return clean;
+}
+
 
 bool Image::insertChunk ( const Chunk &chunk )
 {
@@ -70,17 +111,20 @@ bool Image::reIndex()
 	const size_t chunks = lookup.size();
 	util::FixedVector<size_t, n_dims> size; //storage for the size of the chunk structure
 	size.fill( 1 );
-	//get primary attributes from first chunk - will be usefull
+
+	//get primary attributes from geometrically first chunk - will be usefull
 	const Chunk &first = chunkAt( 0 );
 	const unsigned short chunk_dims = first.relevantDims();
 	chunkVolume = first.volume();
-	///////////////////////////////////////////////////////////////////////////////////////////////////
-	//// geometric sorting (put chunks with distinct geometric position at the remaining dimensions)
-	///////////////////////////////////////////////////////////////////////////////////////////////////
-	//copy sizes of the chunks to to the first chunk_dims sizes of the image
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Determine structure of the image by searching for dimensional breaks in the chunklist
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	//get indexOrigin from the geometrically first chunk
 	propertyValue( "indexOrigin" ) = first.propertyValue( "indexOrigin" );
-	//if there are many chunks, they must leave at least on dimension to the image to sort them in
+
+	//if there are many chunks, they must leave at least on dimension to the image to "sort" them in
 	const unsigned short sortDims = n_dims - ( set.getHorizontalSize() > 1 ? 1 : 0 ); // dont use the uppermost dim, if the timesteps are already there
 
 	if ( chunk_dims >= Image::n_dims ) {
@@ -296,15 +340,7 @@ Chunk &Image::chunkAt( size_t at )
 
 Chunk Image::getChunk ( size_t first, size_t second, size_t third, size_t fourth, bool copy_metadata )
 {
-	if ( ! clean ) {
-		LOG( Debug, info )
-				<< "Image is not clean. Running reIndex ...";
-
-		if( !reIndex() ) {
-			LOG( Runtime, error ) << "Reindexing failed -- undefined behavior ahead ...";
-		}
-	}
-
+	checkMakeClean();
 	return const_cast<const Image &>( *this ).getChunk( first, second, third, fourth, copy_metadata ); // use the const version
 }
 
@@ -315,15 +351,7 @@ const Chunk Image::getChunk ( size_t first, size_t second, size_t third, size_t 
 }
 std::vector< boost::shared_ptr< Chunk > > Image::getChunkList()
 {
-	if( !clean ) {
-		LOG( Debug, info )
-				<< "Image is not clean. Running reIndex ...";
-
-		if( !reIndex() ) {
-			LOG( Runtime, error ) << "Reindexing failed -- undefined behavior ahead ...";
-		}
-	}
-
+	checkMakeClean();
 	return lookup;
 }
 
@@ -658,6 +686,8 @@ bool Image::makeOfTypeId( short unsigned int id )
 	util::TypeReference min, max;
 	getMinMax( min, max );
 	assert( ! ( min.empty() || max.empty() ) );
+	LOG( Debug, info ) << "Computed value range of the original image data: [" << min << ".." << max << "]";
+
 	//we want all chunks to be of type id - so tell them
 	BOOST_FOREACH( boost::shared_ptr<Chunk> &ref, lookup ) {
 		ref->makeOfTypeId( id, *min, *max );
