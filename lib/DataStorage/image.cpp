@@ -696,12 +696,12 @@ bool Image::makeOfTypeId( short unsigned int id )
 
 size_t Image::spliceDownTo( dimensions dim ) //readDim = 0, phaseDim, sliceDim, timeDim
 {
-	if( lookup[0]->relevantDims() < dim ) {
+	if( lookup[0]->relevantDims() < (size_t) dim ) {
 		LOG( Debug, error ) << "The dimensionality of the chunks of this image is already below " << dim << " cannot splice it.";
 		return 0;
 	}
 
-	LOG_IF( lookup[0]->relevantDims() == dim, Debug, info ) << "Running useless splice, the dimensionality of the chunks of this image is already " << dim;
+	LOG_IF( lookup[0]->relevantDims() == (size_t) dim, Debug, info ) << "Running useless splice, the dimensionality of the chunks of this image is already " << dim;
 	util::FixedVector<size_t, 4> size = sizeToVector();
 
 	for( int i = 0; i < dim; i++ )
@@ -715,7 +715,7 @@ size_t Image::spliceDownTo( dimensions dim ) //readDim = 0, phaseDim, sliceDim, 
 		void operator()( const Chunk &ch ) {
 			const size_t topDim = ch.relevantDims() - 1;
 
-			if( topDim >= m_dim ) { // ok we still have to splice that
+			if( topDim >= (size_t) m_dim ) { // ok we still have to splice that
 				const size_t subSize = m_image.sizeToVector()[topDim];
 				assert( !( m_amount % subSize ) ); // there must not be any "remaining"
 				splicer sub( m_dim, m_amount / subSize, m_image );
@@ -723,7 +723,7 @@ size_t Image::spliceDownTo( dimensions dim ) //readDim = 0, phaseDim, sliceDim, 
 					sub( ref );
 				}
 			} else { // seems like we're done - insert it into the image
-				assert( ch.relevantDims() == m_dim ); // index of the higest dim>1 (ch.relevantDims()-1) shall be equal to the dim below the requested splicing (m_dim-1)
+				assert( ch.relevantDims() == (size_t) m_dim ); // index of the higest dim>1 (ch.relevantDims()-1) shall be equal to the dim below the requested splicing (m_dim-1)
 				m_image.insertChunk( ch );
 			}
 		}

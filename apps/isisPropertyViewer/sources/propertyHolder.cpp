@@ -43,13 +43,14 @@ void PropertyHolder::saveIt( const QString &fileNameAs, const bool SaveAs )
 				tmpImageList.push_back( image );
 			}
 
+			// TODO support dialect in property holder save function
 			if ( not SaveAs ) {
 				std::string fileName = boolIter->first;
 				size_t pos = fileName.find( "." );
 				fileName.insert( pos, std::string( ".chg" ) );
-				isis::data::IOFactory::write( tmpImageList, fileName, "" );
+				isis::data::IOFactory::write( tmpImageList, fileName,"","" );
 			} else {
-				isis::data::IOFactory::write( tmpImageList, fileNameAs.toStdString(), "" );
+				isis::data::IOFactory::write( tmpImageList, fileNameAs.toStdString(), "","" );
 			}
 
 			m_propChanged.find( boolIter->first )->second = false;
