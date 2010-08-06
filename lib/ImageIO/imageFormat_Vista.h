@@ -187,7 +187,6 @@ private:
 					continue;
 				}
 
-
 				if ( strcmp ( name, "sex" ) == 0) {
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
 					util::Selection genderSelection( "female,male,other" );
@@ -432,7 +431,7 @@ private:
 	 * @param image The target image. Alle metadata will be copied to the
 	 * corresponding header attributes.
 	 */
-	void copyHeaderToVista( const data::Image &image, const util::PropMap &map, VImage &vimage, const bool functional, size_t slice = 0 );
+	void copyHeaderToVista( const data::Image &image, VImage &vimage, const bool functional, size_t slice = 0 );
 
 	/**
 	 * Copies the whole itk image into a given vista image. This function is

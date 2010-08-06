@@ -69,9 +69,7 @@ throw( std::runtime_error & )
 					}
 				}
 			}
-
-			//          data::MemChunk<VShort> chunk( shortImage.getChunk(0,0,z,0) );
-			copyHeaderToVista( shortImage, static_cast<util::PropMap>( shortImage.getChunkAt( 0 ) ), vimages[z], true, z );
+			copyHeaderToVista( shortImage, vimages[z], true, z );
 			VAppendAttr( attrList, "image", NULL, VImageRepn, vimages[z] );
 		}
 
@@ -129,7 +127,7 @@ throw( std::runtime_error & )
 		}
 
 		// copy header information
-		copyHeaderToVista( image, static_cast<util::PropMap>( image ), vimages[0], false );
+		copyHeaderToVista( image, vimages[0], false );
 		VAppendAttr( attrList, "image", NULL, VImageRepn, vimages[0] );
 	}
 
@@ -426,7 +424,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 	return nloaded;
 }
 
-void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, const util::PropMap &map, VImage &vimage, const bool functional, size_t slice )
+void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vimage, const bool functional, size_t slice )
 {
 	// get attribute list from image
 	VAttrList list = VImageAttrList( vimage );
@@ -454,7 +452,7 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, const util:
 	vstr << sliceVec[0] << " " << sliceVec[1] << " " << sliceVec[2];
 	VAppendAttr( list, "sliceVec", NULL, VStringRepn, vstr.str().c_str() );
 	// index origin
-	util::fvector4 indexOrigin = map.getProperty<util::fvector4>( "indexOrigin" );
+	util::fvector4 indexOrigin = image.getChunkAt(0).getProperty<util::fvector4>( "indexOrigin" );
 	vstr.str( "" );
 	vstr << indexOrigin[0] << " " << indexOrigin[1] << " " << indexOrigin[2];
 	VAppendAttr( list, "indexOrigin", NULL, VStringRepn, vstr.str().c_str() );
@@ -492,14 +490,14 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, const util:
 	//  }
 
 	if ( functional ) {
-		if ( map.hasProperty( "DICOM/CSAImageHeaderInfo/MosaicRefAcqTimes" ) ) {
-			util::dlist sliceTimeList = map.getProperty<util::dlist>( "DICOM/CSAImageHeaderInfo/MosaicRefAcqTimes" );
+		if ( image.getChunkAt(0).hasProperty( "DICOM/CSAImageHeaderInfo/MosaicRefAcqTimes" ) ) {
+			util::dlist sliceTimeList = image.getChunkAt(0).getProperty<util::dlist>( "DICOM/CSAImageHeaderInfo/MosaicRefAcqTimes" );
 			std::vector<double> sliceTime;
 			BOOST_FOREACH( util::dlist::const_reference ref, sliceTimeList ) {
 				sliceTime.push_back( ref );
 			}
 			VAppendAttr( list, "slice_time", NULL, VShortRepn, static_cast<VShort>( sliceTime[slice] ) );
-		} else if ( map.hasProperty( "acquisitionTime" ) )
+		} else if ( image.getChunkAt(0).hasProperty( "acquisitionTime" ) )
 		{
 			//TODO slicetime
 		} else if( image.hasProperty( "repetitionTime" ) ) {
