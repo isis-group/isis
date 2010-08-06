@@ -499,14 +499,46 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, const util:
 				sliceTime.push_back( ref );
 			}
 			VAppendAttr( list, "slice_time", NULL, VShortRepn, static_cast<VShort>( sliceTime[slice] ) );
+		} else if ( map.hasProperty( "acquisitionTime" ) )
+		{
+			//TODO slicetime
 		} else if( image.hasProperty( "repetitionTime" ) ) {
 			size_t tr = image.getProperty<size_t>( "repetitionTime" );
-			size_t ac = map.getProperty<size_t>( "acquisitionNumber" );
-			u_int16_t sliceTime = ( ( float )tr / image.sizeToVector()[2] ) * ( ac - 1 );
+			u_int16_t sliceTime = ( tr / image.sizeToVector()[2] ) * ( slice  );
 			VAppendAttr( list, "slice_time", NULL, VShortRepn, sliceTime );
 		} else {
 			LOG( data::Debug, warning ) << "Missing repetition time. Interpolation of slice time is not possible.";
 		}
+	}
+	if (image.hasProperty("subjectGender"))
+	{
+		util::Selection genderSelection = image.getProperty<util::Selection>("subjectGender");
+		std::string gender = genderSelection;
+		VAppendAttr( list, "sex", NULL, VStringRepn, (VString) gender.c_str());
+
+	}
+
+	if ( image.hasProperty("echoTime"))
+	{
+		VAppendAttr( list, "echoTime", NULL, VFloatRepn, (VFloat) image.getProperty<float>("echoTime"));
+	}
+
+	if ( image.hasProperty("flipAngle"))
+	{
+		VAppendAttr( list, "flipAngle", NULL, VShortRepn, (VShort) image.getProperty<u_int16_t>("flipAngle"));
+	}
+	if ( image.hasProperty("transmitCoil"))
+	{
+		VAppendAttr( list, "transmitCoil", NULL, VStringRepn, (VString) image.getProperty<std::string>("transmitCoil").c_str());
+	}
+
+	if (image.hasProperty("sequenceStart"))
+	{
+		boost::posix_time::ptime isisTime = image.getProperty<boost::posix_time::ptime>("sequenceStart");
+		boost::gregorian::date isisDate = isisTime.date();
+		boost::posix_time::time_duration isisTimeDuration = isisTime.time_of_day();
+		VAppendAttr( list, "date", NULL, VStringRepn, boost::gregorian::to_simple_string(isisDate).c_str());
+		VAppendAttr( list, "time", NULL, VStringRepn, (VString) boost::posix_time::to_simple_string(isisTimeDuration).c_str());
 	}
 
 	// ********** Vista group **********

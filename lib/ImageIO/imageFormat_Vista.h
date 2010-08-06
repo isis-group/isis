@@ -29,6 +29,8 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/regex.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
+#include <list>
+#include <boost/foreach.hpp>
 
 // local includes
 #include <DataStorage/io_interface.h>
@@ -38,7 +40,12 @@ namespace isis
 
 namespace image_io
 {
-
+struct DateDecoding {
+	std::string dateRegex, delimiter;
+	size_t first, second, third;
+	DateDecoding(std::string regex, std::string d, size_t f, size_t s, size_t t)
+		: dateRegex(regex), delimiter(d) , first(f), second(s), third(t) {}
+};
 class ImageFormat_Vista: public FileFormat
 {
 public:
@@ -68,8 +75,10 @@ public:
 
 private:
 
+
 	template <typename TYPE> class VistaChunk : public data::Chunk
 	{
+
 
 	private:
 
@@ -156,10 +165,28 @@ private:
 
 				// OPTIONAL: "repetition_time" or "repetition" -> repetitionTime
 				if( ( strcmp ( name, "repetition" ) == 0 ) || ( strcmp( name, "repetition_time" ) == 0 ) ) {
-					VGetAttrValue( &posn, NULL, VShortRepn, val );
-					chunk.setProperty<unsigned short>( "repetitionTime", *( ( unsigned short * )val ) );
+					VGetAttrValue( &posn, NULL, VStringRepn, &val );
+					std::string repTime = std::string( VString( val ));
+					if ( static_cast<signed int>(repTime.find(".")) != -1)
+					{
+						repTime.erase( repTime.begin() + repTime.find("."), repTime.end() );
+					}
+					std::stringstream sstr(repTime);
+					u_int16_t repTimeInt;
+					sstr >> repTimeInt;
+					chunk.setProperty<u_int16_t>( "repetitionTime", repTimeInt );
 					continue;
 				}
+				if ( strcmp ( name , "slice_time" ) == 0 ) {
+					VGetAttrValue( &posn, NULL, VStringRepn, &val );
+					std::string slice_time = std::string(VString (val));
+					std::stringstream sstr(slice_time);
+					float sliceTimeFloat;
+					sstr >> sliceTimeFloat;
+//					chunk.setProperty<float>("acquisitionTime",  sliceTimeFloat  );
+					continue;
+				}
+
 
 				if ( strcmp ( name, "sex" ) == 0) {
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
@@ -234,6 +261,29 @@ private:
 					time = std::string( ( VString ) val);
 					continue;
 				}
+				if( strcmp( name, "echoTime") == 0) {
+					VGetAttrValue( &posn, NULL, VStringRepn, &val );
+					std::string echoTimeStr = std::string(VString (val));
+					std::stringstream sstr(echoTimeStr);
+					float echoTime;
+					sstr >> echoTime;
+					chunk.setProperty<float>("echoTime", echoTime);
+					continue;
+				}
+				if( strcmp( name, "flipAngle") == 0) {
+					VGetAttrValue( &posn, NULL, VStringRepn, &val );
+					std::string flipAngleStr = std::string(VString (val));
+					std::stringstream sstr(flipAngleStr);
+					u_int16_t flipAngle;
+					sstr >> flipAngle;
+					chunk.setProperty<float>("echoTime", flipAngle);
+					continue;
+				}
+				if( strcmp( name, "transmitCoil") == 0) {
+					VGetAttrValue( &posn, NULL, VStringRepn, &val );
+					chunk.setProperty<std::string>("echoTime", std::string( (VString)val));
+					continue;
+				}
 
 				// traverse through attributes
 				switch( VGetAttrRepn( &posn ) ) {
@@ -270,38 +320,61 @@ private:
 			// AFTERMATH
 			// set missing values according to default rules
 
-			if (time.size() &&  date.size())
+			if (time.size() ||  date.size())
 			{
-				bool found = false;
-				std::string day(""), month(""), year("");
-				boost::regex dateRegex( "^([[:digit:]]{1,2})\\ {1}([[:word:]]{3})\\ {1}([[:digit:]]{4}).*" );
-				boost::cmatch dateResults;
-				if ( boost::regex_match( date.c_str(), dateResults, dateRegex ) ) {
-					day = boost::lexical_cast<std::string>( dateResults.str( 1 ) );
-					month = boost::lexical_cast<std::string>( dateResults.str( 2 ) );
-					year = boost::lexical_cast<std::string>( dateResults.str( 3 ) );
-					found = true;
+				std::list<DateDecoding> m_dateDecodingList;
+				std::list<DateDecoding> m_timeDecodingList;
+				//e.g. 12 May 2007
+				m_dateDecodingList.push_back(DateDecoding( std::string("^([[:digit:]]{1,2})\\ {1}([[:word:]]{3})\\ {1}([[:digit:]]{4}).*"),"-", 1,2,3) );
+				//e.g. 12.03.2007
+				m_dateDecodingList.push_back(DateDecoding( std::string("^([[:digit:]]{2})\\.?([[:digit:]]{2})\\.?([[:digit:]]{4})$"),"-", 1,2,3) );
+				//e.g. 2010-Feb-12
+				m_dateDecodingList.push_back(DateDecoding( std::string("^([[:digit:]]{4})\\-?([[:word:]]{3})\\-?([[:digit:]]{2})$"),"-", 3,2,1) );
+				//e.g. 11:15:49
+				m_timeDecodingList.push_back(DateDecoding(std::string("^([[:digit:]]{2})\\:?([[:digit:]]{2})\\:?([[:digit:]]{2}).*"), "not_needed", 1,2,3));
+
+				if ( ! time.size() )
+				{
+					time = "00.00.00";
 				}
-				if( day.size() == 1 ) {
-					day.insert(0, std::string("0"));
+				if ( ! date.size() )
+				{
+					date = "01.01.0000";
+				}
+				std::string day, month, year;
+				boost::gregorian::date isisDate;
+				BOOST_FOREACH(std::list<DateDecoding>::const_reference dateRef, m_dateDecodingList)
+				{
+					boost::regex dateRegex( dateRef.dateRegex );
+					boost::cmatch dateResults;
+					if ( boost::regex_match( date.c_str(), dateResults, dateRegex ) ) {
+						day = boost::lexical_cast<std::string>( dateResults.str( dateRef.first ) );
+						if( day.size() == 1 ) {
+							day.insert(0, std::string("0"));
+						}
+						month = boost::lexical_cast<std::string>( dateResults.str( dateRef.second ) );
+						year = boost::lexical_cast<std::string>( dateResults.str( dateRef.third ) );
+						std::string strDate = year + dateRef.delimiter + month + dateRef.delimiter + day;
+						isisDate = boost::gregorian::from_simple_string(strDate);
+					}
 				}
 				size_t hours, minutes, seconds;
-				hours = minutes = seconds = 0;
-				boost::regex timeRegex( "^([[:digit:]]{2})\\:?([[:digit:]]{2})\\:?([[:digit:]]{2}).*" );
-				boost::cmatch timeResults;
-				if ( boost::regex_match( time.c_str(), timeResults, timeRegex ) ) {
-					hours = boost::lexical_cast<size_t>( timeResults[1] );
-					minutes = boost::lexical_cast<size_t>( timeResults[2] );
-					seconds = boost::lexical_cast<size_t>( timeResults[3] );
+				boost::posix_time::time_duration isisTimeDuration;
+				BOOST_FOREACH(std::list<DateDecoding>::const_reference timeRef, m_timeDecodingList)
+				{
+					boost::regex timeRegex( timeRef.dateRegex );
+					boost::cmatch timeResults;
+					if ( boost::regex_match( time.c_str(), timeResults, timeRegex ) ) {
+						hours = boost::lexical_cast<size_t>( timeResults[timeRef.first] );
+						minutes = boost::lexical_cast<size_t>( timeResults[timeRef.second] );
+						seconds = boost::lexical_cast<size_t>( timeResults[timeRef.third] );
+						isisTimeDuration = boost::posix_time::time_duration(hours, minutes, seconds);
+					}
 				}
-				std::string isisDate = year + std::string("-") + month + std::string("-") + day;
-
-				boost::gregorian::date boostDate (boost::gregorian::from_simple_string(isisDate));
-				boost::posix_time::ptime isisTime( boostDate, boost::posix_time::time_duration(hours, minutes, seconds));
-				if ( found ) {
-					chunk.setProperty<boost::posix_time::ptime>("sequenceStart", isisTime);
-				}
+				boost::posix_time::ptime isisTime(isisDate, isisTimeDuration);
+				chunk.setProperty<boost::posix_time::ptime>("sequenceStart", isisTime);
 			}
+
 			//if not set yet, set read, phase and slice vector.
 			// DEFAULT: axial
 			if( not chunk.hasProperty( "readVec" ) ) {
