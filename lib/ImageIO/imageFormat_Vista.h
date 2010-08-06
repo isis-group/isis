@@ -276,12 +276,12 @@ private:
 					std::stringstream sstr(flipAngleStr);
 					u_int16_t flipAngle;
 					sstr >> flipAngle;
-					chunk.setProperty<float>("echoTime", flipAngle);
+					chunk.setProperty<float>("flipAngle", flipAngle);
 					continue;
 				}
 				if( strcmp( name, "transmitCoil") == 0) {
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
-					chunk.setProperty<std::string>("echoTime", std::string( (VString)val));
+					chunk.setProperty<std::string>("transmitCoil", std::string( (VString)val));
 					continue;
 				}
 
