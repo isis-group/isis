@@ -687,11 +687,14 @@ bool Image::makeOfTypeId( short unsigned int id )
 	getMinMax( min, max );
 	assert( ! ( min.empty() || max.empty() ) );
 	LOG( Debug, info ) << "Computed value range of the original image data: [" << min << ".." << max << "]";
+	bool retVal = true;
 
 	//we want all chunks to be of type id - so tell them
 	BOOST_FOREACH( boost::shared_ptr<Chunk> &ref, lookup ) {
-		ref->makeOfTypeId( id, *min, *max );
+		retVal &= ref->makeOfTypeId( id, *min, *max );
 	}
+
+	return retVal;
 }
 
 size_t Image::spliceDownTo( dimensions dim ) //readDim = 0, phaseDim, sliceDim, timeDim

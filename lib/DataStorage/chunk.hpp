@@ -262,7 +262,7 @@ public:
 	}
 	/// Create a deep copy of a given MemChunk (automatic conversion will be used if datatype does not fit)
 	MemChunk &operator=( const MemChunk<TYPE> &ref ) { //this is needed, to prevent generation of default-copy operator
-		operator=( static_cast<const Chunk &>( ref ) );
+		return operator=( static_cast<const Chunk &>( ref ) );
 	}
 };
 }
