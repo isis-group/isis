@@ -26,7 +26,7 @@ namespace isis
 namespace data
 {
 
-Image::Image ( ) : set( "indexOrigin", "readVec,phaseVec,sliceVec,coilChannelMask,sequenceNumber" ), clean( false )
+Image::Image ( ) : set( "indexOrigin", "sequenceNumber,readVec,phaseVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ), clean( false )
 {
 	addNeededFromString( needed );
 	set.addSecondarySort( "acquisitionNumber" );
