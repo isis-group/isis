@@ -366,7 +366,6 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 
 			/******************** SET index origin, acquisitionTime and aquisitionNumber ********************/
 			size_t timestep=0;
-			std::cout << repetitionTime << std::endl;
 			BOOST_FOREACH(data::ChunkList::reference spliceRef, splices) {
 				spliceRef.setProperty<util::fvector4>( "indexOrigin", ioprob );
 				int32_t acqusitionNumber = (nloaded-1) + vImageVector.size() * timestep;

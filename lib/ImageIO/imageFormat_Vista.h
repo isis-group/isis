@@ -319,7 +319,7 @@ private:
 			// AFTERMATH
 			// set missing values according to default rules
 
-			if (time.size() ||  date.size())
+			if ( date.size() )
 			{
 				std::list<DateDecoding> m_dateDecodingList;
 				std::list<DateDecoding> m_timeDecodingList;
@@ -331,17 +331,13 @@ private:
 				m_dateDecodingList.push_back(DateDecoding( std::string("^([[:digit:]]{4})\\-([[:word:]]{3})\\-([[:digit:]]{2})$"),"-", 3,2,1) );
 				//e.g. 20081210
 				m_dateDecodingList.push_back(DateDecoding( std::string("^([[:digit:]]{4})([[:digit:]]{2})([[:digit:]]{2})$"),"-", 3,2,1) );
+				//e.g. 11:15:49 5 May 2002 (date)
+				m_dateDecodingList.push_back(DateDecoding( std::string("^([[:digit:]]{2})\\:([[:digit:]]{2})\\:([[:digit:]]{2})\\ +([[:digit:]]{1,2})\\ +([[:word:]]{3})\\ +([[:digit:]]{4}).*"), "-",4,5,6));
 				//e.g. 11:15:49
 				m_timeDecodingList.push_back(DateDecoding(std::string("^([[:digit:]]{2})\\:([[:digit:]]{2})\\:([[:digit:]]{2}).*"), "not_needed", 1,2,3));
+				//e.g. 11:15:49 5 May 2002 (time)
+				m_timeDecodingList.push_back(DateDecoding( std::string("^([[:digit:]]{2})\\:([[:digit:]]{2})\\:([[:digit:]]{2})\\ ?([[:digit:]]{1,2})\\ ?([[:word:]{3})\\ ?([[:digit:]]{4}).*"), "not_needed",1,2,3));
 
-				if ( ! time.size() )
-				{
-					time = "00.00.00";
-				}
-				if ( ! date.size() )
-				{
-					date = "01.01.2000";
-				}
 				std::string day, month, year;
 				boost::gregorian::date isisDate;
 				BOOST_FOREACH(std::list<DateDecoding>::const_reference dateRef, m_dateDecodingList)
@@ -359,7 +355,10 @@ private:
 						isisDate = boost::gregorian::from_simple_string(strDate);
 					}
 				}
-
+				//if no attribute time was found search in date for the time
+				if ( ! time.size() ) {
+					time = date;
+				}
 				size_t hours, minutes, seconds;
 				boost::posix_time::time_duration isisTimeDuration;
 				BOOST_FOREACH(std::list<DateDecoding>::const_reference timeRef, m_timeDecodingList)
