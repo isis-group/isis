@@ -228,21 +228,45 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 		// index origin
 		util::fvector4 indexOrigin;
 		// traverse images and collect all VShort images.
-
-		for( unsigned k = 0; k < nimages; k++ ) {
-			// skip images with no VShort format
+		std::vector<VImage> vImageVector;
+		for( unsigned int k = 0; k < nimages; k++ )
+		{
 			if( VPixelRepn( images[k] ) != VShortRepn ) {
 				VDestroyImage( images[k] );
-				continue;
+			} else vImageVector.push_back(images[k]);
+		}
+		std::list<VistaChunk<VShort> > vistaChunkList;
+		//if we have no repetitionTime we have to calculate it with the help of the biggest slicetime
+		float biggest_slice_time=0;
+		//first we have to create a vista chunkList so we can get the number of slices
+		BOOST_FOREACH(std::vector<VImage>::const_reference sliceRef, vImageVector)
+		{
+			VistaChunk<VShort> vchunk( sliceRef, true, vImageVector.size() );
+			vistaChunkList.push_back(vchunk);
+			if(vchunk.hasProperty("acquisitionTime")) {
+				float currentSliceTime=vchunk.getProperty<float>("acquisitionTime");
+				if ( currentSliceTime > biggest_slice_time ) {
+					float diff = currentSliceTime - biggest_slice_time;
+					biggest_slice_time = currentSliceTime + diff;
+				}
 			}
-
-			LOG( isis::DataLog, info ) << "current slice: " << k;
-			VistaChunk<VShort> vchunk( images[k] );
-			util::fvector4 &ioprob = vchunk.propertyValue( "indexOrigin" )->cast_to<util::fvector4>();
+		}
+		BOOST_FOREACH(std::vector<VistaChunk<VShort> >::reference sliceRef, vistaChunkList) {
+			float acquisitionTime=0;
+			u_int16_t repetitionTime=0;
+			util::fvector4 &ioprob = sliceRef.propertyValue( "indexOrigin" )->cast_to<util::fvector4>();
+			if(sliceRef.hasProperty("acquisitionTime"))
+				acquisitionTime = sliceRef.getProperty<float>("acquisitionTime");
+			if(!sliceRef.hasProperty("repetitionTime") && biggest_slice_time) {
+				sliceRef.setProperty<u_int16_t>("repetitionTime", (u_int16_t) biggest_slice_time);
+			}
+			if(sliceRef.hasProperty("repetitionTime")) {
+				repetitionTime = sliceRef.getProperty<u_int16_t>("repetitionTime");
+			}
 			nloaded++;
 			// splice VistaChunk
 			LOG( DataLog, info ) << "splicing";
-			data::ChunkList splices = vchunk.splice( data::sliceDim );
+			data::ChunkList splices = sliceRef.splice( data::sliceDim );
 			LOG( DataLog, info ) << "finished splicing with " << splices.size();
 			LOG( DataLog, info ) << data::Chunk::n_dims;
 			LOG( DataLog, info ) << splices.begin()->dimSize( 0 );
@@ -254,7 +278,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 			// and voxel resolution. All chunks in the ChunkList splices are supposed
 			// to have the same index origin since they are from the same slice.
 			// get slice orientation of image
-			VAttrList attributes = VImageAttrList( images[k] );
+			VAttrList attributes = VImageAttrList( vImageVector[nloaded-1] );
 			VAttrListPosn posn;
 			val = NULL;
 
@@ -315,9 +339,9 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 			// if there is no index origin value set it default to the index origin
 			// from the first slice
 
-			if( !k ) {
-				LOG( DataLog, info ) << "ioprob is empty";
-				indexOrigin = vchunk.getProperty<util::fvector4>( "indexOrigin" );
+			if( !nloaded ) {
+				LOG( DataDebug, info ) << "ioprob is empty";
+				indexOrigin = sliceRef.getProperty<util::fvector4>( "indexOrigin" );
 			}
 			// else: calculate the index origin according to the slice number and voxel
 			// resolution
@@ -338,13 +362,20 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 					ioprob[2] += ( nloaded - 1 ) * v3[2];
 				}
 			}
+			sliceRef.setProperty<util::fvector4>("indexOrigin", ioprob);
 
-			/******************** SET acquisition number AND index origin ********************/
-			unsigned acq_number = 0;
-
-			for( data::ChunkList::iterator iter = splices.begin(); iter != splices.end(); iter++ ) {
-				iter->setProperty<int32_t>( "acquisitionNumber", acq_number++ );
-				iter->setProperty<util::fvector4>( "indexOrigin", ioprob );
+			/******************** SET index origin, acquisitionTime and aquisitionNumber ********************/
+			size_t timestep=0;
+			std::cout << repetitionTime << std::endl;
+			BOOST_FOREACH(data::ChunkList::reference spliceRef, splices) {
+				spliceRef.setProperty<util::fvector4>( "indexOrigin", ioprob );
+				int32_t acqusitionNumber = (nloaded-1) + vImageVector.size() * timestep;
+				spliceRef.setProperty<int32_t>("acquisitionNumber", acqusitionNumber);
+				if (repetitionTime && acquisitionTime) {
+					float acquisitionTimeSplice = acquisitionTime + (repetitionTime * timestep);
+					spliceRef.setProperty("acquisitionTime", acquisitionTimeSplice );
+				}
+				timestep++;
 			}
 
 			LOG( DataLog, info ) << "adding " << splices.size() << " chunks to ChunkList";
@@ -614,7 +645,7 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 
 template <typename TInput> void ImageFormat_Vista::addChunk( data::ChunkList &chunks, VImage image )
 {
-	VistaChunk<TInput>* chunk_sp = new VistaChunk<TInput>( image );
+	VistaChunk<TInput>* chunk_sp = new VistaChunk<TInput>( image, false );
 	// add chunk to chunk list
 	chunks.push_back( *chunk_sp );
 }

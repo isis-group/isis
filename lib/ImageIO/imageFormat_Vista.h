@@ -106,7 +106,7 @@ private:
 		 * @param image The target chunk where all data will be copied to.
 		 * @oaram chunk The source image that provides the Vista metadata attributes.
 		 */
-		void copyHeaderFromVista( const VImage &image, data::Chunk &chunk ) {
+		void copyHeaderFromVista( const VImage &image, data::Chunk &chunk, size_t nslices ) {
 			// traverse through attribute list and set metadata
 			VAttrList attributes = VImageAttrList( image );
 			VAttrListPosn posn;
@@ -183,7 +183,7 @@ private:
 					std::stringstream sstr(slice_time);
 					float sliceTimeFloat;
 					sstr >> sliceTimeFloat;
-//					chunk.setProperty<float>("acquisitionTime",  sliceTimeFloat  );
+					chunk.setProperty<float>("acquisitionTime",  sliceTimeFloat  );
 					continue;
 				}
 
@@ -326,11 +326,13 @@ private:
 				//e.g. 12 May 2007
 				m_dateDecodingList.push_back(DateDecoding( std::string("^([[:digit:]]{1,2})\\ {1}([[:word:]]{3})\\ {1}([[:digit:]]{4}).*"),"-", 1,2,3) );
 				//e.g. 12.03.2007
-				m_dateDecodingList.push_back(DateDecoding( std::string("^([[:digit:]]{2})\\.?([[:digit:]]{2})\\.?([[:digit:]]{4})$"),"-", 1,2,3) );
+				m_dateDecodingList.push_back(DateDecoding( std::string("^([[:digit:]]{2})\\.([[:digit:]]{2})\\.([[:digit:]]{4})$"),"-", 1,2,3) );
 				//e.g. 2010-Feb-12
-				m_dateDecodingList.push_back(DateDecoding( std::string("^([[:digit:]]{4})\\-?([[:word:]]{3})\\-?([[:digit:]]{2})$"),"-", 3,2,1) );
+				m_dateDecodingList.push_back(DateDecoding( std::string("^([[:digit:]]{4})\\-([[:word:]]{3})\\-([[:digit:]]{2})$"),"-", 3,2,1) );
+				//e.g. 20081210
+				m_dateDecodingList.push_back(DateDecoding( std::string("^([[:digit:]]{4})([[:digit:]]{2})([[:digit:]]{2})$"),"-", 3,2,1) );
 				//e.g. 11:15:49
-				m_timeDecodingList.push_back(DateDecoding(std::string("^([[:digit:]]{2})\\:?([[:digit:]]{2})\\:?([[:digit:]]{2}).*"), "not_needed", 1,2,3));
+				m_timeDecodingList.push_back(DateDecoding(std::string("^([[:digit:]]{2})\\:([[:digit:]]{2})\\:([[:digit:]]{2}).*"), "not_needed", 1,2,3));
 
 				if ( ! time.size() )
 				{
@@ -338,7 +340,7 @@ private:
 				}
 				if ( ! date.size() )
 				{
-					date = "01.01.0000";
+					date = "01.01.2000";
 				}
 				std::string day, month, year;
 				boost::gregorian::date isisDate;
@@ -357,6 +359,7 @@ private:
 						isisDate = boost::gregorian::from_simple_string(strDate);
 					}
 				}
+
 				size_t hours, minutes, seconds;
 				boost::posix_time::time_duration isisTimeDuration;
 				BOOST_FOREACH(std::list<DateDecoding>::const_reference timeRef, m_timeDecodingList)
@@ -390,7 +393,7 @@ private:
 				util::fvector4 ioTmp(
 					-( ( dims[0] - 1 )*voxels[0] ) / 2,
 					-( ( dims[1] - 1 )*voxels[1] ) / 2,
-					-( ( dims[2] - 1 )*voxels[2] ) / 2,
+					-( ( (nslices ? nslices : dims[2])- 1 )*voxels[2] ) / 2,
 					0 );
 				util::fvector4 readV = chunk.getProperty<util::fvector4>( "readVec" );
 				util::fvector4 phaseV = chunk.getProperty<util::fvector4>( "phaseVec" );
@@ -416,10 +419,10 @@ private:
 		 * Default constructor. Create a VistaChunk out of a vista image.
 		 */
 
-		VistaChunk( VImage image ):
+		VistaChunk( VImage image, const bool functional, size_t nslices=0 ):
 			data::Chunk( static_cast<TYPE *>( image->data ), VImageDeleter( image ),
-						 VImageNColumns( image ), VImageNRows( image ), VImageNBands( image ) ) {
-			copyHeaderFromVista( image, *this );
+						 VImageNColumns( image ), VImageNRows( image ), functional ? 1 : VImageNBands( image ), functional ? VImageNBands( image ) : 0 ) {
+			copyHeaderFromVista( image, *this, nslices );
 		}
 	};
 
