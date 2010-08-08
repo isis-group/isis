@@ -242,7 +242,6 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	if ( TImageITK::ImageDimension < 4 ) {
 		imageSize[3] = 1;
 	}
-
 	if ( behaveAsItkWriter ) {
 		imageDirection[0][0] = -imageDirection[0][0];
 		imageDirection[0][1] = -imageDirection[0][1];
@@ -261,6 +260,7 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	boost::shared_ptr<data::MemChunk< typename TImageITK::PixelType > >
 	retChunk( new data::MemChunk< typename TImageITK::PixelType  >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) ) ;
 	//dummy join to allow creating this chunk
+
 	retChunk->join( m_ImagePropMap );
 
 	//since the acquisitionNumber is not stored in the PropMap of the image, we have
@@ -275,6 +275,7 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	data::ImageList isisImageList( chunkList );
 	boost::shared_ptr< data::TypedImage< TOutputISIS > > retImage (
 		new data::TypedImage<TOutputISIS>  ( *isisImageList.front().get() ) );
+
 	//this will splice down the image the same way it was handed over to the itkAdapter
 	retImage->spliceDownTo( static_cast<data::dimensions> ( m_RelevantDim ) );
 	//these are properties eventually manipulated by itk. So we can not take the
@@ -290,17 +291,19 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	LOG_IF( chList.size() != m_ChunkPropMapVector.size(), data::Debug, warning ) << "The image size has changed. The chunk-specific metadata will be interpolated.";
 	//iterate through the spliced chunks of the image and set all the chunk specific parameters
 	size_t chunkCounter = 0;
-	BOOST_FOREACH( std::vector< boost::shared_ptr< data::Chunk > >::const_reference chRef, chList ) {
+	BOOST_FOREACH( std::vector< boost::shared_ptr< data::Chunk > >::reference chRef, chList ) {
 		//TODO if the number of chunks gained by the splice method differs from
 		//the size of the m_ChunkPropMapVector the size of the image was changed in itk.
 		//Thus we have to interpolate the parameters (sliceTime so far)
+
 		chRef->join( static_cast<util::PropMap &>( *retImage ), false );
+		if( chunkCounter < (m_ChunkPropMapVector.size()-1)) {
+			chunkCounter++;
+		}
 
-		if( chunkCounter <= chList.size() )
-			chRef->join( *m_ChunkPropMapVector[chunkCounter], false );
-
-		chunkCounter++;
+		chRef->join( *m_ChunkPropMapVector[chunkCounter], false );
 	}
+	std::cout << "geschafft" << std::endl;
 	data::ImageList retList;
 	retList.push_back( retImage );
 	//declare transformation matrix T (NIFTI -> DICOM)
