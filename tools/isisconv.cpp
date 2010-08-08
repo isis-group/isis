@@ -17,7 +17,6 @@ int main( int argc, char **argv )
 			ref->setProperty<float>( "repetitionTime", app.parameters["tr"]->as<double>() * 1000 );
 		}
 	}
-
 	app.autowrite( app.images );
 	return EXIT_SUCCESS;
 }

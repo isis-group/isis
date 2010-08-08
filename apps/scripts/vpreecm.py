@@ -39,25 +39,20 @@ def getattributevalue(filename, attribute):
 	for i in lines:
 		if (string.find(i, attribute + ":") != -1):
 			valuetuple.append(i.split(":")[1])
+	os.system("rm " + dir_steps + "/attributecheck")
 	return valuetuple
 
 	
 def attributecheck(filename, attribute):
 	attrcount = 0
-	voxelcount = 0
-	orientationcount = 0
 	os.system("less " + filename +" > " + dir_steps + "/attributecheck")
 	fattr = open(dir_steps + "/attributecheck")
 	lines = fattr.readlines()
 	for i in lines:
 		if(string.find(i, attribute + ":") != -1):
 			attrcount+=1
-		elif(string.find(i, "voxel:") !=-1):
-			voxelcount+=1
-		elif(string.find(i, "orientation:") != -1):
-			orientationcount+=1
 	os.system("rm " + dir_steps + "/attributecheck")
-	if(attrcount == orientationcount == voxelcount):
+	if(attrcount):
 		return True
 	else:
 		return False
@@ -70,35 +65,42 @@ def preprocess(input, tr, slicetimefile, scriptuse):
 	if ( not (string.find(input, ".v") != -1) ):
 		print "converting data to vista..."
 		if( tr == -1):
-			os.system("vvinidi -in " + input + " -out " + dir_steps +  "/s1_converted.v")
+			os.system("vvinidi -in " + input + " -out " + dir_steps +  "/s1_converted.v -rdialect functional")
 		else:
-			os.system("vvinidi -in " + input + " -out " + dir_steps +  "/s1_converted.v -tr " + str(tr) )
+			os.system("vvinidi -in " + input + " -out " + dir_steps +  "/s1_converted.v  -rdialect functional -tr " + str(tr) )
 			
 		tmpFile = dir_steps +  "/s1_converted.v"
-	
-	if(not attributecheck(tmpFile, "repetition_time")):
+	if(tr != -1):
+		trstr = str(int(tr)*1000);
+		os.system("vattredit -name repetition_time -value '" + trstr + "' -in " + tmpFile + " -out " + dir_steps + "/s1_converted.v")
+		tmpFile = dir_steps +  "/s1_converted.v"
+		
+		
+	if(not attributecheck(tmpFile, "repetition_time") and tr == -1):
 		print "No repetition time found. You have to specifiy the repetition time in seconds by using the parameter --tr !"
 		sys.exit(2)
 	
 	#check slicetime
-	if( int(getattributevalue(tmpFile, "repetition_time")[0]) < 4000 ):			
+	if( int(getattributevalue(tmpFile, "repetition_time")[0]) < 4000 and int(tr) < 4):			
 		if ( not len(slicetimefile)):
 			if (not attributecheck(tmpFile, "slice_time" ) ):
 				print "Neither a slicetime file was specified nor a valid slicetime information was found in the image. Omitting slicetimecorrection!"
 			else:
 				print "performing slice time correction"
 				os.system("vslicetime -in " + tmpFile + " -out " + dir_steps +  "/s2_slicetimecorrection.v")
+				tmpFile = dir_steps + "/s2_slicetimecorrection.v"
 		else:
 			os.system("vslicetime -in " + tmpFile + " -out " + dir_steps +  "/s2_slicetimecorrection.v -slicetime " + slicetimefile)
-		tmpFile = dir_steps + "/s2_slicetimecorrection.v"
+			tmpFile = dir_steps + "/s2_slicetimecorrection.v"
+		
 	else:
 		print "The repitition time (" + getattributevalue(tmpFile, "repetition_time")[0][:-1] + " ms) is too long for reliable slice time correction. Omitting slice time correction."
 		print "Keep in mind that your results may not be reliable as well!"
 		if (not scriptuse):
 			raw_input("Press any key to continue anyway...")
 		
-		
-		
+	
+	
 	#moco
 	print "performing motion correction"
 	os.system("vmovcorrection -in " + tmpFile + " -out " + dir_steps +  "/s3_motioncorrection.v" )

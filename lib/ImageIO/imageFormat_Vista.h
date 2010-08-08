@@ -407,8 +407,8 @@ private:
 			}
 
 			// set acquisitionNumber. This values is always missing
-			chunk.setProperty<int32_t>( "acquisitionNumber", 0 );
-			chunk.setProperty<int32_t>( "sequenceNumber", 0 );
+			if(!chunk.hasProperty("acquisitionNumber"))
+				chunk.setProperty<int32_t>( "acquisitionNumber", 0 );
 			LOG( DataLog, info ) << "finished copying header";
 		}
 
@@ -420,10 +420,13 @@ private:
 
 		VistaChunk( VImage image, const bool functional, size_t nslices=0 ):
 			data::Chunk( static_cast<TYPE *>( image->data ), VImageDeleter( image ),
-						 VImageNColumns( image ), VImageNRows( image ), functional ? 1 : VImageNBands( image ), functional ? VImageNBands( image ) : 0 ) {
+						 VImageNColumns( image ), VImageNRows( image ), functional ? 1 : VImageNBands( image ), functional ? VImageNBands( image ) : 1 ) {
 			copyHeaderFromVista( image, *this, nslices );
 		}
 	};
+
+	//member function which switch handles the loaded images
+	bool switchHandle( VImage&, data::ChunkList& );
 
 	/**
 	 * This function copies all chunk header informations to the appropriate
