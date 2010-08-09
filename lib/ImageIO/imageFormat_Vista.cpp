@@ -427,7 +427,6 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 			chunks.back().setProperty<u_int16_t>("sequenceNumber", ++sequenceNumber);
 		}
 	}
-
 	//  cleanup, close file handle
 	fclose( ip );
 

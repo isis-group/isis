@@ -406,7 +406,7 @@ private:
 					0 );
 				chunk.setProperty( "indexOrigin", iOrig );
 			}
-
+			chunk.setProperty<util::fvector4>("voxelGap", util::fvector4(0,0,0,0));
 			// set acquisitionNumber. This values is always missing
 			if(!chunk.hasProperty("acquisitionNumber"))
 				chunk.setProperty<u_int32_t>( "acquisitionNumber", 0 );
