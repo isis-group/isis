@@ -48,19 +48,17 @@ throw( std::runtime_error & )
 	int nimages = 0;
 	//  get size for each dimension
 	util::ivector4 dims = image.sizeToVector();
-
 	//  create a vista image container according to the isis image configuration
 	// 4D image data
 	//  when we have got a 4D-image, this image provides functional data information
 	if( dims[3] > 1 ) {
 		data::TypedImage<VShort> shortImage( image );
+		shortImage.spliceDownTo(data::sliceDim);
 		vimages = ( VImage * )malloc( sizeof( VImage ) * dims[2] );
 		nimages = dims[2];
 		std::vector< boost::shared_ptr< data::Chunk > > chList = shortImage.getChunkList();
-
 		for( int z = 0; z < dims[2]; z++ ) {
 			vimages[z] = VCreateImage( dims[3], dims[1], dims[0], VShortRepn );
-
 			for( int x = 0; x < dims[0]; x++ ) {
 				for( int y = 0; y < dims[1]; y++ ) {
 					for( int t = 0; t < dims[3]; t++ ) {
@@ -248,7 +246,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 		}
 		std::list<VistaChunk<VShort> > vistaChunkList;
 		//if we have no repetitionTime we have to calculate it with the help of the biggest slicetime
-		float biggest_slice_time=0;
+		u_int16_t biggest_slice_time=0;
 		//first we have to create a vista chunkList so we can get the number of slices
 		BOOST_FOREACH(std::vector<VImage>::reference sliceRef, vImageVector)
 		{
@@ -263,13 +261,10 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 			}
 		}
 		BOOST_FOREACH(std::vector<VistaChunk<VShort> >::reference sliceRef, vistaChunkList) {
-			float acquisitionTime=0;
 			u_int16_t repetitionTime=0;
 			util::fvector4 &ioprob = sliceRef.propertyValue( "indexOrigin" )->cast_to<util::fvector4>();
-			if(sliceRef.hasProperty("acquisitionTime"))
-				acquisitionTime = sliceRef.getProperty<float>("acquisitionTime");
 			if(!sliceRef.hasProperty("repetitionTime") && biggest_slice_time) {
-				sliceRef.setProperty<u_int16_t>("repetitionTime", (u_int16_t) biggest_slice_time);
+				sliceRef.setProperty<u_int16_t>("repetitionTime", biggest_slice_time);
 			}
 			if(sliceRef.hasProperty("repetitionTime")) {
 				repetitionTime = sliceRef.getProperty<u_int16_t>("repetitionTime");
@@ -374,22 +369,19 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 				}
 			}
 			sliceRef.setProperty<util::fvector4>("indexOrigin", ioprob);
-
 			/******************** SET index origin, acquisitionTime and aquisitionNumber ********************/
 			size_t timestep=0;
 			BOOST_FOREACH(data::ChunkList::reference spliceRef, splices) {
 				spliceRef.setProperty<util::fvector4>( "indexOrigin", ioprob );
 				spliceRef.setProperty<u_int16_t>("sequenceNumber", 0);
-				int32_t acqusitionNumber = (nloaded-1) + vImageVector.size() * timestep;
-				spliceRef.setProperty<int32_t>("acquisitionNumber", acqusitionNumber);
-
-				if (repetitionTime && acquisitionTime) {
-					float acquisitionTimeSplice = acquisitionTime + (repetitionTime * timestep);
-					spliceRef.setProperty("acquisitionTime", acquisitionTimeSplice );
+				u_int32_t acqusitionNumber = (nloaded-1) + vImageVector.size() * timestep;
+				spliceRef.setProperty<u_int32_t>("acquisitionNumber", acqusitionNumber);
+				if (repetitionTime && sliceRef.hasProperty("acquisitionTime")) {
+					float acquisitionTimeSplice = sliceRef.getProperty<float>("acquisitionTime") + (repetitionTime * timestep);
+					spliceRef.setProperty<float>("acquisitionTime", acquisitionTimeSplice );
 				}
 				timestep++;
 			}
-
 			LOG( DataLog, info ) << "adding " << splices.size() << " chunks to ChunkList";
 			/******************** add chunks to ChunkList ********************/
 			std::back_insert_iterator<data::ChunkList> dest_iter ( chunks );
@@ -444,6 +436,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 		throwGenericError ( "No images loaded" );
 
 	LOG( Debug , info ) << nloaded << " images loaded.";
+
 	return nloaded;
 }
 
@@ -515,7 +508,7 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 	vstr << sliceVec[0] << " " << sliceVec[1] << " " << sliceVec[2];
 	VAppendAttr( list, "sliceVec", NULL, VStringRepn, vstr.str().c_str() );
 	// index origin
-	util::fvector4 indexOrigin = image.getChunkAt(0).getProperty<util::fvector4>( "indexOrigin" );
+	util::fvector4 indexOrigin = image.getChunk(0,0,slice,0).getProperty<util::fvector4>( "indexOrigin" );
 	vstr.str( "" );
 	vstr << indexOrigin[0] << " " << indexOrigin[1] << " " << indexOrigin[2];
 	VAppendAttr( list, "indexOrigin", NULL, VStringRepn, vstr.str().c_str() );

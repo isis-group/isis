@@ -184,6 +184,7 @@ private:
 					float sliceTimeFloat;
 					sstr >> sliceTimeFloat;
 					chunk.setProperty<float>("acquisitionTime",  sliceTimeFloat  );
+					chunk.setProperty<float>("Vista/slice_time",  sliceTimeFloat  );
 					continue;
 				}
 
@@ -408,7 +409,7 @@ private:
 
 			// set acquisitionNumber. This values is always missing
 			if(!chunk.hasProperty("acquisitionNumber"))
-				chunk.setProperty<int32_t>( "acquisitionNumber", 0 );
+				chunk.setProperty<u_int32_t>( "acquisitionNumber", 0 );
 			LOG( DataLog, info ) << "finished copying header";
 		}
 
