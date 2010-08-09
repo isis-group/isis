@@ -266,7 +266,7 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	//since the acquisitionNumber is not stored in the PropMap of the image, we have
 	//to create a dummy acquisitionNumber
 	if ( !retChunk->hasProperty( "acqisitionNumber" ) )
-		retChunk->setProperty( "acquisitionNumber", 1 );
+		retChunk->setProperty( "acquisitionNumber", (u_int32_t) 1 );
 
 	//do not try to grasp that in a sober state!!
 	//workaround to create a TypedImage out of a MemChunk
@@ -303,7 +303,6 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 
 		chRef->join( *m_ChunkPropMapVector[chunkCounter], false );
 	}
-	std::cout << "geschafft" << std::endl;
 	data::ImageList retList;
 	retList.push_back( retImage );
 	//declare transformation matrix T (NIFTI -> DICOM)
