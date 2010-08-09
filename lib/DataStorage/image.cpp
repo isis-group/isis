@@ -77,6 +77,11 @@ bool Image::checkMakeClean()
 
 bool Image::insertChunk ( const Chunk &chunk )
 {
+	if ( chunk.volume()==0 ) {
+		LOG( Runtime, error )
+				<< "Cannot insert empty Chunk (Size is "<< chunk.sizeToString() << ").";
+		return false;
+	}
 	if ( ! chunk.valid() ) {
 		LOG( Runtime, error )
 				<< "Cannot insert invalid chunk. Missing properties: " << chunk.getMissing();
@@ -90,7 +95,8 @@ bool Image::insertChunk ( const Chunk &chunk )
 		clean = false;
 		lookup.clear();
 		return true;
-	} else return false;
+	} else
+		return false;
 }
 
 
@@ -230,8 +236,8 @@ bool Image::reIndex()
 			if ( sliceDist > 0 ) {
 				const float inf = std::numeric_limits<float>::infinity();
 
-				if ( ! hasProperty( "voxelGap" ) ) {
-					setProperty( "voxelGap", util::fvector4( inf, inf, inf, inf ) );
+				if ( ! hasProperty( "voxelGap" ) ) { // @todo check this
+					setProperty( "voxelGap", util::fvector4( 0, 0, inf, 0 ) );
 				}
 
 				util::fvector4 &voxelGap = propertyValue( "voxelGap" )->cast_to<util::fvector4>(); //if there is no voxelGap yet, we create it

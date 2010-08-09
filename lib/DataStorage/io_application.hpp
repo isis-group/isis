@@ -48,7 +48,7 @@ public:
 	virtual bool init( int argc, char **argv, bool exitOnError = true );
 
 	bool autoload( bool exitOnError = false );
-	bool autowrite( const ImageList &out_images, bool exitOnError = false );
+	bool autowrite( ImageList out_images, bool exitOnError = false );
 };
 
 }

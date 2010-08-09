@@ -79,7 +79,7 @@ public:
 	std::list<std::string> getEntries()const;
 };
 
-template<typename T> Selection::Selection( const std::map< T, std::string >& map )
+template<typename T> Selection::Selection( const std::map< T, std::string >& map ): m_set( 0 )
 {
 	for( typename std::map< T, std::string >::const_iterator i = map.begin(); i != map.end(); i++ ) {
 		const map_type::value_type pair( i->second, i->first );

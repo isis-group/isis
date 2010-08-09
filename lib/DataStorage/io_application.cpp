@@ -113,63 +113,29 @@ bool IOApplication::autoload( bool exitOnError )
 
 	return true;
 }
-bool IOApplication::autowrite( const ImageList &out_images, bool exitOnError )
+bool IOApplication::autowrite( ImageList out_images, bool exitOnError )
 {
 	const util::Selection repn = parameters["repn"];
 	const std::string output = parameters["out"];
 	const std::string wf = parameters["wf"];
 	const std::string dl = parameters["wdialect"];
-	ImageList convertedList;
-
-	switch ( ( int )repn ) {
-	case util::Type<int8_t>::staticID:
-		convertedList = convertTo<int8_t>( out_images );
-		break;
-	case util::Type<u_int8_t>::staticID:
-		convertedList = convertTo<u_int8_t>( out_images );
-		break;
-	case util::Type<int16_t>::staticID:
-		convertedList = convertTo<int16_t>( out_images );
-		break;
-	case util::Type<u_int16_t>::staticID:
-		convertedList = convertTo<u_int16_t>( out_images );
-		break;
-	case util::Type<int32_t>::staticID:
-		convertedList = convertTo<int32_t>( out_images );
-		break;
-	case util::Type<u_int32_t>::staticID:
-		convertedList = convertTo<u_int32_t>( out_images );
-		break;
-	case util::Type<float>::staticID:
-		convertedList = convertTo<float>( out_images );
-		break;
-	case util::Type<double>::staticID:
-		convertedList = convertTo<double>( out_images );
-		break;
-	default:
-
-		if( parameters["repn"].toString() != "<<NOT_SET>>" ) {
-			std::string oldRepn = util::getTypeMap()[out_images.front()->typeID()];
-			oldRepn.erase( oldRepn.size() - 1, oldRepn.size() );
-			LOG( DataLog, warning ) << "Pixel representation " << parameters["repn"].toString()
-									<< " not yet supported. Retaining "
-									<< oldRepn << ".";
-		}
-
-		convertedList = out_images;
-		break;
-	}
 
 	LOG( Runtime, info )
 			<< "Writing " << out_images.size() << " images"
-			//  << (repn ? std::string(" as ") + (std::string)repn : "")
+			<< (repn ? std::string(" as ") + (std::string)repn : "")
 			<< " to " << util::MSubject( output )
 			<< ( wf.empty() ? "" : std::string( " using the format: " ) + wf )
 			<< ( ( !wf.empty() && !dl.empty() ) ? " and" : "" )
 			<< ( dl.empty() ? "" : std::string( " using the dialect: " ) + dl );
+
+	if(repn!=0){
+		BOOST_FOREACH(ImageList::reference ref,out_images){
+			ref->makeOfTypeId(repn);
+		}
+	}
 	data::IOFactory::setProgressFeedback( &feedback );
 
-	if ( ! IOFactory::write( convertedList, output, wf, dl ) ) {
+	if ( ! IOFactory::write( out_images, output, wf, dl ) ) {
 		if ( exitOnError )
 			exit( 1 );
 
