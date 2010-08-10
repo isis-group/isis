@@ -328,14 +328,12 @@ ChunkList Chunk::splice ( dimensions atDim )const
 	}
 	return ret;
 }
-bool Chunk::swapAlong(  Chunk &dst, const size_t dim, bool convertTransform ) const
+bool Chunk::swapAlong( Chunk &dst, const size_t dim, bool convertTransform ) const
 {
 	size_t dims[] = { dimSize( 0 ), dimSize( 1 ), dimSize( 2 ), dimSize( 3 ) };
+	dst.join(static_cast<util::PropMap>(*this), false);
 
 	if ( get()->swapAlong( *dst, dim, dims ) ) {
-		const util::PropMap &tmpMap( *this );
-		static_cast<PropMap &>( dst ) = tmpMap;
-
 		if ( convertTransform ) {
 			util::fvector4 read = getProperty<util::fvector4>( "readVec" );
 			util::fvector4 phase = getProperty<util::fvector4>( "phaseVec" );
@@ -351,8 +349,9 @@ bool Chunk::swapAlong(  Chunk &dst, const size_t dim, bool convertTransform ) co
 			dst.setProperty<util::fvector4>( "indexOrigin", origin );
 		}
 
-		return 1;
-	} else return 0;
+
+		return true;
+	} else return false;
 }
 
 }
