@@ -11,9 +11,6 @@ public:
 	std::string suffixes() {
 		return std::string( ".null .null.gz" );
 	}
-	std::string dialects() {
-		return std::string( "inverted" );
-	}
 	std::string name() {
 		return "Null";
 	}
