@@ -252,10 +252,7 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 		indexOrigin[0] = -indexOrigin[0];
 		indexOrigin[1] = -indexOrigin[1];
 	}
-
-	//  std::cout << "GNA: " << indexOrigin << std::endl;
-	//  std::cout << "indexOrigin: " << indexOrigin << std::endl;
-	//  std::cout << "itkDirection: " << imageDirection << std::endl;
+	
 	// TODO use MemImage instead of MemChunk.
 	boost::shared_ptr<data::MemChunk< typename TImageITK::PixelType > >
 	retChunk( new data::MemChunk< typename TImageITK::PixelType  >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) ) ;

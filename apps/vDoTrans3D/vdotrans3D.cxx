@@ -208,7 +208,7 @@ int main(
 	if ( template_filename ) {
 		isis::data::ImageList tmpList = isis::data::IOFactory::load( template_filename, "" );
 		LOG_IF( tmpList.empty(), isis::DataLog, isis::error ) << "Template image is empty!";
-		templateImage = fixedAdapter->makeItkImageObject<InputImageType>( tmpList.front() );
+		templateImage = fixedAdapter->makeItkImageObject<InputImageType>( tmpList.front()  );
 		outputDirection = templateImage->GetDirection();
 		outputOrigin = templateImage->GetOrigin();
 	}
@@ -438,7 +438,6 @@ int main(
 			timeStepExtractionFilter->SetRequestedTimeStep( timestep );
 			timeStepExtractionFilter->Update();
 			tmpImage = timeStepExtractionFilter->GetOutput();
-			//                  std::cout << tmpImage << std::endl;
 			tmpImage->SetDirection( inputImage->GetDirection() );
 			tmpImage->SetOrigin( inputImage->GetOrigin() );
 
@@ -462,7 +461,7 @@ int main(
 		tileImageFilter->SetLayout( layout );
 		tileImageFilter->Update();
 		isis::data::ImageList imgList = movingAdapter->makeIsisImageObject<FMRIOutputType>( tileImageFilter->GetOutput() );
-		isis::data::IOFactory::write( imgList, out_filename, "", "" );
+		isis::data::IOFactory::write( imgList, out_filename, "" ,"" );
 	}
 
 	std::cout << std::endl << "Done.    " << std::endl;
