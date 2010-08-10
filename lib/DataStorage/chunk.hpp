@@ -30,7 +30,7 @@ namespace data
 {
 
 class Chunk;
-typedef std::list<Chunk> ChunkList;
+typedef std::list<boost::shared_ptr<Chunk> > ChunkList;
 
 
 namespace _internal

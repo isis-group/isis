@@ -173,7 +173,7 @@ public:
 		//          return 1;
 		//      }
 		// push the completed NiftiChunk into the list
-		retList.push_back( *retChunk );
+		retList.push_back( retChunk );
 		return retChunk ? 1 : 0;
 	}
 

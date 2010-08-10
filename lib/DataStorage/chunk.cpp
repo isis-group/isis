@@ -299,8 +299,8 @@ ChunkList Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 	LOG( Runtime, info ) << "Splicing chunk at dimenstion " << atDim + 1 << " with indexOrigin stride " << indexOriginOffset << " and acquisitionNumberStride " << acquisitionNumberStride;
 	ChunkList ret = splice( ( dimensions )atDim ); // do low level splice - get the chunklist
 	BOOST_FOREACH( ChunkList::reference ref, ret ) { // adapt some metadata in them
-		util::fvector4 &orig = ref.propertyValue( "indexOrigin" )->cast_to<util::fvector4>();
-		uint32_t &acq = ref.propertyValue( "acquisitionNumber" )->cast_to<u_int32_t>();
+		util::fvector4 &orig = ref->propertyValue( "indexOrigin" )->cast_to<util::fvector4>();
+		uint32_t &acq = ref->propertyValue( "acquisitionNumber" )->cast_to<u_int32_t>();
 		orig = orig + indexOriginOffset * cnt;
 		acq += acquisitionNumberStride * cnt; //@todo this might cause trouble if we try to insert this chunks into an image
 		cnt++;
@@ -322,8 +322,8 @@ ChunkList Chunk::splice ( dimensions atDim )const
 	const TypePtrList pointers = this->getTypePtrBase().splice( spliceSize.product() );
 	//create new Chunks from this TypePtr's
 	BOOST_FOREACH( TypePtrList::const_reference ref, pointers ) {
-		Chunk spliced( ref, spliceSize[0], spliceSize[1], spliceSize[2], spliceSize[3] );
-		static_cast<util::PropMap &>( spliced ) = static_cast<const util::PropMap &>( *this ); //copy the metadate of ref
+		boost::shared_ptr<Chunk> spliced( new Chunk( ref, spliceSize[0], spliceSize[1], spliceSize[2], spliceSize[3] ) );
+		static_cast<util::PropMap &>( *spliced ) = static_cast<const util::PropMap &>( *this ); //copy the metadate of ref
 		ret.push_back( spliced ); // store splice for return
 	}
 	return ret;

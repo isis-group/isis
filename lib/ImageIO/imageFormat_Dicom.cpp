@@ -412,7 +412,7 @@ void ImageFormat_Dicom::readMosaic( const data::Chunk &source, data::ChunkList &
 		LOG( Debug, info ) << "New fov: " << newChunk->propertyValue( "fov" );
 	}
 
-	dest.push_back( *newChunk );
+	dest.push_back( newChunk );
 }
 
 
@@ -433,7 +433,7 @@ int ImageFormat_Dicom::load( data::ChunkList &chunks, const std::string &filenam
 				LOG( Runtime, verbose_info ) << "This seems to be an mosaic image, will decompose it";
 				readMosaic( *chunk, chunks );
 			} else {
-				chunks.push_back( *chunk );
+				chunks.push_back( chunk );
 			}
 
 			return 1;

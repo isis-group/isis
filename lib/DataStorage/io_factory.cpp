@@ -252,8 +252,8 @@ data::ImageList IOFactory::load( const std::string &path, std::string suffix_ove
 					   get().loadPath( chunks, p, suffix_override, dialect ) :
 					   get().loadFile( chunks, p, suffix_override, dialect );
 	BOOST_FOREACH( data::ChunkList::reference ref, chunks ) {
-		if ( ! ref.hasProperty( "source" ) )
-			ref.setProperty( "source", p.string() );
+		if ( ! ref->hasProperty( "source" ) )
+			ref->setProperty( "source", p.string() );
 	}
 	LOG( Runtime, info ) << "chunks in list: " << chunks.size();
 	const data::ImageList images( chunks );

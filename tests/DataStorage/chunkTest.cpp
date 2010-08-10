@@ -186,7 +186,7 @@ BOOST_AUTO_TEST_CASE ( chunk_splice_test )//Copy chunks
 	unsigned short cnt = 1;
 	BOOST_CHECK_EQUAL( splices.size(), 3 );
 	BOOST_FOREACH( data::ChunkList::const_reference ref, splices ) {
-		BOOST_CHECK_EQUAL( ref.getProperty<util::fvector4>( "indexOrigin" ), util::fvector4( 1, 1, cnt ) );
+		BOOST_CHECK_EQUAL( ref->getProperty<util::fvector4>( "indexOrigin" ), util::fvector4( 1, 1, cnt ) );
 		cnt += 2;
 	}
 }

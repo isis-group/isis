@@ -464,9 +464,9 @@ ImageList::ImageList() {}
 ImageList::ImageList( ChunkList src )
 {
 	for ( ChunkList::iterator i = src.begin(); i != src.end(); ) {
-		if ( ! i->valid() ) { // drop invalid chunks
+		if ( ! ( *i )->valid() ) { // drop invalid chunks
 			LOG( Runtime, error )
-					<< "Ignoring invalid chunk. Missing properties: " << i->getMissing();
+					<< "Ignoring invalid chunk. Missing properties: " << ( *i )->getMissing();
 			src.erase( i++ );
 		} else
 			i++;
@@ -480,7 +480,7 @@ ImageList::ImageList( ChunkList src )
 		size_t cnt = 0;
 
 		for ( ChunkList::iterator i = src.begin(); i != src.end(); ) { // for all remaining chunks
-			if ( buff->insertChunk( *i ) ) {
+			if ( buff->insertChunk( **i ) ) {
 				src.erase( i++ );
 				cnt++;
 			} else
@@ -649,7 +649,7 @@ void Image::transformCoords( boost::numeric::ublas::matrix<float> transform )
 	// orient * orient^T = I, where I is the identity matrix.
 	// calculate new orientation matrix --> O_new = O * T
 	boost::numeric::ublas::matrix<float> new_orient =
-		boost::numeric::ublas::prod( orient, transform);
+		boost::numeric::ublas::prod( orient, transform );
 	// transform index origin into new coordinate space.
 	// o_new -> O_new * (O^-1 * o)
 	boost::numeric::ublas::vector<float> new_o =
@@ -706,7 +706,7 @@ size_t Image::spliceDownTo( dimensions dim ) //readDim = 0, phaseDim, sliceDim, 
 	}
 
 	LOG_IF( lookup[0]->relevantDims() == ( size_t ) dim, Debug, info ) << "Running useless splice, the dimensionality of the chunks of this image is already " << dim;
-	LOG_IF( hasProperty("acquisitionTime") || lookup[0]->hasProperty("acquisitionTime"), Debug, warning ) << "Splicing images with acquisitionTime will cause you lots of trouble. You should remove that before.";
+	LOG_IF( hasProperty( "acquisitionTime" ) || lookup[0]->hasProperty( "acquisitionTime" ), Debug, warning ) << "Splicing images with acquisitionTime will cause you lots of trouble. You should remove that before.";
 	util::FixedVector<size_t, 4> size = sizeToVector();
 
 	for( int i = 0; i < dim; i++ )
@@ -714,8 +714,8 @@ size_t Image::spliceDownTo( dimensions dim ) //readDim = 0, phaseDim, sliceDim, 
 
 	// get a list of needed properties (everything which is missing in a newly created chunk plus everything which is needed for autosplice)
 	const std::list<std::string> splice_needed = util::string2list<std::string>( "voxelSize,voxelGap,readVec,phaseVec,sliceVec,indexOrigin,acquisitionNumber" );
-	std::set<std::string,util::_internal::caselessStringLess> needed=static_cast<const util::PropMap&>(MemChunk<short>(1)).getMissing();
-	needed.insert(splice_needed.begin(),splice_needed.end());
+	util::PropMap::key_list needed = MemChunk<short>( 1 ).getMissing();
+	needed.insert( splice_needed.begin(), splice_needed.end() );
 
 	struct splicer {
 		dimensions m_dim;
@@ -729,8 +729,8 @@ size_t Image::spliceDownTo( dimensions dim ) //readDim = 0, phaseDim, sliceDim, 
 				const size_t subSize = m_image.sizeToVector()[topDim];
 				assert( !( m_amount % subSize ) ); // there must not be any "remaining"
 				splicer sub( m_dim, m_amount / subSize, m_image );
-				BOOST_FOREACH( const Chunk & ref, ch.autoSplice( m_amount / subSize ) ) {
-					sub( ref );
+				BOOST_FOREACH( ChunkList::const_reference ref, ch.autoSplice( m_amount / subSize ) ) {
+					sub( *ref );
 				}
 			} else { // seems like we're done - insert it into the image
 				assert( ch.relevantDims() == ( size_t ) m_dim ); // index of the higest dim>1 (ch.relevantDims()-1) shall be equal to the dim below the requested splicing (m_dim-1)
@@ -744,7 +744,7 @@ size_t Image::spliceDownTo( dimensions dim ) //readDim = 0, phaseDim, sliceDim, 
 	//static_cast<util::PropMap::base_type*>(this)->clear(); we can keep the common properties - they will be merged with thier own copies from the chunks on the next reIndex
 	splicer splice( dim, size.product(), *this );
 	BOOST_FOREACH( boost::shared_ptr<Chunk> &ref, buffer ) {
-		BOOST_FOREACH( const std::string &need, needed ) { //get back properties needed for the
+		BOOST_FOREACH( const std::string & need, needed ) { //get back properties needed for the
 			if( !ref->hasProperty( need ) && this->hasProperty( need ) )
 				ref->propertyValue( need ) = this->propertyValue( need );
 		}

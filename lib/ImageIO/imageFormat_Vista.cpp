@@ -284,10 +284,10 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 			data::ChunkList splices = sliceRef.splice( data::sliceDim );
 			LOG( DataLog, info ) << "finished splicing with " << splices.size();
 			LOG( DataLog, info ) << data::Chunk::n_dims;
-			LOG( DataLog, info ) << splices.begin()->dimSize( 0 );
-			LOG( DataLog, info ) << splices.begin()->dimSize( 1 );
-			LOG( DataLog, info ) << splices.begin()->dimSize( 2 );
-			LOG( DataLog, info ) << splices.begin()->dimSize( 3 );
+			LOG( DataLog, info ) << splices.front()->dimSize( 0 );
+			LOG( DataLog, info ) << splices.front()->dimSize( 1 );
+			LOG( DataLog, info ) << splices.front()->dimSize( 2 );
+			LOG( DataLog, info ) << splices.front()->dimSize( 3 );
 			/******************** GET index origin ********************/
 			// the index origin of each slice depends on the slice orientation
 			// and voxel resolution. All chunks in the ChunkList splices are supposed
@@ -382,14 +382,14 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 			/******************** SET index origin, acquisitionTime and aquisitionNumber ********************/
 			size_t timestep = 0;
 			BOOST_FOREACH( data::ChunkList::reference spliceRef, splices ) {
-				spliceRef.setProperty<util::fvector4>( "indexOrigin", ioprob );
-				spliceRef.setProperty<u_int16_t>( "sequenceNumber", 0 );
+				spliceRef->setProperty<util::fvector4>( "indexOrigin", ioprob );
+				spliceRef->setProperty<u_int16_t>( "sequenceNumber", 0 );
 				u_int32_t acqusitionNumber = ( nloaded - 1 ) + vImageVector.size() * timestep;
-				spliceRef.setProperty<uint32_t>( "acquisitionNumber", acqusitionNumber );
+				spliceRef->setProperty<uint32_t>( "acquisitionNumber", acqusitionNumber );
 
 				if ( repetitionTime && sliceRef.hasProperty( "acquisitionTime" ) ) {
 					float acquisitionTimeSplice = sliceRef.getProperty<float>( "acquisitionTime" ) + ( repetitionTime * timestep );
-					spliceRef.setProperty<float>( "acquisitionTime", acquisitionTimeSplice );
+					spliceRef->setProperty<float>( "acquisitionTime", acquisitionTimeSplice );
 				}
 
 				timestep++;
@@ -426,7 +426,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 		for( unsigned k = 0; k < nimages; k++ ) {
 			if( switchHandle( images[k], chunks ) ) {
 				nloaded++;
-				chunks.back().setProperty<u_int16_t>( "sequenceNumber", nloaded );
+				chunks.back()->setProperty<u_int16_t>( "sequenceNumber", nloaded );
 			}
 		}
 	} // END else
@@ -436,7 +436,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 	BOOST_FOREACH( std::vector<VImage>::reference vImageRef, residualVImages ) {
 		if( switchHandle( vImageRef, chunks ) ) {
 			nloaded++;
-			chunks.back().setProperty<u_int16_t>( "sequenceNumber", ++sequenceNumber );
+			chunks.back()->setProperty<u_int16_t>( "sequenceNumber", ++sequenceNumber );
 		}
 	}
 	//  cleanup, close file handle
@@ -675,9 +675,7 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 
 template <typename TInput> void ImageFormat_Vista::addChunk( data::ChunkList &chunks, VImage image )
 {
-	VistaChunk<TInput>* chunk_sp = new VistaChunk<TInput>( image, false );
-	// add chunk to chunk list
-	chunks.push_back( *chunk_sp );
+	chunks.push_back( data::ChunkList::value_type( new VistaChunk<TInput>( image, false ) ) );
 }
 
 template <typename T> bool ImageFormat_Vista::copyImageToVista( const data::Image &image, VImage &vimage )

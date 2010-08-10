@@ -461,7 +461,7 @@ int main(
 		tileImageFilter->SetLayout( layout );
 		tileImageFilter->Update();
 		isis::data::ImageList imgList = movingAdapter->makeIsisImageObject<FMRIOutputType>( tileImageFilter->GetOutput() );
-		isis::data::IOFactory::write( imgList, out_filename, "" ,"" );
+		isis::data::IOFactory::write( imgList, out_filename, "" , "" );
 	}
 
 	std::cout << std::endl << "Done.    " << std::endl;
