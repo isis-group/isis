@@ -264,6 +264,11 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer()
 			if ( transform.BSPLINEDEFORMABLETRANSFORM or transform.AFFINE or transform.CENTEREDAFFINE or transform.TRANSLATION ) {
 				optimizerScaleRegularStepGradient.Fill( 1.0 );
 			}
+			if ( transform.AFFINE ) {
+				optimizerScaleRegularStepGradient[9] = 0.001;
+				optimizerScaleRegularStepGradient[10] = 0.001;
+				optimizerScaleRegularStepGradient[11] = 0.001;
+			}
 
 			if ( transform.SCALE ) {
 				//rotation
@@ -309,35 +314,34 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer()
 		VersorRigid3DTransformOptimizerType::ScalesType optimizerScaleVersorRigid3D( m_NumberOfParameters );
 
 		if ( transform.VERSORRIGID ) {
-			optimizerScaleVersorRigid3D[0] = 1.0;
-			optimizerScaleVersorRigid3D[1] = 1.0;
-			optimizerScaleVersorRigid3D[2] = 1.0;
-
-			for ( unsigned int i = 3; i < m_NumberOfParameters; i++ ) {
-				optimizerScaleVersorRigid3D[i] = 1.0 / 1000.0;
-			}
+			optimizerScaleVersorRigid3D[0] = 0.0001;
+			optimizerScaleVersorRigid3D[1] = 10;
+			optimizerScaleVersorRigid3D[2] = 10;
+			optimizerScaleVersorRigid3D[3] = 10;
+			optimizerScaleVersorRigid3D[4] = 10;
+			optimizerScaleVersorRigid3D[5] = 0.00001;
 		}
 
 		if ( transform.SCALE ) {
 			//rotation
-			optimizerScaleVersorRigid3D[0] = 0.0;
-			optimizerScaleVersorRigid3D[1] = 0.0;
-			optimizerScaleVersorRigid3D[2] = 0.0;
+			optimizerScaleVersorRigid3D[0] = 10000.0;
+			optimizerScaleVersorRigid3D[1] = 10000.0;
+			optimizerScaleVersorRigid3D[2] = 10000.0;
 			//translation
-			optimizerScaleVersorRigid3D[3] = 0.0;
-			optimizerScaleVersorRigid3D[4] = 0.0;
-			optimizerScaleVersorRigid3D[5] = 0.0;
+			optimizerScaleVersorRigid3D[3] = 10000.0;
+			optimizerScaleVersorRigid3D[4] = 10000.0;
+			optimizerScaleVersorRigid3D[5] = 10000.0;
 			//scaling
 			optimizerScaleVersorRigid3D[6] = 1.0;
 			optimizerScaleVersorRigid3D[7] = 1.0;
 			optimizerScaleVersorRigid3D[8] = 1.0;
 			//skew
-			optimizerScaleVersorRigid3D[9] = 0.0;
-			optimizerScaleVersorRigid3D[10] = 0.0;
-			optimizerScaleVersorRigid3D[11] = 0.0;
-			optimizerScaleVersorRigid3D[12] = 0.0;
-			optimizerScaleVersorRigid3D[13] = 0.0;
-			optimizerScaleVersorRigid3D[14] = 0.0;
+			optimizerScaleVersorRigid3D[9] = 10000.0;
+			optimizerScaleVersorRigid3D[10] = 10000.0;
+			optimizerScaleVersorRigid3D[11] = 10000.0;
+			optimizerScaleVersorRigid3D[12] = 10000.0;
+			optimizerScaleVersorRigid3D[13] = 10000.0;
+			optimizerScaleVersorRigid3D[14] = 10000.0;
 		}
 
 		m_VersorRigid3DTransformOptimizer->SetMaximumStepLength( 0.1 * UserOptions.CoarseFactor );
@@ -526,8 +530,6 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpTransform()
 		m_ScaleEstimateFilter->SetNumberOfThreads( UserOptions.NumberOfThreads );
 		m_EstimatedScaling = m_ScaleEstimateFilter->EstimateScaling( ScaleEstimateFilterType::isotropic );
 		m_ScaleSkewTransform->SetScale( m_EstimatedScaling );
-		std::cout << m_EstimatedScaling << std::endl;
-		UserOptions.NumberOfIterations = 0;
 		m_NumberOfParameters = m_ScaleSkewTransform->GetNumberOfParameters();
 		m_RegistrationObject->SetInitialTransformParameters( m_ScaleSkewTransform->GetParameters() );
 	}
