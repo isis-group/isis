@@ -263,12 +263,12 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	//since the acquisitionNumber is not stored in the PropMap of the image, we have
 	//to create a dummy acquisitionNumber
 	if ( !retChunk->hasProperty( "acqisitionNumber" ) )
-		retChunk->setProperty<uint32_t>( "acquisitionNumber", 1 );
+		retChunk->setProperty( "acquisitionNumber", static_cast<u_int32_t>(1) );
 
 	//do not try to grasp that in a sober state!!
 	//workaround to create a TypedImage out of a MemChunk
 	data::ChunkList chunkList;
-	chunkList.push_back( *retChunk );
+	chunkList.push_back( retChunk );
 	data::ImageList isisImageList( chunkList );
 	boost::shared_ptr< data::TypedImage< TOutputISIS > > retImage (
 		new data::TypedImage<TOutputISIS>  ( *isisImageList.front().get() ) );
