@@ -193,7 +193,6 @@ public:
 		ni.datatype = DT_UNKNOWN;
 		ni.data = NULL;
 		ni.fname = const_cast<char *>( filename.c_str() );
-
 		//orientation in isis LPS - but in nifti everything relative to RAS
 		// - so let's change read/phase direction and sign of indexOrigin
 		//now we try to transform
@@ -208,7 +207,6 @@ public:
 		matrix( 2, 1 ) = 0;
 		matrix( 2, 2 ) = +1;
 		image.transformCoords( matrix );
-
 		//set the props from the image to the nifti file
 		copyHeaderToNifti( image, ni );
 		// set filename for resulting image(s) due to Analyze vs. Nifti

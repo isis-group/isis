@@ -256,7 +256,6 @@ data::ImageList IOFactory::load( const std::string &path, std::string suffix_ove
 			ref->setProperty( "source", p.string() );
 	}
 	LOG( Runtime, info ) << "chunks in list: " << chunks.size();
-
 	const data::ImageList images( chunks );
 	LOG( Runtime, info )
 			<< "Generated " << images.size() << " images out of " << loaded << " chunks from " << ( boost::filesystem::is_directory( p ) ? "directory " : "" ) << p;

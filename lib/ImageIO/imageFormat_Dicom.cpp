@@ -347,7 +347,7 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 	}
 }
 
-void ImageFormat_Dicom::readMosaic( const data::Chunk &source, data::ChunkList &dest )
+void ImageFormat_Dicom::readMosaic( data::Chunk source, data::ChunkList &dest )
 {
 	// prepare some needed parameters
 	const std::string prefix = std::string( ImageFormat_Dicom::dicomTagTreeName ) + "/";
@@ -369,50 +369,95 @@ void ImageFormat_Dicom::readMosaic( const data::Chunk &source, data::ChunkList &
 	const u_int16_t matrixSize = std::ceil( std::sqrt( images ) );
 	size[0] /= matrixSize;
 	size[1] /= matrixSize;
-	size[2] *= images;
 	assert( size[3] == 1 );
-	LOG( Debug, info ) << "Decomposing a " << source.sizeToVector() << " mosaic-image into a " << size << " image";
-	boost::shared_ptr<data::Chunk> newChunk( new data::Chunk( source.cloneToMem( size[0], size[1], size[2], size[3] ) ) );
-
-	for ( size_t slice = 0; slice < size[2]; slice++ ) {
-		for ( size_t phase = 0; phase < size[1]; phase++ ) {
-			const size_t dpos[] = {0, phase, slice, 0};
-			const size_t column = slice % matrixSize;
-			const size_t row = slice / matrixSize;
-			const size_t sstart[] = {column *size[0], row *size[1] + phase, 0, 0};
-			const size_t send[] = {sstart[0] + size[0] - 1, row *size[1] + phase, 0, 0};
-			source.copyRange( sstart, send, *newChunk, dpos );
-		}
-	}
-
-	// fix the properties
-	static_cast<util::PropMap &>( *newChunk ) = static_cast<const util::PropMap &>( source ); //copy _only_ the Properties of source
-	newChunk->remove( NumberOfImagesInMosaicProp ); // we dont need that anymore
-	newChunk->setProperty( prefix + "ImageType", iType );
-	//remove the additional mosaic offset and recalc the fov if given
-	//eg. if there is a 10x10 Mosaic, substract the half size of 9 Images from the indexOrigin
-	util::fvector4 &origin = newChunk->propertyValue( "indexOrigin" )->cast_to<util::fvector4>();
-	const util::fvector4 voxelSize = newChunk->getProperty<util::fvector4>( "voxelSize" );
+	LOG( Debug, info ) << "Decomposing a " << source.sizeToVector() << " mosaic-image into " << images << " " << size << " slices";
+	// fix the properties of the source (we 'll need them later)
 	util::fvector4 voxelGap;
 
-	if ( newChunk->hasProperty( "voxelGap" ) )
-		voxelGap = newChunk->getProperty<util::fvector4>( "voxelGap" );
+	if ( source.hasProperty( "voxelGap" ) )
+		voxelGap = source.getProperty<util::fvector4>( "voxelGap" );
 
-	const util::fvector4 fovCorr = newChunk->getFoV( voxelSize, voxelGap ) / 2 * ( matrixSize - 1 );
-	const util::fvector4 offset = ( newChunk->getProperty<util::fvector4>( "readVec" ) * fovCorr[0] ) + ( newChunk->getProperty<util::fvector4>( "phaseVec" ) * fovCorr[1] );
-	origin = origin + offset;
-	LOG( Debug, info ) << "New origin: " << newChunk->propertyValue( "indexOrigin" );
+	const util::fvector4 voxelSize = source.getProperty<util::fvector4>( "voxelSize" );
+	const util::fvector4 &readVec = source.getProperty<util::fvector4>( "readVec" );
+	const util::fvector4 &phaseVec = source.getProperty<util::fvector4>( "phaseVec" );
+	//remove the additional mosaic offset
+	//eg. if there is a 10x10 Mosaic, substract the half size of 9 Images from the offset
+	const util::fvector4 fovCorr = ( voxelSize + voxelGap ) * size * ( matrixSize - 1 ) / 2; // @todo this will not include the voxelGap between the slices
+	util::fvector4 &origin = source.propertyValue( "indexOrigin" )->cast_to<util::fvector4>();
+	origin = origin + ( readVec * fovCorr[0] ) + ( phaseVec * fovCorr[1] );
+	source.remove( NumberOfImagesInMosaicProp ); // we dont need that anymore
+	source.setProperty( prefix + "ImageType", iType );
 
-	if ( newChunk->hasProperty( "fov" ) ) {
-		util::fvector4 &ref = newChunk->propertyValue( "fov" )->cast_to<util::fvector4>();
-		ref[0] /= matrixSize;
-		ref[1] /= matrixSize;
-		LOG_IF( ref[2] != invalid_float, Runtime, warning ) << "Overriding defined slice FoV in mosaic image";
-		ref[2] = newChunk->getFoV( voxelSize, voxelGap )[2];
-		LOG( Debug, info ) << "New fov: " << newChunk->propertyValue( "fov" );
+	// if we dont have a sliceVec - compute it
+	if( !source.hasProperty( "sliceVec" ) ) {
+		const util::fvector4 crossVec = util::fvector4(
+											readVec[1] * phaseVec[2] - readVec[2] * phaseVec[1],
+											readVec[2] * phaseVec[0] - readVec[0] * phaseVec[2],
+											readVec[0] * phaseVec[1] - readVec[1] * phaseVec[0]
+										);
+		source.setProperty( "sliceVec", crossVec );
 	}
 
-	dest.push_back( newChunk );
+	const util::fvector4 sliceVec = source.getProperty<util::fvector4>( "sliceVec" ).norm() * ( voxelSize[2] + voxelGap[2] );
+
+	//store and remove acquisitionTime
+	std::list<double>::const_iterator acqTimeIt;
+
+	bool haveAcqTimeList = source.hasProperty( prefix + "CSAImageHeaderInfo/MosaicRefAcqTimes" );
+
+	float acqTime = 0;
+
+	if( haveAcqTimeList )
+		acqTimeIt = source.propertyValue( prefix + "CSAImageHeaderInfo/MosaicRefAcqTimes" )->cast_to<std::list<double> >().begin();
+
+	if( source.hasProperty( "acquisitionTime" ) ) {
+		acqTime = source.propertyValue( "acquisitionTime" )->cast_to<float>();
+	}
+
+	// Create a chunk-vector for the slices
+	std::vector<boost::shared_ptr<data::Chunk> > newChunks( images );
+
+	// for every slice
+	for ( size_t slice = 0; slice < images; slice++ ) {
+		newChunks[slice].reset( new data::Chunk( source.cloneToMem( size[0], size[1] ) ) );
+
+		// copy the lines into the corresponding slice-chunk
+		for ( size_t phase = 0; phase < size[1]; phase++ ) {
+			const size_t dpos[] = {0, phase, 0, 0}; //begin of the target line
+			const size_t column = slice % matrixSize;
+			const size_t row = slice / matrixSize;
+			const size_t sstart[] = {column *size[0], row *size[1] + phase, 0, 0}; //begin of the source line
+			const size_t send[] = {sstart[0] + size[0] - 1, row *size[1] + phase, 0, 0}; //end of the source line
+			source.copyRange( sstart, send, *newChunks[slice], dpos );
+		}
+
+		// and "fix" its properties
+		static_cast<util::PropMap &>( *newChunks[slice] ) = static_cast<const util::PropMap &>( source ); //copy _only_ the Properties of source
+		// update origin
+		util::fvector4 &origin = newChunks[slice]->propertyValue( "indexOrigin" )->cast_to<util::fvector4>();
+		origin = origin + ( sliceVec * slice );
+
+		// update fov
+		if ( newChunks[slice]->hasProperty( "fov" ) ) {
+			util::fvector4 &ref = newChunks[slice]->propertyValue( "fov" )->cast_to<util::fvector4>();
+			ref[0] /= matrixSize;
+			ref[1] /= matrixSize;
+		}
+
+		// fix/set acquisitionNumber and acquisitionTime
+		newChunks[slice]->propertyValue( "acquisitionNumber" )->cast_to<uint32_t>() += slice;
+
+		if( haveAcqTimeList ) {
+			newChunks[slice]->setProperty<float>( "acquisitionTime", acqTime + *( acqTimeIt++ ) );
+		}
+
+		LOG( Debug, verbose_info )
+				<< "New slice " << slice << " at " << newChunks[slice]->propertyValue( "indexOrigin" ).toString( false )
+				<< " with acquisitionNumber " << newChunks[slice]->propertyValue( "acquisitionNumber" ).toString( false )
+				<< ( haveAcqTimeList ? std::string( " and acquisitionTime " ) + newChunks[slice]->propertyValue( "acquisitionTime" ).toString( false ) : "" );
+	}
+
+	dest.insert( dest.end(), newChunks.begin(), newChunks.end() );
 }
 
 

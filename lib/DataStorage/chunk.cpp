@@ -331,7 +331,8 @@ ChunkList Chunk::splice ( dimensions atDim )const
 bool Chunk::swapAlong( Chunk &dst, const size_t dim, bool convertTransform ) const
 {
 	size_t dims[] = { dimSize( 0 ), dimSize( 1 ), dimSize( 2 ), dimSize( 3 ) };
-	dst.join(static_cast<util::PropMap>(*this), false);
+	dst.join( static_cast<util::PropMap>( *this ), false );
+
 	if ( get()->swapAlong( *dst, dim, dims ) ) {
 		if ( convertTransform ) {
 			util::fvector4 read = getProperty<util::fvector4>( "readVec" );
@@ -350,8 +351,8 @@ bool Chunk::swapAlong( Chunk &dst, const size_t dim, bool convertTransform ) con
 			T( 2, 2 ) = 1;
 			T( dim, dim ) *= -1;
 			dst.transformCoords( T );
-
 		}
+
 		return true;
 	} else return false;
 }

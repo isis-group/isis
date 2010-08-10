@@ -394,12 +394,10 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 
 				timestep++;
 			}
-
 			LOG( DataLog, info ) << "adding " << splices.size() << " chunks to ChunkList";
 			/******************** add chunks to ChunkList ********************/
 			std::back_insert_iterator<data::ChunkList> dest_iter ( chunks );
 			std::copy( splices.begin(), splices.end(), dest_iter );
-
 		} // END foreach vistaChunkList
 	} // END if myDialect == "functional"
 

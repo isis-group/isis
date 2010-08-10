@@ -204,6 +204,7 @@ public:
 	 * \f[ \overrightarrow{this} = \overrightarrow{this} * {1 \over {\sqrt{\sum_{i=0}^{SIZE-1} this_i^2}}}  \f]
 	 *
 	 * If len() is equal to zero std::invalid_argument will be thrown, and this wont be changed.
+	 * \returns the changed *this
 	 */
 	const this_class &norm()throw( std::invalid_argument ) {
 		const TYPE d = len();

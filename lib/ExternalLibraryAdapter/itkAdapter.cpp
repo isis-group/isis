@@ -253,7 +253,7 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 		indexOrigin[0] = -indexOrigin[0];
 		indexOrigin[1] = -indexOrigin[1];
 	}
-	
+
 	// TODO use MemImage instead of MemChunk.
 	boost::shared_ptr<data::MemChunk< typename TImageITK::PixelType > >
 	retChunk( new data::MemChunk< typename TImageITK::PixelType  >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) ) ;
@@ -263,7 +263,7 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	//since the acquisitionNumber is not stored in the PropMap of the image, we have
 	//to create a dummy acquisitionNumber
 	if ( !retChunk->hasProperty( "acqisitionNumber" ) )
-		retChunk->setProperty( "acquisitionNumber", static_cast<u_int32_t>(1) );
+		retChunk->setProperty( "acquisitionNumber", static_cast<u_int32_t>( 1 ) );
 
 	//do not try to grasp that in a sober state!!
 	//workaround to create a TypedImage out of a MemChunk

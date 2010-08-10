@@ -115,7 +115,7 @@ public:
 	const size_t use_count()const {
 		return getTypePtrBase().use_count();
 	}
-	Chunk cloneToMem( size_t firstDim = 0, size_t secondDim = 0, size_t thirdDim = 0, size_t fourthDim = 0 )const;
+	Chunk cloneToMem( size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 )const;
 
 	/**
 	 * Ensure, the chunk has the type with the requested id.

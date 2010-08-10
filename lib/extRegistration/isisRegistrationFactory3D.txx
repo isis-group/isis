@@ -264,6 +264,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer()
 			if ( transform.BSPLINEDEFORMABLETRANSFORM or transform.AFFINE or transform.CENTEREDAFFINE or transform.TRANSLATION ) {
 				optimizerScaleRegularStepGradient.Fill( 1.0 );
 			}
+
 			if ( transform.AFFINE ) {
 				optimizerScaleRegularStepGradient[9] = 0.001;
 				optimizerScaleRegularStepGradient[10] = 0.001;

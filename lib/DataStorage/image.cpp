@@ -716,7 +716,6 @@ size_t Image::spliceDownTo( dimensions dim ) //readDim = 0, phaseDim, sliceDim, 
 	const std::list<std::string> splice_needed = util::string2list<std::string>( "voxelSize,voxelGap,readVec,phaseVec,sliceVec,indexOrigin,acquisitionNumber" );
 	util::PropMap::key_list needed = MemChunk<short>( 1 ).getMissing();
 	needed.insert( splice_needed.begin(), splice_needed.end() );
-
 	struct splicer {
 		dimensions m_dim;
 		Image &m_image;
