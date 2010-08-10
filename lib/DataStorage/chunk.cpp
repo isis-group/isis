@@ -332,24 +332,26 @@ bool Chunk::swapAlong( Chunk &dst, const size_t dim, bool convertTransform ) con
 {
 	size_t dims[] = { dimSize( 0 ), dimSize( 1 ), dimSize( 2 ), dimSize( 3 ) };
 	dst.join(static_cast<util::PropMap>(*this), false);
-
 	if ( get()->swapAlong( *dst, dim, dims ) ) {
 		if ( convertTransform ) {
 			util::fvector4 read = getProperty<util::fvector4>( "readVec" );
 			util::fvector4 phase = getProperty<util::fvector4>( "phaseVec" );
 			util::fvector4 slice = getProperty<util::fvector4>( "sliceVec" );
 			util::fvector4 origin = getProperty<util::fvector4>( "indexOrigin" );
-			read[dim] = -read[dim];
-			phase[dim] = -phase[dim];
-			slice[dim] = -slice[dim];
-			origin[dim] = -origin[dim];
-			dst.setProperty<util::fvector4>( "readVec", read );
-			dst.setProperty<util::fvector4>( "phaseVec", phase );
-			dst.setProperty<util::fvector4>( "sliceVec", slice );
-			dst.setProperty<util::fvector4>( "indexOrigin", origin );
+			boost::numeric::ublas::matrix<float> T( 3, 3 );
+			T( 0, 0 ) = 1;
+			T( 0, 1 ) = 0;
+			T( 0, 2 ) = 0;
+			T( 1, 0 ) = 0;
+			T( 1, 1 ) = 1;
+			T( 1, 2 ) = 0;
+			T( 2, 0 ) = 0;
+			T( 2, 1 ) = 0;
+			T( 2, 2 ) = 1;
+			T( dim, dim ) *= -1;
+			dst.transformCoords( T );
+
 		}
-
-
 		return true;
 	} else return false;
 }

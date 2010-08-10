@@ -5,7 +5,7 @@ using namespace isis;
 
 int main( int argc, char **argv )
 {
-	data::IOApplication app( "isisflip", true, true );
+	data::IOApplication app( "isisswap", true, true );
 	util::Selection swapparam( "x,y,z" );
 	util::Selection what( "image,space,both" );
 	swapparam.set( "x" );
@@ -27,7 +27,7 @@ int main( int argc, char **argv )
 		newImage->join(static_cast<util::PropMap>(*ref));
 		BOOST_FOREACH( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef, chList ) {
 			chRef->join(static_cast<util::PropMap>(*ref), false);
-			data::Chunk tmpChunk = *chRef;
+			data::Chunk tmpChunk = chRef->cloneToMem(chRef->sizeToVector()[0],chRef->sizeToVector()[1],chRef->sizeToVector()[2],chRef->sizeToVector()[3]);
 			if( app.parameters["swap"].toString() == "x" ) {
 				dim = 0;
 			}
@@ -38,10 +38,30 @@ int main( int argc, char **argv )
 				dim = 2;
 			}
 			if ( app.parameters["what"].toString() == "both") {
-				chRef->swapAlong( tmpChunk, dim, false );
+				if ( !chRef->swapAlong( tmpChunk, dim, true ) ) {
+					std::cout << "Flipping failed." << std::endl;
+				}
 			} else if ( app.parameters["what"].toString() == "image") {
-				chRef->swapAlong( tmpChunk, dim, true );
+				if ( !chRef->swapAlong( tmpChunk, dim, false ) ) {
+					std::cout << "Flipping failed." << std::endl;
+				}
+			} else if ( app.parameters["what"].toString() == "space") {
+				tmpChunk = *chRef;
+				boost::numeric::ublas::matrix<float> T( 3, 3 );
+				T( 0, 0 ) = 1;
+				T( 0, 1 ) = 0;
+				T( 0, 2 ) = 0;
+				T( 1, 0 ) = 0;
+				T( 1, 1 ) = 1;
+				T( 1, 2 ) = 0;
+				T( 2, 0 ) = 0;
+				T( 2, 1 ) = 0;
+				T( 2, 2 ) = 1;
+				T( dim, dim ) *= -1;
+				tmpChunk.transformCoords( T );
 			}
+
+
 			finChunkList.push_back(boost::shared_ptr<data::Chunk>(new data::Chunk(tmpChunk)));
 		}
 	}
