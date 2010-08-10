@@ -379,7 +379,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 			}
 
 			sliceRef.setProperty<util::fvector4>( "indexOrigin", ioprob );
-			/******************** SET index origin, acquisitionTime and aquisitionNumber ********************/
+			/******************** SET index origin, acquisitionTime and acquisitionNumber ********************/
 			size_t timestep = 0;
 			BOOST_FOREACH( data::ChunkList::reference spliceRef, splices ) {
 				spliceRef->setProperty<util::fvector4>( "indexOrigin", ioprob );
@@ -394,12 +394,14 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 
 				timestep++;
 			}
+
 			LOG( DataLog, info ) << "adding " << splices.size() << " chunks to ChunkList";
 			/******************** add chunks to ChunkList ********************/
 			std::back_insert_iterator<data::ChunkList> dest_iter ( chunks );
 			std::copy( splices.begin(), splices.end(), dest_iter );
-		} // END for(unsigned k=0;k<nimages;k++)
-	} // END if dialect == "functional"
+
+		} // END foreach vistaChunkList
+	} // END if myDialect == "functional"
 
 	// MAP -> the vista image should contain a single 3D VFloat image. Hence the
 	// first image found will be saved in a float MemChunk add added to the ChunkList.

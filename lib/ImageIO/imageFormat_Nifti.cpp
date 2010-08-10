@@ -186,7 +186,16 @@ public:
 		boost::filesystem::path boostFilename( filename );
 		//copy of our image due to changing it by transformCoords
 		isis::data::Image image( imageOrig );
-		//orientation in isis LPS - but in nifti everything relative to RAS - so let's change read/phase direction and sign of indexOrigin
+		//default init for nifti image
+		nifti_image ni;
+		memset( &ni, 0, sizeof( nifti_image ) ); //set everything to zero - default value for "not used"
+		ni.nu = ni.nv = ni.nw = 1;
+		ni.datatype = DT_UNKNOWN;
+		ni.data = NULL;
+		ni.fname = const_cast<char *>( filename.c_str() );
+
+		//orientation in isis LPS - but in nifti everything relative to RAS
+		// - so let's change read/phase direction and sign of indexOrigin
 		//now we try to transform
 		boost::numeric::ublas::matrix<float> matrix( 3, 3 );
 		matrix( 0, 0 ) = -1;
@@ -199,15 +208,7 @@ public:
 		matrix( 2, 1 ) = 0;
 		matrix( 2, 2 ) = +1;
 		image.transformCoords( matrix );
-		//default init for nifti image
-		nifti_image ni;
-		memset( &ni, 0, sizeof( nifti_image ) ); //set everything to zero - default value for "not used"
-		ni.nu = ni.nv = ni.nw = 1;
-		ni.datatype = DT_UNKNOWN;
-		ni.data = NULL;
-		ni.fname = const_cast<char *>( filename.c_str() );
-		// get dim info from image
-		util::fvector4 dimensions = image.sizeToVector();
+
 		//set the props from the image to the nifti file
 		copyHeaderToNifti( image, ni );
 		// set filename for resulting image(s) due to Analyze vs. Nifti
@@ -369,12 +370,11 @@ private:
 		//if "TR=" was found in description and differs from pixdim[dim]
 		if( tr && ( !tr == ni.pixdim[ni.ndim] ) ) {
 			LOG( ImageIoLog, warning ) << "TR=" << tr << " was found in description but differs from pixdim[4]= "
-									   << ni.pixdim[ni.ndim] << ". This seems to be a nifti coming from SPM. Setting repetitionTime to " << tr
-									   << " ms. During conversion this value can be changed by using the parameter -tr";
+									   << ni.pixdim[ni.ndim];
 			retChunk.setProperty<u_int16_t>( "repetitionTime", tr );
 		}
 
-		//if "TR=" was not found in description pixdimg[dim] == 0 a warning calls attention to use parameter -tr to change repetitionTime.
+		//if "TR=" was not found in description and pixdim[dim] == 0 a warning calls attention to use parameter -tr to change repetitionTime.
 		if( tr == 0 && ni.pixdim[ni.ndim] == 0 ) {
 			LOG( ImageIoLog, warning ) << "Repetition time seems to be invalid. To set the repetition time during conversion use the parameter -tr ";
 			retChunk.setProperty<u_int16_t>( "repetitionTime", 0 );

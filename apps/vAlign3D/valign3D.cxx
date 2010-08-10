@@ -245,7 +245,6 @@ int main(
 	LOG_IF( refList.empty(), isis::data::Runtime, isis::error ) << "Reference image is empty!";
 	LOG_IF( inList.empty(), isis::data::Runtime, isis::error ) << "Input image is empty!";
 
-	// TODO DEBUG
 	// use makeItkImageObject with "false" -> no ITK nifti default transformation
 	if ( !smooth ) {
 		fixedImage = fixedAdapter->makeItkImageObject<FixedImageType>( refList.front() );

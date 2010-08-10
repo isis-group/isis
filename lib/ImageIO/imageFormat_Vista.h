@@ -449,9 +449,11 @@ private:
 	 * This function copies all chunk header informations to the appropriate
 	 * vista image attribute values.
 	 *
-	 * @param chunk A reference to chunk that provides the metadata.
-	 * @param image The target image. Alle metadata will be copied to the
+	 * @param image A reference to image that provides the metadata.
+	 * @param vimage The target Vista image. Alle metadata will be copied to the
 	 * corresponding header attributes.
+	 * @param functional flag to indicate that the image contains functional data.
+	 * @param slice the index of the slice.
 	 */
 	void copyHeaderToVista( const data::Image &image, VImage &vimage, const bool functional, size_t slice = 0 );
 
