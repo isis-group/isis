@@ -119,20 +119,20 @@ bool IOApplication::autowrite( ImageList out_images, bool exitOnError )
 	const std::string output = parameters["out"];
 	const std::string wf = parameters["wf"];
 	const std::string dl = parameters["wdialect"];
-
 	LOG( Runtime, info )
 			<< "Writing " << out_images.size() << " images"
-			<< (repn ? std::string(" as ") + (std::string)repn : "")
+			<< ( repn ? std::string( " as " ) + ( std::string )repn : "" )
 			<< " to " << util::MSubject( output )
 			<< ( wf.empty() ? "" : std::string( " using the format: " ) + wf )
 			<< ( ( !wf.empty() && !dl.empty() ) ? " and" : "" )
 			<< ( dl.empty() ? "" : std::string( " using the dialect: " ) + dl );
 
-	if(repn!=0){
-		BOOST_FOREACH(ImageList::reference ref,out_images){
-			ref->makeOfTypeId(repn);
+	if( repn != 0 ) {
+		BOOST_FOREACH( ImageList::reference ref, out_images ) {
+			ref->makeOfTypeId( repn );
 		}
 	}
+
 	data::IOFactory::setProgressFeedback( &feedback );
 
 	if ( ! IOFactory::write( out_images, output, wf, dl ) ) {

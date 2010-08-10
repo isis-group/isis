@@ -188,11 +188,13 @@ bool SortedChunkList::insert( const Chunk &ch )
 	LOG_IF( inserted.first && !inserted.second, Debug, info )
 			<< "Not inserting chunk because there is allready one with the equal properties "
 			<< prop1 << ":" << ch.propertyValue( prop1 ) << " and " << prop2 << ":" << ch.propertyValue( prop2 );
+
 	LOG_IF(
 		inserted.first && !inserted.second &&
-		!(ch.propertyValue( "source" ) == inserted.first->propertyValue( "source" )),
+		ch.hasProperty( "source" ) && inserted.first->hasProperty( "source" ) &&
+		!( ch.propertyValue( "source" ) == inserted.first->propertyValue( "source" ) ),
 		Debug, verbose_info )
-			<< "The conflicting chunks where " << ch.propertyValue( "source" ).toString(false) << " and " << inserted.first->propertyValue( "source" ).toString(false);
+			<< "The conflicting chunks where " << ch.propertyValue( "source" ).toString( false ) << " and " << inserted.first->propertyValue( "source" ).toString( false );
 
 	return inserted.second;
 }

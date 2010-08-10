@@ -249,7 +249,7 @@ void Chunk::transformCoords( boost::numeric::ublas::matrix<float> transform )
 	setProperty<util::fvector4>( "sliceVec", slice );
 }
 
-ChunkList Chunk::autoSplice ( int32_t acquisitionNumberStride )const
+ChunkList Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 {
 	if ( !valid() ) {
 		LOG( Runtime, error ) << "Cannot splice invalid Chunk (missing properties are " << this->getMissing() << ")";
@@ -300,7 +300,7 @@ ChunkList Chunk::autoSplice ( int32_t acquisitionNumberStride )const
 	ChunkList ret = splice( ( dimensions )atDim ); // do low level splice - get the chunklist
 	BOOST_FOREACH( ChunkList::reference ref, ret ) { // adapt some metadata in them
 		util::fvector4 &orig = ref.propertyValue( "indexOrigin" )->cast_to<util::fvector4>();
-		u_int32_t &acq = ref.propertyValue( "acquisitionNumber" )->cast_to<u_int32_t>();
+		uint32_t &acq = ref.propertyValue( "acquisitionNumber" )->cast_to<u_int32_t>();
 		orig = orig + indexOriginOffset * cnt;
 		acq += acquisitionNumberStride * cnt; //@todo this might cause trouble if we try to insert this chunks into an image
 		cnt++;

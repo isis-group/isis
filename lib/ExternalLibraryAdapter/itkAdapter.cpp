@@ -242,6 +242,7 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	if ( TImageITK::ImageDimension < 4 ) {
 		imageSize[3] = 1;
 	}
+
 	if ( behaveAsItkWriter ) {
 		imageDirection[0][0] = -imageDirection[0][0];
 		imageDirection[0][1] = -imageDirection[0][1];
@@ -257,13 +258,12 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	boost::shared_ptr<data::MemChunk< typename TImageITK::PixelType > >
 	retChunk( new data::MemChunk< typename TImageITK::PixelType  >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) ) ;
 	//dummy join to allow creating this chunk
-
 	retChunk->join( m_ImagePropMap );
 
 	//since the acquisitionNumber is not stored in the PropMap of the image, we have
 	//to create a dummy acquisitionNumber
 	if ( !retChunk->hasProperty( "acqisitionNumber" ) )
-		retChunk->setProperty( "acquisitionNumber", (u_int32_t) 1 );
+		retChunk->setProperty<uint32_t>( "acquisitionNumber", 1 );
 
 	//do not try to grasp that in a sober state!!
 	//workaround to create a TypedImage out of a MemChunk
@@ -272,7 +272,6 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	data::ImageList isisImageList( chunkList );
 	boost::shared_ptr< data::TypedImage< TOutputISIS > > retImage (
 		new data::TypedImage<TOutputISIS>  ( *isisImageList.front().get() ) );
-
 	//this will splice down the image the same way it was handed over to the itkAdapter
 	retImage->spliceDownTo( static_cast<data::dimensions> ( m_RelevantDim ) );
 	//these are properties eventually manipulated by itk. So we can not take the
@@ -292,9 +291,9 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 		//TODO if the number of chunks gained by the splice method differs from
 		//the size of the m_ChunkPropMapVector the size of the image was changed in itk.
 		//Thus we have to interpolate the parameters (sliceTime so far)
-
 		chRef->join( static_cast<util::PropMap &>( *retImage ), false );
-		if( chunkCounter < (m_ChunkPropMapVector.size()-1)) {
+
+		if( chunkCounter < ( m_ChunkPropMapVector.size() - 1 ) ) {
 			chunkCounter++;
 		}
 

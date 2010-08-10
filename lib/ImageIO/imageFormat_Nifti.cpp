@@ -315,8 +315,8 @@ private:
 		for ( int t = 0; t < dimensions[3]; t++ ) {
 			util::fvector4 offsets( ni.qoffset_x, ni.qoffset_y, ni.qoffset_z, 0 );
 			//retChunk.setProperty("acquisitionTime", );
-			retChunk.setProperty( "acquisitionNumber", t );
-			retChunk.setProperty<u_int16_t>( "sequenceNumber", 1 );
+			retChunk.setProperty<uint32_t>( "acquisitionNumber", t );
+			retChunk.setProperty<uint16_t>( "sequenceNumber", 1 );
 			// in nifti everything should be relative to RAS, in isis we use LPS coordinates - normally change read/phase dir and sign of indexOrigin
 			//TODO: has to be tested with different niftis - don't trust them!!!!!!!!!
 			retChunk.setProperty( "indexOrigin", util::fvector4( ni.qoffset_x, ni.qoffset_y, ni.qoffset_z, 0 ) );
@@ -361,6 +361,7 @@ private:
 		boost::regex descriptionRegex( ".*TR=([[:digit:]]{1,})ms.*" );
 		boost::cmatch results;
 		u_int16_t tr = 0;
+
 		if ( boost::regex_match( ni.descrip, results,  descriptionRegex ) ) {
 			tr = boost::lexical_cast<u_int16_t>( results.str( 1 ) );
 		}

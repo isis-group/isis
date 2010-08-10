@@ -48,17 +48,20 @@ throw( std::runtime_error & )
 	int nimages = 0;
 	//  get size for each dimension
 	util::ivector4 dims = image.sizeToVector();
+
 	//  create a vista image container according to the isis image configuration
 	// 4D image data
 	//  when we have got a 4D-image, this image provides functional data information
 	if( dims[3] > 1 ) {
 		data::TypedImage<VShort> shortImage( image );
-		shortImage.spliceDownTo(data::sliceDim);
+		shortImage.spliceDownTo( data::sliceDim );
 		vimages = ( VImage * )malloc( sizeof( VImage ) * dims[2] );
 		nimages = dims[2];
 		std::vector< boost::shared_ptr< data::Chunk > > chList = shortImage.getChunkList();
+
 		for( int z = 0; z < dims[2]; z++ ) {
 			vimages[z] = VCreateImage( dims[3], dims[1], dims[0], VShortRepn );
+
 			for( int x = 0; x < dims[0]; x++ ) {
 				for( int y = 0; y < dims[1]; y++ ) {
 					for( int t = 0; t < dims[3]; t++ ) {
@@ -173,7 +176,6 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 	// enable "info" log level
 	// image_io::enable_log<util::DefaultMsgPrint>( info );
 	LOG( image_io::Runtime, info ) << "found " << nimages << " images.";
-
 	/* interpred the image data structure according to the given dialects:
 	 *
 	 * FUNCTIONAL: The vista image contains functional data. In this case there
@@ -186,7 +188,6 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 	 *             images. Each image will be saved in a seperate isis image
 	 *             with the according data type.
 	 */
-
 	//if we have a vista image with functional data and one or more anatomical scans, we
 	//can not reject the anatomical images. So we store them in a vector and handle them later.
 	std::vector<VImage> residualVImages;
@@ -198,15 +199,17 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 		std::set<std::string> voxelSet;
 		std::set<int> columnsSet;
 		std::set<int> rowsSet;
+
 		//if we have more than 1 short image with the same voxelsize, columnsize and rowsize
 		//we assume a functional image
 		for ( size_t k = 0; k < nimages; k++ ) {
 			if( VPixelRepn( images[k] ) == VShortRepn ) {
 				nShortRepn++;
-				columnsSet.insert( VImageNColumns( images[k]));
-				rowsSet.insert( VImageNRows( images[k]));
+				columnsSet.insert( VImageNColumns( images[k] ) );
+				rowsSet.insert( VImageNRows( images[k] ) );
 				VAttrList attributes = VImageAttrList( images[k] );
 				VAttrListPosn posn;
+
 				for( VFirstAttr( attributes, &posn ); VAttrExists( &posn ); VNextAttr( &posn ) ) {
 					const char *name = VGetAttrName( &posn );
 					VPointer val;
@@ -220,15 +223,16 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 				nOtherRepn++;
 			}
 		}
+
 		if ( nShortRepn > 1 && voxelSet.size() == 1 && rowsSet.size() == 1 && columnsSet.size() == 1 ) {
 			LOG( isis::DataDebug, warning ) << "Assuming a functional vista image";
 			myDialect = "functional";
 		}
 	}
+
 	// FUNCTIONAL -> copy every subimage into one chunk, splice the chunk
 	// along the z-direction -> add all resulting chunks to the chunk list.
 	if( myDialect == std::string( "functional" ) ) {
-
 		char orient[100], voxelstr[100];
 		orient[0] = '\0';
 		voxelstr[0] = '\0';
@@ -238,37 +242,42 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 		util::fvector4 indexOrigin;
 		// traverse images and collect all VShort images.
 		std::vector<VImage> vImageVector;
-		for( unsigned int k = 0; k < nimages; k++ )
-		{
+
+		for( unsigned int k = 0; k < nimages; k++ ) {
 			if( VPixelRepn( images[k] ) != VShortRepn ) {
 				residualVImages.push_back( images[k] );
-			} else vImageVector.push_back(images[k]);
+			} else vImageVector.push_back( images[k] );
 		}
+
 		std::list<VistaChunk<VShort> > vistaChunkList;
 		//if we have no repetitionTime we have to calculate it with the help of the biggest slicetime
-		u_int16_t biggest_slice_time=0;
+		u_int16_t biggest_slice_time = 0;
 		//first we have to create a vista chunkList so we can get the number of slices
-		BOOST_FOREACH(std::vector<VImage>::reference sliceRef, vImageVector)
-		{
+		BOOST_FOREACH( std::vector<VImage>::reference sliceRef, vImageVector ) {
 			VistaChunk<VShort> vchunk( sliceRef, true, vImageVector.size() );
-			vistaChunkList.push_back(vchunk);
-			if(vchunk.hasProperty("acquisitionTime") && !vchunk.hasProperty("repetitionTime")) {
-				float currentSliceTime=vchunk.getProperty<float>("acquisitionTime");
+			vistaChunkList.push_back( vchunk );
+
+			if( vchunk.hasProperty( "acquisitionTime" ) && !vchunk.hasProperty( "repetitionTime" ) ) {
+				float currentSliceTime = vchunk.getProperty<float>( "acquisitionTime" );
+
 				if ( currentSliceTime > biggest_slice_time ) {
 					float diff = currentSliceTime - biggest_slice_time;
 					biggest_slice_time = currentSliceTime + diff;
 				}
 			}
 		}
-		BOOST_FOREACH(std::vector<VistaChunk<VShort> >::reference sliceRef, vistaChunkList) {
-			u_int16_t repetitionTime=0;
+		BOOST_FOREACH( std::vector<VistaChunk<VShort> >::reference sliceRef, vistaChunkList ) {
+			u_int16_t repetitionTime = 0;
 			util::fvector4 &ioprob = sliceRef.propertyValue( "indexOrigin" )->cast_to<util::fvector4>();
-			if(!sliceRef.hasProperty("repetitionTime") && biggest_slice_time) {
-				sliceRef.setProperty<u_int16_t>("repetitionTime", biggest_slice_time);
+
+			if( !sliceRef.hasProperty( "repetitionTime" ) && biggest_slice_time ) {
+				sliceRef.setProperty<u_int16_t>( "repetitionTime", biggest_slice_time );
 			}
-			if(sliceRef.hasProperty("repetitionTime")) {
-				repetitionTime = sliceRef.getProperty<u_int16_t>("repetitionTime");
+
+			if( sliceRef.hasProperty( "repetitionTime" ) ) {
+				repetitionTime = sliceRef.getProperty<u_int16_t>( "repetitionTime" );
 			}
+
 			nloaded++;
 			// splice VistaChunk
 			LOG( DataLog, info ) << "splicing";
@@ -368,18 +377,21 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 					ioprob[2] += ( nloaded - 1 ) * v3[2];
 				}
 			}
-			sliceRef.setProperty<util::fvector4>("indexOrigin", ioprob);
+
+			sliceRef.setProperty<util::fvector4>( "indexOrigin", ioprob );
 			/******************** SET index origin, acquisitionTime and aquisitionNumber ********************/
-			size_t timestep=0;
-			BOOST_FOREACH(data::ChunkList::reference spliceRef, splices) {
+			size_t timestep = 0;
+			BOOST_FOREACH( data::ChunkList::reference spliceRef, splices ) {
 				spliceRef.setProperty<util::fvector4>( "indexOrigin", ioprob );
-				spliceRef.setProperty<u_int16_t>("sequenceNumber", 0);
-				u_int32_t acqusitionNumber = (nloaded-1) + vImageVector.size() * timestep;
-				spliceRef.setProperty<u_int32_t>("acquisitionNumber", acqusitionNumber);
-				if (repetitionTime && sliceRef.hasProperty("acquisitionTime")) {
-					float acquisitionTimeSplice = sliceRef.getProperty<float>("acquisitionTime") + (repetitionTime * timestep);
-					spliceRef.setProperty<float>("acquisitionTime", acquisitionTimeSplice );
+				spliceRef.setProperty<u_int16_t>( "sequenceNumber", 0 );
+				u_int32_t acqusitionNumber = ( nloaded - 1 ) + vImageVector.size() * timestep;
+				spliceRef.setProperty<uint32_t>( "acquisitionNumber", acqusitionNumber );
+
+				if ( repetitionTime && sliceRef.hasProperty( "acquisitionTime" ) ) {
+					float acquisitionTimeSplice = sliceRef.getProperty<float>( "acquisitionTime" ) + ( repetitionTime * timestep );
+					spliceRef.setProperty<float>( "acquisitionTime", acquisitionTimeSplice );
 				}
+
 				timestep++;
 			}
 			LOG( DataLog, info ) << "adding " << splices.size() << " chunks to ChunkList";
@@ -414,17 +426,17 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 		for( unsigned k = 0; k < nimages; k++ ) {
 			if( switchHandle( images[k], chunks ) ) {
 				nloaded++;
-				chunks.back().setProperty<u_int16_t>("sequenceNumber", nloaded);
+				chunks.back().setProperty<u_int16_t>( "sequenceNumber", nloaded );
 			}
 		}
 	} // END else
+
 	//handle the residual images
-	u_int16_t sequenceNumber=0;
-	BOOST_FOREACH(std::vector<VImage>::reference vImageRef, residualVImages )
-	{
-		if(switchHandle(vImageRef, chunks )) {
+	u_int16_t sequenceNumber = 0;
+	BOOST_FOREACH( std::vector<VImage>::reference vImageRef, residualVImages ) {
+		if( switchHandle( vImageRef, chunks ) ) {
 			nloaded++;
-			chunks.back().setProperty<u_int16_t>("sequenceNumber", ++sequenceNumber);
+			chunks.back().setProperty<u_int16_t>( "sequenceNumber", ++sequenceNumber );
 		}
 	}
 	//  cleanup, close file handle
@@ -435,48 +447,47 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 		throwGenericError ( "No images loaded" );
 
 	LOG( Debug , info ) << nloaded << " images loaded.";
-
 	return nloaded;
 }
 
-bool ImageFormat_Vista::switchHandle( VImage& image, data::ChunkList& chunks )
+bool ImageFormat_Vista::switchHandle( VImage &image, data::ChunkList &chunks )
 {
 	switch( VPixelRepn( image ) ) {
-		case VBitRepn:
-			addChunk<uint8_t>( chunks, image );
-			return true;
-			break;
-		case VUByteRepn:
-			addChunk<VUByte>( chunks, image );
-			return true;
-			break;
-		case VSByteRepn:
-			addChunk<VSByte>( chunks, image );
-			return true;
-			break;
-		case VShortRepn:
-			addChunk<VShort>( chunks, image );
-			return true;
-			break;
-		case VLongRepn:
-			addChunk<VLong>( chunks, image );
-			return true;
-			break;
-		case VFloatRepn:
-			addChunk<VFloat>( chunks, image );
-			return true;
-			break;
-		case VDoubleRepn:
-			addChunk<VDouble>( chunks, image );
-			return true;
-			break;
-		default:
-			// discard images with unknown data type
-			VDestroyImage( image );
-			return false;
-		}
-	return false;
+	case VBitRepn:
+		addChunk<uint8_t>( chunks, image );
+		return true;
+		break;
+	case VUByteRepn:
+		addChunk<VUByte>( chunks, image );
+		return true;
+		break;
+	case VSByteRepn:
+		addChunk<VSByte>( chunks, image );
+		return true;
+		break;
+	case VShortRepn:
+		addChunk<VShort>( chunks, image );
+		return true;
+		break;
+	case VLongRepn:
+		addChunk<VLong>( chunks, image );
+		return true;
+		break;
+	case VFloatRepn:
+		addChunk<VFloat>( chunks, image );
+		return true;
+		break;
+	case VDoubleRepn:
+		addChunk<VDouble>( chunks, image );
+		return true;
+		break;
+	default:
+		// discard images with unknown data type
+		VDestroyImage( image );
+		return false;
+	}
 
+	return false;
 }
 
 void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vimage, const bool functional, size_t slice )
@@ -507,7 +518,7 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 	vstr << sliceVec[0] << " " << sliceVec[1] << " " << sliceVec[2];
 	VAppendAttr( list, "sliceVec", NULL, VStringRepn, vstr.str().c_str() );
 	// index origin
-	util::fvector4 indexOrigin = image.getChunk(0,0,slice,0).getProperty<util::fvector4>( "indexOrigin" );
+	util::fvector4 indexOrigin = image.getChunk( 0, 0, slice, 0 ).getProperty<util::fvector4>( "indexOrigin" );
 	vstr.str( "" );
 	vstr << indexOrigin[0] << " " << indexOrigin[1] << " " << indexOrigin[2];
 	VAppendAttr( list, "indexOrigin", NULL, VStringRepn, vstr.str().c_str() );
@@ -545,15 +556,14 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 	//  }
 
 	if ( functional ) {
-		if ( image.getChunkAt(0).hasProperty( "DICOM/CSAImageHeaderInfo/MosaicRefAcqTimes" ) ) {
-			util::dlist sliceTimeList = image.getChunkAt(0).getProperty<util::dlist>( "DICOM/CSAImageHeaderInfo/MosaicRefAcqTimes" );
+		if ( image.getChunkAt( 0 ).hasProperty( "DICOM/CSAImageHeaderInfo/MosaicRefAcqTimes" ) ) {
+			util::dlist sliceTimeList = image.getChunkAt( 0 ).getProperty<util::dlist>( "DICOM/CSAImageHeaderInfo/MosaicRefAcqTimes" );
 			std::vector<double> sliceTime;
 			BOOST_FOREACH( util::dlist::const_reference ref, sliceTimeList ) {
 				sliceTime.push_back( ref );
 			}
 			VAppendAttr( list, "slice_time", NULL, VShortRepn, static_cast<VShort>( sliceTime[slice] ) );
-		} else if ( image.getChunkAt(0).hasProperty( "acquisitionTime" ) )
-		{
+		} else if ( image.getChunkAt( 0 ).hasProperty( "acquisitionTime" ) ) {
 			//TODO slicetime
 		} else if( image.hasProperty( "repetitionTime" ) ) {
 			size_t tr = image.getProperty<size_t>( "repetitionTime" );
@@ -563,35 +573,31 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 			LOG( data::Debug, warning ) << "Missing repetition time. Interpolation of slice time is not possible.";
 		}
 	}
-	if (image.hasProperty("subjectGender"))
-	{
-		util::Selection genderSelection = image.getProperty<util::Selection>("subjectGender");
+
+	if ( image.hasProperty( "subjectGender" ) ) {
+		util::Selection genderSelection = image.getProperty<util::Selection>( "subjectGender" );
 		std::string gender = genderSelection;
-		VAppendAttr( list, "sex", NULL, VStringRepn, (VString) gender.c_str());
-
+		VAppendAttr( list, "sex", NULL, VStringRepn, ( VString ) gender.c_str() );
 	}
 
-	if ( image.hasProperty("echoTime"))
-	{
-		VAppendAttr( list, "echoTime", NULL, VFloatRepn, (VFloat) image.getProperty<float>("echoTime"));
+	if ( image.hasProperty( "echoTime" ) ) {
+		VAppendAttr( list, "echoTime", NULL, VFloatRepn, ( VFloat ) image.getProperty<float>( "echoTime" ) );
 	}
 
-	if ( image.hasProperty("flipAngle"))
-	{
-		VAppendAttr( list, "flipAngle", NULL, VShortRepn, (VShort) image.getProperty<u_int16_t>("flipAngle"));
-	}
-	if ( image.hasProperty("transmitCoil"))
-	{
-		VAppendAttr( list, "transmitCoil", NULL, VStringRepn, (VString) image.getProperty<std::string>("transmitCoil").c_str());
+	if ( image.hasProperty( "flipAngle" ) ) {
+		VAppendAttr( list, "flipAngle", NULL, VShortRepn, ( VShort ) image.getProperty<u_int16_t>( "flipAngle" ) );
 	}
 
-	if (image.hasProperty("sequenceStart"))
-	{
-		boost::posix_time::ptime isisTime = image.getProperty<boost::posix_time::ptime>("sequenceStart");
+	if ( image.hasProperty( "transmitCoil" ) ) {
+		VAppendAttr( list, "transmitCoil", NULL, VStringRepn, ( VString ) image.getProperty<std::string>( "transmitCoil" ).c_str() );
+	}
+
+	if ( image.hasProperty( "sequenceStart" ) ) {
+		boost::posix_time::ptime isisTime = image.getProperty<boost::posix_time::ptime>( "sequenceStart" );
 		boost::gregorian::date isisDate = isisTime.date();
 		boost::posix_time::time_duration isisTimeDuration = isisTime.time_of_day();
-		VAppendAttr( list, "date", NULL, VStringRepn, boost::gregorian::to_simple_string(isisDate).c_str());
-		VAppendAttr( list, "time", NULL, VStringRepn, (VString) boost::posix_time::to_simple_string(isisTimeDuration).c_str());
+		VAppendAttr( list, "date", NULL, VStringRepn, boost::gregorian::to_simple_string( isisDate ).c_str() );
+		VAppendAttr( list, "time", NULL, VStringRepn, ( VString ) boost::posix_time::to_simple_string( isisTimeDuration ).c_str() );
 	}
 
 	// ********** Vista group **********

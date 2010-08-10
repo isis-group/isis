@@ -32,7 +32,7 @@ const TypePtrBase::Converter &TypePtrBase::getConverterTo( unsigned short id )co
 
 size_t TypePtrBase::cmp( const TypePtrBase &comp )const
 {
-	LOG_IF( len() != comp.len(), Runtime, info ) << "Comparing data of different length. The difference will be added to the retuned value.";
+	LOG_IF( len() != comp.len(), Runtime, info ) << "Comparing data of different length. The difference will be added to the returned value.";
 	return len() - comp.len() + cmp( 0, std::min( len(), comp.len() ) - 1, comp, 0 );
 }
 

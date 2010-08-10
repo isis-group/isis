@@ -12,7 +12,7 @@ int main()
 	boost::timer timer;
 	data::Image img;
 	timer.restart();
-	unsigned short acq = 0;
+	uint32_t acq = 0;
 
 	for ( size_t tstep = 0; tstep < tsteps; tstep++ ) {
 		for ( size_t slice = 0; slice < slices; slice++ ) {

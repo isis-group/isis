@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE ( chunklist_sort_test )
 		for ( int j = 0; j < 3; j++ ) {
 			data::MemChunk<float> ch( 3, 3 );
 			ch.setProperty( "indexOrigin", util::fvector4( 0, 0, j, i ) );
-			ch.setProperty( "acquisitionNumber", 1 );
+			ch.setProperty<uint32_t>( "acquisitionNumber", 1 );
 
 			if( i == 0 && j == 0 ) { // this is allready there
 				data::enable_log<util::DefaultMsgPrint>( error );
@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE ( chunklist_sort_test )
 BOOST_AUTO_TEST_CASE ( chunklist_secondary_sort_test )
 {
 	data::MemChunk<float> chNumber( 3, 3 ), chTime( 3, 3 );
-	chNumber.setProperty( "acquisitionNumber", 0 );
+	chNumber.setProperty<uint32_t>( "acquisitionNumber", 0 );
 	chNumber.setProperty( "indexOrigin", util::fvector4( 0, 0, 0, 0 ) );
 	chTime.setProperty( "acquisitionTime", 0 );
 	chTime.setProperty( "indexOrigin", util::fvector4( 0, 0, 0, 0 ) );

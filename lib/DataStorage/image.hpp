@@ -109,13 +109,13 @@ public:
 	 * Copy constructor.
 	 * Copies all elements, only the voxel-data (in the chunks) are referenced.
 	 */
-    Image(const Image &ref);
+	Image( const Image &ref );
 
 	/**
 	 * Copy operator.
 	 * Copies all elements, only the voxel-data (in the chunks) are referenced.
 	 */
-	Image &operator=(const Image &ref);
+	Image &operator=( const Image &ref );
 
 	bool checkMakeClean();
 	/**
@@ -138,9 +138,7 @@ public:
 	template <typename T> T &voxel( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 ) {
 		checkMakeClean();
 		const std::pair<size_t, size_t> index = commonGet( first, second, third, fourth );
-
 		TypePtr<T> &data = chunkAt( index.first ).asTypePtr<T>();
-
 		return data[index.second];
 	}
 
@@ -229,8 +227,8 @@ public:
 	 * \returns a chunk contains the (maybe converted) voxel value at the given coordinates.
 	 */
 	template<typename TYPE> Chunk getChunkAs( const util::_internal::TypeBase &min, const  util::_internal::TypeBase &max, size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const {
-		Chunk ret = getChunk(first,second,third,fourth); // get a cheap copy
-		ret.makeOfTypeId(TypePtr<TYPE>::staticID); // make it of type T
+		Chunk ret = getChunk( first, second, third, fourth ); // get a cheap copy
+		ret.makeOfTypeId( TypePtr<TYPE>::staticID ); // make it of type T
 		return ret; //return that
 	}
 	/**
@@ -246,8 +244,8 @@ public:
 	* \returns a chunk contains the (maybe converted) voxel value at the given coordinates.
 	*/
 	template<typename TYPE> Chunk getChunkAs( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const {
-		Chunk ret = getChunk(first,second,third,fourth); // get a cheap copy
-		ret.makeOfTypeId(TypePtr<TYPE>::staticID); // make it of type T
+		Chunk ret = getChunk( first, second, third, fourth ); // get a cheap copy
+		ret.makeOfTypeId( TypePtr<TYPE>::staticID ); // make it of type T
 		return ret; //return that
 	}
 
@@ -321,14 +319,15 @@ public:
 	 * If neccessary a conversion into T is done using min/max of the image.
 	 */
 	template<typename T> void copyToMem( T *dst )const {
-		if(checkMakeClean()){
+		if( checkMakeClean() ) {
 			util::TypeReference min, max;
 			getMinMax( min, max );
 			// we could do this using makeOfTypeId - but this solution does not need any additional temporary memory
-			BOOST_FOREACH(const boost::shared_ptr<Chunk> &ref, lookup ) {
+			BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
 				if( !ref->copyToMem<T>( dst, *min, *max ) ) {
 					LOG( Runtime, error ) << "Failed to copy raw data of type " << ref->typeName() << " from image into memory of type " << TypePtr<T>::staticName();
 				}
+
 				dst += ref->volume(); // increment the cursor
 			}
 		}
@@ -351,15 +350,14 @@ public:
 template<typename T> class MemImage: public Image
 {
 public:
-	MemImage( const Image &src ) { 
-		operator=(src);
+	MemImage( const Image &src ) {
+		operator=( src );
 	}
-	MemImage &operator=(const MemImage &ref){//use the copy for generic Images
-		return operator=(static_cast<const Image &>(ref));
+	MemImage &operator=( const MemImage &ref ) { //use the copy for generic Images
+		return operator=( static_cast<const Image &>( ref ) );
 	}
-	MemImage &operator=(const Image &ref){// copy the image, and make sure its of the given type
-		Image::operator=(ref);// ok we just copied the whole image
-
+	MemImage &operator=( const Image &ref ) { // copy the image, and make sure its of the given type
+		Image::operator=( ref ); // ok we just copied the whole image
 		//we want deep copies of the chunks, and we want them to be of type T
 		struct : _internal::SortedChunkList::chunkPtrOperator {
 			util::TypeReference min, max;
@@ -380,15 +378,15 @@ template<typename T> class TypedImage: public Image
 public:
 	TypedImage( const Image &src ): Image( src ) { // ok we just copied the whole image
 		//but we want it to be of type T
-		makeOfTypeId(TypePtr<T>::staticID);
+		makeOfTypeId( TypePtr<T>::staticID );
 	}
-	TypedImage &operator=(const TypedImage &ref){//its already of the given type - so just copy it
-		Image::operator=(ref);
+	TypedImage &operator=( const TypedImage &ref ) { //its already of the given type - so just copy it
+		Image::operator=( ref );
 		return *this;
-	} 
-	TypedImage &operator=(const Image &ref){// copy the image, and make sure its of the given type
-		Image::operator=(ref);
-		makeOfTypeId(TypePtr<T>::staticID);
+	}
+	TypedImage &operator=( const Image &ref ) { // copy the image, and make sure its of the given type
+		Image::operator=( ref );
+		makeOfTypeId( TypePtr<T>::staticID );
 		return *this;
 	}
 };

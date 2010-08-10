@@ -16,6 +16,7 @@
 #include "CoreUtils/vector.hpp"
 #include <boost/foreach.hpp>
 #include "CoreUtils/property.hpp"
+#include<boost/token_iterator.hpp>
 
 #define _USE_MATH_DEFINES 1
 #include <math.h>
@@ -33,30 +34,28 @@ Image::Image ( ) : set( "indexOrigin", "sequenceNumber,readVec,phaseVec,sliceVec
 	set.addSecondarySort( "acquisitionTime" );
 }
 
-Image::Image(const isis::data::Image& ref):set("","")/*SortedChunkList has no default constructor - lets just make an empty (and invalid) set*/ {
-	(*this)=ref; // set will be replaced here anyway
+Image::Image( const isis::data::Image &ref ): set( "", "" )/*SortedChunkList has no default constructor - lets just make an empty (and invalid) set*/
+{
+	( *this ) = ref; // set will be replaced here anyway
 }
 
-Image &Image::operator=(const isis::data::Image& ref)
+Image &Image::operator=( const isis::data::Image &ref )
 {
 	//deep copy bases
-	static_cast<util::PropMap&>(*this)=static_cast<const util::PropMap&>(ref);
-	static_cast<_internal::NDimensional< 4 >&>(*this)=static_cast<const _internal::NDimensional< 4 >&>(ref);
-
+	static_cast<util::PropMap &>( *this ) = static_cast<const util::PropMap &>( ref );
+	static_cast<_internal::NDimensional< 4 >&>( *this ) = static_cast<const _internal::NDimensional< 4 >&>( ref );
 	//deep copy members
-	chunkVolume=ref.chunkVolume;
-	clean=ref.clean;
-	set=ref.set;
-
+	chunkVolume = ref.chunkVolume;
+	clean = ref.clean;
+	set = ref.set;
 	//replace all chunks (in set) by cheap copies of them
-	struct : public _internal::SortedChunkList::chunkPtrOperator{
-        boost::shared_ptr< Chunk > operator()(const boost::shared_ptr< Chunk >& ptr){
-			return boost::shared_ptr< Chunk > (new Chunk(*ptr));
+	struct : public _internal::SortedChunkList::chunkPtrOperator {
+		boost::shared_ptr< Chunk > operator()( const boost::shared_ptr< Chunk >& ptr ) {
+			return boost::shared_ptr< Chunk > ( new Chunk( *ptr ) );
 		}
-	}replace;
-	set.transform(replace);
-	lookup=set.getLookup();
-	
+	} replace;
+	set.transform( replace );
+	lookup = set.getLookup();
 	return *this;
 }
 
@@ -71,17 +70,19 @@ bool Image::checkMakeClean()
 			LOG( Runtime, error ) << "Reindexing failed -- undefined behavior ahead ...";
 		}
 	}
+
 	return clean;
 }
 
 
 bool Image::insertChunk ( const Chunk &chunk )
 {
-	if ( chunk.volume()==0 ) {
+	if ( chunk.volume() == 0 ) {
 		LOG( Runtime, error )
-				<< "Cannot insert empty Chunk (Size is "<< chunk.sizeToString() << ").";
+				<< "Cannot insert empty Chunk (Size is " << chunk.sizeToString() << ").";
 		return false;
 	}
+
 	if ( ! chunk.valid() ) {
 		LOG( Runtime, error )
 				<< "Cannot insert invalid chunk. Missing properties: " << chunk.getMissing();
@@ -117,19 +118,15 @@ bool Image::reIndex()
 	const size_t chunks = lookup.size();
 	util::FixedVector<size_t, n_dims> size; //storage for the size of the chunk structure
 	size.fill( 1 );
-
 	//get primary attributes from geometrically first chunk - will be usefull
 	const Chunk &first = chunkAt( 0 );
 	const unsigned short chunk_dims = first.relevantDims();
 	chunkVolume = first.volume();
-
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Determine structure of the image by searching for dimensional breaks in the chunklist
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	//get indexOrigin from the geometrically first chunk
 	propertyValue( "indexOrigin" ) = first.propertyValue( "indexOrigin" );
-
 	//if there are many chunks, they must leave at least on dimension to the image to "sort" them in
 	const unsigned short sortDims = n_dims - ( set.getHorizontalSize() > 1 ? 1 : 0 ); // dont use the uppermost dim, if the timesteps are already there
 
@@ -694,27 +691,31 @@ bool Image::makeOfTypeId( short unsigned int id )
 	assert( ! ( min.empty() || max.empty() ) );
 	LOG( Debug, info ) << "Computed value range of the original image data: [" << min << ".." << max << "]";
 	bool retVal = true;
-
 	//we want all chunks to be of type id - so tell them
 	BOOST_FOREACH( boost::shared_ptr<Chunk> &ref, lookup ) {
 		retVal &= ref->makeOfTypeId( id, *min, *max );
 	}
-
 	return retVal;
 }
 
 size_t Image::spliceDownTo( dimensions dim ) //readDim = 0, phaseDim, sliceDim, timeDim
 {
-	if( lookup[0]->relevantDims() < (size_t) dim ) {
+	if( lookup[0]->relevantDims() < ( size_t ) dim ) {
 		LOG( Debug, error ) << "The dimensionality of the chunks of this image is already below " << dim << " cannot splice it.";
 		return 0;
 	}
 
-	LOG_IF( lookup[0]->relevantDims() == (size_t) dim, Debug, info ) << "Running useless splice, the dimensionality of the chunks of this image is already " << dim;
+	LOG_IF( lookup[0]->relevantDims() == ( size_t ) dim, Debug, info ) << "Running useless splice, the dimensionality of the chunks of this image is already " << dim;
+	LOG_IF( hasProperty("acquisitionTime") || lookup[0]->hasProperty("acquisitionTime"), Debug, warning ) << "Splicing images with acquisitionTime will cause you lots of trouble. You should remove that before.";
 	util::FixedVector<size_t, 4> size = sizeToVector();
 
 	for( int i = 0; i < dim; i++ )
 		size[i] = 1;
+
+	// get a list of needed properties (everything which is missing in a newly created chunk plus everything which is needed for autosplice)
+	const std::list<std::string> splice_needed = util::string2list<std::string>( "voxelSize,voxelGap,readVec,phaseVec,sliceVec,indexOrigin,acquisitionNumber" );
+	std::set<std::string,util::_internal::caselessStringLess> needed=static_cast<const util::PropMap&>(MemChunk<short>(1)).getMissing();
+	needed.insert(splice_needed.begin(),splice_needed.end());
 
 	struct splicer {
 		dimensions m_dim;
@@ -724,7 +725,7 @@ size_t Image::spliceDownTo( dimensions dim ) //readDim = 0, phaseDim, sliceDim, 
 		void operator()( const Chunk &ch ) {
 			const size_t topDim = ch.relevantDims() - 1;
 
-			if( topDim >= (size_t) m_dim ) { // ok we still have to splice that
+			if( topDim >= ( size_t ) m_dim ) { // ok we still have to splice that
 				const size_t subSize = m_image.sizeToVector()[topDim];
 				assert( !( m_amount % subSize ) ); // there must not be any "remaining"
 				splicer sub( m_dim, m_amount / subSize, m_image );
@@ -732,7 +733,7 @@ size_t Image::spliceDownTo( dimensions dim ) //readDim = 0, phaseDim, sliceDim, 
 					sub( ref );
 				}
 			} else { // seems like we're done - insert it into the image
-				assert( ch.relevantDims() == (size_t) m_dim ); // index of the higest dim>1 (ch.relevantDims()-1) shall be equal to the dim below the requested splicing (m_dim-1)
+				assert( ch.relevantDims() == ( size_t ) m_dim ); // index of the higest dim>1 (ch.relevantDims()-1) shall be equal to the dim below the requested splicing (m_dim-1)
 				m_image.insertChunk( ch );
 			}
 		}
@@ -743,7 +744,10 @@ size_t Image::spliceDownTo( dimensions dim ) //readDim = 0, phaseDim, sliceDim, 
 	//static_cast<util::PropMap::base_type*>(this)->clear(); we can keep the common properties - they will be merged with thier own copies from the chunks on the next reIndex
 	splicer splice( dim, size.product(), *this );
 	BOOST_FOREACH( boost::shared_ptr<Chunk> &ref, buffer ) {
-		ref->join( *this ); //get back all properties
+		BOOST_FOREACH( const std::string &need, needed ) { //get back properties needed for the
+			if( !ref->hasProperty( need ) && this->hasProperty( need ) )
+				ref->propertyValue( need ) = this->propertyValue( need );
+		}
 		splice( *ref );
 	}
 	reIndex();

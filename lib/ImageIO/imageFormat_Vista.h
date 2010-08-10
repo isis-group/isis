@@ -43,8 +43,8 @@ namespace image_io
 struct DateDecoding {
 	std::string dateRegex, delimiter;
 	size_t first, second, third;
-	DateDecoding(std::string regex, std::string d, size_t f, size_t s, size_t t)
-		: dateRegex(regex), delimiter(d) , first(f), second(s), third(t) {}
+	DateDecoding( std::string regex, std::string d, size_t f, size_t s, size_t t )
+		: dateRegex( regex ), delimiter( d ) , first( f ), second( s ), third( t ) {}
 };
 class ImageFormat_Vista: public FileFormat
 {
@@ -166,52 +166,58 @@ private:
 				// OPTIONAL: "repetition_time" or "repetition" -> repetitionTime
 				if( ( strcmp ( name, "repetition" ) == 0 ) || ( strcmp( name, "repetition_time" ) == 0 ) ) {
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
-					std::string repTime = std::string( VString( val ));
-					if ( static_cast<signed int>(repTime.find(".")) != -1)
-					{
-						repTime.erase( repTime.begin() + repTime.find("."), repTime.end() );
+					std::string repTime = std::string( VString( val ) );
+
+					if ( static_cast<signed int>( repTime.find( "." ) ) != -1 ) {
+						repTime.erase( repTime.begin() + repTime.find( "." ), repTime.end() );
 					}
-					std::stringstream sstr(repTime);
+
+					std::stringstream sstr( repTime );
 					u_int16_t repTimeInt;
 					sstr >> repTimeInt;
 					chunk.setProperty<u_int16_t>( "repetitionTime", repTimeInt );
 					continue;
 				}
+
 				if ( strcmp ( name , "slice_time" ) == 0 ) {
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
-					std::string slice_time = std::string(VString (val));
-					std::stringstream sstr(slice_time);
+					std::string slice_time = std::string( VString ( val ) );
+					std::stringstream sstr( slice_time );
 					float sliceTimeFloat;
 					sstr >> sliceTimeFloat;
-					chunk.setProperty<float>("acquisitionTime",  sliceTimeFloat  );
-					chunk.setProperty<float>("Vista/slice_time",  sliceTimeFloat  );
+					chunk.setProperty<float>( "acquisitionTime",  sliceTimeFloat  );
+					chunk.setProperty<float>( "Vista/slice_time",  sliceTimeFloat  );
 					continue;
 				}
 
-				if ( strcmp ( name, "sex" ) == 0) {
+				if ( strcmp ( name, "sex" ) == 0 ) {
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
 					util::Selection genderSelection( "female,male,other" );
 
-					if (std::string( (VString) val ) == "female") {
-						genderSelection.set("female");
+					if ( std::string( ( VString ) val ) == "female" ) {
+						genderSelection.set( "female" );
 					}
-					if (std::string( (VString) val ) == std::string("male")) {
-						genderSelection.set("male");
+
+					if ( std::string( ( VString ) val ) == std::string( "male" ) ) {
+						genderSelection.set( "male" );
 					}
-					if (std::string( (VString) val ) == "other") {
-						genderSelection.set("other");
+
+					if ( std::string( ( VString ) val ) == "other" ) {
+						genderSelection.set( "other" );
 					}
-					chunk.setProperty<util::Selection>("subjectGender", genderSelection);
+
+					chunk.setProperty<util::Selection>( "subjectGender", genderSelection );
 					continue;
 				}
 
-				if ( strcmp ( name, "patient") == 0) {
+				if ( strcmp ( name, "patient" ) == 0 ) {
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
-					std::string subjectName = std::string ((VString) val );
-					subjectName.resize(4);
-					chunk.setProperty<std::string>("subjectName", subjectName);
+					std::string subjectName = std::string ( ( VString ) val );
+					subjectName.resize( 4 );
+					chunk.setProperty<std::string>( "subjectName", subjectName );
 					continue;
 				}
+
 				// OPTIONAL: columnVec -> readVec, overwrite old values
 				if( strcmp( name, "columnVec" ) == 0 ) {
 					util::fvector4 readVec;
@@ -251,37 +257,42 @@ private:
 					chunk.setProperty( "indexOrigin", util::fvector4( x, y, z, 0 ) );
 					continue;
 				}
-				if( strcmp( name, "date") == 0 ) {
+
+				if( strcmp( name, "date" ) == 0 ) {
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
-					date = std::string( ( VString ) val);
+					date = std::string( ( VString ) val );
 					continue;
 				}
-				if( strcmp( name, "time") == 0) {
+
+				if( strcmp( name, "time" ) == 0 ) {
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
-					time = std::string( ( VString ) val);
+					time = std::string( ( VString ) val );
 					continue;
 				}
-				if( strcmp( name, "echoTime") == 0) {
+
+				if( strcmp( name, "echoTime" ) == 0 ) {
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
-					std::string echoTimeStr = std::string(VString (val));
-					std::stringstream sstr(echoTimeStr);
+					std::string echoTimeStr = std::string( VString ( val ) );
+					std::stringstream sstr( echoTimeStr );
 					float echoTime;
 					sstr >> echoTime;
-					chunk.setProperty<float>("echoTime", echoTime);
+					chunk.setProperty<float>( "echoTime", echoTime );
 					continue;
 				}
-				if( strcmp( name, "flipAngle") == 0) {
+
+				if( strcmp( name, "flipAngle" ) == 0 ) {
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
-					std::string flipAngleStr = std::string(VString (val));
-					std::stringstream sstr(flipAngleStr);
+					std::string flipAngleStr = std::string( VString ( val ) );
+					std::stringstream sstr( flipAngleStr );
 					u_int16_t flipAngle;
 					sstr >> flipAngle;
-					chunk.setProperty<float>("flipAngle", flipAngle);
+					chunk.setProperty<float>( "flipAngle", flipAngle );
 					continue;
 				}
-				if( strcmp( name, "transmitCoil") == 0) {
+
+				if( strcmp( name, "transmitCoil" ) == 0 ) {
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
-					chunk.setProperty<std::string>("transmitCoil", std::string( (VString)val));
+					chunk.setProperty<std::string>( "transmitCoil", std::string( ( VString )val ) );
 					continue;
 				}
 
@@ -320,61 +331,63 @@ private:
 			// AFTERMATH
 			// set missing values according to default rules
 
-			if ( date.size() )
-			{
+			if ( date.size() ) {
 				std::list<DateDecoding> m_dateDecodingList;
 				std::list<DateDecoding> m_timeDecodingList;
 				//e.g. 12 May 2007
-				m_dateDecodingList.push_back(DateDecoding( std::string("^([[:digit:]]{1,2})\\ {1}([[:word:]]{3})\\ {1}([[:digit:]]{4}).*"),"-", 1,2,3) );
+				m_dateDecodingList.push_back( DateDecoding( std::string( "^([[:digit:]]{1,2})\\ {1}([[:word:]]{3})\\ {1}([[:digit:]]{4}).*" ), "-", 1, 2, 3 ) );
 				//e.g. 12.03.2007
-				m_dateDecodingList.push_back(DateDecoding( std::string("^([[:digit:]]{2})\\.([[:digit:]]{2})\\.([[:digit:]]{4})$"),"-", 1,2,3) );
+				m_dateDecodingList.push_back( DateDecoding( std::string( "^([[:digit:]]{2})\\.([[:digit:]]{2})\\.([[:digit:]]{4})$" ), "-", 1, 2, 3 ) );
 				//e.g. 2010-Feb-12
-				m_dateDecodingList.push_back(DateDecoding( std::string("^([[:digit:]]{4})\\-([[:word:]]{3})\\-([[:digit:]]{2})$"),"-", 3,2,1) );
+				m_dateDecodingList.push_back( DateDecoding( std::string( "^([[:digit:]]{4})\\-([[:word:]]{3})\\-([[:digit:]]{2})$" ), "-", 3, 2, 1 ) );
 				//e.g. 20081210
-				m_dateDecodingList.push_back(DateDecoding( std::string("^([[:digit:]]{4})([[:digit:]]{2})([[:digit:]]{2})$"),"-", 3,2,1) );
+				m_dateDecodingList.push_back( DateDecoding( std::string( "^([[:digit:]]{4})([[:digit:]]{2})([[:digit:]]{2})$" ), "-", 3, 2, 1 ) );
 				//e.g. 11:15:49 5 May 2002 (date)
-				m_dateDecodingList.push_back(DateDecoding( std::string("^([[:digit:]]{2})\\:([[:digit:]]{2})\\:([[:digit:]]{2})\\ +([[:digit:]]{1,2})\\ +([[:word:]]{3})\\ +([[:digit:]]{4}).*"), "-",4,5,6));
+				m_dateDecodingList.push_back( DateDecoding( std::string( "^([[:digit:]]{2})\\:([[:digit:]]{2})\\:([[:digit:]]{2})\\ +([[:digit:]]{1,2})\\ +([[:word:]]{3})\\ +([[:digit:]]{4}).*" ), "-", 4, 5, 6 ) );
 				//e.g. 11:15:49
-				m_timeDecodingList.push_back(DateDecoding(std::string("^([[:digit:]]{2})\\:([[:digit:]]{2})\\:([[:digit:]]{2}).*"), "not_needed", 1,2,3));
+				m_timeDecodingList.push_back( DateDecoding( std::string( "^([[:digit:]]{2})\\:([[:digit:]]{2})\\:([[:digit:]]{2}).*" ), "not_needed", 1, 2, 3 ) );
 				//e.g. 11:15:49 5 May 2002 (time)
-				m_timeDecodingList.push_back(DateDecoding( std::string("^([[:digit:]]{2})\\:([[:digit:]]{2})\\:([[:digit:]]{2})\\ ?([[:digit:]]{1,2})\\ ?([[:word:]{3})\\ ?([[:digit:]]{4}).*"), "not_needed",1,2,3));
-
+				m_timeDecodingList.push_back( DateDecoding( std::string( "^([[:digit:]]{2})\\:([[:digit:]]{2})\\:([[:digit:]]{2})\\ ?([[:digit:]]{1,2})\\ ?([[:word:]{3})\\ ?([[:digit:]]{4}).*" ), "not_needed", 1, 2, 3 ) );
 				std::string day, month, year;
 				boost::gregorian::date isisDate;
-				BOOST_FOREACH(std::list<DateDecoding>::const_reference dateRef, m_dateDecodingList)
-				{
+				BOOST_FOREACH( std::list<DateDecoding>::const_reference dateRef, m_dateDecodingList ) {
 					boost::regex dateRegex( dateRef.dateRegex );
 					boost::cmatch dateResults;
+
 					if ( boost::regex_match( date.c_str(), dateResults, dateRegex ) ) {
 						day = boost::lexical_cast<std::string>( dateResults.str( dateRef.first ) );
+
 						if( day.size() == 1 ) {
-							day.insert(0, std::string("0"));
+							day.insert( 0, std::string( "0" ) );
 						}
+
 						month = boost::lexical_cast<std::string>( dateResults.str( dateRef.second ) );
 						year = boost::lexical_cast<std::string>( dateResults.str( dateRef.third ) );
 						std::string strDate = year + dateRef.delimiter + month + dateRef.delimiter + day;
-						isisDate = boost::gregorian::from_simple_string(strDate);
+						isisDate = boost::gregorian::from_simple_string( strDate );
 					}
 				}
+
 				//if no attribute time was found search in date for the time
 				if ( ! time.size() ) {
 					time = date;
 				}
+
 				size_t hours, minutes, seconds;
 				boost::posix_time::time_duration isisTimeDuration;
-				BOOST_FOREACH(std::list<DateDecoding>::const_reference timeRef, m_timeDecodingList)
-				{
+				BOOST_FOREACH( std::list<DateDecoding>::const_reference timeRef, m_timeDecodingList ) {
 					boost::regex timeRegex( timeRef.dateRegex );
 					boost::cmatch timeResults;
+
 					if ( boost::regex_match( time.c_str(), timeResults, timeRegex ) ) {
 						hours = boost::lexical_cast<size_t>( timeResults[timeRef.first] );
 						minutes = boost::lexical_cast<size_t>( timeResults[timeRef.second] );
 						seconds = boost::lexical_cast<size_t>( timeResults[timeRef.third] );
-						isisTimeDuration = boost::posix_time::time_duration(hours, minutes, seconds);
+						isisTimeDuration = boost::posix_time::time_duration( hours, minutes, seconds );
 					}
 				}
-				boost::posix_time::ptime isisTime(isisDate, isisTimeDuration);
-				chunk.setProperty<boost::posix_time::ptime>("sequenceStart", isisTime);
+				boost::posix_time::ptime isisTime( isisDate, isisTimeDuration );
+				chunk.setProperty<boost::posix_time::ptime>( "sequenceStart", isisTime );
 			}
 
 			//if not set yet, set read, phase and slice vector.
@@ -393,7 +406,7 @@ private:
 				util::fvector4 ioTmp(
 					-( ( dims[0] - 1 )*voxels[0] ) / 2,
 					-( ( dims[1] - 1 )*voxels[1] ) / 2,
-					-( ( (nslices ? nslices : dims[2])- 1 )*voxels[2] ) / 2,
+					-( ( ( nslices ? nslices : dims[2] ) - 1 )*voxels[2] ) / 2,
 					0 );
 				util::fvector4 readV = chunk.getProperty<util::fvector4>( "readVec" );
 				util::fvector4 phaseV = chunk.getProperty<util::fvector4>( "phaseVec" );
@@ -406,10 +419,13 @@ private:
 					0 );
 				chunk.setProperty( "indexOrigin", iOrig );
 			}
-			chunk.setProperty<util::fvector4>("voxelGap", util::fvector4(0,0,0,0));
+
+			chunk.setProperty<util::fvector4>( "voxelGap", util::fvector4( 0, 0, 0, 0 ) );
+
 			// set acquisitionNumber. This values is always missing
-			if(!chunk.hasProperty("acquisitionNumber"))
-				chunk.setProperty<u_int32_t>( "acquisitionNumber", 0 );
+			if( !chunk.hasProperty( "acquisitionNumber" ) )
+				chunk.setProperty<uint32_t>( "acquisitionNumber", 0 );
+
 			LOG( DataLog, info ) << "finished copying header";
 		}
 
@@ -419,7 +435,7 @@ private:
 		 * Default constructor. Create a VistaChunk out of a vista image.
 		 */
 
-		VistaChunk( VImage image, const bool functional, size_t nslices=0 ):
+		VistaChunk( VImage image, const bool functional, size_t nslices = 0 ):
 			data::Chunk( static_cast<TYPE *>( image->data ), VImageDeleter( image ),
 						 VImageNColumns( image ), VImageNRows( image ), functional ? 1 : VImageNBands( image ), functional ? VImageNBands( image ) : 1 ) {
 			copyHeaderFromVista( image, *this, nslices );
@@ -427,7 +443,7 @@ private:
 	};
 
 	//member function which switch handles the loaded images
-	bool switchHandle( VImage&, data::ChunkList& );
+	bool switchHandle( VImage &, data::ChunkList & );
 
 	/**
 	 * This function copies all chunk header informations to the appropriate

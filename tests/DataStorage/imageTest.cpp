@@ -127,12 +127,12 @@ BOOST_AUTO_TEST_CASE ( image_chunk_test )
 	BOOST_CHECK_EQUAL( ref11.propertyValue( "indexOrigin" ), util::fvector4( 0, 0, 0 ) );
 	BOOST_CHECK_EQUAL( ref12.propertyValue( "indexOrigin" ), util::fvector4( 0, 0, 1 ) );
 	BOOST_CHECK_EQUAL( ref13.propertyValue( "indexOrigin" ), util::fvector4( 0, 0, 2 ) );
-	BOOST_CHECK_EQUAL( ref11.propertyValue( "acquisitionNumber" ), ( int32_t )0 );
-	BOOST_CHECK_EQUAL( ref12.propertyValue( "acquisitionNumber" ), ( int32_t )1 );
-	BOOST_CHECK_EQUAL( ref13.propertyValue( "acquisitionNumber" ), ( int32_t )2 );
-	BOOST_CHECK_EQUAL( ref21.propertyValue( "acquisitionNumber" ), ( int32_t )3 );
-	BOOST_CHECK_EQUAL( ref22.propertyValue( "acquisitionNumber" ), ( int32_t )4 );
-	BOOST_CHECK_EQUAL( ref23.propertyValue( "acquisitionNumber" ), ( int32_t )5 );
+	BOOST_CHECK_EQUAL( ref11.propertyValue( "acquisitionNumber" ), ( uint32_t )0 );
+	BOOST_CHECK_EQUAL( ref12.propertyValue( "acquisitionNumber" ), ( uint32_t )1 );
+	BOOST_CHECK_EQUAL( ref13.propertyValue( "acquisitionNumber" ), ( uint32_t )2 );
+	BOOST_CHECK_EQUAL( ref21.propertyValue( "acquisitionNumber" ), ( uint32_t )3 );
+	BOOST_CHECK_EQUAL( ref22.propertyValue( "acquisitionNumber" ), ( uint32_t )4 );
+	BOOST_CHECK_EQUAL( ref23.propertyValue( "acquisitionNumber" ), ( uint32_t )5 );
 	BOOST_CHECK_EQUAL( ref22.propertyValue( "indexOrigin" ), util::fvector4( 0, 0, 1 ) );
 	BOOST_CHECK( ref22.propertyValue( "indexOrigin" ) == ref12.propertyValue( "indexOrigin" ) );
 	BOOST_CHECK( !( ref22.propertyValue( "acquisitionNumber" ) == ref12.propertyValue( "acquisitionNumber" ) ) );
@@ -221,7 +221,7 @@ BOOST_AUTO_TEST_CASE( orientation_test )
 	ch.setProperty( "indexOrigin", util::fvector4( 0, 0, 0 ) );
 	ch.setProperty( "readVec", util::fvector4( 1, 0 ) );
 	ch.setProperty( "phaseVec", util::fvector4( 0, 1 ) );
-	ch.setProperty( "acquisitionNumber", ( int32_t )0 );
+	ch.setProperty( "acquisitionNumber", ( uint32_t )0 );
 	ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 	BOOST_REQUIRE( img.insertChunk( ch ) );
 	data::enable_log<util::DefaultMsgPrint>( error );
@@ -234,7 +234,7 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 {
 	std::vector<std::vector<data::MemChunk<float> > > ch( 3, std::vector<data::MemChunk<float> >( 3, data::MemChunk<float>( 3, 3 ) ) );
 	data::Image img;
-	unsigned short acNum = 0;
+	uint32_t acNum = 0;
 	const util::fvector4 vSize( 1, 1, 1, 0 );
 
 	for ( int i = 0; i < 3; i++ )
@@ -299,7 +299,7 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 BOOST_AUTO_TEST_CASE( typediamge_test )
 {
 	data::Image img;
-	unsigned short acNum = 0;
+	uint32_t acNum = 0;
 	const util::fvector4 vSize( 1, 1, 1, 0 );
 
 	for ( int i = 0; i < 3; i++ )
@@ -511,7 +511,7 @@ BOOST_AUTO_TEST_CASE ( image_splice_test )
 {
 	data::MemChunk<uint8_t> original( 10, 10, 10, 10 );
 	data::Image img;
-	original.setProperty<int32_t>( "acquisitionNumber", 1 );
+	original.setProperty<uint32_t>( "acquisitionNumber", 1 );
 	original.setProperty<util::fvector4>( "indexOrigin", util::fvector4() );
 	original.setProperty<util::fvector4>( "voxelSize", util::fvector4( 1, 1, 1 ) );
 	original.setProperty<util::fvector4>( "readVec", util::fvector4( 1, 0, 0 ) );

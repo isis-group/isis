@@ -167,7 +167,7 @@ public:
 	 * (If voxelSize is 1,1,1 and voxelGap is 0,0,0)
 	 * (acquisitionNumber will be reset to a simple incrementing counter starting at acquisitionNumberOffset)
 	 */
-	ChunkList autoSplice( int32_t acquisitionNumberStride = 0 )const;
+	ChunkList autoSplice( uint32_t acquisitionNumberStride = 0 )const;
 
 	/**
 	 * Splices the chunk at the given dimension and all dimensions above.

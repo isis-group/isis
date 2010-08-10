@@ -433,8 +433,9 @@ void PropMap::addNeededFromString( const std::string &needed )
 	const std::list<std::string> needList = util::string2list<std::string>( needed );
 	//@todo util::string2list<std::string>( needed,' ' ) would be faster but less robust
 	LOG( Debug, verbose_info ) << "Adding " << needed << " as needed";
-	BOOST_FOREACH( std::list<std::string>::const_reference ref, needList )
-	addNeeded( ref );
+	BOOST_FOREACH( std::list<std::string>::const_reference ref, needList ) {
+		addNeeded( ref );
+	}
 }
 
 /// \returns true if a leaf exists at the given path and the property is not empty

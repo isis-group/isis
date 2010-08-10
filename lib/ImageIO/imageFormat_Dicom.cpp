@@ -197,8 +197,11 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 		util::fvector4 voxelGap; //find a more robust way to determine inplane voxelGap
 
 		if ( transformOrTell<uint16_t>( prefix + "RepetitionTime", "repetitionTime", object, warning ) );
+
 		if ( transformOrTell<float>( prefix + "EchoTime", "echoTime", object, warning ) );
+
 		if ( transformOrTell<std::string>( prefix + "TransmitCoilName", "transmitCoil", object, warning ) );
+
 		if ( transformOrTell<int16_t>( prefix + "FlipAngle", "flipAngle", object, warning ) );
 
 		if ( hasOrTell( prefix + "SpacingBetweenSlices", object, info ) ) {

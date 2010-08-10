@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE ( chunk_property_test )
 	util::fvector4 pos( 1, 1, 1 );
 	ch.setProperty( "indexOrigin", pos );
 	BOOST_CHECK( !ch.valid() );
-	ch.setProperty<int32_t>( "acquisitionNumber", 0 );
+	ch.setProperty<uint32_t>( "acquisitionNumber", 0 );
 	BOOST_CHECK( !ch.valid() );
 	ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 	BOOST_CHECK( !ch.valid() );
@@ -177,7 +177,7 @@ BOOST_AUTO_TEST_CASE ( chunk_splice_test )//Copy chunks
 	ch1.setProperty( "phaseVec", util::fvector4( 0, 1, 0 ) );
 	ch1.setProperty( "voxelSize", util::fvector4( 1, 1, 1 ) );
 	ch1.setProperty( "voxelGap", util::fvector4( 1, 1, 1 ) );
-	ch1.setProperty<int32_t>( "acquisitionNumber", 0 );
+	ch1.setProperty<uint32_t>( "acquisitionNumber", 0 );
 
 	for ( size_t i = 0; i < ch1.volume(); i++ )
 		ch1.asTypePtr<float>()[i] = i;
