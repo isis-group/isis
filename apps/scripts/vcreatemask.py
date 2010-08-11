@@ -53,7 +53,7 @@ def docreatemask(inputfolder, maxvoxel, outfile):
     print "Creating mask with a maximal volume of " + str(maxvoxel) + " voxel"
     voxelcount = maxvoxel+1
     threshold = 80
-    while( voxelcount > maxvoxel):    
+    while( voxelcount > maxvoxel): 
         os.system("vbinarize -in " + inputfolder + "vcreatemask_tmp/average.v -out " + inputfolder + "vcreatemask_tmp/binarized.v -min " + str(threshold) + "  2> vcreatemask.tmp" )
         os.system("vsmooth3d -in " + inputfolder + "vcreatemask_tmp/binarized.v -out "  + inputfolder + "vcreatemask_tmp/smoothed.v -iter 1000  2> vcreatemask.tmp");
         os.system("vconvert -in " + inputfolder + "vcreatemask_tmp/smoothed.v -out " + inputfolder + "vcreatemask_tmp/smooth_float.v -repn float 2> vcreatemask.tmp")
@@ -71,6 +71,7 @@ def docreatemask(inputfolder, maxvoxel, outfile):
     print "A window will open. There you can check the mask. To view the basic image data you have to use the left vertical slider."
     os.system("vlv -in " + inputfolder + "vcreatemask_tmp/average.v -z " + inputfolder + "vcreatemask_tmp/smooth_float.v" )
     os.system("cp " + inputfolder + "vcreatemask_tmp/smoothed.v " + outfile)
+    os.system("cp " + inputfolder + "vcreatemask_tmp/average.v mask_reference.v")
     print "A mask named " + outfile + " was created. To edit this mask you can use vledit."
     raw_input("Press any key to exit.")
     end(inputfolder)

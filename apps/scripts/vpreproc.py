@@ -22,12 +22,14 @@ def usage():
 	print "Usage:"
 	print "Needed parameters:"
 	print "(-i or --in):\n\tDenotes the input file which has to be preprocesed. Can be of file type dicom, vista or nifti."
+	print "(-o or --out):\n\tDenotes the output filename."
 	print "\nOptional parameters:"
+	print "(--fwhm):\n\tDenotes the width of the spatial Gaussian filter applied during preprocessing. Default is 6 mm"
+	print "(--high):\n\tDenotes the high frequency used by the removal of the baseline drift. Default is 90 Hz."
 	print "(--mni):\n\tDenotes the MNI brain used for the registration. This only has to be set if the user wishes to take an other standard brain."
 	print "(-k or --keep):\n\tKeeps the files from all the steps in a folder named vpreproc_steps_{date}. If not set this folder will be deleted after the preprocessing."
 	print "(--tr):\n\tDenotes the repetition time. The repetition time only has to be set if the programm requested it."
 	print "(--slicetimefile):\n\t This is the file containing the acquisition time for each slice. This only has to pe set if the programm requested it."
-	print "(--scriptuse):\n\tIf you want to use vpreproc in a script you can add this parameter to avoid interruption of the preprocessing chain if you get a important warning from vpreproc."
 	print "\n"
 	
 	
@@ -58,7 +60,7 @@ def attributecheck(filename, attribute):
 		return False
 
 
-def preprocess(input, tr, slicetimefile, scriptuse, output, fwhm, high):
+def preprocess(input, tr, slicetimefile, output, fwhm, high):
 	os.system("mkdir " + dir_steps)
 	tmpFile = input
 	#converting if not vista file
@@ -96,11 +98,7 @@ def preprocess(input, tr, slicetimefile, scriptuse, output, fwhm, high):
 		
 	else:
 		print "The repitition time (" + getattributevalue(tmpFile, "repetition_time")[0][:-1] + " ms) is too long for reliable slice time correction. Omitting slice time correction."
-		print "Keep in mind that your results may not be reliable as well!"
-		if (not scriptuse):
-			raw_input("Press any key to continue anyway...")
-		
-	
+
 	
 	#moco
 	print "performing motion correction..."
@@ -109,10 +107,10 @@ def preprocess(input, tr, slicetimefile, scriptuse, output, fwhm, high):
 	
 	#registration
 	print "performing registration into MNI space..."
-	os.system("valign3d -ref " + MNI_BRAIN_FSL + " -in " + tmpFile + " -itktrans " + dir_steps + "/vpreproc.tra -prealign_m true -iter 50 > vpreproc.tmp 2> vpreproc.tmp")
-	os.system("vdotrans3d -ref " + MNI_BRAIN_FSL + " -in " + tmpFile + " -itktrans " + dir_steps + "/vpreproc.tra -out " + dir_steps +  "/s4_registration.v -fmri -reso 3 > vpreproc.tmp 2> vpreproc.tmp")
+	os.system("valign3d -ref " + MNI_BRAIN_FSL + " -in " + tmpFile + " -trans " + dir_steps + "/vpreproc.nii -prealign_m true -iter 100 10 -transform 0 2 -optimizer 0 2 -bound 4 -smooth 3 > vpreproc.tmp 2> vpreproc.tmp")
+	os.system("vdotrans3d -ref " + MNI_BRAIN_FSL + " -in " + tmpFile + " -trans " + dir_steps + "/vpreproc.nii -out " + dir_steps +  "/s4_registration.v -fmri -reso 3 > vpreproc.tmp 2> vpreproc.tmp")
 	print "creating image to check registration..."
-	os.system("vdotrans3d -ref " + MNI_BRAIN_FSL + " -in " + tmpFile + " -itktrans " + dir_steps + "/vpreproc.tra -out " + dir_steps + "/vpreproc_check_registration.v > vpreproc.tmp 2> vpreproc.tmp")
+	os.system("vdotrans3d -ref " + MNI_BRAIN_FSL + " -in " + tmpFile + " -trans " + dir_steps + "/vpreproc.nii -out " + dir_steps + "/vpreproc_check_registration.v > vpreproc.tmp 2> vpreproc.tmp")
 	tmpFile = dir_steps + "/s4_registration.v"
 	
 	#vpreprocess
@@ -139,9 +137,8 @@ def main(argv):
 	tr = -1
 	convert = False
 	keep = False
-	scriptuse = False
 	try:
-		opts, args = getopt(argv, "o:i:hks:", ["scriptuse", "help", "in=", "keep", "tr=", "mni=", "slicetimefile=", "fwhm=", "high=", "out="])
+		opts, args = getopt(argv, "o:i:hks:", [ "help", "in=", "keep", "tr=", "mni=", "slicetimefile=", "fwhm=", "high=", "out="])
 	except GetoptError:
 		usage()
 		sys.exit(2)
@@ -162,8 +159,6 @@ def main(argv):
 			MNI_BRAIN_FSL = arg
 		if opt in ("--slicetimefile", "-s"):
 			slicetimefile = arg
-		if opt in ("--scriptuse"):
-			scriptuse = True	
 		if opt in ("--fwhm"):
 			fwhm = arg
 		if opt in ("--high"):
@@ -183,7 +178,7 @@ def main(argv):
 		print "Could not find the MNI brain. You have to specifiy it by using the parameter --mni."
 		sys.exit(2)
 	if(len(input)):
-		preprocess(input, tr, slicetimefile, scriptuse, output, fwhm, high)
+		preprocess(input, tr, slicetimefile, output, fwhm, high)
 	else:
 		print "You have to specify an input image file. Please use the parameter -i or --in."
 		sys.exit(2)
