@@ -185,6 +185,7 @@ public:
 	 * \param second The second coordinate in voxel space. Usually the y value / the phase-encoded position.
 	 * \param third The third coordinate in voxel space. Ususally the z value / the slice-encoded position.
 	 * \param fourth The fourth coordinate in voxel space. Usually the time value.
+	 * \param copy_metadata if true the metadata of the image are merged into the returned chunk
 	 * \returns a copy of the chunk that contains the voxel at the given coordinates.
 	 * (Reminder: Chunk-copies are cheap, so the data are NOT copied)
 	 */
@@ -198,6 +199,7 @@ public:
 	 * \param second The second coordinate in voxel space. Usually the y value.
 	 * \param third The third coordinate in voxel space. Ususally the z value.
 	 * \param fourth The fourth coordinate in voxel space. Usually the time value.
+	 * \param copy_metadata if true the metadata of the image are merged into the returned chunk
 	 * \returns a copy of the chunk that contains the voxel at the given coordinates.
 	 * (Reminder: Chunk-copies are cheap, so the data are NOT copied)
 	 */
@@ -306,7 +308,7 @@ public:
 	 * the index origin will be transformed into the new coordinate system. This
 	 * function only changes the
 	 *
-	 * <b>IMPORTANT!<\b>: If you call this function with a matrix other than the
+	 * <B>IMPORTANT!</B>: If you call this function with a matrix other than the
 	 * identidy matrix, it's not guaranteed that the image is still in ISIS space
 	 * according to the DICOM conventions. Eventuelly some ISIS algorithms that
 	 * depend on correct image orientations won't work as expected. Use this method

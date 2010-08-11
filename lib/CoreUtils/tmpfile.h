@@ -40,7 +40,7 @@ public:
 	 * \param prefix string to be inserted between the path and the actual filename
 	 * \param suffix string to be appended to the filename
 	 */
-	TmpFile( std::string prefix = "", std::string sufix = "" );
+	TmpFile( std::string prefix = "", std::string suffix = "" );
 	///Will delete the temporary file if its still there.
 	~TmpFile();
 };

@@ -147,7 +147,7 @@ public:
 
 	void copyRange( const size_t source_start[], const size_t source_end[], Chunk &dst, const size_t destination[] )const;
 	void copyLine( size_t secondDimS, size_t thirdDimS, size_t fourthDimS, Chunk &dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD )const;
-	void copySlice( size_t thirdDimS, size_t fourthDimS, isis::data::Chunk &dst, size_t thirdDimD, size_t fourthDimD )const;
+	void copySlice( size_t thirdDimS, size_t fourthDimS, Chunk &dst, size_t thirdDimD, size_t fourthDimD )const;
 
 	size_t cmpRange( size_t start, size_t end, const Chunk &dst, size_t destination )const;
 	size_t cmpRange( const size_t source_start[], const size_t source_end[], const Chunk &dst, const size_t destination[] )const;
@@ -184,7 +184,7 @@ public:
 	 * the index origin will be transformed into the new coordinate system. This
 	 * function only changes the
 	 *
-	 * <b>IMPORTANT!<\b>: If you call this function with a matrix other than the
+	 * <B>IMPORTANT!</B>: If you call this function with a matrix other than the
 	 * identidy matrix, it's not guaranteed that the image is still in ISIS space
 	 * according to the DICOM conventions. Eventuelly some ISIS algorithms that
 	 * depend on correct image orientations won't work as expected. Use this method

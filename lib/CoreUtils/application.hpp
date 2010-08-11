@@ -51,6 +51,7 @@ public:
 	 * A command line parameter corresponds to an entry of parameters if it string-equals caseless to this entry and is preceded by "-".
 	 * \param argc ammount of command line parameters in argv
 	 * \param argv array of const char[] containing the command line parameters
+	 * \param exitOnError if true the programm will exit, if there is a problem during the initialisation (like missing parameters).
 	 */
 	virtual bool init( int argc, char **argv, bool exitOnError = true );
 	/**

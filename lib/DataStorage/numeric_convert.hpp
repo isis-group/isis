@@ -48,13 +48,18 @@ enum autoscaleOption {noscale, autoscale, noupscale, upscale};
 
 /**
  * Converts data from 'src' to the type of 'dst' and stores them there.
- * If the value range of src does not fit into the domain of dst they will be scaled using the following rules:
- * - will scale "around 0" if 0 is part of the source value range.
+ * If the value range defined by min and max does not fit into the domain of dst they will be scaled using the following rules:
+ * - scale "around 0" if 0 is part of the source value range.
  * - elsewise values will be offset towards 0 if the value range of the source does not fit the destination.
  * - if destination is unsigned, values will be offset to be in positive domain if necessary.
  * - if destination is floating point no scaling is done at all.
  * If dst is shorter than src, no conversion is done.
  * If src is shorter than dst a warning is send to CoreLog.
+ * \param src data to be converted
+ * \param dst target where to convert src to
+ * \param min lowest value in src
+ * \param max highest value in src
+ * \param scaleopt enum to tweak the scaling strategy
  */
 template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &src, TypePtr<DST> &dst, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale )
 {

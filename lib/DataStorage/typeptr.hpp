@@ -196,7 +196,7 @@ public:
 		return ret;
 	}
 
-	/// @copydoc Type::toString()
+	/// @copydoc util::Type::toString
 	virtual std::string toString( bool labeled = false )const {
 		std::string ret;
 
@@ -211,15 +211,15 @@ public:
 
 		return boost::lexical_cast<std::string>( m_len ) + "#" + ret;
 	}
-	/// @copydoc Type::typeName()
+	/// @copydoc util::Type::typeName
 	virtual std::string typeName()const {
 		return staticName();
 	}
-	/// @copydoc Type::typeID()
+	/// @copydoc util::Type::typeID
 	virtual unsigned short typeID()const {
 		return staticID;
 	}
-	/// @copydoc Type::staticName()
+	/// @copydoc util::Type::staticName
 	static std::string staticName() {
 		return std::string( util::Type<TYPE>::staticName() ) + "*";
 	}
@@ -250,7 +250,7 @@ public:
 	size_t bytes_per_elem() const {
 		return sizeof( TYPE );
 	}
-	/// \copydoc TypePtrBase::getMinMax
+	/// \copydoc _internal::TypePtrBase::getMinMax
 	void getMinMax ( util::TypeReference &min, util::TypeReference &max ) const {
 		if ( len() == 0 ) {
 			LOG( Runtime, warning ) << "Skipping computation of min/max on an empty TypePtr";

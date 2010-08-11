@@ -36,8 +36,8 @@ public:
 	Selection( const char *entries );
 	/**
 	 * Default constructor.
-	 * Creates a selection with the given options.
-	 * \param entries comma separated list of the options as a string
+	 * Creates a selection from a number-option map.
+	 * \param map a map which maps specific numbers (must not be 0) to options to be used
 	 */
 	template<typename T> Selection( const std::map<T, std::string> &map );
 	/// Fallback contructor to enable creation of empty selections
