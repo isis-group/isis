@@ -153,7 +153,7 @@ throw( std::runtime_error & )
 			std::stringstream name;
 			name << histPrefix << i;
 			std::string val = image.getProperty<std::string>(name.str());
-			// splite key token from history property string
+			// split key token from history property string
 			size_t x = val.find(":");
 			VAppendAttr(hlist,val.substr(0,x).c_str(),NULL,VStringRepn,
 					val.substr(x+1,val.size()).c_str());
@@ -675,6 +675,8 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 	// ********** Vista group **********
 	// POLICY: Append ALL properties from the 'Vista' Propmap to the end of the
 	// vista attribute list.
+	// EXCEPTION: ignore history attributes with the form "Vista/HistoryLineXX,
+	// with XX is the index number of the history entry in the vista file
 
 	if( image.hasBranch( "Vista" ) ) {
 		util::PropMap vista_branch = image.branch( "Vista" );
@@ -682,7 +684,16 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 		util::PropMap::key_list klist = vista_branch.getKeys();
 		util::PropMap::key_list::const_iterator kiter;
 
+		// prefix of history entries
+		std::string hpref = "HistoryLine";
 		for( kiter = klist.begin(); kiter != klist.end(); kiter++ ) {
+
+			// skip entry from vista image history
+			if(((std::string)*kiter).find(hpref) != std::string::npos){
+				continue;
+			}
+
+			// get property value
 			util::PropertyValue pv = vista_branch.propertyValue( *kiter );
 			// VBit -> VBit (char *)
 			BOOST_MPL_ASSERT_RELATION( sizeof( char ), == , sizeof( uint8_t ) );
