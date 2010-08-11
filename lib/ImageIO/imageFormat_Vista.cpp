@@ -28,6 +28,7 @@
 #include <list>
 #include <sstream>
 #include <algorithm>
+#include <viaio/option.h>
 
 namespace isis
 {
@@ -133,6 +134,34 @@ throw( std::runtime_error & )
 		VAppendAttr( attrList, "image", NULL, VImageRepn, vimages[0] );
 	}
 
+	/*****************************************
+	 * write history information if available
+	 *****************************************/
+	util::PropMap::key_list keyset = image.getKeys();
+	// count number of history entries
+	size_t hcount = 0;
+	// if history list prefix is available increase counter.
+	BOOST_FOREACH(util::PropMap::key_list::key_type key, keyset){
+		if (((std::string)key).find(histPrefix) != std::string::npos){
+			hcount++;
+		}
+	}
+
+	if(hcount > 0){
+		VAttrList hlist = VCreateAttrList();
+		for(unsigned i = 1; i <= hcount;i++){
+			std::stringstream name;
+			name << histPrefix << i;
+			std::string val = image.getProperty<std::string>(name.str());
+			// splite key token from history property string
+			size_t x = val.find(":");
+			VAppendAttr(hlist,val.substr(0,x).c_str(),NULL,VStringRepn,
+					val.substr(x+1,val.size()).c_str());
+		}
+		// Prepend history list to attrlist
+		VPrependAttr(attrList,"history",NULL,VAttrListRepn,hlist);
+	}
+
 	//  write to output file
 	FILE *f;
 	LOG_IF( !( f = VOpenOutputFile( filename.c_str(), true ) ), ImageIoLog, error )
@@ -163,6 +192,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 	}
 
 	VAttrList list;
+	VAttrListPosn hposn;
 	VImage *images;
 	// number of images (images loaded into a VistaChunk)
 	unsigned nimages, nloaded = 0;
@@ -176,6 +206,30 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 	// enable "info" log level
 	// image_io::enable_log<util::DefaultMsgPrint>( info );
 	LOG( image_io::Runtime, info ) << "found " << nimages << " images.";
+
+	/*****************************************
+	 * Save vista file history if available
+	 *****************************************/
+	// Create an empty PropertyMap to store vista history related properties.
+	// This map should be appended to every chunk in the ChunkList.
+	util::PropMap hMap;VAttrList hist_list = VReadHistory(&list);
+
+	if (hist_list != NULL){
+		unsigned int hcount = 0;
+		VPointer val;
+		for(VFirstAttr(hist_list,&hposn); VAttrExists(&hposn);VNextAttr(&hposn)){
+			// The vista file history will be saved in the Vista/HistoryLineXX elements
+			// with XX as the index of the corresponding entry in the vista history list.
+			if(VGetAttrValue(&hposn,NULL,VStringRepn,&val)){
+				const VString attrName = VGetAttrName(&hposn);
+				std::stringstream key, value;
+				key << histPrefix << ++hcount;
+				value << attrName << ":" << std::string((VString) val);
+				hMap.setProperty<std::string>(key.str(), value.str());
+			}
+		}
+	}
+
 	/* interpred the image data structure according to the given dialects:
 	 *
 	 * FUNCTIONAL: The vista image contains functional data. In this case there
@@ -192,41 +246,55 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 	//can not reject the anatomical images. So we store them in a vector and handle them later.
 	std::vector<VImage> residualVImages;
 
-	if( myDialect.empty() and nimages > 1 ) {
-		//test for functional data
-		size_t nShortRepn = 0;
-		size_t nOtherRepn = 0;
-		std::set<std::string> voxelSet;
-		std::set<int> columnsSet;
-		std::set<int> rowsSet;
+	if( myDialect.empty()) {
+		if(nimages > 1){
+			//test for functional data
+			size_t nShortRepn = 0;
+			size_t nOtherRepn = 0;
+			std::set<std::string> voxelSet;
+			std::set<int> columnsSet;
+			std::set<int> rowsSet;
 
-		//if we have more than 1 short image with the same voxelsize, columnsize and rowsize
-		//we assume a functional image
-		for ( size_t k = 0; k < nimages; k++ ) {
-			if( VPixelRepn( images[k] ) == VShortRepn ) {
-				nShortRepn++;
-				columnsSet.insert( VImageNColumns( images[k] ) );
-				rowsSet.insert( VImageNRows( images[k] ) );
-				VAttrList attributes = VImageAttrList( images[k] );
-				VAttrListPosn posn;
+			//if we have more than 1 short image with the same voxelsize, columnsize and rowsize
+			//we assume a functional image
+			for ( size_t k = 0; k < nimages; k++ ) {
+				if( VPixelRepn( images[k] ) == VShortRepn ) {
+					nShortRepn++;
+					columnsSet.insert( VImageNColumns( images[k] ) );
+					rowsSet.insert( VImageNRows( images[k] ) );
+					VAttrList attributes = VImageAttrList( images[k] );
+					VAttrListPosn posn;
 
-				for( VFirstAttr( attributes, &posn ); VAttrExists( &posn ); VNextAttr( &posn ) ) {
-					const char *name = VGetAttrName( &posn );
-					VPointer val;
+					for( VFirstAttr( attributes, &posn ); VAttrExists( &posn ); VNextAttr( &posn ) ) {
+						const char *name = VGetAttrName( &posn );
+						VPointer val;
 
-					if( strcmp( name, "voxel" ) == 0 ) {
-						VGetAttrValue( &posn, NULL, VStringRepn, &val );
-						voxelSet.insert( std::string( ( char * )val ) );
+						if( strcmp( name, "voxel" ) == 0 ) {
+							VGetAttrValue( &posn, NULL, VStringRepn, &val );
+							voxelSet.insert( std::string( ( char * )val ) );
+						}
 					}
+				} else {
+					nOtherRepn++;
 				}
-			} else {
-				nOtherRepn++;
+			}
+
+			if ( nShortRepn > 1 && voxelSet.size() == 1 && rowsSet.size() == 1 && columnsSet.size() == 1 ) {
+				LOG( isis::DataDebug, info ) << "Autodetect Dialect: Multiple VShort images found. Assuming a functional vista image";
+				myDialect = "functional";
+			}
+			else{
+				LOG( isis::DataDebug, info ) << "Autodetect Dialect: Multiple images found. Assuming a set of anatomical images";
 			}
 		}
-
-		if ( nShortRepn > 1 && voxelSet.size() == 1 && rowsSet.size() == 1 && columnsSet.size() == 1 ) {
-			LOG( isis::DataDebug, warning ) << "Assuming a functional vista image";
-			myDialect = "functional";
+		else{
+			if(VPixelRepn(images[0]) == VFloatRepn){
+				LOG( isis::DataDebug, info ) << "Autodetect Dialect: VFloat image found. Assuming a statistical vista image";
+				myDialect = "map";
+			}
+			else{
+				LOG( isis::DataDebug, info ) << "Autodetect Dialect: Assuming an anatomical vista image";
+			}
 		}
 	}
 
@@ -280,14 +348,8 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 
 			nloaded++;
 			// splice VistaChunk
-			LOG( DataLog, info ) << "splicing";
 			data::ChunkList splices = sliceRef.splice( data::sliceDim );
-			LOG( DataLog, info ) << "finished splicing with " << splices.size();
-			LOG( DataLog, info ) << data::Chunk::n_dims;
-			LOG( DataLog, info ) << splices.front()->dimSize( 0 );
-			LOG( DataLog, info ) << splices.front()->dimSize( 1 );
-			LOG( DataLog, info ) << splices.front()->dimSize( 2 );
-			LOG( DataLog, info ) << splices.front()->dimSize( 3 );
+
 			/******************** GET index origin ********************/
 			// the index origin of each slice depends on the slice orientation
 			// and voxel resolution. All chunks in the ChunkList splices are supposed
@@ -355,7 +417,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 			// from the first slice
 
 			if( !nloaded ) {
-				LOG( DataDebug, info ) << "ioprob is empty";
+				LOG( DataDebug, verbose_info ) << "ioprob is empty";
 				indexOrigin = sliceRef.getProperty<util::fvector4>( "indexOrigin" );
 			}
 			// else: calculate the index origin according to the slice number and voxel
@@ -363,17 +425,17 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 			else {
 				// sagittal (x,y,z) -> (z,x,y)
 				if( strcmp( orient, "sagittal" ) == 0 ) {
-					LOG( DataLog, info ) << "computing ioprop with sagittal";
+					LOG( DataLog, verbose_info ) << "computing ioprop with sagittal";
 					ioprob[0] += ( nloaded - 1 ) * v3[2];
 				}
 				// coronal (x,y,z) -> (x,-z,y)
 				else if( strcmp( orient, "coronal" ) == 0 ) {
-					LOG( DataLog, info ) << "computing ioprop with coronal";
+					LOG( DataLog, verbose_info ) << "computing ioprop with coronal";
 					ioprob[1] -= ( nloaded - 1 ) * v3[2];
 				}
 				// axial (x,y,z) -> (x,y,z)
 				else {
-					LOG( DataLog, info ) << "computing ioprop with axial: += " <<  ( nloaded - 1 ) * v3[2];
+					LOG( DataLog, verbose_info ) << "computing ioprop with axial: += " <<  ( nloaded - 1 ) * v3[2];
 					ioprob[2] += ( nloaded - 1 ) * v3[2];
 				}
 			}
@@ -392,13 +454,27 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 					spliceRef->setProperty<float>( "acquisitionTime", acquisitionTimeSplice );
 				}
 
+				// add history information
+				spliceRef->join(hMap,true);
+
 				timestep++;
 			}
-			LOG( DataLog, info ) << "adding " << splices.size() << " chunks to ChunkList";
+			LOG( DataLog, verbose_info ) << "adding " << splices.size() << " chunks to ChunkList";
 			/******************** add chunks to ChunkList ********************/
 			std::back_insert_iterator<data::ChunkList> dest_iter ( chunks );
 			std::copy( splices.begin(), splices.end(), dest_iter );
 		} // END foreach vistaChunkList
+
+		//handle the residual images
+		u_int16_t sequenceNumber = 0;
+		BOOST_FOREACH( std::vector<VImage>::reference vImageRef, residualVImages ) {
+			if( switchHandle( vImageRef, chunks ) ) {
+				chunks.back()->setProperty<u_int16_t>( "sequenceNumber", ++sequenceNumber );
+				// add history information
+				chunks.back()->join(hMap,true);
+				nloaded++;
+			}
+		}
 	} // END if myDialect == "functional"
 
 	// MAP -> the vista image should contain a single 3D VFloat image. Hence the
@@ -416,6 +492,8 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 				VDestroyImage( images[k] );
 			else {
 				addChunk<VFloat>( chunks, images[k] );
+				// add history informations
+				chunks.back()->join(hMap, true);
 				nloaded++;
 			}
 		}
@@ -425,20 +503,14 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 	else {
 		for( unsigned k = 0; k < nimages; k++ ) {
 			if( switchHandle( images[k], chunks ) ) {
-				nloaded++;
 				chunks.back()->setProperty<u_int16_t>( "sequenceNumber", nloaded );
+				// add history information
+				chunks.back()->join(hMap,true);
+				nloaded++;
 			}
 		}
 	} // END else
 
-	//handle the residual images
-	u_int16_t sequenceNumber = 0;
-	BOOST_FOREACH( std::vector<VImage>::reference vImageRef, residualVImages ) {
-		if( switchHandle( vImageRef, chunks ) ) {
-			nloaded++;
-			chunks.back()->setProperty<u_int16_t>( "sequenceNumber", ++sequenceNumber );
-		}
-	}
 	//  cleanup, close file handle
 	fclose( ip );
 

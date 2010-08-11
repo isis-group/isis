@@ -40,12 +40,7 @@ namespace isis
 
 namespace image_io
 {
-struct DateDecoding {
-	std::string dateRegex, delimiter;
-	size_t first, second, third;
-	DateDecoding( std::string regex, std::string d, size_t f, size_t s, size_t t )
-		: dateRegex( regex ), delimiter( d ) , first( f ), second( s ), third( t ) {}
-};
+
 class ImageFormat_Vista: public FileFormat
 {
 public:
@@ -73,12 +68,29 @@ public:
 	void write( const data::Image &image, const std::string &filename,
 				const std::string &dialect ) throw( std::runtime_error & );
 
+	/**
+	 * Default constructor. Needed to initialize some private member variables.
+	 */
+	ImageFormat_Vista() : FileFormat(),
+			histPrefix("Vista/HistoryLine"){}
+
 private:
 
+	/**
+	 * The prefix string for the isis metadata properties holding the vista
+	 * history informations.
+	 */
+	const std::string histPrefix;
+
+	struct DateDecoding {
+		std::string dateRegex, delimiter;
+		size_t first, second, third;
+		DateDecoding( std::string regex, std::string d, size_t f, size_t s, size_t t )
+			: dateRegex( regex ), delimiter( d ) , first( f ), second( s ), third( t ) {}
+	};
 
 	template <typename TYPE> class VistaChunk : public data::Chunk
 	{
-
 
 	private:
 
@@ -110,7 +122,7 @@ private:
 			// traverse through attribute list and set metadata
 			VAttrList attributes = VImageAttrList( image );
 			VAttrListPosn posn;
-			LOG( DataLog, info ) << "copying Header from Vista";
+			LOG( DataLog, verbose_info ) << "copying Header from Vista";
 			std::string time, date;
 
 			for( VFirstAttr( attributes, &posn ); VAttrExists( &posn ); VNextAttr( &posn ) ) {
@@ -124,7 +136,7 @@ private:
 					std::list<float> flist = util::string2list<float>( std::string( ( char * )val ) );
 					std::list<float>::const_iterator iter = flist.begin();
 					float x = *iter++, y = *iter++, z = *iter;
-					chunk.setProperty( "voxelSize", util::fvector4( x, y, z, 1 ) );
+					chunk.setProperty<util::fvector4>( "voxelSize", util::fvector4( x, y, z, 1 ) );
 					continue;
 				}
 
@@ -142,23 +154,23 @@ private:
 
 					// axial is the reference
 					if( strcmp( ( const char * )val, "axial" ) == 0 ) {
-						chunk.setProperty( "readVec", util::fvector4( 1, 0, 0, 0 ) );
-						chunk.setProperty( "phaseVec", util::fvector4( 0, 1, 0, 0 ) );
-						chunk.setProperty( "sliceVec", util::fvector4( 0, 0, 1, 0 ) );
+						chunk.setProperty<util::fvector4>( "readVec", util::fvector4( 1, 0, 0, 0 ) );
+						chunk.setProperty<util::fvector4>( "phaseVec", util::fvector4( 0, 1, 0, 0 ) );
+						chunk.setProperty<util::fvector4>( "sliceVec", util::fvector4( 0, 0, 1, 0 ) );
 						continue;
 					}
 
 					if( strcmp( ( const char * )val, "sagittal" ) == 0 ) {
-						chunk.setProperty( "readVec", util::fvector4( 0, 1, 0, 0 ) );
-						chunk.setProperty( "phaseVec", util::fvector4( 0, 0, 1, 0 ) );
-						chunk.setProperty( "sliceVec", util::fvector4( 1, 0, 0, 0 ) );
+						chunk.setProperty<util::fvector4>( "readVec", util::fvector4( 0, 1, 0, 0 ) );
+						chunk.setProperty<util::fvector4>( "phaseVec", util::fvector4( 0, 0, 1, 0 ) );
+						chunk.setProperty<util::fvector4>( "sliceVec", util::fvector4( 1, 0, 0, 0 ) );
 						continue;
 					}
 
 					if( strcmp( ( const char * )val, "coronal" ) == 0 ) {
-						chunk.setProperty( "readVec", util::fvector4( 1, 0, 0, 0 ) );
-						chunk.setProperty( "phaseVec", util::fvector4( 0, 0, 1, 0 ) );
-						chunk.setProperty( "sliceVec", util::fvector4( 0, -1, 0, 0 ) );
+						chunk.setProperty<util::fvector4>( "readVec", util::fvector4( 1, 0, 0, 0 ) );
+						chunk.setProperty<util::fvector4>( "phaseVec", util::fvector4( 0, 0, 1, 0 ) );
+						chunk.setProperty<util::fvector4>( "sliceVec", util::fvector4( 0, -1, 0, 0 ) );
 						continue;
 					}
 				}
@@ -254,7 +266,7 @@ private:
 					std::list<float> flist = util::string2list<float>( std::string( ( char * )val ) );
 					std::list<float>::const_iterator iter = flist.begin();
 					float x = *iter++, y = *iter++, z = *iter;
-					chunk.setProperty( "indexOrigin", util::fvector4( x, y, z, 0 ) );
+					chunk.setProperty<util::fvector4>( "indexOrigin", util::fvector4( x, y, z, 0 ) );
 					continue;
 				}
 
@@ -393,9 +405,9 @@ private:
 			//if not set yet, set read, phase and slice vector.
 			// DEFAULT: axial
 			if( not chunk.hasProperty( "readVec" ) ) {
-				chunk.setProperty( "readVec", util::fvector4( 1, 0, 0, 0 ) );
-				chunk.setProperty( "phaseVec", util::fvector4( 0, 1, 0, 0 ) );
-				chunk.setProperty( "sliceVec", util::fvector4( 0, 0, 1, 0 ) );
+				chunk.setProperty<util::fvector4>( "readVec", util::fvector4( 1, 0, 0, 0 ) );
+				chunk.setProperty<util::fvector4>( "phaseVec", util::fvector4( 0, 1, 0, 0 ) );
+				chunk.setProperty<util::fvector4>( "sliceVec", util::fvector4( 0, 0, 1, 0 ) );
 			}
 
 			// set default index origin according to the image geometry
@@ -417,7 +429,7 @@ private:
 					readV[1] * ioTmp[0] + phaseV[1] * ioTmp[1] + sliceV[1] * ioTmp[2],
 					readV[2] * ioTmp[0] + phaseV[2] * ioTmp[1] + sliceV[2] * ioTmp[2],
 					0 );
-				chunk.setProperty( "indexOrigin", iOrig );
+				chunk.setProperty<util::fvector4>( "indexOrigin", iOrig );
 			}
 
 			chunk.setProperty<util::fvector4>( "voxelGap", util::fvector4( 0, 0, 0, 0 ) );
@@ -426,7 +438,7 @@ private:
 			if( !chunk.hasProperty( "acquisitionNumber" ) )
 				chunk.setProperty<uint32_t>( "acquisitionNumber", 0 );
 
-			LOG( DataLog, info ) << "finished copying header";
+			LOG( DataLog, verbose_info ) << "finished copying header";
 		}
 
 	public:
