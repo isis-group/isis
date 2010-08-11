@@ -61,8 +61,10 @@ bool isis::util::ParameterMap::parse( int argc, char **argv )
 		if ( argv[i][0] == '-' ) { //seems like we found a new parameter here
 			pName = argv[i];
 			pName.erase( 0, pName.find_first_not_of( '-' ) );
-			i++;
+		} else {
+			LOG(Runtime,error)<< "Ignoring unexpected non-parameter " << MSubject(argv[i]);
 		}
+		i++;
 
 		if( !pName.empty() ) { // if we got a parameter before
 			const int begin = i;
