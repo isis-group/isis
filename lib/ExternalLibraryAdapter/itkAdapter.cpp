@@ -238,6 +238,8 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	typename TImageITK::SizeType imageSize = src->GetBufferedRegion().GetSize();
 	typename TImageITK::SpacingType imageSpacing = src->GetSpacing();
 	typename TImageITK::DirectionType imageDirection = src->GetDirection();
+	typedef typename TImageITK::PixelType ITKRepn;
+	typedef TOutputISIS ISISRepn;
 
 	if ( TImageITK::ImageDimension < 4 ) {
 		imageSize[3] = 1;
@@ -255,8 +257,20 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	}
 
 	// TODO use MemImage instead of MemChunk.
-	boost::shared_ptr<data::MemChunk< typename TImageITK::PixelType > >
-	retChunk( new data::MemChunk< typename TImageITK::PixelType  >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) ) ;
+	boost::shared_ptr<data::Chunk >
+	tmpChunk ( new data::MemChunk< ITKRepn >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) ) ;
+
+	//we have to convert the datatype of retChunk in the desired TOutputISIS type to avoid autoscaling
+	util::TypeReference min, max;
+	tmpChunk->getMinMax(min, max);
+	boost::shared_ptr<data::Chunk > retChunk (new data::MemChunk<ISISRepn>( imageSize[0], imageSize[1], imageSize[2], imageSize[3]) );
+//
+	data::numeric_convert(
+			tmpChunk->asTypePtr<ITKRepn>(),
+			retChunk->asTypePtr<ISISRepn>(),
+			*min, *max,
+			data::noscale );
+
 	//dummy join to allow creating this chunk
 	retChunk->join( m_ImagePropMap );
 
@@ -268,7 +282,7 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	//do not try to grasp that in a sober state!!
 	//workaround to create a TypedImage out of a MemChunk
 	data::ChunkList chunkList;
-	chunkList.push_back( retChunk );
+	chunkList.push_back( boost::shared_ptr<data::Chunk> ( retChunk) );
 	data::ImageList isisImageList( chunkList );
 	boost::shared_ptr< data::TypedImage< TOutputISIS > > retImage (
 		new data::TypedImage<TOutputISIS>  ( *isisImageList.front().get() ) );

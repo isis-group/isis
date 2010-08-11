@@ -27,6 +27,7 @@
 #include "DataStorage/image.hpp"
 #include "CoreUtils/log.hpp"
 #include "CoreUtils/common.hpp"
+#include "DataStorage/numeric_convert.hpp"
 
 //external includes
 #include <boost/shared_ptr.hpp>
