@@ -201,7 +201,6 @@ bool PropMap::remove( const isis::util::PropMap &removeMap, bool keep_needed )
 					ret = false;
 				}
 			} else if( !( thisIt->second.getLeaf().needed() && keep_needed ) ) { // this is a leaf
-				LOG( Debug, verbose_info ) << "Removing " << MSubject( *thisIt ) << " as requested";
 				erase( thisIt++ ); // so delete this (they are equal - kind of)
 			}
 		}

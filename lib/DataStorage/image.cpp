@@ -703,6 +703,9 @@ size_t Image::spliceDownTo( dimensions dim ) //readDim = 0, phaseDim, sliceDim, 
 	if( lookup[0]->relevantDims() < ( size_t ) dim ) {
 		LOG( Debug, error ) << "The dimensionality of the chunks of this image is already below " << dim << " cannot splice it.";
 		return 0;
+	} else if(lookup[0]->relevantDims() == ( size_t ) dim){
+		LOG(Debug,info) << "Skipping useless splicing, relevantDims is allready " << lookup[0]->relevantDims();
+		return lookup.size();
 	}
 
 	LOG_IF( lookup[0]->relevantDims() == ( size_t ) dim, Debug, info ) << "Running useless splice, the dimensionality of the chunks of this image is already " << dim;
