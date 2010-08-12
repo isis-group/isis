@@ -79,7 +79,6 @@ int main( int argc, char **argv )
 
 			finChunkList.push_back( boost::shared_ptr<data::Chunk>( new data::Chunk( tmpChunk ) ) );
 		}
-
 	}
 	data::ImageList finImageList ( finChunkList );
 	app.autowrite( finImageList );

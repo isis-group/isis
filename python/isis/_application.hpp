@@ -26,9 +26,7 @@ public:
 		return Application::init( argc, argv, exitOnError );
 	}
 
-	PropertyValue getParameters( const std::string &key ) {
-		return static_cast<PropertyValue &>( parameters[key] );
-	}
+
 
 private:
 	PyObject *self;
