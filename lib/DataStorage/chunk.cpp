@@ -296,7 +296,7 @@ ChunkList Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 	assert( util::fuzzyEqual<float>( offset.sqlen(), 1 ) ); // it should be norm here
 	const util::fvector4 indexOriginOffset = offset * distance[atDim];
 	size_t cnt = 0;
-	LOG( Runtime, info ) << "Splicing chunk at dimenstion " << atDim + 1 << " with indexOrigin stride " << indexOriginOffset << " and acquisitionNumberStride " << acquisitionNumberStride;
+	LOG( Runtime, verbose_info ) << "Splicing chunk at dimenstion " << atDim + 1 << " with indexOrigin stride " << indexOriginOffset << " and acquisitionNumberStride " << acquisitionNumberStride;
 	ChunkList ret = splice( ( dimensions )atDim ); // do low level splice - get the chunklist
 	BOOST_FOREACH( ChunkList::reference ref, ret ) { // adapt some metadata in them
 		util::fvector4 &orig = ref->propertyValue( "indexOrigin" )->cast_to<util::fvector4>();

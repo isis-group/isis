@@ -118,7 +118,7 @@ private:
 		 * @param image The target chunk where all data will be copied to.
 		 * @oaram chunk The source image that provides the Vista metadata attributes.
 		 */
-		void copyHeaderFromVista( const VImage &image, data::Chunk &chunk, size_t nslices ) {
+		void copyHeaderFromVista( const VImage &image, data::Chunk &chunk ) {
 			// traverse through attribute list and set metadata
 			VAttrList attributes = VImageAttrList( image );
 			VAttrListPosn posn;
@@ -410,28 +410,8 @@ private:
 				chunk.setProperty<util::fvector4>( "sliceVec", util::fvector4( 0, 0, 1, 0 ) );
 			}
 
-			// set default index origin according to the image geometry
-			if( not chunk.hasProperty( "indexOrigin" ) ) {
-				util::fvector4 dims = chunk.sizeToVector();
-				util::fvector4 voxels = chunk.getProperty<util::fvector4>( "voxelSize" );
-				// calculate index origin according to axial
-				util::fvector4 ioTmp(
-					-( ( dims[0] - 1 )*voxels[0] ) / 2,
-					-( ( dims[1] - 1 )*voxels[1] ) / 2,
-					-( ( ( nslices ? nslices : dims[2] ) - 1 )*voxels[2] ) / 2,
-					0 );
-				util::fvector4 readV = chunk.getProperty<util::fvector4>( "readVec" );
-				util::fvector4 phaseV = chunk.getProperty<util::fvector4>( "phaseVec" );
-				util::fvector4 sliceV = chunk.getProperty<util::fvector4>( "sliceVec" );
-				// multiply indexOrigin with read, phase and slice vector
-				util::fvector4 iOrig(
-					readV[0] * ioTmp[0] + phaseV[0] * ioTmp[1] + sliceV[0] * ioTmp[2],
-					readV[1] * ioTmp[0] + phaseV[1] * ioTmp[1] + sliceV[1] * ioTmp[2],
-					readV[2] * ioTmp[0] + phaseV[2] * ioTmp[1] + sliceV[2] * ioTmp[2],
-					0 );
-				chunk.setProperty<util::fvector4>( "indexOrigin", iOrig );
-			}
-
+			// set voxel gap tp (0,0,0,0) since there is no gap information available
+			// in vista images.
 			chunk.setProperty<util::fvector4>( "voxelGap", util::fvector4( 0, 0, 0, 0 ) );
 
 			// set acquisitionNumber. This values is always missing
@@ -450,7 +430,7 @@ private:
 		VistaChunk( VImage image, const bool functional, size_t nslices = 0 ):
 			data::Chunk( static_cast<TYPE *>( image->data ), VImageDeleter( image ),
 						 VImageNColumns( image ), VImageNRows( image ), functional ? 1 : VImageNBands( image ), functional ? VImageNBands( image ) : 1 ) {
-			copyHeaderFromVista( image, *this, nslices );
+			copyHeaderFromVista( image, *this);
 		}
 	};
 
@@ -481,6 +461,16 @@ private:
 	 * end of the Chunk list.
 	 */
 	template <typename TInput> void addChunk( data::ChunkList &chunks, VImage image );
+
+	/**
+	 * This function calculates the index origin of a given chunk according to its
+	 * slice orientation information and voxel resolution. The resulting indexOrigin
+	 * will point to the physical coordinate of the voxel at position (0,0,0).
+	 * Since there are no additional informations about the correct position of
+	 * the voxel space relative to the scanner space available, the routine assumes
+	 * that the voxel space is placed with the center near the scanner iso center.
+	 */
+	util::fvector4 calculateIndexOrigin(data::Chunk &chunk, util::fvector4 &dims);
 };
 
 }

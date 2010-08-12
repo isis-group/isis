@@ -195,7 +195,10 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 	VAttrListPosn hposn;
 	VImage *images;
 	// number of images (images loaded into a VistaChunk)
-	unsigned nimages, nloaded = 0;
+	unsigned nimages = 0;
+	// number of VistaChunks loaded. Since every VImage is saved into a VistaChunk
+	// nloaded gives the number of slices loaded so far.
+	unsigned nloaded = 0;
 
 	// read images from file stream
 	if( ( nimages = VReadImages( ip, &list, &images ) ) == 0 ) {
@@ -320,9 +323,18 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 		std::list<VistaChunk<VShort> > vistaChunkList;
 		//if we have no repetitionTime we have to calculate it with the help of the biggest slicetime
 		u_int16_t biggest_slice_time = 0;
+		// the geometrical dimension of the 3D image according to the slice geometry
+		// and the number of slices.
+		util::fvector4 dims(0,0,0,0);
+		if(vImageVector.size() > 0){
+			dims[0] = VImageNColumns(vImageVector.back());
+			dims[1] = VImageNRows(vImageVector.back());
+			dims[2] = vImageVector.size();
+			dims[3] = VImageNBands(vImageVector.back());
+		}
 		//first we have to create a vista chunkList so we can get the number of slices
 		BOOST_FOREACH( std::vector<VImage>::reference sliceRef, vImageVector ) {
-			VistaChunk<VShort> vchunk( sliceRef, true, vImageVector.size() );
+			VistaChunk<VShort> vchunk( sliceRef, true);
 			vistaChunkList.push_back( vchunk );
 
 			if( vchunk.hasProperty( "acquisitionTime" ) && !vchunk.hasProperty( "repetitionTime" ) ) {
@@ -335,8 +347,11 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 			}
 		}
 		BOOST_FOREACH( std::vector<VistaChunk<VShort> >::reference sliceRef, vistaChunkList ) {
+
+			// increase slice counter
+			nloaded++;
 			u_int16_t repetitionTime = 0;
-			util::fvector4 &ioprob = sliceRef.propertyValue( "indexOrigin" )->cast_to<util::fvector4>();
+			util::fvector4 ioprob;
 
 			if( !sliceRef.hasProperty( "repetitionTime" ) && biggest_slice_time ) {
 				sliceRef.setProperty<u_int16_t>( "repetitionTime", biggest_slice_time );
@@ -346,83 +361,96 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 				repetitionTime = sliceRef.getProperty<u_int16_t>( "repetitionTime" );
 			}
 
-			nloaded++;
-			// splice VistaChunk
-			data::ChunkList splices = sliceRef.splice( data::sliceDim );
+			// since functional data will be read first the sequence number
+			// is 0.
+			sliceRef.setProperty<u_int16_t>( "sequenceNumber", 0 );
 
-			/******************** GET index origin ********************/
-			// the index origin of each slice depends on the slice orientation
-			// and voxel resolution. All chunks in the ChunkList splices are supposed
-			// to have the same index origin since they are from the same slice.
-			// get slice orientation of image
-			VAttrList attributes = VImageAttrList( vImageVector[nloaded-1] );
-			VAttrListPosn posn;
-			val = NULL;
+			/********************* INDEX ORIGIN *********************
+			 * Step 1: check if indexOrigin present.
+			 * Step 2: Calculate indexOrigin according to the slice number
+			 * (value of nloaded).
+			 */
 
-			for ( VFirstAttr( attributes, &posn ); VAttrExists( &posn ); VNextAttr( &posn ) ) {
-				const VString name = VGetAttrName( &posn );
-
-				if( strcmp( name, "orientation" ) == 0 ) {
-					VGetAttrValue( &posn, NULL, VStringRepn, &val );
-					break;
-				}
+			// check if indexOrigin already present
+			if(sliceRef.hasProperty("indexOrigin")){
+				ioprob = sliceRef.getProperty<util::fvector4>("indexOrigin");
 			}
-
-			// unusual error: there is no 'orientation' information in the vista image.
-			if( val == NULL )
-				throwGenericError( "Missing orientation information in functional data." );
-
-			// compare new orientation with old. Just to make sure that all subimages
-			// have the same slice orientation.
-			if( orient[0] == '\0' )
-				strcpy( orient, ( char * )val );
+			// no indexOrigin present -> Calculate index origin
 			else {
-				// orientation string differs from previous value;
-				if( strcmp( orient, ( char * )val ) != 0 )
-					throwGenericError( "Inconsistent orienation information in functional data." );
-			}
 
-			// get voxel resolution
-			val = NULL;
+				/******************** SET index origin ********************/
+				// the index origin of each slice depends on the slice orientation
+				// and voxel resolution. All chunks in the ChunkList splices are supposed
+				// to have the same index origin since they are from the same slice.
+				// get slice orientation of image
+				VAttrList attributes = VImageAttrList( vImageVector[nloaded-1] );
+				VAttrListPosn posn;
+				val = NULL;
 
-			for ( VFirstAttr( attributes, &posn ); VAttrExists( &posn ); VNextAttr( &posn ) ) {
-				const VString name = VGetAttrName( &posn );
+				// Get orientation information
+				for ( VFirstAttr( attributes, &posn ); VAttrExists( &posn ); VNextAttr( &posn ) ) {
+					const VString name = VGetAttrName( &posn );
 
-				if( strcmp( name, "voxel" ) == 0 ) {
-					VGetAttrValue( &posn, NULL, VStringRepn, &val );
-					break;
+					if( strcmp( name, "orientation" ) == 0 ) {
+						VGetAttrValue( &posn, NULL, VStringRepn, &val );
+						break;
+					}
 				}
-			}
 
-			// unusual error: there is no 'voxel' information in the vista image.
-			if( val == NULL )
-				throwGenericError( "Missing voxel information in functional data." );
+				// unusual error: there is no 'orientation' information in the vista image.
+				if( val == NULL )
+					throwGenericError( "Missing orientation information in functional data." );
 
-			// compare new voxel resolution with old. Just to make sure that all subimages
-			// have the same slice voxel resolution.
-			if( voxelstr[0] == '\0' ) {
-				strcpy( voxelstr, ( char * )val );
-				std::list<float> buff = util::string2list<float>( std::string( voxelstr ), ' ' );
-				v3.copyFrom( buff.begin(), buff.end() );
-			} else {
-				// voxel string differs from previous value;
-				if( strcmp( voxelstr, ( char * )val ) != 0 )
-					throwGenericError( "Inconsistent voxel information in functional data." );
-			}
+				// compare new orientation with old. Just to make sure that all subimages
+				// have the same slice orientation.
+				if( orient[0] == '\0' )
+					strcpy( orient, ( char * )val );
+				else {
+					// orientation string differs from previous value;
+					if( strcmp( orient, ( char * )val ) != 0 )
+						throwGenericError( "Inconsistent orienation information in functional data." );
+				}
 
-			// set index origin to the coordinates of the n'th slice according to
-			// the slice orientation. n is the index of the current subimage.
-			// It's defined by the current value of nloaded.
-			// if there is no index origin value set it default to the index origin
-			// from the first slice
+				// get voxel resolution
+				val = NULL;
 
-			if( !nloaded ) {
-				LOG( DataDebug, verbose_info ) << "ioprob is empty";
-				indexOrigin = sliceRef.getProperty<util::fvector4>( "indexOrigin" );
-			}
-			// else: calculate the index origin according to the slice number and voxel
-			// resolution
-			else {
+				for ( VFirstAttr( attributes, &posn ); VAttrExists( &posn ); VNextAttr( &posn ) ) {
+					const VString name = VGetAttrName( &posn );
+
+					if( strcmp( name, "voxel" ) == 0 ) {
+						VGetAttrValue( &posn, NULL, VStringRepn, &val );
+						break;
+					}
+				}
+
+				// unusual error: there is no 'voxel' information in the vista image.
+				if( val == NULL )
+					throwGenericError( "Missing voxel information in functional data." );
+
+				// compare new voxel resolution with old. Just to make sure that all subimages
+				// have the same slice voxel resolution.
+				if( voxelstr[0] == '\0' ) {
+					strcpy( voxelstr, ( char * )val );
+					std::list<float> buff = util::string2list<float>( std::string( voxelstr ), ' ' );
+					v3.copyFrom( buff.begin(), buff.end() );
+				} else {
+					// voxel string differs from previous value;
+					if( strcmp( voxelstr, ( char * )val ) != 0 )
+						throwGenericError( "Inconsistent voxel information in functional data." );
+				}
+
+				// set index origin to the coordinates of the n'th slice according to
+				// the slice orientation. n is the index of the current subimage.
+				// It's defined by the current value of nloaded.
+
+				// Get indexOrigin from whole image with respect of the orientation
+				// information. In general this should be the indexOrigin from the
+				// (0,0,0,0) voxel.
+				ioprob = calculateIndexOrigin(sliceRef,dims);
+
+				// correct the index origin according to the slice number and voxel
+				// resolution
+
 				// sagittal (x,y,z) -> (z,x,y)
 				if( strcmp( orient, "sagittal" ) == 0 ) {
 					LOG( DataLog, verbose_info ) << "computing ioprop with sagittal";
@@ -440,12 +468,21 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 				}
 			}
 
+			// Set indexOrigin. This should be done before splicing.
 			sliceRef.setProperty<util::fvector4>( "indexOrigin", ioprob );
-			/******************** SET index origin, acquisitionTime and acquisitionNumber ********************/
+
+			/********************* SPLICE VistaChunk *********************
+			 * With functional data the VistaChunk has the dimensions
+			 * columns x rows x 1 x time. We splice the Chunk along the
+			 * time axise to get time * (column x row x 1 x 1) chunks.
+			 */
+
+			// splice VistaChunk
+			data::ChunkList splices = sliceRef.splice( data::sliceDim );
+
+			/******************** SET acquisitionTime ********************/
 			size_t timestep = 0;
 			BOOST_FOREACH( data::ChunkList::reference spliceRef, splices ) {
-				spliceRef->setProperty<util::fvector4>( "indexOrigin", ioprob );
-				spliceRef->setProperty<u_int16_t>( "sequenceNumber", 0 );
 				u_int32_t acqusitionNumber = ( nloaded - 1 ) + vImageVector.size() * timestep;
 				spliceRef->setProperty<uint32_t>( "acquisitionNumber", acqusitionNumber );
 
@@ -459,10 +496,12 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 
 				timestep++;
 			}
+
 			LOG( DataLog, verbose_info ) << "adding " << splices.size() << " chunks to ChunkList";
 			/******************** add chunks to ChunkList ********************/
 			std::back_insert_iterator<data::ChunkList> dest_iter ( chunks );
 			std::copy( splices.begin(), splices.end(), dest_iter );
+
 		} // END foreach vistaChunkList
 
 		//handle the residual images
@@ -779,6 +818,33 @@ template <typename T> bool ImageFormat_Vista::copyImageToVista( const data::Imag
 	}
 
 	return true;
+}
+
+util::fvector4 ImageFormat_Vista::calculateIndexOrigin(data::Chunk &chunk, util::fvector4 &dims) {
+
+	// IMPORTANT: We don't use the dims from the chunks since we are not sure if
+	// if the 3rd dimension contains geometrical or time information. Hence it's
+	// neccessary to provide image dimensional informations via a function
+	// parameter.
+
+	util::fvector4 voxels = chunk.getProperty<util::fvector4>( "voxelSize" );
+	// calculate index origin according to axial
+	util::fvector4 ioTmp(
+		-( ( dims[0] - 1 )*voxels[0] ) / 2,
+		-( ( dims[1] - 1 )*voxels[1] ) / 2,
+		-( ( dims[2] - 1 )*voxels[2] ) / 2,
+		0 );
+	util::fvector4 readV = chunk.getProperty<util::fvector4>( "readVec" );
+	util::fvector4 phaseV = chunk.getProperty<util::fvector4>( "phaseVec" );
+	util::fvector4 sliceV = chunk.getProperty<util::fvector4>( "sliceVec" );
+	// multiply indexOrigin with read, phase and slice vector
+	util::fvector4 iOrig(
+		readV[0] * ioTmp[0] + phaseV[0] * ioTmp[1] + sliceV[0] * ioTmp[2],
+		readV[1] * ioTmp[0] + phaseV[1] * ioTmp[1] + sliceV[1] * ioTmp[2],
+		readV[2] * ioTmp[0] + phaseV[2] * ioTmp[1] + sliceV[2] * ioTmp[2],
+		0 );
+
+	return iOrig;
 }
 
 }//namespace image_io
