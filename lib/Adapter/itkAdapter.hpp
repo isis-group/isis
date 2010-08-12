@@ -36,9 +36,7 @@
 //itk includes
 #include <itkImage.h>
 #include <itkImportImageFilter.h>
-#include <itkIntensityWindowingImageFilter.h>
 #include <itkRescaleIntensityImageFilter.h>
-#include <itkNumericTraits.h>
 #include <itkMetaDataObject.h>
 
 #include <vector>

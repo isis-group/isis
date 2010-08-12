@@ -51,7 +51,7 @@
 #include "DataStorage/io_factory.hpp"
 #include "DataStorage/image.hpp"
 #include "CoreUtils/application.hpp"
-#include "ExternalLibraryAdapter/itkAdapter.hpp"
+#include "Adapter/itkAdapter.hpp"
 
 #include "extRegistration/isisRegistrationFactory3D.hpp"
 #include "extITK/isisIterationObserver.hpp"

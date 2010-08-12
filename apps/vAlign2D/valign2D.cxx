@@ -49,7 +49,7 @@
 #include "CoreUtils/log.hpp"
 #include "DataStorage/io_factory.hpp"
 #include "DataStorage/image.hpp"
-#include "ExternalLibraryAdapter/itkAdapter.hpp"
+#include "Adapter/itkAdapter.hpp"
 #include "CoreUtils/application.hpp"
 
 #include "extRegistration/isisRegistrationFactory2D.hpp"

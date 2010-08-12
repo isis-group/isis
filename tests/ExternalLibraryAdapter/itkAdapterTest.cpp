@@ -4,7 +4,7 @@
 #include "CoreUtils/log.hpp"
 #include "DataStorage/image.hpp"
 #include "DataStorage/io_factory.hpp"
-#include "ExternalLibraryAdapter/itkAdapter.hpp"
+#include "Adapter/itkAdapter.hpp"
 
 #include <itkImage.h>
 #include <itkImageFileWriter.h>

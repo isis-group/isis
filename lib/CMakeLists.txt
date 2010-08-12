@@ -30,4 +30,4 @@ IF(ITK_FOUND)
 	 add_subdirectory(extITK)
 ENDIF(ITK_FOUND)
 
-add_subdirectory(ExternalLibraryAdapter)
+add_subdirectory(Adapter)

@@ -46,7 +46,7 @@
 #include "DataStorage/io_factory.hpp"
 #include "DataStorage/image.hpp"
 #include "CoreUtils/application.hpp"
-#include "ExternalLibraryAdapter/itkAdapter.hpp"
+#include "Adapter/itkAdapter.hpp"
 
 #include "extITK/isisTimeStepExtractionFilter.hpp"
 #include "extITK/isisTransformMerger2D.hpp"
