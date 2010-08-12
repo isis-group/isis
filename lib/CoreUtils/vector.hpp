@@ -152,13 +152,16 @@ public:
 	/**
 	* Fuzzy comparison.
 	* Will raise a compiler error when not used with floating point vectors.
+	* @param other the other vector that should be compared with the current vector.
+	* @param boost a scaling factor to regulate the "fuzzyness" of the operation. A higher
+	* value will result in a more fuzzy check. Normally one would use multiple of 10.
 	* \returns true if the difference between the two types is significantly small compared to the values.
 	*/
-	bool fuzzyEqual( const this_class &other )const {
+	bool fuzzyEqual( const this_class &other, unsigned short boost = 1 )const {
 		const_iterator b = other.begin();
 
 		for ( const_iterator a = CONTAINER::begin(); a != CONTAINER::end(); ++a, ++b ) {
-			if ( ! util::fuzzyEqual( *a, *b ) )
+			if ( ! util::fuzzyEqual( *a, *b, boost ) )
 				return false;
 		}
 

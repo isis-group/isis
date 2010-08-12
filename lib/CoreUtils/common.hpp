@@ -213,6 +213,10 @@ continousFind( ForwardIterator &current, const ForwardIterator end, const T &com
 /**
  * Fuzzy comparison between floating point values.
  * Will raise a compiler error when not used with floating point types.
+ * @param a first value to compare with
+ * @param b second value to compare with
+ * @param boost a scaling factor to regulate the "fuzzyness" of the operation. A higher
+ * value will result in a more fuzzy check. Normally one would use multiple of 10.
  * \returns true if the difference between the two values is significantly small compared to their values.
  */
 template<typename T> bool fuzzyEqual( T a, T b, unsigned short boost = 1 )

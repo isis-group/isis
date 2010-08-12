@@ -103,7 +103,7 @@ throw( std::runtime_error & )
 			break;
 			// VShort
 		case data::TypePtr<u_int16_t>::staticID:
-			LOG( Runtime, warning ) << "Vista does not support " << util::Type<u_int16_t>::staticName() << " falling back to " << util::Type<VShort>::staticName();
+			LOG( Runtime, warning ) << "Vista does not support " << util::Type<u_int16_t>::staticName() << ". Falling back to " << util::Type<VShort>::staticName();
 		case data::TypePtr<VShort>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VShortRepn );
 			copyImageToVista<VShort>( image, vimages[0] );
@@ -338,7 +338,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 			VistaChunk<VShort> vchunk( sliceRef, true);
 			vistaChunkList.push_back( vchunk );
 
-			if( vchunk.hasProperty( "acquisitionTime" ) && !vchunk.hasProperty( "repetitionTime" ) ) {
+			if( vchunk.hasProperty( "acquisitionTime" ) && !vchunk.hasProperty( "repetition_time" ) ) {
 				float currentSliceTime = vchunk.getProperty<float>( "acquisitionTime" );
 
 				if ( currentSliceTime > biggest_slice_time ) {
@@ -658,8 +658,6 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 	if( image.hasProperty( "repetitionTime" ) ) {
 		VAppendAttr( list, "repetition_time", NULL, VShortRepn,
 					 image.getProperty<u_int16_t>( "repetitionTime" ) );
-		VAppendAttr( list, "repetitionTime", NULL, VShortRepn,
-					 image.getProperty<VShort>( "repetitionTime" ) );
 	}
 
 	//  if( map.hasProperty( "acquisitionTime" ) && functional ) {
