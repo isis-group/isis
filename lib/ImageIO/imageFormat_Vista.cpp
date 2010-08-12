@@ -83,8 +83,9 @@ throw( std::runtime_error & )
 		vimages = ( VImage * )malloc( sizeof( VImage ) );
 		nimages = 1;
 
-		// choose data type
-		switch( image.getChunk( 0, 0, 0, 0 ).typeID() ) {
+		// choose data type. The data type should be taken from the image, not
+		// from the chunk since the chunks can have different types.
+		switch( image.typeID() ) {
 			// VBit
 		case data::TypePtr<VBit>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VBitRepn );
