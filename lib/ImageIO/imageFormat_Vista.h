@@ -198,7 +198,6 @@ private:
 					float sliceTimeFloat;
 					sstr >> sliceTimeFloat;
 					chunk.setProperty<float>( "acquisitionTime",  sliceTimeFloat  );
-					chunk.setProperty<float>( "Vista/slice_time",  sliceTimeFloat  );
 					continue;
 				}
 

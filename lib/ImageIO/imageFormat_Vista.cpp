@@ -58,7 +58,6 @@ throw( std::runtime_error & )
 		shortImage.spliceDownTo( data::sliceDim );
 		vimages = ( VImage * )malloc( sizeof( VImage ) * dims[2] );
 		nimages = dims[2];
-		std::vector< boost::shared_ptr< data::Chunk > > chList = shortImage.getChunkList();
 
 		for( int z = 0; z < dims[2]; z++ ) {
 			vimages[z] = VCreateImage( dims[3], dims[1], dims[0], VShortRepn );
@@ -666,22 +665,53 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 	//  }
 
 	if ( functional ) {
-		if ( image.getChunkAt( 0 ).hasProperty( "DICOM/CSAImageHeaderInfo/MosaicRefAcqTimes" ) ) {
-			util::dlist sliceTimeList = image.getChunkAt( 0 ).getProperty<util::dlist>( "DICOM/CSAImageHeaderInfo/MosaicRefAcqTimes" );
-			std::vector<double> sliceTime;
-			BOOST_FOREACH( util::dlist::const_reference ref, sliceTimeList ) {
-				sliceTime.push_back( ref );
+
+		// Deriving slice time from acquisition time. This is only ok if we have
+		// timing information for every slice. Hence the cunks should be split to
+		// 2-D slices.
+
+		// Check if the current chunk encodes more than one slice. This
+		// is only valid if there is more than one slice in the isis image.
+		if( image.sizeToVector()[2] > 1){
+			if(image.getChunk(slice).sizeToVector()[2] > 1){
+				LOG(data::Runtime, error) << "Chunk contains more than one slice."
+						<< "Interpolation of slice time is not possible.";
 			}
-			VAppendAttr( list, "slice_time", NULL, VShortRepn, static_cast<VShort>( sliceTime[slice] ) );
-		} else if ( image.getChunkAt( 0 ).hasProperty( "acquisitionTime" ) ) {
-			//TODO slicetime
-		} else if( image.hasProperty( "repetitionTime" ) ) {
-			size_t tr = image.getProperty<size_t>( "repetitionTime" );
-			u_int16_t sliceTime = ( tr / image.sizeToVector()[2] ) * ( slice  );
-			VAppendAttr( list, "slice_time", NULL, VShortRepn, sliceTime );
-		} else {
-			LOG( data::Debug, warning ) << "Missing repetition time. Interpolation of slice time is not possible.";
+			else {
+				// See if there is an acquisition time available
+				if ( image.getChunkAt( slice ).hasProperty( "acquisitionTime" ) ) {
+					std::stringstream sstream;
+					float stime;
+					stime = image.getChunkAt(slice).getProperty<float>("acquisitionTime");
+					sstream << stime;
+					VAppendAttr ( list, "slice_time", NULL, VStringRepn, sstream.str().c_str());
+				}
+				// It's not safe to guess the slice order. If there is no acquisition time
+				// then there is no slice_time attribute in vista image.
+				else{
+					LOG(data::Runtime, error) << "Missing acquisition time. "
+							<< "Interpolation of slice time is not supported.";
+				}
+			}
 		}
+
+//		// Get slice_time from acquisition time
+//		if ( image.getChunkAt( slice ).hasProperty( "acquisitionTime" ) ) {
+//			std::stringstream sstream;
+//			float stime;
+//			stime = image.getChunkAt(slice).getProperty<float>("acquisitionTime");
+//			sstream << stime;
+//			VAppendAttr ( list, "slice_time", NULL, VStringRepn, sstream.str().c_str());
+//		// TODO guessing the slice order is dangerous. Maybe we should avoid it.
+//		} else if( image.hasProperty( "repetitionTime" ) ) {
+//			LOG(data::Runtime, warning) << "Missing acquisition time. slice time will be interpolated by repetition time. "
+//					<< "Assuming linear slice order.";
+//			size_t tr = image.getProperty<size_t>( "repetitionTime" );
+//			u_int16_t sliceTime = ( tr / image.sizeToVector()[2] ) * ( slice  );
+//			VAppendAttr( list, "slice_time", NULL, VShortRepn, sliceTime );
+//		} else {
+//			LOG( data::Debug, warning ) << "Missing repetition time. Interpolation of slice time is not possible.";
+//		}
 	}
 
 	if ( image.hasProperty( "subjectGender" ) ) {
