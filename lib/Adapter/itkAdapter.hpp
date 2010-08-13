@@ -37,7 +37,6 @@
 #include <itkImage.h>
 #include <itkImportImageFilter.h>
 #include <itkRescaleIntensityImageFilter.h>
-#include <itkMetaDataObject.h>
 
 #include <vector>
 

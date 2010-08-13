@@ -20,6 +20,7 @@
  *
  *****************************************************************/
 
+#include <boost/algorithm/string.hpp>
 
 #include <itkImageFileReader.h>
 #include <itkImageFileWriter.h>
@@ -191,7 +192,41 @@ int main(
 	resampler->SetNumberOfThreads( number_threads );
 	warper->SetNumberOfThreads( number_threads );
 	progress_timer time;
+	isis::data::ImageList tmpList;
+	//if template file is specified by the user
+	if ( template_filename ) {
+		tmpList = isis::data::IOFactory::load( template_filename, "" );
+		LOG_IF( tmpList.empty(), isis::DataLog, isis::error ) << "Template image is empty!";
+	}
+	isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "" );
+	BOOST_FOREACH(isis::data::ImageList::reference ref, inList )
+	{
+		if (tmpList.front()->hasProperty("Vista/ca") && tmpList.front()->hasProperty("Vista/cp")) {
+			std::vector< std::string > caTuple;
+			std::vector< std::string > cpTuple;
+			std::string ca = tmpList.front()->getProperty<std::string>("Vista/ca");
+			std::string cp = tmpList.front()->getProperty<std::string>("Vista/cp");
+			isis::util::fvector4 oldVoxelSize = tmpList.front()->getProperty<isis::util::fvector4>("voxelSize");
+			isis::util::fvector4 newVoxelSize = ref->getProperty<isis::util::fvector4>("voxelSize");
+			boost::algorithm::split( caTuple, ca, boost::algorithm::is_any_of( " " ) );
+			boost::algorithm::split( cpTuple, cp, boost::algorithm::is_any_of( " " ) );
+			for ( size_t dim = 0; dim < 3; dim++ )
+			{
+				float caFloat = boost::lexical_cast<float>(caTuple[dim]);
+				float cpFloat = boost::lexical_cast<float>(cpTuple[dim]);
+				float catmp = caFloat * (oldVoxelSize[dim] / newVoxelSize[dim]);
+				float cptmp = cpFloat * (oldVoxelSize[dim] / newVoxelSize[dim]);
+				std::cout << catmp << " = " << caFloat << " * (" << oldVoxelSize[dim] << " / " << newVoxelSize[dim] << ")" << std::endl;
+				caTuple[dim] = std::string( boost::lexical_cast<std::string>(catmp));
+				cpTuple[dim] = std::string( boost::lexical_cast<std::string>(cptmp));
+			}
+			std::string newCa = caTuple[0] + std::string(" ") + caTuple[1] + std::string(" ") + caTuple[2];
+			std::string newCp = cpTuple[0] + std::string(" ") + cpTuple[1] + std::string(" ") + cpTuple[2];
+			ref->setProperty<std::string>("Vista/ca", newCa);
+			ref->setProperty<std::string>("Vista/cp", newCp);
+		}
 
+	}
 	if ( !fmri ) {
 		isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "" );
 		LOG_IF( inList.empty(), isis::DataLog, isis::error ) << "Input image is empty!";
@@ -204,18 +239,13 @@ int main(
 		fmriImage = movingAdapter->makeItkImageObject<FMRIInputType>( inList.front() );
 	}
 
-	//if template file is specified by the user
-	if ( template_filename ) {
-		isis::data::ImageList tmpList = isis::data::IOFactory::load( template_filename, "" );
-		LOG_IF( tmpList.empty(), isis::DataLog, isis::error ) << "Template image is empty!";
-		templateImage = fixedAdapter->makeItkImageObject<InputImageType>( tmpList.front()  );
-		outputDirection = templateImage->GetDirection();
-		outputOrigin = templateImage->GetOrigin();
-	}
-
 	if ( !template_filename ) {
 		outputDirection = inputImage->GetDirection();
 		outputOrigin = inputImage->GetOrigin();
+	} else {
+		templateImage = fixedAdapter->makeItkImageObject<InputImageType>( tmpList.front()  );
+		outputDirection = templateImage->GetDirection();
+		outputOrigin = templateImage->GetOrigin();
 	}
 
 	if ( trans_filename.number ) {
@@ -430,7 +460,7 @@ int main(
 		const unsigned int numberOfTimeSteps = fmriImage->GetLargestPossibleRegion().GetSize()[3];
 		OutputImageType::Pointer tileImage;
 		std::cout << std::endl;
-		isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "" );
+//		isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "" );
 		inputImage = movingAdapter->makeItkImageObject<InputImageType>( inList.front() );
 
 		for ( unsigned int timestep = 0; timestep < numberOfTimeSteps; timestep++ ) {

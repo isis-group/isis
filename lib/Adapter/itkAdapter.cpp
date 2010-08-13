@@ -219,16 +219,6 @@ typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkRea
 	rescaler->SetOutputMaximum( maxIn );
 	rescaler->Update();
 	outputImage = rescaler->GetOutput();
-	//since itk properties do not match the isis properties we need to define metaproperties to prevent data loss
-	propKeyList  = m_ImageISIS.getKeys();
-	BOOST_FOREACH( PropKeyListType::const_reference ref, propKeyList ) {
-		if ( m_ImageISIS.propertyValue( ref )->is<util::fvector4>() ) {
-			itk::EncapsulateMetaData<util::fvector4>( m_ITKDict, ref, m_ImageISIS.getProperty<util::fvector4>( ref ) );
-		} else {
-			itk::EncapsulateMetaData<std::string>( m_ITKDict, ref, m_ImageISIS.getProperty<std::string>( ref ) );
-		}
-	}
-	outputImage->SetMetaDataDictionary( m_ITKDict );
 	return outputImage;
 }
 
