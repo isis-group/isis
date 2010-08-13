@@ -216,7 +216,6 @@ int main(
 				float cpFloat = boost::lexical_cast<float>(cpTuple[dim]);
 				float catmp = caFloat * (oldVoxelSize[dim] / newVoxelSize[dim]);
 				float cptmp = cpFloat * (oldVoxelSize[dim] / newVoxelSize[dim]);
-				std::cout << catmp << " = " << caFloat << " * (" << oldVoxelSize[dim] << " / " << newVoxelSize[dim] << ")" << std::endl;
 				caTuple[dim] = std::string( boost::lexical_cast<std::string>(catmp));
 				cpTuple[dim] = std::string( boost::lexical_cast<std::string>(cptmp));
 			}
