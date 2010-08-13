@@ -672,26 +672,24 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 
 		// Check if the current chunk encodes more than one slice. This
 		// is only valid if there is more than one slice in the isis image.
-		if( image.sizeToVector()[2] > 1){
-			if(image.getChunk(slice).sizeToVector()[2] > 1){
-				LOG(data::Runtime, error) << "Chunk contains more than one slice."
-						<< "Interpolation of slice time is not possible.";
+		if(image.getChunk(slice).sizeToVector()[2] > 1){
+			LOG(data::Runtime, error) << "Chunk contains more than one slice."
+					<< "Interpolation of slice time is not possible.";
+		}
+		else {
+			// See if there is an acquisition time available
+			if ( image.getChunkAt( slice ).hasProperty( "acquisitionTime" ) ) {
+				std::stringstream sstream;
+				float stime;
+				stime = image.getChunkAt(slice).getProperty<float>("acquisitionTime");
+				sstream << stime;
+				VAppendAttr ( list, "slice_time", NULL, VStringRepn, sstream.str().c_str());
 			}
-			else {
-				// See if there is an acquisition time available
-				if ( image.getChunkAt( slice ).hasProperty( "acquisitionTime" ) ) {
-					std::stringstream sstream;
-					float stime;
-					stime = image.getChunkAt(slice).getProperty<float>("acquisitionTime");
-					sstream << stime;
-					VAppendAttr ( list, "slice_time", NULL, VStringRepn, sstream.str().c_str());
-				}
-				// It's not safe to guess the slice order. If there is no acquisition time
-				// then there is no slice_time attribute in vista image.
-				else{
-					LOG(data::Runtime, error) << "Missing acquisition time. "
-							<< "Interpolation of slice time is not supported.";
-				}
+			// It's not safe to guess the slice order. If there is no acquisition time
+			// then there is no slice_time attribute in vista image.
+			else{
+				LOG(data::Runtime, error) << "Missing acquisition time. "
+						<< "Interpolation of slice time is not supported.";
 			}
 		}
 
