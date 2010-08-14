@@ -60,6 +60,7 @@ template<typename T> struct getMinMaxImpl<T, true> {
  * by just use "1" for the length.
  * The pointers are reference counted and will be deleted automatically by a customizable deleter.
  * The copy is cheap, thus the copy of a TypePtr will reference the same data.
+ * The usual dereferencing pointer interface ("*" and "->") is supported.
  */
 template<typename TYPE> class TypePtr: public _internal::TypePtrBase
 {
@@ -129,7 +130,6 @@ public:
 	 * The pointers are automatically deleted by an instance of BasicDeleter and should not be used outside once used here.
 	 * If ptr is a pointer to C++ objects (delete[] needed) you must use
 	 * TypePtr(ptr,len,TypePtr\<TYPE\>::ObjectArrayDeleter())!
-	 * The usual dereferencing pointer interface ("*" and "->") is supported.
 	 * \param ptr the pointer to the used array
 	 * \param length the length of the used array (TypePtr does NOT check for length,
 	 * this is just here for child classes which may want to check)
@@ -140,7 +140,6 @@ public:
 	 * Creates TypePtr from a pointer of type TYPE.
 	 * The pointers are automatically deleted by an copy of d and should not be used outside once used here
 	 * (this does not apply, if d does not delete).
-	 * The usual dereferencing pointer interface ("*" and "->") is supported.
 	 * D must implement operator()(TYPE *p).
 	 * \param ptr the pointer to the used array
 	 * \param length the length of the used array in elements (TypePtr does NOT check for length),

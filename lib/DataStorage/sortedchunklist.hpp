@@ -35,19 +35,13 @@ namespace _internal
 class SortedChunkList
 {
 public:
-	struct sortComparator {
-		sortComparator( const std::string &prop_name );
+	struct scalarPropCompare {
 		std::string propertyName;
-		virtual bool operator() ( const util::PropertyValue &a, const util::PropertyValue &b )const = 0;
-		virtual ~sortComparator();
-	};
-	struct scalarPropCompare: public sortComparator {
 		scalarPropCompare( const std::string &prop_name );
-		bool operator()( const isis::util::PropertyValue &a, const isis::util::PropertyValue &b ) const;
+		bool operator()( const util::PropertyValue &a, const util::PropertyValue &b ) const;
 	};
-	struct fvectorCompare: public sortComparator {
-		fvectorCompare( const std::string &prop_name );
-		bool operator()( const isis::util::PropertyValue &a, const isis::util::PropertyValue &b ) const;
+	struct posCompare {
+		bool operator()( const util::fvector4 &a, const util::fvector4 &b ) const;
 	};
 	struct chunkPtrOperator {
 		virtual boost::shared_ptr<Chunk> operator()( const boost::shared_ptr<Chunk> &ptr ) = 0;
@@ -55,10 +49,10 @@ public:
 	};
 private:
 	typedef std::map<util::PropertyValue, boost::shared_ptr<Chunk>, scalarPropCompare> SecondaryMap;
-	typedef std::map<util::fvector4, SecondaryMap, fvectorCompare> PrimaryMap;
+	typedef std::map<util::fvector4, SecondaryMap, posCompare> PrimaryMap;
 
 	std::stack<scalarPropCompare> secondarySort;
-	fvectorCompare primarySort;
+	posCompare primarySort;
 	PrimaryMap chunks;
 
 	// low level finding

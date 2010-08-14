@@ -29,19 +29,12 @@ namespace _internal
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // sorting algorithm implementation
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-SortedChunkList::sortComparator::sortComparator( const std::string &prop_name ): propertyName( prop_name ) {}
-SortedChunkList::sortComparator::~sortComparator() {}
+SortedChunkList::scalarPropCompare::scalarPropCompare( const std::string &prop_name ): propertyName( prop_name ) {}
 
-SortedChunkList::fvectorCompare::fvectorCompare( const std::string &prop_name ): sortComparator( prop_name ) {}
-SortedChunkList::scalarPropCompare::scalarPropCompare( const std::string &prop_name ): sortComparator( prop_name ) {}
-
-bool SortedChunkList::fvectorCompare::operator()( const isis::util::PropertyValue &a, const isis::util::PropertyValue &b ) const
+bool SortedChunkList::posCompare::operator()( const util::fvector4 &posA, const util::fvector4 &posB ) const
 {
-	const util::fvector4 &posA = a->cast_to<util::fvector4>();
-	const util::fvector4 &posB = b->cast_to<util::fvector4>();
-
 	if ( posA.lexical_less_reverse( posB ) ) { //if chunk is "under" the other - put it there
-		LOG( Debug, verbose_info ) << "Successfully sorted chunks by " << propertyName  << " (" << posA << " below " << posB << ")";
+		LOG( Debug, verbose_info ) << "Successfully sorted chunks by position (" << posA << " below " << posB << ")";
 		return true;
 	}
 
@@ -49,11 +42,11 @@ bool SortedChunkList::fvectorCompare::operator()( const isis::util::PropertyValu
 }
 bool SortedChunkList::scalarPropCompare::operator()( const isis::util::PropertyValue &a, const isis::util::PropertyValue &b ) const
 {
-	const util::_internal::TypeBase &aTime = *a;
-	const util::_internal::TypeBase &bTime = *b;
+	const util::_internal::TypeBase &aScal = *a;
+	const util::_internal::TypeBase &bScal = *b;
 
-	if ( aTime.lt( bTime ) ) {
-		LOG( Debug, verbose_info ) << "Successfully sorted chunks by " << propertyName << " (" << aTime.toString( false ) << " before " << bTime.toString( false ) << ")";
+	if ( aScal.lt( bScal ) ) {
+		LOG( Debug, verbose_info ) << "Successfully sorted chunks by " << propertyName << " (" << aScal.toString( false ) << " before " << bScal.toString( false ) << ")";
 		return true;
 	} else
 		return false;
@@ -71,7 +64,7 @@ SortedChunkList::chunkPtrOperator::~chunkPtrOperator() {}
 
 // constructor
 SortedChunkList::SortedChunkList( std::string fvectorPropName, std::string comma_separated_equal_props ):
-	primarySort( fvectorPropName ), chunks( primarySort ), equalProps( util::string2list<std::string>( comma_separated_equal_props, ',' ) )
+	equalProps( util::string2list<std::string>( comma_separated_equal_props, ',' ) )
 {}
 
 
@@ -112,36 +105,44 @@ std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::secondaryInsert( Seco
 }
 std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::primaryInsert( const Chunk &ch )
 {
-	const std::string &propName = primarySort.propertyName;
 	LOG_IF( secondarySort.empty(), Debug, error ) << "There is no known secondary sorting left. Chunksort will fail.";
+	assert(ch.valid());
+	
+	// compute the position of the chunk in the image space
+	// we dont have this position, but we have the position in scanner-space (indexOrigin)
+	const util::fvector4 &origin = ch.propertyValue( "indexOrigin" )->cast_to<util::fvector4>();
 
-	if( ch.hasProperty( propName ) ) {
-		const util::PropertyValue &prop = ch.propertyValue( propName );
+	// and we have the transformation matrix
+	// [ readVec ]
+	// [ phaseVec]
+	// [ sliceVec]
+	// [ 0 0 0 1 ]
+	const util::fvector4 &readVec = ch.propertyValue( "readVec" )->cast_to<util::fvector4>();
+	const util::fvector4 &phaseVec = ch.propertyValue( "phaseVec" )->cast_to<util::fvector4>();
+	util::fvector4 sliceVec;
+	if(ch.hasProperty("sliceVec"))
+		sliceVec=ch.propertyValue("sliceVec")->cast_to<util::fvector4>();
+	else{
+		sliceVec = util::fvector4(
+			readVec[1] * phaseVec[2] - readVec[2] * phaseVec[1],
+			readVec[2] * phaseVec[0] - readVec[0] * phaseVec[2],
+			readVec[0] * phaseVec[1] - readVec[1] * phaseVec[0]
+		);
+	}
+	const util::fvector4 key(origin.dot(readVec),origin.dot(phaseVec),origin.dot(sliceVec),origin[3]);
+	// this is actually not the complete transform (it lacks the scaling for the voxel size), but its enough
 
-		if( prop->is<util::fvector4>() ) {
-			const util::fvector4 &key = prop->cast_to<util::fvector4>();
-			const scalarPropCompare &secondaryComp = secondarySort.top();
-			// get the reference of the secondary map for "key" (create and insert a new if neccessary)
-			SecondaryMap &subMap = chunks.insert( std::make_pair( key, SecondaryMap( secondaryComp ) ) ).first->second;
-			// run insert on that
-			return secondaryInsert( subMap, ch ); // insert ch into the right secondary map
-		} else {
-			LOG( Runtime, warning )
-					<< "Cannot insert chunk. It's property "
-					<< propName << " has wrong type " << util::MSubject( prop->typeName() )
-					<< " (should be " << util::MSubject( util::Type<util::fvector4>::staticName() ) << ")";
-		}
-	} else
-		LOG( Runtime, warning ) << "Cannot insert chunk. It's lacking the property " << util::MSubject( propName ) << " which is needed for primary sorting";
-
-	return std::pair<boost::shared_ptr<Chunk>, bool>( boost::shared_ptr<Chunk>(), false );;
+	const scalarPropCompare &secondaryComp = secondarySort.top();
+	// get the reference of the secondary map for "key" (create and insert a new if neccessary)
+	SecondaryMap &subMap = chunks.insert( std::make_pair( key, SecondaryMap( secondaryComp ) ) ).first->second;
+	// run insert on that
+	return secondaryInsert( subMap, ch ); // insert ch into the right secondary map
 }
 
 // high level insert
 bool SortedChunkList::insert( const Chunk &ch )
 {
 	LOG_IF( secondarySort.empty(), Debug, error ) << "Inserting will fail without any secondary sort. Use chunks.addSecondarySort at least once.";
-	const std::string &prop1 = primarySort.propertyName;
 
 	if( !empty() ) {
 		// compare some attributes of the first chunk and the one which shall be inserted
@@ -186,8 +187,8 @@ bool SortedChunkList::insert( const Chunk &ch )
 	std::pair<boost::shared_ptr<Chunk>, bool> inserted = primaryInsert( ch );
 
 	LOG_IF( inserted.first && !inserted.second, Debug, info )
-			<< "Not inserting chunk because there is allready one with the equal properties "
-			<< prop1 << ":" << ch.propertyValue( prop1 ) << " and " << prop2 << ":" << ch.propertyValue( prop2 );
+			<< "Not inserting chunk because there is allready a Chunk at the same position (" << ch.propertyValue( "indexOrigin" ) << ") with the equal property "
+			<< std::make_pair(prop2, ch.propertyValue( prop2 ));
 
 	LOG_IF(
 		inserted.first && !inserted.second &&
