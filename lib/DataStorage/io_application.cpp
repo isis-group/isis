@@ -48,16 +48,19 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 		parameters["wdialect"] = std::string();
 		parameters["wdialect"].needed() = false;
 		parameters["wdialect"].setDescription( "choose dialect for writing. The available dialects depend on the capabilities of IO plugins" );
-		std::map<unsigned short, std::string> types = util::getTypeMap( true, false );
+		std::map<unsigned short, std::string> types = util::getTypeMap( false, true );
 		// remove some types which are useless as representation
 		// "(unsigned short)" is needed because otherwise erase would take the reference of a static constant which is only there during compile time
-		types.erase( ( unsigned short )util::Type<util::Selection>::staticID );
-		types.erase( ( unsigned short )util::Type<std::string>::staticID );
-		types.erase( ( unsigned short )util::Type<boost::posix_time::ptime>::staticID );
-		types.erase( ( unsigned short )util::Type<boost::gregorian::date>::staticID );
-		types.erase( ( unsigned short )util::Type<util::ilist>::staticID );
-		types.erase( ( unsigned short )util::Type<util::dlist>::staticID );
-		types.erase( ( unsigned short )util::Type<util::slist>::staticID );
+		types.erase( ( unsigned short )data::TypePtr<util::Selection>::staticID );
+		types.erase( ( unsigned short )data::TypePtr<std::string>::staticID );
+		types.erase( ( unsigned short )data::TypePtr<boost::posix_time::ptime>::staticID );
+		types.erase( ( unsigned short )data::TypePtr<boost::gregorian::date>::staticID );
+		types.erase( ( unsigned short )data::TypePtr<util::ilist>::staticID );
+		types.erase( ( unsigned short )data::TypePtr<util::dlist>::staticID );
+		types.erase( ( unsigned short )data::TypePtr<util::slist>::staticID );
+		for(std::map<unsigned short, std::string>::iterator i=types.begin();i!=types.end();i++){
+			i->second.resize(i->second.find_last_not_of('*')+1);
+		}
 		parameters["repn"] = util::Selection( types );
 		parameters["repn"].needed() = false;
 		parameters["repn"].setDescription(
