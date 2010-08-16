@@ -716,7 +716,7 @@ size_t Image::spliceDownTo( dimensions dim ) //readDim = 0, phaseDim, sliceDim, 
 		size[i] = 1;
 
 	// get a list of needed properties (everything which is missing in a newly created chunk plus everything which is needed for autosplice)
-	const std::list<std::string> splice_needed = util::string2list<std::string>( "voxelSize,voxelGap,readVec,phaseVec,sliceVec,indexOrigin,acquisitionNumber" );
+	const std::list<std::string> splice_needed = util::string2list<std::string>( "voxelSize,voxelGap,readVec,phaseVec,sliceVec,indexOrigin,acquisitionNumber", ',' );
 	util::PropMap::key_list needed = MemChunk<short>( 1 ).getMissing();
 	needed.insert( splice_needed.begin(), splice_needed.end() );
 	struct splicer {
@@ -747,8 +747,9 @@ size_t Image::spliceDownTo( dimensions dim ) //readDim = 0, phaseDim, sliceDim, 
 	splicer splice( dim, size.product(), *this );
 	BOOST_FOREACH( boost::shared_ptr<Chunk> &ref, buffer ) {
 		BOOST_FOREACH( const std::string & need, needed ) { //get back properties needed for the
-			if( !ref->hasProperty( need ) && this->hasProperty( need ) )
+			if( !ref->hasProperty( need ) && this->hasProperty( need ) ){
 				ref->propertyValue( need ) = this->propertyValue( need );
+			}
 		}
 		splice( *ref );
 	}
