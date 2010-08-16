@@ -469,7 +469,7 @@ private:
 	 * the voxel space relative to the scanner space available, the routine assumes
 	 * that the voxel space is placed with the center near the scanner iso center.
 	 */
-	util::fvector4 calculateIndexOrigin(data::Chunk &chunk, util::fvector4 &dims);
+	util::fvector4 calculateIndexOrigin(data::Chunk &chunk, util::ivector4 &dims);
 };
 
 }
