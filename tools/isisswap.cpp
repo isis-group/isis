@@ -9,8 +9,7 @@ using namespace isis;
 template<typename TYPE>
 data::Image voxelSwapZ( const boost::shared_ptr<data::Image> src, unsigned int dim )
 {
-	data::MemImage<TYPE> dest( *src );
-	data::Image tmpImage = dest;
+	data::Image tmpImage = data::MemImage<TYPE> ( *src );
 	for ( size_t t = 0; t < src->sizeToVector()[3]; t++ ) {
 		for ( size_t z = 0; z < src->sizeToVector()[2]; z++ ) {
 			for ( size_t y = 0; y < src->sizeToVector()[1]; y++ ) {

@@ -688,7 +688,7 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 			// It's not safe to guess the slice order. If there is no acquisition time
 			// then there is no slice_time attribute in vista image.
 			else{
-				LOG(data::Runtime, error) << "Missing acquisition time. "
+				LOG(data::Runtime, info) << "Missing acquisition time. "
 						<< "Interpolation of slice time is not supported.";
 			}
 		}

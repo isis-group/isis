@@ -380,7 +380,11 @@ private:
 
 		if( !tr && ni.pixdim[ni.ndim] ) {
 			retChunk.setProperty<u_int16_t>( "repetitionTime", ni.pixdim[ni.ndim] );
+
 		}
+		util::fvector4 newVoxelSize = retChunk.getProperty<util::fvector4>("voxelSize");
+		newVoxelSize[3] = 0;
+		retChunk.setProperty<util::fvector4>("voxelSize", newVoxelSize);
 	}
 
 	util::fvector4 getVector( const nifti_image &ni, const enum vectordirection &dir ) {

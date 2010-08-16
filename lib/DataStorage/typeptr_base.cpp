@@ -46,7 +46,6 @@ TypePtrBase::Reference TypePtrBase::copyToNewById( unsigned short id ) const
 TypePtrBase::Reference TypePtrBase::copyToNewById( unsigned short id, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max ) const
 {
 	const Converter &conv = getConverterTo( id );
-
 	if( conv ) {
 		boost::scoped_ptr<TypePtrBase> ret;
 		conv->generate( *this, ret, min, max );

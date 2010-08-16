@@ -201,6 +201,10 @@ int main(
 	isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "" );
 	BOOST_FOREACH(isis::data::ImageList::reference ref, inList )
 	{
+		if (tmpList.front()->hasProperty("Vista/extent")) {
+			ref->setProperty<std::string>("Vista/extent", tmpList.front()->getProperty<std::string>("Vista/extent"));
+		}
+
 		if (tmpList.front()->hasProperty("Vista/ca") && tmpList.front()->hasProperty("Vista/cp")) {
 			std::vector< std::string > caTuple;
 			std::vector< std::string > cpTuple;

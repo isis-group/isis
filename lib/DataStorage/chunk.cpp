@@ -275,9 +275,9 @@ ChunkList Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 		break;
 	case sliceDim:
 
-		if( this->hasProperty( "sliceVec" ) )
+		if( this->hasProperty( "sliceVec" ) ) {
 			offset = this->propertyValue( "sliceVec" )->cast_to<util::fvector4>();
-		else {
+		} else {
 			const util::fvector4 read = this->propertyValue( "readVec" )->cast_to<util::fvector4>();
 			const util::fvector4 phase = this->propertyValue( "phaseVec" )->cast_to<util::fvector4>();
 			assert( util::fuzzyEqual<float>( read.sqlen(), 1 ) );
@@ -298,7 +298,6 @@ ChunkList Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 	size_t cnt = 0;
 
 	LOG( Debug, info ) << "Splicing chunk at dimenstion " << atDim + 1 << " with indexOrigin stride " << indexOriginOffset << " and acquisitionNumberStride " << acquisitionNumberStride;
-
 	ChunkList ret = splice( ( dimensions )atDim ); // do low level splice - get the chunklist
 	BOOST_FOREACH( ChunkList::reference ref, ret ) { // adapt some metadata in them
 		util::fvector4 &orig = ref->propertyValue( "indexOrigin" )->cast_to<util::fvector4>();
