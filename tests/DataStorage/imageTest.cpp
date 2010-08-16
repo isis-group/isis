@@ -373,7 +373,7 @@ BOOST_AUTO_TEST_CASE( typediamge_test )
 	}
 } // END typedimage_test
 
-BOOST_AUTO_TEST_CASE ( transformCoords_test )
+BOOST_AUTO_TEST_CASE ( image_transformCoords_test )
 {
 	// dummy image
 	data::ImageList images = data::IOFactory::load( "nix.null" );
@@ -394,6 +394,7 @@ BOOST_AUTO_TEST_CASE ( transformCoords_test )
 	T( 2, 0 ) = 0;
 	T( 2, 1 ) = 0;
 	T( 2, 2 ) = 1;
+
 	// **** AXIAL ****
 	// set orientation AXIAL in DCIOM space
 	img->setProperty( "readVec", util::fvector4( 1, 0, 0, 0 ) );
@@ -403,12 +404,13 @@ BOOST_AUTO_TEST_CASE ( transformCoords_test )
 	img->setProperty( "indexOrigin", util::fvector4( -1, -2, -3, 0 ) );
 	// apply transformation
 	img->transformCoords( T );
-	// **** OUTPUT ****
-	std::cout << "DICOM (axial) --> Nifti (axial)" << std::endl;
-	std::cout << img->propertyValue( "readVec" ) << std::endl;
-	std::cout << img->propertyValue( "phaseVec" ) << std::endl;
-	std::cout << img->propertyValue( "sliceVec" ) << std::endl;
-	std::cout << img->propertyValue( "indexOrigin" ) << std::endl;
+
+	// CHECKS
+	BOOST_CHECK(img->getProperty<util::fvector4>("readVec").fuzzyEqual(util::fvector4(-1, 0, 0, 0)));
+	BOOST_CHECK(img->getProperty<util::fvector4>("phaseVec").fuzzyEqual(util::fvector4(0, -1, 0, 0)));
+	BOOST_CHECK(img->getProperty<util::fvector4>("sliceVec").fuzzyEqual(util::fvector4(0, 0, 1, 0)));
+	BOOST_CHECK(img->getProperty<util::fvector4>("indexOrigin").fuzzyEqual(util::fvector4(1, 2, -3, 0)));
+;
 	// **** SAGITTAL ****
 	// set orientation SAGITTAL in DCIOM space
 	img->setProperty( "readVec", util::fvector4( 0, 1, 0, 0 ) );
@@ -418,12 +420,13 @@ BOOST_AUTO_TEST_CASE ( transformCoords_test )
 	img->setProperty( "indexOrigin", util::fvector4( -3, -1, -2, 0 ) );
 	// apply transformation
 	img->transformCoords( T );
-	// **** OUTPUT ****
-	std::cout << "DICOM (sagittal) --> Nifti (sagittal)" << std::endl;
-	std::cout << img->propertyValue( "readVec" ) << std::endl;
-	std::cout << img->propertyValue( "phaseVec" ) << std::endl;
-	std::cout << img->propertyValue( "sliceVec" ) << std::endl;
-	std::cout << img->propertyValue( "indexOrigin" ) << std::endl;
+
+	// CHECKS
+	BOOST_CHECK(img->getProperty<util::fvector4>("readVec").fuzzyEqual(util::fvector4(0, -1, 0, 0)));
+	BOOST_CHECK(img->getProperty<util::fvector4>("phaseVec").fuzzyEqual(util::fvector4(0, 0, -1, 0)));
+	BOOST_CHECK(img->getProperty<util::fvector4>("sliceVec").fuzzyEqual(util::fvector4(1, 0, 0, 0)));
+	BOOST_CHECK(img->getProperty<util::fvector4>("indexOrigin").fuzzyEqual(util::fvector4(-3, 1, 2, 0)));
+
 	// **** CORONAL ****
 	// set orientation CORONAL in DCIOM space
 	img->setProperty( "readVec", util::fvector4( 1, 0, 0, 0 ) );
@@ -432,13 +435,14 @@ BOOST_AUTO_TEST_CASE ( transformCoords_test )
 	// set index origin to DICOM space index origin
 	img->setProperty( "indexOrigin", util::fvector4( -1, 3, -2, 0 ) );
 	// apply transformation
+
 	img->transformCoords( T );
-	// **** OUTPUT ****
-	std::cout << "DICOM (coronal) --> Nifti (coronal)" << std::endl;
-	std::cout << img->propertyValue( "readVec" ) << std::endl;
-	std::cout << img->propertyValue( "phaseVec" ) << std::endl;
-	std::cout << img->propertyValue( "sliceVec" ) << std::endl;
-	std::cout << img->propertyValue( "indexOrigin" ) << std::endl;
+
+	// CHECKS
+	BOOST_CHECK(img->getProperty<util::fvector4>("readVec").fuzzyEqual(util::fvector4(-1, 0, 0, 0)));
+	BOOST_CHECK(img->getProperty<util::fvector4>("phaseVec").fuzzyEqual(util::fvector4(0, 0, -1, 0)));
+	BOOST_CHECK(img->getProperty<util::fvector4>("sliceVec").fuzzyEqual(util::fvector4(0, -1, 0, 0)));
+	BOOST_CHECK(img->getProperty<util::fvector4>("indexOrigin").fuzzyEqual(util::fvector4(1, 3, 2, 0)));
 } // END transformCoords_test
 
 BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
