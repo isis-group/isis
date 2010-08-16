@@ -66,7 +66,7 @@ VDictEntry TYPTransform[] = { {"VersorRigid", 0}, {"Affine", 1}, {"BSplineDeform
 
 VDictEntry TYPInterpolator[] = { {"Linear", 0}, {"BSpline", 1}, {"NearestNeighbor", 2}, {NULL}};
 
-VDictEntry TYPOptimizer[] = { {"VersorRigid", 0}, {"RegularStepGradientDescent", 1}, {"LBFGSB", 2}, {"Amoeba", 3}, {
+VDictEntry TYPOptimizer[] = { {"VersorRigid", 1}, {"RegularStepGradientDescent", 0}, {"LBFGSB", 2}, {"Amoeba", 3}, {
 		"Powell", 4
 	}, {NULL}
 };

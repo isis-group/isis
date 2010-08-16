@@ -658,6 +658,16 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 		VAppendAttr( list, "repetition_time", NULL, VShortRepn,
 					 image.getProperty<u_int16_t>( "repetitionTime" ) );
 	}
+	//subject name
+	if ( image.hasProperty( "subjectName" ) ) {
+		VAppendAttr( list, "patient", NULL, VStringRepn,
+					(VString) image.getProperty<std::string>("subjectName").c_str() );
+	}
+
+	if ( image.hasProperty( "DICOM/ManufacturersModelName" ) ) {
+		VAppendAttr( list, "device", NULL, VStringRepn,
+					(VString) image.getProperty<std::string>("DICOM/ManufacturersModelName").c_str() );
+	}
 
 	//  if( map.hasProperty( "acquisitionTime" ) && functional ) {
 	//      VAppendAttr( list, "slice_time", NULL, VShortRepn,

@@ -315,12 +315,12 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer()
 		VersorRigid3DTransformOptimizerType::ScalesType optimizerScaleVersorRigid3D( m_NumberOfParameters );
 
 		if ( transform.VERSORRIGID ) {
-			optimizerScaleVersorRigid3D[0] = 0.0001;
-			optimizerScaleVersorRigid3D[1] = 10;
-			optimizerScaleVersorRigid3D[2] = 10;
-			optimizerScaleVersorRigid3D[3] = 10;
-			optimizerScaleVersorRigid3D[4] = 10;
-			optimizerScaleVersorRigid3D[5] = 0.00001;
+			optimizerScaleVersorRigid3D[0] = 1.0;
+			optimizerScaleVersorRigid3D[1] = 1.0;
+			optimizerScaleVersorRigid3D[2] = 1.0;
+			optimizerScaleVersorRigid3D[3] = 1/1000;
+			optimizerScaleVersorRigid3D[4] = 1/1000;
+			optimizerScaleVersorRigid3D[5] = 1/1000;
 		}
 
 		if ( transform.SCALE ) {
