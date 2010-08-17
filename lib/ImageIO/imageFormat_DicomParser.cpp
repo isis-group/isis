@@ -44,6 +44,13 @@ void ImageFormat_Dicom::parseAS( DcmElement *elem, const std::string &name, util
 	u_int16_t duration;
 	OFString buff;
 	elem->getOFString( buff, 0 );
+	static boost::numeric::converter <
+		u_int16_t, double,
+		boost::numeric::conversion_traits<uint16_t, double>,
+		boost::numeric::def_overflow_handler,
+		boost::numeric::RoundEven<double>
+	> double2uint16;
+
 
 	if ( _internal::try_cast( buff.substr( 0, 3 ), duration ) ) {
 		switch ( buff.at( buff.size() - 1 ) ) {
@@ -56,11 +63,11 @@ void ImageFormat_Dicom::parseAS( DcmElement *elem, const std::string &name, util
 			break;
 		case 'M':
 		case 'm':
-			duration *= 30.436875;// year/12
+			duration = double2uint16(30.436875*duration);// year/12
 			break;
 		case 'Y':
 		case 'y':
-			duration *= 365.2425; //mean length of a year
+			duration = double2uint16(365.2425*duration); //mean length of a year
 			break;
 		default:
 			LOG( Runtime, warning )
