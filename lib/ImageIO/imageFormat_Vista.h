@@ -307,6 +307,17 @@ private:
 					continue;
 				}
 
+				// read the age in years (vista) and save it in PatientAge in days (isis)
+				if( strcmp( name, "age" ) == 0 ) {
+				  uint16_t age;
+				  VGetAttrValue( &posn, NULL, VShortRepn, &age);
+				  // rounding: floor or ceil
+				  age = ((age * 365.2425) - floor(age * 365.2425)) < 0.5 ?
+					floor(age * 365.2425) : ceil(age * 365.2425);
+				  chunk.setProperty<uint16_t>("subjectAge", age);
+				  continue;
+				}
+
 				// traverse through attributes
 				switch( VGetAttrRepn( &posn ) ) {
 				case VBitRepn:
@@ -337,7 +348,7 @@ private:
 				default:
 					std::cout << "unknown attribute representation found" << std::endl;
 				}
-			}
+			} // END iterate over attributes
 
 			// AFTERMATH
 			// set missing values according to default rules

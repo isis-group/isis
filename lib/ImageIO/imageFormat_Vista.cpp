@@ -760,6 +760,14 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 		VAppendAttr( list, "time", NULL, VStringRepn, ( VString ) boost::posix_time::to_simple_string( isisTimeDuration ).c_str() );
 	}
 
+	if (image.hasProperty( "subjectAge" ) ) {
+	  // age in days
+	  uint16_t age = image.getProperty<uint16_t>("subjectAge");
+	  age = ((age / 365.2425) - floor(age / 365.2425)) < 0.5 ? 
+		floor(age / 365.2425 ) : ceil( age / 365.2425 );
+	  VAppendAttr( list, "age", NULL, VShortRepn, age);
+	}
+
 	// ********** Vista group **********
 	// POLICY: Append ALL properties from the 'Vista' Propmap to the end of the
 	// vista attribute list.
