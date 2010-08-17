@@ -198,7 +198,39 @@ int main(
 		tmpList = isis::data::IOFactory::load( template_filename, "" );
 		LOG_IF( tmpList.empty(), isis::DataLog, isis::error ) << "Template image is empty!";
 	}
-	isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "" );
+
+	//setting up the output resolution
+	if ( resolution.number ) {
+		if ( static_cast<unsigned int> ( resolution.number ) < Dimension ) {
+			//user has specified less than 3 resolution values->sets isotrop resolution with the first typed value
+			outputSpacing.Fill( ( ( VFloat * ) resolution.vector )[0] );
+		}
+
+		if ( resolution.number >= 3 ) {
+			//user has specified at least 3 values -> sets anisotrop resolution
+			for ( unsigned int i = 0; i < 3; i++ ) {
+				outputSpacing[i] = ( ( VFloat * ) resolution.vector )[i];
+			}
+		}
+	}
+
+	if ( !resolution.number ) {
+		if ( template_filename ) {
+			outputSpacing = templateImage->GetSpacing();
+			outputSize = templateImage->GetLargestPossibleRegion().GetSize();
+		}
+
+		if ( !template_filename ) {
+			outputSpacing = inputImage->GetSpacing();
+			outputSize = inputImage->GetLargestPossibleRegion().GetSize();
+		}
+	}
+	if ( !fmri ) {
+		isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "" );
+	}
+	if ( fmri ) {
+		isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "", "functional" );
+	}
 	BOOST_FOREACH(isis::data::ImageList::reference ref, inList )
 	{
 		if (tmpList.front()->hasProperty("Vista/extent")) {
@@ -211,15 +243,14 @@ int main(
 			std::string ca = tmpList.front()->getProperty<std::string>("Vista/ca");
 			std::string cp = tmpList.front()->getProperty<std::string>("Vista/cp");
 			isis::util::fvector4 oldVoxelSize = tmpList.front()->getProperty<isis::util::fvector4>("voxelSize");
-			isis::util::fvector4 newVoxelSize = ref->getProperty<isis::util::fvector4>("voxelSize");
 			boost::algorithm::split( caTuple, ca, boost::algorithm::is_any_of( " " ) );
 			boost::algorithm::split( cpTuple, cp, boost::algorithm::is_any_of( " " ) );
 			for ( size_t dim = 0; dim < 3; dim++ )
 			{
 				float caFloat = boost::lexical_cast<float>(caTuple[dim]);
 				float cpFloat = boost::lexical_cast<float>(cpTuple[dim]);
-				float catmp = caFloat * (oldVoxelSize[dim] / newVoxelSize[dim]);
-				float cptmp = cpFloat * (oldVoxelSize[dim] / newVoxelSize[dim]);
+				float catmp = caFloat * (oldVoxelSize[dim] / outputSpacing[dim]);
+				float cptmp = cpFloat * (oldVoxelSize[dim] / outputSpacing[dim]);
 				caTuple[dim] = std::string( boost::lexical_cast<std::string>(catmp));
 				cpTuple[dim] = std::string( boost::lexical_cast<std::string>(cptmp));
 			}
@@ -231,13 +262,11 @@ int main(
 
 	}
 	if ( !fmri ) {
-		isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "" );
 		LOG_IF( inList.empty(), isis::DataLog, isis::error ) << "Input image is empty!";
 		inputImage = movingAdapter->makeItkImageObject<InputImageType>( inList.front() );
 	}
 
 	if ( fmri ) {
-		isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "", "functional" );
 		LOG_IF( inList.empty(), isis::DataLog, isis::error ) << "Input image is empty!";
 		fmriImage = movingAdapter->makeItkImageObject<FMRIInputType>( inList.front() );
 	}
@@ -297,32 +326,7 @@ int main(
 		deformationFieldReader->Update();
 	}
 
-	//setting up the output resolution
-	if ( resolution.number ) {
-		if ( static_cast<unsigned int> ( resolution.number ) < Dimension ) {
-			//user has specified less than 3 resolution values->sets isotrop resolution with the first typed value
-			outputSpacing.Fill( ( ( VFloat * ) resolution.vector )[0] );
-		}
 
-		if ( resolution.number >= 3 ) {
-			//user has specified at least 3 values -> sets anisotrop resolution
-			for ( unsigned int i = 0; i < 3; i++ ) {
-				outputSpacing[i] = ( ( VFloat * ) resolution.vector )[i];
-			}
-		}
-	}
-
-	if ( !resolution.number ) {
-		if ( template_filename ) {
-			outputSpacing = templateImage->GetSpacing();
-			outputSize = templateImage->GetLargestPossibleRegion().GetSize();
-		}
-
-		if ( !template_filename ) {
-			outputSpacing = inputImage->GetSpacing();
-			outputSize = inputImage->GetLargestPossibleRegion().GetSize();
-		}
-	}
 
 	if ( resolution.number && template_filename ) {
 		for ( unsigned int i = 0; i < 3; i++ ) {
