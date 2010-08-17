@@ -325,7 +325,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 		u_int16_t biggest_slice_time = 0;
 		// the geometrical dimension of the 3D image according to the slice geometry
 		// and the number of slices.
-		util::fvector4 dims(0,0,0,0);
+		util::ivector4 dims(0,0,0,0);
 		if(vImageVector.size() > 0){
 			dims[0] = VImageNColumns(vImageVector.back());
 			dims[1] = VImageNRows(vImageVector.back());
@@ -527,10 +527,16 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 
 		// have a look for the first float image -> destroy the other images
 		for( unsigned k = 0; k < nimages; k++ ) {
-			if( VPixelRepn( images[k] ) != VFloatRepn )
+		  if( (VPixelRepn( images[k] ) != VFloatRepn) || (nloaded > 0) )
 				VDestroyImage( images[k] );
 			else {
 				addChunk<VFloat>( chunks, images[k] );
+				// check indexOrigin -> calculate default value if necessary
+				if ( ! chunks.back()->hasProperty("indexOrigin")) {
+				  util::ivector4 dims = chunks.back()->sizeToVector();
+				  chunks.back()->setProperty<util::fvector4>( "indexOrigin",
+															  calculateIndexOrigin((*(chunks.back())), dims));
+				}
 				// add history informations
 				chunks.back()->join(hMap, true);
 				nloaded++;
@@ -543,6 +549,12 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 		for( unsigned k = 0; k < nimages; k++ ) {
 			if( switchHandle( images[k], chunks ) ) {
 				chunks.back()->setProperty<u_int16_t>( "sequenceNumber", nloaded );
+				// check indexOrigin -> calculate default value if necessary
+				if ( ! chunks.back()->hasProperty("indexOrigin")) {
+				  util::ivector4 dims = chunks.back()->sizeToVector();
+				  chunks.back()->setProperty<util::fvector4>( "indexOrigin",
+															  calculateIndexOrigin((*(chunks.back())),dims));
+				}
 				// add history information
 				chunks.back()->join(hMap,true);
 				nloaded++;
@@ -857,7 +869,7 @@ template <typename T> bool ImageFormat_Vista::copyImageToVista( const data::Imag
 	return true;
 }
 
-util::fvector4 ImageFormat_Vista::calculateIndexOrigin(data::Chunk &chunk, util::fvector4 &dims) {
+util::fvector4 ImageFormat_Vista::calculateIndexOrigin(data::Chunk &chunk, util::ivector4 &dims) {
 
 	// IMPORTANT: We don't use the dims from the chunks since we are not sure if
 	// if the 3rd dimension contains geometrical or time information. Hence it's
