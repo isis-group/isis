@@ -166,9 +166,11 @@ throw( std::runtime_error & )
 
 	//  write to output file
 	FILE *f;
-	LOG_IF( !( f = VOpenOutputFile( filename.c_str(), true ) ), ImageIoLog, error )
+	f = VOpenOutputFile( filename.c_str(), true );
+	LOG_IF( ! f, ImageIoLog, error )
 			<< "Error open file for writing." << util::MSubject( filename );
-	LOG_IF( !VWriteFile( f, attrList ), ImageIoLog, error )
+	bool written = VWriteFile( f, attrList );
+	LOG_IF( !written, ImageIoLog, error )
 			<< "Error writing image data.";
 
 	//  cleanup
