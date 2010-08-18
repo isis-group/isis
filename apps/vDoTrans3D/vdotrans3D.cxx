@@ -197,6 +197,7 @@ int main(
 	if ( template_filename ) {
 		tmpList = isis::data::IOFactory::load( template_filename, "" );
 		LOG_IF( tmpList.empty(), isis::DataLog, isis::error ) << "Template image is empty!";
+		templateImage = fixedAdapter->makeItkImageObject<InputImageType>( tmpList.front()  );
 	}
 
 	//setting up the output resolution
@@ -276,7 +277,7 @@ int main(
 		outputDirection = inputImage->GetDirection();
 		outputOrigin = inputImage->GetOrigin();
 	} else {
-		templateImage = fixedAdapter->makeItkImageObject<InputImageType>( tmpList.front()  );
+
 		outputDirection = templateImage->GetDirection();
 		outputOrigin = templateImage->GetOrigin();
 	}
