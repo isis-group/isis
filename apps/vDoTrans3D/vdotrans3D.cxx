@@ -225,11 +225,12 @@ int main(
 			outputSize = inputImage->GetLargestPossibleRegion().GetSize();
 		}
 	}
+	isis::data::ImageList inList;
 	if ( !fmri ) {
-		isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "" );
+		inList = isis::data::IOFactory::load( in_filename, "" );
 	}
 	if ( fmri ) {
-		isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "", "functional" );
+		inList = isis::data::IOFactory::load( in_filename, "", "functional" );
 	}
 	BOOST_FOREACH(isis::data::ImageList::reference ref, inList )
 	{

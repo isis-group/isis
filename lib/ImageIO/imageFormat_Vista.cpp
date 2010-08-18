@@ -54,6 +54,7 @@ throw( std::runtime_error & )
 	// 4D image data
 	//  when we have got a 4D-image, this image provides functional data information
 	if( dims[3] > 1 ) {
+		LOG( Runtime, warning ) << "Writing a functional vista image, so falling back to representation short!";
 		data::TypedImage<VShort> shortImage( image );
 		shortImage.spliceDownTo( data::sliceDim );
 		vimages = ( VImage * )malloc( sizeof( VImage ) * dims[2] );

@@ -107,7 +107,7 @@ def preprocess(input, tr, slicetimefile, output, fwhm, high):
 	
 	#registration
 	print "performing registration into MNI space..."
-	os.system("valign3d -ref " + MNI_BRAIN_FSL + " -in " + tmpFile + " -trans " + dir_steps + "/vpreproc.nii -prealign_m true -iter 100 10 -transform 0 2 -optimizer 0 2 -bound 4 -smooth 3 > vpreproc.tmp 2> vpreproc.tmp")
+	os.system("valign3d -ref " + MNI_BRAIN_FSL + " -in " + tmpFile + " -trans " + dir_steps + "/vpreproc.nii -prealign_m true -transform 0 2 -optimizer 0 2 -bound 10 -smooth 3 > vpreproc.tmp 2> vpreproc.tmp")
 	os.system("vdotrans3d -ref " + MNI_BRAIN_FSL + " -in " + tmpFile + " -trans " + dir_steps + "/vpreproc.nii -out " + dir_steps +  "/s4_registration.v -fmri -reso 3 > vpreproc.tmp 2> vpreproc.tmp")
 	print "creating image to check registration..."
 	os.system("vdotrans3d -ref " + MNI_BRAIN_FSL + " -in " + tmpFile + " -trans " + dir_steps + "/vpreproc.nii -out " + dir_steps + "/vpreproc_check_registration.v > vpreproc.tmp 2> vpreproc.tmp")
