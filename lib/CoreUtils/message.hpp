@@ -103,6 +103,7 @@ class DefaultMsgPrint : public _internal::MessageHandlerBase
 {
 protected:
 	static std::ostream *o;
+	std::string last;
 public:
 	DefaultMsgPrint( LogLevel level ): _internal::MessageHandlerBase( level ) {}
 	virtual ~DefaultMsgPrint() {}
