@@ -58,7 +58,6 @@ throw( std::runtime_error & )
 		LOG( Runtime, info ) << "Writing a functional vista image, so falling back to representation short!";
 		data::TypedImage<VShort> shortImage( image );
 		shortImage.spliceDownTo( data::sliceDim );
-		std::cout << "chunksize: " << shortImage.getChunkAt(1).sizeToString() << std::endl;
 		vimages = ( VImage * )malloc( sizeof( VImage ) * dims[2] );
 		nimages = dims[2];
 

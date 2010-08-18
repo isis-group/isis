@@ -50,17 +50,26 @@ int main( int argc, char **argv )
 	data::ImageList finImageList;
 	unsigned int dim = alongMap[app.parameters["along"].toString()];
 	//go through every image
+
 	BOOST_FOREACH( data::ImageList::const_reference refImage, app.images ) {
 		//map from pyhisical into image space
+		util::fvector4 sliceVec = refImage->getProperty<util::fvector4>("sliceVec");
+		util::fvector4 phaseVec = refImage->getProperty<util::fvector4>("phaseVec");
+		util::fvector4 readVec = refImage->getProperty<util::fvector4>("readVec");
+
+		util::fvector4 f1( readVec[0], phaseVec[0], sliceVec[0], 0  );
+		util::fvector4 f2( readVec[1], phaseVec[1], sliceVec[1], 0  );
+		util::fvector4 f3( readVec[2], phaseVec[2], sliceVec[2], 0  );
 		if(dim == 3) {
-			dim = getBiggestVecElem( refImage->getProperty<util::fvector4>("readVec") );
+			dim = getBiggestVecElem( f1 );
 		}
 		if(dim == 4) {
-			dim = getBiggestVecElem( refImage->getProperty<util::fvector4>("phaseVec") );
+			dim = getBiggestVecElem( f2 );
 		}
 		if(dim == 5) {
-			dim = getBiggestVecElem( refImage->getProperty<util::fvector4>("sliceVec") );
+			dim = getBiggestVecElem( f3 );
 		}
+		std::cout << dim << std::endl;
 		boost::numeric::ublas::matrix<float> T( 3, 3 );
 		T( 0, 0 ) = 1;
 		T( 0, 1 ) = 0;
