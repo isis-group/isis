@@ -32,9 +32,9 @@ namespace isis
 namespace util
 {
 
-/// @cond _hidden
 namespace _internal
 {
+/// @cond _hidden
 template<typename TYPE, typename T> TYPE __cast_to( Type<TYPE> *dest, const T &value )
 {
 	return boost::lexical_cast<TYPE>( value );
@@ -44,8 +44,6 @@ template<typename TYPE> TYPE __cast_to( Type<TYPE> *dest, const TYPE &value )
 	return value;
 }
 /// @endcond
-
-/// @cond _internal
 
 class TypeBase : public GenericType
 {
@@ -138,7 +136,6 @@ public:
 
 typedef _internal::TypeBase::Reference TypeReference;
 
-/// @endcond
 }
 }
 

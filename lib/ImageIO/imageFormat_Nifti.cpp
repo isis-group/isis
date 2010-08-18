@@ -182,7 +182,7 @@ public:
 	 * write file
 	 ************************/
 	void write( const data::Image &imageOrig, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) {
-		LOG( ImageIoDebug, isis::info ) << "Write Nifti.";
+		LOG(Debug,info) << "Writing image of size " << imageOrig.sizeToString() << " and type " << util::getTypeMap()[imageOrig.typeID()] << " as nifti";
 		boost::filesystem::path boostFilename( filename );
 		//copy of our image due to changing it by transformCoords
 		isis::data::Image image( imageOrig );
@@ -540,7 +540,7 @@ private:
 		//create space tranformation matrices - transforms the space when reading _NOT_ the data
 		// thus ni.qto_xyz describes the orientation of the scanner space in the image space, not the orientation of image in the scanner space
 		ni.sform_code = ni.qform_code = NIFTI_XFORM_SCANNER_ANAT;//set scanner aligned space from nifti1.h
-		LOG( ImageIoLog, info ) << "ReadVec " << readVec << "  phaseVec" << phaseVec << "sliceVec" << sliceVec;
+		LOG( Debug, info ) << "ReadVec " << readVec << "  phaseVec" << phaseVec << "sliceVec" << sliceVec;
 
 		for ( int y = 0; y < 3; y++ ) {
 			ni.qto_xyz.m[y][0] = readVec[y];

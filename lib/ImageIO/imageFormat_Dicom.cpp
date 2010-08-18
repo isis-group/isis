@@ -334,7 +334,6 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 		object.hasProperty( prefix + "Unknown Tag(0019,1029)" ) &&
 		object.propertyValue( prefix + "Unknown Tag(0019,1029)" ) == object.propertyValue( prefix + "CSAImageHeaderInfo/MosaicRefAcqTimes" )
 	) {
-		LOG( Debug, info ) << "Removing redundand mosaic acquisition time - tag \"0019,1029\"";
 		object.remove( prefix + "Unknown Tag(0019,1029)" );
 	}
 
@@ -397,6 +396,7 @@ void ImageFormat_Dicom::readMosaic( data::Chunk source, data::ChunkList &dest )
 											readVec[0] * phaseVec[1] - readVec[1] * phaseVec[0]
 										);
 		source.setProperty( "sliceVec", crossVec );
+		LOG(Debug,info) << "Computed sliceVec as " << source.propertyValue( "sliceVec");
 	}
 
 	const util::fvector4 sliceVec = source.getProperty<util::fvector4>( "sliceVec" ).norm() * ( voxelSize[2] + voxelGap[2] );
