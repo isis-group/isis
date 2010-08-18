@@ -96,7 +96,7 @@ static VFloat smooth = 0;
 static VBoolean use_inverse = false;
 static VFloat coarse_factor = 1;
 static VFloat bspline_bound = 100.0;
-static VBoolean verbose = true;
+static VBoolean verbose = false;
 
 
 static VOptionDescRec
@@ -395,7 +395,7 @@ int main(
 			bsplineCounter++;
 		}
 
-		std::cout << std::endl << "setting up the registration object..." << std::endl;
+
 		registrationFactory->Reset();
 
 		//check pixel density
@@ -434,7 +434,13 @@ int main(
 		}
 
 		//transform setup
-		std::cout << "used transform: " << TYPTransform[transform].keyword << std::endl;
+		if (verbose) {
+			std::cout << std::endl << "setting up the registration object..." << std::endl;
+			std::cout << "used transform: " << TYPTransform[transform].keyword << std::endl;
+			std::cout << "used metric: " << TYPMetric[metric].keyword << std::endl;
+			std::cout << "used interpolator: " << TYPInterpolator[interpolator].keyword << std::endl;		std::cout << "used optimizer: " << TYPOptimizer[optimizer].keyword << std::endl;
+			std::cout << "used optimizer: " << TYPOptimizer[optimizer].keyword << std::endl;
+		}
 
 		switch ( transform ) {
 		case 0:
@@ -456,9 +462,7 @@ int main(
 			registrationFactory->SetTransform( RegistrationFactoryType::CenteredAffineTransform );
 			break;
 		}
-
 		//metric setup
-		std::cout << "used metric: " << TYPMetric[metric].keyword << std::endl;
 
 		switch ( metric ) {
 		case 0:
@@ -476,7 +480,7 @@ int main(
 		}
 
 		//interpolator setup
-		std::cout << "used interpolator: " << TYPInterpolator[interpolator].keyword << std::endl;
+
 
 		switch ( interpolator ) {
 		case 0:
@@ -491,7 +495,7 @@ int main(
 		}
 
 		//optimizer setup
-		std::cout << "used optimizer: " << TYPOptimizer[optimizer].keyword << std::endl;
+
 
 		switch ( optimizer ) {
 		case 0:
@@ -572,14 +576,15 @@ int main(
 		registrationFactory->UserOptions.BSplineGridSize = gridSize;
 
 		if ( verbose ) {
-			registrationFactory->UserOptions.SHOWITERATIONSTATUS = true;
+			registrationFactory->UserOptions.SHOWITERATIONATSTEP = 1;
+			registrationFactory->UserOptions.PRINTRESULTS = true;
 		} else {
-			registrationFactory->UserOptions.SHOWITERATIONSTATUS = false;
+			registrationFactory->UserOptions.SHOWITERATIONATSTEP = 10;
+			registrationFactory->UserOptions.PRINTRESULTS = false;
 		}
 
 		registrationFactory->UserOptions.NumberOfThreads = number_threads;
 		registrationFactory->UserOptions.MattesMutualInitializeSeed = initial_seed;
-		registrationFactory->UserOptions.PRINTRESULTS = true;
 
 		if ( !initialize_center ) registrationFactory->UserOptions.INITIALIZECENTEROFF = true;
 

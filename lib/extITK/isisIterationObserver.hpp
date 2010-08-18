@@ -47,11 +47,14 @@ public:
 	typedef IterationObserver Self;
 	typedef itk::Command Superclass;
 	typedef itk::SmartPointer<Self> Pointer;
+	void setVerboseStep( const unsigned int &step ) { m_step = step; }
 	itkNewMacro( Self );
 
+private:
+	unsigned int m_step;
 protected:
 
-	IterationObserver() {}
+	IterationObserver() { m_step = 1; }
 
 public:
 
@@ -66,18 +69,18 @@ public:
 
 		if ( const itk::RegularStepGradientDescentOptimizer *optimizer =
 				 dynamic_cast<const itk::RegularStepGradientDescentOptimizer *> ( object ) ) {
-			std::cout << optimizer->GetCurrentIteration() << " = ";
-			std::cout << optimizer->GetValue() << " : ";
-			std::cout << optimizer->GetCurrentPosition() << std::endl;
+			if( ! (optimizer->GetCurrentIteration() % m_step) ) {
+				std::cout << "\r" << optimizer->GetCurrentIteration() << " = " << optimizer->GetValue() << " : "
+				<< optimizer->GetCurrentPosition() << "         " << std::flush;
+			}
 		}
 
 		if ( const itk::VersorRigid3DTransformOptimizer *optimizer =
 				 dynamic_cast<const itk::VersorRigid3DTransformOptimizer *> ( object ) ) {
-			std::cout << optimizer->GetCurrentIteration() << " = ";
-			std::cout << optimizer->GetValue() << " : ";
-			std::cout << optimizer->GetCurrentPosition() << std::endl;
-			//          std::cout << optimizer->GetCurrentIteration() << "\t";
-			//          std::cout << optimizer->GetValue() << std::endl;
+			if( ! (optimizer->GetCurrentIteration() % m_step) ) {
+				std::cout << "\r" << optimizer->GetCurrentIteration() << " = " << optimizer->GetValue() << " : "
+				<< optimizer->GetCurrentPosition() << "			" << std::flush;
+			}
 		}
 	}
 

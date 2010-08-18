@@ -72,7 +72,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::Reset(
 	UserOptions.INITIALIZEMASSOFF = false;
 	UserOptions.NumberOfThreads = 1;
 	UserOptions.MattesMutualInitializeSeed = 1;
-	UserOptions.SHOWITERATIONSTATUS = false;
+	UserOptions.SHOWITERATIONATSTEP = 1;
 	UserOptions.USEMASK = false;
 	UserOptions.LANDMARKINITIALIZE = false;
 	UserOptions.CoarseFactor = 1;
@@ -861,10 +861,9 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::StartRegistration
 		this->SetFixedImageMask();
 	}
 
-	if ( UserOptions.SHOWITERATIONSTATUS ) {
-		m_observer = isis::extitk::IterationObserver::New();
-		m_RegistrationObject->GetOptimizer()->AddObserver( itk::IterationEvent(), m_observer );
-	}
+	m_observer = isis::extitk::IterationObserver::New();
+	m_observer->setVerboseStep(UserOptions.SHOWITERATIONATSTEP);
+	m_RegistrationObject->GetOptimizer()->AddObserver( itk::IterationEvent(), m_observer );
 
 	try {
 		m_RegistrationObject->StartRegistration();

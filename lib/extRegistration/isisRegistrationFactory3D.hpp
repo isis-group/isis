@@ -253,7 +253,7 @@ public:
 		bool USEOTSUTHRESHOLDING; //using an otsu threshold filter to create a mask which is designed to restrict the region given to the metric
 		bool INITIALIZEMASSOFF;
 		bool INITIALIZECENTEROFF;
-		bool SHOWITERATIONSTATUS;
+		unsigned int SHOWITERATIONATSTEP;
 		bool USEMASK;
 		bool LANDMARKINITIALIZE;
 	} UserOptions;

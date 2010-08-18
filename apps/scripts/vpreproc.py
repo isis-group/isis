@@ -8,8 +8,8 @@ import logging
 
 
 global MNI_BRAIN_FSL, dir_steps, converter
-if (os.path.exists( "/usr/share/lipsia/mni_fsl.v" )):
-	MNI_BRAIN_FSL = "/usr/share/lipsia/mni_fsl.v"
+if (os.path.exists( "/usr/share/lipsia/MNI152_T1_1mm_peeled.v" )):
+	MNI_BRAIN_FSL = "/usr/share/lipsia/MNI152_T1_1mm_peeled.v"
 else:
 	MNI_BRAIN_FSL = "not found"
 dir_steps = "vpreproc_steps_" + strftime("%Y-%m-%d_%H:%M:%S")
@@ -18,7 +18,7 @@ log_file = "vpreproc_steps_" + strftime("%Y-%m-%d_%H:%M:%S") + "/log.txt"
 	
 
 def usage():
-	print "\nvpreproc is a little script that performs the preprocessing chain for vecm."
+	print "\nvpreproc is a little script which performs the preprocessing chain for vecm."
 	print "Usage:"
 	print "Needed parameters:"
 	print "(-i or --in):\n\tDenotes the input file which has to be preprocesed. Can be of file type dicom, vista or nifti."
