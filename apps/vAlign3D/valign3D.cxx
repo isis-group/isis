@@ -395,7 +395,6 @@ int main(
 			bsplineCounter++;
 		}
 
-
 		registrationFactory->Reset();
 
 		//check pixel density
@@ -434,11 +433,12 @@ int main(
 		}
 
 		//transform setup
-		if (verbose) {
+		if ( verbose ) {
 			std::cout << std::endl << "setting up the registration object..." << std::endl;
 			std::cout << "used transform: " << TYPTransform[transform].keyword << std::endl;
 			std::cout << "used metric: " << TYPMetric[metric].keyword << std::endl;
-			std::cout << "used interpolator: " << TYPInterpolator[interpolator].keyword << std::endl;		std::cout << "used optimizer: " << TYPOptimizer[optimizer].keyword << std::endl;
+			std::cout << "used interpolator: " << TYPInterpolator[interpolator].keyword << std::endl;
+			std::cout << "used optimizer: " << TYPOptimizer[optimizer].keyword << std::endl;
 			std::cout << "used optimizer: " << TYPOptimizer[optimizer].keyword << std::endl;
 		}
 
@@ -462,6 +462,7 @@ int main(
 			registrationFactory->SetTransform( RegistrationFactoryType::CenteredAffineTransform );
 			break;
 		}
+
 		//metric setup
 
 		switch ( metric ) {
@@ -481,7 +482,6 @@ int main(
 
 		//interpolator setup
 
-
 		switch ( interpolator ) {
 		case 0:
 			registrationFactory->SetInterpolator( RegistrationFactoryType::LinearInterpolator );
@@ -495,7 +495,6 @@ int main(
 		}
 
 		//optimizer setup
-
 
 		switch ( optimizer ) {
 		case 0:

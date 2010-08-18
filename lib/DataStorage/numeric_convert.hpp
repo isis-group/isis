@@ -115,7 +115,6 @@ template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &s
 		const double scale_min =
 			range_min != 0 ? domain_min / range_min :
 			std::numeric_limits<double>::max();
-
 		scale = std::min( scale_max ? scale_max : std::numeric_limits<double>::max(), scale_min ? scale_min : std::numeric_limits<double>::max() );//get the smaller scaling factor which is not zero so the bigger range will fit into his domain
 
 		if ( scale < 1 ) {

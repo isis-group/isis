@@ -265,19 +265,19 @@ public:
 		return operator=( static_cast<const Chunk &>( ref ) );
 	}
 };
-	
+
 
 template<typename TYPE> class MemChunkNonDel : public Chunk
 {
-	public:
-	// 
+public:
+	//
 	/// Create an empty MemChunkNoDel with the given size
 	MemChunkNonDel( size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 ):
-	Chunk(
-		  ( TYPE * )calloc( fourthDim *thirdDim *secondDim *firstDim, sizeof( TYPE ) ),
-		  typename TypePtr<TYPE>::NonDeleter(),
-		  firstDim, secondDim, thirdDim, fourthDim
-		  ) {}
+		Chunk(
+			( TYPE * )calloc( fourthDim *thirdDim *secondDim *firstDim, sizeof( TYPE ) ),
+			typename TypePtr<TYPE>::NonDeleter(),
+			firstDim, secondDim, thirdDim, fourthDim
+		) {}
 	/**
 	 * Create a MemChunkNoDel as copy of a given raw memory block
 	 * This chunk won't be deleted automatically - HAVE TO BE DELETED MANUALLY
@@ -290,11 +290,11 @@ template<typename TYPE> class MemChunkNonDel : public Chunk
 	 * \param fourthDim size of the resulting image
 	 */
 	MemChunkNonDel( const TYPE *const org, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 ):
-	Chunk(
-		  ( TYPE * )malloc( sizeof( TYPE )*fourthDim *thirdDim *secondDim *firstDim ),
-		  typename TypePtr<TYPE>::NonDeleter(),
-		  firstDim, secondDim, thirdDim, fourthDim
-		  ) {
+		Chunk(
+			( TYPE * )malloc( sizeof( TYPE )*fourthDim *thirdDim *secondDim *firstDim ),
+			typename TypePtr<TYPE>::NonDeleter(),
+			firstDim, secondDim, thirdDim, fourthDim
+		) {
 		asTypePtr<TYPE>().copyFromMem( org, volume() );
 	}
 	/// Create a deep copy of a given Chunk (automatic conversion will be used if datatype does not fit)
@@ -320,7 +320,7 @@ template<typename TYPE> class MemChunkNonDel : public Chunk
 	/// Create a deep copy of a given Chunk (automatic conversion will be used if datatype does not fit)
 	MemChunkNonDel &operator=( const Chunk &ref ) {
 		LOG_IF( use_count() > 1, Debug, warning )
-		<< "Not overwriting current chunk memory (which is still used by " << use_count() - 1 << " other chunk(s)).";
+				<< "Not overwriting current chunk memory (which is still used by " << use_count() - 1 << " other chunk(s)).";
 		Chunk::operator=( ref ); //copy the chunk of ref
 		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
 		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewById( TypePtr<TYPE>::staticID ) );

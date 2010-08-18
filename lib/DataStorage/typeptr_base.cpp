@@ -24,7 +24,7 @@ const TypePtrConverterMap &TypePtrBase::converters()
 const TypePtrBase::Converter &TypePtrBase::getConverterTo( unsigned short id )const
 {
 	const TypePtrConverterMap::const_iterator f1 = converters().find( typeID() );
-	LOG_IF( f1 == converters().end(),Debug,error ) << "There is no known conversion from " << util::getTypeMap()[typeID()];
+	LOG_IF( f1 == converters().end(), Debug, error ) << "There is no known conversion from " << util::getTypeMap()[typeID()];
 	const TypePtrConverterMap::mapped_type::const_iterator f2 = f1->second.find( id );
 	LOG_IF( f2 == f1->second.end(), Debug, error ) << "There is no known conversion from " << util::getTypeMap()[typeID()] << " to " << util::getTypeMap()[id];
 	return f2->second;
@@ -46,6 +46,7 @@ TypePtrBase::Reference TypePtrBase::copyToNewById( unsigned short id ) const
 TypePtrBase::Reference TypePtrBase::copyToNewById( unsigned short id, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max ) const
 {
 	const Converter &conv = getConverterTo( id );
+
 	if( conv ) {
 		boost::scoped_ptr<TypePtrBase> ret;
 		conv->generate( *this, ret, min, max );

@@ -318,9 +318,9 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer()
 			optimizerScaleVersorRigid3D[0] = 1.0;
 			optimizerScaleVersorRigid3D[1] = 1.0;
 			optimizerScaleVersorRigid3D[2] = 1.0;
-			optimizerScaleVersorRigid3D[3] = 1/1000;
-			optimizerScaleVersorRigid3D[4] = 1/1000;
-			optimizerScaleVersorRigid3D[5] = 1/1000;
+			optimizerScaleVersorRigid3D[3] = 1 / 1000;
+			optimizerScaleVersorRigid3D[4] = 1 / 1000;
+			optimizerScaleVersorRigid3D[5] = 1 / 1000;
 		}
 
 		if ( transform.SCALE ) {
@@ -862,7 +862,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::StartRegistration
 	}
 
 	m_observer = isis::extitk::IterationObserver::New();
-	m_observer->setVerboseStep(UserOptions.SHOWITERATIONATSTEP);
+	m_observer->setVerboseStep( UserOptions.SHOWITERATIONATSTEP );
 	m_RegistrationObject->GetOptimizer()->AddObserver( itk::IterationEvent(), m_observer );
 
 	try {

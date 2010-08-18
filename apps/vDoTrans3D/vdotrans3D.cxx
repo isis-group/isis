@@ -108,7 +108,6 @@ int main(
 	ENABLE_LOG( isis::DataLog, isis::util::DefaultMsgPrint, isis::error );
 	ENABLE_LOG( isis::data::Runtime, isis::util::DefaultMsgPrint, isis::error );
 
-
 	// DANGER! Kids don't try this at home! VParseCommand modifies the values of argc and argv!!!
 	if ( !VParseCommand( VNumber( options ), options, &argc, argv ) || !VIdentifyFiles( VNumber( options ), options, "in",
 			&argc, argv, 0 ) || !VIdentifyFiles( VNumber ( options ), options, "out", &argc, argv, -1 ) ) {
@@ -195,6 +194,7 @@ int main(
 	warper->SetNumberOfThreads( number_threads );
 	progress_timer time;
 	isis::data::ImageList tmpList;
+
 	//if template file is specified by the user
 	if ( template_filename ) {
 		tmpList = isis::data::IOFactory::load( template_filename, "" );
@@ -228,43 +228,47 @@ int main(
 			outputSize = inputImage->GetLargestPossibleRegion().GetSize();
 		}
 	}
+
 	isis::data::ImageList inList;
+
 	if ( !fmri ) {
 		inList = isis::data::IOFactory::load( in_filename, "" );
 	}
+
 	if ( fmri ) {
 		inList = isis::data::IOFactory::load( in_filename, "", "functional" );
 	}
-	BOOST_FOREACH(isis::data::ImageList::reference ref, inList )
-	{
-		if (tmpList.front()->hasProperty("Vista/extent")) {
-			ref->setProperty<std::string>("Vista/extent", tmpList.front()->getProperty<std::string>("Vista/extent"));
+
+	BOOST_FOREACH( isis::data::ImageList::reference ref, inList ) {
+		if ( tmpList.front()->hasProperty( "Vista/extent" ) ) {
+			ref->setProperty<std::string>( "Vista/extent", tmpList.front()->getProperty<std::string>( "Vista/extent" ) );
 		}
 
-		if (tmpList.front()->hasProperty("Vista/ca") && tmpList.front()->hasProperty("Vista/cp")) {
+		if ( tmpList.front()->hasProperty( "Vista/ca" ) && tmpList.front()->hasProperty( "Vista/cp" ) ) {
 			std::vector< std::string > caTuple;
 			std::vector< std::string > cpTuple;
-			std::string ca = tmpList.front()->getProperty<std::string>("Vista/ca");
-			std::string cp = tmpList.front()->getProperty<std::string>("Vista/cp");
-			isis::util::fvector4 oldVoxelSize = tmpList.front()->getProperty<isis::util::fvector4>("voxelSize");
+			std::string ca = tmpList.front()->getProperty<std::string>( "Vista/ca" );
+			std::string cp = tmpList.front()->getProperty<std::string>( "Vista/cp" );
+			isis::util::fvector4 oldVoxelSize = tmpList.front()->getProperty<isis::util::fvector4>( "voxelSize" );
 			boost::algorithm::split( caTuple, ca, boost::algorithm::is_any_of( " " ) );
 			boost::algorithm::split( cpTuple, cp, boost::algorithm::is_any_of( " " ) );
-			for ( size_t dim = 0; dim < 3; dim++ )
-			{
-				float caFloat = boost::lexical_cast<float>(caTuple[dim]);
-				float cpFloat = boost::lexical_cast<float>(cpTuple[dim]);
-				float catmp = caFloat * (oldVoxelSize[dim] / outputSpacing[dim]);
-				float cptmp = cpFloat * (oldVoxelSize[dim] / outputSpacing[dim]);
-				caTuple[dim] = std::string( boost::lexical_cast<std::string>(catmp));
-				cpTuple[dim] = std::string( boost::lexical_cast<std::string>(cptmp));
-			}
-			std::string newCa = caTuple[0] + std::string(" ") + caTuple[1] + std::string(" ") + caTuple[2];
-			std::string newCp = cpTuple[0] + std::string(" ") + cpTuple[1] + std::string(" ") + cpTuple[2];
-			ref->setProperty<std::string>("Vista/ca", newCa);
-			ref->setProperty<std::string>("Vista/cp", newCp);
-		}
 
+			for ( size_t dim = 0; dim < 3; dim++ ) {
+				float caFloat = boost::lexical_cast<float>( caTuple[dim] );
+				float cpFloat = boost::lexical_cast<float>( cpTuple[dim] );
+				float catmp = caFloat * ( oldVoxelSize[dim] / outputSpacing[dim] );
+				float cptmp = cpFloat * ( oldVoxelSize[dim] / outputSpacing[dim] );
+				caTuple[dim] = std::string( boost::lexical_cast<std::string>( catmp ) );
+				cpTuple[dim] = std::string( boost::lexical_cast<std::string>( cptmp ) );
+			}
+
+			std::string newCa = caTuple[0] + std::string( " " ) + caTuple[1] + std::string( " " ) + caTuple[2];
+			std::string newCp = cpTuple[0] + std::string( " " ) + cpTuple[1] + std::string( " " ) + cpTuple[2];
+			ref->setProperty<std::string>( "Vista/ca", newCa );
+			ref->setProperty<std::string>( "Vista/cp", newCp );
+		}
 	}
+
 	if ( !fmri ) {
 		LOG_IF( inList.empty(), isis::DataLog, isis::error ) << "Input image is empty!";
 		inputImage = movingAdapter->makeItkImageObject<InputImageType>( inList.front() );
@@ -279,7 +283,6 @@ int main(
 		outputDirection = inputImage->GetDirection();
 		outputOrigin = inputImage->GetOrigin();
 	} else {
-
 		outputDirection = templateImage->GetDirection();
 		outputOrigin = templateImage->GetOrigin();
 	}
@@ -329,8 +332,6 @@ int main(
 		deformationFieldReader->SetFileName( vtrans_filename );
 		deformationFieldReader->Update();
 	}
-
-
 
 	if ( resolution.number && template_filename ) {
 		for ( unsigned int i = 0; i < 3; i++ ) {
@@ -471,7 +472,7 @@ int main(
 		const unsigned int numberOfTimeSteps = fmriImage->GetLargestPossibleRegion().GetSize()[3];
 		OutputImageType::Pointer tileImage;
 		std::cout << std::endl;
-//		isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "" );
+		//      isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "" );
 		inputImage = movingAdapter->makeItkImageObject<InputImageType>( inList.front() );
 
 		for ( unsigned int timestep = 0; timestep < numberOfTimeSteps; timestep++ ) {

@@ -72,7 +72,7 @@ public:
 	 * Default constructor. Needed to initialize some private member variables.
 	 */
 	ImageFormat_Vista() : FileFormat(),
-			histPrefix("Vista/HistoryLine"){}
+		histPrefix( "Vista/HistoryLine" ) {}
 
 private:
 
@@ -309,13 +309,13 @@ private:
 
 				// read the age in years (vista) and save it in PatientAge in days (isis)
 				if( strcmp( name, "age" ) == 0 ) {
-				  uint16_t age;
-				  VGetAttrValue( &posn, NULL, VShortRepn, &age);
-				  // rounding: floor or ceil
-				  age = ((age * 365.2425) - floor(age * 365.2425)) < 0.5 ?
-					floor(age * 365.2425) : ceil(age * 365.2425);
-				  chunk.setProperty<uint16_t>("subjectAge", age);
-				  continue;
+					uint16_t age;
+					VGetAttrValue( &posn, NULL, VShortRepn, &age );
+					// rounding: floor or ceil
+					age = ( ( age * 365.2425 ) - floor( age * 365.2425 ) ) < 0.5 ?
+						  floor( age * 365.2425 ) : ceil( age * 365.2425 );
+					chunk.setProperty<uint16_t>( "subjectAge", age );
+					continue;
 				}
 
 				// traverse through attributes
@@ -440,7 +440,7 @@ private:
 		VistaChunk( VImage image, const bool functional, size_t nslices = 0 ):
 			data::Chunk( static_cast<TYPE *>( image->data ), VImageDeleter( image ),
 						 VImageNColumns( image ), VImageNRows( image ), functional ? 1 : VImageNBands( image ), functional ? VImageNBands( image ) : 1 ) {
-			copyHeaderFromVista( image, *this);
+			copyHeaderFromVista( image, *this );
 		}
 	};
 
@@ -480,7 +480,7 @@ private:
 	 * the voxel space relative to the scanner space available, the routine assumes
 	 * that the voxel space is placed with the center near the scanner iso center.
 	 */
-	util::fvector4 calculateIndexOrigin(data::Chunk &chunk, util::ivector4 &dims);
+	util::fvector4 calculateIndexOrigin( data::Chunk &chunk, util::ivector4 &dims );
 };
 
 }

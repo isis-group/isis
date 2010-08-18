@@ -182,7 +182,7 @@ public:
 	 * write file
 	 ************************/
 	void write( const data::Image &imageOrig, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) {
-		LOG(Debug,info) << "Writing image of size " << imageOrig.sizeToString() << " and type " << util::getTypeMap()[imageOrig.typeID()] << " as nifti";
+		LOG( Debug, info ) << "Writing image of size " << imageOrig.sizeToString() << " and type " << util::getTypeMap()[imageOrig.typeID()] << " as nifti";
 		boost::filesystem::path boostFilename( filename );
 		//copy of our image due to changing it by transformCoords
 		isis::data::Image image( imageOrig );
@@ -380,11 +380,11 @@ private:
 
 		if( !tr && ni.pixdim[ni.ndim] ) {
 			retChunk.setProperty<u_int16_t>( "repetitionTime", ni.pixdim[ni.ndim] );
-
 		}
-		util::fvector4 newVoxelSize = retChunk.getProperty<util::fvector4>("voxelSize");
+
+		util::fvector4 newVoxelSize = retChunk.getProperty<util::fvector4>( "voxelSize" );
 		newVoxelSize[3] = 0;
-		retChunk.setProperty<util::fvector4>("voxelSize", newVoxelSize);
+		retChunk.setProperty<util::fvector4>( "voxelSize", newVoxelSize );
 	}
 
 	util::fvector4 getVector( const nifti_image &ni, const enum vectordirection &dir ) {

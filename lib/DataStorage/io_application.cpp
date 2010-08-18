@@ -58,9 +58,11 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 		types.erase( ( unsigned short )data::TypePtr<util::ilist>::staticID );
 		types.erase( ( unsigned short )data::TypePtr<util::dlist>::staticID );
 		types.erase( ( unsigned short )data::TypePtr<util::slist>::staticID );
-		for(std::map<unsigned short, std::string>::iterator i=types.begin();i!=types.end();i++){
-			i->second.resize(i->second.find_last_not_of('*')+1);
+
+		for( std::map<unsigned short, std::string>::iterator i = types.begin(); i != types.end(); i++ ) {
+			i->second.resize( i->second.find_last_not_of( '*' ) + 1 );
 		}
+
 		parameters["repn"] = util::Selection( types );
 		parameters["repn"].needed() = false;
 		parameters["repn"].setDescription(

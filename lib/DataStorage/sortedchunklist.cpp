@@ -106,12 +106,10 @@ std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::secondaryInsert( Seco
 std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::primaryInsert( const Chunk &ch )
 {
 	LOG_IF( secondarySort.empty(), Debug, error ) << "There is no known secondary sorting left. Chunksort will fail.";
-	assert(ch.valid());
-	
+	assert( ch.valid() );
 	// compute the position of the chunk in the image space
 	// we dont have this position, but we have the position in scanner-space (indexOrigin)
 	const util::fvector4 &origin = ch.propertyValue( "indexOrigin" )->cast_to<util::fvector4>();
-
 	// and we have the transformation matrix
 	// [ readVec ]
 	// [ phaseVec]
@@ -120,21 +118,25 @@ std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::primaryInsert( const 
 	const util::fvector4 &readVec = ch.propertyValue( "readVec" )->cast_to<util::fvector4>();
 	const util::fvector4 &phaseVec = ch.propertyValue( "phaseVec" )->cast_to<util::fvector4>();
 	util::fvector4 sliceVec;
-	if(ch.hasProperty("sliceVec"))
-		sliceVec=ch.propertyValue("sliceVec")->cast_to<util::fvector4>();
-	else{
-		sliceVec = util::fvector4(
-			readVec[1] * phaseVec[2] - readVec[2] * phaseVec[1],
-			readVec[2] * phaseVec[0] - readVec[0] * phaseVec[2],
-			readVec[0] * phaseVec[1] - readVec[1] * phaseVec[0]
-		);
-	}
-	const util::fvector4 key(origin.dot(readVec),origin.dot(phaseVec),origin.dot(sliceVec),origin[3]);
-	// this is actually not the complete transform (it lacks the scaling for the voxel size), but its enough
 
+	if( ch.hasProperty( "sliceVec" ) )
+		sliceVec = ch.propertyValue( "sliceVec" )->cast_to<util::fvector4>();
+	else {
+		sliceVec = util::fvector4(
+					   readVec[1] * phaseVec[2] - readVec[2] * phaseVec[1],
+					   readVec[2] * phaseVec[0] - readVec[0] * phaseVec[2],
+					   readVec[0] * phaseVec[1] - readVec[1] * phaseVec[0]
+				   );
+	}
+
+	const util::fvector4 key( origin.dot( readVec ), origin.dot( phaseVec ), origin.dot( sliceVec ), origin[3] );
+
+	// this is actually not the complete transform (it lacks the scaling for the voxel size), but its enough
 	const scalarPropCompare &secondaryComp = secondarySort.top();
+
 	// get the reference of the secondary map for "key" (create and insert a new if neccessary)
 	SecondaryMap &subMap = chunks.insert( std::make_pair( key, SecondaryMap( secondaryComp ) ) ).first->second;
+
 	// run insert on that
 	return secondaryInsert( subMap, ch ); // insert ch into the right secondary map
 }
@@ -188,7 +190,7 @@ bool SortedChunkList::insert( const Chunk &ch )
 
 	LOG_IF( inserted.first && !inserted.second, Debug, info )
 			<< "Not inserting chunk because there is allready a Chunk at the same position (" << ch.propertyValue( "indexOrigin" ) << ") with the equal property "
-			<< std::make_pair(prop2, ch.propertyValue( prop2 ));
+			<< std::make_pair( prop2, ch.propertyValue( prop2 ) );
 
 	LOG_IF(
 		inserted.first && !inserted.second &&

@@ -396,7 +396,7 @@ void ImageFormat_Dicom::readMosaic( data::Chunk source, data::ChunkList &dest )
 											readVec[0] * phaseVec[1] - readVec[1] * phaseVec[0]
 										);
 		source.setProperty( "sliceVec", crossVec );
-		LOG(Debug,info) << "Computed sliceVec as " << source.propertyValue( "sliceVec");
+		LOG( Debug, info ) << "Computed sliceVec as " << source.propertyValue( "sliceVec" );
 	}
 
 	const util::fvector4 sliceVec = source.getProperty<util::fvector4>( "sliceVec" ).norm() * ( voxelSize[2] + voxelGap[2] );

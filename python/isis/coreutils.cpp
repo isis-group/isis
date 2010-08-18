@@ -7,7 +7,6 @@ using namespace isis::python;
 
 BOOST_PYTHON_MODULE( coreutils )
 {
-
 	//class Application
 	class_<isis::util::Application, _Application>( "Application", init<const char *>() )
 	//virtual void printHelp()const;

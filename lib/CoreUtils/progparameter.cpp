@@ -62,8 +62,9 @@ bool isis::util::ParameterMap::parse( int argc, char **argv )
 			pName = argv[i];
 			pName.erase( 0, pName.find_first_not_of( '-' ) );
 		} else {
-			LOG(Runtime,error)<< "Ignoring unexpected non-parameter " << MSubject(argv[i]);
+			LOG( Runtime, error ) << "Ignoring unexpected non-parameter " << MSubject( argv[i] );
 		}
+
 		i++;
 
 		if( !pName.empty() ) { // if we got a parameter before
