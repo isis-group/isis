@@ -337,11 +337,15 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 			dims[2] = vImageVector.size();
 			dims[3] = VImageNBands( vImageVector.back() );
 		}
-
+		std::set<util::fvector4, data::_internal::SortedChunkList::posCompare> originCheckSet;
 		//first we have to create a vista chunkList so we can get the number of slices
 		BOOST_FOREACH( std::vector<VImage>::reference sliceRef, vImageVector ) {
 			VistaChunk<VShort> vchunk( sliceRef, true );
 			vistaChunkList.push_back( vchunk );
+
+			if( vchunk.hasProperty("indexOrigin")) {
+				originCheckSet.insert( vchunk.getProperty<util::fvector4>("indexOrigin") );
+			}
 
 			if( vchunk.hasProperty( "acquisitionTime" ) && !vchunk.hasProperty( "repetition_time" ) ) {
 				float currentSliceTime = vchunk.getProperty<float>( "acquisitionTime" );
@@ -375,8 +379,8 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 			 * (value of nloaded).
 			 */
 
-			// check if indexOrigin already present
-			if( sliceRef.hasProperty( "indexOrigin" ) ) {
+			// check if indexOrigin already present AND differs from slice to slice
+			if( sliceRef.hasProperty( "indexOrigin" ) and ( originCheckSet.size() == vImageVector.size() )) {
 				ioprob = sliceRef.getProperty<util::fvector4>( "indexOrigin" );
 			}
 			// no indexOrigin present -> Calculate index origin
@@ -711,24 +715,6 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 										   << "Interpolation of slice time is not supported.";
 			}
 		}
-
-		//      // Get slice_time from acquisition time
-		//      if ( image.getChunkAt( slice ).hasProperty( "acquisitionTime" ) ) {
-		//          std::stringstream sstream;
-		//          float stime;
-		//          stime = image.getChunkAt(slice).getProperty<float>("acquisitionTime");
-		//          sstream << stime;
-		//          VAppendAttr ( list, "slice_time", NULL, VStringRepn, sstream.str().c_str());
-		//      // TODO guessing the slice order is dangerous. Maybe we should avoid it.
-		//      } else if( image.hasProperty( "repetitionTime" ) ) {
-		//          LOG(data::Runtime, warning) << "Missing acquisition time. slice time will be interpolated by repetition time. "
-		//                  << "Assuming linear slice order.";
-		//          size_t tr = image.getProperty<size_t>( "repetitionTime" );
-		//          u_int16_t sliceTime = ( tr / image.sizeToVector()[2] ) * ( slice  );
-		//          VAppendAttr( list, "slice_time", NULL, VShortRepn, sliceTime );
-		//      } else {
-		//          LOG( data::Debug, warning ) << "Missing repetition time. Interpolation of slice time is not possible.";
-		//      }
 	}
 
 	if ( image.hasProperty( "subjectGender" ) ) {
