@@ -314,7 +314,10 @@ public:
 	 * depend on correct image orientations won't work as expected. Use this method
 	 * with caution!
 	 */
-	void transformCoords( boost::numeric::ublas::matrix<float> transform );
+	void transformCoords( boost::numeric::ublas::matrix<float> transform )
+	{
+		isis::data::_internal::transformCoords(*this,transform);
+	}
 
 	/**
 	 * Copy all voxel data of the image into memory.

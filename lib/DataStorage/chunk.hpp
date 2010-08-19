@@ -190,7 +190,10 @@ public:
 	 * depend on correct image orientations won't work as expected. Use this method
 	 * with caution!
 	 */
-	void transformCoords( boost::numeric::ublas::matrix<float> transform );
+	void transformCoords( boost::numeric::ublas::matrix<float> transform )
+	{
+		isis::data::_internal::transformCoords(*this,transform);
+	}
 
 	/**
 	 * Swaps the image along a dimension dim in image space. If convertTransform is true,

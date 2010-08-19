@@ -15,6 +15,9 @@
 
 #include "CoreUtils/log_modules.hpp"
 #include "CoreUtils/log.hpp"
+#include "CoreUtils/propmap.hpp"
+
+#include <boost/numeric/ublas/matrix.hpp>
 
 namespace isis
 {
@@ -26,6 +29,12 @@ namespace isis
 
 namespace data
 {
+
+namespace _internal
+{
+	void transformCoords(isis::util::PropMap&, boost::numeric::ublas::matrix<float>);
+}
+
 typedef DataLog Runtime;
 typedef DataDebug Debug;
 enum dimensions {readDim = 0, phaseDim, sliceDim, timeDim};
