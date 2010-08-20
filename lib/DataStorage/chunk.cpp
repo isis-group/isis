@@ -109,8 +109,8 @@ void Chunk::copyLine( size_t secondDimS, size_t thirdDimS, size_t fourthDimS, Ch
 void Chunk::copySlice( size_t thirdDimS, size_t fourthDimS, Chunk &dst, size_t thirdDimD, size_t fourthDimD ) const
 {
 	const size_t idx1[] = {0, 0, thirdDimS, fourthDimS};
-	const size_t idx2[] = {0, 0, thirdDimD, fourthDimD};
-	const size_t idx3[] = {sizeToVector()[0] - 1, sizeToVector()[1] - 1, thirdDimD, fourthDimD};
+	const size_t idx2[] = {sizeToVector()[0] - 1, sizeToVector()[1] - 1, thirdDimS, fourthDimS};
+	const size_t idx3[] = {0, 0, thirdDimD, fourthDimD};
 	copyRange( idx1, idx2, dst, idx3 );
 }
 
