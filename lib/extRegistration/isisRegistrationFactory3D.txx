@@ -51,6 +51,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::Reset(
 	transform.CENTEREDAFFINE = false;
 	transform.BSPLINEDEFORMABLETRANSFORM = false;
 	transform.SCALE = false;
+	transform.RIGID3D = false;
 	metric.MATTESMUTUALINFORMATION = false;
 	metric.NORMALIZEDCORRELATION = false;
 	metric.VIOLAWELLSMUTUALINFORMATION = false;
@@ -189,6 +190,11 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetTransform(
 		m_ScaleSkewTransform = ScaleSkewVersor3DTransformType::New();
 		m_RegistrationObject->SetTransform( m_ScaleSkewTransform );
 		break;
+	case Rigid3DTransform:
+		transform.RIGID3D = true;
+		m_Rigid3DTransform = Rigid3DTransformType::New();
+		m_RegistrationObject->SetTransform( m_Rigid3DTransform );
+		break;
 	}
 }
 
@@ -248,10 +254,10 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer()
 		//setting up the regular step gradient descent optimizer...
 		RegularStepGradientDescentOptimizerType::ScalesType optimizerScaleRegularStepGradient( m_NumberOfParameters );
 
-		if ( transform.SCALE or transform.VERSORRIGID or transform.CENTEREDAFFINE or transform.AFFINE or transform.BSPLINEDEFORMABLETRANSFORM ) {
+		if ( transform.SCALE or transform.VERSORRIGID or transform.CENTEREDAFFINE or transform.AFFINE or transform.BSPLINEDEFORMABLETRANSFORM  or transform.RIGID3D) {
 			//...for the rigid transform
 			//number of parameters are dependent on the dimension of the images (2D: 4 parameter, 3D: 6 parameters)
-			if ( transform.VERSORRIGID ) {
+			if ( transform.VERSORRIGID or transform.RIGID3D ) {
 				optimizerScaleRegularStepGradient[0] = 1.0;
 				optimizerScaleRegularStepGradient[1] = 1.0;
 				optimizerScaleRegularStepGradient[2] = 1.0;
@@ -518,6 +524,10 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpTransform()
 	if ( transform.VERSORRIGID ) {
 		m_NumberOfParameters = m_VersorRigid3DTransform->GetNumberOfParameters();
 		m_RegistrationObject->SetInitialTransformParameters( m_VersorRigid3DTransform->GetParameters() );
+	}
+	if ( transform.RIGID3D ) {
+		m_NumberOfParameters = m_Rigid3DTransform->GetNumberOfParameters();
+		m_RegistrationObject->SetInitialTransformParameters( m_Rigid3DTransform->GetParameters() );
 	}
 
 	if ( transform.TRANSLATION ) {

@@ -439,7 +439,6 @@ int main(
 			std::cout << "used metric: " << TYPMetric[metric].keyword << std::endl;
 			std::cout << "used interpolator: " << TYPInterpolator[interpolator].keyword << std::endl;
 			std::cout << "used optimizer: " << TYPOptimizer[optimizer].keyword << std::endl;
-			std::cout << "used optimizer: " << TYPOptimizer[optimizer].keyword << std::endl;
 		}
 
 		switch ( transform ) {
@@ -591,7 +590,8 @@ int main(
 
 		registrationFactory->SetFixedImage( fixedImage );
 		registrationFactory->SetMovingImage( movingImage );
-		std::cout << "starting the registration..." << std::endl;
+		std::cout << std::endl;
+		std::cout << "starting the registration...(step " << counter+1 << " of " << repetition << ")" << std::endl;
 		registrationFactory->StartRegistration();
 
 		if ( use_inverse ) {

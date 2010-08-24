@@ -15,7 +15,6 @@ else:
 dir_steps = "vpreproc_steps_" + strftime("%Y-%m-%d_%H:%M:%S")
 log_file = "vpreproc_steps_" + strftime("%Y-%m-%d_%H:%M:%S") + "/log.txt"
 	
-	
 
 def usage():
 	print "\nvpreproc is a little script which performs the preprocessing chain for vecm."

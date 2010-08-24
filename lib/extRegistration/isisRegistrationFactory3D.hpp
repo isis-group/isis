@@ -36,6 +36,7 @@
 #include "itkVersorRigid3DTransform.h"
 #include "itkQuaternionRigidTransform.h"
 #include "itkCenteredEuler3DTransform.h"
+#include "itkRigid3DTransform.h"
 
 //affine:
 #include "itkAffineTransform.h"
@@ -163,6 +164,7 @@ public:
 
 	typedef itk::TranslationTransform<double, 3> TranslationTransformType;
 	typedef itk::VersorRigid3DTransform<double> VersorRigid3DTransformType;
+	typedef itk::Rigid3DTransform<double> Rigid3DTransformType;
 	typedef itk::QuaternionRigidTransform<double> QuaternionRigidTransformType;
 	typedef itk::CenteredEuler3DTransform<double> CenteredEuler3DTransformType;
 
@@ -219,7 +221,8 @@ public:
 		AffineTransform,
 		CenteredAffineTransform,
 		BSplineDeformableTransform,
-		ScaleTransform
+		ScaleTransform,
+		Rigid3DTransform
 
 	};
 
@@ -327,6 +330,7 @@ private:
 		bool CENTEREDAFFINE;
 		bool BSPLINEDEFORMABLETRANSFORM;
 		bool SCALE;
+		bool RIGID3D;
 	} transform;
 
 	struct Optimizer {
@@ -402,6 +406,7 @@ private:
 	//transform
 	TranslationTransformType::Pointer m_TranslationTransform;
 	VersorRigid3DTransformType::Pointer m_VersorRigid3DTransform;
+	Rigid3DTransformType::Pointer m_Rigid3DTransform;
 	QuaternionRigidTransformType::Pointer m_QuaternionRigidTransform;
 	CenteredEuler3DTransformType::Pointer m_CenteredEuler3DTransform;
 
