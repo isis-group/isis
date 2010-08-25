@@ -27,7 +27,7 @@ include_directories(${Boost_INCLUDE_DIR}  lib)
 OPTION(${CMAKE_PROJECT_NAME}_BUILD_APPLICATIONS "Build the isis application directory" OFF)
 
 OPTION(${CMAKE_PROJECT_NAME}_BUILD_TESTS "Build the tests" ON)
-OPTION(${CMAKE_PROJECT_NAME}_BUILD_SHARED "Build isis with shared libraries" ON)
+OPTION(${CMAKE_PROJECT_NAME}_BUILD_SHARED_LIBS "Build isis with shared libraries" ON)
 
 OPTION(${CMAKE_PROJECT_NAME}_BUILD_COREUTILS "Build the isis coreutils" ON)
 OPTION(${CMAKE_PROJECT_NAME}_BUILD_DATA_IO "Build the isis data and io modules" ON)
