@@ -27,7 +27,7 @@ include_directories(${Boost_INCLUDE_DIR}  lib)
 OPTION(${CMAKE_PROJECT_NAME}_BUILD_APPLICATIONS "Build the isis application directory" OFF)
 
 OPTION(${CMAKE_PROJECT_NAME}_BUILD_TESTS "Build the tests" ON)
-OPTION(${CMAKE_PROJECT_NAME}_BUILD_SHARED_LIBS "Build isis with shared libraries" ON)
+OPTION(BUILD_SHARED_LIBS "Build isis with shared libraries" ON)
 
 OPTION(${CMAKE_PROJECT_NAME}_BUILD_COREUTILS "Build the isis coreutils" ON)
 OPTION(${CMAKE_PROJECT_NAME}_BUILD_DATA_IO "Build the isis data and io modules" ON)
@@ -66,7 +66,7 @@ else(${CMAKE_PROJECT_NAME}_DEBUG_LOG)
 endif(${CMAKE_PROJECT_NAME}_DEBUG_LOG)
 
 #If we do a static build at least the plugins will be dynamic, so we need -fPIC
-if (NOT ${CMAKE_PROJECT_NAME}_BUILD_SHARED_LIBS)
+if (NOT BUILD_SHARED_LIBS)
 	if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
 		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC" )
 		SET(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -fPIC"  )
@@ -74,7 +74,7 @@ if (NOT ${CMAKE_PROJECT_NAME}_BUILD_SHARED_LIBS)
 	else("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
 		message(STATUS "Assuming -fPIC will not be necessary for ${CMAKE_SYSTEM_PROCESSOR}")
 	endif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
-endif(NOT ${CMAKE_PROJECT_NAME}_BUILD_SHARED_LIBS)
+endif(NOT BUILD_SHARED_LIBS)
 
 add_definitions(-DSOURCE_ROOT="${CMAKE_HOME_DIRECTORY}")
 
