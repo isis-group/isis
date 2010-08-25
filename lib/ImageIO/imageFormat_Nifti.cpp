@@ -565,6 +565,10 @@ private:
 			&ni.qoffset_x, &ni.qoffset_y, &ni.qoffset_z,
 			NULL, NULL, NULL,
 			&ni.qfac );
+		LOG(Debug,info) << "ni.qto_xyz:" << util::list2string(ni.qto_xyz.m[0],ni.qto_xyz.m[0]+3);
+		LOG(Debug,info) << "ni.qto_xyz:" << util::list2string(ni.qto_xyz.m[1],ni.qto_xyz.m[1]+3);
+		LOG(Debug,info) << "ni.qto_xyz:" << util::list2string(ni.qto_xyz.m[2],ni.qto_xyz.m[2]+3);
+		LOG(Debug,info) << "ni.qfac:" << ni.qfac;
 	}
 
 

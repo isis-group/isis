@@ -189,13 +189,13 @@ void ImageFormat_Dicom::parseScalar( DcmElement *elem, const std::string &name, 
 	case EVR_FL: {
 		Float32 buff;
 		elem->getFloat32( buff );
-		map.propertyValue( name ) = buff; //if Float32 is float its fine, if not we will get an linker error here
+		map.propertyValue( name ) = buff; //if Float32 is float its fine, if not we will get an compiler error here
 	}
 	break;
 	case EVR_FD: {
 		Float64 buff;
 		elem->getFloat64( buff );
-		map.propertyValue( name ) = buff; //if Float64 is double its fine, if not we will get an linker error here
+		map.propertyValue( name ) = buff; //if Float64 is double its fine, if not we will get an compiler error here
 	}
 	break;
 	case EVR_DS: { //Decimal String (can be floating point)
@@ -206,30 +206,30 @@ void ImageFormat_Dicom::parseScalar( DcmElement *elem, const std::string &name, 
 	case EVR_SL: { //signed long
 		Sint32 buff;
 		elem->getSint32( buff );
-		map.propertyValue( name ) = buff;
+		map.setProperty<int32_t>( name, buff);//seems like Sint32 is not allways int32_t, so enforce it
 	}
 	break;
 	case EVR_SS: { //signed short
 		Sint16 buff;
 		elem->getSint16( buff );
-		map.propertyValue( name ) = buff;
+		map.setProperty<int16_t>( name, buff);
 	}
 	break;
 	case EVR_UL: { //unsigned long
 		Uint32 buff;
 		elem->getUint32( buff );
-		map.propertyValue( name ) = buff;
+		map.setProperty<uint32_t>( name, buff);
 	}
 	break;
 	case EVR_US: { //unsigned short
 		Uint16 buff;
 		elem->getUint16( buff );
-		map.propertyValue( name ) = buff;
+		map.setProperty<uint16_t>( name, buff);
 	}
 	break;
 	case EVR_IS: { //integer string
 		elem->getOFString( buff, 0 );
-		map.propertyValue( name ) = boost::lexical_cast<int32_t>( buff );
+		map.setProperty( name, boost::lexical_cast<int32_t>( buff ));
 	}
 	break;
 	case EVR_AE: //Application Entity (string)

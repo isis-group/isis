@@ -22,6 +22,8 @@ namespace test
 /* create an image */
 BOOST_AUTO_TEST_CASE ( image_init_test )
 {
+	data::ImageList list;
+	list.push_back(boost::shared_ptr<data::Image>());
 	{
 		data::MemChunk<float> ch( 4, 4 );
 		data::Image img;
