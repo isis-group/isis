@@ -66,7 +66,7 @@ bool IOFactory::registerFormat( const FileFormatPtr plugin )
 	LOG( Runtime, info )
 			<< "Registering " << ( plugin->tainted() ? "tainted " : "" ) << "io-plugin "
 			<< util::MSubject( plugin->name() )
-			<< " with " << suffixes.size() << " supported suffixes";
+			<< " with supported suffixes " << suffixes;
 	BOOST_FOREACH( std::string & it, suffixes ) {
 		io_suffix[it].push_back( plugin );
 	}
@@ -208,10 +208,12 @@ IOFactory::FileFormatList IOFactory::getFormatInterface( std::string filename, s
 	} else ext = suffix_override;
 
 	if ( ext.empty() ) {
+		LOG(Runtime,warning) << "No suffix detected or given. Wont find any IO plugin.";
 		return FileFormatList();
 	}
 
-	if ( true == dialect.empty() ) {//return whole list of plugins for this file extension
+	if ( dialect.empty() ) {//return whole list of plugins for this file extension
+		LOG(Runtime,info) << "No dialect given. Trying all " << io_suffix[ext].size() << " plugins";
 		return io_suffix[ext];
 	}
 

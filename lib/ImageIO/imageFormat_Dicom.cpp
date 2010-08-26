@@ -177,7 +177,7 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 	transformOrTell<u_int16_t>  ( prefix + "PatientsAge",     "subjectAge",     object, warning );
 	transformOrTell<std::string>( prefix + "SeriesDescription", "sequenceDescription", object, warning );
 	transformOrTell<std::string>( prefix + "PatientsName",     "subjectName",        object, warning );
-	transformOrTell<date>       ( prefix + "PatientsBirthDate", "subjectBirth",       object, warning );
+	transformOrTell<date>       ( prefix + "PatientsBirthDate", "subjectBirth",       object, info );
 	transformOrTell<u_int16_t>  ( prefix + "PatientsWeight",   "subjectWeigth",      object, warning );
 	// compute voxelSize and gap
 	{
