@@ -189,18 +189,18 @@ void ImageFormat_Dicom::parseScalar( DcmElement *elem, const std::string &name, 
 	case EVR_FL: {
 		Float32 buff;
 		elem->getFloat32( buff );
-		map.propertyValue( name ) = buff; //if Float32 is float its fine, if not we will get an compiler error here
+		map.setProperty<float>( name, buff); //if Float32 is float its fine, if not we will get an compiler error here
 	}
 	break;
 	case EVR_FD: {
 		Float64 buff;
 		elem->getFloat64( buff );
-		map.propertyValue( name ) = buff; //if Float64 is double its fine, if not we will get an compiler error here
+		map.setProperty<double>( name, buff); //if Float64 is double its fine, if not we will get an compiler error here
 	}
 	break;
 	case EVR_DS: { //Decimal String (can be floating point)
 		elem->getOFString( buff, 0 );
-		map.propertyValue( name ) = boost::lexical_cast<double>( buff );
+		map.setProperty<double>( name, boost::lexical_cast<double>( buff ));
 	}
 	break;
 	case EVR_SL: { //signed long
@@ -229,7 +229,7 @@ void ImageFormat_Dicom::parseScalar( DcmElement *elem, const std::string &name, 
 	break;
 	case EVR_IS: { //integer string
 		elem->getOFString( buff, 0 );
-		map.setProperty( name, boost::lexical_cast<int32_t>( buff ));
+		map.setProperty<int32_t>( name, boost::lexical_cast<int32_t>( buff ));
 	}
 	break;
 	case EVR_AE: //Application Entity (string)
@@ -242,7 +242,7 @@ void ImageFormat_Dicom::parseScalar( DcmElement *elem, const std::string &name, 
 	case EVR_UI: //Unique Identifier [0-9\.]
 	case EVR_PN: { //Person Name
 		elem->getOFString( buff, 0 );
-		map.propertyValue( name ) = boost::lexical_cast<std::string>( buff );
+		map.setProperty<std::string>( name, boost::lexical_cast<std::string>( buff ));
 	}
 	break;
 	default: {
