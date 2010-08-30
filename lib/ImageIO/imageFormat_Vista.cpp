@@ -623,6 +623,12 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 	// POLICY: copy all mandatory attributes
 	// get voxel
 	util::fvector4 voxels = image.getProperty<util::fvector4>( "voxelSize" );
+	util::fvector4 vGap = image.getProperty<util::fvector4>( "voxelGap" );
+	const float inf = std::numeric_limits<float>::infinity();
+	// if vGap is valid the add it to the voxel resultion.
+	if(vGap[0] != inf && vGap[1] != inf && vGap[2] && vGap[3] != inf) {
+	  voxels = voxels + vGap;
+	}
 	std::stringstream vstr;
 	vstr << voxels[0] << " " << voxels[1] << " " << voxels[2];
 	VAppendAttr( list, "voxel", NULL, VStringRepn, vstr.str().c_str() );
