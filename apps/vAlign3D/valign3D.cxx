@@ -20,6 +20,7 @@
  *
  *****************************************************************/
 
+//#include "preproc.hpp"
 
 #include <itkWarpImageFilter.h>
 #include <itkImageMaskSpatialObject.h>
@@ -37,6 +38,10 @@
 #include <itkMedianImageFilter.h>
 #include <itkDiscreteGaussianImageFilter.h>
 #include <itkRecursiveGaussianImageFilter.h>
+
+#include "itkRescaleIntensityImageFilter.h"
+#include "itkSigmoidImageFilter.h"
+#include "itkOtsuThresholdImageCalculator.h"
 
 #include <fstream>
 #include <boost/algorithm/string.hpp>
@@ -225,7 +230,13 @@ int main(
 	typedef itk::MedianImageFilter<FixedImageType, FixedImageType> FixedFilterType;
 	typedef itk::MedianImageFilter<MovingImageType, MovingImageType> MovingFilterType;
 	typedef itk::RecursiveGaussianImageFilter<FixedImageType, FixedImageType> GaussianFilterType;
-	//  typedef isis::extitk::TimeStepExtractionFilter<>
+	typedef itk::RescaleIntensityImageFilter<FixedImageType, FixedImageType> FixedIntensityFilterType;
+	typedef itk::RescaleIntensityImageFilter<MovingImageType, MovingImageType> MovingIntensityFilterType;
+	typedef itk::SigmoidImageFilter<FixedImageType, FixedImageType> FixedSigmoidFilterType;
+	typedef itk::SigmoidImageFilter<MovingImageType, MovingImageType> MovingSigmoidFilterType;
+	typedef itk::OtsuThresholdImageCalculator<FixedImageType> FixedOtsuCalcType;
+	typedef itk::OtsuThresholdImageCalculator<MovingImageType> MovingOtsuCalcType;
+
 	MaskImageReaderType::Pointer maskReader = MaskImageReaderType::New();
 	itk::AffineTransform<double, Dimension>::Pointer tmpTransform = itk::AffineTransform<double, Dimension>::New();
 	itk::TransformFileWriter::Pointer transformWriter = itk::TransformFileWriter::New();
@@ -240,44 +251,63 @@ int main(
 	tmpConstTransformPointer = 0;
 	isis::adapter::itkAdapter *fixedAdapter = new isis::adapter::itkAdapter;
 	isis::adapter::itkAdapter *movingAdapter = new isis::adapter::itkAdapter;
+	FixedIntensityFilterType::Pointer fixedRescaleFilter = FixedIntensityFilterType::New();
+	MovingIntensityFilterType::Pointer movingRescaleFilter = MovingIntensityFilterType::New();
+	FixedSigmoidFilterType::Pointer fixedSigmoidFilter = FixedSigmoidFilterType::New();
+	MovingSigmoidFilterType::Pointer movingSigmoidFilter = MovingSigmoidFilterType::New();
+	FixedOtsuCalcType::Pointer fixedOtsuCalc = FixedOtsuCalcType::New();
+	MovingOtsuCalcType::Pointer movingOtsuCalc = MovingOtsuCalcType::New();
+
 	isis::data::ImageList refList = isis::data::IOFactory::load( ref_filename, "", "" );
 	isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "", "" );
 	LOG_IF( refList.empty(), isis::data::Runtime, isis::error ) << "Reference image is empty!";
 	LOG_IF( inList.empty(), isis::data::Runtime, isis::error ) << "Input image is empty!";
 
-	// use makeItkImageObject with "false" -> no ITK nifti default transformation
 	if ( !smooth ) {
-		fixedImage = fixedAdapter->makeItkImageObject<FixedImageType>( refList.front() );
-		movingImage = movingAdapter->makeItkImageObject<MovingImageType>( inList.front() );
-		//      writer->SetFileName("test.nii");
-		//      writer->SetInput(movingImage);
-		//      writer->Update();
-		//      // TODO DEBUG
-		//      std::cout << "********** Fixed Image **********" << std::endl;
-		//      std::cout << fixedImage->GetDirection();
-		//      std::cout << "index origin: ";
-		//      std::cout << fixedImage->GetOrigin() << std::endl;
-		//
-		//      FixedImageType::PointType fpoint;
-		//      FixedImageType::SizeType fsize = fixedImage->GetLargestPossibleRegion().GetSize();
-		//      FixedImageType::IndexType findex = {{fsize[0],fsize[1],fsize[2]}};
-		//      fixedImage->TransformIndexToPhysicalPoint(findex,fpoint);
-		//      std::cout << "diagonal point:" << fpoint << std::endl;
-		//      std::cout << "size: " << fsize << std::endl;
-		//      std::cout << "spacing: " << fixedImage->GetSpacing() << std::endl << std::endl;
-		//
-		//      std::cout << "********** Moving Image **********" << std::endl;
-		//      std::cout << movingImage->GetDirection();
-		//      std::cout << "index origin: ";
-		//      std::cout << movingImage->GetOrigin() << std::endl;
-		//
-		//      MovingImageType::PointType mpoint;
-		//      FixedImageType::SizeType msize = movingImage->GetLargestPossibleRegion().GetSize();
-		//      FixedImageType::IndexType mindex = {{msize[0],msize[1],msize[2]}};
-		//      movingImage->TransformIndexToPhysicalPoint(mindex,mpoint);
-		//      std::cout << "diagonal point:" << mpoint << std::endl;
-		//      std::cout << "size: " << msize << std::endl;
-		//      std::cout << "spacing: " << movingImage->GetSpacing() << std::endl;
+		fixedRescaleFilter->SetInput( fixedAdapter->makeItkImageObject<FixedImageType>( refList.front() ));
+		movingRescaleFilter->SetInput( movingAdapter->makeItkImageObject<MovingImageType>( inList.front() ));
+
+		movingRescaleFilter->SetOutputMinimum( -itk::NumericTraits<uint16_t>::max() * 9 );
+		movingRescaleFilter->SetOutputMaximum( itk::NumericTraits<uint16_t>::max() * 9 );
+
+		fixedRescaleFilter->SetOutputMinimum( -itk::NumericTraits<uint16_t>::max() * 9 );
+		fixedRescaleFilter->SetOutputMaximum( itk::NumericTraits<uint16_t>::max() * 9 );
+
+		movingRescaleFilter->Update();
+		fixedRescaleFilter->Update();
+		fixedImage = fixedRescaleFilter->GetOutput();
+		movingImage = movingRescaleFilter->GetOutput();
+//		isis::registration::_internal::filterFrequencyDomain<FixedImageType>( fixedImage );
+//		isis::registration::_internal::filterFrequencyDomain<MovingImageType>( movingImage );
+		writer->SetFileName("test.nii");
+		writer->SetInput(movingImage);
+		writer->Update();
+//		      // TODO DEBUG
+//		      std::cout << "********** Fixed Image **********" << std::endl;
+//		      std::cout << fixedImage->GetDirection();
+//		      std::cout << "index origin: ";
+//		      std::cout << fixedImage->GetOrigin() << std::endl;
+//
+//		      FixedImageType::PointType fpoint;
+//		      FixedImageType::SizeType fsize = fixedImage->GetLargestPossibleRegion().GetSize();
+//		      FixedImageType::IndexType findex = {{fsize[0],fsize[1],fsize[2]}};
+//		      fixedImage->TransformIndexToPhysicalPoint(findex,fpoint);
+//		      std::cout << "diagonal point:" << fpoint << std::endl;
+//		      std::cout << "size: " << fsize << std::endl;
+//		      std::cout << "spacing: " << fixedImage->GetSpacing() << std::endl << std::endl;
+//
+//		      std::cout << "********** Moving Image **********" << std::endl;
+//		      std::cout << movingImage->GetDirection();
+//		      std::cout << "index origin: ";
+//		      std::cout << movingImage->GetOrigin() << std::endl;
+//
+//		      MovingImageType::PointType mpoint;
+//		      FixedImageType::SizeType msize = movingImage->GetLargestPossibleRegion().GetSize();
+//		      FixedImageType::IndexType mindex = {{msize[0],msize[1],msize[2]}};
+//		      movingImage->TransformIndexToPhysicalPoint(mindex,mpoint);
+//		      std::cout << "diagonal point:" << mpoint << std::endl;
+//		      std::cout << "size: " << msize << std::endl;
+//		      std::cout << "spacing: " << movingImage->GetSpacing() << std::endl;
 	}
 
 	if ( smooth ) {
@@ -525,6 +555,8 @@ int main(
 		}
 
 		if ( counter != 0 ) {
+			initialize_mass = false;
+			initialize_center = false;
 			registrationFactory->UserOptions.INITIALIZECENTEROFF = true;
 			registrationFactory->UserOptions.INITIALIZEMASSOFF = true;
 			registrationFactory->SetInitialTransform( const_cast<TransformBasePointerType> ( tmpConstTransformPointer ) );
@@ -616,7 +648,7 @@ int main(
 	}
 
 	if ( vout_filename ) {
-		std::cout << "creating vector deformation field..." << std::endl;
+		std::cout << std::endl << "creating vector deformation field..." << std::endl;
 		vectorWriter->SetInput( registrationFactory->GetTransformVectorField() );
 		vectorWriter->SetFileName( vout_filename );
 		vectorWriter->Update();

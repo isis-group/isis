@@ -1,5 +1,7 @@
 
 #include "CoreUtils/application.hpp"
+#include "CoreUtils/progparameter.hpp"
+#include <boost/python.hpp>
 
 using namespace isis::util;
 
@@ -27,17 +29,30 @@ public:
 		return Application::init( argc, argv, exitOnError );
 	}
 
-	void addParameter( std::string name, std::string value ) {
-		this->parameters[name] = value;
+	void addParameter( const std::string name, PyObject* value, std::string type )
+	{
+		if(PyFloat_Check( value )) {
+			internAddParameter<float>( name, value, type);
+		} else if(PyBool_Check( value )) {
+			internAddParameter<bool>( name, value, type);
+		} else if(PyInt_Check( value )) {
+			internAddParameter<int64_t>( name, value, type);
+		} else {
+			internAddParameter<std::string>( name, value, type);
+		}
 	}
-	std::string getParameterValue( std::string name ) {
-		return this->parameters.operator [](name);
-	}
-
-
-
 private:
 	PyObject *self;
+	template<typename TYPE>
+	void internAddParameter ( const std::string name, PyObject* value, std::string type ) {
+
+//		data::TypePtr<TYPE> val = static_cast<TYPE>( boost::python::extract<TYPE>( value ) );
+//		val.copyToNewByID( getTransposedTypeMap(true, true)[type] );
+
+//		parameters[name] = val;
+
+//		std::cout << val << std::endl;
+	}
 
 };
 }

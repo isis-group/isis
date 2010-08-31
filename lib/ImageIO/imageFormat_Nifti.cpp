@@ -126,8 +126,10 @@ public:
 		float scale = ni->scl_slope ? ni->scl_slope : 1.0;
 
 		// TODO: at the moment scaling not supported due to data type changes
-		if ( 1.0 != scale )
-			throwGenericError( std::string( "Scaling is not supported at the moment. Scale Factor: " ) + util::Type<float>( scale ).toString() );
+		if ( 1.0 != scale ) {
+//			throwGenericError( std::string( "Scaling is not supported at the moment. Scale Factor: " ) + util::Type<float>( scale ).toString() );
+			LOG( ImageIoDebug, warning ) << "Scaling is not supported at the moment. Scale Factor: "  + util::Type<float>( scale ).toString();
+		}
 
 		LOG( ImageIoDebug, isis::info ) << "datatype to load from nifti " << ni->datatype;
 		boost::shared_ptr<data::Chunk> retChunk;

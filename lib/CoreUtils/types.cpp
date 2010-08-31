@@ -17,6 +17,7 @@
 #include "types.hpp"
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/mpl/for_each.hpp>
+#include <boost/foreach.hpp>
 
 namespace isis
 {
@@ -85,6 +86,18 @@ std::map< unsigned short, std::string > getTypeMap( bool withTypes, bool withTyp
 {
 	std::map< unsigned short, std::string > ret;
 	boost::mpl::for_each<_internal::types>( _internal::type_lister( ret, withTypes, withTypePtrs ) );
+	return ret;
+}
+
+std::map< std::string, unsigned short > getTransposedTypeMap( bool withTypes, bool withTypePtrs )
+{
+	typedef std::map< std::string, unsigned short> transposedMapType;
+	typedef std::map< unsigned short, std::string > mapType;
+	transposedMapType ret;
+	BOOST_FOREACH( mapType::const_reference ref, util::getTypeMap( withTypes, withTypePtrs ) )
+	{
+		ret[ref.second] = ref.first;
+	}
 	return ret;
 }
 

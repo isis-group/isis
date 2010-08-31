@@ -372,11 +372,11 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer()
 		m_LBFGSBOptimizer->SetBoundSelection( boundSelect );
 		m_LBFGSBOptimizer->SetLowerBound( lowerBound );
 		m_LBFGSBOptimizer->SetUpperBound( upperBound );
-		m_LBFGSBOptimizer->SetCostFunctionConvergenceFactor( 1.e+1 );
-		m_LBFGSBOptimizer->SetProjectedGradientTolerance( 1e-9 );
+		m_LBFGSBOptimizer->SetCostFunctionConvergenceFactor( 1.0 );
+		m_LBFGSBOptimizer->SetProjectedGradientTolerance( 1e-12 );
 		m_LBFGSBOptimizer->SetMaximumNumberOfIterations( UserOptions.NumberOfIterations );
-		m_LBFGSBOptimizer->SetMaximumNumberOfEvaluations( 500 );
-		m_LBFGSBOptimizer->SetMaximumNumberOfCorrections( 24 );
+		m_LBFGSBOptimizer->SetMaximumNumberOfEvaluations( 5000 );
+		m_LBFGSBOptimizer->SetMaximumNumberOfCorrections( 240 );
 
 		if ( metric.MEANSQUARE or metric.MATTESMUTUALINFORMATION or metric.VIOLAWELLSMUTUALINFORMATION or metric.MUTUALINFORMATIONHISTOGRAM ) {
 			m_LBFGSBOptimizer->MinimizeOn();

@@ -21,7 +21,6 @@ BOOST_PYTHON_MODULE( coreutils )
 		//virtual bool init( int argc, char **argv, bool exitOnError = true );
 		.def( "init", &_Application::init )
 		.def( "addParameter", &_Application::addParameter)
-		.def( "getParameterValue", &_Application::getParameterValue)
 	;
 
 //#######################################################################################

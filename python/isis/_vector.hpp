@@ -8,6 +8,7 @@ namespace isis
 namespace python
 {
 
+
 // helper class vector
 template<class T>
 class _Vector4 : public vector4<T>
@@ -21,6 +22,7 @@ public:
 	_Vector4( PyObject *p, const vector4<T> &v)
 		: vector4<T>( v ), self( p ) {}
 
+
 	void setItem( size_t elem, const T &value) {
 		this->operator [](elem) = value;
 	}
@@ -29,8 +31,11 @@ public:
 		return this->operator [](elem);
 	}
 
+
+
 private:
 	PyObject* self;
+
 };
 
 }
