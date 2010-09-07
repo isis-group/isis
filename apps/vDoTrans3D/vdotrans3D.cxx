@@ -474,7 +474,13 @@ int main(
 		std::cout << std::endl;
 		//      isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "" );
 		inputImage = movingAdapter->makeItkImageObject<InputImageType>( inList.front() );
-
+		FMRIOutputType::DirectionType direction4D;
+		for (size_t i = 0; i < 3; i++) {
+			for (size_t j = 0; j < 3; j++) {
+				direction4D[i][j] = fmriOutputDirection[i][j];
+			}
+		}
+		direction4D[3][3] = 1;
 		for ( unsigned int timestep = 0; timestep < numberOfTimeSteps; timestep++ ) {
 			std::cout << "Resampling timestep: " << timestep << "...\r" << std::flush;
 			timeStepExtractionFilter->SetRequestedTimeStep( timestep );
@@ -488,7 +494,6 @@ int main(
 				resampler->Update();
 				tileImage = resampler->GetOutput();
 			}
-
 			if ( vtrans_filename ) {
 				warper->SetInput( tmpImage );
 				warper->Update();
@@ -501,6 +506,7 @@ int main(
 		}
 
 		tileImageFilter->SetLayout( layout );
+		tileImageFilter->GetOutput()->SetDirection( direction4D );
 		tileImageFilter->Update();
 		isis::data::ImageList imgList = movingAdapter->makeIsisImageObject<FMRIOutputType>( tileImageFilter->GetOutput() );
 		isis::data::IOFactory::write( imgList, out_filename, "" , "" );
