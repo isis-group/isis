@@ -60,7 +60,6 @@ throw( std::runtime_error & )
 		shortImage.spliceDownTo( data::sliceDim );
 		vimages = ( VImage * )malloc( sizeof( VImage ) * dims[2] );
 		nimages = dims[2];
-
 		for( int z = 0; z < dims[2]; z++ ) {
 			vimages[z] = VCreateImage( dims[3], dims[1], dims[0], VShortRepn );
 
@@ -649,7 +648,12 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 	vstr << sliceVec[0] << " " << sliceVec[1] << " " << sliceVec[2];
 	VAppendAttr( list, "sliceVec", NULL, VStringRepn, vstr.str().c_str() );
 	// index origin
-	util::fvector4 indexOrigin = image.getChunk( 0, 0, slice, 0 ).getProperty<util::fvector4>( "indexOrigin" );
+	util::fvector4 indexOrigin;
+	if( functional ) {
+		indexOrigin = image.getChunk( 0, 0, slice, 0 ).getProperty<util::fvector4>( "indexOrigin" );
+	} else {
+		indexOrigin = image.getProperty<util::fvector4>( "indexOrigin" );
+	}
 	vstr.str( "" );
 	vstr << indexOrigin[0] << " " << indexOrigin[1] << " " << indexOrigin[2];
 	VAppendAttr( list, "indexOrigin", NULL, VStringRepn, vstr.str().c_str() );
