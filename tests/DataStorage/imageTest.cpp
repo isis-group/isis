@@ -131,7 +131,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 
 		nrRows = 212;
 		nrCols = 2;
-		nrTimesteps = 17;
+		nrTimesteps = 2;
 		nrSlices = 1;
 		for( int t = 0; t < nrTimesteps; t++ ) {
 			for( int s = 0; s < nrSlices; s++ ){
