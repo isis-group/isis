@@ -92,10 +92,87 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 			img.insertChunk( ch );
 		}
 
+		std::string str = "testString";
+		img.setProperty<std::string>("testProp", str);
+		BOOST_CHECK_EQUAL( img.getProperty<std::string>("testProp"), str );
 		boost::shared_ptr<data::Chunk> ptr = img.getChunkList().back();
 		//as all other chunks where timestep < 4 this must be at the end
 		BOOST_CHECK_EQUAL( ptr->propertyValue( "indexOrigin" ), util::fvector4( 0, 0, 2 ) );
 		BOOST_CHECK_EQUAL( ptr->propertyValue( "acquisitionNumber" ), 5  );
+
+
+		// Check all dimensions
+		data::Image img2;
+
+		uint nrRows = 12;
+		uint nrCols = 32;
+		uint nrTimesteps = 17;
+		uint nrSlices = 27;
+		for( int t = 0; t < nrTimesteps; t++ ) {
+			for( int s = 0; s < nrSlices; s++ ){
+				data::Chunk ch = data::MemChunk<float>( nrCols, nrRows );
+				ch.setProperty( "indexOrigin", util::fvector4( 0, 0, s) );
+				ch.setProperty<uint32_t>( "acquisitionNumber", s+t*nrSlices );
+				ch.setProperty<uint32_t>( "acquisitionTime", s+t*nrSlices );
+				ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
+				ch.setProperty( "readVec", util::fvector4( 1, 0 ) );
+				ch.setProperty( "phaseVec", util::fvector4( 0, 1 ) );
+				img2.insertChunk( ch );
+			}
+		}
+
+		BOOST_REQUIRE(img2.reIndex());
+		BOOST_CHECK_EQUAL(img2.volume(), nrRows*nrCols*nrTimesteps*nrSlices);
+		BOOST_CHECK_EQUAL(img2.sizeToVector(), util::ivector4(nrCols, nrRows, nrSlices, nrTimesteps));
+
+
+		// Check all dimensions with limit sizes
+		data::Image img3;
+
+		nrRows = 212;
+		nrCols = 2;
+		nrTimesteps = 17;
+		nrSlices = 1;
+		for( int t = 0; t < nrTimesteps; t++ ) {
+			for( int s = 0; s < nrSlices; s++ ){
+				data::Chunk ch = data::MemChunk<float>( nrCols, nrRows );
+				ch.setProperty( "indexOrigin", util::fvector4( 0, 0, s) );
+				ch.setProperty<uint32_t>( "acquisitionNumber", s+t*nrSlices );
+				ch.setProperty<uint32_t>( "acquisitionTime", s+t*nrSlices );
+				ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
+				ch.setProperty( "readVec", util::fvector4( 1, 0 ) );
+				ch.setProperty( "phaseVec", util::fvector4( 0, 1 ) );
+				img3.insertChunk( ch );
+			}
+		}
+
+		BOOST_REQUIRE(img3.reIndex());
+		BOOST_CHECK_EQUAL(img3.volume(), nrRows*nrCols*nrTimesteps*nrSlices);
+		BOOST_CHECK_EQUAL(img3.sizeToVector(), util::ivector4(nrCols, nrRows, nrSlices, nrTimesteps));
+
+		data::Image img4;
+
+		nrRows = 54;
+		nrCols = 29;
+		nrTimesteps = 1;
+		nrSlices = 21;
+		for( int t = 0; t < nrTimesteps; t++ ) {
+			for( int s = 0; s < nrSlices; s++ ){
+				data::Chunk ch = data::MemChunk<float>( nrCols, nrRows );
+				ch.setProperty( "indexOrigin", util::fvector4( 0, 0, s, 0 ) );
+				ch.setProperty<uint32_t>( "acquisitionNumber", s+t*nrSlices );
+				ch.setProperty<uint32_t>( "acquisitionTime", s+t*nrSlices );
+				ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
+				ch.setProperty( "readVec", util::fvector4( 1, 0 ) );
+				ch.setProperty( "phaseVec", util::fvector4( 0, 1 ) );
+				img4.insertChunk( ch );
+			}
+		}
+
+		BOOST_REQUIRE(img4.reIndex());
+		BOOST_CHECK_EQUAL(img4.volume(), nrRows*nrCols*nrTimesteps*nrSlices);
+		BOOST_CHECK_EQUAL(img4.sizeToVector(), util::ivector4(nrCols, nrRows, nrSlices, nrTimesteps));
+
 	}
 }
 
@@ -443,7 +520,7 @@ BOOST_AUTO_TEST_CASE ( image_transformCoords_test )
 
 BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
 {
-	unsigned int nrX = 64;
+	unsigned int nrX = 45;
 	unsigned int nrY = 64;
 	unsigned int nrS = 20;
 	unsigned int nrT = 20;
@@ -480,7 +557,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
 		for ( unsigned int iy = 0; iy < nrY; iy++ ) {
 			for ( unsigned int is = 0; is < nrS; is++ ) {
 				for ( unsigned int it = 0; it < nrT; it++ ) {
-					img.voxel<float>( ix, iy, is, it ) = rand();
+					img.voxel<float>( ix, iy, is, it ) = ix+iy+is+it;
 				}
 			}
 		}
@@ -505,6 +582,20 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
 			}
 		}
 	}
+
+
+	data::MemChunk<float> chSlice(nrX, nrY);
+	img.getChunk(0,0,12,8,false).copySlice(0,0,chSlice,0,0);
+
+	float * pValues = ((boost::shared_ptr<float>) chSlice.getTypePtr<float>()).get();
+	float *pRun = pValues;
+	for ( unsigned int iy = 0; iy < nrY; iy++ ) {
+			for ( unsigned int ix = 0; ix < nrX; ix++ ) {
+				BOOST_CHECK_EQUAL(static_cast<float>(20+ix+iy), chSlice.voxel<float>(ix,iy));
+				BOOST_CHECK_EQUAL(static_cast<float>(20+ix+iy), *pRun++);
+
+			}
+		}
 }
 
 BOOST_AUTO_TEST_CASE ( image_splice_test )
