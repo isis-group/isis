@@ -324,9 +324,9 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer()
 			optimizerScaleVersorRigid3D[0] = 1.0;
 			optimizerScaleVersorRigid3D[1] = 1.0;
 			optimizerScaleVersorRigid3D[2] = 1.0;
-			optimizerScaleVersorRigid3D[3] = 1 / 1000;
-			optimizerScaleVersorRigid3D[4] = 1 / 1000;
-			optimizerScaleVersorRigid3D[5] = 1 / 1000;
+			optimizerScaleVersorRigid3D[3] = 1.0;
+			optimizerScaleVersorRigid3D[4] = 1.0;
+			optimizerScaleVersorRigid3D[5] = 1.0;
 		}
 
 		if ( transform.SCALE ) {
@@ -703,6 +703,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetInitialTransfo
 
 	if ( !strcmp( initialTransformName, "AffineTransform" ) and transform.BSPLINEDEFORMABLETRANSFORM ) {
 		m_BSplineTransform->SetBulkTransform( dynamic_cast<AffineTransformType *>( initialTransform ) );
+		std::cout << "initial: " << m_BSplineTransform->GetNumberOfParameters() << std::endl;
 	}
 
 	if ( !strcmp( initialTransformName, "VersorRigid3DTransform" ) and transform.BSPLINEDEFORMABLETRANSFORM ) {
@@ -760,21 +761,21 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::CheckImageSizes(
 		}
 	}
 
-	if ( m_FixedImageIsBigger ) {
-		m_MovingImageMaskObject = MaskObjectType::New();
-		m_MovingThresholdFilter = MovingThresholdFilterType::New();
-		m_MovingMinMaxCalculator = MovingMinMaxCalculatorType::New();
-		m_MovingMinMaxCalculator->SetImage( m_MovingImage );
-		m_MovingMinMaxCalculator->Compute();
-		m_MovingThresholdFilter->SetInput( m_MovingImage );
-		m_MovingThresholdFilter->SetOutsideValue( 0 );
-		m_MovingThresholdFilter->SetInsideValue( 255 );
-		m_MovingThresholdFilter->SetUpperThreshold( m_MovingMinMaxCalculator->GetMaximum() );
-		m_MovingThresholdFilter->SetLowerThreshold( m_MovingMinMaxCalculator->GetMinimum() );
-		m_MovingThresholdFilter->Update();
-		m_MovingImageMaskObject->SetImage( m_MovingThresholdFilter->GetOutput() );
-		m_MovingImageMaskObject->Update();
-	}
+//	if ( m_FixedImageIsBigger ) {
+//		m_MovingImageMaskObject = MaskObjectType::New();
+//		m_MovingThresholdFilter = MovingThresholdFilterType::New();
+//		m_MovingMinMaxCalculator = MovingMinMaxCalculatorType::New();
+//		m_MovingMinMaxCalculator->SetImage( m_MovingImage );
+//		m_MovingMinMaxCalculator->Compute();
+//		m_MovingThresholdFilter->SetInput( m_MovingImage );
+//		m_MovingThresholdFilter->SetOutsideValue( 0 );
+//		m_MovingThresholdFilter->SetInsideValue( 255 );
+//		m_MovingThresholdFilter->SetUpperThreshold( m_MovingMinMaxCalculator->GetMaximum() );
+//		m_MovingThresholdFilter->SetLowerThreshold( m_MovingMinMaxCalculator->GetMinimum() );
+//		m_MovingThresholdFilter->Update();
+//		m_MovingImageMaskObject->SetImage( m_MovingThresholdFilter->GetOutput() );
+//		m_MovingImageMaskObject->Update();
+//	}
 }
 
 template<class TFixedImageType, class TMovingImageType>
@@ -803,6 +804,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetFixedImageMask
 {
 	if ( metric.MATTESMUTUALINFORMATION ) {
 		m_MattesMutualInformationMetric->SetFixedImageMask( m_MovingImageMaskObject );
+		m_MattesMutualInformationMetric->SetMovingImageMask( m_MovingImageMaskObject );
 	}
 
 	if ( metric.VIOLAWELLSMUTUALINFORMATION ) {
@@ -815,6 +817,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetFixedImageMask
 
 	if ( metric.NORMALIZEDCORRELATION ) {
 		m_NormalizedCorrelationMetric->SetFixedImageMask( m_MovingImageMaskObject );
+		m_NormalizedCorrelationMetric->SetMovingImageMask( m_MovingImageMaskObject );
 	}
 
 	if ( metric.MEANSQUARE ) {
@@ -867,14 +870,13 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::StartRegistration
 	//to avoid a itk sample error caused by a lack of spatial samples used by the metric
 	this->CheckImageSizes();
 
-	if ( !UserOptions.USEMASK ) {
-		this->SetFixedImageMask();
-	}
+//	if ( !UserOptions.USEMASK ) {
+//		this->SetFixedImageMask();
+//	}
 
 	m_observer = isis::extitk::IterationObserver::New();
 	m_observer->setVerboseStep( UserOptions.SHOWITERATIONATSTEP );
 	m_RegistrationObject->GetOptimizer()->AddObserver( itk::IterationEvent(), m_observer );
-
 	try {
 		m_RegistrationObject->StartRegistration();
 	} catch ( itk::ExceptionObject &err ) {
