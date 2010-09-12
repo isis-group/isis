@@ -60,6 +60,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 		BOOST_REQUIRE( img.insertChunk( ch ) );
 		//Get a list of the sorted chunks
+		BOOST_REQUIRE(img.reIndex());
 		std::vector<boost::shared_ptr<data::Chunk> > list = img.getChunkList();
 		BOOST_CHECK_EQUAL( list.size(), 3 ); // the should be 3 chunks in the list by now
 
@@ -89,7 +90,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 			ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 			ch.setProperty( "readVec", util::fvector4( 1, 0 ) );
 			ch.setProperty( "phaseVec", util::fvector4( 0, 1 ) );
-			img.insertChunk( ch );
+			BOOST_REQUIRE(img.insertChunk( ch ));
 		}
 
 		std::string str = "testString";
@@ -104,10 +105,10 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		// Check all dimensions
 		data::Image img2;
 
-		uint nrRows = 12;
-		uint nrCols = 32;
-		uint nrTimesteps = 17;
-		uint nrSlices = 27;
+		u_int32_t nrRows = 12;
+		u_int32_t nrCols = 32;
+		u_int32_t nrTimesteps = 17;
+		u_int32_t nrSlices = 27;
 		for( int t = 0; t < nrTimesteps; t++ ) {
 			for( int s = 0; s < nrSlices; s++ ){
 				data::Chunk ch = data::MemChunk<float>( nrCols, nrRows );
@@ -176,6 +177,27 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 	}
 }
 
+BOOST_AUTO_TEST_CASE ( minimal_image_test )
+{
+	data::MemChunk<float> ch1( 4, 4 );
+	ch1.setProperty( "indexOrigin", util::fvector4( 0, 0, 2 ) );
+	ch1.setProperty<uint32_t>( "acquisitionNumber", 0 );
+	ch1.setProperty( "readVec", util::fvector4( 1, 0 ) );
+	ch1.setProperty( "phaseVec", util::fvector4( 0, 1 ) );
+	ch1.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
+	
+	data::MemChunk<float> ch2=ch1;
+	ch2.setProperty<uint32_t>( "acquisitionNumber", 1 );
+	
+	data::Image img;
+	const size_t size[]={4,4,1,2};
+	BOOST_CHECK(img.insertChunk(ch1));
+	BOOST_CHECK(img.insertChunk(ch2));
+	BOOST_CHECK(img.reIndex());
+	BOOST_CHECK_EQUAL(img.sizeToVector(),(util::FixedVector<size_t,4>(size)));
+}
+	
+	
 BOOST_AUTO_TEST_CASE ( image_chunk_test )
 {
 	uint32_t acNum = 0;

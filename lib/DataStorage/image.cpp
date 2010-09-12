@@ -128,8 +128,9 @@ bool Image::reIndex()
 	//get indexOrigin from the geometrically first chunk
 	propertyValue( "indexOrigin" ) = first.propertyValue( "indexOrigin" );
 	//if there are many chunks, they must leave at least on dimension to the image to "sort" them in
-	const unsigned short sortDims = n_dims - ( set.getHorizontalSize() > 1 ? 1 : 0 ); // dont use the uppermost dim, if the timesteps are already there
-
+	const size_t timesteps=set.getHorizontalSize();
+	const unsigned short sortDims = n_dims - ( timesteps > 1 ? 1 : 0 ); // dont use the uppermost dim, if the timesteps are already there
+ 
 	if ( chunk_dims >= Image::n_dims ) {
 		if ( lookup.size() > 1 ) {
 			LOG( Runtime, error )
@@ -150,9 +151,10 @@ bool Image::reIndex()
 			assert( size[i] != 0 );
 		}
 	}
-
-	if( sortDims < n_dims ) size[n_dims-1] = set.getHorizontalSize(); // write timesteps into the uppermost dim, if there are some
-
+	if (sortDims < n_dims) {//if there is a timedim (not all dims was used for geometric sort) 
+		assert(size[sortDims]==1);
+		size[sortDims]=timesteps; // fill the dim above the top geometric dim with the timesteps
+	}
 	assert( size.product() == lookup.size() );
 	//Clean up the properties
 	//@todo might fail if the image contains a prop that differs to that in the Chunks (which is equal in the chunks)
@@ -354,7 +356,7 @@ const Chunk Image::getChunk ( size_t first, size_t second, size_t third, size_t 
 }
 std::vector< boost::shared_ptr< Chunk > > Image::getChunkList()
 {
-	checkMakeClean();
+	checkMakeClean();//lookup is filled by reIndex
 	return lookup;
 }
 
@@ -419,8 +421,8 @@ size_t Image::getChunkStride ( size_t base_stride )
 
 	//we didn't find any break, so we assume its a linear image |c c ... c|
 	LOG( Debug, info )
-			<< "No dimensional break found, assuming it to be at the end (" << lookup.size() << ")";
-	return lookup.size();
+			<< "No dimensional break found, assuming it to be at the end (" << lookup.size() << "/" << set.getHorizontalSize() << ")";
+	return lookup.size()/set.getHorizontalSize();
 }
 
 std::list<util::PropertyValue> Image::getChunksProperties( const util::PropMap::key_type &key, bool unique )const
