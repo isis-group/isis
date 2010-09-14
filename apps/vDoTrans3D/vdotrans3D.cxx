@@ -80,7 +80,7 @@ static VOptionDescRec options[] = {
 	{"itktrans", VStringRepn, 0, &trans_filename, &trans_found, 0, "the itk transform filename"},
 	{
 		"interpolator", VShortRepn,
-		1, &interpolator_type, VOptionalOpt, 0, "The interpolator used to resample the image"
+		0, (VPointer) &interpolator_type, VOptionalOpt, TYPInterpolator, "The interpolator used to resample the image"
 	}, {"ref", VStringRepn, 1,
 		&template_filename, VOptionalOpt, 0, "The template image"
 	   }, {"reso", VFloatRepn, 0, ( VPointer ) &resolution,

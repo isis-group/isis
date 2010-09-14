@@ -14,7 +14,7 @@ int main( int argc, char **argv )
 
 	if( app.parameters["tr"]->as<double>() > 0 ) {
 		BOOST_FOREACH( data::ImageList::const_reference ref, app.images ) {
-			ref->setProperty<float>( "repetitionTime", app.parameters["tr"]->as<double>() * 1000 );
+			ref->setProperty<u_int16_t>( "repetitionTime", app.parameters["tr"]->as<double>() * 1000 );
 		}
 	}
 

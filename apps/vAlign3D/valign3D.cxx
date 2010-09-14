@@ -42,6 +42,7 @@
 #include "itkRescaleIntensityImageFilter.h"
 #include "itkSigmoidImageFilter.h"
 #include "itkOtsuThresholdImageCalculator.h"
+#include "itkBinaryThresholdImageFilter.h"
 
 #include <fstream>
 #include <boost/algorithm/string.hpp>
@@ -102,6 +103,7 @@ static VBoolean use_inverse = false;
 static VFloat coarse_factor = 1;
 static VFloat bspline_bound = 100.0;
 static VBoolean verbose = false;
+static VFloat create_mask = 0;
 
 
 static VOptionDescRec
@@ -128,6 +130,8 @@ options[] = {
 		"iter", VShortRepn, 0, ( VPointer ) &number_of_iterations, VOptionalOpt, 0,
 		"Maximum number of iteration used by the optimizer"
 	},
+	{ "create_mask" , VFloatRepn, 1, &create_mask, VOptionalOpt, 0,
+			"Create a mask with the otsu method" },
 	{
 		"seed", VShortRepn, 1, &initial_seed, VOptionalOpt, 0,
 		"The initialize seed for the MattesMutualInformationMetric"
@@ -172,6 +176,7 @@ options[] = {
 	   }, {"optimizer", VShortRepn, 0, ( VPointer ) &optimizerType,
 		   VOptionalOpt, TYPOptimizer, "Type of optimizer"
 		  }
+
 
 };
 
@@ -236,6 +241,8 @@ int main(
 	typedef itk::SigmoidImageFilter<MovingImageType, MovingImageType> MovingSigmoidFilterType;
 	typedef itk::OtsuThresholdImageCalculator<FixedImageType> FixedOtsuCalcType;
 	typedef itk::OtsuThresholdImageCalculator<MovingImageType> MovingOtsuCalcType;
+	typedef itk::BinaryThresholdImageFilter<FixedImageType, FixedImageType> FixedThresholdFilter;
+	typedef itk::BinaryThresholdImageFilter<MovingImageType, MovingImageType> MovingThresholdFilter;
 
 	MaskImageReaderType::Pointer maskReader = MaskImageReaderType::New();
 	itk::AffineTransform<double, Dimension>::Pointer tmpTransform = itk::AffineTransform<double, Dimension>::New();
@@ -244,8 +251,6 @@ int main(
 	WriterType::Pointer writer = WriterType::New();
 	itk::TransformFileReader::Pointer transformReader = itk::TransformFileReader::New();
 	ImageMaskSpatialObjectType::Pointer mask = ImageMaskSpatialObjectType::New();
-	FixedImageType::Pointer fixedImage = FixedImageType::New();
-	MovingImageType::Pointer movingImage = MovingImageType::New();
 	FixedFilterType::Pointer fixedFilter = FixedFilterType::New();
 	MovingFilterType::Pointer movingFilter = MovingFilterType::New();
 	tmpConstTransformPointer = 0;
@@ -255,17 +260,22 @@ int main(
 	MovingIntensityFilterType::Pointer movingRescaleFilter = MovingIntensityFilterType::New();
 	FixedSigmoidFilterType::Pointer fixedSigmoidFilter = FixedSigmoidFilterType::New();
 	MovingSigmoidFilterType::Pointer movingSigmoidFilter = MovingSigmoidFilterType::New();
-	FixedOtsuCalcType::Pointer fixedOtsuCalc = FixedOtsuCalcType::New();
-	MovingOtsuCalcType::Pointer movingOtsuCalc = MovingOtsuCalcType::New();
+	FixedOtsuCalcType::Pointer fixedOtsuCalculator = FixedOtsuCalcType::New();
+	MovingOtsuCalcType::Pointer movingOtsuCalculator = MovingOtsuCalcType::New();
+	FixedThresholdFilter::Pointer fixedThresholdFilter = FixedThresholdFilter::New();
+	MovingThresholdFilter::Pointer movingThresholdFilter = MovingThresholdFilter::New();
 
 	isis::data::ImageList refList = isis::data::IOFactory::load( ref_filename, "", "" );
 	isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "", "" );
 	LOG_IF( refList.empty(), isis::data::Runtime, isis::error ) << "Reference image is empty!";
 	LOG_IF( inList.empty(), isis::data::Runtime, isis::error ) << "Input image is empty!";
+	FixedImageType::Pointer fixedImage = fixedAdapter->makeItkImageObject<FixedImageType>( refList.front() );
+	MovingImageType::Pointer movingImage = movingAdapter->makeItkImageObject<MovingImageType>( inList.front() );
+
 
 	if ( !smooth ) {
-		fixedRescaleFilter->SetInput( fixedAdapter->makeItkImageObject<FixedImageType>( refList.front() ));
-		movingRescaleFilter->SetInput( movingAdapter->makeItkImageObject<MovingImageType>( inList.front() ));
+		fixedRescaleFilter->SetInput( fixedImage );
+		movingRescaleFilter->SetInput( movingImage );
 
 		movingRescaleFilter->SetOutputMinimum( -itk::NumericTraits<uint16_t>::max() * 9 );
 		movingRescaleFilter->SetOutputMaximum( itk::NumericTraits<uint16_t>::max() * 9 );
@@ -275,13 +285,15 @@ int main(
 
 		movingRescaleFilter->Update();
 		fixedRescaleFilter->Update();
+		fixedImage->DisconnectPipeline();
+		movingImage->DisconnectPipeline();
 		fixedImage = fixedRescaleFilter->GetOutput();
 		movingImage = movingRescaleFilter->GetOutput();
 //		isis::registration::_internal::filterFrequencyDomain<FixedImageType>( fixedImage );
 //		isis::registration::_internal::filterFrequencyDomain<MovingImageType>( movingImage );
-		writer->SetFileName("test.nii");
-		writer->SetInput(movingImage);
-		writer->Update();
+//		writer->SetFileName("test.nii");
+//		writer->SetInput(movingImage);
+//		writer->Update();
 //		      // TODO DEBUG
 //		      std::cout << "********** Fixed Image **********" << std::endl;
 //		      std::cout << fixedImage->GetDirection();
@@ -317,7 +329,7 @@ int main(
 		fixedGaussianFilterX->SetNumberOfThreads( number_threads );
 		fixedGaussianFilterY->SetNumberOfThreads( number_threads );
 		fixedGaussianFilterZ->SetNumberOfThreads( number_threads );
-		fixedGaussianFilterX->SetInput( fixedAdapter->makeItkImageObject<FixedImageType>( refList.front() ) );
+		fixedGaussianFilterX->SetInput( fixedImage );
 		fixedGaussianFilterY->SetInput( fixedGaussianFilterX->GetOutput() );
 		fixedGaussianFilterZ->SetInput( fixedGaussianFilterY->GetOutput() );
 		fixedGaussianFilterX->SetDirection( 0 );
@@ -334,6 +346,7 @@ int main(
 		fixedGaussianFilterZ->SetSigma( smooth );
 		std::cout << "smoothing the fixed image..." << std::endl;
 		fixedGaussianFilterZ->Update();
+		fixedImage->DisconnectPipeline();
 		fixedImage = fixedGaussianFilterZ->GetOutput();
 		GaussianFilterType::Pointer movingGaussianFilterX = GaussianFilterType::New();
 		GaussianFilterType::Pointer movingGaussianFilterY = GaussianFilterType::New();
@@ -341,7 +354,7 @@ int main(
 		movingGaussianFilterX->SetNumberOfThreads( number_threads );
 		movingGaussianFilterY->SetNumberOfThreads( number_threads );
 		movingGaussianFilterZ->SetNumberOfThreads( number_threads );
-		movingGaussianFilterX->SetInput( movingAdapter->makeItkImageObject<MovingImageType>( inList.front() ) );
+		movingGaussianFilterX->SetInput( movingImage );
 		movingGaussianFilterY->SetInput( movingGaussianFilterX->GetOutput() );
 		movingGaussianFilterZ->SetInput( movingGaussianFilterY->GetOutput() );
 		movingGaussianFilterX->SetDirection( 0 );
@@ -358,9 +371,53 @@ int main(
 		movingGaussianFilterZ->SetSigma( smooth );
 		std::cout << "smoothing the moving image..." << std::endl;
 		movingGaussianFilterZ->Update();
+		movingImage->DisconnectPipeline();
 		movingImage = movingGaussianFilterZ->GetOutput();
 	}
+	MovingImageType::Pointer movingOtsuImage;
+	FixedImageType::Pointer fixedOtsuImage;
+	if( create_mask ) {
+		size_t fixedThreshold = 0;
+		size_t movingThreshold = 0;
+		if ( create_mask == -1 ) {
+			fixedOtsuCalculator->SetImage(fixedImage);
+			movingOtsuCalculator->SetImage(movingImage);
+			fixedOtsuCalculator->Compute();
+			movingOtsuCalculator->Compute();
+			fixedThreshold = fixedOtsuCalculator->GetThreshold();
+			movingThreshold = movingOtsuCalculator->GetThreshold();
+		} else {
+			fixedThreshold = create_mask;
+			movingThreshold = create_mask;
+		}
+		fixedThresholdFilter->SetLowerThreshold( fixedThreshold );
+		fixedThresholdFilter->SetUpperThreshold( itk::NumericTraits<float>::max()-1);
+		movingThresholdFilter->SetLowerThreshold( fixedThreshold );
+		movingThresholdFilter->SetUpperThreshold( itk::NumericTraits<float>::max()-1);
+		fixedThresholdFilter->SetOutsideValue(0);
+		fixedThresholdFilter->SetInsideValue(1);
+		movingThresholdFilter->SetOutsideValue(0);
+		movingThresholdFilter->SetInsideValue(1);
+		fixedThresholdFilter->SetInput( fixedImage );
+		movingThresholdFilter->SetInput( movingImage);
 
+		std::cout << "masking fixed image..." << std::endl;
+		fixedThresholdFilter->Update();
+		std::cout << "masking moving image..." << std::endl;
+		movingThresholdFilter->Update();
+		fixedImage->DisconnectPipeline();
+		movingImage->DisconnectPipeline();
+		fixedImage = fixedThresholdFilter->GetOutput();
+		movingImage = movingThresholdFilter->GetOutput();
+		//TODO debug
+//		writer->SetInput( fixedImage );
+//		writer->SetFileName("fixedMask.nii");
+//		writer->Update();
+//		writer->SetInput( movingImage );
+//		writer->SetFileName("movingMask.nii");
+//		writer->Update();
+
+	}
 	RegistrationFactoryType::Pointer registrationFactory = RegistrationFactoryType::New();
 	//analyse transform vector
 	//transform is the master for determining the number of repetitions
@@ -459,7 +516,7 @@ int main(
 		if ( ( transform != 0 and transform != 4 ) and optimizer == 1 ) {
 			std::cerr << "\nInappropriate combination of transform and optimizer! Setting optimizer to RegularStepGradientDescentOptimizer.\n"
 					  << std::endl;
-			optimizer = 1;
+			optimizer = 0;
 		}
 
 		//transform setup
