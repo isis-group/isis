@@ -78,6 +78,28 @@ write_list( InputIterator start, InputIterator end,
 	return o;
 }
 
+// specialization to print char-list as number lists, not strings
+//@todo check if this works for VC
+template<typename _CharT, typename _Traits> std::basic_ostream<_CharT, _Traits> &
+write_list( const unsigned char *start, const unsigned char *end,
+			std::basic_ostream<_CharT, _Traits> &o,
+			const std::string delim = ",",
+			const std::string prefix = "{", const std::string suffix = "}" )
+{
+	o << prefix;
+
+	if ( start != end ) {
+		o << (unsigned short)*start;
+		start++;
+	}
+
+	for (const unsigned char *i = start; i != end; i++ )
+		o << delim << (unsigned short)*i;
+
+	o << suffix;
+	return o;
+}
+
 /// use write_list to create a string from a list
 template<class InputIterator> std::string list2string(
 	InputIterator start, InputIterator end,
