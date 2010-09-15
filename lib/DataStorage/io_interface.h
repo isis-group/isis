@@ -57,7 +57,7 @@ public:
 	/// \return the file-suffixes the plugin supports
 	virtual std::string suffixes() = 0;
 	/// \return the dialects the plugin supports
-	virtual std::string dialects() {return std::string();};
+	virtual std::string dialects(const std::string &filename) {return std::string();};
 	/// \return if the plugin is not part of the official distribution
 	virtual bool tainted() {return true;}
 	/**

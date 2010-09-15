@@ -213,7 +213,7 @@ IOFactory::FileFormatList IOFactory::getFormatInterface( std::string filename, s
 	}
 
 	if ( dialect.empty() ) {//return whole list of plugins for this file extension
-		LOG(Runtime,info) << "No dialect given. Trying all " << io_suffix[ext].size() << " plugins";
+		LOG(Debug,info) << "No dialect given. Trying all " << io_suffix[ext].size() << " plugins";
 		return io_suffix[ext];
 	}
 
@@ -221,27 +221,14 @@ IOFactory::FileFormatList IOFactory::getFormatInterface( std::string filename, s
 	FileFormatList reader;
 
 	for ( FileFormatList::const_iterator it = io_suffix[ext].begin(); it != io_suffix[ext].end(); it++ ) {
-		std::vector<std::string> splitted;
-		std::string d ( ( *it )->dialects() );
-
-		// this file format reader supports no dialects -> skip to the next candidate
-		if( d.empty() )
-			continue;
+		std::list<std::string> splitted;
+		const std::string d ( ( *it )->dialects(filename) );
 
 		boost::algorithm::split( splitted, d, boost::algorithm::is_any_of( " " ) );
-
-		for( std::vector<std::string>::const_iterator iter = splitted.begin(); iter != splitted.end(); iter++ ) {
-			if( dialect == *iter ) {
-				reader.push_back( *it );
-				break;
-			}
+		if(std::find(splitted.begin(),splitted.end(),dialect)!=splitted.end()){
+			reader.push_back( *it );
 		}
-
-		//      if ( std::string::npos != ( *it )->dialects().find( dialect ) ) {
-		//          reader.push_back( *it );
-		//      }
 	}
-
 	return reader;
 }
 

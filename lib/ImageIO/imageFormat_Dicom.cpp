@@ -37,16 +37,16 @@ class DicomChunk : public data::Chunk
 				<< dat << " (" << data::TypePtr<TYPE>::staticName() << ")" ;
 	}
 	template<typename TYPE>
-	static data::Chunk *copyColor( TYPE *source, size_t width, size_t height ) {
+	static data::Chunk *copyColor( TYPE** source, size_t width, size_t height ) {
 		data::Chunk *ret = new data::MemChunk<util::color<TYPE> >( width, height );
 		data::TypePtr<util::color<TYPE> > &dest = ret->asTypePtr<util::color<TYPE> >();
 		const size_t pixels = dest.len();
 
 		for ( size_t i = 0; i < pixels; i++ ) {
 			util::color<TYPE> &dvoxel = dest[i];
-			dvoxel.r = source[i];
-			dvoxel.g = source[i+pixels];
-			dvoxel.b = source[i+2*pixels];
+			dvoxel.r = source[0][i];
+			dvoxel.g = source[1][i];
+			dvoxel.b = source[2][i];
 		}
 
 		return ret;
@@ -98,12 +98,13 @@ public:
 						ImageFormat_Dicom::dcmObject2PropMap( dcdata, ret->branch( ImageFormat_Dicom::dicomTagTreeName ), dialect );
 					}
 				} else if ( pix->getPlanes() == 3 ) { //try to load data as color image
+					// if there are 3 planes data is actually an array of 3 pointers
 					switch ( pix->getRepresentation() ) {
 					case EPR_Uint8:
-						ret.reset( copyColor( ( Uint8 * )data, width, height ) );
+						ret.reset( copyColor( ( Uint8** )data, width, height ) );
 						break;
 					case EPR_Uint16:
-						ret.reset( copyColor( ( Uint16 * )data, width, height ) );
+						ret.reset( copyColor( ( Uint16** )data, width, height ) );
 						break;
 					default:
 						FileFormat::throwGenericError( "Unsupported datatype for color images" ); //@todo tell the user which datatype it is
@@ -135,7 +136,7 @@ const char ImageFormat_Dicom::unknownTagName[] = "Unknown Tag";
 
 std::string ImageFormat_Dicom::suffixes() {return std::string( ".ima .dcm" );}
 std::string ImageFormat_Dicom::name() {return "Dicom";}
-std::string ImageFormat_Dicom::dialects() {return "withPhoenixProtocol";}
+std::string ImageFormat_Dicom::dialects(const std::string &filename) {return "withPhoenixProtocol";}
 
 
 
@@ -195,7 +196,6 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 		}
 
 		object.setProperty( "voxelSize", voxelSize );
-		util::fvector4 voxelGap; //find a more robust way to determine inplane voxelGap
 
 		if ( transformOrTell<uint16_t>( prefix + "RepetitionTime", "repetitionTime", object, warning ) );
 
@@ -206,16 +206,15 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 		if ( transformOrTell<int16_t>( prefix + "FlipAngle", "flipAngle", object, warning ) );
 
 		if ( hasOrTell( prefix + "SpacingBetweenSlices", object, info ) ) {
-			voxelGap[2] = object.getProperty<float>( prefix + "SpacingBetweenSlices" );
-
-			if ( voxelSize[2] != invalid_float )
-				voxelGap[2] -= voxelSize[2]; //SpacingBetweenSlices is the distance between the centers of the slices - so substract the slice SliceThickness here
-
-			object.remove( prefix + "SpacingBetweenSlices" );
+			if ( voxelSize[2] != invalid_float ){
+				object.setProperty( "voxelGap", util::fvector4(0,0,object.getProperty<float>( prefix + "SpacingBetweenSlices" ) - voxelSize[2]) );
+				object.remove( prefix + "SpacingBetweenSlices" );
+			} else
+				LOG(Runtime,warning)
+				<< "Cannot compute the voxel gap from the slice spacing ("
+				<< object.propertyValue(prefix + "SpacingBetweenSlices" )
+				<< "), because the slice thickness is not known";
 		}
-
-		if ( voxelGap != util::fvector4( invalid_float, invalid_float, invalid_float, 0 ) )
-			object.setProperty( "voxelGap", voxelGap );
 	}
 	transformOrTell<std::string>   ( prefix + "PerformingPhysiciansName", "performingPhysician", object, info );
 	transformOrTell<uint16_t>     ( prefix + "NumberOfAverages",        "numberOfAverages",   object, warning );

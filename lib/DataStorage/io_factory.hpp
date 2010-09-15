@@ -71,6 +71,7 @@ public:
 	static IOFactory &get();
 
 	static void setProgressFeedback( util::ProgressFeedback *feedback );
+	FileFormatList getFormatInterface( std::string filename, std::string suffix_override = "", std::string dialect = "" );
 protected:
 	IOFactory();//shall not be created directly
 	FileFormatList io_formats;
@@ -83,7 +84,6 @@ protected:
 	 * */
 	bool registerFormat( const FileFormatPtr plugin );
 	unsigned int findPlugins( const std::string &path );
-	FileFormatList getFormatInterface( std::string filename, std::string suffix_override = "", std::string dialect = "" );
 private:
 	std::map<std::string, FileFormatList, util::_internal::caselessStringLess> io_suffix;
 	IOFactory &operator =( IOFactory & ); //dont do that

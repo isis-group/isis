@@ -50,7 +50,7 @@ int main( int argc, char *argv[] )
 	dropDuplicate( images2 );
 
 	if ( images1.size() != images2.size() ) {
-		std::cout << "Amount of found images in " << files.front() << " and " << files.back() << " differs" << std::endl;
+		std::cout << "Amount of found images in " << files.front() << "(" << images1.size() << ") and " << files.back() << "(" << images2.size() << ") differs" << std::endl;
 		return -1;
 	}
 

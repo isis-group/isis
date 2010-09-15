@@ -99,7 +99,7 @@ public:
 		return std::string( ".nii.gz .nii .hdr" );
 	}
 
-	std::string dialects() {
+	std::string dialects(const std::string &filename) {
 		return std::string( "fsl spm" );
 	}
 

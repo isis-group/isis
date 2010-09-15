@@ -65,7 +65,7 @@ public:
 	static void sanitise( util::PropMap &object, string dialect );
 	std::string suffixes();
 	std::string name();
-	std::string dialects();
+	std::string dialects(const std::string& filename);
 
 	int load( data::ChunkList &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & );
 	void write( const data::Image &image, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & );
