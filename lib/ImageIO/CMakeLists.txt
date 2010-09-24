@@ -1,3 +1,8 @@
+# the ISIS ImageIO plugins
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+
+PROJECT(ISIS_IMAGE_IO)
+
 ###############################################################################
 # add global options
 ###############################################################################

@@ -132,7 +132,7 @@ IF(${CMAKE_PROJECT_NAME}_BUILD_DOC)
 ENDIF(${CMAKE_PROJECT_NAME}_BUILD_DOC)
 
 ###############################################################################
-#Subdirs
+# Subdirs
 ###############################################################################
 
 add_subdirectory(lib)
@@ -149,7 +149,7 @@ ENDIF(${CMAKE_PROJECT_NAME}_BUILD_TESTS)
 
 
 ################################################################################
-#Python support
+# Python support
 ################################################################################
 
 IF(${CMAKE_PROJECT_NAME}_BUILD_PYTHON_LIBS)
