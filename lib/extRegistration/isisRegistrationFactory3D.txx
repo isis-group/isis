@@ -703,7 +703,6 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetInitialTransfo
 
 	if ( !strcmp( initialTransformName, "AffineTransform" ) and transform.BSPLINEDEFORMABLETRANSFORM ) {
 		m_BSplineTransform->SetBulkTransform( dynamic_cast<AffineTransformType *>( initialTransform ) );
-		std::cout << "initial: " << m_BSplineTransform->GetNumberOfParameters() << std::endl;
 	}
 
 	if ( !strcmp( initialTransformName, "VersorRigid3DTransform" ) and transform.BSPLINEDEFORMABLETRANSFORM ) {
