@@ -147,7 +147,7 @@ private:
 				// create default read, phase, slice vector values according to attribute
 				// "orientation" in vista header. This should only be done if the vectors
 				// weren't defined otherwise.
-				if( ( strcmp( name, "orientation" ) == 0 ) and ( not chunk.hasProperty( "readVec" ) ) ) {
+				if( ( strcmp( name, "orientation" ) == 0 ) && ( ! chunk.hasProperty( "readVec" ) ) ) {
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
 					//TODO remove "orientation" in Vista group
 					chunk.setProperty<std::string>( propname, std::string( ( VString )val ) );
@@ -230,7 +230,7 @@ private:
 				}
 
 				// OPTIONAL: columnVec -> readVec, overwrite old values
-				if( strcmp( name, "columnVec" ) == 0 ) {
+				if( strcmp( name, "columnVec" ) == 0 || strcmp( name, "x-axis" ) == 0 ) {
 					util::fvector4 readVec;
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
 					const std::list<float> tokens = util::string2list<float>( ( const char * )val, ' ' );
@@ -240,7 +240,7 @@ private:
 				}
 
 				// OPTIONAL: rowVec -> phaseVec, overwrite old values
-				if( strcmp( name, "rowVec" ) == 0 ) {
+				if( strcmp( name, "rowVec" ) == 0 || strcmp( name, "y-axis" ) == 0 ) {
 					util::fvector4 phaseVec;
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
 					const std::list<float> tokens = util::string2list<float>( ( const char * )val, ' ' );
@@ -250,7 +250,7 @@ private:
 				}
 
 				// OPTIONAL: sliceVec -> sliceVec, overwrite old values
-				if( strcmp( name, "sliceVec" ) == 0 ) {
+				if( strcmp( name, "sliceVec" ) == 0 || strcmp( name, "z-axis" ) == 0 ) {
 					util::fvector4 sliceVec;
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
 					const std::list<float> tokens = util::string2list<float>( ( const char * )val, ' ' );

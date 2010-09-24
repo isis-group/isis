@@ -70,8 +70,13 @@ public:
 		if ( const itk::RegularStepGradientDescentOptimizer *optimizer =
 				 dynamic_cast<const itk::RegularStepGradientDescentOptimizer *> ( object ) ) {
 			if( ! ( optimizer->GetCurrentIteration() % m_step ) ) {
-				std::cout << "\r" << optimizer->GetCurrentIteration() << " = " << optimizer->GetValue() << " : "
-						  << optimizer->GetCurrentPosition() << "         " << std::flush;
+				if ( optimizer->GetCurrentPosition().Size() <= 6) {
+					std::cout << "\r" << optimizer->GetCurrentIteration() << " = " << optimizer->GetValue() << " : "
+							<< optimizer->GetCurrentPosition() << "   " << std::flush;
+				} else
+				{
+					std::cout << "\r" << optimizer->GetCurrentIteration() << " = " << optimizer->GetValue() <<  std::flush;
+				}
 			}
 		}
 
@@ -79,7 +84,7 @@ public:
 				 dynamic_cast<const itk::VersorRigid3DTransformOptimizer *> ( object ) ) {
 			if( ! ( optimizer->GetCurrentIteration() % m_step ) ) {
 				std::cout << "\r" << optimizer->GetCurrentIteration() << " = " << optimizer->GetValue() << " : "
-						  << optimizer->GetCurrentPosition() << "			" << std::flush;
+						  << optimizer->GetCurrentPosition() << "	" << std::flush;
 			}
 		}
 	}
