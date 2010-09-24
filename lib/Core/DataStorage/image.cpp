@@ -12,7 +12,7 @@
 //
 //
 
-#include "image.hpp"
+#include "DataStorage/image.hpp"
 #include "CoreUtils/vector.hpp"
 #include <boost/foreach.hpp>
 #include "CoreUtils/property.hpp"

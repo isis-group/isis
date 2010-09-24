@@ -17,7 +17,7 @@
 
 */
 
-#include "progparameter.hpp"
+#include "CoreUtils/progparameter.hpp"
 #include <boost/foreach.hpp>
 
 isis::util::ProgParameter::ProgParameter()

@@ -17,11 +17,11 @@
 
 */
 
-#include "typeptr_converter.hpp"
+#include "DataStorage/typeptr_converter.hpp"
 
 // #include "type_converter.hpp"
-#include "typeptr_base.hpp"
-#include "numeric_convert.hpp"
+#include "DataStorage/typeptr_base.hpp"
+#include "DataStorage/numeric_convert.hpp"
 #include "CoreUtils/types.hpp"
 #include <boost/mpl/for_each.hpp>
 #include <boost/type_traits/is_arithmetic.hpp>

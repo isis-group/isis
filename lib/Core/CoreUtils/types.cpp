@@ -12,9 +12,9 @@
 
 /// @cond _hidden
 
-#include "type.hpp"
+#include "CoreUtils/type.hpp"
 #include "DataStorage/typeptr.hpp"
-#include "types.hpp"
+#include "CoreUtils/types.hpp"
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/mpl/for_each.hpp>
 #include <boost/foreach.hpp>

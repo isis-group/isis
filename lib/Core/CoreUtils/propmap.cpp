@@ -10,7 +10,7 @@
 //
 //
 
-#include "propmap.hpp"
+#include "CoreUtils/propmap.hpp"
 #include <boost/foreach.hpp>
 
 namespace isis

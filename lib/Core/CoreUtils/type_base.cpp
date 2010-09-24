@@ -10,8 +10,8 @@
 //
 //
 
-#include "type_base.hpp"
-#include "singletons.hpp"
+#include "CoreUtils/type_base.hpp"
+#include "CoreUtils/singletons.hpp"
 
 namespace isis
 {

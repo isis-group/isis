@@ -1,4 +1,4 @@
-#include "singletons.hpp"
+#include "CoreUtils/singletons.hpp"
 #include <boost/foreach.hpp>
 
 namespace isis

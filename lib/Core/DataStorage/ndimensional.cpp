@@ -10,7 +10,7 @@
 //
 //
 
-#include "ndimensional.hpp"
+#include "DataStorage/ndimensional.hpp"
 
 namespace isis
 {

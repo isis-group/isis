@@ -16,8 +16,8 @@
 #ifdef __cplusplus
 #include <string>
 #include <boost/system/system_error.hpp>
-#include "DataStorage/image.hpp"
-#include "ImageIO/common.hpp"
+#include "image.hpp"
+#include "common.hpp"
 
 namespace isis
 {

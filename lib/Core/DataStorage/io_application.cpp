@@ -17,8 +17,8 @@
 
 */
 
-#include "io_application.hpp"
-#include "io_factory.hpp"
+#include "DataStorage/io_application.hpp"
+#include "DataStorage/io_factory.hpp"
 #include <boost/mpl/for_each.hpp>
 
 namespace isis

@@ -1,5 +1,5 @@
-#include "chunk.hpp"
-#include "image.hpp"
+#include "DataStorage/chunk.hpp"
+#include "DataStorage/image.hpp"
 
 /*
  * Add needed properties for Property-objects.

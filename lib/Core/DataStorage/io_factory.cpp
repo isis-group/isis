@@ -10,7 +10,7 @@
 //
 //
 
-#include "io_factory.hpp"
+#include "DataStorage/io_factory.hpp"
 #ifdef WIN32
 #include <windows.h>
 #else
@@ -19,7 +19,7 @@
 #include <iostream>
 #include <vector>
 #include "CoreUtils/log.hpp"
-#include "common.hpp"
+#include "DataStorage/common.hpp"
 #include <boost/regex.hpp>
 #include <boost/foreach.hpp>
 #include <boost/system/error_code.hpp>

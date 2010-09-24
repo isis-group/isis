@@ -17,7 +17,7 @@
 
 */
 
-#include "application.hpp"
+#include "CoreUtils/application.hpp"
 #include <boost/foreach.hpp>
 
 #define STR(s) _xstr_(s)
