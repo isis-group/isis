@@ -63,7 +63,7 @@ static VArgVector trans_filename;
 static VString vtrans_filename;
 static VString template_filename = NULL;
 static VBoolean in_found, out_found, trans_found;
-static VShort interpolator_type = 0;
+static VShort interpolator_type;
 static VArgVector resolution;
 static VBoolean fmri;
 static VBoolean use_inverse = false;
@@ -80,7 +80,7 @@ static VOptionDescRec options[] = {
 	{"itktrans", VStringRepn, 0, &trans_filename, &trans_found, 0, "the itk transform filename"},
 	{
 		"interpolator", VShortRepn,
-		0, (VPointer) &interpolator_type, VOptionalOpt, TYPInterpolator, "The interpolator used to resample the image"
+		1, &interpolator_type, VOptionalOpt, TYPInterpolator, "The interpolator used to resample the image"
 	}, {"ref", VStringRepn, 1,
 		&template_filename, VOptionalOpt, 0, "The template image"
 	   }, {"reso", VFloatRepn, 0, ( VPointer ) &resolution,
