@@ -41,9 +41,9 @@ void transformCoords(isis::util::PropMap& properties, boost::numeric::ublas::mat
 	// input matrix
 	boost::numeric::ublas::matrix<float> R_in(3,3);
 	for(int i = 0; i < 3; i++) {
-		R_in(0,i) = read[i];
-		R_in(1,i) = phase[i];
-		R_in(2,i) = slice[i];
+		R_in(i,0) = read[i];
+		R_in(i,1) = phase[i];
+		R_in(i,2) = slice[i];
 	}
 
 	// output matrix
@@ -51,9 +51,9 @@ void transformCoords(isis::util::PropMap& properties, boost::numeric::ublas::mat
 	R_out = boost::numeric::ublas::prod(transform, R_in);
 
 	for (int i = 0;i < 3; i++){
-		read[i] = R_out(0,i);
-		phase[i] = R_out(1,i);
-		slice[i] = R_out(2,i);
+		read[i] = R_out(i,0);
+		phase[i] = R_out(i,1);
+		slice[i] = R_out(i,2);
 	}
 
 	// STEP 2 transform index origin
