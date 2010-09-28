@@ -16,8 +16,23 @@ void FileFormat::write( const isis::data::ImageList &images, const std::string &
 	std::string file = path.leaf();
 	path.remove_leaf();
 	bool ret = true;
-
+	bool uniqueSequenceNumber;
 	if ( images.size() > 1 ) {
+		//check if there is more than one image with the same sequenceNumber
+		std::set<u_int16_t> sequenceSet;
+		//map to get an index for every sequenceNumber
+		std::map<u_int16_t, size_t> imagePerSequenceCounter;
+		BOOST_FOREACH( data::ImageList::const_reference ref, images ) {
+			if ( ref->hasProperty( "sequenceNumber" ) ) {
+				sequenceSet.insert( ref->getProperty<u_int16_t>( "sequenceNumber" ) );
+				imagePerSequenceCounter.insert( std::pair<u_int16_t, size_t>( ref->getProperty<u_int16_t>( "sequenceNumber" ), 0 ) );
+			}
+		}
+		if( sequenceSet.size() == images.size() ) {
+			uniqueSequenceNumber = true;
+		} else {
+			uniqueSequenceNumber = false;
+		}
 		BOOST_FOREACH( data::ImageList::const_reference ref, images ) {
 			if ( ! ref->hasProperty( "sequenceNumber" ) ) {
 				LOG( Runtime, error )
@@ -25,8 +40,14 @@ void FileFormat::write( const isis::data::ImageList &images, const std::string &
 				ret = false;
 				continue;
 			}
-
-			std::string unique_name = std::string( "S" ) + ref->getProperty<std::string>( "sequenceNumber" ) + "_" + file;
+			std::string unique_name = "";
+			if ( uniqueSequenceNumber ) {
+				unique_name = std::string( "S" ) + ref->getProperty<std::string>( "sequenceNumber" ) + "_" + file;
+			}
+			//if we have more than one image with the same sequenceNumber we have to add a second index to the filename to avoid overwriting
+			else {
+				unique_name = std::string( "S" ) + ref->getProperty<std::string>( "sequenceNumber" ) + "_" + boost::lexical_cast<std::string>( ++imagePerSequenceCounter[ref->getProperty<u_int16_t>( "sequenceNumber" )] ) + "_" + file;
+			}
 			LOG( Runtime, info )   << "Writing image to " <<  path / unique_name;
 			write( *ref, ( path / unique_name ).string(), dialect );
 		}
