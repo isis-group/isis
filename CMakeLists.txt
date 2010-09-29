@@ -5,7 +5,7 @@ project(ISIS)
 
 #set isis version number
 SET(${CMAKE_PROJECT_NAME}_VERSION_MAJOR "0")
-SET(${CMAKE_PROJECT_NAME}_VERSION_MINOR "1")
+SET(${CMAKE_PROJECT_NAME}_VERSION_MINOR "2")
 SET(${CMAKE_PROJECT_NAME}_VERSION_PATCH "0")
 
 add_definitions(-D_ISIS_VERSION_MAJOR=${${CMAKE_PROJECT_NAME}_VERSION_MAJOR})
@@ -138,6 +138,7 @@ ENDIF(${CMAKE_PROJECT_NAME}_BUILD_DOC)
 add_subdirectory(lib)
 add_subdirectory(tools)
 add_subdirectory(design)
+add_subdirectory(documentation)
 
 IF(${CMAKE_PROJECT_NAME}_BUILD_APPLICATIONS)
 	add_subdirectory(apps)

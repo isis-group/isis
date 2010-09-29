@@ -45,7 +45,7 @@ class ImageFormat_Vista: public FileFormat
 {
 public:
 
-	std::string name() { return std::string( "de.mpg.cbs.isis.vista" );}
+	std::string name() { return std::string( "Vista" );}
 	std::string suffixes() {return std::string( ".v" );}
 	/**
 	 * This plugin supports the following dialects:

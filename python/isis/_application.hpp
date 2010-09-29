@@ -2,8 +2,7 @@
 #include "CoreUtils/application.hpp"
 #include "CoreUtils/progparameter.hpp"
 #include <boost/python.hpp>
-
-using namespace isis::util;
+#include "CoreUtils/types.hpp"
 
 namespace isis
 {
@@ -11,11 +10,11 @@ namespace python
 {
 
 // helper class application
-class _Application : public Application
+class _Application : public util::Application
 {
 public:
-	_Application( PyObject *p, const char name[] ) : Application( name ), self( p ) {}
-	_Application( PyObject *p, const Application &base ) : Application( base ), self( p ) {}
+	_Application( PyObject *p, const char name[] ) : util::Application( name ), self( p ) {}
+	_Application( PyObject *p, const util::Application &base ) : util::Application( base ), self( p ) {}
 
 	//wrapper function to convert a python list into a **char
 	virtual bool init( int argc, boost::python::list pyargv, bool exitOnError = true ) {
@@ -37,21 +36,20 @@ public:
 			internAddParameter<bool>( name, value, type);
 		} else if(PyInt_Check( value )) {
 			internAddParameter<int64_t>( name, value, type);
-		} else {
+		} else if(PyString_Check( value )) {
 			internAddParameter<std::string>( name, value, type);
+		} else {
+			internAddParameter<util::fvector4>( name, value, type);
 		}
 	}
 private:
 	PyObject *self;
 	template<typename TYPE>
 	void internAddParameter ( const std::string name, PyObject* value, std::string type ) {
-
-//		data::TypePtr<TYPE> val = static_cast<TYPE>( boost::python::extract<TYPE>( value ) );
-//		val.copyToNewByID( getTransposedTypeMap(true, true)[type] );
-
-//		parameters[name] = val;
-
-//		std::cout << val << std::endl;
+		util::Type<TYPE> val(static_cast<TYPE>( boost::python::extract<TYPE>( value ) ));
+		val.copyToNewById( util::getTransposedTypeMap(true, true)[type] );
+		parameters[name] = val;
+		std::cout << parameters[name] << std::endl;
 	}
 
 };

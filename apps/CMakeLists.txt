@@ -4,6 +4,7 @@ if(${CMAKE_PROJECT_NAME}_HAVE_ITK)
 	add_subdirectory(vAlign3D)
 	add_subdirectory(vDoTrans3D)
 	add_subdirectory(isisCheckerboard3D)
+	add_subdirectory(autoOrient)
 	#add_subdirectory(isisDoTrans3D_float)
 endif(${CMAKE_PROJECT_NAME}_HAVE_ITK)
 
