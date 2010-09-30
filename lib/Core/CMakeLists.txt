@@ -204,4 +204,14 @@ INSTALL(FILES ${DATASTORAGE_HDR_FILES}
 MESSAGE(STATUS "/bin directory: " ${ISIS_INSTALL_BIN_DIR}) 
 MESSAGE(STATUS "/lib directory: " ${ISIS_INSTALL_LIB_DIR}) 
 MESSAGE(STATUS "/include directory: " ${ISIS_INSTALL_INCLUDE_DIR}) 
-MESSAGE(STATUS "/plugins directory: " ${ISIS_INSTALL_PLUGIN_DIR}) 
+MESSAGE(STATUS "/plugins directory: " ${ISIS_INSTALL_PLUGIN_DIR})
+
+# write configuration file
+CONFIGURE_FILE(cmake/isis_corecfg.cmake.in ISISConfig.cmake @ONLY)
+
+# install cmake configuration files
+INSTALL(FILES ${CMAKE_BINARY_DIR}/ISISConfig.cmake
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/share/isis/cmake COMPONENT Development)
+
+
+  

@@ -1,3 +1,20 @@
-set(ISIS_PLUGIN_PATH ${ISIS_PLUGIN_PATH})
-set(ISIS_DATA_LIBS ${ISIS_DATA_LIBS})
-set(ISIS_UTIL_LIBS ${ISIS_UTIL_LIBS})
+# ISIS cmake configuration file
+#
+# This file declares the following variables:
+#
+# ISIS_INSTALL_PREFIX
+# ISIS_PUGIN_DIR
+# ISIS_INCLUDE_DIR
+# ISIS_LIB
+# ISIS_LIB_DIR
+#
+
+SET(ISIS_LIB_DIR @ISIS_INSTALL_LIB_DIR@ CACHE PATH "The directory containing the ISIS library files.")
+SET(ISIS_PLUGIN_DIR @ISIS_INSTALL_PLUGIN_DIR@ CACHE PATH "The directory containing the ISIS plugin files.")
+SET(ISIS_INCLUDE_DIR @ISIS_INSTALL_INCLUDE_DIR@ CACHE PATH "The directory containing the ISIS header files.")
+SET(ISIS_RUNTIME_LOG @${CMAKE_PROJECT_NAME}_RUNTIME_LOG@)
+SET(ISIS_DEBUG_LOG @${CMAKE_PROJECT_NAME}_DEBUG_LOG@)
+
+# search isis core library
+FIND_LIBRARY(ISIS_LIB "isis"
+  PATHS ${ISIS_LIB_DIR})

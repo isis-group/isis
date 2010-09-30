@@ -5,10 +5,7 @@ PROJECT(isis_lib)
 
 ADD_SUBDIRECTORY(Core)
 
-
-
 # configure_file("../cmake/isis_corecfg.cmake.in" "isis_corecfg.cmake")
-
 
 # IF(ITK_FOUND)
 # 	 add_subdirectory(extITK)
