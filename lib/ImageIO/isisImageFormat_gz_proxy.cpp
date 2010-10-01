@@ -124,7 +124,12 @@ public:
 		util::TmpFile tmpfile( "", unzipped_suffix );
 		LOG( ImageIoDebug, info ) <<  "tmpfile=" << tmpfile;
 		file_uncompress( filename, tmpfile.string() );
-		return data::IOFactory::get().loadFile( chunks, tmpfile, "", dialect );
+		int ret=data::IOFactory::get().loadFile( chunks, tmpfile, "", dialect );
+		if(ret){
+			BOOST_FOREACH(data::ChunkList::reference ref,chunks){
+				ref->setProperty( "source", filename );
+			}
+		}
 	}
 
 	void write( const data::Image &image, const std::string &filename, const std::string &dialect )throw( std::runtime_error & ) {
