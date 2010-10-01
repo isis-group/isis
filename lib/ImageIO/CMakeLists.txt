@@ -10,7 +10,8 @@ PROJECT(ISIS_IMAGE_IO)
 ###########################################################
 # find and configure the isis core library
 ###########################################################
-SET(ISIS_DIR /usr/share/isis/cmake CACHE PATH "The directory where the FindIsis.cmake script is located.")
+SET(ISIS_DIR /usr/share/isis/cmake CACHE PATH 
+    "The directory where the isis cmake configuration skript script is located.")
 FIND_PACKAGE(ISIS REQUIRED)
 INCLUDE_DIRECTORIES(${ISIS_INCLUDE_DIR})
 LINK_DIRECTORIES(${ISIS_LIB_DIR})
