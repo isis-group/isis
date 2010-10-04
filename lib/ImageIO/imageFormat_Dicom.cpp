@@ -401,14 +401,19 @@ void ImageFormat_Dicom::readMosaic( data::Chunk source, data::ChunkList &dest )
 	const util::fvector4 sliceVec = source.getProperty<util::fvector4>( "sliceVec" ).norm() * ( voxelSize[2] + voxelGap[2] );
 
 	//store and remove acquisitionTime
+	std::list<double> acqTimeList;
 	std::list<double>::const_iterator acqTimeIt;
 
 	bool haveAcqTimeList = source.hasProperty( prefix + "CSAImageHeaderInfo/MosaicRefAcqTimes" );
 
 	float acqTime = 0;
 
-	if( haveAcqTimeList )
-		acqTimeIt = source.propertyValue( prefix + "CSAImageHeaderInfo/MosaicRefAcqTimes" )->cast_to<std::list<double> >().begin();
+	if( haveAcqTimeList ){
+		acqTimeList = source.getProperty<std::list<double> >( prefix + "CSAImageHeaderInfo/MosaicRefAcqTimes" );
+		source.remove(prefix + "CSAImageHeaderInfo/MosaicRefAcqTimes");
+		acqTimeIt = acqTimeList.begin();
+		LOG(Debug,info)<< "The acquisition time offsets of the slices in the mosaic where " << acqTimeList;
+	}
 
 	if( source.hasProperty( "acquisitionTime" ) ) {
 		acqTime = source.propertyValue( "acquisitionTime" )->cast_to<float>();
@@ -448,7 +453,7 @@ void ImageFormat_Dicom::readMosaic( data::Chunk source, data::ChunkList &dest )
 		newChunks[slice]->propertyValue( "acquisitionNumber" )->cast_to<uint32_t>() += slice;
 
 		if( haveAcqTimeList ) {
-			newChunks[slice]->setProperty<float>( "acquisitionTime", acqTime + *( acqTimeIt++ ) );
+			newChunks[slice]->setProperty<float>( "acquisitionTime", acqTime + (*( acqTimeIt++ ) / 1000.) );
 		}
 
 		LOG( Debug, verbose_info )

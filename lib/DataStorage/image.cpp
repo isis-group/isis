@@ -109,7 +109,7 @@ bool Image::reIndex()
 	}
 
 	if( !set.isRectangular() ) {
-		LOG( Debug, error ) << "The image is incomplete. Aborting reindex.";
+		LOG( Runtime, error ) << "The image is incomplete. Aborting reindex.";
 		return false;
 	}
 
