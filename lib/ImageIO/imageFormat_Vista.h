@@ -457,7 +457,7 @@ private:
 	 * @param functional flag to indicate that the image contains functional data.
 	 * @param slice the index of the slice.
 	 */
-	void copyHeaderToVista( const data::Image &image, VImage &vimage, const bool functional, size_t slice = 0 );
+	void copyHeaderToVista( const data::Image &image, VImage &vimage,  const float& sliceTimeOffset , const bool functional, size_t slice = 0 );
 
 	/**
 	 * Copies the whole itk image into a given vista image. This function is
