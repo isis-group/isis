@@ -65,7 +65,7 @@
 
 VDictEntry TYPMetric[] = { {"MattesMutualInformation", 0}, {"MutualInformationHistogram", 1}, {"NormalizedCorrelation",
 		2
-	}, {"MeanSquare", 3}, {"NormalizedMutualInformation", 4}, {NULL}
+	}, {"MeanSquare", 3}, {NULL}
 };
 
 VDictEntry TYPTransform[] = { {"VersorRigid", 0}, {"Affine", 1}, {"BSplineDeformable", 2}, {"Translation", 3}, {NULL}};
@@ -566,9 +566,6 @@ int main(
 			break;
 		case 3:
 			registrationFactory->SetMetric( RegistrationFactoryType::MeanSquareMetric );
-			break;
-		case 4:
-			registrationFactory->SetMetric( RegistrationFactoryType::NormalizedMutualInformationMetric );
 			break;
 		default:
 			std::cerr << "Unknown metric." << std::endl;
