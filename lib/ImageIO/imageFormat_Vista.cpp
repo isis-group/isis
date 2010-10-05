@@ -60,6 +60,17 @@ throw( std::runtime_error & )
 		shortImage.spliceDownTo( data::sliceDim );
 		vimages = ( VImage * )malloc( sizeof( VImage ) * dims[2] );
 		nimages = dims[2];
+
+		//we have to go through all slices and calculate the offset of the slicetimes
+		std::list<float> acquisitionTimeList;
+		for (int z = 0; z < nimages; z++ ) {
+			if( shortImage.getChunkAt(z).hasProperty("acquisitionTime")) {
+				acquisitionTimeList.push_back( shortImage.getChunkAt(z).getProperty<float>("acquisitionTime") );
+			}
+		}
+		acquisitionTimeList.sort();
+		float sliceTimeOffset = acquisitionTimeList.front();
+
 		for( int z = 0; z < dims[2]; z++ ) {
 			vimages[z] = VCreateImage( dims[3], dims[1], dims[0], VShortRepn );
 
@@ -72,7 +83,7 @@ throw( std::runtime_error & )
 				}
 			}
 
-			copyHeaderToVista( shortImage, vimages[z], true, z );
+			copyHeaderToVista( shortImage, vimages[z], sliceTimeOffset, true, z);
 			VAppendAttr( attrList, "image", NULL, VImageRepn, vimages[z] );
 		}
 
@@ -131,7 +142,7 @@ throw( std::runtime_error & )
 		}
 
 		// copy header information
-		copyHeaderToVista( image, vimages[0], false );
+		copyHeaderToVista( image, vimages[0],0 , false );
 		VAppendAttr( attrList, "image", NULL, VImageRepn, vimages[0] );
 	}
 
@@ -614,7 +625,7 @@ bool ImageFormat_Vista::switchHandle( VImage &image, data::ChunkList &chunks )
 	return false;
 }
 
-void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vimage, const bool functional, size_t slice )
+void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vimage, const float& sliceTimeOffset, const bool functional, size_t slice )
 {
 	// get attribute list from image
 	VAttrList list = VImageAttrList( vimage );
@@ -715,6 +726,8 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 				std::stringstream sstream;
 				float stime;
 				stime = image.getChunkAt( slice ).getProperty<float>( "acquisitionTime" );
+				stime -= sliceTimeOffset;
+				stime *= 1000;
 				sstream << stime;
 				VAppendAttr ( list, "slice_time", NULL, VStringRepn, sstream.str().c_str() );
 			}
