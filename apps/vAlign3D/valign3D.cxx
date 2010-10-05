@@ -65,10 +65,10 @@
 
 VDictEntry TYPMetric[] = { {"MattesMutualInformation", 0}, {"MutualInformationHistogram", 1}, {"NormalizedCorrelation",
 		2
-	}, {"MeanSquare", 3}, {NULL}
+	}, {"MeanSquare", 3}, {"NormalizedMutualInformation", 4}, {NULL}
 };
 
-VDictEntry TYPTransform[] = { {"VersorRigid", 0}, {"Affine", 1}, {"BSplineDeformable", 2}, {"Translation", 3}, {"Scale", 4}, {"CenteredAffine", 5}, {NULL}};
+VDictEntry TYPTransform[] = { {"VersorRigid", 0}, {"Affine", 1}, {"BSplineDeformable", 2}, {"Translation", 3}, {NULL}};
 
 VDictEntry TYPInterpolator[] = { {"Linear", 0}, {"BSpline", 1}, {"NearestNeighbor", 2}, {NULL}};
 
@@ -541,12 +541,15 @@ int main(
 		case 3:
 			registrationFactory->SetTransform( RegistrationFactoryType::TranslationTransform );
 			break;
-		case 4:
-			registrationFactory->SetTransform( RegistrationFactoryType::ScaleTransform );
-			break;
-		case 5:
-			registrationFactory->SetTransform( RegistrationFactoryType::CenteredAffineTransform );
-			break;
+//		case 4:
+//			registrationFactory->SetTransform( RegistrationFactoryType::ScaleTransform );
+//			break;
+//		case 5:
+//			registrationFactory->SetTransform( RegistrationFactoryType::CenteredAffineTransform );
+//			break;
+		default:
+			std::cerr << "Unknown transform." << std::endl;
+			return EXIT_FAILURE;
 		}
 
 		//metric setup
@@ -564,6 +567,12 @@ int main(
 		case 3:
 			registrationFactory->SetMetric( RegistrationFactoryType::MeanSquareMetric );
 			break;
+		case 4:
+			registrationFactory->SetMetric( RegistrationFactoryType::NormalizedMutualInformationMetric );
+			break;
+		default:
+			std::cerr << "Unknown metric." << std::endl;
+			return EXIT_FAILURE;
 		}
 
 		//interpolator setup
@@ -578,6 +587,9 @@ int main(
 		case 2:
 			registrationFactory->SetInterpolator( RegistrationFactoryType::NearestNeighborInterpolator );
 			break;
+		default:
+			std::cerr << "Unknown interpolator." << std::endl;
+			return EXIT_FAILURE;
 		}
 
 		//optimizer setup
@@ -598,6 +610,9 @@ int main(
 		case 4:
 			registrationFactory->SetOptimizer( RegistrationFactoryType::PowellOptimizer );
 			break;
+		default:
+			std::cerr << "Unknown optimizer." << std::endl;
+			return EXIT_FAILURE;
 		}
 
 		if ( transform_filename_in and counter == 0 ) {
@@ -682,6 +697,7 @@ int main(
 		std::cout << std::endl;
 		std::cout << "starting the registration...(step " << counter+1 << " of " << repetition << ")" << std::endl;
 		registrationFactory->StartRegistration();
+		std::cout << std::endl;
 
 		if ( use_inverse ) {
 			tmpTransform->SetParameters( registrationFactory->GetRegistrationObject()->GetTransform()->GetInverseTransform()->GetParameters() );
