@@ -23,8 +23,7 @@ SET(${CMAKE_PROJECT_NAME}_VERSION
 SET(ISIS_INSTALL_BIN_DIR ${CMAKE_INSTALL_PREFIX}/bin)
 SET(ISIS_INSTALL_LIB_DIR ${CMAKE_INSTALL_PREFIX}/lib)
 SET(ISIS_INSTALL_INCLUDE_DIR ${CMAKE_INSTALL_PREFIX}/include/isis)
-SET(ISIS_INSTALL_PLUGIN_DIR ${CMAKE_INSTALL_PREFIX}/share/isis/plugins
-  CACHE PATH "Path where the plugins shall be installed to.")
+SET(ISIS_INSTALL_PLUGIN_DIR ${CMAKE_INSTALL_PREFIX}/share/isis/plugins)
 
 ############################################################
 # set project specific module path
