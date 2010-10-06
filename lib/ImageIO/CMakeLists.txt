@@ -13,11 +13,9 @@ PROJECT(ISIS_IMAGE_IO)
 SET(ISIS_DIR /usr/share/isis/cmake CACHE PATH 
     "The directory where the isis cmake configuration skript script is located.")
 FIND_PACKAGE(ISIS REQUIRED)
-INCLUDE_DIRECTORIES(${ISIS_INCLUDE_DIR})
-LINK_DIRECTORIES(${ISIS_LIB_DIR})
+INCLUDE_DIRECTORIES(${ISIS_INCLUDE_DIRS})
 
 # we use the log definitions of the core
-# enable RUNTIME_LOG
 IF(ISIS_RUNTIME_LOG)
 	ADD_DEFINITIONS(-D_ENABLE_LOG=1)
 ELSE(ISIS_RUNTIME_LOG)
@@ -46,7 +44,7 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI)
 
 	include_directories(${INCPATH_NIFTI} ${INCPATH_ZNZ})
 	add_library(isisImageFormat_Nifti SHARED imageFormat_Nifti.cpp)
-	target_link_libraries(isisImageFormat_Nifti ${LIB_NIFTIIO} ${LIB_ZNZ} ${ISIS_LIB})
+	target_link_libraries(isisImageFormat_Nifti ${LIB_NIFTIIO} ${LIB_ZNZ} ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
 
 	set_target_properties(isisImageFormat_Nifti PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 	  INSTALL_RPATH_USE_LINK_PATH TRUE)
@@ -113,7 +111,7 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA)
 
         INCLUDE_DIRECTORIES(${VIA_INCLUDE_DIR} ${VIAIO_INCLUDE_DIR})
         ADD_LIBRARY(isisImageFormat_Vista SHARED imageFormat_Vista.cpp)
-        TARGET_LINK_LIBRARIES(isisImageFormat_Vista ${VIAIO_LIBRARY}  ${ISIS_LIB})
+        TARGET_LINK_LIBRARIES(isisImageFormat_Vista ${VIAIO_LIBRARY}  ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
         SET_TARGET_PROPERTIES(isisImageFormat_Vista PROPERTIES
             LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 			INSTALL_RPATH_USE_LINK_PATH TRUE)
@@ -132,7 +130,7 @@ endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA)
 
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL)
 	add_library(isisImageFormat_Null SHARED imageFormat_Null.cpp)
-	target_link_libraries(isisImageFormat_Null ${ISIS_LIB})
+	target_link_libraries(isisImageFormat_Null ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
 
 	set_target_properties(isisImageFormat_Null PROPERTIES 
 	  LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
@@ -146,7 +144,7 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ)
 	INCLUDE_DIRECTORIES(${GZIP_INC})
 
 	add_library(isisImageFormat_gz_proxy SHARED isisImageFormat_gz_proxy.cpp)
-	target_link_libraries(isisImageFormat_gz_proxy ${LIB_Z} ${ISIS_LIB})
+	target_link_libraries(isisImageFormat_gz_proxy ${LIB_Z} ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
 
 	set_target_properties(isisImageFormat_gz_proxy PROPERTIES
 	  LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
@@ -168,7 +166,7 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM)
 	include_directories(${INCPATH_DCMTK})
 
 	add_library(isisImageFormat_Dicom SHARED imageFormat_Dicom.cpp imageFormat_DicomParser.cpp)
-	target_link_libraries(isisImageFormat_Dicom ${LIB_DCMDATA} ${LIB_DCMIMGLE} ${LIB_OFSTD} ${LIB_Z} ${ISIS_LIB} ${LIB_DCMIMAGE} ${LIB_TIFF} ${LIB_PNG})
+	target_link_libraries(isisImageFormat_Dicom ${LIB_DCMDATA} ${LIB_DCMIMGLE} ${LIB_OFSTD} ${LIB_Z} ${ISIS_LIB} ${ISIS_LIB_DEPENDS} ${LIB_DCMIMAGE} ${LIB_TIFF} ${LIB_PNG})
 
 	set_target_properties(isisImageFormat_Dicom PROPERTIES
 	  LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
@@ -176,7 +174,7 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM)
 	SET(TARGETS ${TARGETS} isisImageFormat_Dicom)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM)
 
-MESSAGE(STATUS "Installing plugins to ${CMAKE_BINARY_DIR}")
+MESSAGE(STATUS "Installing plugins to ${ISIS_PLUGIN_DIR}")
 
 INSTALL(TARGETS ${TARGETS}
   LIBRARY DESTINATION ${ISIS_PLUGIN_DIR} COMPONENT RuntimeLibraries)

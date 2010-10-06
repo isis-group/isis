@@ -23,7 +23,8 @@ SET(${CMAKE_PROJECT_NAME}_VERSION
 SET(ISIS_INSTALL_BIN_DIR ${CMAKE_INSTALL_PREFIX}/bin)
 SET(ISIS_INSTALL_LIB_DIR ${CMAKE_INSTALL_PREFIX}/lib)
 SET(ISIS_INSTALL_INCLUDE_DIR ${CMAKE_INSTALL_PREFIX}/include/isis)
-SET(ISIS_INSTALL_PLUGIN_DIR ${CMAKE_INSTALL_PREFIX}/share/isis/plugins)
+SET(ISIS_INSTALL_PLUGIN_DIR ${CMAKE_INSTALL_PREFIX}/share/isis/plugins
+  CACHE PATH "Path where the plugins shall be installed to.")
 
 ############################################################
 # set project specific module path
@@ -206,7 +207,7 @@ MESSAGE(STATUS "/include directory: " ${ISIS_INSTALL_INCLUDE_DIR})
 MESSAGE(STATUS "/plugins directory: " ${ISIS_INSTALL_PLUGIN_DIR})
 
 # write configuration file
-CONFIGURE_FILE(cmake/isis_corecfg.cmake.in ISISConfig.cmake @ONLY)
+CONFIGURE_FILE(cmake/isis_corecfg.cmake.in ${CMAKE_BINARY_DIR}/ISISConfig.cmake @ONLY)
 
 # install cmake configuration files
 INSTALL(FILES ${CMAKE_BINARY_DIR}/ISISConfig.cmake
