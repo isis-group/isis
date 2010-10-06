@@ -9,10 +9,9 @@
 #include <boost/test/included/unit_test.hpp>
 #include <boost/foreach.hpp>
 
-#include "DataStorage/image.hpp"
-#include "DataStorage/io_factory.hpp"
-#include "CoreUtils/log.hpp"
-#include "ImageIO/common.hpp"
+#include <DataStorage/image.hpp>
+#include <DataStorage/io_factory.hpp>
+#include <CoreUtils/log.hpp>
 
 namespace isis
 {
