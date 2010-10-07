@@ -118,7 +118,15 @@ bool IOApplication::autoload( bool exitOnError )
 
 	return true;
 }
-bool IOApplication::autowrite( ImageList out_images, bool exitOnError )
+
+bool IOApplication::autowrite( const Image& out_image, bool exitOnError )
+{
+	ImageList list;
+	list.push_back(boost::shared_ptr<Image>(new Image(out_image)));
+	autowrite(list,exitOnError);
+}
+
+bool IOApplication::autowrite( const ImageList& out_images, bool exitOnError )
 {
 	const util::Selection repn = parameters["repn"];
 	const std::string output = parameters["out"];
@@ -133,7 +141,7 @@ bool IOApplication::autowrite( ImageList out_images, bool exitOnError )
 			<< ( dl.empty() ? "" : std::string( " using the dialect: " ) + dl );
 
 	if( repn != 0 ) {
-		BOOST_FOREACH( ImageList::reference ref, out_images ) {
+		BOOST_FOREACH( ImageList::const_reference ref, out_images ) {
 			ref->makeOfTypeId( repn );
 		}
 	}
