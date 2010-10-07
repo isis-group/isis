@@ -39,6 +39,16 @@ BOOST_AUTO_TEST_CASE( propMap_init_test )
 	BOOST_CHECK( map1.propertyValue( "new" ).empty() );
 }
 
+BOOST_AUTO_TEST_CASE( propMap_set_test )
+{
+	util::PropMap map1;
+	map1.propertyValue( "Test1" ) = 6.4;
+	BOOST_CHECK(!(map1.propertyValue( "Test1" )== 7) );
+	BOOST_CHECK_EQUAL( map1.propertyValue( "Test1" ), 6.4 );
+	map1.setProperty( "Test1", 7.);
+	BOOST_CHECK_EQUAL( map1.propertyValue( "Test1" ), 7 );
+}
+
 BOOST_AUTO_TEST_CASE( propMap_remove_test )
 {
 	util::PropMap map;

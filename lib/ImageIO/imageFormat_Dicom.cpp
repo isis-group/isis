@@ -282,10 +282,14 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 	}
 
 	transformOrTell<u_int32_t>( prefix + "CSAImageHeaderInfo/UsedChannelMask", "coilChannelMask", object, info );
+
+	////////////////////////////////////////////////////////////////
 	// interpret DWI data
+	////////////////////////////////////////////////////////////////
 	int32_t bValue;
 	bool foundDiff = true;
 
+	// find the B-Value
 	if ( object.hasProperty( prefix + "DiffusionBValue" ) ) { //in case someone actually used the right Tag
 		bValue = object.getProperty<int32_t>( prefix + "DiffusionBValue" );
 		object.remove( prefix + "DiffusionBValue" );
@@ -310,12 +314,12 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 			}
 		}
 	}
-
 	//@todo fallback for GE/Philips
+
+	
 	////////////////////////////////////////////////////////////////
 	// Do some sanity checks on redundant tags
 	////////////////////////////////////////////////////////////////
-
 	if ( object.hasProperty( prefix + "Unknown Tag(0019,1015)" ) ) {
 		const util::fvector4 org = object.getProperty<util::fvector4>( "indexOrigin" );
 		const util::fvector4 comp = object.getProperty<util::fvector4>( prefix + "Unknown Tag(0019,1015)" );
@@ -336,7 +340,7 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 		object.remove( prefix + "Unknown Tag(0019,1029)" );
 	}
 
-	if ( object.hasProperty( prefix + "Unknown Tag(0051,100c)" ) ) { //@todo siemens only
+	if ( object.hasProperty( prefix + "Unknown Tag(0051,100c)" ) ) { //@todo siemens only ?
 		std::string fov = object.getProperty<std::string>( prefix + "Unknown Tag(0051,100c)" );
 		float read, phase;
 
