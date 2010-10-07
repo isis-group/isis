@@ -80,8 +80,9 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 	setLog<ImageIoDebug>( LLMap[parameters["dImageIO"]->as<Selection>()] );
 	setLog<ImageIoLog>( LLMap[parameters["dImageIO"]->as<Selection>()] );
 
-	if ( err && exitOnError ) {
+	if ( err )
 		printHelp();
+	if( exitOnError ) {
 		std::cout << "Exiting..." << std::endl;
 		exit( 1 );
 	}

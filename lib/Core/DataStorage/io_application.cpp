@@ -68,6 +68,12 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 		parameters["repn"].setDescription(
 			"Representation in which the data shall be written." );
 	}
+
+	if( have_input || have_output){
+		parameters["np"] = false;
+		parameters["np"].needed() = false;
+		parameters["np"].setDescription( "suppress progress bar" );
+	}
 }
 
 IOApplication::~IOApplication()
@@ -91,12 +97,18 @@ bool IOApplication::autoload( bool exitOnError )
 	std::string input = parameters["in"];
 	std::string rf = parameters["rf"];
 	std::string dl = parameters["rdialect"];
+	bool no_progress=parameters["np"];
+
 	LOG( Runtime, info )
 			<< "loading " << util::MSubject( input )
 			<< ( rf.empty() ? "" : std::string( " using the format: " ) + rf )
 			<< ( ( !rf.empty() && !dl.empty() ) ? " and" : "" )
 			<< ( dl.empty() ? "" : std::string( " using the dialect: " ) + dl );
-	data::IOFactory::setProgressFeedback( &feedback );
+
+	if(!no_progress){
+		data::IOFactory::setProgressFeedback( &feedback );
+	}
+
 	images = data::IOFactory::load( input, rf, dl );
 
 	if ( images.empty() ) {
