@@ -1,27 +1,44 @@
 
-FIND_PACKAGE(Boost REQUIRED COMPONENTS unit_test_framework filesystem regex system)
-include_directories(${Boost_INCLUDE_DIR}  lib)
-include_directories(${ITK_INCLUDE_DIRS})
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+PROJECT(ISIS_TESTSUITE)
 
-IF(${CMAKE_PROJECT_NAME}_BUILD_COREUTILS)
-	add_subdirectory(CoreUtils)
-ENDIF(${CMAKE_PROJECT_NAME}_BUILD_COREUTILS)
+SET(ISIS_DIR /usr/share/isis/cmake CACHE PATH
+    "The directory where the isis cmake configuration skript script is located.")
+FIND_PACKAGE(ISIS REQUIRED)
+INCLUDE_DIRECTORIES(${ISIS_INCLUDE_DIRS})
 
-IF(${CMAKE_PROJECT_NAME}_BUILD_DATA_IO)
-	add_subdirectory(DataStorage)
-	add_subdirectory(ImageIO)
-ENDIF(${CMAKE_PROJECT_NAME}_BUILD_DATA_IO)
+# we use the log definitions of the core
+IF(ISIS_RUNTIME_LOG)
+	ADD_DEFINITIONS(-D_ENABLE_LOG=1)
+ELSE(ISIS_RUNTIME_LOG)
+	ADD_DEFINITIONS(-D_ENABLE_LOG=0)
+ENDIF(ISIS_RUNTIME_LOG)
 
-IF(${CMAKE_PROJECT_NAME}_HAVE_ITK)
-	add_subdirectory(extRegistration)
-ENDIF(${CMAKE_PROJECT_NAME}_HAVE_ITK)
+# enable DEBUG_LOG
+IF(ISIS_DEBUG_LOG)
+	ADD_DEFINITIONS(-D_ENABLE_DEBUG=1)
+	MESSAGE(STATUS "Debug code enabled, this will will have a big impact on the performance")
+ELSE(ISIS_DEBUG_LOG)
+	ADD_DEFINITIONS(-D_ENABLE_DEBUG=0)
+ENDIF(ISIS_DEBUG_LOG)
 
-IF(${CMAKE_PROJECT_NAME}_HAVE_VTK OR ${CMAKE_PROJECT_NAME}_HAVE_ITK)
-    add_subdirectory(ExternalLibraryAdapter)
-ENDIF(${CMAKE_PROJECT_NAME}_HAVE_VTK OR ${CMAKE_PROJECT_NAME}_HAVE_ITK)
+FIND_PACKAGE(Boost REQUIRED COMPONENTS unit_test_framework)
+include_directories(${Boost_INCLUDE_DIR})
 
-add_executable(test_logger test_logger.cpp)
-target_link_libraries(test_logger utils ${Boost_LIBRARIES})
+add_subdirectory(CoreUtils)
+add_subdirectory(DataStorage)
+add_subdirectory(ImageIO)
 
-add_executable(test_parameter test_parameter.cpp)
-target_link_libraries(test_parameter utils ${Boost_LIBRARIES})
+# IF(${CMAKE_PROJECT_NAME}_HAVE_ITK)
+# 	add_subdirectory(extRegistration)
+# ENDIF(${CMAKE_PROJECT_NAME}_HAVE_ITK)
+# 
+# IF(${CMAKE_PROJECT_NAME}_HAVE_VTK OR ${CMAKE_PROJECT_NAME}_HAVE_ITK)
+#     add_subdirectory(ExternalLibraryAdapter)
+# ENDIF(${CMAKE_PROJECT_NAME}_HAVE_VTK OR ${CMAKE_PROJECT_NAME}_HAVE_ITK)
+
+# add_executable(test_logger test_logger.cpp)
+# target_link_libraries(test_logger utils ${Boost_LIBRARIES})
+# 
+# add_executable(test_parameter test_parameter.cpp)
+# target_link_libraries(test_parameter utils ${Boost_LIBRARIES})

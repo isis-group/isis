@@ -1,7 +1,7 @@
 #include "imageFormat_Dicom.hpp"
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
-#include "common.hpp"
+#include "DataStorage/common.hpp"
 #include "dcmtk/dcmdata/dcdict.h"
 #include "dcmtk/dcmdata/dcdicent.h"
 
