@@ -1,2 +1,3 @@
 ADD_EXECUTABLE(isisreg3d isisreg3d.cxx)
-TARGET_LINK_LIBRARIES(isisreg3d  ITKIO ITKSpatialObject ITKNumerics ITKStatistics extitk viaio data isisAdapter_itk utils)
+TARGET_LINK_LIBRARIES(isisreg3d ITKIO ITKSpatialObject ITKNumerics ITKStatistics viaio  ${ISIS_LIB} ${ISIS_LIB_DEPENDS} )
+

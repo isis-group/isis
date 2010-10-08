@@ -59,7 +59,7 @@
 #include "CoreUtils/application.hpp"
 #include "Adapter/itkAdapter.hpp"
 
-#include "extRegistration/isisRegistrationFactory3D.hpp"
+#include "isisRegistrationFactory3D.hpp"
 #include "extITK/isisIterationObserver.hpp"
 #include "extITK/isisTimeStepExtractionFilter.hpp"
 

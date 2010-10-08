@@ -438,8 +438,6 @@ private:
 
 } //end namespace isis
 
-#if ITK_TEMPLATE_TXX
-# include "isisRegistrationFactory3D.txx"
-#endif
+# include "isisRegistrationFactory3D_impl.hpp"
 
 #endif /* ISISREGISTRATIONFACTORY_H_ */

@@ -47,7 +47,7 @@
 #include "Adapter/itkAdapter.hpp"
 
 #include "extITK/isisTimeStepExtractionFilter.hpp"
-#include "extITK/isisTransformMerger3D.hpp"
+#include "isisTransformMerger3D.hpp"
 #include "extITK/isisIterationObserver.hpp"
 
 //via command parser include
