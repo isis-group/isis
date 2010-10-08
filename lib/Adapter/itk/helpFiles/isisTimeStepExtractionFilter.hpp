@@ -118,8 +118,6 @@ private:
 } // end namesapce extitk
 } // end namespace isis
 
-#if ITK_TEMPLATE_TXX
-#include "isisTimeStepExtractionFilter.txx"
-#endif /* ITK_TEMPLATE_TXX */
+#include "isisTimeStepExtractionFilter_impl.hpp"
 
 #endif /* __TIMESTEPEXTRACTIONFILTER_H_ */

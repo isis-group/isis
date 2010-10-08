@@ -3,6 +3,8 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 PROJECT(ISIS_ADAPTER)
 
+SET(ISIS_INSTALL_INCLUDE_DIR ${CMAKE_INSTALL_PREFIX}/include/isis)
+
 ###########################################################
 # find and configure the isis core library
 ###########################################################
@@ -10,6 +12,7 @@ SET(ISIS_DIR /usr/share/isis/cmake CACHE PATH
     "The directory where the isis cmake configuration skript script is located.")
 FIND_PACKAGE(ISIS REQUIRED)
 INCLUDE_DIRECTORIES(${ISIS_INCLUDE_DIRS})
+MESSAGE(STATUS ${ISIS_INCLUDE_DIRS})
 
 # we use the log definitions of the core
 IF(ISIS_RUNTIME_LOG)
@@ -32,6 +35,9 @@ OPTION(${CMAKE_PROJECT_NAME}_QT4 "Enable adapter to the Qt4 library" OFF)
 
 if(${CMAKE_PROJECT_NAME}_ITK)
     add_subdirectory(itk)
+    SET(ADAPTER_HDR_FILES ${ADAPTER_HDR_FILES} itk/itkAdapter.hpp itk/itkAdapter_impl.hpp)
+    SET(HELPER_HDR_FILES ${HELPER_HDR_FILES} itk/helpFiles/isisTimeStepExtractionFilter.hpp itk/helpFiles/isisTimeStepExtractionFilter_impl.hpp )
+    SET(HELPER_HDR_FILES ${HELPER_HDR_FILES} itk/helpFiles/isisIterationObserver.hpp)
 endif(${CMAKE_PROJECT_NAME}_ITK)
 
 if(${CMAKE_PROJECT_NAME}_VTK)
@@ -41,6 +47,14 @@ endif(${CMAKE_PROJECT_NAME}_VTK)
 if(${CMAKE_PROJECT_NAME}_Qt4_ADAPTER)
 	add_subdirectory(qt4)
 endif(${CMAKE_PROJECT_NAME}_Qt4_ADAPTER)
+
+# install adapter header files
+INSTALL(FILES ${ADAPTER_HDR_FILES}
+  DESTINATION ${ISIS_INSTALL_INCLUDE_DIR}/Adapter COMPONENT Development)
+
+# install helper header files
+INSTALL(FILES ${HELPER_HDR_FILES}
+  DESTINATION ${ISIS_INSTALL_INCLUDE_DIR}/extITK COMPONENT Development)
 
 INSTALL(TARGETS ${TARGETS}
   LIBRARY DESTINATION  ${CMAKE_INSTALL_PREFIX}/lib COMPONENT RuntimeLibraries)

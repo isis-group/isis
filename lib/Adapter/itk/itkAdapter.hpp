@@ -105,6 +105,6 @@ private:
 }
 }// end namespace
 
-#include "itkAdapter.cpp"
+#include "itkAdapter_impl.hpp"
 
 #endif
