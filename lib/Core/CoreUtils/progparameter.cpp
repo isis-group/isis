@@ -20,21 +20,26 @@
 #include "CoreUtils/progparameter.hpp"
 #include <boost/foreach.hpp>
 
-isis::util::ProgParameter::ProgParameter()
+namespace isis{
+namespace util{
+
+ProgParameter::ProgParameter()
 {
 	needed() = true;
 	hidden() = false;
 }
-bool isis::util::ProgParameter::hidden() const
+ProgParameter::ProgParameter(const ProgParameter& ref): PropertyValue( static_cast<const PropertyValue &>( ref ) ),m_hidden(false) {}
+
+bool ProgParameter::hidden() const
 {
 	return m_hidden;
 }
-bool& isis::util::ProgParameter::hidden()
+bool& ProgParameter::hidden()
 {
 	return m_hidden;
 }
 
-bool isis::util::ProgParameter::parse( const Type<std::string> &props )
+bool ProgParameter::parse( const Type<std::string> &props )
 {
 	_internal::TypeBase &me = **this;
 	bool ret = false;
@@ -51,18 +56,18 @@ bool isis::util::ProgParameter::parse( const Type<std::string> &props )
 	LOG_IF( ret, Debug, info ) << "Parsed " << MSubject( props.toString() ) << " as " << me.toString( true );
 	return ret;
 }
-const std::string &isis::util::ProgParameter::description()const
+const std::string &ProgParameter::description()const
 {
 	return m_description;
 }
-void isis::util::ProgParameter::setDescription( const std::string &desc )
+void ProgParameter::setDescription( const std::string &desc )
 {
 	m_description = desc;
 }
 
-isis::util::ParameterMap::ParameterMap(): parsed( false ) {}
+ParameterMap::ParameterMap(): parsed( false ) {}
 
-bool isis::util::ParameterMap::parse( int argc, char **argv )
+bool ParameterMap::parse( int argc, char **argv )
 {
 	parsed = true;
 	std::string pName;
@@ -102,13 +107,13 @@ bool isis::util::ParameterMap::parse( int argc, char **argv )
 
 	return parsed ;
 }
-bool isis::util::ParameterMap::isComplete()const
+bool ParameterMap::isComplete()const
 {
 	LOG_IF( ! parsed, Debug, error ) << "You did not run parse() yet. This is very likely an error";
 	return std::find_if( begin(), end(), neededP() ) == end();
 }
 
-isis::util::ProgParameter::operator boost::scoped_ptr<_internal::TypeBase>::unspecified_bool_type()const
+ProgParameter::operator boost::scoped_ptr<_internal::TypeBase>::unspecified_bool_type()const
 {
 	boost::scoped_ptr<_internal::TypeBase> dummy;
 
@@ -116,3 +121,5 @@ isis::util::ProgParameter::operator boost::scoped_ptr<_internal::TypeBase>::unsp
 
 	return  dummy;
 }
+
+}}

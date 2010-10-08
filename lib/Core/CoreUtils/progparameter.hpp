@@ -46,14 +46,14 @@ public:
 	 * Thus parameters created using this must be set to any type/value before parse() is called.
 	 */
 	ProgParameter();
-	ProgParameter( const ProgParameter &ref ): PropertyValue( static_cast<const PropertyValue &>( ref ) ) {}
+	ProgParameter( const ProgParameter &ref );
 	/**
 	 * Create a programm parameter using a initial value/type.
 	 * \param ref the intial value/type the programm parameter should get
 	 * (The value is used as default value if the parameter never gets to parse any other value)
 	 * \param needed mark this parameter as needed
 	 */
-	template<typename T> ProgParameter( const T &ref, bool needed = true ): PropertyValue( ref, needed ) {}
+	template<typename T> ProgParameter( const T &ref, bool needed = true ): PropertyValue( ref, needed ),m_hidden(false) {}
 	/**
 	 * Parse the given string as value into this parameter.
 	 * The parsing is done by automatic type-conversion from std::string to the type of the parameter.

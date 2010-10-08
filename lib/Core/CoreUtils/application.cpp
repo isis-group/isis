@@ -104,13 +104,14 @@ void Application::printHelp(bool withHidden)const
 	for ( ParameterMap::const_iterator iP = parameters.begin(); iP != parameters.end(); iP++ ) {
 		std::string pref;
 
-		if ( iP->second.needed() ) {pref = ". Required.";}
-		else if(iP->second.hidden()){
+		if ( iP->second.needed() ) {
+			pref = ". Required.";
+		} else if(iP->second.hidden()){
 			if(!withHidden)
 				continue; // if its hidden, not needed, and wie want the short version skip this parameter
 		}
 
-		if ( ! iP->second.needed() && ! iP->second->is<dlist>() ) {pref = " Default: \"" + iP->second.toString() + "\"";};
+		if ( ! iP->second.needed() && ! iP->second->is<dlist>() ) {pref = ". Default: \"" + iP->second.toString() + "\"";};
 
 		std::cout << "\t-" << iP->first << " <" << iP->second->typeName() << ">" << std::endl;
 
