@@ -34,12 +34,19 @@ Application::Application( const char name[] ): m_name( name )
 {
 	Selection dbg_levels( "error,warning,info,verbose_info" );
 	dbg_levels.set( "warning" );
+
 	parameters["dCore"] = dbg_levels;
 	parameters["dCore"].setDescription( "Debugging level for the Core module" );
+	parameters["dCore"].hidden()=true;
+	
 	parameters["dData"] = dbg_levels;
 	parameters["dData"].setDescription( "Debugging level for the Data module" );
+	parameters["dData"].hidden()=true;
+	
 	parameters["dImageIO"] = dbg_levels;
 	parameters["dImageIO"].setDescription( "Debugging level for the ImageIO module" );
+	parameters["dImageIO"].hidden()=true;
+	
 	parameters["help"] = false;
 	parameters["help"].setDescription( "Print help" );
 	BOOST_FOREACH( ParameterMap::reference ref, parameters ) //none of these is needed
@@ -54,7 +61,7 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 
 	if ( parameters.parse( argc, argv ) ) {
 		if ( parameters["help"] ) {
-			printHelp();
+			printHelp(true);
 			exit( 0 );
 		}
 	} else {
@@ -89,7 +96,7 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 
 	return ! err;
 }
-void Application::printHelp()const
+void Application::printHelp(bool withHidden)const
 {
 	std::cout << this->m_name << " (using isis " << getCoreVersion() << ")" << std::endl;
 	std::cout << "Usage: " << this->m_filename << " <options>, where <options> includes:" << std::endl;
@@ -98,6 +105,10 @@ void Application::printHelp()const
 		std::string pref;
 
 		if ( iP->second.needed() ) {pref = ". Required.";}
+		else if(iP->second.hidden()){
+			if(!withHidden)
+				continue; // if its hidden, not needed, and wie want the short version skip this parameter
+		}
 
 		if ( ! iP->second.needed() && ! iP->second->is<dlist>() ) {pref = " Default: \"" + iP->second.toString() + "\"";};
 

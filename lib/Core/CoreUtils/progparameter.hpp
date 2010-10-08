@@ -37,6 +37,7 @@ namespace util
 class ProgParameter: public PropertyValue
 {
 	std::string m_description;
+	bool m_hidden;
 public:
 	/**
 	 * Default constructor.
@@ -73,6 +74,11 @@ public:
 		return get()->cast_to<T>();
 	}
 	operator boost::scoped_ptr<_internal::TypeBase>::unspecified_bool_type()const;// implicit conversion to "bool" stolen from boost
+
+	///get/set hidden state of the parameter
+	bool hidden()const;
+	///\copydoc hidden
+	bool &hidden();
 };
 
 /**
@@ -87,6 +93,21 @@ class ParameterMap: public std::map<std::string, ProgParameter, _internal::casel
 	struct notneededP {
 		bool operator()( const_reference ref )const {return !ref.second.needed();}
 	};
+	struct hiddenP {
+		bool operator()( const_reference ref )const {return ref.second.hidden();}
+	};
+	template<class T> void printWithout(){
+		std::map<key_type, mapped_type, key_compare> result( *this );
+
+		for (
+			std::map<key_type, mapped_type, key_compare>::iterator at = std::find_if( result.begin(), result.end(), T() );
+			at != result.end();
+			at = std::find_if( at, result.end(), hiddenP() )
+		)
+			result.erase( at++ );
+
+		std::cout << result << std::endl;
+	}
 	bool parsed;
 public:
 	/// create an empty parameter map
@@ -99,10 +120,6 @@ public:
 	bool parse( int argc, char **argv );
 	/// \returns true, if non needed parameter is unset (was not parsed yet)
 	bool isComplete()const;
-	/// print name and description of every ProgParameter in the container
-	void printAll()const;
-	/// print name and description of every needed ProgParameter in the container
-	void printNeeded()const;
 };
 
 }

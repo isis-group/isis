@@ -58,7 +58,7 @@ public:
 	 * Virtual function to display a short help text.
 	 * Ths usually shall print the programm name plus all entries of parameters with their description.
 	 */
-	virtual void printHelp()const;
+	virtual void printHelp(bool withHidden=false)const;
 	/// Set the logging level for the specified module
 	template<typename MODULE> void setLog( LogLevel level ) {
 		if ( !MODULE::use );

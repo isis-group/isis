@@ -23,7 +23,17 @@
 isis::util::ProgParameter::ProgParameter()
 {
 	needed() = true;
+	hidden() = false;
 }
+bool isis::util::ProgParameter::hidden() const
+{
+	return m_hidden;
+}
+bool& isis::util::ProgParameter::hidden()
+{
+	return m_hidden;
+}
+
 bool isis::util::ProgParameter::parse( const Type<std::string> &props )
 {
 	_internal::TypeBase &me = **this;
@@ -96,23 +106,6 @@ bool isis::util::ParameterMap::isComplete()const
 {
 	LOG_IF( ! parsed, Debug, error ) << "You did not run parse() yet. This is very likely an error";
 	return std::find_if( begin(), end(), neededP() ) == end();
-}
-void isis::util::ParameterMap::printAll()const
-{
-	std::cout << *this << std::endl;
-}
-void isis::util::ParameterMap::printNeeded()const
-{
-	std::map<key_type, mapped_type, key_compare> needed( *this );
-
-	for (
-		std::map<key_type, mapped_type, key_compare>::iterator at = std::find_if( needed.begin(), needed.end(), notneededP() );
-		at != needed.end();
-		at = std::find_if( at, needed.end(), notneededP() )
-	)
-		needed.erase( at++ );
-
-	std::cout << needed << std::endl;
 }
 
 isis::util::ProgParameter::operator boost::scoped_ptr<_internal::TypeBase>::unspecified_bool_type()const

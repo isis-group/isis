@@ -30,8 +30,11 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 	if ( have_input ) {
 		parameters["in"] = std::string();
 		parameters["in"].setDescription( "input file or dataset" );
+
 		parameters["rf"] = std::string();
 		parameters["rf"].needed() = false;
+		parameters["rf"].hidden() = true;
+		
 		parameters["rf"].setDescription( "Override automatic detection of file suffix for reading with given value" );
 		parameters["rdialect"] = std::string();
 		parameters["rdialect"].needed() = false;
@@ -42,9 +45,12 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 	if ( have_output ) {
 		parameters["out"] = std::string();
 		parameters["out"].setDescription( "output file" );
+
 		parameters["wf"] = std::string();
 		parameters["wf"].needed() = false;
 		parameters["wf"].setDescription( "Override automatic detection of file suffix for writing with given value" );
+		parameters["wf"].hidden() = true;
+		
 		parameters["wdialect"] = std::string();
 		parameters["wdialect"].needed() = false;
 		parameters["wdialect"].setDescription( "choose dialect for writing. The available dialects depend on the capabilities of IO plugins" );
@@ -73,6 +79,7 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 		parameters["np"] = false;
 		parameters["np"].needed() = false;
 		parameters["np"].setDescription( "suppress progress bar" );
+		parameters["np"].hidden() = true;
 	}
 }
 
