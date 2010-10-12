@@ -236,7 +236,7 @@ int main(
 	}
 
 	if ( fmri ) {
-		inList = isis::data::IOFactory::load( in_filename, "", "functional" );
+		inList = isis::data::IOFactory::load( in_filename, "", "" );
 	}
 
 	BOOST_FOREACH( isis::data::ImageList::reference ref, inList ) {
