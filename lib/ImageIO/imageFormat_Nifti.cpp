@@ -41,6 +41,8 @@
 #include <boost/assert.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/regex.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/date_time/gregorian/gregorian.hpp>
 
 namespace isis
 {
@@ -357,21 +359,42 @@ private:
 									<< getVector( ni, voxelSizeVec );
 		}
 
-		//check repetition time
-		//check description for TR=[[:digit:]]ms.
-		boost::regex descriptionRegex( ".*TR=([[:digit:]]{1,})ms.*" );
+		//check description for tr, te and fa and date which is written by spm8
+
+		boost::regex descriptionRegex(
+				".*TR=([[:digit:]]{1,})ms.*TE=([[:digit:]]{1,})ms.*FA=([[:digit:]]{1,})deg\\ *([[:digit:]]{1,2}).([[:word:]]{3}).([[:digit:]]{4})\\ *([[:digit:]]{1,2}):([[:digit:]]{1,2}):([[:digit:]]{1,2}).*" );
 		boost::cmatch results;
 		u_int16_t tr = 0;
-
+		u_int16_t te = 0;
+		u_int16_t fa = 0;
+		std::string day, month, year;
+		size_t hours, minutes, seconds;
+		boost::gregorian::date isisDate;
+		boost::posix_time::time_duration isisTimeDuration;
 		if ( boost::regex_match( ni.descrip, results,  descriptionRegex ) ) {
 			tr = boost::lexical_cast<u_int16_t>( results.str( 1 ) );
-		}
+			te = boost::lexical_cast<u_int16_t>( results.str( 2 ) );
+			fa = boost::lexical_cast<u_int16_t>( results.str( 3 ) );
+			day = boost::lexical_cast<std::string>( results.str( 4 ) );
+			month = boost::lexical_cast<std::string>( results.str( 5 ) );
+			year = boost::lexical_cast<std::string>( results.str( 6 ) );
+			hours = boost::lexical_cast<size_t>( results.str( 7 ) );
+			minutes = boost::lexical_cast<size_t>( results.str( 8 ) );
+			seconds = boost::lexical_cast<size_t>( results.str( 9 ) );
 
-		//if "TR=" was found in description and differs from pixdim[dim]
-		if( tr && ( !tr == ni.pixdim[ni.ndim] ) ) {
-			LOG( ImageIoLog, warning ) << "TR=" << tr << " was found in description but differs from pixdim[4]= "
-									   << ni.pixdim[ni.ndim];
-			retChunk.setProperty<u_int16_t>( "repetitionTime", tr );
+			if( day.size() == 1) {
+				day.insert( 0, std::string( "0" ) );
+			}
+			isisTimeDuration = boost::posix_time::time_duration( hours, minutes, seconds );
+			std::string strDate = year + "-" + month + "-" + day;
+			isisDate = boost::gregorian::from_simple_string( strDate );
+			boost::posix_time::ptime isisTime( isisDate, isisTimeDuration );
+			LOG( ImageIoLog, info ) << "SPM8 description found.";
+			retChunk.setProperty<boost::posix_time::ptime>("sequenceStart", isisTime );
+			retChunk.setProperty<u_int16_t>("flipAngle", fa );
+			retChunk.setProperty<u_int16_t>("echoTime", te );
+			retChunk.setProperty<u_int16_t>("repetitionTime", tr );
+
 		}
 
 		//if "TR=" was not found in description and pixdim[dim] == 0 a warning calls attention to use parameter -tr to change repetitionTime.
