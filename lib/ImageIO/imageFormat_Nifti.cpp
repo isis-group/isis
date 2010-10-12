@@ -404,7 +404,7 @@ private:
 		}
 
 		if( !tr && ni.pixdim[ni.ndim] ) {
-			retChunk.setProperty<u_int16_t>( "repetitionTime", ni.pixdim[ni.ndim] );
+			retChunk.setProperty<u_int16_t>( "repetitionTime", ni.pixdim[ni.ndim] * 1000 );
 		}
 
 		util::fvector4 newVoxelSize = retChunk.getProperty<util::fvector4>( "voxelSize" );
@@ -558,8 +558,9 @@ private:
 
 		if ( image.hasProperty( "repetitionTime" ) ) {
 			LOG( ImageIoLog, info ) << "Setting pixdim[" << ni.ndim << "] to " << image.getProperty<u_int16_t>( "repetitionTime" );
-			ni.dt = ni.pixdim[ni.ndim+1] = image.getProperty<u_int16_t>( "repetitionTime" );
+			ni.dt = ni.pixdim[ni.ndim+1] = (float) image.getProperty<u_int16_t>( "repetitionTime" ) / 1000; //nifti saves repTime s
 		}
+
 
 		//the rotation matrix
 		//create space tranformation matrices - transforms the space when reading _NOT_ the data

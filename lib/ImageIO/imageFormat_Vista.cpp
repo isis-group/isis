@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * Author: Thomas Pröger, proeger@cbs.mpg.de, 2010
+ * Author: Thomas Proeger, proeger@cbs.mpg.de, 2010
  *
  *****************************************************************/
 
@@ -468,8 +468,9 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 
 				// sagittal (x,y,z) -> (z,x,y)
 				if( strcmp( orient, "sagittal" ) == 0 ) {
+
 					LOG( DataLog, verbose_info ) << "computing ioprop with sagittal";
-					ioprob[0] += ( nloaded - 1 ) * v3[2];
+					ioprob[0] -= ( nloaded - 1 ) * v3[2];
 				}
 				// coronal (x,y,z) -> (x,-z,y)
 				else if( strcmp( orient, "coronal" ) == 0 ) {
