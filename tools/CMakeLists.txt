@@ -17,7 +17,7 @@ project(ISIS_TOOLS)
 ###########################################################
 # find and configure the isis core library
 ###########################################################
-SET(ISIS_DIR /usr/share/isis/cmake CACHE PATH 
+SET(ISIS_DIR /usr/share/isis/cmake CACHE PATH
     "The directory where the isis cmake configuration script is located.")
 
 FIND_PACKAGE(ISIS REQUIRED)
@@ -39,19 +39,19 @@ ELSE(${CMAKE_PROJECT_NAME}_DEBUG_LOG)
 ENDIF(${CMAKE_PROJECT_NAME}_DEBUG_LOG)
 
 add_executable(isisdump isisdump.cpp)
-target_link_libraries(isisdump ${ISIS_LIB} ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
+target_link_libraries(isisdump ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
 SET_TARGET_PROPERTIES(isisdump PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 add_executable(isisdiff isisdiff.cpp)
-target_link_libraries(isisdiff ${ISIS_LIB} ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
+target_link_libraries(isisdiff ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
 SET_TARGET_PROPERTIES(isisdiff PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 add_executable(isisconv isisconv.cpp)
-target_link_libraries(isisconv ${ISIS_LIB} ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
+target_link_libraries(isisconv ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
 SET_TARGET_PROPERTIES(isisconv PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 add_executable(isisswap isisswap.cpp)
-target_link_libraries(isisswap ${ISIS_LIB} ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
+target_link_libraries(isisswap ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
 SET_TARGET_PROPERTIES(isisswap PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # the install targets.
