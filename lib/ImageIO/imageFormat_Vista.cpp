@@ -393,7 +393,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 			if( sliceRef.hasProperty( "indexOrigin" ) and ( originCheckSet.size() == vImageVector.size() )) {
 				ioprob = sliceRef.getProperty<util::fvector4>( "indexOrigin" );
 			}
-			// no indexOrigin present -> Calculate index origin
+			// no indexOrigin present or does not differ from slice to slice -> Calculate index origin
 			else {
 				/******************** SET index origin ********************/
 				// the index origin of each slice depends on the slice orientation
@@ -415,19 +415,19 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 				}
 
 				// unusual error: there is no 'orientation' information in the vista image.
-				if( val == NULL )
+				if( val == NULL ) {
 					throwGenericError( "Missing orientation information in functional data." );
-
+				}
 				// compare new orientation with old. Just to make sure that all subimages
 				// have the same slice orientation.
-				if( orient[0] == '\0' )
+				if( orient[0] == '\0' ) {
 					strcpy( orient, ( char * )val );
+				}
 				else {
 					// orientation string differs from previous value;
 					if( strcmp( orient, ( char * )val ) != 0 )
 						throwGenericError( "Inconsistent orienation information in functional data." );
 				}
-
 				// get voxel resolution
 				val = NULL;
 
@@ -462,13 +462,15 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 				// Get indexOrigin from whole image with respect of the orientation
 				// information. In general this should be the indexOrigin from the
 				// (0,0,0,0) voxel.
-				ioprob = calculateIndexOrigin( sliceRef, dims );
+				if ( !sliceRef.hasProperty("indexOrigin")) {
+					ioprob = calculateIndexOrigin( sliceRef, dims );
+				} else {
+					ioprob = sliceRef.getProperty<util::fvector4>("indexOrigin");
+				}
 				// correct the index origin according to the slice number and voxel
 				// resolution
-
 				// sagittal (x,y,z) -> (z,x,y)
 				if( strcmp( orient, "sagittal" ) == 0 ) {
-
 					LOG( DataLog, verbose_info ) << "computing ioprop with sagittal";
 					ioprob[0] -= ( nloaded - 1 ) * v3[2];
 				}
@@ -480,7 +482,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 				// axial (x,y,z) -> (x,y,z)
 				else {
 					LOG( DataLog, verbose_info ) << "computing ioprop with axial: += " <<  ( nloaded - 1 ) * v3[2];
-					ioprob[2] += ( nloaded - 1 ) * v3[2];
+					ioprob[2] += ( nloaded - 1) * v3[2];
 				}
 			}
 
