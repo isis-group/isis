@@ -229,15 +229,7 @@ int main(
 		}
 	}
 
-	isis::data::ImageList inList;
-
-	if ( !fmri ) {
-		inList = isis::data::IOFactory::load( in_filename, "" );
-	}
-
-	if ( fmri ) {
-		inList = isis::data::IOFactory::load( in_filename, "", "" );
-	}
+	isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "", "" );
 
 	BOOST_FOREACH( isis::data::ImageList::reference ref, inList ) {
 		if ( tmpList.front()->hasProperty( "Vista/extent" ) ) {
