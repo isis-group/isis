@@ -27,11 +27,13 @@
 #include "DataStorage/image.hpp"
 #include "CoreUtils/log.hpp"
 #include "CoreUtils/common.hpp"
+#include "CoreUtils/vector.hpp"
 #include "DataStorage/numeric_convert.hpp"
 
 //external includes
 #include <boost/shared_ptr.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
+#include <boost/foreach.hpp>
 
 //itk includes
 #include <itkImage.h>
@@ -92,7 +94,6 @@ private:
 	//  boost::shared_ptr<data::Image> m_ImageISIS;
 	data::Image m_ImageISIS;
 	unsigned short m_TypeID;
-	itk::MetaDataDictionary m_ITKDict;
 	std::vector< boost::shared_ptr<util::PropMap> > m_ChunkPropMapVector;
 	util::PropMap m_ImagePropMap;
 	size_t m_RelevantDim;
@@ -100,6 +101,9 @@ private:
 	template<typename TInput, typename TOutput> typename TOutput::Pointer internCreateItk( const bool behaveAsItkReader );
 
 	template<typename TImageITK, typename TOutputISIS> data::ImageList internCreateISIS( const typename TImageITK::Pointer src, const bool behaveAsItkWriter );
+
+	template <typename TOutputISIS> bool correctIndexOrigin( boost::shared_ptr< data::TypedImage< TOutputISIS> > );
+
 };
 
 }

@@ -274,8 +274,6 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	data::ImageList isisImageList( chunkList );
 	boost::shared_ptr< data::TypedImage< TOutputISIS > > retImage (
 		new data::TypedImage<TOutputISIS>  ( *isisImageList.front().get() ) );
-	//this will splice down the image the same way it was handed over to the itkAdapter
-	retImage->spliceDownTo( static_cast<data::dimensions> ( m_RelevantDim ) );
 	//these are properties eventually manipulated by itk. So we can not take the
 	//parameters from the isis image which was handed over to the itkAdapter
 	retImage->setProperty( "indexOrigin", util::fvector4( indexOrigin[0], indexOrigin[1], indexOrigin[2], indexOrigin[3] ) );
@@ -283,6 +281,8 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	retImage->setProperty( "phaseVec", util::fvector4( imageDirection[0][1], imageDirection[1][1], imageDirection[2][1], 0 ) );
 	retImage->setProperty( "sliceVec", util::fvector4( imageDirection[0][2], imageDirection[1][2], imageDirection[2][2], 0 ) );
 	retImage->setProperty( "voxelSize", util::fvector4( imageSpacing[0], imageSpacing[1], imageSpacing[2], imageSpacing[3] ) );
+	//this will splice down the image the same way it was handed over to the itkAdapter
+	retImage->spliceDownTo( static_cast<data::dimensions> ( m_RelevantDim ) );
 	//add the residual parameters to the image
 	retImage->join( m_ImagePropMap, false );
 	std::vector< boost::shared_ptr< data::Chunk> > chList = retImage->getChunkList();
@@ -294,11 +294,9 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 		//the size of the m_ChunkPropMapVector the size of the image was changed in itk.
 		//Thus we have to interpolate the parameters (sliceTime so far)
 		chRef->join( static_cast<util::PropMap &>( *retImage ), false );
-
 		if( chunkCounter < ( m_ChunkPropMapVector.size() - 1 ) ) {
 			chunkCounter++;
 		}
-
 		chRef->join( *m_ChunkPropMapVector[chunkCounter], false );
 	}
 	data::ImageList retList;
