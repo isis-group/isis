@@ -122,7 +122,7 @@ public:
 		nifti_image *ni = nifti_image_read( filename.c_str(), true );
 
 		if ( not ni )
-			throwGenericError( "nifti_image_read(" + filename + ") failed" );
+			throwGenericError( "nifti_image_read() failed" );
 
 		// 0.0 would mean "not in use" - so for better handling use a 1.0
 		float scale = ni->scl_slope ? ni->scl_slope : 1.0;

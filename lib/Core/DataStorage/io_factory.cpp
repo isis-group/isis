@@ -18,6 +18,8 @@
 #endif
 #include <iostream>
 #include <vector>
+#include <algorithm>
+
 #include "CoreUtils/log.hpp"
 #include "DataStorage/common.hpp"
 #include <boost/regex.hpp>
@@ -48,6 +50,16 @@ struct pluginDeleter {
 			std::cerr << "Failed to release plugin " << m_pluginName << " (was loaded at " << m_dlHandle << ")";
 
 		//we cannot use LOG here, because the loggers are gone allready
+	}
+};
+struct dialect_missing{
+	std::string dialect;
+	std::string filename;
+	bool operator()(IOFactory::FileFormatList::reference ref)const{
+		std::list<std::string> splitted=util::string2list<std::string>(ref->dialects(filename),' ');
+		const bool ret=(std::find(splitted.begin(),splitted.end(),dialect)==splitted.end());
+		LOG_IF(ret,Runtime,warning) << ref->name() << " does not support the requested dialect " << util::MSubject(dialect);
+		return ret;
 	}
 };
 }
@@ -148,7 +160,12 @@ unsigned int IOFactory::findPlugins( const std::string &path )
 
 std::list<std::string> IOFactory::getSuffixes( const FileFormatPtr &reader )
 {
-	return util::string2list<std::string>( reader->suffixes(), boost::regex( "\\s+" ) );
+	std::list<std::string> ret=util::string2list<std::string>( reader->suffixes(), boost::regex( "\\s+" ) );
+	BOOST_FOREACH(std::string &ref,ret)
+	{
+		ref.erase(0,ref.find_first_not_of('.'));// remove leading . if there are some
+	}
+	return ret;
 }
 
 IOFactory &IOFactory::get()
@@ -161,75 +178,67 @@ int IOFactory::loadFile( isis::data::ChunkList &ret, const boost::filesystem::pa
 	FileFormatList formatReader;
 	formatReader = getFormatInterface( filename.string(), suffix_override, dialect );
 
+	const size_t nimgs_old = ret.size();   // save number of chunks
+	const std::string with_dialect=dialect.empty() ?
+					  std::string( "" ) : std::string( " with dialect \"" ) + dialect + "\"";
+
 	if ( formatReader.empty() ) {
-		if( suffix_override.empty() )
-			LOG( Runtime, error ) << "No plugin found to read " << filename.string() << " with dialect " << dialect;
-		else
-			LOG( Runtime, error ) << "No plugin supporting the requested suffix " << suffix_override << " was found";
-
-		return false;
-	}
-
-	size_t nimgs_old = ret.size();   // save number of chunks
-	BOOST_FOREACH( FileFormatList::const_reference it, formatReader ) {
-		LOG( ImageIoDebug, info )
-				<< "plugin to load file " <<  util::MSubject( filename ) << ": " << it->name()
-				<<  ( dialect.empty() ?
-					  std::string( "" ) : std::string( " with dialect: " ) + dialect
-					);
-
-		try {
-			return it->load( ret, filename.string(), dialect );
-		} catch ( std::runtime_error &e ) {
-			LOG( Runtime, error )
-					<< "Failed to load " <<  filename << " using " <<  it->name() << " ( " << e.what() << " )";
-			return ret.size() - nimgs_old;
+		if( suffix_override.empty() ){
+			LOG( Runtime, error ) << "No plugin found to read "	<< filename.string() << with_dialect;
+		} else {
+			LOG( Runtime, error ) << "No plugin supporting the requested suffix " << suffix_override << with_dialect << " was found";
 		}
-	}
-
-	if( boost::filesystem::exists( filename ) ) {
-		LOG( Runtime, error )
-				<< "No plugin found that is able to load: "
-				<< util::MSubject( filename ) << ( !dialect.empty() ? std::string( " with the dialect [" ) + dialect + "]" : "" );
 	} else {
-		LOG( Runtime, error ) << util::MSubject( filename ) << " is no file or directory, and no plugin was found to load it.";
+		BOOST_FOREACH( FileFormatList::const_reference it, formatReader ) {
+			LOG( ImageIoDebug, info )
+					<< "plugin to load file" << with_dialect << " " << util::MSubject( filename ) << ": " << it->name();
+
+			try {
+				return it->load( ret, filename.string(), dialect );
+			} catch ( std::runtime_error &e ) {
+				LOG( Runtime, formatReader.size()>1 ? warning:error )
+						<< "Failed to load " <<  filename << " using " <<  it->name() << with_dialect << " ( " << e.what() << " )";
+			}
+		}
+
+		LOG_IF(boost::filesystem::exists( filename ) && formatReader.size()>1, Runtime, error )	<< "No plugin was able to load: "	<< util::MSubject( filename ) << with_dialect;
 	}
 
-	return 0;//no plugin of proposed list could load file
+	return ret.size() - nimgs_old;//no plugin of proposed list could load file
 }
+
 
 IOFactory::FileFormatList IOFactory::getFormatInterface( std::string filename, std::string suffix_override, std::string dialect )
 {
-	std::string ext;
 
-	if( suffix_override.empty() ) {
-		boost::filesystem::path fname( filename );
-		ext = boost::filesystem::extension( fname );
-	} else ext = suffix_override;
+	std::list<std::string> ext;
+	FileFormatList ret;
+	_internal::dialect_missing remove_op;
 
-	if ( ext.empty() ) {
-		LOG(Runtime,warning) << "No suffix detected or given. Wont find any IO plugin.";
-		return FileFormatList();
-	}
+	if( suffix_override.empty() ) { // detect suffixes from the filename
+		const boost::filesystem::path fname( filename );
+		ext = util::string2list<std::string>( fname.leaf(),'.'); // get all suffixes
+		ext.pop_front(); // remove the first "suffix" - actually the basename
+	} else ext = util::string2list<std::string>(suffix_override,'.');
 
-	if ( dialect.empty() ) {//return whole list of plugins for this file extension
-		LOG(Debug,info) << "No dialect given. Trying all " << io_suffix[ext].size() << " plugins";
-		return io_suffix[ext];
-	}
-
-	//otherwise sort out by dialect
-	FileFormatList reader;
-
-	for ( FileFormatList::const_iterator it = io_suffix[ext].begin(); it != io_suffix[ext].end(); it++ ) {
-		std::list<std::string> splitted;
-		const std::string d ( ( *it )->dialects(filename) );
-
-		boost::algorithm::split( splitted, d, boost::algorithm::is_any_of( " " ) );
-		if(std::find(splitted.begin(),splitted.end(),dialect)!=splitted.end()){
-			reader.push_back( *it );
+	while(!ext.empty()){
+		const std::string wholeName=util::list2string(ext.begin(),ext.end(),".","",""); // (re)construct the rest of the suffix
+		const std::map<std::string, FileFormatList, util::_internal::caselessStringLess>::iterator found=io_suffix.find(wholeName);
+		if(found!=io_suffix.end()){
+			ret.insert(ret.end(),found->second.begin(),found->second.end());
 		}
+		ext.pop_front();
 	}
-	return reader;
+
+	if(dialect.empty()){
+		LOG(Debug,info) << "No dialect given. Will use all "<< ret.size() << " plugins";
+	} else {//remove everything which lacks the dialect if there was some given
+		remove_op.dialect=dialect;
+		remove_op.filename=filename;
+		ret.remove_if(remove_op);
+		LOG(Debug,info) << "Removed everything which does not support the dialect " << util::MSubject(dialect) << " on " << filename << "(" << ret.size() << " plugins left)";
+	}
+	return ret;
 }
 
 
@@ -247,7 +256,7 @@ data::ImageList IOFactory::load( const std::string &path, std::string suffix_ove
 	LOG( Runtime, info ) << "chunks in list: " << chunks.size();
 	const data::ImageList images( chunks );
 	LOG( Runtime, info )
-			<< "Generated " << images.size() << " images out of " << loaded << " chunks from " << ( boost::filesystem::is_directory( p ) ? "directory " : "" ) << p;
+			<< "Generated " << images.size() << " images out of " << loaded << " chunks loaded from " << ( boost::filesystem::is_directory( p ) ? "directory " : "" ) << p;
 	return images;
 }
 
@@ -277,35 +286,36 @@ int IOFactory::loadPath( isis::data::ChunkList &ret, const boost::filesystem::pa
 
 bool IOFactory::write( const isis::data::ImageList &images, const std::string &path, std::string suffix_override, const std::string &dialect )
 {
-	FileFormatList formatWriter;
-	formatWriter = get().getFormatInterface( path, suffix_override, dialect );
+	const FileFormatList formatWriter = get().getFormatInterface( path, suffix_override, dialect );
 
-	if( formatWriter.empty() ) {
-		formatWriter = get().getFormatInterface( path, suffix_override, "" );
-		LOG( DataLog, warning ) << "No plugin found to write "
-								<< path << " with dialect " << dialect
-								<< "! Trying to omit the dialect...";
-	}
+	if(formatWriter.size()){
+		BOOST_FOREACH( FileFormatList::const_reference it, formatWriter ) {
+			LOG( Debug, info )
+					<< "plugin to write to " <<  path << ": " << it->name()
+					<<  ( dialect.empty() ?
+						std::string( "" ) :
+						std::string( " using dialect: " ) + dialect
+						);
 
-	BOOST_FOREACH( FileFormatList::const_reference it, formatWriter ) {
-		LOG( Debug, info )
-				<< "plugin to write to " <<  path << ": " << it->name()
+			try {
+				it->write( images, path, dialect );
+				LOG( Runtime, info ) << images.size()
+				<< " images written to " << path << " using " <<  it->name()
 				<<  ( dialect.empty() ?
-					  std::string( "" ) :
-					  std::string( " using dialect: " ) + dialect
+					std::string( "" ) :
+					std::string( " and dialect: " ) + dialect
 					);
 
-		try {
-			it->write( images, path, dialect );
-			LOG( Debug, info ) << images.size() << " images written using " <<  it->name();
-			return true;
-		} catch ( std::runtime_error &e ) {
-			LOG( Runtime, error )
-					<< "Failed to write " <<  images.size()
-					<< " images using " <<  it->name() << " (" << e.what() << ")";
+				return true;
+			} catch ( std::runtime_error &e ) {
+				LOG( Runtime, warning )
+						<< "Failed to write " <<  images.size()
+						<< " images to " << path << " using " <<  it->name() << " (" << e.what() << ")";
+			}
 		}
+	} else {
+		LOG( Runtime, error ) << "No plugin found to write to: " << path; //@todo error message missing
 	}
-	LOG( Runtime, error ) << "No plugin found to write to: " << path; //@todo error message missing
 	return false;
 }
 void IOFactory::setProgressFeedback( util::ProgressFeedback *feedback )

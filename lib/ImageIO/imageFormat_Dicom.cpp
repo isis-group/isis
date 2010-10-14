@@ -350,7 +350,7 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 	}
 }
 
-void ImageFormat_Dicom::readMosaic( data::Chunk source, data::ChunkList &dest )
+int ImageFormat_Dicom::readMosaic( data::Chunk source, data::ChunkList &dest )
 {
 	// prepare some needed parameters
 	const std::string prefix = std::string( ImageFormat_Dicom::dicomTagTreeName ) + "/";
@@ -467,6 +467,7 @@ void ImageFormat_Dicom::readMosaic( data::Chunk source, data::ChunkList &dest )
 	}
 
 	dest.insert( dest.end(), newChunks.begin(), newChunks.end() );
+	return newChunks.size();
 }
 
 
@@ -485,17 +486,15 @@ int ImageFormat_Dicom::load( data::ChunkList &chunks, const std::string &filenam
 
 			if ( std::find( iType.begin(), iType.end(), "MOSAIC" ) != iType.end() ) { // if its a mosaic
 				LOG( Runtime, verbose_info ) << "This seems to be an mosaic image, will decompose it";
-				readMosaic( *chunk, chunks );
+				return readMosaic( *chunk, chunks );
 			} else {
 				chunks.push_back( chunk );
+				return 1;
 			}
-
-			return 1;
 		}
 	} else {
 		FileFormat::throwGenericError( std::string( "Failed to open file: " ) + loaded.text() );
 	}
-
 	return 0;
 }
 

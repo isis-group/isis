@@ -39,7 +39,6 @@ public:
 	typedef boost::shared_ptr< ::isis::image_io::FileFormat> FileFormatPtr;
 	typedef std::list<FileFormatPtr> FileFormatList;
 private:
-	typedef std::map<std::string, FileFormatPtr> FormatFormatMap;
 	util::ProgressFeedback *m_feedback;
 public:
 	/**
@@ -56,6 +55,8 @@ public:
 
 	/**
 	 * get all file suffixes a plugin suggests to handle
+	 * The string returned by FileFormat::suffixes is tokenized at the spaces and every leading "." is stripped.
+	 * The result is returned in a string-list.
 	 * @param reader the plugin to ask
 	 * @return a list of suffixes the plugin handles
 	 */
@@ -85,6 +86,10 @@ protected:
 	bool registerFormat( const FileFormatPtr plugin );
 	unsigned int findPlugins( const std::string &path );
 private:
+	/**
+	 * Stores a map of suffixes to a list FileFormats which supports this suffixes.
+	 * Leading "." are stripped in the suffixes.
+	 */
 	std::map<std::string, FileFormatList, util::_internal::caselessStringLess> io_suffix;
 	IOFactory &operator =( IOFactory & ); //dont do that
 };
