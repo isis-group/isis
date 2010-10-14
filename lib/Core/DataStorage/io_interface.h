@@ -56,6 +56,15 @@ public:
 	virtual std::string name() = 0;
 	/// \return the file-suffixes the plugin supports
 	virtual std::string suffixes() = 0;
+	/**
+	 * get all file suffixes a plugin suggests to handle
+	 * The string returned by suffixes is tokenized at the spaces and every leading "." is stripped.
+	 * The result is returned in a string-list.
+	 * @param reader the plugin to ask
+	 * @return a list of suffixes the plugin handles
+	 */
+	std::list<std::string> getSuffixes();
+	
 	/// \return the dialects the plugin supports
 	virtual std::string dialects(const std::string &filename) {return std::string();};
 	/// \return if the plugin is not part of the official distribution

@@ -109,13 +109,17 @@ public:
 		return std::string( ".gz" );
 	}
 	std::string dialects(const std::string &filename){
-		std::set<std::string> ret;
-		data::IOFactory::FileFormatList formats=data::IOFactory::get().getFormatInterface(boost::filesystem::basename( filename ));
-		BOOST_FOREACH(data::IOFactory::FileFormatList::const_reference ref,formats){
-			const std::list<std::string> dias=util::string2list<std::string>(ref->dialects(filename));
-			ret.insert(dias.begin(),dias.end());
+		if(filename.empty()){
+			return std::string();
+		} else {
+			std::set<std::string> ret;
+			data::IOFactory::FileFormatList formats=data::IOFactory::get().getFormatInterface(boost::filesystem::basename( filename ));
+			BOOST_FOREACH(data::IOFactory::FileFormatList::const_reference ref,formats){
+				const std::list<std::string> dias=util::string2list<std::string>(ref->dialects(filename));
+				ret.insert(dias.begin(),dias.end());
+			}
+			return util::list2string(ret.begin(),ret.end(),",","","");
 		}
-		return util::list2string(ret.begin(),ret.end(),",","","");
 	}
 	std::string name() {return "compression proxy for other formats";}
 

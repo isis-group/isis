@@ -100,6 +100,27 @@ bool IOApplication::init( int argc, char **argv, bool exitOnError )
 
 	return true;
 }
+void IOApplication::printHelp(bool withHidden) const
+{
+    util::Application::printHelp(withHidden);
+	if(withHidden){
+		std::cout << std::endl << "Available IO Plugins:" << std::endl;
+		data::IOFactory::FileFormatList plugins=data::IOFactory::getFormats();
+		BOOST_FOREACH(data::IOFactory::FileFormatList::const_reference pi,plugins){
+			
+			std::cout << std::endl << "\t" << pi->name() << std::endl << "\t=======================================" << std::endl;
+
+			const std::list<std::string> suff=pi->getSuffixes(), dialects= util::string2list<std::string>(pi->dialects(""));
+			
+			std::cout << "\tsupported suffixes: " << util::list2string(suff.begin(),suff.end(),"\", \"","\"","\"")  << std::endl;
+
+			if(!dialects.empty())
+				std::cout << "\tsupported dialects: " << util::list2string(dialects.begin(),dialects.end(),"\", \"","\"","\"")  << std::endl;
+			
+		}
+	}
+}
+
 bool IOApplication::autoload( bool exitOnError )
 {
 	std::string input = parameters["in"];

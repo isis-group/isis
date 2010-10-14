@@ -85,6 +85,16 @@ void FileFormat::throwSystemError( int err, std::string desc )
 	throw( boost::system::system_error( err, boost::system::get_system_category(), desc ) );
 }
 
+std::list< std::string > FileFormat::getSuffixes()
+{
+	std::list<std::string> ret=util::string2list<std::string>( suffixes(), boost::regex( "\\s+" ) );
+	BOOST_FOREACH(std::string &ref,ret)
+	{
+		ref.erase(0,ref.find_first_not_of('.'));// remove leading . if there are some
+	}
+	return ret;
+}
+
 const float FileFormat::invalid_float = -std::numeric_limits<float>::infinity();
 }
 }

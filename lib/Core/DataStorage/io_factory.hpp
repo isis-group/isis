@@ -53,22 +53,9 @@ public:
 	int loadPath( ChunkList &ret, const boost::filesystem::path &path, std::string suffix_override, std::string dialect );
 	static ImageList load( const std::string &path, std::string suffix_override = "", std::string dialect = "" );
 
-	/**
-	 * get all file suffixes a plugin suggests to handle
-	 * The string returned by FileFormat::suffixes is tokenized at the spaces and every leading "." is stripped.
-	 * The result is returned in a string-list.
-	 * @param reader the plugin to ask
-	 * @return a list of suffixes the plugin handles
-	 */
-	static std::list<std::string> getSuffixes( const FileFormatPtr &reader );
-
 	static bool write( const ImageList &images, const std::string &path, std::string suffix_override, const std::string &dialect );
 
-	template<typename charT, typename traits> static void print_formats( std::basic_ostream<charT, traits> &out ) {
-		for ( std::list<FileFormatPtr>::const_iterator it = get().io_formats.begin(); it != get().io_formats.end(); it++ )
-			out << ( *it )->name() << std::endl;
-	}
-
+	static FileFormatList getFormats();
 	static IOFactory &get();
 
 	static void setProgressFeedback( util::ProgressFeedback *feedback );

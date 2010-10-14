@@ -46,6 +46,7 @@ public:
 	IOApplication( const char name[], bool have_input = true, bool have_output = true );
 	virtual ~IOApplication();
 	virtual bool init( int argc, char **argv, bool exitOnError = true );
+    virtual void printHelp(bool withHidden = false) const;
 
 	bool autoload( bool exitOnError = false );
 	bool autowrite( const ImageList &out_images, bool exitOnError = false );

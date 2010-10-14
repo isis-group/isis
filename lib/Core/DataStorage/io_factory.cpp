@@ -74,7 +74,7 @@ bool IOFactory::registerFormat( const FileFormatPtr plugin )
 	if ( !plugin )return false;
 
 	io_formats.push_back( plugin );
-	std::list<std::string> suffixes = getSuffixes( plugin );
+	std::list<std::string> suffixes = plugin->getSuffixes(  );
 	LOG( Runtime, info )
 			<< "Registering " << ( plugin->tainted() ? "tainted " : "" ) << "io-plugin "
 			<< util::MSubject( plugin->name() )
@@ -158,16 +158,6 @@ unsigned int IOFactory::findPlugins( const std::string &path )
 	return ret;
 }
 
-std::list<std::string> IOFactory::getSuffixes( const FileFormatPtr &reader )
-{
-	std::list<std::string> ret=util::string2list<std::string>( reader->suffixes(), boost::regex( "\\s+" ) );
-	BOOST_FOREACH(std::string &ref,ret)
-	{
-		ref.erase(0,ref.find_first_not_of('.'));// remove leading . if there are some
-	}
-	return ret;
-}
-
 IOFactory &IOFactory::get()
 {
 	return util::Singletons::get<IOFactory, INT_MAX>();
@@ -225,6 +215,7 @@ IOFactory::FileFormatList IOFactory::getFormatInterface( std::string filename, s
 		const std::string wholeName=util::list2string(ext.begin(),ext.end(),".","",""); // (re)construct the rest of the suffix
 		const std::map<std::string, FileFormatList, util::_internal::caselessStringLess>::iterator found=io_suffix.find(wholeName);
 		if(found!=io_suffix.end()){
+			LOG(Debug,verbose_info) << found->second.size() << " plugins support suffix " << wholeName;
 			ret.insert(ret.end(),found->second.begin(),found->second.end());
 		}
 		ext.pop_front();
@@ -325,6 +316,11 @@ void IOFactory::setProgressFeedback( util::ProgressFeedback *feedback )
 	if( This.m_feedback )This.m_feedback->close();
 
 	This.m_feedback = feedback;
+}
+
+IOFactory::FileFormatList IOFactory::getFormats()
+{
+	return get().io_formats;
 }
 
 
