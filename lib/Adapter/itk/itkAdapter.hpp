@@ -101,9 +101,6 @@ private:
 	template<typename TInput, typename TOutput> typename TOutput::Pointer internCreateItk( const bool behaveAsItkReader );
 
 	template<typename TImageITK, typename TOutputISIS> data::ImageList internCreateISIS( const typename TImageITK::Pointer src, const bool behaveAsItkWriter );
-
-	template <typename TOutputISIS> bool correctIndexOrigin( boost::shared_ptr< data::TypedImage< TOutputISIS> > );
-
 };
 
 }
