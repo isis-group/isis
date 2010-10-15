@@ -161,7 +161,7 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 		if ( hasOrTell( prefix + "AcquisitionTime", object, warning ) and hasOrTell( prefix + "AcquisitionDate", object, warning ) ) {
 			const ptime acTime = genTimeStamp( object.getProperty<date>( prefix + "AcquisitionDate" ), object.getProperty<ptime>( prefix + "AcquisitionTime" ) );
 			const boost::posix_time::time_duration acDist = acTime - sequenceStart;
-			const float fAcDist = float( acDist.ticks() ) / acDist.ticks_per_second();
+			const float fAcDist = float( acDist.ticks()) / acDist.ticks_per_second() * 1000;
 			LOG( Debug, verbose_info ) << "Computed acquisitionTime as " << fAcDist;
 			object.setProperty( "acquisitionTime", fAcDist );
 			object.remove( prefix + "AcquisitionTime" );
@@ -197,13 +197,13 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 
 		object.setProperty( "voxelSize", voxelSize );
 
-		if ( transformOrTell<uint16_t>( prefix + "RepetitionTime", "repetitionTime", object, warning ) );
+		transformOrTell<uint16_t>( prefix + "RepetitionTime", "repetitionTime", object, warning );
 
-		if ( transformOrTell<float>( prefix + "EchoTime", "echoTime", object, warning ) );
+		transformOrTell<float>( prefix + "EchoTime", "echoTime", object, warning );
 
-		if ( transformOrTell<std::string>( prefix + "TransmitCoilName", "transmitCoil", object, warning ) );
+		transformOrTell<std::string>( prefix + "TransmitCoilName", "transmitCoil", object, warning );
 
-		if ( transformOrTell<int16_t>( prefix + "FlipAngle", "flipAngle", object, warning ) );
+		transformOrTell<int16_t>( prefix + "FlipAngle", "flipAngle", object, warning );
 
 		if ( hasOrTell( prefix + "SpacingBetweenSlices", object, info ) ) {
 			if ( voxelSize[2] != invalid_float ){
@@ -373,7 +373,7 @@ int ImageFormat_Dicom::readMosaic( data::Chunk source, data::ChunkList &dest )
 	size[0] /= matrixSize;
 	size[1] /= matrixSize;
 	assert( size[3] == 1 );
-	LOG( Debug, info ) << "Decomposing a " << source.sizeToVector() << " mosaic-image into " << images << " " << size << " slices";
+	LOG( Debug, info ) << "Decomposing a " << source.sizeToString() << " mosaic-image into " << images << " " << size << " slices";
 	// fix the properties of the source (we 'll need them later)
 	util::fvector4 voxelGap;
 
@@ -457,7 +457,7 @@ int ImageFormat_Dicom::readMosaic( data::Chunk source, data::ChunkList &dest )
 		newChunks[slice]->propertyValue( "acquisitionNumber" )->cast_to<uint32_t>() += slice;
 
 		if( haveAcqTimeList ) {
-			newChunks[slice]->setProperty<float>( "acquisitionTime", acqTime + (*( acqTimeIt++ ) / 1000.) );
+			newChunks[slice]->setProperty<float>( "acquisitionTime", acqTime +  *( acqTimeIt++ ) );
 		}
 
 		LOG( Debug, verbose_info )
