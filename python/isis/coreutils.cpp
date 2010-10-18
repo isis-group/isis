@@ -7,7 +7,7 @@
 using namespace boost::python;
 using namespace isis::python;
 
-BOOST_PYTHON_MODULE( coreutils )
+BOOST_PYTHON_MODULE( core )
 {
 //#######################################################################################
 //	Application
@@ -48,7 +48,5 @@ BOOST_PYTHON_MODULE( coreutils )
 		.def("__getitem__", &_Vector4<double>::getItem)
 		.def( init<>())
 		;
-
-
 
 }

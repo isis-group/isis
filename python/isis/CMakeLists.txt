@@ -1,10 +1,14 @@
+MESSAGE(STATUS ${ISIS_LIB_DEPENDS})
+MESSAGE(STATUS ${ISIS_LIB})
+MESSAGE(STATUS ${PYTHON_LIBRARIES})
+MESSAGE(STATUS ${Boost_LIBRARIES})
 
-IF(${CMAKE_PROJECT_NAME}_COREUTILS)
-    add_library(python_coreutils coreutils.cpp )
-    set_target_properties(python_coreutils PROPERTIES PREFIX "" OUTPUT_NAME "libisis-python")
-    TARGET_LINK_LIBRARIES(python_coreutils utils ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
-    SET(TARGETS ${TARETS} python_coreutils)
-ENDIF(${CMAKE_PROJECT_NAME}_COREUTILS)
+if(${CMAKE_PROJECT_NAME}_CORE)    
+    add_library(core SHARED coreutils.cpp _vector.hpp _application.hpp )
+    set_target_properties(core PROPERTIES PREFIX "")
+    TARGET_LINK_LIBRARIES( core ${ISIS_LIB_DEPENDS} ${ISIS_LIB} ${PYTHON_LIBRARIES} ${Boost_LIBRARIES})
+    SET(TARGETS ${TARETS} core)
+endif(${CMAKE_PROJECT_NAME}_CORE)
 
-INSTALL(TARGETS ${TARGETS}
-      ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib COMPONENT RuntimeLibraries)
+#INSTALL(TARGETS ${TARGETS}
+ #     LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib COMPONENT RuntimeLibraries)

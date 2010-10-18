@@ -1,7 +1,6 @@
 
 #include "CoreUtils/application.hpp"
 #include "CoreUtils/progparameter.hpp"
-#include <boost/python.hpp>
 #include "CoreUtils/types.hpp"
 
 namespace isis

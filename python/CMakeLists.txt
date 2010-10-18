@@ -27,7 +27,7 @@ ELSE(ISIS_DEBUG_LOG)
 	ADD_DEFINITIONS(-D_ENABLE_DEBUG=0)
 ENDIF(ISIS_DEBUG_LOG)
 
-OPTION(${CMAKE_PROJECT_NAME}_COREUTILS "Build coreutils python library" ON)
+OPTION(${CMAKE_PROJECT_NAME}_CORE "Build core python library" ON)
 OPTION(${CMAKE_PROJECT_NAME}_DATASTORAGE "Build datastorage python library" ON)
 OPTION(${CMAKE_PROJECT_NAME}_IMAGEIO "Build imageio python library" ON)
 
