@@ -38,14 +38,18 @@ BOOST_PYTHON_MODULE( core )
 		.def( "printHelp", &isis::util::Application::printHelp )
 		.def( "getCoreVersion", &isis::util::Application::getCoreVersion )
 		.staticmethod( "getCoreVersion" )
-		.def( "autoload", &isis::data::IOApplication::autoload)
+		.def( "autoload", &isis::data::IOApplication::autoload )
+		.def( "autowrite", &_IOApplication::autowrite )
 		.def( "images", &_IOApplication::images)
 	;
 
 //#######################################################################################
 //	Image
 //#######################################################################################
-	class_<isis::data::Image> ("Image", init<>() )
+	class_<isis::data::Image, _Image> ("Image", init<>() )
+		.def( "checkMakeClean", &isis::data::Image::checkMakeClean)
+		.def( "voxel", &_Image::voxel)
+		.def( "setVoxel", &_Image::setVoxel)
 			;
 
 //#######################################################################################

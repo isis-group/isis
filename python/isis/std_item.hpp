@@ -11,9 +11,10 @@
 
 void IndexError() { PyErr_SetString(PyExc_IndexError, "Index out of range"); }
 
-template<class T>
-class std_item {
 
+template<class T>
+class std_list
+{
 public:
 	typedef typename T::value_type V;
 
@@ -22,35 +23,7 @@ public:
 		x.push_back(v);
 	}
 
-	virtual void del(T &x, int i)
-	{
-		if( i<0 ) i+=x.size();
-		if( i>=0 && i<x.size() ) x.erase(i);
-		else IndexError();
-	}
-
-	virtual void set(T &x, int i, V const& v)
-	{
-		if( i<0 ) i+=x.size();
-		if( i>=0 && i<x.size() ) x[i]=v;
-		else IndexError();
-	}
-
-	virtual V& get(T const& x, int i)
-	{
-		if( i<0 ) i+=x.size();
-		if( i>=0 && i<x.size() ) return x[i];
-		IndexError();
-	}
-};
-
-template<class T>
-class std_list : public std_item<T>
-{
-public:
-	typedef typename T::value_type V;
-
-	virtual V& get(T &x, int i)
+	static V& get(T &x, int i)
 	{
 		if( i<0 ) i+=x.size();
 		if( i>=0 && i<x.size() ) {
@@ -60,7 +33,7 @@ public:
 		}
 		IndexError();
 	}
-	virtual void set(T &x, int i, V const& v)
+	static void set(T &x, int i, V const& v)
 	{
 		if( i<0 ) i+=x.size();
 		if( i>=0 && i<x.size() ) {
@@ -70,7 +43,7 @@ public:
 		}
 		else IndexError();
 	}
-	virtual void del(T &x, int i)
+	static void del(T &x, int i)
 	{
 		if( i<0 ) i+=x.size();
 		if( i>=0 && i<x.size() ) {

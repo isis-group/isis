@@ -116,6 +116,15 @@ public:
 		return tmpImageList;
 	}
 
+	bool autowrite( const std::list<isis::data::Image> &imgList, bool exitOnError ) {
+		isis::data::ImageList listToWrite;
+		BOOST_FOREACH(std::list<isis::data::Image>::const_reference ref, imgList )
+		{
+			listToWrite.push_back( boost::shared_ptr<isis::data::Image> (new isis::data::Image (ref)));
+		}
+		return isis::data::IOApplication::autowrite(listToWrite, exitOnError );
+	}
+
 private:
 	PyObject *self;
 	template<typename TYPE>
