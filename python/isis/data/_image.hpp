@@ -21,7 +21,7 @@ public:
 	_Image ( PyObject *p) : self( p ) {}
 	_Image ( PyObject *p, const isis::data::Image &base ) : isis::data::Image( base ), self( p ) {}
 
-	size_t _voxel( const int &first, const int &second, const int &third, const int &fourth )
+	float _voxel( const int &first, const int &second, const int &third, const int &fourth )
 	{
 		switch( this->typeID()) {
 		case data::TypePtr<int8_t>::staticID:
@@ -52,6 +52,11 @@ public:
 			return 0;
 		}
 	}
+	float _voxel( const isis::util::ivector4 &coord ) {
+			return _voxel( coord[0], coord[1], coord[2], coord[3] );
+		}
+
+
 	bool _setVoxel( const int &first, const int &second, const int &third, const int &fourth, const float &value )
 	{
 		switch( this->typeID()) {
@@ -91,6 +96,13 @@ public:
 			return false;
 		}
 	}
+
+	bool _setVoxel( const isis::util::ivector4 &coord, const float &value ) {
+		return _setVoxel( coord[0], coord[1], coord[2], coord[3], value);
+	}
+
+
+
 	const isis::util::ivector4 _sizeToVector( ) {
 		return this->sizeToVector();
 	}

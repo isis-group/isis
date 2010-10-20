@@ -6,23 +6,28 @@
  */
 
 #include <boost/python.hpp>
+#include <boost/foreach.hpp>
+#include <boost/algorithm/string.hpp>
+#include "common.hpp"
 #include "_ioapplication.hpp"
 #include "_image.hpp"
 #include "std_item.hpp"
+
 
 using namespace boost::python;
 using namespace isis::python;
 
 BOOST_PYTHON_MODULE( _data )
 {
-//#######################################################################################
+
+	//#######################################################################################
 //	IOApplication
 //#######################################################################################
 	class_<isis::data::IOApplication, _IOApplication, bases<isis::util::Application> > ( "IOApplication", init<const char *, bool, bool>() )
 		.def( "init", &_IOApplication::init )
-		.def( "addParameter", &_IOApplication::addParameter)
-		.def( "setNeeded", &_IOApplication::setNeeded)
-		.def( "setHidden", &_IOApplication::setHidden)
+		.def( "addParameter", &_IOApplication::_addParameter)
+		.def( "setNeeded", &_IOApplication::_setNeeded)
+		.def( "setHidden", &_IOApplication::_setHidden)
 		.def( "printHelp", &isis::util::Application::printHelp )
 		.def( "getCoreVersion", &isis::util::Application::getCoreVersion )
 		.staticmethod( "getCoreVersion" )
@@ -34,10 +39,13 @@ BOOST_PYTHON_MODULE( _data )
 //#######################################################################################
 //	Image
 //#######################################################################################
+
 	class_<isis::data::Image, _Image> ("Image", init<>() )
 		.def( "checkMakeClean", &isis::data::Image::checkMakeClean)
-		.def( "voxel", &_Image::_voxel)
-		.def( "setVoxel", &_Image::_setVoxel)
+		.def( "voxel",(float ( ::_Image::* )( const isis::util::ivector4& ) ) ( &_Image::_voxel), ( arg("coord") ))
+		.def( "voxel",(float ( ::_Image::* )( const int&, const int&, const int&, const int& ) ) ( &_Image::_voxel), ( arg("first"),arg("second"), arg("third"), arg("fourth") ))
+		.def( "setVoxel", (bool ( ::_Image::* )( const isis::util::ivector4&, const float& ) ) ( &_Image::_setVoxel), ( arg("coord"), arg("value") ))
+		.def( "setVoxel", (bool ( ::_Image::* )( const int&, const int&, const int&, const int&, const float& ) ) ( &_Image::_setVoxel), ( arg("first"),arg("second"), arg("third"), arg("fourth"), arg("value") ))
 		.def( "sizeToVector", &_Image::_sizeToVector)
 			;
 
@@ -45,7 +53,7 @@ BOOST_PYTHON_MODULE( _data )
 //	ImageList
 //#######################################################################################
 	typedef std::list<isis::data::Image> IList;
-	class_< IList > ("ImageList" )
+	class_< IList > ("ImageList", init<IList>())
 		.def("__len__", &IList::size )
 		.def("clear", &IList::clear )
 		.def("append", &std_list<IList>::add, with_custodian_and_ward<1,2>() )

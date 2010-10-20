@@ -2,7 +2,7 @@
 #include "CoreUtils/application.hpp"
 #include "CoreUtils/progparameter.hpp"
 #include "CoreUtils/types.hpp"
-#include <boost/foreach.hpp>
+
 
 namespace isis
 {
@@ -38,8 +38,16 @@ public:
 			internAddParameter<int64_t>( name, value, type);
 		} else if(PyString_Check( value )) {
 			internAddParameter<std::string>( name, value, type);
+		} else if (boost::iequals(type, "ivector4" ) ) {
+			internAddParameter<isis::util::ivector4>( name, value, type);
+		} else if (boost::iequals(type, "dvector4" ) ) {
+			internAddParameter<isis::util::dvector4>( name, value, type);
+		} else if (boost::iequals(type, "fvector4" ) ) {
+			internAddParameter<isis::util::fvector4>( name, value, type);
+		} else if (boost::iequals(type, "selection" )) {
+			internAddParameter<isis::util::Selection>( name, value, type);
 		} else {
-			internAddParameter<util::fvector4>( name, value, type);
+			LOG(Runtime, error ) << "Type " << type << " is not registered.";
 		}
 	}
 
@@ -52,7 +60,6 @@ public:
 	{
 		parameters[name].hidden() = hidden;
 	}
-
 
 private:
 	PyObject *self;

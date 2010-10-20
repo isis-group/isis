@@ -9,7 +9,10 @@
 #ifndef STD_ITEM_HPP_
 #define STD_ITEM_HPP_
 
-void IndexError() { PyErr_SetString(PyExc_IndexError, "Index out of range"); }
+
+namespace isis{ namespace python {
+void IndexError() { PyErr_SetString(PyExc_IndexError, "Index out of range");
+					LOG( Runtime, error) << "Index out of range"; }
 
 
 template<class T>
@@ -54,5 +57,5 @@ public:
 		else IndexError();
 	}
 };
-
+}}
 #endif /* STD_ITEM_HPP_ */

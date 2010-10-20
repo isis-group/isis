@@ -28,7 +28,7 @@ public:
 		if( elem <= 3 && elem >= 0 ) {
 			this->operator [](elem) = value;
 		} else {
-			std::cerr << "Index out of range!" << std::endl;
+			LOG( Runtime, error ) << "Index out of range!";
 		}
 	}
 
@@ -36,7 +36,7 @@ public:
 		if( elem <= 3 && elem >= 0 ) {
 			return this->operator [](elem);
 		} else {
-			std::cerr << "Index out of range!" << std::endl;
+			LOG( Runtime, error ) << "Index out of range!";
 		}
 
 

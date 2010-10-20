@@ -32,7 +32,8 @@ public:
 		return IOApplication::init( argc, argv, exitOnError );
 	}
 
-	void addParameter( const std::string name, PyObject* value, std::string type)
+
+	void _addParameter( const std::string &name, PyObject* value, const std::string &type)
 	{
 		if(PyFloat_Check( value )) {
 			internAddParameter<float>( name, value, type);
@@ -42,16 +43,24 @@ public:
 			internAddParameter<int64_t>( name, value, type);
 		} else if(PyString_Check( value )) {
 			internAddParameter<std::string>( name, value, type);
+		} else if (boost::iequals(type, "ivector4" ) ) {
+			internAddParameter<isis::util::ivector4>( name, value, type);
+		} else if (boost::iequals(type, "dvector4" ) ) {
+			internAddParameter<isis::util::dvector4>( name, value, type);
+		} else if (boost::iequals(type, "fvector4" ) ) {
+			internAddParameter<isis::util::fvector4>( name, value, type);
+		} else if (boost::iequals(type, "selection" ) ) {
+			internAddParameter<isis::util::Selection>( name, value, type);
 		} else {
-			internAddParameter<util::fvector4>( name, value, type);
+			LOG(Runtime, error ) << "Type " << type << " is not registered.";
 		}
 	}
-	void setNeeded( const std::string name, const bool needed )
+	void _setNeeded( const std::string name, const bool needed )
 	{
 		parameters[name].needed() = needed;
 	}
 
-	void setHidden( const std::string name, const bool hidden )
+	void _setHidden( const std::string name, const bool hidden )
 	{
 		parameters[name].hidden() = hidden;
 	}
@@ -79,7 +88,9 @@ private:
 	template<typename TYPE>
 	void internAddParameter ( const std::string name, PyObject* value, std::string type ) {
 		util::Type<TYPE> val(static_cast<TYPE>( boost::python::extract<TYPE>( value ) ));
-		val.copyToNewById( util::getTransposedTypeMap(true, true)[type] );
+//		if(!type.empty()) {
+//			val.copyToNewById( util::getTransposedTypeMap(true, true)[type] );
+//		}
 		parameters[name] = val;
 		parameters[name].needed() = false;
 	}

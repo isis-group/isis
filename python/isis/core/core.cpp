@@ -1,9 +1,9 @@
 #include <boost/python.hpp>
-
+#include <boost/foreach.hpp>
+#include <boost/algorithm/string.hpp>
+#include "common.hpp"
 #include "_application.hpp"
 #include "_vector.hpp"
-
-
 #include "CoreUtils/selection.hpp"
 
 using namespace boost::python;
