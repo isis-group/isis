@@ -21,7 +21,7 @@ Description: The ISIS package provides a general I/O framework for neuroimaging
 Package: libisiscore0-dev
 Section: science
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0
 Description: The ISIS package provides a general I/O framework for neuroimaging
  data.  Being started with fMRI data, it can handle several established data
  formats, like Nifti, Analyze, DICOM and vista. A first application based on this
