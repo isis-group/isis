@@ -37,6 +37,8 @@ INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
 
 add_subdirectory(isis)
 configure_file(${PROJECT_SOURCE_DIR}/isis/__init__.py ${PROJECT_BINARY_DIR}/isis/__init__.py COPYONLY)
+configure_file(${PROJECT_SOURCE_DIR}/isis/data/__init__.py ${PROJECT_BINARY_DIR}/isis/data/__init__.py COPYONLY)
+configure_file(${PROJECT_SOURCE_DIR}/isis/core/__init__.py ${PROJECT_BINARY_DIR}/isis/core/__init__.py COPYONLY)
 
 
 

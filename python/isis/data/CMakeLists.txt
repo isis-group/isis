@@ -1,0 +1,9 @@
+
+
+add_library(_data SHARED data.cpp _image.hpp )
+set_target_properties(_data PROPERTIES PREFIX "")
+TARGET_LINK_LIBRARIES( _data ${ISIS_LIB_DEPENDS} ${ISIS_LIB} ${PYTHON_LIBRARIES} ${Boost_LIBRARIES})
+SET(TARGETS ${TARETS} _data)
+
+#INSTALL(TARGETS ${TARGETS}
+ #     LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib COMPONENT RuntimeLibraries)

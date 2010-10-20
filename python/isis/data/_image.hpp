@@ -9,6 +9,7 @@
 #define IMAGE_HPP_
 
 #include "DataStorage/image.hpp"
+#include "CoreUtils/vector.hpp"
 
 namespace isis
 {
@@ -20,7 +21,7 @@ public:
 	_Image ( PyObject *p) : self( p ) {}
 	_Image ( PyObject *p, const isis::data::Image &base ) : isis::data::Image( base ), self( p ) {}
 
-	size_t voxel( const int &first, const int &second, const int &third, const int &fourth )
+	size_t _voxel( const int &first, const int &second, const int &third, const int &fourth )
 	{
 		switch( this->typeID()) {
 		case data::TypePtr<int8_t>::staticID:
@@ -51,7 +52,7 @@ public:
 			return 0;
 		}
 	}
-	bool setVoxel( const int &first, const int &second, const int &third, const int &fourth, const float &value )
+	bool _setVoxel( const int &first, const int &second, const int &third, const int &fourth, const float &value )
 	{
 		switch( this->typeID()) {
 		case data::TypePtr<int8_t>::staticID:
@@ -88,11 +89,11 @@ public:
 			break;
 		default:
 			return false;
-
 		}
-
 	}
-
+	const isis::util::ivector4 _sizeToVector( ) {
+		return this->sizeToVector();
+	}
 
 
 private:

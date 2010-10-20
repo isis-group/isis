@@ -11,9 +11,10 @@ namespace python
 
 // helper class vector
 template<class T>
-class _Vector4 : public vector4<T>
+class _Vector4 : public vector4<T>, boost::python::wrapper< vector4<T> >
 {
 public:
+	_Vector4 () {}
 	_Vector4( PyObject *p) :  self( p ) {}
 
 	_Vector4( PyObject *p, const T &first, const T &second, const T &third, const T &fourth)
@@ -24,11 +25,21 @@ public:
 
 
 	void setItem( size_t elem, const T &value) {
-		this->operator [](elem) = value;
+		if( elem <= 3 && elem >= 0 ) {
+			this->operator [](elem) = value;
+		} else {
+			std::cerr << "Index out of range!" << std::endl;
+		}
 	}
 
 	T getItem( size_t elem ) {
-		return this->operator [](elem);
+		if( elem <= 3 && elem >= 0 ) {
+			return this->operator [](elem);
+		} else {
+			std::cerr << "Index out of range!" << std::endl;
+		}
+
+
 	}
 
 

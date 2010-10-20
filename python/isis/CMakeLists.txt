@@ -1,14 +1,7 @@
-MESSAGE(STATUS ${ISIS_LIB_DEPENDS})
-MESSAGE(STATUS ${ISIS_LIB})
-MESSAGE(STATUS ${PYTHON_LIBRARIES})
-MESSAGE(STATUS ${Boost_LIBRARIES})
-
-if(${CMAKE_PROJECT_NAME}_CORE)    
-    add_library(core SHARED coreutils.cpp _vector.hpp _application.hpp )
-    set_target_properties(core PROPERTIES PREFIX "")
-    TARGET_LINK_LIBRARIES( core ${ISIS_LIB_DEPENDS} ${ISIS_LIB} ${PYTHON_LIBRARIES} ${Boost_LIBRARIES})
-    SET(TARGETS ${TARETS} core)
+if(${CMAKE_PROJECT_NAME}_CORE)
+    add_subdirectory(core)
 endif(${CMAKE_PROJECT_NAME}_CORE)
 
-#INSTALL(TARGETS ${TARGETS}
- #     LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib COMPONENT RuntimeLibraries)
+if(${CMAKE_PROJECT_NAME}_DATASTORAGE)
+    add_subdirectory(data)
+endif(${CMAKE_PROJECT_NAME}_DATASTORAGE)
