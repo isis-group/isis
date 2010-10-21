@@ -67,7 +67,7 @@ public:
 
 	const std::list<isis::data::Image> _images( void ) {
 		std::list<isis::data::Image> tmpImageList;
-		BOOST_FOREACH(std::list<boost::shared_ptr<isis::data::Image> >::const_reference ref, isis::data::IOApplication::images)
+		BOOST_FOREACH(std::list<boost::shared_ptr<isis::data::Image> >::const_reference ref, this->images)
 		{
 			tmpImageList.push_back(*ref);
 		}

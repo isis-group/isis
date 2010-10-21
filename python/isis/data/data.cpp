@@ -11,6 +11,7 @@
 #include "common.hpp"
 #include "_ioapplication.hpp"
 #include "_image.hpp"
+#include "_chunk.hpp"
 #include "std_item.hpp"
 
 
@@ -41,12 +42,33 @@ BOOST_PYTHON_MODULE( _data )
 //#######################################################################################
 
 	class_<isis::data::Image, _Image> ("Image", init<>() )
+		.def( init<_Image>() )
 		.def( "checkMakeClean", &isis::data::Image::checkMakeClean)
 		.def( "voxel",(float ( ::_Image::* )( const isis::util::ivector4& ) ) ( &_Image::_voxel), ( arg("coord") ))
-		.def( "voxel",(float ( ::_Image::* )( const int&, const int&, const int&, const int& ) ) ( &_Image::_voxel), ( arg("first"),arg("second"), arg("third"), arg("fourth") ))
+		.def( "voxel",(float ( ::_Image::* )( const size_t&, const size_t&, const size_t&, const size_t& ) ) ( &_Image::_voxel), ( arg("first"),arg("second"), arg("third"), arg("fourth") ))
 		.def( "setVoxel", (bool ( ::_Image::* )( const isis::util::ivector4&, const float& ) ) ( &_Image::_setVoxel), ( arg("coord"), arg("value") ))
-		.def( "setVoxel", (bool ( ::_Image::* )( const int&, const int&, const int&, const int&, const float& ) ) ( &_Image::_setVoxel), ( arg("first"),arg("second"), arg("third"), arg("fourth"), arg("value") ))
+		.def( "setVoxel", (bool ( ::_Image::* )( const size_t&, const size_t&, const size_t&, const size_t&, const float& ) ) ( &_Image::_setVoxel), ( arg("first"),arg("second"), arg("third"), arg("fourth"), arg("value") ))
 		.def( "sizeToVector", &_Image::_sizeToVector)
+		.def( "getChunkList", &_Image::_getChunkList)
+		.def( "typeID", &isis::data::Image::typeID )
+		.def( "getChunkAt", &isis::data::Image::getChunkAt )
+		.def( "getChunk", ( isis::data::Chunk ( ::isis::data::Image::* )( size_t, size_t, size_t, size_t, bool ) ) ( &isis::data::Image::getChunk), (arg("first"), arg("second"), arg("third"), arg("fourth"), arg("copy_metadata") ))
+		.def( "getChunk", ( isis::data::Chunk ( ::_Image::* )( const isis::util::ivector4&, bool ) ) ( &_Image::_getChunk), (arg("coord"), arg("copy_metadata") ))
+		.def( "getChunkAs", ( isis::data::Chunk ( ::_Image::* )( const size_t&, const size_t&, const size_t&, const size_t&, const std::string&) ) ( &_Image::_getChunk), (arg("first"), arg("second"), arg("third"), arg("fourth"), arg("type") ))
+		.def( "getChunkAs", ( isis::data::Chunk ( ::_Image::* )( const isis::util::ivector4&, const std::string&) ) ( &_Image::_getChunk), ( arg("coords"), arg("type") ))
+		.def( "insertChunk", &isis::data::Image::insertChunk)
+		.def( "reIndex", &isis::data::Image::reIndex)
+		.def( "empty", &isis::data::Image::empty)
+		.def( "bytesPerVoxel", &isis::data::Image::bytes_per_voxel )
+		.def( "getMin", &_Image::_getMin )
+		.def( "getMax", &_Image::_getMax )
+		.def( "cmp", &isis::data::Image::cmp)
+		.def( "transformCoords", &_Image::_transformCoords )
+		.def( "getMainOrientation", &_Image::_getMainOrientation )
+		.def( "makeOfTypeId", &isis::data::Image::makeOfTypeId)
+		.def( "makeOfTypeName", &_Image::_makeOfTypeName)
+		.def( "spliceDownTo", &_Image::_spliceDownTo)
+
 			;
 
 //#######################################################################################
@@ -54,6 +76,7 @@ BOOST_PYTHON_MODULE( _data )
 //#######################################################################################
 	typedef std::list<isis::data::Image> IList;
 	class_< IList > ("ImageList", init<IList>())
+		.def( init<>())
 		.def("__len__", &IList::size )
 		.def("clear", &IList::clear )
 		.def("append", &std_list<IList>::add, with_custodian_and_ward<1,2>() )
@@ -65,8 +88,20 @@ BOOST_PYTHON_MODULE( _data )
 //#######################################################################################
 //	Chunk
 //#######################################################################################
-	class_<isis::data::Chunk> ("Chunk", no_init )
+	class_<isis::data::Chunk, _Chunk> ("Chunk", init<_Chunk>() )
 			;
 
+//#######################################################################################
+//	ChunkList
+//#######################################################################################
+	typedef std::list<isis::data::Chunk> CList;
+	class_< CList > ("ChunkList", init<CList>())
+		.def( init<>())
+		.def("__len__", &CList::size )
+		.def("clear", &CList::clear )
+		.def("append", &std_list<CList>::add, with_custodian_and_ward<1,2>() )
+		.def("__getitem__", &std_list<CList>::get, return_value_policy<copy_non_const_reference>() )
+		.def("__setitem__", &std_list<CList>::set, with_custodian_and_ward<1,2>() )
+		.def("__delitem__", &std_list<CList>::del )
+		;
 }
-

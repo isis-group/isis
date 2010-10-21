@@ -24,21 +24,44 @@ ioapp.setHidden("ivector4Param", True)
 ioapp.setNeeded("ivector4Param", False)
 #standard initialization of our ioapp. First parameter is the amount of parameters, the second parameter is a tuple of all parameters and the last one indicates if the programm should exit if an error occurs
 ioapp.init(len(sys.argv), sys.argv, True)
-ioapp.printHelp(True)
+#ioapp.printHelp(True)
 iList = isis.data.ImageList(ioapp.images())
 
-image = isis.data.Image()
-image = iList[0]
+image = isis.data.Image(iList[0])
 
+print "MainOrientation: ", image.getMainOrientation()
+
+print "bytes per voxel: ", image.bytesPerVoxel()
+print "typeID: ", image.typeID()
+print "min: ", image.getMin()
+print "max: ", image.getMax()
+chunkAt = isis.data.Chunk(image.getChunkAt(0, True))
+chunkAt = image.getChunk(0,0,0,0,True)
+chunkAt = image.getChunk(isis.core.ivector4(0,0,0,0), True)
+
+myChunkList = isis.data.ChunkList(image.getChunkList() )
+myChunk = isis.data.Chunk( myChunkList[0] )
+
+#image.insertChunk(chunkAt)
+print "image contains ", len(myChunkList), " chunks"
+
+mat = [[0,-1,0],[1,0,0],[0,0,-1]]
+
+image.transformCoords( mat )
 newfvector4 = isis.core.fvector4(4,3,2,21)
 
 size = isis.core.ivector4(image.sizeToVector())
-
 for i in range(0, size[0]):
     for j in range(0, size[1]):
-        for k in range(0, size[2]):
-            coords = isis.core.ivector4(i,j,k,0)
-            image.setVoxel(coords, -image.voxel(coords) )
+	
+	coords = isis.core.ivector4(i,j,10,0)
+	image.setVoxel(coords, i*j )
+#print "diff (should be 0): ", image.cmp(image2) #should be 0 because of cheap copy
+image.makeOfTypeName("float")
+image.spliceDownTo("sliceDim")
+print "Now the image has " + str(len(image.getChunkList())) + " chunks"
 
-
-ioapp.autowrite(iList, True)
+iList.append(image)
+outList = isis.data.ImageList()
+outList.append(image)
+ioapp.autowrite(outList, True)
