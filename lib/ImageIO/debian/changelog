@@ -1,0 +1,6 @@
+isisio (0.2.0+svn1047) unstable; urgency=low
+
+    * Initial Debian packaging attempt. This is the first version of
+      a ISIS Image IO debian packages.
+
+ -- Thomas Proeger <thomasproeger@googlemail.com>  Wed, 21 Oct 2010 14:10:00 +0100
