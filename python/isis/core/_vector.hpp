@@ -1,3 +1,5 @@
+#ifndef _VECTOR_HPP_
+#define _VECTOR_HPP_
 
 #include "CoreUtils/vector.hpp"
 
@@ -14,8 +16,8 @@ template<class T>
 class _Vector4 : public vector4<T>, boost::python::wrapper< vector4<T> >
 {
 public:
-	_Vector4 () {}
-	_Vector4( PyObject *p) :  self( p ) {}
+	_Vector4 () : boost::python::wrapper< vector4<T> >() {}
+	_Vector4( PyObject *p) :  self( p ), boost::python::wrapper< vector4<T> >()  {}
 
 	_Vector4( PyObject *p, const T &first, const T &second, const T &third, const T &fourth)
 		: vector4<T>( first, second, third, fourth ),  self( p ) {}
@@ -51,5 +53,5 @@ private:
 
 }
 }
-
+#endif
 

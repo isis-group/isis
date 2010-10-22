@@ -12,6 +12,7 @@
 #include "_ioapplication.hpp"
 #include "_image.hpp"
 #include "_chunk.hpp"
+#include "core/_propmap.hpp"
 #include "std_item.hpp"
 
 
@@ -41,7 +42,7 @@ BOOST_PYTHON_MODULE( _data )
 //	Image
 //#######################################################################################
 
-	class_<isis::data::Image, _Image> ("Image", init<>() )
+	class_<isis::data::Image, _Image, bases<isis::util::PropMap> >("Image", init<>() )
 		.def( init<_Image>() )
 		.def( "checkMakeClean", &isis::data::Image::checkMakeClean)
 		.def( "voxel",(float ( ::_Image::* )( const isis::util::ivector4& ) ) ( &_Image::_voxel), ( arg("coord") ))
@@ -70,6 +71,7 @@ BOOST_PYTHON_MODULE( _data )
 		.def( "spliceDownTo", &_Image::_spliceDownTo)
 		.def( "deepCopy", ( isis::data::Image ( ::_Image::* )( void ) ) ( &_Image::_deepCopy ))
 		.def( "deepCopy", ( isis::data::Image ( ::_Image::* )( std::string ) ) ( &_Image::_deepCopy ), ( arg("type")))
+		.def( "getPropMap",  &_Image::_getPropMap, return_internal_reference<>())
 			;
 
 //#######################################################################################

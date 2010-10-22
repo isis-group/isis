@@ -19,8 +19,8 @@ namespace python
 class _IOApplication : public data::IOApplication, boost::python::wrapper<data::IOApplication>
 {
 public:
-	_IOApplication( PyObject *p, const char name[], const bool &input, const bool &output) : data::IOApplication( name, input, output ), self( p ) {}
-	_IOApplication( PyObject *p, const data::IOApplication &base ) : data::IOApplication( "", true, true), self( p ) {}
+	_IOApplication( PyObject *p, const char name[], const bool &input, const bool &output) : data::IOApplication( name, input, output ), self( p ),  boost::python::wrapper<data::IOApplication>() {}
+	_IOApplication( PyObject *p, const data::IOApplication &base ) : data::IOApplication( "", true, true), self( p ),  boost::python::wrapper<data::IOApplication>() {}
 
 	virtual bool init( int argc, boost::python::list pyargv, bool exitOnError = true ) {
 		char *argv[argc];

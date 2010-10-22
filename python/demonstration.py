@@ -50,13 +50,28 @@ mat = [[0,-1,0],[1,0,0],[0,0,-1]]
 image.transformCoords( mat )
 newfvector4 = isis.core.fvector4(4,3,2,21)
 
-image2 = isis.data.Image(image.deepCopy())
+#propmap = isis.core.PropMap( image.getPropMap() )
+#if( propmap.hasProperty("indexOrigin") ):
+	#print "has indexOrigin"
+#if( not propmap.hasProperty("aufsMaul") ):
+	#print "has no aufsMaul"
+
+#print image.getPropMap().propertyValue("indexOrigin").toString(True)
+#image.getPropMap().setProperty("indexOrigin", isis.core.fvector4(1,2,3,4), "fvector4")
+#print image.getPropMap().propertyValue("indexOrigin").toString(True)
+
+#image2 = isis.data.Image(image.deepCopy())
 
 size = isis.core.ivector4(image.sizeToVector())
+
+print "start"
 for i in range(size[0]):
 	for j in range(size[1]):
-		coords = isis.core.ivector4(i,j,0,0)
-		image.setVoxel(coords, ((i) / (j+1)) * image.voxel(coords) )
+		for k in range(size[2]):
+			
+		#coords = isis.core.ivector4(i,j,0,0)
+			image.setVoxel(i,j,k,0, ((i) / (j+1)) * image.voxel(i,j,k,0) )
+print "end"
 #print "diff (should be 0): ", image.cmp(image2) #should be 0 because of cheap copy
 print "diff: " + str(image.cmp(image2))
 image.makeOfTypeName("float")

@@ -19,8 +19,8 @@ namespace python
 class _Image : public isis::data::Image, boost::python::wrapper<isis::data::Image>
 {
 public:
-	_Image ( PyObject *p) : self( p ) {}
-	_Image ( PyObject *p, const isis::data::Image &base ) : isis::data::Image( base ), self( p ) {}
+	_Image ( PyObject *p) : self( p ), boost::python::wrapper< isis::data::Image >() {}
+	_Image ( PyObject *p, const isis::data::Image &base ) : isis::data::Image( base ), self( p ), boost::python::wrapper< isis::data::Image >()  {}
 
 	float _voxel( const size_t &first, const size_t &second, const size_t &third, const size_t &fourth )
 	{
@@ -245,6 +245,10 @@ public:
 			retImage.makeOfTypeId( isis::util::getTransposedTypeMap()[type] );
 		}
 		return retImage;
+	}
+
+	isis::util::PropMap& _getPropMap() {
+		return static_cast<isis::util::PropMap&> ( *this );
 	}
 
 private:

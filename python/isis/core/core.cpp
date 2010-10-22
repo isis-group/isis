@@ -4,6 +4,8 @@
 #include "common.hpp"
 #include "_application.hpp"
 #include "_vector.hpp"
+#include "_propmap.hpp"
+#include "_property.hpp"
 #include "CoreUtils/selection.hpp"
 
 using namespace boost::python;
@@ -29,10 +31,34 @@ BOOST_PYTHON_MODULE( _core )
 
 
 //#######################################################################################
+//	PropMap
+//#######################################################################################
+	class_<isis::util::PropMap, _PropMap>( "PropMap", init<>() )
+		.def( init<_PropMap>() )
+		.def( "hasProperty", &isis::util::PropMap::hasProperty )
+		.def( "hasBranch", &isis::util::PropMap::hasBranch )
+		.def( "branch", &_PropMap::_branch )
+		.def( "remove", ( bool ( ::isis::util::PropMap::* )( const std::string & ) ) ( &isis::util::PropMap::remove ), ( arg("key")))
+		.def( "remove", ( bool ( ::isis::util::PropMap::* )( const isis::util::PropMap &, bool ) ) ( &isis::util::PropMap::remove ), ( arg("removeMap"), arg("keep_needed")))
+		.def( "propertyValue", &_PropMap::_propertyValue )
+		.def( "valid", &isis::util::PropMap::valid )
+		.def( "empty", &isis::util::PropMap::empty )
+		.def( "setProperty", &_PropMap::_setProperty )
+			;
+
+//#######################################################################################
+//	PropertyValue
+//#######################################################################################
+	class_<isis::util::PropertyValue, _PropertyValue>( "PropertyValue", init<>())
+		.def( init<_PropertyValue>() )
+		.def( "toString", &_PropertyValue::_toString )
+			;
+
+//#######################################################################################
 //	Selection
 //#######################################################################################
 	class_<isis::util::Selection>("Selection", init<const char*>())
-		.def( init<>())
+		.def( init<>() )
 			;
 
 //#######################################################################################
