@@ -215,25 +215,6 @@ public:
 	std::vector<boost::shared_ptr<const Chunk> > getChunkList()const;
 
 	/**
-	 * Get the chunk that contains the voxel at the given coordinates in the given type.
-	 * If the accordant chunk has type T a cheap copy is returned.
-	 * Otherwise a MemChunk of the requested type is created from it.
-	 * In this case min and max are used as value range for the conversion.
-	 *
-	 * \param min The minimum of the value-range of the image (use getMinMax to get this).
-	 * \param max The maximum of the value-range of the image (use getMinMax to get this).
-	 * \param first The first coordinate in voxel space. Usually the x value.
-	 * \param second The second coordinate in voxel space. Usually the y value.
-	 * \param third The third coordinate in voxel space. Ususally the z value.
-	 * \param fourth The fourth coordinate in voxel space. Usually the time value.
-	 * \returns a chunk contains the (maybe converted) voxel value at the given coordinates.
-	 */
-	template<typename TYPE> Chunk getChunkAs( const util::_internal::TypeBase &min, const  util::_internal::TypeBase &max, size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const {
-		Chunk ret = getChunk( first, second, third, fourth ); // get a cheap copy
-		ret.makeOfTypeId( TypePtr<TYPE>::staticID ); // make it of type T
-		return ret; //return that
-	}
-	/**
 	* Get the chunk that contains the voxel at the given coordinates in the given type.
 	* If the accordant chunk has type T a cheap copy is returned.
 	* Otherwise a MemChunk of the requested type is created from it.
