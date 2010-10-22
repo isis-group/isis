@@ -472,8 +472,6 @@ private:
 	void copyDataToNifti( const data::Image &image, nifti_image &ni ) {
 		ni.data = malloc( image.bytes_per_voxel() * image.volume() );
 		T *refNii = ( T * ) ni.data;
-		util::TypeReference min, max;
-		image.getMinMax( min, max );
 		const util::FixedVector<size_t, 4> csize = image.getChunk( 0, 0 ).sizeToVector();
 		const util::FixedVector<size_t, 4> isize = image.sizeToVector();
 
@@ -482,7 +480,7 @@ private:
 				for ( size_t y = 0; y < isize[1]; y += csize[1] ) {
 					for ( size_t x = 0; x < isize[0]; x += csize[0] ) {
 						const size_t dim[] = {x, y, z, t};
-						const data::Chunk ch = image.getChunkAs<T>( *min, *max, x, y, z, t );
+						const data::Chunk ch = image.getChunkAs<T>( x, y, z, t );
 						T *target = refNii + image.dim2Index( dim );
 						ch.getTypePtr<T>().copyToMem( 0, ch.volume() - 1, target );
 					}
