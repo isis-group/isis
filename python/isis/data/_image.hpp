@@ -205,12 +205,52 @@ public:
 			return 0;
 		}
 	}
+	isis::data::Image _deepCopy( void ) {
+		switch( this->typeID() ) {
+		case data::TypePtr<int8_t>::staticID:
+			return isis::data::MemImage<int8_t>(*this);
+			break;
+		case data::TypePtr<u_int8_t>::staticID:
+			return isis::data::MemImage<u_int8_t>(*this);
+			break;
+		case data::TypePtr<int16_t>::staticID:
+			return isis::data::MemImage<int16_t>(*this);
+			break;
+		case data::TypePtr<u_int16_t>::staticID:
+			return isis::data::MemImage<u_int16_t>(*this);
+			break;
+		case data::TypePtr<int32_t>::staticID:
+			return isis::data::MemImage<int32_t>(*this);
+			break;
+		case data::TypePtr<u_int32_t>::staticID:
+			return isis::data::MemImage<u_int32_t>(*this);
+			break;
+		case data::TypePtr<float>::staticID:
+			return isis::data::MemImage<float>(*this);
+			break;
+		case data::TypePtr<double>::staticID:
+			return isis::data::MemImage<double>(*this);
+			break;
+		}
+	}
+	isis::data::Image _deepCopy( std::string type ) {
+		if( type[type.size() - 1] != '*' ) {
+			type.append("*");
+		}
+		isis::data::Image retImage = _deepCopy();
+		if ( ! isis::util::getTransposedTypeMap()[type] ) {
+			LOG( isis::python::Runtime, isis::error ) << "Unable to convert to type "
+								<< type << ". Keeping type.";
+		} else{
+			retImage.makeOfTypeId( isis::util::getTransposedTypeMap()[type] );
+		}
+		return retImage;
+	}
 
 private:
 	PyObject *self;
 
 };
-
 
 
 class _ImageList : public std::list<isis::data::Image>

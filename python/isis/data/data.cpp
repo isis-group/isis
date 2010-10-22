@@ -68,7 +68,8 @@ BOOST_PYTHON_MODULE( _data )
 		.def( "makeOfTypeId", &isis::data::Image::makeOfTypeId)
 		.def( "makeOfTypeName", &_Image::_makeOfTypeName)
 		.def( "spliceDownTo", &_Image::_spliceDownTo)
-
+		.def( "deepCopy", ( isis::data::Image ( ::_Image::* )( void ) ) ( &_Image::_deepCopy ))
+		.def( "deepCopy", ( isis::data::Image ( ::_Image::* )( std::string ) ) ( &_Image::_deepCopy ), ( arg("type")))
 			;
 
 //#######################################################################################
@@ -84,6 +85,8 @@ BOOST_PYTHON_MODULE( _data )
 		.def("__setitem__", &std_list<IList>::set, with_custodian_and_ward<1,2>() )
 		.def("__delitem__", &std_list<IList>::del )
 			;
+
+
 
 //#######################################################################################
 //	Chunk

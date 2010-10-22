@@ -50,13 +50,15 @@ mat = [[0,-1,0],[1,0,0],[0,0,-1]]
 image.transformCoords( mat )
 newfvector4 = isis.core.fvector4(4,3,2,21)
 
+image2 = isis.data.Image(image.deepCopy())
+
 size = isis.core.ivector4(image.sizeToVector())
-for i in range(0, size[0]):
-    for j in range(0, size[1]):
-	
-	coords = isis.core.ivector4(i,j,10,0)
-	image.setVoxel(coords, i*j )
+for i in range(size[0]):
+	for j in range(size[1]):
+		coords = isis.core.ivector4(i,j,0,0)
+		image.setVoxel(coords, ((i) / (j+1)) * image.voxel(coords) )
 #print "diff (should be 0): ", image.cmp(image2) #should be 0 because of cheap copy
+print "diff: " + str(image.cmp(image2))
 image.makeOfTypeName("float")
 image.spliceDownTo("sliceDim")
 print "Now the image has " + str(len(image.getChunkList())) + " chunks"
