@@ -5,10 +5,11 @@
  *      Author: tuerke
  */
 
-#ifndef IOAPPLICATION_HPP_
-#define IOAPPLICATION_HPP_
+#ifndef _IOAPPLICATION_HPP_
+#define _IOAPPLICATION_HPP_
 
 #include "DataStorage/io_application.hpp"
+#include "core/_application.hpp"
 
 namespace isis
 {
@@ -96,4 +97,4 @@ private:
 	}
 };
 }}
-#endif /* IOAPPLICATION_HPP_ */
+#endif /* _IOAPPLICATION_HPP_ */

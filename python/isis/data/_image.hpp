@@ -5,12 +5,14 @@
  *      Author: tuerke
  */
 
-#ifndef IMAGE_HPP_
-#define IMAGE_HPP_
+#ifndef _IMAGE_HPP_
+#define _IMAGE_HPP_
 
 #include "DataStorage/image.hpp"
 #include "CoreUtils/vector.hpp"
 #include <vector>
+
+#include "core/_propmap.hpp"
 
 namespace isis
 {
@@ -19,6 +21,7 @@ namespace python
 class _Image : public isis::data::Image, boost::python::wrapper<isis::data::Image>
 {
 public:
+
 	_Image ( PyObject *p) : self( p ), boost::python::wrapper< isis::data::Image >() {}
 	_Image ( PyObject *p, const isis::data::Image &base ) : isis::data::Image( base ), self( p ), boost::python::wrapper< isis::data::Image >()  {}
 
@@ -231,8 +234,11 @@ public:
 		case data::TypePtr<double>::staticID:
 			return isis::data::MemImage<double>(*this);
 			break;
+		default:
+			LOG( Runtime, error ) << "Unknown pixel type.";
 		}
 	}
+
 	isis::data::Image _deepCopy( std::string type ) {
 		if( type[type.size() - 1] != '*' ) {
 			type.append("*");
@@ -247,8 +253,14 @@ public:
 		return retImage;
 	}
 
+	isis::data::Image _cheapCopy( void ) {
+		isis::data::Image retImg = *this;
+		return retImg;
+	}
+
 	isis::util::PropMap& _getPropMap() {
-		return static_cast<isis::util::PropMap&> ( *this );
+		isis::util::PropMap& retMap = static_cast<isis::util::PropMap&>( *this );
+		return retMap;
 	}
 
 private:
@@ -265,4 +277,4 @@ class _ImageList : public std::list<isis::data::Image>
 
 }}
 
-#endif /* IMAGE_HPP_ */
+#endif /* _IMAGE_HPP_ */

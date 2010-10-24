@@ -27,58 +27,25 @@ ioapp.init(len(sys.argv), sys.argv, True)
 #ioapp.printHelp(True)
 iList = isis.data.ImageList(ioapp.images())
 
+print "creating image"
 image = isis.data.Image(iList[0])
 
-print "MainOrientation: ", image.getMainOrientation()
+print "creating deep copy"
+deepImageCopy = isis.data.Image( image.deepCopy() )
+print "creating cheap copy"
+cheapImageCopy = isis.data.Image( image.cheapCopy() )
+#print "manipulating deepImage"
+#deepImageCopy.setVoxel(1,2,3,0,100)
 
-print "bytes per voxel: ", image.bytesPerVoxel()
-print "typeID: ", image.typeID()
-print "min: ", image.getMin()
-print "max: ", image.getMax()
-chunkAt = isis.data.Chunk(image.getChunkAt(0, True))
-chunkAt = image.getChunk(0,0,0,0,True)
-chunkAt = image.getChunk(isis.core.ivector4(0,0,0,0), True)
+print "diff size cheap<->deep: " + str(deepImageCopy.cmp(cheapImageCopy))
+deepImageCopy.setVoxel(2,2,2,0, -deepImageCopy.getVoxel(2,2,2,0) )
+print "diff size orig<->deep: " + str(deepImageCopy.cmp(image))
 
-myChunkList = isis.data.ChunkList(image.getChunkList() )
-myChunk = isis.data.Chunk( myChunkList[0] )
+print "manipulating cheapImage"
+image.setVoxel(1,2,3,0, -image.getVoxel(1,2,3,0))
 
-#image.insertChunk(chunkAt)
-print "image contains ", len(myChunkList), " chunks"
 
-mat = [[0,-1,0],[1,0,0],[0,0,-1]]
+image.setProperty( "indexOrigin", isis.core.fvector4(1,2,2,2), "fvector4" )
+print image.getPropMap().propertyValue("indexOrigin").toString(True)
 
-image.transformCoords( mat )
-newfvector4 = isis.core.fvector4(4,3,2,21)
-
-#propmap = isis.core.PropMap( image.getPropMap() )
-#if( propmap.hasProperty("indexOrigin") ):
-	#print "has indexOrigin"
-#if( not propmap.hasProperty("aufsMaul") ):
-	#print "has no aufsMaul"
-
-#print image.getPropMap().propertyValue("indexOrigin").toString(True)
-#image.getPropMap().setProperty("indexOrigin", isis.core.fvector4(1,2,3,4), "fvector4")
-#print image.getPropMap().propertyValue("indexOrigin").toString(True)
-
-#image2 = isis.data.Image(image.deepCopy())
-
-size = isis.core.ivector4(image.sizeToVector())
-
-print "start"
-for i in range(size[0]):
-	for j in range(size[1]):
-		for k in range(size[2]):
-			
-		#coords = isis.core.ivector4(i,j,0,0)
-			image.setVoxel(i,j,k,0, ((i) / (j+1)) * image.voxel(i,j,k,0) )
-print "end"
-#print "diff (should be 0): ", image.cmp(image2) #should be 0 because of cheap copy
-print "diff: " + str(image.cmp(image2))
-image.makeOfTypeName("float")
-image.spliceDownTo("sliceDim")
-print "Now the image has " + str(len(image.getChunkList())) + " chunks"
-
-iList.append(image)
-outList = isis.data.ImageList()
-outList.append(image)
-ioapp.autowrite(outList, True)
+#ioapp.autowrite(outList, True)

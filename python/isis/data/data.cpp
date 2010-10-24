@@ -5,6 +5,9 @@
  *      Author: tuerke
  */
 
+#ifndef DATA_HPP_
+#define DATA_HPP_
+
 #include <boost/python.hpp>
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string.hpp>
@@ -12,9 +15,7 @@
 #include "_ioapplication.hpp"
 #include "_image.hpp"
 #include "_chunk.hpp"
-#include "core/_propmap.hpp"
 #include "std_item.hpp"
-
 
 using namespace boost::python;
 using namespace isis::python;
@@ -22,17 +23,15 @@ using namespace isis::python;
 BOOST_PYTHON_MODULE( _data )
 {
 
-	//#######################################################################################
+
+//#######################################################################################
 //	IOApplication
 //#######################################################################################
-	class_<isis::data::IOApplication, _IOApplication, bases<isis::util::Application> > ( "IOApplication", init<const char *, bool, bool>() )
+	class_<isis::data::IOApplication, _IOApplication, bases< _Application> > ( "IOApplication", init<const char *, bool, bool>() )
 		.def( "init", &_IOApplication::init )
 		.def( "addParameter", &_IOApplication::_addParameter)
 		.def( "setNeeded", &_IOApplication::_setNeeded)
 		.def( "setHidden", &_IOApplication::_setHidden)
-		.def( "printHelp", &isis::util::Application::printHelp )
-		.def( "getCoreVersion", &isis::util::Application::getCoreVersion )
-		.staticmethod( "getCoreVersion" )
 		.def( "autoload", &isis::data::IOApplication::autoload )
 		.def( "autowrite", &_IOApplication::_autowrite )
 		.def( "images", &_IOApplication::_images)
@@ -43,10 +42,10 @@ BOOST_PYTHON_MODULE( _data )
 //#######################################################################################
 
 	class_<isis::data::Image, _Image, bases<isis::util::PropMap> >("Image", init<>() )
-		.def( init<_Image>() )
+		.def( init<isis::data::Image>() )
 		.def( "checkMakeClean", &isis::data::Image::checkMakeClean)
-		.def( "voxel",(float ( ::_Image::* )( const isis::util::ivector4& ) ) ( &_Image::_voxel), ( arg("coord") ))
-		.def( "voxel",(float ( ::_Image::* )( const size_t&, const size_t&, const size_t&, const size_t& ) ) ( &_Image::_voxel), ( arg("first"),arg("second"), arg("third"), arg("fourth") ))
+		.def( "getVoxel",(float ( ::_Image::* )( const isis::util::ivector4& ) ) ( &_Image::_voxel), ( arg("coord") ))
+		.def( "getVoxel",(float ( ::_Image::* )( const size_t&, const size_t&, const size_t&, const size_t& ) ) ( &_Image::_voxel), ( arg("first"),arg("second"), arg("third"), arg("fourth") ))
 		.def( "setVoxel", (bool ( ::_Image::* )( const isis::util::ivector4&, const float& ) ) ( &_Image::_setVoxel), ( arg("coord"), arg("value") ))
 		.def( "setVoxel", (bool ( ::_Image::* )( const size_t&, const size_t&, const size_t&, const size_t&, const float& ) ) ( &_Image::_setVoxel), ( arg("first"),arg("second"), arg("third"), arg("fourth"), arg("value") ))
 		.def( "sizeToVector", &_Image::_sizeToVector)
@@ -71,7 +70,7 @@ BOOST_PYTHON_MODULE( _data )
 		.def( "spliceDownTo", &_Image::_spliceDownTo)
 		.def( "deepCopy", ( isis::data::Image ( ::_Image::* )( void ) ) ( &_Image::_deepCopy ))
 		.def( "deepCopy", ( isis::data::Image ( ::_Image::* )( std::string ) ) ( &_Image::_deepCopy ), ( arg("type")))
-		.def( "getPropMap",  &_Image::_getPropMap, return_internal_reference<>())
+		.def( "cheapCopy", ( isis::data::Image ( ::_Image::* )( void ) ) ( &_Image::_cheapCopy ))
 			;
 
 //#######################################################################################
@@ -87,7 +86,6 @@ BOOST_PYTHON_MODULE( _data )
 		.def("__setitem__", &std_list<IList>::set, with_custodian_and_ward<1,2>() )
 		.def("__delitem__", &std_list<IList>::del )
 			;
-
 
 
 //#######################################################################################
@@ -110,3 +108,4 @@ BOOST_PYTHON_MODULE( _data )
 		.def("__delitem__", &std_list<CList>::del )
 		;
 }
+#endif

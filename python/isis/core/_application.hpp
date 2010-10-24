@@ -1,4 +1,8 @@
 
+
+#ifndef _APPLICATION_HPP_
+#define _APPLICATION_HPP_
+
 #include "CoreUtils/application.hpp"
 #include "CoreUtils/progparameter.hpp"
 #include "CoreUtils/types.hpp"
@@ -76,3 +80,4 @@ private:
 
 }
 }
+#endif

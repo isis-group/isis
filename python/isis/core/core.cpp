@@ -1,3 +1,7 @@
+
+#ifndef CORE_HPP_
+#define CORE_HPP_
+
 #include <boost/python.hpp>
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string.hpp>
@@ -84,3 +88,4 @@ BOOST_PYTHON_MODULE( _core )
 		;
 
 }
+#endif
