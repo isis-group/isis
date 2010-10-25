@@ -6,3 +6,6 @@ set_target_properties(isisAdapter_vtk PROPERTIES LINK_FLAGS "--no-undefined" )
 set_target_properties(isisAdapter_vtk PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
   INSTALL_RPATH_USE_LINK_PATH TRUE)
 SET(TARGETS ${TARGETS} isisAdapter_vtk)
+
+INSTALL(TARGETS ${TARGETS}
+  LIBRARY DESTINATION  ${CMAKE_INSTALL_PREFIX}/lib COMPONENT RuntimeLibraries)

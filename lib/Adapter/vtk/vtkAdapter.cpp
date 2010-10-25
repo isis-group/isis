@@ -32,11 +32,20 @@ vtkAdapter::vtkAdapter( const boost::shared_ptr<isis::data::Image> src )
 {}
 
 //return a list of vtkImageData type pointer
-vtkImageData *vtkAdapter::makeVtkImageObject( const boost::shared_ptr<data::Image> src, unsigned int dim4 )
+vtkImageData *vtkAdapter::makeVtkImageObject( const boost::shared_ptr<data::Image> src, bool keepType, size_t dim4 )
 {
-	vtkAdapter *myAdapter = new vtkAdapter( src );
+	vtkAdapter *myAdapter;
 	vtkImageData *vtkImage = vtkImageData::New();
 	vtkImageImport *importer = vtkImageImport::New();
+	if( !keepType ) {
+		boost::shared_ptr<data::Image> imgPtr ( new data::TypedImage<u_int8_t>( *src ) );
+		myAdapter = new vtkAdapter( imgPtr );
+		importer->SetDataScalarTypeToUnsignedChar();
+		vtkImage->SetScalarTypeToUnsignedChar();
+		importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<u_int8_t>( 0,0,0,dim4 ) );
+	} else {
+		myAdapter = new vtkAdapter( src );
+	}
 	const util::fvector4 dimensions( myAdapter->m_ImageISIS->sizeToVector() );
 	const util::fvector4 indexOrigin( myAdapter->m_ImageISIS->getProperty<util::fvector4>( "indexOrigin" ) );
 	const util::fvector4 spacing( myAdapter->m_ImageISIS->getProperty<util::fvector4>( "voxelSize" ) );
@@ -45,11 +54,10 @@ vtkImageData *vtkAdapter::makeVtkImageObject( const boost::shared_ptr<data::Imag
 
 	//set the datatype for the vtkImage object
 	//TODO check datatypes
-	vtkImage->SetOrigin( indexOrigin[0], indexOrigin[1], indexOrigin[2] );
-	vtkImage->SetSpacing( spacing[0], spacing[1], spacing[2] );
-	void *targePtr = malloc( m_ImageISIS->bytes_per_voxel() * m_ImageISIS->volume() );
+
+	void *targePtr = malloc( myAdapter->m_ImageISIS->bytes_per_voxel() * myAdapter->m_ImageISIS->volume() );
 	uint8_t *refTarget = ( uint8_t * ) targePtr;
-	std::vector< boost::shared_ptr< data::Chunk> > chList = m_ImageISIS->getChunkList();
+	std::vector< boost::shared_ptr< data::Chunk> > chList = myAdapter->m_ImageISIS->getChunkList();
 	size_t chunkIndex = 0;
 	BOOST_FOREACH( boost::shared_ptr< data::Chunk> & ref, chList ) {
 		data::Chunk &chRef = *ref;
@@ -57,47 +65,50 @@ vtkImageData *vtkAdapter::makeVtkImageObject( const boost::shared_ptr<data::Imag
 		chRef.getTypePtr<uint8_t>().copyToMem( 0, ( chRef.volume() - 1 ), target );
 	}
 
-	switch ( myAdapter->m_ImageISIS->typeID() ) {
-	case data::TypePtr<int8_t>::staticID:
-		importer->SetDataScalarTypeToUnsignedChar();
-		importer->SetImportVoidPointer( refTarget );
-		vtkImage->SetScalarTypeToChar();
-		break;
-	case data::TypePtr<u_int8_t>::staticID:
-		importer->SetDataScalarTypeToUnsignedChar();
-		vtkImage->SetScalarTypeToUnsignedChar();
-		importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<u_int8_t>( 0, 0, 0, dim4 ) );
-		break;
-	case data::TypePtr<int16_t>::staticID:
-		importer->SetDataScalarTypeToShort();
-		vtkImage->SetScalarTypeToShort();
-		importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<int16_t>( 0, 0, 0, dim4 ) );
-		break;
-	case data::TypePtr<u_int16_t>::staticID:
-		importer->SetDataScalarTypeToUnsignedShort();
-		vtkImage->SetScalarTypeToUnsignedShort();
-		importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<u_int16_t>( 0, 0, 0, dim4 ) );
-		break;
-	case data::TypePtr<int32_t>::staticID:
-		importer->SetDataScalarTypeToInt();
-		vtkImage->SetScalarTypeToInt();
-		importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<int32_t>( 0, 0, 0, dim4 ) );
-		break;
-	case data::TypePtr<u_int32_t>::staticID:
-		importer->SetDataScalarTypeToInt();
-		vtkImage->SetScalarTypeToUnsignedInt();
-		importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<u_int32_t>( 0, 0, 0, dim4 ) );
-		break;
-	case data::TypePtr<float>::staticID:
-		importer->SetDataScalarTypeToFloat();
-		vtkImage->SetScalarTypeToFloat();
-		importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<float>( 0, 0, 0, dim4 ) );
-		break;
-	case data::TypePtr<double>::staticID:
-		importer->SetDataScalarTypeToDouble();
-		vtkImage->SetScalarTypeToDouble();
-		importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<double>( 0, 0, 0, dim4 ) );
-		break;
+
+	if ( keepType ) {
+		switch ( myAdapter->m_ImageISIS->typeID() ) {
+		case data::TypePtr<int8_t>::staticID:
+			importer->SetDataScalarTypeToUnsignedChar();
+			importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<int8_t>( 0, 0, 0, dim4 ) );
+			vtkImage->SetScalarTypeToChar();
+			break;
+		case data::TypePtr<u_int8_t>::staticID:
+			importer->SetDataScalarTypeToUnsignedChar();
+			vtkImage->SetScalarTypeToUnsignedChar();
+			importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<u_int8_t>( 0, 0, 0, dim4 ) );
+			break;
+		case data::TypePtr<int16_t>::staticID:
+			importer->SetDataScalarTypeToShort();
+			vtkImage->SetScalarTypeToShort();
+			importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<int16_t>( 0, 0, 0, dim4 ) );
+			break;
+		case data::TypePtr<u_int16_t>::staticID:
+			importer->SetDataScalarTypeToUnsignedShort();
+			vtkImage->SetScalarTypeToUnsignedShort();
+			importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<u_int16_t>( 0, 0, 0, dim4 ) );
+			break;
+		case data::TypePtr<int32_t>::staticID:
+			importer->SetDataScalarTypeToInt();
+			vtkImage->SetScalarTypeToInt();
+			importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<int32_t>( 0, 0, 0, dim4 ) );
+			break;
+		case data::TypePtr<u_int32_t>::staticID:
+			importer->SetDataScalarTypeToInt();
+			vtkImage->SetScalarTypeToUnsignedInt();
+			importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<u_int32_t>( 0, 0, 0, dim4 ) );
+			break;
+		case data::TypePtr<float>::staticID:
+			importer->SetDataScalarTypeToFloat();
+			vtkImage->SetScalarTypeToFloat();
+			importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<float>( 0, 0, 0, dim4 ) );
+			break;
+		case data::TypePtr<double>::staticID:
+			importer->SetDataScalarTypeToDouble();
+			vtkImage->SetScalarTypeToDouble();
+			importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<double>( 0, 0, 0, dim4 ) );
+			break;
+		}
 	}
 
 	importer->SetWholeExtent( 0, dimensions[0] - 1, 0, dimensions[1] - 1, 0, dimensions[2] - 1 );
