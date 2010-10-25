@@ -29,7 +29,7 @@ ENDIF(ISIS_DEBUG_LOG)
 
 OPTION(${CMAKE_PROJECT_NAME}_REGISTRATION "Build the isis registration tool isisreg3d and isisdotrans3d" OFF)
 OPTION(${CMAKE_PROJECT_NAME}_PROPERTYVIEWER "Build the graphical isis property viewer isispropertyviewer" OFF)
-
+OPTION(${CMAKE_PROJECT_NAME}_VIEWER "Build the isis Viewer (budding)" OFF)
 
 # the registration tools
 if(${CMAKE_PROJECT_NAME}_REGISTRATION)   
@@ -41,7 +41,16 @@ if(${CMAKE_PROJECT_NAME}_REGISTRATION)
 	set(PROGRAMS ${PROGRAMS} ${CMAKE_BINARY_DIR}/isisDoTrans3D/isisdotrans3d)
 	set(PROGRAMS ${PROGRAMS} ${CMAKE_BINARY_DIR}/isisReg3D/isisreg3d)
 endif(${CMAKE_PROJECT_NAME}_REGISTRATION)
-	
+
+if(${CMAKE_PROJECT_NAME}_VIEWER)
+    FIND_PACKAGE(Qt4 REQUIRED)
+    INCLUDE(${QT_USE_FILE})
+    FIND_PACKAGE(VTK REQUIRED)
+    INCLUDE(${USE_VTK_FILE})
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-depth-100")
+    add_subdirectory(isisViewer)
+    set(PROGRAMS ${PROGRAMS} ${CMAKE_BINARY_DIR}/isisViewer/isisViewer)
+endif(${CMAKE_PROJECT_NAME}_VIEWER)
 
 INSTALL(PROGRAMS ${PROGRAMS}
   DESTINATION ${CMAKE_INSTALL_PREFIX}/bin COMPONENT runtime)
