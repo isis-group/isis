@@ -70,13 +70,12 @@ public:
 	boost::shared_ptr<isis::data::Image> getISISImage() const { return m_ISISImage; }
 
 	bool setSliceCoordinates (const int&, const int&, const int& );
+	bool resetSliceCoordinates( void );
 
 	vtkActor* getActorAxial() const { return m_ActorAxial; }
 	vtkActor* getActorSagittal() const { return m_ActorSagittal; }
 	vtkActor* getActorCoronal() const { return m_ActorCoronal; }
 
-	void enablePhysical();
-	void disablePhysical();
 
 private:
 	vtkImageData* m_Image;

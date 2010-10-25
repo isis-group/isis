@@ -58,7 +58,6 @@ public:
 	vtkImageData* m_CurrentImagePtr;
 	boost::shared_ptr<ImageHolder> m_CurrentImageHolder;
 private slots:
-	void checkPhysicalChanged( bool );
 	void valueChangedSagittal( int );
 	void valueChangedCoronal( int );
 	void valueChangedAxial( int );
@@ -71,8 +70,6 @@ private:
 	Ui::isisViewer ui;
 	std::vector< boost::shared_ptr< ImageHolder > > m_ImageVector;
 	void setUpPipe();
-
-
 
 
 	vtkRenderer* m_RendererAxial;

@@ -43,29 +43,35 @@ ImageHolder::ImageHolder()
 
 }
 
+bool ImageHolder::resetSliceCoordinates( void )
+{
+	return setSliceCoordinates(m_Image->GetDimensions()[0] / 2, m_Image->GetDimensions()[1] / 2, m_Image->GetDimensions()[2] / 2);
+}
+
 bool ImageHolder::setSliceCoordinates( const int& sagittal, const int& coronal, const int& axial )
 {
-	//TODO debug
-	std::cout << "picked: " << sagittal << ":" << coronal << ":" << axial << std::endl;
-	if( not m_Physical )
+	if( axial <= (m_Image->GetDimensions()[2] - 1))
 	{
-		if( axial <= (m_Image->GetDimensions()[2] - 1))
-		{
-			m_SliceAxial = axial;
-			m_ExtractAxial->SetOutputWholeExtent( 0, m_Image->GetDimensions()[0] - 1, 0, m_Image->GetDimensions()[1] - 1, m_SliceAxial, m_SliceAxial );
-		} else { return false; }
-		if( coronal <= (m_Image->GetDimensions()[1] - 1) )
-		{
-			m_SliceCoronal = coronal;
-			m_ExtractCoronal->SetOutputWholeExtent( 0, m_Image->GetDimensions()[0] - 1, m_SliceCoronal, m_SliceCoronal, 0, m_Image->GetDimensions()[2] - 1 );
-		} else { return false; }
-		if( sagittal <= (m_Image->GetDimensions()[0] - 1) )
-		{
-			m_SliceSagittal = sagittal;
-			m_ExtractSagittal->SetOutputWholeExtent( m_SliceSagittal, m_SliceSagittal, 0, m_Image->GetDimensions()[1] - 1, 0, m_Image->GetDimensions()[2] - 1  );
-		} else { return false; }
+		//TODO debug
+		std::cout << "axial: " << axial << std::endl;
+		m_SliceAxial = axial;
+		m_ExtractAxial->SetOutputWholeExtent( 0, m_Image->GetDimensions()[0] - 1, 0, m_Image->GetDimensions()[1] - 1, m_SliceAxial, m_SliceAxial );
+	} else { return false; }
+	if( coronal <= (m_Image->GetDimensions()[1] - 1) )
+	{
+		//TODO debug
+		std::cout << "coronal: " << coronal << std::endl;
+		m_SliceCoronal = coronal;
+		m_ExtractCoronal->SetOutputWholeExtent( 0, m_Image->GetDimensions()[0] - 1, m_SliceCoronal, m_SliceCoronal, 0, m_Image->GetDimensions()[2] - 1 );
+	} else { return false; }
+	if( sagittal <= (m_Image->GetDimensions()[0] - 1) )
+	{
+		//TODO debug
+		std::cout << "sagittal: " << sagittal << std::endl;
+		m_SliceSagittal = sagittal;
+		m_ExtractSagittal->SetOutputWholeExtent( m_SliceSagittal, m_SliceSagittal, 0, m_Image->GetDimensions()[1] - 1, 0, m_Image->GetDimensions()[2] - 1  );
+	} else { return false; }
 
-	}
 	m_ExtractAxial->Update();
 	m_ExtractSagittal->Update();
 	m_ExtractCoronal->Update();
@@ -120,20 +126,4 @@ void ImageHolder::calculateRotations()
 	std::cout << "z: " << m_RotZ << std::endl;
 }
 
-void ImageHolder::enablePhysical()
-{
-	m_ActorAxial->AddOrientation( m_RotX, m_RotZ, m_RotY);
-	m_ActorSagittal->AddOrientation( m_RotY , m_RotX, m_RotZ);
-	m_ActorCoronal->AddOrientation( m_RotX, m_RotZ, m_RotY );
-	m_Physical = true;
-	setSliceCoordinates( m_SliceSagittal, m_SliceCoronal, m_SliceAxial );
-}
 
-void ImageHolder::disablePhysical()
-{
-	m_ActorAxial->SetOrientation( orientAxial[0], orientAxial[1], orientAxial[2] );
-	m_ActorSagittal->SetOrientation( orientSagittal[0], orientSagittal[1], orientSagittal[2]  );
-	m_ActorCoronal->SetOrientation( orientCoronal[0], orientCoronal[1], orientCoronal[2] );
-	m_Physical = false;
-	setSliceCoordinates( m_SliceSagittal, m_SliceCoronal, m_SliceAxial );
-}

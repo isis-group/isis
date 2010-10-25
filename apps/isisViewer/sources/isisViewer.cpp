@@ -51,7 +51,6 @@ isisViewer::isisViewer( const isis::util::slist& fileList, QMainWindow *parent )
 
 	ui.setupUi( this );
 	//connections qt
-	QObject::connect( this->ui.checkPhysical, SIGNAL( clicked( bool ) ), this, SLOT( checkPhysicalChanged( bool ) ) );
 
 	QObject::connect( this->ui.verticalSlider, SIGNAL( valueChanged( int ) ), this, SLOT( valueChangedSagittal( int ) ) );
 	QObject::connect( this->ui.verticalSlider_2, SIGNAL( valueChanged( int ) ), this, SLOT( valueChangedCoronal( int) ) );
@@ -121,40 +120,22 @@ void isisViewer::setUpPipe()
 
 void isisViewer::resetCam()
 {
+	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference refImg, m_ImageVector)
+	{
+		refImg->resetSliceCoordinates();
+	}
 	m_RendererAxial->ResetCamera();
 	m_RendererSagittal->ResetCamera();
 	m_RendererCoronal->ResetCamera();
+
 	m_WindowAxial->Render();
-	m_WindowSagittal->Render();
 	m_WindowCoronal->Render();
+	m_WindowSagittal->Render();
+
 }
 
 //gui interactions
-void isisViewer::checkPhysicalChanged( bool on )
-{
-	if( on )
-	{
-		BOOST_FOREACH(  std::vector< boost::shared_ptr< ImageHolder > >::const_reference ref, m_ImageVector )
-		{
-			ref->enablePhysical();
-		}
-		resetCam();
-		m_WindowAxial->Render();
-		m_WindowSagittal->Render();
-		m_WindowCoronal->Render();
-	}
-	if( not on )
-	{
-		BOOST_FOREACH(  std::vector< boost::shared_ptr< ImageHolder > >::const_reference ref, m_ImageVector )
-		{
-			ref->disablePhysical();
-		}
-		resetCam();
-		m_WindowAxial->Render();
-		m_WindowSagittal->Render();
-		m_WindowCoronal->Render();
-	}
-}
+
 
 void isisViewer::displayIntensity( const int& x, const int& y, const int& z )
 {
@@ -200,9 +181,13 @@ void isisViewer::sliceChanged( const int& x, const int& y, const int& z)
 	{
 		if ( not refImg->setSliceCoordinates(x,y,z) ) std::cout << "error during setting slicesetting!" << std::endl;
 	}
+	m_RendererAxial->ResetCamera();
+	m_RendererSagittal->ResetCamera();
+	m_RendererCoronal->ResetCamera();
 	m_WindowAxial->Render();
 	m_WindowCoronal->Render();
 	m_WindowSagittal->Render();
+
 
 }
 
