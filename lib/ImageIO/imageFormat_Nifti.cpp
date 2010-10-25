@@ -538,7 +538,10 @@ private:
 		//indexOrigin[2] = -indexOrigin[2];
 		LOG( ImageIoLog, info ) << indexOrigin;
 		util::fvector4 voxelSizeVector = image.getProperty<util::fvector4>( "voxelSize" );
-		util::fvector4 voxelGap = image.getProperty<util::fvector4>( "voxelGap" );
+		util::fvector4 voxelGap;
+		if(image.hasProperty( "voxelGap" )){
+			voxelGap= image.getProperty<util::fvector4>( "voxelGap" );
+		}
 		ni.dx = ni.pixdim[1] = voxelSizeVector[0] + voxelGap[0];
 		ni.dy = ni.pixdim[2] = voxelSizeVector[1] + voxelGap[1];
 		ni.dz = ni.pixdim[3] = voxelSizeVector[2] + voxelGap[2];

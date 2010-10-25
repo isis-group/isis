@@ -112,7 +112,9 @@ void Application::printHelp(bool withHidden)const
 				continue; // if its hidden, not needed, and wie want the short version skip this parameter
 		}
 
-		if ( ! iP->second.needed() && ! iP->second->is<dlist>() ) {pref = ". Default: \"" + iP->second.toString() + "\"";};
+		if ( ! iP->second.needed() ) {
+			pref = ". Default: \"" + iP->second.toString() + "\"";
+		}
 
 		std::cout << "\t-" << iP->first << " <" << iP->second->typeName() << ">" << std::endl;
 
