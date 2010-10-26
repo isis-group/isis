@@ -64,7 +64,7 @@ isisViewer::isisViewer( const isis::util::slist& fileList, QMainWindow *parent )
 		BOOST_FOREACH( isis::data::ImageList::const_reference refImage, imgList )
 		{
 			boost::shared_ptr< ImageHolder > tmpVec( new ImageHolder );
-			tmpVec->setImage( isis::adapter::vtkAdapter::makeVtkImageObject( refImage,false,0 ), refImage );
+			tmpVec->setImages(  refImage, isis::adapter::vtkAdapter::makeVtkImageObject( refImage,false,0 ) );
 			tmpVec->setReadVec( refImage->getProperty<isis::util::fvector4>("readVec") );
 			tmpVec->setPhaseVec( refImage->getProperty<isis::util::fvector4>("phaseVec") );
 			tmpVec->setSliceVec( refImage->getProperty<isis::util::fvector4>("sliceVec") );

@@ -24,6 +24,7 @@
 #define IMAGEHOLDER_HPP_
 
 #include <vtkImageData.h>
+#include <vtkImageFlip.h>
 #include <vtkDataSetMapper.h>
 #include <vtkImageMapper.h>
 #include <vtkImageClip.h>
@@ -41,6 +42,7 @@
 #include "isisViewer.hpp"
 
 #include <cmath>
+#include <vector>
 
 class isisViewer;
 
@@ -50,14 +52,12 @@ class ImageHolder
 public:
 	ImageHolder();
 
-	void setImage( vtkImageData*, boost::shared_ptr<isis::data::Image> );
+	void setImages( boost::shared_ptr<isis::data::Image> ,vtkImageData* );
 	void setPtrToViewer( const boost::shared_ptr<isisViewer> ptr ) { m_PtrToViewer = ptr; }
 
 	void setReadVec( const isis::util::fvector4& read ) { m_readVec = read; }
 	void setPhaseVec( const isis::util::fvector4& phase ) { m_phaseVec = phase; }
 	void setSliceVec( const isis::util::fvector4& slice ) { m_sliceVec = slice; }
-
-	void setPhysical( const bool& phy ) { m_Physical = phy; }
 
 	isis::util::fvector4 getReadVec() const { return m_readVec; }
 	isis::util::fvector4 getPhaseVec() const { return m_phaseVec; }
@@ -76,6 +76,7 @@ public:
 
 private:
 	vtkImageData* m_Image;
+	vtkImageData* m_OrientedImage;
 	boost::shared_ptr<isis::data::Image> m_ISISImage;
 	boost::shared_ptr<isisViewer> m_PtrToViewer;
 	vtkImageClip* m_ExtractAxial;
@@ -103,8 +104,9 @@ private:
 	double m_RotY;
 	double m_RotZ;
 
-	bool m_Physical;
 	void setUpPipe();
+	bool createOrientedImage();
+	const size_t getBiggestVecElem( const isis::util::fvector4 &vec );
 
 };
 
