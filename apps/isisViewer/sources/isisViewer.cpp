@@ -68,8 +68,6 @@ isisViewer::isisViewer( const isis::util::slist& fileList, QMainWindow *parent )
 			tmpVec->setReadVec( refImage->getProperty<isis::util::fvector4>("readVec") );
 			tmpVec->setPhaseVec( refImage->getProperty<isis::util::fvector4>("phaseVec") );
 			tmpVec->setSliceVec( refImage->getProperty<isis::util::fvector4>("sliceVec") );
-			tmpVec->calculateRotations();
-			tmpVec->setMainOrienation( refImage->getMainOrientation() );
 			m_ImageVector.push_back( tmpVec );
 
 		}

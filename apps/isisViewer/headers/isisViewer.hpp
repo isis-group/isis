@@ -28,13 +28,13 @@
 #include "CoreUtils/vector.hpp"
 
 #include "ui_isisViewer.h"
-#include <boost/foreach.hpp>
 
 #include "ImageHolder.hpp"
 #include "ViewerInteractor.hpp"
 
 #include <vector>
 #include <boost/shared_ptr.hpp>
+#include <boost/foreach.hpp>
 
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>

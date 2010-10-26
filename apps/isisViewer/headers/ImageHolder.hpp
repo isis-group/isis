@@ -56,15 +56,12 @@ public:
 	void setReadVec( const isis::util::fvector4& read ) { m_readVec = read; }
 	void setPhaseVec( const isis::util::fvector4& phase ) { m_phaseVec = phase; }
 	void setSliceVec( const isis::util::fvector4& slice ) { m_sliceVec = slice; }
-	void calculateRotations();
-	void setMainOrienation( const isis::data::Image::orientation& orient ) { m_mainOrientation = orient; }
 
 	void setPhysical( const bool& phy ) { m_Physical = phy; }
 
 	isis::util::fvector4 getReadVec() const { return m_readVec; }
 	isis::util::fvector4 getPhaseVec() const { return m_phaseVec; }
 	isis::util::fvector4 getSliceVec() const { return m_sliceVec; }
-	isis::data::Image::orientation getMainOrientation() const { return m_mainOrientation; }
 
 	vtkImageData* getVTKImageData() const { return m_Image; }
 	boost::shared_ptr<isis::data::Image> getISISImage() const { return m_ISISImage; }
@@ -105,7 +102,6 @@ private:
 	double m_RotX;
 	double m_RotY;
 	double m_RotZ;
-	isis::data::Image::orientation m_mainOrientation;
 
 	bool m_Physical;
 	void setUpPipe();
