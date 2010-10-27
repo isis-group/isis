@@ -36,6 +36,7 @@
 #include <vtkProperty.h>
 #include <vtkTexture.h>
 #include <vtkCamera.h>
+#include <vtkMatrix4x4.h>
 
 #include "CoreUtils/vector.hpp"
 #include "DataStorage/image.hpp"
@@ -93,6 +94,8 @@ private:
 	static const double orientCoronal[];
 	static const double orientAxial[];
 
+	vtkMatrix4x4* m_Matrix;
+
 	unsigned int m_SliceAxial;
 	unsigned int m_SliceSagittal;
 	unsigned int m_SliceCoronal;
@@ -100,6 +103,10 @@ private:
 	isis::util::fvector4 m_readVec;
 	isis::util::fvector4 m_phaseVec;
 	isis::util::fvector4 m_sliceVec;
+	isis::util::fvector4 m_transposedReadVec;
+	isis::util::fvector4 m_transposedPhaseVec;
+	isis::util::fvector4 m_transposedSliceVec;
+
 	double m_RotX;
 	double m_RotY;
 	double m_RotZ;

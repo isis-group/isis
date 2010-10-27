@@ -39,6 +39,7 @@ ImageHolder::ImageHolder()
 	m_ActorAxial = vtkActor::New();
 	m_ActorSagittal = vtkActor::New();
 	m_ActorCoronal = vtkActor::New();
+	m_Matrix = vtkMatrix4x4::New();
 
 }
 
@@ -47,29 +48,19 @@ bool ImageHolder::resetSliceCoordinates( void )
 	return setSliceCoordinates(m_OrientedImage->GetDimensions()[0] / 2, m_OrientedImage->GetDimensions()[1] / 2, m_OrientedImage->GetDimensions()[2] / 2);
 }
 
-bool ImageHolder::setSliceCoordinates( const int& sagittal, const int& coronal, const int& axial )
+bool ImageHolder::setSliceCoordinates( const int& x, const int& y, const int& z )
 {
-	if( axial <= (m_Image->GetDimensions()[2] - 1))
-	{
-		//TODO debug
-		std::cout << "axial: " << axial << std::endl;
-		m_SliceAxial = axial;
-		m_ExtractAxial->SetOutputWholeExtent( 0, m_Image->GetDimensions()[0] - 1, 0, m_Image->GetDimensions()[1] - 1, m_SliceAxial, m_SliceAxial );
-	} else { return false; }
-	if( coronal <= (m_Image->GetDimensions()[1] - 1) )
-	{
-		//TODO debug
-		std::cout << "coronal: " << coronal << std::endl;
-		m_SliceCoronal = coronal;
-		m_ExtractCoronal->SetOutputWholeExtent( 0, m_Image->GetDimensions()[0] - 1, m_SliceCoronal, m_SliceCoronal, 0, m_Image->GetDimensions()[2] - 1 );
-	} else { return false; }
-	if( sagittal <= (m_Image->GetDimensions()[0] - 1) )
-	{
-		//TODO debug
-		std::cout << "sagittal: " << sagittal << std::endl;
-		m_SliceSagittal = sagittal;
-		m_ExtractSagittal->SetOutputWholeExtent( m_SliceSagittal, m_SliceSagittal, 0, m_Image->GetDimensions()[1] - 1, 0, m_Image->GetDimensions()[2] - 1  );
-	} else { return false; }
+	std::vector<vtkImageClip*> extractorVec;
+	std::vector<unsigned int> currentSliceVec;
+	extractorVec.push_back(m_ExtractAxial);
+	extractorVec.push_back(m_ExtractCoronal);
+	extractorVec.push_back(m_ExtractSagittal);
+
+	extractorVec[getBiggestVecElem(m_transposedReadVec)]->SetOutputWholeExtent( 0, m_Image->GetDimensions()[0] - 1, 0, m_Image->GetDimensions()[1] - 1, z, z );
+
+	extractorVec[getBiggestVecElem(m_transposedPhaseVec)]->SetOutputWholeExtent( 0, m_Image->GetDimensions()[0] - 1, y, y, 0, m_Image->GetDimensions()[2] - 1 );
+
+	extractorVec[getBiggestVecElem(m_transposedSliceVec)]->SetOutputWholeExtent( x, x, 0, m_Image->GetDimensions()[1] - 1, 0, m_Image->GetDimensions()[2] - 1  );
 
 	m_ExtractAxial->Update();
 	m_ExtractSagittal->Update();
@@ -80,13 +71,16 @@ bool ImageHolder::setSliceCoordinates( const int& sagittal, const int& coronal, 
 
 void ImageHolder::setUpPipe()
 {
+
 	//axial
 	m_ExtractAxial->SetInput( m_OrientedImage );
 	m_MapperAxial->SetInput( m_ExtractAxial->GetOutput() );
 	m_ActorAxial->SetMapper( m_MapperAxial );
 	m_ActorAxial->GetProperty()->SetInterpolationToFlat();
 	m_ActorAxial->SetScale( m_OrientedImage->GetSpacing()[0], m_OrientedImage->GetSpacing()[1], m_OrientedImage->GetSpacing()[2] );
-	m_ActorAxial->SetOrientation( orientAxial[0], orientAxial[1], orientAxial[2] );
+	m_ActorAxial->SetUserMatrix(m_Matrix);
+	m_ActorAxial->AddOrientation( orientAxial[0], orientAxial[1], orientAxial[2] );
+
 
 	//sagittal
 	m_ExtractSagittal->SetInput( m_OrientedImage );
@@ -94,7 +88,9 @@ void ImageHolder::setUpPipe()
 	m_ActorSagittal->SetMapper( m_MapperSagittal );
 	m_ActorSagittal->GetProperty()->SetInterpolationToFlat();
 	m_ActorSagittal->SetScale( m_OrientedImage->GetSpacing()[0], m_OrientedImage->GetSpacing()[1], m_OrientedImage->GetSpacing()[2] );
-	m_ActorSagittal->SetOrientation( orientSagittal[0], orientSagittal[1], orientSagittal[2] );
+	m_ActorSagittal->SetUserMatrix(m_Matrix);
+	m_ActorSagittal->AddOrientation( orientSagittal[0], orientSagittal[1], orientSagittal[2] );
+
 
 	//coronal
 	m_ExtractCoronal->SetInput( m_OrientedImage );
@@ -102,29 +98,43 @@ void ImageHolder::setUpPipe()
 	m_ActorCoronal->SetMapper( m_MapperCoronal );
 	m_ActorCoronal->GetProperty()->SetInterpolationToFlat();
 	m_ActorCoronal->SetScale( m_OrientedImage->GetSpacing()[0], m_OrientedImage->GetSpacing()[1], m_OrientedImage->GetSpacing()[2] );
-	m_ActorCoronal->SetOrientation( orientCoronal[0], orientCoronal[1], orientCoronal[2] );
+	m_ActorCoronal->SetUserMatrix(m_Matrix);
+	m_ActorCoronal->AddOrientation( orientCoronal[0], orientCoronal[1], orientCoronal[2] );
 }
 
 void ImageHolder::setImages( boost::shared_ptr<isis::data::Image> isisImg,  vtkImageData* img )
 {
 	m_Image = img;
 	m_ISISImage = isisImg;
+	m_readVec = m_ISISImage->getProperty<isis::util::fvector4>("readVec");
+	m_phaseVec = m_ISISImage->getProperty<isis::util::fvector4>("phaseVec");
+	m_sliceVec = m_ISISImage->getProperty<isis::util::fvector4>("sliceVec");
+	m_transposedReadVec = isis::util::fvector4( m_readVec[0], m_phaseVec[0], m_sliceVec[0], 0);
+	m_transposedPhaseVec = isis::util::fvector4( m_readVec[1], m_phaseVec[1], m_sliceVec[1], 0);
+	m_transposedSliceVec = isis::util::fvector4( m_readVec[2], m_phaseVec[2], m_sliceVec[2], 0);
 	createOrientedImage();
 	resetSliceCoordinates();
 	setUpPipe();
 
 }
 
-bool ImageHolder::createOrientedImage( void ) {
+bool ImageHolder::createOrientedImage( void )
+{
 
-
-	isis::util::fvector4 readVec = m_ISISImage->getProperty<isis::util::fvector4>("readVec");
-	isis::util::fvector4 phaseVec = m_ISISImage->getProperty<isis::util::fvector4>("phaseVec");
-	isis::util::fvector4 sliceVec = m_ISISImage->getProperty<isis::util::fvector4>("sliceVec");
 	vtkImageData* phaseImage = vtkImageData::New();
 	vtkImageData* sliceImage = vtkImageData::New();
-
-	if ( readVec[getBiggestVecElem(readVec)] < 0 ) {
+	for ( size_t i = 0; i<3; i++ ) {
+		m_Matrix->SetElement(i,0, floor(fabs(m_readVec[i])+0.5));
+	}
+	for ( size_t i = 0; i<3; i++ ) {
+		m_Matrix->SetElement(i,1, floor(fabs(m_phaseVec[i])+0.5));
+	}
+	for ( size_t i = 0; i<3; i++ ) {
+		m_Matrix->SetElement(i,2, floor(fabs(m_sliceVec[i])+0.5));
+	}
+	m_Matrix->SetElement(3,3,1);
+	m_Matrix->Print(std::cout);
+	if ( m_readVec[getBiggestVecElem(m_readVec)] < 0 ) {
 		vtkImageFlip* flipper = vtkImageFlip::New();
 		flipper->SetFilteredAxis(0);
 		flipper->SetInput(m_Image);
@@ -133,7 +143,7 @@ bool ImageHolder::createOrientedImage( void ) {
 	} else {
 		phaseImage = m_Image;
 	}
-	if ( phaseVec[getBiggestVecElem(phaseVec)] < 0 ) {
+	if ( m_phaseVec[getBiggestVecElem(m_phaseVec)] < 0 ) {
 		vtkImageFlip* flipper = vtkImageFlip::New();
 		flipper->SetFilteredAxis(1);
 		flipper->SetInput(phaseImage);
@@ -142,7 +152,7 @@ bool ImageHolder::createOrientedImage( void ) {
 	} else {
 		sliceImage = phaseImage;
 	}
-	if ( sliceVec[getBiggestVecElem(sliceVec)] < 0 ) {
+	if ( m_sliceVec[getBiggestVecElem(m_sliceVec)] < 0 ) {
 		vtkImageFlip* flipper = vtkImageFlip::New();
 		flipper->SetFilteredAxis(2);
 		flipper->SetInput(sliceImage);
@@ -151,6 +161,7 @@ bool ImageHolder::createOrientedImage( void ) {
 	} else {
 		m_OrientedImage = sliceImage;
 	}
+
 	return true;
 }
 
