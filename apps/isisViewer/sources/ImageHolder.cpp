@@ -110,20 +110,9 @@ void ImageHolder::setImage( vtkImageData* img, boost::shared_ptr<isis::data::Ima
 {
 	m_Image = img;
 	m_ISISImage = isisImg;
-	setSliceCoordinates( (m_Image->GetDimensions()[0] / 2), (m_Image->GetDimensions()[1] / 2), (m_Image->GetDimensions()[2] /2) );
+	resetSliceCoordinates();
 	setUpPipe();
 
-}
-
-void ImageHolder::calculateRotations()
-{
-	m_RotY = atan2(m_readVec[2], sqrt((m_readVec[0]*m_readVec[0])+(m_readVec[1]*m_readVec[1]))) * (180 / M_PI);
-	m_RotZ = atan2((m_readVec[1] / cos(m_RotY)), m_readVec[0] / cos(m_RotY)) * (180 / M_PI);
-	m_RotX = atan2((m_phaseVec[2] / cos(m_RotY)), m_sliceVec[2] / cos(m_RotY)) * (180 / M_PI);
-	//TODO debug
-	std::cout << "x: " << m_RotX << std::endl;
-	std::cout << "y: " << m_RotY << std::endl;
-	std::cout << "z: " << m_RotZ << std::endl;
 }
 
 
