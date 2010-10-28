@@ -112,12 +112,11 @@ private:
 	isis::util::fvector4 m_transposedPhaseVec;
 	isis::util::fvector4 m_transposedSliceVec;
 
-	double m_RotX;
-	double m_RotY;
-	double m_RotZ;
+	std::vector<std::vector<double> > m_RotationVector;
 
 	void setUpPipe();
 	bool createOrientedImage();
+	void createOrientationFromMatrix( vtkMatrix4x4* matrix );
 
 
 };

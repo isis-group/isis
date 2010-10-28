@@ -23,8 +23,8 @@
 #include "ImageHolder.hpp"
 
 //rotation values for visualization in image space
-const double ImageHolder::orientSagittal[] = {180,90,90};
-const double ImageHolder::orientAxial[] = {180,0,0};
+const double ImageHolder::orientSagittal[] = {-0,-90,270};
+const double ImageHolder::orientAxial[] = {0,0,180};
 const double ImageHolder::orientCoronal[] = {90,0,180};
 
 using namespace isis::viewer;
@@ -81,9 +81,7 @@ void ImageHolder::setUpPipe()
 	m_ActorAxial->SetMapper( m_MapperAxial );
 	m_ActorAxial->GetProperty()->SetInterpolationToFlat();
 	m_ActorAxial->SetScale( m_OrientedImage->GetSpacing()[0], m_OrientedImage->GetSpacing()[1], m_OrientedImage->GetSpacing()[2] );
-	m_ActorAxial->SetUserMatrix(m_Matrix);
-	m_ActorAxial->SetOrientation( orientAxial[0], orientAxial[1], orientAxial[2] );
-
+	m_ActorAxial->SetOrientation( orientAxial[0] + m_RotationVector[0][0], orientAxial[1] + m_RotationVector[0][1], orientAxial[2] + m_RotationVector[0][2] );
 
 	//sagittal
 	m_ExtractSagittal->SetInput( m_OrientedImage );
@@ -91,8 +89,7 @@ void ImageHolder::setUpPipe()
 	m_ActorSagittal->SetMapper( m_MapperSagittal );
 	m_ActorSagittal->GetProperty()->SetInterpolationToFlat();
 	m_ActorSagittal->SetScale( m_OrientedImage->GetSpacing()[0], m_OrientedImage->GetSpacing()[1], m_OrientedImage->GetSpacing()[2] );
-	m_ActorSagittal->SetUserMatrix(m_Matrix);
-	m_ActorSagittal->SetOrientation( orientSagittal[0], orientSagittal[1], orientSagittal[2] );
+	m_ActorSagittal->SetOrientation( orientSagittal[0] + m_RotationVector[1][0], orientSagittal[1] + m_RotationVector[1][1], orientSagittal[2]+ m_RotationVector[1][2] );
 
 
 	//coronal
@@ -101,8 +98,8 @@ void ImageHolder::setUpPipe()
 	m_ActorCoronal->SetMapper( m_MapperCoronal );
 	m_ActorCoronal->GetProperty()->SetInterpolationToFlat();
 	m_ActorCoronal->SetScale( m_OrientedImage->GetSpacing()[0], m_OrientedImage->GetSpacing()[1], m_OrientedImage->GetSpacing()[2] );
-	m_ActorCoronal->SetUserMatrix(m_Matrix);
-	m_ActorCoronal->SetOrientation( orientCoronal[0], orientCoronal[1], orientCoronal[2] );
+	m_ActorCoronal->SetOrientation( orientCoronal[0] + m_RotationVector[2][0], orientCoronal[1] + m_RotationVector[2][1], orientCoronal[2] + m_RotationVector[2][2] );
+
 }
 
 void ImageHolder::setImages( boost::shared_ptr<isis::data::Image> isisImg,  vtkImageData* img )
@@ -146,13 +143,15 @@ bool ImageHolder::createOrientedImage( void )
 	m_Matrix->Print(std::cout);
 	m_OriginalMatrix->Print(std::cout);
 
+	createOrientationFromMatrix(m_Matrix);
+
 	isis::util::fvector4 readVec = m_ISISImage->getProperty<isis::util::fvector4>("readVec");
 	isis::util::fvector4 phaseVec = m_ISISImage->getProperty<isis::util::fvector4>("phaseVec");
 	isis::util::fvector4 sliceVec = m_ISISImage->getProperty<isis::util::fvector4>("sliceVec");
 	vtkImageData* phaseImage = vtkImageData::New();
 	vtkImageData* sliceImage = vtkImageData::New();
 
-	 if ( readVec[getBiggestVecElem(readVec)] < 0 ) {
+	if ( readVec[getBiggestVecElem(readVec)] < 0 ) {
 		vtkImageFlip* flipper = vtkImageFlip::New();
 		flipper->SetFilteredAxis(0);
 		flipper->SetInput(m_Image);
@@ -183,5 +182,40 @@ bool ImageHolder::createOrientedImage( void )
 	return true;
 }
 
+void ImageHolder::createOrientationFromMatrix( vtkMatrix4x4* matrix )
+{
+	std::vector<std::vector<double> > retVec;
 
+	std::vector<double> axial;
+	std::vector<double> coronal;
+	std::vector<double> sagittal;
+
+	double rotY = atan2(matrix->GetElement(2,0), sqrt((matrix->GetElement(0,0)*matrix->GetElement(0,0))+(matrix->GetElement(1,0)*matrix->GetElement(1,0)))) * (180 / M_PI);
+	double rotZ = atan2((matrix->GetElement(1,0) / cos(rotY)), matrix->GetElement(0,0) / cos(rotY)) * (180 / M_PI);
+	double rotX = atan2((matrix->GetElement(2,1) / cos(rotY)), matrix->GetElement(2,2) / cos(rotY)) * (180 / M_PI);
+
+	axial.push_back(rotX);
+	axial.push_back(rotY);
+	axial.push_back(rotZ);
+
+	sagittal.push_back(rotY);
+	sagittal.push_back(rotZ);
+	sagittal.push_back(rotX);
+
+	coronal.push_back(rotZ);
+	coronal.push_back(rotX);
+	coronal.push_back(rotY);
+
+	std::cout << "x: " << rotX << std::endl;
+	std::cout << "y: " << rotY << std::endl;
+	std::cout << "z: " << rotZ << std::endl;
+
+	retVec.push_back(axial);
+	retVec.push_back(sagittal);
+	retVec.push_back(coronal);
+
+	m_RotationVector = retVec;
+
+
+}
 
