@@ -60,6 +60,7 @@ public:
 	void setPhaseVec( const isis::util::fvector4& phase ) { m_phaseVec = phase; }
 	void setSliceVec( const isis::util::fvector4& slice ) { m_sliceVec = slice; }
 
+
 	isis::util::fvector4 getReadVec() const { return m_readVec; }
 	isis::util::fvector4 getPhaseVec() const { return m_phaseVec; }
 	isis::util::fvector4 getSliceVec() const { return m_sliceVec; }
@@ -73,6 +74,7 @@ public:
 	vtkActor* getActorAxial() const { return m_ActorAxial; }
 	vtkActor* getActorSagittal() const { return m_ActorSagittal; }
 	vtkActor* getActorCoronal() const { return m_ActorCoronal; }
+	vtkMatrix4x4* getOriginalMatrix() const { return m_OriginalMatrix; }
 
 
 private:
@@ -95,6 +97,9 @@ private:
 	static const double orientAxial[];
 
 	vtkMatrix4x4* m_Matrix;
+	vtkMatrix4x4* m_OriginalMatrix;
+
+	size_t m_Min, m_Max;
 
 	unsigned int m_SliceAxial;
 	unsigned int m_SliceSagittal;
@@ -113,7 +118,7 @@ private:
 
 	void setUpPipe();
 	bool createOrientedImage();
-	const size_t getBiggestVecElem( const isis::util::fvector4 &vec );
+
 
 };
 

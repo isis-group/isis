@@ -77,7 +77,6 @@ isisViewer::isisViewer( const isis::util::slist& fileList, QMainWindow *parent )
 		m_CurrentImageHolder = m_ImageVector.front();
 	}
 
-
 	ui.verticalSlider->setRange(0, m_CurrentImagePtr->GetDimensions()[2]-1);
 	ui.verticalSlider_2->setRange(0, m_CurrentImagePtr->GetDimensions()[1]-1);
 	ui.verticalSlider_3->setRange(0, m_CurrentImagePtr->GetDimensions()[0]-1);
@@ -88,7 +87,6 @@ isisViewer::isisViewer( const isis::util::slist& fileList, QMainWindow *parent )
 		m_RendererCoronal->AddActor( ref->getActorCoronal() );
 		m_RendererSagittal->AddActor( ref->getActorSagittal() );
 	}
-
 	m_InteractorAxial->SetDesiredUpdateRate(0.1);
 	m_InteractorAxial->Initialize();
 	m_InteractorSagittal->Initialize();
@@ -137,34 +135,37 @@ void isisViewer::resetCam()
 
 void isisViewer::displayIntensity( const int& x, const int& y, const int& z )
 {
+	isis::util::fvector4 tmpVec = isis::util::fvector4(x,y,z,0);
+	isis::util::fvector4 mappedVec = isis::viewer::mapCoordinates<float>(m_CurrentImageHolder->getOriginalMatrix(), tmpVec, m_CurrentImageHolder->getISISImage()->sizeToVector());
 	QString atString;
-	atString.sprintf("at %d %d %d", x, y, z);
+	atString.sprintf("at %d %d %d", static_cast<int>(mappedVec[0]), static_cast<int>(mappedVec[1]), static_cast<int>(mappedVec[2]));
 	ui.atLabel->setText(atString);
-	switch ( m_ImageVector.front()->getISISImage()->getChunk(x, y, z ).typeID() )
+
+	switch (m_CurrentImageHolder->getISISImage()->getChunk(x,y,z ).typeID() )
 	{
 	case isis::data::TypePtr<int8_t>::staticID:
-		ui.pxlIntensityContainer->display(m_ImageVector.front()->getISISImage()->voxel<int8_t>(x, y,z));
+		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<int8_t>(x, y,z));
 		break;
 	case isis::data::TypePtr<u_int8_t>::staticID:
-		ui.pxlIntensityContainer->display(m_ImageVector.front()->getISISImage()->voxel<u_int8_t>(x, y,z));
+		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<u_int8_t>(x, y,z));
 		break;
 	case isis::data::TypePtr<int16_t>::staticID:
-		ui.pxlIntensityContainer->display(m_ImageVector.front()->getISISImage()->voxel<int16_t>(x, y,z));
+		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<int16_t>(x, y,z));
 		break;
 	case isis::data::TypePtr<u_int16_t>::staticID:
-		ui.pxlIntensityContainer->display(m_ImageVector.front()->getISISImage()->voxel<u_int16_t>(x, y,z));
+		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<u_int16_t>(x, y,z));
 		break;
 	case isis::data::TypePtr<int32_t>::staticID:
-		ui.pxlIntensityContainer->display(m_ImageVector.front()->getISISImage()->voxel<int32_t>(x, y,z));
+		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<int32_t>(x, y,z));
 		break;
 //	case isis::data::TypePtr<u_int32_t>::staticID:
 //		ui.pxlIntensityContainer->display(m_ImageVector.front()->getISISImage()->voxel<u_int32_t>(x, y,z));
 //		break;
 	case isis::data::TypePtr<float>::staticID:
-		ui.pxlIntensityContainer->display(m_ImageVector.front()->getISISImage()->voxel<float>(x, y,z));
+		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<float>(x, y,z));
 		break;
 	case isis::data::TypePtr<double>::staticID:
-		ui.pxlIntensityContainer->display(m_ImageVector.front()->getISISImage()->voxel<double>(x, y,z));
+		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<double>(x, y,z));
 		break;
 	default:
 		ui.pxlIntensityContainer->display(tr("Error"));

@@ -28,9 +28,11 @@
 #include "CoreUtils/vector.hpp"
 
 #include "ui_isisViewer.h"
+#include "viewerCore.hpp"
 
 #include "ImageHolder.hpp"
 #include "ViewerInteractor.hpp"
+
 
 #include <vector>
 #include <boost/shared_ptr.hpp>
