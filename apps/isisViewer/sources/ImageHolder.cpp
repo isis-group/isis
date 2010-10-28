@@ -60,6 +60,10 @@ bool ImageHolder::setSliceCoordinates( const int& x, const int& y, const int& z 
 	extractorVec.push_back(m_ExtractCoronal);
 	extractorVec.push_back(m_ExtractSagittal);
 
+	std::cout << "read biggest: " << getBiggestVecElem<float>(m_transposedReadVec) << std::endl;
+	std::cout << "phase biggest: " << getBiggestVecElem<float>(m_transposedPhaseVec) << std::endl;
+	std::cout << "slice biggest: " << getBiggestVecElem<float>(m_transposedSliceVec) << std::endl;
+
 	extractorVec[getBiggestVecElem<float>(m_transposedReadVec)]->SetOutputWholeExtent( 0, m_OrientedImage->GetDimensions()[0] - 1, 0, m_OrientedImage->GetDimensions()[1] - 1, z, z );
 
 	extractorVec[getBiggestVecElem<float>(m_transposedPhaseVec)]->SetOutputWholeExtent( 0, m_OrientedImage->GetDimensions()[0] - 1, y, y, 0, m_OrientedImage->GetDimensions()[2] - 1 );
@@ -128,16 +132,16 @@ void ImageHolder::setImages( boost::shared_ptr<isis::data::Image> isisImg,  vtkI
 bool ImageHolder::createOrientedImage( void )
 {
 	for ( size_t i = 0; i<3; i++ ) {
-		m_Matrix->SetElement(i,0, floor(fabs(m_readVec[i])+0.5));
-		m_OriginalMatrix->SetElement(i,0, m_readVec[i] < 0 ? ceil(m_readVec[i]-0.5) : floor(m_readVec[i]+0.5));
+		m_Matrix->SetElement(0,i, floor(fabs(m_readVec[i])+0.5));
+		m_OriginalMatrix->SetElement(0,i, m_readVec[i] < 0 ? ceil(m_readVec[i]-0.5) : floor(m_readVec[i]+0.5));
 	}
 	for ( size_t i = 0; i<3; i++ ) {
-		m_Matrix->SetElement(i,1, floor(fabs(m_phaseVec[i])+0.5));
-		m_OriginalMatrix->SetElement(i,1,m_phaseVec[i] < 0 ? ceil(m_phaseVec[i]-0.5) : floor(m_phaseVec[i]+0.5));
+		m_Matrix->SetElement(1,i, floor(fabs(m_phaseVec[i])+0.5));
+		m_OriginalMatrix->SetElement(1,i,m_phaseVec[i] < 0 ? ceil(m_phaseVec[i]-0.5) : floor(m_phaseVec[i]+0.5));
 	}
 	for ( size_t i = 0; i<3; i++ ) {
-		m_Matrix->SetElement(i,2, floor(fabs(m_sliceVec[i])+0.5));
-		m_OriginalMatrix->SetElement(i,2, m_sliceVec[i] < 0 ? ceil(m_sliceVec[i]-0.5) : floor(m_sliceVec[i]+0.5));
+		m_Matrix->SetElement(2,i, floor(fabs(m_sliceVec[i])+0.5));
+		m_OriginalMatrix->SetElement(2,i, m_sliceVec[i] < 0 ? ceil(m_sliceVec[i]-0.5) : floor(m_sliceVec[i]+0.5));
 	}
 
 	m_Matrix->SetElement(3,3,1);
