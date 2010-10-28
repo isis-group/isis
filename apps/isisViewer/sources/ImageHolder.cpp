@@ -100,6 +100,10 @@ void ImageHolder::setUpPipe()
 	m_ActorCoronal->SetScale( m_OrientedImage->GetSpacing()[0], m_OrientedImage->GetSpacing()[1], m_OrientedImage->GetSpacing()[2] );
 	m_ActorCoronal->SetOrientation( orientCoronal[0] + m_RotationVector[2][0], orientCoronal[1] + m_RotationVector[2][1], orientCoronal[2] + m_RotationVector[2][2] );
 
+//	m_ActorAxial->AddOrientation(m_RotX, m_RotY, m_RotZ);
+//	m_ActorSagittal->AddOrientation(m_RotX, m_RotY, m_RotZ);
+//	m_ActorCoronal->AddOrientation(m_RotX, m_RotY, m_RotZ);
+
 }
 
 void ImageHolder::setImages( boost::shared_ptr<isis::data::Image> isisImg,  vtkImageData* img )
