@@ -75,6 +75,9 @@ bool ImageHolder::setSliceCoordinates( const int& x, const int& y, const int& z 
 
 void ImageHolder::setUpPipe()
 {
+	std::cout << m_Image->GetSpacing()[0] << std::endl;
+	std::cout << m_Image->GetSpacing()[1] << std::endl;
+	std::cout << m_Image->GetSpacing()[2] << std::endl;
 	//axial
 	m_ExtractAxial->SetInput( m_OrientedImage );
 	m_MapperAxial->SetInput( m_ExtractAxial->GetOutput() );
@@ -182,7 +185,7 @@ bool ImageHolder::createOrientedImage( void )
 	} else {
 		m_OrientedImage = sliceImage;
 	}
-
+	m_OrientedImage->SetSpacing( m_Image->GetSpacing() );
 	return true;
 }
 
