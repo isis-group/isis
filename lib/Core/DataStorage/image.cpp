@@ -606,13 +606,15 @@ unsigned short Image::typeID() const
 {
 	unsigned int mytypeID = chunkPtrAt( 0 )->typeID();
 	size_t tmpBytesPerVoxel = 0;
-	BOOST_FOREACH( std::vector< boost::shared_ptr<const Chunk> >::const_reference chunkRef, lookup ) {
-		if ( chunkRef->bytes_per_voxel() > tmpBytesPerVoxel ) {
-			tmpBytesPerVoxel = chunkRef->bytes_per_voxel();
-			mytypeID = chunkRef->typeID();
-		}
+	util::TypeReference min,max;
+	getMinMax(min,max);
+	LOG(Debug,info) << "Determining  datatype of image with the value range " << min << " to " << max;
+	if(min->typeID() == max->typeID()){
+		return min->typeID()  << 8;
+	} else{
+		LOG(Runtime,error) << "Sorry I dont know which datatype I should use. (" << min->typeName() << " or " << max->typeName() <<")";
+		assert(false);
 	}
-	return mytypeID;
 }
 
 bool Image::makeOfTypeId( short unsigned int id )
