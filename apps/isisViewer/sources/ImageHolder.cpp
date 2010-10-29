@@ -22,11 +22,6 @@
 
 #include "ImageHolder.hpp"
 
-//rotation values for visualization in image space
-const double ImageHolder::orientSagittal[] = {0,-90,270};
-const double ImageHolder::orientAxial[] = {0,0,180};
-const double ImageHolder::orientCoronal[] = {90,0,180};
-
 using namespace isis::viewer;
 
 ImageHolder::ImageHolder()
@@ -44,6 +39,7 @@ ImageHolder::ImageHolder()
 	m_ActorCoronal = vtkActor::New();
 	m_CorrectedMatrix = vtkMatrix4x4::New();
 	m_OriginalMatrix = vtkMatrix4x4::New();
+	initMatrices();
 
 }
 
@@ -66,56 +62,18 @@ bool ImageHolder::setSliceCoordinates( const int& x, const int& y, const int& z 
 	extractorVec[getBiggestVecElem<float>(m_phaseVec)]->Update();
 	extractorVec[getBiggestVecElem<float>(m_sliceVec)]->SetOutputWholeExtent( 0, m_OrientedImage->GetDimensions()[0] - 1, 0, m_OrientedImage->GetDimensions()[1] - 1, z, z );
 	extractorVec[getBiggestVecElem<float>(m_sliceVec)]->Update();
-//	m_ExtractSagittal->SetOutputWholeExtent( x, x, 0, m_OrientedImage->GetDimensions()[1] - 1, 0, m_OrientedImage->GetDimensions()[2] - 1  );
-//	m_ExtractAxial->SetOutputWholeExtent( 0, m_OrientedImage->GetDimensions()[0] - 1, 0, m_OrientedImage->GetDimensions()[1] - 1, z, z );
-//	m_ExtractCoronal->SetOutputWholeExtent( 0, m_OrientedImage->GetDimensions()[0] - 1, y, y, 0, m_OrientedImage->GetDimensions()[2] - 1 );
-//	m_ExtractSagittal->Update();
-//	m_ExtractCoronal->Update();
-//	m_ExtractAxial->Update();
-
 	return true;
 }
 
 void ImageHolder::setUpPipe()
 {
-	std::vector<double> axialRot;
-	std::vector<double> sagittalRot;
-	std::vector<double> coronalRot;
-
-	vtkMatrix4x4* axialMatrix = vtkMatrix4x4::New();
-	vtkMatrix4x4* sagittalMatrix = vtkMatrix4x4::New();
-	vtkMatrix4x4* coronalMatrix = vtkMatrix4x4::New();
-	//setup axial matrix
-	axialMatrix->SetElement(0,0,-1);
-	axialMatrix->SetElement(1,1,-1);
-	//setup sagittal matrix
-	sagittalMatrix->SetElement(0,0,0);
-	sagittalMatrix->SetElement(2,0,1);
-	sagittalMatrix->SetElement(0,1,1);
-	sagittalMatrix->SetElement(2,2,0);
-	sagittalMatrix->SetElement(1,2,1);
-	sagittalMatrix->SetElement(1,1,0);
-	//setup sagittal matrix
-	coronalMatrix->SetElement(0,0,-1);
-	coronalMatrix->SetElement(1,1,0);
-	coronalMatrix->SetElement(2,2,0);
-	coronalMatrix->SetElement(2,1,1);
-	coronalMatrix->SetElement(1,2,1);
-	vtkMatrix4x4* finalAxialMatrix = vtkMatrix4x4::New();
-	vtkMatrix4x4* finalSagittalMatrix = vtkMatrix4x4::New();
-	vtkMatrix4x4* finalCoronalMatrix = vtkMatrix4x4::New();
-	vtkMatrix4x4::Multiply4x4(axialMatrix, m_CorrectedMatrix, finalAxialMatrix);
-	vtkMatrix4x4::Multiply4x4(sagittalMatrix, m_CorrectedMatrix, finalSagittalMatrix);
-	vtkMatrix4x4::Multiply4x4(coronalMatrix, m_CorrectedMatrix, finalCoronalMatrix);
-
-
 	//axial
 	m_ExtractAxial->SetInput( m_OrientedImage );
 	m_MapperAxial->SetInput( m_ExtractAxial->GetOutput() );
 	m_ActorAxial->SetMapper( m_MapperAxial );
 	m_ActorAxial->GetProperty()->SetInterpolationToFlat();
 	m_ActorAxial->SetScale( m_OrientedImage->GetSpacing()[0], m_OrientedImage->GetSpacing()[1], m_OrientedImage->GetSpacing()[2] );
-	m_ActorAxial->SetUserMatrix( finalAxialMatrix );
+	m_ActorAxial->SetUserMatrix( m_MatrixAxial );
 
 	//sagittal
 	m_ExtractSagittal->SetInput( m_OrientedImage );
@@ -123,7 +81,7 @@ void ImageHolder::setUpPipe()
 	m_ActorSagittal->SetMapper( m_MapperSagittal );
 	m_ActorSagittal->GetProperty()->SetInterpolationToFlat();
 	m_ActorSagittal->SetScale( m_OrientedImage->GetSpacing()[0], m_OrientedImage->GetSpacing()[1], m_OrientedImage->GetSpacing()[2] );
-	m_ActorSagittal->SetUserMatrix(finalSagittalMatrix);
+	m_ActorSagittal->SetUserMatrix(m_MatrixSagittal);
 
 	//coronal
 	m_ExtractCoronal->SetInput( m_OrientedImage );
@@ -131,7 +89,7 @@ void ImageHolder::setUpPipe()
 	m_ActorCoronal->SetMapper( m_MapperCoronal );
 	m_ActorCoronal->GetProperty()->SetInterpolationToFlat();
 	m_ActorCoronal->SetScale( m_OrientedImage->GetSpacing()[0], m_OrientedImage->GetSpacing()[1], m_OrientedImage->GetSpacing()[2] );
-	m_ActorCoronal->SetUserMatrix( finalCoronalMatrix );
+	m_ActorCoronal->SetUserMatrix( m_MatrixCoronal );
 }
 
 void ImageHolder::setImages( boost::shared_ptr<isis::data::Image> isisImg,  vtkImageData* img )
@@ -188,18 +146,54 @@ bool ImageHolder::correctMatrix( vtkSmartPointer<vtkMatrix4x4> matrix )
 			matrix->GetElement(2, 0) * matrix->GetElement(0, 1) - matrix->GetElement(0, 0) * matrix->GetElement(2,1),
 			matrix->GetElement(0, 0) * matrix->GetElement(1, 1) - matrix->GetElement(1, 0) * matrix->GetElement(0, 1)
 		);
-		std::cout << crossVec << std::endl;
 		matrix->SetElement(0,2,crossVec[0]);
 		matrix->SetElement(1,2,crossVec[1]);
 		matrix->SetElement(2,2,crossVec[2]);
-		matrix->Print(std::cout );
 		return true;
 	} else {
 		return false;
 	}
+}
 
+void ImageHolder::initMatrices( void ) {
 
-
+	vtkSmartPointer<vtkMatrix4x4> axialMatrix = vtkMatrix4x4::New();
+	vtkSmartPointer<vtkMatrix4x4> sagittalMatrix = vtkMatrix4x4::New();
+	vtkSmartPointer<vtkMatrix4x4> coronalMatrix= vtkMatrix4x4::New();
+	/*setup axial matrix
+	*-1  0  0
+	* 0 -1  0
+	* 0  0  1
+	*/
+	axialMatrix->SetElement(0,0,-1);
+	axialMatrix->SetElement(1,1,-1);
+	/*setup sagittal matrix
+	 * 0  1  0
+	 * 0  0  1
+	 * 1  0  0
+	 */
+	sagittalMatrix->SetElement(0,0,0);
+	sagittalMatrix->SetElement(2,0,1);
+	sagittalMatrix->SetElement(0,1,1);
+	sagittalMatrix->SetElement(2,2,0);
+	sagittalMatrix->SetElement(1,2,1);
+	sagittalMatrix->SetElement(1,1,0);
+	/*setup coronal matrix
+	 * -1  0  0
+	 *  0  0  1
+	 *  0  1  0
+	 */
+	coronalMatrix->SetElement(0,0,-1);
+	coronalMatrix->SetElement(1,1,0);
+	coronalMatrix->SetElement(2,2,0);
+	coronalMatrix->SetElement(2,1,1);
+	coronalMatrix->SetElement(1,2,1);
+	//now we have to multiply these view specific matrices with the corrected
+	//orientation matrix to assure the determinant=1
+	vtkMatrix4x4::Multiply4x4(axialMatrix, m_CorrectedMatrix, m_MatrixAxial);
+	vtkMatrix4x4::Multiply4x4(sagittalMatrix, m_CorrectedMatrix, m_MatrixSagittal);
+	vtkMatrix4x4::Multiply4x4(coronalMatrix, m_CorrectedMatrix, m_MatrixCoronal);
 
 }
+
 

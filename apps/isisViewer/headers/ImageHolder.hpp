@@ -80,32 +80,31 @@ public:
 
 
 private:
-	vtkImageData* m_Image;
-	vtkImageData* m_OrientedImage;
+	vtkSmartPointer<vtkImageData> m_Image;
+	vtkSmartPointer<vtkImageData> m_OrientedImage;
 	boost::shared_ptr<isis::data::Image> m_ISISImage;
 	boost::shared_ptr<isisViewer> m_PtrToViewer;
-	vtkImageClip* m_ExtractAxial;
-	vtkImageClip* m_ExtractSagittal;
-	vtkImageClip* m_ExtractCoronal;
-	vtkDataSetMapper* m_MapperAxial;
-	vtkDataSetMapper* m_MapperSagittal;
-	vtkDataSetMapper* m_MapperCoronal;
-	vtkActor* m_ActorAxial;
-	vtkActor* m_ActorSagittal;
-	vtkActor* m_ActorCoronal;
+	vtkSmartPointer<vtkImageClip> m_ExtractAxial;
+	vtkSmartPointer<vtkImageClip> m_ExtractSagittal;
+	vtkSmartPointer<vtkImageClip> m_ExtractCoronal;
+	vtkSmartPointer<vtkDataSetMapper> m_MapperAxial;
+	vtkSmartPointer<vtkDataSetMapper> m_MapperSagittal;
+	vtkSmartPointer<vtkDataSetMapper> m_MapperCoronal;
+	vtkSmartPointer<vtkActor> m_ActorAxial;
+	vtkSmartPointer<vtkActor> m_ActorSagittal;
+	vtkSmartPointer<vtkActor> m_ActorCoronal;
 
-	static const double orientSagittal[];
-	static const double orientCoronal[];
-	static const double orientAxial[];
-
+	//this is the original matrix only containing 0 and 1
 	vtkSmartPointer<vtkMatrix4x4> m_CorrectedMatrix;
+	//if the determinant of the original matrix is not 1, then we have to calculate a
+	//a new matrix
 	vtkSmartPointer<vtkMatrix4x4> m_OriginalMatrix;
 
-	size_t m_Min, m_Max;
+	vtkSmartPointer<vtkMatrix4x4> m_MatrixAxial;
+	vtkSmartPointer<vtkMatrix4x4> m_MatrixSagittal;
+	vtkSmartPointer<vtkMatrix4x4> m_MatrixCoronal;
 
-	double m_RotX;
-	double m_RotY;
-	double m_RotZ;
+	size_t m_Min, m_Max;
 
 	unsigned int m_SliceAxial;
 	unsigned int m_SliceSagittal;
@@ -120,6 +119,7 @@ private:
 	void setUpPipe();
 	bool createOrientedImage();
 	bool correctMatrix( vtkSmartPointer<vtkMatrix4x4> matrix );
+	void initMatrices( void );
 
 
 };
