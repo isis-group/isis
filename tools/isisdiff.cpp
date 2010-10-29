@@ -98,18 +98,19 @@ int main( int argc, char *argv[] )
 		BOOST_FOREACH( util::slist::const_reference ref, ignore )
 		diff.erase( ref );
 		ret += diff.size();
+		const std::string countStr=(images1.size()>1 ? std::string(":") + boost::lexical_cast<std::string>(count) :std::string(""));
 
 		if ( ! diff.empty() ) {
 			std::cout
-					<< "Metadata of " << files.front() << ":" << count << " and "
-					<< files.back() << ":" << count  << " differ:" << std::endl
+					<< "Metadata of " << files.front() << countStr  << " and "
+					<< files.back() << countStr  << " differ:" << std::endl
 					<< diff << std::endl;
 		}
 
 		if ( first.sizeToVector() != second.sizeToVector() ) {
 			std::cout
-					<< "Image sizes of " << files.front() << ":" << count << " and "
-					<< files.back() << ":" << count  << " differ:"
+					<< "Image sizes of " << files.front() << countStr << " and "
+					<< files.back() << countStr  << " differ:"
 					<< first.sizeToString() << "/" << second.sizeToString() << std::endl;
 			ret++;
 		} else {
@@ -117,8 +118,8 @@ int main( int argc, char *argv[] )
 
 			if ( voxels != 0 ) {
 				std::cout << voxels
-						  << " of " << first.sizeToVector().product() << " voxels in " << files.front() << ":" << count << " and "
-						  << files.back() << ":" << count  << " differ" << std::endl;
+						  << " of " << first.sizeToVector().product() << " voxels in " << files.front() << countStr << " and "
+						  << files.back() << countStr  << " differ" << std::endl;
 				ret++;
 			}
 		}
