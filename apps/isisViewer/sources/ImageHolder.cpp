@@ -39,8 +39,9 @@ ImageHolder::ImageHolder()
 	m_ActorCoronal = vtkActor::New();
 	m_CorrectedMatrix = vtkMatrix4x4::New();
 	m_OriginalMatrix = vtkMatrix4x4::New();
-	initMatrices();
-
+	m_MatrixAxial = vtkMatrix4x4::New();
+	m_MatrixCoronal = vtkMatrix4x4::New();
+	m_MatrixSagittal = vtkMatrix4x4::New();
 }
 
 bool ImageHolder::resetSliceCoordinates( void )
@@ -104,6 +105,7 @@ void ImageHolder::setImages( boost::shared_ptr<isis::data::Image> isisImg,  vtkI
 	m_phaseVec = m_ISISImage->getProperty<isis::util::fvector4>("phaseVec");
 	m_sliceVec = m_ISISImage->getProperty<isis::util::fvector4>("sliceVec");
 	createOrientedImage();
+	initMatrices();
 	resetSliceCoordinates();
 	setUpPipe();
 
