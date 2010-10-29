@@ -38,6 +38,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/foreach.hpp>
 
+#include <vtkSmartPointer.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
