@@ -609,11 +609,16 @@ unsigned short Image::typeID() const
 	util::TypeReference min,max;
 	getMinMax(min,max);
 	LOG(Debug,info) << "Determining  datatype of image with the value range " << min << " to " << max;
-	if(min->typeID() == max->typeID()){
+	if(min->typeID() == max->typeID()){ // ok min and max are the same type - trivial case
+		return min->typeID()  << 8; //@todo maybe use a global static function here
+	} else if(min->fitsInto(max->typeID())){ // if min fits into the type of max, use that
+		return max->typeID()  << 8;
+	} else if(max->fitsInto(min->typeID())){ // if max fits into the type of min, use that
 		return min->typeID()  << 8;
-	} else{
+	} else {
 		LOG(Runtime,error) << "Sorry I dont know which datatype I should use. (" << min->typeName() << " or " << max->typeName() <<")";
-		assert(false);
+		throw(std::logic_error("type selection failed"));
+		return std::numeric_limits<unsigned char>::max();
 	}
 }
 
