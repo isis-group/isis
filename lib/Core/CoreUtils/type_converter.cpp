@@ -28,6 +28,11 @@
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
+
+#ifdef _MSC_VER
+#pragma warning(disable:4800)
+#endif
+
 /// @cond _internal
 namespace isis
 {

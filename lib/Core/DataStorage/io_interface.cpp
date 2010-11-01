@@ -21,13 +21,13 @@ void FileFormat::write( const isis::data::ImageList &images, const std::string &
 	bool uniqueSequenceNumber;
 	if ( images.size() > 1 ) {
 		//check if there is more than one image with the same sequenceNumber
-		std::set<u_int16_t> sequenceSet;
+		std::set<uint16_t> sequenceSet;
 		//map to get an index for every sequenceNumber
-		std::map<u_int16_t, size_t> imagePerSequenceCounter;
+		std::map<uint16_t, size_t> imagePerSequenceCounter;
 		BOOST_FOREACH( data::ImageList::const_reference ref, images ) {
 			if ( ref->hasProperty( "sequenceNumber" ) ) {
-				sequenceSet.insert( ref->getProperty<u_int16_t>( "sequenceNumber" ) );
-				imagePerSequenceCounter.insert( std::pair<u_int16_t, unsigned short>( ref->getProperty<u_int16_t>( "sequenceNumber" ), 0 ) );
+				sequenceSet.insert( ref->getProperty<uint16_t>( "sequenceNumber" ) );
+				imagePerSequenceCounter.insert( std::pair<uint16_t, unsigned short>( ref->getProperty<u_int16_t>( "sequenceNumber" ), 0 ) );
 			}
 		}
 		const unsigned short imageDigitsSequence = std::log10( sequenceSet.size() ) + 1;

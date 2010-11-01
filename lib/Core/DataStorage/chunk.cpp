@@ -230,7 +230,7 @@ ChunkList Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 	ChunkList ret = splice( ( dimensions )atDim ); // do low level splice - get the chunklist
 	BOOST_FOREACH( ChunkList::reference ref, ret ) { // adapt some metadata in them
 		util::fvector4 &orig = ref->propertyValue( "indexOrigin" )->cast_to<util::fvector4>();
-		uint32_t &acq = ref->propertyValue( "acquisitionNumber" )->cast_to<u_int32_t>();
+		uint32_t &acq = ref->propertyValue( "acquisitionNumber" )->cast_to<uint32_t>();
 		orig = orig + indexOriginOffset * cnt;
 		acq += acquisitionNumberStride * cnt; //@todo this might cause trouble if we try to insert this chunks into an image
 		cnt++;

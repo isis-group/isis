@@ -20,7 +20,7 @@
 #include <limits.h>
 
 #ifndef __PRETTY_FUNCTION__
-#define  __PRETTY_FUNCTION__ __func__ //SUNPRO need "-features=extensions" to enable __func__
+#define  __PRETTY_FUNCTION__ __FUNCSIG__ //SUNPRO need "-features=extensions" to enable __func__
 #endif
 
 

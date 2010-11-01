@@ -28,6 +28,7 @@
 #include <boost/algorithm/string/case_conv.hpp>
 
 #ifdef _MSC_VER
+#include <Windows.h>
 typedef boost::int8_t   int8_t;
 typedef boost::int16_t  int16_t;
 typedef boost::int32_t  int32_t;
@@ -36,8 +37,9 @@ typedef boost::uint16_t uint16_t;
 typedef boost::uint32_t uint32_t;
 typedef boost::int64_t  int64_t;
 typedef boost::uint64_t uint64_t;
-#define DISABLE_WARN(NUM)   #pragma warning(disable:4244)
-#define DISABLE_WARN_LINE(NUM) #pragma warning(suppress:4996)
+#pragma warning(disable:4290)
+#define DISABLE_WARN(NUM)   //#pragma warning(disable:4244)
+#define DISABLE_WARN_LINE(NUM) //#pragma warning(suppress:4996)
 #else
 #include <stdint.h>
 #define DISABLE_WARN(NUM)
@@ -290,7 +292,11 @@ continousFind( ForwardIterator &current, const ForwardIterator end, const T &com
 ///Caseless less-compare for std::string
 struct caselessStringLess {
 	bool operator() ( const std::string &a, const std::string &b ) const {
+#ifdef _MSC_VER
+		return lstrcmpi(a.c_str(), b.c_str()) < 0;
+#else
 		return strcasecmp( a.c_str(), b.c_str() ) < 0;
+#endif
 		//      return boost::algorithm::to_lower_copy(a) < boost::algorithm::to_lower_copy(b);
 		//@todo for WinXP maybe look at http://www.winehq.org/pipermail/wine-patches/2004-August/012083.html
 	}
