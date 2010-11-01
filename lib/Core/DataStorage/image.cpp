@@ -12,6 +12,10 @@
 //
 //
 
+#ifdef _MSC_VER
+#pragma warning(disable:4996 4244)
+#endif
+
 #include "DataStorage/image.hpp"
 #include "CoreUtils/vector.hpp"
 #include <boost/foreach.hpp>

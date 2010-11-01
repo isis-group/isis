@@ -17,9 +17,14 @@
 
 */
 
+#ifdef _MSC_VER
+#pragma warning(disable:4996)
+#endif
+
 #include "DataStorage/io_application.hpp"
 #include "DataStorage/io_factory.hpp"
 #include <boost/mpl/for_each.hpp>
+
 
 namespace isis
 {
@@ -164,7 +169,7 @@ bool IOApplication::autowrite( const Image& out_image, bool exitOnError )
 {
 	ImageList list;
 	list.push_back(boost::shared_ptr<Image>(new Image(out_image)));
-	autowrite(list,exitOnError);
+	return autowrite(list,exitOnError);
 }
 
 bool IOApplication::autowrite( const ImageList& out_images, bool exitOnError )

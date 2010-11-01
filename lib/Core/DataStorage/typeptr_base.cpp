@@ -1,3 +1,6 @@
+#ifdef _MSC_VER
+#define NOMINMAX 1
+#endif
 
 #include "DataStorage/typeptr_base.hpp"
 #include "DataStorage/typeptr_converter.hpp"

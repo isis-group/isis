@@ -17,6 +17,10 @@
 
 */
 
+#ifdef _MSC_VER
+#pragma warning(disable:4996)
+#endif
+
 #include <stdio.h>
 #include <fstream>
 #include <boost/filesystem/operations.hpp>
@@ -32,7 +36,6 @@ namespace util
 TmpFile::TmpFile( std::string prefix, std::string sufix )
 {
 	// @todo critical block - should be locked
-	DISABLE_WARN_LINE( 4996 );
 	boost::filesystem::path dummy( tmpnam( NULL ) );
 	boost::filesystem::path::operator=( dummy.branch_path() / boost::filesystem::path( prefix + dummy.leaf() + sufix ) );
 	LOG( Debug, info ) << "Creating temporary file " << string();

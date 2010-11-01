@@ -1,3 +1,7 @@
+#ifdef _MSC_VER
+#pragma warning(disable:4996)
+#endif
+
 #include <boost/foreach.hpp>
 #include <boost/filesystem.hpp>
 #include <iomanip>
@@ -27,11 +31,11 @@ void FileFormat::write( const isis::data::ImageList &images, const std::string &
 		BOOST_FOREACH( data::ImageList::const_reference ref, images ) {
 			if ( ref->hasProperty( "sequenceNumber" ) ) {
 				sequenceSet.insert( ref->getProperty<uint16_t>( "sequenceNumber" ) );
-				imagePerSequenceCounter.insert( std::pair<uint16_t, unsigned short>( ref->getProperty<u_int16_t>( "sequenceNumber" ), 0 ) );
+				imagePerSequenceCounter.insert( std::pair<uint16_t, unsigned short>( ref->getProperty<uint16_t>( "sequenceNumber" ), 0 ) );
 			}
 		}
-		const unsigned short imageDigitsSequence = std::log10( sequenceSet.size() ) + 1;
-		const unsigned short imageDigitsImagePerSequenceCounter = std::log10( images.size() ) + 1;
+		const unsigned short imageDigitsSequence = (unsigned short)std::log10( (float)sequenceSet.size() ) + 1;
+		const unsigned short imageDigitsImagePerSequenceCounter = (unsigned short)std::log10( (float)images.size() ) + 1;
 
 		if( sequenceSet.size() == images.size() ) {
 			uniqueSequenceNumber = true;
@@ -47,7 +51,7 @@ void FileFormat::write( const isis::data::ImageList &images, const std::string &
 			}
 			std::stringstream sequenceNumber;
 			std::stringstream sequenceCounter;
-			sequenceCounter << std::setfill('0') << std::setw( imageDigitsImagePerSequenceCounter ) << boost::lexical_cast<std::string>(  ++imagePerSequenceCounter[ref->getProperty<u_int16_t>( "sequenceNumber" ) ] );
+			sequenceCounter << std::setfill('0') << std::setw( imageDigitsImagePerSequenceCounter ) << boost::lexical_cast<std::string>(  ++imagePerSequenceCounter[ref->getProperty<uint16_t>( "sequenceNumber" ) ] );
 			sequenceNumber << std::setfill('0') << std::setw( imageDigitsSequence ) << ref->getProperty<std::string>( "sequenceNumber" );
 			std::string unique_name = "";
 			if ( uniqueSequenceNumber ) {
