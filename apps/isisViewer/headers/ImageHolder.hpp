@@ -43,6 +43,7 @@
 #include "CoreUtils/vector.hpp"
 #include "DataStorage/image.hpp"
 #include "isisViewer.hpp"
+#include "MatrixHandler.hpp"
 
 #include <cmath>
 #include <vector>

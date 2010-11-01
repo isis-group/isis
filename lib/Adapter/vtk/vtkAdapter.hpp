@@ -29,6 +29,7 @@
 
 //external includes
 #include <boost/shared_ptr.hpp>
+#include <boost/foreach.hpp>
 
 //vtk includes
 #include <vtkImageData.h>
@@ -52,7 +53,7 @@ public:
 	/**
 	* Gets a std::vector of vtkSmartpointers on vtkImageData objects.
 	*/
-	std::vector<vtkSmartPointer<vtkImageData> >makeVtkImageObject( const boost::shared_ptr<data::Image>, bool keepType = false, size_t dim4 = 0 );
+	std::vector<vtkSmartPointer<vtkImageData> >makeVtkImageObject( const boost::shared_ptr<data::Image> );
 private:
 	boost::shared_ptr<data::Image> m_ImageISIS;
 protected:
