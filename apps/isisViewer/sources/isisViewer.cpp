@@ -136,9 +136,9 @@ void isisViewer::resetCam()
 void isisViewer::displayIntensity( const int& x, const int& y, const int& z )
 {
 	isis::util::fvector4 tmpVec = isis::util::fvector4(x,y,z,0);
-	isis::util::fvector4 mappedVec = isis::viewer::mapCoordinates<float>(m_CurrentImageHolder->getOriginalMatrix(), tmpVec, m_CurrentImageHolder->getISISImage()->sizeToVector());
+//	isis::util::fvector4 mappedVec = isis::viewer::mapCoordinates<float>(m_CurrentImageHolder->getOriginalMatrix(), tmpVec, m_CurrentImageHolder->getISISImage()->sizeToVector());
 	QString atString;
-	atString.sprintf("at %d %d %d", static_cast<int>(mappedVec[0]), static_cast<int>(mappedVec[1]), static_cast<int>(mappedVec[2]));
+	atString.sprintf("at %d %d %d", x, y, z);
 	ui.atLabel->setText(atString);
 
 	switch (m_CurrentImageHolder->getISISImage()->getChunk(x,y,z ).typeID() )
@@ -175,7 +175,6 @@ void isisViewer::displayIntensity( const int& x, const int& y, const int& z )
 
 void isisViewer::sliceChanged( const int& x, const int& y, const int& z)
 {
-	std::cout << x << ":" << y << ":" << z << std::endl;
 	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference refImg, m_ImageVector)
 	{
 		if ( not refImg->setSliceCoordinates(x,y,z) ) std::cout << "error during setting slicesetting!" << std::endl;

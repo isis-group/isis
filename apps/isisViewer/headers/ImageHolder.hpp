@@ -87,6 +87,7 @@ private:
 	vtkSmartPointer<vtkImageClip> m_ExtractAxial;
 	vtkSmartPointer<vtkImageClip> m_ExtractSagittal;
 	vtkSmartPointer<vtkImageClip> m_ExtractCoronal;
+	std::vector<vtkSmartPointer<vtkImageClip> > m_ExtractorVector;
 	vtkSmartPointer<vtkDataSetMapper> m_MapperAxial;
 	vtkSmartPointer<vtkDataSetMapper> m_MapperSagittal;
 	vtkSmartPointer<vtkDataSetMapper> m_MapperCoronal;
@@ -106,9 +107,7 @@ private:
 
 	size_t m_Min, m_Max;
 
-	unsigned int m_SliceAxial;
-	unsigned int m_SliceSagittal;
-	unsigned int m_SliceCoronal;
+	std::vector<size_t> m_BiggestElemVec;
 
 	isis::util::fvector4 m_readVec;
 	isis::util::fvector4 m_phaseVec;
@@ -120,6 +119,7 @@ private:
 	bool createOrientedImage();
 	bool correctMatrix( vtkSmartPointer<vtkMatrix4x4> matrix );
 	void initMatrices( void );
+	void  commonInit( void );
 
 
 };

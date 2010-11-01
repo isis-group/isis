@@ -42,6 +42,8 @@ ImageHolder::ImageHolder()
 	m_MatrixAxial = vtkMatrix4x4::New();
 	m_MatrixCoronal = vtkMatrix4x4::New();
 	m_MatrixSagittal = vtkMatrix4x4::New();
+
+
 }
 
 bool ImageHolder::resetSliceCoordinates( void )
@@ -51,18 +53,12 @@ bool ImageHolder::resetSliceCoordinates( void )
 
 bool ImageHolder::setSliceCoordinates( const int& x, const int& y, const int& z )
 {
-	std::vector<vtkImageClip*> extractorVec;
-	std::vector<unsigned int> currentSliceVec;
-	extractorVec.push_back(m_ExtractSagittal);
-	extractorVec.push_back(m_ExtractCoronal);
-	extractorVec.push_back(m_ExtractAxial);
-
-	extractorVec[getBiggestVecElem<float>(m_readVec)]->SetOutputWholeExtent( x, x, 0, m_OrientedImage->GetDimensions()[1] - 1, 0, m_OrientedImage->GetDimensions()[2] - 1  );
-	extractorVec[getBiggestVecElem<float>(m_readVec)]->Update();
-	extractorVec[getBiggestVecElem<float>(m_phaseVec)]->SetOutputWholeExtent( 0, m_OrientedImage->GetDimensions()[0] - 1, y, y, 0, m_OrientedImage->GetDimensions()[2] - 1 );
-	extractorVec[getBiggestVecElem<float>(m_phaseVec)]->Update();
-	extractorVec[getBiggestVecElem<float>(m_sliceVec)]->SetOutputWholeExtent( 0, m_OrientedImage->GetDimensions()[0] - 1, 0, m_OrientedImage->GetDimensions()[1] - 1, z, z );
-	extractorVec[getBiggestVecElem<float>(m_sliceVec)]->Update();
+	m_ExtractorVector[m_BiggestElemVec[0]]->SetOutputWholeExtent( x, x, 0, m_OrientedImage->GetDimensions()[1] - 1, 0, m_OrientedImage->GetDimensions()[2] - 1  );
+	m_ExtractorVector[m_BiggestElemVec[0]]->Update();
+	m_ExtractorVector[m_BiggestElemVec[1]]->SetOutputWholeExtent( 0, m_OrientedImage->GetDimensions()[0] - 1, y, y, 0, m_OrientedImage->GetDimensions()[2] - 1 );
+	m_ExtractorVector[m_BiggestElemVec[1]]->Update();
+	m_ExtractorVector[m_BiggestElemVec[2]]->SetOutputWholeExtent( 0, m_OrientedImage->GetDimensions()[0] - 1, 0, m_OrientedImage->GetDimensions()[1] - 1, z, z );
+	m_ExtractorVector[m_BiggestElemVec[2]]->Update();
 	return true;
 }
 
@@ -104,6 +100,7 @@ void ImageHolder::setImages( boost::shared_ptr<isis::data::Image> isisImg,  vtkI
 	m_readVec = m_ISISImage->getProperty<isis::util::fvector4>("readVec");
 	m_phaseVec = m_ISISImage->getProperty<isis::util::fvector4>("phaseVec");
 	m_sliceVec = m_ISISImage->getProperty<isis::util::fvector4>("sliceVec");
+	commonInit();
 	createOrientedImage();
 	initMatrices();
 	resetSliceCoordinates();
@@ -198,4 +195,12 @@ void ImageHolder::initMatrices( void ) {
 
 }
 
-
+void ImageHolder::commonInit( void  )
+{
+	m_ExtractorVector.push_back(m_ExtractSagittal);
+	m_ExtractorVector.push_back(m_ExtractCoronal);
+	m_ExtractorVector.push_back(m_ExtractAxial);
+	m_BiggestElemVec.push_back(getBiggestVecElem<float>(m_readVec));
+	m_BiggestElemVec.push_back(getBiggestVecElem<float>(m_phaseVec));
+	m_BiggestElemVec.push_back(getBiggestVecElem<float>(m_sliceVec));
+}

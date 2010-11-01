@@ -32,6 +32,7 @@ ViewerInteractor::ViewerInteractor( isisViewer* viewer, vtkRenderer* renderer )
 	this->PixelArray = vtkUnsignedCharArray::New();
 	this->m_Picker = vtkCellPicker::New();
 	this->SetCurrentRenderer( m_Renderer );
+	this->SetPickColor(1,0,0);
 
 }
 
@@ -56,7 +57,6 @@ void ViewerInteractor::OnLeftButtonDown()
 		m_Picker->GetMapperPosition(ptMapped);
 		m_ViewerPtr->sliceChanged( static_cast<int>(ptMapped[0]), static_cast<int>(ptMapped[1]), static_cast<int>(ptMapped[2]) );
 	}
-
 	this->Moving = 1;
 
 	vtkRenderWindow *renWin = this->Interactor->GetRenderWindow();
@@ -89,70 +89,84 @@ void ViewerInteractor::OnMouseMove()
 			m_Picker->GetMapperPosition(ptMapped);
 			m_ViewerPtr->displayIntensity( static_cast<int>(ptMapped[0]), static_cast<int>(ptMapped[1]), static_cast<int>(ptMapped[2]) );
 		}
+
+	} else {
+		if( m_Picker->Pick(this->GetInteractor()->GetEventPosition()[0],
+									this->GetInteractor()->GetEventPosition()[1],
+									0,
+									this->CurrentRenderer))
+		{
+			double ptMapped[3];
+			m_Picker->GetMapperPosition(ptMapped);
+			m_ViewerPtr->displayIntensity( static_cast<int>(ptMapped[0]), static_cast<int>(ptMapped[1]), static_cast<int>(ptMapped[2]) );
+			m_ViewerPtr->sliceChanged( static_cast<int>(ptMapped[0]), static_cast<int>(ptMapped[1]), static_cast<int>(ptMapped[2]) );
+		}
+
 	}
+
 	if (!this->Interactor || !this->Moving)
 	{
 		return;
 	}
 
-	this->EndPosition[0] = this->Interactor->GetEventPosition()[0];
-	this->EndPosition[1] = this->Interactor->GetEventPosition()[1];
-	int *size = this->Interactor->GetRenderWindow()->GetSize();
-	if (this->EndPosition[0] > (size[0]-1))
-	{
-		this->EndPosition[0] = size[0]-1;
-	}
-	if (this->EndPosition[0] < 0)
-	{
-		this->EndPosition[0] = 0;
-	}
-	if (this->EndPosition[1] > (size[1]-1))
-	{
-		this->EndPosition[1] = size[1]-1;
-	}
-	if (this->EndPosition[1] < 0)
-	{
-		this->EndPosition[1] = 0;
-	}
-
-	vtkUnsignedCharArray *tmpPixelArray = vtkUnsignedCharArray::New();
-	tmpPixelArray->DeepCopy(this->PixelArray);
-
-	unsigned char *pixels = tmpPixelArray->GetPointer(0);
-
-	int min[2], max[2];
-	min[0] = this->StartPosition[0] <= this->EndPosition[0] ?
-	this->StartPosition[0] : this->EndPosition[0];
-	min[1] = this->StartPosition[1] <= this->EndPosition[1] ?
-	this->StartPosition[1] : this->EndPosition[1];
-	max[0] = this->EndPosition[0] > this->StartPosition[0] ?
-	this->EndPosition[0] : this->StartPosition[0];
-	max[1] = this->EndPosition[1] > this->StartPosition[1] ?
-	this->EndPosition[1] : this->StartPosition[1];
-
-	int i;
-	for (i = min[0]; i <= max[0]; i++)
-	{
-		pixels[3*(min[1]*size[0]+i)] = 255 ^ pixels[3*(min[1]*size[0]+i)];
-		pixels[3*(min[1]*size[0]+i)+1] = 255 ^ pixels[3*(min[1]*size[0]+i)+1];
-		pixels[3*(min[1]*size[0]+i)+2] = 255 ^ pixels[3*(min[1]*size[0]+i)+2];
-		pixels[3*(max[1]*size[0]+i)] = 255 ^ pixels[3*(max[1]*size[0]+i)];
-		pixels[3*(max[1]*size[0]+i)+1] = 255 ^ pixels[3*(max[1]*size[0]+i)+1];
-		pixels[3*(max[1]*size[0]+i)+2] = 255 ^ pixels[3*(max[1]*size[0]+i)+2];
-	}
-	for (i = min[1]+1; i < max[1]; i++)
-	{
-		pixels[3*(i*size[0]+min[0])] = 255 ^ pixels[3*(i*size[0]+min[0])];
-		pixels[3*(i*size[0]+min[0])+1] = 255 ^ pixels[3*(i*size[0]+min[0])+1];
-		pixels[3*(i*size[0]+min[0])+2] = 255 ^ pixels[3*(i*size[0]+min[0])+2];
-		pixels[3*(i*size[0]+max[0])] = 255 ^ pixels[3*(i*size[0]+max[0])];
-		pixels[3*(i*size[0]+max[0])+1] = 255 ^ pixels[3*(i*size[0]+max[0])+1];
-		pixels[3*(i*size[0]+max[0])+2] = 255 ^ pixels[3*(i*size[0]+max[0])+2];
-	}
-
-	this->Interactor->GetRenderWindow()->SetPixelData(0, 0, size[0]-1, size[1]-1, pixels, 1);
-
-	tmpPixelArray->Delete();
+//	this->EndPosition[0] = this->Interactor->GetEventPosition()[0];
+//	this->EndPosition[1] = this->Interactor->GetEventPosition()[1];
+//	int *size = this->Interactor->GetRenderWindow()->GetSize();
+//	if (this->EndPosition[0] > (size[0]-1))
+//	{
+//		this->EndPosition[0] = size[0]-1;
+//	}
+//	if (this->EndPosition[0] < 0)
+//	{
+//		this->EndPosition[0] = 0;
+//	}
+//	if (this->EndPosition[1] > (size[1]-1))
+//	{
+//		this->EndPosition[1] = size[1]-1;
+//	}
+//	if (this->EndPosition[1] < 0)
+//	{
+//		this->EndPosition[1] = 0;
+//	}
+//
+//	vtkUnsignedCharArray *tmpPixelArray = vtkUnsignedCharArray::New();
+//	tmpPixelArray->DeepCopy(this->PixelArray);
+//
+//	unsigned char *pixels = tmpPixelArray->GetPointer(0);
+//
+//	int min[2], max[2];
+//	min[0] = this->StartPosition[0] <= this->EndPosition[0] ?
+//	this->StartPosition[0] : this->EndPosition[0];
+//	min[1] = this->StartPosition[1] <= this->EndPosition[1] ?
+//	this->StartPosition[1] : this->EndPosition[1];
+//	max[0] = this->EndPosition[0] > this->StartPosition[0] ?
+//	this->EndPosition[0] : this->StartPosition[0];
+//	max[1] = this->EndPosition[1] > this->StartPosition[1] ?
+//	this->EndPosition[1] : this->StartPosition[1];
+//
+//	int i;
+//	for (i = min[0]; i <= max[0]; i++)
+//	{
+//		pixels[3*(min[1]*size[0]+i)] = 255 ^ pixels[3*(min[1]*size[0]+i)];
+//		pixels[3*(min[1]*size[0]+i)+1] = 255 ^ pixels[3*(min[1]*size[0]+i)+1];
+//		pixels[3*(min[1]*size[0]+i)+2] = 255 ^ pixels[3*(min[1]*size[0]+i)+2];
+//		pixels[3*(max[1]*size[0]+i)] = 255 ^ pixels[3*(max[1]*size[0]+i)];
+//		pixels[3*(max[1]*size[0]+i)+1] = 255 ^ pixels[3*(max[1]*size[0]+i)+1];
+//		pixels[3*(max[1]*size[0]+i)+2] = 255 ^ pixels[3*(max[1]*size[0]+i)+2];
+//	}
+//	for (i = min[1]+1; i < max[1]; i++)
+//	{
+//		pixels[3*(i*size[0]+min[0])] = 255 ^ pixels[3*(i*size[0]+min[0])];
+//		pixels[3*(i*size[0]+min[0])+1] = 255 ^ pixels[3*(i*size[0]+min[0])+1];
+//		pixels[3*(i*size[0]+min[0])+2] = 255 ^ pixels[3*(i*size[0]+min[0])+2];
+//		pixels[3*(i*size[0]+max[0])] = 255 ^ pixels[3*(i*size[0]+max[0])];
+//		pixels[3*(i*size[0]+max[0])+1] = 255 ^ pixels[3*(i*size[0]+max[0])+1];
+//		pixels[3*(i*size[0]+max[0])+2] = 255 ^ pixels[3*(i*size[0]+max[0])+2];
+//	}
+//
+//	this->Interactor->GetRenderWindow()->SetPixelData(0, 0, size[0]-1, size[1]-1, pixels, 1);
+//
+//	tmpPixelArray->Delete();
 }
 
 void ViewerInteractor::OnLeftButtonUp()
