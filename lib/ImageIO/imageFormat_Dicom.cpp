@@ -136,7 +136,7 @@ const char ImageFormat_Dicom::unknownTagName[] = "Unknown Tag";
 
 std::string ImageFormat_Dicom::suffixes() {return std::string( ".ima .dcm" );}
 std::string ImageFormat_Dicom::name() {return "Dicom";}
-std::string ImageFormat_Dicom::dialects(const std::string &filename) {return "withPhoenixProtocol";}
+std::string ImageFormat_Dicom::dialects(const std::string &filename) {return "withPhoenixProtocol nomosaic";}
 
 
 
@@ -485,8 +485,14 @@ int ImageFormat_Dicom::load( data::ChunkList &chunks, const std::string &filenam
 			const util::slist iType = chunk->getProperty<util::slist>( std::string( ImageFormat_Dicom::dicomTagTreeName ) + "/" + "ImageType" );
 
 			if ( std::find( iType.begin(), iType.end(), "MOSAIC" ) != iType.end() ) { // if its a mosaic
-				LOG( Runtime, verbose_info ) << "This seems to be an mosaic image, will decompose it";
-				return readMosaic( *chunk, chunks );
+				if(dialect=="nomosaic"){
+					LOG( Runtime, warning ) << "This seems to be an mosaic image, but dialect \"nomosaic\" was selected";
+					chunks.push_back( chunk );
+					return 1;
+				} else{
+					LOG( Runtime, verbose_info ) << "This seems to be an mosaic image, will decompose it";
+					return readMosaic( *chunk, chunks );
+				}
 			} else {
 				chunks.push_back( chunk );
 				return 1;

@@ -173,7 +173,11 @@ int IOFactory::loadFile( isis::data::ChunkList &ret, const boost::filesystem::pa
 					  std::string( "" ) : std::string( " with dialect \"" ) + dialect + "\"";
 
 	if ( formatReader.empty() ) {
-		if( suffix_override.empty() ){
+		if(!boost::filesystem::exists( filename )){
+			LOG( Runtime, error ) << util::MSubject(filename)
+				<< " does not exist as file, and no suitable plugin was found to generate data from "
+				<< (suffix_override.empty() ? std::string("that name") : std::string("the suffix \"")+suffix_override+"\"");
+		} else if( suffix_override.empty() ){
 			LOG( Runtime, error ) << "No plugin found to read "	<< filename.string() << with_dialect;
 		} else {
 			LOG( Runtime, error ) << "No plugin supporting the requested suffix " << suffix_override << with_dialect << " was found";

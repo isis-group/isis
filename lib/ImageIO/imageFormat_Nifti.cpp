@@ -263,11 +263,10 @@ public:
 				data::TypedImage<int16_t> fslCopy( image );
 				ni.datatype = DT_INT16;
 				copyDataToNifti<int16_t>( fslCopy, ni );
-				break;
+			} else {
+				ni.datatype = DT_UINT16;
+				copyDataToNifti<u_int16_t>( image, ni );
 			}
-
-			ni.datatype = DT_UINT16;
-			copyDataToNifti<u_int16_t>( image, ni );
 			break;
 		case data::TypePtr<int32_t>::staticID:
 			ni.datatype = DT_INT32;

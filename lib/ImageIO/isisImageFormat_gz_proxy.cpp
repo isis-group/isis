@@ -126,13 +126,16 @@ public:
 	int load ( data::ChunkList &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) {
 		const std::string unzipped_suffix = boost::filesystem::extension( boost::filesystem::basename( filename ) );
 		util::TmpFile tmpfile( "", unzipped_suffix );
-		LOG( ImageIoDebug, info ) <<  "tmpfile=" << tmpfile;
+		LOG( Debug, info ) <<  "tmpfile=" << tmpfile;
 		file_uncompress( filename, tmpfile.string() );
-		int ret=data::IOFactory::get().loadFile( chunks, tmpfile, "", dialect );
+		data::ChunkList buff;
+		int ret=data::IOFactory::get().loadFile( buff, tmpfile, "", dialect );
 		if(ret){
-			BOOST_FOREACH(data::ChunkList::reference ref,chunks){
+			LOG( Debug, info ) <<  "Setting source of all " << buff.size() << " chunks to " << util::MSubject(filename);
+			BOOST_FOREACH(data::ChunkList::reference ref,buff){
 				ref->setProperty( "source", filename );
 			}
+			chunks.insert(chunks.end(),buff.begin(),buff.end());
 		}
 	}
 

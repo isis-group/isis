@@ -548,15 +548,17 @@ void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, isis::util::Pr
 
 		if ( name == "PixelData" )
 			continue;//skip the image data
-		else if ( name == "CSAImageHeaderInfo" ) {
+		else if ( name == "CSAImageHeaderInfo" || tag==DcmTagKey(0x0029,0x1010)) {
+			LOG( Debug, info ) << "Using " << tag.toString() << " as CSAImageHeaderInfo";
 			DcmElement *elem = dynamic_cast<DcmElement *>( obj );
 			parseCSA( elem, map.branch( "CSAImageHeaderInfo" ), dialect );
-		} else if ( name == "CSASeriesHeaderInfo" ) {
+		} else if ( name == "CSASeriesHeaderInfo" || tag==DcmTagKey(0x0029,0x1020)) {
+			LOG( Debug, info ) << "Using " << tag.toString() << " as CSASeriesHeaderInfo";
 			DcmElement *elem = dynamic_cast<DcmElement *>( obj );
 			parseCSA( elem, map.branch( "CSASeriesHeaderInfo" ), dialect );
 		} else if ( name == "MedComHistoryInformation" ) {
 			//@todo special handling needed
-			LOG( Debug, info ) << "Ignoring MedComHistoryInformation";
+			LOG( Debug, info ) << "Ignoring MedComHistoryInformation at " << tag.toString();
 		} else if ( obj->isLeaf() ) {
 			DcmElement *elem = dynamic_cast<DcmElement *>( obj );
 			const size_t mult = obj->getVM();

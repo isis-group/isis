@@ -66,6 +66,21 @@ bool TypeBase::convert( const TypeBase &from, TypeBase &to )
 	return false;
 }
 
+bool TypeBase::fitsInto(short unsigned int id) const
+{
+	boost::scoped_ptr<TypeBase> to;
+	const Converter &conv = getConverterTo( id );
+
+	if ( conv ) {
+		return ( conv->generate( *this, to ) ==  boost::numeric::cInRange);
+	} else {
+		LOG( Runtime, warning )
+				<< "I dont know any conversion from "
+				<< MSubject( toString( true ) ) << " to " << MSubject( getTypeMap( true, false )[id] );
+		return false; // return an empty Reference
+	}
+}
+
 TypeBase::Reference TypeBase::copyToNewById( short unsigned int id ) const
 {
 	boost::scoped_ptr<TypeBase> to;

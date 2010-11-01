@@ -150,8 +150,8 @@ bool IOApplication::autoload( bool exitOnError )
 			for( ImageList::const_iterator b = a; ( ++b ) != images.end(); ) {
 				const util::PropMap &aref = **a, bref = **b;
 				LOG_IF( aref.getDifference( bref ).empty(), Runtime, warning ) << "The metadata of the images from "
-						<< aref.propertyValue( "source" ).toString( false ) << ":" << std::distance<ImageList::const_iterator>( images.begin(), a )
-						<< " and " << bref.propertyValue( "source" ).toString( false ) << ":" << std::distance<ImageList::const_iterator>( images.begin(), b )
+						<< aref.getProperty<std::string>( "source" ) << ":" << std::distance<ImageList::const_iterator>( images.begin(), a )
+						<< " and " << bref.getProperty<std::string>( "source" ) << ":" << std::distance<ImageList::const_iterator>( images.begin(), b )
 						<< " are equal. Maybe they are duplicates.";
 			}
 		}
