@@ -117,6 +117,7 @@ vtkImageData *vtkAdapter::makeVtkImageObject( const boost::shared_ptr<data::Imag
 	vtkImage = importer->GetOutput();
 	vtkImage->SetOrigin( indexOrigin[0], indexOrigin[1], indexOrigin[2] );
 	vtkImage->SetSpacing( spacing[0], spacing[1], spacing[2] );
+	vtkImage->Update();
 	return vtkImage;
 }
 

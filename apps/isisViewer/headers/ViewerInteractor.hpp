@@ -52,6 +52,8 @@ private:
 
 	vtkCellPicker* m_Picker;
 
+
+
 public:
 	virtual void Zoom();
 	virtual void OnMouseMove();
