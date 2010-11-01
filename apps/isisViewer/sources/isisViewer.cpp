@@ -56,6 +56,7 @@ isisViewer::isisViewer( const isis::util::slist& fileList, QMainWindow *parent )
 	QObject::connect( this->ui.verticalSlider_2, SIGNAL( valueChanged( int ) ), this, SLOT( valueChangedCoronal( int) ) );
 	QObject::connect( this->ui.verticalSlider_3, SIGNAL( valueChanged( int ) ), this, SLOT( valueChangedAxial( int ) ) );
 
+	isis::adapter::vtkAdapter* adapter = new isis::adapter::vtkAdapter;
 	//go through all files
 	BOOST_FOREACH( isis::util::slist::const_reference refFile, fileList )
 	{
@@ -64,7 +65,7 @@ isisViewer::isisViewer( const isis::util::slist& fileList, QMainWindow *parent )
 		BOOST_FOREACH( isis::data::ImageList::const_reference refImage, imgList )
 		{
 			boost::shared_ptr< ImageHolder > tmpVec( new ImageHolder );
-			tmpVec->setImages(  refImage, isis::adapter::vtkAdapter::makeVtkImageObject( refImage,false,0 ) );
+			tmpVec->setImages(  refImage, adapter->makeVtkImageObject( refImage  ) );
 			tmpVec->setReadVec( refImage->getProperty<isis::util::fvector4>("readVec") );
 			tmpVec->setPhaseVec( refImage->getProperty<isis::util::fvector4>("phaseVec") );
 			tmpVec->setSliceVec( refImage->getProperty<isis::util::fvector4>("sliceVec") );
