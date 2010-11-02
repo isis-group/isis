@@ -70,12 +70,12 @@ isisViewer::isisViewer( const isis::util::slist& fileList, QMainWindow *parent )
 			tmpVec->setReadVec( refImage->getProperty<isis::util::fvector4>("readVec") );
 			tmpVec->setPhaseVec( refImage->getProperty<isis::util::fvector4>("phaseVec") );
 			tmpVec->setSliceVec( refImage->getProperty<isis::util::fvector4>("sliceVec") );
-			m_ImageVector.push_back( tmpVec );
+			m_ImageHolderVector.push_back( tmpVec );
 		}
 	}
-	if (!m_ImageVector.empty() ) {
-		m_CurrentImagePtr = m_ImageVector.front()->getVTKImageData();
-		m_CurrentImageHolder = m_ImageVector.front();
+	if (!m_ImageHolderVector.empty() ) {
+		m_CurrentImagePtr = m_ImageHolderVector.front()->getVTKImageData();
+		m_CurrentImageHolder = m_ImageHolderVector.front();
 		if(m_CurrentImageHolder->getNumberOfTimesteps() > 1 ) {
 			this->ui.timeStepSpinBox->setMaximum( m_CurrentImageHolder->getNumberOfTimesteps() - 1);
 		} else {
@@ -83,8 +83,7 @@ isisViewer::isisViewer( const isis::util::slist& fileList, QMainWindow *parent )
 		}
 	}
 
-
-	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference ref, m_ImageVector )
+	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference ref, m_ImageHolderVector )
 	{
 		m_RendererAxial->AddActor( ref->getActorAxial() );
 		m_RendererCoronal->AddActor( ref->getActorCoronal() );
@@ -119,7 +118,7 @@ void isisViewer::setUpPipe()
 
 void isisViewer::resetCam()
 {
-	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference refImg, m_ImageVector)
+	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference refImg, m_ImageHolderVector)
 	{
 		refImg->resetSliceCoordinates();
 	}
@@ -184,7 +183,7 @@ void isisViewer::displayIntensity( const int& x, const int& y, const int& z )
 
 void isisViewer::sliceChanged( const int& x, const int& y, const int& z)
 {
-	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference refImg, m_ImageVector)
+	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference refImg, m_ImageHolderVector)
 	{
 		if ( not refImg->setSliceCoordinates(x,y,z) ) std::cout << "error during setting slicesetting!" << std::endl;
 	}
@@ -201,7 +200,11 @@ void isisViewer::timeStepChanged( int val )
 void isisViewer::checkPhysicalChanged( bool physical )
 {
 	LOG(Runtime, info) << "Setting physical to " << physical;
-	m_CurrentImageHolder->setPhysical( physical );
+	BOOST_FOREACH(std::vector< boost::shared_ptr< ImageHolder > >::const_reference ref, m_ImageHolderVector)
+	{
+		ref->setPhysical( physical );
+	}
+
 	UpdateWidgets();
 }
 

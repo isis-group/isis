@@ -77,7 +77,7 @@ signals:
 
 private:
 	Ui::isisViewer ui;
-	std::vector< boost::shared_ptr< ImageHolder > > m_ImageVector;
+	std::vector< boost::shared_ptr< ImageHolder > > m_ImageHolderVector;
 	void setUpPipe();
 
 	vtkSmartPointer<vtkRenderer> m_RendererAxial;
