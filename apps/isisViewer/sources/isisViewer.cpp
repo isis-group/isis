@@ -55,6 +55,7 @@ isisViewer::isisViewer( const isis::util::slist& fileList, QMainWindow *parent )
 
 	ui.setupUi( this );
 	//connections qt
+	QObject::connect( this->ui.timeStepSpinBox, SIGNAL( valueChanged( int ) ), this, SLOT( timeStepChanged( int ) ) );
 
 	//go through all files
 	BOOST_FOREACH( isis::util::slist::const_reference refFile, fileList )
@@ -182,5 +183,10 @@ void isisViewer::sliceChanged( const int& x, const int& y, const int& z)
 	m_WindowCoronal->Render();
 	m_WindowSagittal->Render();
 
+}
+
+void isisViewer::timeStepChanged( int val )
+{
+	std::cout << "value: " << val << std::endl;
 }
 }}

@@ -27,8 +27,10 @@
 #include "DataStorage/io_factory.hpp"
 #include "CoreUtils/vector.hpp"
 
+#include "common.hpp"
 #include "ui_isisViewer.h"
 #include "viewerCore.hpp"
+
 
 #include "ImageHolder.hpp"
 #include "ViewerInteractor.hpp"
@@ -64,7 +66,7 @@ public:
 	vtkImageData* m_CurrentImagePtr;
 	boost::shared_ptr<ImageHolder> m_CurrentImageHolder;
 private slots:
-	
+	void timeStepChanged( int );
 
 signals:
 	void clicked( bool );

@@ -71,19 +71,22 @@ public:
 	isis::util::fvector4 getPhaseVec() const { return m_phaseVec; }
 	isis::util::fvector4 getSliceVec() const { return m_sliceVec; }
 
-	vtkImageData* getVTKImageData() const { return m_Image; }
+	vtkImageData* getVTKImageData() const { return m_ImageVector[m_currentTimestep]; }
 	boost::shared_ptr<isis::data::Image> getISISImage() const { return m_ISISImage; }
 
 	bool setSliceCoordinates (const int&, const int&, const int& );
+	bool setCurrentTimeStep( const int& timeStep ) { m_currentTimestep = timeStep; }
 	bool resetSliceCoordinates( void );
 
 	vtkActor* getActorAxial() const { return m_ActorAxial; }
 	vtkActor* getActorSagittal() const { return m_ActorSagittal; }
 	vtkActor* getActorCoronal() const { return m_ActorCoronal; }
+	const unsigned int getNumberOfTimesteps( void ) const { return m_timeSteps; }
+
 
 private:
 	MatrixHandler m_MatrixHandler;
-	vtkSmartPointer<vtkImageData> m_Image;
+	std::vector<vtkSmartPointer<vtkImageData> > m_ImageVector;
 	vtkSmartPointer<vtkImageData> m_OrientedImage;
 	boost::shared_ptr<isis::data::Image> m_ISISImage;
 	boost::shared_ptr<isisViewer> m_PtrToViewer;
@@ -98,6 +101,9 @@ private:
 	vtkSmartPointer<vtkActor> m_ActorSagittal;
 	vtkSmartPointer<vtkActor> m_ActorCoronal;
 
+	unsigned int m_timeSteps;
+	unsigned int m_currentTimestep;
+
 	size_t m_Min, m_Max;
 
 	std::vector<size_t> m_BiggestElemVec;
@@ -109,7 +115,7 @@ private:
 	std::vector<std::vector<double> > m_RotationVector;
 
 	void setUpPipe( void );
-	bool createOrientedImage( void );
+	bool createOrientedImages( void );
 	void commonInit( void );
 
 };

@@ -27,8 +27,8 @@ namespace isis {
 namespace viewer {
 
 ImageHolder::ImageHolder()
+	: m_timeSteps( 0 ), m_currentTimestep( 0 )
 {
-	m_Image = vtkImageData::New();
 	m_OrientedImage = vtkImageData::New();
 	m_ExtractAxial = vtkImageClip::New();
 	m_ExtractSagittal = vtkImageClip::New();
@@ -60,7 +60,7 @@ bool ImageHolder::setSliceCoordinates( const int& x, const int& y, const int& z 
 void ImageHolder::setUpPipe()
 {
 	//axial
-	m_ExtractAxial->SetInput( m_OrientedImage );
+	m_ExtractAxial->SetInput( m_ImageVector[m_currentTimestep] );
 	m_MapperAxial->SetInput( m_ExtractAxial->GetOutput() );
 	m_ActorAxial->SetMapper( m_MapperAxial );
 	m_ActorAxial->GetProperty()->SetInterpolationToFlat();
@@ -68,7 +68,7 @@ void ImageHolder::setUpPipe()
 	m_ActorAxial->SetUserMatrix( m_MatrixHandler.getAxialMatrix1() );
 
 	//sagittal
-	m_ExtractSagittal->SetInput( m_OrientedImage );
+	m_ExtractSagittal->SetInput( m_ImageVector[m_currentTimestep] );
 	m_MapperSagittal->SetInput( m_ExtractSagittal->GetOutput() );
 	m_ActorSagittal->SetMapper( m_MapperSagittal );
 	m_ActorSagittal->GetProperty()->SetInterpolationToFlat();
@@ -76,7 +76,7 @@ void ImageHolder::setUpPipe()
 	m_ActorSagittal->SetUserMatrix( m_MatrixHandler.getSagittalMatrix1() );
 
 	//coronal
-	m_ExtractCoronal->SetInput( m_OrientedImage );
+	m_ExtractCoronal->SetInput( m_ImageVector[m_currentTimestep] );
 	m_MapperCoronal->SetInput( m_ExtractCoronal->GetOutput() );
 	m_ActorCoronal->SetMapper( m_MapperCoronal );
 	m_ActorCoronal->GetProperty()->SetInterpolationToFlat();
@@ -86,8 +86,8 @@ void ImageHolder::setUpPipe()
 
 void ImageHolder::setImages( boost::shared_ptr<isis::data::Image> isisImg,  std::vector<vtkSmartPointer<vtkImageData> >imgVec )
 {
-	std::cout << "images: " << imgVec.size() << std::endl;
-	m_Image = imgVec.front();
+	m_ImageVector = imgVec;
+	m_timeSteps = m_ImageVector.size();
 	m_ISISImage = isisImg;
 	isis::util::TypeReference min, max;
 	m_ISISImage->getMinMax( min, max );
@@ -98,22 +98,26 @@ void ImageHolder::setImages( boost::shared_ptr<isis::data::Image> isisImg,  std:
 	m_sliceVec = m_ISISImage->getProperty<isis::util::fvector4>("sliceVec");
 	m_MatrixHandler.setVectors( m_readVec, m_phaseVec, m_sliceVec );
 	commonInit();
-	createOrientedImage();
+	createOrientedImages();
 	resetSliceCoordinates();
 	setUpPipe();
 
 }
 
-bool ImageHolder::createOrientedImage( void )
+bool ImageHolder::createOrientedImages( void )
 {
-
-	m_OrientedImage = m_Image;
 	if( m_MatrixHandler.isRotationMatrix() ) {
-		vtkSmartPointer<vtkImageFlip> flipper = vtkImageFlip::New();
-		flipper->SetFilteredAxis(2);
-		flipper->SetInput(m_Image);
-		flipper->Update();
-		m_OrientedImage = flipper->GetOutput();
+		LOG( Runtime, isis::info ) << "Determinant is not 1. Flipping image along slice vector.";
+		for( std::vector<vtkSmartPointer<vtkImageData> >::iterator it = m_ImageVector.begin(); it != m_ImageVector.end(); it++ )
+		{
+			vtkSmartPointer<vtkImageData> tmpImage = *it;
+			vtkSmartPointer<vtkImageFlip> flipper = vtkImageFlip::New();
+			flipper->SetFilteredAxis(2);
+			flipper->SetInput(tmpImage);
+			flipper->Update();
+			*it = flipper->GetOutput();
+		}
+
 	}
 
 	return true;

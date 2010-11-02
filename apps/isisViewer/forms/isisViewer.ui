@@ -113,7 +113,7 @@
         <string/>
        </property>
       </widget>
-      <widget class="QSpinBox" name="spinBox" >
+      <widget class="QSpinBox" name="timeStepSpinBox" >
        <property name="geometry" >
         <rect>
          <x>90</x>
