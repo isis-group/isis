@@ -144,6 +144,7 @@ void ImageHolder::setCurrentTimeStep( const int& timestep )
 {
 	LOG( Runtime, info ) << "Changing timestep to " << timestep;
 	m_currentTimestep = timestep;
+	//TODO here we have to call a method that only applies necessary stuff
 	setUpPipe();
 	setSliceCoordinates(m_X, m_Y, m_Z);
 }

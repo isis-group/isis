@@ -81,6 +81,7 @@ public:
 	vtkActor* getActorAxial() const { return m_ActorAxial; }
 	vtkActor* getActorSagittal() const { return m_ActorSagittal; }
 	vtkActor* getActorCoronal() const { return m_ActorCoronal; }
+	const int getCurrentTimeStep() const { return m_currentTimestep; }
 	const unsigned int getNumberOfTimesteps( void ) const { return m_TimeSteps; }
 
 

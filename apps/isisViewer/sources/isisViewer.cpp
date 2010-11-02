@@ -122,6 +122,12 @@ void isisViewer::resetCam()
 	{
 		refImg->resetSliceCoordinates();
 	}
+	UpdateWidgets();
+
+}
+
+void isisViewer::UpdateWidgets()
+{
 	m_RendererAxial->ResetCamera();
 	m_RendererSagittal->ResetCamera();
 	m_RendererCoronal->ResetCamera();
@@ -129,7 +135,6 @@ void isisViewer::resetCam()
 	m_WindowAxial->Render();
 	m_WindowCoronal->Render();
 	m_WindowSagittal->Render();
-
 }
 
 //gui interactions
@@ -137,37 +142,38 @@ void isisViewer::resetCam()
 
 void isisViewer::displayIntensity( const int& x, const int& y, const int& z )
 {
-	isis::util::fvector4 tmpVec = isis::util::fvector4(x,y,z,0);
+	const int t = m_CurrentImageHolder->getCurrentTimeStep();
+	isis::util::fvector4 tmpVec = isis::util::fvector4(x,y,z,t);
 //	isis::util::fvector4 mappedVec = isis::viewer::mapCoordinates<float>(m_CurrentImageHolder->getOriginalMatrix(), tmpVec, m_CurrentImageHolder->getISISImage()->sizeToVector());
 	QString atString;
 	atString.sprintf("at %d %d %d", x, y, z);
 	ui.atLabel->setText(atString);
 
-	switch (m_CurrentImageHolder->getISISImage()->getChunk(x,y,z ).typeID() )
+	switch (m_CurrentImageHolder->getISISImage()->getChunk(x,y,z,t ).typeID() )
 	{
 	case isis::data::TypePtr<int8_t>::staticID:
-		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<int8_t>(x, y,z));
+		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<int8_t>(x, y,z, t));
 		break;
 	case isis::data::TypePtr<u_int8_t>::staticID:
-		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<u_int8_t>(x, y,z));
+		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<u_int8_t>(x, y,z, t));
 		break;
 	case isis::data::TypePtr<int16_t>::staticID:
-		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<int16_t>(x, y,z));
+		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<int16_t>(x, y,z, t));
 		break;
 	case isis::data::TypePtr<u_int16_t>::staticID:
-		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<u_int16_t>(x, y,z));
+		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<u_int16_t>(x, y,z, t));
 		break;
 	case isis::data::TypePtr<int32_t>::staticID:
-		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<int32_t>(x, y,z));
+		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<int32_t>(x, y,z, t));
 		break;
 //	case isis::data::TypePtr<u_int32_t>::staticID:
-//		ui.pxlIntensityContainer->display(m_ImageVector.front()->getISISImage()->voxel<u_int32_t>(x, y,z));
+//		ui.pxlIntensityContainer->display(m_ImageVector.front()->getISISImage()->voxel<u_int32_t>(x, y,z, t));
 //		break;
 	case isis::data::TypePtr<float>::staticID:
-		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<float>(x, y,z));
+		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<float>(x, y,z, t));
 		break;
 	case isis::data::TypePtr<double>::staticID:
-		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<double>(x, y,z));
+		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<double>(x, y,z, t));
 		break;
 	default:
 		ui.pxlIntensityContainer->display(tr("Error"));
@@ -181,17 +187,13 @@ void isisViewer::sliceChanged( const int& x, const int& y, const int& z)
 	{
 		if ( not refImg->setSliceCoordinates(x,y,z) ) std::cout << "error during setting slicesetting!" << std::endl;
 	}
-	m_RendererAxial->ResetCamera();
-	m_RendererSagittal->ResetCamera();
-	m_RendererCoronal->ResetCamera();
-	m_WindowAxial->Render();
-	m_WindowCoronal->Render();
-	m_WindowSagittal->Render();
-
+	UpdateWidgets();
 }
 
 void isisViewer::timeStepChanged( int val )
 {
-	std::cout << "value: " << val << std::endl;
+	m_CurrentImageHolder->setCurrentTimeStep( val );
+	UpdateWidgets();
+
 }
 }}

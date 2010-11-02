@@ -46,7 +46,7 @@ std::vector<vtkSmartPointer<vtkImageData> >vtkAdapter::makeVtkImageObject( const
 		u_int8_t *target = refTarget + chunkIndex++ * chRef.volume();
 		chRef.getTypePtr<uint8_t>().copyToMem( 0, ( chRef.volume() - 1 ), target );
 	}
-	size_t imageVolume3D = typedPtr->volume()  / typedPtr->getChunkList().size();
+	size_t imageVolume3D = typedPtr->sizeToVector()[0] * typedPtr->sizeToVector()[1] * typedPtr->sizeToVector()[2];
 	for ( size_t t = 0; t<typedPtr->sizeToVector()[3]; t++ ) {
 		vtkSmartPointer<vtkImageImport> importer = vtkImageImport::New();
 		vtkSmartPointer<vtkImageData> vtkImage = vtkImageData::New();
@@ -62,23 +62,6 @@ std::vector<vtkSmartPointer<vtkImageData> >vtkAdapter::makeVtkImageObject( const
 		vtkImage->Update();
 		retVector.push_back(vtkImage);
 	}
-
-
-	//set the datatype for the vtkImage object
-	//TODO check datatypes
-
-//	void *targePtr = malloc( m_ImageISIS->bytes_per_voxel() * myAdapter->m_ImageISIS->volume() );
-//	uint8_t *refTarget = ( uint8_t * ) targePtr;
-//	std::vector< boost::shared_ptr< data::Chunk> > chList = myAdapter->m_ImageISIS->getChunkList();
-//	size_t chunkIndex = 0;
-//	BOOST_FOREACH( boost::shared_ptr< data::Chunk> & ref, chList ) {
-//		data::Chunk &chRef = *ref;
-//		uint8_t *target = refTarget + chunkIndex++ * chRef.volume();
-//		chRef.getTypePtr<uint8_t>().copyToMem( 0, ( chRef.volume() - 1 ), target );
-//	}
-
-
-
 	return retVector;
 }
 

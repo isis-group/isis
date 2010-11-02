@@ -63,6 +63,8 @@ public:
 
 	void displayIntensity( const int&, const int&, const int& );
 
+	void UpdateWidgets();
+
 	vtkImageData* m_CurrentImagePtr;
 	boost::shared_ptr<ImageHolder> m_CurrentImageHolder;
 private slots:
