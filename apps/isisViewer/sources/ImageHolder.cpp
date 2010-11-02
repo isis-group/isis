@@ -89,9 +89,10 @@ void ImageHolder::setUpPipe()
 	m_ActorCoronal->SetUserMatrix( m_MatrixCoronal );
 }
 
-void ImageHolder::setImages( boost::shared_ptr<isis::data::Image> isisImg,  vtkImageData* img )
+void ImageHolder::setImages( boost::shared_ptr<isis::data::Image> isisImg,  std::vector<vtkSmartPointer<vtkImageData> >imgVec )
 {
-	m_Image = img;
+	std::cout << "images: " << imgVec.size() << std::endl;
+	m_Image = imgVec.front();
 	m_ISISImage = isisImg;
 	isis::util::TypeReference min, max;
 	m_ISISImage->getMinMax( min, max );

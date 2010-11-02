@@ -730,7 +730,6 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 				stime = image.getChunkAt( slice ).getProperty<float>( "acquisitionTime" );
 				stime -= sliceTimeOffset;
 				sstream << stime;
-
 				VAppendAttr ( list, "slice_time", NULL, VStringRepn, sstream.str().c_str() );
 			}
 			// It's not safe to guess the slice order. If there is no acquisition time

@@ -49,13 +49,11 @@ namespace adapter
 class vtkAdapter
 {
 public:
-	vtkAdapter() {};
 	/**
 	* Gets a std::vector of vtkSmartpointers on vtkImageData objects.
 	*/
-	std::vector<vtkSmartPointer<vtkImageData> >makeVtkImageObject( const boost::shared_ptr<data::Image> );
+	static std::vector<vtkSmartPointer<vtkImageData> >makeVtkImageObject( const boost::shared_ptr<data::Image> );
 private:
-	boost::shared_ptr<data::Image> m_ImageISIS;
 protected:
 	//should not be loaded directly
 	vtkAdapter( const boost::shared_ptr<data::Image> );

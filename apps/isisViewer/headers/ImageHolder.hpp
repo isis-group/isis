@@ -56,7 +56,7 @@ class ImageHolder
 public:
 	ImageHolder();
 
-	void setImages( boost::shared_ptr<isis::data::Image> ,vtkImageData* );
+	void setImages( boost::shared_ptr<isis::data::Image>, std::vector<vtkSmartPointer<vtkImageData> >);
 	void setPtrToViewer( const boost::shared_ptr<isisViewer> ptr ) { m_PtrToViewer = ptr; }
 
 	void setReadVec( const isis::util::fvector4& read ) { m_readVec = read; }
