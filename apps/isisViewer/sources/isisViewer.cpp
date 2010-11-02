@@ -75,6 +75,11 @@ isisViewer::isisViewer( const isis::util::slist& fileList, QMainWindow *parent )
 	if (!m_ImageVector.empty() ) {
 		m_CurrentImagePtr = m_ImageVector.front()->getVTKImageData();
 		m_CurrentImageHolder = m_ImageVector.front();
+		if(m_CurrentImageHolder->getNumberOfTimesteps() > 1 ) {
+			this->ui.timeStepSpinBox->setMaximum( m_CurrentImageHolder->getNumberOfTimesteps() - 1);
+		} else {
+			this->ui.timeStepSpinBox->setEnabled( false );
+		}
 	}
 
 

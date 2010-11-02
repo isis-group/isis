@@ -15,6 +15,7 @@ int main( int argc, char *argv[] )
 	app.parameters["dViewer"] = dbg_levels;
 	app.parameters["dViewer"].setDescription( "Debugging level for the Viewer module" );
 	app.parameters["dViewer"].hidden()=true;
+	app.parameters["dViewer"].needed() = false;
 
 	app.init( argc, argv );
 

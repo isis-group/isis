@@ -27,9 +27,8 @@ namespace isis {
 namespace viewer {
 
 ImageHolder::ImageHolder()
-	: m_timeSteps( 0 ), m_currentTimestep( 0 )
+	: m_TimeSteps( 0 ), m_currentTimestep( 0 )
 {
-	m_OrientedImage = vtkImageData::New();
 	m_ExtractAxial = vtkImageClip::New();
 	m_ExtractSagittal = vtkImageClip::New();
 	m_ExtractCoronal = vtkImageClip::New();
@@ -43,16 +42,19 @@ ImageHolder::ImageHolder()
 
 bool ImageHolder::resetSliceCoordinates( void )
 {
-	return setSliceCoordinates(m_OrientedImage->GetDimensions()[0] / 2, m_OrientedImage->GetDimensions()[1] / 2, m_OrientedImage->GetDimensions()[2] / 2);
+	return setSliceCoordinates(m_ImageVector[m_currentTimestep]->GetDimensions()[0] / 2, m_ImageVector[m_currentTimestep]->GetDimensions()[1] / 2, m_ImageVector[m_currentTimestep]->GetDimensions()[2] / 2);
 }
 
 bool ImageHolder::setSliceCoordinates( const int& x, const int& y, const int& z )
 {
-	m_ExtractorVector[m_BiggestElemVec[0]]->SetOutputWholeExtent( x, x, 0, m_OrientedImage->GetDimensions()[1] - 1, 0, m_OrientedImage->GetDimensions()[2] - 1  );
+	m_X = x;
+	m_Y = y;
+	m_Z = z;
+	m_ExtractorVector[m_BiggestElemVec[0]]->SetOutputWholeExtent( x, x, 0, m_ImageVector[m_currentTimestep]->GetDimensions()[1] - 1, 0, m_ImageVector[m_currentTimestep]->GetDimensions()[2] - 1  );
 	m_ExtractorVector[m_BiggestElemVec[0]]->Update();
-	m_ExtractorVector[m_BiggestElemVec[1]]->SetOutputWholeExtent( 0, m_OrientedImage->GetDimensions()[0] - 1, y, y, 0, m_OrientedImage->GetDimensions()[2] - 1 );
+	m_ExtractorVector[m_BiggestElemVec[1]]->SetOutputWholeExtent( 0, m_ImageVector[m_currentTimestep]->GetDimensions()[0] - 1, y, y, 0, m_ImageVector[m_currentTimestep]->GetDimensions()[2] - 1 );
 	m_ExtractorVector[m_BiggestElemVec[1]]->Update();
-	m_ExtractorVector[m_BiggestElemVec[2]]->SetOutputWholeExtent( 0, m_OrientedImage->GetDimensions()[0] - 1, 0, m_OrientedImage->GetDimensions()[1] - 1, z, z );
+	m_ExtractorVector[m_BiggestElemVec[2]]->SetOutputWholeExtent( 0, m_ImageVector[m_currentTimestep]->GetDimensions()[0] - 1, 0, m_ImageVector[m_currentTimestep]->GetDimensions()[1] - 1, z, z );
 	m_ExtractorVector[m_BiggestElemVec[2]]->Update();
 	return true;
 }
@@ -64,7 +66,7 @@ void ImageHolder::setUpPipe()
 	m_MapperAxial->SetInput( m_ExtractAxial->GetOutput() );
 	m_ActorAxial->SetMapper( m_MapperAxial );
 	m_ActorAxial->GetProperty()->SetInterpolationToFlat();
-	m_ActorAxial->SetScale( m_OrientedImage->GetSpacing()[0], m_OrientedImage->GetSpacing()[1], m_OrientedImage->GetSpacing()[2] );
+	m_ActorAxial->SetScale( m_ImageVector[m_currentTimestep]->GetSpacing()[0], m_ImageVector[m_currentTimestep]->GetSpacing()[1], m_ImageVector[m_currentTimestep]->GetSpacing()[2] );
 	m_ActorAxial->SetUserMatrix( m_MatrixHandler.getAxialMatrix1() );
 
 	//sagittal
@@ -72,7 +74,7 @@ void ImageHolder::setUpPipe()
 	m_MapperSagittal->SetInput( m_ExtractSagittal->GetOutput() );
 	m_ActorSagittal->SetMapper( m_MapperSagittal );
 	m_ActorSagittal->GetProperty()->SetInterpolationToFlat();
-	m_ActorSagittal->SetScale( m_OrientedImage->GetSpacing()[0], m_OrientedImage->GetSpacing()[1], m_OrientedImage->GetSpacing()[2] );
+	m_ActorSagittal->SetScale( m_ImageVector[m_currentTimestep]->GetSpacing()[0], m_ImageVector[m_currentTimestep]->GetSpacing()[1], m_ImageVector[m_currentTimestep]->GetSpacing()[2] );
 	m_ActorSagittal->SetUserMatrix( m_MatrixHandler.getSagittalMatrix1() );
 
 	//coronal
@@ -80,22 +82,27 @@ void ImageHolder::setUpPipe()
 	m_MapperCoronal->SetInput( m_ExtractCoronal->GetOutput() );
 	m_ActorCoronal->SetMapper( m_MapperCoronal );
 	m_ActorCoronal->GetProperty()->SetInterpolationToFlat();
-	m_ActorCoronal->SetScale( m_OrientedImage->GetSpacing()[0], m_OrientedImage->GetSpacing()[1], m_OrientedImage->GetSpacing()[2] );
+	m_ActorCoronal->SetScale( m_ImageVector[m_currentTimestep]->GetSpacing()[0], m_ImageVector[m_currentTimestep]->GetSpacing()[1], m_ImageVector[m_currentTimestep]->GetSpacing()[2] );
 	m_ActorCoronal->SetUserMatrix( m_MatrixHandler.getCoronalMatrix1() );
 }
 
 void ImageHolder::setImages( boost::shared_ptr<isis::data::Image> isisImg,  std::vector<vtkSmartPointer<vtkImageData> >imgVec )
 {
 	m_ImageVector = imgVec;
-	m_timeSteps = m_ImageVector.size();
+	LOG( Runtime, info ) << "Image contains " << m_ImageVector.size() << " timesteps.";
+	m_TimeSteps = m_ImageVector.size();
 	m_ISISImage = isisImg;
 	isis::util::TypeReference min, max;
 	m_ISISImage->getMinMax( min, max );
 	m_Min = min->as<double>();
 	m_Max = max->as<double>();
+	LOG( Runtime, info ) << "Image minimum: " << min << "; Image maximum: " << max;
 	m_readVec = m_ISISImage->getProperty<isis::util::fvector4>("readVec");
 	m_phaseVec = m_ISISImage->getProperty<isis::util::fvector4>("phaseVec");
 	m_sliceVec = m_ISISImage->getProperty<isis::util::fvector4>("sliceVec");
+	LOG( Runtime, info ) << "readVector: " << m_readVec;
+	LOG( Runtime, info ) << "phaseVector: " << m_phaseVec;
+	LOG( Runtime, info ) << "sliceVector: " << m_sliceVec;
 	m_MatrixHandler.setVectors( m_readVec, m_phaseVec, m_sliceVec );
 	commonInit();
 	createOrientedImages();
@@ -117,21 +124,28 @@ bool ImageHolder::createOrientedImages( void )
 			flipper->Update();
 			*it = flipper->GetOutput();
 		}
-
 	}
-
 	return true;
 }
 
 
 void ImageHolder::commonInit( void  )
 {
+	LOG( Runtime, info ) << "commonInit.";
 	m_ExtractorVector.push_back(m_ExtractSagittal);
 	m_ExtractorVector.push_back(m_ExtractCoronal);
 	m_ExtractorVector.push_back(m_ExtractAxial);
 	m_BiggestElemVec.push_back(getBiggestVecElem<float>(m_readVec));
 	m_BiggestElemVec.push_back(getBiggestVecElem<float>(m_phaseVec));
 	m_BiggestElemVec.push_back(getBiggestVecElem<float>(m_sliceVec));
+}
+
+void ImageHolder::setCurrentTimeStep( const int& timestep )
+{
+	LOG( Runtime, info ) << "Changing timestep to " << timestep;
+	m_currentTimestep = timestep;
+	setUpPipe();
+	setSliceCoordinates(m_X, m_Y, m_Z);
 }
 
 }
