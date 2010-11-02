@@ -48,6 +48,10 @@
 #include <cmath>
 #include <vector>
 
+namespace isis {
+
+namespace viewer {
+
 class isisViewer;
 
 class ImageHolder
@@ -63,7 +67,6 @@ public:
 	void setPhaseVec( const isis::util::fvector4& phase ) { m_phaseVec = phase; }
 	void setSliceVec( const isis::util::fvector4& slice ) { m_sliceVec = slice; }
 
-
 	isis::util::fvector4 getReadVec() const { return m_readVec; }
 	isis::util::fvector4 getPhaseVec() const { return m_phaseVec; }
 	isis::util::fvector4 getSliceVec() const { return m_sliceVec; }
@@ -77,10 +80,9 @@ public:
 	vtkActor* getActorAxial() const { return m_ActorAxial; }
 	vtkActor* getActorSagittal() const { return m_ActorSagittal; }
 	vtkActor* getActorCoronal() const { return m_ActorCoronal; }
-	vtkMatrix4x4* getOriginalMatrix() const { return m_OriginalMatrix; }
-
 
 private:
+	MatrixHandler m_MatrixHandler;
 	vtkSmartPointer<vtkImageData> m_Image;
 	vtkSmartPointer<vtkImageData> m_OrientedImage;
 	boost::shared_ptr<isis::data::Image> m_ISISImage;
@@ -96,16 +98,6 @@ private:
 	vtkSmartPointer<vtkActor> m_ActorSagittal;
 	vtkSmartPointer<vtkActor> m_ActorCoronal;
 
-	//this is the original matrix only containing 0 and 1
-	vtkSmartPointer<vtkMatrix4x4> m_CorrectedMatrix;
-	//if the determinant of the original matrix is not 1, then we have to calculate a
-	//a new matrix
-	vtkSmartPointer<vtkMatrix4x4> m_OriginalMatrix;
-
-	vtkSmartPointer<vtkMatrix4x4> m_MatrixAxial;
-	vtkSmartPointer<vtkMatrix4x4> m_MatrixSagittal;
-	vtkSmartPointer<vtkMatrix4x4> m_MatrixCoronal;
-
 	size_t m_Min, m_Max;
 
 	std::vector<size_t> m_BiggestElemVec;
@@ -116,14 +108,11 @@ private:
 
 	std::vector<std::vector<double> > m_RotationVector;
 
-	void setUpPipe();
-	bool createOrientedImage();
-	bool correctMatrix( vtkSmartPointer<vtkMatrix4x4> matrix );
-	void initMatrices( void );
-	void  commonInit( void );
-
+	void setUpPipe( void );
+	bool createOrientedImage( void );
+	void commonInit( void );
 
 };
 
-
+}}
 #endif /* IMAGEHOLDER_HPP_ */

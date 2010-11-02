@@ -24,6 +24,10 @@
 #include "isisViewer.hpp"
 #include "Adapter/vtkAdapter.hpp"
 
+namespace isis {
+
+namespace viewer {
+
 
 isisViewer::isisViewer( const isis::util::slist& fileList, QMainWindow *parent )
 		: QMainWindow( parent )
@@ -52,10 +56,6 @@ isisViewer::isisViewer( const isis::util::slist& fileList, QMainWindow *parent )
 	ui.setupUi( this );
 	//connections qt
 
-	QObject::connect( this->ui.verticalSlider, SIGNAL( valueChanged( int ) ), this, SLOT( valueChangedSagittal( int ) ) );
-	QObject::connect( this->ui.verticalSlider_2, SIGNAL( valueChanged( int ) ), this, SLOT( valueChangedCoronal( int) ) );
-	QObject::connect( this->ui.verticalSlider_3, SIGNAL( valueChanged( int ) ), this, SLOT( valueChangedAxial( int ) ) );
-
 	//go through all files
 	BOOST_FOREACH( isis::util::slist::const_reference refFile, fileList )
 	{
@@ -64,7 +64,7 @@ isisViewer::isisViewer( const isis::util::slist& fileList, QMainWindow *parent )
 		BOOST_FOREACH( isis::data::ImageList::const_reference refImage, imgList )
 		{
 			boost::shared_ptr< ImageHolder > tmpVec( new ImageHolder );
-			tmpVec->setImages(  refImage, isis::adapter::vtkAdapter::makeVtkImageObject( refImage  ) );
+			tmpVec->setImages( refImage, isis::adapter::vtkAdapter::makeVtkImageObject( refImage  ) );
 			tmpVec->setReadVec( refImage->getProperty<isis::util::fvector4>("readVec") );
 			tmpVec->setPhaseVec( refImage->getProperty<isis::util::fvector4>("phaseVec") );
 			tmpVec->setSliceVec( refImage->getProperty<isis::util::fvector4>("sliceVec") );
@@ -76,9 +76,6 @@ isisViewer::isisViewer( const isis::util::slist& fileList, QMainWindow *parent )
 		m_CurrentImageHolder = m_ImageVector.front();
 	}
 
-	ui.verticalSlider->setRange(0, m_CurrentImagePtr->GetDimensions()[2]-1);
-	ui.verticalSlider_2->setRange(0, m_CurrentImagePtr->GetDimensions()[1]-1);
-	ui.verticalSlider_3->setRange(0, m_CurrentImagePtr->GetDimensions()[0]-1);
 
 	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference ref, m_ImageVector )
 	{
@@ -185,21 +182,5 @@ void isisViewer::sliceChanged( const int& x, const int& y, const int& z)
 	m_WindowCoronal->Render();
 	m_WindowSagittal->Render();
 
-
 }
-
-void isisViewer::valueChangedSagittal( int val )
-{
-	sliceChanged( ui.verticalSlider->value(), ui.verticalSlider_2->value(), ui.verticalSlider_3->value() );
-
-}
-
-void isisViewer::valueChangedCoronal( int val )
-{
-	sliceChanged( ui.verticalSlider->value(), ui.verticalSlider_2->value(), ui.verticalSlider_3->value() );
-}
-
-void isisViewer::valueChangedAxial( int val )
-{
-	sliceChanged( ui.verticalSlider->value(), ui.verticalSlider_2->value(), ui.verticalSlider_3->value() );
-}
+}}

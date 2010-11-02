@@ -22,7 +22,9 @@
 
 #include "ImageHolder.hpp"
 
-using namespace isis::viewer;
+namespace isis {
+
+namespace viewer {
 
 ImageHolder::ImageHolder()
 {
@@ -37,13 +39,6 @@ ImageHolder::ImageHolder()
 	m_ActorAxial = vtkActor::New();
 	m_ActorSagittal = vtkActor::New();
 	m_ActorCoronal = vtkActor::New();
-	m_CorrectedMatrix = vtkMatrix4x4::New();
-	m_OriginalMatrix = vtkMatrix4x4::New();
-	m_MatrixAxial = vtkMatrix4x4::New();
-	m_MatrixCoronal = vtkMatrix4x4::New();
-	m_MatrixSagittal = vtkMatrix4x4::New();
-
-
 }
 
 bool ImageHolder::resetSliceCoordinates( void )
@@ -70,7 +65,7 @@ void ImageHolder::setUpPipe()
 	m_ActorAxial->SetMapper( m_MapperAxial );
 	m_ActorAxial->GetProperty()->SetInterpolationToFlat();
 	m_ActorAxial->SetScale( m_OrientedImage->GetSpacing()[0], m_OrientedImage->GetSpacing()[1], m_OrientedImage->GetSpacing()[2] );
-	m_ActorAxial->SetUserMatrix( m_MatrixAxial );
+	m_ActorAxial->SetUserMatrix( m_MatrixHandler.getAxialMatrix1() );
 
 	//sagittal
 	m_ExtractSagittal->SetInput( m_OrientedImage );
@@ -78,7 +73,7 @@ void ImageHolder::setUpPipe()
 	m_ActorSagittal->SetMapper( m_MapperSagittal );
 	m_ActorSagittal->GetProperty()->SetInterpolationToFlat();
 	m_ActorSagittal->SetScale( m_OrientedImage->GetSpacing()[0], m_OrientedImage->GetSpacing()[1], m_OrientedImage->GetSpacing()[2] );
-	m_ActorSagittal->SetUserMatrix(m_MatrixSagittal);
+	m_ActorSagittal->SetUserMatrix( m_MatrixHandler.getSagittalMatrix1() );
 
 	//coronal
 	m_ExtractCoronal->SetInput( m_OrientedImage );
@@ -86,7 +81,7 @@ void ImageHolder::setUpPipe()
 	m_ActorCoronal->SetMapper( m_MapperCoronal );
 	m_ActorCoronal->GetProperty()->SetInterpolationToFlat();
 	m_ActorCoronal->SetScale( m_OrientedImage->GetSpacing()[0], m_OrientedImage->GetSpacing()[1], m_OrientedImage->GetSpacing()[2] );
-	m_ActorCoronal->SetUserMatrix( m_MatrixCoronal );
+	m_ActorCoronal->SetUserMatrix( m_MatrixHandler.getCoronalMatrix1() );
 }
 
 void ImageHolder::setImages( boost::shared_ptr<isis::data::Image> isisImg,  std::vector<vtkSmartPointer<vtkImageData> >imgVec )
@@ -101,9 +96,9 @@ void ImageHolder::setImages( boost::shared_ptr<isis::data::Image> isisImg,  std:
 	m_readVec = m_ISISImage->getProperty<isis::util::fvector4>("readVec");
 	m_phaseVec = m_ISISImage->getProperty<isis::util::fvector4>("phaseVec");
 	m_sliceVec = m_ISISImage->getProperty<isis::util::fvector4>("sliceVec");
+	m_MatrixHandler.setVectors( m_readVec, m_phaseVec, m_sliceVec );
 	commonInit();
 	createOrientedImage();
-	initMatrices();
 	resetSliceCoordinates();
 	setUpPipe();
 
@@ -111,21 +106,9 @@ void ImageHolder::setImages( boost::shared_ptr<isis::data::Image> isisImg,  std:
 
 bool ImageHolder::createOrientedImage( void )
 {
-	for ( size_t i = 0; i<3; i++ ) {
-		m_OriginalMatrix->SetElement(i,0, m_readVec[i] < 0 ? ceil(m_readVec[i]-0.5) : floor(m_readVec[i]+0.5));
-	}
-	for ( size_t i = 0; i<3; i++ ) {
-		m_OriginalMatrix->SetElement(i,1,m_phaseVec[i] < 0 ? ceil(m_phaseVec[i]-0.5) : floor(m_phaseVec[i]+0.5));
-	}
-	for ( size_t i = 0; i<3; i++ ) {
-		m_OriginalMatrix->SetElement(i,2, m_sliceVec[i] < 0 ? ceil(m_sliceVec[i]-0.5) : floor(m_sliceVec[i]+0.5));
-	}
-	m_OriginalMatrix->SetElement(3,3,1);
-	//TODO debug
-	m_CorrectedMatrix = m_OriginalMatrix;
-	m_OrientedImage = m_Image;
 
-	if( correctMatrix(m_CorrectedMatrix) ) {
+	m_OrientedImage = m_Image;
+	if( m_MatrixHandler.isRotationMatrix() ) {
 		vtkSmartPointer<vtkImageFlip> flipper = vtkImageFlip::New();
 		flipper->SetFilteredAxis(2);
 		flipper->SetInput(m_Image);
@@ -136,65 +119,6 @@ bool ImageHolder::createOrientedImage( void )
 	return true;
 }
 
-bool ImageHolder::correctMatrix( vtkSmartPointer<vtkMatrix4x4> matrix )
-{
-	matrix->Print(std::cout);
-	if (matrix->Determinant() != 1 ) {
-		std::cout << "correct" << std::endl;
-		const isis::util::fvector4 crossVec = isis::util::fvector4( //we could use their cross-product as sliceVector
-			matrix->GetElement(1, 0)  * matrix->GetElement(2, 1) - matrix->GetElement(2, 0) * matrix->GetElement(1,1),
-			matrix->GetElement(2, 0) * matrix->GetElement(0, 1) - matrix->GetElement(0, 0) * matrix->GetElement(2,1),
-			matrix->GetElement(0, 0) * matrix->GetElement(1, 1) - matrix->GetElement(1, 0) * matrix->GetElement(0, 1)
-		);
-		matrix->SetElement(0,2,crossVec[0]);
-		matrix->SetElement(1,2,crossVec[1]);
-		matrix->SetElement(2,2,crossVec[2]);
-		return true;
-	} else {
-		return false;
-	}
-}
-
-void ImageHolder::initMatrices( void ) {
-
-	vtkSmartPointer<vtkMatrix4x4> axialMatrix = vtkMatrix4x4::New();
-	vtkSmartPointer<vtkMatrix4x4> sagittalMatrix = vtkMatrix4x4::New();
-	vtkSmartPointer<vtkMatrix4x4> coronalMatrix= vtkMatrix4x4::New();
-	/*setup axial matrix
-	*-1  0  0
-	* 0 -1  0
-	* 0  0  1
-	*/
-	axialMatrix->SetElement(0,0,-1);
-	axialMatrix->SetElement(1,1,-1);
-	/*setup sagittal matrix
-	 * 0  1  0
-	 * 0  0  1
-	 * 1  0  0
-	 */
-	sagittalMatrix->SetElement(0,0,0);
-	sagittalMatrix->SetElement(2,0,1);
-	sagittalMatrix->SetElement(0,1,1);
-	sagittalMatrix->SetElement(2,2,0);
-	sagittalMatrix->SetElement(1,2,1);
-	sagittalMatrix->SetElement(1,1,0);
-	/*setup coronal matrix
-	 * -1  0  0
-	 *  0  0  1
-	 *  0  1  0
-	 */
-	coronalMatrix->SetElement(0,0,-1);
-	coronalMatrix->SetElement(1,1,0);
-	coronalMatrix->SetElement(2,2,0);
-	coronalMatrix->SetElement(2,1,1);
-	coronalMatrix->SetElement(1,2,1);
-	//now we have to multiply these view specific matrices with the corrected
-	//orientation matrix to assure the determinant=1
-	vtkMatrix4x4::Multiply4x4(axialMatrix, m_CorrectedMatrix, m_MatrixAxial);
-	vtkMatrix4x4::Multiply4x4(sagittalMatrix, m_CorrectedMatrix, m_MatrixSagittal);
-	vtkMatrix4x4::Multiply4x4(coronalMatrix, m_CorrectedMatrix, m_MatrixCoronal);
-
-}
 
 void ImageHolder::commonInit( void  )
 {
@@ -204,4 +128,7 @@ void ImageHolder::commonInit( void  )
 	m_BiggestElemVec.push_back(getBiggestVecElem<float>(m_readVec));
 	m_BiggestElemVec.push_back(getBiggestVecElem<float>(m_phaseVec));
 	m_BiggestElemVec.push_back(getBiggestVecElem<float>(m_sliceVec));
+}
+
+}
 }

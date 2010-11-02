@@ -10,7 +10,7 @@ int main( int argc, char *argv[] )
 	app.parameters["in"].setDescription("The input image file list.");
 	app.init( argc, argv );
 	isis::util::slist fileList = app.parameters["in"];
-	isisViewer isisViewerWindow( fileList );
+	isis::viewer::isisViewer isisViewerWindow( fileList );
 	isisViewerWindow.show();
 	return app.getQApplication().exec();
 }

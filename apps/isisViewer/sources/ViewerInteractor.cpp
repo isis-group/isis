@@ -22,6 +22,10 @@
 
 #include "ViewerInteractor.hpp"
 
+namespace isis {
+
+namespace viewer {
+
 ViewerInteractor::ViewerInteractor( isisViewer* viewer, vtkRenderer* renderer )
 	: m_ViewerPtr( viewer ), m_Renderer( renderer )
 {
@@ -258,3 +262,5 @@ void ViewerInteractor::Zoom()
 
   this->Interactor->Render();
 }
+
+}}
