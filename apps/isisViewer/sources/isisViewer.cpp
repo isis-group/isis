@@ -55,6 +55,7 @@ isisViewer::isisViewer( const isis::util::slist& fileList, QMainWindow *parent )
 
 	ui.setupUi( this );
 	//connections qt
+	QObject::connect( this->ui.checkPhysical, SIGNAL( clicked( bool ) ), this, SLOT( checkPhysicalChanged( bool ) ) );
 	QObject::connect( this->ui.timeStepSpinBox, SIGNAL( valueChanged( int ) ), this, SLOT( timeStepChanged( int ) ) );
 
 	//go through all files
@@ -196,4 +197,12 @@ void isisViewer::timeStepChanged( int val )
 	UpdateWidgets();
 
 }
+
+void isisViewer::checkPhysicalChanged( bool physical )
+{
+	LOG(Runtime, info) << "Setting physical to " << physical;
+	m_CurrentImageHolder->setPhysical( physical );
+	UpdateWidgets();
+}
+
 }}

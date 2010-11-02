@@ -69,6 +69,7 @@ public:
 	boost::shared_ptr<ImageHolder> m_CurrentImageHolder;
 private slots:
 	void timeStepChanged( int );
+	void checkPhysicalChanged( bool );
 
 signals:
 	void clicked( bool );

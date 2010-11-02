@@ -27,7 +27,7 @@ namespace isis {
 namespace viewer {
 
 ImageHolder::ImageHolder()
-	: m_TimeSteps( 0 ), m_currentTimestep( 0 )
+	: m_TimeSteps( 0 ), m_currentTimestep( 0 ), m_Physical(false)
 {
 	m_ExtractAxial = vtkImageClip::New();
 	m_ExtractSagittal = vtkImageClip::New();
@@ -67,7 +67,11 @@ void ImageHolder::setUpPipe()
 	m_ActorAxial->SetMapper( m_MapperAxial );
 	m_ActorAxial->GetProperty()->SetInterpolationToFlat();
 	m_ActorAxial->SetScale( m_ImageVector[m_currentTimestep]->GetSpacing()[0], m_ImageVector[m_currentTimestep]->GetSpacing()[1], m_ImageVector[m_currentTimestep]->GetSpacing()[2] );
-	m_ActorAxial->SetUserMatrix( m_MatrixHandler.getAxialMatrix1() );
+	if (!m_Physical ) {
+		m_ActorAxial->SetUserMatrix( m_MatrixHandler.getAxialMatrix1() );
+	} else {
+		m_ActorAxial->SetUserMatrix( m_MatrixHandler.getAxialMatrix() );
+	}
 
 	//sagittal
 	m_ExtractSagittal->SetInput( m_ImageVector[m_currentTimestep] );
@@ -75,7 +79,11 @@ void ImageHolder::setUpPipe()
 	m_ActorSagittal->SetMapper( m_MapperSagittal );
 	m_ActorSagittal->GetProperty()->SetInterpolationToFlat();
 	m_ActorSagittal->SetScale( m_ImageVector[m_currentTimestep]->GetSpacing()[0], m_ImageVector[m_currentTimestep]->GetSpacing()[1], m_ImageVector[m_currentTimestep]->GetSpacing()[2] );
-	m_ActorSagittal->SetUserMatrix( m_MatrixHandler.getSagittalMatrix1() );
+	if (!m_Physical ) {
+		m_ActorSagittal->SetUserMatrix( m_MatrixHandler.getSagittalMatrix1() );
+	} else {
+		m_ActorSagittal->SetUserMatrix( m_MatrixHandler.getSagittalMatrix() );
+	}
 
 	//coronal
 	m_ExtractCoronal->SetInput( m_ImageVector[m_currentTimestep] );
@@ -84,6 +92,11 @@ void ImageHolder::setUpPipe()
 	m_ActorCoronal->GetProperty()->SetInterpolationToFlat();
 	m_ActorCoronal->SetScale( m_ImageVector[m_currentTimestep]->GetSpacing()[0], m_ImageVector[m_currentTimestep]->GetSpacing()[1], m_ImageVector[m_currentTimestep]->GetSpacing()[2] );
 	m_ActorCoronal->SetUserMatrix( m_MatrixHandler.getCoronalMatrix1() );
+	if (!m_Physical ) {
+		m_ActorCoronal->SetUserMatrix( m_MatrixHandler.getCoronalMatrix1() );
+	} else {
+		m_ActorCoronal->SetUserMatrix( m_MatrixHandler.getCoronalMatrix() );
+	}
 }
 
 void ImageHolder::setImages( boost::shared_ptr<isis::data::Image> isisImg,  std::vector<vtkSmartPointer<vtkImageData> >imgVec )
@@ -148,6 +161,5 @@ void ImageHolder::setCurrentTimeStep( const int& timestep )
 	setUpPipe();
 	setSliceCoordinates(m_X, m_Y, m_Z);
 }
-
 }
 }

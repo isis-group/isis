@@ -76,6 +76,10 @@ public:
 
 	bool setSliceCoordinates (const int&, const int&, const int& );
 	void setCurrentTimeStep( const int& );
+	void setPhysical( bool physical ) {
+		m_Physical = physical;
+		setCurrentTimeStep(m_currentTimestep);
+	}
 	bool resetSliceCoordinates( void );
 
 	vtkActor* getActorAxial() const { return m_ActorAxial; }
@@ -101,6 +105,7 @@ private:
 	vtkSmartPointer<vtkActor> m_ActorSagittal;
 	vtkSmartPointer<vtkActor> m_ActorCoronal;
 
+	bool m_Physical;
 	unsigned int m_TimeSteps;
 	unsigned int m_currentTimestep;
 	size_t m_X, m_Y, m_Z;
