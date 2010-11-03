@@ -51,9 +51,6 @@ isisViewer::isisViewer( )
 	setUpPipe();
 
 	m_InteractorAxial->SetDesiredUpdateRate(0.1);
-	m_InteractorAxial->Initialize();
-	m_InteractorSagittal->Initialize();
-	m_InteractorCoronal->Initialize();
 
 }
 
@@ -62,11 +59,8 @@ void isisViewer::init(QVTKWidget *axial, QVTKWidget *sagittal, QVTKWidget *coron
 	m_AxialWidget = axial;
 	m_SagittalWidget = sagittal;
 	m_CoronalWidget = coronal;
-	m_CoronalWidget->SetRenderWindow( m_WindowCoronal );
-	m_AxialWidget->SetRenderWindow( m_WindowAxial );
-	m_SagittalWidget->SetRenderWindow( m_WindowSagittal );
-}
 
+}
 
 void isisViewer::addImages( const ImageMapType& fileMap )
 {
@@ -80,8 +74,9 @@ void isisViewer::addImages( const ImageMapType& fileMap )
 		m_ImageHolderVector.push_back( tmpVec );
 	}
 	if (!m_ImageHolderVector.empty() ) {
-		m_CurrentImagePtr = m_ImageHolderVector.front()->getVTKImageData();
-		m_CurrentImageHolder = m_ImageHolderVector.front();
+		m_CurrentImageHolder = m_CurrentImageHolder ? m_CurrentImageHolder : m_ImageHolderVector.front();
+		m_CurrentImagePtr = m_CurrentImageHolder ? m_CurrentImageHolder->getVTKImageData() : m_ImageHolderVector.front()->getVTKImageData();
+
 	}
 	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference ref, m_ImageHolderVector )
 	{
@@ -89,6 +84,14 @@ void isisViewer::addImages( const ImageMapType& fileMap )
 		m_RendererCoronal->AddActor( ref->getActorCoronal() );
 		m_RendererSagittal->AddActor( ref->getActorSagittal() );
 	}
+	//TODO only if first image is added?
+	m_InteractorAxial->Initialize();
+	m_InteractorSagittal->Initialize();
+	m_InteractorCoronal->Initialize();
+	m_CoronalWidget->SetRenderWindow( m_WindowCoronal );
+	m_AxialWidget->SetRenderWindow( m_WindowAxial );
+	m_SagittalWidget->SetRenderWindow( m_WindowSagittal );
+
 	resetCam();
 }
 
@@ -115,11 +118,11 @@ void isisViewer::resetCam()
 		refImg->resetSliceCoordinates();
 	}
 	UpdateWidgets();
-
 }
 
 void isisViewer::UpdateWidgets()
 {
+
 	m_RendererAxial->ResetCamera();
 	m_RendererSagittal->ResetCamera();
 	m_RendererCoronal->ResetCamera();
@@ -130,7 +133,6 @@ void isisViewer::UpdateWidgets()
 }
 
 //gui interactions
-
 
 void isisViewer::displayIntensity( const int& x, const int& y, const int &z )
 {
@@ -165,6 +167,11 @@ void isisViewer::displayIntensity( const int& x, const int& y, const int &z )
 		signalList.intensityChanged(m_CurrentImageHolder->getISISImage()->voxel<double>(x, y,z, t));
 		break;
 	default:
+		LOG( Runtime, error )
+		<< "Unknown pixel representation with typeid " <<
+			m_CurrentImageHolder->getISISImage()->getChunk(x,y,z,t ).typeID() <<
+		". Can not display intensity! ";
+
 		signalList.intensityChanged(-1);
 	}
 
@@ -174,7 +181,7 @@ void isisViewer::sliceChanged( const int& x, const int& y, const int& z)
 {
 	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference refImg, m_ImageHolderVector)
 	{
-		if ( not refImg->setSliceCoordinates(x,y,z) ) std::cout << "error during setting slicesetting!" << std::endl;
+		if ( not refImg->setSliceCoordinates(x,y,z) ) LOG( Runtime, error ) << "error during setting slicesetting!";
 	}
 	UpdateWidgets();
 }

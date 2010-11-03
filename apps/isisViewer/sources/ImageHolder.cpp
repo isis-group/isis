@@ -71,8 +71,6 @@ void ImageHolder::setUpPipe()
 	m_ActorAxial->SetScale( m_ImageVector[m_currentTimestep]->GetSpacing()[0], m_ImageVector[m_currentTimestep]->GetSpacing()[1], m_ImageVector[m_currentTimestep]->GetSpacing()[2] );
 	if (!m_Physical ) {
 		m_ActorAxial->SetUserMatrix( m_MatrixHandler.getAxialMatrix1() );
-		m_ActorAxial->SetPosition(0,0,0);
-		m_ActorAxial->SetOrigin(0,0,0);
 	} else {
 		m_ActorAxial->SetUserMatrix( m_MatrixHandler.getAxialMatrix() );
 		m_ActorAxial->SetPosition( m_ISISImage->getProperty<util::fvector4>("indexOrigin")[0],
@@ -88,8 +86,6 @@ void ImageHolder::setUpPipe()
 	m_ActorSagittal->SetScale( m_ImageVector[m_currentTimestep]->GetSpacing()[0], m_ImageVector[m_currentTimestep]->GetSpacing()[1], m_ImageVector[m_currentTimestep]->GetSpacing()[2] );
 	if (!m_Physical ) {
 		m_ActorSagittal->SetUserMatrix( m_MatrixHandler.getSagittalMatrix1() );
-		m_ActorSagittal->SetPosition(0,0,0);
-		m_ActorSagittal->SetOrigin(0,0,0);
 	} else {
 		m_ActorSagittal->SetUserMatrix( m_MatrixHandler.getSagittalMatrix() );
 		m_ActorSagittal->SetPosition( m_ISISImage->getProperty<util::fvector4>("indexOrigin")[0],
@@ -106,7 +102,6 @@ void ImageHolder::setUpPipe()
 	m_ActorCoronal->SetUserMatrix( m_MatrixHandler.getCoronalMatrix1() );
 	if (!m_Physical ) {
 		m_ActorCoronal->SetUserMatrix( m_MatrixHandler.getCoronalMatrix1() );
-		m_ActorCoronal->SetPosition(0,0,0);
 	} else {
 		m_ActorCoronal->SetUserMatrix( m_MatrixHandler.getCoronalMatrix() );
 		m_ActorCoronal->SetPosition( m_ISISImage->getProperty<util::fvector4>("indexOrigin")[0],

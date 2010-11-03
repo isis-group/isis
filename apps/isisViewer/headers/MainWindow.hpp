@@ -23,16 +23,16 @@ class MainWindow : public QMainWindow
 
 public:
 	MainWindow(  const util::slist&, QMainWindow *parent = 0 );
-	struct Slot{
-		MainWindow &parent;
-		Slot( MainWindow& p ) : parent( p ) {}
-	};
 
 private:
 	Ui::isisViewer ui;
 	isisViewer m_Viewer;
 	void setUpGui( void );
 	void createAndSendImageMap( const util::slist& );
+	struct Slot{
+		MainWindow &parent;
+		Slot( MainWindow& p ) : parent( p ) {}
+	};
 
 private Q_SLOTS:
 	void timeStepChanged( int );
@@ -42,11 +42,11 @@ Q_SIGNALS:
 	void clicked( bool );
 	void valueChanged( int );
 
+//slots
 private:
-	//slots
 	struct RefreshIntensityDisplay : Slot
 	{
-		RefreshIntensityDisplay( MainWindow& p ):Slot(p){}
+		RefreshIntensityDisplay( MainWindow& p ):Slot(p) {}
 		void operator() ( const size_t& );
 	}my_RefreshIntensityDisplay;
 	struct RefreshCoordsDisplay : Slot
