@@ -155,9 +155,9 @@ void isisViewer::displayIntensity( const int& x, const int& y, const int &z )
 	case isis::data::TypePtr<int32_t>::staticID:
 		signalList.intensityChanged(m_CurrentImageHolder->getISISImage()->voxel<int32_t>(x, y,z, t));
 		break;
-//	case isis::data::TypePtr<u_int32_t>::staticID:
-//		ui.pxlIntensityContainer->display(m_ImageVector.front()->getISISImage()->voxel<u_int32_t>(x, y,z, t));
-//		break;
+	case isis::data::TypePtr<u_int32_t>::staticID:
+		signalList.intensityChanged(m_CurrentImageHolder->getISISImage()->voxel<u_int32_t>(x, y,z, t));
+		break;
 	case isis::data::TypePtr<float>::staticID:
 		signalList.intensityChanged(m_CurrentImageHolder->getISISImage()->voxel<float>(x, y,z, t));
 		break;
