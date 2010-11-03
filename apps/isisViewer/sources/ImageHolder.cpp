@@ -27,7 +27,9 @@ namespace isis {
 namespace viewer {
 
 ImageHolder::ImageHolder()
-	: m_TimeSteps( 0 ), m_currentTimestep( 0 ), m_Physical(false)
+	: m_TimeSteps( 0 ),
+	  m_currentTimestep( 0 ),
+	  m_Physical(false)
 {
 	m_ExtractAxial = vtkImageClip::New();
 	m_ExtractSagittal = vtkImageClip::New();
@@ -175,5 +177,5 @@ void ImageHolder::setCurrentTimeStep( const int& timestep )
 	setUpPipe();
 	setSliceCoordinates(m_X, m_Y, m_Z);
 }
-}
-}
+
+}} // end namespace

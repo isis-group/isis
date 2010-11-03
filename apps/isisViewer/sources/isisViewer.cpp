@@ -20,19 +20,16 @@
  *
  *****************************************************************/
 
-#include <QtGui>
+
 #include "isisViewer.hpp"
-#include "Adapter/vtkAdapter.hpp"
 
 namespace isis {
 
 namespace viewer {
 
+isisViewer::isisViewer( )
 
-isisViewer::isisViewer( const isis::util::slist& fileList, QMainWindow *parent )
-		: QMainWindow( parent )
 {
-
 	m_CurrentImagePtr = vtkImageData::New();
 
 	m_RendererAxial = vtkRenderer::New();
@@ -53,50 +50,45 @@ isisViewer::isisViewer( const isis::util::slist& fileList, QMainWindow *parent )
 
 	setUpPipe();
 
-	ui.setupUi( this );
-	//connections qt
-	QObject::connect( this->ui.checkPhysical, SIGNAL( clicked( bool ) ), this, SLOT( checkPhysicalChanged( bool ) ) );
-	QObject::connect( this->ui.timeStepSpinBox, SIGNAL( valueChanged( int ) ), this, SLOT( timeStepChanged( int ) ) );
+	m_InteractorAxial->SetDesiredUpdateRate(0.1);
+	m_InteractorAxial->Initialize();
+	m_InteractorSagittal->Initialize();
+	m_InteractorCoronal->Initialize();
 
-	//go through all files
-	BOOST_FOREACH( isis::util::slist::const_reference refFile, fileList )
+}
+
+void isisViewer::init(QVTKWidget *axial, QVTKWidget *sagittal, QVTKWidget *coronal )
+{
+	m_AxialWidget = axial;
+	m_SagittalWidget = sagittal;
+	m_CoronalWidget = coronal;
+	m_CoronalWidget->SetRenderWindow( m_WindowCoronal );
+	m_AxialWidget->SetRenderWindow( m_WindowAxial );
+	m_SagittalWidget->SetRenderWindow( m_WindowSagittal );
+}
+
+
+void isisViewer::addImages( const ImageMapType& fileMap )
+{
+	BOOST_FOREACH( ImageMapType::const_reference ref, fileMap )
 	{
-		//go through all the images in one file
-		isis::data::ImageList imgList = isis::data::IOFactory::load( refFile, "");
-		BOOST_FOREACH( isis::data::ImageList::const_reference refImage, imgList )
-		{
-			boost::shared_ptr< ImageHolder > tmpVec( new ImageHolder );
-			tmpVec->setImages( refImage, isis::adapter::vtkAdapter::makeVtkImageObject( refImage  ) );
-			tmpVec->setReadVec( refImage->getProperty<isis::util::fvector4>("readVec") );
-			tmpVec->setPhaseVec( refImage->getProperty<isis::util::fvector4>("phaseVec") );
-			tmpVec->setSliceVec( refImage->getProperty<isis::util::fvector4>("sliceVec") );
-			m_ImageHolderVector.push_back( tmpVec );
-		}
+		boost::shared_ptr< ImageHolder > tmpVec( new ImageHolder );
+		tmpVec->setImages( ref.first, ref.second );
+		tmpVec->setReadVec( ref.first->getProperty<isis::util::fvector4>("readVec") );
+		tmpVec->setPhaseVec( ref.first->getProperty<isis::util::fvector4>("phaseVec") );
+		tmpVec->setSliceVec( ref.first->getProperty<isis::util::fvector4>("sliceVec") );
+		m_ImageHolderVector.push_back( tmpVec );
 	}
 	if (!m_ImageHolderVector.empty() ) {
 		m_CurrentImagePtr = m_ImageHolderVector.front()->getVTKImageData();
 		m_CurrentImageHolder = m_ImageHolderVector.front();
-		if(m_CurrentImageHolder->getNumberOfTimesteps() > 1 ) {
-			this->ui.timeStepSpinBox->setMaximum( m_CurrentImageHolder->getNumberOfTimesteps() - 1);
-		} else {
-			this->ui.timeStepSpinBox->setEnabled( false );
-		}
 	}
-
 	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference ref, m_ImageHolderVector )
 	{
 		m_RendererAxial->AddActor( ref->getActorAxial() );
 		m_RendererCoronal->AddActor( ref->getActorCoronal() );
 		m_RendererSagittal->AddActor( ref->getActorSagittal() );
 	}
-	m_InteractorAxial->SetDesiredUpdateRate(0.1);
-	m_InteractorAxial->Initialize();
-	m_InteractorSagittal->Initialize();
-	m_InteractorCoronal->Initialize();
-
-	ui.qvtkWidgetCoronal->SetRenderWindow( m_WindowCoronal );
-	ui.qvtkWidgetAxial->SetRenderWindow( m_WindowAxial );
-	ui.qvtkWidgetSagittal->SetRenderWindow( m_WindowSagittal );
 	resetCam();
 }
 
@@ -140,43 +132,40 @@ void isisViewer::UpdateWidgets()
 //gui interactions
 
 
-void isisViewer::displayIntensity( const int& x, const int& y, const int& z )
+void isisViewer::displayIntensity( const int& x, const int& y, const int &z )
 {
+
 	const int t = m_CurrentImageHolder->getCurrentTimeStep();
-	isis::util::fvector4 tmpVec = isis::util::fvector4(x,y,z,t);
-//	isis::util::fvector4 mappedVec = isis::viewer::mapCoordinates<float>(m_CurrentImageHolder->getOriginalMatrix(), tmpVec, m_CurrentImageHolder->getISISImage()->sizeToVector());
-	QString atString;
-	atString.sprintf("at %d %d %d", x, y, z);
-	ui.atLabel->setText(atString);
+	signalList.mousePosChanged( x, y, z, t );
 
 	switch (m_CurrentImageHolder->getISISImage()->getChunk(x,y,z,t ).typeID() )
 	{
 	case isis::data::TypePtr<int8_t>::staticID:
-		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<int8_t>(x, y,z, t));
+		signalList.intensityChanged(m_CurrentImageHolder->getISISImage()->voxel<int8_t>(x, y,z, t));
 		break;
 	case isis::data::TypePtr<u_int8_t>::staticID:
-		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<u_int8_t>(x, y,z, t));
+		signalList.intensityChanged(m_CurrentImageHolder->getISISImage()->voxel<u_int8_t>(x, y,z, t));
 		break;
 	case isis::data::TypePtr<int16_t>::staticID:
-		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<int16_t>(x, y,z, t));
+		signalList.intensityChanged(m_CurrentImageHolder->getISISImage()->voxel<int16_t>(x, y,z, t));
 		break;
 	case isis::data::TypePtr<u_int16_t>::staticID:
-		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<u_int16_t>(x, y,z, t));
+		signalList.intensityChanged(m_CurrentImageHolder->getISISImage()->voxel<u_int16_t>(x, y,z, t));
 		break;
 	case isis::data::TypePtr<int32_t>::staticID:
-		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<int32_t>(x, y,z, t));
+		signalList.intensityChanged(m_CurrentImageHolder->getISISImage()->voxel<int32_t>(x, y,z, t));
 		break;
 //	case isis::data::TypePtr<u_int32_t>::staticID:
 //		ui.pxlIntensityContainer->display(m_ImageVector.front()->getISISImage()->voxel<u_int32_t>(x, y,z, t));
 //		break;
 	case isis::data::TypePtr<float>::staticID:
-		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<float>(x, y,z, t));
+		signalList.intensityChanged(m_CurrentImageHolder->getISISImage()->voxel<float>(x, y,z, t));
 		break;
 	case isis::data::TypePtr<double>::staticID:
-		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<double>(x, y,z, t));
+		signalList.intensityChanged(m_CurrentImageHolder->getISISImage()->voxel<double>(x, y,z, t));
 		break;
 	default:
-		ui.pxlIntensityContainer->display(tr("Error"));
+		signalList.intensityChanged(-1);
 	}
 
 }
@@ -190,7 +179,7 @@ void isisViewer::sliceChanged( const int& x, const int& y, const int& z)
 	UpdateWidgets();
 }
 
-void isisViewer::timeStepChanged( int val )
+void isisViewer::changeCurrentTimeStep( int val )
 {
 	m_CurrentImageHolder->setCurrentTimeStep( val );
 	UpdateWidgets();
