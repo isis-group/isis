@@ -47,11 +47,14 @@ ImageHolder::ImageHolder()
 
 bool ImageHolder::resetSliceCoordinates( void )
 {
-	return setSliceCoordinates(m_ImageVector[m_currentTimestep]->GetDimensions()[0] / 2, m_ImageVector[m_currentTimestep]->GetDimensions()[1] / 2, m_ImageVector[m_currentTimestep]->GetDimensions()[2] / 2);
+	LOG(Runtime, info) << "Resetting slice coordinates.";
+	setSliceCoordinates(m_ImageVector[m_currentTimestep]->GetDimensions()[0] / 2, m_ImageVector[m_currentTimestep]->GetDimensions()[1] / 2, m_ImageVector[m_currentTimestep]->GetDimensions()[2] / 2);
+
 }
 
 bool ImageHolder::setSliceCoordinates( const int& x, const int& y, const int& z )
 {
+	LOG(Runtime, info) << "Setting slice coordinates to " << x << ", " << y << ", " << z;
 	m_X = x;
 	m_Y = y;
 	m_Z = z;
@@ -63,13 +66,12 @@ bool ImageHolder::setSliceCoordinates( const int& x, const int& y, const int& z 
 	m_ExtractorVector[m_BiggestElemVec[2]]->Update();
 	return true;
 }
-
+//TODO this method needs a more effective approach
 void ImageHolder::setUpPipe()
 {
 	LOG(Runtime, info) << "ImageHolder::setUpPipe";
 	//axial
 	m_ExtractAxial->SetInput( m_ImageVector[m_currentTimestep]);
-	m_ExtractAxial->Update();
 	m_MapperAxial->SetInput( m_ExtractAxial->GetOutput() );
 	m_ActorAxial->SetMapper( m_MapperAxial );
 	m_ActorAxial->GetProperty()->SetInterpolationToFlat();
@@ -86,7 +88,6 @@ void ImageHolder::setUpPipe()
 
 	//sagittal
 	m_ExtractSagittal->SetInput( m_ImageVector[m_currentTimestep]);
-	m_ExtractSagittal->Update();
 	m_MapperSagittal->SetInput( m_ExtractSagittal->GetOutput() );
 	m_ActorSagittal->SetMapper( m_MapperSagittal );
 	m_ActorSagittal->GetProperty()->SetInterpolationToFlat();
@@ -103,7 +104,6 @@ void ImageHolder::setUpPipe()
 
 	//coronal
 	m_ExtractCoronal->SetInput( m_ImageVector[m_currentTimestep]);
-	m_ExtractSagittal->Update();
 	m_MapperCoronal->SetInput( m_ExtractCoronal->GetOutput() );
 	m_ActorCoronal->SetMapper( m_MapperCoronal );
 	m_ActorCoronal->GetProperty()->SetInterpolationToFlat();

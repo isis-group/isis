@@ -71,7 +71,7 @@ void MainWindow::setUpGui( void ) {
 	}
 }
 
-void MainWindow::RefreshIntensityDisplay::operator ()( const size_t& intensity )
+void MainWindow::RefreshIntensityDisplay::operator()( const size_t& intensity )
 {
 	parent.ui.pxlIntensityContainer->display( static_cast<int>(intensity) );
 }

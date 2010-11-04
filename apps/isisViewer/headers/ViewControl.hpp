@@ -78,6 +78,7 @@ public:
 
 private:
 
+	bool m_Valid;
 	vtkSmartPointer<vtkImageData> m_CurrentImagePtr;
 	boost::shared_ptr<ImageHolder> m_CurrentImageHolder;
 	std::vector< boost::shared_ptr< ImageHolder > > m_ImageHolderVector;
