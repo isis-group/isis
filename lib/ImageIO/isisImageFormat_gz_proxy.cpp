@@ -113,7 +113,7 @@ public:
 			return std::string();
 		} else {
 			std::set<std::string> ret;
-			data::IOFactory::FileFormatList formats=data::IOFactory::get().getFormatInterface(boost::filesystem::basename( filename ));
+			data::IOFactory::FileFormatList formats=data::IOFactory::get().getFormatInterface(FileFormat::makeBasename(filename).first);
 			BOOST_FOREACH(data::IOFactory::FileFormatList::const_reference ref,formats){
 				const std::list<std::string> dias=util::string2list<std::string>(ref->dialects(filename));
 				ret.insert(dias.begin(),dias.end());
@@ -122,6 +122,21 @@ public:
 		}
 	}
 	std::string name()const {return "compression proxy for other formats";}
+
+	virtual std::pair<std::string,std::string> makeBasename(const std::string &filename)const{
+		const std::pair<std::string,std::string> proxyBase=FileFormat::makeBasename(filename); // get rid of the the .gz
+
+		//then get the actual plugin for the format
+		const data::IOFactory::FileFormatList formats=data::IOFactory::get().getFormatInterface(proxyBase.first );
+		if(formats.empty()){
+			LOG(Runtime,error) << "Cannot determine the basename of " << util::MSubject(proxyBase.first) << " because no io-plugin was found for it";
+			return proxyBase;
+		}
+		
+		//and ask it for the basename
+		const std::pair<std::string,std::string> realBase=formats.front()->makeBasename(proxyBase.first);
+		return std::make_pair(realBase.first,realBase.second+proxyBase.second);
+	}
 
 	int load ( data::ChunkList &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) {
 		const std::string unzipped_suffix = boost::filesystem::extension( boost::filesystem::basename( filename ) );
