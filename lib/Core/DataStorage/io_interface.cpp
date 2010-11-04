@@ -18,6 +18,7 @@ void FileFormat::write( const isis::data::ImageList &images, const std::string &
 	std::string file = path.leaf();
 	path.remove_leaf();
 	bool ret = true;
+	std::list<std::string> names=makeUniqueFilenames(images,filename);
 	bool uniqueSequenceNumber;
 	if ( images.size() > 1 ) {
 		//check if there is more than one image with the same sequenceNumber
@@ -91,6 +92,44 @@ std::list< std::string > FileFormat::getSuffixes()
 	BOOST_FOREACH(std::string &ref,ret)
 	{
 		ref.erase(0,ref.find_first_not_of('.'));// remove leading . if there are some
+	}
+	return ret;
+}
+
+std::string FileFormat::makeFilename(const util::PropMap &props,std::string namePattern)
+{
+	boost::regex reg( "\\{[^{}]+\\}" );
+	boost::match_results<std::string::iterator> what;
+	while(boost::regex_search(namePattern.begin(),namePattern.end() , what, reg ))
+	{
+		const std::string prop=what[0].str().substr(1,what.length()-2);
+		if(props.hasProperty(prop)){
+			namePattern.replace(what[0].first,what[0].second,props.getProperty<std::string>(prop));
+			LOG(Debug,info)
+			<< "Replacing " << util::MSubject(std::string("{")+prop+"}") << " by "	<< util::MSubject( props.getProperty<std::string>(prop) )
+			<< " the string is now " << util::MSubject(namePattern);
+		} else
+			LOG(Runtime,warning) << "The property " << util::MSubject(prop) << " does not exist - wont replace " << util::MSubject(what[0].str());
+	}
+
+	return namePattern;
+}
+std::list<std::string> FileFormat::makeUniqueFilenames(const data::ImageList& images, const std::string& namePattern){
+	std::list<std::string> ret;
+	std::map<std::string,unsigned short> names,used_names;
+	BOOST_FOREACH(data::ImageList::const_reference ref,images){
+		names[makeFilename(*ref,namePattern)]++;
+	}
+	
+	BOOST_FOREACH(data::ImageList::const_reference ref,images){
+		std::string name=makeFilename(*ref,namePattern);
+		if(names[name]>1){
+			const unsigned short length=log10(names[name]);
+			const unsigned short number=++used_names[name];
+			const std::string snumber=std::string(length,'0')+boost::lexical_cast<std::string>(number);
+			name +="_"+snumber;
+		}
+		ret.push_back(name);
 	}
 	return ret;
 }
