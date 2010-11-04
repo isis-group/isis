@@ -20,8 +20,8 @@
  *
  *****************************************************************/
 
-#ifndef ISISVIEWER_H
-#define ISISVIEWER_H
+#ifndef VIEWCONTROL_H
+#define VIEWCONTROL_H
 
 #include "CoreUtils/log.hpp"
 #include "DataStorage/io_factory.hpp"
@@ -29,7 +29,6 @@
 
 #include "common.hpp"
 #include "ui_isisViewer.h"
-#include "viewerCore.hpp"
 
 #include "ImageHolder.hpp"
 #include "ViewerInteractor.hpp"
@@ -52,11 +51,11 @@ namespace viewer {
 class ViewerInteractor;
 class ImageHolder;
 
-class isisViewer
+class ViewControl
 {
 public:
 	typedef std::map<boost::shared_ptr<data::Image>, std::vector<vtkSmartPointer< vtkImageData > > > ImageMapType;
-	isisViewer();
+	ViewControl();
 	void init( QVTKWidget *axial, QVTKWidget *sagittal, QVTKWidget *coronal );
 	void resetCam();
 	void sliceChanged(const int&, const int&, const int&);

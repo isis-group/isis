@@ -26,7 +26,7 @@ namespace isis {
 
 namespace viewer {
 
-ViewerInteractor::ViewerInteractor( isisViewer* viewer, vtkRenderer* renderer )
+ViewerInteractor::ViewerInteractor( ViewControl* viewer, vtkRenderer* renderer )
 	: m_ViewerPtr( viewer ), m_Renderer( renderer )
 {
 

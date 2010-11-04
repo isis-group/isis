@@ -10,7 +10,7 @@
 
 #include <QtGui>
 #include "ui_isisViewer.h"
-#include "isisViewer.hpp"
+#include "ViewControl.hpp"
 #include "Adapter/vtkAdapter.hpp"
 
 namespace isis {
@@ -26,7 +26,7 @@ public:
 
 private:
 	Ui::isisViewer ui;
-	isisViewer m_Viewer;
+	ViewControl m_Viewer;
 	void setUpGui( void );
 	void createAndSendImageMap( const util::slist& );
 	struct Slot{

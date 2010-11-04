@@ -21,51 +21,44 @@
  *****************************************************************/
 
 
-#include "isisViewer.hpp"
+#include "ViewControl.hpp"
 
 namespace isis {
 
 namespace viewer {
 
-isisViewer::isisViewer( )
+ViewControl::ViewControl( )
 {
-	LOG(Runtime, info ) << "isisViewer::isisViewer";
+	LOG(Runtime, info ) << "ViewControl::ViewControl";
 	m_CurrentImagePtr = vtkImageData::New();
 
 	m_RendererAxial = vtkRenderer::New();
 	m_RendererSagittal = vtkRenderer::New();
 	m_RendererCoronal = vtkRenderer::New();
-
-	m_WindowAxial = vtkRenderWindow::New();
-	m_WindowSagittal = vtkRenderWindow::New();
-	m_WindowCoronal = vtkRenderWindow::New();
-
-	m_InteractorAxial = vtkRenderWindowInteractor::New();
-	m_InteractorSagittal = vtkRenderWindowInteractor::New();
-	m_InteractorCoronal = vtkRenderWindowInteractor::New();
-
-	m_InteractionStyleAxial = new ViewerInteractor(this, m_RendererAxial);
-	m_InteractionStyleSagittal = new ViewerInteractor(this, m_RendererSagittal);
-	m_InteractionStyleCoronal = new ViewerInteractor(this, m_RendererCoronal);
-
-	setUpPipe();
-
-
-
 }
 
-void isisViewer::init(QVTKWidget *axial, QVTKWidget *sagittal, QVTKWidget *coronal )
+void ViewControl::init(QVTKWidget *axial, QVTKWidget *sagittal, QVTKWidget *coronal )
 {
-	LOG (Runtime, info ) << "isisViewer::init";
+	LOG (Runtime, info ) << "ViewControl::init";
 	m_AxialWidget = axial;
 	m_SagittalWidget = sagittal;
 	m_CoronalWidget = coronal;
+	m_WindowAxial = m_AxialWidget->GetRenderWindow();
+	m_WindowSagittal = m_SagittalWidget->GetRenderWindow();
+	m_WindowCoronal = m_CoronalWidget->GetRenderWindow();
+	m_InteractorAxial = m_WindowAxial->GetInteractor();
+	m_InteractorSagittal = m_WindowSagittal->GetInteractor();
+	m_InteractorCoronal = m_WindowCoronal->GetInteractor();
+	m_InteractionStyleAxial = new ViewerInteractor(this, m_RendererAxial);
+	m_InteractionStyleSagittal = new ViewerInteractor(this, m_RendererSagittal);
+	m_InteractionStyleCoronal = new ViewerInteractor(this, m_RendererCoronal);
+	setUpPipe();
 
 }
 
-void isisViewer::addImages( const ImageMapType& fileMap )
+void ViewControl::addImages( const ImageMapType& fileMap )
 {
-	LOG(Runtime, info) << "isisViewer::addImages";
+	LOG(Runtime, info) << "ViewControl::addImages";
 	BOOST_FOREACH( ImageMapType::const_reference ref, fileMap )
 	{
 		boost::shared_ptr< ImageHolder > tmpVec( new ImageHolder );
@@ -78,20 +71,20 @@ void isisViewer::addImages( const ImageMapType& fileMap )
 	if (!m_ImageHolderVector.empty() ) {
 		m_CurrentImageHolder = m_CurrentImageHolder ? m_CurrentImageHolder : m_ImageHolderVector.front();
 		m_CurrentImagePtr = m_CurrentImageHolder ? m_CurrentImageHolder->getVTKImageData() : m_ImageHolderVector.front()->getVTKImageData();
+		BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference ref, m_ImageHolderVector )
+		{
+			LOG(Runtime, info) << "Adding actors to renderers";
+			m_RendererAxial->AddActor( ref->getActorAxial() );
+			m_RendererCoronal->AddActor( ref->getActorCoronal() );
+			m_RendererSagittal->AddActor( ref->getActorSagittal() );
+		}
+	}
 
-	}
-	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference ref, m_ImageHolderVector )
-	{
-		LOG(Runtime, info) << "Adding actors to renderers";
-		m_RendererAxial->AddActor( ref->getActorAxial() );
-		m_RendererCoronal->AddActor( ref->getActorCoronal() );
-		m_RendererSagittal->AddActor( ref->getActorSagittal() );
-	}
 	//TODO only if first image is added?
 	LOG(Runtime, info ) << "Initializing interactors";
+
 	m_InteractorAxial->Initialize();
 	m_InteractorSagittal->Initialize();
-	m_InteractorCoronal->Initialize();
 	m_InteractorCoronal->Initialize();
 
 	LOG(Runtime, info) << "Setting render windows of QVTKWidgets";
@@ -102,7 +95,7 @@ void isisViewer::addImages( const ImageMapType& fileMap )
 	resetCam();
 }
 
-void isisViewer::setUpPipe()
+void ViewControl::setUpPipe()
 {
 	LOG( Runtime, info ) << "Setting up the pipe";
 	m_InteractorCoronal->SetInteractorStyle( m_InteractionStyleCoronal );
@@ -123,9 +116,9 @@ void isisViewer::setUpPipe()
 
 }
 
-void isisViewer::resetCam()
+void ViewControl::resetCam()
 {
-	LOG(Runtime, info) << "isisViewer::resetCam";
+	LOG(Runtime, info) << "ViewControl::resetCam";
 	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference refImg, m_ImageHolderVector)
 	{
 		refImg->resetSliceCoordinates();
@@ -133,25 +126,20 @@ void isisViewer::resetCam()
 	UpdateWidgets();
 }
 
-void isisViewer::UpdateWidgets()
+void ViewControl::UpdateWidgets()
 {
-	LOG(Runtime, info ) << "isisViewer::UpdateWidgets";
+	LOG(Runtime, info ) << "ViewControl::UpdateWidgets";
 	m_RendererAxial->ResetCamera();
 	m_RendererSagittal->ResetCamera();
 	m_RendererCoronal->ResetCamera();
 	m_AxialWidget->update();
 	m_SagittalWidget->update();
 	m_CoronalWidget->update();
-
-
-//	m_WindowAxial->Render();
-//	m_WindowCoronal->Render();
-//	m_WindowSagittal->Render();
 }
 
 //gui interactions
 
-void isisViewer::displayIntensity( const int& x, const int& y, const int &z )
+void ViewControl::displayIntensity( const int& x, const int& y, const int &z )
 {
 
 	const int t = m_CurrentImageHolder->getCurrentTimeStep();
@@ -194,7 +182,7 @@ void isisViewer::displayIntensity( const int& x, const int& y, const int &z )
 
 }
 
-void isisViewer::sliceChanged( const int& x, const int& y, const int& z)
+void ViewControl::sliceChanged( const int& x, const int& y, const int& z)
 {
 	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference refImg, m_ImageHolderVector)
 	{
@@ -203,14 +191,14 @@ void isisViewer::sliceChanged( const int& x, const int& y, const int& z)
 	UpdateWidgets();
 }
 
-void isisViewer::changeCurrentTimeStep( int val )
+void ViewControl::changeCurrentTimeStep( int val )
 {
 	m_CurrentImageHolder->setCurrentTimeStep( val );
 	UpdateWidgets();
 
 }
 
-void isisViewer::checkPhysicalChanged( bool physical )
+void ViewControl::checkPhysicalChanged( bool physical )
 {
 	LOG(Runtime, info) << "Setting physical to " << physical;
 	BOOST_FOREACH(std::vector< boost::shared_ptr< ImageHolder > >::const_reference ref, m_ImageHolderVector)

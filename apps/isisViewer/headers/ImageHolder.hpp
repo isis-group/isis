@@ -43,7 +43,7 @@
 
 #include "CoreUtils/vector.hpp"
 #include "DataStorage/image.hpp"
-#include "isisViewer.hpp"
+#include "ViewControl.hpp"
 #include "MatrixHandler.hpp"
 
 #include <cmath>
@@ -121,8 +121,8 @@ private:
 	isis::util::fvector4 m_readVec;
 	isis::util::fvector4 m_phaseVec;
 	isis::util::fvector4 m_sliceVec;
+	util::fvector4 m_pseudoOrigin;
 
-	std::vector<std::vector<double> > m_RotationVector;
 
 	void setUpPipe( void );
 	bool createOrientedImages( void );

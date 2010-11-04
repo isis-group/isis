@@ -35,7 +35,7 @@ MainWindow::MainWindow( const util::slist& inFileList, QMainWindow *parent )
 
 void MainWindow::createAndSendImageMap( const util::slist& fileList )
 {
-	isisViewer::ImageMapType imageMap;
+	ViewControl::ImageMapType imageMap;
 	BOOST_FOREACH( util::slist::const_reference refFile, fileList )
 	{
 		//go through all the images in one file
@@ -43,11 +43,13 @@ void MainWindow::createAndSendImageMap( const util::slist& fileList )
 		BOOST_FOREACH( isis::data::ImageList::const_reference refImage, imgList )
 		{
 			std::vector<vtkSmartPointer<vtkImageData> > vtkImageVector = isis::adapter::vtkAdapter::makeVtkImageObject(refImage);
-			imageMap.insert( isisViewer::ImageMapType::value_type(refImage, vtkImageVector ) );
+			imageMap.insert( ViewControl::ImageMapType::value_type(refImage, vtkImageVector ) );
 		}
 	}
-	m_Viewer.addImages(imageMap);
-	setUpGui();
+	if(!imageMap.empty()) {
+		m_Viewer.addImages(imageMap);
+		setUpGui();
+	}
 }
 
 

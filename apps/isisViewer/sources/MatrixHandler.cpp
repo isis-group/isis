@@ -12,6 +12,7 @@ namespace isis {
 namespace viewer {
 
 MatrixHandler::MatrixHandler( void )
+	:m_Valid( false )
 {
 	m_origMatrix = vtkMatrix4x4::New();
 	m_origMatrix1 = vtkMatrix4x4::New();
@@ -27,6 +28,7 @@ MatrixHandler::MatrixHandler( void )
 
 void MatrixHandler::setVectors( isis::util::fvector4 readVec, isis::util::fvector4 phaseVec, isis::util::fvector4 sliceVec )
 {
+	m_Valid = true;
 	m_readVec = readVec;
 	m_phaseVec = phaseVec;
 	m_sliceVec = sliceVec;
@@ -116,6 +118,21 @@ void MatrixHandler::createMatricesForWidgets( void )
 	vtkMatrix4x4::Multiply4x4(axialMatrix, m_correctedMatrix, m_MatrixAxial);
 	vtkMatrix4x4::Multiply4x4(sagittalMatrix, m_correctedMatrix, m_MatrixSagittal);
 	vtkMatrix4x4::Multiply4x4(coronalMatrix, m_correctedMatrix, m_MatrixCoronal);
+}
+
+util::fvector4 MatrixHandler::createPseudoOrigin( const util::fvector4& size ) const
+{
+	vtkSmartPointer<vtkMatrix4x4> usedMatrix = vtkMatrix4x4::New();
+	usedMatrix = m_correctedMatrix1;
+	if ( !m_Valid ) {
+		LOG( Runtime, error ) << "Cannot create pseudo origin. First call setVectors.";
+		return util::fvector4(0,0,0,0);
+	} else {
+		return util::fvector4( 0.1 * (size[0] * usedMatrix->GetElement(0,0) + size[1] * usedMatrix->GetElement(0,1) + size[2] * usedMatrix->GetElement(0,2) ),
+				-0.5 * ( size[0] * usedMatrix->GetElement(1,0) + size[1] * usedMatrix->GetElement(1,1) + size[2] * usedMatrix->GetElement(1,2) ),
+				-0.5 * ( size[0] * usedMatrix->GetElement(2,0) + size[1] * usedMatrix->GetElement(2,1) + size[2] * usedMatrix->GetElement(2,2) ) );
+	}
+
 }
 
 }}
