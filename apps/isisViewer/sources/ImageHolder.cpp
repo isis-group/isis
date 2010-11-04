@@ -75,7 +75,7 @@ void ImageHolder::setUpPipe()
 	m_MapperAxial->SetInput( m_ExtractAxial->GetOutput() );
 	m_ActorAxial->SetMapper( m_MapperAxial );
 	m_ActorAxial->GetProperty()->SetInterpolationToFlat();
-	m_ActorAxial->SetScale( m_ImageVector[m_currentTimestep]->GetSpacing()[0], m_ImageVector[m_currentTimestep]->GetSpacing()[1], m_ImageVector[m_currentTimestep]->GetSpacing()[2] );
+	m_ActorAxial->SetScale( m_ImageVector.front()->GetSpacing()[0], m_ImageVector[m_currentTimestep]->GetSpacing()[1], m_ImageVector[m_currentTimestep]->GetSpacing()[2] );
 	if (!m_Physical ) {
 		m_ActorAxial->SetUserMatrix( m_MatrixHandler.getAxialMatrix1() );
 		m_ActorAxial->SetPosition(m_pseudoOrigin[0], m_pseudoOrigin[1], m_pseudoOrigin[2]);
@@ -139,7 +139,8 @@ void ImageHolder::setImages( boost::shared_ptr<isis::data::Image> isisImg,  std:
 	LOG( Runtime, info ) << "phaseVector: " << m_phaseVec;
 	LOG( Runtime, info ) << "sliceVector: " << m_sliceVec;
 	m_MatrixHandler.setVectors( m_readVec, m_phaseVec, m_sliceVec );
-	m_pseudoOrigin = m_MatrixHandler.createPseudoOrigin( m_ISISImage->sizeToVector());
+	LOG( Runtime, info) << "spacing[0]: " << m_ImageVector.front()->GetSpacing()[0];
+	m_pseudoOrigin = m_MatrixHandler.createPseudoOrigin( m_ISISImage->sizeToVector(), m_ISISImage->getProperty<util::fvector4>("voxelSize"));
 	std::cout << "pseudo: " << m_pseudoOrigin << std::endl;
 	commonInit();
 	createOrientedImages();
@@ -154,11 +155,15 @@ bool ImageHolder::createOrientedImages( void )
 		for( std::vector<vtkSmartPointer<vtkImageData> >::iterator it = m_ImageVector.begin(); it != m_ImageVector.end(); it++ )
 		{
 			vtkSmartPointer<vtkImageData> tmpImage = *it;
+			tmpImage->SetSpacing( (*it)->GetSpacing() );
+			tmpImage->SetOrigin( (*it)->GetOrigin() );
 			vtkSmartPointer<vtkImageFlip> flipper = vtkImageFlip::New();
 			flipper->SetFilteredAxis(2);
 			flipper->SetInput(tmpImage);
 			flipper->Update();
 			*it = flipper->GetOutput();
+			(*it)->SetSpacing(tmpImage->GetSpacing());
+			(*it)->SetOrigin(tmpImage->GetOrigin());
 		}
 	}
 	return true;

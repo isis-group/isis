@@ -32,7 +32,7 @@ public:
 	vtkSmartPointer<vtkMatrix4x4> getCoronalMatrix1( void ) const { return m_MatrixCoronal1; }
 
 	bool isRotationMatrix( void ) const { return m_isRotationMatrix; }
-	util::fvector4 createPseudoOrigin( const util::fvector4& ) const;
+	util::fvector4 createPseudoOrigin( const util::fvector4& size, const util::fvector4& voxelSize ) const;
 
 private:
 	bool m_isRotationMatrix;
