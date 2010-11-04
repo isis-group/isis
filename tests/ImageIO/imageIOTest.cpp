@@ -18,28 +18,25 @@ namespace isis
 namespace test
 {
 
-BOOST_AUTO_TEST_CASE ( imageLoadtest )
+BOOST_AUTO_TEST_CASE ( imageNameGenTest )
 {
-	/*  util::enable_log<util::DefaultMsgPrint>(info);
-	    data::enable_log<util::DefaultMsgPrint>(info);*/
-	// just to make sure the wanted file exists
-	FILE *f = fopen( "test.null", "w" );
-	fclose( f );
-	data::ImageList images = data::IOFactory::load( "test.null", "" );
-	// the null-loader shall generate 5 50x50x50x10 images
-	BOOST_CHECK( images.size() == 5 );
-	short cnt = 0;
-	BOOST_FOREACH( data::ImageList::value_type & ref, images ) {
-		BOOST_CHECK_EQUAL( ref->sizeToVector(), util::fvector4( 50, 50, 50, 10 ) );
-		BOOST_CHECK_EQUAL( ref->voxel<u_int8_t>( 0, 0 ), cnt );
+	data::MemChunk<uint8_t> ch(5,5,5);
+	data::Image img;
+	ch.setProperty( "indexOrigin", util::fvector4( 0, 0, 2 ) );
+	ch.setProperty<uint32_t>( "acquisitionNumber", 0 );
+	ch.setProperty<float>( "acquisitionTime", 0 );
+	ch.setProperty( "readVec", util::fvector4( 1, 0 ) );
+	ch.setProperty( "phaseVec", util::fvector4( 0, 1 ) );
+	ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
+	BOOST_REQUIRE( img.insertChunk( ch ) );
+	img.reIndex();
 
-		for ( int i = 0; i < 10; i++ )
-			for ( int j = 10; j < 40; j++ )
-				BOOST_CHECK_EQUAL( ref->voxel<u_int8_t>( j, j, j, i ), 255 - i * 20 );
-
-		cnt++;
-	}
-	BOOST_CHECK( data::IOFactory::write( images, "test.null", "" ) );
+	BOOST_CHECK_EQUAL(image_io::FileFormat::makeFilename(img,"/tmp/S{acquisitionNumber}.nii"),"/tmp/S0.nii");
+	BOOST_CHECK_EQUAL(image_io::FileFormat::makeFilename(img,"/tmp/S{nich da}.nii"),"/tmp/S.nii"); // {nich da} does not exist - so we just remove it from the string
+	BOOST_CHECK_EQUAL(
+		image_io::FileFormat::makeFilename(img,"/tmp/acq{acquisitionTime}.nii"),
+		std::string("/tmp/acq")+img.getProperty<std::string>("acquisitionTime")+".nii" 
+	);
 }
 
 
