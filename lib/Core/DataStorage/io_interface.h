@@ -52,8 +52,8 @@ public:
 	static void throwGenericError( std::string desc );
 	static void throwSystemError( int err, std::string desc = "" );
 
-	std::string makeFilename(const util::PropMap &img,std::string namePattern);
-	std::list<std::string> makeUniqueFilenames(const data::ImageList &images,const std::string &namePattern);
+	static std::string makeFilename(const util::PropMap &img,std::string namePattern);
+	static std::list<std::string> makeUniqueFilenames(const data::ImageList &images,const std::string &namePattern);
 
 
 	static const float invalid_float;

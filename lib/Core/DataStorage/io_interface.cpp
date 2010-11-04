@@ -108,8 +108,10 @@ std::string FileFormat::makeFilename(const util::PropMap &props,std::string name
 			LOG(Debug,info)
 			<< "Replacing " << util::MSubject(std::string("{")+prop+"}") << " by "	<< util::MSubject( props.getProperty<std::string>(prop) )
 			<< " the string is now " << util::MSubject(namePattern);
-		} else
-			LOG(Runtime,warning) << "The property " << util::MSubject(prop) << " does not exist - wont replace " << util::MSubject(what[0].str());
+		} else{
+			LOG(Runtime,warning) << "The property " << util::MSubject(prop) << " does not exist - ignoring it";
+			namePattern.replace(what[0].first,what[0].second,""); // it must be removed, or it will match forever
+		}
 	}
 
 	return namePattern;
