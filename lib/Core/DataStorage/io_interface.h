@@ -52,8 +52,11 @@ public:
 	static void throwGenericError( std::string desc );
 	static void throwSystemError( int err, std::string desc = "" );
 
+	/// splits the suffix (and the ".") from the filename (or path) and returns a pair made of both parts
+	virtual std::pair<std::string,std::string> makeBasename(const std::string &filename);
+	
 	static std::string makeFilename(const util::PropMap &img,std::string namePattern);
-	static std::list<std::string> makeUniqueFilenames(const data::ImageList &images,const std::string &namePattern);
+	std::list<std::string> makeUniqueFilenames(const data::ImageList &images,const std::string &namePattern)const;
 
 
 	static const float invalid_float;
