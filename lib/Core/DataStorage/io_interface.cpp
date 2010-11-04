@@ -85,7 +85,7 @@ void FileFormat::throwSystemError( int err, std::string desc )
 	throw( boost::system::system_error( err, boost::system::get_system_category(), desc ) );
 }
 
-std::list< std::string > FileFormat::getSuffixes()
+std::list< std::string > FileFormat::getSuffixes()const
 {
 	std::list<std::string> ret=util::string2list<std::string>( suffixes(), boost::regex( "\\s+" ) );
 	BOOST_FOREACH(std::string &ref,ret)

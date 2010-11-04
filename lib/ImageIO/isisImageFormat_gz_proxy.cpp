@@ -15,7 +15,7 @@ namespace image_io
 class ImageFormat_CompProxy: public FileFormat
 {
 private:
-	void gz_compress( std::ifstream &in, gzFile out ) {
+	static void gz_compress( std::ifstream &in, gzFile out ) {
 		char buf[2048*1024];
 		int len;
 
@@ -38,7 +38,7 @@ private:
 		}
 	}
 
-	void file_compress( std::string infile, std::string outfile ) {
+	static void file_compress( std::string infile, std::string outfile ) {
 		std::ifstream in;
 		in.exceptions( std::ifstream::failbit | std::ifstream::badbit );
 		in.open( infile.c_str(), std::ios::binary );
@@ -58,7 +58,7 @@ private:
 		}
 	}
 
-	void gz_uncompress( gzFile in, std::ofstream &out ) {
+	static void gz_uncompress( gzFile in, std::ofstream &out ) {
 		char buf[2048*1024];
 		int len;
 
@@ -83,7 +83,7 @@ private:
 		}
 	}
 
-	void file_uncompress( std::string infile, std::string outfile ) {
+	static void file_uncompress( std::string infile, std::string outfile ) {
 		gzFile in = gzopen( infile.c_str(), "rb" );
 
 		if ( in == NULL ) {
@@ -105,10 +105,10 @@ private:
 
 
 public:
-	std::string suffixes() {
+	std::string suffixes()const {
 		return std::string( ".gz" );
 	}
-	std::string dialects(const std::string &filename){
+	std::string dialects(const std::string &filename)const{
 		if(filename.empty()){
 			return std::string();
 		} else {
@@ -121,7 +121,7 @@ public:
 			return util::list2string(ret.begin(),ret.end(),",","","");
 		}
 	}
-	std::string name() {return "compression proxy for other formats";}
+	std::string name()const {return "compression proxy for other formats";}
 
 	int load ( data::ChunkList &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) {
 		const std::string unzipped_suffix = boost::filesystem::extension( boost::filesystem::basename( filename ) );
@@ -142,7 +142,7 @@ public:
 	void write( const data::Image &image, const std::string &filename, const std::string &dialect )throw( std::runtime_error & ) {
 		throw( std::runtime_error( "Compressed write is not yet implemented" ) );
 	}
-	bool tainted() {return false;}//internal plugins are not tainted
+	bool tainted()const {return false;}//internal plugins are not tainted
 };
 }
 }
