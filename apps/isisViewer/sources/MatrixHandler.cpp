@@ -122,17 +122,10 @@ void MatrixHandler::createMatricesForWidgets( void )
 
 util::fvector4 MatrixHandler::createPseudoOrigin( const util::fvector4& size ) const
 {
-	vtkSmartPointer<vtkMatrix4x4> usedMatrix = vtkMatrix4x4::New();
-	usedMatrix = m_correctedMatrix1;
 	if ( !m_Valid ) {
 		LOG( Runtime, error ) << "Cannot create pseudo origin. First call setVectors.";
 		return util::fvector4(0,0,0,0);
-	} else {
-		return util::fvector4( 0.1 * (size[0] * usedMatrix->GetElement(0,0) + size[1] * usedMatrix->GetElement(0,1) + size[2] * usedMatrix->GetElement(0,2) ),
-				-0.5 * ( size[0] * usedMatrix->GetElement(1,0) + size[1] * usedMatrix->GetElement(1,1) + size[2] * usedMatrix->GetElement(1,2) ),
-				-0.5 * ( size[0] * usedMatrix->GetElement(2,0) + size[1] * usedMatrix->GetElement(2,1) + size[2] * usedMatrix->GetElement(2,2) ) );
-	}
-
+	} else { return util::fvector4(-size[0] / 2, -size[1] / 2, -size[2] / 2,0); }
 }
 
 }}

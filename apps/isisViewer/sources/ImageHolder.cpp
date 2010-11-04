@@ -79,6 +79,7 @@ void ImageHolder::setUpPipe()
 	if (!m_Physical ) {
 		m_ActorAxial->SetUserMatrix( m_MatrixHandler.getAxialMatrix1() );
 		m_ActorAxial->SetPosition(m_pseudoOrigin[0], m_pseudoOrigin[1], m_pseudoOrigin[2]);
+
 	} else {
 		m_ActorAxial->SetUserMatrix( m_MatrixHandler.getAxialMatrix() );
 		m_ActorAxial->SetPosition( m_ISISImage->getProperty<util::fvector4>("indexOrigin")[0],

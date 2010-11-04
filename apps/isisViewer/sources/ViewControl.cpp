@@ -174,10 +174,16 @@ void ViewControl::displayIntensity( const int& x, const int& y, const int &z )
 void ViewControl::sliceChanged( const int& x, const int& y, const int& z)
 {
 	LOG( Runtime, info ) << "ViewControl::sliceChanged";
+//	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference refImg, m_ImageHolderVector)
+//	{
+//		if ( not refImg->setSliceCoordinates(x,y,z) ) LOG( Runtime, error ) << "error during setting slicesetting!";
+//	}
 	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference refImg, m_ImageHolderVector)
 	{
-		if ( not refImg->setSliceCoordinates(x,y,z) ) LOG( Runtime, error ) << "error during setting slicesetting!";
+		refImg->getActorAxial()->GetProperty()->SetOpacity(0.2);
 	}
+	m_CurrentImageHolder->setSliceCoordinates(x,y,z) ;
+
 	UpdateWidgets();
 }
 
