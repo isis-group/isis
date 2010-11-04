@@ -45,8 +45,10 @@ class ImageFormat_Vista: public FileFormat
 {
 public:
 
-	std::string name() { return std::string( "Vista" );}
-	std::string suffixes() {return std::string( ".v" );}
+	std::string name()const { return std::string( "Vista" );}
+	std::string suffixes()const {return std::string( ".v" );}
+	bool tainted()const {return false;}//internal plugins are not tainted
+
 	/**
 	 * This plugin supports the following dialects:
 	 *
@@ -62,7 +64,7 @@ public:
 	 * </ul>
 	 *
 	 */
-	std::string dialects(const std::string &filename) {return std::string( "functional map anatomical" );}
+	std::string dialects(const std::string &filename)const {return std::string( "functional map anatomical" );}
 	int load( data::ChunkList &chunks, const std::string &filename,
 			  const std::string &dialect ) throw( std::runtime_error & );
 	void write( const data::Image &image, const std::string &filename,

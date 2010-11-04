@@ -27,7 +27,10 @@
 #include "DataStorage/io_factory.hpp"
 #include "CoreUtils/vector.hpp"
 
+#include "common.hpp"
 #include "ui_isisViewer.h"
+#include "viewerCore.hpp"
+
 
 #include "ImageHolder.hpp"
 #include "ViewerInteractor.hpp"
@@ -36,9 +39,14 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/foreach.hpp>
 
+#include <vtkSmartPointer.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
+
+namespace isis {
+
+namespace viewer {
 
 class ViewerInteractor;
 class ImageHolder;
@@ -55,40 +63,40 @@ public:
 
 	void displayIntensity( const int&, const int&, const int& );
 
+	void UpdateWidgets();
+
 	vtkImageData* m_CurrentImagePtr;
 	boost::shared_ptr<ImageHolder> m_CurrentImageHolder;
 private slots:
-	void valueChangedSagittal( int );
-	void valueChangedCoronal( int );
-	void valueChangedAxial( int );
-	
+	void timeStepChanged( int );
+	void checkPhysicalChanged( bool );
+
 signals:
 	void clicked( bool );
 	void valueChanged( int );
 
 private:
 	Ui::isisViewer ui;
-	std::vector< boost::shared_ptr< ImageHolder > > m_ImageVector;
+	std::vector< boost::shared_ptr< ImageHolder > > m_ImageHolderVector;
 	void setUpPipe();
 
+	vtkSmartPointer<vtkRenderer> m_RendererAxial;
+	vtkSmartPointer<vtkRenderer> m_RendererSagittal;
+	vtkSmartPointer<vtkRenderer> m_RendererCoronal;
 
-	vtkRenderer* m_RendererAxial;
-	vtkRenderer* m_RendererSagittal;
-	vtkRenderer* m_RendererCoronal;
+	vtkSmartPointer<vtkRenderWindow> m_WindowAxial;
+	vtkSmartPointer<vtkRenderWindow> m_WindowSagittal;
+	vtkSmartPointer<vtkRenderWindow> m_WindowCoronal;
 
-	vtkRenderWindow* m_WindowAxial;
-	vtkRenderWindow* m_WindowSagittal;
-	vtkRenderWindow* m_WindowCoronal;
+	vtkSmartPointer<ViewerInteractor> m_InteractionStyleCoronal;
+	vtkSmartPointer<ViewerInteractor> m_InteractionStyleSagittal;
+	vtkSmartPointer<ViewerInteractor> m_InteractionStyleAxial;
 
-	ViewerInteractor* m_InteractionStyleCoronal;
-	ViewerInteractor* m_InteractionStyleSagittal;
-	ViewerInteractor* m_InteractionStyleAxial;
-
-	vtkRenderWindowInteractor* m_InteractorAxial;
-	vtkRenderWindowInteractor* m_InteractorSagittal;
-	vtkRenderWindowInteractor* m_InteractorCoronal;
+	vtkSmartPointer<vtkRenderWindowInteractor> m_InteractorAxial;
+	vtkSmartPointer<vtkRenderWindowInteractor> m_InteractorSagittal;
+	vtkSmartPointer<vtkRenderWindowInteractor> m_InteractorCoronal;
 
 };
-
+}}
 #endif
 	

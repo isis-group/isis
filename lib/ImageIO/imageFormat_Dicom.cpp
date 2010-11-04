@@ -134,9 +134,9 @@ using boost::gregorian::date;
 const char ImageFormat_Dicom::dicomTagTreeName[] = "DICOM";
 const char ImageFormat_Dicom::unknownTagName[] = "Unknown Tag";
 
-std::string ImageFormat_Dicom::suffixes() {return std::string( ".ima .dcm" );}
-std::string ImageFormat_Dicom::name() {return "Dicom";}
-std::string ImageFormat_Dicom::dialects(const std::string &filename) {return "withPhoenixProtocol nomosaic";}
+std::string ImageFormat_Dicom::suffixes()const {return std::string( ".ima .dcm" );}
+std::string ImageFormat_Dicom::name()const {return "Dicom";}
+std::string ImageFormat_Dicom::dialects(const std::string &filename)const {return "withPhoenixProtocol nomosaic";}
 
 
 
@@ -509,7 +509,7 @@ void ImageFormat_Dicom::write( const data::Image &image, const std::string &file
 	throw( std::runtime_error( "writing dicom files is not yet supportet" ) );
 }
 
-bool ImageFormat_Dicom::tainted() {return false;}//internal plugins are not tainted
+bool ImageFormat_Dicom::tainted()const {return false;}//internal plugins are not tainted
 }
 }
 

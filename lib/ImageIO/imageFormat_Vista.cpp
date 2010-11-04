@@ -712,7 +712,6 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 	//      VAppendAttr( list, "slice_time", NULL, VShortRepn,
 	//                   map.getProperty<int16_t>( "acquisitionTime" ) );
 	//  }
-
 	if ( functional ) {
 		// Deriving slice time from acquisition time. This is only ok if we have
 		// timing information for every slice. Hence the cunks should be split to
@@ -730,7 +729,6 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 				float stime;
 				stime = image.getChunkAt( slice ).getProperty<float>( "acquisitionTime" );
 				stime -= sliceTimeOffset;
-				stime *= 1000;
 				sstream << stime;
 				VAppendAttr ( list, "slice_time", NULL, VStringRepn, sstream.str().c_str() );
 			}

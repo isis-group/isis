@@ -24,6 +24,10 @@
 #include "isisViewer.hpp"
 #include "Adapter/vtkAdapter.hpp"
 
+namespace isis {
+
+namespace viewer {
+
 
 isisViewer::isisViewer( const isis::util::slist& fileList, QMainWindow *parent )
 		: QMainWindow( parent )
@@ -51,10 +55,8 @@ isisViewer::isisViewer( const isis::util::slist& fileList, QMainWindow *parent )
 
 	ui.setupUi( this );
 	//connections qt
-
-	QObject::connect( this->ui.verticalSlider, SIGNAL( valueChanged( int ) ), this, SLOT( valueChangedSagittal( int ) ) );
-	QObject::connect( this->ui.verticalSlider_2, SIGNAL( valueChanged( int ) ), this, SLOT( valueChangedCoronal( int) ) );
-	QObject::connect( this->ui.verticalSlider_3, SIGNAL( valueChanged( int ) ), this, SLOT( valueChangedAxial( int ) ) );
+	QObject::connect( this->ui.checkPhysical, SIGNAL( clicked( bool ) ), this, SLOT( checkPhysicalChanged( bool ) ) );
+	QObject::connect( this->ui.timeStepSpinBox, SIGNAL( valueChanged( int ) ), this, SLOT( timeStepChanged( int ) ) );
 
 	//go through all files
 	BOOST_FOREACH( isis::util::slist::const_reference refFile, fileList )
@@ -64,31 +66,29 @@ isisViewer::isisViewer( const isis::util::slist& fileList, QMainWindow *parent )
 		BOOST_FOREACH( isis::data::ImageList::const_reference refImage, imgList )
 		{
 			boost::shared_ptr< ImageHolder > tmpVec( new ImageHolder );
-			tmpVec->setImage( isis::adapter::vtkAdapter::makeVtkImageObject( refImage,false,0 ), refImage );
+			tmpVec->setImages( refImage, isis::adapter::vtkAdapter::makeVtkImageObject( refImage  ) );
 			tmpVec->setReadVec( refImage->getProperty<isis::util::fvector4>("readVec") );
 			tmpVec->setPhaseVec( refImage->getProperty<isis::util::fvector4>("phaseVec") );
 			tmpVec->setSliceVec( refImage->getProperty<isis::util::fvector4>("sliceVec") );
-			m_ImageVector.push_back( tmpVec );
-
+			m_ImageHolderVector.push_back( tmpVec );
 		}
 	}
-	if (!m_ImageVector.empty() ) {
-		m_CurrentImagePtr = m_ImageVector.front()->getVTKImageData();
-		m_CurrentImageHolder = m_ImageVector.front();
+	if (!m_ImageHolderVector.empty() ) {
+		m_CurrentImagePtr = m_ImageHolderVector.front()->getVTKImageData();
+		m_CurrentImageHolder = m_ImageHolderVector.front();
+		if(m_CurrentImageHolder->getNumberOfTimesteps() > 1 ) {
+			this->ui.timeStepSpinBox->setMaximum( m_CurrentImageHolder->getNumberOfTimesteps() - 1);
+		} else {
+			this->ui.timeStepSpinBox->setEnabled( false );
+		}
 	}
 
-
-	ui.verticalSlider->setRange(0, m_CurrentImagePtr->GetDimensions()[2]-1);
-	ui.verticalSlider_2->setRange(0, m_CurrentImagePtr->GetDimensions()[1]-1);
-	ui.verticalSlider_3->setRange(0, m_CurrentImagePtr->GetDimensions()[0]-1);
-
-	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference ref, m_ImageVector )
+	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference ref, m_ImageHolderVector )
 	{
 		m_RendererAxial->AddActor( ref->getActorAxial() );
 		m_RendererCoronal->AddActor( ref->getActorCoronal() );
 		m_RendererSagittal->AddActor( ref->getActorSagittal() );
 	}
-
 	m_InteractorAxial->SetDesiredUpdateRate(0.1);
 	m_InteractorAxial->Initialize();
 	m_InteractorSagittal->Initialize();
@@ -118,10 +118,16 @@ void isisViewer::setUpPipe()
 
 void isisViewer::resetCam()
 {
-	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference refImg, m_ImageVector)
+	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference refImg, m_ImageHolderVector)
 	{
 		refImg->resetSliceCoordinates();
 	}
+	UpdateWidgets();
+
+}
+
+void isisViewer::UpdateWidgets()
+{
 	m_RendererAxial->ResetCamera();
 	m_RendererSagittal->ResetCamera();
 	m_RendererCoronal->ResetCamera();
@@ -129,7 +135,6 @@ void isisViewer::resetCam()
 	m_WindowAxial->Render();
 	m_WindowCoronal->Render();
 	m_WindowSagittal->Render();
-
 }
 
 //gui interactions
@@ -137,34 +142,38 @@ void isisViewer::resetCam()
 
 void isisViewer::displayIntensity( const int& x, const int& y, const int& z )
 {
+	const int t = m_CurrentImageHolder->getCurrentTimeStep();
+	isis::util::fvector4 tmpVec = isis::util::fvector4(x,y,z,t);
+//	isis::util::fvector4 mappedVec = isis::viewer::mapCoordinates<float>(m_CurrentImageHolder->getOriginalMatrix(), tmpVec, m_CurrentImageHolder->getISISImage()->sizeToVector());
 	QString atString;
 	atString.sprintf("at %d %d %d", x, y, z);
 	ui.atLabel->setText(atString);
-	switch ( m_ImageVector.front()->getISISImage()->getChunk(x, y, z ).typeID() )
+
+	switch (m_CurrentImageHolder->getISISImage()->getChunk(x,y,z,t ).typeID() )
 	{
 	case isis::data::TypePtr<int8_t>::staticID:
-		ui.pxlIntensityContainer->display(m_ImageVector.front()->getISISImage()->voxel<int8_t>(x, y,z));
+		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<int8_t>(x, y,z, t));
 		break;
 	case isis::data::TypePtr<u_int8_t>::staticID:
-		ui.pxlIntensityContainer->display(m_ImageVector.front()->getISISImage()->voxel<u_int8_t>(x, y,z));
+		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<u_int8_t>(x, y,z, t));
 		break;
 	case isis::data::TypePtr<int16_t>::staticID:
-		ui.pxlIntensityContainer->display(m_ImageVector.front()->getISISImage()->voxel<int16_t>(x, y,z));
+		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<int16_t>(x, y,z, t));
 		break;
 	case isis::data::TypePtr<u_int16_t>::staticID:
-		ui.pxlIntensityContainer->display(m_ImageVector.front()->getISISImage()->voxel<u_int16_t>(x, y,z));
+		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<u_int16_t>(x, y,z, t));
 		break;
 	case isis::data::TypePtr<int32_t>::staticID:
-		ui.pxlIntensityContainer->display(m_ImageVector.front()->getISISImage()->voxel<int32_t>(x, y,z));
+		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<int32_t>(x, y,z, t));
 		break;
 //	case isis::data::TypePtr<u_int32_t>::staticID:
-//		ui.pxlIntensityContainer->display(m_ImageVector.front()->getISISImage()->voxel<u_int32_t>(x, y,z));
+//		ui.pxlIntensityContainer->display(m_ImageVector.front()->getISISImage()->voxel<u_int32_t>(x, y,z, t));
 //		break;
 	case isis::data::TypePtr<float>::staticID:
-		ui.pxlIntensityContainer->display(m_ImageVector.front()->getISISImage()->voxel<float>(x, y,z));
+		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<float>(x, y,z, t));
 		break;
 	case isis::data::TypePtr<double>::staticID:
-		ui.pxlIntensityContainer->display(m_ImageVector.front()->getISISImage()->voxel<double>(x, y,z));
+		ui.pxlIntensityContainer->display(m_CurrentImageHolder->getISISImage()->voxel<double>(x, y,z, t));
 		break;
 	default:
 		ui.pxlIntensityContainer->display(tr("Error"));
@@ -174,33 +183,29 @@ void isisViewer::displayIntensity( const int& x, const int& y, const int& z )
 
 void isisViewer::sliceChanged( const int& x, const int& y, const int& z)
 {
-	std::cout << x << ":" << y << ":" << z << std::endl;
-	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference refImg, m_ImageVector)
+	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference refImg, m_ImageHolderVector)
 	{
 		if ( not refImg->setSliceCoordinates(x,y,z) ) std::cout << "error during setting slicesetting!" << std::endl;
 	}
-	m_RendererAxial->ResetCamera();
-	m_RendererSagittal->ResetCamera();
-	m_RendererCoronal->ResetCamera();
-	m_WindowAxial->Render();
-	m_WindowCoronal->Render();
-	m_WindowSagittal->Render();
-
-
+	UpdateWidgets();
 }
 
-void isisViewer::valueChangedSagittal( int val )
+void isisViewer::timeStepChanged( int val )
 {
-	sliceChanged( ui.verticalSlider->value(), ui.verticalSlider_2->value(), ui.verticalSlider_3->value() );
+	m_CurrentImageHolder->setCurrentTimeStep( val );
+	UpdateWidgets();
 
 }
 
-void isisViewer::valueChangedCoronal( int val )
+void isisViewer::checkPhysicalChanged( bool physical )
 {
-	sliceChanged( ui.verticalSlider->value(), ui.verticalSlider_2->value(), ui.verticalSlider_3->value() );
+	LOG(Runtime, info) << "Setting physical to " << physical;
+	BOOST_FOREACH(std::vector< boost::shared_ptr< ImageHolder > >::const_reference ref, m_ImageHolderVector)
+	{
+		ref->setPhysical( physical );
+	}
+
+	UpdateWidgets();
 }
 
-void isisViewer::valueChangedAxial( int val )
-{
-	sliceChanged( ui.verticalSlider->value(), ui.verticalSlider_2->value(), ui.verticalSlider_3->value() );
-}
+}}

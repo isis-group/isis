@@ -3,6 +3,7 @@
 
 #include <map>
 #include <boost/assign.hpp>
+#include <boost/foreach.hpp>
 
 using namespace isis;
 

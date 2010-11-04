@@ -20,7 +20,7 @@ void FileFormat::write( const isis::data::ImageList &images, const std::string &
 	std::list<std::string> names=makeUniqueFilenames(images,filename);
 	std::list<std::string>::const_iterator inames=names.begin();
 	BOOST_FOREACH( data::ImageList::const_reference ref, images ) {
-		std::string uniquePath=*inames;
+		std::string uniquePath=*(inames++);
 		LOG( Runtime, info )   << "Writing image to " <<  uniquePath;
 		write( *ref, uniquePath, dialect );
 	}
@@ -63,6 +63,8 @@ std::pair< std::string, std::string > FileFormat::makeBasename(const std::string
 	BOOST_FOREACH(const std::string &suff,suffixes){
 		size_t at=filename.rfind(suff);
 		if(at!=filename.npos){
+			if(at && filename[at-1]=='.')
+				at--;
 			return std::make_pair(filename.substr(0,at),filename.substr(at));
 		}
 	}

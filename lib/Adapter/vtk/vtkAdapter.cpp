@@ -27,97 +27,42 @@ namespace isis
 namespace adapter
 {
 
-vtkAdapter::vtkAdapter( const boost::shared_ptr<isis::data::Image> src )
-	: m_ImageISIS( src )
-{}
-
 //return a list of vtkImageData type pointer
-vtkImageData *vtkAdapter::makeVtkImageObject( const boost::shared_ptr<data::Image> src, bool keepType, size_t dim4 )
+std::vector<vtkSmartPointer<vtkImageData> >vtkAdapter::makeVtkImageObject( const boost::shared_ptr<data::Image> src )
 {
-	vtkAdapter *myAdapter;
-	vtkImageData *vtkImage = vtkImageData::New();
-	vtkImageImport *importer = vtkImageImport::New();
-	if( !keepType ) {
-		boost::shared_ptr<data::Image> imgPtr ( new data::TypedImage<u_int8_t>( *src ) );
-		myAdapter = new vtkAdapter( imgPtr );
-		importer->SetDataScalarTypeToUnsignedChar();
-		vtkImage->SetScalarTypeToUnsignedChar();
-		importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<u_int8_t>( 0,0,0,dim4 ) );
-	} else {
-		myAdapter = new vtkAdapter( src );
-	}
-	const util::fvector4 dimensions( myAdapter->m_ImageISIS->sizeToVector() );
-	const util::fvector4 indexOrigin( myAdapter->m_ImageISIS->getProperty<util::fvector4>( "indexOrigin" ) );
-	const util::fvector4 spacing( myAdapter->m_ImageISIS->getProperty<util::fvector4>( "voxelSize" ) );
+	const util::fvector4 indexOrigin( src->getProperty<util::fvector4>( "indexOrigin" ) );
+	const util::fvector4 spacing( src->getProperty<util::fvector4>( "voxelSize" ) );
+	std::vector<vtkSmartPointer<vtkImageData> > retVector;
 
-	if ( dim4 > dimensions[3] - 1 ) dim4 = dimensions[3] - 1;
 
-	//set the datatype for the vtkImage object
-	//TODO check datatypes
-
-	void *targePtr = malloc( myAdapter->m_ImageISIS->bytes_per_voxel() * myAdapter->m_ImageISIS->volume() );
+	boost::shared_ptr<data::Image> typedPtr ( new data::TypedImage<u_int8_t>( *src ) );
+	void *targePtr = malloc( typedPtr->bytes_per_voxel() * typedPtr->volume() );
 	uint8_t *refTarget = ( uint8_t * ) targePtr;
-	std::vector< boost::shared_ptr< data::Chunk> > chList = myAdapter->m_ImageISIS->getChunkList();
+	std::vector< boost::shared_ptr< data::Chunk> > chList = typedPtr->getChunkList();
 	size_t chunkIndex = 0;
+
 	BOOST_FOREACH( boost::shared_ptr< data::Chunk> & ref, chList ) {
 		data::Chunk &chRef = *ref;
-		uint8_t *target = refTarget + chunkIndex++ * chRef.volume();
+		u_int8_t *target = refTarget + chunkIndex++ * chRef.volume();
 		chRef.getTypePtr<uint8_t>().copyToMem( 0, ( chRef.volume() - 1 ), target );
 	}
-
-
-	if ( keepType ) {
-		switch ( myAdapter->m_ImageISIS->typeID() ) {
-		case data::TypePtr<int8_t>::staticID:
-			importer->SetDataScalarTypeToUnsignedChar();
-			importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<int8_t>( 0, 0, 0, dim4 ) );
-			vtkImage->SetScalarTypeToChar();
-			break;
-		case data::TypePtr<u_int8_t>::staticID:
-			importer->SetDataScalarTypeToUnsignedChar();
-			vtkImage->SetScalarTypeToUnsignedChar();
-			importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<u_int8_t>( 0, 0, 0, dim4 ) );
-			break;
-		case data::TypePtr<int16_t>::staticID:
-			importer->SetDataScalarTypeToShort();
-			vtkImage->SetScalarTypeToShort();
-			importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<int16_t>( 0, 0, 0, dim4 ) );
-			break;
-		case data::TypePtr<u_int16_t>::staticID:
-			importer->SetDataScalarTypeToUnsignedShort();
-			vtkImage->SetScalarTypeToUnsignedShort();
-			importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<u_int16_t>( 0, 0, 0, dim4 ) );
-			break;
-		case data::TypePtr<int32_t>::staticID:
-			importer->SetDataScalarTypeToInt();
-			vtkImage->SetScalarTypeToInt();
-			importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<int32_t>( 0, 0, 0, dim4 ) );
-			break;
-		case data::TypePtr<u_int32_t>::staticID:
-			importer->SetDataScalarTypeToInt();
-			vtkImage->SetScalarTypeToUnsignedInt();
-			importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<u_int32_t>( 0, 0, 0, dim4 ) );
-			break;
-		case data::TypePtr<float>::staticID:
-			importer->SetDataScalarTypeToFloat();
-			vtkImage->SetScalarTypeToFloat();
-			importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<float>( 0, 0, 0, dim4 ) );
-			break;
-		case data::TypePtr<double>::staticID:
-			importer->SetDataScalarTypeToDouble();
-			vtkImage->SetScalarTypeToDouble();
-			importer->SetImportVoidPointer( &myAdapter->m_ImageISIS->voxel<double>( 0, 0, 0, dim4 ) );
-			break;
-		}
+	size_t imageVolume3D = typedPtr->sizeToVector()[0] * typedPtr->sizeToVector()[1] * typedPtr->sizeToVector()[2];
+	for ( size_t t = 0; t<typedPtr->sizeToVector()[3]; t++ ) {
+		vtkSmartPointer<vtkImageImport> importer = vtkImageImport::New();
+		vtkSmartPointer<vtkImageData> vtkImage = vtkImageData::New();
+		importer->SetDataScalarTypeToUnsignedChar();
+		vtkImage->SetScalarTypeToUnsignedChar();
+		importer->SetImportVoidPointer( refTarget + t * imageVolume3D );
+		importer->SetWholeExtent( 0, typedPtr->sizeToVector()[0] - 1, 0, typedPtr->sizeToVector()[1] - 1, 0, typedPtr->sizeToVector()[2] - 1);
+		importer->SetDataExtentToWholeExtent();
+		importer->Update();
+		vtkImage = importer->GetOutput();
+		vtkImage->SetSpacing( spacing[0], spacing[1], spacing[2] );
+		vtkImage->SetOrigin( indexOrigin[0], indexOrigin[1], indexOrigin[2] );
+		vtkImage->Update();
+		retVector.push_back(vtkImage);
 	}
-
-	importer->SetWholeExtent( 0, dimensions[0] - 1, 0, dimensions[1] - 1, 0, dimensions[2] - 1 );
-	importer->SetDataExtentToWholeExtent();
-	importer->Update();
-	vtkImage = importer->GetOutput();
-	vtkImage->SetOrigin( indexOrigin[0], indexOrigin[1], indexOrigin[2] );
-	vtkImage->SetSpacing( spacing[0], spacing[1], spacing[2] );
-	return vtkImage;
+	return retVector;
 }
 
 }

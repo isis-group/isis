@@ -35,6 +35,10 @@
 #include <vtkRenderer.h>
 #include <vtkCellPicker.h>
 
+namespace isis {
+
+namespace viewer {
+
 class isisViewer;
 
 class ViewerInteractor : public vtkInteractorStyle
@@ -52,6 +56,8 @@ private:
 
 	vtkCellPicker* m_Picker;
 
+
+
 public:
 	virtual void Zoom();
 	virtual void OnMouseMove();
@@ -61,6 +67,6 @@ public:
 	ViewerInteractor( isisViewer*, vtkRenderer* );
 };
 
-
+}}
 #endif /* VIEWERINTERACTOR_HPP_ */
 

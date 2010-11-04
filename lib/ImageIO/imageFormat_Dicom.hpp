@@ -39,7 +39,6 @@ class ImageFormat_Dicom: public FileFormat
 	template<typename BASE, typename DST> static DST endian( const BASE *b ) {
 		DST ret = 0;
 #if __BYTE_ORDER == __LITTLE_ENDIAN
-
 		for ( short i = 0; i < ( short )sizeof( DST ); i++ )
 #elif __BYTE_ORDER == __BIG_ENDIAN
 		for ( short i = ( short )sizeof( DST ) - 1; i >= 0; i-- )
@@ -53,7 +52,7 @@ class ImageFormat_Dicom: public FileFormat
 	static size_t parseCSAEntry( Uint8 *at, isis::util::PropMap &map, const std::string &dialect );
 	static bool parseCSAValue( const std::string &val, const std::string &name, const char *const vr, isis::util::PropMap &map );
 	static bool parseCSAValueList( const isis::util::slist &val, const std::string &name, const char *const vr, isis::util::PropMap &map );
-	int readMosaic( data::Chunk source, data::ChunkList &dest );
+	static int readMosaic( data::Chunk source, data::ChunkList &dest );
 public:
 	static const char dicomTagTreeName[];
 	static const char unknownTagName[];
@@ -63,14 +62,14 @@ public:
 	static void parseList( DcmElement *elem, const std::string &name, isis::util::PropMap &map );
 	static void dcmObject2PropMap( DcmObject *master_obj, isis::util::PropMap &map, const std::string &dialect );
 	static void sanitise( util::PropMap &object, string dialect );
-	std::string suffixes();
-	std::string name();
-	std::string dialects(const std::string& filename);
+	std::string suffixes()const;
+	std::string name()const;
+	std::string dialects(const std::string& filename)const;
 
 	int load( data::ChunkList &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & );
 	void write( const data::Image &image, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & );
 
-	bool tainted();
+	bool tainted()const;
 };
 }
 }
