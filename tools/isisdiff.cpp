@@ -117,8 +117,8 @@ int main( int argc, char *argv[] )
 			size_t voxels = first.cmp( second );
 
 			if ( voxels != 0 ) {
-				std::cout << voxels
-						  << " of " << first.sizeToVector().product() << " voxels in " << files.front() << countStr << " and "
+				std::cout << voxels*100/first.sizeToVector().product() 
+						  << "% of the voxels in " << files.front() << countStr << " and "
 						  << files.back() << countStr  << " differ" << std::endl;
 				ret++;
 			}
