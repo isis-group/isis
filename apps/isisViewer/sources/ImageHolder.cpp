@@ -34,6 +34,9 @@ ImageHolder::ImageHolder()
 	m_ExtractAxial = vtkImageClip::New();
 	m_ExtractSagittal = vtkImageClip::New();
 	m_ExtractCoronal = vtkImageClip::New();
+	m_TrivialProducerAxial = vtkTrivialProducer::New();
+	m_TrivialProducerSagittal = vtkTrivialProducer::New();
+	m_TrivialProducerCoronal = vtkTrivialProducer::New();
 	m_MapperAxial = vtkDataSetMapper::New();
 	m_MapperSagittal = vtkDataSetMapper::New();
 	m_MapperCoronal = vtkDataSetMapper::New();
@@ -63,8 +66,10 @@ bool ImageHolder::setSliceCoordinates( const int& x, const int& y, const int& z 
 
 void ImageHolder::setUpPipe()
 {
+	LOG(Runtime, info) << "ImageHolder::setUpPipe";
 	//axial
-	m_ExtractAxial->SetInput( m_ImageVector[m_currentTimestep] );
+	m_ExtractAxial->SetInput( m_ImageVector[m_currentTimestep]);
+	m_ExtractAxial->Update();
 	m_MapperAxial->SetInput( m_ExtractAxial->GetOutput() );
 	m_ActorAxial->SetMapper( m_MapperAxial );
 	m_ActorAxial->GetProperty()->SetInterpolationToFlat();
@@ -79,7 +84,8 @@ void ImageHolder::setUpPipe()
 	}
 
 	//sagittal
-	m_ExtractSagittal->SetInput( m_ImageVector[m_currentTimestep] );
+	m_ExtractSagittal->SetInput( m_ImageVector[m_currentTimestep]);
+	m_ExtractSagittal->Update();
 	m_MapperSagittal->SetInput( m_ExtractSagittal->GetOutput() );
 	m_ActorSagittal->SetMapper( m_MapperSagittal );
 	m_ActorSagittal->GetProperty()->SetInterpolationToFlat();
@@ -94,7 +100,8 @@ void ImageHolder::setUpPipe()
 	}
 
 	//coronal
-	m_ExtractCoronal->SetInput( m_ImageVector[m_currentTimestep] );
+	m_ExtractCoronal->SetInput( m_ImageVector[m_currentTimestep]);
+	m_ExtractSagittal->Update();
 	m_MapperCoronal->SetInput( m_ExtractCoronal->GetOutput() );
 	m_ActorCoronal->SetMapper( m_MapperCoronal );
 	m_ActorCoronal->GetProperty()->SetInterpolationToFlat();
@@ -130,8 +137,8 @@ void ImageHolder::setImages( boost::shared_ptr<isis::data::Image> isisImg,  std:
 	m_MatrixHandler.setVectors( m_readVec, m_phaseVec, m_sliceVec );
 	commonInit();
 	createOrientedImages();
-	resetSliceCoordinates();
 	setUpPipe();
+	resetSliceCoordinates();
 
 }
 

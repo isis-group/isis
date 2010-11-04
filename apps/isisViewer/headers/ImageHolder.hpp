@@ -39,6 +39,7 @@
 #include <vtkMatrix4x4.h>
 #include <vtkTransform.h>
 #include <vtkSmartPointer.h>
+#include <vtkTrivialProducer.h>
 
 #include "CoreUtils/vector.hpp"
 #include "DataStorage/image.hpp"
@@ -97,6 +98,9 @@ private:
 	vtkSmartPointer<vtkImageClip> m_ExtractAxial;
 	vtkSmartPointer<vtkImageClip> m_ExtractSagittal;
 	vtkSmartPointer<vtkImageClip> m_ExtractCoronal;
+	vtkSmartPointer<vtkTrivialProducer> m_TrivialProducerAxial;
+	vtkSmartPointer<vtkTrivialProducer> m_TrivialProducerSagittal;
+	vtkSmartPointer<vtkTrivialProducer> m_TrivialProducerCoronal;
 	std::vector<vtkSmartPointer<vtkImageClip> > m_ExtractorVector;
 	vtkSmartPointer<vtkDataSetMapper> m_MapperAxial;
 	vtkSmartPointer<vtkDataSetMapper> m_MapperSagittal;

@@ -28,8 +28,8 @@ namespace isis {
 namespace viewer {
 
 isisViewer::isisViewer( )
-
 {
+	LOG(Runtime, info ) << "isisViewer::isisViewer";
 	m_CurrentImagePtr = vtkImageData::New();
 
 	m_RendererAxial = vtkRenderer::New();
@@ -50,12 +50,13 @@ isisViewer::isisViewer( )
 
 	setUpPipe();
 
-	m_InteractorAxial->SetDesiredUpdateRate(0.1);
+
 
 }
 
 void isisViewer::init(QVTKWidget *axial, QVTKWidget *sagittal, QVTKWidget *coronal )
 {
+	LOG (Runtime, info ) << "isisViewer::init";
 	m_AxialWidget = axial;
 	m_SagittalWidget = sagittal;
 	m_CoronalWidget = coronal;
@@ -64,6 +65,7 @@ void isisViewer::init(QVTKWidget *axial, QVTKWidget *sagittal, QVTKWidget *coron
 
 void isisViewer::addImages( const ImageMapType& fileMap )
 {
+	LOG(Runtime, info) << "isisViewer::addImages";
 	BOOST_FOREACH( ImageMapType::const_reference ref, fileMap )
 	{
 		boost::shared_ptr< ImageHolder > tmpVec( new ImageHolder );
@@ -80,14 +82,19 @@ void isisViewer::addImages( const ImageMapType& fileMap )
 	}
 	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference ref, m_ImageHolderVector )
 	{
+		LOG(Runtime, info) << "Adding actors to renderers";
 		m_RendererAxial->AddActor( ref->getActorAxial() );
 		m_RendererCoronal->AddActor( ref->getActorCoronal() );
 		m_RendererSagittal->AddActor( ref->getActorSagittal() );
 	}
 	//TODO only if first image is added?
+	LOG(Runtime, info ) << "Initializing interactors";
 	m_InteractorAxial->Initialize();
 	m_InteractorSagittal->Initialize();
 	m_InteractorCoronal->Initialize();
+	m_InteractorCoronal->Initialize();
+
+	LOG(Runtime, info) << "Setting render windows of QVTKWidgets";
 	m_CoronalWidget->SetRenderWindow( m_WindowCoronal );
 	m_AxialWidget->SetRenderWindow( m_WindowAxial );
 	m_SagittalWidget->SetRenderWindow( m_WindowSagittal );
@@ -97,6 +104,7 @@ void isisViewer::addImages( const ImageMapType& fileMap )
 
 void isisViewer::setUpPipe()
 {
+	LOG( Runtime, info ) << "Setting up the pipe";
 	m_InteractorCoronal->SetInteractorStyle( m_InteractionStyleCoronal );
 	m_InteractorSagittal->SetInteractorStyle( m_InteractionStyleSagittal );
 	m_InteractorAxial->SetInteractorStyle( m_InteractionStyleAxial );
@@ -109,10 +117,15 @@ void isisViewer::setUpPipe()
 	m_WindowSagittal->AddRenderer( m_RendererSagittal );
 	m_WindowAxial->AddRenderer( m_RendererAxial );
 
+	m_InteractorAxial->SetDesiredUpdateRate(0.1);
+	m_InteractorSagittal->SetDesiredUpdateRate(0.1);
+	m_InteractorCoronal->SetDesiredUpdateRate(0.1);
+
 }
 
 void isisViewer::resetCam()
 {
+	LOG(Runtime, info) << "isisViewer::resetCam";
 	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference refImg, m_ImageHolderVector)
 	{
 		refImg->resetSliceCoordinates();
@@ -122,14 +135,18 @@ void isisViewer::resetCam()
 
 void isisViewer::UpdateWidgets()
 {
-
+	LOG(Runtime, info ) << "isisViewer::UpdateWidgets";
 	m_RendererAxial->ResetCamera();
 	m_RendererSagittal->ResetCamera();
 	m_RendererCoronal->ResetCamera();
+	m_AxialWidget->update();
+	m_SagittalWidget->update();
+	m_CoronalWidget->update();
 
-	m_WindowAxial->Render();
-	m_WindowCoronal->Render();
-	m_WindowSagittal->Render();
+
+//	m_WindowAxial->Render();
+//	m_WindowCoronal->Render();
+//	m_WindowSagittal->Render();
 }
 
 //gui interactions
