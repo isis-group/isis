@@ -139,8 +139,16 @@ public:
 	}
 
 	int load ( data::ChunkList &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) {
-		const std::string unzipped_suffix = boost::filesystem::extension( boost::filesystem::basename( filename ) );
-		util::TmpFile tmpfile( "", unzipped_suffix );
+		const std::pair<std::string,std::string> proxyBase=FileFormat::makeBasename(filename); // get rid of the the .gz
+
+		//then get the actual plugin for the format
+		const data::IOFactory::FileFormatList formats=data::IOFactory::get().getFormatInterface(proxyBase.first );
+		if(formats.empty()){
+			throwGenericError("Cannot determine the unzipped suffix of \"" + filename + "\" because no io-plugin was found for it");
+		}
+		const std::pair<std::string,std::string> realBase=formats.front()->makeBasename(proxyBase.first);
+		util::TmpFile tmpfile( "", realBase.second );
+
 		LOG( Debug, info ) <<  "tmpfile=" << tmpfile;
 		file_uncompress( filename, tmpfile.string() );
 		data::ChunkList buff;
