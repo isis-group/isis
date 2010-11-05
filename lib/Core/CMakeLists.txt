@@ -156,6 +156,7 @@ SET ( SRC_FILES
   DataStorage/common.cpp )
 
 SET (COREUTILS_HDR_FILES
+  ./CoreUtils/istring.hpp
   ./CoreUtils/tmpfile.h
   ./CoreUtils/progparameter.hpp
   ./CoreUtils/type_converter.hpp
