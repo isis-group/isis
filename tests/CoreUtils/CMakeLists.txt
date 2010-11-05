@@ -6,6 +6,7 @@ add_executable( propMapTest propMapTest.cpp )
 add_executable( singletonTest singletonTest.cpp )
 add_executable( selectionTest selectionTest.cpp )
 add_executable( commonTest commonTest.cpp )
+add_executable( istringTest istringTest.cpp )
 
 target_link_libraries( commonTest ${Boost_LIBRARIES} ${ISIS_LIB} ${ISIS_LIB_DEPENDS} )
 target_link_libraries( propertyTest ${Boost_LIBRARIES} ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
@@ -14,3 +15,4 @@ target_link_libraries( vectorTest ${Boost_LIBRARIES} ${ISIS_LIB} ${ISIS_LIB_DEPE
 target_link_libraries( propMapTest ${Boost_LIBRARIES} ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
 target_link_libraries( singletonTest ${Boost_LIBRARIES} ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
 target_link_libraries( selectionTest ${Boost_LIBRARIES} ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
+target_link_libraries( istringTest ${Boost_LIBRARIES} ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
