@@ -103,11 +103,11 @@ private:
 		}
 	}
 
-
-public:
+protected:
 	std::string suffixes()const {
 		return std::string( ".gz" );
 	}
+public:
 	std::string dialects(const std::string &filename)const{
 		if(filename.empty()){
 			return std::string();

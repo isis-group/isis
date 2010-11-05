@@ -43,10 +43,10 @@ namespace image_io
 
 class ImageFormat_Vista: public FileFormat
 {
-public:
-
-	std::string name()const { return std::string( "Vista" );}
+protected:
 	std::string suffixes()const {return std::string( ".v" );}
+public:
+	std::string name()const { return std::string( "Vista" );}
 	bool tainted()const {return false;}//internal plugins are not tainted
 
 	/**

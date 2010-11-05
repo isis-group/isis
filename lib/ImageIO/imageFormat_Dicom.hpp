@@ -53,6 +53,8 @@ class ImageFormat_Dicom: public FileFormat
 	static bool parseCSAValue( const std::string &val, const std::string &name, const char *const vr, isis::util::PropMap &map );
 	static bool parseCSAValueList( const isis::util::slist &val, const std::string &name, const char *const vr, isis::util::PropMap &map );
 	static int readMosaic( data::Chunk source, data::ChunkList &dest );
+protected:
+	std::string suffixes()const;
 public:
 	static const char dicomTagTreeName[];
 	static const char unknownTagName[];
@@ -62,7 +64,6 @@ public:
 	static void parseList( DcmElement *elem, const std::string &name, isis::util::PropMap &map );
 	static void dcmObject2PropMap( DcmObject *master_obj, isis::util::PropMap &map, const std::string &dialect );
 	static void sanitise( util::PropMap &object, string dialect );
-	std::string suffixes()const;
 	std::string name()const;
 	std::string dialects(const std::string& filename)const;
 
