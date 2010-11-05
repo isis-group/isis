@@ -12,6 +12,7 @@ namespace isis {
 namespace viewer {
 
 MatrixHandler::MatrixHandler( void )
+	:m_Valid( false )
 {
 	m_origMatrix = vtkMatrix4x4::New();
 	m_origMatrix1 = vtkMatrix4x4::New();
@@ -27,6 +28,7 @@ MatrixHandler::MatrixHandler( void )
 
 void MatrixHandler::setVectors( isis::util::fvector4 readVec, isis::util::fvector4 phaseVec, isis::util::fvector4 sliceVec )
 {
+	m_Valid = true;
 	m_readVec = readVec;
 	m_phaseVec = phaseVec;
 	m_sliceVec = sliceVec;
@@ -116,6 +118,14 @@ void MatrixHandler::createMatricesForWidgets( void )
 	vtkMatrix4x4::Multiply4x4(axialMatrix, m_correctedMatrix, m_MatrixAxial);
 	vtkMatrix4x4::Multiply4x4(sagittalMatrix, m_correctedMatrix, m_MatrixSagittal);
 	vtkMatrix4x4::Multiply4x4(coronalMatrix, m_correctedMatrix, m_MatrixCoronal);
+}
+
+util::fvector4 MatrixHandler::createPseudoOrigin( const util::fvector4& size, const util::fvector4& voxelSize ) const
+{
+	if ( !m_Valid ) {
+		LOG( Runtime, error ) << "Cannot create pseudo origin. First call setVectors.";
+		return util::fvector4(0,0,0,0);
+	} else { return util::fvector4(-size[0] * voxelSize[0] / 2, -size[1] * voxelSize[1] / 2, -size[2] * voxelSize[2] / 2,0); }
 }
 
 }}

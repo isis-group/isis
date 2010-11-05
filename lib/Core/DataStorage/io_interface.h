@@ -49,6 +49,8 @@ protected:
 
 		return false;
 	}
+	/// \return the file-suffixes the plugin supports
+	virtual std::string suffixes()const = 0;
 public:
 	static void throwGenericError( std::string desc );
 	static void throwSystemError( int err, std::string desc = "" );
@@ -63,8 +65,6 @@ public:
 	static const float invalid_float;
 	/// \return the name of the plugin
 	virtual std::string name()const = 0;
-	/// \return the file-suffixes the plugin supports
-	virtual std::string suffixes()const = 0;
 	/**
 	 * get all file suffixes a plugin suggests to handle
 	 * The string returned by suffixes is tokenized at the spaces and every leading "." is stripped.

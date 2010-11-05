@@ -7,10 +7,11 @@ namespace image_io
 
 class ImageFormat_Null: public FileFormat
 {
-public:
+protected:
 	std::string suffixes()const {
 		return std::string( ".null .null.gz" );
 	}
+public:
 	std::string name()const {
 		return "Null";
 	}
