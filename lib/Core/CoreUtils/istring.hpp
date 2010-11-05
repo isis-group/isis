@@ -37,4 +37,15 @@ typedef std::basic_string<char,_internal::ichar_traits>    istring;
 }
 }
 
+namespace std
+{
+///Streaming output for color using isis::util::write_list
+template<typename charT, typename traits>
+basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::istring& s )
+{
+	return out << std::basic_string<charT,traits>(s.begin(),s.end());
+}
+}
+
+
 #endif // UTIL_ISTRING_HPP
