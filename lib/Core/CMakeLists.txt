@@ -128,7 +128,8 @@ ENDIF(SVN_REVISION)
 ############################################################
 
 # add new source files to this parameter list
-SET ( SRC_FILES 
+SET ( SRC_FILES
+  CoreUtils/istring.cpp
   CoreUtils/progressfeedback.cpp 
   CoreUtils/tmpfile.cpp 
   CoreUtils/application.cpp 
