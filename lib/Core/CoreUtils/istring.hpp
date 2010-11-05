@@ -21,16 +21,20 @@
 #define UTIL_ISTRING_HPP
 
 #include <string>
+#include <ostream>
+#include <istream>
+#include <boost/lexical_cast.hpp>
 
-namespace isis{
-namespace util{
-namespace _internal{
-	struct ichar_traits: public std::char_traits<char>{
-		static bool eq ( const char_type& c1, const char_type& c2);
-		static bool lt ( const char_type& c1, const char_type& c2);
-		static int compare ( const char_type* s1, const char_type* s2, size_t n);
-		static const char_type* find ( const char_type* s, size_t n, const char_type& a );
-	};
+
+namespace isis{namespace util{namespace _internal{
+
+struct ichar_traits: public std::char_traits<char>{
+	static bool eq ( const char_type& c1, const char_type& c2);
+	static bool lt ( const char_type& c1, const char_type& c2);
+	static int compare ( const char_type* s1, const char_type* s2, std::size_t n);
+	static const char_type* find ( const char_type* s, std::size_t n, const char_type& a );
+};
+
 }
 
 typedef std::basic_string<char,_internal::ichar_traits>    istring;
@@ -40,12 +44,25 @@ typedef std::basic_string<char,_internal::ichar_traits>    istring;
 namespace std
 {
 ///Streaming output for color using isis::util::write_list
-template<typename charT, typename traits>
-basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::istring& s )
+template<typename charT>
+basic_ostream<charT, std::char_traits<charT> >& operator<<( basic_ostream<charT, std::char_traits<charT> > &out, const isis::util::istring& s )
 {
-	return out << std::basic_string<charT,traits>(s.begin(),s.end());
+	return out << std::basic_string<charT, std::char_traits<charT> >(s.begin(),s.end());
 }
 }
 
+// specialization for boost::lexical_cast
+namespace boost{namespace detail{
+template<class Source> struct deduce_char_traits<char,isis::util::istring, Source>
+{
+	typedef isis::util::_internal::ichar_traits type;
+};
+template<class Traits, class Alloc>
+struct deduce_char_traits< char, isis::util::istring, std::basic_string<char,Traits,Alloc> >
+{
+	typedef isis::util::_internal::ichar_traits type;
+};
+
+}}
 
 #endif // UTIL_ISTRING_HPP

@@ -18,6 +18,7 @@
 #include <boost/system/system_error.hpp>
 #include "image.hpp"
 #include "common.hpp"
+#include "CoreUtils/istring.hpp"
 
 namespace isis
 {
@@ -71,7 +72,7 @@ public:
 	 * @param reader the plugin to ask
 	 * @return a list of suffixes the plugin handles
 	 */
-	std::list<std::string> getSuffixes()const;
+	std::list<util::istring> getSuffixes()const;
 
 	
 	/// \return the dialects the plugin supports
