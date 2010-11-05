@@ -26,7 +26,7 @@ namespace isis {
 
 namespace viewer {
 
-ViewerInteractor::ViewerInteractor( isisViewer* viewer, vtkRenderer* renderer )
+ViewerInteractor::ViewerInteractor( ViewControl* viewer, vtkRenderer* renderer )
 	: m_ViewerPtr( viewer ), m_Renderer( renderer )
 {
 
@@ -48,9 +48,9 @@ void ViewerInteractor::OnRightButtonUp()
 void ViewerInteractor::OnLeftButtonDown()
 {
 	 if (!this->Interactor)
-		{
-		return;
-		}
+	{
+		 return;
+	}
 
 	 if( m_Picker->Pick(this->GetInteractor()->GetEventPosition()[0],
 	 							this->GetInteractor()->GetEventPosition()[1],
@@ -62,22 +62,22 @@ void ViewerInteractor::OnLeftButtonDown()
 		m_ViewerPtr->sliceChanged( static_cast<int>(ptMapped[0]), static_cast<int>(ptMapped[1]), static_cast<int>(ptMapped[2]) );
 	}
 	this->Moving = 1;
-
-	vtkRenderWindow *renWin = this->Interactor->GetRenderWindow();
-
-	this->StartPosition[0] = this->Interactor->GetEventPosition()[0];
-	this->StartPosition[1] = this->Interactor->GetEventPosition()[1];
-	this->EndPosition[0] = this->StartPosition[0];
-	this->EndPosition[1] = this->StartPosition[1];
-
-	this->PixelArray->Initialize();
-	this->PixelArray->SetNumberOfComponents(3);
-	int *size = renWin->GetSize();
-	this->PixelArray->SetNumberOfTuples(size[0]*size[1]);
-
-	renWin->GetPixelData(0, 0, size[0]-1, size[1]-1, 1, this->PixelArray);
-
-	this->FindPokedRenderer(this->StartPosition[0], this->StartPosition[1]);
+//
+//	vtkRenderWindow *renWin = this->Interactor->GetRenderWindow();
+//
+//	this->StartPosition[0] = this->Interactor->GetEventPosition()[0];
+//	this->StartPosition[1] = this->Interactor->GetEventPosition()[1];
+//	this->EndPosition[0] = this->StartPosition[0];
+//	this->EndPosition[1] = this->StartPosition[1];
+//
+//	this->PixelArray->Initialize();
+//	this->PixelArray->SetNumberOfComponents(3);
+//	int *size = renWin->GetSize();
+//	this->PixelArray->SetNumberOfTuples(size[0]*size[1]);
+//
+//	renWin->GetPixelData(0, 0, size[0]-1, size[1]-1, 1, this->PixelArray);
+//
+//	this->FindPokedRenderer(this->StartPosition[0], this->StartPosition[1]);
 }
 
 void ViewerInteractor::OnMouseMove()

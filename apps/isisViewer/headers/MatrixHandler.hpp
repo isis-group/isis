@@ -11,6 +11,7 @@
 #include "CoreUtils/vector.hpp"
 #include <vtkSmartPointer.h>
 #include <vtkMatrix4x4.h>
+#include "common.hpp"
 
 namespace isis {
 
@@ -31,9 +32,11 @@ public:
 	vtkSmartPointer<vtkMatrix4x4> getCoronalMatrix1( void ) const { return m_MatrixCoronal1; }
 
 	bool isRotationMatrix( void ) const { return m_isRotationMatrix; }
+	util::fvector4 createPseudoOrigin( const util::fvector4& size, const util::fvector4& voxelSize ) const;
 
 private:
 	bool m_isRotationMatrix;
+	bool m_Valid;
 	isis::util::fvector4 m_readVec;
 	isis::util::fvector4 m_phaseVec;
 	isis::util::fvector4 m_sliceVec;

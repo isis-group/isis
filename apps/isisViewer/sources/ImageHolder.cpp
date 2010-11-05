@@ -27,11 +27,16 @@ namespace isis {
 namespace viewer {
 
 ImageHolder::ImageHolder()
-	: m_TimeSteps( 0 ), m_currentTimestep( 0 ), m_Physical(false)
+	: m_TimeSteps( 0 ),
+	  m_currentTimestep( 0 ),
+	  m_Physical(false)
 {
 	m_ExtractAxial = vtkImageClip::New();
 	m_ExtractSagittal = vtkImageClip::New();
 	m_ExtractCoronal = vtkImageClip::New();
+	m_TrivialProducerAxial = vtkTrivialProducer::New();
+	m_TrivialProducerSagittal = vtkTrivialProducer::New();
+	m_TrivialProducerCoronal = vtkTrivialProducer::New();
 	m_MapperAxial = vtkDataSetMapper::New();
 	m_MapperSagittal = vtkDataSetMapper::New();
 	m_MapperCoronal = vtkDataSetMapper::New();
@@ -42,11 +47,14 @@ ImageHolder::ImageHolder()
 
 bool ImageHolder::resetSliceCoordinates( void )
 {
-	return setSliceCoordinates(m_ImageVector[m_currentTimestep]->GetDimensions()[0] / 2, m_ImageVector[m_currentTimestep]->GetDimensions()[1] / 2, m_ImageVector[m_currentTimestep]->GetDimensions()[2] / 2);
+	LOG(Runtime, info) << "Resetting slice coordinates.";
+	setSliceCoordinates(m_ImageVector[m_currentTimestep]->GetDimensions()[0] / 2, m_ImageVector[m_currentTimestep]->GetDimensions()[1] / 2, m_ImageVector[m_currentTimestep]->GetDimensions()[2] / 2);
+
 }
 
 bool ImageHolder::setSliceCoordinates( const int& x, const int& y, const int& z )
 {
+	LOG(Runtime, info) << "Setting slice coordinates to " << x << ", " << y << ", " << z;
 	m_X = x;
 	m_Y = y;
 	m_Z = z;
@@ -58,19 +66,20 @@ bool ImageHolder::setSliceCoordinates( const int& x, const int& y, const int& z 
 	m_ExtractorVector[m_BiggestElemVec[2]]->Update();
 	return true;
 }
-
+//TODO this method needs a more effective approach
 void ImageHolder::setUpPipe()
 {
+	LOG(Runtime, info) << "ImageHolder::setUpPipe";
 	//axial
-	m_ExtractAxial->SetInput( m_ImageVector[m_currentTimestep] );
+	m_ExtractAxial->SetInput( m_ImageVector[m_currentTimestep]);
 	m_MapperAxial->SetInput( m_ExtractAxial->GetOutput() );
 	m_ActorAxial->SetMapper( m_MapperAxial );
 	m_ActorAxial->GetProperty()->SetInterpolationToFlat();
-	m_ActorAxial->SetScale( m_ImageVector[m_currentTimestep]->GetSpacing()[0], m_ImageVector[m_currentTimestep]->GetSpacing()[1], m_ImageVector[m_currentTimestep]->GetSpacing()[2] );
+	m_ActorAxial->SetScale( m_ImageVector.front()->GetSpacing()[0], m_ImageVector[m_currentTimestep]->GetSpacing()[1], m_ImageVector[m_currentTimestep]->GetSpacing()[2] );
 	if (!m_Physical ) {
 		m_ActorAxial->SetUserMatrix( m_MatrixHandler.getAxialMatrix1() );
-		m_ActorAxial->SetPosition(0,0,0);
-		m_ActorAxial->SetOrigin(0,0,0);
+		m_ActorAxial->SetPosition(m_pseudoOrigin[0], m_pseudoOrigin[1], m_pseudoOrigin[2]);
+
 	} else {
 		m_ActorAxial->SetUserMatrix( m_MatrixHandler.getAxialMatrix() );
 		m_ActorAxial->SetPosition( m_ISISImage->getProperty<util::fvector4>("indexOrigin")[0],
@@ -79,15 +88,14 @@ void ImageHolder::setUpPipe()
 	}
 
 	//sagittal
-	m_ExtractSagittal->SetInput( m_ImageVector[m_currentTimestep] );
+	m_ExtractSagittal->SetInput( m_ImageVector[m_currentTimestep]);
 	m_MapperSagittal->SetInput( m_ExtractSagittal->GetOutput() );
 	m_ActorSagittal->SetMapper( m_MapperSagittal );
 	m_ActorSagittal->GetProperty()->SetInterpolationToFlat();
 	m_ActorSagittal->SetScale( m_ImageVector[m_currentTimestep]->GetSpacing()[0], m_ImageVector[m_currentTimestep]->GetSpacing()[1], m_ImageVector[m_currentTimestep]->GetSpacing()[2] );
 	if (!m_Physical ) {
 		m_ActorSagittal->SetUserMatrix( m_MatrixHandler.getSagittalMatrix1() );
-		m_ActorSagittal->SetPosition(0,0,0);
-		m_ActorSagittal->SetOrigin(0,0,0);
+		m_ActorSagittal->SetPosition(m_pseudoOrigin[0], m_pseudoOrigin[1], m_pseudoOrigin[2]);
 	} else {
 		m_ActorSagittal->SetUserMatrix( m_MatrixHandler.getSagittalMatrix() );
 		m_ActorSagittal->SetPosition( m_ISISImage->getProperty<util::fvector4>("indexOrigin")[0],
@@ -96,7 +104,7 @@ void ImageHolder::setUpPipe()
 	}
 
 	//coronal
-	m_ExtractCoronal->SetInput( m_ImageVector[m_currentTimestep] );
+	m_ExtractCoronal->SetInput( m_ImageVector[m_currentTimestep]);
 	m_MapperCoronal->SetInput( m_ExtractCoronal->GetOutput() );
 	m_ActorCoronal->SetMapper( m_MapperCoronal );
 	m_ActorCoronal->GetProperty()->SetInterpolationToFlat();
@@ -104,7 +112,7 @@ void ImageHolder::setUpPipe()
 	m_ActorCoronal->SetUserMatrix( m_MatrixHandler.getCoronalMatrix1() );
 	if (!m_Physical ) {
 		m_ActorCoronal->SetUserMatrix( m_MatrixHandler.getCoronalMatrix1() );
-		m_ActorCoronal->SetPosition(0,0,0);
+		m_ActorCoronal->SetPosition(m_pseudoOrigin[0], m_pseudoOrigin[1], m_pseudoOrigin[2]);
 	} else {
 		m_ActorCoronal->SetUserMatrix( m_MatrixHandler.getCoronalMatrix() );
 		m_ActorCoronal->SetPosition( m_ISISImage->getProperty<util::fvector4>("indexOrigin")[0],
@@ -131,11 +139,13 @@ void ImageHolder::setImages( boost::shared_ptr<isis::data::Image> isisImg,  std:
 	LOG( Runtime, info ) << "phaseVector: " << m_phaseVec;
 	LOG( Runtime, info ) << "sliceVector: " << m_sliceVec;
 	m_MatrixHandler.setVectors( m_readVec, m_phaseVec, m_sliceVec );
+	LOG( Runtime, info) << "spacing[0]: " << m_ImageVector.front()->GetSpacing()[0];
+	m_pseudoOrigin = m_MatrixHandler.createPseudoOrigin( m_ISISImage->sizeToVector(), m_ISISImage->getProperty<util::fvector4>("voxelSize"));
+	std::cout << "pseudo: " << m_pseudoOrigin << std::endl;
 	commonInit();
 	createOrientedImages();
-	resetSliceCoordinates();
 	setUpPipe();
-
+	resetSliceCoordinates();
 }
 
 bool ImageHolder::createOrientedImages( void )
@@ -145,11 +155,15 @@ bool ImageHolder::createOrientedImages( void )
 		for( std::vector<vtkSmartPointer<vtkImageData> >::iterator it = m_ImageVector.begin(); it != m_ImageVector.end(); it++ )
 		{
 			vtkSmartPointer<vtkImageData> tmpImage = *it;
+			tmpImage->SetSpacing( (*it)->GetSpacing() );
+			tmpImage->SetOrigin( (*it)->GetOrigin() );
 			vtkSmartPointer<vtkImageFlip> flipper = vtkImageFlip::New();
 			flipper->SetFilteredAxis(2);
 			flipper->SetInput(tmpImage);
 			flipper->Update();
 			*it = flipper->GetOutput();
+			(*it)->SetSpacing(tmpImage->GetSpacing());
+			(*it)->SetOrigin(tmpImage->GetOrigin());
 		}
 	}
 	return true;
@@ -175,5 +189,5 @@ void ImageHolder::setCurrentTimeStep( const int& timestep )
 	setUpPipe();
 	setSliceCoordinates(m_X, m_Y, m_Z);
 }
-}
-}
+
+}} // end namespace

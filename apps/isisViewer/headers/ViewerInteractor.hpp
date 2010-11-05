@@ -23,7 +23,7 @@
 #ifndef VIEWERINTERACTOR_HPP_
 #define VIEWERINTERACTOR_HPP_
 
-#include "isisViewer.hpp"
+#include "ViewControl.hpp"
 
 #include <vtkUnsignedCharArray.h>
 
@@ -39,7 +39,7 @@ namespace isis {
 
 namespace viewer {
 
-class isisViewer;
+class ViewControl;
 
 class ViewerInteractor : public vtkInteractorStyle
 {
@@ -49,14 +49,12 @@ private:
 	int EndPosition[2];
 	int Moving;
 
-	isisViewer* m_ViewerPtr;
+	ViewControl* m_ViewerPtr;
 	vtkRenderer* m_Renderer;
 
 	vtkUnsignedCharArray *PixelArray;
 
 	vtkCellPicker* m_Picker;
-
-
 
 public:
 	virtual void Zoom();
@@ -64,7 +62,7 @@ public:
 	virtual void OnRightButtonUp();
 	virtual void OnLeftButtonUp();
 	virtual void OnLeftButtonDown();
-	ViewerInteractor( isisViewer*, vtkRenderer* );
+	ViewerInteractor( ViewControl*, vtkRenderer* );
 };
 
 }}
