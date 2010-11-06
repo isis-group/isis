@@ -12,7 +12,7 @@ namespace isis
 namespace image_io
 {
 namespace _internal{
-bool moreCmp(std::string a,std::string b){return a.length()>b.length();}
+bool moreCmp(const util::istring &a,const util::istring &b){return a.length()>b.length();}
 }
 
 void FileFormat::write( const isis::data::ImageList &images, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & )
@@ -46,10 +46,10 @@ void FileFormat::throwSystemError( int err, std::string desc )
 	throw( boost::system::system_error( err, boost::system::get_system_category(), desc ) );
 }
 
-std::list< std::string > FileFormat::getSuffixes()const
+std::list< util::istring > FileFormat::getSuffixes()const
 {
-	std::list<std::string> ret=util::string2list<std::string>( suffixes(), boost::regex( "\\s+" ) );
-	BOOST_FOREACH(std::string &ref,ret)
+	std::list<util::istring> ret=util::string2list<util::istring>( suffixes(), boost::regex( "[[:space:]]" ) );
+	BOOST_FOREACH(util::istring &ref,ret)
 	{
 		ref.erase(0,ref.find_first_not_of('.'));// remove leading . if there are some
 	}
@@ -59,11 +59,12 @@ std::list< std::string > FileFormat::getSuffixes()const
 
 std::pair< std::string, std::string > FileFormat::makeBasename(const std::string& filename)const
 {
-	std::list<std::string> suffixes=getSuffixes();
-	BOOST_FOREACH(const std::string &suff,suffixes){
-		size_t at=filename.rfind(suff);
-		if(at!=filename.npos){
-			if(at && filename[at-1]=='.')
+	std::list<util::istring> suffixes=getSuffixes();
+	util::istring ifilename(filename.begin(),filename.end());
+	BOOST_FOREACH(const util::istring &suff,suffixes){
+		size_t at=ifilename.rfind(suff);
+		if(at!=ifilename.npos){
+			if(at && ifilename[at-1]=='.')
 				at--;
 			return std::make_pair(filename.substr(0,at),filename.substr(at));
 		}

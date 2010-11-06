@@ -39,10 +39,11 @@
 #include <vtkMatrix4x4.h>
 #include <vtkTransform.h>
 #include <vtkSmartPointer.h>
+#include <vtkTrivialProducer.h>
 
 #include "CoreUtils/vector.hpp"
 #include "DataStorage/image.hpp"
-#include "isisViewer.hpp"
+#include "ViewControl.hpp"
 #include "MatrixHandler.hpp"
 
 #include <cmath>
@@ -52,7 +53,7 @@ namespace isis {
 
 namespace viewer {
 
-class isisViewer;
+class ViewControl;
 
 class ImageHolder
 {
@@ -61,7 +62,7 @@ public:
 	ImageHolder();
 
 	void setImages( boost::shared_ptr<isis::data::Image>, std::vector<vtkSmartPointer<vtkImageData> >);
-	void setPtrToViewer( const boost::shared_ptr<isisViewer> ptr ) { m_PtrToViewer = ptr; }
+	void setPtrToViewer( const boost::shared_ptr<ViewControl> ptr ) { m_PtrToViewer = ptr; }
 
 	void setReadVec( const isis::util::fvector4& read ) { m_readVec = read; }
 	void setPhaseVec( const isis::util::fvector4& phase ) { m_phaseVec = phase; }
@@ -88,15 +89,17 @@ public:
 	const int getCurrentTimeStep() const { return m_currentTimestep; }
 	const unsigned int getNumberOfTimesteps( void ) const { return m_TimeSteps; }
 
-
 private:
 	MatrixHandler m_MatrixHandler;
 	std::vector<vtkSmartPointer<vtkImageData> > m_ImageVector;
 	boost::shared_ptr<isis::data::Image> m_ISISImage;
-	boost::shared_ptr<isisViewer> m_PtrToViewer;
+	boost::shared_ptr<ViewControl> m_PtrToViewer;
 	vtkSmartPointer<vtkImageClip> m_ExtractAxial;
 	vtkSmartPointer<vtkImageClip> m_ExtractSagittal;
 	vtkSmartPointer<vtkImageClip> m_ExtractCoronal;
+	vtkSmartPointer<vtkTrivialProducer> m_TrivialProducerAxial;
+	vtkSmartPointer<vtkTrivialProducer> m_TrivialProducerSagittal;
+	vtkSmartPointer<vtkTrivialProducer> m_TrivialProducerCoronal;
 	std::vector<vtkSmartPointer<vtkImageClip> > m_ExtractorVector;
 	vtkSmartPointer<vtkDataSetMapper> m_MapperAxial;
 	vtkSmartPointer<vtkDataSetMapper> m_MapperSagittal;
@@ -117,8 +120,8 @@ private:
 	isis::util::fvector4 m_readVec;
 	isis::util::fvector4 m_phaseVec;
 	isis::util::fvector4 m_sliceVec;
+	util::fvector4 m_pseudoOrigin;
 
-	std::vector<std::vector<double> > m_RotationVector;
 
 	void setUpPipe( void );
 	bool createOrientedImages( void );

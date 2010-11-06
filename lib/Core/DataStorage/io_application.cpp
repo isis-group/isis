@@ -110,7 +110,8 @@ void IOApplication::printHelp(bool withHidden) const
 			
 			std::cout << std::endl << "\t" << pi->name() << std::endl << "\t=======================================" << std::endl;
 
-			const std::list<std::string> suff=pi->getSuffixes(), dialects= util::string2list<std::string>(pi->dialects(""));
+			const std::list<util::istring> suff=pi->getSuffixes();
+			const std::list<std::string> dialects= util::string2list<std::string>(pi->dialects(""));
 			
 			std::cout << "\tsupported suffixes: " << util::list2string(suff.begin(),suff.end(),"\", \"","\"","\"")  << std::endl;
 

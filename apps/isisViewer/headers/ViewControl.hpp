@@ -20,8 +20,8 @@
  *
  *****************************************************************/
 
-#ifndef ISISVIEWER_H
-#define ISISVIEWER_H
+#ifndef VIEWCONTROL_H
+#define VIEWCONTROL_H
 
 #include "CoreUtils/log.hpp"
 #include "DataStorage/io_factory.hpp"
@@ -29,15 +29,15 @@
 
 #include "common.hpp"
 #include "ui_isisViewer.h"
-#include "viewerCore.hpp"
-
 
 #include "ImageHolder.hpp"
 #include "ViewerInteractor.hpp"
 
 #include <vector>
+#include <map>
 #include <boost/shared_ptr.hpp>
 #include <boost/foreach.hpp>
+#include <boost/signal.hpp>
 
 #include <vtkSmartPointer.h>
 #include <vtkRenderer.h>
@@ -51,34 +51,37 @@ namespace viewer {
 class ViewerInteractor;
 class ImageHolder;
 
-class isisViewer : public QMainWindow
+class ViewControl
 {
-	Q_OBJECT
-
 public:
-	isisViewer( const isis::util::slist&, QMainWindow *parent = 0 );
+	typedef std::map<boost::shared_ptr<data::Image>, std::vector<vtkSmartPointer< vtkImageData > > > ImageMapType;
+	ViewControl();
+	void init( QVTKWidget *axial, QVTKWidget *sagittal, QVTKWidget *coronal );
 	void resetCam();
-
 	void sliceChanged(const int&, const int&, const int&);
-
 	void displayIntensity( const int&, const int&, const int& );
-
+	void addImages( const ImageMapType& );
 	void UpdateWidgets();
 
-	vtkImageData* m_CurrentImagePtr;
-	boost::shared_ptr<ImageHolder> m_CurrentImageHolder;
-private slots:
-	void timeStepChanged( int );
+	void changeCurrentTimeStep( int );
 	void checkPhysicalChanged( bool );
 
-signals:
-	void clicked( bool );
-	void valueChanged( int );
+	//getter methods
+	vtkSmartPointer<vtkImageData> getCurrentVTKImagePtr( void ) const { return m_CurrentImagePtr; }
+	boost::shared_ptr<ImageHolder> getCurrentImageHolder( void ) const { return m_CurrentImageHolder; }
+	std::vector<boost::shared_ptr< ImageHolder > > getImageHolderVector( void ) const { return m_ImageHolderVector; }
+
+	struct Signals {
+			boost::signal< void ( const size_t& )> intensityChanged;
+			boost::signal< void ( const size_t&, const size_t&, const size_t&, const size_t& )> mousePosChanged;
+		} signalList;
 
 private:
-	Ui::isisViewer ui;
+
+	bool m_Valid;
+	vtkSmartPointer<vtkImageData> m_CurrentImagePtr;
+	boost::shared_ptr<ImageHolder> m_CurrentImageHolder;
 	std::vector< boost::shared_ptr< ImageHolder > > m_ImageHolderVector;
-	void setUpPipe();
 
 	vtkSmartPointer<vtkRenderer> m_RendererAxial;
 	vtkSmartPointer<vtkRenderer> m_RendererSagittal;
@@ -95,6 +98,13 @@ private:
 	vtkSmartPointer<vtkRenderWindowInteractor> m_InteractorAxial;
 	vtkSmartPointer<vtkRenderWindowInteractor> m_InteractorSagittal;
 	vtkSmartPointer<vtkRenderWindowInteractor> m_InteractorCoronal;
+
+	QVTKWidget *m_AxialWidget;
+	QVTKWidget *m_SagittalWidget;
+	QVTKWidget *m_CoronalWidget;
+
+	void setUpPipe();
+	void loadImages( util::slist& );
 
 };
 }}

@@ -1,5 +1,5 @@
 #include "Adapter/qtapplication.hpp"
-#include "isisViewer.hpp"
+#include "MainWindow.hpp"
 
 #include "common.hpp"
 
@@ -23,7 +23,7 @@ int main( int argc, char *argv[] )
 	app.setLog<isis::ViewerDebug>( app.getLLMap()[app.parameters["dViewer"]->as<isis::util::Selection>()] );
 
 	isis::util::slist fileList = app.parameters["in"];
-	isis::viewer::isisViewer isisViewerWindow( fileList );
-	isisViewerWindow.show();
+	isis::viewer::MainWindow isisViewerMainWindow( fileList );
+	isisViewerMainWindow.show();
 	return app.getQApplication().exec();
 }

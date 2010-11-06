@@ -26,12 +26,12 @@
 namespace isis{
 namespace util{
 namespace _internal{
-	struct ichar_traits: public std::char_traits<char>{
-		static bool eq ( const char_type& c1, const char_type& c2);
-		static bool lt ( const char_type& c1, const char_type& c2);
-		static int compare ( const char_type* s1, const char_type* s2, size_t n);
-		static const char_type* find ( const char_type* s, size_t n, const char_type& a );
-	};
+struct ichar_traits: public std::char_traits<char>{
+	static bool eq ( const char_type& c1, const char_type& c2);
+	static bool lt ( const char_type& c1, const char_type& c2);
+	static int compare ( const char_type* s1, const char_type* s2, std::size_t n);
+	static const char_type* find ( const char_type* s, std::size_t n, const char_type& a );
+};
 }
 
 typedef std::basic_string<char,_internal::ichar_traits>    istring;

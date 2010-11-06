@@ -93,13 +93,13 @@ class ImageFormat_Nifti : public FileFormat
 			nifti_image_free( m_pNiImage );
 		}
 	};
-
-public:
-	enum vectordirection {readDir = 0, phaseDir, sliceDir, indexOrigin, voxelSizeVec};
-
+protected:
 	std::string suffixes()const {
 		return std::string( ".nii.gz .nii .hdr" );
 	}
+public:
+	enum vectordirection {readDir = 0, phaseDir, sliceDir, indexOrigin, voxelSizeVec};
+
 
 	std::string dialects(const std::string &filename)const {
 		return std::string( "fsl spm" );

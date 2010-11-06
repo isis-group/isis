@@ -157,8 +157,9 @@ template<typename TARGET> std::list<TARGET> string2list(
 	boost::sregex_token_iterator i = boost::make_regex_token_iterator( source, separator, -1 );
 	const boost::sregex_token_iterator token_end;
 
-	while ( i != token_end )
-		ret.push_back( boost::lexical_cast<TARGET>( *i++ ) );
+	while ( i != token_end ){
+		ret.push_back( boost::lexical_cast<TARGET>( (i++)->str() ) );
+	}
 
 	return ret;
 }
@@ -173,7 +174,7 @@ template<typename TARGET> std::list<TARGET> string2list(
  */
 template<typename TARGET> std::list<TARGET> string2list(
 	std::string source,
-	const boost::regex separator = boost::regex( "\\s+" ) )
+	const boost::regex separator = boost::regex( "[[:space:]]" ) )
 {
 	return string2list<TARGET>( source, separator, separator, separator );
 }
@@ -320,23 +321,23 @@ template<typename HANDLE> void enable_log_global( LogLevel level )
 namespace std
 {
 /// Streaming output for std::pair
-template<typename charT, typename traits, typename _FIRST, typename _SECOND > basic_ostream<charT, traits>&
-operator<<( basic_ostream<charT, traits> &out, const pair<_FIRST, _SECOND> &s )
+template<typename charT, typename _FIRST, typename _SECOND > basic_ostream<charT, std::char_traits<charT> >&
+operator<<( basic_ostream<charT, std::char_traits<charT> > &out, const pair<_FIRST, _SECOND> &s )
 {
 	return out << s.first << ":" << s.second;
 }
 
 /// Streaming output for std::map
-template<typename charT, typename traits, typename _Key, typename _Tp, typename _Compare, typename _Alloc >
-basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const map<_Key, _Tp, _Compare, _Alloc>& s )
+template<typename charT, typename _Key, typename _Tp, typename _Compare, typename _Alloc >
+basic_ostream<charT, std::char_traits<charT> >& operator<<( basic_ostream<charT, std::char_traits<charT> > &out, const map<_Key, _Tp, _Compare, _Alloc>& s )
 {
 	isis::util::write_list( s.begin(), s.end(), out, "\n", "", "" );
 	return out;
 }
 
 /// Formatted streaming output for std::map\<string,...\>
-template<typename charT, typename traits, typename _Tp, typename _Compare, typename _Alloc >
-basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const map<std::string, _Tp, _Compare, _Alloc>& s )
+template<typename charT, typename _Tp, typename _Compare, typename _Alloc >
+basic_ostream<charT, std::char_traits<charT> >& operator<<( basic_ostream<charT, std::char_traits<charT> > &out, const map<std::string, _Tp, _Compare, _Alloc>& s )
 {
 	size_t key_len = 0;
 	typedef typename map<std::string, _Tp, _Compare, _Alloc>::const_iterator m_iterator;
@@ -356,15 +357,15 @@ basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, con
 }
 
 ///Streaming output for std::list
-template<typename charT, typename traits, typename _Tp, typename _Alloc >
-basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const list<_Tp, _Alloc>& s )
+template<typename charT, typename _Tp, typename _Alloc >
+basic_ostream<charT, std::char_traits<charT> >& operator<<( basic_ostream<charT, std::char_traits<charT> > &out, const list<_Tp, _Alloc>& s )
 {
 	isis::util::write_list( s.begin(), s.end(), out );
 	return out;
 }
 ///Streaming output for std::set
-template<typename charT, typename traits, typename _Tp, typename _Alloc >
-basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const set<_Tp, _Alloc>& s )
+template<typename charT, typename _Tp, typename _Alloc >
+basic_ostream<charT, std::char_traits<charT> >& operator<<( basic_ostream<charT, std::char_traits<charT> > &out, const set<_Tp, _Alloc>& s )
 {
 	isis::util::write_list( s.begin(), s.end(), out );
 	return out;

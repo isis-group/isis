@@ -74,12 +74,12 @@ bool IOFactory::registerFormat( const FileFormatPtr plugin )
 	if ( !plugin )return false;
 
 	io_formats.push_back( plugin );
-	std::list<std::string> suffixes = plugin->getSuffixes(  );
+	std::list<util::istring> suffixes = plugin->getSuffixes(  );
 	LOG( Runtime, info )
 			<< "Registering " << ( plugin->tainted() ? "tainted " : "" ) << "io-plugin "
 			<< util::MSubject( plugin->name() )
 			<< " with supported suffixes " << suffixes;
-	BOOST_FOREACH( std::string & it, suffixes ) {
+	BOOST_FOREACH( util::istring & it, suffixes ) {
 		io_suffix[it].push_back( plugin );
 	}
 	return true;
@@ -216,8 +216,8 @@ IOFactory::FileFormatList IOFactory::getFormatInterface( std::string filename, s
 	} else ext = util::string2list<std::string>(suffix_override,'.');
 
 	while(!ext.empty()){
-		const std::string wholeName=util::list2string(ext.begin(),ext.end(),".","",""); // (re)construct the rest of the suffix
-		const std::map<std::string, FileFormatList, util::_internal::caselessStringLess>::iterator found=io_suffix.find(wholeName);
+		const util::istring wholeName(util::list2string(ext.begin(),ext.end(),".","","").c_str()); // (re)construct the rest of the suffix
+		const std::map<util::istring, FileFormatList>::iterator found=io_suffix.find(wholeName);
 		if(found!=io_suffix.end()){
 			LOG(Debug,verbose_info) << found->second.size() << " plugins support suffix " << wholeName;
 			ret.insert(ret.end(),found->second.begin(),found->second.end());
