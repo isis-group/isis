@@ -11,8 +11,7 @@ namespace isis
 {
 namespace data
 {
-enum autoscaleOption {noscale, autoscale, noupscale, upscale};
-
+	enum autoscaleOption;
 namespace _internal
 {
 template<typename SRC, typename DST> static void numeric_convert_impl( const SRC *src, DST *dst, size_t count, double scale, double offset )

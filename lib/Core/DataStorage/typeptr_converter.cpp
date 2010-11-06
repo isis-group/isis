@@ -87,6 +87,12 @@ public:
 		LOG_IF( src.len() > dst.len(), Debug, error ) << "The target is shorter than the the source (" << dst.len() << "<" << src.len() << "). Will only copy/convert " << dst.len() << " elements";
 		dstVal.copyFromMem( srcPtr, std::min( src.len(), dstVal.len() ) );
 	}
+	virtual std::pair<util::TypeReference,util::TypeReference> getScale(const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale)const{
+		//as we're just copying - its 1/1
+		util::TypeReference one(util::Type<unsigned short>(1));
+		return std::make_pair<util::TypeReference,util::TypeReference>(one,one);
+		
+	}
 	virtual ~TypePtrConverter() {}
 };
 
@@ -114,6 +120,10 @@ public:
 	}
 	void convert( const TypePtrBase &src, TypePtrBase &dst, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max )const {
 		numeric_convert( src.cast_to_TypePtr<SRC>(), dst.cast_to_TypePtr<DST>(), min, max );
+	}
+	std::pair<util::TypeReference,util::TypeReference> getScale(const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale)const{
+		const std::pair<double,double> scale=_internal::getScaling<SRC,DST>(min,max,scaleopt);
+		return std::make_pair<util::TypeReference,util::TypeReference>(util::TypeReference(util::Type<double>(scale.first)),util::TypeReference(util::Type<double>(scale.second)));
 	}
 	virtual ~TypePtrConverter() {}
 };
