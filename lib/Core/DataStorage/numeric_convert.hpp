@@ -59,10 +59,6 @@ getScaling(const util::_internal::TypeBase &min, const util::_internal::TypeBase
 		const DST domain_min = std::numeric_limits<DST>::min();//negative value domain of this dst
 		const DST domain_max = std::numeric_limits<DST>::max();//positive value domain of this dst
 		double minval, maxval;
-		LOG_IF( min.typeID() != util::Type<SRC>::staticID, Debug, info )
-		<< "The given minimum for src Range is not of the same type as the data ("  << min.typeName() << "!=" << util::Type<SRC>::staticName() << ")";
-		LOG_IF( max.typeID() != util::Type<SRC>::staticID, Debug, info )
-		<< "The given maximum for src Range is not of the same type as the data ("  << max.typeName() << "!=" << util::Type<SRC>::staticName() << ")";
 		minval = min.as<double>();
 		maxval = max.as<double>();
 		assert( minval < maxval );
@@ -131,7 +127,12 @@ template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &s
 
 	if ( src.len() == 0 )return;
 	const size_t size = std::min( src.len(), dst.len() );
-	
+
+	LOG_IF( min.typeID() != util::Type<SRC>::staticID, Debug, info )
+	<< "The given minimum for src Range is not of the same type as the data ("  << min.typeName() << "!=" << util::Type<SRC>::staticName() << ")";
+	LOG_IF( max.typeID() != util::Type<SRC>::staticID, Debug, info )
+	<< "The given maximum for src Range is not of the same type as the data ("  << max.typeName() << "!=" << util::Type<SRC>::staticName() << ")";
+
 	const std::pair<double,double> scale=_internal::getScaling<SRC,DST>(min,max,scaleopt);
 
 	if ( ( scale.first != 1. || scale.second ) )
