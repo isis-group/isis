@@ -231,7 +231,46 @@ BOOST_AUTO_TEST_CASE ( type_selection_test )
 	BOOST_CHECK_EQUAL(img.typeID(),data::TypePtr<int16_t>(NULL,0).typeID());
 }
 
+BOOST_AUTO_TEST_CASE ( type_scale_test )
+{
+	float org=0;
+	#define MAKE_CHUNK(type,name) \
+	data::MemChunk<type> name( 4, 4 );\
+	name.setProperty( "indexOrigin", util::fvector4( 0, 0, org ) );\
+	name.setProperty<uint32_t>( "acquisitionNumber", org );\
+	name.setProperty( "readVec", util::fvector4( 1, 0 ) );\
+	name.setProperty( "phaseVec", util::fvector4( 0, 1 ) );\
+	name.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );\
+	org++;\
 	
+	MAKE_CHUNK(int16_t,ch_int16_t);
+	MAKE_CHUNK(int8_t,ch_int8_t);
+	MAKE_CHUNK(uint8_t,ch_uint8_t);
+	MAKE_CHUNK(uint16_t,ch_uint16_t);
+
+	ch_int8_t.voxel<int8_t>(0,0,0)=-1;
+	ch_uint8_t.voxel<uint8_t>(0,0,0)=1;
+	ch_int16_t.voxel<int16_t>(0,0,0)=-50;
+	ch_uint16_t.voxel<uint16_t>(0,0,0)=2500;
+	
+	
+	data::Image img;
+	const size_t size[]={4,4,4,1};
+	BOOST_CHECK(img.insertChunk(ch_int16_t));
+	BOOST_CHECK(img.insertChunk(ch_uint16_t));
+	BOOST_CHECK(img.insertChunk(ch_int8_t));
+	BOOST_CHECK(img.insertChunk(ch_uint8_t));
+	BOOST_CHECK(img.reIndex());
+
+	std::list<std::pair<util::TypeReference,util::TypeReference> > scale=img.getScalingTo(data::TypePtr<uint8_t>::staticID);
+
+	typedef std::list<std::pair<util::TypeReference,util::TypeReference> >::const_reference scale_ref;
+
+	BOOST_CHECK(scale.size()==1);
+	BOOST_CHECK_EQUAL(scale.front().first->as<double>(),1./10);
+	BOOST_CHECK_EQUAL(scale.front().second->as<double>(),5);
+}
+
 BOOST_AUTO_TEST_CASE ( image_chunk_test )
 {
 	uint32_t acNum = 0;

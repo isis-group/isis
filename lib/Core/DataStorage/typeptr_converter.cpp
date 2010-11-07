@@ -91,7 +91,6 @@ public:
 		//as we're just copying - its 1/1
 		util::TypeReference one(util::Type<unsigned short>(1));
 		return std::make_pair<util::TypeReference,util::TypeReference>(one,one);
-		
 	}
 	virtual ~TypePtrConverter() {}
 };
