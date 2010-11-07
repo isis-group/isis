@@ -43,6 +43,17 @@ SET(CPACK_PACKAGE_VERSION_MINOR ${${CMAKE_PROJECT_NAME}_VERSION_MINOR})
 SET(CPACK_PACKAGE_VERSION_PATCH ${${CMAKE_PROJECT_NAME}_VERSION_PATCH})
 #SET(CPACK_PACKAGE_INSTALL_DIRECTORY "CMake ${${CMAKE_PROJECT_NAME}_VERSION_MAJOR}.${${CMAKE_PROJECT_NAME}_VERSION_MINOR}")
 
+############################################################
+# check for liboil
+############################################################
+set(ISIS_USE_LIBOIL OFF CACHE BOOL "use liboil" )
+if(ISIS_USE_LIBOIL)
+	find_path(LibOil_INCLUDE_DIR "liboil/liboil.h" PATH_SUFFIXES "liboil" "liboil-0.3")
+	find_library(LibOil_LIBRARY NAMES "oil-0.3")
+	include_directories(${LibOil_INCLUDE_DIR})
+else(ISIS_USE_LIBOIL)
+	set(LibOil_LIBRARY "")
+endif(ISIS_USE_LIBOIL)
 
 ############################################################
 # set project specific module path
@@ -201,7 +212,7 @@ SET (DATASTORAGE_HDR_FILES
 if(ISIS_BUILD_DYNAMIC)
 	SET(LIBS isis_core ${LIBS})
 	ADD_LIBRARY( isis_core SHARED ${SRC_FILES} )
-	TARGET_LINK_LIBRARIES( isis_core ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} )
+	TARGET_LINK_LIBRARIES( isis_core ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} ${LibOil_LIBRARY})
 	SET_TARGET_PROPERTIES( isis_core PROPERTIES	${ISIS_BUILD_PROPERTIES} VERSION ${${CMAKE_PROJECT_NAME}_VERSION} INSTALL_NAME_DIR ${ISIS_INSTALL_LIB_DIR})
 endif(ISIS_BUILD_DYNAMIC)
 
@@ -240,6 +251,3 @@ CONFIGURE_FILE(cmake/isis_corecfg.cmake.in ${CMAKE_BINARY_DIR}/ISISConfig.cmake 
 # install cmake configuration files
 INSTALL(FILES ${CMAKE_BINARY_DIR}/ISISConfig.cmake
   DESTINATION ${CMAKE_INSTALL_PREFIX}/share/isis/cmake COMPONENT Development)
-
-
-  
