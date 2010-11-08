@@ -172,6 +172,11 @@ void Chunk::getMinMax ( util::TypeReference &min, util::TypeReference &max ) con
 {
 	return operator*().getMinMax( min, max );
 }
+
+std::pair<util::TypeReference,util::TypeReference> Chunk::getScalingTo( unsigned short typeID, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt )const{
+	return operator*().getScalingTo(typeID,min,max,scaleopt);
+}
+
 Chunk &Chunk::operator=( const Chunk &ref )
 {
 	_internal::ChunkBase::operator=( static_cast<const _internal::ChunkBase &>( ref ) ); //copy the metadate of ref

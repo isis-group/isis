@@ -174,7 +174,7 @@ public:
 		size_t length = end - start;
 
 		if ( dst.typeID() != typeID() ) {
-			LOG( Runtime, error )
+			LOG( Debug, error )
 					<< "Comparing to a TypePtr of different type(" << dst.typeName() << ", not " << typeName()
 					<< "). Assuming all voxels to be different";
 			return length;

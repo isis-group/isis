@@ -93,24 +93,24 @@ class ImageFormat_Nifti : public FileFormat
 			nifti_image_free( m_pNiImage );
 		}
 	};
-
+protected:
+	std::string suffixes()const {
+		return std::string( ".nii.gz .nii .hdr" );
+	}
 public:
 	enum vectordirection {readDir = 0, phaseDir, sliceDir, indexOrigin, voxelSizeVec};
 
-	std::string suffixes() {
-		return std::string( ".nii.gz .nii .hdr" );
-	}
 
-	std::string dialects(const std::string &filename) {
+	std::string dialects(const std::string &filename)const {
 		return std::string( "fsl spm" );
 	}
 
-	std::string name() {
+	std::string name()const {
 		//TODO: wahrscheinlich sollten die Namen irgendwie so aussehen "mpg.cbs.nii"?
 		return "Nifti";
 	}
 
-	bool tainted() {
+	bool tainted()const {
 		return false;
 	}//internal plugins are not tainted
 

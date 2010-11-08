@@ -48,27 +48,29 @@ protected:
 
 		return false;
 	}
+	/// \return the file-suffixes the plugin supports
+	virtual std::string suffixes()const = 0;
 public:
 	static void throwGenericError( std::string desc );
 	static void throwSystemError( int err, std::string desc = "" );
+
 	static const float invalid_float;
 	/// \return the name of the plugin
-	virtual std::string name() = 0;
-	/// \return the file-suffixes the plugin supports
-	virtual std::string suffixes() = 0;
+	virtual std::string name()const = 0;
 	/**
 	 * get all file suffixes a plugin suggests to handle
 	 * The string returned by suffixes is tokenized at the spaces and every leading "." is stripped.
-	 * The result is returned in a string-list.
+	 * The result is returned in a string-list sorted by the length of the suffix (longest first).
 	 * @param reader the plugin to ask
 	 * @return a list of suffixes the plugin handles
 	 */
-	std::list<std::string> getSuffixes();
+	std::list<std::string> getSuffixes()const;
+
 	
 	/// \return the dialects the plugin supports
-	virtual std::string dialects(const std::string &filename) {return std::string();};
+	virtual std::string dialects(const std::string &filename)const {return std::string();};
 	/// \return if the plugin is not part of the official distribution
-	virtual bool tainted() {return true;}
+	virtual bool tainted()const {return true;}
 	/**
 	 * Load data into the given chunk list.
 	 * I case of an error std::runtime_error will be thrown.

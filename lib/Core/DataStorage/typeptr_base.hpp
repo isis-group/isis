@@ -79,6 +79,11 @@ public:
 	bool convertTo( TypePtrBase &dst )const;
 	bool convertTo( TypePtrBase &dst, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max )const;
 
+	///get the scaling (and offset) which would be used in an convertTo 
+	std::pair<util::TypeReference,util::TypeReference> getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const;
+	std::pair<util::TypeReference,util::TypeReference> getScalingTo( unsigned short typeID, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale )const;
+	
+
 	/// Copy (or Convert) data from this to memory of maybe another type and the given length.
 	template<typename T> bool convertTo( T *dst, size_t len ) const {
 		TypePtr<T> dest( dst, len, TypePtr<T>::NonDeleter() );

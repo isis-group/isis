@@ -138,6 +138,10 @@ public:
 		return getTypePtrBase().convertTo( dstPtr, min, max ); // copy-convert the data into dstPtr
 	}
 
+	///get the scaling (and offset) which would be used in an conversion to the given type
+	std::pair<util::TypeReference,util::TypeReference> getScalingTo( unsigned short typeID, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale )const;
+	
+
 	size_t bytes_per_voxel()const;
 	std::string typeName()const;
 	unsigned short typeID()const;

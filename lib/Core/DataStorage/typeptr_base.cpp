@@ -83,6 +83,26 @@ void TypePtrBase::copyRange( size_t start, size_t end, TypePtrBase &dst, size_t 
 	}
 }
 
+std::pair<util::TypeReference,util::TypeReference> TypePtrBase::getScalingTo( unsigned short typeID, autoscaleOption scaleopt )const
+{
+	util::TypeReference min, max;
+	getMinMax( min, max );
+	assert( ! ( min.empty() || max.empty() ) );
+	return TypePtrBase::getScalingTo( typeID, *min, *max );
+}
+std::pair<util::TypeReference,util::TypeReference>
+TypePtrBase::getScalingTo( unsigned short typeID, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt )const
+{
+	const Converter &conv = getConverterTo( typeID );
+	
+	if ( conv ) {
+		return conv->getScaling(min, max, scaleopt);
+	} else {
+		LOG( Runtime, error )
+		<< "I dont know any conversion from " << util::MSubject( typeName() ) << " to " << util::MSubject( util::getTypeMap(false,true)[typeID] );
+		return std::pair<util::TypeReference,util::TypeReference>();
+	}
+}
 bool TypePtrBase::convertTo( TypePtrBase &dst )const
 {
 	util::TypeReference min, max;

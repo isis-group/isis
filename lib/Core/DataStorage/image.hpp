@@ -232,6 +232,10 @@ public:
 		return ret; //return that
 	}
 
+	///for each chunk get the scaling (and offset) which would be used in an conversion to the given type
+	std::list<std::pair<util::TypeReference,util::TypeReference> > getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const;
+	
+
 	/**
 	 * Insert a Chunk into the Image.
 	 * The insertion is sorted and unique. So the Chunk will be inserted behind a geometrically "lower" Chunk if there is one.

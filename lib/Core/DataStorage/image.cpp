@@ -63,8 +63,7 @@ Image &Image::operator=( const isis::data::Image &ref )
 bool Image::checkMakeClean()
 {
 	if ( ! clean ) {
-		LOG( Debug, info )
-				<< "Image is not clean. Running reIndex ...";
+		LOG( Debug, info )	<< "Image is not clean. Running reIndex ...";
 
 		if( !reIndex() ) {
 			LOG( Runtime, error ) << "Reindexing failed -- undefined behavior ahead ...";
@@ -521,6 +520,36 @@ void Image::getMinMax ( util::TypeReference &min, util::TypeReference &max ) con
 		ref->getMinMax( min, max );
 	}
 }
+
+std::list< std::pair< util::TypeReference, util::TypeReference > > Image::getScalingTo(short unsigned int targetID, autoscaleOption scaleopt) const
+{
+	LOG_IF(!clean,Runtime,error) << "You should run reIndex before running this";
+	std::list< std::pair< util::TypeReference, util::TypeReference > >  ret;
+	util::TypeReference min,max;
+	getMinMax(min,max);
+	bool unique=true;
+	const std::vector<boost::shared_ptr<const Chunk> > chunks=getChunkList();
+	BOOST_FOREACH(const boost::shared_ptr<const Chunk> &ref, chunks){ //collect all scales for all chunks
+		if(targetID != ref->typeID())ret.push_back( //but only if this chunk would be scaled
+			ref->getScalingTo(targetID,*min,*max,scaleopt)
+		);
+		const util::_internal::TypeBase &firstmin=*(ret.front().first);
+		const util::_internal::TypeBase &firstmax=*(ret.front().second);
+		const util::_internal::TypeBase &lastmin=*(ret.back().first);
+		const util::_internal::TypeBase &lastmax=*(ret.back().second);
+		
+		if(unique && !((firstmin==lastmin) || (firstmax==lastmax)))
+			unique = false;
+	}
+	if(ret.empty()){ // if the was no scaling at all - insert 1/1
+		util::TypeReference one(util::Type<unsigned short>(1));
+		ret.push_back(std::make_pair<util::TypeReference,util::TypeReference>(one,one));
+	} else if(unique){ // if all scales are the same 
+		ret.erase((++ret.begin()),ret.end());
+	}
+	return ret;
+}
+
 size_t Image::cmp( const isis::data::Image &comp ) const
 {
 	size_t ret = 0;

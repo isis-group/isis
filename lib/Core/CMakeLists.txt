@@ -30,6 +30,7 @@ IF(NOT ISIS_INSTALL_PLUGIN_DIR)
   SET(ISIS_INSTALL_PLUGIN_DIR ${CMAKE_INSTALL_PREFIX}/share/isis/plugins)
 ENDIF(NOT ISIS_INSTALL_PLUGIN_DIR)
 
+
 ###########################################################
 # CPack stuff
 ###########################################################
@@ -124,6 +125,13 @@ IF (SVN_REVISION)
 ENDIF(SVN_REVISION)
 
 ############################################################
+# Build config
+############################################################
+SET(ISIS_BUILD_PROPERTIES LINK_FLAGS "--no-undefined" CLEAN_DIRECT_OUTPUT 1)
+SET(ISIS_BUILD_STATIC ON CACHE BOOL "enable build of the static library" )
+SET(ISIS_BUILD_DYNAMIC ON CACHE BOOL "enable build of the dynamic library" )
+
+############################################################
 # build core
 ############################################################
 
@@ -190,26 +198,25 @@ SET (DATASTORAGE_HDR_FILES
   ./DataStorage/common.hpp )
 
 # the core library shared and static build
-ADD_LIBRARY( isis_core SHARED ${SRC_FILES} )
-ADD_LIBRARY( isis_static STATIC ${SRC_FILES} )
+if(ISIS_BUILD_DYNAMIC)
+	SET(LIBS isis_core ${LIBS})
+	ADD_LIBRARY( isis_core SHARED ${SRC_FILES} )
+	TARGET_LINK_LIBRARIES( isis_core ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} )
+	SET_TARGET_PROPERTIES( isis_core PROPERTIES	${ISIS_BUILD_PROPERTIES} VERSION ${${CMAKE_PROJECT_NAME}_VERSION} INSTALL_NAME_DIR ${ISIS_INSTALL_LIB_DIR})
+endif(ISIS_BUILD_DYNAMIC)
 
-TARGET_LINK_LIBRARIES( isis_core ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} )
-
-SET(ISIS_BUILD_PROPERTIES LINK_FLAGS "--no-undefined" CLEAN_DIRECT_OUTPUT 1)
-
-SET_TARGET_PROPERTIES( isis_core PROPERTIES 
-  ${ISIS_BUILD_PROPERTIES}
-  VERSION ${${CMAKE_PROJECT_NAME}_VERSION}
-  INSTALL_NAME_DIR ${ISIS_INSTALL_LIB_DIR}
-)
-SET_TARGET_PROPERTIES( isis_static PROPERTIES ${ISIS_BUILD_PROPERTIES} OUTPUT_NAME "isis_core" )
+if(ISIS_BUILD_STATIC)
+	SET(LIBS isis_static ${LIBS})
+	ADD_LIBRARY( isis_static STATIC ${SRC_FILES} )
+	SET_TARGET_PROPERTIES( isis_static PROPERTIES ${ISIS_BUILD_PROPERTIES} OUTPUT_NAME "isis_core" )
+endif(ISIS_BUILD_STATIC)
 
 ############################################################
 # Installation
 ############################################################
 
 # install libraries
-INSTALL (TARGETS isis_core isis_static
+INSTALL (TARGETS ${LIBS}
   RUNTIME DESTINATION ${ISIS_INSTALL_BIN_DIR} COMPONENT RuntimeLibraries
   LIBRARY DESTINATION ${ISIS_INSTALL_LIB_DIR} COMPONENT RuntimeLibraries
   ARCHIVE DESTINATION ${ISIS_INSTALL_LIB_DIR} COMPONENT Development)
