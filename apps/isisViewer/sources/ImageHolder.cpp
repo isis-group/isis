@@ -75,16 +75,14 @@ void ImageHolder::setUpPipe()
 	m_MapperAxial->SetInput( m_ExtractAxial->GetOutput() );
 	m_ActorAxial->SetMapper( m_MapperAxial );
 	m_ActorAxial->GetProperty()->SetInterpolationToFlat();
-	m_ActorAxial->SetScale( m_ImageVector.front()->GetSpacing()[0], m_ImageVector[m_currentTimestep]->GetSpacing()[1], m_ImageVector[m_currentTimestep]->GetSpacing()[2] );
+	m_ActorAxial->SetScale( m_ImageVector[m_currentTimestep]->GetSpacing()[0], m_ImageVector[m_currentTimestep]->GetSpacing()[1], m_ImageVector[m_currentTimestep]->GetSpacing()[2] );
 	if (!m_Physical ) {
 		m_ActorAxial->SetUserMatrix( m_MatrixHandler.getAxialMatrix1() );
 		m_ActorAxial->SetPosition(m_pseudoOrigin[0], m_pseudoOrigin[1], m_pseudoOrigin[2]);
 
 	} else {
 		m_ActorAxial->SetUserMatrix( m_MatrixHandler.getAxialMatrix() );
-		m_ActorAxial->SetPosition( m_ISISImage->getProperty<util::fvector4>("indexOrigin")[0],
-				m_ISISImage->getProperty<util::fvector4>("indexOrigin")[1],
-				m_ISISImage->getProperty<util::fvector4>("indexOrigin")[2] );
+		m_ActorAxial->SetPosition( m_transformedOrigin[0] * 2, m_transformedOrigin[1] * 2, m_transformedOrigin[2] * 2 );
 	}
 
 	//sagittal
@@ -98,9 +96,7 @@ void ImageHolder::setUpPipe()
 		m_ActorSagittal->SetPosition(m_pseudoOrigin[0], m_pseudoOrigin[1], m_pseudoOrigin[2]);
 	} else {
 		m_ActorSagittal->SetUserMatrix( m_MatrixHandler.getSagittalMatrix() );
-		m_ActorSagittal->SetPosition( m_ISISImage->getProperty<util::fvector4>("indexOrigin")[0],
-				m_ISISImage->getProperty<util::fvector4>("indexOrigin")[1],
-				m_ISISImage->getProperty<util::fvector4>("indexOrigin")[2] );
+		m_ActorSagittal->SetPosition( m_transformedOrigin[0], m_transformedOrigin[1], m_transformedOrigin[2] );
 	}
 
 	//coronal
@@ -115,34 +111,39 @@ void ImageHolder::setUpPipe()
 		m_ActorCoronal->SetPosition(m_pseudoOrigin[0], m_pseudoOrigin[1], m_pseudoOrigin[2]);
 	} else {
 		m_ActorCoronal->SetUserMatrix( m_MatrixHandler.getCoronalMatrix() );
-		m_ActorCoronal->SetPosition( m_ISISImage->getProperty<util::fvector4>("indexOrigin")[0],
-				m_ISISImage->getProperty<util::fvector4>("indexOrigin")[1],
-				m_ISISImage->getProperty<util::fvector4>("indexOrigin")[2] );
+		m_ActorCoronal->SetPosition( m_transformedOrigin[0], m_transformedOrigin[1], m_transformedOrigin[2] );
 	}
 }
 
-void ImageHolder::setImages( boost::shared_ptr<isis::data::Image> isisImg,  std::vector<vtkSmartPointer<vtkImageData> >imgVec )
+void ImageHolder::setImages( util::PropMap propMap,  std::vector<vtkSmartPointer<vtkImageData> >imgVec )
 {
 	m_ImageVector = imgVec;
 	LOG( Runtime, info ) << "Image contains " << m_ImageVector.size() << " timesteps.";
 	m_TimeSteps = m_ImageVector.size();
-	m_ISISImage = isisImg;
+	m_PropMap = propMap;
 	isis::util::TypeReference min, max;
 	#warning check this - the interfave for the conversion does not expect min max anymore
 	m_ISISImage->getMinMax( min, max );
 	m_Min = min->as<double>();
 	m_Max = max->as<double>();
 	LOG( Runtime, info ) << "Image minimum: " << min << "; Image maximum: " << max;
-	m_readVec = m_ISISImage->getProperty<isis::util::fvector4>("readVec");
-	m_phaseVec = m_ISISImage->getProperty<isis::util::fvector4>("phaseVec");
-	m_sliceVec = m_ISISImage->getProperty<isis::util::fvector4>("sliceVec");
+
+	m_ScalingFactor = m_PropMap.propertyValue("scale");
+	m_Offset = m_PropMap.propertyValue("offset");
+
+	m_readVec = m_PropMap.getProperty<isis::util::fvector4>("readVec");
+	m_phaseVec = m_PropMap.getProperty<isis::util::fvector4>("phaseVec");
+	m_sliceVec = m_PropMap.getProperty<isis::util::fvector4>("sliceVec");
 	LOG( Runtime, info ) << "readVector: " << m_readVec;
 	LOG( Runtime, info ) << "phaseVector: " << m_phaseVec;
 	LOG( Runtime, info ) << "sliceVector: " << m_sliceVec;
 	m_MatrixHandler.setVectors( m_readVec, m_phaseVec, m_sliceVec );
 	LOG( Runtime, info) << "spacing[0]: " << m_ImageVector.front()->GetSpacing()[0];
-	m_pseudoOrigin = m_MatrixHandler.createPseudoOrigin( m_ISISImage->sizeToVector(), m_ISISImage->getProperty<util::fvector4>("voxelSize"));
-	std::cout << "pseudo: " << m_pseudoOrigin << std::endl;
+	m_pseudoOrigin = m_MatrixHandler.createPseudoOrigin( m_PropMap.getProperty<util::fvector4>("imageSize"), m_PropMap.getProperty<util::fvector4>("voxelSize"));
+	m_transformedOrigin = m_MatrixHandler.transformOrigin( m_PropMap.getProperty<util::fvector4>("indexOrigin"), m_PropMap.getProperty<util::fvector4>("voxelSize"));
+	//TODO debug
+	std::cout << "transformedOrigin: " << m_transformedOrigin << std::endl;
+
 	commonInit();
 	createOrientedImages();
 	setUpPipe();

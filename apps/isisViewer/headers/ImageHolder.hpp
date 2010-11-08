@@ -61,7 +61,7 @@ class ImageHolder
 public:
 	ImageHolder();
 
-	void setImages( boost::shared_ptr<isis::data::Image>, std::vector<vtkSmartPointer<vtkImageData> >);
+	void setImages( util::PropMap, std::vector<vtkSmartPointer<vtkImageData> >);
 	void setPtrToViewer( const boost::shared_ptr<ViewControl> ptr ) { m_PtrToViewer = ptr; }
 
 	void setReadVec( const isis::util::fvector4& read ) { m_readVec = read; }
@@ -73,7 +73,7 @@ public:
 	isis::util::fvector4 getSliceVec() const { return m_sliceVec; }
 
 	vtkImageData* getVTKImageData() const { return m_ImageVector[m_currentTimestep]; }
-	boost::shared_ptr<isis::data::Image> getISISImage() const { return m_ISISImage; }
+	const util::PropMap& getISISImage() const { return m_PropMap; }
 
 	bool setSliceCoordinates (const int&, const int&, const int& );
 	void setCurrentTimeStep( const int& );
@@ -88,11 +88,13 @@ public:
 	vtkActor* getActorCoronal() const { return m_ActorCoronal; }
 	const int getCurrentTimeStep() const { return m_currentTimestep; }
 	const unsigned int getNumberOfTimesteps( void ) const { return m_TimeSteps; }
+	util::TypeReference getScalingFactor( void ) const { return m_ScalingFactor; }
+	util::TypeReference getOffset( void ) const { return m_Offset; }
 
 private:
 	MatrixHandler m_MatrixHandler;
 	std::vector<vtkSmartPointer<vtkImageData> > m_ImageVector;
-	boost::shared_ptr<isis::data::Image> m_ISISImage;
+	util::PropMap m_PropMap;
 	boost::shared_ptr<ViewControl> m_PtrToViewer;
 	vtkSmartPointer<vtkImageClip> m_ExtractAxial;
 	vtkSmartPointer<vtkImageClip> m_ExtractSagittal;
@@ -113,6 +115,9 @@ private:
 	unsigned int m_currentTimestep;
 	size_t m_X, m_Y, m_Z;
 
+	util::TypeReference m_ScalingFactor;
+	util::TypeReference m_Offset;
+
 	size_t m_Min, m_Max;
 
 	std::vector<size_t> m_BiggestElemVec;
@@ -121,6 +126,7 @@ private:
 	isis::util::fvector4 m_phaseVec;
 	isis::util::fvector4 m_sliceVec;
 	util::fvector4 m_pseudoOrigin;
+	util::fvector4 m_transformedOrigin;
 
 
 	void setUpPipe( void );

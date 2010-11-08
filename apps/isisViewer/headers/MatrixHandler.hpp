@@ -33,6 +33,7 @@ public:
 
 	bool isRotationMatrix( void ) const { return m_isRotationMatrix; }
 	util::fvector4 createPseudoOrigin( const util::fvector4& size, const util::fvector4& voxelSize ) const;
+	util::fvector4 transformOrigin( const util::fvector4& origin, const util::fvector4& voxelSize ) const;
 
 private:
 	bool m_isRotationMatrix;
