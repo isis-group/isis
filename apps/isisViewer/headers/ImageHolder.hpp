@@ -121,6 +121,7 @@ private:
 	isis::util::fvector4 m_phaseVec;
 	isis::util::fvector4 m_sliceVec;
 	util::fvector4 m_pseudoOrigin;
+	util::fvector4 m_transformedOrigin;
 
 
 	void setUpPipe( void );

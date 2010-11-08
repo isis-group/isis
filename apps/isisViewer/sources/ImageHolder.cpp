@@ -75,16 +75,14 @@ void ImageHolder::setUpPipe()
 	m_MapperAxial->SetInput( m_ExtractAxial->GetOutput() );
 	m_ActorAxial->SetMapper( m_MapperAxial );
 	m_ActorAxial->GetProperty()->SetInterpolationToFlat();
-	m_ActorAxial->SetScale( m_ImageVector.front()->GetSpacing()[0], m_ImageVector[m_currentTimestep]->GetSpacing()[1], m_ImageVector[m_currentTimestep]->GetSpacing()[2] );
+	m_ActorAxial->SetScale( m_ImageVector[m_currentTimestep]->GetSpacing()[0], m_ImageVector[m_currentTimestep]->GetSpacing()[1], m_ImageVector[m_currentTimestep]->GetSpacing()[2] );
 	if (!m_Physical ) {
 		m_ActorAxial->SetUserMatrix( m_MatrixHandler.getAxialMatrix1() );
 		m_ActorAxial->SetPosition(m_pseudoOrigin[0], m_pseudoOrigin[1], m_pseudoOrigin[2]);
 
 	} else {
 		m_ActorAxial->SetUserMatrix( m_MatrixHandler.getAxialMatrix() );
-		m_ActorAxial->SetPosition( m_ISISImage->getProperty<util::fvector4>("indexOrigin")[0],
-				m_ISISImage->getProperty<util::fvector4>("indexOrigin")[1],
-				m_ISISImage->getProperty<util::fvector4>("indexOrigin")[2] );
+		m_ActorAxial->SetPosition( m_transformedOrigin[0] * 2, m_transformedOrigin[1] * 2, m_transformedOrigin[2] * 2 );
 	}
 
 	//sagittal
@@ -98,9 +96,7 @@ void ImageHolder::setUpPipe()
 		m_ActorSagittal->SetPosition(m_pseudoOrigin[0], m_pseudoOrigin[1], m_pseudoOrigin[2]);
 	} else {
 		m_ActorSagittal->SetUserMatrix( m_MatrixHandler.getSagittalMatrix() );
-		m_ActorSagittal->SetPosition( m_ISISImage->getProperty<util::fvector4>("indexOrigin")[0],
-				m_ISISImage->getProperty<util::fvector4>("indexOrigin")[1],
-				m_ISISImage->getProperty<util::fvector4>("indexOrigin")[2] );
+		m_ActorSagittal->SetPosition( m_transformedOrigin[0], m_transformedOrigin[1], m_transformedOrigin[2] );
 	}
 
 	//coronal
@@ -115,9 +111,7 @@ void ImageHolder::setUpPipe()
 		m_ActorCoronal->SetPosition(m_pseudoOrigin[0], m_pseudoOrigin[1], m_pseudoOrigin[2]);
 	} else {
 		m_ActorCoronal->SetUserMatrix( m_MatrixHandler.getCoronalMatrix() );
-		m_ActorCoronal->SetPosition( m_ISISImage->getProperty<util::fvector4>("indexOrigin")[0],
-				m_ISISImage->getProperty<util::fvector4>("indexOrigin")[1],
-				m_ISISImage->getProperty<util::fvector4>("indexOrigin")[2] );
+		m_ActorCoronal->SetPosition( m_transformedOrigin[0], m_transformedOrigin[1], m_transformedOrigin[2] );
 	}
 }
 
@@ -141,7 +135,8 @@ void ImageHolder::setImages( boost::shared_ptr<isis::data::Image> isisImg,  std:
 	m_MatrixHandler.setVectors( m_readVec, m_phaseVec, m_sliceVec );
 	LOG( Runtime, info) << "spacing[0]: " << m_ImageVector.front()->GetSpacing()[0];
 	m_pseudoOrigin = m_MatrixHandler.createPseudoOrigin( m_ISISImage->sizeToVector(), m_ISISImage->getProperty<util::fvector4>("voxelSize"));
-	std::cout << "pseudo: " << m_pseudoOrigin << std::endl;
+	m_transformedOrigin = m_MatrixHandler.transformOrigin( m_ISISImage->getProperty<util::fvector4>("indexOrigin"), m_ISISImage->getProperty<util::fvector4>("voxelSize"));
+	std::cout << "transformedOrigin: " << m_transformedOrigin << std::endl;
 	commonInit();
 	createOrientedImages();
 	setUpPipe();

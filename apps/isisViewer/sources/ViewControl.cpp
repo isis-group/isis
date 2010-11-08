@@ -99,9 +99,9 @@ void ViewControl::setUpPipe()
 	m_SagittalWidget->GetRenderWindow()->SetInteractor( m_SagittalWidget->GetInteractor() );
 	m_CoronalWidget->GetRenderWindow()->SetInteractor( m_CoronalWidget->GetInteractor() );
 
-	m_AxialWidget->GetRenderWindow()->AddRenderer( m_RendererCoronal );
+	m_AxialWidget->GetRenderWindow()->AddRenderer( m_RendererAxial );
 	m_SagittalWidget->GetRenderWindow()->AddRenderer( m_RendererSagittal );
-	m_CoronalWidget->GetRenderWindow()->AddRenderer( m_RendererAxial );
+	m_CoronalWidget->GetRenderWindow()->AddRenderer( m_RendererCoronal );
 }
 
 void ViewControl::resetCam()
@@ -174,16 +174,10 @@ void ViewControl::displayIntensity( const int& x, const int& y, const int &z )
 void ViewControl::sliceChanged( const int& x, const int& y, const int& z)
 {
 	LOG( Runtime, info ) << "ViewControl::sliceChanged";
-//	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference refImg, m_ImageHolderVector)
-//	{
-//		if ( not refImg->setSliceCoordinates(x,y,z) ) LOG( Runtime, error ) << "error during setting slicesetting!";
-//	}
 	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference refImg, m_ImageHolderVector)
 	{
-		refImg->getActorAxial()->GetProperty()->SetOpacity(0.2);
+		if ( not refImg->setSliceCoordinates(x,y,z) ) LOG( Runtime, error ) << "error during setting slicesetting!";
 	}
-	m_CurrentImageHolder->setSliceCoordinates(x,y,z) ;
-
 	UpdateWidgets();
 }
 
