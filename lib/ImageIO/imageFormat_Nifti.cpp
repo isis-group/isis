@@ -473,13 +473,15 @@ private:
 		T *refNii = ( T * ) ni.data;
 		const util::FixedVector<size_t, 4> csize = image.getChunk( 0, 0 ).sizeToVector();
 		const util::FixedVector<size_t, 4> isize = image.sizeToVector();
+		const std::pair<util::TypeReference,util::TypeReference> scale=image.getScalingTo(data::TypePtr<T>::staticID);
+
 
 		for ( size_t t = 0; t < isize[3]; t += csize[3] ) {
 			for ( size_t z = 0; z < isize[2]; z += csize[2] ) {
 				for ( size_t y = 0; y < isize[1]; y += csize[1] ) {
 					for ( size_t x = 0; x < isize[0]; x += csize[0] ) {
 						const size_t dim[] = {x, y, z, t};
-						const data::Chunk ch = image.getChunkAs<T>( x, y, z, t );
+						const data::Chunk ch = image.getChunkAs<T>(*scale.first,*scale.second, x, y, z, t );
 						T *target = refNii + image.dim2Index( dim );
 						ch.getTypePtr<T>().copyToMem( 0, ch.volume() - 1, target );
 					}

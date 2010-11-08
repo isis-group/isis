@@ -521,7 +521,7 @@ void Image::getMinMax ( util::TypeReference &min, util::TypeReference &max ) con
 	}
 }
 
-std::list< std::pair< util::TypeReference, util::TypeReference > > Image::getScalingTo(short unsigned int targetID, autoscaleOption scaleopt) const
+std::pair< util::TypeReference, util::TypeReference > Image::getScalingTo(short unsigned int targetID, autoscaleOption scaleopt) const
 {
 	LOG_IF(!clean,Runtime,error) << "You should run reIndex before running this";
 	std::list< std::pair< util::TypeReference, util::TypeReference > >  ret;
@@ -529,25 +529,14 @@ std::list< std::pair< util::TypeReference, util::TypeReference > > Image::getSca
 	getMinMax(min,max);
 	bool unique=true;
 	const std::vector<boost::shared_ptr<const Chunk> > chunks=getChunkList();
-	BOOST_FOREACH(const boost::shared_ptr<const Chunk> &ref, chunks){ //collect all scales for all chunks
-		if(targetID != ref->typeID())ret.push_back( //but only if this chunk would be scaled
-			ref->getScalingTo(targetID,*min,*max,scaleopt)
-		);
-		const util::_internal::TypeBase &firstmin=*(ret.front().first);
-		const util::_internal::TypeBase &firstmax=*(ret.front().second);
-		const util::_internal::TypeBase &lastmin=*(ret.back().first);
-		const util::_internal::TypeBase &lastmax=*(ret.back().second);
-		
-		if(unique && !((firstmin==lastmin) || (firstmax==lastmax)))
-			unique = false;
+	BOOST_FOREACH(const boost::shared_ptr<const Chunk> &ref, chunks){ //find a chunk which would be converted
+		if(targetID != ref->typeID())
+			return ref->getScalingTo(targetID,*min,*max,scaleopt); // and ask that for the scaling
 	}
-	if(ret.empty()){ // if the was no scaling at all - insert 1/1
-		util::TypeReference one(util::Type<unsigned short>(1));
-		ret.push_back(std::make_pair<util::TypeReference,util::TypeReference>(one,one));
-	} else if(unique){ // if all scales are the same 
-		ret.erase((++ret.begin()),ret.end());
-	}
-	return ret;
+	return std::make_pair( //ok seems like no conversion is needed - return 1/0
+			util::TypeReference(util::Type<uint8_t>(1)),
+			util::TypeReference(util::Type<uint8_t>(0))
+	);
 }
 
 size_t Image::cmp( const isis::data::Image &comp ) const
@@ -655,13 +644,13 @@ bool Image::makeOfTypeId( short unsigned int id )
 {
 	// get value range of the image for the conversion
 	util::TypeReference min, max;
-	getMinMax( min, max );
-	assert( ! ( min.empty() || max.empty() ) );
-	LOG( Debug, info ) << "Computed value range of the original image data: [" << min << ".." << max << "]";
+	std::pair<util::TypeReference,util::TypeReference> scale=getScalingTo(id);
+
+	LOG( Debug, info ) << "Computed scaling of the original image data: [" << scale << "]";
 	bool retVal = true;
 	//we want all chunks to be of type id - so tell them
 	BOOST_FOREACH( boost::shared_ptr<Chunk> &ref, lookup ) {
-		retVal &= ref->makeOfTypeId( id, *min, *max );
+		retVal &= ref->makeOfTypeId( id, *scale.first, *scale.second );
 	}
 	return retVal;
 }

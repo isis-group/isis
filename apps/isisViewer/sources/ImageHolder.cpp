@@ -128,6 +128,7 @@ void ImageHolder::setImages( boost::shared_ptr<isis::data::Image> isisImg,  std:
 	m_TimeSteps = m_ImageVector.size();
 	m_ISISImage = isisImg;
 	isis::util::TypeReference min, max;
+	#warning check this - the interfave for the conversion does not expect min max anymore
 	m_ISISImage->getMinMax( min, max );
 	m_Min = min->as<double>();
 	m_Max = max->as<double>();
