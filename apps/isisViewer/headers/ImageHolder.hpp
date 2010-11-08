@@ -88,8 +88,8 @@ public:
 	vtkActor* getActorCoronal() const { return m_ActorCoronal; }
 	const int getCurrentTimeStep() const { return m_currentTimestep; }
 	const unsigned int getNumberOfTimesteps( void ) const { return m_TimeSteps; }
-	const util::TypeReference getScalingFactor( void ) const { return m_ScalingFactor; }
-	const util::TypeReference getOffset( void ) const { return m_Offset; }
+	util::TypeReference getScalingFactor( void ) const { return m_ScalingFactor; }
+	util::TypeReference getOffset( void ) const { return m_Offset; }
 
 private:
 	MatrixHandler m_MatrixHandler;

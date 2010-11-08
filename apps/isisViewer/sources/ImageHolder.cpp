@@ -115,16 +115,17 @@ void ImageHolder::setUpPipe()
 	}
 }
 
-void ImageHolder::setImages( util::PropMap isisImg,  std::vector<vtkSmartPointer<vtkImageData> >imgVec )
+void ImageHolder::setImages( util::PropMap propMap,  std::vector<vtkSmartPointer<vtkImageData> >imgVec )
 {
 	m_ImageVector = imgVec;
 	LOG( Runtime, info ) << "Image contains " << m_ImageVector.size() << " timesteps.";
 	m_TimeSteps = m_ImageVector.size();
-	m_PropMap = isisImg;
+	m_PropMap = propMap;
 	isis::util::TypeReference min, max;
 	LOG( Runtime, info ) << "Image minimum: " << min << "; Image maximum: " << max;
 
-//	m_ScalingFactor = m_PropMap.getProperty<util::TypeReference>("scale");
+	m_ScalingFactor = m_PropMap.propertyValue("scale");
+	m_Offset = m_PropMap.propertyValue("offset");
 
 	m_readVec = m_PropMap.getProperty<isis::util::fvector4>("readVec");
 	m_phaseVec = m_PropMap.getProperty<isis::util::fvector4>("phaseVec");

@@ -130,10 +130,13 @@ void ViewControl::UpdateWidgets()
 
 void ViewControl::displayIntensity( const int& x, const int& y, const int &z )
 {
-
 	const int t = m_CurrentImageHolder->getCurrentTimeStep();
 	signalList.mousePosChanged( x, y, z, t );
-	signalList.intensityChanged( 0 );
+	float scaling = m_CurrentImageHolder->getScalingFactor()->as<float>();
+	size_t offset = m_CurrentImageHolder->getOffset()->as<size_t>();
+	std::cout << "offset: " << offset << std::endl;
+	std::cout << "scaling: " << scaling << std::endl;
+	signalList.intensityChanged( m_CurrentImagePtr->GetScalarComponentAsDouble(x,y,z, 0) / scaling - offset );
 
 }
 
