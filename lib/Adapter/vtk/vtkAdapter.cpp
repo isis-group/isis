@@ -28,7 +28,7 @@ namespace adapter
 {
 
 //return a list of vtkImageData type pointer
-std::vector<vtkSmartPointer<vtkImageData> >vtkAdapter::makeVtkImageObject( const boost::shared_ptr<data::Image> src )
+std::vector<vtkSmartPointer<vtkImageData> >vtkAdapter::makeVtkImageObject( const boost::shared_ptr<data::Image> src, ScalingType &scaling)
 {
 	const util::fvector4 indexOrigin( src->getProperty<util::fvector4>( "indexOrigin" ) );
 	const util::fvector4 spacing( src->getProperty<util::fvector4>( "voxelSize" ) );
@@ -36,6 +36,7 @@ std::vector<vtkSmartPointer<vtkImageData> >vtkAdapter::makeVtkImageObject( const
 
 	util::TypeReference min, max;
 	src->getMinMax(min, max);
+	scaling = src->getChunkList().front()->getScalingTo(data::TypePtr<u_int8_t>::staticID, *min, *max, data::autoscale);
 	void *targePtr = malloc( src->bytes_per_voxel() * src->volume() );
 	uint8_t *refTarget = ( uint8_t * ) targePtr;
 	size_t chunkIndex = 0;

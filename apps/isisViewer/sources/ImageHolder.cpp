@@ -115,28 +115,30 @@ void ImageHolder::setUpPipe()
 	}
 }
 
-void ImageHolder::setImages( boost::shared_ptr<isis::data::Image> isisImg,  std::vector<vtkSmartPointer<vtkImageData> >imgVec )
+void ImageHolder::setImages( util::PropMap isisImg,  std::vector<vtkSmartPointer<vtkImageData> >imgVec )
 {
 	m_ImageVector = imgVec;
 	LOG( Runtime, info ) << "Image contains " << m_ImageVector.size() << " timesteps.";
 	m_TimeSteps = m_ImageVector.size();
-	m_ISISImage = isisImg;
+	m_PropMap = isisImg;
 	isis::util::TypeReference min, max;
-	m_ISISImage->getMinMax( min, max );
-	m_Min = min->as<double>();
-	m_Max = max->as<double>();
 	LOG( Runtime, info ) << "Image minimum: " << min << "; Image maximum: " << max;
-	m_readVec = m_ISISImage->getProperty<isis::util::fvector4>("readVec");
-	m_phaseVec = m_ISISImage->getProperty<isis::util::fvector4>("phaseVec");
-	m_sliceVec = m_ISISImage->getProperty<isis::util::fvector4>("sliceVec");
+
+//	m_ScalingFactor = m_PropMap.getProperty<util::TypeReference>("scale");
+
+	m_readVec = m_PropMap.getProperty<isis::util::fvector4>("readVec");
+	m_phaseVec = m_PropMap.getProperty<isis::util::fvector4>("phaseVec");
+	m_sliceVec = m_PropMap.getProperty<isis::util::fvector4>("sliceVec");
 	LOG( Runtime, info ) << "readVector: " << m_readVec;
 	LOG( Runtime, info ) << "phaseVector: " << m_phaseVec;
 	LOG( Runtime, info ) << "sliceVector: " << m_sliceVec;
 	m_MatrixHandler.setVectors( m_readVec, m_phaseVec, m_sliceVec );
 	LOG( Runtime, info) << "spacing[0]: " << m_ImageVector.front()->GetSpacing()[0];
-	m_pseudoOrigin = m_MatrixHandler.createPseudoOrigin( m_ISISImage->sizeToVector(), m_ISISImage->getProperty<util::fvector4>("voxelSize"));
-	m_transformedOrigin = m_MatrixHandler.transformOrigin( m_ISISImage->getProperty<util::fvector4>("indexOrigin"), m_ISISImage->getProperty<util::fvector4>("voxelSize"));
+	m_pseudoOrigin = m_MatrixHandler.createPseudoOrigin( m_PropMap.getProperty<util::fvector4>("imageSize"), m_PropMap.getProperty<util::fvector4>("voxelSize"));
+	m_transformedOrigin = m_MatrixHandler.transformOrigin( m_PropMap.getProperty<util::fvector4>("indexOrigin"), m_PropMap.getProperty<util::fvector4>("voxelSize"));
+	//TODO debug
 	std::cout << "transformedOrigin: " << m_transformedOrigin << std::endl;
+
 	commonInit();
 	createOrientedImages();
 	setUpPipe();

@@ -68,9 +68,9 @@ void ViewControl::addImages( const ImageMapType& fileMap )
 	{
 		boost::shared_ptr< ImageHolder > tmpVec( new ImageHolder );
 		tmpVec->setImages( ref.first, ref.second );
-		tmpVec->setReadVec( ref.first->getProperty<isis::util::fvector4>("readVec") );
-		tmpVec->setPhaseVec( ref.first->getProperty<isis::util::fvector4>("phaseVec") );
-		tmpVec->setSliceVec( ref.first->getProperty<isis::util::fvector4>("sliceVec") );
+		tmpVec->setReadVec( ref.first.getProperty<isis::util::fvector4>("readVec") );
+		tmpVec->setPhaseVec( ref.first.getProperty<isis::util::fvector4>("phaseVec") );
+		tmpVec->setSliceVec( ref.first.getProperty<isis::util::fvector4>("sliceVec") );
 		m_ImageHolderVector.push_back( tmpVec );
 	}
 
@@ -133,41 +133,7 @@ void ViewControl::displayIntensity( const int& x, const int& y, const int &z )
 
 	const int t = m_CurrentImageHolder->getCurrentTimeStep();
 	signalList.mousePosChanged( x, y, z, t );
-
-	switch (m_CurrentImageHolder->getISISImage()->getChunk(x,y,z,t ).typeID() )
-	{
-	case isis::data::TypePtr<int8_t>::staticID:
-		signalList.intensityChanged(m_CurrentImageHolder->getISISImage()->voxel<int8_t>(x, y,z, t));
-		break;
-	case isis::data::TypePtr<u_int8_t>::staticID:
-		signalList.intensityChanged(m_CurrentImageHolder->getISISImage()->voxel<u_int8_t>(x, y,z, t));
-		break;
-	case isis::data::TypePtr<int16_t>::staticID:
-		signalList.intensityChanged(m_CurrentImageHolder->getISISImage()->voxel<int16_t>(x, y,z, t));
-		break;
-	case isis::data::TypePtr<u_int16_t>::staticID:
-		signalList.intensityChanged(m_CurrentImageHolder->getISISImage()->voxel<u_int16_t>(x, y,z, t));
-		break;
-	case isis::data::TypePtr<int32_t>::staticID:
-		signalList.intensityChanged(m_CurrentImageHolder->getISISImage()->voxel<int32_t>(x, y,z, t));
-		break;
-	case isis::data::TypePtr<u_int32_t>::staticID:
-		signalList.intensityChanged(m_CurrentImageHolder->getISISImage()->voxel<u_int32_t>(x, y,z, t));
-		break;
-	case isis::data::TypePtr<float>::staticID:
-		signalList.intensityChanged(m_CurrentImageHolder->getISISImage()->voxel<float>(x, y,z, t));
-		break;
-	case isis::data::TypePtr<double>::staticID:
-		signalList.intensityChanged(m_CurrentImageHolder->getISISImage()->voxel<double>(x, y,z, t));
-		break;
-	default:
-		LOG( Runtime, error )
-		<< "Unknown pixel representation with typeid " <<
-			m_CurrentImageHolder->getISISImage()->getChunk(x,y,z,t ).typeID() <<
-		". Can not display intensity! ";
-
-		signalList.intensityChanged(-1);
-	}
+	signalList.intensityChanged( 0 );
 
 }
 

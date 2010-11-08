@@ -134,7 +134,7 @@ public:
 
 	template<typename T> bool copyToMem( T *dst, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max )const {
 		// wrap the raw memory at into an non-deleting TypePtr of the length of the chunk
-		TypePtr<T> dstPtr( dst, volume(), TypePtr<T>::NonDeleter() );
+		TypePtr<T> dstPtr( dst, volume(), typename TypePtr<T>::NonDeleter() );
 		return getTypePtrBase().convertTo( dstPtr, min, max ); // copy-convert the data into dstPtr
 	}
 
