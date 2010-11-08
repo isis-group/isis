@@ -62,16 +62,15 @@ Chunk Chunk::cloneToMem( size_t firstDim, size_t secondDim, size_t thirdDim, siz
 bool Chunk::makeOfTypeId( short unsigned int id )
 {
 	if( typeID() != id ) {
-		std::pair<util::TypeReference,util::TypeReference> scale=getScalingTo(id);
-		return makeOfTypeId( id, *scale.first, *scale.second );
+		return makeOfTypeId( id, getScalingTo(id));
 	}
 	return true;
 }
 
-bool Chunk::makeOfTypeId( short unsigned int id, const util::_internal::TypeBase &scale, const util::_internal::TypeBase &offset )
+bool Chunk::makeOfTypeId( short unsigned int id, const scaling_pair &scaling )
 {
 	if( typeID() != id ) { // if its not the same type - replace the internal TypePtr by a new returned from TypePtrBase::copyToNewById
-		TypePtrReference newPtr = getTypePtrBase().copyToNewById( id, scale, offset ); // create a new TypePtr of type id and store it in a TypePtrReference
+		TypePtrReference newPtr = getTypePtrBase().copyToNewById( id, scaling ); // create a new TypePtr of type id and store it in a TypePtrReference
 
 		if( newPtr.empty() ) // if the reference is empty the conversion failed
 			return false;

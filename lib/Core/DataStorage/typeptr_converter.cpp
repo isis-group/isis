@@ -43,15 +43,15 @@ namespace _internal
 template<typename SRC, typename DST> class TypePtrGenerator: public TypePtrConverterBase
 {
 public:
-	void generate( const TypePtrBase &src, boost::scoped_ptr<TypePtrBase>& dst, const util::_internal::TypeBase &scale, const util::_internal::TypeBase &offset )const {
+	void generate( const TypePtrBase &src, boost::scoped_ptr<TypePtrBase>& dst, const scaling_pair &scaling )const {
 		LOG_IF( dst.get(), Debug, warning ) << "Generating into existing value " << dst->toString( true );
 		//Create new "stuff" in memory
 		TypePtr<DST> *newDat = new TypePtr<DST>( ( DST * )malloc( sizeof( DST )*src.len() ), src.len() );
 		dst.reset( newDat );
-		convert( src, *dst, scale, offset );//and convert into that
+		convert( src, *dst, scaling );//and convert into that
 	}
 };
-void TypePtrConverterBase::convert( const TypePtrBase &src, TypePtrBase &dst, const util::_internal::TypeBase &scale, const util::_internal::TypeBase &offset ) const
+void TypePtrConverterBase::convert( const TypePtrBase &src, TypePtrBase &dst, const scaling_pair &scaling ) const
 {
 	LOG( Debug, error ) << "Empty conversion was called as conversion from " << src.typeName() << " to " << dst.typeName() << " this is most likely an error.";
 }
@@ -80,7 +80,7 @@ public:
 		TypePtrConverter<NUMERIC, true, SRC, DST> *ret = new TypePtrConverter<NUMERIC, true, SRC, DST>;
 		return boost::shared_ptr<const TypePtrConverterBase>( ret );
 	}
-	void convert( const TypePtrBase &src, TypePtrBase &dst, const util::_internal::TypeBase &scale, const util::_internal::TypeBase &offset )const {
+	void convert( const TypePtrBase &src, TypePtrBase &dst, const scaling_pair &scaling )const {
 		TypePtr<SRC> &dstVal = dst.cast_to_TypePtr<SRC>();
 		const SRC *srcPtr = &src.cast_to_TypePtr<SRC>()[0];
 		LOG_IF( src.len() < dst.len(), Debug, info ) << "The target is longer than the the source (" << dst.len() << ">" << src.len() << "). Will only copy/convert " << src.len() << " elements";
@@ -119,8 +119,9 @@ public:
 		TypePtrConverter<true, false, SRC, DST> *ret = new TypePtrConverter<true, false, SRC, DST>;
 		return boost::shared_ptr<const TypePtrConverterBase>( ret );
 	}
-	void convert( const TypePtrBase &src, TypePtrBase &dst, const util::_internal::TypeBase &scale, const util::_internal::TypeBase &offset )const {
-		numeric_convert( src.cast_to_TypePtr<SRC>(), dst.cast_to_TypePtr<DST>(), scale.as<double>(), offset.as<double>() );
+	void convert( const TypePtrBase &src, TypePtrBase &dst, const scaling_pair &scaling )const {
+		LOG_IF(scaling.first.empty() || scaling.first.empty(), Debug,error) << "Running conversion with invalid scaling (" << scaling << ") this won't work";
+		numeric_convert( src.cast_to_TypePtr<SRC>(), dst.cast_to_TypePtr<DST>(), scaling.first->as<double>(), scaling.second->as<double>() );
 	}
 	std::pair<util::TypeReference,util::TypeReference> getScaling(const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale)const{
 		const std::pair<double,double> scale=getNumericScaling<SRC,DST>(min,max,scaleopt);

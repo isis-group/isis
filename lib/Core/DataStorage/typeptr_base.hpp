@@ -77,7 +77,7 @@ public:
 
 	/// Copy (or Convert) data from this to another TypePtr of maybe another type and the same length.
 	bool convertTo( TypePtrBase &dst )const;
-	bool convertTo( TypePtrBase &dst, const util::_internal::TypeBase &scale, const util::_internal::TypeBase &offset )const;
+	bool convertTo( TypePtrBase &dst, const scaling_pair &scaling )const;
 
 	///get the scaling (and offset) which would be used in an convertTo 
 	std::pair<util::TypeReference,util::TypeReference> getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const;
@@ -91,7 +91,7 @@ public:
 	}
 
 	Reference copyToNewById( unsigned short id ) const;
-	Reference copyToNewById( unsigned short id, const util::_internal::TypeBase &scale, const util::_internal::TypeBase &offset ) const;
+	Reference copyToNewById( unsigned short id, const scaling_pair &scaling ) const;
 
 	/**
 	 * Copy this to a new TypePtr\<T\> using newly allocated memory.
@@ -100,8 +100,8 @@ public:
 	 * If the conversion fails, an error will be send to CoreLog and the data of the newly created TypePtr will be undefined.
 	 * \returns a the newly created TypePtr
 	 */
-	template<typename T> TypePtr<T> copyToNew( const util::_internal::TypeBase &scale, const util::_internal::TypeBase &offset )const {
-		Reference ret = copyToNewById( TypePtr<T>::staticID, scale, offset );
+	template<typename T> TypePtr<T> copyToNew( const scaling_pair &scaling )const {
+		Reference ret = copyToNewById( TypePtr<T>::staticID, scaling );
 		return ret->cast_to_TypePtr<T>();
 	}
 	/**

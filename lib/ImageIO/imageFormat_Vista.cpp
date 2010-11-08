@@ -874,7 +874,7 @@ template <typename T> bool ImageFormat_Vista::copyImageToVista( const data::Imag
 	for ( size_t z = 0; z < isize[2]; z += csize[2] ) {
 		for ( size_t y = 0; y < isize[1]; y += csize[1] ) {
 			for ( size_t x = 0; x < isize[0]; x += csize[0] ) {
-				data::Chunk ch = image.getChunkAs<T>(*scale.first,*scale.second, x, y, z, 0 );
+				data::Chunk ch = image.getChunkAs<T>(scale, x, y, z, 0 );
 				ch.getTypePtr<T>().copyToMem( 0, csize.product() - 1, &VPixel( vimage, z, y, x, T ) );
 			}
 		}

@@ -650,7 +650,7 @@ bool Image::makeOfTypeId( short unsigned int id )
 	bool retVal = true;
 	//we want all chunks to be of type id - so tell them
 	BOOST_FOREACH( boost::shared_ptr<Chunk> &ref, lookup ) {
-		retVal &= ref->makeOfTypeId( id, *scale.first, *scale.second );
+		retVal &= ref->makeOfTypeId( id, scale );
 	}
 	return retVal;
 }

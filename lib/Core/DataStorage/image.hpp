@@ -227,18 +227,15 @@ public:
 	* \returns a chunk contains the (maybe converted) voxel value at the given coordinates.
 	*/
 	template<typename TYPE> Chunk getChunkAs(size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0)const {
-		Chunk ret = getChunk( first, second, third, fourth ); // get a cheap copy
-		std::pair<util::TypeReference,util::TypeReference> scale=getScalingTo(TypePtr<TYPE>::staticID);
-		ret.makeOfTypeId( TypePtr<TYPE>::staticID,*scale.first,*scale.second ); // make it of type T
-		return ret; //return that
+		return getChunkAs<TYPE>(getScalingTo(TypePtr<TYPE>::staticID),first,second,third,fourth);
 	}
 	/**
 	 * Get the chunk that contains the voxel at the given coordinates in the given type (fast version).
 	 * \copydetails getChunkAs
 	 */
-	template<typename TYPE> Chunk getChunkAs(const util::_internal::TypeBase &scale, const util::_internal::TypeBase &offset, size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0)const {
+	template<typename TYPE> Chunk getChunkAs(const scaling_pair &scaling, size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0)const {
 		Chunk ret = getChunk( first, second, third, fourth ); // get a cheap copy
-		ret.makeOfTypeId( TypePtr<TYPE>::staticID,scale,offset ); // make it of type T
+		ret.makeOfTypeId( TypePtr<TYPE>::staticID,scaling ); // make it of type T
 		return ret; //return that
 	}
 
@@ -323,7 +320,7 @@ public:
 			std::pair<util::TypeReference,util::TypeReference> scale=getScalingTo(TypePtr<T>::staticID);
 			// we could do this using makeOfTypeId - but this solution does not need any additional temporary memory
 			BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
-				if( !ref->copyToMem<T>( dst, *scale.first, *scale.second) ) {
+				if( !ref->copyToMem<T>( dst, scale) ) {
 					LOG( Runtime, error ) << "Failed to copy raw data of type " << ref->typeName() << " from image into memory of type " << TypePtr<T>::staticName();
 				}
 
@@ -361,7 +358,7 @@ public:
 		struct : _internal::SortedChunkList::chunkPtrOperator {
 			std::pair<util::TypeReference,util::TypeReference> scale;
 			boost::shared_ptr<Chunk> operator()( const boost::shared_ptr< Chunk >& ptr ) {
-				return boost::shared_ptr<Chunk>( new MemChunk<T>( *ptr, *scale.first, *scale.second ) );
+				return boost::shared_ptr<Chunk>( new MemChunk<T>( *ptr, scale ) );
 			}
 		} conv_op;
 		conv_op.scale=ref.getScalingTo(TypePtr<T>::staticID);

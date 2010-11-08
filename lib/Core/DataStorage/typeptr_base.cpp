@@ -38,16 +38,15 @@ size_t TypePtrBase::cmp( const TypePtrBase &comp )const
 
 TypePtrBase::Reference TypePtrBase::copyToNewById( unsigned short id ) const
 {
-	std::pair<util::TypeReference,util::TypeReference> scale=getScalingTo(id);
-	return copyToNewById( id, *scale.first, *scale.second);
+	return copyToNewById( id, getScalingTo(id));
 }
-TypePtrBase::Reference TypePtrBase::copyToNewById( unsigned short id, const util::_internal::TypeBase &scale, const util::_internal::TypeBase &offset ) const
+TypePtrBase::Reference TypePtrBase::copyToNewById( unsigned short id, const scaling_pair &scaling ) const
 {
 	const Converter &conv = getConverterTo( id );
 
 	if( conv ) {
 		boost::scoped_ptr<TypePtrBase> ret;
-		conv->generate( *this, ret, scale, offset );
+		conv->generate( *this, ret, scaling );
 		return *ret;
 	} else {
 		LOG( Runtime, error )
@@ -103,15 +102,14 @@ TypePtrBase::getScalingTo( unsigned short typeID, const util::_internal::TypeBas
 }
 bool TypePtrBase::convertTo( TypePtrBase &dst )const
 {
-	std::pair<util::TypeReference,util::TypeReference> scale=getScalingTo(dst.typeID());
-	return TypePtrBase::convertTo( dst, *scale.first, *scale.second);
+	return convertTo( dst, getScalingTo(dst.typeID()));
 }
-bool TypePtrBase::convertTo( TypePtrBase &dst, const util::_internal::TypeBase &scale, const util::_internal::TypeBase &offset ) const
+bool TypePtrBase::convertTo( TypePtrBase &dst, const scaling_pair &scaling ) const
 {
 	const Converter &conv = getConverterTo( dst.typeID() );
 
 	if ( conv ) {
-		conv->convert( *this, dst, scale, offset );
+		conv->convert( *this, dst, scaling );
 		return true;
 	} else {
 		LOG( Runtime, error )
