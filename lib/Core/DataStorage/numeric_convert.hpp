@@ -43,18 +43,37 @@ template<typename SRC, typename DST> static void numeric_convert_impl( const SRC
 	for ( size_t i = 0; i < count; i++ )
 		dst[i] = converter( src[i] );
 }
+}
+
+/**
+ * Computes scaling and offset between two scalar value domains.
+ * The rules are:
+ * - If the value range defined by min and max does not fit into the domain of dst they will be scaled
+ * - scale "around 0" if 0 is part of the source value range.
+ * - elsewise values will be offset towards 0 if the value range of the source does not fit the destination.
+ * - if destination is unsigned, values will be offset to be in positive domain if necessary.
+ * - if destination is floating point no scaling is done at all (scale factor will be 1, offset will be 0).
+ * The scaling strategies are:
+ * - autoscale: do not scale up (scale <=1) if src is an integer type, otherwise also do upscaling
+ * - noupscale: never scale up (scale <=1)
+ * - upscale: enforce upscaling even if SRC is an integer type
+ * - noscale: do not scale at all (scale==1)
+ * \param scale the scaling factor
+ * \param offset the offset
+ * \param scaleopt enum to tweak the scaling strategy
+ */
 template<typename SRC, typename DST> std::pair<double,double>
-getScaling(const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale )
+getNumericScaling(const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale )
 {
 	double scale = 1.0;
 	double offset = 0.0;
 	bool doScale = ( scaleopt != noscale && std::numeric_limits<DST>::is_integer ); //only do scale if scaleopt!=noscale and the target is an integer (scaling into float is useless)
-	
+
 	if ( scaleopt == autoscale && std::numeric_limits<SRC>::is_integer ) {
 		LOG( Debug, verbose_info ) << "Won't upscale, because the source datatype is discrete (" << util::Type<SRC>::staticName() << ")";
 		scaleopt = noupscale; //dont scale up if SRC is an integer
 	}
-	
+
 	if ( doScale ) {
 		const DST domain_min = std::numeric_limits<DST>::min();//negative value domain of this dst
 		const DST domain_max = std::numeric_limits<DST>::max();//positive value domain of this dst
@@ -76,7 +95,7 @@ getScaling(const util::_internal::TypeBase &min, const util::_internal::TypeBase
 			if ( ( domain_min - minval ) > 0  ) // if the values completely fit into the domain we dont have to offset them
 				offset = -maxval;
 		}
-		
+
 		//calculate range of values which will be on postive/negative domain when offset is applied
 		const double range_max = maxval + offset; //allways >=0
 		const double range_min = minval + offset; //allways <=0
@@ -89,7 +108,7 @@ getScaling(const util::_internal::TypeBase &min, const util::_internal::TypeBase
 		range_min != 0 ? domain_min / range_min :
 		std::numeric_limits<double>::max();
 		scale = std::min( scale_max ? scale_max : std::numeric_limits<double>::max(), scale_min ? scale_min : std::numeric_limits<double>::max() );//get the smaller scaling factor which is not zero so the bigger range will fit into his domain
-		
+
 		if ( scale < 1 ) {
 			LOG( Runtime, warning ) << "Downscaling your values by Factor " << scale << " you might lose information.";
 		} else if ( scaleopt == noupscale ) {
@@ -103,8 +122,6 @@ getScaling(const util::_internal::TypeBase &min, const util::_internal::TypeBase
 	return std::make_pair(scale,offset);
 }
 
-}
-
 /**
  * Converts data from 'src' to the type of 'dst' and stores them there.
  * If the value range defined by min and max does not fit into the domain of dst they will be scaled using the following rules:
@@ -114,13 +131,14 @@ getScaling(const util::_internal::TypeBase &min, const util::_internal::TypeBase
  * - if destination is floating point no scaling is done at all.
  * If dst is shorter than src, no conversion is done.
  * If src is shorter than dst a warning is send to CoreLog.
+ * The conversion itself is equivalent to dst[i] = round( src[i] * scale + offset )
  * \param src data to be converted
  * \param dst target where to convert src to
- * \param min lowest value in src
- * \param max highest value in src
+ * \param scale the scaling factor
+ * \param offset the offset
  * \param scaleopt enum to tweak the scaling strategy
  */
-template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &src, TypePtr<DST> &dst, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale )
+template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &src, TypePtr<DST> &dst, const double scale, const double offset)
 {
 	LOG_IF( src.len() > dst.len(), Runtime, error ) << "The " << src.len() << " elements of src wont fit into the destination. Will only convert " << dst.len() << " elements.";
 	LOG_IF( src.len() < dst.len(), Runtime, warning ) << "Source is shorter than destination. Will only convert " << src.len() << " values";
@@ -128,15 +146,8 @@ template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &s
 	if ( src.len() == 0 )return;
 	const size_t size = std::min( src.len(), dst.len() );
 
-	LOG_IF( min.typeID() != util::Type<SRC>::staticID, Debug, info )
-	<< "The given minimum for src Range is not of the same type as the data ("  << min.typeName() << "!=" << util::Type<SRC>::staticName() << ")";
-	LOG_IF( max.typeID() != util::Type<SRC>::staticID, Debug, info )
-	<< "The given maximum for src Range is not of the same type as the data ("  << max.typeName() << "!=" << util::Type<SRC>::staticName() << ")";
-
-	const std::pair<double,double> scale=_internal::getScaling<SRC,DST>(min,max,scaleopt);
-
-	if ( ( scale.first != 1. || scale.second ) )
-		_internal::numeric_convert_impl( &src[0], &dst[0], size, scale.first, scale.second );
+	if ( ( scale != 1. || offset ) )
+		_internal::numeric_convert_impl( &src[0], &dst[0], size, scale, offset );
 	else
 		_internal::numeric_convert_impl( &src[0], &dst[0], size );
 }
