@@ -524,14 +524,16 @@ void Image::getMinMax ( util::TypeReference &min, util::TypeReference &max ) con
 std::pair< util::TypeReference, util::TypeReference > Image::getScalingTo(short unsigned int targetID, autoscaleOption scaleopt) const
 {
 	LOG_IF(!clean,Runtime,error) << "You should run reIndex before running this";
-	std::list< std::pair< util::TypeReference, util::TypeReference > >  ret;
 	util::TypeReference min,max;
 	getMinMax(min,max);
 	bool unique=true;
 	const std::vector<boost::shared_ptr<const Chunk> > chunks=getChunkList();
 	BOOST_FOREACH(const boost::shared_ptr<const Chunk> &ref, chunks){ //find a chunk which would be converted
-		if(targetID != ref->typeID())
+		if(targetID != ref->typeID()){
+			LOG_IF(ref->getScalingTo(targetID,*min,*max,scaleopt).first.empty() || ref->getScalingTo(targetID,*min,*max,scaleopt).second.empty(),Debug,error)
+				<< "Returning an invalid scaling. This is bad!";
 			return ref->getScalingTo(targetID,*min,*max,scaleopt); // and ask that for the scaling
+		}
 	}
 	return std::make_pair( //ok seems like no conversion is needed - return 1/0
 			util::TypeReference(util::Type<uint8_t>(1)),
@@ -643,8 +645,7 @@ unsigned short Image::typeID() const
 bool Image::makeOfTypeId( short unsigned int id )
 {
 	// get value range of the image for the conversion
-	util::TypeReference min, max;
-	std::pair<util::TypeReference,util::TypeReference> scale=getScalingTo(id);
+	scaling_pair scale=getScalingTo(id);
 
 	LOG( Debug, info ) << "Computed scaling of the original image data: [" << scale << "]";
 	bool retVal = true;

@@ -240,7 +240,7 @@ public:
 	}
 
 	///for each chunk get the scaling (and offset) which would be used in an conversion to the given type
-	std::pair<util::TypeReference,util::TypeReference> getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const;
+	scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const;
 	
 
 	/**
@@ -317,7 +317,7 @@ public:
 	 */
 	template<typename T> void copyToMem( T *dst )const {
 		if( checkMakeClean() ) {
-			std::pair<util::TypeReference,util::TypeReference> scale=getScalingTo(TypePtr<T>::staticID);
+			scaling_pair scale=getScalingTo(TypePtr<T>::staticID);
 			// we could do this using makeOfTypeId - but this solution does not need any additional temporary memory
 			BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
 				if( !ref->copyToMem<T>( dst, scale) ) {

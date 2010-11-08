@@ -80,8 +80,8 @@ public:
 	bool convertTo( TypePtrBase &dst, const scaling_pair &scaling )const;
 
 	///get the scaling (and offset) which would be used in an convertTo 
-	std::pair<util::TypeReference,util::TypeReference> getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const;
-	std::pair<util::TypeReference,util::TypeReference> getScalingTo( unsigned short typeID, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale )const;
+	scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const;
+	scaling_pair getScalingTo( unsigned short typeID, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale )const;
 	
 
 	/// Copy (or Convert) data from this to memory of maybe another type and the given length.

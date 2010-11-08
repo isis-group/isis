@@ -869,7 +869,7 @@ template <typename T> bool ImageFormat_Vista::copyImageToVista( const data::Imag
 	const util::FixedVector<size_t, 4> isize = image.sizeToVector();
 	LOG_IF( isize[3] > 1, Debug, error ) << "Vista cannot store 4D-Data in one VImage.";
 
-	std::pair<util::TypeReference,util::TypeReference> scale=image.getScalingTo(data::TypePtr<T>::staticID);
+	scaling_pair scale=image.getScalingTo(data::TypePtr<T>::staticID);
 
 	for ( size_t z = 0; z < isize[2]; z += csize[2] ) {
 		for ( size_t y = 0; y < isize[1]; y += csize[1] ) {

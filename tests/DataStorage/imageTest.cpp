@@ -262,10 +262,7 @@ BOOST_AUTO_TEST_CASE ( type_scale_test )
 	BOOST_CHECK(img.insertChunk(ch_uint8_t));
 	BOOST_CHECK(img.reIndex());
 
-	std::pair<util::TypeReference,util::TypeReference> scale=img.getScalingTo(data::TypePtr<uint8_t>::staticID);
-
-	typedef std::list<std::pair<util::TypeReference,util::TypeReference> >::const_reference scale_ref;
-
+	data::scaling_pair scale=img.getScalingTo(data::TypePtr<uint8_t>::staticID);
 	BOOST_CHECK_EQUAL(scale.first->as<double>(),1./10);
 	BOOST_CHECK_EQUAL(scale.second->as<double>(),5);
 }

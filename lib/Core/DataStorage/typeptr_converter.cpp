@@ -87,7 +87,7 @@ public:
 		LOG_IF( src.len() > dst.len(), Debug, error ) << "The target is shorter than the the source (" << dst.len() << "<" << src.len() << "). Will only copy/convert " << dst.len() << " elements";
 		dstVal.copyFromMem( srcPtr, std::min( src.len(), dstVal.len() ) );
 	}
-	virtual std::pair<util::TypeReference,util::TypeReference> getScaling(const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale)const{
+	virtual scaling_pair getScaling(const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale)const{
 		//as we're just copying - its 1/0
 		return std::make_pair(
 			util::TypeReference(util::Type<uint8_t>(1)),
@@ -123,7 +123,7 @@ public:
 		LOG_IF(scaling.first.empty() || scaling.first.empty(), Debug,error) << "Running conversion with invalid scaling (" << scaling << ") this won't work";
 		numeric_convert( src.cast_to_TypePtr<SRC>(), dst.cast_to_TypePtr<DST>(), scaling.first->as<double>(), scaling.second->as<double>() );
 	}
-	std::pair<util::TypeReference,util::TypeReference> getScaling(const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale)const{
+	scaling_pair getScaling(const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale)const{
 		const std::pair<double,double> scale=getNumericScaling<SRC,DST>(min,max,scaleopt);
 		return std::make_pair(
 			util::TypeReference(util::Type<double>(scale.first)),

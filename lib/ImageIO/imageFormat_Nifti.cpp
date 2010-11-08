@@ -473,7 +473,7 @@ private:
 		T *refNii = ( T * ) ni.data;
 		const util::FixedVector<size_t, 4> csize = image.getChunk( 0, 0 ).sizeToVector();
 		const util::FixedVector<size_t, 4> isize = image.sizeToVector();
-		const std::pair<util::TypeReference,util::TypeReference> scale=image.getScalingTo(data::TypePtr<T>::staticID);
+		const data::scaling_pair scale=image.getScalingTo(data::TypePtr<T>::staticID);
 
 
 		for ( size_t t = 0; t < isize[3]; t += csize[3] ) {
