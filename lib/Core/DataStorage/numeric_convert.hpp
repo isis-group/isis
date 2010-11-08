@@ -11,10 +11,11 @@ namespace isis
 {
 namespace data
 {
-	enum autoscaleOption;
+enum autoscaleOption;
 namespace _internal
 {
-template<typename SRC, typename DST> static void numeric_convert_impl( const SRC *src, DST *dst, size_t count, double scale, double offset )
+
+template<typename SRC, typename DST> void numeric_convert_impl( const SRC *src, DST *dst, size_t count, double scale, double offset )
 {
 	LOG( Runtime, info )
 			<< "using generic scaling convert " << TypePtr<SRC>::staticName() << "=>" << TypePtr<DST>::staticName()
@@ -30,7 +31,8 @@ template<typename SRC, typename DST> static void numeric_convert_impl( const SRC
 		dst[i] = converter( src[i] * scale + offset );
 	}
 }
-template<typename SRC, typename DST> static void numeric_convert_impl( const SRC *src, DST *dst, size_t count )
+
+template<typename SRC, typename DST> void numeric_convert_impl( const SRC *src, DST *dst, size_t count )
 {
 	LOG( Runtime, info ) << "using generic convert " << TypePtr<SRC>::staticName() << " => " << TypePtr<DST>::staticName() << " without scaling";
 	static boost::numeric::converter <
@@ -43,6 +45,128 @@ template<typename SRC, typename DST> static void numeric_convert_impl( const SRC
 	for ( size_t i = 0; i < count; i++ )
 		dst[i] = converter( src[i] );
 }
+
+#ifdef ISIS_USE_LIBOIL
+#define DECL_CONVERT(SRC_TYPE,DST_TYPE)        template<> void numeric_convert_impl<SRC_TYPE,DST_TYPE>( const SRC_TYPE *src, DST_TYPE *dst, size_t count )
+#define DECL_SCALED_CONVERT(SRC_TYPE,DST_TYPE) template<> void numeric_convert_impl<SRC_TYPE,DST_TYPE>( const SRC_TYPE *src, DST_TYPE *dst, size_t count, double scale, double offset )
+// storage class for explicit specilisations is not allowed (http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_defects.html#605)
+
+//>>s32
+DECL_CONVERT(float,int32_t);
+DECL_CONVERT(double,int32_t);
+DECL_CONVERT(uint32_t,int32_t);
+DECL_CONVERT(int16_t,int32_t);
+DECL_CONVERT(uint16_t,int32_t);
+DECL_CONVERT(int8_t,int32_t);
+DECL_CONVERT(uint8_t,int32_t);
+
+//>>u32
+//DECL_CONVERT(float,uint32_t); conversion to u32 is broken (https://bugs.freedesktop.org/show_bug.cgi?id=16524)
+//DECL_CONVERT(double,uint32_t);
+DECL_CONVERT(int32_t,uint32_t);
+//DECL_CONVERT(int16_t,uint32_t); ** Not available in liboil - but should be imho
+DECL_CONVERT(uint16_t,uint32_t);
+//DECL_CONVERT(int8_t,uint32_t); ** Not available in liboil - but should be imho
+DECL_CONVERT(uint8_t,uint32_t);
+
+//>>s16
+DECL_CONVERT(float,int16_t);
+DECL_CONVERT(double,int16_t);
+DECL_CONVERT(int32_t,int16_t);
+DECL_CONVERT(uint32_t,int16_t);
+DECL_CONVERT(uint16_t,int16_t);
+DECL_CONVERT(int8_t,int16_t);
+DECL_CONVERT(uint8_t,int16_t);
+
+//>>u16
+DECL_CONVERT(float,uint16_t);
+DECL_CONVERT(double,uint16_t);
+DECL_CONVERT(int32_t,uint16_t);
+DECL_CONVERT(uint32_t,uint16_t);
+DECL_CONVERT(int16_t,uint16_t);
+//DECL_CONVERT(int8_t,uint16_t); ** Not available in liboil - but should be imho
+DECL_CONVERT(uint8_t,uint16_t);
+
+//>>s8
+DECL_CONVERT(float,int8_t);
+DECL_CONVERT(double,int8_t);
+DECL_CONVERT(int32_t,int8_t);
+DECL_CONVERT(uint32_t,int8_t);
+DECL_CONVERT(int16_t,int8_t);
+DECL_CONVERT(uint16_t,int8_t);
+DECL_CONVERT(uint8_t,int8_t);
+
+//>>u8
+DECL_CONVERT(float,uint8_t);
+DECL_CONVERT(double,uint8_t);
+DECL_CONVERT(int32_t,uint8_t);
+DECL_CONVERT(uint32_t,uint8_t);
+DECL_CONVERT(int16_t,uint8_t);
+DECL_CONVERT(uint16_t,uint8_t);
+DECL_CONVERT(int8_t,uint8_t);
+
+//>>f32
+DECL_CONVERT(double,float);
+DECL_CONVERT(int32_t,float);
+DECL_CONVERT(uint32_t,float);
+DECL_CONVERT(int16_t,float);
+DECL_CONVERT(uint16_t,float);
+DECL_CONVERT(int8_t,float);
+DECL_CONVERT(uint8_t,float);
+
+//>>f64
+DECL_CONVERT(float,double);
+DECL_CONVERT(int32_t,double);
+DECL_CONVERT(uint32_t,double);
+DECL_CONVERT(int16_t,double);
+DECL_CONVERT(uint16_t,double);
+DECL_CONVERT(int8_t,double);
+DECL_CONVERT(uint8_t,double);
+
+//scale>>s32
+DECL_SCALED_CONVERT(float,int32_t);
+DECL_SCALED_CONVERT(double,int32_t);
+
+//scale>>u32
+//DECL_SCALED_CONVERT(float,uint32_t); conversion to u32 is broken (https://bugs.freedesktop.org/show_bug.cgi?id=16524)
+//DECL_SCALED_CONVERT(double,uint32_t);
+
+//scale>>s16
+DECL_SCALED_CONVERT(float,int16_t);
+DECL_SCALED_CONVERT(double,int16_t);
+
+//scale>>u16
+DECL_SCALED_CONVERT(float,uint16_t);
+DECL_SCALED_CONVERT(double,uint16_t);
+
+//scale>>s8
+DECL_SCALED_CONVERT(float,int8_t);
+DECL_SCALED_CONVERT(double,int8_t);
+
+//scale>>u8
+DECL_SCALED_CONVERT(float,uint8_t);
+DECL_SCALED_CONVERT(double,uint8_t);
+
+//scale>>f32
+DECL_SCALED_CONVERT(int32_t,float);
+DECL_SCALED_CONVERT(uint32_t,float);
+DECL_SCALED_CONVERT(int16_t,float);
+DECL_SCALED_CONVERT(uint16_t,float);
+DECL_SCALED_CONVERT(int8_t,float);
+DECL_SCALED_CONVERT(uint8_t,float);
+
+//scale>>f64
+DECL_SCALED_CONVERT(int32_t,double);
+DECL_SCALED_CONVERT(uint32_t,double);
+DECL_SCALED_CONVERT(int16_t,double);
+DECL_SCALED_CONVERT(uint16_t,double);
+DECL_SCALED_CONVERT(int8_t,double);
+DECL_SCALED_CONVERT(uint8_t,double);
+
+#undef DECL_CONVERT
+#undef DECL_SCALED_CONVERT
+#endif //ISIS_USE_LIBOIL
+
 template<typename SRC, typename DST> std::pair<double,double>
 getScaling(const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale )
 {
