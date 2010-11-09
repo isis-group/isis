@@ -128,4 +128,22 @@ util::fvector4 MatrixHandler::createPseudoOrigin( const util::fvector4& size, co
 	} else { return util::fvector4(-size[0] * voxelSize[0] / 2, -size[1] * voxelSize[1] / 2, -size[2] * voxelSize[2] / 2,0); }
 }
 
+util::fvector4 MatrixHandler::transformOrigin( const util::fvector4& origin, const util::fvector4& voxelSize  ) const
+{
+	vtkSmartPointer<vtkMatrix4x4> matrix = m_correctedMatrix;
+	if( !m_Valid ) {
+		LOG( Runtime, error ) << "Cannot create transformed origin. First call setVectors.";
+		return origin;
+	} else {
+//		return util::fvector4(origin[0] * voxelSize[0] / 2,
+//			origin[1] * voxelSize[1] / 2,
+//			origin[2] * voxelSize[2] / 2,
+//			0);
+		return util::fvector4(  (origin[0] * voxelSize[0] * matrix->GetElement(0,0) + origin[1] * voxelSize[1]* matrix->GetElement(0,1) + origin[2] * voxelSize[2] * matrix->GetElement(0,2)),
+					(origin[0] * voxelSize[0] * matrix->GetElement(1,0) + origin[1] * voxelSize[1] * matrix->GetElement(1,1) + origin[2] * voxelSize[2] * matrix->GetElement(1,2)),
+					(origin[0] * voxelSize[0] * matrix->GetElement(2,0) + origin[1] * voxelSize[1] * matrix->GetElement(2,1) + origin[2] * voxelSize[2] * matrix->GetElement(2,2)),
+					0);
+	}
+}
+
 }}

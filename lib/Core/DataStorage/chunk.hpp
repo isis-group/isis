@@ -130,13 +130,18 @@ public:
 	 * The conversion is done using the value range given via min and max.
 	 * \returns false if there was an error
 	 */
-	bool makeOfTypeId( unsigned short id, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max );
+	bool makeOfTypeId( unsigned short id, const scaling_pair &scaling );
 
-	template<typename T> bool copyToMem( T *dst, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max )const {
+	template<typename T> bool copyToMem( T *dst, const scaling_pair &scaling )const {
 		// wrap the raw memory at into an non-deleting TypePtr of the length of the chunk
 		TypePtr<T> dstPtr( dst, volume(), TypePtr<T>::NonDeleter() );
-		return getTypePtrBase().convertTo( dstPtr, min, max ); // copy-convert the data into dstPtr
+		return getTypePtrBase().convertTo( dstPtr, scaling ); // copy-convert the data into dstPtr
 	}
+
+	///get the scaling (and offset) which would be used in an conversion to the given type
+	scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const;
+	scaling_pair getScalingTo( unsigned short typeID, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale )const;
+	
 
 	size_t bytes_per_voxel()const;
 	std::string typeName()const;
@@ -246,9 +251,9 @@ public:
 	 * \param min
 	 * \param max the value range of the source to be used when the scaling for the conversion is computed
 	 */
-	MemChunk( const Chunk &ref, const util::_internal::TypeBase &min, const  util::_internal::TypeBase &max ): Chunk( ref ) {
+	MemChunk( const Chunk &ref, const scaling_pair &scaling ): Chunk( ref ) {
 		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewById( TypePtr<TYPE>::staticID, min, max ) );
+		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewById( TypePtr<TYPE>::staticID, scaling ) );
 	}
 	MemChunk( const MemChunk<TYPE> &ref ): Chunk( ref ) { //this is needed, to prevent generation of default-copy constructor
 		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)

@@ -68,9 +68,9 @@ void ViewControl::addImages( const ImageMapType& fileMap )
 	{
 		boost::shared_ptr< ImageHolder > tmpVec( new ImageHolder );
 		tmpVec->setImages( ref.first, ref.second );
-		tmpVec->setReadVec( ref.first->getProperty<isis::util::fvector4>("readVec") );
-		tmpVec->setPhaseVec( ref.first->getProperty<isis::util::fvector4>("phaseVec") );
-		tmpVec->setSliceVec( ref.first->getProperty<isis::util::fvector4>("sliceVec") );
+		tmpVec->setReadVec( ref.first.getProperty<isis::util::fvector4>("readVec") );
+		tmpVec->setPhaseVec( ref.first.getProperty<isis::util::fvector4>("phaseVec") );
+		tmpVec->setSliceVec( ref.first.getProperty<isis::util::fvector4>("sliceVec") );
 		m_ImageHolderVector.push_back( tmpVec );
 	}
 
@@ -99,9 +99,9 @@ void ViewControl::setUpPipe()
 	m_SagittalWidget->GetRenderWindow()->SetInteractor( m_SagittalWidget->GetInteractor() );
 	m_CoronalWidget->GetRenderWindow()->SetInteractor( m_CoronalWidget->GetInteractor() );
 
-	m_AxialWidget->GetRenderWindow()->AddRenderer( m_RendererCoronal );
+	m_AxialWidget->GetRenderWindow()->AddRenderer( m_RendererAxial );
 	m_SagittalWidget->GetRenderWindow()->AddRenderer( m_RendererSagittal );
-	m_CoronalWidget->GetRenderWindow()->AddRenderer( m_RendererAxial );
+	m_CoronalWidget->GetRenderWindow()->AddRenderer( m_RendererCoronal );
 }
 
 void ViewControl::resetCam()
@@ -130,60 +130,23 @@ void ViewControl::UpdateWidgets()
 
 void ViewControl::displayIntensity( const int& x, const int& y, const int &z )
 {
-
 	const int t = m_CurrentImageHolder->getCurrentTimeStep();
 	signalList.mousePosChanged( x, y, z, t );
-
-	switch (m_CurrentImageHolder->getISISImage()->getChunk(x,y,z,t ).typeID() )
-	{
-	case isis::data::TypePtr<int8_t>::staticID:
-		signalList.intensityChanged(m_CurrentImageHolder->getISISImage()->voxel<int8_t>(x, y,z, t));
-		break;
-	case isis::data::TypePtr<u_int8_t>::staticID:
-		signalList.intensityChanged(m_CurrentImageHolder->getISISImage()->voxel<u_int8_t>(x, y,z, t));
-		break;
-	case isis::data::TypePtr<int16_t>::staticID:
-		signalList.intensityChanged(m_CurrentImageHolder->getISISImage()->voxel<int16_t>(x, y,z, t));
-		break;
-	case isis::data::TypePtr<u_int16_t>::staticID:
-		signalList.intensityChanged(m_CurrentImageHolder->getISISImage()->voxel<u_int16_t>(x, y,z, t));
-		break;
-	case isis::data::TypePtr<int32_t>::staticID:
-		signalList.intensityChanged(m_CurrentImageHolder->getISISImage()->voxel<int32_t>(x, y,z, t));
-		break;
-	case isis::data::TypePtr<u_int32_t>::staticID:
-		signalList.intensityChanged(m_CurrentImageHolder->getISISImage()->voxel<u_int32_t>(x, y,z, t));
-		break;
-	case isis::data::TypePtr<float>::staticID:
-		signalList.intensityChanged(m_CurrentImageHolder->getISISImage()->voxel<float>(x, y,z, t));
-		break;
-	case isis::data::TypePtr<double>::staticID:
-		signalList.intensityChanged(m_CurrentImageHolder->getISISImage()->voxel<double>(x, y,z, t));
-		break;
-	default:
-		LOG( Runtime, error )
-		<< "Unknown pixel representation with typeid " <<
-			m_CurrentImageHolder->getISISImage()->getChunk(x,y,z,t ).typeID() <<
-		". Can not display intensity! ";
-
-		signalList.intensityChanged(-1);
-	}
+	float scaling = m_CurrentImageHolder->getScalingFactor()->as<float>();
+	size_t offset = m_CurrentImageHolder->getOffset()->as<size_t>();
+	std::cout << "offset: " << offset << std::endl;
+	std::cout << "scaling: " << scaling << std::endl;
+	signalList.intensityChanged( m_CurrentImagePtr->GetScalarComponentAsDouble(x,y,z, 0) / scaling - offset );
 
 }
 
 void ViewControl::sliceChanged( const int& x, const int& y, const int& z)
 {
 	LOG( Runtime, info ) << "ViewControl::sliceChanged";
-//	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference refImg, m_ImageHolderVector)
-//	{
-//		if ( not refImg->setSliceCoordinates(x,y,z) ) LOG( Runtime, error ) << "error during setting slicesetting!";
-//	}
 	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference refImg, m_ImageHolderVector)
 	{
-		refImg->getActorAxial()->GetProperty()->SetOpacity(0.2);
+		if ( not refImg->setSliceCoordinates(x,y,z) ) LOG( Runtime, error ) << "error during setting slicesetting!";
 	}
-	m_CurrentImageHolder->setSliceCoordinates(x,y,z) ;
-
 	UpdateWidgets();
 }
 

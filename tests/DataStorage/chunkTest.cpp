@@ -81,6 +81,28 @@ BOOST_AUTO_TEST_CASE ( chunk_data_test1 )//Access Chunk elements via dimensional
 		BOOST_CHECK_EQUAL( ch2.voxel<float>( i, i, i, i ), i );
 }
 
+
+BOOST_AUTO_TEST_CASE ( chunk_scale_test )//Access Chunk elements via dimensional index
+{
+	data::MemChunk<int16_t> ch( 10, 10, 10 );
+	util::TypeReference min,max;
+
+	for ( size_t x = 0; x < ch.dimSize( data::readDim ); x++ ){
+		ch.voxel<int16_t>( x, x, 0 ) =  2500;
+		ch.voxel<int16_t>( x, x, 1 ) = -50;
+	}
+
+	ch.getMinMax(min,max);
+
+	data::scaling_pair scale=ch.getScalingTo(data::TypePtr<uint8_t>::staticID,*min,*max);
+
+	const util::_internal::TypeBase &scale_s = *(scale.first);
+	const util::_internal::TypeBase &scale_o = *(scale.second);
+	
+	BOOST_CHECK_EQUAL(scale_s.as<double>(),1./10);
+	BOOST_CHECK_EQUAL(scale_o.as<double>(),5);
+}
+
 BOOST_AUTO_TEST_CASE ( chunk_data_test2 )//Access Chunk elements via linear index (threat it as TypePtr)
 {
 	data::MemChunk<float> ch( 4, 3, 2, 1 );

@@ -42,8 +42,14 @@ void MainWindow::createAndSendImageMap( const util::slist& fileList )
 		data::ImageList imgList = isis::data::IOFactory::load( refFile, "");
 		BOOST_FOREACH( isis::data::ImageList::const_reference refImage, imgList )
 		{
-			std::vector<vtkSmartPointer<vtkImageData> > vtkImageVector = isis::adapter::vtkAdapter::makeVtkImageObject(refImage);
-			imageMap.insert( ViewControl::ImageMapType::value_type(refImage, vtkImageVector ) );
+			adapter::vtkAdapter::ScalingType scaling;
+			std::vector<vtkSmartPointer<vtkImageData> > vtkImageVector = isis::adapter::vtkAdapter::makeVtkImageObject(refImage, scaling);
+
+			refImage->setProperty< util::fvector4 >( "imageSize", refImage->sizeToVector() );
+			static_cast<util::TypeReference&>(refImage->propertyValue("scale"))=scaling.first;
+			static_cast<util::TypeReference&>(refImage->propertyValue("offset"))=scaling.second;
+
+			imageMap.push_back(std::make_pair(static_cast<util::PropMap>(*refImage), vtkImageVector ) );
 		}
 	}
 	if(!imageMap.empty()) {

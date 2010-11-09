@@ -54,7 +54,7 @@ class ImageHolder;
 class ViewControl
 {
 public:
-	typedef std::map<boost::shared_ptr<data::Image>, std::vector<vtkSmartPointer< vtkImageData > > > ImageMapType;
+	typedef std::list< std::pair< util::PropMap, std::vector<vtkSmartPointer< vtkImageData > > > > ImageMapType;
 	ViewControl();
 	void init( QVTKWidget *axial, QVTKWidget *sagittal, QVTKWidget *coronal );
 	void resetCam();
