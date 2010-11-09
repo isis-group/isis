@@ -164,10 +164,10 @@ public:
 	}
 
 
-	/**
-	 * Get the typeID of the chunk with "biggest" type
-	 */
+	/// Get the type of the chunk with "biggest" type
 	unsigned short typeID() const;
+	/// \copydoc typeID
+	std::string typeName() const;
 
 	/**
 	 * Get a chunk via index (and the lookup table).
