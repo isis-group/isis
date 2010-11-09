@@ -22,7 +22,12 @@ void FileFormat::write( const isis::data::ImageList &images, const std::string &
 	BOOST_FOREACH( data::ImageList::const_reference ref, images ) {
 		std::string uniquePath=*(inames++);
 		LOG( Runtime, info )   << "Writing image to " <<  uniquePath;
-		write( *ref, uniquePath, dialect );
+		try{
+			write( *ref, uniquePath, dialect );
+		} catch ( std::runtime_error &e ) {
+			LOG( Runtime, warning )
+					<< "Failed to write image to " <<  uniquePath << " using " <<  name() << " (" << e.what() << ")";
+		}
 	}
 }
 
