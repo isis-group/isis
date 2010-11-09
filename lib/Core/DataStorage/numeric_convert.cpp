@@ -32,7 +32,7 @@ namespace isis{namespace data{namespace _internal{
 #define IMPL_CONVERT(SRC,DST,SRC_KEY,DST_KEY)                                           \
 template<> void numeric_convert_impl<SRC,DST>( const SRC *src, DST *dst, size_t count ){\
 LOG( Runtime, info )                                                                    \
-	<< "using generic convert " << TypePtr<SRC>::staticName() << " => "                 \
+	<< "using optimized convert " << TypePtr<SRC>::staticName() << " => "               \
 	<< TypePtr<DST>::staticName() << " without scaling";                                \
 	oil_conv_ ## DST_KEY ## _ ## SRC_KEY (dst,sizeof(DST),src,sizeof(SRC),count);       \
 }

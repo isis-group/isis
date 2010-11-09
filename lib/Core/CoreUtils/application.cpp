@@ -80,12 +80,18 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 		err = true;
 	}
 
-	setLog<CoreDebug>( LLMap[parameters["dCore"]->as<Selection>()] );
-	setLog<CoreLog>( LLMap[parameters["dCore"]->as<Selection>()] );
-	setLog<DataDebug>( LLMap[parameters["dData"]->as<Selection>()] );
-	setLog<DataLog>( LLMap[parameters["dData"]->as<Selection>()] );
-	setLog<ImageIoDebug>( LLMap[parameters["dImageIO"]->as<Selection>()] );
-	setLog<ImageIoLog>( LLMap[parameters["dImageIO"]->as<Selection>()] );
+	if(parameters["dCore"].isSet()){
+		setLog<CoreDebug>( LLMap[parameters["dCore"]->as<Selection>()] );
+		setLog<CoreLog>( LLMap[parameters["dCore"]->as<Selection>()] );
+	}
+	if(parameters["dData"].isSet()){
+		setLog<DataDebug>( LLMap[parameters["dData"]->as<Selection>()] );
+		setLog<DataLog>( LLMap[parameters["dData"]->as<Selection>()] );
+	}
+	if(parameters["dImageIO"].isSet()){
+		setLog<ImageIoDebug>( LLMap[parameters["dImageIO"]->as<Selection>()] );
+		setLog<ImageIoLog>( LLMap[parameters["dImageIO"]->as<Selection>()] );
+	}
 
 	if ( err ) {
 		printHelp();
