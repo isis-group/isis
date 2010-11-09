@@ -27,6 +27,10 @@
 #include <boost/type_traits/is_arithmetic.hpp>
 #include <boost/mpl/and.hpp>
 
+#ifdef ISIS_USE_LIBOIL
+#include <liboil/liboil.h>
+#endif
+
 // @todo we need to know this for lexical_cast (toString)
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -167,6 +171,10 @@ struct outer_TypePtrConverter {
 
 TypePtrConverterMap::TypePtrConverterMap()
 {
+	#ifdef ISIS_USE_LIBOIL
+	LOG(Debug,info) << "Initializing liboil";
+	oil_init();
+	#endif // ISIS_USE_LIBOIL
 	boost::mpl::for_each<util::_internal::types>( outer_TypePtrConverter( *this ) );
 	LOG( Debug, info )
 			<< "conversion map for " << size() << " array-types created";

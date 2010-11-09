@@ -156,6 +156,7 @@ BOOST_AUTO_TEST_CASE ( memchunk_copy_test )//Copy chunks
 		   boost::numeric::def_overflow_handler,
 		   boost::numeric::RoundEven<double>
 		   > converter;
+
 	data::MemChunk<float> ch1( 4, 3, 2, 1 );
 	ch1.setProperty( "indexOrigin", util::fvector4( 1, 2, 3, 4 ) );
 
