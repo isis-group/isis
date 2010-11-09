@@ -49,10 +49,11 @@ namespace adapter
 class vtkAdapter
 {
 public:
+	typedef  std::pair< util::TypeReference, util::TypeReference> ScalingType;
 	/**
 	* Gets a std::vector of vtkSmartpointers on vtkImageData objects.
 	*/
-	static std::vector<vtkSmartPointer<vtkImageData> >makeVtkImageObject( const boost::shared_ptr<data::Image> );
+	static std::vector<vtkSmartPointer<vtkImageData> >makeVtkImageObject( const boost::shared_ptr<data::Image>, ScalingType& );
 private:
 protected:
 	//should not be loaded directly

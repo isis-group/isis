@@ -148,7 +148,8 @@ SET(ISIS_BUILD_DYNAMIC ON CACHE BOOL "enable build of the dynamic library" )
 ############################################################
 
 # add new source files to this parameter list
-SET ( SRC_FILES 
+SET ( SRC_FILES
+  CoreUtils/istring.cpp
   CoreUtils/progressfeedback.cpp 
   CoreUtils/tmpfile.cpp 
   CoreUtils/application.cpp 
@@ -175,6 +176,7 @@ SET ( SRC_FILES
   DataStorage/common.cpp )
 
 SET (COREUTILS_HDR_FILES
+  ./CoreUtils/istring.hpp
   ./CoreUtils/tmpfile.h
   ./CoreUtils/progparameter.hpp
   ./CoreUtils/type_converter.hpp

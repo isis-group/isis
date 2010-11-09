@@ -62,19 +62,15 @@ Chunk Chunk::cloneToMem( size_t firstDim, size_t secondDim, size_t thirdDim, siz
 bool Chunk::makeOfTypeId( short unsigned int id )
 {
 	if( typeID() != id ) {
-		util::TypeReference min, max;
-		getMinMax( min, max );
-		assert( ! ( min.empty() || max.empty() ) );
-		return makeOfTypeId( id, *min, *max );
+		return makeOfTypeId( id, getScalingTo(id));
 	}
-
 	return true;
 }
 
-bool Chunk::makeOfTypeId( short unsigned int id, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max )
+bool Chunk::makeOfTypeId( short unsigned int id, const scaling_pair &scaling )
 {
 	if( typeID() != id ) { // if its not the same type - replace the internal TypePtr by a new returned from TypePtrBase::copyToNewById
-		TypePtrReference newPtr = getTypePtrBase().copyToNewById( id, min, max ); // create a new TypePtr of type id and store it in a TypePtrReference
+		TypePtrReference newPtr = getTypePtrBase().copyToNewById( id, scaling ); // create a new TypePtr of type id and store it in a TypePtrReference
 
 		if( newPtr.empty() ) // if the reference is empty the conversion failed
 			return false;
@@ -173,7 +169,12 @@ void Chunk::getMinMax ( util::TypeReference &min, util::TypeReference &max ) con
 	return operator*().getMinMax( min, max );
 }
 
-std::pair<util::TypeReference,util::TypeReference> Chunk::getScalingTo( unsigned short typeID, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt )const{
+scaling_pair Chunk::getScalingTo( unsigned short typeID, autoscaleOption scaleopt )const{
+	util::TypeReference min,max;
+	getMinMax(min,max);
+	return operator*().getScalingTo(typeID,*min,*max,scaleopt);
+}
+scaling_pair Chunk::getScalingTo( unsigned short typeID, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt )const{
 	return operator*().getScalingTo(typeID,min,max,scaleopt);
 }
 
