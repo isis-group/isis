@@ -186,7 +186,7 @@ public:
 	 * write file
 	 ************************/
 	void write( const data::Image &imageOrig, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) {
-		LOG( Debug, info ) << "Writing image of size " << imageOrig.sizeToString() << " and type " << util::getTypeMap()[imageOrig.typeID()] << " as nifti";
+		LOG( Debug, info ) << "Writing image of size " << imageOrig.sizeToString() << " and type " << imageOrig.typeName() << " as nifti";
 		boost::filesystem::path boostFilename( filename );
 		//copy of our image due to changing it by transformCoords
 		isis::data::Image image( imageOrig );
@@ -233,7 +233,7 @@ public:
 
 		// copy the data to the nifti image
 		LOG( ImageIoLog, isis::info ) << "image typeid: " << image.typeID();
-		LOG( ImageIoLog, isis::info ) << "image typename: " << util::getTypeMap()[image.typeID()];
+		LOG( ImageIoLog, isis::info ) << "image typename: " << image.typeName();
 
 		switch ( image.typeID() ) {
 		case data::TypePtr<int8_t>::staticID:
@@ -293,7 +293,7 @@ public:
 			copyDataToNifti<double>( image, ni );
 			break;
 		default:
-			throwGenericError( "Datatype " + data::TypePtr<float>::staticName() + " cannot be written!" );
+			throwGenericError( "Datatype " + image.typeName() + " cannot be written!" );
 		}
 
 		//now really write the nifti file with the function from nifti1_io.h

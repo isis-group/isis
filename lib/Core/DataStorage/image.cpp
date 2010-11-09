@@ -641,6 +641,10 @@ unsigned short Image::typeID() const
 		return std::numeric_limits<unsigned char>::max();
 	}
 }
+std::string Image::typeName() const
+{
+	return util::getTypeMap()[typeID()];
+}
 
 bool Image::makeOfTypeId( short unsigned int id )
 {
