@@ -37,7 +37,7 @@ namespace util
 class ProgParameter: public PropertyValue
 {
 	std::string m_description;
-	bool m_hidden;
+	bool m_hidden,m_set;
 public:
 	/**
 	 * Default constructor.
@@ -53,7 +53,7 @@ public:
 	 * (The value is used as default value if the parameter never gets to parse any other value)
 	 * \param needed mark this parameter as needed
 	 */
-	template<typename T> ProgParameter( const T &ref, bool needed = true ): PropertyValue( ref, needed ),m_hidden(false) {}
+	template<typename T> ProgParameter( const T &ref, bool needed = true ): PropertyValue( ref, needed ),m_hidden(false),m_set(false) {}
 	/**
 	 * Parse the given string as value into this parameter.
 	 * The parsing is done by automatic type-conversion from std::string to the type of the parameter.
@@ -74,6 +74,9 @@ public:
 		return get()->cast_to<T>();
 	}
 	operator boost::scoped_ptr<_internal::TypeBase>::unspecified_bool_type()const;// implicit conversion to "bool" stolen from boost
+
+	/// \returns true, if the parameter was ever successfully parsed
+	bool isSet()const;
 
 	///get/set hidden state of the parameter
 	bool hidden()const;
