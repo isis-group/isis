@@ -113,33 +113,33 @@ ADD_DEFINITIONS(-DDL_SUFFIX="${CMAKE_SHARED_LIBRARY_SUFFIX}")
 ADD_DEFINITIONS(-DDL_PREFIX="${CMAKE_SHARED_LIBRARY_PREFIX}")
 
 ############################################################
-# SVN revision number
+# RCS revision number
 ############################################################
 # Set the revision number if this dir is a svn working copy.
-# The revision number will be stored in SVN_REVISION.
-FIND_FILE(SVNVERSION svnversion
+# The revision number will be stored in RCS_REVISION.
+FIND_FILE(RCS_DESC_COMMAND git-describe
     PATHS /usr/bin /usr/local/bin
-    DOC "The subversion revision information tool.")
+    DOC "The rcs revision description information tool.")
 
-IF (NOT SVN_REVISION)
-	IF (SVNVERSION)
-		EXECUTE_PROCESS(COMMAND ${SVNVERSION}
-			OUTPUT_VARIABLE OUT
-			WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+IF (NOT RCS_REVISION)
+	IF (RCS_DESC_COMMAND)
+		EXECUTE_PROCESS(COMMAND ${RCS_DESC_COMMAND} OUTPUT_VARIABLE OUT WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} OUTPUT_STRIP_TRAILING_WHITESPACE)
 		string(REGEX MATCH "exported" EXPORTED "${OUT}")
 		IF (NOT EXPORTED)
-			string(REGEX MATCH "^[0-9]+" SVN_REVISION "${OUT}") #@todo wont work with more complex revisions/modified sources
-			SET(SVN_REVISION ${SVN_REVISION})
+			string(REGEX MATCH "^[0-9.]+" RCS_REVISION "${OUT}") #@todo wont work with more complex revisions/modified sources
+			SET(RCS_REVISION ${RCS_REVISION})
 		ELSE (NOT EXPORTED)
-			set(SVN_REVISION "exported")
+			set(RCS_REVISION "exported")
 		ENDIF (NOT EXPORTED)
-	ENDIF (SVNVERSION)
-ENDIF (NOT SVN_REVISION)
+	else(RCS_DESC_COMMAND)
+		message(status "No rcs command given")
+	ENDIF (RCS_DESC_COMMAND)
+ENDIF (NOT RCS_REVISION)
 
-IF (SVN_REVISION)
-  MESSAGE(STATUS "SVN Revision: ${SVN_REVISION}")
-  ADD_DEFINITIONS(-D_ISIS_SVN_REVISION=${SVN_REVISION})
-ENDIF(SVN_REVISION)
+IF (RCS_REVISION)
+  MESSAGE(STATUS "RCS Revision: ${RCS_REVISION}")
+  ADD_DEFINITIONS(-D_ISIS_RCS_REVISION=${RCS_REVISION})
+ENDIF(RCS_REVISION)
 
 ############################################################
 # Build config
