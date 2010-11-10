@@ -108,8 +108,8 @@ std::list<std::string> FileFormat::makeUniqueFilenames(const data::ImageList& im
 	BOOST_FOREACH(data::ImageList::const_reference ref,images){
 		std::string name=makeFilename(*ref,namePattern);
 		if(names[name]>1){
-			const unsigned short length=log10(names[name]);
 			const unsigned short number=++used_names[name];
+			const unsigned short length=(uint16_t)log10(names[name])-(uint16_t)log10(number);
 			const std::string snumber=std::string(length,'0')+boost::lexical_cast<std::string>(number);
 			const std::pair<std::string,std::string> splitted=makeBasename(name);
 			name =splitted.first+"_"+snumber+splitted.second;
