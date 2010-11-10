@@ -63,6 +63,11 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 
 ############################################################
+# set up doxygen
+############################################################
+include(UseDoxygen)
+
+############################################################
 # Compiler flags on 64Bit cpus
 ############################################################
 IF("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")

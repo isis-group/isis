@@ -224,7 +224,7 @@ public:
 	* \param second The second coordinate in voxel space. Usually the y value.
 	* \param third The third coordinate in voxel space. Ususally the z value.
 	* \param fourth The fourth coordinate in voxel space. Usually the time value.
-	* \returns a chunk contains the (maybe converted) voxel value at the given coordinates.
+	* \returns a (maybe converted) chunk containing the voxel value at the given coordinates.
 	*/
 	template<typename TYPE> Chunk getChunkAs(size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0)const {
 		return getChunkAs<TYPE>(getScalingTo(TypePtr<TYPE>::staticID),first,second,third,fourth);
@@ -232,6 +232,13 @@ public:
 	/**
 	 * Get the chunk that contains the voxel at the given coordinates in the given type (fast version).
 	 * \copydetails getChunkAs
+	 * This version does not compute the scaling, and thus is much faster.
+	 * \param scaling the scaling (scale and offset) to be used if a conversion to the requested type is neccessary.
+	 * \param first The first coordinate in voxel space. Usually the x value.
+	 * \param second The second coordinate in voxel space. Usually the y value.
+	 * \param third The third coordinate in voxel space. Ususally the z value.
+	 * \param fourth The fourth coordinate in voxel space. Usually the time value.
+	 * \returns a (maybe converted) chunk containing the voxel value at the given coordinates.
 	 */
 	template<typename TYPE> Chunk getChunkAs(const scaling_pair &scaling, size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0)const {
 		Chunk ret = getChunk( first, second, third, fourth ); // get a cheap copy

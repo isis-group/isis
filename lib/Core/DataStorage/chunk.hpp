@@ -246,10 +246,9 @@ public:
 	}
 	/**
 	 * Create a deep copy of a given Chunk.
-	 * An automatic conversion used if datatype does not fit
+	 * An automatic conversion is used if datatype does not fit
 	 * \param ref the source chunk
-	 * \param min
-	 * \param max the value range of the source to be used when the scaling for the conversion is computed
+	 * \param scaling the scaling (scale and offset) to be used if a conversion to the requested type is neccessary.
 	 */
 	MemChunk( const Chunk &ref, const scaling_pair &scaling ): Chunk( ref ) {
 		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)

@@ -182,8 +182,8 @@ DECL_SCALED_CONVERT(uint8_t,double);
  * - noupscale: never scale up (scale <=1)
  * - upscale: enforce upscaling even if SRC is an integer type
  * - noscale: do not scale at all (scale==1)
- * \param scale the scaling factor
- * \param offset the offset
+ * \param min the smallest value of the source data
+ * \param max the biggest value of the source data
  * \param scaleopt enum to tweak the scaling strategy
  */
 template<typename SRC, typename DST> std::pair<double,double>
@@ -260,7 +260,6 @@ getNumericScaling(const util::_internal::TypeBase &min, const util::_internal::T
  * \param dst target where to convert src to
  * \param scale the scaling factor
  * \param offset the offset
- * \param scaleopt enum to tweak the scaling strategy
  */
 template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &src, TypePtr<DST> &dst, const double scale, const double offset)
 {
