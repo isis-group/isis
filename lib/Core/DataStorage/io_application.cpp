@@ -199,6 +199,12 @@ bool IOApplication::autowrite( const ImageList& out_images, bool exitOnError )
 		return true;
 }
 
+Image IOApplication::fetchImage(){
+	Image ret=*images.front();
+	images.pop_front();
+	return ret;
+}
+
 }
 }
 
