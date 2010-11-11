@@ -124,13 +124,8 @@ FIND_FILE(RCS_DESC_COMMAND git-describe
 IF (NOT RCS_REVISION)
 	IF (RCS_DESC_COMMAND)
 		EXECUTE_PROCESS(COMMAND ${RCS_DESC_COMMAND} OUTPUT_VARIABLE OUT WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} OUTPUT_STRIP_TRAILING_WHITESPACE)
-		string(REGEX MATCH "exported" EXPORTED "${OUT}")
-		IF (NOT EXPORTED)
-			string(REGEX MATCH "^[0-9.]+" RCS_REVISION "${OUT}") #@todo wont work with more complex revisions/modified sources
-			SET(RCS_REVISION ${RCS_REVISION})
-		ELSE (NOT EXPORTED)
-			set(RCS_REVISION "exported")
-		ENDIF (NOT EXPORTED)
+		string(REGEX MATCH "[0-9]+-[^-]+$" RCS_REVISION "${OUT}") #@todo wont work with more complex revisions/modified sources
+		SET(RCS_REVISION ${RCS_REVISION})
 	else(RCS_DESC_COMMAND)
 		message(status "No rcs command given")
 	ENDIF (RCS_DESC_COMMAND)
@@ -138,7 +133,7 @@ ENDIF (NOT RCS_REVISION)
 
 IF (RCS_REVISION)
   MESSAGE(STATUS "RCS Revision: ${RCS_REVISION}")
-  ADD_DEFINITIONS(-D_ISIS_RCS_REVISION=${RCS_REVISION})
+  ADD_DEFINITIONS(-DISIS_RCS_REVISION=${RCS_REVISION})
 ENDIF(RCS_REVISION)
 
 ############################################################
