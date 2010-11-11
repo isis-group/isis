@@ -152,7 +152,20 @@ public:
 	 * \param min TypeBase::Reference for the current lowest value
 	 */
 	virtual void getMinMax( util::TypeReference &min, util::TypeReference &max )const = 0;
+	/**
+	 * Compare to another TypePtr.
+	 * This counts the elements between start and end, which are not equal to the corresponding elements in dst.
+	 * If dst is of another type all element are assumed to be different
+	 * \param start starting index for the comparison
+	 * \param end end index for the comparison (this element the first element which is _not_ compared)
+	 * \param dst the TypePtr to compare against
+	 * \param dst_start the index where to start comparison in dst
+	 */
 	virtual size_t compare( size_t start, size_t end, const TypePtrBase &dst, size_t dst_start )const = 0;
+	/**
+	 * Compare to another TypePtr.
+	 * Short hand version of compare( size_t start, size_t end, const TypePtrBase &dst, size_t dst_start )const
+	 */
 	size_t compare( const TypePtrBase &comp )const;
 };
 }
