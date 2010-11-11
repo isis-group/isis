@@ -41,10 +41,11 @@ std::vector<vtkSmartPointer<vtkImageData> >vtkAdapter::makeVtkImageObject( const
 	uint8_t *refTarget = ( uint8_t * ) targePtr;
 	size_t chunkIndex = 0;
 	std::vector< boost::shared_ptr< data::Chunk> > chList = src->getChunkList();
+	const data::scaling_pair scale=src->getScalingTo(data::TypePtr<u_int8_t>::staticID);
 	BOOST_FOREACH( boost::shared_ptr< data::Chunk> & ref, chList ) {
 		data::Chunk &chRef = *ref;
 		u_int8_t *target = refTarget + chunkIndex++ * chRef.volume();
-		chRef.copyToMem<u_int8_t>( target, *min, *max );
+		chRef.copyToMem<u_int8_t>( target, scale );
 	}
 	size_t imageVolume3D = src->sizeToVector()[0] * src->sizeToVector()[1] * src->sizeToVector()[2];
 	for ( size_t t = 0; t<src->sizeToVector()[3]; t++ ) {

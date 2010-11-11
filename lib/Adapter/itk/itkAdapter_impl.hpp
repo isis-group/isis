@@ -21,7 +21,7 @@
  *****************************************************************/
 
 #include "itkAdapter.hpp"
-#include <isis/DataStorage/chunk.hpp>
+#include <DataStorage/chunk.hpp>
 
 namespace isis
 {
@@ -247,20 +247,20 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 		indexOrigin[1] = -indexOrigin[1];
 	}
 
-	// TODO use MemImage instead of MemChunk.
+	//TODO adopt conversion to the new interface
 	#warning conversion has changed
 	boost::shared_ptr<data::Chunk >
 	tmpChunk ( new data::MemChunk< ITKRepn >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) ) ;
 	//we have to convert the datatype of retChunk to the desired TOutputISIS type to avoid autoscaling
-	util::TypeReference min, max;
-	tmpChunk->getMinMax( min, max );
+
 	boost::shared_ptr<data::Chunk > retChunk ( new data::MemChunk<ISISRepn>( imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) );
+	const data::scaling_pair scale=tmpChunk->getScalingTo(data::TypePtr<ISISRepn>::staticID, data::noscale);
 	//
-	data::numeric_convert(
+	data::numeric_convert<ITKRepn, ISISRepn>(
 		tmpChunk->asTypePtr<ITKRepn>(),
 		retChunk->asTypePtr<ISISRepn>(),
-		*min, *max,
-		data::noscale );
+		scale.first->as<double>(),
+		scale.second->as<double>() );
 	//dummy join to allow creating this chunk
 	retChunk->join( m_ImagePropMap );
 
