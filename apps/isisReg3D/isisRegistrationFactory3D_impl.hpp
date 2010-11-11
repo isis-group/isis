@@ -250,15 +250,25 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer()
 		if ( transform.VERSORRIGID or transform.CENTEREDAFFINE or transform.AFFINE or transform.BSPLINEDEFORMABLETRANSFORM  or transform.RIGID3D) {
 			//...for the rigid transform
 			//number of parameters are dependent on the dimension of the images (2D: 4 parameter, 3D: 6 parameters)
-			if ( transform.VERSORRIGID or transform.RIGID3D ) {
-				optimizerScaleRegularStepGradient[0] = 1.0;
-				optimizerScaleRegularStepGradient[1] = 1.0;
-				optimizerScaleRegularStepGradient[2] = 1.0;
-
-				for ( unsigned int i = 3; i < m_NumberOfParameters; i++ ) {
-					optimizerScaleRegularStepGradient[i] = 1.0 / 1000.0;
-				}
+			if ( transform.VERSORRIGID ) {
+				//rotation
+				optimizerScaleRegularStepGradient[0] = 1.0 / 10.0;
+				optimizerScaleRegularStepGradient[1] = 1.0 / 10.0;
+				optimizerScaleRegularStepGradient[2] = 1.0 / 10.0;
+				//translation
+				optimizerScaleRegularStepGradient[3] = 1.0 / 1000.0;
+				optimizerScaleRegularStepGradient[4] = 1.0 / 1000.0;
+				optimizerScaleRegularStepGradient[5] = 1.0 / 1000.0;
 			}
+			if ( transform.RIGID3D ) {
+				for ( unsigned short i=0; i<9; i++ ) {
+					optimizerScaleRegularStepGradient[i] = 1.0;
+				}
+				optimizerScaleRegularStepGradient[9] =1.0;
+				optimizerScaleRegularStepGradient[10] =1.0;
+				optimizerScaleRegularStepGradient[11] =1.0;
+			}
+
 
 			if ( transform.BSPLINEDEFORMABLETRANSFORM or transform.AFFINE or transform.CENTEREDAFFINE or transform.TRANSLATION ) {
 				optimizerScaleRegularStepGradient.Fill( 1.0 );
@@ -271,7 +281,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer()
 			}
 
 			m_RegularStepGradientDescentOptimizer->SetMaximumStepLength( 0.1 * UserOptions.CoarseFactor );
-			m_RegularStepGradientDescentOptimizer->SetMinimumStepLength( 0.00001 * UserOptions.CoarseFactor );
+			m_RegularStepGradientDescentOptimizer->SetMinimumStepLength( 0.0001 * UserOptions.CoarseFactor );
 			m_RegularStepGradientDescentOptimizer->SetScales( optimizerScaleRegularStepGradient );
 			m_RegularStepGradientDescentOptimizer->SetNumberOfIterations( UserOptions.NumberOfIterations );
 			m_RegularStepGradientDescentOptimizer->SetRelaxationFactor( 0.9 );
