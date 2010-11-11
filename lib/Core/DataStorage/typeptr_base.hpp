@@ -52,27 +52,27 @@ public:
 	* Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
 	* \returns a constant reference of the pointer.
 	*/
-	template<typename T> const TypePtr<T>& cast_to_TypePtr() const {
+	template<typename T> const TypePtr<T>& castToTypePtr() const {
 		return m_cast_to<TypePtr<T> >();
 	}
 	/**
-	* Dynamically cast the TypeBase up to its actual TypePtr\<T\>. Referenced version.
-	* Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
-	* \returns a reference of the pointer.
-	*/
-	template<typename T> TypePtr<T>& cast_to_TypePtr() {
+	 * Dynamically cast the TypeBase up to its actual TypePtr\<T\>. Referenced version.
+	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
+	 * \returns a reference of the pointer.
+	 */
+	template<typename T> TypePtr<T>& castToTypePtr() {
 		return m_cast_to<TypePtr<T> >();
 	}
 	/// \returns the length of the data pointed to
-	size_t len()const;
+	size_t length()const;
 
 	/**
-	* Split up into cheap copies of given length.
-	* This will create TypePtr's which will point at elements within this data block.
-	* - They will have a distance of size and therefore have the have the same length (exept the last one which will point an the rest).
-	* - They will use a special proxy-reference-counting (If at least one of them is still used, the whole original TypePtr will be kept).
-	* \returns a vector of ceil(len()/size) not intersecting TypePtrBase::Reference's of the length<=size.
-	*/
+	 * Split up into cheap copies of given length.
+	 * This will create TypePtr's which will point at elements within this data block.
+	 * - They will have a distance of size and therefore have the have the same length (exept the last one which will point an the rest).
+	 * - They will use a special proxy-reference-counting (If at least one of them is still used, the whole original TypePtr will be kept).
+	 * \returns a vector of ceil(len()/size) not intersecting TypePtrBase::Reference's of the length<=size.
+	 */
 	virtual std::vector<Reference> splice( size_t size )const = 0;
 
 	/// Copy (or Convert) data from this to another TypePtr of maybe another type and the same length.
@@ -102,7 +102,7 @@ public:
 	 */
 	template<typename T> TypePtr<T> copyToNew( const scaling_pair &scaling )const {
 		Reference ret = copyToNewById( TypePtr<T>::staticID, scaling );
-		return ret->cast_to_TypePtr<T>();
+		return ret->castToTypePtr<T>();
 	}
 	/**
 	 * Copy this to a new TypePtr\<T\> using newly allocated memory.
@@ -113,15 +113,16 @@ public:
 	 */
 	template<typename T> TypePtr<T> copyToNew()const {
 		Reference ret = copyToNewById( TypePtr<T>::staticID );
-		return ret->cast_to_TypePtr<T>();
+		return ret->castToTypePtr<T>();
 	}
 	/**
 	 * Create a new TypePtr, of the same type, but differnent size in memory.
 	 * \param length length of the new memory block in elements of the given TYPE
 	 */
-	virtual TypePtrBase::Reference cloneToMem( size_t length )const = 0;
+	virtual TypePtrBase::Reference cloneToNew( size_t length )const = 0;
+	TypePtrBase::Reference cloneToNew();
 
-	virtual size_t bytes_per_elem()const = 0;
+	virtual size_t bytesPerElem()const = 0;
 	virtual ~TypePtrBase();
 	/**
 	 * Copy a range of elements to another TypePtr of the same type.
@@ -132,7 +133,7 @@ public:
 	 */
 	void copyRange( size_t start, size_t end, TypePtrBase &dst, size_t dst_start )const;
 
-	size_t use_count()const;
+	size_t useCount()const;
 
 	bool swapAlong( TypePtrBase &dst, const size_t dim, const size_t dims[] ) const;
 	/**
@@ -151,10 +152,9 @@ public:
 	 * \param min TypeBase::Reference for the current lowest value
 	 */
 	virtual void getMinMax( util::TypeReference &min, util::TypeReference &max )const = 0;
-	virtual size_t cmp( size_t start, size_t end, const TypePtrBase &dst, size_t dst_start )const = 0;
-	size_t cmp( const TypePtrBase &comp )const;
+	virtual size_t compare( size_t start, size_t end, const TypePtrBase &dst, size_t dst_start )const = 0;
+	size_t compare( const TypePtrBase &comp )const;
 };
-
 }
 
 typedef _internal::TypePtrBase::Reference TypePtrReference;

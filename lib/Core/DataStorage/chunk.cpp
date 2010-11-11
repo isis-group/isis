@@ -40,7 +40,7 @@ Chunk::Chunk( const TypePtrReference &src, size_t firstDim, size_t secondDim, si
 	_internal::ChunkBase( firstDim, secondDim, thirdDim, fourthDim ),
 	TypePtrReference( src )
 {
-	assert( ( *this )->len() == volume() );
+	assert( ( *this )->length() == volume() );
 }
 
 Chunk Chunk::cloneToMem( size_t firstDim, size_t secondDim, size_t thirdDim, size_t fourthDim )const
@@ -55,7 +55,7 @@ Chunk Chunk::cloneToMem( size_t firstDim, size_t secondDim, size_t thirdDim, siz
 
 	if ( fourthDim )newSize[3] = fourthDim;
 
-	const TypePtrReference cloned( get()->cloneToMem( newSize.product() ) );
+	const TypePtrReference cloned( get()->cloneToNew( newSize.product() ) );
 	return Chunk( cloned, newSize[0], newSize[1], newSize[2], newSize[3] );
 }
 
@@ -83,7 +83,7 @@ bool Chunk::makeOfTypeId( short unsigned int id, const scaling_pair &scaling )
 
 size_t Chunk::bytes_per_voxel()const
 {
-	return get()->bytes_per_elem();
+	return get()->bytesPerElem();
 }
 std::string Chunk::typeName()const
 {
@@ -129,7 +129,7 @@ void Chunk::copyRange( const size_t source_start[], const size_t source_end[], C
 
 size_t Chunk::cmpRange( size_t start, size_t end, const Chunk &dst, size_t destination ) const
 {
-	return get()->cmp( start, end, *dst, destination );
+	return get()->compare( start, end, *dst, destination );
 }
 size_t Chunk::cmpRange( const size_t source_start[], const size_t source_end[], const Chunk &dst, const size_t destination[] ) const
 {

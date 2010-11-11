@@ -107,13 +107,13 @@ public:
 		return operator*();
 	}
 	template<typename TYPE> TypePtr<TYPE> &asTypePtr() {
-		return asTypePtrBase().cast_to_TypePtr<TYPE>();
+		return asTypePtrBase().castToTypePtr<TYPE>();
 	}
 	template<typename TYPE> const TypePtr<TYPE> getTypePtr()const {
-		return getTypePtrBase().cast_to_TypePtr<TYPE>();
+		return getTypePtrBase().castToTypePtr<TYPE>();
 	}
-	const size_t use_count()const {
-		return getTypePtrBase().use_count();
+	const size_t useCount()const {
+		return getTypePtrBase().useCount();
 	}
 	Chunk cloneToMem( size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 )const;
 
@@ -260,8 +260,8 @@ public:
 	}
 	/// Create a deep copy of a given Chunk (automatic conversion will be used if datatype does not fit)
 	MemChunk &operator=( const Chunk &ref ) {
-		LOG_IF( use_count() > 1, Debug, warning )
-				<< "Not overwriting current chunk memory (which is still used by " << use_count() - 1 << " other chunk(s)).";
+		LOG_IF( useCount() > 1, Debug, warning )
+				<< "Not overwriting current chunk memory (which is still used by " << useCount() - 1 << " other chunk(s)).";
 		Chunk::operator=( ref ); //copy the chunk of ref
 		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
 		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewById( TypePtr<TYPE>::staticID ) );
@@ -326,8 +326,8 @@ public:
 	}
 	/// Create a deep copy of a given Chunk (automatic conversion will be used if datatype does not fit)
 	MemChunkNonDel &operator=( const Chunk &ref ) {
-		LOG_IF( use_count() > 1, Debug, warning )
-				<< "Not overwriting current chunk memory (which is still used by " << use_count() - 1 << " other chunk(s)).";
+		LOG_IF( useCount() > 1, Debug, warning )
+				<< "Not overwriting current chunk memory (which is still used by " << useCount() - 1 << " other chunk(s)).";
 		Chunk::operator=( ref ); //copy the chunk of ref
 		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
 		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewById( TypePtr<TYPE>::staticID ) );

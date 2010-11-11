@@ -65,13 +65,13 @@ public:
 };
 
 /**
-* Base class to store and handle references to Type and TypePtr objects.
-* The values are refernced as smart pointers to their base class.
-* So the references are counted and data are automatically deleted if necessary.
-* The usual dereferencing pointer interface ("*" and "->") is supported.
-* This class is designed as base class for specialisations, it should not be used directly.
-* Because of that, the contructors of this class are protected.
-*/
+ * Base class to store and handle references to Type and TypePtr objects.
+ * The values are refernced as smart pointers to their base class.
+ * So the references are counted and data are automatically deleted if necessary.
+ * The usual dereferencing pointer interface ("*" and "->") is supported.
+ * This class is designed as base class for specialisations, it should not be used directly.
+ * Because of that, the contructors of this class are protected.
+ */
 template<typename TYPE_TYPE> class TypeReference: protected boost::scoped_ptr<TYPE_TYPE>
 {
 	template<typename TT> friend class data::TypePtr; //allow Type and TypePtr to use the protected contructor below
