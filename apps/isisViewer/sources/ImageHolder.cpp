@@ -122,6 +122,10 @@ void ImageHolder::setImages( util::PropMap propMap,  std::vector<vtkSmartPointer
 	m_TimeSteps = m_ImageVector.size();
 	m_PropMap = propMap;
 	isis::util::TypeReference min, max;
+	#warning check this - the interfave for the conversion does not expect min max anymore
+	m_ISISImage->getMinMax( min, max );
+	m_Min = min->as<double>();
+	m_Max = max->as<double>();
 	LOG( Runtime, info ) << "Image minimum: " << min << "; Image maximum: " << max;
 
 	m_ScalingFactor = m_PropMap.propertyValue("scale");

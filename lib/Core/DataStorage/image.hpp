@@ -164,10 +164,10 @@ public:
 	}
 
 
-	/**
-	 * Get the typeID of the chunk with "biggest" type
-	 */
+	/// Get the type of the chunk with "biggest" type
 	unsigned short typeID() const;
+	/// \copydoc typeID
+	std::string typeName() const;
 
 	/**
 	 * Get a chunk via index (and the lookup table).
@@ -224,16 +224,30 @@ public:
 	* \param second The second coordinate in voxel space. Usually the y value.
 	* \param third The third coordinate in voxel space. Ususally the z value.
 	* \param fourth The fourth coordinate in voxel space. Usually the time value.
-	* \returns a chunk contains the (maybe converted) voxel value at the given coordinates.
+	* \returns a (maybe converted) chunk containing the voxel value at the given coordinates.
 	*/
-	template<typename TYPE> Chunk getChunkAs( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const {
+	template<typename TYPE> Chunk getChunkAs(size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0)const {
+		return getChunkAs<TYPE>(getScalingTo(TypePtr<TYPE>::staticID),first,second,third,fourth);
+	}
+	/**
+	 * Get the chunk that contains the voxel at the given coordinates in the given type (fast version).
+	 * \copydetails getChunkAs
+	 * This version does not compute the scaling, and thus is much faster.
+	 * \param scaling the scaling (scale and offset) to be used if a conversion to the requested type is neccessary.
+	 * \param first The first coordinate in voxel space. Usually the x value.
+	 * \param second The second coordinate in voxel space. Usually the y value.
+	 * \param third The third coordinate in voxel space. Ususally the z value.
+	 * \param fourth The fourth coordinate in voxel space. Usually the time value.
+	 * \returns a (maybe converted) chunk containing the voxel value at the given coordinates.
+	 */
+	template<typename TYPE> Chunk getChunkAs(const scaling_pair &scaling, size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0)const {
 		Chunk ret = getChunk( first, second, third, fourth ); // get a cheap copy
-		ret.makeOfTypeId( TypePtr<TYPE>::staticID ); // make it of type T
+		ret.makeOfTypeId( TypePtr<TYPE>::staticID,scaling ); // make it of type T
 		return ret; //return that
 	}
 
 	///for each chunk get the scaling (and offset) which would be used in an conversion to the given type
-	std::list<std::pair<util::TypeReference,util::TypeReference> > getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const;
+	scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const;
 	
 
 	/**
@@ -310,11 +324,10 @@ public:
 	 */
 	template<typename T> void copyToMem( T *dst )const {
 		if( checkMakeClean() ) {
-			util::TypeReference min, max;
-			getMinMax( min, max );
+			scaling_pair scale=getScalingTo(TypePtr<T>::staticID);
 			// we could do this using makeOfTypeId - but this solution does not need any additional temporary memory
 			BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
-				if( !ref->copyToMem<T>( dst, *min, *max ) ) {
+				if( !ref->copyToMem<T>( dst, scale) ) {
 					LOG( Runtime, error ) << "Failed to copy raw data of type " << ref->typeName() << " from image into memory of type " << TypePtr<T>::staticName();
 				}
 
@@ -350,13 +363,13 @@ public:
 		Image::operator=( ref ); // ok we just copied the whole image
 		//we want deep copies of the chunks, and we want them to be of type T
 		struct : _internal::SortedChunkList::chunkPtrOperator {
-			util::TypeReference min, max;
+			std::pair<util::TypeReference,util::TypeReference> scale;
 			boost::shared_ptr<Chunk> operator()( const boost::shared_ptr< Chunk >& ptr ) {
-				return boost::shared_ptr<Chunk>( new MemChunk<T>( *ptr, *min, *max ) );
+				return boost::shared_ptr<Chunk>( new MemChunk<T>( *ptr, scale ) );
 			}
 		} conv_op;
-		getMinMax( conv_op.min, conv_op.max );
-		LOG( Debug, info ) << "Computed value range of the source image: [" << conv_op.min << ".." << conv_op.max << "]";
+		conv_op.scale=ref.getScalingTo(TypePtr<T>::staticID);
+		LOG( Debug, info ) << "Computed scaling for conversion from source image: [" << conv_op.scale << "]";
 		set.transform( conv_op );
 		lookup = set.getLookup(); // the lookup table still points to the old chunks
 		return *this;

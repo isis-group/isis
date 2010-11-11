@@ -21,6 +21,8 @@
  *****************************************************************/
 
 #include "itkAdapter.hpp"
+#include <isis/DataStorage/chunk.hpp>
+
 namespace isis
 {
 
@@ -246,6 +248,7 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	}
 
 	// TODO use MemImage instead of MemChunk.
+	#warning conversion has changed
 	boost::shared_ptr<data::Chunk >
 	tmpChunk ( new data::MemChunk< ITKRepn >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) ) ;
 	//we have to convert the datatype of retChunk to the desired TOutputISIS type to avoid autoscaling

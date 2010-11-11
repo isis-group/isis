@@ -43,12 +43,29 @@ SET(CPACK_PACKAGE_VERSION_MINOR ${${CMAKE_PROJECT_NAME}_VERSION_MINOR})
 SET(CPACK_PACKAGE_VERSION_PATCH ${${CMAKE_PROJECT_NAME}_VERSION_PATCH})
 #SET(CPACK_PACKAGE_INSTALL_DIRECTORY "CMake ${${CMAKE_PROJECT_NAME}_VERSION_MAJOR}.${${CMAKE_PROJECT_NAME}_VERSION_MINOR}")
 
+############################################################
+# check for liboil
+############################################################
+set(ISIS_USE_LIBOIL OFF CACHE BOOL "use liboil" )
+if(ISIS_USE_LIBOIL)
+	find_path(LibOil_INCLUDE_DIR "liboil/liboil.h" PATH_SUFFIXES "liboil" "liboil-0.3")
+	find_library(LibOil_LIBRARY NAMES "oil-0.3")
+	include_directories(${LibOil_INCLUDE_DIR})
+	ADD_DEFINITIONS(-DISIS_USE_LIBOIL)
+else(ISIS_USE_LIBOIL)
+	set(LibOil_LIBRARY "")
+endif(ISIS_USE_LIBOIL)
 
 ############################################################
 # set project specific module path
 ############################################################
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
+
+############################################################
+# set up doxygen
+############################################################
+include(UseDoxygen)
 
 ############################################################
 # Compiler flags on 64Bit cpus
@@ -96,33 +113,33 @@ ADD_DEFINITIONS(-DDL_SUFFIX="${CMAKE_SHARED_LIBRARY_SUFFIX}")
 ADD_DEFINITIONS(-DDL_PREFIX="${CMAKE_SHARED_LIBRARY_PREFIX}")
 
 ############################################################
-# SVN revision number
+# RCS revision number
 ############################################################
 # Set the revision number if this dir is a svn working copy.
-# The revision number will be stored in SVN_REVISION.
-FIND_FILE(SVNVERSION svnversion
+# The revision number will be stored in RCS_REVISION.
+FIND_FILE(RCS_DESC_COMMAND git-describe
     PATHS /usr/bin /usr/local/bin
-    DOC "The subversion revision information tool.")
+    DOC "The rcs revision description information tool.")
 
-IF (NOT SVN_REVISION)
-	IF (SVNVERSION)
-		EXECUTE_PROCESS(COMMAND ${SVNVERSION}
-			OUTPUT_VARIABLE OUT
-			WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+IF (NOT RCS_REVISION)
+	IF (RCS_DESC_COMMAND)
+		EXECUTE_PROCESS(COMMAND ${RCS_DESC_COMMAND} OUTPUT_VARIABLE OUT WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} OUTPUT_STRIP_TRAILING_WHITESPACE)
 		string(REGEX MATCH "exported" EXPORTED "${OUT}")
 		IF (NOT EXPORTED)
-			string(REGEX MATCH "^[0-9]+" SVN_REVISION "${OUT}") #@todo wont work with more complex revisions/modified sources
-			SET(SVN_REVISION ${SVN_REVISION})
+			string(REGEX MATCH "^[0-9.]+" RCS_REVISION "${OUT}") #@todo wont work with more complex revisions/modified sources
+			SET(RCS_REVISION ${RCS_REVISION})
 		ELSE (NOT EXPORTED)
-			set(SVN_REVISION "exported")
+			set(RCS_REVISION "exported")
 		ENDIF (NOT EXPORTED)
-	ENDIF (SVNVERSION)
-ENDIF (NOT SVN_REVISION)
+	else(RCS_DESC_COMMAND)
+		message(status "No rcs command given")
+	ENDIF (RCS_DESC_COMMAND)
+ENDIF (NOT RCS_REVISION)
 
-IF (SVN_REVISION)
-  MESSAGE(STATUS "SVN Revision: ${SVN_REVISION}")
-  ADD_DEFINITIONS(-D_ISIS_SVN_REVISION=${SVN_REVISION})
-ENDIF(SVN_REVISION)
+IF (RCS_REVISION)
+  MESSAGE(STATUS "RCS Revision: ${RCS_REVISION}")
+  ADD_DEFINITIONS(-D_ISIS_RCS_REVISION=${RCS_REVISION})
+ENDIF(RCS_REVISION)
 
 ############################################################
 # Build config
@@ -136,7 +153,8 @@ SET(ISIS_BUILD_DYNAMIC ON CACHE BOOL "enable build of the dynamic library" )
 ############################################################
 
 # add new source files to this parameter list
-SET ( SRC_FILES 
+SET ( SRC_FILES
+  CoreUtils/istring.cpp
   CoreUtils/progressfeedback.cpp 
   CoreUtils/tmpfile.cpp 
   CoreUtils/application.cpp 
@@ -163,6 +181,7 @@ SET ( SRC_FILES
   DataStorage/common.cpp )
 
 SET (COREUTILS_HDR_FILES
+  ./CoreUtils/istring.hpp
   ./CoreUtils/tmpfile.h
   ./CoreUtils/progparameter.hpp
   ./CoreUtils/type_converter.hpp
@@ -201,7 +220,7 @@ SET (DATASTORAGE_HDR_FILES
 if(ISIS_BUILD_DYNAMIC)
 	SET(LIBS isis_core ${LIBS})
 	ADD_LIBRARY( isis_core SHARED ${SRC_FILES} )
-	TARGET_LINK_LIBRARIES( isis_core ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} )
+	TARGET_LINK_LIBRARIES( isis_core ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} ${LibOil_LIBRARY})
 	SET_TARGET_PROPERTIES( isis_core PROPERTIES	${ISIS_BUILD_PROPERTIES} VERSION ${${CMAKE_PROJECT_NAME}_VERSION} INSTALL_NAME_DIR ${ISIS_INSTALL_LIB_DIR})
 endif(ISIS_BUILD_DYNAMIC)
 
@@ -240,6 +259,3 @@ CONFIGURE_FILE(cmake/isis_corecfg.cmake.in ${CMAKE_BINARY_DIR}/ISISConfig.cmake 
 # install cmake configuration files
 INSTALL(FILES ${CMAKE_BINARY_DIR}/ISISConfig.cmake
   DESTINATION ${CMAKE_INSTALL_PREFIX}/share/isis/cmake COMPONENT Development)
-
-
-  

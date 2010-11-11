@@ -18,6 +18,7 @@
 #include <boost/system/system_error.hpp>
 #include "image.hpp"
 #include "common.hpp"
+#include "CoreUtils/istring.hpp"
 
 namespace isis
 {
@@ -54,6 +55,13 @@ public:
 	static void throwGenericError( std::string desc );
 	static void throwSystemError( int err, std::string desc = "" );
 
+	/// splits the suffix (and the ".") from the filename (or path) and returns a pair made of both parts
+	virtual std::pair<std::string,std::string> makeBasename(const std::string &filename)const;
+	
+	static std::string makeFilename(const util::PropMap &img,std::string namePattern);
+	std::list<std::string> makeUniqueFilenames(const data::ImageList &images,const std::string &namePattern)const;
+
+
 	static const float invalid_float;
 	/// \return the name of the plugin
 	virtual std::string name()const = 0;
@@ -64,7 +72,7 @@ public:
 	 * @param reader the plugin to ask
 	 * @return a list of suffixes the plugin handles
 	 */
-	std::list<std::string> getSuffixes()const;
+	std::list<util::istring> getSuffixes()const;
 
 	
 	/// \return the dialects the plugin supports

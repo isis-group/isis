@@ -94,8 +94,7 @@ BOOST_AUTO_TEST_CASE ( chunk_scale_test )//Access Chunk elements via dimensional
 
 	ch.getMinMax(min,max);
 
-	std::pair<util::TypeReference,util::TypeReference> scale=
-		ch.getScalingTo(data::TypePtr<uint8_t>::staticID,*min,*max);
+	data::scaling_pair scale=ch.getScalingTo(data::TypePtr<uint8_t>::staticID,*min,*max);
 
 	const util::_internal::TypeBase &scale_s = *(scale.first);
 	const util::_internal::TypeBase &scale_o = *(scale.second);
@@ -157,6 +156,7 @@ BOOST_AUTO_TEST_CASE ( memchunk_copy_test )//Copy chunks
 		   boost::numeric::def_overflow_handler,
 		   boost::numeric::RoundEven<double>
 		   > converter;
+
 	data::MemChunk<float> ch1( 4, 3, 2, 1 );
 	ch1.setProperty( "indexOrigin", util::fvector4( 1, 2, 3, 4 ) );
 

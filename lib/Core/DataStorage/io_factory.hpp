@@ -77,7 +77,7 @@ private:
 	 * Stores a map of suffixes to a list FileFormats which supports this suffixes.
 	 * Leading "." are stripped in the suffixes.
 	 */
-	std::map<std::string, FileFormatList, util::_internal::caselessStringLess> io_suffix;
+	std::map<util::istring, FileFormatList> io_suffix;
 	IOFactory &operator =( IOFactory & ); //dont do that
 };
 
