@@ -66,6 +66,9 @@ public:
 	}
 	//get the version of the coreutils
 	static const std::string getCoreVersion( void );
+
+	//get the LLMap
+	static const LogLevel* getLLMap( void ) { return LLMap; }
 };
 }
 }

@@ -54,6 +54,7 @@ bool ProgParameter::parse( const Type<std::string> &props )
 	}
 
 	LOG_IF( ret, Debug, info ) << "Parsed " << MSubject( props.toString() ) << " as " << me.toString( true );
+	if(ret)m_set=true;
 	return ret;
 }
 const std::string &ProgParameter::description()const
@@ -64,6 +65,11 @@ void ProgParameter::setDescription( const std::string &desc )
 {
 	m_description = desc;
 }
+bool ProgParameter::isSet() const
+{
+	return m_set;
+}
+
 
 ParameterMap::ParameterMap(): parsed( false ) {}
 

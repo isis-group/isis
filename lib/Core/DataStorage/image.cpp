@@ -67,8 +67,7 @@ Image &Image::operator=( const isis::data::Image &ref )
 bool Image::checkMakeClean()
 {
 	if ( ! clean ) {
-		LOG( Debug, info )
-				<< "Image is not clean. Running reIndex ...";
+		LOG( Debug, info )	<< "Image is not clean. Running reIndex ...";
 
 		if( !reIndex() ) {
 			LOG( Runtime, error ) << "Reindexing failed -- undefined behavior ahead ...";
@@ -525,6 +524,27 @@ void Image::getMinMax ( util::TypeReference &min, util::TypeReference &max ) con
 		ref->getMinMax( min, max );
 	}
 }
+
+std::pair< util::TypeReference, util::TypeReference > Image::getScalingTo(short unsigned int targetID, autoscaleOption scaleopt) const
+{
+	LOG_IF(!clean,Runtime,error) << "You should run reIndex before running this";
+	util::TypeReference min,max;
+	getMinMax(min,max);
+	bool unique=true;
+	const std::vector<boost::shared_ptr<const Chunk> > chunks=getChunkList();
+	BOOST_FOREACH(const boost::shared_ptr<const Chunk> &ref, chunks){ //find a chunk which would be converted
+		if(targetID != ref->typeID()){
+			LOG_IF(ref->getScalingTo(targetID,*min,*max,scaleopt).first.empty() || ref->getScalingTo(targetID,*min,*max,scaleopt).second.empty(),Debug,error)
+				<< "Returning an invalid scaling. This is bad!";
+			return ref->getScalingTo(targetID,*min,*max,scaleopt); // and ask that for the scaling
+		}
+	}
+	return std::make_pair( //ok seems like no conversion is needed - return 1/0
+			util::TypeReference(util::Type<uint8_t>(1)),
+			util::TypeReference(util::Type<uint8_t>(0))
+	);
+}
+
 size_t Image::cmp( const isis::data::Image &comp ) const
 {
 	size_t ret = 0;
@@ -610,26 +630,36 @@ unsigned short Image::typeID() const
 {
 	unsigned int mytypeID = chunkPtrAt( 0 )->typeID();
 	size_t tmpBytesPerVoxel = 0;
-	BOOST_FOREACH( std::vector< boost::shared_ptr<const Chunk> >::const_reference chunkRef, lookup ) {
-		if ( chunkRef->bytes_per_voxel() > tmpBytesPerVoxel ) {
-			tmpBytesPerVoxel = chunkRef->bytes_per_voxel();
-			mytypeID = chunkRef->typeID();
-		}
+	util::TypeReference min,max;
+	getMinMax(min,max);
+	LOG(Debug,info) << "Determining  datatype of image with the value range " << min << " to " << max;
+	if(min->typeID() == max->typeID()){ // ok min and max are the same type - trivial case
+		return min->typeID()  << 8; //@todo maybe use a global static function here
+	} else if(min->fitsInto(max->typeID())){ // if min fits into the type of max, use that
+		return max->typeID()  << 8;
+	} else if(max->fitsInto(min->typeID())){ // if max fits into the type of min, use that
+		return min->typeID()  << 8;
+	} else {
+		LOG(Runtime,error) << "Sorry I dont know which datatype I should use. (" << min->typeName() << " or " << max->typeName() <<")";
+		throw(std::logic_error("type selection failed"));
+		return std::numeric_limits<unsigned char>::max();
 	}
-	return mytypeID;
+}
+std::string Image::typeName() const
+{
+	return util::getTypeMap()[typeID()];
 }
 
 bool Image::makeOfTypeId( short unsigned int id )
 {
 	// get value range of the image for the conversion
-	util::TypeReference min, max;
-	getMinMax( min, max );
-	assert( ! ( min.empty() || max.empty() ) );
-	LOG( Debug, info ) << "Computed value range of the original image data: [" << min << ".." << max << "]";
+	scaling_pair scale=getScalingTo(id);
+
+	LOG( Debug, info ) << "Computed scaling of the original image data: [" << scale << "]";
 	bool retVal = true;
 	//we want all chunks to be of type id - so tell them
 	BOOST_FOREACH( boost::shared_ptr<Chunk> &ref, lookup ) {
-		retVal &= ref->makeOfTypeId( id, *min, *max );
+		retVal &= ref->makeOfTypeId( id, scale );
 	}
 	return retVal;
 }

@@ -7,11 +7,12 @@ namespace image_io
 
 class ImageFormat_Null: public FileFormat
 {
-public:
-	std::string suffixes() {
+protected:
+	std::string suffixes()const {
 		return std::string( ".null .null.gz" );
 	}
-	std::string name() {
+public:
+	std::string name()const {
 		return "Null";
 	}
 
@@ -55,7 +56,7 @@ public:
 			if ( image.voxel<uint8_t>( 0, 0 ) != snum )
 				throw( std::runtime_error( "Data mismatch" ) );
 	}
-	bool tainted() {return false;}//internal plugins are not tainted
+	bool tainted()const {return false;}//internal plugins are not tainted
 };
 }
 }

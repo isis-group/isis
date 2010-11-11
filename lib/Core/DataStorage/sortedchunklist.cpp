@@ -192,7 +192,7 @@ bool SortedChunkList::insert( const Chunk &ch )
 
 	std::pair<boost::shared_ptr<Chunk>, bool> inserted = primaryInsert( ch );
 
-	LOG_IF( inserted.first && !inserted.second, Debug, info )
+	LOG_IF( inserted.first && !inserted.second, Debug, verbose_info )
 			<< "Not inserting chunk because there is allready a Chunk at the same position (" << ch.propertyValue( "indexOrigin" ) << ") with the equal property "
 			<< std::make_pair( prop2, ch.propertyValue( prop2 ) );
 

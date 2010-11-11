@@ -41,18 +41,15 @@ size_t TypePtrBase::cmp( const TypePtrBase &comp )const
 
 TypePtrBase::Reference TypePtrBase::copyToNewById( unsigned short id ) const
 {
-	util::TypeReference min, max;
-	getMinMax( min, max );
-	assert( ! ( min.empty() || max.empty() ) );
-	return copyToNewById( id, *min, *max );
+	return copyToNewById( id, getScalingTo(id));
 }
-TypePtrBase::Reference TypePtrBase::copyToNewById( unsigned short id, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max ) const
+TypePtrBase::Reference TypePtrBase::copyToNewById( unsigned short id, const scaling_pair &scaling ) const
 {
 	const Converter &conv = getConverterTo( id );
 
 	if( conv ) {
 		boost::scoped_ptr<TypePtrBase> ret;
-		conv->generate( *this, ret, min, max );
+		conv->generate( *this, ret, scaling );
 		return *ret;
 	} else {
 		LOG( Runtime, error )
@@ -86,19 +83,36 @@ void TypePtrBase::copyRange( size_t start, size_t end, TypePtrBase &dst, size_t 
 	}
 }
 
-bool TypePtrBase::convertTo( TypePtrBase &dst )const
+scaling_pair TypePtrBase::getScalingTo( unsigned short typeID, autoscaleOption scaleopt )const
 {
 	util::TypeReference min, max;
 	getMinMax( min, max );
 	assert( ! ( min.empty() || max.empty() ) );
-	return TypePtrBase::convertTo( dst, *min, *max );
+	return TypePtrBase::getScalingTo( typeID, *min, *max );
 }
-bool TypePtrBase::convertTo( TypePtrBase &dst, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max ) const
+
+scaling_pair TypePtrBase::getScalingTo( unsigned short typeID, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt )const
+{
+	const Converter &conv = getConverterTo( typeID );
+	
+	if ( conv ) {
+		return conv->getScaling(min, max, scaleopt);
+	} else {
+		LOG( Runtime, error )
+		<< "I dont know any conversion from " << util::MSubject( typeName() ) << " to " << util::MSubject( util::getTypeMap(false,true)[typeID] );
+		return scaling_pair();
+	}
+}
+bool TypePtrBase::convertTo( TypePtrBase &dst )const
+{
+	return convertTo( dst, getScalingTo(dst.typeID()));
+}
+bool TypePtrBase::convertTo( TypePtrBase &dst, const scaling_pair &scaling ) const
 {
 	const Converter &conv = getConverterTo( dst.typeID() );
 
 	if ( conv ) {
-		conv->convert( *this, dst, min, max );
+		conv->convert( *this, dst, scaling );
 		return true;
 	} else {
 		LOG( Runtime, error )

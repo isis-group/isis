@@ -80,12 +80,18 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 		err = true;
 	}
 
-	setLog<CoreDebug>( LLMap[parameters["dCore"]->as<Selection>()] );
-	setLog<CoreLog>( LLMap[parameters["dCore"]->as<Selection>()] );
-	setLog<DataDebug>( LLMap[parameters["dData"]->as<Selection>()] );
-	setLog<DataLog>( LLMap[parameters["dData"]->as<Selection>()] );
-	setLog<ImageIoDebug>( LLMap[parameters["dImageIO"]->as<Selection>()] );
-	setLog<ImageIoLog>( LLMap[parameters["dImageIO"]->as<Selection>()] );
+	if(parameters["dCore"].isSet()){
+		setLog<CoreDebug>( LLMap[parameters["dCore"]->as<Selection>()] );
+		setLog<CoreLog>( LLMap[parameters["dCore"]->as<Selection>()] );
+	}
+	if(parameters["dData"].isSet()){
+		setLog<DataDebug>( LLMap[parameters["dData"]->as<Selection>()] );
+		setLog<DataLog>( LLMap[parameters["dData"]->as<Selection>()] );
+	}
+	if(parameters["dImageIO"].isSet()){
+		setLog<ImageIoDebug>( LLMap[parameters["dImageIO"]->as<Selection>()] );
+		setLog<ImageIoLog>( LLMap[parameters["dImageIO"]->as<Selection>()] );
+	}
 
 	if ( err ) {
 		printHelp();
@@ -133,7 +139,11 @@ boost::shared_ptr< _internal::MessageHandlerBase > Application::getLogHandler( s
 }
 const std::string Application::getCoreVersion( void )
 {
-	return STR( _ISIS_VERSION_MAJOR ) + "." + STR( _ISIS_VERSION_MINOR ) + "." + STR( _ISIS_VERSION_PATCH ) + " [" + STR( _ISIS_SVN_REVISION ) + "]";
+#ifdef ISIS_RCS_REVISION
+	return STR( _ISIS_VERSION_MAJOR ) + "." + STR( _ISIS_VERSION_MINOR ) + "." + STR( _ISIS_VERSION_PATCH ) + " [" + STR( ISIS_RCS_REVISION ) + "]";
+#else
+	return STR( _ISIS_VERSION_MAJOR ) + "." + STR( _ISIS_VERSION_MINOR ) + "." + STR( _ISIS_VERSION_PATCH );
+#endif
 }
 
 }

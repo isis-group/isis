@@ -24,6 +24,7 @@
 #define IMAGEHOLDER_HPP_
 
 #include <vtkImageData.h>
+#include <vtkImageFlip.h>
 #include <vtkDataSetMapper.h>
 #include <vtkImageMapper.h>
 #include <vtkImageClip.h>
@@ -35,14 +36,24 @@
 #include <vtkProperty.h>
 #include <vtkTexture.h>
 #include <vtkCamera.h>
+#include <vtkMatrix4x4.h>
+#include <vtkTransform.h>
+#include <vtkSmartPointer.h>
+#include <vtkTrivialProducer.h>
 
 #include "CoreUtils/vector.hpp"
 #include "DataStorage/image.hpp"
-#include "isisViewer.hpp"
+#include "ViewControl.hpp"
+#include "MatrixHandler.hpp"
 
 #include <cmath>
+#include <vector>
 
-class isisViewer;
+namespace isis {
+
+namespace viewer {
+
+class ViewControl;
 
 class ImageHolder
 {
@@ -50,63 +61,79 @@ class ImageHolder
 public:
 	ImageHolder();
 
-	void setImage( vtkImageData*, boost::shared_ptr<isis::data::Image> );
-	void setPtrToViewer( const boost::shared_ptr<isisViewer> ptr ) { m_PtrToViewer = ptr; }
+	void setImages( util::PropMap, std::vector<vtkSmartPointer<vtkImageData> >);
+	void setPtrToViewer( const boost::shared_ptr<ViewControl> ptr ) { m_PtrToViewer = ptr; }
 
 	void setReadVec( const isis::util::fvector4& read ) { m_readVec = read; }
 	void setPhaseVec( const isis::util::fvector4& phase ) { m_phaseVec = phase; }
 	void setSliceVec( const isis::util::fvector4& slice ) { m_sliceVec = slice; }
 
-	void setPhysical( const bool& phy ) { m_Physical = phy; }
-
 	isis::util::fvector4 getReadVec() const { return m_readVec; }
 	isis::util::fvector4 getPhaseVec() const { return m_phaseVec; }
 	isis::util::fvector4 getSliceVec() const { return m_sliceVec; }
 
-	vtkImageData* getVTKImageData() const { return m_Image; }
-	boost::shared_ptr<isis::data::Image> getISISImage() const { return m_ISISImage; }
+	vtkImageData* getVTKImageData() const { return m_ImageVector[m_currentTimestep]; }
+	const util::PropMap& getISISImage() const { return m_PropMap; }
 
 	bool setSliceCoordinates (const int&, const int&, const int& );
+	void setCurrentTimeStep( const int& );
+	void setPhysical( bool physical ) {
+		m_Physical = physical;
+		setCurrentTimeStep(m_currentTimestep);
+	}
 	bool resetSliceCoordinates( void );
 
 	vtkActor* getActorAxial() const { return m_ActorAxial; }
 	vtkActor* getActorSagittal() const { return m_ActorSagittal; }
 	vtkActor* getActorCoronal() const { return m_ActorCoronal; }
-
+	const int getCurrentTimeStep() const { return m_currentTimestep; }
+	const unsigned int getNumberOfTimesteps( void ) const { return m_TimeSteps; }
+	util::TypeReference getScalingFactor( void ) const { return m_ScalingFactor; }
+	util::TypeReference getOffset( void ) const { return m_Offset; }
 
 private:
-	vtkImageData* m_Image;
-	boost::shared_ptr<isis::data::Image> m_ISISImage;
-	boost::shared_ptr<isisViewer> m_PtrToViewer;
-	vtkImageClip* m_ExtractAxial;
-	vtkImageClip* m_ExtractSagittal;
-	vtkImageClip* m_ExtractCoronal;
-	vtkDataSetMapper* m_MapperAxial;
-	vtkDataSetMapper* m_MapperSagittal;
-	vtkDataSetMapper* m_MapperCoronal;
-	vtkActor* m_ActorAxial;
-	vtkActor* m_ActorSagittal;
-	vtkActor* m_ActorCoronal;
+	MatrixHandler m_MatrixHandler;
+	std::vector<vtkSmartPointer<vtkImageData> > m_ImageVector;
+	util::PropMap m_PropMap;
+	boost::shared_ptr<ViewControl> m_PtrToViewer;
+	vtkSmartPointer<vtkImageClip> m_ExtractAxial;
+	vtkSmartPointer<vtkImageClip> m_ExtractSagittal;
+	vtkSmartPointer<vtkImageClip> m_ExtractCoronal;
+	vtkSmartPointer<vtkTrivialProducer> m_TrivialProducerAxial;
+	vtkSmartPointer<vtkTrivialProducer> m_TrivialProducerSagittal;
+	vtkSmartPointer<vtkTrivialProducer> m_TrivialProducerCoronal;
+	std::vector<vtkSmartPointer<vtkImageClip> > m_ExtractorVector;
+	vtkSmartPointer<vtkDataSetMapper> m_MapperAxial;
+	vtkSmartPointer<vtkDataSetMapper> m_MapperSagittal;
+	vtkSmartPointer<vtkDataSetMapper> m_MapperCoronal;
+	vtkSmartPointer<vtkActor> m_ActorAxial;
+	vtkSmartPointer<vtkActor> m_ActorSagittal;
+	vtkSmartPointer<vtkActor> m_ActorCoronal;
 
-	static const double orientSagittal[];
-	static const double orientCoronal[];
-	static const double orientAxial[];
+	bool m_Physical;
+	unsigned int m_TimeSteps;
+	unsigned int m_currentTimestep;
+	size_t m_X, m_Y, m_Z;
 
-	unsigned int m_SliceAxial;
-	unsigned int m_SliceSagittal;
-	unsigned int m_SliceCoronal;
+	util::TypeReference m_ScalingFactor;
+	util::TypeReference m_Offset;
+
+	size_t m_Min, m_Max;
+
+	std::vector<size_t> m_BiggestElemVec;
 
 	isis::util::fvector4 m_readVec;
 	isis::util::fvector4 m_phaseVec;
 	isis::util::fvector4 m_sliceVec;
-	double m_RotX;
-	double m_RotY;
-	double m_RotZ;
+	util::fvector4 m_pseudoOrigin;
+	util::fvector4 m_transformedOrigin;
 
-	bool m_Physical;
-	void setUpPipe();
+
+	void setUpPipe( void );
+	bool createOrientedImages( void );
+	void commonInit( void );
 
 };
 
-
+}}
 #endif /* IMAGEHOLDER_HPP_ */

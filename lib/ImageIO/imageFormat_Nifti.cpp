@@ -93,24 +93,24 @@ class ImageFormat_Nifti : public FileFormat
 			nifti_image_free( m_pNiImage );
 		}
 	};
-
+protected:
+	std::string suffixes()const {
+		return std::string( ".nii.gz .nii .hdr" );
+	}
 public:
 	enum vectordirection {readDir = 0, phaseDir, sliceDir, indexOrigin, voxelSizeVec};
 
-	std::string suffixes() {
-		return std::string( ".nii.gz .nii .hdr" );
-	}
 
-	std::string dialects(const std::string &filename) {
+	std::string dialects(const std::string &filename)const {
 		return std::string( "fsl spm" );
 	}
 
-	std::string name() {
+	std::string name()const {
 		//TODO: wahrscheinlich sollten die Namen irgendwie so aussehen "mpg.cbs.nii"?
 		return "Nifti";
 	}
 
-	bool tainted() {
+	bool tainted()const {
 		return false;
 	}//internal plugins are not tainted
 
@@ -186,7 +186,7 @@ public:
 	 * write file
 	 ************************/
 	void write( const data::Image &imageOrig, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) {
-		LOG( Debug, info ) << "Writing image of size " << imageOrig.sizeToString() << " and type " << util::getTypeMap()[imageOrig.typeID()] << " as nifti";
+		LOG( Debug, info ) << "Writing image of size " << imageOrig.sizeToString() << " and type " << imageOrig.typeName() << " as nifti";
 		boost::filesystem::path boostFilename( filename );
 		//copy of our image due to changing it by transformCoords
 		isis::data::Image image( imageOrig );
@@ -233,7 +233,7 @@ public:
 
 		// copy the data to the nifti image
 		LOG( ImageIoLog, isis::info ) << "image typeid: " << image.typeID();
-		LOG( ImageIoLog, isis::info ) << "image typename: " << util::getTypeMap()[image.typeID()];
+		LOG( ImageIoLog, isis::info ) << "image typename: " << image.typeName();
 
 		switch ( image.typeID() ) {
 		case data::TypePtr<int8_t>::staticID:
@@ -263,11 +263,10 @@ public:
 				data::TypedImage<int16_t> fslCopy( image );
 				ni.datatype = DT_INT16;
 				copyDataToNifti<int16_t>( fslCopy, ni );
-				break;
+			} else {
+				ni.datatype = DT_UINT16;
+				copyDataToNifti<u_int16_t>( image, ni );
 			}
-
-			ni.datatype = DT_UINT16;
-			copyDataToNifti<u_int16_t>( image, ni );
 			break;
 		case data::TypePtr<int32_t>::staticID:
 			ni.datatype = DT_INT32;
@@ -294,7 +293,7 @@ public:
 			copyDataToNifti<double>( image, ni );
 			break;
 		default:
-			throwGenericError( "Datatype " + data::TypePtr<float>::staticName() + " cannot be written!" );
+			throwGenericError( "Datatype " + image.typeName() + " cannot be written!" );
 		}
 
 		//now really write the nifti file with the function from nifti1_io.h
@@ -474,13 +473,15 @@ private:
 		T *refNii = ( T * ) ni.data;
 		const util::FixedVector<size_t, 4> csize = image.getChunk( 0, 0 ).sizeToVector();
 		const util::FixedVector<size_t, 4> isize = image.sizeToVector();
+		const data::scaling_pair scale=image.getScalingTo(data::TypePtr<T>::staticID);
+
 
 		for ( size_t t = 0; t < isize[3]; t += csize[3] ) {
 			for ( size_t z = 0; z < isize[2]; z += csize[2] ) {
 				for ( size_t y = 0; y < isize[1]; y += csize[1] ) {
 					for ( size_t x = 0; x < isize[0]; x += csize[0] ) {
 						const size_t dim[] = {x, y, z, t};
-						const data::Chunk ch = image.getChunkAs<T>( x, y, z, t );
+						const data::Chunk ch = image.getChunkAs<T>(scale, x, y, z, t );
 						T *target = refNii + image.dim2Index( dim );
 						ch.getTypePtr<T>().copyToMem( 0, ch.volume() - 1, target );
 					}

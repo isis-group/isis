@@ -106,7 +106,7 @@ public:
 	struct BasicDeleter {
 		void operator()( TYPE *p ) {
 			//we have to cast the pointer to void* here, because in case of u_int8_t it will try to print the "string"
-			LOG( Debug, info ) << "Freeing pointer " << ( void * )p << " (" << TypePtr<TYPE>::staticName() << ") ";
+			LOG( Debug, verbose_info ) << "Freeing pointer " << ( void * )p << " (" << TypePtr<TYPE>::staticName() << ") ";
 			free( p );
 		};
 	};
@@ -174,7 +174,7 @@ public:
 		size_t length = end - start;
 
 		if ( dst.typeID() != typeID() ) {
-			LOG( Runtime, error )
+			LOG( Debug, error )
 					<< "Comparing to a TypePtr of different type(" << dst.typeName() << ", not " << typeName()
 					<< "). Assuming all voxels to be different";
 			return length;
