@@ -198,7 +198,6 @@ typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkRea
 	importer->SetDirection( itkDirection );
 	m_ImagePropMap = static_cast<util::PropMap>( m_ImageISIS );
 	m_RelevantDim = m_ImageISIS.getChunkAt( 0 ).relevantDims();
-	//  std::cout << "relevant dims: " << m_RelevantDim << std::endl;
 	//reorganisation of memory according to the chunk organisiation
 	void *targePtr = malloc( m_ImageISIS.bytes_per_voxel() * m_ImageISIS.volume() );
 	typename InputImageType::PixelType *refTarget = ( typename InputImageType::PixelType * ) targePtr;
@@ -249,7 +248,7 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	// TODO use MemImage instead of MemChunk.
 	boost::shared_ptr<data::Chunk >
 	tmpChunk ( new data::MemChunk< ITKRepn >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) ) ;
-	//we have to convert the datatype of retChunk in the desired TOutputISIS type to avoid autoscaling
+	//we have to convert the datatype of retChunk to the desired TOutputISIS type to avoid autoscaling
 	util::TypeReference min, max;
 	tmpChunk->getMinMax( min, max );
 	boost::shared_ptr<data::Chunk > retChunk ( new data::MemChunk<ISISRepn>( imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) );
