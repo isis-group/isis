@@ -136,7 +136,7 @@ const char ImageFormat_Dicom::unknownTagName[] = "Unknown Tag";
 
 std::string ImageFormat_Dicom::suffixes()const {return std::string( ".ima .dcm" );}
 std::string ImageFormat_Dicom::name()const {return "Dicom";}
-std::string ImageFormat_Dicom::dialects(const std::string &filename)const {return "withPhoenixProtocol nomosaic";}
+std::string ImageFormat_Dicom::dialects(const std::string &filename)const {return "withExtProtocols nomosaic";}
 
 
 
