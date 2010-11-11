@@ -85,7 +85,7 @@ void MainWindow::RefreshIntensityDisplay::operator()( const size_t& intensity )
 void MainWindow::RefreshCoordsDisplay::operator()( const size_t& x, const size_t& y, const size_t& z, const size_t& t )
 {
 	QString atString;
-	atString.sprintf("at %d %d %d", x, y, z);
+	atString.sprintf("at %ld %ld %ld", x, y, z);
 	parent.ui.atLabel->setText(atString);
 }
 

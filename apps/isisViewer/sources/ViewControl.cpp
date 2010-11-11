@@ -134,10 +134,7 @@ void ViewControl::displayIntensity( const int& x, const int& y, const int &z )
 	signalList.mousePosChanged( x, y, z, t );
 	float scaling = m_CurrentImageHolder->getScalingFactor()->as<float>();
 	size_t offset = m_CurrentImageHolder->getOffset()->as<size_t>();
-	std::cout << "offset: " << offset << std::endl;
-	std::cout << "scaling: " << scaling << std::endl;
 	signalList.intensityChanged( m_CurrentImagePtr->GetScalarComponentAsDouble(x,y,z, 0) / scaling - offset );
-
 }
 
 void ViewControl::sliceChanged( const int& x, const int& y, const int& z)
@@ -145,7 +142,9 @@ void ViewControl::sliceChanged( const int& x, const int& y, const int& z)
 	LOG( Runtime, info ) << "ViewControl::sliceChanged";
 	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference refImg, m_ImageHolderVector)
 	{
-		if ( not refImg->setSliceCoordinates(x,y,z) ) LOG( Runtime, error ) << "error during setting slicesetting!";
+		if ( !refImg->setSliceCoordinates(x,y,z) ) {
+			LOG( Runtime, error ) << "error during setting slicesetting!";
+		}
 	}
 	UpdateWidgets();
 }
