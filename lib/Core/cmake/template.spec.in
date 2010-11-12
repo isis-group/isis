@@ -1,0 +1,49 @@
+
+# This is the rpm spec file template. 
+
+%define _topdir     @CMAKE_BINARY_DIR@/rpm
+%define name        libisiscore0
+%define release     1
+%define version     @ISIS_CORE_VERSION@
+%define buildroot   %{_topdir}/%{name}-%{version}
+
+BuildRoot:          %{buildroot}
+Summary:            The ISIS core library
+License:            GPL
+Name:               %{name}
+Version:            %{version}
+Release:            %{release}
+Source:             %{name}-%{version}.tar.gz
+Prefix:             /usr
+Group:              Development
+
+%description
+The ISIS package provides a general I/O framework for neuroimaging
+ data.  Being started with fMRI data, it can handle several established data
+ formats, like Nifti, Analyze, DICOM and vista. A first application based on this
+ project is a data converter that allows an easy and unified handling of fMRI
+ data from various MRI scanners. 
+ .
+ This Package provides the core libraries needed by all applications that
+ are build upon ISIS.
+
+%prep
+%setup -q
+
+%build
+mkdir -f release
+cd release
+cmake -DCMAKE_BUILD_TYPE=@CMAKE_BUILD_TYPE@ \
+    -DCMAKE_INSTALL_PREFIX=${RPM_BUILD_ROOT}/usr \
+    -DISIS_CORE_DEBUG_LOG=@ISIS_CORE_DEBUG_LOG@ \
+    -DBUILD_SHARED_LIBS=@BUILD_SHARED_LIBS@ \
+    -DCMAKE_SKIP_RPATH=@CMAKE_SKIP_RPATH@ \
+    ..
+make
+
+%install
+make install
+
+
+%files
+%defattr(-,root,root)
