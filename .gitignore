@@ -2,3 +2,13 @@
 *.project
 *~
 *.kdev4
+files
+*.log
+*.substvars
+lib/Core/debian/tmp/
+obj-x86_64-linux-gnu/
+stamp-makefile-build
+lib/Core/debian/libisiscore0/
+lib/Core/debian/libisiscore0.postrm.debhelper
+lib/Core/debian/libisiscore0.postinst.debhelper
+lib/Core/debian/libisiscore0-dev/
