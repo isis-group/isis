@@ -252,9 +252,9 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer()
 			//number of parameters are dependent on the dimension of the images (2D: 4 parameter, 3D: 6 parameters)
 			if ( transform.VERSORRIGID ) {
 				//rotation
-				optimizerScaleRegularStepGradient[0] = 1.0 / 10.0;
-				optimizerScaleRegularStepGradient[1] = 1.0 / 10.0;
-				optimizerScaleRegularStepGradient[2] = 1.0 / 10.0;
+				optimizerScaleRegularStepGradient[0] = 1.0 / 7.0;
+				optimizerScaleRegularStepGradient[1] = 1.0 / 7.0;
+				optimizerScaleRegularStepGradient[2] = 1.0 / 7.0;
 				//translation
 				optimizerScaleRegularStepGradient[3] = 1.0 / 1000.0;
 				optimizerScaleRegularStepGradient[4] = 1.0 / 1000.0;

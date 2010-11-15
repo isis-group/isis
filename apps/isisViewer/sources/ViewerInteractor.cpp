@@ -134,6 +134,7 @@ void ViewerInteractor::OnMouseWheelForward()
 }
 
 //----------------------------------------------------------------------------
+/*
 void ViewerInteractor::OnMouseWheelBackward()
 {
 	this->FindPokedRenderer(this->Interactor->GetEventPosition()[0],
@@ -194,5 +195,5 @@ void ViewerInteractor::Dolly(double factor)
 
   this->Interactor->Render();
 }
-
+*/
 }}

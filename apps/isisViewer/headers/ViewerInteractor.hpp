@@ -65,12 +65,12 @@ public:
 	virtual void OnRightButtonUp();
 	virtual void OnLeftButtonUp();
 	virtual void OnLeftButtonDown();
-	virtual void OnMouseWheelForward();
-	virtual void OnMouseWheelBackward();
+	//virtual void OnMouseWheelForward();
+	//virtual void OnMouseWheelBackward();
 	ViewerInteractor( ViewControl*, vtkRenderer* );
 
-	virtual void Dolly(double factor);
-	virtual void Dolly( void );
+	//virtual void Dolly(double factor);
+	//virtual void Dolly( void );
 
 	vtkSetMacro(MotionFactor,double);
 	vtkGetMacro(MotionFactor,double);
