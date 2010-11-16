@@ -141,7 +141,7 @@ endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL)
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ)
 	FIND_LIBRARY(LIB_Z "z")
 	FIND_PATH(INCPATH_GZIP "zlib.h")
-	INCLUDE_DIRECTORIES(${GZIP_INC})
+	INCLUDE_DIRECTORIES(${INCPATH_GZIP})
 
 	add_library(isisImageFormat_gz_proxy SHARED isisImageFormat_gz_proxy.cpp)
 	target_link_libraries(isisImageFormat_gz_proxy ${LIB_Z} ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
