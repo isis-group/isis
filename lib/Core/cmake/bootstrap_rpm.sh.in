@@ -5,6 +5,7 @@ PACKAGE=libisiscore0
 TMPDIR=${TMPROOT}/rpm
 FILES="../CMakeLists.txt ../DataStorage/ ../CoreUtils/ ../cmake/"
 VERSION=@ISIS_CORE_VERSION@
+TGZTMPDIR=${PACKAGE}-${VERSION}
 
 # create temporary directories
 if [ -d ${TMPDIR} ];then
@@ -20,12 +21,20 @@ mkdir ${TMPDIR}/SRPMS
 mkdir ${TMPDIR}/SPECS
 
 # create source archive and copy it to temp. directory
-tar -czf ${TMPDIR}/SOURCES/libisiscore0-${VERSION}.tar.gz ${FILES}
+if [ -d  ${TMPDIR}/${TGZTMPDIR} ];then
+    rm -rf ${TMPDIR}/${TGZTMPDIR}
+fi
+mkdir ${TMPDIR}/${TGZTMPDIR}
+cp -r ${FILES} ${TMPDIR}/${TGZTMPDIR}
+pushd ${TMPDIR}
+tar -czf SOURCES/${PACKAGE}-${VERSION}.tar.gz ${TGZTMPDIR}
+rm -rf ${TGZTMPDIR}
+popd
 
 # copy spec file
 cp ${PACKAGE}.spec ${TMPDIR}/SPECS
 
 # build rpm package
-# cd ${TMPDIR}
-# rpmbuild -v -bb SPECS/${PACKAGE}.spec
+cd ${TMPDIR}
+rpmbuild -v -bb SPECS/${PACKAGE}.spec
 

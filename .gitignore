@@ -1,4 +1,12 @@
 *.cproject
 *.project
 *~
+# cmake build dirs
+release/
+Release/
+debug/
+Debug/
+build/
+Build/
+
 
