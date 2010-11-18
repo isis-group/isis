@@ -501,7 +501,7 @@ ImageList::ImageList( ChunkList src )
 					errcnt += cnt;
 				}
 			} else {
-				LOG( Runtime, error ) << "Cannot insert image. Indexing failed.";
+				LOG( Runtime, info ) << "Skipping broken image.";
 				errcnt += cnt;
 			}
 		}
