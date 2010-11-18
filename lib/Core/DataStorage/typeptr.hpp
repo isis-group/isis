@@ -74,7 +74,7 @@ protected:
 		return new TypePtr( *this );
 	}
 public:
-	static const unsigned short staticID = util::_internal::TypeId<TYPE>::value << 8;
+	static const unsigned short staticID = util::_internal::TypeID<TYPE>::value << 8;
 	/// Proxy-Deleter to encapsulate the real deleter/shared_ptr when creating shared_ptr for parts of a shared_ptr
 	class DelProxy : public boost::shared_ptr<TYPE>
 	{

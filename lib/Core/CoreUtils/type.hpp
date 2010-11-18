@@ -118,7 +118,7 @@ protected:
 		return new Type<TYPE>( *this );
 	}
 public:
-	static const unsigned short staticID = _internal::TypeId<TYPE>::value;
+	static const unsigned short staticID = _internal::TypeID<TYPE>::value;
 	Type() {
 		BOOST_MPL_ASSERT_RELATION( staticID, < , 0xFF );
 		check_type<TYPE>();
@@ -135,7 +135,7 @@ public:
 	}
 	std::string toString( bool labeled = false )const {
 		std::string ret;
-		Reference ref = copyToNewById( Type<std::string>::staticID );
+		Reference ref = copyToNewByID( Type<std::string>::staticID );
 
 		if ( ref.empty() ) {
 			LOG( Debug, error ) << "Automatic conversion of " << *this << " to string failed. Falling back to boost::lexical_cast<std::string>";

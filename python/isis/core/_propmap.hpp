@@ -61,7 +61,7 @@ private:
 	template<typename TYPE>
 	void internSetProperty ( const std::string key, PyObject* value, std::string type ) {
 		util::Type<TYPE> val(static_cast<TYPE>( boost::python::extract<TYPE>( value ) ));
-		val.copyToNewById( util::getTransposedTypeMap(true, true)[type] );
+		val.copyToNewByID( util::getTransposedTypeMap(true, true)[type] );
 		this->setProperty<TYPE>(key, val);
 
 	}

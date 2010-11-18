@@ -213,11 +213,11 @@ public:
 	 * Converts the value of the given property into the requested type and stores it with the given new key.
 	 * \param from the key of the property to be transformed
 	 * \param to the key for the new property
-	 * \param dstId the type-id of the new property value
+	 * \param dstID the type-id of the new property value
 	 * \param delSource if the original property shall be deleted after the tramsformation was done
 	 * \returns true if the transformation was done
 	 */
-	bool transform( std::string from, std::string to, int dstId, bool delSource = true );
+	bool transform( std::string from, std::string to, int dstID, bool delSource = true );
 
 	/**
 	* Transform an existing property into another (statically typed version).

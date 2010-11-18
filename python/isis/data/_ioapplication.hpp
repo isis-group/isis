@@ -90,7 +90,7 @@ private:
 	void internAddParameter ( const std::string name, PyObject* value, std::string type ) {
 		util::Type<TYPE> val(static_cast<TYPE>( boost::python::extract<TYPE>( value ) ));
 //		if(!type.empty()) {
-//			val.copyToNewById( util::getTransposedTypeMap(true, true)[type] );
+//			val.copyToNewByID( util::getTransposedTypeMap(true, true)[type] );
 //		}
 		parameters[name] = val;
 		parameters[name].needed() = false;

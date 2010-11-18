@@ -90,8 +90,8 @@ public:
 		return convertTo( dest );
 	}
 
-	Reference copyToNewById( unsigned short id ) const;
-	Reference copyToNewById( unsigned short id, const scaling_pair &scaling ) const;
+	Reference copyToNewByID( unsigned short id ) const;
+	Reference copyToNewByID( unsigned short id, const scaling_pair &scaling ) const;
 
 	/**
 	 * Copy this to a new TypePtr\<T\> using newly allocated memory.
@@ -101,7 +101,7 @@ public:
 	 * \returns a the newly created TypePtr
 	 */
 	template<typename T> TypePtr<T> copyToNew( const scaling_pair &scaling )const {
-		Reference ret = copyToNewById( TypePtr<T>::staticID, scaling );
+		Reference ret = copyToNewByID( TypePtr<T>::staticID, scaling );
 		return ret->castToTypePtr<T>();
 	}
 	/**
@@ -112,7 +112,7 @@ public:
 	 * \returns a the newly created TypePtr
 	 */
 	template<typename T> TypePtr<T> copyToNew()const {
-		Reference ret = copyToNewById( TypePtr<T>::staticID );
+		Reference ret = copyToNewByID( TypePtr<T>::staticID );
 		return ret->castToTypePtr<T>();
 	}
 	/**

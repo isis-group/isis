@@ -378,7 +378,7 @@ void PropMap::linearize( flat_map &out, std::string key_prefix ) const
 	}
 }
 
-bool PropMap::transform( std::string from,  std::string to, int dstId, bool delSource )
+bool PropMap::transform( std::string from,  std::string to, int dstID, bool delSource )
 {
 	const PropertyValue &found = propertyValue( from );
 	bool ret = false;
@@ -386,7 +386,7 @@ bool PropMap::transform( std::string from,  std::string to, int dstId, bool delS
 	if( ! found.empty() ) {
 		util::TypeReference &dst = static_cast<util::TypeReference &>( propertyValue( to ) );
 
-		if ( found->typeID() == dstId ) {
+		if ( found->typeID() == dstID ) {
 			if( from != to ) {
 				dst = found ;
 				ret = true;
@@ -395,7 +395,7 @@ bool PropMap::transform( std::string from,  std::string to, int dstId, bool delS
 			}
 		} else {
 			LOG_IF( from == to, Debug, warning ) << "Transforming " << MSubject( found ) << " in place.";
-			dst = found->copyToNewById( dstId );
+			dst = found->copyToNewByID( dstID );
 			ret = !dst.empty();
 		}
 	}

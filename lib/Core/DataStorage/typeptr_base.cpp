@@ -36,11 +36,11 @@ size_t TypePtrBase::compare( const TypePtrBase &comp )const
 	return length() - comp.length() + compare( 0, std::min( length(), comp.length() ) - 1, comp, 0 );
 }
 
-TypePtrBase::Reference TypePtrBase::copyToNewById( unsigned short id ) const
+TypePtrBase::Reference TypePtrBase::copyToNewByID( unsigned short id ) const
 {
-	return copyToNewById( id, getScalingTo(id));
+	return copyToNewByID( id, getScalingTo(id));
 }
-TypePtrBase::Reference TypePtrBase::copyToNewById( unsigned short id, const scaling_pair &scaling ) const
+TypePtrBase::Reference TypePtrBase::copyToNewByID( unsigned short id, const scaling_pair &scaling ) const
 {
 	const Converter &conv = getConverterTo( id );
 

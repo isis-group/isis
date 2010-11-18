@@ -184,7 +184,7 @@ bool IOApplication::autowrite( const ImageList& out_images, bool exitOnError )
 
 	if( repn != 0 ) {
 		BOOST_FOREACH( ImageList::const_reference ref, out_images ) {
-			ref->makeOfTypeId( repn );
+			ref->makeOfTypeID( repn );
 		}
 	}
 

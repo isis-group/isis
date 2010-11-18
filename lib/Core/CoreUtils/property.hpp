@@ -114,7 +114,7 @@ public:
 		} else if ( ! empty() ) { // otherwise try to make me T and compare that
 			LOG( Debug, info )
 					<< *this << " is not " << Type<T>::staticName() << " trying to convert.";
-			TypeReference dst = ( *this )->copyToNewById( Type<T>::staticID );
+			TypeReference dst = ( *this )->copyToNewByID( Type<T>::staticID );
 
 			if ( !dst.empty() )
 				return dst->castTo<T>() == second;

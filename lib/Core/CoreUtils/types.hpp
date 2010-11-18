@@ -47,11 +47,11 @@ bool
 
 /**
  * Templated pseudo struct to generate the id of a supported type.
- * The id is stored in TypeId\<T\>::value.
+ * The id is stored in TypeID\<T\>::value.
  * The id is the position of the type in the mpl::vector types, starting with 1 (so there is no id==0)
  * This is a compile-time-constant, so it can be used as a template parameter and has no impact at the runtime.
  */
-template<class T> struct TypeId {
+template<class T> struct TypeID {
 	typedef plus< int_<1>, typename distance<begin<types>::type, typename find<types, T>::type >::type > type;
 	static const unsigned short value = type::value;
 };

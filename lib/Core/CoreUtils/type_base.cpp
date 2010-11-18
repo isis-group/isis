@@ -81,7 +81,7 @@ bool TypeBase::fitsInto(short unsigned int id) const
 	}
 }
 
-TypeBase::Reference TypeBase::copyToNewById( short unsigned int id ) const
+TypeBase::Reference TypeBase::copyToNewByID( short unsigned int id ) const
 {
 	boost::scoped_ptr<TypeBase> to;
 	const Converter &conv = getConverterTo( id );

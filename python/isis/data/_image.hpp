@@ -125,7 +125,7 @@ public:
 
 	isis::data::Chunk _getChunkAs( const size_t& first, const size_t& second, const size_t &third, const size_t &fourth, const std::string &type ) {
 		isis::data::Chunk ret = this->getChunk( first, second, third, fourth ); // get a cheap copy
-		ret.makeOfTypeId( util::getTransposedTypeMap(true, true)[type] );
+		ret.makeOfTypeID( util::getTransposedTypeMap(true, true)[type] );
 		return ret;
 	}
 
@@ -191,7 +191,7 @@ public:
 		if( type[type.size() - 1] != '*' ) {
 			type.append("*");
 		}
-		return this->makeOfTypeId( util::getTransposedTypeMap(true, true)[type] );
+		return this->makeOfTypeID( util::getTransposedTypeMap(true, true)[type] );
 	}
 
 	size_t _spliceDownTo( const std::string dim ) {
@@ -248,7 +248,7 @@ public:
 			LOG( isis::python::Runtime, isis::error ) << "Unable to convert to type "
 								<< type << ". Keeping type.";
 		} else{
-			retImage.makeOfTypeId( isis::util::getTransposedTypeMap()[type] );
+			retImage.makeOfTypeID( isis::util::getTransposedTypeMap()[type] );
 		}
 		return retImage;
 	}

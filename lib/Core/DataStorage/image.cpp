@@ -646,7 +646,7 @@ std::string Image::typeName() const
 	return util::getTypeMap()[typeID()];
 }
 
-bool Image::makeOfTypeId( short unsigned int id )
+bool Image::makeOfTypeID( short unsigned int id )
 {
 	// get value range of the image for the conversion
 	scaling_pair scale=getScalingTo(id);
@@ -655,7 +655,7 @@ bool Image::makeOfTypeId( short unsigned int id )
 	bool retVal = true;
 	//we want all chunks to be of type id - so tell them
 	BOOST_FOREACH( boost::shared_ptr<Chunk> &ref, lookup ) {
-		retVal &= ref->makeOfTypeId( id, scale );
+		retVal &= ref->makeOfTypeID( id, scale );
 	}
 	return retVal;
 }
