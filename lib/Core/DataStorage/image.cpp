@@ -501,7 +501,7 @@ ImageList::ImageList( ChunkList src )
 					errcnt += cnt;
 				}
 			} else {
-				LOG( Runtime, error ) << "Cannot insert image. Indexing failed.";
+				LOG( Runtime, info ) << "Skipping broken image.";
 				errcnt += cnt;
 			}
 		}
@@ -630,9 +630,9 @@ unsigned short Image::typeID() const
 	getMinMax(min,max);
 	LOG(Debug,info) << "Determining  datatype of image with the value range " << min << " to " << max;
 	if(min->typeID() == max->typeID()){ // ok min and max are the same type - trivial case
-		return min->typeID()  << 8; //@todo maybe use a global static function here
+		return min->typeID()  << 8; // btw: we do the shift, because min and max are Type - but we want the id's TypePtr
 	} else if(min->fitsInto(max->typeID())){ // if min fits into the type of max, use that
-		return max->typeID()  << 8;
+		return max->typeID()  << 8; //@todo maybe use a global static function here instead of a obscure shit operation
 	} else if(max->fitsInto(min->typeID())){ // if max fits into the type of min, use that
 		return min->typeID()  << 8;
 	} else {
