@@ -21,6 +21,7 @@
  *****************************************************************/
 
 #include <boost/algorithm/string.hpp>
+#include <boost/foreach.hpp>
 
 #include <itkImageFileReader.h>
 #include <itkImageFileWriter.h>
