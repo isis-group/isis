@@ -40,7 +40,7 @@ class DicomChunk : public data::Chunk
 	static data::Chunk *copyColor( TYPE** source, size_t width, size_t height ) {
 		data::Chunk *ret = new data::MemChunk<util::color<TYPE> >( width, height );
 		data::TypePtr<util::color<TYPE> > &dest = ret->asTypePtr<util::color<TYPE> >();
-		const size_t pixels = dest.len();
+		const size_t pixels = dest.length();
 
 		for ( size_t i = 0; i < pixels; i++ ) {
 			util::color<TYPE> &dvoxel = dest[i];
@@ -300,7 +300,7 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 
 	// If we do have DWI here, create a property diffusionGradient (which defaults to 0,0,0,0)
 	if( foundDiff ) {
-		util::fvector4 &diff = object.setProperty( "diffusionGradient", util::fvector4() )->cast_to<util::fvector4>();
+		util::fvector4 &diff = object.setProperty( "diffusionGradient", util::fvector4() )->castTo<util::fvector4>();
 
 		if( bValue ) { // if bValue is not zero multiply the diffusionGradient by it
 			if( object.hasProperty( prefix + "DiffusionGradientOrientation" ) ) {
@@ -386,7 +386,7 @@ int ImageFormat_Dicom::readMosaic( data::Chunk source, data::ChunkList &dest )
 	//remove the additional mosaic offset
 	//eg. if there is a 10x10 Mosaic, substract the half size of 9 Images from the offset
 	const util::fvector4 fovCorr = ( voxelSize + voxelGap ) * size * ( matrixSize - 1 ) / 2; // @todo this will not include the voxelGap between the slices
-	util::fvector4 &origin = source.propertyValue( "indexOrigin" )->cast_to<util::fvector4>();
+	util::fvector4 &origin = source.propertyValue( "indexOrigin" )->castTo<util::fvector4>();
 	origin = origin + ( readVec * fovCorr[0] ) + ( phaseVec * fovCorr[1] );
 	source.remove( NumberOfImagesInMosaicProp ); // we dont need that anymore
 	source.setProperty( prefix + "ImageType", iType );
@@ -420,7 +420,7 @@ int ImageFormat_Dicom::readMosaic( data::Chunk source, data::ChunkList &dest )
 	}
 
 	if( source.hasProperty( "acquisitionTime" ) ) {
-		acqTime = source.propertyValue( "acquisitionTime" )->cast_to<float>();
+		acqTime = source.propertyValue( "acquisitionTime" )->castTo<float>();
 	}
 
 	// Create a chunk-vector for the slices
@@ -443,18 +443,18 @@ int ImageFormat_Dicom::readMosaic( data::Chunk source, data::ChunkList &dest )
 		// and "fix" its properties
 		static_cast<util::PropMap &>( *newChunks[slice] ) = static_cast<const util::PropMap &>( source ); //copy _only_ the Properties of source
 		// update origin
-		util::fvector4 &origin = newChunks[slice]->propertyValue( "indexOrigin" )->cast_to<util::fvector4>();
+		util::fvector4 &origin = newChunks[slice]->propertyValue( "indexOrigin" )->castTo<util::fvector4>();
 		origin = origin + ( sliceVec * slice );
 
 		// update fov
 		if ( newChunks[slice]->hasProperty( "fov" ) ) {
-			util::fvector4 &ref = newChunks[slice]->propertyValue( "fov" )->cast_to<util::fvector4>();
+			util::fvector4 &ref = newChunks[slice]->propertyValue( "fov" )->castTo<util::fvector4>();
 			ref[0] /= matrixSize;
 			ref[1] /= matrixSize;
 		}
 
 		// fix/set acquisitionNumber and acquisitionTime
-		newChunks[slice]->propertyValue( "acquisitionNumber" )->cast_to<uint32_t>() += slice;
+		newChunks[slice]->propertyValue( "acquisitionNumber" )->castTo<uint32_t>() += slice;
 
 		if( haveAcqTimeList ) {
 			newChunks[slice]->setProperty<float>( "acquisitionTime", acqTime +  *( acqTimeIt++ ) );
