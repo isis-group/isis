@@ -109,18 +109,18 @@ std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::primaryInsert( const 
 	assert( ch.valid() );
 	// compute the position of the chunk in the image space
 	// we dont have this position, but we have the position in scanner-space (indexOrigin)
-	const util::fvector4 &origin = ch.propertyValue( "indexOrigin" )->cast_to<util::fvector4>();
+	const util::fvector4 &origin = ch.propertyValue( "indexOrigin" )->castTo<util::fvector4>();
 	// and we have the transformation matrix
 	// [ readVec ]
 	// [ phaseVec]
 	// [ sliceVec]
 	// [ 0 0 0 1 ]
-	const util::fvector4 &readVec = ch.propertyValue( "readVec" )->cast_to<util::fvector4>();
-	const util::fvector4 &phaseVec = ch.propertyValue( "phaseVec" )->cast_to<util::fvector4>();
+	const util::fvector4 &readVec = ch.propertyValue( "readVec" )->castTo<util::fvector4>();
+	const util::fvector4 &phaseVec = ch.propertyValue( "phaseVec" )->castTo<util::fvector4>();
 	util::fvector4 sliceVec;
 
 	if( ch.hasProperty( "sliceVec" ) )
-		sliceVec = ch.propertyValue( "sliceVec" )->cast_to<util::fvector4>();
+		sliceVec = ch.propertyValue( "sliceVec" )->castTo<util::fvector4>();
 	else {
 		sliceVec = util::fvector4(
 					   readVec[1] * phaseVec[2] - readVec[2] * phaseVec[1],

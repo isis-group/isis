@@ -91,7 +91,7 @@ public:
 	*/
 	template<class T> T as()const {
 		if( is<T>() )
-			return cast_to<T>();
+			return castTo<T>();
 
 		Reference ret = copyToNewById( Type<T>::staticID );
 
@@ -101,17 +101,17 @@ public:
 					<< " failed. Returning " << Type<T>().toString() << ".";
 			return T();
 		} else
-			return ret->cast_to<T>();
+			return ret->castTo<T>();
 	}
 
 	/**
-	 * Dynamically cast the TypeBase up to its actual Type\<T\>. Constant version.
+	 * Dynamically cast the TypeBase down to its actual Type\<T\>. Constant version.
 	 * Will throw std::bad_cast if T is not the actual type.
 	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
 	 * \returns a constant reference of the stored value.
 	 */
-	template<typename T> const Type<T>& cast_to_Type() const;
-	template<typename T> const T &cast_to() const;
+	template<typename T> const Type<T>& castToType() const;
+	template<typename T> const T &castTo() const;
 
 	/**
 	 * Dynamically cast the TypeBase up to its actual Type\<T\>. Referenced version.
@@ -119,8 +119,8 @@ public:
 	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
 	 * \returns a reference of the stored value.
 	 */
-	template<typename T> Type<T>& cast_to_Type();
-	template<typename T> T &cast_to();
+	template<typename T> Type<T>& castToType();
+	template<typename T> T &castTo();
 	virtual bool operator==( const TypeBase &second )const = 0;
 
 	/// creates a copy of the stored value using a type referenced by its id

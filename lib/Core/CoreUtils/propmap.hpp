@@ -249,7 +249,7 @@ public:
 			const bool needed = ret.needed();
 			( ret = val ).needed() = needed;
 		} else if( ret->is<T>() ) {
-			ret->cast_to<T>() = val;
+			ret->castTo<T>() = val;
 		} else { // don't overwrite allready set properties with a different type
 			LOG( Runtime, error ) << "Property " << MSubject( key ) << " is allready set to " << MSubject( ret.toString( true ) ) << " won't override with " << MSubject( Type<T>( val ).toString( true ) );
 		}

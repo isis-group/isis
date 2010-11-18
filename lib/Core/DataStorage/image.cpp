@@ -189,7 +189,7 @@ bool Image::reIndex()
 		if ( hasProperty( ref ) ) {
 			util::PropertyValue &prop = propertyValue( ref );
 			LOG_IF( !prop->is<util::fvector4>(), Debug, error ) << "Using " << prop->typeName() << " as " << util::Type<util::fvector4>::staticName();
-			util::fvector4 &vec = prop->cast_to<util::fvector4>();
+			util::fvector4 &vec = prop->castTo<util::fvector4>();
 			LOG_IF( vec.len() == 0, Runtime, error )
 					<< "The existing " << ref << " " << vec << " has the length zero. Thats bad, because I'm going to normalize it.";
 			vec.norm();
@@ -238,7 +238,7 @@ bool Image::reIndex()
 					setProperty( "voxelGap", util::fvector4( 0, 0, inf, 0 ) );
 				}
 
-				util::fvector4 &voxelGap = propertyValue( "voxelGap" )->cast_to<util::fvector4>(); //if there is no voxelGap yet, we create it
+				util::fvector4 &voxelGap = propertyValue( "voxelGap" )->castTo<util::fvector4>(); //if there is no voxelGap yet, we create it
 
 				if ( voxelGap[2] != inf ) {
 					if ( ! util::fuzzyEqual( voxelGap[2], sliceDist, 5e1 ) ) {
@@ -258,8 +258,8 @@ bool Image::reIndex()
 
 	//if we have read- and phase- vector
 	if ( hasProperty( "readVec" ) && hasProperty( "phaseVec" ) ) {
-		util::fvector4 &read = propertyValue( "readVec" )->cast_to<util::fvector4>();
-		util::fvector4 &phase = propertyValue( "phaseVec" )->cast_to<util::fvector4>();
+		util::fvector4 &read = propertyValue( "readVec" )->castTo<util::fvector4>();
+		util::fvector4 &phase = propertyValue( "phaseVec" )->castTo<util::fvector4>();
 		LOG_IF( read.dot( phase ) > 0.01, Runtime, warning ) << "The cosine between the columns and the rows of the image is bigger than 0.01";
 		const util::fvector4 crossVec = util::fvector4( //we could use their cross-product as sliceVector
 											read[1] * phase[2] - read[2] * phase[1],
@@ -268,7 +268,7 @@ bool Image::reIndex()
 										);
 
 		if ( hasProperty( "sliceVec" ) ) {
-			util::fvector4 &sliceVec = propertyValue( "sliceVec" )->cast_to<util::fvector4>(); //get the slice vector
+			util::fvector4 &sliceVec = propertyValue( "sliceVec" )->castTo<util::fvector4>(); //get the slice vector
 			LOG_IF( ! crossVec.fuzzyEqual( sliceVec, 1e3 ), Runtime, warning )
 					<< "The existing sliceVec " << sliceVec
 					<< " differs from the cross product of the read- and phase vector " << crossVec;
@@ -284,7 +284,7 @@ bool Image::reIndex()
 	}
 
 	if ( hasProperty( "fov" ) ) {
-		util::fvector4 &propFoV = propertyValue( "fov" )->cast_to<util::fvector4>();
+		util::fvector4 &propFoV = propertyValue( "fov" )->castTo<util::fvector4>();
 		util::fvector4 voxelGap;
 
 		if ( hasProperty( "voxelGap" ) ) {

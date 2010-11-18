@@ -141,7 +141,7 @@ public:
 			LOG( Debug, error ) << "Automatic conversion of " << *this << " to string failed. Falling back to boost::lexical_cast<std::string>";
 			ret = boost::lexical_cast<std::string>( m_val );
 		} else {
-			ret = ref->cast_to<std::string>();
+			ret = ref->castTo<std::string>();
 		}
 
 		if ( labeled )ret += "(" + staticName() + ")";
@@ -158,7 +158,7 @@ public:
 	/// \returns true if this and second contain the same value of the same type
 	virtual bool operator==( const TypeBase &second )const {
 		if ( second.is<TYPE>() ) {
-			return m_val == second.cast_to<TYPE>();
+			return m_val == second.castTo<TYPE>();
 		} else
 			return  false;
 	}
@@ -193,24 +193,25 @@ public:
 	virtual ~Type() {}
 };
 
-template<typename T> const Type<T>& _internal::TypeBase::cast_to_Type() const
+template<typename T> const Type<T>& _internal::TypeBase::castToType() const
 {
 	check_type<T>();
 	return m_cast_to<Type<T> >();
 }
-template<typename T> const T &_internal::TypeBase::cast_to() const
+template<typename T> const T &_internal::TypeBase::castTo
+() const
 {
-	const Type<T> &ret = cast_to_Type<T>();
+	const Type<T> &ret = castToType<T>();
 	return ret.operator const T & ();
 }
-template<typename T> Type<T>& _internal::TypeBase::cast_to_Type()
+template<typename T> Type<T>& _internal::TypeBase::castToType()
 {
 	check_type<T>();
 	return m_cast_to<Type<T> >();
 }
-template<typename T> T &_internal::TypeBase::cast_to()
+template<typename T> T &_internal::TypeBase::castTo()
 {
-	Type<T> &ret = cast_to_Type<T>();
+	Type<T> &ret = castToType<T>();
 	return ret.operator T & ();
 }
 

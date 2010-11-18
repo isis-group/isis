@@ -125,7 +125,7 @@ void Application::printHelp(bool withHidden)const
 		std::cout << "\t-" << iP->first << " <" << iP->second->typeName() << ">" << std::endl;
 
 		if ( iP->second->is<Selection>() ) {
-			const Selection &ref = iP->second->cast_to<Selection>();
+			const Selection &ref = iP->second->castTo<Selection>();
 			std::cout << "\t\tOptions are: " <<  ref.getEntries() << std::endl;
 		}
 
