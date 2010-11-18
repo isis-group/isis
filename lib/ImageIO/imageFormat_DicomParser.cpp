@@ -442,7 +442,9 @@ size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, isis::util::PropMap &map, co
 
 			if ( !len )continue;
 
-			if( std::string( "MrPhoenixProtocol" ) != name  || dialect == "withPhoenixProtocol" ) {
+			if( (
+					std::string( "MrPhoenixProtocol" ) != name  && std::string( "MrEvaProtocol" ) != name && std::string( "MrProtocol" ) != name 
+				) || dialect == "withExtProtocols" ) {
 				std::string insert( ( char * )at + pos );
 				const std::string whitespaces( " \t\f\v\n\r" );
 				const std::string::size_type start = insert.find_first_not_of( whitespaces );
@@ -458,7 +460,7 @@ size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, isis::util::PropMap &map, co
 						ret.push_back( insert.substr( start, end + 1 - start ) );//store the text if there is some
 				}
 			} else {
-				LOG( Runtime, info ) << "Skipping MrPhoenixProtocol as its not requested by the dialect";
+				LOG( Runtime, info ) << "Skipping " << name << " as its not requested by the dialect (use dialect \"withExtProtocols\" to get it)";
 			}
 
 			pos += (
