@@ -112,6 +112,9 @@ void ViewControl::resetCam()
 		refImg->resetSliceCoordinates();
 	}
 	UpdateWidgets();
+	m_RendererAxial->ResetCamera();
+	m_RendererSagittal->ResetCamera();
+	m_RendererCoronal->ResetCamera();
 }
 
 void ViewControl::UpdateWidgets()
@@ -120,10 +123,10 @@ void ViewControl::UpdateWidgets()
 	m_AxialWidget->update();
 	m_SagittalWidget->update();
 	m_CoronalWidget->update();
-	m_RendererAxial->ResetCamera();
-	m_RendererSagittal->ResetCamera();
-	m_RendererCoronal->ResetCamera();
-
+	m_RendererAxial->ResetCameraClippingRange();
+	m_RendererSagittal->ResetCameraClippingRange();
+	m_RendererCoronal->ResetCameraClippingRange();
+	
 }
 
 //gui interactions
@@ -163,7 +166,7 @@ void ViewControl::checkPhysicalChanged( bool physical )
 	{
 		ref->setPhysical( physical );
 	}
-	UpdateWidgets();
+	resetCam();
 }
 
 }}

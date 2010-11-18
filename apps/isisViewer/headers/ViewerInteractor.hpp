@@ -56,25 +56,17 @@ private:
 
 	vtkCellPicker* m_Picker;
 
-protected:
-	 ~ViewerInteractor() {};
-
 public:
-	virtual void Zoom();
 	virtual void OnMouseMove();
 	virtual void OnRightButtonUp();
 	virtual void OnLeftButtonUp();
 	virtual void OnLeftButtonDown();
-	//virtual void OnMouseWheelForward();
-	//virtual void OnMouseWheelBackward();
+	virtual void Dolly( const double );
+	virtual void OnMouseWheelForward();
+	virtual void OnMouseWheelBackward();
 	ViewerInteractor( ViewControl*, vtkRenderer* );
-
-	//virtual void Dolly(double factor);
-	//virtual void Dolly( void );
-
 	vtkSetMacro(MotionFactor,double);
 	vtkGetMacro(MotionFactor,double);
-
 	double MotionFactor;
 };
 

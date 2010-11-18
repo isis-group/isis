@@ -31,7 +31,7 @@ ViewerInteractor::ViewerInteractor( ViewControl* viewer, vtkRenderer* renderer )
 	: m_ViewerPtr( viewer ),
 	  m_Renderer( renderer )
 {
-
+	MotionFactor = 2;
 	this->StartPosition[0] = this->StartPosition[1] = 0;
 	this->EndPosition[0] = this->EndPosition[1] = 0;
 	this->Moving = 0;
@@ -116,64 +116,48 @@ void ViewerInteractor::OnLeftButtonUp()
     }
   this->Moving = 0;
 }
-void ViewerInteractor::OnMouseWheelForward()
+void ViewerInteractor::OnMouseWheelForward() 
 {
-	this->FindPokedRenderer(this->Interactor->GetEventPosition()[0],
-						  this->Interactor->GetEventPosition()[1]);
-	if (this->CurrentRenderer == NULL)
-	{
-		return;
-	}
-
-	this->GrabFocus(this->EventCallbackCommand);
-	this->StartDolly();
-	double factor = this->MotionFactor * 0.2 * this->MouseWheelMotionFactor;
-	this->Dolly(pow(1.1, factor));
-	this->EndDolly();
-	this->ReleaseFocus();
+  this->FindPokedRenderer(this->Interactor->GetEventPosition()[0], 
+                          this->Interactor->GetEventPosition()[1]);
+  if (this->CurrentRenderer == NULL)
+    {
+    return;
+    }
+  
+  this->GrabFocus(this->EventCallbackCommand);
+  this->StartDolly();
+  double factor = this->MotionFactor * 0.2 * this->MouseWheelMotionFactor;
+  this->Dolly(pow(1.1, factor));
+  this->EndDolly();
+  this->ReleaseFocus();
 }
-
-//----------------------------------------------------------------------------
-/*
 void ViewerInteractor::OnMouseWheelBackward()
 {
-	this->FindPokedRenderer(this->Interactor->GetEventPosition()[0],
-						  this->Interactor->GetEventPosition()[1]);
-	if (this->CurrentRenderer == NULL)
-	{
-		return;
-	}
-
-	this->GrabFocus(this->EventCallbackCommand);
-	this->StartDolly();
-	double factor = this->MotionFactor * -0.2 * this->MouseWheelMotionFactor;
-	this->Dolly(pow(1.1, factor));
-	this->EndDolly();
-	this->ReleaseFocus();
-}
-
-void ViewerInteractor::Dolly()
-{
+  this->FindPokedRenderer(this->Interactor->GetEventPosition()[0], 
+                          this->Interactor->GetEventPosition()[1]);
   if (this->CurrentRenderer == NULL)
     {
     return;
     }
-
-  vtkRenderWindowInteractor *rwi = this->Interactor;
-  double *center = this->CurrentRenderer->GetCenter();
-  int dy = rwi->GetEventPosition()[1] - rwi->GetLastEventPosition()[1];
-  double dyf = this->MotionFactor * dy / center[1];
-  this->Dolly(pow(1.1, dyf));
+  
+  this->GrabFocus(this->EventCallbackCommand);
+  this->StartDolly();
+  double factor = this->MotionFactor * -0.2 * this->MouseWheelMotionFactor;
+  this->Dolly(pow(1.1, factor));
+  this->EndDolly();
+  this->ReleaseFocus();
 }
 
-//----------------------------------------------------------------------------
+
 void ViewerInteractor::Dolly(double factor)
 {
+	std::cout << "factor: " << factor << std::endl;
   if (this->CurrentRenderer == NULL)
     {
     return;
     }
-
+  
   vtkCamera *camera = this->CurrentRenderer->GetActiveCamera();
   if (camera->GetParallelProjection())
     {
@@ -187,13 +171,12 @@ void ViewerInteractor::Dolly(double factor)
       this->CurrentRenderer->ResetCameraClippingRange();
       }
     }
-
-  if (this->Interactor->GetLightFollowCamera())
+  
+  if (this->Interactor->GetLightFollowCamera()) 
     {
     this->CurrentRenderer->UpdateLightsGeometryToFollowCamera();
     }
-
+  
   this->Interactor->Render();
 }
-*/
 }}
