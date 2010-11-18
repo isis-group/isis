@@ -62,8 +62,9 @@ Chunk Chunk::cloneToMem( size_t firstDim, size_t secondDim, size_t thirdDim, siz
 bool Chunk::makeOfTypeId( short unsigned int id )
 {
 	if( typeID() != id ) {
-		return makeOfTypeId( id, getScalingTo(id));
+		return makeOfTypeId( id, getScalingTo( id ) );
 	}
+
 	return true;
 }
 
@@ -169,13 +170,15 @@ void Chunk::getMinMax ( util::TypeReference &min, util::TypeReference &max ) con
 	return operator*().getMinMax( min, max );
 }
 
-scaling_pair Chunk::getScalingTo( unsigned short typeID, autoscaleOption scaleopt )const{
-	util::TypeReference min,max;
-	getMinMax(min,max);
-	return operator*().getScalingTo(typeID,*min,*max,scaleopt);
+scaling_pair Chunk::getScalingTo( unsigned short typeID, autoscaleOption scaleopt )const
+{
+	util::TypeReference min, max;
+	getMinMax( min, max );
+	return operator*().getScalingTo( typeID, *min, *max, scaleopt );
 }
-scaling_pair Chunk::getScalingTo( unsigned short typeID, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt )const{
-	return operator*().getScalingTo(typeID,min,max,scaleopt);
+scaling_pair Chunk::getScalingTo( unsigned short typeID, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt )const
+{
+	return operator*().getScalingTo( typeID, min, max, scaleopt );
 }
 
 Chunk &Chunk::operator=( const Chunk &ref )

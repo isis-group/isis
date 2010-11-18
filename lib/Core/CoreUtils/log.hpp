@@ -53,7 +53,7 @@ public:
 		getHandle() = handler;
 	}
 	static Message send( const char file[], const char object[], int line, LogLevel level ) {
-		boost::shared_ptr<util::_internal::MessageHandlerBase> &handle=getHandle();
+		boost::shared_ptr<util::_internal::MessageHandlerBase> &handle = getHandle();
 		return Message( object, MODULE::name(), file, line, level, handle );
 	}
 };

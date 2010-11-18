@@ -37,7 +37,7 @@ namespace util
 class ProgParameter: public PropertyValue
 {
 	std::string m_description;
-	bool m_hidden,m_set;
+	bool m_hidden, m_set;
 public:
 	/**
 	 * Default constructor.
@@ -53,7 +53,7 @@ public:
 	 * (The value is used as default value if the parameter never gets to parse any other value)
 	 * \param needed mark this parameter as needed
 	 */
-	template<typename T> ProgParameter( const T &ref, bool needed = true ): PropertyValue( ref, needed ),m_hidden(false),m_set(false) {}
+	template<typename T> ProgParameter( const T &ref, bool needed = true ): PropertyValue( ref, needed ), m_hidden( false ), m_set( false ) {}
 	/**
 	 * Parse the given string as value into this parameter.
 	 * The parsing is done by automatic type-conversion from std::string to the type of the parameter.
@@ -99,7 +99,7 @@ class ParameterMap: public std::map<std::string, ProgParameter, _internal::casel
 	struct hiddenP {
 		bool operator()( const_reference ref )const {return ref.second.hidden();}
 	};
-	template<class T> void printWithout(){
+	template<class T> void printWithout() {
 		std::map<key_type, mapped_type, key_compare> result( *this );
 
 		for (

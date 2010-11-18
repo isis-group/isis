@@ -44,9 +44,11 @@
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 
-namespace isis {
+namespace isis
+{
 
-namespace viewer {
+namespace viewer
+{
 
 class ViewerInteractor;
 class ImageHolder;
@@ -58,9 +60,9 @@ public:
 	ViewControl();
 	void init( QVTKWidget *axial, QVTKWidget *sagittal, QVTKWidget *coronal );
 	void resetCam();
-	void sliceChanged(const int&, const int&, const int&);
-	void displayIntensity( const int&, const int&, const int& );
-	void addImages( const ImageMapType& );
+	void sliceChanged( const int &, const int &, const int & );
+	void displayIntensity( const int &, const int &, const int & );
+	void addImages( const ImageMapType & );
 	void UpdateWidgets();
 
 	void changeCurrentTimeStep( int );
@@ -72,9 +74,9 @@ public:
 	std::vector<boost::shared_ptr< ImageHolder > > getImageHolderVector( void ) const { return m_ImageHolderVector; }
 
 	struct Signals {
-			boost::signal< void ( const size_t& )> intensityChanged;
-			boost::signal< void ( const size_t&, const size_t&, const size_t&, const size_t& )> mousePosChanged;
-		} signalList;
+		boost::signal< void ( const size_t & )> intensityChanged;
+		boost::signal< void ( const size_t &, const size_t &, const size_t &, const size_t & )> mousePosChanged;
+	} signalList;
 
 private:
 
@@ -104,9 +106,10 @@ private:
 	QVTKWidget *m_CoronalWidget;
 
 	void setUpPipe();
-	void loadImages( util::slist& );
+	void loadImages( util::slist & );
 
 };
-}}
+}
+}
 #endif
-	
+

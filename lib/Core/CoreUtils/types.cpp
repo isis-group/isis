@@ -94,8 +94,7 @@ std::map< std::string, unsigned short > getTransposedTypeMap( bool withTypes, bo
 	typedef std::map< std::string, unsigned short> transposedMapType;
 	typedef std::map< unsigned short, std::string > mapType;
 	transposedMapType ret;
-	BOOST_FOREACH( mapType::const_reference ref, util::getTypeMap( withTypes, withTypePtrs ) )
-	{
+	BOOST_FOREACH( mapType::const_reference ref, util::getTypeMap( withTypes, withTypePtrs ) ) {
 		ret[ref.second] = ref.first;
 	}
 	return ret;

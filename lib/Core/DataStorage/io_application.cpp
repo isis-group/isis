@@ -30,11 +30,9 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 	if ( have_input ) {
 		parameters["in"] = std::string();
 		parameters["in"].setDescription( "input file or dataset" );
-
 		parameters["rf"] = std::string();
 		parameters["rf"].needed() = false;
 		parameters["rf"].hidden() = true;
-		
 		parameters["rf"].setDescription( "Override automatic detection of file suffix for reading with given value" );
 		parameters["rdialect"] = std::string();
 		parameters["rdialect"].needed() = false;
@@ -45,17 +43,14 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 	if ( have_output ) {
 		parameters["out"] = std::string();
 		parameters["out"].setDescription( "output file" );
-
 		parameters["wf"] = std::string();
 		parameters["wf"].needed() = false;
 		parameters["wf"].setDescription( "Override automatic detection of file suffix for writing with given value" );
 		parameters["wf"].hidden() = true;
-		
 		parameters["wdialect"] = std::string();
 		parameters["wdialect"].needed() = false;
 		parameters["wdialect"].setDescription( "choose dialect for writing. The available dialects depend on the capabilities of IO plugins" );
 		std::map<unsigned short, std::string> types = util::getTypeMap( false, true );
-
 		// remove some types which are useless as representation
 		// "(unsigned short)" is needed because otherwise erase would take the reference of a static constant which is only there during compile time
 		types.erase( ( unsigned short )data::TypePtr<util::Selection>::staticID );
@@ -76,7 +71,7 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 			"Representation in which the data shall be written." );
 	}
 
-	if( have_input || have_output){
+	if( have_input || have_output ) {
 		parameters["np"] = false;
 		parameters["np"].needed() = false;
 		parameters["np"].setDescription( "suppress progress bar" );
@@ -100,24 +95,21 @@ bool IOApplication::init( int argc, char **argv, bool exitOnError )
 
 	return true;
 }
-void IOApplication::printHelp(bool withHidden) const
+void IOApplication::printHelp( bool withHidden ) const
 {
-    util::Application::printHelp(withHidden);
-	if(withHidden){
+	util::Application::printHelp( withHidden );
+
+	if( withHidden ) {
 		std::cout << std::endl << "Available IO Plugins:" << std::endl;
-		data::IOFactory::FileFormatList plugins=data::IOFactory::getFormats();
-		BOOST_FOREACH(data::IOFactory::FileFormatList::const_reference pi,plugins){
-			
+		data::IOFactory::FileFormatList plugins = data::IOFactory::getFormats();
+		BOOST_FOREACH( data::IOFactory::FileFormatList::const_reference pi, plugins ) {
 			std::cout << std::endl << "\t" << pi->name() << std::endl << "\t=======================================" << std::endl;
+			const std::list<util::istring> suff = pi->getSuffixes();
+			const std::list<std::string> dialects = util::string2list<std::string>( pi->dialects( "" ) );
+			std::cout << "\tsupported suffixes: " << util::list2string( suff.begin(), suff.end(), "\", \"", "\"", "\"" )  << std::endl;
 
-			const std::list<util::istring> suff=pi->getSuffixes();
-			const std::list<std::string> dialects= util::string2list<std::string>(pi->dialects(""));
-			
-			std::cout << "\tsupported suffixes: " << util::list2string(suff.begin(),suff.end(),"\", \"","\"","\"")  << std::endl;
-
-			if(!dialects.empty())
-				std::cout << "\tsupported dialects: " << util::list2string(dialects.begin(),dialects.end(),"\", \"","\"","\"")  << std::endl;
-			
+			if( !dialects.empty() )
+				std::cout << "\tsupported dialects: " << util::list2string( dialects.begin(), dialects.end(), "\", \"", "\"", "\"" )  << std::endl;
 		}
 	}
 }
@@ -127,15 +119,14 @@ bool IOApplication::autoload( bool exitOnError )
 	std::string input = parameters["in"];
 	std::string rf = parameters["rf"];
 	std::string dl = parameters["rdialect"];
-	bool no_progress=parameters["np"];
-
+	bool no_progress = parameters["np"];
 	LOG( Runtime, info )
 			<< "loading " << util::MSubject( input )
 			<< ( rf.empty() ? "" : std::string( " using the format: " ) + rf )
 			<< ( ( !rf.empty() && !dl.empty() ) ? " and" : "" )
 			<< ( dl.empty() ? "" : std::string( " using the dialect: " ) + dl );
 
-	if(!no_progress){
+	if( !no_progress ) {
 		data::IOFactory::setProgressFeedback( &feedback );
 	}
 
@@ -161,14 +152,14 @@ bool IOApplication::autoload( bool exitOnError )
 	return true;
 }
 
-bool IOApplication::autowrite( const Image& out_image, bool exitOnError )
+bool IOApplication::autowrite( const Image &out_image, bool exitOnError )
 {
 	ImageList list;
-	list.push_back(boost::shared_ptr<Image>(new Image(out_image)));
-	autowrite(list,exitOnError);
+	list.push_back( boost::shared_ptr<Image>( new Image( out_image ) ) );
+	autowrite( list, exitOnError );
 }
 
-bool IOApplication::autowrite( const ImageList& out_images, bool exitOnError )
+bool IOApplication::autowrite( const ImageList &out_images, bool exitOnError )
 {
 	const util::Selection repn = parameters["repn"];
 	const std::string output = parameters["out"];
@@ -199,8 +190,9 @@ bool IOApplication::autowrite( const ImageList& out_images, bool exitOnError )
 		return true;
 }
 
-Image IOApplication::fetchImage(){
-	Image ret=*images.front();
+Image IOApplication::fetchImage()
+{
+	Image ret = *images.front();
 	images.pop_front();
 	return ret;
 }

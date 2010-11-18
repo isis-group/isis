@@ -23,11 +23,13 @@
 #include "ViewerInteractor.hpp"
 #include "vtkCallbackCommand.h"
 
-namespace isis {
+namespace isis
+{
 
-namespace viewer {
+namespace viewer
+{
 
-ViewerInteractor::ViewerInteractor( ViewControl* viewer, vtkRenderer* renderer )
+ViewerInteractor::ViewerInteractor( ViewControl *viewer, vtkRenderer *renderer )
 	: m_ViewerPtr( viewer ),
 	  m_Renderer( renderer )
 {
@@ -38,8 +40,7 @@ ViewerInteractor::ViewerInteractor( ViewControl* viewer, vtkRenderer* renderer )
 	this->PixelArray = vtkUnsignedCharArray::New();
 	this->m_Picker = vtkCellPicker::New();
 	this->SetCurrentRenderer( m_Renderer );
-	this->SetPickColor(1,0,0);
-
+	this->SetPickColor( 1, 0, 0 );
 }
 
 
@@ -50,133 +51,120 @@ void ViewerInteractor::OnRightButtonUp()
 
 void ViewerInteractor::OnLeftButtonDown()
 {
-	 if (!this->Interactor)
-	{
-		 return;
+	if ( !this->Interactor ) {
+		return;
 	}
 
-	 if( m_Picker->Pick(this->GetInteractor()->GetEventPosition()[0],
-	 							this->GetInteractor()->GetEventPosition()[1],
-	 							0,
-	 							this->CurrentRenderer))
-	{
+	if( m_Picker->Pick( this->GetInteractor()->GetEventPosition()[0],
+						this->GetInteractor()->GetEventPosition()[1],
+						0,
+						this->CurrentRenderer ) ) {
 		double ptMapped[3];
-		m_Picker->GetMapperPosition(ptMapped);
-		m_ViewerPtr->sliceChanged( static_cast<int>(ptMapped[0]), static_cast<int>(ptMapped[1]), static_cast<int>(ptMapped[2]) );
+		m_Picker->GetMapperPosition( ptMapped );
+		m_ViewerPtr->sliceChanged( static_cast<int>( ptMapped[0] ), static_cast<int>( ptMapped[1] ), static_cast<int>( ptMapped[2] ) );
 	}
-	this->Moving = 1;
 
+	this->Moving = 1;
 }
 
 void ViewerInteractor::OnMouseMove()
 {
-	if (!this->Moving)
-	{
-		if( m_Picker->Pick(this->GetInteractor()->GetEventPosition()[0],
+	if ( !this->Moving ) {
+		if( m_Picker->Pick( this->GetInteractor()->GetEventPosition()[0],
 							this->GetInteractor()->GetEventPosition()[1],
 							0,
-							this->CurrentRenderer))
-		{
+							this->CurrentRenderer ) ) {
 			double ptMapped[3];
-			m_Picker->GetMapperPosition(ptMapped);
-			m_ViewerPtr->displayIntensity( static_cast<int>(ptMapped[0]), static_cast<int>(ptMapped[1]), static_cast<int>(ptMapped[2]) );
+			m_Picker->GetMapperPosition( ptMapped );
+			m_ViewerPtr->displayIntensity( static_cast<int>( ptMapped[0] ), static_cast<int>( ptMapped[1] ), static_cast<int>( ptMapped[2] ) );
 		}
-
 	} else {
-		if( m_Picker->Pick(this->GetInteractor()->GetEventPosition()[0],
-									this->GetInteractor()->GetEventPosition()[1],
-									0,
-									this->CurrentRenderer))
-		{
+		if( m_Picker->Pick( this->GetInteractor()->GetEventPosition()[0],
+							this->GetInteractor()->GetEventPosition()[1],
+							0,
+							this->CurrentRenderer ) ) {
 			double ptMapped[3];
-			m_Picker->GetMapperPosition(ptMapped);
-			m_ViewerPtr->displayIntensity( static_cast<int>(ptMapped[0]), static_cast<int>(ptMapped[1]), static_cast<int>(ptMapped[2]) );
-			m_ViewerPtr->sliceChanged( static_cast<int>(ptMapped[0]), static_cast<int>(ptMapped[1]), static_cast<int>(ptMapped[2]) );
+			m_Picker->GetMapperPosition( ptMapped );
+			m_ViewerPtr->displayIntensity( static_cast<int>( ptMapped[0] ), static_cast<int>( ptMapped[1] ), static_cast<int>( ptMapped[2] ) );
+			m_ViewerPtr->sliceChanged( static_cast<int>( ptMapped[0] ), static_cast<int>( ptMapped[1] ), static_cast<int>( ptMapped[2] ) );
 		}
-
 	}
 
-	if (!this->Interactor || !this->Moving)
-	{
+	if ( !this->Interactor || !this->Moving ) {
 		return;
 	}
 }
 
 void ViewerInteractor::OnLeftButtonUp()
 {
-  if (!this->Interactor || !this->Moving)
-    {
-    return;
-    }
+	if ( !this->Interactor || !this->Moving ) {
+		return;
+	}
 
-  if (   (this->StartPosition[0] != this->EndPosition[0])
-      || (this->StartPosition[1] != this->EndPosition[1]) )
-    {
-    this->Zoom();
-    }
-  this->Moving = 0;
+	if (   ( this->StartPosition[0] != this->EndPosition[0] )
+		   || ( this->StartPosition[1] != this->EndPosition[1] ) ) {
+		this->Zoom();
+	}
+
+	this->Moving = 0;
 }
-void ViewerInteractor::OnMouseWheelForward() 
+void ViewerInteractor::OnMouseWheelForward()
 {
-  this->FindPokedRenderer(this->Interactor->GetEventPosition()[0], 
-                          this->Interactor->GetEventPosition()[1]);
-  if (this->CurrentRenderer == NULL)
-    {
-    return;
-    }
-  
-  this->GrabFocus(this->EventCallbackCommand);
-  this->StartDolly();
-  double factor = this->MotionFactor * 0.2 * this->MouseWheelMotionFactor;
-  this->Dolly(pow(1.1, factor));
-  this->EndDolly();
-  this->ReleaseFocus();
+	this->FindPokedRenderer( this->Interactor->GetEventPosition()[0],
+							 this->Interactor->GetEventPosition()[1] );
+
+	if ( this->CurrentRenderer == NULL ) {
+		return;
+	}
+
+	this->GrabFocus( this->EventCallbackCommand );
+	this->StartDolly();
+	double factor = this->MotionFactor * 0.2 * this->MouseWheelMotionFactor;
+	this->Dolly( pow( 1.1, factor ) );
+	this->EndDolly();
+	this->ReleaseFocus();
 }
 void ViewerInteractor::OnMouseWheelBackward()
 {
-  this->FindPokedRenderer(this->Interactor->GetEventPosition()[0], 
-                          this->Interactor->GetEventPosition()[1]);
-  if (this->CurrentRenderer == NULL)
-    {
-    return;
-    }
-  
-  this->GrabFocus(this->EventCallbackCommand);
-  this->StartDolly();
-  double factor = this->MotionFactor * -0.2 * this->MouseWheelMotionFactor;
-  this->Dolly(pow(1.1, factor));
-  this->EndDolly();
-  this->ReleaseFocus();
+	this->FindPokedRenderer( this->Interactor->GetEventPosition()[0],
+							 this->Interactor->GetEventPosition()[1] );
+
+	if ( this->CurrentRenderer == NULL ) {
+		return;
+	}
+
+	this->GrabFocus( this->EventCallbackCommand );
+	this->StartDolly();
+	double factor = this->MotionFactor * -0.2 * this->MouseWheelMotionFactor;
+	this->Dolly( pow( 1.1, factor ) );
+	this->EndDolly();
+	this->ReleaseFocus();
 }
 
 
-void ViewerInteractor::Dolly(double factor)
+void ViewerInteractor::Dolly( double factor )
 {
-	std::cout << "factor: " << factor << std::endl;
-  if (this->CurrentRenderer == NULL)
-    {
-    return;
-    }
-  
-  vtkCamera *camera = this->CurrentRenderer->GetActiveCamera();
-  if (camera->GetParallelProjection())
-    {
-    camera->SetParallelScale(camera->GetParallelScale() / factor);
-    }
-  else
-    {
-    camera->Dolly(factor);
-    if (this->AutoAdjustCameraClippingRange)
-      {
-      this->CurrentRenderer->ResetCameraClippingRange();
-      }
-    }
-  
-  if (this->Interactor->GetLightFollowCamera()) 
-    {
-    this->CurrentRenderer->UpdateLightsGeometryToFollowCamera();
-    }
-  
-  this->Interactor->Render();
+	if ( this->CurrentRenderer == NULL ) {
+		return;
+	}
+
+	vtkCamera *camera = this->CurrentRenderer->GetActiveCamera();
+
+	if ( camera->GetParallelProjection() ) {
+		camera->SetParallelScale( camera->GetParallelScale() / factor );
+	} else {
+		camera->Dolly( factor );
+
+		if ( this->AutoAdjustCameraClippingRange ) {
+			this->CurrentRenderer->ResetCameraClippingRange();
+		}
+	}
+
+	if ( this->Interactor->GetLightFollowCamera() ) {
+		this->CurrentRenderer->UpdateLightsGeometryToFollowCamera();
+	}
+
+	this->Interactor->Render();
 }
-}}
+}
+}

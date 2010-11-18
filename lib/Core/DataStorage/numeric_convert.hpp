@@ -52,116 +52,116 @@ template<typename SRC, typename DST> void numeric_convert_impl( const SRC *src, 
 // storage class for explicit specilisations is not allowed (http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_defects.html#605)
 
 //>>s32
-DECL_CONVERT(float,int32_t);
-DECL_CONVERT(double,int32_t);
-DECL_CONVERT(uint32_t,int32_t);
-DECL_CONVERT(int16_t,int32_t);
-DECL_CONVERT(uint16_t,int32_t);
-DECL_CONVERT(int8_t,int32_t);
-DECL_CONVERT(uint8_t,int32_t);
+DECL_CONVERT( float, int32_t );
+DECL_CONVERT( double, int32_t );
+DECL_CONVERT( uint32_t, int32_t );
+DECL_CONVERT( int16_t, int32_t );
+DECL_CONVERT( uint16_t, int32_t );
+DECL_CONVERT( int8_t, int32_t );
+DECL_CONVERT( uint8_t, int32_t );
 
 //>>u32
 //DECL_CONVERT(float,uint32_t); conversion to u32 is broken (https://bugs.freedesktop.org/show_bug.cgi?id=16524)
 //DECL_CONVERT(double,uint32_t);
-DECL_CONVERT(int32_t,uint32_t);
+DECL_CONVERT( int32_t, uint32_t );
 //DECL_CONVERT(int16_t,uint32_t); ** Not available in liboil - but should be imho
-DECL_CONVERT(uint16_t,uint32_t);
+DECL_CONVERT( uint16_t, uint32_t );
 //DECL_CONVERT(int8_t,uint32_t); ** Not available in liboil - but should be imho
-DECL_CONVERT(uint8_t,uint32_t);
+DECL_CONVERT( uint8_t, uint32_t );
 
 //>>s16
-DECL_CONVERT(float,int16_t);
-DECL_CONVERT(double,int16_t);
-DECL_CONVERT(int32_t,int16_t);
-DECL_CONVERT(uint32_t,int16_t);
-DECL_CONVERT(uint16_t,int16_t);
-DECL_CONVERT(int8_t,int16_t);
-DECL_CONVERT(uint8_t,int16_t);
+DECL_CONVERT( float, int16_t );
+DECL_CONVERT( double, int16_t );
+DECL_CONVERT( int32_t, int16_t );
+DECL_CONVERT( uint32_t, int16_t );
+DECL_CONVERT( uint16_t, int16_t );
+DECL_CONVERT( int8_t, int16_t );
+DECL_CONVERT( uint8_t, int16_t );
 
 //>>u16
-DECL_CONVERT(float,uint16_t);
-DECL_CONVERT(double,uint16_t);
-DECL_CONVERT(int32_t,uint16_t);
-DECL_CONVERT(uint32_t,uint16_t);
-DECL_CONVERT(int16_t,uint16_t);
+DECL_CONVERT( float, uint16_t );
+DECL_CONVERT( double, uint16_t );
+DECL_CONVERT( int32_t, uint16_t );
+DECL_CONVERT( uint32_t, uint16_t );
+DECL_CONVERT( int16_t, uint16_t );
 //DECL_CONVERT(int8_t,uint16_t); ** Not available in liboil - but should be imho
-DECL_CONVERT(uint8_t,uint16_t);
+DECL_CONVERT( uint8_t, uint16_t );
 
 //>>s8
-DECL_CONVERT(float,int8_t);
-DECL_CONVERT(double,int8_t);
-DECL_CONVERT(int32_t,int8_t);
-DECL_CONVERT(uint32_t,int8_t);
-DECL_CONVERT(int16_t,int8_t);
-DECL_CONVERT(uint16_t,int8_t);
-DECL_CONVERT(uint8_t,int8_t);
+DECL_CONVERT( float, int8_t );
+DECL_CONVERT( double, int8_t );
+DECL_CONVERT( int32_t, int8_t );
+DECL_CONVERT( uint32_t, int8_t );
+DECL_CONVERT( int16_t, int8_t );
+DECL_CONVERT( uint16_t, int8_t );
+DECL_CONVERT( uint8_t, int8_t );
 
 //>>u8
-DECL_CONVERT(float,uint8_t);
-DECL_CONVERT(double,uint8_t);
-DECL_CONVERT(int32_t,uint8_t);
-DECL_CONVERT(uint32_t,uint8_t);
-DECL_CONVERT(int16_t,uint8_t);
-DECL_CONVERT(uint16_t,uint8_t);
-DECL_CONVERT(int8_t,uint8_t);
+DECL_CONVERT( float, uint8_t );
+DECL_CONVERT( double, uint8_t );
+DECL_CONVERT( int32_t, uint8_t );
+DECL_CONVERT( uint32_t, uint8_t );
+DECL_CONVERT( int16_t, uint8_t );
+DECL_CONVERT( uint16_t, uint8_t );
+DECL_CONVERT( int8_t, uint8_t );
 
 //>>f32
-DECL_CONVERT(double,float);
-DECL_CONVERT(int32_t,float);
-DECL_CONVERT(uint32_t,float);
-DECL_CONVERT(int16_t,float);
-DECL_CONVERT(uint16_t,float);
-DECL_CONVERT(int8_t,float);
-DECL_CONVERT(uint8_t,float);
+DECL_CONVERT( double, float );
+DECL_CONVERT( int32_t, float );
+DECL_CONVERT( uint32_t, float );
+DECL_CONVERT( int16_t, float );
+DECL_CONVERT( uint16_t, float );
+DECL_CONVERT( int8_t, float );
+DECL_CONVERT( uint8_t, float );
 
 //>>f64
-DECL_CONVERT(float,double);
-DECL_CONVERT(int32_t,double);
-DECL_CONVERT(uint32_t,double);
-DECL_CONVERT(int16_t,double);
-DECL_CONVERT(uint16_t,double);
-DECL_CONVERT(int8_t,double);
-DECL_CONVERT(uint8_t,double);
+DECL_CONVERT( float, double );
+DECL_CONVERT( int32_t, double );
+DECL_CONVERT( uint32_t, double );
+DECL_CONVERT( int16_t, double );
+DECL_CONVERT( uint16_t, double );
+DECL_CONVERT( int8_t, double );
+DECL_CONVERT( uint8_t, double );
 
 //scale>>s32
-DECL_SCALED_CONVERT(float,int32_t);
-DECL_SCALED_CONVERT(double,int32_t);
+DECL_SCALED_CONVERT( float, int32_t );
+DECL_SCALED_CONVERT( double, int32_t );
 
 //scale>>u32
 //DECL_SCALED_CONVERT(float,uint32_t); conversion to u32 is broken (https://bugs.freedesktop.org/show_bug.cgi?id=16524)
 //DECL_SCALED_CONVERT(double,uint32_t);
 
 //scale>>s16
-DECL_SCALED_CONVERT(float,int16_t);
-DECL_SCALED_CONVERT(double,int16_t);
+DECL_SCALED_CONVERT( float, int16_t );
+DECL_SCALED_CONVERT( double, int16_t );
 
 //scale>>u16
-DECL_SCALED_CONVERT(float,uint16_t);
-DECL_SCALED_CONVERT(double,uint16_t);
+DECL_SCALED_CONVERT( float, uint16_t );
+DECL_SCALED_CONVERT( double, uint16_t );
 
 //scale>>s8
-DECL_SCALED_CONVERT(float,int8_t);
-DECL_SCALED_CONVERT(double,int8_t);
+DECL_SCALED_CONVERT( float, int8_t );
+DECL_SCALED_CONVERT( double, int8_t );
 
 //scale>>u8
-DECL_SCALED_CONVERT(float,uint8_t);
-DECL_SCALED_CONVERT(double,uint8_t);
+DECL_SCALED_CONVERT( float, uint8_t );
+DECL_SCALED_CONVERT( double, uint8_t );
 
 //scale>>f32
-DECL_SCALED_CONVERT(int32_t,float);
-DECL_SCALED_CONVERT(uint32_t,float);
-DECL_SCALED_CONVERT(int16_t,float);
-DECL_SCALED_CONVERT(uint16_t,float);
-DECL_SCALED_CONVERT(int8_t,float);
-DECL_SCALED_CONVERT(uint8_t,float);
+DECL_SCALED_CONVERT( int32_t, float );
+DECL_SCALED_CONVERT( uint32_t, float );
+DECL_SCALED_CONVERT( int16_t, float );
+DECL_SCALED_CONVERT( uint16_t, float );
+DECL_SCALED_CONVERT( int8_t, float );
+DECL_SCALED_CONVERT( uint8_t, float );
 
 //scale>>f64
-DECL_SCALED_CONVERT(int32_t,double);
-DECL_SCALED_CONVERT(uint32_t,double);
-DECL_SCALED_CONVERT(int16_t,double);
-DECL_SCALED_CONVERT(uint16_t,double);
-DECL_SCALED_CONVERT(int8_t,double);
-DECL_SCALED_CONVERT(uint8_t,double);
+DECL_SCALED_CONVERT( int32_t, double );
+DECL_SCALED_CONVERT( uint32_t, double );
+DECL_SCALED_CONVERT( int16_t, double );
+DECL_SCALED_CONVERT( uint16_t, double );
+DECL_SCALED_CONVERT( int8_t, double );
+DECL_SCALED_CONVERT( uint8_t, double );
 
 #undef DECL_CONVERT
 #undef DECL_SCALED_CONVERT
@@ -186,8 +186,8 @@ DECL_SCALED_CONVERT(uint8_t,double);
  * \param max the biggest value of the source data
  * \param scaleopt enum to tweak the scaling strategy
  */
-template<typename SRC, typename DST> std::pair<double,double>
-getNumericScaling(const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale )
+template<typename SRC, typename DST> std::pair<double, double>
+getNumericScaling( const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale )
 {
 	double scale = 1.0;
 	double offset = 0.0;
@@ -226,11 +226,11 @@ getNumericScaling(const util::_internal::TypeBase &min, const util::_internal::T
 		//set scaling factor to fit src-range into dst domain
 		//some compilers dont make x/0 = inf, so we use std::numeric_limits<double>::max() instead, in this case
 		const double scale_max =
-		range_max != 0 ? domain_max / range_max :
-		std::numeric_limits<double>::max();
+			range_max != 0 ? domain_max / range_max :
+			std::numeric_limits<double>::max();
 		const double scale_min =
-		range_min != 0 ? domain_min / range_min :
-		std::numeric_limits<double>::max();
+			range_min != 0 ? domain_min / range_min :
+			std::numeric_limits<double>::max();
 		scale = std::min( scale_max ? scale_max : std::numeric_limits<double>::max(), scale_min ? scale_min : std::numeric_limits<double>::max() );//get the smaller scaling factor which is not zero so the bigger range will fit into his domain
 
 		if ( scale < 1 ) {
@@ -241,9 +241,11 @@ getNumericScaling(const util::_internal::TypeBase &min, const util::_internal::T
 				scale = 1;
 			}
 		}
+
 		offset *= scale;//calc offset for dst
 	}
-	return std::make_pair(scale,offset);
+
+	return std::make_pair( scale, offset );
 }
 
 /**
@@ -261,12 +263,13 @@ getNumericScaling(const util::_internal::TypeBase &min, const util::_internal::T
  * \param scale the scaling factor
  * \param offset the offset
  */
-template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &src, TypePtr<DST> &dst, const double scale, const double offset)
+template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &src, TypePtr<DST> &dst, const double scale, const double offset )
 {
 	LOG_IF( src.len() > dst.len(), Runtime, error ) << "The " << src.len() << " elements of src wont fit into the destination. Will only convert " << dst.len() << " elements.";
 	LOG_IF( src.len() < dst.len(), Runtime, warning ) << "Source is shorter than destination. Will only convert " << src.len() << " values";
 
 	if ( src.len() == 0 )return;
+
 	const size_t size = std::min( src.len(), dst.len() );
 
 	if ( ( scale != 1. || offset ) )

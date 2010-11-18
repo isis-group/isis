@@ -35,9 +35,11 @@
 #include <vtkRenderer.h>
 #include <vtkCellPicker.h>
 
-namespace isis {
+namespace isis
+{
 
-namespace viewer {
+namespace viewer
+{
 
 class ViewControl;
 
@@ -49,12 +51,12 @@ private:
 	int EndPosition[2];
 	int Moving;
 
-	ViewControl* m_ViewerPtr;
-	vtkRenderer* m_Renderer;
+	ViewControl *m_ViewerPtr;
+	vtkRenderer *m_Renderer;
 
 	vtkUnsignedCharArray *PixelArray;
 
-	vtkCellPicker* m_Picker;
+	vtkCellPicker *m_Picker;
 
 public:
 	virtual void OnMouseMove();
@@ -64,12 +66,13 @@ public:
 	virtual void Dolly( const double );
 	virtual void OnMouseWheelForward();
 	virtual void OnMouseWheelBackward();
-	ViewerInteractor( ViewControl*, vtkRenderer* );
-	vtkSetMacro(MotionFactor,double);
-	vtkGetMacro(MotionFactor,double);
+	ViewerInteractor( ViewControl *, vtkRenderer * );
+	vtkSetMacro( MotionFactor, double );
+	vtkGetMacro( MotionFactor, double );
 	double MotionFactor;
 };
 
-}}
+}
+}
 #endif /* VIEWERINTERACTOR_HPP_ */
 

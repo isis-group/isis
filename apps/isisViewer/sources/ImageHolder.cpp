@@ -22,14 +22,16 @@
 
 #include "ImageHolder.hpp"
 
-namespace isis {
+namespace isis
+{
 
-namespace viewer {
+namespace viewer
+{
 
 ImageHolder::ImageHolder()
 	: m_TimeSteps( 0 ),
 	  m_currentTimestep( 0 ),
-	  m_Physical(false)
+	  m_Physical( false )
 {
 	m_ExtractAxial = vtkImageClip::New();
 	m_ExtractSagittal = vtkImageClip::New();
@@ -47,14 +49,13 @@ ImageHolder::ImageHolder()
 
 bool ImageHolder::resetSliceCoordinates( void )
 {
-	LOG(Runtime, info) << "Resetting slice coordinates.";
-	setSliceCoordinates(m_ImageVector[m_currentTimestep]->GetDimensions()[0] / 2, m_ImageVector[m_currentTimestep]->GetDimensions()[1] / 2, m_ImageVector[m_currentTimestep]->GetDimensions()[2] / 2);
-
+	LOG( Runtime, info ) << "Resetting slice coordinates.";
+	setSliceCoordinates( m_ImageVector[m_currentTimestep]->GetDimensions()[0] / 2, m_ImageVector[m_currentTimestep]->GetDimensions()[1] / 2, m_ImageVector[m_currentTimestep]->GetDimensions()[2] / 2 );
 }
 
-bool ImageHolder::setSliceCoordinates( const int& x, const int& y, const int& z )
+bool ImageHolder::setSliceCoordinates( const int &x, const int &y, const int &z )
 {
-	LOG(Runtime, info) << "Setting slice coordinates to " << x << ", " << y << ", " << z;
+	LOG( Runtime, info ) << "Setting slice coordinates to " << x << ", " << y << ", " << z;
 	m_X = x;
 	m_Y = y;
 	m_Z = z;
@@ -69,46 +70,48 @@ bool ImageHolder::setSliceCoordinates( const int& x, const int& y, const int& z 
 //TODO this method needs a more effective approach
 void ImageHolder::setUpPipe()
 {
-	LOG(Runtime, info) << "ImageHolder::setUpPipe";
+	LOG( Runtime, info ) << "ImageHolder::setUpPipe";
 	//axial
-	m_ExtractAxial->SetInput( m_ImageVector[m_currentTimestep]);
+	m_ExtractAxial->SetInput( m_ImageVector[m_currentTimestep] );
 	m_MapperAxial->SetInput( m_ExtractAxial->GetOutput() );
 	m_ActorAxial->SetMapper( m_MapperAxial );
 	m_ActorAxial->GetProperty()->SetInterpolationToFlat();
 	m_ActorAxial->SetScale( m_ImageVector[m_currentTimestep]->GetSpacing()[0], m_ImageVector[m_currentTimestep]->GetSpacing()[1], m_ImageVector[m_currentTimestep]->GetSpacing()[2] );
-	if (!m_Physical ) {
-		m_ActorAxial->SetUserMatrix( m_MatrixHandler.getAxialMatrix1() );
-		m_ActorAxial->SetPosition(m_pseudoOrigin[0], m_pseudoOrigin[1], m_pseudoOrigin[2]);
 
+	if ( !m_Physical ) {
+		m_ActorAxial->SetUserMatrix( m_MatrixHandler.getAxialMatrix1() );
+		m_ActorAxial->SetPosition( m_pseudoOrigin[0], m_pseudoOrigin[1], m_pseudoOrigin[2] );
 	} else {
 		m_ActorAxial->SetUserMatrix( m_MatrixHandler.getAxialMatrix() );
 		m_ActorAxial->SetPosition( m_transformedOrigin[0] * 2, m_transformedOrigin[1] * 2, m_transformedOrigin[2] * 2 );
 	}
 
 	//sagittal
-	m_ExtractSagittal->SetInput( m_ImageVector[m_currentTimestep]);
+	m_ExtractSagittal->SetInput( m_ImageVector[m_currentTimestep] );
 	m_MapperSagittal->SetInput( m_ExtractSagittal->GetOutput() );
 	m_ActorSagittal->SetMapper( m_MapperSagittal );
 	m_ActorSagittal->GetProperty()->SetInterpolationToFlat();
 	m_ActorSagittal->SetScale( m_ImageVector[m_currentTimestep]->GetSpacing()[0], m_ImageVector[m_currentTimestep]->GetSpacing()[1], m_ImageVector[m_currentTimestep]->GetSpacing()[2] );
-	if (!m_Physical ) {
+
+	if ( !m_Physical ) {
 		m_ActorSagittal->SetUserMatrix( m_MatrixHandler.getSagittalMatrix1() );
-		m_ActorSagittal->SetPosition(m_pseudoOrigin[0], m_pseudoOrigin[1], m_pseudoOrigin[2]);
+		m_ActorSagittal->SetPosition( m_pseudoOrigin[0], m_pseudoOrigin[1], m_pseudoOrigin[2] );
 	} else {
 		m_ActorSagittal->SetUserMatrix( m_MatrixHandler.getSagittalMatrix() );
 		m_ActorSagittal->SetPosition( m_transformedOrigin[0], m_transformedOrigin[1], m_transformedOrigin[2] );
 	}
 
 	//coronal
-	m_ExtractCoronal->SetInput( m_ImageVector[m_currentTimestep]);
+	m_ExtractCoronal->SetInput( m_ImageVector[m_currentTimestep] );
 	m_MapperCoronal->SetInput( m_ExtractCoronal->GetOutput() );
 	m_ActorCoronal->SetMapper( m_MapperCoronal );
 	m_ActorCoronal->GetProperty()->SetInterpolationToFlat();
 	m_ActorCoronal->SetScale( m_ImageVector[m_currentTimestep]->GetSpacing()[0], m_ImageVector[m_currentTimestep]->GetSpacing()[1], m_ImageVector[m_currentTimestep]->GetSpacing()[2] );
 	m_ActorCoronal->SetUserMatrix( m_MatrixHandler.getCoronalMatrix1() );
-	if (!m_Physical ) {
+
+	if ( !m_Physical ) {
 		m_ActorCoronal->SetUserMatrix( m_MatrixHandler.getCoronalMatrix1() );
-		m_ActorCoronal->SetPosition(m_pseudoOrigin[0], m_pseudoOrigin[1], m_pseudoOrigin[2]);
+		m_ActorCoronal->SetPosition( m_pseudoOrigin[0], m_pseudoOrigin[1], m_pseudoOrigin[2] );
 	} else {
 		m_ActorCoronal->SetUserMatrix( m_MatrixHandler.getCoronalMatrix() );
 		m_ActorCoronal->SetPosition( m_transformedOrigin[0], m_transformedOrigin[1], m_transformedOrigin[2] );
@@ -122,25 +125,22 @@ void ImageHolder::setImages( util::PropMap propMap,  std::vector<vtkSmartPointer
 	m_TimeSteps = m_ImageVector.size();
 	m_PropMap = propMap;
 	isis::util::TypeReference min, max;
-	#warning check this - the interfave for the conversion does not expect min max anymore
+#warning check this - the interfave for the conversion does not expect min max anymore
 	LOG( Runtime, info ) << "Image minimum: " << min << "; Image maximum: " << max;
-
-	m_ScalingFactor = m_PropMap.propertyValue("scale");
-	m_Offset = m_PropMap.propertyValue("offset");
-
-	m_readVec = m_PropMap.getProperty<isis::util::fvector4>("readVec");
-	m_phaseVec = m_PropMap.getProperty<isis::util::fvector4>("phaseVec");
-	m_sliceVec = m_PropMap.getProperty<isis::util::fvector4>("sliceVec");
+	m_ScalingFactor = m_PropMap.propertyValue( "scale" );
+	m_Offset = m_PropMap.propertyValue( "offset" );
+	m_readVec = m_PropMap.getProperty<isis::util::fvector4>( "readVec" );
+	m_phaseVec = m_PropMap.getProperty<isis::util::fvector4>( "phaseVec" );
+	m_sliceVec = m_PropMap.getProperty<isis::util::fvector4>( "sliceVec" );
 	LOG( Runtime, info ) << "readVector: " << m_readVec;
 	LOG( Runtime, info ) << "phaseVector: " << m_phaseVec;
 	LOG( Runtime, info ) << "sliceVector: " << m_sliceVec;
 	m_MatrixHandler.setVectors( m_readVec, m_phaseVec, m_sliceVec );
-	LOG( Runtime, info) << "spacing[0]: " << m_ImageVector.front()->GetSpacing()[0];
-	m_pseudoOrigin = m_MatrixHandler.createPseudoOrigin( m_PropMap.getProperty<util::fvector4>("imageSize"), m_PropMap.getProperty<util::fvector4>("voxelSize"));
-	m_transformedOrigin = m_MatrixHandler.transformOrigin( m_PropMap.getProperty<util::fvector4>("indexOrigin"), m_PropMap.getProperty<util::fvector4>("voxelSize"));
+	LOG( Runtime, info ) << "spacing[0]: " << m_ImageVector.front()->GetSpacing()[0];
+	m_pseudoOrigin = m_MatrixHandler.createPseudoOrigin( m_PropMap.getProperty<util::fvector4>( "imageSize" ), m_PropMap.getProperty<util::fvector4>( "voxelSize" ) );
+	m_transformedOrigin = m_MatrixHandler.transformOrigin( m_PropMap.getProperty<util::fvector4>( "indexOrigin" ), m_PropMap.getProperty<util::fvector4>( "voxelSize" ) );
 	//TODO debug
 	std::cout << "transformedOrigin: " << m_transformedOrigin << std::endl;
-
 	commonInit();
 	createOrientedImages();
 	setUpPipe();
@@ -151,20 +151,21 @@ bool ImageHolder::createOrientedImages( void )
 {
 	if( m_MatrixHandler.isRotationMatrix() ) {
 		LOG( Runtime, isis::info ) << "Determinant is not 1. Flipping image along slice vector.";
-		for( std::vector<vtkSmartPointer<vtkImageData> >::iterator it = m_ImageVector.begin(); it != m_ImageVector.end(); it++ )
-		{
+
+		for( std::vector<vtkSmartPointer<vtkImageData> >::iterator it = m_ImageVector.begin(); it != m_ImageVector.end(); it++ ) {
 			vtkSmartPointer<vtkImageData> tmpImage = *it;
-			tmpImage->SetSpacing( (*it)->GetSpacing() );
-			tmpImage->SetOrigin( (*it)->GetOrigin() );
+			tmpImage->SetSpacing( ( *it )->GetSpacing() );
+			tmpImage->SetOrigin( ( *it )->GetOrigin() );
 			vtkSmartPointer<vtkImageFlip> flipper = vtkImageFlip::New();
-			flipper->SetFilteredAxis(2);
-			flipper->SetInput(tmpImage);
+			flipper->SetFilteredAxis( 2 );
+			flipper->SetInput( tmpImage );
 			flipper->Update();
 			*it = flipper->GetOutput();
-			(*it)->SetSpacing(tmpImage->GetSpacing());
-			(*it)->SetOrigin(tmpImage->GetOrigin());
+			( *it )->SetSpacing( tmpImage->GetSpacing() );
+			( *it )->SetOrigin( tmpImage->GetOrigin() );
 		}
 	}
+
 	return true;
 }
 
@@ -172,21 +173,22 @@ bool ImageHolder::createOrientedImages( void )
 void ImageHolder::commonInit( void  )
 {
 	LOG( Runtime, info ) << "commonInit.";
-	m_ExtractorVector.push_back(m_ExtractSagittal);
-	m_ExtractorVector.push_back(m_ExtractCoronal);
-	m_ExtractorVector.push_back(m_ExtractAxial);
-	m_BiggestElemVec.push_back(getBiggestVecElem<float>(m_readVec));
-	m_BiggestElemVec.push_back(getBiggestVecElem<float>(m_phaseVec));
-	m_BiggestElemVec.push_back(getBiggestVecElem<float>(m_sliceVec));
+	m_ExtractorVector.push_back( m_ExtractSagittal );
+	m_ExtractorVector.push_back( m_ExtractCoronal );
+	m_ExtractorVector.push_back( m_ExtractAxial );
+	m_BiggestElemVec.push_back( getBiggestVecElem<float>( m_readVec ) );
+	m_BiggestElemVec.push_back( getBiggestVecElem<float>( m_phaseVec ) );
+	m_BiggestElemVec.push_back( getBiggestVecElem<float>( m_sliceVec ) );
 }
 
-void ImageHolder::setCurrentTimeStep( const int& timestep )
+void ImageHolder::setCurrentTimeStep( const int &timestep )
 {
 	LOG( Runtime, info ) << "Changing timestep to " << timestep;
 	m_currentTimestep = timestep;
 	//TODO here we have to call a method that only applies necessary stuff
 	setUpPipe();
-	setSliceCoordinates(m_X, m_Y, m_Z);
+	setSliceCoordinates( m_X, m_Y, m_Z );
 }
 
-}} // end namespace
+}
+} // end namespace

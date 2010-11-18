@@ -30,7 +30,7 @@ namespace isis
 namespace data
 {
 enum autoscaleOption {noscale, autoscale, noupscale, upscale};
-typedef std::pair<util::TypeReference,util::TypeReference> scaling_pair;
+typedef std::pair<util::TypeReference, util::TypeReference> scaling_pair;
 namespace _internal
 {
 class TypePtrBase;
@@ -39,7 +39,7 @@ class TypePtrConverterBase
 public:
 	virtual void convert( const TypePtrBase &src, TypePtrBase &dst, const scaling_pair &scaling )const;
 	virtual void generate( const TypePtrBase &src, boost::scoped_ptr<TypePtrBase>& dst, const scaling_pair &scaling )const = 0;
-	virtual scaling_pair getScaling(const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale)const=0;
+	virtual scaling_pair getScaling( const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale )const = 0;
 	static boost::shared_ptr<const TypePtrConverterBase> create() {return boost::shared_ptr<const TypePtrConverterBase>();}
 public:
 	virtual ~TypePtrConverterBase() {}

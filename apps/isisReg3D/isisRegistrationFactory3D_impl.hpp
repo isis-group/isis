@@ -247,7 +247,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer()
 		//setting up the regular step gradient descent optimizer...
 		RegularStepGradientDescentOptimizerType::ScalesType optimizerScaleRegularStepGradient( m_NumberOfParameters );
 
-		if ( transform.VERSORRIGID or transform.CENTEREDAFFINE or transform.AFFINE or transform.BSPLINEDEFORMABLETRANSFORM  or transform.RIGID3D) {
+		if ( transform.VERSORRIGID or transform.CENTEREDAFFINE or transform.AFFINE or transform.BSPLINEDEFORMABLETRANSFORM  or transform.RIGID3D ) {
 			//...for the rigid transform
 			//number of parameters are dependent on the dimension of the images (2D: 4 parameter, 3D: 6 parameters)
 			if ( transform.VERSORRIGID ) {
@@ -260,15 +260,16 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer()
 				optimizerScaleRegularStepGradient[4] = 1.0 / 1000.0;
 				optimizerScaleRegularStepGradient[5] = 1.0 / 1000.0;
 			}
+
 			if ( transform.RIGID3D ) {
-				for ( unsigned short i=0; i<9; i++ ) {
+				for ( unsigned short i = 0; i < 9; i++ ) {
 					optimizerScaleRegularStepGradient[i] = 1.0;
 				}
-				optimizerScaleRegularStepGradient[9] =1.0;
-				optimizerScaleRegularStepGradient[10] =1.0;
-				optimizerScaleRegularStepGradient[11] =1.0;
-			}
 
+				optimizerScaleRegularStepGradient[9] = 1.0;
+				optimizerScaleRegularStepGradient[10] = 1.0;
+				optimizerScaleRegularStepGradient[11] = 1.0;
+			}
 
 			if ( transform.BSPLINEDEFORMABLETRANSFORM or transform.AFFINE or transform.CENTEREDAFFINE or transform.TRANSLATION ) {
 				optimizerScaleRegularStepGradient.Fill( 1.0 );
@@ -484,6 +485,7 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpTransform()
 		m_NumberOfParameters = m_VersorRigid3DTransform->GetNumberOfParameters();
 		m_RegistrationObject->SetInitialTransformParameters( m_VersorRigid3DTransform->GetParameters() );
 	}
+
 	if ( transform.RIGID3D ) {
 		m_NumberOfParameters = m_Rigid3DTransform->GetNumberOfParameters();
 		m_RegistrationObject->SetInitialTransformParameters( m_Rigid3DTransform->GetParameters() );
@@ -700,21 +702,21 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::CheckImageSizes(
 		}
 	}
 
-//	if ( m_FixedImageIsBigger ) {
-//		m_MovingImageMaskObject = MaskObjectType::New();
-//		m_MovingThresholdFilter = MovingThresholdFilterType::New();
-//		m_MovingMinMaxCalculator = MovingMinMaxCalculatorType::New();
-//		m_MovingMinMaxCalculator->SetImage( m_MovingImage );
-//		m_MovingMinMaxCalculator->Compute();
-//		m_MovingThresholdFilter->SetInput( m_MovingImage );
-//		m_MovingThresholdFilter->SetOutsideValue( 0 );
-//		m_MovingThresholdFilter->SetInsideValue( 255 );
-//		m_MovingThresholdFilter->SetUpperThreshold( m_MovingMinMaxCalculator->GetMaximum() );
-//		m_MovingThresholdFilter->SetLowerThreshold( m_MovingMinMaxCalculator->GetMinimum() );
-//		m_MovingThresholdFilter->Update();
-//		m_MovingImageMaskObject->SetImage( m_MovingThresholdFilter->GetOutput() );
-//		m_MovingImageMaskObject->Update();
-//	}
+	//  if ( m_FixedImageIsBigger ) {
+	//      m_MovingImageMaskObject = MaskObjectType::New();
+	//      m_MovingThresholdFilter = MovingThresholdFilterType::New();
+	//      m_MovingMinMaxCalculator = MovingMinMaxCalculatorType::New();
+	//      m_MovingMinMaxCalculator->SetImage( m_MovingImage );
+	//      m_MovingMinMaxCalculator->Compute();
+	//      m_MovingThresholdFilter->SetInput( m_MovingImage );
+	//      m_MovingThresholdFilter->SetOutsideValue( 0 );
+	//      m_MovingThresholdFilter->SetInsideValue( 255 );
+	//      m_MovingThresholdFilter->SetUpperThreshold( m_MovingMinMaxCalculator->GetMaximum() );
+	//      m_MovingThresholdFilter->SetLowerThreshold( m_MovingMinMaxCalculator->GetMinimum() );
+	//      m_MovingThresholdFilter->Update();
+	//      m_MovingImageMaskObject->SetImage( m_MovingThresholdFilter->GetOutput() );
+	//      m_MovingImageMaskObject->Update();
+	//  }
 }
 
 template<class TFixedImageType, class TMovingImageType>
@@ -808,14 +810,13 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::StartRegistration
 	//check the image sizes and creat a joint image mask if the fixed image is bigger than the moving image
 	//to avoid a itk sample error caused by a lack of spatial samples used by the metric
 	this->CheckImageSizes();
-
-//	if ( !UserOptions.USEMASK ) {
-//		this->SetFixedImageMask();
-//	}
-
+	//  if ( !UserOptions.USEMASK ) {
+	//      this->SetFixedImageMask();
+	//  }
 	m_observer = isis::extitk::IterationObserver::New();
 	m_observer->setVerboseStep( UserOptions.SHOWITERATIONATSTEP );
 	m_RegistrationObject->GetOptimizer()->AddObserver( itk::IterationEvent(), m_observer );
+
 	try {
 		m_RegistrationObject->StartRegistration();
 	} catch ( itk::ExceptionObject &err ) {

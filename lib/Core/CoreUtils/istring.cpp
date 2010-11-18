@@ -20,31 +20,35 @@
 #include "istring.hpp"
 #include <strings.h>
 
-namespace isis{
-namespace util{
-namespace _internal{
-
-int ichar_traits::compare(const char* s1, const char* s2, size_t n)
+namespace isis
 {
-	return strncasecmp(s1,s2,n);
+namespace util
+{
+namespace _internal
+{
+
+int ichar_traits::compare( const char *s1, const char *s2, size_t n )
+{
+	return strncasecmp( s1, s2, n );
 }
 
-bool ichar_traits::eq(const char& c1, const char& c2)
+bool ichar_traits::eq( const char &c1, const char &c2 )
 {
-	return std::tolower(c1) == std::tolower(c2);
+	return std::tolower( c1 ) == std::tolower( c2 );
 }
 
-bool ichar_traits::lt(const char& c1, const char& c2)
+bool ichar_traits::lt( const char &c1, const char &c2 )
 {
-	return std::tolower(c1) < std::tolower(c2);
+	return std::tolower( c1 ) < std::tolower( c2 );
 }
 
-const char* ichar_traits::find(const char* s, size_t n, const char& a)
+const char *ichar_traits::find( const char *s, size_t n, const char &a )
 {
-	for(size_t i=0;i<n;i++,s++){
-		if(eq(*s,a))
+	for( size_t i = 0; i < n; i++, s++ ) {
+		if( eq( *s, a ) )
 			return s;
 	}
+
 	return NULL;
 }
 
@@ -53,7 +57,8 @@ const char* ichar_traits::find(const char* s, size_t n, const char& a)
 }
 }
 
-namespace boost{
-template<> isis::util::istring lexical_cast< isis::util::istring, std::string >(const std::string& arg){return isis::util::istring(arg.begin(),arg.end());}
-template<> std::string lexical_cast< std::string, isis::util::istring >(const isis::util::istring& arg){return std::string(arg.begin(),arg.end());}
+namespace boost
+{
+template<> isis::util::istring lexical_cast< isis::util::istring, std::string >( const std::string &arg ) {return isis::util::istring( arg.begin(), arg.end() );}
+template<> std::string lexical_cast< std::string, isis::util::istring >( const isis::util::istring &arg ) {return std::string( arg.begin(), arg.end() );}
 }

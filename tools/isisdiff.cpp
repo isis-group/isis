@@ -25,16 +25,18 @@ void dropDuplicate( data::ImageList &list )
 	}
 }
 
-std::pair<std::string,int>  parseFilename(std::string name){
+std::pair<std::string, int>  parseFilename( std::string name )
+{
 	const boost::regex reg( "^([^:]*):([[:digit:]]+)$" );
 	boost::cmatch results;
-	std::pair<std::string,int> ret;ret.second=-1;
+	std::pair<std::string, int> ret;
+	ret.second = -1;
 
 	if ( boost::regex_match( name.c_str(), results, reg ) ) {
-		ret.first=results.str(results.size()-2);
-		ret.second=boost::lexical_cast<int>(results.str(results.size()-1));
+		ret.first = results.str( results.size() - 2 );
+		ret.second = boost::lexical_cast<int>( results.str( results.size() - 1 ) );
 	} else
-		ret.first=name;
+		ret.first = name;
 
 	return ret;
 }
@@ -59,22 +61,26 @@ int main( int argc, char *argv[] )
 		return 1;
 	}
 
-	std::pair<std::string,int> in1=parseFilename(files.front()),in2=parseFilename(files.back());
+	std::pair<std::string, int> in1 = parseFilename( files.front() ), in2 = parseFilename( files.back() );
 	data::ImageList images1;
 	data::ImageList images2;
 
-	if(in1.second >=0 && in2.second >=0){ // seems like we got numbers
-		assert(!in1.first.empty());
-		data::ImageList erg=data::IOFactory::load( in1.first );
-		assert(erg.size()>in1.second);
-		data::ImageList::iterator at=erg.begin();std::advance(at,in1.second);
-		images1.push_back(*at);
-		if(!in2.first.empty()){
-			erg=data::IOFactory::load( in2.first );
+	if( in1.second >= 0 && in2.second >= 0 ) { // seems like we got numbers
+		assert( !in1.first.empty() );
+		data::ImageList erg = data::IOFactory::load( in1.first );
+		assert( erg.size() > in1.second );
+		data::ImageList::iterator at = erg.begin();
+		std::advance( at, in1.second );
+		images1.push_back( *at );
+
+		if( !in2.first.empty() ) {
+			erg = data::IOFactory::load( in2.first );
 		}
-		assert(erg.size()>in2.second);
-		at=erg.begin();std::advance(at,in2.second);
-		images2.push_back(*at);
+
+		assert( erg.size() > in2.second );
+		at = erg.begin();
+		std::advance( at, in2.second );
+		images2.push_back( *at );
 	} else {
 		images1 = data::IOFactory::load( in1.first );
 		images2 = data::IOFactory::load( in2.first );
@@ -98,7 +104,7 @@ int main( int argc, char *argv[] )
 		BOOST_FOREACH( util::slist::const_reference ref, ignore )
 		diff.erase( ref );
 		ret += diff.size();
-		const std::string countStr=(images1.size()>1 ? std::string(":") + boost::lexical_cast<std::string>(count) :std::string(""));
+		const std::string countStr = ( images1.size() > 1 ? std::string( ":" ) + boost::lexical_cast<std::string>( count ) : std::string( "" ) );
 
 		if ( ! diff.empty() ) {
 			std::cout
@@ -117,7 +123,7 @@ int main( int argc, char *argv[] )
 			size_t voxels = first.cmp( second );
 
 			if ( voxels != 0 ) {
-				std::cout << voxels*100/first.sizeToVector().product() 
+				std::cout << voxels * 100 / first.sizeToVector().product()
 						  << "% of the voxels in " << files.front() << countStr << " and "
 						  << files.back() << countStr  << " differ" << std::endl;
 				ret++;

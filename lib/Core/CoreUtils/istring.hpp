@@ -23,33 +23,37 @@
 #include <string>
 #include <boost/lexical_cast.hpp>
 
-namespace isis{
-namespace util{
-namespace _internal{
-struct ichar_traits: public std::char_traits<char>{
-	static bool eq ( const char_type& c1, const char_type& c2);
-	static bool lt ( const char_type& c1, const char_type& c2);
-	static int compare ( const char_type* s1, const char_type* s2, std::size_t n);
-	static const char_type* find ( const char_type* s, std::size_t n, const char_type& a );
+namespace isis
+{
+namespace util
+{
+namespace _internal
+{
+struct ichar_traits: public std::char_traits<char> {
+	static bool eq ( const char_type &c1, const char_type &c2 );
+	static bool lt ( const char_type &c1, const char_type &c2 );
+	static int compare ( const char_type *s1, const char_type *s2, std::size_t n );
+	static const char_type *find ( const char_type *s, std::size_t n, const char_type &a );
 };
 }
 
-typedef std::basic_string<char,_internal::ichar_traits>    istring;
+typedef std::basic_string<char, _internal::ichar_traits>    istring;
 }
 }
 
 namespace std
 {
 template<typename charT, typename traits>
-basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::istring& s )
+basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::istring &s )
 {
 	return out << s.c_str();
 }
 }
 
 // specialization for boost::lexical_cast to differ std::string and util::istring
-namespace boost{
-template<> isis::util::istring lexical_cast<isis::util::istring, std::string>        (const std::string         &arg);
-template<> std::string         lexical_cast<std::string,         isis::util::istring>(const isis::util::istring &arg);
+namespace boost
+{
+template<> isis::util::istring lexical_cast<isis::util::istring, std::string>        ( const std::string         &arg );
+template<> std::string         lexical_cast<std::string,         isis::util::istring>( const isis::util::istring &arg );
 }
 #endif // UTIL_ISTRING_HPP

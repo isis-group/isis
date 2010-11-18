@@ -64,7 +64,7 @@ public:
 	 * </ul>
 	 *
 	 */
-	std::string dialects(const std::string &filename)const {return std::string( "functional map anatomical" );}
+	std::string dialects( const std::string &filename )const {return std::string( "functional map anatomical" );}
 	int load( data::ChunkList &chunks, const std::string &filename,
 			  const std::string &dialect ) throw( std::runtime_error & );
 	void write( const data::Image &image, const std::string &filename,
@@ -459,7 +459,7 @@ private:
 	 * @param functional flag to indicate that the image contains functional data.
 	 * @param slice the index of the slice.
 	 */
-	void copyHeaderToVista( const data::Image &image, VImage &vimage,  const float& sliceTimeOffset , const bool functional, size_t slice = 0 );
+	void copyHeaderToVista( const data::Image &image, VImage &vimage,  const float &sliceTimeOffset , const bool functional, size_t slice = 0 );
 
 	/**
 	 * Copies the whole itk image into a given vista image. This function is

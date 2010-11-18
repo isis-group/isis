@@ -105,9 +105,10 @@ int main(
 {
 	// show revision information string constant
 	std::cout << "Core Version: " << isis::util::Application::getCoreVersion() << std::endl;
-	isis::util::enable_log<isis::util::DefaultMsgPrint>(isis::error);
-	isis::data::enable_log<isis::util::DefaultMsgPrint>(isis::error);
-	isis::image_io::enable_log<isis::util::DefaultMsgPrint>(isis::error);
+	isis::util::enable_log<isis::util::DefaultMsgPrint>( isis::error );
+	isis::data::enable_log<isis::util::DefaultMsgPrint>( isis::error );
+	isis::image_io::enable_log<isis::util::DefaultMsgPrint>( isis::error );
+
 	// DANGER! Kids don't try this at home! VParseCommand modifies the values of argc and argv!!!
 	if ( !VParseCommand( VNumber( options ), options, &argc, argv ) || !VIdentifyFiles( VNumber( options ), options, "in",
 			&argc, argv, 0 ) || !VIdentifyFiles( VNumber ( options ), options, "out", &argc, argv, -1 ) ) {
@@ -230,7 +231,6 @@ int main(
 	}
 
 	isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "", "" );
-
 	BOOST_FOREACH( isis::data::ImageList::reference ref, inList ) {
 		if ( tmpList.front()->hasProperty( "Vista/extent" ) ) {
 			ref->setProperty<std::string>( "Vista/extent", tmpList.front()->getProperty<std::string>( "Vista/extent" ) );
@@ -467,12 +467,15 @@ int main(
 		//      isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "" );
 		inputImage = movingAdapter->makeItkImageObject<InputImageType>( inList.front() );
 		FMRIOutputType::DirectionType direction4D;
-		for (size_t i = 0; i < 3; i++) {
-			for (size_t j = 0; j < 3; j++) {
+
+		for ( size_t i = 0; i < 3; i++ ) {
+			for ( size_t j = 0; j < 3; j++ ) {
 				direction4D[i][j] = fmriOutputDirection[i][j];
 			}
 		}
+
 		direction4D[3][3] = 1;
+
 		for ( unsigned int timestep = 0; timestep < numberOfTimeSteps; timestep++ ) {
 			std::cout << "Resampling timestep: " << timestep << "...\r" << std::flush;
 			timeStepExtractionFilter->SetRequestedTimeStep( timestep );
@@ -486,6 +489,7 @@ int main(
 				resampler->Update();
 				tileImage = resampler->GetOutput();
 			}
+
 			if ( vtrans_filename ) {
 				warper->SetInput( tmpImage );
 				warper->Update();
