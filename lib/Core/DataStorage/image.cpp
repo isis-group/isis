@@ -630,7 +630,7 @@ unsigned short Image::typeID() const
 	getMinMax(min,max);
 	LOG(Debug,info) << "Determining  datatype of image with the value range " << min << " to " << max;
 	if(min->typeID() == max->typeID()){ // ok min and max are the same type - trivial case
-		return min->typeID()  << 8; // btw: we do the shift, because min and max are Type - but we want the id's TypePtr
+		return min->typeID()  << 8; // btw: we do the shift, because min and max are Type - but we want the ID's TypePtr
 	} else if(min->fitsInto(max->typeID())){ // if min fits into the type of max, use that
 		return max->typeID()  << 8; //@todo maybe use a global static function here instead of a obscure shit operation
 	} else if(max->fitsInto(min->typeID())){ // if max fits into the type of min, use that
@@ -646,16 +646,16 @@ std::string Image::typeName() const
 	return util::getTypeMap()[typeID()];
 }
 
-bool Image::makeOfTypeID( short unsigned int id )
+bool Image::makeOfTypeID( short unsigned int ID )
 {
 	// get value range of the image for the conversion
-	scaling_pair scale=getScalingTo(id);
+	scaling_pair scale=getScalingTo(ID);
 
 	LOG( Debug, info ) << "Computed scaling of the original image data: [" << scale << "]";
 	bool retVal = true;
-	//we want all chunks to be of type id - so tell them
+	//we want all chunks to be of type ID - so tell them
 	BOOST_FOREACH( boost::shared_ptr<Chunk> &ref, lookup ) {
-		retVal &= ref->makeOfTypeID( id, scale );
+		retVal &= ref->makeOfTypeID( ID, scale );
 	}
 	return retVal;
 }

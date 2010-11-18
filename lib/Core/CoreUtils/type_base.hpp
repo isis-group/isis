@@ -63,7 +63,7 @@ public:
 
 	template<typename T> bool is()const;
 
-	const Converter &getConverterTo( unsigned short id )const;
+	const Converter &getConverterTo( unsigned short ID )const;
 
 	/**
 	 * Convert the content of one Type to another.
@@ -124,13 +124,13 @@ public:
 	virtual bool operator==( const TypeBase &second )const = 0;
 
 	/// creates a copy of the stored value using a type referenced by its id
-	Reference copyToNewByID( unsigned short id ) const;
+	Reference copyToNewByID( unsigned short ID ) const;
 
 	/**
 	 * Check if the stored value would also fit into another type referenced by its id
 	 * \returns true if the stored value would fit into the target type, false otherwise
 	 */
-	bool fitsInto( unsigned short id ) const;
+	bool fitsInto( unsigned short ID ) const;
 
 	virtual ~TypeBase();
 

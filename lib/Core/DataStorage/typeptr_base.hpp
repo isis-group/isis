@@ -46,7 +46,7 @@ public:
 
 	template<typename T> bool is()const;
 
-	const Converter &getConverterTo( unsigned short id )const;
+	const Converter &getConverterTo( unsigned short ID )const;
 	/**
 	* Dynamically cast the TypeBase up to its actual TypePtr\<T\>. Constant version.
 	* Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
@@ -90,8 +90,8 @@ public:
 		return convertTo( dest );
 	}
 
-	Reference copyToNewByID( unsigned short id ) const;
-	Reference copyToNewByID( unsigned short id, const scaling_pair &scaling ) const;
+	Reference copyToNewByID( unsigned short ID ) const;
+	Reference copyToNewByID( unsigned short ID, const scaling_pair &scaling ) const;
 
 	/**
 	 * Copy this to a new TypePtr\<T\> using newly allocated memory.

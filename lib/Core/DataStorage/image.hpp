@@ -343,12 +343,12 @@ public:
 		}
 	}
 	/**
-	 * Ensure, the image has the type with the requested id.
-	 * If the typeID of any chunk is not equal to the requested id, the data of the chunk is replaced by an converted version.
+	 * Ensure, the image has the type with the requested ID.
+	 * If the typeID of any chunk is not equal to the requested ID, the data of the chunk is replaced by an converted version.
 	 * The conversion is done using the value range of the image.
 	 * \returns false if there was an error
 	 */
-	bool makeOfTypeID( unsigned short id );
+	bool makeOfTypeID( unsigned short ID );
 
 	/**
 	 * Automatically splice the given dimension and all dimensions above.

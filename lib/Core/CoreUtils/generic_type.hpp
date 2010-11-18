@@ -56,7 +56,7 @@ public:
 	/// \returns the name of its actual type
 	virtual std::string typeName()const = 0;
 
-	/// \returns the id of its actual type
+	/// \returns the ID of its actual type
 	virtual unsigned short typeID()const = 0;
 
 	/// \returns true if type of this and second are equal

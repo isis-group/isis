@@ -118,19 +118,19 @@ public:
 	Chunk cloneToMem( size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 )const;
 
 	/**
-	 * Ensure, the chunk has the type with the requested id.
-	 * If the typeID of the chunk is not equal to the requested id, the data of the chunk is replaced by an converted version.
+	 * Ensure, the chunk has the type with the requested ID.
+	 * If the typeID of the chunk is not equal to the requested ID, the data of the chunk is replaced by an converted version.
 	 * The conversion is done using the value range of the old data.
 	 * \returns false if there was an error
 	 */
-	bool makeOfTypeID( unsigned short id );
+	bool makeOfTypeID( unsigned short ID );
 	/**
-	 * Ensure, the chunk has the type with the requested id.
-	 * If the typeID of the chunk is not equal to the requested id, the data of the chunk is replaced by an converted version.
+	 * Ensure, the chunk has the type with the requested ID.
+	 * If the typeID of the chunk is not equal to the requested ID, the data of the chunk is replaced by an converted version.
 	 * The conversion is done using the value range given via min and max.
 	 * \returns false if there was an error
 	 */
-	bool makeOfTypeID( unsigned short id, const scaling_pair &scaling );
+	bool makeOfTypeID( unsigned short ID, const scaling_pair &scaling );
 
 	template<typename T> bool copyToMem( T *dst, const scaling_pair &scaling )const {
 		// wrap the raw memory at into an non-deleting TypePtr of the length of the chunk

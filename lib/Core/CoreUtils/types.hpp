@@ -46,9 +46,9 @@ bool
 > types;
 
 /**
- * Templated pseudo struct to generate the id of a supported type.
- * The id is stored in TypeID\<T\>::value.
- * The id is the position of the type in the mpl::vector types, starting with 1 (so there is no id==0)
+ * Templated pseudo struct to generate the ID of a supported type.
+ * The ID is stored in TypeID\<T\>::value.
+ * The ID is the position of the type in the mpl::vector types, starting with 1 (so there is no id==0)
  * This is a compile-time-constant, so it can be used as a template parameter and has no impact at the runtime.
  */
 template<class T> struct TypeID {

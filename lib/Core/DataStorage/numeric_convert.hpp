@@ -61,7 +61,7 @@ DECL_CONVERT(int8_t,int32_t);
 DECL_CONVERT(uint8_t,int32_t);
 
 //>>u32
-//DECL_CONVERT(float,uint32_t); conversion to u32 is broken (https://bugs.freedesktop.org/show_bug.cgi?id=16524)
+//DECL_CONVERT(float,uint32_t); conversion to u32 is broken (https://bugs.freedesktop.org/show_bug.cgi?ID=16524)
 //DECL_CONVERT(double,uint32_t);
 DECL_CONVERT(int32_t,uint32_t);
 //DECL_CONVERT(int16_t,uint32_t); ** Not available in liboil - but should be imho
@@ -128,7 +128,7 @@ DECL_SCALED_CONVERT(float,int32_t);
 DECL_SCALED_CONVERT(double,int32_t);
 
 //scale>>u32
-//DECL_SCALED_CONVERT(float,uint32_t); conversion to u32 is broken (https://bugs.freedesktop.org/show_bug.cgi?id=16524)
+//DECL_SCALED_CONVERT(float,uint32_t); conversion to u32 is broken (https://bugs.freedesktop.org/show_bug.cgi?ID=16524)
 //DECL_SCALED_CONVERT(double,uint32_t);
 
 //scale>>s16

@@ -21,12 +21,12 @@ const TypePtrConverterMap &TypePtrBase::converters()
 	return util::Singletons::get<_internal::TypePtrConverterMap, 0>();
 }
 
-const TypePtrBase::Converter &TypePtrBase::getConverterTo( unsigned short id )const
+const TypePtrBase::Converter &TypePtrBase::getConverterTo( unsigned short ID )const
 {
 	const TypePtrConverterMap::const_iterator f1 = converters().find( typeID() );
 	LOG_IF( f1 == converters().end(), Debug, error ) << "There is no known conversion from " << util::getTypeMap()[typeID()];
-	const TypePtrConverterMap::mapped_type::const_iterator f2 = f1->second.find( id );
-	LOG_IF( f2 == f1->second.end(), Debug, error ) << "There is no known conversion from " << util::getTypeMap()[typeID()] << " to " << util::getTypeMap()[id];
+	const TypePtrConverterMap::mapped_type::const_iterator f2 = f1->second.find( ID );
+	LOG_IF( f2 == f1->second.end(), Debug, error ) << "There is no known conversion from " << util::getTypeMap()[typeID()] << " to " << util::getTypeMap()[ID];
 	return f2->second;
 }
 
@@ -36,13 +36,13 @@ size_t TypePtrBase::compare( const TypePtrBase &comp )const
 	return length() - comp.length() + compare( 0, std::min( length(), comp.length() ) - 1, comp, 0 );
 }
 
-TypePtrBase::Reference TypePtrBase::copyToNewByID( unsigned short id ) const
+TypePtrBase::Reference TypePtrBase::copyToNewByID( unsigned short ID ) const
 {
-	return copyToNewByID( id, getScalingTo(id));
+	return copyToNewByID( ID, getScalingTo(ID));
 }
-TypePtrBase::Reference TypePtrBase::copyToNewByID( unsigned short id, const scaling_pair &scaling ) const
+TypePtrBase::Reference TypePtrBase::copyToNewByID( unsigned short ID, const scaling_pair &scaling ) const
 {
-	const Converter &conv = getConverterTo( id );
+	const Converter &conv = getConverterTo( ID );
 
 	if( conv ) {
 		boost::scoped_ptr<TypePtrBase> ret;
@@ -51,7 +51,7 @@ TypePtrBase::Reference TypePtrBase::copyToNewByID( unsigned short id, const scal
 	} else {
 		LOG( Runtime, error )
 				<< "I dont know any conversion from "
-				<< util::MSubject( toString( true ) ) << " to " << util::MSubject( util::getTypeMap( false, true )[id] );
+				<< util::MSubject( toString( true ) ) << " to " << util::MSubject( util::getTypeMap( false, true )[ID] );
 		return Reference(); // return an empty Reference
 	}
 }
