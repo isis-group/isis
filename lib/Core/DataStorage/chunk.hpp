@@ -112,9 +112,9 @@ public:
 	template<typename TYPE> const TypePtr<TYPE> getTypePtr()const {
 		return getTypePtrBase().castToTypePtr<TYPE>();
 	}
-	const size_t useCount()const {
-		return getTypePtrBase().useCount();
-	}
+
+	/// \returns the number of cheap-copy-chunks using the same memory as this
+	const size_t useCount()const;
 	Chunk cloneToMem( size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 )const;
 
 	/**

@@ -265,6 +265,11 @@ ChunkList Chunk::splice ( dimensions atDim )const
 	return ret;
 }
 
+const size_t Chunk::useCount() const
+{
+	return getTypePtrBase().useCount();
+}
+
 }
 }
 

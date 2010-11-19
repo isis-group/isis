@@ -133,6 +133,7 @@ public:
 	 */
 	void copyRange( size_t start, size_t end, TypePtrBase &dst, size_t dst_start )const;
 
+	/// \returns the number of references using the same memory as this.
 	size_t useCount()const;
 
 	/**
