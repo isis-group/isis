@@ -118,7 +118,7 @@ ADD_DEFINITIONS(-DDL_PREFIX="${CMAKE_SHARED_LIBRARY_PREFIX}")
 # Set the revision number if this dir is a svn working copy.
 # The revision number will be stored in RCS_REVISION.
 FIND_FILE(RCS_DESC_COMMAND git-describe
-    PATHS /usr/bin /usr/local/bin
+	PATHS /usr/bin /usr/local/bin /usr/lib/git-core
     DOC "The rcs revision description information tool.")
 
 IF (NOT RCS_REVISION)
@@ -127,7 +127,7 @@ IF (NOT RCS_REVISION)
 		string(REGEX MATCH "[0-9]+-[^-]+$" RCS_REVISION "${OUT}") #@todo wont work with more complex revisions/modified sources
 		SET(RCS_REVISION ${RCS_REVISION})
 	else(RCS_DESC_COMMAND)
-		message(status "No rcs command given")
+		message(STATUS "No rcs command given")
 	ENDIF (RCS_DESC_COMMAND)
 ENDIF (NOT RCS_REVISION)
 
