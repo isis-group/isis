@@ -107,7 +107,7 @@ int main( int argc, char *argv[] )
 					<< diff << std::endl;
 		}
 
-		if ( first.sizeToVector() != second.sizeToVector() ) {
+		if ( first.getSizeAsVector() != second.getSizeAsVector() ) {
 			std::cout
 					<< "Image sizes of " << files.front() << countStr << " and "
 					<< files.back() << countStr  << " differ:"
@@ -117,7 +117,7 @@ int main( int argc, char *argv[] )
 			size_t voxels = first.cmp( second );
 
 			if ( voxels != 0 ) {
-				std::cout << voxels*100/first.sizeToVector().product() 
+				std::cout << voxels*100/first.getSizeAsVector().product() 
 						  << "% of the voxels in " << files.front() << countStr << " and "
 						  << files.back() << countStr  << " differ" << std::endl;
 				ret++;

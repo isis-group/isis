@@ -49,7 +49,7 @@ throw( std::runtime_error & )
 	// count number of images that where created with malloc
 	int nimages = 0;
 	//  get size for each dimension
-	util::ivector4 dims = image.sizeToVector();
+	util::ivector4 dims = image.getSizeAsVector();
 
 	//  create a vista image container according to the isis image configuration
 	// 4D image data
@@ -545,7 +545,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 
 				// check indexOrigin -> calculate default value if necessary
 				if ( ! chunks.back()->hasProperty( "indexOrigin" ) ) {
-					util::ivector4 dims = chunks.back()->sizeToVector();
+					util::ivector4 dims = chunks.back()->getSizeAsVector();
 					chunks.back()->setProperty<util::fvector4>( "indexOrigin",
 							calculateIndexOrigin( ( *( chunks.back() ) ), dims ) );
 				}
@@ -565,7 +565,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 
 				// check indexOrigin -> calculate default value if necessary
 				if ( ! chunks.back()->hasProperty( "indexOrigin" ) ) {
-					util::ivector4 dims = chunks.back()->sizeToVector();
+					util::ivector4 dims = chunks.back()->getSizeAsVector();
 					chunks.back()->setProperty<util::fvector4>( "indexOrigin",
 							calculateIndexOrigin( ( *( chunks.back() ) ), dims ) );
 				}
@@ -719,7 +719,7 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 
 		// Check if the current chunk encodes more than one slice. This
 		// is only valid if there is more than one slice in the isis image.
-		if( image.getChunk( slice ).sizeToVector()[2] > 1 ) {
+		if( image.getChunk( slice ).getSizeAsVector()[2] > 1 ) {
 			LOG( data::Runtime, error ) << "Chunk contains more than one slice."
 										<< "Interpolation of slice time is not possible.";
 		} else {
@@ -865,8 +865,8 @@ template <typename TInput> void ImageFormat_Vista::addChunk( data::ChunkList &ch
 
 template <typename T> bool ImageFormat_Vista::copyImageToVista( const data::Image &image, VImage &vimage )
 {
-	const util::FixedVector<size_t, 4> csize = image.getChunk( 0, 0 ).sizeToVector();
-	const util::FixedVector<size_t, 4> isize = image.sizeToVector();
+	const util::FixedVector<size_t, 4> csize = image.getChunk( 0, 0 ).getSizeAsVector();
+	const util::FixedVector<size_t, 4> isize = image.getSizeAsVector();
 	LOG_IF( isize[3] > 1, Debug, error ) << "Vista cannot store 4D-Data in one VImage.";
 
 	const data::scaling_pair scale=image.getScalingTo(data::TypePtr<T>::staticID);

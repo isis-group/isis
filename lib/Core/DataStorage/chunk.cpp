@@ -45,7 +45,7 @@ Chunk::Chunk( const TypePtrReference &src, size_t firstDim, size_t secondDim, si
 
 Chunk Chunk::cloneToMem( size_t firstDim, size_t secondDim, size_t thirdDim, size_t fourthDim )const
 {
-	util::FixedVector<size_t, 4> newSize = sizeToVector();
+	util::FixedVector<size_t, 4> newSize = getSizeAsVector();
 
 	if ( firstDim )newSize[0] = firstDim;
 
@@ -97,7 +97,7 @@ unsigned short Chunk::typeID()const
 void Chunk::copyLine( size_t secondDimS, size_t thirdDimS, size_t fourthDimS, Chunk &dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD ) const
 {
 	const size_t idx1[] = {0, secondDimS, thirdDimS, fourthDimS};
-	const size_t idx2[] = {sizeToVector()[0] - 1, secondDimS, thirdDimS, fourthDimS};
+	const size_t idx2[] = {getSizeAsVector()[0] - 1, secondDimS, thirdDimS, fourthDimS};
 	const size_t idx3[] = {0, secondDimD, thirdDimD, fourthDimD};
 	copyRange( idx1, idx2, dst, idx3 );
 }
@@ -105,7 +105,7 @@ void Chunk::copyLine( size_t secondDimS, size_t thirdDimS, size_t fourthDimS, Ch
 void Chunk::copySlice( size_t thirdDimS, size_t fourthDimS, Chunk &dst, size_t thirdDimD, size_t fourthDimD ) const
 {
 	const size_t idx1[] = {0, 0, thirdDimS, fourthDimS};
-	const size_t idx2[] = {sizeToVector()[0] - 1, sizeToVector()[1] - 1, thirdDimS, fourthDimS};
+	const size_t idx2[] = {getSizeAsVector()[0] - 1, getSizeAsVector()[1] - 1, thirdDimS, fourthDimS};
 	const size_t idx3[] = {0, 0, thirdDimD, fourthDimD};
 	copyRange( idx1, idx2, dst, idx3 );
 }
@@ -154,14 +154,14 @@ size_t Chunk::cmpLine( size_t secondDimS, size_t thirdDimS, size_t fourthDimS, c
 {
 	const size_t idx1[] = {0, secondDimS, thirdDimS, fourthDimS};
 	const size_t idx2[] = {0, secondDimD, thirdDimD, fourthDimD};
-	const size_t idx3[] = {sizeToVector()[0] - 1, secondDimD, thirdDimD, fourthDimD};
+	const size_t idx3[] = {getSizeAsVector()[0] - 1, secondDimD, thirdDimD, fourthDimD};
 	return cmpRange( idx1, idx2, dst, idx3 );
 }
 size_t Chunk::cmpSlice( size_t thirdDimS, size_t fourthDimS, const Chunk &dst, size_t thirdDimD, size_t fourthDimD ) const
 {
 	const size_t idx1[] = {0, 0, thirdDimS, fourthDimS};
 	const size_t idx2[] = {0, 0, thirdDimD, fourthDimD};
-	const size_t idx3[] = {sizeToVector()[0] - 1, sizeToVector()[1] - 1, thirdDimD, fourthDimD};
+	const size_t idx3[] = {getSizeAsVector()[0] - 1, getSizeAsVector()[1] - 1, thirdDimD, fourthDimD};
 	return cmpRange( idx1, idx2, dst, idx3 );
 }
 void Chunk::getMinMax ( util::TypeReference &min, util::TypeReference &max ) const
@@ -249,8 +249,8 @@ ChunkList Chunk::splice ( dimensions atDim )const
 	ChunkList ret;
 	//@todo should be locking
 	typedef std::vector<TypePtrReference> TypePtrList;
-	const util::FixedVector<size_t, n_dims> wholesize = sizeToVector();
-	util::FixedVector<size_t, n_dims> spliceSize;
+	const util::FixedVector<size_t, dims> wholesize = getSizeAsVector();
+	util::FixedVector<size_t, dims> spliceSize;
 	spliceSize.fill( 1 ); //init size of one chunk-splice to 1x1x1x1
 	//copy the relevant dimensional sizes from wholesize (in case of sliceDim we copy only the first two elements of wholesize - making slices)
 	spliceSize.copyFrom( &wholesize[0], &wholesize[atDim] );

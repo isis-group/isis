@@ -182,7 +182,7 @@ BOOST_AUTO_TEST_CASE ( memchunk_copy_test )//Copy chunks
 
 	data::MemChunk<short> ch4( 1, 1 );
 	ch4 = ch3;
-	BOOST_CHECK_EQUAL( ch3.sizeToVector(), ch4.sizeToVector() );
+	BOOST_CHECK_EQUAL( ch3.getSizeAsVector(), ch4.getSizeAsVector() );
 
 	//because MemChunk does deep copy changing ch3 should not change ch2
 	for ( size_t i = 0; i < ch3.volume(); i++ ) {

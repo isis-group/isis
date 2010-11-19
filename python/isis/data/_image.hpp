@@ -115,8 +115,8 @@ public:
 		return retChunkList;
 	}
 
-	const isis::util::ivector4 _sizeToVector( ) {
-		return this->sizeToVector();
+	const isis::util::ivector4 _getSizeAsVector( ) {
+		return this->getSizeAsVector();
 	}
 
 	isis::data::Chunk _getChunk( const isis::util::ivector4& coord, bool copy_metadata ) {

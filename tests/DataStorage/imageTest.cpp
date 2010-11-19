@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 
 		BOOST_REQUIRE(img2.reIndex());
 		BOOST_CHECK_EQUAL(img2.volume(), nrRows*nrCols*nrTimesteps*nrSlices);
-		BOOST_CHECK_EQUAL(img2.sizeToVector(), util::ivector4(nrCols, nrRows, nrSlices, nrTimesteps));
+		BOOST_CHECK_EQUAL(img2.getSizeAsVector(), util::ivector4(nrCols, nrRows, nrSlices, nrTimesteps));
 
 
 		// Check all dimensions with limit sizes
@@ -149,7 +149,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 
 		BOOST_REQUIRE(img3.reIndex());
 		BOOST_CHECK_EQUAL(img3.volume(), nrRows*nrCols*nrTimesteps*nrSlices);
-		BOOST_CHECK_EQUAL(img3.sizeToVector(), util::ivector4(nrCols, nrRows, nrSlices, nrTimesteps));
+		BOOST_CHECK_EQUAL(img3.getSizeAsVector(), util::ivector4(nrCols, nrRows, nrSlices, nrTimesteps));
 
 		data::Image img4;
 
@@ -172,7 +172,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 
 		BOOST_REQUIRE(img4.reIndex());
 		BOOST_CHECK_EQUAL(img4.volume(), nrRows*nrCols*nrTimesteps*nrSlices);
-		BOOST_CHECK_EQUAL(img4.sizeToVector(), util::ivector4(nrCols, nrRows, nrSlices, nrTimesteps));
+		BOOST_CHECK_EQUAL(img4.getSizeAsVector(), util::ivector4(nrCols, nrRows, nrSlices, nrTimesteps));
 
 	}
 }
@@ -194,7 +194,7 @@ BOOST_AUTO_TEST_CASE ( minimal_image_test )
 	BOOST_CHECK(img.insertChunk(ch1));
 	BOOST_CHECK(img.insertChunk(ch2));
 	BOOST_CHECK(img.reIndex());
-	BOOST_CHECK_EQUAL(img.sizeToVector(),(util::FixedVector<size_t,4>(size)));
+	BOOST_CHECK_EQUAL(img.getSizeAsVector(),(util::FixedVector<size_t,4>(size)));
 }
 
 BOOST_AUTO_TEST_CASE ( type_selection_test )
@@ -227,7 +227,7 @@ BOOST_AUTO_TEST_CASE ( type_selection_test )
 	BOOST_CHECK(img.insertChunk(ch_int8_t));
 	BOOST_CHECK(img.insertChunk(ch_uint8_t));
 	BOOST_CHECK(img.reIndex());
-	BOOST_CHECK_EQUAL(img.sizeToVector(),(util::FixedVector<size_t,4>(size)));
+	BOOST_CHECK_EQUAL(img.getSizeAsVector(),(util::FixedVector<size_t,4>(size)));
 	BOOST_CHECK_EQUAL(img.typeID(),data::TypePtr<int16_t>(NULL,0).typeID());
 }
 
@@ -286,7 +286,7 @@ BOOST_AUTO_TEST_CASE ( image_chunk_test )
 
 	BOOST_REQUIRE( img.reIndex() );
 	BOOST_CHECK_EQUAL( img.volume(), 9 * 9 );
-	BOOST_CHECK_EQUAL( img.sizeToVector(), util::ivector4( 3, 3, 3, 3 ) );
+	BOOST_CHECK_EQUAL( img.getSizeAsVector(), util::ivector4( 3, 3, 3, 3 ) );
 	const data::Chunk &ref11 = img.getChunk( 0, 0, 0 );
 	const data::Chunk &ref12 = img.getChunk( 1, 1, 1 );
 	const data::Chunk &ref13 = img.getChunk( 2, 2, 2 );
@@ -642,7 +642,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
 	const util::FixedVector<size_t, 4> sizeVec( dummy );
 	img.reIndex();
 	BOOST_REQUIRE_EQUAL( img.getChunkList().size(), nrT * nrS );
-	BOOST_REQUIRE_EQUAL( img.sizeToVector(), sizeVec );
+	BOOST_REQUIRE_EQUAL( img.getSizeAsVector(), sizeVec );
 
 	for ( unsigned int ix = 0; ix < nrX; ix++ ) {
 		for ( unsigned int iy = 0; iy < nrY; iy++ ) {
@@ -662,7 +662,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
 	data::MemImage<uint16_t> copyImg( img );
 	data::enable_log<util::DefaultMsgPrint>( warning );
 	copyImg.reIndex();
-	BOOST_REQUIRE_EQUAL( copyImg.sizeToVector(), sizeVec );
+	BOOST_REQUIRE_EQUAL( copyImg.getSizeAsVector(), sizeVec );
 
 	for ( unsigned int ix = 0; ix < nrX; ix++ ) {
 		for ( unsigned int iy = 0; iy < nrY; iy++ ) {
@@ -739,7 +739,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes )
 
 	img.reIndex();
 
-	BOOST_REQUIRE_EQUAL( img.sizeToVector(), sizeVec );
+	BOOST_REQUIRE_EQUAL( img.getSizeAsVector(), sizeVec );
 
 	//***************************************************************
 	nrX = 64;
@@ -771,7 +771,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes )
 
 	img2.reIndex();
 
-	BOOST_REQUIRE_EQUAL( img2.sizeToVector(), sizeVec2 );
+	BOOST_REQUIRE_EQUAL( img2.getSizeAsVector(), sizeVec2 );
 
 	//***************************************************************
 	nrX = 1;
@@ -805,7 +805,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes )
 
 	img3.reIndex();
 
-	BOOST_REQUIRE_EQUAL( img3.sizeToVector(), sizeVec3 );
+	BOOST_REQUIRE_EQUAL( img3.getSizeAsVector(), sizeVec3 );
 
 	//***************************************************************
 	nrX = 64;
@@ -839,7 +839,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes )
 
 	img4.reIndex();
 
-	BOOST_REQUIRE_EQUAL( img4.sizeToVector(), sizeVec4 );
+	BOOST_REQUIRE_EQUAL( img4.getSizeAsVector(), sizeVec4 );
 
 	//***************************************************************
 	nrX = 64;
@@ -873,7 +873,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes )
 
 	img5.reIndex();
 
-	BOOST_REQUIRE_EQUAL( img5.sizeToVector(), sizeVec5 );
+	BOOST_REQUIRE_EQUAL( img5.getSizeAsVector(), sizeVec5 );
 
 	//***************************************************************
 	nrX = 0;

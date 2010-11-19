@@ -57,7 +57,7 @@ template<unsigned short DIMS> class NDimensional
 protected:
 	NDimensional() {}
 public:
-	static const size_t n_dims = DIMS;
+	static const size_t dims = DIMS;
 	/**
 	 * Initializes the size-vector.
 	 * This must be done before anything else, or behaviour will be undefined.
@@ -107,7 +107,7 @@ public:
 	}
 
 	/// generates a FixedVector\<DIMS\> representing the size
-	util::FixedVector<size_t, DIMS> sizeToVector()const {
+	util::FixedVector<size_t, DIMS> getSizeAsVector()const {
 		return util::FixedVector<size_t, DIMS>( dim );
 	}
 
@@ -130,7 +130,7 @@ public:
 	util::FixedVector<float, DIMS> getFoV( const util::FixedVector<float, DIMS> &voxelSize, const util::FixedVector<float, DIMS> &voxelGap )const {
 		DISABLE_WARN( 4244 );
 		LOG_IF( volume() == 0, DataLog, warning ) << "Calculating FoV of empty data";
-		const util::FixedVector<size_t, DIMS> voxels = sizeToVector();
+		const util::FixedVector<size_t, DIMS> voxels = getSizeAsVector();
 		const util::fvector4 gapSize = voxelGap * ( voxels - 1 );
 		return voxelSize * voxels + gapSize;
 	}

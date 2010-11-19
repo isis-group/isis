@@ -47,14 +47,14 @@ std::vector<vtkSmartPointer<vtkImageData> >vtkAdapter::makeVtkImageObject( const
 		u_int8_t *target = refTarget + chunkIndex++ * chRef.volume();
 		chRef.copyToMem<u_int8_t>( target, scale );
 	}
-	size_t imageVolume3D = src->sizeToVector()[0] * src->sizeToVector()[1] * src->sizeToVector()[2];
-	for ( size_t t = 0; t<src->sizeToVector()[3]; t++ ) {
+	size_t imageVolume3D = src->getSizeAsVector()[0] * src->getSizeAsVector()[1] * src->getSizeAsVector()[2];
+	for ( size_t t = 0; t<src->getSizeAsVector()[3]; t++ ) {
 		vtkSmartPointer<vtkImageImport> importer = vtkImageImport::New();
 		vtkSmartPointer<vtkImageData> vtkImage = vtkImageData::New();
 		importer->SetDataScalarTypeToUnsignedChar();
 		vtkImage->SetScalarTypeToUnsignedChar();
 		importer->SetImportVoidPointer( refTarget + t * imageVolume3D );
-		importer->SetWholeExtent( 0, src->sizeToVector()[0] - 1, 0, src->sizeToVector()[1] - 1, 0, src->sizeToVector()[2] - 1);
+		importer->SetWholeExtent( 0, src->getSizeAsVector()[0] - 1, 0, src->getSizeAsVector()[1] - 1, 0, src->getSizeAsVector()[2] - 1);
 		importer->SetDataExtentToWholeExtent();
 		importer->Update();
 		vtkImage = importer->GetOutput();

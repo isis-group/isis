@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE ( loadsaveImages )
 	uint8_t cnt = 0;
 	BOOST_FOREACH( data::ImageList::value_type & ref, images ) {
 		//  check geometry
-		BOOST_CHECK_EQUAL( ref->sizeToVector(), util::fvector4( 50, 50, 50, 10 ) );
+		BOOST_CHECK_EQUAL( ref->getSizeAsVector(), util::fvector4( 50, 50, 50, 10 ) );
 		BOOST_CHECK_EQUAL( ref->voxel<uint8_t>( 0, 0 ), cnt * 40 );
 
 		for ( int i = 0; i < 10; i++ )

@@ -150,7 +150,7 @@ bool SortedChunkList::insert( const Chunk &ch )
 		// compare some attributes of the first chunk and the one which shall be inserted
 		Chunk &first = *( chunks.begin()->second.begin()->second );
 
-		if ( first.sizeToVector() != ch.sizeToVector() ) { // if they have different size - do not insert
+		if ( first.getSizeAsVector() != ch.getSizeAsVector() ) { // if they have different size - do not insert
 			LOG( Debug, verbose_info )
 					<< "Ignoring chunk with different size. (" << ch.getSizeAsString() << "!=" << first.getSizeAsString() << ")";
 			return false;

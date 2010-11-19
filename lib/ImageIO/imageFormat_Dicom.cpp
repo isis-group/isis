@@ -368,7 +368,7 @@ int ImageFormat_Dicom::readMosaic( data::Chunk source, data::ChunkList &dest )
 
 	// All is fine, lets start
 	u_int16_t images = source.getProperty<u_int16_t>( NumberOfImagesInMosaicProp );
-	util::FixedVector<size_t, 4> size = source.sizeToVector();
+	util::FixedVector<size_t, 4> size = source.getSizeAsVector();
 	const u_int16_t matrixSize = std::ceil( std::sqrt( images ) );
 	size[0] /= matrixSize;
 	size[1] /= matrixSize;

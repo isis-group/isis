@@ -45,7 +45,7 @@ void MainWindow::createAndSendImageMap( const util::slist& fileList )
 			adapter::vtkAdapter::ScalingType scaling;
 			std::vector<vtkSmartPointer<vtkImageData> > vtkImageVector = isis::adapter::vtkAdapter::makeVtkImageObject(refImage, scaling);
 
-			refImage->setProperty< util::fvector4 >( "imageSize", refImage->sizeToVector() );
+			refImage->setProperty< util::fvector4 >( "imageSize", refImage->getSizeAsVector() );
 			static_cast<util::TypeReference&>(refImage->propertyValue("scale"))=scaling.first;
 			static_cast<util::TypeReference&>(refImage->propertyValue("offset"))=scaling.second;
 

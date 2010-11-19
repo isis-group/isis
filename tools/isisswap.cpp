@@ -12,13 +12,13 @@ data::Image voxelSwapZ( const boost::shared_ptr<data::Image> src, unsigned int d
 {
 	data::Image tmpImage = data::MemImage<TYPE> ( *src );
 
-	for ( size_t t = 0; t < src->sizeToVector()[3]; t++ ) {
-		for ( size_t z = 0; z < src->sizeToVector()[2]; z++ ) {
-			for ( size_t y = 0; y < src->sizeToVector()[1]; y++ ) {
-				for ( size_t x = 0; x < src->sizeToVector()[0]; x++ ) {
-					tmpImage.voxel<TYPE>( x, y, z, t ) = src->voxel<TYPE>( dim == 0 ? ( src->sizeToVector()[0] - x ) - 1 : x,
-														 dim == 1 ? ( src->sizeToVector()[1] - y ) - 1 : y,
-														 dim == 2 ? ( src->sizeToVector()[2] - z ) - 1 : z,
+	for ( size_t t = 0; t < src->getSizeAsVector()[3]; t++ ) {
+		for ( size_t z = 0; z < src->getSizeAsVector()[2]; z++ ) {
+			for ( size_t y = 0; y < src->getSizeAsVector()[1]; y++ ) {
+				for ( size_t x = 0; x < src->getSizeAsVector()[0]; x++ ) {
+					tmpImage.voxel<TYPE>( x, y, z, t ) = src->voxel<TYPE>( dim == 0 ? ( src->getSizeAsVector()[0] - x ) - 1 : x,
+														 dim == 1 ? ( src->getSizeAsVector()[1] - y ) - 1 : y,
+														 dim == 2 ? ( src->getSizeAsVector()[2] - z ) - 1 : z,
 														 t );
 				}
 			}

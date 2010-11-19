@@ -471,8 +471,8 @@ private:
 	void copyDataToNifti( const data::Image &image, nifti_image &ni ) {
 		ni.data = malloc( image.bytes_per_voxel() * image.volume() );
 		T *refNii = ( T * ) ni.data;
-		const util::FixedVector<size_t, 4> csize = image.getChunk( 0, 0 ).sizeToVector();
-		const util::FixedVector<size_t, 4> isize = image.sizeToVector();
+		const util::FixedVector<size_t, 4> csize = image.getChunk( 0, 0 ).getSizeAsVector();
+		const util::FixedVector<size_t, 4> isize = image.getSizeAsVector();
 		const data::scaling_pair scale=image.getScalingTo(data::TypePtr<T>::staticID);
 
 
@@ -523,7 +523,7 @@ private:
 
 		ni.xyz_units = NIFTI_UNITS_MM;
 		ni.time_units = NIFTI_UNITS_MSEC;
-		util::fvector4 dimensions = image.sizeToVector();
+		util::fvector4 dimensions = image.getSizeAsVector();
 		LOG( ImageIoLog, info ) << dimensions;
 		ni.ndim = ni.dim[0] = image.relevantDims();
 		ni.nx = ni.dim[1] = dimensions[0];

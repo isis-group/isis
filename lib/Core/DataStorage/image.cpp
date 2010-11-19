@@ -115,7 +115,7 @@ bool Image::reIndex()
 	//redo lookup table
 	lookup = set.getLookup();
 	const size_t chunks = lookup.size();
-	util::FixedVector<size_t, n_dims> size; //storage for the size of the chunk structure
+	util::FixedVector<size_t, dims> size; //storage for the size of the chunk structure
 	size.fill( 1 );
 	//get primary attributes from geometrically first chunk - will be usefull
 	const Chunk &first = chunkAt( 0 );
@@ -128,13 +128,13 @@ bool Image::reIndex()
 	propertyValue( "indexOrigin" ) = first.propertyValue( "indexOrigin" );
 	//if there are many chunks, they must leave at least on dimension to the image to "sort" them in
 	const size_t timesteps=set.getHorizontalSize();
-	const unsigned short sortDims = n_dims - ( timesteps > 1 ? 1 : 0 ); // dont use the uppermost dim, if the timesteps are already there
+	const unsigned short sortDims = dims - ( timesteps > 1 ? 1 : 0 ); // dont use the uppermost dim, if the timesteps are already there
  
-	if ( chunk_dims >= Image::n_dims ) {
+	if ( chunk_dims >= Image::dims ) {
 		if ( lookup.size() > 1 ) {
 			LOG( Runtime, error )
 					<< "Cannot handle multiple Chunks, if they have more than "
-					<< Image::n_dims - 1 << " dimensions";
+					<< Image::dims - 1 << " dimensions";
 			return false;
 		}
 
@@ -150,7 +150,7 @@ bool Image::reIndex()
 			assert( size[i] != 0 );
 		}
 	}
-	if (sortDims < n_dims) {//if there is a timedim (not all dims was used for geometric sort) 
+	if (sortDims < dims) {//if there is a timedim (not all dims was used for geometric sort)
 		assert(size[sortDims]==1);
 		size[sortDims]=timesteps; // fill the dim above the top geometric dim with the timesteps
 	}
@@ -290,7 +290,7 @@ bool Image::reIndex()
 		if ( hasProperty( "voxelGap" ) ) {
 			voxelGap = getProperty<util::fvector4>( "voxelGap" );
 
-			for ( size_t i = 0; i < n_dims; i++ )
+			for ( size_t i = 0; i < dims; i++ )
 				if ( voxelGap[i] == -std::numeric_limits<float>::infinity() ) {
 					LOG( Runtime, info ) << "Ignoring unknown voxel gap in direction " << i;
 					voxelGap[i] = 0;
@@ -301,7 +301,7 @@ bool Image::reIndex()
 
 		bool ok = true;
 
-		for ( size_t i = 0; i < n_dims; i++ ) {
+		for ( size_t i = 0; i < dims; i++ ) {
 			if ( propFoV[i] != -std::numeric_limits<float>::infinity() ) {
 				ok &= util::fuzzyEqual( propFoV[i], calcFoV[i] );
 			} else
@@ -547,13 +547,13 @@ size_t Image::cmp( const isis::data::Image &comp ) const
 	LOG_IF( ! ( clean && comp.clean ), Debug, error )
 			<< "Comparing unindexed images will cause you trouble, run reIndex()!";
 
-	if ( sizeToVector() != comp.sizeToVector() ) {
-		LOG( Runtime, warning ) << "Size of images differs (" << sizeToVector() << "/"
-								<< comp.sizeToVector() << "). Adding difference to the result.";
-		ret += ( sizeToVector() - comp.sizeToVector() ).product();
+	if ( getSizeAsVector() != comp.getSizeAsVector() ) {
+		LOG( Runtime, warning ) << "Size of images differs (" << getSizeAsVector() << "/"
+								<< comp.getSizeAsVector() << "). Adding difference to the result.";
+		ret += ( getSizeAsVector() - comp.getSizeAsVector() ).product();
 	}
 
-	util::ivector4 compVect( util::minVector( chunkPtrAt( 0 )->sizeToVector(), comp.chunkPtrAt( 0 )->sizeToVector() ) );
+	util::ivector4 compVect( util::minVector( chunkPtrAt( 0 )->getSizeAsVector(), comp.chunkPtrAt( 0 )->getSizeAsVector() ) );
 	util::ivector4 start;
 	const size_t increment = compVect.product();
 
@@ -672,7 +672,7 @@ size_t Image::spliceDownTo( dimensions dim ) //readDim = 0, phaseDim, sliceDim, 
 
 	LOG_IF( lookup[0]->relevantDims() == ( size_t ) dim, Debug, info ) << "Running useless splice, the dimensionality of the chunks of this image is already " << dim;
 	LOG_IF( hasProperty( "acquisitionTime" ) || lookup[0]->hasProperty( "acquisitionTime" ), Debug, warning ) << "Splicing images with acquisitionTime will cause you lots of trouble. You should remove that before.";
-	util::FixedVector<size_t, 4> size = sizeToVector();
+	util::FixedVector<size_t, 4> size = getSizeAsVector();
 
 	for( int i = 0; i < dim; i++ )
 		size[i] = 1;
@@ -690,7 +690,7 @@ size_t Image::spliceDownTo( dimensions dim ) //readDim = 0, phaseDim, sliceDim, 
 			const size_t topDim = ch.relevantDims() - 1;
 
 			if( topDim >= ( size_t ) m_dim ) { // ok we still have to splice that
-				const size_t subSize = m_image.sizeToVector()[topDim];
+				const size_t subSize = m_image.getSizeAsVector()[topDim];
 				assert( !( m_amount % subSize ) ); // there must not be any "remaining"
 				splicer sub( m_dim, m_amount / subSize, m_image );
 				BOOST_FOREACH( ChunkList::const_reference ref, ch.autoSplice( m_amount / subSize ) ) {

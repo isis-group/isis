@@ -141,7 +141,7 @@ typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkRea
 	// apply transformation to local isis image copy
 	m_ImageISIS.transformCoords( T );
 	//getting the required metadata from the isis image
-	const util::fvector4 dimensions( m_ImageISIS.sizeToVector() );
+	const util::fvector4 dimensions( m_ImageISIS.getSizeAsVector() );
 	const util::fvector4 indexOrigin( m_ImageISIS.getProperty<util::fvector4>( "indexOrigin" ) );
 	util::fvector4 spacing( m_ImageISIS.getProperty<util::fvector4>( "voxelSize" ) );
 
