@@ -496,7 +496,7 @@ private:
 
 	void copyHeaderToNifti( const data::Image &image, nifti_image &ni ) {
 		//all the other information for the nifti header
-		BOOST_ASSERT( data::Image::n_dims == 4 );
+		BOOST_ASSERT( data::Image::dims == 4 );
 		ni.scl_slope = 1.0;
 		ni.scl_inter = 0.0;// TODO: ? http://209.85.135.104/search?q=cache:AxBp5gn9GzoJ:nifti.nimh.nih.gov/board/read.php%3Ff%3D1%26i%3D57%26t%3D57+nifti-1+scl_slope&hl=en&ct=clnk&cd=1&client=iceweasel-a
 

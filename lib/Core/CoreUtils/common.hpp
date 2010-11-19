@@ -184,13 +184,16 @@ template<typename TARGET> std::list<TARGET> string2list(
  * Splits source into tokens and tries to lexically cast them to TARGET.
  * If that fails, boost::bad_lexical_cast is thrown.
  * Leading and trailing seperators are ignored.
+ * 
+ * In contrast to the versions based on regular expressions, this can handle any basic_string as input.
  *
  * \param source the source string to be split up
  * \param separator string to delimit the tokens
  * \returns a list of the casted tokens
  */
 //@todo test
-template<typename TARGET> std::list<TARGET> string2list( const std::string &source,  char separator )
+template<typename TARGET,typename charT, typename traits> std::list<TARGET>
+string2list( const std::basic_string<charT,traits> &source,  char separator )
 {
 	std::list<TARGET> ret;
 
