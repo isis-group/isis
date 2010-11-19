@@ -50,6 +50,7 @@ private:
 	int StartPosition[2];
 	int EndPosition[2];
 	int Moving;
+	int Slicing;
 
 	ViewControl *m_ViewerPtr;
 	vtkRenderer *m_Renderer;
@@ -58,18 +59,20 @@ private:
 
 	vtkCellPicker *m_Picker;
 
+	double MotionFactor;
+
 public:
 	virtual void OnMouseMove();
+	virtual void OnMiddleButtonUp();
+	virtual void OnRightButtonDown();
 	virtual void OnRightButtonUp();
 	virtual void OnLeftButtonUp();
 	virtual void OnLeftButtonDown();
-	virtual void Dolly( const double );
-	virtual void OnMouseWheelForward();
-	virtual void OnMouseWheelBackward();
+	virtual void Zoom();
 	ViewerInteractor( ViewControl *, vtkRenderer * );
 	vtkSetMacro( MotionFactor, double );
 	vtkGetMacro( MotionFactor, double );
-	double MotionFactor;
+
 };
 
 }
