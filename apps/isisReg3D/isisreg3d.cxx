@@ -86,7 +86,7 @@ static VString pointset_filename = NULL;
 static VString transform_filename_in = NULL;
 static VShort number_of_bins = 50;
 static VArgVector number_of_iterations;
-static VFloat pixel_density = 0.01;
+static VFloat pixel_density = 0;
 static VArgVector grid_size;
 static VArgVector transformType;
 static VArgVector interpolatorType;
@@ -267,6 +267,8 @@ int main(
 	FixedThresholdFilter::Pointer fixedThresholdFilter = FixedThresholdFilter::New();
 	MovingThresholdFilter::Pointer movingThresholdFilter = MovingThresholdFilter::New();
 	isis::data::ImageList refList = isis::data::IOFactory::load( ref_filename, "", "" );
+	//if no pixel density is specified it will be calculated to achive a amount of 15000 voxel considered for registration
+	float pixelDens = float(15000) / ( refList.front()->sizeToVector()[0] * refList.front()->sizeToVector()[1] * refList.front()->sizeToVector()[2] ) ;
 	isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "", "" );
 	LOG_IF( refList.empty(), isis::data::Runtime, isis::error ) << "Reference image is empty!";
 	LOG_IF( inList.empty(), isis::data::Runtime, isis::error ) << "Input image is empty!";
@@ -274,18 +276,7 @@ int main(
 	MovingImageType::Pointer movingImage = movingAdapter->makeItkImageObject<MovingImageType>( inList.front() );
 
 	if ( !smooth ) {
-		fixedRescaleFilter->SetInput( fixedImage );
-		movingRescaleFilter->SetInput( movingImage );
-		movingRescaleFilter->SetOutputMinimum( -itk::NumericTraits<uint16_t>::max() * 9 );
-		movingRescaleFilter->SetOutputMaximum( itk::NumericTraits<uint16_t>::max() * 9 );
-		fixedRescaleFilter->SetOutputMinimum( -itk::NumericTraits<uint16_t>::max() * 9 );
-		fixedRescaleFilter->SetOutputMaximum( itk::NumericTraits<uint16_t>::max() * 9 );
-		movingRescaleFilter->Update();
-		fixedRescaleFilter->Update();
-		fixedImage->DisconnectPipeline();
-		movingImage->DisconnectPipeline();
-		fixedImage = fixedRescaleFilter->GetOutput();
-		movingImage = movingRescaleFilter->GetOutput();
+		
 		//      isis::registration::_internal::filterFrequencyDomain<FixedImageType>( fixedImage );
 		//      isis::registration::_internal::filterFrequencyDomain<MovingImageType>( movingImage );
 		//      writer->SetFileName("test.nii");
@@ -486,8 +477,7 @@ int main(
 
 		//check pixel density
 		if ( pixel_density <= 0 ) {
-			std::cerr << "wrong pixel density...set to 0.01" << std::endl;
-			pixel_density = 0.01;
+			pixel_density = pixelDens;
 		}
 
 		if ( pixel_density >= 1 ) {

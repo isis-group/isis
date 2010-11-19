@@ -39,6 +39,11 @@
 #include <boost/foreach.hpp>
 #include <boost/signal.hpp>
 
+#include <vtkPolyDataMapper.h>
+#include <vtkActor.h>
+#include <vtkCursor2D.h>
+#include <vtkPointHandleRepresentation2D.h>
+#include <vtkMapper2D.h>
 #include <vtkSmartPointer.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
@@ -60,7 +65,7 @@ public:
 	ViewControl();
 	void init( QVTKWidget *axial, QVTKWidget *sagittal, QVTKWidget *coronal );
 	void resetCam();
-	void sliceChanged( const int &, const int &, const int & );
+	void sliceChanged( const int &, const int &, const int &, const double* );
 	void displayIntensity( const int &, const int &, const int & );
 	void addImages( const ImageMapType & );
 	void UpdateWidgets();
@@ -72,6 +77,7 @@ public:
 	vtkSmartPointer<vtkImageData> getCurrentVTKImagePtr( void ) const { return m_CurrentImagePtr; }
 	boost::shared_ptr<ImageHolder> getCurrentImageHolder( void ) const { return m_CurrentImageHolder; }
 	std::vector<boost::shared_ptr< ImageHolder > > getImageHolderVector( void ) const { return m_ImageHolderVector; }
+	
 
 	struct Signals {
 		boost::signal< void ( const size_t & )> intensityChanged;
@@ -88,7 +94,8 @@ private:
 	vtkSmartPointer<vtkRenderer> m_RendererAxial;
 	vtkSmartPointer<vtkRenderer> m_RendererSagittal;
 	vtkSmartPointer<vtkRenderer> m_RendererCoronal;
-
+	vtkSmartPointer<vtkRenderer> m_TopRendererCoronal;
+	
 	vtkSmartPointer<vtkRenderWindow> m_WindowAxial;
 	vtkSmartPointer<vtkRenderWindow> m_WindowSagittal;
 	vtkSmartPointer<vtkRenderWindow> m_WindowCoronal;
@@ -100,12 +107,21 @@ private:
 	vtkSmartPointer<vtkRenderWindowInteractor> m_InteractorAxial;
 	vtkSmartPointer<vtkRenderWindowInteractor> m_InteractorSagittal;
 	vtkSmartPointer<vtkRenderWindowInteractor> m_InteractorCoronal;
-
+	
+	vtkSmartPointer<vtkCursor2D> m_Cursor;
+	vtkSmartPointer<vtkPolyDataMapper> m_PolyMapperCursorAxial;
+	vtkSmartPointer<vtkPolyDataMapper> m_PolyMapperCursorCoronal;
+	vtkSmartPointer<vtkPolyDataMapper> m_PolyMapperCursorSagittal;
+	vtkSmartPointer<vtkActor> m_ActorCursorAxial;
+	vtkSmartPointer<vtkActor> m_ActorCursorSagittal;
+	vtkSmartPointer<vtkActor> m_ActorCursorCoronal;
+	
 	QVTKWidget *m_AxialWidget;
 	QVTKWidget *m_SagittalWidget;
 	QVTKWidget *m_CoronalWidget;
 
 	void setUpPipe();
+	void setUpCursors();
 	void loadImages( util::slist & );
 
 };

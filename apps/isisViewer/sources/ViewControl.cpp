@@ -36,6 +36,16 @@ ViewControl::ViewControl( ) : m_Valid( false )
 	m_RendererAxial = vtkRenderer::New();
 	m_RendererSagittal = vtkRenderer::New();
 	m_RendererCoronal = vtkRenderer::New();
+	m_TopRendererCoronal = vtkRenderer::New();
+		
+	m_Cursor = vtkCursor2D::New();
+	m_ActorCursorAxial = vtkActor::New();
+	m_ActorCursorSagittal = vtkActor::New();
+	m_ActorCursorCoronal = vtkActor::New();
+	m_PolyMapperCursorAxial = vtkPolyDataMapper::New();
+	m_PolyMapperCursorCoronal = vtkPolyDataMapper::New();
+	m_PolyMapperCursorSagittal = vtkPolyDataMapper::New();
+
 }
 
 void ViewControl::init( QVTKWidget *axial, QVTKWidget *sagittal, QVTKWidget *coronal )
@@ -86,15 +96,46 @@ void ViewControl::addImages( const ImageMapType &fileMap )
 void ViewControl::setUpPipe()
 {
 	LOG( Runtime, info ) << "Setting up the pipe";
+	m_RendererCoronal->SetLayer(0);
+	m_TopRendererCoronal->SetLayer(1);
 	m_AxialWidget->GetInteractor()->SetInteractorStyle( m_InteractionStyleAxial );
 	m_SagittalWidget->GetInteractor()->SetInteractorStyle( m_InteractionStyleSagittal );
 	m_CoronalWidget->GetInteractor()->SetInteractorStyle( m_InteractionStyleCoronal );
 	m_AxialWidget->GetRenderWindow()->SetInteractor( m_AxialWidget->GetInteractor() );
 	m_SagittalWidget->GetRenderWindow()->SetInteractor( m_SagittalWidget->GetInteractor() );
 	m_CoronalWidget->GetRenderWindow()->SetInteractor( m_CoronalWidget->GetInteractor() );
+	m_CoronalWidget->GetRenderWindow()->SetNumberOfLayers(2);
 	m_AxialWidget->GetRenderWindow()->AddRenderer( m_RendererAxial );
 	m_SagittalWidget->GetRenderWindow()->AddRenderer( m_RendererSagittal );
 	m_CoronalWidget->GetRenderWindow()->AddRenderer( m_RendererCoronal );
+	m_CoronalWidget->GetRenderWindow()->AddRenderer( m_TopRendererCoronal );
+	setUpCursors();
+	
+}
+
+
+void ViewControl::setUpCursors()
+{
+	m_Cursor->AllOn();
+// 	m_Cursor->AxesOn();
+	m_Cursor->OutlineOff();
+	m_Cursor->SetRadius(80);
+	m_Cursor->Update();
+	m_RendererAxial->AddActor( m_ActorCursorAxial );
+	m_TopRendererCoronal->AddActor( m_ActorCursorCoronal );
+	m_RendererSagittal->AddActor( m_ActorCursorSagittal );
+	m_PolyMapperCursorAxial->SetInputConnection( m_Cursor->GetOutputPort() );
+	m_PolyMapperCursorCoronal->SetInputConnection( m_Cursor->GetOutputPort() );
+	m_PolyMapperCursorSagittal->SetInputConnection( m_Cursor->GetOutputPort() );
+	m_ActorCursorAxial->GetProperty()->SetColor(1,0,0);
+	m_ActorCursorCoronal->GetProperty()->SetColor(0,1,0);
+	m_ActorCursorSagittal->GetProperty()->SetColor(0,0,1);
+	m_ActorCursorAxial->SetMapper( m_PolyMapperCursorAxial );	
+	m_ActorCursorCoronal->SetMapper( m_PolyMapperCursorCoronal );	
+	m_ActorCursorSagittal->SetMapper( m_PolyMapperCursorSagittal );	
+	m_ActorCursorAxial->SetPickable(0);
+	m_ActorCursorCoronal->SetPickable(0);
+	m_ActorCursorSagittal->SetPickable(0);	
 }
 
 void ViewControl::resetCam()
@@ -131,7 +172,7 @@ void ViewControl::displayIntensity( const int &x, const int &y, const int &z )
 	signalList.intensityChanged( m_CurrentImagePtr->GetScalarComponentAsDouble( x, y, z, 0 ) / scaling - offset );
 }
 
-void ViewControl::sliceChanged( const int &x, const int &y, const int &z )
+void ViewControl::sliceChanged( const int &x, const int &y, const int &z, const double *pos )
 {
 	LOG( Runtime, info ) << "ViewControl::sliceChanged";
 	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference refImg, m_ImageHolderVector ) {
@@ -139,6 +180,9 @@ void ViewControl::sliceChanged( const int &x, const int &y, const int &z )
 			LOG( Runtime, error ) << "error during setting slicesetting!";
 		}
 	}
+	m_ActorCursorAxial->SetPosition( static_cast<int>(pos[0]), static_cast<int>(pos[1]), 0 );
+	m_ActorCursorCoronal->SetPosition( static_cast<int>(pos[0]),  static_cast<int>(pos[2]), 0 );
+	m_ActorCursorSagittal->SetPosition( -static_cast<int>(pos[1]),  static_cast<int>(pos[2]), 0 );
 	UpdateWidgets();
 }
 

@@ -37,6 +37,7 @@ ViewerInteractor::ViewerInteractor( ViewControl *viewer, vtkRenderer *renderer )
 	this->StartPosition[0] = this->StartPosition[1] = 0;
 	this->EndPosition[0] = this->EndPosition[1] = 0;
 	this->Moving = 0;
+	this->Slicing = 0;
 	this->PixelArray = vtkUnsignedCharArray::New();
 	this->m_Picker = vtkCellPicker::New();
 	this->SetCurrentRenderer( m_Renderer );
@@ -95,7 +96,7 @@ void ViewerInteractor::OnLeftButtonDown()
 						this->CurrentRenderer ) ) {
 		double ptMapped[3];
 		m_Picker->GetMapperPosition( ptMapped );
-		m_ViewerPtr->sliceChanged( static_cast<int>( ptMapped[0] ), static_cast<int>( ptMapped[1] ), static_cast<int>( ptMapped[2] ) );
+		m_ViewerPtr->sliceChanged( static_cast<int>( ptMapped[0] ), static_cast<int>( ptMapped[1] ), static_cast<int>( ptMapped[2] ), m_Picker->GetPickPosition() );
 	}
 
 	this->Slicing = 1;
@@ -121,7 +122,7 @@ void ViewerInteractor::OnMouseMove()
 			double ptMapped[3];
 			m_Picker->GetMapperPosition( ptMapped );
 			m_ViewerPtr->displayIntensity( static_cast<int>( ptMapped[0] ), static_cast<int>( ptMapped[1] ), static_cast<int>( ptMapped[2] ) );
-			m_ViewerPtr->sliceChanged( static_cast<int>( ptMapped[0] ), static_cast<int>( ptMapped[1] ), static_cast<int>( ptMapped[2] ) );
+			m_ViewerPtr->sliceChanged( static_cast<int>( ptMapped[0] ), static_cast<int>( ptMapped[1] ), static_cast<int>( ptMapped[2] ), m_Picker->GetPickPosition() );
 		}
 	}
 
