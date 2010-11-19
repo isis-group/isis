@@ -66,7 +66,7 @@ private:
 				<< "Getting data from a non indexed image will result in undefined behavior. Run reIndex first.";
 		LOG_IF( set.empty(), Debug, error )
 				<< "Getting data from a empty image will result in undefined behavior.";
-		LOG_IF( !rangeCheck( idx ), Debug, isis::error )
+		LOG_IF( !isInRange( idx ), Debug, isis::error )
 				<< "Index " << util::list2string( idx, idx + 4, "|" ) << " is out of range (" << sizeToString() << ")";
 		const size_t index = getLinearIndex( idx );
 		return std::make_pair( index / chunkVolume, index % chunkVolume );

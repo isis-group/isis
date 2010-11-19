@@ -112,13 +112,13 @@ void Chunk::copySlice( size_t thirdDimS, size_t fourthDimS, Chunk &dst, size_t t
 
 void Chunk::copyRange( const size_t source_start[], const size_t source_end[], Chunk &dst, const size_t destination[] ) const
 {
-	LOG_IF( ! rangeCheck( source_start ), Debug, error )
+	LOG_IF( ! isInRange( source_start ), Debug, error )
 			<< "Copy start " << util::FixedVector<size_t, 4>( source_start )
 			<< " is out of range (" << sizeToString() << ") at the source chunk";
-	LOG_IF( ! rangeCheck( source_end ), Debug, error )
+	LOG_IF( ! isInRange( source_end ), Debug, error )
 			<< "Copy end " << util::FixedVector<size_t, 4>( source_end )
 			<< " is out of range (" << sizeToString() << ") at the source chunk";
-	LOG_IF( ! dst.rangeCheck( destination ), Debug, error )
+	LOG_IF( ! dst.isInRange( destination ), Debug, error )
 			<< "Index " << util::FixedVector<size_t, 4>( destination )
 			<< " is out of range (" << sizeToString() << ") at the destination chunk";
 	const size_t sstart = getLinearIndex( source_start );
@@ -133,13 +133,13 @@ size_t Chunk::cmpRange( size_t start, size_t end, const Chunk &dst, size_t desti
 }
 size_t Chunk::cmpRange( const size_t source_start[], const size_t source_end[], const Chunk &dst, const size_t destination[] ) const
 {
-	LOG_IF( ! rangeCheck( source_start ), Debug, error )
+	LOG_IF( ! isInRange( source_start ), Debug, error )
 			<< "memcmp start " << util::FixedVector<size_t, 4>( source_start )
 			<< " is out of range (" << sizeToString() << ") at the first chunk";
-	LOG_IF( ! rangeCheck( source_end ), Debug, error )
+	LOG_IF( ! isInRange( source_end ), Debug, error )
 			<< "memcmp end " << util::FixedVector<size_t, 4>( source_end )
 			<< " is out of range (" << sizeToString() << ") at the first chunk";
-	LOG_IF( ! dst.rangeCheck( destination ), Debug, error )
+	LOG_IF( ! dst.isInRange( destination ), Debug, error )
 			<< "Index " << util::FixedVector<size_t, 4>( destination )
 			<< " is out of range (" << sizeToString() << ") at the second chunk";
 	LOG( Debug, verbose_info )

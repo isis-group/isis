@@ -31,13 +31,11 @@ namespace _internal
 
 template<unsigned short DIM> size_t __dimStride( const size_t dim[] )
 {
-	BOOST_STATIC_ASSERT( DIM > 0 );//Make sure recursion terminates
 	return __dimStride < DIM - 1 > ( dim ) * dim[DIM-1];
 }
 
 template<unsigned short DIM> size_t __dim2index( const size_t d[], const size_t dim[] )
 {
-	BOOST_STATIC_ASSERT( DIM > 0 );//Make sure recursion terminates
 	return d[DIM] * __dimStride<DIM>( dim ) + __dim2index < DIM - 1 > ( d, dim );
 }
 
@@ -84,11 +82,11 @@ public:
 		return __dim2index < DIMS - 1 > ( d, dim );
 	}
 	/**
-	 * Check if index fits into size of the object.
+	 * Check if index fits into the dimensional size of the object.
 	 * \param d index to be checked (d[0] is most iterating element / lowest dimension)
 	 * \returns true if given index will get a reasonable result when used for getLinearIndex
 	 */
-	bool rangeCheck( const size_t d[DIMS] )const {
+	bool isInRange( const size_t d[DIMS] )const {
 		return __rangeCheck < DIMS - 1 > ( d, dim );
 	}
 	/**
