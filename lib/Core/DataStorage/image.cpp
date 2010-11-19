@@ -139,7 +139,7 @@ bool Image::reIndex()
 		}
 
 		//if there is only one chunk, its ok - the image will consist only of this one,
-		//and commonGet will allways return <0,set.begin()->dim2Index()>
+		//and commonGet will allways return <0,set.begin()->getLinearIndex()>
 		//thus in this case voxel() equals set.begin()->voxel()
 	} else {// OK there is at least one dimension to sort in the chunks
 		LOG( Debug, info ) << "Computing strides for dimensions " << util::MSubject( chunk_dims + 1 ) << " to " << util::MSubject( sortDims );

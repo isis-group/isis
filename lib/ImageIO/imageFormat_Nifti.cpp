@@ -482,7 +482,7 @@ private:
 					for ( size_t x = 0; x < isize[0]; x += csize[0] ) {
 						const size_t dim[] = {x, y, z, t};
 						const data::Chunk ch = image.getChunkAs<T>(scale, x, y, z, t );
-						T *target = refNii + image.dim2Index( dim );
+						T *target = refNii + image.getLinearIndex( dim );
 						ch.getTypePtr<T>().copyToMem( 0, ch.volume() - 1, target );
 					}
 				}

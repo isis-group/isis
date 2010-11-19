@@ -121,9 +121,9 @@ void Chunk::copyRange( const size_t source_start[], const size_t source_end[], C
 	LOG_IF( ! dst.rangeCheck( destination ), Debug, error )
 			<< "Index " << util::FixedVector<size_t, 4>( destination )
 			<< " is out of range (" << sizeToString() << ") at the destination chunk";
-	const size_t sstart = dim2Index( source_start );
-	const size_t send = dim2Index( source_end );
-	const size_t dstart = dst.dim2Index( destination );
+	const size_t sstart = getLinearIndex( source_start );
+	const size_t send = getLinearIndex( source_end );
+	const size_t dstart = dst.getLinearIndex( destination );
 	get()->copyRange( sstart, send, *dst, dstart );
 }
 
@@ -145,9 +145,9 @@ size_t Chunk::cmpRange( const size_t source_start[], const size_t source_end[], 
 	LOG( Debug, verbose_info )
 			<< "Comparing range from " << util::FixedVector<size_t, 4>( source_start ) << " to " << util::FixedVector<size_t, 4>( source_end )
 			<< " and " << util::FixedVector<size_t, 4>( destination );
-	const size_t sstart = dim2Index( source_start );
-	const size_t send = dim2Index( source_end );
-	const size_t dstart = dst.dim2Index( destination );
+	const size_t sstart = getLinearIndex( source_start );
+	const size_t send = getLinearIndex( source_end );
+	const size_t dstart = dst.getLinearIndex( destination );
 	return cmpRange( sstart, send, dst, dstart );
 }
 size_t Chunk::cmpLine( size_t secondDimS, size_t thirdDimS, size_t fourthDimS, const Chunk &dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD ) const

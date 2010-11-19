@@ -81,7 +81,7 @@ public:
 				<< "Index " << util::ivector4( firstDim, secondDim, thirdDim, fourthDim )
 				<< " is out of range " << sizeToString();
 		TypePtr<TYPE> &ret = asTypePtr<TYPE>();
-		return ret[dim2Index( idx )];
+		return ret[getLinearIndex( idx )];
 	}
 	/**
 	 * Gets a copy of the element at a given index.
@@ -98,7 +98,7 @@ public:
 
 		const TypePtr<TYPE> &ret = getTypePtr<TYPE>();
 
-		return ret[dim2Index( idx )];
+		return ret[getLinearIndex( idx )];
 	}
 	_internal::TypePtrBase &asTypePtrBase() {
 		return operator*();
