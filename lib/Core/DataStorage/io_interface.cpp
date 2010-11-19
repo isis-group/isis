@@ -31,7 +31,7 @@ void FileFormat::write( const isis::data::ImageList &images, const std::string &
 	}
 }
 
-bool FileFormat::hasOrTell( const util::PropMap::pname_type &name, const isis::util::PropMap &object, isis::LogLevel level )
+bool FileFormat::hasOrTell( const util::PropMap::key_type &name, const isis::util::PropMap &object, isis::LogLevel level )
 {
 	if ( object.hasProperty( name ) ) {
 		return true;
@@ -83,11 +83,11 @@ std::string FileFormat::makeFilename(const util::PropMap &props,std::string name
 	boost::match_results<std::string::iterator> what;
 	while(boost::regex_search(namePattern.begin(),namePattern.end() , what, reg ))
 	{
-		const util::PropMap::pname_type prop(what[0].str().substr(1,what.length()-2).c_str());
+		const util::PropMap::key_type prop(what[0].str().substr(1,what.length()-2).c_str());
 		if(props.hasProperty(prop)){
 			namePattern.replace(what[0].first,what[0].second,props.getProperty<std::string>(prop));
 			LOG(Debug,info)
-			<< "Replacing " << util::MSubject(util::PropMap::pname_type("{")+prop+"}") << " by "	<< util::MSubject( props.getProperty<std::string>(prop) )
+			<< "Replacing " << util::MSubject(util::PropMap::key_type("{")+prop+"}") << " by "	<< util::MSubject( props.getProperty<std::string>(prop) )
 			<< " the string is now " << util::MSubject(namePattern);
 		} else{
 			LOG(Runtime,warning) << "The property " << util::MSubject(prop) << " does not exist - ignoring it";

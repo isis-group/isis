@@ -158,7 +158,7 @@ bool Image::reIndex()
 	//Clean up the properties
 	//@todo might fail if the image contains a prop that differs to that in the Chunks (which is equal in the chunks)
 	util::PropMap common;
-	util::PropMap::key_list uniques;
+	util::PropMap::KeyList uniques;
 	first.toCommonUnique( common, uniques, true );
 
 	for ( size_t i = 1; i < chunks; i++ ) {
@@ -184,8 +184,8 @@ bool Image::reIndex()
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	//reconstruct some redundant information, if its missing
 	//////////////////////////////////////////////////////////////////////////////////////////////////
-	const util::PropMap::pname_type vectors[] = {"readVec", "phaseVec", "sliceVec"};
-	BOOST_FOREACH( const util::PropMap::pname_type & ref, vectors ) {
+	const util::PropMap::key_type vectors[] = {"readVec", "phaseVec", "sliceVec"};
+	BOOST_FOREACH( const util::PropMap::key_type & ref, vectors ) {
 		if ( hasProperty( ref ) ) {
 			util::PropertyValue &prop = propertyValue( ref );
 			LOG_IF( !prop->is<util::fvector4>(), Debug, error ) << "Using " << prop->typeName() << " as " << util::Type<util::fvector4>::staticName();
@@ -424,7 +424,7 @@ size_t Image::getChunkStride ( size_t base_stride )
 	return lookup.size()/set.getHorizontalSize();
 }
 
-std::list<util::PropertyValue> Image::getChunksProperties( const util::PropMap::pname_type &key, bool unique )const
+std::list<util::PropertyValue> Image::getChunksProperties( const util::PropMap::key_type &key, bool unique )const
 {
 	std::list<util::PropertyValue > ret;
 
@@ -678,8 +678,8 @@ size_t Image::spliceDownTo( dimensions dim ) //readDim = 0, phaseDim, sliceDim, 
 		size[i] = 1;
 
 	// get a list of needed properties (everything which is missing in a newly created chunk plus everything which is needed for autosplice)
-	const std::list<util::PropMap::pname_type> splice_needed = util::string2list<util::PropMap::pname_type>( util::PropMap::pname_type("voxelSize,voxelGap,readVec,phaseVec,sliceVec,indexOrigin,acquisitionNumber"), ',' );
-	util::PropMap::key_list needed = MemChunk<short>( 1 ).getMissing();
+	const std::list<util::PropMap::key_type> splice_needed = util::string2list<util::PropMap::key_type>( util::PropMap::key_type("voxelSize,voxelGap,readVec,phaseVec,sliceVec,indexOrigin,acquisitionNumber"), ',' );
+	util::PropMap::KeyList needed = MemChunk<short>( 1 ).getMissing();
 	needed.insert( splice_needed.begin(), splice_needed.end() );
 	struct splicer {
 		dimensions m_dim;
@@ -708,7 +708,7 @@ size_t Image::spliceDownTo( dimensions dim ) //readDim = 0, phaseDim, sliceDim, 
 	//static_cast<util::PropMap::base_type*>(this)->clear(); we can keep the common properties - they will be merged with thier own copies from the chunks on the next reIndex
 	splicer splice( dim, size.product(), *this );
 	BOOST_FOREACH( boost::shared_ptr<Chunk> &ref, buffer ) {
-		BOOST_FOREACH( const util::PropMap::pname_type & need, needed ) { //get back properties needed for the
+		BOOST_FOREACH( const util::PropMap::key_type & need, needed ) { //get back properties needed for the
 			if( !ref->hasProperty( need ) && this->hasProperty( need ) ) {
 				ref->propertyValue( need ) = this->propertyValue( need );
 			}

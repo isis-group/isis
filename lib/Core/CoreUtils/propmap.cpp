@@ -24,11 +24,11 @@ const PropMap::mapped_type PropMap::emptyEntry;//dummy to be able to return an e
 // Contructors
 ///////////////////////////////////////////////////////////////////
 
-PropMap::PropMap( const isis::util::PropMap::base_type &src ): base_type( src ) {}
+PropMap::PropMap( const isis::util::PropMap::Container &src ): Container( src ) {}
 
 bool PropMap::operator==( const PropMap &src )const
 {
-	const base_type &other = src, &me = *this;
+	const Container &other = src, &me = *this;
 	return me == other;
 }
 
@@ -53,7 +53,7 @@ PropMap::mapped_type &PropMap::fetchEntry(
 {
 	propPath::const_iterator next = at;
 	next++;
-	base_type &rootRef = root;
+	Container &rootRef = root;
 	iterator found = root.find( *at );
 
 	if ( next != pathEnd ) {//we are not at the end of the path (a proposed leaf in the PropMap)
@@ -222,17 +222,17 @@ bool PropMap::valid() const
 
 bool PropMap::empty() const
 {
-	return base_type::empty();
+	return Container::empty();
 }
 
-PropMap::diff_map PropMap::getDifference( const PropMap &other ) const
+PropMap::DiffMap PropMap::getDifference( const PropMap &other ) const
 {
-	PropMap::diff_map ret;
+	PropMap::DiffMap ret;
 	diffTree( other, ret, "" );
 	return ret;
 }
 
-void PropMap::diffTree( const PropMap& other, PropMap::diff_map& ret, istring prefix ) const
+void PropMap::diffTree( const PropMap& other, PropMap::DiffMap& ret, istring prefix ) const
 {
 	const_iterator otherIt = other.begin();
 
@@ -289,7 +289,7 @@ void PropMap::diffTree( const PropMap& other, PropMap::diff_map& ret, istring pr
 	}
 }
 
-void PropMap::make_unique ( const util::PropMap &other, bool removeNeeded )
+void PropMap::makeUnique ( const util::PropMap &other, bool removeNeeded )
 {
 	iterator thisIt = begin();
 
@@ -316,7 +316,7 @@ void PropMap::make_unique ( const util::PropMap &other, bool removeNeeded )
 				} else if ( ! ( thisIt->second.is_leaf() || otherIt->second.is_leaf() ) ) { //but maybe they are branches
 					PropMap &thisMap = thisIt->second.getBranch();
 					const PropMap &otherMap = otherIt->second.getBranch();
-					thisMap.make_unique( otherMap );
+					thisMap.makeUnique( otherMap );
 					thisIt++;
 				}
 			} else {//only the other is empty
@@ -328,14 +328,14 @@ void PropMap::make_unique ( const util::PropMap &other, bool removeNeeded )
 }
 
 
-PropMap::key_list PropMap::join( const isis::util::PropMap &other, bool overwrite )
+PropMap::KeyList PropMap::join( const isis::util::PropMap &other, bool overwrite )
 {
-	key_list rejects;
+	KeyList rejects;
 	joinTree( other, overwrite, "", rejects );
 	return rejects;
 }
 
-void PropMap::joinTree( const isis::util::PropMap &other, bool overwrite, util::istring prefix, PropMap::key_list &rejects )
+void PropMap::joinTree( const isis::util::PropMap &other, bool overwrite, util::istring prefix, PropMap::KeyList &rejects )
 {
 	iterator thisIt = begin();
 
@@ -365,7 +365,7 @@ void PropMap::joinTree( const isis::util::PropMap &other, bool overwrite, util::
 }
 
 
-void PropMap::linearize( flat_map &out, key_type key_prefix ) const
+void PropMap::linearize( FlatMap &out, key_type key_prefix ) const
 {
 	for ( const_iterator i = begin(); i != end(); i++ ) {
 		key_type key = ( key_prefix.empty() ? "" : key_prefix + pathSeperator ) + i->first;
@@ -406,16 +406,16 @@ bool PropMap::transform( key_type from,  key_type to, int dstID, bool delSource 
 }
 
 
-const PropMap::key_list PropMap::getKeys()const
+const PropMap::KeyList PropMap::getKeys()const
 {
-	PropMap::key_list ret;
+	PropMap::KeyList ret;
 	std::for_each( begin(), end(), walkTree<trueP>( ret ) );
 	return ret;
 }
 
-const PropMap::key_list PropMap::getMissing() const
+const PropMap::KeyList PropMap::getMissing() const
 {
-	PropMap::key_list ret;
+	PropMap::KeyList ret;
 	std::for_each( begin(), end(), walkTree<invalidP>( ret ) );
 	return ret;
 }
@@ -476,8 +476,8 @@ void PropMap::toCommonUnique( PropMap &common, std::set<key_type> &uniques, bool
 		uniques.clear();
 		return;
 	} else {
-		const diff_map difference = common.getDifference( *this );
-		BOOST_FOREACH( const diff_map::value_type & ref, difference ) {
+		const DiffMap difference = common.getDifference( *this );
+		BOOST_FOREACH( const DiffMap::value_type & ref, difference ) {
 			uniques.insert( ref.first );
 
 			if ( ! ref.second.first.empty() )common.remove( ref.first );//if there is something in common, remove it
@@ -487,15 +487,15 @@ void PropMap::toCommonUnique( PropMap &common, std::set<key_type> &uniques, bool
 
 std::ostream &PropMap::print( std::ostream &out, bool label )const
 {
-	flat_map buff;
+	FlatMap buff;
 	linearize( buff );
 	size_t key_len = 0;
 
-	for ( flat_map::const_iterator i = buff.begin(); i != buff.end(); i++ )
+	for ( FlatMap::const_iterator i = buff.begin(); i != buff.end(); i++ )
 		if ( key_len < i->first.length() )
 			key_len = i->first.length();
 
-	for ( flat_map::const_iterator i = buff.begin(); i != buff.end(); i++ )
+	for ( FlatMap::const_iterator i = buff.begin(); i != buff.end(); i++ )
 		out << i->first << std::string( key_len - i->first.length(), ' ' ) + ":" << i->second.toString( label ) << std::endl;
 
 	return out;

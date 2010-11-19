@@ -39,11 +39,11 @@ class treeNode; //predeclare treeNode -- we'll need it in PropMap
 class PropMap : protected std::map<util::istring, _internal::treeNode>
 {
 public:
-	typedef std::map<key_type, mapped_type, key_compare> base_type;
-	typedef std::set<key_type, key_compare> key_list;
-	typedef std::map<key_type, std::pair<PropertyValue, PropertyValue>, key_compare> diff_map;
-	typedef std::map<key_type, PropertyValue> flat_map;
-	typedef key_type pname_type;
+	typedef std::map<key_type, mapped_type, key_compare> Container;
+	typedef std::set<key_type, key_compare> KeyList;
+	typedef std::map<key_type, std::pair<PropertyValue, PropertyValue>, key_compare> DiffMap;
+	typedef std::map<key_type, PropertyValue> FlatMap;
+	using std::map<util::istring, _internal::treeNode>::key_type;
 private:
 	typedef std::list<key_type> propPath;
 	typedef propPath::const_iterator propPathIterator;
@@ -71,9 +71,9 @@ private:
 	// internal tool-backends
 	/////////////////////////////////////////////////////////////////////////////////////////
 	/// internal recursion-function for join
-	void joinTree( const isis::util::PropMap &other, bool overwrite, key_type prefix, PropMap::key_list &rejects );
+	void joinTree( const isis::util::PropMap &other, bool overwrite, key_type prefix, PropMap::KeyList &rejects );
 	/// internal recursion-function for diff
-	void diffTree( const PropMap &other, PropMap::diff_map &ret, key_type prefix ) const;
+	void diffTree( const PropMap &other, PropMap::DiffMap &ret, key_type prefix ) const;
 
 	static mapped_type &fetchEntry( util::PropMap &root, const propPathIterator at, const propPathIterator pathEnd );
 	mapped_type &fetchEntry( const key_type &key );
@@ -88,8 +88,8 @@ protected:
 	// rw-backends
 	/////////////////////////////////////////////////////////////////////////////////////////
 	/// create a list of keys for every entry for which the given scalar predicate is true.
-	template<class Predicate> const key_list genKeyList()const {
-		key_list k;
+	template<class Predicate> const KeyList genKeyList()const {
+		KeyList k;
 		std::for_each( begin(), end(), walkTree<Predicate>( k ) );
 		return k;
 	}
@@ -108,7 +108,7 @@ public:
 	/////////////////////////////////////////////////////////////////////////////////////////
 	// constructors
 	/////////////////////////////////////////////////////////////////////////////////////////
-	PropMap( const base_type &src );
+	PropMap( const Container &src );
 	PropMap();
 
 	bool operator==( const PropMap &src )const;
@@ -162,12 +162,12 @@ public:
 	/// \returns true if the PropMap is empty, false otherwhise
 	bool empty()const;
 	/// get a flat list of the "paths" to all properties in the PropMap
-	const key_list getKeys()const;
+	const KeyList getKeys()const;
 	/**
 	 * Get a list of missing properties.
 	 * \returns a list of all needed and empty properties.
 	 */
-	const key_list getMissing()const;
+	const KeyList getMissing()const;
 	/**
 	 * Get a difference map of this and the given PropMap.
 	 * Creates a map out of the Name of differencing properties and their difference, which is a std::pair\<PropertyValue,PropertyValue\>.
@@ -183,15 +183,15 @@ public:
 	 * \param second the "other" PropMap to compare with
 	 * \return a map of property keys and value-pairs
 	 */
-	diff_map getDifference( const PropMap &second )const;
+	DiffMap getDifference( const PropMap &second )const;
 	/// Remove everything that is also in second and equal.
-	void make_unique( const isis::util::PropMap &other, bool removeNeeded = false );
+	void makeUnique( const isis::util::PropMap &other, bool removeNeeded = false );
 	/**
 	* Add Properties from another PropMap.
 	* \param other the other PropMap
 	* \param overwrite if existing properties shall be replaced
 	*/
-	PropMap::key_list join( const isis::util::PropMap &other, bool overwrite = false );
+	PropMap::KeyList join( const isis::util::PropMap &other, bool overwrite = false );
 
 	/**
 	* Get common and unique properties from the map.
@@ -208,7 +208,7 @@ public:
 	void toCommonUnique( PropMap &common, std::set<key_type> &uniques, bool init )const;
 
 	///copy the tree into a flat key/property-map
-	void linearize( flat_map &out, key_type key_prefix = "" )const;
+	void linearize( FlatMap &out, key_type key_prefix = "" )const;
 
 	/**
 	 * Transform an existing property into another.
@@ -343,10 +343,10 @@ public:
 
 // and now we can define walkTree (needs treeNode to be defined)
 template<class Predicate> struct PropMap::walkTree {
-	key_list &m_out;
+	KeyList &m_out;
 	const key_type m_prefix;
-	walkTree( key_list &out, const key_type &prefix ): m_out( out ), m_prefix( prefix ) {}
-	walkTree( key_list &out ): m_out( out ) {}
+	walkTree( KeyList &out, const key_type &prefix ): m_out( out ), m_prefix( prefix ) {}
+	walkTree( KeyList &out ): m_out( out ) {}
 	void operator()( const_reference ref ) const {
 		if ( ref.second.is_leaf() ) {
 			if ( Predicate()( ref ) )
@@ -395,7 +395,7 @@ basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, con
 template<typename charT, typename traits>
 basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::PropMap &s )
 {
-	isis::util::PropMap::flat_map buff;
+	isis::util::PropMap::FlatMap buff;
 	s.linearize( buff );
 	isis::util::write_list( buff.begin(), buff.end(), out );
 	return out;

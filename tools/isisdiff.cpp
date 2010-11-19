@@ -94,7 +94,7 @@ int main( int argc, char *argv[] )
 
 	for ( i = images1.begin(), j = images2.begin(), count = 0; i != images1.end(); i++, j++, count++ ) {
 		const data::Image &first = **i, &second = **j;
-		util::PropMap::diff_map diff = first.getDifference( second );
+		util::PropMap::DiffMap diff = first.getDifference( second );
 		BOOST_FOREACH( util::slist::const_reference ref, ignore ){
 			diff.erase( util::istring(ref.begin(),ref.end()) );
 		}
