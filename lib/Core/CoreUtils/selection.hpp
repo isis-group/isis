@@ -11,6 +11,7 @@
 #define SELECTION_HPP_INCLUDED
 #include <map>
 #include "common.hpp"
+#include "istring.hpp"
 #include <boost/foreach.hpp>
 
 namespace isis
@@ -24,8 +25,8 @@ namespace util
  */
 class Selection
 {
-	typedef std::map<std::string, unsigned short, _internal::caselessStringLess> map_type;
-	map_type ent_map;
+	typedef std::map<util::istring, unsigned short> MapType;
+	MapType ent_map;
 	int m_set;
 public:
 	/**
@@ -61,6 +62,11 @@ public:
 	 */
 	operator const std::string()const;
 	/**
+	 * Implicit cast to istring.
+	 * \returns the currently set option or "<<NOT_SET>>" if none is set
+	 */
+	operator const util::istring()const;
+	/**
 	 * Common comparison.
 	 * \returns true if both selection have the same options and are currently set to the the option. False otherwise.
 	 */
@@ -76,13 +82,16 @@ public:
 	 */
 	bool operator==( const int ref )const;
 	/// \returns a list of all options
-	std::list<std::string> getEntries()const;
+	std::list<util::istring> getEntries()const;
 };
 
 template<typename T> Selection::Selection( const std::map< T, std::string >& map ): m_set( 0 )
 {
 	for( typename std::map< T, std::string >::const_iterator i = map.begin(); i != map.end(); i++ ) {
-		const map_type::value_type pair( i->second, i->first );
+		const MapType::value_type pair(
+			util::istring( i->second.begin(),i->second.end()),
+			i->first
+		);
 		assert( pair.second != 0 ); // 0 is reserved for <<NOT_SET>>
 
 		if( !ent_map.insert( pair ).second ) {
