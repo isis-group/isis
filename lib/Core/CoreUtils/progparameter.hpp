@@ -88,7 +88,7 @@ public:
  * Container for ProgParameter.
  * Handles instances of ProgParameter for every expected programm parameter and sets them by reading an argc/argv pair.
  */
-class ParameterMap: public std::map<std::string, ProgParameter, _internal::caselessStringLess>
+class ParameterMap: public std::map<std::string, ProgParameter>
 {
 	struct neededP {
 		bool operator()( const_reference ref )const {return ref.second.needed();}
@@ -103,7 +103,7 @@ class ParameterMap: public std::map<std::string, ProgParameter, _internal::casel
 		std::map<key_type, mapped_type, key_compare> result( *this );
 
 		for (
-			std::map<key_type, mapped_type, key_compare>::iterator at = std::find_if( result.begin(), result.end(), T() );
+			iterator at = std::find_if( result.begin(), result.end(), T() );
 			at != result.end();
 			at = std::find_if( at, result.end(), hiddenP() )
 		)
