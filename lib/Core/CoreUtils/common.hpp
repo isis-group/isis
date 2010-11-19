@@ -25,7 +25,6 @@
 #include <cmath>
 #include "log.hpp"
 #include "log_modules.hpp"
-#include <boost/algorithm/string/case_conv.hpp>
 
 #ifdef _MSC_VER
 typedef boost::int8_t   int8_t;
@@ -291,14 +290,6 @@ continousFind( ForwardIterator &current, const ForwardIterator end, const T &com
 	return continousFind( current, end, compare, std::less<T>() );
 }
 
-///Caseless less-compare for std::string
-struct caselessStringLess {
-	bool operator() ( const std::string &a, const std::string &b ) const {
-		return strcasecmp( a.c_str(), b.c_str() ) < 0;
-		//      return boost::algorithm::to_lower_copy(a) < boost::algorithm::to_lower_copy(b);
-		//@todo for WinXP maybe look at http://www.winehq.org/pipermail/wine-patches/2004-August/012083.html
-	}
-};
 }
 /// @endcond
 typedef CoreDebug Debug;

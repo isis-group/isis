@@ -62,7 +62,7 @@ bool Selection::operator==( const Selection &ref )const
 }
 bool Selection::operator==( const char ref[] ) const
 {
-	return boost::algorithm::to_lower_copy<std::string>( *this ) == boost::algorithm::to_lower_copy( std::string( ref ) );
+	return ((const util::istring&)*this ) == ref ;
 }
 bool Selection::operator==( const int ref ) const
 {
