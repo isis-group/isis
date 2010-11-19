@@ -29,7 +29,6 @@
 #include <cmath>
 #include "log.hpp"
 #include "log_modules.hpp"
-#include <boost/algorithm/string/case_conv.hpp>
 
 #ifdef _MSC_VER
 #include <Windows.h>
@@ -189,13 +188,16 @@ template<typename TARGET> std::list<TARGET> string2list(
  * Splits source into tokens and tries to lexically cast them to TARGET.
  * If that fails, boost::bad_lexical_cast is thrown.
  * Leading and trailing seperators are ignored.
+ * 
+ * In contrast to the versions based on regular expressions, this can handle any basic_string as input.
  *
  * \param source the source string to be split up
  * \param separator string to delimit the tokens
  * \returns a list of the casted tokens
  */
 //@todo test
-template<typename TARGET> std::list<TARGET> string2list( const std::string &source,  char separator )
+template<typename TARGET,typename charT, typename traits> std::list<TARGET>
+string2list( const std::basic_string<charT,traits> &source,  char separator )
 {
 	std::list<TARGET> ret;
 
@@ -292,19 +294,6 @@ continousFind( ForwardIterator &current, const ForwardIterator end, const T &com
 {
 	return continousFind( current, end, compare, std::less<T>() );
 }
-
-///Caseless less-compare for std::string
-struct caselessStringLess {
-	bool operator() ( const std::string &a, const std::string &b ) const {
-#ifdef _MSC_VER
-		return lstrcmpi(a.c_str(), b.c_str()) < 0;
-#else
-		return strcasecmp( a.c_str(), b.c_str() ) < 0;
-#endif
-		//      return boost::algorithm::to_lower_copy(a) < boost::algorithm::to_lower_copy(b);
-		//@todo for WinXP maybe look at http://www.winehq.org/pipermail/wine-patches/2004-August/012083.html
-	}
-};
 }
 /// @endcond
 typedef CoreDebug Debug;

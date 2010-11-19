@@ -116,7 +116,7 @@ ADD_DEFINITIONS(-DDL_PREFIX="${CMAKE_SHARED_LIBRARY_PREFIX}")
 # Set the revision number if this dir is a svn working copy.
 # The revision number will be stored in RCS_REVISION.
 FIND_FILE(RCS_DESC_COMMAND git-describe
-    PATHS /usr/bin /usr/local/bin
+	PATHS /usr/bin /usr/local/bin /usr/lib/git-core
     DOC "The rcs revision description information tool.")
 
 IF (NOT RCS_REVISION)
@@ -125,7 +125,7 @@ IF (NOT RCS_REVISION)
 		string(REGEX MATCH "[0-9]+-[^-]+$" RCS_REVISION "${OUT}") #@todo wont work with more complex revisions/modified sources
 		SET(RCS_REVISION ${RCS_REVISION})
 	else(RCS_DESC_COMMAND)
-		message(status "No rcs command given")
+		message(STATUS "No rcs command given")
 	ENDIF (RCS_DESC_COMMAND)
 ENDIF (NOT RCS_REVISION)
 
@@ -252,3 +252,8 @@ CONFIGURE_FILE(cmake/isis_corecfg.cmake.in ${CMAKE_BINARY_DIR}/ISISConfig.cmake 
 # install cmake configuration files
 INSTALL(FILES ${CMAKE_BINARY_DIR}/ISISConfig.cmake
   DESTINATION ${CMAKE_INSTALL_PREFIX}/share/isis/cmake COMPONENT Development)
+
+# uninstall target
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake//cmake_uninstall.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake" IMMEDIATE @ONLY)
+
+add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)

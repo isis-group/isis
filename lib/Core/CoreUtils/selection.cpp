@@ -18,8 +18,8 @@ namespace util
 Selection::Selection( const char *entries ): m_set( 0 )
 {
 	int id = 1;
-	BOOST_FOREACH( const std::string & ref, string2list<std::string>( std::string( entries ), ',' ) ) {
-		const map_type::value_type pair( ref, id++ );
+	BOOST_FOREACH( const util::istring & ref, string2list<util::istring>( util::istring( entries ), ',' ) ) {
+		const MapType::value_type pair( ref, id++ );
 
 		if( ! ent_map.insert( pair ).second ) {
 			LOG( Debug, error ) << "Entry " << util::MSubject( pair ) << " could not be inserted";
@@ -29,18 +29,23 @@ Selection::Selection( const char *entries ): m_set( 0 )
 Selection::Selection(): m_set( 0 ) {}
 
 Selection::operator const int()const {return m_set;}
-Selection::operator const std::string()const
+Selection::operator const util::istring()const
 {
-	BOOST_FOREACH( map_type::const_reference ref, ent_map ) {
+	BOOST_FOREACH( MapType::const_reference ref, ent_map ) {
 		if ( ref.second == m_set )
 			return ref.first;
 	}
-	return std::string( "<<NOT_SET>>" );
+	return util::istring( "<<NOT_SET>>" );
+}
+Selection::operator const std::string()const
+{
+	util::istring buff=*this;
+	return std::string( buff.begin(),buff.end() );
 }
 
 bool Selection::set( const char *entry )
 {
-	map_type::const_iterator found = ent_map.find( entry );
+	MapType::const_iterator found = ent_map.find( entry );
 
 	if ( found != ent_map.end() ) {
 		m_set = found->second;
@@ -57,7 +62,7 @@ bool Selection::operator==( const Selection &ref )const
 }
 bool Selection::operator==( const char ref[] ) const
 {
-	return boost::algorithm::to_lower_copy<std::string>( *this ) == boost::algorithm::to_lower_copy( std::string( ref ) );
+	return ((const util::istring&)*this ) == ref ;
 }
 bool Selection::operator==( const int ref ) const
 {
@@ -65,11 +70,12 @@ bool Selection::operator==( const int ref ) const
 }
 
 
-std::list<std::string> Selection::getEntries()const
+std::list<util::istring> Selection::getEntries()const
 {
-	std::list<std::string> ret;
-	BOOST_FOREACH( map_type::const_reference ref, ent_map )
-	ret.push_back( ref.first );
+	std::list<util::istring> ret;
+	BOOST_FOREACH( MapType::const_reference ref, ent_map ){
+		ret.push_back( ref.first );
+	}
 	return ret;
 }
 }

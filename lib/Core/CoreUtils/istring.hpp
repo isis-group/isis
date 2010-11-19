@@ -49,9 +49,10 @@ basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, con
 }
 }
 
-// specialization for boost::lexical_cast to differ std::string and util::istring
 namespace boost{
+/// specialization for boost::lexical_cast to differ std::string and util::istring
 template<> isis::util::istring lexical_cast<isis::util::istring, std::string>        (const std::string         &arg);
+/// specialization for boost::lexical_cast to differ std::string and util::istring
 template<> std::string         lexical_cast<std::string,         isis::util::istring>(const isis::util::istring &arg);
 }
 #endif // UTIL_ISTRING_HPP
