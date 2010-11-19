@@ -61,6 +61,7 @@ private:
 	static void gz_uncompress( gzFile in, std::ofstream &out ) {
 		char buf[2048*1024];
 		int len;
+		size_t bytes=0;
 
 		for (
 			len = gzread( in, buf, 2048 * 1024 );
@@ -79,12 +80,16 @@ private:
 				}
 			} else {
 				out.write( buf, len );
+				bytes+=len;
 			}
 		}
+		LOG(Debug,verbose_info) << "Uncompressed " << bytes << " bytes";
 	}
 
 	static void file_uncompress( std::string infile, std::string outfile ) {
 		gzFile in = gzopen( infile.c_str(), "rb" );
+		LOG( Debug, info ) <<  "Uncompressing " << util::MSubject(infile) << " to "  << util::MSubject(outfile);
+
 
 		if ( in == NULL ) {
 			if ( errno )
@@ -149,7 +154,6 @@ public:
 		const std::pair<std::string,std::string> realBase=formats.front()->makeBasename(proxyBase.first);
 		util::TmpFile tmpfile( "", realBase.second );
 
-		LOG( Debug, info ) <<  "tmpfile=" << tmpfile;
 		file_uncompress( filename, tmpfile.string() );
 		data::ChunkList buff;
 		int ret=data::IOFactory::get().loadFile( buff, tmpfile, "", dialect );
