@@ -135,7 +135,6 @@ public:
 
 	size_t useCount()const;
 
-	bool swapAlong( TypePtrBase &dst, const size_t dim, const size_t dims[] ) const;
 	/**
 	 * Get minimum/maximum from a TypePtr.
 	 * The parameters are reverences to the current maximum/minimum found.

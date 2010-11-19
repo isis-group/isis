@@ -258,8 +258,7 @@ template<typename T> const Type<T>& _internal::TypeBase::castToType() const
 	check_type<T>();
 	return m_cast_to<Type<T> >();
 }
-template<typename T> const T &_internal::TypeBase::castTo
-() const
+template<typename T> const T &_internal::TypeBase::castTo() const
 {
 	const Type<T> &ret = castToType<T>();
 	return ret.operator const T & ();

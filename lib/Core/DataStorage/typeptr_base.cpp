@@ -122,50 +122,6 @@ size_t TypePtrBase::useCount() const
 	return address().use_count();
 }
 
-
-bool TypePtrBase::swapAlong( TypePtrBase &dst, const size_t dim, const size_t dims[]  ) const
-{
-	boost::shared_ptr<void> daddr = dst.address().lock();
-	boost::shared_ptr<void> saddr = address().lock();
-	const int8_t *const  src = ( int8_t * )saddr.get();
-	int8_t *const dest = ( int8_t * )daddr.get();
-
-	if ( dim == 0 ) {
-		size_t index_forward = 0;
-		size_t index_y = 0;
-
-		for ( size_t z = 0; z < dims[2]; z++ ) {
-			for ( size_t y = 0; y < dims[1]; y++ ) {
-				index_y++;
-
-				for ( size_t direction = 0; direction < dims[0]; direction++ ) {
-					memcpy( dest + index_forward * bytesPerElem(), src + ( ( index_y * dims[0] ) - direction - 1 ) * bytesPerElem(), bytesPerElem() );
-					index_forward++;
-				}
-			}
-		}
-
-		return 1;
-	} else if ( dim == 1 ) {
-		for ( size_t z = 0; z < dims[2]; z++ ) {
-			for ( size_t direction = 0; direction < dims[dim]; direction++ ) {
-				memcpy( dest + ( ( dims[0] * direction ) + z * dims[0] * dims[1] ) * bytesPerElem(), src + ( ( dims[0] * ( dims[1] - direction - 1 ) ) + z * dims[0] * dims[1] ) * bytesPerElem(), bytesPerElem() * dims[0] );
-			}
-		}
-
-		return 1;
-	} else if ( dim == 2 ) {
-		for ( size_t direction = 0; direction < dims[dim]; direction++ ) {
-			memcpy( dest + direction * dims[0]*dims[1]*bytesPerElem(), src + ( dims[dim] - direction - 1 )*dims[0]*dims[1]*bytesPerElem(), bytesPerElem()*dims[0]*dims[1] );
-		}
-
-		return 1;
-	} else {
-		LOG( Runtime, error ) << "Swapping along axis referred by " << dim << " is not possible!";
-		return 0;
-	}
-}
-
 }
 }
 }
