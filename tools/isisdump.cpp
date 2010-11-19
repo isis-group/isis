@@ -19,7 +19,7 @@ int main( int argc, char *argv[] )
 	const unsigned short imageDigits = std::log10( app.images.size() ) + 1;
 	std::cout.fill( '0' );
 	BOOST_FOREACH( data::ImageList::const_reference ref, app.images ) {
-		std::cout << "======Image #" << std::setw( imageDigits )  << ++count1 << std::setw( 0 ) << ref->sizeToString() << "======Metadata======" << std::endl;
+		std::cout << "======Image #" << std::setw( imageDigits )  << ++count1 << std::setw( 0 ) << ref->getSizeAsString() << "======Metadata======" << std::endl;
 		ref->print( std::cout, true );
 		int count2 = 0;
 
@@ -27,7 +27,7 @@ int main( int argc, char *argv[] )
 			std::vector<boost::shared_ptr<data::Chunk> > chunks = ref->getChunkList();
 			const unsigned short chunkDigits = std::log10( chunks.size() ) + 1;
 			BOOST_FOREACH( const boost::shared_ptr<data::Chunk> &c, chunks ) {
-				std::cout << "======Image #" << std::setw( imageDigits )  << count1 << std::setw( 0 ) << "==Chunk #" << std::setw( chunkDigits )  << ++count2 << std::setw( 0 ) << c->sizeToString() << c->typeName() << "======Metadata======" << std::endl;
+				std::cout << "======Image #" << std::setw( imageDigits )  << count1 << std::setw( 0 ) << "==Chunk #" << std::setw( chunkDigits )  << ++count2 << std::setw( 0 ) << c->getSizeAsString() << c->typeName() << "======Metadata======" << std::endl;
 				c->print( std::cout, true );
 			}
 		}

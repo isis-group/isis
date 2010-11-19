@@ -48,7 +48,7 @@ public:
 
 	void write( const data::Image &image, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
 		if ( image.sizeToVector() != util::fvector4( 50, 50, 50, 10 ) )
-			throw( std::runtime_error( "Size mismatch (" + image.sizeToString() + "!=" + boost::lexical_cast<std::string>( util::fvector4( 50, 50, 50, 10 ) ) + ")" ) );
+			throw( std::runtime_error( "Size mismatch (" + image.getSizeAsString() + "!=" + boost::lexical_cast<std::string>( util::fvector4( 50, 50, 50, 10 ) ) + ")" ) );
 
 		const int snum = image.getProperty<int32_t>( "sequenceNumber" );
 

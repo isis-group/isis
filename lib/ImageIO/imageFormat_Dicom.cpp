@@ -373,7 +373,7 @@ int ImageFormat_Dicom::readMosaic( data::Chunk source, data::ChunkList &dest )
 	size[0] /= matrixSize;
 	size[1] /= matrixSize;
 	assert( size[3] == 1 );
-	LOG( Debug, info ) << "Decomposing a " << source.sizeToString() << " mosaic-image into " << images << " " << size << " slices";
+	LOG( Debug, info ) << "Decomposing a " << source.getSizeAsString() << " mosaic-image into " << images << " " << size << " slices";
 	// fix the properties of the source (we 'll need them later)
 	util::fvector4 voxelGap;
 

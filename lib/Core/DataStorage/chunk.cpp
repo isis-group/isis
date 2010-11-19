@@ -114,13 +114,13 @@ void Chunk::copyRange( const size_t source_start[], const size_t source_end[], C
 {
 	LOG_IF( ! isInRange( source_start ), Debug, error )
 			<< "Copy start " << util::FixedVector<size_t, 4>( source_start )
-			<< " is out of range (" << sizeToString() << ") at the source chunk";
+			<< " is out of range (" << getSizeAsString() << ") at the source chunk";
 	LOG_IF( ! isInRange( source_end ), Debug, error )
 			<< "Copy end " << util::FixedVector<size_t, 4>( source_end )
-			<< " is out of range (" << sizeToString() << ") at the source chunk";
+			<< " is out of range (" << getSizeAsString() << ") at the source chunk";
 	LOG_IF( ! dst.isInRange( destination ), Debug, error )
 			<< "Index " << util::FixedVector<size_t, 4>( destination )
-			<< " is out of range (" << sizeToString() << ") at the destination chunk";
+			<< " is out of range (" << getSizeAsString() << ") at the destination chunk";
 	const size_t sstart = getLinearIndex( source_start );
 	const size_t send = getLinearIndex( source_end );
 	const size_t dstart = dst.getLinearIndex( destination );
@@ -135,13 +135,13 @@ size_t Chunk::cmpRange( const size_t source_start[], const size_t source_end[], 
 {
 	LOG_IF( ! isInRange( source_start ), Debug, error )
 			<< "memcmp start " << util::FixedVector<size_t, 4>( source_start )
-			<< " is out of range (" << sizeToString() << ") at the first chunk";
+			<< " is out of range (" << getSizeAsString() << ") at the first chunk";
 	LOG_IF( ! isInRange( source_end ), Debug, error )
 			<< "memcmp end " << util::FixedVector<size_t, 4>( source_end )
-			<< " is out of range (" << sizeToString() << ") at the first chunk";
+			<< " is out of range (" << getSizeAsString() << ") at the first chunk";
 	LOG_IF( ! dst.isInRange( destination ), Debug, error )
 			<< "Index " << util::FixedVector<size_t, 4>( destination )
-			<< " is out of range (" << sizeToString() << ") at the second chunk";
+			<< " is out of range (" << getSizeAsString() << ") at the second chunk";
 	LOG( Debug, verbose_info )
 			<< "Comparing range from " << util::FixedVector<size_t, 4>( source_start ) << " to " << util::FixedVector<size_t, 4>( source_end )
 			<< " and " << util::FixedVector<size_t, 4>( destination );

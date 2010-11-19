@@ -79,7 +79,7 @@ public:
 		const size_t idx[] = {firstDim, secondDim, thirdDim, fourthDim};
 		LOG_IF( ! isInRange( idx ), Debug, isis::error )
 				<< "Index " << util::ivector4( firstDim, secondDim, thirdDim, fourthDim )
-				<< " is out of range " << sizeToString();
+				<< " is out of range " << getSizeAsString();
 		TypePtr<TYPE> &ret = asTypePtr<TYPE>();
 		return ret[getLinearIndex( idx )];
 	}
@@ -93,7 +93,7 @@ public:
 		if ( !isInRange( idx ) ) {
 			LOG( Debug, isis::error )
 					<< "Index " << firstDim << "|" << secondDim << "|" << thirdDim << "|" << fourthDim
-					<< " is out of range (" << sizeToString() << ")";
+					<< " is out of range (" << getSizeAsString() << ")";
 		}
 
 		const TypePtr<TYPE> &ret = getTypePtr<TYPE>();

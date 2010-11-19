@@ -186,7 +186,7 @@ public:
 	 * write file
 	 ************************/
 	void write( const data::Image &imageOrig, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) {
-		LOG( Debug, info ) << "Writing image of size " << imageOrig.sizeToString() << " and type " << imageOrig.typeName() << " as nifti";
+		LOG( Debug, info ) << "Writing image of size " << imageOrig.getSizeAsString() << " and type " << imageOrig.typeName() << " as nifti";
 		boost::filesystem::path boostFilename( filename );
 		//copy of our image due to changing it by transformCoords
 		isis::data::Image image( imageOrig );

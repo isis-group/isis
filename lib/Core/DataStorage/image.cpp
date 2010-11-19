@@ -78,7 +78,7 @@ bool Image::insertChunk ( const Chunk &chunk )
 {
 	if ( chunk.volume() == 0 ) {
 		LOG( Runtime, error )
-				<< "Cannot insert empty Chunk (Size is " << chunk.sizeToString() << ").";
+				<< "Cannot insert empty Chunk (Size is " << chunk.getSizeAsString() << ").";
 		return false;
 	}
 
@@ -494,7 +494,7 @@ ImageList::ImageList( ChunkList src )
 			if ( buff->reIndex() ) {
 				if ( buff->valid() ) {
 					push_back( buff );
-					LOG( Runtime, info ) << "Image " << size() << " with size " << buff->sizeToString() <<  " done.";
+					LOG( Runtime, info ) << "Image " << size() << " with size " << buff->getSizeAsString() <<  " done.";
 				} else {
 					LOG( Runtime, error )
 							<< "Cannot insert image. Missing properties: " << buff->getMissing();

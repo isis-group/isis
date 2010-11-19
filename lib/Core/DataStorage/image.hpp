@@ -67,7 +67,7 @@ private:
 		LOG_IF( set.empty(), Debug, error )
 				<< "Getting data from a empty image will result in undefined behavior.";
 		LOG_IF( !isInRange( idx ), Debug, isis::error )
-				<< "Index " << util::list2string( idx, idx + 4, "|" ) << " is out of range (" << sizeToString() << ")";
+				<< "Index " << util::list2string( idx, idx + 4, "|" ) << " is out of range (" << getSizeAsString() << ")";
 		const size_t index = getLinearIndex( idx );
 		return std::make_pair( index / chunkVolume, index % chunkVolume );
 	}

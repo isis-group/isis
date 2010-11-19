@@ -111,7 +111,7 @@ int main( int argc, char *argv[] )
 			std::cout
 					<< "Image sizes of " << files.front() << countStr << " and "
 					<< files.back() << countStr  << " differ:"
-					<< first.sizeToString() << "/" << second.sizeToString() << std::endl;
+					<< first.getSizeAsString() << "/" << second.getSizeAsString() << std::endl;
 			ret++;
 		} else {
 			size_t voxels = first.cmp( second );

@@ -152,7 +152,7 @@ bool SortedChunkList::insert( const Chunk &ch )
 
 		if ( first.sizeToVector() != ch.sizeToVector() ) { // if they have different size - do not insert
 			LOG( Debug, verbose_info )
-					<< "Ignoring chunk with different size. (" << ch.sizeToString() << "!=" << first.sizeToString() << ")";
+					<< "Ignoring chunk with different size. (" << ch.getSizeAsString() << "!=" << first.getSizeAsString() << ")";
 			return false;
 		}
 

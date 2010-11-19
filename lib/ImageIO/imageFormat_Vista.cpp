@@ -41,7 +41,7 @@ ImageFormat_Vista::write( const data::Image &image,
 						  const std::string &filename, const std::string &dialect )
 throw( std::runtime_error & )
 {
-	LOG( Debug, info ) << "Writing image of size " << image.sizeToString() << " and type " << util::getTypeMap()[image.typeID()] << " as vista";
+	LOG( Debug, info ) << "Writing image of size " << image.getSizeAsString() << " and type " << util::getTypeMap()[image.typeID()] << " as vista";
 	//  All vista images a organized in an attribue list. Let's create an empty one:
 	VAttrList attrList = VCreateAttrList();
 	//  One or more VImages need to be written to disk.
