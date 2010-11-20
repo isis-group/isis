@@ -16,3 +16,4 @@ target_link_libraries( propMapTest ${Boost_LIBRARIES} ${ISIS_LIB} ${ISIS_LIB_DEP
 target_link_libraries( singletonTest ${Boost_LIBRARIES} ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
 target_link_libraries( selectionTest ${Boost_LIBRARIES} ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
 target_link_libraries( istringTest ${Boost_LIBRARIES} ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
+
