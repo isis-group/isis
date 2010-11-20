@@ -39,8 +39,8 @@ Selection::operator const util::istring()const
 }
 Selection::operator const std::string()const
 {
-	util::istring buff=*this;
-	return std::string( buff.begin(),buff.end() );
+	util::istring buff = *this;
+	return std::string( buff.begin(), buff.end() );
 }
 
 bool Selection::set( const char *entry )
@@ -62,7 +62,7 @@ bool Selection::operator==( const Selection &ref )const
 }
 bool Selection::operator==( const char ref[] ) const
 {
-	return ((const util::istring&)*this ) == ref ;
+	return ( ( const util::istring & ) * this ) == ref ;
 }
 bool Selection::operator==( const int ref ) const
 {
@@ -73,7 +73,7 @@ bool Selection::operator==( const int ref ) const
 std::list<util::istring> Selection::getEntries()const
 {
 	std::list<util::istring> ret;
-	BOOST_FOREACH( MapType::const_reference ref, ent_map ){
+	BOOST_FOREACH( MapType::const_reference ref, ent_map ) {
 		ret.push_back( ref.first );
 	}
 	return ret;

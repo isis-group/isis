@@ -141,7 +141,7 @@ public:
 	///get the scaling (and offset) which would be used in an conversion to the given type
 	scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const;
 	scaling_pair getScalingTo( unsigned short typeID, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale )const;
-	
+
 
 	size_t bytes_per_voxel()const;
 	std::string typeName()const;
@@ -195,9 +195,8 @@ public:
 	 * depend on correct image orientations won't work as expected. Use this method
 	 * with caution!
 	 */
-	void transformCoords( boost::numeric::ublas::matrix<float> transform )
-	{
-		isis::data::_internal::transformCoords(*this,transform);
+	void transformCoords( boost::numeric::ublas::matrix<float> transform ) {
+		isis::data::_internal::transformCoords( *this, transform );
 	}
 
 	/**

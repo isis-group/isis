@@ -38,7 +38,7 @@ size_t TypePtrBase::cmp( const TypePtrBase &comp )const
 
 TypePtrBase::Reference TypePtrBase::copyToNewById( unsigned short id ) const
 {
-	return copyToNewById( id, getScalingTo(id));
+	return copyToNewById( id, getScalingTo( id ) );
 }
 TypePtrBase::Reference TypePtrBase::copyToNewById( unsigned short id, const scaling_pair &scaling ) const
 {
@@ -62,12 +62,13 @@ void TypePtrBase::copyRange( size_t start, size_t end, TypePtrBase &dst, size_t 
 	const size_t length = end - start + 1;
 	LOG_IF( ! dst.isSameType( *this ), Debug, error )
 			<< "Copying into a TypePtr of different type. Its " << dst.typeName() << " not " << typeName();
-	if(end >= len()){
+
+	if( end >= len() ) {
 		LOG( Runtime, error )
-			<< "End of the range (" << end << ") is behind the end of this TypePtr (" << len() << ")";
-	} else if(length + dst_start > dst.len()){
+				<< "End of the range (" << end << ") is behind the end of this TypePtr (" << len() << ")";
+	} else if( length + dst_start > dst.len() ) {
 		LOG( Runtime, error )
-			<< "End of the range (" << length + dst_start << ") is behind the end of the destination (" << dst.len() << ")";
+				<< "End of the range (" << length + dst_start << ") is behind the end of the destination (" << dst.len() << ")";
 	} else {
 		boost::shared_ptr<void> daddr = dst.address().lock();
 		boost::shared_ptr<void> saddr = address().lock();
@@ -91,18 +92,18 @@ scaling_pair TypePtrBase::getScalingTo( unsigned short typeID, autoscaleOption s
 scaling_pair TypePtrBase::getScalingTo( unsigned short typeID, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt )const
 {
 	const Converter &conv = getConverterTo( typeID );
-	
+
 	if ( conv ) {
-		return conv->getScaling(min, max, scaleopt);
+		return conv->getScaling( min, max, scaleopt );
 	} else {
 		LOG( Runtime, error )
-		<< "I dont know any conversion from " << util::MSubject( typeName() ) << " to " << util::MSubject( util::getTypeMap(false,true)[typeID] );
+				<< "I dont know any conversion from " << util::MSubject( typeName() ) << " to " << util::MSubject( util::getTypeMap( false, true )[typeID] );
 		return scaling_pair();
 	}
 }
 bool TypePtrBase::convertTo( TypePtrBase &dst )const
 {
-	return convertTo( dst, getScalingTo(dst.typeID()));
+	return convertTo( dst, getScalingTo( dst.typeID() ) );
 }
 bool TypePtrBase::convertTo( TypePtrBase &dst, const scaling_pair &scaling ) const
 {

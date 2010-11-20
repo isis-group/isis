@@ -361,7 +361,7 @@ template<class Predicate> struct PropMap::walkTree {
 // as well as PropMap::getProperty ...
 template<typename T> T PropMap::getProperty( const key_type &key ) const
 {
-	const mapped_type *entry = findEntry( util::istring(key) );
+	const mapped_type *entry = findEntry( util::istring( key ) );
 
 	if( entry ) {
 		const PropertyValue &ref = entry->getLeaf();

@@ -66,13 +66,13 @@ bool TypeBase::convert( const TypeBase &from, TypeBase &to )
 	return false;
 }
 
-bool TypeBase::fitsInto(short unsigned int id) const
+bool TypeBase::fitsInto( short unsigned int id ) const
 {
 	boost::scoped_ptr<TypeBase> to;
 	const Converter &conv = getConverterTo( id );
 
 	if ( conv ) {
-		return ( conv->generate( *this, to ) ==  boost::numeric::cInRange);
+		return ( conv->generate( *this, to ) ==  boost::numeric::cInRange );
 	} else {
 		LOG( Runtime, warning )
 				<< "I dont know any conversion from "

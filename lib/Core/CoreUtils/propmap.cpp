@@ -232,7 +232,7 @@ PropMap::diff_map PropMap::getDifference( const PropMap &other ) const
 	return ret;
 }
 
-void PropMap::diffTree( const PropMap& other, PropMap::diff_map& ret, istring prefix ) const
+void PropMap::diffTree( const PropMap &other, PropMap::diff_map &ret, istring prefix ) const
 {
 	const_iterator otherIt = other.begin();
 
@@ -433,7 +433,7 @@ void PropMap::addNeededFromString( const std::string &needed )
 	//@todo util::string2list<std::string>( needed,' ' ) would be faster but less robust
 	LOG( Debug, verbose_info ) << "Adding " << needed << " as needed";
 	BOOST_FOREACH( std::list<std::string>::const_reference ref, needList ) {
-		addNeeded( key_type(ref.c_str()) );
+		addNeeded( key_type( ref.c_str() ) );
 	}
 }
 

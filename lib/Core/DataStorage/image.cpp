@@ -63,7 +63,7 @@ Image &Image::operator=( const isis::data::Image &ref )
 bool Image::checkMakeClean()
 {
 	if ( ! clean ) {
-		LOG( Debug, info )	<< "Image is not clean. Running reIndex ...";
+		LOG( Debug, info )  << "Image is not clean. Running reIndex ...";
 
 		if( !reIndex() ) {
 			LOG( Runtime, error ) << "Reindexing failed -- undefined behavior ahead ...";
@@ -127,9 +127,9 @@ bool Image::reIndex()
 	//get indexOrigin from the geometrically first chunk
 	propertyValue( "indexOrigin" ) = first.propertyValue( "indexOrigin" );
 	//if there are many chunks, they must leave at least on dimension to the image to "sort" them in
-	const size_t timesteps=set.getHorizontalSize();
+	const size_t timesteps = set.getHorizontalSize();
 	const unsigned short sortDims = n_dims - ( timesteps > 1 ? 1 : 0 ); // dont use the uppermost dim, if the timesteps are already there
- 
+
 	if ( chunk_dims >= Image::n_dims ) {
 		if ( lookup.size() > 1 ) {
 			LOG( Runtime, error )
@@ -150,10 +150,12 @@ bool Image::reIndex()
 			assert( size[i] != 0 );
 		}
 	}
-	if (sortDims < n_dims) {//if there is a timedim (not all dims was used for geometric sort) 
-		assert(size[sortDims]==1);
-		size[sortDims]=timesteps; // fill the dim above the top geometric dim with the timesteps
+
+	if ( sortDims < n_dims ) { //if there is a timedim (not all dims was used for geometric sort)
+		assert( size[sortDims] == 1 );
+		size[sortDims] = timesteps; // fill the dim above the top geometric dim with the timesteps
 	}
+
 	assert( size.product() == lookup.size() );
 	//Clean up the properties
 	//@todo might fail if the image contains a prop that differs to that in the Chunks (which is equal in the chunks)
@@ -421,7 +423,7 @@ size_t Image::getChunkStride ( size_t base_stride )
 	//we didn't find any break, so we assume its a linear image |c c ... c|
 	LOG( Debug, info )
 			<< "No dimensional break found, assuming it to be at the end (" << lookup.size() << "/" << set.getHorizontalSize() << ")";
-	return lookup.size()/set.getHorizontalSize();
+	return lookup.size() / set.getHorizontalSize();
 }
 
 std::list<util::PropertyValue> Image::getChunksProperties( const util::PropMap::pname_type &key, bool unique )const
@@ -521,24 +523,24 @@ void Image::getMinMax ( util::TypeReference &min, util::TypeReference &max ) con
 	}
 }
 
-std::pair< util::TypeReference, util::TypeReference > Image::getScalingTo(short unsigned int targetID, autoscaleOption scaleopt) const
+std::pair< util::TypeReference, util::TypeReference > Image::getScalingTo( short unsigned int targetID, autoscaleOption scaleopt ) const
 {
-	LOG_IF(!clean,Runtime,error) << "You should run reIndex before running this";
-	util::TypeReference min,max;
-	getMinMax(min,max);
-	bool unique=true;
-	const std::vector<boost::shared_ptr<const Chunk> > chunks=getChunkList();
-	BOOST_FOREACH(const boost::shared_ptr<const Chunk> &ref, chunks){ //find a chunk which would be converted
-		if(targetID != ref->typeID()){
-			LOG_IF(ref->getScalingTo(targetID,*min,*max,scaleopt).first.empty() || ref->getScalingTo(targetID,*min,*max,scaleopt).second.empty(),Debug,error)
-				<< "Returning an invalid scaling. This is bad!";
-			return ref->getScalingTo(targetID,*min,*max,scaleopt); // and ask that for the scaling
+	LOG_IF( !clean, Runtime, error ) << "You should run reIndex before running this";
+	util::TypeReference min, max;
+	getMinMax( min, max );
+	bool unique = true;
+	const std::vector<boost::shared_ptr<const Chunk> > chunks = getChunkList();
+	BOOST_FOREACH( const boost::shared_ptr<const Chunk> &ref, chunks ) { //find a chunk which would be converted
+		if( targetID != ref->typeID() ) {
+			LOG_IF( ref->getScalingTo( targetID, *min, *max, scaleopt ).first.empty() || ref->getScalingTo( targetID, *min, *max, scaleopt ).second.empty(), Debug, error )
+					<< "Returning an invalid scaling. This is bad!";
+			return ref->getScalingTo( targetID, *min, *max, scaleopt ); // and ask that for the scaling
 		}
 	}
 	return std::make_pair( //ok seems like no conversion is needed - return 1/0
-			util::TypeReference(util::Type<uint8_t>(1)),
-			util::TypeReference(util::Type<uint8_t>(0))
-	);
+			   util::TypeReference( util::Type<uint8_t>( 1 ) ),
+			   util::TypeReference( util::Type<uint8_t>( 0 ) )
+		   );
 }
 
 size_t Image::cmp( const isis::data::Image &comp ) const
@@ -626,18 +628,19 @@ unsigned short Image::typeID() const
 {
 	unsigned int mytypeID = chunkPtrAt( 0 )->typeID();
 	size_t tmpBytesPerVoxel = 0;
-	util::TypeReference min,max;
-	getMinMax(min,max);
-	LOG(Debug,info) << "Determining  datatype of image with the value range " << min << " to " << max;
-	if(min->typeID() == max->typeID()){ // ok min and max are the same type - trivial case
+	util::TypeReference min, max;
+	getMinMax( min, max );
+	LOG( Debug, info ) << "Determining  datatype of image with the value range " << min << " to " << max;
+
+	if( min->typeID() == max->typeID() ) { // ok min and max are the same type - trivial case
 		return min->typeID()  << 8; // btw: we do the shift, because min and max are Type - but we want the id's TypePtr
-	} else if(min->fitsInto(max->typeID())){ // if min fits into the type of max, use that
+	} else if( min->fitsInto( max->typeID() ) ) { // if min fits into the type of max, use that
 		return max->typeID()  << 8; //@todo maybe use a global static function here instead of a obscure shit operation
-	} else if(max->fitsInto(min->typeID())){ // if max fits into the type of min, use that
+	} else if( max->fitsInto( min->typeID() ) ) { // if max fits into the type of min, use that
 		return min->typeID()  << 8;
 	} else {
-		LOG(Runtime,error) << "Sorry I dont know which datatype I should use. (" << min->typeName() << " or " << max->typeName() <<")";
-		throw(std::logic_error("type selection failed"));
+		LOG( Runtime, error ) << "Sorry I dont know which datatype I should use. (" << min->typeName() << " or " << max->typeName() << ")";
+		throw( std::logic_error( "type selection failed" ) );
 		return std::numeric_limits<unsigned char>::max();
 	}
 }
@@ -649,8 +652,7 @@ std::string Image::typeName() const
 bool Image::makeOfTypeId( short unsigned int id )
 {
 	// get value range of the image for the conversion
-	scaling_pair scale=getScalingTo(id);
-
+	scaling_pair scale = getScalingTo( id );
 	LOG( Debug, info ) << "Computed scaling of the original image data: [" << scale << "]";
 	bool retVal = true;
 	//we want all chunks to be of type id - so tell them
@@ -678,7 +680,7 @@ size_t Image::spliceDownTo( dimensions dim ) //readDim = 0, phaseDim, sliceDim, 
 		size[i] = 1;
 
 	// get a list of needed properties (everything which is missing in a newly created chunk plus everything which is needed for autosplice)
-	const std::list<util::PropMap::pname_type> splice_needed = util::string2list<util::PropMap::pname_type>( util::PropMap::pname_type("voxelSize,voxelGap,readVec,phaseVec,sliceVec,indexOrigin,acquisitionNumber"), ',' );
+	const std::list<util::PropMap::pname_type> splice_needed = util::string2list<util::PropMap::pname_type>( util::PropMap::pname_type( "voxelSize,voxelGap,readVec,phaseVec,sliceVec,indexOrigin,acquisitionNumber" ), ',' );
 	util::PropMap::key_list needed = MemChunk<short>( 1 ).getMissing();
 	needed.insert( splice_needed.begin(), splice_needed.end() );
 	struct splicer {

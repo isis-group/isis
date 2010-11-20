@@ -38,7 +38,7 @@ class DicomChunk : public data::Chunk
 				<< dat << " (" << data::TypePtr<TYPE>::staticName() << ")" ;
 	}
 	template<typename TYPE>
-	static data::Chunk *copyColor( TYPE** source, size_t width, size_t height ) {
+	static data::Chunk *copyColor( TYPE **source, size_t width, size_t height ) {
 		data::Chunk *ret = new data::MemChunk<util::color<TYPE> >( width, height );
 		data::TypePtr<util::color<TYPE> > &dest = ret->asTypePtr<util::color<TYPE> >();
 		const size_t pixels = dest.len();
@@ -102,10 +102,10 @@ public:
 					// if there are 3 planes data is actually an array of 3 pointers
 					switch ( pix->getRepresentation() ) {
 					case EPR_Uint8:
-						ret.reset( copyColor( ( Uint8** )data, width, height ) );
+						ret.reset( copyColor( ( Uint8 ** )data, width, height ) );
 						break;
 					case EPR_Uint16:
-						ret.reset( copyColor( ( Uint16** )data, width, height ) );
+						ret.reset( copyColor( ( Uint16 ** )data, width, height ) );
 						break;
 					default:
 						FileFormat::throwGenericError( "Unsupported datatype for color images" ); //@todo tell the user which datatype it is
@@ -137,7 +137,7 @@ const char ImageFormat_Dicom::unknownTagName[] = "Unknown Tag";
 
 std::string ImageFormat_Dicom::suffixes()const {return std::string( ".ima .dcm" );}
 std::string ImageFormat_Dicom::name()const {return "Dicom";}
-std::string ImageFormat_Dicom::dialects(const std::string &filename)const {return "withExtProtocols nomosaic";}
+std::string ImageFormat_Dicom::dialects( const std::string &filename )const {return "withExtProtocols nomosaic";}
 
 
 
@@ -149,7 +149,7 @@ ptime ImageFormat_Dicom::genTimeStamp( const date &date, const ptime &time )
 
 void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 {
-	const util::istring prefix = util::istring(ImageFormat_Dicom::dicomTagTreeName ) + "/";
+	const util::istring prefix = util::istring( ImageFormat_Dicom::dicomTagTreeName ) + "/";
 	/////////////////////////////////////////////////////////////////////////////////
 	// Transform known DICOM-Tags into default-isis-properties
 	/////////////////////////////////////////////////////////////////////////////////
@@ -162,7 +162,7 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 		if ( hasOrTell( prefix + "AcquisitionTime", object, warning ) and hasOrTell( prefix + "AcquisitionDate", object, warning ) ) {
 			const ptime acTime = genTimeStamp( object.getProperty<date>( prefix + "AcquisitionDate" ), object.getProperty<ptime>( prefix + "AcquisitionTime" ) );
 			const boost::posix_time::time_duration acDist = acTime - sequenceStart;
-			const float fAcDist = float( acDist.ticks()) / acDist.ticks_per_second() * 1000;
+			const float fAcDist = float( acDist.ticks() ) / acDist.ticks_per_second() * 1000;
 			LOG( Debug, verbose_info ) << "Computed acquisitionTime as " << fAcDist;
 			object.setProperty( "acquisitionTime", fAcDist );
 			object.remove( prefix + "AcquisitionTime" );
@@ -197,24 +197,20 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 		}
 
 		object.setProperty( "voxelSize", voxelSize );
-
 		transformOrTell<uint16_t>( prefix + "RepetitionTime", "repetitionTime", object, warning );
-
 		transformOrTell<float>( prefix + "EchoTime", "echoTime", object, warning );
-
 		transformOrTell<std::string>( prefix + "TransmitCoilName", "transmitCoil", object, warning );
-
 		transformOrTell<int16_t>( prefix + "FlipAngle", "flipAngle", object, warning );
 
 		if ( hasOrTell( prefix + "SpacingBetweenSlices", object, info ) ) {
-			if ( voxelSize[2] != invalid_float ){
-				object.setProperty( "voxelGap", util::fvector4(0,0,object.getProperty<float>( prefix + "SpacingBetweenSlices" ) - voxelSize[2]) );
+			if ( voxelSize[2] != invalid_float ) {
+				object.setProperty( "voxelGap", util::fvector4( 0, 0, object.getProperty<float>( prefix + "SpacingBetweenSlices" ) - voxelSize[2] ) );
 				object.remove( prefix + "SpacingBetweenSlices" );
 			} else
-				LOG(Runtime,warning)
-				<< "Cannot compute the voxel gap from the slice spacing ("
-				<< object.propertyValue(prefix + "SpacingBetweenSlices" )
-				<< "), because the slice thickness is not known";
+				LOG( Runtime, warning )
+						<< "Cannot compute the voxel gap from the slice spacing ("
+						<< object.propertyValue( prefix + "SpacingBetweenSlices" )
+						<< "), because the slice thickness is not known";
 		}
 	}
 	transformOrTell<std::string>   ( prefix + "PerformingPhysiciansName", "performingPhysician", object, info );
@@ -283,7 +279,6 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 	}
 
 	transformOrTell<u_int32_t>( prefix + "CSAImageHeaderInfo/UsedChannelMask", "coilChannelMask", object, info );
-
 	////////////////////////////////////////////////////////////////
 	// interpret DWI data
 	////////////////////////////////////////////////////////////////
@@ -315,9 +310,8 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 			}
 		}
 	}
-	//@todo fallback for GE/Philips
 
-	
+	//@todo fallback for GE/Philips
 	////////////////////////////////////////////////////////////////
 	// Do some sanity checks on redundant tags
 	////////////////////////////////////////////////////////////////
@@ -407,17 +401,18 @@ int ImageFormat_Dicom::readMosaic( data::Chunk source, data::ChunkList &dest )
 
 	//store and remove acquisitionTime
 	std::list<double> acqTimeList;
+
 	std::list<double>::const_iterator acqTimeIt;
 
 	bool haveAcqTimeList = source.hasProperty( prefix + "CSAImageHeaderInfo/MosaicRefAcqTimes" );
 
 	float acqTime = 0;
 
-	if( haveAcqTimeList ){
+	if( haveAcqTimeList ) {
 		acqTimeList = source.getProperty<std::list<double> >( prefix + "CSAImageHeaderInfo/MosaicRefAcqTimes" );
-		source.remove(prefix + "CSAImageHeaderInfo/MosaicRefAcqTimes");
+		source.remove( prefix + "CSAImageHeaderInfo/MosaicRefAcqTimes" );
 		acqTimeIt = acqTimeList.begin();
-		LOG(Debug,info)<< "The acquisition time offsets of the slices in the mosaic where " << acqTimeList;
+		LOG( Debug, info ) << "The acquisition time offsets of the slices in the mosaic where " << acqTimeList;
 	}
 
 	if( source.hasProperty( "acquisitionTime" ) ) {
@@ -486,11 +481,11 @@ int ImageFormat_Dicom::load( data::ChunkList &chunks, const std::string &filenam
 			const util::slist iType = chunk->getProperty<util::slist>( util::istring( ImageFormat_Dicom::dicomTagTreeName ) + "/" + "ImageType" );
 
 			if ( std::find( iType.begin(), iType.end(), "MOSAIC" ) != iType.end() ) { // if its a mosaic
-				if(dialect=="nomosaic"){
+				if( dialect == "nomosaic" ) {
 					LOG( Runtime, warning ) << "This seems to be an mosaic image, but dialect \"nomosaic\" was selected";
 					chunks.push_back( chunk );
 					return 1;
-				} else{
+				} else {
 					LOG( Runtime, verbose_info ) << "This seems to be an mosaic image, will decompose it";
 					return readMosaic( *chunk, chunks );
 				}
@@ -502,6 +497,7 @@ int ImageFormat_Dicom::load( data::ChunkList &chunks, const std::string &filenam
 	} else {
 		FileFormat::throwGenericError( std::string( "Failed to open file: " ) + loaded.text() );
 	}
+
 	return 0;
 }
 

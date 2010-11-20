@@ -91,12 +91,12 @@ public:
 		LOG_IF( src.len() > dst.len(), Debug, error ) << "The target is shorter than the the source (" << dst.len() << "<" << src.len() << "). Will only copy/convert " << dst.len() << " elements";
 		dstVal.copyFromMem( srcPtr, std::min( src.len(), dstVal.len() ) );
 	}
-	virtual scaling_pair getScaling(const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale)const{
+	virtual scaling_pair getScaling( const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale )const {
 		//as we're just copying - its 1/0
 		return std::make_pair(
-			util::TypeReference(util::Type<uint8_t>(1)),
-			util::TypeReference(util::Type<uint8_t>(0))
-		);
+				   util::TypeReference( util::Type<uint8_t>( 1 ) ),
+				   util::TypeReference( util::Type<uint8_t>( 0 ) )
+			   );
 	}
 	virtual ~TypePtrConverter() {}
 };
@@ -124,15 +124,15 @@ public:
 		return boost::shared_ptr<const TypePtrConverterBase>( ret );
 	}
 	void convert( const TypePtrBase &src, TypePtrBase &dst, const scaling_pair &scaling )const {
-		LOG_IF(scaling.first.empty() || scaling.first.empty(), Debug,error) << "Running conversion with invalid scaling (" << scaling << ") this won't work";
+		LOG_IF( scaling.first.empty() || scaling.first.empty(), Debug, error ) << "Running conversion with invalid scaling (" << scaling << ") this won't work";
 		numeric_convert( src.cast_to_TypePtr<SRC>(), dst.cast_to_TypePtr<DST>(), scaling.first->as<double>(), scaling.second->as<double>() );
 	}
-	scaling_pair getScaling(const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale)const{
-		const std::pair<double,double> scale=getNumericScaling<SRC,DST>(min,max,scaleopt);
+	scaling_pair getScaling( const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale )const {
+		const std::pair<double, double> scale = getNumericScaling<SRC, DST>( min, max, scaleopt );
 		return std::make_pair(
-			util::TypeReference(util::Type<double>(scale.first)),
-			util::TypeReference(util::Type<double>(scale.second))
-		);
+				   util::TypeReference( util::Type<double>( scale.first ) ),
+				   util::TypeReference( util::Type<double>( scale.second ) )
+			   );
 	}
 	virtual ~TypePtrConverter() {}
 };
@@ -171,10 +171,10 @@ struct outer_TypePtrConverter {
 
 TypePtrConverterMap::TypePtrConverterMap()
 {
-	#ifdef ISIS_USE_LIBOIL
-	LOG(Debug,info) << "Initializing liboil";
+#ifdef ISIS_USE_LIBOIL
+	LOG( Debug, info ) << "Initializing liboil";
 	oil_init();
-	#endif // ISIS_USE_LIBOIL
+#endif // ISIS_USE_LIBOIL
 	boost::mpl::for_each<util::_internal::types>( outer_TypePtrConverter( *this ) );
 	LOG( Debug, info )
 			<< "conversion map for " << size() << " array-types created";

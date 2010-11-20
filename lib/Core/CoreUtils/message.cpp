@@ -139,7 +139,7 @@ LogLevel MessageHandlerBase::m_stop_below = error;
 std::ostream *DefaultMsgPrint::o = &::std::cerr;
 void DefaultMsgPrint::commit( const _internal::Message &mesg )
 {
-	if(last.empty() || last !=mesg.str() ){
+	if( last.empty() || last != mesg.str() ) {
 		*o << mesg.m_module << ":" << _internal::logLevelNames( mesg.m_level );
 #ifndef NDEBUG //if with debug-info
 		*o << "[" << mesg.m_file.leaf() << ":" << mesg.m_line << "] "; //print the file and the line
@@ -148,7 +148,7 @@ void DefaultMsgPrint::commit( const _internal::Message &mesg )
 #endif //NDEBUG
 		*o << mesg.merge(); //print the message itself
 		*o << std::endl;
-		last=mesg.str();
+		last = mesg.str();
 	}
 }
 
