@@ -490,22 +490,19 @@ size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, isis::util::PropMap &map, co
 	return pos;
 }
 
-bool ImageFormat_Dicom::parseCSAValue( const std::string &val, const util::istring &name, const char *const vr, isis::util::PropMap &map )
+bool ImageFormat_Dicom::parseCSAValue( const std::string &val, const util::istring &name, const util::istring &vr, isis::util::PropMap &map )
 {
-	if ( strcasecmp( vr, "IS" ) == 0 or strcasecmp( vr, "SL" ) == 0 ) {
+	if ( vr == "IS" or vr == "SL" ) {
 		map.propertyValue( name ) = boost::lexical_cast<int32_t>( val );
-	} else if ( strcasecmp( vr, "UL" ) == 0 ) {
+	} else if ( vr == "UL" ) {
 		map.propertyValue( name ) = boost::lexical_cast<u_int32_t>( val );
-	} else if (
-		strcasecmp( vr, "CS" ) == 0 or
-		strcasecmp( vr, "LO" ) == 0 or strcasecmp( vr, "SH" ) == 0 or
-		strcasecmp( vr, "UN" ) == 0 or strcasecmp( vr, "ST" ) == 0 ) {
+	} else if (vr == "CS" or vr == "LO" or vr == "SH" or vr == "UN" or vr == "ST" ) {
 		map.propertyValue( name ) = val;
-	} else if ( strcasecmp( vr, "DS" ) == 0 or strcasecmp( vr, "FD" ) == 0 ) {
+	} else if ( vr == "DS" or vr == "FD" ) {
 		map.propertyValue( name ) = boost::lexical_cast<double>( val );
-	} else if ( strcasecmp( vr, "US" ) == 0 ) {
+	} else if ( vr == "US" ) {
 		map.propertyValue( name ) = boost::lexical_cast<u_int16_t>( val );
-	} else if ( strcasecmp( vr, "SS" ) == 0 ) {
+	} else if ( vr == "SS" ) {
 		map.propertyValue( name ) = boost::lexical_cast<int16_t>( val );
 	} else {
 		LOG( Runtime, error ) << "Dont know how to parse CSA entry " << std::make_pair( name, val ) << " type is " << util::MSubject( vr );
@@ -514,16 +511,15 @@ bool ImageFormat_Dicom::parseCSAValue( const std::string &val, const util::istri
 
 	return true;
 }
-bool ImageFormat_Dicom::parseCSAValueList( const util::slist &val, const util::istring &name, const char *const vr, isis::util::PropMap &map )
+bool ImageFormat_Dicom::parseCSAValueList( const util::slist &val, const util::istring &name, const util::istring &vr, isis::util::PropMap &map )
 {
-	if ( strcasecmp( vr, "IS" ) == 0 or strcasecmp( vr, "SL" ) == 0 or
-		 strcasecmp( vr, "US" ) == 0 or strcasecmp( vr, "SS" ) == 0 ) {
+	if ( vr == "IS" or vr == "SL" or vr == "US" or vr == "SS" ) {
 		map.propertyValue( name ) = util::list2list<int32_t>( val.begin(), val.end() );
-	} else if ( strcasecmp( vr, "UL" ) == 0 ) {
+	} else if ( vr == "UL" ) {
 		map.propertyValue( name ) = val; // @todo we dont have an unsigned int list
-	} else if ( strcasecmp( vr, "LO" ) == 0 or strcasecmp( vr, "SH" ) == 0 or strcasecmp( vr, "UN" ) == 0 or strcasecmp( vr, "ST" ) == 0 or strcasecmp( vr, "SL" ) == 0 ) {
+	} else if ( vr == "LO" or vr == "SH" or vr == "UN" or vr == "ST" or vr == "SL" ) {
 		map.propertyValue( name ) = val;
-	} else if ( strcasecmp( vr, "DS" ) == 0 or strcasecmp( vr, "FD" ) == 0 ) {
+	} else if ( vr == "DS" or vr == "FD" ) {
 		map.propertyValue( name ) = util::list2list<double>( val.begin(), val.end() );
 	} else {
 		LOG( Runtime, error ) << "Dont know how to parse CSA entry " << std::make_pair( name, val ) << " type is " << util::MSubject( vr );

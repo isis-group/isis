@@ -21,7 +21,11 @@
 #define IMAGEFORMAT_DICOM_HPP
 
 #include "DataStorage/io_interface.h"
-#include <dcmtk/config/cfunix.h> //@todo add switch for windows if needed
+#ifdef _WIN32 // workaround for broken dcmtk/config/osconfig.h
+#include <dcmtk/config/cfwin32.h>
+#else
+#include <dcmtk/config/cfunix.h> 
+#endif //_WIN32
 #include <dcmtk/dcmdata/dcfilefo.h>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
@@ -50,8 +54,8 @@ class ImageFormat_Dicom: public FileFormat
 		return ret;
 	}
 	static size_t parseCSAEntry( Uint8 *at, isis::util::PropMap &map, const std::string &dialect );
-	static bool parseCSAValue( const std::string &val, const util::istring &name, const char *const vr, isis::util::PropMap &map );
-	static bool parseCSAValueList( const isis::util::slist &val, const util::istring &name, const char *const vr, isis::util::PropMap &map );
+	static bool parseCSAValue( const std::string &val, const util::istring &name, const util::istring &vr, isis::util::PropMap &map );
+	static bool parseCSAValueList( const isis::util::slist &val, const util::istring &name, const util::istring &vr, isis::util::PropMap &map );
 	static int readMosaic( data::Chunk source, data::ChunkList &dest );
 protected:
 	std::string suffixes()const;
