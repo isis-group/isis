@@ -116,25 +116,22 @@ ADD_DEFINITIONS(-DDL_PREFIX="${CMAKE_SHARED_LIBRARY_PREFIX}")
 # RCS revision number
 ############################################################
 # Set the revision number if this dir is a svn working copy.
-# The revision number will be stored in RCS_REVISION.
-FIND_FILE(RCS_DESC_COMMAND git-describe
-	PATHS /usr/bin /usr/local/bin /usr/lib/git-core
-    DOC "The rcs revision description information tool.")
+# The revision number will be stored in GIT_REVISION.
+find_program(GIT_COMMAND git DOC "The rcs revision description information tool.")
 
-IF (NOT RCS_REVISION)
-	IF (RCS_DESC_COMMAND)
-		EXECUTE_PROCESS(COMMAND ${RCS_DESC_COMMAND} OUTPUT_VARIABLE OUT WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} OUTPUT_STRIP_TRAILING_WHITESPACE)
-		string(REGEX MATCH "[0-9]+-[^-]+$" RCS_REVISION "${OUT}") #@todo wont work with more complex revisions/modified sources
-		SET(RCS_REVISION ${RCS_REVISION})
-	else(RCS_DESC_COMMAND)
-		message(STATUS "No rcs command given")
-	ENDIF (RCS_DESC_COMMAND)
-ENDIF (NOT RCS_REVISION)
+IF (NOT GIT_REVISION)
+	IF (GIT_COMMAND)
+		EXECUTE_PROCESS(COMMAND ${GIT_COMMAND} describe OUTPUT_VARIABLE OUT WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} OUTPUT_STRIP_TRAILING_WHITESPACE)
+		string(REGEX MATCH "[0-9]+-[^-]+$" GIT_REVISION "${OUT}") #@todo wont work with more complex revisions/modified sources
+	else(GIT_COMMAND)
+		message(STATUS "git not found")
+	ENDIF (GIT_COMMAND)
+ENDIF (NOT GIT_REVISION)
 
-IF (RCS_REVISION)
-  MESSAGE(STATUS "RCS Revision: ${RCS_REVISION}")
-  ADD_DEFINITIONS(-DISIS_RCS_REVISION=${RCS_REVISION})
-ENDIF(RCS_REVISION)
+IF (GIT_REVISION)
+  MESSAGE(STATUS "RCS Revision: ${GIT_REVISION}")
+  ADD_DEFINITIONS(-DISIS_RCS_REVISION=${GIT_REVISION})
+ENDIF(GIT_REVISION)
 
 ############################################################
 # Build config
