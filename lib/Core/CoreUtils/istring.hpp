@@ -21,6 +21,7 @@
 #define UTIL_ISTRING_HPP
 
 #include <string>
+#include <locale>
 #include <boost/lexical_cast.hpp>
 
 namespace isis
@@ -30,6 +31,7 @@ namespace util
 namespace _internal
 {
 struct ichar_traits: public std::char_traits<char> {
+	static const std::locale loc;
 	static bool eq ( const char_type &c1, const char_type &c2 );
 	static bool lt ( const char_type &c1, const char_type &c2 );
 	static int compare ( const char_type *s1, const char_type *s2, std::size_t n );

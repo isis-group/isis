@@ -1,3 +1,7 @@
+#ifdef _MSC_VER
+#pragma warning(disable:4996)
+#endif
+
 #include <boost/foreach.hpp>
 #include <boost/filesystem.hpp>
 #include <iomanip>
@@ -113,7 +117,7 @@ std::list<std::string> FileFormat::makeUniqueFilenames( const data::ImageList &i
 
 		if( names[name] > 1 ) {
 			const unsigned short number = ++used_names[name];
-			const unsigned short length = ( uint16_t )log10( names[name] ) - ( uint16_t )log10( number );
+			const unsigned short length = ( uint16_t )log10( ( float )names[name] ) - ( uint16_t )log10( ( float )number );
 			const std::string snumber = std::string( length, '0' ) + boost::lexical_cast<std::string>( number );
 			const std::pair<std::string, std::string> splitted = makeBasename( name );
 			name = splitted.first + "_" + snumber + splitted.second;

@@ -12,6 +12,10 @@
 //
 //
 
+#ifdef _MSC_VER
+#pragma warning(disable:4996 4244)
+#endif
+
 #include "DataStorage/image.hpp"
 #include "CoreUtils/vector.hpp"
 #include <boost/foreach.hpp>
@@ -243,8 +247,8 @@ bool Image::reIndex()
 				util::fvector4 &voxelGap = propertyValue( "voxelGap" )->cast_to<util::fvector4>(); //if there is no voxelGap yet, we create it
 
 				if ( voxelGap[2] != inf ) {
-					if ( ! util::fuzzyEqual( voxelGap[2], sliceDist, 5e1 ) ) {
-						LOG_IF( ! util::fuzzyEqual( voxelGap[2], sliceDist, 5e1 ), Runtime, warning )
+					if ( ! util::fuzzyEqual( voxelGap[2], sliceDist, 50 ) ) {
+						LOG_IF( ! util::fuzzyEqual( voxelGap[2], sliceDist, 50 ), Runtime, warning )
 								<< "The existing slice distance (voxelGap[2]) " << util::MSubject( voxelGap[2] )
 								<< " differs from the distance between chunk 0 and 1, which is " << sliceDist;
 					}
@@ -271,7 +275,7 @@ bool Image::reIndex()
 
 		if ( hasProperty( "sliceVec" ) ) {
 			util::fvector4 &sliceVec = propertyValue( "sliceVec" )->cast_to<util::fvector4>(); //get the slice vector
-			LOG_IF( ! crossVec.fuzzyEqual( sliceVec, 1e3 ), Runtime, warning )
+			LOG_IF( ! crossVec.fuzzyEqual( sliceVec, 1000 ), Runtime, warning )
 					<< "The existing sliceVec " << sliceVec
 					<< " differs from the cross product of the read- and phase vector " << crossVec;
 		} else {

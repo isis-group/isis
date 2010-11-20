@@ -13,6 +13,10 @@
 #ifndef CORE_COMMON_HPP
 #define CORE_COMMON_HPP
 
+#ifdef _MSC_VER
+#define NOMINMAX 1
+#endif
+
 #include <utility>
 #include <ostream>
 #include <map>
@@ -27,6 +31,7 @@
 #include "log_modules.hpp"
 
 #ifdef _MSC_VER
+#include <Windows.h>
 typedef boost::int8_t   int8_t;
 typedef boost::int16_t  int16_t;
 typedef boost::int32_t  int32_t;
@@ -35,16 +40,16 @@ typedef boost::uint16_t uint16_t;
 typedef boost::uint32_t uint32_t;
 typedef boost::int64_t  int64_t;
 typedef boost::uint64_t uint64_t;
-#define DISABLE_WARN(NUM)   #pragma warning(disable:4244)
-#define DISABLE_WARN_LINE(NUM) #pragma warning(suppress:4996)
 #else
 #include <stdint.h>
-#define DISABLE_WARN(NUM)
-#define DISABLE_WARN_LINE(NUM)
 #endif
 
 namespace isis
 {
+#ifdef _MSC_VER
+// dear microsoft, if I 'ld mean "boost::mpl::size_t", I 'ld write "boost::mpl::size_t" *argl*
+typedef ::size_t size_t;
+#endif
 namespace util
 {
 
@@ -289,7 +294,6 @@ continousFind( ForwardIterator &current, const ForwardIterator end, const T &com
 {
 	return continousFind( current, end, compare, std::less<T>() );
 }
-
 }
 /// @endcond
 typedef CoreDebug Debug;

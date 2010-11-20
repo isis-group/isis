@@ -1,3 +1,7 @@
+#ifdef _WINDOWS
+#define ZLIB_WINAPI
+#endif
+
 #include "DataStorage/io_interface.h"
 #include "DataStorage/io_factory.hpp"
 #include "CoreUtils/tmpfile.h"
@@ -21,7 +25,7 @@ private:
 
 		for (
 			in.read( buf, 2048 * 1024 );
-			( len = in.gcount() );
+			( len = ( int )in.gcount() );
 			in.read( buf, 2048 * 1024 )
 		) {
 			if ( gzwrite( out, buf, len ) != len ) {
@@ -169,6 +173,8 @@ public:
 			}
 			chunks.insert( chunks.end(), buff.begin(), buff.end() );
 		}
+
+		return ret;
 	}
 
 	void write( const data::Image &image, const std::string &filename, const std::string &dialect )throw( std::runtime_error & ) {
