@@ -13,7 +13,7 @@ if [ $# -gt 1 ];then
 fi
 
 # check astyle installation
-ASTYLE_BIN=$(which astyle)
+ASTYLE_BIN="/tmp/astyle/build/gcc/bin/astyle"
 if [ ! ${ASTYLE_BIN} ];then
   echo -e "Artistic Style binary not found. Abort\nPlease install the 'astyle' package.";
   exit -1;

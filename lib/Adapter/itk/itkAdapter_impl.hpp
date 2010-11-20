@@ -248,13 +248,12 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	}
 
 	//TODO adopt conversion to the new interface
-	#warning conversion has changed
+#warning conversion has changed
 	boost::shared_ptr<data::Chunk >
 	tmpChunk ( new data::MemChunk< ITKRepn >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) ) ;
 	//we have to convert the datatype of retChunk to the desired TOutputISIS type to avoid autoscaling
-
 	boost::shared_ptr<data::Chunk > retChunk ( new data::MemChunk<ISISRepn>( imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) );
-	const data::scaling_pair scale=tmpChunk->getScalingTo(data::TypePtr<ISISRepn>::staticID, data::noscale);
+	const data::scaling_pair scale = tmpChunk->getScalingTo( data::TypePtr<ISISRepn>::staticID, data::noscale );
 	//
 	data::numeric_convert<ITKRepn, ISISRepn>(
 		tmpChunk->asTypePtr<ITKRepn>(),
@@ -296,9 +295,11 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 		//the size of the m_ChunkPropMapVector the size of the image was changed in itk.
 		//Thus we have to interpolate the parameters (sliceTime so far)
 		chRef->join( static_cast<util::PropMap &>( *retImage ), false );
+
 		if( chunkCounter < ( m_ChunkPropMapVector.size() - 1 ) ) {
 			chunkCounter++;
 		}
+
 		chRef->join( *m_ChunkPropMapVector[chunkCounter], false );
 	}
 	data::ImageList retList;

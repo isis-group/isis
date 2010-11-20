@@ -10,9 +10,15 @@
 #define STD_ITEM_HPP_
 
 
-namespace isis{ namespace python {
-void IndexError() { PyErr_SetString(PyExc_IndexError, "Index out of range");
-					LOG( Runtime, error) << "Index out of range"; }
+namespace isis
+{
+namespace python
+{
+void IndexError()
+{
+	PyErr_SetString( PyExc_IndexError, "Index out of range" );
+	LOG( Runtime, error ) << "Index out of range";
+}
 
 
 template<class T>
@@ -21,41 +27,40 @@ class std_list
 public:
 	typedef typename T::value_type V;
 
-	static void add(T &x, V const& v)
-	{
-		x.push_back(v);
+	static void add( T &x, V const &v ) {
+		x.push_back( v );
 	}
 
-	static V& get(T &x, int i)
-	{
-		if( i<0 ) i+=x.size();
-		if( i>=0 && i<x.size() ) {
+	static V &get( T &x, int i ) {
+		if( i < 0 ) i += x.size();
+
+		if( i >= 0 && i < x.size() ) {
 			typename T::iterator iter = x.begin();
-			std::advance(iter, i);
+			std::advance( iter, i );
 			return *iter;
 		}
+
 		IndexError();
 	}
-	static void set(T &x, int i, V const& v)
-	{
-		if( i<0 ) i+=x.size();
-		if( i>=0 && i<x.size() ) {
+	static void set( T &x, int i, V const &v ) {
+		if( i < 0 ) i += x.size();
+
+		if( i >= 0 && i < x.size() ) {
 			typename T::iterator iter = x.begin();
-			std::advance(iter, i);
+			std::advance( iter, i );
 			*iter = v;
-		}
-		else IndexError();
+		} else IndexError();
 	}
-	static void del(T &x, int i)
-	{
-		if( i<0 ) i+=x.size();
-		if( i>=0 && i<x.size() ) {
+	static void del( T &x, int i ) {
+		if( i < 0 ) i += x.size();
+
+		if( i >= 0 && i < x.size() ) {
 			typename T::iterator iter = x.begin();
-			std::advance(iter, i);
-			x.erase(iter);
-		}
-		else IndexError();
+			std::advance( iter, i );
+			x.erase( iter );
+		} else IndexError();
 	}
 };
-}}
+}
+}
 #endif /* STD_ITEM_HPP_ */

@@ -633,11 +633,11 @@ unsigned short Image::typeID() const
 	LOG( Debug, info ) << "Determining  datatype of image with the value range " << min << " to " << max;
 
 	if( min->typeID() == max->typeID() ) { // ok min and max are the same type - trivial case
-		return min->typeID()  << 8; // btw: we do the shift, because min and max are Type - but we want the id's TypePtr
+		return min->typeID() << 8; // btw: we do the shift, because min and max are Type - but we want the id's TypePtr
 	} else if( min->fitsInto( max->typeID() ) ) { // if min fits into the type of max, use that
-		return max->typeID()  << 8; //@todo maybe use a global static function here instead of a obscure shit operation
+		return max->typeID() << 8; //@todo maybe use a global static function here instead of a obscure shit operation
 	} else if( max->fitsInto( min->typeID() ) ) { // if max fits into the type of min, use that
-		return min->typeID()  << 8;
+		return min->typeID() << 8;
 	} else {
 		LOG( Runtime, error ) << "Sorry I dont know which datatype I should use. (" << min->typeName() << " or " << max->typeName() << ")";
 		throw( std::logic_error( "type selection failed" ) );

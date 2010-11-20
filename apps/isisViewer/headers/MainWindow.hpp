@@ -13,25 +13,27 @@
 #include "ViewControl.hpp"
 #include "Adapter/vtkAdapter.hpp"
 
-namespace isis {
+namespace isis
+{
 
-namespace viewer {
+namespace viewer
+{
 
 class MainWindow : public QMainWindow
 {
 	Q_OBJECT
 
 public:
-	MainWindow(  const util::slist&, QMainWindow *parent = 0 );
+	MainWindow(  const util::slist &, QMainWindow *parent = 0 );
 
 private:
 	Ui::isisViewer ui;
 	ViewControl m_Viewer;
 	void setUpGui( void );
-	void createAndSendImageMap( const util::slist& );
-	struct Slot{
+	void createAndSendImageMap( const util::slist & );
+	struct Slot {
 		MainWindow &parent;
-		Slot( MainWindow& p ) : parent( p ) {}
+		Slot( MainWindow &p ) : parent( p ) {}
 	};
 
 private Q_SLOTS:
@@ -42,21 +44,20 @@ Q_SIGNALS:
 	void clicked( bool );
 	void valueChanged( int );
 
-//slots
+	//slots
 private:
-	struct RefreshIntensityDisplay : Slot
-	{
-		RefreshIntensityDisplay( MainWindow& p ):Slot(p) {}
-		void operator() ( const size_t& );
-	}my_RefreshIntensityDisplay;
-	struct RefreshCoordsDisplay : Slot
-	{
-		RefreshCoordsDisplay( MainWindow &p ) : Slot(p) {}
-		void operator() ( const size_t&, const size_t&, const size_t&, const size_t& );
-	}my_RefreshCoordsDisplay;
+	struct RefreshIntensityDisplay : Slot {
+		RefreshIntensityDisplay( MainWindow &p ): Slot( p ) {}
+		void operator() ( const size_t & );
+	} my_RefreshIntensityDisplay;
+	struct RefreshCoordsDisplay : Slot {
+		RefreshCoordsDisplay( MainWindow &p ) : Slot( p ) {}
+		void operator() ( const size_t &, const size_t &, const size_t &, const size_t & );
+	} my_RefreshCoordsDisplay;
 };
 
 
-}} //end namespaces
+}
+} //end namespaces
 
 #endif /* MAINWINDOW_CPP_ */

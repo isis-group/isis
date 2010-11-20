@@ -53,7 +53,7 @@ public:
 	/**
 	* Gets a std::vector of vtkSmartpointers on vtkImageData objects.
 	*/
-	static std::vector<vtkSmartPointer<vtkImageData> >makeVtkImageObject( const boost::shared_ptr<data::Image>, ScalingType& );
+	static std::vector<vtkSmartPointer<vtkImageData> >makeVtkImageObject( const boost::shared_ptr<data::Image>, ScalingType & );
 private:
 protected:
 	//should not be loaded directly

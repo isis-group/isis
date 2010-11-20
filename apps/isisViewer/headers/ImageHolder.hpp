@@ -49,9 +49,11 @@
 #include <cmath>
 #include <vector>
 
-namespace isis {
+namespace isis
+{
 
-namespace viewer {
+namespace viewer
+{
 
 class ViewControl;
 
@@ -61,31 +63,31 @@ class ImageHolder
 public:
 	ImageHolder();
 
-	void setImages( util::PropMap, std::vector<vtkSmartPointer<vtkImageData> >);
+	void setImages( util::PropMap, std::vector<vtkSmartPointer<vtkImageData> > );
 	void setPtrToViewer( const boost::shared_ptr<ViewControl> ptr ) { m_PtrToViewer = ptr; }
 
-	void setReadVec( const isis::util::fvector4& read ) { m_readVec = read; }
-	void setPhaseVec( const isis::util::fvector4& phase ) { m_phaseVec = phase; }
-	void setSliceVec( const isis::util::fvector4& slice ) { m_sliceVec = slice; }
+	void setReadVec( const isis::util::fvector4 &read ) { m_readVec = read; }
+	void setPhaseVec( const isis::util::fvector4 &phase ) { m_phaseVec = phase; }
+	void setSliceVec( const isis::util::fvector4 &slice ) { m_sliceVec = slice; }
 
 	isis::util::fvector4 getReadVec() const { return m_readVec; }
 	isis::util::fvector4 getPhaseVec() const { return m_phaseVec; }
 	isis::util::fvector4 getSliceVec() const { return m_sliceVec; }
 
-	vtkImageData* getVTKImageData() const { return m_ImageVector[m_currentTimestep]; }
-	const util::PropMap& getISISImage() const { return m_PropMap; }
+	vtkImageData *getVTKImageData() const { return m_ImageVector[m_currentTimestep]; }
+	const util::PropMap &getISISImage() const { return m_PropMap; }
 
-	bool setSliceCoordinates (const int&, const int&, const int& );
-	void setCurrentTimeStep( const int& );
+	bool setSliceCoordinates ( const int &, const int &, const int & );
+	void setCurrentTimeStep( const int & );
 	void setPhysical( bool physical ) {
 		m_Physical = physical;
-		setCurrentTimeStep(m_currentTimestep);
+		setCurrentTimeStep( m_currentTimestep );
 	}
 	bool resetSliceCoordinates( void );
 
-	vtkActor* getActorAxial() const { return m_ActorAxial; }
-	vtkActor* getActorSagittal() const { return m_ActorSagittal; }
-	vtkActor* getActorCoronal() const { return m_ActorCoronal; }
+	vtkActor *getActorAxial() const { return m_ActorAxial; }
+	vtkActor *getActorSagittal() const { return m_ActorSagittal; }
+	vtkActor *getActorCoronal() const { return m_ActorCoronal; }
 	const int getCurrentTimeStep() const { return m_currentTimestep; }
 	const unsigned int getNumberOfTimesteps( void ) const { return m_TimeSteps; }
 	util::TypeReference getScalingFactor( void ) const { return m_ScalingFactor; }
@@ -135,5 +137,6 @@ private:
 
 };
 
-}}
+}
+}
 #endif /* IMAGEHOLDER_HPP_ */
