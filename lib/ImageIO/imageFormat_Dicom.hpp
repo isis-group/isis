@@ -21,7 +21,11 @@
 #define IMAGEFORMAT_DICOM_HPP
 
 #include "DataStorage/io_interface.h"
-#include <dcmtk/config/cfunix.h> //@todo add switch for windows if needed
+#ifdef _WIN32 // workaround for broken dcmtk/config/osconfig.h
+#include <dcmtk/config/cfwin32.h>
+#else
+#include <dcmtk/config/cfunix.h> 
+#endif //_WIN32
 #include <dcmtk/dcmdata/dcfilefo.h>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
