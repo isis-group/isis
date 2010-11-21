@@ -3,8 +3,6 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 PROJECT(ISIS_ADAPTER)
 
-SET(ISIS_INSTALL_INCLUDE_DIR ${CMAKE_INSTALL_PREFIX}/include/isis)
-
 ###########################################################
 # find and configure the isis core library
 ###########################################################
@@ -51,14 +49,11 @@ if(${CMAKE_PROJECT_NAME}_QT4)
 endif(${CMAKE_PROJECT_NAME}_QT4)
 
 # install adapter header files
-INSTALL(FILES ${ADAPTER_HDR_FILES}
-  DESTINATION ${ISIS_INSTALL_INCLUDE_DIR}/Adapter COMPONENT Development)
+INSTALL(FILES ${ADAPTER_HDR_FILES} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/isis/Adapter COMPONENT Development)
 
 # install helper header files
-INSTALL(FILES ${HELPER_HDR_FILES}
-  DESTINATION ${ISIS_INSTALL_INCLUDE_DIR}/extITK COMPONENT Development)
+INSTALL(FILES ${HELPER_HDR_FILES} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/isis/extITK COMPONENT Development)
   
 MESSAGE(STATUS "Targets: ${TARGETS}")
 
-INSTALL(TARGETS ${TARGETS}
-  LIBRARY DESTINATION  ${CMAKE_INSTALL_PREFIX}/lib COMPONENT RuntimeLibraries)
+INSTALL(TARGETS ${TARGETS} LIBRARY DESTINATION  ${CMAKE_INSTALL_PREFIX}/lib COMPONENT RuntimeLibraries)

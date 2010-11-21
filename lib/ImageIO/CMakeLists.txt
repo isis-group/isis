@@ -15,6 +15,14 @@ SET(ISIS_DIR /usr/share/isis/cmake CACHE PATH
 FIND_PACKAGE(ISIS REQUIRED)
 INCLUDE_DIRECTORIES(${ISIS_INCLUDE_DIRS})
 
+string(COMPARE EQUAL ${CMAKE_INSTALL_PREFIX} ${ISIS_INSTALL_PREFIX} PREFIX_IS_SAME)
+if(NOT ${PREFIX_IS_SAME})
+	message(SEND_ERROR
+		"Seems the your install prefix (${CMAKE_INSTALL_PREFIX}) is not the same as the prefix, which was used when the core library was built (${ISIS_INSTALL_PREFIX})."
+		"This will prevent this core library from finding the plugins you are building right now. Please use ${ISIS_INSTALL_PREFIX}"
+	)
+endif(NOT ${PREFIX_IS_SAME})
+
 # we use the log definitions of the core
 IF(ISIS_RUNTIME_LOG)
 	ADD_DEFINITIONS(-D_ENABLE_LOG=1)
@@ -158,7 +166,7 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM)
 	SET(TARGETS ${TARGETS} isisImageFormat_Dicom)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM)
 
-MESSAGE(STATUS "Installing following plugins to ${ISIS_PLUGIN_DIR}")
+MESSAGE(STATUS "Installing following plugins to ${CMAKE_INSTALL_PREFIX}/${ISIS_PLUGIN_INFIX}")
 
 foreach(PLUGIN ${TARGETS})
 	MESSAGE(STATUS " == ${PLUGIN}")
@@ -166,10 +174,11 @@ foreach(PLUGIN ${TARGETS})
 endforeach(PLUGIN)
 
 INSTALL(TARGETS ${TARGETS}
-  LIBRARY DESTINATION ${ISIS_PLUGIN_DIR} 
-  RUNTIME DESTINATION ${ISIS_PLUGIN_DIR} 
-  ARCHIVE DESTINATION ${ISIS_PLUGIN_DIR}
-  COMPONENT RuntimeLibraries)
+	LIBRARY DESTINATION ${ISIS_PLUGIN_INFIX} 
+	RUNTIME DESTINATION ${ISIS_PLUGIN_INFIX} 
+	ARCHIVE DESTINATION ${ISIS_PLUGIN_INFIX}
+	COMPONENT RuntimeLibraries
+)
 
 # uninstall target
 configure_file(

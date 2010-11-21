@@ -22,12 +22,7 @@ SET(${CMAKE_PROJECT_NAME}_VERSION
 ############################################################
 # Set ISIS install paths
 ############################################################
-SET(ISIS_INSTALL_BIN_DIR ${CMAKE_INSTALL_PREFIX}/bin)
-SET(ISIS_INSTALL_LIB_DIR ${CMAKE_INSTALL_PREFIX}/lib)
-SET(ISIS_INSTALL_INCLUDE_DIR ${CMAKE_INSTALL_PREFIX}/include/isis)
-IF(NOT ISIS_INSTALL_PLUGIN_DIR)
-  SET(ISIS_INSTALL_PLUGIN_DIR ${CMAKE_INSTALL_PREFIX}/share/isis/plugins)
-ENDIF(NOT ISIS_INSTALL_PLUGIN_DIR)
+SET(ISIS_PLUGIN_INFIX share/isis/plugins)
 
 ############################################################
 # check for liboil
@@ -94,7 +89,7 @@ INCLUDE_DIRECTORIES(.)
 # set the plugin directory and the system dependend shared
 # library naming conventions
 ############################################################
-ADD_DEFINITIONS(-DPLUGIN_PATH="${ISIS_INSTALL_PLUGIN_DIR}")
+ADD_DEFINITIONS(-DPLUGIN_PATH=" ${CMAKE_INSTALL_PREFIX}/${ISIS_PLUGIN_INFIX}")
 ADD_DEFINITIONS(-DDL_SUFFIX="${CMAKE_SHARED_LIBRARY_SUFFIX}")
 ADD_DEFINITIONS(-DDL_PREFIX="${CMAKE_SHARED_LIBRARY_PREFIX}")
 
@@ -220,7 +215,7 @@ if(ISIS_BUILD_DYNAMIC)
 	SET(LIBS isis_core ${LIBS})
 	ADD_LIBRARY( isis_core SHARED ${SRC_FILES} )
 	TARGET_LINK_LIBRARIES( isis_core ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} ${LibOil_LIBRARY})
-	SET_TARGET_PROPERTIES( isis_core PROPERTIES	${ISIS_BUILD_PROPERTIES} VERSION ${${CMAKE_PROJECT_NAME}_VERSION} INSTALL_NAME_DIR ${ISIS_INSTALL_LIB_DIR})
+	SET_TARGET_PROPERTIES( isis_core PROPERTIES	${ISIS_BUILD_PROPERTIES} VERSION ${${CMAKE_PROJECT_NAME}_VERSION} INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
 endif(ISIS_BUILD_DYNAMIC)
 
 if(ISIS_BUILD_STATIC)
@@ -240,23 +235,19 @@ INSTALL (TARGETS ${LIBS}
   ARCHIVE DESTINATION lib COMPONENT Development)
 
 # install header files
-INSTALL(FILES ${COREUTILS_HDR_FILES}
-  DESTINATION include/CoreUtils COMPONENT Development)
-
-INSTALL(FILES ${DATASTORAGE_HDR_FILES}
-  DESTINATION include/DataStorage COMPONENT Development)
+INSTALL(FILES ${COREUTILS_HDR_FILES} DESTINATION include/CoreUtils COMPONENT Development)
+INSTALL(FILES ${DATASTORAGE_HDR_FILES} DESTINATION include/DataStorage COMPONENT Development)
 
 # status messages
-MESSAGE(STATUS "/lib directory: " "${CMAKE_INSTALL_PREFIX}/lib")
-MESSAGE(STATUS "/include directory: " "${CMAKE_INSTALL_PREFIX}/include")
-MESSAGE(STATUS "/plugins directory: " ${ISIS_INSTALL_PLUGIN_DIR})
+MESSAGE(STATUS "/lib directory: ${CMAKE_INSTALL_PREFIX}/lib")
+MESSAGE(STATUS "/include directory: ${CMAKE_INSTALL_PREFIX}/include")
+MESSAGE(STATUS "/plugins directory: ${CMAKE_INSTALL_PREFIX}/${ISIS_PLUGIN_INFIX}")
 
 # write configuration file
 CONFIGURE_FILE(cmake/isis_corecfg.cmake.in ${CMAKE_BINARY_DIR}/ISISConfig.cmake @ONLY)
 
 # install cmake configuration files
-INSTALL(FILES ${CMAKE_BINARY_DIR}/ISISConfig.cmake
-  DESTINATION share/isis/cmake COMPONENT Development)
+INSTALL(FILES ${CMAKE_BINARY_DIR}/ISISConfig.cmake DESTINATION share/isis/cmake COMPONENT Development)
 
 # uninstall target
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake//cmake_uninstall.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake" IMMEDIATE @ONLY)
