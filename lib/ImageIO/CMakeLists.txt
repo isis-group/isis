@@ -35,6 +35,11 @@ OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL "Enable Null-IO plugin" ON)
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM "Enable Dicom-IO plugin" OFF)
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA "Enable Vista-IO plugin" OFF)
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ "Enable proxy plugin for compressed files" ON)
+OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_RAW "Enable plugin for raw data output" ON)
+
+#############################################################################################
+# nifti
+#############################################################################################
 
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI)
 	find_library(LIB_NIFTIIO niftiio)
@@ -48,6 +53,10 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI)
 
 	SET(TARGETS ${TARGETS} isisImageFormat_Nifti)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI)
+
+#############################################################################################
+# vista
+#############################################################################################
 
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA)
     # This code snipped was taken from the lipsia source package.
@@ -120,6 +129,9 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA)
         AND VIA_LIBRARY AND VIAIO_LIBRARY)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA)
 
+#############################################################################################
+# null io-plugin
+#############################################################################################
 
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL)
 	add_library(isisImageFormat_Null SHARED imageFormat_Null.cpp)
@@ -127,6 +139,10 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL)
 
 	SET(TARGETS ${TARGETS} isisImageFormat_Null)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL)
+
+#############################################################################################
+# gz proxy
+#############################################################################################
 
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ)
 	FIND_LIBRARY(LIB_Z "z")
@@ -139,6 +155,9 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ)
 	SET(TARGETS ${TARGETS} isisImageFormat_gz_proxy)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ)
 
+#############################################################################################
+# Dicom
+#############################################################################################
 
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM)
 	find_library(LIB_DCMIMGLE dcmimgle)
@@ -157,6 +176,12 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM)
 
 	SET(TARGETS ${TARGETS} isisImageFormat_Dicom)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM)
+
+if(${CMAKE_PROJECT_NAME}_IOPLUGIN_RAW)
+	add_library(isisImageFormat_raw SHARED imageFormat_raw.cpp)
+	target_link_libraries(isisImageFormat_raw ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
+	SET(TARGETS ${TARGETS} isisImageFormat_raw)
+endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_RAW)
 
 MESSAGE(STATUS "Installing following plugins to ${ISIS_PLUGIN_DIR}")
 

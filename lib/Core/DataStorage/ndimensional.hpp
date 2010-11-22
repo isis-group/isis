@@ -115,7 +115,7 @@ public:
 
 	/**
 	 * get amount of relevant dimensions (last dim with size>1)
-	 * e.g. on a slice (64x64x1x1) it will be 2
+	 * e.g. on a slice (1x64x1x1) it will be 2
 	 */
 	size_t relevantDims()const {
 		size_t ret = 0;
