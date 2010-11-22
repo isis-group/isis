@@ -1,3 +1,4 @@
+# -*- mode: cmake -*-
 # ISIS cmake configuration file
 #
 # This file declares the following variables:
@@ -10,13 +11,19 @@
 
 SET(ISIS_INSTALL_PREFIX @CMAKE_INSTALL_PREFIX@)
 SET(ISIS_LIB_DEPENDS  ${CMAKE_DL_LIBS} @Boost_LIBRARIES@)
-SET(ISIS_PLUGIN_DIR   @ISIS_INSTALL_PLUGIN_DIR@ )
-SET(ISIS_INCLUDE_DIRS @CMAKE_INSTALL_PREFIX@/include @Boost_INCLUDE_DIR@ )
+# If not given otherwise then use core plugin directory.
+# This enables isis core client applications to overwrite the
+# default plugin directory with a non-cached CMake variable given
+# at the command-line.
+IF(NOT ISIS_PLUGIN_DIR)
+    SET(ISIS_PLUGIN_DIR   @ISIS_INSTALL_PLUGIN_DIR@ )
+ENDIF(NOT ISIS_PLUGIN_DIR)
+SET(ISIS_INCLUDE_DIRS @ISIS_INSTALL_INCLUDE_DIR@ @Boost_INCLUDE_DIR@ )
 SET(ISIS_RUNTIME_LOG  @ISIS_CORE_RUNTIME_LOG@)
 SET(ISIS_DEBUG_LOG    @ISIS_CORE_DEBUG_LOG@)
 
 # search isis core library
-SET(CMAKE_PREFIX_PATH ${ISIS_INSTALL_PREFIX} ${CMAKE_PREFIX_PATH}) #make cmake first serch where we installed the core
+SET(CMAKE_PREFIX_PATH ${ISIS_INSTALL_PREFIX} ${CMAKE_PREFIX_PATH}) #make cmake first search where we installed the core
 FIND_LIBRARY(ISIS_LIB "isis_core")
 
 MESSAGE(STATUS "isis library: ${ISIS_LIB}")
