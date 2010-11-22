@@ -105,7 +105,7 @@ public:
 
 	/// generates a string representing the size
 	std::string sizeToString( std::string delim = "x" )const {
-		return util::list2string( dim, dim + DIMS, delim );
+		return util::list2string( dim, dim + DIMS, delim, "", "" );
 	}
 
 	/// generates a FixedVector\<DIMS\> representing the size
