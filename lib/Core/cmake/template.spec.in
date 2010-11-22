@@ -1,0 +1,115 @@
+# -*- mode:rpm-spec -*-
+# This is the rpm spec file template. 
+
+%define _topdir     @CMAKE_BINARY_DIR@/rpm
+%define name        libisiscore0
+%define release     1
+%define version     @ISIS_CORE_VERSION@
+%define buildroot   %{_topdir}/%{name}-%{version}
+%define _unpackaged_files_terminate_build 0
+
+BuildRoot:          %{buildroot}
+Summary:            The ISIS core library
+License:            GPL
+Name:               %{name}
+Version:            %{version}
+Release:            %{release}
+Source:             %{name}-%{version}.tar.gz
+Prefix:             /usr
+Group:              Development
+%description
+The ISIS package provides a general I/O framework for neuroimaging
+data.  Being started with fMRI data, it can handle several established data
+formats, like Nifti, Analyze, DICOM and vista. A first application based on this
+project is a data converter that allows an easy and unified handling of fMRI
+data from various MRI scanners. 
+
+This Package provides the core libraries needed by all applications that
+are build upon ISIS.
+
+
+# subpackages
+
+# Development files, this will create a %{name}-dev.rpm file
+%package dev
+Summary:            The header and static library files from the ISIS core library.
+Group:              Development
+Requires:	    %{name} >= %{version}
+%description dev
+The ISIS package provides a general I/O framework for neuroimaging
+data.  Being started with fMRI data, it can handle several established data
+formats, like Nifti, Analyze, DICOM and vista. A first application based on this
+project is a data converter that allows an easy and unified handling of fMRI
+data from various MRI scanners. 
+
+This Package provides the header and static library files needed to build software
+upon the ISIS core.
+
+
+%prep
+%setup -q
+
+%build
+mkdir release
+cd release
+cmake -DCMAKE_BUILD_TYPE=@CMAKE_BUILD_TYPE@ \
+    -DISIS_CORE_DEBUG_LOG=@ISIS_CORE_DEBUG_LOG@ \
+    -DBUILD_SHARED_LIBS=ON \
+    -DCMAKE_INSTALL_PREFIX=${RPM_BUILD_ROOT}/usr \
+    -DCMAKE_SKIP_RPATH=@CMAKE_SKIP_RPATH@ \
+    -DBOOST_INCLUDEDIR=@BOOST_INCLUDEDIR@ \
+    -DBOOST_LIBRARYDIR=@BOOST_LIBRARYDIR@ \
+    ..
+make
+
+%install
+cd release
+# since the ISISConfig.cmake script contains a temporary
+# install path prefix we need to do something -> remove 
+# ${RPM_BUILD_ROOT}-prefix from all path entries in 
+# ISISConfig.cmake
+sed "s/${RPM_BUILD_ROOT//\//\\/}//g" ISISConfig.cmake > tmp.cmake
+mv -f tmp.cmake ISISConfig.cmake
+make install
+
+%files
+%defattr(-,root,root)
+/usr/lib/libisis_core.so.0.2.0
+/usr/lib/libisis_core.so
+
+%files dev
+%defattr(-,root,root)
+/usr/include/isis/CoreUtils/application.hpp
+/usr/include/isis/CoreUtils/color.hpp
+/usr/include/isis/CoreUtils/common.hpp
+/usr/include/isis/CoreUtils/generic_type.hpp
+/usr/include/isis/CoreUtils/log.hpp
+/usr/include/isis/CoreUtils/log_modules.hpp
+/usr/include/isis/CoreUtils/message.hpp
+/usr/include/isis/CoreUtils/progparameter.hpp
+/usr/include/isis/CoreUtils/progressfeedback.hpp
+/usr/include/isis/CoreUtils/property.hpp
+/usr/include/isis/CoreUtils/propmap.hpp
+/usr/include/isis/CoreUtils/selection.hpp
+/usr/include/isis/CoreUtils/singletons.hpp
+/usr/include/isis/CoreUtils/tmpfile.h
+/usr/include/isis/CoreUtils/type.hpp
+/usr/include/isis/CoreUtils/type_base.hpp
+/usr/include/isis/CoreUtils/type_converter.hpp
+/usr/include/isis/CoreUtils/types.hpp
+/usr/include/isis/CoreUtils/vector.hpp
+/usr/include/isis/DataStorage/chunk.hpp
+/usr/include/isis/DataStorage/common.hpp
+/usr/include/isis/DataStorage/image.hpp
+/usr/include/isis/DataStorage/io_application.hpp
+/usr/include/isis/DataStorage/io_factory.hpp
+/usr/include/isis/DataStorage/io_interface.h
+/usr/include/isis/DataStorage/ndimensional.hpp
+/usr/include/isis/DataStorage/numeric_convert.hpp
+/usr/include/isis/DataStorage/sortedchunklist.hpp
+/usr/include/isis/DataStorage/typeptr.hpp
+/usr/include/isis/DataStorage/typeptr_base.hpp
+/usr/include/isis/DataStorage/typeptr_converter.hpp
+/usr/lib/libisis_core.a
+/usr/share/isis/cmake/ISISConfig.cmake
+

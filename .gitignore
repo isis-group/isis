@@ -3,6 +3,13 @@
 files
 *.log
 *.substvars
+# cmake build dirs
+release/
+Release/
+debug/
+Debug/
+build/
+Build/
 
 #Packaging##############################
 lib/Core/debian/tmp/
