@@ -105,7 +105,7 @@ public:
 
 	/// generates a string representing the size
 	std::string sizeToString( std::string delim = "x" )const {
-		return util::list2string( dim, dim + DIMS, delim );
+		return util::list2string( dim, dim + DIMS, delim, "", "" );
 	}
 
 	/// generates a FixedVector\<DIMS\> representing the size
@@ -115,7 +115,7 @@ public:
 
 	/**
 	 * get amount of relevant dimensions (last dim with size>1)
-	 * e.g. on a slice (64x64x1x1) it will be 2
+	 * e.g. on a slice (1x64x1x1) it will be 2
 	 */
 	size_t relevantDims()const {
 		size_t ret = 0;
