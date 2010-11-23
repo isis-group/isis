@@ -83,7 +83,7 @@ void ImageHolder::setUpPipe()
 		m_ActorAxial->SetPosition( m_pseudoOrigin[0], m_pseudoOrigin[1], m_pseudoOrigin[2] );
 	} else {
 		m_ActorAxial->SetUserMatrix( m_MatrixHandler.getAxialMatrix() );
-		m_ActorAxial->SetPosition( m_transformedOrigin[0] * 2, m_transformedOrigin[1] * 2, m_transformedOrigin[2] * 2 );
+// 		m_ActorAxial->SetPosition( m_transformedOrigin[0] * 2, m_transformedOrigin[1] * 2, m_transformedOrigin[2] * 2 );
 	}
 
 	//sagittal
@@ -98,7 +98,7 @@ void ImageHolder::setUpPipe()
 		m_ActorSagittal->SetPosition( m_pseudoOrigin[0], m_pseudoOrigin[1], m_pseudoOrigin[2] );
 	} else {
 		m_ActorSagittal->SetUserMatrix( m_MatrixHandler.getSagittalMatrix() );
-		m_ActorSagittal->SetPosition( m_transformedOrigin[0], m_transformedOrigin[1], m_transformedOrigin[2] );
+// 		m_ActorSagittal->SetPosition( m_transformedOrigin[0], m_transformedOrigin[1], m_transformedOrigin[2] );
 	}
 
 	//coronal
@@ -114,7 +114,7 @@ void ImageHolder::setUpPipe()
 		m_ActorCoronal->SetPosition( m_pseudoOrigin[0], m_pseudoOrigin[1], m_pseudoOrigin[2] );
 	} else {
 		m_ActorCoronal->SetUserMatrix( m_MatrixHandler.getCoronalMatrix() );
-		m_ActorCoronal->SetPosition( m_transformedOrigin[0], m_transformedOrigin[1], m_transformedOrigin[2] );
+// 		m_ActorCoronal->SetPosition( m_transformedOrigin[0], m_transformedOrigin[1], m_transformedOrigin[2] );
 	}
 }
 

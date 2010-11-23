@@ -65,7 +65,7 @@ public:
 	ViewControl();
 	void init( QVTKWidget *axial, QVTKWidget *sagittal, QVTKWidget *coronal );
 	void resetCam();
-	void sliceChanged( const int &, const int &, const int &, const double* );
+	void sliceChanged( const int &, const int &, const int & );
 	void displayIntensity( const int &, const int &, const int & );
 	void addImages( const ImageMapType & );
 	void UpdateWidgets();
@@ -77,7 +77,6 @@ public:
 	vtkSmartPointer<vtkImageData> getCurrentVTKImagePtr( void ) const { return m_CurrentImagePtr; }
 	boost::shared_ptr<ImageHolder> getCurrentImageHolder( void ) const { return m_CurrentImageHolder; }
 	std::vector<boost::shared_ptr< ImageHolder > > getImageHolderVector( void ) const { return m_ImageHolderVector; }
-	
 
 	struct Signals {
 		boost::signal< void ( const size_t & )> intensityChanged;
@@ -91,9 +90,13 @@ private:
 	boost::shared_ptr<ImageHolder> m_CurrentImageHolder;
 	std::vector< boost::shared_ptr< ImageHolder > > m_ImageHolderVector;
 
+	//these are the renderers responsible for holding all the images
 	vtkSmartPointer<vtkRenderer> m_RendererAxial;
 	vtkSmartPointer<vtkRenderer> m_RendererSagittal;
 	vtkSmartPointer<vtkRenderer> m_RendererCoronal;
+	//the TopRenderer are responsible for holding the reticle
+	vtkSmartPointer<vtkRenderer> m_TopRendererAxial;
+	vtkSmartPointer<vtkRenderer> m_TopRendererSagittal;
 	vtkSmartPointer<vtkRenderer> m_TopRendererCoronal;
 	
 	vtkSmartPointer<vtkRenderWindow> m_WindowAxial;
