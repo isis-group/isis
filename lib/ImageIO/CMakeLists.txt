@@ -39,12 +39,14 @@ OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ "Enable proxy plugin for compressed fil
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI)
 	find_library(LIB_NIFTIIO niftiio)
 	find_library(LIB_ZNZ znz)
+	find_library(LIB_Z z)
+
 	find_path(INCPATH_NIFTI "nifti1_io.h" PATH_SUFFIXES "nifti")
 	find_path(INCPATH_ZNZ "znzlib.h" PATH_SUFFIXES "nifti")
 
 	include_directories(${INCPATH_NIFTI} ${INCPATH_ZNZ})
 	add_library(isisImageFormat_Nifti SHARED imageFormat_Nifti.cpp)
-	target_link_libraries(isisImageFormat_Nifti ${LIB_NIFTIIO} ${LIB_ZNZ} ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
+	target_link_libraries(isisImageFormat_Nifti ${LIB_NIFTIIO} ${LIB_ZNZ} ${LIB_Z} ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
 
 	SET(TARGETS ${TARGETS} isisImageFormat_Nifti)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI)
