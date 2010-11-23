@@ -273,8 +273,8 @@ INSTALL(FILES ${DATASTORAGE_HDR_FILES}
   DESTINATION include/DataStorage COMPONENT Development)
 
 # status messages
-MESSAGE(STATUS "/lib directory: " "${CMAKE_INSTALL_PREFIX}/lib")
-MESSAGE(STATUS "/include directory: " "${CMAKE_INSTALL_PREFIX}/include")
+MESSAGE(STATUS "/lib directory: " ${ISIS_INSTALL_LIB_DIR})
+MESSAGE(STATUS "/include directory: " ${ISIS_INSTALL_INCLUDE_DIR})
 MESSAGE(STATUS "/plugins directory: " ${ISIS_INSTALL_PLUGIN_DIR})
 
 # write configuration file
