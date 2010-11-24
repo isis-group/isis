@@ -197,7 +197,7 @@ template<typename TARGET> std::list<TARGET> string2list(
  */
 //@todo test
 template<typename TARGET, typename charT, typename traits> std::list<TARGET>
-string2list( const std::basic_string<charT, traits> &source,  char separator )
+string2list( const std::basic_string<charT, traits> &source,  charT separator )
 {
 	std::list<TARGET> ret;
 
