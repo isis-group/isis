@@ -34,14 +34,14 @@ protected:
 	 * If the property doesn't exist a message will be sent to Log using the given loglevel.
 	 * \returns object.hasProperty(name)
 	 */
-	static bool hasOrTell( const std::string &name, const util::PropMap &object, LogLevel level );
+	static bool hasOrTell( const util::PropMap::pname_type &name, const util::PropMap &object, LogLevel level );
 	/**
 	 * Transform a given property into another and remove the original in the given PropMap.
 	 * If the property doesn't exist a message will be sent to Log using the given loglevel.
 	 * \returns true if the property existed and was transformed.
 	 */
 	template<typename TYPE> static bool
-	transformOrTell( const std::string &from, const std::string &to, util::PropMap &object, LogLevel level ) {
+	transformOrTell( const util::PropMap::pname_type &from, const util::PropMap::pname_type &to, util::PropMap &object, LogLevel level ) {
 		if ( hasOrTell( from, object, level ) and object.transform<TYPE>( from, to ) ) {
 			LOG( Debug, verbose_info ) << "Transformed " << from << " into " << object.propertyValue( to );
 			return true;

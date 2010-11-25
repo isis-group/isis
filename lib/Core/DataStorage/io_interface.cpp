@@ -1,3 +1,7 @@
+#ifdef _MSC_VER
+#pragma warning(disable:4996)
+#endif
+
 #include <boost/foreach.hpp>
 #include <boost/filesystem.hpp>
 #include <iomanip>
@@ -33,7 +37,7 @@ void FileFormat::write( const isis::data::ImageList &images, const std::string &
 	}
 }
 
-bool FileFormat::hasOrTell( const std::string &name, const isis::util::PropMap &object, isis::LogLevel level )
+bool FileFormat::hasOrTell( const util::PropMap::pname_type &name, const isis::util::PropMap &object, isis::LogLevel level )
 {
 	if ( object.hasProperty( name ) ) {
 		return true;
@@ -86,12 +90,12 @@ std::string FileFormat::makeFilename( const util::PropMap &props, std::string na
 	boost::match_results<std::string::iterator> what;
 
 	while( boost::regex_search( namePattern.begin(), namePattern.end() , what, reg ) ) {
-		const std::string prop = what[0].str().substr( 1, what.length() - 2 );
+		const util::PropMap::pname_type prop( what[0].str().substr( 1, what.length() - 2 ).c_str() );
 
 		if( props.hasProperty( prop ) ) {
 			namePattern.replace( what[0].first, what[0].second, props.getProperty<std::string>( prop ) );
 			LOG( Debug, info )
-					<< "Replacing " << util::MSubject( std::string( "{" ) + prop + "}" ) << " by "  << util::MSubject( props.getProperty<std::string>( prop ) )
+					<< "Replacing " << util::MSubject( util::PropMap::pname_type( "{" ) + prop + "}" ) << " by "    << util::MSubject( props.getProperty<std::string>( prop ) )
 					<< " the string is now " << util::MSubject( namePattern );
 		} else {
 			LOG( Runtime, warning ) << "The property " << util::MSubject( prop ) << " does not exist - ignoring it";
@@ -113,7 +117,7 @@ std::list<std::string> FileFormat::makeUniqueFilenames( const data::ImageList &i
 
 		if( names[name] > 1 ) {
 			const unsigned short number = ++used_names[name];
-			const unsigned short length = ( uint16_t )log10( names[name] ) - ( uint16_t )log10( number );
+			const unsigned short length = ( uint16_t )log10( ( float )names[name] ) - ( uint16_t )log10( ( float )number );
 			const std::string snumber = std::string( length, '0' ) + boost::lexical_cast<std::string>( number );
 			const std::pair<std::string, std::string> splitted = makeBasename( name );
 			name = splitted.first + "_" + snumber + splitted.second;

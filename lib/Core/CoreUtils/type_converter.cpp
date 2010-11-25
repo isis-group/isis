@@ -17,6 +17,10 @@
 
 */
 
+#ifdef _MSC_VER
+#pragma warning(disable:4800 4996)
+#endif
+
 #include "CoreUtils/type_converter.hpp"
 #include "CoreUtils/type_base.hpp"
 #include "CoreUtils/type.hpp"
@@ -27,6 +31,7 @@
 // @todo we need to know this for lexical_cast (toString)
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+
 
 /// @cond _internal
 namespace isis

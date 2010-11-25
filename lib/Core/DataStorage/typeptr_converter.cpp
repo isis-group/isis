@@ -17,6 +17,10 @@
 
 */
 
+#ifdef _MSC_VER
+#pragma warning(disable:4800 4996)
+#endif
+
 #include "DataStorage/typeptr_converter.hpp"
 
 // #include "type_converter.hpp"
