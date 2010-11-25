@@ -111,7 +111,7 @@ typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkRea
 	typedef TOutput OutputImageType;
 	typedef itk::ImportImageFilter<typename InputImageType::PixelType, OutputImageType::ImageDimension> MyImporterType;
 	typedef itk::RescaleIntensityImageFilter<InputImageType, OutputImageType> MyRescaleType;
-	typedef std::set<std::string, isis::util::_internal::caselessStringLess> PropKeyListType;
+	typedef std::set<util::ilist> PropKeyListType;
 	typename MyImporterType::Pointer importer = MyImporterType::New();
 	typename MyRescaleType::Pointer rescaler = MyRescaleType::New();
 	typename OutputImageType::Pointer outputImage = OutputImageType::New();
