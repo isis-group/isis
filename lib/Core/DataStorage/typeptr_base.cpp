@@ -1,3 +1,6 @@
+#ifdef _MSC_VER
+#define NOMINMAX 1
+#endif
 
 #include "DataStorage/typeptr_base.hpp"
 #include "DataStorage/typeptr_converter.hpp"
@@ -70,8 +73,8 @@ void TypePtrBase::copyRange( size_t start, size_t end, TypePtrBase &dst, size_t 
 		LOG( Runtime, error )
 				<< "End of the range (" << length + dst_start << ") is behind the end of the destination (" << dst.len() << ")";
 	} else {
-		boost::shared_ptr<void> daddr = dst.address().lock();
-		boost::shared_ptr<void> saddr = address().lock();
+		boost::shared_ptr<void> daddr = dst.getRawAddress().lock();
+		boost::shared_ptr<void> saddr = getRawAddress().lock();
 		const size_t soffset = bytes_per_elem() * start; //source offset in bytes
 		const int8_t *const  src = ( int8_t * )saddr.get();
 		const size_t doffset = bytes_per_elem() * dst_start;//destination offset in bytes
@@ -120,14 +123,14 @@ bool TypePtrBase::convertTo( TypePtrBase &dst, const scaling_pair &scaling ) con
 }
 size_t TypePtrBase::use_count() const
 {
-	return address().use_count();
+	return getRawAddress().use_count();
 }
 
 
 bool TypePtrBase::swapAlong( TypePtrBase &dst, const size_t dim, const size_t dims[]  ) const
 {
-	boost::shared_ptr<void> daddr = dst.address().lock();
-	boost::shared_ptr<void> saddr = address().lock();
+	boost::shared_ptr<void> daddr = dst.getRawAddress().lock();
+	boost::shared_ptr<void> saddr = getRawAddress().lock();
 	const int8_t *const  src = ( int8_t * )saddr.get();
 	int8_t *const dest = ( int8_t * )daddr.get();
 

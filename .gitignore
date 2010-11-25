@@ -1,10 +1,10 @@
-*.cproject
-*.project
 *~
 *.kdev4
 files
 *.log
 *.substvars
+
+#Packaging##############################
 lib/Core/debian/tmp/
 obj-x86_64-linux-gnu/
 stamp-makefile-build
@@ -12,3 +12,70 @@ lib/Core/debian/libisiscore0/
 lib/Core/debian/libisiscore0.postrm.debhelper
 lib/Core/debian/libisiscore0.postinst.debhelper
 lib/Core/debian/libisiscore0-dev/
+
+#Windows################################
+# Windows image file caches
+Thumbs.db 
+# Folder config file
+Desktop.ini
+
+#MacOS##################################
+.DS_Store
+Icon?
+# Thumbnails
+._*
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
+#C++####################################
+# Compiled Object files
+*.slo
+*.lo
+*.o
+# Compiled Dynamic libraries
+*.so
+*.dll
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+#CMake##################################
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+build/
+
+#VStudio#################################
+# User-specific files
+*.suo
+*.user
+# Build results
+Debug/
+Release/
+*.ncb
+*.aps
+*.obj
+.builds
+
+#eclipse##################################
+*.pydevproject
+.project
+.metadata
+bin/**
+tmp/**
+tmp/**/*
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.classpath
+.settings/
+.loadpath
+# CDT-specific
+.cproject

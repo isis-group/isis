@@ -168,7 +168,7 @@ public:
 
 		// don't forget to take the properties with
 		copyHeaderFromNifti( *retChunk, *ni );
-		//      if ( !strcasecmp( dialect.c_str(), "spm" ) )
+		//      if ( dialect == "spm" )
 		//      {
 		//          boost::shared_ptr<data::MemChunk<int16_t> >
 		//              dst( new data::MemChunk<int16_t>( ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ) ) ;
@@ -185,7 +185,8 @@ public:
 	/***********************
 	 * write file
 	 ************************/
-	void write( const data::Image &imageOrig, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) {
+	void write( const data::Image &imageOrig, const std::string &filename, const std::string &sdialect ) throw( std::runtime_error & ) {
+		const util::istring dialect( sdialect.begin(), sdialect.end() );
 		LOG( Debug, info ) << "Writing image of size " << imageOrig.sizeToString() << " and type " << imageOrig.typeName() << " as nifti";
 		boost::filesystem::path boostFilename( filename );
 		//copy of our image due to changing it by transformCoords
@@ -227,7 +228,7 @@ public:
 		}
 
 		// FSL compatibility
-		if ( strcasecmp( dialect.c_str(), "fsl" ) ) {
+		if ( dialect != "fsl" ) { //@todo wtf ? shouldn't that be ==
 			//  stuffFslCompatibility(image, ni);
 		}
 
@@ -238,7 +239,7 @@ public:
 		switch ( image.typeID() ) {
 		case data::TypePtr<int8_t>::staticID:
 
-			if ( 0 == strcasecmp( dialect.c_str(), "fsl" ) ) { // fsl not compatible with int8, convert to uint8
+			if ( dialect == "fsl" ) { // fsl not compatible with int8, convert to uint8
 				data::TypedImage<u_int8_t> fslCopy( image );
 				ni.datatype = DT_UINT8;
 				copyDataToNifti<u_int8_t>( fslCopy, ni );
@@ -258,7 +259,7 @@ public:
 			break;
 		case data::TypePtr<u_int16_t>::staticID:
 
-			if ( 0 == strcasecmp( dialect.c_str(), "fsl" ) ) {
+			if ( dialect == "fsl" ) {
 				//              image.print( std::cout );
 				data::TypedImage<int16_t> fslCopy( image );
 				ni.datatype = DT_INT16;
@@ -275,7 +276,7 @@ public:
 			break;
 		case data::TypePtr<u_int32_t>::staticID:
 
-			if ( 0 == strcasecmp( dialect.c_str(), "fsl" ) ) {
+			if ( dialect == "fsl" ) {
 				data::TypedImage<int32_t> fslCopy( image );
 				ni.datatype = DT_INT32;
 				copyDataToNifti<int32_t>( image, ni );

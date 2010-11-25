@@ -12,6 +12,10 @@
 //
 //
 
+#ifdef _MSC_VER
+#pragma warning(disable:4996 4244)
+#endif
+
 #include "DataStorage/image.hpp"
 #include "CoreUtils/vector.hpp"
 #include <boost/foreach.hpp>
@@ -160,7 +164,7 @@ bool Image::reIndex()
 	//Clean up the properties
 	//@todo might fail if the image contains a prop that differs to that in the Chunks (which is equal in the chunks)
 	util::PropMap common;
-	std::set<std::string> uniques;
+	util::PropMap::key_list uniques;
 	first.toCommonUnique( common, uniques, true );
 
 	for ( size_t i = 1; i < chunks; i++ ) {
@@ -186,8 +190,8 @@ bool Image::reIndex()
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	//reconstruct some redundant information, if its missing
 	//////////////////////////////////////////////////////////////////////////////////////////////////
-	const std::string vectors[] = {"readVec", "phaseVec", "sliceVec"};
-	BOOST_FOREACH( const std::string & ref, vectors ) {
+	const util::PropMap::pname_type vectors[] = {"readVec", "phaseVec", "sliceVec"};
+	BOOST_FOREACH( const util::PropMap::pname_type & ref, vectors ) {
 		if ( hasProperty( ref ) ) {
 			util::PropertyValue &prop = propertyValue( ref );
 			LOG_IF( !prop->is<util::fvector4>(), Debug, error ) << "Using " << prop->typeName() << " as " << util::Type<util::fvector4>::staticName();
@@ -243,8 +247,8 @@ bool Image::reIndex()
 				util::fvector4 &voxelGap = propertyValue( "voxelGap" )->cast_to<util::fvector4>(); //if there is no voxelGap yet, we create it
 
 				if ( voxelGap[2] != inf ) {
-					if ( ! util::fuzzyEqual( voxelGap[2], sliceDist, 5e1 ) ) {
-						LOG_IF( ! util::fuzzyEqual( voxelGap[2], sliceDist, 5e1 ), Runtime, warning )
+					if ( ! util::fuzzyEqual( voxelGap[2], sliceDist, 50 ) ) {
+						LOG_IF( ! util::fuzzyEqual( voxelGap[2], sliceDist, 50 ), Runtime, warning )
 								<< "The existing slice distance (voxelGap[2]) " << util::MSubject( voxelGap[2] )
 								<< " differs from the distance between chunk 0 and 1, which is " << sliceDist;
 					}
@@ -271,7 +275,7 @@ bool Image::reIndex()
 
 		if ( hasProperty( "sliceVec" ) ) {
 			util::fvector4 &sliceVec = propertyValue( "sliceVec" )->cast_to<util::fvector4>(); //get the slice vector
-			LOG_IF( ! crossVec.fuzzyEqual( sliceVec, 1e3 ), Runtime, warning )
+			LOG_IF( ! crossVec.fuzzyEqual( sliceVec, 1000 ), Runtime, warning )
 					<< "The existing sliceVec " << sliceVec
 					<< " differs from the cross product of the read- and phase vector " << crossVec;
 		} else {
@@ -426,7 +430,7 @@ size_t Image::getChunkStride ( size_t base_stride )
 	return lookup.size() / set.getHorizontalSize();
 }
 
-std::list<util::PropertyValue> Image::getChunksProperties( const util::PropMap::key_type &key, bool unique )const
+std::list<util::PropertyValue> Image::getChunksProperties( const util::PropMap::pname_type &key, bool unique )const
 {
 	std::list<util::PropertyValue > ret;
 
@@ -503,7 +507,7 @@ ImageList::ImageList( ChunkList src )
 					errcnt += cnt;
 				}
 			} else {
-				LOG( Runtime, error ) << "Cannot insert image. Indexing failed.";
+				LOG( Runtime, info ) << "Skipping broken image.";
 				errcnt += cnt;
 			}
 		}
@@ -633,11 +637,11 @@ unsigned short Image::typeID() const
 	LOG( Debug, info ) << "Determining  datatype of image with the value range " << min << " to " << max;
 
 	if( min->typeID() == max->typeID() ) { // ok min and max are the same type - trivial case
-		return min->typeID()  << 8; //@todo maybe use a global static function here
+		return min->typeID() << 8; // btw: we do the shift, because min and max are Type - but we want the id's TypePtr
 	} else if( min->fitsInto( max->typeID() ) ) { // if min fits into the type of max, use that
-		return max->typeID()  << 8;
+		return max->typeID() << 8; //@todo maybe use a global static function here instead of a obscure shit operation
 	} else if( max->fitsInto( min->typeID() ) ) { // if max fits into the type of min, use that
-		return min->typeID()  << 8;
+		return min->typeID() << 8;
 	} else {
 		LOG( Runtime, error ) << "Sorry I dont know which datatype I should use. (" << min->typeName() << " or " << max->typeName() << ")";
 		throw( std::logic_error( "type selection failed" ) );
@@ -680,7 +684,7 @@ size_t Image::spliceDownTo( dimensions dim ) //readDim = 0, phaseDim, sliceDim, 
 		size[i] = 1;
 
 	// get a list of needed properties (everything which is missing in a newly created chunk plus everything which is needed for autosplice)
-	const std::list<std::string> splice_needed = util::string2list<std::string>( "voxelSize,voxelGap,readVec,phaseVec,sliceVec,indexOrigin,acquisitionNumber", ',' );
+	const std::list<util::PropMap::pname_type> splice_needed = util::string2list<util::PropMap::pname_type>( util::PropMap::pname_type( "voxelSize,voxelGap,readVec,phaseVec,sliceVec,indexOrigin,acquisitionNumber" ), ',' );
 	util::PropMap::key_list needed = MemChunk<short>( 1 ).getMissing();
 	needed.insert( splice_needed.begin(), splice_needed.end() );
 	struct splicer {
@@ -710,7 +714,7 @@ size_t Image::spliceDownTo( dimensions dim ) //readDim = 0, phaseDim, sliceDim, 
 	//static_cast<util::PropMap::base_type*>(this)->clear(); we can keep the common properties - they will be merged with thier own copies from the chunks on the next reIndex
 	splicer splice( dim, size.product(), *this );
 	BOOST_FOREACH( boost::shared_ptr<Chunk> &ref, buffer ) {
-		BOOST_FOREACH( const std::string & need, needed ) { //get back properties needed for the
+		BOOST_FOREACH( const util::PropMap::pname_type & need, needed ) { //get back properties needed for the
 			if( !ref->hasProperty( need ) && this->hasProperty( need ) ) {
 				ref->propertyValue( need ) = this->propertyValue( need );
 			}
