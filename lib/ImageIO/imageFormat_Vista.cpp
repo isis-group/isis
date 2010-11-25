@@ -155,7 +155,7 @@ throw( std::runtime_error & )
 	size_t hcount = 0;
 	// if history list prefix is available increase counter.
 	BOOST_FOREACH( util::PropMap::key_list::key_type key, keyset ) {
-		if ( ( ( std::string )key ).find( histPrefix ) != std::string::npos ) {
+		if (  std::string(key.c_str()).find( histPrefix ) != std::string::npos ) {
 			hcount++;
 		}
 	}
@@ -166,7 +166,7 @@ throw( std::runtime_error & )
 		for( unsigned i = 1; i <= hcount; i++ ) {
 			std::stringstream name;
 			name << histPrefix << i;
-			std::string val = image.getProperty<std::string>( name.str() );
+			std::string val = image.getProperty<std::string>( util::istring(name.str().c_str()) );
 			// split key token from history property string
 			size_t x = val.find( ":" );
 			VAppendAttr( hlist, val.substr( 0, x ).c_str(), NULL, VStringRepn,
@@ -246,7 +246,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 				std::stringstream key, value;
 				key << histPrefix << ++hcount;
 				value << attrName << ":" << std::string( ( VString ) val );
-				hMap.setProperty<std::string>( key.str(), value.str() );
+				hMap.setProperty<std::string>( util::istring(key.str().c_str()), value.str().c_str() );
 			}
 		}
 	}
@@ -799,7 +799,7 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 
 		for( kiter = klist.begin(); kiter != klist.end(); kiter++ ) {
 			// skip entry from vista image history
-			if( ( ( std::string )*kiter ).find( hpref ) != std::string::npos ) {
+			if( (  std::string ((*kiter).c_str() ) ).find( hpref ) != std::string::npos ) {
 				continue;
 			}
 
