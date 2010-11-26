@@ -25,11 +25,11 @@ BOOST_AUTO_TEST_CASE ( imageList_chunk_test )
 	for ( size_t i = 0; i < timesteps; i++ ) {
 		for ( size_t c = 0; c < images; c++ ) {
 			data::ChunkList::value_type  ch( new data::MemChunk<float>( 3, 3, 3 ) );
-			ch->setProperty( "indexOrigin", util::fvector4( 0, 0, i ) );
-			ch->setProperty( "acquisitionNumber",  i );
-			ch->setProperty( "readVec", util::fvector4( 1, 0 ) );
-			ch->setProperty( "phaseVec", util::fvector4( 0, 1 ) );
-			ch->setProperty( "voxelSize", util::fvector4( 1, 1, 1 ) );
+			ch->setPropertyAs( "indexOrigin", util::fvector4( 0, 0, i ) );
+			ch->setPropertyAs( "acquisitionNumber",  i );
+			ch->setPropertyAs( "readVec", util::fvector4( 1, 0 ) );
+			ch->setPropertyAs( "phaseVec", util::fvector4( 0, 1 ) );
+			ch->setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1 ) );
 			ch->voxel<float>( 0, 0, 0 ) = c + i;
 			chunks.push_back( ch );
 		}

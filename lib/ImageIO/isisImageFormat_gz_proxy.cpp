@@ -160,7 +160,7 @@ public:
 		if(ret){
 			LOG( Debug, info ) <<  "Setting source of all " << buff.size() << " chunks to " << util::MSubject(filename);
 			BOOST_FOREACH(data::ChunkList::reference ref,buff){
-				ref->setProperty( "source", filename );
+				ref->setPropertyAs( "source", filename );
 			}
 			chunks.insert(chunks.end(),buff.begin(),buff.end());
 		}

@@ -164,7 +164,7 @@ void isisPropertyViewer::addPropToTree( const boost::shared_ptr<isis::data::Imag
 
 			for ( unsigned short dim = 0; dim < 4; dim++ ) {
 				QString tmp = "";
-				tmp.sprintf( "%f", image->getProperty<isis::util::fvector4>( propIterator )[dim] );
+				tmp.sprintf( "%f", image->getPropertyAs<isis::util::fvector4>( propIterator )[dim] );
 				stringVec.push_back( tmp );
 			}
 

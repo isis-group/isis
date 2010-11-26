@@ -30,8 +30,8 @@ namespace adapter
 //return a list of vtkImageData type pointer
 std::vector<vtkSmartPointer<vtkImageData> >vtkAdapter::makeVtkImageObject( const boost::shared_ptr<data::Image> src, ScalingType &scaling)
 {
-	const util::fvector4 indexOrigin( src->getProperty<util::fvector4>( "indexOrigin" ) );
-	const util::fvector4 spacing( src->getProperty<util::fvector4>( "voxelSize" ) );
+	const util::fvector4 indexOrigin( src->getPropertyAs<util::fvector4>( "indexOrigin" ) );
+	const util::fvector4 spacing( src->getPropertyAs<util::fvector4>( "voxelSize" ) );
 	std::vector<vtkSmartPointer<vtkImageData> > retVector;
 
 	util::TypeReference min, max;

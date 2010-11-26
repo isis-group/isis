@@ -142,16 +142,16 @@ typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkRea
 	m_ImageISIS.transformCoords( T );
 	//getting the required metadata from the isis image
 	const util::fvector4 dimensions( m_ImageISIS.getSizeAsVector() );
-	const util::fvector4 indexOrigin( m_ImageISIS.getProperty<util::fvector4>( "indexOrigin" ) );
-	util::fvector4 spacing( m_ImageISIS.getProperty<util::fvector4>( "voxelSize" ) );
+	const util::fvector4 indexOrigin( m_ImageISIS.getPropertyAs<util::fvector4>( "indexOrigin" ) );
+	util::fvector4 spacing( m_ImageISIS.getPropertyAs<util::fvector4>( "voxelSize" ) );
 
 	if( spacing[3] == 0 ) { spacing[3] = 1; }
 
-	const util::fvector4 readVec = m_ImageISIS.getProperty<util::fvector4>( "readVec" );
+	const util::fvector4 readVec = m_ImageISIS.getPropertyAs<util::fvector4>( "readVec" );
 
-	const util::fvector4 phaseVec = m_ImageISIS.getProperty<util::fvector4>( "phaseVec" );
+	const util::fvector4 phaseVec = m_ImageISIS.getPropertyAs<util::fvector4>( "phaseVec" );
 
-	const util::fvector4 sliceVec = m_ImageISIS.getProperty<util::fvector4>( "sliceVec" );
+	const util::fvector4 sliceVec = m_ImageISIS.getPropertyAs<util::fvector4>( "sliceVec" );
 
 	//  std::cout << "indexOrigin: " << indexOrigin << std::endl;
 	//  std::cout << "readVec: " << readVec << std::endl;
@@ -267,7 +267,7 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	//since the acquisitionNumber is not stored in the PropMap of the image, we have
 	//to create a dummy acquisitionNumber
 	if ( !retChunk->hasProperty( "acqisitionNumber" ) )
-		retChunk->setProperty( "acquisitionNumber", static_cast<uint32_t>( 1 ) );
+		retChunk->setPropertyAs( "acquisitionNumber", static_cast<uint32_t>( 1 ) );
 
 	//do not try to grasp that in a sober state!!
 	//workaround to create a TypedImage out of a MemChunk
@@ -278,11 +278,11 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 		new data::TypedImage<TOutputISIS>  ( *isisImageList.front().get() ) );
 	//these are properties eventually manipulated by itk. So we can not take the
 	//parameters from the isis image which was handed over to the itkAdapter
-	retImage->setProperty( "indexOrigin", util::fvector4( indexOrigin[0], indexOrigin[1], indexOrigin[2], indexOrigin[3] ) );
-	retImage->setProperty( "readVec", util::fvector4( imageDirection[0][0], imageDirection[1][0], imageDirection[2][0], 0 ) );
-	retImage->setProperty( "phaseVec", util::fvector4( imageDirection[0][1], imageDirection[1][1], imageDirection[2][1], 0 ) );
-	retImage->setProperty( "sliceVec", util::fvector4( imageDirection[0][2], imageDirection[1][2], imageDirection[2][2], 0 ) );
-	retImage->setProperty( "voxelSize", util::fvector4( imageSpacing[0], imageSpacing[1], imageSpacing[2], imageSpacing[3] ) );
+	retImage->setPropertyAs( "indexOrigin", util::fvector4( indexOrigin[0], indexOrigin[1], indexOrigin[2], indexOrigin[3] ) );
+	retImage->setPropertyAs( "readVec", util::fvector4( imageDirection[0][0], imageDirection[1][0], imageDirection[2][0], 0 ) );
+	retImage->setPropertyAs( "phaseVec", util::fvector4( imageDirection[0][1], imageDirection[1][1], imageDirection[2][1], 0 ) );
+	retImage->setPropertyAs( "sliceVec", util::fvector4( imageDirection[0][2], imageDirection[1][2], imageDirection[2][2], 0 ) );
+	retImage->setPropertyAs( "voxelSize", util::fvector4( imageSpacing[0], imageSpacing[1], imageSpacing[2], imageSpacing[3] ) );
 	//this will splice down the image the same way it was handed over to the itkAdapter
 	retImage->spliceDownTo( static_cast<data::dimensions> ( m_RelevantDim ) );
 	//add the residual parameters to the image

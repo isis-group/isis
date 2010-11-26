@@ -189,47 +189,47 @@ void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::istring &name
 	case EVR_FL: {
 		Float32 buff;
 		elem->getFloat32( buff );
-		map.setProperty<float>( name, buff); //if Float32 is float its fine, if not we will get an compiler error here
+		map.setPropertyAs<float>( name, buff); //if Float32 is float its fine, if not we will get an compiler error here
 	}
 	break;
 	case EVR_FD: {
 		Float64 buff;
 		elem->getFloat64( buff );
-		map.setProperty<double>( name, buff); //if Float64 is double its fine, if not we will get an compiler error here
+		map.setPropertyAs<double>( name, buff); //if Float64 is double its fine, if not we will get an compiler error here
 	}
 	break;
 	case EVR_DS: { //Decimal String (can be floating point)
 		elem->getOFString( buff, 0 );
-		map.setProperty<double>( name, boost::lexical_cast<double>( buff ));
+		map.setPropertyAs<double>( name, boost::lexical_cast<double>( buff ));
 	}
 	break;
 	case EVR_SL: { //signed long
 		Sint32 buff;
 		elem->getSint32( buff );
-		map.setProperty<int32_t>( name, buff);//seems like Sint32 is not allways int32_t, so enforce it
+		map.setPropertyAs<int32_t>( name, buff);//seems like Sint32 is not allways int32_t, so enforce it
 	}
 	break;
 	case EVR_SS: { //signed short
 		Sint16 buff;
 		elem->getSint16( buff );
-		map.setProperty<int16_t>( name, buff);
+		map.setPropertyAs<int16_t>( name, buff);
 	}
 	break;
 	case EVR_UL: { //unsigned long
 		Uint32 buff;
 		elem->getUint32( buff );
-		map.setProperty<uint32_t>( name, buff);
+		map.setPropertyAs<uint32_t>( name, buff);
 	}
 	break;
 	case EVR_US: { //unsigned short
 		Uint16 buff;
 		elem->getUint16( buff );
-		map.setProperty<uint16_t>( name, buff);
+		map.setPropertyAs<uint16_t>( name, buff);
 	}
 	break;
 	case EVR_IS: { //integer string
 		elem->getOFString( buff, 0 );
-		map.setProperty<int32_t>( name, boost::lexical_cast<int32_t>( buff ));
+		map.setPropertyAs<int32_t>( name, boost::lexical_cast<int32_t>( buff ));
 	}
 	break;
 	case EVR_AE: //Application Entity (string)
@@ -242,7 +242,7 @@ void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::istring &name
 	case EVR_UI: //Unique Identifier [0-9\.]
 	case EVR_PN: { //Person Name
 		elem->getOFString( buff, 0 );
-		map.setProperty<std::string>( name, boost::lexical_cast<std::string>( buff ));
+		map.setPropertyAs<std::string>( name, boost::lexical_cast<std::string>( buff ));
 	}
 	break;
 	default: {

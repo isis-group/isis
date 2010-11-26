@@ -22,12 +22,12 @@ BOOST_AUTO_TEST_CASE ( imageNameGenTest )
 {
 	data::MemChunk<uint8_t> ch(5,5,5);
 	data::Image img;
-	ch.setProperty( "indexOrigin", util::fvector4( 0, 0, 2 ) );
-	ch.setProperty<uint32_t>( "acquisitionNumber", 0 );
-	ch.setProperty<float>( "acquisitionTime", 0 );
-	ch.setProperty( "readVec", util::fvector4( 1, 0 ) );
-	ch.setProperty( "phaseVec", util::fvector4( 0, 1 ) );
-	ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
+	ch.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, 2 ) );
+	ch.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
+	ch.setPropertyAs<float>( "acquisitionTime", 0 );
+	ch.setPropertyAs( "readVec", util::fvector4( 1, 0 ) );
+	ch.setPropertyAs( "phaseVec", util::fvector4( 0, 1 ) );
+	ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 	BOOST_REQUIRE( img.insertChunk( ch ) );
 	img.reIndex();
 
@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE ( imageNameGenTest )
 	BOOST_CHECK_EQUAL(image_io::FileFormat::makeFilename(img,"/tmp/S{nich da}.nii"),"/tmp/S.nii"); // {nich da} does not exist - so we just remove it from the string
 	BOOST_CHECK_EQUAL(
 		image_io::FileFormat::makeFilename(img,"/tmp/acq{acquisitionTime}.nii"),
-		std::string("/tmp/acq")+img.getProperty<std::string>("acquisitionTime")+".nii" 
+		std::string("/tmp/acq")+img.getPropertyAs<std::string>("acquisitionTime")+".nii" 
 	);
 }
 
@@ -44,16 +44,16 @@ BOOST_AUTO_TEST_CASE ( imageUniqueName )
 	data::MemChunk<uint8_t> ch1(5,5,5);
 	data::ChunkList chunks;
 	data::Image img;
-	ch1.setProperty( "indexOrigin", util::fvector4( 0, 0, 2 ) );
-	ch1.setProperty<uint32_t>( "acquisitionNumber", 0 );
-	ch1.setProperty<float>( "acquisitionTime", 0 );
-	ch1.setProperty( "readVec", util::fvector4( 1, 0 ) );
-	ch1.setProperty( "phaseVec", util::fvector4( 0, 1 ) );
-	ch1.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
+	ch1.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, 2 ) );
+	ch1.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
+	ch1.setPropertyAs<float>( "acquisitionTime", 0 );
+	ch1.setPropertyAs( "readVec", util::fvector4( 1, 0 ) );
+	ch1.setPropertyAs( "phaseVec", util::fvector4( 0, 1 ) );
+	ch1.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 
 	for(uint32_t i=0;i<5;i++){ // make some copies of ch1 - change their acquisitionNumber and put the into the list
 		boost::shared_ptr<data::Chunk> ch(new data::MemChunk<uint8_t>(ch1));
-		ch->setProperty<uint32_t>( "acquisitionNumber", i );
+		ch->setPropertyAs<uint32_t>( "acquisitionNumber", i );
 		chunks.push_back(ch);
 	}
 	data::ImageList images(chunks);

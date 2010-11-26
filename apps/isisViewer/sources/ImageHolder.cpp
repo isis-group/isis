@@ -128,16 +128,16 @@ void ImageHolder::setImages( util::PropMap propMap,  std::vector<vtkSmartPointer
 	m_ScalingFactor = m_PropMap.propertyValue("scale");
 	m_Offset = m_PropMap.propertyValue("offset");
 
-	m_readVec = m_PropMap.getProperty<isis::util::fvector4>("readVec");
-	m_phaseVec = m_PropMap.getProperty<isis::util::fvector4>("phaseVec");
-	m_sliceVec = m_PropMap.getProperty<isis::util::fvector4>("sliceVec");
+	m_readVec = m_PropMap.getPropertyAs<isis::util::fvector4>("readVec");
+	m_phaseVec = m_PropMap.getPropertyAs<isis::util::fvector4>("phaseVec");
+	m_sliceVec = m_PropMap.getPropertyAs<isis::util::fvector4>("sliceVec");
 	LOG( Runtime, info ) << "readVector: " << m_readVec;
 	LOG( Runtime, info ) << "phaseVector: " << m_phaseVec;
 	LOG( Runtime, info ) << "sliceVector: " << m_sliceVec;
 	m_MatrixHandler.setVectors( m_readVec, m_phaseVec, m_sliceVec );
 	LOG( Runtime, info) << "spacing[0]: " << m_ImageVector.front()->GetSpacing()[0];
-	m_pseudoOrigin = m_MatrixHandler.createPseudoOrigin( m_PropMap.getProperty<util::fvector4>("imageSize"), m_PropMap.getProperty<util::fvector4>("voxelSize"));
-	m_transformedOrigin = m_MatrixHandler.transformOrigin( m_PropMap.getProperty<util::fvector4>("indexOrigin"), m_PropMap.getProperty<util::fvector4>("voxelSize"));
+	m_pseudoOrigin = m_MatrixHandler.createPseudoOrigin( m_PropMap.getPropertyAs<util::fvector4>("imageSize"), m_PropMap.getPropertyAs<util::fvector4>("voxelSize"));
+	m_transformedOrigin = m_MatrixHandler.transformOrigin( m_PropMap.getPropertyAs<util::fvector4>("indexOrigin"), m_PropMap.getPropertyAs<util::fvector4>("voxelSize"));
 	//TODO debug
 	std::cout << "transformedOrigin: " << m_transformedOrigin << std::endl;
 

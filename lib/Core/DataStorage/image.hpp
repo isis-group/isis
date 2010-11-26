@@ -274,14 +274,14 @@ public:
 	bool reIndex();
 
 	/// \returns true if there is no chunk in the image
-	bool empty()const;
+	bool isEmpty()const;
 
 	/**
 	 * Get a list of the properties of the chunks for the given key
 	 * \param key the name of the property to search for
 	 * \param unique when true empty or consecutive duplicates wont be added
 	 */
-	std::list<util::PropertyValue> getChunksProperties( const util::PropMap::key_type &key, bool unique = false )const;
+	std::list<util::PropertyValue> getChunksProperties( const util::PropMap::KeyType &key, bool unique = false )const;
 
 	/// get the size of every voxel (in bytes)
 	size_t bytes_per_voxel()const;

@@ -187,7 +187,7 @@ Chunk &Chunk::operator=( const Chunk &ref )
 
 ChunkList Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 {
-	if ( !valid() ) {
+	if ( !isValid() ) {
 		LOG( Runtime, error ) << "Cannot splice invalid Chunk (missing properties are " << this->getMissing() << ")";
 		return ChunkList();
 	}

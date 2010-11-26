@@ -39,13 +39,13 @@ class treeNode; //predeclare treeNode -- we'll need it in PropMap
 class PropMap : protected std::map<util::istring, _internal::treeNode>
 {
 public:
-	typedef std::map<key_type, mapped_type, key_compare> Container;
-	typedef std::set<key_type, key_compare> KeyList;
-	typedef std::map<key_type, std::pair<PropertyValue, PropertyValue>, key_compare> DiffMap;
-	typedef std::map<key_type, PropertyValue> FlatMap;
-	using std::map<util::istring, _internal::treeNode>::key_type;
+	typedef key_type KeyType;
+	typedef std::map<KeyType, mapped_type, key_compare> Container;
+	typedef std::set<KeyType, key_compare> KeyList;
+	typedef std::map<KeyType, std::pair<PropertyValue, PropertyValue>, key_compare> DiffMap;
+	typedef std::map<KeyType, PropertyValue> FlatMap;
 private:
-	typedef std::list<key_type> propPath;
+	typedef std::list<KeyType> propPath;
 	typedef propPath::const_iterator propPathIterator;
 
 	static const char pathSeperator = '/';
@@ -71,15 +71,15 @@ private:
 	// internal tool-backends
 	/////////////////////////////////////////////////////////////////////////////////////////
 	/// internal recursion-function for join
-	void joinTree( const isis::util::PropMap &other, bool overwrite, key_type prefix, PropMap::KeyList &rejects );
+	void joinTree( const isis::util::PropMap &other, bool overwrite, KeyType prefix, PropMap::KeyList &rejects );
 	/// internal recursion-function for diff
-	void diffTree( const PropMap &other, PropMap::DiffMap &ret, key_type prefix ) const;
+	void diffTree( const PropMap &other, PropMap::DiffMap &ret, KeyType prefix ) const;
 
 	static mapped_type &fetchEntry( util::PropMap &root, const propPathIterator at, const propPathIterator pathEnd );
-	mapped_type &fetchEntry( const key_type &key );
+	mapped_type &fetchEntry( const KeyType &key );
 
 	static const mapped_type *findEntry( const util::PropMap &root, const propPathIterator at, const propPathIterator pathEnd );
-	const mapped_type *findEntry( const key_type &key )const;
+	const mapped_type *findEntry( const KeyType &key )const;
 
 	/// internal recursion-function for remove
 	bool recursiveRemove( util::PropMap &root, const propPathIterator at, const propPathIterator pathEnd );
@@ -103,7 +103,7 @@ protected:
 	* Adds a property as needed.
 	* If the given property allready exists, it is just flagged as needed.
 	*/
-	void addNeeded( const key_type &key );
+	void addNeeded( const KeyType &key );
 public:
 	/////////////////////////////////////////////////////////////////////////////////////////
 	// constructors
@@ -122,34 +122,34 @@ public:
 	 * \param key the "path" to the property
 	 * \returns a reference to the PropertyValue
 	 */
-	const PropertyValue &propertyValue( const key_type &key )const;
+	const PropertyValue &propertyValue( const KeyType &key )const;
 	/**
 	 * Access the property referenced by the path-key, create it if its not there.
 	 * \param key the "path" to the property
 	 * \returns a reference to the PropertyValue
 	 */
-	PropertyValue &propertyValue( const key_type &key );
+	PropertyValue &propertyValue( const KeyType &key );
 	/**
 	 * Access the branch referenced by the path-key, create it if its not there.
 	 * \param key the "path" to the branch
 	 * \returns a reference to the branching PropMap
 	 */
-	PropMap &branch( const key_type &key );
+	PropMap &branch( const KeyType &key );
 	/**
 	 * Access the branch referenced by the path-key.
 	 * If the branch does not exist, an empty dummy will returned.
 	 * \param key the "path" to the branch
 	 * \returns a reference to the branching PropMap
 	 */
-	const PropMap &branch( const key_type &key )const;
+	const PropMap &branch( const KeyType &key )const;
 	/// remove the property/branch adressed by the key
-	bool remove( const key_type &key );
+	bool remove( const KeyType &key );
 	/// remove every property which is also in the given map (regardless of the value)
 	bool remove( const isis::util::PropMap &removeMap, bool keep_needed = false );
 	/// \returns true is the given property does exist and is not empty.
-	bool hasProperty( const key_type &key )const;
+	bool hasProperty( const KeyType &key )const;
 	/// \returns true is the given branch does exist and is not empty.
-	bool hasBranch( const key_type &key )const;
+	bool hasBranch( const KeyType &key )const;
 
 	////////////////////////////////////////////////////////////////////////////////////////
 	// tools
@@ -158,9 +158,9 @@ public:
 	* Check if every needed property is set.
 	* \returns false if there is any needed and empty property, true otherwhise.
 	*/
-	bool valid()const;
+	bool isValid()const;
 	/// \returns true if the PropMap is empty, false otherwhise
-	bool empty()const;
+	bool isEmpty()const;
 	/// get a flat list of the "paths" to all properties in the PropMap
 	const KeyList getKeys()const;
 	/**
@@ -184,7 +184,12 @@ public:
 	 * \return a map of property keys and value-pairs
 	 */
 	DiffMap getDifference( const PropMap &second )const;
-	/// Remove everything that is also in second and equal.
+	
+	/**
+	 * Remove every PropertyValue which is also in the other PropMap and where operator== returns true.
+	 * \param other the other PropMap to compare to
+	 * \param removeNeeded if a PropertyValue should also be deleted if they're needed
+	 */
 	void makeUnique( const isis::util::PropMap &other, bool removeNeeded = false );
 	/**
 	* Add Properties from another PropMap.
@@ -205,10 +210,10 @@ public:
 	* \param uniques reference of the unique-map
 	* \param init if initialisation shall be done instead of normal seperation
 	*/
-	void toCommonUnique( PropMap &common, std::set<key_type> &uniques, bool init )const;
+	void toCommonUnique( PropMap &common, std::set<KeyType> &uniques, bool init )const;
 
 	///copy the tree into a flat key/property-map
-	void linearize( FlatMap &out, key_type key_prefix = "" )const;
+	void linearize( FlatMap &out, KeyType key_prefix = "" )const;
 
 	/**
 	 * Transform an existing property into another.
@@ -219,7 +224,7 @@ public:
 	 * \param delSource if the original property shall be deleted after the tramsformation was done
 	 * \returns true if the transformation was done
 	 */
-	bool transform( key_type from, key_type to, int dstId, bool delSource = true );
+	bool transform( KeyType from, KeyType to, int dstId, bool delSource = true );
 
 	/**
 	* Transform an existing property into another (statically typed version).
@@ -230,7 +235,7 @@ public:
 	* \param delSource if the original property shall be deleted after the tramsformation was done
 	* \returns true if the transformation was done
 	*/
-	template<typename DST> bool transform( key_type from, key_type to, bool delSource = true ) {
+	template<typename DST> bool transform( KeyType from, KeyType to, bool delSource = true ) {
 		check_type<DST>();
 		return transform( from, to, Type<DST>::staticID, delSource );
 	}
@@ -244,7 +249,7 @@ public:
 	 * The needed flag (if set) will be kept.
 	 * If the property is already set to a value of another type an error is send to Runtime an nothing will be set.
 	 */
-	template<typename T> PropertyValue &setProperty( const key_type &key, const T &val ) {
+	template<typename T> PropertyValue &setPropertyAs( const KeyType &key, const T &val ) {
 		PropertyValue &ret = propertyValue( key );
 
 		if( ret.empty() ) {
@@ -263,7 +268,7 @@ public:
 	 * If the requested type is not equal to type the property is stored with, an automatic conversion is done.
 	 * If the property is not set yet T() is returned.
 	 */
-	template<typename T> T getProperty( const key_type &key )const;
+	template<typename T> T getPropertyAs( const KeyType &key )const;
 	/**
 	 * Rename a given property/branch.
 	 * This is implemented as copy+delete and can also be used between branches.
@@ -271,7 +276,7 @@ public:
 	 * - if the source does not exist a warning will be send and nothing is done
 	 * \returns true if renaming/moving was successful
 	 */
-	bool rename( key_type oldname, key_type newname );
+	bool rename( KeyType oldname, KeyType newname );
 
 	/**
 	 * "Print" the PropMap.
@@ -310,11 +315,11 @@ class treeNode
 	PropertyValue m_leaf;
 public:
 	bool empty()const {
-		return m_branch.empty() && m_leaf.empty();
+		return m_branch.isEmpty() && m_leaf.empty();
 	}
 	bool is_leaf()const {
-		LOG_IF( ! ( m_branch.empty() || m_leaf.empty() ), Debug, error ) << "There is a non empty leaf at a branch. This should not be.";
-		return m_branch.empty();
+		LOG_IF( ! ( m_branch.isEmpty() || m_leaf.empty() ), Debug, error ) << "There is a non empty leaf at a branch. This should not be.";
+		return m_branch.isEmpty();
 	}
 	const PropMap &getBranch()const {
 		return m_branch;
@@ -344,8 +349,8 @@ public:
 // and now we can define walkTree (needs treeNode to be defined)
 template<class Predicate> struct PropMap::walkTree {
 	KeyList &m_out;
-	const key_type m_prefix;
-	walkTree( KeyList &out, const key_type &prefix ): m_out( out ), m_prefix( prefix ) {}
+	const KeyType m_prefix;
+	walkTree( KeyList &out, const KeyType &prefix ): m_out( out ), m_prefix( prefix ) {}
 	walkTree( KeyList &out ): m_out( out ) {}
 	void operator()( const_reference ref ) const {
 		if ( ref.second.is_leaf() ) {
@@ -359,7 +364,7 @@ template<class Predicate> struct PropMap::walkTree {
 };
 
 // as well as PropMap::getProperty ...
-template<typename T> T PropMap::getProperty( const key_type &key ) const
+template<typename T> T PropMap::getPropertyAs( const KeyType &key ) const
 {
 	const mapped_type *entry = findEntry( util::istring(key) );
 

@@ -115,7 +115,7 @@ bool PropMap::recursiveRemove( PropMap &root, const propPathIterator at, const p
 			if ( ! ref.is_leaf() ) {
 				ret = recursiveRemove( ref.getBranch(), next, pathEnd );
 
-				if ( ref.getBranch().empty() )
+				if ( ref.getBranch().isEmpty() )
 					root.erase( found ); // remove the now empty branch
 			} else
 				root.erase( found );
@@ -162,7 +162,7 @@ const PropMap &PropMap::branch( const key_type &key ) const
 		LOG( Runtime, warning ) << "Trying to access non existing branch " << key << ".";
 		return emptyEntry.getBranch();
 	} else {
-		LOG_IF( ref->getBranch().empty(), Runtime, warning ) << "Accessing empty branch " << key;
+		LOG_IF( ref->getBranch().isEmpty(), Runtime, warning ) << "Accessing empty branch " << key;
 		return ref->getBranch();
 	}
 }
@@ -194,7 +194,7 @@ bool PropMap::remove( const isis::util::PropMap &removeMap, bool keep_needed )
 					const PropMap &otherSub = otherIt->second.getBranch();
 					ret &= mySub.remove( otherSub );
 
-					if( mySub.empty() ) // delete my branch, if its empty
+					if( mySub.isEmpty() ) // delete my branch, if its empty
 						erase( thisIt++ );
 				} else {
 					LOG( Debug, warning ) << "Not deleting branch " << MSubject( thisIt->first ) << " because its no subtree in the removal map";
@@ -213,14 +213,14 @@ bool PropMap::remove( const isis::util::PropMap &removeMap, bool keep_needed )
 /////////////////////////////////////////////////////////////////////////////////////
 // utilities
 ////////////////////////////////////////////////////////////////////////////////////
-bool PropMap::valid() const
+bool PropMap::isValid() const
 {
 	//iterate through the whole map and return false as soon as we find something needed _and_ empty
 	const const_iterator found = std::find_if( begin(), end(), treeInvalidP() );
 	return found == end();
 }
 
-bool PropMap::empty() const
+bool PropMap::isEmpty() const
 {
 	return Container::empty();
 }
@@ -515,7 +515,7 @@ bool PropMap::treeInvalidP::operator()( const PropMap::value_type &ref ) const
 		const PropertyValue &val = ref.second.getLeaf();
 		return val.needed() && val.empty();
 	} else  {
-		return ! ref.second.getBranch().valid();
+		return ! ref.second.getBranch().isValid();
 	}
 }
 
