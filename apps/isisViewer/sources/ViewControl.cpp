@@ -111,6 +111,9 @@ void ViewControl::setUpPipe()
 	m_AxialWidget->GetRenderWindow()->SetInteractor( m_AxialWidget->GetInteractor() );
 	m_SagittalWidget->GetRenderWindow()->SetInteractor( m_SagittalWidget->GetInteractor() );
 	m_CoronalWidget->GetRenderWindow()->SetInteractor( m_CoronalWidget->GetInteractor() );
+	m_CoronalWidget->GetRenderWindow()->SetDesiredUpdateRate(20);
+	m_AxialWidget->GetRenderWindow()->SetDesiredUpdateRate(20);
+	m_SagittalWidget->GetRenderWindow()->SetDesiredUpdateRate(20);
 	m_CoronalWidget->GetRenderWindow()->SetNumberOfLayers(2);
 	m_SagittalWidget->GetRenderWindow()->SetNumberOfLayers(2);
 	m_AxialWidget->GetRenderWindow()->SetNumberOfLayers(2);
