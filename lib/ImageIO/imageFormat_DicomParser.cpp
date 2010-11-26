@@ -41,11 +41,11 @@ template<typename T> std::list<T> dcmtkListString2list( DcmElement *elem )
  */
 void ImageFormat_Dicom::parseAS( DcmElement *elem, const util::istring &name, util::PropMap &map )
 {
-	u_int16_t duration;
+	uint16_t duration;
 	OFString buff;
 	elem->getOFString( buff, 0 );
 	static boost::numeric::converter <
-	u_int16_t, double,
+	uint16_t, double,
 			 boost::numeric::conversion_traits<uint16_t, double>,
 			 boost::numeric::def_overflow_handler,
 			 boost::numeric::RoundEven<double>
@@ -495,13 +495,13 @@ bool ImageFormat_Dicom::parseCSAValue( const std::string &val, const util::istri
 	if ( vr == "IS" or vr == "SL" ) {
 		map.propertyValue( name ) = boost::lexical_cast<int32_t>( val );
 	} else if ( vr == "UL" ) {
-		map.propertyValue( name ) = boost::lexical_cast<u_int32_t>( val );
+		map.propertyValue( name ) = boost::lexical_cast<uint32_t>( val );
 	} else if (vr == "CS" or vr == "LO" or vr == "SH" or vr == "UN" or vr == "ST" ) {
 		map.propertyValue( name ) = val;
 	} else if ( vr == "DS" or vr == "FD" ) {
 		map.propertyValue( name ) = boost::lexical_cast<double>( val );
 	} else if ( vr == "US" ) {
-		map.propertyValue( name ) = boost::lexical_cast<u_int16_t>( val );
+		map.propertyValue( name ) = boost::lexical_cast<uint16_t>( val );
 	} else if ( vr == "SS" ) {
 		map.propertyValue( name ) = boost::lexical_cast<int16_t>( val );
 	} else {

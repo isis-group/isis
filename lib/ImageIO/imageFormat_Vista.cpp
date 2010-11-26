@@ -113,8 +113,8 @@ throw( std::runtime_error & )
 			copyImageToVista<VSByte>( image, vimages[0] );
 			break;
 			// VShort
-		case data::TypePtr<u_int16_t>::staticID:
-			LOG( Runtime, warning ) << "Vista does not support " << util::Type<u_int16_t>::staticName() << ". Falling back to " << util::Type<VShort>::staticName();
+		case data::TypePtr<uint16_t>::staticID:
+			LOG( Runtime, warning ) << "Vista does not support " << util::Type<uint16_t>::staticName() << ". Falling back to " << util::Type<VShort>::staticName();
 		case data::TypePtr<VShort>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VShortRepn );
 			copyImageToVista<VShort>( image, vimages[0] );
@@ -336,7 +336,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 
 		std::list<VistaChunk<VShort> > vistaChunkList;
 		//if we have no repetitionTime we have to calculate it with the help of the biggest slicetime
-		u_int16_t biggest_slice_time = 0;
+		uint16_t biggest_slice_time = 0;
 		// the geometrical dimension of the 3D image according to the slice geometry
 		// and the number of slices.
 		util::ivector4 dims( 0, 0, 0, 0 );
@@ -369,20 +369,20 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 		BOOST_FOREACH( std::vector<VistaChunk<VShort> >::reference sliceRef, vistaChunkList ) {
 			// increase slice counter
 			nloaded++;
-			u_int16_t repetitionTime = 0;
+			uint16_t repetitionTime = 0;
 			util::fvector4 ioprob;
 
 			if( !sliceRef.hasProperty( "repetitionTime" ) && biggest_slice_time ) {
-				sliceRef.setProperty<u_int16_t>( "repetitionTime", biggest_slice_time );
+				sliceRef.setProperty<uint16_t>( "repetitionTime", biggest_slice_time );
 			}
 
 			if( sliceRef.hasProperty( "repetitionTime" ) ) {
-				repetitionTime = sliceRef.getProperty<u_int16_t>( "repetitionTime" );
+				repetitionTime = sliceRef.getProperty<uint16_t>( "repetitionTime" );
 			}
 
 			// since functional data will be read first the sequence number
 			// is 0.
-			sliceRef.setProperty<u_int16_t>( "sequenceNumber", 0 );
+			sliceRef.setProperty<uint16_t>( "sequenceNumber", 0 );
 			/********************* INDEX ORIGIN *********************
 			 * Step 1: check if indexOrigin present.
 			 * Step 2: Calculate indexOrigin according to the slice number
@@ -498,7 +498,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 			/******************** SET acquisitionTime ********************/
 			size_t timestep = 0;
 			BOOST_FOREACH( data::ChunkList::reference spliceRef, splices ) {
-				u_int32_t acqusitionNumber = ( nloaded - 1 ) + vImageVector.size() * timestep;
+				uint32_t acqusitionNumber = ( nloaded - 1 ) + vImageVector.size() * timestep;
 				spliceRef->setProperty<uint32_t>( "acquisitionNumber", acqusitionNumber );
 
 				if ( repetitionTime && sliceRef.hasProperty( "acquisitionTime" ) ) {
@@ -516,10 +516,10 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 			std::copy( splices.begin(), splices.end(), dest_iter );
 		} // END foreach vistaChunkList
 		//handle the residual images
-		u_int16_t sequenceNumber = 0;
+		uint16_t sequenceNumber = 0;
 		BOOST_FOREACH( std::vector<VImage>::reference vImageRef, residualVImages ) {
 			if( switchHandle( vImageRef, chunks ) ) {
-				chunks.back()->setProperty<u_int16_t>( "sequenceNumber", ++sequenceNumber );
+				chunks.back()->setProperty<uint16_t>( "sequenceNumber", ++sequenceNumber );
 				// add history information
 				chunks.back()->join( hMap, true );
 				nloaded++;
@@ -561,7 +561,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 	else {
 		for( unsigned k = 0; k < nimages; k++ ) {
 			if( switchHandle( images[k], chunks ) ) {
-				chunks.back()->setProperty<u_int16_t>( "sequenceNumber", nloaded );
+				chunks.back()->setProperty<uint16_t>( "sequenceNumber", nloaded );
 
 				// check indexOrigin -> calculate default value if necessary
 				if ( ! chunks.back()->hasProperty( "indexOrigin" ) ) {
@@ -694,7 +694,7 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 	// repetition time
 	if( image.hasProperty( "repetitionTime" ) ) {
 		VAppendAttr( list, "repetition_time", NULL, VShortRepn,
-					 image.getProperty<u_int16_t>( "repetitionTime" ) );
+					 image.getProperty<uint16_t>( "repetitionTime" ) );
 	}
 
 	//subject name
@@ -752,7 +752,7 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 	}
 
 	if ( image.hasProperty( "flipAngle" ) ) {
-		VAppendAttr( list, "flipAngle", NULL, VShortRepn, ( VShort ) image.getProperty<u_int16_t>( "flipAngle" ) );
+		VAppendAttr( list, "flipAngle", NULL, VShortRepn, ( VShort ) image.getProperty<uint16_t>( "flipAngle" ) );
 	}
 
 	if ( image.hasProperty( "transmitCoil" ) ) {

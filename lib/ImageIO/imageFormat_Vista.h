@@ -187,9 +187,9 @@ private:
 					}
 
 					std::stringstream sstr( repTime );
-					u_int16_t repTimeInt;
+					uint16_t repTimeInt;
 					sstr >> repTimeInt;
-					chunk.setProperty<u_int16_t>( "repetitionTime", repTimeInt );
+					chunk.setProperty<uint16_t>( "repetitionTime", repTimeInt );
 					continue;
 				}
 
@@ -297,7 +297,7 @@ private:
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
 					std::string flipAngleStr = std::string( VString ( val ) );
 					std::stringstream sstr( flipAngleStr );
-					u_int16_t flipAngle;
+					uint16_t flipAngle;
 					sstr >> flipAngle;
 					chunk.setProperty<float>( "flipAngle", flipAngle );
 					continue;

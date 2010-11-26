@@ -175,12 +175,12 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 		object.remove( prefix + "SeriesDate" );
 	}
 
-	transformOrTell<u_int16_t>  ( prefix + "SeriesNumber",     "sequenceNumber",     object, warning );
-	transformOrTell<u_int16_t>  ( prefix + "PatientsAge",     "subjectAge",     object, warning );
+	transformOrTell<uint16_t>  ( prefix + "SeriesNumber",     "sequenceNumber",     object, warning );
+	transformOrTell<uint16_t>  ( prefix + "PatientsAge",     "subjectAge",     object, warning );
 	transformOrTell<std::string>( prefix + "SeriesDescription", "sequenceDescription", object, warning );
 	transformOrTell<std::string>( prefix + "PatientsName",     "subjectName",        object, warning );
 	transformOrTell<date>       ( prefix + "PatientsBirthDate", "subjectBirth",       object, info );
-	transformOrTell<u_int16_t>  ( prefix + "PatientsWeight",   "subjectWeigth",      object, warning );
+	transformOrTell<uint16_t>  ( prefix + "PatientsWeight",   "subjectWeigth",      object, warning );
 	// compute voxelSize and gap
 	{
 		util::fvector4 voxelSize( invalid_float, invalid_float, invalid_float, 0 );
@@ -259,7 +259,7 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 		LOG( Runtime, warning ) << "Making up indexOrigin, because the image lacks this information";
 	}
 
-	transformOrTell<u_int32_t>( prefix + "InstanceNumber", "acquisitionNumber", object, error );
+	transformOrTell<uint32_t>( prefix + "InstanceNumber", "acquisitionNumber", object, error );
 
 	if ( hasOrTell( prefix + "PatientsSex", object, warning ) ) {
 		util::Selection isisGender( "male,female,other" );
@@ -282,7 +282,7 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 		object.remove( prefix + "PatientsSex" );
 	}
 
-	transformOrTell<u_int32_t>( prefix + "CSAImageHeaderInfo/UsedChannelMask", "coilChannelMask", object, info );
+	transformOrTell<uint32_t>( prefix + "CSAImageHeaderInfo/UsedChannelMask", "coilChannelMask", object, info );
 
 	////////////////////////////////////////////////////////////////
 	// interpret DWI data
@@ -368,9 +368,9 @@ int ImageFormat_Dicom::readMosaic( data::Chunk source, data::ChunkList &dest )
 	}
 
 	// All is fine, lets start
-	u_int16_t images = source.getProperty<u_int16_t>( NumberOfImagesInMosaicProp );
+	uint16_t images = source.getProperty<uint16_t>( NumberOfImagesInMosaicProp );
 	util::FixedVector<size_t, 4> size = source.getSizeAsVector();
-	const u_int16_t matrixSize = std::ceil( std::sqrt( images ) );
+	const uint16_t matrixSize = std::ceil( std::sqrt( images ) );
 	size[0] /= matrixSize;
 	size[1] /= matrixSize;
 	assert( size[3] == 1 );

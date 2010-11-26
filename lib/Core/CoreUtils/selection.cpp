@@ -19,7 +19,7 @@ Selection::Selection( const char *entries ): m_set( 0 )
 {
 	int ID = 1;
 	BOOST_FOREACH( const util::istring & ref, string2list<util::istring>( util::istring( entries ), ',' ) ) {
-		const map_type::value_type pair( ref, ID++ );
+		const MapType::value_type pair( ref, ID++ );
 		if( ! ent_map.insert( pair ).second ) {
 			LOG( Debug, error ) << "Entry " << util::MSubject( pair ) << " could not be inserted";
 		}

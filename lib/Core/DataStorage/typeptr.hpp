@@ -98,14 +98,14 @@ public:
 	/// delete-functor which does nothing (in case someone else manages the data).
 	struct NonDeleter {
 		void operator()( TYPE *p ) {
-			//we have to cast the pointer to void* here, because in case of u_int8_t it will try to print the "string"
+			//we have to cast the pointer to void* here, because in case of uint8_t it will try to print the "string"
 			LOG( Debug, info ) << "Not freeing pointer " << ( void * )p << " (" << TypePtr<TYPE>::staticName() << ") ";
 		};
 	};
 	/// Default delete-functor for c-arrays (uses free()).
 	struct BasicDeleter {
 		void operator()( TYPE *p ) {
-			//we have to cast the pointer to void* here, because in case of u_int8_t it will try to print the "string"
+			//we have to cast the pointer to void* here, because in case of uint8_t it will try to print the "string"
 			LOG( Debug, verbose_info ) << "Freeing pointer " << ( void * )p << " (" << TypePtr<TYPE>::staticName() << ") ";
 			free( p );
 		};
@@ -113,7 +113,7 @@ public:
 	/// Default delete-functor for arrays of objects (uses delete[]).
 	struct ObjectArrayDeleter {
 		void operator()( TYPE *p ) {
-			//we have to cast the pointer to void* here, because in case of u_int8_t it will try to print the "string"
+			//we have to cast the pointer to void* here, because in case of uint8_t it will try to print the "string"
 			LOG( Debug, info ) << "Deleting object array at " << ( void * )p << " (" << TypePtr<TYPE>::staticName() << ") ";
 			delete[] p;
 		};

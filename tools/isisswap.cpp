@@ -86,26 +86,26 @@ int main( int argc, char **argv )
 
 		if ( app.parameters["swap"].toString() == "image" || app.parameters["swap"].toString() == "both" ) {
 			switch ( refImage->typeID() ) {
-			case data::TypePtr<u_int8_t>::staticID:
-				newImage = voxelSwapZ<u_int8_t>( refImage, dim );
+			case data::TypePtr<uint8_t>::staticID:
+				newImage = voxelSwapZ<uint8_t>( refImage, dim );
 				break;
 			case data::TypePtr<int8_t>::staticID:
 				newImage = voxelSwapZ<int8_t>( refImage, dim );
 				break;
-			case data::TypePtr<u_int16_t>::staticID:
-				newImage = voxelSwapZ<u_int16_t>( refImage, dim );
+			case data::TypePtr<uint16_t>::staticID:
+				newImage = voxelSwapZ<uint16_t>( refImage, dim );
 				break;
 			case data::TypePtr<int16_t>::staticID:
 				newImage = voxelSwapZ<int16_t>( refImage, dim );
 				break;
-			case data::TypePtr<u_int32_t>::staticID:
-				newImage = voxelSwapZ<u_int32_t>( refImage, dim );
+			case data::TypePtr<uint32_t>::staticID:
+				newImage = voxelSwapZ<uint32_t>( refImage, dim );
 				break;
 			case data::TypePtr<int32_t>::staticID:
 				newImage = voxelSwapZ<int32_t>( refImage, dim );
 				break;
-			case data::TypePtr<u_int64_t>::staticID:
-				newImage = voxelSwapZ<u_int64_t>( refImage, dim );
+			case data::TypePtr<uint64_t>::staticID:
+				newImage = voxelSwapZ<uint64_t>( refImage, dim );
 				break;
 			case data::TypePtr<int64_t>::staticID:
 				newImage = voxelSwapZ<int64_t>( refImage, dim );

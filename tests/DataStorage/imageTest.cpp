@@ -105,10 +105,10 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		// Check all dimensions
 		data::Image img2;
 
-		u_int32_t nrRows = 12;
-		u_int32_t nrCols = 32;
-		u_int32_t nrTimesteps = 17;
-		u_int32_t nrSlices = 27;
+		uint32_t nrRows = 12;
+		uint32_t nrCols = 32;
+		uint32_t nrTimesteps = 17;
+		uint32_t nrSlices = 27;
 		for( int t = 0; t < nrTimesteps; t++ ) {
 			for( int s = 0; s < nrSlices; s++ ){
 				data::Chunk ch = data::MemChunk<float>( nrCols, nrRows );

@@ -40,20 +40,20 @@ itkAdapter::makeItkImageObject( const boost::shared_ptr<data::Image> src, const 
 	case data::TypePtr<int8_t>::staticID:
 		return this->internCreateItk<int8_t, OutputImageType>( behaveAsItkReader );
 		break;
-	case data::TypePtr<u_int8_t>::staticID:
-		return this->internCreateItk<u_int8_t, OutputImageType>( behaveAsItkReader );
+	case data::TypePtr<uint8_t>::staticID:
+		return this->internCreateItk<uint8_t, OutputImageType>( behaveAsItkReader );
 		break;
 	case data::TypePtr<int16_t>::staticID:
 		return this->internCreateItk<int16_t, OutputImageType>( behaveAsItkReader );
 		break;
-	case data::TypePtr<u_int16_t>::staticID:
-		return this->internCreateItk<u_int16_t, OutputImageType>( behaveAsItkReader );
+	case data::TypePtr<uint16_t>::staticID:
+		return this->internCreateItk<uint16_t, OutputImageType>( behaveAsItkReader );
 		break;
 	case data::TypePtr<int32_t>::staticID:
 		return this->internCreateItk<int32_t, OutputImageType>( behaveAsItkReader );
 		break;
-	case data::TypePtr<u_int32_t>::staticID:
-		return this->internCreateItk<u_int32_t, OutputImageType>( behaveAsItkReader );
+	case data::TypePtr<uint32_t>::staticID:
+		return this->internCreateItk<uint32_t, OutputImageType>( behaveAsItkReader );
 		break;
 	case data::TypePtr<float>::staticID:
 		return this->internCreateItk<float, OutputImageType>( behaveAsItkReader );
@@ -74,20 +74,20 @@ itkAdapter::makeIsisImageObject( const typename TImage::Pointer src, const bool 
 		case data::TypePtr<int8_t>::staticID:
 			return this->internCreateISIS<TImage, int8_t>( src, behaveAsItkWriter );
 			break;
-		case data::TypePtr<u_int8_t>::staticID:
-			return this->internCreateISIS<TImage, u_int8_t>( src, behaveAsItkWriter );
+		case data::TypePtr<uint8_t>::staticID:
+			return this->internCreateISIS<TImage, uint8_t>( src, behaveAsItkWriter );
 			break;
 		case data::TypePtr<int16_t>::staticID:
 			return this->internCreateISIS<TImage, int16_t>( src, behaveAsItkWriter );
 			break;
-		case data::TypePtr<u_int16_t>::staticID:
-			return this->internCreateISIS<TImage, u_int16_t>( src, behaveAsItkWriter );
+		case data::TypePtr<uint16_t>::staticID:
+			return this->internCreateISIS<TImage, uint16_t>( src, behaveAsItkWriter );
 			break;
 		case data::TypePtr<int32_t>::staticID:
 			return this->internCreateISIS<TImage, int32_t>( src, behaveAsItkWriter );
 			break;
-		case data::TypePtr<u_int32_t>::staticID:
-			return this->internCreateISIS<TImage, u_int32_t>( src, behaveAsItkWriter );
+		case data::TypePtr<uint32_t>::staticID:
+			return this->internCreateISIS<TImage, uint32_t>( src, behaveAsItkWriter );
 			break;
 		case data::TypePtr<float>::staticID:
 			return this->internCreateISIS<TImage, float>( src, behaveAsItkWriter );
@@ -267,7 +267,7 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	//since the acquisitionNumber is not stored in the PropMap of the image, we have
 	//to create a dummy acquisitionNumber
 	if ( !retChunk->hasProperty( "acqisitionNumber" ) )
-		retChunk->setProperty( "acquisitionNumber", static_cast<u_int32_t>( 1 ) );
+		retChunk->setProperty( "acquisitionNumber", static_cast<uint32_t>( 1 ) );
 
 	//do not try to grasp that in a sober state!!
 	//workaround to create a TypedImage out of a MemChunk
