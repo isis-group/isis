@@ -21,7 +21,7 @@ namespace data
 namespace _internal
 {
 
-void transformCoords(isis::util::PropMap& properties, boost::numeric::ublas::matrix<float> transform){
+void transformCoords(isis::util::PropertyMap& properties, boost::numeric::ublas::matrix<float> transform){
 
 	// this implementation assumes that the PropMap properties is either a
 	// data::Chunk or a data::Image object. Hence it should contain the

@@ -259,7 +259,7 @@ ChunkList Chunk::splice ( dimensions atDim )const
 	//create new Chunks from this TypePtr's
 	BOOST_FOREACH( TypePtrList::const_reference ref, pointers ) {
 		boost::shared_ptr<Chunk> spliced( new Chunk( ref, spliceSize[0], spliceSize[1], spliceSize[2], spliceSize[3] ) );
-		static_cast<util::PropMap &>( *spliced ) = static_cast<const util::PropMap &>( *this ); //copy the metadate of ref
+		static_cast<util::PropertyMap &>( *spliced ) = static_cast<const util::PropertyMap &>( *this ); //copy the metadate of ref
 		ret.push_back( spliced ); // store splice for return
 	}
 	return ret;

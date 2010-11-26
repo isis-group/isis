@@ -35,7 +35,7 @@ typedef std::list<boost::shared_ptr<Chunk> > ChunkList;
 
 namespace _internal
 {
-class ChunkBase : public NDimensional<4>, public util::PropMap
+class ChunkBase : public NDimensional<4>, public util::PropertyMap
 {
 protected:
 	static const char *needed;

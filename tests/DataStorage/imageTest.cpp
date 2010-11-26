@@ -438,8 +438,10 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 
 		for ( int i = 0; i < 3; i++ )
 			for ( int j = 0; j < 3; j++ ) {
-				const util::PropMap &c1 = img.getChunk( 0, 0, i, j );
-				const util::PropMap &c2 = img2.getChunk( 0, 0, i, j );
+				const util::PropertyMap
+ &c1 = img.getChunk( 0, 0, i, j );
+				const util::PropertyMap
+ &c2 = img2.getChunk( 0, 0, i, j );
 				BOOST_REQUIRE( c1.isValid
 () );
 				BOOST_CHECK( c2.isValid

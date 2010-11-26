@@ -18,27 +18,27 @@ namespace isis
 namespace util
 {
 
-const PropMap::mapped_type PropMap::emptyEntry;//dummy to be able to return an empty Property
+const PropertyMap::mapped_type PropertyMap::emptyEntry;//dummy to be able to return an empty Property
 
 ///////////////////////////////////////////////////////////////////
 // Contructors
 ///////////////////////////////////////////////////////////////////
 
-PropMap::PropMap( const isis::util::PropMap::Container &src ): Container( src ) {}
+PropertyMap::PropertyMap( const isis::util::PropertyMap::Container &src ): Container( src ) {}
 
-bool PropMap::operator==( const PropMap &src )const
+bool PropertyMap::operator==( const PropertyMap &src )const
 {
 	const Container &other = src, &me = *this;
 	return me == other;
 }
 
-PropMap::PropMap() {}
+PropertyMap::PropertyMap() {}
 
 
 ///////////////////////////////////////////////////////////////////
 // The core tree traversal functions
 ///////////////////////////////////////////////////////////////////
-PropMap::mapped_type &PropMap::fetchEntry( const key_type &key )
+PropertyMap::mapped_type &PropertyMap::fetchEntry( const key_type &key )
 {
 	const propPath path = util::string2list<key_type>( key, pathSeperator );
 	return fetchEntry( *this, path.begin(), path.end() );
@@ -47,9 +47,9 @@ PropMap::mapped_type &PropMap::fetchEntry( const key_type &key )
  * Follow a "Path" to a property to get it.
  * This will create branches on its way if necessary.
  */
-PropMap::mapped_type &PropMap::fetchEntry(
-	PropMap &root,
-	const isis::util::PropMap::propPathIterator at, const isis::util::PropMap::propPathIterator pathEnd )
+PropertyMap::mapped_type &PropertyMap::fetchEntry(
+	PropertyMap &root,
+	const isis::util::PropertyMap::propPathIterator at, const isis::util::PropertyMap::propPathIterator pathEnd )
 {
 	propPath::const_iterator next = at;
 	next++;
@@ -72,7 +72,7 @@ PropMap::mapped_type &PropMap::fetchEntry(
 	}
 }
 
-const PropMap::mapped_type *PropMap::findEntry( const key_type &key )const
+const PropertyMap::mapped_type *PropertyMap::findEntry( const key_type &key )const
 {
 	const propPath path = util::string2list<key_type>( key, pathSeperator );
 	return findEntry( *this, path.begin(), path.end() );
@@ -81,13 +81,13 @@ const PropMap::mapped_type *PropMap::findEntry( const key_type &key )const
  * Find property following the given "path".
  * If the "path" or the property does not exist NULL is returned.
  */
-const PropMap::mapped_type *PropMap::findEntry(
-	const PropMap &root,
+const PropertyMap::mapped_type *PropertyMap::findEntry(
+	const PropertyMap &root,
 	const propPathIterator at, const propPathIterator pathEnd )
 {
 	propPathIterator next = at;
 	next++;
-	util::PropMap::const_iterator found = root.find( *at );
+	util::PropertyMap::const_iterator found = root.find( *at );
 
 	if ( next != pathEnd ) {//we are not at the end of the path (aka the leaf)
 		if ( found != root.end() ) {//and we found the entry
@@ -100,7 +100,7 @@ const PropMap::mapped_type *PropMap::findEntry(
 
 	return NULL;
 }
-bool PropMap::recursiveRemove( PropMap &root, const propPathIterator at, const propPathIterator pathEnd )
+bool PropertyMap::recursiveRemove( PropertyMap &root, const propPathIterator at, const propPathIterator pathEnd )
 {
 	bool ret = true;
 
@@ -132,7 +132,7 @@ bool PropMap::recursiveRemove( PropMap &root, const propPathIterator at, const p
 /////////////////////////////////////////////////////////////////////////////////////
 // Generic interface for accessing elements
 ////////////////////////////////////////////////////////////////////////////////////
-const PropertyValue &PropMap::propertyValue( const key_type &key )const
+const PropertyValue &PropertyMap::propertyValue( const key_type &key )const
 {
 	const propPath path = util::string2list<key_type>( key, pathSeperator );
 	const mapped_type *ref = findEntry( *this, path.begin(), path.end() );
@@ -145,7 +145,7 @@ const PropertyValue &PropMap::propertyValue( const key_type &key )const
 	}
 }
 
-PropertyValue &PropMap::propertyValue( const key_type &key )
+PropertyValue &PropertyMap::propertyValue( const key_type &key )
 {
 	const propPath path = util::string2list<key_type>( key, pathSeperator );
 	mapped_type &n = fetchEntry( *this, path.begin(), path.end() );
@@ -153,7 +153,7 @@ PropertyValue &PropMap::propertyValue( const key_type &key )
 	return n.getLeaf();
 }
 
-const PropMap &PropMap::branch( const key_type &key ) const
+const PropertyMap &PropertyMap::branch( const key_type &key ) const
 {
 	const propPath path = util::string2list<key_type>( key, pathSeperator );
 	const mapped_type *ref = findEntry( *this, path.begin(), path.end() );
@@ -166,20 +166,20 @@ const PropMap &PropMap::branch( const key_type &key ) const
 		return ref->getBranch();
 	}
 }
-PropMap &PropMap::branch( const key_type &key )
+PropertyMap &PropertyMap::branch( const key_type &key )
 {
 	const propPath path = util::string2list<key_type>( key, pathSeperator );
 	mapped_type &n = fetchEntry( *this, path.begin(), path.end() );
 	return n.getBranch();
 }
 
-bool PropMap::remove( const key_type &key )
+bool PropertyMap::remove( const key_type &key )
 {
 	const propPath path = util::string2list<key_type>( key, pathSeperator );
 	return recursiveRemove( *this, path.begin(), path.end() );
 }
 
-bool PropMap::remove( const isis::util::PropMap &removeMap, bool keep_needed )
+bool PropertyMap::remove( const isis::util::PropertyMap &removeMap, bool keep_needed )
 {
 	iterator thisIt = begin();
 	bool ret = true;
@@ -190,8 +190,8 @@ bool PropMap::remove( const isis::util::PropMap &removeMap, bool keep_needed )
 		if ( continousFind( thisIt, end(), *otherIt, value_comp() ) ) { //thisIt->first == otherIt->first - so its the same property or propmap
 			if ( ! thisIt->second.is_leaf() ) { //this is a branch
 				if ( ! otherIt->second.is_leaf() ) { // recurse if its a branch in the removal map as well
-					PropMap &mySub = thisIt->second.getBranch();
-					const PropMap &otherSub = otherIt->second.getBranch();
+					PropertyMap &mySub = thisIt->second.getBranch();
+					const PropertyMap &otherSub = otherIt->second.getBranch();
 					ret &= mySub.remove( otherSub );
 
 					if( mySub.isEmpty() ) // delete my branch, if its empty
@@ -213,26 +213,26 @@ bool PropMap::remove( const isis::util::PropMap &removeMap, bool keep_needed )
 /////////////////////////////////////////////////////////////////////////////////////
 // utilities
 ////////////////////////////////////////////////////////////////////////////////////
-bool PropMap::isValid() const
+bool PropertyMap::isValid() const
 {
 	//iterate through the whole map and return false as soon as we find something needed _and_ empty
 	const const_iterator found = std::find_if( begin(), end(), treeInvalidP() );
 	return found == end();
 }
 
-bool PropMap::isEmpty() const
+bool PropertyMap::isEmpty() const
 {
 	return Container::empty();
 }
 
-PropMap::DiffMap PropMap::getDifference( const PropMap &other ) const
+PropertyMap::DiffMap PropertyMap::getDifference( const PropertyMap &other ) const
 {
-	PropMap::DiffMap ret;
+	PropertyMap::DiffMap ret;
 	diffTree( other, ret, "" );
 	return ret;
 }
 
-void PropMap::diffTree( const PropMap& other, PropMap::DiffMap& ret, istring prefix ) const
+void PropertyMap::diffTree( const PropertyMap& other, PropertyMap::DiffMap& ret, istring prefix ) const
 {
 	const_iterator otherIt = other.begin();
 
@@ -245,8 +245,8 @@ void PropMap::diffTree( const PropMap& other, PropMap::DiffMap& ret, istring pre
 			const mapped_type &first = thisIt->second, &second = otherIt->second;
 
 			if ( ! ( first.is_leaf() || second.is_leaf() ) ) { // if both are a branch
-				const PropMap &thisMap = first.getBranch();
-				const PropMap &refMap = second.getBranch();
+				const PropertyMap &thisMap = first.getBranch();
+				const PropertyMap &refMap = second.getBranch();
 				thisMap.diffTree( refMap, ret, pathname + "/" );
 			} else if ( ! ( first == second )  ) { // if they are not equal
 				const PropertyValue firstVal = first.is_leaf() ? first.getLeaf() : PropertyValue( Type<std::string>( first.toString() ) );
@@ -289,7 +289,7 @@ void PropMap::diffTree( const PropMap& other, PropMap::DiffMap& ret, istring pre
 	}
 }
 
-void PropMap::makeUnique ( const util::PropMap &other, bool removeNeeded )
+void PropertyMap::makeUnique ( const util::PropertyMap &other, bool removeNeeded )
 {
 	iterator thisIt = begin();
 
@@ -314,8 +314,8 @@ void PropMap::makeUnique ( const util::PropMap &other, bool removeNeeded )
 					LOG( Debug, verbose_info ) << "Removing " << *thisIt << " because its equal with the other (" << *otherIt << ")";
 					erase( thisIt++ ); // so delete this (they are equal - kind of)
 				} else if ( ! ( thisIt->second.is_leaf() || otherIt->second.is_leaf() ) ) { //but maybe they are branches
-					PropMap &thisMap = thisIt->second.getBranch();
-					const PropMap &otherMap = otherIt->second.getBranch();
+					PropertyMap &thisMap = thisIt->second.getBranch();
+					const PropertyMap &otherMap = otherIt->second.getBranch();
 					thisMap.makeUnique( otherMap );
 					thisIt++;
 				}
@@ -328,14 +328,14 @@ void PropMap::makeUnique ( const util::PropMap &other, bool removeNeeded )
 }
 
 
-PropMap::KeyList PropMap::join( const isis::util::PropMap &other, bool overwrite )
+PropertyMap::KeyList PropertyMap::join( const isis::util::PropertyMap &other, bool overwrite )
 {
 	KeyList rejects;
 	joinTree( other, overwrite, "", rejects );
 	return rejects;
 }
 
-void PropMap::joinTree( const isis::util::PropMap &other, bool overwrite, util::istring prefix, PropMap::KeyList &rejects )
+void PropertyMap::joinTree( const isis::util::PropertyMap &other, bool overwrite, util::istring prefix, PropertyMap::KeyList &rejects )
 {
 	iterator thisIt = begin();
 
@@ -345,8 +345,8 @@ void PropMap::joinTree( const isis::util::PropMap &other, bool overwrite, util::
 				LOG( Debug, verbose_info ) << "Replacing empty property " << MSubject( thisIt->first ) << " by " << MSubject( otherIt->second );
 				thisIt->second = otherIt->second;
 			} else if ( ! ( thisIt->second.is_leaf() || otherIt->second.is_leaf() ) ) { // if both are a subtree
-				PropMap &thisMap = thisIt->second.getBranch();
-				const PropMap &refMap = otherIt->second.getBranch();
+				PropertyMap &thisMap = thisIt->second.getBranch();
+				const PropertyMap &refMap = otherIt->second.getBranch();
 				thisMap.joinTree( refMap, overwrite, prefix + thisIt->first + "/", rejects ); //recursion
 			} else if ( overwrite ) { // otherwise replace ours by the other (if we shall overwrite)
 				LOG( Debug, info ) << "Replacing property " << MSubject( *thisIt ) << " by " << MSubject( otherIt->second );
@@ -365,7 +365,7 @@ void PropMap::joinTree( const isis::util::PropMap &other, bool overwrite, util::
 }
 
 
-void PropMap::linearize( FlatMap &out, key_type key_prefix ) const
+void PropertyMap::linearize( FlatMap &out, key_type key_prefix ) const
 {
 	for ( const_iterator i = begin(); i != end(); i++ ) {
 		key_type key = ( key_prefix.empty() ? "" : key_prefix + pathSeperator ) + i->first;
@@ -378,7 +378,7 @@ void PropMap::linearize( FlatMap &out, key_type key_prefix ) const
 	}
 }
 
-bool PropMap::transform( key_type from,  key_type to, int dstID, bool delSource )
+bool PropertyMap::transform( key_type from,  key_type to, int dstID, bool delSource )
 {
 	const PropertyValue &found = propertyValue( from );
 	bool ret = false;
@@ -406,28 +406,28 @@ bool PropMap::transform( key_type from,  key_type to, int dstID, bool delSource 
 }
 
 
-const PropMap::KeyList PropMap::getKeys()const
+const PropertyMap::KeyList PropertyMap::getKeys()const
 {
-	PropMap::KeyList ret;
+	PropertyMap::KeyList ret;
 	std::for_each( begin(), end(), walkTree<trueP>( ret ) );
 	return ret;
 }
 
-const PropMap::KeyList PropMap::getMissing() const
+const PropertyMap::KeyList PropertyMap::getMissing() const
 {
-	PropMap::KeyList ret;
+	PropertyMap::KeyList ret;
 	std::for_each( begin(), end(), walkTree<invalidP>( ret ) );
 	return ret;
 }
 
 
-void PropMap::addNeeded( const key_type &key )
+void PropertyMap::addNeeded( const key_type &key )
 {
 	propertyValue( key ).needed() = true;
 }
 
 
-void PropMap::addNeededFromString( const std::string &needed )
+void PropertyMap::addNeededFromString( const std::string &needed )
 {
 	const std::list<std::string> needList = util::string2list<std::string>( needed );
 	//@todo util::string2list<std::string>( needed,' ' ) would be faster but less robust
@@ -438,21 +438,21 @@ void PropMap::addNeededFromString( const std::string &needed )
 }
 
 /// \returns true if a leaf exists at the given path and the property is not empty
-bool PropMap::hasProperty( const key_type &key ) const
+bool PropertyMap::hasProperty( const key_type &key ) const
 {
 	const propPath path = util::string2list<key_type>( key, pathSeperator );
 	const mapped_type *ref = findEntry( *this, path.begin(), path.end() );
 	return ( ref && ref->is_leaf() && ! ref->getLeaf().empty() );
 }
 /// \returns true if a leaf exists at the given path and the property is not empty
-bool PropMap::hasBranch( const key_type &key ) const
+bool PropertyMap::hasBranch( const key_type &key ) const
 {
 	const propPath path = util::string2list<key_type>( key, pathSeperator );
 	const mapped_type *ref = findEntry( *this, path.begin(), path.end() );
 	return ( ref && ! ref->is_leaf()  );
 }
 
-bool PropMap::rename( key_type oldname, key_type newname )
+bool PropertyMap::rename( key_type oldname, key_type newname )
 {
 	const mapped_type *old_e = findEntry( oldname );
 	const mapped_type *new_e = findEntry( newname );
@@ -469,7 +469,7 @@ bool PropMap::rename( key_type oldname, key_type newname )
 	}
 }
 
-void PropMap::toCommonUnique( PropMap &common, std::set<key_type> &uniques, bool init )const
+void PropertyMap::toCommonUnique( PropertyMap &common, std::set<key_type> &uniques, bool init )const
 {
 	if ( init ) {
 		common = *this;
@@ -485,7 +485,7 @@ void PropMap::toCommonUnique( PropMap &common, std::set<key_type> &uniques, bool
 	}
 }
 
-std::ostream &PropMap::print( std::ostream &out, bool label )const
+std::ostream &PropertyMap::print( std::ostream &out, bool label )const
 {
 	FlatMap buff;
 	linearize( buff );
@@ -501,15 +501,15 @@ std::ostream &PropMap::print( std::ostream &out, bool label )const
 	return out;
 }
 
-bool PropMap::trueP::operator()( const PropMap::value_type &ref ) const
+bool PropertyMap::trueP::operator()( const PropertyMap::value_type &ref ) const
 {
 	return true;
 }
-bool PropMap::invalidP::operator()( const PropMap::value_type &ref ) const
+bool PropertyMap::invalidP::operator()( const PropertyMap::value_type &ref ) const
 {
 	return ref.second.getLeaf().needed() && ref.second.getLeaf().empty();
 }
-bool PropMap::treeInvalidP::operator()( const PropMap::value_type &ref ) const
+bool PropertyMap::treeInvalidP::operator()( const PropertyMap::value_type &ref ) const
 {
 	if ( ref.second.is_leaf() ) {
 		const PropertyValue &val = ref.second.getLeaf();

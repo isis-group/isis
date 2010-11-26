@@ -147,7 +147,7 @@ ptime ImageFormat_Dicom::genTimeStamp( const date &date, const ptime &time )
 }
 
 
-void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
+void ImageFormat_Dicom::sanitise( isis::util::PropertyMap &object, string dialect )
 {
 	const util::istring prefix = util::istring(ImageFormat_Dicom::dicomTagTreeName ) + "/";
 	/////////////////////////////////////////////////////////////////////////////////
@@ -442,7 +442,7 @@ int ImageFormat_Dicom::readMosaic( data::Chunk source, data::ChunkList &dest )
 		}
 
 		// and "fix" its properties
-		static_cast<util::PropMap &>( *newChunks[slice] ) = static_cast<const util::PropMap &>( source ); //copy _only_ the Properties of source
+		static_cast<util::PropertyMap &>( *newChunks[slice] ) = static_cast<const util::PropertyMap &>( source ); //copy _only_ the Properties of source
 		// update origin
 		util::fvector4 &origin = newChunks[slice]->propertyValue( "indexOrigin" )->castTo<util::fvector4>();
 		origin = origin + ( sliceVec * slice );

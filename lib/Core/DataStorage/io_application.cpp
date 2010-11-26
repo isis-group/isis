@@ -149,7 +149,7 @@ bool IOApplication::autoload( bool exitOnError )
 	} else {
 		for( ImageList::const_iterator a = images.begin(); a != images.end(); a++ ) {
 			for( ImageList::const_iterator b = a; ( ++b ) != images.end(); ) {
-				const util::PropMap &aref = **a, bref = **b;
+				const util::PropertyMap &aref = **a, bref = **b;
 				LOG_IF( aref.getDifference( bref ).empty(), Runtime, warning ) << "The metadata of the images from "
 						<< aref.getPropertyAs<std::string>( "source" ) << ":" << std::distance<ImageList::const_iterator>( images.begin(), a )
 						<< " and " << bref.getPropertyAs<std::string>( "source" ) << ":" << std::distance<ImageList::const_iterator>( images.begin(), b )

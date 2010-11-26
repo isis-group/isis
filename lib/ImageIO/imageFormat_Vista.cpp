@@ -149,11 +149,11 @@ throw( std::runtime_error & )
 	/*****************************************
 	 * write history information if available
 	 *****************************************/
-	util::PropMap::key_list keyset = image.getKeys();
+	util::PropertyMap::key_list keyset = image.getKeys();
 	// count number of history entries
 	size_t hcount = 0;
 	// if history list prefix is available increase counter.
-	BOOST_FOREACH( util::PropMap::key_list::key_type key, keyset ) {
+	BOOST_FOREACH( util::PropertyMap::key_list::key_type key, keyset ) {
 		if ( ( ( std::string )key ).find( histPrefix ) != std::string::npos ) {
 			hcount++;
 		}
@@ -230,7 +230,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 	 *****************************************/
 	// Create an empty PropertyMap to store vista history related properties.
 	// This map should be appended to every chunk in the ChunkList.
-	util::PropMap hMap;
+	util::PropertyMap hMap;
 	VAttrList hist_list = VReadHistory( &list );
 
 	if ( hist_list != NULL ) {
@@ -782,10 +782,10 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 	// with XX is the index number of the history entry in the vista file
 
 	if( image.hasBranch( "Vista" ) ) {
-		util::PropMap vista_branch = image.branch( "Vista" );
+		util::PropertyMap vista_branch = image.branch( "Vista" );
 		// convert it to a property map
-		util::PropMap::key_list klist = vista_branch.getKeys();
-		util::PropMap::key_list::const_iterator kiter;
+		util::PropertyMap::key_list klist = vista_branch.getKeys();
+		util::PropertyMap::key_list::const_iterator kiter;
 		// prefix of history entries
 		std::string hpref = "HistoryLine";
 
