@@ -37,16 +37,16 @@ Application::Application( const char name[] ): m_name( name )
 
 	parameters["dCore"] = dbg_levels;
 	parameters["dCore"].setDescription( "Debugging level for the Core module" );
-	parameters["dCore"].hidden()=true;
-	
+	parameters["dCore"].hidden() = true;
+
 	parameters["dData"] = dbg_levels;
 	parameters["dData"].setDescription( "Debugging level for the Data module" );
-	parameters["dData"].hidden()=true;
-	
+	parameters["dData"].hidden() = true;
+
 	parameters["dImageIO"] = dbg_levels;
 	parameters["dImageIO"].setDescription( "Debugging level for the ImageIO module" );
-	parameters["dImageIO"].hidden()=true;
-	
+	parameters["dImageIO"].hidden() = true;
+
 	parameters["help"] = false;
 	parameters["help"].setDescription( "Print help" );
 	BOOST_FOREACH( ParameterMap::reference ref, parameters ) //none of these is needed
@@ -61,7 +61,7 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 
 	if ( parameters.parse( argc, argv ) ) {
 		if ( parameters["help"] ) {
-			printHelp(true);
+			printHelp( true );
 			exit( 0 );
 		}
 	} else {
@@ -80,21 +80,24 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 		err = true;
 	}
 
-	if(parameters["dCore"].isSet()){
+	if( parameters["dCore"].isSet() ) {
 		setLog<CoreDebug>( LLMap[parameters["dCore"]->as<Selection>()] );
 		setLog<CoreLog>( LLMap[parameters["dCore"]->as<Selection>()] );
 	}
-	if(parameters["dData"].isSet()){
+
+	if( parameters["dData"].isSet() ) {
 		setLog<DataDebug>( LLMap[parameters["dData"]->as<Selection>()] );
 		setLog<DataLog>( LLMap[parameters["dData"]->as<Selection>()] );
 	}
-	if(parameters["dImageIO"].isSet()){
+
+	if( parameters["dImageIO"].isSet() ) {
 		setLog<ImageIoDebug>( LLMap[parameters["dImageIO"]->as<Selection>()] );
 		setLog<ImageIoLog>( LLMap[parameters["dImageIO"]->as<Selection>()] );
 	}
 
 	if ( err ) {
 		printHelp();
+
 		if( exitOnError ) {
 			std::cout << "Exiting..." << std::endl;
 			exit( 1 );
@@ -103,7 +106,7 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 
 	return ! err;
 }
-void Application::printHelp(bool withHidden)const
+void Application::printHelp( bool withHidden )const
 {
 	std::cout << this->m_name << " (using isis " << getCoreVersion() << ")" << std::endl;
 	std::cout << "Usage: " << this->m_filename << " <options>, where <options> includes:" << std::endl;
@@ -113,8 +116,8 @@ void Application::printHelp(bool withHidden)const
 
 		if ( iP->second.needed() ) {
 			pref = ". Required.";
-		} else if(iP->second.hidden()){
-			if(!withHidden)
+		} else if( iP->second.hidden() ) {
+			if( !withHidden )
 				continue; // if its hidden, not needed, and wie want the short version skip this parameter
 		}
 

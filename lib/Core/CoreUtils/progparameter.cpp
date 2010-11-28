@@ -20,21 +20,23 @@
 #include "CoreUtils/progparameter.hpp"
 #include <boost/foreach.hpp>
 
-namespace isis{
-namespace util{
+namespace isis
+{
+namespace util
+{
 
 ProgParameter::ProgParameter()
 {
 	needed() = true;
 	hidden() = false;
 }
-ProgParameter::ProgParameter(const ProgParameter& ref): PropertyValue( static_cast<const PropertyValue &>( ref ) ),m_hidden(false) {}
+ProgParameter::ProgParameter( const ProgParameter &ref ): PropertyValue( static_cast<const PropertyValue &>( ref ) ), m_hidden( false ) {}
 
 bool ProgParameter::hidden() const
 {
 	return m_hidden;
 }
-bool& ProgParameter::hidden()
+bool &ProgParameter::hidden()
 {
 	return m_hidden;
 }
@@ -54,7 +56,9 @@ bool ProgParameter::parse( const Type<std::string> &props )
 	}
 
 	LOG_IF( ret, Debug, info ) << "Parsed " << MSubject( props.toString() ) << " as " << me.toString( true );
-	if(ret)m_set=true;
+
+	if( ret )m_set = true;
+
 	return ret;
 }
 const std::string &ProgParameter::description()const
@@ -128,4 +132,5 @@ ProgParameter::operator boost::scoped_ptr<_internal::TypeBase>::unspecified_bool
 	return  dummy;
 }
 
-}}
+}
+}

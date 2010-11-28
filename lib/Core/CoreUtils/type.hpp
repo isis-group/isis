@@ -34,7 +34,7 @@ namespace _internal
 {
 
 /// @cond _hidden
-/** 
+/**
  * Generic value comparison class for Type.
  * This generic class does nothing, and the ()-operator will allways fail with an error send to the debug-logging.
  * It has to be (partly) specialized for the regarding type.
@@ -50,7 +50,7 @@ public:
 
 /**
  * Half-generic value comparison class for numeric Types.
- * This generic class does compares numeric Type's by converting the second 
+ * This generic class does compares numeric Type's by converting the second
  * Type-object to the type of the first Type-object. Then:
  * - if the conversion was successfull (the second value can be represented in the type of the first) the "inRange"-comparison is used
  * - if the conversion failed with an positive or negative overflow (the second value is to high/low the type of the first) a info sent to the debug-logging and the posOverflow/negOverflow comarison us used

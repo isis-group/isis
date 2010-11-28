@@ -184,7 +184,7 @@ public:
 	 * \return a map of property keys and value-pairs
 	 */
 	DiffMap getDifference( const PropertyMap &second )const;
-	
+
 	/**
 	 * Remove every PropertyValue which is also in the other PropMap and where operator== returns true.
 	 * \param other the other PropMap to compare to
@@ -366,7 +366,7 @@ template<class Predicate> struct PropertyMap::walkTree {
 // as well as PropMap::getProperty ...
 template<typename T> T PropertyMap::getPropertyAs( const KeyType &key ) const
 {
-	const mapped_type *entry = findEntry( util::istring(key) );
+	const mapped_type *entry = findEntry( util::istring( key ) );
 
 	if( entry ) {
 		const PropertyValue &ref = entry->getLeaf();

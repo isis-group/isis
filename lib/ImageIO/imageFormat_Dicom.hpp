@@ -24,7 +24,7 @@
 #ifdef _WIN32 // workaround for broken dcmtk/config/osconfig.h
 #include <dcmtk/config/cfwin32.h>
 #else
-#include <dcmtk/config/cfunix.h> 
+#include <dcmtk/config/cfunix.h>
 #endif //_WIN32
 #include <dcmtk/dcmdata/dcfilefo.h>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
@@ -43,6 +43,7 @@ class ImageFormat_Dicom: public FileFormat
 	template<typename BASE, typename DST> static DST endian( const BASE *b ) {
 		DST ret = 0;
 #if __BYTE_ORDER == __LITTLE_ENDIAN
+
 		for ( short i = 0; i < ( short )sizeof( DST ); i++ )
 #elif __BYTE_ORDER == __BIG_ENDIAN
 		for ( short i = ( short )sizeof( DST ) - 1; i >= 0; i-- )
@@ -63,13 +64,13 @@ public:
 	static const char dicomTagTreeName[];
 	static const char unknownTagName[];
 	static void parseCSA( DcmElement *elem, isis::util::PropertyMap &map, const std::string &dialect );
-	static void parseScalar( DcmElement* elem, const util::istring& name, util::PropertyMap& map );
+	static void parseScalar( DcmElement *elem, const util::istring &name, util::PropertyMap &map );
 	static void parseVector( DcmElement *elem, const util::istring &name, isis::util::PropertyMap &map );
 	static void parseList( DcmElement *elem, const util::istring &name, isis::util::PropertyMap &map );
 	static void dcmObject2PropMap( DcmObject *master_obj, isis::util::PropertyMap &map, const std::string &dialect );
 	static void sanitise( util::PropertyMap &object, string dialect );
 	std::string name()const;
-	std::string dialects(const std::string& filename)const;
+	std::string dialects( const std::string &filename )const;
 
 	int load( data::ChunkList &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & );
 	void write( const data::Image &image, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & );

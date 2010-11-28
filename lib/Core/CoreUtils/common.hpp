@@ -88,12 +88,12 @@ write_list( const unsigned char *start, const unsigned char *end,
 	o << prefix;
 
 	if ( start != end ) {
-		o << (unsigned short)*start;
+		o << ( unsigned short )*start;
 		start++;
 	}
 
-	for (const unsigned char *i = start; i != end; i++ )
-		o << delim << (unsigned short)*i;
+	for ( const unsigned char *i = start; i != end; i++ )
+		o << delim << ( unsigned short )*i;
 
 	o << suffix;
 	return o;
@@ -156,8 +156,8 @@ template<typename TARGET> std::list<TARGET> string2list(
 	boost::sregex_token_iterator i = boost::make_regex_token_iterator( source, separator, -1 );
 	const boost::sregex_token_iterator token_end;
 
-	while ( i != token_end ){
-		ret.push_back( boost::lexical_cast<TARGET>( (i++)->str() ) );
+	while ( i != token_end ) {
+		ret.push_back( boost::lexical_cast<TARGET>( ( i++ )->str() ) );
 	}
 
 	return ret;
@@ -183,7 +183,7 @@ template<typename TARGET> std::list<TARGET> string2list(
  * Splits source into tokens and tries to lexically cast them to TARGET.
  * If that fails, boost::bad_lexical_cast is thrown.
  * Leading and trailing seperators are ignored.
- * 
+ *
  * In contrast to the versions based on regular expressions, this can handle any basic_string as input.
  *
  * \param source the source string to be split up
@@ -191,8 +191,8 @@ template<typename TARGET> std::list<TARGET> string2list(
  * \returns a list of the casted tokens
  */
 //@todo test
-template<typename TARGET,typename charT, typename traits> std::list<TARGET>
-string2list( const std::basic_string<charT,traits> &source,  char separator )
+template<typename TARGET, typename charT, typename traits> std::list<TARGET>
+string2list( const std::basic_string<charT, traits> &source,  char separator )
 {
 	std::list<TARGET> ret;
 

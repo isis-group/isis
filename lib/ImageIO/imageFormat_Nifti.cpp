@@ -101,7 +101,7 @@ public:
 	enum vectordirection {readDir = 0, phaseDir, sliceDir, indexOrigin, voxelSizeVec};
 
 
-	std::string dialects(const std::string &filename)const {
+	std::string dialects( const std::string &filename )const {
 		return std::string( "fsl spm" );
 	}
 
@@ -129,7 +129,7 @@ public:
 
 		// TODO: at the moment scaling not supported due to data type changes
 		if ( 1.0 != scale ) {
-//			throwGenericError( std::string( "Scaling is not supported at the moment. Scale Factor: " ) + util::Type<float>( scale ).toString() );
+			//          throwGenericError( std::string( "Scaling is not supported at the moment. Scale Factor: " ) + util::Type<float>( scale ).toString() );
 			LOG( ImageIoDebug, warning ) << "Scaling is not supported at the moment. Scale Factor: "  + util::Type<float>( scale ).toString();
 		}
 
@@ -186,7 +186,7 @@ public:
 	 * write file
 	 ************************/
 	void write( const data::Image &imageOrig, const std::string &filename, const std::string &sdialect ) throw( std::runtime_error & ) {
-		const util::istring dialect(sdialect.begin(),sdialect.end());
+		const util::istring dialect( sdialect.begin(), sdialect.end() );
 		LOG( Debug, info ) << "Writing image of size " << imageOrig.getSizeAsString() << " and type " << imageOrig.typeName() << " as nifti";
 
 		boost::filesystem::path boostFilename( filename );
@@ -269,6 +269,7 @@ public:
 				ni.datatype = DT_UINT16;
 				copyDataToNifti<uint16_t>( image, ni );
 			}
+
 			break;
 		case data::TypePtr<int32_t>::staticID:
 			ni.datatype = DT_INT32;
@@ -363,7 +364,7 @@ private:
 		//check description for tr, te and fa and date which is written by spm8
 
 		boost::regex descriptionRegex(
-				".*TR=([[:digit:]]{1,})ms.*TE=([[:digit:]]{1,})ms.*FA=([[:digit:]]{1,})deg\\ *([[:digit:]]{1,2}).([[:word:]]{3}).([[:digit:]]{4})\\ *([[:digit:]]{1,2}):([[:digit:]]{1,2}):([[:digit:]]{1,2}).*" );
+			".*TR=([[:digit:]]{1,})ms.*TE=([[:digit:]]{1,})ms.*FA=([[:digit:]]{1,})deg\\ *([[:digit:]]{1,2}).([[:word:]]{3}).([[:digit:]]{4})\\ *([[:digit:]]{1,2}):([[:digit:]]{1,2}):([[:digit:]]{1,2}).*" );
 		boost::cmatch results;
 		uint16_t tr = 0;
 		uint16_t te = 0;
@@ -372,6 +373,7 @@ private:
 		size_t hours, minutes, seconds;
 		boost::gregorian::date isisDate;
 		boost::posix_time::time_duration isisTimeDuration;
+
 		if ( boost::regex_match( ni.descrip, results,  descriptionRegex ) ) {
 			tr = boost::lexical_cast<uint16_t>( results.str( 1 ) );
 			te = boost::lexical_cast<uint16_t>( results.str( 2 ) );
@@ -383,18 +385,19 @@ private:
 			minutes = boost::lexical_cast<size_t>( results.str( 8 ) );
 			seconds = boost::lexical_cast<size_t>( results.str( 9 ) );
 
-			if( day.size() == 1) {
+			if( day.size() == 1 ) {
 				day.insert( 0, std::string( "0" ) );
 			}
+
 			isisTimeDuration = boost::posix_time::time_duration( hours, minutes, seconds );
 			std::string strDate = year + "-" + month + "-" + day;
 			isisDate = boost::gregorian::from_simple_string( strDate );
 			boost::posix_time::ptime isisTime( isisDate, isisTimeDuration );
 			LOG( ImageIoLog, info ) << "SPM8 description found.";
-			retChunk.setPropertyAs<boost::posix_time::ptime>("sequenceStart", isisTime );
-			retChunk.setPropertyAs<uint16_t>("flipAngle", fa );
-			retChunk.setPropertyAs<uint16_t>("echoTime", te );
-			retChunk.setPropertyAs<uint16_t>("repetitionTime", tr );
+			retChunk.setPropertyAs<boost::posix_time::ptime>( "sequenceStart", isisTime );
+			retChunk.setPropertyAs<uint16_t>( "flipAngle", fa );
+			retChunk.setPropertyAs<uint16_t>( "echoTime", te );
+			retChunk.setPropertyAs<uint16_t>( "repetitionTime", tr );
 
 		}
 
@@ -475,7 +478,7 @@ private:
 		T *refNii = ( T * ) ni.data;
 		const util::FixedVector<size_t, 4> csize = image.getChunk( 0, 0 ).getSizeAsVector();
 		const util::FixedVector<size_t, 4> isize = image.getSizeAsVector();
-		const data::scaling_pair scale=image.getScalingTo(data::TypePtr<T>::staticID);
+		const data::scaling_pair scale = image.getScalingTo( data::TypePtr<T>::staticID );
 
 
 		for ( size_t t = 0; t < isize[3]; t += csize[3] ) {
@@ -483,7 +486,7 @@ private:
 				for ( size_t y = 0; y < isize[1]; y += csize[1] ) {
 					for ( size_t x = 0; x < isize[0]; x += csize[0] ) {
 						const size_t dim[] = {x, y, z, t};
-						const data::Chunk ch = image.getChunkAs<T>(scale, x, y, z, t );
+						const data::Chunk ch = image.getChunkAs<T>( scale, x, y, z, t );
 						T *target = refNii + image.getLinearIndex( dim );
 						ch.getTypePtr<T>().copyToMem( 0, ch.volume() - 1, target );
 					}
@@ -542,9 +545,11 @@ private:
 		LOG( ImageIoLog, info ) << indexOrigin;
 		util::fvector4 voxelSizeVector = image.getPropertyAs<util::fvector4>( "voxelSize" );
 		util::fvector4 voxelGap;
-		if(image.hasProperty( "voxelGap" )){
-			voxelGap= image.getPropertyAs<util::fvector4>( "voxelGap" );
+
+		if( image.hasProperty( "voxelGap" ) ) {
+			voxelGap = image.getPropertyAs<util::fvector4>( "voxelGap" );
 		}
+
 		ni.dx = ni.pixdim[1] = voxelSizeVector[0] + voxelGap[0];
 		ni.dy = ni.pixdim[2] = voxelSizeVector[1] + voxelGap[1];
 		ni.dz = ni.pixdim[3] = voxelSizeVector[2] + voxelGap[2];
@@ -562,7 +567,7 @@ private:
 
 		if ( image.hasProperty( "repetitionTime" ) ) {
 			LOG( ImageIoLog, info ) << "Setting pixdim[" << ni.ndim << "] to " << image.getPropertyAs<uint16_t>( "repetitionTime" );
-			ni.dt = ni.pixdim[ni.ndim+1] = (float) image.getPropertyAs<uint16_t>( "repetitionTime" ) / 1000; //nifti saves repTime s
+			ni.dt = ni.pixdim[ni.ndim+1] = ( float ) image.getPropertyAs<uint16_t>( "repetitionTime" ) / 1000; //nifti saves repTime s
 		}
 
 
@@ -595,10 +600,10 @@ private:
 			&ni.qoffset_x, &ni.qoffset_y, &ni.qoffset_z,
 			NULL, NULL, NULL,
 			&ni.qfac );
-		LOG(Debug,info) << "ni.qto_xyz:" << util::list2string(ni.qto_xyz.m[0],ni.qto_xyz.m[0]+3);
-		LOG(Debug,info) << "ni.qto_xyz:" << util::list2string(ni.qto_xyz.m[1],ni.qto_xyz.m[1]+3);
-		LOG(Debug,info) << "ni.qto_xyz:" << util::list2string(ni.qto_xyz.m[2],ni.qto_xyz.m[2]+3);
-		LOG(Debug,info) << "ni.qfac:" << ni.qfac;
+		LOG( Debug, info ) << "ni.qto_xyz:" << util::list2string( ni.qto_xyz.m[0], ni.qto_xyz.m[0] + 3 );
+		LOG( Debug, info ) << "ni.qto_xyz:" << util::list2string( ni.qto_xyz.m[1], ni.qto_xyz.m[1] + 3 );
+		LOG( Debug, info ) << "ni.qto_xyz:" << util::list2string( ni.qto_xyz.m[2], ni.qto_xyz.m[2] + 3 );
+		LOG( Debug, info ) << "ni.qfac:" << ni.qfac;
 	}
 
 

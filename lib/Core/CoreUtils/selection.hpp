@@ -89,7 +89,7 @@ template<typename T> Selection::Selection( const std::map< T, std::string >& map
 {
 	for( typename std::map< T, std::string >::const_iterator i = map.begin(); i != map.end(); i++ ) {
 		const MapType::value_type pair(
-			util::istring( i->second.begin(),i->second.end()),
+			util::istring( i->second.begin(), i->second.end() ),
 			i->first
 		);
 		assert( pair.second != 0 ); // 0 is reserved for <<NOT_SET>>

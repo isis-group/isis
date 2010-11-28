@@ -43,9 +43,9 @@ BOOST_AUTO_TEST_CASE( propMap_set_test )
 {
 	util::PropertyMap map1;
 	map1.propertyValue( "Test1" ) = 6.4;
-	BOOST_CHECK(!(map1.propertyValue( "Test1" )== 7) );
+	BOOST_CHECK( !( map1.propertyValue( "Test1" ) == 7 ) );
 	BOOST_CHECK_EQUAL( map1.propertyValue( "Test1" ), 6.4 );
-	map1.setPropertyAs( "Test1", 7.);
+	map1.setPropertyAs( "Test1", 7. );
 	BOOST_CHECK_EQUAL( map1.propertyValue( "Test1" ), 7 );
 }
 

@@ -13,7 +13,7 @@ int main( int argc, char *argv[] )
 	app.parameters["chunks"] = false;
 	app.parameters["chunks"].needed() = false;
 	app.parameters["chunks"].setDescription( "print detailed data about the chunks" );
-	app.init( argc, argv,false ); // if there is a problem, we just get no images and exit cleanly
+	app.init( argc, argv, false ); // if there is a problem, we just get no images and exit cleanly
 	unsigned short count1 = 0;
 	std::cout << "Got " << app.images.size() << " Images" << std::endl;
 	const unsigned short imageDigits = std::log10( app.images.size() ) + 1;

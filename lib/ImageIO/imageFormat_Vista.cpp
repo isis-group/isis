@@ -63,11 +63,13 @@ throw( std::runtime_error & )
 
 		//we have to go through all slices and calculate the offset of the slicetimes
 		std::list<float> acquisitionTimeList;
-		for (int z = 0; z < nimages; z++ ) {
-			if( shortImage.getChunkAt(z).hasProperty("acquisitionTime")) {
-				acquisitionTimeList.push_back( shortImage.getChunkAt(z).getPropertyAs<float>("acquisitionTime") );
+
+		for ( int z = 0; z < nimages; z++ ) {
+			if( shortImage.getChunkAt( z ).hasProperty( "acquisitionTime" ) ) {
+				acquisitionTimeList.push_back( shortImage.getChunkAt( z ).getPropertyAs<float>( "acquisitionTime" ) );
 			}
 		}
+
 		acquisitionTimeList.sort();
 		float sliceTimeOffset = acquisitionTimeList.front();
 
@@ -83,7 +85,7 @@ throw( std::runtime_error & )
 				}
 			}
 
-			copyHeaderToVista( shortImage, vimages[z], sliceTimeOffset, true, z);
+			copyHeaderToVista( shortImage, vimages[z], sliceTimeOffset, true, z );
 			VAppendAttr( attrList, "image", NULL, VImageRepn, vimages[z] );
 		}
 
@@ -142,7 +144,7 @@ throw( std::runtime_error & )
 		}
 
 		// copy header information
-		copyHeaderToVista( image, vimages[0],0 , false );
+		copyHeaderToVista( image, vimages[0], 0 , false );
 		VAppendAttr( attrList, "image", NULL, VImageRepn, vimages[0] );
 	}
 
@@ -347,14 +349,15 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 			dims[2] = vImageVector.size();
 			dims[3] = VImageNBands( vImageVector.back() );
 		}
+
 		std::set<util::fvector4, data::_internal::SortedChunkList::posCompare> originCheckSet;
 		//first we have to create a vista chunkList so we can get the number of slices
 		BOOST_FOREACH( std::vector<VImage>::reference sliceRef, vImageVector ) {
 			VistaChunk<VShort> vchunk( sliceRef, true );
 			vistaChunkList.push_back( vchunk );
 
-			if( vchunk.hasProperty("indexOrigin")) {
-				originCheckSet.insert( vchunk.getPropertyAs<util::fvector4>("indexOrigin") );
+			if( vchunk.hasProperty( "indexOrigin" ) ) {
+				originCheckSet.insert( vchunk.getPropertyAs<util::fvector4>( "indexOrigin" ) );
 			}
 
 			if( vchunk.hasProperty( "acquisitionTime" ) && !vchunk.hasProperty( "repetition_time" ) ) {
@@ -390,7 +393,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 			 */
 
 			// check if indexOrigin already present AND differs from slice to slice
-			if( sliceRef.hasProperty( "indexOrigin" ) and ( originCheckSet.size() == vImageVector.size() )) {
+			if( sliceRef.hasProperty( "indexOrigin" ) and ( originCheckSet.size() == vImageVector.size() ) ) {
 				ioprob = sliceRef.getPropertyAs<util::fvector4>( "indexOrigin" );
 			}
 			// no indexOrigin present or does not differ from slice to slice -> Calculate index origin
@@ -418,16 +421,17 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 				if( val == NULL ) {
 					throwGenericError( "Missing orientation information in functional data." );
 				}
+
 				// compare new orientation with old. Just to make sure that all subimages
 				// have the same slice orientation.
 				if( orient[0] == '\0' ) {
 					strcpy( orient, ( char * )val );
-				}
-				else {
+				} else {
 					// orientation string differs from previous value;
 					if( strcmp( orient, ( char * )val ) != 0 )
 						throwGenericError( "Inconsistent orienation information in functional data." );
 				}
+
 				// get voxel resolution
 				val = NULL;
 
@@ -462,11 +466,12 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 				// Get indexOrigin from whole image with respect of the orientation
 				// information. In general this should be the indexOrigin from the
 				// (0,0,0,0) voxel.
-				if ( !sliceRef.hasProperty("indexOrigin")) {
+				if ( !sliceRef.hasProperty( "indexOrigin" ) ) {
 					ioprob = calculateIndexOrigin( sliceRef, dims );
 				} else {
-					ioprob = sliceRef.getPropertyAs<util::fvector4>("indexOrigin");
+					ioprob = sliceRef.getPropertyAs<util::fvector4>( "indexOrigin" );
 				}
+
 				// correct the index origin according to the slice number and voxel
 				// resolution
 				// sagittal (x,y,z) -> (z,x,y)
@@ -482,7 +487,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 				// axial (x,y,z) -> (x,y,z)
 				else {
 					LOG( DataLog, verbose_info ) << "computing ioprop with axial: += " <<  ( nloaded - 1 ) * v3[2];
-					ioprob[2] += ( nloaded - 1) * v3[2];
+					ioprob[2] += ( nloaded - 1 ) * v3[2];
 				}
 			}
 
@@ -628,7 +633,7 @@ bool ImageFormat_Vista::switchHandle( VImage &image, data::ChunkList &chunks )
 	return false;
 }
 
-void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vimage, const float& sliceTimeOffset, const bool functional, size_t slice )
+void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vimage, const float &sliceTimeOffset, const bool functional, size_t slice )
 {
 	// get attribute list from image
 	VAttrList list = VImageAttrList( vimage );
@@ -638,10 +643,12 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 	util::fvector4 voxels = image.getPropertyAs<util::fvector4>( "voxelSize" );
 	util::fvector4 vGap = image.getPropertyAs<util::fvector4>( "voxelGap" );
 	const float inf = std::numeric_limits<float>::infinity();
+
 	// if vGap is valid the add it to the voxel resultion.
-	if(vGap[0] != inf && vGap[1] != inf && vGap[2] && vGap[3] != inf) {
-	  voxels = voxels + vGap;
+	if( vGap[0] != inf && vGap[1] != inf && vGap[2] && vGap[3] != inf ) {
+		voxels = voxels + vGap;
 	}
+
 	std::stringstream vstr;
 	vstr << voxels[0] << " " << voxels[1] << " " << voxels[2];
 	VAppendAttr( list, "voxel", NULL, VStringRepn, vstr.str().c_str() );
@@ -663,11 +670,13 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 	VAppendAttr( list, "sliceVec", NULL, VStringRepn, vstr.str().c_str() );
 	// index origin
 	util::fvector4 indexOrigin;
+
 	if( functional ) {
 		indexOrigin = image.getChunk( 0, 0, slice, 0 ).getPropertyAs<util::fvector4>( "indexOrigin" );
 	} else {
 		indexOrigin = image.getPropertyAs<util::fvector4>( "indexOrigin" );
 	}
+
 	vstr.str( "" );
 	vstr << indexOrigin[0] << " " << indexOrigin[1] << " " << indexOrigin[2];
 	VAppendAttr( list, "indexOrigin", NULL, VStringRepn, vstr.str().c_str() );
@@ -869,12 +878,12 @@ template <typename T> bool ImageFormat_Vista::copyImageToVista( const data::Imag
 	const util::FixedVector<size_t, 4> isize = image.getSizeAsVector();
 	LOG_IF( isize[3] > 1, Debug, error ) << "Vista cannot store 4D-Data in one VImage.";
 
-	const data::scaling_pair scale=image.getScalingTo(data::TypePtr<T>::staticID);
+	const data::scaling_pair scale = image.getScalingTo( data::TypePtr<T>::staticID );
 
 	for ( size_t z = 0; z < isize[2]; z += csize[2] ) {
 		for ( size_t y = 0; y < isize[1]; y += csize[1] ) {
 			for ( size_t x = 0; x < isize[0]; x += csize[0] ) {
-				data::Chunk ch = image.getChunkAs<T>(scale, x, y, z, 0 );
+				data::Chunk ch = image.getChunkAs<T>( scale, x, y, z, 0 );
 				ch.getTypePtr<T>().copyToMem( 0, csize.product() - 1, &VPixel( vimage, z, y, x, T ) );
 			}
 		}
