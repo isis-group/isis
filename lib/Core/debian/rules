@@ -9,7 +9,8 @@ include /usr/share/cdbs/1/class/cmake.mk
 DEB_CMAKE_EXTRA_FLAGS = \
 	-DCMAKE_C_COMPILER="/usr/bin/gcc" \
 	-DBUILD_SHARED_LIBS:BOOL=ON \
-	-DCMAKE_SKIP_RPATH:BOOL=OFF
+	-DCMAKE_SKIP_RPATH:BOOL=OFF \
+	-DISIS_CORE_DEBUG_LOG:BOOL=OFF
 
 # get number of parallel builds from the default environment
 # variable DEB_BUILD_OPTIONS. The expected value is 'parrallel=#'.
