@@ -13,15 +13,12 @@
 #include "CoreUtils/message.hpp"
 #include "CoreUtils/common.hpp"
 #include <sys/types.h>
+
 #include <boost/filesystem/path.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp> //we need the to_string functions for the automatic conversion
 
 #ifndef WIN32
 #include <signal.h>
-#endif
-
-#ifndef __PRETTY_FUNCTION__
-#pragma message("Using __FUNCTION__ instead of __PRETTY_FUNCTION__ - logging will not contain full function names")
 #endif
 
 namespace isis

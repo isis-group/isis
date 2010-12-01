@@ -13,6 +13,10 @@
 #ifndef CORE_COMMON_HPP
 #define CORE_COMMON_HPP
 
+#ifdef _MSC_VER
+#define NOMINMAX 1
+#endif
+
 #include <utility>
 #include <ostream>
 #include <map>
@@ -25,9 +29,9 @@
 #include <cmath>
 #include "log.hpp"
 #include "log_modules.hpp"
-#include <boost/algorithm/string/case_conv.hpp>
 
 #ifdef _MSC_VER
+#include <Windows.h>
 typedef boost::int8_t   int8_t;
 typedef boost::int16_t  int16_t;
 typedef boost::int32_t  int32_t;
@@ -36,16 +40,16 @@ typedef boost::uint16_t uint16_t;
 typedef boost::uint32_t uint32_t;
 typedef boost::int64_t  int64_t;
 typedef boost::uint64_t uint64_t;
-#define DISABLE_WARN(NUM)   #pragma warning(disable:4244)
-#define DISABLE_WARN_LINE(NUM) #pragma warning(suppress:4996)
 #else
 #include <stdint.h>
-#define DISABLE_WARN(NUM)
-#define DISABLE_WARN_LINE(NUM)
 #endif
 
 namespace isis
 {
+#ifdef _MSC_VER
+// dear microsoft, if I 'ld mean "boost::mpl::size_t", I 'ld write "boost::mpl::size_t" *argl*
+typedef ::size_t size_t;
+#endif
 namespace util
 {
 
@@ -134,7 +138,7 @@ template<typename T, typename InputIterator> std::list<T> list2list( InputIterat
  * \returns a list of the casted tokens
  */
 template<typename TARGET> std::list<TARGET> string2list(
-	std::string source, const boost::regex separator,
+	std::string source, const boost::regex &separator,
 	boost::regex prefix, boost::regex postfix )
 {
 	std::list<TARGET> ret;
@@ -185,12 +189,15 @@ template<typename TARGET> std::list<TARGET> string2list(
  * If that fails, boost::bad_lexical_cast is thrown.
  * Leading and trailing seperators are ignored.
  *
+ * In contrast to the versions based on regular expressions, this can handle any basic_string as input.
+ *
  * \param source the source string to be split up
  * \param separator string to delimit the tokens
  * \returns a list of the casted tokens
  */
 //@todo test
-template<typename TARGET> std::list<TARGET> string2list( const std::string &source,  char separator )
+template<typename TARGET, typename charT, typename traits> std::list<TARGET>
+string2list( const std::basic_string<charT, traits> &source,  charT separator )
 {
 	std::list<TARGET> ret;
 
@@ -287,15 +294,6 @@ continousFind( ForwardIterator &current, const ForwardIterator end, const T &com
 {
 	return continousFind( current, end, compare, std::less<T>() );
 }
-
-///Caseless less-compare for std::string
-struct caselessStringLess {
-	bool operator() ( const std::string &a, const std::string &b ) const {
-		return strcasecmp( a.c_str(), b.c_str() ) < 0;
-		//      return boost::algorithm::to_lower_copy(a) < boost::algorithm::to_lower_copy(b);
-		//@todo for WinXP maybe look at http://www.winehq.org/pipermail/wine-patches/2004-August/012083.html
-	}
-};
 }
 /// @endcond
 typedef CoreDebug Debug;

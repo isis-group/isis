@@ -33,7 +33,7 @@ pad-oper
 pad-paren-in
 
 # Delete empty lines within a function or method.
-delete-empty-lines
+# delete-empty-lines #causes to much trouble
 
 # Don't break blocks residing completely on one line.
 --keep-one-line-blocks

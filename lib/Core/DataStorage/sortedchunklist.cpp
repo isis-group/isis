@@ -17,6 +17,10 @@
 
 */
 
+#ifdef _MSC_VER
+#pragma warning(disable:4996)
+#endif
+
 #include "DataStorage/sortedchunklist.hpp"
 
 namespace isis
@@ -29,7 +33,7 @@ namespace _internal
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // sorting algorithm implementation
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-SortedChunkList::scalarPropCompare::scalarPropCompare( const std::string &prop_name ): propertyName( prop_name ) {}
+SortedChunkList::scalarPropCompare::scalarPropCompare( const util::PropMap::pname_type &prop_name ): propertyName( prop_name ) {}
 
 bool SortedChunkList::posCompare::operator()( const util::fvector4 &posA, const util::fvector4 &posB ) const
 {
@@ -63,8 +67,8 @@ SortedChunkList::chunkPtrOperator::~chunkPtrOperator() {}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // constructor
-SortedChunkList::SortedChunkList( std::string fvectorPropName, std::string comma_separated_equal_props ):
-	equalProps( util::string2list<std::string>( comma_separated_equal_props, ',' ) )
+SortedChunkList::SortedChunkList( util::PropMap::pname_type fvectorPropName, util::PropMap::pname_type comma_separated_equal_props ):
+	equalProps( util::string2list<util::PropMap::pname_type>( comma_separated_equal_props, ',' ) )
 {}
 
 
@@ -83,7 +87,7 @@ SortedChunkList::SecondaryMap *SortedChunkList::primaryFind( const util::fvector
 // low level insert
 std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::secondaryInsert( SecondaryMap &map, const Chunk &ch )
 {
-	std::string propName = map.key_comp().propertyName;
+	util::PropMap::pname_type propName = map.key_comp().propertyName;
 
 	if( ch.hasProperty( propName ) ) {
 		//check, if there is already a chunk
@@ -145,6 +149,9 @@ std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::primaryInsert( const 
 bool SortedChunkList::insert( const Chunk &ch )
 {
 	LOG_IF( secondarySort.empty(), Debug, error ) << "Inserting will fail without any secondary sort. Use chunks.addSecondarySort at least once.";
+	LOG_IF( !ch.valid(), Debug, error )	<< "You're trying insert an invalid chunk. The missing properties are " << ch.getMissing() << " This will break.";
+	LOG_IF( !ch.valid(), Debug, error ) << "You should definitively check the chunks validity (use the function Chunk::valid) before calling this funktion.";
+	assert(ch.valid());
 
 	if( !empty() ) {
 		// compare some attributes of the first chunk and the one which shall be inserted
@@ -156,7 +163,7 @@ bool SortedChunkList::insert( const Chunk &ch )
 			return false;
 		}
 
-		BOOST_FOREACH( std::string & ref, equalProps ) { // check all properties which where given to the constructor of the list
+		BOOST_FOREACH( util::PropMap::pname_type & ref, equalProps ) { // check all properties which where given to the constructor of the list
 			// if at least one of them has the property and they are not equal - do not insert
 			if ( ( first.hasProperty( ref ) || ch.hasProperty( ref ) ) && first.propertyValue( ref ) != ch.propertyValue( ref ) ) {
 				LOG( Debug, verbose_info )
@@ -169,7 +176,7 @@ bool SortedChunkList::insert( const Chunk &ch )
 		std::stack<scalarPropCompare> backup = secondarySort;
 
 		while( !ch.hasProperty( secondarySort.top().propertyName ) ) {
-			const std::string temp = secondarySort.top().propertyName;
+			const util::PropMap::pname_type temp = secondarySort.top().propertyName;
 
 			if ( secondarySort.size() > 1 ) {
 				secondarySort.pop();
@@ -184,7 +191,7 @@ bool SortedChunkList::insert( const Chunk &ch )
 		LOG( Debug, info )  << "Using " << secondarySort.top().propertyName << " for secondary sorting, determined by the first chunk";
 	}
 
-	const std::string &prop2 = secondarySort.top().propertyName;
+	const util::PropMap::pname_type &prop2 = secondarySort.top().propertyName;
 
 	std::pair<boost::shared_ptr<Chunk>, bool> inserted = primaryInsert( ch );
 
@@ -202,7 +209,7 @@ bool SortedChunkList::insert( const Chunk &ch )
 	return inserted.second;
 }
 
-void SortedChunkList::addSecondarySort( const std::string &cmp )
+void SortedChunkList::addSecondarySort( const util::PropMap::pname_type &cmp )
 {
 	secondarySort.push( scalarPropCompare( cmp ) );
 }

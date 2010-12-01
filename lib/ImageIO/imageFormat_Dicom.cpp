@@ -1,5 +1,6 @@
 #include "imageFormat_Dicom.hpp"
-#include "DataStorage/common.hpp"
+#include <DataStorage/common.hpp>
+#include <CoreUtils/istring.hpp>
 #include <dcmtk/dcmdata/dcdict.h>
 #include <dcmtk/dcmimgle/dcmimage.h>
 #include <dcmtk/dcmimage/diregist.h> //for color support
@@ -148,7 +149,7 @@ ptime ImageFormat_Dicom::genTimeStamp( const date &date, const ptime &time )
 
 void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 {
-	const std::string prefix = std::string( ImageFormat_Dicom::dicomTagTreeName ) + "/";
+	const util::istring prefix = util::istring( ImageFormat_Dicom::dicomTagTreeName ) + "/";
 	/////////////////////////////////////////////////////////////////////////////////
 	// Transform known DICOM-Tags into default-isis-properties
 	/////////////////////////////////////////////////////////////////////////////////
@@ -347,10 +348,10 @@ void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
 int ImageFormat_Dicom::readMosaic( data::Chunk source, data::ChunkList &dest )
 {
 	// prepare some needed parameters
-	const std::string prefix = std::string( ImageFormat_Dicom::dicomTagTreeName ) + "/";
+	const util::istring prefix = util::istring( ImageFormat_Dicom::dicomTagTreeName ) + "/";
 	util::slist iType = source.getProperty<util::slist>( prefix + "ImageType" );
 	std::replace( iType.begin(), iType.end(), std::string( "MOSAIC" ), std::string( "WAS_MOSAIC" ) );
-	std::string NumberOfImagesInMosaicProp;
+	util::istring NumberOfImagesInMosaicProp;
 
 	if ( source.hasProperty( prefix + "Unknown Tag(0019,100a)" ) ) {
 		NumberOfImagesInMosaicProp = prefix + "Unknown Tag(0019,100a)";
@@ -477,7 +478,7 @@ int ImageFormat_Dicom::load( data::ChunkList &chunks, const std::string &filenam
 			//we got a chunk from the file
 			sanitise( *chunk, "" );
 			chunk->setProperty( "source", filename );
-			const util::slist iType = chunk->getProperty<util::slist>( std::string( ImageFormat_Dicom::dicomTagTreeName ) + "/" + "ImageType" );
+			const util::slist iType = chunk->getProperty<util::slist>( util::istring( ImageFormat_Dicom::dicomTagTreeName ) + "/" + "ImageType" );
 
 			if ( std::find( iType.begin(), iType.end(), "MOSAIC" ) != iType.end() ) { // if its a mosaic
 				if( dialect == "nomosaic" ) {

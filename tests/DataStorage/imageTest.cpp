@@ -199,8 +199,9 @@ BOOST_AUTO_TEST_CASE ( type_selection_test )
 	name.setProperty( "readVec", util::fvector4( 1, 0 ) );\
 	name.setProperty( "phaseVec", util::fvector4( 0, 1 ) );\
 	name.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );\
-	org++;\
-	MAKE_CHUNK(int16_t,ch_int16_t);
+	org++;
+
+	MAKE_CHUNK( int16_t, ch_int16_t );
 	MAKE_CHUNK( int8_t, ch_int8_t );
 	MAKE_CHUNK( uint8_t, ch_uint8_t );
 	MAKE_CHUNK( uint16_t, ch_uint16_t );
@@ -217,6 +218,7 @@ BOOST_AUTO_TEST_CASE ( type_selection_test )
 	BOOST_CHECK( img.reIndex() );
 	BOOST_CHECK_EQUAL( img.sizeToVector(), ( util::FixedVector<size_t, 4>( size ) ) );
 	BOOST_CHECK_EQUAL( img.typeID(), data::TypePtr<int16_t>( NULL, 0 ).typeID() );
+#undef MAKE_CHUNK
 }
 
 BOOST_AUTO_TEST_CASE ( type_scale_test )
@@ -229,8 +231,9 @@ BOOST_AUTO_TEST_CASE ( type_scale_test )
 	name.setProperty( "readVec", util::fvector4( 1, 0 ) );\
 	name.setProperty( "phaseVec", util::fvector4( 0, 1 ) );\
 	name.setProperty( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );\
-	org++;\
-	MAKE_CHUNK(int16_t,ch_int16_t);
+	org++;
+
+	MAKE_CHUNK( int16_t, ch_int16_t );
 	MAKE_CHUNK( int8_t, ch_int8_t );
 	MAKE_CHUNK( uint8_t, ch_uint8_t );
 	MAKE_CHUNK( uint16_t, ch_uint16_t );
@@ -248,6 +251,7 @@ BOOST_AUTO_TEST_CASE ( type_scale_test )
 	data::scaling_pair scale = img.getScalingTo( data::TypePtr<uint8_t>::staticID );
 	BOOST_CHECK_EQUAL( scale.first->as<double>(), 1. / 10 );
 	BOOST_CHECK_EQUAL( scale.second->as<double>(), 5 );
+#undef MAKE_CHUNK
 }
 
 BOOST_AUTO_TEST_CASE ( image_chunk_test )
