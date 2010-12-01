@@ -138,7 +138,7 @@ template<typename T, typename InputIterator> std::list<T> list2list( InputIterat
  * \returns a list of the casted tokens
  */
 template<typename TARGET> std::list<TARGET> string2list(
-	std::string source, const boost::regex separator,
+	std::string source, const boost::regex &separator,
 	boost::regex prefix, boost::regex postfix )
 {
 	std::list<TARGET> ret;
