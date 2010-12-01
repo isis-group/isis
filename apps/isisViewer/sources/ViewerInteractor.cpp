@@ -29,7 +29,7 @@ namespace isis
 namespace viewer
 {
 
-ViewerInteractor::ViewerInteractor( ViewControl* viewer, vtkSmartPointer<vtkRenderer> renderer )
+ViewerInteractor::ViewerInteractor( ViewControl *viewer, vtkSmartPointer<vtkRenderer> renderer )
 	: m_ViewerPtr( viewer ),
 	  m_Renderer( renderer )
 {
@@ -96,8 +96,8 @@ void ViewerInteractor::OnLeftButtonDown()
 						m_Renderer ) ) {
 		double ptMapped[3];
 		m_Picker->GetMapperPosition( ptMapped );
-		m_ViewerPtr->sliceChanged( static_cast<int>( ptMapped[0] ), 
-								   static_cast<int>( ptMapped[1] ), 
+		m_ViewerPtr->sliceChanged( static_cast<int>( ptMapped[0] ),
+								   static_cast<int>( ptMapped[1] ),
 								   static_cast<int>( ptMapped[2] ) );
 	}
 
@@ -124,8 +124,8 @@ void ViewerInteractor::OnMouseMove()
 			double ptMapped[3];
 			m_Picker->GetMapperPosition( ptMapped );
 			m_ViewerPtr->displayIntensity( static_cast<int>( ptMapped[0] ), static_cast<int>( ptMapped[1] ), static_cast<int>( ptMapped[2] ) );
-			m_ViewerPtr->sliceChanged( static_cast<int>( ptMapped[0] ), 
-									   static_cast<int>( ptMapped[1] ), 
+			m_ViewerPtr->sliceChanged( static_cast<int>( ptMapped[0] ),
+									   static_cast<int>( ptMapped[1] ),
 									   static_cast<int>( ptMapped[2] ) );
 		}
 	}
