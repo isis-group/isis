@@ -23,13 +23,15 @@
 
 #include "ViewControl.hpp"
 
-namespace isis {
+namespace isis
+{
 
-namespace viewer {
+namespace viewer
+{
 
 ViewControl::ViewControl( ) : m_Valid( false )
 {
-	LOG(Runtime, info ) << "ViewControl::ViewControl";
+	LOG( Runtime, info ) << "ViewControl::ViewControl";
 	m_CurrentImagePtr = vtkImageData::New();
 
 	m_RendererAxial = vtkRenderer::New();
@@ -37,20 +39,20 @@ ViewControl::ViewControl( ) : m_Valid( false )
 	m_RendererCoronal = vtkRenderer::New();
 }
 
-void ViewControl::init(QVTKWidget *axial, QVTKWidget *sagittal, QVTKWidget *coronal )
+void ViewControl::init( QVTKWidget *axial, QVTKWidget *sagittal, QVTKWidget *coronal )
 {
 	m_Valid = true;
-	LOG (Runtime, info ) << "ViewControl::init";
+	LOG ( Runtime, info ) << "ViewControl::init";
 	m_AxialWidget = axial;
 	m_SagittalWidget = sagittal;
 	m_CoronalWidget = coronal;
 
-	m_InteractionStyleAxial = new ViewerInteractor(this, m_RendererAxial);
-	m_InteractionStyleSagittal = new ViewerInteractor(this, m_RendererSagittal);
-	m_InteractionStyleCoronal = new ViewerInteractor(this, m_RendererCoronal);
+	m_InteractionStyleAxial = new ViewerInteractor( this, m_RendererAxial );
+	m_InteractionStyleSagittal = new ViewerInteractor( this, m_RendererSagittal );
+	m_InteractionStyleCoronal = new ViewerInteractor( this, m_RendererCoronal );
 	setUpPipe();
 
-	LOG(Runtime, info ) << "Initializing interactors";
+	LOG( Runtime, info ) << "Initializing interactors";
 	m_AxialWidget->GetInteractor()->Initialize();
 	m_SagittalWidget->GetInteractor()->Initialize();
 	m_CoronalWidget->GetInteractor()->Initialize();
@@ -59,32 +61,31 @@ void ViewControl::init(QVTKWidget *axial, QVTKWidget *sagittal, QVTKWidget *coro
 
 }
 
-void ViewControl::addImages( const ImageMapType& fileMap )
+void ViewControl::addImages( const ImageMapType &fileMap )
 {
-	LOG_IF(!m_Valid, Runtime, error ) << "ViewControl is not valid. Please call the init function prior to adding images.";
-	assert(m_Valid);
-	LOG(Runtime, info) << "ViewControl::addImages";
-	BOOST_FOREACH( ImageMapType::const_reference ref, fileMap )
-	{
+	LOG_IF( !m_Valid, Runtime, error ) << "ViewControl is not valid. Please call the init function prior to adding images.";
+	assert( m_Valid );
+	LOG( Runtime, info ) << "ViewControl::addImages";
+	BOOST_FOREACH( ImageMapType::const_reference ref, fileMap ) {
 		boost::shared_ptr< ImageHolder > tmpVec( new ImageHolder );
 		tmpVec->setImages( ref.first, ref.second );
-		tmpVec->setReadVec( ref.first.getPropertyAs<isis::util::fvector4>("readVec") );
-		tmpVec->setPhaseVec( ref.first.getPropertyAs<isis::util::fvector4>("phaseVec") );
-		tmpVec->setSliceVec( ref.first.getPropertyAs<isis::util::fvector4>("sliceVec") );
+		tmpVec->setReadVec( ref.first.getPropertyAs<isis::util::fvector4>( "readVec" ) );
+		tmpVec->setPhaseVec( ref.first.getPropertyAs<isis::util::fvector4>( "phaseVec" ) );
+		tmpVec->setSliceVec( ref.first.getPropertyAs<isis::util::fvector4>( "sliceVec" ) );
 		m_ImageHolderVector.push_back( tmpVec );
 	}
 
-	if (!m_ImageHolderVector.empty() ) {
+	if ( !m_ImageHolderVector.empty() ) {
 		m_CurrentImageHolder = m_CurrentImageHolder ? m_CurrentImageHolder : m_ImageHolderVector.front();
 		m_CurrentImagePtr = m_CurrentImageHolder ? m_CurrentImageHolder->getVTKImageData() : m_ImageHolderVector.front()->getVTKImageData();
-		BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference ref, m_ImageHolderVector )
-		{
-			LOG(Runtime, info) << "Adding actors to renderers";
+		BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference ref, m_ImageHolderVector ) {
+			LOG( Runtime, info ) << "Adding actors to renderers";
 			m_RendererAxial->AddActor( ref->getActorAxial() );
 			m_RendererCoronal->AddActor( ref->getActorCoronal() );
 			m_RendererSagittal->AddActor( ref->getActorSagittal() );
 		}
 	}
+
 	resetCam();
 }
 
@@ -106,9 +107,8 @@ void ViewControl::setUpPipe()
 
 void ViewControl::resetCam()
 {
-	LOG(Runtime, info) << "ViewControl::resetCam";
-	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference refImg, m_ImageHolderVector)
-	{
+	LOG( Runtime, info ) << "ViewControl::resetCam";
+	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference refImg, m_ImageHolderVector ) {
 		refImg->resetSliceCoordinates();
 	}
 	UpdateWidgets();
@@ -116,7 +116,7 @@ void ViewControl::resetCam()
 
 void ViewControl::UpdateWidgets()
 {
-	LOG(Runtime, info ) << "ViewControl::UpdateWidgets";
+	LOG( Runtime, info ) << "ViewControl::UpdateWidgets";
 	m_AxialWidget->update();
 	m_SagittalWidget->update();
 	m_CoronalWidget->update();
@@ -128,7 +128,7 @@ void ViewControl::UpdateWidgets()
 
 //gui interactions
 
-void ViewControl::displayIntensity( const int& x, const int& y, const int &z )
+void ViewControl::displayIntensity( const int &x, const int &y, const int &z )
 {
 	const int t = m_CurrentImageHolder->getCurrentTimeStep();
 	signalList.mousePosChanged( x, y, z, t );
@@ -136,16 +136,15 @@ void ViewControl::displayIntensity( const int& x, const int& y, const int &z )
 	size_t offset = m_CurrentImageHolder->getOffset()->as<size_t>();
 	std::cout << "offset: " << offset << std::endl;
 	std::cout << "scaling: " << scaling << std::endl;
-	signalList.intensityChanged( m_CurrentImagePtr->GetScalarComponentAsDouble(x,y,z, 0) / scaling - offset );
+	signalList.intensityChanged( m_CurrentImagePtr->GetScalarComponentAsDouble( x, y, z, 0 ) / scaling - offset );
 
 }
 
-void ViewControl::sliceChanged( const int& x, const int& y, const int& z)
+void ViewControl::sliceChanged( const int &x, const int &y, const int &z )
 {
 	LOG( Runtime, info ) << "ViewControl::sliceChanged";
-	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference refImg, m_ImageHolderVector)
-	{
-		if ( not refImg->setSliceCoordinates(x,y,z) ) LOG( Runtime, error ) << "error during setting slicesetting!";
+	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference refImg, m_ImageHolderVector ) {
+		if ( not refImg->setSliceCoordinates( x, y, z ) ) LOG( Runtime, error ) << "error during setting slicesetting!";
 	}
 	UpdateWidgets();
 }
@@ -159,12 +158,12 @@ void ViewControl::changeCurrentTimeStep( int val )
 
 void ViewControl::checkPhysicalChanged( bool physical )
 {
-	LOG(Runtime, info) << "Setting physical to " << physical;
-	BOOST_FOREACH(std::vector< boost::shared_ptr< ImageHolder > >::const_reference ref, m_ImageHolderVector)
-	{
+	LOG( Runtime, info ) << "Setting physical to " << physical;
+	BOOST_FOREACH( std::vector< boost::shared_ptr< ImageHolder > >::const_reference ref, m_ImageHolderVector ) {
 		ref->setPhysical( physical );
 	}
 	UpdateWidgets();
 }
 
-}}
+}
+}

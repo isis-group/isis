@@ -11,10 +11,10 @@ int main( int argc, char *argv[] )
 	isis::qt4::QtApplication app( "isisViewer" );
 	app.parameters["in"] = isis::util::slist();
 	app.parameters["in"].needed() = false;
-	app.parameters["in"].setDescription("The input image file list.");
+	app.parameters["in"].setDescription( "The input image file list." );
 	app.parameters["dViewer"] = dbg_levels;
 	app.parameters["dViewer"].setDescription( "Debugging level for the Viewer module" );
-	app.parameters["dViewer"].hidden()=true;
+	app.parameters["dViewer"].hidden() = true;
 	app.parameters["dViewer"].needed() = false;
 
 	app.init( argc, argv );

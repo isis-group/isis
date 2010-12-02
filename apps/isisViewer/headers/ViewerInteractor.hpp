@@ -35,9 +35,11 @@
 #include <vtkRenderer.h>
 #include <vtkCellPicker.h>
 
-namespace isis {
+namespace isis
+{
 
-namespace viewer {
+namespace viewer
+{
 
 class ViewControl;
 
@@ -49,12 +51,12 @@ private:
 	int EndPosition[2];
 	int Moving;
 
-	ViewControl* m_ViewerPtr;
-	vtkRenderer* m_Renderer;
+	ViewControl *m_ViewerPtr;
+	vtkRenderer *m_Renderer;
 
 	vtkUnsignedCharArray *PixelArray;
 
-	vtkCellPicker* m_Picker;
+	vtkCellPicker *m_Picker;
 
 public:
 	virtual void Zoom();
@@ -62,9 +64,10 @@ public:
 	virtual void OnRightButtonUp();
 	virtual void OnLeftButtonUp();
 	virtual void OnLeftButtonDown();
-	ViewerInteractor( ViewControl*, vtkRenderer* );
+	ViewerInteractor( ViewControl *, vtkRenderer * );
 };
 
-}}
+}
+}
 #endif /* VIEWERINTERACTOR_HPP_ */
 

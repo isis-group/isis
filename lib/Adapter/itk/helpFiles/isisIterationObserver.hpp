@@ -70,11 +70,10 @@ public:
 		if ( const itk::RegularStepGradientDescentOptimizer *optimizer =
 				 dynamic_cast<const itk::RegularStepGradientDescentOptimizer *> ( object ) ) {
 			if( ! ( optimizer->GetCurrentIteration() % m_step ) ) {
-				if ( optimizer->GetCurrentPosition().Size() <= 6) {
+				if ( optimizer->GetCurrentPosition().Size() <= 6 ) {
 					std::cout << "\r" << optimizer->GetCurrentIteration() << " = " << optimizer->GetValue() << " : "
-							<< optimizer->GetCurrentPosition() << "   " << std::flush;
-				} else
-				{
+							  << optimizer->GetCurrentPosition() << "   " << std::flush;
+				} else {
 					std::cout << "\r" << optimizer->GetCurrentIteration() << " = " << optimizer->GetValue() <<  std::flush;
 				}
 			}

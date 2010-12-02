@@ -13,9 +13,11 @@
 #include <vtkMatrix4x4.h>
 #include "common.hpp"
 
-namespace isis {
+namespace isis
+{
 
-namespace viewer {
+namespace viewer
+{
 
 class MatrixHandler
 {
@@ -32,8 +34,8 @@ public:
 	vtkSmartPointer<vtkMatrix4x4> getCoronalMatrix1( void ) const { return m_MatrixCoronal1; }
 
 	bool isRotationMatrix( void ) const { return m_isRotationMatrix; }
-	util::fvector4 createPseudoOrigin( const util::fvector4& size, const util::fvector4& voxelSize ) const;
-	util::fvector4 transformOrigin( const util::fvector4& origin, const util::fvector4& voxelSize ) const;
+	util::fvector4 createPseudoOrigin( const util::fvector4 &size, const util::fvector4 &voxelSize ) const;
+	util::fvector4 transformOrigin( const util::fvector4 &origin, const util::fvector4 &voxelSize ) const;
 
 private:
 	bool m_isRotationMatrix;
@@ -56,5 +58,6 @@ private:
 	void createMatricesForWidgets( void );
 };
 
-}}
+}
+}
 #endif /* MATRIXHANDLER_HPP_ */

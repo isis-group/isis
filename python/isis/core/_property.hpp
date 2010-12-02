@@ -20,14 +20,15 @@ class _PropertyValue : public PropertyValue, boost::python::wrapper< PropertyVal
 {
 public:
 	_PropertyValue () {}
-	_PropertyValue ( PyObject* p ) : self( p ),  boost::python::wrapper< PropertyValue >() {}
-	_PropertyValue ( PyObject* p, const PropertyValue& base ) : PropertyValue( base ), self( p ),  boost::python::wrapper< PropertyValue >() {}
+	_PropertyValue ( PyObject *p ) : self( p ),  boost::python::wrapper< PropertyValue >() {}
+	_PropertyValue ( PyObject *p, const PropertyValue &base ) : PropertyValue( base ), self( p ),  boost::python::wrapper< PropertyValue >() {}
 
-	std::string _toString( bool label ) { return this->toString(label); }
+	std::string _toString( bool label ) { return this->toString( label ); }
 private:
-	PyObject* self;
+	PyObject *self;
 };
-}}
+}
+}
 
 
 #endif /* _PROPERTY_HPP_ */
