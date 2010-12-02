@@ -17,9 +17,14 @@
 
 */
 
+#ifdef _MSC_VER
+#pragma warning(disable:4996)
+#endif
+
 #include "DataStorage/io_application.hpp"
 #include "DataStorage/io_factory.hpp"
 #include <boost/mpl/for_each.hpp>
+
 
 namespace isis
 {
@@ -30,7 +35,6 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 	if ( have_input ) {
 		parameters["in"] = std::string();
 		parameters["in"].setDescription( "input file or dataset" );
-
 		parameters["rf"] = std::string();
 		parameters["rf"].needed() = false;
 		parameters["rf"].hidden() = true;
@@ -45,7 +49,6 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 	if ( have_output ) {
 		parameters["out"] = std::string();
 		parameters["out"].setDescription( "output file" );
-
 		parameters["wf"] = std::string();
 		parameters["wf"].needed() = false;
 		parameters["wf"].setDescription( "Override automatic detection of file suffix for writing with given value" );
@@ -55,7 +58,6 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 		parameters["wdialect"].needed() = false;
 		parameters["wdialect"].setDescription( "choose dialect for writing. The available dialects depend on the capabilities of IO plugins" );
 		std::map<unsigned short, std::string> types = util::getTypeMap( false, true );
-
 		// remove some types which are useless as representation
 		// "(unsigned short)" is needed because otherwise erase would take the reference of a static constant which is only there during compile time
 		types.erase( ( unsigned short )data::TypePtr<util::Selection>::staticID );
@@ -110,7 +112,6 @@ void IOApplication::printHelp( bool withHidden ) const
 		BOOST_FOREACH( data::IOFactory::FileFormatList::const_reference pi, plugins ) {
 
 			std::cout << std::endl << "\t" << pi->name() << std::endl << "\t=======================================" << std::endl;
-
 			const std::list<util::istring> suff = pi->getSuffixes();
 			const std::list<std::string> dialects = util::string2list<std::string>( pi->dialects( "" ) );
 
@@ -129,7 +130,6 @@ bool IOApplication::autoload( bool exitOnError )
 	std::string rf = parameters["rf"];
 	std::string dl = parameters["rdialect"];
 	bool no_progress = parameters["np"];
-
 	LOG( Runtime, info )
 			<< "loading " << util::MSubject( input )
 			<< ( rf.empty() ? "" : std::string( " using the format: " ) + rf )
@@ -166,7 +166,7 @@ bool IOApplication::autowrite( const Image &out_image, bool exitOnError )
 {
 	ImageList list;
 	list.push_back( boost::shared_ptr<Image>( new Image( out_image ) ) );
-	autowrite( list, exitOnError );
+	return autowrite( list, exitOnError );
 }
 
 bool IOApplication::autowrite( const ImageList &out_images, bool exitOnError )

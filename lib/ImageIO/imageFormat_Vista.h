@@ -34,6 +34,7 @@
 
 // local includes
 #include <DataStorage/io_interface.h>
+#include <CoreUtils/istring.hpp>
 
 namespace isis
 {
@@ -64,7 +65,7 @@ public:
 	 * </ul>
 	 *
 	 */
-	std::string dialects(const std::string &filename)const {return std::string( "functional map anatomical" );}
+	std::string dialects( const std::string &filename )const {return std::string( "functional map anatomical" );}
 	int load( data::ChunkList &chunks, const std::string &filename,
 			  const std::string &dialect ) throw( std::runtime_error & );
 	void write( const data::Image &image, const std::string &filename,
@@ -120,7 +121,7 @@ private:
 		 * @param image The target chunk where all data will be copied to.
 		 * @oaram chunk The source image that provides the Vista metadata attributes.
 		 */
-		void copyHeaderFromVista( const VImage &image, data::Chunk &chunk ) {
+		void copyHeaderFromVista( const VImage &image, data::Chunk &chunk, bool functional ) {
 			// traverse through attribute list and set metadata
 			VAttrList attributes = VImageAttrList( image );
 			VAttrListPosn posn;
@@ -143,7 +144,7 @@ private:
 				}
 
 				// set all vista specific properties in a extra group.
-				std::string propname = std::string( "Vista/" ) + name;
+				util::istring propname = (std::string( "Vista/" ) + name).c_str();
 
 				// MANDATORY: orientation --> readVector, phaseVector, sliceVector
 				// create default read, phase, slice vector values according to attribute
@@ -153,27 +154,49 @@ private:
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
 					//TODO remove "orientation" in Vista group
 					chunk.setProperty<std::string>( propname, std::string( ( VString )val ) );
+					if( functional ) {
+						// axial is the reference
+						if( strcmp( ( const char * )val, "axial" ) == 0 ) {
+							chunk.setProperty<util::fvector4>( "readVec", util::fvector4( 1, 0, 0, 0 ) );
+							chunk.setProperty<util::fvector4>( "phaseVec", util::fvector4( 0, 1, 0, 0 ) );
+							chunk.setProperty<util::fvector4>( "sliceVec", util::fvector4( 0, 0, 1, 0 ) );
+							continue;
+						}
 
-					// axial is the reference
-					if( strcmp( ( const char * )val, "axial" ) == 0 ) {
-						chunk.setProperty<util::fvector4>( "readVec", util::fvector4( 1, 0, 0, 0 ) );
-						chunk.setProperty<util::fvector4>( "phaseVec", util::fvector4( 0, 1, 0, 0 ) );
-						chunk.setProperty<util::fvector4>( "sliceVec", util::fvector4( 0, 0, 1, 0 ) );
-						continue;
-					}
+						if( strcmp( ( const char * )val, "sagittal" ) == 0 ) {
+							chunk.setProperty<util::fvector4>( "readVec", util::fvector4( 0, 1, 0, 0 ) );
+							chunk.setProperty<util::fvector4>( "phaseVec", util::fvector4( 0, 0, 1, 0 ) );
+							chunk.setProperty<util::fvector4>( "sliceVec", util::fvector4( 1, 0, 0, 0 ) );
+							continue;
+						}
 
-					if( strcmp( ( const char * )val, "sagittal" ) == 0 ) {
-						chunk.setProperty<util::fvector4>( "readVec", util::fvector4( 0, 1, 0, 0 ) );
-						chunk.setProperty<util::fvector4>( "phaseVec", util::fvector4( 0, 0, 1, 0 ) );
-						chunk.setProperty<util::fvector4>( "sliceVec", util::fvector4( 1, 0, 0, 0 ) );
-						continue;
-					}
+						if( strcmp( ( const char * )val, "coronal" ) == 0 ) {
+							chunk.setProperty<util::fvector4>( "readVec", util::fvector4( 1, 0, 0, 0 ) );
+							chunk.setProperty<util::fvector4>( "phaseVec", util::fvector4( 0, 0, 1, 0 ) );
+							chunk.setProperty<util::fvector4>( "sliceVec", util::fvector4( 0, -1, 0, 0 ) );
+							continue;
+						}
+					} else {
+						if( strcmp( ( const char * )val, "axial" ) == 0 ) {
+							chunk.setProperty<util::fvector4>( "readVec", util::fvector4( -1, 0, 0, 0 ) );
+							chunk.setProperty<util::fvector4>( "phaseVec", util::fvector4( 0, 1, 0, 0 ) );
+							chunk.setProperty<util::fvector4>( "sliceVec", util::fvector4( 0, 0, -1, 0 ) );
+							continue;
+						}
 
-					if( strcmp( ( const char * )val, "coronal" ) == 0 ) {
-						chunk.setProperty<util::fvector4>( "readVec", util::fvector4( 1, 0, 0, 0 ) );
-						chunk.setProperty<util::fvector4>( "phaseVec", util::fvector4( 0, 0, 1, 0 ) );
-						chunk.setProperty<util::fvector4>( "sliceVec", util::fvector4( 0, -1, 0, 0 ) );
-						continue;
+						if( strcmp( ( const char * )val, "sagittal" ) == 0 ) {
+							chunk.setProperty<util::fvector4>( "readVec", util::fvector4( 0, 1, 0, 0 ) );
+							chunk.setProperty<util::fvector4>( "phaseVec", util::fvector4( 0, 0, 1, 0 ) );
+							chunk.setProperty<util::fvector4>( "sliceVec", util::fvector4( 1, 0, 0, 0 ) );
+							continue;
+						}
+
+						if( strcmp( ( const char * )val, "coronal" ) == 0 ) {
+							chunk.setProperty<util::fvector4>( "readVec", util::fvector4( 1, 0, 0, 0 ) );
+							chunk.setProperty<util::fvector4>( "phaseVec", util::fvector4( 0, 0, 1, 0 ) );
+							chunk.setProperty<util::fvector4>( "sliceVec", util::fvector4( 0, -1, 0, 0 ) );
+							continue;
+						}
 					}
 				}
 
@@ -235,7 +258,7 @@ private:
 				if( strcmp( name, "columnVec" ) == 0 ) {
 					util::fvector4 readVec;
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
-					const std::list<float> tokens = util::string2list<float>( ( const char * )val, ' ' );
+					const std::list<float> tokens = util::string2list<float>( std::string(( const char * )val), ' ' );
 					readVec.copyFrom<std::list<float>::const_iterator>( tokens.begin(), tokens.end() );
 					chunk.setProperty<util::fvector4>( "readVec", readVec );
 					continue;
@@ -245,7 +268,7 @@ private:
 				if( strcmp( name, "rowVec" ) == 0 ) {
 					util::fvector4 phaseVec;
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
-					const std::list<float> tokens = util::string2list<float>( ( const char * )val, ' ' );
+					const std::list<float> tokens = util::string2list<float>( std::string(( const char * )val), ' ' );
 					phaseVec.copyFrom<std::list<float>::const_iterator>( tokens.begin(), tokens.end() );
 					chunk.setProperty<util::fvector4>( "phaseVec", phaseVec );
 					continue;
@@ -255,7 +278,7 @@ private:
 				if( strcmp( name, "sliceVec" ) == 0 ) {
 					util::fvector4 sliceVec;
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
-					const std::list<float> tokens = util::string2list<float>( ( const char * )val, ' ' );
+					const std::list<float> tokens = util::string2list<float>( std::string(( const char * )val), ' ' );
 					sliceVec.copyFrom<std::list<float>::const_iterator>( tokens.begin(), tokens.end() );
 					chunk.setProperty<util::fvector4>( "sliceVec", sliceVec );
 					continue;
@@ -442,7 +465,7 @@ private:
 		VistaChunk( VImage image, const bool functional, size_t nslices = 0 ):
 			data::Chunk( static_cast<TYPE *>( image->data ), VImageDeleter( image ),
 						 VImageNColumns( image ), VImageNRows( image ), functional ? 1 : VImageNBands( image ), functional ? VImageNBands( image ) : 1 ) {
-			copyHeaderFromVista( image, *this );
+			copyHeaderFromVista( image, *this, functional );
 		}
 	};
 
@@ -459,7 +482,7 @@ private:
 	 * @param functional flag to indicate that the image contains functional data.
 	 * @param slice the index of the slice.
 	 */
-	void copyHeaderToVista( const data::Image &image, VImage &vimage,  const float& sliceTimeOffset , const bool functional, size_t slice = 0 );
+	void copyHeaderToVista( const data::Image &image, VImage &vimage,  const float &sliceTimeOffset , const bool functional, size_t slice = 0 );
 
 	/**
 	 * Copies the whole itk image into a given vista image. This function is

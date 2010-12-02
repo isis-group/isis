@@ -151,7 +151,7 @@ public:
 	 * If that fails, boost::bad_lexical_cast is thrown.
 	 */
 	template<typename T> Type( const T &value ) {
-		m_val = __cast_to( this, value );
+		m_val = _internal::__cast_to<TYPE>()( this, value );
 		BOOST_MPL_ASSERT_RELATION( staticID, < , 0xFF );
 		check_type<TYPE>();
 	}

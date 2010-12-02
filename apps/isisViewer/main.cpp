@@ -7,7 +7,6 @@ int main( int argc, char *argv[] )
 {
 	isis::util::Selection dbg_levels( "error,warning,info,verbose_info" );
 	dbg_levels.set( "warning" );
-
 	isis::qt4::QtApplication app( "isisViewer" );
 	app.parameters["in"] = isis::util::slist();
 	app.parameters["in"].needed() = false;
@@ -16,12 +15,9 @@ int main( int argc, char *argv[] )
 	app.parameters["dViewer"].setDescription( "Debugging level for the Viewer module" );
 	app.parameters["dViewer"].hidden() = true;
 	app.parameters["dViewer"].needed() = false;
-
 	app.init( argc, argv );
-
 	app.setLog<isis::ViewerLog>( app.getLLMap()[app.parameters["dViewer"]->as<isis::util::Selection>()] );
 	app.setLog<isis::ViewerDebug>( app.getLLMap()[app.parameters["dViewer"]->as<isis::util::Selection>()] );
-
 	isis::util::slist fileList = app.parameters["in"];
 	isis::viewer::MainWindow isisViewerMainWindow( fileList );
 	isisViewerMainWindow.show();

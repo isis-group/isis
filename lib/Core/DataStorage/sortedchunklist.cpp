@@ -17,6 +17,10 @@
 
 */
 
+#ifdef _MSC_VER
+#pragma warning(disable:4996)
+#endif
+
 #include "DataStorage/sortedchunklist.hpp"
 
 namespace isis
@@ -145,6 +149,9 @@ std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::primaryInsert( const 
 bool SortedChunkList::insert( const Chunk &ch )
 {
 	LOG_IF( secondarySort.empty(), Debug, error ) << "Inserting will fail without any secondary sort. Use chunks.addSecondarySort at least once.";
+	LOG_IF( !ch.valid(), Debug, error ) << "You're trying insert an invalid chunk. The missing properties are " << ch.getMissing() << " This will break.";
+	LOG_IF( !ch.valid(), Debug, error ) << "You should definitively check the chunks validity (use the function Chunk::valid) before calling this funktion.";
+	assert( ch.valid() );
 
 	if( !empty() ) {
 		// compare some attributes of the first chunk and the one which shall be inserted

@@ -362,7 +362,6 @@ private:
 		}
 
 		//check description for tr, te and fa and date which is written by spm8
-
 		boost::regex descriptionRegex(
 			".*TR=([[:digit:]]{1,})ms.*TE=([[:digit:]]{1,})ms.*FA=([[:digit:]]{1,})deg\\ *([[:digit:]]{1,2}).([[:word:]]{3}).([[:digit:]]{4})\\ *([[:digit:]]{1,2}):([[:digit:]]{1,2}):([[:digit:]]{1,2}).*" );
 		boost::cmatch results;
@@ -398,7 +397,6 @@ private:
 			retChunk.setPropertyAs<uint16_t>( "flipAngle", fa );
 			retChunk.setPropertyAs<uint16_t>( "echoTime", te );
 			retChunk.setPropertyAs<uint16_t>( "repetitionTime", tr );
-
 		}
 
 		//if "TR=" was not found in description and pixdim[dim] == 0 a warning calls attention to use parameter -tr to change repetitionTime.
@@ -479,7 +477,6 @@ private:
 		const util::FixedVector<size_t, 4> csize = image.getChunk( 0, 0 ).getSizeAsVector();
 		const util::FixedVector<size_t, 4> isize = image.getSizeAsVector();
 		const data::scaling_pair scale = image.getScalingTo( data::TypePtr<T>::staticID );
-
 
 		for ( size_t t = 0; t < isize[3]; t += csize[3] ) {
 			for ( size_t z = 0; z < isize[2]; z += csize[2] ) {
@@ -569,7 +566,6 @@ private:
 			LOG( ImageIoLog, info ) << "Setting pixdim[" << ni.ndim << "] to " << image.getPropertyAs<uint16_t>( "repetitionTime" );
 			ni.dt = ni.pixdim[ni.ndim+1] = ( float ) image.getPropertyAs<uint16_t>( "repetitionTime" ) / 1000; //nifti saves repTime s
 		}
-
 
 		//the rotation matrix
 		//create space tranformation matrices - transforms the space when reading _NOT_ the data

@@ -60,7 +60,6 @@ throw( std::runtime_error & )
 		shortImage.spliceDownTo( data::sliceDim );
 		vimages = ( VImage * )malloc( sizeof( VImage ) * dims[2] );
 		nimages = dims[2];
-
 		//we have to go through all slices and calculate the offset of the slicetimes
 		std::list<float> acquisitionTimeList;
 
@@ -156,7 +155,7 @@ throw( std::runtime_error & )
 	size_t hcount = 0;
 	// if history list prefix is available increase counter.
 	BOOST_FOREACH( util::PropertyMap::key_list::key_type key, keyset ) {
-		if ( ( ( std::string )key ).find( histPrefix ) != std::string::npos ) {
+		if (  std::string( key.c_str() ).find( histPrefix ) != std::string::npos ) {
 			hcount++;
 		}
 	}
@@ -800,7 +799,7 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 
 		for( kiter = klist.begin(); kiter != klist.end(); kiter++ ) {
 			// skip entry from vista image history
-			if( ( ( std::string )*kiter ).find( hpref ) != std::string::npos ) {
+			if( (  std::string ( ( *kiter ).c_str() ) ).find( hpref ) != std::string::npos ) {
 				continue;
 			}
 
@@ -877,7 +876,6 @@ template <typename T> bool ImageFormat_Vista::copyImageToVista( const data::Imag
 	const util::FixedVector<size_t, 4> csize = image.getChunk( 0, 0 ).getSizeAsVector();
 	const util::FixedVector<size_t, 4> isize = image.getSizeAsVector();
 	LOG_IF( isize[3] > 1, Debug, error ) << "Vista cannot store 4D-Data in one VImage.";
-
 	const data::scaling_pair scale = image.getScalingTo( data::TypePtr<T>::staticID );
 
 	for ( size_t z = 0; z < isize[2]; z += csize[2] ) {

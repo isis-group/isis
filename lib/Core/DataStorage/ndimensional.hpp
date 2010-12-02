@@ -103,7 +103,7 @@ public:
 
 	/// generates a string representing the size
 	std::string getSizeAsString( std::string delim = "x" )const {
-		return util::list2string( dim, dim + DIMS, delim );
+		return util::list2string( dim, dim + DIMS, delim, "", "" );
 	}
 
 	/// generates a FixedVector\<DIMS\> representing the size
@@ -113,7 +113,7 @@ public:
 
 	/**
 	 * get amount of relevant dimensions (last dim with size>1)
-	 * e.g. on a slice (64x64x1x1) it will be 2
+	 * e.g. on a slice (1x64x1x1) it will be 2
 	 */
 	size_t relevantDims()const {
 		size_t ret = 0;
@@ -128,7 +128,6 @@ public:
 		return ret;
 	}
 	util::FixedVector<float, DIMS> getFoV( const util::FixedVector<float, DIMS> &voxelSize, const util::FixedVector<float, DIMS> &voxelGap )const {
-		DISABLE_WARN( 4244 );
 		LOG_IF( volume() == 0, DataLog, warning ) << "Calculating FoV of empty data";
 		const util::FixedVector<size_t, DIMS> voxels = getSizeAsVector();
 		const util::fvector4 gapSize = voxelGap * ( voxels - 1 );

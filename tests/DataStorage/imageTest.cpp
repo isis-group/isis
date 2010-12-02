@@ -100,11 +100,8 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		//as all other chunks where timestep < 4 this must be at the end
 		BOOST_CHECK_EQUAL( ptr->propertyValue( "indexOrigin" ), util::fvector4( 0, 0, 2 ) );
 		BOOST_CHECK_EQUAL( ptr->propertyValue( "acquisitionNumber" ), 5  );
-
-
 		// Check all dimensions
 		data::Image img2;
-
 		uint32_t nrRows = 12;
 		uint32_t nrCols = 32;
 		uint32_t nrTimesteps = 17;
@@ -126,11 +123,8 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		BOOST_REQUIRE( img2.reIndex() );
 		BOOST_CHECK_EQUAL( img2.volume(), nrRows * nrCols * nrTimesteps * nrSlices );
 		BOOST_CHECK_EQUAL( img2.getSizeAsVector(), util::ivector4( nrCols, nrRows, nrSlices, nrTimesteps ) );
-
-
 		// Check all dimensions with limit sizes
 		data::Image img3;
-
 		nrRows = 212;
 		nrCols = 2;
 		nrTimesteps = 2;
@@ -152,9 +146,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		BOOST_REQUIRE( img3.reIndex() );
 		BOOST_CHECK_EQUAL( img3.volume(), nrRows * nrCols * nrTimesteps * nrSlices );
 		BOOST_CHECK_EQUAL( img3.getSizeAsVector(), util::ivector4( nrCols, nrRows, nrSlices, nrTimesteps ) );
-
 		data::Image img4;
-
 		nrRows = 54;
 		nrCols = 29;
 		nrTimesteps = 1;
@@ -176,7 +168,6 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		BOOST_REQUIRE( img4.reIndex() );
 		BOOST_CHECK_EQUAL( img4.volume(), nrRows * nrCols * nrTimesteps * nrSlices );
 		BOOST_CHECK_EQUAL( img4.getSizeAsVector(), util::ivector4( nrCols, nrRows, nrSlices, nrTimesteps ) );
-
 	}
 }
 
@@ -210,19 +201,16 @@ BOOST_AUTO_TEST_CASE ( type_selection_test )
 	name.setPropertyAs( "readVec", util::fvector4( 1, 0 ) );\
 	name.setPropertyAs( "phaseVec", util::fvector4( 0, 1 ) );\
 	name.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );\
-	org++;\
+	org++;
 	 
 	MAKE_CHUNK( int16_t, ch_int16_t );
 	MAKE_CHUNK( int8_t, ch_int8_t );
 	MAKE_CHUNK( uint8_t, ch_uint8_t );
 	MAKE_CHUNK( uint16_t, ch_uint16_t );
-
 	ch_int16_t.voxel<int16_t>( 0, 0, 0 ) = std::numeric_limits<int16_t>::min();
 	ch_int8_t.voxel<int8_t>( 0, 0, 0 ) = std::numeric_limits<int8_t>::min();
 	ch_uint8_t.voxel<uint8_t>( 0, 0, 0 ) = std::numeric_limits<uint8_t>::max();
 	ch_uint16_t.voxel<uint16_t>( 0, 0, 0 ) = std::numeric_limits<int16_t>::max(); // the maximum shall fit into int16_t
-
-
 	data::Image img;
 	const size_t size[] = {4, 4, 4, 1};
 	BOOST_CHECK( img.insertChunk( ch_int16_t ) );
@@ -230,8 +218,9 @@ BOOST_AUTO_TEST_CASE ( type_selection_test )
 	BOOST_CHECK( img.insertChunk( ch_int8_t ) );
 	BOOST_CHECK( img.insertChunk( ch_uint8_t ) );
 	BOOST_CHECK( img.reIndex() );
-	BOOST_CHECK_EQUAL( img.getSizeAsVector(), ( util::FixedVector<size_t, 4>( size ) ) );
+	BOOST_CHECK_EQUAL( img.sizeToVector(), ( util::FixedVector<size_t, 4>( size ) ) );
 	BOOST_CHECK_EQUAL( img.typeID(), data::TypePtr<int16_t>( NULL, 0 ).typeID() );
+#undef MAKE_CHUNK
 }
 
 BOOST_AUTO_TEST_CASE ( type_scale_test )
@@ -244,19 +233,16 @@ BOOST_AUTO_TEST_CASE ( type_scale_test )
 	name.setPropertyAs( "readVec", util::fvector4( 1, 0 ) );\
 	name.setPropertyAs( "phaseVec", util::fvector4( 0, 1 ) );\
 	name.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );\
-	org++;\
-	 
+	org++;
+
 	MAKE_CHUNK( int16_t, ch_int16_t );
 	MAKE_CHUNK( int8_t, ch_int8_t );
 	MAKE_CHUNK( uint8_t, ch_uint8_t );
 	MAKE_CHUNK( uint16_t, ch_uint16_t );
-
 	ch_int8_t.voxel<int8_t>( 0, 0, 0 ) = -1;
 	ch_uint8_t.voxel<uint8_t>( 0, 0, 0 ) = 1;
 	ch_int16_t.voxel<int16_t>( 0, 0, 0 ) = -50;
 	ch_uint16_t.voxel<uint16_t>( 0, 0, 0 ) = 2500;
-
-
 	data::Image img;
 	const size_t size[] = {4, 4, 4, 1};
 	BOOST_CHECK( img.insertChunk( ch_int16_t ) );
@@ -264,10 +250,10 @@ BOOST_AUTO_TEST_CASE ( type_scale_test )
 	BOOST_CHECK( img.insertChunk( ch_int8_t ) );
 	BOOST_CHECK( img.insertChunk( ch_uint8_t ) );
 	BOOST_CHECK( img.reIndex() );
-
 	data::scaling_pair scale = img.getScalingTo( data::TypePtr<uint8_t>::staticID );
 	BOOST_CHECK_EQUAL( scale.first->as<double>(), 1. / 10 );
 	BOOST_CHECK_EQUAL( scale.second->as<double>(), 5 );
+#undef MAKE_CHUNK
 }
 
 BOOST_AUTO_TEST_CASE ( image_chunk_test )
@@ -681,10 +667,8 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
 		}
 	}
 
-
 	data::MemChunk<float> chSlice( nrX, nrY );
 	img.getChunk( 0, 0, 12, 8, false ).copySlice( 0, 0, chSlice, 0, 0 );
-
 	float *pValues = ( ( boost::shared_ptr<float> ) chSlice.getTypePtr<float>() ).get();
 	float *pRun = pValues;
 
@@ -692,7 +676,6 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
 		for ( unsigned int ix = 0; ix < nrX; ix++ ) {
 			BOOST_CHECK_EQUAL( static_cast<float>( 20 + ix + iy ), chSlice.voxel<float>( ix, iy ) );
 			BOOST_CHECK_EQUAL( static_cast<float>( 20 + ix + iy ), *pRun++ );
-
 		}
 	}
 }

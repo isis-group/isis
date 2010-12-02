@@ -252,9 +252,9 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer()
 			//number of parameters are dependent on the dimension of the images (2D: 4 parameter, 3D: 6 parameters)
 			if ( transform.VERSORRIGID ) {
 				//rotation
-				optimizerScaleRegularStepGradient[0] = 1.0 / 10.0;
-				optimizerScaleRegularStepGradient[1] = 1.0 / 10.0;
-				optimizerScaleRegularStepGradient[2] = 1.0 / 10.0;
+				optimizerScaleRegularStepGradient[0] = 1.0 / 7.0;
+				optimizerScaleRegularStepGradient[1] = 1.0 / 7.0;
+				optimizerScaleRegularStepGradient[2] = 1.0 / 7.0;
 				//translation
 				optimizerScaleRegularStepGradient[3] = 1.0 / 1000.0;
 				optimizerScaleRegularStepGradient[4] = 1.0 / 1000.0;
@@ -270,7 +270,6 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::SetUpOptimizer()
 				optimizerScaleRegularStepGradient[10] = 1.0;
 				optimizerScaleRegularStepGradient[11] = 1.0;
 			}
-
 
 			if ( transform.BSPLINEDEFORMABLETRANSFORM or transform.AFFINE or transform.CENTEREDAFFINE or transform.TRANSLATION ) {
 				optimizerScaleRegularStepGradient.Fill( 1.0 );
@@ -811,11 +810,9 @@ void RegistrationFactory3D<TFixedImageType, TMovingImageType>::StartRegistration
 	//check the image sizes and creat a joint image mask if the fixed image is bigger than the moving image
 	//to avoid a itk sample error caused by a lack of spatial samples used by the metric
 	this->CheckImageSizes();
-
 	//  if ( !UserOptions.USEMASK ) {
 	//      this->SetFixedImageMask();
 	//  }
-
 	m_observer = isis::extitk::IterationObserver::New();
 	m_observer->setVerboseStep( UserOptions.SHOWITERATIONATSTEP );
 	m_RegistrationObject->GetOptimizer()->AddObserver( itk::IterationEvent(), m_observer );

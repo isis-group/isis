@@ -56,10 +56,10 @@ public:
 	static void throwSystemError( int err, std::string desc = "" );
 
 	/// splits the suffix (and the ".") from the filename (or path) and returns a pair made of both parts
-	virtual std::pair<std::string,std::string> makeBasename(const std::string &filename)const;
-	
+	virtual std::pair<std::string, std::string> makeBasename( const std::string &filename )const;
+
 	static std::string makeFilename(const util::PropertyMap &img,std::string namePattern);
-	std::list<std::string> makeUniqueFilenames(const data::ImageList &images,const std::string &namePattern)const;
+	std::list<std::string> makeUniqueFilenames( const data::ImageList &images, const std::string &namePattern )const;
 
 
 	static const float invalid_float;
@@ -74,9 +74,9 @@ public:
 	 */
 	std::list<util::istring> getSuffixes()const;
 
-	
+
 	/// \return the dialects the plugin supports
-	virtual std::string dialects(const std::string &filename)const {return std::string();};
+	virtual std::string dialects( const std::string &filename )const {return std::string();};
 	/// \return if the plugin is not part of the official distribution
 	virtual bool tainted()const {return true;}
 	/**

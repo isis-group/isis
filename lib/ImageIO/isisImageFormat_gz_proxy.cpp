@@ -1,3 +1,7 @@
+#ifdef _WINDOWS
+#define ZLIB_WINAPI
+#endif
+
 #include "DataStorage/io_interface.h"
 #include "DataStorage/io_factory.hpp"
 #include "CoreUtils/tmpfile.h"
@@ -21,7 +25,7 @@ private:
 
 		for (
 			in.read( buf, 2048 * 1024 );
-			( len = in.gcount() );
+			( len = ( int )in.gcount() );
 			in.read( buf, 2048 * 1024 )
 		) {
 			if ( gzwrite( out, buf, len ) != len ) {
@@ -91,7 +95,6 @@ private:
 		gzFile in = gzopen( infile.c_str(), "rb" );
 		LOG( Debug, info ) <<  "Uncompressing " << util::MSubject( infile ) << " to "  << util::MSubject( outfile );
 
-
 		if ( in == NULL ) {
 			if ( errno )
 				throwSystemError( errno );
@@ -131,7 +134,6 @@ public:
 
 	virtual std::pair<std::string, std::string> makeBasename( const std::string &filename )const {
 		const std::pair<std::string, std::string> proxyBase = FileFormat::makeBasename( filename ); // get rid of the the .gz
-
 		//then get the actual plugin for the format
 		const data::IOFactory::FileFormatList formats = data::IOFactory::get().getFormatInterface( proxyBase.first );
 
@@ -147,7 +149,6 @@ public:
 
 	int load ( data::ChunkList &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) {
 		const std::pair<std::string, std::string> proxyBase = FileFormat::makeBasename( filename ); // get rid of the the .gz
-
 		//then get the actual plugin for the format
 		const data::IOFactory::FileFormatList formats = data::IOFactory::get().getFormatInterface( proxyBase.first );
 
@@ -172,6 +173,8 @@ public:
 			}
 			chunks.insert( chunks.end(), buff.begin(), buff.end() );
 		}
+
+		return ret;
 	}
 
 	void write( const data::Image &image, const std::string &filename, const std::string &dialect )throw( std::runtime_error & ) {

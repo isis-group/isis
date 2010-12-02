@@ -197,13 +197,9 @@ void ImageFormat_Dicom::sanitise( isis::util::PropertyMap &object, string dialec
 		}
 
 		object.setPropertyAs( "voxelSize", voxelSize );
-
 		transformOrTell<uint16_t>( prefix + "RepetitionTime", "repetitionTime", object, warning );
-
 		transformOrTell<float>( prefix + "EchoTime", "echoTime", object, warning );
-
 		transformOrTell<std::string>( prefix + "TransmitCoilName", "transmitCoil", object, warning );
-
 		transformOrTell<int16_t>( prefix + "FlipAngle", "flipAngle", object, warning );
 
 		if ( hasOrTell( prefix + "SpacingBetweenSlices", object, info ) ) {
@@ -283,7 +279,6 @@ void ImageFormat_Dicom::sanitise( isis::util::PropertyMap &object, string dialec
 	}
 
 	transformOrTell<uint32_t>( prefix + "CSAImageHeaderInfo/UsedChannelMask", "coilChannelMask", object, info );
-
 	////////////////////////////////////////////////////////////////
 	// interpret DWI data
 	////////////////////////////////////////////////////////////////
@@ -316,9 +311,8 @@ void ImageFormat_Dicom::sanitise( isis::util::PropertyMap &object, string dialec
 		}
 	}
 
+
 	//@todo fallback for GE/Philips
-
-
 	////////////////////////////////////////////////////////////////
 	// Do some sanity checks on redundant tags
 	////////////////////////////////////////////////////////////////

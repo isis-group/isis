@@ -131,7 +131,12 @@ util::fvector4 MatrixHandler::createPseudoOrigin( const util::fvector4 &size, co
 	if ( !m_Valid ) {
 		LOG( Runtime, error ) << "Cannot create pseudo origin. First call setVectors.";
 		return util::fvector4( 0, 0, 0, 0 );
-	} else { return util::fvector4( -size[0] * voxelSize[0] / 2, -size[1] * voxelSize[1] / 2, -size[2] * voxelSize[2] / 2, 0 ); }
+	} else {
+		return util::fvector4( -size[0] * voxelSize[0] / 2,
+							   -size[1] * voxelSize[1] / 2,
+							   -size[2] * voxelSize[2] / 2,
+							   0 );
+	}
 }
 
 util::fvector4 MatrixHandler::transformOrigin( const util::fvector4 &origin, const util::fvector4 &voxelSize  ) const

@@ -15,6 +15,14 @@ SET(ISIS_DIR /usr/share/isis/cmake CACHE PATH
 FIND_PACKAGE(ISIS REQUIRED)
 INCLUDE_DIRECTORIES(${ISIS_INCLUDE_DIRS})
 
+string(COMPARE EQUAL ${CMAKE_INSTALL_PREFIX} ${ISIS_INSTALL_PREFIX} PREFIX_IS_SAME)
+if(NOT ${PREFIX_IS_SAME})
+	message(SEND_ERROR
+		"Seems like your install prefix (${CMAKE_INSTALL_PREFIX}) is not the same as the prefix, which was used when the core library was built (${ISIS_INSTALL_PREFIX})."
+		"This will prevent this core library from finding the plugins you are building right now. Please use CMAKE_INSTALL_PREFIX=${ISIS_INSTALL_PREFIX}"
+	)
+endif(NOT ${PREFIX_IS_SAME})
+
 # we use the log definitions of the core
 IF(ISIS_RUNTIME_LOG)
 	ADD_DEFINITIONS(-D_ENABLE_LOG=1)
@@ -35,19 +43,30 @@ OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL "Enable Null-IO plugin" ON)
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM "Enable Dicom-IO plugin" OFF)
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA "Enable Vista-IO plugin" OFF)
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ "Enable proxy plugin for compressed files" ON)
+OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_RAW "Enable plugin for raw data output" ON)
+
+#############################################################################################
+# nifti
+#############################################################################################
 
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI)
 	find_library(LIB_NIFTIIO niftiio)
 	find_library(LIB_ZNZ znz)
+	find_library(LIB_Z z)
+
 	find_path(INCPATH_NIFTI "nifti1_io.h" PATH_SUFFIXES "nifti")
 	find_path(INCPATH_ZNZ "znzlib.h" PATH_SUFFIXES "nifti")
 
 	include_directories(${INCPATH_NIFTI} ${INCPATH_ZNZ})
 	add_library(isisImageFormat_Nifti SHARED imageFormat_Nifti.cpp)
-	target_link_libraries(isisImageFormat_Nifti ${LIB_NIFTIIO} ${LIB_ZNZ} ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
+	target_link_libraries(isisImageFormat_Nifti ${LIB_NIFTIIO} ${LIB_ZNZ} ${LIB_Z} ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
 
 	SET(TARGETS ${TARGETS} isisImageFormat_Nifti)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI)
+
+#############################################################################################
+# vista
+#############################################################################################
 
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA)
     # This code snipped was taken from the lipsia source package.
@@ -120,6 +139,9 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA)
         AND VIA_LIBRARY AND VIAIO_LIBRARY)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA)
 
+#############################################################################################
+# null io-plugin
+#############################################################################################
 
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL)
 	add_library(isisImageFormat_Null SHARED imageFormat_Null.cpp)
@@ -128,10 +150,14 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL)
 	SET(TARGETS ${TARGETS} isisImageFormat_Null)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL)
 
+#############################################################################################
+# gz proxy
+#############################################################################################
+
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ)
 	FIND_LIBRARY(LIB_Z "z")
 	FIND_PATH(INCPATH_GZIP "zlib.h")
-	INCLUDE_DIRECTORIES(${GZIP_INC})
+	INCLUDE_DIRECTORIES(${INCPATH_GZIP})
 
 	add_library(isisImageFormat_gz_proxy SHARED isisImageFormat_gz_proxy.cpp)
 	target_link_libraries(isisImageFormat_gz_proxy ${LIB_Z} ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
@@ -139,6 +165,9 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ)
 	SET(TARGETS ${TARGETS} isisImageFormat_gz_proxy)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ)
 
+#############################################################################################
+# Dicom
+#############################################################################################
 
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM)
 	find_library(LIB_DCMIMGLE dcmimgle)
@@ -158,15 +187,46 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM)
 	SET(TARGETS ${TARGETS} isisImageFormat_Dicom)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM)
 
-MESSAGE(STATUS "Installing following plugins to ${ISIS_PLUGIN_DIR}")
+if(${CMAKE_PROJECT_NAME}_IOPLUGIN_RAW)
+	add_library(isisImageFormat_raw SHARED imageFormat_raw.cpp)
+	target_link_libraries(isisImageFormat_raw ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
+	SET(TARGETS ${TARGETS} isisImageFormat_raw)
+endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_RAW)
+
+MESSAGE(STATUS "Installing following plugins to ${CMAKE_INSTALL_PREFIX}/${ISIS_PLUGIN_INFIX}")
 
 foreach(PLUGIN ${TARGETS})
 	MESSAGE(STATUS " == ${PLUGIN}")
 	set_target_properties(${PLUGIN} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} INSTALL_RPATH_USE_LINK_PATH TRUE)
 endforeach(PLUGIN)
 
+###########################################################
+# CPack config
+###########################################################
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "isis default io plugins")
+SET(CPACK_PACKAGE_VENDOR "the friendly isis team")
+SET(CPACK_PACKAGE_CONTACT "reimer@cbs.mpg.de")
+SET(CPACK_PACKAGE_NAME "isis-io")
+SET(CPACK_BUNDLE_NAME ${CPACK_PACKAGE_NAME})
+#SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/ReadMe.txt")
+SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/../../COPYING.txt")
+SET(CPACK_PACKAGE_VERSION_MAJOR ${${CMAKE_PROJECT_NAME}_VERSION_MAJOR})
+SET(CPACK_PACKAGE_VERSION_MINOR ${${CMAKE_PROJECT_NAME}_VERSION_MINOR})
+SET(CPACK_PACKAGE_VERSION_PATCH ${${CMAKE_PROJECT_NAME}_VERSION_PATCH})
+SET(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${ISIS_CORE_REV_STRING}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}-${CMAKE_BUILD_TYPE})
+#SET(CPACK_PACKAGE_INSTALL_DIRECTORY "CMake ${${CMAKE_PROJECT_NAME}_VERSION_MAJOR}.${${CMAKE_PROJECT_NAME}_VERSION_MINOR}")
+INCLUDE(CPack)
+
+
+###########################################################
+# actual install
+###########################################################
 INSTALL(TARGETS ${TARGETS}
-  LIBRARY DESTINATION ${ISIS_PLUGIN_DIR} COMPONENT RuntimeLibraries)
+	LIBRARY DESTINATION ${ISIS_PLUGIN_INFIX} 
+	RUNTIME DESTINATION ${ISIS_PLUGIN_INFIX} 
+	ARCHIVE DESTINATION ${ISIS_PLUGIN_INFIX}
+	COMPONENT RuntimeLibraries
+)
 
 # uninstall target
 configure_file(

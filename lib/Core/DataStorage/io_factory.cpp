@@ -167,7 +167,6 @@ int IOFactory::loadFile( isis::data::ChunkList &ret, const boost::filesystem::pa
 {
 	FileFormatList formatReader;
 	formatReader = getFormatInterface( filename.string(), suffix_override, dialect );
-
 	const size_t nimgs_old = ret.size();   // save number of chunks
 	const std::string with_dialect = dialect.empty() ?
 									 std::string( "" ) : std::string( " with dialect \"" ) + dialect + "\"";
@@ -194,7 +193,6 @@ int IOFactory::loadFile( isis::data::ChunkList &ret, const boost::filesystem::pa
 						<< "Failed to load " <<  filename << " using " <<  it->name() << with_dialect << " ( " << e.what() << " )";
 			}
 		}
-
 		LOG_IF( boost::filesystem::exists( filename ) && formatReader.size() > 1, Runtime, error ) << "No plugin was able to load: "   << util::MSubject( filename ) << with_dialect;
 	}
 
@@ -204,7 +202,6 @@ int IOFactory::loadFile( isis::data::ChunkList &ret, const boost::filesystem::pa
 
 IOFactory::FileFormatList IOFactory::getFormatInterface( std::string filename, std::string suffix_override, std::string dialect )
 {
-
 	std::list<std::string> ext;
 	FileFormatList ret;
 	_internal::dialect_missing remove_op;
@@ -303,7 +300,6 @@ bool IOFactory::write( const isis::data::ImageList &images, const std::string &p
 										   std::string( "" ) :
 										   std::string( " and dialect: " ) + dialect
 										 );
-
 				return true;
 			} catch ( std::runtime_error &e ) {
 				LOG( Runtime, warning )

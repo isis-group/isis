@@ -57,7 +57,6 @@ isis::util::vector4<T> mapCoordinates( const vtkMatrix4x4 *matrix, const isis::u
 	T z = biggestElemSlice > 0 ? coords[biggestElemSlice] : size[biggestElemSlice] - coords[biggestElemSlice];
 	isis::util::vector4<T> retVec = isis::util::vector4<T>( x, y, z, 0 );
 	return retVec;
-
 }
 
 }

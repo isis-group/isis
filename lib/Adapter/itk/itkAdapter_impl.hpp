@@ -111,7 +111,7 @@ typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkRea
 	typedef TOutput OutputImageType;
 	typedef itk::ImportImageFilter<typename InputImageType::PixelType, OutputImageType::ImageDimension> MyImporterType;
 	typedef itk::RescaleIntensityImageFilter<InputImageType, OutputImageType> MyRescaleType;
-	typedef std::set<std::string, isis::util::_internal::caselessStringLess> PropKeyListType;
+	typedef std::set<util::istring> PropKeyListType;
 	typename MyImporterType::Pointer importer = MyImporterType::New();
 	typename MyRescaleType::Pointer rescaler = MyRescaleType::New();
 	typename OutputImageType::Pointer outputImage = OutputImageType::New();
@@ -252,7 +252,6 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	boost::shared_ptr<data::Chunk >
 	tmpChunk ( new data::MemChunk< ITKRepn >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) ) ;
 	//we have to convert the datatype of retChunk to the desired TOutputISIS type to avoid autoscaling
-
 	boost::shared_ptr<data::Chunk > retChunk ( new data::MemChunk<ISISRepn>( imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) );
 	const data::scaling_pair scale = tmpChunk->getScalingTo( data::TypePtr<ISISRepn>::staticID, data::noscale );
 	//

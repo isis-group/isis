@@ -67,7 +67,7 @@ template<typename TYPE> class TypePtr: public _internal::TypePtrBase
 	boost::shared_ptr<TYPE> m_val;
 	template<typename T> TypePtr( const util::Type<T>& value ); // Dont do this
 protected:
-	const boost::weak_ptr<void> address()const {
+	const boost::weak_ptr<void> getRawAddress()const {
 		return boost::weak_ptr<void>( m_val );
 	}
 	TypePtrBase *clone() const {

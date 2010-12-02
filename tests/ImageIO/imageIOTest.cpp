@@ -30,7 +30,6 @@ BOOST_AUTO_TEST_CASE ( imageNameGenTest )
 	ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 	BOOST_REQUIRE( img.insertChunk( ch ) );
 	img.reIndex();
-
 	BOOST_CHECK_EQUAL( image_io::FileFormat::makeFilename( img, "/tmp/S{acquisitionNumber}.nii" ), "/tmp/S0.nii" );
 	BOOST_CHECK_EQUAL( image_io::FileFormat::makeFilename( img, "/tmp/S{nich da}.nii" ), "/tmp/S.nii" ); // {nich da} does not exist - so we just remove it from the string
 	BOOST_CHECK_EQUAL(

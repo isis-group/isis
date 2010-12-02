@@ -22,13 +22,10 @@ MainWindow::MainWindow( const util::slist &inFileList, QMainWindow *parent )
 	m_Viewer.init(  ui.qvtkWidgetAxial,
 					ui.qvtkWidgetSagittal,
 					ui.qvtkWidgetCoronal );
-
 	createAndSendImageMap( inFileList );
-
 	//connections qt
 	QObject::connect( this->ui.checkPhysical, SIGNAL( clicked( bool ) ), this, SLOT( checkPhysicalChanged( bool ) ) );
 	QObject::connect( this->ui.timeStepSpinBox, SIGNAL( valueChanged( int ) ), this, SLOT( timeStepChanged( int ) ) );
-
 	//connections to controller
 	m_Viewer.signalList.intensityChanged.connect( my_RefreshIntensityDisplay );
 	m_Viewer.signalList.mousePosChanged.connect( my_RefreshCoordsDisplay );
@@ -44,11 +41,9 @@ void MainWindow::createAndSendImageMap( const util::slist &fileList )
 		BOOST_FOREACH( isis::data::ImageList::const_reference refImage, imgList ) {
 			adapter::vtkAdapter::ScalingType scaling;
 			std::vector<vtkSmartPointer<vtkImageData> > vtkImageVector = isis::adapter::vtkAdapter::makeVtkImageObject( refImage, scaling );
-
 			refImage->setPropertyAs< util::fvector4 >( "imageSize", refImage->getSizeAsVector() );
 			static_cast<util::TypeReference &>( refImage->propertyValue( "scale" ) ) = scaling.first;
 			static_cast<util::TypeReference &>( refImage->propertyValue( "offset" ) ) = scaling.second;
-
 			imageMap.push_back( std::make_pair( static_cast<util::PropMap>( *refImage ), vtkImageVector ) );
 		}
 	}
@@ -77,6 +72,9 @@ void MainWindow::setUpGui( void )
 	} else {
 		this->ui.timeStepSpinBox->setEnabled( false );
 	}
+
+	this->ui.checkPhysical->setChecked( false );
+	m_Viewer.checkPhysicalChanged( false );
 }
 
 void MainWindow::RefreshIntensityDisplay::operator()( const size_t &intensity )
@@ -87,7 +85,7 @@ void MainWindow::RefreshIntensityDisplay::operator()( const size_t &intensity )
 void MainWindow::RefreshCoordsDisplay::operator()( const size_t &x, const size_t &y, const size_t &z, const size_t &t )
 {
 	QString atString;
-	atString.sprintf( "at %d %d %d", x, y, z );
+	atString.sprintf( "at %ld %ld %ld", x, y, z );
 	parent.ui.atLabel->setText( atString );
 }
 

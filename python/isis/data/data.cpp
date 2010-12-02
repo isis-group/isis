@@ -22,8 +22,6 @@ using namespace isis::python;
 
 BOOST_PYTHON_MODULE( _data )
 {
-
-
 	//#######################################################################################
 	//  IOApplication
 	//#######################################################################################
@@ -36,11 +34,9 @@ BOOST_PYTHON_MODULE( _data )
 	.def( "autowrite", &_IOApplication::_autowrite )
 	.def( "images", &_IOApplication::_images )
 	;
-
 	//#######################################################################################
 	//  Image
 	//#######################################################################################
-
 	class_<isis::data::Image, _Image, bases<isis::util::PropMap> >( "Image", init<>() )
 	.def( init<isis::data::Image>() )
 	.def( "checkMakeClean", &isis::data::Image::checkMakeClean )
@@ -72,7 +68,6 @@ BOOST_PYTHON_MODULE( _data )
 	.def( "deepCopy", ( isis::data::Image ( ::_Image:: * )( std::string ) ) ( &_Image::_deepCopy ), ( arg( "type" ) ) )
 	.def( "cheapCopy", ( isis::data::Image ( ::_Image:: * )( void ) ) ( &_Image::_cheapCopy ) )
 	;
-
 	//#######################################################################################
 	//  ImageList
 	//#######################################################################################
@@ -86,14 +81,11 @@ BOOST_PYTHON_MODULE( _data )
 	.def( "__setitem__", &std_list<IList>::set, with_custodian_and_ward<1, 2>() )
 	.def( "__delitem__", &std_list<IList>::del )
 	;
-
-
 	//#######################################################################################
 	//  Chunk
 	//#######################################################################################
 	class_<isis::data::Chunk, _Chunk> ( "Chunk", init<_Chunk>() )
 	;
-
 	//#######################################################################################
 	//  ChunkList
 	//#######################################################################################

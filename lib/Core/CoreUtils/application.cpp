@@ -34,7 +34,6 @@ Application::Application( const char name[] ): m_name( name )
 {
 	Selection dbg_levels( "error,warning,info,verbose_info" );
 	dbg_levels.set( "warning" );
-
 	parameters["dCore"] = dbg_levels;
 	parameters["dCore"].setDescription( "Debugging level for the Core module" );
 	parameters["dCore"].hidden() = true;

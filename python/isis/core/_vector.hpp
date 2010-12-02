@@ -40,8 +40,6 @@ public:
 		} else {
 			LOG( Runtime, error ) << "Index out of range!";
 		}
-
-
 	}
 
 

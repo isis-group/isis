@@ -51,7 +51,6 @@ bool ImageHolder::resetSliceCoordinates( void )
 {
 	LOG( Runtime, info ) << "Resetting slice coordinates.";
 	setSliceCoordinates( m_ImageVector[m_currentTimestep]->GetDimensions()[0] / 2, m_ImageVector[m_currentTimestep]->GetDimensions()[1] / 2, m_ImageVector[m_currentTimestep]->GetDimensions()[2] / 2 );
-
 }
 
 bool ImageHolder::setSliceCoordinates( const int &x, const int &y, const int &z )
@@ -82,10 +81,9 @@ void ImageHolder::setUpPipe()
 	if ( !m_Physical ) {
 		m_ActorAxial->SetUserMatrix( m_MatrixHandler.getAxialMatrix1() );
 		m_ActorAxial->SetPosition( m_pseudoOrigin[0], m_pseudoOrigin[1], m_pseudoOrigin[2] );
-
 	} else {
 		m_ActorAxial->SetUserMatrix( m_MatrixHandler.getAxialMatrix() );
-		m_ActorAxial->SetPosition( m_transformedOrigin[0] * 2, m_transformedOrigin[1] * 2, m_transformedOrigin[2] * 2 );
+		//      m_ActorAxial->SetPosition( m_transformedOrigin[0] * 2, m_transformedOrigin[1] * 2, m_transformedOrigin[2] * 2 );
 	}
 
 	//sagittal
@@ -100,7 +98,7 @@ void ImageHolder::setUpPipe()
 		m_ActorSagittal->SetPosition( m_pseudoOrigin[0], m_pseudoOrigin[1], m_pseudoOrigin[2] );
 	} else {
 		m_ActorSagittal->SetUserMatrix( m_MatrixHandler.getSagittalMatrix() );
-		m_ActorSagittal->SetPosition( m_transformedOrigin[0], m_transformedOrigin[1], m_transformedOrigin[2] );
+		//      m_ActorSagittal->SetPosition( m_transformedOrigin[0], m_transformedOrigin[1], m_transformedOrigin[2] );
 	}
 
 	//coronal
@@ -116,7 +114,7 @@ void ImageHolder::setUpPipe()
 		m_ActorCoronal->SetPosition( m_pseudoOrigin[0], m_pseudoOrigin[1], m_pseudoOrigin[2] );
 	} else {
 		m_ActorCoronal->SetUserMatrix( m_MatrixHandler.getCoronalMatrix() );
-		m_ActorCoronal->SetPosition( m_transformedOrigin[0], m_transformedOrigin[1], m_transformedOrigin[2] );
+		//      m_ActorCoronal->SetPosition( m_transformedOrigin[0], m_transformedOrigin[1], m_transformedOrigin[2] );
 	}
 }
 
@@ -129,10 +127,8 @@ void ImageHolder::setImages( util::PropMap propMap,  std::vector<vtkSmartPointer
 	isis::util::TypeReference min, max;
 #warning check this - the interfave for the conversion does not expect min max anymore
 	LOG( Runtime, info ) << "Image minimum: " << min << "; Image maximum: " << max;
-
 	m_ScalingFactor = m_PropMap.propertyValue( "scale" );
 	m_Offset = m_PropMap.propertyValue( "offset" );
-
 	m_readVec = m_PropMap.getPropertyAs<isis::util::fvector4>( "readVec" );
 	m_phaseVec = m_PropMap.getPropertyAs<isis::util::fvector4>( "phaseVec" );
 	m_sliceVec = m_PropMap.getPropertyAs<isis::util::fvector4>( "sliceVec" );
@@ -145,7 +141,6 @@ void ImageHolder::setImages( util::PropMap propMap,  std::vector<vtkSmartPointer
 	m_transformedOrigin = m_MatrixHandler.transformOrigin( m_PropMap.getPropertyAs<util::fvector4>( "indexOrigin" ), m_PropMap.getPropertyAs<util::fvector4>( "voxelSize" ) );
 	//TODO debug
 	std::cout << "transformedOrigin: " << m_transformedOrigin << std::endl;
-
 	commonInit();
 	createOrientedImages();
 	setUpPipe();

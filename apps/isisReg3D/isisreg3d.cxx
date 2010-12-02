@@ -86,7 +86,7 @@ static VString pointset_filename = NULL;
 static VString transform_filename_in = NULL;
 static VShort number_of_bins = 50;
 static VArgVector number_of_iterations;
-static VFloat pixel_density = 0.01;
+static VFloat pixel_density = 0;
 static VArgVector grid_size;
 static VArgVector transformType;
 static VArgVector interpolatorType;
@@ -130,8 +130,10 @@ options[] = {
 		"iter", VShortRepn, 0, ( VPointer ) &number_of_iterations, VOptionalOpt, 0,
 		"Maximum number of iteration used by the optimizer"
 	},
-	{ "create_mask" , VFloatRepn, 1, &create_mask, VOptionalOpt, 0,
-			"Create a mask with the otsu method" },
+	{
+		"create_mask" , VFloatRepn, 1, &create_mask, VOptionalOpt, 0,
+		"Create a mask with the otsu method"
+	},
 	{
 		"seed", VShortRepn, 1, &initial_seed, VOptionalOpt, 0,
 		"The initialize seed for the MattesMutualInformationMetric"
@@ -186,9 +188,9 @@ int main(
 {
 	// show revision information string constant
 	std::cout << "Core Version: " << isis::util::Application::getCoreVersion() << std::endl;
-	isis::util::enable_log<isis::util::DefaultMsgPrint>(isis::error);
-	isis::data::enable_log<isis::util::DefaultMsgPrint>(isis::error);
-	isis::image_io::enable_log<isis::util::DefaultMsgPrint>(isis::error);
+	isis::util::enable_log<isis::util::DefaultMsgPrint>( isis::error );
+	isis::data::enable_log<isis::util::DefaultMsgPrint>( isis::error );
+	isis::image_io::enable_log<isis::util::DefaultMsgPrint>( isis::error );
 
 	// DANGER! Kids don't try this at home! VParseCommand modifies the values of argc and argv!!!
 	if ( !VParseCommand( VNumber( options ), options, &argc, argv ) || !VIdentifyFiles( VNumber( options ), options, "in",
@@ -244,7 +246,6 @@ int main(
 	typedef itk::OtsuThresholdImageCalculator<MovingImageType> MovingOtsuCalcType;
 	typedef itk::BinaryThresholdImageFilter<FixedImageType, FixedImageType> FixedThresholdFilter;
 	typedef itk::BinaryThresholdImageFilter<MovingImageType, MovingImageType> MovingThresholdFilter;
-
 	MaskImageReaderType::Pointer maskReader = MaskImageReaderType::New();
 	itk::AffineTransform<double, Dimension>::Pointer tmpTransform = itk::AffineTransform<double, Dimension>::New();
 	itk::TransformFileWriter::Pointer transformWriter = itk::TransformFileWriter::New();
@@ -265,62 +266,48 @@ int main(
 	MovingOtsuCalcType::Pointer movingOtsuCalculator = MovingOtsuCalcType::New();
 	FixedThresholdFilter::Pointer fixedThresholdFilter = FixedThresholdFilter::New();
 	MovingThresholdFilter::Pointer movingThresholdFilter = MovingThresholdFilter::New();
-
 	isis::data::ImageList refList = isis::data::IOFactory::load( ref_filename, "", "" );
+	//if no pixel density is specified it will be calculated to achive a amount of 15000 voxel considered for registration
+	float pixelDens = float(15000) / ( refList.front()->sizeToVector()[0] * refList.front()->sizeToVector()[1] * refList.front()->sizeToVector()[2] ) ;
 	isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "", "" );
 	LOG_IF( refList.empty(), isis::data::Runtime, isis::error ) << "Reference image is empty!";
 	LOG_IF( inList.empty(), isis::data::Runtime, isis::error ) << "Input image is empty!";
 	FixedImageType::Pointer fixedImage = fixedAdapter->makeItkImageObject<FixedImageType>( refList.front() );
 	MovingImageType::Pointer movingImage = movingAdapter->makeItkImageObject<MovingImageType>( inList.front() );
 
-
 	if ( !smooth ) {
-		fixedRescaleFilter->SetInput( fixedImage );
-		movingRescaleFilter->SetInput( movingImage );
-
-		movingRescaleFilter->SetOutputMinimum( -itk::NumericTraits<uint16_t>::max() * 9 );
-		movingRescaleFilter->SetOutputMaximum( itk::NumericTraits<uint16_t>::max() * 9 );
-
-		fixedRescaleFilter->SetOutputMinimum( -itk::NumericTraits<uint16_t>::max() * 9 );
-		fixedRescaleFilter->SetOutputMaximum( itk::NumericTraits<uint16_t>::max() * 9 );
-
-		movingRescaleFilter->Update();
-		fixedRescaleFilter->Update();
-		fixedImage->DisconnectPipeline();
-		movingImage->DisconnectPipeline();
-		fixedImage = fixedRescaleFilter->GetOutput();
-		movingImage = movingRescaleFilter->GetOutput();
-//		isis::registration::_internal::filterFrequencyDomain<FixedImageType>( fixedImage );
-//		isis::registration::_internal::filterFrequencyDomain<MovingImageType>( movingImage );
-//		writer->SetFileName("test.nii");
-//		writer->SetInput(movingImage);
-//		writer->Update();
-//		      // TODO DEBUG
-//		      std::cout << "********** Fixed Image **********" << std::endl;
-//		      std::cout << fixedImage->GetDirection();
-//		      std::cout << "index origin: ";
-//		      std::cout << fixedImage->GetOrigin() << std::endl;
-//
-//		      FixedImageType::PointType fpoint;
-//		      FixedImageType::SizeType fsize = fixedImage->GetLargestPossibleRegion().GetSize();
-//		      FixedImageType::IndexType findex = {{fsize[0],fsize[1],fsize[2]}};
-//		      fixedImage->TransformIndexToPhysicalPoint(findex,fpoint);
-//		      std::cout << "diagonal point:" << fpoint << std::endl;
-//		      std::cout << "size: " << fsize << std::endl;
-//		      std::cout << "spacing: " << fixedImage->GetSpacing() << std::endl << std::endl;
-//
-//		      std::cout << "********** Moving Image **********" << std::endl;
-//		      std::cout << movingImage->GetDirection();
-//		      std::cout << "index origin: ";
-//		      std::cout << movingImage->GetOrigin() << std::endl;
-//
-//		      MovingImageType::PointType mpoint;
-//		      FixedImageType::SizeType msize = movingImage->GetLargestPossibleRegion().GetSize();
-//		      FixedImageType::IndexType mindex = {{msize[0],msize[1],msize[2]}};
-//		      movingImage->TransformIndexToPhysicalPoint(mindex,mpoint);
-//		      std::cout << "diagonal point:" << mpoint << std::endl;
-//		      std::cout << "size: " << msize << std::endl;
-//		      std::cout << "spacing: " << movingImage->GetSpacing() << std::endl;
+		
+		//      isis::registration::_internal::filterFrequencyDomain<FixedImageType>( fixedImage );
+		//      isis::registration::_internal::filterFrequencyDomain<MovingImageType>( movingImage );
+		//      writer->SetFileName("test.nii");
+		//      writer->SetInput(movingImage);
+		//      writer->Update();
+		//            // TODO DEBUG
+		//            std::cout << "********** Fixed Image **********" << std::endl;
+		//            std::cout << fixedImage->GetDirection();
+		//            std::cout << "index origin: ";
+		//            std::cout << fixedImage->GetOrigin() << std::endl;
+		//
+		//            FixedImageType::PointType fpoint;
+		//            FixedImageType::SizeType fsize = fixedImage->GetLargestPossibleRegion().GetSize();
+		//            FixedImageType::IndexType findex = {{fsize[0],fsize[1],fsize[2]}};
+		//            fixedImage->TransformIndexToPhysicalPoint(findex,fpoint);
+		//            std::cout << "diagonal point:" << fpoint << std::endl;
+		//            std::cout << "size: " << fsize << std::endl;
+		//            std::cout << "spacing: " << fixedImage->GetSpacing() << std::endl << std::endl;
+		//
+		//            std::cout << "********** Moving Image **********" << std::endl;
+		//            std::cout << movingImage->GetDirection();
+		//            std::cout << "index origin: ";
+		//            std::cout << movingImage->GetOrigin() << std::endl;
+		//
+		//            MovingImageType::PointType mpoint;
+		//            FixedImageType::SizeType msize = movingImage->GetLargestPossibleRegion().GetSize();
+		//            FixedImageType::IndexType mindex = {{msize[0],msize[1],msize[2]}};
+		//            movingImage->TransformIndexToPhysicalPoint(mindex,mpoint);
+		//            std::cout << "diagonal point:" << mpoint << std::endl;
+		//            std::cout << "size: " << msize << std::endl;
+		//            std::cout << "spacing: " << movingImage->GetSpacing() << std::endl;
 	}
 
 	if ( smooth ) {
@@ -375,14 +362,17 @@ int main(
 		movingImage->DisconnectPipeline();
 		movingImage = movingGaussianFilterZ->GetOutput();
 	}
+
 	MovingImageType::Pointer movingOtsuImage;
 	FixedImageType::Pointer fixedOtsuImage;
+
 	if( create_mask ) {
 		size_t fixedThreshold = 0;
 		size_t movingThreshold = 0;
+
 		if ( create_mask == -1 ) {
-			fixedOtsuCalculator->SetImage(fixedImage);
-			movingOtsuCalculator->SetImage(movingImage);
+			fixedOtsuCalculator->SetImage( fixedImage );
+			movingOtsuCalculator->SetImage( movingImage );
 			fixedOtsuCalculator->Compute();
 			movingOtsuCalculator->Compute();
 			fixedThreshold = fixedOtsuCalculator->GetThreshold();
@@ -391,17 +381,17 @@ int main(
 			fixedThreshold = create_mask;
 			movingThreshold = create_mask;
 		}
-		fixedThresholdFilter->SetLowerThreshold( fixedThreshold );
-		fixedThresholdFilter->SetUpperThreshold( itk::NumericTraits<float>::max()-1);
-		movingThresholdFilter->SetLowerThreshold( fixedThreshold );
-		movingThresholdFilter->SetUpperThreshold( itk::NumericTraits<float>::max()-1);
-		fixedThresholdFilter->SetOutsideValue(0);
-		fixedThresholdFilter->SetInsideValue(1);
-		movingThresholdFilter->SetOutsideValue(0);
-		movingThresholdFilter->SetInsideValue(1);
-		fixedThresholdFilter->SetInput( fixedImage );
-		movingThresholdFilter->SetInput( movingImage);
 
+		fixedThresholdFilter->SetLowerThreshold( fixedThreshold );
+		fixedThresholdFilter->SetUpperThreshold( itk::NumericTraits<float>::max() - 1 );
+		movingThresholdFilter->SetLowerThreshold( fixedThreshold );
+		movingThresholdFilter->SetUpperThreshold( itk::NumericTraits<float>::max() - 1 );
+		fixedThresholdFilter->SetOutsideValue( 0 );
+		fixedThresholdFilter->SetInsideValue( 1 );
+		movingThresholdFilter->SetOutsideValue( 0 );
+		movingThresholdFilter->SetInsideValue( 1 );
+		fixedThresholdFilter->SetInput( fixedImage );
+		movingThresholdFilter->SetInput( movingImage );
 		std::cout << "masking fixed image..." << std::endl;
 		fixedThresholdFilter->Update();
 		std::cout << "masking moving image..." << std::endl;
@@ -411,14 +401,14 @@ int main(
 		fixedImage = fixedThresholdFilter->GetOutput();
 		movingImage = movingThresholdFilter->GetOutput();
 		//TODO debug
-//		writer->SetInput( fixedImage );
-//		writer->SetFileName("fixedMask.nii");
-//		writer->Update();
-//		writer->SetInput( movingImage );
-//		writer->SetFileName("movingMask.nii");
-//		writer->Update();
-
+		//      writer->SetInput( fixedImage );
+		//      writer->SetFileName("fixedMask.nii");
+		//      writer->Update();
+		//      writer->SetInput( movingImage );
+		//      writer->SetFileName("movingMask.nii");
+		//      writer->Update();
 	}
+
 	RegistrationFactoryType::Pointer registrationFactory = RegistrationFactoryType::New();
 	//analyse transform vector
 	//transform is the master for determining the number of repetitions
@@ -487,8 +477,7 @@ int main(
 
 		//check pixel density
 		if ( pixel_density <= 0 ) {
-			std::cerr << "wrong pixel density...set to 0.01" << std::endl;
-			pixel_density = 0.01;
+			pixel_density = pixelDens;
 		}
 
 		if ( pixel_density >= 1 ) {
@@ -542,12 +531,12 @@ int main(
 		case 3:
 			registrationFactory->SetTransform( RegistrationFactoryType::TranslationTransform );
 			break;
-//		case 4:
-//			registrationFactory->SetTransform( RegistrationFactoryType::ScaleTransform );
-//			break;
-//		case 5:
-//			registrationFactory->SetTransform( RegistrationFactoryType::CenteredAffineTransform );
-//			break;
+			//      case 4:
+			//          registrationFactory->SetTransform( RegistrationFactoryType::ScaleTransform );
+			//          break;
+			//      case 5:
+			//          registrationFactory->SetTransform( RegistrationFactoryType::CenteredAffineTransform );
+			//          break;
 		default:
 			std::cerr << "Unknown transform." << std::endl;
 			return EXIT_FAILURE;
@@ -693,7 +682,7 @@ int main(
 		registrationFactory->SetFixedImage( fixedImage );
 		registrationFactory->SetMovingImage( movingImage );
 		std::cout << std::endl;
-		std::cout << "starting the registration...(step " << counter+1 << " of " << repetition << ")" << std::endl;
+		std::cout << "starting the registration...(step " << counter + 1 << " of " << repetition << ")" << std::endl;
 		registrationFactory->StartRegistration();
 		std::cout << std::endl;
 

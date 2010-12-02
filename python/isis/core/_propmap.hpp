@@ -62,7 +62,6 @@ private:
 		util::Type<TYPE> val( static_cast<TYPE>( boost::python::extract<TYPE>( value ) ) );
 		val.copyToNewByID( util::getTransposedTypeMap( true, true )[type] );
 		this->setPropertyAs<TYPE>( key, val );
-
 	}
 };
 }

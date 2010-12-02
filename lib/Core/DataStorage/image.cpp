@@ -12,6 +12,10 @@
 //
 //
 
+#ifdef _MSC_VER
+#pragma warning(disable:4996 4244)
+#endif
+
 #include "DataStorage/image.hpp"
 #include "CoreUtils/vector.hpp"
 #include <boost/foreach.hpp>
@@ -243,8 +247,8 @@ bool Image::reIndex()
 				util::fvector4 &voxelGap = propertyValue( "voxelGap" )->castTo<util::fvector4>(); //if there is no voxelGap yet, we create it
 
 				if ( voxelGap[2] != inf ) {
-					if ( ! util::fuzzyEqual( voxelGap[2], sliceDist, 5e1 ) ) {
-						LOG_IF( ! util::fuzzyEqual( voxelGap[2], sliceDist, 5e1 ), Runtime, warning )
+					if ( ! util::fuzzyEqual( voxelGap[2], sliceDist, 50 ) ) {
+						LOG_IF( ! util::fuzzyEqual( voxelGap[2], sliceDist, 50 ), Runtime, warning )
 								<< "The existing slice distance (voxelGap[2]) " << util::MSubject( voxelGap[2] )
 								<< " differs from the distance between chunk 0 and 1, which is " << sliceDist;
 					}
@@ -271,7 +275,7 @@ bool Image::reIndex()
 
 		if ( hasProperty( "sliceVec" ) ) {
 			util::fvector4 &sliceVec = propertyValue( "sliceVec" )->castTo<util::fvector4>(); //get the slice vector
-			LOG_IF( ! crossVec.fuzzyEqual( sliceVec, 1e3 ), Runtime, warning )
+			LOG_IF( ! crossVec.fuzzyEqual( sliceVec, 1000 ), Runtime, warning )
 					<< "The existing sliceVec " << sliceVec
 					<< " differs from the cross product of the read- and phase vector " << crossVec;
 		} else {
@@ -496,7 +500,9 @@ ImageList::ImageList( ChunkList src )
 			if ( buff->reIndex() ) {
 				if ( buff->isValid() ) {
 					push_back( buff );
-					LOG( Runtime, info ) << "Image " << size() << " with size " << buff->getSizeAsString() <<  " done.";
+					util::TypeReference min, max;
+					buff->getMinMax( min, max );
+					LOG( Runtime, info ) << "Image " << size() << " with size " << buff->sizeToString() <<  " and value range " << min << " to " << max << " done.";
 				} else {
 					LOG( Runtime, error )
 							<< "Cannot insert image. Missing properties: " << buff->getMissing();
@@ -633,11 +639,11 @@ unsigned short Image::typeID() const
 	LOG( Debug, info ) << "Determining  datatype of image with the value range " << min << " to " << max;
 
 	if( min->typeID() == max->typeID() ) { // ok min and max are the same type - trivial case
-		return min->typeID()  << 8; // btw: we do the shift, because min and max are Type - but we want the ID's TypePtr
+		return min->typeID() << 8; // btw: we do the shift, because min and max are Type - but we want the id's TypePtr
 	} else if( min->fitsInto( max->typeID() ) ) { // if min fits into the type of max, use that
-		return max->typeID()  << 8; //@todo maybe use a global static function here instead of a obscure shit operation
+		return max->typeID() << 8; //@todo maybe use a global static function here instead of a obscure shit operation
 	} else if( max->fitsInto( min->typeID() ) ) { // if max fits into the type of min, use that
-		return min->typeID()  << 8;
+		return min->typeID() << 8;
 	} else {
 		LOG( Runtime, error ) << "Sorry I dont know which datatype I should use. (" << min->typeName() << " or " << max->typeName() << ")";
 		throw( std::logic_error( "type selection failed" ) );
