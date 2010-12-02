@@ -37,9 +37,13 @@ class TypePtrBase : public util::_internal::GenericType
 protected:
 	size_t m_len;
 	TypePtrBase( size_t len = 0 );
+
 	/// Create a TypePtr of the same type pointing at the same address.
 	virtual TypePtrBase *clone()const = 0;
+
 public:
+	virtual const boost::weak_ptr<void> getRawAddress()const = 0;
+	
 	typedef util::_internal::TypeReference<TypePtrBase> Reference;
 	typedef TypePtrConverterMap::mapped_type::mapped_type Converter;
 

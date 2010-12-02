@@ -218,7 +218,7 @@ BOOST_AUTO_TEST_CASE ( type_selection_test )
 	BOOST_CHECK( img.insertChunk( ch_int8_t ) );
 	BOOST_CHECK( img.insertChunk( ch_uint8_t ) );
 	BOOST_CHECK( img.reIndex() );
-	BOOST_CHECK_EQUAL( img.sizeToVector(), ( util::FixedVector<size_t, 4>( size ) ) );
+	BOOST_CHECK_EQUAL( img.getSizeAsVector(), ( util::FixedVector<size_t, 4>( size ) ) );
 	BOOST_CHECK_EQUAL( img.typeID(), data::TypePtr<int16_t>( NULL, 0 ).typeID() );
 #undef MAKE_CHUNK
 }
@@ -423,7 +423,7 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 		data::enable_log<util::DefaultMsgPrint>( warning );
 		BOOST_REQUIRE( img2.reIndex() );
 		//Check if the metadata were copied correct
-		BOOST_CHECK_EQUAL( static_cast<util::PropMap>( img ), static_cast<util::PropMap>( img2 ) );
+		BOOST_CHECK_EQUAL( static_cast<util::PropertyMap>( img ), static_cast<util::PropertyMap>( img2 ) );
 
 		for ( int i = 0; i < 3; i++ )
 			for ( int j = 0; j < 3; j++ ) {
@@ -449,7 +449,7 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 		// Conversion to int16_t (will upscale [0-32k) )
 		data::MemImage<int16_t> img2( img );
 		BOOST_REQUIRE( img2.reIndex() );
-		BOOST_CHECK_EQUAL( static_cast<util::PropMap>( img ), static_cast<util::PropMap>( img2 ) );
+		BOOST_CHECK_EQUAL( static_cast<util::PropertyMap>( img ), static_cast<util::PropertyMap>( img2 ) );
 		util::TypeReference min, max;
 		img2.getMinMax( min, max );
 		BOOST_CHECK( min->is<int16_t>() );
@@ -505,7 +505,7 @@ BOOST_AUTO_TEST_CASE( typediamge_test )
 		data::enable_log<util::DefaultMsgPrint>( warning );
 		BOOST_REQUIRE( img2.reIndex() );
 		//Check if the metadata were copied correct
-		BOOST_CHECK_EQUAL( static_cast<util::PropMap>( img ), static_cast<util::PropMap>( img2 ) );
+		BOOST_CHECK_EQUAL( static_cast<util::PropertyMap>( img ), static_cast<util::PropertyMap>( img2 ) );
 
 		for ( int i = 0; i < 3; i++ )
 			for ( int j = 0; j < 3; j++ ) {
@@ -691,7 +691,7 @@ BOOST_AUTO_TEST_CASE ( image_splice_test )
 	original.setPropertyAs<util::fvector4>( "phaseVec", util::fvector4( 0, 1, 0 ) );
 	BOOST_REQUIRE( img.insertChunk( original ) );
 	BOOST_REQUIRE( img.reIndex() );
-	BOOST_REQUIRE( !img.empty() );
+	BOOST_REQUIRE( !img.isEmpty() );
 	img.spliceDownTo( data::sliceDim );
 	std::vector<boost::shared_ptr<data::Chunk> > chunks = img.getChunkList();
 	BOOST_CHECK_EQUAL( chunks.size(), 100 );

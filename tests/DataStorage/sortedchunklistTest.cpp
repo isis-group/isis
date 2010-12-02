@@ -19,11 +19,11 @@ BOOST_AUTO_TEST_CASE ( chunklist_insert_test )
 	chunks.addSecondarySort( "acquisitionTime" );
 
 	data::MemChunk<float> ch( 4, 4 );
-	ch.setProperty( "acquisitionNumber", 2 );
-	ch.setProperty( "indexOrigin", util::fvector4( 0, 0, 2 ) );
-	ch.setProperty( "readVec", util::fvector4( 1, 0 ) );
-	ch.setProperty( "phaseVec", util::fvector4( 0, 1 ) );
-	ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1 ) );
+	ch.setPropertyAs( "acquisitionNumber", 2 );
+	ch.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, 2 ) );
+	ch.setPropertyAs( "readVec", util::fvector4( 1, 0 ) );
+	ch.setPropertyAs( "phaseVec", util::fvector4( 0, 1 ) );
+	ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1 ) );
 	ch.setPropertyAs<uint32_t>( "acquisitionNumber", 2 );
 	ch.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, 2, 0 ) );
 	BOOST_REQUIRE( chunks.insert( ch ) );
@@ -43,8 +43,8 @@ BOOST_AUTO_TEST_CASE ( chunklist_sort_test )
 			data::MemChunk<float> ch( 3, 3 );
 			ch.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, j, i ) );
 			ch.setPropertyAs( "acquisitionNumber", 0 );
-			ch.setProperty( "phaseVec", util::fvector4( 0, 1 ) );
-			ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1 ) );
+			ch.setPropertyAs( "phaseVec", util::fvector4( 0, 1 ) );
+			ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1 ) );
 
 			BOOST_REQUIRE( chunks.insert( ch ) );
 		}
@@ -73,9 +73,9 @@ BOOST_AUTO_TEST_CASE ( chunklist_sort_test )
 			data::MemChunk<float> ch( 3, 3 );
 			ch.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, j, i ) );
 			ch.setPropertyAs<uint32_t>( "acquisitionNumber", 1 );
-			ch.setProperty( "readVec", util::fvector4( 1, 0 ) );
-			ch.setProperty( "phaseVec", util::fvector4( 0, 1 ) );
-			ch.setProperty( "voxelSize", util::fvector4( 1, 1, 1 ) );
+			ch.setPropertyAs( "readVec", util::fvector4( 1, 0 ) );
+			ch.setPropertyAs( "phaseVec", util::fvector4( 0, 1 ) );
+			ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1 ) );
 
 
 			if( i == 0 && j == 0 ) { // this is allready there
@@ -95,10 +95,10 @@ BOOST_AUTO_TEST_CASE ( chunklist_sort_test )
 // @todo figure out, if we can remove acquisitionNumber from the needed list, if we say that one of acquisitionNumber or acquisitionTime is there
 // BOOST_AUTO_TEST_CASE ( chunklist_secondary_sort_test )
 // {
-	chNumber.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
+/*	chNumber.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
 	chNumber.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, 0, 0 ) );
 	chTime.setPropertyAs( "acquisitionTime", 0 );
-	chTime.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, 0, 0 ) );
+	chTime.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, 0, 0 ) );*/
 //  chTime.setProperty( "indexOrigin", util::fvector4( 0, 0, 0, 0 ) );
 //  {
 //      // inserting a not-first chunk which lacks the current secondary sort property should fail
