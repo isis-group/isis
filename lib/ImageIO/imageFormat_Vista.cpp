@@ -150,11 +150,11 @@ throw( std::runtime_error & )
 	/*****************************************
 	 * write history information if available
 	 *****************************************/
-	util::PropertyMap::key_list keyset = image.getKeys();
+	util::PropertyMap::KeyList keyset = image.getKeys();
 	// count number of history entries
 	size_t hcount = 0;
 	// if history list prefix is available increase counter.
-	BOOST_FOREACH( util::PropertyMap::key_list::key_type key, keyset ) {
+	BOOST_FOREACH( util::PropertyMap::KeyList::key_type key, keyset ) {
 		if (  std::string( key.c_str() ).find( histPrefix ) != std::string::npos ) {
 			hcount++;
 		}
@@ -166,7 +166,7 @@ throw( std::runtime_error & )
 		for( unsigned i = 1; i <= hcount; i++ ) {
 			std::stringstream name;
 			name << histPrefix << i;
-			std::string val = image.getPropertyAs<std::string>( name.str() );
+			std::string val = image.getPropertyAs<std::string>( util::istring( name.str().c_str() ) );
 			// split key token from history property string
 			size_t x = val.find( ":" );
 			VAppendAttr( hlist, val.substr( 0, x ).c_str(), NULL, VStringRepn,
@@ -246,7 +246,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 				std::stringstream key, value;
 				key << histPrefix << ++hcount;
 				value << attrName << ":" << std::string( ( VString ) val );
-				hMap.setPropertyAs<std::string>( key.str(), value.str() );
+				hMap.setPropertyAs<std::string>( util::istring( key.str().c_str() ), value.str() );
 			}
 		}
 	}
@@ -792,8 +792,8 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 	if( image.hasBranch( "Vista" ) ) {
 		util::PropertyMap vista_branch = image.branch( "Vista" );
 		// convert it to a property map
-		util::PropertyMap::key_list klist = vista_branch.getKeys();
-		util::PropertyMap::key_list::const_iterator kiter;
+		util::PropertyMap::KeyList klist = vista_branch.getKeys();
+		util::PropertyMap::KeyList::const_iterator kiter;
 		// prefix of history entries
 		std::string hpref = "HistoryLine";
 
@@ -810,56 +810,56 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 
 			if( pv->is<uint8_t>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VBitRepn,
-							 ( VBit )pv->cast_to<uint8_t>() );
+							 ( VBit )pv->castTo<uint8_t>() );
 				continue;
 			}
 
 			// VUByte -> VUByte (char *)
 			if( pv->is<VUByte>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VUByteRepn,
-							 pv->cast_to<VUByte>() );
+							 pv->castTo<VUByte>() );
 				continue;
 			}
 
 			// VSByte -> VSByte (char *)
 			if( pv->is<VSByte>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VSByteRepn,
-							 pv->cast_to<VSByte>() );
+							 pv->castTo<VSByte>() );
 				continue;
 			}
 
 			// VShort -> VShort (char *)
 			if( pv->is<VShort>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VShortRepn,
-							 pv->cast_to<VShort>() );
+							 pv->castTo<VShort>() );
 				continue;
 			}
 
 			// VLong -> VLong (char *)
 			if( pv->is<VLong>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VLongRepn,
-							 pv->cast_to<VLong>() );
+							 pv->castTo<VLong>() );
 				continue;
 			}
 
 			// VFloat -> VFloat (char *)
 			if( pv->is<VFloat>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VFloatRepn,
-							 pv->cast_to<VFloat>() );
+							 pv->castTo<VFloat>() );
 				continue;
 			}
 
 			// VDouble -> VDouble (char *)
 			if( pv->is<VDouble>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VDoubleRepn,
-							 pv->cast_to<VDouble>() );
+							 pv->castTo<VDouble>() );
 				continue;
 			}
 
 			// VString -> std::string
 			if( pv->is<std::string>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VStringRepn,
-							 pv->cast_to<std::string>().c_str() );
+							 pv->castTo<std::string>().c_str() );
 				continue;
 			}
 		}

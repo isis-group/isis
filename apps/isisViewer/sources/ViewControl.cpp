@@ -194,14 +194,14 @@ void ViewControl::sliceChanged( const int &x, const int &y, const int &z )
 			LOG( Runtime, error ) << "error during setting slicesetting!";
 		}
 	}
-	m_ActorCursorAxial->SetPosition( x - m_CurrentImageHolder->getISISImage().getProperty<util::ivector4>( "imageSize" )[0] / 2,
-									 y - m_CurrentImageHolder->getISISImage().getProperty<util::ivector4>( "imageSize" )[1] / 2
+	m_ActorCursorAxial->SetPosition( x - m_CurrentImageHolder->getISISImage().getPropertyAs<util::ivector4>( "imageSize" )[0] / 2,
+									 y - m_CurrentImageHolder->getISISImage().getPropertyAs<util::ivector4>( "imageSize" )[1] / 2
 									 , 0 );
-	m_ActorCursorCoronal->SetPosition(  x - m_CurrentImageHolder->getISISImage().getProperty<util::ivector4>( "imageSize" )[0] / 2,
-										z - m_CurrentImageHolder->getISISImage().getProperty<util::ivector4>( "imageSize" )[2] / 2
+	m_ActorCursorCoronal->SetPosition(  x - m_CurrentImageHolder->getISISImage().getPropertyAs<util::ivector4>( "imageSize" )[0] / 2,
+										z - m_CurrentImageHolder->getISISImage().getPropertyAs<util::ivector4>( "imageSize" )[2] / 2
 										, 0 );
-	m_ActorCursorSagittal->SetPosition( x - m_CurrentImageHolder->getISISImage().getProperty<util::ivector4>( "imageSize" )[0] / 2,
-										y - m_CurrentImageHolder->getISISImage().getProperty<util::ivector4>( "imageSize" )[1] / 2
+	m_ActorCursorSagittal->SetPosition( x - m_CurrentImageHolder->getISISImage().getPropertyAs<util::ivector4>( "imageSize" )[0] / 2,
+										y - m_CurrentImageHolder->getISISImage().getPropertyAs<util::ivector4>( "imageSize" )[1] / 2
 										, 0 );
 	UpdateWidgets();
 }
