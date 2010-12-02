@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE( propMap_init_test )
 {
 	ENABLE_LOG( CoreDebug, util::DefaultMsgPrint, warning );
 	ENABLE_LOG( CoreLog, util::DefaultMsgPrint, warning );
-	util::PropertyMap map1;
+	util::PropMap map1;
 	map1.propertyValue( "Test1" ) = 6.4;
 	map1.propertyValue( "Test2" ) = ( int32_t )5;
 	map1.propertyValue( "Test3" ) = util::fvector4( 1, 1, 1, 1 );
@@ -32,8 +32,8 @@ BOOST_AUTO_TEST_CASE( propMap_init_test )
 	BOOST_CHECK_EQUAL( map1.propertyValue( "Test2" ), ( int32_t )5 );
 	BOOST_CHECK_EQUAL( map1.propertyValue( "Test3" ), util::fvector4( 1, 1, 1, 1 ) );
 	BOOST_CHECK_EQUAL( map1.propertyValue( "Test4" ), std::string( "Hallo" ) );
-	util::PropertyMap &ref = map1.branch( "sub" );
-	BOOST_CHECK( ! ref.isEmpty() );
+	util::PropMap &ref = map1.branch( "sub" );
+	BOOST_CHECK( ! ref.empty() );
 	BOOST_CHECK_EQUAL( ref.propertyValue( "Test1" ), ( int32_t )1 );
 	BOOST_CHECK_EQUAL( ref.propertyValue( "Test2" ), ( int32_t )2 );
 	BOOST_CHECK( map1.propertyValue( "new" ).empty() );
@@ -41,17 +41,17 @@ BOOST_AUTO_TEST_CASE( propMap_init_test )
 
 BOOST_AUTO_TEST_CASE( propMap_set_test )
 {
-	util::PropertyMap map1;
+	util::PropMap map1;
 	map1.propertyValue( "Test1" ) = 6.4;
 	BOOST_CHECK( !( map1.propertyValue( "Test1" ) == 7 ) );
 	BOOST_CHECK_EQUAL( map1.propertyValue( "Test1" ), 6.4 );
-	map1.setPropertyAs( "Test1", 7. );
+	map1.setProperty( "Test1", 7. );
 	BOOST_CHECK_EQUAL( map1.propertyValue( "Test1" ), 7 );
 }
 
 BOOST_AUTO_TEST_CASE( propMap_remove_test )
 {
-	util::PropertyMap map;
+	util::PropMap map;
 	map.propertyValue( "Test1" ) = 6.4;
 	map.propertyValue( "Test2" ) = ( int32_t )5;
 	map.propertyValue( "Test3" ) = util::fvector4( 1, 1, 1, 1 );
@@ -63,18 +63,18 @@ BOOST_AUTO_TEST_CASE( propMap_remove_test )
 	BOOST_CHECK( map.remove( "Test3" ) );
 	BOOST_CHECK( map.remove( "Test4" ) );
 	BOOST_CHECK( map.remove( "sub/Test1" ) );
-	BOOST_CHECK( ! map.branch( "sub" ).isEmpty() ); //the submap must still be there
+	BOOST_CHECK( ! map.branch( "sub" ).empty() ); //the submap must still be there
 	BOOST_CHECK( map.remove( "sub/Test2" ) );
-	BOOST_CHECK( map.branch( "sub" ).isEmpty() ); //not anymore (this will create an "normal" empty entry)
+	BOOST_CHECK( map.branch( "sub" ).empty() ); //not anymore (this will create an "normal" empty entry)
 }
 
 BOOST_AUTO_TEST_CASE( propMap_join_test )
 {
-	util::PropertyMap map1, map2, result, org;
+	util::PropMap map1, map2, result, org;
 	map1.propertyValue( "Test1" ) = 6.4;
 	map1.propertyValue( "Test3" ) = util::fvector4( 1, 1, 1, 1 );
 	map1.propertyValue( "Test4" ) = std::string( "Hallo" );
-	util::PropertyMap::KeyList rej;
+	util::PropMap::key_list rej;
 	//create empty Property "Test5" through accessing it
 	BOOST_CHECK( map1.propertyValue( "Test5" ).empty() );
 	map2.propertyValue( "Test2" ) = ( int32_t )5;
@@ -105,21 +105,21 @@ BOOST_AUTO_TEST_CASE( propMap_join_test )
 
 BOOST_AUTO_TEST_CASE( propMap_diff_test )
 {
-	util::PropertyMap map1, map2;
-	map1.setPropertyAs( "Test1", 6.4 );
-	map1.setPropertyAs( "Test3", util::fvector4( 1, 1, 1, 1 ) );
-	map1.setPropertyAs( "Test4", std::string( "Hallo" ) );
-	map1.setPropertyAs( "Test6/1", std::string( "nix" ) );
-	map1.setPropertyAs( "Test6/2", std::string( "leer" ) );
-	util::PropertyMap::KeyList rej;
+	util::PropMap map1, map2;
+	map1.setProperty( "Test1", 6.4 );
+	map1.setProperty( "Test3", util::fvector4( 1, 1, 1, 1 ) );
+	map1.setProperty( "Test4", std::string( "Hallo" ) );
+	map1.setProperty( "Test6/1", std::string( "nix" ) );
+	map1.setProperty( "Test6/2", std::string( "leer" ) );
+	util::PropMap::key_list rej;
 	//create empty Property "Test5" through accessing it
 	BOOST_CHECK( map1.propertyValue( "Test5" ).empty() );
-	map2.setPropertyAs( "Test2", ( int32_t )5 );
-	map2.setPropertyAs( "Test3", util::fvector4( 1, 1, 1, 1 ) );
-	map2.setPropertyAs( "Test4", std::string( "Hallo Welt" ) );
-	map2.setPropertyAs( "Test5", std::string( "Hallo leer" ) );
-	map2.setPropertyAs( "Test6", std::string( "Hallo branch" ) );
-	util::PropertyMap::DiffMap result = map1.getDifference( map2 ), org;
+	map2.setProperty( "Test2", ( int32_t )5 );
+	map2.setProperty( "Test3", util::fvector4( 1, 1, 1, 1 ) );
+	map2.setProperty( "Test4", std::string( "Hallo Welt" ) );
+	map2.setProperty( "Test5", std::string( "Hallo leer" ) );
+	map2.setProperty( "Test6", std::string( "Hallo branch" ) );
+	util::PropMap::diff_map result = map1.getDifference( map2 ), org;
 	//Test1 must be pair of map1.propertyValue("Test1") and |empty|
 	BOOST_CHECK_EQUAL( result["Test1"].first, map1.propertyValue( "Test1" ) );
 	BOOST_CHECK( result["Test1"].second.empty() );
@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE( propMap_diff_test )
 }
 BOOST_AUTO_TEST_CASE( propMap_transform_test )
 {
-	util::PropertyMap map;
+	util::PropMap map;
 	map.propertyValue( "Test1" ) = 6.4;
 	map.propertyValue( "Test2" ) = ( int32_t )5;
 	map.propertyValue( "Test3" ) = util::fvector4( 1, 1, 1, 1 );

@@ -38,7 +38,6 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 		parameters["rf"] = std::string();
 		parameters["rf"].needed() = false;
 		parameters["rf"].hidden() = true;
-
 		parameters["rf"].setDescription( "Override automatic detection of file suffix for reading with given value" );
 		parameters["rdialect"] = std::string();
 		parameters["rdialect"].needed() = false;
@@ -53,7 +52,6 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 		parameters["wf"].needed() = false;
 		parameters["wf"].setDescription( "Override automatic detection of file suffix for writing with given value" );
 		parameters["wf"].hidden() = true;
-
 		parameters["wdialect"] = std::string();
 		parameters["wdialect"].needed() = false;
 		parameters["wdialect"].setDescription( "choose dialect for writing. The available dialects depend on the capabilities of IO plugins" );
@@ -110,16 +108,13 @@ void IOApplication::printHelp( bool withHidden ) const
 		std::cout << std::endl << "Available IO Plugins:" << std::endl;
 		data::IOFactory::FileFormatList plugins = data::IOFactory::getFormats();
 		BOOST_FOREACH( data::IOFactory::FileFormatList::const_reference pi, plugins ) {
-
 			std::cout << std::endl << "\t" << pi->name() << std::endl << "\t=======================================" << std::endl;
 			const std::list<util::istring> suff = pi->getSuffixes();
 			const std::list<std::string> dialects = util::string2list<std::string>( pi->dialects( "" ) );
-
 			std::cout << "\tsupported suffixes: " << util::list2string( suff.begin(), suff.end(), "\", \"", "\"", "\"" )  << std::endl;
 
 			if( !dialects.empty() )
 				std::cout << "\tsupported dialects: " << util::list2string( dialects.begin(), dialects.end(), "\", \"", "\"", "\"" )  << std::endl;
-
 		}
 	}
 }
@@ -150,10 +145,10 @@ bool IOApplication::autoload( bool exitOnError )
 	} else {
 		for( ImageList::const_iterator a = images.begin(); a != images.end(); a++ ) {
 			for( ImageList::const_iterator b = a; ( ++b ) != images.end(); ) {
-				const util::PropertyMap &aref = **a, bref = **b;
+				const util::PropMap &aref = **a, bref = **b;
 				LOG_IF( aref.getDifference( bref ).empty(), Runtime, warning ) << "The metadata of the images from "
-						<< aref.getPropertyAs<std::string>( "source" ) << ":" << std::distance<ImageList::const_iterator>( images.begin(), a )
-						<< " and " << bref.getPropertyAs<std::string>( "source" ) << ":" << std::distance<ImageList::const_iterator>( images.begin(), b )
+						<< aref.getProperty<std::string>( "source" ) << ":" << std::distance<ImageList::const_iterator>( images.begin(), a )
+						<< " and " << bref.getProperty<std::string>( "source" ) << ":" << std::distance<ImageList::const_iterator>( images.begin(), b )
 						<< " are equal. Maybe they are duplicates.";
 			}
 		}
@@ -185,7 +180,7 @@ bool IOApplication::autowrite( const ImageList &out_images, bool exitOnError )
 
 	if( repn != 0 ) {
 		BOOST_FOREACH( ImageList::const_reference ref, out_images ) {
-			ref->makeOfTypeID( repn );
+			ref->makeOfTypeId( repn );
 		}
 	}
 

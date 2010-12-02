@@ -37,15 +37,12 @@ Application::Application( const char name[] ): m_name( name )
 	parameters["dCore"] = dbg_levels;
 	parameters["dCore"].setDescription( "Debugging level for the Core module" );
 	parameters["dCore"].hidden() = true;
-
 	parameters["dData"] = dbg_levels;
 	parameters["dData"].setDescription( "Debugging level for the Data module" );
 	parameters["dData"].hidden() = true;
-
 	parameters["dImageIO"] = dbg_levels;
 	parameters["dImageIO"].setDescription( "Debugging level for the ImageIO module" );
 	parameters["dImageIO"].hidden() = true;
-
 	parameters["help"] = false;
 	parameters["help"].setDescription( "Print help" );
 	BOOST_FOREACH( ParameterMap::reference ref, parameters ) //none of these is needed
@@ -127,7 +124,7 @@ void Application::printHelp( bool withHidden )const
 		std::cout << "\t-" << iP->first << " <" << iP->second->typeName() << ">" << std::endl;
 
 		if ( iP->second->is<Selection>() ) {
-			const Selection &ref = iP->second->castTo<Selection>();
+			const Selection &ref = iP->second->cast_to<Selection>();
 			std::cout << "\t\tOptions are: " <<  ref.getEntries() << std::endl;
 		}
 

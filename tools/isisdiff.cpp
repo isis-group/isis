@@ -12,7 +12,7 @@ void dropDuplicate( data::ImageList &list )
 		b++;
 
 		while( b != list.end() ) {
-			const util::PropertyMap &aref = **a, bref = **b;
+			const util::PropMap &aref = **a, bref = **b;
 
 			if( aref.getDifference( bref ).empty() ) {
 				std::cout << "Duplicate found in data from "
@@ -100,7 +100,7 @@ int main( int argc, char *argv[] )
 
 	for ( i = images1.begin(), j = images2.begin(), count = 0; i != images1.end(); i++, j++, count++ ) {
 		const data::Image &first = **i, &second = **j;
-		util::PropertyMap::DiffMap diff = first.getDifference( second );
+		util::PropMap::diff_map diff = first.getDifference( second );
 		BOOST_FOREACH( util::slist::const_reference ref, ignore ) {
 			diff.erase( util::istring( ref.begin(), ref.end() ) );
 		}
@@ -114,17 +114,17 @@ int main( int argc, char *argv[] )
 					<< diff << std::endl;
 		}
 
-		if ( first.getSizeAsVector() != second.getSizeAsVector() ) {
+		if ( first.sizeToVector() != second.sizeToVector() ) {
 			std::cout
 					<< "Image sizes of " << files.front() << countStr << " and "
 					<< files.back() << countStr  << " differ:"
-					<< first.getSizeAsString() << "/" << second.getSizeAsString() << std::endl;
+					<< first.sizeToString() << "/" << second.sizeToString() << std::endl;
 			ret++;
 		} else {
 			size_t voxels = first.cmp( second );
 
 			if ( voxels != 0 ) {
-				std::cout << voxels * 100 / first.getSizeAsVector().product()
+				std::cout << voxels * 100 / first.sizeToVector().product()
 						  << "% of the voxels in " << files.front() << countStr << " and "
 						  << files.back() << countStr  << " differ" << std::endl;
 				ret++;

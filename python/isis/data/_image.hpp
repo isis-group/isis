@@ -30,20 +30,20 @@ public:
 		case data::TypePtr<int8_t>::staticID:
 			return isis::data::Image::voxel<int8_t>( first, second, third, fourth );
 			break;
-		case data::TypePtr<uint8_t>::staticID:
-			return isis::data::Image::voxel<uint8_t>( first, second, third, fourth );
+		case data::TypePtr<u_int8_t>::staticID:
+			return isis::data::Image::voxel<u_int8_t>( first, second, third, fourth );
 			break;
 		case data::TypePtr<int16_t>::staticID:
 			return isis::data::Image::voxel<int16_t>( first, second, third, fourth );
 			break;
-		case data::TypePtr<uint16_t>::staticID:
-			return isis::data::Image::voxel<uint16_t>( first, second, third, fourth );
+		case data::TypePtr<u_int16_t>::staticID:
+			return isis::data::Image::voxel<u_int16_t>( first, second, third, fourth );
 			break;
 		case data::TypePtr<int32_t>::staticID:
 			return isis::data::Image::voxel<int32_t>( first, second, third, fourth );
 			break;
-		case data::TypePtr<uint32_t>::staticID:
-			return isis::data::Image::voxel<uint32_t>( first, second, third, fourth );
+		case data::TypePtr<u_int32_t>::staticID:
+			return isis::data::Image::voxel<u_int32_t>( first, second, third, fourth );
 			break;
 		case data::TypePtr<float>::staticID:
 			return isis::data::Image::voxel<float>( first, second, third, fourth );
@@ -66,24 +66,24 @@ public:
 			isis::data::Image::voxel<int8_t>( first, second, third, fourth ) = value;
 			return true;
 			break;
-		case data::TypePtr<uint8_t>::staticID:
-			isis::data::Image::voxel<uint8_t>( first, second, third, fourth ) = value;
+		case data::TypePtr<u_int8_t>::staticID:
+			isis::data::Image::voxel<u_int8_t>( first, second, third, fourth ) = value;
 			return true;
 			break;
 		case data::TypePtr<int16_t>::staticID:
 			isis::data::Image::voxel<int16_t>( first, second, third, fourth ) = value;
 			return true;
 			break;
-		case data::TypePtr<uint16_t>::staticID:
-			isis::data::Image::voxel<uint16_t>( first, second, third, fourth ) = value;
+		case data::TypePtr<u_int16_t>::staticID:
+			isis::data::Image::voxel<u_int16_t>( first, second, third, fourth ) = value;
 			return true;
 			break;
 		case data::TypePtr<int32_t>::staticID:
 			isis::data::Image::voxel<int32_t>( first, second, third, fourth ) = value;
 			return true;
 			break;
-		case data::TypePtr<uint32_t>::staticID:
-			isis::data::Image::voxel<uint32_t>( first, second, third, fourth ) = value;
+		case data::TypePtr<u_int32_t>::staticID:
+			isis::data::Image::voxel<u_int32_t>( first, second, third, fourth ) = value;
 			return true;
 			break;
 		case data::TypePtr<float>::staticID:
@@ -112,8 +112,8 @@ public:
 		return retChunkList;
 	}
 
-	const isis::util::ivector4 _getSizeAsVector( ) {
-		return this->getSizeAsVector();
+	const isis::util::ivector4 _sizeToVector( ) {
+		return this->sizeToVector();
 	}
 
 	isis::data::Chunk _getChunk( const isis::util::ivector4 &coord, bool copy_metadata ) {
@@ -122,7 +122,7 @@ public:
 
 	isis::data::Chunk _getChunkAs( const size_t &first, const size_t &second, const size_t &third, const size_t &fourth, const std::string &type ) {
 		isis::data::Chunk ret = this->getChunk( first, second, third, fourth ); // get a cheap copy
-		ret.makeOfTypeID( util::getTransposedTypeMap( true, true )[type] );
+		ret.makeOfTypeId( util::getTransposedTypeMap( true, true )[type] );
 		return ret;
 	}
 
@@ -189,7 +189,7 @@ public:
 			type.append( "*" );
 		}
 
-		return this->makeOfTypeID( util::getTransposedTypeMap( true, true )[type] );
+		return this->makeOfTypeId( util::getTransposedTypeMap( true, true )[type] );
 	}
 
 	size_t _spliceDownTo( const std::string dim ) {
@@ -211,20 +211,20 @@ public:
 		case data::TypePtr<int8_t>::staticID:
 			return isis::data::MemImage<int8_t>( *this );
 			break;
-		case data::TypePtr<uint8_t>::staticID:
-			return isis::data::MemImage<uint8_t>( *this );
+		case data::TypePtr<u_int8_t>::staticID:
+			return isis::data::MemImage<u_int8_t>( *this );
 			break;
 		case data::TypePtr<int16_t>::staticID:
 			return isis::data::MemImage<int16_t>( *this );
 			break;
-		case data::TypePtr<uint16_t>::staticID:
-			return isis::data::MemImage<uint16_t>( *this );
+		case data::TypePtr<u_int16_t>::staticID:
+			return isis::data::MemImage<u_int16_t>( *this );
 			break;
 		case data::TypePtr<int32_t>::staticID:
 			return isis::data::MemImage<int32_t>( *this );
 			break;
-		case data::TypePtr<uint32_t>::staticID:
-			return isis::data::MemImage<uint32_t>( *this );
+		case data::TypePtr<u_int32_t>::staticID:
+			return isis::data::MemImage<u_int32_t>( *this );
 			break;
 		case data::TypePtr<float>::staticID:
 			return isis::data::MemImage<float>( *this );
@@ -248,7 +248,7 @@ public:
 			LOG( isis::python::Runtime, isis::error ) << "Unable to convert to type "
 					<< type << ". Keeping type.";
 		} else {
-			retImage.makeOfTypeID( isis::util::getTransposedTypeMap()[type] );
+			retImage.makeOfTypeId( isis::util::getTransposedTypeMap()[type] );
 		}
 
 		return retImage;

@@ -63,7 +63,7 @@ class ImageHolder
 public:
 	ImageHolder();
 
-	void setImages( util::PropertyMap, std::vector<vtkSmartPointer<vtkImageData> > );
+	void setImages( util::PropMap, std::vector<vtkSmartPointer<vtkImageData> > );
 	void setPtrToViewer( const boost::shared_ptr<ViewControl> ptr ) { m_PtrToViewer = ptr; }
 
 	void setReadVec( const isis::util::fvector4 &read ) { m_readVec = read; }
@@ -75,7 +75,7 @@ public:
 	isis::util::fvector4 getSliceVec() const { return m_sliceVec; }
 
 	vtkImageData *getVTKImageData() const { return m_ImageVector[m_currentTimestep]; }
-	const util::PropertyMap &getISISImage() const { return m_PropertyMap; }
+	const util::PropMap &getISISImage() const { return m_PropMap; }
 
 	bool setSliceCoordinates ( const int &, const int &, const int & );
 	void setCurrentTimeStep( const int & );
@@ -96,7 +96,7 @@ public:
 private:
 	MatrixHandler m_MatrixHandler;
 	std::vector<vtkSmartPointer<vtkImageData> > m_ImageVector;
-	util::PropertyMap m_PropertyMap;
+	util::PropMap m_PropMap;
 	boost::shared_ptr<ViewControl> m_PtrToViewer;
 	vtkSmartPointer<vtkImageClip> m_ExtractAxial;
 	vtkSmartPointer<vtkImageClip> m_ExtractSagittal;

@@ -33,7 +33,7 @@ namespace _internal
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // sorting algorithm implementation
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-SortedChunkList::scalarPropCompare::scalarPropCompare( const util::PropertyMap::KeyType &prop_name ): propertyName( prop_name ) {}
+SortedChunkList::scalarPropCompare::scalarPropCompare( const util::PropMap::pname_type &prop_name ): propertyName( prop_name ) {}
 
 bool SortedChunkList::posCompare::operator()( const util::fvector4 &posA, const util::fvector4 &posB ) const
 {
@@ -67,8 +67,8 @@ SortedChunkList::chunkPtrOperator::~chunkPtrOperator() {}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // constructor
-SortedChunkList::SortedChunkList( util::PropertyMap::KeyType fvectorPropName, util::PropertyMap::KeyType comma_separated_equal_props ):
-	equalProps( util::string2list<util::PropertyMap::KeyType>( comma_separated_equal_props, ',' ) )
+SortedChunkList::SortedChunkList( util::PropMap::pname_type fvectorPropName, util::PropMap::pname_type comma_separated_equal_props ):
+	equalProps( util::string2list<util::PropMap::pname_type>( comma_separated_equal_props, ',' ) )
 {}
 
 
@@ -87,7 +87,7 @@ SortedChunkList::SecondaryMap *SortedChunkList::primaryFind( const util::fvector
 // low level insert
 std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::secondaryInsert( SecondaryMap &map, const Chunk &ch )
 {
-	util::PropertyMap::KeyType propName = map.key_comp().propertyName;
+	util::PropMap::pname_type propName = map.key_comp().propertyName;
 
 	if( ch.hasProperty( propName ) ) {
 		//check, if there is already a chunk
@@ -110,21 +110,21 @@ std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::secondaryInsert( Seco
 std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::primaryInsert( const Chunk &ch )
 {
 	LOG_IF( secondarySort.empty(), Debug, error ) << "There is no known secondary sorting left. Chunksort will fail.";
-	assert( ch.isValid() );
+	assert( ch.valid() );
 	// compute the position of the chunk in the image space
 	// we dont have this position, but we have the position in scanner-space (indexOrigin)
-	const util::fvector4 &origin = ch.propertyValue( "indexOrigin" )->castTo<util::fvector4>();
+	const util::fvector4 &origin = ch.propertyValue( "indexOrigin" )->cast_to<util::fvector4>();
 	// and we have the transformation matrix
 	// [ readVec ]
 	// [ phaseVec]
 	// [ sliceVec]
 	// [ 0 0 0 1 ]
-	const util::fvector4 &readVec = ch.propertyValue( "readVec" )->castTo<util::fvector4>();
-	const util::fvector4 &phaseVec = ch.propertyValue( "phaseVec" )->castTo<util::fvector4>();
+	const util::fvector4 &readVec = ch.propertyValue( "readVec" )->cast_to<util::fvector4>();
+	const util::fvector4 &phaseVec = ch.propertyValue( "phaseVec" )->cast_to<util::fvector4>();
 	util::fvector4 sliceVec;
 
 	if( ch.hasProperty( "sliceVec" ) )
-		sliceVec = ch.propertyValue( "sliceVec" )->castTo<util::fvector4>();
+		sliceVec = ch.propertyValue( "sliceVec" )->cast_to<util::fvector4>();
 	else {
 		sliceVec = util::fvector4(
 					   readVec[1] * phaseVec[2] - readVec[2] * phaseVec[1],
@@ -149,21 +149,21 @@ std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::primaryInsert( const 
 bool SortedChunkList::insert( const Chunk &ch )
 {
 	LOG_IF( secondarySort.empty(), Debug, error ) << "Inserting will fail without any secondary sort. Use chunks.addSecondarySort at least once.";
-	LOG_IF( !ch.isValid(), Debug, error ) << "You're trying insert an invalid chunk. The missing properties are " << ch.getMissing() << " This will break.";
-	LOG_IF( !ch.isValid(), Debug, error ) << "You should definitively check the chunks validity (use the function Chunk::valid) before calling this funktion.";
-	assert( ch.isValid() );
+	LOG_IF( !ch.valid(), Debug, error ) << "You're trying insert an invalid chunk. The missing properties are " << ch.getMissing() << " This will break.";
+	LOG_IF( !ch.valid(), Debug, error ) << "You should definitively check the chunks validity (use the function Chunk::valid) before calling this funktion.";
+	assert( ch.valid() );
 
 	if( !empty() ) {
 		// compare some attributes of the first chunk and the one which shall be inserted
 		Chunk &first = *( chunks.begin()->second.begin()->second );
 
-		if ( first.getSizeAsVector() != ch.getSizeAsVector() ) { // if they have different size - do not insert
+		if ( first.sizeToVector() != ch.sizeToVector() ) { // if they have different size - do not insert
 			LOG( Debug, verbose_info )
-					<< "Ignoring chunk with different size. (" << ch.getSizeAsString() << "!=" << first.getSizeAsString() << ")";
+					<< "Ignoring chunk with different size. (" << ch.sizeToString() << "!=" << first.sizeToString() << ")";
 			return false;
 		}
 
-		BOOST_FOREACH( util::PropertyMap::KeyType & ref, equalProps ) { // check all properties which where given to the constructor of the list
+		BOOST_FOREACH( util::PropMap::pname_type & ref, equalProps ) { // check all properties which where given to the constructor of the list
 			// if at least one of them has the property and they are not equal - do not insert
 			if ( ( first.hasProperty( ref ) || ch.hasProperty( ref ) ) && first.propertyValue( ref ) != ch.propertyValue( ref ) ) {
 				LOG( Debug, verbose_info )
@@ -176,7 +176,7 @@ bool SortedChunkList::insert( const Chunk &ch )
 		std::stack<scalarPropCompare> backup = secondarySort;
 
 		while( !ch.hasProperty( secondarySort.top().propertyName ) ) {
-			const util::PropertyMap::KeyType temp = secondarySort.top().propertyName;
+			const util::PropMap::pname_type temp = secondarySort.top().propertyName;
 
 			if ( secondarySort.size() > 1 ) {
 				secondarySort.pop();
@@ -191,7 +191,7 @@ bool SortedChunkList::insert( const Chunk &ch )
 		LOG( Debug, info )  << "Using " << secondarySort.top().propertyName << " for secondary sorting, determined by the first chunk";
 	}
 
-	const util::PropertyMap::KeyType &prop2 = secondarySort.top().propertyName;
+	const util::PropMap::pname_type &prop2 = secondarySort.top().propertyName;
 
 	std::pair<boost::shared_ptr<Chunk>, bool> inserted = primaryInsert( ch );
 
@@ -209,7 +209,7 @@ bool SortedChunkList::insert( const Chunk &ch )
 	return inserted.second;
 }
 
-void SortedChunkList::addSecondarySort( const util::PropertyMap::KeyType &cmp )
+void SortedChunkList::addSecondarySort( const util::PropMap::pname_type &cmp )
 {
 	secondarySort.push( scalarPropCompare( cmp ) );
 }

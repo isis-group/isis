@@ -45,7 +45,7 @@ BOOST_PYTHON_MODULE( _core )
 	.def( "propertyValue", &_PropMap::_propertyValue )
 	.def( "valid", &isis::util::PropMap::valid )
 	.def( "empty", &isis::util::PropMap::empty )
-	.def( "setPropertyAs", &_PropMap::_setPropertyAs )
+	.def( "setProperty", &_PropMap::_setProperty )
 	;
 	//#######################################################################################
 	//  PropertyValue

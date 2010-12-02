@@ -31,12 +31,14 @@ namespace _internal
 
 template<unsigned short DIM> size_t __dimStride( const size_t dim[] )
 {
+	BOOST_STATIC_ASSERT( DIM > 0 );//Make sure recursion terminates
 	return __dimStride < DIM - 1 > ( dim ) * dim[DIM-1];
 }
 
-template<unsigned short DIM> size_t __dim2index( const size_t d[], const size_t dim[] )
+template<unsigned short DIM> size_t __dim2Index( const size_t d[], const size_t dim[] )
 {
-	return d[DIM] * __dimStride<DIM>( dim ) + __dim2index < DIM - 1 > ( d, dim );
+	BOOST_STATIC_ASSERT( DIM > 0 );//Make sure recursion terminates
+	return d[DIM] * __dimStride<DIM>( dim ) + __dim2Index < DIM - 1 > ( d, dim );
 }
 
 template<unsigned short DIM> bool __rangeCheck( const size_t d[], const size_t dim[] )
@@ -45,7 +47,7 @@ template<unsigned short DIM> bool __rangeCheck( const size_t d[], const size_t d
 }
 
 template<> inline size_t __dimStride<0>( const size_t dim[] ) {return 1;}
-template<> inline size_t __dim2index<0>( const size_t d[], const size_t dim[] ) {return d[0] * __dimStride<0>( dim );}
+template<> inline size_t __dim2Index<0>( const size_t d[], const size_t dim[] ) {return d[0] * __dimStride<0>( dim );}
 template<> inline bool   __rangeCheck<0>( const size_t d[], const size_t dim[] ) {return d[0] < dim[0];}
 
 /// @endcond
@@ -57,7 +59,7 @@ template<unsigned short DIMS> class NDimensional
 protected:
 	NDimensional() {}
 public:
-	static const size_t dims = DIMS;
+	static const size_t n_dims = DIMS;
 	/**
 	 * Initializes the size-vector.
 	 * This must be done before anything else, or behaviour will be undefined.
@@ -78,15 +80,15 @@ public:
 	 * Compute linear index from n-dimensional index,
 	 * \param d array of indexes (d[0] is most iterating element / lowest dimension)
 	 */
-	size_t getLinearIndex( const size_t d[DIMS] )const {
-		return __dim2index < DIMS - 1 > ( d, dim );
+	size_t dim2Index( const size_t d[DIMS] )const {
+		return __dim2Index < DIMS - 1 > ( d, dim );
 	}
 	/**
-	 * Check if index fits into the dimensional size of the object.
+	 * Check if index fits into size of the object.
 	 * \param d index to be checked (d[0] is most iterating element / lowest dimension)
-	 * \returns true if given index will get a reasonable result when used for getLinearIndex
+	 * \returns true if given index will get a reasonable result when used for dim2index
 	 */
-	bool isInRange( const size_t d[DIMS] )const {
+	bool rangeCheck( const size_t d[DIMS] )const {
 		return __rangeCheck < DIMS - 1 > ( d, dim );
 	}
 	/**
@@ -102,12 +104,12 @@ public:
 	}
 
 	/// generates a string representing the size
-	std::string getSizeAsString( std::string delim = "x" )const {
+	std::string sizeToString( std::string delim = "x" )const {
 		return util::list2string( dim, dim + DIMS, delim, "", "" );
 	}
 
 	/// generates a FixedVector\<DIMS\> representing the size
-	util::FixedVector<size_t, DIMS> getSizeAsVector()const {
+	util::FixedVector<size_t, DIMS> sizeToVector()const {
 		return util::FixedVector<size_t, DIMS>( dim );
 	}
 
@@ -129,7 +131,7 @@ public:
 	}
 	util::FixedVector<float, DIMS> getFoV( const util::FixedVector<float, DIMS> &voxelSize, const util::FixedVector<float, DIMS> &voxelGap )const {
 		LOG_IF( volume() == 0, DataLog, warning ) << "Calculating FoV of empty data";
-		const util::FixedVector<size_t, DIMS> voxels = getSizeAsVector();
+		const util::FixedVector<size_t, DIMS> voxels = sizeToVector();
 		const util::fvector4 gapSize = voxelGap * ( voxels - 1 );
 		return voxelSize * voxels + gapSize;
 	}

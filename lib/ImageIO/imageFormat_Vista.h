@@ -139,7 +139,7 @@ private:
 					std::list<float> flist = util::string2list<float>( std::string( ( char * )val ) );
 					std::list<float>::const_iterator iter = flist.begin();
 					float x = *iter++, y = *iter++, z = *iter;
-					chunk.setPropertyAs<util::fvector4>( "voxelSize", util::fvector4( x, y, z, 1 ) );
+					chunk.setProperty<util::fvector4>( "voxelSize", util::fvector4( x, y, z, 1 ) );
 					continue;
 				}
 
@@ -153,48 +153,48 @@ private:
 				if( ( strcmp( name, "orientation" ) == 0 ) && ( ! chunk.hasProperty( "readVec" ) ) ) {
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
 					//TODO remove "orientation" in Vista group
-					chunk.setPropertyAs<std::string>( propname, std::string( ( VString )val ) );
+					chunk.setProperty<std::string>( propname, std::string( ( VString )val ) );
 					if( functional ) {
 						// axial is the reference
 						if( strcmp( ( const char * )val, "axial" ) == 0 ) {
-							chunk.setPropertyAs<util::fvector4>( "readVec", util::fvector4( 1, 0, 0, 0 ) );
-							chunk.setPropertyAs<util::fvector4>( "phaseVec", util::fvector4( 0, 1, 0, 0 ) );
-							chunk.setPropertyAs<util::fvector4>( "sliceVec", util::fvector4( 0, 0, 1, 0 ) );
+							chunk.setProperty<util::fvector4>( "readVec", util::fvector4( 1, 0, 0, 0 ) );
+							chunk.setProperty<util::fvector4>( "phaseVec", util::fvector4( 0, 1, 0, 0 ) );
+							chunk.setProperty<util::fvector4>( "sliceVec", util::fvector4( 0, 0, 1, 0 ) );
 							continue;
 						}
 
 						if( strcmp( ( const char * )val, "sagittal" ) == 0 ) {
-							chunk.setPropertyAs<util::fvector4>( "readVec", util::fvector4( 0, 1, 0, 0 ) );
-							chunk.setPropertyAs<util::fvector4>( "phaseVec", util::fvector4( 0, 0, 1, 0 ) );
-							chunk.setPropertyAs<util::fvector4>( "sliceVec", util::fvector4( 1, 0, 0, 0 ) );
+							chunk.setProperty<util::fvector4>( "readVec", util::fvector4( 0, 1, 0, 0 ) );
+							chunk.setProperty<util::fvector4>( "phaseVec", util::fvector4( 0, 0, 1, 0 ) );
+							chunk.setProperty<util::fvector4>( "sliceVec", util::fvector4( 1, 0, 0, 0 ) );
 							continue;
 						}
 
 						if( strcmp( ( const char * )val, "coronal" ) == 0 ) {
-							chunk.setPropertyAs<util::fvector4>( "readVec", util::fvector4( 1, 0, 0, 0 ) );
-							chunk.setPropertyAs<util::fvector4>( "phaseVec", util::fvector4( 0, 0, 1, 0 ) );
-							chunk.setPropertyAs<util::fvector4>( "sliceVec", util::fvector4( 0, -1, 0, 0 ) );
+							chunk.setProperty<util::fvector4>( "readVec", util::fvector4( 1, 0, 0, 0 ) );
+							chunk.setProperty<util::fvector4>( "phaseVec", util::fvector4( 0, 0, 1, 0 ) );
+							chunk.setProperty<util::fvector4>( "sliceVec", util::fvector4( 0, -1, 0, 0 ) );
 							continue;
 						}
 					} else {
 						if( strcmp( ( const char * )val, "axial" ) == 0 ) {
-							chunk.setPropertyAs<util::fvector4>( "readVec", util::fvector4( -1, 0, 0, 0 ) );
-							chunk.setPropertyAs<util::fvector4>( "phaseVec", util::fvector4( 0, 1, 0, 0 ) );
-							chunk.setPropertyAs<util::fvector4>( "sliceVec", util::fvector4( 0, 0, -1, 0 ) );
+							chunk.setProperty<util::fvector4>( "readVec", util::fvector4( -1, 0, 0, 0 ) );
+							chunk.setProperty<util::fvector4>( "phaseVec", util::fvector4( 0, 1, 0, 0 ) );
+							chunk.setProperty<util::fvector4>( "sliceVec", util::fvector4( 0, 0, -1, 0 ) );
 							continue;
 						}
 
 						if( strcmp( ( const char * )val, "sagittal" ) == 0 ) {
-							chunk.setPropertyAs<util::fvector4>( "readVec", util::fvector4( 0, 1, 0, 0 ) );
-							chunk.setPropertyAs<util::fvector4>( "phaseVec", util::fvector4( 0, 0, 1, 0 ) );
-							chunk.setPropertyAs<util::fvector4>( "sliceVec", util::fvector4( 1, 0, 0, 0 ) );
+							chunk.setProperty<util::fvector4>( "readVec", util::fvector4( 0, 1, 0, 0 ) );
+							chunk.setProperty<util::fvector4>( "phaseVec", util::fvector4( 0, 0, 1, 0 ) );
+							chunk.setProperty<util::fvector4>( "sliceVec", util::fvector4( 1, 0, 0, 0 ) );
 							continue;
 						}
 
 						if( strcmp( ( const char * )val, "coronal" ) == 0 ) {
-							chunk.setPropertyAs<util::fvector4>( "readVec", util::fvector4( 1, 0, 0, 0 ) );
-							chunk.setPropertyAs<util::fvector4>( "phaseVec", util::fvector4( 0, 0, 1, 0 ) );
-							chunk.setPropertyAs<util::fvector4>( "sliceVec", util::fvector4( 0, -1, 0, 0 ) );
+							chunk.setProperty<util::fvector4>( "readVec", util::fvector4( 1, 0, 0, 0 ) );
+							chunk.setProperty<util::fvector4>( "phaseVec", util::fvector4( 0, 0, 1, 0 ) );
+							chunk.setProperty<util::fvector4>( "sliceVec", util::fvector4( 0, -1, 0, 0 ) );
 							continue;
 						}
 					}
@@ -210,9 +210,9 @@ private:
 					}
 
 					std::stringstream sstr( repTime );
-					uint16_t repTimeInt;
+					u_int16_t repTimeInt;
 					sstr >> repTimeInt;
-					chunk.setPropertyAs<uint16_t>( "repetitionTime", repTimeInt );
+					chunk.setProperty<u_int16_t>( "repetitionTime", repTimeInt );
 					continue;
 				}
 
@@ -222,7 +222,7 @@ private:
 					std::stringstream sstr( slice_time );
 					float sliceTimeFloat;
 					sstr >> sliceTimeFloat;
-					chunk.setPropertyAs<float>( "acquisitionTime",  sliceTimeFloat  );
+					chunk.setProperty<float>( "acquisitionTime",  sliceTimeFloat  );
 					continue;
 				}
 
@@ -242,7 +242,7 @@ private:
 						genderSelection.set( "other" );
 					}
 
-					chunk.setPropertyAs<util::Selection>( "subjectGender", genderSelection );
+					chunk.setProperty<util::Selection>( "subjectGender", genderSelection );
 					continue;
 				}
 
@@ -250,7 +250,7 @@ private:
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
 					std::string subjectName = std::string ( ( VString ) val );
 					subjectName.resize( 4 );
-					chunk.setPropertyAs<std::string>( "subjectName", subjectName );
+					chunk.setProperty<std::string>( "subjectName", subjectName );
 					continue;
 				}
 
@@ -260,7 +260,7 @@ private:
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
 					const std::list<float> tokens = util::string2list<float>( std::string(( const char * )val), ' ' );
 					readVec.copyFrom<std::list<float>::const_iterator>( tokens.begin(), tokens.end() );
-					chunk.setPropertyAs<util::fvector4>( "readVec", readVec );
+					chunk.setProperty<util::fvector4>( "readVec", readVec );
 					continue;
 				}
 
@@ -270,7 +270,7 @@ private:
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
 					const std::list<float> tokens = util::string2list<float>( std::string(( const char * )val), ' ' );
 					phaseVec.copyFrom<std::list<float>::const_iterator>( tokens.begin(), tokens.end() );
-					chunk.setPropertyAs<util::fvector4>( "phaseVec", phaseVec );
+					chunk.setProperty<util::fvector4>( "phaseVec", phaseVec );
 					continue;
 				}
 
@@ -280,7 +280,7 @@ private:
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
 					const std::list<float> tokens = util::string2list<float>( std::string(( const char * )val), ' ' );
 					sliceVec.copyFrom<std::list<float>::const_iterator>( tokens.begin(), tokens.end() );
-					chunk.setPropertyAs<util::fvector4>( "sliceVec", sliceVec );
+					chunk.setProperty<util::fvector4>( "sliceVec", sliceVec );
 					continue;
 				}
 
@@ -290,7 +290,7 @@ private:
 					std::list<float> flist = util::string2list<float>( std::string( ( char * )val ) );
 					std::list<float>::const_iterator iter = flist.begin();
 					float x = *iter++, y = *iter++, z = *iter;
-					chunk.setPropertyAs<util::fvector4>( "indexOrigin", util::fvector4( x, y, z, 0 ) );
+					chunk.setProperty<util::fvector4>( "indexOrigin", util::fvector4( x, y, z, 0 ) );
 					continue;
 				}
 
@@ -312,7 +312,7 @@ private:
 					std::stringstream sstr( echoTimeStr );
 					float echoTime;
 					sstr >> echoTime;
-					chunk.setPropertyAs<float>( "echoTime", echoTime );
+					chunk.setProperty<float>( "echoTime", echoTime );
 					continue;
 				}
 
@@ -320,15 +320,15 @@ private:
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
 					std::string flipAngleStr = std::string( VString ( val ) );
 					std::stringstream sstr( flipAngleStr );
-					uint16_t flipAngle;
+					u_int16_t flipAngle;
 					sstr >> flipAngle;
-					chunk.setPropertyAs<float>( "flipAngle", flipAngle );
+					chunk.setProperty<float>( "flipAngle", flipAngle );
 					continue;
 				}
 
 				if( strcmp( name, "transmitCoil" ) == 0 ) {
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
-					chunk.setPropertyAs<std::string>( "transmitCoil", std::string( ( VString )val ) );
+					chunk.setProperty<std::string>( "transmitCoil", std::string( ( VString )val ) );
 					continue;
 				}
 
@@ -339,7 +339,7 @@ private:
 					// rounding: floor or ceil
 					age = ( ( age * 365.2425 ) - floor( age * 365.2425 ) ) < 0.5 ?
 						  floor( age * 365.2425 ) : ceil( age * 365.2425 );
-					chunk.setPropertyAs<uint16_t>( "subjectAge", age );
+					chunk.setProperty<uint16_t>( "subjectAge", age );
 					continue;
 				}
 
@@ -368,7 +368,7 @@ private:
 					break;
 				case VStringRepn:
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
-					chunk.setPropertyAs<std::string>( propname, std::string( ( VString )val ) );
+					chunk.setProperty<std::string>( propname, std::string( ( VString )val ) );
 					break;
 				default:
 					std::cout << "unknown attribute representation found" << std::endl;
@@ -434,24 +434,24 @@ private:
 					}
 				}
 				boost::posix_time::ptime isisTime( isisDate, isisTimeDuration );
-				chunk.setPropertyAs<boost::posix_time::ptime>( "sequenceStart", isisTime );
+				chunk.setProperty<boost::posix_time::ptime>( "sequenceStart", isisTime );
 			}
 
 			//if not set yet, set read, phase and slice vector.
 			// DEFAULT: axial
 			if( not chunk.hasProperty( "readVec" ) ) {
-				chunk.setPropertyAs<util::fvector4>( "readVec", util::fvector4( 1, 0, 0, 0 ) );
-				chunk.setPropertyAs<util::fvector4>( "phaseVec", util::fvector4( 0, 1, 0, 0 ) );
-				chunk.setPropertyAs<util::fvector4>( "sliceVec", util::fvector4( 0, 0, 1, 0 ) );
+				chunk.setProperty<util::fvector4>( "readVec", util::fvector4( 1, 0, 0, 0 ) );
+				chunk.setProperty<util::fvector4>( "phaseVec", util::fvector4( 0, 1, 0, 0 ) );
+				chunk.setProperty<util::fvector4>( "sliceVec", util::fvector4( 0, 0, 1, 0 ) );
 			}
 
 			// set voxel gap tp (0,0,0,0) since there is no gap information available
 			// in vista images.
-			chunk.setPropertyAs<util::fvector4>( "voxelGap", util::fvector4( 0, 0, 0, 0 ) );
+			chunk.setProperty<util::fvector4>( "voxelGap", util::fvector4( 0, 0, 0, 0 ) );
 
 			// set acquisitionNumber. This values is always missing
 			if( !chunk.hasProperty( "acquisitionNumber" ) )
-				chunk.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
+				chunk.setProperty<uint32_t>( "acquisitionNumber", 0 );
 
 			LOG( DataLog, verbose_info ) << "finished copying header";
 		}

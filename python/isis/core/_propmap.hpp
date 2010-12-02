@@ -33,7 +33,7 @@ public:
 		return this->propertyValue( key );
 	}
 
-	void _setPropertyAs( std::string key, PyObject *value, std::string type ) {
+	void _setProperty( std::string key, PyObject *value, std::string type ) {
 		if( PyFloat_Check( value ) ) {
 			internSetProperty<float>( key, value, type );
 		} else if( PyBool_Check( value ) ) {
@@ -60,8 +60,8 @@ private:
 	template<typename TYPE>
 	void internSetProperty ( const std::string key, PyObject *value, std::string type ) {
 		util::Type<TYPE> val( static_cast<TYPE>( boost::python::extract<TYPE>( value ) ) );
-		val.copyToNewByID( util::getTransposedTypeMap( true, true )[type] );
-		this->setPropertyAs<TYPE>( key, val );
+		val.copyToNewById( util::getTransposedTypeMap( true, true )[type] );
+		this->setProperty<TYPE>( key, val );
 	}
 };
 }

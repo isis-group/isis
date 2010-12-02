@@ -48,7 +48,7 @@ bool ProgParameter::parse( const Type<std::string> &props )
 
 	if ( ( ( std::string )props ).empty() ) {
 		if ( me.is<bool>() ) {
-			me.castTo<bool>() = true;
+			me.cast_to<bool>() = true;
 			ret = true;
 		}
 	} else {
@@ -127,7 +127,7 @@ ProgParameter::operator boost::scoped_ptr<_internal::TypeBase>::unspecified_bool
 {
 	boost::scoped_ptr<_internal::TypeBase> dummy;
 
-	if( ( *this )->castTo<bool>() )dummy.reset( new Type<int16_t> );
+	if( ( *this )->cast_to<bool>() )dummy.reset( new Type<int16_t> );
 
 	return  dummy;
 }

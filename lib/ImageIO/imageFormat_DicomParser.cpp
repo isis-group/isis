@@ -39,17 +39,17 @@ template<typename T> std::list<T> dcmtkListString2list( DcmElement *elem )
  * where nnn shall contain the number of days for D, weeks for W, months for M, or years for Y.
  * Example - "018M" would represent an age of 18 months.
  */
-void ImageFormat_Dicom::parseAS( DcmElement *elem, const util::istring &name, util::PropertyMap &map )
+void ImageFormat_Dicom::parseAS( DcmElement *elem, const util::istring &name, util::PropMap &map )
 {
-	uint16_t duration;
+	u_int16_t duration;
 	OFString buff;
 	elem->getOFString( buff, 0 );
 	static boost::numeric::converter <
-	uint16_t, double,
-			boost::numeric::conversion_traits<uint16_t, double>,
-			boost::numeric::def_overflow_handler,
-			boost::numeric::RoundEven<double>
-			> double2uint16;
+	u_int16_t, double,
+			 boost::numeric::conversion_traits<uint16_t, double>,
+			 boost::numeric::def_overflow_handler,
+			 boost::numeric::RoundEven<double>
+			 > double2uint16;
 
 	if ( _internal::try_cast( buff.substr( 0, 3 ), duration ) ) {
 		switch ( buff.at( buff.size() - 1 ) ) {
@@ -91,7 +91,7 @@ void ImageFormat_Dicom::parseAS( DcmElement *elem, const util::istring &name, ut
  * For reasons of backward compatibility with versions of this standard prior to V3.0,
  * it is recommended that implementations also support a string of characters of the format yyyy.mm.dd for this VR.
  */
-void ImageFormat_Dicom::parseDA( DcmElement *elem, const util::istring &name, util::PropertyMap &map )
+void ImageFormat_Dicom::parseDA( DcmElement *elem, const util::istring &name, util::PropMap &map )
 {
 	//@todo if we drop support for old yyyy.mm.dd this would be much easier
 	boost::regex reg( "^([[:digit:]]{4})\\.?([[:digit:]]{2})\\.?([[:digit:]]{2})$" );
@@ -132,7 +132,7 @@ void ImageFormat_Dicom::parseDA( DcmElement *elem, const util::istring &name, ut
  * For reasons of backward compatibility with versions of this standard prior to V3.0, it is
  * recommended that implementations also support a string of characters of the format hh:mm:ss.frac for this VR.
  */
-void ImageFormat_Dicom::parseTM( DcmElement *elem, const util::istring &name, util::PropertyMap &map )
+void ImageFormat_Dicom::parseTM( DcmElement *elem, const util::istring &name, util::PropMap &map )
 {
 	short shift = 0;
 	OFString buff;
@@ -169,7 +169,7 @@ void ImageFormat_Dicom::parseTM( DcmElement *elem, const util::istring &name, ut
 				<< "Cannot parse Time string \"" << buff << "\" in the field \"" << name << "\"";
 }
 
-void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::istring &name, util::PropertyMap &map )
+void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::istring &name, util::PropMap &map )
 {
 	OFString buff;
 
@@ -189,47 +189,47 @@ void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::istring &name
 	case EVR_FL: {
 		Float32 buff;
 		elem->getFloat32( buff );
-		map.setPropertyAs<float>( name, buff ); //if Float32 is float its fine, if not we will get an compiler error here
+		map.setProperty<float>( name, buff ); //if Float32 is float its fine, if not we will get an compiler error here
 	}
 	break;
 	case EVR_FD: {
 		Float64 buff;
 		elem->getFloat64( buff );
-		map.setPropertyAs<double>( name, buff ); //if Float64 is double its fine, if not we will get an compiler error here
+		map.setProperty<double>( name, buff ); //if Float64 is double its fine, if not we will get an compiler error here
 	}
 	break;
 	case EVR_DS: { //Decimal String (can be floating point)
 		elem->getOFString( buff, 0 );
-		map.setPropertyAs<double>( name, boost::lexical_cast<double>( buff ) );
+		map.setProperty<double>( name, boost::lexical_cast<double>( buff ) );
 	}
 	break;
 	case EVR_SL: { //signed long
 		Sint32 buff;
 		elem->getSint32( buff );
-		map.setPropertyAs<int32_t>( name, buff ); //seems like Sint32 is not allways int32_t, so enforce it
+		map.setProperty<int32_t>( name, buff ); //seems like Sint32 is not allways int32_t, so enforce it
 	}
 	break;
 	case EVR_SS: { //signed short
 		Sint16 buff;
 		elem->getSint16( buff );
-		map.setPropertyAs<int16_t>( name, buff );
+		map.setProperty<int16_t>( name, buff );
 	}
 	break;
 	case EVR_UL: { //unsigned long
 		Uint32 buff;
 		elem->getUint32( buff );
-		map.setPropertyAs<uint32_t>( name, buff );
+		map.setProperty<uint32_t>( name, buff );
 	}
 	break;
 	case EVR_US: { //unsigned short
 		Uint16 buff;
 		elem->getUint16( buff );
-		map.setPropertyAs<uint16_t>( name, buff );
+		map.setProperty<uint16_t>( name, buff );
 	}
 	break;
 	case EVR_IS: { //integer string
 		elem->getOFString( buff, 0 );
-		map.setPropertyAs<int32_t>( name, boost::lexical_cast<int32_t>( buff ) );
+		map.setProperty<int32_t>( name, boost::lexical_cast<int32_t>( buff ) );
 	}
 	break;
 	case EVR_AE: //Application Entity (string)
@@ -242,7 +242,7 @@ void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::istring &name
 	case EVR_UI: //Unique Identifier [0-9\.]
 	case EVR_PN: { //Person Name
 		elem->getOFString( buff, 0 );
-		map.setPropertyAs<std::string>( name, boost::lexical_cast<std::string>( buff ) );
+		map.setProperty<std::string>( name, boost::lexical_cast<std::string>( buff ) );
 	}
 	break;
 	default: {
@@ -256,7 +256,7 @@ void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::istring &name
 	}
 }
 
-void ImageFormat_Dicom::parseVector( DcmElement *elem, const util::istring &name, isis::util::PropertyMap &map )
+void ImageFormat_Dicom::parseVector( DcmElement *elem, const util::istring &name, isis::util::PropMap &map )
 {
 	OFString buff;
 	size_t len = elem->getVM();
@@ -338,7 +338,7 @@ void ImageFormat_Dicom::parseVector( DcmElement *elem, const util::istring &name
 	LOG( Debug, verbose_info ) << "Parsed the vector " << name << " as " << map.propertyValue( name );
 }
 
-void ImageFormat_Dicom::parseList( DcmElement *elem, const util::istring &name, isis::util::PropertyMap &map )
+void ImageFormat_Dicom::parseList( DcmElement *elem, const util::istring &name, isis::util::PropMap &map )
 {
 	OFString buff;
 	size_t len = elem->getVM();
@@ -406,7 +406,7 @@ void ImageFormat_Dicom::parseList( DcmElement *elem, const util::istring &name, 
 	LOG( Debug, verbose_info ) << "Parsed the list " << name << " as " << map.propertyValue( name );
 }
 
-void ImageFormat_Dicom::parseCSA( DcmElement *elem, isis::util::PropertyMap &map, const std::string &dialect )
+void ImageFormat_Dicom::parseCSA( DcmElement *elem, isis::util::PropMap &map, const std::string &dialect )
 {
 	Uint8 *array;
 	elem->getUint8Array( array );
@@ -416,7 +416,7 @@ void ImageFormat_Dicom::parseCSA( DcmElement *elem, isis::util::PropertyMap &map
 		pos += parseCSAEntry( array + pos, map, dialect );
 	}
 }
-size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, isis::util::PropertyMap &map, const std::string &dialect )
+size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, isis::util::PropMap &map, const std::string &dialect )
 {
 	size_t pos = 0;
 	const char *const name = ( char * )at + pos;
@@ -490,18 +490,18 @@ size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, isis::util::PropertyMap &map
 	return pos;
 }
 
-bool ImageFormat_Dicom::parseCSAValue( const std::string &val, const util::istring &name, const util::istring &vr, isis::util::PropertyMap &map )
+bool ImageFormat_Dicom::parseCSAValue( const std::string &val, const util::istring &name, const util::istring &vr, isis::util::PropMap &map )
 {
 	if ( vr == "IS" or vr == "SL" ) {
 		map.propertyValue( name ) = boost::lexical_cast<int32_t>( val );
 	} else if ( vr == "UL" ) {
-		map.propertyValue( name ) = boost::lexical_cast<uint32_t>( val );
+		map.propertyValue( name ) = boost::lexical_cast<u_int32_t>( val );
 	} else if ( vr == "CS" or vr == "LO" or vr == "SH" or vr == "UN" or vr == "ST" ) {
 		map.propertyValue( name ) = val;
 	} else if ( vr == "DS" or vr == "FD" ) {
 		map.propertyValue( name ) = boost::lexical_cast<double>( val );
 	} else if ( vr == "US" ) {
-		map.propertyValue( name ) = boost::lexical_cast<uint16_t>( val );
+		map.propertyValue( name ) = boost::lexical_cast<u_int16_t>( val );
 	} else if ( vr == "SS" ) {
 		map.propertyValue( name ) = boost::lexical_cast<int16_t>( val );
 	} else {
@@ -511,7 +511,7 @@ bool ImageFormat_Dicom::parseCSAValue( const std::string &val, const util::istri
 
 	return true;
 }
-bool ImageFormat_Dicom::parseCSAValueList( const util::slist &val, const util::istring &name, const util::istring &vr, isis::util::PropertyMap &map )
+bool ImageFormat_Dicom::parseCSAValueList( const util::slist &val, const util::istring &name, const util::istring &vr, isis::util::PropMap &map )
 {
 	if ( vr == "IS" or vr == "SL" or vr == "US" or vr == "SS" ) {
 		map.propertyValue( name ) = util::list2list<int32_t>( val.begin(), val.end() );
@@ -529,7 +529,7 @@ bool ImageFormat_Dicom::parseCSAValueList( const util::slist &val, const util::i
 	return true;
 }
 
-void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, isis::util::PropertyMap &map, const std::string &dialect )
+void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, isis::util::PropMap &map, const std::string &dialect )
 {
 	for ( DcmObject *obj = master_obj->nextInContainer( NULL ); obj; obj = master_obj->nextInContainer( obj ) ) {
 		const DcmTag &tag = obj->getTag();

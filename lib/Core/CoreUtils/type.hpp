@@ -32,13 +32,6 @@ template<class TYPE > class Type;
 
 namespace _internal
 {
-
-/// @cond _hidden
-/**
- * Generic value comparison class for Type.
- * This generic class does nothing, and the ()-operator will allways fail with an error send to the debug-logging.
- * It has to be (partly) specialized for the regarding type.
- */
 template<typename T, bool isNumber> class type_compare
 {
 public:
@@ -47,17 +40,6 @@ public:
 		return false;
 	}
 };
-
-/**
- * Half-generic value comparison class for numeric Types.
- * This generic class does compares numeric Type's by converting the second
- * Type-object to the type of the first Type-object. Then:
- * - if the conversion was successfull (the second value can be represented in the type of the first) the "inRange"-comparison is used
- * - if the conversion failed with an positive or negative overflow (the second value is to high/low the type of the first) a info sent to the debug-logging and the posOverflow/negOverflow comarison us used
- * - if there is no known conversion from second to first an error is sent to the debug-logging and false is returned
- * The comparison functions (inRange/posOverflow,negOverflow) here are only stubs and will allways return false.
- * So, these class has to be further specialized for the regarding compare operation.
- */
 template<typename T> class type_compare<T, true>
 {
 protected:
@@ -103,7 +85,6 @@ protected:
 	}
 };
 
-/// less-than comparison for arithmetic types
 template<typename T> class type_less<T, true> : public type_compare<T, true>
 {
 protected:
@@ -114,8 +95,6 @@ protected:
 		return ( T )first < ( T )second;
 	}
 };
-
-/// greater-than comparison for arithmetic types
 template<typename T> class type_greater<T, true> : public type_compare<T, true>
 {
 protected:
@@ -127,7 +106,6 @@ protected:
 	}
 };
 
-/// @endcond _hidden
 }
 
 /// Generic class for type aware variables
@@ -140,7 +118,7 @@ protected:
 		return new Type<TYPE>( *this );
 	}
 public:
-	static const unsigned short staticID = _internal::TypeID<TYPE>::value;
+	static const unsigned short staticID = _internal::TypeId<TYPE>::value;
 	Type() {
 		BOOST_MPL_ASSERT_RELATION( staticID, < , 0xFF );
 		check_type<TYPE>();
@@ -157,13 +135,13 @@ public:
 	}
 	std::string toString( bool labeled = false )const {
 		std::string ret;
-		Reference ref = copyToNewByID( Type<std::string>::staticID );
+		Reference ref = copyToNewById( Type<std::string>::staticID );
 
 		if ( ref.empty() ) {
-			LOG( Debug, warning ) << "Automatic conversion of " << *this << " to string failed. Falling back to boost::lexical_cast<std::string>";
+			LOG( Debug, error ) << "Automatic conversion of " << *this << " to string failed. Falling back to boost::lexical_cast<std::string>";
 			ret = boost::lexical_cast<std::string>( m_val );
 		} else {
-			ret = ref->castTo<std::string>();
+			ret = ref->cast_to<std::string>();
 		}
 
 		if ( labeled )ret += "(" + staticName() + ")";
@@ -177,10 +155,10 @@ public:
 		return staticID;
 	}
 
-	/// \returns true if and only if this and second contain the same value of the same type
+	/// \returns true if this and second contain the same value of the same type
 	virtual bool operator==( const TypeBase &second )const {
 		if ( second.is<TYPE>() ) {
-			return m_val == second.castTo<TYPE>();
+			return m_val == second.cast_to<TYPE>();
 		} else
 			return  false;
 	}
@@ -197,55 +175,17 @@ public:
 	 * float f=i;
 	 * \endcode
 	 * In this case the function returns int which is then also implicitely converted to float.
-	 * \return a const reference to the stored value
+	 * \return the stored value
 	 */
 	operator const TYPE&()const {return m_val;}
-	/**
-	 * Implicit conversion of Type to its value type.
-	 * Only the actual type is allowed.
-	 * However, the following is valid:
-	 * \code
-	 * Type<int> i(5);
-	 * float f=i;
-	 * \endcode
-	 * In this case the function returns int which is then also implicitely converted to float.
-	 * \return a reference to the stored value
-	 */
 	operator TYPE&() {return m_val;}
 
-	/**
-	 * Check if the value of this is greater than ref converted to TYPE.
-	 * The funktion tries to convert ref to the type of this and compare the result.
-	 * If there is no conversion an error is send to the debug logging, and false is returned.
-	 * \returns value_of_this > converted_value_of_ref if the conversion was successfull
-	 * \returns true if the conversion failed because the value was to low for TYPE (negative overflow)
-	 * \returns false if the conversion failed because the value was to high for TYPE (positive overflow)
-	 * \returns false if there is no know conversion from ref to TYPE
-	 */
 	bool gt( const _internal::TypeBase &ref )const {
 		return _internal::type_greater<TYPE, boost::is_arithmetic<TYPE>::value >()( *this, ref );
 	}
-	/**
-	 * Check if the value of this is less than ref converted to TYPE.
-	 * The funktion tries to convert ref to the type of this and compare the result.
-	 * If there is no conversion an error is send to the debug logging, and false is returned.
-	 * \returns value_of_this < converted_value_of_ref if the conversion was successfull
-	 * \returns false if the conversion failed because the value was to low for TYPE (negative overflow)
-	 * \returns true if the conversion failed because the value was to high for TYPE (positive overflow)
-	 * \returns false if there is no know conversion from ref to TYPE
-	 */
 	bool lt( const _internal::TypeBase &ref )const {
 		return _internal::type_less<TYPE, boost::is_arithmetic<TYPE>::value >()( *this, ref );
 	}
-	/**
-	 * Check if the value of this is less than ref converted to TYPE.
-	 * The funktion tries to convert ref to the type of this and compare the result.
-	 * If there is no conversion an error is send to the debug logging, and false is returned.
-	 * \returns value_of_this == converted_value_of_ref if the conversion was successfull
-	 * \returns false if the conversion failed because the value was to low for TYPE (negative overflow)
-	 * \returns false if the conversion failed because the value was to high for TYPE (positive overflow)
-	 * \returns false if there is no know conversion from ref to TYPE
-	 */
 	bool eq( const _internal::TypeBase &ref )const {
 		return _internal::type_eq<TYPE, boost::is_arithmetic<TYPE>::value >()( *this, ref );
 	}
@@ -253,24 +193,24 @@ public:
 	virtual ~Type() {}
 };
 
-template<typename T> const Type<T>& _internal::TypeBase::castToType() const
+template<typename T> const Type<T>& _internal::TypeBase::cast_to_Type() const
 {
 	check_type<T>();
 	return m_cast_to<Type<T> >();
 }
-template<typename T> const T &_internal::TypeBase::castTo() const
+template<typename T> const T &_internal::TypeBase::cast_to() const
 {
-	const Type<T> &ret = castToType<T>();
+	const Type<T> &ret = cast_to_Type<T>();
 	return ret.operator const T & ();
 }
-template<typename T> Type<T>& _internal::TypeBase::castToType()
+template<typename T> Type<T>& _internal::TypeBase::cast_to_Type()
 {
 	check_type<T>();
 	return m_cast_to<Type<T> >();
 }
-template<typename T> T &_internal::TypeBase::castTo()
+template<typename T> T &_internal::TypeBase::cast_to()
 {
-	Type<T> &ret = castToType<T>();
+	Type<T> &ret = cast_to_Type<T>();
 	return ret.operator T & ();
 }
 

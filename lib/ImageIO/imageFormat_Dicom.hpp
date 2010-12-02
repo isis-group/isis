@@ -21,11 +21,7 @@
 #define IMAGEFORMAT_DICOM_HPP
 
 #include "DataStorage/io_interface.h"
-#ifdef _WIN32 // workaround for broken dcmtk/config/osconfig.h
-#include <dcmtk/config/cfwin32.h>
-#else
-#include <dcmtk/config/cfunix.h>
-#endif //_WIN32
+#include <dcmtk/config/cfunix.h> //@todo add switch for windows if needed
 #include <dcmtk/dcmdata/dcfilefo.h>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
@@ -36,9 +32,9 @@ namespace image_io
 
 class ImageFormat_Dicom: public FileFormat
 {
-	static void parseAS( DcmElement *elem, const util::istring &name, util::PropertyMap &map );
-	static void parseDA( DcmElement *elem, const util::istring &name, util::PropertyMap &map );
-	static void parseTM( DcmElement *elem, const util::istring &name, util::PropertyMap &map );
+	static void parseAS( DcmElement *elem, const util::istring &name, util::PropMap &map );
+	static void parseDA( DcmElement *elem, const util::istring &name, util::PropMap &map );
+	static void parseTM( DcmElement *elem, const util::istring &name, util::PropMap &map );
 	static boost::posix_time::ptime genTimeStamp( const boost::gregorian::date &date, const boost::posix_time::ptime &time );
 	template<typename BASE, typename DST> static DST endian( const BASE *b ) {
 		DST ret = 0;
@@ -54,21 +50,21 @@ class ImageFormat_Dicom: public FileFormat
 
 		return ret;
 	}
-	static size_t parseCSAEntry( Uint8 *at, isis::util::PropertyMap &map, const std::string &dialect );
-	static bool parseCSAValue( const std::string &val, const util::istring &name, const util::istring &vr, isis::util::PropertyMap &map );
-	static bool parseCSAValueList( const isis::util::slist &val, const util::istring &name, const util::istring &vr, isis::util::PropertyMap &map );
+	static size_t parseCSAEntry( Uint8 *at, isis::util::PropMap &map, const std::string &dialect );
+	static bool parseCSAValue( const std::string &val, const util::istring &name, const util::istring &vr, isis::util::PropMap &map );
+	static bool parseCSAValueList( const isis::util::slist &val, const util::istring &name, const util::istring &vr, isis::util::PropMap &map );
 	static int readMosaic( data::Chunk source, data::ChunkList &dest );
 protected:
 	std::string suffixes()const;
 public:
 	static const char dicomTagTreeName[];
 	static const char unknownTagName[];
-	static void parseCSA( DcmElement *elem, isis::util::PropertyMap &map, const std::string &dialect );
-	static void parseScalar( DcmElement *elem, const util::istring &name, util::PropertyMap &map );
-	static void parseVector( DcmElement *elem, const util::istring &name, isis::util::PropertyMap &map );
-	static void parseList( DcmElement *elem, const util::istring &name, isis::util::PropertyMap &map );
-	static void dcmObject2PropMap( DcmObject *master_obj, isis::util::PropertyMap &map, const std::string &dialect );
-	static void sanitise( util::PropertyMap &object, string dialect );
+	static void parseCSA( DcmElement *elem, isis::util::PropMap &map, const std::string &dialect );
+	static void parseScalar( DcmElement *elem, const util::istring &name, util::PropMap &map );
+	static void parseVector( DcmElement *elem, const util::istring &name, isis::util::PropMap &map );
+	static void parseList( DcmElement *elem, const util::istring &name, isis::util::PropMap &map );
+	static void dcmObject2PropMap( DcmObject *master_obj, isis::util::PropMap &map, const std::string &dialect );
+	static void sanitise( util::PropMap &object, string dialect );
 	std::string name()const;
 	std::string dialects( const std::string &filename )const;
 

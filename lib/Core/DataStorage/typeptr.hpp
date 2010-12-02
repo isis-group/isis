@@ -42,7 +42,7 @@ template<typename T> struct getMinMaxImpl<T, true> {
 	std::pair<T, T> operator()( const TypePtr<T> &ref ) const {
 		std::pair<T, T> result;
 
-		for ( size_t i = 0; i < ref.length(); i++ ) {
+		for ( size_t i = 0; i < ref.len(); i++ ) {
 			if ( result.second < ref[i] )result.second = ref[i];
 
 			if ( result.first > ref[i] )result.first = ref[i];
@@ -67,11 +67,14 @@ template<typename TYPE> class TypePtr: public _internal::TypePtrBase
 	boost::shared_ptr<TYPE> m_val;
 	template<typename T> TypePtr( const util::Type<T>& value ); // Dont do this
 protected:
+	const boost::weak_ptr<void> getRawAddress()const {
+		return boost::weak_ptr<void>( m_val );
+	}
 	TypePtrBase *clone() const {
 		return new TypePtr( *this );
 	}
 public:
-	static const unsigned short staticID = util::_internal::TypeID<TYPE>::value << 8;
+	static const unsigned short staticID = util::_internal::TypeId<TYPE>::value << 8;
 	/// Proxy-Deleter to encapsulate the real deleter/shared_ptr when creating shared_ptr for parts of a shared_ptr
 	class DelProxy : public boost::shared_ptr<TYPE>
 	{
@@ -122,7 +125,6 @@ public:
 	TypePtr() {
 		LOG( Debug, warning ) << "Creating an empty TypePtr of type " << util::MSubject( staticName() ) << " you should overwrite it with a usefull pointer before using it";
 	}
-
 	/**
 	 * Creates TypePtr from a pointer of type TYPE.
 	 * The pointers are automatically deleted by an instance of BasicDeleter and should not be used outside once used here.
@@ -134,7 +136,6 @@ public:
 	 */
 	TypePtr( TYPE *const ptr, size_t length ):
 		_internal::TypePtrBase( length ), m_val( ptr, BasicDeleter() ) {}
-
 	/**
 	 * Creates TypePtr from a pointer of type TYPE.
 	 * The pointers are automatically deleted by an copy of d and should not be used outside once used here
@@ -150,44 +151,40 @@ public:
 
 	virtual ~TypePtr() {}
 
-	const boost::weak_ptr<void> getRawAddress()const {
-		return boost::weak_ptr<void>( m_val );
-	}
-
 	/// Copy elements from raw memory
-	void copyFromMem( const TYPE *const src, size_t _length ) {
-		LOG_IF( _length > length(), Runtime, error )
-				<< "Amount of the elements to copy from memory (" << _length << ") exceeds the length of the array (" << length() << ")";
+	void copyFromMem( const TYPE *const src, size_t length ) {
+		LOG_IF( length > len(), Runtime, error )
+				<< "Amount of the elements to copy from memory (" << length << ") exceeds the length of the array (" << len() << ")";
 		TYPE &dest = this->operator[]( 0 );
-		LOG( Debug, info ) << "Copying " << _length *sizeof( TYPE ) << " bytes of " << typeName() << " from " << src << " to " << &dest;
-		memcpy( &dest, src, _length * sizeof( TYPE ) );
+		LOG( Debug, info ) << "Copying " << length *sizeof( TYPE ) << " bytes of " << typeName() << " from " << src << " to " << &dest;
+		memcpy( &dest, src, length * sizeof( TYPE ) );
 	}
 	/// Copy elements within a range [start,end] to raw memory
 	void copyToMem( size_t start, size_t end, TYPE *const dst )const {
 		assert( start <= end );
-		const size_t _length = end - start + 1;
-		LOG_IF( end >= length(), Runtime, error )
-				<< "End of the range (" << end << ") is behind the end of this TypePtr (" << length() << ")";
+		const size_t length = end - start + 1;
+		LOG_IF( end >= len(), Runtime, error )
+				<< "End of the range (" << end << ") is behind the end of this TypePtr (" << len() << ")";
 		const TYPE &source = this->operator[]( start );
-		memcpy( dst, &source, _length * sizeof( TYPE ) );
+		memcpy( dst, &source, length * sizeof( TYPE ) );
 	}
-	size_t compare( size_t start, size_t end, const _internal::TypePtrBase &dst, size_t dst_start ) const {
+	size_t cmp( size_t start, size_t end, const _internal::TypePtrBase &dst, size_t dst_start ) const {
 		assert( start <= end );
 		size_t ret = 0;
-		size_t _length = end - start;
+		size_t length = end - start;
 
 		if ( dst.typeID() != typeID() ) {
 			LOG( Debug, error )
 					<< "Comparing to a TypePtr of different type(" << dst.typeName() << ", not " << typeName()
 					<< "). Assuming all voxels to be different";
-			return _length;
+			return length;
 		}
 
-		LOG_IF( end >= length(), Runtime, error )
-				<< "End of the range (" << end << ") is behind the end of this TypePtr (" << length() << ")";
-		LOG_IF( _length + dst_start >= dst.length(), Runtime, error )
-				<< "End of the range (" << _length + dst_start << ") is behind the end of the destination (" << dst.length() << ")";
-		const TypePtr<TYPE> &compare = dst.castToTypePtr<TYPE>();
+		LOG_IF( end >= len(), Runtime, error )
+				<< "End of the range (" << end << ") is behind the end of this TypePtr (" << len() << ")";
+		LOG_IF( length + dst_start >= dst.len(), Runtime, error )
+				<< "End of the range (" << length + dst_start << ") is behind the end of the destination (" << dst.len() << ")";
+		const TypePtr<TYPE> &compare = dst.cast_to_TypePtr<TYPE>();
 		LOG( Debug, verbose_info ) << "Comparing " << dst.typeName() << " at " << &operator[]( 0 ) << " and " << &compare[0];
 
 		for ( size_t i = start; i < end; i++ ) {
@@ -247,15 +244,15 @@ public:
 	operator boost::shared_ptr<TYPE>&() {return m_val;}
 	operator const boost::shared_ptr<TYPE>&()const {return m_val;}
 
-	TypePtrBase::Reference cloneToNew( size_t _length ) const {
-		return TypePtrBase::Reference( new TypePtr( ( TYPE * )malloc( _length * sizeof( TYPE ) ), _length ) );
+	TypePtrBase::Reference cloneToMem( size_t length ) const {
+		return TypePtrBase::Reference( new TypePtr( ( TYPE * )malloc( length * sizeof( TYPE ) ), length ) );
 	}
-	size_t bytesPerElem() const {
+	size_t bytes_per_elem() const {
 		return sizeof( TYPE );
 	}
 	/// \copydoc _internal::TypePtrBase::getMinMax
 	void getMinMax ( util::TypeReference &min, util::TypeReference &max ) const {
-		if ( length() == 0 ) {
+		if ( len() == 0 ) {
 			LOG( Runtime, warning ) << "Skipping computation of min/max on an empty TypePtr";
 			return;
 		}
@@ -270,14 +267,14 @@ public:
 	}
 
 	std::vector<Reference> splice( size_t size )const {
-		if ( size >= length() ) {
+		if ( size >= len() ) {
 			LOG( Debug, warning )
-					<< "splicing data of the size " << length() << " up into blocks of the size " << size << " is kind of useless ...";
+					<< "splicing data of the size " << len() << " up into blocks of the size " << size << " is kind of useless ...";
 		}
 
-		const size_t fullSplices = length() / size;
+		const size_t fullSplices = len() / size;
 
-		const size_t lastSize = length() % size;//rest of the division - size of the last splice
+		const size_t lastSize = len() % size;//rest of the division - size of the last splice
 
 		const size_t splices = fullSplices + ( lastSize ? 1 : 0 );
 

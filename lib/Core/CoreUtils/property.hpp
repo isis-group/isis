@@ -109,15 +109,15 @@ public:
 		check_type<T>();
 
 		if ( get()->is<T>() ) { // If I'm of the same type as the comparator
-			const T &cmp = get()->castTo<T>();
+			const T &cmp = get()->cast_to<T>();
 			return second == cmp; //compare our values
 		} else if ( ! empty() ) { // otherwise try to make me T and compare that
 			LOG( Debug, info )
 					<< *this << " is not " << Type<T>::staticName() << " trying to convert.";
-			TypeReference dst = ( *this )->copyToNewByID( Type<T>::staticID );
+			TypeReference dst = ( *this )->copyToNewById( Type<T>::staticID );
 
 			if ( !dst.empty() )
-				return dst->castTo<T>() == second;
+				return dst->cast_to<T>() == second;
 		}
 
 		return false;

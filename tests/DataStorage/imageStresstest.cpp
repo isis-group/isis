@@ -17,11 +17,11 @@ int main()
 	for ( size_t tstep = 0; tstep < tsteps; tstep++ ) {
 		for ( size_t slice = 0; slice < slices; slice++ ) {
 			data::MemChunk<short> chk( slice_size, slice_size );
-			chk.setPropertyAs( "readVec", util::fvector4( 1, 0 ) );
-			chk.setPropertyAs( "phaseVec", util::fvector4( 0, 1 ) );
-			chk.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, slice ) );
-			chk.setPropertyAs( "acquisitionNumber", ++acq );
-			chk.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1 ) );
+			chk.setProperty( "readVec", util::fvector4( 1, 0 ) );
+			chk.setProperty( "phaseVec", util::fvector4( 0, 1 ) );
+			chk.setProperty( "indexOrigin", util::fvector4( 0, 0, slice ) );
+			chk.setProperty( "acquisitionNumber", ++acq );
+			chk.setProperty( "voxelSize", util::fvector4( 1, 1, 1 ) );
 
 			if ( !img.insertChunk( chk ) )
 				std::cout << "Inserting Chunk " << slice << " failed" << std::endl;

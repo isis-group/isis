@@ -28,9 +28,9 @@ public:
 		const std::pair<std::string, std::string> splitted = makeBasename( filename );
 		std::string type = image.typeName();
 		type = type.substr( 0, type.find_last_not_of( '*' ) + 1 );
-		const std::string outName = splitted.first + "_" + image.getSizeAsString() + "_" + type + splitted.second ;
+		const std::string outName = splitted.first + "_" + image.sizeToString() + "_" + type + splitted.second ;
 
-		LOG( ImageIoLog, info ) << "Writing image of size " << image.getSizeAsVector() << " and type " << type << " to " << outName;
+		LOG( ImageIoLog, info ) << "Writing image of size " << image.sizeToVector() << " and type " << type << " to " << outName;
 		std::ofstream out( outName.c_str() );
 		out.exceptions( std::ios::failbit | std::ios::badbit );
 		BOOST_FOREACH( const boost::shared_ptr<const data::Chunk > &ref, image.getChunkList() ) {
