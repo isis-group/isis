@@ -425,7 +425,7 @@ int ImageFormat_Dicom::readMosaic( data::Chunk source, data::ChunkList &dest )
 
 	// for every slice
 	for ( size_t slice = 0; slice < images; slice++ ) {
-		newChunks[slice].reset( new data::Chunk( source.cloneToMem( size[0], size[1] ) ) );
+		newChunks[slice].reset( new data::Chunk( source.cloneToNew( size[0], size[1] ) ) );
 
 		// copy the lines into the corresponding slice-chunk
 		for ( size_t phase = 0; phase < size[1]; phase++ ) {

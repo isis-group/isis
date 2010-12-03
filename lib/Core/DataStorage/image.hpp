@@ -74,7 +74,7 @@ private:
 
 
 protected:
-	static const char *needed;
+	static const char *neededProperties;
 
 	/**
 	 * Search for a dimensional break in all stored chunks.

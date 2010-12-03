@@ -35,7 +35,7 @@ public:
 		out.exceptions( std::ios::failbit | std::ios::badbit );
 		BOOST_FOREACH( const boost::shared_ptr<const data::Chunk > &ref, image.getChunkList() ) {
 			const boost::shared_ptr<void> data( ref->getTypePtrBase().getRawAddress() );
-			const size_t data_size = ref->bytes_per_voxel() * ref->volume();
+			const size_t data_size = ref->bytesPerVoxel() * ref->volume();
 			out.write( static_cast<const char *>( data.get() ), data_size );
 		}
 	}

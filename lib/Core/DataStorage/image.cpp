@@ -33,7 +33,7 @@ namespace data
 
 Image::Image ( ) : set( "indexOrigin", "sequenceNumber,readVec,phaseVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ), clean( false )
 {
-	addNeededFromString( needed );
+	addNeededFromString( neededProperties );
 	set.addSecondarySort( "acquisitionNumber" );
 	set.addSecondarySort( "acquisitionTime" );
 }
@@ -455,13 +455,13 @@ std::list<util::PropertyValue> Image::getChunksProperties( const util::PropertyM
 
 size_t Image::bytes_per_voxel() const
 {
-	size_t size = chunkPtrAt( 0 )->bytes_per_voxel();
+	size_t size = chunkPtrAt( 0 )->bytesPerVoxel();
 	BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
-		LOG_IF( size != ref->bytes_per_voxel(), Debug, warning )
-				<< "Not all voxels have the same byte size (" << size << "!=" << ref->bytes_per_voxel() << "). Using the biggest.";
+		LOG_IF( size != ref->bytesPerVoxel(), Debug, warning )
+				<< "Not all voxels have the same byte size (" << size << "!=" << ref->bytesPerVoxel() << "). Using the biggest.";
 
-		if( size < ref->bytes_per_voxel() ) {
-			size = ref->bytes_per_voxel();
+		if( size < ref->bytesPerVoxel() ) {
+			size = ref->bytesPerVoxel();
 		}
 	}
 	return size;

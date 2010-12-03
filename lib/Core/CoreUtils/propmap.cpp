@@ -365,7 +365,7 @@ void PropertyMap::joinTree( const isis::util::PropertyMap &other, bool overwrite
 }
 
 
-void PropertyMap::linearize( FlatMap &out, key_type key_prefix ) const
+void PropertyMap::makeFlatMap( FlatMap &out, key_type key_prefix ) const
 {
 	for ( const_iterator i = begin(); i != end(); i++ ) {
 		key_type key = ( key_prefix.empty() ? "" : key_prefix + pathSeperator ) + i->first;
@@ -373,7 +373,7 @@ void PropertyMap::linearize( FlatMap &out, key_type key_prefix ) const
 		if ( i->second.is_leaf()  ) {
 			out.insert( std::make_pair( key, i->second.getLeaf() ) );
 		} else {
-			i->second.getBranch().linearize( out, key );
+			i->second.getBranch().makeFlatMap( out, key );
 		}
 	}
 }
@@ -488,7 +488,7 @@ void PropertyMap::toCommonUnique( PropertyMap &common, std::set<key_type> &uniqu
 std::ostream &PropertyMap::print( std::ostream &out, bool label )const
 {
 	FlatMap buff;
-	linearize( buff );
+	makeFlatMap( buff );
 	size_t key_len = 0;
 
 	for ( FlatMap::const_iterator i = buff.begin(); i != buff.end(); i++ )

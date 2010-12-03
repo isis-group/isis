@@ -38,7 +38,7 @@ namespace _internal
 class ChunkBase : public NDimensional<4>, public util::PropertyMap
 {
 protected:
-	static const char *needed;
+	static const char *neededProperties;
 public:
 	//  static const dimensions dimension[n_dims]={readDim,phaseDim,sliceDim,timeDim};
 	typedef isis::util::_internal::TypeReference <ChunkBase > Reference;
@@ -115,7 +115,7 @@ public:
 
 	/// \returns the number of cheap-copy-chunks using the same memory as this
 	const size_t useCount()const;
-	Chunk cloneToMem( size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 )const;
+	Chunk cloneToNew( size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 )const;
 
 	/**
 	 * Ensure, the chunk has the type with the requested ID.
@@ -143,7 +143,7 @@ public:
 	scaling_pair getScalingTo( unsigned short typeID, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale )const;
 
 
-	size_t bytes_per_voxel()const;
+	size_t bytesPerVoxel()const;
 	std::string typeName()const;
 	unsigned short typeID()const;
 	template<typename T> bool is()const {

@@ -29,7 +29,7 @@ ChunkBase::ChunkBase ( size_t firstDim, size_t secondDim, size_t thirdDim, size_
 {
 	const size_t idx[] = {firstDim, secondDim, thirdDim, fourthDim};
 	init( idx );
-	addNeededFromString( needed );
+	addNeededFromString( neededProperties );
 	LOG_IF( NDimensional<4>::volume() == 0, Debug, warning )
 			<< "Size " << fourthDim << "|" << thirdDim << "|" << secondDim << "|" << firstDim << " is invalid";
 }
@@ -45,7 +45,7 @@ Chunk::Chunk( const TypePtrReference &src, size_t firstDim, size_t secondDim, si
 	assert( ( *this )->length() == volume() );
 }
 
-Chunk Chunk::cloneToMem( size_t firstDim, size_t secondDim, size_t thirdDim, size_t fourthDim )const
+Chunk Chunk::cloneToNew( size_t firstDim, size_t secondDim, size_t thirdDim, size_t fourthDim )const
 {
 	util::FixedVector<size_t, 4> newSize = getSizeAsVector();
 
@@ -84,7 +84,7 @@ bool Chunk::makeOfTypeID( short unsigned int ID, const scaling_pair &scaling )
 	return true;
 }
 
-size_t Chunk::bytes_per_voxel()const
+size_t Chunk::bytesPerVoxel()const
 {
 	return get()->bytesPerElem();
 }
@@ -169,7 +169,7 @@ size_t Chunk::cmpSlice( size_t thirdDimS, size_t fourthDimS, const Chunk &dst, s
 }
 void Chunk::getMinMax ( util::TypeReference &min, util::TypeReference &max ) const
 {
-	return operator*().getMinMax( min, max );
+	operator*().getMinMax( min, max );
 }
 
 scaling_pair Chunk::getScalingTo( unsigned short typeID, autoscaleOption scaleopt )const

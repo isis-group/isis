@@ -142,12 +142,16 @@ public:
 	 * \returns a reference to the branching PropMap
 	 */
 	const PropertyMap &branch( const KeyType &key )const;
+	
 	/// remove the property/branch adressed by the key
 	bool remove( const KeyType &key );
+	
 	/// remove every property which is also in the given map (regardless of the value)
 	bool remove( const isis::util::PropertyMap &removeMap, bool keep_needed = false );
+	
 	/// \returns true is the given property does exist and is not empty.
 	bool hasProperty( const KeyType &key )const;
+	
 	/// \returns true is the given branch does exist and is not empty.
 	bool hasBranch( const KeyType &key )const;
 
@@ -213,7 +217,7 @@ public:
 	void toCommonUnique( PropertyMap &common, std::set<KeyType> &uniques, bool init )const;
 
 	///copy the tree into a flat key/property-map
-	void linearize( FlatMap &out, KeyType key_prefix = "" )const;
+	void makeFlatMap( FlatMap &out, KeyType key_prefix = "" )const;
 
 	/**
 	 * Transform an existing property into another.
@@ -224,7 +228,7 @@ public:
 	 * \param delSource if the original property shall be deleted after the tramsformation was done
 	 * \returns true if the transformation was done
 	 */
-	bool transform( KeyType from, KeyType to, int dstId, bool delSource = true );
+	bool transform( KeyType from, KeyType to, int dstID, bool delSource = true );
 
 	/**
 	* Transform an existing property into another (statically typed version).
@@ -401,7 +405,7 @@ template<typename charT, typename traits>
 basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::PropertyMap &s )
 {
 	isis::util::PropertyMap::FlatMap buff;
-	s.linearize( buff );
+	s.makeFlatMap( buff );
 	isis::util::write_list( buff.begin(), buff.end(), out );
 	return out;
 }
