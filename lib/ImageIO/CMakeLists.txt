@@ -44,6 +44,7 @@ OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM "Enable Dicom-IO plugin" OFF)
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA "Enable Vista-IO plugin" OFF)
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ "Enable proxy plugin for compressed files" ON)
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_RAW "Enable plugin for raw data output" ON)
+OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_TCPIPSIEMENS "Enable plugin for Siemens data coming on TCP Port" ON)
 
 #############################################################################################
 # nifti
@@ -187,11 +188,32 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM)
 	SET(TARGETS ${TARGETS} isisImageFormat_Dicom)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM)
 
+
+#################################################################################################
+# RawP
+#################################################################################################
+
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_RAW)
 	add_library(isisImageFormat_raw SHARED imageFormat_raw.cpp)
 	target_link_libraries(isisImageFormat_raw ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
 	SET(TARGETS ${TARGETS} isisImageFormat_raw)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_RAW)
+
+
+#################################################################################################
+# Siemens TCPIP
+#################################################################################################
+
+if (${CMAKE_PROJECT_NAME}_IOPLUGIN_SIEMENSTCPIP)
+	add_library(isisImageFormat_SiemensTcpIp SHARED imageFormat_SiemensTcpIp.cpp)
+	target_link_libraries(isisImageFormat_SiemensTcpIp ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
+	SET(TARGETS ${TARGETS} isisImageFormat_SiemensTcpIp)
+endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_SIEMENSTCPIP)
+
+
+#################################################################################################
+# For all plugins do
+#################################################################################################
 
 MESSAGE(STATUS "Installing following plugins to ${CMAKE_INSTALL_PREFIX}/${ISIS_PLUGIN_INFIX}")
 
