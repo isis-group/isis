@@ -22,9 +22,9 @@ BOOST_AUTO_TEST_CASE( property_init_test )
 	/*  ENABLE_LOG(CoreLog,util::DefaultMsgPrint,info);
 	    ENABLE_LOG(CoreDebug,util::DefaultMsgPrint,verbose_info);*/
 	//  default constructor
-	util::PropertyValue propZero;
+	util::TypeValue propZero;
 	//  initializer
-	util::PropertyValue propA = std::string( "Property01" );
+	util::TypeValue propA = std::string( "Property01" );
 	BOOST_CHECK_EQUAL( propA->toString(), "Property01" );
 	//  default: not needed
 	BOOST_CHECK( !propA.needed() );
@@ -34,8 +34,8 @@ BOOST_AUTO_TEST_CASE( property_init_test )
 BOOST_AUTO_TEST_CASE( property_copy_test )
 {
 	// Test copy operator
-	util::PropertyValue propA = ( int32_t )5;
-	util::PropertyValue propB = propA;
+	util::TypeValue propA = ( int32_t )5;
+	util::TypeValue propB = propA;
 	BOOST_CHECK_EQUAL( propB, ( int32_t )5 );
 	//check for deep copy (change of propA shall not change propB)
 	propA = ( int32_t )6;
@@ -46,11 +46,11 @@ BOOST_AUTO_TEST_CASE( property_copy_test )
 BOOST_AUTO_TEST_CASE( property_compare_test )
 {
 	// trivial case - direct compare
-	BOOST_CHECK_EQUAL( util::PropertyValue( 5 ), 5 );
+	BOOST_CHECK_EQUAL( util::TypeValue( 5 ), 5 );
 	// using conversion - should be true, because 5.4 will be converted to int (and thus rounded to 5)
-	BOOST_CHECK_EQUAL( util::PropertyValue( 5.4 ), 5 );
+	BOOST_CHECK_EQUAL( util::TypeValue( 5.4 ), 5 );
 	// using conversion - should be false, because 5.5 will be converted to int (and thus rounded to 6)
-	BOOST_CHECK( !( util::PropertyValue( 5.5 ) == 5 ) );
+	BOOST_CHECK( !( util::TypeValue( 5.5 ) == 5 ) );
 }
 
 }

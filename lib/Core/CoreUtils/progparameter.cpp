@@ -30,7 +30,7 @@ ProgParameter::ProgParameter()
 	needed() = true;
 	hidden() = false;
 }
-ProgParameter::ProgParameter( const ProgParameter &ref ): PropertyValue( static_cast<const PropertyValue &>( ref ) ), m_hidden( false ) {}
+ProgParameter::ProgParameter( const ProgParameter &ref ): TypeValue( static_cast<const TypeValue &>( ref ) ), m_hidden( false ) {}
 
 bool ProgParameter::hidden() const
 {

@@ -42,8 +42,8 @@ public:
 	typedef key_type KeyType;
 	typedef std::map<KeyType, mapped_type, key_compare> Container;
 	typedef std::set<KeyType, key_compare> KeyList;
-	typedef std::map<KeyType, std::pair<PropertyValue, PropertyValue>, key_compare> DiffMap;
-	typedef std::map<KeyType, PropertyValue> FlatMap;
+	typedef std::map<KeyType, std::pair<TypeValue, TypeValue>, key_compare> DiffMap;
+	typedef std::map<KeyType, TypeValue> FlatMap;
 private:
 	typedef std::list<KeyType> propPath;
 	typedef propPath::const_iterator propPathIterator;
@@ -120,15 +120,15 @@ public:
 	 * Access the property referenced by the path-key.
 	 * If the property does not exist, an empty dummy will returned.
 	 * \param key the "path" to the property
-	 * \returns a reference to the PropertyValue
+	 * \returns a reference to the TypeValue
 	 */
-	const PropertyValue &propertyValue( const KeyType &key )const;
+	const TypeValue &propertyValue( const KeyType &key )const;
 	/**
 	 * Access the property referenced by the path-key, create it if its not there.
 	 * \param key the "path" to the property
-	 * \returns a reference to the PropertyValue
+	 * \returns a reference to the TypeValue
 	 */
-	PropertyValue &propertyValue( const KeyType &key );
+	TypeValue &propertyValue( const KeyType &key );
 	/**
 	 * Access the branch referenced by the path-key, create it if its not there.
 	 * \param key the "path" to the branch
@@ -174,14 +174,14 @@ public:
 	const KeyList getMissing()const;
 	/**
 	 * Get a difference map of this and the given PropMap.
-	 * Creates a map out of the Name of differencing properties and their difference, which is a std::pair\<PropertyValue,PropertyValue\>.
+	 * Creates a map out of the Name of differencing properties and their difference, which is a std::pair\<TypeValue,TypeValue\>.
 	 * - If a Property is empty in this but set in second,
-	 *   it will be added with the first PropertyValue emtpy and the second PropertyValue
+	 *   it will be added with the first TypeValue emtpy and the second TypeValue
 	 *   taken from second
 	 * - If a Property is set in this but empty in second,
-	 *   it will be added with the first PropertyValue taken from this and the second PropertyValue empty
-	 * - If a Property is set in both, but not equal, it will be added with the first PropertyValue taken from this
-	 *   and the second PropertyValue taken from second
+	 *   it will be added with the first TypeValue taken from this and the second TypeValue empty
+	 * - If a Property is set in both, but not equal, it will be added with the first TypeValue taken from this
+	 *   and the second TypeValue taken from second
 	 * - If a Property is set in both and equal, it wont be added
 	 * - If a Property is empty in both, it wont be added
 	 * \param second the "other" PropMap to compare with
@@ -190,9 +190,9 @@ public:
 	DiffMap getDifference( const PropertyMap &second )const;
 
 	/**
-	 * Remove every PropertyValue which is also in the other PropMap and where operator== returns true.
+	 * Remove every TypeValue which is also in the other PropMap and where operator== returns true.
 	 * \param other the other PropMap to compare to
-	 * \param removeNeeded if a PropertyValue should also be deleted if they're needed
+	 * \param removeNeeded if a TypeValue should also be deleted if they're needed
 	 */
 	void makeUnique( const isis::util::PropertyMap &other, bool removeNeeded = false );
 	/**
@@ -253,8 +253,8 @@ public:
 	 * The needed flag (if set) will be kept.
 	 * If the property is already set to a value of another type an error is send to Runtime an nothing will be set.
 	 */
-	template<typename T> PropertyValue &setPropertyAs( const KeyType &key, const T &val ) {
-		PropertyValue &ret = propertyValue( key );
+	template<typename T> TypeValue &setPropertyAs( const KeyType &key, const T &val ) {
+		TypeValue &ret = propertyValue( key );
 
 		if( ret.empty() ) {
 			const bool needed = ret.needed();
@@ -284,7 +284,7 @@ public:
 
 	/**
 	 * "Print" the PropMap.
-	 * Will send the name and the result of PropertyValue->toString(label) to the given ostream.
+	 * Will send the name and the result of TypeValue->toString(label) to the given ostream.
 	 * Is equivalent to common streaming operation but has the option to print the type of the printed properties.
 	 * \param out the output stream to use
 	 * \param label print the type of the property (see Type::toString())
@@ -316,7 +316,7 @@ namespace _internal
 class treeNode
 {
 	PropertyMap m_branch;
-	PropertyValue m_leaf;
+	TypeValue m_leaf;
 public:
 	bool empty()const {
 		return m_branch.isEmpty() && m_leaf.empty();
@@ -331,11 +331,11 @@ public:
 	PropertyMap &getBranch() {
 		return m_branch;
 	}
-	PropertyValue &getLeaf() {
+	TypeValue &getLeaf() {
 		assert( is_leaf() );
 		return m_leaf;
 	}
-	const PropertyValue &getLeaf()const {
+	const TypeValue &getLeaf()const {
 		assert( is_leaf() );
 		return m_leaf;
 	}
@@ -373,7 +373,7 @@ template<typename T> T PropertyMap::getPropertyAs( const KeyType &key ) const
 	const mapped_type *entry = findEntry( util::istring( key ) );
 
 	if( entry ) {
-		const PropertyValue &ref = entry->getLeaf();
+		const TypeValue &ref = entry->getLeaf();
 
 		if( !ref.empty() )
 			return ref->as<T>();

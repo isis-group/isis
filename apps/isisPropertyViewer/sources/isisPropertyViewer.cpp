@@ -212,7 +212,7 @@ void isisPropertyViewer::edit_item( QTreeWidgetItem *item, int val )
 			}
 
 			std::string propName = tmpItem->text( 0 ).toStdString();
-			const isis::util::PropertyValue &tmpProp = m_propHolder.m_propHolderMap.find( currentFileName )->second.propertyValue( propName );
+			const isis::util::TypeValue &tmpProp = m_propHolder.m_propHolderMap.find( currentFileName )->second.propertyValue( propName );
 
 			if ( not tmpProp->is<isis::util::fvector4>() ) {
 				isis::util::Type<std::string> myVal( val.toStdString() );

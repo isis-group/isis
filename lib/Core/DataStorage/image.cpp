@@ -193,7 +193,7 @@ bool Image::reIndex()
 	const util::PropertyMap::KeyType vectors[] = {"readVec", "phaseVec", "sliceVec"};
 	BOOST_FOREACH( const util::PropertyMap::KeyType & ref, vectors ) {
 		if ( hasProperty( ref ) ) {
-			util::PropertyValue &prop = propertyValue( ref );
+			util::TypeValue &prop = propertyValue( ref );
 			LOG_IF( !prop->is<util::fvector4>(), Debug, error ) << "Using " << prop->typeName() << " as " << util::Type<util::fvector4>::staticName();
 			util::fvector4 &vec = prop->castTo<util::fvector4>();
 			LOG_IF( vec.len() == 0, Runtime, error )
@@ -430,13 +430,13 @@ size_t Image::getChunkStride ( size_t base_stride )
 	return lookup.size() / set.getHorizontalSize();
 }
 
-std::list<util::PropertyValue> Image::getChunksProperties( const util::PropertyMap::KeyType &key, bool unique )const
+std::list<util::TypeValue> Image::getChunksProperties( const util::PropertyMap::KeyType &key, bool unique )const
 {
-	std::list<util::PropertyValue > ret;
+	std::list<util::TypeValue > ret;
 
 	if( clean ) {
 		BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
-			const util::PropertyValue &prop = ref->propertyValue( key );
+			const util::TypeValue &prop = ref->propertyValue( key );
 
 			if ( unique && prop.empty() ) //if unique is requested and the property is empty
 				continue; //skip it

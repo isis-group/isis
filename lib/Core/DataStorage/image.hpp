@@ -281,7 +281,7 @@ public:
 	 * \param key the name of the property to search for
 	 * \param unique when true empty or consecutive duplicates wont be added
 	 */
-	std::list<util::PropertyValue> getChunksProperties( const util::PropertyMap::KeyType &key, bool unique = false )const;
+	std::list<util::TypeValue> getChunksProperties( const util::PropertyMap::KeyType &key, bool unique = false )const;
 
 	/// get the size of every voxel (in bytes)
 	size_t bytes_per_voxel()const;

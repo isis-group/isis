@@ -804,7 +804,7 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 			}
 
 			// get property value
-			util::PropertyValue pv = vista_branch.propertyValue( *kiter );
+			util::TypeValue pv = vista_branch.propertyValue( *kiter );
 			// VBit -> VBit (char *)
 			BOOST_MPL_ASSERT_RELATION( sizeof( char ), == , sizeof( uint8_t ) );
 

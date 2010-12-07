@@ -72,9 +72,9 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 
 		//Get a list of properties from the chunks in the image
 		//List of the properties shall be as if every chunk of the image was asked for the property
-		std::list<util::PropertyValue> origins = img.getChunksProperties( "indexOrigin" );
+		std::list<util::TypeValue> origins = img.getChunksProperties( "indexOrigin" );
 		unsigned int i = 0;
-		BOOST_FOREACH( const util::PropertyValue & ref, origins ) {
+		BOOST_FOREACH( const util::TypeValue & ref, origins ) {
 			BOOST_CHECK( ref == util::fvector4( 0, 0, i++, 0 ) );
 		}
 	}

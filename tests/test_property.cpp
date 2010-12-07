@@ -11,9 +11,9 @@ using namespace isis::util; //needed for the log-levels
 int main( int argc, char *argv[] )
 {
 	ENABLE_LOG( CoreLog, DefaultMsgPrint, info );
-	PropertyValue a = std::string( "Hallo" );
+	TypeValue a = std::string( "Hallo" );
 	std::cout << a->toString( true ) << std::endl;
-	PropertyValue b = a;
+	TypeValue b = a;
 	std::cout << b->toString( true ) << std::endl;
 	b = 5.2;
 	std::cout << b->toString( true ) << std::endl;
