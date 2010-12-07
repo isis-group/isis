@@ -141,20 +141,17 @@ public:
 
 	/**
 	 * Get minimum/maximum from a TypePtr.
-	 * The parameters are reverences to the current maximum/minimum found.
-	 * max will be replaced by a value from the array if:
-	 * - max is empty
-	 * - max is less than that value from the array
-	 *
-	 * min will be replaced by a value from the array if:
-	 * - min is empty
-	 * - min is greater than that value from the array
-	 *
-	 * Note, that min/max will also adopt the type of the value.
-	 * \param max TypeBase::Reference for the current greatest value
-	 * \param min TypeBase::Reference for the current lowest value
+	 * This computes the minimum and maximum value of the stored data and stores them in TypeReference-Objects.
+	 * The computes min/max are of the same type as the stored data, but can be compared to other TypeReference without knowing this type via the lt/gt function of TypeBase.
+	 * The following code checks if the value range of TypePtr-object data1 is a real subset of data2:
+	 * \code
+	 * std::pair<util::TypeReference,util::TypeReference> minmax1=data1.getMinMax(), minmax2=data2.getMinMax();
+	 * if(minmax1.first->gt(minmax2.second) && minmax1.second->lt(minmax2.second)
+	 * 	std::cout << minmax1 << " is a subset of " minmax2 << std::endl;
+	 * \endcode
+	 * \returns a pair of TypeReferences referring to the found minimum/maximum of the data
 	 */
-	virtual void getMinMax( util::TypeReference &min, util::TypeReference &max )const = 0;
+	virtual std::pair<util::TypeReference,util::TypeReference> getMinMax()const = 0;
 	/**
 	 * Compare to another TypePtr.
 	 * This counts the elements between start and end, which are not equal to the corresponding elements in dst.

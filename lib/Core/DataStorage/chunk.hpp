@@ -159,7 +159,7 @@ public:
 	size_t cmpLine( size_t secondDimS, size_t thirdDimS, size_t fourthDimS, const Chunk &dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD )const;
 	size_t cmpSlice( size_t thirdDimS, size_t fourthDimS, const Chunk &dst, size_t thirdDimD, size_t fourthDimD )const;
 
-	void getMinMax( util::TypeReference &min, util::TypeReference &max )const;
+	std::pair<util::TypeReference,util::TypeReference> getMinMax()const;
 
 	Chunk &operator=( const Chunk &ref );
 

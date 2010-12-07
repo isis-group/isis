@@ -288,18 +288,17 @@ public:
 
 	/**
 	 * Get the maximum and the minimum voxel value of the image.
-	 * The results are stored as type T, if they dont fit an error ist send.
+	 * The results are converted to T, if they dont fit an error ist send.
+	 * \returns a pair of T storing the minimum and maximum values of the image.
 	 */
-	template<typename T> void getMinMax( T &min, T &max )const {
+	template<typename T> std::pair<T,T> getMinMaxAs()const {
 		util::check_type<T>();// works only for T from _internal::types
-		util::TypeReference _min, _max;
-		getMinMax( _min, _max );
-		min = _min->as<T>();
-		max = _max->as<T>();
+		std::pair<util::TypeReference,util::TypeReference> minmax=getMinMax();
+		return std::make_pair(minmax.first->as<T>(),minmax.second->as<T>());
 	}
 
-	/// Get the maximum and the minimum voxel value of the image and store them as Type-object in the given references.
-	void getMinMax( util::TypeReference &min, util::TypeReference &max )const;
+	/// Get the maximum and the minimum voxel value of the image as a pair of TypeReference-objects.
+	std::pair<util::TypeReference,util::TypeReference> getMinMax()const;
 
 	/**
 	 * Compares the voxel-values of this image to the given.

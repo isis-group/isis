@@ -86,10 +86,9 @@ void TypePtrBase::copyRange( size_t start, size_t end, TypePtrBase &dst, size_t 
 
 scaling_pair TypePtrBase::getScalingTo( unsigned short typeID, autoscaleOption scaleopt )const
 {
-	util::TypeReference min, max;
-	getMinMax( min, max );
-	assert( ! ( min.empty() || max.empty() ) );
-	return TypePtrBase::getScalingTo( typeID, *min, *max );
+	std::pair<util::TypeReference,util::TypeReference> minmax=getMinMax();
+	assert( ! ( minmax.first.empty() || minmax.second.empty() ) );
+	return TypePtrBase::getScalingTo( typeID, *minmax.first, *minmax.second );
 }
 
 scaling_pair TypePtrBase::getScalingTo( unsigned short typeID, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt )const

@@ -500,9 +500,7 @@ ImageList::ImageList( ChunkList src )
 			if ( buff->reIndex() ) {
 				if ( buff->isValid() ) {
 					push_back( buff );
-					util::TypeReference min, max;
-					buff->getMinMax( min, max );
-					LOG( Runtime, info ) << "Image " << size() << " with size " << buff->getSizeAsString() <<  " and value range " << min << " to " << max << " done.";
+					LOG( Runtime, info ) << "Image " << size() << " with size " << buff->getSizeAsString() <<  " and value range " << buff->getMinMax() << " done.";
 				} else {
 					LOG( Runtime, error )
 							<< "Cannot insert image. Missing properties: " << buff->getMissing();
@@ -518,29 +516,36 @@ ImageList::ImageList( ChunkList src )
 	LOG_IF( errcnt, Runtime, warning ) << "Dropped " << errcnt << " chunks because they didn't form valid images";
 }
 
-void Image::getMinMax ( util::TypeReference &min, util::TypeReference &max ) const
+std::pair<util::TypeReference,util::TypeReference> Image::getMinMax () const
 {
-	LOG_IF( ! min.empty(), Debug, warning ) << "Running getMinMax using non empty min. It will be reset.";
-	LOG_IF( ! max.empty(), Debug, warning ) << "Running getMinMax using non empty max. It will be reset.";
-	min = util::TypeReference();
-	max = util::TypeReference();
-	BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
-		ref->getMinMax( min, max );
+	std::pair<util::TypeReference,util::TypeReference> ret;
+	if(!lookup.empty()){
+		std::vector<boost::shared_ptr<Chunk> >::const_iterator i=lookup.begin();
+		ret=(*i)->getMinMax();
+
+		for(++i;i!=lookup.end();++i){
+			std::pair<util::TypeReference,util::TypeReference> current=(*i)->getMinMax();
+			if(ret.first->gt(*current.first))
+				ret.first=current.first;
+			if(ret.second->lt(*current.second))
+				ret.second=current.second;
+		}
 	}
+	return ret;
 }
 
 std::pair< util::TypeReference, util::TypeReference > Image::getScalingTo( short unsigned int targetID, autoscaleOption scaleopt ) const
 {
 	LOG_IF( !clean, Runtime, error ) << "You should run reIndex before running this";
-	util::TypeReference min, max;
-	getMinMax( min, max );
+	std::pair<util::TypeReference,util::TypeReference> minmax=getMinMax();
+	
 	bool unique = true;
 	const std::vector<boost::shared_ptr<const Chunk> > chunks = getChunkList();
 	BOOST_FOREACH( const boost::shared_ptr<const Chunk> &ref, chunks ) { //find a chunk which would be converted
 		if( targetID != ref->typeID() ) {
-			LOG_IF( ref->getScalingTo( targetID, *min, *max, scaleopt ).first.empty() || ref->getScalingTo( targetID, *min, *max, scaleopt ).second.empty(), Debug, error )
+			LOG_IF( ref->getScalingTo( targetID, *minmax.first, *minmax.second, scaleopt ).first.empty() || ref->getScalingTo( targetID, *minmax.first, *minmax.second, scaleopt ).second.empty(), Debug, error )
 					<< "Returning an invalid scaling. This is bad!";
-			return ref->getScalingTo( targetID, *min, *max, scaleopt ); // and ask that for the scaling
+			return ref->getScalingTo( targetID, *minmax.first, *minmax.second, scaleopt ); // and ask that for the scaling
 		}
 	}
 	return std::make_pair( //ok seems like no conversion is needed - return 1/0
@@ -634,18 +639,17 @@ unsigned short Image::typeID() const
 {
 	unsigned int mytypeID = chunkPtrAt( 0 )->typeID();
 	size_t tmpBytesPerVoxel = 0;
-	util::TypeReference min, max;
-	getMinMax( min, max );
-	LOG( Debug, info ) << "Determining  datatype of image with the value range " << min << " to " << max;
+	std::pair<util::TypeReference,util::TypeReference> minmax=getMinMax();
+	LOG( Debug, info ) << "Determining  datatype of image with the value range " << minmax;
 
-	if( min->typeID() == max->typeID() ) { // ok min and max are the same type - trivial case
-		return min->typeID() << 8; // btw: we do the shift, because min and max are Type - but we want the id's TypePtr
-	} else if( min->fitsInto( max->typeID() ) ) { // if min fits into the type of max, use that
-		return max->typeID() << 8; //@todo maybe use a global static function here instead of a obscure shit operation
-	} else if( max->fitsInto( min->typeID() ) ) { // if max fits into the type of min, use that
-		return min->typeID() << 8;
+	if( minmax.first->typeID() == minmax.second->typeID() ) { // ok min and max are the same type - trivial case
+		return minmax.first->typeID() << 8; // btw: we do the shift, because min and max are Type - but we want the id's TypePtr
+	} else if( minmax.first->fitsInto( minmax.second->typeID() ) ) { // if min fits into the type of max, use that
+		return minmax.second->typeID() << 8; //@todo maybe use a global static function here instead of a obscure shit operation
+	} else if( minmax.second->fitsInto( minmax.first->typeID() ) ) { // if max fits into the type of min, use that
+		return minmax.first->typeID() << 8;
 	} else {
-		LOG( Runtime, error ) << "Sorry I dont know which datatype I should use. (" << min->typeName() << " or " << max->typeName() << ")";
+		LOG( Runtime, error ) << "Sorry I dont know which datatype I should use. (" << minmax.first->typeName() << " or " << minmax.second->typeName() << ")";
 		throw( std::logic_error( "type selection failed" ) );
 		return std::numeric_limits<unsigned char>::max();
 	}
