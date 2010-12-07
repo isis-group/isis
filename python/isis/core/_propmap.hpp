@@ -25,7 +25,7 @@ public:
 	_PropMap ( PyObject *p ) : self( p ), boost::python::wrapper< PropMap >() {}
 	_PropMap ( PyObject *p, const PropMap &base ) : PropMap( base ), self( p ), boost::python::wrapper< PropMap >() {}
 
-	isis::util::PropMap _branch ( const std::string &key ) {
+	isis::util::PropertyMap _branch ( const std::string &key ) {
 		return this->branch( key );
 	}
 

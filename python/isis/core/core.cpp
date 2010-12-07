@@ -35,16 +35,16 @@ BOOST_PYTHON_MODULE( _core )
 	//#######################################################################################
 	//  PropMap
 	//#######################################################################################
-	class_<isis::util::PropMap, _PropMap>( "PropMap", init<>() )
+	class_<isis::util::PropertyMap, _PropMap>( "PropMap", init<>() )
 	.def( init<_PropMap>() )
-	.def( "hasProperty", &isis::util::PropMap::hasProperty )
-	.def( "hasBranch", &isis::util::PropMap::hasBranch )
+	.def( "hasProperty", &isis::util::PropertyMap::hasProperty )
+	.def( "hasBranch", &isis::util::PropertyMap::hasBranch )
 	.def( "branch", &_PropMap::_branch )
-	.def( "remove", ( bool ( ::isis::util::PropMap:: * )( const std::string & ) ) ( &isis::util::PropMap::remove ), ( arg( "key" ) ) )
-	.def( "remove", ( bool ( ::isis::util::PropMap:: * )( const isis::util::PropMap &, bool ) ) ( &isis::util::PropMap::remove ), ( arg( "removeMap" ), arg( "keep_needed" ) ) )
+	.def( "remove", ( bool ( ::isis::util::PropertyMap:: * )( const std::string & ) ) ( &isis::util::PropertyMap::remove ), ( arg( "key" ) ) )
+	.def( "remove", ( bool ( ::isis::util::PropertyMap:: * )( const isis::util::PropertyMap &, bool ) ) ( &isis::util::PropertyMap::remove ), ( arg( "removeMap" ), arg( "keep_needed" ) ) )
 	.def( "propertyValue", &_PropMap::_propertyValue )
-	.def( "valid", &isis::util::PropMap::valid )
-	.def( "empty", &isis::util::PropMap::empty )
+	.def( "valid", &isis::util::PropertyMap::valid )
+	.def( "empty", &isis::util::PropertyMap::empty )
 	.def( "setPropertyAs", &_PropMap::_setPropertyAs )
 	;
 	//#######################################################################################

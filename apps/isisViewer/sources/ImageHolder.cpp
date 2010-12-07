@@ -118,7 +118,7 @@ void ImageHolder::setUpPipe()
 	}
 }
 
-void ImageHolder::setImages( util::PropMap propMap,  std::vector<vtkSmartPointer<vtkImageData> >imgVec )
+void ImageHolder::setImages( util::PropertyMap propMap,  std::vector<vtkSmartPointer<vtkImageData> >imgVec )
 {
 	m_ImageVector = imgVec;
 	LOG( Runtime, info ) << "Image contains " << m_ImageVector.size() << " timesteps.";

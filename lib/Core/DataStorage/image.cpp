@@ -714,7 +714,7 @@ size_t Image::spliceDownTo( dimensions dim ) //readDim = 0, phaseDim, sliceDim, 
 	std::vector<boost::shared_ptr<Chunk> > buffer = lookup; // store the old lookup table
 	lookup.clear();
 	set.clear(); // clear the image, so we can insert the splices
-	//static_cast<util::PropMap::base_type*>(this)->clear(); we can keep the common properties - they will be merged with thier own copies from the chunks on the next reIndex
+	//static_cast<util::PropertyMap::base_type*>(this)->clear(); we can keep the common properties - they will be merged with thier own copies from the chunks on the next reIndex
 	splicer splice( dim, size.product(), *this );
 	BOOST_FOREACH( boost::shared_ptr<Chunk> &ref, buffer ) {
 		BOOST_FOREACH( const util::PropertyMap::KeyType & need, needed ) { //get back properties needed for the

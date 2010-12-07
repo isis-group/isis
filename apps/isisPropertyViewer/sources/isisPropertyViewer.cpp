@@ -203,7 +203,7 @@ void isisPropertyViewer::edit_item( QTreeWidgetItem *item, int val )
 
 			m_propHolder.m_propChanged.find( tmpItem->text( 1 ).toStdString() )->second = true;
 			currentFileName = tmpItem->text( 1 ).toStdString();
-			isis::util::PropMap &tmpPropMap = m_propHolder.m_propHolderMap.find( currentFileName )->second;
+			isis::util::PropertyMap &tmpPropMap = m_propHolder.m_propHolderMap.find( currentFileName )->second;
 			tmpItem = item;
 
 			//go up to the next not empty prop if necessary. This might be the case if current item is a vector

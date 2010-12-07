@@ -94,8 +94,8 @@ private:
 	//  boost::shared_ptr<data::Image> m_ImageISIS;
 	data::Image m_ImageISIS;
 	unsigned short m_TypeID;
-	std::vector< boost::shared_ptr<util::PropMap> > m_ChunkPropMapVector;
-	util::PropMap m_ImagePropMap;
+	std::vector< boost::shared_ptr<util::PropertyMap> > m_ChunkPropMapVector;
+	util::PropertyMap m_ImagePropMap;
 	size_t m_RelevantDim;
 
 	template<typename TInput, typename TOutput> typename TOutput::Pointer internCreateItk( const bool behaveAsItkReader );

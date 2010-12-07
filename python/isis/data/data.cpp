@@ -37,7 +37,7 @@ BOOST_PYTHON_MODULE( _data )
 	//#######################################################################################
 	//  Image
 	//#######################################################################################
-	class_<isis::data::Image, _Image, bases<isis::util::PropMap> >( "Image", init<>() )
+	class_<isis::data::Image, _Image, bases<isis::util::PropertyMap> >( "Image", init<>() )
 	.def( init<isis::data::Image>() )
 	.def( "checkMakeClean", &isis::data::Image::checkMakeClean )
 	.def( "getVoxel", ( float ( ::_Image:: * )( const isis::util::ivector4 & ) ) ( &_Image::_voxel ), ( arg( "coord" ) ) )

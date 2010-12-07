@@ -259,8 +259,8 @@ public:
 		return retImg;
 	}
 
-	isis::util::PropMap &_getPropMap() {
-		isis::util::PropMap &retMap = static_cast<isis::util::PropMap &>( *this );
+	isis::util::PropertyMap &_getPropMap() {
+		isis::util::PropertyMap &retMap = static_cast<isis::util::PropertyMap &>( *this );
 		return retMap;
 	}
 

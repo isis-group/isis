@@ -198,7 +198,7 @@ typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkRea
 	importer->SetSpacing( itkSpacing );
 	importer->SetOrigin( itkOrigin );
 	importer->SetDirection( itkDirection );
-	m_ImagePropMap = static_cast<util::PropMap>( m_ImageISIS );
+	m_ImagePropMap = static_cast<util::PropertyMap>( m_ImageISIS );
 	m_RelevantDim = m_ImageISIS.getChunkAt( 0 ).relevantDims();
 	//reorganisation of memory according to the chunk organisiation
 	void *targePtr = malloc( m_ImageISIS.bytes_per_voxel() * m_ImageISIS.volume() );
@@ -209,7 +209,7 @@ typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkRea
 		data::Chunk &chRef = *ref;
 		typename InputImageType::PixelType *target = refTarget + chunkIndex++ * chRef.volume();
 		chRef.getTypePtr<typename InputImageType::PixelType>().copyToMem( 0, ( chRef.volume() - 1 ), target );
-		boost::shared_ptr<util::PropMap> tmpMap ( new util::PropMap ( static_cast<util::PropMap>( chRef ) ) );
+		boost::shared_ptr<util::PropertyMap> tmpMap ( new util::PropertyMap ( static_cast<util::PropertyMap>( chRef ) ) );
 		m_ChunkPropMapVector.push_back( tmpMap );
 	}
 	importer->SetImportPointer( refTarget, itkSize[0], false );
@@ -294,7 +294,7 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 		//TODO if the number of chunks gained by the splice method differs from
 		//the size of the m_ChunkPropMapVector the size of the image was changed in itk.
 		//Thus we have to interpolate the parameters (sliceTime so far)
-		chRef->join( static_cast<util::PropMap &>( *retImage ), false );
+		chRef->join( static_cast<util::PropertyMap &>( *retImage ), false );
 
 		if( chunkCounter < ( m_ChunkPropMapVector.size() - 1 ) ) {
 			chunkCounter++;
