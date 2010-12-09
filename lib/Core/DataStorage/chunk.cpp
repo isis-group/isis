@@ -177,6 +177,10 @@ scaling_pair Chunk::getScalingTo( unsigned short typeID, autoscaleOption scaleop
 	std::pair<util::TypeReference,util::TypeReference> minmax=getMinMax();
 	return operator*().getScalingTo( typeID, *minmax.first, *minmax.second, scaleopt );
 }
+scaling_pair Chunk::getScalingTo( unsigned short typeID, const std::pair<util::TypeReference,util::TypeReference> &minmax, autoscaleOption scaleopt )const
+{
+	return operator*().getScalingTo( typeID, minmax, scaleopt );
+}
 scaling_pair Chunk::getScalingTo( unsigned short typeID, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt )const
 {
 	return operator*().getScalingTo( typeID, min, max, scaleopt );

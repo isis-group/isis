@@ -194,7 +194,7 @@ public:
 	 * \param other the other PropMap to compare to
 	 * \param removeNeeded if a TypeValue should also be deleted if they're needed
 	 */
-	void makeUnique( const isis::util::PropertyMap &other, bool removeNeeded = false );
+	void removeEqual( const isis::util::PropertyMap &other, bool removeNeeded = false );
 	/**
 	* Add Properties from another PropMap.
 	* \param other the other PropMap

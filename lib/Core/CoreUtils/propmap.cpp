@@ -289,7 +289,7 @@ void PropertyMap::diffTree( const PropertyMap &other, PropertyMap::DiffMap &ret,
 	}
 }
 
-void PropertyMap::makeUnique ( const util::PropertyMap &other, bool removeNeeded )
+void PropertyMap::removeEqual ( const util::PropertyMap &other, bool removeNeeded )
 {
 	iterator thisIt = begin();
 
@@ -316,7 +316,7 @@ void PropertyMap::makeUnique ( const util::PropertyMap &other, bool removeNeeded
 				} else if ( ! ( thisIt->second.is_leaf() || otherIt->second.is_leaf() ) ) { //but maybe they are branches
 					PropertyMap &thisMap = thisIt->second.getBranch();
 					const PropertyMap &otherMap = otherIt->second.getBranch();
-					thisMap.makeUnique( otherMap );
+					thisMap.removeEqual( otherMap );
 					thisIt++;
 				}
 			} else {//only the other is empty

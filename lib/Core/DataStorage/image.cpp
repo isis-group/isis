@@ -543,9 +543,9 @@ std::pair< util::TypeReference, util::TypeReference > Image::getScalingTo( short
 	const std::vector<boost::shared_ptr<const Chunk> > chunks = getChunkList();
 	BOOST_FOREACH( const boost::shared_ptr<const Chunk> &ref, chunks ) { //find a chunk which would be converted
 		if( targetID != ref->typeID() ) {
-			LOG_IF( ref->getScalingTo( targetID, *minmax.first, *minmax.second, scaleopt ).first.empty() || ref->getScalingTo( targetID, *minmax.first, *minmax.second, scaleopt ).second.empty(), Debug, error )
+			LOG_IF( ref->getScalingTo( targetID, minmax, scaleopt ).first.empty() || ref->getScalingTo( targetID, minmax, scaleopt ).second.empty(), Debug, error )
 					<< "Returning an invalid scaling. This is bad!";
-			return ref->getScalingTo( targetID, *minmax.first, *minmax.second, scaleopt ); // and ask that for the scaling
+			return ref->getScalingTo( targetID, minmax, scaleopt ); // and ask that for the scaling
 		}
 	}
 	return std::make_pair( //ok seems like no conversion is needed - return 1/0

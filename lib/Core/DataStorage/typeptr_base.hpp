@@ -85,6 +85,7 @@ public:
 	///get the scaling (and offset) which would be used in an convertTo
 	scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const;
 	scaling_pair getScalingTo( unsigned short typeID, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale )const;
+	scaling_pair getScalingTo( unsigned short typeID, const std::pair<util::TypeReference,util::TypeReference> &minmax, autoscaleOption scaleopt = autoscale )const;
 
 
 	/// Copy (or Convert) data from this to memory of maybe another type and the given length.
