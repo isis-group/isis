@@ -283,6 +283,10 @@ bool IOFactory::write( const isis::data::ImageList &images, const std::string &p
 {
 	const FileFormatList formatWriter = get().getFormatInterface( path, suffix_override, dialect );
 
+	BOOST_FOREACH( ImageList::const_reference ref, images ) {
+		ref->checkMakeClean();
+	}
+
 	if( formatWriter.size() ) {
 		BOOST_FOREACH( FileFormatList::const_reference it, formatWriter ) {
 			LOG( Debug, info )
