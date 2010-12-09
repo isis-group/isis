@@ -33,7 +33,7 @@ namespace util
 {
 namespace _internal
 {
-class treeNode; //predeclare treeNode -- we'll need it in PropMap
+class treeNode; //predeclare treeNode -- we'll need it in PropertyMap
 }
 /// A mapping tree to store properties (keys / values)
 class PropertyMap : protected std::map<util::istring, _internal::treeNode>
@@ -104,6 +104,30 @@ protected:
 	* If the given property allready exists, it is just flagged as needed.
 	*/
 	void addNeeded( const KeyType &key );
+
+	/**
+	 * Remove every TypeValue which is also in the other PropertyMap and where operator== returns true.
+	 * \param other the other PropertyMap to compare to
+	 * \param removeNeeded if a TypeValue should also be deleted if they're needed
+	 */
+	void removeEqual( const isis::util::PropertyMap &other, bool removeNeeded = false );
+
+	/**
+	 * Get common and unique properties from the map.
+	 * For every entry of the map this checks if it is common/unique and removes/adds it accordingly.
+	 * This is done by:
+	 * - generating a difference (using diff) between the current common and the map
+	 * - the resulting diff_map contains all newly unique properties (properties which has been in common, but are not euqual in the map)
+	 * - these newly diffent properties are removed from common and added to unique.
+	 * - if init is true uniques is cleared and common is replaced by a copy of the map (shall be done at first step/map)
+	 * \param common reference of the common-map
+	 * \param uniques reference of the unique-map
+	 * \param init if initialisation shall be done instead of normal seperation
+	 */
+	void toCommonUnique( PropertyMap &common, std::set<KeyType> &uniques, bool init )const;
+
+	///copy the tree into a flat key/property-map
+	void makeFlatMap( FlatMap &out, KeyType key_prefix = "" )const;
 public:
 	/////////////////////////////////////////////////////////////////////////////////////////
 	// constructors
@@ -132,18 +156,23 @@ public:
 	/**
 	 * Access the branch referenced by the path-key, create it if its not there.
 	 * \param key the "path" to the branch
-	 * \returns a reference to the branching PropMap
+	 * \returns a reference to the branching PropertyMap
 	 */
 	PropertyMap &branch( const KeyType &key );
 	/**
 	 * Access the branch referenced by the path-key.
 	 * If the branch does not exist, an empty dummy will returned.
 	 * \param key the "path" to the branch
-	 * \returns a reference to the branching PropMap
+	 * \returns a reference to the branching PropertyMap
 	 */
 	const PropertyMap &branch( const KeyType &key )const;
 	
-	/// remove the property/branch adressed by the key
+	/**
+	 * Remove the property adressed by the key.
+	 * This actually only removes properties.
+	 * Non-empty branches are not deleted. 
+	 * And if an branch becomes empty after deletion of its last entry, it is deleted automatically.
+	 */
 	bool remove( const KeyType &key );
 	
 	/// remove every property which is also in the given map (regardless of the value)
@@ -163,9 +192,9 @@ public:
 	* \returns false if there is any needed and empty property, true otherwhise.
 	*/
 	bool isValid()const;
-	/// \returns true if the PropMap is empty, false otherwhise
+	/// \returns true if the PropertyMap is empty, false otherwhise
 	bool isEmpty()const;
-	/// get a flat list of the "paths" to all properties in the PropMap
+	/// get a flat list of the "paths" to all properties in the PropertyMap
 	const KeyList getKeys()const;
 	/**
 	 * Get a list of missing properties.
@@ -173,7 +202,7 @@ public:
 	 */
 	const KeyList getMissing()const;
 	/**
-	 * Get a difference map of this and the given PropMap.
+	 * Get a difference map of this and the given PropertyMap.
 	 * Creates a map out of the Name of differencing properties and their difference, which is a std::pair\<TypeValue,TypeValue\>.
 	 * - If a Property is empty in this but set in second,
 	 *   it will be added with the first TypeValue emtpy and the second TypeValue
@@ -184,40 +213,17 @@ public:
 	 *   and the second TypeValue taken from second
 	 * - If a Property is set in both and equal, it wont be added
 	 * - If a Property is empty in both, it wont be added
-	 * \param second the "other" PropMap to compare with
+	 * \param second the "other" PropertyMap to compare with
 	 * \return a map of property keys and value-pairs
 	 */
 	DiffMap getDifference( const PropertyMap &second )const;
 
 	/**
-	 * Remove every TypeValue which is also in the other PropMap and where operator== returns true.
-	 * \param other the other PropMap to compare to
-	 * \param removeNeeded if a TypeValue should also be deleted if they're needed
-	 */
-	void removeEqual( const isis::util::PropertyMap &other, bool removeNeeded = false );
-	/**
-	* Add Properties from another PropMap.
-	* \param other the other PropMap
+	* Add Properties from another PropertyMap.
+	* \param other the other PropertyMap
 	* \param overwrite if existing properties shall be replaced
 	*/
 	PropertyMap::KeyList join( const isis::util::PropertyMap &other, bool overwrite = false );
-
-	/**
-	* Get common and unique properties from the map.
-	* For every entry of the map this checks if it is common/unique and removes/adds it accordingly.
-	* This is done by:
-	* - generating a difference (using diff) between the current common and the map
-	* - the resulting diff_map contains all newly unique properties (properties which has been in common, but are not euqual in the map)
-	* - these newly diffent properties are removed from common and added to unique.
-	* - if init is true uniques is cleared and common is replaced by a copy of the map (shall be done at first step/map)
-	* \param common reference of the common-map
-	* \param uniques reference of the unique-map
-	* \param init if initialisation shall be done instead of normal seperation
-	*/
-	void toCommonUnique( PropertyMap &common, std::set<KeyType> &uniques, bool init )const;
-
-	///copy the tree into a flat key/property-map
-	void makeFlatMap( FlatMap &out, KeyType key_prefix = "" )const;
 
 	/**
 	 * Transform an existing property into another.
@@ -282,8 +288,11 @@ public:
 	 */
 	bool rename( KeyType oldname, KeyType newname );
 
+	/// Get a flat representation of the whole property tree
+	FlatMap getFlatMap( )const;
+
 	/**
-	 * "Print" the PropMap.
+	 * "Print" the PropertyMap.
 	 * Will send the name and the result of TypeValue->toString(label) to the given ostream.
 	 * Is equivalent to common streaming operation but has the option to print the type of the printed properties.
 	 * \param out the output stream to use
@@ -297,10 +306,10 @@ public:
 
 namespace std ///predeclare streaming output -- we'll need it in treeNode
 {
-/// Streaming output for PropMap::node
+/// Streaming output for PropertyMap::node
 template<typename charT, typename traits>
 basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::_internal::treeNode &s );
-/// Streaming output for PropMap
+/// Streaming output for PropertyMap
 template<typename charT, typename traits>
 basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::PropertyMap &s );
 }
@@ -367,7 +376,7 @@ template<class Predicate> struct PropertyMap::walkTree {
 	}
 };
 
-// as well as PropMap::getProperty ...
+// as well as PropertyMap::getProperty ...
 template<typename T> T PropertyMap::getPropertyAs( const KeyType &key ) const
 {
 	const mapped_type *entry = findEntry( util::istring( key ) );
@@ -389,7 +398,7 @@ template<typename T> T PropertyMap::getPropertyAs( const KeyType &key ) const
 // and finally define the streaming output for treeNode
 namespace std
 {
-/// Streaming output for PropMap::node
+/// Streaming output for PropertyMap::node
 template<typename charT, typename traits>
 basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::_internal::treeNode &s )
 {
@@ -400,12 +409,11 @@ basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, con
 
 	return out;
 }
-/// Streaming output for PropMap
+/// Streaming output for PropertyMap
 template<typename charT, typename traits>
 basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::PropertyMap &s )
 {
-	isis::util::PropertyMap::FlatMap buff;
-	s.makeFlatMap( buff );
+	isis::util::PropertyMap::FlatMap buff=s.getFlatMap();
 	isis::util::write_list( buff.begin(), buff.end(), out );
 	return out;
 }

@@ -55,6 +55,7 @@ public:
  */
 class Chunk : public _internal::ChunkBase, protected TypePtrReference
 {
+	friend class Image;
 protected:
 	/**
 	 * Creates an data-block from existing data.

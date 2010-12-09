@@ -102,7 +102,7 @@ const PropertyMap::mapped_type *PropertyMap::findEntry(
 }
 bool PropertyMap::recursiveRemove( PropertyMap &root, const propPathIterator at, const propPathIterator pathEnd )
 {
-	bool ret = true;
+	bool ret = false;
 
 	if ( at != pathEnd ) {
 		propPathIterator next = at;
@@ -117,11 +117,12 @@ bool PropertyMap::recursiveRemove( PropertyMap &root, const propPathIterator at,
 
 				if ( ref.getBranch().isEmpty() )
 					root.erase( found ); // remove the now empty branch
-			} else
+			} else {
 				root.erase( found );
+				ret = true;
+			}
 		} else {
 			LOG( Runtime, warning ) << "Entry " << util::MSubject( *at ) << " not found, skipping it";
-			ret = false;
 		}
 	}
 
@@ -377,6 +378,14 @@ void PropertyMap::makeFlatMap( FlatMap &out, key_type key_prefix ) const
 		}
 	}
 }
+
+PropertyMap::FlatMap PropertyMap::getFlatMap() const
+{
+	isis::util::PropertyMap::FlatMap buff;
+	makeFlatMap( buff );
+	return buff;
+}
+
 
 bool PropertyMap::transform( key_type from,  key_type to, int dstID, bool delSource )
 {
