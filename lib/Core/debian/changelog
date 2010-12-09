@@ -3,4 +3,4 @@ isis (0.2.0+svn1047) unstable; urgency=low
     * Initial Debian packaging attempt. This is the first version of
       a ISIS debian package.
 
- -- Thomas Proeger <thomasproeger@googlemail.com>  Wed, 13 Oct 2010 19:43:07 +0100
+ -- Erik Tuerke <tuerke@cbs.mpg.de>  Wed, 13 Oct 2010 19:43:07 +0100
