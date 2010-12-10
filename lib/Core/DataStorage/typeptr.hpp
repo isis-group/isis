@@ -254,20 +254,20 @@ public:
 		return sizeof( TYPE );
 	}
 	/// \copydoc _internal::TypePtrBase::getMinMax
-	std::pair<util::TypeReference,util::TypeReference> getMinMax()const {
+	std::pair<util::TypeReference, util::TypeReference> getMinMax()const {
 		if ( length() == 0 ) {
 			LOG( Runtime, warning ) << "Skipping computation of min/max on an empty TypePtr";
-			std::pair<util::TypeReference,util::TypeReference>();
+			std::pair<util::TypeReference, util::TypeReference>();
 		}
 
 		const std::pair<util::Type<TYPE>, util::Type<TYPE> > result = _internal::getMinMaxImpl<TYPE, boost::is_arithmetic<TYPE>::value>()( *this );
 
-/*		if ( min.empty() || min->gt( result.first ) )
-			min = result.first;
+		/*      if ( min.empty() || min->gt( result.first ) )
+		            min = result.first;
 
-		if ( max.empty() || max->lt( result.second ) )
-			max = result.second;*/
-		return std::make_pair(util::TypeReference(result.first),util::TypeReference(result.second));
+		        if ( max.empty() || max->lt( result.second ) )
+		            max = result.second;*/
+		return std::make_pair( util::TypeReference( result.first ), util::TypeReference( result.second ) );
 	}
 
 	std::vector<Reference> splice( size_t size )const {

@@ -88,7 +88,7 @@ public:
 	 * Gets a const reference of the element at a given index.
 	 * \copydetails Chunk::voxel
 	 */
-	template<typename TYPE> const TYPE& voxel( size_t firstDim, size_t secondDim = 0, size_t thirdDim = 0, size_t fourthDim = 0 )const {
+	template<typename TYPE> const TYPE &voxel( size_t firstDim, size_t secondDim = 0, size_t thirdDim = 0, size_t fourthDim = 0 )const {
 		const size_t idx[] = {firstDim, secondDim, thirdDim, fourthDim};
 
 		if ( !isInRange( idx ) ) {
@@ -141,7 +141,7 @@ public:
 
 	///get the scaling (and offset) which would be used in an conversion to the given type
 	scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const;
-	scaling_pair getScalingTo( unsigned short typeID, const std::pair<util::TypeReference,util::TypeReference> &minmax, autoscaleOption scaleopt = autoscale )const;
+	scaling_pair getScalingTo( unsigned short typeID, const std::pair<util::TypeReference, util::TypeReference> &minmax, autoscaleOption scaleopt = autoscale )const;
 	scaling_pair getScalingTo( unsigned short typeID, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale )const;
 
 
@@ -161,7 +161,7 @@ public:
 	size_t cmpLine( size_t secondDimS, size_t thirdDimS, size_t fourthDimS, const Chunk &dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD )const;
 	size_t cmpSlice( size_t thirdDimS, size_t fourthDimS, const Chunk &dst, size_t thirdDimD, size_t fourthDimD )const;
 
-	std::pair<util::TypeReference,util::TypeReference> getMinMax()const;
+	std::pair<util::TypeReference, util::TypeReference> getMinMax()const;
 
 	Chunk &operator=( const Chunk &ref );
 

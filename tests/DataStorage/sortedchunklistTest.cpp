@@ -95,10 +95,10 @@ BOOST_AUTO_TEST_CASE ( chunklist_sort_test )
 // @todo figure out, if we can remove acquisitionNumber from the needed list, if we say that one of acquisitionNumber or acquisitionTime is there
 // BOOST_AUTO_TEST_CASE ( chunklist_secondary_sort_test )
 // {
-/*	chNumber.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
-	chNumber.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, 0, 0 ) );
-	chTime.setPropertyAs( "acquisitionTime", 0 );
-	chTime.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, 0, 0 ) );*/
+/*  chNumber.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
+    chNumber.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, 0, 0 ) );
+    chTime.setPropertyAs( "acquisitionTime", 0 );
+    chTime.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, 0, 0 ) );*/
 //  chTime.setProperty( "indexOrigin", util::fvector4( 0, 0, 0, 0 ) );
 //  {
 //      // inserting a not-first chunk which lacks the current secondary sort property should fail

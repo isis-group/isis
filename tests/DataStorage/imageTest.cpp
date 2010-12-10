@@ -202,7 +202,7 @@ BOOST_AUTO_TEST_CASE ( type_selection_test )
 	name.setPropertyAs( "phaseVec", util::fvector4( 0, 1 ) );\
 	name.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );\
 	org++;
-	 
+
 	MAKE_CHUNK( int16_t, ch_int16_t );
 	MAKE_CHUNK( int8_t, ch_int8_t );
 	MAKE_CHUNK( uint8_t, ch_uint8_t );

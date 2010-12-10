@@ -86,14 +86,15 @@ void TypePtrBase::copyRange( size_t start, size_t end, TypePtrBase &dst, size_t 
 
 scaling_pair TypePtrBase::getScalingTo( unsigned short typeID, autoscaleOption scaleopt )const
 {
-	std::pair<util::TypeReference,util::TypeReference> minmax=getMinMax();
+	std::pair<util::TypeReference, util::TypeReference> minmax = getMinMax();
 	assert( ! ( minmax.first.empty() || minmax.second.empty() ) );
 	return TypePtrBase::getScalingTo( typeID, minmax, scaleopt );
 }
 
-scaling_pair TypePtrBase::getScalingTo( unsigned short typeID, const std::pair<util::TypeReference,util::TypeReference> &minmax, autoscaleOption scaleopt )const{
-	LOG_IF(minmax.first.empty() || minmax.second.empty(),Debug,error) << "One of the TypeReference's in minmax is empty(). This will crash...";
-	return getScalingTo(typeID,*minmax.first,*minmax.second,scaleopt);
+scaling_pair TypePtrBase::getScalingTo( unsigned short typeID, const std::pair<util::TypeReference, util::TypeReference> &minmax, autoscaleOption scaleopt )const
+{
+	LOG_IF( minmax.first.empty() || minmax.second.empty(), Debug, error ) << "One of the TypeReference's in minmax is empty(). This will crash...";
+	return getScalingTo( typeID, *minmax.first, *minmax.second, scaleopt );
 }
 
 scaling_pair TypePtrBase::getScalingTo( unsigned short typeID, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt )const

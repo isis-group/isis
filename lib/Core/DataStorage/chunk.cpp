@@ -167,17 +167,17 @@ size_t Chunk::cmpSlice( size_t thirdDimS, size_t fourthDimS, const Chunk &dst, s
 	const size_t idx3[] = {getSizeAsVector()[0] - 1, getSizeAsVector()[1] - 1, thirdDimD, fourthDimD};
 	return cmpRange( idx1, idx2, dst, idx3 );
 }
-std::pair<util::TypeReference,util::TypeReference> Chunk::getMinMax ( ) const
+std::pair<util::TypeReference, util::TypeReference> Chunk::getMinMax ( ) const
 {
 	return operator*().getMinMax();
 }
 
 scaling_pair Chunk::getScalingTo( unsigned short typeID, autoscaleOption scaleopt )const
 {
-	std::pair<util::TypeReference,util::TypeReference> minmax=getMinMax();
+	std::pair<util::TypeReference, util::TypeReference> minmax = getMinMax();
 	return operator*().getScalingTo( typeID, *minmax.first, *minmax.second, scaleopt );
 }
-scaling_pair Chunk::getScalingTo( unsigned short typeID, const std::pair<util::TypeReference,util::TypeReference> &minmax, autoscaleOption scaleopt )const
+scaling_pair Chunk::getScalingTo( unsigned short typeID, const std::pair<util::TypeReference, util::TypeReference> &minmax, autoscaleOption scaleopt )const
 {
 	return operator*().getScalingTo( typeID, minmax, scaleopt );
 }

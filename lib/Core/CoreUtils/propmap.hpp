@@ -166,21 +166,21 @@ public:
 	 * \returns a reference to the branching PropertyMap
 	 */
 	const PropertyMap &branch( const KeyType &key )const;
-	
+
 	/**
 	 * Remove the property adressed by the key.
 	 * This actually only removes properties.
-	 * Non-empty branches are not deleted. 
+	 * Non-empty branches are not deleted.
 	 * And if an branch becomes empty after deletion of its last entry, it is deleted automatically.
 	 */
 	bool remove( const KeyType &key );
-	
+
 	/// remove every property which is also in the given map (regardless of the value)
 	bool remove( const isis::util::PropertyMap &removeMap, bool keep_needed = false );
-	
+
 	/// \returns true is the given property does exist and is not empty.
 	bool hasProperty( const KeyType &key )const;
-	
+
 	/// \returns true is the given branch does exist and is not empty.
 	bool hasBranch( const KeyType &key )const;
 
@@ -413,7 +413,7 @@ basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, con
 template<typename charT, typename traits>
 basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::PropertyMap &s )
 {
-	isis::util::PropertyMap::FlatMap buff=s.getFlatMap();
+	isis::util::PropertyMap::FlatMap buff = s.getFlatMap();
 	isis::util::write_list( buff.begin(), buff.end(), out );
 	return out;
 }

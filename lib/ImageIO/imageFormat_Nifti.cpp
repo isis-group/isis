@@ -493,9 +493,9 @@ private:
 
 		// data dependent information added
 		ni.nbyper = image.bytes_per_voxel();
-		std::pair<double,double> minmax=image.getMinMaxAs<double>();
-		ni.cal_min=minmax.first;
-		ni.cal_max=minmax.second;
+		std::pair<double, double> minmax = image.getMinMaxAs<double>();
+		ni.cal_min = minmax.first;
+		ni.cal_max = minmax.second;
 	}
 
 	void copyHeaderToNifti( const data::Image &image, nifti_image &ni ) {

@@ -43,7 +43,7 @@ protected:
 
 public:
 	virtual const boost::weak_ptr<void> getRawAddress()const = 0;
-	
+
 	typedef util::_internal::TypeReference<TypePtrBase> Reference;
 	typedef TypePtrConverterMap::mapped_type::mapped_type Converter;
 
@@ -85,7 +85,7 @@ public:
 	///get the scaling (and offset) which would be used in an convertTo
 	scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const;
 	scaling_pair getScalingTo( unsigned short typeID, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale )const;
-	scaling_pair getScalingTo( unsigned short typeID, const std::pair<util::TypeReference,util::TypeReference> &minmax, autoscaleOption scaleopt = autoscale )const;
+	scaling_pair getScalingTo( unsigned short typeID, const std::pair<util::TypeReference, util::TypeReference> &minmax, autoscaleOption scaleopt = autoscale )const;
 
 
 	/// Copy (or Convert) data from this to memory of maybe another type and the given length.
@@ -148,11 +148,11 @@ public:
 	 * \code
 	 * std::pair<util::TypeReference,util::TypeReference> minmax1=data1.getMinMax(), minmax2=data2.getMinMax();
 	 * if(minmax1.first->gt(minmax2.second) && minmax1.second->lt(minmax2.second)
-	 * 	std::cout << minmax1 << " is a subset of " minmax2 << std::endl;
+	 *  std::cout << minmax1 << " is a subset of " minmax2 << std::endl;
 	 * \endcode
 	 * \returns a pair of TypeReferences referring to the found minimum/maximum of the data
 	 */
-	virtual std::pair<util::TypeReference,util::TypeReference> getMinMax()const = 0;
+	virtual std::pair<util::TypeReference, util::TypeReference> getMinMax()const = 0;
 	/**
 	 * Compare to another TypePtr.
 	 * This counts the elements between start and end, which are not equal to the corresponding elements in dst.

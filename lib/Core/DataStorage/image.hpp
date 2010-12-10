@@ -154,7 +154,7 @@ public:
 	 *
 	 * \returns A reference to the addressed voxel value. Only reading access is provided
 	 */
-	template <typename T> const T& voxel( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const {
+	template <typename T> const T &voxel( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const {
 		const std::pair<size_t, size_t> index = commonGet( first, second, third, fourth );
 		const TypePtr<T> &data = chunkPtrAt( index.first )->getTypePtr<T>();
 		return data[index.second];
@@ -290,14 +290,14 @@ public:
 	 * The results are converted to T, if they dont fit an error ist send.
 	 * \returns a pair of T storing the minimum and maximum values of the image.
 	 */
-	template<typename T> std::pair<T,T> getMinMaxAs()const {
+	template<typename T> std::pair<T, T> getMinMaxAs()const {
 		util::check_type<T>();// works only for T from _internal::types
-		std::pair<util::TypeReference,util::TypeReference> minmax=getMinMax();
-		return std::make_pair(minmax.first->as<T>(),minmax.second->as<T>());
+		std::pair<util::TypeReference, util::TypeReference> minmax = getMinMax();
+		return std::make_pair( minmax.first->as<T>(), minmax.second->as<T>() );
 	}
 
 	/// Get the maximum and the minimum voxel value of the image as a pair of TypeReference-objects.
-	std::pair<util::TypeReference,util::TypeReference> getMinMax()const;
+	std::pair<util::TypeReference, util::TypeReference> getMinMax()const;
 
 	/**
 	 * Compares the voxel-values of this image to the given.
