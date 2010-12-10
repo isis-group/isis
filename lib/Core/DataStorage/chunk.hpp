@@ -85,10 +85,10 @@ public:
 		return ret[getLinearIndex( idx )];
 	}
 	/**
-	 * Gets a copy of the element at a given index.
+	 * Gets a const reference of the element at a given index.
 	 * \copydetails Chunk::voxel
 	 */
-	template<typename TYPE> TYPE voxel( size_t firstDim, size_t secondDim = 0, size_t thirdDim = 0, size_t fourthDim = 0 )const {
+	template<typename TYPE> const TYPE& voxel( size_t firstDim, size_t secondDim = 0, size_t thirdDim = 0, size_t fourthDim = 0 )const {
 		const size_t idx[] = {firstDim, secondDim, thirdDim, fourthDim};
 
 		if ( !isInRange( idx ) ) {

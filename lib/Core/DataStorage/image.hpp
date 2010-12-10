@@ -143,10 +143,7 @@ public:
 	}
 
 	/**
-	 * Get the value of the voxel value at the given coordinates.
-	 *
-	 * The voxel reference provides reading and writing access to the refered
-	 * value.
+	 * Get a const reference to the voxel value at the given coordinates.
 	 *
 	 * \param first The first coordinate in voxel space. Usually the x value / the read-encoded position..
 	 * \param second The second coordinate in voxel space. Usually the y value / the phase-encoded position.
@@ -157,7 +154,7 @@ public:
 	 *
 	 * \returns A reference to the addressed voxel value. Only reading access is provided
 	 */
-	template <typename T> T voxel( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const {
+	template <typename T> const T& voxel( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const {
 		const std::pair<size_t, size_t> index = commonGet( first, second, third, fourth );
 		const TypePtr<T> &data = chunkPtrAt( index.first )->getTypePtr<T>();
 		return data[index.second];
@@ -222,19 +219,20 @@ public:
 	std::vector<boost::shared_ptr<const Chunk> > getChunkList()const;
 
 	/**
-	* Get the chunk that contains the voxel at the given coordinates in the given type.
-	* If the accordant chunk has type T a cheap copy is returned.
-	* Otherwise a MemChunk of the requested type is created from it.
-	* In this case the minimum and maximum values of the image are computed and used for the MemChunk constructor.
-	*
-	* \param first The first coordinate in voxel space. Usually the x value.
-	* \param second The second coordinate in voxel space. Usually the y value.
-	* \param third The third coordinate in voxel space. Ususally the z value.
-	* \param fourth The fourth coordinate in voxel space. Usually the time value.
-	* \returns a (maybe converted) chunk containing the voxel value at the given coordinates.
-	*/
-	template<typename TYPE> Chunk getChunkAs( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const {
-		return getChunkAs<TYPE>( getScalingTo( TypePtr<TYPE>::staticID ), first, second, third, fourth );
+	 * Get the chunk that contains the voxel at the given coordinates in the given type.
+	 * If the accordant chunk has type T a cheap copy is returned.
+	 * Otherwise a MemChunk-copy of the requested type is created from it.
+	 * In this case the minimum and maximum values of the image are computed and used for the MemChunk constructor.
+	 *
+	 * \param first The first coordinate in voxel space. Usually the x value.
+	 * \param second The second coordinate in voxel space. Usually the y value.
+	 * \param third The third coordinate in voxel space. Ususally the z value.
+	 * \param fourth The fourth coordinate in voxel space. Usually the time value.
+	 * \param copy_metadata if true the metadata of the image are merged into the returned chunk
+	 * \returns a (maybe converted) chunk containing the voxel value at the given coordinates.
+	 */
+	template<typename TYPE> Chunk getChunkAs( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true )const {
+		return getChunkAs<TYPE>( getScalingTo( TypePtr<TYPE>::staticID ), first, second, third, fourth, copy_metadata );
 	}
 	/**
 	 * Get the chunk that contains the voxel at the given coordinates in the given type (fast version).
@@ -245,10 +243,11 @@ public:
 	 * \param second The second coordinate in voxel space. Usually the y value.
 	 * \param third The third coordinate in voxel space. Ususally the z value.
 	 * \param fourth The fourth coordinate in voxel space. Usually the time value.
+	 * \param copy_metadata if true the metadata of the image are merged into the returned chunk
 	 * \returns a (maybe converted) chunk containing the voxel value at the given coordinates.
 	 */
-	template<typename TYPE> Chunk getChunkAs( const scaling_pair &scaling, size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const {
-		Chunk ret = getChunk( first, second, third, fourth ); // get a cheap copy
+	template<typename TYPE> Chunk getChunkAs( const scaling_pair &scaling, size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true )const {
+		Chunk ret = getChunk( first, second, third, fourth, copy_metadata ); // get a cheap copy
 		ret.makeOfTypeID( TypePtr<TYPE>::staticID, scaling ); // make it of type T
 		return ret; //return that
 	}
