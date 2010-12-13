@@ -34,14 +34,14 @@ protected:
 	 * If the property doesn't exist a message will be sent to Log using the given loglevel.
 	 * \returns object.hasProperty(name)
 	 */
-	static bool hasOrTell( const util::PropMap::pname_type &name, const util::PropMap &object, LogLevel level );
+	static bool hasOrTell( const util::PropertyMap::KeyType &name, const util::PropertyMap &object, LogLevel level );
 	/**
 	 * Transform a given property into another and remove the original in the given PropMap.
 	 * If the property doesn't exist a message will be sent to Log using the given loglevel.
 	 * \returns true if the property existed and was transformed.
 	 */
 	template<typename TYPE> static bool
-	transformOrTell( const util::PropMap::pname_type &from, const util::PropMap::pname_type &to, util::PropMap &object, LogLevel level ) {
+	transformOrTell( const util::PropertyMap::KeyType &from, const util::PropertyMap::KeyType &to, util::PropertyMap &object, LogLevel level ) {
 		if ( hasOrTell( from, object, level ) and object.transform<TYPE>( from, to ) ) {
 			LOG( Debug, verbose_info ) << "Transformed " << from << " into " << object.propertyValue( to );
 			return true;
@@ -58,7 +58,7 @@ public:
 	/// splits the suffix (and the ".") from the filename (or path) and returns a pair made of both parts
 	virtual std::pair<std::string, std::string> makeBasename( const std::string &filename )const;
 
-	static std::string makeFilename( const util::PropMap &img, std::string namePattern );
+	static std::string makeFilename(const util::PropertyMap &img,std::string namePattern);
 	std::list<std::string> makeUniqueFilenames( const data::ImageList &images, const std::string &namePattern )const;
 
 

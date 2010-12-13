@@ -54,7 +54,7 @@ public:
 	void generate( const TypePtrBase &src, boost::scoped_ptr<TypePtrBase>& dst, const scaling_pair &scaling )const {
 		LOG_IF( dst.get(), Debug, warning ) << "Generating into existing value " << dst->toString( true );
 		//Create new "stuff" in memory
-		TypePtr<DST> *newDat = new TypePtr<DST>( ( DST * )malloc( sizeof( DST )*src.len() ), src.len() );
+		TypePtr<DST> *newDat = new TypePtr<DST>( ( DST * )malloc( sizeof( DST )*src.length() ), src.length() );
 		dst.reset( newDat );
 		convert( src, *dst, scaling );//and convert into that
 	}
@@ -89,11 +89,11 @@ public:
 		return boost::shared_ptr<const TypePtrConverterBase>( ret );
 	}
 	void convert( const TypePtrBase &src, TypePtrBase &dst, const scaling_pair &scaling )const {
-		TypePtr<SRC> &dstVal = dst.cast_to_TypePtr<SRC>();
-		const SRC *srcPtr = &src.cast_to_TypePtr<SRC>()[0];
-		LOG_IF( src.len() < dst.len(), Debug, info ) << "The target is longer than the the source (" << dst.len() << ">" << src.len() << "). Will only copy/convert " << src.len() << " elements";
-		LOG_IF( src.len() > dst.len(), Debug, error ) << "The target is shorter than the the source (" << dst.len() << "<" << src.len() << "). Will only copy/convert " << dst.len() << " elements";
-		dstVal.copyFromMem( srcPtr, std::min( src.len(), dstVal.len() ) );
+		TypePtr<SRC> &dstVal = dst.castToTypePtr<SRC>();
+		const SRC *srcPtr = &src.castToTypePtr<SRC>()[0];
+		LOG_IF( src.length() < dst.length(), Debug, info ) << "The target is longer than the the source (" << dst.length() << ">" << src.length() << "). Will only copy/convert " << src.length() << " elements";
+		LOG_IF( src.length() > dst.length(), Debug, error ) << "The target is shorter than the the source (" << dst.length() << "<" << src.length() << "). Will only copy/convert " << dst.length() << " elements";
+		dstVal.copyFromMem( srcPtr, std::min( src.length(), dstVal.length() ) );
 	}
 	virtual scaling_pair getScaling( const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale )const {
 		//as we're just copying - its 1/0
@@ -129,7 +129,7 @@ public:
 	}
 	void convert( const TypePtrBase &src, TypePtrBase &dst, const scaling_pair &scaling )const {
 		LOG_IF( scaling.first.empty() || scaling.first.empty(), Debug, error ) << "Running conversion with invalid scaling (" << scaling << ") this won't work";
-		numeric_convert( src.cast_to_TypePtr<SRC>(), dst.cast_to_TypePtr<DST>(), scaling.first->as<double>(), scaling.second->as<double>() );
+		numeric_convert( src.castToTypePtr<SRC>(), dst.castToTypePtr<DST>(), scaling.first->as<double>(), scaling.second->as<double>() );
 	}
 	scaling_pair getScaling( const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale )const {
 		const std::pair<double, double> scale = getNumericScaling<SRC, DST>( min, max, scaleopt );

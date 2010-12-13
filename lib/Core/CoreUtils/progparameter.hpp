@@ -71,7 +71,7 @@ public:
 	 */
 	template<typename T> operator const T()const {
 		LOG_IF( empty(), isis::CoreDebug, isis::error ) << "Program parameters must not be empty. Please set it to any value.";
-		return get()->cast_to<T>();
+		return get()->castTo<T>();
 	}
 	operator boost::scoped_ptr<_internal::TypeBase>::unspecified_bool_type()const;// implicit conversion to "bool" stolen from boost
 

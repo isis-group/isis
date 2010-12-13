@@ -118,27 +118,27 @@ void ImageHolder::setUpPipe()
 	}
 }
 
-void ImageHolder::setImages( util::PropMap propMap,  std::vector<vtkSmartPointer<vtkImageData> >imgVec )
+void ImageHolder::setImages( util::PropertyMap propMap,  std::vector<vtkSmartPointer<vtkImageData> >imgVec )
 {
 	m_ImageVector = imgVec;
 	LOG( Runtime, info ) << "Image contains " << m_ImageVector.size() << " timesteps.";
 	m_TimeSteps = m_ImageVector.size();
-	m_PropMap = propMap;
+	m_PropertyMap = propMap;
 	isis::util::TypeReference min, max;
 #warning check this - the interfave for the conversion does not expect min max anymore
 	LOG( Runtime, info ) << "Image minimum: " << min << "; Image maximum: " << max;
-	m_ScalingFactor = m_PropMap.propertyValue( "scale" );
-	m_Offset = m_PropMap.propertyValue( "offset" );
-	m_readVec = m_PropMap.getProperty<isis::util::fvector4>( "readVec" );
-	m_phaseVec = m_PropMap.getProperty<isis::util::fvector4>( "phaseVec" );
-	m_sliceVec = m_PropMap.getProperty<isis::util::fvector4>( "sliceVec" );
+	m_ScalingFactor = m_PropertyMap.propertyValue( "scale" );
+	m_Offset = m_PropertyMap.propertyValue( "offset" );
+	m_readVec = m_PropertyMap.getPropertyAs<isis::util::fvector4>( "readVec" );
+	m_phaseVec = m_PropertyMap.getPropertyAs<isis::util::fvector4>( "phaseVec" );
+	m_sliceVec = m_PropertyMap.getPropertyAs<isis::util::fvector4>( "sliceVec" );
 	LOG( Runtime, info ) << "readVector: " << m_readVec;
 	LOG( Runtime, info ) << "phaseVector: " << m_phaseVec;
 	LOG( Runtime, info ) << "sliceVector: " << m_sliceVec;
 	m_MatrixHandler.setVectors( m_readVec, m_phaseVec, m_sliceVec );
 	LOG( Runtime, info ) << "spacing[0]: " << m_ImageVector.front()->GetSpacing()[0];
-	m_pseudoOrigin = m_MatrixHandler.createPseudoOrigin( m_PropMap.getProperty<util::fvector4>( "imageSize" ), m_PropMap.getProperty<util::fvector4>( "voxelSize" ) );
-	m_transformedOrigin = m_MatrixHandler.transformOrigin( m_PropMap.getProperty<util::fvector4>( "indexOrigin" ), m_PropMap.getProperty<util::fvector4>( "voxelSize" ) );
+	m_pseudoOrigin = m_MatrixHandler.createPseudoOrigin( m_PropertyMap.getPropertyAs<util::fvector4>( "imageSize" ), m_PropertyMap.getPropertyAs<util::fvector4>( "voxelSize" ) );
+	m_transformedOrigin = m_MatrixHandler.transformOrigin( m_PropertyMap.getPropertyAs<util::fvector4>( "indexOrigin" ), m_PropertyMap.getPropertyAs<util::fvector4>( "voxelSize" ) );
 	//TODO debug
 	std::cout << "transformedOrigin: " << m_transformedOrigin << std::endl;
 	commonInit();

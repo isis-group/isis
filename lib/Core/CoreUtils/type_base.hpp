@@ -77,7 +77,7 @@ public:
 
 	template<typename T> bool is()const;
 
-	const Converter &getConverterTo( unsigned short id )const;
+	const Converter &getConverterTo( unsigned short ID )const;
 
 	/**
 	 * Convert the content of one Type to another.
@@ -105,9 +105,9 @@ public:
 	*/
 	template<class T> T as()const {
 		if( is<T>() )
-			return cast_to<T>();
+			return castTo<T>();
 
-		Reference ret = copyToNewById( Type<T>::staticID );
+		Reference ret = copyToNewByID( Type<T>::staticID );
 
 		if ( ret.empty() ) {
 			LOG( Debug, error )
@@ -115,17 +115,17 @@ public:
 					<< " failed. Returning " << Type<T>().toString() << ".";
 			return T();
 		} else
-			return ret->cast_to<T>();
+			return ret->castTo<T>();
 	}
 
 	/**
-	 * Dynamically cast the TypeBase up to its actual Type\<T\>. Constant version.
+	 * Dynamically cast the TypeBase down to its actual Type\<T\>. Constant version.
 	 * Will throw std::bad_cast if T is not the actual type.
 	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
 	 * \returns a constant reference of the stored value.
 	 */
-	template<typename T> const Type<T>& cast_to_Type() const;
-	template<typename T> const T &cast_to() const;
+	template<typename T> const Type<T>& castToType() const;
+	template<typename T> const T &castTo() const;
 
 	/**
 	 * Dynamically cast the TypeBase up to its actual Type\<T\>. Referenced version.
@@ -133,18 +133,18 @@ public:
 	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
 	 * \returns a reference of the stored value.
 	 */
-	template<typename T> Type<T>& cast_to_Type();
-	template<typename T> T &cast_to();
+	template<typename T> Type<T>& castToType();
+	template<typename T> T &castTo();
 	virtual bool operator==( const TypeBase &second )const = 0;
 
 	/// creates a copy of the stored value using a type referenced by its id
-	Reference copyToNewById( unsigned short id ) const;
+	Reference copyToNewByID( unsigned short ID ) const;
 
 	/**
 	 * Check if the stored value would also fit into another type referenced by its id
 	 * \returns true if the stored value would fit into the target type, false otherwise
 	 */
-	bool fitsInto( unsigned short id ) const;
+	bool fitsInto( unsigned short ID ) const;
 
 	virtual ~TypeBase();
 

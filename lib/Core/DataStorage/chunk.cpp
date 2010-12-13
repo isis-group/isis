@@ -42,12 +42,12 @@ Chunk::Chunk( const TypePtrReference &src, size_t firstDim, size_t secondDim, si
 	_internal::ChunkBase( firstDim, secondDim, thirdDim, fourthDim ),
 	TypePtrReference( src )
 {
-	assert( ( *this )->len() == volume() );
+	assert( ( *this )->length() == volume() );
 }
 
 Chunk Chunk::cloneToMem( size_t firstDim, size_t secondDim, size_t thirdDim, size_t fourthDim )const
 {
-	util::FixedVector<size_t, 4> newSize = sizeToVector();
+	util::FixedVector<size_t, 4> newSize = getSizeAsVector();
 
 	if ( firstDim )newSize[0] = firstDim;
 
@@ -57,23 +57,23 @@ Chunk Chunk::cloneToMem( size_t firstDim, size_t secondDim, size_t thirdDim, siz
 
 	if ( fourthDim )newSize[3] = fourthDim;
 
-	const TypePtrReference cloned( get()->cloneToMem( newSize.product() ) );
+	const TypePtrReference cloned( get()->cloneToNew( newSize.product() ) );
 	return Chunk( cloned, newSize[0], newSize[1], newSize[2], newSize[3] );
 }
 
-bool Chunk::makeOfTypeId( short unsigned int id )
+bool Chunk::makeOfTypeID( short unsigned int ID )
 {
-	if( typeID() != id ) {
-		return makeOfTypeId( id, getScalingTo( id ) );
+	if( typeID() != ID ) {
+		return makeOfTypeID( ID, getScalingTo( ID ) );
 	}
 
 	return true;
 }
 
-bool Chunk::makeOfTypeId( short unsigned int id, const scaling_pair &scaling )
+bool Chunk::makeOfTypeID( short unsigned int ID, const scaling_pair &scaling )
 {
-	if( typeID() != id ) { // if its not the same type - replace the internal TypePtr by a new returned from TypePtrBase::copyToNewById
-		TypePtrReference newPtr = getTypePtrBase().copyToNewById( id, scaling ); // create a new TypePtr of type id and store it in a TypePtrReference
+	if( typeID() != ID ) { // if its not the same type - replace the internal TypePtr by a new returned from TypePtrBase::copyToNewById
+		TypePtrReference newPtr = getTypePtrBase().copyToNewByID( ID, scaling ); // create a new TypePtr of type id and store it in a TypePtrReference
 
 		if( newPtr.empty() ) // if the reference is empty the conversion failed
 			return false;
@@ -86,7 +86,7 @@ bool Chunk::makeOfTypeId( short unsigned int id, const scaling_pair &scaling )
 
 size_t Chunk::bytes_per_voxel()const
 {
-	return get()->bytes_per_elem();
+	return get()->bytesPerElem();
 }
 std::string Chunk::typeName()const
 {
@@ -100,7 +100,7 @@ unsigned short Chunk::typeID()const
 void Chunk::copyLine( size_t secondDimS, size_t thirdDimS, size_t fourthDimS, Chunk &dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD ) const
 {
 	const size_t idx1[] = {0, secondDimS, thirdDimS, fourthDimS};
-	const size_t idx2[] = {sizeToVector()[0] - 1, secondDimS, thirdDimS, fourthDimS};
+	const size_t idx2[] = {getSizeAsVector()[0] - 1, secondDimS, thirdDimS, fourthDimS};
 	const size_t idx3[] = {0, secondDimD, thirdDimD, fourthDimD};
 	copyRange( idx1, idx2, dst, idx3 );
 }
@@ -108,63 +108,63 @@ void Chunk::copyLine( size_t secondDimS, size_t thirdDimS, size_t fourthDimS, Ch
 void Chunk::copySlice( size_t thirdDimS, size_t fourthDimS, Chunk &dst, size_t thirdDimD, size_t fourthDimD ) const
 {
 	const size_t idx1[] = {0, 0, thirdDimS, fourthDimS};
-	const size_t idx2[] = {sizeToVector()[0] - 1, sizeToVector()[1] - 1, thirdDimS, fourthDimS};
+	const size_t idx2[] = {getSizeAsVector()[0] - 1, getSizeAsVector()[1] - 1, thirdDimS, fourthDimS};
 	const size_t idx3[] = {0, 0, thirdDimD, fourthDimD};
 	copyRange( idx1, idx2, dst, idx3 );
 }
 
 void Chunk::copyRange( const size_t source_start[], const size_t source_end[], Chunk &dst, const size_t destination[] ) const
 {
-	LOG_IF( ! rangeCheck( source_start ), Debug, error )
+	LOG_IF( ! isInRange( source_start ), Debug, error )
 			<< "Copy start " << util::FixedVector<size_t, 4>( source_start )
-			<< " is out of range (" << sizeToString() << ") at the source chunk";
-	LOG_IF( ! rangeCheck( source_end ), Debug, error )
+			<< " is out of range (" << getSizeAsString() << ") at the source chunk";
+	LOG_IF( ! isInRange( source_end ), Debug, error )
 			<< "Copy end " << util::FixedVector<size_t, 4>( source_end )
-			<< " is out of range (" << sizeToString() << ") at the source chunk";
-	LOG_IF( ! dst.rangeCheck( destination ), Debug, error )
+			<< " is out of range (" << getSizeAsString() << ") at the source chunk";
+	LOG_IF( ! dst.isInRange( destination ), Debug, error )
 			<< "Index " << util::FixedVector<size_t, 4>( destination )
-			<< " is out of range (" << sizeToString() << ") at the destination chunk";
-	const size_t sstart = dim2Index( source_start );
-	const size_t send = dim2Index( source_end );
-	const size_t dstart = dst.dim2Index( destination );
+			<< " is out of range (" << getSizeAsString() << ") at the destination chunk";
+	const size_t sstart = getLinearIndex( source_start );
+	const size_t send = getLinearIndex( source_end );
+	const size_t dstart = dst.getLinearIndex( destination );
 	get()->copyRange( sstart, send, *dst, dstart );
 }
 
 size_t Chunk::cmpRange( size_t start, size_t end, const Chunk &dst, size_t destination ) const
 {
-	return get()->cmp( start, end, *dst, destination );
+	return get()->compare( start, end, *dst, destination );
 }
 size_t Chunk::cmpRange( const size_t source_start[], const size_t source_end[], const Chunk &dst, const size_t destination[] ) const
 {
-	LOG_IF( ! rangeCheck( source_start ), Debug, error )
+	LOG_IF( ! isInRange( source_start ), Debug, error )
 			<< "memcmp start " << util::FixedVector<size_t, 4>( source_start )
-			<< " is out of range (" << sizeToString() << ") at the first chunk";
-	LOG_IF( ! rangeCheck( source_end ), Debug, error )
+			<< " is out of range (" << getSizeAsString() << ") at the first chunk";
+	LOG_IF( ! isInRange( source_end ), Debug, error )
 			<< "memcmp end " << util::FixedVector<size_t, 4>( source_end )
-			<< " is out of range (" << sizeToString() << ") at the first chunk";
-	LOG_IF( ! dst.rangeCheck( destination ), Debug, error )
+			<< " is out of range (" << getSizeAsString() << ") at the first chunk";
+	LOG_IF( ! dst.isInRange( destination ), Debug, error )
 			<< "Index " << util::FixedVector<size_t, 4>( destination )
-			<< " is out of range (" << sizeToString() << ") at the second chunk";
+			<< " is out of range (" << getSizeAsString() << ") at the second chunk";
 	LOG( Debug, verbose_info )
 			<< "Comparing range from " << util::FixedVector<size_t, 4>( source_start ) << " to " << util::FixedVector<size_t, 4>( source_end )
 			<< " and " << util::FixedVector<size_t, 4>( destination );
-	const size_t sstart = dim2Index( source_start );
-	const size_t send = dim2Index( source_end );
-	const size_t dstart = dst.dim2Index( destination );
+	const size_t sstart = getLinearIndex( source_start );
+	const size_t send = getLinearIndex( source_end );
+	const size_t dstart = dst.getLinearIndex( destination );
 	return cmpRange( sstart, send, dst, dstart );
 }
 size_t Chunk::cmpLine( size_t secondDimS, size_t thirdDimS, size_t fourthDimS, const Chunk &dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD ) const
 {
 	const size_t idx1[] = {0, secondDimS, thirdDimS, fourthDimS};
 	const size_t idx2[] = {0, secondDimD, thirdDimD, fourthDimD};
-	const size_t idx3[] = {sizeToVector()[0] - 1, secondDimD, thirdDimD, fourthDimD};
+	const size_t idx3[] = {getSizeAsVector()[0] - 1, secondDimD, thirdDimD, fourthDimD};
 	return cmpRange( idx1, idx2, dst, idx3 );
 }
 size_t Chunk::cmpSlice( size_t thirdDimS, size_t fourthDimS, const Chunk &dst, size_t thirdDimD, size_t fourthDimD ) const
 {
 	const size_t idx1[] = {0, 0, thirdDimS, fourthDimS};
 	const size_t idx2[] = {0, 0, thirdDimD, fourthDimD};
-	const size_t idx3[] = {sizeToVector()[0] - 1, sizeToVector()[1] - 1, thirdDimD, fourthDimD};
+	const size_t idx3[] = {getSizeAsVector()[0] - 1, getSizeAsVector()[1] - 1, thirdDimD, fourthDimD};
 	return cmpRange( idx1, idx2, dst, idx3 );
 }
 void Chunk::getMinMax ( util::TypeReference &min, util::TypeReference &max ) const
@@ -192,35 +192,35 @@ Chunk &Chunk::operator=( const Chunk &ref )
 
 ChunkList Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 {
-	if ( !valid() ) {
+	if ( !isValid() ) {
 		LOG( Runtime, error ) << "Cannot splice invalid Chunk (missing properties are " << this->getMissing() << ")";
 		return ChunkList();
 	}
 
 	util::fvector4 offset;
-	const util::fvector4 voxelSize = propertyValue( "voxelSize" )->cast_to<util::fvector4>();
+	const util::fvector4 voxelSize = propertyValue( "voxelSize" )->castTo<util::fvector4>();
 	util::fvector4 voxelGap;
 
 	if( hasProperty( "voxelGap" ) )
-		voxelGap = propertyValue( "voxelGap" )->cast_to<util::fvector4>();
+		voxelGap = propertyValue( "voxelGap" )->castTo<util::fvector4>();
 
 	const util::fvector4 distance = voxelSize + voxelGap;
 	int32_t atDim = relevantDims() - 1;
 
 	switch( atDim ) { // init offset with the given direction
 	case readDim :
-		offset = this->propertyValue( "readVec" )->cast_to<util::fvector4>();
+		offset = this->propertyValue( "readVec" )->castTo<util::fvector4>();
 		break;
 	case phaseDim:
-		offset = this->propertyValue( "phaseVec" )->cast_to<util::fvector4>();
+		offset = this->propertyValue( "phaseVec" )->castTo<util::fvector4>();
 		break;
 	case sliceDim:
 
 		if( this->hasProperty( "sliceVec" ) ) {
-			offset = this->propertyValue( "sliceVec" )->cast_to<util::fvector4>();
+			offset = this->propertyValue( "sliceVec" )->castTo<util::fvector4>();
 		} else {
-			const util::fvector4 read = this->propertyValue( "readVec" )->cast_to<util::fvector4>();
-			const util::fvector4 phase = this->propertyValue( "phaseVec" )->cast_to<util::fvector4>();
+			const util::fvector4 read = this->propertyValue( "readVec" )->castTo<util::fvector4>();
+			const util::fvector4 phase = this->propertyValue( "phaseVec" )->castTo<util::fvector4>();
 			assert( util::fuzzyEqual<float>( read.sqlen(), 1 ) );
 			assert( util::fuzzyEqual<float>( phase.sqlen(), 1 ) );
 			offset[0] = read[1] * phase[2] - read[2] * phase[1];
@@ -240,8 +240,8 @@ ChunkList Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 	LOG( Debug, info ) << "Splicing chunk at dimenstion " << atDim + 1 << " with indexOrigin stride " << indexOriginOffset << " and acquisitionNumberStride " << acquisitionNumberStride;
 	ChunkList ret = splice( ( dimensions )atDim ); // do low level splice - get the chunklist
 	BOOST_FOREACH( ChunkList::reference ref, ret ) { // adapt some metadata in them
-		util::fvector4 &orig = ref->propertyValue( "indexOrigin" )->cast_to<util::fvector4>();
-		uint32_t &acq = ref->propertyValue( "acquisitionNumber" )->cast_to<uint32_t>();
+		util::fvector4 &orig = ref->propertyValue( "indexOrigin" )->castTo<util::fvector4>();
+		uint32_t &acq = ref->propertyValue( "acquisitionNumber" )->castTo<uint32_t>();
 		orig = orig + indexOriginOffset * ( float )cnt;
 		acq += acquisitionNumberStride * cnt; //@todo this might cause trouble if we try to insert this chunks into an image
 		cnt++;
@@ -254,8 +254,8 @@ ChunkList Chunk::splice ( dimensions atDim )const
 	ChunkList ret;
 	//@todo should be locking
 	typedef std::vector<TypePtrReference> TypePtrList;
-	const util::FixedVector<size_t, n_dims> wholesize = sizeToVector();
-	util::FixedVector<size_t, n_dims> spliceSize;
+	const util::FixedVector<size_t, dims> wholesize = getSizeAsVector();
+	util::FixedVector<size_t, dims> spliceSize;
 	spliceSize.fill( 1 ); //init size of one chunk-splice to 1x1x1x1
 	//copy the relevant dimensional sizes from wholesize (in case of sliceDim we copy only the first two elements of wholesize - making slices)
 	spliceSize.copyFrom( &wholesize[0], &wholesize[atDim] );
@@ -264,38 +264,15 @@ ChunkList Chunk::splice ( dimensions atDim )const
 	//create new Chunks from this TypePtr's
 	BOOST_FOREACH( TypePtrList::const_reference ref, pointers ) {
 		boost::shared_ptr<Chunk> spliced( new Chunk( ref, spliceSize[0], spliceSize[1], spliceSize[2], spliceSize[3] ) );
-		static_cast<util::PropMap &>( *spliced ) = static_cast<const util::PropMap &>( *this ); //copy the metadate of ref
+		static_cast<util::PropertyMap &>( *spliced ) = static_cast<const util::PropertyMap &>( *this ); //copy the metadate of ref
 		ret.push_back( spliced ); // store splice for return
 	}
 	return ret;
 }
-bool Chunk::swapAlong( Chunk &dst, const size_t dim, bool convertTransform ) const
+
+const size_t Chunk::useCount() const
 {
-	size_t dims[] = { dimSize( 0 ), dimSize( 1 ), dimSize( 2 ), dimSize( 3 ) };
-	dst.join( static_cast<util::PropMap>( *this ), false );
-
-	if ( get()->swapAlong( *dst, dim, dims ) ) {
-		if ( convertTransform ) {
-			util::fvector4 read = getProperty<util::fvector4>( "readVec" );
-			util::fvector4 phase = getProperty<util::fvector4>( "phaseVec" );
-			util::fvector4 slice = getProperty<util::fvector4>( "sliceVec" );
-			util::fvector4 origin = getProperty<util::fvector4>( "indexOrigin" );
-			boost::numeric::ublas::matrix<float> T( 3, 3 );
-			T( 0, 0 ) = 1;
-			T( 0, 1 ) = 0;
-			T( 0, 2 ) = 0;
-			T( 1, 0 ) = 0;
-			T( 1, 1 ) = 1;
-			T( 1, 2 ) = 0;
-			T( 2, 0 ) = 0;
-			T( 2, 1 ) = 0;
-			T( 2, 2 ) = 1;
-			T( dim, dim ) *= -1;
-			dst.transformCoords( T );
-		}
-
-		return true;
-	} else return false;
+	return getTypePtrBase().useCount();
 }
 
 }

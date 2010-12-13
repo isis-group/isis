@@ -36,8 +36,8 @@ class SortedChunkList
 {
 public:
 	struct scalarPropCompare {
-		util::PropMap::pname_type propertyName;
-		scalarPropCompare( const util::PropMap::pname_type &prop_name );
+		util::PropertyMap::KeyType propertyName;
+		scalarPropCompare( const util::PropertyMap::KeyType &prop_name );
 		bool operator()( const util::PropertyValue &a, const util::PropertyValue &b ) const;
 	};
 	struct posCompare {
@@ -63,20 +63,20 @@ private:
 	std::pair<boost::shared_ptr<Chunk>, bool> secondaryInsert( SecondaryMap &map, const Chunk &ch );
 	std::pair<boost::shared_ptr<Chunk>, bool> primaryInsert( const Chunk &ch );
 
-	std::list<util::PropMap::pname_type> equalProps;
+	std::list<util::PropertyMap::KeyType> equalProps;
 public:
 
 	//initialisation
 	/**
 	 * Creates a sorted list and sets primary sorting as well as properties which should be equal across all chunks.
 	 */
-	SortedChunkList( util::PropMap::pname_type fvectorPropName, util::PropMap::pname_type comma_separated_equal_props );
+	SortedChunkList( util::PropertyMap::KeyType fvectorPropName, util::PropertyMap::KeyType comma_separated_equal_props );
 
 	/**
 	 * Adds a property for secondary sorting.
 	 * At least one secondary sorting is needed.
 	 */
-	void addSecondarySort( const util::PropMap::pname_type &cmp );
+	void addSecondarySort( const util::PropertyMap::KeyType &cmp );
 
 	// utils
 

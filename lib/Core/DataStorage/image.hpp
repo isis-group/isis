@@ -30,7 +30,7 @@ namespace data
 
 class Image:
 	public _internal::NDimensional<4>,
-	public util::PropMap
+	public util::PropertyMap
 {
 public:
 	enum orientation {axial, reversed_axial, sagittal, reversed_sagittal, coronal, reversed_coronal};
@@ -66,9 +66,9 @@ private:
 				<< "Getting data from a non indexed image will result in undefined behavior. Run reIndex first.";
 		LOG_IF( set.empty(), Debug, error )
 				<< "Getting data from a empty image will result in undefined behavior.";
-		LOG_IF( !rangeCheck( idx ), Debug, isis::error )
-				<< "Index " << util::list2string( idx, idx + 4, "|" ) << " is out of range (" << sizeToString() << ")";
-		const size_t index = dim2Index( idx );
+		LOG_IF( !isInRange( idx ), Debug, isis::error )
+				<< "Index " << util::list2string( idx, idx + 4, "|" ) << " is out of range (" << getSizeAsString() << ")";
+		const size_t index = getLinearIndex( idx );
 		return std::make_pair( index / chunkVolume, index % chunkVolume );
 	}
 
@@ -249,7 +249,7 @@ public:
 	 */
 	template<typename TYPE> Chunk getChunkAs( const scaling_pair &scaling, size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const {
 		Chunk ret = getChunk( first, second, third, fourth ); // get a cheap copy
-		ret.makeOfTypeId( TypePtr<TYPE>::staticID, scaling ); // make it of type T
+		ret.makeOfTypeID( TypePtr<TYPE>::staticID, scaling ); // make it of type T
 		return ret; //return that
 	}
 
@@ -274,14 +274,14 @@ public:
 	bool reIndex();
 
 	/// \returns true if there is no chunk in the image
-	bool empty()const;
+	bool isEmpty()const;
 
 	/**
 	 * Get a list of the properties of the chunks for the given key
 	 * \param key the name of the property to search for
 	 * \param unique when true empty or consecutive duplicates wont be added
 	 */
-	std::list<util::PropertyValue> getChunksProperties( const util::PropMap::pname_type &key, bool unique = false )const;
+	std::list<util::PropertyValue> getChunksProperties( const util::PropertyMap::KeyType &key, bool unique = false )const;
 
 	/// get the size of every voxel (in bytes)
 	size_t bytes_per_voxel()const;
@@ -331,7 +331,7 @@ public:
 	template<typename T> void copyToMem( T *dst )const {
 		if( checkMakeClean() ) {
 			scaling_pair scale = getScalingTo( TypePtr<T>::staticID );
-			// we could do this using makeOfTypeId - but this solution does not need any additional temporary memory
+			// we could do this using makeOfTypeID - but this solution does not need any additional temporary memory
 			BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
 				if( !ref->copyToMem<T>( dst, scale ) ) {
 					LOG( Runtime, error ) << "Failed to copy raw data of type " << ref->typeName() << " from image into memory of type " << TypePtr<T>::staticName();
@@ -342,12 +342,12 @@ public:
 		}
 	}
 	/**
-	 * Ensure, the image has the type with the requested id.
-	 * If the typeId of any chunk is not equal to the requested id, the data of the chunk is replaced by an converted version.
+	 * Ensure, the image has the type with the requested ID.
+	 * If the typeID of any chunk is not equal to the requested ID, the data of the chunk is replaced by an converted version.
 	 * The conversion is done using the value range of the image.
 	 * \returns false if there was an error
 	 */
-	bool makeOfTypeId( unsigned short id );
+	bool makeOfTypeID( unsigned short ID );
 
 	/**
 	 * Automatically splice the given dimension and all dimensions above.
@@ -387,7 +387,7 @@ template<typename T> class TypedImage: public Image
 public:
 	TypedImage( const Image &src ): Image( src ) { // ok we just copied the whole image
 		//but we want it to be of type T
-		makeOfTypeId( TypePtr<T>::staticID );
+		makeOfTypeID( TypePtr<T>::staticID );
 	}
 	TypedImage &operator=( const TypedImage &ref ) { //its already of the given type - so just copy it
 		Image::operator=( ref );
@@ -395,7 +395,7 @@ public:
 	}
 	TypedImage &operator=( const Image &ref ) { // copy the image, and make sure its of the given type
 		Image::operator=( ref );
-		makeOfTypeId( TypePtr<T>::staticID );
+		makeOfTypeID( TypePtr<T>::staticID );
 		return *this;
 	}
 };

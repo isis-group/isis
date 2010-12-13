@@ -35,7 +35,7 @@ typedef std::list<boost::shared_ptr<Chunk> > ChunkList;
 
 namespace _internal
 {
-class ChunkBase : public NDimensional<4>, public util::PropMap
+class ChunkBase : public NDimensional<4>, public util::PropertyMap
 {
 protected:
 	static const char *needed;
@@ -77,11 +77,11 @@ public:
 	 */
 	template<typename TYPE> TYPE &voxel( size_t firstDim, size_t secondDim = 0, size_t thirdDim = 0, size_t fourthDim = 0 ) {
 		const size_t idx[] = {firstDim, secondDim, thirdDim, fourthDim};
-		LOG_IF( ! rangeCheck( idx ), Debug, isis::error )
+		LOG_IF( ! isInRange( idx ), Debug, isis::error )
 				<< "Index " << util::ivector4( firstDim, secondDim, thirdDim, fourthDim )
-				<< " is out of range " << sizeToString();
+				<< " is out of range " << getSizeAsString();
 		TypePtr<TYPE> &ret = asTypePtr<TYPE>();
-		return ret[dim2Index( idx )];
+		return ret[getLinearIndex( idx )];
 	}
 	/**
 	 * Gets a copy of the element at a given index.
@@ -90,15 +90,15 @@ public:
 	template<typename TYPE> TYPE voxel( size_t firstDim, size_t secondDim = 0, size_t thirdDim = 0, size_t fourthDim = 0 )const {
 		const size_t idx[] = {firstDim, secondDim, thirdDim, fourthDim};
 
-		if ( !rangeCheck( idx ) ) {
+		if ( !isInRange( idx ) ) {
 			LOG( Debug, isis::error )
 					<< "Index " << firstDim << "|" << secondDim << "|" << thirdDim << "|" << fourthDim
-					<< " is out of range (" << sizeToString() << ")";
+					<< " is out of range (" << getSizeAsString() << ")";
 		}
 
 		const TypePtr<TYPE> &ret = getTypePtr<TYPE>();
 
-		return ret[dim2Index( idx )];
+		return ret[getLinearIndex( idx )];
 	}
 	_internal::TypePtrBase &asTypePtrBase() {
 		return operator*();
@@ -107,30 +107,30 @@ public:
 		return operator*();
 	}
 	template<typename TYPE> TypePtr<TYPE> &asTypePtr() {
-		return asTypePtrBase().cast_to_TypePtr<TYPE>();
+		return asTypePtrBase().castToTypePtr<TYPE>();
 	}
 	template<typename TYPE> const TypePtr<TYPE> getTypePtr()const {
-		return getTypePtrBase().cast_to_TypePtr<TYPE>();
+		return getTypePtrBase().castToTypePtr<TYPE>();
 	}
-	const size_t use_count()const {
-		return getTypePtrBase().use_count();
-	}
+
+	/// \returns the number of cheap-copy-chunks using the same memory as this
+	const size_t useCount()const;
 	Chunk cloneToMem( size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 )const;
 
 	/**
-	 * Ensure, the chunk has the type with the requested id.
-	 * If the typeId of the chunk is not equal to the requested id, the data of the chunk is replaced by an converted version.
+	 * Ensure, the chunk has the type with the requested ID.
+	 * If the typeID of the chunk is not equal to the requested ID, the data of the chunk is replaced by an converted version.
 	 * The conversion is done using the value range of the old data.
 	 * \returns false if there was an error
 	 */
-	bool makeOfTypeId( unsigned short id );
+	bool makeOfTypeID( unsigned short ID );
 	/**
-	 * Ensure, the chunk has the type with the requested id.
-	 * If the typeId of the chunk is not equal to the requested id, the data of the chunk is replaced by an converted version.
+	 * Ensure, the chunk has the type with the requested ID.
+	 * If the typeID of the chunk is not equal to the requested ID, the data of the chunk is replaced by an converted version.
 	 * The conversion is done using the value range given via min and max.
 	 * \returns false if there was an error
 	 */
-	bool makeOfTypeId( unsigned short id, const scaling_pair &scaling );
+	bool makeOfTypeID( unsigned short ID, const scaling_pair &scaling );
 
 	template<typename T> bool copyToMem( T *dst, const scaling_pair &scaling )const {
 		// wrap the raw memory at into an non-deleting TypePtr of the length of the chunk
@@ -199,14 +199,6 @@ public:
 		isis::data::_internal::transformCoords( *this, transform );
 	}
 
-	/**
-	 * Swaps the image along a dimension dim in image space. If convertTransform is true,
-	 * the transform will be converted in a way that the image is the same in physical space
-	 * as it was prior to swapping.
-	 */
-
-	bool swapAlong( Chunk &, const size_t dim = 0, bool convertTransform = true ) const;
-
 };
 
 /// Chunk class for memory-based buffers
@@ -241,7 +233,7 @@ public:
 	/// Create a deep copy of a given Chunk (automatic conversion will be used if datatype does not fit)
 	MemChunk( const Chunk &ref ): Chunk( ref ) {
 		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewById( TypePtr<TYPE>::staticID ) );
+		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewByID( TypePtr<TYPE>::staticID ) );
 	}
 	/**
 	 * Create a deep copy of a given Chunk.
@@ -251,19 +243,19 @@ public:
 	 */
 	MemChunk( const Chunk &ref, const scaling_pair &scaling ): Chunk( ref ) {
 		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewById( TypePtr<TYPE>::staticID, scaling ) );
+		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewByID( TypePtr<TYPE>::staticID, scaling ) );
 	}
 	MemChunk( const MemChunk<TYPE> &ref ): Chunk( ref ) { //this is needed, to prevent generation of default-copy constructor
 		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewById( TypePtr<TYPE>::staticID ) );
+		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewByID( TypePtr<TYPE>::staticID ) );
 	}
 	/// Create a deep copy of a given Chunk (automatic conversion will be used if datatype does not fit)
 	MemChunk &operator=( const Chunk &ref ) {
-		LOG_IF( use_count() > 1, Debug, warning )
-				<< "Not overwriting current chunk memory (which is still used by " << use_count() - 1 << " other chunk(s)).";
+		LOG_IF( useCount() > 1, Debug, warning )
+				<< "Not overwriting current chunk memory (which is still used by " << useCount() - 1 << " other chunk(s)).";
 		Chunk::operator=( ref ); //copy the chunk of ref
 		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewById( TypePtr<TYPE>::staticID ) );
+		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewByID( TypePtr<TYPE>::staticID ) );
 		return *this;
 	}
 	/// Create a deep copy of a given MemChunk (automatic conversion will be used if datatype does not fit)
@@ -306,7 +298,7 @@ public:
 	/// Create a deep copy of a given Chunk (automatic conversion will be used if datatype does not fit)
 	MemChunkNonDel( const Chunk &ref ): Chunk( ref ) {
 		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewById( TypePtr<TYPE>::staticID ) );
+		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewByID( TypePtr<TYPE>::staticID ) );
 	}
 	/**
 	 * Create a deep copy of a given Chunk.
@@ -317,19 +309,19 @@ public:
 	 */
 	MemChunkNonDel( const Chunk &ref, const util::_internal::TypeBase &min, const  util::_internal::TypeBase &max ): Chunk( ref ) {
 		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewById( TypePtr<TYPE>::staticID, min, max ) );
+		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewByID( TypePtr<TYPE>::staticID, min, max ) );
 	}
 	MemChunkNonDel( const MemChunk<TYPE> &ref ): Chunk( ref ) { //this is needed, to prevent generation of default-copy constructor
 		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewById( TypePtr<TYPE>::staticID ) );
+		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewByID( TypePtr<TYPE>::staticID ) );
 	}
 	/// Create a deep copy of a given Chunk (automatic conversion will be used if datatype does not fit)
 	MemChunkNonDel &operator=( const Chunk &ref ) {
-		LOG_IF( use_count() > 1, Debug, warning )
-				<< "Not overwriting current chunk memory (which is still used by " << use_count() - 1 << " other chunk(s)).";
+		LOG_IF( useCount() > 1, Debug, warning )
+				<< "Not overwriting current chunk memory (which is still used by " << useCount() - 1 << " other chunk(s)).";
 		Chunk::operator=( ref ); //copy the chunk of ref
 		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewById( TypePtr<TYPE>::staticID ) );
+		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewByID( TypePtr<TYPE>::staticID ) );
 		return *this;
 	}
 	/// Create a deep copy of a given MemChunk (automatic conversion will be used if datatype does not fit)
