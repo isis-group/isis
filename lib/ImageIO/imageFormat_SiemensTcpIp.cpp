@@ -37,10 +37,11 @@ namespace isis
 			
 			int load ( data::ChunkList &chunks, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
 				
-				
+				firstHeaderArrived = false;
 				data_received = 0L;
 				sprintf(header_start, "<data_block_header>");
 				sprintf(header_end, "</data_block_header>");
+				int byteSize = 294912;
 				
 				for(;;){
 				memset(buffer, 0, sizeof(buffer));
@@ -49,9 +50,12 @@ namespace isis
 					exit(0);
 				}
 				printf("[%i] Received %i bytes\n", ++counter, length);
+				printf("buffer: %s\n", buffer);
+   			    printf("header_start: %s\n", header_start);
 				
 				
 				if(memcmp(buffer, header_start, sizeof(header_start) - 1) == 0) {
+					firstHeaderArrived = true;
 					printf("[receiver2] received block with header\n");
 					data_received = 0;
 					int header_length = 0;
@@ -68,8 +72,10 @@ namespace isis
 					char byteSizeString[byteSizeStringEnd - byteSizeStringStart];
 					strncat(byteSizeString, byteSizeStringStart, byteSizeStringEnd - byteSizeStringStart);
 					
-					byteSize = atoi(byteSizeString);
-					
+					//byteSize = strtol(byteSizeString, NULL, 10);
+					//byteSize = atoi(byteSizeString);
+					sscanf(byteSizeString, "%i", &byteSize);
+					printf("byteSize: %s %i\n", byteSizeString, byteSize);
 					dataBuffer = (char*)malloc(byteSize);
 					
 					// copy the first bit of data
@@ -77,7 +83,7 @@ namespace isis
 					
 					data_received += sizeof(buffer) - header_length;
 					
-				} else {
+				} else if (true == firstHeaderArrived) {
 					
 					if(byteSize - data_received > 32768) {
 						memcpy(dataBuffer + data_received, buffer, sizeof(buffer));
@@ -103,11 +109,12 @@ namespace isis
 						uint nrCols = 384;
 						uint nrSlices = 1;
 						boost::shared_ptr<data::Chunk> ch(new data::MemChunk<uint16_t>((uint16_t*)dataBuffer, nrCols,nrRows,nrSlices) );
-						ch->setProperty("indexOrigin", util::fvector4(1,2,3));
+						ch->setProperty("indexOrigin", util::fvector4(1,2,image_counter));
 						ch->setProperty<uint32_t>("acquisitionNumber", image_counter);
 						ch->setProperty<uint16_t>("sequenceNumber", 1);
-						ch->setProperty("readVec", util::fvector4());
-						ch->setProperty("phaseVec", util::fvector4());
+						ch->setProperty("readVec", util::fvector4(1,0,0,0));
+						ch->setProperty("phaseVec", util::fvector4(0,1,0,0));
+						ch->setProperty("voxelSize", util::fvector4(1,1,1,0));
 						ch->setProperty("repetitionTime",2000);
 						ch->setProperty<std::string>("InPlanePhaseEncodingDirection","COL");
 						ch->setProperty( "voxelGap", util::fvector4() );
@@ -151,16 +158,17 @@ namespace isis
 			static struct sockaddr_in receiver_address;
 			static int counter;
 			static int image_counter;
-			static int byteSize;
+			
 			static unsigned int receiver_address_length;
+			static bool firstHeaderArrived;
 		private:
 			
 			char   buffer[32768];
 			int    length;
 			char* dataBuffer;
 			long data_received;
-			char header_start[];
-			char header_end[];
+			char header_start[19];
+			char header_end[20];
 			
 		};
 		
@@ -168,8 +176,9 @@ namespace isis
 		struct sockaddr_in ImageFormat_SiemensTcpIp::receiver_address;
 		int ImageFormat_SiemensTcpIp::counter;
 		int ImageFormat_SiemensTcpIp::image_counter;
-		int ImageFormat_SiemensTcpIp::byteSize;
+		
 		unsigned int ImageFormat_SiemensTcpIp::receiver_address_length;
+		bool ImageFormat_SiemensTcpIp::firstHeaderArrived;
 		
 	}
 }
