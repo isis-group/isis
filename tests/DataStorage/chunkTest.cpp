@@ -85,15 +85,15 @@ BOOST_AUTO_TEST_CASE ( chunk_data_test1 )//Access Chunk elements via dimensional
 BOOST_AUTO_TEST_CASE ( chunk_scale_test )//Access Chunk elements via dimensional index
 {
 	data::MemChunk<int16_t> ch( 10, 10, 10 );
-	util::TypeReference min, max;
 
 	for ( size_t x = 0; x < ch.dimSize( data::readDim ); x++ ) {
 		ch.voxel<int16_t>( x, x, 0 ) =  2500;
 		ch.voxel<int16_t>( x, x, 1 ) = -50;
 	}
 
-	ch.getMinMax( min, max );
-	data::scaling_pair scale = ch.getScalingTo( data::TypePtr<uint8_t>::staticID, *min, *max );
+	std::pair<util::TypeReference,util::TypeReference> minmax=ch.getMinMax();
+
+	data::scaling_pair scale = ch.getScalingTo( data::TypePtr<uint8_t>::staticID, *minmax.first, *minmax.second );
 	const util::_internal::TypeBase &scale_s = *( scale.first );
 	const util::_internal::TypeBase &scale_o = *( scale.second );
 

@@ -356,21 +356,19 @@ BOOST_AUTO_TEST_CASE( image_minmax_test )
 
 	BOOST_REQUIRE( img.reIndex() );
 	{
-		util::TypeReference min, max;
-		img.getMinMax( min, max );
-		BOOST_CHECK( min->is<float>() );
-		BOOST_CHECK( max->is<float>() );
-		BOOST_CHECK_EQUAL( min->as<float>(), 0 );
-		BOOST_CHECK_EQUAL( max->as<float>(), 4 );
+		std::pair<util::TypeReference,util::TypeReference> minmax=img.getMinMax();
+		BOOST_CHECK( minmax.first->is<float>() );
+		BOOST_CHECK( minmax.second->is<float>() );
+		BOOST_CHECK_EQUAL( minmax.first->as<float>(), 0 );
+		BOOST_CHECK_EQUAL( minmax.second->as<float>(), 4 );
 	}
 	{
-		util::TypeReference min, max;
 		//this should be 0,0 because the first chunk only has zeros
-		img.getChunk( 0, 0, 0, 0 ).getMinMax( min, max );
-		BOOST_CHECK( min->is<float>() );
-		BOOST_CHECK( max->is<float>() );
-		BOOST_CHECK_EQUAL( min->as<float>(), 0 );
-		BOOST_CHECK_EQUAL( max->as<float>(), 0 );
+		std::pair<util::TypeReference,util::TypeReference> minmax=img.getChunk( 0, 0, 0, 0 ).getMinMax();
+		BOOST_CHECK( minmax.first->is<float>() );
+		BOOST_CHECK( minmax.second->is<float>() );
+		BOOST_CHECK_EQUAL( minmax.first->as<float>(), 0 );
+		BOOST_CHECK_EQUAL( minmax.second->as<float>(), 0 );
 	}
 }
 BOOST_AUTO_TEST_CASE( orientation_test )
@@ -409,12 +407,11 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 
 	BOOST_REQUIRE( img.reIndex() );
 	{
-		util::TypeReference min, max;
-		img.getMinMax( min, max );
-		BOOST_CHECK( min->is<float>() );
-		BOOST_CHECK( max->is<float>() );
-		BOOST_CHECK_EQUAL( min->as<float>(), 0 );
-		BOOST_CHECK_EQUAL( max->as<float>(), 2 * 2 * 1000 );
+		std::pair<util::TypeReference,util::TypeReference> minmax=img.getMinMax();
+		BOOST_CHECK( minmax.first->is<float>() );
+		BOOST_CHECK( minmax.second->is<float>() );
+		BOOST_CHECK_EQUAL( minmax.first->as<float>(), 0 );
+		BOOST_CHECK_EQUAL( minmax.second->as<float>(), 2 * 2 * 1000 );
 	}
 	{
 		// Conversion to uint8_t (will downscale [0-255])
@@ -438,24 +435,22 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 				BOOST_CHECK_EQUAL( c1, c2 );
 			}
 
-		util::TypeReference min, max;
-		img2.getMinMax( min, max );
-		BOOST_CHECK( min->is<uint8_t>() );
-		BOOST_CHECK( max->is<uint8_t>() );
-		BOOST_CHECK_EQUAL( min->as<uint8_t>(), 0 );
-		BOOST_CHECK_EQUAL( max->as<uint8_t>(), 255 );
+		std::pair<util::TypeReference,util::TypeReference> minmax=img2.getMinMax();
+		BOOST_CHECK( minmax.first->is<uint8_t>() );
+		BOOST_CHECK( minmax.second->is<uint8_t>() );
+		BOOST_CHECK_EQUAL( minmax.first->as<uint8_t>(), 0 );
+		BOOST_CHECK_EQUAL( minmax.second->as<uint8_t>(), 255 );
 	}
 	{
 		// Conversion to int16_t (will upscale [0-32k) )
 		data::MemImage<int16_t> img2( img );
 		BOOST_REQUIRE( img2.reIndex() );
 		BOOST_CHECK_EQUAL( static_cast<util::PropertyMap>( img ), static_cast<util::PropertyMap>( img2 ) );
-		util::TypeReference min, max;
-		img2.getMinMax( min, max );
-		BOOST_CHECK( min->is<int16_t>() );
-		BOOST_CHECK( max->is<int16_t>() );
-		BOOST_CHECK_EQUAL( min->as<int16_t>(), 0 );
-		BOOST_CHECK_EQUAL( max->as<int16_t>(), std::numeric_limits<int16_t>::max() );
+		std::pair<util::TypeReference,util::TypeReference> minmax=img2.getMinMax();
+		BOOST_CHECK( minmax.first->is<int16_t>() );
+		BOOST_CHECK( minmax.second->is<int16_t>() );
+		BOOST_CHECK_EQUAL( minmax.first->as<int16_t>(), 0 );
+		BOOST_CHECK_EQUAL( minmax.second->as<int16_t>(), std::numeric_limits<int16_t>::max() );
 	}
 } // END memimage_test
 
@@ -491,12 +486,11 @@ BOOST_AUTO_TEST_CASE( typediamge_test )
 
 	BOOST_REQUIRE( img.reIndex() );
 	{
-		util::TypeReference min, max;
-		img.getMinMax( min, max );
-		BOOST_CHECK( min->is<uint8_t>() );
-		BOOST_CHECK( max->is<int16_t>() );
-		BOOST_CHECK_EQUAL( min->as<int16_t>(), 0 );
-		BOOST_CHECK_EQUAL( max->as<int16_t>(), std::numeric_limits<int16_t>::max() );
+		std::pair<util::TypeReference,util::TypeReference> minmax=img.getMinMax();
+		BOOST_CHECK( minmax.first->is<uint8_t>() );
+		BOOST_CHECK( minmax.second->is<int16_t>() );
+		BOOST_CHECK_EQUAL( minmax.first->as<int16_t>(), 0 );
+		BOOST_CHECK_EQUAL( minmax.second->as<int16_t>(), std::numeric_limits<int16_t>::max() );
 	}
 	{
 		// Conversion to uint8_t (will downscale [0-255])
@@ -527,12 +521,11 @@ BOOST_AUTO_TEST_CASE( typediamge_test )
 				BOOST_CHECK( ( void * )&c1.voxel<int16_t>( 0, 0 ) != ( void * )&c2.voxel<uint8_t>( 0, 0 ) );
 			}
 
-		util::TypeReference min, max;
-		img2.getMinMax( min, max );
-		BOOST_CHECK( min->is<uint8_t>() );
-		BOOST_CHECK( max->is<uint8_t>() );
-		BOOST_CHECK_EQUAL( min->as<uint8_t>(), 0 );
-		BOOST_CHECK_EQUAL( max->as<uint8_t>(), std::numeric_limits<uint8_t>::max() );
+		std::pair<util::TypeReference,util::TypeReference> minmax=img2.getMinMax();
+		BOOST_CHECK( minmax.first->is<uint8_t>() );
+		BOOST_CHECK( minmax.second->is<uint8_t>() );
+		BOOST_CHECK_EQUAL( minmax.first->as<uint8_t>(), 0 );
+		BOOST_CHECK_EQUAL( minmax.second->as<uint8_t>(), std::numeric_limits<uint8_t>::max() );
 	}
 } // END typedimage_test
 
@@ -647,10 +640,9 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
 		}
 	}
 
-	float min, max;
-	img.getMinMax( min, max );
-	BOOST_REQUIRE_EQUAL( min, 0 );
-	double scale = std::numeric_limits<uint16_t>::max() / max;
+	std::pair<float,float> minmax=img.getMinMaxAs<float>();
+	BOOST_REQUIRE_EQUAL( minmax.first, 0 );
+	double scale = std::numeric_limits<uint16_t>::max() / minmax.second;
 	data::enable_log<util::DefaultMsgPrint>( error );
 	data::MemImage<uint16_t> copyImg( img );
 	data::enable_log<util::DefaultMsgPrint>( warning );

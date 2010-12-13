@@ -219,12 +219,11 @@ BOOST_AUTO_TEST_CASE( typePtr_minmax_test )
 	//without scaling
 	floatArray.copyFromMem( init, 10 );
 	{
-		util::TypeReference min, max;
-		floatArray.getMinMax( min, max );
-		BOOST_CHECK( min->is<float>() );
-		BOOST_CHECK( max->is<float>() );
-		BOOST_CHECK_EQUAL( min->as<float>(), -1.8f );
-		BOOST_CHECK_EQUAL( max->as<float>(), 1.8f );
+		std::pair<util::TypeReference,util::TypeReference> minmax=floatArray.getMinMax();
+		BOOST_CHECK( minmax.first->is<float>() );
+		BOOST_CHECK( minmax.second->is<float>() );
+		BOOST_CHECK_EQUAL( minmax.first->as<float>(), -1.8f );
+		BOOST_CHECK_EQUAL( minmax.second->as<float>(), 1.8f );
 	}
 }
 }
