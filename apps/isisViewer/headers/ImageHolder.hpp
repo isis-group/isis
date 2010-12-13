@@ -75,7 +75,7 @@ public:
 	isis::util::fvector4 getSliceVec() const { return m_sliceVec; }
 
 	vtkImageData *getVTKImageData() const { return m_ImageVector[m_currentTimestep]; }
-	const util::PropertyMap &getISISImage() const { return m_PropMap; }
+	const util::PropertyMap &getISISImage() const { return m_PropertyMap; }
 
 	bool setSliceCoordinates ( const int &, const int &, const int & );
 	void setCurrentTimeStep( const int & );
@@ -96,7 +96,7 @@ public:
 private:
 	MatrixHandler m_MatrixHandler;
 	std::vector<vtkSmartPointer<vtkImageData> > m_ImageVector;
-	util::PropertyMap m_PropMap;
+	util::PropertyMap m_PropertyMap;
 	boost::shared_ptr<ViewControl> m_PtrToViewer;
 	vtkSmartPointer<vtkImageClip> m_ExtractAxial;
 	vtkSmartPointer<vtkImageClip> m_ExtractSagittal;

@@ -98,7 +98,7 @@ private:
 	vtkSmartPointer<vtkRenderer> m_TopRendererAxial;
 	vtkSmartPointer<vtkRenderer> m_TopRendererSagittal;
 	vtkSmartPointer<vtkRenderer> m_TopRendererCoronal;
-
+	
 	vtkSmartPointer<vtkRenderWindow> m_WindowAxial;
 	vtkSmartPointer<vtkRenderWindow> m_WindowSagittal;
 	vtkSmartPointer<vtkRenderWindow> m_WindowCoronal;
@@ -110,7 +110,7 @@ private:
 	vtkSmartPointer<vtkRenderWindowInteractor> m_InteractorAxial;
 	vtkSmartPointer<vtkRenderWindowInteractor> m_InteractorSagittal;
 	vtkSmartPointer<vtkRenderWindowInteractor> m_InteractorCoronal;
-
+	
 	vtkSmartPointer<vtkCursor2D> m_Cursor;
 	vtkSmartPointer<vtkPolyDataMapper> m_PolyMapperCursorAxial;
 	vtkSmartPointer<vtkPolyDataMapper> m_PolyMapperCursorCoronal;
@@ -118,7 +118,7 @@ private:
 	vtkSmartPointer<vtkActor> m_ActorCursorAxial;
 	vtkSmartPointer<vtkActor> m_ActorCursorSagittal;
 	vtkSmartPointer<vtkActor> m_ActorCursorCoronal;
-
+	
 	QVTKWidget *m_AxialWidget;
 	QVTKWidget *m_SagittalWidget;
 	QVTKWidget *m_CoronalWidget;

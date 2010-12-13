@@ -1,7 +1,7 @@
 Source: isis
 Section: science
 Priority: optional
-Maintainer: Thomas Proeger <thomasproeger@googlemail.com>
+Maintainer: Erik Tuerke <tuerke@cbs.mpg.de>
 Build-Depends: 
 Standards-Version: 3.8.1
 
