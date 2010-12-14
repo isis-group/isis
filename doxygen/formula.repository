@@ -1,0 +1,7 @@
+\form#0:$ \overrightarrow{this} \cdot \overrightarrow{src} = \sum_{i=0}^{SIZE-1} {this_i * src_i} $
+\form#1:$ \overrightarrow{this} \cdot \overrightarrow{this} = \sum_{i=0}^{SIZE-1} this_i^2 $
+\form#2:$ \sqrt{\sum_{i=0}^{SIZE-1} this_i^2} $
+\form#3:\[ \overrightarrow{this} = \overrightarrow{this} * {1 \over {\sqrt{\sum_{i=0}^{SIZE-1} this_i^2}}} \]
+\form#4:\[ \prod_{i=0}^{SIZE-1} this_i \]
+\form#5:\[ \sum_{i=0}^{SIZE-1} this_i \]
+\form#6:$ \prod_{i=0}^{DIMS-1} dimSize(i) $
