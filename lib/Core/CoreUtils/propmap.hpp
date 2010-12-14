@@ -304,7 +304,7 @@ public:
 /** @} */
 }
 
-namespace std ///predeclare streaming output -- we'll need it in treeNode
+namespace std //predeclare streaming output -- we'll need it in treeNode
 {
 /// Streaming output for PropertyMap::node
 template<typename charT, typename traits>

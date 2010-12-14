@@ -354,17 +354,20 @@ public:
 	size_t spliceDownTo( dimensions dim );
 };
 
+/**
+ * An Image which allways uses its own memory and a specific type.
+ * Thus, creating this image from another Image allways does a deep copy
+ */
 template<typename T> class MemImage: public Image
 {
 public:
 	MemImage( const Image &src ) {
 		operator=( src );
 	}
-	MemImage &operator=( const MemImage &ref ) { //use the copy for generic Images
-		return operator=( static_cast<const Image &>( ref ) );
-	}
+	/// makes a deep copy of the given image
 	MemImage &operator=( const Image &ref ) { // copy the image, and make sure its of the given type
 		Image::operator=( ref ); // ok we just copied the whole image
+
 		//we want deep copies of the chunks, and we want them to be of type T
 		struct : _internal::SortedChunkList::chunkPtrOperator {
 			std::pair<util::TypeReference, util::TypeReference> scale;
@@ -380,17 +383,24 @@ public:
 	}
 };
 
+/**
+ * An Image where all chunks are guaranteed to have a specific type.
+ * This not necessarily means, that all chunks in this image are a deep copy of their origin.
+ */
 template<typename T> class TypedImage: public Image
 {
 public:
+	/// cheap copy another Image and make sure all chunks have type T
 	TypedImage( const Image &src ): Image( src ) { // ok we just copied the whole image
 		//but we want it to be of type T
 		makeOfTypeID( TypePtr<T>::staticID );
 	}
+	/// cheap copy another TypedImage
 	TypedImage &operator=( const TypedImage &ref ) { //its already of the given type - so just copy it
 		Image::operator=( ref );
 		return *this;
 	}
+	/// cheap copy another Image and make sure all chunks have type T
 	TypedImage &operator=( const Image &ref ) { // copy the image, and make sure its of the given type
 		Image::operator=( ref );
 		makeOfTypeID( TypePtr<T>::staticID );
