@@ -44,11 +44,6 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 
 ############################################################
-# set up doxygen
-############################################################
-include(UseDoxygen)
-
-############################################################
 # Compiler flags on 64Bit cpus
 ############################################################
 IF("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
@@ -117,6 +112,11 @@ IF (GIT_REVISION)
 else(GIT_REVISION)
   SET(ISIS_CORE_REV_STRING ${${CMAKE_PROJECT_NAME}_VERSION_MAJOR}.${${CMAKE_PROJECT_NAME}_VERSION_MINOR}.${${CMAKE_PROJECT_NAME}_VERSION_PATCH})
 ENDIF(GIT_REVISION)
+
+############################################################
+# set up doxygen
+############################################################
+include(UseDoxygen)
 
 ###########################################################
 # CPack config
