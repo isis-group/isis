@@ -35,16 +35,20 @@ namespace _internal
 {
 class treeNode; //predeclare treeNode -- we'll need it in PropertyMap
 }
-/// A mapping tree to store properties (keys / values)
+/// A mapping tree to store properties (path/key : value)
 class PropertyMap : protected std::map<util::istring, _internal::treeNode>
 {
 public:
-	typedef key_type KeyType;
-	typedef std::map<KeyType, mapped_type, key_compare> Container;
+	/// type of the used keys
+	typedef key_type KeyType; 
+	/// a list to store keys only (without the corresponding values)
 	typedef std::set<KeyType, key_compare> KeyList;
+	/// a map, mapping keys to pairs of values
 	typedef std::map<KeyType, std::pair<TypeValue, TypeValue>, key_compare> DiffMap;
-	typedef std::map<KeyType, TypeValue> FlatMap;
+	/// a map, using complete key-paths as keys for the corresponding values
+	typedef std::map<KeyType, TypeValue> FlatMap; 
 private:
+	typedef std::map<KeyType, mapped_type, key_compare> Container;
 	typedef std::list<KeyType> propPath;
 	typedef propPath::const_iterator propPathIterator;
 
@@ -64,7 +68,6 @@ private:
 	/////////////////////////////////////////////////////////////////////////////////////////
 	// internal functors
 	/////////////////////////////////////////////////////////////////////////////////////////
-	///Walks the whole tree and inserts any key into out for which the given scalar predicate is true.
 	template<class Predicate> struct walkTree;
 
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -147,18 +150,21 @@ public:
 	 * \returns a reference to the TypeValue
 	 */
 	const TypeValue &propertyValue( const KeyType &key )const;
+	
 	/**
 	 * Access the property referenced by the path-key, create it if its not there.
 	 * \param key the "path" to the property
 	 * \returns a reference to the TypeValue
 	 */
 	TypeValue &propertyValue( const KeyType &key );
+	
 	/**
 	 * Access the branch referenced by the path-key, create it if its not there.
 	 * \param key the "path" to the branch
 	 * \returns a reference to the branching PropertyMap
 	 */
 	PropertyMap &branch( const KeyType &key );
+	
 	/**
 	 * Access the branch referenced by the path-key.
 	 * If the branch does not exist, an empty dummy will returned.
@@ -192,15 +198,19 @@ public:
 	* \returns false if there is any needed and empty property, true otherwhise.
 	*/
 	bool isValid()const;
+	
 	/// \returns true if the PropertyMap is empty, false otherwhise
 	bool isEmpty()const;
+	
 	/// get a flat list of the "paths" to all properties in the PropertyMap
 	const KeyList getKeys()const;
+	
 	/**
 	 * Get a list of missing properties.
 	 * \returns a list of all needed and empty properties.
 	 */
 	const KeyList getMissing()const;
+	
 	/**
 	 * Get a difference map of this and the given PropertyMap.
 	 * Creates a map out of the Name of differencing properties and their difference, which is a std::pair\<TypeValue,TypeValue\>.
@@ -214,7 +224,7 @@ public:
 	 * - If a Property is set in both and equal, it wont be added
 	 * - If a Property is empty in both, it wont be added
 	 * \param second the "other" PropertyMap to compare with
-	 * \return a map of property keys and value-pairs
+	 * \return a map of property keys and pairs of the corresponding different values
 	 */
 	DiffMap getDifference( const PropertyMap &second )const;
 
@@ -237,14 +247,14 @@ public:
 	bool transform( KeyType from, KeyType to, int dstID, bool delSource = true );
 
 	/**
-	* Transform an existing property into another (statically typed version).
-	* Converts the value of the given property into the requested type and stores it with the given new key.
-	* A compile-time check is done to test if the requested type is available.
-	* \param from the key of the property to be transformed
-	* \param to the key for the new property
-	* \param delSource if the original property shall be deleted after the tramsformation was done
-	* \returns true if the transformation was done
-	*/
+	 * Transform an existing property into another (statically typed version).
+	 * Converts the value of the given property into the requested type and stores it with the given new key.
+	 * A compile-time check is done to test if the requested type is available.
+	 * \param from the key of the property to be transformed
+	 * \param to the key for the new property
+	 * \param delSource if the original property shall be deleted after the tramsformation was done
+	 * \returns true if the transformation was done
+	 */
 	template<typename DST> bool transform( KeyType from, KeyType to, bool delSource = true ) {
 		check_type<DST>();
 		return transform( from, to, Type<DST>::staticID, delSource );
@@ -273,12 +283,14 @@ public:
 
 		return ret;
 	}
+	
 	/**
 	 * Request a property via the given key in the given type.
 	 * If the requested type is not equal to type the property is stored with, an automatic conversion is done.
 	 * If the property is not set yet T() is returned.
 	 */
 	template<typename T> T getPropertyAs( const KeyType &key )const;
+	
 	/**
 	 * Rename a given property/branch.
 	 * This is implemented as copy+delete and can also be used between branches.
@@ -359,7 +371,11 @@ public:
 };
 }
 
+////////////////////////////////////////////////////////////////////////////////////////
 // and now we can define walkTree (needs treeNode to be defined)
+////////////////////////////////////////////////////////////////////////////////////////
+
+/// Walks the whole tree and inserts any key into out for which the given scalar predicate is true.
 template<class Predicate> struct PropertyMap::walkTree {
 	KeyList &m_out;
 	const KeyType m_prefix;
