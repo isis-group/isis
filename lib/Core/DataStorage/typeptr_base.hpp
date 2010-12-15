@@ -20,7 +20,7 @@
 #ifndef TYPEPTRBASE_HPP
 #define TYPEPTRBASE_HPP
 
-#include "CoreUtils/type_base.hpp"
+#include "../CoreUtils/type_base.hpp"
 #include "typeptr_converter.hpp"
 
 namespace isis

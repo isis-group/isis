@@ -77,9 +77,6 @@ ENDIF(${CMAKE_PROJECT_NAME}_DEBUG_LOG)
 FIND_PACKAGE(Boost REQUIRED COMPONENTS filesystem regex system date_time)
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
 
-# local include directory
-INCLUDE_DIRECTORIES(.)
-
 ############################################################
 # set the plugin directory and the system dependend shared
 # library naming conventions
@@ -148,8 +145,8 @@ SET(ISIS_BUILD_DYNAMIC ON CACHE BOOL "enable build of the dynamic library" )
 
 # add new source files to this parameter list
 FILE(GLOB CORE_SRC_FILES "DataStorage/*.cpp" "CoreUtils/*.cpp")
-FILE(GLOB COREUTIL_HDR_FILES "CoreUtils/*.hpp")
-FILE(GLOB DATASTORAGE_HDR_FILES "DataStorage/*.hpp")
+FILE(GLOB COREUTILS_HDR_FILES "CoreUtils/*.hpp" "CoreUtils/*.h")
+FILE(GLOB DATASTORAGE_HDR_FILES "DataStorage/*.hpp" "DataStorage/*.h")
 
 # the core library shared and static build
 if(ISIS_BUILD_DYNAMIC)

@@ -17,7 +17,7 @@
 
 */
 
-#include "DataStorage/numeric_convert.hpp"
+#include "numeric_convert.hpp"
 
 #ifdef ISIS_USE_LIBOIL
 extern "C" {

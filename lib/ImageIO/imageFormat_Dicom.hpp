@@ -20,7 +20,7 @@
 #ifndef IMAGEFORMAT_DICOM_HPP
 #define IMAGEFORMAT_DICOM_HPP
 
-#include "DataStorage/io_interface.h"
+#include <DataStorage/io_interface.h>
 #include <dcmtk/config/cfunix.h> //@todo add switch for windows if needed
 #include <dcmtk/dcmdata/dcfilefo.h>
 #include <boost/date_time/posix_time/posix_time_types.hpp>

@@ -22,7 +22,7 @@
 #include <boost/filesystem.hpp>
 
 #include "io_interface.h"
-#include "CoreUtils/progressfeedback.hpp"
+#include "../CoreUtils/progressfeedback.hpp"
 
 //????
 #include "chunk.hpp"

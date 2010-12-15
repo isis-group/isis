@@ -10,8 +10,8 @@
 //
 //
 
-#include "CoreUtils/message.hpp"
-#include "CoreUtils/common.hpp"
+#include "message.hpp"
+#include "common.hpp"
 #include <sys/types.h>
 
 #include <boost/filesystem/path.hpp>

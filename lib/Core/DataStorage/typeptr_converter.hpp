@@ -23,7 +23,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <map>
-#include "CoreUtils/type_base.hpp"
+#include "../CoreUtils/type_base.hpp"
 
 namespace isis
 {
