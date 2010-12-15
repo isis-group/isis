@@ -24,9 +24,9 @@
 #include <stdio.h>
 #include <fstream>
 #include <boost/filesystem/operations.hpp>
-#include "CoreUtils/tmpfile.h"
-#include "CoreUtils/message.hpp"
-#include "CoreUtils/common.hpp"
+#include "tmpfile.h"
+#include "message.hpp"
+#include "common.hpp"
 
 namespace isis
 {

@@ -20,12 +20,14 @@
 #ifndef IMAGEFORMAT_DICOM_HPP
 #define IMAGEFORMAT_DICOM_HPP
 
-#include "DataStorage/io_interface.h"
+#include <DataStorage/io_interface.h>
+
 #ifdef _WIN32 // workaround for broken dcmtk/config/osconfig.h
 #include <dcmtk/config/cfwin32.h>
 #else
 #include <dcmtk/config/cfunix.h>
 #endif //_WIN32
+
 #include <dcmtk/dcmdata/dcfilefo.h>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 

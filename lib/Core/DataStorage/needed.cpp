@@ -2,8 +2,8 @@
 #pragma warning(disable:4996)
 #endif
 
-#include "DataStorage/chunk.hpp"
-#include "DataStorage/image.hpp"
+#include "chunk.hpp"
+#include "image.hpp"
 
 /*
  * Add needed properties for Property-objects.

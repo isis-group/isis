@@ -16,11 +16,11 @@
 #pragma warning(disable:4996 4244)
 #endif
 
-#include "DataStorage/image.hpp"
-#include "CoreUtils/vector.hpp"
+#include "image.hpp"
+#include "../CoreUtils/vector.hpp"
 #include <boost/foreach.hpp>
-#include "CoreUtils/property.hpp"
-#include<boost/token_iterator.hpp>
+#include "../CoreUtils/property.hpp"
+#include <boost/token_iterator.hpp>
 
 #define _USE_MATH_DEFINES 1
 #include <math.h>

@@ -10,7 +10,7 @@
 //
 //
 
-#include "DataStorage/common.hpp"
+#include "common.hpp"
 
 namespace isis
 {

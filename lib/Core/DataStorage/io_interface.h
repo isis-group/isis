@@ -18,7 +18,7 @@
 #include <boost/system/system_error.hpp>
 #include "image.hpp"
 #include "common.hpp"
-#include "CoreUtils/istring.hpp"
+#include "../CoreUtils/istring.hpp"
 
 namespace isis
 {

@@ -21,7 +21,7 @@
 #pragma warning(disable:4996)
 #endif
 
-#include "DataStorage/sortedchunklist.hpp"
+#include "sortedchunklist.hpp"
 
 namespace isis
 {

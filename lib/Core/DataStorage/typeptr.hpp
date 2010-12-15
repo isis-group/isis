@@ -22,7 +22,7 @@
 
 #include "typeptr_base.hpp"
 #include "typeptr_converter.hpp"
-#include "CoreUtils/type.hpp"
+#include "../CoreUtils/type.hpp"
 #include "common.hpp"
 
 namespace isis

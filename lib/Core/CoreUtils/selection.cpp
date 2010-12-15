@@ -7,7 +7,7 @@
  *
  */
 
-#include "CoreUtils/selection.hpp"
+#include "selection.hpp"
 #include <boost/foreach.hpp>
 
 namespace isis

@@ -17,7 +17,7 @@
 
 */
 
-#include "CoreUtils/progparameter.hpp"
+#include "progparameter.hpp"
 #include <boost/foreach.hpp>
 
 namespace isis

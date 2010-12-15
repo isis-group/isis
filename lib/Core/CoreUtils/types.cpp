@@ -16,9 +16,9 @@
 #pragma warning(disable:4800 4996)
 #endif
 
-#include "CoreUtils/type.hpp"
-#include "DataStorage/typeptr.hpp"
-#include "CoreUtils/types.hpp"
+#include "type.hpp"
+#include "../DataStorage/typeptr.hpp"
+#include "types.hpp"
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/mpl/for_each.hpp>
 #include <boost/foreach.hpp>

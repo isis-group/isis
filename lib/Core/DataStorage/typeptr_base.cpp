@@ -2,9 +2,9 @@
 #define NOMINMAX 1
 #endif
 
-#include "DataStorage/typeptr_base.hpp"
-#include "DataStorage/typeptr_converter.hpp"
-#include "DataStorage/common.hpp"
+#include "typeptr_base.hpp"
+#include "typeptr_converter.hpp"
+#include "common.hpp"
 
 namespace isis
 {

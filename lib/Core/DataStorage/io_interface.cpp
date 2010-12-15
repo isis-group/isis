@@ -7,9 +7,9 @@
 #include <iomanip>
 #include <iostream>
 
-#include "CoreUtils/log.hpp"
-#include "DataStorage/common.hpp"
-#include "DataStorage/io_interface.h"
+#include "../CoreUtils/log.hpp"
+#include "common.hpp"
+#include "io_interface.h"
 
 namespace isis
 {

@@ -21,8 +21,8 @@
 #pragma warning(disable:4996)
 #endif
 
-#include "DataStorage/io_application.hpp"
-#include "DataStorage/io_factory.hpp"
+#include "io_application.hpp"
+#include "io_factory.hpp"
 #include <boost/mpl/for_each.hpp>
 
 

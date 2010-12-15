@@ -17,8 +17,8 @@
 
 */
 
-#include "CoreUtils/progressfeedback.hpp"
-#include "CoreUtils/common.hpp"
+#include "progressfeedback.hpp"
+#include "common.hpp"
 
 namespace isis
 {

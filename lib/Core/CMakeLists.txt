@@ -44,11 +44,6 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 
 ############################################################
-# set up doxygen
-############################################################
-include(UseDoxygen)
-
-############################################################
 # Compiler flags on 64Bit cpus
 ############################################################
 IF("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
@@ -81,9 +76,6 @@ ENDIF(${CMAKE_PROJECT_NAME}_DEBUG_LOG)
 # Search BOOST packages
 FIND_PACKAGE(Boost REQUIRED COMPONENTS filesystem regex system date_time)
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
-
-# local include directory
-INCLUDE_DIRECTORIES(.)
 
 ############################################################
 # set the plugin directory and the system dependend shared
@@ -118,6 +110,11 @@ else(GIT_REVISION)
   SET(ISIS_CORE_REV_STRING ${${CMAKE_PROJECT_NAME}_VERSION_MAJOR}.${${CMAKE_PROJECT_NAME}_VERSION_MINOR}.${${CMAKE_PROJECT_NAME}_VERSION_PATCH})
 ENDIF(GIT_REVISION)
 
+############################################################
+# set up doxygen
+############################################################
+include(UseDoxygen)
+
 ###########################################################
 # CPack config
 ###########################################################
@@ -148,8 +145,8 @@ SET(ISIS_BUILD_DYNAMIC ON CACHE BOOL "enable build of the dynamic library" )
 
 # add new source files to this parameter list
 FILE(GLOB CORE_SRC_FILES "DataStorage/*.cpp" "CoreUtils/*.cpp")
-FILE(GLOB COREUTIL_HDR_FILES "CoreUtils/*.hpp")
-FILE(GLOB DATASTORAGE_HDR_FILES "DataStorage/*.hpp")
+FILE(GLOB COREUTILS_HDR_FILES "CoreUtils/*.hpp" "CoreUtils/*.h")
+FILE(GLOB DATASTORAGE_HDR_FILES "DataStorage/*.hpp" "DataStorage/*.h")
 
 # the core library shared and static build
 if(ISIS_BUILD_DYNAMIC)
