@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE ( chunk_scale_test )//Access Chunk elements via dimensional
 		ch.voxel<int16_t>( x, x, 1 ) = -50;
 	}
 
-	std::pair<util::TypeReference,util::TypeReference> minmax=ch.getMinMax();
+	std::pair<util::TypeReference, util::TypeReference> minmax = ch.getMinMax();
 
 	data::scaling_pair scale = ch.getScalingTo( data::TypePtr<uint8_t>::staticID, *minmax.first, *minmax.second );
 	const util::_internal::TypeBase &scale_s = *( scale.first );

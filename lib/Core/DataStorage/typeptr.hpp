@@ -262,11 +262,6 @@ public:
 
 		const std::pair<util::Type<TYPE>, util::Type<TYPE> > result = _internal::getMinMaxImpl<TYPE, boost::is_arithmetic<TYPE>::value>()( *this );
 
-		/*      if ( min.empty() || min->gt( result.first ) )
-		            min = result.first;
-
-		        if ( max.empty() || max->lt( result.second ) )
-		            max = result.second;*/
 		return std::make_pair( util::TypeReference( result.first ), util::TypeReference( result.second ) );
 	}
 
