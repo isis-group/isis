@@ -221,7 +221,7 @@ public:
 		if ( "hdr" == extension( boostFilename ) ) {
 			ni.nifti_type = 0; // that's ANALYZE ID
 			imgname  =  change_extension( boostFilename, ".img" );
-			ni.iname = const_cast<char *>( imgname.string().c_str() );
+			ni.iname = const_cast<char *>( imgname.file_string().c_str() );
 		} else {
 			ni.nifti_type = 1; // that's NIFTI ID
 			ni.iname = const_cast<char *>( filename.c_str() );

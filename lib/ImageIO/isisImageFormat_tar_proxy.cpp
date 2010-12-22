@@ -102,14 +102,14 @@ public:
 
 			if(tar_header.typeflag == AREGTYPE || tar_header.typeflag == REGTYPE){
 				
-				data::IOFactory::FileFormatList formats = data::IOFactory::get().getFormatInterface( org_file.string() ); // and get the reading pluging for that
+				data::IOFactory::FileFormatList formats = data::IOFactory::get().getFormatInterface( org_file.file_string() ); // and get the reading pluging for that
 
 				if(formats.empty()){
 					LOG(Runtime,warning) << "Skipping " << org_file << " from " << filename << " because no plugin was found to read it"; // skip if we found none
 				} else {
 					LOG(Debug,info) << "Got " << org_file << " from " << filename << " there are " << formats.size() << " plugins which should be able to read it";
 
-					const std::pair<std::string, std::string> base = formats.front()->makeBasename( org_file.string() );//ask any of the plugins for the suffix
+					const std::pair<std::string, std::string> base = formats.front()->makeBasename( org_file.file_string() );//ask any of the plugins for the suffix
 					util::TmpFile tmpfile( "", base.second );//create a temporary file with this suffix
 					int mfile=open(tmpfile.file_string().c_str(),O_CREAT|O_RDWR);
 					if(mfile==-1){

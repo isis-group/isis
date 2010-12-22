@@ -160,7 +160,7 @@ public:
 
 		util::TmpFile tmpfile( "", realBase.second );
 
-		file_uncompress( filename, tmpfile.string() );
+		file_uncompress( filename, tmpfile.file_string() );
 
 		data::ChunkList buff;
 
