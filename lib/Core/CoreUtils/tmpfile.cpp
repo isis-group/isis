@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <fstream>
 #include <boost/filesystem/operations.hpp>
-#include "tmpfile.h"
+#include "tmpfile.hpp"
 #include "message.hpp"
 #include "common.hpp"
 
