@@ -4,7 +4,7 @@
 
 #include "DataStorage/io_interface.h"
 #include <DataStorage/io_factory.hpp>
-#include <CoreUtils/tmpfile.h>
+#include <CoreUtils/tmpfile.hpp>
 #include <stdio.h>
 #include <fstream>
 #include <zlib.h>

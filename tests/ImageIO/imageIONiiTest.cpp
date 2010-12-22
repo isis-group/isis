@@ -5,10 +5,10 @@
  *      Author: Thomas Proeger
  */
 
-#include "DataStorage/image.hpp"
-#include "DataStorage/io_factory.hpp"
-#include "CoreUtils/log.hpp"
-#include "CoreUtils/tmpfile.h"
+#include <DataStorage/image.hpp>
+#include <DataStorage/io_factory.hpp>
+#include <CoreUtils/log.hpp>
+#include <CoreUtils/tmpfile.hpp>
 
 using namespace isis;
 

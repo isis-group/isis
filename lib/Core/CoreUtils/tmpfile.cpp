@@ -46,8 +46,9 @@ TmpFile::~TmpFile()
 {
 	if ( boost::filesystem::exists( *this ) ) {
 		boost::filesystem::remove( *this );
+		LOG(Debug,verbose_info) << "Removing temporary " << file_string();
 	} else {
-		LOG( Debug, warning ) << "Temporary file " << string() << " does not exist, won't delete it";
+		LOG( Debug, warning ) << "Temporary file " << file_string() << " does not exist, won't delete it";
 	}
 }
 }

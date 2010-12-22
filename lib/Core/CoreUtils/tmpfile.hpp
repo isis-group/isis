@@ -31,8 +31,12 @@ namespace util
  * If its not there anymore, a warning will be send.
  * This inherits from boost::filesystem::path and thus can be used as such.
  */
-class TmpFile: public boost::filesystem::path
+class TmpFile: public boost::filesystem::path, boost::noncopyable
 {
+private:
+	// dont do this
+	TmpFile(TmpFile &);
+	TmpFile& operator=(TmpFile &);
 public:
 	/** Create a temporary file.
 	 * This generates a temporary filename using the given prefix and suffix.

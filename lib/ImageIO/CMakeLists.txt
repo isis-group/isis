@@ -43,6 +43,7 @@ OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL "Enable Null-IO plugin" ON)
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM "Enable Dicom-IO plugin" OFF)
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA "Enable Vista-IO plugin" OFF)
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ "Enable proxy plugin for compressed files" ON)
+OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_TAR "Enable proxy plugin for tar datasets" ON)
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_RAW "Enable plugin for raw data output" ON)
 
 
@@ -158,6 +159,16 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ)
 
 	SET(TARGETS ${TARGETS} isisImageFormat_gz_proxy)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ)
+
+# tar proxy
+if(${CMAKE_PROJECT_NAME}_IOPLUGIN_TAR)
+	FIND_PACKAGE(Boost REQUIRED COMPONENTS iostreams)
+
+	add_library(isisImageFormat_tar_proxy SHARED isisImageFormat_tar_proxy.cpp)
+	target_link_libraries(isisImageFormat_tar_proxy ${ISIS_LIB} ${ISIS_LIB_DEPENDS} ${Boost_IOSTREAMS_LIBRARY})
+
+	SET(TARGETS ${TARGETS} isisImageFormat_tar_proxy)
+endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_TAR)
 
 # Dicom
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM)
