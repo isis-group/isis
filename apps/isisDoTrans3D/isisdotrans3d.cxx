@@ -49,7 +49,7 @@
 
 #include "extITK/isisTimeStepExtractionFilter.hpp"
 #include "isisTransformMerger3D.hpp"
-#include "extITK/isisIterationObserver.hpp"
+// #include "extITK/isisIterationObserver.hpp"
 
 //via command parser include
 #include <viaio/option.h>
@@ -98,13 +98,12 @@ static VOptionDescRec options[] = {
 
 };
 
-#include <boost/concept_check.hpp>
 int main(
 
 	int argc, char *argv[] )
 {
 	// show revision information string constant
-	std::cout << "Core Version: " << isis::util::Application::getCoreVersion() << std::endl;
+	std::cout << "isisdotrans3d, core version: " << isis::util::Application::getCoreVersion() << std::endl;
 	isis::util::enable_log<isis::util::DefaultMsgPrint>( isis::error );
 	isis::data::enable_log<isis::util::DefaultMsgPrint>( isis::error );
 	isis::image_io::enable_log<isis::util::DefaultMsgPrint>( isis::error );
@@ -157,7 +156,7 @@ int main(
 	ResampleImageFilterType::Pointer resampler = ResampleImageFilterType::New();
 	WarpImageFilterType::Pointer warper = WarpImageFilterType::New();
 	CastImageFilterType::Pointer caster = CastImageFilterType::New();
-	isis::extitk::ProcessUpdate::Pointer progressObserver = isis::extitk::ProcessUpdate::New();
+// 	isis::extitk::ProcessUpdate::Pointer progressObserver = isis::extitk::ProcessUpdate::New();
 	TimeStepExtractionFilterType::Pointer timeStepExtractionFilter = TimeStepExtractionFilterType::New();
 	isis::extitk::TransformMerger3D *transformMerger = new isis::extitk::TransformMerger3D;
 	DeformationFieldReaderType::Pointer deformationFieldReader = DeformationFieldReaderType::New();
@@ -193,7 +192,6 @@ int main(
 
 	resampler->SetNumberOfThreads( number_threads );
 	warper->SetNumberOfThreads( number_threads );
-	progress_timer time;
 	isis::data::ImageList tmpList;
 
 	//if template file is specified by the user
@@ -368,7 +366,7 @@ int main(
 		writer->SetFileName( out_filename );
 
 		if ( !vtrans_filename && trans_filename.number == 1 ) {
-			resampler->AddObserver( itk::ProgressEvent(), progressObserver );
+// 			resampler->AddObserver( itk::ProgressEvent(), progressObserver );
 			resampler->SetInput( inputImage );
 			resampler->SetOutputSpacing( outputSpacing );
 			resampler->SetSize( outputSize );
@@ -383,7 +381,7 @@ int main(
 		}
 
 		if ( vtrans_filename or trans_filename.number > 1 ) {
-			warper->AddObserver( itk::ProgressEvent(), progressObserver );
+// 			warper->AddObserver( itk::ProgressEvent(), progressObserver );
 			warper->SetOutputDirection( outputDirection );
 			warper->SetOutputOrigin( outputOrigin );
 			warper->SetOutputSize( outputSize );
@@ -405,8 +403,8 @@ int main(
 		fmriWriter->SetFileName( out_filename );
 
 		if ( template_filename ) {
-			fmriOutputOrigin = templateImage->GetOrigin();
-			fmriOutputDirection = templateImage->GetDirection();
+			fmriOutputOrigin = outputOrigin;
+			fmriOutputDirection = outputDirection;
 		}
 
 		for ( unsigned int i = 0; i < 4; i++ ) {
@@ -463,7 +461,7 @@ int main(
 		layout[3] = 0;
 		const unsigned int numberOfTimeSteps = fmriImage->GetLargestPossibleRegion().GetSize()[3];
 		OutputImageType::Pointer tileImage;
-		std::cout << std::endl;
+// 		std::cout << std::endl;
 		//      isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "" );
 		inputImage = movingAdapter->makeItkImageObject<InputImageType>( inList.front() );
 		FMRIOutputType::DirectionType direction4D;
@@ -498,6 +496,8 @@ int main(
 
 			tileImage->Update();
 			tileImage->DisconnectPipeline();
+			tileImage->SetDirection( outputDirection );
+			tileImage->SetOrigin( outputOrigin );
 			tileImageFilter->PushBackInput( tileImage );
 		}
 
