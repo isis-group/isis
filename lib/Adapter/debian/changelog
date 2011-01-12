@@ -1,4 +1,4 @@
-libisisadapter (0.2.0-0) unstable; urgency=low
+libisisadapter (0.2.0-3) unstable; urgency=low
 
     * Initial Debian packaging attempt. This is the first version of
       a ISIS Adapter debian packages.
