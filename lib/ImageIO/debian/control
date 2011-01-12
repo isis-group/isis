@@ -66,3 +66,27 @@ Description: The ISIS package provides a general I/O framework for neuroimaging
  .
  This Package provides the ISIS I/O plugins for the NULL image support. The NULL 
  image is an artificial image for testing and debugging purpose.
+
+Package: isisio0-tar-proxy
+Section: science
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0
+Description: The ISIS package provides a general I/O framework for neuroimaging
+ data.  Being started with fMRI data, it can handle several established data
+ formats, like Nifti, Analyze, DICOM and vista. A first application based on this
+ project is a data converter that allows an easy and unified handling of fMRI
+ data from various MRI scanners.
+ .
+ This Package provides the ISIS I/O plugins for the tar support. 
+
+Package: isisio0-raw
+Section: science
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0
+Description: The ISIS package provides a general I/O framework for neuroimaging
+ data.  Being started with fMRI data, it can handle several established data
+ formats, like Nifti, Analyze, DICOM and vista. A first application based on this
+ project is a data converter that allows an easy and unified handling of fMRI
+ data from various MRI scanners.
+ .
+ This Package provides the ISIS I/O plugins for the raw data support. 
