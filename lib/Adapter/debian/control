@@ -1,0 +1,45 @@
+Source: libisisadapter
+Section: science
+Priority: optional
+Maintainer: Thomas Proeger <thomasproeger@googlemail.com>
+Build-Depends: 
+Standards-Version: 3.8.1
+
+Package: libisisadapter0-itk
+Section: science
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0
+Description: The ISIS package provides a general I/O framework for neuroimaging
+ data.  Being started with fMRI data, it can handle several established data
+ formats, like Nifti, Analyze, DICOM and vista. A first application based on this
+ project is a data converter that allows an easy and unified handling of fMRI
+ data from various MRI scanners. 
+ .
+ This Package provides the development files for the ISIS extension to the 
+ Insight Segmentation and Registration Toolkit (ITK) from Kitware. 
+
+Package: libisisadapter0-vtk
+Section: science
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0
+Description: The ISIS package provides a general I/O framework for neuroimaging
+ data.  Being started with fMRI data, it can handle several established data
+ formats, like Nifti, Analyze, DICOM and vista. A first application based on this
+ project is a data converter that allows an easy and unified handling of fMRI
+ data from various MRI scanners. 
+ .
+ This Package provides the development files for the ISIS extension to the
+ Visualization Toolkit (VTK), provided by Kitware.
+
+Package: libisisadapter0-qt4
+Section: science
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0
+Description: The ISIS package provides a general I/O framework for neuroimaging
+ data.  Being started with fMRI data, it can handle several established data
+ formats, like Nifti, Analyze, DICOM and vista. A first application based on this
+ project is a data converter that allows an easy and unified handling of fMRI
+ data from various MRI scanners. 
+ .
+ This Package provides the development files for the ISIS extension to the
+ Qt4 cross-platform application and UI framework from Trolltech.
