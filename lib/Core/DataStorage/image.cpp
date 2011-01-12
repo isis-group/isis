@@ -500,7 +500,9 @@ ImageList::ImageList( ChunkList src )
 			if ( buff->reIndex() ) {
 				if ( buff->valid() ) {
 					push_back( buff );
-					LOG( Runtime, info ) << "Image " << size() << " with size " << buff->sizeToString() <<  " done.";
+					util::TypeReference min, max;
+					buff->getMinMax( min, max );
+					LOG( Runtime, info ) << "Image " << size() << " with size " << buff->sizeToString() <<  " and value range " << min << " to " << max << " done.";
 				} else {
 					LOG( Runtime, error )
 							<< "Cannot insert image. Missing properties: " << buff->getMissing();

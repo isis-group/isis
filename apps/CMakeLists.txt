@@ -11,6 +11,7 @@ SET(ISIS_DIR /usr/share/isis/cmake CACHE PATH
     "The directory where the isis cmake configuration skript script is located.")
 FIND_PACKAGE(ISIS REQUIRED)
 INCLUDE_DIRECTORIES(${ISIS_INCLUDE_DIRS})
+message(STATUS "include: ${ISIS_INCLUDE_DIRS}")
 
 # we use the log definitions of the core
 IF(ISIS_RUNTIME_LOG)

@@ -86,7 +86,7 @@ static VString pointset_filename = NULL;
 static VString transform_filename_in = NULL;
 static VShort number_of_bins = 50;
 static VArgVector number_of_iterations;
-static VFloat pixel_density = 0.01;
+static VFloat pixel_density = 0;
 static VArgVector grid_size;
 static VArgVector transformType;
 static VArgVector interpolatorType;
@@ -97,12 +97,15 @@ static VShort number_threads = 1;
 static VShort initial_seed = 1;
 static VBoolean initialize_center = false;
 static VBoolean initialize_mass = false;
+static VBoolean prealign = false;
 static VString mask_filename = NULL;
 static VFloat smooth = 0;
 static VBoolean use_inverse = false;
 static VFloat coarse_factor = 1;
-static VFloat bspline_bound = 100.0;
+static VFloat bspline_bound = 15.0;
 static VBoolean verbose = false;
+static VFloat rotatioscale = -1;
+static VFloat translationscale = -1;
 static VFloat create_mask = 0;
 
 
@@ -114,8 +117,8 @@ options[] = {
 
 	//non-required inputs
 	{"mask", VStringRepn, 1, &mask_filename, VOptionalOpt, 0, "the mask filename"},
-	{"pointset", VStringRepn, 1, &pointset_filename, &pointset_found, 0, "the pointset filename"},
-	{"itktrans", VStringRepn, 1, &out_filename, VOptionalOpt, 0, "the itk output transform filename"},
+// 	{"pointset", VStringRepn, 1, &pointset_filename, &pointset_found, 0, "the pointset filename"},
+	{"txttrans", VStringRepn, 1, &out_filename, VOptionalOpt, 0, "the transform filename as an ascii file"},
 	{"trans", VStringRepn, 1, &vout_filename, VOptionalOpt, 0, "the output vector image filename. Has to be of type nifti."},
 	{
 		"tin", VStringRepn, 1, &transform_filename_in, VOptionalOpt, 0,
@@ -130,14 +133,15 @@ options[] = {
 		"iter", VShortRepn, 0, ( VPointer ) &number_of_iterations, VOptionalOpt, 0,
 		"Maximum number of iteration used by the optimizer"
 	},
-	{
-		"create_mask" , VFloatRepn, 1, &create_mask, VOptionalOpt, 0,
-		"Create a mask with the otsu method"
-	},
-	{
-		"seed", VShortRepn, 1, &initial_seed, VOptionalOpt, 0,
-		"The initialize seed for the MattesMutualInformationMetric"
-	},
+	
+// 	{
+// 		"create_mask" , VFloatRepn, 1, &create_mask, VOptionalOpt, 0,
+// 		"Create a mask with the otsu method"
+// 	},
+// 	{
+// 		"seed", VShortRepn, 1, &initial_seed, VOptionalOpt, 0,
+// 		"The initialize seed for the MattesMutualInformationMetric"
+// 	},
 
 	{
 		"pd",
@@ -148,23 +152,44 @@ options[] = {
 		0,
 		"The density of pixels the metric uses. 1 denotes the metric uses all pixels. Has to be > 0. Only operative with a MattesMutualInformation metric"
 	},
-
-	{"j", VShortRepn, 1, &number_threads, VOptionalOpt, 0, "Number of threads used for the registration"},
-	{"cf", VFloatRepn, 1, &coarse_factor, VOptionalOpt, 0, "Coarse factor. Multiple of the max and min step length of the optimizer. Standard is 1"},
+	{
+		"scale_rotation",
+		VFloatRepn,
+		1,
+		&rotatioscale,
+		VOptionalOpt,
+		0,
+		"debug"
+	},
+	{
+		"scale_translation",
+		VFloatRepn,
+		1,
+		&translationscale,
+		VOptionalOpt,
+		0,
+		"debug"
+	},
+// 	{"j", VShortRepn, 1, &number_threads, VOptionalOpt, 0, "Number of threads used for the registration"},
+// 	{"cf", VFloatRepn, 1, &coarse_factor, VOptionalOpt, 0, "Coarse factor. Multiple of the max and min step length of the optimizer. Standard is 1"},
 	{"bound", VFloatRepn, 1, &bspline_bound, VOptionalOpt, 0, "max/min value of the bepline deformation."},
 	{
 		"gridSize", VShortRepn, 0, ( VPointer ) &grid_size, VOptionalOpt, 0,
 		"Grid size used for the BSplineDeformable transform."
 	},
 
+// 	{
+// 		"prealign_center", VBooleanRepn, 1, &initialize_center, VOptionalOpt, 0,
+// 		"Using an initializer to align the image centers"
+// 	},
 	{
-		"prealign_center", VBooleanRepn, 1, &initialize_center, VOptionalOpt, 0,
-		"Using an initializer to align the image centers"
+		"prealign", VBooleanRepn, 1, &prealign, VOptionalOpt, 0,
+		"Prealigning the images using a searchng algorithm"
 	},
-	{
-		"prealign_mass", VBooleanRepn, 1, &initialize_mass, VOptionalOpt, 0,
-		"Using an initializer to align the center of mass"
-	},
+// 	{
+// 		"prealign_mass", VBooleanRepn, 1, &initialize_mass, VOptionalOpt, 0,
+// 		"Using an initializer to align the center of mass"
+// 	},
 	{"verbose", VBooleanRepn, 1, &verbose, VOptionalOpt, 0, "printing the optimizer values of each iteration"},
 	{"smooth", VFloatRepn, 1, &smooth, VOptionalOpt, 0, "Applying a smoothing filter to the fixed and moving image before the registration process"},
 	{"get_inverse", VBooleanRepn, 1, &use_inverse, VOptionalOpt, 0, "Getting the inverse transform"},
@@ -187,7 +212,7 @@ int main(
 	int argc, char *argv[] )
 {
 	// show revision information string constant
-	std::cout << "Core Version: " << isis::util::Application::getCoreVersion() << std::endl;
+	std::cout << "isisreg3d, core version: " << isis::util::Application::getCoreVersion() << std::endl;
 	isis::util::enable_log<isis::util::DefaultMsgPrint>( isis::error );
 	isis::data::enable_log<isis::util::DefaultMsgPrint>( isis::error );
 	isis::image_io::enable_log<isis::util::DefaultMsgPrint>( isis::error );
@@ -267,6 +292,8 @@ int main(
 	FixedThresholdFilter::Pointer fixedThresholdFilter = FixedThresholdFilter::New();
 	MovingThresholdFilter::Pointer movingThresholdFilter = MovingThresholdFilter::New();
 	isis::data::ImageList refList = isis::data::IOFactory::load( ref_filename, "", "" );
+	//if no pixel density is specified it will be calculated to achive a amount of 15000 voxel considered for registration
+	float pixelDens = float(15000) / ( refList.front()->sizeToVector()[0] * refList.front()->sizeToVector()[1] * refList.front()->sizeToVector()[2] ) ;
 	isis::data::ImageList inList = isis::data::IOFactory::load( in_filename, "", "" );
 	LOG_IF( refList.empty(), isis::data::Runtime, isis::error ) << "Reference image is empty!";
 	LOG_IF( inList.empty(), isis::data::Runtime, isis::error ) << "Input image is empty!";
@@ -274,18 +301,7 @@ int main(
 	MovingImageType::Pointer movingImage = movingAdapter->makeItkImageObject<MovingImageType>( inList.front() );
 
 	if ( !smooth ) {
-		fixedRescaleFilter->SetInput( fixedImage );
-		movingRescaleFilter->SetInput( movingImage );
-		movingRescaleFilter->SetOutputMinimum( -itk::NumericTraits<uint16_t>::max() * 9 );
-		movingRescaleFilter->SetOutputMaximum( itk::NumericTraits<uint16_t>::max() * 9 );
-		fixedRescaleFilter->SetOutputMinimum( -itk::NumericTraits<uint16_t>::max() * 9 );
-		fixedRescaleFilter->SetOutputMaximum( itk::NumericTraits<uint16_t>::max() * 9 );
-		movingRescaleFilter->Update();
-		fixedRescaleFilter->Update();
-		fixedImage->DisconnectPipeline();
-		movingImage->DisconnectPipeline();
-		fixedImage = fixedRescaleFilter->GetOutput();
-		movingImage = movingRescaleFilter->GetOutput();
+		
 		//      isis::registration::_internal::filterFrequencyDomain<FixedImageType>( fixedImage );
 		//      isis::registration::_internal::filterFrequencyDomain<MovingImageType>( movingImage );
 		//      writer->SetFileName("test.nii");
@@ -486,8 +502,7 @@ int main(
 
 		//check pixel density
 		if ( pixel_density <= 0 ) {
-			std::cerr << "wrong pixel density...set to 0.01" << std::endl;
-			pixel_density = 0.01;
+			pixel_density = pixelDens;
 		}
 
 		if ( pixel_density >= 1 ) {
@@ -622,8 +637,12 @@ int main(
 			ti = transformList->begin();
 			registrationFactory->SetInitialTransform( ( *ti ).GetPointer() );
 		}
-
+		if ( prealign ) {
+			registrationFactory->UserOptions.PREALIGN = true;
+			registrationFactory->UserOptions.PREALIGNPRECISION = 7;
+		}
 		if ( counter != 0 ) {
+			registrationFactory->UserOptions.PREALIGN = false;
 			initialize_mass = false;
 			initialize_center = false;
 			registrationFactory->UserOptions.INITIALIZECENTEROFF = true;
@@ -673,6 +692,8 @@ int main(
 		registrationFactory->UserOptions.NumberOfBins = number_of_bins;
 		registrationFactory->UserOptions.PixelDensity = pixel_density;
 		registrationFactory->UserOptions.BSplineGridSize = gridSize;
+ 		registrationFactory->UserOptions.ROTATIONSCALE = rotatioscale;
+		registrationFactory->UserOptions.TRANSLATIONSCALE = translationscale;
 
 		if ( verbose ) {
 			registrationFactory->UserOptions.SHOWITERATIONATSTEP = 1;
@@ -716,9 +737,10 @@ int main(
 		transformWriter->SetFileName( out_filename );
 		transformWriter->Update();
 	}
+	
 
 	if ( vout_filename ) {
-		std::cout << std::endl << "creating vector deformation field..." << std::endl;
+		std::cout << "creating vector deformation field..." << std::endl;
 		vectorWriter->SetInput( registrationFactory->GetTransformVectorField() );
 		vectorWriter->SetFileName( vout_filename );
 		vectorWriter->Update();

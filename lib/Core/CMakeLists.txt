@@ -190,7 +190,6 @@ SET ( SRC_FILES
   DataStorage/io_application.cpp 
   DataStorage/needed.cpp 
   DataStorage/chunk.cpp 
-  DataStorage/ndimensional.cpp 
   DataStorage/image.cpp 
   DataStorage/io_factory.cpp 
   DataStorage/typeptr_converter.cpp 

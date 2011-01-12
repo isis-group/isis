@@ -167,13 +167,13 @@ BOOST_AUTO_TEST_CASE( typePtr_conv_scaling_test )
 	data::TypePtr<float> floatArray( ( float * )malloc( sizeof( float ) * 12 ), 12 );
 	//with automatic upscaling into integer
 	floatArray.copyFromMem( init, 12 );
-	data::scaling_pair scale=floatArray.getScalingTo(data::TypePtr<float>::staticID);
-	BOOST_CHECK_EQUAL(scale.first->as<float>(), 1);
-	BOOST_CHECK_EQUAL(scale.second->as<float>(), 0);
+	data::scaling_pair scale = floatArray.getScalingTo( data::TypePtr<float>::staticID );
+	BOOST_CHECK_EQUAL( scale.first->as<float>(), 1 );
+	BOOST_CHECK_EQUAL( scale.second->as<float>(), 0 );
 
-	scale=floatArray.getScalingTo(data::TypePtr<int32_t>::staticID);
-	BOOST_CHECK_EQUAL(scale.first->as<double>(),std::numeric_limits<int32_t>::max() / 2.);
-	BOOST_CHECK_EQUAL(scale.second->as<double>(),0);
+	scale = floatArray.getScalingTo( data::TypePtr<int32_t>::staticID );
+	BOOST_CHECK_EQUAL( scale.first->as<double>(), std::numeric_limits<int32_t>::max() / 2. );
+	BOOST_CHECK_EQUAL( scale.second->as<double>(), 0 );
 }
 
 BOOST_AUTO_TEST_CASE( typePtr_conversion_test )

@@ -29,7 +29,7 @@ namespace isis
 namespace viewer
 {
 
-ViewerInteractor::ViewerInteractor( ViewControl *viewer, vtkRenderer *renderer )
+ViewerInteractor::ViewerInteractor( ViewControl *viewer, vtkSmartPointer<vtkRenderer> renderer )
 	: m_ViewerPtr( viewer ),
 	  m_Renderer( renderer )
 {
@@ -37,6 +37,7 @@ ViewerInteractor::ViewerInteractor( ViewControl *viewer, vtkRenderer *renderer )
 	this->StartPosition[0] = this->StartPosition[1] = 0;
 	this->EndPosition[0] = this->EndPosition[1] = 0;
 	this->Moving = 0;
+	this->Slicing = 0;
 	this->PixelArray = vtkUnsignedCharArray::New();
 	this->m_Picker = vtkCellPicker::New();
 	this->SetCurrentRenderer( m_Renderer );
@@ -92,10 +93,12 @@ void ViewerInteractor::OnLeftButtonDown()
 	if( m_Picker->Pick( this->GetInteractor()->GetEventPosition()[0],
 						this->GetInteractor()->GetEventPosition()[1],
 						0,
-						this->CurrentRenderer ) ) {
+						m_Renderer ) ) {
 		double ptMapped[3];
 		m_Picker->GetMapperPosition( ptMapped );
-		m_ViewerPtr->sliceChanged( static_cast<int>( ptMapped[0] ), static_cast<int>( ptMapped[1] ), static_cast<int>( ptMapped[2] ) );
+		m_ViewerPtr->sliceChanged( static_cast<int>( ptMapped[0] ),
+								   static_cast<int>( ptMapped[1] ),
+								   static_cast<int>( ptMapped[2] ) );
 	}
 
 	this->Slicing = 1;
@@ -108,7 +111,7 @@ void ViewerInteractor::OnMouseMove()
 		if( m_Picker->Pick( this->GetInteractor()->GetEventPosition()[0],
 							this->GetInteractor()->GetEventPosition()[1],
 							0,
-							this->CurrentRenderer ) ) {
+							m_Renderer ) ) {
 			double ptMapped[3];
 			m_Picker->GetMapperPosition( ptMapped );
 			m_ViewerPtr->displayIntensity( static_cast<int>( ptMapped[0] ), static_cast<int>( ptMapped[1] ), static_cast<int>( ptMapped[2] ) );
@@ -117,11 +120,13 @@ void ViewerInteractor::OnMouseMove()
 		if( m_Picker->Pick( this->GetInteractor()->GetEventPosition()[0],
 							this->GetInteractor()->GetEventPosition()[1],
 							0,
-							this->CurrentRenderer ) ) {
+							m_Renderer ) ) {
 			double ptMapped[3];
 			m_Picker->GetMapperPosition( ptMapped );
 			m_ViewerPtr->displayIntensity( static_cast<int>( ptMapped[0] ), static_cast<int>( ptMapped[1] ), static_cast<int>( ptMapped[2] ) );
-			m_ViewerPtr->sliceChanged( static_cast<int>( ptMapped[0] ), static_cast<int>( ptMapped[1] ), static_cast<int>( ptMapped[2] ) );
+			m_ViewerPtr->sliceChanged( static_cast<int>( ptMapped[0] ),
+									   static_cast<int>( ptMapped[1] ),
+									   static_cast<int>( ptMapped[2] ) );
 		}
 	}
 
@@ -201,9 +206,9 @@ void ViewerInteractor::Zoom()
 	int width, height;
 	width = abs( this->EndPosition[0] - this->StartPosition[0] );
 	height = abs( this->EndPosition[1] - this->StartPosition[1] );
-	int *size = this->CurrentRenderer->GetSize();
-	int *origin = this->CurrentRenderer->GetOrigin();
-	vtkCamera *cam = this->CurrentRenderer->GetActiveCamera();
+	int *size = m_Renderer->GetSize();
+	int *origin = m_Renderer->GetOrigin();
+	vtkCamera *cam = m_Renderer->GetActiveCamera();
 	int min[2];
 	double rbcenter[3];
 	min[0] = this->StartPosition[0] < this->EndPosition[0] ?
@@ -213,12 +218,12 @@ void ViewerInteractor::Zoom()
 	rbcenter[0] = min[0] + 0.5 * width;
 	rbcenter[1] = min[1] + 0.5 * height;
 	rbcenter[2] = 0;
-	this->CurrentRenderer->SetDisplayPoint( rbcenter );
-	this->CurrentRenderer->DisplayToView();
-	this->CurrentRenderer->ViewToWorld();
+	m_Renderer->SetDisplayPoint( rbcenter );
+	m_Renderer->DisplayToView();
+	m_Renderer->ViewToWorld();
 	double invw;
 	double worldRBCenter[4];
-	this->CurrentRenderer->GetWorldPoint( worldRBCenter );
+	m_Renderer->GetWorldPoint( worldRBCenter );
 	invw = 1.0 / worldRBCenter[3];
 	worldRBCenter[0] *= invw;
 	worldRBCenter[1] *= invw;
@@ -227,11 +232,11 @@ void ViewerInteractor::Zoom()
 	winCenter[0] = origin[0] + 0.5 * size[0];
 	winCenter[1] = origin[1] + 0.5 * size[1];
 	winCenter[2] = 0;
-	this->CurrentRenderer->SetDisplayPoint( winCenter );
-	this->CurrentRenderer->DisplayToView();
-	this->CurrentRenderer->ViewToWorld();
+	m_Renderer->SetDisplayPoint( winCenter );
+	m_Renderer->DisplayToView();
+	m_Renderer->ViewToWorld();
 	double worldWinCenter[4];
-	this->CurrentRenderer->GetWorldPoint( worldWinCenter );
+	m_Renderer->GetWorldPoint( worldWinCenter );
 	invw = 1.0 / worldWinCenter[3];
 	worldWinCenter[0] *= invw;
 	worldWinCenter[1] *= invw;

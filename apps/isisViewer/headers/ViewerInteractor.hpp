@@ -69,7 +69,7 @@ public:
 	virtual void OnLeftButtonUp();
 	virtual void OnLeftButtonDown();
 	virtual void Zoom();
-	ViewerInteractor( ViewControl *, vtkRenderer * );
+	ViewerInteractor( ViewControl *, vtkSmartPointer<vtkRenderer> );
 	vtkSetMacro( MotionFactor, double );
 	vtkGetMacro( MotionFactor, double );
 

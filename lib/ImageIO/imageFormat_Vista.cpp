@@ -120,11 +120,13 @@ throw( std::runtime_error & )
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VShortRepn );
 			copyImageToVista<VShort>( image, vimages[0] );
 			break;
+#if defined(_M_X64) || defined(__amd64__)
 			// VLong
 		case data::TypePtr<VLong>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VLongRepn );
 			copyImageToVista<VLong>( image, vimages[0] );
 			break;
+#endif
 			// VFloat
 		case data::TypePtr<VFloat>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VFloatRepn );
@@ -155,7 +157,7 @@ throw( std::runtime_error & )
 	size_t hcount = 0;
 	// if history list prefix is available increase counter.
 	BOOST_FOREACH( util::PropMap::key_list::key_type key, keyset ) {
-		if ( ( ( std::string )key ).find( histPrefix ) != std::string::npos ) {
+		if (  std::string( key.c_str() ).find( histPrefix ) != std::string::npos ) {
 			hcount++;
 		}
 	}
@@ -166,7 +168,7 @@ throw( std::runtime_error & )
 		for( unsigned i = 1; i <= hcount; i++ ) {
 			std::stringstream name;
 			name << histPrefix << i;
-			std::string val = image.getProperty<std::string>( name.str() );
+			std::string val = image.getProperty<std::string>( util::istring( name.str().c_str() ) );
 			// split key token from history property string
 			size_t x = val.find( ":" );
 			VAppendAttr( hlist, val.substr( 0, x ).c_str(), NULL, VStringRepn,
@@ -246,7 +248,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 				std::stringstream key, value;
 				key << histPrefix << ++hcount;
 				value << attrName << ":" << std::string( ( VString ) val );
-				hMap.setProperty<std::string>( key.str(), value.str() );
+				hMap.setProperty<std::string>( util::istring( key.str().c_str() ), value.str().c_str() );
 			}
 		}
 	}
@@ -611,10 +613,12 @@ bool ImageFormat_Vista::switchHandle( VImage &image, data::ChunkList &chunks )
 		addChunk<VShort>( chunks, image );
 		return true;
 		break;
+#if defined(_M_X64) || defined(__amd64__)
 	case VLongRepn:
 		addChunk<VLong>( chunks, image );
 		return true;
 		break;
+#endif
 	case VFloatRepn:
 		addChunk<VFloat>( chunks, image );
 		return true;
@@ -799,7 +803,7 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 
 		for( kiter = klist.begin(); kiter != klist.end(); kiter++ ) {
 			// skip entry from vista image history
-			if( ( ( std::string )*kiter ).find( hpref ) != std::string::npos ) {
+			if( (  std::string ( ( *kiter ).c_str() ) ).find( hpref ) != std::string::npos ) {
 				continue;
 			}
 
@@ -834,6 +838,7 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 							 pv->cast_to<VShort>() );
 				continue;
 			}
+#if defined(_M_X64) || defined(__amd64__)
 
 			// VLong -> VLong (char *)
 			if( pv->is<VLong>() ) {
@@ -841,7 +846,7 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 							 pv->cast_to<VLong>() );
 				continue;
 			}
-
+#endif
 			// VFloat -> VFloat (char *)
 			if( pv->is<VFloat>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VFloatRepn,

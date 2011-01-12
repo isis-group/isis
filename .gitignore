@@ -19,6 +19,15 @@ lib/Core/debian/libisiscore0/
 lib/Core/debian/libisiscore0.postrm.debhelper
 lib/Core/debian/libisiscore0.postinst.debhelper
 lib/Core/debian/libisiscore0-dev/
+*.dsc
+*.deb
+*.tar.gz*
+*changes
+lib/ImageIO/debian/isisio0-dicom
+lib/ImageIO/debian/isisio0-gz-proxy
+lib/ImageIO/debian/isisio0-nifti
+lib/ImageIO/debian/isisio0-null
+lib/ImageIO/debian/isisio0-vista
 
 #Windows################################
 # Windows image file caches
