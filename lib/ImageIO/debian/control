@@ -64,8 +64,9 @@ Description: The ISIS package provides a general I/O framework for neuroimaging
  project is a data converter that allows an easy and unified handling of fMRI
  data from various MRI scanners. 
  .
- This Package provides the ISIS I/O plugins for the NULL image support. The NULL 
- image is an artificial image for testing and debugging purpose.
+ This Package provides the ISIS I/O plugins for the gzip proxy support. The gzip
+ proxy uses the gnuzip implementation to create a compressed archive file from
+ any other ISIS image IO plugin.
 
 Package: isisio0-tar-proxy
 Section: science

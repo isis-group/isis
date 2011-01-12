@@ -1,0 +1,74 @@
+# -*- mode:rpm-spec -*-
+# This is the rpm spec file template. 
+
+%define _topdir     @CMAKE_BINARY_DIR@/rpm
+%define name        isisio0
+%define release     1
+%define version     @ISIS_IMAGE_IO_VERSION@
+%define buildroot   %{_topdir}/%{name}-%{version}
+%define _unpackaged_files_terminate_build 0
+
+BuildRoot:          %{buildroot}
+Summary:            The ISIS core plugins
+License:            GPL
+Name:               %{name}
+Version:            %{version}
+Release:            %{release}
+Source:             %{name}-%{version}.tar.gz
+Prefix:             /usr
+Group:              Development
+%description
+The ISIS package provides a general I/O framework for neuroimaging
+data.  Being started with fMRI data, it can handle several established data
+formats, like Nifti, Analyze, DICOM and vista. A first application based on this
+project is a data converter that allows an easy and unified handling of fMRI
+data from various MRI scanners. 
+
+This Package provides additional IO plugins for the ISIS core library. It supports:
+DICOM, NIFTI, vista and gnuzip archives.
+
+%prep
+%setup -q
+
+%build
+mkdir release
+cd release
+cmake -DCMAKE_BUILD_TYPE=@CMAKE_BUILD_TYPE@ \
+    -DISIS_CORE_DEBUG_LOG=@ISIS_DEBUG_LOG@ \
+    -DISIS_CORE_RUNTIME_LOG=@ISIS_RUNTIME_LOG@ \
+    -DBUILD_SHARED_LIBS=ON \
+    -DISIS_IMAGE_IO_IOPLUGIN_VISTA=ON \
+    -DVIA_ROOT_INCLUDE_DIR=/home/user/local/include \
+    -DVIAIO_INCLUDE_DIR=/home/user/local/include/viaio \
+    -DVIA_INCLUDE_DIR=/home/user/local/include/via \
+    -DVIAIO_LIBRARY=/home/user/local/lib/libviaio.a \
+    -DVIA_LIBRARY=/home/user/local/lib/libvia.a \
+    -DISIS_IMAGE_IO_IOPLUGIN_DICOM=ON \
+    -DINCPATH_DCMTK=/home/user/local/include \
+    -DLIB_DCMDATA=/home/user/local/lib/libdcmdata.a \
+    -DLIB_DCMIMAGE=/home/user/local/lib/libdcmimage.a \
+    -DLIB_DCMIMGLE=/home/user/local/lib/libdcmimgle.a \
+    -DLIB_OFSTD=/home/user/local/lib/libofstd.a \
+    -DISIS_IMAGE_IO_IOPLUGIN_NIFTI=ON \
+    -DINCPATH_NIFTI=/home/user/local/include/nifti \
+    -DINCPATH_ZNZ=/home/user/local/include/nifti \
+    -DLIB_NIFTIIO=/home/user/local/lib/libniftiio.a \
+    -DLIB_ZNZ=/home/user/local/lib/libznz.a \
+    -DCMAKE_INSTALL_PREFIX=${RPM_BUILD_ROOT}/usr \
+    -DISIS_PLUGIN_DIR=${RPM_BUILD_ROOT}/usr/share/isis/plugins \
+    -DCMAKE_SKIP_RPATH=ON \
+    ..
+make
+
+%install
+cd release
+make install
+
+%files
+%defattr(-,root,root)
+/usr/share/isis/plugins/libisisImageFormat_Null.so
+/usr/share/isis/plugins/libisisImageFormat_Vista.so
+/usr/share/isis/plugins/libisisImageFormat_gz_proxy.so
+/usr/share/isis/plugins/libisisImageFormat_Dicom.so
+/usr/share/isis/plugins/libisisImageFormat_Nifti.so
+

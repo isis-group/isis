@@ -1,0 +1,6 @@
+libisisadapter (0.2.0) unstable; urgency=low
+
+    * Initial Debian packaging attempt. This is the first version of
+      a ISIS Adapter debian packages.
+
+ -- Thomas Proeger <thomasproeger@googlemail.com>  Tue, 23 Nov 2010 13:47:18 +0100
