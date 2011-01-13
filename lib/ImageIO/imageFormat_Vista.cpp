@@ -22,7 +22,7 @@
  *****************************************************************/
 
 // local includes
-#include "imageFormat_Vista.h"
+#include "imageFormat_Vista.hpp"
 
 // global includes
 #include <list>
