@@ -136,7 +136,7 @@ public:
 
 					const std::pair<std::string, std::string> base = formats.front()->makeBasename( org_file.file_string() );//ask any of the plugins for the suffix
 					util::TmpFile tmpfile( "", base.second );//create a temporary file with this suffix
-					int mfile=open(tmpfile.file_string().c_str(),O_CREAT|O_RDWR);
+					int mfile=open(tmpfile.file_string().c_str(),O_CREAT|O_RDWR,S_IRUSR|S_IWUSR);
 					if(mfile==-1){
 						throwSystemError( errno, std::string("Failed to open temporary ") + tmpfile.file_string());
 					}
