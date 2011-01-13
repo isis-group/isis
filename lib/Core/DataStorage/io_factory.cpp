@@ -66,6 +66,14 @@ struct dialect_missing {
 
 IOFactory::IOFactory(): m_feedback( NULL )
 {
+	const char *env_path=getenv("ISIS_PLUGIN_PATH");
+	const char *env_home=getenv("HOME");
+	if(env_path){
+		findPlugins( boost::filesystem::path( env_path ).directory_string() );
+	}
+	if(env_home){
+		findPlugins( (boost::filesystem::path( env_home ) / "isis" / "plugins").directory_string() );
+	}
 	findPlugins( std::string( PLUGIN_PATH ) );
 }
 

@@ -62,8 +62,9 @@ private:
 	}
 	static size_t tar_readstream(const boost::iostreams::filtering_istream &src, void* dst,size_t size,const std::string &log_title){
 		size_t red=boost::iostreams::read(src,(char*)dst,size); // read data from the stream into the mapped memory
-		if(red!=size) // read the data from the stream
+		if(red!=size){ // read the data from the stream
 			LOG(Runtime,warning) << "Could not read all " << size << " bytes for " << util::MSubject( log_title );
+		}
 		return red;
 	}
 
@@ -150,8 +151,9 @@ public:
 					
 					size_t red=boost::iostreams::read(in,mmem,size); // read data from the stream into the mapped memory
 					next_header_in-=red;
-					if(red!=size) // read the data from the stream
+					if(red!=size){ // read the data from the stream
 						LOG(Runtime,warning) << "Could not read all " << size << " bytes for " << tmpfile.file_string();
+					}
 
 					//unmap and close the file
 					munmap(mmem,size);
