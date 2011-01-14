@@ -47,6 +47,26 @@ private:
 		char prefix[155];
 		char padding[12];
 	}tar_header;
+	bool read_header(const boost::iostreams::filtering_istream &src,size_t &size,size_t &next_header_in){
+		if(boost::iostreams::read(src,reinterpret_cast<char*>(&tar_header),512)==512){
+			//get the size
+			std::stringstream buff(tar_header.size);
+			size=0,next_header_in=0;
+			if(tar_header.size[10]!=0) {
+				buff >> std::oct >> size;
+				next_header_in=(size/512)*512 + (size%512 ? 512:0);
+			}
+			return true;
+		} else
+			return false;
+	}
+	static size_t tar_readstream(const boost::iostreams::filtering_istream &src, void* dst,size_t size,const std::string &log_title){
+		size_t red=boost::iostreams::read(src,(char*)dst,size); // read data from the stream into the mapped memory
+		if(red!=size){ // read the data from the stream
+			LOG(Runtime,warning) << "Could not read all " << size << " bytes for " << util::MSubject( log_title );
+		}
+		return red;
+	}
 
 protected:
 	std::string suffixes()const {
@@ -86,32 +106,38 @@ public:
 			in.push(boost::iostreams::zlib_decompressor());
 		in.push(input);
 
-		while(in.good() && boost::iostreams::read(in,reinterpret_cast<char*>(&tar_header),512)==512){ //read the header block
+		size_t size,next_header_in;
 
-			//get the size
-			std::stringstream buff(tar_header.size);
-			size_t size,next_header_in;
-			if(tar_header.size[10]!=0) {
-				buff >> std::oct >> size;
-				next_header_in=(size/512)*512 + (size%512 ? 512:0);
-			} else
-				continue; // if the size entry is zero there wont be anything usefull to us
+		while(in.good() && read_header(in,size,next_header_in)){ //read the header block
 
-			//get the original filename (use substr, because these fields are not )
-			boost::filesystem::path org_file(std::string(tar_header.prefix).substr(0,155)+std::string(tar_header.name).substr(0,100));
+			boost::filesystem::path org_file;
+			if(tar_header.typeflag == 'L'){ // the filename of the next file is to long - so its stored in the next block (following this header)
+				char namebuff[size];
+				next_header_in -= tar_readstream(in,namebuff,size,"overlong filename for next entry");
+				in.ignore(next_header_in); // skip the remaining input until the next header
+				org_file=boost::filesystem::path(namebuff);
+				LOG(Debug,verbose_info) << "Got overlong name " << util::MSubject( org_file.file_string() ) << " for next file.";
+
+				read_header(in,size,next_header_in); //continue with the next header
+			} else {
+				//get the original filename (use substr, because these fields are not \0-terminated)
+				org_file=boost::filesystem::path(std::string(tar_header.prefix).substr(0,155)+std::string(tar_header.name).substr(0,100));
+			}
+			if(size==0) //if there is no content skip this entry (there are allways two "empty" blocks at the end of a tar)
+				continue;
 
 			if(tar_header.typeflag == AREGTYPE || tar_header.typeflag == REGTYPE){
 				
 				data::IOFactory::FileFormatList formats = data::IOFactory::get().getFormatInterface( org_file.file_string() ); // and get the reading pluging for that
 
 				if(formats.empty()){
-					LOG(Runtime,warning) << "Skipping " << org_file << " from " << filename << " because no plugin was found to read it"; // skip if we found none
+					LOG(Runtime,info) << "Skipping " << org_file << " from " << filename << " because no plugin was found to read it"; // skip if we found none
 				} else {
 					LOG(Debug,info) << "Got " << org_file << " from " << filename << " there are " << formats.size() << " plugins which should be able to read it";
 
 					const std::pair<std::string, std::string> base = formats.front()->makeBasename( org_file.file_string() );//ask any of the plugins for the suffix
 					util::TmpFile tmpfile( "", base.second );//create a temporary file with this suffix
-					int mfile=open(tmpfile.file_string().c_str(),O_CREAT|O_RDWR);
+					int mfile=open(tmpfile.file_string().c_str(),O_CREAT|O_RDWR,S_IRUSR|S_IWUSR);
 					if(mfile==-1){
 						throwSystemError( errno, std::string("Failed to open temporary ") + tmpfile.file_string());
 					}
@@ -133,8 +159,9 @@ public:
 					
 					size_t red=boost::iostreams::read(in,mmem,size); // read data from the stream into the mapped memory
 					next_header_in-=red;
-					if(red!=size) // read the data from the stream
+					if(red!=size){ // read the data from the stream
 						LOG(Runtime,warning) << "Could not read all " << size << " bytes for " << tmpfile.file_string();
+					}
 
 					//unmap and close the file
 					munmap(mmem,size);

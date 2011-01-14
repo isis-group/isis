@@ -66,6 +66,14 @@ struct dialect_missing {
 
 IOFactory::IOFactory(): m_feedback( NULL )
 {
+	const char *env_path=getenv("ISIS_PLUGIN_PATH");
+	const char *env_home=getenv("HOME");
+	if(env_path){
+		findPlugins( boost::filesystem::path( env_path ).directory_string() );
+	}
+	if(env_home){
+		findPlugins( (boost::filesystem::path( env_home ) / "isis" / "plugins").directory_string() );
+	}
 	findPlugins( std::string( PLUGIN_PATH ) );
 }
 
@@ -209,6 +217,7 @@ IOFactory::FileFormatList IOFactory::getFormatInterface( std::string filename, s
 	if( suffix_override.empty() ) { // detect suffixes from the filename
 		const boost::filesystem::path fname( filename );
 		ext = util::string2list<std::string>( fname.leaf(), '.' ); // get all suffixes
+		assert(!ext.empty());
 		ext.pop_front(); // remove the first "suffix" - actually the basename
 	} else ext = util::string2list<std::string>( suffix_override, '.' );
 

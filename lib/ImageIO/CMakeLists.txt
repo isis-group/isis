@@ -3,6 +3,20 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 PROJECT(ISIS_IMAGE_IO)
 
+###############################################################################
+# add global options
+###############################################################################
+
+############################################################
+# set isis version number
+############################################################
+SET(${CMAKE_PROJECT_NAME}_VERSION_MAJOR "0")
+SET(${CMAKE_PROJECT_NAME}_VERSION_MINOR "1")
+SET(${CMAKE_PROJECT_NAME}_VERSION_PATCH "0")
+
+SET(${CMAKE_PROJECT_NAME}_VERSION
+  ${${CMAKE_PROJECT_NAME}_VERSION_MAJOR}.${${CMAKE_PROJECT_NAME}_VERSION_MINOR}.${${CMAKE_PROJECT_NAME}_VERSION_PATCH})
+
 ###########################################################
 # find and configure the isis core library
 ###########################################################
@@ -38,6 +52,7 @@ ELSE(ISIS_DEBUG_LOG)
 	ADD_DEFINITIONS(-D_ENABLE_DEBUG=0)
 ENDIF(ISIS_DEBUG_LOG)
 
+
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI "Enable Nifti-IO plugin" OFF)
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL "Enable Null-IO plugin" ON)
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM "Enable Dicom-IO plugin" OFF)
@@ -47,6 +62,28 @@ OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_TAR "Enable proxy plugin for tar datasets"
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_RAW "Enable plugin for raw data output" ON)
 
 
+#OPTION(${CMAKE_PROJECT_NAME}_PACKAGE_RPM "Enable support for RPM packaging" OFF)
+
+############################################################
+# PACKAGING
+# @TODO: Check if CPACK is a better solution for building 
+# a rpm package
+############################################################
+#IF(${CMAKE_PROJECT_NAME}_PACKAGE_RPM)
+#
+#    MESSAGE(STATUS "Configuring RPM build")
+#
+#    # write spec file for rpm package
+#    CONFIGURE_FILE(cmake/template.spec.in ${CMAKE_BINARY_DIR}/isisio0.spec
+#      @ONLY)
+#    CONFIGURE_FILE(cmake/bootstrap_rpm.sh.in ${CMAKE_BINARY_DIR}/bootstrap_rpm.sh
+#      @ONLY)
+#
+#    # add a custom make target
+#    ADD_CUSTOM_TARGET(rpm   
+#        "${CMAKE_BINARY_DIR}/bootstrap_rpm.sh" WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+#
+#ENDIF()
 
 #############################################################################################
 # the plugins ...
@@ -85,6 +122,12 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA)
     # VIAIO_LIBRARY           - libviaio
     # VX_LIBRARY              - libvx
     #
+
+    # SET a root VIA include directory if necessary. This should be the directory
+    # containing the via and viaio include dirs.
+    IF(VIA_ROOT_INCLUDE_DIR)
+      INCLUDE_DIRECTORIES(${VIA_ROOT_INCLUDE_DIR})
+    ENDIF(VIA_ROOT_INCLUDE_DIR)
 
     # INCLUDE directories
     FIND_PATH(VIA_INCLUDE_DIR
@@ -247,7 +290,7 @@ INSTALL(TARGETS ${TARGETS}
 
 # uninstall target
 configure_file(
-	"${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
+	"${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
 	"${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
 	IMMEDIATE @ONLY
 )

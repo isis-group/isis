@@ -1,5 +1,5 @@
-isisio (0.2.0-2) stable; urgency=low
+isisio (0.2.0-3) stable; urgency=low
     * Initial Debian packaging attempt. This is the first version of      
     a ISIS Image IO debian packages.
 
- -- Erik Tuerke <tuerke@cbs.mpg.de>  Wed, 21 Oct 2010 14:10:00 +0100
+ -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Wed, 21 Oct 2010 14:10:00 +0100
