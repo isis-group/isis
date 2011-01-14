@@ -72,7 +72,12 @@ IOFactory::IOFactory(): m_feedback( NULL )
 		findPlugins( boost::filesystem::path( env_path ).directory_string() );
 	}
 	if(env_home){
-		findPlugins( (boost::filesystem::path( env_home ) / "isis" / "plugins").directory_string() );
+		const boost::filesystem::path home=boost::filesystem::path( env_home ) / "isis" / "plugins";
+		if(boost::filesystem::exists(home)){
+			findPlugins( home.directory_string() );
+		} else {
+			LOG(Runtime, info) << home.directory_string() << "does not exist. Won't check for plugins there";
+		}
 	}
 	findPlugins( std::string( PLUGIN_PATH ) );
 }
@@ -131,11 +136,12 @@ unsigned int IOFactory::findPlugins( const std::string &path )
 
 				if ( factory_func ) {
 					FileFormatPtr io_class( factory_func(), _internal::pluginDeleter( handle, pluginName ) );
-
-					if ( registerFormat( io_class ) )
+					if ( registerFormat( io_class ) ){
+						io_class->plugin_file=pluginName;
 						ret++;
-					else
+					} else {
 						LOG( Runtime, error ) << "failed to register plugin " << util::MSubject( pluginName );
+					}
 				} else {
 #ifdef WIN32
 					LOG( Runtime, error )
