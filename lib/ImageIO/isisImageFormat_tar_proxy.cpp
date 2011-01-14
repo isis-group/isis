@@ -115,7 +115,15 @@ public:
 					if(mfile==-1){
 						throwSystemError( errno, std::string("Failed to open temporary ") + tmpfile.file_string());
 					}
-					posix_fallocate(mfile,0,size); // set it to the given size - otherwise mmap will be very sad
+					
+					// set it to the given size - otherwise mmap will be very sad
+#ifdef HAVE_FALLOCATE
+					fallocate(mfile,0,size); //fast preallocation using features of ome linux-filesystems
+#elif HAVE_POSIX_FALLOCATE
+					posix_fallocate(mfile,0,size); // slower posix compatible version
+#else
+					lseek(mfile,size-1,SEEK_SET);::write(mfile," ",1); //workaround in case there is no fallocate
+#endif
 
 					char *mmem=(char*)mmap(NULL,size,PROT_WRITE,MAP_SHARED,mfile,0);//map it into memory
 					if(mmem==MAP_FAILED){

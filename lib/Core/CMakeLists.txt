@@ -1,7 +1,7 @@
 # the ISIS core module
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
-INCLUDE(InstallRequiredSystemLibraries)
+INCLUDE(InstallRequiredSystemLibraries) #http://docdb.fnal.gov/ILC/sid/stanitz/ilcsoft-latest/cmake-2.4.8/Modules/InstallRequiredSystemLibraries.cmake
 
 PROJECT(ISIS_CORE)
 
