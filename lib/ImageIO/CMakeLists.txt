@@ -205,11 +205,22 @@ endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ)
 
 # tar proxy
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_TAR)
+	include(CheckFunctionExists)
 	FIND_PACKAGE(Boost REQUIRED COMPONENTS iostreams)
 
 	add_library(isisImageFormat_tar_proxy SHARED isisImageFormat_tar_proxy.cpp)
-	target_link_libraries(isisImageFormat_tar_proxy ${ISIS_LIB} ${ISIS_LIB_DEPENDS} ${Boost_IOSTREAMS_LIBRARY})
 
+	check_function_exists(HAVE_FALLOCATE fallocate)
+	if(HAVE_FALLOCATE)
+		set_target_properties(isisImageFormat_tar_proxy PROPERTIES COMPILE_DEFINITIONS HAVE_FALLOCATE)
+	else(HAVE_FALLOCATE)
+        	check_function_exists(HAVE_POSIX_FALLOCATE posix_fallocate)
+		if(HAVE_POSIX_FALLOCATE)
+			set_target_properties(isisImageFormat_tar_proxy PROPERTIES COMPILE_DEFINITIONS HAVE_POSIX_FALLOCATE)
+		endif(HAVE_POSIX_FALLOCATE)
+	endif(HAVE_FALLOCATE)
+
+	target_link_libraries(isisImageFormat_tar_proxy ${ISIS_LIB} ${ISIS_LIB_DEPENDS} ${Boost_IOSTREAMS_LIBRARY})
 	SET(TARGETS ${TARGETS} isisImageFormat_tar_proxy)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_TAR)
 
