@@ -374,7 +374,7 @@ private:
 	unsigned int m_NumberOfParameters;
 
 	isis::extitk::IterationObserver::Pointer m_observer;
-	
+
 	void prealign();
 
 	//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

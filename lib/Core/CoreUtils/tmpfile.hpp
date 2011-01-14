@@ -35,8 +35,8 @@ class TmpFile: public boost::filesystem::path, boost::noncopyable
 {
 private:
 	// dont do this
-	TmpFile(TmpFile &);
-	TmpFile& operator=(TmpFile &);
+	TmpFile( TmpFile & );
+	TmpFile &operator=( TmpFile & );
 public:
 	/** Create a temporary file.
 	 * This generates a temporary filename using the given prefix and suffix.

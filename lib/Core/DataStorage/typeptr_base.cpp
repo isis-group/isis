@@ -59,15 +59,16 @@ TypePtrBase::Reference TypePtrBase::copyToNewById( unsigned short id, const scal
 	}
 }
 
-TypePtrBase::Reference TypePtrBase::createById( unsigned short id, size_t len ){
+TypePtrBase::Reference TypePtrBase::createById( unsigned short id, size_t len )
+{
 	const TypePtrConverterMap::const_iterator f1 = converters().find( id );
 	TypePtrConverterMap::mapped_type::const_iterator f2;
 
 	// try to get a converter to convert the requestet type into itself - they 're there for all known types
-	if(f1 != converters().end() && (f2 = f1->second.find( id )) != f1->second.end()){ 
-		const _internal::TypePtrConverterBase &conv = *(f2->second);
+	if( f1 != converters().end() && ( f2 = f1->second.find( id ) ) != f1->second.end() ) {
+		const _internal::TypePtrConverterBase &conv = *( f2->second );
 		boost::scoped_ptr<TypePtrBase> ret;
-		conv.create(ret, len );
+		conv.create( ret, len );
 		return *ret;
 	} else {
 		LOG( Debug, error ) << "There is no known creator for " << util::getTypeMap()[id];

@@ -838,6 +838,7 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 							 pv->cast_to<VShort>() );
 				continue;
 			}
+
 #if defined(_M_X64) || defined(__amd64__)
 
 			// VLong -> VLong (char *)
@@ -846,7 +847,9 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 							 pv->cast_to<VLong>() );
 				continue;
 			}
+
 #endif
+
 			// VFloat -> VFloat (char *)
 			if( pv->is<VFloat>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VFloatRepn,
