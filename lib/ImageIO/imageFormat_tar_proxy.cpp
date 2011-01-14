@@ -9,11 +9,18 @@
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/filter/bzip2.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include <tar.h>
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <fstream>
+
+#ifdef HAVE_FALLOCATE
+#include <linux/falloc.h>
+#elif defined HAVE_POSIX_FALLOCATE
+#include <fcntl.h>
+#endif
 
 namespace isis
 {
@@ -144,12 +151,15 @@ public:
 					
 					// set it to the given size - otherwise mmap will be very sad
 #ifdef HAVE_FALLOCATE
-					fallocate(mfile,0,size); //fast preallocation using features of ome linux-filesystems
+					const int err=fallocate(mfile,0,size); //fast preallocation using features of ome linux-filesystems
 #elif HAVE_POSIX_FALLOCATE
-					posix_fallocate(mfile,0,size); // slower posix compatible version
+					const int err=posix_fallocate(mfile,0,size); // slower posix compatible version
 #else
-					lseek(mfile,size-1,SEEK_SET);::write(mfile," ",1); //workaround in case there is no fallocate
+					const int err= (lseek(mfile,size-1,SEEK_SET)==size-1 && ::write(mfile," ",1)) ? 0:errno; //workaround in case there is no fallocate
 #endif
+					if(err){
+						throwSystemError( err, std::string("Failed grow ") + tmpfile.file_string() + " to size " + boost::lexical_cast<std::string>(size) );
+					}
 
 					char *mmem=(char*)mmap(NULL,size,PROT_WRITE,MAP_SHARED,mfile,0);//map it into memory
 					if(mmem==MAP_FAILED){
