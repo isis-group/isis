@@ -55,6 +55,7 @@ ENDIF(ISIS_DEBUG_LOG)
 
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI "Enable Nifti-IO plugin" OFF)
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL "Enable Null-IO plugin" ON)
+OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_PNG "Enable Null-IO plugin" OFF)
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM "Enable Dicom-IO plugin" OFF)
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA "Enable Vista-IO plugin" OFF)
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ "Enable proxy plugin for compressed files" ON)
@@ -190,6 +191,21 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL)
 
 	SET(TARGETS ${TARGETS} isisImageFormat_Null)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL)
+
+# png
+if(${CMAKE_PROJECT_NAME}_IOPLUGIN_PNG)
+	find_library(LIB_Z z)
+	find_library(LIB_PNG png12)
+
+	find_path(INCPATH_PNG "png.h")
+	include_directories(${INCPATH_PNG})
+
+	add_library(isisImageFormat_png SHARED imageFormat_png.cpp)
+	target_link_libraries(isisImageFormat_png ${LIB_Z} ${ISIS_LIB} ${ISIS_LIB_DEPENDS} ${LIB_PNG})
+
+	SET(TARGETS ${TARGETS} isisImageFormat_png)
+endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_PNG)
+
 
 # gz proxy
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ)
