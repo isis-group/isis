@@ -17,7 +17,10 @@ public:
 	std::string name()const {
 		return "PNG (Portable Network Graphics)";
 	}
-	bool write_png(const char *filename, data::Chunk &buff){
+    std::string dialects(const std::string& filename) const{
+		return "middle";
+	}
+	bool write_png(const std::string &filename, data::Chunk &buff){
 		FILE *fp;
 		png_structp png_ptr;
 		png_infop info_ptr;
@@ -25,7 +28,7 @@ public:
 		util::FixedVector<size_t,4> size = buff.sizeToVector();
 		
 		/* open the file */
-		fp = fopen(filename, "wb");
+		fp = fopen(filename.c_str(), "wb");
 		if (fp == NULL){
 			throwSystemError(errno,std::string("Failed to open ")+filename);
 			return 0;
@@ -106,14 +109,23 @@ public:
 		std::vector<boost::shared_ptr<data::Chunk> > chunks= tImg.getChunkList();
 		unsigned short numLen=std::log10(chunks.size())+1;
 		size_t number=0;
-		LOG(Debug,info) << "Writing " << chunks.size() << " chunks as png-images of size " << chunks.front()->sizeToString();
-		BOOST_FOREACH(const boost::shared_ptr<data::Chunk> &ref,chunks){
-			const std::string num = boost::lexical_cast<std::string>( ++number );
-			std::pair<std::string,std::string> fname=makeBasename(filename);
-			
-			if(!write_png((fname.first+"_"+std::string( numLen-num.length(), '0' ) + num + fname.second).c_str(),*ref))
-				throwGenericError(std::string("Failed to write ")+(filename+"_"+std::string( numLen-num.length(), '0' ) + num));;
+		if(util::istring( dialect.c_str() )==util::istring("middle")){ //save only the middle
+			LOG(Runtime,info) << "Writing the slice " << chunks.size()/2+1 << " of " << chunks.size() << " slices as png-image of size " << chunks.front()->sizeToString();
+			if(!write_png(filename,*chunks[chunks.size()/2])){
+				throwGenericError(std::string("Failed to write ")+filename);
+			}
+		} else { //save all slices
+			LOG(Runtime,info) << "Writing " << chunks.size() << " slices as png-images of size " << chunks.front()->sizeToString();
+			BOOST_FOREACH(const boost::shared_ptr<data::Chunk> &ref,chunks){
+				const std::string num = boost::lexical_cast<std::string>( ++number );
+				std::pair<std::string,std::string> fname=makeBasename(filename);
+
+				if(!write_png(fname.first+"_"+std::string( numLen-num.length(), '0' ) + num + fname.second,*ref)){
+					throwGenericError(std::string("Failed to write ")+(filename+"_"+std::string( numLen-num.length(), '0' ) + num));;
+				}
+			}
 		}
+		
 	}
 	bool tainted()const {return false;}//internal plugins are not tainted
 };
