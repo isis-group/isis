@@ -23,7 +23,6 @@ public:
 		png_infop info_ptr;
 		assert(buff.relevantDims()==2);
 		util::FixedVector<size_t,4> size = buff.sizeToVector();
-		buff.makeOfTypeId(data::TypePtr<png_byte>::staticID);
 		
 		/* open the file */
 		fp = fopen(filename, "wb");
@@ -98,6 +97,23 @@ public:
 	}
 
 	void write( const data::Image &image, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
+		if(image.relevantDims()<2){
+			throwGenericError("Cannot write png when image is made of stripes");
+		}
+		data::Image tImg(image);
+		tImg.makeOfTypeId(data::TypePtr<png_byte>::staticID);
+		tImg.spliceDownTo(data::sliceDim);
+		std::vector<boost::shared_ptr<data::Chunk> > chunks= tImg.getChunkList();
+		unsigned short numLen=std::log10(chunks.size())+1;
+		size_t number=0;
+		LOG(Debug,info) << "Writing " << chunks.size() << " chunks as png-images of size " << chunks.front()->sizeToString();
+		BOOST_FOREACH(const boost::shared_ptr<data::Chunk> &ref,chunks){
+			const std::string num = boost::lexical_cast<std::string>( ++number );
+			std::pair<std::string,std::string> fname=makeBasename(filename);
+			
+			if(!write_png((fname.first+"_"+std::string( numLen-num.length(), '0' ) + num + fname.second).c_str(),*ref))
+				throwGenericError(std::string("Failed to write ")+(filename+"_"+std::string( numLen-num.length(), '0' ) + num));;
+		}
 	}
 	bool tainted()const {return false;}//internal plugins are not tainted
 };
