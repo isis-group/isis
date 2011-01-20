@@ -115,13 +115,17 @@ public:
 				throwGenericError(std::string("Failed to write ")+filename);
 			}
 		} else { //save all slices
-			LOG(Runtime,info) << "Writing " << chunks.size() << " slices as png-images of size " << chunks.front()->sizeToString();
+			const std::pair<std::string,std::string> fname=makeBasename(filename);
+			LOG(Runtime,info)
+			<< "Writing " << chunks.size() << " slices as png-images " << fname.first << "_"
+			<< std::string( numLen, 'X' ) << fname.second << " of size " << chunks.front()->sizeToString();
+			
 			BOOST_FOREACH(const boost::shared_ptr<data::Chunk> &ref,chunks){
 				const std::string num = boost::lexical_cast<std::string>( ++number );
-				std::pair<std::string,std::string> fname=makeBasename(filename);
+				const std::string name=fname.first+"_"+std::string( numLen-num.length(), '0' ) + num + fname.second;
 
-				if(!write_png(fname.first+"_"+std::string( numLen-num.length(), '0' ) + num + fname.second,*ref)){
-					throwGenericError(std::string("Failed to write ")+(filename+"_"+std::string( numLen-num.length(), '0' ) + num));;
+				if(!write_png(name,*ref)){
+					throwGenericError(std::string("Failed to write ")+name);;
 				}
 			}
 		}
