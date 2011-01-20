@@ -55,6 +55,7 @@ ENDIF(ISIS_DEBUG_LOG)
 
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI "Enable Nifti-IO plugin" OFF)
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL "Enable Null-IO plugin" ON)
+OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_PNG "Enable Null-IO plugin" OFF)
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM "Enable Dicom-IO plugin" OFF)
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA "Enable Vista-IO plugin" OFF)
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ "Enable proxy plugin for compressed files" ON)
@@ -191,13 +192,28 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL)
 	SET(TARGETS ${TARGETS} isisImageFormat_Null)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL)
 
+# png
+if(${CMAKE_PROJECT_NAME}_IOPLUGIN_PNG)
+	find_library(LIB_Z z)
+	find_library(LIB_PNG png12)
+
+	find_path(INCPATH_PNG "png.h")
+	include_directories(${INCPATH_PNG})
+
+	add_library(isisImageFormat_png SHARED imageFormat_png.cpp)
+	target_link_libraries(isisImageFormat_png ${LIB_Z} ${ISIS_LIB} ${ISIS_LIB_DEPENDS} ${LIB_PNG})
+
+	SET(TARGETS ${TARGETS} isisImageFormat_png)
+endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_PNG)
+
+
 # gz proxy
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ)
 	FIND_LIBRARY(LIB_Z "z")
 	FIND_PATH(INCPATH_GZIP "zlib.h")
 	INCLUDE_DIRECTORIES(${INCPATH_GZIP})
 
-	add_library(isisImageFormat_gz_proxy SHARED isisImageFormat_gz_proxy.cpp)
+	add_library(isisImageFormat_gz_proxy SHARED imageFormat_gz_proxy.cpp)
 	target_link_libraries(isisImageFormat_gz_proxy ${LIB_Z} ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
 
 	SET(TARGETS ${TARGETS} isisImageFormat_gz_proxy)
@@ -205,11 +221,22 @@ endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ)
 
 # tar proxy
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_TAR)
+	include(CheckFunctionExists)
 	FIND_PACKAGE(Boost REQUIRED COMPONENTS iostreams)
 
-	add_library(isisImageFormat_tar_proxy SHARED isisImageFormat_tar_proxy.cpp)
-	target_link_libraries(isisImageFormat_tar_proxy ${ISIS_LIB} ${ISIS_LIB_DEPENDS} ${Boost_IOSTREAMS_LIBRARY})
+	add_library(isisImageFormat_tar_proxy SHARED imageFormat_tar_proxy.cpp)
 
+	check_function_exists(fallocate HAVE_FALLOCATE)
+	if(HAVE_FALLOCATE)
+		set_target_properties(isisImageFormat_tar_proxy PROPERTIES COMPILE_DEFINITIONS HAVE_FALLOCATE)
+	else(HAVE_FALLOCATE)
+        	check_function_exists(posix_fallocate HAVE_POSIX_FALLOCATE)
+		if(HAVE_POSIX_FALLOCATE)
+			set_target_properties(isisImageFormat_tar_proxy PROPERTIES COMPILE_DEFINITIONS HAVE_POSIX_FALLOCATE)
+		endif(HAVE_POSIX_FALLOCATE)
+	endif(HAVE_FALLOCATE)
+
+	target_link_libraries(isisImageFormat_tar_proxy ${ISIS_LIB} ${ISIS_LIB_DEPENDS} ${Boost_IOSTREAMS_LIBRARY})
 	SET(TARGETS ${TARGETS} isisImageFormat_tar_proxy)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_TAR)
 

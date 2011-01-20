@@ -50,15 +50,15 @@ namespace _internal
 template<typename SRC, typename DST> class TypePtrGenerator: public TypePtrConverterBase
 {
 public:
-	void create( boost::scoped_ptr<TypePtrBase>& dst, const size_t len)const {
+	void create( boost::scoped_ptr<TypePtrBase>& dst, const size_t len )const {
 		LOG_IF( dst.get(), Debug, warning ) << "Creating into existing value " << dst->toString( true );
 		TypePtr<DST> *newDat = new TypePtr<DST>( ( DST * )malloc( sizeof( DST )*len ), len );
-		dst.reset(newDat);
+		dst.reset( newDat );
 	}
 	void generate( const TypePtrBase &src, boost::scoped_ptr<TypePtrBase>& dst, const scaling_pair &scaling )const {
 		//Create new "stuff" in memory
-		create(dst,src.len());
-		assert(dst);
+		create( dst, src.len() );
+		assert( dst );
 		convert( src, *dst, scaling );//and convert into that
 	}
 };

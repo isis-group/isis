@@ -66,6 +66,23 @@ struct dialect_missing {
 
 IOFactory::IOFactory(): m_feedback( NULL )
 {
+	const char *env_path = getenv( "ISIS_PLUGIN_PATH" );
+	const char *env_home = getenv( "HOME" );
+
+	if( env_path ) {
+		findPlugins( boost::filesystem::path( env_path ).directory_string() );
+	}
+
+	if( env_home ) {
+		const boost::filesystem::path home = boost::filesystem::path( env_home ) / "isis" / "plugins";
+
+		if( boost::filesystem::exists( home ) ) {
+			findPlugins( home.directory_string() );
+		} else {
+			LOG( Runtime, info ) << home.directory_string() << "does not exist. Won't check for plugins there";
+		}
+	}
+
 	findPlugins( std::string( PLUGIN_PATH ) );
 }
 
@@ -124,10 +141,12 @@ unsigned int IOFactory::findPlugins( const std::string &path )
 				if ( factory_func ) {
 					FileFormatPtr io_class( factory_func(), _internal::pluginDeleter( handle, pluginName ) );
 
-					if ( registerFormat( io_class ) )
+					if ( registerFormat( io_class ) ) {
+						io_class->plugin_file = pluginName;
 						ret++;
-					else
+					} else {
 						LOG( Runtime, error ) << "failed to register plugin " << util::MSubject( pluginName );
+					}
 				} else {
 #ifdef WIN32
 					LOG( Runtime, error )
@@ -209,7 +228,7 @@ IOFactory::FileFormatList IOFactory::getFormatInterface( std::string filename, s
 	if( suffix_override.empty() ) { // detect suffixes from the filename
 		const boost::filesystem::path fname( filename );
 		ext = util::string2list<std::string>( fname.leaf(), '.' ); // get all suffixes
-		assert(!ext.empty());
+		assert( !ext.empty() );
 		ext.pop_front(); // remove the first "suffix" - actually the basename
 	} else ext = util::string2list<std::string>( suffix_override, '.' );
 

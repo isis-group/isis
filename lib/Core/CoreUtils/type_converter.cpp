@@ -45,15 +45,15 @@ namespace _internal
 template<typename SRC, typename DST> class TypeGenerator: public TypeConverterBase
 {
 public:
-	boost::numeric::range_check_result create( boost::scoped_ptr<TypeBase>& dst )const{
+	boost::numeric::range_check_result create( boost::scoped_ptr<TypeBase>& dst )const {
 		LOG_IF( dst.get(), Debug, warning ) <<
 											"Generating into existing value " << dst->toString( true ) << " (dropping this).";
 		Type<DST> *ref = new Type<DST>;
 		dst.reset( ref );
 	}
 	boost::numeric::range_check_result generate( const TypeBase &src, boost::scoped_ptr<TypeBase>& dst )const {
-		create(dst);
-		assert(dst);
+		create( dst );
+		assert( dst );
 		const boost::numeric::range_check_result result = convert( src.cast_to_Type<SRC>(), *dst );
 		return result;
 	}

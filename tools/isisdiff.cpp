@@ -70,8 +70,10 @@ int main( int argc, char *argv[] )
 		data::ImageList erg = data::IOFactory::load( in1.first );
 		assert( erg.size() > in1.second );
 		data::ImageList::iterator at = erg.begin();
-		if(in1.second>=0)
+
+		if( in1.second >= 0 )
 			std::advance( at, in1.second );
+
 		images1.push_back( *at );
 
 		if( !in2.first.empty() ) {
@@ -80,8 +82,10 @@ int main( int argc, char *argv[] )
 
 		assert( erg.size() > in2.second );
 		at = erg.begin();
-		if(in2.second>=0)
+
+		if( in2.second >= 0 )
 			std::advance( at, in2.second );
+
 		images2.push_back( *at );
 	} else {
 		images1 = data::IOFactory::load( in1.first );

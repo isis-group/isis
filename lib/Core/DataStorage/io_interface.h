@@ -54,6 +54,7 @@ protected:
 public:
 	static void throwGenericError( std::string desc );
 	static void throwSystemError( int err, std::string desc = "" );
+	boost::filesystem::path plugin_file;
 
 	/// splits the suffix (and the ".") from the filename (or path) and returns a pair made of both parts
 	virtual std::pair<std::string, std::string> makeBasename( const std::string &filename )const;
