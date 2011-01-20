@@ -91,3 +91,15 @@ Description: The ISIS package provides a general I/O framework for neuroimaging
  data from various MRI scanners.
  .
  This Package provides the ISIS I/O plugins for the raw data support. 
+
+Package: isisio0-png
+Section: science
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0
+Description: The ISIS package provides a general I/O framework for neuroimaging
+ data.  Being started with fMRI data, it can handle several established data
+ formats, like Nifti, Analyze, DICOM and vista. A first application based on this
+ project is a data converter that allows an easy and unified handling of fMRI
+ data from various MRI scanners.
+ .
+ This Package provides the ISIS I/O plugins for the png data support. 
