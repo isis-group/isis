@@ -159,7 +159,7 @@ public:
 
 					// set it to the given size - otherwise mmap will be very sad
 #ifdef HAVE_FALLOCATE
-					const int err = fallocate( mfile, 0, size ); //fast preallocation using features of ome linux-filesystems
+					const int err = fallocate( mfile, FALLOC_FL_KEEP_SIZE, 0, size ); //fast preallocation using features of ome linux-filesystems
 #elif HAVE_POSIX_FALLOCATE
 					const int err = posix_fallocate( mfile, 0, size ); // slower posix compatible version
 #else
