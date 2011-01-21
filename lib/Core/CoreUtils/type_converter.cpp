@@ -54,7 +54,7 @@ public:
 	boost::numeric::range_check_result generate( const TypeBase &src, boost::scoped_ptr<TypeBase>& dst )const {
 		create( dst );
 		assert( dst );
-		const boost::numeric::range_check_result result = convert( src.cast_to_Type<SRC>(), *dst );
+		const boost::numeric::range_check_result result = convert( src.castToType<SRC>(), *dst );
 		return result;
 	}
 };

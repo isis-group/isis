@@ -94,7 +94,7 @@ std::string FileFormat::makeFilename( const util::PropertyMap &props, std::strin
 
 		if( props.hasProperty( prop ) ) {
 
-			const std::string pstring =  boost::regex_replace( props.getProperty<std::string>( prop ), boost::regex( "[[:space:]/\\\\]" ), "_" );
+			const std::string pstring =  boost::regex_replace( props.getPropertyAs<std::string>( prop ), boost::regex( "[[:space:]/\\\\]" ), "_" );
 
 			namePattern.replace( what[0].first, what[0].second, pstring );
 			LOG( Debug, info )

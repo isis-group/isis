@@ -25,7 +25,7 @@ public:
 		png_structp png_ptr;
 		png_infop info_ptr;
 		assert( buff.relevantDims() == 2 );
-		util::FixedVector<size_t, 4> size = buff.sizeToVector();
+		util::FixedVector<size_t, 4> size = buff.getSizeAsVector();
 
 		/* open the file */
 		fp = fopen( filename.c_str(), "wb" );
@@ -110,14 +110,14 @@ public:
 		}
 
 		data::Image tImg( image );
-		tImg.makeOfTypeId( data::TypePtr<png_byte>::staticID );
+		tImg.makeOfTypeID( data::TypePtr<png_byte>::staticID );
 		tImg.spliceDownTo( data::sliceDim );
 		std::vector<boost::shared_ptr<data::Chunk> > chunks = tImg.getChunkList();
 		unsigned short numLen = std::log10( chunks.size() ) + 1;
 		size_t number = 0;
 
 		if( util::istring( dialect.c_str() ) == util::istring( "middle" ) ) { //save only the middle
-			LOG( Runtime, info ) << "Writing the slice " << chunks.size() / 2 + 1 << " of " << chunks.size() << " slices as png-image of size " << chunks.front()->sizeToString();
+			LOG( Runtime, info ) << "Writing the slice " << chunks.size() / 2 + 1 << " of " << chunks.size() << " slices as png-image of size " << chunks.front()->getSizeAsString();
 
 			if( !write_png( filename, *chunks[chunks.size()/2] ) ) {
 				throwGenericError( std::string( "Failed to write " ) + filename );
@@ -126,7 +126,7 @@ public:
 			const std::pair<std::string, std::string> fname = makeBasename( filename );
 			LOG( Runtime, info )
 					<< "Writing " << chunks.size() << " slices as png-images " << fname.first << "_"
-					<< std::string( numLen, 'X' ) << fname.second << " of size " << chunks.front()->sizeToString();
+					<< std::string( numLen, 'X' ) << fname.second << " of size " << chunks.front()->getSizeAsString();
 
 			BOOST_FOREACH( const boost::shared_ptr<data::Chunk> &ref, chunks ) {
 				const std::string num = boost::lexical_cast<std::string>( ++number );

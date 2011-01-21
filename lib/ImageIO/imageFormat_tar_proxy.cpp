@@ -193,7 +193,7 @@ public:
 					data::ChunkList chunksT;
 					ret += data::IOFactory::get().loadFile( chunksT, tmpfile, "", dialect );
 					BOOST_FOREACH( data::ChunkList::reference ref, chunksT ) { // set the source property of the red chunks to something more usefull
-						ref->setProperty( "source", ( boost::filesystem::path( filename ) / org_file ).file_string() );
+						ref->setPropertyAs( "source", ( boost::filesystem::path( filename ) / org_file ).file_string() );
 					}
 					chunks.insert( chunks.end(), chunksT.begin(), chunksT.end() ); // copy the red chunks into the output-list
 				}

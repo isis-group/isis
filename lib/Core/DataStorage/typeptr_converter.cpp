@@ -57,7 +57,7 @@ public:
 	}
 	void generate( const TypePtrBase &src, boost::scoped_ptr<TypePtrBase>& dst, const scaling_pair &scaling )const {
 		//Create new "stuff" in memory
-		create( dst, src.len() );
+		create( dst, src.length() );
 		assert( dst );
 		convert( src, *dst, scaling );//and convert into that
 	}
