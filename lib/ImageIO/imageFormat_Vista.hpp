@@ -144,7 +144,7 @@ private:
 				}
 
 				// set all vista specific properties in a extra group.
-				util::istring propname = (std::string( "Vista/" ) + name).c_str();
+				util::istring propname = ( std::string( "Vista/" ) + name ).c_str();
 
 				// MANDATORY: orientation --> readVector, phaseVector, sliceVector
 				// create default read, phase, slice vector values according to attribute
@@ -154,6 +154,7 @@ private:
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
 					//TODO remove "orientation" in Vista group
 					chunk.setPropertyAs<std::string>( propname, std::string( ( VString )val ) );
+
 					if( functional ) {
 						// axial is the reference
 						if( strcmp( ( const char * )val, "axial" ) == 0 ) {
@@ -258,7 +259,7 @@ private:
 				if( strcmp( name, "columnVec" ) == 0 ) {
 					util::fvector4 readVec;
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
-					const std::list<float> tokens = util::string2list<float>( std::string(( const char * )val), ' ' );
+					const std::list<float> tokens = util::string2list<float>( std::string( ( const char * )val ), ' ' );
 					readVec.copyFrom<std::list<float>::const_iterator>( tokens.begin(), tokens.end() );
 					chunk.setPropertyAs<util::fvector4>( "readVec", readVec );
 					continue;
@@ -268,7 +269,7 @@ private:
 				if( strcmp( name, "rowVec" ) == 0 ) {
 					util::fvector4 phaseVec;
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
-					const std::list<float> tokens = util::string2list<float>( std::string(( const char * )val), ' ' );
+					const std::list<float> tokens = util::string2list<float>( std::string( ( const char * )val ), ' ' );
 					phaseVec.copyFrom<std::list<float>::const_iterator>( tokens.begin(), tokens.end() );
 					chunk.setPropertyAs<util::fvector4>( "phaseVec", phaseVec );
 					continue;
@@ -278,7 +279,7 @@ private:
 				if( strcmp( name, "sliceVec" ) == 0 ) {
 					util::fvector4 sliceVec;
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
-					const std::list<float> tokens = util::string2list<float>( std::string(( const char * )val), ' ' );
+					const std::list<float> tokens = util::string2list<float>( std::string( ( const char * )val ), ' ' );
 					sliceVec.copyFrom<std::list<float>::const_iterator>( tokens.begin(), tokens.end() );
 					chunk.setPropertyAs<util::fvector4>( "sliceVec", sliceVec );
 					continue;

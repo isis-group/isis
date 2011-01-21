@@ -252,6 +252,10 @@ public:
 		bool USEOTSUTHRESHOLDING; //using an otsu threshold filter to create a mask which is designed to restrict the region given to the metric
 		bool INITIALIZEMASSOFF;
 		bool INITIALIZECENTEROFF;
+		bool PREALIGN;
+		short PREALIGNPRECISION;
+		double ROTATIONSCALE;
+		double TRANSLATIONSCALE;
 		unsigned int SHOWITERATIONATSTEP;
 		bool USEMASK;
 		bool LANDMARKINITIALIZE;
@@ -370,6 +374,8 @@ private:
 	unsigned int m_NumberOfParameters;
 
 	isis::extitk::IterationObserver::Pointer m_observer;
+
+	void prealign();
 
 	//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

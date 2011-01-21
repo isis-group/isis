@@ -22,7 +22,7 @@
  *****************************************************************/
 
 // local includes
-#include "imageFormat_Vista.h"
+#include "imageFormat_Vista.hpp"
 
 // global includes
 #include <list>
@@ -120,11 +120,13 @@ throw( std::runtime_error & )
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VShortRepn );
 			copyImageToVista<VShort>( image, vimages[0] );
 			break;
+#if defined(_M_X64) || defined(__amd64__)
 			// VLong
 		case data::TypePtr<VLong>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VLongRepn );
 			copyImageToVista<VLong>( image, vimages[0] );
 			break;
+#endif
 			// VFloat
 		case data::TypePtr<VFloat>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VFloatRepn );
@@ -611,10 +613,12 @@ bool ImageFormat_Vista::switchHandle( VImage &image, data::ChunkList &chunks )
 		addChunk<VShort>( chunks, image );
 		return true;
 		break;
+#if defined(_M_X64) || defined(__amd64__)
 	case VLongRepn:
 		addChunk<VLong>( chunks, image );
 		return true;
 		break;
+#endif
 	case VFloatRepn:
 		addChunk<VFloat>( chunks, image );
 		return true;
@@ -835,12 +839,16 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 				continue;
 			}
 
+#if defined(_M_X64) || defined(__amd64__)
+
 			// VLong -> VLong (char *)
 			if( pv->is<VLong>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VLongRepn,
 							 pv->castTo<VLong>() );
 				continue;
 			}
+
+#endif
 
 			// VFloat -> VFloat (char *)
 			if( pv->is<VFloat>() ) {

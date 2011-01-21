@@ -93,7 +93,10 @@ std::string FileFormat::makeFilename( const util::PropertyMap &props, std::strin
 		const util::PropertyMap::KeyType prop( what[0].str().substr( 1, what.length() - 2 ).c_str() );
 
 		if( props.hasProperty( prop ) ) {
-			namePattern.replace( what[0].first, what[0].second, props.getPropertyAs<std::string>( prop ) );
+
+			const std::string pstring =  boost::regex_replace( props.getProperty<std::string>( prop ), boost::regex( "[[:space:]/\\\\]" ), "_" );
+
+			namePattern.replace( what[0].first, what[0].second, pstring );
 			LOG( Debug, info )
 					<< "Replacing " << util::MSubject( util::PropertyMap::KeyType( "{" ) + prop + "}" ) << " by "   << util::MSubject( props.getPropertyAs<std::string>( prop ) )
 					<< " the string is now " << util::MSubject( namePattern );

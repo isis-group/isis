@@ -536,9 +536,9 @@ void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, isis::util::Pr
 		util::istring name;
 		const DcmDataDictionary &globalDataDict = dcmDataDict.rdlock();
 		const DcmDictEntry *dictRef = globalDataDict.findEntry( tag, tag.getPrivateCreator() );
-		LOG( Debug, verbose_info ) << "Parsing " << tag.toString();
 
-		if ( dictRef ) name = dictRef->getTagName();
+		if ( dictRef )
+			name = dictRef->getTagName();
 		else
 			name = util::istring( unknownTagName ) + tag.toString().c_str();
 

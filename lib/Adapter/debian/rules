@@ -1,7 +1,5 @@
 #!/usr/bin/make -f
 
-all:
-	echo "DESTDIR $(DEB_DESTDIR)"
 
 include /usr/share/cdbs/1/rules/debhelper.mk
 
@@ -15,12 +13,9 @@ DEB_CMAKE_EXTRA_FLAGS = \
 	-DCMAKE_SKIP_RPATH:BOOL=OFF \
 	-DCMAKE_BUILD_TYPE=release \
 	-DISIS_DIR=/usr/share/isis/cmake \
-	-DISIS_IMAGE_IO_IOPLUGIN_DICOM=ON \
-	-DISIS_IMAGE_IO_IOPLUGIN_NIFTI=ON \
-	-DISIS_IMAGE_IO_IOPLUGIN_VISTA=ON \
-	-DISIS_IMAGE_IO_IOPLUGIN_TAR=ON \
-	-DISIS_IMAGE_IO_IOPLUGIN_RAW=ON \
-	-DISIS_IMAGE_IO_IOPLUGIN_PNG=ON
+	-DISIS_ADAPTER_ITK=ON \
+	-DISIS_ADAPTER_QT4=OFF \
+	-DISIS_ADAPTER_VTK=OFF
 
 include /usr/share/cdbs/1/class/cmake.mk
 

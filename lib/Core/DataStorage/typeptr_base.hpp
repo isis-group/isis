@@ -96,6 +96,12 @@ public:
 
 	Reference copyToNewByID( unsigned short ID ) const;
 	Reference copyToNewByID( unsigned short ID, const scaling_pair &scaling ) const;
+	/**
+	 * Create a TypePtr of given type and length.
+	 * This allocates memory as needed but does not initialize it.
+	 * \returns a Reference to a TypePtr pointing to the allocated memory. Or an empty Reference if the creation failed.
+	 */
+	static Reference createById( unsigned short id, size_t len );
 
 	/**
 	 * Copy this to a new TypePtr\<T\> using newly allocated memory.

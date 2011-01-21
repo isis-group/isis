@@ -1,7 +1,7 @@
 # the ISIS core module
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
-INCLUDE(InstallRequiredSystemLibraries)
+INCLUDE(InstallRequiredSystemLibraries) #http://docdb.fnal.gov/ILC/sid/stanitz/ilcsoft-latest/cmake-2.4.8/Modules/InstallRequiredSystemLibraries.cmake
 
 PROJECT(ISIS_CORE)
 
@@ -139,11 +139,36 @@ SET(ISIS_BUILD_PROPERTIES LINK_FLAGS "--no-undefined" CLEAN_DIRECT_OUTPUT 1)
 SET(ISIS_BUILD_STATIC ON CACHE BOOL "enable build of the static library" )
 SET(ISIS_BUILD_DYNAMIC ON CACHE BOOL "enable build of the dynamic library" )
 
+
+############################################################
+# PACKAGING
+# @TODO: Check if CPACK is a better solution for building 
+# a rpm package
+############################################################
+OPTION(${CMAKE_PROJECT_NAME}_PACKAGE_RPM 
+    "Enable support for RPM packaging" OFF)
+
+IF(${CMAKE_PROJECT_NAME}_PACKAGE_RPM)
+
+    MESSAGE(STATUS "Configuring RPM build")
+
+    # write spec file for rpm package
+    CONFIGURE_FILE(cmake/template.spec.in ${CMAKE_BINARY_DIR}/libisiscore0.spec
+      @ONLY)
+    CONFIGURE_FILE(cmake/bootstrap_rpm.sh.in ${CMAKE_BINARY_DIR}/bootstrap_rpm.sh
+      @ONLY)
+
+    # add a custom make target
+    ADD_CUSTOM_TARGET(rpm   
+        "${CMAKE_BINARY_DIR}/bootstrap_rpm.sh" WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+
+ENDIF()
+
 ############################################################
 # build core
 ############################################################
 
-# add new source files to this parameter list
+# add source files to this parameter list
 FILE(GLOB CORE_SRC_FILES "DataStorage/*.cpp" "CoreUtils/*.cpp")
 FILE(GLOB COREUTILS_HDR_FILES "CoreUtils/*.hpp" "CoreUtils/*.h")
 FILE(GLOB DATASTORAGE_HDR_FILES "DataStorage/*.hpp" "DataStorage/*.h")
