@@ -217,7 +217,7 @@ bool Image::reIndex()
 
 			if ( hasProperty( "sliceVec" ) ) {
 				const util::fvector4 sliceVec = getPropertyAs<util::fvector4>( "sliceVec" );
-				LOG_IF( ! distVecNorm.fuzzyEqual( sliceVec ), Runtime, warning )
+				LOG_IF( ! distVecNorm.fuzzyEqual( sliceVec ), Runtime, info )
 						<< "The existing sliceVec " << sliceVec
 						<< " differs from the distance vector between chunk 0 and " << size[2] - 1
 						<< " " << distVecNorm;
@@ -314,7 +314,7 @@ bool Image::reIndex()
 				propFoV[i] = calcFoV[i];
 		}
 
-		LOG_IF( ! ok, Runtime, warning )
+		LOG_IF( ! ok, Runtime, info )
 				<< "The calculated field of view differs from the stored " << propFoV << "/" << calcFoV;
 	}
 
