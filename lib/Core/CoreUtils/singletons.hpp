@@ -13,9 +13,20 @@ namespace util
 {
 
 /**
- * Static class to handle singletons.
- * This class can be used to create singletons with a specified priority.
- * It keeps track of them and deletes them automatically based of their priority.
+ * Static class to handle singletons of a given type and priority.
+ * 
+ * The special issues for these Singletons are: \n
+ * 1) it's a template class - can be used for every type \n
+ * 2) they have a priority used for destroying the Singletons AFTER the application ends:
+ * - singletons are deleted in ascending order of int values
+ * - singletons of the same priority are deleted in the opposite order they where created (LIFO)
+ * By this, one can count for dependencies of destroying objects, e.g. general objects as the log module
+ * to be deleted latest.
+ *
+ * \code
+ * Singletons::get < MyClass, INT_MAX - 1 > 
+ * \endcode
+ * This generates a Singleton of MyClass with highest priority
  */
 class Singletons
 {
@@ -43,15 +54,11 @@ class Singletons
 	static Singletons &getMaster();
 public:
 	/**
-	 * Get a singleton of type T and priority PRIO.
-	 * If called the first time this creates a singleton of type T with the priority PRIO.
-	 * In any other case it just returns the same object which was created at the first call.
-	 * Singletons created by this function are automatically deleted based on the following rules:
-	 * - singletons are deleted _after_ the program ends
-	 * - singletons are not deleted before any singleton of a lower priority
-	 * - singletons of the same priority are deleted in the opposite order they where created. (LIFO)
-	 *
-	 * \return allways a reference to the same object of type T.
+	 * The first call creates a singleton of type T with the priority PRIO, 
+	 * all repetetive calls return this object.
+	 * \param T  type of the Singleton object
+	 * \param PRIO the priority of the Singleton object (ascending order)
+	 * \return a reference to the same object of type T.
 	 */
 	template<typename T, int PRIO> static Singleton<T> &get() {
 		return request<T>( PRIO );
