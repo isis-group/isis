@@ -147,7 +147,7 @@ ptime ImageFormat_Dicom::genTimeStamp( const date &date, const ptime &time )
 }
 
 
-void ImageFormat_Dicom::sanitise( isis::util::PropMap &object, string dialect )
+void ImageFormat_Dicom::sanitise( util::PropMap &object, string dialect )
 {
 	const util::istring prefix = util::istring( ImageFormat_Dicom::dicomTagTreeName ) + "/";
 	/////////////////////////////////////////////////////////////////////////////////
