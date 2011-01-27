@@ -66,13 +66,13 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 	}
 
 	if ( ! parameters.isComplete() ) {
-		std::cout << "Missing parameters: ";
+		std::cerr << "Missing parameters: ";
 
 		for ( ParameterMap::iterator iP = parameters.begin(); iP != parameters.end(); iP++ ) {
-			if ( iP->second.needed() ) {std::cout << "-" << iP->first << "  ";}
+			if ( iP->second.needed() ) {std::cerr << "-" << iP->first << "  ";}
 		}
 
-		std::cout << std::endl;
+		std::cerr << std::endl;
 		err = true;
 	}
 
@@ -95,7 +95,7 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 		printHelp();
 
 		if( exitOnError ) {
-			std::cout << "Exiting..." << std::endl;
+			std::cerr << "Exiting..." << std::endl;
 			exit( 1 );
 		}
 	}
@@ -104,8 +104,8 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 }
 void Application::printHelp( bool withHidden )const
 {
-	std::cout << this->m_name << " (using isis " << getCoreVersion() << ")" << std::endl;
-	std::cout << "Usage: " << this->m_filename << " <options>, where <options> includes:" << std::endl;
+	std::cerr << this->m_name << " (using isis " << getCoreVersion() << ")" << std::endl;
+	std::cerr << "Usage: " << this->m_filename << " <options>, where <options> includes:" << std::endl;
 
 	for ( ParameterMap::const_iterator iP = parameters.begin(); iP != parameters.end(); iP++ ) {
 		std::string pref;
@@ -121,14 +121,14 @@ void Application::printHelp( bool withHidden )const
 			pref = ". Default: \"" + iP->second.toString() + "\"";
 		}
 
-		std::cout << "\t-" << iP->first << " <" << iP->second->typeName() << ">" << std::endl;
+		std::cerr << "\t-" << iP->first << " <" << iP->second->typeName() << ">" << std::endl;
 
 		if ( iP->second->is<Selection>() ) {
 			const Selection &ref = iP->second->cast_to<Selection>();
-			std::cout << "\t\tOptions are: " <<  ref.getEntries() << std::endl;
+			std::cerr << "\t\tOptions are: " <<  ref.getEntries() << std::endl;
 		}
 
-		std::cout << "\t\t" << iP->second.description() << pref << std::endl;
+		std::cerr << "\t\t" << iP->second.description() << pref << std::endl;
 	}
 }
 
