@@ -17,7 +17,7 @@
 #pragma warning(disable:4290)
 #endif
 
-#include "CoreUtils/common.hpp"
+#include "common.hpp"
 #include <algorithm>
 #include <ostream>
 #include <numeric>

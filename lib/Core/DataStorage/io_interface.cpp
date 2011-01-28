@@ -7,9 +7,9 @@
 #include <iomanip>
 #include <iostream>
 
-#include "CoreUtils/log.hpp"
-#include "DataStorage/common.hpp"
-#include "DataStorage/io_interface.h"
+#include "../CoreUtils/log.hpp"
+#include "common.hpp"
+#include "io_interface.h"
 
 namespace isis
 {
@@ -93,7 +93,10 @@ std::string FileFormat::makeFilename( const util::PropMap &props, std::string na
 		const util::PropMap::pname_type prop( what[0].str().substr( 1, what.length() - 2 ).c_str() );
 
 		if( props.hasProperty( prop ) ) {
-			namePattern.replace( what[0].first, what[0].second, props.getProperty<std::string>( prop ) );
+
+			const std::string pstring =  boost::regex_replace( props.getProperty<std::string>( prop ), boost::regex( "[[:space:]/\\\\]" ), "_" );
+
+			namePattern.replace( what[0].first, what[0].second, pstring );
 			LOG( Debug, info )
 					<< "Replacing " << util::MSubject( util::PropMap::pname_type( "{" ) + prop + "}" ) << " by "    << util::MSubject( props.getProperty<std::string>( prop ) )
 					<< " the string is now " << util::MSubject( namePattern );

@@ -21,7 +21,7 @@
 #define SORTEDCHUNKLIST_HPP
 
 #include "chunk.hpp"
-#include "CoreUtils/vector.hpp"
+#include "../CoreUtils/vector.hpp"
 #include <stack>
 #include <boost/shared_ptr.hpp>
 

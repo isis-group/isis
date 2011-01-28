@@ -1,6 +1,6 @@
-isis (0.2.0-10) stable; urgency=low
+isis (0.2.0-4) stable; urgency=low
 
     * Initial Debian packaging attempt. This is the first version of
       a ISIS debian package.
 
- -- Erik Tuerke <tuerke@cbs.mpg.de>  Wed, 13 Oct 2010 19:43:07 +0100
+ -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Wed, 13 Oct 2010 19:43:07 +0100

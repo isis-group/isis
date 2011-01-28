@@ -1,3 +1,4 @@
+# -*- mode: cmake -*-
 # ISIS cmake configuration file
 #
 # This file declares the following variables:

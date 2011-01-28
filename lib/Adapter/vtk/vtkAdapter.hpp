@@ -24,8 +24,8 @@
 #ifndef VTKADAPTER_HPP_
 #define VTKADAPTER_HPP_
 
-#include "DataStorage/image.hpp"
-#include "CoreUtils/log.hpp"
+#include <DataStorage/image.hpp>
+#include <CoreUtils/log.hpp>
 
 //external includes
 #include <boost/shared_ptr.hpp>

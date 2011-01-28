@@ -9,7 +9,8 @@
 */
 
 #define BOOST_TEST_MODULE VectorTest
-#include <boost/test/included/unit_test.hpp>
+#define BOOST_TEST_DYN_LINK
+#include <boost/test/unit_test.hpp>
 #include "CoreUtils/vector.hpp"
 #include <string.h>
 
