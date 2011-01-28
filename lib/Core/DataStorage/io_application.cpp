@@ -146,12 +146,12 @@ bool IOApplication::autoload( bool exitOnError )
 		else
 			return false;
 	} else {
-		for( ImageList::const_iterator a = images.begin(); a != images.end(); a++ ) {
-			for( ImageList::const_iterator b = a; ( ++b ) != images.end(); ) {
-				const util::PropertyMap &aref = **a, bref = **b;
+		for( std::list<data::Image>::const_iterator a = images.begin(); a != images.end(); a++ ) {
+			for( std::list<data::Image>::const_iterator b = a; ( ++b ) != images.end(); ) {
+				const util::PropertyMap &aref = *a, bref = *b;
 				LOG_IF( aref.getDifference( bref ).empty(), Runtime, warning ) << "The metadata of the images from "
-						<< aref.getPropertyAs<std::string>( "source" ) << ":" << std::distance<ImageList::const_iterator>( images.begin(), a )
-						<< " and " << bref.getPropertyAs<std::string>( "source" ) << ":" << std::distance<ImageList::const_iterator>( images.begin(), b )
+						<< aref.getPropertyAs<std::string>( "source" ) << ":" << std::distance<std::list<Image> ::const_iterator>( images.begin(), a )
+						<< " and " << bref.getPropertyAs<std::string>( "source" ) << ":" << std::distance<std::list<Image> ::const_iterator>( images.begin(), b )
 						<< " are equal. Maybe they are duplicates.";
 			}
 		}
@@ -160,14 +160,12 @@ bool IOApplication::autoload( bool exitOnError )
 	return true;
 }
 
-bool IOApplication::autowrite( const Image &out_image, bool exitOnError )
+bool IOApplication::autowrite( Image out_image, bool exitOnError )
 {
-	ImageList list;
-	list.push_back( boost::shared_ptr<Image>( new Image( out_image ) ) );
-	return autowrite( list, exitOnError );
+	return autowrite( std::list<Image>(1,out_image), exitOnError );
 }
 
-bool IOApplication::autowrite( const ImageList &out_images, bool exitOnError )
+bool IOApplication::autowrite( std::list<Image> out_images, bool exitOnError )
 {
 	const util::Selection repn = parameters["repn"];
 	const std::string output = parameters["out"];
@@ -182,8 +180,8 @@ bool IOApplication::autowrite( const ImageList &out_images, bool exitOnError )
 			<< ( dl.empty() ? "" : std::string( " using the dialect: " ) + dl );
 
 	if( repn != 0 ) {
-		BOOST_FOREACH( ImageList::const_reference ref, out_images ) {
-			ref->makeOfTypeID( repn );
+		BOOST_FOREACH( std::list<Image>::reference ref, out_images ) {
+			ref.makeOfTypeID( repn );
 		}
 	}
 
@@ -200,7 +198,7 @@ bool IOApplication::autowrite( const ImageList &out_images, bool exitOnError )
 
 Image IOApplication::fetchImage()
 {
-	Image ret = *images.front();
+	Image ret = images.front();
 	images.pop_front();
 	return ret;
 }

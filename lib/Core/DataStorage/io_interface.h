@@ -60,7 +60,7 @@ public:
 	virtual std::pair<std::string, std::string> makeBasename( const std::string &filename )const;
 
 	static std::string makeFilename(const util::PropertyMap &img,std::string namePattern);
-	std::list<std::string> makeUniqueFilenames( const data::ImageList &images, const std::string &namePattern )const;
+	std::list<std::string> makeUniqueFilenames( const std::list<data::Image> &images, const std::string &namePattern )const;
 
 
 	static const float invalid_float;
@@ -103,7 +103,7 @@ public:
 	 * \param filename the name to be used as base for the filename generation if neccessary.
 	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
 	 */
-	virtual void write( const data::ImageList &images, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & );
+	virtual void write( const std::list<data::Image> &images, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & );
 	virtual ~FileFormat() {}
 };
 }

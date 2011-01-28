@@ -32,17 +32,13 @@ namespace data
 class IOApplication: public util::Application
 {
 	bool m_input, m_output;
-	template< typename TYPE > ImageList convertTo( const ImageList &imageList ) {
-		ImageList retList;
-		BOOST_FOREACH( ImageList::const_reference listRef, imageList ) {
-			retList.push_back( boost::shared_ptr<Image> ( new TypedImage<TYPE>( *listRef ) ) );
-		}
-		return retList;
+	template< typename TYPE > std::list<data::TypedImage<TYPE> > convertTo( const std::list<data::Image> &src ) {
+		return std::list<data::TypedImage<TYPE> >(src.begin(),src.end());
 	}
 	util::ConsoleFeedback feedback;
 
 public:
-	data::ImageList images;
+	std::list<data::Image> images;
 	IOApplication( const char name[], bool have_input = true, bool have_output = true );
 	virtual ~IOApplication();
 	virtual bool init( int argc, char **argv, bool exitOnError = true );
@@ -76,8 +72,8 @@ public:
 	}
 
 	bool autoload( bool exitOnError = false );
-	bool autowrite( const ImageList &out_images, bool exitOnError = false );
-	bool autowrite( const Image &out_image, bool exitOnError = false );
+	bool autowrite( std::list<data::Image> out_images, bool exitOnError = false );
+	bool autowrite( Image out_image, bool exitOnError = false );
 };
 
 }

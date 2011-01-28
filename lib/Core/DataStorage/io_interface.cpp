@@ -20,16 +20,16 @@ namespace _internal
 bool moreCmp( const util::istring &a, const util::istring &b ) {return a.length() > b.length();}
 }
 
-void FileFormat::write( const isis::data::ImageList &images, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & )
+void FileFormat::write( const std::list<data::Image> &images, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & )
 {
 	std::list<std::string> names = makeUniqueFilenames( images, filename );
 	std::list<std::string>::const_iterator inames = names.begin();
-	BOOST_FOREACH( data::ImageList::const_reference ref, images ) {
+	BOOST_FOREACH( std::list<data::Image>::const_reference ref, images ) {
 		std::string uniquePath = *( inames++ );
 		LOG( Runtime, info )   << "Writing image to " <<  uniquePath;
 
 		try {
-			write( *ref, uniquePath, dialect );
+			write( ref, uniquePath, dialect );
 		} catch ( std::runtime_error &e ) {
 			LOG( Runtime, warning )
 					<< "Failed to write image to " <<  uniquePath << " using " <<  name() << " (" << e.what() << ")";
@@ -108,16 +108,16 @@ std::string FileFormat::makeFilename( const util::PropertyMap &props, std::strin
 
 	return namePattern;
 }
-std::list<std::string> FileFormat::makeUniqueFilenames( const data::ImageList &images, const std::string &namePattern )const
+std::list<std::string> FileFormat::makeUniqueFilenames( const std::list<data::Image> &images, const std::string &namePattern )const
 {
 	std::list<std::string> ret;
 	std::map<std::string, unsigned short> names, used_names;
-	BOOST_FOREACH( data::ImageList::const_reference ref, images ) {
-		names[makeFilename( *ref, namePattern )]++;
+	BOOST_FOREACH( std::list<data::Image>::const_reference ref, images ) {
+		names[makeFilename( ref, namePattern )]++;
 	}
 
-	BOOST_FOREACH( data::ImageList::const_reference ref, images ) {
-		std::string name = makeFilename( *ref, namePattern );
+	BOOST_FOREACH( std::list<data::Image>::const_reference ref, images ) {
+		std::string name = makeFilename( ref, namePattern );
 
 		if( names[name] > 1 ) {
 			const unsigned short number = ++used_names[name];

@@ -51,9 +51,9 @@ public:
 	 */
 	int loadFile( isis::data::ChunkList &ret, const boost::filesystem::path &filename, std::string suffix_override, std::string dialect );
 	int loadPath( ChunkList &ret, const boost::filesystem::path &path, std::string suffix_override, std::string dialect );
-	static ImageList load( const std::string &path, std::string suffix_override = "", std::string dialect = "" );
+	static std::list<data::Image> load( const std::string &path, std::string suffix_override = "", std::string dialect = "" );
 
-	static bool write( const ImageList &images, const std::string &path, std::string suffix_override, const std::string &dialect );
+	static bool write( std::list<data::Image> images, const std::string &path, std::string suffix_override, const std::string &dialect );
 
 	static FileFormatList getFormats();
 	static IOFactory &get();
@@ -63,6 +63,13 @@ public:
 protected:
 	IOFactory();//shall not be created directly
 	FileFormatList io_formats;
+	/**
+	 *  Make images out of a (unordered) list of chunks.
+	 *  Uses the chunks in the chunklist to fit them together into images.
+	 *  \param chunk list of chunks to be used for the new images.
+	 *  \returns a list of newly created images consisting off chunks out of the given chunk list.
+	 */
+	static std::list<data::Image> chunkListToImageList(data::ChunkList chunks);
 
 	/*
 	 * each ImageFormat will be registered in a map after plugin has been loaded

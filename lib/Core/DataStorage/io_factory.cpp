@@ -256,8 +256,58 @@ IOFactory::FileFormatList IOFactory::getFormatInterface( std::string filename, s
 	return ret;
 }
 
+std::list< Image > IOFactory::chunkListToImageList(ChunkList src)
+{
+	// throw away invalid chunks
+	size_t errcnt = 0;
+	for ( ChunkList::iterator i = src.begin(); i != src.end(); ) {
+		if ( ! ( *i )->isValid() ) { // drop invalid chunks
+			LOG( Runtime, error )
+			<< "Ignoring invalid chunk. Missing properties: " << ( *i )->getMissing();
+			src.erase( i++ );
+			errcnt++;
+		} else
+			i++;
+	}
 
-data::ImageList IOFactory::load( const std::string &path, std::string suffix_override, std::string dialect )
+	std::list< Image > ret;
+
+	while ( !src.empty() ) {
+		LOG( Debug, info ) << src.size() << " Chunks left to be distributed.";
+		Image buff;
+		size_t cnt = 0;
+
+		for ( ChunkList::iterator i = src.begin(); i != src.end(); ) { // for all remaining chunks
+			if ( buff.insertChunk( **i ) ) {
+				src.erase( i++ );
+				cnt++;
+			} else
+				i++;
+		}
+
+		if ( buff.isEmpty() ) {
+			LOG( Debug, info ) << "Reindexing image with " << cnt << " chunks.";
+
+			if ( buff.reIndex() ) {
+				if ( buff.isValid() ) { //if the image was successfully indexed and is valid, keep it
+					ret.push_back( buff );
+					LOG( Runtime, info ) << "Image " << ret.size() << " with size " << buff.getSizeAsString() <<  " and value range " << buff.getMinMax() << " done.";
+				} else {
+					LOG( Runtime, error )
+					<< "Cannot insert image. Missing properties: " << buff.getMissing();
+					errcnt += cnt;
+				}
+			} else {
+				LOG( Runtime, info ) << "Skipping broken image.";
+				errcnt += cnt;
+			}
+		}
+	}
+
+	LOG_IF( errcnt, Runtime, warning ) << "Dropped " << errcnt << " chunks because they didn't form valid images";
+}
+
+std::list<data::Image> IOFactory::load( const std::string &path, std::string suffix_override, std::string dialect )
 {
 	const boost::filesystem::path p( path );
 	ChunkList chunks;
@@ -269,7 +319,7 @@ data::ImageList IOFactory::load( const std::string &path, std::string suffix_ove
 			ref->setPropertyAs( "source", p.file_string() );
 	}
 	LOG( Runtime, info ) << "Debug in list: " << chunks.size();
-	const data::ImageList images( chunks );
+	const std::list<data::Image> images=chunkListToImageList( chunks );
 	LOG( Runtime, info )
 			<< "Generated " << images.size() << " images out of " << loaded << " chunks loaded from " << ( boost::filesystem::is_directory( p ) ? "directory " : "" ) << p;
 	return images;
@@ -299,12 +349,12 @@ int IOFactory::loadPath( isis::data::ChunkList &ret, const boost::filesystem::pa
 	return loaded;
 }
 
-bool IOFactory::write( const isis::data::ImageList &images, const std::string &path, std::string suffix_override, const std::string &dialect )
+bool IOFactory::write( std::list<data::Image> images, const std::string &path, std::string suffix_override, const std::string &dialect )
 {
 	const FileFormatList formatWriter = get().getFormatInterface( path, suffix_override, dialect );
 
-	BOOST_FOREACH( ImageList::const_reference ref, images ) {
-		ref->checkMakeClean();
+	BOOST_FOREACH( std::list<data::Image>::reference ref, images ) {
+		ref.checkMakeClean();
 	}
 
 	if( formatWriter.size() ) {

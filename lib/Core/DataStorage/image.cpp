@@ -467,55 +467,6 @@ size_t Image::bytes_per_voxel() const
 	return size;
 }
 
-ImageList::ImageList() {}
-ImageList::ImageList( ChunkList src )
-{
-	for ( ChunkList::iterator i = src.begin(); i != src.end(); ) {
-		if ( ! ( *i )->isValid() ) { // drop invalid chunks
-			LOG( Runtime, error )
-					<< "Ignoring invalid chunk. Missing properties: " << ( *i )->getMissing();
-			src.erase( i++ );
-		} else
-			i++;
-	}
-
-	size_t errcnt = 0;
-
-	while ( !src.empty() ) {
-		LOG( Debug, info ) << src.size() << " Chunks left to be distributed.";
-		value_type buff( new Image );
-		size_t cnt = 0;
-
-		for ( ChunkList::iterator i = src.begin(); i != src.end(); ) { // for all remaining chunks
-			if ( buff->insertChunk( **i ) ) {
-				src.erase( i++ );
-				cnt++;
-			} else
-				i++;
-		}
-
-		if ( !buff->isEmpty() ) {
-			LOG( Debug, info ) << "Reindexing image with " << cnt << " chunks.";
-
-			if ( buff->reIndex() ) {
-				if ( buff->isValid() ) {
-					push_back( buff );
-					LOG( Runtime, info ) << "Image " << size() << " with size " << buff->getSizeAsString() <<  " and value range " << buff->getMinMax() << " done.";
-				} else {
-					LOG( Runtime, error )
-							<< "Cannot insert image. Missing properties: " << buff->getMissing();
-					errcnt += cnt;
-				}
-			} else {
-				LOG( Runtime, info ) << "Skipping broken image.";
-				errcnt += cnt;
-			}
-		}
-	}
-
-	LOG_IF( errcnt, Runtime, warning ) << "Dropped " << errcnt << " chunks because they didn't form valid images";
-}
-
 std::pair<util::TypeReference, util::TypeReference> Image::getMinMax () const
 {
 	std::pair<util::TypeReference, util::TypeReference> ret;
