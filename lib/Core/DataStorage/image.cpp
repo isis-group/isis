@@ -282,7 +282,7 @@ bool Image::reIndex()
 			// We dont know anything about the slice-direction
 			// we just guess its along the positive cross-product between read- and phase direction
 			// so at least warn the user if we do that long shot
-			LOG( Runtime, warning )
+			LOG( Runtime, info )
 					<< "used the cross product between readVec and phaseVec as sliceVec:"
 					<< crossVec << ". That might be wrong!";
 			setProperty( "sliceVec", crossVec );
