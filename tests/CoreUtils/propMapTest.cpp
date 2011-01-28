@@ -7,7 +7,8 @@
 
 // The BOOST_TEST_MODULE is similar to a unit test suite.
 #define BOOST_TEST_MODULE PropMapTests
-#include <boost/test/included/unit_test.hpp>
+#define BOOST_TEST_DYN_LINK
+#include <boost/test/unit_test.hpp>
 #include <CoreUtils/propmap.hpp>
 #include <CoreUtils/vector.hpp>
 #include <string>

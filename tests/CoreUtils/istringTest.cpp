@@ -1,6 +1,7 @@
 #define BOOST_TEST_MODULE TypeTest
 #define NOMINMAX 1
-#include <boost/test/included/unit_test.hpp>
+#define BOOST_TEST_DYN_LINK
+#include <boost/test/unit_test.hpp>
 #include <CoreUtils/istring.hpp>
 
 namespace isis
