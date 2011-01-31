@@ -88,7 +88,7 @@ public:
 	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
 	 * \returns the amount of loaded chunks.
 	 */
-	virtual int load( data::ChunkList &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) = 0; //@todo should be locked
+	virtual int load( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) = 0; //@todo should be locked
 	/**
 	 * Write a single image to a file.
 	 * I case of an error std::runtime_error will be thrown.

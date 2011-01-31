@@ -62,6 +62,12 @@ struct dialect_missing {
 		return ret;
 	}
 };
+
+bool invalid_and_tell(Chunk &candidate){
+	LOG_IF(!candidate.isValid(), Runtime, error ) << "Ignoring invalid chunk. Missing properties: " << candidate.getMissing();
+	return !candidate.isValid();
+}
+
 }
 
 IOFactory::IOFactory(): m_feedback( NULL )
@@ -182,7 +188,7 @@ IOFactory &IOFactory::get()
 	return util::Singletons::get<IOFactory, INT_MAX>();
 }
 
-int IOFactory::loadFile( isis::data::ChunkList &ret, const boost::filesystem::path &filename, std::string suffix_override, std::string dialect )
+int IOFactory::loadFile( std::list<Chunk> &ret, const boost::filesystem::path &filename, std::string suffix_override, std::string dialect )
 {
 	FileFormatList formatReader;
 	formatReader = getFormatInterface( filename.file_string(), suffix_override, dialect );
@@ -256,19 +262,12 @@ IOFactory::FileFormatList IOFactory::getFormatInterface( std::string filename, s
 	return ret;
 }
 
-std::list< Image > IOFactory::chunkListToImageList(ChunkList src)
+std::list< Image > IOFactory::chunkListToImageList(std::list<Chunk> &src)
 {
 	// throw away invalid chunks
-	size_t errcnt = 0;
-	for ( ChunkList::iterator i = src.begin(); i != src.end(); ) {
-		if ( ! ( *i )->isValid() ) { // drop invalid chunks
-			LOG( Runtime, error )
-			<< "Ignoring invalid chunk. Missing properties: " << ( *i )->getMissing();
-			src.erase( i++ );
-			errcnt++;
-		} else
-			i++;
-	}
+	size_t errcnt = src.size();
+	src.remove_if(_internal::invalid_and_tell);
+	errcnt-=src.size();
 
 	std::list< Image > ret;
 
@@ -277,8 +276,8 @@ std::list< Image > IOFactory::chunkListToImageList(ChunkList src)
 		Image buff;
 		size_t cnt = 0;
 
-		for ( ChunkList::iterator i = src.begin(); i != src.end(); ) { // for all remaining chunks
-			if ( buff.insertChunk( **i ) ) {
+		for ( std::list<Chunk>::iterator i = src.begin(); i != src.end(); ) { // for all remaining chunks
+			if ( buff.insertChunk( *i ) ) {
 				src.erase( i++ );
 				cnt++;
 			} else
@@ -310,13 +309,13 @@ std::list< Image > IOFactory::chunkListToImageList(ChunkList src)
 std::list<data::Image> IOFactory::load( const std::string &path, std::string suffix_override, std::string dialect )
 {
 	const boost::filesystem::path p( path );
-	ChunkList chunks;
+	std::list<Chunk> chunks;
 	const int loaded = boost::filesystem::is_directory( p ) ?
 					   get().loadPath( chunks, p, suffix_override, dialect ) :
 					   get().loadFile( chunks, p, suffix_override, dialect );
-	BOOST_FOREACH( data::ChunkList::reference ref, chunks ) {
-		if ( ! ref->hasProperty( "source" ) )
-			ref->setPropertyAs( "source", p.file_string() );
+	BOOST_FOREACH( Chunk &ref, chunks ) {
+		if ( ! ref.hasProperty( "source" ) )
+			ref.setPropertyAs( "source", p.file_string() );
 	}
 	LOG( Runtime, info ) << "Debug in list: " << chunks.size();
 	const std::list<data::Image> images=chunkListToImageList( chunks );
@@ -325,7 +324,7 @@ std::list<data::Image> IOFactory::load( const std::string &path, std::string suf
 	return images;
 }
 
-int IOFactory::loadPath( isis::data::ChunkList &ret, const boost::filesystem::path &path, std::string suffix_override, std::string dialect )
+int IOFactory::loadPath( std::list<Chunk> &ret, const boost::filesystem::path &path, std::string suffix_override, std::string dialect )
 {
 	int loaded = 0;
 
