@@ -115,7 +115,7 @@ throw( std::runtime_error & )
 			break;
 			// VShort
 		case data::TypePtr<u_int16_t>::staticID:
-			LOG( Runtime, warning ) << "Vista does not support " << util::Type<u_int16_t>::staticName() << ". Falling back to " << util::Type<VShort>::staticName();
+			LOG( Runtime, info ) << "Vista does not support " << util::Type<u_int16_t>::staticName() << ". Falling back to " << util::Type<VShort>::staticName();
 		case data::TypePtr<VShort>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VShortRepn );
 			copyImageToVista<VShort>( image, vimages[0] );
