@@ -193,11 +193,11 @@ Chunk &Chunk::operator=( const Chunk &ref )
 	return *this;
 }
 
-ChunkList Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
+std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 {
 	if ( !isValid() ) {
 		LOG( Runtime, error ) << "Cannot splice invalid Chunk (missing properties are " << this->getMissing() << ")";
-		return ChunkList();
+		return std::list<Chunk>();
 	}
 
 	util::fvector4 offset;
@@ -241,10 +241,10 @@ ChunkList Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 	const util::fvector4 indexOriginOffset = offset * distance[atDim];
 	size_t cnt = 0;
 	LOG( Debug, info ) << "Splicing chunk at dimenstion " << atDim + 1 << " with indexOrigin stride " << indexOriginOffset << " and acquisitionNumberStride " << acquisitionNumberStride;
-	ChunkList ret = splice( ( dimensions )atDim ); // do low level splice - get the chunklist
-	BOOST_FOREACH( ChunkList::reference ref, ret ) { // adapt some metadata in them
-		util::fvector4 &orig = ref->propertyValue( "indexOrigin" )->castTo<util::fvector4>();
-		uint32_t &acq = ref->propertyValue( "acquisitionNumber" )->castTo<uint32_t>();
+	std::list<Chunk> ret = splice( ( dimensions )atDim ); // do low level splice - get the chunklist
+	BOOST_FOREACH( Chunk& ref, ret ) { // adapt some metadata in them
+		util::fvector4 &orig = ref.propertyValue( "indexOrigin" )->castTo<util::fvector4>();
+		uint32_t &acq = ref.propertyValue( "acquisitionNumber" )->castTo<uint32_t>();
 		orig = orig + indexOriginOffset * ( float )cnt;
 		acq += acquisitionNumberStride * cnt; //@todo this might cause trouble if we try to insert this chunks into an image
 		cnt++;
@@ -252,9 +252,9 @@ ChunkList Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 	return ret;
 }
 
-ChunkList Chunk::splice ( dimensions atDim )const
+std::list<Chunk> Chunk::splice ( dimensions atDim )const
 {
-	ChunkList ret;
+	std::list<Chunk> ret;
 	//@todo should be locking
 	typedef std::vector<TypePtrReference> TypePtrList;
 	const util::FixedVector<size_t, dims> wholesize = getSizeAsVector();
@@ -266,9 +266,8 @@ ChunkList Chunk::splice ( dimensions atDim )const
 	const TypePtrList pointers = this->getTypePtrBase().splice( spliceSize.product() );
 	//create new Chunks from this TypePtr's
 	BOOST_FOREACH( TypePtrList::const_reference ref, pointers ) {
-		boost::shared_ptr<Chunk> spliced( new Chunk( ref, spliceSize[0], spliceSize[1], spliceSize[2], spliceSize[3] ) );
-		static_cast<util::PropertyMap &>( *spliced ) = static_cast<const util::PropertyMap &>( *this ); //copy the metadate of ref
-		ret.push_back( spliced ); // store splice for return
+		ret.push_back(Chunk( ref, spliceSize[0], spliceSize[1], spliceSize[2], spliceSize[3] ) ); //@todo make sure zhis is only one copy-operation
+		static_cast<util::PropertyMap &>( ret.front() ) = static_cast<const util::PropertyMap &>( *this ); //copy the metadate of ref
 	}
 	return ret;
 }

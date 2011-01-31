@@ -661,8 +661,8 @@ size_t Image::spliceDownTo( dimensions dim ) //readDim = 0, phaseDim, sliceDim, 
 				const size_t subSize = m_image.getSizeAsVector()[topDim];
 				assert( !( m_amount % subSize ) ); // there must not be any "remaining"
 				splicer sub( m_dim, m_amount / subSize, m_image );
-				BOOST_FOREACH( ChunkList::const_reference ref, ch.autoSplice( m_amount / subSize ) ) {
-					sub( *ref );
+				BOOST_FOREACH( const Chunk &ref, ch.autoSplice( m_amount / subSize ) ) {
+					sub( ref );
 				}
 			} else { // seems like we're done - insert it into the image
 				assert( ch.relevantDims() == ( size_t ) m_dim ); // index of the higest dim>1 (ch.relevantDims()-1) shall be equal to the dim below the requested splicing (m_dim-1)
