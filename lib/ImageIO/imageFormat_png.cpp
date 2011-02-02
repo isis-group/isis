@@ -99,7 +99,7 @@ public:
 	}
 
 
-	int load ( data::ChunkList &chunks, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
+	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
 		throwGenericError( "png loading is not supportted (yet)" );
 		return 0;
 	}

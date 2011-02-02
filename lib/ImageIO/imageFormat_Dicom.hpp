@@ -59,7 +59,7 @@ class ImageFormat_Dicom: public FileFormat
 	static size_t parseCSAEntry( Uint8 *at, isis::util::PropertyMap &map, const std::string &dialect );
 	static bool parseCSAValue( const std::string &val, const util::istring &name, const util::istring &vr, isis::util::PropertyMap &map );
 	static bool parseCSAValueList( const isis::util::slist &val, const util::istring &name, const util::istring &vr, isis::util::PropertyMap &map );
-	static int readMosaic( data::Chunk source, data::ChunkList &dest );
+	static int readMosaic( data::Chunk source, std::list<data::Chunk> &dest );
 protected:
 	std::string suffixes()const;
 public:
@@ -74,7 +74,7 @@ public:
 	std::string name()const;
 	std::string dialects( const std::string &filename )const;
 
-	int load( data::ChunkList &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & );
+	int load( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & );
 	void write( const data::Image &image, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & );
 
 	bool tainted()const;

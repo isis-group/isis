@@ -98,7 +98,7 @@ public:
 	}
 	std::string name()const {return "tar decompression proxy for other formats";}
 
-	int load ( data::ChunkList &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) {
+	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) {
 		int ret = 0;
 
 		const util::istring suffix = makeBasename( filename ).second.c_str();
@@ -190,12 +190,11 @@ public:
 					close( mfile );
 
 					// read the temporary file
-					data::ChunkList chunksT;
-					ret += data::IOFactory::get().loadFile( chunksT, tmpfile, "", dialect );
-					BOOST_FOREACH( data::ChunkList::reference ref, chunksT ) { // set the source property of the red chunks to something more usefull
-						ref->setPropertyAs( "source", ( boost::filesystem::path( filename ) / org_file ).file_string() );
+					std::list<data::Chunk>::iterator prev=chunks.end();--prev;
+					ret += data::IOFactory::get().loadFile( chunks, tmpfile, "", dialect );
+					for( ;prev!=chunks.end(); ++prev ) { // set the source property of the red chunks to something more usefull
+						prev->setPropertyAs( "source", ( boost::filesystem::path( filename ) / org_file ).file_string() );
 					}
-					chunks.insert( chunks.end(), chunksT.begin(), chunksT.end() ); // copy the red chunks into the output-list
 				}
 			} else {
 				LOG( Debug, verbose_info ) << "Skipping " << org_file.file_string() << " because its no regular file (type is " << tar_header.typeflag << ")" ;

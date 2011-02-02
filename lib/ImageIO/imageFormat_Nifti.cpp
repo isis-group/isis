@@ -117,7 +117,7 @@ public:
 	/***********************
 	 * load file
 	 ************************/
-	int load( data::ChunkList &retList, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
+	int load( std::list<data::Chunk> &retList, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
 		//read the file with the function from nifti1_io.h
 		nifti_image *ni = nifti_image_read( filename.c_str(), true );
 
@@ -134,40 +134,39 @@ public:
 		}
 
 		LOG( ImageIoDebug, isis::info ) << "datatype to load from nifti " << ni->datatype;
-		boost::shared_ptr<data::Chunk> retChunk;
 		Deleter del( ni, filename );
 
 		switch ( ni->datatype ) {
 		case DT_UINT8:
-			retChunk.reset( new _internal::NiftiChunk( static_cast<uint8_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
+			retList.push_back(_internal::NiftiChunk( static_cast<uint8_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
 			break;
 		case DT_INT8:
-			retChunk.reset( new _internal::NiftiChunk( static_cast<int8_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
+			retList.push_back(_internal::NiftiChunk( static_cast<int8_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
 			break;
 		case DT_INT16:
-			retChunk.reset( new _internal::NiftiChunk( static_cast<int16_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
+			retList.push_back(_internal::NiftiChunk( static_cast<int16_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
 			break;
 		case DT_UINT16:
-			retChunk.reset( new _internal::NiftiChunk( static_cast<uint16_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
+			retList.push_back(_internal::NiftiChunk( static_cast<uint16_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
 			break;
 		case DT_UINT32:
-			retChunk.reset( new _internal::NiftiChunk( static_cast<uint32_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
+			retList.push_back(_internal::NiftiChunk( static_cast<uint32_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
 			break;
 		case DT_INT32:
-			retChunk.reset( new _internal::NiftiChunk( static_cast<int32_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
+			retList.push_back(_internal::NiftiChunk( static_cast<int32_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
 			break;
 		case DT_FLOAT32:
-			retChunk.reset( new _internal::NiftiChunk( static_cast<float *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
+			retList.push_back(_internal::NiftiChunk( static_cast<float *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
 			break;
 		case DT_FLOAT64:
-			retChunk.reset( new _internal::NiftiChunk( static_cast<double *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
+			retList.push_back(_internal::NiftiChunk( static_cast<double *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
 			break;
 		default:
 			throwGenericError( std::string( "Unsupported datatype " ) + util::Type<int>( ni->datatype ).toString() );
 		}
 
 		// don't forget to take the properties with
-		copyHeaderFromNifti( *retChunk, *ni );
+		copyHeaderFromNifti( retList.back(), *ni );
 		//      if ( dialect == "spm" )
 		//      {
 		//          boost::shared_ptr<data::MemChunk<int16_t> >
@@ -177,8 +176,7 @@ public:
 		//          return 1;
 		//      }
 		// push the completed NiftiChunk into the list
-		retList.push_back( retChunk );
-		return retChunk ? 1 : 0;
+		return 1; // if there was an error, we wouldn't get here
 	}
 
 

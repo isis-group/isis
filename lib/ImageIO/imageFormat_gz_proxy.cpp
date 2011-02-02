@@ -147,7 +147,7 @@ public:
 		return std::make_pair( realBase.first, realBase.second + proxyBase.second );
 	}
 
-	int load ( data::ChunkList &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) {
+	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) {
 		const std::pair<std::string, std::string> proxyBase = FileFormat::makeBasename( filename ); // get rid of the the .gz
 		//then get the actual plugin for the format
 		const data::IOFactory::FileFormatList formats = data::IOFactory::get().getFormatInterface( proxyBase.first );
@@ -162,16 +162,16 @@ public:
 
 		file_uncompress( filename, tmpfile.file_string() );
 
-		data::ChunkList buff;
+		std::list<data::Chunk>::iterator prev=chunks.end();--prev;
 
-		int ret = data::IOFactory::get().loadFile( buff, tmpfile, "", dialect );
+		int ret = data::IOFactory::get().loadFile( chunks, tmpfile, "", dialect );
 
 		if( ret ) {
-			LOG( Debug, info ) <<  "Setting source of all " << buff.size() << " chunks to " << util::MSubject( filename );
-			BOOST_FOREACH( data::ChunkList::reference ref, buff ) {
-				ref->setPropertyAs( "source", filename );
+			prev++;
+			LOG( Debug, info ) <<  "Setting source of all " << std::distance(prev,chunks.end()) << " chunks to " << util::MSubject( filename );
+			for( ;prev!=chunks.end();++prev ) {
+				prev->setPropertyAs( "source", filename );
 			}
-			chunks.insert( chunks.end(), buff.begin(), buff.end() );
 		}
 
 		return ret;

@@ -66,7 +66,7 @@ public:
 	 *
 	 */
 	std::string dialects( const std::string &filename )const {return std::string( "functional map anatomical" );}
-	int load( data::ChunkList &chunks, const std::string &filename,
+	int load( std::list<data::Chunk> &chunks, const std::string &filename,
 			  const std::string &dialect ) throw( std::runtime_error & );
 	void write( const data::Image &image, const std::string &filename,
 				const std::string &dialect ) throw( std::runtime_error & );
@@ -471,7 +471,7 @@ private:
 	};
 
 	//member function which switch handles the loaded images
-	bool switchHandle( VImage &, data::ChunkList & );
+	bool switchHandle( VImage &, std::list<data::Chunk> & );
 
 	/**
 	 * This function copies all chunk header informations to the appropriate
@@ -496,7 +496,7 @@ private:
 	 * This function creates a MemChunk with the correct type and adds it to the
 	 * end of the Chunk list.
 	 */
-	template <typename TInput> void addChunk( data::ChunkList &chunks, VImage image );
+	template <typename TInput> void addChunk( std::list<data::Chunk> &chunks, VImage image );
 
 	/**
 	 * This function calculates the index origin of a given chunk according to its

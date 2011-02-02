@@ -66,6 +66,7 @@ protected:
 	/**
 	 *  Make images out of a (unordered) list of chunks.
 	 *  Uses the chunks in the chunklist to fit them together into images.
+	 *  This removes _every_ image from chunks - so make a copy if you need them
 	 *  \param chunk list of chunks to be used for the new images.
 	 *  \returns a list of newly created images consisting off chunks out of the given chunk list.
 	 */

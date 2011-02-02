@@ -55,8 +55,8 @@ class DicomChunk : public data::Chunk
 public:
 	//this uses auto_ptr by intention
 	//the ownership of the DcmFileFormat-pointer shall be transfered to this function, because it has to decide if it should be deleted
-	static boost::shared_ptr<data::Chunk> makeChunk( std::string filename, std::auto_ptr<DcmFileFormat> dcfile, const std::string &dialect ) {
-		boost::shared_ptr<data::Chunk> ret;
+	static data::Chunk makeChunk( std::string filename, std::auto_ptr<DcmFileFormat> dcfile, const std::string &dialect ) {
+		std::auto_ptr<data::Chunk> ret;
 		std::auto_ptr<DicomImage> img( new DicomImage( dcfile.get(), EXS_Unknown ) );
 
 		if ( img->getStatus() == EIS_Normal ) {
@@ -92,7 +92,7 @@ public:
 						FileFormat::throwGenericError( "Unsupported datatype for monochrome images" ); //@todo tell the user which datatype it is
 					}
 
-					if ( ret ) {
+					if ( ret.get() ) {
 						//OK, the source image and file pointer are managed by the chunk, we must release them
 						img.release();
 						dcfile.release();
@@ -111,7 +111,7 @@ public:
 						FileFormat::throwGenericError( "Unsupported datatype for color images" ); //@todo tell the user which datatype it is
 					}
 
-					if ( ret ) {
+					if ( ret.get() ) {
 						ImageFormat_Dicom::dcmObject2PropMap( dcdata, ret->branch( ImageFormat_Dicom::dicomTagTreeName ), dialect );
 					}
 				} else {
@@ -124,7 +124,7 @@ public:
 			FileFormat::throwGenericError( std::string( "Failed to open image: " ) + DicomImage::getString( img->getStatus() )  + ")" );
 		}
 
-		return ret;
+		return *ret;
 	}
 };
 }
@@ -346,13 +346,15 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, string dialect )
 	}
 }
 
-int ImageFormat_Dicom::readMosaic( data::Chunk source, data::ChunkList &dest )
+int ImageFormat_Dicom::readMosaic( isis::data::Chunk source, list< isis::data::Chunk >& dest )
 {
 	// prepare some needed parameters
 	const util::istring prefix = util::istring( ImageFormat_Dicom::dicomTagTreeName ) + "/";
 	util::slist iType = source.getPropertyAs<util::slist>( prefix + "ImageType" );
 	std::replace( iType.begin(), iType.end(), std::string( "MOSAIC" ), std::string( "WAS_MOSAIC" ) );
 	util::istring NumberOfImagesInMosaicProp;
+
+	const unsigned short oldSize=dest.size();
 
 	if ( source.hasProperty( prefix + "Unknown Tag(0019,100a)" ) ) {
 		NumberOfImagesInMosaicProp = prefix + "Unknown Tag(0019,100a)";
@@ -420,12 +422,10 @@ int ImageFormat_Dicom::readMosaic( data::Chunk source, data::ChunkList &dest )
 		acqTime = source.propertyValue( "acquisitionTime" )->castTo<float>();
 	}
 
-	// Create a chunk-vector for the slices
-	std::vector<boost::shared_ptr<data::Chunk> > newChunks( images );
-
 	// for every slice
 	for ( size_t slice = 0; slice < images; slice++ ) {
-		newChunks[slice].reset( new data::Chunk( source.cloneToNew( size[0], size[1] ) ) );
+		dest.push_back( source.cloneToNew( size[0], size[1] ) );//create a new chunk at the end of the output
+		data::Chunk &working=dest.back(); // use this as working slice
 
 		// copy the lines into the corresponding slice-chunk
 		for ( size_t phase = 0; phase < size[1]; phase++ ) {
@@ -434,66 +434,64 @@ int ImageFormat_Dicom::readMosaic( data::Chunk source, data::ChunkList &dest )
 			const size_t row = slice / matrixSize;
 			const size_t sstart[] = {column *size[0], row *size[1] + phase, 0, 0}; //begin of the source line
 			const size_t send[] = {sstart[0] + size[0] - 1, row *size[1] + phase, 0, 0}; //end of the source line
-			source.copyRange( sstart, send, *newChunks[slice], dpos );
+			source.copyRange( sstart, send, working, dpos );
 		}
 
 		// and "fix" its properties
-		static_cast<util::PropertyMap &>( *newChunks[slice] ) = static_cast<const util::PropertyMap &>( source ); //copy _only_ the Properties of source
+		static_cast<util::PropertyMap &>( working ) = static_cast<const util::PropertyMap &>( source ); //copy _only_ the Properties of source
 		// update origin
-		util::fvector4 &origin = newChunks[slice]->propertyValue( "indexOrigin" )->castTo<util::fvector4>();
+		util::fvector4 &origin = working.propertyValue( "indexOrigin" )->castTo<util::fvector4>();
 		origin = origin + ( sliceVec * slice );
 
 		// update fov
-		if ( newChunks[slice]->hasProperty( "fov" ) ) {
-			util::fvector4 &ref = newChunks[slice]->propertyValue( "fov" )->castTo<util::fvector4>();
+		if ( working.hasProperty( "fov" ) ) {
+			util::fvector4 &ref = working.propertyValue( "fov" )->castTo<util::fvector4>();
 			ref[0] /= matrixSize;
 			ref[1] /= matrixSize;
 		}
 
 		// fix/set acquisitionNumber and acquisitionTime
-		newChunks[slice]->propertyValue( "acquisitionNumber" )->castTo<uint32_t>() += slice;
+		working.propertyValue( "acquisitionNumber" )->castTo<uint32_t>() += slice;
 
 		if( haveAcqTimeList ) {
-			newChunks[slice]->setPropertyAs<float>( "acquisitionTime", acqTime +  *( acqTimeIt++ ) );
+			working.setPropertyAs<float>( "acquisitionTime", acqTime +  *( acqTimeIt++ ) );
 		}
 
 		LOG( Debug, verbose_info )
-				<< "New slice " << slice << " at " << newChunks[slice]->propertyValue( "indexOrigin" ).toString( false )
-				<< " with acquisitionNumber " << newChunks[slice]->propertyValue( "acquisitionNumber" ).toString( false )
-				<< ( haveAcqTimeList ? std::string( " and acquisitionTime " ) + newChunks[slice]->propertyValue( "acquisitionTime" ).toString( false ) : "" );
+			<< "New slice " << slice << " at " << working.propertyValue( "indexOrigin" ).toString( false )
+			<< " with acquisitionNumber " << working.propertyValue( "acquisitionNumber" ).toString( false )
+			<< ( haveAcqTimeList ? std::string( " and acquisitionTime " ) + working.propertyValue( "acquisitionTime" ).toString( false ) : "" );
 	}
 
-	dest.insert( dest.end(), newChunks.begin(), newChunks.end() );
-	return newChunks.size();
+	return dest.size()-oldSize;
 }
 
 
-int ImageFormat_Dicom::load( data::ChunkList &chunks, const std::string &filename, const std::string &dialect )throw( std::runtime_error & )
+int ImageFormat_Dicom::load( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect )throw( std::runtime_error & )
 {
-	boost::shared_ptr<data::Chunk> chunk;
+
 	std::auto_ptr<DcmFileFormat> dcfile( new DcmFileFormat );
 	OFCondition loaded = dcfile->loadFile( filename.c_str() );
 
 	if ( loaded.good() ) {
-		if ( chunk = _internal::DicomChunk::makeChunk( filename, dcfile, dialect ) ) {
-			//we got a chunk from the file
-			sanitise( *chunk, "" );
-			chunk->setPropertyAs( "source", filename );
-			const util::slist iType = chunk->getPropertyAs<util::slist>( util::istring( ImageFormat_Dicom::dicomTagTreeName ) + "/" + "ImageType" );
+		data::Chunk chunk = _internal::DicomChunk::makeChunk( filename, dcfile, dialect );
+		//we got a chunk from the file
+		sanitise( chunk, "" );
+		chunk.setPropertyAs( "source", filename );
+		const util::slist iType = chunk.getPropertyAs<util::slist>( util::istring( ImageFormat_Dicom::dicomTagTreeName ) + "/" + "ImageType" );
 
-			if ( std::find( iType.begin(), iType.end(), "MOSAIC" ) != iType.end() ) { // if its a mosaic
-				if( dialect == "nomosaic" ) {
-					LOG( Runtime, warning ) << "This seems to be an mosaic image, but dialect \"nomosaic\" was selected";
-					chunks.push_back( chunk );
-					return 1;
-				} else {
-					LOG( Runtime, verbose_info ) << "This seems to be an mosaic image, will decompose it";
-					return readMosaic( *chunk, chunks );
-				}
-			} else {
+		if ( std::find( iType.begin(), iType.end(), "MOSAIC" ) != iType.end() ) { // if its a mosaic
+			if( dialect == "nomosaic" ) {
+				LOG( Runtime, info ) << "This seems to be an mosaic image, but dialect \"nomosaic\" was selected";
 				chunks.push_back( chunk );
 				return 1;
+			} else {
+				LOG( Runtime, verbose_info ) << "This seems to be an mosaic image, will decompose it";
+				return readMosaic( chunk, chunks );
 			}
+		} else {
+			chunks.push_back( chunk );
+			return 1;
 		}
 	} else {
 		FileFormat::throwGenericError( std::string( "Failed to open file: " ) + loaded.text() );
