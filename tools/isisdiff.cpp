@@ -5,14 +5,14 @@
 
 using namespace isis;
 
-void dropDuplicate( data::ImageList &list )
+void dropDuplicate( std::list<data::Image> &list )
 {
-	for( data::ImageList::iterator a = list.begin(); a != list.end(); a++ ) {
-		data::ImageList::iterator b = a;
+	for( std::list<data::Image>::iterator a = list.begin(); a != list.end(); a++ ) {
+		std::list<data::Image>::iterator b = a;
 		b++;
 
 		while( b != list.end() ) {
-			const util::PropertyMap &aref = **a, bref = **b;
+			const util::PropertyMap &aref = *a, &bref = *b;
 
 			if( aref.getDifference( bref ).empty() ) {
 				std::cout << "Duplicate found in data from "
@@ -62,14 +62,13 @@ int main( int argc, char *argv[] )
 	}
 
 	std::pair<std::string, int> in1 = parseFilename( files.front() ), in2 = parseFilename( files.back() );
-	data::ImageList images1;
-	data::ImageList images2;
+	std::list<data::Image> images1,images2;
 
 	if( in1.second >= 0 || in2.second >= 0 ) { // seems like we got numbers
 		assert( !in1.first.empty() );
-		data::ImageList erg = data::IOFactory::load( in1.first );
+		std::list<data::Image> erg = data::IOFactory::load( in1.first );
 		assert( erg.size() > in1.second );
-		data::ImageList::iterator at = erg.begin();
+		std::list<data::Image>::iterator at = erg.begin();
 
 		if( in1.second >= 0 )
 			std::advance( at, in1.second );
@@ -99,13 +98,13 @@ int main( int argc, char *argv[] )
 		return -1;
 	}
 
-	data::ImageList::const_iterator i, j;
+	std::list<data::Image>::const_iterator i, j;
 	int count;
 	util::slist ignore = app.parameters["ignore"];
 	ignore.push_back( "source" );
 
 	for ( i = images1.begin(), j = images2.begin(), count = 0; i != images1.end(); i++, j++, count++ ) {
-		const data::Image &first = **i, &second = **j;
+		const data::Image &first = *i, &second = *j;
 		util::PropertyMap::DiffMap diff = first.getDifference( second );
 		BOOST_FOREACH( util::slist::const_reference ref, ignore ) {
 			diff.erase( util::istring( ref.begin(), ref.end() ) );

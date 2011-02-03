@@ -22,8 +22,6 @@ namespace test
 /* create an image */
 BOOST_AUTO_TEST_CASE ( image_init_test )
 {
-	data::ImageList list;
-	list.push_back( boost::shared_ptr<data::Image>() );
 	{
 		data::MemChunk<float> ch( 4, 4 );
 		data::Image img;
@@ -219,7 +217,7 @@ BOOST_AUTO_TEST_CASE ( type_selection_test )
 	BOOST_CHECK( img.insertChunk( ch_uint8_t ) );
 	BOOST_CHECK( img.reIndex() );
 	BOOST_CHECK_EQUAL( img.getSizeAsVector(), ( util::FixedVector<size_t, 4>( size ) ) );
-	BOOST_CHECK_EQUAL( img.typeID(), data::TypePtr<int16_t>( NULL, 0 ).typeID() );
+	BOOST_CHECK_EQUAL( img.getMajorTypeID(), data::TypePtr<int16_t>( NULL, 0 ).typeID() );
 #undef MAKE_CHUNK
 }
 
@@ -532,9 +530,9 @@ BOOST_AUTO_TEST_CASE( typediamge_test )
 BOOST_AUTO_TEST_CASE ( image_transformCoords_test )
 {
 	// dummy image
-	data::ImageList images = data::IOFactory::load( "nix.null" );
+	std::list<data::Image> images = data::IOFactory::load( "nix.null" );
 	BOOST_REQUIRE( !images.empty() );
-	boost::shared_ptr<data::Image> img = *( images.begin() );
+	data::Image &img = images.front();
 	//TODO rewrite this test to use BOST_UNIT_TEST_ASSERTS with the help of
 	// util::fuzzyEqual
 	// ************************************************************************
@@ -552,47 +550,47 @@ BOOST_AUTO_TEST_CASE ( image_transformCoords_test )
 	T( 2, 2 ) = 1;
 	// **** AXIAL ****
 	// set orientation AXIAL in DCIOM space
-	img->setPropertyAs( "readVec", util::fvector4( 1, 0, 0, 0 ) );
-	img->setPropertyAs( "phaseVec", util::fvector4( 0, 1, 0, 0 ) );
-	img->setPropertyAs( "sliceVec", util::fvector4( 0, 0, 1, 0 ) );
+	img.setPropertyAs( "readVec", util::fvector4( 1, 0, 0, 0 ) );
+	img.setPropertyAs( "phaseVec", util::fvector4( 0, 1, 0, 0 ) );
+	img.setPropertyAs( "sliceVec", util::fvector4( 0, 0, 1, 0 ) );
 	// set index origin to DICOM space index origin
-	img->setPropertyAs( "indexOrigin", util::fvector4( -1, -2, -3, 0 ) );
+	img.setPropertyAs( "indexOrigin", util::fvector4( -1, -2, -3, 0 ) );
 	// apply transformation
-	img->transformCoords( T );
+	img.transformCoords( T );
 	// CHECKS
-	BOOST_CHECK( img->getPropertyAs<util::fvector4>( "readVec" ).fuzzyEqual( util::fvector4( -1, 0, 0, 0 ) ) );
-	BOOST_CHECK( img->getPropertyAs<util::fvector4>( "phaseVec" ).fuzzyEqual( util::fvector4( 0, -1, 0, 0 ) ) );
-	BOOST_CHECK( img->getPropertyAs<util::fvector4>( "sliceVec" ).fuzzyEqual( util::fvector4( 0, 0, 1, 0 ) ) );
-	BOOST_CHECK( img->getPropertyAs<util::fvector4>( "indexOrigin" ).fuzzyEqual( util::fvector4( 1, 2, -3, 0 ) ) );
+	BOOST_CHECK( img.getPropertyAs<util::fvector4>( "readVec" ).fuzzyEqual( util::fvector4( -1, 0, 0, 0 ) ) );
+	BOOST_CHECK( img.getPropertyAs<util::fvector4>( "phaseVec" ).fuzzyEqual( util::fvector4( 0, -1, 0, 0 ) ) );
+	BOOST_CHECK( img.getPropertyAs<util::fvector4>( "sliceVec" ).fuzzyEqual( util::fvector4( 0, 0, 1, 0 ) ) );
+	BOOST_CHECK( img.getPropertyAs<util::fvector4>( "indexOrigin" ).fuzzyEqual( util::fvector4( 1, 2, -3, 0 ) ) );
 	;
 	// **** SAGITTAL ****
 	// set orientation SAGITTAL in DCIOM space
-	img->setPropertyAs( "readVec", util::fvector4( 0, 1, 0, 0 ) );
-	img->setPropertyAs( "phaseVec", util::fvector4( 0, 0, 1, 0 ) );
-	img->setPropertyAs( "sliceVec", util::fvector4( 1, 0, 0, 0 ) );
+	img.setPropertyAs( "readVec", util::fvector4( 0, 1, 0, 0 ) );
+	img.setPropertyAs( "phaseVec", util::fvector4( 0, 0, 1, 0 ) );
+	img.setPropertyAs( "sliceVec", util::fvector4( 1, 0, 0, 0 ) );
 	// set index origin to DICOM space index origin
-	img->setPropertyAs( "indexOrigin", util::fvector4( -3, -1, -2, 0 ) );
+	img.setPropertyAs( "indexOrigin", util::fvector4( -3, -1, -2, 0 ) );
 	// apply transformation
-	img->transformCoords( T );
+	img.transformCoords( T );
 	// CHECKS
-	BOOST_CHECK( img->getPropertyAs<util::fvector4>( "readVec" ).fuzzyEqual( util::fvector4( 0, -1, 0, 0 ) ) );
-	BOOST_CHECK( img->getPropertyAs<util::fvector4>( "phaseVec" ).fuzzyEqual( util::fvector4( 0, 0, -1, 0 ) ) );
-	BOOST_CHECK( img->getPropertyAs<util::fvector4>( "sliceVec" ).fuzzyEqual( util::fvector4( 1, 0, 0, 0 ) ) );
-	BOOST_CHECK( img->getPropertyAs<util::fvector4>( "indexOrigin" ).fuzzyEqual( util::fvector4( -3, 1, 2, 0 ) ) );
+	BOOST_CHECK( img.getPropertyAs<util::fvector4>( "readVec" ).fuzzyEqual( util::fvector4( 0, -1, 0, 0 ) ) );
+	BOOST_CHECK( img.getPropertyAs<util::fvector4>( "phaseVec" ).fuzzyEqual( util::fvector4( 0, 0, -1, 0 ) ) );
+	BOOST_CHECK( img.getPropertyAs<util::fvector4>( "sliceVec" ).fuzzyEqual( util::fvector4( 1, 0, 0, 0 ) ) );
+	BOOST_CHECK( img.getPropertyAs<util::fvector4>( "indexOrigin" ).fuzzyEqual( util::fvector4( -3, 1, 2, 0 ) ) );
 	// **** CORONAL ****
 	// set orientation CORONAL in DCIOM space
-	img->setPropertyAs( "readVec", util::fvector4( 1, 0, 0, 0 ) );
-	img->setPropertyAs( "phaseVec", util::fvector4( 0, 0, 1, 0 ) );
-	img->setPropertyAs( "sliceVec", util::fvector4( 0, -1, 0, 0 ) );
+	img.setPropertyAs( "readVec", util::fvector4( 1, 0, 0, 0 ) );
+	img.setPropertyAs( "phaseVec", util::fvector4( 0, 0, 1, 0 ) );
+	img.setPropertyAs( "sliceVec", util::fvector4( 0, -1, 0, 0 ) );
 	// set index origin to DICOM space index origin
-	img->setPropertyAs( "indexOrigin", util::fvector4( -1, 3, -2, 0 ) );
+	img.setPropertyAs( "indexOrigin", util::fvector4( -1, 3, -2, 0 ) );
 	// apply transformation
-	img->transformCoords( T );
+	img.transformCoords( T );
 	// CHECKS
-	BOOST_CHECK( img->getPropertyAs<util::fvector4>( "readVec" ).fuzzyEqual( util::fvector4( -1, 0, 0, 0 ) ) );
-	BOOST_CHECK( img->getPropertyAs<util::fvector4>( "phaseVec" ).fuzzyEqual( util::fvector4( 0, 0, -1, 0 ) ) );
-	BOOST_CHECK( img->getPropertyAs<util::fvector4>( "sliceVec" ).fuzzyEqual( util::fvector4( 0, -1, 0, 0 ) ) );
-	BOOST_CHECK( img->getPropertyAs<util::fvector4>( "indexOrigin" ).fuzzyEqual( util::fvector4( 1, 3, 2, 0 ) ) );
+	BOOST_CHECK( img.getPropertyAs<util::fvector4>( "readVec" ).fuzzyEqual( util::fvector4( -1, 0, 0, 0 ) ) );
+	BOOST_CHECK( img.getPropertyAs<util::fvector4>( "phaseVec" ).fuzzyEqual( util::fvector4( 0, 0, -1, 0 ) ) );
+	BOOST_CHECK( img.getPropertyAs<util::fvector4>( "sliceVec" ).fuzzyEqual( util::fvector4( 0, -1, 0, 0 ) ) );
+	BOOST_CHECK( img.getPropertyAs<util::fvector4>( "indexOrigin" ).fuzzyEqual( util::fvector4( 1, 3, 2, 0 ) ) );
 } // END transformCoords_test
 
 BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )

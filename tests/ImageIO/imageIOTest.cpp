@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE ( imageNameGenTest )
 BOOST_AUTO_TEST_CASE ( imageUniqueName )
 {
 	data::MemChunk<uint8_t> ch1( 5, 5, 5 );
-	data::ChunkList chunks;
+	std::list<data::Chunk> chunks;
 	data::Image img;
 	ch1.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, 2 ) );
 	ch1.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
@@ -51,12 +51,12 @@ BOOST_AUTO_TEST_CASE ( imageUniqueName )
 	ch1.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 
 	for( uint32_t i = 0; i < 5; i++ ) { // make some copies of ch1 - change their acquisitionNumber and put the into the list
-		boost::shared_ptr<data::Chunk> ch( new data::MemChunk<uint8_t>( ch1 ) );
-		ch->setPropertyAs<uint32_t>( "acquisitionNumber", i );
+		data::MemChunk<uint8_t> ch( ch1 );
+		ch.setPropertyAs<uint32_t>( "acquisitionNumber", i );
 		chunks.push_back( ch );
 	}
 
-	data::ImageList images( chunks );
+	std::list<data::Image> images=data::IOFactory::chunkListToImageList( chunks );
 
 	BOOST_REQUIRE_EQUAL( images.size(), 5 );
 	int number = 0;

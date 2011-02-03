@@ -60,7 +60,7 @@ int main()
 	const short x[] = {1, 2, 3, 4};
 	FixedVector<short, 4> v( x );
 	//  std::cout << "v.toString():" << v.toString() << std::endl;
-	ChunkList list;
+	std::list<data::Chunk> list;
 	{
 		MemChunk<short> a( 1, 1, 1, 10 );
 		list.push_back( a );

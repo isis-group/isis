@@ -202,11 +202,11 @@ BOOST_AUTO_TEST_CASE ( chunk_splice_test )//Copy chunks
 	for ( size_t i = 0; i < ch1.volume(); i++ )
 		ch1.asTypePtr<float>()[i] = i;
 
-	const data::ChunkList splices = ch1.autoSplice( );
+	const std::list<data::Chunk> splices = ch1.autoSplice( );
 	unsigned short cnt = 1;
 	BOOST_CHECK_EQUAL( splices.size(), 3 );
-	BOOST_FOREACH( data::ChunkList::const_reference ref, splices ) {
-		BOOST_CHECK_EQUAL( ref->getPropertyAs<util::fvector4>( "indexOrigin" ), util::fvector4( 1, 1, cnt ) );
+	BOOST_FOREACH( const data::Chunk &ref, splices ) {
+		BOOST_CHECK_EQUAL( ref.getPropertyAs<util::fvector4>( "indexOrigin" ), util::fvector4( 1, 1, cnt ) );
 		cnt += 2;
 	}
 }

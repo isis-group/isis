@@ -45,7 +45,7 @@ public:
 			}
 		}
 
-		return timesteps * images; //return data::ChunkList();
+		return timesteps * images;;
 	}
 
 	void write( const data::Image &image, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {

@@ -193,7 +193,7 @@ public:
 	 * \param fourth The fourth coordinate in voxel space. Usually the time value.
 	 * \param copy_metadata if true the metadata of the image are merged into the returned chunk
 	 * \returns a copy of the chunk that contains the voxel at the given coordinates.
-	 * (Reminder: Chunk-copies are cheap, so the data are NOT copied)
+	 * (Reminder: Chunk-copies are cheap, so the image data are NOT copied but referenced)
 	 */
 	const Chunk getChunk( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true )const;
 
@@ -207,7 +207,7 @@ public:
 	 * \param fourth The fourth coordinate in voxel space. Usually the time value.
 	 * \param copy_metadata if true the metadata of the image are merged into the returned chunk
 	 * \returns a copy of the chunk that contains the voxel at the given coordinates.
-	 * (Reminder: Chunk-copies are cheap, so the data are NOT copied)
+	 * (Reminder: Chunk-copies are cheap, so the image data are NOT copied but referenced)
 	 */
 	Chunk getChunk( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true );
 
@@ -289,7 +289,7 @@ public:
 
 	/**
 	 * Get the maximum and the minimum voxel value of the image.
-	 * The results are converted to T, if they dont fit an error ist send.
+	 * The results are converted to T. If they dont fit an error ist send.
 	 * \returns a pair of T storing the minimum and maximum values of the image.
 	 */
 	template<typename T> std::pair<T, T> getMinMaxAs()const {

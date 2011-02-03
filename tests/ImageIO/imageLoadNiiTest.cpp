@@ -23,7 +23,7 @@ int main( int argc, char *argv[] )
 	ENABLE_LOG( isis::CoreLog, isis::util::DefaultMsgPrint, isis::info );
 	ENABLE_LOG( isis::ImageIoDebug, isis::util::DefaultMsgPrint, isis::info );
 	ENABLE_LOG( isis::ImageIoLog, isis::util::DefaultMsgPrint, isis::info );
-	isis::data::ImageList img = isis::data::IOFactory::load( "/scr/feige1/tmp/data.nii", "" );
+	std::list<isis::data::Image> img = isis::data::IOFactory::load( "/scr/feige1/tmp/data.nii", "" );
 	/*/SCR/Programming2/hellrung/isis/Debug/tests/ImageIO/*/
 	isis::data::IOFactory::write( img, "/tmp/delme.nii", "" );
 	return EXIT_SUCCESS;

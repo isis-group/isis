@@ -232,7 +232,7 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 	 * Save vista file history if available
 	 *****************************************/
 	// Create an empty PropertyMap to store vista history related properties.
-	// This map should be appended to every chunk in the ChunkList.
+	// This map should be appended to every chunk in the output.
 	util::PropertyMap hMap;
 	VAttrList hist_list = VReadHistory( &list );
 
@@ -401,7 +401,7 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 			else {
 				/******************** SET index origin ********************/
 				// the index origin of each slice depends on the slice orientation
-				// and voxel resolution. All chunks in the ChunkList splices are supposed
+				// and voxel resolution. All chunks in the list splices are supposed
 				// to have the same index origin since they are from the same slice.
 				// get slice orientation of image
 				VAttrList attributes = VImageAttrList( vImageVector[nloaded-1] );
@@ -516,8 +516,8 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 				spliceRef.join( hMap, true );
 				timestep++;
 			}
-			LOG( DataLog, verbose_info ) << "adding " << splices.size() << " chunks to ChunkList";
-			/******************** add chunks to ChunkList ********************/
+			LOG( DataLog, verbose_info ) << "adding " << splices.size() << " chunks to the output";
+			/******************** add chunks to output ********************/
 			std::back_insert_iterator<std::list<data::Chunk> > dest_iter ( chunks );
 			std::copy( splices.begin(), splices.end(), dest_iter );
 		} // END foreach vistaChunkList
@@ -534,7 +534,7 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 	} // END if myDialect == "functional"
 
 	// MAP -> the vista image should contain a single 3D VFloat image. Hence the
-	// first image found will be saved in a float MemChunk add added to the ChunkList.
+	// first image found will be saved in a float MemChunk and added to the output.
 	else if( myDialect == std::string( "map" ) ) {
 		// print a warning message when there are more than one image.
 		if( nimages >= 1 ) {
