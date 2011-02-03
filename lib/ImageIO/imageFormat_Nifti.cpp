@@ -185,7 +185,7 @@ public:
 	 ************************/
 	void write( const data::Image &imageOrig, const std::string &filename, const std::string &sdialect ) throw( std::runtime_error & ) {
 		const util::istring dialect( sdialect.begin(), sdialect.end() );
-		LOG( Debug, info ) << "Writing image of size " << imageOrig.getSizeAsString() << " and type " << imageOrig.typeName() << " as nifti";
+		LOG( Debug, info ) << "Writing image of size " << imageOrig.getSizeAsString() << " and type " << imageOrig.getMajorTypeName() << " as nifti";
 
 		boost::filesystem::path boostFilename( filename );
 		//copy of our image due to changing it by transformCoords
@@ -232,10 +232,10 @@ public:
 		}
 
 		// copy the data to the nifti image
-		LOG( ImageIoLog, isis::info ) << "image typeid: " << image.typeID();
-		LOG( ImageIoLog, isis::info ) << "image typename: " << image.typeName();
+		LOG( ImageIoLog, isis::info ) << "image typeid: " << image.getMajorTypeID();
+		LOG( ImageIoLog, isis::info ) << "image typename: " << image.getMajorTypeName();
 
-		switch ( image.typeID() ) {
+		switch ( image.getMajorTypeID() ) {
 		case data::TypePtr<int8_t>::staticID:
 
 			if ( dialect == "fsl" ) { // fsl not compatible with int8, convert to uint8
@@ -294,7 +294,7 @@ public:
 			copyDataToNifti<double>( image, ni );
 			break;
 		default:
-			throwGenericError( "Datatype " + image.typeName() + " cannot be written!" );
+			throwGenericError( "Datatype " + image.getMajorTypeName() + " cannot be written!" );
 		}
 
 		//now really write the nifti file with the function from nifti1_io.h

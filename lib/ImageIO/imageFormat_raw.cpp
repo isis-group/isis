@@ -26,7 +26,7 @@ public:
 
 	void write( const data::Image &image, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
 		const std::pair<std::string, std::string> splitted = makeBasename( filename );
-		std::string type = image.typeName();
+		std::string type = image.getMajorTypeName();
 		type = type.substr( 0, type.find_last_not_of( '*' ) + 1 );
 		const std::string outName = splitted.first + "_" + image.getSizeAsString() + "_" + type + splitted.second ;
 

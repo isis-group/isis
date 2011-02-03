@@ -590,7 +590,7 @@ Image::orientation Image::getMainOrientation()const
 	return axial; //will never be reached
 }
 
-unsigned short Image::typeID() const
+unsigned short Image::getMajorTypeID() const
 {
 	unsigned int mytypeID = chunkPtrAt( 0 )->typeID();
 	size_t tmpBytesPerVoxel = 0;
@@ -609,9 +609,9 @@ unsigned short Image::typeID() const
 		return std::numeric_limits<unsigned char>::max();
 	}
 }
-std::string Image::typeName() const
+std::string Image::getMajorTypeName() const
 {
-	return util::getTypeMap()[typeID()];
+	return util::getTypeMap()[getMajorTypeID()];
 }
 
 bool Image::makeOfTypeID( short unsigned int ID )

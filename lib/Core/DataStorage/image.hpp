@@ -166,12 +166,14 @@ public:
 	 * Determines the minimum and maximum of the image, (and with that the types of these limits).
 	 * If they are not the same, the type which can store the other type is selected.
 	 * E.g. if min is "-5(int8_t)" and max is "1000(int16_t)" "int16_t" is selected.
-	 * Warning: this will fail if min is "-5(int8_t)" and max is "70000(uint16_t)"
+	 * Warning1: this will fail if min is "-5(int8_t)" and max is "70000(uint16_t)"
+	 * Warning2: the cost of this is O(n) while Chunk::getTypeID is O(1) - so do not use it in loops
+	 * Warning3: the result is not exact - so never use it to determine the type for Image::voxel (Use TypedImage to get an image with an guaranteed type)
 	 * \returns a number which is equal to the TypePtr::staticID of the selected type.
 	 */
-	unsigned short typeID() const;
+	unsigned short getMajorTypeID() const;
 	/// \returns the typename correspondig to the result of typeID
-	std::string typeName() const;
+	std::string getMajorTypeName() const;
 
 	/**
 	 * Get a chunk via index (and the lookup table).
