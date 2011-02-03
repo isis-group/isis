@@ -60,9 +60,6 @@ public:
 
 	static void setProgressFeedback( util::ProgressFeedback *feedback );
 	FileFormatList getFormatInterface( std::string filename, std::string suffix_override = "", std::string dialect = "" );
-protected:
-	IOFactory();//shall not be created directly
-	FileFormatList io_formats;
 	/**
 	 *  Make images out of a (unordered) list of chunks.
 	 *  Uses the chunks in the chunklist to fit them together into images.
@@ -71,6 +68,9 @@ protected:
 	 *  \returns a list of newly created images consisting off chunks out of the given chunk list.
 	 */
 	static std::list<data::Image> chunkListToImageList(std::list<Chunk> &chunks);
+protected:
+	IOFactory();//shall not be created directly
+	FileFormatList io_formats;
 
 	/*
 	 * each ImageFormat will be registered in a map after plugin has been loaded

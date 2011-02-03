@@ -340,7 +340,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, string dialect )
 		std::string fov = object.getPropertyAs<std::string>( prefix + "Unknown Tag(0051,100c)" );
 		float read, phase;
 
-		if ( std::sscanf( fov.c_str(), "FoV %f*%f", &read, &phase ) == 2 ) {
+		if ( std::sscanf( fov.c_str(), "FoV %f*%f", &phase, &read ) == 2 ) {
 			object.setPropertyAs( "fov", util::fvector4( read, phase, invalid_float, invalid_float ) );
 		}
 	}

@@ -133,6 +133,7 @@ bool PropertyMap::recursiveRemove( PropertyMap &root, const propPathIterator at,
 /////////////////////////////////////////////////////////////////////////////////////
 // Generic interface for accessing elements
 ////////////////////////////////////////////////////////////////////////////////////
+//@todo what about using that to create properties
 const TypeValue &PropertyMap::propertyValue( const key_type &key )const
 {
 	const propPath path = util::string2list<key_type>( key, pathSeperator );

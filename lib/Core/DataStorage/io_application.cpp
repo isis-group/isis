@@ -107,17 +107,17 @@ void IOApplication::printHelp( bool withHidden ) const
 	util::Application::printHelp( withHidden );
 
 	if( withHidden ) {
-		std::cout << std::endl << "Available IO Plugins:" << std::endl;
+		std::cerr << std::endl << "Available IO Plugins:" << std::endl;
 		data::IOFactory::FileFormatList plugins = data::IOFactory::getFormats();
 		BOOST_FOREACH( data::IOFactory::FileFormatList::const_reference pi, plugins ) {
-			std::cout << std::endl << "\t" << pi->name() << " (" << pi->plugin_file.file_string() << ")" << std::endl;
-			std::cout << "\t=======================================" << std::endl;
+			std::cerr << std::endl << "\t" << pi->name() << " (" << pi->plugin_file.file_string() << ")" << std::endl;
+			std::cerr << "\t=======================================" << std::endl;
 			const std::list<util::istring> suff = pi->getSuffixes();
 			const std::list<std::string> dialects = util::string2list<std::string>( pi->dialects( "" ) );
-			std::cout << "\tsupported suffixes: " << util::list2string( suff.begin(), suff.end(), "\", \"", "\"", "\"" )  << std::endl;
+			std::cerr << "\tsupported suffixes: " << util::list2string( suff.begin(), suff.end(), "\", \"", "\"", "\"" )  << std::endl;
 
 			if( !dialects.empty() )
-				std::cout << "\tsupported dialects: " << util::list2string( dialects.begin(), dialects.end(), "\", \"", "\"", "\"" )  << std::endl;
+				std::cerr << "\tsupported dialects: " << util::list2string( dialects.begin(), dialects.end(), "\", \"", "\"", "\"" )  << std::endl;
 		}
 	}
 }
