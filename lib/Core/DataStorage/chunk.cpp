@@ -267,7 +267,7 @@ std::list<Chunk> Chunk::splice ( dimensions atDim )const
 	//create new Chunks from this TypePtr's
 	BOOST_FOREACH( TypePtrList::const_reference ref, pointers ) {
 		ret.push_back(Chunk( ref, spliceSize[0], spliceSize[1], spliceSize[2], spliceSize[3] ) ); //@todo make sure zhis is only one copy-operation
-		static_cast<util::PropertyMap &>( ret.front() ) = static_cast<const util::PropertyMap &>( *this ); //copy the metadate of ref
+		static_cast<util::PropertyMap &>( ret.back() ) = static_cast<const util::PropertyMap &>( *this ); //copy my metadate into all spliced
 	}
 	return ret;
 }

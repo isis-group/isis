@@ -284,7 +284,7 @@ std::list< Image > IOFactory::chunkListToImageList(std::list<Chunk> &src)
 				i++;
 		}
 
-		if ( buff.isEmpty() ) {
+		if (! buff.isEmpty() ) {
 			LOG( Debug, info ) << "Reindexing image with " << cnt << " chunks.";
 
 			if ( buff.reIndex() ) {
@@ -304,6 +304,7 @@ std::list< Image > IOFactory::chunkListToImageList(std::list<Chunk> &src)
 	}
 
 	LOG_IF( errcnt, Runtime, warning ) << "Dropped " << errcnt << " chunks because they didn't form valid images";
+	return ret;
 }
 
 std::list<data::Image> IOFactory::load( const std::string &path, std::string suffix_override, std::string dialect )

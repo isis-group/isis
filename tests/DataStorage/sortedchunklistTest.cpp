@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE ( chunklist_insert_test )
 	ch.setPropertyAs( "readVec", util::fvector4( 1, 0 ) );
 	ch.setPropertyAs( "phaseVec", util::fvector4( 0, 1 ) );
 	ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1 ) );
-	ch.setPropertyAs<uint32_t>( "acquisitionNumber", 2 );
+	ch.setPropertyAs( "acquisitionNumber", 2 );
 	ch.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, 2, 0 ) );
 	BOOST_REQUIRE( chunks.insert( ch ) );
 
@@ -44,6 +44,7 @@ BOOST_AUTO_TEST_CASE ( chunklist_sort_test )
 			data::MemChunk<float> ch( 3, 3 );
 			ch.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, j, i ) );
 			ch.setPropertyAs( "acquisitionNumber", 0 );
+			ch.setPropertyAs( "READVec", util::fvector4( 1, 0 ) );
 			ch.setPropertyAs( "phaseVec", util::fvector4( 0, 1 ) );
 			ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1 ) );
 
@@ -53,7 +54,7 @@ BOOST_AUTO_TEST_CASE ( chunklist_sort_test )
 	// inserting duplicate Chunk should fail
 	data::MemChunk<float> ch1( *( chunks.getLookup()[0] ) ); //just make copy of the first chunk
 	ch1.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, 0, 0 ) );
-	ch1.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
+	ch1.setPropertyAs( "acquisitionNumber", 0 );
 	data::enable_log<util::DefaultMsgPrint>( error );
 	BOOST_CHECK( ! chunks.insert( ch1 ) );
 
@@ -62,7 +63,7 @@ BOOST_AUTO_TEST_CASE ( chunklist_sort_test )
 	BOOST_REQUIRE( chunks.isRectangular() );
 
 	// inserting Chunk with diffent secondary prop should be ok
-	ch1.setPropertyAs<uint32_t>( "acquisitionNumber", 1 );
+	ch1.setPropertyAs( "acquisitionNumber", 1 );
 	BOOST_CHECK( chunks.insert( ch1 ) );
 
 	// and the list it should not be rectangular anymore
@@ -73,7 +74,7 @@ BOOST_AUTO_TEST_CASE ( chunklist_sort_test )
 		for ( int j = 0; j < 3; j++ ) {
 			data::MemChunk<float> ch( 3, 3 );
 			ch.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, j, i ) );
-			ch.setPropertyAs<uint32_t>( "acquisitionNumber", 1 );
+			ch.setPropertyAs( "acquisitionNumber", 1 );
 			ch.setPropertyAs( "readVec", util::fvector4( 1, 0 ) );
 			ch.setPropertyAs( "phaseVec", util::fvector4( 0, 1 ) );
 			ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1 ) );

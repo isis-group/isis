@@ -65,9 +65,11 @@ PropertyMap::mapped_type &PropertyMap::fetchEntry(
 			return fetchEntry( ref.getBranch(), next, pathEnd ); //continue there
 		} else { // if we should create a sub-map
 			//insert a empty branch (aka PropMap) at "*at" (and fetch the reference of that)
+			LOG(Debug,verbose_info) << "Creating an empty branch " << *at << " trough fetching";
 			return fetchEntry( rootRef[*at].getBranch(), next, pathEnd ); // and continue there
 		}
 	} else { //if its the leaf
+		LOG_IF(rootRef.find(*at)==rootRef.end() ,Debug,verbose_info) << "Creating an empty entry " << *at << " trough fetching";
 		return rootRef[*at]; // (create and) return that entry
 	}
 }
@@ -133,7 +135,6 @@ bool PropertyMap::recursiveRemove( PropertyMap &root, const propPathIterator at,
 /////////////////////////////////////////////////////////////////////////////////////
 // Generic interface for accessing elements
 ////////////////////////////////////////////////////////////////////////////////////
-//@todo what about using that to create properties
 const TypeValue &PropertyMap::propertyValue( const key_type &key )const
 {
 	const propPath path = util::string2list<key_type>( key, pathSeperator );
