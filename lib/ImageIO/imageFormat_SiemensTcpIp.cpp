@@ -64,13 +64,9 @@ namespace isis
 					header_length += sizeof(header_end);
                     header = std::string(buffer, header_length);
                     
-                    size_t byteSizeStringStart = header.find("<data_size_in_bytes>") +20 ;
-                    size_t byteSizeStringEnd   = header.find("</data_size_in_bytes>");
-                    
-                    std::string byteSizeString = header.substr(byteSizeStringStart, byteSizeStringEnd - byteSizeStringStart);
-                    byteSize = atoi(byteSizeString.c_str());
+                    byteSize = atoi(getStringFromHeader("data_size_in_bytes", header).c_str());
 					
-					printf("byteSize: '%s' '%i'\n", byteSizeString.c_str(), byteSize);
+					printf("byteSize: '%i'\n", byteSize);
 					dataBuffer = (char*)malloc(byteSize);
 					
 					// copy the first bit of data
@@ -85,32 +81,21 @@ namespace isis
 						data_received += sizeof(buffer);
 					} else {
 						// image complete
-                        std::string width_start = "<width>";
-                        std::string width_end   = "</width>";
-                        size_t width = atoi(header.substr((header.find(width_start)+width_start.length()), header.find(width_end) - (header.find(width_start)+width_start.length())).c_str());
-                        std::string height_start = "<height>";
-                        std::string height_end   = "</height>";
                         
-                        std::string moco_start = "<motion_corrected>";
-                        std::string moco_end   = "</motion_corrected>";
-                        bool moco = header.substr((header.find(moco_start)+moco_start.length()), header.find(moco_end) - (header.find(moco_start)+moco_start.length())).compare("yes") == 0 ? true : false;
+                        size_t width = atoi(getStringFromHeader("width", header).c_str());
+                        
+                        bool moco = getStringFromHeader("motion_corrected", header).compare("yes") == 0 ? true : false;
                         
                         
-                        size_t height = atoi(header.substr((header.find(height_start)+height_start.length()), header.find(height_end) - (header.find(height_start)+height_start.length())).c_str());
-                        std::string mosaic_start = "<mosaic>";
-                        std::string mosaic_end   = "</mosaic>";
-                        bool mosaic = header.substr((header.find(mosaic_start)+mosaic_start.length()), header.find(mosaic_end) - (header.find(mosaic_start)+mosaic_start.length())).compare("yes") == 0 ? true : false;
+                        size_t height = atoi(getStringFromHeader("height", header).c_str());
+                        bool mosaic = getStringFromHeader("mosaic", header).compare("yes") == 0 ? true : false;
                         size_t iim = 1;
-                        printf("Header \n %s \n", header.c_str());
+                        //printf("Header \n %s \n", header.c_str());
                         if ( true == mosaic){
-                            std::string iim_start = "<images_in_mosaic>";
-                            std::string iim_end   = "</images_in_mosaic>";
-                            iim = atoi(header.substr((header.find(iim_start)+iim_start.length()), header.find(iim_end) - (header.find(iim_start)+iim_start.length())).c_str());
+                            iim = atoi(getStringFromHeader("images_in_mosaic", header).c_str());
                         }
                         
-                        std::string type_start = "<data_type>";
-                        std::string type_end   = "</data_type>";
-                        std::string data_type = header.substr((header.find(type_start)+type_start.length()), header.find(type_end) - (header.find(type_start)+type_start.length()));
+                        std::string data_type = getStringFromHeader("data_type", header);
                         
                         // Mosaics are always quadratic, so don't bother but only looking for the rows
                         size_t slices_in_row = static_cast<size_t> (ceil(sqrt(static_cast<double_t> (iim) )));
@@ -118,16 +103,85 @@ namespace isis
                         size_t height_slice = height / slices_in_row;
                         
                         printf("width_slices: %ld height_slices: %ld\n", width_slice, height_slice);
-                        printf("data_type %s\n", data_type.c_str());
+                        printf("data_type '%s'\n", data_type.c_str());
                         
-                        std::string acq_nr_start = "<acquisition_number>";
-                        std::string acq_nr_end   = "</acquisition_number>";
-                        size_t acq_nr = atoi(header.substr((header.find(acq_nr_start)+acq_nr_start.length()), header.find(acq_nr_end) - (header.find(acq_nr_start)+acq_nr_start.length())).c_str());
+                        size_t acq_nr = atoi(getStringFromHeader("acquisition_number", header).c_str());
+                        std::string seq_descr = getStringFromHeader("sequence_description", header);
                         
-                        std::string seq_descr_start = "<sequence_description>";
-                        std::string seq_descr_end   = "</sequence_description>";
-                        std::string seq_descr = header.substr((header.find(seq_descr_start)+seq_descr_start.length()), header.find(seq_descr_end) - (header.find(seq_descr_start)+seq_descr_start.length()));
                         
+                        
+                        /**********/
+                         
+                        size_t seq_number = atoi(getStringFromHeader("meas_uid", header).c_str());
+                        //printf("series_number %ld\n", series_number );
+                        size_t acq_time = atoi(getStringFromHeader("acquisition_time", header).c_str());
+                        //printf("acq_time %ld\n", acq_time );
+                        uint16_t rep_time = atol(getStringFromHeader("repetition_time", header).c_str());
+                        //printf("repetition_time %ld\n", rep_time );
+                        std::string read_vector = getStringFromHeader("read_vector", header);
+                        size_t indexK1 = read_vector.find(",", 0, 1);
+                        size_t indexK2 = read_vector.find(",", indexK1+1, 1);
+                        double_t val1 = atof(read_vector.substr(0, indexK1).c_str());
+                        double_t val2 = atof(read_vector.substr(indexK1+1, indexK2-indexK1).c_str());
+                        double_t val3 = atof(read_vector.substr(indexK1+indexK2, read_vector.length()-indexK2).c_str());
+                        util::fvector4 read_vec(val1, val2, val3);
+                        //printf("!!!!!!read_vec %.8f,%.8f,%.8f\n", read_vec[0], read_vec[1],read_vec[2] );
+                        //printf("read_vector %s\n", read_vector.c_str() );
+                        
+                        
+                        util::fvector4 phase_vec = getVectorFromString(getStringFromHeader("phase_vector", header));
+                        //printf("!!!!!!phase_vec %.8f,%.8f,%.8f\n", phase_vec[0], phase_vec[1],phase_vec[2] );
+                        //printf("phase_vector %s\n", phase_vector.c_str() );
+                        
+                        util::fvector4 slice_norm_vec = getVectorFromString(getStringFromHeader("slice_norm_vector", header));
+                        //printf("!!!!!!slice_norm_vec %.8f,%.8f,%.8f\n", slice_norm_vec[0], slice_norm_vec[1],slice_norm_vec[2] );
+                        //printf("slice_norm_vector %s\n", slice_norm_vector.c_str() );
+                        
+                        size_t inplane_rot = atoi(getStringFromHeader("implane_rotation", header).c_str());
+                        
+                        std::string slice_orient = getStringFromHeader("slice_orientation", header);
+                        
+                        //Fallunterscheidung
+                        // Wenn ((slice_orient == TRANSVERSE) gilt: (-45 < inplane_rot < 45)) ? -> COL : ROW -> phaseVec == col + readVec == row
+                        // Wenn ((slice_orient != TRANSVERSE) gilt: (-45 < inplane_rot < 45)) ? -> ROW : COL -> phaseVec == row + readVec == col
+                        std::string InPlanePhaseEncodingDirection;
+                        if (0 == slice_orient.compare(0, slice_orient.length(), "TRANSVERSE")) {
+                            InPlanePhaseEncodingDirection = (-45 < inplane_rot && inplane_rot < 45 ) ? "COL" : "ROW";
+                        }
+                        else {
+                            InPlanePhaseEncodingDirection = (-45 < inplane_rot && inplane_rot < 45 ) ? "ROW" : "COL";
+                        }
+
+                        
+                        size_t fov_read = atoi(getStringFromHeader("fov_read", header).c_str());
+                        //printf("fov_read %ld\n", fov_read );
+                        
+                        size_t fov_phase = atoi(getStringFromHeader("fov_phase", header).c_str());
+                        
+                        //printf("fov_phase %ld\n", fov_phase );
+                        
+                        size_t slice_thickness = atoi(getStringFromHeader("slice_thickness", header).c_str());
+                        
+                        size_t dimension_number = atoi(getStringFromHeader("dimension_number", header).c_str());
+                        
+                        /**
+                         * get voxelGap from first two slice positions
+                         */                         
+                        //TODO: Was wenn anat Daten
+                        std::string slice0_pos = getStringFromHeader("slice_position_0", header);
+                        indexK1 = slice0_pos.find(",", 0, 1);
+                        indexK2 = slice0_pos.find(",", indexK1+1, 1);
+                        double_t slice0 = atof(slice0_pos.substr(indexK1+indexK2, slice0_pos.length()-indexK2).c_str());
+                        std::string slice1_pos = getStringFromHeader("slice_position_1", header);
+                        indexK1 = slice1_pos.find(",", 0, 1);
+                        indexK2 = slice1_pos.find(",", indexK1+1, 1);
+                        double_t slice1 = atof(slice1_pos.substr(indexK1+indexK2, slice1_pos.length()-indexK2).c_str());
+                        
+                        util::fvector4 voxelGap(0, 0, (slice1 - slice0 - slice_thickness));
+                        
+                        //*********
+                        
+                        /************/
                         
 						image_counter++;
 												
@@ -148,11 +202,35 @@ namespace isis
                                         memcpy(slice_buffer + (_row * width_slice * sizeof(short)), line_start, (width_slice * sizeof(short)));
                                     }
                                 
+                                /********
+                                * get each slice position from header 
+                                */
+                                std::string slice_pos_start = "<slice_position_";
+                                char buf[5];
+                                sprintf(buf, "%i>", _slice);
+                                slice_pos_start.append(buf);
+                                slice_pos_start.append("\n");
+                                std::string slice_pos_end = "\n</slice_position_";
+                                slice_pos_end.append(buf);
+                                std::string slice_pos = header.substr((header.find(slice_pos_start)+slice_pos_start.length()), 
+                                                                      header.find(slice_pos_end) - (header.find(slice_pos_start)+slice_pos_start.length()));
+                                util::fvector4 slice_pos_vec = getVectorFromString(slice_pos);//(val1, val2, val3);
+                                printf("Slice string: %s\n\n", slice_pos.c_str());
+                                std::cout << "SlicePos: " << slice_pos_vec << std::endl;
+                                
+                                printf("Read string: %s\n\n", read_vector.c_str());
+                                std::cout << "ReadVec: " << read_vec << std::endl;
+                                
+                                printf("Phase string: %s\n\n",getStringFromHeader("phase_vector", header).c_str());
+                                std::cout << "PhaseVec: " << phase_vec << std::endl;
+                                //*********
+                                
                                 boost::shared_ptr<data::Chunk> ch(new data::MemChunk<uint16_t>((uint16_t*)slice_buffer, height_slice,width_slice,1) );
                                 ch->setProperty("indexOrigin", util::fvector4(0,0,_slice));
+                                
                                 ch->setProperty<uint32_t>("acquisitionNumber", acq_nr);
                                 if (true == moco){
-                                    ch->setProperty<uint16_t>("sequenceNumber", 2);
+                                    ch->setProperty<uint16_t>("sequenceNumber", 0);
                                 }
                                 else {
                                     ch->setProperty<uint16_t>("sequenceNumber", 1);
@@ -160,12 +238,22 @@ namespace isis
                                 ch->setProperty<std::string>("sequenceDescription", seq_descr);
                                 
 
-                                ch->setProperty("readVec", util::fvector4(1,0,0,0));
-                                ch->setProperty("phaseVec", util::fvector4(0,-1,0,0));
-                                ch->setProperty("voxelSize", util::fvector4(3,3,6,0));
-                                ch->setProperty("repetitionTime",2000);
-                                ch->setProperty<std::string>("InPlanePhaseEncodingDirection","COL");
-                                ch->setProperty( "voxelGap", util::fvector4() );
+                                if ( 0 == InPlanePhaseEncodingDirection.compare(0, 3, "COL") ){
+                                    ch->setProperty<util::fvector4>("readVec", phase_vec);
+                                    ch->setProperty<util::fvector4>("phaseVec", read_vec);
+                                    ch->setProperty<util::fvector4>("voxelSize", util::fvector4(fov_read/width_slice,fov_phase/height_slice,slice_thickness,0));
+                                }
+                                else {
+                                    ch->setProperty<util::fvector4>("phaseVec", phase_vec);
+                                    ch->setProperty<util::fvector4>("readVec", read_vec);
+                                    ch->setProperty<util::fvector4>("voxelSize", util::fvector4(fov_phase/width_slice,fov_read/height_slice,slice_thickness,0));
+                                }
+
+                                
+                                ch->setProperty<util::fvector4>("sliceVec", slice_norm_vec);
+                                ch->setProperty<uint16_t>("repetitionTime",rep_time);
+                                ch->setProperty<std::string>("InPlanePhaseEncodingDirection",InPlanePhaseEncodingDirection);
+                                ch->setProperty<util::fvector4>( "voxelGap", voxelGap );
                                 chunks.push_back(ch);
                             }
                        }
@@ -208,6 +296,30 @@ namespace isis
 			static bool firstHeaderArrived;
 		private:
 			
+            std::string getStringFromHeader(const std::string& propName, const std::string& header){
+                
+                std::string prop_start = "<";
+                prop_start.append(propName);
+                prop_start.append(">\n");
+                std::string prop_end = "\n</";
+                prop_end.append(propName);
+                prop_end.append(">");
+                std::string propString = header.substr((header.find(prop_start)+prop_start.length()), 
+                                                         header.find(prop_end) - (header.find(prop_start)+prop_start.length()));
+                return propString;
+            }
+            
+            util::fvector4 getVectorFromString(std::string propName)
+            {
+                size_t indexK1 = propName.find(",", 0, 1);
+                size_t indexK2 = propName.find(",", indexK1+1, 1);
+                double_t val1 = atof(propName.substr(0, indexK1).c_str());
+                double_t val2 = atof(propName.substr(indexK1+1, indexK2-indexK1).c_str());
+                double_t val3 = atof(propName.substr(indexK1+indexK2, propName.length()-indexK2).c_str());
+                return util::fvector4(val1, val2, val3);
+                
+            }
+            
 			char   buffer[32768];
         
         };
@@ -232,7 +344,7 @@ isis::image_io::FileFormat *factory()
 	memset((void*)&pluginRtExport->receiver_address, 0, sizeof(pluginRtExport->receiver_address));
 	pluginRtExport->receiver_address.sin_family      = PF_INET;
 	pluginRtExport->receiver_address.sin_addr.s_addr = INADDR_ANY;
-	pluginRtExport->receiver_address.sin_port        = htons(12345);
+	pluginRtExport->receiver_address.sin_port        = htons(54321);
 		
 	printf("[bind] --> %i\n", bind(pluginRtExport->sock, (struct sockaddr*)&pluginRtExport->receiver_address, sizeof(pluginRtExport->receiver_address)));
 		
