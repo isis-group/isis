@@ -228,7 +228,8 @@ IOFactory::FileFormatList IOFactory::getFormatInterface( std::string filename, s
 	if( suffix_override.empty() ) { // detect suffixes from the filename
 		const boost::filesystem::path fname( filename );
 		ext = util::string2list<std::string>( fname.leaf(), '.' ); // get all suffixes
-		if(!ext.empty())ext.pop_front(); // remove the first "suffix" - actually the basename
+
+		if( !ext.empty() )ext.pop_front(); // remove the first "suffix" - actually the basename
 	} else ext = util::string2list<std::string>( suffix_override, '.' );
 
 	while( !ext.empty() ) {
