@@ -313,8 +313,8 @@ private:
 
 	void geometryFromNifti( util::PropertyValue &read, util::PropertyValue &phase, util::PropertyValue &slice, const mat44 &geo, const util::fvector4 &div ) {
 		read->cast_to<util::fvector4>() = util::fvector4( geo.m[0][0], geo.m[1][0], geo.m[2][0], geo.m[3][0] ) / div[0];
-		phase->cast_to<util::fvector4>() = util::fvector4( geo.m[0][1], geo.m[1][1], geo.m[2][0], geo.m[3][1] ) / div[1];
-		slice->cast_to<util::fvector4>() = util::fvector4( geo.m[0][2], geo.m[1][2], geo.m[2][0], geo.m[3][2] ) / div[2];
+		phase->cast_to<util::fvector4>() = util::fvector4( geo.m[0][1], geo.m[1][1], geo.m[2][1], geo.m[3][1] ) / div[1];
+		slice->cast_to<util::fvector4>() = util::fvector4( geo.m[0][2], geo.m[1][2], geo.m[2][2], geo.m[3][2] ) / div[2];
 	}
 
 	void copyHeaderFromNifti( data::Chunk &retChunk, const nifti_image &ni ) {
@@ -357,10 +357,10 @@ private:
 				}
 			} else if( ni.qform_code ) {
 				geometryFromNifti(
-					retChunk.setProperty( "nifti/qreadVec", util::fvector4() ),
-					retChunk.setProperty( "nifti/qphaseVec", util::fvector4() ),
-					retChunk.setProperty( "nifti/qsliceVec", util::fvector4() ),
-					ni.qto_xyz, util::fvector4( 1, 1, 1 )
+					retChunk.setProperty( "readVec", util::fvector4() ),
+					retChunk.setProperty( "phaseVec", util::fvector4() ),
+					retChunk.setProperty( "sliceVec", util::fvector4() ),
+					ni.qto_xyz, voxel_size
 				);
 				LOG( Debug, info ) << "Using qto_xyz as primary orientation "
 								   << retChunk.propertyValue( "readVec" ) << " " << retChunk.propertyValue( "phaseVec" ) << retChunk.propertyValue( "sliceVec" );
@@ -397,10 +397,10 @@ private:
 			LOG( ImageIoLog, info ) << "dims at all " << dimensions;
 			LOG( ImageIoLog, info ) << "Offset values from nifti" << offsets;
 			LOG( ImageIoLog, info ) << "FOV read/phase/slice/voxelsize:"
-									<< getVector( ni, readDir )
-									<< " / " << getVector( ni, phaseDir )
-									<< " / " << getVector( ni, sliceDir )
-									<< getVector( ni, voxelSizeVec );
+									<< retChunk.propertyValue("readVec").toString(false)
+									<< " / " << retChunk.propertyValue("phaseVec").toString(false)
+									<< " / " << retChunk.propertyValue("sliceVec").toString(false)
+									<< " / " << voxel_size;
 		}
 
 		//check description for tr, te and fa and date which is written by spm8
