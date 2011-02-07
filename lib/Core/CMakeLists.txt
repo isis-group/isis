@@ -1,7 +1,7 @@
 # the ISIS core module
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
-INCLUDE(InstallRequiredSystemLibraries)
+INCLUDE(InstallRequiredSystemLibraries) #http://docdb.fnal.gov/ILC/sid/stanitz/ilcsoft-latest/cmake-2.4.8/Modules/InstallRequiredSystemLibraries.cmake
 
 PROJECT(ISIS_CORE)
 
@@ -44,11 +44,6 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 
 ############################################################
-# set up doxygen
-############################################################
-include(UseDoxygen)
-
-############################################################
 # Compiler flags on 64Bit cpus
 ############################################################
 IF("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
@@ -81,9 +76,6 @@ ENDIF(${CMAKE_PROJECT_NAME}_DEBUG_LOG)
 # Search BOOST packages
 FIND_PACKAGE(Boost REQUIRED COMPONENTS filesystem regex system date_time)
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
-
-# local include directory
-INCLUDE_DIRECTORIES(.)
 
 ############################################################
 # set the plugin directory and the system dependend shared
@@ -118,6 +110,11 @@ else(GIT_REVISION)
   SET(ISIS_CORE_REV_STRING ${${CMAKE_PROJECT_NAME}_VERSION_MAJOR}.${${CMAKE_PROJECT_NAME}_VERSION_MINOR}.${${CMAKE_PROJECT_NAME}_VERSION_PATCH})
 ENDIF(GIT_REVISION)
 
+############################################################
+# set up doxygen
+############################################################
+include(UseDoxygen)
+
 ###########################################################
 # CPack config
 ###########################################################
@@ -142,85 +139,51 @@ SET(ISIS_BUILD_PROPERTIES LINK_FLAGS "--no-undefined" CLEAN_DIRECT_OUTPUT 1)
 SET(ISIS_BUILD_STATIC ON CACHE BOOL "enable build of the static library" )
 SET(ISIS_BUILD_DYNAMIC ON CACHE BOOL "enable build of the dynamic library" )
 
+
+############################################################
+# PACKAGING
+# @TODO: Check if CPACK is a better solution for building 
+# a rpm package
+############################################################
+OPTION(${CMAKE_PROJECT_NAME}_PACKAGE_RPM 
+    "Enable support for RPM packaging" OFF)
+
+IF(${CMAKE_PROJECT_NAME}_PACKAGE_RPM)
+
+    MESSAGE(STATUS "Configuring RPM build")
+
+    # write spec file for rpm package
+    CONFIGURE_FILE(cmake/template.spec.in ${CMAKE_BINARY_DIR}/libisiscore0.spec
+      @ONLY)
+    CONFIGURE_FILE(cmake/bootstrap_rpm.sh.in ${CMAKE_BINARY_DIR}/bootstrap_rpm.sh
+      @ONLY)
+
+    # add a custom make target
+    ADD_CUSTOM_TARGET(rpm   
+        "${CMAKE_BINARY_DIR}/bootstrap_rpm.sh" WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+
+ENDIF()
+
 ############################################################
 # build core
 ############################################################
 
-# add new source files to this parameter list
-SET ( SRC_FILES
-  CoreUtils/istring.cpp
-  CoreUtils/progressfeedback.cpp 
-  CoreUtils/tmpfile.cpp 
-  CoreUtils/application.cpp 
-  CoreUtils/selection.cpp 
-  CoreUtils/progparameter.cpp 
-  CoreUtils/type_converter.cpp 
-  CoreUtils/type_base.cpp 
-  CoreUtils/types.cpp 
-  CoreUtils/property.cpp 
-  CoreUtils/propmap.cpp 
-  CoreUtils/message.cpp 
-  CoreUtils/singletons.cpp 
-  DataStorage/sortedchunklist.cpp
-  DataStorage/io_application.cpp 
-  DataStorage/needed.cpp 
-  DataStorage/chunk.cpp 
-  DataStorage/ndimensional.cpp 
-  DataStorage/image.cpp 
-  DataStorage/io_factory.cpp 
-  DataStorage/typeptr_converter.cpp 
-  DataStorage/numeric_convert.cpp 
-  DataStorage/io_interface.cpp 
-  DataStorage/typeptr_base.cpp 
-  DataStorage/common.cpp )
-
-SET (COREUTILS_HDR_FILES
-  ./CoreUtils/istring.hpp
-  ./CoreUtils/tmpfile.h
-  ./CoreUtils/progparameter.hpp
-  ./CoreUtils/type_converter.hpp
-  ./CoreUtils/progressfeedback.hpp
-  ./CoreUtils/application.hpp
-  ./CoreUtils/singletons.hpp
-  ./CoreUtils/log_modules.hpp
-  ./CoreUtils/propmap.hpp
-  ./CoreUtils/type_base.hpp
-  ./CoreUtils/types.hpp
-  ./CoreUtils/log.hpp
-  ./CoreUtils/selection.hpp
-  ./CoreUtils/generic_type.hpp
-  ./CoreUtils/vector.hpp
-  ./CoreUtils/property.hpp
-  ./CoreUtils/type.hpp
-  ./CoreUtils/common.hpp
-  ./CoreUtils/message.hpp
-  ./CoreUtils/color.hpp)
-
-SET (DATASTORAGE_HDR_FILES
-  ./DataStorage/chunk.hpp
-  ./DataStorage/sortedchunklist.hpp
-  ./DataStorage/io_factory.hpp
-  ./DataStorage/typeptr.hpp
-  ./DataStorage/numeric_convert.hpp
-  ./DataStorage/typeptr_converter.hpp
-  ./DataStorage/image.hpp
-  ./DataStorage/io_application.hpp
-  ./DataStorage/typeptr_base.hpp
-  ./DataStorage/ndimensional.hpp
-  ./DataStorage/io_interface.h
-  ./DataStorage/common.hpp )
+# add source files to this parameter list
+FILE(GLOB CORE_SRC_FILES "DataStorage/*.cpp" "CoreUtils/*.cpp")
+FILE(GLOB COREUTILS_HDR_FILES "CoreUtils/*.hpp" "CoreUtils/*.h")
+FILE(GLOB DATASTORAGE_HDR_FILES "DataStorage/*.hpp" "DataStorage/*.h")
 
 # the core library shared and static build
 if(ISIS_BUILD_DYNAMIC)
 	SET(LIBS isis_core ${LIBS})
-	ADD_LIBRARY( isis_core SHARED ${SRC_FILES} )
+	ADD_LIBRARY( isis_core SHARED ${CORE_SRC_FILES} )
 	TARGET_LINK_LIBRARIES( isis_core ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} ${LibOil_LIBRARY})
 	SET_TARGET_PROPERTIES( isis_core PROPERTIES	${ISIS_BUILD_PROPERTIES} VERSION ${${CMAKE_PROJECT_NAME}_VERSION} INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
 endif(ISIS_BUILD_DYNAMIC)
 
 if(ISIS_BUILD_STATIC)
 	SET(LIBS isis_static ${LIBS})
-	ADD_LIBRARY( isis_static STATIC ${SRC_FILES} )
+	ADD_LIBRARY( isis_static STATIC ${CORE_SRC_FILES} )
 	SET_TARGET_PROPERTIES( isis_static PROPERTIES ${ISIS_BUILD_PROPERTIES} OUTPUT_NAME "isis_core" )
 endif(ISIS_BUILD_STATIC)
 

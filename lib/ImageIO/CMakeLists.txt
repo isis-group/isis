@@ -7,10 +7,20 @@ PROJECT(ISIS_IMAGE_IO)
 # add global options
 ###############################################################################
 
+############################################################
+# set isis version number
+############################################################
+SET(${CMAKE_PROJECT_NAME}_VERSION_MAJOR "0")
+SET(${CMAKE_PROJECT_NAME}_VERSION_MINOR "1")
+SET(${CMAKE_PROJECT_NAME}_VERSION_PATCH "0")
+
+SET(${CMAKE_PROJECT_NAME}_VERSION
+  ${${CMAKE_PROJECT_NAME}_VERSION_MAJOR}.${${CMAKE_PROJECT_NAME}_VERSION_MINOR}.${${CMAKE_PROJECT_NAME}_VERSION_PATCH})
+
 ###########################################################
 # find and configure the isis core library
 ###########################################################
-SET(ISIS_DIR /usr/share/isis/cmake CACHE PATH 
+SET(ISIS_DIR /usr/share/isis/cmake CACHE PATH
     "The directory where the isis cmake configuration skript script is located.")
 FIND_PACKAGE(ISIS REQUIRED)
 INCLUDE_DIRECTORIES(${ISIS_INCLUDE_DIRS})
@@ -22,6 +32,10 @@ if(NOT ${PREFIX_IS_SAME})
 		"This will prevent this core library from finding the plugins you are building right now. Please use CMAKE_INSTALL_PREFIX=${ISIS_INSTALL_PREFIX}"
 	)
 endif(NOT ${PREFIX_IS_SAME})
+
+###############################################################################
+# add global options
+###############################################################################
 
 # we use the log definitions of the core
 IF(ISIS_RUNTIME_LOG)
@@ -38,19 +52,47 @@ ELSE(ISIS_DEBUG_LOG)
 	ADD_DEFINITIONS(-D_ENABLE_DEBUG=0)
 ENDIF(ISIS_DEBUG_LOG)
 
+
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI "Enable Nifti-IO plugin" OFF)
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL "Enable Null-IO plugin" ON)
+OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_PNG "Enable Null-IO plugin" OFF)
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM "Enable Dicom-IO plugin" OFF)
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA "Enable Vista-IO plugin" OFF)
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ "Enable proxy plugin for compressed files" ON)
+OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_TAR "Enable proxy plugin for tar datasets" ON)
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_RAW "Enable plugin for raw data output" ON)
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_SIEMENSTCPIP "Enable plugin for Siemens data coming on TCP Port" OFF)
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_WEIRD "Enable plugin for Siemens data coming on TCP Port" ON)
 
+
+#OPTION(${CMAKE_PROJECT_NAME}_PACKAGE_RPM "Enable support for RPM packaging" OFF)
+
+############################################################
+# PACKAGING
+# @TODO: Check if CPACK is a better solution for building 
+# a rpm package
+############################################################
+#IF(${CMAKE_PROJECT_NAME}_PACKAGE_RPM)
+#
+#    MESSAGE(STATUS "Configuring RPM build")
+#
+#    # write spec file for rpm package
+#    CONFIGURE_FILE(cmake/template.spec.in ${CMAKE_BINARY_DIR}/isisio0.spec
+#      @ONLY)
+#    CONFIGURE_FILE(cmake/bootstrap_rpm.sh.in ${CMAKE_BINARY_DIR}/bootstrap_rpm.sh
+#      @ONLY)
+#
+#    # add a custom make target
+#    ADD_CUSTOM_TARGET(rpm   
+#        "${CMAKE_BINARY_DIR}/bootstrap_rpm.sh" WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+#
+#ENDIF()
+
 #############################################################################################
-# nifti
+# the plugins ...
 #############################################################################################
 
+# Nifti
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI)
 	find_library(LIB_NIFTIIO niftiio)
 	find_library(LIB_ZNZ znz)
@@ -66,10 +108,7 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI)
 	SET(TARGETS ${TARGETS} isisImageFormat_Nifti)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI)
 
-#############################################################################################
 # vista
-#############################################################################################
-
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA)
     # This code snipped was taken from the lipsia source package.
 
@@ -86,6 +125,12 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA)
     # VIAIO_LIBRARY           - libviaio
     # VX_LIBRARY              - libvx
     #
+
+    # SET a root VIA include directory if necessary. This should be the directory
+    # containing the via and viaio include dirs.
+    IF(VIA_ROOT_INCLUDE_DIR)
+      INCLUDE_DIRECTORIES(${VIA_ROOT_INCLUDE_DIR})
+    ENDIF(VIA_ROOT_INCLUDE_DIR)
 
     # INCLUDE directories
     FIND_PATH(VIA_INCLUDE_DIR
@@ -141,10 +186,7 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA)
         AND VIA_LIBRARY AND VIAIO_LIBRARY)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA)
 
-#############################################################################################
 # null io-plugin
-#############################################################################################
-
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL)
 	add_library(isisImageFormat_Null SHARED imageFormat_Null.cpp)
 	target_link_libraries(isisImageFormat_Null ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
@@ -152,25 +194,55 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL)
 	SET(TARGETS ${TARGETS} isisImageFormat_Null)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL)
 
-#############################################################################################
-# gz proxy
-#############################################################################################
+# png
+if(${CMAKE_PROJECT_NAME}_IOPLUGIN_PNG)
+	find_library(LIB_Z z)
+	find_library(LIB_PNG png12)
 
+	find_path(INCPATH_PNG "png.h")
+	include_directories(${INCPATH_PNG})
+
+	add_library(isisImageFormat_png SHARED imageFormat_png.cpp)
+	target_link_libraries(isisImageFormat_png ${LIB_Z} ${ISIS_LIB} ${ISIS_LIB_DEPENDS} ${LIB_PNG})
+
+	SET(TARGETS ${TARGETS} isisImageFormat_png)
+endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_PNG)
+
+
+# gz proxy
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ)
 	FIND_LIBRARY(LIB_Z "z")
 	FIND_PATH(INCPATH_GZIP "zlib.h")
 	INCLUDE_DIRECTORIES(${INCPATH_GZIP})
 
-	add_library(isisImageFormat_gz_proxy SHARED isisImageFormat_gz_proxy.cpp)
+	add_library(isisImageFormat_gz_proxy SHARED imageFormat_gz_proxy.cpp)
 	target_link_libraries(isisImageFormat_gz_proxy ${LIB_Z} ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
 
 	SET(TARGETS ${TARGETS} isisImageFormat_gz_proxy)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ)
 
-#############################################################################################
-# Dicom
-#############################################################################################
+# tar proxy
+if(${CMAKE_PROJECT_NAME}_IOPLUGIN_TAR)
+	include(CheckFunctionExists)
+	FIND_PACKAGE(Boost REQUIRED COMPONENTS iostreams)
 
+	add_library(isisImageFormat_tar_proxy SHARED imageFormat_tar_proxy.cpp)
+
+	check_function_exists(fallocate HAVE_FALLOCATE)
+	if(HAVE_FALLOCATE)
+		set_target_properties(isisImageFormat_tar_proxy PROPERTIES COMPILE_DEFINITIONS HAVE_FALLOCATE)
+	else(HAVE_FALLOCATE)
+        	check_function_exists(posix_fallocate HAVE_POSIX_FALLOCATE)
+		if(HAVE_POSIX_FALLOCATE)
+			set_target_properties(isisImageFormat_tar_proxy PROPERTIES COMPILE_DEFINITIONS HAVE_POSIX_FALLOCATE)
+		endif(HAVE_POSIX_FALLOCATE)
+	endif(HAVE_FALLOCATE)
+
+	target_link_libraries(isisImageFormat_tar_proxy ${ISIS_LIB} ${ISIS_LIB_DEPENDS} ${Boost_IOSTREAMS_LIBRARY})
+	SET(TARGETS ${TARGETS} isisImageFormat_tar_proxy)
+endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_TAR)
+
+# Dicom
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM)
 	find_library(LIB_DCMIMGLE dcmimgle)
 	find_library(LIB_DCMIMAGE dcmimage)
@@ -217,10 +289,9 @@ if (${CMAKE_PROJECT_NAME}_IOPLUGIN_WEIRD)
 	SET(TARGETS ${TARGETS} isisImageFormat_WeirdTest)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_WEIRD)
 
-#################################################################################################
-# For all plugins do
-#################################################################################################
-
+###########################################################################
+# prepare all plugins for installation
+###########################################################################
 MESSAGE(STATUS "Installing following plugins to ${CMAKE_INSTALL_PREFIX}/${ISIS_PLUGIN_INFIX}")
 
 foreach(PLUGIN ${TARGETS})
@@ -258,7 +329,7 @@ INSTALL(TARGETS ${TARGETS}
 
 # uninstall target
 configure_file(
-	"${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
+	"${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
 	"${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
 	IMMEDIATE @ONLY
 )

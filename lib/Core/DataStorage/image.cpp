@@ -16,11 +16,11 @@
 #pragma warning(disable:4996 4244)
 #endif
 
-#include "DataStorage/image.hpp"
-#include "CoreUtils/vector.hpp"
+#include "image.hpp"
+#include "../CoreUtils/vector.hpp"
 #include <boost/foreach.hpp>
-#include "CoreUtils/property.hpp"
-#include<boost/token_iterator.hpp>
+#include "../CoreUtils/property.hpp"
+#include <boost/token_iterator.hpp>
 
 #define _USE_MATH_DEFINES 1
 #include <math.h>
@@ -217,7 +217,7 @@ bool Image::reIndex()
 
 			if ( hasProperty( "sliceVec" ) ) {
 				const util::fvector4 sliceVec = getProperty<util::fvector4>( "sliceVec" );
-				LOG_IF( ! distVecNorm.fuzzyEqual( sliceVec ), Runtime, warning )
+				LOG_IF( ! distVecNorm.fuzzyEqual( sliceVec ), Runtime, info )
 						<< "The existing sliceVec " << sliceVec
 						<< " differs from the distance vector between chunk 0 and " << size[2] - 1
 						<< " " << distVecNorm;
@@ -282,7 +282,7 @@ bool Image::reIndex()
 			// We dont know anything about the slice-direction
 			// we just guess its along the positive cross-product between read- and phase direction
 			// so at least warn the user if we do that long shot
-			LOG( Runtime, warning )
+			LOG( Runtime, info )
 					<< "used the cross product between readVec and phaseVec as sliceVec:"
 					<< crossVec << ". That might be wrong!";
 			setProperty( "sliceVec", crossVec );
@@ -314,7 +314,7 @@ bool Image::reIndex()
 				propFoV[i] = calcFoV[i];
 		}
 
-		LOG_IF( ! ok, Runtime, warning )
+		LOG_IF( ! ok, Runtime, info )
 				<< "The calculated field of view differs from the stored " << propFoV << "/" << calcFoV;
 	}
 

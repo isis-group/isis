@@ -21,12 +21,11 @@
 #pragma warning(disable:4800 4996)
 #endif
 
-#include "DataStorage/typeptr_converter.hpp"
+#include "typeptr_converter.hpp"
 
-// #include "type_converter.hpp"
-#include "DataStorage/typeptr_base.hpp"
-#include "DataStorage/numeric_convert.hpp"
-#include "CoreUtils/types.hpp"
+#include "typeptr_base.hpp"
+#include "numeric_convert.hpp"
+#include "../CoreUtils/types.hpp"
 #include <boost/mpl/for_each.hpp>
 #include <boost/type_traits/is_arithmetic.hpp>
 #include <boost/mpl/and.hpp>
@@ -51,11 +50,15 @@ namespace _internal
 template<typename SRC, typename DST> class TypePtrGenerator: public TypePtrConverterBase
 {
 public:
-	void generate( const TypePtrBase &src, boost::scoped_ptr<TypePtrBase>& dst, const scaling_pair &scaling )const {
-		LOG_IF( dst.get(), Debug, warning ) << "Generating into existing value " << dst->toString( true );
-		//Create new "stuff" in memory
-		TypePtr<DST> *newDat = new TypePtr<DST>( ( DST * )malloc( sizeof( DST )*src.len() ), src.len() );
+	void create( boost::scoped_ptr<TypePtrBase>& dst, const size_t len )const {
+		LOG_IF( dst.get(), Debug, warning ) << "Creating into existing value " << dst->toString( true );
+		TypePtr<DST> *newDat = new TypePtr<DST>( ( DST * )malloc( sizeof( DST )*len ), len );
 		dst.reset( newDat );
+	}
+	void generate( const TypePtrBase &src, boost::scoped_ptr<TypePtrBase>& dst, const scaling_pair &scaling )const {
+		//Create new "stuff" in memory
+		create( dst, src.len() );
+		assert( dst );
 		convert( src, *dst, scaling );//and convert into that
 	}
 };
@@ -84,7 +87,7 @@ template<bool NUMERIC, typename SRC, typename DST> class TypePtrConverter<NUMERI
 				<< "Creating trivial copy converter for " << TypePtr<SRC>::staticName();
 	};
 public:
-	static boost::shared_ptr<const TypePtrConverterBase> create() {
+	static boost::shared_ptr<const TypePtrConverterBase> get() {
 		TypePtrConverter<NUMERIC, true, SRC, DST> *ret = new TypePtrConverter<NUMERIC, true, SRC, DST>;
 		return boost::shared_ptr<const TypePtrConverterBase>( ret );
 	}
@@ -123,7 +126,7 @@ template<typename SRC, typename DST> class TypePtrConverter<true, false, SRC, DS
 				<< TypePtr<SRC>::staticName() << " to " << TypePtr<DST>::staticName();
 	};
 public:
-	static boost::shared_ptr<const TypePtrConverterBase> create() {
+	static boost::shared_ptr<const TypePtrConverterBase> get() {
 		TypePtrConverter<true, false, SRC, DST> *ret = new TypePtrConverter<true, false, SRC, DST>;
 		return boost::shared_ptr<const TypePtrConverterBase>( ret );
 	}
@@ -155,7 +158,7 @@ template<typename SRC> struct inner_TypePtrConverter {
 		typedef boost::mpl::and_<boost::is_arithmetic<SRC>, boost::is_arithmetic<DST> > is_num;
 		typedef boost::is_same<SRC, DST> is_same;
 		boost::shared_ptr<const TypePtrConverterBase> conv =
-			TypePtrConverter<is_num::value, is_same::value, SRC, DST>::create();
+			TypePtrConverter<is_num::value, is_same::value, SRC, DST>::get();
 		//and insert it into the to-conversion-map of SRC
 		m_subMap.insert( m_subMap.end(), std::make_pair( TypePtr<DST>::staticID, conv ) );
 	}

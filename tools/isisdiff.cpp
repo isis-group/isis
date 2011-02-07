@@ -65,12 +65,15 @@ int main( int argc, char *argv[] )
 	data::ImageList images1;
 	data::ImageList images2;
 
-	if( in1.second >= 0 && in2.second >= 0 ) { // seems like we got numbers
+	if( in1.second >= 0 || in2.second >= 0 ) { // seems like we got numbers
 		assert( !in1.first.empty() );
 		data::ImageList erg = data::IOFactory::load( in1.first );
 		assert( erg.size() > in1.second );
 		data::ImageList::iterator at = erg.begin();
-		std::advance( at, in1.second );
+
+		if( in1.second >= 0 )
+			std::advance( at, in1.second );
+
 		images1.push_back( *at );
 
 		if( !in2.first.empty() ) {
@@ -79,7 +82,10 @@ int main( int argc, char *argv[] )
 
 		assert( erg.size() > in2.second );
 		at = erg.begin();
-		std::advance( at, in2.second );
+
+		if( in2.second >= 0 )
+			std::advance( at, in2.second );
+
 		images2.push_back( *at );
 	} else {
 		images1 = data::IOFactory::load( in1.first );

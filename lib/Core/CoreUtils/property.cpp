@@ -10,7 +10,7 @@
 //
 //
 
-#include "CoreUtils/property.hpp"
+#include "property.hpp"
 
 namespace isis
 {

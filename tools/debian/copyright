@@ -1,0 +1,11 @@
+Format-Specification: http://wiki.debian.org/Proposals/CopyrightFormat
+Upstream-Name: ISIS
+Upstream-Maintainer: ISIS developers
+
+Files: *
+Copyright: 2008-2010 Erik Tuerke <tuerke@cbs.mpg.de>, Enrico Reimer 
+    <reimer@cbs.mpg.de>. Lydia Hellrung <hellrung@cbs.mpg.de>,
+    Thomas Proeger <proege@googlemail.com> 
+License: GPL-2+
+ On Debian systems the full text of the GNU General Public License can be found
+ in the `/usr/share/common-licenses/GPL-2' file.

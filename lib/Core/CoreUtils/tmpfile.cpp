@@ -24,9 +24,9 @@
 #include <stdio.h>
 #include <fstream>
 #include <boost/filesystem/operations.hpp>
-#include "CoreUtils/tmpfile.h"
-#include "CoreUtils/message.hpp"
-#include "CoreUtils/common.hpp"
+#include "tmpfile.hpp"
+#include "message.hpp"
+#include "common.hpp"
 
 namespace isis
 {
@@ -46,8 +46,9 @@ TmpFile::~TmpFile()
 {
 	if ( boost::filesystem::exists( *this ) ) {
 		boost::filesystem::remove( *this );
+		LOG( Debug, verbose_info ) << "Removing temporary " << file_string();
 	} else {
-		LOG( Debug, warning ) << "Temporary file " << string() << " does not exist, won't delete it";
+		LOG( Debug, warning ) << "Temporary file " << file_string() << " does not exist, won't delete it";
 	}
 }
 }

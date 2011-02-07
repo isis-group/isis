@@ -14,7 +14,7 @@
 #pragma warning(disable:4996)
 #endif
 
-#include "DataStorage/chunk.hpp"
+#include "chunk.hpp"
 #include <boost/foreach.hpp>
 #include <limits>
 

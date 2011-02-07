@@ -3,8 +3,8 @@
 #endif
 
 #include "DataStorage/io_interface.h"
-#include "DataStorage/io_factory.hpp"
-#include "CoreUtils/tmpfile.h"
+#include <DataStorage/io_factory.hpp>
+#include <CoreUtils/tmpfile.hpp>
 #include <stdio.h>
 #include <fstream>
 #include <zlib.h>
@@ -160,7 +160,7 @@ public:
 
 		util::TmpFile tmpfile( "", realBase.second );
 
-		file_uncompress( filename, tmpfile.string() );
+		file_uncompress( filename, tmpfile.file_string() );
 
 		data::ChunkList buff;
 

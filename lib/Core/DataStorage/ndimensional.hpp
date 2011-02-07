@@ -18,8 +18,8 @@
 #include <algorithm>
 #include <boost/static_assert.hpp>
 #include <string>
-#include "DataStorage/common.hpp"
-#include "CoreUtils/vector.hpp"
+#include "common.hpp"
+#include "../CoreUtils/vector.hpp"
 
 namespace isis
 {

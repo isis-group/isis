@@ -25,7 +25,8 @@
 #include "CoreUtils/log.hpp"
 
 //#define BOOST_TEST_MODULE "imageIOVistaTest"
-//#include <boost/test/included/unit_test.hpp>
+//#define BOOST_TEST_DYN_LINK
+//#include <boost/test/unit_test.hpp>
 #include <string>
 #include <iostream>
 

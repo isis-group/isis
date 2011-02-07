@@ -10,7 +10,7 @@
 //
 //
 
-#include "DataStorage/io_factory.hpp"
+#include "io_factory.hpp"
 #ifdef WIN32
 #include <windows.h>
 #else
@@ -20,13 +20,13 @@
 #include <vector>
 #include <algorithm>
 
-#include "CoreUtils/log.hpp"
-#include "DataStorage/common.hpp"
+#include "../CoreUtils/log.hpp"
+#include "common.hpp"
 #include <boost/regex.hpp>
 #include <boost/foreach.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/algorithm/string.hpp>
-#include "CoreUtils/singletons.hpp"
+#include "../CoreUtils/singletons.hpp"
 
 namespace isis
 {
@@ -66,6 +66,23 @@ struct dialect_missing {
 
 IOFactory::IOFactory(): m_feedback( NULL )
 {
+	const char *env_path = getenv( "ISIS_PLUGIN_PATH" );
+	const char *env_home = getenv( "HOME" );
+
+	if( env_path ) {
+		findPlugins( boost::filesystem::path( env_path ).directory_string() );
+	}
+
+	if( env_home ) {
+		const boost::filesystem::path home = boost::filesystem::path( env_home ) / "isis" / "plugins";
+
+		if( boost::filesystem::exists( home ) ) {
+			findPlugins( home.directory_string() );
+		} else {
+			LOG( Runtime, info ) << home.directory_string() << "does not exist. Won't check for plugins there";
+		}
+	}
+
 	findPlugins( std::string( PLUGIN_PATH ) );
 }
 
@@ -107,7 +124,7 @@ unsigned int IOFactory::findPlugins( const std::string &path )
 		if ( boost::filesystem::is_directory( *itr ) )continue;
 
 		if ( boost::regex_match( itr->path().leaf(), pluginFilter ) ) {
-			const std::string pluginName = itr->path().string();
+			const std::string pluginName = itr->path().file_string();
 #ifdef WIN32
 			HINSTANCE handle = LoadLibrary( pluginName.c_str() );
 #else
@@ -124,10 +141,12 @@ unsigned int IOFactory::findPlugins( const std::string &path )
 				if ( factory_func ) {
 					FileFormatPtr io_class( factory_func(), _internal::pluginDeleter( handle, pluginName ) );
 
-					if ( registerFormat( io_class ) )
+					if ( registerFormat( io_class ) ) {
+						io_class->plugin_file = pluginName;
 						ret++;
-					else
+					} else {
 						LOG( Runtime, error ) << "failed to register plugin " << util::MSubject( pluginName );
+					}
 				} else {
 #ifdef WIN32
 					LOG( Runtime, error )
@@ -166,7 +185,7 @@ IOFactory &IOFactory::get()
 int IOFactory::loadFile( isis::data::ChunkList &ret, const boost::filesystem::path &filename, std::string suffix_override, std::string dialect )
 {
 	FileFormatList formatReader;
-	formatReader = getFormatInterface( filename.string(), suffix_override, dialect );
+	formatReader = getFormatInterface( filename.file_string(), suffix_override, dialect );
 	const size_t nimgs_old = ret.size();   // save number of chunks
 	const std::string with_dialect = dialect.empty() ?
 									 std::string( "" ) : std::string( " with dialect \"" ) + dialect + "\"";
@@ -177,7 +196,7 @@ int IOFactory::loadFile( isis::data::ChunkList &ret, const boost::filesystem::pa
 								  << " does not exist as file, and no suitable plugin was found to generate data from "
 								  << ( suffix_override.empty() ? std::string( "that name" ) : std::string( "the suffix \"" ) + suffix_override + "\"" );
 		} else if( suffix_override.empty() ) {
-			LOG( Runtime, error ) << "No plugin found to read " << filename.string() << with_dialect;
+			LOG( Runtime, error ) << "No plugin found to read " << filename.file_string() << with_dialect;
 		} else {
 			LOG( Runtime, error ) << "No plugin supporting the requested suffix " << suffix_override << with_dialect << " was found";
 		}
@@ -187,7 +206,7 @@ int IOFactory::loadFile( isis::data::ChunkList &ret, const boost::filesystem::pa
 					<< "plugin to load file" << with_dialect << " " << util::MSubject( filename ) << ": " << it->name();
 
 			try {
-				return it->load( ret, filename.string(), dialect );
+				return it->load( ret, filename.file_string(), dialect );
 			} catch ( std::runtime_error &e ) {
 				LOG( Runtime, formatReader.size() > 1 ? warning : error )
 						<< "Failed to load " <<  filename << " using " <<  it->name() << with_dialect << " ( " << e.what() << " )";
@@ -209,6 +228,7 @@ IOFactory::FileFormatList IOFactory::getFormatInterface( std::string filename, s
 	if( suffix_override.empty() ) { // detect suffixes from the filename
 		const boost::filesystem::path fname( filename );
 		ext = util::string2list<std::string>( fname.leaf(), '.' ); // get all suffixes
+		assert( !ext.empty() );
 		ext.pop_front(); // remove the first "suffix" - actually the basename
 	} else ext = util::string2list<std::string>( suffix_override, '.' );
 
@@ -246,7 +266,7 @@ data::ImageList IOFactory::load( const std::string &path, std::string suffix_ove
 					   get().loadFile( chunks, p, suffix_override, dialect );
 	BOOST_FOREACH( data::ChunkList::reference ref, chunks ) {
 		if ( ! ref->hasProperty( "source" ) )
-			ref->setProperty( "source", p.string() );
+			ref->setProperty( "source", p.file_string() );
 	}
 	LOG( Runtime, info ) << "Debug in list: " << chunks.size();
 	const data::ImageList images( chunks );
@@ -261,7 +281,7 @@ int IOFactory::loadPath( isis::data::ChunkList &ret, const boost::filesystem::pa
 
 	if( m_feedback ) {
 		const size_t length = std::distance( boost::filesystem::directory_iterator( path ), boost::filesystem::directory_iterator() ); //@todo this will also count directories
-		m_feedback->show( length, std::string( "Reading " ) + util::Type<std::string>( length ).toString( false ) + " files from " + path.string() );
+		m_feedback->show( length, std::string( "Reading " ) + util::Type<std::string>( length ).toString( false ) + " files from " + path.file_string() );
 	}
 
 	for ( boost::filesystem::directory_iterator i( path ); i != boost::filesystem::directory_iterator(); ++i )  {
@@ -282,6 +302,10 @@ int IOFactory::loadPath( isis::data::ChunkList &ret, const boost::filesystem::pa
 bool IOFactory::write( const isis::data::ImageList &images, const std::string &path, std::string suffix_override, const std::string &dialect )
 {
 	const FileFormatList formatWriter = get().getFormatInterface( path, suffix_override, dialect );
+
+	BOOST_FOREACH( ImageList::const_reference ref, images ) {
+		ref->checkMakeClean();
+	}
 
 	if( formatWriter.size() ) {
 		BOOST_FOREACH( FileFormatList::const_reference it, formatWriter ) {

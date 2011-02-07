@@ -21,9 +21,9 @@
 #pragma warning(disable:4800 4996)
 #endif
 
-#include "CoreUtils/type_converter.hpp"
-#include "CoreUtils/type_base.hpp"
-#include "CoreUtils/type.hpp"
+#include "type_converter.hpp"
+#include "type_base.hpp"
+#include "type.hpp"
 #include <boost/mpl/for_each.hpp>
 #include <boost/type_traits/is_arithmetic.hpp>
 #include <boost/mpl/and.hpp>
@@ -45,12 +45,16 @@ namespace _internal
 template<typename SRC, typename DST> class TypeGenerator: public TypeConverterBase
 {
 public:
-	boost::numeric::range_check_result generate( const TypeBase &src, boost::scoped_ptr<TypeBase>& dst )const {
+	boost::numeric::range_check_result create( boost::scoped_ptr<TypeBase>& dst )const {
 		LOG_IF( dst.get(), Debug, warning ) <<
 											"Generating into existing value " << dst->toString( true ) << " (dropping this).";
 		Type<DST> *ref = new Type<DST>;
-		const boost::numeric::range_check_result result = convert( src.cast_to_Type<SRC>(), *ref );
 		dst.reset( ref );
+	}
+	boost::numeric::range_check_result generate( const TypeBase &src, boost::scoped_ptr<TypeBase>& dst )const {
+		create( dst );
+		assert( dst );
+		const boost::numeric::range_check_result result = convert( src.cast_to_Type<SRC>(), *dst );
 		return result;
 	}
 };
@@ -73,7 +77,7 @@ template<bool NUMERIC, typename SRC, typename DST> class TypeConverter<NUMERIC, 
 				<< "Creating trivial copy converter for " << Type<SRC>::staticName();
 	};
 public:
-	static boost::shared_ptr<const TypeConverterBase> create() {
+	static boost::shared_ptr<const TypeConverterBase> get() {
 		TypeConverter<NUMERIC, true, SRC, DST> *ret = new TypeConverter<NUMERIC, true, SRC, DST>;
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
@@ -106,7 +110,7 @@ template<typename SRC, typename DST> class TypeConverter<true, false, SRC, DST> 
 				<< Type<SRC>::staticName() << " to " << Type<DST>::staticName();
 	};
 public:
-	static boost::shared_ptr<const TypeConverterBase> create() {
+	static boost::shared_ptr<const TypeConverterBase> get() {
 		TypeConverter<true, false, SRC, DST> *ret = new TypeConverter<true, false, SRC, DST>;
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
@@ -138,11 +142,11 @@ template<typename SRC, typename DST > class TypeConverter<false, false, vector4<
 				<< Type<vector4<SRC> >::staticName() << " to " << Type<vector4<DST> >::staticName();
 	};
 public:
-	static boost::shared_ptr<const TypeConverterBase> create() {
+	static boost::shared_ptr<const TypeConverterBase> get() {
 		typedef boost::mpl::and_<boost::is_arithmetic<SRC>, boost::is_arithmetic<DST> > is_num;
 		typedef boost::is_same<SRC, DST> is_same;
 		boost::shared_ptr<const TypeConverterBase> elem_conv =
-			TypeConverter<is_num::value, is_same::value, SRC, DST>::create();
+			TypeConverter<is_num::value, is_same::value, SRC, DST>::get();
 
 		if ( elem_conv ) {
 			TypeConverter<false, false, vector4<SRC>, vector4<DST> > *ret = new TypeConverter<false, false, vector4<SRC>, vector4<DST> >( elem_conv );
@@ -183,11 +187,11 @@ template<typename SRC, typename DST > class TypeConverter<false, false, std::lis
 				<< Type<std::list<SRC> >::staticName() << " to " << Type<std::list<DST> >::staticName();
 	};
 public:
-	static boost::shared_ptr<const TypeConverterBase> create() {
+	static boost::shared_ptr<const TypeConverterBase> get() {
 		typedef boost::mpl::and_<boost::is_arithmetic<SRC>, boost::is_arithmetic<DST> > is_num;
 		typedef boost::is_same<SRC, DST> is_same;
 		boost::shared_ptr<const TypeConverterBase> elem_conv =
-			TypeConverter<is_num::value, is_same::value, SRC, DST>::create();
+			TypeConverter<is_num::value, is_same::value, SRC, DST>::get();
 
 		if ( elem_conv ) {
 			TypeConverter<false, false, std::list<SRC>, std::list<DST> > *ret = new TypeConverter<false, false, std::list<SRC>, std::list<DST> >( elem_conv );
@@ -230,7 +234,7 @@ template<typename DST> class TypeConverter<false, false, std::string, DST> : pub
 				<< "Creating from-string converter for " << Type<DST>::staticName();
 	};
 public:
-	static boost::shared_ptr<const TypeConverterBase> create() {
+	static boost::shared_ptr<const TypeConverterBase> get() {
 		TypeConverter<false, false, std::string, DST> *ret = new TypeConverter<false, false, std::string, DST>;
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
@@ -249,7 +253,7 @@ template<typename SRC> class TypeConverter<false, false, SRC, std::string> : pub
 				<< "Creating to-string converter for " << Type<SRC>::staticName();
 	};
 public:
-	static boost::shared_ptr<const TypeConverterBase> create() {
+	static boost::shared_ptr<const TypeConverterBase> get() {
 		TypeConverter<false, false, SRC, std::string> *ret = new TypeConverter<false, false, SRC, std::string>;
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
@@ -273,7 +277,7 @@ template<> class TypeConverter<false, false, std::string, Selection> : public Ty
 				<< "Creating special from-string converter for " << Type<Selection>::staticName();
 	};
 public:
-	static boost::shared_ptr<const TypeConverterBase> create() {
+	static boost::shared_ptr<const TypeConverterBase> get() {
 		TypeConverter<false, false, std::string, Selection> *ret = new TypeConverter<false, false, std::string, Selection>;
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
@@ -300,7 +304,7 @@ template<> class TypeConverter<false, false, std::string, bool> : public TypeGen
 				<< "Creating special from-string converter for " << Type<bool>::staticName();
 	};
 public:
-	static boost::shared_ptr<const TypeConverterBase> create() {
+	static boost::shared_ptr<const TypeConverterBase> get() {
 		TypeConverter<false, false, std::string, bool> *ret = new TypeConverter<false, false, std::string, bool>;
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
@@ -328,7 +332,7 @@ template<> class TypeConverter<false, false, bool, std::string> : public TypeGen
 				<< "Creating special to-string converter for " << Type<bool>::staticName();
 	};
 public:
-	static boost::shared_ptr<const TypeConverterBase> create() {
+	static boost::shared_ptr<const TypeConverterBase> get() {
 		TypeConverter<false, false, bool, std::string> *ret = new TypeConverter<false, false, bool, std::string>;
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
@@ -352,7 +356,7 @@ template<typename DST> class TypeConverter<false, false, std::string, std::list<
 				<< "Creating from-string converter for " << Type<std::list<DST> >::staticName();
 	};
 public:
-	static boost::shared_ptr<const TypeConverterBase> create() {
+	static boost::shared_ptr<const TypeConverterBase> get() {
 		TypeConverter<false, false, std::string, std::list<DST> > *ret = new TypeConverter<false, false, std::string, std::list<DST> >;
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
@@ -376,7 +380,7 @@ template<typename DST> class TypeConverter<false, false, std::string, vector4<DS
 				<< "Creating from-string converter for " << Type<vector4<DST> >::staticName();
 	};
 public:
-	static boost::shared_ptr<const TypeConverterBase> create() {
+	static boost::shared_ptr<const TypeConverterBase> get() {
 		TypeConverter<false, false, std::string, vector4<DST> > *ret = new TypeConverter<false, false, std::string, vector4<DST> >;
 		return boost::shared_ptr<const TypeConverterBase>( ret );
 	}
@@ -417,7 +421,7 @@ template<typename SRC> struct inner_TypeConverter {
 		typedef boost::mpl::and_<boost::is_arithmetic<SRC>, boost::is_arithmetic<DST> > is_num;
 		typedef boost::is_same<SRC, DST> is_same;
 		boost::shared_ptr<const TypeConverterBase> conv =
-			TypeConverter<is_num::value, is_same::value, SRC, DST>::create();
+			TypeConverter<is_num::value, is_same::value, SRC, DST>::get();
 		//and insert it into the to-conversion-map of SRC
 		m_subMap.insert( m_subMap.end(), std::make_pair( Type<DST>::staticID, conv ) );
 	}

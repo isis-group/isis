@@ -14,13 +14,13 @@
 #define CHUNK_H
 
 #include "typeptr.hpp"
-#include "CoreUtils/log.hpp"
-#include "CoreUtils/propmap.hpp"
+#include "../CoreUtils/log.hpp"
+#include "../CoreUtils/propmap.hpp"
 #include "common.hpp"
 #include <string.h>
 #include <list>
 #include "ndimensional.hpp"
-#include "CoreUtils/vector.hpp"
+#include "../CoreUtils/vector.hpp"
 
 #include <boost/numeric/ublas/matrix.hpp>
 

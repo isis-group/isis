@@ -10,7 +10,7 @@
 //
 //
 
-#include "CoreUtils/propmap.hpp"
+#include "propmap.hpp"
 #include <boost/foreach.hpp>
 
 namespace isis
@@ -132,6 +132,7 @@ bool PropMap::recursiveRemove( PropMap &root, const propPathIterator at, const p
 /////////////////////////////////////////////////////////////////////////////////////
 // Generic interface for accessing elements
 ////////////////////////////////////////////////////////////////////////////////////
+//@todo what about using that to create properties
 const PropertyValue &PropMap::propertyValue( const key_type &key )const
 {
 	const propPath path = util::string2list<key_type>( key, pathSeperator );

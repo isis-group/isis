@@ -21,7 +21,7 @@
 #define APPLICATION_H
 
 #include <QApplication>
-#include "CoreUtils/application.hpp"
+#include <CoreUtils/application.hpp>
 #include <boost/scoped_ptr.hpp>
 
 namespace isis
