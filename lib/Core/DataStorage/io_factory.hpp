@@ -42,24 +42,31 @@ private:
 	util::ProgressFeedback *m_feedback;
 public:
 	/**
-	 * load a data file with given filename and dialect
+	 * Load a data file with given filename and dialect.
 	 * @param ret list to store the loaded chunks in
 	 * @param filename file to open
 	 * @param suffix_override override the given suffix with this one (especially if there's no suffix)
 	 * @param dialect dialect of the fileformat to load
 	 * @return list of chunks (part of an image)
 	 */
-	int loadFile( std::list<Chunk> &ret, const boost::filesystem::path &filename, std::string suffix_override, std::string dialect );
-	int loadPath( std::list<Chunk> &ret, const boost::filesystem::path &path, std::string suffix_override, std::string dialect );
 	static std::list<data::Image> load( const std::string &path, std::string suffix_override = "", std::string dialect = "" );
+	/**
+	 * Load a data file with given filename and dialect into a chunklist.
+	 * @param ret list to store the loaded chunks in
+	 * @param filename file to open
+	 * @param suffix_override override the given suffix with this one (especially if there's no suffix)
+	 * @param dialect dialect of the fileformat to load
+	 * @return list of chunks (part of an image)
+	 */
+	static int load( std::list<data::Chunk> &chunks, const std::string &path, std::string suffix_override = "", std::string dialect = "" );
 
+	static bool write( const data::Image &image, const std::string &path, std::string suffix_override, const std::string &dialect );
 	static bool write( std::list<data::Image> images, const std::string &path, std::string suffix_override, const std::string &dialect );
 
 	static FileFormatList getFormats();
-	static IOFactory &get();
 
 	static void setProgressFeedback( util::ProgressFeedback *feedback );
-	FileFormatList getFormatInterface( std::string filename, std::string suffix_override = "", std::string dialect = "" );
+	static FileFormatList getFileFormatList( std::string filename, std::string suffix_override = "", std::string dialect = "" );
 	/**
 	 *  Make images out of a (unordered) list of chunks.
 	 *  Uses the chunks in the chunklist to fit them together into images.
@@ -69,6 +76,10 @@ public:
 	 */
 	static std::list<data::Image> chunkListToImageList(std::list<Chunk> &chunks);
 protected:
+	int loadFile( std::list<Chunk> &ret, const boost::filesystem::path &filename, std::string suffix_override, std::string dialect );
+	int loadPath( std::list<Chunk> &ret, const boost::filesystem::path &path, std::string suffix_override, std::string dialect );
+
+	static IOFactory &get();
 	IOFactory();//shall not be created directly
 	FileFormatList io_formats;
 
@@ -78,7 +89,7 @@ protected:
 	 *
 	 * @return true if registration was successful, false otherwise
 	 * */
-	bool registerFormat( const FileFormatPtr plugin );
+	bool registerFileFormat( const FileFormatPtr plugin );
 	unsigned int findPlugins( const std::string &path );
 private:
 	/**

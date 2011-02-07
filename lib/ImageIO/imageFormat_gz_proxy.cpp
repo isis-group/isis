@@ -122,7 +122,7 @@ public:
 			return std::string();
 		} else {
 			std::set<std::string> ret;
-			data::IOFactory::FileFormatList formats = data::IOFactory::get().getFormatInterface( FileFormat::makeBasename( filename ).first );
+			data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( FileFormat::makeBasename( filename ).first );
 			BOOST_FOREACH( data::IOFactory::FileFormatList::const_reference ref, formats ) {
 				const std::list<std::string> dias = util::string2list<std::string>( ref->dialects( filename ) );
 				ret.insert( dias.begin(), dias.end() );
@@ -135,7 +135,7 @@ public:
 	virtual std::pair<std::string, std::string> makeBasename( const std::string &filename )const {
 		const std::pair<std::string, std::string> proxyBase = FileFormat::makeBasename( filename ); // get rid of the the .gz
 		//then get the actual plugin for the format
-		const data::IOFactory::FileFormatList formats = data::IOFactory::get().getFormatInterface( proxyBase.first );
+		const data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( proxyBase.first );
 
 		if( formats.empty() ) {
 			LOG( Runtime, error ) << "Cannot determine the basename of " << util::MSubject( proxyBase.first ) << " because no io-plugin was found for it";
@@ -150,7 +150,7 @@ public:
 	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) {
 		const std::pair<std::string, std::string> proxyBase = FileFormat::makeBasename( filename ); // get rid of the the .gz
 		//then get the actual plugin for the format
-		const data::IOFactory::FileFormatList formats = data::IOFactory::get().getFormatInterface( proxyBase.first );
+		const data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( proxyBase.first );
 
 		if( formats.empty() ) {
 			throwGenericError( "Cannot determine the unzipped suffix of \"" + filename + "\" because no io-plugin was found for it" );
@@ -164,7 +164,7 @@ public:
 
 		std::list<data::Chunk>::iterator prev=chunks.end();--prev;
 
-		int ret = data::IOFactory::get().loadFile( chunks, tmpfile, "", dialect );
+		int ret = data::IOFactory::load( chunks, tmpfile.string(), "", dialect );
 
 		if( ret ) {
 			prev++;

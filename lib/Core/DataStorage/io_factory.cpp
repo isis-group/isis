@@ -92,7 +92,7 @@ IOFactory::IOFactory(): m_feedback( NULL )
 	findPlugins( std::string( PLUGIN_PATH ) );
 }
 
-bool IOFactory::registerFormat( const FileFormatPtr plugin )
+bool IOFactory::registerFileFormat( const FileFormatPtr plugin )
 {
 	if ( !plugin )return false;
 
@@ -147,7 +147,7 @@ unsigned int IOFactory::findPlugins( const std::string &path )
 				if ( factory_func ) {
 					FileFormatPtr io_class( factory_func(), _internal::pluginDeleter( handle, pluginName ) );
 
-					if ( registerFormat( io_class ) ) {
+					if ( registerFileFormat( io_class ) ) {
 						io_class->plugin_file = pluginName;
 						ret++;
 					} else {
@@ -191,7 +191,7 @@ IOFactory &IOFactory::get()
 int IOFactory::loadFile( std::list<Chunk> &ret, const boost::filesystem::path &filename, std::string suffix_override, std::string dialect )
 {
 	FileFormatList formatReader;
-	formatReader = getFormatInterface( filename.file_string(), suffix_override, dialect );
+	formatReader = getFileFormatList( filename.file_string(), suffix_override, dialect );
 	const size_t nimgs_old = ret.size();   // save number of chunks
 	const std::string with_dialect = dialect.empty() ?
 									 std::string( "" ) : std::string( " with dialect \"" ) + dialect + "\"";
@@ -225,7 +225,7 @@ int IOFactory::loadFile( std::list<Chunk> &ret, const boost::filesystem::path &f
 }
 
 
-IOFactory::FileFormatList IOFactory::getFormatInterface( std::string filename, std::string suffix_override, std::string dialect )
+IOFactory::FileFormatList IOFactory::getFileFormatList( std::string filename, std::string suffix_override, std::string dialect )
 {
 	std::list<std::string> ext;
 	FileFormatList ret;
@@ -240,9 +240,9 @@ IOFactory::FileFormatList IOFactory::getFormatInterface( std::string filename, s
 
 	while( !ext.empty() ) {
 		const util::istring wholeName( util::list2string( ext.begin(), ext.end(), ".", "", "" ).c_str() ); // (re)construct the rest of the suffix
-		const std::map<util::istring, FileFormatList>::iterator found = io_suffix.find( wholeName );
+		const std::map<util::istring, FileFormatList>::iterator found = get().io_suffix.find( wholeName );
 
-		if( found != io_suffix.end() ) {
+		if( found != get().io_suffix.end() ) {
 			LOG( Debug, verbose_info ) << found->second.size() << " plugins support suffix " << wholeName;
 			ret.insert( ret.end(), found->second.begin(), found->second.end() );
 		}
@@ -307,18 +307,23 @@ std::list< Image > IOFactory::chunkListToImageList(std::list<Chunk> &src)
 	return ret;
 }
 
-std::list<data::Image> IOFactory::load( const std::string &path, std::string suffix_override, std::string dialect )
-{
+int IOFactory::load( std::list<data::Chunk> &chunks, const std::string &path, std::string suffix_override, std::string dialect ){
 	const boost::filesystem::path p( path );
-	std::list<Chunk> chunks;
 	const int loaded = boost::filesystem::is_directory( p ) ?
-					   get().loadPath( chunks, p, suffix_override, dialect ) :
-					   get().loadFile( chunks, p, suffix_override, dialect );
+		get().loadPath( chunks, p, suffix_override, dialect ) :
+		get().loadFile( chunks, p, suffix_override, dialect );
 	BOOST_FOREACH( Chunk &ref, chunks ) {
 		if ( ! ref.hasProperty( "source" ) )
 			ref.setPropertyAs( "source", p.file_string() );
 	}
-	LOG( Runtime, info ) << "Debug in list: " << chunks.size();
+	return loaded;
+}
+
+std::list<data::Image> IOFactory::load( const std::string &path, std::string suffix_override, std::string dialect )
+{
+	std::list<Chunk> chunks;
+	const boost::filesystem::path p( path );
+	const int loaded=load(chunks,path,suffix_override,dialect);
 	const std::list<data::Image> images=chunkListToImageList( chunks );
 	LOG( Runtime, info )
 			<< "Generated " << images.size() << " images out of " << loaded << " chunks loaded from " << ( boost::filesystem::is_directory( p ) ? "directory " : "" ) << p;
@@ -349,9 +354,14 @@ int IOFactory::loadPath( std::list<Chunk> &ret, const boost::filesystem::path &p
 	return loaded;
 }
 
+bool IOFactory::write( const data::Image &image, const std::string &path, std::string suffix_override, const std::string &dialect ){
+	write(std::list<data::Image>(1,image),path,suffix_override,dialect);
+}
+
+
 bool IOFactory::write( std::list<data::Image> images, const std::string &path, std::string suffix_override, const std::string &dialect )
 {
-	const FileFormatList formatWriter = get().getFormatInterface( path, suffix_override, dialect );
+	const FileFormatList formatWriter = get().getFileFormatList( path, suffix_override, dialect );
 
 	BOOST_FOREACH( std::list<data::Image>::reference ref, images ) {
 		ref.checkMakeClean();

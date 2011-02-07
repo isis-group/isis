@@ -357,40 +357,13 @@ public:
 };
 
 /**
- * An Image which allways uses its own memory and a specific type.
- * Thus, creating this image from another Image allways does a deep copy
- */
-template<typename T> class MemImage: public Image
-{
-public:
-	MemImage( const Image &src ) {
-		operator=( src );
-	}
-	/// makes a deep copy of the given image
-	MemImage &operator=( const Image &ref ) { // copy the image, and make sure its of the given type
-		Image::operator=( ref ); // ok we just copied the whole image
-
-		//we want deep copies of the chunks, and we want them to be of type T
-		struct : _internal::SortedChunkList::chunkPtrOperator {
-			std::pair<util::TypeReference, util::TypeReference> scale;
-			boost::shared_ptr<Chunk> operator()( const boost::shared_ptr< Chunk >& ptr ) {
-				return boost::shared_ptr<Chunk>( new MemChunk<T>( *ptr, scale ) );
-			}
-		} conv_op;
-		conv_op.scale = ref.getScalingTo( TypePtr<T>::staticID );
-		LOG( Debug, info ) << "Computed scaling for conversion from source image: [" << conv_op.scale << "]";
-		set.transform( conv_op );
-		lookup = set.getLookup(); // the lookup table still points to the old chunks
-		return *this;
-	}
-};
-
-/**
  * An Image where all chunks are guaranteed to have a specific type.
  * This not necessarily means, that all chunks in this image are a deep copy of their origin.
  */
 template<typename T> class TypedImage: public Image
 {
+protected:
+	TypedImage(){} // to be used only by inheriting classes
 public:
 	/// cheap copy another Image and make sure all chunks have type T
 	TypedImage( const Image &src ): Image( src ) { // ok we just copied the whole image
@@ -406,6 +379,46 @@ public:
 	TypedImage &operator=( const Image &ref ) { // copy the image, and make sure its of the given type
 		Image::operator=( ref );
 		makeOfTypeID( TypePtr<T>::staticID );
+		return *this;
+	}
+};
+
+/**
+ * An Image which allways uses its own memory and a specific type.
+ * Thus, creating this image from another Image allways does a deep copy
+ */
+template<typename T> class MemImage: public TypedImage<T>
+{
+public:
+	/**
+	 * Copy contructor.
+	 * This makes a deep copy of the given image.
+	 * The image data are converted to T if necessary.
+	 */
+	MemImage( const Image &src ) {
+		operator=( src );
+	}
+
+	/**
+	 * Copy operator.
+	 * This makes a deep copy of the given image.
+	 * The image data are converted to T if necessary.
+	 */
+	MemImage &operator=( const Image &ref ) { // copy the image, and make sure its of the given type
+
+		Image::operator=( ref ); // ok we just copied the whole image
+
+		//we want deep copies of the chunks, and we want them to be of type T
+		struct : _internal::SortedChunkList::chunkPtrOperator {
+			std::pair<util::TypeReference, util::TypeReference> scale;
+			boost::shared_ptr<Chunk> operator()( const boost::shared_ptr< Chunk >& ptr ) {
+				return boost::shared_ptr<Chunk>( new MemChunk<T>( *ptr, scale ) );
+			}
+		} conv_op;
+		conv_op.scale = ref.getScalingTo( TypePtr<T>::staticID );
+		LOG( Debug, info ) << "Computed scaling for conversion from source image: [" << conv_op.scale << "]";
+		Image::set.transform( conv_op );
+		Image::lookup = Image::set.getLookup(); // the lookup table still points to the old chunks
 		return *this;
 	}
 };

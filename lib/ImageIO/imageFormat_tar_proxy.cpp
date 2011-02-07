@@ -142,7 +142,7 @@ public:
 
 			if( tar_header.typeflag == AREGTYPE || tar_header.typeflag == REGTYPE ) {
 
-				data::IOFactory::FileFormatList formats = data::IOFactory::get().getFormatInterface( org_file.file_string() ); // and get the reading pluging for that
+				data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( org_file.file_string() ); // and get the reading pluging for that
 
 				if( formats.empty() ) {
 					LOG( Runtime, info ) << "Skipping " << org_file << " from " << filename << " because no plugin was found to read it"; // skip if we found none
@@ -191,7 +191,7 @@ public:
 
 					// read the temporary file
 					std::list<data::Chunk>::iterator prev=chunks.end();--prev;
-					ret += data::IOFactory::get().loadFile( chunks, tmpfile, "", dialect );
+					ret += data::IOFactory::load( chunks, tmpfile.string(), "", dialect );
 					for( ;prev!=chunks.end(); ++prev ) { // set the source property of the red chunks to something more usefull
 						prev->setPropertyAs( "source", ( boost::filesystem::path( filename ) / org_file ).file_string() );
 					}
