@@ -16,6 +16,7 @@
 #include <netdb.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 namespace isis
 {
@@ -51,7 +52,12 @@ namespace isis
 				if(length == 0) {
 					exit(0);
 				}
-				
+                    
+                     //TODO: If this was the last volume return something empty, something like:
+                    // std::string lastVolume = <lastVolume>
+                    // if (memcmp(buffer, lastVolume.c_str(), sizeof(lastVolume) -1 ) == 0 ){
+                    //  return 0;}
+                    
 				
 				if(memcmp(buffer, header_start.c_str(), sizeof(header_start) - 1) == 0) {
 					firstHeaderArrived = true;
@@ -265,12 +271,28 @@ namespace isis
 						
 						/******************************/
 						free(dataBuffer);
+                        /*****************************/
+                        // TIME DIFF from send to finished reading data
+                        time_t startTime = static_cast<time_t>(atof(getStringFromHeader("time_stamp", header).c_str()));
+                        time_t endTime;
+                        time(&endTime);
+                        double_t dif = difftime (endTime,startTime);
+                        printf ("It took us %.2lf seconds to get this volume.\n", dif );
+                        
+                        
+                        
+                        
+                        
+                        
+                        
 						return 0;
 					}
 					
 				}
+                    
 				
 			}
+               
 				
 				
 				
