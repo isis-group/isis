@@ -150,6 +150,19 @@ public:
 
 	virtual ~TypePtr() {}
 
+	/**
+	 * Create a new TypePtr which uses newly allocated memory.
+	 * \param len requested size of the memory block in elements
+	 * \returns a TypePtr\<TYPE\> of given len
+	 */
+	static TypePtr allocate(size_t len){
+		return TypePtr((TYPE*)malloc(len*sizeof(TYPE)),len);
+	}
+
+	/**
+	 * Get the raw address the TypePtr points to.
+	 * \returns a weak_ptr\<void\> with the memory address of the data handled by this TypePtr.
+	 */
 	const boost::weak_ptr<void> getRawAddress()const {
 		return boost::weak_ptr<void>( m_val );
 	}
@@ -171,6 +184,18 @@ public:
 		const TYPE &source = this->operator[]( start );
 		memcpy( dst, &source, _length * sizeof( TYPE ) );
 	}
+
+	/**
+	 * Compare the data of two TypePtr.
+	 * Counts how many elements in this and the given TypePtr are different within the given range.
+	 * If the type of this is not equal to the type of the given TypePtr the whole length is assumed to be different.
+	 * If the given range does not fit into this or the given TypePtr an error is send to the runtime log and the function will probably crash.
+	 * \param start the first element in this, which schould be compared to the first element in the given TyprPtr
+	 * \param end the first element in this, which schould _not_ be compared anymore to the given TyprPtr
+	 * \param dst the given TypePtr this should be compared to
+	 * \param dst_start the first element in the given TyprPtr, which schould be compared to the first element in this
+	 * \returns the amount of elements which actually differ in both TypePtr or the whole length of the range when the types are not equal.
+	 */
 	size_t compare( size_t start, size_t end, const _internal::TypePtrBase &dst, size_t dst_start ) const {
 		assert( start <= end );
 		size_t ret = 0;
@@ -250,6 +275,7 @@ public:
 	TypePtrBase::Reference cloneToNew( size_t _length ) const {
 		return TypePtrBase::Reference( new TypePtr( ( TYPE * )malloc( _length * sizeof( TYPE ) ), _length ) );
 	}
+	/// \returns the byte-size of the type of the data this TypePtr points to.
 	size_t bytesPerElem() const {
 		return sizeof( TYPE );
 	}
@@ -265,6 +291,14 @@ public:
 		return std::make_pair( util::TypeReference( result.first ), util::TypeReference( result.second ) );
 	}
 
+	/**
+	 * Splice up the TypePtr into equal sized blocks.
+	 * This virtually creates new data blocks of the given size by computing new pointers into the block and creating TypePtr objects for them.
+	 * This TypePtr use the reference counting of the original TypePtr via DelProxy, so the original data are only deleted (as a whole)
+	 * when all spliced and all "normal" TypePtr for this data are deleted.
+	 * \param size the maximum size of the spliced parts of the data (the last part can be smaller)
+	 * \returns a vector of TypePtr which point to the parts of the spliced data
+	 */
 	std::vector<Reference> splice( size_t size )const {
 		if ( size >= length() ) {
 			LOG( Debug, warning )
