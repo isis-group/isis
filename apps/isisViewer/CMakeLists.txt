@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 2.6)
+
 # collecting files
 file (GLOB HEADER_FILES headers/*.h headers/*.hpp)
 file (GLOB CPP_FILES sources/*.cpp *.cpp)
