@@ -36,10 +36,8 @@ ViewControl::ViewControl( ) : m_Valid( false )
 	m_RendererAxial = vtkRenderer::New();
 	m_RendererSagittal = vtkRenderer::New();
 	m_RendererCoronal = vtkRenderer::New();
-	m_TopRendererCoronal = vtkRenderer::New();
-	m_TopRendererSagittal = vtkRenderer::New();
-	m_TopRendererAxial = vtkRenderer::New();
-
+	m_PlaneWidgetAxial = vtkPlaneWidget::New();
+	
 	m_Cursor = vtkCursor2D::New();
 	m_ActorCursorAxial = vtkActor::New();
 	m_ActorCursorSagittal = vtkActor::New();
@@ -92,7 +90,6 @@ void ViewControl::addImages( const ImageMapType &fileMap )
 			m_RendererSagittal->AddActor( ref->getActorSagittal() );
 		}
 	}
-
 	resetCam();
 }
 
@@ -105,9 +102,6 @@ void ViewControl::setUpPipe()
 	m_AxialWidget->GetRenderWindow()->SetInteractor( m_AxialWidget->GetInteractor() );
 	m_SagittalWidget->GetRenderWindow()->SetInteractor( m_SagittalWidget->GetInteractor() );
 	m_CoronalWidget->GetRenderWindow()->SetInteractor( m_CoronalWidget->GetInteractor() );
-	m_CoronalWidget->GetRenderWindow()->SetDesiredUpdateRate( 20 );
-	m_AxialWidget->GetRenderWindow()->SetDesiredUpdateRate( 20 );
-	m_SagittalWidget->GetRenderWindow()->SetDesiredUpdateRate( 20 );
 	m_AxialWidget->GetRenderWindow()->AddRenderer( m_RendererAxial );
 	m_SagittalWidget->GetRenderWindow()->AddRenderer( m_RendererSagittal );
 	m_CoronalWidget->GetRenderWindow()->AddRenderer( m_RendererCoronal );
@@ -157,15 +151,6 @@ void ViewControl::sliceChanged( const int &x, const int &y, const int &z )
 			LOG( Runtime, error ) << "error during setting slicesetting!";
 		}
 	}
-	m_ActorCursorAxial->SetPosition( x - m_CurrentImageHolder->getISISImage().getProperty<util::ivector4>( "imageSize" )[0] / 2,
-									 y - m_CurrentImageHolder->getISISImage().getProperty<util::ivector4>( "imageSize" )[1] / 2
-									 , 0 );
-	m_ActorCursorCoronal->SetPosition(  x - m_CurrentImageHolder->getISISImage().getProperty<util::ivector4>( "imageSize" )[0] / 2,
-										z - m_CurrentImageHolder->getISISImage().getProperty<util::ivector4>( "imageSize" )[2] / 2
-										, 0 );
-	m_ActorCursorSagittal->SetPosition( x - m_CurrentImageHolder->getISISImage().getProperty<util::ivector4>( "imageSize" )[0] / 2,
-										y - m_CurrentImageHolder->getISISImage().getProperty<util::ivector4>( "imageSize" )[1] / 2
-										, 0 );
 	UpdateWidgets();
 }
 

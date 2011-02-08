@@ -83,7 +83,7 @@ void ImageHolder::setUpPipe()
 		m_ActorAxial->SetPosition( m_pseudoOrigin[0], m_pseudoOrigin[1], m_pseudoOrigin[2] );
 	} else {
 		m_ActorAxial->SetUserMatrix( m_MatrixHandler.getAxialMatrix() );
-		//      m_ActorAxial->SetPosition( m_transformedOrigin[0] * 2, m_transformedOrigin[1] * 2, m_transformedOrigin[2] * 2 );
+		m_ActorAxial->SetPosition( m_transformedOrigin[0] * 2, m_transformedOrigin[1] * 2, m_transformedOrigin[2] * 2 );
 	}
 
 	//sagittal
@@ -98,7 +98,7 @@ void ImageHolder::setUpPipe()
 		m_ActorSagittal->SetPosition( m_pseudoOrigin[0], m_pseudoOrigin[1], m_pseudoOrigin[2] );
 	} else {
 		m_ActorSagittal->SetUserMatrix( m_MatrixHandler.getSagittalMatrix() );
-		//      m_ActorSagittal->SetPosition( m_transformedOrigin[0], m_transformedOrigin[1], m_transformedOrigin[2] );
+		m_ActorSagittal->SetPosition( m_transformedOrigin[0], m_transformedOrigin[1], m_transformedOrigin[2] );
 	}
 
 	//coronal
@@ -114,7 +114,7 @@ void ImageHolder::setUpPipe()
 		m_ActorCoronal->SetPosition( m_pseudoOrigin[0], m_pseudoOrigin[1], m_pseudoOrigin[2] );
 	} else {
 		m_ActorCoronal->SetUserMatrix( m_MatrixHandler.getCoronalMatrix() );
-		//      m_ActorCoronal->SetPosition( m_transformedOrigin[0], m_transformedOrigin[1], m_transformedOrigin[2] );
+		m_ActorCoronal->SetPosition( m_transformedOrigin[0], m_transformedOrigin[1], m_transformedOrigin[2] );
 	}
 }
 
@@ -140,7 +140,6 @@ void ImageHolder::setImages( util::PropMap propMap,  std::vector<vtkSmartPointer
 	m_pseudoOrigin = m_MatrixHandler.createPseudoOrigin( m_PropMap.getProperty<util::fvector4>( "imageSize" ), m_PropMap.getProperty<util::fvector4>( "voxelSize" ) );
 	m_transformedOrigin = m_MatrixHandler.transformOrigin( m_PropMap.getProperty<util::fvector4>( "indexOrigin" ), m_PropMap.getProperty<util::fvector4>( "voxelSize" ) );
 	//TODO debug
-	std::cout << "transformedOrigin: " << m_transformedOrigin << std::endl;
 	commonInit();
 	createOrientedImages();
 	setUpPipe();
