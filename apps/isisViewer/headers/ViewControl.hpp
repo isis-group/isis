@@ -124,7 +124,6 @@ private:
 	QVTKWidget *m_CoronalWidget;
 
 	void setUpPipe();
-	void setUpCursors();
 	void loadImages( util::slist & );
 
 };
