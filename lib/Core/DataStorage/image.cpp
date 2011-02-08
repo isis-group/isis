@@ -453,7 +453,7 @@ std::list<util::TypeValue> Image::getChunksProperties( const util::PropertyMap::
 	return ret;
 }
 
-size_t Image::bytes_per_voxel() const
+size_t Image::getBytesPerVoxel() const
 {
 	size_t size = chunkPtrAt( 0 )->bytesPerVoxel();
 	BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
