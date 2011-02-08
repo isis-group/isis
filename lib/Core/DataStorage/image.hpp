@@ -305,7 +305,7 @@ public:
 	 * Compares the voxel-values of this image to the given.
 	 * \returns the amount of the different voxels
 	 */
-	size_t cmp( const Image &comp )const;
+	size_t compare( const Image &comp )const;
 
 	orientation getMainOrientation()const;
 	/**

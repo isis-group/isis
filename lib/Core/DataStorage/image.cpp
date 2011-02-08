@@ -509,7 +509,7 @@ std::pair< util::TypeReference, util::TypeReference > Image::getScalingTo( short
 		   );
 }
 
-size_t Image::cmp( const isis::data::Image &comp ) const
+size_t Image::compare( const isis::data::Image &comp ) const
 {
 	size_t ret = 0;
 	LOG_IF( ! ( clean && comp.clean ), Debug, error )
@@ -537,7 +537,7 @@ size_t Image::cmp( const isis::data::Image &comp ) const
 		LOG( Debug, verbose_info )
 				<< "Start positions are " << c1pair1.second << " and " << c2pair1.second
 				<< " and the length is " << c1pair2.second - c1pair1.second;
-		ret += c1.cmpRange( c1pair1.second, c1pair2.second, c2, c2pair1.second );
+		ret += c1.compareRange( c1pair1.second, c1pair2.second, c2, c2pair1.second );
 	}
 
 	return ret;

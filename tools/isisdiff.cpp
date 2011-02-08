@@ -126,7 +126,7 @@ int main( int argc, char *argv[] )
 					<< first.getSizeAsString() << "/" << second.getSizeAsString() << std::endl;
 			ret++;
 		} else {
-			size_t voxels = first.cmp( second );
+			size_t voxels = first.compare( second );
 
 			if ( voxels != 0 ) {
 				std::cout << voxels * 100 / first.getSizeAsVector().product()

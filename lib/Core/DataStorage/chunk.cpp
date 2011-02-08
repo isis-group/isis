@@ -130,11 +130,11 @@ void Chunk::copyRange( const size_t source_start[], const size_t source_end[], C
 	get()->copyRange( sstart, send, *dst, dstart );
 }
 
-size_t Chunk::cmpRange( size_t start, size_t end, const Chunk &dst, size_t destination ) const
+size_t Chunk::compareRange( size_t start, size_t end, const Chunk &dst, size_t destination ) const
 {
 	return get()->compare( start, end, *dst, destination );
 }
-size_t Chunk::cmpRange( const size_t source_start[], const size_t source_end[], const Chunk &dst, const size_t destination[] ) const
+size_t Chunk::compareRange( const size_t source_start[], const size_t source_end[], const Chunk &dst, const size_t destination[] ) const
 {
 	LOG_IF( ! isInRange( source_start ), Debug, error )
 			<< "memcmp start " << util::FixedVector<size_t, 4>( source_start )
@@ -151,21 +151,21 @@ size_t Chunk::cmpRange( const size_t source_start[], const size_t source_end[], 
 	const size_t sstart = getLinearIndex( source_start );
 	const size_t send = getLinearIndex( source_end );
 	const size_t dstart = dst.getLinearIndex( destination );
-	return cmpRange( sstart, send, dst, dstart );
+	return compareRange( sstart, send, dst, dstart );
 }
-size_t Chunk::cmpLine( size_t secondDimS, size_t thirdDimS, size_t fourthDimS, const Chunk &dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD ) const
+size_t Chunk::compareLine( size_t secondDimS, size_t thirdDimS, size_t fourthDimS, const Chunk &dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD ) const
 {
 	const size_t idx1[] = {0, secondDimS, thirdDimS, fourthDimS};
 	const size_t idx2[] = {0, secondDimD, thirdDimD, fourthDimD};
 	const size_t idx3[] = {getSizeAsVector()[0] - 1, secondDimD, thirdDimD, fourthDimD};
-	return cmpRange( idx1, idx2, dst, idx3 );
+	return compareRange( idx1, idx2, dst, idx3 );
 }
-size_t Chunk::cmpSlice( size_t thirdDimS, size_t fourthDimS, const Chunk &dst, size_t thirdDimD, size_t fourthDimD ) const
+size_t Chunk::compareSlice( size_t thirdDimS, size_t fourthDimS, const Chunk &dst, size_t thirdDimD, size_t fourthDimD ) const
 {
 	const size_t idx1[] = {0, 0, thirdDimS, fourthDimS};
 	const size_t idx2[] = {0, 0, thirdDimD, fourthDimD};
 	const size_t idx3[] = {getSizeAsVector()[0] - 1, getSizeAsVector()[1] - 1, thirdDimD, fourthDimD};
-	return cmpRange( idx1, idx2, dst, idx3 );
+	return compareRange( idx1, idx2, dst, idx3 );
 }
 std::pair<util::TypeReference, util::TypeReference> Chunk::getMinMax ( ) const
 {
