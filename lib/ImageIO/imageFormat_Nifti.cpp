@@ -396,9 +396,9 @@ private:
 			LOG( ImageIoLog, info ) << "dims at all " << dimensions;
 			LOG( ImageIoLog, info ) << "Offset values from nifti" << offsets;
 			LOG( ImageIoLog, info ) << "FOV read/phase/slice/voxelsize:"
-									<< retChunk.propertyValue("readVec").toString(false)
-									<< " / " << retChunk.propertyValue("phaseVec").toString(false)
-									<< " / " << retChunk.propertyValue("sliceVec").toString(false)
+									<< retChunk.propertyValue( "readVec" ).toString( false )
+									<< " / " << retChunk.propertyValue( "phaseVec" ).toString( false )
+									<< " / " << retChunk.propertyValue( "sliceVec" ).toString( false )
 									<< " / " << voxel_size;
 		}
 

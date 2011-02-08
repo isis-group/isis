@@ -56,6 +56,11 @@ public:
 			LOG( Runtime, error ) << "Type " << type << " is not registered.";
 		}
 	}
+	
+	std::string _getParameterAsString(const std::string name) {
+		return parameters[name];
+	}
+	
 	void _setNeeded( const std::string name, const bool needed ) {
 		parameters[name].needed() = needed;
 	}

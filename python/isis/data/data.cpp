@@ -15,6 +15,7 @@
 #include "_ioapplication.hpp"
 #include "_image.hpp"
 #include "_chunk.hpp"
+#include "_iofactory.hpp"
 #include "std_item.hpp"
 
 using namespace boost::python;
@@ -28,6 +29,7 @@ BOOST_PYTHON_MODULE( _data )
 	class_<isis::data::IOApplication, _IOApplication, bases< _Application> > ( "IOApplication", init<const char *, bool, bool>() )
 	.def( "init", &_IOApplication::init )
 	.def( "addParameter", &_IOApplication::_addParameter )
+	.def( "getParameterAsString", &_IOApplication::_getParameterAsString )
 	.def( "setNeeded", &_IOApplication::_setNeeded )
 	.def( "setHidden", &_IOApplication::_setHidden )
 	.def( "autoload", &isis::data::IOApplication::autoload )
@@ -99,5 +101,15 @@ BOOST_PYTHON_MODULE( _data )
 	.def( "__setitem__", &std_list<CList>::set, with_custodian_and_ward<1, 2>() )
 	.def( "__delitem__", &std_list<CList>::del )
 	;
+	//#######################################################################################
+	//	IOFactory
+	//#######################################################################################
+	class_<_IOFactory>( "IOFactory", no_init )
+// 	.def( "write", &_IOFactory::_write )
+// 	.staticmethod( "write" )
+	.def( "load", &_IOFactory::_load )
+	.staticmethod( "load" )
+	;
+	
 }
 #endif
