@@ -727,6 +727,28 @@ size_t Image::spliceDownTo( dimensions dim ) //readDim = 0, phaseDim, sliceDim, 
 	return lookup.size();
 }
 
+size_t Image::foreachChunk(Image::ChunkOP& op,bool copyMetaData)
+{
+	size_t err=0;
+	checkMakeClean();
+	util::FixedVector<size_t,4> imgSize=sizeToVector();
+	util::FixedVector<size_t,4> chunkSize=getChunk(0,0,0,0).sizeToVector();
+	util::FixedVector<size_t,4> pos;
+
+	for(pos[timeDim]=0;pos[timeDim]<imgSize[timeDim];pos[timeDim]+=chunkSize[timeDim]){
+		for(pos[sliceDim]=0;pos[sliceDim]<imgSize[sliceDim];pos[sliceDim]+=chunkSize[sliceDim]){
+			for(pos[phaseDim]=0;pos[phaseDim]<imgSize[phaseDim];pos[phaseDim]+=chunkSize[phaseDim]){
+				for(pos[readDim]=0;pos[readDim]<imgSize[readDim];pos[readDim]+=chunkSize[readDim]){
+					Chunk ch=getChunk(pos[readDim],pos[phaseDim],pos[sliceDim],pos[timeDim],copyMetaData);
+					if(op(ch,pos)==false)
+						err++;
+				}
+			}
+		}
+	}
+	return err;
+}
+
 
 } // END namespace data
 } // END namespace isis
