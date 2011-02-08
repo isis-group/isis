@@ -614,7 +614,7 @@ std::string Image::getMajorTypeName() const
 	return util::getTypeMap()[getMajorTypeID()];
 }
 
-bool Image::makeOfTypeID( short unsigned int ID )
+bool Image::convertToType( short unsigned int ID )
 {
 	// get value range of the image for the conversion
 	scaling_pair scale = getScalingTo( ID );

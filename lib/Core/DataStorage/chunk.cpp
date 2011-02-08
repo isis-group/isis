@@ -61,7 +61,7 @@ Chunk Chunk::cloneToNew( size_t firstDim, size_t secondDim, size_t thirdDim, siz
 	return Chunk( cloned, newSize[0], newSize[1], newSize[2], newSize[3] );
 }
 
-bool Chunk::makeOfTypeID( short unsigned int ID )
+bool Chunk::convertToType( short unsigned int ID )
 {
 	if( typeID() != ID ) {
 		return convertToType( ID, getScalingTo( ID ) );

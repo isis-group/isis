@@ -55,7 +55,7 @@ public:
 	/**
 	 * Get the next image from the input.
 	 * This uses fetchImage() to get the next image off of the input list and makes sure,
-	 * that all chunks of this image are of the given type (using makeOfTypeID).
+	 * that all chunks of this image are of the given type (using convertToType).
 	 * If the input image list is empty, an exception is thrown.
 	 * You might want to check the amount of available images via images.size().
 	 * \param copy enforce deep copy of the data, even if its not neccessary
@@ -66,7 +66,7 @@ public:
 			return MemImage<TYPE>( fetchImage() );
 		} else {
 			Image ret = fetchImage();
-			ret.makeOfTypeID( TypePtr<TYPE>::staticID );
+			ret.convertToType( TypePtr<TYPE>::staticID );
 			return ret;
 		}
 	}

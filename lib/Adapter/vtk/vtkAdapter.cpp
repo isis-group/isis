@@ -36,7 +36,7 @@ std::vector<vtkSmartPointer<vtkImageData> >vtkAdapter::makeVtkImageObject( const
 	util::TypeReference min, max;
 	src->getMinMax( min, max );
 	scaling = src->getChunkList().front()->getScalingTo( data::TypePtr<uint8_t>::staticID, *min, *max, data::autoscale );
-	void *targePtr = malloc( src->bytes_per_voxel() * src->volume() );
+	void *targePtr = malloc( src->getBytesPerVoxel() * src->volume() );
 	uint8_t *refTarget = ( uint8_t * ) targePtr;
 	size_t chunkIndex = 0;
 	std::vector< boost::shared_ptr< data::Chunk> > chList = src->getChunkList();

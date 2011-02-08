@@ -181,7 +181,7 @@ bool IOApplication::autowrite( std::list<Image> out_images, bool exitOnError )
 
 	if( repn != 0 ) {
 		BOOST_FOREACH( std::list<Image>::reference ref, out_images ) {
-			ref.makeOfTypeID( repn );
+			ref.convertToType( repn );
 		}
 	}
 

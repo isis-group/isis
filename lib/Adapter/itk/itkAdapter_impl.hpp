@@ -201,7 +201,7 @@ typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkRea
 	m_ImagePropMap = static_cast<util::PropertyMap>( m_ImageISIS );
 	m_RelevantDim = m_ImageISIS.getChunkAt( 0 ).relevantDims();
 	//reorganisation of memory according to the chunk organisiation
-	void *targePtr = malloc( m_ImageISIS.bytes_per_voxel() * m_ImageISIS.volume() );
+	void *targePtr = malloc( m_ImageISIS.getBytesPerVoxel() * m_ImageISIS.volume() );
 	typename InputImageType::PixelType *refTarget = ( typename InputImageType::PixelType * ) targePtr;
 	std::vector< boost::shared_ptr< data::Chunk> > chList = m_ImageISIS.getChunkList();
 	size_t chunkIndex = 0;

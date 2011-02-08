@@ -331,7 +331,7 @@ public:
 	template<typename T> void copyToMem( T *dst )const {
 		if( checkMakeClean() ) {
 			scaling_pair scale = getScalingTo( TypePtr<T>::staticID );
-			// we could do this using makeOfTypeID - but this solution does not need any additional temporary memory
+			// we could do this using convertToType - but this solution does not need any additional temporary memory
 			BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
 				if( !ref->copyToMem<T>( dst, scale ) ) {
 					LOG( Runtime, error ) << "Failed to copy raw data of type " << ref->typeName() << " from image into memory of type " << TypePtr<T>::staticName();
@@ -347,7 +347,7 @@ public:
 	 * The conversion is done using the value range of the image.
 	 * \returns false if there was an error
 	 */
-	bool makeOfTypeID( unsigned short ID );
+	bool convertToType( unsigned short ID );
 
 	/**
 	 * Automatically splice the given dimension and all dimensions above.
@@ -368,7 +368,7 @@ public:
 	/// cheap copy another Image and make sure all chunks have type T
 	TypedImage( const Image &src ): Image( src ) { // ok we just copied the whole image
 		//but we want it to be of type T
-		makeOfTypeID( TypePtr<T>::staticID );
+		convertToType( TypePtr<T>::staticID );
 	}
 	/// cheap copy another TypedImage
 	TypedImage &operator=( const TypedImage &ref ) { //its already of the given type - so just copy it
@@ -378,7 +378,7 @@ public:
 	/// cheap copy another Image and make sure all chunks have type T
 	TypedImage &operator=( const Image &ref ) { // copy the image, and make sure its of the given type
 		Image::operator=( ref );
-		makeOfTypeID( TypePtr<T>::staticID );
+		convertToType( TypePtr<T>::staticID );
 		return *this;
 	}
 };

@@ -122,7 +122,7 @@ public:
 	 * The conversion is done using the value range of the old data.
 	 * \returns false if there was an error
 	 */
-	bool makeOfTypeID( unsigned short ID );
+	bool convertToType( unsigned short ID );
 	/**
 	 * Ensure, the chunk has the type with the requested ID.
 	 * If the typeID of the chunk is not equal to the requested ID, the data of the chunk is replaced by an converted version.
