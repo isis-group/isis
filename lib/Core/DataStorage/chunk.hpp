@@ -129,7 +129,7 @@ public:
 	 * The conversion is done using the value range given via min and max.
 	 * \returns false if there was an error
 	 */
-	bool makeOfTypeID( unsigned short ID, const scaling_pair &scaling );
+	bool convertToType( unsigned short ID, const scaling_pair &scaling );
 
 	template<typename T> bool copyToMem( T *dst, const scaling_pair &scaling )const {
 		// wrap the raw memory at into an non-deleting TypePtr of the length of the chunk

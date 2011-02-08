@@ -250,7 +250,7 @@ public:
 	 */
 	template<typename TYPE> Chunk getChunkAs( const scaling_pair &scaling, size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true )const {
 		Chunk ret = getChunk( first, second, third, fourth, copy_metadata ); // get a cheap copy
-		ret.makeOfTypeID( TypePtr<TYPE>::staticID, scaling ); // make it of type T
+		ret.convertToType( TypePtr<TYPE>::staticID, scaling ); // make it of type T
 		return ret; //return that
 	}
 
