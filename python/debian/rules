@@ -1,0 +1,20 @@
+#!/usr/bin/make -f
+
+all:
+	echo "DESTDIR $(DEB_DESTDIR)"
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/cmake.mk
+
+DEB_CMAKE_EXTRA_FLAGS = \
+	-DCMAKE_BUILD_TYPE="Release" \
+	-DCMAKE_C_COMPILER="/usr/bin/gcc" \
+	-DISIS_PYTHON_CORE:BOOL=ON \
+	-DISIS_PYTHON_DATASTORAGE:BOOL=ON \
+
+# get number of parallel builds from the default environment
+# variable DEB_BUILD_OPTIONS. The expected value is 'parrallel=#'.
+ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+	NUMJOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+    MAKEFLAGS += -j$(NUMJOBS)
+endif
