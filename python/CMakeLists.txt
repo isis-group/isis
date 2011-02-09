@@ -3,7 +3,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 PROJECT(ISIS_PYTHON)
 
-set(ISIS_PYTHON_INSTALL_DIR "lib/python/isis")
+set(ISIS_PYTHON_INSTALL_DIR "lib/python${CURRENT_PYTHON_VERSION}/site-packages/isis")
 
 ###########################################################
 # find and configure the isis core library
