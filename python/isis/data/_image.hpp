@@ -63,7 +63,9 @@ public:
 
 
 	bool _setVoxel( const size_t &first, const size_t &second, const size_t &third, const size_t &fourth, const float &value ) {
-		switch( this->typeID() ) {
+		data::Chunk ch = this->getChunk(first, second, third, fourth, false);
+
+		switch( ch.typeID() ) {
 		case data::TypePtr<int8_t>::staticID:
 			isis::data::Image::voxel<int8_t>( first, second, third, fourth ) = value;
 			return true;
