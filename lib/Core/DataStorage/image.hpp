@@ -449,8 +449,9 @@ public:
 		} conv_op;
 		conv_op.scale = ref.getScalingTo( TypePtr<T>::staticID );
 		LOG( Debug, info ) << "Computed scaling for conversion from source image: [" << conv_op.scale << "]";
-		Image::set.transform( conv_op );
-		Image::lookup = Image::set.getLookup(); // the lookup table still points to the old chunks
+
+		this->set.transform( conv_op );
+		this->lookup = this->set.getLookup(); // the lookup table still points to the old chunks
 		return *this;
 	}
 };
