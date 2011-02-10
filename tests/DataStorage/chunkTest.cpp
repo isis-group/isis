@@ -8,7 +8,7 @@
 #define BOOST_TEST_MODULE ChunkTest
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
-#include "DataStorage/chunk.hpp"
+#include <DataStorage/chunk.hpp>
 #include <boost/foreach.hpp>
 
 namespace isis
@@ -29,6 +29,47 @@ BOOST_AUTO_TEST_CASE ( chunk_init_test )
 	BOOST_CHECK_EQUAL( ch.dimSize( data::phaseDim ), 3 );
 	BOOST_CHECK_EQUAL( ch.dimSize( data::sliceDim ), 2 );
 	BOOST_CHECK_EQUAL( ch.dimSize( data::timeDim ), 1 );
+}
+
+BOOST_AUTO_TEST_CASE ( chunk_foreach_voxel_test )
+{
+	data::MemChunk<uint8_t> ch( 4, 3, 2, 1 );
+	memset(&ch.asTypePtr<uint8_t>()[0],1,ch.volume());
+
+	class :public data::Chunk::VoxelOp<uint8_t>{
+	public:
+		bool operator()(uint8_t& vox, const util::FixedVector< size_t, 4 >& pos){
+			return vox==0;
+		}
+	}zero;
+
+	class setIdx:public data::Chunk::VoxelOp<uint8_t>{
+		data::_internal::NDimensional<4> chunkGeometry;
+	public:
+		setIdx(data::_internal::NDimensional<4> geo):chunkGeometry(geo){}
+		bool operator()(uint8_t& vox, const util::FixedVector< size_t, 4 >& pos){
+			vox=chunkGeometry.dim2Index(&pos[0]);
+			return true;
+		}
+	};
+	class checkIdx:public data::Chunk::VoxelOp<uint8_t>{
+		data::_internal::NDimensional<4> chunkGeometry;
+	public:
+		checkIdx(data::_internal::NDimensional<4> geo):chunkGeometry(geo){}
+		bool operator()(uint8_t& vox, const util::FixedVector< size_t, 4 >& pos){
+			return vox==chunkGeometry.dim2Index(&pos[0]);
+		}
+	};
+
+	BOOST_CHECK_EQUAL(ch.foreachVoxel(zero),ch.volume());
+	memset(&ch.asTypePtr<uint8_t>()[0],0,ch.volume());
+	BOOST_CHECK_EQUAL(ch.foreachVoxel(zero),0);
+
+	checkIdx check(ch);
+	setIdx set(ch);
+	BOOST_CHECK_EQUAL(ch.foreachVoxel(check),ch.volume()-1); //the first index _is_ 0
+	ch.foreachVoxel(set);
+	BOOST_CHECK_EQUAL(ch.foreachVoxel(check),0); // now they all should be
 }
 
 BOOST_AUTO_TEST_CASE ( chunk_mem_init_test )

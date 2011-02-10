@@ -1,0 +1,6 @@
+isis-python (0.2.0-5) stable; urgency=low
+
+    * Initial Debian packaging attempt. This is the first version of
+      a ISIS pthon debian package.
+
+ -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Tue, 08 Feb 2011 19:43:07 +0100

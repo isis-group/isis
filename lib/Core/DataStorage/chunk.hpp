@@ -69,6 +69,10 @@ protected:
 		util::_internal::TypeReference<_internal::TypePtrBase>( new TypePtr<TYPE>( src, volume(), d ) ) {}
 	Chunk( const TypePtrReference &src, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 );
 public:
+	template <typename TYPE> class VoxelOp:std::unary_function<bool,TYPE>{
+	public:
+		virtual bool operator()(TYPE &vox,const util::FixedVector<size_t,4> &pos)=0;
+	};
 	/**
 	 * Gets a reference to the element at a given index.
 	 * If index is invalid, behaviour is undefined. Most probably it will crash.
@@ -99,6 +103,28 @@ public:
 
 		return ret[getLinearIndex( idx )];
 	}
+
+	/**
+	 * Run a functor on every Voxel in the chunk.
+	 * \param op a functor inheriting from VoxelOp
+	 * \returns amount of operations which returned false - so 0 is good!
+	 */
+	template <typename TYPE> size_t foreachVoxel(VoxelOp<TYPE> &op,util::FixedVector<size_t,4> offset=util::FixedVector<size_t,4>()){
+		const util::FixedVector<size_t,4> size=sizeToVector();
+		util::FixedVector<size_t,4> pos;
+		TYPE *vox= &asTypePtr<TYPE>()[0];
+		size_t ret=0;
+
+		for(pos[timeDim]=0;pos[timeDim]<size[timeDim];pos[timeDim]++)
+			for(pos[sliceDim]=0;pos[sliceDim]<size[sliceDim];pos[sliceDim]++)
+				for(pos[phaseDim]=0;pos[phaseDim]<size[phaseDim];pos[phaseDim]++)
+					for(pos[readDim]=0;pos[readDim]<size[readDim];pos[readDim]++){
+						if(op(*(vox++),pos+offset)==false)
+							++ret;
+					}
+		return ret;
+	}
+
 	_internal::TypePtrBase &asTypePtrBase() {
 		return operator*();
 	}

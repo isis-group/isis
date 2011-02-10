@@ -102,6 +102,10 @@ protected:
 	 */
 	Chunk &chunkAt( size_t at );
 public:
+	class ChunkOp : std::unary_function<Chunk&, bool> {
+	public:
+		virtual bool operator()(Chunk &,util::FixedVector<size_t,4> posInImage)=0;
+	};
 	/// Creates an empty Image object.
 	Image();
 
@@ -354,6 +358,34 @@ public:
 	 * e.g. spliceDownTo(sliceDim) will result in an image made of slices (aka 2d-chunks).
 	 */
 	size_t spliceDownTo( dimensions dim );
+
+	/**
+	 * Run a functor with the base ChunkOp on every cunk in the image.
+	 * This does not check the types of the images. So if your functor needs a specific type, use TypedImage.
+	 * \param op a functor object which inherits ChunkOP
+	 * \param copyMetaData if true the metadata of the image are copied into the chunks before calling the functor
+	 */
+	size_t foreachChunk(ChunkOp &op,bool copyMetaData=false);
+
+
+	/**
+	 * Run a functor with the base VoxelOp on every cunk in the image.
+	 * This does not check the types of the images. So if your functor needs a specific type, use TypedImage.
+	 * \param op a functor object which inherits ChunkOp
+	 * \param copyMetaData if true the metadata of the image are copied into the chunks before calling the functor
+	 */
+	template <typename TYPE> size_t foreachVoxel(Chunk::VoxelOp<TYPE> &op){
+		class _proxy:public ChunkOp{
+			Chunk::VoxelOp<TYPE> &op;
+		public:
+			_proxy(Chunk::VoxelOp<TYPE> &_op):op(_op){}
+			bool operator()(Chunk &ch, util::FixedVector<size_t, 4 > posInImage){
+				return ch.foreachVoxel<TYPE>(op,posInImage)==0;
+			}
+		};
+		_proxy prx(op);
+		return foreachChunk(prx,false);
+	}
 };
 
 /**
