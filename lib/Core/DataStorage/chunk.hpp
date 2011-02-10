@@ -108,9 +108,10 @@ public:
 	/**
 	 * Run a functor on every Voxel in the chunk.
 	 * \param op a functor inheriting from VoxelOp
+	 * \param offset offset to be added to the voxel position before op is called
 	 * \returns amount of operations which returned false - so 0 is good!
 	 */
-	template <typename TYPE> size_t foreachVoxel(VoxelOp<TYPE> &op,util::FixedVector<size_t,4> offset=util::FixedVector<size_t,4>()){
+	template<typename TYPE> size_t foreachVoxel(VoxelOp<TYPE> &op,const util::FixedVector<size_t,4> offset){
 		const util::FixedVector<size_t,4> size=sizeToVector();
 		util::FixedVector<size_t,4> pos;
 		TYPE *vox= &asTypePtr<TYPE>()[0];
@@ -124,6 +125,14 @@ public:
 							++ret;
 					}
 		return ret;
+	}
+	/**
+	 * Run a functor on every Voxel in the chunk.
+	 * \param op a functor inheriting from VoxelOp
+	 * \returns amount of operations which returned false - so 0 is good!
+	 */
+	template<typename TYPE> size_t foreachVoxel(VoxelOp<TYPE> &op){
+		return foreachVoxel<TYPE>(op,util::FixedVector<size_t,4>() );
 	}
 
 	_internal::TypePtrBase &asTypePtrBase() {
