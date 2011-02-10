@@ -12,8 +12,8 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
 #include <boost/foreach.hpp>
-#include "DataStorage/image.hpp"
-#include "DataStorage/io_factory.hpp"
+#include <DataStorage/image.hpp>
+#include <DataStorage/io_factory.hpp>
 
 namespace isis
 {
@@ -308,7 +308,7 @@ BOOST_AUTO_TEST_CASE ( image_foreach_chunk_test )
 	std::vector<std::vector<data::MemChunk<uint8_t> > > ch( 3, std::vector<data::MemChunk<uint8_t> >( 3, data::MemChunk<uint8_t>( 3, 3 ) ) );
 	data::Image img;
 
-	class : public data::Image::ChunkOP{
+	class : public data::Image::ChunkOp{
 		class :public data::Chunk::VoxelOp<uint8_t>{
 		public:
 			bool operator()(uint8_t& vox, const util::FixedVector< size_t, 4 >& pos){
@@ -321,6 +321,17 @@ BOOST_AUTO_TEST_CASE ( image_foreach_chunk_test )
 			return ch.foreachVoxel(vox42)==0;
 		}
 	}set42;
+
+	class setIdx:public data::Chunk::VoxelOp<uint8_t>{
+		data::_internal::NDimensional<4> geometry;
+	public:
+		setIdx(data::_internal::NDimensional<4> geo):geometry(geo){}
+		bool operator()(uint8_t& vox, const util::FixedVector< size_t, 4 >& pos){
+			vox=geometry.dim2Index(&pos[0]);
+			return true;
+		}
+	};
+
 
 	for ( int i = 0; i < 3; i++ )
 		for ( int j = 0; j < 3; j++ ) {
@@ -340,6 +351,19 @@ BOOST_AUTO_TEST_CASE ( image_foreach_chunk_test )
 			for(size_t y=0;y<imgSize[data::phaseDim];y++){
 				for(size_t x=0;x<imgSize[data::readDim];x++){
 					BOOST_CHECK_EQUAL(img.voxel<uint8_t>(x,y,z,t),42);
+				}
+			}
+		}
+	}
+
+	setIdx setidx(img);
+	BOOST_REQUIRE_EQUAL(img.foreachVoxel<uint8_t>(setidx),0);
+	uint8_t cnt=0;
+	for(size_t t=0;t<imgSize[data::timeDim];t++){
+		for(size_t z=0;z<imgSize[data::sliceDim];z++){
+			for(size_t y=0;y<imgSize[data::phaseDim];y++){
+				for(size_t x=0;x<imgSize[data::readDim];x++){
+					BOOST_CHECK_EQUAL(img.voxel<uint8_t>(x,y,z,t),cnt++);
 				}
 			}
 		}

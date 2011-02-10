@@ -110,7 +110,7 @@ public:
 	 * \param op a functor inheriting from VoxelOp
 	 * \returns amount of operations which returned false - so 0 is good!
 	 */
-	template <typename TYPE> size_t foreachVoxel(VoxelOp<TYPE> &op){
+	template <typename TYPE> size_t foreachVoxel(VoxelOp<TYPE> &op,util::FixedVector<size_t,4> offset=util::FixedVector<size_t,4>()){
 		const util::FixedVector<size_t,4> size=sizeToVector();
 		util::FixedVector<size_t,4> pos;
 		TYPE *vox= &asTypePtr<TYPE>()[0];
@@ -120,7 +120,7 @@ public:
 			for(pos[sliceDim]=0;pos[sliceDim]<size[sliceDim];pos[sliceDim]++)
 				for(pos[phaseDim]=0;pos[phaseDim]<size[phaseDim];pos[phaseDim]++)
 					for(pos[readDim]=0;pos[readDim]<size[readDim];pos[readDim]++){
-						if(op(*(vox++),pos)==false)
+						if(op(*(vox++),pos+offset)==false)
 							++ret;
 					}
 		return ret;

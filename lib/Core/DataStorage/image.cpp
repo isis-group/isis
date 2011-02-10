@@ -727,7 +727,7 @@ size_t Image::spliceDownTo( dimensions dim ) //readDim = 0, phaseDim, sliceDim, 
 	return lookup.size();
 }
 
-size_t Image::foreachChunk(Image::ChunkOP& op,bool copyMetaData)
+size_t Image::foreachChunk(Image::ChunkOp& op,bool copyMetaData)
 {
 	size_t err=0;
 	checkMakeClean();
