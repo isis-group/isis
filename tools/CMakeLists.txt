@@ -1,7 +1,7 @@
 # The ISIS tools project
 #
-# The isis tools are: 
-# 
+# The isis tools are:
+#
 # isisdump    -    Dumps the meta data informations from an image file as seen
 #                  by the ISIS internal data representation.
 # isisiff     -    Produces a difference output between the meta information
@@ -18,7 +18,7 @@ project(ISIS_TOOLS)
 # find and configure the isis core library
 ###########################################################
 SET(ISIS_DIR /usr/share/isis/cmake CACHE PATH
-    "The directory where the isis cmake configuration script is located.")
+"The directory where the isis cmake configuration script is located.")
 
 FIND_PACKAGE(ISIS REQUIRED)
 INCLUDE_DIRECTORIES(${ISIS_INCLUDE_DIRS})
@@ -26,16 +26,16 @@ INCLUDE_DIRECTORIES(${ISIS_INCLUDE_DIRS})
 # copy definitions for debug and runtime log
 # enable RUNTIME_LOG
 IF(${CMAKE_PROJECT_NAME}_RUNTIME_LOG)
-	ADD_DEFINITIONS(-D_ENABLE_LOG=1)
+ADD_DEFINITIONS(-D_ENABLE_LOG=1)
 ELSE(${CMAKE_PROJECT_NAME}_RUNTIME_LOG)
-	ADD_DEFINITIONS(-D_ENABLE_LOG=0)
+ADD_DEFINITIONS(-D_ENABLE_LOG=0)
 ENDIF(${CMAKE_PROJECT_NAME}_RUNTIME_LOG)
 # enable DEBUG_LOG
 IF(${CMAKE_PROJECT_NAME}_DEBUG_LOG)
-	ADD_DEFINITIONS(-D_ENABLE_DEBUG=1)
-	MESSAGE(STATUS "Debug code enabled, this will will have a big impact on the performance")
+ADD_DEFINITIONS(-D_ENABLE_DEBUG=1)
+MESSAGE(STATUS "Debug code enabled, this will will have a big impact on the performance")
 ELSE(${CMAKE_PROJECT_NAME}_DEBUG_LOG)
-	ADD_DEFINITIONS(-D_ENABLE_DEBUG=0)
+ADD_DEFINITIONS(-D_ENABLE_DEBUG=0)
 ENDIF(${CMAKE_PROJECT_NAME}_DEBUG_LOG)
 
 add_executable(isisdump isisdump.cpp)
@@ -49,6 +49,11 @@ SET_TARGET_PROPERTIES(isisdiff PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 add_executable(isisconv isisconv.cpp)
 target_link_libraries(isisconv ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
 SET_TARGET_PROPERTIES(isisconv PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+FIND_LIBRARY(LIB_MUPARSER "muparser")
+add_executable(isiscalc isiscalc.cpp)
+target_link_libraries(isiscalc ${LIB_MUPARSER} ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
+SET_TARGET_PROPERTIES(isiscalc PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 add_executable(isisswap isisswap.cpp)
 target_link_libraries(isisswap ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
@@ -73,11 +78,11 @@ INCLUDE(CPack)
 
 # the install targets.
 INSTALL(TARGETS
-    isisdump
-    isisdiff
-    isisconv
-    isisswap
-    RUNTIME DESTINATION bin)
-    
+isisdump
+isisdiff
+isisconv
+isisswap
+RUNTIME DESTINATION bin)
+
 MESSAGE(STATUS "Installing binary files to ${CMAKE_INSTALL_PREFIX}/bin")
 
