@@ -37,7 +37,7 @@ ViewControl::ViewControl( ) : m_Valid( false )
 	m_RendererSagittal = vtkRenderer::New();
 	m_RendererCoronal = vtkRenderer::New();
 	m_PlaneWidgetAxial = vtkPlaneWidget::New();
-
+	
 	m_Cursor = vtkCursor2D::New();
 	m_ActorCursorAxial = vtkActor::New();
 	m_ActorCursorSagittal = vtkActor::New();

@@ -26,7 +26,9 @@ public:
 	_Image ( PyObject *p, const isis::data::Image &base ) : isis::data::Image( base ), self( p ), boost::python::wrapper< isis::data::Image >()  {}
 
 	float _voxel( const size_t &first, const size_t &second, const size_t &third, const size_t &fourth ) {
-		switch( this->typeID() ) {
+		data::Chunk ch = this->getChunk(first, second, third, fourth, false);
+		
+		switch( ch.typeID() ) {
 		case data::TypePtr<int8_t>::staticID:
 			return isis::data::Image::voxel<int8_t>( first, second, third, fourth );
 			break;
@@ -61,7 +63,9 @@ public:
 
 
 	bool _setVoxel( const size_t &first, const size_t &second, const size_t &third, const size_t &fourth, const float &value ) {
-		switch( this->typeID() ) {
+		data::Chunk ch = this->getChunk(first, second, third, fourth, false);
+
+		switch( ch.typeID() ) {
 		case data::TypePtr<int8_t>::staticID:
 			isis::data::Image::voxel<int8_t>( first, second, third, fourth ) = value;
 			return true;
