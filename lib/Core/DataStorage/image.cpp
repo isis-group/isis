@@ -691,8 +691,8 @@ size_t Image::foreachChunk(Image::ChunkOp& op,bool copyMetaData)
 {
 	size_t err=0;
 	checkMakeClean();
-	util::FixedVector<size_t,4> imgSize=sizeToVector();
-	util::FixedVector<size_t,4> chunkSize=getChunk(0,0,0,0).sizeToVector();
+	util::FixedVector<size_t,4> imgSize=getSizeAsVector();
+	util::FixedVector<size_t,4> chunkSize=getChunk(0,0,0,0).getSizeAsVector();
 	util::FixedVector<size_t,4> pos;
 
 	for(pos[timeDim]=0;pos[timeDim]<imgSize[timeDim];pos[timeDim]+=chunkSize[timeDim]){

@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE ( chunk_foreach_voxel_test )
 	public:
 		setIdx(data::_internal::NDimensional<4> geo):chunkGeometry(geo){}
 		bool operator()(uint8_t& vox, const util::FixedVector< size_t, 4 >& pos){
-			vox=chunkGeometry.dim2Index(&pos[0]);
+			vox=chunkGeometry.getLinearIndex(&pos[0]);
 			return true;
 		}
 	};
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE ( chunk_foreach_voxel_test )
 	public:
 		checkIdx(data::_internal::NDimensional<4> geo):chunkGeometry(geo){}
 		bool operator()(uint8_t& vox, const util::FixedVector< size_t, 4 >& pos){
-			return vox==chunkGeometry.dim2Index(&pos[0]);
+			return vox==chunkGeometry.getLinearIndex(&pos[0]);
 		}
 	};
 

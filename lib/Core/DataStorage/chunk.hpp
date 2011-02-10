@@ -110,7 +110,7 @@ public:
 	 * \returns amount of operations which returned false - so 0 is good!
 	 */
 	template <typename TYPE> size_t foreachVoxel(VoxelOp<TYPE> &op,util::FixedVector<size_t,4> offset=util::FixedVector<size_t,4>()){
-		const util::FixedVector<size_t,4> size=sizeToVector();
+		const util::FixedVector<size_t,4> size=getSizeAsVector();
 		util::FixedVector<size_t,4> pos;
 		TYPE *vox= &asTypePtr<TYPE>()[0];
 		size_t ret=0;

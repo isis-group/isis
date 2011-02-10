@@ -327,7 +327,7 @@ BOOST_AUTO_TEST_CASE ( image_foreach_chunk_test )
 	public:
 		setIdx(data::_internal::NDimensional<4> geo):geometry(geo){}
 		bool operator()(uint8_t& vox, const util::FixedVector< size_t, 4 >& pos){
-			vox=geometry.dim2Index(&pos[0]);
+			vox=geometry.getLinearIndex(&pos[0]);
 			return true;
 		}
 	};
@@ -335,16 +335,16 @@ BOOST_AUTO_TEST_CASE ( image_foreach_chunk_test )
 
 	for ( int i = 0; i < 3; i++ )
 		for ( int j = 0; j < 3; j++ ) {
-			ch[i][j].setProperty( "readVec", util::fvector4( 1, 0 ) );
-			ch[i][j].setProperty( "phaseVec", util::fvector4( 0, 1 ) );
-			ch[i][j].setProperty( "indexOrigin", util::fvector4( 0, 0, j ) );
-			ch[i][j].setProperty( "acquisitionNumber", acNum++ );
-			ch[i][j].setProperty( "voxelSize", util::fvector4( 1, 1, 1 ) );
+			ch[i][j].setPropertyAs( "readVec", util::fvector4( 1, 0 ) );
+			ch[i][j].setPropertyAs( "phaseVec", util::fvector4( 0, 1 ) );
+			ch[i][j].setPropertyAs( "indexOrigin", util::fvector4( 0, 0, j ) );
+			ch[i][j].setPropertyAs( "acquisitionNumber", acNum++ );
+			ch[i][j].setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1 ) );
 			BOOST_REQUIRE( img.insertChunk( ch[i][j] ) );
 		}
 	BOOST_REQUIRE_EQUAL(img.foreachChunk(set42),0);
 
-	util::FixedVector<size_t,4> imgSize=img.sizeToVector();
+	util::FixedVector<size_t,4> imgSize=img.getSizeAsVector();
 
 	for(size_t t=0;t<imgSize[data::timeDim];t++){
 		for(size_t z=0;z<imgSize[data::sliceDim];z++){
