@@ -61,14 +61,8 @@ public:
 	 * \param copy enforce deep copy of the data, even if its not neccessary
 	 * \returns the currently first image in the input chain represented in the given type
 	 */
-	template<typename TYPE> Image fetchImageAs( bool copy = true ) {
-		if( copy ) {
-			return MemImage<TYPE>( fetchImage() );
-		} else {
-			Image ret = fetchImage();
-			ret.convertToType( TypePtr<TYPE>::staticID );
-			return ret;
-		}
+	template<typename TYPE> TypedImage<TYPE> fetchImageAs( bool copy = true ) {
+		return copy ? MemImage<TYPE>( fetchImage() ):TypedImage<TYPE>(fetchImage());
 	}
 
 	bool autoload( bool exitOnError = false );
