@@ -135,14 +135,10 @@ public:
 	}
 
 	float _getMin( ) {
-		float _min, _max;
-		this->getMinMax( _min, _max );
-		return _min;
+		return this->getMinMax().first->as<float>();
 	}
 	float _getMax( ) {
-		float _min, _max;
-		this->getMinMax( _min, _max );
-		return _max;
+		return this->getMinMax().second->as<float>();
 	}
 
 	const std::string _getMainOrientation( ) {
@@ -211,7 +207,7 @@ public:
 		}
 	}
 	isis::data::Image _deepCopy( void ) {
-		switch( this->typeID() ) {
+		switch( this->getMajorTypeID() ) {
 		case data::TypePtr<int8_t>::staticID:
 			return isis::data::MemImage<int8_t>( *this );
 			break;

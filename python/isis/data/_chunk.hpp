@@ -20,6 +20,93 @@ public:
 	//  _Chunk ( PyObject *p ) : self( p ) {}
 	_Chunk ( PyObject *p, const isis::data::Chunk &base ) : isis::data::Chunk( base ), self( p ) {}
 
+	float _voxel( const size_t &first, const size_t &second, const size_t &third, const size_t &fourth ) {
+		switch( typeID() ) {
+		case data::TypePtr<int8_t>::staticID:
+			return isis::data::Chunk::voxel<int8_t>( first, second, third, fourth );
+			break;
+		case data::TypePtr<uint8_t>::staticID:
+			return isis::data::Chunk::voxel<uint8_t>( first, second, third, fourth );
+			break;
+		case data::TypePtr<int16_t>::staticID:
+			return isis::data::Chunk::voxel<int16_t>( first, second, third, fourth );
+			break;
+		case data::TypePtr<uint16_t>::staticID:
+			return isis::data::Chunk::voxel<uint16_t>( first, second, third, fourth );
+			break;
+		case data::TypePtr<int32_t>::staticID:
+			return isis::data::Chunk::voxel<int32_t>( first, second, third, fourth );
+			break;
+		case data::TypePtr<uint32_t>::staticID:
+			return isis::data::Chunk::voxel<uint32_t>( first, second, third, fourth );
+			break;
+		case data::TypePtr<float>::staticID:
+			return isis::data::Chunk::voxel<float>( first, second, third, fourth );
+			break;
+		case data::TypePtr<double>::staticID:
+			return isis::data::Chunk::voxel<double>( first, second, third, fourth );
+			break;
+		default:
+			return 0;
+		}
+	}
+	
+	float _voxel( const isis::util::ivector4 &coord ) {
+		return _voxel( coord[0], coord[1], coord[2], coord[3] );
+	}
+	
+	bool _setVoxel( const size_t &first, const size_t &second, const size_t &third, const size_t &fourth, const float &value ) {
+
+		switch( typeID() ) {
+		case data::TypePtr<int8_t>::staticID:
+			isis::data::Chunk::voxel<int8_t>( first, second, third, fourth ) = value;
+			return true;
+			break;
+		case data::TypePtr<uint8_t>::staticID:
+			isis::data::Chunk::voxel<uint8_t>( first, second, third, fourth ) = value;
+			return true;
+			break;
+		case data::TypePtr<int16_t>::staticID:
+			isis::data::Chunk::voxel<int16_t>( first, second, third, fourth ) = value;
+			return true;
+			break;
+		case data::TypePtr<uint16_t>::staticID:
+			isis::data::Chunk::voxel<uint16_t>( first, second, third, fourth ) = value;
+			return true;
+			break;
+		case data::TypePtr<int32_t>::staticID:
+			isis::data::Chunk::voxel<int32_t>( first, second, third, fourth ) = value;
+			return true;
+			break;
+		case data::TypePtr<uint32_t>::staticID:
+			isis::data::Chunk::voxel<uint32_t>( first, second, third, fourth ) = value;
+			return true;
+			break;
+		case data::TypePtr<float>::staticID:
+			isis::data::Chunk::voxel<float>( first, second, third, fourth ) = value;
+			return true;
+			break;
+		case data::TypePtr<double>::staticID:
+			isis::data::Chunk::voxel<double>( first, second, third, fourth ) = value;
+			return true;
+			break;
+		default:
+			return false;
+		}
+	}
+	
+	bool _setVoxel( const isis::util::ivector4 &coord, const float &value ) {
+		return _setVoxel( coord[0], coord[1], coord[2], coord[3], value );
+	}
+	
+	bool _convertToType( const unsigned short ID ) {
+		return convertToType( ID );
+	}
+	
+	bool _convertToType( const unsigned short ID, float scaling, size_t offset ) {
+		return convertToType( ID, std::make_pair<util::Type<float>, util::Type<size_t> >(scaling, offset) );
+	}
+	
 private:
 	PyObject *self;
 };

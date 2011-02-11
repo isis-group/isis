@@ -20,18 +20,18 @@ SET(${CMAKE_PROJECT_NAME}_VERSION
 ###########################################################
 # find and configure the isis core library
 ###########################################################
-SET(ISIS_DIR /usr/share/isis/cmake CACHE PATH
+SET(ISIS_DIR ${CMAKE_INSTALL_PREFIX}/share/isis/cmake CACHE PATH
     "The directory where the isis cmake configuration skript script is located.")
 FIND_PACKAGE(ISIS REQUIRED)
 INCLUDE_DIRECTORIES(${ISIS_INCLUDE_DIRS})
-
-string(COMPARE EQUAL ${CMAKE_INSTALL_PREFIX} ${ISIS_INSTALL_PREFIX} PREFIX_IS_SAME)
-if(NOT ${PREFIX_IS_SAME})
-	message(SEND_ERROR
-		"Seems like your install prefix (${CMAKE_INSTALL_PREFIX}) is not the same as the prefix, which was used when the core library was built (${ISIS_INSTALL_PREFIX})."
-		"This will prevent this core library from finding the plugins you are building right now. Please use CMAKE_INSTALL_PREFIX=${ISIS_INSTALL_PREFIX}"
-	)
-endif(NOT ${PREFIX_IS_SAME})
+# 
+# string(COMPARE EQUAL ${CMAKE_INSTALL_PREFIX} ${ISIS_INSTALL_PREFIX} PREFIX_IS_SAME)
+# if(NOT ${PREFIX_IS_SAME})
+# 	message(SEND_ERROR
+# 		"Seems like your install prefix (${CMAKE_INSTALL_PREFIX}) is not the same as the prefix, which was used when the core library was built (${ISIS_INSTALL_PREFIX})."
+# 		"This will prevent this core library from finding the plugins you are building right now. Please use CMAKE_INSTALL_PREFIX=${ISIS_INSTALL_PREFIX}"
+# 	)
+# endif(NOT ${PREFIX_IS_SAME})
 
 ###############################################################################
 # add global options
