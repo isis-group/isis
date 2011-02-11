@@ -50,6 +50,7 @@ namespace isis
 				unsigned long data_received = 0L;
                 std::string header_start = "<data_block_header>";
                 std::string header_end =  "</data_block_header>";
+                std::string session_terminus = "<series_finished>";
                 unsigned int byteSize = 0;
                 char* dataBuffer;
                 std::string header;
@@ -65,7 +66,7 @@ namespace isis
                     // std::string lastVolume = <lastVolume>
                     // if (memcmp(buffer, lastVolume.c_str(), sizeof(lastVolume) -1 ) == 0 ){
                     //  return 0;}
-                    if (22 == image_counter){
+                    if (memcmp(buffer, session_terminus.c_str(), sizeof(session_terminus) - 1) == 0){
                         return 0;
                     }
                         
@@ -103,10 +104,7 @@ namespace isis
 						// image complete
                         
                         size_t width = atoi(getStringFromHeader("width", header).c_str());
-                        
                         bool moco = getStringFromHeader("motion_corrected", header).compare("yes") == 0 ? true : false;
-                        
-                        
                         size_t height = atoi(getStringFromHeader("height", header).c_str());
                         bool mosaic = getStringFromHeader("mosaic", header).compare("yes") == 0 ? true : false;
                         size_t iim = 1;
@@ -117,43 +115,20 @@ namespace isis
                         
                         std::string data_type = getStringFromHeader("data_type", header);
                         
-                        // Mosaics are always quadratic, so don't bother but only looking for the rows
+                        // Mosaics are always quadratic, so don't bother 'bout only looking for the rows
                         size_t slices_in_row = static_cast<size_t> (ceil(sqrt(static_cast<double_t> (iim) )));
                         size_t width_slice = width / slices_in_row;
                         size_t height_slice = height / slices_in_row;
                         
-                        //printf("width_slices: %ld height_slices: %ld\n", width_slice, height_slice);
-                        //printf("data_type '%s'\n", data_type.c_str());
-                        
                         size_t acq_nr = atoi(getStringFromHeader("acquisition_number", header).c_str());
-                        //printf("ACQ_NR: %ld\n", acq_nr);
                         std::string seq_descr = getStringFromHeader("sequence_description", header);
-                        
-                        
-                        
-                        /**********/
-                         
                         size_t seq_number = atoi(getStringFromHeader("meas_uid", header).c_str());
-                        //printf("series_number %ld\n", seq_number );
                         size_t acq_time = atoi(getStringFromHeader("acquisition_time", header).c_str());
-                        //printf("acq_time %ld\n", acq_time );
                         uint16_t rep_time = atol(getStringFromHeader("repetition_time", header).c_str());
-                        //printf("repetition_time %ld\n", rep_time );
                         util::fvector4 read_vec = getVectorFromString(getStringFromHeader("read_vector", header));
-                        //printf("!!!!!!read_vec %.8f,%.8f,%.8f\n", read_vec[0], read_vec[1],read_vec[2] );
-                        //printf("read_vector %s\n", read_vector.c_str() );
-                        
-                        
                         util::fvector4 phase_vec = getVectorFromString(getStringFromHeader("phase_vector", header));
-                        //printf("!!!!!!phase_vec %.8f,%.8f,%.8f\n", phase_vec[0], phase_vec[1],phase_vec[2] );
-                        //printf("phase_vector %s\n", phase_vector.c_str() );
-                        
                         util::fvector4 slice_norm_vec = getVectorFromString(getStringFromHeader("slice_norm_vector", header));
-                        //printf("!!!!!!slice_norm_vec %.8f,%.8f,%.8f\n", slice_norm_vec[0], slice_norm_vec[1],slice_norm_vec[2] );
-                        //printf("slice_norm_vector %s\n", slice_norm_vector.c_str() );
-                        
                         size_t inplane_rot = atoi(getStringFromHeader("implane_rotation", header).c_str());
-                        
                         std::string slice_orient = getStringFromHeader("slice_orientation", header);
                         
                         //Fallunterscheidung
@@ -167,36 +142,20 @@ namespace isis
                             InPlanePhaseEncodingDirection = (-45 < inplane_rot && inplane_rot < 45 ) ? "ROW" : "COL";
                         }
 
-                        
                         size_t fov_read = atoi(getStringFromHeader("fov_read", header).c_str());
-                        //printf("fov_read %ld\n", fov_read );
-                        
                         size_t fov_phase = atoi(getStringFromHeader("fov_phase", header).c_str());
-                        
-                        //printf("fov_phase %ld\n", fov_phase );
-                        
                         size_t slice_thickness = atoi(getStringFromHeader("slice_thickness", header).c_str());
-                        
                         size_t dimension_number = atoi(getStringFromHeader("dimension_number", header).c_str());
-                        
-                        /**
-                         * get voxelGap from first two slice positions
-                         */                         
-                        //TODO: Was wenn anat Daten
-                        util::fvector4 slice0_vec = getVectorFromString(getStringFromHeader("slice_position_0", header));
-                        util::fvector4 slice1_vec = getVectorFromString(getStringFromHeader("slice_position_1", header));
-                        
-                        util::fvector4 voxelGap(0, 0, (abs(slice1_vec[2] - slice0_vec[2]) - slice_thickness));
+                        // get voxelGap out of the distance (in percent!) between slices
+                        size_t distFactor = atoi(getStringFromHeader("distance_factor", header).c_str());
+                        util::fvector4 voxelGap(0, 0, slice_thickness*(distFactor/100));
                         
                         //*********
                         
-                        /************/
-                        
-						image_counter++;
+ 						image_counter++;
 												
 						memcpy(dataBuffer + data_received, buffer, byteSize - data_received);
 						data_received += byteSize - data_received;
-						//printf("[receiver2] did receive %i bytes of data\n", byteSize);
 						
 						// ... do something ...
 						/******************************/
@@ -218,27 +177,14 @@ namespace isis
                                 char buf[5];
                                 sprintf(buf, "%i", _slice);
                                 slice_pos.append(buf);
-                                //slice_pos_start.append("\n");
-                                //std::string slice_pos_end = "\n</slice_position_";
-                                //slice_pos_end.append(buf);
-                                //std::string slice_pos = header.substr((header.find(slice_pos_start)+slice_pos_start.length()), 
-                                 //                                     header.find(slice_pos_end) - (header.find(slice_pos_start)+slice_pos_start.length()));
                                 util::fvector4 slice_pos_vec = getVectorFromString(getStringFromHeader(slice_pos, header));//(val1, val2, val3);
-                                //printf("Slice string: %s\n\n", slice_pos.c_str());
-                                //std::cout << "SlicePos: " << slice_pos_vec << std::endl;
-                                
-                                //printf("Read string: %s\n\n", read_vector.c_str());
-                                //std::cout << "ReadVec: " << read_vec << std::endl;
-                                
-                                //printf("Phase string: %s\n\n",getStringFromHeader("phase_vector", header).c_str());
-                                //std::cout << "PhaseVec: " << phase_vec << std::endl;
                                 //*********
                                 
+                                // now, create chunks per slice ang feed it with metadata
                                 boost::shared_ptr<data::Chunk> ch(new data::MemChunk<uint16_t>((uint16_t*)slice_buffer, height_slice,width_slice,1) );
                                 ch->setProperty("indexOrigin", slice_pos_vec);
-                                //std::cout << "SlicePos: " << slice_pos_vec << std::endl;
-                                
                                 ch->setProperty<uint32_t>("acquisitionNumber", acq_nr);
+                                //ch->setProperty<>("acquisitionTime", acquisition_time);
                                 if (true == moco){
                                     ch->setProperty<uint16_t>("sequenceNumber", 0);
                                 }
@@ -251,12 +197,12 @@ namespace isis
                                 if ( 0 == InPlanePhaseEncodingDirection.compare(0, 3, "COL") ){
                                     ch->setProperty<util::fvector4>("readVec", phase_vec);
                                     ch->setProperty<util::fvector4>("phaseVec", read_vec);
-                                    ch->setProperty<util::fvector4>("voxelSize", util::fvector4(fov_read/width_slice,fov_phase/height_slice,5.6,0));
+                                    ch->setProperty<util::fvector4>("voxelSize", util::fvector4(fov_read/width_slice,fov_phase/height_slice,slice_thickness,0));
                                 }
                                 else {
                                     ch->setProperty<util::fvector4>("phaseVec", phase_vec);
                                     ch->setProperty<util::fvector4>("readVec", read_vec);
-                                    ch->setProperty<util::fvector4>("voxelSize", util::fvector4(fov_phase/width_slice,fov_read/height_slice,5.6,0));
+                                    ch->setProperty<util::fvector4>("voxelSize", util::fvector4(fov_phase/width_slice,fov_read/height_slice,slice_thickness,0));
                                 }
 
                                 
@@ -276,15 +222,10 @@ namespace isis
 						/******************************/
 						free(dataBuffer);
                         /*****************************/
-                        // TIME DIFF from send to finished reading data
-                        //time_t startTime = static_cast<time_t>(atol(getStringFromHeader("time_stamp", header).c_str()));
-//                        printf("timestamp: %s ||  as double: %.6f\n", getStringFromHeader("time_stamp", header).c_str(), startTime);
-//                        time_t endTime;
-//                        time(&endTime);
-//                        printf("endTime: %.6f\n", endTime);
-//                        double_t dif = difftime (endTime,startTime);
-//                        printf ("It took us %.2lf seconds to get this volume.\n", dif );
-//                        
+
+                        
+                        // evaluate the sending timing
+                        // TODO:: remove this stuff sometime
                         if (true == moco){
                             timestampPreviousMOCO = timestampCurrentMOCO;
                             timestampCurrentMOCO = atof(getStringFromHeader("time_stamp", header).c_str());
@@ -297,22 +238,13 @@ namespace isis
                             double_t diffTimestamps = (timestampCurrent - timestampPrevious);
                             fprintf(timediffRECO, "%.6lf\n", diffTimestamps );
                         }
-                        
-                        
-                        
-                        
-                        
-						return 0;
+   					return 0;
 					}
 					
 				}
                     
 				
 			}
-               
-				
-				
-				
 				return 0;
 			}
 			
@@ -364,14 +296,9 @@ namespace isis
             {
                 size_t indexK1 = propName.find(",", 0, 1);
                 size_t indexK2 = propName.find(",", indexK1+1, 1);
-                //printf("propName: %s\n", propName.c_str());
-                //printf("indexK1: %ld    indexK2: %ld\n", indexK1, indexK2);
                 double_t val1 = atof(propName.substr(0, indexK1).c_str());
-                //printf("val1: %s\n", propName.substr(0, indexK1).c_str());
                 double_t val2 = atof(propName.substr(indexK1+1, indexK2-indexK1).c_str());
-                //printf("val2: %s\n", propName.substr(indexK1+1, indexK2-indexK1-1).c_str());
                 double_t val3 = atof(propName.substr(indexK2+1, propName.length()-indexK2).c_str());
-                //printf("val3: %s\n", propName.substr(indexK2+1, propName.length()-indexK2).c_str());
                 return util::fvector4(val1, val2, val3);
             }
 			char   buffer[32768];
