@@ -82,6 +82,7 @@ isisdump
 isisdiff
 isisconv
 isisswap
+isiscalc
 RUNTIME DESTINATION bin)
 
 MESSAGE(STATUS "Installing binary files to ${CMAKE_INSTALL_PREFIX}/bin")

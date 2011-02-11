@@ -8,13 +8,19 @@ using namespace isis;
 class VoxelOp : public data::Chunk::VoxelOp<float>{
 	mu::Parser parser;
 	double voxBuff;
+	util::FixedVector<double,4> posBuff;
 public:
 	VoxelOp(std::string expr){
 		parser.SetExpr(expr);
 		parser.DefineVar(std::string("vox"),&voxBuff);
+		parser.DefineVar(std::string("pos_x"),&posBuff[data::readDim]);
+		parser.DefineVar(std::string("pos_y"),&posBuff[data::phaseDim]);
+		parser.DefineVar(std::string("pos_z"),&posBuff[data::sliceDim]);
+		parser.DefineVar(std::string("pos_t"),&posBuff[data::timeDim]);
 	}
 	bool operator()(float& vox, const isis::util::FixedVector< size_t,4 >& pos){
 		voxBuff=vox; //using parser.DefineVar every time would slow down the evaluation
+		posBuff=pos;
 		vox=parser.Eval();
 	}
 
