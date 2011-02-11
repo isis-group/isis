@@ -38,6 +38,14 @@ namespace isis
 			
 			int load ( data::ChunkList &chunks, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
 				
+                
+                /*
+                 *TIMESTAMPS
+                 */
+                printf("IMAGE: %d\n", image_counter);
+                
+                
+                
 				firstHeaderArrived = false;
 				unsigned long data_received = 0L;
                 std::string header_start = "<data_block_header>";
@@ -57,11 +65,16 @@ namespace isis
                     // std::string lastVolume = <lastVolume>
                     // if (memcmp(buffer, lastVolume.c_str(), sizeof(lastVolume) -1 ) == 0 ){
                     //  return 0;}
+                    if (22 == image_counter){
+                        return 0;
+                    }
+                        
+                    
                     
 				
 				if(memcmp(buffer, header_start.c_str(), sizeof(header_start) - 1) == 0) {
 					firstHeaderArrived = true;
-					printf("[receiver2] received block with header\n");
+					//printf("[receiver2] received block with header\n");
 					data_received = 0L;
 					unsigned int header_length = 0;
 					while(memcmp(header_end.c_str(), (buffer + header_length), sizeof(header_end)) != 0) {
@@ -72,13 +85,14 @@ namespace isis
                     
                     byteSize = atoi(getStringFromHeader("data_size_in_bytes", header).c_str());
 					
-					printf("byteSize: '%i'\n", byteSize);
+					//printf("byteSize: '%i'\n", byteSize);
 					dataBuffer = (char*)malloc(byteSize);
 					
 					// copy the first bit of data
 					memcpy(dataBuffer, (buffer + header_length), sizeof(buffer) - header_length);
 					
 					data_received += sizeof(buffer) - header_length;
+                    time(&startTime);
 					
 				} else if (true == firstHeaderArrived) {
 					
@@ -108,10 +122,11 @@ namespace isis
                         size_t width_slice = width / slices_in_row;
                         size_t height_slice = height / slices_in_row;
                         
-                        printf("width_slices: %ld height_slices: %ld\n", width_slice, height_slice);
-                        printf("data_type '%s'\n", data_type.c_str());
+                        //printf("width_slices: %ld height_slices: %ld\n", width_slice, height_slice);
+                        //printf("data_type '%s'\n", data_type.c_str());
                         
                         size_t acq_nr = atoi(getStringFromHeader("acquisition_number", header).c_str());
+                        //printf("ACQ_NR: %ld\n", acq_nr);
                         std::string seq_descr = getStringFromHeader("sequence_description", header);
                         
                         
@@ -119,18 +134,12 @@ namespace isis
                         /**********/
                          
                         size_t seq_number = atoi(getStringFromHeader("meas_uid", header).c_str());
-                        //printf("series_number %ld\n", series_number );
+                        //printf("series_number %ld\n", seq_number );
                         size_t acq_time = atoi(getStringFromHeader("acquisition_time", header).c_str());
                         //printf("acq_time %ld\n", acq_time );
                         uint16_t rep_time = atol(getStringFromHeader("repetition_time", header).c_str());
                         //printf("repetition_time %ld\n", rep_time );
-                        std::string read_vector = getStringFromHeader("read_vector", header);
-                        size_t indexK1 = read_vector.find(",", 0, 1);
-                        size_t indexK2 = read_vector.find(",", indexK1+1, 1);
-                        double_t val1 = atof(read_vector.substr(0, indexK1).c_str());
-                        double_t val2 = atof(read_vector.substr(indexK1+1, indexK2-indexK1).c_str());
-                        double_t val3 = atof(read_vector.substr(indexK1+indexK2, read_vector.length()-indexK2).c_str());
-                        util::fvector4 read_vec(val1, val2, val3);
+                        util::fvector4 read_vec = getVectorFromString(getStringFromHeader("read_vector", header));
                         //printf("!!!!!!read_vec %.8f,%.8f,%.8f\n", read_vec[0], read_vec[1],read_vec[2] );
                         //printf("read_vector %s\n", read_vector.c_str() );
                         
@@ -174,16 +183,10 @@ namespace isis
                          * get voxelGap from first two slice positions
                          */                         
                         //TODO: Was wenn anat Daten
-                        std::string slice0_pos = getStringFromHeader("slice_position_0", header);
-                        indexK1 = slice0_pos.find(",", 0, 1);
-                        indexK2 = slice0_pos.find(",", indexK1+1, 1);
-                        double_t slice0 = atof(slice0_pos.substr(indexK1+indexK2, slice0_pos.length()-indexK2).c_str());
-                        std::string slice1_pos = getStringFromHeader("slice_position_1", header);
-                        indexK1 = slice1_pos.find(",", 0, 1);
-                        indexK2 = slice1_pos.find(",", indexK1+1, 1);
-                        double_t slice1 = atof(slice1_pos.substr(indexK1+indexK2, slice1_pos.length()-indexK2).c_str());
+                        util::fvector4 slice0_vec = getVectorFromString(getStringFromHeader("slice_position_0", header));
+                        util::fvector4 slice1_vec = getVectorFromString(getStringFromHeader("slice_position_1", header));
                         
-                        util::fvector4 voxelGap(0, 0, (slice1 - slice0 - slice_thickness));
+                        util::fvector4 voxelGap(0, 0, (abs(slice1_vec[2] - slice0_vec[2]) - slice_thickness));
                         
                         //*********
                         
@@ -193,7 +196,7 @@ namespace isis
 												
 						memcpy(dataBuffer + data_received, buffer, byteSize - data_received);
 						data_received += byteSize - data_received;
-						printf("[receiver2] did receive %i bytes of data\n", byteSize);
+						//printf("[receiver2] did receive %i bytes of data\n", byteSize);
 						
 						// ... do something ...
 						/******************************/
@@ -211,28 +214,29 @@ namespace isis
                                 /********
                                 * get each slice position from header 
                                 */
-                                std::string slice_pos_start = "<slice_position_";
+                                std::string slice_pos = "slice_position_";
                                 char buf[5];
-                                sprintf(buf, "%i>", _slice);
-                                slice_pos_start.append(buf);
-                                slice_pos_start.append("\n");
-                                std::string slice_pos_end = "\n</slice_position_";
-                                slice_pos_end.append(buf);
-                                std::string slice_pos = header.substr((header.find(slice_pos_start)+slice_pos_start.length()), 
-                                                                      header.find(slice_pos_end) - (header.find(slice_pos_start)+slice_pos_start.length()));
-                                util::fvector4 slice_pos_vec = getVectorFromString(slice_pos);//(val1, val2, val3);
-                                printf("Slice string: %s\n\n", slice_pos.c_str());
-                                std::cout << "SlicePos: " << slice_pos_vec << std::endl;
+                                sprintf(buf, "%i", _slice);
+                                slice_pos.append(buf);
+                                //slice_pos_start.append("\n");
+                                //std::string slice_pos_end = "\n</slice_position_";
+                                //slice_pos_end.append(buf);
+                                //std::string slice_pos = header.substr((header.find(slice_pos_start)+slice_pos_start.length()), 
+                                 //                                     header.find(slice_pos_end) - (header.find(slice_pos_start)+slice_pos_start.length()));
+                                util::fvector4 slice_pos_vec = getVectorFromString(getStringFromHeader(slice_pos, header));//(val1, val2, val3);
+                                //printf("Slice string: %s\n\n", slice_pos.c_str());
+                                //std::cout << "SlicePos: " << slice_pos_vec << std::endl;
                                 
-                                printf("Read string: %s\n\n", read_vector.c_str());
-                                std::cout << "ReadVec: " << read_vec << std::endl;
+                                //printf("Read string: %s\n\n", read_vector.c_str());
+                                //std::cout << "ReadVec: " << read_vec << std::endl;
                                 
-                                printf("Phase string: %s\n\n",getStringFromHeader("phase_vector", header).c_str());
-                                std::cout << "PhaseVec: " << phase_vec << std::endl;
+                                //printf("Phase string: %s\n\n",getStringFromHeader("phase_vector", header).c_str());
+                                //std::cout << "PhaseVec: " << phase_vec << std::endl;
                                 //*********
                                 
                                 boost::shared_ptr<data::Chunk> ch(new data::MemChunk<uint16_t>((uint16_t*)slice_buffer, height_slice,width_slice,1) );
-                                ch->setProperty("indexOrigin", util::fvector4(0,0,_slice));
+                                ch->setProperty("indexOrigin", slice_pos_vec);
+                                //std::cout << "SlicePos: " << slice_pos_vec << std::endl;
                                 
                                 ch->setProperty<uint32_t>("acquisitionNumber", acq_nr);
                                 if (true == moco){
@@ -247,19 +251,19 @@ namespace isis
                                 if ( 0 == InPlanePhaseEncodingDirection.compare(0, 3, "COL") ){
                                     ch->setProperty<util::fvector4>("readVec", phase_vec);
                                     ch->setProperty<util::fvector4>("phaseVec", read_vec);
-                                    ch->setProperty<util::fvector4>("voxelSize", util::fvector4(fov_read/width_slice,fov_phase/height_slice,slice_thickness,0));
+                                    ch->setProperty<util::fvector4>("voxelSize", util::fvector4(fov_read/width_slice,fov_phase/height_slice,5.6,0));
                                 }
                                 else {
                                     ch->setProperty<util::fvector4>("phaseVec", phase_vec);
                                     ch->setProperty<util::fvector4>("readVec", read_vec);
-                                    ch->setProperty<util::fvector4>("voxelSize", util::fvector4(fov_phase/width_slice,fov_read/height_slice,slice_thickness,0));
+                                    ch->setProperty<util::fvector4>("voxelSize", util::fvector4(fov_phase/width_slice,fov_read/height_slice,5.6,0));
                                 }
 
                                 
                                 ch->setProperty<util::fvector4>("sliceVec", slice_norm_vec);
                                 ch->setProperty<uint16_t>("repetitionTime",rep_time);
                                 ch->setProperty<std::string>("InPlanePhaseEncodingDirection",InPlanePhaseEncodingDirection);
-                                ch->setProperty<util::fvector4>( "voxelGap", voxelGap );
+                                ch->setProperty<util::fvector4>( "voxelGap", util::fvector4() );
                                 chunks.push_back(ch);
                             }
                        }
@@ -273,13 +277,26 @@ namespace isis
 						free(dataBuffer);
                         /*****************************/
                         // TIME DIFF from send to finished reading data
-                        time_t startTime = static_cast<time_t>(atof(getStringFromHeader("time_stamp", header).c_str()));
-                        time_t endTime;
-                        time(&endTime);
-                        double_t dif = difftime (endTime,startTime);
-                        printf ("It took us %.2lf seconds to get this volume.\n", dif );
-                        
-                        
+                        //time_t startTime = static_cast<time_t>(atol(getStringFromHeader("time_stamp", header).c_str()));
+//                        printf("timestamp: %s ||  as double: %.6f\n", getStringFromHeader("time_stamp", header).c_str(), startTime);
+//                        time_t endTime;
+//                        time(&endTime);
+//                        printf("endTime: %.6f\n", endTime);
+//                        double_t dif = difftime (endTime,startTime);
+//                        printf ("It took us %.2lf seconds to get this volume.\n", dif );
+//                        
+                        if (true == moco){
+                            timestampPreviousMOCO = timestampCurrentMOCO;
+                            timestampCurrentMOCO = atof(getStringFromHeader("time_stamp", header).c_str());
+                            double_t diffTimestamps = (timestampCurrentMOCO - timestampPreviousMOCO);
+                            fprintf(timediffMOCO, "%.6lf\n", diffTimestamps );
+                        }
+                        if (false == moco){
+                            timestampPrevious = timestampCurrent;
+                            timestampCurrent = atof(getStringFromHeader("time_stamp", header).c_str());
+                            double_t diffTimestamps = (timestampCurrent - timestampPrevious);
+                            fprintf(timediffRECO, "%.6lf\n", diffTimestamps );
+                        }
                         
                         
                         
@@ -304,7 +321,10 @@ namespace isis
 			bool tainted()const {return false;}//internal plugins are not tainted
 			
 			~ImageFormat_SiemensTcpIp()
-			{}
+			{
+                fclose(timediffRECO);
+                fclose(timediffMOCO);
+            }
 			
 			
 			
@@ -316,7 +336,16 @@ namespace isis
 			
 			static unsigned int receiver_address_length;
 			static bool firstHeaderArrived;
+            static double_t timestampPrevious;
+            static double_t timestampCurrent;
+            static double_t timestampPreviousMOCO;
+            static double_t timestampCurrentMOCO;
+            static FILE* timediffMOCO;
+            static FILE* timediffRECO;
+            
 		private:
+            time_t startTime;
+            time_t endTime;
 			
             std::string getStringFromHeader(const std::string& propName, const std::string& header){
                 
@@ -335,15 +364,17 @@ namespace isis
             {
                 size_t indexK1 = propName.find(",", 0, 1);
                 size_t indexK2 = propName.find(",", indexK1+1, 1);
+                //printf("propName: %s\n", propName.c_str());
+                //printf("indexK1: %ld    indexK2: %ld\n", indexK1, indexK2);
                 double_t val1 = atof(propName.substr(0, indexK1).c_str());
+                //printf("val1: %s\n", propName.substr(0, indexK1).c_str());
                 double_t val2 = atof(propName.substr(indexK1+1, indexK2-indexK1).c_str());
-                double_t val3 = atof(propName.substr(indexK1+indexK2, propName.length()-indexK2).c_str());
+                //printf("val2: %s\n", propName.substr(indexK1+1, indexK2-indexK1-1).c_str());
+                double_t val3 = atof(propName.substr(indexK2+1, propName.length()-indexK2).c_str());
+                //printf("val3: %s\n", propName.substr(indexK2+1, propName.length()-indexK2).c_str());
                 return util::fvector4(val1, val2, val3);
-                
             }
-            
 			char   buffer[32768];
-        
         };
 		
 		int    ImageFormat_SiemensTcpIp::sock;
@@ -353,7 +384,13 @@ namespace isis
 		
 		unsigned int ImageFormat_SiemensTcpIp::receiver_address_length;
 		bool ImageFormat_SiemensTcpIp::firstHeaderArrived;
-		
+        double_t ImageFormat_SiemensTcpIp::timestampCurrent;
+        double_t ImageFormat_SiemensTcpIp::timestampPrevious;
+        double_t ImageFormat_SiemensTcpIp::timestampCurrentMOCO;
+        double_t ImageFormat_SiemensTcpIp::timestampPreviousMOCO;
+        FILE* ImageFormat_SiemensTcpIp::timediffMOCO;
+        FILE* ImageFormat_SiemensTcpIp::timediffRECO;
+        		
 	}
 }
 isis::image_io::FileFormat *factory()
@@ -374,7 +411,12 @@ isis::image_io::FileFormat *factory()
 	pluginRtExport->counter = 0;
 	pluginRtExport->image_counter = 0;
 	
-	
+	pluginRtExport->timestampCurrent = 0;
+    pluginRtExport->timestampPrevious = 0;
+    pluginRtExport->timestampCurrentMOCO = 0;
+    pluginRtExport->timestampPreviousMOCO = 0;
+    pluginRtExport->timediffMOCO = fopen("/tmp/timediffMOCO.txt", "w");
+	pluginRtExport->timediffRECO = fopen("/tmp/timediffRECO.txt", "w");
 	
 	
 	return (isis::image_io::FileFormat*) pluginRtExport;
