@@ -48,7 +48,7 @@ public:
 
 /**
  * Main class for four-dimensional random-access data blocks.
- * Like in TypePtr, the copy of a Chunk will reference the same data.
+ * Like in TypePtr, the copy of a Chunk will reference the same data. (cheap copy)
  * (If you want to make a memory based deep copy of a Chunk create a MemChunk from it)
  */
 class Chunk : public _internal::ChunkBase, protected TypePtrReference

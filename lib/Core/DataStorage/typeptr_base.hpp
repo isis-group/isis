@@ -88,14 +88,25 @@ public:
 	scaling_pair getScalingTo( unsigned short typeID, const std::pair<util::TypeReference, util::TypeReference> &minmax, autoscaleOption scaleopt = autoscale )const;
 
 
-	/// Copy (or Convert) data from this to memory of maybe another type and the given length.
+	/// Convert (or Copy) data from this to existing memory of maybe another type and the given length.
 	template<typename T> bool convertTo( T *dst, size_t len ) const {
 		TypePtr<T> dest( dst, len, TypePtr<T>::NonDeleter() );
 		return convertTo( dest );
 	}
 
+	/**
+	 * Create new data in memory containg a (converted) copy of this.
+	 * Allocates new memory of the requested ID and copies the content of this into that memory.
+	 * \param ID the ID of the type the new TypePtr (referenced by the Reference returned) should have
+	 */
 	Reference copyToNewByID( unsigned short ID ) const;
+	/**
+	 * @copydoc copyToNewByID
+	 * \param ID the ID of the type the new TypePtr (referenced by the Reference returned) should have
+	 * \param scaling the scaling to be used if a conversion is necessary
+	 */	
 	Reference copyToNewByID( unsigned short ID, const scaling_pair &scaling ) const;
+	
 	/**
 	 * Create a TypePtr of given type and length.
 	 * This allocates memory as needed but does not initialize it.
