@@ -112,7 +112,7 @@ bool Image::reIndex()
 	}
 
 	if( !set.isRectangular() ) {
-		LOG( Runtime, error ) << "The image is incomplete. Aborting reindex.";
+		LOG( Runtime, error ) << "The image is incomplete. Aborting reindex. (horizontal size is "<< set.getHorizontalSize() << ")";
 		return false;
 	}
 
