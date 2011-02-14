@@ -28,7 +28,7 @@ public:
 
 int main( int argc, char **argv )
 {
-	data::IOApplication app( "isis data converter", true, true );
+	data::IOApplication app( "isis calc", true, true );
 	app.parameters["voxelop"]=std::string("vox");
 	app.parameters["voxelop"].setDescription("a term to evaluate the new value of each voxel");
 	app.init( argc, argv, true ); // will exit if there is a problem
