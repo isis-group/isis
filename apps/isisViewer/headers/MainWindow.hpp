@@ -11,7 +11,6 @@
 #include <QtGui>
 #include "ui_isisViewer.h"
 #include "ViewControl.hpp"
-#include "Adapter/vtkAdapter.hpp"
 
 namespace isis
 {

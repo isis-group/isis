@@ -229,7 +229,7 @@ public:
 			return isis::data::MemImage<double>( *this );
 			break;
 		default:
-			LOG( Runtime, error ) << "Unknown pixel type.";
+			LOG( Runtime, error ) << "Unregistered pixel type " << getTypeMap()[this->getMajorTypeID()] << ".";
 		}
 	}
 
@@ -251,8 +251,7 @@ public:
 	}
 
 	isis::data::Image _cheapCopy( void ) {
-		isis::data::Image retImg = *this;
-		return retImg;
+		return *this;
 	}
 
 	isis::util::PropertyMap &_getPropMap() {

@@ -23,24 +23,6 @@
 #ifndef IMAGEHOLDER_HPP_
 #define IMAGEHOLDER_HPP_
 
-#include <vtkImageData.h>
-#include <vtkImageFlip.h>
-#include <vtkDataSetMapper.h>
-#include <vtkImageMapper.h>
-#include <vtkImageClip.h>
-#include <vtkRenderer.h>
-#include <vtkRenderWindow.h>
-#include <vtkRenderWindowInteractor.h>
-#include <vtkActor.h>
-#include <vtkInteractorStyleRubberBandZoom.h>
-#include <vtkProperty.h>
-#include <vtkTexture.h>
-#include <vtkCamera.h>
-#include <vtkMatrix4x4.h>
-#include <vtkTransform.h>
-#include <vtkSmartPointer.h>
-#include <vtkTrivialProducer.h>
-
 #include "CoreUtils/vector.hpp"
 #include "DataStorage/image.hpp"
 #include "ViewControl.hpp"
@@ -85,42 +67,19 @@ public:
 	}
 	bool resetSliceCoordinates( void );
 
-	vtkActor *getActorAxial() const { return m_ActorAxial; }
-	vtkActor *getActorSagittal() const { return m_ActorSagittal; }
-	vtkActor *getActorCoronal() const { return m_ActorCoronal; }
 	const int getCurrentTimeStep() const { return m_currentTimestep; }
 	const unsigned int getNumberOfTimesteps( void ) const { return m_TimeSteps; }
-	util::TypeReference getScalingFactor( void ) const { return m_ScalingFactor; }
-	util::TypeReference getOffset( void ) const { return m_Offset; }
 
 private:
 	MatrixHandler m_MatrixHandler;
-	std::vector<vtkSmartPointer<vtkImageData> > m_ImageVector;
+	data::Image m_Image;
 	util::PropertyMap m_PropertyMap;
 	boost::shared_ptr<ViewControl> m_PtrToViewer;
-	vtkSmartPointer<vtkImageClip> m_ExtractAxial;
-	vtkSmartPointer<vtkImageClip> m_ExtractSagittal;
-	vtkSmartPointer<vtkImageClip> m_ExtractCoronal;
-	vtkSmartPointer<vtkTrivialProducer> m_TrivialProducerAxial;
-	vtkSmartPointer<vtkTrivialProducer> m_TrivialProducerSagittal;
-	vtkSmartPointer<vtkTrivialProducer> m_TrivialProducerCoronal;
-	std::vector<vtkSmartPointer<vtkImageClip> > m_ExtractorVector;
-	vtkSmartPointer<vtkDataSetMapper> m_MapperAxial;
-	vtkSmartPointer<vtkDataSetMapper> m_MapperSagittal;
-	vtkSmartPointer<vtkDataSetMapper> m_MapperCoronal;
-	vtkSmartPointer<vtkActor> m_ActorAxial;
-	vtkSmartPointer<vtkActor> m_ActorSagittal;
-	vtkSmartPointer<vtkActor> m_ActorCoronal;
+	
 
 	bool m_Physical;
 	unsigned int m_TimeSteps;
 	unsigned int m_currentTimestep;
-	size_t m_X, m_Y, m_Z;
-
-	util::TypeReference m_ScalingFactor;
-	util::TypeReference m_Offset;
-
-	size_t m_Min, m_Max;
 
 	std::vector<size_t> m_BiggestElemVec;
 
@@ -129,7 +88,6 @@ private:
 	isis::util::fvector4 m_sliceVec;
 	util::fvector4 m_pseudoOrigin;
 	util::fvector4 m_transformedOrigin;
-
 
 	void setUpPipe( void );
 	bool createOrientedImages( void );

@@ -9,8 +9,9 @@
 #define MATRIXHANDLER_HPP_
 
 #include "CoreUtils/vector.hpp"
-#include <vtkSmartPointer.h>
-#include <vtkMatrix4x4.h>
+#include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/lu.hpp>
+#include <boost/numeric/ublas/io.hpp>
 #include "common.hpp"
 
 namespace isis
@@ -22,16 +23,17 @@ namespace viewer
 class MatrixHandler
 {
 public:
+	typedef boost::numeric::ublas::matrix<float> MatrixType;
 	MatrixHandler();
 	void setVectors ( isis::util::fvector4 readVec, isis::util::fvector4 phaseVec, isis::util::fvector4 sliceVec );
 
-	vtkSmartPointer<vtkMatrix4x4> getAxialMatrix( void ) const { return m_MatrixAxial; }
-	vtkSmartPointer<vtkMatrix4x4> getSagittalMatrix( void ) const { return m_MatrixSagittal; }
-	vtkSmartPointer<vtkMatrix4x4> getCoronalMatrix( void ) const { return m_MatrixCoronal; }
+	MatrixType getAxialMatrix( void ) const { return m_MatrixAxial; }
+	MatrixType getSagittalMatrix( void ) const { return m_MatrixSagittal; }
+	MatrixType getCoronalMatrix( void ) const { return m_MatrixCoronal; }
 
-	vtkSmartPointer<vtkMatrix4x4> getAxialMatrix1( void ) const { return m_MatrixAxial1; }
-	vtkSmartPointer<vtkMatrix4x4> getSagittalMatrix1( void ) const { return m_MatrixSagittal1; }
-	vtkSmartPointer<vtkMatrix4x4> getCoronalMatrix1( void ) const { return m_MatrixCoronal1; }
+	MatrixType getAxialMatrix1( void ) const { return m_MatrixAxial1; }
+	MatrixType getSagittalMatrix1( void ) const { return m_MatrixSagittal1; }
+	MatrixType getCoronalMatrix1( void ) const { return m_MatrixCoronal1; }
 
 	bool isRotationMatrix( void ) const { return m_isRotationMatrix; }
 	util::fvector4 createPseudoOrigin( const util::fvector4 &size, const util::fvector4 &voxelSize ) const;
@@ -43,19 +45,21 @@ private:
 	isis::util::fvector4 m_readVec;
 	isis::util::fvector4 m_phaseVec;
 	isis::util::fvector4 m_sliceVec;
-	vtkSmartPointer<vtkMatrix4x4> m_origMatrix;
-	vtkSmartPointer<vtkMatrix4x4> m_origMatrix1;
-	vtkSmartPointer<vtkMatrix4x4> m_correctedMatrix;
-	vtkSmartPointer<vtkMatrix4x4> m_correctedMatrix1;
+	MatrixType m_origMatrix;
+	MatrixType m_origMatrix1;
+	MatrixType m_correctedMatrix;
+	MatrixType m_correctedMatrix1;
 	// matrices associated with the widgets
-	vtkSmartPointer<vtkMatrix4x4> m_MatrixAxial;
-	vtkSmartPointer<vtkMatrix4x4> m_MatrixSagittal;
-	vtkSmartPointer<vtkMatrix4x4> m_MatrixCoronal;
-	vtkSmartPointer<vtkMatrix4x4> m_MatrixAxial1;
-	vtkSmartPointer<vtkMatrix4x4> m_MatrixSagittal1;
-	vtkSmartPointer<vtkMatrix4x4> m_MatrixCoronal1;
+	MatrixType m_MatrixAxial;
+	MatrixType m_MatrixSagittal;
+	MatrixType m_MatrixCoronal;
+	MatrixType m_MatrixAxial1;
+	MatrixType m_MatrixSagittal1;
+	MatrixType m_MatrixCoronal1;
 	bool correctMatrix( void );
 	void createMatricesForWidgets( void );
+	double determinant( MatrixType& );
+	int determinant_sign(const boost::numeric::ublas::permutation_matrix<size_t>& );
 };
 
 }
