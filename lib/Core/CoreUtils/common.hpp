@@ -215,32 +215,6 @@ string2list( const std::basic_string<charT, traits> &source,  charT separator )
 }
 
 /**
- * Continously searches in an sorted list using the given less-than comparison.
- * It starts at current and increments it until the referenced value is not less than the compare-value anymore.
- * Than it returns.
- * \param current the current-position-iterator for the sorted list.
- * This value is changed directly, so after the function returns is references the first entry of the list
- * which does not compare less than compare or, if such a value does not exit in the list, it will be equal to end.
- * \param end the end of the list
- * \param compare the compare-value
- * \param compOp the comparison functor. It must provide "bool operator()(T,T)".
- * \returns true if the value current currently refers to is equal to compare
- */
-template<typename ForwardIterator, typename T, typename CMP> bool
-continousFind( ForwardIterator &current, const ForwardIterator end, const T &compare, CMP compOp )
-{
-	//find the first iterator which is does not compare less
-	current = std::lower_bound( current, end, compare, compOp );
-
-	if ( current == end //if we're at the end
-		 || compOp( compare, *current ) //or compare is less than that iterator
-	   )
-		return false;//we didn't find a match
-	else
-		return true;//not(current <> compare) makes compare == current
-}
-
-/**
  * Fuzzy comparison between floating point values.
  * Will raise a compiler error when not used with floating point types.
  * @param a first value to compare with
@@ -275,27 +249,6 @@ template<typename T> bool fuzzyEqual( T a, T b, unsigned short boost = 1 )
 	return  dist_fac <= epsilon * boost;
 }
 
-/// @cond _internal
-namespace _internal
-{
-/**
- * Continously searches in an sorted list using std::less.
- * It starts at current and increments it until the referenced value is not less than the compare-value anymore.
- * Than it returns.
- * \param current the current-position-iterator for the sorted list.
- * This value is changed directly, so after the function returns is references the first entry of the list
- * which does not compare less than compare or, if such a value does not exit in the list, it will be equal to end.
- * \param end the end of the list
- * \param compare the compare-value
- * \returns true if the value current currently refers to is equal to compare
- */
-template<typename ForwardIterator, typename T> bool
-continousFind( ForwardIterator &current, const ForwardIterator end, const T &compare )
-{
-	return continousFind( current, end, compare, std::less<T>() );
-}
-}
-/// @endcond
 typedef CoreDebug Debug;
 typedef CoreLog Runtime;
 

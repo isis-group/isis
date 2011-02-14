@@ -17,8 +17,36 @@ namespace isis
 {
 namespace util
 {
+namespace _internal
+{
+/**
+ * Continously searches in a sorted list using the given less-than comparison.
+ * It starts at current and increments it until the referenced value is not less than the compare-value anymore.
+ * Than it returns.
+ * \param current the current-position-iterator for the sorted list.
+ * This value is changed directly, so after the function returns is references the first entry of the list
+ * which does not compare less than compare or, if such a value does not exit in the list, it will be equal to end.
+ * \param end the end of the list
+ * \param compare the compare-value
+ * \param compOp the comparison functor. It must provide "bool operator()(T,T)".
+ * \returns true if the value current currently refers to is equal to compare
+ */
+template<typename ForwardIterator, typename T, typename CMP> bool
+continousFind( ForwardIterator &current, const ForwardIterator end, const T &compare, CMP compOp )
+{
+	//find the first iterator which is does not compare less
+	current = std::lower_bound( current, end, compare, compOp );
 
+	if ( current == end //if we're at the end
+		|| compOp( compare, *current ) //or compare is less than that iterator
+	)
+	return false;//we didn't find a match
+	else
+		return true;//not(current <> compare) makes compare == current
+}
+}
 const PropertyMap::mapped_type PropertyMap::emptyEntry;//dummy to be able to return an empty Property
+
 
 ///////////////////////////////////////////////////////////////////
 // Contructors
@@ -244,7 +272,7 @@ void PropertyMap::diffTree( const PropertyMap &other, PropertyMap::DiffMap &ret,
 		const propPath::value_type pathname = prefix + thisIt->first;
 
 		//find the closest match for thisIt->first in other (use the value-comparison-functor of PropMap)
-		if ( continousFind( otherIt, other.end(), *thisIt, value_comp() ) ) { //otherIt->first == thisIt->first - so its the same property
+		if ( _internal::continousFind( otherIt, other.end(), *thisIt, value_comp() ) ) { //otherIt->first == thisIt->first - so its the same property
 			const mapped_type &first = thisIt->second, &second = otherIt->second;
 
 			if ( ! ( first.is_leaf() || second.is_leaf() ) ) { // if both are a branch
@@ -280,7 +308,7 @@ void PropertyMap::diffTree( const PropertyMap &other, PropertyMap::DiffMap &ret,
 	for ( otherIt = other.begin(); otherIt != other.end(); otherIt++ ) {
 		const propPath::value_type pathname = prefix + otherIt->first;
 
-		if ( ! continousFind( thisIt, end(), *otherIt, value_comp() ) ) { //there is nothing in this which has the same key as ref
+		if ( ! _internal::continousFind( thisIt, end(), *otherIt, value_comp() ) ) { //there is nothing in this which has the same key as ref
 			const TypeValue secondVal = otherIt->second.is_leaf() ? otherIt->second.getLeaf() : TypeValue( Type<std::string>( otherIt->second.toString() ) );
 			ret.insert(
 				std::make_pair( // add (propertyname|([empty]|value2))
