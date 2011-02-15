@@ -58,6 +58,12 @@ template<> struct __cast_to<uint8_t> { // we cannot lexical_cast to uint8_t - we
 	}
 };
 /// @endcond
+	
+/*
+ * This is the mostly abstract base class for all scalar values (see types.hpp).
+ * Additionally, there's the TypePtrBase containing the more complex data handling stuff with abstract values. 
+ * Both are derived from GenericType containing the description of the actual value type.
+ */
 
 class TypeBase : public GenericType
 {
@@ -122,19 +128,35 @@ public:
 	 * Dynamically cast the TypeBase down to its actual Type\<T\>. Constant version.
 	 * Will throw std::bad_cast if T is not the actual type.
 	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
-	 * \returns a constant reference of the stored value.
+	 * \returns a constant reference of the Type\<T\> object.
 	 */
 	template<typename T> const Type<T>& castToType() const;
+
+	/**
+	 * Dynamically cast the TypeBase up to its actual value of type T. Constant version.
+	 * Will throw std::bad_cast if T is not the actual type.
+	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
+	 * \returns a constant reference of the stored value.
+	 */
 	template<typename T> const T &castTo() const;
 
 	/**
 	 * Dynamically cast the TypeBase up to its actual Type\<T\>. Referenced version.
 	 * Will throw std::bad_cast if T is not the actual type.
 	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
-	 * \returns a reference of the stored value.
+	 * \returns a reference of the Type\<T\> object.
 	 */
 	template<typename T> Type<T>& castToType();
+
+	/**
+	 * Dynamically cast the TypeBase up to its actual value of type T. Referenced version.
+	 * Will throw std::bad_cast if T is not the actual type.
+	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
+	 * \returns a reference of the stored value.
+	 */
 	template<typename T> T &castTo();
+
+	/// \returns true if and only if the types of this and second are equal and the values are equal
 	virtual bool operator==( const TypeBase &second )const = 0;
 
 	/// creates a copy of the stored value using a type referenced by its id

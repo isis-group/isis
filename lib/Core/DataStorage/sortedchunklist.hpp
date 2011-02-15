@@ -1,6 +1,5 @@
 /*
-    <one line to give the program's name and a brief idea of what it does.>
-    Copyright (C) <year>  <name of author>
+    Copyright (C) 2010  reimer@cbs.mpg.de
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,6 +31,11 @@ namespace data
 namespace _internal
 {
 
+/*
+ * This class sorts the inserted chunks by the given properties while construction.
+ * The rules of the sorting depends on the upper level using these chunkLists later on.
+ * See the special classes, e.g. MRImage to find details about sorting criterias.
+ */
 class SortedChunkList
 {
 public:
