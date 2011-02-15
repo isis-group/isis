@@ -54,10 +54,8 @@ class Singletons
 	static Singletons &getMaster();
 public:
 	/**
-	 * The first call creates a singleton of type T with the priority PRIO, 
+	 * The first call creates a singleton of type T with the priority PRIO (ascending order), 
 	 * all repetetive calls return this object.
-	 * \param T  type of the Singleton object
-	 * \param PRIO the priority of the Singleton object (ascending order)
 	 * \return a reference to the same object of type T.
 	 */
 	template<typename T, int PRIO> static Singleton<T> &get() {

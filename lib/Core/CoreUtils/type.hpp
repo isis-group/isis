@@ -136,7 +136,7 @@ protected:
  * data these library can handle. On the other side it's more complex to read and write with these kind of types.
  * Please don't bother about and look carefully at further comments on functionality and examples in use,
  * e.g. with TypeValue.\n
- * For supported types see types.hpp used in Ty. \n
+ * For supported types see types.hpp \n
  * Another advantage is the available type conversion, for further information how to do this and 
  * limitations see type_converter.hpp
  */

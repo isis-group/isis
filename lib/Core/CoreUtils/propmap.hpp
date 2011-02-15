@@ -37,6 +37,12 @@ class treeNode; //predeclare treeNode -- we'll need it in PropertyMap
 }
 /**
  * This class contains a mapping tree to store all kinds of properties (path/key : value)
+ * It's also a generic class to have the probability to handle
+ * different modalities in upper levels (in our special case we'll have to handle things like images or other 
+ * time series of data each having different properties in its standard or wherever from). Here, you can hierarchilly 
+ * setup a property tree to sort all these things. To ensure essential properties for a special case, you'll need to define
+ * the needed properties. For all the other play-around with PropertyMaps see extensive documentation below!!!
+ * 
  */
 class PropertyMap : protected std::map<util::istring, _internal::treeNode>
 {
@@ -328,7 +334,7 @@ public:
 	 * \code
 	 * getPropertyAs<isis::util::fvector4>( "MyPropertyName" );
 	 * \endcode
-	 * \params key the "path" to the property
+	 * \param key the "path" to the property
 	 * \returns the property with given type, if not set yet T() is returned.
 	 */
 	template<typename T> T getPropertyAs( const KeyType &key )const;

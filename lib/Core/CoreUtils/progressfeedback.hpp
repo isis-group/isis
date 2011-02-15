@@ -1,6 +1,5 @@
 /*
-    <one line to give the program's name and a brief idea of what it does.>
-    Copyright (C) <year>  <name of author>
+    Copyright (C) 2010  reimer@cbs.mpg.de
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,7 +27,9 @@ namespace isis
 {
 namespace util
 {
-
+/*
+ * Basic class for any feedback given from longlasting processes about its progress (e.g. file loading)
+ */
 class ProgressFeedback
 {
 public:
@@ -38,18 +39,24 @@ public:
 	 */
 	virtual void show( size_t max, std::string header = "" ) = 0;
 	/**
-	 * Increment the "progress" by step "steps".
+	 * Set the actual "progress".
 	 * Behavior is undefined if show was not called before.
+	 * \param message message to be displayed (default: "")
+	 * \param step increment of the progress (default: 1)
+	 * \returns the actual amount of the "progress"
 	 */
 	virtual size_t progress( const std::string message = "", size_t step = 1 ) = 0;
 	///Close/undisplay a progress display.
 	virtual void close() = 0;
-	/// get the current valued which represents 100%
+	/// \returns the current valued which represents 100%
 	virtual size_t getMax() = 0;
 	/// Increment the "progress" by one
 	ProgressFeedback &operator++();
 };
 
+/*
+ * Most simple implementation of a progress bar on the console
+ */
 class ConsoleFeedback: public ProgressFeedback
 {
 	boost::scoped_ptr<boost::progress_display> disp;
