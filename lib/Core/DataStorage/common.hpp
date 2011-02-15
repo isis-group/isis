@@ -32,7 +32,7 @@ namespace image_io
 typedef ImageIoLog Runtime;
 typedef ImageIoDebug Debug;
 
-template<typename HANDLE> void enable_log( LogLevel level )
+template<typename HANDLE> void enableLog( LogLevel level )
 {
 	ENABLE_LOG( Runtime, HANDLE, level );
 	ENABLE_LOG( Debug, HANDLE, level );
@@ -59,7 +59,7 @@ enum dimensions {readDim = 0, phaseDim, sliceDim, timeDim};
  * So if you compile with "-D_ENABLE_DEBUG=0" against a library which (for example) was comiled with "-D_ENABLE_DEBUG=1",
  * you won't be able to change the logging level of the debug messages of these library.
  */
-template<typename HANDLE> void enable_log( LogLevel level )
+template<typename HANDLE> void enableLog( LogLevel level )
 {
 	ENABLE_LOG( Runtime, HANDLE, level );
 	ENABLE_LOG( Debug, HANDLE, level );

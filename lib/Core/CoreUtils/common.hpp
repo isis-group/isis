@@ -260,7 +260,7 @@ typedef CoreLog Runtime;
  * So if you compile with "-D_ENABLE_DEBUG=0" against a library which (for example) was comiled with "-D_ENABLE_DEBUG=1",
  * you won't be able to change the logging level of the debug messages of these library.
  */
-template<typename HANDLE> void enable_log( LogLevel level )
+template<typename HANDLE> void enableLog( LogLevel level )
 {
 	ENABLE_LOG( CoreLog, HANDLE, level );
 	ENABLE_LOG( CoreDebug, HANDLE, level );
@@ -275,7 +275,7 @@ template<typename HANDLE> void enable_log( LogLevel level )
  * So if you compile with "-D_ENABLE_DEBUG=0" against a library which (for example) was comiled with "-D_ENABLE_DEBUG=1",
  * you won't be able to change the logging level of the debug messages of these library.
  */
-template<typename HANDLE> void enable_log_global( LogLevel level )
+template<typename HANDLE> void enableLogGlobal( LogLevel level )
 {
 	ENABLE_LOG( CoreLog, HANDLE, level );
 	ENABLE_LOG( CoreDebug, HANDLE, level );
