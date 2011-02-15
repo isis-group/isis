@@ -136,7 +136,7 @@ private:
 				// it's a vector with 3 elements
 				if( strcmp( name, "voxel" ) == 0 ) {
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
-					std::list<float> flist = util::string2list<float>( std::string( ( char * )val ) );
+					std::list<float> flist = util::stringToList<float>( std::string( ( char * )val ) );
 					std::list<float>::const_iterator iter = flist.begin();
 					float x = *iter++, y = *iter++, z = *iter;
 					chunk.setPropertyAs<util::fvector4>( "voxelSize", util::fvector4( x, y, z, 1 ) );
@@ -259,7 +259,7 @@ private:
 				if( strcmp( name, "columnVec" ) == 0 ) {
 					util::fvector4 readVec;
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
-					const std::list<float> tokens = util::string2list<float>( std::string( ( const char * )val ), ' ' );
+					const std::list<float> tokens = util::stringToList<float>( std::string( ( const char * )val ), ' ' );
 					readVec.copyFrom<std::list<float>::const_iterator>( tokens.begin(), tokens.end() );
 					chunk.setPropertyAs<util::fvector4>( "readVec", readVec );
 					continue;
@@ -269,7 +269,7 @@ private:
 				if( strcmp( name, "rowVec" ) == 0 ) {
 					util::fvector4 phaseVec;
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
-					const std::list<float> tokens = util::string2list<float>( std::string( ( const char * )val ), ' ' );
+					const std::list<float> tokens = util::stringToList<float>( std::string( ( const char * )val ), ' ' );
 					phaseVec.copyFrom<std::list<float>::const_iterator>( tokens.begin(), tokens.end() );
 					chunk.setPropertyAs<util::fvector4>( "phaseVec", phaseVec );
 					continue;
@@ -279,7 +279,7 @@ private:
 				if( strcmp( name, "sliceVec" ) == 0 ) {
 					util::fvector4 sliceVec;
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
-					const std::list<float> tokens = util::string2list<float>( std::string( ( const char * )val ), ' ' );
+					const std::list<float> tokens = util::stringToList<float>( std::string( ( const char * )val ), ' ' );
 					sliceVec.copyFrom<std::list<float>::const_iterator>( tokens.begin(), tokens.end() );
 					chunk.setPropertyAs<util::fvector4>( "sliceVec", sliceVec );
 					continue;
@@ -288,7 +288,7 @@ private:
 				// OPTIONAL: indexOrigin -> indexOrigin
 				if( strcmp( name, "indexOrigin" ) == 0 ) {
 					VGetAttrValue( &posn, NULL, VStringRepn, &val );
-					std::list<float> flist = util::string2list<float>( std::string( ( char * )val ) );
+					std::list<float> flist = util::stringToList<float>( std::string( ( char * )val ) );
 					std::list<float>::const_iterator iter = flist.begin();
 					float x = *iter++, y = *iter++, z = *iter;
 					chunk.setPropertyAs<util::fvector4>( "indexOrigin", util::fvector4( x, y, z, 0 ) );

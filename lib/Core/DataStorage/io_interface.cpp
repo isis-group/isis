@@ -59,7 +59,7 @@ void FileFormat::throwSystemError( int err, std::string desc )
 
 std::list< util::istring > FileFormat::getSuffixes()const
 {
-	std::list<util::istring> ret = util::string2list<util::istring>( suffixes(), boost::regex( "[[:space:]]" ) );
+	std::list<util::istring> ret = util::stringToList<util::istring>( suffixes(), boost::regex( "[[:space:]]" ) );
 	BOOST_FOREACH( util::istring & ref, ret ) {
 		ref.erase( 0, ref.find_first_not_of( '.' ) ); // remove leading . if there are some
 	}

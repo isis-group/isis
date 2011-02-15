@@ -453,7 +453,7 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 				// have the same slice voxel resolution.
 				if( voxelstr[0] == '\0' ) {
 					strcpy( voxelstr, ( char * )val );
-					std::list<float> buff = util::string2list<float>( std::string( voxelstr ), ' ' );
+					std::list<float> buff = util::stringToList<float>( std::string( voxelstr ), ' ' );
 					v3.copyFrom( buff.begin(), buff.end() );
 				} else {
 					// voxel string differs from previous value;

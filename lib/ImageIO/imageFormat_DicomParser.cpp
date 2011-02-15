@@ -29,7 +29,7 @@ template<typename T> std::list<T> dcmtkListString2list( DcmElement *elem )
 {
 	OFString buff;
 	elem->getOFStringArray( buff );
-	return util::string2list<T>( std::string( buff.c_str() ), '\\' );
+	return util::stringToList<T>( std::string( buff.c_str() ), '\\' );
 }
 
 }

@@ -124,7 +124,7 @@ public:
 			std::set<std::string> ret;
 			data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( FileFormat::makeBasename( filename ).first );
 			BOOST_FOREACH( data::IOFactory::FileFormatList::const_reference ref, formats ) {
-				const std::list<std::string> dias = util::string2list<std::string>( ref->dialects( filename ) );
+				const std::list<std::string> dias = util::stringToList<std::string>( ref->dialects( filename ) );
 				ret.insert( dias.begin(), dias.end() );
 			}
 			return util::listToString( ret.begin(), ret.end(), ",", "", "" );

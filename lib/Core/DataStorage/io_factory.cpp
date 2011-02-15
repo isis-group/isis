@@ -56,7 +56,7 @@ struct dialect_missing {
 	std::string dialect;
 	std::string filename;
 	bool operator()( IOFactory::FileFormatList::reference ref )const {
-		std::list<std::string> splitted = util::string2list<std::string>( ref->dialects( filename ), ' ' );
+		std::list<std::string> splitted = util::stringToList<std::string>( ref->dialects( filename ), ' ' );
 		const bool ret = ( std::find( splitted.begin(), splitted.end(), dialect ) == splitted.end() );
 		LOG_IF( ret, Runtime, warning ) << ref->name() << " does not support the requested dialect " << util::MSubject( dialect );
 		return ret;
@@ -233,10 +233,10 @@ IOFactory::FileFormatList IOFactory::getFileFormatList( std::string filename, st
 
 	if( suffix_override.empty() ) { // detect suffixes from the filename
 		const boost::filesystem::path fname( filename );
-		ext = util::string2list<std::string>( fname.leaf(), '.' ); // get all suffixes
+		ext = util::stringToList<std::string>( fname.leaf(), '.' ); // get all suffixes
 
 		if( !ext.empty() )ext.pop_front(); // remove the first "suffix" - actually the basename
-	} else ext = util::string2list<std::string>( suffix_override, '.' );
+	} else ext = util::stringToList<std::string>( suffix_override, '.' );
 
 	while( !ext.empty() ) {
 		const util::istring wholeName( util::listToString( ext.begin(), ext.end(), ".", "", "" ).c_str() ); // (re)construct the rest of the suffix

@@ -347,7 +347,7 @@ public:
 
 
 /////////////////////////////////////////////////////////////////////////////
-// string => list/vector version -- uses util::string2list
+// string => list/vector version -- uses util::stringToList
 /////////////////////////////////////////////////////////////////////////////
 template<typename DST> class TypeConverter<false, false, std::string, std::list<DST> >: public TypeGenerator<std::string, std::list<DST> >  //string => list
 {
@@ -367,7 +367,7 @@ public:
 				<< " into non empty list  " << Type<std::list<DST> >::staticName()
 				<< " previous content will be lost";
 		const std::string &srcVal = src.castTo<std::string>();
-		const std::list<DST> buff = util::string2list<DST>( srcVal, boost::regex( "[\\s,;]+" ) );
+		const std::list<DST> buff = util::stringToList<DST>( srcVal, boost::regex( "[\\s,;]+" ) );
 		dstVal.assign( buff.begin(), buff.end() );
 		return boost::numeric::cInRange;  //@todo handle bad casts
 	}
@@ -387,7 +387,7 @@ public:
 	boost::numeric::range_check_result convert( const TypeBase &src, TypeBase &dst )const {
 		vector4<DST> &dstVal = dst.castTo<vector4<DST> >();
 		const std::string &srcVal = src.castTo<std::string>();
-		const std::list<DST> buff = string2list<DST>( srcVal, boost::regex( "[\\s,;]+" ) );
+		const std::list<DST> buff = stringToList<DST>( srcVal, boost::regex( "[\\s,;]+" ) );
 		dstVal.copyFrom( buff.begin(), buff.end() );
 		return boost::numeric::cInRange; //@todo handle bad casts
 	}

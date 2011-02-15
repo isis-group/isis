@@ -115,7 +115,7 @@ template<class InputIterator> std::string listToString(
 	return ret.str();
 }
 /// do lexical_cast\<T\> on the elements of a list and return them
-template<typename T, typename InputIterator> std::list<T> list2list( InputIterator start, InputIterator end )
+template<typename T, typename InputIterator> std::list<T> listToList( InputIterator start, InputIterator end )
 {
 	std::list<T> ret;
 
@@ -137,7 +137,7 @@ template<typename T, typename InputIterator> std::list<T> list2list( InputIterat
  * ("$" if not given, will be added at the end)
  * \returns a list of the casted tokens
  */
-template<typename TARGET> std::list<TARGET> string2list(
+template<typename TARGET> std::list<TARGET> stringToList(
 	std::string source, const boost::regex &separator,
 	boost::regex prefix, boost::regex postfix )
 {
@@ -176,11 +176,11 @@ template<typename TARGET> std::list<TARGET> string2list(
  * \param separator string to delimit the tokens
  * \returns a list of the casted tokens
  */
-template<typename TARGET> std::list<TARGET> string2list(
+template<typename TARGET> std::list<TARGET> stringToList(
 	std::string source,
 	const boost::regex separator = boost::regex( "[[:space:]]" ) )
 {
-	return string2list<TARGET>( source, separator, separator, separator );
+	return stringToList<TARGET>( source, separator, separator, separator );
 }
 
 /**
@@ -197,7 +197,7 @@ template<typename TARGET> std::list<TARGET> string2list(
  */
 //@todo test
 template<typename TARGET, typename charT, typename traits> std::list<TARGET>
-string2list( const std::basic_string<charT, traits> &source,  charT separator )
+stringToList( const std::basic_string<charT, traits> &source,  charT separator )
 {
 	std::list<TARGET> ret;
 

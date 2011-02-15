@@ -18,7 +18,7 @@ namespace util
 Selection::Selection( const char *entries ): m_set( 0 )
 {
 	int ID = 1;
-	BOOST_FOREACH( const util::istring & ref, string2list<util::istring>( util::istring( entries ), ',' ) ) {
+	BOOST_FOREACH( const util::istring & ref, stringToList<util::istring>( util::istring( entries ), ',' ) ) {
 		const MapType::value_type pair( ref, ID++ );
 
 		if( ! ent_map.insert( pair ).second ) {

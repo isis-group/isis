@@ -68,7 +68,7 @@ PropertyMap::PropertyMap() {}
 ///////////////////////////////////////////////////////////////////
 PropertyMap::mapped_type &PropertyMap::fetchEntry( const key_type &key )
 {
-	const propPath path = util::string2list<key_type>( key, pathSeperator );
+	const propPath path = util::stringToList<key_type>( key, pathSeperator );
 	return fetchEntry( *this, path.begin(), path.end() );
 }
 /**
@@ -104,7 +104,7 @@ PropertyMap::mapped_type &PropertyMap::fetchEntry(
 
 const PropertyMap::mapped_type *PropertyMap::findEntry( const key_type &key )const
 {
-	const propPath path = util::string2list<key_type>( key, pathSeperator );
+	const propPath path = util::stringToList<key_type>( key, pathSeperator );
 	return findEntry( *this, path.begin(), path.end() );
 }
 /**
@@ -165,7 +165,7 @@ bool PropertyMap::recursiveRemove( PropertyMap &root, const propPathIterator at,
 ////////////////////////////////////////////////////////////////////////////////////
 const TypeValue &PropertyMap::propertyValue( const key_type &key )const
 {
-	const propPath path = util::string2list<key_type>( key, pathSeperator );
+	const propPath path = util::stringToList<key_type>( key, pathSeperator );
 	const mapped_type *ref = findEntry( *this, path.begin(), path.end() );
 
 	if( ref && ref->is_leaf() ) {
@@ -178,7 +178,7 @@ const TypeValue &PropertyMap::propertyValue( const key_type &key )const
 
 TypeValue &PropertyMap::propertyValue( const key_type &key )
 {
-	const propPath path = util::string2list<key_type>( key, pathSeperator );
+	const propPath path = util::stringToList<key_type>( key, pathSeperator );
 	mapped_type &n = fetchEntry( *this, path.begin(), path.end() );
 	LOG_IF( ! n.is_leaf(), Debug, error ) << "Using branch " << key << " as TypeValue";
 	return n.getLeaf();
@@ -186,7 +186,7 @@ TypeValue &PropertyMap::propertyValue( const key_type &key )
 
 const PropertyMap &PropertyMap::branch( const key_type &key ) const
 {
-	const propPath path = util::string2list<key_type>( key, pathSeperator );
+	const propPath path = util::stringToList<key_type>( key, pathSeperator );
 	const mapped_type *ref = findEntry( *this, path.begin(), path.end() );
 
 	if( ! ref ) {
@@ -199,14 +199,14 @@ const PropertyMap &PropertyMap::branch( const key_type &key ) const
 }
 PropertyMap &PropertyMap::branch( const key_type &key )
 {
-	const propPath path = util::string2list<key_type>( key, pathSeperator );
+	const propPath path = util::stringToList<key_type>( key, pathSeperator );
 	mapped_type &n = fetchEntry( *this, path.begin(), path.end() );
 	return n.getBranch();
 }
 
 bool PropertyMap::remove( const key_type &key )
 {
-	const propPath path = util::string2list<key_type>( key, pathSeperator );
+	const propPath path = util::stringToList<key_type>( key, pathSeperator );
 	return recursiveRemove( *this, path.begin(), path.end() );
 }
 
@@ -468,8 +468,8 @@ void PropertyMap::addNeeded( const key_type &key )
 
 void PropertyMap::addNeededFromString( const std::string &needed )
 {
-	const std::list<std::string> needList = util::string2list<std::string>( needed );
-	//@todo util::string2list<std::string>( needed,' ' ) would be faster but less robust
+	const std::list<std::string> needList = util::stringToList<std::string>( needed );
+	//@todo util::stringToList<std::string>( needed,' ' ) would be faster but less robust
 	LOG( Debug, verbose_info ) << "Adding " << needed << " as needed";
 	BOOST_FOREACH( std::list<std::string>::const_reference ref, needList ) {
 		addNeeded( key_type( ref.c_str() ) );
@@ -479,14 +479,14 @@ void PropertyMap::addNeededFromString( const std::string &needed )
 /// \returns true if a leaf exists at the given path and the property is not empty
 bool PropertyMap::hasProperty( const key_type &key ) const
 {
-	const propPath path = util::string2list<key_type>( key, pathSeperator );
+	const propPath path = util::stringToList<key_type>( key, pathSeperator );
 	const mapped_type *ref = findEntry( *this, path.begin(), path.end() );
 	return ( ref && ref->is_leaf() && ! ref->getLeaf().empty() );
 }
 /// \returns true if a leaf exists at the given path and the property is not empty
 bool PropertyMap::hasBranch( const key_type &key ) const
 {
-	const propPath path = util::string2list<key_type>( key, pathSeperator );
+	const propPath path = util::stringToList<key_type>( key, pathSeperator );
 	const mapped_type *ref = findEntry( *this, path.begin(), path.end() );
 	return ( ref && ! ref->is_leaf()  );
 }
