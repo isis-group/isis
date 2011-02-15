@@ -8,7 +8,7 @@
 #ifndef MATRIXHANDLER_HPP_
 #define MATRIXHANDLER_HPP_
 
-#include "CoreUtils/vector.hpp"
+#include <CoreUtils/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/lu.hpp>
 #include <boost/numeric/ublas/io.hpp>

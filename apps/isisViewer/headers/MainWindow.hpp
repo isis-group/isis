@@ -8,9 +8,10 @@
 #ifndef MAINWINDOW_CPP_
 #define MAINWINDOW_CPP_
 
+#include "QGLView.h"
 #include <QtGui>
+#include <QtOpenGL>
 #include "ui_isisViewer.h"
-#include "ViewControl.hpp"
 
 namespace isis
 {
@@ -23,21 +24,20 @@ class MainWindow : public QMainWindow
 	Q_OBJECT
 
 public:
-	MainWindow(  const util::slist &, QMainWindow *parent = 0 );
+	MainWindow( QMainWindow *parent = 0 );
 
 private:
+	QGLView *viewAxial;
+	QGLView *viewSagittal;
+	QGLView *viewCoronal;
+	
 	Ui::isisViewer ui;
-	ViewControl m_Viewer;
-	void setUpGui( void );
-	void createAndSendImageMap( const util::slist & );
 	struct Slot {
 		MainWindow &parent;
 		Slot( MainWindow &p ) : parent( p ) {}
 	};
 
 private Q_SLOTS:
-	void timeStepChanged( int );
-	void checkPhysicalChanged( bool );
 
 Q_SIGNALS:
 	void clicked( bool );
@@ -49,7 +49,7 @@ private:
 		RefreshIntensityDisplay( MainWindow &p ): Slot( p ) {}
 		void operator() ( const size_t & );
 	} my_RefreshIntensityDisplay;
-	struct RefreshCoordsDisplay : Slot {
+	struct RefreshCoordsDisplay: Slot {
 		RefreshCoordsDisplay( MainWindow &p ) : Slot( p ) {}
 		void operator() ( const size_t &, const size_t &, const size_t &, const size_t & );
 	} my_RefreshCoordsDisplay;

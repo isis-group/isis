@@ -1,5 +1,7 @@
 #include "Adapter/qtapplication.hpp"
 #include "MainWindow.hpp"
+#include <iostream>
+#include <GL/gl.h>
 
 #include "common.hpp"
 
@@ -19,7 +21,7 @@ int main( int argc, char *argv[] )
 	app.setLog<isis::ViewerLog>( app.getLLMap()[app.parameters["dViewer"]->as<isis::util::Selection>()] );
 	app.setLog<isis::ViewerDebug>( app.getLLMap()[app.parameters["dViewer"]->as<isis::util::Selection>()] );
 	isis::util::slist fileList = app.parameters["in"];
-	isis::viewer::MainWindow isisViewerMainWindow( fileList );
+	isis::viewer::MainWindow isisViewerMainWindow;
 	isisViewerMainWindow.show();
 	return app.getQApplication().exec();
 }

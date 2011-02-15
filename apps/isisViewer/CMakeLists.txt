@@ -5,21 +5,28 @@ file (GLOB HEADER_FILES headers/*.h headers/*.hpp)
 file (GLOB CPP_FILES sources/*.cpp *.cpp)
 file (GLOB UI_FILES forms/*.ui)
 
-FIND_PACKAGE(Qt4 REQUIRED)
+FIND_PACKAGE(Qt4 COMPONENTS QtCore QtGui QtOpenGL REQUIRED)
 INCLUDE(${QT_USE_FILE})
-FIND_PACKAGE(VTK REQUIRED)
-INCLUDE(${USE_VTK_FILE})
+
+find_package(ISIS REQUIRED)
+include_directories(${ISIS_INCLUDE_DIRS})
+
+find_package(OpenGL REQUIRED)
+find_package(GLUT REQUIRED)
+
+message(STATUS "openGL library: ${OPENGL_LIBRARY}")
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR} ${ISIS_INCLUDE_DIRS})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/headers)
+include_directories(${OPENGL_INCLUDE_DIR})
 
 FIND_PACKAGE(Boost REQUIRED COMPONENTS signals)
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
 #setup 
 set(QT_USE_QTUITOOLS TRUE)
+set(QT_USE_QTOPENGL TRUE)
+set( QT_USE_OPENGL TRUE )
 
-set(VTK_USE_QVTK TRUE)
-set(VTK_USE_GUISUPPORT TRUE)
 #this flags has to be set due to use parallel with boos::signal
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DQT_NO_KEYWORDS" )
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DQT_NO_KEYWORDS" )
@@ -28,12 +35,18 @@ qt4_wrap_cpp(isisViewer_moc_files ${HEADER_FILES})
 
 QT4_WRAP_UI(isisViewer_UIS_H ${UI_FILES})
 
-
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-depth-100")
-
 
 add_executable(isisViewer ${CPP_FILES} ${isisViewer_UIS_H} ${isisViewer_moc_files})
 
-target_link_libraries(isisViewer ${QT_LIBRARIES} QVTK ${Boost_LIBRARIES} ${ISIS_LIB} ${ISIS_LIB_DEPENDS} ${CMAKE_INSTALL_PREFIX}/lib/libisisAdapter_vtk.so ${CMAKE_INSTALL_PREFIX}/lib/libisisAdapter_qt4.so)
+set(NEEDED_LIBS
+${OPENGL_LIBRARY} 
+${QT_LIBRARIES}
+${Boost_LIBRARIES}
+${ISIS_LIB}
+${ISIS_LIB_DEPENDS}
+${CMAKE_INSTALL_PREFIX}/lib/libisisAdapter_qt4.so )
+
+target_link_libraries(isisViewer ${NEEDED_LIBS})
 
 

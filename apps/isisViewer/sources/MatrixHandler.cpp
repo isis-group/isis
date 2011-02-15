@@ -15,10 +15,7 @@ namespace viewer
 
 MatrixHandler::MatrixHandler( void )
 	: m_Valid( false )
-{
-	
-	
-}
+{}
 
 void MatrixHandler::setVectors( isis::util::fvector4 readVec, isis::util::fvector4 phaseVec, isis::util::fvector4 sliceVec )
 {
@@ -50,7 +47,7 @@ void MatrixHandler::setVectors( isis::util::fvector4 readVec, isis::util::fvecto
 
 bool MatrixHandler::correctMatrix( void )
 {
-	if ( determinant(m_origMatrix1) != 1.0 ) {
+	if ( determinant(m_origMatrix1) == 1.0 ) {
 		const isis::util::fvector4 crossVec1 = isis::util::fvector4( //we could use their cross-product as sliceVector
 				m_origMatrix1( 1, 0 )  * m_origMatrix1( 2, 1 ) - m_origMatrix1( 2, 0 ) * m_origMatrix1( 1, 1 ),
 				m_origMatrix1( 2, 0 ) * m_origMatrix1( 0, 1 ) - m_origMatrix1( 0, 0 ) * m_origMatrix1( 2, 1 ),
