@@ -114,10 +114,10 @@ void IOApplication::printHelp( bool withHidden ) const
 			std::cerr << "\t=======================================" << std::endl;
 			const std::list<util::istring> suff = pi->getSuffixes();
 			const std::list<std::string> dialects = util::string2list<std::string>( pi->dialects( "" ) );
-			std::cerr << "\tsupported suffixes: " << util::list2string( suff.begin(), suff.end(), "\", \"", "\"", "\"" )  << std::endl;
+			std::cerr << "\tsupported suffixes: " << util::listToString( suff.begin(), suff.end(), "\", \"", "\"", "\"" )  << std::endl;
 
 			if( !dialects.empty() )
-				std::cerr << "\tsupported dialects: " << util::list2string( dialects.begin(), dialects.end(), "\", \"", "\"", "\"" )  << std::endl;
+				std::cerr << "\tsupported dialects: " << util::listToString( dialects.begin(), dialects.end(), "\", \"", "\"", "\"" )  << std::endl;
 		}
 	}
 }

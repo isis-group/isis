@@ -101,13 +101,13 @@ bool ParameterMap::parse( int argc, char **argv )
 			iterator found = find( pName );
 
 			if( found == end() ) {
-				LOG( Runtime, warning ) << "Ignoring unknown parameter " << MSubject( std::string( "-" ) + pName + " " + list2string( argv + begin, argv + i, " ", "", "" ) );
-			} else if ( found->second.parse( list2string( argv + begin, argv + i, ",", "", "" ) ) ) { // parse the collected properties
+				LOG( Runtime, warning ) << "Ignoring unknown parameter " << MSubject( std::string( "-" ) + pName + " " + listToString( argv + begin, argv + i, " ", "", "" ) );
+			} else if ( found->second.parse( listToString( argv + begin, argv + i, ",", "", "" ) ) ) { // parse the collected properties
 				found->second.needed() = false;//remove needed flag, because the value is set (aka "not needed anymore")
 			} else {
 				LOG( Runtime, error )
 						<< "Failed to parse value(s) "
-						<< MSubject( list2string( argv + begin, argv + i, " ", "", "" ) )
+						<< MSubject( listToString( argv + begin, argv + i, " ", "", "" ) )
 						<< " for "  << found->first << "(" << found->second->typeName() << ")";
 				parsed = false;
 			}

@@ -89,7 +89,7 @@ PropertyMap::mapped_type &PropertyMap::fetchEntry(
 			mapped_type &ref = found->second;
 			LOG_IF( ref.is_leaf(), Runtime, error )
 					<< util::MSubject( found->first ) << " is a leaf, but was requested as a branch in "
-					<< util::MSubject( util::list2string( at, pathEnd, "/" ) );
+					<< util::MSubject( util::listToString( at, pathEnd, "/" ) );
 			return fetchEntry( ref.getBranch(), next, pathEnd ); //continue there
 		} else { // if we should create a sub-map
 			//insert a empty branch (aka PropMap) at "*at" (and fetch the reference of that)

@@ -127,7 +127,7 @@ public:
 				const std::list<std::string> dias = util::string2list<std::string>( ref->dialects( filename ) );
 				ret.insert( dias.begin(), dias.end() );
 			}
-			return util::list2string( ret.begin(), ret.end(), ",", "", "" );
+			return util::listToString( ret.begin(), ret.end(), ",", "", "" );
 		}
 	}
 	std::string name()const {return "compression proxy for other formats";}

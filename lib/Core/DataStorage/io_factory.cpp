@@ -239,7 +239,7 @@ IOFactory::FileFormatList IOFactory::getFileFormatList( std::string filename, st
 	} else ext = util::string2list<std::string>( suffix_override, '.' );
 
 	while( !ext.empty() ) {
-		const util::istring wholeName( util::list2string( ext.begin(), ext.end(), ".", "", "" ).c_str() ); // (re)construct the rest of the suffix
+		const util::istring wholeName( util::listToString( ext.begin(), ext.end(), ".", "", "" ).c_str() ); // (re)construct the rest of the suffix
 		const std::map<util::istring, FileFormatList>::iterator found = get().io_suffix.find( wholeName );
 
 		if( found != get().io_suffix.end() ) {

@@ -172,7 +172,7 @@ bool Image::reIndex()
 	}
 
 	LOG( Debug, info ) << uniques.size() << " Chunk-unique properties found in the Image";
-	LOG_IF( uniques.size(), Debug, verbose_info ) << util::list2string( uniques.begin(), uniques.end(), ", " );
+	LOG_IF( uniques.size(), Debug, verbose_info ) << util::listToString( uniques.begin(), uniques.end(), ", " );
 	join( common );
 	LOG_IF( ! common.isEmpty(), Debug, verbose_info ) << "common properties saved into the image " << common;
 

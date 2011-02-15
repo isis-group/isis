@@ -105,7 +105,7 @@ listToOStream( const unsigned char *start, const unsigned char *end,
 }
 
 /// use listToOStream to create a string from a list
-template<class InputIterator> std::string list2string(
+template<class InputIterator> std::string listToString(
 	InputIterator start, InputIterator end,
 	const std::string delim = ",",
 	const std::string prefix = "{", const std::string suffix = "}" )
