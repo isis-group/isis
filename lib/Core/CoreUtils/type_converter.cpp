@@ -396,12 +396,12 @@ public:
 
 
 // @todo we cannot parse this stuff yet
-template<> class TypeConverter<false, false, std::string, rgb_color24 >: public TypeGenerator<std::string, rgb_color24 >  //string => color
+template<> class TypeConverter<false, false, std::string, color24 >: public TypeGenerator<std::string, color24 >  //string => color
 {
 public:
 	virtual ~TypeConverter() {}
 };
-template<> class TypeConverter<false, false, std::string, rgb_color48 >: public TypeGenerator<std::string, rgb_color48 >  //string => color
+template<> class TypeConverter<false, false, std::string, color48 >: public TypeGenerator<std::string, color48 >  //string => color
 {
 public:
 	virtual ~TypeConverter() {}

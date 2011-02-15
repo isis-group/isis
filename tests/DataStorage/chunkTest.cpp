@@ -159,7 +159,7 @@ BOOST_AUTO_TEST_CASE ( chunk_data_test2 )//Access Chunk elements via linear inde
 	for ( size_t i = 0; i < ch.volume(); i++ )
 		BOOST_CHECK( ch.getTypePtr<float>()[i] == i );
 
-	util::write_list(
+	util::listToOStream(
 		sample, sample + ch.volume(), o,
 		"|",
 		util::Type<int32_t>( ch.volume() ).toString( false ) + "#", ""

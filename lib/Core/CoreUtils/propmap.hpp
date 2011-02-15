@@ -485,7 +485,7 @@ template<typename charT, typename traits>
 basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::PropertyMap &s )
 {
 	isis::util::PropertyMap::FlatMap buff = s.getFlatMap();
-	isis::util::write_list( buff.begin(), buff.end(), out );
+	isis::util::listToOStream( buff.begin(), buff.end(), out );
 	return out;
 }
 }

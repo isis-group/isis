@@ -263,7 +263,7 @@ public:
 
 	/// write the elements formated to basic_ostream
 	template<typename charT, typename traits> void writeTo( std::basic_ostream<charT, traits> &out )const {
-		util::write_list( CONTAINER::begin(), CONTAINER::end(), out, "|", "<", ">" );
+		util::listToOStream( CONTAINER::begin(), CONTAINER::end(), out, "|", "<", ">" );
 	}
 
 };

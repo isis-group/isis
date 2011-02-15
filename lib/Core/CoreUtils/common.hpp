@@ -63,7 +63,7 @@ Write a list of elements to a std::basic_ostream
 \param suffix will be send to the stream at the end (default: "")
 */
 template<class InputIterator, typename _CharT, typename _Traits> std::basic_ostream<_CharT, _Traits> &
-write_list( InputIterator start, InputIterator end,
+listToOStream( InputIterator start, InputIterator end,
 			std::basic_ostream<_CharT, _Traits> &o,
 			const std::string delim = ",",
 			const std::string prefix = "{", const std::string suffix = "}" )
@@ -85,7 +85,7 @@ write_list( InputIterator start, InputIterator end,
 // specialization to print char-list as number lists, not strings
 //@todo check if this works for VC
 template<typename _CharT, typename _Traits> std::basic_ostream<_CharT, _Traits> &
-write_list( const unsigned char *start, const unsigned char *end,
+listToOStream( const unsigned char *start, const unsigned char *end,
 			std::basic_ostream<_CharT, _Traits> &o,
 			const std::string delim = ",",
 			const std::string prefix = "{", const std::string suffix = "}" )
@@ -104,14 +104,14 @@ write_list( const unsigned char *start, const unsigned char *end,
 	return o;
 }
 
-/// use write_list to create a string from a list
+/// use listToOStream to create a string from a list
 template<class InputIterator> std::string list2string(
 	InputIterator start, InputIterator end,
 	const std::string delim = ",",
 	const std::string prefix = "{", const std::string suffix = "}" )
 {
 	std::ostringstream ret;
-	write_list( start, end, ret, delim, prefix, suffix );
+	listToOStream( start, end, ret, delim, prefix, suffix );
 	return ret.str();
 }
 /// do lexical_cast\<T\> on the elements of a list and return them
@@ -299,7 +299,7 @@ operator<<( basic_ostream<charT, std::char_traits<charT> > &out, const pair<_FIR
 template<typename charT, typename _Key, typename _Tp, typename _Compare, typename _Alloc >
 basic_ostream<charT, std::char_traits<charT> >& operator<<( basic_ostream<charT, std::char_traits<charT> > &out, const map<_Key, _Tp, _Compare, _Alloc>& s )
 {
-	isis::util::write_list( s.begin(), s.end(), out, "\n", "", "" );
+	isis::util::listToOStream( s.begin(), s.end(), out, "\n", "", "" );
 	return out;
 }
 
@@ -328,14 +328,14 @@ basic_ostream<charT, std::char_traits<charT> >& operator<<( basic_ostream<charT,
 template<typename charT, typename _Tp, typename _Alloc >
 basic_ostream<charT, std::char_traits<charT> >& operator<<( basic_ostream<charT, std::char_traits<charT> > &out, const list<_Tp, _Alloc>& s )
 {
-	isis::util::write_list( s.begin(), s.end(), out );
+	isis::util::listToOStream( s.begin(), s.end(), out );
 	return out;
 }
 ///Streaming output for std::set
 template<typename charT, typename _Tp, typename _Alloc >
 basic_ostream<charT, std::char_traits<charT> >& operator<<( basic_ostream<charT, std::char_traits<charT> > &out, const set<_Tp, _Alloc>& s )
 {
-	isis::util::write_list( s.begin(), s.end(), out );
+	isis::util::listToOStream( s.begin(), s.end(), out );
 	return out;
 }
 
