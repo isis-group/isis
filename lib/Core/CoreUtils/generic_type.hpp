@@ -104,7 +104,7 @@ public:
 	 * \returns reference to the (just changed) target
 	 */
 	TypeReference<TYPE_TYPE>& operator=( const TypeReference<TYPE_TYPE> &src ) {
-		boost::scoped_ptr<TYPE_TYPE>::reset( src.empty() ? 0 : src->clone() );
+		boost::scoped_ptr<TYPE_TYPE>::reset( src.isEmpty() ? 0 : src->clone() );
 		return *this;
 	}
 	/**
@@ -117,11 +117,11 @@ public:
 		return *this;
 	}
 	/// \returns true if "contained" type has no value (a.k.a. is undefined)
-	bool empty()const {
+	bool isEmpty()const {
 		return boost::scoped_ptr<TYPE_TYPE>::get() == NULL;
 	}
 	const std::string toString( bool label = false )const {
-		if ( empty() )
+		if ( isEmpty() )
 			return std::string( "\xd8" ); //ASCII code empty set
 		else
 			return this->get()->toString( label );

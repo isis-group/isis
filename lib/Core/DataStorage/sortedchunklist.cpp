@@ -152,7 +152,7 @@ bool SortedChunkList::insert( const Chunk &ch )
 	LOG_IF( !ch.isValid(), Debug, error ) << "You should definitively check the chunks validity (use the function Chunk::valid) before calling this funktion.";
 	assert( ch.isValid() );
 
-	if( !empty() ) {
+	if( !isEmpty() ) {
 		// compare some attributes of the first chunk and the one which shall be inserted
 		Chunk &first = *( chunks.begin()->second.begin()->second );
 
@@ -212,7 +212,7 @@ void SortedChunkList::addSecondarySort( const util::PropertyMap::KeyType &cmp )
 {
 	secondarySort.push( scalarPropCompare( cmp ) );
 }
-bool SortedChunkList::empty()const
+bool SortedChunkList::isEmpty()const
 {
 	return chunks.empty() || chunks.begin()->second.empty(); // if there is no subMap or nothing in the first subMap ... its empty
 }
@@ -222,7 +222,7 @@ void SortedChunkList::clear()
 }
 bool SortedChunkList::isRectangular()
 {
-	if( empty() )return true;
+	if( isEmpty() )return true;
 
 	size_t images = getHorizontalSize();
 	BOOST_FOREACH( PrimaryMap::reference outer, chunks ) {
@@ -233,7 +233,7 @@ bool SortedChunkList::isRectangular()
 }
 size_t SortedChunkList::getHorizontalSize()
 {
-	if( empty() )return 0;
+	if( isEmpty() )return 0;
 	else return chunks.begin()->second.size();
 }
 
@@ -241,7 +241,7 @@ std::vector< boost::shared_ptr< Chunk > > SortedChunkList::getLookup()
 {
 	LOG_IF( !isRectangular(), Debug, error ) << "Running getLookup on an non rectangular chunk-list is not defined";
 
-	if( !empty() ) {
+	if( !isEmpty() ) {
 		PrimaryMap::iterator iP = chunks.begin();
 		const size_t horizontal = chunks.size();
 		const size_t vertical = iP->second.size();

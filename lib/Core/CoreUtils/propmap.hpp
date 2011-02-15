@@ -233,7 +233,7 @@ public:
 	/**
 	 * \returns true if the PropertyMap is empty, false otherwhise
 	 */
-	bool isEmpty()const;
+	bool empty()const;
 	
 	/**
 	 * Get a list of all properties.
@@ -316,7 +316,7 @@ public:
 	template<typename T> TypeValue &setPropertyAs( const KeyType &key, const T &val ) {
 		TypeValue &ret = propertyValue( key );
 
-		if( ret.empty() ) {
+		if( ret.isEmpty() ) {
 			const bool needed = ret.needed();
 			( ret = val ).needed() = needed;
 		} else if( ret->is<T>() ) {
@@ -393,11 +393,11 @@ class treeNode
 	TypeValue m_leaf;
 public:
 	bool empty()const {
-		return m_branch.isEmpty() && m_leaf.empty();
+		return m_branch.empty() && m_leaf.isEmpty();
 	}
 	bool is_leaf()const {
-		LOG_IF( ! ( m_branch.isEmpty() || m_leaf.empty() ), Debug, error ) << "There is a non empty leaf at a branch. This should not be.";
-		return m_branch.isEmpty();
+		LOG_IF( ! ( m_branch.empty() || m_leaf.isEmpty() ), Debug, error ) << "There is a non empty leaf at a branch. This should not be.";
+		return m_branch.empty();
 	}
 	const PropertyMap &getBranch()const {
 		return m_branch;
@@ -455,7 +455,7 @@ template<typename T> T PropertyMap::getPropertyAs( const KeyType &key ) const
 	if( entry ) {
 		const TypeValue &ref = entry->getLeaf();
 
-		if( !ref.empty() )
+		if( !ref.isEmpty() )
 			return ref->as<T>();
 	}
 

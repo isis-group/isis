@@ -90,8 +90,8 @@ public:
 	/// Tries to insert a chunk (a cheap copy of the chunk is done when inserted)
 	bool insert( const Chunk &ch );
 
-	/// \returns true if there is not chunk in the list
-	bool empty()const;
+	/// \returns true if there is no chunk in the list
+	bool isEmpty()const;
 
 	/// Empties the list.
 	void clear();

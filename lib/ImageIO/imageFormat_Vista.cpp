@@ -269,7 +269,7 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 	//can not reject the anatomical images. So we store them in a vector and handle them later.
 	std::vector<VImage> residualVImages;
 
-	if( myDialect.empty() ) {
+	if( myDialect.isEmpty() ) {
 		if( nimages > 1 ) {
 			//test for functional data
 			size_t nShortRepn = 0;

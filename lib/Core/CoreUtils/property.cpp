@@ -23,17 +23,17 @@ bool TypeValue::needed()const { return m_needed;}
 
 bool TypeValue::operator== ( const util::TypeValue &second )const
 {
-	return !second.empty() && operator==( *second );
+	return !second.isEmpty() && operator==( *second );
 }
 bool TypeValue::operator!= ( const util::TypeValue &second )const
 {
-	return !( ( second.empty() && empty() ) || operator==( second ) );
+	return !( ( second.isEmpty() && isEmpty() ) || operator==( second ) );
 }
 
 
 bool TypeValue::operator== ( const _internal::TypeBase &second )const
 {
-	return !empty() && get()->operator==( second );
+	return !isEmpty() && get()->operator==( second );
 }
 
 

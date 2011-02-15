@@ -58,7 +58,7 @@ public:
 	}
 	/**
 	 * Empty constructor.
-	 * Creates an empty property value. So TypeValue().empty() will allways be true.
+	 * Creates an empty property value. So TypeValue().isEmpty() will allways be true.
 	 * \param _needed flag if this TypeValue is needed an thus not allowed to be empty (a.k.a. undefined)
 	 */
 	TypeValue( bool _needed = false );
@@ -111,12 +111,12 @@ public:
 		if ( get()->is<T>() ) { // If I'm of the same type as the comparator
 			const T &cmp = get()->castTo<T>();
 			return second == cmp; //compare our values
-		} else if ( ! empty() ) { // otherwise try to make me T and compare that
+		} else if ( ! isEmpty() ) { // otherwise try to make me T and compare that
 			LOG( Debug, info )
 					<< *this << " is not " << Type<T>::staticName() << " trying to convert.";
 			TypeReference dst = ( *this )->copyToNewByID( Type<T>::staticID );
 
-			if ( !dst.empty() )
+			if ( !dst.isEmpty() )
 				return dst->castTo<T>() == second;
 		}
 

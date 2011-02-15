@@ -75,7 +75,7 @@ bool Chunk::convertToType( short unsigned int ID, const scaling_pair &scaling )
 	if( typeID() != ID ) { // if its not the same type - replace the internal TypePtr by a new returned from TypePtrBase::copyToNewById
 		TypePtrReference newPtr = getTypePtrBase().copyToNewByID( ID, scaling ); // create a new TypePtr of type id and store it in a TypePtrReference
 
-		if( newPtr.empty() ) // if the reference is empty the conversion failed
+		if( newPtr.isEmpty() ) // if the reference is empty the conversion failed
 			return false;
 
 		static_cast<TypePtrReference &>( *this ) = newPtr; // otherwise replace my own TypePtr with the new one

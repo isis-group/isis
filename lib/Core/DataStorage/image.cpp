@@ -106,7 +106,7 @@ bool Image::insertChunk ( const Chunk &chunk )
 
 bool Image::reIndex()
 {
-	if ( set.empty() ) {
+	if ( set.isEmpty() ) {
 		LOG( Debug, warning ) << "Reindexing an empty image is useless.";
 		return false;
 	}
@@ -174,13 +174,13 @@ bool Image::reIndex()
 	LOG( Debug, info ) << uniques.size() << " Chunk-unique properties found in the Image";
 	LOG_IF( uniques.size(), Debug, verbose_info ) << util::listToString( uniques.begin(), uniques.end(), ", " );
 	join( common );
-	LOG_IF( ! common.isEmpty(), Debug, verbose_info ) << "common properties saved into the image " << common;
+	LOG_IF( ! common.empty(), Debug, verbose_info ) << "common properties saved into the image " << common;
 
 	//remove common props from the chunks
 	for ( size_t i = 0; i != lookup.size(); i++ )
 		chunkAt( i ).remove( common, false ); //this _won't keep needed properties - so from here on the chunks of the image are invalid
 
-	LOG_IF( ! common.isEmpty(), Debug, verbose_info ) << "common properties removed from " << chunks << " chunks: " << common;
+	LOG_IF( ! common.empty(), Debug, verbose_info ) << "common properties removed from " << chunks << " chunks: " << common;
 
 	// add the chunk-size to the image-size
 	for ( unsigned short i = 0; i < chunk_dims; i++ )
@@ -321,9 +321,9 @@ bool Image::reIndex()
 	LOG_IF( ! isValid(), Runtime, warning ) << "The image is not valid after reindexing. Missing properties: " << getMissing();
 	return clean = isValid();
 }
-bool Image::isEmpty()const
+bool Image::empty()const
 {
-	return set.empty();
+	return set.isEmpty();
 }
 
 const boost::shared_ptr< Chunk >& Image::chunkPtrAt( size_t at )const
@@ -374,7 +374,7 @@ std::vector< boost::shared_ptr<const Chunk > > Image::getChunkList()const
 
 size_t Image::getChunkStride ( size_t base_stride )
 {
-	LOG_IF( set.empty(), Runtime, error ) << "Trying to get chunk stride in an empty image";
+	LOG_IF( set.isEmpty(), Runtime, error ) << "Trying to get chunk stride in an empty image";
 	LOG_IF( lookup.empty(), Debug, error ) << "Lookup table for chunks is empty. Do reIndex() first!";
 
 	if ( lookup.size() >= 4 * base_stride ) {
@@ -438,7 +438,7 @@ std::list<util::TypeValue> Image::getChunksProperties( const util::PropertyMap::
 		BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
 			const util::TypeValue &prop = ref->propertyValue( key );
 
-			if ( unique && prop.empty() ) //if unique is requested and the property is empty
+			if ( unique && prop.isEmpty() ) //if unique is requested and the property is empty
 				continue; //skip it
 			else if ( unique && !( ret.empty() ||  prop == ret.back() ) )
 				//if unique is requested and the property is equal to the one added before
@@ -498,7 +498,7 @@ std::pair< util::TypeReference, util::TypeReference > Image::getScalingTo( short
 	const std::vector<boost::shared_ptr<const Chunk> > chunks = getChunkList();
 	BOOST_FOREACH( const boost::shared_ptr<const Chunk> &ref, chunks ) { //find a chunk which would be converted
 		if( targetID != ref->typeID() ) {
-			LOG_IF( ref->getScalingTo( targetID, minmax, scaleopt ).first.empty() || ref->getScalingTo( targetID, minmax, scaleopt ).second.empty(), Debug, error )
+			LOG_IF( ref->getScalingTo( targetID, minmax, scaleopt ).first.isEmpty() || ref->getScalingTo( targetID, minmax, scaleopt ).second.isEmpty(), Debug, error )
 					<< "Returning an invalid scaling. This is bad!";
 			return ref->getScalingTo( targetID, minmax, scaleopt ); // and ask that for the scaling
 		}

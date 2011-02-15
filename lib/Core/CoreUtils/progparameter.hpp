@@ -72,7 +72,7 @@ public:
 	 * If the parameter does not contain T, a rutime error will be raised
 	 */
 	template<typename T> operator const T()const {
-		LOG_IF( empty(), isis::CoreDebug, isis::error ) << "Program parameters must not be empty. Please set it to any value.";
+		LOG_IF( isEmpty(), isis::CoreDebug, isis::error ) << "Program parameters must not be empty. Please set it to any value.";
 		return get()->castTo<T>();
 	}
 	
@@ -150,8 +150,8 @@ operator<<( basic_ostream<charT, traits> &out, const isis::util::ProgParameter &
 		out << desc << ", ";
 	}
 
-	LOG_IF( s.empty(), isis::CoreDebug, isis::error ) << "Program parameters must not be empty. Please set it to any value.";
-	assert( !s.empty() );
+	LOG_IF( s.isEmpty(), isis::CoreDebug, isis::error ) << "Program parameters must not be empty. Please set it to any value.";
+	assert( !s.isEmpty() );
 	out << "default=\"" << s.toString( false ) << "\", type=" << s->typeName();
 
 	if ( s.needed() )out << " (needed)";

@@ -112,10 +112,10 @@ BOOST_AUTO_TEST_CASE( typePtr_Reference_test )
 	{
 		data::TypePtr<int32_t>::Reference outer;
 		// default constructor must create an empty pointer-ref
-		BOOST_CHECK( outer.empty() );
+		BOOST_CHECK( outer.isEmpty() );
 		{
 			ReferenceTest inner;
-			BOOST_CHECK( ! inner.empty() );
+			BOOST_CHECK( ! inner.isEmpty() );
 			// for now we have only one pointer referencing the data
 			boost::shared_ptr<int32_t> &dummy1 = inner->castToTypePtr<int32_t>();//get the smart_pointer inside the referenced TypePtr
 			BOOST_CHECK_EQUAL( dummy1.use_count(), 1 ); //We only have one TypePtr (inside inner)

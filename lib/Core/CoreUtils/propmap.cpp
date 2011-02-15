@@ -145,7 +145,7 @@ bool PropertyMap::recursiveRemove( PropertyMap &root, const propPathIterator at,
 			if ( ! ref.is_leaf() ) {
 				ret = recursiveRemove( ref.getBranch(), next, pathEnd );
 
-				if ( ref.getBranch().isEmpty() )
+				if ( ref.getBranch().empty() )
 					root.erase( found ); // remove the now empty branch
 			} else {
 				root.erase( found );
@@ -193,7 +193,7 @@ const PropertyMap &PropertyMap::branch( const key_type &key ) const
 		LOG( Runtime, warning ) << "Trying to access non existing branch " << key << ".";
 		return emptyEntry.getBranch();
 	} else {
-		LOG_IF( ref->getBranch().isEmpty(), Runtime, warning ) << "Accessing empty branch " << key;
+		LOG_IF( ref->getBranch().empty(), Runtime, warning ) << "Accessing empty branch " << key;
 		return ref->getBranch();
 	}
 }
@@ -225,7 +225,7 @@ bool PropertyMap::remove( const isis::util::PropertyMap &removeMap, bool keep_ne
 					const PropertyMap &otherSub = otherIt->second.getBranch();
 					ret &= mySub.remove( otherSub );
 
-					if( mySub.isEmpty() ) // delete my branch, if its empty
+					if( mySub.empty() ) // delete my branch, if its empty
 						erase( thisIt++ );
 				} else {
 					LOG( Debug, warning ) << "Not deleting branch " << MSubject( thisIt->first ) << " because its no subtree in the removal map";
@@ -251,7 +251,7 @@ bool PropertyMap::isValid() const
 	return found == end();
 }
 
-bool PropertyMap::isEmpty() const
+bool PropertyMap::empty() const
 {
 	return Container::empty();
 }
@@ -422,7 +422,7 @@ bool PropertyMap::transform( key_type from,  key_type to, int dstID, bool delSou
 	const TypeValue &found = propertyValue( from );
 	bool ret = false;
 
-	if( ! found.empty() ) {
+	if( ! found.isEmpty() ) {
 		util::TypeReference &dst = static_cast<util::TypeReference &>( propertyValue( to ) );
 
 		if ( found->typeID() == dstID ) {
@@ -435,7 +435,7 @@ bool PropertyMap::transform( key_type from,  key_type to, int dstID, bool delSou
 		} else {
 			LOG_IF( from == to, Debug, warning ) << "Transforming " << MSubject( found ) << " in place.";
 			dst = found->copyToNewByID( dstID );
-			ret = !dst.empty();
+			ret = !dst.isEmpty();
 		}
 	}
 
@@ -481,7 +481,7 @@ bool PropertyMap::hasProperty( const key_type &key ) const
 {
 	const propPath path = util::stringToList<key_type>( key, pathSeperator );
 	const mapped_type *ref = findEntry( *this, path.begin(), path.end() );
-	return ( ref && ref->is_leaf() && ! ref->getLeaf().empty() );
+	return ( ref && ref->is_leaf() && ! ref->getLeaf().isEmpty() );
 }
 /// \returns true if a leaf exists at the given path and the property is not empty
 bool PropertyMap::hasBranch( const key_type &key ) const
@@ -519,7 +519,7 @@ void PropertyMap::toCommonUnique( PropertyMap &common, std::set<key_type> &uniqu
 		BOOST_FOREACH( const DiffMap::value_type & ref, difference ) {
 			uniques.insert( ref.first );
 
-			if ( ! ref.second.first.empty() )common.remove( ref.first );//if there is something in common, remove it
+			if ( ! ref.second.first.isEmpty() )common.remove( ref.first );//if there is something in common, remove it
 		}
 	}
 }
@@ -546,13 +546,13 @@ bool PropertyMap::trueP::operator()( const PropertyMap::value_type &ref ) const
 }
 bool PropertyMap::invalidP::operator()( const PropertyMap::value_type &ref ) const
 {
-	return ref.second.getLeaf().needed() && ref.second.getLeaf().empty();
+	return ref.second.getLeaf().needed() && ref.second.getLeaf().isEmpty();
 }
 bool PropertyMap::treeInvalidP::operator()( const PropertyMap::value_type &ref ) const
 {
 	if ( ref.second.is_leaf() ) {
 		const TypeValue &val = ref.second.getLeaf();
-		return val.needed() && val.empty();
+		return val.needed() && val.isEmpty();
 	} else  {
 		return ! ref.second.getBranch().isValid();
 	}

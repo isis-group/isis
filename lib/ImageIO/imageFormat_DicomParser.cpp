@@ -449,7 +449,7 @@ size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, isis::util::PropertyMap &map
 				const std::string whitespaces( " \t\f\v\n\r" );
 				const std::string::size_type start = insert.find_first_not_of( whitespaces );
 
-				if ( insert.empty() || start == std::string::npos ) {
+				if ( insert.isEmpty() || start == std::string::npos ) {
 					LOG( Runtime, verbose_info ) << "Skipping empty string for CSA entry " << name;
 				} else {
 					const std::string::size_type end = insert.find_last_not_of( whitespaces ); //strip spaces

@@ -601,7 +601,7 @@ BOOST_AUTO_TEST_CASE ( image_transformCoords_test )
 {
 	// dummy image
 	std::list<data::Image> images = data::IOFactory::load( "nix.null" );
-	BOOST_REQUIRE( !images.empty() );
+	BOOST_REQUIRE( !images.isEmpty() );
 	data::Image &img = images.front();
 	//TODO rewrite this test to use BOST_UNIT_TEST_ASSERTS with the help of
 	// util::fuzzyEqual

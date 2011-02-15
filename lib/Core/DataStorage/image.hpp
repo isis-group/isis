@@ -64,7 +64,7 @@ private:
 		const size_t idx[] = {first, second, third, fourth};
 		LOG_IF( ! clean, Debug, error )
 				<< "Getting data from a non indexed image will result in undefined behavior. Run reIndex first.";
-		LOG_IF( set.empty(), Debug, error )
+		LOG_IF( set.isEmpty(), Debug, error )
 				<< "Getting data from a empty image will result in undefined behavior.";
 		LOG_IF( !isInRange( idx ), Debug, isis::error )
 				<< "Index " << util::listToString( idx, idx + 4, "|" ) << " is out of range (" << getSizeAsString() << ")";
@@ -279,7 +279,7 @@ public:
 	bool reIndex();
 
 	/// \returns true if there is no chunk in the image
-	bool isEmpty()const;
+	bool empty()const;
 
 	/**
 	 * Get a list of the properties of the chunks for the given key

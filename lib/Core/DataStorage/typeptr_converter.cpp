@@ -131,7 +131,7 @@ public:
 		return boost::shared_ptr<const TypePtrConverterBase>( ret );
 	}
 	void convert( const TypePtrBase &src, TypePtrBase &dst, const scaling_pair &scaling )const {
-		LOG_IF( scaling.first.empty() || scaling.first.empty(), Debug, error ) << "Running conversion with invalid scaling (" << scaling << ") this won't work";
+		LOG_IF( scaling.first.isEmpty() || scaling.first.isEmpty(), Debug, error ) << "Running conversion with invalid scaling (" << scaling << ") this won't work";
 		numeric_convert( src.castToTypePtr<SRC>(), dst.castToTypePtr<DST>(), scaling.first->as<double>(), scaling.second->as<double>() );
 	}
 	scaling_pair getScaling( const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale )const {

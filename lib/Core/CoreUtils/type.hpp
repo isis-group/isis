@@ -169,7 +169,7 @@ public:
 		std::string ret;
 		Reference ref = copyToNewByID( Type<std::string>::staticID );
 
-		if ( ref.empty() ) {
+		if ( ref.isEmpty() ) {
 			LOG( Debug, warning ) << "Automatic conversion of " << *this << " to string failed. Falling back to boost::lexical_cast<std::string>";
 			ret = boost::lexical_cast<std::string>( m_val );
 		} else {

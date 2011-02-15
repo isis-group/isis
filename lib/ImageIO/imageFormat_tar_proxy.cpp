@@ -84,7 +84,7 @@ protected:
 	}
 public:
 	std::string dialects( const std::string &filename )const {
-		/*      if( filename.empty() ) {*/
+		/*      if( filename.isEmpty() ) {*/
 		return std::string();
 		/*      } else {
 		            std::set<std::string> ret;

@@ -115,7 +115,7 @@ public:
 
 		Reference ret = copyToNewByID( Type<T>::staticID );
 
-		if ( ret.empty() ) {
+		if ( ret.isEmpty() ) {
 			LOG( Debug, error )
 					<< "Interpretation of " << toString( true ) << " as " << Type<T>::staticName()
 					<< " failed. Returning " << Type<T>().toString() << ".";

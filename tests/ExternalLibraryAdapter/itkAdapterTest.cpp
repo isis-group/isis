@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE ( ISIS_to_ITK )
 	itk::ImageFileWriter<MyImageType>::Pointer writer = itk::ImageFileWriter<MyImageType>::New();
 	// data::ImageList imgList = isis::data::IOFactory::load("test.null", "");
 	data::ImageList imgList = isis::data::IOFactory::load( "/scr/kastanie1/DATA/isis/data_fmrt.nii", "" );
-	BOOST_CHECK( not imgList.empty() );
+	BOOST_CHECK( not imgList.isEmpty() );
 	MyImageType::Pointer itkImage = MyImageType::New();
 	itkImage = adapter->makeItkImageObject<MyImageType>( imgList.front() );
 	writer->SetInput( itkImage );
