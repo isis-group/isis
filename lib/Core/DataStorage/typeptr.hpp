@@ -70,8 +70,6 @@ protected:
 	TypePtrBase *clone() const {
 		return new TypePtr( *this );
 	}
-public:
-	static const unsigned short staticID = util::_internal::TypeID<TYPE>::value << 8;
 	/// Proxy-Deleter to encapsulate the real deleter/shared_ptr when creating shared_ptr for parts of a shared_ptr
 	class DelProxy : public boost::shared_ptr<TYPE>
 	{
@@ -87,11 +85,13 @@ public:
 		/// decrement the use_count of the master when a specific part is not referenced anymore
 		void operator()( TYPE *at ) {
 			LOG( Debug, verbose_info )
-					<< "Deletion for " << this->get() << " called from splice at offset "   << at - this->get()
-					<< ", current use_count: " << this->use_count();
+			<< "Deletion for " << this->get() << " called from splice at offset "   << at - this->get()
+			<< ", current use_count: " << this->use_count();
 			this->reset();//actually not needed, but we keep it here to keep obfuscation low
 		}
 	};
+public:
+	static const unsigned short staticID = util::_internal::TypeID<TYPE>::value << 8;
 	/// delete-functor which does nothing (in case someone else manages the data).
 	struct NonDeleter {
 		void operator()( TYPE *p ) {
