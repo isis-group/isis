@@ -31,7 +31,7 @@ ProgParameter::ProgParameter()
 }
 ProgParameter::ProgParameter( const ProgParameter &ref ): TypeValue( static_cast<const TypeValue &>( ref ) ), m_hidden( false ) {}
 
-bool ProgParameter::hidden() const
+bool ProgParameter::isHidden() const
 {
 	return m_hidden;
 }

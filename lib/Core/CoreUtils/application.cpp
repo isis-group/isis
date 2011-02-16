@@ -115,7 +115,7 @@ void Application::printHelp( bool withHidden )const
 
 		if ( iP->second.needed() ) {
 			pref = ". Required.";
-		} else if( iP->second.hidden() ) {
+		} else if( iP->second.isHidden() ) {
 			if( !withHidden )
 				continue; // if its hidden, not needed, and wie want the short version skip this parameter
 		}

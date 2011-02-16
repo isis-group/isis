@@ -83,7 +83,7 @@ public:
 	bool isSet()const;
 
 	///returns true for hidden parameters, false otherwise
-	bool hidden()const;
+	bool isHidden()const;
 	
 	///\copydoc hidden
 	bool &hidden();
@@ -102,7 +102,7 @@ class ParameterMap: public std::map<std::string, ProgParameter>
 		bool operator()( const_reference ref )const {return !ref.second.needed();}
 	};
 	struct hiddenP {
-		bool operator()( const_reference ref )const {return ref.second.hidden();}
+		bool operator()( const_reference ref )const {return ref.second.isHidden();}
 	};
 	template<class T> void printWithout() {
 		std::map<key_type, mapped_type, key_compare> result( *this );
