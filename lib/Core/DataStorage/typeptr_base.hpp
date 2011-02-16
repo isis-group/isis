@@ -29,22 +29,22 @@ namespace data
 namespace _internal
 {
 
-class TypePtrBase : public util::_internal::GenericType
+class ValuePtrBase : public util::_internal::GenericType
 {
-	friend class util::_internal::TypeReference<TypePtrBase>;
-	static const _internal::TypePtrConverterMap &converters();
+	friend class util::_internal::TypeReference<ValuePtrBase>;
+	static const _internal::ValuePtrConverterMap &converters();
 protected:
 	size_t m_len;
-	TypePtrBase( size_t len = 0 );
+	ValuePtrBase( size_t len = 0 );
 
 	/// Create a ValuePtr of the same type pointing at the same address.
-	virtual TypePtrBase *clone()const = 0;
+	virtual ValuePtrBase *clone()const = 0;
 
 public:
 	virtual const boost::weak_ptr<void> getRawAddress()const = 0;
 
-	typedef util::_internal::TypeReference<TypePtrBase> Reference;
-	typedef TypePtrConverterMap::mapped_type::mapped_type Converter;
+	typedef util::_internal::TypeReference<ValuePtrBase> Reference;
+	typedef ValuePtrConverterMap::mapped_type::mapped_type Converter;
 
 	template<typename T> bool is()const;
 
@@ -73,13 +73,13 @@ public:
 	 * This will create ValuePtr's which will point at elements within this data block.
 	 * - They will have a distance of size and therefore have the have the same length (exept the last one which will point an the rest).
 	 * - They will use a special proxy-reference-counting (If at least one of them is still used, the whole original ValuePtr will be kept).
-	 * \returns a vector of ceil(len()/size) not intersecting TypePtrBase::Reference's of the length<=size.
+	 * \returns a vector of ceil(len()/size) not intersecting ValuePtrBase::Reference's of the length<=size.
 	 */
 	virtual std::vector<Reference> splice( size_t size )const = 0;
 
 	/// Copy (or Convert) data from this to another ValuePtr of maybe another type and the same length.
-	bool convertTo( TypePtrBase &dst )const;
-	bool convertTo( TypePtrBase &dst, const scaling_pair &scaling )const;
+	bool convertTo( ValuePtrBase &dst )const;
+	bool convertTo( ValuePtrBase &dst, const scaling_pair &scaling )const;
 
 	///get the scaling (and offset) which would be used in an convertTo
 	scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const;
@@ -139,11 +139,11 @@ public:
 	 * Create a new ValuePtr, of the same type, but differnent size in memory.
 	 * \param length length of the new memory block in elements of the given TYPE
 	 */
-	virtual TypePtrBase::Reference cloneToNew( size_t length )const = 0;
-	TypePtrBase::Reference cloneToNew();
+	virtual ValuePtrBase::Reference cloneToNew( size_t length )const = 0;
+	ValuePtrBase::Reference cloneToNew();
 
 	virtual size_t bytesPerElem()const = 0;
-	virtual ~TypePtrBase();
+	virtual ~ValuePtrBase();
 	/**
 	 * Copy a range of elements to another ValuePtr of the same type.
 	 * \param start first element in this to be copied
@@ -151,7 +151,7 @@ public:
 	 * \param dst target for the copy
 	 * \param dst_start starting element in dst to be overwritten
 	 */
-	void copyRange( size_t start, size_t end, TypePtrBase &dst, size_t dst_start )const;
+	void copyRange( size_t start, size_t end, ValuePtrBase &dst, size_t dst_start )const;
 
 	/// \returns the number of references using the same memory as this.
 	size_t useCount()const;
@@ -178,16 +178,16 @@ public:
 	 * \param dst the ValuePtr to compare against
 	 * \param dst_start the index where to start comparison in dst
 	 */
-	virtual size_t compare( size_t start, size_t end, const TypePtrBase &dst, size_t dst_start )const = 0;
+	virtual size_t compare( size_t start, size_t end, const ValuePtrBase &dst, size_t dst_start )const = 0;
 	/**
 	 * Compare to another ValuePtr.
-	 * Short hand version of compare( size_t start, size_t end, const TypePtrBase &dst, size_t dst_start )const
+	 * Short hand version of compare( size_t start, size_t end, const ValuePtrBase &dst, size_t dst_start )const
 	 */
-	size_t compare( const TypePtrBase &comp )const;
+	size_t compare( const ValuePtrBase &comp )const;
 };
 }
 
-typedef _internal::TypePtrBase::Reference TypePtrReference;
+typedef _internal::ValuePtrBase::Reference ValuePtrReference;
 
 }
 }

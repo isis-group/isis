@@ -62,12 +62,12 @@ template<typename T> struct getMinMaxImpl<T, true> {
  * The copy is cheap, thus the copy of a ValuePtr will reference the same data.
  * The usual dereferencing pointer interface ("*" and "->") is supported.
  */
-template<typename TYPE> class ValuePtr: public _internal::TypePtrBase
+template<typename TYPE> class ValuePtr: public _internal::ValuePtrBase
 {
 	boost::shared_ptr<TYPE> m_val;
 	template<typename T> ValuePtr( const util::Value<T>& value ); // Dont do this
 protected:
-	TypePtrBase *clone() const {
+	ValuePtrBase *clone() const {
 		return new ValuePtr( *this );
 	}
 	/// Proxy-Deleter to encapsulate the real deleter/shared_ptr when creating shared_ptr for parts of a shared_ptr
@@ -133,7 +133,7 @@ public:
 	 * this is just here for child classes which may want to check)
 	 */
 	ValuePtr( TYPE *const ptr, size_t length ):
-		_internal::TypePtrBase( length ), m_val( ptr, BasicDeleter() ) {}
+		_internal::ValuePtrBase( length ), m_val( ptr, BasicDeleter() ) {}
 
 	/**
 	 * Creates ValuePtr from a pointer of type TYPE.
@@ -146,7 +146,7 @@ public:
 	 */
 
 	template<typename D> ValuePtr( TYPE *const ptr, size_t length, D d ):
-		_internal::TypePtrBase( length ), m_val( ptr, d ) {}
+		_internal::ValuePtrBase( length ), m_val( ptr, d ) {}
 
 	virtual ~ValuePtr() {}
 
@@ -196,7 +196,7 @@ public:
 	 * \param dst_start the first element in the given TyprPtr, which schould be compared to the first element in this
 	 * \returns the amount of elements which actually differ in both ValuePtr or the whole length of the range when the types are not equal.
 	 */
-	size_t compare( size_t start, size_t end, const _internal::TypePtrBase &dst, size_t dst_start ) const {
+	size_t compare( size_t start, size_t end, const _internal::ValuePtrBase &dst, size_t dst_start ) const {
 		assert( start <= end );
 		size_t ret = 0;
 		size_t _length = end - start;
@@ -272,14 +272,14 @@ public:
 	operator boost::shared_ptr<TYPE>&() {return m_val;}
 	operator const boost::shared_ptr<TYPE>&()const {return m_val;}
 
-	TypePtrBase::Reference cloneToNew( size_t _length ) const {
-		return TypePtrBase::Reference( new ValuePtr( ( TYPE * )malloc( _length * sizeof( TYPE ) ), _length ) );
+	ValuePtrBase::Reference cloneToNew( size_t _length ) const {
+		return ValuePtrBase::Reference( new ValuePtr( ( TYPE * )malloc( _length * sizeof( TYPE ) ), _length ) );
 	}
 	/// \returns the byte-size of the type of the data this ValuePtr points to.
 	size_t bytesPerElem() const {
 		return sizeof( TYPE );
 	}
-	/// \copydoc _internal::TypePtrBase::getMinMax
+	/// \copydoc _internal::ValuePtrBase::getMinMax
 	std::pair<util::TypeReference, util::TypeReference> getMinMax()const {
 		if ( length() == 0 ) {
 			LOG( Runtime, warning ) << "Skipping computation of min/max on an empty ValuePtr";
@@ -327,7 +327,7 @@ public:
 
 };
 
-template<typename T> bool _internal::TypePtrBase::is()const
+template<typename T> bool _internal::ValuePtrBase::is()const
 {
 	util::check_type<T>();
 	return getTypeID() == ValuePtr<T>::staticID;

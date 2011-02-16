@@ -38,9 +38,9 @@ ChunkBase::~ChunkBase() { }
 
 }
 
-Chunk::Chunk( const TypePtrReference &src, size_t firstDim, size_t secondDim, size_t thirdDim, size_t fourthDim ):
+Chunk::Chunk( const ValuePtrReference &src, size_t firstDim, size_t secondDim, size_t thirdDim, size_t fourthDim ):
 	_internal::ChunkBase( firstDim, secondDim, thirdDim, fourthDim ),
-	TypePtrReference( src )
+	ValuePtrReference( src )
 {
 	assert( ( *this )->length() == getVolume() );
 }
@@ -57,7 +57,7 @@ Chunk Chunk::cloneToNew( size_t firstDim, size_t secondDim, size_t thirdDim, siz
 
 	if ( fourthDim )newSize[3] = fourthDim;
 
-	const TypePtrReference cloned( get()->cloneToNew( newSize.product() ) );
+	const ValuePtrReference cloned( get()->cloneToNew( newSize.product() ) );
 	return Chunk( cloned, newSize[0], newSize[1], newSize[2], newSize[3] );
 }
 
@@ -72,13 +72,13 @@ bool Chunk::convertToType( short unsigned int ID )
 
 bool Chunk::convertToType( short unsigned int ID, const scaling_pair &scaling )
 {
-	if( getTypeID() != ID ) { // if its not the same type - replace the internal ValuePtr by a new returned from TypePtrBase::copyToNewById
-		TypePtrReference newPtr = getTypePtrBase().copyToNewByID( ID, scaling ); // create a new ValuePtr of type id and store it in a TypePtrReference
+	if( getTypeID() != ID ) { // if its not the same type - replace the internal ValuePtr by a new returned from ValuePtrBase::copyToNewById
+		ValuePtrReference newPtr = getTypePtrBase().copyToNewByID( ID, scaling ); // create a new ValuePtr of type id and store it in a ValuePtrReference
 
 		if( newPtr.isEmpty() ) // if the reference is empty the conversion failed
 			return false;
 
-		static_cast<TypePtrReference &>( *this ) = newPtr; // otherwise replace my own ValuePtr with the new one
+		static_cast<ValuePtrReference &>( *this ) = newPtr; // otherwise replace my own ValuePtr with the new one
 	}
 
 	return true;
@@ -189,7 +189,7 @@ scaling_pair Chunk::getScalingTo( unsigned short typeID, const util::_internal::
 Chunk &Chunk::operator=( const Chunk &ref )
 {
 	_internal::ChunkBase::operator=( static_cast<const _internal::ChunkBase &>( ref ) ); //copy the metadate of ref
-	TypePtrReference::operator=( static_cast<const TypePtrReference &>( ref ) ); // copy the reference of ref's data
+	ValuePtrReference::operator=( static_cast<const ValuePtrReference &>( ref ) ); // copy the reference of ref's data
 	return *this;
 }
 
@@ -256,16 +256,16 @@ std::list<Chunk> Chunk::splice ( dimensions atDim )const
 {
 	std::list<Chunk> ret;
 	//@todo should be locking
-	typedef std::vector<TypePtrReference> TypePtrList;
+	typedef std::vector<ValuePtrReference> ValuePtrList;
 	const util::FixedVector<size_t, dims> wholesize = getSizeAsVector();
 	util::FixedVector<size_t, dims> spliceSize;
 	spliceSize.fill( 1 ); //init size of one chunk-splice to 1x1x1x1
 	//copy the relevant dimensional sizes from wholesize (in case of sliceDim we copy only the first two elements of wholesize - making slices)
 	spliceSize.copyFrom( &wholesize[0], &wholesize[atDim] );
 	//get the spliced ValuePtr's (the volume of the requested dims is the split-size - in case of sliceDim it is rows*columns)
-	const TypePtrList pointers = this->getTypePtrBase().splice( spliceSize.product() );
+	const ValuePtrList pointers = this->getTypePtrBase().splice( spliceSize.product() );
 	//create new Chunks from this ValuePtr's
-	BOOST_FOREACH( TypePtrList::const_reference ref, pointers ) {
+	BOOST_FOREACH( ValuePtrList::const_reference ref, pointers ) {
 		ret.push_back(Chunk( ref, spliceSize[0], spliceSize[1], spliceSize[2], spliceSize[3] ) ); //@todo make sure zhis is only one copy-operation
 		static_cast<util::PropertyMap &>( ret.back() ) = static_cast<const util::PropertyMap &>( *this ); //copy my metadate into all spliced
 	}

@@ -61,7 +61,7 @@ template<> struct __cast_to<uint8_t> { // we cannot lexical_cast to uint8_t - we
 	
 /*
  * This is the mostly abstract base class for all scalar values (see types.hpp).
- * Additionally, there's the TypePtrBase containing the more complex data handling stuff with abstract values. 
+ * Additionally, there's the ValuePtrBase containing the more complex data handling stuff with abstract values. 
  * Both are derived from GenericType containing the description of the actual value type.
  */
 

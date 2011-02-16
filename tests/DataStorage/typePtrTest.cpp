@@ -6,7 +6,7 @@
  */
 
 #define NOMINMAX 1
-#define BOOST_TEST_MODULE TypePtrTest
+#define BOOST_TEST_MODULE ValuePtrTest
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
 #include "DataStorage/typeptr.hpp"
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE( typePtr_clone_test )
 {
 	Deleter::deleted = false;
 	{
-		data::TypePtrReference outer;
+		data::ValuePtrReference outer;
 		{
 			data::ValuePtr<int32_t> inner( ( int32_t * )calloc( 5, sizeof( int32_t ) ), 5, Deleter() );
 			// for now we have only one ValuePtr referencing the data
@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_CASE( typePtr_splice_test )
 {
 	Deleter::deleted = false;
 	{
-		std::vector<data::TypePtrReference> outer;
+		std::vector<data::ValuePtrReference> outer;
 		{
 			data::ValuePtr<int32_t> inner( ( int32_t * )calloc( 5, sizeof( int32_t ) ), 5, Deleter() );
 			// for now we have only one pointer referencing the data

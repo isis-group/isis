@@ -33,23 +33,23 @@ enum autoscaleOption {noscale, autoscale, noupscale, upscale};
 typedef std::pair<util::TypeReference, util::TypeReference> scaling_pair;
 namespace _internal
 {
-class TypePtrBase;
-class TypePtrConverterBase
+class ValuePtrBase;
+class ValuePtrConverterBase
 {
 public:
-	virtual void convert( const TypePtrBase &src, TypePtrBase &dst, const scaling_pair &scaling )const;
-	virtual void generate( const TypePtrBase &src, boost::scoped_ptr<TypePtrBase>& dst, const scaling_pair &scaling )const = 0;
-	virtual void create( boost::scoped_ptr<TypePtrBase>& dst, size_t len )const = 0;
+	virtual void convert( const ValuePtrBase &src, ValuePtrBase &dst, const scaling_pair &scaling )const;
+	virtual void generate( const ValuePtrBase &src, boost::scoped_ptr<ValuePtrBase>& dst, const scaling_pair &scaling )const = 0;
+	virtual void create( boost::scoped_ptr<ValuePtrBase>& dst, size_t len )const = 0;
 	virtual scaling_pair getScaling( const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale )const = 0;
-	static boost::shared_ptr<const TypePtrConverterBase> get() {return boost::shared_ptr<const TypePtrConverterBase>();}
+	static boost::shared_ptr<const ValuePtrConverterBase> get() {return boost::shared_ptr<const ValuePtrConverterBase>();}
 public:
-	virtual ~TypePtrConverterBase() {}
+	virtual ~ValuePtrConverterBase() {}
 };
 
-class TypePtrConverterMap : public std::map< int , std::map<int, boost::shared_ptr<const TypePtrConverterBase> > >
+class ValuePtrConverterMap : public std::map< int , std::map<int, boost::shared_ptr<const ValuePtrConverterBase> > >
 {
 public:
-	TypePtrConverterMap();
+	ValuePtrConverterMap();
 };
 
 }
