@@ -239,11 +239,11 @@ public:
 
 		return boost::lexical_cast<std::string>( m_len ) + "#" + ret;
 	}
-	/// @copydoc util::Value::typeName
+	/// @copydoc util::Value::getTypeName
 	virtual std::string getTypeName()const {
 		return staticName();
 	}
-	/// @copydoc util::Value::typeID
+	/// @copydoc util::Value::getTypeID
 	virtual unsigned short getTypeID()const {
 		return staticID;
 	}

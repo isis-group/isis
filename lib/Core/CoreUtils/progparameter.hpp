@@ -85,7 +85,7 @@ public:
 	///returns true for hidden parameters, false otherwise
 	bool isHidden()const;
 
-	///\copydoc hidden
+	///\copydoc isHidden
 	bool &hidden();
 };
 

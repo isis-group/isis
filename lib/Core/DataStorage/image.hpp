@@ -222,7 +222,8 @@ public:
 	 * (run join on copies of them using the image as parameter to insert all non-unique-metadata).
 	 */
 	std::vector<boost::shared_ptr<Chunk> > getChunksAsVector();
-	/// \copydoc getChunkList
+
+	/// \copydoc getChunksAsVector
 	std::vector<boost::shared_ptr<const Chunk> > getChunksAsVector()const;
 
 	/**
@@ -373,7 +374,6 @@ public:
 	 * Run a functor with the base VoxelOp on every cunk in the image.
 	 * This does not check the types of the images. So if your functor needs a specific type, use TypedImage.
 	 * \param op a functor object which inherits ChunkOp
-	 * \param copyMetaData if true the metadata of the image are copied into the chunks before calling the functor
 	 */
 	template <typename TYPE> size_t foreachVoxel( Chunk::VoxelOp<TYPE> &op ) {
 		class _proxy: public ChunkOp
