@@ -182,6 +182,13 @@ public:
 	this_class operator*( const TYPE &src )const {return binaryOp<std::multiplies<TYPE> >( src );}
 	this_class operator/( const TYPE &src )const {return binaryOp<std::divides<TYPE>    >( src );}
 
+	///\returns a negated copy
+	const this_class negate()const{
+		this_class ret=*this;
+		ret.unaryOp<std::negate<float> >();
+		return ret;
+	}
+
 	/**
 	 * Get the inner product.
 	 * \returns \f$ \overrightarrow{this} \cdot \overrightarrow{src}  = \sum_{i=0}^{SIZE-1} {this_i * src_i} \f$
@@ -313,7 +320,7 @@ typedef vector4<int32_t> ivector4;
 template<typename TYPE, size_t SIZE, typename CONTAINER >
 ::isis::util::FixedVector<TYPE, SIZE, CONTAINER> operator-( const ::isis::util::FixedVector<TYPE, SIZE, CONTAINER>& s )
 {
-	return s.isis::util::FixedVector<TYPE, SIZE, CONTAINER>::template unaryOp<std::negate<float> >();
+	return s.negate();
 }
 
 /// Streaming output for FixedVector
