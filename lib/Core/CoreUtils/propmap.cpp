@@ -280,8 +280,8 @@ void PropertyMap::diffTree( const PropertyMap &other, PropertyMap::DiffMap &ret,
 				const PropertyMap &refMap = second.getBranch();
 				thisMap.diffTree( refMap, ret, pathname + "/" );
 			} else if ( ! ( first == second )  ) { // if they are not equal
-				const TypeValue firstVal = first.is_leaf() ? first.getLeaf() : TypeValue( Type<std::string>( first.toString() ) );
-				const TypeValue secondVal = second.is_leaf() ? second.getLeaf() : TypeValue( Type<std::string>( second.toString() ) );
+				const TypeValue firstVal = first.is_leaf() ? first.getLeaf() : TypeValue( Value<std::string>( first.toString() ) );
+				const TypeValue secondVal = second.is_leaf() ? second.getLeaf() : TypeValue( Value<std::string>( second.toString() ) );
 				ret.insert( // add (propertyname|(value1|value2))
 					ret.end(),      // we know it has to be at the end
 					std::make_pair(
@@ -291,7 +291,7 @@ void PropertyMap::diffTree( const PropertyMap &other, PropertyMap::DiffMap &ret,
 				);
 			}
 		} else { // if ref is not in the other map
-			const TypeValue firstVal = thisIt->second.is_leaf() ? thisIt->second.getLeaf() : TypeValue( Type<std::string>( thisIt->second.toString() ) );
+			const TypeValue firstVal = thisIt->second.is_leaf() ? thisIt->second.getLeaf() : TypeValue( Value<std::string>( thisIt->second.toString() ) );
 			ret.insert( // add (propertyname|(value1|[empty]))
 				ret.end(),      // we know it has to be at the end
 				std::make_pair(
@@ -309,7 +309,7 @@ void PropertyMap::diffTree( const PropertyMap &other, PropertyMap::DiffMap &ret,
 		const propPath::value_type pathname = prefix + otherIt->first;
 
 		if ( ! _internal::continousFind( thisIt, end(), *otherIt, value_comp() ) ) { //there is nothing in this which has the same key as ref
-			const TypeValue secondVal = otherIt->second.is_leaf() ? otherIt->second.getLeaf() : TypeValue( Type<std::string>( otherIt->second.toString() ) );
+			const TypeValue secondVal = otherIt->second.is_leaf() ? otherIt->second.getLeaf() : TypeValue( Value<std::string>( otherIt->second.toString() ) );
 			ret.insert(
 				std::make_pair( // add (propertyname|([empty]|value2))
 					pathname,

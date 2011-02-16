@@ -336,7 +336,7 @@ int IOFactory::loadPath( std::list<Chunk> &ret, const boost::filesystem::path &p
 
 	if( m_feedback ) {
 		const size_t length = std::distance( boost::filesystem::directory_iterator( path ), boost::filesystem::directory_iterator() ); //@todo this will also count directories
-		m_feedback->show( length, std::string( "Reading " ) + util::Type<std::string>( length ).toString( false ) + " files from " + path.file_string() );
+		m_feedback->show( length, std::string( "Reading " ) + util::Value<std::string>( length ).toString( false ) + " files from " + path.file_string() );
 	}
 
 	for ( boost::filesystem::directory_iterator i( path ); i != boost::filesystem::directory_iterator(); ++i )  {

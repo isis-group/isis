@@ -53,7 +53,7 @@ public:
 		} else if ( boost::iequals( type, "selection" ) ) {
 			internAddParameter<isis::util::Selection>( name, value, type );
 		} else {
-			LOG( Runtime, error ) << "Type " << type << " is not registered.";
+			LOG( Runtime, error ) << "Value " << type << " is not registered.";
 		}
 	}
 	
@@ -89,7 +89,7 @@ private:
 	PyObject *self;
 	template<typename TYPE>
 	void internAddParameter ( const std::string name, PyObject *value, std::string type ) {
-		util::Type<TYPE> val( static_cast<TYPE>( boost::python::extract<TYPE>( value ) ) );
+		util::Value<TYPE> val( static_cast<TYPE>( boost::python::extract<TYPE>( value ) ) );
 		//      if(!type.empty()) {
 		//          val.copyToNewByID( util::getTransposedTypeMap(true, true)[type] );
 		//      }

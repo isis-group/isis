@@ -40,7 +40,7 @@ bool &ProgParameter::hidden()
 	return m_hidden;
 }
 
-bool ProgParameter::parse( const Type<std::string> &props )
+bool ProgParameter::parse( const Value<std::string> &props )
 {
 	_internal::TypeBase &me = **this;
 	bool ret = false;
@@ -126,7 +126,7 @@ ProgParameter::operator boost::scoped_ptr<_internal::TypeBase>::unspecified_bool
 {
 	boost::scoped_ptr<_internal::TypeBase> dummy;
 
-	if( ( *this )->castTo<bool>() )dummy.reset( new Type<int16_t> );
+	if( ( *this )->castTo<bool>() )dummy.reset( new Value<int16_t> );
 
 	return  dummy;
 }

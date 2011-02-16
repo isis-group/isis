@@ -29,14 +29,14 @@ namespace util
 {
 
 /*
- * Define types for the Type<>-System here.
+ * Define types for the Value<>-System here.
  * There must be a streaming output available for every type used here.
  * template<typename charT, typename traits,typename TYPE > basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits> &out,const TYPE& s)
  */
 
 
 #define DEF_TYPE(TYPE,NAME)  \
-	template<> const char Type<TYPE>::m_typeName[]=#NAME;
+	template<> const char Value<TYPE>::m_typeName[]=#NAME;
 
 DEF_TYPE( bool, boolean );
 
@@ -78,7 +78,7 @@ struct type_lister {
 	bool m_withTypes, m_withTypePtrs;
 	type_lister( std::map< unsigned short, std::string > &map, bool withTypes, bool withTypePtrs ): m_map( map ), m_withTypes( withTypes ), m_withTypePtrs( withTypePtrs ) {}
 	template<typename SRC> void operator()( SRC ) {//will be called by the mpl::for_each
-		if( m_withTypes )m_map.insert( std::make_pair( Type<SRC>::staticID, Type<SRC>::staticName() ) );
+		if( m_withTypes )m_map.insert( std::make_pair( Value<SRC>::staticID, Value<SRC>::staticName() ) );
 
 		if( m_withTypePtrs )m_map.insert( std::make_pair( data::TypePtr<SRC>::staticID, data::TypePtr<SRC>::staticName() ) );
 	}

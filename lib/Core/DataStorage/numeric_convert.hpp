@@ -194,7 +194,7 @@ getNumericScaling( const util::_internal::TypeBase &min, const util::_internal::
 	bool doScale = ( scaleopt != noscale && std::numeric_limits<DST>::is_integer ); //only do scale if scaleopt!=noscale and the target is an integer (scaling into float is useless)
 
 	if ( scaleopt == autoscale && std::numeric_limits<SRC>::is_integer ) {
-		LOG( Debug, verbose_info ) << "Won't upscale, because the source datatype is discrete (" << util::Type<SRC>::staticName() << ")";
+		LOG( Debug, verbose_info ) << "Won't upscale, because the source datatype is discrete (" << util::Value<SRC>::staticName() << ")";
 		scaleopt = noupscale; //dont scale up if SRC is an integer
 	}
 

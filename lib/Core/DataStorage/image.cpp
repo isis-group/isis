@@ -194,7 +194,7 @@ bool Image::reIndex()
 	BOOST_FOREACH( const util::PropertyMap::KeyType & ref, vectors ) {
 		if ( hasProperty( ref ) ) {
 			util::TypeValue &prop = propertyValue( ref );
-			LOG_IF( !prop->is<util::fvector4>(), Debug, error ) << "Using " << prop->getTypeName() << " as " << util::Type<util::fvector4>::staticName();
+			LOG_IF( !prop->is<util::fvector4>(), Debug, error ) << "Using " << prop->getTypeName() << " as " << util::Value<util::fvector4>::staticName();
 			util::fvector4 &vec = prop->castTo<util::fvector4>();
 			LOG_IF( vec.len() == 0, Runtime, error )
 					<< "The existing " << ref << " " << vec << " has the length zero. Thats bad, because I'm going to normalize it.";
@@ -504,8 +504,8 @@ std::pair< util::TypeReference, util::TypeReference > Image::getScalingTo( short
 		}
 	}
 	return std::make_pair( //ok seems like no conversion is needed - return 1/0
-			   util::TypeReference( util::Type<uint8_t>( 1 ) ),
-			   util::TypeReference( util::Type<uint8_t>( 0 ) )
+			   util::TypeReference( util::Value<uint8_t>( 1 ) ),
+			   util::TypeReference( util::Value<uint8_t>( 0 ) )
 		   );
 }
 
@@ -598,7 +598,7 @@ unsigned short Image::getMajorTypeID() const
 	LOG( Debug, info ) << "Determining  datatype of image with the value range " << minmax;
 
 	if( minmax.first->getTypeID() == minmax.second->getTypeID() ) { // ok min and max are the same type - trivial case
-		return minmax.first->getTypeID() << 8; // btw: we do the shift, because min and max are Type - but we want the id's TypePtr
+		return minmax.first->getTypeID() << 8; // btw: we do the shift, because min and max are Value - but we want the id's TypePtr
 	} else if( minmax.first->fitsInto( minmax.second->getTypeID() ) ) { // if min fits into the type of max, use that
 		return minmax.second->getTypeID() << 8; //@todo maybe use a global static function here instead of a obscure shit operation
 	} else if( minmax.second->fitsInto( minmax.first->getTypeID() ) ) { // if max fits into the type of min, use that

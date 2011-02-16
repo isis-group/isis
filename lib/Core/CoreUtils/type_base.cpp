@@ -98,7 +98,7 @@ TypeBase::Reference TypeBase::copyToNewByID( short unsigned int ID ) const
 			break;
 		}
 
-		return *to; // return the generated Type-Object - wrapping it into Reference
+		return *to; // return the generated Value-Object - wrapping it into Reference
 	} else {
 		LOG( Runtime, error )
 				<< "I dont know any conversion from "

@@ -294,7 +294,7 @@ public:
 	 */
 	template<typename DST> bool transform( KeyType from, KeyType to, bool delSource = true ) {
 		check_type<DST>();
-		return transform( from, to, Type<DST>::staticID, delSource );
+		return transform( from, to, Value<DST>::staticID, delSource );
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////
@@ -322,7 +322,7 @@ public:
 		} else if( ret->is<T>() ) {
 			ret->castTo<T>() = val;
 		} else { // don't overwrite already set properties with a different type
-			LOG( Runtime, error ) << "Property " << MSubject( key ) << " is already set to " << MSubject( ret.toString( true ) ) << " won't override with " << MSubject( Type<T>( val ).toString( true ) );
+			LOG( Runtime, error ) << "Property " << MSubject( key ) << " is already set to " << MSubject( ret.toString( true ) ) << " won't override with " << MSubject( Value<T>( val ).toString( true ) );
 		}
 
 		return ret;
@@ -358,7 +358,7 @@ public:
 	 * Will send the name and the result of TypeValue->toString(label) to the given ostream.
 	 * Is equivalent to common streaming operation but has the option to print the type of the printed properties.
 	 * \param out the output stream to use
-	 * \param label print the type of the property (see Type::toString())
+	 * \param label print the type of the property (see Value::toString())
 	 */
 	std::ostream &print( std::ostream &out, bool label = false )const;
 };
@@ -459,7 +459,7 @@ template<typename T> T PropertyMap::getPropertyAs( const KeyType &key ) const
 			return ref->as<T>();
 	}
 
-	LOG( Debug, warning ) << "Returning " << Type<T>().toString( true ) << " because property " << key << " does not exist";
+	LOG( Debug, warning ) << "Returning " << Value<T>().toString( true ) << " because property " << key << " does not exist";
 	return T();
 }
 

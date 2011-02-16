@@ -35,26 +35,26 @@ int main()
 	IOFactory::get().load( "test.null", "dia2" );
 	IOFactory::get().load( "test.xxx", "" );//returns that plugin is missing
 	//  iUtil::DefaultMsgPrint::stopBelow(warning);
-	Type<float> float_0_5( 0.5 );//will implicitly convert the double to float
+	Value<float> float_0_5( 0.5 );//will implicitly convert the double to float
 	std::cout << "float_0_5.toString():" <<  float_0_5.toString() << std::endl;
-	::isis::util::_internal::TypeBase *mephisto = new Type<std::string>( "666" );
+	::isis::util::_internal::TypeBase *mephisto = new Value<std::string>( "666" );
 	int devil = mephisto->as<int>();
 	std::string lucifer = mephisto->as<std::string>();
 
 	try {
-		Type<short> short_0_5( ( float )float_0_5 ); // Will throw exception because conversion float->int is "bad"
-		//Type<short> short_0_5((short)float_0_5);//will be ok, because the float-value (which is returned from Type<float>::operator float() ) is implicitely casted to short
+		Value<short> short_0_5( ( float )float_0_5 ); // Will throw exception because conversion float->int is "bad"
+		//Value<short> short_0_5((short)float_0_5);//will be ok, because the float-value (which is returned from Value<float>::operator float() ) is implicitely casted to short
 		std::cout << "short_0_5.toString():" <<  short_0_5.toString( true ) << std::endl;
 	} catch ( boost::bad_lexical_cast & ) {
 		std::cout << "Whoops " << std::endl;
 	}
 
-	Type<int> i( 5 );
+	Value<int> i( 5 );
 	float f_ = i;
-	std::cout << "Type<int>(5) is " << i.toString( true ) << " float from that is " << f_ << std::endl;
-	Type<float> f( 5.4 );
-	int i_ = f;//this wont throw an exception because it only does an implizit conversions from Type<float>=>float and float=>int
-	std::cout << "Type<float>(5.4) is " << f.toString( true ) << " int from that is " << i_ << std::endl;
+	std::cout << "Value<int>(5) is " << i.toString( true ) << " float from that is " << f_ << std::endl;
+	Value<float> f( 5.4 );
+	int i_ = f;//this wont throw an exception because it only does an implizit conversions from Value<float>=>float and float=>int
+	std::cout << "Value<float>(5.4) is " << f.toString( true ) << " int from that is " << i_ << std::endl;
 	TypePtr<int> p( ( int * )calloc( 5, sizeof( int ) ), 5, isis::test::SpeakingDeleter( "Rolf" ) );
 	std::cout << "p.toString():" <<  p.toString() << std::endl;
 	const short x[] = {1, 2, 3, 4};

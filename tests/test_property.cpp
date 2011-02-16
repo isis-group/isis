@@ -23,7 +23,7 @@ int main( int argc, char *argv[] )
 	map2["Test1"] = 6.4;
 
 	if ( map2["Test1"] == 6.4 ) {
-		std::cout << map2["Test1"]->toString( true ) <<  " ist gleich " << Type<double>( 6.4 ).toString() << std::endl;
+		std::cout << map2["Test1"]->toString( true ) <<  " ist gleich " << Value<double>( 6.4 ).toString() << std::endl;
 	}
 
 	map2["Test2"] = 6;

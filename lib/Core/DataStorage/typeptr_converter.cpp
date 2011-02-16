@@ -101,8 +101,8 @@ public:
 	virtual scaling_pair getScaling( const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale )const {
 		//as we're just copying - its 1/0
 		return std::make_pair(
-				   util::TypeReference( util::Type<uint8_t>( 1 ) ),
-				   util::TypeReference( util::Type<uint8_t>( 0 ) )
+				   util::TypeReference( util::Value<uint8_t>( 1 ) ),
+				   util::TypeReference( util::Value<uint8_t>( 0 ) )
 			   );
 	}
 	virtual ~TypePtrConverter() {}
@@ -137,8 +137,8 @@ public:
 	scaling_pair getScaling( const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale )const {
 		const std::pair<double, double> scale = getNumericScaling<SRC, DST>( min, max, scaleopt );
 		return std::make_pair(
-				   util::TypeReference( util::Type<double>( scale.first ) ),
-				   util::TypeReference( util::Type<double>( scale.second ) )
+				   util::TypeReference( util::Value<double>( scale.first ) ),
+				   util::TypeReference( util::Value<double>( scale.second ) )
 			   );
 	}
 	virtual ~TypePtrConverter() {}

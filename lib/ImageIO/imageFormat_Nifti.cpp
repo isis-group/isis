@@ -129,8 +129,8 @@ public:
 
 		// TODO: at the moment scaling not supported due to data type changes
 		if ( 1.0 != scale ) {
-			//          throwGenericError( std::string( "Scaling is not supported at the moment. Scale Factor: " ) + util::Type<float>( scale ).toString() );
-			LOG( ImageIoDebug, warning ) << "Scaling is not supported at the moment. Scale Factor: "  + util::Type<float>( scale ).toString();
+			//          throwGenericError( std::string( "Scaling is not supported at the moment. Scale Factor: " ) + util::Value<float>( scale ).toString() );
+			LOG( ImageIoDebug, warning ) << "Scaling is not supported at the moment. Scale Factor: "  + util::Value<float>( scale ).toString();
 		}
 
 		LOG( ImageIoDebug, isis::info ) << "datatype to load from nifti " << ni->datatype;
@@ -162,7 +162,7 @@ public:
 			retList.push_back(_internal::NiftiChunk( static_cast<double *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
 			break;
 		default:
-			throwGenericError( std::string( "Unsupported datatype " ) + util::Type<int>( ni->datatype ).toString() );
+			throwGenericError( std::string( "Unsupported datatype " ) + util::Value<int>( ni->datatype ).toString() );
 		}
 
 		// don't forget to take the properties with

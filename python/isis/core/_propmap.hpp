@@ -53,7 +53,7 @@ public:
 		} else if ( boost::iequals( type, "selection" ) ) {
 			internSetProperty<isis::util::Selection>( key, value, type );
 		} else {
-			LOG( Runtime, error ) << "Type " << type << " is not registered.";
+			LOG( Runtime, error ) << "Value " << type << " is not registered.";
 		}
 	}
 
@@ -61,7 +61,7 @@ private:
 	PyObject *self;
 	template<typename TYPE>
 	void internSetProperty ( const util::istring key, PyObject *value, std::string type ) {
-		util::Type<TYPE> val( static_cast<TYPE>( boost::python::extract<TYPE>( value ) ) );
+		util::Value<TYPE> val( static_cast<TYPE>( boost::python::extract<TYPE>( value ) ) );
 		val.copyToNewByID( util::getTransposedTypeMap( true, true )[type] );
 		this->setPropertyAs<TYPE>( key, val );
 	}

@@ -34,7 +34,7 @@ namespace _internal
 {
 template<typename T, bool isNumber> struct getMinMaxImpl {
 	std::pair<T, T> operator()( const TypePtr<T> &ref ) const {
-		LOG( Debug, error ) << "min/max comparison of " << util::Type<T>::staticName() << " is not supportet";
+		LOG( Debug, error ) << "min/max comparison of " << util::Value<T>::staticName() << " is not supportet";
 		return std::pair<T, T>();
 	}
 };
@@ -65,7 +65,7 @@ template<typename T> struct getMinMaxImpl<T, true> {
 template<typename TYPE> class TypePtr: public _internal::TypePtrBase
 {
 	boost::shared_ptr<TYPE> m_val;
-	template<typename T> TypePtr( const util::Type<T>& value ); // Dont do this
+	template<typename T> TypePtr( const util::Value<T>& value ); // Dont do this
 protected:
 	TypePtrBase *clone() const {
 		return new TypePtr( *this );
@@ -224,7 +224,7 @@ public:
 		return ret;
 	}
 
-	/// @copydoc util::Type::toString
+	/// @copydoc util::Value::toString
 	virtual std::string toString( bool labeled = false )const {
 		std::string ret;
 
@@ -232,24 +232,24 @@ public:
 			const TYPE *ptr = m_val.get();
 
 			for ( size_t i = 0; i < m_len - 1; i++ )
-				ret += util::Type<TYPE>( ptr[i] ).toString( false ) + "|";
+				ret += util::Value<TYPE>( ptr[i] ).toString( false ) + "|";
 
-			ret += util::Type<TYPE>( ptr[m_len-1] ).toString( labeled );
+			ret += util::Value<TYPE>( ptr[m_len-1] ).toString( labeled );
 		}
 
 		return boost::lexical_cast<std::string>( m_len ) + "#" + ret;
 	}
-	/// @copydoc util::Type::typeName
+	/// @copydoc util::Value::typeName
 	virtual std::string getTypeName()const {
 		return staticName();
 	}
-	/// @copydoc util::Type::typeID
+	/// @copydoc util::Value::typeID
 	virtual unsigned short getTypeID()const {
 		return staticID;
 	}
-	/// @copydoc util::Type::staticName
+	/// @copydoc util::Value::staticName
 	static std::string staticName() {
-		return std::string( util::Type<TYPE>::staticName() ) + "*";
+		return std::string( util::Value<TYPE>::staticName() ) + "*";
 	}
 
 	/**
@@ -286,7 +286,7 @@ public:
 			std::pair<util::TypeReference, util::TypeReference>();
 		}
 
-		const std::pair<util::Type<TYPE>, util::Type<TYPE> > result = _internal::getMinMaxImpl<TYPE, boost::is_arithmetic<TYPE>::value>()( *this );
+		const std::pair<util::Value<TYPE>, util::Value<TYPE> > result = _internal::getMinMaxImpl<TYPE, boost::is_arithmetic<TYPE>::value>()( *this );
 
 		return std::make_pair( util::TypeReference( result.first ), util::TypeReference( result.second ) );
 	}

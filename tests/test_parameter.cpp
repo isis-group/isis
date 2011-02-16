@@ -19,5 +19,5 @@ int main( int argc, char **argv )
 	std::cout << "Selection: " << app.parameters["select"].toString() << std::endl;
 	std::cout << "The dump file: " << app.parameters["dump"].toString() << std::endl;
 	std::cout << "The offset as parameter:" << app.parameters["offset"] << std::endl; //prints as ProgParameter
-	std::cout << "The offset as Type:" << app.parameters["offset"].toString( true ) << std::endl; //prints as string from TypeBase::toString
+	std::cout << "The offset as Value:" << app.parameters["offset"].toString( true ) << std::endl; //prints as string from TypeBase::toString
 }

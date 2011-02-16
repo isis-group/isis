@@ -30,7 +30,7 @@ namespace isis
 namespace data {template<typename TYPE> class TypePtr;}
 namespace util
 {
-template<typename TYPE> class Type;
+template<typename TYPE> class Value;
 
 namespace _internal
 {
@@ -65,7 +65,7 @@ public:
 };
 
 /**
- * Base class to store and handle references to Type and TypePtr objects.
+ * Base class to store and handle references to Value and TypePtr objects.
  * The values are refernced as smart pointers to their base class.
  * So the references are counted and data are automatically deleted if necessary.
  * The usual dereferencing pointer interface ("*" and "->") is supported.
@@ -74,8 +74,8 @@ public:
  */
 template<typename TYPE_TYPE> class TypeReference: protected boost::scoped_ptr<TYPE_TYPE>
 {
-	template<typename TT> friend class data::TypePtr; //allow Type and TypePtr to use the protected contructor below
-	template<typename TT> friend class Type;
+	template<typename TT> friend class data::TypePtr; //allow Value and TypePtr to use the protected contructor below
+	template<typename TT> friend class Value;
 protected:
 	//dont use this directly
 	TypeReference( TYPE_TYPE *t ): boost::scoped_ptr<TYPE_TYPE>( t ) {}
@@ -87,7 +87,7 @@ public:
 	TypeReference() {}
 	/**
 	* Copy constructor
-	* This operator creates a copy of the referenced Type-Object.
+	* This operator creates a copy of the referenced Value-Object.
 	* So its NO cheap copy. (At least not if the copy-operator contained type is not cheap)
 	*/
 	TypeReference( const TypeReference &src ) {

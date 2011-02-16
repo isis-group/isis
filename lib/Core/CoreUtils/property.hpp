@@ -44,16 +44,16 @@ public:
 	/**
 	 * Default constructor.
 	 * Creates and stores a value from any known type.
-	 * If the type is not known (there is no Type\<type\> available) an compiler error will be raised.
+	 * If the type is not known (there is no Value\<type\> available) an compiler error will be raised.
 	 * \param ref the value to be stored
 	 * \param _needed flag if this TypeValue is needed an thus not allowed to be empty (a.k.a. undefined)
 	 */
 	template<typename T> TypeValue( const T &ref, bool _needed = false ):
-		TypeReference( new Type<T>( ref ) ), m_needed( _needed ) {
+		TypeReference( new Value<T>( ref ) ), m_needed( _needed ) {
 		check_type<T>();
 	}
-	template<typename T> TypeValue( const Type<T>& ref, bool _needed = false ):
-		TypeReference( new Type<T>( ref ) ), m_needed( _needed ) {
+	template<typename T> TypeValue( const Value<T>& ref, bool _needed = false ):
+		TypeReference( new Value<T>( ref ) ), m_needed( _needed ) {
 		check_type<T>();
 	}
 	/**
@@ -87,9 +87,9 @@ public:
 	 */
 	bool operator !=( const TypeValue &second )const;
 	/**
-	 * Equality to another Type-Object (this cannot be empty but TypeValue can).
-	 * Properties are ONLY equal to Type-Object if:
-	 * - the property and the Type-Object contain the same value type T
+	 * Equality to another Value-Object (this cannot be empty but TypeValue can).
+	 * Properties are ONLY equal to Value-Object if:
+	 * - the property and the Value-Object contain the same value type T
 	 * - both stored values are equal
 	 * \returns true if both contain the same value of type T, false otherwise.
 	 */
@@ -113,8 +113,8 @@ public:
 			return second == cmp; //compare our values
 		} else if ( ! isEmpty() ) { // otherwise try to make me T and compare that
 			LOG( Debug, info )
-					<< *this << " is not " << Type<T>::staticName() << " trying to convert.";
-			TypeReference dst = ( *this )->copyToNewByID( Type<T>::staticID );
+					<< *this << " is not " << Value<T>::staticName() << " trying to convert.";
+			TypeReference dst = ( *this )->copyToNewByID( Value<T>::staticID );
 
 			if ( !dst.isEmpty() )
 				return dst->castTo<T>() == second;

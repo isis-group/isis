@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE ( imageUniqueName )
 	// @todo this needs an actual io-plugin
 	/*  std::list<std::string> names=image_io::FileFormat::makeUniqueFilenames(images,"/tmp/S{acquisitionNumber}.nii");
 	    BOOST_FOREACH(const std::string &ref,names){
-	        BOOST_REQUIRE_EQUAL(ref,std::string("/tmp/S.nii").insert(6,util::Type<uint32_t>(number++).toString(false)));
+	        BOOST_REQUIRE_EQUAL(ref,std::string("/tmp/S.nii").insert(6,util::Value<uint32_t>(number++).toString(false)));
 	    }*/
 }
 

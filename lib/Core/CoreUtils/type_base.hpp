@@ -36,15 +36,15 @@ namespace _internal
 {
 /// @cond _hidden
 template<typename TYPE> struct __cast_to {
-	template<typename SOURCE> TYPE operator()( Type<TYPE> *dest, const SOURCE &value ) {
+	template<typename SOURCE> TYPE operator()( Value<TYPE> *dest, const SOURCE &value ) {
 		return boost::lexical_cast<TYPE>( value ); //generic version types are different - so do lexical cast
 	}
-	TYPE operator()( Type<TYPE> *dest, const TYPE &value ) {
+	TYPE operator()( Value<TYPE> *dest, const TYPE &value ) {
 		return value; //special version types are same - so just return the value
 	}
 };
 template<> struct __cast_to<uint8_t> { // we cannot lexical_cast to uint8_t - we'll get "characters" (1 => '1' == 49)
-	template<typename SOURCE> uint8_t operator()( Type<uint8_t> *dest, const SOURCE &value ) {
+	template<typename SOURCE> uint8_t operator()( Value<uint8_t> *dest, const SOURCE &value ) {
 		// have to check by hand because the lexical cast will only check against unsigned short
 		if( value > std::numeric_limits<uint8_t>::max() ) {
 			throw boost::bad_lexical_cast( typeid( SOURCE ), typeid( uint8_t ) );
@@ -53,7 +53,7 @@ template<> struct __cast_to<uint8_t> { // we cannot lexical_cast to uint8_t - we
 		// lexical cast to unsigned short and then static_cast to uint8_t
 		return static_cast<uint8_t>( boost::lexical_cast<unsigned short>( value ) );
 	}
-	uint8_t operator()( Type<uint8_t> *dest, const uint8_t &value ) {
+	uint8_t operator()( Value<uint8_t> *dest, const uint8_t &value ) {
 		return value; //special version types are same - so just return the value
 	}
 };
@@ -72,9 +72,9 @@ class TypeBase : public GenericType
 protected:
 	/**
 	* Create a copy of this.
-	* Creates a new Type/TypePtr an stores a copy of its value there.
+	* Creates a new Value/TypePtr an stores a copy of its value there.
 	* Makes TypeBase-pointers copyable without knowing their type.
-	* \returns a TypeBase-pointer to a newly created Type/TypePtr.
+	* \returns a TypeBase-pointer to a newly created Value/TypePtr.
 	*/
 	virtual TypeBase *clone()const = 0;
 public:
@@ -86,11 +86,11 @@ public:
 	const Converter &getConverterTo( unsigned short ID )const;
 
 	/**
-	 * Convert the content of one Type to another.
-	 * This will use the automatic conversion system to transform the value one Type-Object into another.
+	 * Convert the content of one Value to another.
+	 * This will use the automatic conversion system to transform the value one Value-Object into another.
 	 * The types of both objects can be unknown.
-	 * \param from the Type-object containing the value which should be converted
-	 * \param to the Type-object which will contain the converted value if conversion was successfull
+	 * \param from the Value-object containing the value which should be converted
+	 * \param to the Value-object which will contain the converted value if conversion was successfull
 	 * \returns false if the conversion failed for any reason, true otherwise
 	 */
 	static bool convert( const TypeBase &from, TypeBase &to );
@@ -99,13 +99,13 @@ public:
 	* Interpret the value as value of any (other) type.
 	* This is a runtime-based cast via automatic conversion.
 	* \code
-	* TypeBase *mephisto=new Type<std::string>("666");
+	* TypeBase *mephisto=new Value<std::string>("666");
 	* int devil=mephisto->as<int>();
 	* \endcode
-	* If you know the type of source and destination at compile time you should use Type\<DEST_TYPE\>((SOURCE_TYPE)src).
+	* If you know the type of source and destination at compile time you should use Value\<DEST_TYPE\>((SOURCE_TYPE)src).
 	* \code
-	* Type<std::string> mephisto("666");
-	* Type<int> devil((std::string)devil);
+	* Value<std::string> mephisto("666");
+	* Value<int> devil((std::string)devil);
 	* \endcode
 	* \return value of any requested type parsed from toString(false).
 	*/
@@ -113,24 +113,24 @@ public:
 		if( is<T>() )
 			return castTo<T>();
 
-		Reference ret = copyToNewByID( Type<T>::staticID );
+		Reference ret = copyToNewByID( Value<T>::staticID );
 
 		if ( ret.isEmpty() ) {
 			LOG( Debug, error )
-					<< "Interpretation of " << toString( true ) << " as " << Type<T>::staticName()
-					<< " failed. Returning " << Type<T>().toString() << ".";
+					<< "Interpretation of " << toString( true ) << " as " << Value<T>::staticName()
+					<< " failed. Returning " << Value<T>().toString() << ".";
 			return T();
 		} else
 			return ret->castTo<T>();
 	}
 
 	/**
-	 * Dynamically cast the TypeBase down to its actual Type\<T\>. Constant version.
+	 * Dynamically cast the TypeBase down to its actual Value\<T\>. Constant version.
 	 * Will throw std::bad_cast if T is not the actual type.
 	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
-	 * \returns a constant reference of the Type\<T\> object.
+	 * \returns a constant reference of the Value\<T\> object.
 	 */
-	template<typename T> const Type<T>& castToType() const;
+	template<typename T> const Value<T>& castToType() const;
 
 	/**
 	 * Dynamically cast the TypeBase up to its actual value of type T. Constant version.
@@ -141,12 +141,12 @@ public:
 	template<typename T> const T &castTo() const;
 
 	/**
-	 * Dynamically cast the TypeBase up to its actual Type\<T\>. Referenced version.
+	 * Dynamically cast the TypeBase up to its actual Value\<T\>. Referenced version.
 	 * Will throw std::bad_cast if T is not the actual type.
 	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
-	 * \returns a reference of the Type\<T\> object.
+	 * \returns a reference of the Value\<T\> object.
 	 */
-	template<typename T> Type<T>& castToType();
+	template<typename T> Value<T>& castToType();
 
 	/**
 	 * Dynamically cast the TypeBase up to its actual value of type T. Referenced version.
@@ -184,13 +184,13 @@ typedef _internal::TypeBase::Reference TypeReference;
 
 namespace std
 {
-/// Streaming output for Type - classes
+/// Streaming output for Value - classes
 template<typename charT, typename traits> basic_ostream<charT, traits>&
 operator<<( basic_ostream<charT, traits> &out, const isis::util::_internal::GenericType &s )
 {
 	return out << s.toString();
 }
-/// /// Streaming output for Type referencing classes
+/// /// Streaming output for Value referencing classes
 template<typename charT, typename traits, typename TYPE_TYPE> basic_ostream<charT, traits>&
 operator<<( basic_ostream<charT, traits> &out, const isis::util::_internal::TypeReference<TYPE_TYPE> &s )
 {

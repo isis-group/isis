@@ -61,14 +61,14 @@ public:
 	 * \param props the value as string written on commandline to be put into this parameter
 	 * \return true if parsing was succesful, false otherwise
 	 */
-	bool parse( const isis::util::Type< std::string >& props );
+	bool parse( const isis::util::Value< std::string >& props );
 	/// \return the description string
 	const std::string &description()const;
 	/* set the description string
 	*  \param desc description to be set */
 	void setDescription( const std::string &desc );
 	/**
-	 * Implicit cast to Type T.
+	 * Implicit cast to Value T.
 	 * If the parameter does not contain T, a rutime error will be raised
 	 */
 	template<typename T> operator const T()const {
