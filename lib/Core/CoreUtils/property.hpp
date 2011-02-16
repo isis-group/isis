@@ -65,7 +65,7 @@ public:
 	/// returns true if TypeValue is marked as needed, false otherwise
 	bool &needed();
 	///\copydoc needed
-	bool needed()const;
+	bool isNeeded ()const;
 
 	/**
 	 * Equality to another TypeValue.

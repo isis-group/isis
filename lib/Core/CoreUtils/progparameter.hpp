@@ -96,10 +96,10 @@ public:
 class ParameterMap: public std::map<std::string, ProgParameter>
 {
 	struct neededP {
-		bool operator()( const_reference ref )const {return ref.second.needed();}
+		bool operator()( const_reference ref )const {return ref.second.isNeeded();}
 	};
 	struct notneededP {
-		bool operator()( const_reference ref )const {return !ref.second.needed();}
+		bool operator()( const_reference ref )const {return !ref.second.isNeeded();}
 	};
 	struct hiddenP {
 		bool operator()( const_reference ref )const {return ref.second.isHidden();}
@@ -154,7 +154,7 @@ operator<<( basic_ostream<charT, traits> &out, const isis::util::ProgParameter &
 	assert( !s.isEmpty() );
 	out << "default=\"" << s.toString( false ) << "\", type=" << s->typeName();
 
-	if ( s.needed() )out << " (needed)";
+	if ( s.isNeeded() )out << " (needed)";
 
 	return out;
 }

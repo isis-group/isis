@@ -317,7 +317,7 @@ public:
 		TypeValue &ret = propertyValue( key );
 
 		if( ret.isEmpty() ) {
-			const bool needed = ret.needed();
+			const bool needed = ret.isNeeded();
 			( ret = val ).needed() = needed;
 		} else if( ret->is<T>() ) {
 			ret->castTo<T>() = val;

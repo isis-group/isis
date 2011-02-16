@@ -18,7 +18,7 @@ namespace util
 {
 
 bool &TypeValue::needed() { return m_needed;}
-bool TypeValue::needed()const { return m_needed;}
+bool TypeValue::isNeeded()const { return m_needed;}
 
 
 bool TypeValue::operator== ( const util::TypeValue &second )const

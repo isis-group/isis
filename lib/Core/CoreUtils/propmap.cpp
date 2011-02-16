@@ -231,7 +231,7 @@ bool PropertyMap::remove( const isis::util::PropertyMap &removeMap, bool keep_ne
 					LOG( Debug, warning ) << "Not deleting branch " << MSubject( thisIt->first ) << " because its no subtree in the removal map";
 					ret = false;
 				}
-			} else if( !( thisIt->second.getLeaf().needed() && keep_needed ) ) { // this is a leaf
+			} else if( !( thisIt->second.getLeaf().isNeeded() && keep_needed ) ) { // this is a leaf
 				erase( thisIt++ ); // so delete this (they are equal - kind of)
 			}
 		}
@@ -328,7 +328,7 @@ void PropertyMap::removeEqual ( const util::PropertyMap &other, bool removeNeede
 	for ( const_iterator otherIt = other.begin(); otherIt != other.end(); otherIt++ ) {
 		//find the closest match for otherIt->first in this (use the value-comparison-functor of PropMap)
 		if ( continousFind( thisIt, end(), *otherIt, value_comp() ) ) { //thisIt->first == otherIt->first  - so its the same property
-			if ( ! removeNeeded && thisIt->second.getLeaf().needed() ) {//Skip needed
+			if ( ! removeNeeded && thisIt->second.getLeaf().isNeeded() ) {//Skip needed
 				thisIt++;
 				continue;
 			}
@@ -546,13 +546,13 @@ bool PropertyMap::trueP::operator()( const PropertyMap::value_type &ref ) const
 }
 bool PropertyMap::invalidP::operator()( const PropertyMap::value_type &ref ) const
 {
-	return ref.second.getLeaf().needed() && ref.second.getLeaf().isEmpty();
+	return ref.second.getLeaf().isNeeded() && ref.second.getLeaf().isEmpty();
 }
 bool PropertyMap::treeInvalidP::operator()( const PropertyMap::value_type &ref ) const
 {
 	if ( ref.second.is_leaf() ) {
 		const TypeValue &val = ref.second.getLeaf();
-		return val.needed() && val.isEmpty();
+		return val.isNeeded() && val.isEmpty();
 	} else  {
 		return ! ref.second.getBranch().isValid();
 	}
