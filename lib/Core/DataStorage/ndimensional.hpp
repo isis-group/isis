@@ -65,11 +65,11 @@ public:
 	 */
 	void init( const size_t d[DIMS] ) {
 		std::copy( d, d + DIMS, dim );
-		LOG_IF( volume() == 0, Runtime, error ) << "Creating object with volume of 0";
+		LOG_IF( getVolume() == 0, Runtime, error ) << "Creating object with volume of 0";
 	}
 	void init( const util::FixedVector<size_t, DIMS>& d ) {
 		d.copyTo( dim );
-		LOG_IF( volume() == 0, Runtime, error ) << "Creating object with volume of 0";
+		LOG_IF( getVolume() == 0, Runtime, error ) << "Creating object with volume of 0";
 	}
 	NDimensional( const NDimensional &src ) {//@todo default copier should do the job
 		init( src.dim );
@@ -93,7 +93,7 @@ public:
 	 * Get the size of the object in elements of TYPE.
 	 * \returns \f$ \prod_{i=0}^{DIMS-1} dimSize(i) \f$
 	 */
-	size_t volume()const {
+	size_t getVolume()const {
 		return __dimStride<DIMS>( dim );
 	}
 	///\returns the size of the object in the given dimension
@@ -128,7 +128,7 @@ public:
 		return ret;
 	}
 	util::FixedVector<float, DIMS> getFoV( const util::FixedVector<float, DIMS> &voxelSize, const util::FixedVector<float, DIMS> &voxelGap )const {
-		LOG_IF( volume() == 0, DataLog, warning ) << "Calculating FoV of empty data";
+		LOG_IF( getVolume() == 0, DataLog, warning ) << "Calculating FoV of empty data";
 		const util::FixedVector<size_t, DIMS> voxels = getSizeAsVector();
 		const util::fvector4 gapSize = voxelGap * ( voxels - 1 );
 		return voxelSize * voxels + gapSize;

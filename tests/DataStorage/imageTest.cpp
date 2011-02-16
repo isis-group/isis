@@ -120,7 +120,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		}
 
 		BOOST_REQUIRE( img2.reIndex() );
-		BOOST_CHECK_EQUAL( img2.volume(), nrRows * nrCols * nrTimesteps * nrSlices );
+		BOOST_CHECK_EQUAL( img2.getVolume(), nrRows * nrCols * nrTimesteps * nrSlices );
 		BOOST_CHECK_EQUAL( img2.getSizeAsVector(), util::ivector4( nrCols, nrRows, nrSlices, nrTimesteps ) );
 		// Check all dimensions with limit sizes
 		data::Image img3;
@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		}
 
 		BOOST_REQUIRE( img3.reIndex() );
-		BOOST_CHECK_EQUAL( img3.volume(), nrRows * nrCols * nrTimesteps * nrSlices );
+		BOOST_CHECK_EQUAL( img3.getVolume(), nrRows * nrCols * nrTimesteps * nrSlices );
 		BOOST_CHECK_EQUAL( img3.getSizeAsVector(), util::ivector4( nrCols, nrRows, nrSlices, nrTimesteps ) );
 		data::Image img4;
 		nrRows = 54;
@@ -165,7 +165,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		}
 
 		BOOST_REQUIRE( img4.reIndex() );
-		BOOST_CHECK_EQUAL( img4.volume(), nrRows * nrCols * nrTimesteps * nrSlices );
+		BOOST_CHECK_EQUAL( img4.getVolume(), nrRows * nrCols * nrTimesteps * nrSlices );
 		BOOST_CHECK_EQUAL( img4.getSizeAsVector(), util::ivector4( nrCols, nrRows, nrSlices, nrTimesteps ) );
 	}
 }
@@ -273,7 +273,7 @@ BOOST_AUTO_TEST_CASE ( image_chunk_test )
 		}
 
 	BOOST_REQUIRE( img.reIndex() );
-	BOOST_CHECK_EQUAL( img.volume(), 9 * 9 );
+	BOOST_CHECK_EQUAL( img.getVolume(), 9 * 9 );
 	BOOST_CHECK_EQUAL( img.getSizeAsVector(), util::ivector4( 3, 3, 3, 3 ) );
 	const data::Chunk &ref11 = img.getChunk( 0, 0, 0 );
 	const data::Chunk &ref12 = img.getChunk( 1, 1, 1 );

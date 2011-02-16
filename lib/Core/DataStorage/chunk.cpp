@@ -30,7 +30,7 @@ ChunkBase::ChunkBase ( size_t firstDim, size_t secondDim, size_t thirdDim, size_
 	const size_t idx[] = {firstDim, secondDim, thirdDim, fourthDim};
 	init( idx );
 	addNeededFromString( neededProperties );
-	LOG_IF( NDimensional<4>::volume() == 0, Debug, warning )
+	LOG_IF( NDimensional<4>::getVolume() == 0, Debug, warning )
 			<< "Size " << fourthDim << "|" << thirdDim << "|" << secondDim << "|" << firstDim << " is invalid";
 }
 
@@ -42,7 +42,7 @@ Chunk::Chunk( const TypePtrReference &src, size_t firstDim, size_t secondDim, si
 	_internal::ChunkBase( firstDim, secondDim, thirdDim, fourthDim ),
 	TypePtrReference( src )
 {
-	assert( ( *this )->length() == volume() );
+	assert( ( *this )->length() == getVolume() );
 }
 
 Chunk Chunk::cloneToNew( size_t firstDim, size_t secondDim, size_t thirdDim, size_t fourthDim )const

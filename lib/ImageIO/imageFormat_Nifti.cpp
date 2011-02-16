@@ -513,7 +513,7 @@ private:
 
 	template<typename T>
 	void copyDataToNifti( const data::Image &image, nifti_image &ni ) {
-		ni.data = malloc( image.getBytesPerVoxel() * image.volume() );
+		ni.data = malloc( image.getBytesPerVoxel() * image.getVolume() );
 		T *refNii = ( T * ) ni.data;
 		const util::FixedVector<size_t, 4> csize = image.getChunk( 0, 0 ).getSizeAsVector();
 		const util::FixedVector<size_t, 4> isize = image.getSizeAsVector();
@@ -526,7 +526,7 @@ private:
 						const size_t dim[] = {x, y, z, t};
 						const data::Chunk ch = image.getChunkAs<T>( scale, x, y, z, t );
 						T *target = refNii + image.getLinearIndex( dim );
-						ch.getTypePtr<T>().copyToMem( 0, ch.volume() - 1, target );
+						ch.getTypePtr<T>().copyToMem( 0, ch.getVolume() - 1, target );
 					}
 				}
 			}
@@ -584,7 +584,7 @@ private:
 		ni.ny = ni.dim[2] = dimensions[1];
 		ni.nz = ni.dim[3] = dimensions[2];
 		ni.nt = ni.dim[4] = dimensions[3];
-		ni.nvox = image.volume();
+		ni.nvox = image.getVolume();
 		util::fvector4 readVec = image.getPropertyAs<util::fvector4>( "readVec" );
 		util::fvector4 phaseVec = image.getPropertyAs<util::fvector4>( "phaseVec" );
 		util::fvector4 sliceVec = image.getPropertyAs<util::fvector4>( "sliceVec" );

@@ -66,7 +66,7 @@ protected:
 	 */
 	template<typename TYPE, typename D> Chunk( TYPE *src, D d, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 ):
 		_internal::ChunkBase( firstDim, secondDim, thirdDim, fourthDim ),
-		util::_internal::TypeReference<_internal::TypePtrBase>( new TypePtr<TYPE>( src, volume(), d ) ) {}
+		util::_internal::TypeReference<_internal::TypePtrBase>( new TypePtr<TYPE>( src, getVolume(), d ) ) {}
 	Chunk( const TypePtrReference &src, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 );
 public:
 	template <typename TYPE> class VoxelOp:std::unary_function<bool,TYPE>{
@@ -168,7 +168,7 @@ public:
 
 	template<typename T> bool copyToMem( T *dst, const scaling_pair &scaling )const {
 		// wrap the raw memory at into an non-deleting TypePtr of the length of the chunk
-		TypePtr<T> dstPtr( dst, volume(), typename TypePtr<T>::NonDeleter() );
+		TypePtr<T> dstPtr( dst, getVolume(), typename TypePtr<T>::NonDeleter() );
 		return getTypePtrBase().convertTo( dstPtr, scaling ); // copy-convert the data into dstPtr
 	}
 
@@ -263,7 +263,7 @@ public:
 			typename TypePtr<TYPE>::BasicDeleter(),
 			firstDim, secondDim, thirdDim, fourthDim
 		) {
-		asTypePtr<TYPE>().copyFromMem( org, volume() );
+		asTypePtr<TYPE>().copyFromMem( org, getVolume() );
 	}
 	/// Create a deep copy of a given Chunk (automatic conversion will be used if datatype does not fit)
 	MemChunk( const Chunk &ref ): Chunk( ref ) {
@@ -328,7 +328,7 @@ public:
 			typename TypePtr<TYPE>::NonDeleter(),
 			firstDim, secondDim, thirdDim, fourthDim
 		) {
-		asTypePtr<TYPE>().copyFromMem( org, volume() );
+		asTypePtr<TYPE>().copyFromMem( org, getVolume() );
 	}
 	/// Create a deep copy of a given Chunk (automatic conversion will be used if datatype does not fit)
 	MemChunkNonDel( const Chunk &ref ): Chunk( ref ) {

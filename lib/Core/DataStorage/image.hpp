@@ -341,7 +341,7 @@ public:
 					LOG( Runtime, error ) << "Failed to copy raw data of type " << ref->typeName() << " from image into memory of type " << TypePtr<T>::staticName();
 				}
 
-				dst += ref->volume(); // increment the cursor
+				dst += ref->getVolume(); // increment the cursor
 			}
 		}
 	}

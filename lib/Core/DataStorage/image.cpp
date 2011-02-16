@@ -80,7 +80,7 @@ bool Image::checkMakeClean()
 
 bool Image::insertChunk ( const Chunk &chunk )
 {
-	if ( chunk.volume() == 0 ) {
+	if ( chunk.getVolume() == 0 ) {
 		LOG( Runtime, error )
 				<< "Cannot insert empty Chunk (Size is " << chunk.getSizeAsString() << ").";
 		return false;
@@ -124,7 +124,7 @@ bool Image::reIndex()
 	//get primary attributes from geometrically first chunk - will be usefull
 	const Chunk &first = chunkAt( 0 );
 	const unsigned short chunk_dims = first.relevantDims();
-	chunkVolume = first.volume();
+	chunkVolume = first.getVolume();
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Determine structure of the image by searching for dimensional breaks in the chunklist
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -525,7 +525,7 @@ size_t Image::compare( const isis::data::Image &comp ) const
 	util::ivector4 start;
 	const size_t increment = compVect.product();
 
-	for ( size_t i = 0; i < volume(); i += increment ) {
+	for ( size_t i = 0; i < getVolume(); i += increment ) {
 		const size_t nexti = i + increment - 1;
 		const std::pair<size_t, size_t> c1pair1( i / chunkVolume, i % chunkVolume );
 		const std::pair<size_t, size_t> c1pair2( nexti / chunkVolume, nexti % chunkVolume );
