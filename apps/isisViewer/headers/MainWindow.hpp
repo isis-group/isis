@@ -12,6 +12,7 @@
 #include <QtGui>
 #include <QtOpenGL>
 #include "ui_isisViewer.h"
+#include <DataStorage/image.hpp>
 
 namespace isis
 {
@@ -24,7 +25,7 @@ class MainWindow : public QMainWindow
 	Q_OBJECT
 
 public:
-	MainWindow( QMainWindow *parent = 0 );
+	MainWindow( isis::data::ImageList, QMainWindow *parent = 0 );
 
 private:
 	QGLView *viewAxial;

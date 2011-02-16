@@ -23,7 +23,8 @@ namespace isis {
 namespace viewer {
 	
 QGLView::QGLView( QWidget *parent )
-	: QGLWidget( parent )
+	: QGLWidget( parent ),
+	texname()
 {
 		QObject::connect( this, SIGNAL( mousePressEvent(QMouseEvent*) ), this, SLOT( paint() ) );
 }
@@ -31,27 +32,64 @@ QGLView::QGLView( QWidget *parent )
 
 void QGLView::initializeGL()
 {
-	glClearColor(1,1,1,1);
+
+	isis::data::Chunk ch = *m_Image.getChunkList().front();
+	u_int32_t checkImage[ch.sizeToVector()[0]][ch.sizeToVector()[1]][ch.sizeToVector()[2]];
+	int i,j,c;
+	u_int32_t *ptr = ch.voxel<u_int32_t>(0);
+	for (i=0;i<ch.sizeToVector()[0];i++) 
+	{
+		for (j=0;j<ch.sizeToVector()[1];j++)
+		{
+			
+			for(unsigned short rgba=0;rgba<4;rgba++) 
+			{
+				std::cout << *ptr << std::endl;
+				checkImage[i][j][rgba] = *ptr;
+			}
+			ptr++;
+		}
+	}
+	glClearColor (0.0, 0.0, 0.0, 0.0);
 	glShadeModel(GL_FLAT);
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+	glGenTextures(1, &texname);
+	glBindTexture(GL_TEXTURE_2D, texname);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, 
+					GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, 
+					GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ch.sizeToVector()[0], 
+					ch.sizeToVector()[1], 0, GL_RGBA, GL_UNSIGNED_BYTE, 
+					checkImage);
 }
 
 void QGLView::paint( )
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glLoadIdentity();
-	glColor3f(1.0,0.0,0.0);
-	glRotated(45 / 16.0, 1.0, 0.0, 0.0);
-	glRotated(45 / 16.0, 0.0, 1.0, 0.0);
-	glRotated(90 / 16.0, 0.0, 0.0, 1.0);
-	// A basic square to impress all your friends
-	glBegin(GL_LINE_LOOP);
-		glVertex3d(0,0,0);
-		glVertex3d(1,0,0);
-		glVertex3d(1,1,0);
-		glVertex3d(0,1,0);
+	glEnable(GL_TEXTURE_2D);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+	glBindTexture(GL_TEXTURE_2D, texname);
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0, 0.0); glVertex3f(-1.0, -1.0, 0.0);
+	glTexCoord2f(0.0, 1.0); glVertex3f(-1.0, 1.0, 0.0);
+	glTexCoord2f(10.0, 1.0); glVertex3f(0.0, 1.0, 0.0);
+	glTexCoord2f(1.0, 0.0); glVertex3f(0.0, -1.0, 0.0);
+
+	glTexCoord2f(0.0, 0.0); glVertex3f(1.0, -1.0, 0.0);
+	glTexCoord2f(0.0, 1.0); glVertex3f(1.0, 1.0, 0.0);
+	glTexCoord2f(1.0, 1.0); glVertex3f(2.41421, 1.0, -1.41421);
+	glTexCoord2f(1.0, 0.0); glVertex3f(2.41421, -1.0, -1.41421);
 	glEnd();
+	glFlush();
+	glDisable(GL_TEXTURE_2D);
+	
 	updateGL();
 }
 	

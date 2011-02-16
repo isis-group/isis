@@ -13,7 +13,7 @@ namespace isis
 namespace viewer
 {
 
-MainWindow::MainWindow( QMainWindow *parent )
+MainWindow::MainWindow( isis::data::ImageList imgList, QMainWindow *parent )
 	: QMainWindow( parent ),
 	  my_RefreshIntensityDisplay( *this ),
 	  my_RefreshCoordsDisplay( *this ),
@@ -23,6 +23,7 @@ MainWindow::MainWindow( QMainWindow *parent )
 {
 	ui.setupUi( this );
 	ui.gridLayout->addWidget( viewAxial );
+	viewAxial->setImage( imgList );
 	//connections qt
 	QObject::connect( this->ui.checkPhysical, SIGNAL( clicked( bool ) ), this, SLOT( checkPhysicalChanged( bool ) ) );
 	QObject::connect( this->ui.timeStepSpinBox, SIGNAL( valueChanged( int ) ), this, SLOT( timeStepChanged( int ) ) );

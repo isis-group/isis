@@ -22,6 +22,7 @@
 
 #include <QtOpenGL/QGLWidget>
 #include <iostream>
+#include <DataStorage/image.hpp>
 
 namespace isis {
 namespace viewer {
@@ -31,6 +32,7 @@ class QGLView : public QGLWidget
 	Q_OBJECT
 public:
 	QGLView( QWidget *parent = 0);
+	void setImage( isis::data::ImageList img ) { m_Image = *img.front(); };
 
 public Q_SLOTS:
 	void paint();
@@ -40,6 +42,9 @@ Q_SIGNALS:
 	protected:
 	void initializeGL();
 
+private:
+	GLuint texname;
+	isis::data::Image m_Image;
 };
 
 }
