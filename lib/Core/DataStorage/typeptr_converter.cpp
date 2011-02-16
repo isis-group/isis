@@ -64,7 +64,7 @@ public:
 };
 void TypePtrConverterBase::convert( const TypePtrBase &src, TypePtrBase &dst, const scaling_pair &scaling ) const
 {
-	LOG( Debug, error ) << "Empty conversion was called as conversion from " << src.typeName() << " to " << dst.typeName() << " this is most likely an error.";
+	LOG( Debug, error ) << "Empty conversion was called as conversion from " << src.getTypeName() << " to " << dst.getTypeName() << " this is most likely an error.";
 }
 
 

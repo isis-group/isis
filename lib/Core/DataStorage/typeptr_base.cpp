@@ -26,10 +26,10 @@ const TypePtrConverterMap &TypePtrBase::converters()
 
 const TypePtrBase::Converter &TypePtrBase::getConverterTo( unsigned short ID )const
 {
-	const TypePtrConverterMap::const_iterator f1 = converters().find( typeID() );
-	LOG_IF( f1 == converters().end(), Debug, error ) << "There is no known conversion from " << util::getTypeMap()[typeID()];
+	const TypePtrConverterMap::const_iterator f1 = converters().find( getTypeID() );
+	LOG_IF( f1 == converters().end(), Debug, error ) << "There is no known conversion from " << util::getTypeMap()[getTypeID()];
 	const TypePtrConverterMap::mapped_type::const_iterator f2 = f1->second.find( ID );
-	LOG_IF( f2 == f1->second.end(), Debug, error ) << "There is no known conversion from " << util::getTypeMap()[typeID()] << " to " << util::getTypeMap()[ID];
+	LOG_IF( f2 == f1->second.end(), Debug, error ) << "There is no known conversion from " << util::getTypeMap()[getTypeID()] << " to " << util::getTypeMap()[ID];
 	return f2->second;
 }
 
@@ -81,7 +81,7 @@ void TypePtrBase::copyRange( size_t start, size_t end, TypePtrBase &dst, size_t 
 	assert( start <= end );
 	const size_t len = end - start + 1;
 	LOG_IF( ! dst.isSameType( *this ), Debug, error )
-			<< "Copying into a TypePtr of different type. Its " << dst.typeName() << " not " << typeName();
+			<< "Copying into a TypePtr of different type. Its " << dst.getTypeName() << " not " << getTypeName();
 
 	if( end >= length() ) {
 		LOG( Runtime, error )
@@ -122,24 +122,24 @@ scaling_pair TypePtrBase::getScalingTo( unsigned short typeID, const util::_inte
 		return conv->getScaling( min, max, scaleopt );
 	} else {
 		LOG( Runtime, error )
-				<< "I dont know any conversion from " << util::MSubject( typeName() ) << " to " << util::MSubject( util::getTypeMap( false, true )[typeID] );
+				<< "I dont know any conversion from " << util::MSubject( getTypeName() ) << " to " << util::MSubject( util::getTypeMap( false, true )[typeID] );
 		return scaling_pair();
 	}
 }
 bool TypePtrBase::convertTo( TypePtrBase &dst )const
 {
-	return convertTo( dst, getScalingTo( dst.typeID() ) );
+	return convertTo( dst, getScalingTo( dst.getTypeID() ) );
 }
 bool TypePtrBase::convertTo( TypePtrBase &dst, const scaling_pair &scaling ) const
 {
-	const Converter &conv = getConverterTo( dst.typeID() );
+	const Converter &conv = getConverterTo( dst.getTypeID() );
 
 	if ( conv ) {
 		conv->convert( *this, dst, scaling );
 		return true;
 	} else {
 		LOG( Runtime, error )
-				<< "I dont know any conversion from " << util::MSubject( typeName() ) << " to " << util::MSubject( dst.typeName() );
+				<< "I dont know any conversion from " << util::MSubject( getTypeName() ) << " to " << util::MSubject( dst.getTypeName() );
 		return false;
 	}
 }

@@ -140,7 +140,7 @@ throw( std::runtime_error & )
 			// default error
 		default:
 			LOG( image_io::Runtime, error )
-					<< "Can't map image type " << image.getChunk( 0 ).typeName() << "(" << image.getChunk( 0 ).typeID() << ") to vista type. Aborting" ;
+					<< "Can't map image type " << image.getChunk( 0 ).getTypeName() << "(" << image.getChunk( 0 ).getTypeID() << ") to vista type. Aborting" ;
 			return;
 		}
 

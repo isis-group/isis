@@ -179,8 +179,8 @@ public:
 
 
 	size_t bytesPerVoxel()const;
-	std::string typeName()const;
-	unsigned short typeID()const;
+	std::string getTypeName()const;
+	unsigned short getTypeID()const;
 	template<typename T> bool is()const {
 		return get()->is<T>();
 	}

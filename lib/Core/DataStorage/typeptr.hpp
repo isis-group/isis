@@ -172,7 +172,7 @@ public:
 		LOG_IF( _length > length(), Runtime, error )
 				<< "Amount of the elements to copy from memory (" << _length << ") exceeds the length of the array (" << length() << ")";
 		TYPE &dest = this->operator[]( 0 );
-		LOG( Debug, info ) << "Copying " << _length *sizeof( TYPE ) << " bytes of " << typeName() << " from " << src << " to " << &dest;
+		LOG( Debug, info ) << "Copying " << _length *sizeof( TYPE ) << " bytes of " << getTypeName() << " from " << src << " to " << &dest;
 		memcpy( &dest, src, _length * sizeof( TYPE ) );
 	}
 	/// Copy elements within a range [start,end] to raw memory
@@ -201,9 +201,9 @@ public:
 		size_t ret = 0;
 		size_t _length = end - start;
 
-		if ( dst.typeID() != typeID() ) {
+		if ( dst.getTypeID() != getTypeID() ) {
 			LOG( Debug, error )
-					<< "Comparing to a TypePtr of different type(" << dst.typeName() << ", not " << typeName()
+					<< "Comparing to a TypePtr of different type(" << dst.getTypeName() << ", not " << getTypeName()
 					<< "). Assuming all voxels to be different";
 			return _length;
 		}
@@ -213,7 +213,7 @@ public:
 		LOG_IF( _length + dst_start >= dst.length(), Runtime, error )
 				<< "End of the range (" << _length + dst_start << ") is behind the end of the destination (" << dst.length() << ")";
 		const TypePtr<TYPE> &compare = dst.castToTypePtr<TYPE>();
-		LOG( Debug, verbose_info ) << "Comparing " << dst.typeName() << " at " << &operator[]( 0 ) << " and " << &compare[0];
+		LOG( Debug, verbose_info ) << "Comparing " << dst.getTypeName() << " at " << &operator[]( 0 ) << " and " << &compare[0];
 
 		for ( size_t i = start; i < end; i++ ) {
 			if ( ! ( operator[]( i ) == compare[i] ) ) {
@@ -240,11 +240,11 @@ public:
 		return boost::lexical_cast<std::string>( m_len ) + "#" + ret;
 	}
 	/// @copydoc util::Type::typeName
-	virtual std::string typeName()const {
+	virtual std::string getTypeName()const {
 		return staticName();
 	}
 	/// @copydoc util::Type::typeID
-	virtual unsigned short typeID()const {
+	virtual unsigned short getTypeID()const {
 		return staticID;
 	}
 	/// @copydoc util::Type::staticName
@@ -330,7 +330,7 @@ public:
 template<typename T> bool _internal::TypePtrBase::is()const
 {
 	util::check_type<T>();
-	return typeID() == TypePtr<T>::staticID;
+	return getTypeID() == TypePtr<T>::staticID;
 }
 
 

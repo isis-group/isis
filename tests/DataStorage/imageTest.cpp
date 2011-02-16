@@ -218,7 +218,7 @@ BOOST_AUTO_TEST_CASE ( type_selection_test )
 	BOOST_CHECK( img.insertChunk( ch_uint8_t ) );
 	BOOST_CHECK( img.reIndex() );
 	BOOST_CHECK_EQUAL( img.getSizeAsVector(), ( util::FixedVector<size_t, 4>( size ) ) );
-	BOOST_CHECK_EQUAL( img.getMajorTypeID(), data::TypePtr<int16_t>( NULL, 0 ).typeID() );
+	BOOST_CHECK_EQUAL( img.getMajorTypeID(), data::TypePtr<int16_t>( NULL, 0 ).getTypeID() );
 #undef MAKE_CHUNK
 }
 

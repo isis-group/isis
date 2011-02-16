@@ -28,7 +28,7 @@ public:
 	float _voxel( const size_t &first, const size_t &second, const size_t &third, const size_t &fourth ) {
 		data::Chunk ch = this->getChunk(first, second, third, fourth, false);
 		
-		switch( ch.typeID() ) {
+		switch( ch.getTypeID() ) {
 		case data::TypePtr<int8_t>::staticID:
 			return isis::data::Image::voxel<int8_t>( first, second, third, fourth );
 			break;
@@ -65,7 +65,7 @@ public:
 	bool _setVoxel( const size_t &first, const size_t &second, const size_t &third, const size_t &fourth, const float &value ) {
 		data::Chunk ch = this->getChunk(first, second, third, fourth, false);
 
-		switch( ch.typeID() ) {
+		switch( ch.getTypeID() ) {
 		case data::TypePtr<int8_t>::staticID:
 			isis::data::Image::voxel<int8_t>( first, second, third, fourth ) = value;
 			return true;
@@ -211,7 +211,7 @@ public:
 		}
 	}
 	isis::data::Image _deepCopy( void ) {
-		switch( this->typeID() ) {
+		switch( this->getTypeID() ) {
 		case data::TypePtr<int8_t>::staticID:
 			return isis::data::MemImage<int8_t>( *this );
 			break;

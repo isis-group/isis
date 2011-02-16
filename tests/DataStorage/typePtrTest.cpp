@@ -151,7 +151,7 @@ BOOST_AUTO_TEST_CASE( typePtr_splice_test )
 			BOOST_CHECK_EQUAL( dummy.use_count(), outer.size() + 1 );
 		}
 		boost::shared_ptr<int32_t> &dummy = outer.front()->castToTypePtr<int32_t>();
-		assert( boost::get_deleter<data::TypePtr<int32_t>::DelProxy>( dummy ) );
+
 		BOOST_CHECK_EQUAL( outer.front()->length(), 2 );// the first slices shall be of the size 2
 		BOOST_CHECK_EQUAL( outer.back()->length(), 1 );// the last slice shall be of the size 1 (5%2)
 		//we cannot ask for the use_count of the original because its hidden in DelProxy (outer[0].use_count will get the use_count of the splice)

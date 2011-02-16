@@ -433,7 +433,7 @@ struct outer_TypeConverter {
 	outer_TypeConverter( std::map< int , std::map<int, boost::shared_ptr<const TypeConverterBase> > > &map ): m_map( map ) {}
 	template<typename SRC> void operator()( SRC ) {//will be called by the mpl::for_each in TypeConverterMap() for any SRC out of "types"
 		boost::mpl::for_each<types>( // create a functor for from-SRC-conversion and call its ()-operator for any DST out of "types"
-			inner_TypeConverter<SRC>( m_map[Type<SRC>().typeID()] )
+			inner_TypeConverter<SRC>( m_map[Type<SRC>().getTypeID()] )
 		);
 	}
 };

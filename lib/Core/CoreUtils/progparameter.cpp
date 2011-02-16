@@ -108,7 +108,7 @@ bool ParameterMap::parse( int argc, char **argv )
 				LOG( Runtime, error )
 						<< "Failed to parse value(s) "
 						<< MSubject( listToString( argv + begin, argv + i, " ", "", "" ) )
-						<< " for "  << found->first << "(" << found->second->typeName() << ")";
+						<< " for "  << found->first << "(" << found->second->getTypeName() << ")";
 				parsed = false;
 			}
 		}

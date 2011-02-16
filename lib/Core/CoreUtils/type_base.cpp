@@ -22,7 +22,7 @@ namespace _internal
 
 bool GenericType::isSameType ( const GenericType &second ) const
 {
-	return typeID() == second.typeID();
+	return getTypeID() == second.getTypeID();
 }
 
 TypeBase::~TypeBase() {}
@@ -35,7 +35,7 @@ const TypeConverterMap &TypeBase::converters()
 
 const TypeBase::Converter &TypeBase::getConverterTo( unsigned short ID )const
 {
-	const TypeConverterMap::const_iterator f1 = converters().find( typeID() );
+	const TypeConverterMap::const_iterator f1 = converters().find( getTypeID() );
 	assert( f1 != converters().end() );
 	const TypeConverterMap::mapped_type::const_iterator f2 = f1->second.find( ID );
 	assert( f2 != f1->second.end() );
@@ -43,15 +43,15 @@ const TypeBase::Converter &TypeBase::getConverterTo( unsigned short ID )const
 }
 bool TypeBase::convert( const TypeBase &from, TypeBase &to )
 {
-	const Converter &conv = from.getConverterTo( to.typeID() );
+	const Converter &conv = from.getConverterTo( to.getTypeID() );
 
 	if ( conv ) {
 		switch ( conv->convert( from, to ) ) {
 		case boost::numeric::cPosOverflow:
-			LOG( Runtime, error ) << "Positive overflow when converting " << from.toString( true ) << " to " << to.typeName() << ".";
+			LOG( Runtime, error ) << "Positive overflow when converting " << from.toString( true ) << " to " << to.getTypeName() << ".";
 			break;
 		case boost::numeric::cNegOverflow:
-			LOG( Runtime, error ) << "Negative overflow when converting " << from.toString( true ) << " to " << to.typeName() << ".";
+			LOG( Runtime, error ) << "Negative overflow when converting " << from.toString( true ) << " to " << to.getTypeName() << ".";
 			break;
 		case boost::numeric::cInRange:
 			return true;
@@ -60,7 +60,7 @@ bool TypeBase::convert( const TypeBase &from, TypeBase &to )
 	} else {
 		LOG( Runtime, error )
 				<< "I dont know any conversion from "
-				<< MSubject( from.toString( true ) ) << " to " << MSubject( to.typeName() );
+				<< MSubject( from.toString( true ) ) << " to " << MSubject( to.getTypeName() );
 	}
 
 	return false;

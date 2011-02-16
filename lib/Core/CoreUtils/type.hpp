@@ -84,7 +84,7 @@ public:
 				return inRange( first, buff );
 			}
 		} else {
-			LOG( Debug, error ) << "No conversion of " << second.typeName() << " to " << Type<T>::staticName() << " available";
+			LOG( Debug, error ) << "No conversion of " << second.getTypeName() << " to " << Type<T>::staticName() << " available";
 			return false;
 		}
 
@@ -180,10 +180,10 @@ public:
 
 		return ret;
 	}
-	virtual std::string typeName()const {
+	virtual std::string getTypeName()const {
 		return staticName();
 	}
-	virtual unsigned short typeID()const {
+	virtual unsigned short getTypeID()const {
 		return staticID;
 	}
 
@@ -287,7 +287,7 @@ template<typename T> T &_internal::TypeBase::castTo()
 template<typename T> bool _internal::TypeBase::is()const
 {
 	check_type<T>();
-	return typeID() == Type<T>::staticID;
+	return getTypeID() == Type<T>::staticID;
 }
 
 }

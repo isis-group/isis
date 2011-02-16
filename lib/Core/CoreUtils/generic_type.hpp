@@ -39,13 +39,13 @@ class GenericType
 {
 protected:
 	template<typename T> T &m_cast_to() {
-		LOG_IF( typeID() != T::staticID, Debug, error ) << "using " << typeName() << " at " << this << " as " << T::staticName() << " aborting ...";
-		assert( typeID() == T::staticID );
+		LOG_IF( getTypeID() != T::staticID, Debug, error ) << "using " << getTypeName() << " at " << this << " as " << T::staticName() << " aborting ...";
+		assert( getTypeID() == T::staticID );
 		return *reinterpret_cast<T *>( this );
 	}
 	template<typename T> const T &m_cast_to()const {
-		LOG_IF( typeID() != T::staticID, Debug, error ) << "using " << typeName() << " at " << this << " as " << T::staticName() << " aborting ...";
-		assert( typeID() == T::staticID );
+		LOG_IF( getTypeID() != T::staticID, Debug, error ) << "using " << getTypeName() << " at " << this << " as " << T::staticName() << " aborting ...";
+		assert( getTypeID() == T::staticID );
 		return *reinterpret_cast<const T *>( this );
 	}
 
@@ -54,10 +54,10 @@ public:
 	virtual std::string toString( bool labeled = false )const = 0;
 
 	/// \returns the name of its actual type
-	virtual std::string typeName()const = 0;
+	virtual std::string getTypeName()const = 0;
 
 	/// \returns the ID of its actual type
-	virtual unsigned short typeID()const = 0;
+	virtual unsigned short getTypeID()const = 0;
 
 	/// \returns true if type of this and second are equal
 	bool isSameType( const GenericType &second )const;

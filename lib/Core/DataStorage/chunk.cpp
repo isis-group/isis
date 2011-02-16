@@ -63,7 +63,7 @@ Chunk Chunk::cloneToNew( size_t firstDim, size_t secondDim, size_t thirdDim, siz
 
 bool Chunk::convertToType( short unsigned int ID )
 {
-	if( typeID() != ID ) {
+	if( getTypeID() != ID ) {
 		return convertToType( ID, getScalingTo( ID ) );
 	}
 
@@ -72,7 +72,7 @@ bool Chunk::convertToType( short unsigned int ID )
 
 bool Chunk::convertToType( short unsigned int ID, const scaling_pair &scaling )
 {
-	if( typeID() != ID ) { // if its not the same type - replace the internal TypePtr by a new returned from TypePtrBase::copyToNewById
+	if( getTypeID() != ID ) { // if its not the same type - replace the internal TypePtr by a new returned from TypePtrBase::copyToNewById
 		TypePtrReference newPtr = getTypePtrBase().copyToNewByID( ID, scaling ); // create a new TypePtr of type id and store it in a TypePtrReference
 
 		if( newPtr.isEmpty() ) // if the reference is empty the conversion failed
@@ -88,13 +88,13 @@ size_t Chunk::bytesPerVoxel()const
 {
 	return get()->bytesPerElem();
 }
-std::string Chunk::typeName()const
+std::string Chunk::getTypeName()const
 {
-	return get()->typeName();
+	return get()->getTypeName();
 }
-unsigned short Chunk::typeID()const
+unsigned short Chunk::getTypeID()const
 {
-	return get()->typeID();
+	return get()->getTypeID();
 }
 
 void Chunk::copyLine( size_t secondDimS, size_t thirdDimS, size_t fourthDimS, Chunk &dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD ) const

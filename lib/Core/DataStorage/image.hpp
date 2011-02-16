@@ -338,7 +338,7 @@ public:
 			// we could do this using convertToType - but this solution does not need any additional temporary memory
 			BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
 				if( !ref->copyToMem<T>( dst, scale ) ) {
-					LOG( Runtime, error ) << "Failed to copy raw data of type " << ref->typeName() << " from image into memory of type " << TypePtr<T>::staticName();
+					LOG( Runtime, error ) << "Failed to copy raw data of type " << ref->getTypeName() << " from image into memory of type " << TypePtr<T>::staticName();
 				}
 
 				dst += ref->getVolume(); // increment the cursor

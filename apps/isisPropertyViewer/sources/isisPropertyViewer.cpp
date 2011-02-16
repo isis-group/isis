@@ -175,7 +175,7 @@ void isisPropertyViewer::addPropToTree( const boost::shared_ptr<isis::data::Imag
 		} else {
 			addChildToItem( currentHeadItem, tr( propIterator.c_str() ),
 							tr( image->propertyValue( propIterator )->toString( false ).c_str() ),
-							tr( image->propertyValue( propIterator )->typeName().c_str() ) );
+							tr( image->propertyValue( propIterator )->getTypeName().c_str() ) );
 		}
 	} else {
 		addChildToItem( currentHeadItem, tr( propIterator.c_str() ), tr( "empty" ) , tr( "none" ) );

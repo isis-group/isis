@@ -194,7 +194,7 @@ bool Image::reIndex()
 	BOOST_FOREACH( const util::PropertyMap::KeyType & ref, vectors ) {
 		if ( hasProperty( ref ) ) {
 			util::TypeValue &prop = propertyValue( ref );
-			LOG_IF( !prop->is<util::fvector4>(), Debug, error ) << "Using " << prop->typeName() << " as " << util::Type<util::fvector4>::staticName();
+			LOG_IF( !prop->is<util::fvector4>(), Debug, error ) << "Using " << prop->getTypeName() << " as " << util::Type<util::fvector4>::staticName();
 			util::fvector4 &vec = prop->castTo<util::fvector4>();
 			LOG_IF( vec.len() == 0, Runtime, error )
 					<< "The existing " << ref << " " << vec << " has the length zero. Thats bad, because I'm going to normalize it.";
@@ -497,7 +497,7 @@ std::pair< util::TypeReference, util::TypeReference > Image::getScalingTo( short
 	bool unique = true;
 	const std::vector<boost::shared_ptr<const Chunk> > chunks = getChunksAsVector();
 	BOOST_FOREACH( const boost::shared_ptr<const Chunk> &ref, chunks ) { //find a chunk which would be converted
-		if( targetID != ref->typeID() ) {
+		if( targetID != ref->getTypeID() ) {
 			LOG_IF( ref->getScalingTo( targetID, minmax, scaleopt ).first.isEmpty() || ref->getScalingTo( targetID, minmax, scaleopt ).second.isEmpty(), Debug, error )
 					<< "Returning an invalid scaling. This is bad!";
 			return ref->getScalingTo( targetID, minmax, scaleopt ); // and ask that for the scaling
@@ -592,19 +592,19 @@ Image::orientation Image::getMainOrientation()const
 
 unsigned short Image::getMajorTypeID() const
 {
-	unsigned int mytypeID = chunkPtrAt( 0 )->typeID();
+	unsigned int mytypeID = chunkPtrAt( 0 )->getTypeID();
 	size_t tmpBytesPerVoxel = 0;
 	std::pair<util::TypeReference, util::TypeReference> minmax = getMinMax();
 	LOG( Debug, info ) << "Determining  datatype of image with the value range " << minmax;
 
-	if( minmax.first->typeID() == minmax.second->typeID() ) { // ok min and max are the same type - trivial case
-		return minmax.first->typeID() << 8; // btw: we do the shift, because min and max are Type - but we want the id's TypePtr
-	} else if( minmax.first->fitsInto( minmax.second->typeID() ) ) { // if min fits into the type of max, use that
-		return minmax.second->typeID() << 8; //@todo maybe use a global static function here instead of a obscure shit operation
-	} else if( minmax.second->fitsInto( minmax.first->typeID() ) ) { // if max fits into the type of min, use that
-		return minmax.first->typeID() << 8;
+	if( minmax.first->getTypeID() == minmax.second->getTypeID() ) { // ok min and max are the same type - trivial case
+		return minmax.first->getTypeID() << 8; // btw: we do the shift, because min and max are Type - but we want the id's TypePtr
+	} else if( minmax.first->fitsInto( minmax.second->getTypeID() ) ) { // if min fits into the type of max, use that
+		return minmax.second->getTypeID() << 8; //@todo maybe use a global static function here instead of a obscure shit operation
+	} else if( minmax.second->fitsInto( minmax.first->getTypeID() ) ) { // if max fits into the type of min, use that
+		return minmax.first->getTypeID() << 8;
 	} else {
-		LOG( Runtime, error ) << "Sorry I dont know which datatype I should use. (" << minmax.first->typeName() << " or " << minmax.second->typeName() << ")";
+		LOG( Runtime, error ) << "Sorry I dont know which datatype I should use. (" << minmax.first->getTypeName() << " or " << minmax.second->getTypeName() << ")";
 		throw( std::logic_error( "type selection failed" ) );
 		return std::numeric_limits<unsigned char>::max();
 	}
