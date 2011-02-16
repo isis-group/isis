@@ -174,13 +174,13 @@ bool Image::reIndex()
 	LOG( Debug, info ) << uniques.size() << " Chunk-unique properties found in the Image";
 	LOG_IF( uniques.size(), Debug, verbose_info ) << util::listToString( uniques.begin(), uniques.end(), ", " );
 	join( common );
-	LOG_IF( ! common.empty(), Debug, verbose_info ) << "common properties saved into the image " << common;
+	LOG_IF( ! common.isEmpty(), Debug, verbose_info ) << "common properties saved into the image " << common;
 
 	//remove common props from the chunks
 	for ( size_t i = 0; i != lookup.size(); i++ )
 		chunkAt( i ).remove( common, false ); //this _won't keep needed properties - so from here on the chunks of the image are invalid
 
-	LOG_IF( ! common.empty(), Debug, verbose_info ) << "common properties removed from " << chunks << " chunks: " << common;
+	LOG_IF( ! common.isEmpty(), Debug, verbose_info ) << "common properties removed from " << chunks << " chunks: " << common;
 
 	// add the chunk-size to the image-size
 	for ( unsigned short i = 0; i < chunk_dims; i++ )
@@ -321,7 +321,7 @@ bool Image::reIndex()
 	LOG_IF( ! isValid(), Runtime, warning ) << "The image is not valid after reindexing. Missing properties: " << getMissing();
 	return clean = isValid();
 }
-bool Image::empty()const
+bool Image::isEmpty()const
 {
 	return set.isEmpty();
 }

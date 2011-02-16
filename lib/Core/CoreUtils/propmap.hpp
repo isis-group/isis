@@ -233,7 +233,7 @@ public:
 	/**
 	 * \returns true if the PropertyMap is empty, false otherwhise
 	 */
-	bool empty()const;
+	bool isEmpty()const;
 	
 	/**
 	 * Get a list of all properties.
@@ -393,11 +393,11 @@ class treeNode
 	TypeValue m_leaf;
 public:
 	bool empty()const {
-		return m_branch.empty() && m_leaf.isEmpty();
+		return m_branch.isEmpty() && m_leaf.isEmpty();
 	}
 	bool is_leaf()const {
-		LOG_IF( ! ( m_branch.empty() || m_leaf.isEmpty() ), Debug, error ) << "There is a non empty leaf at a branch. This should not be.";
-		return m_branch.empty();
+		LOG_IF( ! ( m_branch.isEmpty() || m_leaf.isEmpty() ), Debug, error ) << "There is a non empty leaf at a branch. This should not be.";
+		return m_branch.isEmpty();
 	}
 	const PropertyMap &getBranch()const {
 		return m_branch;

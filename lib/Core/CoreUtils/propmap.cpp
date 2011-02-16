@@ -145,7 +145,7 @@ bool PropertyMap::recursiveRemove( PropertyMap &root, const propPathIterator at,
 			if ( ! ref.is_leaf() ) {
 				ret = recursiveRemove( ref.getBranch(), next, pathEnd );
 
-				if ( ref.getBranch().empty() )
+				if ( ref.getBranch().isEmpty() )
 					root.erase( found ); // remove the now empty branch
 			} else {
 				root.erase( found );
@@ -193,7 +193,7 @@ const PropertyMap &PropertyMap::branch( const key_type &key ) const
 		LOG( Runtime, warning ) << "Trying to access non existing branch " << key << ".";
 		return emptyEntry.getBranch();
 	} else {
-		LOG_IF( ref->getBranch().empty(), Runtime, warning ) << "Accessing empty branch " << key;
+		LOG_IF( ref->getBranch().isEmpty(), Runtime, warning ) << "Accessing empty branch " << key;
 		return ref->getBranch();
 	}
 }
@@ -225,7 +225,7 @@ bool PropertyMap::remove( const isis::util::PropertyMap &removeMap, bool keep_ne
 					const PropertyMap &otherSub = otherIt->second.getBranch();
 					ret &= mySub.remove( otherSub );
 
-					if( mySub.empty() ) // delete my branch, if its empty
+					if( mySub.isEmpty() ) // delete my branch, if its empty
 						erase( thisIt++ );
 				} else {
 					LOG( Debug, warning ) << "Not deleting branch " << MSubject( thisIt->first ) << " because its no subtree in the removal map";
@@ -251,7 +251,7 @@ bool PropertyMap::isValid() const
 	return found == end();
 }
 
-bool PropertyMap::empty() const
+bool PropertyMap::isEmpty() const
 {
 	return Container::empty();
 }

@@ -284,7 +284,7 @@ std::list< Image > IOFactory::chunkListToImageList(std::list<Chunk> &src)
 				i++;
 		}
 
-		if (! buff.empty() ) {
+		if (! buff.isEmpty() ) {
 			LOG( Debug, info ) << "Reindexing image with " << cnt << " chunks.";
 
 			if ( buff.reIndex() ) {

@@ -279,7 +279,7 @@ public:
 	bool reIndex();
 
 	/// \returns true if there is no chunk in the image
-	bool empty()const;
+	bool isEmpty()const;
 
 	/**
 	 * Get a list of the properties of the chunks for the given key

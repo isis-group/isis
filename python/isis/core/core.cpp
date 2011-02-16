@@ -44,7 +44,7 @@ BOOST_PYTHON_MODULE( _core )
 	.def( "remove", ( bool ( ::isis::util::PropertyMap:: * )( const isis::util::PropertyMap &, bool ) ) ( &isis::util::PropertyMap::remove ), ( arg( "removeMap" ), arg( "keep_needed" ) ) )
 	.def( "propertyValue", &_PropMap::_propertyValue )
 	.def( "valid", &isis::util::PropertyMap::valid )
-	.def( "empty", &isis::util::PropertyMap::empty )
+	.def( "empty", &isis::util::PropertyMap::isEmpty )
 	.def( "setPropertyAs", &_PropMap::_setPropertyAs )
 	;
 	//#######################################################################################
