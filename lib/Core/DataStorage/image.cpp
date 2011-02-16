@@ -709,6 +709,24 @@ size_t Image::foreachChunk(Image::ChunkOp& op,bool copyMetaData)
 	return err;
 }
 
+size_t Image::getNrOfColumms() const
+{
+	return getDimSize(data::rowDim);
+}
+
+size_t Image::getNrOfRows() const
+{
+	return getDimSize(data::columnDim);
+}
+size_t Image::getNrOfSlices() const
+{
+	return getDimSize(data::sliceDim);
+}
+size_t Image::getNrOfTimesteps() const
+{
+	return getDimSize(data::timeDim);
+}
+
 
 } // END namespace data
 } // END namespace isis
