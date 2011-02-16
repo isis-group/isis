@@ -55,11 +55,11 @@ BOOST_AUTO_TEST_CASE ( chunklist_sort_test )
 	data::MemChunk<float> ch1( *( chunks.getLookup()[0] ) ); //just make copy of the first chunk
 	ch1.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, 0, 0 ) );
 	ch1.setPropertyAs( "acquisitionNumber", 0 );
-	data::enable_log<util::DefaultMsgPrint>( error );
+	data::enableLog<util::DefaultMsgPrint>( error );
 	BOOST_CHECK( ! chunks.insert( ch1 ) );
 
 	// the list should still be rectangular
-	data::enable_log<util::DefaultMsgPrint>( warning );
+	data::enableLog<util::DefaultMsgPrint>( warning );
 	BOOST_REQUIRE( chunks.isRectangular() );
 
 	// inserting Chunk with diffent secondary prop should be ok
@@ -81,9 +81,9 @@ BOOST_AUTO_TEST_CASE ( chunklist_sort_test )
 
 
 			if( i == 0 && j == 0 ) { // this is allready there
-				data::enable_log<util::DefaultMsgPrint>( error );
+				data::enableLog<util::DefaultMsgPrint>( error );
 				BOOST_REQUIRE( ! chunks.insert( ch ) );
-				data::enable_log<util::DefaultMsgPrint>( warning );
+				data::enableLog<util::DefaultMsgPrint>( warning );
 			} else
 				BOOST_REQUIRE( chunks.insert( ch ) );
 		}
@@ -108,9 +108,9 @@ BOOST_AUTO_TEST_CASE ( chunklist_sort_test )
 //      chunks.addSecondarySort( "acquisitionNumber" );
 //      chunks.addSecondarySort( "acquisitionTime" );
 //      BOOST_REQUIRE( chunks.insert( chTime ) ); // this is ok - has "acquisitionTime" which is the top secondary sort-property
-//      data::enable_log<util::DefaultMsgPrint>( error );
+//      data::enableLog<util::DefaultMsgPrint>( error );
 //      BOOST_CHECK( !chunks.insert( chNumber ) ); // this should fail - it does not have "acquisitionTime"
-//      data::enable_log<util::DefaultMsgPrint>( warning );
+//      data::enableLog<util::DefaultMsgPrint>( warning );
 //  }
 //  {
 //      // inserting a not-first chunk which lacks the fallback secondary sort property should fail
@@ -119,9 +119,9 @@ BOOST_AUTO_TEST_CASE ( chunklist_sort_test )
 //      chunks.addSecondarySort( "acquisitionTime" );
 //      // this is ok - has "acquisitionNumber" to which the sorting will fallback
 //      BOOST_REQUIRE( chunks.insert( chNumber ) );
-//      data::enable_log<util::DefaultMsgPrint>( error );
+//      data::enableLog<util::DefaultMsgPrint>( error );
 //      BOOST_CHECK( !chunks.insert( chTime ) ); // this should fail - it does not have "acquisitionNumber" - the current secondary sorting
-//      data::enable_log<util::DefaultMsgPrint>( warning );
+//      data::enableLog<util::DefaultMsgPrint>( warning );
 //  }
 // }
 

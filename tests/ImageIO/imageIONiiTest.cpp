@@ -28,9 +28,9 @@ BOOST_AUTO_TEST_SUITE ( imageIONii_NullTests )
 
 BOOST_AUTO_TEST_CASE( loadsaveImage )
 {
-	//  data::enable_log<util::DefaultMsgPrint>(info);
+	//  data::enableLog<util::DefaultMsgPrint>(info);
 
-	image_io::enable_log<util::DefaultMsgPrint>( info );
+	image_io::enableLog<util::DefaultMsgPrint>( info );
 	//  We will use the Null plugin to get some image data
 	util::TmpFile niifile( "", ".nii" );
 	// the null-loader shall generate 5 3x3x3x10 images

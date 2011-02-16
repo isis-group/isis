@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE( propMap_init_test )
 	BOOST_CHECK_EQUAL( map1.propertyValue( "Test3" ), util::fvector4( 1, 1, 1, 1 ) );
 	BOOST_CHECK_EQUAL( map1.propertyValue( "Test4" ), std::string( "Hallo" ) );
 	util::PropertyMap &ref = map1.branch( "sub" );
-	BOOST_CHECK( ! ref.empty() );
+	BOOST_CHECK( ! ref.isEmpty() );
 	BOOST_CHECK_EQUAL( ref.propertyValue( "Test1" ), ( int32_t )1 );
 	BOOST_CHECK_EQUAL( ref.propertyValue( "Test2" ), ( int32_t )2 );
 	BOOST_CHECK( map1.propertyValue( "new" ).isEmpty() );
@@ -65,9 +65,9 @@ BOOST_AUTO_TEST_CASE( propMap_remove_test )
 	BOOST_CHECK( map.remove( "Test4" ) );
 	BOOST_CHECK( ! map.remove( "sub" ) ); //non empty branches should not be deleted
 	BOOST_CHECK( map.remove( "sub/Test1" ) );
-	BOOST_CHECK( ! map.branch( "sub" ).empty() ); //the submap must still be there
+	BOOST_CHECK( ! map.branch( "sub" ).isEmpty() ); //the submap must still be there
 	BOOST_CHECK( map.remove( "sub/Test2" ) );
-	BOOST_CHECK( map.branch( "sub" ).empty() ); //not anymore (this will create an "normal" empty entry)
+	BOOST_CHECK( map.branch( "sub" ).isEmpty() ); //not anymore (this will create an "normal" empty entry)
 }
 
 BOOST_AUTO_TEST_CASE( propMap_join_test )

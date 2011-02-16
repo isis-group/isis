@@ -27,9 +27,9 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		data::MemChunk<float> ch( 4, 4 );
 		data::Image img;
 		// inserting insufficient Chunk should fail
-		data::enable_log<util::DefaultMsgPrint>( ( LogLevel )0 );
+		data::enableLog<util::DefaultMsgPrint>( ( LogLevel )0 );
 		BOOST_CHECK( ! img.insertChunk( ch ) );
-		data::enable_log<util::DefaultMsgPrint>( warning );
+		data::enableLog<util::DefaultMsgPrint>( warning );
 		// but inserting a proper Chunk should work
 		ch.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, 2 ) );
 		ch.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
@@ -449,9 +449,9 @@ BOOST_AUTO_TEST_CASE( orientation_test )
 	ch.setPropertyAs( "acquisitionNumber", ( uint32_t )0 );
 	ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 	BOOST_REQUIRE( img.insertChunk( ch ) );
-	data::enable_log<util::DefaultMsgPrint>( error );
+	data::enableLog<util::DefaultMsgPrint>( error );
 	BOOST_REQUIRE( img.reIndex() );
-	data::enable_log<util::DefaultMsgPrint>( warning );
+	data::enableLog<util::DefaultMsgPrint>( warning );
 	BOOST_CHECK_EQUAL( img.getMainOrientation(), data::Image::axial );
 }
 
@@ -483,9 +483,9 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 	}
 	{
 		// Conversion to uint8_t (will downscale [0-255])
-		data::enable_log<util::DefaultMsgPrint>( error );
+		data::enableLog<util::DefaultMsgPrint>( error );
 		data::MemImage<uint8_t> img2( img );
-		data::enable_log<util::DefaultMsgPrint>( warning );
+		data::enableLog<util::DefaultMsgPrint>( warning );
 		BOOST_REQUIRE( img2.reIndex() );
 		//Check if the metadata were copied correct
 		BOOST_CHECK_EQUAL( static_cast<util::PropertyMap>( img ), static_cast<util::PropertyMap>( img2 ) );
@@ -562,9 +562,9 @@ BOOST_AUTO_TEST_CASE( typediamge_test )
 	}
 	{
 		// Conversion to uint8_t (will downscale [0-255])
-		data::enable_log<util::DefaultMsgPrint>( error );
+		data::enableLog<util::DefaultMsgPrint>( error );
 		data::TypedImage<uint8_t> img2( img );
-		data::enable_log<util::DefaultMsgPrint>( warning );
+		data::enableLog<util::DefaultMsgPrint>( warning );
 		BOOST_REQUIRE( img2.reIndex() );
 		//Check if the metadata were copied correct
 		BOOST_CHECK_EQUAL( static_cast<util::PropertyMap>( img ), static_cast<util::PropertyMap>( img2 ) );
@@ -601,7 +601,7 @@ BOOST_AUTO_TEST_CASE ( image_transformCoords_test )
 {
 	// dummy image
 	std::list<data::Image> images = data::IOFactory::load( "nix.null" );
-	BOOST_REQUIRE( !images.isEmpty() );
+	BOOST_REQUIRE( !images.empty() );
 	data::Image &img = images.front();
 	//TODO rewrite this test to use BOST_UNIT_TEST_ASSERTS with the help of
 	// util::fuzzyEqual
@@ -711,9 +711,9 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
 	std::pair<float, float> minmax = img.getMinMaxAs<float>();
 	BOOST_REQUIRE_EQUAL( minmax.first, 0 );
 	double scale = std::numeric_limits<uint16_t>::max() / minmax.second;
-	data::enable_log<util::DefaultMsgPrint>( error );
+	data::enableLog<util::DefaultMsgPrint>( error );
 	data::MemImage<uint16_t> copyImg( img );
-	data::enable_log<util::DefaultMsgPrint>( warning );
+	data::enableLog<util::DefaultMsgPrint>( warning );
 	copyImg.reIndex();
 	BOOST_REQUIRE_EQUAL( copyImg.getSizeAsVector(), sizeVec );
 
@@ -941,11 +941,11 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes )
 
 	const util::FixedVector<size_t, 4> sizeVec6( dummy6 );
 
-	data::enable_log<util::DefaultMsgPrint>( error );
+	data::enableLog<util::DefaultMsgPrint>( error );
 
 	BOOST_REQUIRE( !img6.reIndex() ); //reIndex on an empty image shall fail (size will be undefined)
 
-	data::enable_log<util::DefaultMsgPrint>( warning );
+	data::enableLog<util::DefaultMsgPrint>( warning );
 }
 
 
