@@ -42,7 +42,7 @@ bool &ProgParameter::hidden()
 
 bool ProgParameter::parse( const Value<std::string> &props )
 {
-	_internal::TypeBase &me = **this;
+	_internal::ValueBase &me = **this;
 	bool ret = false;
 
 	if ( ( ( std::string )props ).empty() ) {
@@ -51,7 +51,7 @@ bool ProgParameter::parse( const Value<std::string> &props )
 			ret = true;
 		}
 	} else {
-		ret = _internal::TypeBase::convert( props, me );
+		ret = _internal::ValueBase::convert( props, me );
 	}
 
 	LOG_IF( ret, Debug, info ) << "Parsed " << MSubject( props.toString() ) << " as " << me.toString( true );
@@ -122,9 +122,9 @@ bool ParameterMap::isComplete()const
 	return std::find_if( begin(), end(), neededP() ) == end();
 }
 
-ProgParameter::operator boost::scoped_ptr<_internal::TypeBase>::unspecified_bool_type()const
+ProgParameter::operator boost::scoped_ptr<_internal::ValueBase>::unspecified_bool_type()const
 {
-	boost::scoped_ptr<_internal::TypeBase> dummy;
+	boost::scoped_ptr<_internal::ValueBase> dummy;
 
 	if( ( *this )->castTo<bool>() )dummy.reset( new Value<int16_t> );
 

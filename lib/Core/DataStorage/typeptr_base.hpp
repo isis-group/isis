@@ -31,7 +31,7 @@ namespace _internal
 
 class ValuePtrBase : public util::_internal::GenericType
 {
-	friend class util::_internal::TypeReference<ValuePtrBase>;
+	friend class util::_internal::ValueReference<ValuePtrBase>;
 	static const _internal::ValuePtrConverterMap &converters();
 protected:
 	size_t m_len;
@@ -43,14 +43,14 @@ protected:
 public:
 	virtual const boost::weak_ptr<void> getRawAddress()const = 0;
 
-	typedef util::_internal::TypeReference<ValuePtrBase> Reference;
+	typedef util::_internal::ValueReference<ValuePtrBase> Reference;
 	typedef ValuePtrConverterMap::mapped_type::mapped_type Converter;
 
 	template<typename T> bool is()const;
 
 	const Converter &getConverterTo( unsigned short ID )const;
 	/**
-	* Dynamically cast the TypeBase up to its actual ValuePtr\<T\>. Constant version.
+	* Dynamically cast the ValueBase up to its actual ValuePtr\<T\>. Constant version.
 	* Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
 	* \returns a constant reference of the pointer.
 	*/
@@ -58,7 +58,7 @@ public:
 		return m_cast_to<ValuePtr<T> >();
 	}
 	/**
-	 * Dynamically cast the TypeBase up to its actual ValuePtr\<T\>. Referenced version.
+	 * Dynamically cast the ValueBase up to its actual ValuePtr\<T\>. Referenced version.
 	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
 	 * \returns a reference of the pointer.
 	 */
@@ -83,8 +83,8 @@ public:
 
 	///get the scaling (and offset) which would be used in an convertTo
 	scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const;
-	scaling_pair getScalingTo( unsigned short typeID, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale )const;
-	scaling_pair getScalingTo( unsigned short typeID, const std::pair<util::TypeReference, util::TypeReference> &minmax, autoscaleOption scaleopt = autoscale )const;
+	scaling_pair getScalingTo( unsigned short typeID, const util::_internal::ValueBase &min, const util::_internal::ValueBase &max, autoscaleOption scaleopt = autoscale )const;
+	scaling_pair getScalingTo( unsigned short typeID, const std::pair<util::ValueReference, util::ValueReference> &minmax, autoscaleOption scaleopt = autoscale )const;
 
 
 	/// Convert (or Copy) data from this to existing memory of maybe another type and the given length.
@@ -158,17 +158,17 @@ public:
 
 	/**
 	 * Get minimum/maximum from a ValuePtr.
-	 * This computes the minimum and maximum value of the stored data and stores them in TypeReference-Objects.
-	 * The computes min/max are of the same type as the stored data, but can be compared to other TypeReference without knowing this type via the lt/gt function of TypeBase.
+	 * This computes the minimum and maximum value of the stored data and stores them in ValueReference-Objects.
+	 * The computes min/max are of the same type as the stored data, but can be compared to other ValueReference without knowing this type via the lt/gt function of ValueBase.
 	 * The following code checks if the value range of ValuePtr-object data1 is a real subset of data2:
 	 * \code
-	 * std::pair<util::TypeReference,util::TypeReference> minmax1=data1.getMinMax(), minmax2=data2.getMinMax();
+	 * std::pair<util::ValueReference,util::ValueReference> minmax1=data1.getMinMax(), minmax2=data2.getMinMax();
 	 * if(minmax1.first->gt(minmax2.second) && minmax1.second->lt(minmax2.second)
 	 *  std::cout << minmax1 << " is a subset of " minmax2 << std::endl;
 	 * \endcode
-	 * \returns a pair of TypeReferences referring to the found minimum/maximum of the data
+	 * \returns a pair of ValueReferences referring to the found minimum/maximum of the data
 	 */
-	virtual std::pair<util::TypeReference, util::TypeReference> getMinMax()const = 0;
+	virtual std::pair<util::ValueReference, util::ValueReference> getMinMax()const = 0;
 	/**
 	 * Compare to another ValuePtr.
 	 * This counts the elements between start and end, which are not equal to the corresponding elements in dst.

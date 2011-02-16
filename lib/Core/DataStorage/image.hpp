@@ -298,12 +298,12 @@ public:
 	 */
 	template<typename T> std::pair<T, T> getMinMaxAs()const {
 		util::check_type<T>();// works only for T from _internal::types
-		std::pair<util::TypeReference, util::TypeReference> minmax = getMinMax();
+		std::pair<util::ValueReference, util::ValueReference> minmax = getMinMax();
 		return std::make_pair( minmax.first->as<T>(), minmax.second->as<T>() );
 	}
 
-	/// Get the maximum and the minimum voxel value of the image as a pair of TypeReference-objects.
-	std::pair<util::TypeReference, util::TypeReference> getMinMax()const;
+	/// Get the maximum and the minimum voxel value of the image as a pair of ValueReference-objects.
+	std::pair<util::ValueReference, util::ValueReference> getMinMax()const;
 
 	/**
 	 * Compares the voxel-values of this image to the given.
@@ -442,7 +442,7 @@ public:
 
 		//we want deep copies of the chunks, and we want them to be of type T
 		struct : _internal::SortedChunkList::chunkPtrOperator {
-			std::pair<util::TypeReference, util::TypeReference> scale;
+			std::pair<util::ValueReference, util::ValueReference> scale;
 			boost::shared_ptr<Chunk> operator()( const boost::shared_ptr< Chunk >& ptr ) {
 				return boost::shared_ptr<Chunk>( new MemChunk<T>( *ptr, scale ) );
 			}

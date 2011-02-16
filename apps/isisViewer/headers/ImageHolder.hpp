@@ -90,8 +90,8 @@ public:
 	vtkActor *getActorCoronal() const { return m_ActorCoronal; }
 	const int getCurrentTimeStep() const { return m_currentTimestep; }
 	const unsigned int getNumberOfTimesteps( void ) const { return m_TimeSteps; }
-	util::TypeReference getScalingFactor( void ) const { return m_ScalingFactor; }
-	util::TypeReference getOffset( void ) const { return m_Offset; }
+	util::ValueReference getScalingFactor( void ) const { return m_ScalingFactor; }
+	util::ValueReference getOffset( void ) const { return m_Offset; }
 
 private:
 	MatrixHandler m_MatrixHandler;
@@ -117,8 +117,8 @@ private:
 	unsigned int m_currentTimestep;
 	size_t m_X, m_Y, m_Z;
 
-	util::TypeReference m_ScalingFactor;
-	util::TypeReference m_Offset;
+	util::ValueReference m_ScalingFactor;
+	util::ValueReference m_Offset;
 
 	size_t m_Min, m_Max;
 

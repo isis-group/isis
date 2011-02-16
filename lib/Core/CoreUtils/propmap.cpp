@@ -423,7 +423,7 @@ bool PropertyMap::transform( key_type from,  key_type to, int dstID, bool delSou
 	bool ret = false;
 
 	if( ! found.isEmpty() ) {
-		util::TypeReference &dst = static_cast<util::TypeReference &>( propertyValue( to ) );
+		util::ValueReference &dst = static_cast<util::ValueReference &>( propertyValue( to ) );
 
 		if ( found->getTypeID() == dstID ) {
 			if( from != to ) {

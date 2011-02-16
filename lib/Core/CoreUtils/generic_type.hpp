@@ -72,28 +72,28 @@ public:
  * This class is designed as base class for specialisations, it should not be used directly.
  * Because of that, the contructors of this class are protected.
  */
-template<typename TYPE_TYPE> class TypeReference: protected boost::scoped_ptr<TYPE_TYPE>
+template<typename TYPE_TYPE> class ValueReference: protected boost::scoped_ptr<TYPE_TYPE>
 {
 	template<typename TT> friend class data::ValuePtr; //allow Value and ValuePtr to use the protected contructor below
 	template<typename TT> friend class Value;
 protected:
 	//dont use this directly
-	TypeReference( TYPE_TYPE *t ): boost::scoped_ptr<TYPE_TYPE>( t ) {}
+	ValueReference( TYPE_TYPE *t ): boost::scoped_ptr<TYPE_TYPE>( t ) {}
 public:
 	///reexport parts of scoped_ptr's interface
 	TYPE_TYPE *operator->() const {return boost::scoped_ptr<TYPE_TYPE>::operator->();}
 	TYPE_TYPE &operator*() const {return boost::scoped_ptr<TYPE_TYPE>::operator*();}
 	///Default contructor. Creates an empty reference
-	TypeReference() {}
+	ValueReference() {}
 	/**
 	* Copy constructor
 	* This operator creates a copy of the referenced Value-Object.
 	* So its NO cheap copy. (At least not if the copy-operator contained type is not cheap)
 	*/
-	TypeReference( const TypeReference &src ) {
+	ValueReference( const ValueReference &src ) {
 		operator=( src );
 	}
-	TypeReference( const TYPE_TYPE &src ) {
+	ValueReference( const TYPE_TYPE &src ) {
 		operator=( src );
 	}
 	/**
@@ -103,7 +103,7 @@ public:
 	 * If the source is empty the target will drop its content. Thus it will become empty as well.
 	 * \returns reference to the (just changed) target
 	 */
-	TypeReference<TYPE_TYPE>& operator=( const TypeReference<TYPE_TYPE> &src ) {
+	ValueReference<TYPE_TYPE>& operator=( const ValueReference<TYPE_TYPE> &src ) {
 		boost::scoped_ptr<TYPE_TYPE>::reset( src.isEmpty() ? 0 : src->clone() );
 		return *this;
 	}
@@ -112,7 +112,7 @@ public:
 	 * This operator replaces the current content by a copy of src.
 	 * \returns reference to the (just changed) target
 	 */
-	TypeReference<TYPE_TYPE>& operator=( const TYPE_TYPE &src ) {
+	ValueReference<TYPE_TYPE>& operator=( const TYPE_TYPE &src ) {
 		boost::scoped_ptr<TYPE_TYPE>::reset( src.clone() );
 		return *this;
 	}

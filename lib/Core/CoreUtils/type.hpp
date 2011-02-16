@@ -42,14 +42,14 @@ namespace _internal
 template<typename T, bool isNumber> class type_compare
 {
 public:
-	bool operator()( const Value<T> &first, const TypeBase &second )const {
+	bool operator()( const Value<T> &first, const ValueBase &second )const {
 		LOG( Debug, error ) << "comparison of " << Value<T>::staticName() << " is not supportet";
 		return false;
 	}
 };
 
 /**
- * Half-generic value comparison class for numeric Types.
+ * Half-generic value comparison class for numeric types.
  * This generic class does compares numeric Value's by converting the second
  * Value-object to the type of the first Value-object. Then:
  * - if the conversion was successfull (the second value can be represented in the type of the first) the "inRange"-comparison is used
@@ -65,9 +65,9 @@ protected:
 	virtual bool negOverflow( const Value<T> &first, const Value<T> &second )const {return false;} //default to false
 	virtual bool inRange( const Value<T> &first, const Value<T> &second )const {return false;} //default to false
 public:
-	bool operator()( const Value<T> &first, const TypeBase &second )const {
+	bool operator()( const Value<T> &first, const ValueBase &second )const {
 		// ask second for a converter from itself to Value<T>
-		const TypeBase::Converter conv = second.getConverterTo( Value<T>::staticID );
+		const ValueBase::Converter conv = second.getConverterTo( Value<T>::staticID );
 
 		if ( conv ) {
 			//try to convert second into T and handle results
@@ -132,21 +132,21 @@ protected:
 
 /**
  * Generic class for type aware variables.
- * Only this generic approach for types makes it possible to handle all the types of Properties for the different 
+ * Only this generic approach for types makes it possible to handle all the types of Properties for the different
  * data these library can handle. On the other side it's more complex to read and write with these kind of types.
  * Please don't bother about and look carefully at further comments on functionality and examples in use,
  * e.g. with PropertyValue.\n
  * For supported types see types.hpp \n
- * Another advantage is the available type conversion, for further information how to do this and 
+ * Another advantage is the available type conversion, for further information how to do this and
  * limitations see type_converter.hpp
  */
-	
-template<typename TYPE> class Value: public _internal::TypeBase
+
+template<typename TYPE> class Value: public _internal::ValueBase
 {
 	TYPE m_val;
 	static const char m_typeName[];
 protected:
-	TypeBase *clone() const {
+	ValueBase *clone() const {
 		return new Value<TYPE>( *this );
 	}
 public:
@@ -188,7 +188,7 @@ public:
 	}
 
 	/// \returns true if and only if this and second contain the same value of the same type
-	virtual bool operator==( const TypeBase &second )const {
+	virtual bool operator==( const ValueBase &second )const {
 		if ( second.is<TYPE>() ) {
 			return m_val == second.castTo<TYPE>();
 		} else
@@ -232,7 +232,7 @@ public:
 	 * \returns false if the conversion failed because the value was to high for TYPE (positive overflow)
 	 * \returns false if there is no know conversion from ref to TYPE
 	 */
-	bool gt( const _internal::TypeBase &ref )const {
+	bool gt( const _internal::ValueBase &ref )const {
 		return _internal::type_greater<TYPE, boost::is_arithmetic<TYPE>::value >()( *this, ref );
 	}
 	/**
@@ -244,7 +244,7 @@ public:
 	 * \returns true if the conversion failed because the value was to high for TYPE (positive overflow)
 	 * \returns false if there is no know conversion from ref to TYPE
 	 */
-	bool lt( const _internal::TypeBase &ref )const {
+	bool lt( const _internal::ValueBase &ref )const {
 		return _internal::type_less<TYPE, boost::is_arithmetic<TYPE>::value >()( *this, ref );
 	}
 	/**
@@ -256,35 +256,35 @@ public:
 	 * \returns false if the conversion failed because the value was to high for TYPE (positive overflow)
 	 * \returns false if there is no know conversion from ref to TYPE
 	 */
-	bool eq( const _internal::TypeBase &ref )const {
+	bool eq( const _internal::ValueBase &ref )const {
 		return _internal::type_eq<TYPE, boost::is_arithmetic<TYPE>::value >()( *this, ref );
 	}
 
 	virtual ~Value() {}
 };
 
-template<typename T> const Value<T>& _internal::TypeBase::castToType() const
+template<typename T> const Value<T>& _internal::ValueBase::castToType() const
 {
 	check_type<T>();
 	return m_cast_to<Value<T> >();
 }
-template<typename T> const T &_internal::TypeBase::castTo() const
+template<typename T> const T &_internal::ValueBase::castTo() const
 {
 	const Value<T> &ret = castToType<T>();
 	return ret.operator const T & ();
 }
-template<typename T> Value<T>& _internal::TypeBase::castToType()
+template<typename T> Value<T>& _internal::ValueBase::castToType()
 {
 	check_type<T>();
 	return m_cast_to<Value<T> >();
 }
-template<typename T> T &_internal::TypeBase::castTo()
+template<typename T> T &_internal::ValueBase::castTo()
 {
 	Value<T> &ret = castToType<T>();
 	return ret.operator T & ();
 }
 
-template<typename T> bool _internal::TypeBase::is()const
+template<typename T> bool _internal::ValueBase::is()const
 {
 	check_type<T>();
 	return getTypeID() == Value<T>::staticID;

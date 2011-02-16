@@ -124,7 +124,7 @@ void ImageHolder::setImages( util::PropertyMap propMap,  std::vector<vtkSmartPoi
 	LOG( Runtime, info ) << "Image contains " << m_ImageVector.size() << " timesteps.";
 	m_TimeSteps = m_ImageVector.size();
 	m_PropertyMap = propMap;
-	isis::util::TypeReference min, max;
+	isis::util::ValueReference min, max;
 #warning check this - the interfave for the conversion does not expect min max anymore
 	LOG( Runtime, info ) << "Image minimum: " << min << "; Image maximum: " << max;
 	m_ScalingFactor = m_PropertyMap.propertyValue( "scale" );

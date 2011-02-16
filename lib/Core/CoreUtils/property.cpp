@@ -31,7 +31,7 @@ bool PropertyValue::operator!= ( const util::PropertyValue &second )const
 }
 
 
-bool PropertyValue::operator== ( const _internal::TypeBase &second )const
+bool PropertyValue::operator== ( const _internal::ValueBase &second )const
 {
 	return !isEmpty() && get()->operator==( second );
 }

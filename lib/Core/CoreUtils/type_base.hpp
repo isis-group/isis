@@ -65,21 +65,21 @@ template<> struct __cast_to<uint8_t> { // we cannot lexical_cast to uint8_t - we
  * Both are derived from GenericType containing the description of the actual value type.
  */
 
-class TypeBase : public GenericType
+class ValueBase : public GenericType
 {
-	static const TypeConverterMap &converters();
-	friend class TypeReference<TypeBase>;
+	static const ValueConverterMap &converters();
+	friend class ValueReference<ValueBase>;
 protected:
 	/**
 	* Create a copy of this.
 	* Creates a new Value/ValuePtr an stores a copy of its value there.
-	* Makes TypeBase-pointers copyable without knowing their type.
-	* \returns a TypeBase-pointer to a newly created Value/ValuePtr.
+	* Makes ValueBase-pointers copyable without knowing their type.
+	* \returns a ValueBase-pointer to a newly created Value/ValuePtr.
 	*/
-	virtual TypeBase *clone()const = 0;
+	virtual ValueBase *clone()const = 0;
 public:
-	typedef TypeReference<TypeBase> Reference;
-	typedef TypeConverterMap::mapped_type::mapped_type Converter;
+	typedef ValueReference<ValueBase> Reference;
+	typedef ValueConverterMap::mapped_type::mapped_type Converter;
 
 	template<typename T> bool is()const;
 
@@ -93,13 +93,13 @@ public:
 	 * \param to the Value-object which will contain the converted value if conversion was successfull
 	 * \returns false if the conversion failed for any reason, true otherwise
 	 */
-	static bool convert( const TypeBase &from, TypeBase &to );
+	static bool convert( const ValueBase &from, ValueBase &to );
 
 	/**
 	* Interpret the value as value of any (other) type.
 	* This is a runtime-based cast via automatic conversion.
 	* \code
-	* TypeBase *mephisto=new Value<std::string>("666");
+	* ValueBase *mephisto=new Value<std::string>("666");
 	* int devil=mephisto->as<int>();
 	* \endcode
 	* If you know the type of source and destination at compile time you should use Value\<DEST_TYPE\>((SOURCE_TYPE)src).
@@ -125,7 +125,7 @@ public:
 	}
 
 	/**
-	 * Dynamically cast the TypeBase down to its actual Value\<T\>. Constant version.
+	 * Dynamically cast the ValueBase down to its actual Value\<T\>. Constant version.
 	 * Will throw std::bad_cast if T is not the actual type.
 	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
 	 * \returns a constant reference of the Value\<T\> object.
@@ -133,7 +133,7 @@ public:
 	template<typename T> const Value<T>& castToType() const;
 
 	/**
-	 * Dynamically cast the TypeBase up to its actual value of type T. Constant version.
+	 * Dynamically cast the ValueBase up to its actual value of type T. Constant version.
 	 * Will throw std::bad_cast if T is not the actual type.
 	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
 	 * \returns a constant reference of the stored value.
@@ -141,7 +141,7 @@ public:
 	template<typename T> const T &castTo() const;
 
 	/**
-	 * Dynamically cast the TypeBase up to its actual Value\<T\>. Referenced version.
+	 * Dynamically cast the ValueBase up to its actual Value\<T\>. Referenced version.
 	 * Will throw std::bad_cast if T is not the actual type.
 	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
 	 * \returns a reference of the Value\<T\> object.
@@ -149,7 +149,7 @@ public:
 	template<typename T> Value<T>& castToType();
 
 	/**
-	 * Dynamically cast the TypeBase up to its actual value of type T. Referenced version.
+	 * Dynamically cast the ValueBase up to its actual value of type T. Referenced version.
 	 * Will throw std::bad_cast if T is not the actual type.
 	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
 	 * \returns a reference of the stored value.
@@ -157,7 +157,7 @@ public:
 	template<typename T> T &castTo();
 
 	/// \returns true if and only if the types of this and second are equal and the values are equal
-	virtual bool operator==( const TypeBase &second )const = 0;
+	virtual bool operator==( const ValueBase &second )const = 0;
 
 	/// creates a copy of the stored value using a type referenced by its id
 	Reference copyToNewByID( unsigned short ID ) const;
@@ -168,16 +168,16 @@ public:
 	 */
 	bool fitsInto( unsigned short ID ) const;
 
-	virtual ~TypeBase();
+	virtual ~ValueBase();
 
-	virtual bool gt( const _internal::TypeBase &ref )const = 0;
-	virtual bool lt( const _internal::TypeBase &ref )const = 0;
-	virtual bool eq( const _internal::TypeBase &ref )const = 0;
+	virtual bool gt( const _internal::ValueBase &ref )const = 0;
+	virtual bool lt( const _internal::ValueBase &ref )const = 0;
+	virtual bool eq( const _internal::ValueBase &ref )const = 0;
 };
 
 }
 
-typedef _internal::TypeBase::Reference TypeReference;
+typedef _internal::ValueBase::Reference ValueReference;
 
 }
 }
@@ -192,7 +192,7 @@ operator<<( basic_ostream<charT, traits> &out, const isis::util::_internal::Gene
 }
 /// /// Streaming output for Value referencing classes
 template<typename charT, typename traits, typename TYPE_TYPE> basic_ostream<charT, traits>&
-operator<<( basic_ostream<charT, traits> &out, const isis::util::_internal::TypeReference<TYPE_TYPE> &s )
+operator<<( basic_ostream<charT, traits> &out, const isis::util::_internal::ValueReference<TYPE_TYPE> &s )
 {
 	return out << s.toString( true );
 }

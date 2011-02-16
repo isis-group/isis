@@ -30,14 +30,14 @@ namespace util
 /**
  * A very generic class to store values of properties.
  * PropertyValue may store a value of any type (defined in types.cpp) otherwise it's empty.
- * Empty TypeValues are never equal to anything (not even to empty TypeValues).
- * Non-empty TypeValues are equal-compareable.
+ * Empty ValueValues are never equal to anything (not even to empty ValueValues).
+ * Non-empty ValueValues are equal-compareable.
  * They only store a value but no name, because they will get a name when they are stored (in PropertyMap).
- * IMPORTANT: for this class "not equal" (not ==) does NOT mean "unequal" (!=) in case of both TypeValues empty
+ * IMPORTANT: for this class "not equal" (not ==) does NOT mean "unequal" (!=) in case of both ValueValues empty
  * see operators documentation below.
  * @author Enrico Reimer
  */
-class PropertyValue: public TypeReference
+class PropertyValue: public ValueReference
 {
 	bool m_needed;
 public:
@@ -49,11 +49,11 @@ public:
 	 * \param _needed flag if this PropertyValue is needed an thus not allowed to be empty (a.k.a. undefined)
 	 */
 	template<typename T> PropertyValue( const T &ref, bool _needed = false ):
-		TypeReference( new Value<T>( ref ) ), m_needed( _needed ) {
+		ValueReference( new Value<T>( ref ) ), m_needed( _needed ) {
 		check_type<T>();
 	}
 	template<typename T> PropertyValue( const Value<T>& ref, bool _needed = false ):
-		TypeReference( new Value<T>( ref ) ), m_needed( _needed ) {
+		ValueReference( new Value<T>( ref ) ), m_needed( _needed ) {
 		check_type<T>();
 	}
 	/**
@@ -93,7 +93,7 @@ public:
 	 * - both stored values are equal
 	 * \returns true if both contain the same value of type T, false otherwise.
 	 */
-	bool operator ==( const _internal::TypeBase &second )const;
+	bool operator ==( const _internal::ValueBase &second )const;
 	/**
 	 * Equality to a Value of type T (convenience function).
 	 * Properties are ONLY equal to Values if:
@@ -114,7 +114,7 @@ public:
 		} else if ( ! isEmpty() ) { // otherwise try to make me T and compare that
 			LOG( Debug, info )
 					<< *this << " is not " << Value<T>::staticName() << " trying to convert.";
-			TypeReference dst = ( *this )->copyToNewByID( Value<T>::staticID );
+			ValueReference dst = ( *this )->copyToNewByID( Value<T>::staticID );
 
 			if ( !dst.isEmpty() )
 				return dst->castTo<T>() == second;

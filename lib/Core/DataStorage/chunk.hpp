@@ -39,7 +39,7 @@ protected:
 	static const char *neededProperties;
 public:
 	//  static const dimensions dimension[n_dims]={readDim,phaseDim,sliceDim,timeDim};
-	typedef isis::util::_internal::TypeReference <ChunkBase > Reference;
+	typedef isis::util::_internal::ValueReference <ChunkBase > Reference;
 
 	ChunkBase( size_t firstDim, size_t secondDim, size_t thirdDim, size_t fourthDim );
 	virtual ~ChunkBase(); //needed to make it polymorphic
@@ -66,7 +66,7 @@ protected:
 	 */
 	template<typename TYPE, typename D> Chunk( TYPE *src, D d, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 ):
 		_internal::ChunkBase( firstDim, secondDim, thirdDim, fourthDim ),
-		util::_internal::TypeReference<_internal::ValuePtrBase>( new ValuePtr<TYPE>( src, getVolume(), d ) ) {}
+		util::_internal::ValueReference<_internal::ValuePtrBase>( new ValuePtr<TYPE>( src, getVolume(), d ) ) {}
 	Chunk( const ValuePtrReference &src, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 );
 public:
 	template <typename TYPE> class VoxelOp:std::unary_function<bool,TYPE>{
@@ -174,8 +174,8 @@ public:
 
 	///get the scaling (and offset) which would be used in an conversion to the given type
 	scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const;
-	scaling_pair getScalingTo( unsigned short typeID, const std::pair<util::TypeReference, util::TypeReference> &minmax, autoscaleOption scaleopt = autoscale )const;
-	scaling_pair getScalingTo( unsigned short typeID, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale )const;
+	scaling_pair getScalingTo( unsigned short typeID, const std::pair<util::ValueReference, util::ValueReference> &minmax, autoscaleOption scaleopt = autoscale )const;
+	scaling_pair getScalingTo( unsigned short typeID, const util::_internal::ValueBase &min, const util::_internal::ValueBase &max, autoscaleOption scaleopt = autoscale )const;
 
 
 	size_t bytesPerVoxel()const;
@@ -194,7 +194,7 @@ public:
 	size_t compareLine( size_t secondDimS, size_t thirdDimS, size_t fourthDimS, const Chunk &dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD )const;
 	size_t compareSlice( size_t thirdDimS, size_t fourthDimS, const Chunk &dst, size_t thirdDimD, size_t fourthDimD )const;
 
-	std::pair<util::TypeReference, util::TypeReference> getMinMax()const;
+	std::pair<util::ValueReference, util::ValueReference> getMinMax()const;
 
 	Chunk &operator=( const Chunk &ref );
 
@@ -342,7 +342,7 @@ public:
 	 * \param min
 	 * \param max the value range of the source to be used when the scaling for the conversion is computed
 	 */
-	MemChunkNonDel( const Chunk &ref, const util::_internal::TypeBase &min, const  util::_internal::TypeBase &max ): Chunk( ref ) {
+	MemChunkNonDel( const Chunk &ref, const util::_internal::ValueBase &min, const  util::_internal::ValueBase &max ): Chunk( ref ) {
 		//get rid of my ValuePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
 		ValuePtrReference::operator=( ref.getTypePtrBase().copyToNewByID( ValuePtr<TYPE>::staticID, min, max ) );
 	}

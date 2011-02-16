@@ -216,7 +216,7 @@ void isisPropertyViewer::edit_item( QTreeWidgetItem *item, int val )
 
 			if ( not tmpProp->is<isis::util::fvector4>() ) {
 				isis::util::Value<std::string> myVal( val.toStdString() );
-				isis::util::_internal::TypeBase::convert( myVal, *tmpProp );
+				isis::util::_internal::ValueBase::convert( myVal, *tmpProp );
 			} else {
 				isis::util::fvector4 &tmpVector = tmpPropMap.propertyValue( propName )->cast_to_Type<isis::util::fvector4>();
 

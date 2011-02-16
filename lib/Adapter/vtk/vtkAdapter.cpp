@@ -33,7 +33,7 @@ std::vector<vtkSmartPointer<vtkImageData> >vtkAdapter::makeVtkImageObject( const
 	const util::fvector4 indexOrigin( src->getPropertyAs<util::fvector4>( "indexOrigin" ) );
 	const util::fvector4 spacing( src->getPropertyAs<util::fvector4>( "voxelSize" ) );
 	std::vector<vtkSmartPointer<vtkImageData> > retVector;
-	util::TypeReference min, max;
+	util::ValueReference min, max;
 	src->getMinMax( min, max );
 	scaling = src->getChunksAsVector().front()->getScalingTo( data::ValuePtr<uint8_t>::staticID, *min, *max, data::autoscale );
 	void *targePtr = malloc( src->getBytesPerVoxel() * src->getVolume() );

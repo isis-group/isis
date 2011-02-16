@@ -11,7 +11,7 @@
 // This might crash on MacOS. See http://old.nabble.com/-Boost.Test--Error:-Non-aligned-pointer-being-freed-td24335733.html
 // seems to work with XCode 3.2.3 and boost 1.42
 
-#define BOOST_TEST_MODULE TypeTest
+#define BOOST_TEST_MODULE ValueTest
 #define NOMINMAX 1
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
@@ -28,7 +28,7 @@ namespace test
 using util::Value;
 using util::fvector4;
 using util::ivector4;
-using util::_internal::TypeBase;
+using util::_internal::ValueBase;
 
 // TestCase object instantiation
 BOOST_AUTO_TEST_CASE( test_type_init )
@@ -146,10 +146,10 @@ BOOST_AUTO_TEST_CASE( type_conversion_test )
 	Value<float> tFloat1( 3.1415 );
 	Value<float> tFloat2( 3.5415 );
 	Value<ivector4> vec( ivector4( 1, 2, 3, 4 ) );
-	TypeBase *iRef = &tInt;
-	TypeBase *fRef1 = &tFloat1;
-	TypeBase *fRef2 = &tFloat2;
-	TypeBase *vRef = &vec;
+	ValueBase *iRef = &tInt;
+	ValueBase *fRef1 = &tFloat1;
+	ValueBase *fRef2 = &tFloat2;
+	ValueBase *vRef = &vec;
 	BOOST_CHECK_EQUAL( iRef->as<double>(), 42 );
 	BOOST_CHECK_EQUAL( fRef1->as<int32_t>(), ( int32_t )ceil( tFloat1 - .5 ) );
 	BOOST_CHECK_EQUAL( fRef2->as<int32_t>(), ( int32_t )ceil( tFloat2 - .5 ) );

@@ -280,15 +280,15 @@ public:
 		return sizeof( TYPE );
 	}
 	/// \copydoc _internal::ValuePtrBase::getMinMax
-	std::pair<util::TypeReference, util::TypeReference> getMinMax()const {
+	std::pair<util::ValueReference, util::ValueReference> getMinMax()const {
 		if ( length() == 0 ) {
 			LOG( Runtime, warning ) << "Skipping computation of min/max on an empty ValuePtr";
-			std::pair<util::TypeReference, util::TypeReference>();
+			std::pair<util::ValueReference, util::ValueReference>();
 		}
 
 		const std::pair<util::Value<TYPE>, util::Value<TYPE> > result = _internal::getMinMaxImpl<TYPE, boost::is_arithmetic<TYPE>::value>()( *this );
 
-		return std::make_pair( util::TypeReference( result.first ), util::TypeReference( result.second ) );
+		return std::make_pair( util::ValueReference( result.first ), util::ValueReference( result.second ) );
 	}
 
 	/**

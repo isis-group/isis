@@ -467,16 +467,16 @@ size_t Image::getBytesPerVoxel() const
 	return size;
 }
 
-std::pair<util::TypeReference, util::TypeReference> Image::getMinMax () const
+std::pair<util::ValueReference, util::ValueReference> Image::getMinMax () const
 {
-	std::pair<util::TypeReference, util::TypeReference> ret;
+	std::pair<util::ValueReference, util::ValueReference> ret;
 
 	if( !lookup.empty() ) {
 		std::vector<boost::shared_ptr<Chunk> >::const_iterator i = lookup.begin();
 		ret = ( *i )->getMinMax();
 
 		for( ++i; i != lookup.end(); ++i ) {
-			std::pair<util::TypeReference, util::TypeReference> current = ( *i )->getMinMax();
+			std::pair<util::ValueReference, util::ValueReference> current = ( *i )->getMinMax();
 
 			if( ret.first->gt( *current.first ) )
 				ret.first = current.first;
@@ -489,10 +489,10 @@ std::pair<util::TypeReference, util::TypeReference> Image::getMinMax () const
 	return ret;
 }
 
-std::pair< util::TypeReference, util::TypeReference > Image::getScalingTo( short unsigned int targetID, autoscaleOption scaleopt ) const
+std::pair< util::ValueReference, util::ValueReference > Image::getScalingTo( short unsigned int targetID, autoscaleOption scaleopt ) const
 {
 	LOG_IF( !clean, Runtime, error ) << "You should run reIndex before running this";
-	std::pair<util::TypeReference, util::TypeReference> minmax = getMinMax();
+	std::pair<util::ValueReference, util::ValueReference> minmax = getMinMax();
 
 	bool unique = true;
 	const std::vector<boost::shared_ptr<const Chunk> > chunks = getChunksAsVector();
@@ -504,8 +504,8 @@ std::pair< util::TypeReference, util::TypeReference > Image::getScalingTo( short
 		}
 	}
 	return std::make_pair( //ok seems like no conversion is needed - return 1/0
-			   util::TypeReference( util::Value<uint8_t>( 1 ) ),
-			   util::TypeReference( util::Value<uint8_t>( 0 ) )
+			   util::ValueReference( util::Value<uint8_t>( 1 ) ),
+			   util::ValueReference( util::Value<uint8_t>( 0 ) )
 		   );
 }
 
@@ -594,7 +594,7 @@ unsigned short Image::getMajorTypeID() const
 {
 	unsigned int mytypeID = chunkPtrAt( 0 )->getTypeID();
 	size_t tmpBytesPerVoxel = 0;
-	std::pair<util::TypeReference, util::TypeReference> minmax = getMinMax();
+	std::pair<util::ValueReference, util::ValueReference> minmax = getMinMax();
 	LOG( Debug, info ) << "Determining  datatype of image with the value range " << minmax;
 
 	if( minmax.first->getTypeID() == minmax.second->getTypeID() ) { // ok min and max are the same type - trivial case
