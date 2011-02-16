@@ -29,7 +29,7 @@ namespace util
 
 /**
  * A very generic class to store values of properties.
- * TypeValue may store a value of any type (defined in types.cpp) otherwise it's empty.
+ * PropertyValue may store a value of any type (defined in types.cpp) otherwise it's empty.
  * Empty TypeValues are never equal to anything (not even to empty TypeValues).
  * Non-empty TypeValues are equal-compareable.
  * They only store a value but no name, because they will get a name when they are stored (in PropertyMap).
@@ -37,7 +37,7 @@ namespace util
  * see operators documentation below.
  * @author Enrico Reimer
  */
-class TypeValue: public TypeReference
+class PropertyValue: public TypeReference
 {
 	bool m_needed;
 public:
@@ -46,38 +46,38 @@ public:
 	 * Creates and stores a value from any known type.
 	 * If the type is not known (there is no Value\<type\> available) an compiler error will be raised.
 	 * \param ref the value to be stored
-	 * \param _needed flag if this TypeValue is needed an thus not allowed to be empty (a.k.a. undefined)
+	 * \param _needed flag if this PropertyValue is needed an thus not allowed to be empty (a.k.a. undefined)
 	 */
-	template<typename T> TypeValue( const T &ref, bool _needed = false ):
+	template<typename T> PropertyValue( const T &ref, bool _needed = false ):
 		TypeReference( new Value<T>( ref ) ), m_needed( _needed ) {
 		check_type<T>();
 	}
-	template<typename T> TypeValue( const Value<T>& ref, bool _needed = false ):
+	template<typename T> PropertyValue( const Value<T>& ref, bool _needed = false ):
 		TypeReference( new Value<T>( ref ) ), m_needed( _needed ) {
 		check_type<T>();
 	}
 	/**
 	 * Empty constructor.
-	 * Creates an empty property value. So TypeValue().isEmpty() will allways be true.
-	 * \param _needed flag if this TypeValue is needed an thus not allowed to be empty (a.k.a. undefined)
+	 * Creates an empty property value. So PropertyValue().isEmpty() will allways be true.
+	 * \param _needed flag if this PropertyValue is needed an thus not allowed to be empty (a.k.a. undefined)
 	 */
-	TypeValue( bool _needed = false );
-	/// returns true if TypeValue is marked as needed, false otherwise
+	PropertyValue( bool _needed = false );
+	/// returns true if PropertyValue is marked as needed, false otherwise
 	bool &needed();
 	///\copydoc needed
 	bool isNeeded ()const;
 
 	/**
-	 * Equality to another TypeValue.
+	 * Equality to another PropertyValue.
 	 * Properties are ONLY equal if:
 	 * - both properties are not empty
 	 * - both properties contain the same value type T
 	 * - the stored values are equal
 	 * \returns true if both contain the same value of type T, false otherwise.
 	 */
-	bool operator ==( const TypeValue &second )const;
+	bool operator ==( const PropertyValue &second )const;
 	/**
-	 * Unequality to another TypeValue.
+	 * Unequality to another PropertyValue.
 	 * Properties are ONLY unequal if:
 	 * - only one of both properties is empty
 	 * - or both properties contain a different value of same type T
@@ -85,9 +85,9 @@ public:
 	 * If both are empty, they are not unequal
 	 * \returns true if they differ in type T or in value of same type, false otherwise.
 	 */
-	bool operator !=( const TypeValue &second )const;
+	bool operator !=( const PropertyValue &second )const;
 	/**
-	 * Equality to another Value-Object (this cannot be empty but TypeValue can).
+	 * Equality to another Value-Object (this cannot be empty but PropertyValue can).
 	 * Properties are ONLY equal to Value-Object if:
 	 * - the property and the Value-Object contain the same value type T
 	 * - both stored values are equal
@@ -101,7 +101,7 @@ public:
 	 * - the property contains the value type T or is convertible into it
 	 * - stored/converted value is equal to the given value
 	 * \warning because of rounding in the conversion the following will be true.
-	 * \code TypeValue(4.5)==5 \endcode
+	 * \code PropertyValue(4.5)==5 \endcode
 	 * If Debug is enabled and its loglevel is at least warning, a message will be send to the logger.
 	 * \returns true if both contain the same value of type T, false otherwise.
 	 */

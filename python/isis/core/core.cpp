@@ -48,9 +48,9 @@ BOOST_PYTHON_MODULE( _core )
 	.def( "setPropertyAs", &_PropMap::_setPropertyAs )
 	;
 	//#######################################################################################
-	//  TypeValue
+	//  PropertyValue
 	//#######################################################################################
-	class_<isis::util::TypeValue, _TypeValue>( "TypeValue", init<>() )
+	class_<isis::util::PropertyValue, _TypeValue>( "PropertyValue", init<>() )
 	.def( init<_TypeValue>() )
 	.def( "toString", &_TypeValue::_toString )
 	;

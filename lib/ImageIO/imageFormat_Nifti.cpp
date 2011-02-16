@@ -310,7 +310,7 @@ public:
 	 ****************************************/
 private:
 
-	void geometryFromNifti( util::TypeValue &read, util::TypeValue &phase, util::TypeValue &slice, const mat44 &geo, const util::fvector4 &div ) {
+	void geometryFromNifti( util::PropertyValue &read, util::PropertyValue &phase, util::PropertyValue &slice, const mat44 &geo, const util::fvector4 &div ) {
 		read->castTo<util::fvector4>() = util::fvector4( geo.m[0][0], geo.m[1][0], geo.m[2][0], geo.m[3][0] ) / div[0];
 		phase->castTo<util::fvector4>() = util::fvector4( geo.m[0][1], geo.m[1][1], geo.m[2][1], geo.m[3][1] ) / div[1];
 		slice->castTo<util::fvector4>() = util::fvector4( geo.m[0][2], geo.m[1][2], geo.m[2][2], geo.m[3][2] ) / div[2];

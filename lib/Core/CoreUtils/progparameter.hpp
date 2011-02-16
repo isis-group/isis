@@ -29,11 +29,11 @@ namespace util
 {
 /**
  * Container class for programm parameters (commandline parameters) given to applications derived from isis.
- * It is derived from TypeValue, and thus can store any known type.
+ * It is derived from PropertyValue, and thus can store any known type.
  * Additionally, it holds a description of the parameter and
  * parses the given strings to cast them to correct internal parameter types.
  */
-class ProgParameter: public TypeValue
+class ProgParameter: public PropertyValue
 {
 	std::string m_description;
 	bool m_hidden, m_set;
@@ -52,7 +52,7 @@ public:
 	 * (The value is used as default value if the parameter never gets to parse any other value)
 	 * \param needed flag if parameter is a needed one (default: true)
 	 */
-	template<typename T> ProgParameter( const T &ref, bool needed = true ): TypeValue( ref, needed ), m_hidden( false ), m_set( false ) {}
+	template<typename T> ProgParameter( const T &ref, bool needed = true ): PropertyValue( ref, needed ), m_hidden( false ), m_set( false ) {}
 	/**
 	 * Put the given value into this parameter.
 	 * The parsing is done by automatic (!) type-conversion from std::string to the type of the parameter.

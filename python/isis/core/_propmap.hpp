@@ -30,7 +30,7 @@ public:
 		return this->branch( key );
 	}
 
-	isis::util::TypeValue _propertyValue( const util::istring &key ) {
+	isis::util::PropertyValue _propertyValue( const util::istring &key ) {
 		return this->propertyValue( key );
 	}
 

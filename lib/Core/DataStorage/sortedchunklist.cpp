@@ -43,7 +43,7 @@ bool SortedChunkList::posCompare::operator()( const util::fvector4 &posA, const 
 
 	return false;
 }
-bool SortedChunkList::scalarPropCompare::operator()( const isis::util::TypeValue &a, const isis::util::TypeValue &b ) const
+bool SortedChunkList::scalarPropCompare::operator()( const isis::util::PropertyValue &a, const isis::util::PropertyValue &b ) const
 {
 	const util::_internal::TypeBase &aScal = *a;
 	const util::_internal::TypeBase &bScal = *b;
@@ -72,7 +72,7 @@ SortedChunkList::SortedChunkList( util::PropertyMap::KeyType fvectorPropName, ut
 
 
 // low level finding
-boost::shared_ptr<Chunk> SortedChunkList::secondaryFind( const util::TypeValue &key, SortedChunkList::SecondaryMap &map )
+boost::shared_ptr<Chunk> SortedChunkList::secondaryFind( const util::PropertyValue &key, SortedChunkList::SecondaryMap &map )
 {
 	const SecondaryMap::iterator found = map.find( key );
 	return found != map.end() ? found->second : boost::shared_ptr<Chunk>();

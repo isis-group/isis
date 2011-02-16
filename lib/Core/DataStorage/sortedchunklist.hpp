@@ -42,7 +42,7 @@ public:
 	struct scalarPropCompare {
 		util::PropertyMap::KeyType propertyName;
 		scalarPropCompare( const util::PropertyMap::KeyType &prop_name );
-		bool operator()( const util::TypeValue &a, const util::TypeValue &b ) const;
+		bool operator()( const util::PropertyValue &a, const util::PropertyValue &b ) const;
 	};
 	struct posCompare {
 		bool operator()( const util::fvector4 &a, const util::fvector4 &b ) const;
@@ -52,7 +52,7 @@ public:
 		virtual ~chunkPtrOperator();
 	};
 private:
-	typedef std::map<util::TypeValue, boost::shared_ptr<Chunk>, scalarPropCompare> SecondaryMap;
+	typedef std::map<util::PropertyValue, boost::shared_ptr<Chunk>, scalarPropCompare> SecondaryMap;
 	typedef std::map<util::fvector4, SecondaryMap, posCompare> PrimaryMap;
 
 	std::stack<scalarPropCompare> secondarySort;
@@ -60,7 +60,7 @@ private:
 	PrimaryMap chunks;
 
 	// low level finding
-	boost::shared_ptr<Chunk> secondaryFind( const util::TypeValue &key, SecondaryMap &map );
+	boost::shared_ptr<Chunk> secondaryFind( const util::PropertyValue &key, SecondaryMap &map );
 	SecondaryMap *primaryFind( const util::fvector4 &key );
 
 	// low level inserting

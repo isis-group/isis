@@ -16,12 +16,12 @@ namespace python
 {
 
 
-class _TypeValue : public TypeValue, boost::python::wrapper< TypeValue >
+class _TypeValue : public PropertyValue, boost::python::wrapper< PropertyValue >
 {
 public:
 	_TypeValue () {}
-	_TypeValue ( PyObject *p ) : self( p ),  boost::python::wrapper< TypeValue >() {}
-	_TypeValue ( PyObject *p, const TypeValue &base ) : TypeValue( base ), self( p ),  boost::python::wrapper< TypeValue >() {}
+	_TypeValue ( PyObject *p ) : self( p ),  boost::python::wrapper< PropertyValue >() {}
+	_TypeValue ( PyObject *p, const PropertyValue &base ) : PropertyValue( base ), self( p ),  boost::python::wrapper< PropertyValue >() {}
 
 	std::string _toString( bool label ) { return this->toString( label ); }
 private:

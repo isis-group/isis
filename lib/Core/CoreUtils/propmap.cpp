@@ -163,7 +163,7 @@ bool PropertyMap::recursiveRemove( PropertyMap &root, const propPathIterator at,
 /////////////////////////////////////////////////////////////////////////////////////
 // Generic interface for accessing elements
 ////////////////////////////////////////////////////////////////////////////////////
-const TypeValue &PropertyMap::propertyValue( const key_type &key )const
+const PropertyValue &PropertyMap::propertyValue( const key_type &key )const
 {
 	const propPath path = util::stringToList<key_type>( key, pathSeperator );
 	const mapped_type *ref = findEntry( *this, path.begin(), path.end() );
@@ -176,11 +176,11 @@ const TypeValue &PropertyMap::propertyValue( const key_type &key )const
 	}
 }
 
-TypeValue &PropertyMap::propertyValue( const key_type &key )
+PropertyValue &PropertyMap::propertyValue( const key_type &key )
 {
 	const propPath path = util::stringToList<key_type>( key, pathSeperator );
 	mapped_type &n = fetchEntry( *this, path.begin(), path.end() );
-	LOG_IF( ! n.is_leaf(), Debug, error ) << "Using branch " << key << " as TypeValue";
+	LOG_IF( ! n.is_leaf(), Debug, error ) << "Using branch " << key << " as PropertyValue";
 	return n.getLeaf();
 }
 
@@ -280,8 +280,8 @@ void PropertyMap::diffTree( const PropertyMap &other, PropertyMap::DiffMap &ret,
 				const PropertyMap &refMap = second.getBranch();
 				thisMap.diffTree( refMap, ret, pathname + "/" );
 			} else if ( ! ( first == second )  ) { // if they are not equal
-				const TypeValue firstVal = first.is_leaf() ? first.getLeaf() : TypeValue( Value<std::string>( first.toString() ) );
-				const TypeValue secondVal = second.is_leaf() ? second.getLeaf() : TypeValue( Value<std::string>( second.toString() ) );
+				const PropertyValue firstVal = first.is_leaf() ? first.getLeaf() : PropertyValue( Value<std::string>( first.toString() ) );
+				const PropertyValue secondVal = second.is_leaf() ? second.getLeaf() : PropertyValue( Value<std::string>( second.toString() ) );
 				ret.insert( // add (propertyname|(value1|value2))
 					ret.end(),      // we know it has to be at the end
 					std::make_pair(
@@ -291,12 +291,12 @@ void PropertyMap::diffTree( const PropertyMap &other, PropertyMap::DiffMap &ret,
 				);
 			}
 		} else { // if ref is not in the other map
-			const TypeValue firstVal = thisIt->second.is_leaf() ? thisIt->second.getLeaf() : TypeValue( Value<std::string>( thisIt->second.toString() ) );
+			const PropertyValue firstVal = thisIt->second.is_leaf() ? thisIt->second.getLeaf() : PropertyValue( Value<std::string>( thisIt->second.toString() ) );
 			ret.insert( // add (propertyname|(value1|[empty]))
 				ret.end(),      // we know it has to be at the end
 				std::make_pair(
 					pathname,
-					std::make_pair( firstVal, TypeValue() )
+					std::make_pair( firstVal, PropertyValue() )
 				)
 			);
 		}
@@ -309,11 +309,11 @@ void PropertyMap::diffTree( const PropertyMap &other, PropertyMap::DiffMap &ret,
 		const propPath::value_type pathname = prefix + otherIt->first;
 
 		if ( ! _internal::continousFind( thisIt, end(), *otherIt, value_comp() ) ) { //there is nothing in this which has the same key as ref
-			const TypeValue secondVal = otherIt->second.is_leaf() ? otherIt->second.getLeaf() : TypeValue( Value<std::string>( otherIt->second.toString() ) );
+			const PropertyValue secondVal = otherIt->second.is_leaf() ? otherIt->second.getLeaf() : PropertyValue( Value<std::string>( otherIt->second.toString() ) );
 			ret.insert(
 				std::make_pair( // add (propertyname|([empty]|value2))
 					pathname,
-					std::make_pair( TypeValue(), secondVal )
+					std::make_pair( PropertyValue(), secondVal )
 				)
 			);
 		}
@@ -419,7 +419,7 @@ PropertyMap::FlatMap PropertyMap::getFlatMap() const
 
 bool PropertyMap::transform( key_type from,  key_type to, int dstID, bool delSource )
 {
-	const TypeValue &found = propertyValue( from );
+	const PropertyValue &found = propertyValue( from );
 	bool ret = false;
 
 	if( ! found.isEmpty() ) {
@@ -551,7 +551,7 @@ bool PropertyMap::invalidP::operator()( const PropertyMap::value_type &ref ) con
 bool PropertyMap::treeInvalidP::operator()( const PropertyMap::value_type &ref ) const
 {
 	if ( ref.second.is_leaf() ) {
-		const TypeValue &val = ref.second.getLeaf();
+		const PropertyValue &val = ref.second.getLeaf();
 		return val.isNeeded() && val.isEmpty();
 	} else  {
 		return ! ref.second.getBranch().isValid();
