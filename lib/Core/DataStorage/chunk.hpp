@@ -38,10 +38,10 @@ class ChunkBase : public NDimensional<4>, public util::PropertyMap
 protected:
 	static const char *neededProperties;
 public:
-	//  static const dimensions dimension[n_dims]={readDim,phaseDim,sliceDim,timeDim};
+	//  static const dimensions dimension[n_dims]={rowDim,columnDim,sliceDim,timeDim};
 	typedef isis::util::_internal::ValueReference <ChunkBase > Reference;
 
-	ChunkBase( size_t firstDim, size_t secondDim, size_t thirdDim, size_t fourthDim );
+	ChunkBase( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps );
 	virtual ~ChunkBase(); //needed to make it polymorphic
 };
 }
@@ -59,15 +59,15 @@ protected:
 	 * Creates an data-block from existing data.
 	 * \param src is a pointer to the existing data. This data will automatically be deleted. So don't use this pointer afterwards.
 	 * \param d is the deleter to be used for deletion of src. It must define operator(TYPE *), which than shall free the given pointer.
-	 * \param firstDim size in the first dimension (usually read-encoded dim)
-	 * \param secondDim size in the second dimension (usually phase-encoded dim)
-	 * \param thirdDim size in the third dimension (usually slice-encoded dim)
-	 * \param fourthDim size in the fourth dimension
+	 * \param nrOfColumns size in the first dimension (usually read-encoded dim)
+	 * \param nrOfRows size in the second dimension (usually phase-encoded dim)
+	 * \param nrOfSlices size in the third dimension (usually slice-encoded dim)
+	 * \param nrOfTimesteps size in the fourth dimension
 	 */
-	template<typename TYPE, typename D> Chunk( TYPE *src, D d, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 ):
-		_internal::ChunkBase( firstDim, secondDim, thirdDim, fourthDim ),
+	template<typename TYPE, typename D> Chunk( TYPE *src, D d, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 ):
+		_internal::ChunkBase( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ),
 		util::_internal::ValueReference<_internal::ValuePtrBase>( new ValuePtr<TYPE>( src, getVolume(), d ) ) {}
-	Chunk( const ValuePtrReference &src, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 );
+	Chunk( const ValuePtrReference &src, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 );
 public:
 	template <typename TYPE> class VoxelOp:std::unary_function<bool,TYPE>{
 	public:
@@ -78,10 +78,10 @@ public:
 	 * If index is invalid, behaviour is undefined. Most probably it will crash.
 	 * If _ENABLE_DATA_DEBUG is true an error message will be send (but it will _not_ stop).
 	 */
-	template<typename TYPE> TYPE &voxel( size_t firstDim, size_t secondDim = 0, size_t thirdDim = 0, size_t fourthDim = 0 ) {
-		const size_t idx[] = {firstDim, secondDim, thirdDim, fourthDim};
+	template<typename TYPE> TYPE &voxel( size_t nrOfColumns, size_t nrOfRows = 0, size_t nrOfSlices = 0, size_t nrOfTimesteps = 0 ) {
+		const size_t idx[] = {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps};
 		LOG_IF( ! isInRange( idx ), Debug, isis::error )
-				<< "Index " << util::ivector4( firstDim, secondDim, thirdDim, fourthDim )
+				<< "Index " << util::ivector4( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps )
 				<< " is out of range " << getSizeAsString();
 		ValuePtr<TYPE> &ret = asTypePtr<TYPE>();
 		return ret[getLinearIndex( idx )];
@@ -90,12 +90,12 @@ public:
 	 * Gets a const reference of the element at a given index.
 	 * \copydetails Chunk::voxel
 	 */
-	template<typename TYPE> const TYPE &voxel( size_t firstDim, size_t secondDim = 0, size_t thirdDim = 0, size_t fourthDim = 0 )const {
-		const size_t idx[] = {firstDim, secondDim, thirdDim, fourthDim};
+	template<typename TYPE> const TYPE &voxel( size_t nrOfColumns, size_t nrOfRows = 0, size_t nrOfSlices = 0, size_t nrOfTimesteps = 0 )const {
+		const size_t idx[] = {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps};
 
 		if ( !isInRange( idx ) ) {
 			LOG( Debug, isis::error )
-					<< "Index " << firstDim << "|" << secondDim << "|" << thirdDim << "|" << fourthDim
+					<< "Index " << nrOfColumns << "|" << nrOfRows << "|" << nrOfSlices << "|" << nrOfTimesteps
 					<< " is out of range (" << getSizeAsString() << ")";
 		}
 
@@ -118,8 +118,8 @@ public:
 
 		for(pos[timeDim]=0;pos[timeDim]<size[timeDim];pos[timeDim]++)
 			for(pos[sliceDim]=0;pos[sliceDim]<size[sliceDim];pos[sliceDim]++)
-				for(pos[phaseDim]=0;pos[phaseDim]<size[phaseDim];pos[phaseDim]++)
-					for(pos[readDim]=0;pos[readDim]<size[readDim];pos[readDim]++){
+				for(pos[columnDim]=0;pos[columnDim]<size[columnDim];pos[columnDim]++)
+					for(pos[rowDim]=0;pos[rowDim]<size[rowDim];pos[rowDim]++){
 						if(op(*(vox++),pos+offset)==false)
 							++ret;
 					}
@@ -149,7 +149,7 @@ public:
 
 	/// \returns the number of cheap-copy-chunks using the same memory as this
 	const size_t useCount()const;
-	Chunk cloneToNew( size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 )const;
+	Chunk cloneToNew( size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 )const;
 
 	/**
 	 * Ensure, the chunk has the type with the requested ID.
@@ -214,7 +214,7 @@ public:
 	 * As this will not set or use any property
 	 * - they have to be modified afterwards
 	 * - this can be done on chunks without any property (aka invalid Chunks)
-	 * E.g. splice\(phaseDim\) on a chunk of the size 512x512x128 will result in 512*128 chunks of the size 512x1x1
+	 * E.g. splice\(columnDim\) on a chunk of the size 512x512x128 will result in 512*128 chunks of the size 512x1x1
 	 */
 	std::list<Chunk> splice( dimensions atDim )const;
 
@@ -241,27 +241,27 @@ template<typename TYPE> class MemChunk : public Chunk
 {
 public:
 	/// Create an empty MemChunk with the given size
-	MemChunk( size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 ):
+	MemChunk( size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 ):
 		Chunk(
-			( TYPE * )calloc( fourthDim *thirdDim *secondDim *firstDim, sizeof( TYPE ) ),
+			( TYPE * )calloc( nrOfTimesteps *nrOfSlices *nrOfRows *nrOfColumns, sizeof( TYPE ) ),
 			typename ValuePtr<TYPE>::BasicDeleter(),
-			firstDim, secondDim, thirdDim, fourthDim
+			nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps
 		) {}
 	/**
 	 * Create a MemChunk as copy of a given raw memory block
 	 * This will create a MemChunk of the given size and fill it with the data at the given address.
 	 * No range check will be done.
 	 * \param org pointer to the raw data which shall be copied
-	 * \param firstDim
-	 * \param secondDim
-	 * \param thirdDim
-	 * \param fourthDim size of the resulting image
+	 * \param nrOfColumns
+	 * \param nrOfRows
+	 * \param nrOfSlices
+	 * \param nrOfTimesteps size of the resulting image
 	 */
-	MemChunk( const TYPE *const org, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 ):
+	MemChunk( const TYPE *const org, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 ):
 		Chunk(
-			( TYPE * )malloc( sizeof( TYPE )*fourthDim *thirdDim *secondDim *firstDim ),
+			( TYPE * )malloc( sizeof( TYPE )*nrOfTimesteps *nrOfSlices *nrOfRows *nrOfColumns ),
 			typename ValuePtr<TYPE>::BasicDeleter(),
-			firstDim, secondDim, thirdDim, fourthDim
+			nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps
 		) {
 		asTypePtr<TYPE>().copyFromMem( org, getVolume() );
 	}
@@ -305,11 +305,11 @@ template<typename TYPE> class MemChunkNonDel : public Chunk
 public:
 	//
 	/// Create an empty MemChunkNoDel with the given size
-	MemChunkNonDel( size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 ):
+	MemChunkNonDel( size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 ):
 		Chunk(
-			( TYPE * )calloc( fourthDim *thirdDim *secondDim *firstDim, sizeof( TYPE ) ),
+			( TYPE * )calloc( nrOfTimesteps *nrOfSlices *nrOfRows *nrOfColumns, sizeof( TYPE ) ),
 			typename ValuePtr<TYPE>::NonDeleter(),
-			firstDim, secondDim, thirdDim, fourthDim
+			nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps
 		) {}
 	/**
 	 * Create a MemChunkNoDel as copy of a given raw memory block
@@ -317,16 +317,16 @@ public:
 	 * This will create a MemChunkNoDel of the given size and fill it with the data at the given address.
 	 * No range check will be done.
 	 * \param org pointer to the raw data which shall be copied
-	 * \param firstDim
-	 * \param secondDim
-	 * \param thirdDim
-	 * \param fourthDim size of the resulting image
+	 * \param nrOfColumns
+	 * \param nrOfRows
+	 * \param nrOfSlices
+	 * \param nrOfTimesteps size of the resulting image
 	 */
-	MemChunkNonDel( const TYPE *const org, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 ):
+	MemChunkNonDel( const TYPE *const org, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 ):
 		Chunk(
-			( TYPE * )malloc( sizeof( TYPE )*fourthDim *thirdDim *secondDim *firstDim ),
+			( TYPE * )malloc( sizeof( TYPE )*nrOfTimesteps *nrOfSlices *nrOfRows *nrOfColumns ),
 			typename ValuePtr<TYPE>::NonDeleter(),
-			firstDim, secondDim, thirdDim, fourthDim
+			nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps
 		) {
 		asTypePtr<TYPE>().copyFromMem( org, getVolume() );
 	}

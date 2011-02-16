@@ -25,37 +25,37 @@ namespace data
 namespace _internal
 {
 
-ChunkBase::ChunkBase ( size_t firstDim, size_t secondDim, size_t thirdDim, size_t fourthDim )
+ChunkBase::ChunkBase ( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps )
 {
-	const size_t idx[] = {firstDim, secondDim, thirdDim, fourthDim};
+	const size_t idx[] = {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps};
 	init( idx );
 	addNeededFromString( neededProperties );
 	LOG_IF( NDimensional<4>::getVolume() == 0, Debug, warning )
-			<< "Size " << fourthDim << "|" << thirdDim << "|" << secondDim << "|" << firstDim << " is invalid";
+			<< "Size " << nrOfTimesteps << "|" << nrOfSlices << "|" << nrOfRows << "|" << nrOfColumns << " is invalid";
 }
 
 ChunkBase::~ChunkBase() { }
 
 }
 
-Chunk::Chunk( const ValuePtrReference &src, size_t firstDim, size_t secondDim, size_t thirdDim, size_t fourthDim ):
-	_internal::ChunkBase( firstDim, secondDim, thirdDim, fourthDim ),
+Chunk::Chunk( const ValuePtrReference &src, size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps ):
+	_internal::ChunkBase( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ),
 	ValuePtrReference( src )
 {
 	assert( ( *this )->length() == getVolume() );
 }
 
-Chunk Chunk::cloneToNew( size_t firstDim, size_t secondDim, size_t thirdDim, size_t fourthDim )const
+Chunk Chunk::cloneToNew( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps )const
 {
 	util::FixedVector<size_t, 4> newSize = getSizeAsVector();
 
-	if ( firstDim )newSize[0] = firstDim;
+	if ( nrOfColumns )newSize[0] = nrOfColumns;
 
-	if ( secondDim )newSize[1] = secondDim;
+	if ( nrOfRows )newSize[1] = nrOfRows;
 
-	if ( thirdDim )newSize[2] = thirdDim;
+	if ( nrOfSlices )newSize[2] = nrOfSlices;
 
-	if ( fourthDim )newSize[3] = fourthDim;
+	if ( nrOfTimesteps )newSize[3] = nrOfTimesteps;
 
 	const ValuePtrReference cloned( get()->cloneToNew( newSize.product() ) );
 	return Chunk( cloned, newSize[0], newSize[1], newSize[2], newSize[3] );
@@ -211,10 +211,10 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 	int32_t atDim = getRelevantDims() - 1;
 
 	switch( atDim ) { // init offset with the given direction
-	case readDim :
+	case rowDim :
 		offset = this->propertyValue( "rowVec" )->castTo<util::fvector4>();
 		break;
-	case phaseDim:
+	case columnDim:
 		offset = this->propertyValue( "columnVec" )->castTo<util::fvector4>();
 		break;
 	case sliceDim:

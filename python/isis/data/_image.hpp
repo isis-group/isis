@@ -201,12 +201,12 @@ public:
 			return this->spliceDownTo( isis::data::sliceDim );
 		} else if ( boost::iequals( dim, "timeDim" ) ) {
 			return this->spliceDownTo( isis::data::timeDim );
-		} else if ( boost::iequals( dim, "readDim" ) ) {
-			return this->spliceDownTo( isis::data::readDim );
-		} else if ( boost::iequals( dim, "phaseDim" ) ) {
-			return this->spliceDownTo( isis::data::phaseDim );
+		} else if ( boost::iequals( dim, "rowDim" ) ) {
+			return this->spliceDownTo( isis::data::rowDim );
+		} else if ( boost::iequals( dim, "columnDim" ) ) {
+			return this->spliceDownTo( isis::data::columnDim );
 		} else {
-			LOG( Runtime, error ) << dim << " is an unknown dimension. Possible dimensions are readDim, phaseDim, sliceDim and timeDim.";
+			LOG( Runtime, error ) << dim << " is an unknown dimension. Possible dimensions are rowDim, columnDim, sliceDim and timeDim.";
 			return 0;
 		}
 	}

@@ -628,7 +628,7 @@ bool Image::convertToType( short unsigned int ID )
 	return retVal;
 }
 
-size_t Image::spliceDownTo( dimensions dim ) //readDim = 0, phaseDim, sliceDim, timeDim
+size_t Image::spliceDownTo( dimensions dim ) //rowDim = 0, columnDim, sliceDim, timeDim
 {
 	if( lookup[0]->getRelevantDims() < ( size_t ) dim ) {
 		LOG( Debug, error ) << "The dimensionality of the chunks of this image is already below " << dim << " cannot splice it.";
@@ -697,9 +697,9 @@ size_t Image::foreachChunk(Image::ChunkOp& op,bool copyMetaData)
 
 	for(pos[timeDim]=0;pos[timeDim]<imgSize[timeDim];pos[timeDim]+=chunkSize[timeDim]){
 		for(pos[sliceDim]=0;pos[sliceDim]<imgSize[sliceDim];pos[sliceDim]+=chunkSize[sliceDim]){
-			for(pos[phaseDim]=0;pos[phaseDim]<imgSize[phaseDim];pos[phaseDim]+=chunkSize[phaseDim]){
-				for(pos[readDim]=0;pos[readDim]<imgSize[readDim];pos[readDim]+=chunkSize[readDim]){
-					Chunk ch=getChunk(pos[readDim],pos[phaseDim],pos[sliceDim],pos[timeDim],copyMetaData);
+			for(pos[columnDim]=0;pos[columnDim]<imgSize[columnDim];pos[columnDim]+=chunkSize[columnDim]){
+				for(pos[rowDim]=0;pos[rowDim]<imgSize[rowDim];pos[rowDim]+=chunkSize[rowDim]){
+					Chunk ch=getChunk(pos[rowDim],pos[columnDim],pos[sliceDim],pos[timeDim],copyMetaData);
 					if(op(ch,pos)==false)
 						err++;
 				}

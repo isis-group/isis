@@ -49,7 +49,7 @@ void transformCoords( isis::util::PropertyMap &, boost::numeric::ublas::matrix<f
 
 typedef DataLog Runtime;
 typedef DataDebug Debug;
-enum dimensions {readDim = 0, phaseDim, sliceDim, timeDim};
+enum dimensions {rowDim = 0, columnDim, sliceDim, timeDim};
 
 /**
  * Set logging level for the namespace data.

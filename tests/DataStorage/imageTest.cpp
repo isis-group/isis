@@ -348,8 +348,8 @@ BOOST_AUTO_TEST_CASE ( image_foreach_chunk_test )
 
 	for(size_t t=0;t<imgSize[data::timeDim];t++){
 		for(size_t z=0;z<imgSize[data::sliceDim];z++){
-			for(size_t y=0;y<imgSize[data::phaseDim];y++){
-				for(size_t x=0;x<imgSize[data::readDim];x++){
+			for(size_t y=0;y<imgSize[data::columnDim];y++){
+				for(size_t x=0;x<imgSize[data::rowDim];x++){
 					BOOST_CHECK_EQUAL(img.voxel<uint8_t>(x,y,z,t),42);
 				}
 			}
@@ -361,8 +361,8 @@ BOOST_AUTO_TEST_CASE ( image_foreach_chunk_test )
 	uint8_t cnt=0;
 	for(size_t t=0;t<imgSize[data::timeDim];t++){
 		for(size_t z=0;z<imgSize[data::sliceDim];z++){
-			for(size_t y=0;y<imgSize[data::phaseDim];y++){
-				for(size_t x=0;x<imgSize[data::readDim];x++){
+			for(size_t y=0;y<imgSize[data::columnDim];y++){
+				for(size_t x=0;x<imgSize[data::rowDim];x++){
 					BOOST_CHECK_EQUAL(img.voxel<uint8_t>(x,y,z,t),cnt++);
 				}
 			}
