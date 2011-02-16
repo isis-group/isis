@@ -18,7 +18,7 @@ namespace _internal
 template<typename SRC, typename DST> void numeric_convert_impl( const SRC *src, DST *dst, size_t count, double scale, double offset )
 {
 	LOG( Runtime, info )
-			<< "using generic scaling convert " << TypePtr<SRC>::staticName() << "=>" << TypePtr<DST>::staticName()
+			<< "using generic scaling convert " << ValuePtr<SRC>::staticName() << "=>" << ValuePtr<DST>::staticName()
 			<< " with scale/offset " << std::fixed << scale << "/" << offset;
 	static boost::numeric::converter <
 	DST, double,
@@ -34,7 +34,7 @@ template<typename SRC, typename DST> void numeric_convert_impl( const SRC *src, 
 
 template<typename SRC, typename DST> void numeric_convert_impl( const SRC *src, DST *dst, size_t count )
 {
-	LOG( Runtime, info ) << "using generic convert " << TypePtr<SRC>::staticName() << " => " << TypePtr<DST>::staticName() << " without scaling";
+	LOG( Runtime, info ) << "using generic convert " << ValuePtr<SRC>::staticName() << " => " << ValuePtr<DST>::staticName() << " without scaling";
 	static boost::numeric::converter <
 	DST, SRC,
 	   boost::numeric::conversion_traits<DST, SRC>,
@@ -61,7 +61,7 @@ DECL_CONVERT( int8_t, int32_t );
 DECL_CONVERT( uint8_t, int32_t );
 
 //>>u32
-//DECL_CONVERT(float,uint32_t); conversion to u32 is broken (https://bugs.freedesktop.org/show_bug.cgi?id=16524)
+//DECL_CONVERT(float,uint32_t); conversion to u32 is broken (https://bugs.freedesktop.org/show_bug.cgi?ID=16524)
 //DECL_CONVERT(double,uint32_t);
 DECL_CONVERT( int32_t, uint32_t );
 //DECL_CONVERT(int16_t,uint32_t); ** Not available in liboil - but should be imho
@@ -128,7 +128,7 @@ DECL_SCALED_CONVERT( float, int32_t );
 DECL_SCALED_CONVERT( double, int32_t );
 
 //scale>>u32
-//DECL_SCALED_CONVERT(float,uint32_t); conversion to u32 is broken (https://bugs.freedesktop.org/show_bug.cgi?id=16524)
+//DECL_SCALED_CONVERT(float,uint32_t); conversion to u32 is broken (https://bugs.freedesktop.org/show_bug.cgi?ID=16524)
 //DECL_SCALED_CONVERT(double,uint32_t);
 
 //scale>>s16
@@ -187,14 +187,14 @@ DECL_SCALED_CONVERT( uint8_t, double );
  * \param scaleopt enum to tweak the scaling strategy
  */
 template<typename SRC, typename DST> std::pair<double, double>
-getNumericScaling( const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale )
+getNumericScaling( const util::_internal::ValueBase &min, const util::_internal::ValueBase &max, autoscaleOption scaleopt = autoscale )
 {
 	double scale = 1.0;
 	double offset = 0.0;
 	bool doScale = ( scaleopt != noscale && std::numeric_limits<DST>::is_integer ); //only do scale if scaleopt!=noscale and the target is an integer (scaling into float is useless)
 
 	if ( scaleopt == autoscale && std::numeric_limits<SRC>::is_integer ) {
-		LOG( Debug, verbose_info ) << "Won't upscale, because the source datatype is discrete (" << util::Type<SRC>::staticName() << ")";
+		LOG( Debug, verbose_info ) << "Won't upscale, because the source datatype is discrete (" << util::Value<SRC>::staticName() << ")";
 		scaleopt = noupscale; //dont scale up if SRC is an integer
 	}
 
@@ -263,14 +263,14 @@ getNumericScaling( const util::_internal::TypeBase &min, const util::_internal::
  * \param scale the scaling factor
  * \param offset the offset
  */
-template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &src, TypePtr<DST> &dst, const double scale, const double offset )
+template<typename SRC, typename DST> void numeric_convert( const ValuePtr<SRC> &src, ValuePtr<DST> &dst, const double scale, const double offset )
 {
-	LOG_IF( src.len() > dst.len(), Runtime, error ) << "The " << src.len() << " elements of src wont fit into the destination. Will only convert " << dst.len() << " elements.";
-	LOG_IF( src.len() < dst.len(), Runtime, warning ) << "Source is shorter than destination. Will only convert " << src.len() << " values";
+	LOG_IF( src.length() > dst.length(), Runtime, error ) << "The " << src.length() << " elements of src wont fit into the destination. Will only convert " << dst.length() << " elements.";
+	LOG_IF( src.length() < dst.length(), Runtime, warning ) << "Source is shorter than destination. Will only convert " << src.length() << " values";
 
-	if ( src.len() == 0 )return;
+	if ( src.length() == 0 )return;
 
-	const size_t size = std::min( src.len(), dst.len() );
+	const size_t size = std::min( src.length(), dst.length() );
 
 	if ( ( scale != 1. || offset ) )
 		_internal::numeric_convert_impl( &src[0], &dst[0], size, scale, offset );

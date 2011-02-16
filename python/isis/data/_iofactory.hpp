@@ -16,27 +16,28 @@ namespace python
 {
 
 // helper class iofactory
-class _IOFactory 
+class _IOFactory
 {
 public:
 	//_IOFactory( PyObject *p ) : self(p) {}
 	_IOFactory() {}
-	
+
 	static std::list<data::Image> _load( const std::string path, const std::string suffix_override, const std::string dialect ) {
 		std::list<isis::data::Image> tmpImageList;
-		data::ImageList tmpList = data::IOFactory::load(path, suffix_override, dialect);
+		data::ImageList tmpList = data::IOFactory::load( path, suffix_override, dialect );
 		BOOST_FOREACH( std::list<boost::shared_ptr<isis::data::Image> >::const_reference ref, tmpList ) {
 			tmpImageList.push_back( *ref );
 		}
-		return tmpImageList; 
+		return tmpImageList;
 	}
 private:
 	PyObject *self;
-		
+
 };
 
 
 
-}} //end namespace
+}
+} //end namespace
 
 #endif

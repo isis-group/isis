@@ -63,19 +63,19 @@ class ImageHolder
 public:
 	ImageHolder();
 
-	void setImages( util::PropMap, std::vector<vtkSmartPointer<vtkImageData> > );
+	void setImages( util::PropertyMap, std::vector<vtkSmartPointer<vtkImageData> > );
 	void setPtrToViewer( const boost::shared_ptr<ViewControl> ptr ) { m_PtrToViewer = ptr; }
 
-	void setReadVec( const isis::util::fvector4 &read ) { m_readVec = read; }
-	void setPhaseVec( const isis::util::fvector4 &phase ) { m_phaseVec = phase; }
+	void setRowVec( const isis::util::fvector4 &row ) { m_rowVec = row; }
+	void setColumnVec( const isis::util::fvector4 &column ) { m_columnVec = column; }
 	void setSliceVec( const isis::util::fvector4 &slice ) { m_sliceVec = slice; }
 
-	isis::util::fvector4 getReadVec() const { return m_readVec; }
-	isis::util::fvector4 getPhaseVec() const { return m_phaseVec; }
+	isis::util::fvector4 getRowVec() const { return m_rowVec; }
+	isis::util::fvector4 getColumnVec() const { return m_columnVec; }
 	isis::util::fvector4 getSliceVec() const { return m_sliceVec; }
 
 	vtkImageData *getVTKImageData() const { return m_ImageVector[m_currentTimestep]; }
-	const util::PropMap &getISISImage() const { return m_PropMap; }
+	const util::PropertyMap &getISISImage() const { return m_PropertyMap; }
 
 	bool setSliceCoordinates ( const int &, const int &, const int & );
 	void setCurrentTimeStep( const int & );
@@ -90,13 +90,13 @@ public:
 	vtkActor *getActorCoronal() const { return m_ActorCoronal; }
 	const int getCurrentTimeStep() const { return m_currentTimestep; }
 	const unsigned int getNumberOfTimesteps( void ) const { return m_TimeSteps; }
-	util::TypeReference getScalingFactor( void ) const { return m_ScalingFactor; }
-	util::TypeReference getOffset( void ) const { return m_Offset; }
+	util::ValueReference getScalingFactor( void ) const { return m_ScalingFactor; }
+	util::ValueReference getOffset( void ) const { return m_Offset; }
 
 private:
 	MatrixHandler m_MatrixHandler;
 	std::vector<vtkSmartPointer<vtkImageData> > m_ImageVector;
-	util::PropMap m_PropMap;
+	util::PropertyMap m_PropertyMap;
 	boost::shared_ptr<ViewControl> m_PtrToViewer;
 	vtkSmartPointer<vtkImageClip> m_ExtractAxial;
 	vtkSmartPointer<vtkImageClip> m_ExtractSagittal;
@@ -117,15 +117,15 @@ private:
 	unsigned int m_currentTimestep;
 	size_t m_X, m_Y, m_Z;
 
-	util::TypeReference m_ScalingFactor;
-	util::TypeReference m_Offset;
+	util::ValueReference m_ScalingFactor;
+	util::ValueReference m_Offset;
 
 	size_t m_Min, m_Max;
 
 	std::vector<size_t> m_BiggestElemVec;
 
-	isis::util::fvector4 m_readVec;
-	isis::util::fvector4 m_phaseVec;
+	isis::util::fvector4 m_rowVec;
+	isis::util::fvector4 m_columnVec;
 	isis::util::fvector4 m_sliceVec;
 	util::fvector4 m_pseudoOrigin;
 	util::fvector4 m_transformedOrigin;

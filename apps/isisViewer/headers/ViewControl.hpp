@@ -62,7 +62,7 @@ class ImageHolder;
 class ViewControl
 {
 public:
-	typedef std::list< std::pair< util::PropMap, std::vector<vtkSmartPointer< vtkImageData > > > > ImageMapType;
+	typedef std::list< std::pair< util::PropertyMap, std::vector<vtkSmartPointer< vtkImageData > > > > ImageMapType;
 	ViewControl();
 	void init( QVTKWidget *axial, QVTKWidget *sagittal, QVTKWidget *coronal );
 	void resetCam();
@@ -97,7 +97,7 @@ private:
 	vtkSmartPointer<vtkRenderer> m_RendererCoronal;
 
 	vtkSmartPointer<vtkPlaneWidget> m_PlaneWidgetAxial;
-	
+
 	vtkSmartPointer<vtkRenderWindow> m_WindowAxial;
 	vtkSmartPointer<vtkRenderWindow> m_WindowSagittal;
 	vtkSmartPointer<vtkRenderWindow> m_WindowCoronal;

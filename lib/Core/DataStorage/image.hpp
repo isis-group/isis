@@ -30,7 +30,7 @@ namespace data
 
 class Image:
 	public _internal::NDimensional<4>,
-	public util::PropMap
+	public util::PropertyMap
 {
 public:
 	enum orientation {axial, reversed_axial, sagittal, reversed_sagittal, coronal, reversed_coronal};
@@ -64,17 +64,17 @@ private:
 		const size_t idx[] = {first, second, third, fourth};
 		LOG_IF( ! clean, Debug, error )
 				<< "Getting data from a non indexed image will result in undefined behavior. Run reIndex first.";
-		LOG_IF( set.empty(), Debug, error )
+		LOG_IF( set.isEmpty(), Debug, error )
 				<< "Getting data from a empty image will result in undefined behavior.";
-		LOG_IF( !rangeCheck( idx ), Debug, isis::error )
-				<< "Index " << util::list2string( idx, idx + 4, "|" ) << " is out of range (" << sizeToString() << ")";
-		const size_t index = dim2Index( idx );
+		LOG_IF( !isInRange( idx ), Debug, isis::error )
+				<< "Index " << util::listToString( idx, idx + 4, "|" ) << " is out of range (" << getSizeAsString() << ")";
+		const size_t index = getLinearIndex( idx );
 		return std::make_pair( index / chunkVolume, index % chunkVolume );
 	}
 
 
 protected:
-	static const char *needed;
+	static const char *neededProperties;
 
 	/**
 	 * Search for a dimensional break in all stored chunks.
@@ -102,9 +102,10 @@ protected:
 	 */
 	Chunk &chunkAt( size_t at );
 public:
-	class ChunkOp : std::unary_function<Chunk&, bool> {
+	class ChunkOp : std::unary_function<Chunk &, bool>
+	{
 	public:
-		virtual bool operator()(Chunk &,util::FixedVector<size_t,4> posInImage)=0;
+		virtual bool operator()( Chunk &, util::FixedVector<size_t, 4> posInImage ) = 0;
 	};
 	/// Creates an empty Image object.
 	Image();
@@ -132,7 +133,7 @@ public:
 	 * If the requested voxel is not of type T, an error will be raised.
 	 *
 	 * \param first The first coordinate in voxel space. Usually the x value / the read-encoded position..
-	 * \param second The second coordinate in voxel space. Usually the y value / the phase-encoded position.
+	 * \param second The second coordinate in voxel space. Usually the y value / the column-encoded position.
 	 * \param third The third coordinate in voxel space. Ususally the z value / the time-encoded position.
 	 * \param fourth The fourth coordinate in voxel space. Usually the time value.
 	 *
@@ -142,18 +143,15 @@ public:
 	template <typename T> T &voxel( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 ) {
 		checkMakeClean();
 		const std::pair<size_t, size_t> index = commonGet( first, second, third, fourth );
-		TypePtr<T> &data = chunkAt( index.first ).asTypePtr<T>();
+		ValuePtr<T> &data = chunkAt( index.first ).asTypePtr<T>();
 		return data[index.second];
 	}
 
 	/**
-	 * Get the value of the voxel value at the given coordinates.
-	 *
-	 * The voxel reference provides reading and writing access to the refered
-	 * value.
+	 * Get a const reference to the voxel value at the given coordinates.
 	 *
 	 * \param first The first coordinate in voxel space. Usually the x value / the read-encoded position..
-	 * \param second The second coordinate in voxel space. Usually the y value / the phase-encoded position.
+	 * \param second The second coordinate in voxel space. Usually the y value / the column-encoded position.
 	 * \param third The third coordinate in voxel space. Ususally the z value / the time-encoded position.
 	 * \param fourth The fourth coordinate in voxel space. Usually the time value.
 	 *
@@ -161,9 +159,9 @@ public:
 	 *
 	 * \returns A reference to the addressed voxel value. Only reading access is provided
 	 */
-	template <typename T> T voxel( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const {
+	template <typename T> const T &voxel( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const {
 		const std::pair<size_t, size_t> index = commonGet( first, second, third, fourth );
-		const TypePtr<T> &data = chunkPtrAt( index.first )->getTypePtr<T>();
+		const ValuePtr<T> &data = chunkPtrAt( index.first )->getTypePtr<T>();
 		return data[index.second];
 	}
 
@@ -173,12 +171,14 @@ public:
 	 * Determines the minimum and maximum of the image, (and with that the types of these limits).
 	 * If they are not the same, the type which can store the other type is selected.
 	 * E.g. if min is "-5(int8_t)" and max is "1000(int16_t)" "int16_t" is selected.
-	 * Warning: this will fail if min is "-5(int8_t)" and max is "70000(uint16_t)"
-	 * \returns a number which is equal to the TypePtr::staticID of the selected type.
+	 * Warning1: this will fail if min is "-5(int8_t)" and max is "70000(uint16_t)"
+	 * Warning2: the cost of this is O(n) while Chunk::getTypeID is O(1) - so do not use it in loops
+	 * Warning3: the result is not exact - so never use it to determine the type for Image::voxel (Use TypedImage to get an image with an guaranteed type)
+	 * \returns a number which is equal to the ValuePtr::staticID of the selected type.
 	 */
-	unsigned short typeID() const;
+	unsigned short getMajorTypeID() const;
 	/// \returns the typename correspondig to the result of typeID
-	std::string typeName() const;
+	std::string getMajorTypeName() const;
 
 	/**
 	 * Get a chunk via index (and the lookup table).
@@ -193,12 +193,12 @@ public:
 	 * If the image is not clean, behaviour is undefined. (See Image::commonGet).
 	 *
 	 * \param first The first coordinate in voxel space. Usually the x value / the read-encoded position.
-	 * \param second The second coordinate in voxel space. Usually the y value / the phase-encoded position.
+	 * \param second The second coordinate in voxel space. Usually the y value / the column-encoded position.
 	 * \param third The third coordinate in voxel space. Ususally the z value / the slice-encoded position.
 	 * \param fourth The fourth coordinate in voxel space. Usually the time value.
 	 * \param copy_metadata if true the metadata of the image are merged into the returned chunk
 	 * \returns a copy of the chunk that contains the voxel at the given coordinates.
-	 * (Reminder: Chunk-copies are cheap, so the data are NOT copied)
+	 * (Reminder: Chunk-copies are cheap, so the image data are NOT copied but referenced)
 	 */
 	const Chunk getChunk( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true )const;
 
@@ -212,7 +212,7 @@ public:
 	 * \param fourth The fourth coordinate in voxel space. Usually the time value.
 	 * \param copy_metadata if true the metadata of the image are merged into the returned chunk
 	 * \returns a copy of the chunk that contains the voxel at the given coordinates.
-	 * (Reminder: Chunk-copies are cheap, so the data are NOT copied)
+	 * (Reminder: Chunk-copies are cheap, so the image data are NOT copied but referenced)
 	 */
 	Chunk getChunk( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true );
 
@@ -221,24 +221,26 @@ public:
 	 * Note: this chunks only have metadata which are unique to them - so they might be invalid.
 	 * (run join on copies of them using the image as parameter to insert all non-unique-metadata).
 	 */
-	std::vector<boost::shared_ptr<Chunk> > getChunkList();
-	/// \copydoc getChunkList
-	std::vector<boost::shared_ptr<const Chunk> > getChunkList()const;
+	std::vector<boost::shared_ptr<Chunk> > getChunksAsVector();
+
+	/// \copydoc getChunksAsVector
+	std::vector<boost::shared_ptr<const Chunk> > getChunksAsVector()const;
 
 	/**
-	* Get the chunk that contains the voxel at the given coordinates in the given type.
-	* If the accordant chunk has type T a cheap copy is returned.
-	* Otherwise a MemChunk of the requested type is created from it.
-	* In this case the minimum and maximum values of the image are computed and used for the MemChunk constructor.
-	*
-	* \param first The first coordinate in voxel space. Usually the x value.
-	* \param second The second coordinate in voxel space. Usually the y value.
-	* \param third The third coordinate in voxel space. Ususally the z value.
-	* \param fourth The fourth coordinate in voxel space. Usually the time value.
-	* \returns a (maybe converted) chunk containing the voxel value at the given coordinates.
-	*/
-	template<typename TYPE> Chunk getChunkAs( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const {
-		return getChunkAs<TYPE>( getScalingTo( TypePtr<TYPE>::staticID ), first, second, third, fourth );
+	 * Get the chunk that contains the voxel at the given coordinates in the given type.
+	 * If the accordant chunk has type T a cheap copy is returned.
+	 * Otherwise a MemChunk-copy of the requested type is created from it.
+	 * In this case the minimum and maximum values of the image are computed and used for the MemChunk constructor.
+	 *
+	 * \param first The first coordinate in voxel space. Usually the x value.
+	 * \param second The second coordinate in voxel space. Usually the y value.
+	 * \param third The third coordinate in voxel space. Ususally the z value.
+	 * \param fourth The fourth coordinate in voxel space. Usually the time value.
+	 * \param copy_metadata if true the metadata of the image are merged into the returned chunk
+	 * \returns a (maybe converted) chunk containing the voxel value at the given coordinates.
+	 */
+	template<typename TYPE> Chunk getChunkAs( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true )const {
+		return getChunkAs<TYPE>( getScalingTo( ValuePtr<TYPE>::staticID ), first, second, third, fourth, copy_metadata );
 	}
 	/**
 	 * Get the chunk that contains the voxel at the given coordinates in the given type (fast version).
@@ -249,11 +251,12 @@ public:
 	 * \param second The second coordinate in voxel space. Usually the y value.
 	 * \param third The third coordinate in voxel space. Ususally the z value.
 	 * \param fourth The fourth coordinate in voxel space. Usually the time value.
+	 * \param copy_metadata if true the metadata of the image are merged into the returned chunk
 	 * \returns a (maybe converted) chunk containing the voxel value at the given coordinates.
 	 */
-	template<typename TYPE> Chunk getChunkAs( const scaling_pair &scaling, size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const {
-		Chunk ret = getChunk( first, second, third, fourth ); // get a cheap copy
-		ret.makeOfTypeId( TypePtr<TYPE>::staticID, scaling ); // make it of type T
+	template<typename TYPE> Chunk getChunkAs( const scaling_pair &scaling, size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true )const {
+		Chunk ret = getChunk( first, second, third, fourth, copy_metadata ); // get a cheap copy
+		ret.convertToType( ValuePtr<TYPE>::staticID, scaling ); // make it of type T
 		return ret; //return that
 	}
 
@@ -278,38 +281,37 @@ public:
 	bool reIndex();
 
 	/// \returns true if there is no chunk in the image
-	bool empty()const;
+	bool isEmpty()const;
 
 	/**
 	 * Get a list of the properties of the chunks for the given key
 	 * \param key the name of the property to search for
 	 * \param unique when true empty or consecutive duplicates wont be added
 	 */
-	std::list<util::PropertyValue> getChunksProperties( const util::PropMap::pname_type &key, bool unique = false )const;
+	std::list<util::PropertyValue> getChunksProperties( const util::PropertyMap::KeyType &key, bool unique = false )const;
 
 	/// get the size of every voxel (in bytes)
-	size_t bytes_per_voxel()const;
+	size_t getBytesPerVoxel()const;
 
 	/**
 	 * Get the maximum and the minimum voxel value of the image.
-	 * The results are stored as type T, if they dont fit an error ist send.
+	 * The results are converted to T. If they dont fit an error ist send.
+	 * \returns a pair of T storing the minimum and maximum values of the image.
 	 */
-	template<typename T> void getMinMax( T &min, T &max )const {
-		util::check_type<T>();// works only for T from _internal::types
-		util::TypeReference _min, _max;
-		getMinMax( _min, _max );
-		min = _min->as<T>();
-		max = _max->as<T>();
+	template<typename T> std::pair<T, T> getMinMaxAs()const {
+		util::checkType<T>();// works only for T from _internal::types
+		std::pair<util::ValueReference, util::ValueReference> minmax = getMinMax();
+		return std::make_pair( minmax.first->as<T>(), minmax.second->as<T>() );
 	}
 
-	/// Get the maximum and the minimum voxel value of the image and store them as Type-object in the given references.
-	void getMinMax( util::TypeReference &min, util::TypeReference &max )const;
+	/// Get the maximum and the minimum voxel value of the image as a pair of ValueReference-objects.
+	std::pair<util::ValueReference, util::ValueReference> getMinMax()const;
 
 	/**
 	 * Compares the voxel-values of this image to the given.
 	 * \returns the amount of the different voxels
 	 */
-	size_t cmp( const Image &comp )const;
+	size_t compare( const Image &comp )const;
 
 	orientation getMainOrientation()const;
 	/**
@@ -334,24 +336,24 @@ public:
 	 */
 	template<typename T> void copyToMem( T *dst )const {
 		if( checkMakeClean() ) {
-			scaling_pair scale = getScalingTo( TypePtr<T>::staticID );
-			// we could do this using makeOfTypeId - but this solution does not need any additional temporary memory
+			scaling_pair scale = getScalingTo( ValuePtr<T>::staticID );
+			// we could do this using convertToType - but this solution does not need any additional temporary memory
 			BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
 				if( !ref->copyToMem<T>( dst, scale ) ) {
-					LOG( Runtime, error ) << "Failed to copy raw data of type " << ref->typeName() << " from image into memory of type " << TypePtr<T>::staticName();
+					LOG( Runtime, error ) << "Failed to copy raw data of type " << ref->getTypeName() << " from image into memory of type " << ValuePtr<T>::staticName();
 				}
 
-				dst += ref->volume(); // increment the cursor
+				dst += ref->getVolume(); // increment the cursor
 			}
 		}
 	}
 	/**
-	 * Ensure, the image has the type with the requested id.
-	 * If the typeId of any chunk is not equal to the requested id, the data of the chunk is replaced by an converted version.
+	 * Ensure, the image has the type with the requested ID.
+	 * If the typeID of any chunk is not equal to the requested ID, the data of the chunk is replaced by an converted version.
 	 * The conversion is done using the value range of the image.
 	 * \returns false if there was an error
 	 */
-	bool makeOfTypeId( unsigned short id );
+	bool convertToType( unsigned short ID );
 
 	/**
 	 * Automatically splice the given dimension and all dimensions above.
@@ -365,82 +367,107 @@ public:
 	 * \param op a functor object which inherits ChunkOP
 	 * \param copyMetaData if true the metadata of the image are copied into the chunks before calling the functor
 	 */
-	size_t foreachChunk(ChunkOp &op,bool copyMetaData=false);
+	size_t foreachChunk( ChunkOp &op, bool copyMetaData = false );
 
 
 	/**
 	 * Run a functor with the base VoxelOp on every cunk in the image.
 	 * This does not check the types of the images. So if your functor needs a specific type, use TypedImage.
 	 * \param op a functor object which inherits ChunkOp
-	 * \param copyMetaData if true the metadata of the image are copied into the chunks before calling the functor
 	 */
-	template <typename TYPE> size_t foreachVoxel(Chunk::VoxelOp<TYPE> &op){
-		class _proxy:public ChunkOp{
+	template <typename TYPE> size_t foreachVoxel( Chunk::VoxelOp<TYPE> &op ) {
+		class _proxy: public ChunkOp
+		{
 			Chunk::VoxelOp<TYPE> &op;
 		public:
-			_proxy(Chunk::VoxelOp<TYPE> &_op):op(_op){}
-			bool operator()(Chunk &ch, util::FixedVector<size_t, 4 > posInImage){
-				return ch.foreachVoxel<TYPE>(op,posInImage)==0;
+			_proxy( Chunk::VoxelOp<TYPE> &_op ): op( _op ) {}
+			bool operator()( Chunk &ch, util::FixedVector<size_t, 4 > posInImage ) {
+				return ch.foreachVoxel<TYPE>( op, posInImage ) == 0;
 			}
 		};
-		_proxy prx(op);
-		return foreachChunk(prx,false);
+		_proxy prx( op );
+		return foreachChunk( prx, false );
 	}
+
+	/// \returns the number of rows of the image
+	size_t getNrOfRows()const;
+	/// \returns the number of columns of the image
+	size_t getNrOfColumms()const;
+	/// \returns the number of slices of the image
+	size_t getNrOfSlices()const;
+	/// \returns the number of timesteps of the image
+	size_t getNrOfTimesteps()const;
+
 };
 
-template<typename T> class MemImage: public Image
-{
-public:
-	MemImage( const Image &src ) {
-		operator=( src );
-	}
-	MemImage &operator=( const MemImage &ref ) { //use the copy for generic Images
-		return operator=( static_cast<const Image &>( ref ) );
-	}
-	MemImage &operator=( const Image &ref ) { // copy the image, and make sure its of the given type
-		Image::operator=( ref ); // ok we just copied the whole image
-		//we want deep copies of the chunks, and we want them to be of type T
-		struct : _internal::SortedChunkList::chunkPtrOperator {
-			std::pair<util::TypeReference, util::TypeReference> scale;
-			boost::shared_ptr<Chunk> operator()( const boost::shared_ptr< Chunk >& ptr ) {
-				return boost::shared_ptr<Chunk>( new MemChunk<T>( *ptr, scale ) );
-			}
-		} conv_op;
-		conv_op.scale = ref.getScalingTo( TypePtr<T>::staticID );
-		LOG( Debug, info ) << "Computed scaling for conversion from source image: [" << conv_op.scale << "]";
-		set.transform( conv_op );
-		lookup = set.getLookup(); // the lookup table still points to the old chunks
-		return *this;
-	}
-};
-
+/**
+ * An Image where all chunks are guaranteed to have a specific type.
+ * This not necessarily means, that all chunks in this image are a deep copy of their origin.
+ */
 template<typename T> class TypedImage: public Image
 {
+protected:
+	TypedImage() {} // to be used only by inheriting classes
 public:
+	/// cheap copy another Image and make sure all chunks have type T
 	TypedImage( const Image &src ): Image( src ) { // ok we just copied the whole image
 		//but we want it to be of type T
-		makeOfTypeId( TypePtr<T>::staticID );
+		convertToType( ValuePtr<T>::staticID );
 	}
+	/// cheap copy another TypedImage
 	TypedImage &operator=( const TypedImage &ref ) { //its already of the given type - so just copy it
 		Image::operator=( ref );
 		return *this;
 	}
+	/// cheap copy another Image and make sure all chunks have type T
 	TypedImage &operator=( const Image &ref ) { // copy the image, and make sure its of the given type
 		Image::operator=( ref );
-		makeOfTypeId( TypePtr<T>::staticID );
+		convertToType( ValuePtr<T>::staticID );
 		return *this;
 	}
 };
 
-class ImageList : public std::list< boost::shared_ptr<Image> >
+/**
+ * An Image which allways uses its own memory and a specific type.
+ * Thus, creating this image from another Image allways does a deep copy
+ */
+template<typename T> class MemImage: public TypedImage<T>
 {
 public:
-	ImageList();
 	/**
-	 * Create a number of images out of a Chunk list.
+	 * Copy contructor.
+	 * This makes a deep copy of the given image.
+	 * The image data are converted to T if necessary.
 	 */
-	ImageList( ChunkList src );
+	MemImage( const Image &src ) {
+		operator=( src );
+	}
+
+	/**
+	 * Copy operator.
+	 * This makes a deep copy of the given image.
+	 * The image data are converted to T if necessary.
+	 */
+	MemImage &operator=( const Image &ref ) { // copy the image, and make sure its of the given type
+
+		Image::operator=( ref ); // ok we just copied the whole image
+
+		//we want deep copies of the chunks, and we want them to be of type T
+		struct : _internal::SortedChunkList::chunkPtrOperator {
+			std::pair<util::ValueReference, util::ValueReference> scale;
+			boost::shared_ptr<Chunk> operator()( const boost::shared_ptr< Chunk >& ptr ) {
+				return boost::shared_ptr<Chunk>( new MemChunk<T>( *ptr, scale ) );
+			}
+		} conv_op;
+		conv_op.scale = ref.getScalingTo( ValuePtr<T>::staticID );
+		LOG( Debug, info ) << "Computed scaling for conversion from source image: [" << conv_op.scale << "]";
+
+		this->set.transform( conv_op );
+		this->lookup = this->set.getLookup(); // the lookup table still points to the old chunks
+		return *this;
+	}
 };
+
 }
 }
 

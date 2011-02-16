@@ -41,7 +41,7 @@ ImageFormat_Vista::write( const data::Image &image,
 						  const std::string &filename, const std::string &dialect )
 throw( std::runtime_error & )
 {
-	LOG( Debug, info ) << "Writing image of size " << image.sizeToString() << " and type " << util::getTypeMap()[image.typeID()] << " as vista";
+	LOG( Debug, info ) << "Writing image of size " << image.getSizeAsString() << " and type " << util::getTypeMap()[image.getMajorTypeID()] << " as vista";
 	//  All vista images a organized in an attribue list. Let's create an empty one:
 	VAttrList attrList = VCreateAttrList();
 	//  One or more VImages need to be written to disk.
@@ -49,7 +49,7 @@ throw( std::runtime_error & )
 	// count number of images that where created with malloc
 	int nimages = 0;
 	//  get size for each dimension
-	util::ivector4 dims = image.sizeToVector();
+	util::ivector4 dims = image.getSizeAsVector();
 
 	//  create a vista image container according to the isis image configuration
 	// 4D image data
@@ -65,7 +65,7 @@ throw( std::runtime_error & )
 
 		for ( int z = 0; z < nimages; z++ ) {
 			if( shortImage.getChunkAt( z ).hasProperty( "acquisitionTime" ) ) {
-				acquisitionTimeList.push_back( shortImage.getChunkAt( z ).getProperty<float>( "acquisitionTime" ) );
+				acquisitionTimeList.push_back( shortImage.getChunkAt( z ).getPropertyAs<float>( "acquisitionTime" ) );
 			}
 		}
 
@@ -97,50 +97,50 @@ throw( std::runtime_error & )
 
 		// choose data type. The data type should be taken from the image, not
 		// from the chunk since the chunks can have different types.
-		switch( image.typeID() ) {
+		switch( image.getMajorTypeID() ) {
 			// VBit
-		case data::TypePtr<VBit>::staticID:
+		case data::ValuePtr<VBit>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VBitRepn );
 			copyImageToVista<uint8_t>( image, vimages[0] );
 			break;
 			// VUByte
-		case data::TypePtr<VUByte>::staticID:
+		case data::ValuePtr<VUByte>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VUByteRepn );
 			copyImageToVista<VUByte>( image, vimages[0] );
 			break;
 			// VSByte
-		case data::TypePtr<VSByte>::staticID:
+		case data::ValuePtr<VSByte>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VSByteRepn );
 			copyImageToVista<VSByte>( image, vimages[0] );
 			break;
 			// VShort
-		case data::TypePtr<u_int16_t>::staticID:
-			LOG( Runtime, info ) << "Vista does not support " << util::Type<u_int16_t>::staticName() << ". Falling back to " << util::Type<VShort>::staticName();
-		case data::TypePtr<VShort>::staticID:
+		case data::ValuePtr<u_int16_t>::staticID:
+			LOG( Runtime, info ) << "Vista does not support " << util::Value<u_int16_t>::staticName() << ". Falling back to " << util::Value<VShort>::staticName();
+		case data::ValuePtr<VShort>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VShortRepn );
 			copyImageToVista<VShort>( image, vimages[0] );
 			break;
 #if defined(_M_X64) || defined(__amd64__)
 			// VLong
-		case data::TypePtr<VLong>::staticID:
+		case data::ValuePtr<VLong>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VLongRepn );
 			copyImageToVista<VLong>( image, vimages[0] );
 			break;
 #endif
 			// VFloat
-		case data::TypePtr<VFloat>::staticID:
+		case data::ValuePtr<VFloat>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VFloatRepn );
 			copyImageToVista<VFloat>( image, vimages[0] );
 			break;
 			// VDouble
-		case data::TypePtr<VDouble>::staticID:
+		case data::ValuePtr<VDouble>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VDoubleRepn );
 			copyImageToVista<VDouble>( image, vimages[0] );
 			break;
 			// default error
 		default:
 			LOG( image_io::Runtime, error )
-					<< "Can't map image type " << image.getChunk( 0 ).typeName() << "(" << image.getChunk( 0 ).typeID() << ") to vista type. Aborting" ;
+					<< "Can't map image type " << image.getChunk( 0 ).getTypeName() << "(" << image.getChunk( 0 ).getTypeID() << ") to vista type. Aborting" ;
 			return;
 		}
 
@@ -152,11 +152,11 @@ throw( std::runtime_error & )
 	/*****************************************
 	 * write history information if available
 	 *****************************************/
-	util::PropMap::key_list keyset = image.getKeys();
+	util::PropertyMap::KeyList keyset = image.getKeys();
 	// count number of history entries
 	size_t hcount = 0;
 	// if history list prefix is available increase counter.
-	BOOST_FOREACH( util::PropMap::key_list::key_type key, keyset ) {
+	BOOST_FOREACH( util::PropertyMap::KeyList::key_type key, keyset ) {
 		if (  std::string( key.c_str() ).find( histPrefix ) != std::string::npos ) {
 			hcount++;
 		}
@@ -168,7 +168,7 @@ throw( std::runtime_error & )
 		for( unsigned i = 1; i <= hcount; i++ ) {
 			std::stringstream name;
 			name << histPrefix << i;
-			std::string val = image.getProperty<std::string>( util::istring( name.str().c_str() ) );
+			std::string val = image.getPropertyAs<std::string>( util::istring( name.str().c_str() ) );
 			// split key token from history property string
 			size_t x = val.find( ":" );
 			VAppendAttr( hlist, val.substr( 0, x ).c_str(), NULL, VStringRepn,
@@ -197,7 +197,7 @@ throw( std::runtime_error & )
 }
 
 
-int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filename,
+int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &filename,
 							 const std::string &dialect ) throw ( std::runtime_error & )
 {
 	// open input file
@@ -232,8 +232,8 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 	 * Save vista file history if available
 	 *****************************************/
 	// Create an empty PropertyMap to store vista history related properties.
-	// This map should be appended to every chunk in the ChunkList.
-	util::PropMap hMap;
+	// This map should be appended to every chunk in the output.
+	util::PropertyMap hMap;
 	VAttrList hist_list = VReadHistory( &list );
 
 	if ( hist_list != NULL ) {
@@ -248,7 +248,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 				std::stringstream key, value;
 				key << histPrefix << ++hcount;
 				value << attrName << ":" << std::string( ( VString ) val );
-				hMap.setProperty<std::string>( util::istring( key.str().c_str() ), value.str().c_str() );
+				hMap.setPropertyAs<std::string>( util::istring( key.str().c_str() ), value.str() );
 			}
 		}
 	}
@@ -339,7 +339,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 
 		std::list<VistaChunk<VShort> > vistaChunkList;
 		//if we have no repetitionTime we have to calculate it with the help of the biggest slicetime
-		u_int16_t biggest_slice_time = 0;
+		uint16_t biggest_slice_time = 0;
 		// the geometrical dimension of the 3D image according to the slice geometry
 		// and the number of slices.
 		util::ivector4 dims( 0, 0, 0, 0 );
@@ -358,11 +358,11 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 			vistaChunkList.push_back( vchunk );
 
 			if( vchunk.hasProperty( "indexOrigin" ) ) {
-				originCheckSet.insert( vchunk.getProperty<util::fvector4>( "indexOrigin" ) );
+				originCheckSet.insert( vchunk.getPropertyAs<util::fvector4>( "indexOrigin" ) );
 			}
 
 			if( vchunk.hasProperty( "acquisitionTime" ) && !vchunk.hasProperty( "repetition_time" ) ) {
-				float currentSliceTime = vchunk.getProperty<float>( "acquisitionTime" );
+				float currentSliceTime = vchunk.getPropertyAs<float>( "acquisitionTime" );
 
 				if ( currentSliceTime > biggest_slice_time ) {
 					float diff = currentSliceTime - biggest_slice_time;
@@ -373,20 +373,20 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 		BOOST_FOREACH( std::vector<VistaChunk<VShort> >::reference sliceRef, vistaChunkList ) {
 			// increase slice counter
 			nloaded++;
-			u_int16_t repetitionTime = 0;
+			uint16_t repetitionTime = 0;
 			util::fvector4 ioprob;
 
 			if( !sliceRef.hasProperty( "repetitionTime" ) && biggest_slice_time ) {
-				sliceRef.setProperty<u_int16_t>( "repetitionTime", biggest_slice_time );
+				sliceRef.setPropertyAs<uint16_t>( "repetitionTime", biggest_slice_time );
 			}
 
 			if( sliceRef.hasProperty( "repetitionTime" ) ) {
-				repetitionTime = sliceRef.getProperty<u_int16_t>( "repetitionTime" );
+				repetitionTime = sliceRef.getPropertyAs<uint16_t>( "repetitionTime" );
 			}
 
 			// since functional data will be read first the sequence number
 			// is 0.
-			sliceRef.setProperty<u_int16_t>( "sequenceNumber", 0 );
+			sliceRef.setPropertyAs<uint16_t>( "sequenceNumber", 0 );
 			/********************* INDEX ORIGIN *********************
 			 * Step 1: check if indexOrigin present.
 			 * Step 2: Calculate indexOrigin according to the slice number
@@ -395,13 +395,13 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 
 			// check if indexOrigin already present AND differs from slice to slice
 			if( sliceRef.hasProperty( "indexOrigin" ) and ( originCheckSet.size() == vImageVector.size() ) ) {
-				ioprob = sliceRef.getProperty<util::fvector4>( "indexOrigin" );
+				ioprob = sliceRef.getPropertyAs<util::fvector4>( "indexOrigin" );
 			}
 			// no indexOrigin present or does not differ from slice to slice -> Calculate index origin
 			else {
 				/******************** SET index origin ********************/
 				// the index origin of each slice depends on the slice orientation
-				// and voxel resolution. All chunks in the ChunkList splices are supposed
+				// and voxel resolution. All chunks in the list splices are supposed
 				// to have the same index origin since they are from the same slice.
 				// get slice orientation of image
 				VAttrList attributes = VImageAttrList( vImageVector[nloaded-1] );
@@ -453,7 +453,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 				// have the same slice voxel resolution.
 				if( voxelstr[0] == '\0' ) {
 					strcpy( voxelstr, ( char * )val );
-					std::list<float> buff = util::string2list<float>( std::string( voxelstr ), ' ' );
+					std::list<float> buff = util::stringToList<float>( std::string( voxelstr ), ' ' );
 					v3.copyFrom( buff.begin(), buff.end() );
 				} else {
 					// voxel string differs from previous value;
@@ -470,7 +470,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 				if ( !sliceRef.hasProperty( "indexOrigin" ) ) {
 					ioprob = calculateIndexOrigin( sliceRef, dims );
 				} else {
-					ioprob = sliceRef.getProperty<util::fvector4>( "indexOrigin" );
+					ioprob = sliceRef.getPropertyAs<util::fvector4>( "indexOrigin" );
 				}
 
 				// correct the index origin according to the slice number and voxel
@@ -493,48 +493,48 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 			}
 
 			// Set indexOrigin. This should be done before splicing.
-			sliceRef.setProperty<util::fvector4>( "indexOrigin", ioprob );
+			sliceRef.setPropertyAs<util::fvector4>( "indexOrigin", ioprob );
 			/********************* SPLICE VistaChunk *********************
 			 * With functional data the VistaChunk has the dimensions
 			 * columns x rows x 1 x time. We splice the Chunk along the
 			 * time axise to get time * (column x row x 1 x 1) chunks.
 			 */
 			// splice VistaChunk
-			data::ChunkList splices = sliceRef.splice( data::sliceDim );
+			std::list<data::Chunk> splices = sliceRef.splice( data::sliceDim );
 			/******************** SET acquisitionTime ********************/
 			size_t timestep = 0;
-			BOOST_FOREACH( data::ChunkList::reference spliceRef, splices ) {
-				u_int32_t acqusitionNumber = ( nloaded - 1 ) + vImageVector.size() * timestep;
-				spliceRef->setProperty<uint32_t>( "acquisitionNumber", acqusitionNumber );
+			BOOST_FOREACH( data::Chunk & spliceRef, splices ) {
+				uint32_t acqusitionNumber = ( nloaded - 1 ) + vImageVector.size() * timestep;
+				spliceRef.setPropertyAs<uint32_t>( "acquisitionNumber", acqusitionNumber );
 
 				if ( repetitionTime && sliceRef.hasProperty( "acquisitionTime" ) ) {
-					float acquisitionTimeSplice = sliceRef.getProperty<float>( "acquisitionTime" ) + ( repetitionTime * timestep );
-					spliceRef->setProperty<float>( "acquisitionTime", acquisitionTimeSplice );
+					float acquisitionTimeSplice = sliceRef.getPropertyAs<float>( "acquisitionTime" ) + ( repetitionTime * timestep );
+					spliceRef.setPropertyAs<float>( "acquisitionTime", acquisitionTimeSplice );
 				}
 
 				// add history information
-				spliceRef->join( hMap, true );
+				spliceRef.join( hMap, true );
 				timestep++;
 			}
-			LOG( DataLog, verbose_info ) << "adding " << splices.size() << " chunks to ChunkList";
-			/******************** add chunks to ChunkList ********************/
-			std::back_insert_iterator<data::ChunkList> dest_iter ( chunks );
+			LOG( DataLog, verbose_info ) << "adding " << splices.size() << " chunks to the output";
+			/******************** add chunks to output ********************/
+			std::back_insert_iterator<std::list<data::Chunk> > dest_iter ( chunks );
 			std::copy( splices.begin(), splices.end(), dest_iter );
 		} // END foreach vistaChunkList
 		//handle the residual images
-		u_int16_t sequenceNumber = 0;
+		uint16_t sequenceNumber = 0;
 		BOOST_FOREACH( std::vector<VImage>::reference vImageRef, residualVImages ) {
 			if( switchHandle( vImageRef, chunks ) ) {
-				chunks.back()->setProperty<u_int16_t>( "sequenceNumber", ++sequenceNumber );
+				chunks.back().setPropertyAs<uint16_t>( "sequenceNumber", ++sequenceNumber );
 				// add history information
-				chunks.back()->join( hMap, true );
+				chunks.back().join( hMap, true );
 				nloaded++;
 			}
 		}
 	} // END if myDialect == "functional"
 
 	// MAP -> the vista image should contain a single 3D VFloat image. Hence the
-	// first image found will be saved in a float MemChunk add added to the ChunkList.
+	// first image found will be saved in a float MemChunk and added to the output.
 	else if( myDialect == std::string( "map" ) ) {
 		// print a warning message when there are more than one image.
 		if( nimages >= 1 ) {
@@ -550,14 +550,14 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 				addChunk<VFloat>( chunks, images[k] );
 
 				// check indexOrigin -> calculate default value if necessary
-				if ( ! chunks.back()->hasProperty( "indexOrigin" ) ) {
-					util::ivector4 dims = chunks.back()->sizeToVector();
-					chunks.back()->setProperty<util::fvector4>( "indexOrigin",
-							calculateIndexOrigin( ( *( chunks.back() ) ), dims ) );
+				if ( ! chunks.back().hasProperty( "indexOrigin" ) ) {
+					util::ivector4 dims = chunks.back().getSizeAsVector();
+					chunks.back().setPropertyAs<util::fvector4>( "indexOrigin",
+							calculateIndexOrigin( ( chunks.back() ), dims ) );
 				}
 
 				// add history informations
-				chunks.back()->join( hMap, true );
+				chunks.back().join( hMap, true );
 				nloaded++;
 			}
 		}
@@ -567,17 +567,17 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 	else {
 		for( unsigned k = 0; k < nimages; k++ ) {
 			if( switchHandle( images[k], chunks ) ) {
-				chunks.back()->setProperty<u_int16_t>( "sequenceNumber", nloaded );
+				chunks.back().setPropertyAs<uint16_t>( "sequenceNumber", nloaded );
 
 				// check indexOrigin -> calculate default value if necessary
-				if ( ! chunks.back()->hasProperty( "indexOrigin" ) ) {
-					util::ivector4 dims = chunks.back()->sizeToVector();
-					chunks.back()->setProperty<util::fvector4>( "indexOrigin",
-							calculateIndexOrigin( ( *( chunks.back() ) ), dims ) );
+				if ( ! chunks.back().hasProperty( "indexOrigin" ) ) {
+					util::ivector4 dims = chunks.back().getSizeAsVector();
+					chunks.back().setPropertyAs<util::fvector4>( "indexOrigin",
+							calculateIndexOrigin( ( chunks.back() ), dims ) );
 				}
 
 				// add history information
-				chunks.back()->join( hMap, true );
+				chunks.back().join( hMap, true );
 				nloaded++;
 			}
 		}
@@ -594,7 +594,7 @@ int ImageFormat_Vista::load( data::ChunkList &chunks, const std::string &filenam
 	return nloaded;
 }
 
-bool ImageFormat_Vista::switchHandle( VImage &image, data::ChunkList &chunks )
+bool ImageFormat_Vista::switchHandle( VImage &image, std::list<data::Chunk> &chunks )
 {
 	switch( VPixelRepn( image ) ) {
 	case VBitRepn:
@@ -643,8 +643,8 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 	// ********** MANDATORY attributes **********
 	// POLICY: copy all mandatory attributes
 	// get voxel
-	util::fvector4 voxels = image.getProperty<util::fvector4>( "voxelSize" );
-	util::fvector4 vGap = image.getProperty<util::fvector4>( "voxelGap" );
+	util::fvector4 voxels = image.getPropertyAs<util::fvector4>( "voxelSize" );
+	util::fvector4 vGap = image.getPropertyAs<util::fvector4>( "voxelGap" );
 	const float inf = std::numeric_limits<float>::infinity();
 
 	// if vGap is valid the add it to the voxel resultion.
@@ -656,16 +656,16 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 	vstr << voxels[0] << " " << voxels[1] << " " << voxels[2];
 	VAppendAttr( list, "voxel", NULL, VStringRepn, vstr.str().c_str() );
 	// copy orientation vectors
-	util::fvector4 readVec = image.getProperty<util::fvector4>( "readVec" );
-	util::fvector4 phaseVec = image.getProperty<util::fvector4>( "phaseVec" );
-	util::fvector4 sliceVec = image.getProperty<util::fvector4>( "sliceVec" );
-	// set readVec -> columnVec
+	util::fvector4 rowVec = image.getPropertyAs<util::fvector4>( "rowVec" );
+	util::fvector4 columnVec = image.getPropertyAs<util::fvector4>( "columnVec" );
+	util::fvector4 sliceVec = image.getPropertyAs<util::fvector4>( "sliceVec" );
+	// set rowVec -> columnVec
 	vstr.str( "" );
-	vstr << readVec[0] << " " << readVec[1] << " " << readVec[2];
+	vstr << rowVec[0] << " " << rowVec[1] << " " << rowVec[2];
 	VAppendAttr( list, "columnVec", NULL, VStringRepn, vstr.str().c_str() );
-	// set phase -> rowVec
+	// set column -> rowVec
 	vstr.str( "" );
-	vstr << phaseVec[0] << " " << phaseVec[1] << " " << phaseVec[2];
+	vstr << columnVec[0] << " " << columnVec[1] << " " << columnVec[2];
 	VAppendAttr( list, "rowVec", NULL, VStringRepn, vstr.str().c_str() );
 	// set sliceVec -> sliceVec
 	vstr.str( "" );
@@ -675,9 +675,9 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 	util::fvector4 indexOrigin;
 
 	if( functional ) {
-		indexOrigin = image.getChunk( 0, 0, slice, 0 ).getProperty<util::fvector4>( "indexOrigin" );
+		indexOrigin = image.getChunk( 0, 0, slice, 0 ).getPropertyAs<util::fvector4>( "indexOrigin" );
 	} else {
-		indexOrigin = image.getProperty<util::fvector4>( "indexOrigin" );
+		indexOrigin = image.getPropertyAs<util::fvector4>( "indexOrigin" );
 	}
 
 	vstr.str( "" );
@@ -706,23 +706,23 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 	// repetition time
 	if( image.hasProperty( "repetitionTime" ) ) {
 		VAppendAttr( list, "repetition_time", NULL, VShortRepn,
-					 image.getProperty<u_int16_t>( "repetitionTime" ) );
+					 image.getPropertyAs<uint16_t>( "repetitionTime" ) );
 	}
 
 	//subject name
 	if ( image.hasProperty( "subjectName" ) ) {
 		VAppendAttr( list, "patient", NULL, VStringRepn,
-					 ( VString ) image.getProperty<std::string>( "subjectName" ).c_str() );
+					 ( VString ) image.getPropertyAs<std::string>( "subjectName" ).c_str() );
 	}
 
 	if ( image.hasProperty( "DICOM/ManufacturersModelName" ) ) {
 		VAppendAttr( list, "device", NULL, VStringRepn,
-					 ( VString ) image.getProperty<std::string>( "DICOM/ManufacturersModelName" ).c_str() );
+					 ( VString ) image.getPropertyAs<std::string>( "DICOM/ManufacturersModelName" ).c_str() );
 	}
 
 	//  if( map.hasProperty( "acquisitionTime" ) && functional ) {
 	//      VAppendAttr( list, "slice_time", NULL, VShortRepn,
-	//                   map.getProperty<int16_t>( "acquisitionTime" ) );
+	//                   map.getPropertyAs<int16_t>( "acquisitionTime" ) );
 	//  }
 	if ( functional ) {
 		// Deriving slice time from acquisition time. This is only ok if we have
@@ -731,7 +731,7 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 
 		// Check if the current chunk encodes more than one slice. This
 		// is only valid if there is more than one slice in the isis image.
-		if( image.getChunk( slice ).sizeToVector()[2] > 1 ) {
+		if( image.getChunk( slice ).getSizeAsVector()[2] > 1 ) {
 			LOG( data::Runtime, error ) << "Chunk contains more than one slice."
 										<< "Interpolation of slice time is not possible.";
 		} else {
@@ -739,7 +739,7 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 			if ( image.getChunkAt( slice ).hasProperty( "acquisitionTime" ) ) {
 				std::stringstream sstream;
 				float stime;
-				stime = image.getChunkAt( slice ).getProperty<float>( "acquisitionTime" );
+				stime = image.getChunkAt( slice ).getPropertyAs<float>( "acquisitionTime" );
 				stime -= sliceTimeOffset;
 				sstream << stime;
 				VAppendAttr ( list, "slice_time", NULL, VStringRepn, sstream.str().c_str() );
@@ -754,25 +754,25 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 	}
 
 	if ( image.hasProperty( "subjectGender" ) ) {
-		util::Selection genderSelection = image.getProperty<util::Selection>( "subjectGender" );
+		util::Selection genderSelection = image.getPropertyAs<util::Selection>( "subjectGender" );
 		std::string gender = genderSelection;
 		VAppendAttr( list, "sex", NULL, VStringRepn, ( VString ) gender.c_str() );
 	}
 
 	if ( image.hasProperty( "echoTime" ) ) {
-		VAppendAttr( list, "echoTime", NULL, VFloatRepn, ( VFloat ) image.getProperty<float>( "echoTime" ) );
+		VAppendAttr( list, "echoTime", NULL, VFloatRepn, ( VFloat ) image.getPropertyAs<float>( "echoTime" ) );
 	}
 
 	if ( image.hasProperty( "flipAngle" ) ) {
-		VAppendAttr( list, "flipAngle", NULL, VShortRepn, ( VShort ) image.getProperty<u_int16_t>( "flipAngle" ) );
+		VAppendAttr( list, "flipAngle", NULL, VShortRepn, ( VShort ) image.getPropertyAs<uint16_t>( "flipAngle" ) );
 	}
 
 	if ( image.hasProperty( "transmitCoil" ) ) {
-		VAppendAttr( list, "transmitCoil", NULL, VStringRepn, ( VString ) image.getProperty<std::string>( "transmitCoil" ).c_str() );
+		VAppendAttr( list, "transmitCoil", NULL, VStringRepn, ( VString ) image.getPropertyAs<std::string>( "transmitCoil" ).c_str() );
 	}
 
 	if ( image.hasProperty( "sequenceStart" ) ) {
-		boost::posix_time::ptime isisTime = image.getProperty<boost::posix_time::ptime>( "sequenceStart" );
+		boost::posix_time::ptime isisTime = image.getPropertyAs<boost::posix_time::ptime>( "sequenceStart" );
 		boost::gregorian::date isisDate = isisTime.date();
 		boost::posix_time::time_duration isisTimeDuration = isisTime.time_of_day();
 		VAppendAttr( list, "date", NULL, VStringRepn, boost::gregorian::to_simple_string( isisDate ).c_str() );
@@ -781,7 +781,7 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 
 	if ( image.hasProperty( "subjectAge" ) ) {
 		// age in days
-		uint16_t age = image.getProperty<uint16_t>( "subjectAge" );
+		uint16_t age = image.getPropertyAs<uint16_t>( "subjectAge" );
 		age = ( ( age / 365.2425 ) - floor( age / 365.2425 ) ) < 0.5 ?
 			  floor( age / 365.2425 ) : ceil( age / 365.2425 );
 		VAppendAttr( list, "age", NULL, VShortRepn, age );
@@ -794,10 +794,10 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 	// with XX is the index number of the history entry in the vista file
 
 	if( image.hasBranch( "Vista" ) ) {
-		util::PropMap vista_branch = image.branch( "Vista" );
+		util::PropertyMap vista_branch = image.branch( "Vista" );
 		// convert it to a property map
-		util::PropMap::key_list klist = vista_branch.getKeys();
-		util::PropMap::key_list::const_iterator kiter;
+		util::PropertyMap::KeyList klist = vista_branch.getKeys();
+		util::PropertyMap::KeyList::const_iterator kiter;
 		// prefix of history entries
 		std::string hpref = "HistoryLine";
 
@@ -814,28 +814,28 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 
 			if( pv->is<uint8_t>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VBitRepn,
-							 ( VBit )pv->cast_to<uint8_t>() );
+							 ( VBit )pv->castTo<uint8_t>() );
 				continue;
 			}
 
 			// VUByte -> VUByte (char *)
 			if( pv->is<VUByte>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VUByteRepn,
-							 pv->cast_to<VUByte>() );
+							 pv->castTo<VUByte>() );
 				continue;
 			}
 
 			// VSByte -> VSByte (char *)
 			if( pv->is<VSByte>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VSByteRepn,
-							 pv->cast_to<VSByte>() );
+							 pv->castTo<VSByte>() );
 				continue;
 			}
 
 			// VShort -> VShort (char *)
 			if( pv->is<VShort>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VShortRepn,
-							 pv->cast_to<VShort>() );
+							 pv->castTo<VShort>() );
 				continue;
 			}
 
@@ -844,7 +844,7 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 			// VLong -> VLong (char *)
 			if( pv->is<VLong>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VLongRepn,
-							 pv->cast_to<VLong>() );
+							 pv->castTo<VLong>() );
 				continue;
 			}
 
@@ -853,38 +853,38 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 			// VFloat -> VFloat (char *)
 			if( pv->is<VFloat>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VFloatRepn,
-							 pv->cast_to<VFloat>() );
+							 pv->castTo<VFloat>() );
 				continue;
 			}
 
 			// VDouble -> VDouble (char *)
 			if( pv->is<VDouble>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VDoubleRepn,
-							 pv->cast_to<VDouble>() );
+							 pv->castTo<VDouble>() );
 				continue;
 			}
 
 			// VString -> std::string
 			if( pv->is<std::string>() ) {
 				VAppendAttr( list, ( *kiter ).c_str(), NULL, VStringRepn,
-							 pv->cast_to<std::string>().c_str() );
+							 pv->castTo<std::string>().c_str() );
 				continue;
 			}
 		}
 	}
 }
 
-template <typename TInput> void ImageFormat_Vista::addChunk( data::ChunkList &chunks, VImage image )
+template <typename TInput> void ImageFormat_Vista::addChunk( std::list< isis::data::Chunk >& chunks, VImage image )
 {
-	chunks.push_back( data::ChunkList::value_type( new VistaChunk<TInput>( image, false ) ) );
+	chunks.push_back( VistaChunk<TInput>( image, false ) );
 }
 
 template <typename T> bool ImageFormat_Vista::copyImageToVista( const data::Image &image, VImage &vimage )
 {
-	const util::FixedVector<size_t, 4> csize = image.getChunk( 0, 0 ).sizeToVector();
-	const util::FixedVector<size_t, 4> isize = image.sizeToVector();
+	const util::FixedVector<size_t, 4> csize = image.getChunk( 0, 0 ).getSizeAsVector();
+	const util::FixedVector<size_t, 4> isize = image.getSizeAsVector();
 	LOG_IF( isize[3] > 1, Debug, error ) << "Vista cannot store 4D-Data in one VImage.";
-	const data::scaling_pair scale = image.getScalingTo( data::TypePtr<T>::staticID );
+	const data::scaling_pair scale = image.getScalingTo( data::ValuePtr<T>::staticID );
 
 	for ( size_t z = 0; z < isize[2]; z += csize[2] ) {
 		for ( size_t y = 0; y < isize[1]; y += csize[1] ) {
@@ -904,17 +904,17 @@ util::fvector4 ImageFormat_Vista::calculateIndexOrigin( data::Chunk &chunk, util
 	// if the 3rd dimension contains geometrical or time information. Hence it's
 	// neccessary to provide image dimensional informations via a function
 	// parameter.
-	util::fvector4 voxels = chunk.getProperty<util::fvector4>( "voxelSize" );
+	util::fvector4 voxels = chunk.getPropertyAs<util::fvector4>( "voxelSize" );
 	// calculate index origin according to axial
 	util::fvector4 ioTmp(
 		-( ( dims[0] - 1 )*voxels[0] ) / 2,
 		-( ( dims[1] - 1 )*voxels[1] ) / 2,
 		-( ( dims[2] - 1 )*voxels[2] ) / 2,
 		0 );
-	util::fvector4 readV = chunk.getProperty<util::fvector4>( "readVec" );
-	util::fvector4 phaseV = chunk.getProperty<util::fvector4>( "phaseVec" );
-	util::fvector4 sliceV = chunk.getProperty<util::fvector4>( "sliceVec" );
-	// multiply indexOrigin with read, phase and slice vector
+	util::fvector4 readV = chunk.getPropertyAs<util::fvector4>( "rowVec" );
+	util::fvector4 phaseV = chunk.getPropertyAs<util::fvector4>( "columnVec" );
+	util::fvector4 sliceV = chunk.getPropertyAs<util::fvector4>( "sliceVec" );
+	// multiply indexOrigin with read, column and slice vector
 	util::fvector4 iOrig(
 		readV[0] * ioTmp[0] + phaseV[0] * ioTmp[1] + sliceV[0] * ioTmp[2],
 		readV[1] * ioTmp[0] + phaseV[1] * ioTmp[1] + sliceV[1] * ioTmp[2],

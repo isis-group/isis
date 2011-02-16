@@ -28,21 +28,21 @@ MatrixHandler::MatrixHandler( void )
 	m_MatrixCoronal1 = vtkMatrix4x4::New();
 }
 
-void MatrixHandler::setVectors( isis::util::fvector4 readVec, isis::util::fvector4 phaseVec, isis::util::fvector4 sliceVec )
+void MatrixHandler::setVectors( isis::util::fvector4 rowVec, isis::util::fvector4 columnVec, isis::util::fvector4 sliceVec )
 {
 	m_Valid = true;
-	m_readVec = readVec;
-	m_phaseVec = phaseVec;
+	m_rowVec = rowVec;
+	m_columnVec = columnVec;
 	m_sliceVec = sliceVec;
 
 	for ( size_t i = 0; i < 3; i++ ) {
-		m_origMatrix->SetElement( i, 0, m_readVec[i] );
-		m_origMatrix1->SetElement( i, 0, m_readVec[i] < 0 ? ceil( m_readVec[i] - 0.5 ) : floor( m_readVec[i] + 0.5 ) );
+		m_origMatrix->SetElement( i, 0, m_rowVec[i] );
+		m_origMatrix1->SetElement( i, 0, m_rowVec[i] < 0 ? ceil( m_rowVec[i] - 0.5 ) : floor( m_rowVec[i] + 0.5 ) );
 	}
 
 	for ( size_t i = 0; i < 3; i++ ) {
-		m_origMatrix->SetElement( i, 1, m_phaseVec[i] );
-		m_origMatrix1->SetElement( i, 1, m_phaseVec[i] < 0 ? ceil( m_phaseVec[i] - 0.5 ) : floor( m_phaseVec[i] + 0.5 ) );
+		m_origMatrix->SetElement( i, 1, m_columnVec[i] );
+		m_origMatrix1->SetElement( i, 1, m_columnVec[i] < 0 ? ceil( m_columnVec[i] - 0.5 ) : floor( m_columnVec[i] + 0.5 ) );
 	}
 
 	for ( size_t i = 0; i < 3; i++ ) {

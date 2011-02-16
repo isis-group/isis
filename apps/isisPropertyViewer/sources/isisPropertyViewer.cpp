@@ -121,7 +121,7 @@ void isisPropertyViewer::createTree( const boost::shared_ptr<isis::data::Image> 
 	unsigned short chunkCounter = 0;
 	//go through all the chunks
 	// for ( isis::data::Image::ChunkIterator chunkIterator = image->chunksBegin(); chunkIterator != image->chunksEnd(); chunkIterator++ ) {
-	BOOST_FOREACH( boost::shared_ptr<isis::data::Chunk> chunkref, image->getChunkList() ) {
+	BOOST_FOREACH( boost::shared_ptr<isis::data::Chunk> chunkref, image->getChunksAsVector() ) {
 		m_keyList = chunkref->getKeys();
 
 		if ( not m_keyList.empty() ) {
@@ -164,7 +164,7 @@ void isisPropertyViewer::addPropToTree( const boost::shared_ptr<isis::data::Imag
 
 			for ( unsigned short dim = 0; dim < 4; dim++ ) {
 				QString tmp = "";
-				tmp.sprintf( "%f", image->getProperty<isis::util::fvector4>( propIterator )[dim] );
+				tmp.sprintf( "%f", image->getPropertyAs<isis::util::fvector4>( propIterator )[dim] );
 				stringVec.push_back( tmp );
 			}
 
@@ -175,7 +175,7 @@ void isisPropertyViewer::addPropToTree( const boost::shared_ptr<isis::data::Imag
 		} else {
 			addChildToItem( currentHeadItem, tr( propIterator.c_str() ),
 							tr( image->propertyValue( propIterator )->toString( false ).c_str() ),
-							tr( image->propertyValue( propIterator )->typeName().c_str() ) );
+							tr( image->propertyValue( propIterator )->getTypeName().c_str() ) );
 		}
 	} else {
 		addChildToItem( currentHeadItem, tr( propIterator.c_str() ), tr( "empty" ) , tr( "none" ) );
@@ -203,7 +203,7 @@ void isisPropertyViewer::edit_item( QTreeWidgetItem *item, int val )
 
 			m_propHolder.m_propChanged.find( tmpItem->text( 1 ).toStdString() )->second = true;
 			currentFileName = tmpItem->text( 1 ).toStdString();
-			isis::util::PropMap &tmpPropMap = m_propHolder.m_propHolderMap.find( currentFileName )->second;
+			isis::util::PropertyMap &tmpPropMap = m_propHolder.m_propHolderMap.find( currentFileName )->second;
 			tmpItem = item;
 
 			//go up to the next not empty prop if necessary. This might be the case if current item is a vector
@@ -215,8 +215,8 @@ void isisPropertyViewer::edit_item( QTreeWidgetItem *item, int val )
 			const isis::util::PropertyValue &tmpProp = m_propHolder.m_propHolderMap.find( currentFileName )->second.propertyValue( propName );
 
 			if ( not tmpProp->is<isis::util::fvector4>() ) {
-				isis::util::Type<std::string> myVal( val.toStdString() );
-				isis::util::_internal::TypeBase::convert( myVal, *tmpProp );
+				isis::util::Value<std::string> myVal( val.toStdString() );
+				isis::util::_internal::ValueBase::convert( myVal, *tmpProp );
 			} else {
 				isis::util::fvector4 &tmpVector = tmpPropMap.propertyValue( propName )->cast_to_Type<isis::util::fvector4>();
 

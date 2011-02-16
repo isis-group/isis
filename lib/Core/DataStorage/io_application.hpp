@@ -32,17 +32,13 @@ namespace data
 class IOApplication: public util::Application
 {
 	bool m_input, m_output;
-	template< typename TYPE > ImageList convertTo( const ImageList &imageList ) {
-		ImageList retList;
-		BOOST_FOREACH( ImageList::const_reference listRef, imageList ) {
-			retList.push_back( boost::shared_ptr<Image> ( new TypedImage<TYPE>( *listRef ) ) );
-		}
-		return retList;
+	template< typename TYPE > std::list<data::TypedImage<TYPE> > convertTo( const std::list<data::Image> &src ) {
+		return std::list<data::TypedImage<TYPE> >( src.begin(), src.end() );
 	}
 	util::ConsoleFeedback feedback;
 
 public:
-	data::ImageList images;
+	std::list<data::Image> images;
 	IOApplication( const char name[], bool have_input = true, bool have_output = true );
 	virtual ~IOApplication();
 	virtual bool init( int argc, char **argv, bool exitOnError = true );
@@ -59,25 +55,19 @@ public:
 	/**
 	 * Get the next image from the input.
 	 * This uses fetchImage() to get the next image off of the input list and makes sure,
-	 * that all chunks of this image are of the given type (using makeOfTypeId).
+	 * that all chunks of this image are of the given type (using convertToType).
 	 * If the input image list is empty, an exception is thrown.
 	 * You might want to check the amount of available images via images.size().
 	 * \param copy enforce deep copy of the data, even if its not neccessary
 	 * \returns the currently first image in the input chain represented in the given type
 	 */
-	template<typename TYPE> Image fetchImageAs( bool copy = true ) {
-		if( copy ) {
-			return MemImage<TYPE>( fetchImage() );
-		} else {
-			Image ret = fetchImage();
-			ret.makeOfTypeId( TypePtr<TYPE>::staticID );
-			return ret;
-		}
+	template<typename TYPE> TypedImage<TYPE> fetchImageAs( bool copy = true ) {
+		return copy ? MemImage<TYPE>( fetchImage() ) : TypedImage<TYPE>( fetchImage() );
 	}
 
 	bool autoload( bool exitOnError = false );
-	bool autowrite( const ImageList &out_images, bool exitOnError = false );
-	bool autowrite( const Image &out_image, bool exitOnError = false );
+	bool autowrite( std::list<data::Image> out_images, bool exitOnError = false );
+	bool autowrite( Image out_image, bool exitOnError = false );
 };
 
 }

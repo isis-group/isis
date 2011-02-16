@@ -35,24 +35,24 @@ BOOST_PYTHON_MODULE( _core )
 	//#######################################################################################
 	//  PropMap
 	//#######################################################################################
-	class_<isis::util::PropMap, _PropMap>( "PropMap", init<>() )
+	class_<isis::util::PropertyMap, _PropMap>( "PropMap", init<>() )
 	.def( init<_PropMap>() )
-	.def( "hasProperty", &isis::util::PropMap::hasProperty )
-	.def( "hasBranch", &isis::util::PropMap::hasBranch )
+	.def( "hasProperty", &isis::util::PropertyMap::hasProperty )
+	.def( "hasBranch", &isis::util::PropertyMap::hasBranch )
 	.def( "branch", &_PropMap::_branch )
-	.def( "remove", ( bool ( ::isis::util::PropMap:: * )( const isis::util::istring & ) ) ( &isis::util::PropMap::remove ), ( arg( "key" ) ) )
-	.def( "remove", ( bool ( ::isis::util::PropMap:: * )( const isis::util::PropMap &, bool ) ) ( &isis::util::PropMap::remove ), ( arg( "removeMap" ), arg( "keep_needed" ) ) )
+	.def( "remove", ( bool ( ::isis::util::PropertyMap:: * )( const isis::util::istring & ) ) ( &isis::util::PropertyMap::remove ), ( arg( "key" ) ) )
+	.def( "remove", ( bool ( ::isis::util::PropertyMap:: * )( const isis::util::PropertyMap &, bool ) ) ( &isis::util::PropertyMap::remove ), ( arg( "removeMap" ), arg( "keep_needed" ) ) )
 	.def( "propertyValue", &_PropMap::_propertyValue )
-	.def( "valid", &isis::util::PropMap::valid )
-	.def( "empty", &isis::util::PropMap::empty )
-	.def( "setProperty", &_PropMap::_setProperty )
+	.def( "valid", &isis::util::PropertyMap::valid )
+	.def( "empty", &isis::util::PropertyMap::isEmpty )
+	.def( "setPropertyAs", &_PropMap::_setPropertyAs )
 	;
 	//#######################################################################################
 	//  PropertyValue
 	//#######################################################################################
-	class_<isis::util::PropertyValue, _PropertyValue>( "PropertyValue", init<>() )
-	.def( init<_PropertyValue>() )
-	.def( "toString", &_PropertyValue::_toString )
+	class_<isis::util::PropertyValue, _TypeValue>( "PropertyValue", init<>() )
+	.def( init<_TypeValue>() )
+	.def( "toString", &_TypeValue::_toString )
 	;
 	//#######################################################################################
 	//  Selection

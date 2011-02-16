@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE ( VTKAdapterTest3D )
 	//load an image and store it into the vtkAdapter
 	//      data::ImageList imgList = isis::data::IOFactory::load("test.null", "");
 	data::ImageList imgList = isis::data::IOFactory::load( "/scr/kastanie1/DATA/isis/data.nii", "" );
-	BOOST_CHECK( not imgList.empty() );
+	BOOST_CHECK( not imgList.isEmpty() );
 	vtkImageData *vtkImage = adapter::vtkAdapter::makeVtkImageObject( imgList.front() );
 	BOOST_CHECK( not vtkImage );
 	//finally show one axial slice of the vtkImage, z=zdimension/2

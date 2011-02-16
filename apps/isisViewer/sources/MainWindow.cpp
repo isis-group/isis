@@ -41,10 +41,10 @@ void MainWindow::createAndSendImageMap( const util::slist &fileList )
 		BOOST_FOREACH( isis::data::ImageList::const_reference refImage, imgList ) {
 			adapter::vtkAdapter::ScalingType scaling;
 			std::vector<vtkSmartPointer<vtkImageData> > vtkImageVector = isis::adapter::vtkAdapter::makeVtkImageObject( refImage, scaling );
-			refImage->setProperty< util::fvector4 >( "imageSize", refImage->sizeToVector() );
-			static_cast<util::TypeReference &>( refImage->propertyValue( "scale" ) ) = scaling.first;
-			static_cast<util::TypeReference &>( refImage->propertyValue( "offset" ) ) = scaling.second;
-			imageMap.push_back( std::make_pair( static_cast<util::PropMap>( *refImage ), vtkImageVector ) );
+			refImage->setPropertyAs< util::fvector4 >( "imageSize", refImage->getSizeAsVector() );
+			static_cast<util::ValueReference &>( refImage->propertyValue( "scale" ) ) = scaling.first;
+			static_cast<util::ValueReference &>( refImage->propertyValue( "offset" ) ) = scaling.second;
+			imageMap.push_back( std::make_pair( static_cast<util::PropertyMap>( *refImage ), vtkImageVector ) );
 		}
 	}
 
