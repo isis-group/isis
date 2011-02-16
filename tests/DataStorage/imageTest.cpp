@@ -948,7 +948,25 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes )
 	data::enableLog<util::DefaultMsgPrint>( warning );
 }
 
+BOOST_AUTO_TEST_CASE ( image_size_test )
+{
+	data::MemChunk<uint8_t> original( 11, 23, 90, 12 );
+	data::Image img;
+	original.setPropertyAs<uint32_t>( "acquisitionNumber", 1 );
+	original.setPropertyAs<util::fvector4>( "indexOrigin", util::fvector4() );
+	original.setPropertyAs<util::fvector4>( "voxelSize", util::fvector4( 1, 1, 1 ) );
+	original.setPropertyAs<util::fvector4>( "rowVec", util::fvector4( 1, 0, 0 ) );
+	original.setPropertyAs<util::fvector4>( "columnVec", util::fvector4( 0, 1, 0 ) );
+	BOOST_REQUIRE( img.insertChunk( original ) );
+	BOOST_REQUIRE( img.reIndex() );
+	BOOST_REQUIRE( !img.isEmpty() );
 
+	BOOST_CHECK_EQUAL(img.getNrOfColumms(), 11);
+	BOOST_CHECK_EQUAL(img.getNrOfRows(), 23);
+	BOOST_CHECK_EQUAL(img.getNrOfSlices(), 90);
+	BOOST_CHECK_EQUAL(img.getNrOfTimesteps(), 12);
+
+}
 
 
 } // END namespace test
