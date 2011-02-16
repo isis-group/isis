@@ -69,11 +69,12 @@ public:
 	size_t length()const;
 
 	/**
-	 * Split up into cheap copies of given length.
-	 * This will create ValuePtr's which will point at elements within this data block.
-	 * - They will have a distance of size and therefore have the have the same length (exept the last one which will point an the rest).
-	 * - They will use a special proxy-reference-counting (If at least one of them is still used, the whole original ValuePtr will be kept).
-	 * \returns a vector of ceil(len()/size) not intersecting ValuePtrBase::Reference's of the length<=size.
+	 * Splice up the ValuePtr into equal sized blocks.
+	 * This virtually creates new data blocks of the given size by computing new pointers into the block and creating ValuePtr objects for them.
+	 * This ValuePtr objects use the reference counting of the original ValuePtr via DelProxy, so the original data are only deleted (as a whole)
+	 * when all spliced and all "normal" ValuePtr for this data are deleted.
+	 * \param size the maximum size of the spliced parts of the data (the last part can be smaller)
+	 * \returns a vector of references to ValuePtr's which point to the parts of the spliced data
 	 */
 	virtual std::vector<Reference> splice( size_t size )const = 0;
 
@@ -137,13 +138,22 @@ public:
 	}
 	/**
 	 * Create a new ValuePtr, of the same type, but differnent size in memory.
+	 * (The actual data are _not_ copied)
 	 * \param length length of the new memory block in elements of the given TYPE
 	 */
 	virtual ValuePtrBase::Reference cloneToNew( size_t length )const = 0;
+
+	/**
+	 * Create a new ValuePtr, of the same type and size in memory.
+	 * (The actual data are _not_ copied - use copyToNew())
+	 */
 	ValuePtrBase::Reference cloneToNew();
 
+	/// \returns the byte-size of the type of the data this ValuePtr points to.
 	virtual size_t bytesPerElem()const = 0;
+
 	virtual ~ValuePtrBase();
+
 	/**
 	 * Copy a range of elements to another ValuePtr of the same type.
 	 * \param start first element in this to be copied
@@ -157,7 +167,7 @@ public:
 	size_t useCount()const;
 
 	/**
-	 * Get minimum/maximum from a ValuePtr.
+	 * Get minimum/maximum of a ValuePtr.
 	 * This computes the minimum and maximum value of the stored data and stores them in ValueReference-Objects.
 	 * The computes min/max are of the same type as the stored data, but can be compared to other ValueReference without knowing this type via the lt/gt function of ValueBase.
 	 * The following code checks if the value range of ValuePtr-object data1 is a real subset of data2:
@@ -169,16 +179,20 @@ public:
 	 * \returns a pair of ValueReferences referring to the found minimum/maximum of the data
 	 */
 	virtual std::pair<util::ValueReference, util::ValueReference> getMinMax()const = 0;
+
 	/**
-	 * Compare to another ValuePtr.
-	 * This counts the elements between start and end, which are not equal to the corresponding elements in dst.
-	 * If dst is of another type all element are assumed to be different
-	 * \param start starting index for the comparison
-	 * \param end end index for the comparison (this element the first element which is _not_ compared)
-	 * \param dst the ValuePtr to compare against
-	 * \param dst_start the index where to start comparison in dst
+	 * Compare the data of two ValuePtr.
+	 * Counts how many elements in this and the given ValuePtr are different within the given range.
+	 * If the type of this is not equal to the type of the given ValuePtr the whole length is assumed to be different.
+	 * If the given range does not fit into this or the given ValuePtr an error is send to the runtime log and the function will probably crash.
+	 * \param start the first element in this, which schould be compared to the first element in the given TyprPtr
+	 * \param end the first element in this, which schould _not_ be compared anymore to the given TyprPtr
+	 * \param dst the given ValuePtr this should be compared to
+	 * \param dst_start the first element in the given TyprPtr, which schould be compared to the first element in this
+	 * \returns the amount of elements which actually differ in both ValuePtr or the whole length of the range when the types are not equal.
 	 */
 	virtual size_t compare( size_t start, size_t end, const ValuePtrBase &dst, size_t dst_start )const = 0;
+
 	/**
 	 * Compare to another ValuePtr.
 	 * Short hand version of compare( size_t start, size_t end, const ValuePtrBase &dst, size_t dst_start )const

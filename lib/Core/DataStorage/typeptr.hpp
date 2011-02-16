@@ -185,17 +185,6 @@ public:
 		memcpy( dst, &source, _length * sizeof( TYPE ) );
 	}
 
-	/**
-	 * Compare the data of two ValuePtr.
-	 * Counts how many elements in this and the given ValuePtr are different within the given range.
-	 * If the type of this is not equal to the type of the given ValuePtr the whole length is assumed to be different.
-	 * If the given range does not fit into this or the given ValuePtr an error is send to the runtime log and the function will probably crash.
-	 * \param start the first element in this, which schould be compared to the first element in the given TyprPtr
-	 * \param end the first element in this, which schould _not_ be compared anymore to the given TyprPtr
-	 * \param dst the given ValuePtr this should be compared to
-	 * \param dst_start the first element in the given TyprPtr, which schould be compared to the first element in this
-	 * \returns the amount of elements which actually differ in both ValuePtr or the whole length of the range when the types are not equal.
-	 */
 	size_t compare( size_t start, size_t end, const _internal::ValuePtrBase &dst, size_t dst_start ) const {
 		assert( start <= end );
 		size_t ret = 0;
@@ -275,11 +264,11 @@ public:
 	ValuePtrBase::Reference cloneToNew( size_t _length ) const {
 		return ValuePtrBase::Reference( new ValuePtr( ( TYPE * )malloc( _length * sizeof( TYPE ) ), _length ) );
 	}
-	/// \returns the byte-size of the type of the data this ValuePtr points to.
+
 	size_t bytesPerElem() const {
 		return sizeof( TYPE );
 	}
-	/// \copydoc _internal::ValuePtrBase::getMinMax
+
 	std::pair<util::ValueReference, util::ValueReference> getMinMax()const {
 		if ( length() == 0 ) {
 			LOG( Runtime, warning ) << "Skipping computation of min/max on an empty ValuePtr";
@@ -291,14 +280,6 @@ public:
 		return std::make_pair( util::ValueReference( result.first ), util::ValueReference( result.second ) );
 	}
 
-	/**
-	 * Splice up the ValuePtr into equal sized blocks.
-	 * This virtually creates new data blocks of the given size by computing new pointers into the block and creating ValuePtr objects for them.
-	 * This ValuePtr use the reference counting of the original ValuePtr via DelProxy, so the original data are only deleted (as a whole)
-	 * when all spliced and all "normal" ValuePtr for this data are deleted.
-	 * \param size the maximum size of the spliced parts of the data (the last part can be smaller)
-	 * \returns a vector of ValuePtr which point to the parts of the spliced data
-	 */
 	std::vector<Reference> splice( size_t size )const {
 		if ( size >= length() ) {
 			LOG( Debug, warning )

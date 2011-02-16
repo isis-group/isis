@@ -62,7 +62,7 @@ template<class T> struct TypeID {
  * Instanciating this with any datatype (eg: check_type\<short\>() ) will cause the
  * compiler to raise an error if this datatype is not in the list of the supported types.
  */
-template< typename T > struct check_type {
+template< typename T > struct checkType {
 	BOOST_MPL_ASSERT_MSG(
 		( boost::mpl::contains<_internal::types, T>::value )
 		, TYPE_IS_NOT_KNOWN
