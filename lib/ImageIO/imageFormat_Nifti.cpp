@@ -579,7 +579,7 @@ private:
 		ni.time_units = NIFTI_UNITS_MSEC;
 		util::fvector4 dimensions = image.getSizeAsVector();
 		LOG( ImageIoLog, info ) << dimensions;
-		ni.ndim = ni.dim[0] = image.relevantDims();
+		ni.ndim = ni.dim[0] = image.getRelevantDims();
 		ni.nx = ni.dim[1] = dimensions[0];
 		ni.ny = ni.dim[2] = dimensions[1];
 		ni.nz = ni.dim[3] = dimensions[2];

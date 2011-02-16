@@ -123,7 +123,7 @@ bool Image::reIndex()
 	size.fill( 1 );
 	//get primary attributes from geometrically first chunk - will be usefull
 	const Chunk &first = chunkAt( 0 );
-	const unsigned short chunk_dims = first.relevantDims();
+	const unsigned short chunk_dims = first.getRelevantDims();
 	chunkVolume = first.getVolume();
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Determine structure of the image by searching for dimensional breaks in the chunklist
@@ -184,7 +184,7 @@ bool Image::reIndex()
 
 	// add the chunk-size to the image-size
 	for ( unsigned short i = 0; i < chunk_dims; i++ )
-		size[i] = first.dimSize( i );
+		size[i] = first.getDimSize( i );
 
 	init( size ); // set size of the image
 	//////////////////////////////////////////////////////////////////////////////////////////////////
@@ -630,15 +630,15 @@ bool Image::convertToType( short unsigned int ID )
 
 size_t Image::spliceDownTo( dimensions dim ) //readDim = 0, phaseDim, sliceDim, timeDim
 {
-	if( lookup[0]->relevantDims() < ( size_t ) dim ) {
+	if( lookup[0]->getRelevantDims() < ( size_t ) dim ) {
 		LOG( Debug, error ) << "The dimensionality of the chunks of this image is already below " << dim << " cannot splice it.";
 		return 0;
-	} else if( lookup[0]->relevantDims() == ( size_t ) dim ) {
-		LOG( Debug, info ) << "Skipping useless splicing, relevantDims is allready " << lookup[0]->relevantDims();
+	} else if( lookup[0]->getRelevantDims() == ( size_t ) dim ) {
+		LOG( Debug, info ) << "Skipping useless splicing, relevantDims is allready " << lookup[0]->getRelevantDims();
 		return lookup.size();
 	}
 
-	LOG_IF( lookup[0]->relevantDims() == ( size_t ) dim, Debug, info ) << "Running useless splice, the dimensionality of the chunks of this image is already " << dim;
+	LOG_IF( lookup[0]->getRelevantDims() == ( size_t ) dim, Debug, info ) << "Running useless splice, the dimensionality of the chunks of this image is already " << dim;
 	LOG_IF( hasProperty( "acquisitionTime" ) || lookup[0]->hasProperty( "acquisitionTime" ), Debug, warning ) << "Splicing images with acquisitionTime will cause you lots of trouble. You should remove that before.";
 	util::FixedVector<size_t, 4> size = getSizeAsVector();
 
@@ -655,7 +655,7 @@ size_t Image::spliceDownTo( dimensions dim ) //readDim = 0, phaseDim, sliceDim, 
 		size_t m_amount;
 		splicer( dimensions dim, size_t amount, Image &image ): m_dim( dim ), m_image( image ), m_amount( amount ) {}
 		void operator()( const Chunk &ch ) {
-			const size_t topDim = ch.relevantDims() - 1;
+			const size_t topDim = ch.getRelevantDims() - 1;
 
 			if( topDim >= ( size_t ) m_dim ) { // ok we still have to splice that
 				const size_t subSize = m_image.getSizeAsVector()[topDim];
@@ -665,7 +665,7 @@ size_t Image::spliceDownTo( dimensions dim ) //readDim = 0, phaseDim, sliceDim, 
 					sub( ref );
 				}
 			} else { // seems like we're done - insert it into the image
-				assert( ch.relevantDims() == ( size_t ) m_dim ); // index of the higest dim>1 (ch.relevantDims()-1) shall be equal to the dim below the requested splicing (m_dim-1)
+				assert( ch.getRelevantDims() == ( size_t ) m_dim ); // index of the higest dim>1 (ch.getRelevantDims()-1) shall be equal to the dim below the requested splicing (m_dim-1)
 				m_image.insertChunk( ch );
 			}
 		}

@@ -24,7 +24,7 @@ public:
 		FILE *fp;
 		png_structp png_ptr;
 		png_infop info_ptr;
-		assert( buff.relevantDims() == 2 );
+		assert( buff.getRelevantDims() == 2 );
 		util::FixedVector<size_t, 4> size = buff.getSizeAsVector();
 
 		/* open the file */
@@ -105,7 +105,7 @@ public:
 	}
 
 	void write( const data::Image &image, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
-		if( image.relevantDims() < 2 ) {
+		if( image.getRelevantDims() < 2 ) {
 			throwGenericError( "Cannot write png when image is made of stripes" );
 		}
 

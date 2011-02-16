@@ -91,13 +91,13 @@ public:
 	}
 	/**
 	 * Get the size of the object in elements of TYPE.
-	 * \returns \f$ \prod_{i=0}^{DIMS-1} dimSize(i) \f$
+	 * \returns \f$ \prod_{i=0}^{DIMS-1} getDimSize(i) \f$
 	 */
 	size_t getVolume()const {
 		return __dimStride<DIMS>( dim );
 	}
 	///\returns the size of the object in the given dimension
-	size_t dimSize( size_t idx )const {
+	size_t getDimSize( size_t idx )const {
 		return dim[idx];
 	}
 
@@ -115,7 +115,7 @@ public:
 	 * get amount of relevant dimensions (last dim with size>1)
 	 * e.g. on a slice (1x64x1x1) it will be 2
 	 */
-	size_t relevantDims()const {
+	size_t getRelevantDims()const {
 		size_t ret = 0;
 
 		for ( unsigned short i = DIMS; i; i-- ) {

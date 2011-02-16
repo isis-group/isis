@@ -25,10 +25,10 @@ BOOST_AUTO_TEST_CASE ( chunk_init_test )
 	ENABLE_LOG( DataDebug, util::DefaultMsgPrint, warning );
 	data::MemChunk<float> ch( 4, 3, 2, 1 );
 	BOOST_CHECK_EQUAL( ch.getVolume(), 1 * 2 * 3 * 4 );
-	BOOST_CHECK_EQUAL( ch.dimSize( data::readDim ), 4 );
-	BOOST_CHECK_EQUAL( ch.dimSize( data::phaseDim ), 3 );
-	BOOST_CHECK_EQUAL( ch.dimSize( data::sliceDim ), 2 );
-	BOOST_CHECK_EQUAL( ch.dimSize( data::timeDim ), 1 );
+	BOOST_CHECK_EQUAL( ch.getDimSize( data::readDim ), 4 );
+	BOOST_CHECK_EQUAL( ch.getDimSize( data::phaseDim ), 3 );
+	BOOST_CHECK_EQUAL( ch.getDimSize( data::sliceDim ), 2 );
+	BOOST_CHECK_EQUAL( ch.getDimSize( data::timeDim ), 1 );
 }
 
 BOOST_AUTO_TEST_CASE ( chunk_foreach_voxel_test )
@@ -111,15 +111,15 @@ BOOST_AUTO_TEST_CASE ( chunk_data_test1 )//Access Chunk elements via dimensional
 {
 	data::MemChunk<float> ch( 4, 4, 4, 4 );
 
-	for ( size_t i = 0; i < ch.dimSize( data::readDim ); i++ )
+	for ( size_t i = 0; i < ch.getDimSize( data::readDim ); i++ )
 		ch.voxel<float>( i, i, i, i ) = i;
 
-	for ( size_t i = 0; i < ch.dimSize( data::readDim ); i++ )
+	for ( size_t i = 0; i < ch.getDimSize( data::readDim ); i++ )
 		BOOST_CHECK_EQUAL( ch.voxel<float>( i, i, i, i ), i );
 
 	data::Chunk ch2 = ch;
 
-	for ( size_t i = 0; i < ch.dimSize( data::readDim ); i++ )
+	for ( size_t i = 0; i < ch.getDimSize( data::readDim ); i++ )
 		BOOST_CHECK_EQUAL( ch2.voxel<float>( i, i, i, i ), i );
 }
 
@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE ( chunk_scale_test )//Access Chunk elements via dimensional
 {
 	data::MemChunk<int16_t> ch( 10, 10, 10 );
 
-	for ( size_t x = 0; x < ch.dimSize( data::readDim ); x++ ) {
+	for ( size_t x = 0; x < ch.getDimSize( data::readDim ); x++ ) {
 		ch.voxel<int16_t>( x, x, 0 ) =  2500;
 		ch.voxel<int16_t>( x, x, 1 ) = -50;
 	}

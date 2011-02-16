@@ -199,7 +199,7 @@ typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkRea
 	importer->SetOrigin( itkOrigin );
 	importer->SetDirection( itkDirection );
 	m_ImagePropMap = static_cast<util::PropertyMap>( m_ImageISIS );
-	m_RelevantDim = m_ImageISIS.getChunkAt( 0 ).relevantDims();
+	m_RelevantDim = m_ImageISIS.getChunkAt( 0 ).getRelevantDims();
 	//reorganisation of memory according to the chunk organisiation
 	void *targePtr = malloc( m_ImageISIS.getBytesPerVoxel() * m_ImageISIS.getVolume() );
 	typename InputImageType::PixelType *refTarget = ( typename InputImageType::PixelType * ) targePtr;
