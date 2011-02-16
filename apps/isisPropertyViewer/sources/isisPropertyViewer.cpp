@@ -121,7 +121,7 @@ void isisPropertyViewer::createTree( const boost::shared_ptr<isis::data::Image> 
 	unsigned short chunkCounter = 0;
 	//go through all the chunks
 	// for ( isis::data::Image::ChunkIterator chunkIterator = image->chunksBegin(); chunkIterator != image->chunksEnd(); chunkIterator++ ) {
-	BOOST_FOREACH( boost::shared_ptr<isis::data::Chunk> chunkref, image->getChunkList() ) {
+	BOOST_FOREACH( boost::shared_ptr<isis::data::Chunk> chunkref, image->getChunksAsVector() ) {
 		m_keyList = chunkref->getKeys();
 
 		if ( not m_keyList.empty() ) {

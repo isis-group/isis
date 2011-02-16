@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		BOOST_REQUIRE( img.insertChunk( ch ) );
 		//Get a list of the sorted chunks
 		BOOST_REQUIRE( img.reIndex() );
-		std::vector<boost::shared_ptr<data::Chunk> > list = img.getChunkList();
+		std::vector<boost::shared_ptr<data::Chunk> > list = img.getChunksAsVector();
 		BOOST_CHECK_EQUAL( list.size(), 3 ); // the should be 3 chunks in the list by now
 
 		for( unsigned int i = 0; i < list.size(); i++ ) {
@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		std::string str = "testString";
 		img.setPropertyAs<std::string>( "testProp", str );
 		BOOST_CHECK_EQUAL( img.getPropertyAs<std::string>( "testProp" ), str );
-		boost::shared_ptr<data::Chunk> ptr = img.getChunkList().back();
+		boost::shared_ptr<data::Chunk> ptr = img.getChunksAsVector().back();
 		//as all other chunks where timestep < 4 this must be at the end
 		BOOST_CHECK_EQUAL( ptr->propertyValue( "indexOrigin" ), util::fvector4( 0, 0, 2 ) );
 		BOOST_CHECK_EQUAL( ptr->propertyValue( "acquisitionNumber" ), 5  );
@@ -695,7 +695,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
 	const size_t dummy[] = {nrX, nrY, nrS, nrT};
 	const util::FixedVector<size_t, 4> sizeVec( dummy );
 	img.reIndex();
-	BOOST_REQUIRE_EQUAL( img.getChunkList().size(), nrT * nrS );
+	BOOST_REQUIRE_EQUAL( img.getChunksAsVector().size(), nrT * nrS );
 	BOOST_REQUIRE_EQUAL( img.getSizeAsVector(), sizeVec );
 
 	for ( unsigned int ix = 0; ix < nrX; ix++ ) {
@@ -753,7 +753,7 @@ BOOST_AUTO_TEST_CASE ( image_splice_test )
 	BOOST_REQUIRE( img.reIndex() );
 	BOOST_REQUIRE( !img.isEmpty() );
 	img.spliceDownTo( data::sliceDim );
-	std::vector<boost::shared_ptr<data::Chunk> > chunks = img.getChunkList();
+	std::vector<boost::shared_ptr<data::Chunk> > chunks = img.getChunksAsVector();
 	BOOST_CHECK_EQUAL( chunks.size(), 100 );
 
 	for( size_t i = 0; i < chunks.size(); i++ ) {

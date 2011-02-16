@@ -107,9 +107,9 @@ public:
 		return _setVoxel( coord[0], coord[1], coord[2], coord[3], value );
 	}
 
-	std::list<isis::data::Chunk> _getChunkList( void ) {
+	std::list<isis::data::Chunk> _getChunksAsVector( void ) {
 		std::list<isis::data::Chunk> retChunkList;
-		std::vector<boost::shared_ptr<isis::data::Chunk> > chunkList( this->getChunkList() );
+		std::vector<boost::shared_ptr<isis::data::Chunk> > chunkList( this->getChunksAsVector() );
 		BOOST_FOREACH( std::vector<boost::shared_ptr<isis::data::Chunk> >::reference ref, chunkList ) {
 			retChunkList.push_back( *ref );
 		}

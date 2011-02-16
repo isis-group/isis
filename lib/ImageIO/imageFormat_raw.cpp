@@ -33,7 +33,7 @@ public:
 		LOG( ImageIoLog, info ) << "Writing image of size " << image.getSizeAsVector() << " and type " << type << " to " << outName;
 		std::ofstream out( outName.c_str() );
 		out.exceptions( std::ios::failbit | std::ios::badbit );
-		BOOST_FOREACH( const boost::shared_ptr<const data::Chunk > &ref, image.getChunkList() ) {
+		BOOST_FOREACH( const boost::shared_ptr<const data::Chunk > &ref, image.getChunksAsVector() ) {
 			const boost::shared_ptr<void> data( ref->getTypePtrBase().getRawAddress() );
 			const size_t data_size = ref->bytesPerVoxel() * ref->getVolume();
 			out.write( static_cast<const char *>( data.get() ), data_size );

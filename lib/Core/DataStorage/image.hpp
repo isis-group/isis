@@ -220,9 +220,9 @@ public:
 	 * Note: this chunks only have metadata which are unique to them - so they might be invalid.
 	 * (run join on copies of them using the image as parameter to insert all non-unique-metadata).
 	 */
-	std::vector<boost::shared_ptr<Chunk> > getChunkList();
+	std::vector<boost::shared_ptr<Chunk> > getChunksAsVector();
 	/// \copydoc getChunkList
-	std::vector<boost::shared_ptr<const Chunk> > getChunkList()const;
+	std::vector<boost::shared_ptr<const Chunk> > getChunksAsVector()const;
 
 	/**
 	 * Get the chunk that contains the voxel at the given coordinates in the given type.

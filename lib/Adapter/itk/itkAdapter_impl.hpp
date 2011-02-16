@@ -203,7 +203,7 @@ typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkRea
 	//reorganisation of memory according to the chunk organisiation
 	void *targePtr = malloc( m_ImageISIS.getBytesPerVoxel() * m_ImageISIS.getVolume() );
 	typename InputImageType::PixelType *refTarget = ( typename InputImageType::PixelType * ) targePtr;
-	std::vector< boost::shared_ptr< data::Chunk> > chList = m_ImageISIS.getChunkList();
+	std::vector< boost::shared_ptr< data::Chunk> > chList = m_ImageISIS.getChunksAsVector();
 	size_t chunkIndex = 0;
 	BOOST_FOREACH( boost::shared_ptr< data::Chunk> & ref, chList ) {
 		data::Chunk &chRef = *ref;
@@ -286,7 +286,7 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	retImage->spliceDownTo( static_cast<data::dimensions> ( m_RelevantDim ) );
 	//add the residual parameters to the image
 	retImage->join( m_ImagePropMap, false );
-	std::vector< boost::shared_ptr< data::Chunk> > chList = retImage->getChunkList();
+	std::vector< boost::shared_ptr< data::Chunk> > chList = retImage->getChunksAsVector();
 	LOG_IF( chList.size() != m_ChunkPropMapVector.size(), data::Debug, warning ) << "The image size has changed. The chunk-specific metadata will be interpolated.";
 	//iterate through the spliced chunks of the image and set all the chunk specific parameters
 	size_t chunkCounter = 0;

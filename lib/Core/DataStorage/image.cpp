@@ -359,13 +359,13 @@ const Chunk Image::getChunk ( size_t first, size_t second, size_t third, size_t 
 	const size_t index = commonGet( first, second, third, fourth ).first;
 	return getChunkAt( index, copy_metadata );
 }
-std::vector< boost::shared_ptr< Chunk > > Image::getChunkList()
+std::vector< boost::shared_ptr< Chunk > > Image::getChunksAsVector()
 {
 	checkMakeClean();//lookup is filled by reIndex
 	return lookup;
 }
 
-std::vector< boost::shared_ptr<const Chunk > > Image::getChunkList()const
+std::vector< boost::shared_ptr<const Chunk > > Image::getChunksAsVector()const
 {
 	LOG_IF( !clean, Debug, error ) << "You shouldn't do this on a non clean image. Run reIndex first.";
 	return std::vector< boost::shared_ptr<const Chunk > >( lookup.begin(), lookup.end() );
@@ -495,7 +495,7 @@ std::pair< util::TypeReference, util::TypeReference > Image::getScalingTo( short
 	std::pair<util::TypeReference, util::TypeReference> minmax = getMinMax();
 
 	bool unique = true;
-	const std::vector<boost::shared_ptr<const Chunk> > chunks = getChunkList();
+	const std::vector<boost::shared_ptr<const Chunk> > chunks = getChunksAsVector();
 	BOOST_FOREACH( const boost::shared_ptr<const Chunk> &ref, chunks ) { //find a chunk which would be converted
 		if( targetID != ref->typeID() ) {
 			LOG_IF( ref->getScalingTo( targetID, minmax, scaleopt ).first.isEmpty() || ref->getScalingTo( targetID, minmax, scaleopt ).second.isEmpty(), Debug, error )
