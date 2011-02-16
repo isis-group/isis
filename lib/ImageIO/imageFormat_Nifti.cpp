@@ -105,7 +105,7 @@ public:
 		return std::string( "fsl spm" );
 	}
 
-	std::string name()const {
+	std::string getName()const {
 		//TODO: wahrscheinlich sollten die Namen irgendwie so aussehen "mpg.cbs.nii"?
 		return "Nifti";
 	}

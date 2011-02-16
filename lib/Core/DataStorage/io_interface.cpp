@@ -32,7 +32,7 @@ void FileFormat::write( const std::list<data::Image> &images, const std::string 
 			write( ref, uniquePath, dialect );
 		} catch ( std::runtime_error &e ) {
 			LOG( Runtime, warning )
-					<< "Failed to write image to " <<  uniquePath << " using " <<  name() << " (" << e.what() << ")";
+					<< "Failed to write image to " <<  uniquePath << " using " <<  getName() << " (" << e.what() << ")";
 		}
 	}
 }

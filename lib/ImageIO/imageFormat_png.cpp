@@ -14,7 +14,7 @@ protected:
 		return std::string( ".png" );
 	}
 public:
-	std::string name()const {
+	std::string getName()const {
 		return "PNG (Portable Network Graphics)";
 	}
 	std::string dialects( const std::string &filename ) const {

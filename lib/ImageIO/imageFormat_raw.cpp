@@ -14,7 +14,7 @@ protected:
 		return std::string( "raw" );
 	}
 public:
-	std::string name()const {
+	std::string getName()const {
 		return "raw data output";
 	}
 

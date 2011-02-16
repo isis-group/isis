@@ -47,7 +47,7 @@ class ImageFormat_Vista: public FileFormat
 protected:
 	std::string suffixes()const {return std::string( ".v" );}
 public:
-	std::string name()const { return std::string( "Vista" );}
+	std::string getName()const { return std::string( "Vista" );}
 	bool tainted()const {return false;}//internal plugins are not tainted
 
 	/**

@@ -58,7 +58,7 @@ struct dialect_missing {
 	bool operator()( IOFactory::FileFormatList::reference ref )const {
 		std::list<std::string> splitted = util::stringToList<std::string>( ref->dialects( filename ), ' ' );
 		const bool ret = ( std::find( splitted.begin(), splitted.end(), dialect ) == splitted.end() );
-		LOG_IF( ret, Runtime, warning ) << ref->name() << " does not support the requested dialect " << util::MSubject( dialect );
+		LOG_IF( ret, Runtime, warning ) << ref->getName() << " does not support the requested dialect " << util::MSubject( dialect );
 		return ret;
 	}
 };
@@ -100,7 +100,7 @@ bool IOFactory::registerFileFormat( const FileFormatPtr plugin )
 	std::list<util::istring> suffixes = plugin->getSuffixes(  );
 	LOG( Runtime, info )
 			<< "Registering " << ( plugin->tainted() ? "tainted " : "" ) << "io-plugin "
-			<< util::MSubject( plugin->name() )
+			<< util::MSubject( plugin->getName() )
 			<< " with supported suffixes " << suffixes;
 	BOOST_FOREACH( util::istring & it, suffixes ) {
 		io_suffix[it].push_back( plugin );
@@ -209,13 +209,13 @@ int IOFactory::loadFile( std::list<Chunk> &ret, const boost::filesystem::path &f
 	} else {
 		BOOST_FOREACH( FileFormatList::const_reference it, formatReader ) {
 			LOG( ImageIoDebug, info )
-					<< "plugin to load file" << with_dialect << " " << util::MSubject( filename ) << ": " << it->name();
+					<< "plugin to load file" << with_dialect << " " << util::MSubject( filename ) << ": " << it->getName();
 
 			try {
 				return it->load( ret, filename.file_string(), dialect );
 			} catch ( std::runtime_error &e ) {
 				LOG( Runtime, formatReader.size() > 1 ? warning : error )
-						<< "Failed to load " <<  filename << " using " <<  it->name() << with_dialect << " ( " << e.what() << " )";
+						<< "Failed to load " <<  filename << " using " <<  it->getName() << with_dialect << " ( " << e.what() << " )";
 			}
 		}
 		LOG_IF( boost::filesystem::exists( filename ) && formatReader.size() > 1, Runtime, error ) << "No plugin was able to load: "   << util::MSubject( filename ) << with_dialect;
@@ -370,7 +370,7 @@ bool IOFactory::write( std::list<data::Image> images, const std::string &path, s
 	if( formatWriter.size() ) {
 		BOOST_FOREACH( FileFormatList::const_reference it, formatWriter ) {
 			LOG( Debug, info )
-					<< "plugin to write to " <<  path << ": " << it->name()
+					<< "plugin to write to " <<  path << ": " << it->getName()
 					<<  ( dialect.empty() ?
 						  std::string( "" ) :
 						  std::string( " using dialect: " ) + dialect
@@ -379,7 +379,7 @@ bool IOFactory::write( std::list<data::Image> images, const std::string &path, s
 			try {
 				it->write( images, path, dialect );
 				LOG( Runtime, info ) << images.size()
-									 << " images written to " << path << " using " <<  it->name()
+									 << " images written to " << path << " using " <<  it->getName()
 									 <<  ( dialect.empty() ?
 										   std::string( "" ) :
 										   std::string( " and dialect: " ) + dialect
@@ -388,7 +388,7 @@ bool IOFactory::write( std::list<data::Image> images, const std::string &path, s
 			} catch ( std::runtime_error &e ) {
 				LOG( Runtime, warning )
 						<< "Failed to write " <<  images.size()
-						<< " images to " << path << " using " <<  it->name() << " (" << e.what() << ")";
+						<< " images to " << path << " using " <<  it->getName() << " (" << e.what() << ")";
 			}
 		}
 	} else {

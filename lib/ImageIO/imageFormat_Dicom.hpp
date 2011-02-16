@@ -71,7 +71,7 @@ public:
 	static void parseList( DcmElement *elem, const util::istring &name, isis::util::PropertyMap &map );
 	static void dcmObject2PropMap( DcmObject *master_obj, isis::util::PropertyMap &map, const std::string &dialect );
 	static void sanitise( util::PropertyMap &object, string dialect );
-	std::string name()const;
+	std::string getName()const;
 	std::string dialects( const std::string &filename )const;
 
 	int load( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & );

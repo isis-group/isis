@@ -130,7 +130,7 @@ public:
 			return util::listToString( ret.begin(), ret.end(), ",", "", "" );
 		}
 	}
-	std::string name()const {return "compression proxy for other formats";}
+	std::string getName()const {return "compression proxy for other formats";}
 
 	virtual std::pair<std::string, std::string> makeBasename( const std::string &filename )const {
 		const std::pair<std::string, std::string> proxyBase = FileFormat::makeBasename( filename ); // get rid of the the .gz

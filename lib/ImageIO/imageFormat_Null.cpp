@@ -13,7 +13,7 @@ protected:
 		return std::string( ".null .null.gz" );
 	}
 public:
-	std::string name()const {
+	std::string getName()const {
 		return "Null";
 	}
 

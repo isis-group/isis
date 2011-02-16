@@ -96,7 +96,7 @@ public:
 		            return util::listToString( ret.begin(), ret.end(), ",", "", "" );
 		        }*/
 	}
-	std::string name()const {return "tar decompression proxy for other formats";}
+	std::string getName()const {return "tar decompression proxy for other formats";}
 
 	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) {
 		int ret = 0;
