@@ -33,7 +33,7 @@ class IOApplication: public util::Application
 {
 	bool m_input, m_output;
 	template< typename TYPE > std::list<data::TypedImage<TYPE> > convertTo( const std::list<data::Image> &src ) {
-		return std::list<data::TypedImage<TYPE> >(src.begin(),src.end());
+		return std::list<data::TypedImage<TYPE> >( src.begin(), src.end() );
 	}
 	util::ConsoleFeedback feedback;
 
@@ -62,7 +62,7 @@ public:
 	 * \returns the currently first image in the input chain represented in the given type
 	 */
 	template<typename TYPE> TypedImage<TYPE> fetchImageAs( bool copy = true ) {
-		return copy ? MemImage<TYPE>( fetchImage() ):TypedImage<TYPE>(fetchImage());
+		return copy ? MemImage<TYPE>( fetchImage() ) : TypedImage<TYPE>( fetchImage() );
 	}
 
 	bool autoload( bool exitOnError = false );

@@ -103,9 +103,9 @@ public:
 	 * @copydoc copyToNewByID
 	 * \param ID the ID of the type the new ValuePtr (referenced by the Reference returned) should have
 	 * \param scaling the scaling to be used if a conversion is necessary
-	 */	
+	 */
 	Reference copyToNewByID( unsigned short ID, const scaling_pair &scaling ) const;
-	
+
 	/**
 	 * Create a ValuePtr of given type and length.
 	 * This allocates memory as needed but does not initialize it.

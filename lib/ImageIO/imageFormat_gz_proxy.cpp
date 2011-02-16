@@ -162,14 +162,17 @@ public:
 
 		file_uncompress( filename, tmpfile.file_string() );
 
-		std::list<data::Chunk>::iterator prev=chunks.end();--prev;
+		std::list<data::Chunk>::iterator prev = chunks.end();
+
+		--prev;
 
 		int ret = data::IOFactory::load( chunks, tmpfile.string(), "", dialect );
 
 		if( ret ) {
 			prev++;
-			LOG( Debug, info ) <<  "Setting source of all " << std::distance(prev,chunks.end()) << " chunks to " << util::MSubject( filename );
-			for( ;prev!=chunks.end();++prev ) {
+			LOG( Debug, info ) <<  "Setting source of all " << std::distance( prev, chunks.end() ) << " chunks to " << util::MSubject( filename );
+
+			for( ; prev != chunks.end(); ++prev ) {
 				prev->setPropertyAs( "source", filename );
 			}
 		}

@@ -190,9 +190,11 @@ public:
 					close( mfile );
 
 					// read the temporary file
-					std::list<data::Chunk>::iterator prev=chunks.end();--prev;
+					std::list<data::Chunk>::iterator prev = chunks.end();
+					--prev;
 					ret += data::IOFactory::load( chunks, tmpfile.string(), "", dialect );
-					for( ;prev!=chunks.end(); ++prev ) { // set the source property of the red chunks to something more usefull
+
+					for( ; prev != chunks.end(); ++prev ) { // set the source property of the red chunks to something more usefull
 						prev->setPropertyAs( "source", ( boost::filesystem::path( filename ) / org_file ).file_string() );
 					}
 				}

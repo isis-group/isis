@@ -308,26 +308,29 @@ BOOST_AUTO_TEST_CASE ( image_foreach_chunk_test )
 	std::vector<std::vector<data::MemChunk<uint8_t> > > ch( 3, std::vector<data::MemChunk<uint8_t> >( 3, data::MemChunk<uint8_t>( 3, 3 ) ) );
 	data::Image img;
 
-	class : public data::Image::ChunkOp{
-		class :public data::Chunk::VoxelOp<uint8_t>{
+	class : public data::Image::ChunkOp
+	{
+		class : public data::Chunk::VoxelOp<uint8_t>
+		{
 		public:
-			bool operator()(uint8_t& vox, const util::FixedVector< size_t, 4 >& pos){
-				vox=42;
+			bool operator()( uint8_t &vox, const util::FixedVector< size_t, 4 >& pos ) {
+				vox = 42;
 				return true;
 			}
-		}vox42;
+		} vox42;
 	public:
-		bool operator()(data::Chunk &ch,util::FixedVector<size_t,4> posInImage){
-			return ch.foreachVoxel(vox42)==0;
+		bool operator()( data::Chunk &ch, util::FixedVector<size_t, 4> posInImage ) {
+			return ch.foreachVoxel( vox42 ) == 0;
 		}
-	}set42;
+	} set42;
 
-	class setIdx:public data::Chunk::VoxelOp<uint8_t>{
+	class setIdx: public data::Chunk::VoxelOp<uint8_t>
+	{
 		data::_internal::NDimensional<4> geometry;
 	public:
-		setIdx(data::_internal::NDimensional<4> geo):geometry(geo){}
-		bool operator()(uint8_t& vox, const util::FixedVector< size_t, 4 >& pos){
-			vox=geometry.getLinearIndex(&pos[0]);
+		setIdx( data::_internal::NDimensional<4> geo ): geometry( geo ) {}
+		bool operator()( uint8_t &vox, const util::FixedVector< size_t, 4 >& pos ) {
+			vox = geometry.getLinearIndex( &pos[0] );
 			return true;
 		}
 	};
@@ -342,28 +345,30 @@ BOOST_AUTO_TEST_CASE ( image_foreach_chunk_test )
 			ch[i][j].setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1 ) );
 			BOOST_REQUIRE( img.insertChunk( ch[i][j] ) );
 		}
-	BOOST_REQUIRE_EQUAL(img.foreachChunk(set42),0);
 
-	util::FixedVector<size_t,4> imgSize=img.getSizeAsVector();
+	BOOST_REQUIRE_EQUAL( img.foreachChunk( set42 ), 0 );
 
-	for(size_t t=0;t<imgSize[data::timeDim];t++){
-		for(size_t z=0;z<imgSize[data::sliceDim];z++){
-			for(size_t y=0;y<imgSize[data::columnDim];y++){
-				for(size_t x=0;x<imgSize[data::rowDim];x++){
-					BOOST_CHECK_EQUAL(img.voxel<uint8_t>(x,y,z,t),42);
+	util::FixedVector<size_t, 4> imgSize = img.getSizeAsVector();
+
+	for( size_t t = 0; t < imgSize[data::timeDim]; t++ ) {
+		for( size_t z = 0; z < imgSize[data::sliceDim]; z++ ) {
+			for( size_t y = 0; y < imgSize[data::columnDim]; y++ ) {
+				for( size_t x = 0; x < imgSize[data::rowDim]; x++ ) {
+					BOOST_CHECK_EQUAL( img.voxel<uint8_t>( x, y, z, t ), 42 );
 				}
 			}
 		}
 	}
 
-	setIdx setidx(img);
-	BOOST_REQUIRE_EQUAL(img.foreachVoxel<uint8_t>(setidx),0);
-	uint8_t cnt=0;
-	for(size_t t=0;t<imgSize[data::timeDim];t++){
-		for(size_t z=0;z<imgSize[data::sliceDim];z++){
-			for(size_t y=0;y<imgSize[data::columnDim];y++){
-				for(size_t x=0;x<imgSize[data::rowDim];x++){
-					BOOST_CHECK_EQUAL(img.voxel<uint8_t>(x,y,z,t),cnt++);
+	setIdx setidx( img );
+	BOOST_REQUIRE_EQUAL( img.foreachVoxel<uint8_t>( setidx ), 0 );
+	uint8_t cnt = 0;
+
+	for( size_t t = 0; t < imgSize[data::timeDim]; t++ ) {
+		for( size_t z = 0; z < imgSize[data::sliceDim]; z++ ) {
+			for( size_t y = 0; y < imgSize[data::columnDim]; y++ ) {
+				for( size_t x = 0; x < imgSize[data::rowDim]; x++ ) {
+					BOOST_CHECK_EQUAL( img.voxel<uint8_t>( x, y, z, t ), cnt++ );
 				}
 			}
 		}
@@ -961,10 +966,10 @@ BOOST_AUTO_TEST_CASE ( image_size_test )
 	BOOST_REQUIRE( img.reIndex() );
 	BOOST_REQUIRE( !img.isEmpty() );
 
-	BOOST_CHECK_EQUAL(img.getNrOfColumms(), 11);
-	BOOST_CHECK_EQUAL(img.getNrOfRows(), 23);
-	BOOST_CHECK_EQUAL(img.getNrOfSlices(), 90);
-	BOOST_CHECK_EQUAL(img.getNrOfTimesteps(), 12);
+	BOOST_CHECK_EQUAL( img.getNrOfColumms(), 11 );
+	BOOST_CHECK_EQUAL( img.getNrOfRows(), 23 );
+	BOOST_CHECK_EQUAL( img.getNrOfSlices(), 90 );
+	BOOST_CHECK_EQUAL( img.getNrOfTimesteps(), 12 );
 
 }
 

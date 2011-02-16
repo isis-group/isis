@@ -354,7 +354,7 @@ int ImageFormat_Dicom::readMosaic( isis::data::Chunk source, list< isis::data::C
 	std::replace( iType.begin(), iType.end(), std::string( "MOSAIC" ), std::string( "WAS_MOSAIC" ) );
 	util::istring NumberOfImagesInMosaicProp;
 
-	const unsigned short oldSize=dest.size();
+	const unsigned short oldSize = dest.size();
 
 	if ( source.hasProperty( prefix + "Unknown Tag(0019,100a)" ) ) {
 		NumberOfImagesInMosaicProp = prefix + "Unknown Tag(0019,100a)";
@@ -425,7 +425,7 @@ int ImageFormat_Dicom::readMosaic( isis::data::Chunk source, list< isis::data::C
 	// for every slice
 	for ( size_t slice = 0; slice < images; slice++ ) {
 		dest.push_back( source.cloneToNew( size[0], size[1] ) );//create a new chunk at the end of the output
-		data::Chunk &working=dest.back(); // use this as working slice
+		data::Chunk &working = dest.back(); // use this as working slice
 
 		// copy the lines into the corresponding slice-chunk
 		for ( size_t column = 0; column < size[1]; column++ ) {
@@ -458,12 +458,12 @@ int ImageFormat_Dicom::readMosaic( isis::data::Chunk source, list< isis::data::C
 		}
 
 		LOG( Debug, verbose_info )
-			<< "New slice " << slice << " at " << working.propertyValue( "indexOrigin" ).toString( false )
-			<< " with acquisitionNumber " << working.propertyValue( "acquisitionNumber" ).toString( false )
-			<< ( haveAcqTimeList ? std::string( " and acquisitionTime " ) + working.propertyValue( "acquisitionTime" ).toString( false ) : "" );
+				<< "New slice " << slice << " at " << working.propertyValue( "indexOrigin" ).toString( false )
+				<< " with acquisitionNumber " << working.propertyValue( "acquisitionNumber" ).toString( false )
+				<< ( haveAcqTimeList ? std::string( " and acquisitionTime " ) + working.propertyValue( "acquisitionTime" ).toString( false ) : "" );
 	}
 
-	return dest.size()-oldSize;
+	return dest.size() - oldSize;
 }
 
 

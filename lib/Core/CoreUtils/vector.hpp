@@ -183,7 +183,7 @@ public:
 	this_class operator/( const TYPE &src )const {return binaryOp<std::divides<TYPE>    >( src );}
 
 	///\returns a negated copy
-	const this_class negate()const{
+	const this_class negate()const {
 		return unaryOp<std::negate<float> >();
 	}
 

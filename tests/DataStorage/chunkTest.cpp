@@ -34,42 +34,45 @@ BOOST_AUTO_TEST_CASE ( chunk_init_test )
 BOOST_AUTO_TEST_CASE ( chunk_foreach_voxel_test )
 {
 	data::MemChunk<uint8_t> ch( 4, 3, 2, 1 );
-	memset(&ch.asTypePtr<uint8_t>()[0],1,ch.getVolume());
+	memset( &ch.asTypePtr<uint8_t>()[0], 1, ch.getVolume() );
 
-	class :public data::Chunk::VoxelOp<uint8_t>{
+	class : public data::Chunk::VoxelOp<uint8_t>
+	{
 	public:
-		bool operator()(uint8_t& vox, const util::FixedVector< size_t, 4 >& pos){
-			return vox==0;
+		bool operator()( uint8_t &vox, const util::FixedVector< size_t, 4 >& pos ) {
+			return vox == 0;
 		}
-	}zero;
+	} zero;
 
-	class setIdx:public data::Chunk::VoxelOp<uint8_t>{
+	class setIdx: public data::Chunk::VoxelOp<uint8_t>
+	{
 		data::_internal::NDimensional<4> chunkGeometry;
 	public:
-		setIdx(data::_internal::NDimensional<4> geo):chunkGeometry(geo){}
-		bool operator()(uint8_t& vox, const util::FixedVector< size_t, 4 >& pos){
-			vox=chunkGeometry.getLinearIndex(&pos[0]);
+		setIdx( data::_internal::NDimensional<4> geo ): chunkGeometry( geo ) {}
+		bool operator()( uint8_t &vox, const util::FixedVector< size_t, 4 >& pos ) {
+			vox = chunkGeometry.getLinearIndex( &pos[0] );
 			return true;
 		}
 	};
-	class checkIdx:public data::Chunk::VoxelOp<uint8_t>{
+	class checkIdx: public data::Chunk::VoxelOp<uint8_t>
+	{
 		data::_internal::NDimensional<4> chunkGeometry;
 	public:
-		checkIdx(data::_internal::NDimensional<4> geo):chunkGeometry(geo){}
-		bool operator()(uint8_t& vox, const util::FixedVector< size_t, 4 >& pos){
-			return vox==chunkGeometry.getLinearIndex(&pos[0]);
+		checkIdx( data::_internal::NDimensional<4> geo ): chunkGeometry( geo ) {}
+		bool operator()( uint8_t &vox, const util::FixedVector< size_t, 4 >& pos ) {
+			return vox == chunkGeometry.getLinearIndex( &pos[0] );
 		}
 	};
 
-	BOOST_CHECK_EQUAL(ch.foreachVoxel(zero),ch.getVolume());
-	memset(&ch.asTypePtr<uint8_t>()[0],0,ch.getVolume());
-	BOOST_CHECK_EQUAL(ch.foreachVoxel(zero),0);
+	BOOST_CHECK_EQUAL( ch.foreachVoxel( zero ), ch.getVolume() );
+	memset( &ch.asTypePtr<uint8_t>()[0], 0, ch.getVolume() );
+	BOOST_CHECK_EQUAL( ch.foreachVoxel( zero ), 0 );
 
-	checkIdx check(ch);
-	setIdx set(ch);
-	BOOST_CHECK_EQUAL(ch.foreachVoxel(check),ch.getVolume()-1); //the first index _is_ 0
-	ch.foreachVoxel(set);
-	BOOST_CHECK_EQUAL(ch.foreachVoxel(check),0); // now they all should be
+	checkIdx check( ch );
+	setIdx set( ch );
+	BOOST_CHECK_EQUAL( ch.foreachVoxel( check ), ch.getVolume() - 1 ); //the first index _is_ 0
+	ch.foreachVoxel( set );
+	BOOST_CHECK_EQUAL( ch.foreachVoxel( check ), 0 ); // now they all should be
 }
 
 BOOST_AUTO_TEST_CASE ( chunk_mem_init_test )
@@ -247,7 +250,7 @@ BOOST_AUTO_TEST_CASE ( chunk_splice_test )//Copy chunks
 	const std::list<data::Chunk> splices = ch1.autoSplice( );
 	unsigned short cnt = 1;
 	BOOST_CHECK_EQUAL( splices.size(), 3 );
-	BOOST_FOREACH( const data::Chunk &ref, splices ) {
+	BOOST_FOREACH( const data::Chunk & ref, splices ) {
 		BOOST_CHECK_EQUAL( ref.getPropertyAs<util::fvector4>( "indexOrigin" ), util::fvector4( 1, 1, cnt ) );
 		cnt += 2;
 	}

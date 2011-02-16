@@ -242,7 +242,7 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 	size_t cnt = 0;
 	LOG( Debug, info ) << "Splicing chunk at dimenstion " << atDim + 1 << " with indexOrigin stride " << indexOriginOffset << " and acquisitionNumberStride " << acquisitionNumberStride;
 	std::list<Chunk> ret = splice( ( dimensions )atDim ); // do low level splice - get the chunklist
-	BOOST_FOREACH( Chunk& ref, ret ) { // adapt some metadata in them
+	BOOST_FOREACH( Chunk & ref, ret ) { // adapt some metadata in them
 		util::fvector4 &orig = ref.propertyValue( "indexOrigin" )->castTo<util::fvector4>();
 		uint32_t &acq = ref.propertyValue( "acquisitionNumber" )->castTo<uint32_t>();
 		orig = orig + indexOriginOffset * ( float )cnt;
@@ -266,7 +266,7 @@ std::list<Chunk> Chunk::splice ( dimensions atDim )const
 	const ValuePtrList pointers = this->getTypePtrBase().splice( spliceSize.product() );
 	//create new Chunks from this ValuePtr's
 	BOOST_FOREACH( ValuePtrList::const_reference ref, pointers ) {
-		ret.push_back(Chunk( ref, spliceSize[0], spliceSize[1], spliceSize[2], spliceSize[3] ) ); //@todo make sure zhis is only one copy-operation
+		ret.push_back( Chunk( ref, spliceSize[0], spliceSize[1], spliceSize[2], spliceSize[3] ) ); //@todo make sure zhis is only one copy-operation
 		static_cast<util::PropertyMap &>( ret.back() ) = static_cast<const util::PropertyMap &>( *this ); //copy my metadate into all spliced
 	}
 	return ret;

@@ -138,28 +138,28 @@ public:
 
 		switch ( ni->datatype ) {
 		case DT_UINT8:
-			retList.push_back(_internal::NiftiChunk( static_cast<uint8_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
+			retList.push_back( _internal::NiftiChunk( static_cast<uint8_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
 			break;
 		case DT_INT8:
-			retList.push_back(_internal::NiftiChunk( static_cast<int8_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
+			retList.push_back( _internal::NiftiChunk( static_cast<int8_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
 			break;
 		case DT_INT16:
-			retList.push_back(_internal::NiftiChunk( static_cast<int16_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
+			retList.push_back( _internal::NiftiChunk( static_cast<int16_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
 			break;
 		case DT_UINT16:
-			retList.push_back(_internal::NiftiChunk( static_cast<uint16_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
+			retList.push_back( _internal::NiftiChunk( static_cast<uint16_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
 			break;
 		case DT_UINT32:
-			retList.push_back(_internal::NiftiChunk( static_cast<uint32_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
+			retList.push_back( _internal::NiftiChunk( static_cast<uint32_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
 			break;
 		case DT_INT32:
-			retList.push_back(_internal::NiftiChunk( static_cast<int32_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
+			retList.push_back( _internal::NiftiChunk( static_cast<int32_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
 			break;
 		case DT_FLOAT32:
-			retList.push_back(_internal::NiftiChunk( static_cast<float *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
+			retList.push_back( _internal::NiftiChunk( static_cast<float *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
 			break;
 		case DT_FLOAT64:
-			retList.push_back(_internal::NiftiChunk( static_cast<double *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
+			retList.push_back( _internal::NiftiChunk( static_cast<double *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
 			break;
 		default:
 			throwGenericError( std::string( "Unsupported datatype " ) + util::Value<int>( ni->datatype ).toString() );

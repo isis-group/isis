@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE ( imageUniqueName )
 		chunks.push_back( ch );
 	}
 
-	std::list<data::Image> images=data::IOFactory::chunkListToImageList( chunks );
+	std::list<data::Image> images = data::IOFactory::chunkListToImageList( chunks );
 
 	BOOST_REQUIRE_EQUAL( images.size(), 5 );
 	int number = 0;

@@ -38,11 +38,11 @@ class treeNode; //predeclare treeNode -- we'll need it in PropertyMap
 /**
  * This class contains a mapping tree to store all kinds of properties (path/key : value)
  * It's also a generic class to have the probability to handle
- * different modalities in upper levels (in our special case we'll have to handle things like images or other 
- * time series of data each having different properties in its standard or wherever from). Here, you can hierarchilly 
+ * different modalities in upper levels (in our special case we'll have to handle things like images or other
+ * time series of data each having different properties in its standard or wherever from). Here, you can hierarchilly
  * setup a property tree to sort all these things. To ensure essential properties for a special case, you'll need to define
  * the needed properties. For all the other play-around with PropertyMaps see extensive documentation below!!!
- * 
+ *
  */
 class PropertyMap : protected std::map<util::istring, _internal::treeNode>
 {
@@ -52,7 +52,7 @@ public:
 	 */
 	typedef key_type KeyType;
 	/**
-	 * a list to store keys only (without the corresponding values)	 
+	 * a list to store keys only (without the corresponding values)
 	 */
 	typedef std::set<KeyType, key_compare> KeyList;
 	/**
@@ -62,7 +62,7 @@ public:
 	/**
 	 * a map, using complete key-paths as keys for the corresponding values
 	 */
-	typedef std::map<KeyType, PropertyValue> FlatMap; 
+	typedef std::map<KeyType, PropertyValue> FlatMap;
 private:
 	typedef std::map<KeyType, mapped_type, key_compare> Container;
 	typedef std::list<KeyType> propPath;
@@ -166,21 +166,21 @@ public:
 	 * \returns a reference to the PropertyValue
 	 */
 	const PropertyValue &propertyValue( const KeyType &key )const;
-	
+
 	/**
 	 * Access the property referenced by the path-key, create it if its not there.
 	 * \param key the "path" to the property
 	 * \returns a reference to the PropertyValue
 	 */
 	PropertyValue &propertyValue( const KeyType &key );
-	
+
 	/**
 	 * Access the branch referenced by the path-key, create it if its not there.
 	 * \param key the "path" to the branch
 	 * \returns a reference to the branching PropertyMap
 	 */
 	PropertyMap &branch( const KeyType &key );
-	
+
 	/**
 	 * Access the branch referenced by the path-key.
 	 * If the branch does not exist, an empty dummy will returned.
@@ -202,23 +202,23 @@ public:
 	/**
 	 * remove every property which is also in the given map (regardless of the value)
 	 * \param removeMap the map of properties to be removed
-	 * \param keep_needed flag 
+	 * \param keep_needed flag
 	 * \returns true if all properties removed succesfully, false otherwise
-	 */ 
+	 */
 	bool remove( const isis::util::PropertyMap &removeMap, bool keep_needed = false );
 
 	/**
 	 * check if property is available
 	 * \param key the "path" to the property
 	 * \returns true if the given property does exist and is not empty, false otherwise
-	 */ 
+	 */
 	bool hasProperty( const KeyType &key )const;
 
 	/**
 	 * check if branch of the tree is available
 	 * \param key the "path" to the branch
 	 * \returns true if the given branch does exist and is not empty, false otherwise
-	 */ 
+	 */
 	bool hasBranch( const KeyType &key )const;
 
 	////////////////////////////////////////////////////////////////////////////////////////
@@ -229,24 +229,24 @@ public:
 	* \returns true if ALL needed properties are NOT empty, false otherwhise.
 	*/
 	bool isValid()const;
-	
+
 	/**
 	 * \returns true if the PropertyMap is empty, false otherwhise
 	 */
 	bool isEmpty()const;
-	
+
 	/**
 	 * Get a list of all properties.
 	 * \returns a flat list of the "paths" to all properties in the PropertyMap
 	 */
 	const KeyList getKeys()const;
-	
+
 	/**
 	 * Get a list of missing properties.
 	 * \returns a list of all needed and empty properties.
 	 */
 	const KeyList getMissing()const;
-	
+
 	/**
 	 * Get a difference map of actual object and another PropertyMap.
 	 * Out of the names of differing properties a map of std::pair\<PropertyValue,PropertyValue\> is created with following rules:
@@ -327,7 +327,7 @@ public:
 
 		return ret;
 	}
-	
+
 	/**
 	 * Request a property via the given key in the given type.
 	 * If the requested type is not equal to type the property is stored with, an automatic conversion is done.
@@ -338,7 +338,7 @@ public:
 	 * \returns the property with given type, if not set yet T() is returned.
 	 */
 	template<typename T> T getPropertyAs( const KeyType &key )const;
-	
+
 	/**
 	 * Rename a given property/branch.
 	 * This is implemented as copy+delete and can also be used between branches.
@@ -350,7 +350,7 @@ public:
 
 	/**
 	 * \returns a flat representation of the whole property tree
-	 */ 
+	 */
 	FlatMap getFlatMap( )const;
 
 	/**
@@ -430,7 +430,7 @@ public:
 
 /**
  * Walks the whole tree and inserts any key into out for which the given scalar predicate is true.
- */ 
+ */
 template<class Predicate> struct PropertyMap::walkTree {
 	KeyList &m_out;
 	const KeyType m_prefix;

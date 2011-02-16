@@ -90,6 +90,7 @@ void ViewControl::addImages( const ImageMapType &fileMap )
 			m_RendererSagittal->AddActor( ref->getActorSagittal() );
 		}
 	}
+
 	resetCam();
 }
 

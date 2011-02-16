@@ -102,14 +102,14 @@ BOOST_PYTHON_MODULE( _data )
 	.def( "__delitem__", &std_list<CList>::del )
 	;
 	//#######################################################################################
-	//	IOFactory
+	//  IOFactory
 	//#######################################################################################
 	class_<_IOFactory>( "IOFactory", no_init )
-// 	.def( "write", &_IOFactory::_write )
-// 	.staticmethod( "write" )
+	//  .def( "write", &_IOFactory::_write )
+	//  .staticmethod( "write" )
 	.def( "load", &_IOFactory::_load )
 	.staticmethod( "load" )
 	;
-	
+
 }
 #endif

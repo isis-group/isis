@@ -75,8 +75,8 @@ public:
 		LOG_IF( isEmpty(), isis::CoreDebug, isis::error ) << "Program parameters must not be empty. Please set it to any value.";
 		return get()->castTo<T>();
 	}
-	
-	
+
+
 	operator boost::scoped_ptr<_internal::ValueBase>::unspecified_bool_type()const;// implicit conversion to "bool" stolen from boost
 
 	/// \returns true, if the parameter was ever successfully parsed
@@ -84,7 +84,7 @@ public:
 
 	///returns true for hidden parameters, false otherwise
 	bool isHidden()const;
-	
+
 	///\copydoc hidden
 	bool &hidden();
 };

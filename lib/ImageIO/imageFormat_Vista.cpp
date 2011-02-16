@@ -503,7 +503,7 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 			std::list<data::Chunk> splices = sliceRef.splice( data::sliceDim );
 			/******************** SET acquisitionTime ********************/
 			size_t timestep = 0;
-			BOOST_FOREACH( data::Chunk &spliceRef, splices ) {
+			BOOST_FOREACH( data::Chunk & spliceRef, splices ) {
 				uint32_t acqusitionNumber = ( nloaded - 1 ) + vImageVector.size() * timestep;
 				spliceRef.setPropertyAs<uint32_t>( "acquisitionNumber", acqusitionNumber );
 

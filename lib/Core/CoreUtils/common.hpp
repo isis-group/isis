@@ -64,9 +64,9 @@ Write a list of elements to a std::basic_ostream
 */
 template<class InputIterator, typename _CharT, typename _Traits> std::basic_ostream<_CharT, _Traits> &
 listToOStream( InputIterator start, InputIterator end,
-			std::basic_ostream<_CharT, _Traits> &o,
-			const std::string delim = ",",
-			const std::string prefix = "{", const std::string suffix = "}" )
+			   std::basic_ostream<_CharT, _Traits> &o,
+			   const std::string delim = ",",
+			   const std::string prefix = "{", const std::string suffix = "}" )
 {
 	o << prefix;
 
@@ -86,9 +86,9 @@ listToOStream( InputIterator start, InputIterator end,
 //@todo check if this works for VC
 template<typename _CharT, typename _Traits> std::basic_ostream<_CharT, _Traits> &
 listToOStream( const unsigned char *start, const unsigned char *end,
-			std::basic_ostream<_CharT, _Traits> &o,
-			const std::string delim = ",",
-			const std::string prefix = "{", const std::string suffix = "}" )
+			   std::basic_ostream<_CharT, _Traits> &o,
+			   const std::string delim = ",",
+			   const std::string prefix = "{", const std::string suffix = "}" )
 {
 	o << prefix;
 

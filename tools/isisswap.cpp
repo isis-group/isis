@@ -49,7 +49,7 @@ int main( int argc, char **argv )
 	std::list<data::Image> finImageList;
 	unsigned int dim = alongMap[app.parameters["along"].toString()];
 	//go through every image
-	BOOST_FOREACH( data::Image &refImage, app.images ) {
+	BOOST_FOREACH( data::Image & refImage, app.images ) {
 		//map from pyhisical into image space
 		util::fvector4 sliceVec = refImage.getPropertyAs<util::fvector4>( "sliceVec" );
 		util::fvector4 columnVec = refImage.getPropertyAs<util::fvector4>( "columnVec" );

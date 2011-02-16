@@ -162,7 +162,7 @@ bool IOApplication::autoload( bool exitOnError )
 
 bool IOApplication::autowrite( Image out_image, bool exitOnError )
 {
-	return autowrite( std::list<Image>(1,out_image), exitOnError );
+	return autowrite( std::list<Image>( 1, out_image ), exitOnError );
 }
 
 bool IOApplication::autowrite( std::list<Image> out_images, bool exitOnError )

@@ -85,8 +85,8 @@ protected:
 		/// decrement the use_count of the master when a specific part is not referenced anymore
 		void operator()( TYPE *at ) {
 			LOG( Debug, verbose_info )
-			<< "Deletion for " << this->get() << " called from splice at offset "   << at - this->get()
-			<< ", current use_count: " << this->use_count();
+					<< "Deletion for " << this->get() << " called from splice at offset "   << at - this->get()
+					<< ", current use_count: " << this->use_count();
 			this->reset();//actually not needed, but we keep it here to keep obfuscation low
 		}
 	};
@@ -155,8 +155,8 @@ public:
 	 * \param len requested size of the memory block in elements
 	 * \returns a ValuePtr\<TYPE\> of given len
 	 */
-	static ValuePtr allocate(size_t len){
-		return ValuePtr((TYPE*)malloc(len*sizeof(TYPE)),len);
+	static ValuePtr allocate( size_t len ) {
+		return ValuePtr( ( TYPE * )malloc( len * sizeof( TYPE ) ), len );
 	}
 
 	/**

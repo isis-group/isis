@@ -38,9 +38,9 @@ continousFind( ForwardIterator &current, const ForwardIterator end, const T &com
 	current = std::lower_bound( current, end, compare, compOp );
 
 	if ( current == end //if we're at the end
-		|| compOp( compare, *current ) //or compare is less than that iterator
-	)
-	return false;//we didn't find a match
+		 || compOp( compare, *current ) //or compare is less than that iterator
+	   )
+		return false;//we didn't find a match
 	else
 		return true;//not(current <> compare) makes compare == current
 }
@@ -93,11 +93,11 @@ PropertyMap::mapped_type &PropertyMap::fetchEntry(
 			return fetchEntry( ref.getBranch(), next, pathEnd ); //continue there
 		} else { // if we should create a sub-map
 			//insert a empty branch (aka PropMap) at "*at" (and fetch the reference of that)
-			LOG(Debug,verbose_info) << "Creating an empty branch " << *at << " trough fetching";
+			LOG( Debug, verbose_info ) << "Creating an empty branch " << *at << " trough fetching";
 			return fetchEntry( rootRef[*at].getBranch(), next, pathEnd ); // and continue there
 		}
 	} else { //if its the leaf
-		LOG_IF(rootRef.find(*at)==rootRef.end() ,Debug,verbose_info) << "Creating an empty entry " << *at << " trough fetching";
+		LOG_IF( rootRef.find( *at ) == rootRef.end() , Debug, verbose_info ) << "Creating an empty entry " << *at << " trough fetching";
 		return rootRef[*at]; // (create and) return that entry
 	}
 }

@@ -661,7 +661,7 @@ size_t Image::spliceDownTo( dimensions dim ) //rowDim = 0, columnDim, sliceDim, 
 				const size_t subSize = m_image.getSizeAsVector()[topDim];
 				assert( !( m_amount % subSize ) ); // there must not be any "remaining"
 				splicer sub( m_dim, m_amount / subSize, m_image );
-				BOOST_FOREACH( const Chunk &ref, ch.autoSplice( m_amount / subSize ) ) {
+				BOOST_FOREACH( const Chunk & ref, ch.autoSplice( m_amount / subSize ) ) {
 					sub( ref );
 				}
 			} else { // seems like we're done - insert it into the image
@@ -687,44 +687,46 @@ size_t Image::spliceDownTo( dimensions dim ) //rowDim = 0, columnDim, sliceDim, 
 	return lookup.size();
 }
 
-size_t Image::foreachChunk(Image::ChunkOp& op,bool copyMetaData)
+size_t Image::foreachChunk( Image::ChunkOp &op, bool copyMetaData )
 {
-	size_t err=0;
+	size_t err = 0;
 	checkMakeClean();
-	util::FixedVector<size_t,4> imgSize=getSizeAsVector();
-	util::FixedVector<size_t,4> chunkSize=getChunk(0,0,0,0).getSizeAsVector();
-	util::FixedVector<size_t,4> pos;
+	util::FixedVector<size_t, 4> imgSize = getSizeAsVector();
+	util::FixedVector<size_t, 4> chunkSize = getChunk( 0, 0, 0, 0 ).getSizeAsVector();
+	util::FixedVector<size_t, 4> pos;
 
-	for(pos[timeDim]=0;pos[timeDim]<imgSize[timeDim];pos[timeDim]+=chunkSize[timeDim]){
-		for(pos[sliceDim]=0;pos[sliceDim]<imgSize[sliceDim];pos[sliceDim]+=chunkSize[sliceDim]){
-			for(pos[columnDim]=0;pos[columnDim]<imgSize[columnDim];pos[columnDim]+=chunkSize[columnDim]){
-				for(pos[rowDim]=0;pos[rowDim]<imgSize[rowDim];pos[rowDim]+=chunkSize[rowDim]){
-					Chunk ch=getChunk(pos[rowDim],pos[columnDim],pos[sliceDim],pos[timeDim],copyMetaData);
-					if(op(ch,pos)==false)
+	for( pos[timeDim] = 0; pos[timeDim] < imgSize[timeDim]; pos[timeDim] += chunkSize[timeDim] ) {
+		for( pos[sliceDim] = 0; pos[sliceDim] < imgSize[sliceDim]; pos[sliceDim] += chunkSize[sliceDim] ) {
+			for( pos[columnDim] = 0; pos[columnDim] < imgSize[columnDim]; pos[columnDim] += chunkSize[columnDim] ) {
+				for( pos[rowDim] = 0; pos[rowDim] < imgSize[rowDim]; pos[rowDim] += chunkSize[rowDim] ) {
+					Chunk ch = getChunk( pos[rowDim], pos[columnDim], pos[sliceDim], pos[timeDim], copyMetaData );
+
+					if( op( ch, pos ) == false )
 						err++;
 				}
 			}
 		}
 	}
+
 	return err;
 }
 
 size_t Image::getNrOfColumms() const
 {
-	return getDimSize(data::rowDim);
+	return getDimSize( data::rowDim );
 }
 
 size_t Image::getNrOfRows() const
 {
-	return getDimSize(data::columnDim);
+	return getDimSize( data::columnDim );
 }
 size_t Image::getNrOfSlices() const
 {
-	return getDimSize(data::sliceDim);
+	return getDimSize( data::sliceDim );
 }
 size_t Image::getNrOfTimesteps() const
 {
-	return getDimSize(data::timeDim);
+	return getDimSize( data::timeDim );
 }
 
 

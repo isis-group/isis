@@ -26,7 +26,7 @@ namespace isis
 namespace util
 {
 /** Class to automatically create and handle a temporary file.
- * This can e.g. be used when writing plugins for image formats to have a mock object. 
+ * This can e.g. be used when writing plugins for image formats to have a mock object.
  * The file will be created by the constructor and deleted by the destructor.
  * If its not there anymore, a warning will be send.
  * This inherits from boost::filesystem::path and thus can be used as such.

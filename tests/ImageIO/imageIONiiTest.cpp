@@ -34,11 +34,11 @@ BOOST_AUTO_TEST_CASE( loadsaveImage )
 	//  We will use the Null plugin to get some image data
 	util::TmpFile niifile( "", ".nii" );
 	// the null-loader shall generate 5 3x3x3x10 images
-	std::list<data::Image> images= data::IOFactory::load( "nix.null", "" );
-	BOOST_REQUIRE(images.size()>=1);
+	std::list<data::Image> images = data::IOFactory::load( "nix.null", "" );
+	BOOST_REQUIRE( images.size() >= 1 );
 
 	//  write images to file(s)
-	if ( data::IOFactory::write( std::list<data::Image>(1,images.front()), niifile.file_string(), "", "fsl" ) )
+	if ( data::IOFactory::write( std::list<data::Image>( 1, images.front() ), niifile.file_string(), "", "fsl" ) )
 		std::cout << "Wrote Image to " << niifile << std::endl;
 
 	data::IOFactory::load( niifile.file_string(), "" );

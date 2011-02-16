@@ -69,9 +69,10 @@ protected:
 		util::_internal::ValueReference<_internal::ValuePtrBase>( new ValuePtr<TYPE>( src, getVolume(), d ) ) {}
 	Chunk( const ValuePtrReference &src, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 );
 public:
-	template <typename TYPE> class VoxelOp:std::unary_function<bool,TYPE>{
+	template <typename TYPE> class VoxelOp: std::unary_function<bool, TYPE>
+	{
 	public:
-		virtual bool operator()(TYPE &vox,const util::FixedVector<size_t,4> &pos)=0;
+		virtual bool operator()( TYPE &vox, const util::FixedVector<size_t, 4> &pos ) = 0;
 	};
 	/**
 	 * Gets a reference to the element at a given index.
@@ -110,19 +111,20 @@ public:
 	 * \param offset offset to be added to the voxel position before op is called
 	 * \returns amount of operations which returned false - so 0 is good!
 	 */
-	template <typename TYPE> size_t foreachVoxel(VoxelOp<TYPE> &op,util::FixedVector<size_t,4> offset){
-		const util::FixedVector<size_t,4> size=getSizeAsVector();
-		util::FixedVector<size_t,4> pos;
-		TYPE *vox= &asTypePtr<TYPE>()[0];
-		size_t ret=0;
+	template <typename TYPE> size_t foreachVoxel( VoxelOp<TYPE> &op, util::FixedVector<size_t, 4> offset ) {
+		const util::FixedVector<size_t, 4> size = getSizeAsVector();
+		util::FixedVector<size_t, 4> pos;
+		TYPE *vox = &asTypePtr<TYPE>()[0];
+		size_t ret = 0;
 
-		for(pos[timeDim]=0;pos[timeDim]<size[timeDim];pos[timeDim]++)
-			for(pos[sliceDim]=0;pos[sliceDim]<size[sliceDim];pos[sliceDim]++)
-				for(pos[columnDim]=0;pos[columnDim]<size[columnDim];pos[columnDim]++)
-					for(pos[rowDim]=0;pos[rowDim]<size[rowDim];pos[rowDim]++){
-						if(op(*(vox++),pos+offset)==false)
+		for( pos[timeDim] = 0; pos[timeDim] < size[timeDim]; pos[timeDim]++ )
+			for( pos[sliceDim] = 0; pos[sliceDim] < size[sliceDim]; pos[sliceDim]++ )
+				for( pos[columnDim] = 0; pos[columnDim] < size[columnDim]; pos[columnDim]++ )
+					for( pos[rowDim] = 0; pos[rowDim] < size[rowDim]; pos[rowDim]++ ) {
+						if( op( *( vox++ ), pos + offset ) == false )
 							++ret;
 					}
+
 		return ret;
 	}
 	/**
@@ -130,8 +132,8 @@ public:
 	 * \param op a functor inheriting from VoxelOp
 	 * \returns amount of operations which returned false - so 0 is good!
 	 */
-	template<typename TYPE> size_t foreachVoxel(VoxelOp<TYPE> &op){
-		return foreachVoxel<TYPE>(op,util::FixedVector<size_t,4>() );
+	template<typename TYPE> size_t foreachVoxel( VoxelOp<TYPE> &op ) {
+		return foreachVoxel<TYPE>( op, util::FixedVector<size_t, 4>() );
 	}
 
 	_internal::ValuePtrBase &asTypePtrBase() {

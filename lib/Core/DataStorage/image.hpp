@@ -102,9 +102,10 @@ protected:
 	 */
 	Chunk &chunkAt( size_t at );
 public:
-	class ChunkOp : std::unary_function<Chunk&, bool> {
+	class ChunkOp : std::unary_function<Chunk &, bool>
+	{
 	public:
-		virtual bool operator()(Chunk &,util::FixedVector<size_t,4> posInImage)=0;
+		virtual bool operator()( Chunk &, util::FixedVector<size_t, 4> posInImage ) = 0;
 	};
 	/// Creates an empty Image object.
 	Image();
@@ -365,7 +366,7 @@ public:
 	 * \param op a functor object which inherits ChunkOP
 	 * \param copyMetaData if true the metadata of the image are copied into the chunks before calling the functor
 	 */
-	size_t foreachChunk(ChunkOp &op,bool copyMetaData=false);
+	size_t foreachChunk( ChunkOp &op, bool copyMetaData = false );
 
 
 	/**
@@ -374,17 +375,18 @@ public:
 	 * \param op a functor object which inherits ChunkOp
 	 * \param copyMetaData if true the metadata of the image are copied into the chunks before calling the functor
 	 */
-	template <typename TYPE> size_t foreachVoxel(Chunk::VoxelOp<TYPE> &op){
-		class _proxy:public ChunkOp{
+	template <typename TYPE> size_t foreachVoxel( Chunk::VoxelOp<TYPE> &op ) {
+		class _proxy: public ChunkOp
+		{
 			Chunk::VoxelOp<TYPE> &op;
 		public:
-			_proxy(Chunk::VoxelOp<TYPE> &_op):op(_op){}
-			bool operator()(Chunk &ch, util::FixedVector<size_t, 4 > posInImage){
-				return ch.foreachVoxel<TYPE>(op,posInImage)==0;
+			_proxy( Chunk::VoxelOp<TYPE> &_op ): op( _op ) {}
+			bool operator()( Chunk &ch, util::FixedVector<size_t, 4 > posInImage ) {
+				return ch.foreachVoxel<TYPE>( op, posInImage ) == 0;
 			}
 		};
-		_proxy prx(op);
-		return foreachChunk(prx,false);
+		_proxy prx( op );
+		return foreachChunk( prx, false );
 	}
 
 	/// \returns the number of rows of the image
@@ -405,7 +407,7 @@ public:
 template<typename T> class TypedImage: public Image
 {
 protected:
-	TypedImage(){} // to be used only by inheriting classes
+	TypedImage() {} // to be used only by inheriting classes
 public:
 	/// cheap copy another Image and make sure all chunks have type T
 	TypedImage( const Image &src ): Image( src ) { // ok we just copied the whole image

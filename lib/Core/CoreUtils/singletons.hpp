@@ -14,7 +14,7 @@ namespace util
 
 /**
  * Static class to handle singletons of a given type and priority.
- * 
+ *
  * The special issues for these Singletons are: \n
  * 1) it's a template class - can be used for every type \n
  * 2) they have a priority used for destroying the Singletons AFTER the application ends:
@@ -24,7 +24,7 @@ namespace util
  * to be deleted latest.
  *
  * \code
- * Singletons::get < MyClass, INT_MAX - 1 > 
+ * Singletons::get < MyClass, INT_MAX - 1 >
  * \endcode
  * This generates a Singleton of MyClass with highest priority
  */
@@ -54,7 +54,7 @@ class Singletons
 	static Singletons &getMaster();
 public:
 	/**
-	 * The first call creates a singleton of type T with the priority PRIO (ascending order), 
+	 * The first call creates a singleton of type T with the priority PRIO (ascending order),
 	 * all repetetive calls return this object.
 	 * \return a reference to the same object of type T.
 	 */

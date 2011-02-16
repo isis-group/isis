@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE ( imageList_chunk_test )
 		}
 	}
 
-	std::list<data::Image> list=data::IOFactory::chunkListToImageList( chunks );
+	std::list<data::Image> list = data::IOFactory::chunkListToImageList( chunks );
 	BOOST_CHECK_EQUAL( list.size(), images );
 	short cnt = 0;
 	BOOST_FOREACH( data::Image & ref, list ) {
