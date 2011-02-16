@@ -53,14 +53,14 @@ public:
 	typedef typename CONTAINER::iterator iterator;
 	typedef typename CONTAINER::const_iterator const_iterator;
 	typedef FixedVector<TYPE, SIZE, CONTAINER> this_class;
-public:
+protected:
 	/// Generic operations
-	template<typename OP> this_class binary_op( const this_class &src )const {
+	template<typename OP> this_class binaryOp ( const this_class &src )const {
 		this_class ret;
 		std::transform( CONTAINER::begin(), CONTAINER::end(), src.begin(), ret.begin(), OP() );
 		return ret;
 	}
-	template<typename OP> this_class binary_op( const TYPE &src )const {
+	template<typename OP> this_class binaryOp( const TYPE &src )const {
 		this_class ret;
 		iterator dst = ret.begin();
 		const OP op = OP();
@@ -70,12 +70,12 @@ public:
 
 		return ret;
 	}
-	template<typename OP> this_class unary_op()const {
+	template<typename OP> this_class unaryOp()const {
 		this_class ret;
 		std::transform( CONTAINER::begin(), CONTAINER::end(), ret.begin(), OP() );
 		return ret;
 	}
-
+public:
 	////////////////////////////////////////////////////////////////////////////////////
 	// Contructor stuff
 	////////////////////////////////////////////////////////////////////////////////////
@@ -172,15 +172,15 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////
 	// Arithmetic operations
 	////////////////////////////////////////////////////////////////////////////////////
-	this_class operator-( const this_class &src )const {return binary_op<std::minus<TYPE>      >( src );}
-	this_class operator+( const this_class &src )const {return binary_op<std::plus<TYPE>       >( src );}
-	this_class operator*( const this_class &src )const {return binary_op<std::multiplies<TYPE> >( src );}
-	this_class operator/( const this_class &src )const {return binary_op<std::divides<TYPE>    >( src );}
+	this_class operator-( const this_class &src )const {return binaryOp<std::minus<TYPE>      >( src );}
+	this_class operator+( const this_class &src )const {return binaryOp<std::plus<TYPE>       >( src );}
+	this_class operator*( const this_class &src )const {return binaryOp<std::multiplies<TYPE> >( src );}
+	this_class operator/( const this_class &src )const {return binaryOp<std::divides<TYPE>    >( src );}
 
-	this_class operator-( const TYPE &src )const {return binary_op<std::minus<TYPE>      >( src );}
-	this_class operator+( const TYPE &src )const {return binary_op<std::plus<TYPE>       >( src );}
-	this_class operator*( const TYPE &src )const {return binary_op<std::multiplies<TYPE> >( src );}
-	this_class operator/( const TYPE &src )const {return binary_op<std::divides<TYPE>    >( src );}
+	this_class operator-( const TYPE &src )const {return binaryOp<std::minus<TYPE>      >( src );}
+	this_class operator+( const TYPE &src )const {return binaryOp<std::plus<TYPE>       >( src );}
+	this_class operator*( const TYPE &src )const {return binaryOp<std::multiplies<TYPE> >( src );}
+	this_class operator/( const TYPE &src )const {return binaryOp<std::divides<TYPE>    >( src );}
 
 	/**
 	 * Get the inner product.
@@ -313,7 +313,7 @@ typedef vector4<int32_t> ivector4;
 template<typename TYPE, size_t SIZE, typename CONTAINER >
 ::isis::util::FixedVector<TYPE, SIZE, CONTAINER> operator-( const ::isis::util::FixedVector<TYPE, SIZE, CONTAINER>& s )
 {
-	return s.isis::util::FixedVector<TYPE, SIZE, CONTAINER>::template unary_op<std::negate<float> >();
+	return s.isis::util::FixedVector<TYPE, SIZE, CONTAINER>::template unaryOp<std::negate<float> >();
 }
 
 /// Streaming output for FixedVector
