@@ -142,7 +142,7 @@ public:
 	template <typename T> T &voxel( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 ) {
 		checkMakeClean();
 		const std::pair<size_t, size_t> index = commonGet( first, second, third, fourth );
-		TypePtr<T> &data = chunkAt( index.first ).asTypePtr<T>();
+		ValuePtr<T> &data = chunkAt( index.first ).asTypePtr<T>();
 		return data[index.second];
 	}
 
@@ -160,7 +160,7 @@ public:
 	 */
 	template <typename T> const T &voxel( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const {
 		const std::pair<size_t, size_t> index = commonGet( first, second, third, fourth );
-		const TypePtr<T> &data = chunkPtrAt( index.first )->getTypePtr<T>();
+		const ValuePtr<T> &data = chunkPtrAt( index.first )->getTypePtr<T>();
 		return data[index.second];
 	}
 
@@ -173,7 +173,7 @@ public:
 	 * Warning1: this will fail if min is "-5(int8_t)" and max is "70000(uint16_t)"
 	 * Warning2: the cost of this is O(n) while Chunk::getTypeID is O(1) - so do not use it in loops
 	 * Warning3: the result is not exact - so never use it to determine the type for Image::voxel (Use TypedImage to get an image with an guaranteed type)
-	 * \returns a number which is equal to the TypePtr::staticID of the selected type.
+	 * \returns a number which is equal to the ValuePtr::staticID of the selected type.
 	 */
 	unsigned short getMajorTypeID() const;
 	/// \returns the typename correspondig to the result of typeID
@@ -238,7 +238,7 @@ public:
 	 * \returns a (maybe converted) chunk containing the voxel value at the given coordinates.
 	 */
 	template<typename TYPE> Chunk getChunkAs( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true )const {
-		return getChunkAs<TYPE>( getScalingTo( TypePtr<TYPE>::staticID ), first, second, third, fourth, copy_metadata );
+		return getChunkAs<TYPE>( getScalingTo( ValuePtr<TYPE>::staticID ), first, second, third, fourth, copy_metadata );
 	}
 	/**
 	 * Get the chunk that contains the voxel at the given coordinates in the given type (fast version).
@@ -254,7 +254,7 @@ public:
 	 */
 	template<typename TYPE> Chunk getChunkAs( const scaling_pair &scaling, size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true )const {
 		Chunk ret = getChunk( first, second, third, fourth, copy_metadata ); // get a cheap copy
-		ret.convertToType( TypePtr<TYPE>::staticID, scaling ); // make it of type T
+		ret.convertToType( ValuePtr<TYPE>::staticID, scaling ); // make it of type T
 		return ret; //return that
 	}
 
@@ -334,11 +334,11 @@ public:
 	 */
 	template<typename T> void copyToMem( T *dst )const {
 		if( checkMakeClean() ) {
-			scaling_pair scale = getScalingTo( TypePtr<T>::staticID );
+			scaling_pair scale = getScalingTo( ValuePtr<T>::staticID );
 			// we could do this using convertToType - but this solution does not need any additional temporary memory
 			BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
 				if( !ref->copyToMem<T>( dst, scale ) ) {
-					LOG( Runtime, error ) << "Failed to copy raw data of type " << ref->getTypeName() << " from image into memory of type " << TypePtr<T>::staticName();
+					LOG( Runtime, error ) << "Failed to copy raw data of type " << ref->getTypeName() << " from image into memory of type " << ValuePtr<T>::staticName();
 				}
 
 				dst += ref->getVolume(); // increment the cursor
@@ -400,7 +400,7 @@ public:
 	/// cheap copy another Image and make sure all chunks have type T
 	TypedImage( const Image &src ): Image( src ) { // ok we just copied the whole image
 		//but we want it to be of type T
-		convertToType( TypePtr<T>::staticID );
+		convertToType( ValuePtr<T>::staticID );
 	}
 	/// cheap copy another TypedImage
 	TypedImage &operator=( const TypedImage &ref ) { //its already of the given type - so just copy it
@@ -410,7 +410,7 @@ public:
 	/// cheap copy another Image and make sure all chunks have type T
 	TypedImage &operator=( const Image &ref ) { // copy the image, and make sure its of the given type
 		Image::operator=( ref );
-		convertToType( TypePtr<T>::staticID );
+		convertToType( ValuePtr<T>::staticID );
 		return *this;
 	}
 };
@@ -447,7 +447,7 @@ public:
 				return boost::shared_ptr<Chunk>( new MemChunk<T>( *ptr, scale ) );
 			}
 		} conv_op;
-		conv_op.scale = ref.getScalingTo( TypePtr<T>::staticID );
+		conv_op.scale = ref.getScalingTo( ValuePtr<T>::staticID );
 		LOG( Debug, info ) << "Computed scaling for conversion from source image: [" << conv_op.scale << "]";
 
 		this->set.transform( conv_op );

@@ -80,7 +80,7 @@ struct type_lister {
 	template<typename SRC> void operator()( SRC ) {//will be called by the mpl::for_each
 		if( m_withTypes )m_map.insert( std::make_pair( Value<SRC>::staticID, Value<SRC>::staticName() ) );
 
-		if( m_withTypePtrs )m_map.insert( std::make_pair( data::TypePtr<SRC>::staticID, data::TypePtr<SRC>::staticName() ) );
+		if( m_withTypePtrs )m_map.insert( std::make_pair( data::ValuePtr<SRC>::staticID, data::ValuePtr<SRC>::staticName() ) );
 	}
 };
 

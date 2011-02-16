@@ -72,13 +72,13 @@ bool Chunk::convertToType( short unsigned int ID )
 
 bool Chunk::convertToType( short unsigned int ID, const scaling_pair &scaling )
 {
-	if( getTypeID() != ID ) { // if its not the same type - replace the internal TypePtr by a new returned from TypePtrBase::copyToNewById
-		TypePtrReference newPtr = getTypePtrBase().copyToNewByID( ID, scaling ); // create a new TypePtr of type id and store it in a TypePtrReference
+	if( getTypeID() != ID ) { // if its not the same type - replace the internal ValuePtr by a new returned from TypePtrBase::copyToNewById
+		TypePtrReference newPtr = getTypePtrBase().copyToNewByID( ID, scaling ); // create a new ValuePtr of type id and store it in a TypePtrReference
 
 		if( newPtr.isEmpty() ) // if the reference is empty the conversion failed
 			return false;
 
-		static_cast<TypePtrReference &>( *this ) = newPtr; // otherwise replace my own TypePtr with the new one
+		static_cast<TypePtrReference &>( *this ) = newPtr; // otherwise replace my own ValuePtr with the new one
 	}
 
 	return true;
@@ -262,9 +262,9 @@ std::list<Chunk> Chunk::splice ( dimensions atDim )const
 	spliceSize.fill( 1 ); //init size of one chunk-splice to 1x1x1x1
 	//copy the relevant dimensional sizes from wholesize (in case of sliceDim we copy only the first two elements of wholesize - making slices)
 	spliceSize.copyFrom( &wholesize[0], &wholesize[atDim] );
-	//get the spliced TypePtr's (the volume of the requested dims is the split-size - in case of sliceDim it is rows*columns)
+	//get the spliced ValuePtr's (the volume of the requested dims is the split-size - in case of sliceDim it is rows*columns)
 	const TypePtrList pointers = this->getTypePtrBase().splice( spliceSize.product() );
-	//create new Chunks from this TypePtr's
+	//create new Chunks from this ValuePtr's
 	BOOST_FOREACH( TypePtrList::const_reference ref, pointers ) {
 		ret.push_back(Chunk( ref, spliceSize[0], spliceSize[1], spliceSize[2], spliceSize[3] ) ); //@todo make sure zhis is only one copy-operation
 		static_cast<util::PropertyMap &>( ret.back() ) = static_cast<const util::PropertyMap &>( *this ); //copy my metadate into all spliced

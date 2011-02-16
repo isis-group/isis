@@ -33,13 +33,13 @@ namespace data
 namespace _internal
 {
 template<typename T, bool isNumber> struct getMinMaxImpl {
-	std::pair<T, T> operator()( const TypePtr<T> &ref ) const {
+	std::pair<T, T> operator()( const ValuePtr<T> &ref ) const {
 		LOG( Debug, error ) << "min/max comparison of " << util::Value<T>::staticName() << " is not supportet";
 		return std::pair<T, T>();
 	}
 };
 template<typename T> struct getMinMaxImpl<T, true> {
-	std::pair<T, T> operator()( const TypePtr<T> &ref ) const {
+	std::pair<T, T> operator()( const ValuePtr<T> &ref ) const {
 		std::pair<T, T> result;
 
 		for ( size_t i = 0; i < ref.length(); i++ ) {
@@ -59,16 +59,16 @@ template<typename T> struct getMinMaxImpl<T, true> {
  * The class is designed for arrays, but you can also "point" to an single element
  * by just use "1" for the length.
  * The pointers are reference counted and will be deleted automatically by a customizable deleter.
- * The copy is cheap, thus the copy of a TypePtr will reference the same data.
+ * The copy is cheap, thus the copy of a ValuePtr will reference the same data.
  * The usual dereferencing pointer interface ("*" and "->") is supported.
  */
-template<typename TYPE> class TypePtr: public _internal::TypePtrBase
+template<typename TYPE> class ValuePtr: public _internal::TypePtrBase
 {
 	boost::shared_ptr<TYPE> m_val;
-	template<typename T> TypePtr( const util::Value<T>& value ); // Dont do this
+	template<typename T> ValuePtr( const util::Value<T>& value ); // Dont do this
 protected:
 	TypePtrBase *clone() const {
-		return new TypePtr( *this );
+		return new ValuePtr( *this );
 	}
 	/// Proxy-Deleter to encapsulate the real deleter/shared_ptr when creating shared_ptr for parts of a shared_ptr
 	class DelProxy : public boost::shared_ptr<TYPE>
@@ -79,7 +79,7 @@ protected:
 		 * This increments the use_count of the master and thus keeps the
 		 * master from being deleted while parts of it are still in use.
 		 */
-		DelProxy( const TypePtr<TYPE> &master ): boost::shared_ptr<TYPE>( master ) {
+		DelProxy( const ValuePtr<TYPE> &master ): boost::shared_ptr<TYPE>( master ) {
 			LOG( Debug, verbose_info ) << "Creating DelProxy for " << this->get();
 		}
 		/// decrement the use_count of the master when a specific part is not referenced anymore
@@ -96,14 +96,14 @@ public:
 	struct NonDeleter {
 		void operator()( TYPE *p ) {
 			//we have to cast the pointer to void* here, because in case of u_int8_t it will try to print the "string"
-			LOG( Debug, info ) << "Not freeing pointer " << ( void * )p << " (" << TypePtr<TYPE>::staticName() << ") ";
+			LOG( Debug, info ) << "Not freeing pointer " << ( void * )p << " (" << ValuePtr<TYPE>::staticName() << ") ";
 		};
 	};
 	/// Default delete-functor for c-arrays (uses free()).
 	struct BasicDeleter {
 		void operator()( TYPE *p ) {
 			//we have to cast the pointer to void* here, because in case of u_int8_t it will try to print the "string"
-			LOG( Debug, verbose_info ) << "Freeing pointer " << ( void * )p << " (" << TypePtr<TYPE>::staticName() << ") ";
+			LOG( Debug, verbose_info ) << "Freeing pointer " << ( void * )p << " (" << ValuePtr<TYPE>::staticName() << ") ";
 			free( p );
 		};
 	};
@@ -111,7 +111,7 @@ public:
 	struct ObjectArrayDeleter {
 		void operator()( TYPE *p ) {
 			//we have to cast the pointer to void* here, because in case of u_int8_t it will try to print the "string"
-			LOG( Debug, info ) << "Deleting object array at " << ( void * )p << " (" << TypePtr<TYPE>::staticName() << ") ";
+			LOG( Debug, info ) << "Deleting object array at " << ( void * )p << " (" << ValuePtr<TYPE>::staticName() << ") ";
 			delete[] p;
 		};
 	};
@@ -119,49 +119,49 @@ public:
 	 * Contructor for empty pointer.
 	 * length will be 0 and every attempt to dereference it will raise an exception.
 	 */
-	TypePtr() {
-		LOG( Debug, warning ) << "Creating an empty TypePtr of type " << util::MSubject( staticName() ) << " you should overwrite it with a usefull pointer before using it";
+	ValuePtr() {
+		LOG( Debug, warning ) << "Creating an empty ValuePtr of type " << util::MSubject( staticName() ) << " you should overwrite it with a usefull pointer before using it";
 	}
 
 	/**
-	 * Creates TypePtr from a pointer of type TYPE.
+	 * Creates ValuePtr from a pointer of type TYPE.
 	 * The pointers are automatically deleted by an instance of BasicDeleter and should not be used outside once used here.
 	 * If ptr is a pointer to C++ objects (delete[] needed) you must use
-	 * TypePtr(ptr,len,TypePtr\<TYPE\>::ObjectArrayDeleter())!
+	 * ValuePtr(ptr,len,ValuePtr\<TYPE\>::ObjectArrayDeleter())!
 	 * \param ptr the pointer to the used array
-	 * \param length the length of the used array (TypePtr does NOT check for length,
+	 * \param length the length of the used array (ValuePtr does NOT check for length,
 	 * this is just here for child classes which may want to check)
 	 */
-	TypePtr( TYPE *const ptr, size_t length ):
+	ValuePtr( TYPE *const ptr, size_t length ):
 		_internal::TypePtrBase( length ), m_val( ptr, BasicDeleter() ) {}
 
 	/**
-	 * Creates TypePtr from a pointer of type TYPE.
+	 * Creates ValuePtr from a pointer of type TYPE.
 	 * The pointers are automatically deleted by an copy of d and should not be used outside once used here
 	 * (this does not apply, if d does not delete).
 	 * D must implement operator()(TYPE *p).
 	 * \param ptr the pointer to the used array
-	 * \param length the length of the used array in elements (TypePtr does NOT check for length),
+	 * \param length the length of the used array in elements (ValuePtr does NOT check for length),
 	 * \param d the deleter to be used when the data shall be deleted ( d() is called then )
 	 */
 
-	template<typename D> TypePtr( TYPE *const ptr, size_t length, D d ):
+	template<typename D> ValuePtr( TYPE *const ptr, size_t length, D d ):
 		_internal::TypePtrBase( length ), m_val( ptr, d ) {}
 
-	virtual ~TypePtr() {}
+	virtual ~ValuePtr() {}
 
 	/**
-	 * Create a new TypePtr which uses newly allocated memory.
+	 * Create a new ValuePtr which uses newly allocated memory.
 	 * \param len requested size of the memory block in elements
-	 * \returns a TypePtr\<TYPE\> of given len
+	 * \returns a ValuePtr\<TYPE\> of given len
 	 */
-	static TypePtr allocate(size_t len){
-		return TypePtr((TYPE*)malloc(len*sizeof(TYPE)),len);
+	static ValuePtr allocate(size_t len){
+		return ValuePtr((TYPE*)malloc(len*sizeof(TYPE)),len);
 	}
 
 	/**
-	 * Get the raw address the TypePtr points to.
-	 * \returns a weak_ptr\<void\> with the memory address of the data handled by this TypePtr.
+	 * Get the raw address the ValuePtr points to.
+	 * \returns a weak_ptr\<void\> with the memory address of the data handled by this ValuePtr.
 	 */
 	const boost::weak_ptr<void> getRawAddress()const {
 		return boost::weak_ptr<void>( m_val );
@@ -180,21 +180,21 @@ public:
 		assert( start <= end );
 		const size_t _length = end - start + 1;
 		LOG_IF( end >= length(), Runtime, error )
-				<< "End of the range (" << end << ") is behind the end of this TypePtr (" << length() << ")";
+				<< "End of the range (" << end << ") is behind the end of this ValuePtr (" << length() << ")";
 		const TYPE &source = this->operator[]( start );
 		memcpy( dst, &source, _length * sizeof( TYPE ) );
 	}
 
 	/**
-	 * Compare the data of two TypePtr.
-	 * Counts how many elements in this and the given TypePtr are different within the given range.
-	 * If the type of this is not equal to the type of the given TypePtr the whole length is assumed to be different.
-	 * If the given range does not fit into this or the given TypePtr an error is send to the runtime log and the function will probably crash.
+	 * Compare the data of two ValuePtr.
+	 * Counts how many elements in this and the given ValuePtr are different within the given range.
+	 * If the type of this is not equal to the type of the given ValuePtr the whole length is assumed to be different.
+	 * If the given range does not fit into this or the given ValuePtr an error is send to the runtime log and the function will probably crash.
 	 * \param start the first element in this, which schould be compared to the first element in the given TyprPtr
 	 * \param end the first element in this, which schould _not_ be compared anymore to the given TyprPtr
-	 * \param dst the given TypePtr this should be compared to
+	 * \param dst the given ValuePtr this should be compared to
 	 * \param dst_start the first element in the given TyprPtr, which schould be compared to the first element in this
-	 * \returns the amount of elements which actually differ in both TypePtr or the whole length of the range when the types are not equal.
+	 * \returns the amount of elements which actually differ in both ValuePtr or the whole length of the range when the types are not equal.
 	 */
 	size_t compare( size_t start, size_t end, const _internal::TypePtrBase &dst, size_t dst_start ) const {
 		assert( start <= end );
@@ -203,16 +203,16 @@ public:
 
 		if ( dst.getTypeID() != getTypeID() ) {
 			LOG( Debug, error )
-					<< "Comparing to a TypePtr of different type(" << dst.getTypeName() << ", not " << getTypeName()
+					<< "Comparing to a ValuePtr of different type(" << dst.getTypeName() << ", not " << getTypeName()
 					<< "). Assuming all voxels to be different";
 			return _length;
 		}
 
 		LOG_IF( end >= length(), Runtime, error )
-				<< "End of the range (" << end << ") is behind the end of this TypePtr (" << length() << ")";
+				<< "End of the range (" << end << ") is behind the end of this ValuePtr (" << length() << ")";
 		LOG_IF( _length + dst_start >= dst.length(), Runtime, error )
 				<< "End of the range (" << _length + dst_start << ") is behind the end of the destination (" << dst.length() << ")";
-		const TypePtr<TYPE> &compare = dst.castToTypePtr<TYPE>();
+		const ValuePtr<TYPE> &compare = dst.castToTypePtr<TYPE>();
 		LOG( Debug, verbose_info ) << "Comparing " << dst.getTypeName() << " at " << &operator[]( 0 ) << " and " << &compare[0];
 
 		for ( size_t i = start; i < end; i++ ) {
@@ -273,16 +273,16 @@ public:
 	operator const boost::shared_ptr<TYPE>&()const {return m_val;}
 
 	TypePtrBase::Reference cloneToNew( size_t _length ) const {
-		return TypePtrBase::Reference( new TypePtr( ( TYPE * )malloc( _length * sizeof( TYPE ) ), _length ) );
+		return TypePtrBase::Reference( new ValuePtr( ( TYPE * )malloc( _length * sizeof( TYPE ) ), _length ) );
 	}
-	/// \returns the byte-size of the type of the data this TypePtr points to.
+	/// \returns the byte-size of the type of the data this ValuePtr points to.
 	size_t bytesPerElem() const {
 		return sizeof( TYPE );
 	}
 	/// \copydoc _internal::TypePtrBase::getMinMax
 	std::pair<util::TypeReference, util::TypeReference> getMinMax()const {
 		if ( length() == 0 ) {
-			LOG( Runtime, warning ) << "Skipping computation of min/max on an empty TypePtr";
+			LOG( Runtime, warning ) << "Skipping computation of min/max on an empty ValuePtr";
 			std::pair<util::TypeReference, util::TypeReference>();
 		}
 
@@ -292,12 +292,12 @@ public:
 	}
 
 	/**
-	 * Splice up the TypePtr into equal sized blocks.
-	 * This virtually creates new data blocks of the given size by computing new pointers into the block and creating TypePtr objects for them.
-	 * This TypePtr use the reference counting of the original TypePtr via DelProxy, so the original data are only deleted (as a whole)
-	 * when all spliced and all "normal" TypePtr for this data are deleted.
+	 * Splice up the ValuePtr into equal sized blocks.
+	 * This virtually creates new data blocks of the given size by computing new pointers into the block and creating ValuePtr objects for them.
+	 * This ValuePtr use the reference counting of the original ValuePtr via DelProxy, so the original data are only deleted (as a whole)
+	 * when all spliced and all "normal" ValuePtr for this data are deleted.
 	 * \param size the maximum size of the spliced parts of the data (the last part can be smaller)
-	 * \returns a vector of TypePtr which point to the parts of the spliced data
+	 * \returns a vector of ValuePtr which point to the parts of the spliced data
 	 */
 	std::vector<Reference> splice( size_t size )const {
 		if ( size >= length() ) {
@@ -316,10 +316,10 @@ public:
 		DelProxy proxy( *this );
 
 		for ( size_t i = 0; i < fullSplices; i++ )
-			ret[i].reset( new TypePtr( m_val.get() + i * size, size, proxy ) );
+			ret[i].reset( new ValuePtr( m_val.get() + i * size, size, proxy ) );
 
 		if ( lastSize )
-			ret.back().reset( new TypePtr( m_val.get() + fullSplices * size, lastSize, proxy ) );
+			ret.back().reset( new ValuePtr( m_val.get() + fullSplices * size, lastSize, proxy ) );
 
 		return ret;
 	}
@@ -330,7 +330,7 @@ public:
 template<typename T> bool _internal::TypePtrBase::is()const
 {
 	util::check_type<T>();
-	return getTypeID() == TypePtr<T>::staticID;
+	return getTypeID() == ValuePtr<T>::staticID;
 }
 
 

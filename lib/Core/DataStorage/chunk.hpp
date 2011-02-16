@@ -48,7 +48,7 @@ public:
 
 /**
  * Main class for four-dimensional random-access data blocks.
- * Like in TypePtr, the copy of a Chunk will reference the same data. (cheap copy)
+ * Like in ValuePtr, the copy of a Chunk will reference the same data. (cheap copy)
  * (If you want to make a memory based deep copy of a Chunk create a MemChunk from it)
  */
 class Chunk : public _internal::ChunkBase, protected TypePtrReference
@@ -66,7 +66,7 @@ protected:
 	 */
 	template<typename TYPE, typename D> Chunk( TYPE *src, D d, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 ):
 		_internal::ChunkBase( firstDim, secondDim, thirdDim, fourthDim ),
-		util::_internal::TypeReference<_internal::TypePtrBase>( new TypePtr<TYPE>( src, getVolume(), d ) ) {}
+		util::_internal::TypeReference<_internal::TypePtrBase>( new ValuePtr<TYPE>( src, getVolume(), d ) ) {}
 	Chunk( const TypePtrReference &src, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 );
 public:
 	template <typename TYPE> class VoxelOp:std::unary_function<bool,TYPE>{
@@ -83,7 +83,7 @@ public:
 		LOG_IF( ! isInRange( idx ), Debug, isis::error )
 				<< "Index " << util::ivector4( firstDim, secondDim, thirdDim, fourthDim )
 				<< " is out of range " << getSizeAsString();
-		TypePtr<TYPE> &ret = asTypePtr<TYPE>();
+		ValuePtr<TYPE> &ret = asTypePtr<TYPE>();
 		return ret[getLinearIndex( idx )];
 	}
 	/**
@@ -99,7 +99,7 @@ public:
 					<< " is out of range (" << getSizeAsString() << ")";
 		}
 
-		const TypePtr<TYPE> &ret = getTypePtr<TYPE>();
+		const ValuePtr<TYPE> &ret = getTypePtr<TYPE>();
 
 		return ret[getLinearIndex( idx )];
 	}
@@ -140,10 +140,10 @@ public:
 	const _internal::TypePtrBase &getTypePtrBase()const {
 		return operator*();
 	}
-	template<typename TYPE> TypePtr<TYPE> &asTypePtr() {
+	template<typename TYPE> ValuePtr<TYPE> &asTypePtr() {
 		return asTypePtrBase().castToTypePtr<TYPE>();
 	}
-	template<typename TYPE> const TypePtr<TYPE> getTypePtr()const {
+	template<typename TYPE> const ValuePtr<TYPE> getTypePtr()const {
 		return getTypePtrBase().castToTypePtr<TYPE>();
 	}
 
@@ -167,8 +167,8 @@ public:
 	bool convertToType( unsigned short ID, const scaling_pair &scaling );
 
 	template<typename T> bool copyToMem( T *dst, const scaling_pair &scaling )const {
-		// wrap the raw memory at into an non-deleting TypePtr of the length of the chunk
-		TypePtr<T> dstPtr( dst, getVolume(), typename TypePtr<T>::NonDeleter() );
+		// wrap the raw memory at into an non-deleting ValuePtr of the length of the chunk
+		ValuePtr<T> dstPtr( dst, getVolume(), typename ValuePtr<T>::NonDeleter() );
 		return getTypePtrBase().convertTo( dstPtr, scaling ); // copy-convert the data into dstPtr
 	}
 
@@ -244,7 +244,7 @@ public:
 	MemChunk( size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 ):
 		Chunk(
 			( TYPE * )calloc( fourthDim *thirdDim *secondDim *firstDim, sizeof( TYPE ) ),
-			typename TypePtr<TYPE>::BasicDeleter(),
+			typename ValuePtr<TYPE>::BasicDeleter(),
 			firstDim, secondDim, thirdDim, fourthDim
 		) {}
 	/**
@@ -260,15 +260,15 @@ public:
 	MemChunk( const TYPE *const org, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 ):
 		Chunk(
 			( TYPE * )malloc( sizeof( TYPE )*fourthDim *thirdDim *secondDim *firstDim ),
-			typename TypePtr<TYPE>::BasicDeleter(),
+			typename ValuePtr<TYPE>::BasicDeleter(),
 			firstDim, secondDim, thirdDim, fourthDim
 		) {
 		asTypePtr<TYPE>().copyFromMem( org, getVolume() );
 	}
 	/// Create a deep copy of a given Chunk (automatic conversion will be used if datatype does not fit)
 	MemChunk( const Chunk &ref ): Chunk( ref ) {
-		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewByID( TypePtr<TYPE>::staticID ) );
+		//get rid of my ValuePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
+		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewByID( ValuePtr<TYPE>::staticID ) );
 	}
 	/**
 	 * Create a deep copy of a given Chunk.
@@ -277,20 +277,20 @@ public:
 	 * \param scaling the scaling (scale and offset) to be used if a conversion to the requested type is neccessary.
 	 */
 	MemChunk( const Chunk &ref, const scaling_pair &scaling ): Chunk( ref ) {
-		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewByID( TypePtr<TYPE>::staticID, scaling ) );
+		//get rid of my ValuePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
+		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewByID( ValuePtr<TYPE>::staticID, scaling ) );
 	}
 	MemChunk( const MemChunk<TYPE> &ref ): Chunk( ref ) { //this is needed, to prevent generation of default-copy constructor
-		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewByID( TypePtr<TYPE>::staticID ) );
+		//get rid of my ValuePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
+		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewByID( ValuePtr<TYPE>::staticID ) );
 	}
 	/// Create a deep copy of a given Chunk (automatic conversion will be used if datatype does not fit)
 	MemChunk &operator=( const Chunk &ref ) {
 		LOG_IF( useCount() > 1, Debug, warning )
 				<< "Not overwriting current chunk memory (which is still used by " << useCount() - 1 << " other chunk(s)).";
 		Chunk::operator=( ref ); //copy the chunk of ref
-		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewByID( TypePtr<TYPE>::staticID ) );
+		//get rid of my ValuePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
+		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewByID( ValuePtr<TYPE>::staticID ) );
 		return *this;
 	}
 	/// Create a deep copy of a given MemChunk (automatic conversion will be used if datatype does not fit)
@@ -308,7 +308,7 @@ public:
 	MemChunkNonDel( size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 ):
 		Chunk(
 			( TYPE * )calloc( fourthDim *thirdDim *secondDim *firstDim, sizeof( TYPE ) ),
-			typename TypePtr<TYPE>::NonDeleter(),
+			typename ValuePtr<TYPE>::NonDeleter(),
 			firstDim, secondDim, thirdDim, fourthDim
 		) {}
 	/**
@@ -325,15 +325,15 @@ public:
 	MemChunkNonDel( const TYPE *const org, size_t firstDim, size_t secondDim = 1, size_t thirdDim = 1, size_t fourthDim = 1 ):
 		Chunk(
 			( TYPE * )malloc( sizeof( TYPE )*fourthDim *thirdDim *secondDim *firstDim ),
-			typename TypePtr<TYPE>::NonDeleter(),
+			typename ValuePtr<TYPE>::NonDeleter(),
 			firstDim, secondDim, thirdDim, fourthDim
 		) {
 		asTypePtr<TYPE>().copyFromMem( org, getVolume() );
 	}
 	/// Create a deep copy of a given Chunk (automatic conversion will be used if datatype does not fit)
 	MemChunkNonDel( const Chunk &ref ): Chunk( ref ) {
-		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewByID( TypePtr<TYPE>::staticID ) );
+		//get rid of my ValuePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
+		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewByID( ValuePtr<TYPE>::staticID ) );
 	}
 	/**
 	 * Create a deep copy of a given Chunk.
@@ -343,20 +343,20 @@ public:
 	 * \param max the value range of the source to be used when the scaling for the conversion is computed
 	 */
 	MemChunkNonDel( const Chunk &ref, const util::_internal::TypeBase &min, const  util::_internal::TypeBase &max ): Chunk( ref ) {
-		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewByID( TypePtr<TYPE>::staticID, min, max ) );
+		//get rid of my ValuePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
+		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewByID( ValuePtr<TYPE>::staticID, min, max ) );
 	}
 	MemChunkNonDel( const MemChunk<TYPE> &ref ): Chunk( ref ) { //this is needed, to prevent generation of default-copy constructor
-		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewByID( TypePtr<TYPE>::staticID ) );
+		//get rid of my ValuePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
+		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewByID( ValuePtr<TYPE>::staticID ) );
 	}
 	/// Create a deep copy of a given Chunk (automatic conversion will be used if datatype does not fit)
 	MemChunkNonDel &operator=( const Chunk &ref ) {
 		LOG_IF( useCount() > 1, Debug, warning )
 				<< "Not overwriting current chunk memory (which is still used by " << useCount() - 1 << " other chunk(s)).";
 		Chunk::operator=( ref ); //copy the chunk of ref
-		//get rid of my TypePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewByID( TypePtr<TYPE>::staticID ) );
+		//get rid of my ValuePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
+		TypePtrReference::operator=( ref.getTypePtrBase().copyToNewByID( ValuePtr<TYPE>::staticID ) );
 		return *this;
 	}
 	/// Create a deep copy of a given MemChunk (automatic conversion will be used if datatype does not fit)

@@ -72,9 +72,9 @@ class TypeBase : public GenericType
 protected:
 	/**
 	* Create a copy of this.
-	* Creates a new Value/TypePtr an stores a copy of its value there.
+	* Creates a new Value/ValuePtr an stores a copy of its value there.
 	* Makes TypeBase-pointers copyable without knowing their type.
-	* \returns a TypeBase-pointer to a newly created Value/TypePtr.
+	* \returns a TypeBase-pointer to a newly created Value/ValuePtr.
 	*/
 	virtual TypeBase *clone()const = 0;
 public:

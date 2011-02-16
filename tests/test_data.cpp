@@ -55,7 +55,7 @@ int main()
 	Value<float> f( 5.4 );
 	int i_ = f;//this wont throw an exception because it only does an implizit conversions from Value<float>=>float and float=>int
 	std::cout << "Value<float>(5.4) is " << f.toString( true ) << " int from that is " << i_ << std::endl;
-	TypePtr<int> p( ( int * )calloc( 5, sizeof( int ) ), 5, isis::test::SpeakingDeleter( "Rolf" ) );
+	ValuePtr<int> p( ( int * )calloc( 5, sizeof( int ) ), 5, isis::test::SpeakingDeleter( "Rolf" ) );
 	std::cout << "p.toString():" <<  p.toString() << std::endl;
 	const short x[] = {1, 2, 3, 4};
 	FixedVector<short, 4> v( x );

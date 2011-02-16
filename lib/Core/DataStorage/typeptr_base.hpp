@@ -37,7 +37,7 @@ protected:
 	size_t m_len;
 	TypePtrBase( size_t len = 0 );
 
-	/// Create a TypePtr of the same type pointing at the same address.
+	/// Create a ValuePtr of the same type pointing at the same address.
 	virtual TypePtrBase *clone()const = 0;
 
 public:
@@ -50,34 +50,34 @@ public:
 
 	const Converter &getConverterTo( unsigned short ID )const;
 	/**
-	* Dynamically cast the TypeBase up to its actual TypePtr\<T\>. Constant version.
+	* Dynamically cast the TypeBase up to its actual ValuePtr\<T\>. Constant version.
 	* Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
 	* \returns a constant reference of the pointer.
 	*/
-	template<typename T> const TypePtr<T>& castToTypePtr() const {
-		return m_cast_to<TypePtr<T> >();
+	template<typename T> const ValuePtr<T>& castToTypePtr() const {
+		return m_cast_to<ValuePtr<T> >();
 	}
 	/**
-	 * Dynamically cast the TypeBase up to its actual TypePtr\<T\>. Referenced version.
+	 * Dynamically cast the TypeBase up to its actual ValuePtr\<T\>. Referenced version.
 	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
 	 * \returns a reference of the pointer.
 	 */
-	template<typename T> TypePtr<T>& castToTypePtr() {
-		return m_cast_to<TypePtr<T> >();
+	template<typename T> ValuePtr<T>& castToTypePtr() {
+		return m_cast_to<ValuePtr<T> >();
 	}
 	/// \returns the length of the data pointed to
 	size_t length()const;
 
 	/**
 	 * Split up into cheap copies of given length.
-	 * This will create TypePtr's which will point at elements within this data block.
+	 * This will create ValuePtr's which will point at elements within this data block.
 	 * - They will have a distance of size and therefore have the have the same length (exept the last one which will point an the rest).
-	 * - They will use a special proxy-reference-counting (If at least one of them is still used, the whole original TypePtr will be kept).
+	 * - They will use a special proxy-reference-counting (If at least one of them is still used, the whole original ValuePtr will be kept).
 	 * \returns a vector of ceil(len()/size) not intersecting TypePtrBase::Reference's of the length<=size.
 	 */
 	virtual std::vector<Reference> splice( size_t size )const = 0;
 
-	/// Copy (or Convert) data from this to another TypePtr of maybe another type and the same length.
+	/// Copy (or Convert) data from this to another ValuePtr of maybe another type and the same length.
 	bool convertTo( TypePtrBase &dst )const;
 	bool convertTo( TypePtrBase &dst, const scaling_pair &scaling )const;
 
@@ -89,54 +89,54 @@ public:
 
 	/// Convert (or Copy) data from this to existing memory of maybe another type and the given length.
 	template<typename T> bool convertTo( T *dst, size_t len ) const {
-		TypePtr<T> dest( dst, len, TypePtr<T>::NonDeleter() );
+		ValuePtr<T> dest( dst, len, ValuePtr<T>::NonDeleter() );
 		return convertTo( dest );
 	}
 
 	/**
 	 * Create new data in memory containg a (converted) copy of this.
 	 * Allocates new memory of the requested ID and copies the content of this into that memory.
-	 * \param ID the ID of the type the new TypePtr (referenced by the Reference returned) should have
+	 * \param ID the ID of the type the new ValuePtr (referenced by the Reference returned) should have
 	 */
 	Reference copyToNewByID( unsigned short ID ) const;
 	/**
 	 * @copydoc copyToNewByID
-	 * \param ID the ID of the type the new TypePtr (referenced by the Reference returned) should have
+	 * \param ID the ID of the type the new ValuePtr (referenced by the Reference returned) should have
 	 * \param scaling the scaling to be used if a conversion is necessary
 	 */	
 	Reference copyToNewByID( unsigned short ID, const scaling_pair &scaling ) const;
 	
 	/**
-	 * Create a TypePtr of given type and length.
+	 * Create a ValuePtr of given type and length.
 	 * This allocates memory as needed but does not initialize it.
-	 * \returns a Reference to a TypePtr pointing to the allocated memory. Or an empty Reference if the creation failed.
+	 * \returns a Reference to a ValuePtr pointing to the allocated memory. Or an empty Reference if the creation failed.
 	 */
 	static Reference createById( unsigned short id, size_t len );
 
 	/**
-	 * Copy this to a new TypePtr\<T\> using newly allocated memory.
-	 * This will create a new TypePtr of type T and the length of this.
+	 * Copy this to a new ValuePtr\<T\> using newly allocated memory.
+	 * This will create a new ValuePtr of type T and the length of this.
 	 * The memory will be allocated and the data of this will be copy-converted to T using min/max as value range.
-	 * If the conversion fails, an error will be send to CoreLog and the data of the newly created TypePtr will be undefined.
-	 * \returns a the newly created TypePtr
+	 * If the conversion fails, an error will be send to CoreLog and the data of the newly created ValuePtr will be undefined.
+	 * \returns a the newly created ValuePtr
 	 */
-	template<typename T> TypePtr<T> copyToNew( const scaling_pair &scaling )const {
-		Reference ret = copyToNewByID( TypePtr<T>::staticID, scaling );
+	template<typename T> ValuePtr<T> copyToNew( const scaling_pair &scaling )const {
+		Reference ret = copyToNewByID( ValuePtr<T>::staticID, scaling );
 		return ret->castToTypePtr<T>();
 	}
 	/**
-	 * Copy this to a new TypePtr\<T\> using newly allocated memory.
-	 * This will create a new TypePtr of type T and the length of this.
+	 * Copy this to a new ValuePtr\<T\> using newly allocated memory.
+	 * This will create a new ValuePtr of type T and the length of this.
 	 * The memory will be allocated and the data of this will be copy-converted to T.
-	 * If the conversion fails, an error will be send to CoreLog and the data of the newly created TypePtr will be undefined.
-	 * \returns a the newly created TypePtr
+	 * If the conversion fails, an error will be send to CoreLog and the data of the newly created ValuePtr will be undefined.
+	 * \returns a the newly created ValuePtr
 	 */
-	template<typename T> TypePtr<T> copyToNew()const {
-		Reference ret = copyToNewByID( TypePtr<T>::staticID );
+	template<typename T> ValuePtr<T> copyToNew()const {
+		Reference ret = copyToNewByID( ValuePtr<T>::staticID );
 		return ret->castToTypePtr<T>();
 	}
 	/**
-	 * Create a new TypePtr, of the same type, but differnent size in memory.
+	 * Create a new ValuePtr, of the same type, but differnent size in memory.
 	 * \param length length of the new memory block in elements of the given TYPE
 	 */
 	virtual TypePtrBase::Reference cloneToNew( size_t length )const = 0;
@@ -145,7 +145,7 @@ public:
 	virtual size_t bytesPerElem()const = 0;
 	virtual ~TypePtrBase();
 	/**
-	 * Copy a range of elements to another TypePtr of the same type.
+	 * Copy a range of elements to another ValuePtr of the same type.
 	 * \param start first element in this to be copied
 	 * \param end last element in this to be copied
 	 * \param dst target for the copy
@@ -157,10 +157,10 @@ public:
 	size_t useCount()const;
 
 	/**
-	 * Get minimum/maximum from a TypePtr.
+	 * Get minimum/maximum from a ValuePtr.
 	 * This computes the minimum and maximum value of the stored data and stores them in TypeReference-Objects.
 	 * The computes min/max are of the same type as the stored data, but can be compared to other TypeReference without knowing this type via the lt/gt function of TypeBase.
-	 * The following code checks if the value range of TypePtr-object data1 is a real subset of data2:
+	 * The following code checks if the value range of ValuePtr-object data1 is a real subset of data2:
 	 * \code
 	 * std::pair<util::TypeReference,util::TypeReference> minmax1=data1.getMinMax(), minmax2=data2.getMinMax();
 	 * if(minmax1.first->gt(minmax2.second) && minmax1.second->lt(minmax2.second)
@@ -170,17 +170,17 @@ public:
 	 */
 	virtual std::pair<util::TypeReference, util::TypeReference> getMinMax()const = 0;
 	/**
-	 * Compare to another TypePtr.
+	 * Compare to another ValuePtr.
 	 * This counts the elements between start and end, which are not equal to the corresponding elements in dst.
 	 * If dst is of another type all element are assumed to be different
 	 * \param start starting index for the comparison
 	 * \param end end index for the comparison (this element the first element which is _not_ compared)
-	 * \param dst the TypePtr to compare against
+	 * \param dst the ValuePtr to compare against
 	 * \param dst_start the index where to start comparison in dst
 	 */
 	virtual size_t compare( size_t start, size_t end, const TypePtrBase &dst, size_t dst_start )const = 0;
 	/**
-	 * Compare to another TypePtr.
+	 * Compare to another ValuePtr.
 	 * Short hand version of compare( size_t start, size_t end, const TypePtrBase &dst, size_t dst_start )const
 	 */
 	size_t compare( const TypePtrBase &comp )const;

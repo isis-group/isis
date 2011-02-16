@@ -236,7 +236,7 @@ public:
 		LOG( ImageIoLog, isis::info ) << "image typename: " << image.getMajorTypeName();
 
 		switch ( image.getMajorTypeID() ) {
-		case data::TypePtr<int8_t>::staticID:
+		case data::ValuePtr<int8_t>::staticID:
 
 			if ( dialect == "fsl" ) { // fsl not compatible with int8, convert to uint8
 				data::TypedImage<uint8_t> fslCopy( image );
@@ -248,15 +248,15 @@ public:
 			ni.datatype = DT_INT8;
 			copyDataToNifti<int8_t>( image, ni );
 			break;
-		case data::TypePtr<uint8_t>::staticID:
+		case data::ValuePtr<uint8_t>::staticID:
 			ni.datatype = DT_UINT8;
 			copyDataToNifti<uint8_t>( image, ni );
 			break;
-		case data::TypePtr<int16_t>::staticID:
+		case data::ValuePtr<int16_t>::staticID:
 			ni.datatype = DT_INT16;
 			copyDataToNifti<int16_t>( image, ni );
 			break;
-		case data::TypePtr<uint16_t>::staticID:
+		case data::ValuePtr<uint16_t>::staticID:
 
 			if ( dialect == "fsl" ) {
 				//              image.print( std::cout );
@@ -269,11 +269,11 @@ public:
 			}
 
 			break;
-		case data::TypePtr<int32_t>::staticID:
+		case data::ValuePtr<int32_t>::staticID:
 			ni.datatype = DT_INT32;
 			copyDataToNifti<int32_t>( image, ni );
 			break;
-		case data::TypePtr<uint32_t>::staticID:
+		case data::ValuePtr<uint32_t>::staticID:
 
 			if ( dialect == "fsl" ) {
 				data::TypedImage<int32_t> fslCopy( image );
@@ -285,11 +285,11 @@ public:
 			ni.datatype = DT_UINT32;
 			copyDataToNifti<uint16_t>( image, ni );
 			break;
-		case data::TypePtr<float>::staticID:
+		case data::ValuePtr<float>::staticID:
 			ni.datatype = DT_FLOAT32;
 			copyDataToNifti<float>( image, ni );
 			break;
-		case data::TypePtr<double>::staticID:
+		case data::ValuePtr<double>::staticID:
 			ni.datatype = DT_FLOAT64;
 			copyDataToNifti<double>( image, ni );
 			break;
@@ -517,7 +517,7 @@ private:
 		T *refNii = ( T * ) ni.data;
 		const util::FixedVector<size_t, 4> csize = image.getChunk( 0, 0 ).getSizeAsVector();
 		const util::FixedVector<size_t, 4> isize = image.getSizeAsVector();
-		const data::scaling_pair scale = image.getScalingTo( data::TypePtr<T>::staticID );
+		const data::scaling_pair scale = image.getScalingTo( data::ValuePtr<T>::staticID );
 
 		for ( size_t t = 0; t < isize[3]; t += csize[3] ) {
 			for ( size_t z = 0; z < isize[2]; z += csize[2] ) {

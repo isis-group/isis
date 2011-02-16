@@ -110,7 +110,7 @@ public:
 		}
 
 		data::Image tImg( image );
-		tImg.convertToType( data::TypePtr<png_byte>::staticID );
+		tImg.convertToType( data::ValuePtr<png_byte>::staticID );
 		tImg.spliceDownTo( data::sliceDim );
 		std::vector<boost::shared_ptr<data::Chunk> > chunks = tImg.getChunksAsVector();
 		unsigned short numLen = std::log10( chunks.size() ) + 1;

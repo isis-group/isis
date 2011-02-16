@@ -218,7 +218,7 @@ BOOST_AUTO_TEST_CASE ( type_selection_test )
 	BOOST_CHECK( img.insertChunk( ch_uint8_t ) );
 	BOOST_CHECK( img.reIndex() );
 	BOOST_CHECK_EQUAL( img.getSizeAsVector(), ( util::FixedVector<size_t, 4>( size ) ) );
-	BOOST_CHECK_EQUAL( img.getMajorTypeID(), data::TypePtr<int16_t>( NULL, 0 ).getTypeID() );
+	BOOST_CHECK_EQUAL( img.getMajorTypeID(), data::ValuePtr<int16_t>( NULL, 0 ).getTypeID() );
 #undef MAKE_CHUNK
 }
 
@@ -249,7 +249,7 @@ BOOST_AUTO_TEST_CASE ( type_scale_test )
 	BOOST_CHECK( img.insertChunk( ch_int8_t ) );
 	BOOST_CHECK( img.insertChunk( ch_uint8_t ) );
 	BOOST_CHECK( img.reIndex() );
-	data::scaling_pair scale = img.getScalingTo( data::TypePtr<uint8_t>::staticID );
+	data::scaling_pair scale = img.getScalingTo( data::ValuePtr<uint8_t>::staticID );
 	BOOST_CHECK_EQUAL( scale.first->as<double>(), 1. / 10 );
 	BOOST_CHECK_EQUAL( scale.second->as<double>(), 5 );
 #undef MAKE_CHUNK

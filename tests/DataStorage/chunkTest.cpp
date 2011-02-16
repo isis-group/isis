@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE ( chunk_scale_test )//Access Chunk elements via dimensional
 
 	std::pair<util::TypeReference, util::TypeReference> minmax = ch.getMinMax();
 
-	data::scaling_pair scale = ch.getScalingTo( data::TypePtr<uint8_t>::staticID, *minmax.first, *minmax.second );
+	data::scaling_pair scale = ch.getScalingTo( data::ValuePtr<uint8_t>::staticID, *minmax.first, *minmax.second );
 	const util::_internal::TypeBase &scale_s = *( scale.first );
 	const util::_internal::TypeBase &scale_o = *( scale.second );
 
@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE ( chunk_scale_test )//Access Chunk elements via dimensional
 	BOOST_CHECK_EQUAL( scale_o.as<double>(), 5 );
 }
 
-BOOST_AUTO_TEST_CASE ( chunk_data_test2 )//Access Chunk elements via linear index (threat it as TypePtr)
+BOOST_AUTO_TEST_CASE ( chunk_data_test2 )//Access Chunk elements via linear index (threat it as ValuePtr)
 {
 	data::MemChunk<float> ch( 4, 3, 2, 1 );
 	std::ostringstream o;
@@ -174,7 +174,7 @@ BOOST_AUTO_TEST_CASE ( chunk_copy_test )//Copy chunks
 	for ( size_t i = 0; i < ch1.getVolume(); i++ )
 		ch1.asTypePtr<float>()[i] = i;
 
-	data::Chunk ch2 = ch1;//This shall clone the underlying TypePtr-Object
+	data::Chunk ch2 = ch1;//This shall clone the underlying ValuePtr-Object
 	//but it should of course of the same type and contain the same data
 	BOOST_CHECK( ch1.getTypePtrBase().isSameType( ch2.getTypePtrBase() ) );
 	BOOST_CHECK( ch1.getTypePtrBase().is<float>() );

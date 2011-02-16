@@ -18,7 +18,7 @@ namespace _internal
 template<typename SRC, typename DST> void numeric_convert_impl( const SRC *src, DST *dst, size_t count, double scale, double offset )
 {
 	LOG( Runtime, info )
-			<< "using generic scaling convert " << TypePtr<SRC>::staticName() << "=>" << TypePtr<DST>::staticName()
+			<< "using generic scaling convert " << ValuePtr<SRC>::staticName() << "=>" << ValuePtr<DST>::staticName()
 			<< " with scale/offset " << std::fixed << scale << "/" << offset;
 	static boost::numeric::converter <
 	DST, double,
@@ -34,7 +34,7 @@ template<typename SRC, typename DST> void numeric_convert_impl( const SRC *src, 
 
 template<typename SRC, typename DST> void numeric_convert_impl( const SRC *src, DST *dst, size_t count )
 {
-	LOG( Runtime, info ) << "using generic convert " << TypePtr<SRC>::staticName() << " => " << TypePtr<DST>::staticName() << " without scaling";
+	LOG( Runtime, info ) << "using generic convert " << ValuePtr<SRC>::staticName() << " => " << ValuePtr<DST>::staticName() << " without scaling";
 	static boost::numeric::converter <
 	DST, SRC,
 	   boost::numeric::conversion_traits<DST, SRC>,
@@ -263,7 +263,7 @@ getNumericScaling( const util::_internal::TypeBase &min, const util::_internal::
  * \param scale the scaling factor
  * \param offset the offset
  */
-template<typename SRC, typename DST> void numeric_convert( const TypePtr<SRC> &src, TypePtr<DST> &dst, const double scale, const double offset )
+template<typename SRC, typename DST> void numeric_convert( const ValuePtr<SRC> &src, ValuePtr<DST> &dst, const double scale, const double offset )
 {
 	LOG_IF( src.length() > dst.length(), Runtime, error ) << "The " << src.length() << " elements of src wont fit into the destination. Will only convert " << dst.length() << " elements.";
 	LOG_IF( src.length() < dst.length(), Runtime, warning ) << "Source is shorter than destination. Will only convert " << src.length() << " values";

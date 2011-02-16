@@ -52,7 +52,7 @@ template<typename SRC, typename DST> class TypePtrGenerator: public TypePtrConve
 public:
 	void create( boost::scoped_ptr<TypePtrBase>& dst, const size_t len )const {
 		LOG_IF( dst.get(), Debug, warning ) << "Creating into existing value " << dst->toString( true );
-		TypePtr<DST> *newDat = new TypePtr<DST>( ( DST * )malloc( sizeof( DST )*len ), len );
+		ValuePtr<DST> *newDat = new ValuePtr<DST>( ( DST * )malloc( sizeof( DST )*len ), len );
 		dst.reset( newDat );
 	}
 	void generate( const TypePtrBase &src, boost::scoped_ptr<TypePtrBase>& dst, const scaling_pair &scaling )const {
@@ -84,7 +84,7 @@ template<bool NUMERIC, typename SRC, typename DST> class TypePtrConverter<NUMERI
 {
 	TypePtrConverter() {
 		LOG( Debug, verbose_info )
-				<< "Creating trivial copy converter for " << TypePtr<SRC>::staticName();
+				<< "Creating trivial copy converter for " << ValuePtr<SRC>::staticName();
 	};
 public:
 	static boost::shared_ptr<const TypePtrConverterBase> get() {
@@ -92,7 +92,7 @@ public:
 		return boost::shared_ptr<const TypePtrConverterBase>( ret );
 	}
 	void convert( const TypePtrBase &src, TypePtrBase &dst, const scaling_pair &scaling )const {
-		TypePtr<SRC> &dstVal = dst.castToTypePtr<SRC>();
+		ValuePtr<SRC> &dstVal = dst.castToTypePtr<SRC>();
 		const SRC *srcPtr = &src.castToTypePtr<SRC>()[0];
 		LOG_IF( src.length() < dst.length(), Debug, info ) << "The target is longer than the the source (" << dst.length() << ">" << src.length() << "). Will only copy/convert " << src.length() << " elements";
 		LOG_IF( src.length() > dst.length(), Debug, error ) << "The target is shorter than the the source (" << dst.length() << "<" << src.length() << "). Will only copy/convert " << dst.length() << " elements";
@@ -123,7 +123,7 @@ template<typename SRC, typename DST> class TypePtrConverter<true, false, SRC, DS
 	TypePtrConverter() {
 		LOG( Debug, verbose_info )
 				<< "Creating numeric converter from "
-				<< TypePtr<SRC>::staticName() << " to " << TypePtr<DST>::staticName();
+				<< ValuePtr<SRC>::staticName() << " to " << ValuePtr<DST>::staticName();
 	};
 public:
 	static boost::shared_ptr<const TypePtrConverterBase> get() {
@@ -160,7 +160,7 @@ template<typename SRC> struct inner_TypePtrConverter {
 		boost::shared_ptr<const TypePtrConverterBase> conv =
 			TypePtrConverter<is_num::value, is_same::value, SRC, DST>::get();
 		//and insert it into the to-conversion-map of SRC
-		m_subMap.insert( m_subMap.end(), std::make_pair( TypePtr<DST>::staticID, conv ) );
+		m_subMap.insert( m_subMap.end(), std::make_pair( ValuePtr<DST>::staticID, conv ) );
 	}
 };
 
@@ -170,7 +170,7 @@ struct outer_TypePtrConverter {
 	outer_TypePtrConverter( std::map< int , std::map<int, boost::shared_ptr<const TypePtrConverterBase> > > &map ): m_map( map ) {}
 	template<typename SRC> void operator()( SRC ) {//will be called by the mpl::for_each in TypePtrConverterMap() for any SRC out of "types"
 		boost::mpl::for_each<util::_internal::types>( // create a functor for from-SRC-conversion and call its ()-operator for any DST out of "types"
-			inner_TypePtrConverter<SRC>( m_map[TypePtr<SRC>::staticID] )
+			inner_TypePtrConverter<SRC>( m_map[ValuePtr<SRC>::staticID] )
 		);
 	}
 };

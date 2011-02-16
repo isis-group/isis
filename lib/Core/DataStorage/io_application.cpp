@@ -60,13 +60,13 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 		std::map<unsigned short, std::string> types = util::getTypeMap( false, true );
 		// remove some types which are useless as representation
 		// "(unsigned short)" is needed because otherwise erase would take the reference of a static constant which is only there during compile time
-		types.erase( ( unsigned short )data::TypePtr<util::Selection>::staticID );
-		types.erase( ( unsigned short )data::TypePtr<std::string>::staticID );
-		types.erase( ( unsigned short )data::TypePtr<boost::posix_time::ptime>::staticID );
-		types.erase( ( unsigned short )data::TypePtr<boost::gregorian::date>::staticID );
-		types.erase( ( unsigned short )data::TypePtr<util::ilist>::staticID );
-		types.erase( ( unsigned short )data::TypePtr<util::dlist>::staticID );
-		types.erase( ( unsigned short )data::TypePtr<util::slist>::staticID );
+		types.erase( ( unsigned short )data::ValuePtr<util::Selection>::staticID );
+		types.erase( ( unsigned short )data::ValuePtr<std::string>::staticID );
+		types.erase( ( unsigned short )data::ValuePtr<boost::posix_time::ptime>::staticID );
+		types.erase( ( unsigned short )data::ValuePtr<boost::gregorian::date>::staticID );
+		types.erase( ( unsigned short )data::ValuePtr<util::ilist>::staticID );
+		types.erase( ( unsigned short )data::ValuePtr<util::dlist>::staticID );
+		types.erase( ( unsigned short )data::ValuePtr<util::slist>::staticID );
 
 		for( std::map<unsigned short, std::string>::iterator i = types.begin(); i != types.end(); i++ ) {
 			i->second.resize( i->second.find_last_not_of( '*' ) + 1 );
