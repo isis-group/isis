@@ -293,7 +293,7 @@ public:
 	 * \returns true if the transformation was done, false otherwise
 	 */
 	template<typename DST> bool transform( KeyType from, KeyType to, bool delSource = true ) {
-		check_type<DST>();
+		checkType<DST>();
 		return transform( from, to, Value<DST>::staticID, delSource );
 	}
 

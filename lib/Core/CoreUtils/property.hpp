@@ -50,11 +50,11 @@ public:
 	 */
 	template<typename T> PropertyValue( const T &ref, bool _needed = false ):
 		ValueReference( new Value<T>( ref ) ), m_needed( _needed ) {
-		check_type<T>();
+		checkType<T>();
 	}
 	template<typename T> PropertyValue( const Value<T>& ref, bool _needed = false ):
 		ValueReference( new Value<T>( ref ) ), m_needed( _needed ) {
-		check_type<T>();
+		checkType<T>();
 	}
 	/**
 	 * Empty constructor.
@@ -106,7 +106,7 @@ public:
 	 * \returns true if both contain the same value of type T, false otherwise.
 	 */
 	template<typename T> bool operator ==( const T &second )const {
-		check_type<T>();
+		checkType<T>();
 
 		if ( get()->is<T>() ) { // If I'm of the same type as the comparator
 			const T &cmp = get()->castTo<T>();

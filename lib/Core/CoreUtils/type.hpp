@@ -153,7 +153,7 @@ public:
 	static const unsigned short staticID = _internal::TypeID<TYPE>::value;
 	Value() {
 		BOOST_MPL_ASSERT_RELATION( staticID, < , 0xFF );
-		check_type<TYPE>();
+		checkType<TYPE>();
 	}
 	/**
 	 * Create a Value from any type of value-type.
@@ -163,7 +163,7 @@ public:
 	template<typename T> Value( const T &value ) {
 		m_val = _internal::__cast_to<TYPE>()( this, value );
 		BOOST_MPL_ASSERT_RELATION( staticID, < , 0xFF );
-		check_type<TYPE>();
+		checkType<TYPE>();
 	}
 	std::string toString( bool labeled = false )const {
 		std::string ret;
@@ -265,7 +265,7 @@ public:
 
 template<typename T> const Value<T>& _internal::ValueBase::castToType() const
 {
-	check_type<T>();
+	checkType<T>();
 	return m_cast_to<Value<T> >();
 }
 template<typename T> const T &_internal::ValueBase::castTo() const
@@ -275,7 +275,7 @@ template<typename T> const T &_internal::ValueBase::castTo() const
 }
 template<typename T> Value<T>& _internal::ValueBase::castToType()
 {
-	check_type<T>();
+	checkType<T>();
 	return m_cast_to<Value<T> >();
 }
 template<typename T> T &_internal::ValueBase::castTo()
@@ -286,7 +286,7 @@ template<typename T> T &_internal::ValueBase::castTo()
 
 template<typename T> bool _internal::ValueBase::is()const
 {
-	check_type<T>();
+	checkType<T>();
 	return getTypeID() == Value<T>::staticID;
 }
 

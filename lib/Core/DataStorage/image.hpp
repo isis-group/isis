@@ -299,7 +299,7 @@ public:
 	 * \returns a pair of T storing the minimum and maximum values of the image.
 	 */
 	template<typename T> std::pair<T, T> getMinMaxAs()const {
-		util::check_type<T>();// works only for T from _internal::types
+		util::checkType<T>();// works only for T from _internal::types
 		std::pair<util::ValueReference, util::ValueReference> minmax = getMinMax();
 		return std::make_pair( minmax.first->as<T>(), minmax.second->as<T>() );
 	}

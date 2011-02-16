@@ -310,7 +310,7 @@ public:
 
 template<typename T> bool _internal::ValuePtrBase::is()const
 {
-	util::check_type<T>();
+	util::checkType<T>();
 	return getTypeID() == ValuePtr<T>::staticID;
 }
 

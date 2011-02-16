@@ -59,7 +59,7 @@ template<class T> struct TypeID {
 /// @endcond
 /**
  * Templated pseudo struct to check for availability of a type at compile time.
- * Instanciating this with any datatype (eg: check_type\<short\>() ) will cause the
+ * Instanciating this with any datatype (eg: checkType\<short\>() ) will cause the
  * compiler to raise an error if this datatype is not in the list of the supported types.
  */
 template< typename T > struct checkType {
