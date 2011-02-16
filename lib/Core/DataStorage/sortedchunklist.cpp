@@ -114,25 +114,25 @@ std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::primaryInsert( const 
 	// we dont have this position, but we have the position in scanner-space (indexOrigin)
 	const util::fvector4 &origin = ch.propertyValue( "indexOrigin" )->castTo<util::fvector4>();
 	// and we have the transformation matrix
-	// [ readVec ]
-	// [ phaseVec]
+	// [ rowVec ]
+	// [ columnVec]
 	// [ sliceVec]
 	// [ 0 0 0 1 ]
-	const util::fvector4 &readVec = ch.propertyValue( "readVec" )->castTo<util::fvector4>();
-	const util::fvector4 &phaseVec = ch.propertyValue( "phaseVec" )->castTo<util::fvector4>();
+	const util::fvector4 &rowVec = ch.propertyValue( "rowVec" )->castTo<util::fvector4>();
+	const util::fvector4 &columnVec = ch.propertyValue( "columnVec" )->castTo<util::fvector4>();
 	util::fvector4 sliceVec;
 
 	if( ch.hasProperty( "sliceVec" ) )
 		sliceVec = ch.propertyValue( "sliceVec" )->castTo<util::fvector4>();
 	else {
 		sliceVec = util::fvector4(
-					   readVec[1] * phaseVec[2] - readVec[2] * phaseVec[1],
-					   readVec[2] * phaseVec[0] - readVec[0] * phaseVec[2],
-					   readVec[0] * phaseVec[1] - readVec[1] * phaseVec[0]
+					   rowVec[1] * columnVec[2] - rowVec[2] * columnVec[1],
+					   rowVec[2] * columnVec[0] - rowVec[0] * columnVec[2],
+					   rowVec[0] * columnVec[1] - rowVec[1] * columnVec[0]
 				   );
 	}
 
-	const util::fvector4 key( origin.dot( readVec ), origin.dot( phaseVec ), origin.dot( sliceVec ), origin[3] );
+	const util::fvector4 key( origin.dot( rowVec ), origin.dot( columnVec ), origin.dot( sliceVec ), origin[3] );
 
 	// this is actually not the complete transform (it lacks the scaling for the voxel size), but its enough
 	const scalarPropCompare &secondaryComp = secondarySort.top();

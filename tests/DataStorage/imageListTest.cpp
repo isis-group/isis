@@ -29,8 +29,8 @@ BOOST_AUTO_TEST_CASE ( imageList_chunk_test )
 			data::MemChunk<float> ch( 3, 3, 3 );
 			ch.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, i ) );
 			ch.setPropertyAs( "acquisitionNumber",  i );
-			ch.setPropertyAs( "readVec", util::fvector4( 1, 0 ) );
-			ch.setPropertyAs( "phaseVec", util::fvector4( 0, 1 ) );
+			ch.setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
+			ch.setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
 			ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1 ) );
 			ch.voxel<float>( 0, 0, 0 ) = c + i;
 			chunks.push_back( ch );

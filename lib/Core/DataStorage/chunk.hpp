@@ -202,8 +202,8 @@ public:
 	 * Splices the chunk at the uppermost dimension and automatically sets indexOrigin and acquisitionNumber appropriately.
 	 * This automatically selects the upermost dimension of the chunk to be spliced and will compute the correct offsets
 	 * for indexOrigin and acquisitionNumberOffset which will be applied to the resulting splices.
-	 * E.g. splice\(1\) on a chunk of the size 512x512x128, the readVec 1,0,0, the phaseVec 0,1,0 and the indexOrigin 0,0,0
-	 * will result in 128 chunks of the size 512x512x1, the readVec 1,0,0, the phaseVec 0,1,0 and the indexOrigin 0,0,0 to 0,0,128.
+	 * E.g. splice\(1\) on a chunk of the size 512x512x128, the rowVec 1,0,0, the columnVec 0,1,0 and the indexOrigin 0,0,0
+	 * will result in 128 chunks of the size 512x512x1, the rowVec 1,0,0, the columnVec 0,1,0 and the indexOrigin 0,0,0 to 0,0,128.
 	 * (If voxelSize is 1,1,1 and voxelGap is 0,0,0)
 	 * (acquisitionNumber will be reset to a simple incrementing counter starting at acquisitionNumberOffset)
 	 */

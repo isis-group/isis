@@ -198,7 +198,7 @@ public:
 		ni.data = NULL;
 		ni.fname = const_cast<char *>( filename.c_str() );
 		//orientation in isis LPS - but in nifti everything relative to RAS
-		// - so let's change read/phase direction and sign of indexOrigin
+		// - so let's change row/column direction and sign of indexOrigin
 		//now we try to transform
 		boost::numeric::ublas::matrix<float> matrix( 3, 3 );
 		matrix( 0, 0 ) = -1;
@@ -310,9 +310,9 @@ public:
 	 ****************************************/
 private:
 
-	void geometryFromNifti( util::PropertyValue &read, util::PropertyValue &phase, util::PropertyValue &slice, const mat44 &geo, const util::fvector4 &div ) {
-		read->castTo<util::fvector4>() = util::fvector4( geo.m[0][0], geo.m[1][0], geo.m[2][0], geo.m[3][0] ) / div[0];
-		phase->castTo<util::fvector4>() = util::fvector4( geo.m[0][1], geo.m[1][1], geo.m[2][1], geo.m[3][1] ) / div[1];
+	void geometryFromNifti( util::PropertyValue &row, util::PropertyValue &column, util::PropertyValue &slice, const mat44 &geo, const util::fvector4 &div ) {
+		row->castTo<util::fvector4>() = util::fvector4( geo.m[0][0], geo.m[1][0], geo.m[2][0], geo.m[3][0] ) / div[0];
+		column->castTo<util::fvector4>() = util::fvector4( geo.m[0][1], geo.m[1][1], geo.m[2][1], geo.m[3][1] ) / div[1];
 		slice->castTo<util::fvector4>() = util::fvector4( geo.m[0][2], geo.m[1][2], geo.m[2][2], geo.m[3][2] ) / div[2];
 	}
 
@@ -326,7 +326,7 @@ private:
 			//retChunk.setPropertyAs("acquisitionTime", );
 			retChunk.setPropertyAs<uint32_t>( "acquisitionNumber", t );
 			retChunk.setPropertyAs<uint16_t>( "sequenceNumber", 1 );
-			// in nifti everything should be relative to RAS, in isis we use LPS coordinates - normally change read/phase dir and sign of indexOrigin
+			// in nifti everything should be relative to RAS, in isis we use LPS coordinates - normally change row/column dir and sign of indexOrigin
 			//TODO: has to be tested with different niftis - don't trust them!!!!!!!!!
 			retChunk.setPropertyAs( "indexOrigin", util::fvector4( ni.qoffset_x, ni.qoffset_y, ni.qoffset_z, 0 ) );
 
@@ -336,37 +336,37 @@ private:
 
 			if( ni.sform_code ) {
 				geometryFromNifti(
-					retChunk.setPropertyAs( "readVec", util::fvector4() ),
-					retChunk.setPropertyAs( "phaseVec", util::fvector4() ),
+					retChunk.setPropertyAs( "rowVec", util::fvector4() ),
+					retChunk.setPropertyAs( "columnVec", util::fvector4() ),
 					retChunk.setPropertyAs( "sliceVec", util::fvector4() ),
 					ni.sto_xyz, voxel_size
 				);
 				LOG( Debug, info ) << "Using sto_xyz as primary orientation "
-								   << retChunk.propertyValue( "readVec" ) << " " << retChunk.propertyValue( "phaseVec" ) << retChunk.propertyValue( "sliceVec" );
+								   << retChunk.propertyValue( "rowVec" ) << " " << retChunk.propertyValue( "columnVec" ) << retChunk.propertyValue( "sliceVec" );
 
 				if( ni.qform_code ) {
 					geometryFromNifti(
-						retChunk.setPropertyAs( "nifti/qreadVec", util::fvector4() ),
-						retChunk.setPropertyAs( "nifti/qphaseVec", util::fvector4() ),
+						retChunk.setPropertyAs( "nifti/qrowVec", util::fvector4() ),
+						retChunk.setPropertyAs( "nifti/qcolumnVec", util::fvector4() ),
 						retChunk.setPropertyAs( "nifti/qsliceVec", util::fvector4() ),
 						ni.qto_xyz, voxel_size
 					);
 					LOG( Debug, info ) << "Using qto_xyz as secondary orientation "
-									   << retChunk.propertyValue( "nifti/qreadVec" ) << " " << retChunk.propertyValue( "nifti/qphaseVec" ) << retChunk.propertyValue( "nifti/qsliceVec" );
+									   << retChunk.propertyValue( "nifti/qrowVec" ) << " " << retChunk.propertyValue( "nifti/qcolumnVec" ) << retChunk.propertyValue( "nifti/qsliceVec" );
 				}
 			} else if( ni.qform_code ) {
 				geometryFromNifti(
-					retChunk.setPropertyAs( "readVec", util::fvector4() ),
-					retChunk.setPropertyAs( "phaseVec", util::fvector4() ),
+					retChunk.setPropertyAs( "rowVec", util::fvector4() ),
+					retChunk.setPropertyAs( "columnVec", util::fvector4() ),
 					retChunk.setPropertyAs( "sliceVec", util::fvector4() ),
 					ni.qto_xyz, voxel_size
 				);
 				LOG( Debug, info ) << "Using qto_xyz as primary orientation "
-								   << retChunk.propertyValue( "readVec" ) << " " << retChunk.propertyValue( "phaseVec" ) << retChunk.propertyValue( "sliceVec" );
+								   << retChunk.propertyValue( "rowVec" ) << " " << retChunk.propertyValue( "columnVec" ) << retChunk.propertyValue( "sliceVec" );
 			} else {
 				LOG( Runtime, warning ) << "Neigther sform_code nor qform_code are set, using identity matrix for geometry";
-				retChunk.setPropertyAs( "readVec",  util::fvector4( 1, 0, 0 ) );
-				retChunk.setPropertyAs( "phaseVec", util::fvector4( 0, 1, 0 ) );
+				retChunk.setPropertyAs( "rowVec",  util::fvector4( 1, 0, 0 ) );
+				retChunk.setPropertyAs( "columnVec", util::fvector4( 0, 1, 0 ) );
 				retChunk.setPropertyAs( "sliceVec", util::fvector4( 0, 0, 1 ) );
 			}
 
@@ -395,9 +395,9 @@ private:
 			//just some LOGS
 			LOG( ImageIoLog, info ) << "dims at all " << dimensions;
 			LOG( ImageIoLog, info ) << "Offset values from nifti" << offsets;
-			LOG( ImageIoLog, info ) << "FOV read/phase/slice/voxelsize:"
-									<< retChunk.propertyValue( "readVec" ).toString( false )
-									<< " / " << retChunk.propertyValue( "phaseVec" ).toString( false )
+			LOG( ImageIoLog, info ) << "FOV row/column/slice/voxelsize:"
+									<< retChunk.propertyValue( "rowVec" ).toString( false )
+									<< " / " << retChunk.propertyValue( "columnVec" ).toString( false )
 									<< " / " << retChunk.propertyValue( "sliceVec" ).toString( false )
 									<< " / " << voxel_size;
 		}
@@ -539,10 +539,10 @@ private:
 		ni.cal_max = minmax.second;
 	}
 
-	void geometryToNifti( const util::fvector4 &read, const util::fvector4 &phase, const util::fvector4 &slice, const util::fvector4 &offset, mat44 &geo, const util::fvector4 &factor ) {
+	void geometryToNifti( const util::fvector4 &row, const util::fvector4 &column, const util::fvector4 &slice, const util::fvector4 &offset, mat44 &geo, const util::fvector4 &factor ) {
 		for ( int y = 0; y < 3; y++ ) {
-			geo.m[y][0] = read[y] * factor[0];
-			geo.m[y][1] = phase[y] * factor[1];
+			geo.m[y][0] = row[y] * factor[0];
+			geo.m[y][1] = column[y] * factor[1];
 			geo.m[y][2] = slice[y] * factor[2];
 			geo.m[y][3] = offset[y];
 		}
@@ -585,8 +585,8 @@ private:
 		ni.nz = ni.dim[3] = dimensions[2];
 		ni.nt = ni.dim[4] = dimensions[3];
 		ni.nvox = image.getVolume();
-		util::fvector4 readVec = image.getPropertyAs<util::fvector4>( "readVec" );
-		util::fvector4 phaseVec = image.getPropertyAs<util::fvector4>( "phaseVec" );
+		util::fvector4 rowVec = image.getPropertyAs<util::fvector4>( "rowVec" );
+		util::fvector4 columnVec = image.getPropertyAs<util::fvector4>( "columnVec" );
 		util::fvector4 sliceVec = image.getPropertyAs<util::fvector4>( "sliceVec" );
 		util::fvector4 indexOrigin = image.getPropertyAs<util::fvector4>( "indexOrigin" );
 
@@ -630,16 +630,16 @@ private:
 		//create space tranformation matrices - transforms the space when reading _NOT_ the data
 		// thus ni.qto_xyz describes the orientation of the scanner space in the image space, not the orientation of image in the scanner space
 		//      ni.sform_code = ni.qform_code = NIFTI_XFORM_SCANNER_ANAT;//set scanner aligned space from nifti1.h
-		LOG( Debug, info ) << "ReadVec " << readVec << "  phaseVec" << phaseVec << "sliceVec" << sliceVec;
+		LOG( Debug, info ) << "rowVec " << rowVec << "  columnVec" << columnVec << "sliceVec" << sliceVec;
 
 
 		if( ni.sform_code ) { // if sform_code was set - sform was used as geometry
-			geometryToNifti( readVec, phaseVec, sliceVec, indexOrigin, ni.sto_xyz, voxelSizeVector + voxelGap );
+			geometryToNifti( rowVec, columnVec, sliceVec, indexOrigin, ni.sto_xyz, voxelSizeVector + voxelGap );
 
 			if( ni.qform_code ) { // if both was set - qform would be stored in "nifti/"
 				geometryToNifti(
-					image.getPropertyAs<util::fvector4>( "nifti/qreadVec" ),
-					image.getPropertyAs<util::fvector4>( "nifti/qphaseVec" ),
+					image.getPropertyAs<util::fvector4>( "nifti/qrowVec" ),
+					image.getPropertyAs<util::fvector4>( "nifti/qcolumnVec" ),
 					image.getPropertyAs<util::fvector4>( "nifti/qsliceVec" ),
 					indexOrigin, ni.qto_xyz, util::fvector4( 1, 1, 1 )
 				);
@@ -648,7 +648,7 @@ private:
 			if( !ni.qform_code ) //if none was set, default qform to NIFTI_XFORM_SCANNER_ANAT
 				ni.qform_code = NIFTI_XFORM_SCANNER_ANAT;
 
-			geometryToNifti( readVec, phaseVec, sliceVec, indexOrigin, ni.qto_xyz, util::fvector4( 1, 1, 1 ) );
+			geometryToNifti( rowVec, columnVec, sliceVec, indexOrigin, ni.qto_xyz, util::fvector4( 1, 1, 1 ) );
 		}
 
 		if( ni.qform_code ) {

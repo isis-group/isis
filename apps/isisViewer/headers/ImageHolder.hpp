@@ -66,12 +66,12 @@ public:
 	void setImages( util::PropertyMap, std::vector<vtkSmartPointer<vtkImageData> > );
 	void setPtrToViewer( const boost::shared_ptr<ViewControl> ptr ) { m_PtrToViewer = ptr; }
 
-	void setReadVec( const isis::util::fvector4 &read ) { m_readVec = read; }
-	void setPhaseVec( const isis::util::fvector4 &phase ) { m_phaseVec = phase; }
+	void setRowVec( const isis::util::fvector4 &row ) { m_rowVec = row; }
+	void setColumnVec( const isis::util::fvector4 &column ) { m_columnVec = column; }
 	void setSliceVec( const isis::util::fvector4 &slice ) { m_sliceVec = slice; }
 
-	isis::util::fvector4 getReadVec() const { return m_readVec; }
-	isis::util::fvector4 getPhaseVec() const { return m_phaseVec; }
+	isis::util::fvector4 getRowVec() const { return m_rowVec; }
+	isis::util::fvector4 getColumnVec() const { return m_columnVec; }
 	isis::util::fvector4 getSliceVec() const { return m_sliceVec; }
 
 	vtkImageData *getVTKImageData() const { return m_ImageVector[m_currentTimestep]; }
@@ -124,8 +124,8 @@ private:
 
 	std::vector<size_t> m_BiggestElemVec;
 
-	isis::util::fvector4 m_readVec;
-	isis::util::fvector4 m_phaseVec;
+	isis::util::fvector4 m_rowVec;
+	isis::util::fvector4 m_columnVec;
 	isis::util::fvector4 m_sliceVec;
 	util::fvector4 m_pseudoOrigin;
 	util::fvector4 m_transformedOrigin;

@@ -29,8 +29,8 @@ public:
 				ch.setPropertyAs<uint32_t>( "acquisitionNumber", i );
 				ch.setPropertyAs<uint16_t>( "sequenceNumber", c );
 				ch.setPropertyAs( "performingPhysician", std::string( "Dr. Jon Doe" ) );
-				ch.setPropertyAs( "readVec", util::fvector4(   ( float )1 / sqrtf( 2 ), ( float )1 / sqrtf( 2 ) ) ); //rotated by pi/4 (45°)
-				ch.setPropertyAs( "phaseVec", util::fvector4( ( float ) - 1 / sqrtf( 2 ), ( float )1 / sqrtf( 2 ) ) );
+				ch.setPropertyAs( "rowVec", util::fvector4(   ( float )1 / sqrtf( 2 ), ( float )1 / sqrtf( 2 ) ) ); //rotated by pi/4 (45°)
+				ch.setPropertyAs( "columnVec", util::fvector4( ( float ) - 1 / sqrtf( 2 ), ( float )1 / sqrtf( 2 ) ) );
 				ch.setPropertyAs( "sliceVec", util::fvector4( 0, 0, 1 ) );
 				ch.setPropertyAs( "voxelSize", util::fvector4( 1, 2, 3 ) );
 				ch.setPropertyAs( "repetitionTime", 1234 );

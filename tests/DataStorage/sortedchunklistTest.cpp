@@ -15,15 +15,15 @@ namespace test
 
 BOOST_AUTO_TEST_CASE ( chunklist_insert_test )
 {
-	data::_internal::SortedChunkList chunks( "indexOrigin", "readVec,phaseVec,sliceVec,coilChannelMask,sequenceNumber" );
+	data::_internal::SortedChunkList chunks( "indexOrigin", "rowVec,columnVec,sliceVec,coilChannelMask,sequenceNumber" );
 	chunks.addSecondarySort( "acquisitionNumber" );
 	chunks.addSecondarySort( "acquisitionTime" );
 
 	data::MemChunk<float> ch( 4, 4 );
 	ch.setPropertyAs( "acquisitionNumber", 2 );
 	ch.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, 2 ) );
-	ch.setPropertyAs( "readVec", util::fvector4( 1, 0 ) );
-	ch.setPropertyAs( "phaseVec", util::fvector4( 0, 1 ) );
+	ch.setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
+	ch.setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
 	ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1 ) );
 	ch.setPropertyAs( "acquisitionNumber", 2 );
 	ch.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, 2, 0 ) );
@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE ( chunklist_insert_test )
 
 BOOST_AUTO_TEST_CASE ( chunklist_sort_test )
 {
-	data::_internal::SortedChunkList chunks( "indexOrigin", "readVec,phaseVec,sliceVec,coilChannelMask,sequenceNumber" );
+	data::_internal::SortedChunkList chunks( "indexOrigin", "rowVec,columnVec,sliceVec,coilChannelMask,sequenceNumber" );
 	chunks.addSecondarySort( "acquisitionNumber" );
 	chunks.addSecondarySort( "acquisitionTime" );
 
@@ -44,8 +44,8 @@ BOOST_AUTO_TEST_CASE ( chunklist_sort_test )
 			data::MemChunk<float> ch( 3, 3 );
 			ch.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, j, i ) );
 			ch.setPropertyAs( "acquisitionNumber", 0 );
-			ch.setPropertyAs( "READVec", util::fvector4( 1, 0 ) );
-			ch.setPropertyAs( "phaseVec", util::fvector4( 0, 1 ) );
+			ch.setPropertyAs( "ROWVec", util::fvector4( 1, 0 ) );
+			ch.setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
 			ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1 ) );
 
 			BOOST_REQUIRE( chunks.insert( ch ) );
@@ -75,8 +75,8 @@ BOOST_AUTO_TEST_CASE ( chunklist_sort_test )
 			data::MemChunk<float> ch( 3, 3 );
 			ch.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, j, i ) );
 			ch.setPropertyAs( "acquisitionNumber", 1 );
-			ch.setPropertyAs( "readVec", util::fvector4( 1, 0 ) );
-			ch.setPropertyAs( "phaseVec", util::fvector4( 0, 1 ) );
+			ch.setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
+			ch.setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
 			ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1 ) );
 
 
@@ -104,7 +104,7 @@ BOOST_AUTO_TEST_CASE ( chunklist_sort_test )
 //  chTime.setProperty( "indexOrigin", util::fvector4( 0, 0, 0, 0 ) );
 //  {
 //      // inserting a not-first chunk which lacks the current secondary sort property should fail
-//      data::_internal::SortedChunkList chunks( "indexOrigin", "readVec,phaseVec,sliceVec,coilChannelMask,sequenceNumber" );
+//      data::_internal::SortedChunkList chunks( "indexOrigin", "rowVec,columnVec,sliceVec,coilChannelMask,sequenceNumber" );
 //      chunks.addSecondarySort( "acquisitionNumber" );
 //      chunks.addSecondarySort( "acquisitionTime" );
 //      BOOST_REQUIRE( chunks.insert( chTime ) ); // this is ok - has "acquisitionTime" which is the top secondary sort-property
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE ( chunklist_sort_test )
 //  }
 //  {
 //      // inserting a not-first chunk which lacks the fallback secondary sort property should fail
-//      data::_internal::SortedChunkList chunks( "indexOrigin", "readVec,phaseVec,sliceVec,coilChannelMask,sequenceNumber" );
+//      data::_internal::SortedChunkList chunks( "indexOrigin", "rowVec,columnVec,sliceVec,coilChannelMask,sequenceNumber" );
 //      chunks.addSecondarySort( "acquisitionNumber" );
 //      chunks.addSecondarySort( "acquisitionTime" );
 //      // this is ok - has "acquisitionNumber" to which the sorting will fallback

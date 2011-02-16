@@ -132,7 +132,7 @@ public:
 	 * If the requested voxel is not of type T, an error will be raised.
 	 *
 	 * \param first The first coordinate in voxel space. Usually the x value / the read-encoded position..
-	 * \param second The second coordinate in voxel space. Usually the y value / the phase-encoded position.
+	 * \param second The second coordinate in voxel space. Usually the y value / the column-encoded position.
 	 * \param third The third coordinate in voxel space. Ususally the z value / the time-encoded position.
 	 * \param fourth The fourth coordinate in voxel space. Usually the time value.
 	 *
@@ -150,7 +150,7 @@ public:
 	 * Get a const reference to the voxel value at the given coordinates.
 	 *
 	 * \param first The first coordinate in voxel space. Usually the x value / the read-encoded position..
-	 * \param second The second coordinate in voxel space. Usually the y value / the phase-encoded position.
+	 * \param second The second coordinate in voxel space. Usually the y value / the column-encoded position.
 	 * \param third The third coordinate in voxel space. Ususally the z value / the time-encoded position.
 	 * \param fourth The fourth coordinate in voxel space. Usually the time value.
 	 *
@@ -192,7 +192,7 @@ public:
 	 * If the image is not clean, behaviour is undefined. (See Image::commonGet).
 	 *
 	 * \param first The first coordinate in voxel space. Usually the x value / the read-encoded position.
-	 * \param second The second coordinate in voxel space. Usually the y value / the phase-encoded position.
+	 * \param second The second coordinate in voxel space. Usually the y value / the column-encoded position.
 	 * \param third The third coordinate in voxel space. Ususally the z value / the slice-encoded position.
 	 * \param fourth The fourth coordinate in voxel space. Usually the time value.
 	 * \param copy_metadata if true the metadata of the image are merged into the returned chunk

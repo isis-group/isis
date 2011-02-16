@@ -31,7 +31,7 @@ namespace isis
 namespace data
 {
 
-Image::Image ( ) : set( "indexOrigin", "sequenceNumber,readVec,phaseVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ), clean( false )
+Image::Image ( ) : set( "indexOrigin", "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ), clean( false )
 {
 	addNeededFromString( neededProperties );
 	set.addSecondarySort( "acquisitionNumber" );
@@ -190,7 +190,7 @@ bool Image::reIndex()
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	//reconstruct some redundant information, if its missing
 	//////////////////////////////////////////////////////////////////////////////////////////////////
-	const util::PropertyMap::KeyType vectors[] = {"readVec", "phaseVec", "sliceVec"};
+	const util::PropertyMap::KeyType vectors[] = {"rowVec", "columnVec", "sliceVec"};
 	BOOST_FOREACH( const util::PropertyMap::KeyType & ref, vectors ) {
 		if ( hasProperty( ref ) ) {
 			util::PropertyValue &prop = propertyValue( ref );
@@ -262,28 +262,28 @@ bool Image::reIndex()
 		}
 	}
 
-	//if we have read- and phase- vector
-	if ( hasProperty( "readVec" ) && hasProperty( "phaseVec" ) ) {
-		util::fvector4 &read = propertyValue( "readVec" )->castTo<util::fvector4>();
-		util::fvector4 &phase = propertyValue( "phaseVec" )->castTo<util::fvector4>();
-		LOG_IF( read.dot( phase ) > 0.01, Runtime, warning ) << "The cosine between the columns and the rows of the image is bigger than 0.01";
+	//if we have row- and column- vector
+	if ( hasProperty( "rowVec" ) && hasProperty( "columnVec" ) ) {
+		util::fvector4 &row = propertyValue( "rowVec" )->castTo<util::fvector4>();
+		util::fvector4 &column = propertyValue( "columnVec" )->castTo<util::fvector4>();
+		LOG_IF( row.dot( column ) > 0.01, Runtime, warning ) << "The cosine between the columns and the rows of the image is bigger than 0.01";
 		const util::fvector4 crossVec = util::fvector4( //we could use their cross-product as sliceVector
-											read[1] * phase[2] - read[2] * phase[1],
-											read[2] * phase[0] - read[0] * phase[2],
-											read[0] * phase[1] - read[1] * phase[0]
+											row[1] * column[2] - row[2] * column[1],
+											row[2] * column[0] - row[0] * column[2],
+											row[0] * column[1] - row[1] * column[0]
 										);
 
 		if ( hasProperty( "sliceVec" ) ) {
 			util::fvector4 &sliceVec = propertyValue( "sliceVec" )->castTo<util::fvector4>(); //get the slice vector
 			LOG_IF( ! crossVec.fuzzyEqual( sliceVec, 1000 ), Runtime, warning )
 					<< "The existing sliceVec " << sliceVec
-					<< " differs from the cross product of the read- and phase vector " << crossVec;
+					<< " differs from the cross product of the row- and column vector " << crossVec;
 		} else {
 			// We dont know anything about the slice-direction
-			// we just guess its along the positive cross-product between read- and phase direction
+			// we just guess its along the positive cross-product between row- and column direction
 			// so at least warn the user if we do that long shot
 			LOG( Runtime, info )
-					<< "used the cross product between readVec and phaseVec as sliceVec:"
+					<< "used the cross product between rowVec and columnVec as sliceVec:"
 					<< crossVec << ". That might be wrong!";
 			setPropertyAs( "sliceVec", crossVec );
 		}
@@ -546,15 +546,15 @@ size_t Image::compare( const isis::data::Image &comp ) const
 Image::orientation Image::getMainOrientation()const
 {
 	LOG_IF( ! isValid() || ! clean, Debug, warning ) << "You should not run this on non clean image. Run reIndex first.";
-	util::fvector4 read = getPropertyAs<util::fvector4>( "readVec" );
-	util::fvector4 phase = getPropertyAs<util::fvector4>( "phaseVec" );
-	read.norm();
-	phase.norm();
-	LOG_IF( read.dot( phase ) > 0.01, Runtime, warning ) << "The cosine between the columns and the rows of the image is bigger than 0.01";
+	util::fvector4 row = getPropertyAs<util::fvector4>( "rowVec" );
+	util::fvector4 column = getPropertyAs<util::fvector4>( "columnVec" );
+	row.norm();
+	column.norm();
+	LOG_IF( row.dot( column ) > 0.01, Runtime, warning ) << "The cosine between the columns and the rows of the image is bigger than 0.01";
 	const util::fvector4 crossVec = util::fvector4(
-										read[1] * phase[2] - read[2] * phase[1],
-										read[2] * phase[0] - read[0] * phase[2],
-										read[0] * phase[1] - read[1] * phase[0]
+										row[1] * column[2] - row[2] * column[1],
+										row[2] * column[0] - row[0] * column[2],
+										row[0] * column[1] - row[1] * column[0]
 									);
 	const util::fvector4 x( 1, 0 ), y( 0, 1 ), z( 0, 0, 1 );
 	double a_axial    = std::acos( crossVec.dot( z ) ) / M_PI;
@@ -646,7 +646,7 @@ size_t Image::spliceDownTo( dimensions dim ) //readDim = 0, phaseDim, sliceDim, 
 		size[i] = 1;
 
 	// get a list of needed properties (everything which is missing in a newly created chunk plus everything which is needed for autosplice)
-	const std::list<util::PropertyMap::KeyType> splice_needed = util::stringToList<util::PropertyMap::KeyType>( util::PropertyMap::KeyType( "voxelSize,voxelGap,readVec,phaseVec,sliceVec,indexOrigin,acquisitionNumber" ), ',' );
+	const std::list<util::PropertyMap::KeyType> splice_needed = util::stringToList<util::PropertyMap::KeyType>( util::PropertyMap::KeyType( "voxelSize,voxelGap,rowVec,columnVec,sliceVec,indexOrigin,acquisitionNumber" ), ',' );
 	util::PropertyMap::KeyList needed = MemChunk<short>( 1 ).getMissing();
 	needed.insert( splice_needed.begin(), splice_needed.end() );
 	struct splicer {

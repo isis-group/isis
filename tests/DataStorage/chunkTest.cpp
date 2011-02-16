@@ -97,9 +97,9 @@ BOOST_AUTO_TEST_CASE ( chunk_property_test )
 	BOOST_CHECK( !ch.isValid() );
 	ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 	BOOST_CHECK( !ch.isValid() );
-	ch.setPropertyAs( "readVec", pos );
+	ch.setPropertyAs( "rowVec", pos );
 	BOOST_CHECK( !ch.isValid() );
-	ch.setPropertyAs( "phaseVec", pos );
+	ch.setPropertyAs( "columnVec", pos );
 	BOOST_CHECK( ch.isValid() );
 	//properties shall not be case sensitive
 	BOOST_CHECK( ch.hasProperty( "indexorigin" ) );
@@ -235,8 +235,8 @@ BOOST_AUTO_TEST_CASE ( chunk_splice_test )//Copy chunks
 {
 	data::MemChunk<float> ch1( 3, 3, 3 );
 	ch1.setPropertyAs( "indexOrigin", util::fvector4( 1, 1, 1 ) );
-	ch1.setPropertyAs( "readVec", util::fvector4( 1, 0, 0 ) );
-	ch1.setPropertyAs( "phaseVec", util::fvector4( 0, 1, 0 ) );
+	ch1.setPropertyAs( "rowVec", util::fvector4( 1, 0, 0 ) );
+	ch1.setPropertyAs( "columnVec", util::fvector4( 0, 1, 0 ) );
 	ch1.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1 ) );
 	ch1.setPropertyAs( "voxelGap", util::fvector4( 1, 1, 1 ) );
 	ch1.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
@@ -258,8 +258,8 @@ BOOST_AUTO_TEST_CASE ( chunk_swap_test )
 	//TODO
 	//  data::MemChunk<float> ch1( 3, 3, 3, 1 );
 	//  ch1.setPropertyAs( "indexOrigin", util::fvector4( 1, 1, 1, 1 ) );
-	//  ch1.setPropertyAs( "readVec", util::fvector4( 1, 0, 0 ) );
-	//  ch1.setPropertyAs( "phaseVec", util::fvector4( 0, 1, 0 ) );
+	//  ch1.setPropertyAs( "rowVec", util::fvector4( 1, 0, 0 ) );
+	//  ch1.setPropertyAs( "columnVec", util::fvector4( 0, 1, 0 ) );
 	//  ch1.setPropertyAs( "sliceVec", util::fvector4( 0, 0, 1 ) );
 	//  ch1.setPropertyAs( "dummyProp", std::string( "dummy" ) );
 	//
@@ -273,8 +273,8 @@ BOOST_AUTO_TEST_CASE ( chunk_swap_test )
 	//  for ( size_t dim = 0; dim < 3; dim++ ) {
 	//      ch1.swapAlong( ch2, dim, false );
 	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "indexOrigin" ), ch2.getPropertyAs<util::fvector4>( "indexOrigin" ) );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "readVec" ), ch2.getPropertyAs<util::fvector4>( "readVec" ) );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "phaseVec" ), ch2.getPropertyAs<util::fvector4>( "phaseVec" ) );
+	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "rowVec" ), ch2.getPropertyAs<util::fvector4>( "rowVec" ) );
+	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "columnVec" ), ch2.getPropertyAs<util::fvector4>( "columnVec" ) );
 	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "sliceVec" ), ch2.getPropertyAs<util::fvector4>( "sliceVec" ) );
 	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<std::string>( "dummyProp" ), ch2.getPropertyAs<std::string>( "dummyProp" ) );
 	//      ch2.swapAlong( ch3, dim, false );
@@ -288,14 +288,14 @@ BOOST_AUTO_TEST_CASE ( chunk_swap_test )
 	//  for ( size_t dim = 0; dim < 3; dim++ ) {
 	//      ch1.swapAlong( ch2, dim, true );
 	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "indexOrigin" )[dim], -ch2.getPropertyAs<util::fvector4>( "indexOrigin" )[dim] );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "readVec" )[dim], -ch2.getPropertyAs<util::fvector4>( "readVec" )[dim] );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "phaseVec" )[dim], -ch2.getPropertyAs<util::fvector4>( "phaseVec" )[dim] );
+	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "rowVec" )[dim], -ch2.getPropertyAs<util::fvector4>( "rowVec" )[dim] );
+	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "columnVec" )[dim], -ch2.getPropertyAs<util::fvector4>( "columnVec" )[dim] );
 	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "sliceVec" )[dim], -ch2.getPropertyAs<util::fvector4>( "sliceVec" )[dim] );
 	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<std::string>( "dummyProp" ), ch2.getPropertyAs<std::string>( "dummyProp" ) );
 	//      ch2.swapAlong( ch3, dim, true );
 	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "indexOrigin" ), ch3.getPropertyAs<util::fvector4>( "indexOrigin" ) );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "readVec" ), ch3.getPropertyAs<util::fvector4>( "readVec" ) );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "phaseVec" ), ch3.getPropertyAs<util::fvector4>( "phaseVec" ) );
+	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "rowVec" ), ch3.getPropertyAs<util::fvector4>( "rowVec" ) );
+	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "columnVec" ), ch3.getPropertyAs<util::fvector4>( "columnVec" ) );
 	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "sliceVec" ), ch3.getPropertyAs<util::fvector4>( "sliceVec" ) );
 	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<std::string>( "dummyProp" ), ch3.getPropertyAs<std::string>( "dummyProp" ) );
 	//

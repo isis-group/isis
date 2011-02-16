@@ -52,11 +52,11 @@ int main( int argc, char **argv )
 	BOOST_FOREACH( data::Image &refImage, app.images ) {
 		//map from pyhisical into image space
 		util::fvector4 sliceVec = refImage.getPropertyAs<util::fvector4>( "sliceVec" );
-		util::fvector4 phaseVec = refImage.getPropertyAs<util::fvector4>( "phaseVec" );
-		util::fvector4 readVec = refImage.getPropertyAs<util::fvector4>( "readVec" );
-		util::fvector4 f1( readVec[0], phaseVec[0], sliceVec[0], 0  );
-		util::fvector4 f2( readVec[1], phaseVec[1], sliceVec[1], 0  );
-		util::fvector4 f3( readVec[2], phaseVec[2], sliceVec[2], 0  );
+		util::fvector4 columnVec = refImage.getPropertyAs<util::fvector4>( "columnVec" );
+		util::fvector4 rowVec = refImage.getPropertyAs<util::fvector4>( "rowVec" );
+		util::fvector4 f1( rowVec[0], columnVec[0], sliceVec[0], 0  );
+		util::fvector4 f2( rowVec[1], columnVec[1], sliceVec[1], 0  );
+		util::fvector4 f3( rowVec[2], columnVec[2], sliceVec[2], 0  );
 
 		if( dim == 3 ) {
 			dim = getBiggestVecElem( f1 );

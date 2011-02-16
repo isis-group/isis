@@ -25,10 +25,10 @@ void transformCoords( isis::util::PropertyMap &properties, boost::numeric::ublas
 {
 	// this implementation assumes that the PropMap properties is either a
 	// data::Chunk or a data::Image object. Hence it should contain the
-	// properties readVec, phaseVec, sliceVec and indexOrigin.
-	// get read, phase and slice vector from property map
-	isis::util::fvector4 read = properties.getPropertyAs<util::fvector4>( "readVec" );
-	isis::util::fvector4 phase = properties.getPropertyAs<util::fvector4>( "phaseVec" );
+	// properties rowVec, columnVec, sliceVec and indexOrigin.
+	// get row, column and slice vector from property map
+	isis::util::fvector4 row = properties.getPropertyAs<util::fvector4>( "rowVec" );
+	isis::util::fvector4 column = properties.getPropertyAs<util::fvector4>( "columnVec" );
 	isis::util::fvector4 slice = properties.getPropertyAs<util::fvector4>( "sliceVec" );
 	// get index origin from property map
 	isis::util::fvector4 indexorig = properties.getPropertyAs<util::fvector4>( "indexOrigin" );
@@ -38,8 +38,8 @@ void transformCoords( isis::util::PropertyMap &properties, boost::numeric::ublas
 	boost::numeric::ublas::matrix<float> R_in( 3, 3 );
 
 	for( int i = 0; i < 3; i++ ) {
-		R_in( i, 0 ) = read[i];
-		R_in( i, 1 ) = phase[i];
+		R_in( i, 0 ) = row[i];
+		R_in( i, 1 ) = column[i];
 		R_in( i, 2 ) = slice[i];
 	}
 
@@ -48,8 +48,8 @@ void transformCoords( isis::util::PropertyMap &properties, boost::numeric::ublas
 	R_out = boost::numeric::ublas::prod( transform, R_in );
 
 	for ( int i = 0; i < 3; i++ ) {
-		read[i] = R_out( i, 0 );
-		phase[i] = R_out( i, 1 );
+		row[i] = R_out( i, 0 );
+		column[i] = R_out( i, 1 );
 		slice[i] = R_out( i, 2 );
 	}
 
@@ -69,8 +69,8 @@ void transformCoords( isis::util::PropertyMap &properties, boost::numeric::ublas
 
 	// write modified values back into property map
 	properties.setPropertyAs<util::fvector4>( "indexOrigin", indexorig );
-	properties.setPropertyAs<util::fvector4>( "readVec", read );
-	properties.setPropertyAs<util::fvector4>( "phaseVec", phase );
+	properties.setPropertyAs<util::fvector4>( "rowVec", row );
+	properties.setPropertyAs<util::fvector4>( "columnVec", column );
 	properties.setPropertyAs<util::fvector4>( "sliceVec", slice );
 }
 

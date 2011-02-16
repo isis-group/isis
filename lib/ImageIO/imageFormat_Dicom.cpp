@@ -188,7 +188,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, string dialect )
 		if ( hasOrTell( prefix + "PixelSpacing", object, warning ) ) {
 			voxelSize = object.getPropertyAs<util::fvector4>( prefix + "PixelSpacing" );
 			object.remove( prefix + "PixelSpacing" );
-			std::swap( voxelSize[0], voxelSize[1] ); // the values are row-spacing (size in phase dir) /column spacing (size in read dir)
+			std::swap( voxelSize[0], voxelSize[1] ); // the values are row-spacing (size in column dir) /column spacing (size in row dir)
 		}
 
 		if ( hasOrTell( prefix + "SliceThickness", object, warning ) ) {
@@ -220,18 +220,18 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, string dialect )
 		util::dlist buff = object.getPropertyAs<util::dlist>( prefix + "ImageOrientationPatient" );
 
 		if ( buff.size() == 6 ) {
-			util::fvector4 read, phase;
+			util::fvector4 row, column;
 			util::dlist::iterator b = buff.begin();
 
-			for ( int i = 0; i < 3; i++ )read[i] = *b++;
+			for ( int i = 0; i < 3; i++ )row[i] = *b++;
 
-			for ( int i = 0; i < 3; i++ )phase[i] = *b++;
+			for ( int i = 0; i < 3; i++ )column[i] = *b++;
 
-			object.setPropertyAs( "readVec" , read );
-			object.setPropertyAs( "phaseVec", phase );
+			object.setPropertyAs( "rowVec" , row );
+			object.setPropertyAs( "columnVec", column );
 			object.remove( prefix + "ImageOrientationPatient" );
 		} else {
-			LOG( Runtime, error ) << "Could not extract read- and phaseVector from " << object.propertyValue( prefix + "ImageOrientationPatient" );
+			LOG( Runtime, error ) << "Could not extract row- and columnVector from " << object.propertyValue( prefix + "ImageOrientationPatient" );
 		}
 
 		if( object.hasProperty( prefix + "CSAImageHeaderInfo/SliceNormalVector" ) && !object.hasProperty( "sliceVec" ) ) {
@@ -243,9 +243,9 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, string dialect )
 			object.remove( prefix + "CSAImageHeaderInfo/SliceNormalVector" );
 		}
 	} else {
-		LOG( Runtime, warning ) << "Making up read and phase vector, because the image lacks this information";
-		object.setPropertyAs( "readVec" , util::fvector4( 1, 0, 0 ) );
-		object.setPropertyAs( "phaseVec", util::fvector4( 0, 1, 0 ) );
+		LOG( Runtime, warning ) << "Making up row and column vector, because the image lacks this information";
+		object.setPropertyAs( "rowVec" , util::fvector4( 1, 0, 0 ) );
+		object.setPropertyAs( "columnVec", util::fvector4( 0, 1, 0 ) );
 	}
 
 	if ( hasOrTell( prefix + "ImagePositionPatient", object, info ) ) {
@@ -338,10 +338,10 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, string dialect )
 
 	if ( object.hasProperty( prefix + "Unknown Tag(0051,100c)" ) ) { //@todo siemens only ?
 		std::string fov = object.getPropertyAs<std::string>( prefix + "Unknown Tag(0051,100c)" );
-		float read, phase;
+		float row, column;
 
-		if ( std::sscanf( fov.c_str(), "FoV %f*%f", &phase, &read ) == 2 ) {
-			object.setPropertyAs( "fov", util::fvector4( read, phase, invalid_float, invalid_float ) );
+		if ( std::sscanf( fov.c_str(), "FoV %f*%f", &column, &row ) == 2 ) {
+			object.setPropertyAs( "fov", util::fvector4( row, column, invalid_float, invalid_float ) );
 		}
 	}
 }
@@ -379,22 +379,22 @@ int ImageFormat_Dicom::readMosaic( isis::data::Chunk source, list< isis::data::C
 		voxelGap = source.getPropertyAs<util::fvector4>( "voxelGap" );
 
 	const util::fvector4 voxelSize = source.getPropertyAs<util::fvector4>( "voxelSize" );
-	const util::fvector4 &readVec = source.getPropertyAs<util::fvector4>( "readVec" );
-	const util::fvector4 &phaseVec = source.getPropertyAs<util::fvector4>( "phaseVec" );
+	const util::fvector4 &rowVec = source.getPropertyAs<util::fvector4>( "rowVec" );
+	const util::fvector4 &columnVec = source.getPropertyAs<util::fvector4>( "columnVec" );
 	//remove the additional mosaic offset
 	//eg. if there is a 10x10 Mosaic, substract the half size of 9 Images from the offset
 	const util::fvector4 fovCorr = ( voxelSize + voxelGap ) * size * ( matrixSize - 1 ) / 2; // @todo this will not include the voxelGap between the slices
 	util::fvector4 &origin = source.propertyValue( "indexOrigin" )->castTo<util::fvector4>();
-	origin = origin + ( readVec * fovCorr[0] ) + ( phaseVec * fovCorr[1] );
+	origin = origin + ( rowVec * fovCorr[0] ) + ( columnVec * fovCorr[1] );
 	source.remove( NumberOfImagesInMosaicProp ); // we dont need that anymore
 	source.setPropertyAs( prefix + "ImageType", iType );
 
 	// if we dont have a sliceVec - compute it
 	if( !source.hasProperty( "sliceVec" ) ) {
 		const util::fvector4 crossVec = util::fvector4(
-											readVec[1] * phaseVec[2] - readVec[2] * phaseVec[1],
-											readVec[2] * phaseVec[0] - readVec[0] * phaseVec[2],
-											readVec[0] * phaseVec[1] - readVec[1] * phaseVec[0]
+											rowVec[1] * columnVec[2] - rowVec[2] * columnVec[1],
+											rowVec[2] * columnVec[0] - rowVec[0] * columnVec[2],
+											rowVec[0] * columnVec[1] - rowVec[1] * columnVec[0]
 										);
 		source.setPropertyAs( "sliceVec", crossVec );
 		LOG( Debug, info ) << "Computed sliceVec as " << source.propertyValue( "sliceVec" );
@@ -428,12 +428,12 @@ int ImageFormat_Dicom::readMosaic( isis::data::Chunk source, list< isis::data::C
 		data::Chunk &working=dest.back(); // use this as working slice
 
 		// copy the lines into the corresponding slice-chunk
-		for ( size_t phase = 0; phase < size[1]; phase++ ) {
-			const size_t dpos[] = {0, phase, 0, 0}; //begin of the target line
+		for ( size_t column = 0; column < size[1]; column++ ) {
+			const size_t dpos[] = {0, column, 0, 0}; //begin of the target line
 			const size_t column = slice % matrixSize;
 			const size_t row = slice / matrixSize;
-			const size_t sstart[] = {column *size[0], row *size[1] + phase, 0, 0}; //begin of the source line
-			const size_t send[] = {sstart[0] + size[0] - 1, row *size[1] + phase, 0, 0}; //end of the source line
+			const size_t sstart[] = {column *size[0], row *size[1] + column, 0, 0}; //begin of the source line
+			const size_t send[] = {sstart[0] + size[0] - 1, row *size[1] + column, 0, 0}; //end of the source line
 			source.copyRange( sstart, send, working, dpos );
 		}
 

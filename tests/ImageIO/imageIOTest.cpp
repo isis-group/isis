@@ -26,8 +26,8 @@ BOOST_AUTO_TEST_CASE ( imageNameGenTest )
 	ch.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, 2 ) );
 	ch.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
 	ch.setPropertyAs<float>( "acquisitionTime", 0 );
-	ch.setPropertyAs( "readVec", util::fvector4( 1, 0 ) );
-	ch.setPropertyAs( "phaseVec", util::fvector4( 0, 1 ) );
+	ch.setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
+	ch.setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
 	ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 	BOOST_REQUIRE( img.insertChunk( ch ) );
 	img.reIndex();
@@ -47,8 +47,8 @@ BOOST_AUTO_TEST_CASE ( imageUniqueName )
 	ch1.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, 2 ) );
 	ch1.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
 	ch1.setPropertyAs<float>( "acquisitionTime", 0 );
-	ch1.setPropertyAs( "readVec", util::fvector4( 1, 0 ) );
-	ch1.setPropertyAs( "phaseVec", util::fvector4( 0, 1 ) );
+	ch1.setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
+	ch1.setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
 	ch1.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 
 	for( uint32_t i = 0; i < 5; i++ ) { // make some copies of ch1 - change their acquisitionNumber and put the into the list

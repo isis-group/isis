@@ -212,23 +212,23 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 
 	switch( atDim ) { // init offset with the given direction
 	case readDim :
-		offset = this->propertyValue( "readVec" )->castTo<util::fvector4>();
+		offset = this->propertyValue( "rowVec" )->castTo<util::fvector4>();
 		break;
 	case phaseDim:
-		offset = this->propertyValue( "phaseVec" )->castTo<util::fvector4>();
+		offset = this->propertyValue( "columnVec" )->castTo<util::fvector4>();
 		break;
 	case sliceDim:
 
 		if( this->hasProperty( "sliceVec" ) ) {
 			offset = this->propertyValue( "sliceVec" )->castTo<util::fvector4>();
 		} else {
-			const util::fvector4 read = this->propertyValue( "readVec" )->castTo<util::fvector4>();
-			const util::fvector4 phase = this->propertyValue( "phaseVec" )->castTo<util::fvector4>();
-			assert( util::fuzzyEqual<float>( read.sqlen(), 1 ) );
-			assert( util::fuzzyEqual<float>( phase.sqlen(), 1 ) );
-			offset[0] = read[1] * phase[2] - read[2] * phase[1];
-			offset[1] = read[2] * phase[0] - read[0] * phase[2];
-			offset[2] = read[0] * phase[1] - read[1] * phase[0];
+			const util::fvector4 row = this->propertyValue( "rowVec" )->castTo<util::fvector4>();
+			const util::fvector4 column = this->propertyValue( "columnVec" )->castTo<util::fvector4>();
+			assert( util::fuzzyEqual<float>( row.sqlen(), 1 ) );
+			assert( util::fuzzyEqual<float>( column.sqlen(), 1 ) );
+			offset[0] = row[1] * column[2] - row[2] * column[1];
+			offset[1] = row[2] * column[0] - row[0] * column[2];
+			offset[2] = row[0] * column[1] - row[1] * column[0];
 		}
 
 		break;

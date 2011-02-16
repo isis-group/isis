@@ -129,13 +129,13 @@ void ImageHolder::setImages( util::PropertyMap propMap,  std::vector<vtkSmartPoi
 	LOG( Runtime, info ) << "Image minimum: " << min << "; Image maximum: " << max;
 	m_ScalingFactor = m_PropertyMap.propertyValue( "scale" );
 	m_Offset = m_PropertyMap.propertyValue( "offset" );
-	m_readVec = m_PropertyMap.getPropertyAs<isis::util::fvector4>( "readVec" );
-	m_phaseVec = m_PropertyMap.getPropertyAs<isis::util::fvector4>( "phaseVec" );
+	m_rowVec = m_PropertyMap.getPropertyAs<isis::util::fvector4>( "rowVec" );
+	m_columnVec = m_PropertyMap.getPropertyAs<isis::util::fvector4>( "columnVec" );
 	m_sliceVec = m_PropertyMap.getPropertyAs<isis::util::fvector4>( "sliceVec" );
-	LOG( Runtime, info ) << "readVector: " << m_readVec;
-	LOG( Runtime, info ) << "phaseVector: " << m_phaseVec;
+	LOG( Runtime, info ) << "rowVector: " << m_rowVec;
+	LOG( Runtime, info ) << "columnVector: " << m_columnVec;
 	LOG( Runtime, info ) << "sliceVector: " << m_sliceVec;
-	m_MatrixHandler.setVectors( m_readVec, m_phaseVec, m_sliceVec );
+	m_MatrixHandler.setVectors( m_rowVec, m_columnVec, m_sliceVec );
 	LOG( Runtime, info ) << "spacing[0]: " << m_ImageVector.front()->GetSpacing()[0];
 	m_pseudoOrigin = m_MatrixHandler.createPseudoOrigin( m_PropertyMap.getPropertyAs<util::fvector4>( "imageSize" ), m_PropertyMap.getPropertyAs<util::fvector4>( "voxelSize" ) );
 	m_transformedOrigin = m_MatrixHandler.transformOrigin( m_PropertyMap.getPropertyAs<util::fvector4>( "indexOrigin" ), m_PropertyMap.getPropertyAs<util::fvector4>( "voxelSize" ) );
@@ -175,8 +175,8 @@ void ImageHolder::commonInit( void  )
 	m_ExtractorVector.push_back( m_ExtractSagittal );
 	m_ExtractorVector.push_back( m_ExtractCoronal );
 	m_ExtractorVector.push_back( m_ExtractAxial );
-	m_BiggestElemVec.push_back( getBiggestVecElem<float>( m_readVec ) );
-	m_BiggestElemVec.push_back( getBiggestVecElem<float>( m_phaseVec ) );
+	m_BiggestElemVec.push_back( getBiggestVecElem<float>( m_rowVec ) );
+	m_BiggestElemVec.push_back( getBiggestVecElem<float>( m_columnVec ) );
 	m_BiggestElemVec.push_back( getBiggestVecElem<float>( m_sliceVec ) );
 }
 

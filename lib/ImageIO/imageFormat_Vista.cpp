@@ -656,16 +656,16 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 	vstr << voxels[0] << " " << voxels[1] << " " << voxels[2];
 	VAppendAttr( list, "voxel", NULL, VStringRepn, vstr.str().c_str() );
 	// copy orientation vectors
-	util::fvector4 readVec = image.getPropertyAs<util::fvector4>( "readVec" );
-	util::fvector4 phaseVec = image.getPropertyAs<util::fvector4>( "phaseVec" );
+	util::fvector4 rowVec = image.getPropertyAs<util::fvector4>( "rowVec" );
+	util::fvector4 columnVec = image.getPropertyAs<util::fvector4>( "columnVec" );
 	util::fvector4 sliceVec = image.getPropertyAs<util::fvector4>( "sliceVec" );
-	// set readVec -> columnVec
+	// set rowVec -> columnVec
 	vstr.str( "" );
-	vstr << readVec[0] << " " << readVec[1] << " " << readVec[2];
+	vstr << rowVec[0] << " " << rowVec[1] << " " << rowVec[2];
 	VAppendAttr( list, "columnVec", NULL, VStringRepn, vstr.str().c_str() );
-	// set phase -> rowVec
+	// set column -> rowVec
 	vstr.str( "" );
-	vstr << phaseVec[0] << " " << phaseVec[1] << " " << phaseVec[2];
+	vstr << columnVec[0] << " " << columnVec[1] << " " << columnVec[2];
 	VAppendAttr( list, "rowVec", NULL, VStringRepn, vstr.str().c_str() );
 	// set sliceVec -> sliceVec
 	vstr.str( "" );
@@ -911,10 +911,10 @@ util::fvector4 ImageFormat_Vista::calculateIndexOrigin( data::Chunk &chunk, util
 		-( ( dims[1] - 1 )*voxels[1] ) / 2,
 		-( ( dims[2] - 1 )*voxels[2] ) / 2,
 		0 );
-	util::fvector4 readV = chunk.getPropertyAs<util::fvector4>( "readVec" );
-	util::fvector4 phaseV = chunk.getPropertyAs<util::fvector4>( "phaseVec" );
+	util::fvector4 readV = chunk.getPropertyAs<util::fvector4>( "rowVec" );
+	util::fvector4 phaseV = chunk.getPropertyAs<util::fvector4>( "columnVec" );
 	util::fvector4 sliceV = chunk.getPropertyAs<util::fvector4>( "sliceVec" );
-	// multiply indexOrigin with read, phase and slice vector
+	// multiply indexOrigin with read, column and slice vector
 	util::fvector4 iOrig(
 		readV[0] * ioTmp[0] + phaseV[0] * ioTmp[1] + sliceV[0] * ioTmp[2],
 		readV[1] * ioTmp[0] + phaseV[1] * ioTmp[1] + sliceV[1] * ioTmp[2],
