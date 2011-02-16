@@ -29,7 +29,7 @@ namespace data
 namespace _internal
 {
 
-class ValuePtrBase : public util::_internal::GenericType
+class ValuePtrBase : public util::_internal::GenericValue
 {
 	friend class util::_internal::ValueReference<ValuePtrBase>;
 	static const _internal::ValuePtrConverterMap &converters();

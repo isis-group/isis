@@ -35,7 +35,7 @@ template<typename TYPE> class Value;
 namespace _internal
 {
 
-class GenericType
+class GenericValue
 {
 protected:
 	template<typename T> T &m_cast_to() {
@@ -60,8 +60,8 @@ public:
 	virtual unsigned short getTypeID()const = 0;
 
 	/// \returns true if type of this and second are equal
-	bool isSameType( const GenericType &second )const;
-	virtual ~GenericType() {}
+	bool isSameType( const GenericValue &second )const;
+	virtual ~GenericValue() {}
 };
 
 /**

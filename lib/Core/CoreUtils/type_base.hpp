@@ -62,10 +62,10 @@ template<> struct __cast_to<uint8_t> { // we cannot lexical_cast to uint8_t - we
 /*
  * This is the mostly abstract base class for all scalar values (see types.hpp).
  * Additionally, there's the ValuePtrBase containing the more complex data handling stuff with abstract values. 
- * Both are derived from GenericType containing the description of the actual value type.
+ * Both are derived from GenericValue containing the description of the actual value type.
  */
 
-class ValueBase : public GenericType
+class ValueBase : public GenericValue
 {
 	static const ValueConverterMap &converters();
 	friend class ValueReference<ValueBase>;
@@ -186,7 +186,7 @@ namespace std
 {
 /// Streaming output for Value - classes
 template<typename charT, typename traits> basic_ostream<charT, traits>&
-operator<<( basic_ostream<charT, traits> &out, const isis::util::_internal::GenericType &s )
+operator<<( basic_ostream<charT, traits> &out, const isis::util::_internal::GenericValue &s )
 {
 	return out << s.toString();
 }

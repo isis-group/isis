@@ -20,7 +20,7 @@ namespace util
 namespace _internal
 {
 
-bool GenericType::isSameType ( const GenericType &second ) const
+bool GenericValue::isSameType ( const GenericValue &second ) const
 {
 	return getTypeID() == second.getTypeID();
 }
