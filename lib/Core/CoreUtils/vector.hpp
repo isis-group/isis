@@ -184,9 +184,7 @@ public:
 
 	///\returns a negated copy
 	const this_class negate()const{
-		this_class ret=*this;
-		ret.unaryOp<std::negate<float> >();
-		return ret;
+		return unaryOp<std::negate<float> >();
 	}
 
 	/**
