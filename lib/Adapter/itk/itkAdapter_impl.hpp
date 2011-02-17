@@ -208,7 +208,7 @@ typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkRea
 	BOOST_FOREACH( boost::shared_ptr< data::Chunk> & ref, chList ) {
 		data::Chunk &chRef = *ref;
 		typename InputImageType::PixelType *target = refTarget + chunkIndex++ * chRef.getVolume();
-		chRef.getTypePtr<typename InputImageType::PixelType>().copyToMem( 0, ( chRef.getVolume() - 1 ), target );
+		chRef.getValuePtr<typename InputImageType::PixelType>().copyToMem( 0, ( chRef.getVolume() - 1 ), target );
 		boost::shared_ptr<util::PropertyMap> tmpMap ( new util::PropertyMap ( static_cast<util::PropertyMap>( chRef ) ) );
 		m_ChunkPropMapVector.push_back( tmpMap );
 	}
@@ -256,8 +256,8 @@ template<typename TImageITK, typename TOutputISIS> data::ImageList itkAdapter::i
 	const data::scaling_pair scale = tmpChunk->getScalingTo( data::ValuePtr<ISISRepn>::staticID, data::noscale );
 	//
 	data::numeric_convert<ITKRepn, ISISRepn>(
-		tmpChunk->asTypePtr<ITKRepn>(),
-		retChunk->asTypePtr<ISISRepn>(),
+		tmpChunk->asValuePtr<ITKRepn>(),
+		retChunk->asValuePtr<ISISRepn>(),
 		scale.first->as<double>(),
 		scale.second->as<double>() );
 	//dummy join to allow creating this chunk

@@ -73,7 +73,7 @@ bool Chunk::convertToType( short unsigned int ID )
 bool Chunk::convertToType( short unsigned int ID, const scaling_pair &scaling )
 {
 	if( getTypeID() != ID ) { // if its not the same type - replace the internal ValuePtr by a new returned from ValuePtrBase::copyToNewById
-		ValuePtrReference newPtr = getTypePtrBase().copyToNewByID( ID, scaling ); // create a new ValuePtr of type id and store it in a ValuePtrReference
+		ValuePtrReference newPtr = getValuePtrBase().copyToNewByID( ID, scaling ); // create a new ValuePtr of type id and store it in a ValuePtrReference
 
 		if( newPtr.isEmpty() ) // if the reference is empty the conversion failed
 			return false;
@@ -263,7 +263,7 @@ std::list<Chunk> Chunk::splice ( dimensions atDim )const
 	//copy the relevant dimensional sizes from wholesize (in case of sliceDim we copy only the first two elements of wholesize - making slices)
 	spliceSize.copyFrom( &wholesize[0], &wholesize[atDim] );
 	//get the spliced ValuePtr's (the volume of the requested dims is the split-size - in case of sliceDim it is rows*columns)
-	const ValuePtrList pointers = this->getTypePtrBase().splice( spliceSize.product() );
+	const ValuePtrList pointers = this->getValuePtrBase().splice( spliceSize.product() );
 	//create new Chunks from this ValuePtr's
 	BOOST_FOREACH( ValuePtrList::const_reference ref, pointers ) {
 		ret.push_back( Chunk( ref, spliceSize[0], spliceSize[1], spliceSize[2], spliceSize[3] ) ); //@todo make sure zhis is only one copy-operation
@@ -274,7 +274,7 @@ std::list<Chunk> Chunk::splice ( dimensions atDim )const
 
 const size_t Chunk::useCount() const
 {
-	return getTypePtrBase().useCount();
+	return getValuePtrBase().useCount();
 }
 
 }

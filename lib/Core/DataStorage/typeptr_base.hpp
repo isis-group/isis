@@ -54,7 +54,7 @@ public:
 	* Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
 	* \returns a constant reference of the pointer.
 	*/
-	template<typename T> const ValuePtr<T>& castToTypePtr() const {
+	template<typename T> const ValuePtr<T>& castToValuePtr() const {
 		return m_cast_to<ValuePtr<T> >();
 	}
 	/**
@@ -62,7 +62,7 @@ public:
 	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
 	 * \returns a reference of the pointer.
 	 */
-	template<typename T> ValuePtr<T>& castToTypePtr() {
+	template<typename T> ValuePtr<T>& castToValuePtr() {
 		return m_cast_to<ValuePtr<T> >();
 	}
 	/// \returns the length of the data pointed to
@@ -123,7 +123,7 @@ public:
 	 */
 	template<typename T> ValuePtr<T> copyToNew( const scaling_pair &scaling )const {
 		Reference ret = copyToNewByID( ValuePtr<T>::staticID, scaling );
-		return ret->castToTypePtr<T>();
+		return ret->castToValuePtr<T>();
 	}
 	/**
 	 * Copy this to a new ValuePtr\<T\> using newly allocated memory.
@@ -134,7 +134,7 @@ public:
 	 */
 	template<typename T> ValuePtr<T> copyToNew()const {
 		Reference ret = copyToNewByID( ValuePtr<T>::staticID );
-		return ret->castToTypePtr<T>();
+		return ret->castToValuePtr<T>();
 	}
 	/**
 	 * Create a new ValuePtr, of the same type, but differnent size in memory.

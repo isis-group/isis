@@ -201,7 +201,7 @@ public:
 				<< "End of the range (" << end << ") is behind the end of this ValuePtr (" << length() << ")";
 		LOG_IF( _length + dst_start >= dst.length(), Runtime, error )
 				<< "End of the range (" << _length + dst_start << ") is behind the end of the destination (" << dst.length() << ")";
-		const ValuePtr<TYPE> &compare = dst.castToTypePtr<TYPE>();
+		const ValuePtr<TYPE> &compare = dst.castToValuePtr<TYPE>();
 		LOG( Debug, verbose_info ) << "Comparing " << dst.getTypeName() << " at " << &operator[]( 0 ) << " and " << &compare[0];
 
 		for ( size_t i = start; i < end; i++ ) {

@@ -64,11 +64,11 @@ int main()
 	{
 		MemChunk<short> a( 1, 1, 1, 10 );
 		list.push_back( a );
-		a.asTypePtr<short>()[5] = 5;
+		a.asValuePtr<short>()[5] = 5;
 		std::cout << "a.voxel<short>(0,0,0,5):" << a.voxel<short>( 0, 0, 0, 5 ) << std::endl;
 		a.voxel<short>( 3, 0, 0, 5 ) = 3;//fail (may crash or not)
 	}
 	Chunk cp = *list.begin();
 	std::cout << "cp.voxel(0,0,0,5):" << cp.voxel<short>( 0, 0, 0, 5 ) << std::endl;
-	std::cout << "list.begin()->getTypePtr<short>().toString():" << list.begin()->getTypePtr<short>().toString() << std::endl;
+	std::cout << "list.begin()->getValuePtr<short>().toString():" << list.begin()->getValuePtr<short>().toString() << std::endl;
 }

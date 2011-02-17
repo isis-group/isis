@@ -734,7 +734,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
 
 	data::MemChunk<float> chSlice( nrX, nrY );
 	img.getChunk( 0, 0, 12, 8, false ).copySlice( 0, 0, chSlice, 0, 0 );
-	float *pValues = ( ( boost::shared_ptr<float> ) chSlice.getTypePtr<float>() ).get();
+	float *pValues = ( ( boost::shared_ptr<float> ) chSlice.getValuePtr<float>() ).get();
 	float *pRun = pValues;
 
 	for ( unsigned int iy = 0; iy < nrY; iy++ ) {

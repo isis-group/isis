@@ -1,5 +1,5 @@
 /*
- * typePtrTest.cpp
+ * ValuePtrTest.cpp
  *
  *  Created on: Sep 25, 2009
  *      Author: proeger
@@ -51,7 +51,7 @@ public:
 
 bool Deleter::deleted = false;
 
-BOOST_AUTO_TEST_CASE( typePtr_init_test )
+BOOST_AUTO_TEST_CASE( ValuePtr_init_test )
 {
 	BOOST_CHECK( ! Deleter::deleted );
 	{
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE( typePtr_init_test )
 	BOOST_CHECK( Deleter::deleted );
 }
 
-BOOST_AUTO_TEST_CASE( typePtr_clone_test )
+BOOST_AUTO_TEST_CASE( ValuePtr_clone_test )
 {
 	Deleter::deleted = false;
 	{
@@ -94,19 +94,19 @@ BOOST_AUTO_TEST_CASE( typePtr_clone_test )
 			//and both reference the same data
 			BOOST_CHECK_EQUAL( outer->length(), inner.length() );
 			BOOST_CHECK_EQUAL(
-				( ( boost::shared_ptr<int32_t> )outer->castToTypePtr<int32_t>() ).get(),
+				( ( boost::shared_ptr<int32_t> )outer->castToValuePtr<int32_t>() ).get(),
 				( ( boost::shared_ptr<int32_t> )inner ).get()
 			);
 		}
 		//now again its only one (inner is gone)
-		boost::shared_ptr<int32_t> &dummy = outer->castToTypePtr<int32_t>();
+		boost::shared_ptr<int32_t> &dummy = outer->castToValuePtr<int32_t>();
 		BOOST_CHECK_EQUAL( dummy.use_count(), 1 );
 	}
 	//data should be deleted by now (outer is gone)
 	BOOST_CHECK( Deleter::deleted );
 }
 
-BOOST_AUTO_TEST_CASE( typePtr_Reference_test )
+BOOST_AUTO_TEST_CASE( ValuePtr_Reference_test )
 {
 	Deleter::deleted = false;
 	{
@@ -117,24 +117,24 @@ BOOST_AUTO_TEST_CASE( typePtr_Reference_test )
 			ReferenceTest inner;
 			BOOST_CHECK( ! inner.isEmpty() );
 			// for now we have only one pointer referencing the data
-			boost::shared_ptr<int32_t> &dummy1 = inner->castToTypePtr<int32_t>();//get the smart_pointer inside the referenced ValuePtr
+			boost::shared_ptr<int32_t> &dummy1 = inner->castToValuePtr<int32_t>();//get the smart_pointer inside the referenced ValuePtr
 			BOOST_CHECK_EQUAL( dummy1.use_count(), 1 ); //We only have one ValuePtr (inside inner)
 			outer = inner;//now we have two
-			boost::shared_ptr<int32_t> &dummy2 = outer->castToTypePtr<int32_t>();
+			boost::shared_ptr<int32_t> &dummy2 = outer->castToValuePtr<int32_t>();
 			BOOST_CHECK_EQUAL( dummy1.use_count(), 2 );
 			BOOST_CHECK_EQUAL( dummy2.use_count(), 2 );
 			//and both reference the same data
 			BOOST_CHECK_EQUAL( dummy1.get(), dummy2.get() );
 		}
 		//now again its only one (inner is gone)
-		boost::shared_ptr<int32_t> &dummy = outer->castToTypePtr<int32_t>();
+		boost::shared_ptr<int32_t> &dummy = outer->castToValuePtr<int32_t>();
 		BOOST_CHECK_EQUAL( dummy.use_count(), 1 );
 	}
 	//data should be deleted by now (outer is gone)
 	BOOST_CHECK( Deleter::deleted );
 }
 
-BOOST_AUTO_TEST_CASE( typePtr_splice_test )
+BOOST_AUTO_TEST_CASE( ValuePtr_splice_test )
 {
 	Deleter::deleted = false;
 	{
@@ -150,7 +150,7 @@ BOOST_AUTO_TEST_CASE( typePtr_splice_test )
 			//the shall be outer.size() references from the splices, plus one for the origin
 			BOOST_CHECK_EQUAL( dummy.use_count(), outer.size() + 1 );
 		}
-		boost::shared_ptr<int32_t> &dummy = outer.front()->castToTypePtr<int32_t>();
+		boost::shared_ptr<int32_t> &dummy = outer.front()->castToValuePtr<int32_t>();
 
 		BOOST_CHECK_EQUAL( outer.front()->length(), 2 );// the first slices shall be of the size 2
 		BOOST_CHECK_EQUAL( outer.back()->length(), 1 );// the last slice shall be of the size 1 (5%2)
@@ -162,7 +162,7 @@ BOOST_AUTO_TEST_CASE( typePtr_splice_test )
 	BOOST_CHECK( Deleter::deleted );
 }
 
-BOOST_AUTO_TEST_CASE( typePtr_conv_scaling_test )
+BOOST_AUTO_TEST_CASE( ValuePtr_conv_scaling_test )
 {
 	const float init[] = { -2, -1.8, -1.5, -1.3, -0.6, -0.2, 2, 1.8, 1.5, 1.3, 0.6, 0.2};
 	data::ValuePtr<float> floatArray( ( float * )malloc( sizeof( float ) * 12 ), 12 );
@@ -177,7 +177,7 @@ BOOST_AUTO_TEST_CASE( typePtr_conv_scaling_test )
 	BOOST_CHECK_EQUAL( scale.second->as<double>(), 0 );
 }
 
-BOOST_AUTO_TEST_CASE( typePtr_conversion_test )
+BOOST_AUTO_TEST_CASE( ValuePtr_conversion_test )
 {
 	const float init[] = { -2, -1.8, -1.5, -1.3, -0.6, -0.2, 2, 1.8, 1.5, 1.3, 0.6, 0.2};
 	data::ValuePtr<float> floatArray( ( float * )malloc( sizeof( float ) * 12 ), 12 );
@@ -213,7 +213,7 @@ BOOST_AUTO_TEST_CASE( typePtr_conversion_test )
 		BOOST_CHECK_EQUAL( ushortArray[i], ceil( init[i] * 1e5 * uscale + 32767.5 - .5 ) );
 }
 
-BOOST_AUTO_TEST_CASE( typePtr_minmax_test )
+BOOST_AUTO_TEST_CASE( ValuePtr_minmax_test )
 {
 	const float init[] = { -1.8, -1.5, -1.3, -0.6, -0.2, 1.8, 1.5, 1.3, 0.6, 0.2};
 	data::ValuePtr<float> floatArray( ( float * )malloc( sizeof( float ) * 10 ), 10 );

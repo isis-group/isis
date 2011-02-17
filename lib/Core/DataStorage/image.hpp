@@ -143,7 +143,7 @@ public:
 	template <typename T> T &voxel( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 ) {
 		checkMakeClean();
 		const std::pair<size_t, size_t> index = commonGet( first, second, third, fourth );
-		ValuePtr<T> &data = chunkAt( index.first ).asTypePtr<T>();
+		ValuePtr<T> &data = chunkAt( index.first ).asValuePtr<T>();
 		return data[index.second];
 	}
 
@@ -161,7 +161,7 @@ public:
 	 */
 	template <typename T> const T &voxel( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const {
 		const std::pair<size_t, size_t> index = commonGet( first, second, third, fourth );
-		const ValuePtr<T> &data = chunkPtrAt( index.first )->getTypePtr<T>();
+		const ValuePtr<T> &data = chunkPtrAt( index.first )->getValuePtr<T>();
 		return data[index.second];
 	}
 
@@ -424,6 +424,12 @@ public:
 		Image::operator=( ref );
 		convertToType( ValuePtr<T>::staticID );
 		return *this;
+	}
+	void copyToMem( void *dst ){
+		Image::copyToMem<T>((T*)dst);
+	}
+	void copyToMem( void *dst )const {
+		Image::copyToMem<T>((T*)dst);
 	}
 };
 
