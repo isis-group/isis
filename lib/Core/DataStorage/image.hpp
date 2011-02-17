@@ -425,6 +425,12 @@ public:
 		convertToType( ValuePtr<T>::staticID );
 		return *this;
 	}
+	void copyToMem( void *dst ){
+		Image::copyToMem<T>((T*)dst);
+	}
+	void copyToMem( void *dst )const {
+		Image::copyToMem<T>((T*)dst);
+	}
 };
 
 /**
