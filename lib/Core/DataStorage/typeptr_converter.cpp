@@ -92,8 +92,8 @@ public:
 		return boost::shared_ptr<const ValuePtrConverterBase>( ret );
 	}
 	void convert( const ValuePtrBase &src, ValuePtrBase &dst, const scaling_pair &scaling )const {
-		ValuePtr<SRC> &dstVal = dst.castToTypePtr<SRC>();
-		const SRC *srcPtr = &src.castToTypePtr<SRC>()[0];
+		ValuePtr<SRC> &dstVal = dst.castToValuePtr<SRC>();
+		const SRC *srcPtr = &src.castToValuePtr<SRC>()[0];
 		LOG_IF( src.length() < dst.length(), Debug, info ) << "The target is longer than the the source (" << dst.length() << ">" << src.length() << "). Will only copy/convert " << src.length() << " elements";
 		LOG_IF( src.length() > dst.length(), Debug, error ) << "The target is shorter than the the source (" << dst.length() << "<" << src.length() << "). Will only copy/convert " << dst.length() << " elements";
 		dstVal.copyFromMem( srcPtr, std::min( src.length(), dstVal.length() ) );
@@ -132,7 +132,7 @@ public:
 	}
 	void convert( const ValuePtrBase &src, ValuePtrBase &dst, const scaling_pair &scaling )const {
 		LOG_IF( scaling.first.isEmpty() || scaling.first.isEmpty(), Debug, error ) << "Running conversion with invalid scaling (" << scaling << ") this won't work";
-		numeric_convert( src.castToTypePtr<SRC>(), dst.castToTypePtr<DST>(), scaling.first->as<double>(), scaling.second->as<double>() );
+		numeric_convert( src.castToValuePtr<SRC>(), dst.castToValuePtr<DST>(), scaling.first->as<double>(), scaling.second->as<double>() );
 	}
 	scaling_pair getScaling( const util::_internal::ValueBase &min, const util::_internal::ValueBase &max, autoscaleOption scaleopt = autoscale )const {
 		const std::pair<double, double> scale = getNumericScaling<SRC, DST>( min, max, scaleopt );
@@ -150,10 +150,10 @@ public:
 ////////////////////////////////////////////////////////////////////////
 
 ///generate a ValuePtrConverter for conversions from SRC to any type from the "types" list
-template<typename SRC> struct inner_TypePtrConverter {
+template<typename SRC> struct inner_ValuePtrConverter {
 	std::map<int, boost::shared_ptr<const ValuePtrConverterBase> > &m_subMap;
-	inner_TypePtrConverter( std::map<int, boost::shared_ptr<const ValuePtrConverterBase> > &subMap ): m_subMap( subMap ) {}
-	template<typename DST> void operator()( DST ) { //will be called by the mpl::for_each in outer_TypePtrConverter for any DST out of "types"
+	inner_ValuePtrConverter( std::map<int, boost::shared_ptr<const ValuePtrConverterBase> > &subMap ): m_subMap( subMap ) {}
+	template<typename DST> void operator()( DST ) { //will be called by the mpl::for_each in outer_ValuePtrConverter for any DST out of "types"
 		//create a converter based on the type traits and the types of SRC and DST
 		typedef boost::mpl::and_<boost::is_arithmetic<SRC>, boost::is_arithmetic<DST> > is_num;
 		typedef boost::is_same<SRC, DST> is_same;
@@ -165,12 +165,12 @@ template<typename SRC> struct inner_TypePtrConverter {
 };
 
 ///generate a ValuePtrConverter for conversions from any SRC from the "types" list
-struct outer_TypePtrConverter {
+struct outer_ValuePtrConverter {
 	std::map< int , std::map<int, boost::shared_ptr<const ValuePtrConverterBase> > > &m_map;
-	outer_TypePtrConverter( std::map< int , std::map<int, boost::shared_ptr<const ValuePtrConverterBase> > > &map ): m_map( map ) {}
+	outer_ValuePtrConverter( std::map< int , std::map<int, boost::shared_ptr<const ValuePtrConverterBase> > > &map ): m_map( map ) {}
 	template<typename SRC> void operator()( SRC ) {//will be called by the mpl::for_each in ValuePtrConverterMap() for any SRC out of "types"
 		boost::mpl::for_each<util::_internal::types>( // create a functor for from-SRC-conversion and call its ()-operator for any DST out of "types"
-			inner_TypePtrConverter<SRC>( m_map[ValuePtr<SRC>::staticID] )
+			inner_ValuePtrConverter<SRC>( m_map[ValuePtr<SRC>::staticID] )
 		);
 	}
 };
@@ -182,7 +182,7 @@ ValuePtrConverterMap::ValuePtrConverterMap()
 	LOG( Debug, info ) << "Initializing liboil";
 	oil_init();
 #endif // ISIS_USE_LIBOIL
-	boost::mpl::for_each<util::_internal::types>( outer_TypePtrConverter( *this ) );
+	boost::mpl::for_each<util::_internal::types>( outer_ValuePtrConverter( *this ) );
 	LOG( Debug, info )
 			<< "conversion map for " << size() << " array-types created";
 }

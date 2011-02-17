@@ -40,7 +40,7 @@ class DicomChunk : public data::Chunk
 	template<typename TYPE>
 	static data::Chunk *copyColor( TYPE **source, size_t width, size_t height ) {
 		data::Chunk *ret = new data::MemChunk<util::color<TYPE> >( width, height );
-		data::ValuePtr<util::color<TYPE> > &dest = ret->asTypePtr<util::color<TYPE> >();
+		data::ValuePtr<util::color<TYPE> > &dest = ret->asValuePtr<util::color<TYPE> >();
 		const size_t pixels = dest.length();
 
 		for ( size_t i = 0; i < pixels; i++ ) {
