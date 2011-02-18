@@ -38,6 +38,46 @@ Image::Image ( ) : set( "indexOrigin", "sequenceNumber,rowVec,columnVec,sliceVec
 	set.addSecondarySort( "acquisitionTime" );
 }
 
+Image::Image ( const Chunk &chunk) : set( "indexOrigin", "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ), clean( false )
+{
+	addNeededFromString( neededProperties );
+	set.addSecondarySort( "acquisitionNumber" );
+	set.addSecondarySort( "acquisitionTime" );
+
+	if ( ! (insertChunk( chunk ) && reIndex() && isClean()) ) {
+		LOG(Runtime,error) << "Failed to create image from single chunk.";
+	} else if(!isValid()){
+		LOG_IF(!getMissing().empty(), Debug, warning )
+					<< "The created image is missing some properties: " << getMissing() << ". It will be invalid.";
+	}
+}
+
+Image::Image ( std::list<Chunk> &chunks) : set( "indexOrigin", "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ), clean( false )
+{
+	addNeededFromString( neededProperties );
+	set.addSecondarySort( "acquisitionNumber" );
+	set.addSecondarySort( "acquisitionTime" );
+
+	size_t cnt = 0;
+	for ( std::list<Chunk>::iterator i = chunks.begin(); i != chunks.end(); ) { // for all remaining chunks
+		if ( insertChunk( *i ) ) {
+			chunks.erase( i++ );
+			cnt++;
+		} else {
+			i++;
+		}
+	}
+	if ( ! isEmpty() ) {
+		LOG( Debug, info ) << "Reindexing image with " << cnt << " chunks.";
+		if(!reIndex()){
+			LOG(Runtime,error) << "Failed to create image from " << cnt << " chunks.";
+		} else {
+			LOG_IF(!getMissing().empty(), Debug, warning )
+					<< "The created image is missing some properties: " << getMissing() << ". It will be invalid.";
+		}
+	}
+}
+
 Image::Image( const isis::data::Image &ref ): set( "", "" )/*SortedChunkList has no default constructor - lets just make an empty (and invalid) set*/
 {
 	( *this ) = ref; // set will be replaced here anyway
@@ -76,6 +116,11 @@ bool Image::checkMakeClean()
 
 	return clean;
 }
+bool Image::isClean()
+{
+	return clean;
+}
+
 
 
 bool Image::insertChunk ( const Chunk &chunk )

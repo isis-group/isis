@@ -101,14 +101,14 @@ protected:
 	 * (run join on it using the image as parameter to insert all non-unique-metadata).
 	 */
 	Chunk &chunkAt( size_t at );
+	/// Creates an empty Image object.
+	Image();
 public:
 	class ChunkOp : std::unary_function<Chunk &, bool>
 	{
 	public:
 		virtual bool operator()( Chunk &, util::FixedVector<size_t, 4> posInImage ) = 0;
 	};
-	/// Creates an empty Image object.
-	Image();
 
 	/**
 	 * Copy constructor.
@@ -117,12 +117,24 @@ public:
 	Image( const Image &ref );
 
 	/**
+	 * Create image from a list of chunks.
+	 * Removes used chunks from the given list. So afterwards the list consists of the rejected chunks.
+	 */
+	Image( std::list<Chunk> &chunks );
+
+	/**
+	 * Create image from a single chunk.
+	 */
+	Image( const Chunk &chunk );
+
+	/**
 	 * Copy operator.
 	 * Copies all elements, only the voxel-data (in the chunks) are referenced.
 	 */
 	Image &operator=( const Image &ref );
 
 	bool checkMakeClean();
+	bool isClean();
 	/**
 	 * This method returns a reference to the voxel value at the given coordinates.
 	 *
