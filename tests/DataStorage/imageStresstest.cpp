@@ -10,23 +10,22 @@ const size_t slice_size = 128;
 int main()
 {
 	boost::timer timer;
-	data::Image img;
+	std::list<data::Chunk> chunks;
 	timer.restart();
 	uint32_t acq = 0;
 
 	for ( size_t tstep = 0; tstep < tsteps; tstep++ ) {
 		for ( size_t slice = 0; slice < slices; slice++ ) {
-			data::MemChunk<short> chk( slice_size, slice_size );
-			chk.setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
-			chk.setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
-			chk.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, slice ) );
-			chk.setPropertyAs( "acquisitionNumber", ++acq );
-			chk.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1 ) );
-
-			if ( !img.insertChunk( chk ) )
-				std::cout << "Inserting Chunk " << slice << " failed" << std::endl;
+			chunks.push_back(data::MemChunk<short>( slice_size, slice_size ));
+			chunks.back().setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
+			chunks.back().setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
+			chunks.back().setPropertyAs( "indexOrigin", util::fvector4( 0, 0, slice ) );
+			chunks.back().setPropertyAs( "acquisitionNumber", ++acq );
+			chunks.back().setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1 ) );
 		}
 	}
+
+	data::Image img(chunks);
 
 	std::cout << tsteps << "*" << slices << " Chunks inserted in " << timer.elapsed() << " sec " << std::endl;
 	timer.restart();
