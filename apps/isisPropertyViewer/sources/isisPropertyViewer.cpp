@@ -121,7 +121,7 @@ void isisPropertyViewer::createTree( const boost::shared_ptr<isis::data::Image> 
 	unsigned short chunkCounter = 0;
 	//go through all the chunks
 	// for ( isis::data::Image::ChunkIterator chunkIterator = image->chunksBegin(); chunkIterator != image->chunksEnd(); chunkIterator++ ) {
-	BOOST_FOREACH( boost::shared_ptr<isis::data::Chunk> chunkref, image->getChunkList() ) {
+	BOOST_FOREACH( boost::shared_ptr<isis::data::Chunk> chunkref, image->getChunksAsVector() ) {
 		m_keyList = chunkref->getKeys();
 
 		if ( not m_keyList.empty() ) {
@@ -175,7 +175,7 @@ void isisPropertyViewer::addPropToTree( const boost::shared_ptr<isis::data::Imag
 		} else {
 			addChildToItem( currentHeadItem, tr( propIterator.c_str() ),
 							tr( image->propertyValue( propIterator )->toString( false ).c_str() ),
-							tr( image->propertyValue( propIterator )->typeName().c_str() ) );
+							tr( image->propertyValue( propIterator )->getTypeName().c_str() ) );
 		}
 	} else {
 		addChildToItem( currentHeadItem, tr( propIterator.c_str() ), tr( "empty" ) , tr( "none" ) );
@@ -212,11 +212,11 @@ void isisPropertyViewer::edit_item( QTreeWidgetItem *item, int val )
 			}
 
 			std::string propName = tmpItem->text( 0 ).toStdString();
-			const isis::util::TypeValue &tmpProp = m_propHolder.m_propHolderMap.find( currentFileName )->second.propertyValue( propName );
+			const isis::util::PropertyValue &tmpProp = m_propHolder.m_propHolderMap.find( currentFileName )->second.propertyValue( propName );
 
 			if ( not tmpProp->is<isis::util::fvector4>() ) {
-				isis::util::Type<std::string> myVal( val.toStdString() );
-				isis::util::_internal::TypeBase::convert( myVal, *tmpProp );
+				isis::util::Value<std::string> myVal( val.toStdString() );
+				isis::util::_internal::ValueBase::convert( myVal, *tmpProp );
 			} else {
 				isis::util::fvector4 &tmpVector = tmpPropMap.propertyValue( propName )->cast_to_Type<isis::util::fvector4>();
 

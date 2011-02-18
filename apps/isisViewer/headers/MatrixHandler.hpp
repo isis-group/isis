@@ -23,7 +23,7 @@ class MatrixHandler
 {
 public:
 	MatrixHandler();
-	void setVectors ( isis::util::fvector4 readVec, isis::util::fvector4 phaseVec, isis::util::fvector4 sliceVec );
+	void setVectors ( isis::util::fvector4 rowVec, isis::util::fvector4 columnVec, isis::util::fvector4 sliceVec );
 
 	vtkSmartPointer<vtkMatrix4x4> getAxialMatrix( void ) const { return m_MatrixAxial; }
 	vtkSmartPointer<vtkMatrix4x4> getSagittalMatrix( void ) const { return m_MatrixSagittal; }
@@ -40,8 +40,8 @@ public:
 private:
 	bool m_isRotationMatrix;
 	bool m_Valid;
-	isis::util::fvector4 m_readVec;
-	isis::util::fvector4 m_phaseVec;
+	isis::util::fvector4 m_rowVec;
+	isis::util::fvector4 m_columnVec;
 	isis::util::fvector4 m_sliceVec;
 	vtkSmartPointer<vtkMatrix4x4> m_origMatrix;
 	vtkSmartPointer<vtkMatrix4x4> m_origMatrix1;

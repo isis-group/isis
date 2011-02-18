@@ -29,7 +29,7 @@ template<typename T> std::list<T> dcmtkListString2list( DcmElement *elem )
 {
 	OFString buff;
 	elem->getOFStringArray( buff );
-	return util::string2list<T>( std::string( buff.c_str() ), '\\' );
+	return util::stringToList<T>( std::string( buff.c_str() ), '\\' );
 }
 
 }
@@ -514,13 +514,13 @@ bool ImageFormat_Dicom::parseCSAValue( const std::string &val, const util::istri
 bool ImageFormat_Dicom::parseCSAValueList( const util::slist &val, const util::istring &name, const util::istring &vr, isis::util::PropertyMap &map )
 {
 	if ( vr == "IS" or vr == "SL" or vr == "US" or vr == "SS" ) {
-		map.propertyValue( name ) = util::list2list<int32_t>( val.begin(), val.end() );
+		map.propertyValue( name ) = util::listToList<int32_t>( val.begin(), val.end() );
 	} else if ( vr == "UL" ) {
 		map.propertyValue( name ) = val; // @todo we dont have an unsigned int list
 	} else if ( vr == "LO" or vr == "SH" or vr == "UN" or vr == "ST" or vr == "SL" ) {
 		map.propertyValue( name ) = val;
 	} else if ( vr == "DS" or vr == "FD" ) {
-		map.propertyValue( name ) = util::list2list<double>( val.begin(), val.end() );
+		map.propertyValue( name ) = util::listToList<double>( val.begin(), val.end() );
 	} else {
 		LOG( Runtime, error ) << "Dont know how to parse CSA entry " << std::make_pair( name, val ) << " type is " << util::MSubject( vr );
 		return false;

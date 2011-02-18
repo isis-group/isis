@@ -13,42 +13,42 @@ namespace data
 namespace _internal
 {
 
-TypePtrBase::TypePtrBase( size_t length ): m_len( length ) {}
+ValuePtrBase::ValuePtrBase( size_t length ): m_len( length ) {}
 
-size_t TypePtrBase::length() const { return m_len;}
+size_t ValuePtrBase::length() const { return m_len;}
 
-TypePtrBase::~TypePtrBase() {}
+ValuePtrBase::~ValuePtrBase() {}
 
-const TypePtrConverterMap &TypePtrBase::converters()
+const ValuePtrConverterMap &ValuePtrBase::converters()
 {
-	return util::Singletons::get<_internal::TypePtrConverterMap, 0>();
+	return util::Singletons::get<_internal::ValuePtrConverterMap, 0>();
 }
 
-const TypePtrBase::Converter &TypePtrBase::getConverterTo( unsigned short ID )const
+const ValuePtrBase::Converter &ValuePtrBase::getConverterTo( unsigned short ID )const
 {
-	const TypePtrConverterMap::const_iterator f1 = converters().find( typeID() );
-	LOG_IF( f1 == converters().end(), Debug, error ) << "There is no known conversion from " << util::getTypeMap()[typeID()];
-	const TypePtrConverterMap::mapped_type::const_iterator f2 = f1->second.find( ID );
-	LOG_IF( f2 == f1->second.end(), Debug, error ) << "There is no known conversion from " << util::getTypeMap()[typeID()] << " to " << util::getTypeMap()[ID];
+	const ValuePtrConverterMap::const_iterator f1 = converters().find( getTypeID() );
+	LOG_IF( f1 == converters().end(), Debug, error ) << "There is no known conversion from " << util::getTypeMap()[getTypeID()];
+	const ValuePtrConverterMap::mapped_type::const_iterator f2 = f1->second.find( ID );
+	LOG_IF( f2 == f1->second.end(), Debug, error ) << "There is no known conversion from " << util::getTypeMap()[getTypeID()] << " to " << util::getTypeMap()[ID];
 	return f2->second;
 }
 
-size_t TypePtrBase::compare( const TypePtrBase &comp )const
+size_t ValuePtrBase::compare( const ValuePtrBase &comp )const
 {
 	LOG_IF( length() != comp.length(), Runtime, info ) << "Comparing data of different length. The difference will be added to the returned value.";
 	return length() - comp.length() + compare( 0, std::min( length(), comp.length() ) - 1, comp, 0 );
 }
 
-TypePtrBase::Reference TypePtrBase::copyToNewByID( unsigned short ID ) const
+ValuePtrBase::Reference ValuePtrBase::copyToNewByID( unsigned short ID ) const
 {
 	return copyToNewByID( ID, getScalingTo( ID ) );
 }
-TypePtrBase::Reference TypePtrBase::copyToNewByID( unsigned short ID, const scaling_pair &scaling ) const
+ValuePtrBase::Reference ValuePtrBase::copyToNewByID( unsigned short ID, const scaling_pair &scaling ) const
 {
 	const Converter &conv = getConverterTo( ID );
 
 	if( conv ) {
-		boost::scoped_ptr<TypePtrBase> ret;
+		boost::scoped_ptr<ValuePtrBase> ret;
 		conv->generate( *this, ret, scaling );
 		return *ret;
 	} else {
@@ -59,15 +59,15 @@ TypePtrBase::Reference TypePtrBase::copyToNewByID( unsigned short ID, const scal
 	}
 }
 
-TypePtrBase::Reference TypePtrBase::createById( unsigned short id, size_t len )
+ValuePtrBase::Reference ValuePtrBase::createById( unsigned short id, size_t len )
 {
-	const TypePtrConverterMap::const_iterator f1 = converters().find( id );
-	TypePtrConverterMap::mapped_type::const_iterator f2;
+	const ValuePtrConverterMap::const_iterator f1 = converters().find( id );
+	ValuePtrConverterMap::mapped_type::const_iterator f2;
 
 	// try to get a converter to convert the requestet type into itself - they 're there for all known types
 	if( f1 != converters().end() && ( f2 = f1->second.find( id ) ) != f1->second.end() ) {
-		const _internal::TypePtrConverterBase &conv = *( f2->second );
-		boost::scoped_ptr<TypePtrBase> ret;
+		const _internal::ValuePtrConverterBase &conv = *( f2->second );
+		boost::scoped_ptr<ValuePtrBase> ret;
 		conv.create( ret, len );
 		return *ret;
 	} else {
@@ -76,16 +76,16 @@ TypePtrBase::Reference TypePtrBase::createById( unsigned short id, size_t len )
 	}
 }
 
-void TypePtrBase::copyRange( size_t start, size_t end, TypePtrBase &dst, size_t dst_start )const
+void ValuePtrBase::copyRange( size_t start, size_t end, ValuePtrBase &dst, size_t dst_start )const
 {
 	assert( start <= end );
 	const size_t len = end - start + 1;
 	LOG_IF( ! dst.isSameType( *this ), Debug, error )
-			<< "Copying into a TypePtr of different type. Its " << dst.typeName() << " not " << typeName();
+			<< "Copying into a ValuePtr of different type. Its " << dst.getTypeName() << " not " << getTypeName();
 
 	if( end >= length() ) {
 		LOG( Runtime, error )
-				<< "End of the range (" << end << ") is behind the end of this TypePtr (" << length() << ")";
+				<< "End of the range (" << end << ") is behind the end of this ValuePtr (" << length() << ")";
 	} else if( len + dst_start > dst.length() ) {
 		LOG( Runtime, error )
 				<< "End of the range (" << len + dst_start << ") is behind the end of the destination (" << dst.length() << ")";
@@ -101,20 +101,20 @@ void TypePtrBase::copyRange( size_t start, size_t end, TypePtrBase &dst, size_t 
 	}
 }
 
-scaling_pair TypePtrBase::getScalingTo( unsigned short typeID, autoscaleOption scaleopt )const
+scaling_pair ValuePtrBase::getScalingTo( unsigned short typeID, autoscaleOption scaleopt )const
 {
-	std::pair<util::TypeReference, util::TypeReference> minmax = getMinMax();
-	assert( ! ( minmax.first.empty() || minmax.second.empty() ) );
-	return TypePtrBase::getScalingTo( typeID, minmax, scaleopt );
+	std::pair<util::ValueReference, util::ValueReference> minmax = getMinMax();
+	assert( ! ( minmax.first.isEmpty() || minmax.second.isEmpty() ) );
+	return ValuePtrBase::getScalingTo( typeID, minmax, scaleopt );
 }
 
-scaling_pair TypePtrBase::getScalingTo( unsigned short typeID, const std::pair<util::TypeReference, util::TypeReference> &minmax, autoscaleOption scaleopt )const
+scaling_pair ValuePtrBase::getScalingTo( unsigned short typeID, const std::pair<util::ValueReference, util::ValueReference> &minmax, autoscaleOption scaleopt )const
 {
-	LOG_IF( minmax.first.empty() || minmax.second.empty(), Debug, error ) << "One of the TypeReference's in minmax is empty(). This will crash...";
+	LOG_IF( minmax.first.isEmpty() || minmax.second.isEmpty(), Debug, error ) << "One of the ValueReference's in minmax is empty(). This will crash...";
 	return getScalingTo( typeID, *minmax.first, *minmax.second, scaleopt );
 }
 
-scaling_pair TypePtrBase::getScalingTo( unsigned short typeID, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt )const
+scaling_pair ValuePtrBase::getScalingTo( unsigned short typeID, const util::_internal::ValueBase &min, const util::_internal::ValueBase &max, autoscaleOption scaleopt )const
 {
 	const Converter &conv = getConverterTo( typeID );
 
@@ -122,28 +122,28 @@ scaling_pair TypePtrBase::getScalingTo( unsigned short typeID, const util::_inte
 		return conv->getScaling( min, max, scaleopt );
 	} else {
 		LOG( Runtime, error )
-				<< "I dont know any conversion from " << util::MSubject( typeName() ) << " to " << util::MSubject( util::getTypeMap( false, true )[typeID] );
+				<< "I dont know any conversion from " << util::MSubject( getTypeName() ) << " to " << util::MSubject( util::getTypeMap( false, true )[typeID] );
 		return scaling_pair();
 	}
 }
-bool TypePtrBase::convertTo( TypePtrBase &dst )const
+bool ValuePtrBase::convertTo( ValuePtrBase &dst )const
 {
-	return convertTo( dst, getScalingTo( dst.typeID() ) );
+	return convertTo( dst, getScalingTo( dst.getTypeID() ) );
 }
-bool TypePtrBase::convertTo( TypePtrBase &dst, const scaling_pair &scaling ) const
+bool ValuePtrBase::convertTo( ValuePtrBase &dst, const scaling_pair &scaling ) const
 {
-	const Converter &conv = getConverterTo( dst.typeID() );
+	const Converter &conv = getConverterTo( dst.getTypeID() );
 
 	if ( conv ) {
 		conv->convert( *this, dst, scaling );
 		return true;
 	} else {
 		LOG( Runtime, error )
-				<< "I dont know any conversion from " << util::MSubject( typeName() ) << " to " << util::MSubject( dst.typeName() );
+				<< "I dont know any conversion from " << util::MSubject( getTypeName() ) << " to " << util::MSubject( dst.getTypeName() );
 		return false;
 	}
 }
-size_t TypePtrBase::useCount() const
+size_t ValuePtrBase::useCount() const
 {
 	return getRawAddress().use_count();
 }

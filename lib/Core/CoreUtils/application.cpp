@@ -72,7 +72,7 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 		std::cerr << "Missing parameters: ";
 
 		for ( ParameterMap::iterator iP = parameters.begin(); iP != parameters.end(); iP++ ) {
-			if ( iP->second.needed() ) {std::cerr << "-" << iP->first << "  ";}
+			if ( iP->second.isNeeded() ) {std::cerr << "-" << iP->first << "  ";}
 		}
 
 		std::cerr << std::endl;
@@ -113,18 +113,18 @@ void Application::printHelp( bool withHidden )const
 	for ( ParameterMap::const_iterator iP = parameters.begin(); iP != parameters.end(); iP++ ) {
 		std::string pref;
 
-		if ( iP->second.needed() ) {
+		if ( iP->second.isNeeded() ) {
 			pref = ". Required.";
-		} else if( iP->second.hidden() ) {
+		} else if( iP->second.isHidden() ) {
 			if( !withHidden )
 				continue; // if its hidden, not needed, and wie want the short version skip this parameter
 		}
 
-		if ( ! iP->second.needed() ) {
+		if ( ! iP->second.isNeeded() ) {
 			pref = ". Default: \"" + iP->second.toString() + "\"";
 		}
 
-		std::cerr << "\t-" << iP->first << " <" << iP->second->typeName() << ">" << std::endl;
+		std::cerr << "\t-" << iP->first << " <" << iP->second->getTypeName() << ">" << std::endl;
 
 		if ( iP->second->is<Selection>() ) {
 			const Selection &ref = iP->second->castTo<Selection>();

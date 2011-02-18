@@ -1,12 +1,12 @@
 /*
- * typePtrTest.cpp
+ * ValuePtrTest.cpp
  *
  *  Created on: Sep 25, 2009
  *      Author: proeger
  */
 
 #define NOMINMAX 1
-#define BOOST_TEST_MODULE TypePtrTest
+#define BOOST_TEST_MODULE ValuePtrTest
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
 #include "DataStorage/typeptr.hpp"
@@ -42,28 +42,28 @@ public:
 };
 int TestHandler::hit = 0;
 
-class ReferenceTest: public data::TypePtr<int32_t>::Reference
+class ReferenceTest: public data::ValuePtr<int32_t>::Reference
 {
 public:
-	ReferenceTest(): data::TypePtr<int32_t>::Reference( new data::TypePtr<int32_t>( ( int32_t * )calloc( 5, sizeof( int32_t ) ), 5, Deleter() ) ) {}
+	ReferenceTest(): data::ValuePtr<int32_t>::Reference( new data::ValuePtr<int32_t>( ( int32_t * )calloc( 5, sizeof( int32_t ) ), 5, Deleter() ) ) {}
 	//we have to wrap this into a class, because you cannot directly create a Reference of a pointer
 };
 
 bool Deleter::deleted = false;
 
-BOOST_AUTO_TEST_CASE( typePtr_init_test )
+BOOST_AUTO_TEST_CASE( ValuePtr_init_test )
 {
 	BOOST_CHECK( ! Deleter::deleted );
 	{
-		data::TypePtr<int32_t> outer;
+		data::ValuePtr<int32_t> outer;
 		// default constructor must create an empty pointer
 		BOOST_CHECK_EQUAL( outer.length(), 0 );
 		BOOST_CHECK( ! ( boost::shared_ptr<int32_t> )outer );
 		BOOST_CHECK_EQUAL( ( ( boost::shared_ptr<int32_t> )outer ).use_count(), 0 );
 		{
-			data::TypePtr<int32_t> inner( ( int32_t * )calloc( 5, sizeof( int32_t ) ), 5, Deleter() );
+			data::ValuePtr<int32_t> inner( ( int32_t * )calloc( 5, sizeof( int32_t ) ), 5, Deleter() );
 			// for now we have only one pointer referencing the data
-			boost::shared_ptr<int32_t> &dummy = inner; //get the smart_pointer inside, because TypePtr does not have/need use_count
+			boost::shared_ptr<int32_t> &dummy = inner; //get the smart_pointer inside, because ValuePtr does not have/need use_count
 			BOOST_CHECK_EQUAL( dummy.use_count(), 1 );
 			outer = inner;//now we have two
 			BOOST_CHECK_EQUAL( dummy.use_count(), 2 );
@@ -79,70 +79,70 @@ BOOST_AUTO_TEST_CASE( typePtr_init_test )
 	BOOST_CHECK( Deleter::deleted );
 }
 
-BOOST_AUTO_TEST_CASE( typePtr_clone_test )
+BOOST_AUTO_TEST_CASE( ValuePtr_clone_test )
 {
 	Deleter::deleted = false;
 	{
-		data::TypePtrReference outer;
+		data::ValuePtrReference outer;
 		{
-			data::TypePtr<int32_t> inner( ( int32_t * )calloc( 5, sizeof( int32_t ) ), 5, Deleter() );
-			// for now we have only one TypePtr referencing the data
-			boost::shared_ptr<int32_t> &dummy = inner; //get the smart_pointer inside, because TypePtr does not have/need use_count
+			data::ValuePtr<int32_t> inner( ( int32_t * )calloc( 5, sizeof( int32_t ) ), 5, Deleter() );
+			// for now we have only one ValuePtr referencing the data
+			boost::shared_ptr<int32_t> &dummy = inner; //get the smart_pointer inside, because ValuePtr does not have/need use_count
 			BOOST_CHECK_EQUAL( dummy.use_count(), 1 );
 			outer = inner;//now we have two
 			BOOST_CHECK_EQUAL( dummy.use_count(), 2 );
 			//and both reference the same data
 			BOOST_CHECK_EQUAL( outer->length(), inner.length() );
 			BOOST_CHECK_EQUAL(
-				( ( boost::shared_ptr<int32_t> )outer->castToTypePtr<int32_t>() ).get(),
+				( ( boost::shared_ptr<int32_t> )outer->castToValuePtr<int32_t>() ).get(),
 				( ( boost::shared_ptr<int32_t> )inner ).get()
 			);
 		}
 		//now again its only one (inner is gone)
-		boost::shared_ptr<int32_t> &dummy = outer->castToTypePtr<int32_t>();
+		boost::shared_ptr<int32_t> &dummy = outer->castToValuePtr<int32_t>();
 		BOOST_CHECK_EQUAL( dummy.use_count(), 1 );
 	}
 	//data should be deleted by now (outer is gone)
 	BOOST_CHECK( Deleter::deleted );
 }
 
-BOOST_AUTO_TEST_CASE( typePtr_Reference_test )
+BOOST_AUTO_TEST_CASE( ValuePtr_Reference_test )
 {
 	Deleter::deleted = false;
 	{
-		data::TypePtr<int32_t>::Reference outer;
+		data::ValuePtr<int32_t>::Reference outer;
 		// default constructor must create an empty pointer-ref
-		BOOST_CHECK( outer.empty() );
+		BOOST_CHECK( outer.isEmpty() );
 		{
 			ReferenceTest inner;
-			BOOST_CHECK( ! inner.empty() );
+			BOOST_CHECK( ! inner.isEmpty() );
 			// for now we have only one pointer referencing the data
-			boost::shared_ptr<int32_t> &dummy1 = inner->castToTypePtr<int32_t>();//get the smart_pointer inside the referenced TypePtr
-			BOOST_CHECK_EQUAL( dummy1.use_count(), 1 ); //We only have one TypePtr (inside inner)
+			boost::shared_ptr<int32_t> &dummy1 = inner->castToValuePtr<int32_t>();//get the smart_pointer inside the referenced ValuePtr
+			BOOST_CHECK_EQUAL( dummy1.use_count(), 1 ); //We only have one ValuePtr (inside inner)
 			outer = inner;//now we have two
-			boost::shared_ptr<int32_t> &dummy2 = outer->castToTypePtr<int32_t>();
+			boost::shared_ptr<int32_t> &dummy2 = outer->castToValuePtr<int32_t>();
 			BOOST_CHECK_EQUAL( dummy1.use_count(), 2 );
 			BOOST_CHECK_EQUAL( dummy2.use_count(), 2 );
 			//and both reference the same data
 			BOOST_CHECK_EQUAL( dummy1.get(), dummy2.get() );
 		}
 		//now again its only one (inner is gone)
-		boost::shared_ptr<int32_t> &dummy = outer->castToTypePtr<int32_t>();
+		boost::shared_ptr<int32_t> &dummy = outer->castToValuePtr<int32_t>();
 		BOOST_CHECK_EQUAL( dummy.use_count(), 1 );
 	}
 	//data should be deleted by now (outer is gone)
 	BOOST_CHECK( Deleter::deleted );
 }
 
-BOOST_AUTO_TEST_CASE( typePtr_splice_test )
+BOOST_AUTO_TEST_CASE( ValuePtr_splice_test )
 {
 	Deleter::deleted = false;
 	{
-		std::vector<data::TypePtrReference> outer;
+		std::vector<data::ValuePtrReference> outer;
 		{
-			data::TypePtr<int32_t> inner( ( int32_t * )calloc( 5, sizeof( int32_t ) ), 5, Deleter() );
+			data::ValuePtr<int32_t> inner( ( int32_t * )calloc( 5, sizeof( int32_t ) ), 5, Deleter() );
 			// for now we have only one pointer referencing the data
-			boost::shared_ptr<int32_t> &dummy = inner; //get the smart_pointer inside, because TypePtr does not have/need use_count
+			boost::shared_ptr<int32_t> &dummy = inner; //get the smart_pointer inside, because ValuePtr does not have/need use_count
 			BOOST_CHECK_EQUAL( dummy.use_count(), 1 );
 			//splicing up makes a references for every splice
 			outer = inner.splice( 2 );
@@ -150,8 +150,8 @@ BOOST_AUTO_TEST_CASE( typePtr_splice_test )
 			//the shall be outer.size() references from the splices, plus one for the origin
 			BOOST_CHECK_EQUAL( dummy.use_count(), outer.size() + 1 );
 		}
-		boost::shared_ptr<int32_t> &dummy = outer.front()->castToTypePtr<int32_t>();
-		assert( boost::get_deleter<data::TypePtr<int32_t>::DelProxy>( dummy ) );
+		boost::shared_ptr<int32_t> &dummy = outer.front()->castToValuePtr<int32_t>();
+
 		BOOST_CHECK_EQUAL( outer.front()->length(), 2 );// the first slices shall be of the size 2
 		BOOST_CHECK_EQUAL( outer.back()->length(), 1 );// the last slice shall be of the size 1 (5%2)
 		//we cannot ask for the use_count of the original because its hidden in DelProxy (outer[0].use_count will get the use_count of the splice)
@@ -162,32 +162,32 @@ BOOST_AUTO_TEST_CASE( typePtr_splice_test )
 	BOOST_CHECK( Deleter::deleted );
 }
 
-BOOST_AUTO_TEST_CASE( typePtr_conv_scaling_test )
+BOOST_AUTO_TEST_CASE( ValuePtr_conv_scaling_test )
 {
 	const float init[] = { -2, -1.8, -1.5, -1.3, -0.6, -0.2, 2, 1.8, 1.5, 1.3, 0.6, 0.2};
-	data::TypePtr<float> floatArray( ( float * )malloc( sizeof( float ) * 12 ), 12 );
+	data::ValuePtr<float> floatArray( ( float * )malloc( sizeof( float ) * 12 ), 12 );
 	//with automatic upscaling into integer
 	floatArray.copyFromMem( init, 12 );
-	data::scaling_pair scale = floatArray.getScalingTo( data::TypePtr<float>::staticID );
+	data::scaling_pair scale = floatArray.getScalingTo( data::ValuePtr<float>::staticID );
 	BOOST_CHECK_EQUAL( scale.first->as<float>(), 1 );
 	BOOST_CHECK_EQUAL( scale.second->as<float>(), 0 );
 
-	scale = floatArray.getScalingTo( data::TypePtr<int32_t>::staticID );
+	scale = floatArray.getScalingTo( data::ValuePtr<int32_t>::staticID );
 	BOOST_CHECK_EQUAL( scale.first->as<double>(), std::numeric_limits<int32_t>::max() / 2. );
 	BOOST_CHECK_EQUAL( scale.second->as<double>(), 0 );
 }
 
-BOOST_AUTO_TEST_CASE( typePtr_conversion_test )
+BOOST_AUTO_TEST_CASE( ValuePtr_conversion_test )
 {
 	const float init[] = { -2, -1.8, -1.5, -1.3, -0.6, -0.2, 2, 1.8, 1.5, 1.3, 0.6, 0.2};
-	data::TypePtr<float> floatArray( ( float * )malloc( sizeof( float ) * 12 ), 12 );
+	data::ValuePtr<float> floatArray( ( float * )malloc( sizeof( float ) * 12 ), 12 );
 	//with automatic upscaling into integer
 	floatArray.copyFromMem( init, 12 );
 
 	for ( int i = 0; i < 12; i++ )
 		BOOST_REQUIRE_EQUAL( floatArray[i], init[i] );
 
-	data::TypePtr<int32_t> intArray = floatArray.copyToNew<int32_t>();
+	data::ValuePtr<int32_t> intArray = floatArray.copyToNew<int32_t>();
 	double scale = std::numeric_limits<int32_t>::max() / 2.;
 
 	for ( int i = 0; i < 12; i++ ) // Conversion from float to integer will scale up to maximum, to map the fraction as exact as possible
@@ -199,28 +199,28 @@ BOOST_AUTO_TEST_CASE( typePtr_conversion_test )
 	for ( int i = 0; i < 12; i++ )
 		floatArray[i] = init[i] * 1e5;
 
-	data::TypePtr<short> shortArray = floatArray.copyToNew<short>();
-	data::TypePtr<uint8_t> byteArray = shortArray.copyToNew<uint8_t>();
+	data::ValuePtr<short> shortArray = floatArray.copyToNew<short>();
+	data::ValuePtr<uint8_t> byteArray = shortArray.copyToNew<uint8_t>();
 
 	for ( int i = 0; i < 12; i++ )
 		BOOST_CHECK_EQUAL( shortArray[i], ceil( init[i] * 1e5 * scale - .5 ) );
 
 	//with offset and scale
 	const double uscale = std::numeric_limits< unsigned short >::max() / 4e5;
-	data::TypePtr<unsigned short> ushortArray = floatArray.copyToNew<unsigned short>();
+	data::ValuePtr<unsigned short> ushortArray = floatArray.copyToNew<unsigned short>();
 
 	for ( int i = 0; i < 12; i++ )
 		BOOST_CHECK_EQUAL( ushortArray[i], ceil( init[i] * 1e5 * uscale + 32767.5 - .5 ) );
 }
 
-BOOST_AUTO_TEST_CASE( typePtr_minmax_test )
+BOOST_AUTO_TEST_CASE( ValuePtr_minmax_test )
 {
 	const float init[] = { -1.8, -1.5, -1.3, -0.6, -0.2, 1.8, 1.5, 1.3, 0.6, 0.2};
-	data::TypePtr<float> floatArray( ( float * )malloc( sizeof( float ) * 10 ), 10 );
+	data::ValuePtr<float> floatArray( ( float * )malloc( sizeof( float ) * 10 ), 10 );
 	//without scaling
 	floatArray.copyFromMem( init, 10 );
 	{
-		std::pair<util::TypeReference, util::TypeReference> minmax = floatArray.getMinMax();
+		std::pair<util::ValueReference, util::ValueReference> minmax = floatArray.getMinMax();
 		BOOST_CHECK( minmax.first->is<float>() );
 		BOOST_CHECK( minmax.second->is<float>() );
 		BOOST_CHECK_EQUAL( minmax.first->as<float>(), -1.8f );

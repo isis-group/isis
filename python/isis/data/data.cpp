@@ -110,7 +110,7 @@ BOOST_PYTHON_MODULE( _data )
 	.def( "__delitem__", &std_list<CList>::del )
 	;
 	//#######################################################################################
-	//	IOFactory
+	//  IOFactory
 	//#######################################################################################
 	class_<_IOFactory>( "IOFactory", no_init )
  	.def( "writeImage", &_IOFactory::_writeImage )
@@ -128,6 +128,6 @@ BOOST_PYTHON_MODULE( _data )
 	.def( "chunkListToImageList", &_IOFactory::_chunkListToImageList )
 	.staticmethod( "chunkListToImageList" )
 	;
-	
+
 }
 #endif

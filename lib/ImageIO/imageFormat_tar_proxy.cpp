@@ -84,19 +84,19 @@ protected:
 	}
 public:
 	std::string dialects( const std::string &filename )const {
-		/*      if( filename.empty() ) {*/
+		/*      if( filename.isEmpty() ) {*/
 		return std::string();
 		/*      } else {
 		            std::set<std::string> ret;
 		            data::IOFactory::FileFormatList formats = data::IOFactory::get().getFormatInterface( FileFormat::makeBasename( filename ).first );
 		            BOOST_FOREACH( data::IOFactory::FileFormatList::const_reference ref, formats ) {
-		                const std::list<std::string> dias = util::string2list<std::string>( ref->dialects( filename ) );
+		                const std::list<std::string> dias = util::stringToList<std::string>( ref->dialects( filename ) );
 		                ret.insert( dias.begin(), dias.end() );
 		            }
-		            return util::list2string( ret.begin(), ret.end(), ",", "", "" );
+		            return util::listToString( ret.begin(), ret.end(), ",", "", "" );
 		        }*/
 	}
-	std::string name()const {return "tar decompression proxy for other formats";}
+	std::string getName()const {return "tar decompression proxy for other formats";}
 
 	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) {
 		int ret = 0;
@@ -190,9 +190,11 @@ public:
 					close( mfile );
 
 					// read the temporary file
-					std::list<data::Chunk>::iterator prev=chunks.end();--prev;
+					std::list<data::Chunk>::iterator prev = chunks.end();
+					--prev;
 					ret += data::IOFactory::load( chunks, tmpfile.string(), "", dialect );
-					for( ;prev!=chunks.end(); ++prev ) { // set the source property of the red chunks to something more usefull
+
+					for( ; prev != chunks.end(); ++prev ) { // set the source property of the red chunks to something more usefull
 						prev->setPropertyAs( "source", ( boost::filesystem::path( filename ) / org_file ).file_string() );
 					}
 				}

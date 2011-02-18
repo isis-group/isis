@@ -74,8 +74,8 @@ void ViewControl::addImages( const ImageMapType &fileMap )
 	BOOST_FOREACH( ImageMapType::const_reference ref, fileMap ) {
 		boost::shared_ptr< ImageHolder > tmpVec( new ImageHolder );
 		tmpVec->setImages( ref.first, ref.second );
-		tmpVec->setReadVec( ref.first.getPropertyAs<isis::util::fvector4>( "readVec" ) );
-		tmpVec->setPhaseVec( ref.first.getPropertyAs<isis::util::fvector4>( "phaseVec" ) );
+		tmpVec->setRowVec( ref.first.getPropertyAs<isis::util::fvector4>( "rowVec" ) );
+		tmpVec->setColumnVec( ref.first.getPropertyAs<isis::util::fvector4>( "columnVec" ) );
 		tmpVec->setSliceVec( ref.first.getPropertyAs<isis::util::fvector4>( "sliceVec" ) );
 		m_ImageHolderVector.push_back( tmpVec );
 	}
@@ -90,6 +90,7 @@ void ViewControl::addImages( const ImageMapType &fileMap )
 			m_RendererSagittal->AddActor( ref->getActorSagittal() );
 		}
 	}
+
 	resetCam();
 }
 

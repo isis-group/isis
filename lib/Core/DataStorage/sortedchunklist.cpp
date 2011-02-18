@@ -1,6 +1,5 @@
 /*
-    <one line to give the program's name and a brief idea of what it does.>
-    Copyright (C) <year>  <name of author>
+    Copyright (C) 2010  reimer@cbs.mpg.de
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -44,10 +43,10 @@ bool SortedChunkList::posCompare::operator()( const util::fvector4 &posA, const 
 
 	return false;
 }
-bool SortedChunkList::scalarPropCompare::operator()( const isis::util::TypeValue &a, const isis::util::TypeValue &b ) const
+bool SortedChunkList::scalarPropCompare::operator()( const isis::util::PropertyValue &a, const isis::util::PropertyValue &b ) const
 {
-	const util::_internal::TypeBase &aScal = *a;
-	const util::_internal::TypeBase &bScal = *b;
+	const util::_internal::ValueBase &aScal = *a;
+	const util::_internal::ValueBase &bScal = *b;
 
 	if ( aScal.lt( bScal ) ) {
 		LOG( Debug, verbose_info ) << "Successfully sorted chunks by " << propertyName << " (" << aScal.toString( false ) << " before " << bScal.toString( false ) << ")";
@@ -68,12 +67,12 @@ SortedChunkList::chunkPtrOperator::~chunkPtrOperator() {}
 
 // constructor
 SortedChunkList::SortedChunkList( util::PropertyMap::KeyType fvectorPropName, util::PropertyMap::KeyType comma_separated_equal_props ):
-	equalProps( util::string2list<util::PropertyMap::KeyType>( comma_separated_equal_props, ',' ) )
+	equalProps( util::stringToList<util::PropertyMap::KeyType>( comma_separated_equal_props, ',' ) )
 {}
 
 
 // low level finding
-boost::shared_ptr<Chunk> SortedChunkList::secondaryFind( const util::TypeValue &key, SortedChunkList::SecondaryMap &map )
+boost::shared_ptr<Chunk> SortedChunkList::secondaryFind( const util::PropertyValue &key, SortedChunkList::SecondaryMap &map )
 {
 	const SecondaryMap::iterator found = map.find( key );
 	return found != map.end() ? found->second : boost::shared_ptr<Chunk>();
@@ -115,25 +114,25 @@ std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::primaryInsert( const 
 	// we dont have this position, but we have the position in scanner-space (indexOrigin)
 	const util::fvector4 &origin = ch.propertyValue( "indexOrigin" )->castTo<util::fvector4>();
 	// and we have the transformation matrix
-	// [ readVec ]
-	// [ phaseVec]
+	// [ rowVec ]
+	// [ columnVec]
 	// [ sliceVec]
 	// [ 0 0 0 1 ]
-	const util::fvector4 &readVec = ch.propertyValue( "readVec" )->castTo<util::fvector4>();
-	const util::fvector4 &phaseVec = ch.propertyValue( "phaseVec" )->castTo<util::fvector4>();
+	const util::fvector4 &rowVec = ch.propertyValue( "rowVec" )->castTo<util::fvector4>();
+	const util::fvector4 &columnVec = ch.propertyValue( "columnVec" )->castTo<util::fvector4>();
 	util::fvector4 sliceVec;
 
 	if( ch.hasProperty( "sliceVec" ) )
 		sliceVec = ch.propertyValue( "sliceVec" )->castTo<util::fvector4>();
 	else {
 		sliceVec = util::fvector4(
-					   readVec[1] * phaseVec[2] - readVec[2] * phaseVec[1],
-					   readVec[2] * phaseVec[0] - readVec[0] * phaseVec[2],
-					   readVec[0] * phaseVec[1] - readVec[1] * phaseVec[0]
+					   rowVec[1] * columnVec[2] - rowVec[2] * columnVec[1],
+					   rowVec[2] * columnVec[0] - rowVec[0] * columnVec[2],
+					   rowVec[0] * columnVec[1] - rowVec[1] * columnVec[0]
 				   );
 	}
 
-	const util::fvector4 key( origin.dot( readVec ), origin.dot( phaseVec ), origin.dot( sliceVec ), origin[3] );
+	const util::fvector4 key( origin.dot( rowVec ), origin.dot( columnVec ), origin.dot( sliceVec ), origin[3] );
 
 	// this is actually not the complete transform (it lacks the scaling for the voxel size), but its enough
 	const scalarPropCompare &secondaryComp = secondarySort.top();
@@ -153,7 +152,7 @@ bool SortedChunkList::insert( const Chunk &ch )
 	LOG_IF( !ch.isValid(), Debug, error ) << "You should definitively check the chunks validity (use the function Chunk::valid) before calling this funktion.";
 	assert( ch.isValid() );
 
-	if( !empty() ) {
+	if( !isEmpty() ) {
 		// compare some attributes of the first chunk and the one which shall be inserted
 		Chunk &first = *( chunks.begin()->second.begin()->second );
 
@@ -213,7 +212,7 @@ void SortedChunkList::addSecondarySort( const util::PropertyMap::KeyType &cmp )
 {
 	secondarySort.push( scalarPropCompare( cmp ) );
 }
-bool SortedChunkList::empty()const
+bool SortedChunkList::isEmpty()const
 {
 	return chunks.empty() || chunks.begin()->second.empty(); // if there is no subMap or nothing in the first subMap ... its empty
 }
@@ -223,7 +222,7 @@ void SortedChunkList::clear()
 }
 bool SortedChunkList::isRectangular()
 {
-	if( empty() )return true;
+	if( isEmpty() )return true;
 
 	size_t images = getHorizontalSize();
 	BOOST_FOREACH( PrimaryMap::reference outer, chunks ) {
@@ -234,7 +233,7 @@ bool SortedChunkList::isRectangular()
 }
 size_t SortedChunkList::getHorizontalSize()
 {
-	if( empty() )return 0;
+	if( isEmpty() )return 0;
 	else return chunks.begin()->second.size();
 }
 
@@ -242,7 +241,7 @@ std::vector< boost::shared_ptr< Chunk > > SortedChunkList::getLookup()
 {
 	LOG_IF( !isRectangular(), Debug, error ) << "Running getLookup on an non rectangular chunk-list is not defined";
 
-	if( !empty() ) {
+	if( !isEmpty() ) {
 		PrimaryMap::iterator iP = chunks.begin();
 		const size_t horizontal = chunks.size();
 		const size_t vertical = iP->second.size();

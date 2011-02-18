@@ -32,7 +32,7 @@ void FileFormat::write( const std::list<data::Image> &images, const std::string 
 			write( ref, uniquePath, dialect );
 		} catch ( std::runtime_error &e ) {
 			LOG( Runtime, warning )
-					<< "Failed to write image to " <<  uniquePath << " using " <<  name() << " (" << e.what() << ")";
+					<< "Failed to write image to " <<  uniquePath << " using " <<  getName() << " (" << e.what() << ")";
 		}
 	}
 }
@@ -59,7 +59,7 @@ void FileFormat::throwSystemError( int err, std::string desc )
 
 std::list< util::istring > FileFormat::getSuffixes()const
 {
-	std::list<util::istring> ret = util::string2list<util::istring>( suffixes(), boost::regex( "[[:space:]]" ) );
+	std::list<util::istring> ret = util::stringToList<util::istring>( suffixes(), boost::regex( "[[:space:]]" ) );
 	BOOST_FOREACH( util::istring & ref, ret ) {
 		ref.erase( 0, ref.find_first_not_of( '.' ) ); // remove leading . if there are some
 	}
