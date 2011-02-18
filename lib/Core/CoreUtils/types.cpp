@@ -75,10 +75,10 @@ namespace _internal
 {
 struct type_lister {
 	std::map< unsigned short, std::string > &m_map;
-	bool m_witValues, m_withValuePtrs;
-	type_lister( std::map< unsigned short, std::string > &map, bool witValues, bool withValuePtrs ): m_map( map ), m_witValues( witValues ), m_withValuePtrs( withValuePtrs ) {}
+	bool m_withValues, m_withValuePtrs;
+	type_lister( std::map< unsigned short, std::string > &map, bool withValues, bool withValuePtrs ): m_map( map ), m_withValues( withValues ), m_withValuePtrs( withValuePtrs ) {}
 	template<typename SRC> void operator()( SRC ) {//will be called by the mpl::for_each
-		if( m_witValues )m_map.insert( std::make_pair( Value<SRC>::staticID, Value<SRC>::staticName() ) );
+		if( m_withValues )m_map.insert( std::make_pair( Value<SRC>::staticID, Value<SRC>::staticName() ) );
 
 		if( m_withValuePtrs )m_map.insert( std::make_pair( data::ValuePtr<SRC>::staticID, data::ValuePtr<SRC>::staticName() ) );
 	}
@@ -86,19 +86,19 @@ struct type_lister {
 
 }
 
-std::map< unsigned short, std::string > getTypeMap( bool witValues, bool withValuePtrs )
+std::map< unsigned short, std::string > getTypeMap( bool withValues, bool withValuePtrs )
 {
 	std::map< unsigned short, std::string > ret;
-	boost::mpl::for_each<_internal::types>( _internal::type_lister( ret, witValues, withValuePtrs ) );
+	boost::mpl::for_each<_internal::types>( _internal::type_lister( ret, withValues, withValuePtrs ) );
 	return ret;
 }
 
-std::map< std::string, unsigned short > getTransposedTypeMap( bool witValues, bool withValuePtrs )
+std::map< std::string, unsigned short > getTransposedTypeMap( bool withValues, bool withValuePtrs )
 {
 	typedef std::map< std::string, unsigned short> transposedMapType;
 	typedef std::map< unsigned short, std::string > mapType;
 	transposedMapType ret;
-	BOOST_FOREACH( mapType::const_reference ref, util::getTypeMap( witValues, withValuePtrs ) ) {
+	BOOST_FOREACH( mapType::const_reference ref, util::getTypeMap( withValues, withValuePtrs ) ) {
 		ret[ref.second] = ref.first;
 	}
 	return ret;
