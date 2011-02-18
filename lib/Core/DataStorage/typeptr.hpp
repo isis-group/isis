@@ -172,7 +172,7 @@ public:
 		LOG_IF( _length > length(), Runtime, error )
 				<< "Amount of the elements to copy from memory (" << _length << ") exceeds the length of the array (" << length() << ")";
 		TYPE &dest = this->operator[]( 0 );
-		LOG( Debug, info ) << "Copying " << _length *sizeof( TYPE ) << " bytes of " << getTypeName() << " from " << src << " to " << &dest;
+		LOG( Debug, info ) << "Copying " << _length *sizeof( TYPE ) << " bytes from " << ValuePtr<TYPE>::staticName() << src << " to " << getTypeName() << &dest;
 		memcpy( &dest, src, _length * sizeof( TYPE ) );
 	}
 	/// Copy elements within a range [start,end] to raw memory

@@ -38,7 +38,7 @@ Image::Image ( ) : set( "indexOrigin", "sequenceNumber,rowVec,columnVec,sliceVec
 	set.addSecondarySort( "acquisitionTime" );
 }
 
-Image::Image ( const Chunk &chunk) : set( "indexOrigin", "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ), clean( false )
+Image::Image ( const Chunk &chunk) : set( "indexOrigin", "sequenceNumber,rowVec,columnVec,coilChannelMask,DICOM/EchoNumbers" ), clean( false )
 {
 	addNeededFromString( neededProperties );
 	set.addSecondarySort( "acquisitionNumber" );
@@ -95,7 +95,31 @@ bool Image::isClean()
 	return clean;
 }
 
+void Image::deduplicateProperties()
+{
+	LOG_IF( lookup.empty(), Debug, error ) << "The lookup table is empty. Won't do anything.";
+	const boost::shared_ptr<Chunk> &first = lookup[0];
+	//@todo might fail if the image contains a prop that differs to that in the Chunks (which is equal in the chunks)
+	util::PropertyMap common;
+	util::PropertyMap::KeyList uniques;
+	first->toCommonUnique( common, uniques, true );
 
+	for ( size_t i = 1; i < lookup.size(); i++ ) {
+		lookup[i]->toCommonUnique( common, uniques, false );
+	}
+
+	LOG( Debug, info ) << uniques.size() << " Chunk-unique properties found in the Image";
+	LOG_IF( uniques.size(), Debug, verbose_info ) << util::listToString( uniques.begin(), uniques.end(), ", " );
+	join( common );
+	LOG_IF( ! common.isEmpty(), Debug, verbose_info ) << "common properties saved into the image " << common;
+
+	//remove common props from the chunks
+	for ( size_t i = 0; i != lookup.size(); i++ )
+		lookup[i]->remove( common, false ); //this _won't keep needed properties - so from here on the chunks of the image are invalid
+
+	LOG_IF( ! common.isEmpty(), Debug, verbose_info ) << "common properties removed from " << lookup.size() << " chunks: " << common;
+
+}
 
 bool Image::insertChunk ( const Chunk &chunk )
 {
@@ -111,15 +135,31 @@ bool Image::insertChunk ( const Chunk &chunk )
 		return false;
 	}
 
+	if(clean){
+		LOG(Debug,info) << "Resetting image structure because of new insertion.";
+		LOG(Runtime,warning) << "Inserting into already indexed images is inefficient. You should not do that.";
+
+		// re-gather all properties of the chunks from the image
+		BOOST_FOREACH(boost::shared_ptr<Chunk> &ref,lookup){
+			ref->join(*this);
+		}
+	}
+
+
 	LOG_IF( chunk.getPropertyAs<util::fvector4>( "indexOrigin" )[3] != 0, Debug, warning )
 			<< " inserting chunk with nonzero at the 4th position - you shouldn't use the fourth dim for the time (use acquisitionTime)";
 
-	if ( set.insert( chunk ) ) {
-		clean = false;
+	if(set.insert( chunk )){ // if the insertion was successful the image has to be reindexed anyway
+		clean=false;
 		lookup.clear();
 		return true;
-	} else
+	} else {
+		// if the insersion failed but the image was clean - de-duplicate properties again
+		// the image is still clean - no need reindex
+		if(clean)
+			deduplicateProperties(); 
 		return false;
+	}
 }
 
 
@@ -181,25 +221,7 @@ bool Image::reIndex()
 
 	assert( size.product() == lookup.size() );
 	//Clean up the properties
-	//@todo might fail if the image contains a prop that differs to that in the Chunks (which is equal in the chunks)
-	util::PropertyMap common;
-	util::PropertyMap::KeyList uniques;
-	first.toCommonUnique( common, uniques, true );
-
-	for ( size_t i = 1; i < chunks; i++ ) {
-		chunkAt( i ).toCommonUnique( common, uniques, false );
-	}
-
-	LOG( Debug, info ) << uniques.size() << " Chunk-unique properties found in the Image";
-	LOG_IF( uniques.size(), Debug, verbose_info ) << util::listToString( uniques.begin(), uniques.end(), ", " );
-	join( common );
-	LOG_IF( ! common.isEmpty(), Debug, verbose_info ) << "common properties saved into the image " << common;
-
-	//remove common props from the chunks
-	for ( size_t i = 0; i != lookup.size(); i++ )
-		chunkAt( i ).remove( common, false ); //this _won't keep needed properties - so from here on the chunks of the image are invalid
-
-	LOG_IF( ! common.isEmpty(), Debug, verbose_info ) << "common properties removed from " << chunks << " chunks: " << common;
+	deduplicateProperties();
 
 	// add the chunk-size to the image-size
 	for ( unsigned short i = 0; i < chunk_dims; i++ )

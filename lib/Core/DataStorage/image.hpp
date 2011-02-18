@@ -42,6 +42,8 @@ private:
 	bool clean;
 	size_t chunkVolume;
 
+	void deduplicateProperties();
+
 	/**
 	 * Get the pointer to the chunk in the internal lookup-table at position at.
 	 * The Chunk will only have metadata which are unique to it - so it might be invalid

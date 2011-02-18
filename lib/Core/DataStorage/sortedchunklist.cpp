@@ -148,8 +148,8 @@ std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::primaryInsert( const 
 bool SortedChunkList::insert( const Chunk &ch )
 {
 	LOG_IF( secondarySort.empty(), Debug, error ) << "Inserting will fail without any secondary sort. Use chunks.addSecondarySort at least once.";
-	LOG_IF( !ch.isValid(), Debug, error ) << "You're trying insert an invalid chunk. The missing properties are " << ch.getMissing() << " This will break.";
-	LOG_IF( !ch.isValid(), Debug, error ) << "You should definitively check the chunks validity (use the function Chunk::valid) before calling this funktion.";
+	LOG_IF( !ch.isValid(), Debug, error ) << "You're trying insert an invalid chunk. The missing properties are " << ch.getMissing();
+	LOG_IF( !ch.isValid(), Debug, error ) << "You should definitively check the chunks validity (use the function Chunk::valid) before calling this funktion. Aborting now..";
 	assert( ch.isValid() );
 
 	if( !isEmpty() ) {
@@ -166,7 +166,8 @@ bool SortedChunkList::insert( const Chunk &ch )
 			// if at least one of them has the property and they are not equal - do not insert
 			if ( ( first.hasProperty( ref ) || ch.hasProperty( ref ) ) && first.propertyValue( ref ) != ch.propertyValue( ref ) ) {
 				LOG( Debug, verbose_info )
-						<< "Ignoring chunk with different " << ref << ". (" << ch.propertyValue( ref ) << "!=" << first.propertyValue( ref ) << ")";
+						<< "Ignoring chunk with different " << ref << ". Is " << util::MSubject( ch.propertyValue( ref ) )
+						<< " but chunks already in the list have " << util::MSubject( first.propertyValue( ref ) );
 				return false;
 			}
 		}
