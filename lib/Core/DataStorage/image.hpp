@@ -117,10 +117,36 @@ public:
 	Image( const Image &ref );
 
 	/**
-	 * Create image from a list of chunks.
+	 * Create image from a list of Chunks or objects with the base Chunk.
 	 * Removes used chunks from the given list. So afterwards the list consists of the rejected chunks.
 	 */
-	Image( std::list<Chunk> &chunks );
+	template<typename T> Image( std::list<T> &chunks ) : set( "indexOrigin", "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ), clean( false )
+	{
+		BOOST_STATIC_ASSERT((boost::is_base_of<Chunk, T>::value));
+		addNeededFromString( neededProperties );
+		set.addSecondarySort( "acquisitionNumber" );
+		set.addSecondarySort( "acquisitionTime" );
+
+		size_t cnt = 0;
+		for ( typename std::list<T>::iterator i = chunks.begin(); i != chunks.end(); ) { // for all remaining chunks
+		if ( insertChunk( *i ) ) {
+			chunks.erase( i++ );
+			cnt++;
+		} else {
+			i++;
+		}
+		}
+		if ( ! isEmpty() ) {
+			LOG( Debug, info ) << "Reindexing image with " << cnt << " chunks.";
+			if(!reIndex()){
+				LOG(Runtime,error) << "Failed to create image from " << cnt << " chunks.";
+			} else {
+				LOG_IF(!getMissing().empty(), Debug, warning )
+				<< "The created image is missing some properties: " << getMissing() << ". It will be invalid.";
+			}
+		}
+	}
+
 
 	/**
 	 * Create image from a single chunk.
