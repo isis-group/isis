@@ -62,7 +62,6 @@ OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ "Enable proxy plugin for compressed fil
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_TAR "Enable proxy plugin for tar datasets" ON)
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_RAW "Enable plugin for raw data output" ON)
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_SIEMENSTCPIP "Enable plugin for Siemens data coming on TCP Port" OFF)
-OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_WEIRD "Enable plugin for Siemens data coming on TCP Port" ON)
 
 
 #OPTION(${CMAKE_PROJECT_NAME}_PACKAGE_RPM "Enable support for RPM packaging" OFF)
@@ -282,12 +281,6 @@ if (${CMAKE_PROJECT_NAME}_IOPLUGIN_SIEMENSTCPIP)
 	target_link_libraries(isisImageFormat_SiemensTcpIp ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
 	SET(TARGETS ${TARGETS} isisImageFormat_SiemensTcpIp)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_SIEMENSTCPIP)
-if (${CMAKE_PROJECT_NAME}_IOPLUGIN_WEIRD)
-
-	add_library(isisImageFormat_WeirdTest SHARED imageFormat_WeirdTest.cpp)
-	target_link_libraries(isisImageFormat_WeirdTest ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
-	SET(TARGETS ${TARGETS} isisImageFormat_WeirdTest)
-endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_WEIRD)
 
 ###########################################################################
 # prepare all plugins for installation
