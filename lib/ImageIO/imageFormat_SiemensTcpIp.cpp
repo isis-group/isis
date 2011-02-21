@@ -32,11 +32,11 @@ namespace isis
 				return std::string( ".tcpip" );
 			}
 		public:
-			std::string name()const {
+			std::string getName()const {
 				return "SiemensTcpIp";
 			}
 			
-			int load ( data::ChunkList &chunks, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
+			int load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
 				
                 
                 /*
@@ -180,36 +180,37 @@ namespace isis
                                 util::fvector4 slice_pos_vec = getVectorFromString(getStringFromHeader(slice_pos, header));//(val1, val2, val3);
                                 //*********
                                 
-                                // now, create chunks per slice ang feed it with metadata
-                                boost::shared_ptr<data::Chunk> ch(new data::MemChunk<uint16_t>((uint16_t*)slice_buffer, height_slice,width_slice,1) );
-                                ch->setProperty("indexOrigin", slice_pos_vec);
-                                ch->setProperty<uint32_t>("acquisitionNumber", acq_nr);
-                                //ch->setProperty<>("acquisitionTime", acquisition_time);
+                                // now, create chunks per slice and feed it with metadata
+                                data::Chunk ch(data::MemChunk<uint16_t>((uint16_t*)slice_buffer, height_slice,width_slice,1) );
+				
+                                ch.setPropertyAs("indexOrigin", slice_pos_vec);
+                                ch.setPropertyAs<uint32_t>("acquisitionNumber", acq_nr);
+                                //ch.setPropertyAs<>("acquisitionTime", acquisition_time);
                                 if (true == moco){
-                                    ch->setProperty<uint16_t>("sequenceNumber", 0);
+                                    ch.setPropertyAs<uint16_t>("sequenceNumber", 0);
                                 }
                                 else {
-                                    ch->setProperty<uint16_t>("sequenceNumber", 1);
+                                    ch.setPropertyAs<uint16_t>("sequenceNumber", 1);
                                 }
-                                ch->setProperty<std::string>("sequenceDescription", seq_descr);
+                                ch.setPropertyAs<std::string>("sequenceDescription", seq_descr);
                                 
 
                                 if ( 0 == InPlanePhaseEncodingDirection.compare(0, 3, "COL") ){
-                                    ch->setProperty<util::fvector4>("readVec", phase_vec);
-                                    ch->setProperty<util::fvector4>("phaseVec", read_vec);
-                                    ch->setProperty<util::fvector4>("voxelSize", util::fvector4(fov_read/width_slice,fov_phase/height_slice,slice_thickness,0));
+                                    ch.setPropertyAs<util::fvector4>("readVec", phase_vec);
+                                    ch.setPropertyAs<util::fvector4>("phaseVec", read_vec);
+                                    ch.setPropertyAs<util::fvector4>("voxelSize", util::fvector4(fov_read/width_slice,fov_phase/height_slice,slice_thickness,0));
                                 }
                                 else {
-                                    ch->setProperty<util::fvector4>("phaseVec", phase_vec);
-                                    ch->setProperty<util::fvector4>("readVec", read_vec);
-                                    ch->setProperty<util::fvector4>("voxelSize", util::fvector4(fov_phase/width_slice,fov_read/height_slice,slice_thickness,0));
+                                    ch.setPropertyAs<util::fvector4>("phaseVec", phase_vec);
+                                    ch.setPropertyAs<util::fvector4>("readVec", read_vec);
+                                    ch.setPropertyAs<util::fvector4>("voxelSize", util::fvector4(fov_phase/width_slice,fov_read/height_slice,slice_thickness,0));
                                 }
 
                                 
-                                ch->setProperty<util::fvector4>("sliceVec", slice_norm_vec);
-                                ch->setProperty<uint16_t>("repetitionTime",rep_time);
-                                ch->setProperty<std::string>("InPlanePhaseEncodingDirection",InPlanePhaseEncodingDirection);
-                                ch->setProperty<util::fvector4>( "voxelGap", util::fvector4() );
+                                ch.setPropertyAs<util::fvector4>("sliceVec", slice_norm_vec);
+                                ch.setPropertyAs<uint16_t>("repetitionTime",rep_time);
+                                ch.setPropertyAs<std::string>("InPlanePhaseEncodingDirection",InPlanePhaseEncodingDirection);
+                                ch.setPropertyAs<util::fvector4>( "voxelGap", util::fvector4() );
                                 chunks.push_back(ch);
                             }
                        }
@@ -339,10 +340,10 @@ isis::image_io::FileFormat *factory()
 	pluginRtExport->image_counter = 0;
 	
 	pluginRtExport->timestampCurrent = 0;
-    pluginRtExport->timestampPrevious = 0;
-    pluginRtExport->timestampCurrentMOCO = 0;
-    pluginRtExport->timestampPreviousMOCO = 0;
-    pluginRtExport->timediffMOCO = fopen("/tmp/timediffMOCO.txt", "w");
+        pluginRtExport->timestampPrevious = 0;
+        pluginRtExport->timestampCurrentMOCO = 0;
+        pluginRtExport->timestampPreviousMOCO = 0;
+        pluginRtExport->timediffMOCO = fopen("/tmp/timediffMOCO.txt", "w");
 	pluginRtExport->timediffRECO = fopen("/tmp/timediffRECO.txt", "w");
 	
 	
