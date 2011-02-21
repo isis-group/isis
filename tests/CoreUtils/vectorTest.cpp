@@ -2,7 +2,7 @@
 * typeTest.cpp
 *
 * A unit test suite to confirm the capabilities of the
-* utils::Type class.
+* utils::Value class.
 *
 *  Created on: Oct 19, 2009
 *      Author: reimer

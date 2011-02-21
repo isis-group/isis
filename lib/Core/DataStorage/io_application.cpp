@@ -38,6 +38,7 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 		parameters["rf"] = std::string();
 		parameters["rf"].needed() = false;
 		parameters["rf"].hidden() = true;
+
 		parameters["rf"].setDescription( "Override automatic detection of file suffix for reading with given value" );
 		parameters["rdialect"] = std::string();
 		parameters["rdialect"].needed() = false;
@@ -52,19 +53,20 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 		parameters["wf"].needed() = false;
 		parameters["wf"].setDescription( "Override automatic detection of file suffix for writing with given value" );
 		parameters["wf"].hidden() = true;
+
 		parameters["wdialect"] = std::string();
 		parameters["wdialect"].needed() = false;
 		parameters["wdialect"].setDescription( "choose dialect for writing. The available dialects depend on the capabilities of IO plugins" );
 		std::map<unsigned short, std::string> types = util::getTypeMap( false, true );
 		// remove some types which are useless as representation
 		// "(unsigned short)" is needed because otherwise erase would take the reference of a static constant which is only there during compile time
-		types.erase( ( unsigned short )data::TypePtr<util::Selection>::staticID );
-		types.erase( ( unsigned short )data::TypePtr<std::string>::staticID );
-		types.erase( ( unsigned short )data::TypePtr<boost::posix_time::ptime>::staticID );
-		types.erase( ( unsigned short )data::TypePtr<boost::gregorian::date>::staticID );
-		types.erase( ( unsigned short )data::TypePtr<util::ilist>::staticID );
-		types.erase( ( unsigned short )data::TypePtr<util::dlist>::staticID );
-		types.erase( ( unsigned short )data::TypePtr<util::slist>::staticID );
+		types.erase( ( unsigned short )data::ValuePtr<util::Selection>::staticID );
+		types.erase( ( unsigned short )data::ValuePtr<std::string>::staticID );
+		types.erase( ( unsigned short )data::ValuePtr<boost::posix_time::ptime>::staticID );
+		types.erase( ( unsigned short )data::ValuePtr<boost::gregorian::date>::staticID );
+		types.erase( ( unsigned short )data::ValuePtr<util::ilist>::staticID );
+		types.erase( ( unsigned short )data::ValuePtr<util::dlist>::staticID );
+		types.erase( ( unsigned short )data::ValuePtr<util::slist>::staticID );
 
 		for( std::map<unsigned short, std::string>::iterator i = types.begin(); i != types.end(); i++ ) {
 			i->second.resize( i->second.find_last_not_of( '*' ) + 1 );
@@ -108,14 +110,14 @@ void IOApplication::printHelp( bool withHidden ) const
 		std::cerr << std::endl << "Available IO Plugins:" << std::endl;
 		data::IOFactory::FileFormatList plugins = data::IOFactory::getFormats();
 		BOOST_FOREACH( data::IOFactory::FileFormatList::const_reference pi, plugins ) {
-			std::cerr << std::endl << "\t" << pi->name() << " (" << pi->plugin_file.file_string() << ")" << std::endl;
+			std::cerr << std::endl << "\t" << pi->getName() << " (" << pi->plugin_file.file_string() << ")" << std::endl;
 			std::cerr << "\t=======================================" << std::endl;
 			const std::list<util::istring> suff = pi->getSuffixes();
-			const std::list<std::string> dialects = util::string2list<std::string>( pi->dialects( "" ) );
-			std::cerr << "\tsupported suffixes: " << util::list2string( suff.begin(), suff.end(), "\", \"", "\"", "\"" )  << std::endl;
+			const std::list<std::string> dialects = util::stringToList<std::string>( pi->dialects( "" ) );
+			std::cerr << "\tsupported suffixes: " << util::listToString( suff.begin(), suff.end(), "\", \"", "\"", "\"" )  << std::endl;
 
 			if( !dialects.empty() )
-				std::cerr << "\tsupported dialects: " << util::list2string( dialects.begin(), dialects.end(), "\", \"", "\"", "\"" )  << std::endl;
+				std::cerr << "\tsupported dialects: " << util::listToString( dialects.begin(), dialects.end(), "\", \"", "\"", "\"" )  << std::endl;
 		}
 	}
 }
@@ -144,12 +146,12 @@ bool IOApplication::autoload( bool exitOnError )
 		else
 			return false;
 	} else {
-		for( ImageList::const_iterator a = images.begin(); a != images.end(); a++ ) {
-			for( ImageList::const_iterator b = a; ( ++b ) != images.end(); ) {
-				const util::PropMap &aref = **a, bref = **b;
+		for( std::list<data::Image>::const_iterator a = images.begin(); a != images.end(); a++ ) {
+			for( std::list<data::Image>::const_iterator b = a; ( ++b ) != images.end(); ) {
+				const util::PropertyMap &aref = *a, bref = *b;
 				LOG_IF( aref.getDifference( bref ).empty(), Runtime, warning ) << "The metadata of the images from "
-						<< aref.getProperty<std::string>( "source" ) << ":" << std::distance<ImageList::const_iterator>( images.begin(), a )
-						<< " and " << bref.getProperty<std::string>( "source" ) << ":" << std::distance<ImageList::const_iterator>( images.begin(), b )
+						<< aref.getPropertyAs<std::string>( "source" ) << ":" << std::distance<std::list<Image> ::const_iterator>( images.begin(), a )
+						<< " and " << bref.getPropertyAs<std::string>( "source" ) << ":" << std::distance<std::list<Image> ::const_iterator>( images.begin(), b )
 						<< " are equal. Maybe they are duplicates.";
 			}
 		}
@@ -158,14 +160,12 @@ bool IOApplication::autoload( bool exitOnError )
 	return true;
 }
 
-bool IOApplication::autowrite( const Image &out_image, bool exitOnError )
+bool IOApplication::autowrite( Image out_image, bool exitOnError )
 {
-	ImageList list;
-	list.push_back( boost::shared_ptr<Image>( new Image( out_image ) ) );
-	return autowrite( list, exitOnError );
+	return autowrite( std::list<Image>( 1, out_image ), exitOnError );
 }
 
-bool IOApplication::autowrite( const ImageList &out_images, bool exitOnError )
+bool IOApplication::autowrite( std::list<Image> out_images, bool exitOnError )
 {
 	const util::Selection repn = parameters["repn"];
 	const std::string output = parameters["out"];
@@ -180,8 +180,8 @@ bool IOApplication::autowrite( const ImageList &out_images, bool exitOnError )
 			<< ( dl.empty() ? "" : std::string( " using the dialect: " ) + dl );
 
 	if( repn != 0 ) {
-		BOOST_FOREACH( ImageList::const_reference ref, out_images ) {
-			ref->makeOfTypeId( repn );
+		BOOST_FOREACH( std::list<Image>::reference ref, out_images ) {
+			ref.convertToType( repn );
 		}
 	}
 
@@ -198,7 +198,7 @@ bool IOApplication::autowrite( const ImageList &out_images, bool exitOnError )
 
 Image IOApplication::fetchImage()
 {
-	Image ret = *images.front();
+	Image ret = images.front();
 	images.pop_front();
 	return ret;
 }

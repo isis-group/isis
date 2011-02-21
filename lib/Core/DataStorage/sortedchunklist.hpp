@@ -1,6 +1,5 @@
 /*
-    <one line to give the program's name and a brief idea of what it does.>
-    Copyright (C) <year>  <name of author>
+    Copyright (C) 2010  reimer@cbs.mpg.de
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,12 +31,17 @@ namespace data
 namespace _internal
 {
 
+/*
+ * This class sorts the inserted chunks by the given properties while construction.
+ * The rules of the sorting depends on the upper level using these chunkLists later on.
+ * See the special classes, e.g. MRImage to find details about sorting criterias.
+ */
 class SortedChunkList
 {
 public:
 	struct scalarPropCompare {
-		util::PropMap::pname_type propertyName;
-		scalarPropCompare( const util::PropMap::pname_type &prop_name );
+		util::PropertyMap::KeyType propertyName;
+		scalarPropCompare( const util::PropertyMap::KeyType &prop_name );
 		bool operator()( const util::PropertyValue &a, const util::PropertyValue &b ) const;
 	};
 	struct posCompare {
@@ -63,20 +67,20 @@ private:
 	std::pair<boost::shared_ptr<Chunk>, bool> secondaryInsert( SecondaryMap &map, const Chunk &ch );
 	std::pair<boost::shared_ptr<Chunk>, bool> primaryInsert( const Chunk &ch );
 
-	std::list<util::PropMap::pname_type> equalProps;
+	std::list<util::PropertyMap::KeyType> equalProps;
 public:
 
 	//initialisation
 	/**
 	 * Creates a sorted list and sets primary sorting as well as properties which should be equal across all chunks.
 	 */
-	SortedChunkList( util::PropMap::pname_type fvectorPropName, util::PropMap::pname_type comma_separated_equal_props );
+	SortedChunkList( util::PropertyMap::KeyType fvectorPropName, util::PropertyMap::KeyType comma_separated_equal_props );
 
 	/**
 	 * Adds a property for secondary sorting.
 	 * At least one secondary sorting is needed.
 	 */
-	void addSecondarySort( const util::PropMap::pname_type &cmp );
+	void addSecondarySort( const util::PropertyMap::KeyType &cmp );
 
 	// utils
 
@@ -86,8 +90,8 @@ public:
 	/// Tries to insert a chunk (a cheap copy of the chunk is done when inserted)
 	bool insert( const Chunk &ch );
 
-	/// \returns true if there is not chunk in the list
-	bool empty()const;
+	/// \returns true if there is no chunk in the list
+	bool isEmpty()const;
 
 	/// Empties the list.
 	void clear();

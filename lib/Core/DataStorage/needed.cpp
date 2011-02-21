@@ -12,19 +12,19 @@
  */
 
 // Stuff needed for every Chunk
-const char *isis::data::_internal::ChunkBase::needed = "\
+const char *isis::data::_internal::ChunkBase::neededProperties = "\
 	indexOrigin\
 	acquisitionNumber\
 	voxelSize\
-	readVec\
-	phaseVec\
+	rowVec\
+	columnVec\
 ";
 
 // Stuff needed for any Image
-const char *isis::data::Image::needed = "\
+const char *isis::data::Image::neededProperties = "\
 	voxelSize\
-	readVec\
-	phaseVec\
+	rowVec\
+	columnVec\
 	sliceVec\
 ";
 

@@ -10,6 +10,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/foreach.hpp>
 #include "DataStorage/image.hpp"
+#include "DataStorage/io_factory.hpp"
 
 namespace isis
 {
@@ -21,29 +22,29 @@ BOOST_AUTO_TEST_CASE ( imageList_chunk_test )
 {
 	const size_t images = 5;
 	const size_t timesteps = 10;
-	data::ChunkList chunks;
+	std::list<data::Chunk> chunks;
 
 	for ( size_t i = 0; i < timesteps; i++ ) {
 		for ( size_t c = 0; c < images; c++ ) {
-			data::ChunkList::value_type  ch( new data::MemChunk<float>( 3, 3, 3 ) );
-			ch->setProperty( "indexOrigin", util::fvector4( 0, 0, i ) );
-			ch->setProperty( "acquisitionNumber",  i );
-			ch->setProperty( "readVec", util::fvector4( 1, 0 ) );
-			ch->setProperty( "phaseVec", util::fvector4( 0, 1 ) );
-			ch->setProperty( "voxelSize", util::fvector4( 1, 1, 1 ) );
-			ch->voxel<float>( 0, 0, 0 ) = c + i;
+			data::MemChunk<float> ch( 3, 3, 3 );
+			ch.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, i ) );
+			ch.setPropertyAs( "acquisitionNumber",  i );
+			ch.setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
+			ch.setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
+			ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1 ) );
+			ch.voxel<float>( 0, 0, 0 ) = c + i;
 			chunks.push_back( ch );
 		}
 	}
 
-	data::ImageList list( chunks );
+	std::list<data::Image> list = data::IOFactory::chunkListToImageList( chunks );
 	BOOST_CHECK_EQUAL( list.size(), images );
 	short cnt = 0;
-	BOOST_FOREACH( data::ImageList::value_type & ref, list ) {
-		BOOST_CHECK( ref->sizeToVector() == util::fvector4( 3, 3, 3, timesteps ) );
+	BOOST_FOREACH( data::Image & ref, list ) {
+		BOOST_CHECK( ref.getSizeAsVector() == util::fvector4( 3, 3, 3, timesteps ) );
 
 		for ( size_t i = 0; i < timesteps; i++ )
-			BOOST_CHECK( ref->voxel<float>( 0, 0, 0, i ) == i + cnt );
+			BOOST_CHECK( ref.voxel<float>( 0, 0, 0, i ) == i + cnt );
 
 		cnt++;
 	}

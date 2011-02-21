@@ -37,12 +37,15 @@ Application::Application( const char name[] ): m_name( name )
 	parameters["dCore"] = dbg_levels;
 	parameters["dCore"].setDescription( "Debugging level for the Core module" );
 	parameters["dCore"].hidden() = true;
+
 	parameters["dData"] = dbg_levels;
 	parameters["dData"].setDescription( "Debugging level for the Data module" );
 	parameters["dData"].hidden() = true;
+
 	parameters["dImageIO"] = dbg_levels;
 	parameters["dImageIO"].setDescription( "Debugging level for the ImageIO module" );
 	parameters["dImageIO"].hidden() = true;
+
 	parameters["help"] = false;
 	parameters["help"].setDescription( "Print help" );
 	BOOST_FOREACH( ParameterMap::reference ref, parameters ) //none of these is needed
@@ -69,7 +72,7 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 		std::cerr << "Missing parameters: ";
 
 		for ( ParameterMap::iterator iP = parameters.begin(); iP != parameters.end(); iP++ ) {
-			if ( iP->second.needed() ) {std::cerr << "-" << iP->first << "  ";}
+			if ( iP->second.isNeeded() ) {std::cerr << "-" << iP->first << "  ";}
 		}
 
 		std::cerr << std::endl;
@@ -110,21 +113,21 @@ void Application::printHelp( bool withHidden )const
 	for ( ParameterMap::const_iterator iP = parameters.begin(); iP != parameters.end(); iP++ ) {
 		std::string pref;
 
-		if ( iP->second.needed() ) {
+		if ( iP->second.isNeeded() ) {
 			pref = ". Required.";
-		} else if( iP->second.hidden() ) {
+		} else if( iP->second.isHidden() ) {
 			if( !withHidden )
 				continue; // if its hidden, not needed, and wie want the short version skip this parameter
 		}
 
-		if ( ! iP->second.needed() ) {
+		if ( ! iP->second.isNeeded() ) {
 			pref = ". Default: \"" + iP->second.toString() + "\"";
 		}
 
-		std::cerr << "\t-" << iP->first << " <" << iP->second->typeName() << ">" << std::endl;
+		std::cerr << "\t-" << iP->first << " <" << iP->second->getTypeName() << ">" << std::endl;
 
 		if ( iP->second->is<Selection>() ) {
-			const Selection &ref = iP->second->cast_to<Selection>();
+			const Selection &ref = iP->second->castTo<Selection>();
 			std::cerr << "\t\tOptions are: " <<  ref.getEntries() << std::endl;
 		}
 

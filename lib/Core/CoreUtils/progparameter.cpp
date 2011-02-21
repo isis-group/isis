@@ -1,6 +1,5 @@
 /*
-    <one line to give the program's name and a brief idea of what it does.>
-    Copyright (C) <year>  <name of author>
+    Copyright (C) 2010  reimer@cbs.mpg.de
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,7 +31,7 @@ ProgParameter::ProgParameter()
 }
 ProgParameter::ProgParameter( const ProgParameter &ref ): PropertyValue( static_cast<const PropertyValue &>( ref ) ), m_hidden( false ) {}
 
-bool ProgParameter::hidden() const
+bool ProgParameter::isHidden() const
 {
 	return m_hidden;
 }
@@ -41,18 +40,18 @@ bool &ProgParameter::hidden()
 	return m_hidden;
 }
 
-bool ProgParameter::parse( const Type<std::string> &props )
+bool ProgParameter::parse( const Value<std::string> &props )
 {
-	_internal::TypeBase &me = **this;
+	_internal::ValueBase &me = **this;
 	bool ret = false;
 
 	if ( ( ( std::string )props ).empty() ) {
 		if ( me.is<bool>() ) {
-			me.cast_to<bool>() = true;
+			me.castTo<bool>() = true;
 			ret = true;
 		}
 	} else {
-		ret = _internal::TypeBase::convert( props, me );
+		ret = _internal::ValueBase::convert( props, me );
 	}
 
 	LOG_IF( ret, Debug, info ) << "Parsed " << MSubject( props.toString() ) << " as " << me.toString( true );
@@ -102,14 +101,14 @@ bool ParameterMap::parse( int argc, char **argv )
 			iterator found = find( pName );
 
 			if( found == end() ) {
-				LOG( Runtime, warning ) << "Ignoring unknown parameter " << MSubject( std::string( "-" ) + pName + " " + list2string( argv + begin, argv + i, " ", "", "" ) );
-			} else if ( found->second.parse( list2string( argv + begin, argv + i, ",", "", "" ) ) ) { // parse the collected properties
+				LOG( Runtime, warning ) << "Ignoring unknown parameter " << MSubject( std::string( "-" ) + pName + " " + listToString( argv + begin, argv + i, " ", "", "" ) );
+			} else if ( found->second.parse( listToString( argv + begin, argv + i, ",", "", "" ) ) ) { // parse the collected properties
 				found->second.needed() = false;//remove needed flag, because the value is set (aka "not needed anymore")
 			} else {
 				LOG( Runtime, error )
 						<< "Failed to parse value(s) "
-						<< MSubject( list2string( argv + begin, argv + i, " ", "", "" ) )
-						<< " for "  << found->first << "(" << found->second->typeName() << ")";
+						<< MSubject( listToString( argv + begin, argv + i, " ", "", "" ) )
+						<< " for "  << found->first << "(" << found->second->getTypeName() << ")";
 				parsed = false;
 			}
 		}
@@ -123,11 +122,11 @@ bool ParameterMap::isComplete()const
 	return std::find_if( begin(), end(), neededP() ) == end();
 }
 
-ProgParameter::operator boost::scoped_ptr<_internal::TypeBase>::unspecified_bool_type()const
+ProgParameter::operator boost::scoped_ptr<_internal::ValueBase>::unspecified_bool_type()const
 {
-	boost::scoped_ptr<_internal::TypeBase> dummy;
+	boost::scoped_ptr<_internal::ValueBase> dummy;
 
-	if( ( *this )->cast_to<bool>() )dummy.reset( new Type<int16_t> );
+	if( ( *this )->castTo<bool>() )dummy.reset( new Value<int16_t> );
 
 	return  dummy;
 }

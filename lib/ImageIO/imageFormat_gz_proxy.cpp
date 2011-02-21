@@ -122,20 +122,20 @@ public:
 			return std::string();
 		} else {
 			std::set<std::string> ret;
-			data::IOFactory::FileFormatList formats = data::IOFactory::get().getFormatInterface( FileFormat::makeBasename( filename ).first );
+			data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( FileFormat::makeBasename( filename ).first );
 			BOOST_FOREACH( data::IOFactory::FileFormatList::const_reference ref, formats ) {
-				const std::list<std::string> dias = util::string2list<std::string>( ref->dialects( filename ) );
+				const std::list<std::string> dias = util::stringToList<std::string>( ref->dialects( filename ) );
 				ret.insert( dias.begin(), dias.end() );
 			}
-			return util::list2string( ret.begin(), ret.end(), ",", "", "" );
+			return util::listToString( ret.begin(), ret.end(), ",", "", "" );
 		}
 	}
-	std::string name()const {return "compression proxy for other formats";}
+	std::string getName()const {return "compression proxy for other formats";}
 
 	virtual std::pair<std::string, std::string> makeBasename( const std::string &filename )const {
 		const std::pair<std::string, std::string> proxyBase = FileFormat::makeBasename( filename ); // get rid of the the .gz
 		//then get the actual plugin for the format
-		const data::IOFactory::FileFormatList formats = data::IOFactory::get().getFormatInterface( proxyBase.first );
+		const data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( proxyBase.first );
 
 		if( formats.empty() ) {
 			LOG( Runtime, error ) << "Cannot determine the basename of " << util::MSubject( proxyBase.first ) << " because no io-plugin was found for it";
@@ -147,10 +147,10 @@ public:
 		return std::make_pair( realBase.first, realBase.second + proxyBase.second );
 	}
 
-	int load ( data::ChunkList &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) {
+	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) {
 		const std::pair<std::string, std::string> proxyBase = FileFormat::makeBasename( filename ); // get rid of the the .gz
 		//then get the actual plugin for the format
-		const data::IOFactory::FileFormatList formats = data::IOFactory::get().getFormatInterface( proxyBase.first );
+		const data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( proxyBase.first );
 
 		if( formats.empty() ) {
 			throwGenericError( "Cannot determine the unzipped suffix of \"" + filename + "\" because no io-plugin was found for it" );
@@ -162,16 +162,19 @@ public:
 
 		file_uncompress( filename, tmpfile.file_string() );
 
-		data::ChunkList buff;
+		std::list<data::Chunk>::iterator prev = chunks.end();
 
-		int ret = data::IOFactory::get().loadFile( buff, tmpfile, "", dialect );
+		--prev;
+
+		int ret = data::IOFactory::load( chunks, tmpfile.string(), "", dialect );
 
 		if( ret ) {
-			LOG( Debug, info ) <<  "Setting source of all " << buff.size() << " chunks to " << util::MSubject( filename );
-			BOOST_FOREACH( data::ChunkList::reference ref, buff ) {
-				ref->setProperty( "source", filename );
+			prev++;
+			LOG( Debug, info ) <<  "Setting source of all " << std::distance( prev, chunks.end() ) << " chunks to " << util::MSubject( filename );
+
+			for( ; prev != chunks.end(); ++prev ) {
+				prev->setPropertyAs( "source", filename );
 			}
-			chunks.insert( chunks.end(), buff.begin(), buff.end() );
 		}
 
 		return ret;

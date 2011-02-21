@@ -20,24 +20,24 @@ namespace _internal
 bool moreCmp( const util::istring &a, const util::istring &b ) {return a.length() > b.length();}
 }
 
-void FileFormat::write( const isis::data::ImageList &images, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & )
+void FileFormat::write( const std::list<data::Image> &images, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & )
 {
 	std::list<std::string> names = makeUniqueFilenames( images, filename );
 	std::list<std::string>::const_iterator inames = names.begin();
-	BOOST_FOREACH( data::ImageList::const_reference ref, images ) {
+	BOOST_FOREACH( std::list<data::Image>::const_reference ref, images ) {
 		std::string uniquePath = *( inames++ );
 		LOG( Runtime, info )   << "Writing image to " <<  uniquePath;
 
 		try {
-			write( *ref, uniquePath, dialect );
+			write( ref, uniquePath, dialect );
 		} catch ( std::runtime_error &e ) {
 			LOG( Runtime, warning )
-					<< "Failed to write image to " <<  uniquePath << " using " <<  name() << " (" << e.what() << ")";
+					<< "Failed to write image to " <<  uniquePath << " using " <<  getName() << " (" << e.what() << ")";
 		}
 	}
 }
 
-bool FileFormat::hasOrTell( const util::PropMap::pname_type &name, const isis::util::PropMap &object, isis::LogLevel level )
+bool FileFormat::hasOrTell( const util::PropertyMap::KeyType &name, const isis::util::PropertyMap &object, isis::LogLevel level )
 {
 	if ( object.hasProperty( name ) ) {
 		return true;
@@ -59,7 +59,7 @@ void FileFormat::throwSystemError( int err, std::string desc )
 
 std::list< util::istring > FileFormat::getSuffixes()const
 {
-	std::list<util::istring> ret = util::string2list<util::istring>( suffixes(), boost::regex( "[[:space:]]" ) );
+	std::list<util::istring> ret = util::stringToList<util::istring>( suffixes(), boost::regex( "[[:space:]]" ) );
 	BOOST_FOREACH( util::istring & ref, ret ) {
 		ref.erase( 0, ref.find_first_not_of( '.' ) ); // remove leading . if there are some
 	}
@@ -84,21 +84,21 @@ std::pair< std::string, std::string > FileFormat::makeBasename( const std::strin
 	return std::make_pair( filename, std::string() );
 }
 
-std::string FileFormat::makeFilename( const util::PropMap &props, std::string namePattern )
+std::string FileFormat::makeFilename( const util::PropertyMap &props, std::string namePattern )
 {
 	boost::regex reg( "\\{[^{}]+\\}" );
 	boost::match_results<std::string::iterator> what;
 
 	while( boost::regex_search( namePattern.begin(), namePattern.end() , what, reg ) ) {
-		const util::PropMap::pname_type prop( what[0].str().substr( 1, what.length() - 2 ).c_str() );
+		const util::PropertyMap::KeyType prop( what[0].str().substr( 1, what.length() - 2 ).c_str() );
 
 		if( props.hasProperty( prop ) ) {
 
-			const std::string pstring =  boost::regex_replace( props.getProperty<std::string>( prop ), boost::regex( "[[:space:]/\\\\]" ), "_" );
+			const std::string pstring =  boost::regex_replace( props.getPropertyAs<std::string>( prop ), boost::regex( "[[:space:]/\\\\]" ), "_" );
 
 			namePattern.replace( what[0].first, what[0].second, pstring );
 			LOG( Debug, info )
-					<< "Replacing " << util::MSubject( util::PropMap::pname_type( "{" ) + prop + "}" ) << " by "    << util::MSubject( props.getProperty<std::string>( prop ) )
+					<< "Replacing " << util::MSubject( util::PropertyMap::KeyType( "{" ) + prop + "}" ) << " by "   << util::MSubject( props.getPropertyAs<std::string>( prop ) )
 					<< " the string is now " << util::MSubject( namePattern );
 		} else {
 			LOG( Runtime, warning ) << "The property " << util::MSubject( prop ) << " does not exist - ignoring it";
@@ -108,15 +108,16 @@ std::string FileFormat::makeFilename( const util::PropMap &props, std::string na
 
 	return namePattern;
 }
-std::list<std::string> FileFormat::makeUniqueFilenames( const data::ImageList &images, const std::string &namePattern )const
+std::list<std::string> FileFormat::makeUniqueFilenames( const std::list<data::Image> &images, const std::string &namePattern )const
 {
 	std::list<std::string> ret;
 	std::map<std::string, unsigned short> names, used_names;
-	BOOST_FOREACH( data::ImageList::const_reference ref, images ) {
-		names[makeFilename( *ref, namePattern )]++;
+	BOOST_FOREACH( std::list<data::Image>::const_reference ref, images ) {
+		names[makeFilename( ref, namePattern )]++;
 	}
-	BOOST_FOREACH( data::ImageList::const_reference ref, images ) {
-		std::string name = makeFilename( *ref, namePattern );
+
+	BOOST_FOREACH( std::list<data::Image>::const_reference ref, images ) {
+		std::string name = makeFilename( ref, namePattern );
 
 		if( names[name] > 1 ) {
 			const unsigned short number = ++used_names[name];

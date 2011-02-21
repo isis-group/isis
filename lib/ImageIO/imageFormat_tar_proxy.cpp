@@ -84,21 +84,21 @@ protected:
 	}
 public:
 	std::string dialects( const std::string &filename )const {
-		/*      if( filename.empty() ) {*/
+		/*      if( filename.isEmpty() ) {*/
 		return std::string();
 		/*      } else {
 		            std::set<std::string> ret;
 		            data::IOFactory::FileFormatList formats = data::IOFactory::get().getFormatInterface( FileFormat::makeBasename( filename ).first );
 		            BOOST_FOREACH( data::IOFactory::FileFormatList::const_reference ref, formats ) {
-		                const std::list<std::string> dias = util::string2list<std::string>( ref->dialects( filename ) );
+		                const std::list<std::string> dias = util::stringToList<std::string>( ref->dialects( filename ) );
 		                ret.insert( dias.begin(), dias.end() );
 		            }
-		            return util::list2string( ret.begin(), ret.end(), ",", "", "" );
+		            return util::listToString( ret.begin(), ret.end(), ",", "", "" );
 		        }*/
 	}
-	std::string name()const {return "tar decompression proxy for other formats";}
+	std::string getName()const {return "tar decompression proxy for other formats";}
 
-	int load ( data::ChunkList &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) {
+	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) {
 		int ret = 0;
 
 		const util::istring suffix = makeBasename( filename ).second.c_str();
@@ -142,7 +142,7 @@ public:
 
 			if( tar_header.typeflag == AREGTYPE || tar_header.typeflag == REGTYPE ) {
 
-				data::IOFactory::FileFormatList formats = data::IOFactory::get().getFormatInterface( org_file.file_string() ); // and get the reading pluging for that
+				data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( org_file.file_string() ); // and get the reading pluging for that
 
 				if( formats.empty() ) {
 					LOG( Runtime, info ) << "Skipping " << org_file << " from " << filename << " because no plugin was found to read it"; // skip if we found none
@@ -190,12 +190,13 @@ public:
 					close( mfile );
 
 					// read the temporary file
-					data::ChunkList chunksT;
-					ret += data::IOFactory::get().loadFile( chunksT, tmpfile, "", dialect );
-					BOOST_FOREACH( data::ChunkList::reference ref, chunksT ) { // set the source property of the red chunks to something more usefull
-						ref->setProperty( "source", ( boost::filesystem::path( filename ) / org_file ).file_string() );
+					std::list<data::Chunk>::iterator prev = chunks.end();
+					--prev;
+					ret += data::IOFactory::load( chunks, tmpfile.string(), "", dialect );
+
+					for( ; prev != chunks.end(); ++prev ) { // set the source property of the red chunks to something more usefull
+						prev->setPropertyAs( "source", ( boost::filesystem::path( filename ) / org_file ).file_string() );
 					}
-					chunks.insert( chunks.end(), chunksT.begin(), chunksT.end() ); // copy the red chunks into the output-list
 				}
 			} else {
 				LOG( Debug, verbose_info ) << "Skipping " << org_file.file_string() << " because its no regular file (type is " << tar_header.typeflag << ")" ;

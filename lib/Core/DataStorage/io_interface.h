@@ -34,14 +34,14 @@ protected:
 	 * If the property doesn't exist a message will be sent to Log using the given loglevel.
 	 * \returns object.hasProperty(name)
 	 */
-	static bool hasOrTell( const util::PropMap::pname_type &name, const util::PropMap &object, LogLevel level );
+	static bool hasOrTell( const util::PropertyMap::KeyType &name, const util::PropertyMap &object, LogLevel level );
 	/**
 	 * Transform a given property into another and remove the original in the given PropMap.
 	 * If the property doesn't exist a message will be sent to Log using the given loglevel.
 	 * \returns true if the property existed and was transformed.
 	 */
 	template<typename TYPE> static bool
-	transformOrTell( const util::PropMap::pname_type &from, const util::PropMap::pname_type &to, util::PropMap &object, LogLevel level ) {
+	transformOrTell( const util::PropertyMap::KeyType &from, const util::PropertyMap::KeyType &to, util::PropertyMap &object, LogLevel level ) {
 		if ( hasOrTell( from, object, level ) and object.transform<TYPE>( from, to ) ) {
 			LOG( Debug, verbose_info ) << "Transformed " << from << " into " << object.propertyValue( to );
 			return true;
@@ -51,6 +51,7 @@ protected:
 	}
 	/// \return the file-suffixes the plugin supports
 	virtual std::string suffixes()const = 0;
+	static const float invalid_float;
 public:
 	static void throwGenericError( std::string desc );
 	static void throwSystemError( int err, std::string desc = "" );
@@ -59,13 +60,13 @@ public:
 	/// splits the suffix (and the ".") from the filename (or path) and returns a pair made of both parts
 	virtual std::pair<std::string, std::string> makeBasename( const std::string &filename )const;
 
-	static std::string makeFilename( const util::PropMap &img, std::string namePattern );
-	std::list<std::string> makeUniqueFilenames( const data::ImageList &images, const std::string &namePattern )const;
+	static std::string makeFilename(const util::PropertyMap &img,std::string namePattern);
+	std::list<std::string> makeUniqueFilenames( const std::list<data::Image> &images, const std::string &namePattern )const;
 
 
-	static const float invalid_float;
 	/// \return the name of the plugin
-	virtual std::string name()const = 0;
+	virtual std::string getName()const = 0;
+
 	/**
 	 * get all file suffixes a plugin suggests to handle
 	 * The string returned by suffixes is tokenized at the spaces and every leading "." is stripped.
@@ -78,8 +79,10 @@ public:
 
 	/// \return the dialects the plugin supports
 	virtual std::string dialects( const std::string &filename )const {return std::string();};
+
 	/// \return if the plugin is not part of the official distribution
 	virtual bool tainted()const {return true;}
+
 	/**
 	 * Load data into the given chunk list.
 	 * I case of an error std::runtime_error will be thrown.
@@ -88,7 +91,8 @@ public:
 	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
 	 * \returns the amount of loaded chunks.
 	 */
-	virtual int load( data::ChunkList &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) = 0; //@todo should be locked
+	virtual int load( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) = 0; //@todo should be locked
+
 	/**
 	 * Write a single image to a file.
 	 * I case of an error std::runtime_error will be thrown.
@@ -96,6 +100,7 @@ public:
 	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
 	 */
 	virtual void write( const data::Image &image, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) = 0;
+
 	/**
 	 * Write a image list.
 	 * I case of an error std::runtime_error will be thrown.
@@ -103,7 +108,8 @@ public:
 	 * \param filename the name to be used as base for the filename generation if neccessary.
 	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
 	 */
-	virtual void write( const data::ImageList &images, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & );
+	virtual void write( const std::list<data::Image> &images, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & );
+
 	virtual ~FileFormat() {}
 };
 }

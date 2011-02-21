@@ -15,6 +15,7 @@
 #include "_ioapplication.hpp"
 #include "_image.hpp"
 #include "_chunk.hpp"
+#include "_iofactory.hpp"
 #include "std_item.hpp"
 
 using namespace boost::python;
@@ -28,6 +29,7 @@ BOOST_PYTHON_MODULE( _data )
 	class_<isis::data::IOApplication, _IOApplication, bases< _Application> > ( "IOApplication", init<const char *, bool, bool>() )
 	.def( "init", &_IOApplication::init )
 	.def( "addParameter", &_IOApplication::_addParameter )
+	.def( "getParameterAsString", &_IOApplication::_getParameterAsString )
 	.def( "setNeeded", &_IOApplication::_setNeeded )
 	.def( "setHidden", &_IOApplication::_setHidden )
 	.def( "autoload", &isis::data::IOApplication::autoload )
@@ -37,14 +39,14 @@ BOOST_PYTHON_MODULE( _data )
 	//#######################################################################################
 	//  Image
 	//#######################################################################################
-	class_<isis::data::Image, _Image, bases<isis::util::PropMap> >( "Image", init<>() )
+	class_<isis::data::Image, _Image, bases<isis::util::PropertyMap> >( "Image", init<>() )
 	.def( init<isis::data::Image>() )
 	.def( "checkMakeClean", &isis::data::Image::checkMakeClean )
 	.def( "getVoxel", ( float ( ::_Image:: * )( const isis::util::ivector4 & ) ) ( &_Image::_voxel ), ( arg( "coord" ) ) )
 	.def( "getVoxel", ( float ( ::_Image:: * )( const size_t &, const size_t &, const size_t &, const size_t & ) ) ( &_Image::_voxel ), ( arg( "first" ), arg( "second" ), arg( "third" ), arg( "fourth" ) ) )
 	.def( "setVoxel", ( bool ( ::_Image:: * )( const isis::util::ivector4 &, const float & ) ) ( &_Image::_setVoxel ), ( arg( "coord" ), arg( "value" ) ) )
 	.def( "setVoxel", ( bool ( ::_Image:: * )( const size_t &, const size_t &, const size_t &, const size_t &, const float & ) ) ( &_Image::_setVoxel ), ( arg( "first" ), arg( "second" ), arg( "third" ), arg( "fourth" ), arg( "value" ) ) )
-	.def( "sizeToVector", &_Image::_sizeToVector )
+	.def( "getSizeAsVector", &_Image::_getSizeAsVector )
 	.def( "getChunkList", &_Image::_getChunkList )
 	.def( "typeID", &isis::data::Image::typeID )
 	.def( "getChunkAt", &isis::data::Image::getChunkAt )
@@ -55,13 +57,13 @@ BOOST_PYTHON_MODULE( _data )
 	.def( "insertChunk", &isis::data::Image::insertChunk )
 	.def( "reIndex", &isis::data::Image::reIndex )
 	.def( "empty", &isis::data::Image::empty )
-	.def( "bytesPerVoxel", &isis::data::Image::bytes_per_voxel )
+	.def( "bytesPerVoxel", &isis::data::Image::getBytesPerVoxel )
 	.def( "getMin", &_Image::_getMin )
 	.def( "getMax", &_Image::_getMax )
-	.def( "cmp", &isis::data::Image::cmp )
+	.def( "compare", &isis::data::Image::compare )
 	.def( "transformCoords", &_Image::_transformCoords )
 	.def( "getMainOrientation", &_Image::_getMainOrientation )
-	.def( "makeOfTypeId", &isis::data::Image::makeOfTypeId )
+	.def( "convertToType", &isis::data::Image::convertToType )
 	.def( "makeOfTypeName", &_Image::_makeOfTypeName )
 	.def( "spliceDownTo", &_Image::_spliceDownTo )
 	.def( "deepCopy", ( isis::data::Image ( ::_Image:: * )( void ) ) ( &_Image::_deepCopy ) )
@@ -99,5 +101,15 @@ BOOST_PYTHON_MODULE( _data )
 	.def( "__setitem__", &std_list<CList>::set, with_custodian_and_ward<1, 2>() )
 	.def( "__delitem__", &std_list<CList>::del )
 	;
+	//#######################################################################################
+	//  IOFactory
+	//#######################################################################################
+	class_<_IOFactory>( "IOFactory", no_init )
+	//  .def( "write", &_IOFactory::_write )
+	//  .staticmethod( "write" )
+	.def( "load", &_IOFactory::_load )
+	.staticmethod( "load" )
+	;
+
 }
 #endif

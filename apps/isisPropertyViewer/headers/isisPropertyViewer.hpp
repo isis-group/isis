@@ -31,7 +31,7 @@ signals:
 
 private:
 	typedef std::set<std::string, isis::util::_internal::caselessStringLess> PropKeyListType;
-	typedef std::map<std::string, isis::util::PropMap> PropMapType;
+	typedef std::map<std::string, isis::util::PropertyMap> PropMapType;
 	PropKeyListType m_keyList;
 	Ui::isisPropertyViewer ui;
 	void createTree( const boost::shared_ptr<isis::data::Image>, const QString & );

@@ -1,23 +1,20 @@
 #!/usr/bin/make -f
 
+PYVER:=$(shell python -c 'import sys;print sys.version[:3]')
+
+all:
+	echo "DESTDIR $(DEB_DESTDIR)" 
 
 include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/cmake.mk
 
-########################################
-# CMAKE support
-########################################
 
 DEB_CMAKE_EXTRA_FLAGS = \
+	-DCMAKE_BUILD_TYPE="Release" \
 	-DCMAKE_C_COMPILER="/usr/bin/gcc" \
-	-DBUILD_SHARED_LIBS:BOOL=ON \
-	-DCMAKE_SKIP_RPATH:BOOL=OFF \
-	-DCMAKE_BUILD_TYPE=release \
-	-DISIS_DIR=/usr/share/isis/cmake \
-	-DISIS_ADAPTER_ITK=ON \
-	-DISIS_ADAPTER_QT4=ON \
-	-DISIS_ADAPTER_VTK=ON
-
-include /usr/share/cdbs/1/class/cmake.mk
+	-DISIS_PYTHON_CORE:BOOL=ON \
+	-DISIS_PYTHON_DATASTORAGE:BOOL=ON \
+	-DCURRENT_PYTHON_VERSION=${PYVER}
 
 # get number of parallel builds from the default environment
 # variable DEB_BUILD_OPTIONS. The expected value is 'parrallel=#'.
@@ -25,3 +22,4 @@ ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
 	NUMJOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
     MAKEFLAGS += -j$(NUMJOBS)
 endif
+

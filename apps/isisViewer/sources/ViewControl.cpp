@@ -36,9 +36,7 @@ ViewControl::ViewControl( ) : m_Valid( false )
 	m_RendererAxial = vtkRenderer::New();
 	m_RendererSagittal = vtkRenderer::New();
 	m_RendererCoronal = vtkRenderer::New();
-	m_TopRendererCoronal = vtkRenderer::New();
-	m_TopRendererSagittal = vtkRenderer::New();
-	m_TopRendererAxial = vtkRenderer::New();
+	m_PlaneWidgetAxial = vtkPlaneWidget::New();
 
 	m_Cursor = vtkCursor2D::New();
 	m_ActorCursorAxial = vtkActor::New();
@@ -76,9 +74,9 @@ void ViewControl::addImages( const ImageMapType &fileMap )
 	BOOST_FOREACH( ImageMapType::const_reference ref, fileMap ) {
 		boost::shared_ptr< ImageHolder > tmpVec( new ImageHolder );
 		tmpVec->setImages( ref.first, ref.second );
-		tmpVec->setReadVec( ref.first.getProperty<isis::util::fvector4>( "readVec" ) );
-		tmpVec->setPhaseVec( ref.first.getProperty<isis::util::fvector4>( "phaseVec" ) );
-		tmpVec->setSliceVec( ref.first.getProperty<isis::util::fvector4>( "sliceVec" ) );
+		tmpVec->setRowVec( ref.first.getPropertyAs<isis::util::fvector4>( "rowVec" ) );
+		tmpVec->setColumnVec( ref.first.getPropertyAs<isis::util::fvector4>( "columnVec" ) );
+		tmpVec->setSliceVec( ref.first.getPropertyAs<isis::util::fvector4>( "sliceVec" ) );
 		m_ImageHolderVector.push_back( tmpVec );
 	}
 
@@ -99,58 +97,18 @@ void ViewControl::addImages( const ImageMapType &fileMap )
 void ViewControl::setUpPipe()
 {
 	LOG( Runtime, info ) << "Setting up the pipe";
-	m_RendererAxial->SetLayer( 0 );
-	m_TopRendererAxial->SetLayer( 1 );
-	m_RendererSagittal->SetLayer( 0 );
-	m_TopRendererSagittal->SetLayer( 1 );
-	m_RendererCoronal->SetLayer( 0 );
-	m_TopRendererCoronal->SetLayer( 1 );
 	m_AxialWidget->GetInteractor()->SetInteractorStyle( m_InteractionStyleAxial );
 	m_SagittalWidget->GetInteractor()->SetInteractorStyle( m_InteractionStyleSagittal );
 	m_CoronalWidget->GetInteractor()->SetInteractorStyle( m_InteractionStyleCoronal );
 	m_AxialWidget->GetRenderWindow()->SetInteractor( m_AxialWidget->GetInteractor() );
 	m_SagittalWidget->GetRenderWindow()->SetInteractor( m_SagittalWidget->GetInteractor() );
 	m_CoronalWidget->GetRenderWindow()->SetInteractor( m_CoronalWidget->GetInteractor() );
-	m_CoronalWidget->GetRenderWindow()->SetDesiredUpdateRate( 20 );
-	m_AxialWidget->GetRenderWindow()->SetDesiredUpdateRate( 20 );
-	m_SagittalWidget->GetRenderWindow()->SetDesiredUpdateRate( 20 );
-	m_CoronalWidget->GetRenderWindow()->SetNumberOfLayers( 2 );
-	m_SagittalWidget->GetRenderWindow()->SetNumberOfLayers( 2 );
-	m_AxialWidget->GetRenderWindow()->SetNumberOfLayers( 2 );
 	m_AxialWidget->GetRenderWindow()->AddRenderer( m_RendererAxial );
-	m_AxialWidget->GetRenderWindow()->AddRenderer( m_TopRendererAxial );
 	m_SagittalWidget->GetRenderWindow()->AddRenderer( m_RendererSagittal );
-	m_SagittalWidget->GetRenderWindow()->AddRenderer( m_TopRendererSagittal );
 	m_CoronalWidget->GetRenderWindow()->AddRenderer( m_RendererCoronal );
-	m_CoronalWidget->GetRenderWindow()->AddRenderer( m_TopRendererCoronal );
-	setUpCursors();
 
 }
 
-
-void ViewControl::setUpCursors()
-{
-	m_Cursor->AllOn();
-	//  m_Cursor->AxesOn();
-	m_Cursor->OutlineOff();
-	m_Cursor->SetRadius( 80 );
-	m_Cursor->Update();
-	m_TopRendererCoronal->AddActor( m_ActorCursorCoronal );
-	m_TopRendererAxial->AddActor( m_ActorCursorAxial );
-	m_TopRendererSagittal->AddActor( m_ActorCursorSagittal );
-	m_PolyMapperCursorAxial->SetInputConnection( m_Cursor->GetOutputPort() );
-	m_PolyMapperCursorCoronal->SetInputConnection( m_Cursor->GetOutputPort() );
-	m_PolyMapperCursorSagittal->SetInputConnection( m_Cursor->GetOutputPort() );
-	m_ActorCursorAxial->GetProperty()->SetColor( 1, 0, 0 );
-	m_ActorCursorCoronal->GetProperty()->SetColor( 0, 1, 0 );
-	m_ActorCursorSagittal->GetProperty()->SetColor( 0, 0, 1 );
-	m_ActorCursorAxial->SetMapper( m_PolyMapperCursorAxial );
-	m_ActorCursorCoronal->SetMapper( m_PolyMapperCursorCoronal );
-	m_ActorCursorSagittal->SetMapper( m_PolyMapperCursorSagittal );
-	m_ActorCursorAxial->SetPickable( 0 );
-	m_ActorCursorCoronal->SetPickable( 0 );
-	m_ActorCursorSagittal->SetPickable( 0 );
-}
 
 void ViewControl::resetCam()
 {
@@ -194,15 +152,6 @@ void ViewControl::sliceChanged( const int &x, const int &y, const int &z )
 			LOG( Runtime, error ) << "error during setting slicesetting!";
 		}
 	}
-	m_ActorCursorAxial->SetPosition( x - m_CurrentImageHolder->getISISImage().getProperty<util::ivector4>( "imageSize" )[0] / 2,
-									 y - m_CurrentImageHolder->getISISImage().getProperty<util::ivector4>( "imageSize" )[1] / 2
-									 , 0 );
-	m_ActorCursorCoronal->SetPosition(  x - m_CurrentImageHolder->getISISImage().getProperty<util::ivector4>( "imageSize" )[0] / 2,
-										z - m_CurrentImageHolder->getISISImage().getProperty<util::ivector4>( "imageSize" )[2] / 2
-										, 0 );
-	m_ActorCursorSagittal->SetPosition( x - m_CurrentImageHolder->getISISImage().getProperty<util::ivector4>( "imageSize" )[0] / 2,
-										y - m_CurrentImageHolder->getISISImage().getProperty<util::ivector4>( "imageSize" )[1] / 2
-										, 0 );
 	UpdateWidgets();
 }
 

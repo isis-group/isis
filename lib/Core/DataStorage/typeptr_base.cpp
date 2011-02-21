@@ -13,61 +13,61 @@ namespace data
 namespace _internal
 {
 
-TypePtrBase::TypePtrBase( size_t length ): m_len( length ) {}
+ValuePtrBase::ValuePtrBase( size_t length ): m_len( length ) {}
 
-size_t TypePtrBase::len() const { return m_len;}
+size_t ValuePtrBase::length() const { return m_len;}
 
-TypePtrBase::~TypePtrBase() {}
+ValuePtrBase::~ValuePtrBase() {}
 
-const TypePtrConverterMap &TypePtrBase::converters()
+const ValuePtrConverterMap &ValuePtrBase::converters()
 {
-	return util::Singletons::get<_internal::TypePtrConverterMap, 0>();
+	return util::Singletons::get<_internal::ValuePtrConverterMap, 0>();
 }
 
-const TypePtrBase::Converter &TypePtrBase::getConverterTo( unsigned short id )const
+const ValuePtrBase::Converter &ValuePtrBase::getConverterTo( unsigned short ID )const
 {
-	const TypePtrConverterMap::const_iterator f1 = converters().find( typeID() );
-	LOG_IF( f1 == converters().end(), Debug, error ) << "There is no known conversion from " << util::getTypeMap()[typeID()];
-	const TypePtrConverterMap::mapped_type::const_iterator f2 = f1->second.find( id );
-	LOG_IF( f2 == f1->second.end(), Debug, error ) << "There is no known conversion from " << util::getTypeMap()[typeID()] << " to " << util::getTypeMap()[id];
+	const ValuePtrConverterMap::const_iterator f1 = converters().find( getTypeID() );
+	LOG_IF( f1 == converters().end(), Debug, error ) << "There is no known conversion from " << util::getTypeMap()[getTypeID()];
+	const ValuePtrConverterMap::mapped_type::const_iterator f2 = f1->second.find( ID );
+	LOG_IF( f2 == f1->second.end(), Debug, error ) << "There is no known conversion from " << util::getTypeMap()[getTypeID()] << " to " << util::getTypeMap()[ID];
 	return f2->second;
 }
 
-size_t TypePtrBase::cmp( const TypePtrBase &comp )const
+size_t ValuePtrBase::compare( const ValuePtrBase &comp )const
 {
-	LOG_IF( len() != comp.len(), Runtime, info ) << "Comparing data of different length. The difference will be added to the returned value.";
-	return len() - comp.len() + cmp( 0, std::min( len(), comp.len() ) - 1, comp, 0 );
+	LOG_IF( length() != comp.length(), Runtime, info ) << "Comparing data of different length. The difference will be added to the returned value.";
+	return length() - comp.length() + compare( 0, std::min( length(), comp.length() ) - 1, comp, 0 );
 }
 
-TypePtrBase::Reference TypePtrBase::copyToNewById( unsigned short id ) const
+ValuePtrBase::Reference ValuePtrBase::copyToNewByID( unsigned short ID ) const
 {
-	return copyToNewById( id, getScalingTo( id ) );
+	return copyToNewByID( ID, getScalingTo( ID ) );
 }
-TypePtrBase::Reference TypePtrBase::copyToNewById( unsigned short id, const scaling_pair &scaling ) const
+ValuePtrBase::Reference ValuePtrBase::copyToNewByID( unsigned short ID, const scaling_pair &scaling ) const
 {
-	const Converter &conv = getConverterTo( id );
+	const Converter &conv = getConverterTo( ID );
 
 	if( conv ) {
-		boost::scoped_ptr<TypePtrBase> ret;
+		boost::scoped_ptr<ValuePtrBase> ret;
 		conv->generate( *this, ret, scaling );
 		return *ret;
 	} else {
 		LOG( Runtime, error )
 				<< "I dont know any conversion from "
-				<< util::MSubject( toString( true ) ) << " to " << util::MSubject( util::getTypeMap( false, true )[id] );
+				<< util::MSubject( toString( true ) ) << " to " << util::MSubject( util::getTypeMap( false, true )[ID] );
 		return Reference(); // return an empty Reference
 	}
 }
 
-TypePtrBase::Reference TypePtrBase::createById( unsigned short id, size_t len )
+ValuePtrBase::Reference ValuePtrBase::createById( unsigned short id, size_t len )
 {
-	const TypePtrConverterMap::const_iterator f1 = converters().find( id );
-	TypePtrConverterMap::mapped_type::const_iterator f2;
+	const ValuePtrConverterMap::const_iterator f1 = converters().find( id );
+	ValuePtrConverterMap::mapped_type::const_iterator f2;
 
 	// try to get a converter to convert the requestet type into itself - they 're there for all known types
 	if( f1 != converters().end() && ( f2 = f1->second.find( id ) ) != f1->second.end() ) {
-		const _internal::TypePtrConverterBase &conv = *( f2->second );
-		boost::scoped_ptr<TypePtrBase> ret;
+		const _internal::ValuePtrConverterBase &conv = *( f2->second );
+		boost::scoped_ptr<ValuePtrBase> ret;
 		conv.create( ret, len );
 		return *ret;
 	} else {
@@ -76,40 +76,45 @@ TypePtrBase::Reference TypePtrBase::createById( unsigned short id, size_t len )
 	}
 }
 
-void TypePtrBase::copyRange( size_t start, size_t end, TypePtrBase &dst, size_t dst_start )const
+void ValuePtrBase::copyRange( size_t start, size_t end, ValuePtrBase &dst, size_t dst_start )const
 {
 	assert( start <= end );
-	const size_t length = end - start + 1;
+	const size_t len = end - start + 1;
 	LOG_IF( ! dst.isSameType( *this ), Debug, error )
-			<< "Copying into a TypePtr of different type. Its " << dst.typeName() << " not " << typeName();
+			<< "Copying into a ValuePtr of different type. Its " << dst.getTypeName() << " not " << getTypeName();
 
-	if( end >= len() ) {
+	if( end >= length() ) {
 		LOG( Runtime, error )
-				<< "End of the range (" << end << ") is behind the end of this TypePtr (" << len() << ")";
-	} else if( length + dst_start > dst.len() ) {
+				<< "End of the range (" << end << ") is behind the end of this ValuePtr (" << length() << ")";
+	} else if( len + dst_start > dst.length() ) {
 		LOG( Runtime, error )
-				<< "End of the range (" << length + dst_start << ") is behind the end of the destination (" << dst.len() << ")";
+				<< "End of the range (" << len + dst_start << ") is behind the end of the destination (" << dst.length() << ")";
 	} else {
 		boost::shared_ptr<void> daddr = dst.getRawAddress().lock();
 		boost::shared_ptr<void> saddr = getRawAddress().lock();
-		const size_t soffset = bytes_per_elem() * start; //source offset in bytes
+		const size_t soffset = bytesPerElem() * start; //source offset in bytes
 		const int8_t *const  src = ( int8_t * )saddr.get();
-		const size_t doffset = bytes_per_elem() * dst_start;//destination offset in bytes
+		const size_t doffset = bytesPerElem() * dst_start;//destination offset in bytes
 		int8_t *const  dest = ( int8_t * )daddr.get();
-		const size_t blength = length * bytes_per_elem();//length in bytes
+		const size_t blength = len * bytesPerElem();//length in bytes
 		memcpy( dest + doffset, src + soffset, blength );
 	}
 }
 
-scaling_pair TypePtrBase::getScalingTo( unsigned short typeID, autoscaleOption scaleopt )const
+scaling_pair ValuePtrBase::getScalingTo( unsigned short typeID, autoscaleOption scaleopt )const
 {
-	util::TypeReference min, max;
-	getMinMax( min, max );
-	assert( ! ( min.empty() || max.empty() ) );
-	return TypePtrBase::getScalingTo( typeID, *min, *max );
+	std::pair<util::ValueReference, util::ValueReference> minmax = getMinMax();
+	assert( ! ( minmax.first.isEmpty() || minmax.second.isEmpty() ) );
+	return ValuePtrBase::getScalingTo( typeID, minmax, scaleopt );
 }
 
-scaling_pair TypePtrBase::getScalingTo( unsigned short typeID, const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt )const
+scaling_pair ValuePtrBase::getScalingTo( unsigned short typeID, const std::pair<util::ValueReference, util::ValueReference> &minmax, autoscaleOption scaleopt )const
+{
+	LOG_IF( minmax.first.isEmpty() || minmax.second.isEmpty(), Debug, error ) << "One of the ValueReference's in minmax is empty(). This will crash...";
+	return getScalingTo( typeID, *minmax.first, *minmax.second, scaleopt );
+}
+
+scaling_pair ValuePtrBase::getScalingTo( unsigned short typeID, const util::_internal::ValueBase &min, const util::_internal::ValueBase &max, autoscaleOption scaleopt )const
 {
 	const Converter &conv = getConverterTo( typeID );
 
@@ -117,74 +122,30 @@ scaling_pair TypePtrBase::getScalingTo( unsigned short typeID, const util::_inte
 		return conv->getScaling( min, max, scaleopt );
 	} else {
 		LOG( Runtime, error )
-				<< "I dont know any conversion from " << util::MSubject( typeName() ) << " to " << util::MSubject( util::getTypeMap( false, true )[typeID] );
+				<< "I dont know any conversion from " << util::MSubject( getTypeName() ) << " to " << util::MSubject( util::getTypeMap( false, true )[typeID] );
 		return scaling_pair();
 	}
 }
-bool TypePtrBase::convertTo( TypePtrBase &dst )const
+bool ValuePtrBase::convertTo( ValuePtrBase &dst )const
 {
-	return convertTo( dst, getScalingTo( dst.typeID() ) );
+	return convertTo( dst, getScalingTo( dst.getTypeID() ) );
 }
-bool TypePtrBase::convertTo( TypePtrBase &dst, const scaling_pair &scaling ) const
+bool ValuePtrBase::convertTo( ValuePtrBase &dst, const scaling_pair &scaling ) const
 {
-	const Converter &conv = getConverterTo( dst.typeID() );
+	const Converter &conv = getConverterTo( dst.getTypeID() );
 
 	if ( conv ) {
 		conv->convert( *this, dst, scaling );
 		return true;
 	} else {
 		LOG( Runtime, error )
-				<< "I dont know any conversion from " << util::MSubject( typeName() ) << " to " << util::MSubject( dst.typeName() );
+				<< "I dont know any conversion from " << util::MSubject( getTypeName() ) << " to " << util::MSubject( dst.getTypeName() );
 		return false;
 	}
 }
-size_t TypePtrBase::use_count() const
+size_t ValuePtrBase::useCount() const
 {
 	return getRawAddress().use_count();
-}
-
-
-bool TypePtrBase::swapAlong( TypePtrBase &dst, const size_t dim, const size_t dims[]  ) const
-{
-	boost::shared_ptr<void> daddr = dst.getRawAddress().lock();
-	boost::shared_ptr<void> saddr = getRawAddress().lock();
-	const int8_t *const  src = ( int8_t * )saddr.get();
-	int8_t *const dest = ( int8_t * )daddr.get();
-
-	if ( dim == 0 ) {
-		size_t index_forward = 0;
-		size_t index_y = 0;
-
-		for ( size_t z = 0; z < dims[2]; z++ ) {
-			for ( size_t y = 0; y < dims[1]; y++ ) {
-				index_y++;
-
-				for ( size_t direction = 0; direction < dims[0]; direction++ ) {
-					memcpy( dest + index_forward * bytes_per_elem(), src + ( ( index_y * dims[0] ) - direction - 1 ) * bytes_per_elem(), bytes_per_elem() );
-					index_forward++;
-				}
-			}
-		}
-
-		return 1;
-	} else if ( dim == 1 ) {
-		for ( size_t z = 0; z < dims[2]; z++ ) {
-			for ( size_t direction = 0; direction < dims[dim]; direction++ ) {
-				memcpy( dest + ( ( dims[0] * direction ) + z * dims[0] * dims[1] ) * bytes_per_elem(), src + ( ( dims[0] * ( dims[1] - direction - 1 ) ) + z * dims[0] * dims[1] ) * bytes_per_elem(), bytes_per_elem() * dims[0] );
-			}
-		}
-
-		return 1;
-	} else if ( dim == 2 ) {
-		for ( size_t direction = 0; direction < dims[dim]; direction++ ) {
-			memcpy( dest + direction * dims[0]*dims[1]*bytes_per_elem(), src + ( dims[dim] - direction - 1 )*dims[0]*dims[1]*bytes_per_elem(), bytes_per_elem()*dims[0]*dims[1] );
-		}
-
-		return 1;
-	} else {
-		LOG( Runtime, error ) << "Swapping along axis referred by " << dim << " is not possible!";
-		return 0;
-	}
 }
 
 }

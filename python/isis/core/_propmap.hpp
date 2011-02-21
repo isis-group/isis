@@ -25,15 +25,17 @@ public:
 	_PropMap ( PyObject *p ) : self( p ), boost::python::wrapper< PropMap >() {}
 	_PropMap ( PyObject *p, const PropMap &base ) : PropMap( base ), self( p ), boost::python::wrapper< PropMap >() {}
 
-	isis::util::PropMap _branch ( const std::string &key ) {
+	isis::util::PropertyMap _branch ( const util::istring &key ) {
+		return this->branch( key );
 		return this->branch( key );
 	}
 
-	isis::util::PropertyValue _propertyValue( const std::string &key ) {
+	isis::util::PropertyValue _propertyValue( const util::istring &key ) {
 		return this->propertyValue( key );
 	}
 
-	void _setProperty( std::string key, PyObject *value, std::string type ) {
+
+	void _setPropertyAs( std::string key, PyObject *value, std::string type ) {
 		if( PyFloat_Check( value ) ) {
 			internSetProperty<float>( key, value, type );
 		} else if( PyBool_Check( value ) ) {
@@ -51,17 +53,17 @@ public:
 		} else if ( boost::iequals( type, "selection" ) ) {
 			internSetProperty<isis::util::Selection>( key, value, type );
 		} else {
-			LOG( Runtime, error ) << "Type " << type << " is not registered.";
+			LOG( Runtime, error ) << "Value " << type << " is not registered.";
 		}
 	}
 
 private:
 	PyObject *self;
 	template<typename TYPE>
-	void internSetProperty ( const std::string key, PyObject *value, std::string type ) {
-		util::Type<TYPE> val( static_cast<TYPE>( boost::python::extract<TYPE>( value ) ) );
-		val.copyToNewById( util::getTransposedTypeMap( true, true )[type] );
-		this->setProperty<TYPE>( key, val );
+	void internSetProperty ( const util::istring key, PyObject *value, std::string type ) {
+		util::Value<TYPE> val( static_cast<TYPE>( boost::python::extract<TYPE>( value ) ) );
+		val.copyToNewByID( util::getTransposedTypeMap( true, true )[type] );
+		this->setPropertyAs<TYPE>( key, val );
 	}
 };
 }

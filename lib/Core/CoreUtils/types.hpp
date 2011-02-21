@@ -38,7 +38,7 @@ typedef vector23 < //increase this if a type is added (if >30 consider including
 bool
 , int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t
 , float, double
-, rgb_color24, rgb_color48
+, color24, color48
 , fvector4, dvector4, ivector4
 , ilist, dlist, slist
 , std::string, isis::util::Selection
@@ -46,12 +46,12 @@ bool
 > types;
 
 /**
- * Templated pseudo struct to generate the id of a supported type.
- * The id is stored in TypeId\<T\>::value.
- * The id is the position of the type in the mpl::vector types, starting with 1 (so there is no id==0)
+ * Templated pseudo struct to generate the ID of a supported type.
+ * The ID is stored in TypeID\<T\>::value.
+ * The ID is the position of the type in the mpl::vector types, starting with 1 (so there is no id==0)
  * This is a compile-time-constant, so it can be used as a template parameter and has no impact at the runtime.
  */
-template<class T> struct TypeId {
+template<class T> struct TypeID {
 	typedef plus< int_<1>, typename distance<begin<types>::type, typename find<types, T>::type >::type > type;
 	static const unsigned short value = type::value;
 };
@@ -59,10 +59,10 @@ template<class T> struct TypeId {
 /// @endcond
 /**
  * Templated pseudo struct to check for availability of a type at compile time.
- * Instanciating this with any datatype (eg: check_type\<short\>() ) will cause the
+ * Instanciating this with any datatype (eg: checkType\<short\>() ) will cause the
  * compiler to raise an error if this datatype is not in the list of the supported types.
  */
-template< typename T > struct check_type {
+template< typename T > struct checkType {
 	BOOST_MPL_ASSERT_MSG(
 		( boost::mpl::contains<_internal::types, T>::value )
 		, TYPE_IS_NOT_KNOWN
@@ -70,9 +70,9 @@ template< typename T > struct check_type {
 	);
 };
 
-std::map<unsigned short, std::string> getTypeMap( bool withTypes = true, bool withTypePtrs = true );
+std::map<unsigned short, std::string> getTypeMap( bool withValues = true, bool withValuePtrs = true );
 
-std::map< std::string, unsigned short> getTransposedTypeMap( bool withTypes = true, bool withTypePtrs = true );
+std::map< std::string, unsigned short> getTransposedTypeMap( bool withValues = true, bool withValuePtrs = true );
 }
 }
 

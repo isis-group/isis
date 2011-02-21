@@ -48,6 +48,7 @@
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
+#include <vtkPlaneWidget.h>
 
 namespace isis
 {
@@ -61,7 +62,7 @@ class ImageHolder;
 class ViewControl
 {
 public:
-	typedef std::list< std::pair< util::PropMap, std::vector<vtkSmartPointer< vtkImageData > > > > ImageMapType;
+	typedef std::list< std::pair< util::PropertyMap, std::vector<vtkSmartPointer< vtkImageData > > > > ImageMapType;
 	ViewControl();
 	void init( QVTKWidget *axial, QVTKWidget *sagittal, QVTKWidget *coronal );
 	void resetCam();
@@ -94,10 +95,8 @@ private:
 	vtkSmartPointer<vtkRenderer> m_RendererAxial;
 	vtkSmartPointer<vtkRenderer> m_RendererSagittal;
 	vtkSmartPointer<vtkRenderer> m_RendererCoronal;
-	//the TopRenderer are responsible for holding the reticle
-	vtkSmartPointer<vtkRenderer> m_TopRendererAxial;
-	vtkSmartPointer<vtkRenderer> m_TopRendererSagittal;
-	vtkSmartPointer<vtkRenderer> m_TopRendererCoronal;
+
+	vtkSmartPointer<vtkPlaneWidget> m_PlaneWidgetAxial;
 
 	vtkSmartPointer<vtkRenderWindow> m_WindowAxial;
 	vtkSmartPointer<vtkRenderWindow> m_WindowSagittal;
@@ -124,7 +123,6 @@ private:
 	QVTKWidget *m_CoronalWidget;
 
 	void setUpPipe();
-	void setUpCursors();
 	void loadImages( util::slist & );
 
 };

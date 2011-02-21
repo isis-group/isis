@@ -28,16 +28,17 @@ BOOST_AUTO_TEST_SUITE ( imageIONii_NullTests )
 
 BOOST_AUTO_TEST_CASE( loadsaveImage )
 {
-	//  data::enable_log<util::DefaultMsgPrint>(info);
-	data::ImageList images;
-	image_io::enable_log<util::DefaultMsgPrint>( info );
+	//  data::enableLog<util::DefaultMsgPrint>(info);
+
+	image_io::enableLog<util::DefaultMsgPrint>( info );
 	//  We will use the Null plugin to get some image data
-	util::TmpFile nullfile( "", ".null" ), niifile( "", ".nii" );
+	util::TmpFile niifile( "", ".nii" );
 	// the null-loader shall generate 5 3x3x3x10 images
-	images = data::IOFactory::load( nullfile.file_string(), "" );
+	std::list<data::Image> images = data::IOFactory::load( "nix.null", "" );
+	BOOST_REQUIRE( images.size() >= 1 );
 
 	//  write images to file(s)
-	if ( data::IOFactory::write( images, "", niifile.file_string(), "fsl" ) )
+	if ( data::IOFactory::write( std::list<data::Image>( 1, images.front() ), niifile.file_string(), "", "fsl" ) )
 		std::cout << "Wrote Image to " << niifile << std::endl;
 
 	data::IOFactory::load( niifile.file_string(), "" );

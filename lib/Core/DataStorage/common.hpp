@@ -32,7 +32,7 @@ namespace image_io
 typedef ImageIoLog Runtime;
 typedef ImageIoDebug Debug;
 
-template<typename HANDLE> void enable_log( LogLevel level )
+template<typename HANDLE> void enableLog( LogLevel level )
 {
 	ENABLE_LOG( Runtime, HANDLE, level );
 	ENABLE_LOG( Debug, HANDLE, level );
@@ -44,12 +44,12 @@ namespace data
 
 namespace _internal
 {
-void transformCoords( isis::util::PropMap &, boost::numeric::ublas::matrix<float> );
+void transformCoords( isis::util::PropertyMap &, boost::numeric::ublas::matrix<float> );
 }
 
 typedef DataLog Runtime;
 typedef DataDebug Debug;
-enum dimensions {readDim = 0, phaseDim, sliceDim, timeDim};
+enum dimensions {rowDim = 0, columnDim, sliceDim, timeDim};
 
 /**
  * Set logging level for the namespace data.
@@ -59,7 +59,7 @@ enum dimensions {readDim = 0, phaseDim, sliceDim, timeDim};
  * So if you compile with "-D_ENABLE_DEBUG=0" against a library which (for example) was comiled with "-D_ENABLE_DEBUG=1",
  * you won't be able to change the logging level of the debug messages of these library.
  */
-template<typename HANDLE> void enable_log( LogLevel level )
+template<typename HANDLE> void enableLog( LogLevel level )
 {
 	ENABLE_LOG( Runtime, HANDLE, level );
 	ENABLE_LOG( Debug, HANDLE, level );

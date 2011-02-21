@@ -25,7 +25,7 @@
 
 bool PropertyHolder::addPropMapFromImage( const boost::shared_ptr<isis::data::Image> image, const QString &filename )
 {
-	isis::util::PropMap tmpPropMap = *image;
+	isis::util::PropertyMap tmpPropMap = *image;
 	m_propHolderMap[filename.toStdString()] = tmpPropMap;
 	m_propChanged[filename.toStdString()] = false;
 	return true;
@@ -38,8 +38,8 @@ void PropertyHolder::saveIt( const QString &fileNameAs, const bool SaveAs )
 			isis::data::ImageList imageList = isis::data::IOFactory::load( boolIter->first , "" );
 			isis::data::ImageList tmpImageList;
 			BOOST_FOREACH( isis::data::ImageList::reference image, imageList ) {
-				const isis::util::PropMap &tmpMap( m_propHolderMap.find( boolIter->first )->second ) ;
-				static_cast<isis::util::PropMap &>( *image ) = tmpMap;
+				const isis::util::PropertyMap &tmpMap( m_propHolderMap.find( boolIter->first )->second ) ;
+				static_cast<isis::util::PropertyMap &>( *image ) = tmpMap;
 				tmpImageList.push_back( image );
 			}
 

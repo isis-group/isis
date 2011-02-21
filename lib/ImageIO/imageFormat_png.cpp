@@ -14,7 +14,7 @@ protected:
 		return std::string( ".png" );
 	}
 public:
-	std::string name()const {
+	std::string getName()const {
 		return "PNG (Portable Network Graphics)";
 	}
 	std::string dialects( const std::string &filename ) const {
@@ -24,8 +24,8 @@ public:
 		FILE *fp;
 		png_structp png_ptr;
 		png_infop info_ptr;
-		assert( buff.relevantDims() == 2 );
-		util::FixedVector<size_t, 4> size = buff.sizeToVector();
+		assert( buff.getRelevantDims() == 2 );
+		util::FixedVector<size_t, 4> size = buff.getSizeAsVector();
 
 		/* open the file */
 		fp = fopen( filename.c_str(), "wb" );
@@ -99,25 +99,25 @@ public:
 	}
 
 
-	int load ( data::ChunkList &chunks, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
+	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
 		throwGenericError( "png loading is not supportted (yet)" );
 		return 0;
 	}
 
 	void write( const data::Image &image, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
-		if( image.relevantDims() < 2 ) {
+		if( image.getRelevantDims() < 2 ) {
 			throwGenericError( "Cannot write png when image is made of stripes" );
 		}
 
 		data::Image tImg( image );
-		tImg.makeOfTypeId( data::TypePtr<png_byte>::staticID );
+		tImg.convertToType( data::ValuePtr<png_byte>::staticID );
 		tImg.spliceDownTo( data::sliceDim );
-		std::vector<boost::shared_ptr<data::Chunk> > chunks = tImg.getChunkList();
+		std::vector<boost::shared_ptr<data::Chunk> > chunks = tImg.getChunksAsVector();
 		unsigned short numLen = std::log10( chunks.size() ) + 1;
 		size_t number = 0;
 
 		if( util::istring( dialect.c_str() ) == util::istring( "middle" ) ) { //save only the middle
-			LOG( Runtime, info ) << "Writing the slice " << chunks.size() / 2 + 1 << " of " << chunks.size() << " slices as png-image of size " << chunks.front()->sizeToString();
+			LOG( Runtime, info ) << "Writing the slice " << chunks.size() / 2 + 1 << " of " << chunks.size() << " slices as png-image of size " << chunks.front()->getSizeAsString();
 
 			if( !write_png( filename, *chunks[chunks.size()/2] ) ) {
 				throwGenericError( std::string( "Failed to write " ) + filename );
@@ -126,7 +126,7 @@ public:
 			const std::pair<std::string, std::string> fname = makeBasename( filename );
 			LOG( Runtime, info )
 					<< "Writing " << chunks.size() << " slices as png-images " << fname.first << "_"
-					<< std::string( numLen, 'X' ) << fname.second << " of size " << chunks.front()->sizeToString();
+					<< std::string( numLen, 'X' ) << fname.second << " of size " << chunks.front()->getSizeAsString();
 
 			BOOST_FOREACH( const boost::shared_ptr<data::Chunk> &ref, chunks ) {
 				const std::string num = boost::lexical_cast<std::string>( ++number );
