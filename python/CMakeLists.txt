@@ -8,7 +8,7 @@ set(ISIS_PYTHON_INSTALL_DIR "lib/python${CURRENT_PYTHON_VERSION}/site-packages/i
 ###########################################################
 # find and configure the isis core library
 ###########################################################
-SET(ISIS_DIR /usr/share/isis/cmake CACHE PATH 
+SET(ISIS_DIR /usr/share/isis/cmake CACHE PATH
     "The directory where the isis cmake configuration skript script is located.")
 FIND_PACKAGE(ISIS REQUIRED)
 INCLUDE_DIRECTORIES(${ISIS_INCLUDE_DIRS})
@@ -24,14 +24,6 @@ SET(${CMAKE_PROJECT_NAME}_VERSION_PATCH "0")
 
 SET(${CMAKE_PROJECT_NAME}_VERSION
   ${${CMAKE_PROJECT_NAME}_VERSION_MAJOR}.${${CMAKE_PROJECT_NAME}_VERSION_MINOR}.${${CMAKE_PROJECT_NAME}_VERSION_PATCH})
-
-string(COMPARE EQUAL ${CMAKE_INSTALL_PREFIX} ${ISIS_INSTALL_PREFIX} PREFIX_IS_SAME)
-if(NOT ${PREFIX_IS_SAME})
-	message(SEND_ERROR
-		"Seems like your install prefix (${CMAKE_INSTALL_PREFIX}) is not the same as the prefix, which was used when the core library was built (${ISIS_INSTALL_PREFIX})."
-		"This will prevent this core library from finding the plugins you are building right now. Please use CMAKE_INSTALL_PREFIX=${ISIS_INSTALL_PREFIX}"
-	)
-endif(NOT ${PREFIX_IS_SAME})
 
 # we use the log definitions of the core
 IF(ISIS_RUNTIME_LOG)
@@ -52,7 +44,7 @@ OPTION(${CMAKE_PROJECT_NAME}_CORE "Build core python library" ON)
 OPTION(${CMAKE_PROJECT_NAME}_DATASTORAGE "Build datastorage python library" ON)
 
 FIND_PACKAGE(Boost REQUIRED COMPONENTS python)
-FIND_PACKAGE(PythonLibs REQUIRED) 
+FIND_PACKAGE(PythonLibs REQUIRED)
 INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
 
 add_subdirectory(isis)
