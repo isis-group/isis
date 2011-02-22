@@ -45,7 +45,7 @@ namespace _internal
 template<typename SRC, typename DST> class ValueGenerator: public ValueConverterBase
 {
 public:
-	boost::numeric::range_check_result create( boost::scoped_ptr<ValueBase>& dst )const {
+	void create( boost::scoped_ptr<ValueBase>& dst )const {
 		LOG_IF( dst.get(), Debug, warning ) <<
 											"Generating into existing value " << dst->toString( true ) << " (dropping this).";
 		Value<DST> *ref = new Value<DST>;

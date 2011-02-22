@@ -68,17 +68,17 @@ public:
 	 * The numbers correspont to the order the options where given at the creation of the selection (first option -> 1, second option -> 2 ...)
 	 * \returns number corresponding the currently set option or "0" if none is set
 	 */
-	operator const int()const;
+	operator int()const;
 	/**
 	 * Implicit cast to string.
 	 * \returns the currently set option or "<<NOT_SET>>" if none is set
 	 */
-	operator const std::string()const;
+	operator std::string()const;
 	/**
 	 * Implicit cast to istring.
 	 * \returns the currently set option or "<<NOT_SET>>" if none is set
 	 */
-	operator const util::istring()const;
+	operator util::istring()const;
 	/**
 	 * Common comparison.
 	 * \returns true if both selection have the same options and are currently set to the the option. False otherwise.

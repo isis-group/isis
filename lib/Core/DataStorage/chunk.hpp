@@ -150,7 +150,7 @@ public:
 	}
 
 	/// \returns the number of cheap-copy-chunks using the same memory as this
-	const size_t useCount()const;
+	size_t useCount()const;
 	Chunk cloneToNew( size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 )const;
 
 	/**

@@ -28,8 +28,8 @@ Selection::Selection( const char *entries ): m_set( 0 )
 }
 Selection::Selection(): m_set( 0 ) {}
 
-Selection::operator const int()const {return m_set;}
-Selection::operator const util::istring()const
+Selection::operator int()const {return m_set;}
+Selection::operator util::istring()const
 {
 	BOOST_FOREACH( MapType::const_reference ref, ent_map ) {
 		if ( ref.second == m_set )
@@ -37,7 +37,7 @@ Selection::operator const util::istring()const
 	}
 	return util::istring( "<<NOT_SET>>" );
 }
-Selection::operator const std::string()const
+Selection::operator std::string()const
 {
 	util::istring buff = *this;
 	return std::string( buff.begin(), buff.end() );

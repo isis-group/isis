@@ -74,7 +74,7 @@ public:
 	/**
 	 * Creates a sorted list and sets primary sorting as well as properties which should be equal across all chunks.
 	 */
-	SortedChunkList( util::PropertyMap::KeyType fvectorPropName, util::PropertyMap::KeyType comma_separated_equal_props );
+	SortedChunkList( util::PropertyMap::KeyType comma_separated_equal_props );
 
 	/**
 	 * Adds a property for secondary sorting.

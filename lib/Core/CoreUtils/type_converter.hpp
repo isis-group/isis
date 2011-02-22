@@ -38,7 +38,7 @@ class ValueConverterBase
 {
 public:
 	virtual boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const = 0;
-	virtual boost::numeric::range_check_result create( boost::scoped_ptr<ValueBase>& dst )const = 0;
+	virtual void create( boost::scoped_ptr<ValueBase>& dst )const = 0;
 	virtual boost::numeric::range_check_result generate( const ValueBase &src, boost::scoped_ptr<ValueBase>& dst )const = 0;
 	static boost::shared_ptr<const ValueConverterBase> get() {return boost::shared_ptr<const ValueConverterBase>();}
 public:
