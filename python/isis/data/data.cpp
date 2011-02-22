@@ -35,6 +35,7 @@ BOOST_PYTHON_MODULE( _data )
 	.def( "autoload", &isis::data::IOApplication::autoload )
 	.def( "autowrite", &_IOApplication::_autowrite )
 	.def( "images", &_IOApplication::_images )
+	.def( "setDescroption" , &_IOApplication::_setDescription );
 	;
 	//#######################################################################################
 	//  Image
