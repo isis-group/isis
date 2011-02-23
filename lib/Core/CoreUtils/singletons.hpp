@@ -41,8 +41,8 @@ class Singletons
 	prioMap map;
 	Singletons();
 	virtual ~Singletons();
-	template<typename T> Singleton<T> *const create( int priority ) {
-		Singleton<T> * const ret( new Singleton<T> );
+	template<typename T> Singleton<T> *create( int priority ) {
+		Singleton<T>* ret( new Singleton<T> );
 		map.insert( map.find( priority ), std::make_pair( priority, ret ) );
 		return ret;
 	}

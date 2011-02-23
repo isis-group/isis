@@ -272,7 +272,7 @@ std::list<Chunk> Chunk::splice ( dimensions atDim )const
 	return ret;
 }
 
-const size_t Chunk::useCount() const
+size_t Chunk::useCount() const
 {
 	return getValuePtrBase().useCount();
 }

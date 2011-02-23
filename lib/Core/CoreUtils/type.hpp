@@ -42,7 +42,7 @@ namespace _internal
 template<typename T, bool isNumber> class type_compare
 {
 public:
-	bool operator()( const Value<T> &first, const ValueBase &second )const {
+	bool operator()( const Value<T> &/*first*/, const ValueBase &/*second*/ )const {
 		LOG( Debug, error ) << "comparison of " << Value<T>::staticName() << " is not supportet";
 		return false;
 	}
@@ -53,7 +53,7 @@ public:
  * This generic class does compares numeric Value's by converting the second
  * Value-object to the type of the first Value-object. Then:
  * - if the conversion was successfull (the second value can be represented in the type of the first) the "inRange"-comparison is used
- * - if the conversion failed with an positive or negative overflow (the second value is to high/low the type of the first) a info sent to the debug-logging and the posOverflow/negOverflow comarison us used
+ * - if the conversion failed with an positive or negative overflow (the second value is to high/low to fit into the type of the first) a info sent to the debug-logging and the posOverflow/negOverflow comarison us used
  * - if there is no known conversion from second to first an error is sent to the debug-logging and false is returned
  * The comparison functions (inRange/posOverflow,negOverflow) here are only stubs and will allways return false.
  * So, these class has to be further specialized for the regarding compare operation.
@@ -61,9 +61,9 @@ public:
 template<typename T> class type_compare<T, true>
 {
 protected:
-	virtual bool posOverflow( const Value<T> &first, const Value<T> &second )const {return false;} //default to false
-	virtual bool negOverflow( const Value<T> &first, const Value<T> &second )const {return false;} //default to false
-	virtual bool inRange( const Value<T> &first, const Value<T> &second )const {return false;} //default to false
+	virtual bool posOverflow( const Value<T> &/*first*/, const Value<T> &/*second*/ )const {return false;} //default to false
+	virtual bool negOverflow( const Value<T> &/*first*/, const Value<T> &/*second*/ )const {return false;} //default to false
+	virtual bool inRange( const Value<T> &/*first*/, const Value<T> &/*second*/ )const {return false;} //default to false
 public:
 	bool operator()( const Value<T> &first, const ValueBase &second )const {
 		// ask second for a converter from itself to Value<T>
@@ -107,7 +107,7 @@ protected:
 template<typename T> class type_less<T, true> : public type_compare<T, true>
 {
 protected:
-	bool posOverflow( const Value<T> &first, const Value<T> &second )const {
+	bool posOverflow( const Value<T> &/*first*/, const Value<T> &/*second*/ )const {
 		return true; //getting an positive overflow when trying to convert second into T, obviously means first is less
 	}
 	bool inRange( const Value<T> &first, const Value<T> &second )const {
@@ -119,7 +119,7 @@ protected:
 template<typename T> class type_greater<T, true> : public type_compare<T, true>
 {
 protected:
-	bool negOverflow( const Value<T> &first, const Value<T> &second )const {
+	bool negOverflow( const Value<T> &/*first*/, const Value<T> &/*second*/ )const {
 		return true; //getting an negative overflow when trying to convert second into T, obviously means first is greater
 	}
 	bool inRange( const Value<T> &first, const Value<T> &second )const {
@@ -210,6 +210,7 @@ public:
 	 * \return a const reference to the stored value
 	 */
 	operator const TYPE&()const {return m_val;}
+
 	/**
 	 * Implicit conversion of Value to its value type.
 	 * Only the actual type is allowed.
@@ -225,35 +226,37 @@ public:
 
 	/**
 	 * Check if the value of this is greater than ref converted to TYPE.
-	 * The funktion tries to convert ref to the type of this and compare the result.
+	 * The function tries to convert ref to the type of this and compare the result.
 	 * If there is no conversion an error is send to the debug logging, and false is returned.
 	 * \returns value_of_this > converted_value_of_ref if the conversion was successfull
-	 * \returns true if the conversion failed because the value was to low for TYPE (negative overflow)
-	 * \returns false if the conversion failed because the value was to high for TYPE (positive overflow)
+	 * \returns true if the conversion failed because the value of ref was to low for TYPE (negative overflow)
+	 * \returns false if the conversion failed because the value of ref was to high for TYPE (positive overflow)
 	 * \returns false if there is no know conversion from ref to TYPE
 	 */
 	bool gt( const _internal::ValueBase &ref )const {
 		return _internal::type_greater<TYPE, boost::is_arithmetic<TYPE>::value >()( *this, ref );
 	}
+
 	/**
 	 * Check if the value of this is less than ref converted to TYPE.
-	 * The funktion tries to convert ref to the type of this and compare the result.
+	 * The funkcion tries to convert ref to the type of this and compare the result.
 	 * If there is no conversion an error is send to the debug logging, and false is returned.
 	 * \returns value_of_this < converted_value_of_ref if the conversion was successfull
-	 * \returns false if the conversion failed because the value was to low for TYPE (negative overflow)
-	 * \returns true if the conversion failed because the value was to high for TYPE (positive overflow)
+	 * \returns false if the conversion failed because the value of ref was to low for TYPE (negative overflow)
+	 * \returns true if the conversion failed because the value of ref was to high for TYPE (positive overflow)
 	 * \returns false if there is no know conversion from ref to TYPE
 	 */
 	bool lt( const _internal::ValueBase &ref )const {
 		return _internal::type_less<TYPE, boost::is_arithmetic<TYPE>::value >()( *this, ref );
 	}
+
 	/**
 	 * Check if the value of this is less than ref converted to TYPE.
 	 * The funktion tries to convert ref to the type of this and compare the result.
 	 * If there is no conversion an error is send to the debug logging, and false is returned.
 	 * \returns value_of_this == converted_value_of_ref if the conversion was successfull
-	 * \returns false if the conversion failed because the value was to low for TYPE (negative overflow)
-	 * \returns false if the conversion failed because the value was to high for TYPE (positive overflow)
+	 * \returns false if the conversion failed because the value of ref was to low for TYPE (negative overflow)
+	 * \returns false if the conversion failed because the value of ref was to high for TYPE (positive overflow)
 	 * \returns false if there is no know conversion from ref to TYPE
 	 */
 	bool eq( const _internal::ValueBase &ref )const {

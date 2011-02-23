@@ -43,6 +43,13 @@ endif(ISIS_USE_LIBOIL)
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 
+
+############################################################
+# general compiler flags
+############################################################
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra" )
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra"  )
+
 ############################################################
 # Compiler flags on 64Bit cpus
 ############################################################
@@ -142,10 +149,10 @@ SET(ISIS_BUILD_DYNAMIC ON CACHE BOOL "enable build of the dynamic library" )
 
 ############################################################
 # PACKAGING
-# @TODO: Check if CPACK is a better solution for building 
+# @TODO: Check if CPACK is a better solution for building
 # a rpm package
 ############################################################
-OPTION(${CMAKE_PROJECT_NAME}_PACKAGE_RPM 
+OPTION(${CMAKE_PROJECT_NAME}_PACKAGE_RPM
     "Enable support for RPM packaging" OFF)
 
 IF(${CMAKE_PROJECT_NAME}_PACKAGE_RPM)
@@ -159,7 +166,7 @@ IF(${CMAKE_PROJECT_NAME}_PACKAGE_RPM)
       @ONLY)
 
     # add a custom make target
-    ADD_CUSTOM_TARGET(rpm   
+    ADD_CUSTOM_TARGET(rpm
         "${CMAKE_BINARY_DIR}/bootstrap_rpm.sh" WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 
 ENDIF()
