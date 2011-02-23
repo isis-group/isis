@@ -1,4 +1,4 @@
-isis (0.2.0-5) stable; urgency=low
+isis (0.2.0-6) stable; urgency=low
 
     * Initial Debian packaging attempt. This is the first version of
       a ISIS debian package.
