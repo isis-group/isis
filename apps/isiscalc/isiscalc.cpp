@@ -30,7 +30,7 @@ int main( int argc, char **argv )
 {
 	data::IOApplication app( "isis calc", true, true );
 	app.parameters["voxelop"]=std::string("vox");
-	app.parameters["voxelop"].setDescription("a term to evaluate the new value of each voxel");
+	app.parameters["voxelop"].setDescription("a term to evaluate the new value of each voxel. Available variables are: vox,pos_x,pos_y,pos_z,pos_t.");
 	app.init( argc, argv, true ); // will exit if there is a problem
 
 
