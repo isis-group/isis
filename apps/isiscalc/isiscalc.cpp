@@ -13,8 +13,8 @@ public:
 	VoxelOp(std::string expr){
 		parser.SetExpr(expr);
 		parser.DefineVar(std::string("vox"),&voxBuff);
-		parser.DefineVar(std::string("pos_x"),&posBuff[data::readDim]);
-		parser.DefineVar(std::string("pos_y"),&posBuff[data::phaseDim]);
+		parser.DefineVar(std::string("pos_x"),&posBuff[data::rowDim]);
+		parser.DefineVar(std::string("pos_y"),&posBuff[data::columnDim]);
 		parser.DefineVar(std::string("pos_z"),&posBuff[data::sliceDim]);
 		parser.DefineVar(std::string("pos_t"),&posBuff[data::timeDim]);
 	}
