@@ -44,7 +44,7 @@ template<unsigned short DIM> bool __rangeCheck( const size_t d[], const size_t d
 	return ( d[DIM] < dim[DIM] ) && __rangeCheck < DIM - 1 > ( d, dim );
 }
 
-template<> inline size_t __dimStride<0>( const size_t dim[] ) {return 1;}
+template<> inline size_t __dimStride<0>( const size_t[] /*dim*/ ) {return 1;}
 template<> inline size_t __dim2index<0>( const size_t d[], const size_t dim[] ) {return d[0] * __dimStride<0>( dim );}
 template<> inline bool   __rangeCheck<0>( const size_t d[], const size_t dim[] ) {return d[0] < dim[0];}
 
@@ -65,11 +65,11 @@ public:
 	 */
 	void init( const size_t d[DIMS] ) {
 		std::copy( d, d + DIMS, dim );
-		LOG_IF( volume() == 0, Runtime, error ) << "Creating object with volume of 0";
+		LOG_IF( getVolume() == 0, Runtime, error ) << "Creating object with volume of 0";
 	}
 	void init( const util::FixedVector<size_t, DIMS>& d ) {
 		d.copyTo( dim );
-		LOG_IF( volume() == 0, Runtime, error ) << "Creating object with volume of 0";
+		LOG_IF( getVolume() == 0, Runtime, error ) << "Creating object with volume of 0";
 	}
 	NDimensional( const NDimensional &src ) {//@todo default copier should do the job
 		init( src.dim );
@@ -91,19 +91,19 @@ public:
 	}
 	/**
 	 * Get the size of the object in elements of TYPE.
-	 * \returns \f$ \prod_{i=0}^{DIMS-1} dimSize(i) \f$
+	 * \returns \f$ \prod_{i=0}^{DIMS-1} getDimSize(i) \f$
 	 */
-	size_t volume()const {
+	size_t getVolume()const {
 		return __dimStride<DIMS>( dim );
 	}
 	///\returns the size of the object in the given dimension
-	size_t dimSize( size_t idx )const {
+	size_t getDimSize( size_t idx )const {
 		return dim[idx];
 	}
 
 	/// generates a string representing the size
 	std::string getSizeAsString( std::string delim = "x" )const {
-		return util::list2string( dim, dim + DIMS, delim, "", "" );
+		return util::listToString( dim, dim + DIMS, delim, "", "" );
 	}
 
 	/// generates a FixedVector\<DIMS\> representing the size
@@ -115,7 +115,7 @@ public:
 	 * get amount of relevant dimensions (last dim with size>1)
 	 * e.g. on a slice (1x64x1x1) it will be 2
 	 */
-	size_t relevantDims()const {
+	size_t getRelevantDims()const {
 		size_t ret = 0;
 
 		for ( unsigned short i = DIMS; i; i-- ) {
@@ -128,7 +128,7 @@ public:
 		return ret;
 	}
 	util::FixedVector<float, DIMS> getFoV( const util::FixedVector<float, DIMS> &voxelSize, const util::FixedVector<float, DIMS> &voxelGap )const {
-		LOG_IF( volume() == 0, DataLog, warning ) << "Calculating FoV of empty data";
+		LOG_IF( getVolume() == 0, DataLog, warning ) << "Calculating FoV of empty data";
 		const util::FixedVector<size_t, DIMS> voxels = getSizeAsVector();
 		const util::fvector4 gapSize = voxelGap * ( voxels - 1 );
 		return voxelSize * voxels + gapSize;

@@ -47,101 +47,101 @@ namespace _internal
 {
 
 //Define generator - this can be global because its using convert internally
-template<typename SRC, typename DST> class TypePtrGenerator: public TypePtrConverterBase
+template<typename SRC, typename DST> class ValuePtrGenerator: public ValuePtrConverterBase
 {
 public:
-	void create( boost::scoped_ptr<TypePtrBase>& dst, const size_t len )const {
+	void create( boost::scoped_ptr<ValuePtrBase>& dst, const size_t len )const {
 		LOG_IF( dst.get(), Debug, warning ) << "Creating into existing value " << dst->toString( true );
-		TypePtr<DST> *newDat = new TypePtr<DST>( ( DST * )malloc( sizeof( DST )*len ), len );
+		ValuePtr<DST> *newDat = new ValuePtr<DST>( ( DST * )malloc( sizeof( DST )*len ), len );
 		dst.reset( newDat );
 	}
-	void generate( const TypePtrBase &src, boost::scoped_ptr<TypePtrBase>& dst, const scaling_pair &scaling )const {
+	void generate( const ValuePtrBase &src, boost::scoped_ptr<ValuePtrBase>& dst, const scaling_pair &scaling )const {
 		//Create new "stuff" in memory
 		create( dst, src.length() );
 		assert( dst );
 		convert( src, *dst, scaling );//and convert into that
 	}
 };
-void TypePtrConverterBase::convert( const TypePtrBase &src, TypePtrBase &dst, const scaling_pair &scaling ) const
+void ValuePtrConverterBase::convert( const ValuePtrBase &src, ValuePtrBase &dst, const scaling_pair &/*scaling*/ ) const
 {
-	LOG( Debug, error ) << "Empty conversion was called as conversion from " << src.typeName() << " to " << dst.typeName() << " this is most likely an error.";
+	LOG( Debug, error ) << "Empty conversion was called as conversion from " << src.getTypeName() << " to " << dst.getTypeName() << " this is most likely an error.";
 }
 
 
 /////////////////////////////////////////////////////////////////////////////
 // general converter version -- does nothing
 /////////////////////////////////////////////////////////////////////////////
-template<bool NUMERIC, bool SAME, typename SRC, typename DST> class TypePtrConverter : public TypePtrGenerator<SRC, DST>
+template<bool NUMERIC, bool SAME, typename SRC, typename DST> class ValuePtrConverter : public ValuePtrGenerator<SRC, DST>
 {
 public:
-	virtual ~TypePtrConverter() {}
+	virtual ~ValuePtrConverter() {}
 };
 
 /////////////////////////////////////////////////////////////////////////////
 // trivial version -- for conversion of the same type
 /////////////////////////////////////////////////////////////////////////////
-template<bool NUMERIC, typename SRC, typename DST> class TypePtrConverter<NUMERIC, true, SRC, DST> : public TypePtrGenerator<SRC, DST>
+template<bool NUMERIC, typename SRC, typename DST> class ValuePtrConverter<NUMERIC, true, SRC, DST> : public ValuePtrGenerator<SRC, DST>
 {
-	TypePtrConverter() {
+	ValuePtrConverter() {
 		LOG( Debug, verbose_info )
-				<< "Creating trivial copy converter for " << TypePtr<SRC>::staticName();
+				<< "Creating trivial copy converter for " << ValuePtr<SRC>::staticName();
 	};
 public:
-	static boost::shared_ptr<const TypePtrConverterBase> get() {
-		TypePtrConverter<NUMERIC, true, SRC, DST> *ret = new TypePtrConverter<NUMERIC, true, SRC, DST>;
-		return boost::shared_ptr<const TypePtrConverterBase>( ret );
+	static boost::shared_ptr<const ValuePtrConverterBase> get() {
+		ValuePtrConverter<NUMERIC, true, SRC, DST> *ret = new ValuePtrConverter<NUMERIC, true, SRC, DST>;
+		return boost::shared_ptr<const ValuePtrConverterBase>( ret );
 	}
-	void convert( const TypePtrBase &src, TypePtrBase &dst, const scaling_pair &scaling )const {
-		TypePtr<SRC> &dstVal = dst.castToTypePtr<SRC>();
-		const SRC *srcPtr = &src.castToTypePtr<SRC>()[0];
+	void convert( const ValuePtrBase &src, ValuePtrBase &dst, const scaling_pair &/*scaling*/ )const {
+		ValuePtr<SRC> &dstVal = dst.castToValuePtr<SRC>();
+		const SRC *srcPtr = &src.castToValuePtr<SRC>()[0];
 		LOG_IF( src.length() < dst.length(), Debug, info ) << "The target is longer than the the source (" << dst.length() << ">" << src.length() << "). Will only copy/convert " << src.length() << " elements";
 		LOG_IF( src.length() > dst.length(), Debug, error ) << "The target is shorter than the the source (" << dst.length() << "<" << src.length() << "). Will only copy/convert " << dst.length() << " elements";
 		dstVal.copyFromMem( srcPtr, std::min( src.length(), dstVal.length() ) );
 	}
-	virtual scaling_pair getScaling( const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale )const {
+	virtual scaling_pair getScaling( const util::_internal::ValueBase &/*min*/, const util::_internal::ValueBase &/*max*/, autoscaleOption /*scaleopt*/ )const {
 		//as we're just copying - its 1/0
 		return std::make_pair(
-				   util::TypeReference( util::Type<uint8_t>( 1 ) ),
-				   util::TypeReference( util::Type<uint8_t>( 0 ) )
+				   util::ValueReference( util::Value<uint8_t>( 1 ) ),
+				   util::ValueReference( util::Value<uint8_t>( 0 ) )
 			   );
 	}
-	virtual ~TypePtrConverter() {}
+	virtual ~ValuePtrConverter() {}
 };
 
 
 /////////////////////////////////////////////////////////////////////////////
 // VC90 thinks bool is numeric - so tell him it isn't
 /////////////////////////////////////////////////////////////////////////////
-template<typename SRC> class TypePtrConverter<true, false, SRC, bool> : public TypePtrGenerator<SRC, bool> {virtual ~TypePtrConverter() {}};
-template<typename DST> class TypePtrConverter<true, false, bool, DST> : public TypePtrGenerator<bool, DST> {virtual ~TypePtrConverter() {}};
+template<typename SRC> class ValuePtrConverter<true, false, SRC, bool> : public ValuePtrGenerator<SRC, bool> {virtual ~ValuePtrConverter() {}};
+template<typename DST> class ValuePtrConverter<true, false, bool, DST> : public ValuePtrGenerator<bool, DST> {virtual ~ValuePtrConverter() {}};
 
 /////////////////////////////////////////////////////////////////////////////
 // Numeric version -- uses numeric_convert
 /////////////////////////////////////////////////////////////////////////////
-template<typename SRC, typename DST> class TypePtrConverter<true, false, SRC, DST> : public TypePtrGenerator<SRC, DST>
+template<typename SRC, typename DST> class ValuePtrConverter<true, false, SRC, DST> : public ValuePtrGenerator<SRC, DST>
 {
-	TypePtrConverter() {
+	ValuePtrConverter() {
 		LOG( Debug, verbose_info )
 				<< "Creating numeric converter from "
-				<< TypePtr<SRC>::staticName() << " to " << TypePtr<DST>::staticName();
+				<< ValuePtr<SRC>::staticName() << " to " << ValuePtr<DST>::staticName();
 	};
 public:
-	static boost::shared_ptr<const TypePtrConverterBase> get() {
-		TypePtrConverter<true, false, SRC, DST> *ret = new TypePtrConverter<true, false, SRC, DST>;
-		return boost::shared_ptr<const TypePtrConverterBase>( ret );
+	static boost::shared_ptr<const ValuePtrConverterBase> get() {
+		ValuePtrConverter<true, false, SRC, DST> *ret = new ValuePtrConverter<true, false, SRC, DST>;
+		return boost::shared_ptr<const ValuePtrConverterBase>( ret );
 	}
-	void convert( const TypePtrBase &src, TypePtrBase &dst, const scaling_pair &scaling )const {
-		LOG_IF( scaling.first.empty() || scaling.first.empty(), Debug, error ) << "Running conversion with invalid scaling (" << scaling << ") this won't work";
-		numeric_convert( src.castToTypePtr<SRC>(), dst.castToTypePtr<DST>(), scaling.first->as<double>(), scaling.second->as<double>() );
+	void convert( const ValuePtrBase &src, ValuePtrBase &dst, const scaling_pair &scaling )const {
+		LOG_IF( scaling.first.isEmpty() || scaling.first.isEmpty(), Debug, error ) << "Running conversion with invalid scaling (" << scaling << ") this won't work";
+		numeric_convert( src.castToValuePtr<SRC>(), dst.castToValuePtr<DST>(), scaling.first->as<double>(), scaling.second->as<double>() );
 	}
-	scaling_pair getScaling( const util::_internal::TypeBase &min, const util::_internal::TypeBase &max, autoscaleOption scaleopt = autoscale )const {
+	scaling_pair getScaling( const util::_internal::ValueBase &min, const util::_internal::ValueBase &max, autoscaleOption scaleopt = autoscale )const {
 		const std::pair<double, double> scale = getNumericScaling<SRC, DST>( min, max, scaleopt );
 		return std::make_pair(
-				   util::TypeReference( util::Type<double>( scale.first ) ),
-				   util::TypeReference( util::Type<double>( scale.second ) )
+				   util::ValueReference( util::Value<double>( scale.first ) ),
+				   util::ValueReference( util::Value<double>( scale.second ) )
 			   );
 	}
-	virtual ~TypePtrConverter() {}
+	virtual ~ValuePtrConverter() {}
 };
 
 
@@ -149,40 +149,40 @@ public:
 //OK, thats about the foreplay. Now we get to the dirty stuff.
 ////////////////////////////////////////////////////////////////////////
 
-///generate a TypePtrConverter for conversions from SRC to any type from the "types" list
-template<typename SRC> struct inner_TypePtrConverter {
-	std::map<int, boost::shared_ptr<const TypePtrConverterBase> > &m_subMap;
-	inner_TypePtrConverter( std::map<int, boost::shared_ptr<const TypePtrConverterBase> > &subMap ): m_subMap( subMap ) {}
-	template<typename DST> void operator()( DST ) { //will be called by the mpl::for_each in outer_TypePtrConverter for any DST out of "types"
+///generate a ValuePtrConverter for conversions from SRC to any type from the "types" list
+template<typename SRC> struct inner_ValuePtrConverter {
+	std::map<int, boost::shared_ptr<const ValuePtrConverterBase> > &m_subMap;
+	inner_ValuePtrConverter( std::map<int, boost::shared_ptr<const ValuePtrConverterBase> > &subMap ): m_subMap( subMap ) {}
+	template<typename DST> void operator()( DST ) { //will be called by the mpl::for_each in outer_ValuePtrConverter for any DST out of "types"
 		//create a converter based on the type traits and the types of SRC and DST
 		typedef boost::mpl::and_<boost::is_arithmetic<SRC>, boost::is_arithmetic<DST> > is_num;
 		typedef boost::is_same<SRC, DST> is_same;
-		boost::shared_ptr<const TypePtrConverterBase> conv =
-			TypePtrConverter<is_num::value, is_same::value, SRC, DST>::get();
+		boost::shared_ptr<const ValuePtrConverterBase> conv =
+			ValuePtrConverter<is_num::value, is_same::value, SRC, DST>::get();
 		//and insert it into the to-conversion-map of SRC
-		m_subMap.insert( m_subMap.end(), std::make_pair( TypePtr<DST>::staticID, conv ) );
+		m_subMap.insert( m_subMap.end(), std::make_pair( ValuePtr<DST>::staticID, conv ) );
 	}
 };
 
-///generate a TypePtrConverter for conversions from any SRC from the "types" list
-struct outer_TypePtrConverter {
-	std::map< int , std::map<int, boost::shared_ptr<const TypePtrConverterBase> > > &m_map;
-	outer_TypePtrConverter( std::map< int , std::map<int, boost::shared_ptr<const TypePtrConverterBase> > > &map ): m_map( map ) {}
-	template<typename SRC> void operator()( SRC ) {//will be called by the mpl::for_each in TypePtrConverterMap() for any SRC out of "types"
+///generate a ValuePtrConverter for conversions from any SRC from the "types" list
+struct outer_ValuePtrConverter {
+	std::map< int , std::map<int, boost::shared_ptr<const ValuePtrConverterBase> > > &m_map;
+	outer_ValuePtrConverter( std::map< int , std::map<int, boost::shared_ptr<const ValuePtrConverterBase> > > &map ): m_map( map ) {}
+	template<typename SRC> void operator()( SRC ) {//will be called by the mpl::for_each in ValuePtrConverterMap() for any SRC out of "types"
 		boost::mpl::for_each<util::_internal::types>( // create a functor for from-SRC-conversion and call its ()-operator for any DST out of "types"
-			inner_TypePtrConverter<SRC>( m_map[TypePtr<SRC>::staticID] )
+			inner_ValuePtrConverter<SRC>( m_map[ValuePtr<SRC>::staticID] )
 		);
 	}
 };
 /// @endcond
 
-TypePtrConverterMap::TypePtrConverterMap()
+ValuePtrConverterMap::ValuePtrConverterMap()
 {
 #ifdef ISIS_USE_LIBOIL
 	LOG( Debug, info ) << "Initializing liboil";
 	oil_init();
 #endif // ISIS_USE_LIBOIL
-	boost::mpl::for_each<util::_internal::types>( outer_TypePtrConverter( *this ) );
+	boost::mpl::for_each<util::_internal::types>( outer_ValuePtrConverter( *this ) );
 	LOG( Debug, info )
 			<< "conversion map for " << size() << " array-types created";
 }

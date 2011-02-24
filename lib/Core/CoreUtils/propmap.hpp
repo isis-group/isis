@@ -37,6 +37,12 @@ class treeNode; //predeclare treeNode -- we'll need it in PropertyMap
 }
 /**
  * This class contains a mapping tree to store all kinds of properties (path/key : value)
+ * It's also a generic class to have the probability to handle
+ * different modalities in upper levels (in our special case we'll have to handle things like images or other
+ * time series of data each having different properties in its standard or wherever from). Here, you can hierarchilly
+ * setup a property tree to sort all these things. To ensure essential properties for a special case, you'll need to define
+ * the needed properties. For all the other play-around with PropertyMaps see extensive documentation below!!!
+ *
  */
 class PropertyMap : protected std::map<util::istring, _internal::treeNode>
 {
@@ -46,17 +52,17 @@ public:
 	 */
 	typedef key_type KeyType;
 	/**
-	 * a list to store keys only (without the corresponding values)	 
+	 * a list to store keys only (without the corresponding values)
 	 */
 	typedef std::set<KeyType, key_compare> KeyList;
 	/**
 	 * a map to match keys to pairs of values
 	 */
-	typedef std::map<KeyType, std::pair<TypeValue, TypeValue>, key_compare> DiffMap;
+	typedef std::map<KeyType, std::pair<PropertyValue, PropertyValue>, key_compare> DiffMap;
 	/**
 	 * a map, using complete key-paths as keys for the corresponding values
 	 */
-	typedef std::map<KeyType, TypeValue> FlatMap; 
+	typedef std::map<KeyType, PropertyValue> FlatMap;
 private:
 	typedef std::map<KeyType, mapped_type, key_compare> Container;
 	typedef std::list<KeyType> propPath;
@@ -119,9 +125,9 @@ protected:
 	void addNeeded( const KeyType &key );
 
 	/**
-	 * Remove every TypeValue which is also in the other PropertyMap and where operator== returns true.
+	 * Remove every PropertyValue which is also in the other PropertyMap and where operator== returns true.
 	 * \param other the other PropertyMap to compare to
-	 * \param removeNeeded if a TypeValue should also be deleted if they're needed
+	 * \param removeNeeded if a PropertyValue should also be deleted if they're needed
 	 */
 	void removeEqual( const isis::util::PropertyMap &other, bool removeNeeded = false );
 
@@ -157,24 +163,24 @@ public:
 	 * Access the property referenced by the path-key.
 	 * If the property does not exist, an empty dummy will returned.
 	 * \param key the "path" to the property
-	 * \returns a reference to the TypeValue
+	 * \returns a reference to the PropertyValue
 	 */
-	const TypeValue &propertyValue( const KeyType &key )const;
-	
+	const PropertyValue &propertyValue( const KeyType &key )const;
+
 	/**
 	 * Access the property referenced by the path-key, create it if its not there.
 	 * \param key the "path" to the property
-	 * \returns a reference to the TypeValue
+	 * \returns a reference to the PropertyValue
 	 */
-	TypeValue &propertyValue( const KeyType &key );
-	
+	PropertyValue &propertyValue( const KeyType &key );
+
 	/**
 	 * Access the branch referenced by the path-key, create it if its not there.
 	 * \param key the "path" to the branch
 	 * \returns a reference to the branching PropertyMap
 	 */
 	PropertyMap &branch( const KeyType &key );
-	
+
 	/**
 	 * Access the branch referenced by the path-key.
 	 * If the branch does not exist, an empty dummy will returned.
@@ -196,23 +202,23 @@ public:
 	/**
 	 * remove every property which is also in the given map (regardless of the value)
 	 * \param removeMap the map of properties to be removed
-	 * \param keep_needed flag 
+	 * \param keep_needed flag
 	 * \returns true if all properties removed succesfully, false otherwise
-	 */ 
+	 */
 	bool remove( const isis::util::PropertyMap &removeMap, bool keep_needed = false );
 
 	/**
 	 * check if property is available
 	 * \param key the "path" to the property
 	 * \returns true if the given property does exist and is not empty, false otherwise
-	 */ 
+	 */
 	bool hasProperty( const KeyType &key )const;
 
 	/**
 	 * check if branch of the tree is available
 	 * \param key the "path" to the branch
 	 * \returns true if the given branch does exist and is not empty, false otherwise
-	 */ 
+	 */
 	bool hasBranch( const KeyType &key )const;
 
 	////////////////////////////////////////////////////////////////////////////////////////
@@ -223,34 +229,34 @@ public:
 	* \returns true if ALL needed properties are NOT empty, false otherwhise.
 	*/
 	bool isValid()const;
-	
+
 	/**
 	 * \returns true if the PropertyMap is empty, false otherwhise
 	 */
 	bool isEmpty()const;
-	
+
 	/**
 	 * Get a list of all properties.
 	 * \returns a flat list of the "paths" to all properties in the PropertyMap
 	 */
 	const KeyList getKeys()const;
-	
+
 	/**
 	 * Get a list of missing properties.
 	 * \returns a list of all needed and empty properties.
 	 */
 	const KeyList getMissing()const;
-	
+
 	/**
 	 * Get a difference map of actual object and another PropertyMap.
-	 * Out of the names of differing properties a map of std::pair\<TypeValue,TypeValue\> is created with following rules:
+	 * Out of the names of differing properties a map of std::pair\<PropertyValue,PropertyValue\> is created with following rules:
 	 * - If a Property is empty in actual object but set in second,
-	 *   it will be added with the first TypeValue emtpy and the second TypeValue
+	 *   it will be added with the first PropertyValue emtpy and the second PropertyValue
 	 *   taken from second
 	 * - If a Property is set in actual object but empty in second,
-	 *   it will be added with the first TypeValue taken from this and the second TypeValue empty
-	 * - If a Property is set in both, but not equal, it will be added with the first TypeValue taken from this
-	 *   and the second TypeValue taken from second
+	 *   it will be added with the first PropertyValue taken from this and the second PropertyValue empty
+	 * - If a Property is set in both, but not equal, it will be added with the first PropertyValue taken from this
+	 *   and the second PropertyValue taken from second
 	 * - If a Property is set in both and equal, it wont be added
 	 * - If a Property is empty in both, it wont be added
 	 * \param second the "other" PropertyMap to compare with
@@ -287,8 +293,8 @@ public:
 	 * \returns true if the transformation was done, false otherwise
 	 */
 	template<typename DST> bool transform( KeyType from, KeyType to, bool delSource = true ) {
-		check_type<DST>();
-		return transform( from, to, Type<DST>::staticID, delSource );
+		checkType<DST>();
+		return transform( from, to, Value<DST>::staticID, delSource );
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////
@@ -304,35 +310,35 @@ public:
 	 * \endcode
 	 * \param key the "path" to the property
 	 * \param val the value to set of type T
-	 * \returns a reference to the TypeValue (this can be used later, e.g. if a vector is filled step by step
+	 * \returns a reference to the PropertyValue (this can be used later, e.g. if a vector is filled step by step
 	 * the reference can be used to not ask for the Property everytime)
 	 */
-	template<typename T> TypeValue &setPropertyAs( const KeyType &key, const T &val ) {
-		TypeValue &ret = propertyValue( key );
+	template<typename T> PropertyValue &setPropertyAs( const KeyType &key, const T &val ) {
+		PropertyValue &ret = propertyValue( key );
 
-		if( ret.empty() ) {
-			const bool needed = ret.needed();
+		if( ret.isEmpty() ) {
+			const bool needed = ret.isNeeded();
 			( ret = val ).needed() = needed;
 		} else if( ret->is<T>() ) {
 			ret->castTo<T>() = val;
 		} else { // don't overwrite already set properties with a different type
-			LOG( Runtime, error ) << "Property " << MSubject( key ) << " is already set to " << MSubject( ret.toString( true ) ) << " won't override with " << MSubject( Type<T>( val ).toString( true ) );
+			LOG( Runtime, error ) << "Property " << MSubject( key ) << " is already set to " << MSubject( ret.toString( true ) ) << " won't override with " << MSubject( Value<T>( val ).toString( true ) );
 		}
 
 		return ret;
 	}
-	
+
 	/**
 	 * Request a property via the given key in the given type.
 	 * If the requested type is not equal to type the property is stored with, an automatic conversion is done.
 	 * \code
 	 * getPropertyAs<isis::util::fvector4>( "MyPropertyName" );
 	 * \endcode
-	 * \params key the "path" to the property
+	 * \param key the "path" to the property
 	 * \returns the property with given type, if not set yet T() is returned.
 	 */
 	template<typename T> T getPropertyAs( const KeyType &key )const;
-	
+
 	/**
 	 * Rename a given property/branch.
 	 * This is implemented as copy+delete and can also be used between branches.
@@ -344,15 +350,15 @@ public:
 
 	/**
 	 * \returns a flat representation of the whole property tree
-	 */ 
+	 */
 	FlatMap getFlatMap( )const;
 
 	/**
 	 * "Print" the PropertyMap.
-	 * Will send the name and the result of TypeValue->toString(label) to the given ostream.
+	 * Will send the name and the result of PropertyValue->toString(label) to the given ostream.
 	 * Is equivalent to common streaming operation but has the option to print the type of the printed properties.
 	 * \param out the output stream to use
-	 * \param label print the type of the property (see Type::toString())
+	 * \param label print the type of the property (see Value::toString())
 	 */
 	std::ostream &print( std::ostream &out, bool label = false )const;
 };
@@ -384,13 +390,13 @@ namespace _internal
 class treeNode
 {
 	PropertyMap m_branch;
-	TypeValue m_leaf;
+	PropertyValue m_leaf;
 public:
 	bool empty()const {
-		return m_branch.isEmpty() && m_leaf.empty();
+		return m_branch.isEmpty() && m_leaf.isEmpty();
 	}
 	bool is_leaf()const {
-		LOG_IF( ! ( m_branch.isEmpty() || m_leaf.empty() ), Debug, error ) << "There is a non empty leaf at a branch. This should not be.";
+		LOG_IF( ! ( m_branch.isEmpty() || m_leaf.isEmpty() ), Debug, error ) << "There is a non empty leaf at a branch. This should not be.";
 		return m_branch.isEmpty();
 	}
 	const PropertyMap &getBranch()const {
@@ -399,11 +405,11 @@ public:
 	PropertyMap &getBranch() {
 		return m_branch;
 	}
-	TypeValue &getLeaf() {
+	PropertyValue &getLeaf() {
 		assert( is_leaf() );
 		return m_leaf;
 	}
-	const TypeValue &getLeaf()const {
+	const PropertyValue &getLeaf()const {
 		assert( is_leaf() );
 		return m_leaf;
 	}
@@ -424,7 +430,7 @@ public:
 
 /**
  * Walks the whole tree and inserts any key into out for which the given scalar predicate is true.
- */ 
+ */
 template<class Predicate> struct PropertyMap::walkTree {
 	KeyList &m_out;
 	const KeyType m_prefix;
@@ -447,13 +453,13 @@ template<typename T> T PropertyMap::getPropertyAs( const KeyType &key ) const
 	const mapped_type *entry = findEntry( util::istring( key ) );
 
 	if( entry ) {
-		const TypeValue &ref = entry->getLeaf();
+		const PropertyValue &ref = entry->getLeaf();
 
-		if( !ref.empty() )
+		if( !ref.isEmpty() )
 			return ref->as<T>();
 	}
 
-	LOG( Debug, warning ) << "Returning " << Type<T>().toString( true ) << " because property " << key << " does not exist";
+	LOG( Debug, warning ) << "Returning " << Value<T>().toString( true ) << " because property " << key << " does not exist";
 	return T();
 }
 
@@ -479,7 +485,7 @@ template<typename charT, typename traits>
 basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::PropertyMap &s )
 {
 	isis::util::PropertyMap::FlatMap buff = s.getFlatMap();
-	isis::util::write_list( buff.begin(), buff.end(), out );
+	isis::util::listToOStream( buff.begin(), buff.end(), out );
 	return out;
 }
 }

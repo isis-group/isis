@@ -1,6 +1,5 @@
 /*
-    <one line to give the program's name and a brief idea of what it does.>
-    Copyright (C) <year>  <name of author>
+    Copyright (C) 2010  reimer@cbs.mpg.de
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -27,6 +26,7 @@ namespace isis
 namespace util
 {
 /** Class to automatically create and handle a temporary file.
+ * This can e.g. be used when writing plugins for image formats to have a mock object.
  * The file will be created by the constructor and deleted by the destructor.
  * If its not there anymore, a warning will be send.
  * This inherits from boost::filesystem::path and thus can be used as such.

@@ -27,25 +27,25 @@
 
 namespace isis
 {
-namespace data {template<typename TYPE> class TypePtr;}
+namespace data {template<typename TYPE> class ValuePtr;}
 namespace util
 {
-template<typename TYPE> class Type;
+template<typename TYPE> class Value;
 
 namespace _internal
 {
 
-class GenericType
+class GenericValue
 {
 protected:
 	template<typename T> T &m_cast_to() {
-		LOG_IF( typeID() != T::staticID, Debug, error ) << "using " << typeName() << " at " << this << " as " << T::staticName() << " aborting ...";
-		assert( typeID() == T::staticID );
+		LOG_IF( getTypeID() != T::staticID, Debug, error ) << "using " << getTypeName() << " at " << this << " as " << T::staticName() << " aborting ...";
+		assert( getTypeID() == T::staticID );
 		return *reinterpret_cast<T *>( this );
 	}
 	template<typename T> const T &m_cast_to()const {
-		LOG_IF( typeID() != T::staticID, Debug, error ) << "using " << typeName() << " at " << this << " as " << T::staticName() << " aborting ...";
-		assert( typeID() == T::staticID );
+		LOG_IF( getTypeID() != T::staticID, Debug, error ) << "using " << getTypeName() << " at " << this << " as " << T::staticName() << " aborting ...";
+		assert( getTypeID() == T::staticID );
 		return *reinterpret_cast<const T *>( this );
 	}
 
@@ -54,46 +54,46 @@ public:
 	virtual std::string toString( bool labeled = false )const = 0;
 
 	/// \returns the name of its actual type
-	virtual std::string typeName()const = 0;
+	virtual std::string getTypeName()const = 0;
 
 	/// \returns the ID of its actual type
-	virtual unsigned short typeID()const = 0;
+	virtual unsigned short getTypeID()const = 0;
 
 	/// \returns true if type of this and second are equal
-	bool isSameType( const GenericType &second )const;
-	virtual ~GenericType() {}
+	bool isSameType( const GenericValue &second )const;
+	virtual ~GenericValue() {}
 };
 
 /**
- * Base class to store and handle references to Type and TypePtr objects.
+ * Base class to store and handle references to Value and ValuePtr objects.
  * The values are refernced as smart pointers to their base class.
  * So the references are counted and data are automatically deleted if necessary.
  * The usual dereferencing pointer interface ("*" and "->") is supported.
  * This class is designed as base class for specialisations, it should not be used directly.
  * Because of that, the contructors of this class are protected.
  */
-template<typename TYPE_TYPE> class TypeReference: protected boost::scoped_ptr<TYPE_TYPE>
+template<typename TYPE_TYPE> class ValueReference: protected boost::scoped_ptr<TYPE_TYPE>
 {
-	template<typename TT> friend class data::TypePtr; //allow Type and TypePtr to use the protected contructor below
-	template<typename TT> friend class Type;
+	template<typename TT> friend class data::ValuePtr; //allow Value and ValuePtr to use the protected contructor below
+	template<typename TT> friend class Value;
 protected:
 	//dont use this directly
-	TypeReference( TYPE_TYPE *t ): boost::scoped_ptr<TYPE_TYPE>( t ) {}
+	ValueReference( TYPE_TYPE *t ): boost::scoped_ptr<TYPE_TYPE>( t ) {}
 public:
 	///reexport parts of scoped_ptr's interface
 	TYPE_TYPE *operator->() const {return boost::scoped_ptr<TYPE_TYPE>::operator->();}
 	TYPE_TYPE &operator*() const {return boost::scoped_ptr<TYPE_TYPE>::operator*();}
 	///Default contructor. Creates an empty reference
-	TypeReference() {}
+	ValueReference() {}
 	/**
-	* Copy constructor
-	* This operator creates a copy of the referenced Type-Object.
-	* So its NO cheap copy. (At least not if the copy-operator contained type is not cheap)
-	*/
-	TypeReference( const TypeReference &src ) {
+	 * Copy constructor
+	 * This operator creates a copy of the referenced Value-Object.
+	 * So its NO cheap copy. (At least not if the copy-operator of the contained type is not cheap)
+	 */
+	ValueReference( const ValueReference &src ):boost::scoped_ptr<TYPE_TYPE>(NULL) {
 		operator=( src );
 	}
-	TypeReference( const TYPE_TYPE &src ) {
+	ValueReference( const TYPE_TYPE &src ):boost::scoped_ptr<TYPE_TYPE>(NULL) {
 		operator=( src );
 	}
 	/**
@@ -103,8 +103,8 @@ public:
 	 * If the source is empty the target will drop its content. Thus it will become empty as well.
 	 * \returns reference to the (just changed) target
 	 */
-	TypeReference<TYPE_TYPE>& operator=( const TypeReference<TYPE_TYPE> &src ) {
-		boost::scoped_ptr<TYPE_TYPE>::reset( src.empty() ? 0 : src->clone() );
+	ValueReference<TYPE_TYPE>& operator=( const ValueReference<TYPE_TYPE> &src ) {
+		boost::scoped_ptr<TYPE_TYPE>::reset( src.isEmpty() ? 0 : src->clone() );
 		return *this;
 	}
 	/**
@@ -112,16 +112,16 @@ public:
 	 * This operator replaces the current content by a copy of src.
 	 * \returns reference to the (just changed) target
 	 */
-	TypeReference<TYPE_TYPE>& operator=( const TYPE_TYPE &src ) {
+	ValueReference<TYPE_TYPE>& operator=( const TYPE_TYPE &src ) {
 		boost::scoped_ptr<TYPE_TYPE>::reset( src.clone() );
 		return *this;
 	}
 	/// \returns true if "contained" type has no value (a.k.a. is undefined)
-	bool empty()const {
+	bool isEmpty()const {
 		return boost::scoped_ptr<TYPE_TYPE>::get() == NULL;
 	}
 	const std::string toString( bool label = false )const {
-		if ( empty() )
+		if ( isEmpty() )
 			return std::string( "\xd8" ); //ASCII code empty set
 		else
 			return this->get()->toString( label );

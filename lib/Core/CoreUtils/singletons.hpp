@@ -14,7 +14,7 @@ namespace util
 
 /**
  * Static class to handle singletons of a given type and priority.
- * 
+ *
  * The special issues for these Singletons are: \n
  * 1) it's a template class - can be used for every type \n
  * 2) they have a priority used for destroying the Singletons AFTER the application ends:
@@ -24,7 +24,7 @@ namespace util
  * to be deleted latest.
  *
  * \code
- * Singletons::get < MyClass, INT_MAX - 1 > 
+ * Singletons::get < MyClass, INT_MAX - 1 >
  * \endcode
  * This generates a Singleton of MyClass with highest priority
  */
@@ -41,8 +41,8 @@ class Singletons
 	prioMap map;
 	Singletons();
 	virtual ~Singletons();
-	template<typename T> Singleton<T> *const create( int priority ) {
-		Singleton<T> * const ret( new Singleton<T> );
+	template<typename T> Singleton<T> *create( int priority ) {
+		Singleton<T>* ret( new Singleton<T> );
 		map.insert( map.find( priority ), std::make_pair( priority, ret ) );
 		return ret;
 	}
@@ -54,10 +54,8 @@ class Singletons
 	static Singletons &getMaster();
 public:
 	/**
-	 * The first call creates a singleton of type T with the priority PRIO, 
+	 * The first call creates a singleton of type T with the priority PRIO (ascending order),
 	 * all repetetive calls return this object.
-	 * \param T  type of the Singleton object
-	 * \param PRIO the priority of the Singleton object (ascending order)
 	 * \return a reference to the same object of type T.
 	 */
 	template<typename T, int PRIO> static Singleton<T> &get() {

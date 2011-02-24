@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_SUITE ( imageIONull_BaseTests )
 
 BOOST_AUTO_TEST_CASE ( loadsaveImages )
 {
-	data::enable_log<util::DefaultMsgPrint>( warning );
+	data::enableLog<util::DefaultMsgPrint>( warning );
 	std::list<data::Image> images = data::IOFactory::load( "nix.null" );
 	// the null-loader shall generate 5 50x50x50x10 images
 	BOOST_CHECK( images.size() == 5 );

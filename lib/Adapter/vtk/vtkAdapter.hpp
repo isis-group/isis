@@ -49,7 +49,7 @@ namespace adapter
 class vtkAdapter
 {
 public:
-	typedef  std::pair< util::TypeReference, util::TypeReference> ScalingType;
+	typedef  std::pair< util::ValueReference, util::ValueReference> ScalingType;
 	/**
 	* Gets a std::vector of vtkSmartpointers on vtkImageData objects.
 	*/
