@@ -62,7 +62,7 @@ public:
 		convert( src, *dst, scaling );//and convert into that
 	}
 };
-void ValuePtrConverterBase::convert( const ValuePtrBase &src, ValuePtrBase &dst, const scaling_pair &scaling ) const
+void ValuePtrConverterBase::convert( const ValuePtrBase &src, ValuePtrBase &dst, const scaling_pair &/*scaling*/ ) const
 {
 	LOG( Debug, error ) << "Empty conversion was called as conversion from " << src.getTypeName() << " to " << dst.getTypeName() << " this is most likely an error.";
 }
@@ -91,14 +91,14 @@ public:
 		ValuePtrConverter<NUMERIC, true, SRC, DST> *ret = new ValuePtrConverter<NUMERIC, true, SRC, DST>;
 		return boost::shared_ptr<const ValuePtrConverterBase>( ret );
 	}
-	void convert( const ValuePtrBase &src, ValuePtrBase &dst, const scaling_pair &scaling )const {
+	void convert( const ValuePtrBase &src, ValuePtrBase &dst, const scaling_pair &/*scaling*/ )const {
 		ValuePtr<SRC> &dstVal = dst.castToValuePtr<SRC>();
 		const SRC *srcPtr = &src.castToValuePtr<SRC>()[0];
 		LOG_IF( src.length() < dst.length(), Debug, info ) << "The target is longer than the the source (" << dst.length() << ">" << src.length() << "). Will only copy/convert " << src.length() << " elements";
 		LOG_IF( src.length() > dst.length(), Debug, error ) << "The target is shorter than the the source (" << dst.length() << "<" << src.length() << "). Will only copy/convert " << dst.length() << " elements";
 		dstVal.copyFromMem( srcPtr, std::min( src.length(), dstVal.length() ) );
 	}
-	virtual scaling_pair getScaling( const util::_internal::ValueBase &min, const util::_internal::ValueBase &max, autoscaleOption scaleopt = autoscale )const {
+	virtual scaling_pair getScaling( const util::_internal::ValueBase &/*min*/, const util::_internal::ValueBase &/*max*/, autoscaleOption /*scaleopt*/ )const {
 		//as we're just copying - its 1/0
 		return std::make_pair(
 				   util::ValueReference( util::Value<uint8_t>( 1 ) ),

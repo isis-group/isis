@@ -135,7 +135,7 @@ void Application::printHelp( bool withHidden )const
 	}
 }
 
-boost::shared_ptr< _internal::MessageHandlerBase > Application::getLogHandler( std::string module, isis::LogLevel level )const
+boost::shared_ptr< _internal::MessageHandlerBase > Application::getLogHandler( std::string /*module*/, isis::LogLevel level )const
 {
 	return boost::shared_ptr< _internal::MessageHandlerBase >( level ? new util::DefaultMsgPrint( level ) : 0 );
 }

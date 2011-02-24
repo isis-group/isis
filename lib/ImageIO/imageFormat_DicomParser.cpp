@@ -375,7 +375,7 @@ void ImageFormat_Dicom::parseList( DcmElement *elem, const util::istring &name, 
 	case EVR_CS: // Code String (string)
 	case EVR_SH: //short string
 	case EVR_ST: { //short text
-		map.propertyValue( name ) = _internal::dcmtkListString2list<string>( elem );
+		map.propertyValue( name ) = _internal::dcmtkListString2list<std::string>( elem );
 	}
 	break;
 	case EVR_DS: {

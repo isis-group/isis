@@ -358,7 +358,7 @@ int IOFactory::loadPath( std::list<Chunk> &ret, const boost::filesystem::path &p
 
 bool IOFactory::write( const data::Image &image, const std::string &path, std::string suffix_override, const std::string &dialect )
 {
-	write( std::list<data::Image>( 1, image ), path, suffix_override, dialect );
+	return write( std::list<data::Image>( 1, image ), path, suffix_override, dialect );
 }
 
 
