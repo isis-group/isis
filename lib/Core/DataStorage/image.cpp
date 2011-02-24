@@ -646,7 +646,9 @@ unsigned short Image::getMajorTypeID() const
 		return minmax.first->getTypeID() << 8;
 	} else {
 		LOG( Runtime, error ) << "Sorry I dont know which datatype I should use. (" << minmax.first->getTypeName() << " or " << minmax.second->getTypeName() << ")";
-		throw( std::logic_error( "type selection failed" ) );
+		std::stringstream o;
+		o << "Type selection failed. Range was: " << minmax;
+		throw( std::logic_error( o.str() ) );
 		return std::numeric_limits<unsigned char>::max();
 	}
 }
