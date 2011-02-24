@@ -540,7 +540,7 @@ std::ostream &PropertyMap::print( std::ostream &out, bool label )const
 	return out;
 }
 
-bool PropertyMap::trueP::operator()( const PropertyMap::value_type &ref ) const
+bool PropertyMap::trueP::operator()( const PropertyMap::value_type &/*ref*/ ) const
 {
 	return true;
 }

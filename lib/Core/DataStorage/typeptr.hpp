@@ -33,7 +33,7 @@ namespace data
 namespace _internal
 {
 template<typename T, bool isNumber> struct getMinMaxImpl {
-	std::pair<T, T> operator()( const ValuePtr<T> &ref ) const {
+	std::pair<T, T> operator()( const ValuePtr<T> &/*ref*/ ) const {
 		LOG( Debug, error ) << "min/max comparison of " << util::Value<T>::staticName() << " is not supportet";
 		return std::pair<T, T>();
 	}

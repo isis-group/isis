@@ -36,15 +36,15 @@ namespace _internal
 {
 /// @cond _hidden
 template<typename TYPE> struct __cast_to {
-	template<typename SOURCE> TYPE operator()( Value<TYPE> *dest, const SOURCE &value ) {
+	template<typename SOURCE> TYPE operator()( Value<TYPE>*, const SOURCE &value ) {
 		return boost::lexical_cast<TYPE>( value ); //generic version types are different - so do lexical cast
 	}
-	TYPE operator()( Value<TYPE> *dest, const TYPE &value ) {
+	TYPE operator()( Value<TYPE>*, const TYPE &value ) {
 		return value; //special version types are same - so just return the value
 	}
 };
 template<> struct __cast_to<uint8_t> { // we cannot lexical_cast to uint8_t - we'll get "characters" (1 => '1' == 49)
-	template<typename SOURCE> uint8_t operator()( Value<uint8_t> *dest, const SOURCE &value ) {
+	template<typename SOURCE> uint8_t operator()( Value<uint8_t>*, const SOURCE &value ) {
 		// have to check by hand because the lexical cast will only check against unsigned short
 		if( value > std::numeric_limits<uint8_t>::max() ) {
 			throw boost::bad_lexical_cast( typeid( SOURCE ), typeid( uint8_t ) );
@@ -53,7 +53,7 @@ template<> struct __cast_to<uint8_t> { // we cannot lexical_cast to uint8_t - we
 		// lexical cast to unsigned short and then static_cast to uint8_t
 		return static_cast<uint8_t>( boost::lexical_cast<unsigned short>( value ) );
 	}
-	uint8_t operator()( Value<uint8_t> *dest, const uint8_t &value ) {
+	uint8_t operator()( Value<uint8_t> *, const uint8_t &value ) {
 		return value; //special version types are same - so just return the value
 	}
 };

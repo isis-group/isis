@@ -122,7 +122,7 @@ public:
 	 * Create image from a list of Chunks or objects with the base Chunk.
 	 * Removes used chunks from the given list. So afterwards the list consists of the rejected chunks.
 	 */
-	template<typename T> Image( std::list<T> &chunks ) : set( "indexOrigin", "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ), clean( false )
+	template<typename T> Image( std::list<T> &chunks ) : _internal::NDimensional<4>(),util::PropertyMap(),set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ), clean( false )
 	{
 		BOOST_STATIC_ASSERT((boost::is_base_of<Chunk, T>::value));
 		addNeededFromString( neededProperties );

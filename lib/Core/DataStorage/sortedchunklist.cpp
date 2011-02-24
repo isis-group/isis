@@ -66,7 +66,7 @@ SortedChunkList::chunkPtrOperator::~chunkPtrOperator() {}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // constructor
-SortedChunkList::SortedChunkList( util::PropertyMap::KeyType fvectorPropName, util::PropertyMap::KeyType comma_separated_equal_props ):
+SortedChunkList::SortedChunkList( util::PropertyMap::KeyType comma_separated_equal_props ):
 	equalProps( util::stringToList<util::PropertyMap::KeyType>( comma_separated_equal_props, ',' ) )
 {}
 

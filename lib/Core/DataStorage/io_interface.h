@@ -78,7 +78,7 @@ public:
 
 
 	/// \return the dialects the plugin supports
-	virtual std::string dialects( const std::string &filename )const {return std::string();};
+	virtual std::string dialects( const std::string &/*filename*/ )const {return std::string();};
 
 	/// \return if the plugin is not part of the official distribution
 	virtual bool tainted()const {return true;}

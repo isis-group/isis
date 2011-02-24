@@ -31,14 +31,14 @@ namespace isis
 namespace data
 {
 
-Image::Image ( ) : set( "indexOrigin", "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ), clean( false )
+Image::Image ( ) : set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ), clean( false )
 {
 	addNeededFromString( neededProperties );
 	set.addSecondarySort( "acquisitionNumber" );
 	set.addSecondarySort( "acquisitionTime" );
 }
 
-Image::Image ( const Chunk &chunk) : set( "indexOrigin", "sequenceNumber,rowVec,columnVec,coilChannelMask,DICOM/EchoNumbers" ), clean( false )
+Image::Image ( const Chunk &chunk) : _internal::NDimensional<4>(),util::PropertyMap(),set( "sequenceNumber,rowVec,columnVec,coilChannelMask,DICOM/EchoNumbers" ), clean( false )
 {
 	addNeededFromString( neededProperties );
 	set.addSecondarySort( "acquisitionNumber" );
@@ -52,7 +52,8 @@ Image::Image ( const Chunk &chunk) : set( "indexOrigin", "sequenceNumber,rowVec,
 	}
 }
 
-Image::Image( const isis::data::Image &ref ): set( "", "" )/*SortedChunkList has no default constructor - lets just make an empty (and invalid) set*/
+Image::Image( const isis::data::Image &ref ):_internal::NDimensional<4>(),util::PropertyMap(),
+set( "" )/*SortedChunkList has no default constructor - lets just make an empty (and invalid) set*/
 {
 	( *this ) = ref; // set will be replaced here anyway
 }
@@ -177,7 +178,6 @@ bool Image::reIndex()
 
 	//redo lookup table
 	lookup = set.getLookup();
-	const size_t chunks = lookup.size();
 	util::FixedVector<size_t, dims> size; //storage for the size of the chunk structure
 	size.fill( 1 );
 	//get primary attributes from geometrically first chunk - will be usefull
@@ -535,7 +535,6 @@ std::pair< util::ValueReference, util::ValueReference > Image::getScalingTo( sho
 	LOG_IF( !clean, Runtime, error ) << "You should run reIndex before running this";
 	std::pair<util::ValueReference, util::ValueReference> minmax = getMinMax();
 
-	bool unique = true;
 	const std::vector<boost::shared_ptr<const Chunk> > chunks = getChunksAsVector();
 	BOOST_FOREACH( const boost::shared_ptr<const Chunk> &ref, chunks ) { //find a chunk which would be converted
 		if( targetID != ref->getTypeID() ) {
@@ -633,8 +632,6 @@ Image::orientation Image::getMainOrientation()const
 
 unsigned short Image::getMajorTypeID() const
 {
-	unsigned int mytypeID = chunkPtrAt( 0 )->getTypeID();
-	size_t tmpBytesPerVoxel = 0;
 	std::pair<util::ValueReference, util::ValueReference> minmax = getMinMax();
 	LOG( Debug, info ) << "Determining  datatype of image with the value range " << minmax;
 
