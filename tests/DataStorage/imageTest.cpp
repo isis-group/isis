@@ -20,19 +20,24 @@ namespace isis
 namespace test
 {
 
+template<typename T> data::Chunk genSlice(size_t columns=4,size_t rows=4,size_t at=0,uint32_t acnum=0){
+	data::MemChunk<T> ch( columns, rows );
+	ch.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, at ) );
+	ch.setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
+	ch.setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
+	ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
+
+	ch.setPropertyAs( "acquisitionNumber", (uint32_t)acnum );
+	ch.setPropertyAs( "acquisitionTime", (float)acnum );
+	return ch;
+}
+
 /* create an image */
 BOOST_AUTO_TEST_CASE ( image_init_test )
 {
 	{
-		data::MemChunk<float> ch( 4, 4 );
-		data::enableLog<util::DefaultMsgPrint>( verbose_info );
+		data::Chunk ch=genSlice<float>(4,4,2,0);
 		// inserting a proper Chunk should work
-		ch.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, 2 ) );
-		ch.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
-		ch.setPropertyAs<float>( "acquisitionTime", 0 );
-		ch.setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
-		ch.setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
-		ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 		data::Image img(ch);
 		BOOST_CHECK( img.isClean() );
 
@@ -45,23 +50,12 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		BOOST_CHECK( ! img.insertChunk( ch ) );
 
 		// but inserting another Chunk should work
-		ch = data::MemChunk<float>( 4, 4 );
-		ch.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, 0 ) );
-		ch.setPropertyAs<uint32_t>( "acquisitionNumber", 2 );
-		ch.setPropertyAs<float>( "acquisitionTime", 2 );
-		ch.setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
-		ch.setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
-		ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
-		BOOST_CHECK( img.insertChunk( ch ) );
+		ch = genSlice<float>(4,4,0,2);
+		data::enableLog<util::DefaultMsgPrint>( verbose_info );
+		img.insertChunk( ch );
 
 		// Chunks should be inserted based on their position (lowest first)
-		ch = data::MemChunk<float>( 4, 4 );
-		ch.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, 1 ) );
-		ch.setPropertyAs<uint32_t>( "acquisitionNumber", 1 );
-		ch.setPropertyAs<float>( "acquisitionTime", 1 );
-		ch.setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
-		ch.setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
-		ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
+		ch = genSlice<float>( 4, 4, 1, 1 );
 		BOOST_REQUIRE( img.insertChunk( ch ) );
 		//Get a list of the sorted chunks
 		BOOST_REQUIRE( img.reIndex() );
@@ -87,13 +81,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		std::list<data::Chunk> chunks;
 
 		for( int i = 0; i < 3; i++ ) {
-			chunks.push_back(data::MemChunk<float>( 4, 4 ));
-			chunks.back().setPropertyAs( "indexOrigin", util::fvector4( 0, 0, i, 0 ) );
-			chunks.back().setPropertyAs<uint32_t>( "acquisitionNumber", 3 + i );
-			chunks.back().setPropertyAs<uint32_t>( "acquisitionTime", 3 + i );
-			chunks.back().setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
-			chunks.back().setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
-			chunks.back().setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
+			chunks.push_back(genSlice<float>( 4, 4, i, 3+i ));
 		}
 		data::Image img(chunks);
 		BOOST_CHECK(img.isClean());
@@ -116,13 +104,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		chunks.clear();
 		for( int t = 0; t < nrTimesteps; t++ ) {
 			for( int s = 0; s < nrSlices; s++ ) {
-				chunks.push_back(data::MemChunk<float>( nrCols, nrRows ) );
-				chunks.back().setPropertyAs( "indexOrigin", util::fvector4( 0, 0, s ) );
-				chunks.back().setPropertyAs<uint32_t>( "acquisitionNumber", s + t * nrSlices );
-				chunks.back().setPropertyAs<uint32_t>( "acquisitionTime", s + t * nrSlices );
-				chunks.back().setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
-				chunks.back().setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
-				chunks.back().setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
+				chunks.push_back(genSlice<float>( nrCols, nrRows, s, s + t * nrSlices ) );
 			}
 		}
 		data::Image img2(chunks);
@@ -139,13 +121,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		chunks.clear();
 		for( int t = 0; t < nrTimesteps; t++ ) {
 			for( int s = 0; s < nrSlices; s++ ) {
-				chunks.push_back(data::MemChunk<float>( nrCols, nrRows ));
-				chunks.back().setPropertyAs( "indexOrigin", util::fvector4( 0, 0, s ) );
-				chunks.back().setPropertyAs<uint32_t>( "acquisitionNumber", s + t * nrSlices );
-				chunks.back().setPropertyAs<uint32_t>( "acquisitionTime", s + t * nrSlices );
-				chunks.back().setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
-				chunks.back().setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
-				chunks.back().setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
+				chunks.push_back(genSlice<float>( nrCols, nrRows, s, s + t * nrSlices ));
 			}
 		}
 		data::Image img3(chunks);
@@ -162,13 +138,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		chunks.clear();
 		for( int t = 0; t < nrTimesteps; t++ ) {
 			for( int s = 0; s < nrSlices; s++ ) {
-				data::Chunk ch = data::MemChunk<float>( nrCols, nrRows );
-				ch.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, s, 0 ) );
-				ch.setPropertyAs<uint32_t>( "acquisitionNumber", s + t * nrSlices );
-				ch.setPropertyAs<uint32_t>( "acquisitionTime", s + t * nrSlices );
-				ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
-				ch.setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
-				ch.setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
+				chunks.push_back(genSlice<float>( nrCols, nrRows, s, s + t * nrSlices ));
 			}
 		}
 		data::Image img4(chunks);
@@ -181,15 +151,9 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 
 BOOST_AUTO_TEST_CASE ( minimal_image_test )
 {
-	data::MemChunk<float> ch( 4, 4 );
-	ch.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, 2 ) );
-	ch.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
-	ch.setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
-	ch.setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
-	ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
-
-	std::list<data::MemChunk<float> > chunks(2,ch);
-	chunks.back().setPropertyAs<uint32_t>( "acquisitionNumber", 1 );
+	data::Chunk ch=genSlice<float>( 4, 4, 2 ); //create chunk at 2 with acquisitionNumber 0
+	std::list<data::MemChunk<float> > chunks(2,ch); //make a list with two copies of that
+	chunks.back().setPropertyAs<uint32_t>( "acquisitionNumber", 1 ); //change the acquisitionNumber of that to 1
 
 	data::Image img(chunks);
 	const size_t size[] = {4, 4, 1, 2};
@@ -203,19 +167,10 @@ BOOST_AUTO_TEST_CASE ( type_selection_test )
 	float org = 0;
 	std::list<data::Chunk> chunks;
 
-#define MAKE_CHUNK(type) \
-	chunks.push_back(data::MemChunk<type>( 4, 4 ));\
-	chunks.back().setPropertyAs( "indexOrigin", util::fvector4( 0, 0, org ) );\
-	chunks.back().setPropertyAs<uint32_t>( "acquisitionNumber", org );\
-	chunks.back().setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );\
-	chunks.back().setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );\
-	chunks.back().setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );\
-	org++;
-
-	MAKE_CHUNK( int16_t);
-	MAKE_CHUNK( int8_t);
-	MAKE_CHUNK( uint8_t);
-	MAKE_CHUNK( uint16_t);
+	chunks.push_back(genSlice<int16_t>(4,4,org,org));++org;
+	chunks.push_back(genSlice<int8_t>(4,4,org,org));++org;
+	chunks.push_back(genSlice<uint8_t>(4,4,org,org));++org;
+	chunks.push_back(genSlice<uint16_t>(4,4,org,org));++org;
 
 	std::list<data::Chunk>::iterator i=chunks.begin();
 
@@ -231,7 +186,6 @@ BOOST_AUTO_TEST_CASE ( type_selection_test )
 	BOOST_CHECK_EQUAL(img.getChunksAsVector().size(),4);
 	BOOST_CHECK_EQUAL( img.getSizeAsVector(), ( util::FixedVector<size_t, 4>( size ) ) );
 	BOOST_CHECK_EQUAL( img.getMajorTypeID(), data::ValuePtr<int16_t>( NULL, 0 ).getTypeID() );
-#undef MAKE_CHUNK
 }
 
 BOOST_AUTO_TEST_CASE ( type_scale_test )
@@ -239,19 +193,10 @@ BOOST_AUTO_TEST_CASE ( type_scale_test )
 	float org = 0;
 	std::list<data::Chunk> chunks;
 
-	#define MAKE_CHUNK(type) \
-	chunks.push_back(data::MemChunk<type>( 4, 4 ));\
-	chunks.back().setPropertyAs( "indexOrigin", util::fvector4( 0, 0, org ) );\
-	chunks.back().setPropertyAs<uint32_t>( "acquisitionNumber", org );\
-	chunks.back().setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );\
-	chunks.back().setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );\
-	chunks.back().setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );\
-	org++;
-
-	MAKE_CHUNK( int16_t);
-	MAKE_CHUNK( int8_t);
-	MAKE_CHUNK( uint8_t);
-	MAKE_CHUNK( uint16_t);
+	chunks.push_back(genSlice<int16_t>(4,4,org,org));++org;
+	chunks.push_back(genSlice<int8_t>(4,4,org,org));++org;
+	chunks.push_back(genSlice<uint8_t>(4,4,org,org));++org;
+	chunks.push_back(genSlice<uint16_t>(4,4,org,org));++org;
 
 	std::list<data::Chunk>::iterator i=chunks.begin();
 
@@ -273,18 +218,12 @@ BOOST_AUTO_TEST_CASE ( type_scale_test )
 
 BOOST_AUTO_TEST_CASE ( image_chunk_test )
 {
-	uint32_t acNum = 0;
-	std::list<data::Chunk> chunks( 9, data::MemChunk<float>( 3, 3 ) );
-	std::list<data::Chunk>::iterator k=chunks.begin();
+	std::list<data::Chunk> chunks;
 
 	for ( int i = 0; i < 3; i++ )
-		for ( int j = 0; j < 3; j++,k++ ) {
-			k->setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
-			k->setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
-			k->setPropertyAs( "indexOrigin", util::fvector4( 0, 0, j ) );
-			k->setPropertyAs( "acquisitionNumber", acNum++ );
-			k->setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1 ) );
-			k->voxel<float>( j, j ) = 42;
+		for ( int j = 0; j < 3; j++ ) {
+			chunks.push_back(genSlice<float>(3,3,j,j+i*3));
+			chunks.back().voxel<float>( j, j ) = 42;
 		}
 
 	data::Image img(chunks);
@@ -323,19 +262,13 @@ BOOST_AUTO_TEST_CASE ( image_chunk_test )
 
 BOOST_AUTO_TEST_CASE ( image_foreach_chunk_test )
 {
-	uint32_t acNum = 0;
-	std::list<data::Chunk> chunks( 9, data::MemChunk<float>( 3, 3 ) );
-	std::list<data::Chunk>::iterator k=chunks.begin();
-
+	std::list<data::Chunk> chunks;
 	for ( int i = 0; i < 3; i++ )
-		for ( int j = 0; j < 3; j++,k++ ) {
-			k->setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
-			k->setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
-			k->setPropertyAs( "indexOrigin", util::fvector4( 0, 0, j ) );
-			k->setPropertyAs( "acquisitionNumber", acNum++ );
-			k->setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1 ) );
-			k->voxel<float>( j, j ) = 42;
+		for ( int j = 0; j < 3; j++ ) {
+			chunks.push_back(genSlice<float>(3,3,j,j+i*3));
+			chunks.back().voxel<float>( j, j ) = 42;
 		}
+
 	data::Image img(chunks);
 
 	class : public data::Image::ChunkOp
@@ -398,17 +331,9 @@ BOOST_AUTO_TEST_CASE ( image_foreach_chunk_test )
 BOOST_AUTO_TEST_CASE ( image_voxel_test )
 {
 	//  get a voxel from inside and outside the image
-	std::list<data::Chunk> chunks( 3, data::MemChunk<float>( 3, 3 ) );
-	unsigned short acNum = 0;
-
-	BOOST_FOREACH(data::Chunk &ch,chunks){
-		ch.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, acNum, 0 ) );
-		ch.setPropertyAs<uint32_t>( "acquisitionNumber", acNum );
-		ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
-		ch.setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
-		ch.setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
-		acNum++;
-	}
+	std::list<data::Chunk> chunks;
+	for(int i=0;i<3;i++)
+		chunks.push_back(genSlice<float>(3,3,i,i));
 
 	std::list<data::Chunk>::iterator k=chunks.begin();
 	(k++)->voxel<float>( 0, 0 ) = 42.0;
@@ -431,17 +356,10 @@ BOOST_AUTO_TEST_CASE ( image_voxel_test )
 
 BOOST_AUTO_TEST_CASE( image_minmax_test )
 {
-	std::list<data::Chunk> chunks( 3, data::MemChunk<float>( 3, 3 ) );
-	unsigned short acNum = 0;
+	std::list<data::Chunk> chunks;
+	for(int i=0;i<3;i++)
+		chunks.push_back(genSlice<float>(3,3,i,i));
 
-	BOOST_FOREACH(data::Chunk &ch,chunks){
-		ch.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, acNum, 0 ) );
-		ch.setPropertyAs<uint32_t>( "acquisitionNumber", acNum );
-		ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
-		ch.setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
-		ch.setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
-		acNum++;
-	}
 	data::Image img(chunks);
 	BOOST_REQUIRE( img.isClean() );
 	BOOST_CHECK( img.isValid() );
@@ -482,23 +400,12 @@ BOOST_AUTO_TEST_CASE( orientation_test )
 
 BOOST_AUTO_TEST_CASE( memimage_test )
 {
-	std::list<data::Chunk> chunks( 9, data::MemChunk<float>( 3, 3 ) );
-	std::list<data::Chunk>::iterator k=chunks.begin();
-
-
-	uint32_t acNum = 0;
-	const util::fvector4 vSize( 1, 1, 1, 0 );
-
+	std::list<data::Chunk> chunks;
 	for ( int i = 0; i < 3; i++ )
-		for ( int j = 0; j < 3; j++,k++ ) {
-			k->setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
-			k->setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
-			k->setPropertyAs( "indexOrigin", util::fvector4( 0, 0, j ) );
-			k->setPropertyAs( "acquisitionNumber", acNum++ );
-			k->setPropertyAs( "voxelSize", vSize );
-			k->voxel<float>( j, j ) = i * j * 1000;
+		for ( int j = 0; j < 3; j++ ) {
+			chunks.push_back(genSlice<float>(3,3,j,j+i*3));
+			chunks.back().voxel<float>( j, j ) = i * j * 1000;
 		}
-
 	data::Image img(chunks);
 	BOOST_REQUIRE( img.isClean() );
 	{
@@ -552,31 +459,16 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 BOOST_AUTO_TEST_CASE( typediamge_test )
 {
 	std::list<data::Chunk> chunks;
-	std::list<data::Chunk>::iterator k=chunks.begin();
-
-	uint32_t acNum = 0;
-	const util::fvector4 vSize( 1, 1, 1, 0 );
-
 	for ( int i = 0; i < 3; i++ )
-		for ( int j = 0; j < 3; j++,k++ ) {
-			chunks.push_back(data::MemChunk<float>( 3, 3 ));
-			chunks.back().setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
-			chunks.back().setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
-			chunks.back().setPropertyAs( "indexOrigin", util::fvector4( 0, 0, j ) );
-			chunks.back().setPropertyAs( "acquisitionNumber", acNum++ );
-			chunks.back().setPropertyAs( "voxelSize", vSize );
+		for ( int j = 0; j < 3; j++ ) {
+			chunks.push_back(genSlice<uint8_t>(3,3,j,j+i*3));
 			chunks.back().voxel<uint8_t>( j, j ) = std::numeric_limits<uint8_t>::max();
 		}
 
-	for ( int i = 3; i < 10; i++ )
+	for ( int i = 0; i < 10; i++ )
 		for ( int j = 0; j < 3; j++ ) {
-			chunks.push_back(data::MemChunk<int16_t>( 3, 3 ));
-			chunks.back().setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
-			chunks.back().setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
-			chunks.back().setPropertyAs( "indexOrigin", util::fvector4( 0, 0, j ) );
-			chunks.back().setPropertyAs( "acquisitionNumber", acNum++ );
-			chunks.back().setPropertyAs( "voxelSize", vSize );
-			chunks.back().voxel<int16_t>( j, j ) = std::numeric_limits<int16_t>::max();
+			chunks.push_back(genSlice<uint16_t>(3,3,j,j+i*3));
+			chunks.back().voxel<uint8_t>( j, j ) = std::numeric_limits<int16_t>::max();
 		}
 
 	data::Image img(chunks);
@@ -703,19 +595,17 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
 		   boost::numeric::RoundEven<double>
 		   > converter;
 
-	std::list<data::Chunk> chunks( nrS*nrT, data::MemChunk<float>( 3, 3 ) );
-	std::list<data::Chunk>::iterator k=chunks.begin();
+	std::list<data::Chunk> chunks;
 
 	for ( unsigned int is = 0; is < nrS; is++ ) {
-		for ( unsigned int it = 0; it < nrT; it++,k++ ) {
-			k->setPropertyAs( "indexOrigin", util::fvector4( 0, 0, is ) );
-			BOOST_CHECK( k->propertyValue( "indexOrigin" ).needed() );
-			k->setPropertyAs( "rowVec", util::fvector4( 17, 0, 0 ) );
-			k->setPropertyAs( "columnVec", util::fvector4( 0, 17, 0 ) );
-			k->setPropertyAs( "sliceVec", util::fvector4( 0, 0, 31 ) );
-			k->setPropertyAs( "voxelSize", util::fvector4( 3, 3, 3 ) );
-			k->setPropertyAs<uint32_t>( "acquisitionNumber", is + it * nrS );
-			k->setPropertyAs<uint16_t>( "sequenceNumber", 1 );
+		for ( unsigned int it = 0; it < nrT; it++ ) {
+			chunks.push_back(genSlice<float>(3,3,is,is + it * nrS));
+			BOOST_CHECK( chunks.back().propertyValue( "indexOrigin" ).needed() );
+			chunks.back().setPropertyAs( "rowVec", util::fvector4( 17, 0, 0 ) );
+			chunks.back().setPropertyAs( "columnVec", util::fvector4( 0, 17, 0 ) );
+			chunks.back().setPropertyAs( "sliceVec", util::fvector4( 0, 0, 31 ) );
+			chunks.back().setPropertyAs( "voxelSize", util::fvector4( 3, 3, 3 ) );
+			chunks.back().setPropertyAs<uint16_t>( "sequenceNumber", 1 );
 		}
 	}
 
@@ -799,20 +689,10 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes )
 	unsigned int nrS = 20;
 	unsigned int nrT = 20;
 
-	std::list<data::Chunk> chunks( nrS*nrT, data::MemChunk<float>( nrX, nrY ) );
-	std::list<data::Chunk>::iterator k=chunks.begin();
-
-
+	std::list<data::Chunk> chunks;
 	for ( unsigned int is = 0; is < nrS; is++ ) {
-		for ( unsigned int it = 0; it < nrT; it++,k++ ) {
-			k->setPropertyAs( "indexOrigin", util::fvector4( 0, 0, is ) );
-			BOOST_CHECK( k->propertyValue( "indexOrigin" ).needed() );
-			k->setPropertyAs( "rowVec", util::fvector4( 17, 0, 0 ) );
-			k->setPropertyAs( "columnVec", util::fvector4( 0, 17, 0 ) );
-			k->setPropertyAs( "sliceVec", util::fvector4( 0, 0, 31 ) );
-			k->setPropertyAs( "voxelSize", util::fvector4( 3, 3, 3 ) );
-			k->setPropertyAs<uint32_t>( "acquisitionNumber", is + it * nrS );
-			k->setPropertyAs<uint16_t>( "sequenceNumber", 1 );
+		for ( unsigned int it = 0; it < nrT; it++ ) {
+			chunks.push_back(genSlice<float>(nrX,nrY,is,is + it * nrS));
 		}
 	}
 
@@ -831,19 +711,10 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes )
 
 	nrT = 20;
 
-	std::list<data::Chunk> chunks2( nrS*nrT, data::MemChunk<float>( nrX, nrY ) );
-	std::list<data::Chunk>::iterator k2=chunks2.begin();
-
+	std::list<data::Chunk> chunks2;
 	for ( unsigned int is = 0; is < nrS; is++ ) {
-		for ( unsigned int it = 0; it < nrT; it++,k2++ ) {
-			k2->setPropertyAs( "indexOrigin", util::fvector4( 0, 0, is ) );
-			BOOST_CHECK( k2->propertyValue( "indexOrigin" ).needed() );
-			k2->setPropertyAs( "rowVec", util::fvector4( 17, 0, 0 ) );
-			k2->setPropertyAs( "columnVec", util::fvector4( 0, 17, 0 ) );
-			k2->setPropertyAs( "sliceVec", util::fvector4( 0, 0, 31 ) );
-			k2->setPropertyAs( "voxelSize", util::fvector4( 3, 3, 3 ) );
-			k2->setPropertyAs<uint32_t>( "acquisitionNumber", is + it * nrS );
-			k2->setPropertyAs<uint16_t>( "sequenceNumber", 1 );
+		for ( unsigned int it = 0; it < nrT; it++ ) {
+			chunks2.push_back(genSlice<float>(nrX,nrY,is,is + it * nrS));
 		}
 	}
 
@@ -866,19 +737,10 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes )
 
 	nrT = 20;
 
-	std::list<data::Chunk> chunks3( nrS*nrT, data::MemChunk<float>( nrX, nrY ) );
-	std::list<data::Chunk>::iterator k3=chunks3.begin();
-
+	std::list<data::Chunk> chunks3;
 	for ( unsigned int is = 0; is < nrS; is++ ) {
-		for ( unsigned int it = 0; it < nrT; it++,k3++ ) {
-			k3->setPropertyAs( "indexOrigin", util::fvector4( 0, 0, is ) );
-			BOOST_CHECK( k3->propertyValue( "indexOrigin" ).needed() );
-			k3->setPropertyAs( "rowVec", util::fvector4( 17, 0, 0 ) );
-			k3->setPropertyAs( "columnVec", util::fvector4( 0, 17, 0 ) );
-			k3->setPropertyAs( "sliceVec", util::fvector4( 0, 0, 31 ) );
-			k3->setPropertyAs( "voxelSize", util::fvector4( 3, 3, 3 ) );
-			k3->setPropertyAs<uint32_t>( "acquisitionNumber", is + it * nrS );
-			k3->setPropertyAs<uint16_t>( "sequenceNumber", 1 );
+		for ( unsigned int it = 0; it < nrT; it++ ) {
+			chunks3.push_back(genSlice<float>(nrX,nrY,is,is + it * nrS));
 		}
 	}
 
@@ -900,19 +762,10 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes )
 
 	nrT = 20;
 
-	std::list<data::Chunk> chunks4( nrS*nrT, data::MemChunk<float>( nrX, nrY ) );
-	std::list<data::Chunk>::iterator k4=chunks4.begin();
-
+	std::list<data::Chunk> chunks4;
 	for ( unsigned int is = 0; is < nrS; is++ ) {
-		for ( unsigned int it = 0; it < nrT; it++,k4++ ) {
-			k4->setPropertyAs( "indexOrigin", util::fvector4( 0, 0, is ) );
-			BOOST_CHECK( k4->propertyValue( "indexOrigin" ).needed() );
-			k4->setPropertyAs( "rowVec", util::fvector4( 17, 0, 0 ) );
-			k4->setPropertyAs( "columnVec", util::fvector4( 0, 17, 0 ) );
-			k4->setPropertyAs( "sliceVec", util::fvector4( 0, 0, 31 ) );
-			k4->setPropertyAs( "voxelSize", util::fvector4( 3, 3, 3 ) );
-			k4->setPropertyAs<uint32_t>( "acquisitionNumber", is + it * nrS );
-			k4->setPropertyAs<uint16_t>( "sequenceNumber", 1 );
+		for ( unsigned int it = 0; it < nrT; it++ ) {
+			chunks4.push_back(genSlice<float>(nrX,nrY,is,is + it * nrS));
 		}
 	}
 
@@ -934,20 +787,10 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes )
 
 	nrT = 1;
 
-	std::list<data::Chunk> chunks5( nrS*nrT, data::MemChunk<float>( nrX, nrY ) );
-	std::list<data::Chunk>::iterator k5=chunks5.begin();
-
-
+	std::list<data::Chunk> chunks5;
 	for ( unsigned int is = 0; is < nrS; is++ ) {
-		for ( unsigned int it = 0; it < nrT; it++,k5++ ) {
-			k5->setPropertyAs( "indexOrigin", util::fvector4( 0, 0, is ) );
-			BOOST_CHECK( k5->propertyValue( "indexOrigin" ).needed() );
-			k5->setPropertyAs( "rowVec", util::fvector4( 17, 0, 0 ) );
-			k5->setPropertyAs( "columnVec", util::fvector4( 0, 17, 0 ) );
-			k5->setPropertyAs( "sliceVec", util::fvector4( 0, 0, 31 ) );
-			k5->setPropertyAs( "voxelSize", util::fvector4( 3, 3, 3 ) );
-			k5->setPropertyAs<uint32_t>( "acquisitionNumber", is + it * nrS );
-			k5->setPropertyAs<uint16_t>( "sequenceNumber", 1 );
+		for ( unsigned int it = 0; it < nrT; it++ ) {
+			chunks5.push_back(genSlice<float>(nrX,nrY,is,is + it * nrS));
 		}
 	}
 
