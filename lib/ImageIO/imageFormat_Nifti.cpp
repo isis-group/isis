@@ -63,6 +63,14 @@ public:
 		LOG( ImageIoDebug, info ) << "create NiftiChunk";
 	}
 
+	//TODO: This is really weird staff - the gcc4.2 on MAC and RedHat is complaining about 
+	// the private copy constructor because he cannot resolve the template constructor when creating NiftiChunk
+	// e.g. in retList.push_back( _internal::NiftiChunk::makeNiftiChunk( static_cast<uint8_t *> (ni->data), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 )  );
+	// That's completely crazy but this workaround is a first solution - we hope to find a better one
+	template<typename T, typename D> static data::Chunk makeNiftiChunk( T *src, D del, size_t width, size_t height, size_t slices, size_t timesteps )  {
+		return NiftiChunk( src, del, width, height, slices, timesteps );
+	}
+	
 private:
 	NiftiChunk( const NiftiChunk & ); // no standard copy constructor
 	NiftiChunk &operator=( const NiftiChunk & ); // no copy operator
@@ -138,33 +146,33 @@ public:
 
 		switch ( ni->datatype ) {
 		case DT_UINT8:
-			retList.push_back( _internal::NiftiChunk( static_cast<uint8_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
+			retList.push_back( _internal::NiftiChunk::makeNiftiChunk( static_cast<uint8_t *> (ni->data), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 )  );
 			break;
 		case DT_INT8:
-			retList.push_back( _internal::NiftiChunk( static_cast<int8_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
+			retList.push_back( _internal::NiftiChunk::makeNiftiChunk( static_cast<int8_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
 			break;
 		case DT_INT16:
-			retList.push_back( _internal::NiftiChunk( static_cast<int16_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
+			retList.push_back( _internal::NiftiChunk::makeNiftiChunk( static_cast<int16_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
 			break;
 		case DT_UINT16:
-			retList.push_back( _internal::NiftiChunk( static_cast<uint16_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
+			retList.push_back( _internal::NiftiChunk::makeNiftiChunk( static_cast<uint16_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
 			break;
 		case DT_UINT32:
-			retList.push_back( _internal::NiftiChunk( static_cast<uint32_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
+			retList.push_back( _internal::NiftiChunk::makeNiftiChunk( static_cast<uint32_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
 			break;
 		case DT_INT32:
-			retList.push_back( _internal::NiftiChunk( static_cast<int32_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
+			retList.push_back( _internal::NiftiChunk::makeNiftiChunk( static_cast<int32_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
 			break;
 		case DT_FLOAT32:
-			retList.push_back( _internal::NiftiChunk( static_cast<float *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
+			retList.push_back( _internal::NiftiChunk::makeNiftiChunk( static_cast<float *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
 			break;
 		case DT_FLOAT64:
-			retList.push_back( _internal::NiftiChunk( static_cast<double *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
+			retList.push_back( _internal::NiftiChunk::makeNiftiChunk( static_cast<double *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
 			break;
 		default:
 			throwGenericError( std::string( "Unsupported datatype " ) + util::Value<int>( ni->datatype ).toString() );
 		}
-
+		
 		// don't forget to take the properties with
 		copyHeaderFromNifti( retList.back(), *ni );
 		//      if ( dialect == "spm" )
@@ -175,7 +183,8 @@ public:
 		//          retList.push_back( *dst );
 		//          return 1;
 		//      }
-		// push the completed NiftiChunk into the list
+		//
+		
 		return 1; // if there was an error, we wouldn't get here
 	}
 
