@@ -42,7 +42,7 @@ Chunk::Chunk( const ValuePtrReference &src, size_t nrOfColumns, size_t nrOfRows,
 	_internal::ChunkBase( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ),
 	ValuePtrReference( src )
 {
-	assert( ( *this )->length() == getVolume() );
+	assert( ( *this )->getLength() == getVolume() );
 }
 
 Chunk Chunk::cloneToNew( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps )const
