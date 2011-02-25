@@ -71,6 +71,7 @@ public:
 		return NiftiChunk( src, del, width, height, slices, timesteps );
 	}
 	
+
 private:
 	NiftiChunk( const NiftiChunk & ); // no standard copy constructor
 	NiftiChunk &operator=( const NiftiChunk & ); // no copy operator
@@ -146,7 +147,7 @@ public:
 
 		switch ( ni->datatype ) {
 		case DT_UINT8:
-			retList.push_back( _internal::NiftiChunk::makeNiftiChunk( static_cast<uint8_t *> (ni->data), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 )  );
+			retList.push_back( _internal::NiftiChunk::makeNiftiChunk( static_cast<uint8_t *> ( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 )  );
 			break;
 		case DT_INT8:
 			retList.push_back( _internal::NiftiChunk::makeNiftiChunk( static_cast<int8_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
@@ -185,6 +186,7 @@ public:
 		//      }
 		//
 		
+
 		return 1; // if there was an error, we wouldn't get here
 	}
 

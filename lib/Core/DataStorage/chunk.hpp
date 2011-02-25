@@ -112,15 +112,15 @@ public:
 	 * \returns amount of operations which returned false - so 0 is good!
 	 */
 	template <typename TYPE> size_t foreachVoxel( VoxelOp<TYPE> &op, util::FixedVector<size_t, 4> offset ) {
-		const util::FixedVector<size_t, 4> size = getSizeAsVector();
+		const util::FixedVector<size_t, 4> imagesize = getSizeAsVector();
 		util::FixedVector<size_t, 4> pos;
 		TYPE *vox = &asValuePtr<TYPE>()[0];
 		size_t ret = 0;
 
-		for( pos[timeDim] = 0; pos[timeDim] < size[timeDim]; pos[timeDim]++ )
-			for( pos[sliceDim] = 0; pos[sliceDim] < size[sliceDim]; pos[sliceDim]++ )
-				for( pos[columnDim] = 0; pos[columnDim] < size[columnDim]; pos[columnDim]++ )
-					for( pos[rowDim] = 0; pos[rowDim] < size[rowDim]; pos[rowDim]++ ) {
+		for( pos[timeDim] = 0; pos[timeDim] < imagesize[timeDim]; pos[timeDim]++ )
+			for( pos[sliceDim] = 0; pos[sliceDim] < imagesize[sliceDim]; pos[sliceDim]++ )
+				for( pos[columnDim] = 0; pos[columnDim] < imagesize[columnDim]; pos[columnDim]++ )
+					for( pos[rowDim] = 0; pos[rowDim] < imagesize[rowDim]; pos[rowDim]++ ) {
 						if( op( *( vox++ ), pos + offset ) == false )
 							++ret;
 					}
@@ -232,8 +232,8 @@ public:
 	 * depend on correct image orientations won't work as expected. Use this method
 	 * with caution!
 	 */
-	void transformCoords( boost::numeric::ublas::matrix<float> transform ) {
-		isis::data::_internal::transformCoords( *this, transform );
+	void transformCoords( boost::numeric::ublas::matrix<float> transform_matrix ) {
+		isis::data::_internal::transformCoords( *this, transform_matrix );
 	}
 
 };

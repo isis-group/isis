@@ -326,8 +326,8 @@ public:
 	 * depend on correct image orientations won't work as expected. Use this method
 	 * with caution!
 	 */
-	void transformCoords( boost::numeric::ublas::matrix<float> transform ) {
-		isis::data::_internal::transformCoords( *this, transform );
+	void transformCoords( boost::numeric::ublas::matrix<float> transform_matrix ) {
+		isis::data::_internal::transformCoords( *this, transform_matrix );
 	}
 
 	/**
@@ -335,7 +335,7 @@ public:
 	 * If neccessary a conversion into T is done using min/max of the image.
 	 */
 	template<typename T> void copyToMem( T *dst )const {
-		if( checkMakeClean() ) {
+		if( clean ) {
 			scaling_pair scale = getScalingTo( ValuePtr<T>::staticID );
 			// we could do this using convertToType - but this solution does not need any additional temporary memory
 			BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
@@ -345,6 +345,8 @@ public:
 
 				dst += ref->getVolume(); // increment the cursor
 			}
+		} else {
+			LOG( Runtime, error ) << "Cannot copy from non clean images. Run reIndex first";
 		}
 	}
 	/**
@@ -425,11 +427,11 @@ public:
 		convertToType( ValuePtr<T>::staticID );
 		return *this;
 	}
-	void copyToMem( void *dst ){
-		Image::copyToMem<T>((T*)dst);
+	void copyToMem( void *dst ) {
+		Image::copyToMem<T>( ( T * )dst );
 	}
 	void copyToMem( void *dst )const {
-		Image::copyToMem<T>((T*)dst);
+		Image::copyToMem<T>( ( T * )dst );
 	}
 };
 

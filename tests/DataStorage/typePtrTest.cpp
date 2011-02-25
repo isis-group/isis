@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE( ValuePtr_init_test )
 	{
 		data::ValuePtr<int32_t> outer;
 		// default constructor must create an empty pointer
-		BOOST_CHECK_EQUAL( outer.length(), 0 );
+		BOOST_CHECK_EQUAL( outer.getLength(), 0 );
 		BOOST_CHECK( ! ( boost::shared_ptr<int32_t> )outer );
 		BOOST_CHECK_EQUAL( ( ( boost::shared_ptr<int32_t> )outer ).use_count(), 0 );
 		{
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE( ValuePtr_init_test )
 			outer = inner;//now we have two
 			BOOST_CHECK_EQUAL( dummy.use_count(), 2 );
 			//and both reference the same data
-			BOOST_CHECK_EQUAL( outer.length(), inner.length() );
+			BOOST_CHECK_EQUAL( outer.getLength(), inner.getLength() );
 			BOOST_CHECK_EQUAL( ( ( boost::shared_ptr<int32_t> )outer ).get(), ( ( boost::shared_ptr<int32_t> )inner ).get() );
 		}
 		//now again its only one (inner is gone)
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE( ValuePtr_clone_test )
 			outer = inner;//now we have two
 			BOOST_CHECK_EQUAL( dummy.use_count(), 2 );
 			//and both reference the same data
-			BOOST_CHECK_EQUAL( outer->length(), inner.length() );
+			BOOST_CHECK_EQUAL( outer->getLength(), inner.getLength() );
 			BOOST_CHECK_EQUAL(
 				( ( boost::shared_ptr<int32_t> )outer->castToValuePtr<int32_t>() ).get(),
 				( ( boost::shared_ptr<int32_t> )inner ).get()
@@ -152,8 +152,8 @@ BOOST_AUTO_TEST_CASE( ValuePtr_splice_test )
 		}
 		boost::shared_ptr<int32_t> &dummy = outer.front()->castToValuePtr<int32_t>();
 
-		BOOST_CHECK_EQUAL( outer.front()->length(), 2 );// the first slices shall be of the size 2
-		BOOST_CHECK_EQUAL( outer.back()->length(), 1 );// the last slice shall be of the size 1 (5%2)
+		BOOST_CHECK_EQUAL( outer.front()->getLength(), 2 );// the first slices shall be of the size 2
+		BOOST_CHECK_EQUAL( outer.back()->getLength(), 1 );// the last slice shall be of the size 1 (5%2)
 		//we cannot ask for the use_count of the original because its hidden in DelProxy (outer[0].use_count will get the use_count of the splice)
 		//but we can check if it was allready deleted (it shouldn't, because the splices are still using that data)
 		BOOST_CHECK( ! Deleter::deleted );

@@ -69,10 +69,10 @@ std::list< util::istring > FileFormat::getSuffixes()const
 
 std::pair< std::string, std::string > FileFormat::makeBasename( const std::string &filename )const
 {
-	std::list<util::istring> suffixes = getSuffixes();
+	std::list<util::istring> supported_suffixes = getSuffixes();
 	util::istring ifilename( filename.begin(), filename.end() );
-	BOOST_FOREACH( const util::istring & suff, suffixes ) {
-		size_t at = ifilename.rfind( suff );
+	BOOST_FOREACH( const util::istring & suffix, supported_suffixes ) {
+		size_t at = ifilename.rfind( suffix );
 
 		if( at != ifilename.npos ) {
 			if( at && ifilename[at-1] == '.' )
