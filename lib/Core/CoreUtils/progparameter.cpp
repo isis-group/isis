@@ -92,7 +92,7 @@ bool ParameterMap::parse( int argc, char **argv )
 		i++;
 
 		if( !pName.empty() ) { // if we got a parameter before
-			const int begin = i;
+			const int start = i;
 
 			while( i < argc && argv[i][0] != '-' ) { //collect its properties, while there are some ..
 				i++;
@@ -101,13 +101,13 @@ bool ParameterMap::parse( int argc, char **argv )
 			iterator found = find( pName );
 
 			if( found == end() ) {
-				LOG( Runtime, warning ) << "Ignoring unknown parameter " << MSubject( std::string( "-" ) + pName + " " + listToString( argv + begin, argv + i, " ", "", "" ) );
-			} else if ( found->second.parse( listToString( argv + begin, argv + i, ",", "", "" ) ) ) { // parse the collected properties
+				LOG( Runtime, warning ) << "Ignoring unknown parameter " << MSubject( std::string( "-" ) + pName + " " + listToString( argv + start, argv + i, " ", "", "" ) );
+			} else if ( found->second.parse( listToString( argv + start, argv + i, ",", "", "" ) ) ) { // parse the collected properties
 				found->second.needed() = false;//remove needed flag, because the value is set (aka "not needed anymore")
 			} else {
 				LOG( Runtime, error )
 						<< "Failed to parse value(s) "
-						<< MSubject( listToString( argv + begin, argv + i, " ", "", "" ) )
+						<< MSubject( listToString( argv + start, argv + i, " ", "", "" ) )
 						<< " for "  << found->first << "(" << found->second->getTypeName() << ")";
 				parsed = false;
 			}

@@ -41,7 +41,7 @@ class DicomChunk : public data::Chunk
 	static data::Chunk *copyColor( TYPE **source, size_t width, size_t height ) {
 		data::Chunk *ret = new data::MemChunk<util::color<TYPE> >( width, height );
 		data::ValuePtr<util::color<TYPE> > &dest = ret->asValuePtr<util::color<TYPE> >();
-		const size_t pixels = dest.length();
+		const size_t pixels = dest.getLength();
 
 		for ( size_t i = 0; i < pixels; i++ ) {
 			util::color<TYPE> &dvoxel = dest[i];
@@ -147,7 +147,7 @@ ptime ImageFormat_Dicom::genTimeStamp( const date &date, const ptime &time )
 }
 
 
-void ImageFormat_Dicom::sanitise( util::PropertyMap &object, string dialect )
+void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string dialect )
 {
 	const util::istring prefix = util::istring( ImageFormat_Dicom::dicomTagTreeName ) + "/";
 	/////////////////////////////////////////////////////////////////////////////////
@@ -346,7 +346,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, string dialect )
 	}
 }
 
-int ImageFormat_Dicom::readMosaic( isis::data::Chunk source, list< isis::data::Chunk >& dest )
+int ImageFormat_Dicom::readMosaic( isis::data::Chunk source, std::list< isis::data::Chunk >& dest )
 {
 	// prepare some needed parameters
 	const util::istring prefix = util::istring( ImageFormat_Dicom::dicomTagTreeName ) + "/";

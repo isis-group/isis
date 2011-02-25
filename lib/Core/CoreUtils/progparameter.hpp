@@ -52,7 +52,7 @@ public:
 	 * (The value is used as default value if the parameter never gets to parse any other value)
 	 * \param needed flag if parameter is a needed one (default: true)
 	 */
-	template<typename T> ProgParameter( const T &ref, bool needed = true ): PropertyValue( ref, needed ), m_hidden( false ), m_set( false ) {}
+	template<typename T> ProgParameter( const T &ref, bool is_needed = true ): PropertyValue( ref, is_needed ), m_hidden( false ), m_set( false ) {}
 	/**
 	 * Put the given value into this parameter.
 	 * The parsing is done by automatic (!) type-conversion from std::string to the type of the parameter.
@@ -108,11 +108,11 @@ class ParameterMap: public std::map<std::string, ProgParameter>
 		std::map<key_type, mapped_type, key_compare> result( *this );
 
 		for (
-			iterator at = std::find_if( result.begin(), result.end(), T() );
-			at != result.end();
-			at = std::find_if( at, result.end(), hiddenP() )
+			iterator found = std::find_if( result.begin(), result.end(), T() );
+			found != result.end();
+			found = std::find_if( found, result.end(), hiddenP() )
 		)
-			result.erase( at++ );
+			result.erase( found++ );
 
 		std::cout << result << std::endl;
 	}

@@ -161,13 +161,13 @@ public:
 		boost::numeric::range_check_result ret = boost::numeric::cInRange;
 
 		for ( int i = 0; i < 4; i++ ) {//slow and ugly, but flexible
-			Value<DST> dst;
-			const boost::numeric::range_check_result result = m_conv->convert( Value<SRC>( srcVal[i] ), dst );
+			Value<DST> elem_dst;
+			const boost::numeric::range_check_result result = m_conv->convert( Value<SRC>( srcVal[i] ), elem_dst );
 
 			if ( result != boost::numeric::cInRange )
 				ret = result;
 
-			dstVal[i] = ( DST )dst;
+			dstVal[i] = ( DST )elem_dst;
 		}
 
 		return ret;
@@ -209,13 +209,13 @@ public:
 		boost::numeric::range_check_result ret = boost::numeric::cInRange;
 
 		for ( typename std::list<SRC>::const_iterator i = srcVal.begin(); i != srcVal.end(); i++ ) {//slow and ugly, but flexible
-			Value<DST> dst;
-			const boost::numeric::range_check_result result = m_conv->convert( Value<SRC>( *i ), dst );
+			Value<DST> elem_dst;
+			const boost::numeric::range_check_result result = m_conv->convert( Value<SRC>( *i ), elem_dst );
 
 			if ( result != boost::numeric::cInRange )
 				ret = result;
 
-			dstVal.push_back( ( DST )dst );
+			dstVal.push_back( ( DST )elem_dst );
 		}
 
 		return ret;

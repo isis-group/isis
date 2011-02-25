@@ -27,7 +27,7 @@ namespace util
 {
 namespace _internal
 {
-const char* logLevelNames( LogLevel level )
+const char *logLevelNames( LogLevel level )
 {
 	switch( level ) {
 	case error:

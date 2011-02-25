@@ -90,10 +90,10 @@ public:
 	 * This operator creates a copy of the referenced Value-Object.
 	 * So its NO cheap copy. (At least not if the copy-operator of the contained type is not cheap)
 	 */
-	ValueReference( const ValueReference &src ):boost::scoped_ptr<TYPE_TYPE>(NULL) {
+	ValueReference( const ValueReference &src ): boost::scoped_ptr<TYPE_TYPE>( NULL ) {
 		operator=( src );
 	}
-	ValueReference( const TYPE_TYPE &src ):boost::scoped_ptr<TYPE_TYPE>(NULL) {
+	ValueReference( const TYPE_TYPE &src ): boost::scoped_ptr<TYPE_TYPE>( NULL ) {
 		operator=( src );
 	}
 	/**

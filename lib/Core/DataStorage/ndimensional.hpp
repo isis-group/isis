@@ -53,7 +53,7 @@ template<> inline bool   __rangeCheck<0>( const size_t d[], const size_t dim[] )
 /// Base class for anything that has dimensional size
 template<unsigned short DIMS> class NDimensional
 {
-	size_t dim[DIMS];
+	size_t m_dim[DIMS];
 protected:
 	NDimensional() {}
 public:
@@ -64,22 +64,22 @@ public:
 	 * \param d array with sizes to use. (d[0] is most iterating element / lowest dimension)
 	 */
 	void init( const size_t d[DIMS] ) {
-		std::copy( d, d + DIMS, dim );
+		std::copy( d, d + DIMS, m_dim );
 		LOG_IF( getVolume() == 0, Runtime, error ) << "Creating object with volume of 0";
 	}
 	void init( const util::FixedVector<size_t, DIMS>& d ) {
-		d.copyTo( dim );
+		d.copyTo( m_dim );
 		LOG_IF( getVolume() == 0, Runtime, error ) << "Creating object with volume of 0";
 	}
 	NDimensional( const NDimensional &src ) {//@todo default copier should do the job
-		init( src.dim );
+		init( src.m_dim );
 	}
 	/**
 	 * Compute linear index from n-dimensional index,
 	 * \param d array of indexes (d[0] is most iterating element / lowest dimension)
 	 */
 	size_t getLinearIndex( const size_t d[DIMS] )const {
-		return __dim2index < DIMS - 1 > ( d, dim );
+		return __dim2index < DIMS - 1 > ( d, m_dim );
 	}
 	/**
 	 * Check if index fits into the dimensional size of the object.
@@ -87,28 +87,28 @@ public:
 	 * \returns true if given index will get a reasonable result when used for getLinearIndex
 	 */
 	bool isInRange( const size_t d[DIMS] )const {
-		return __rangeCheck < DIMS - 1 > ( d, dim );
+		return __rangeCheck < DIMS - 1 > ( d, m_dim );
 	}
 	/**
 	 * Get the size of the object in elements of TYPE.
 	 * \returns \f$ \prod_{i=0}^{DIMS-1} getDimSize(i) \f$
 	 */
 	size_t getVolume()const {
-		return __dimStride<DIMS>( dim );
+		return __dimStride<DIMS>( m_dim );
 	}
 	///\returns the size of the object in the given dimension
 	size_t getDimSize( size_t idx )const {
-		return dim[idx];
+		return m_dim[idx];
 	}
 
 	/// generates a string representing the size
 	std::string getSizeAsString( std::string delim = "x" )const {
-		return util::listToString( dim, dim + DIMS, delim, "", "" );
+		return util::listToString( m_dim, m_dim + DIMS, delim, "", "" );
 	}
 
 	/// generates a FixedVector\<DIMS\> representing the size
 	util::FixedVector<size_t, DIMS> getSizeAsVector()const {
-		return util::FixedVector<size_t, DIMS>( dim );
+		return util::FixedVector<size_t, DIMS>( m_dim );
 	}
 
 	/**
@@ -119,7 +119,7 @@ public:
 		size_t ret = 0;
 
 		for ( unsigned short i = DIMS; i; i-- ) {
-			if ( dim[i-1] > 1 ) {
+			if ( m_dim[i-1] > 1 ) {
 				ret = i;
 				break;
 			}
