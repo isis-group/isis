@@ -265,12 +265,12 @@ getNumericScaling( const util::_internal::ValueBase &min, const util::_internal:
  */
 template<typename SRC, typename DST> void numeric_convert( const ValuePtr<SRC> &src, ValuePtr<DST> &dst, const double scale, const double offset )
 {
-	LOG_IF( src.length() > dst.length(), Runtime, error ) << "The " << src.length() << " elements of src wont fit into the destination. Will only convert " << dst.length() << " elements.";
-	LOG_IF( src.length() < dst.length(), Runtime, warning ) << "Source is shorter than destination. Will only convert " << src.length() << " values";
+	LOG_IF( src.getLength() > dst.getLength(), Runtime, error ) << "The " << src.getLength() << " elements of src wont fit into the destination. Will only convert " << dst.getLength() << " elements.";
+	LOG_IF( src.getLength() < dst.getLength(), Runtime, warning ) << "Source is shorter than destination. Will only convert " << src.getLength() << " values";
 
-	if ( src.length() == 0 )return;
+	if ( src.getLength() == 0 )return;
 
-	const size_t size = std::min( src.length(), dst.length() );
+	const size_t size = std::min( src.getLength(), dst.getLength() );
 
 	if ( ( scale != 1. || offset ) )
 		_internal::numeric_convert_impl( &src[0], &dst[0], size, scale, offset );

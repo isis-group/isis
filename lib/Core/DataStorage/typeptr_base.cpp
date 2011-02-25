@@ -15,7 +15,7 @@ namespace _internal
 
 ValuePtrBase::ValuePtrBase( size_t length ): m_len( length ) {}
 
-size_t ValuePtrBase::length() const { return m_len;}
+size_t ValuePtrBase::getLength() const { return m_len;}
 
 ValuePtrBase::~ValuePtrBase() {}
 
@@ -35,8 +35,8 @@ const ValuePtrBase::Converter &ValuePtrBase::getConverterTo( unsigned short ID )
 
 size_t ValuePtrBase::compare( const ValuePtrBase &comp )const
 {
-	LOG_IF( length() != comp.length(), Runtime, info ) << "Comparing data of different length. The difference will be added to the returned value.";
-	return length() - comp.length() + compare( 0, std::min( length(), comp.length() ) - 1, comp, 0 );
+	LOG_IF( getLength() != comp.getLength(), Runtime, info ) << "Comparing data of different length. The difference will be added to the returned value.";
+	return getLength() - comp.getLength() + compare( 0, std::min( getLength(), comp.getLength() ) - 1, comp, 0 );
 }
 
 ValuePtrBase::Reference ValuePtrBase::copyToNewByID( unsigned short ID ) const
@@ -83,12 +83,12 @@ void ValuePtrBase::copyRange( size_t start, size_t end, ValuePtrBase &dst, size_
 	LOG_IF( ! dst.isSameType( *this ), Debug, error )
 			<< "Copying into a ValuePtr of different type. Its " << dst.getTypeName() << " not " << getTypeName();
 
-	if( end >= length() ) {
+	if( end >= getLength() ) {
 		LOG( Runtime, error )
-				<< "End of the range (" << end << ") is behind the end of this ValuePtr (" << length() << ")";
-	} else if( len + dst_start > dst.length() ) {
+				<< "End of the range (" << end << ") is behind the end of this ValuePtr (" << getLength() << ")";
+	} else if( len + dst_start > dst.getLength() ) {
 		LOG( Runtime, error )
-				<< "End of the range (" << len + dst_start << ") is behind the end of the destination (" << dst.length() << ")";
+				<< "End of the range (" << len + dst_start << ") is behind the end of the destination (" << dst.getLength() << ")";
 	} else {
 		boost::shared_ptr<void> daddr = dst.getRawAddress().lock();
 		boost::shared_ptr<void> saddr = getRawAddress().lock();

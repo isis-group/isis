@@ -130,14 +130,14 @@ const PropertyMap::mapped_type *PropertyMap::findEntry(
 
 	return NULL;
 }
-bool PropertyMap::recursiveRemove( PropertyMap &root, const propPathIterator at, const propPathIterator pathEnd )
+bool PropertyMap::recursiveRemove( PropertyMap &root, const propPathIterator path_it, const propPathIterator pathEnd )
 {
 	bool ret = false;
 
-	if ( at != pathEnd ) {
-		propPathIterator next = at;
+	if ( path_it != pathEnd ) {
+		propPathIterator next = path_it;
 		next++;
-		iterator found = root.find( *at );
+		iterator found = root.find( *path_it );
 
 		if ( found != root.end() ) {
 			mapped_type &ref = found->second;
@@ -152,7 +152,7 @@ bool PropertyMap::recursiveRemove( PropertyMap &root, const propPathIterator at,
 				ret = true;
 			}
 		} else {
-			LOG( Runtime, warning ) << "Entry " << util::MSubject( *at ) << " not found, skipping it";
+			LOG( Runtime, warning ) << "Entry " << util::MSubject( *path_it ) << " not found, skipping it";
 		}
 	}
 
