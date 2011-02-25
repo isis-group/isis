@@ -38,8 +38,8 @@ Image::Image ( ) : set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMas
 	set.addSecondarySort( "acquisitionTime" );
 }
 
-Image::Image( const isis::data::Image &ref ):_internal::NDimensional<4>(),util::PropertyMap(),
-set( "" )/*SortedChunkList has no default constructor - lets just make an empty (and invalid) set*/
+Image::Image( const isis::data::Image &ref ): _internal::NDimensional<4>(), util::PropertyMap(),
+	set( "" )/*SortedChunkList has no default constructor - lets just make an empty (and invalid) set*/
 {
 	( *this ) = ref; // set will be replaced here anyway
 }
@@ -120,8 +120,8 @@ bool Image::reIndex()
 	//redo lookup table
 	lookup = set.getLookup();
 	const size_t chunks = lookup.size();
-	util::FixedVector<size_t, dims> size; //storage for the size of the chunk structure
-	size.fill( 1 );
+	util::FixedVector<size_t, dims> structure_size; //storage for the size of the chunk structure
+	structure_size.fill( 1 );
 	//get primary attributes from geometrically first chunk - will be usefull
 	const Chunk &first = chunkAt( 0 );
 	const unsigned short chunk_dims = first.getRelevantDims();
@@ -151,17 +151,17 @@ bool Image::reIndex()
 
 		// check the chunks for at least one dimensional break - use that for the size of that dimension
 		for ( unsigned short i = chunk_dims; i < sortDims; i++ ) { //if there are dimensions left figure out their size
-			size[i] = getChunkStride( size.product() ) / size.product();
-			assert( size[i] != 0 );
+			structure_size[i] = getChunkStride( structure_size.product() ) / structure_size.product();
+			assert( structure_size[i] != 0 );
 		}
 	}
 
 	if ( sortDims < dims ) { //if there is a timedim (not all dims was used for geometric sort)
-		assert( size[sortDims] == 1 );
-		size[sortDims] = timesteps; // fill the dim above the top geometric dim with the timesteps
+		assert( structure_size[sortDims] == 1 );
+		structure_size[sortDims] = timesteps; // fill the dim above the top geometric dim with the timesteps
 	}
 
-	assert( size.product() == lookup.size() );
+	assert( structure_size.product() == lookup.size() );
 	//Clean up the properties
 	//@todo might fail if the image contains a prop that differs to that in the Chunks (which is equal in the chunks)
 	util::PropertyMap common;
@@ -185,9 +185,9 @@ bool Image::reIndex()
 
 	// add the chunk-size to the image-size
 	for ( unsigned short i = 0; i < chunk_dims; i++ )
-		size[i] = first.getDimSize( i );
+		structure_size[i] = first.getDimSize( i );
 
-	init( size ); // set size of the image
+	init( structure_size ); // set size of the image
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	//reconstruct some redundant information, if its missing
 	//////////////////////////////////////////////////////////////////////////////////////////////////
@@ -204,9 +204,9 @@ bool Image::reIndex()
 	}
 
 	//if we have at least two slides (and have slides (with different positions) at all)
-	if ( chunk_dims == 2 && size[2] > 1 && first.hasProperty( "indexOrigin" ) ) {
+	if ( chunk_dims == 2 && structure_size[2] > 1 && first.hasProperty( "indexOrigin" ) ) {
 		const util::fvector4 thisV = first.getPropertyAs<util::fvector4>( "indexOrigin" );
-		const Chunk &last = chunkAt( size[2] - 1 );
+		const Chunk &last = chunkAt( structure_size[2] - 1 );
 
 		if ( last.hasProperty( "indexOrigin" ) ) {
 			const util::fvector4 lastV = last.getPropertyAs<util::fvector4>( "indexOrigin" );
@@ -220,11 +220,11 @@ bool Image::reIndex()
 				const util::fvector4 sliceVec = getPropertyAs<util::fvector4>( "sliceVec" );
 				LOG_IF( ! distVecNorm.fuzzyEqual( sliceVec ), Runtime, info )
 						<< "The existing sliceVec " << sliceVec
-						<< " differs from the distance vector between chunk 0 and " << size[2] - 1
+						<< " differs from the distance vector between chunk 0 and " << structure_size[2] - 1
 						<< " " << distVecNorm;
 			} else {
 				LOG( Debug, info )
-						<< "used the distance between chunk 0 and " << size[2] - 1
+						<< "used the distance between chunk 0 and " << structure_size[2] - 1
 						<< " to synthesize the missing sliceVec as " << distVecNorm;
 				propertyValue( "sliceVec" ) = distVecNorm;
 			}
@@ -327,26 +327,26 @@ bool Image::isEmpty()const
 	return set.isEmpty();
 }
 
-const boost::shared_ptr< Chunk >& Image::chunkPtrAt( size_t at )const
+const boost::shared_ptr< Chunk >& Image::chunkPtrAt( size_t pos )const
 {
 	LOG_IF( lookup.empty(), Debug, error ) << "The lookup table is empty. Run reIndex first.";
-	LOG_IF( at >= lookup.size(), Debug, error ) << "Index is out of the range of the lookup table (" << at << ">=" << lookup.size() << ").";
-	const boost::shared_ptr<Chunk> &ptr = lookup[at];
-	LOG_IF( !ptr, Debug, error ) << "There is no chunk at " << at << ". This usually happens in incomplete images.";
+	LOG_IF( pos >= lookup.size(), Debug, error ) << "Index is out of the range of the lookup table (" << pos << ">=" << lookup.size() << ").";
+	const boost::shared_ptr<Chunk> &ptr = lookup[pos];
+	LOG_IF( !ptr, Debug, error ) << "There is no chunk at " << pos << ". This usually happens in incomplete images.";
 	return ptr;
 }
 
-Chunk Image::getChunkAt( size_t at, bool copy_metadata )const
+Chunk Image::getChunkAt( size_t pos, bool copy_metadata )const
 {
-	Chunk ret( *chunkPtrAt( at ) );
+	Chunk ret( *chunkPtrAt( pos ) );
 
 	if( copy_metadata )ret.join( *this ); // copy all metadata from the image in here
 
 	return ret;
 }
-Chunk &Image::chunkAt( size_t at )
+Chunk &Image::chunkAt( size_t pos )
 {
-	return *chunkPtrAt( at );
+	return *chunkPtrAt( pos );
 }
 
 Chunk Image::getChunk ( size_t first, size_t second, size_t third, size_t fourth, bool copy_metadata )
@@ -391,8 +391,8 @@ size_t Image::getChunkStride ( size_t base_stride )
 		 */
 		// get the distance between first and second chunk for comparision
 		const util::fvector4 firstV = chunkAt( 0 ).getPropertyAs<util::fvector4>( "indexOrigin" );
-		const util::fvector4 nextV = chunkAt( base_stride ).getPropertyAs<util::fvector4>( "indexOrigin" );
-		const util::fvector4 dist1 = nextV - firstV;
+		const util::fvector4 secondV = chunkAt( base_stride ).getPropertyAs<util::fvector4>( "indexOrigin" );
+		const util::fvector4 dist1 = secondV - firstV;
 
 		if( dist1.sqlen() == 0 ) { //if there is no geometric structure anymore - so asume its flat from here on
 			LOG( Debug, info ) << "Distance between 0 and " << util::MSubject( base_stride )
@@ -456,16 +456,16 @@ std::list<util::PropertyValue> Image::getChunksProperties( const util::PropertyM
 
 size_t Image::getBytesPerVoxel() const
 {
-	size_t size = chunkPtrAt( 0 )->bytesPerVoxel();
+	size_t bytes = chunkPtrAt( 0 )->bytesPerVoxel();
 	BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
-		LOG_IF( size != ref->bytesPerVoxel(), Debug, warning )
-				<< "Not all voxels have the same byte size (" << size << "!=" << ref->bytesPerVoxel() << "). Using the biggest.";
+		LOG_IF( bytes != ref->bytesPerVoxel(), Debug, warning )
+				<< "Not all voxels have the same byte size (" << bytes << "!=" << ref->bytesPerVoxel() << "). Using the biggest.";
 
-		if( size < ref->bytesPerVoxel() ) {
-			size = ref->bytesPerVoxel();
+		if( bytes < ref->bytesPerVoxel() ) {
+			bytes = ref->bytesPerVoxel();
 		}
 	}
-	return size;
+	return bytes;
 }
 
 std::pair<util::ValueReference, util::ValueReference> Image::getMinMax () const
@@ -638,10 +638,10 @@ size_t Image::spliceDownTo( dimensions dim ) //rowDim = 0, columnDim, sliceDim, 
 
 	LOG_IF( lookup[0]->getRelevantDims() == ( size_t ) dim, Debug, info ) << "Running useless splice, the dimensionality of the chunks of this image is already " << dim;
 	LOG_IF( hasProperty( "acquisitionTime" ) || lookup[0]->hasProperty( "acquisitionTime" ), Debug, warning ) << "Splicing images with acquisitionTime will cause you lots of trouble. You should remove that before.";
-	util::FixedVector<size_t, 4> size = getSizeAsVector();
+	util::FixedVector<size_t, 4> image_size = getSizeAsVector();
 
 	for( int i = 0; i < dim; i++ )
-		size[i] = 1;
+		image_size[i] = 1;
 
 	// get a list of needed properties (everything which is missing in a newly created chunk plus everything which is needed for autosplice)
 	const std::list<util::PropertyMap::KeyType> splice_needed = util::stringToList<util::PropertyMap::KeyType>( util::PropertyMap::KeyType( "voxelSize,voxelGap,rowVec,columnVec,sliceVec,indexOrigin,acquisitionNumber" ), ',' );
@@ -651,7 +651,7 @@ size_t Image::spliceDownTo( dimensions dim ) //rowDim = 0, columnDim, sliceDim, 
 		dimensions m_dim;
 		Image &m_image;
 		size_t m_amount;
-		splicer( dimensions dim, size_t amount, Image &image ): m_dim( dim ), m_image( image ), m_amount( amount ) {}
+		splicer( dimensions dimemsion, size_t amount, Image &image ): m_dim( dimemsion ), m_image( image ), m_amount( amount ) {}
 		void operator()( const Chunk &ch ) {
 			const size_t topDim = ch.getRelevantDims() - 1;
 
@@ -672,7 +672,7 @@ size_t Image::spliceDownTo( dimensions dim ) //rowDim = 0, columnDim, sliceDim, 
 	lookup.clear();
 	set.clear(); // clear the image, so we can insert the splices
 	//static_cast<util::PropertyMap::base_type*>(this)->clear(); we can keep the common properties - they will be merged with thier own copies from the chunks on the next reIndex
-	splicer splice( dim, size.product(), *this );
+	splicer splice( dim, image_size.product(), *this );
 	BOOST_FOREACH( boost::shared_ptr<Chunk> &ref, buffer ) {
 		BOOST_FOREACH( const util::PropertyMap::KeyType & need, needed ) { //get back properties needed for the
 			if( !ref->hasProperty( need ) && this->hasProperty( need ) ) {

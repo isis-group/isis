@@ -326,8 +326,8 @@ public:
 	 * depend on correct image orientations won't work as expected. Use this method
 	 * with caution!
 	 */
-	void transformCoords( boost::numeric::ublas::matrix<float> transform ) {
-		isis::data::_internal::transformCoords( *this, transform );
+	void transformCoords( boost::numeric::ublas::matrix<float> transform_matrix ) {
+		isis::data::_internal::transformCoords( *this, transform_matrix );
 	}
 
 	/**
@@ -425,11 +425,11 @@ public:
 		convertToType( ValuePtr<T>::staticID );
 		return *this;
 	}
-	void copyToMem( void *dst ){
-		Image::copyToMem<T>((T*)dst);
+	void copyToMem( void *dst ) {
+		Image::copyToMem<T>( ( T * )dst );
 	}
 	void copyToMem( void *dst )const {
-		Image::copyToMem<T>((T*)dst);
+		Image::copyToMem<T>( ( T * )dst );
 	}
 };
 
