@@ -335,7 +335,7 @@ public:
 	 * If neccessary a conversion into T is done using min/max of the image.
 	 */
 	template<typename T> void copyToMem( T *dst )const {
-		if( checkMakeClean() ) {
+		if( clean ) {
 			scaling_pair scale = getScalingTo( ValuePtr<T>::staticID );
 			// we could do this using convertToType - but this solution does not need any additional temporary memory
 			BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
@@ -345,6 +345,8 @@ public:
 
 				dst += ref->getVolume(); // increment the cursor
 			}
+		} else {
+			LOG( Runtime, error ) << "Cannot copy from non clean images. Run reIndex first";
 		}
 	}
 	/**
