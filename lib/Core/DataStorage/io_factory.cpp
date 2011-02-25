@@ -274,16 +274,17 @@ std::list< Image > IOFactory::chunkListToImageList( std::list<Chunk> &src )
 
 	while ( !src.empty() ) {
 		LOG( Debug, info ) << src.size() << " Chunks left to be distributed.";
-		size_t before=src.size();
+		size_t before = src.size();
 
-		Image buff(src);
+		Image buff( src );
+
 		if ( buff.isClean() && buff.isValid() ) { //if the image was successfully indexed and is valid, keep it
-				ret.push_back( buff );
-				LOG( Runtime, info ) << "Image " << ret.size() << " with size " << buff.getSizeAsString() <<  " and value range " << buff.getMinMax() << " done.";
+			ret.push_back( buff );
+			LOG( Runtime, info ) << "Image " << ret.size() << " with size " << buff.getSizeAsString() <<  " and value range " << buff.getMinMax() << " done.";
 		} else {
-			LOG_IF(!buff.getMissing().empty(), Runtime, error )
+			LOG_IF( !buff.getMissing().empty(), Runtime, error )
 					<< "Cannot insert image. Missing properties: " << buff.getMissing();
-			errcnt += before-src.size();
+			errcnt += before - src.size();
 		}
 	}
 

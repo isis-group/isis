@@ -38,22 +38,22 @@ Image::Image ( ) : set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMas
 	set.addSecondarySort( "acquisitionTime" );
 }
 
-Image::Image ( const Chunk &chunk) : _internal::NDimensional<4>(),util::PropertyMap(),set( "sequenceNumber,rowVec,columnVec,coilChannelMask,DICOM/EchoNumbers" ), clean( false )
+Image::Image ( const Chunk &chunk ) : _internal::NDimensional<4>(), util::PropertyMap(), set( "sequenceNumber,rowVec,columnVec,coilChannelMask,DICOM/EchoNumbers" ), clean( false )
 {
 	addNeededFromString( neededProperties );
 	set.addSecondarySort( "acquisitionNumber" );
 	set.addSecondarySort( "acquisitionTime" );
 
-	if ( ! (insertChunk( chunk ) && reIndex() && isClean()) ) {
-		LOG(Runtime,error) << "Failed to create image from single chunk.";
-	} else if(!isValid()){
-		LOG_IF(!getMissing().empty(), Debug, warning )
-					<< "The created image is missing some properties: " << getMissing() << ". It will be invalid.";
+	if ( ! ( insertChunk( chunk ) && reIndex() && isClean() ) ) {
+		LOG( Runtime, error ) << "Failed to create image from single chunk.";
+	} else if( !isValid() ) {
+		LOG_IF( !getMissing().empty(), Debug, warning )
+				<< "The created image is missing some properties: " << getMissing() << ". It will be invalid.";
 	}
 }
 
-Image::Image( const isis::data::Image &ref ):_internal::NDimensional<4>(),util::PropertyMap(),
-set( "" )/*SortedChunkList has no default constructor - lets just make an empty (and invalid) set*/
+Image::Image( const isis::data::Image &ref ): _internal::NDimensional<4>(), util::PropertyMap(),
+	set( "" )/*SortedChunkList has no default constructor - lets just make an empty (and invalid) set*/
 {
 	( *this ) = ref; // set will be replaced here anyway
 }
@@ -136,13 +136,13 @@ bool Image::insertChunk ( const Chunk &chunk )
 		return false;
 	}
 
-	if(clean){
-		LOG(Debug,info) << "Resetting image structure because of new insertion.";
-		LOG(Runtime,warning) << "Inserting into already indexed images is inefficient. You should not do that.";
+	if( clean ) {
+		LOG( Debug, info ) << "Resetting image structure because of new insertion.";
+		LOG( Runtime, warning ) << "Inserting into already indexed images is inefficient. You should not do that.";
 
 		// re-gather all properties of the chunks from the image
-		BOOST_FOREACH(boost::shared_ptr<Chunk> &ref,lookup){
-			ref->join(*this);
+		BOOST_FOREACH( boost::shared_ptr<Chunk> &ref, lookup ) {
+			ref->join( *this );
 		}
 	}
 
@@ -150,15 +150,16 @@ bool Image::insertChunk ( const Chunk &chunk )
 	LOG_IF( chunk.getPropertyAs<util::fvector4>( "indexOrigin" )[3] != 0, Debug, warning )
 			<< " inserting chunk with nonzero at the 4th position - you shouldn't use the fourth dim for the time (use acquisitionTime)";
 
-	if(set.insert( chunk )){ // if the insertion was successful the image has to be reindexed anyway
-		clean=false;
+	if( set.insert( chunk ) ) { // if the insertion was successful the image has to be reindexed anyway
+		clean = false;
 		lookup.clear();
 		return true;
 	} else {
 		// if the insersion failed but the image was clean - de-duplicate properties again
 		// the image is still clean - no need reindex
-		if(clean)
-			deduplicateProperties(); 
+		if( clean )
+			deduplicateProperties();
+
 		return false;
 	}
 }
@@ -172,7 +173,7 @@ bool Image::reIndex()
 	}
 
 	if( !set.isRectangular() ) {
-		LOG( Runtime, error ) << "The image is incomplete. Aborting reindex. (horizontal size is "<< set.getHorizontalSize() << ")";
+		LOG( Runtime, error ) << "The image is incomplete. Aborting reindex. (horizontal size is " << set.getHorizontalSize() << ")";
 		return false;
 	}
 
@@ -288,8 +289,8 @@ bool Image::reIndex()
 				util::fvector4 &voxelGap = propertyValue( "voxelGap" )->castTo<util::fvector4>(); //if there is no voxelGap yet, we create it
 
 				if ( voxelGap[2] != inf ) {
-					if ( ! util::fuzzyEqual( voxelGap[2], sliceDist, 50 ) ) {
-						LOG_IF( ! util::fuzzyEqual( voxelGap[2], sliceDist, 50 ), Runtime, warning )
+					if ( ! util::fuzzyEqual( voxelGap[2], sliceDist ) ) {
+						LOG_IF( ! util::fuzzyEqual( voxelGap[2], sliceDist ), Runtime, warning )
 								<< "The existing slice distance (voxelGap[2]) " << util::MSubject( voxelGap[2] )
 								<< " differs from the distance between chunk 0 and 1, which is " << sliceDist;
 					}
@@ -316,7 +317,7 @@ bool Image::reIndex()
 
 		if ( hasProperty( "sliceVec" ) ) {
 			util::fvector4 &sliceVec = propertyValue( "sliceVec" )->castTo<util::fvector4>(); //get the slice vector
-			LOG_IF( ! crossVec.fuzzyEqual( sliceVec, 1000 ), Runtime, warning )
+			LOG_IF( ! crossVec.fuzzyEqual( sliceVec ), Runtime, warning )
 					<< "The existing sliceVec " << sliceVec
 					<< " differs from the cross product of the row- and column vector " << crossVec;
 		} else {

@@ -20,7 +20,8 @@ namespace isis
 namespace test
 {
 
-template<typename T> data::Chunk genSlice(size_t columns=4,size_t rows=4,size_t at=0,uint32_t acnum=0){
+template<typename T> data::Chunk genSlice( size_t columns = 4, size_t rows = 4, size_t at = 0, uint32_t acnum = 0 )
+{
 	data::MemChunk<T> ch( columns, rows );
 	ch.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, at ) );
 	ch.setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
@@ -28,8 +29,8 @@ template<typename T> data::Chunk genSlice(size_t columns=4,size_t rows=4,size_t 
 	ch.setPropertyAs( "sliceVec", util::fvector4( 0, 0, 1 ) );
 	ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 
-	ch.setPropertyAs( "acquisitionNumber", (uint32_t)acnum );
-	ch.setPropertyAs( "acquisitionTime", (float)acnum );
+	ch.setPropertyAs( "acquisitionNumber", ( uint32_t )acnum );
+	ch.setPropertyAs( "acquisitionTime", ( float )acnum );
 	return ch;
 }
 
@@ -37,9 +38,9 @@ template<typename T> data::Chunk genSlice(size_t columns=4,size_t rows=4,size_t 
 BOOST_AUTO_TEST_CASE ( image_init_test )
 {
 	{
-		data::Chunk ch=genSlice<float>(4,4,2,0);
+		data::Chunk ch = genSlice<float>( 4, 4, 2, 0 );
 		// inserting a proper Chunk should work
-		data::Image img(ch);
+		data::Image img( ch );
 		BOOST_CHECK( img.isClean() );
 
 
@@ -47,12 +48,12 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		data::enableLog<util::DefaultMsgPrint>( ( LogLevel )0 );
 		BOOST_CHECK( ! img.insertChunk( data::MemChunk<float>( 4, 4 ) ) );
 		data::enableLog<util::DefaultMsgPrint>( error );
-		
+
 		//inserting the same chunk twice should fail
 		BOOST_CHECK( ! img.insertChunk( ch ) );
 
 		// but inserting another Chunk should work
-		ch = genSlice<float>(4,4,0,2);
+		ch = genSlice<float>( 4, 4, 0, 2 );
 		img.insertChunk( ch );
 
 		// Chunks should be inserted based on their position (lowest first)
@@ -82,11 +83,12 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		std::list<data::Chunk> chunks;
 
 		for( int i = 0; i < 3; i++ ) {
-			chunks.push_back(genSlice<float>( 4, 4, i, 3+i ));
+			chunks.push_back( genSlice<float>( 4, 4, i, 3 + i ) );
 		}
-		data::Image img(chunks);
-		BOOST_CHECK(img.isClean());
-		BOOST_CHECK(img.isValid());
+
+		data::Image img( chunks );
+		BOOST_CHECK( img.isClean() );
+		BOOST_CHECK( img.isValid() );
 
 		std::string str = "testString";
 		img.setPropertyAs<std::string>( "testProp", str );
@@ -103,12 +105,14 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		uint32_t nrSlices = 27;
 
 		chunks.clear();
+
 		for( int t = 0; t < nrTimesteps; t++ ) {
 			for( int s = 0; s < nrSlices; s++ ) {
-				chunks.push_back(genSlice<float>( nrCols, nrRows, s, s + t * nrSlices ) );
+				chunks.push_back( genSlice<float>( nrCols, nrRows, s, s + t * nrSlices ) );
 			}
 		}
-		data::Image img2(chunks);
+
+		data::Image img2( chunks );
 
 		BOOST_REQUIRE( img2.isClean() );
 		BOOST_CHECK_EQUAL( img2.getVolume(), nrRows * nrCols * nrTimesteps * nrSlices );
@@ -120,12 +124,14 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		nrTimesteps = 2;
 		nrSlices = 1;
 		chunks.clear();
+
 		for( int t = 0; t < nrTimesteps; t++ ) {
 			for( int s = 0; s < nrSlices; s++ ) {
-				chunks.push_back(genSlice<float>( nrCols, nrRows, s, s + t * nrSlices ));
+				chunks.push_back( genSlice<float>( nrCols, nrRows, s, s + t * nrSlices ) );
 			}
 		}
-		data::Image img3(chunks);
+
+		data::Image img3( chunks );
 		BOOST_REQUIRE( img3.isClean() );
 		BOOST_CHECK_EQUAL( img3.getVolume(), nrRows * nrCols * nrTimesteps * nrSlices );
 		BOOST_CHECK_EQUAL( img3.getSizeAsVector(), util::ivector4( nrCols, nrRows, nrSlices, nrTimesteps ) );
@@ -137,12 +143,14 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		nrTimesteps = 1;
 		nrSlices = 21;
 		chunks.clear();
+
 		for( int t = 0; t < nrTimesteps; t++ ) {
 			for( int s = 0; s < nrSlices; s++ ) {
-				chunks.push_back(genSlice<float>( nrCols, nrRows, s, s + t * nrSlices ));
+				chunks.push_back( genSlice<float>( nrCols, nrRows, s, s + t * nrSlices ) );
 			}
 		}
-		data::Image img4(chunks);
+
+		data::Image img4( chunks );
 
 		BOOST_REQUIRE( img4.isClean() );
 		BOOST_CHECK_EQUAL( img4.getVolume(), nrRows * nrCols * nrTimesteps * nrSlices );
@@ -152,12 +160,12 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 
 BOOST_AUTO_TEST_CASE ( minimal_image_test )
 {
-	data::Chunk ch=genSlice<float>( 4, 4, 2 ); //create chunk at 2 with acquisitionNumber 0
-	std::list<data::MemChunk<float> > chunks(2,ch); //make a list with two copies of that
+	data::Chunk ch = genSlice<float>( 4, 4, 2 ); //create chunk at 2 with acquisitionNumber 0
+	std::list<data::MemChunk<float> > chunks( 2, ch ); //make a list with two copies of that
 	chunks.back().setPropertyAs<uint32_t>( "acquisitionNumber", 1 ); //change the acquisitionNumber of that to 1
 	chunks.back().setPropertyAs<float>( "acquisitionTime", 1 );
-	
-	data::Image img(chunks);
+
+	data::Image img( chunks );
 	const size_t size[] = {4, 4, 1, 2};
 	BOOST_CHECK( img.isClean() );
 	BOOST_CHECK( img.isValid() );
@@ -169,23 +177,26 @@ BOOST_AUTO_TEST_CASE ( type_selection_test )
 	float org = 0;
 	std::list<data::Chunk> chunks;
 
-	chunks.push_back(genSlice<int16_t>(4,4,org,org));++org;
+	chunks.push_back( genSlice<int16_t>( 4, 4, org, org ) );
+	++org;
 	chunks.back().voxel<int16_t>( 0, 0, 0 ) = std::numeric_limits<int16_t>::min();
-	
-	chunks.push_back(genSlice<int8_t>(4,4,org,org));++org;
+
+	chunks.push_back( genSlice<int8_t>( 4, 4, org, org ) );
+	++org;
 	chunks.back().voxel<int8_t>( 0, 0, 0 ) = std::numeric_limits<int8_t>::min();
 
-	chunks.push_back(genSlice<uint8_t>(4,4,org,org));++org;
+	chunks.push_back( genSlice<uint8_t>( 4, 4, org, org ) );
+	++org;
 	chunks.back().voxel<uint8_t>( 0, 0, 0 ) = std::numeric_limits<uint8_t>::max();
-	
-	chunks.push_back(genSlice<uint16_t>(4,4,org,org));
+
+	chunks.push_back( genSlice<uint16_t>( 4, 4, org, org ) );
 	chunks.back().voxel<uint16_t>( 0, 0, 0 ) = std::numeric_limits<int16_t>::max(); // the maximum shall fit into int16_t
-	
-	data::Image img(chunks);
+
+	data::Image img( chunks );
 	const size_t size[] = {4, 4, 4, 1};
 	BOOST_CHECK( img.isClean() );
 	BOOST_CHECK( img.isValid() );
-	BOOST_CHECK_EQUAL(img.getChunksAsVector().size(),4);
+	BOOST_CHECK_EQUAL( img.getChunksAsVector().size(), 4 );
 	BOOST_CHECK_EQUAL( img.getSizeAsVector(), ( util::FixedVector<size_t, 4>( size ) ) );
 	BOOST_CHECK_EQUAL( img.getMajorTypeID(), data::ValuePtr<int16_t>( NULL, 0 ).getTypeID() );
 }
@@ -195,19 +206,23 @@ BOOST_AUTO_TEST_CASE ( type_scale_test )
 	float org = 0;
 	std::list<data::Chunk> chunks;
 
-	chunks.push_back(genSlice<int16_t>(4,4,org,org));++org;
+	chunks.push_back( genSlice<int16_t>( 4, 4, org, org ) );
+	++org;
 	chunks.back().voxel<int16_t>( 0, 0, 0 ) = -50;
-	
-	chunks.push_back(genSlice<int8_t>(4,4,org,org));++org;
+
+	chunks.push_back( genSlice<int8_t>( 4, 4, org, org ) );
+	++org;
 	chunks.back().voxel<int8_t>( 0, 0, 0 ) = -1;
-	
-	chunks.push_back(genSlice<uint8_t>(4,4,org,org));++org;
+
+	chunks.push_back( genSlice<uint8_t>( 4, 4, org, org ) );
+	++org;
 	chunks.back().voxel<uint8_t>( 0, 0, 0 ) = 1;
-	
-	chunks.push_back(genSlice<uint16_t>(4,4,org,org));++org;
+
+	chunks.push_back( genSlice<uint16_t>( 4, 4, org, org ) );
+	++org;
 	chunks.back().voxel<uint16_t>( 0, 0, 0 ) = 2500;
-	
-	data::Image img(chunks);
+
+	data::Image img( chunks );
 	const size_t size[] = {4, 4, 4, 1};
 	BOOST_CHECK( img.isClean() );
 	BOOST_CHECK( img.isValid() );
@@ -223,11 +238,11 @@ BOOST_AUTO_TEST_CASE ( image_chunk_test )
 
 	for ( int i = 0; i < 3; i++ )
 		for ( int j = 0; j < 3; j++ ) {
-			chunks.push_back(genSlice<float>(3,3,j,j+i*3));
+			chunks.push_back( genSlice<float>( 3, 3, j, j + i * 3 ) );
 			chunks.back().voxel<float>( j, j ) = 42;
 		}
 
-	data::Image img(chunks);
+	data::Image img( chunks );
 	BOOST_REQUIRE( img.isClean() );
 	BOOST_REQUIRE( img.isValid() );
 	BOOST_CHECK_EQUAL( img.getVolume(), 9 * 9 );
@@ -264,13 +279,14 @@ BOOST_AUTO_TEST_CASE ( image_chunk_test )
 BOOST_AUTO_TEST_CASE ( image_foreach_chunk_test )
 {
 	std::list<data::Chunk> chunks;
+
 	for ( int i = 0; i < 3; i++ )
 		for ( int j = 0; j < 3; j++ ) {
-			chunks.push_back(genSlice<uint8_t>(3,3,j,j+i*3));
+			chunks.push_back( genSlice<uint8_t>( 3, 3, j, j + i * 3 ) );
 			chunks.back().voxel<uint8_t>( j, j ) = 42;
 		}
 
-	data::Image img(chunks);
+	data::Image img( chunks );
 
 	class : public data::Image::ChunkOp
 	{
@@ -333,15 +349,16 @@ BOOST_AUTO_TEST_CASE ( image_voxel_test )
 {
 	//  get a voxel from inside and outside the image
 	std::list<data::Chunk> chunks;
-	for(int i=0;i<3;i++)
-		chunks.push_back(genSlice<float>(3,3,i,i));
 
-	std::list<data::Chunk>::iterator k=chunks.begin();
-	(k++)->voxel<float>( 0, 0 ) = 42.0;
-	(k++)->voxel<float>( 1, 1 ) = 42.0;
-	(k++)->voxel<float>( 2, 2 ) = 42;
+	for( int i = 0; i < 3; i++ )
+		chunks.push_back( genSlice<float>( 3, 3, i, i ) );
 
-	data::Image img(chunks);
+	std::list<data::Chunk>::iterator k = chunks.begin();
+	( k++ )->voxel<float>( 0, 0 ) = 42.0;
+	( k++ )->voxel<float>( 1, 1 ) = 42.0;
+	( k++ )->voxel<float>( 2, 2 ) = 42;
+
+	data::Image img( chunks );
 	BOOST_REQUIRE( img.isClean() );
 	BOOST_CHECK( img.isValid() );
 
@@ -358,13 +375,14 @@ BOOST_AUTO_TEST_CASE ( image_voxel_test )
 BOOST_AUTO_TEST_CASE( image_minmax_test )
 {
 	std::list<data::Chunk> chunks;
-	for(int i=0;i<3;i++)
-		for(int j=0;j<3;j++){
-			chunks.push_back(genSlice<float>(3,3,j,i*3+j));
+
+	for( int i = 0; i < 3; i++ )
+		for( int j = 0; j < 3; j++ ) {
+			chunks.push_back( genSlice<float>( 3, 3, j, i * 3 + j ) );
 			chunks.back().voxel<float>( j, j ) = i * j;
 		}
 
-	data::Image img(chunks);
+	data::Image img( chunks );
 	BOOST_REQUIRE( img.isClean() );
 	BOOST_CHECK( img.isValid() );
 
@@ -393,7 +411,7 @@ BOOST_AUTO_TEST_CASE( orientation_test )
 	ch.setPropertyAs( "acquisitionNumber", ( uint32_t )0 );
 	ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 
-	data::Image img(ch);
+	data::Image img( ch );
 	BOOST_REQUIRE( img.isClean() );
 	BOOST_REQUIRE( img.isValid() );
 
@@ -403,12 +421,14 @@ BOOST_AUTO_TEST_CASE( orientation_test )
 BOOST_AUTO_TEST_CASE( memimage_test )
 {
 	std::list<data::Chunk> chunks;
+
 	for ( int i = 0; i < 3; i++ )
 		for ( int j = 0; j < 3; j++ ) {
-			chunks.push_back(genSlice<float>(3,3,j,j+i*3));
+			chunks.push_back( genSlice<float>( 3, 3, j, j + i * 3 ) );
 			chunks.back().voxel<float>( j, j ) = i * j * 1000;
 		}
-	data::Image img(chunks);
+
+	data::Image img( chunks );
 	BOOST_REQUIRE( img.isClean() );
 	{
 		std::pair<util::ValueReference, util::ValueReference> minmax = img.getMinMax();
@@ -459,19 +479,20 @@ BOOST_AUTO_TEST_CASE( memimage_test )
 BOOST_AUTO_TEST_CASE( typediamge_test )
 {
 	std::list<data::Chunk> chunks;
+
 	for ( int i = 0; i < 3; i++ )
 		for ( int j = 0; j < 3; j++ ) {
-			chunks.push_back(genSlice<uint8_t>(3,3,j,j+i*3));
+			chunks.push_back( genSlice<uint8_t>( 3, 3, j, j + i * 3 ) );
 			chunks.back().voxel<uint8_t>( j, j ) = std::numeric_limits<uint8_t>::max();
 		}
 
 	for ( int i = 3; i < 10; i++ )
 		for ( int j = 0; j < 3; j++ ) {
-			chunks.push_back(genSlice<int16_t>(3,3,j,j+i*3));
+			chunks.push_back( genSlice<int16_t>( 3, 3, j, j + i * 3 ) );
 			chunks.back().voxel<int16_t>( j, j ) = std::numeric_limits<int16_t>::max();
 		}
 
-	data::Image img(chunks);
+	data::Image img( chunks );
 	BOOST_REQUIRE( img.isClean() );
 	BOOST_REQUIRE( chunks.empty() );
 	{
@@ -598,7 +619,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
 
 	for ( unsigned int is = 0; is < nrS; is++ ) {
 		for ( unsigned int it = 0; it < nrT; it++ ) {
-			chunks.push_back(genSlice<float>(nrX,nrY,is,is + it * nrS));
+			chunks.push_back( genSlice<float>( nrX, nrY, is, is + it * nrS ) );
 			BOOST_CHECK( chunks.back().propertyValue( "indexOrigin" ).needed() );
 			chunks.back().setPropertyAs( "rowVec", util::fvector4( 17, 0, 0 ) );
 			chunks.back().setPropertyAs( "columnVec", util::fvector4( 0, 17, 0 ) );
@@ -608,8 +629,8 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
 		}
 	}
 
-	data::Image img(chunks);
-	BOOST_REQUIRE(img.isClean());
+	data::Image img( chunks );
+	BOOST_REQUIRE( img.isClean() );
 
 	srand ( time( NULL ) );
 	const size_t dummy[] = {nrX, nrY, nrS, nrT};
@@ -666,7 +687,7 @@ BOOST_AUTO_TEST_CASE ( image_splice_test )
 	original.setPropertyAs<util::fvector4>( "voxelSize", util::fvector4( 1, 1, 1 ) );
 	original.setPropertyAs<util::fvector4>( "rowVec", util::fvector4( 1, 0, 0 ) );
 	original.setPropertyAs<util::fvector4>( "columnVec", util::fvector4( 0, 1, 0 ) );
-	data::Image img(original);
+	data::Image img( original );
 	BOOST_REQUIRE( img.isClean() );
 	BOOST_REQUIRE( img.isValid() );
 	BOOST_REQUIRE( !img.isEmpty() );
@@ -687,9 +708,10 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes )
 	unsigned int nrT = 20;
 
 	std::list<data::Chunk> chunks;
+
 	for ( unsigned int is = 0; is < nrS; is++ ) {
 		for ( unsigned int it = 0; it < nrT; it++ ) {
-			chunks.push_back(genSlice<float>(nrX,nrY,is,is + it * nrS));
+			chunks.push_back( genSlice<float>( nrX, nrY, is, is + it * nrS ) );
 		}
 	}
 
@@ -697,8 +719,10 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes )
 
 	const util::FixedVector<size_t, 4> sizeVec( dummy );
 
-	data::Image img(chunks);
-	BOOST_REQUIRE(img.isClean());
+	data::Image img( chunks );
+
+	BOOST_REQUIRE( img.isClean() );
+
 	BOOST_REQUIRE_EQUAL( img.getSizeAsVector(), sizeVec );
 
 	//***************************************************************
@@ -709,14 +733,15 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes )
 	nrT = 20;
 
 	std::list<data::Chunk> chunks2;
+
 	for ( unsigned int is = 0; is < nrS; is++ ) {
 		for ( unsigned int it = 0; it < nrT; it++ ) {
-			chunks2.push_back(genSlice<float>(nrX,1,is,is + it * nrS));
+			chunks2.push_back( genSlice<float>( nrX, 1, is, is + it * nrS ) );
 		}
 	}
 
-	data::Image img2(chunks2);
-	BOOST_REQUIRE(img2.isClean());
+	data::Image img2( chunks2 );
+	BOOST_REQUIRE( img2.isClean() );
 
 	const size_t dummy2[] = {nrX, nrS, 1, nrT};
 
@@ -735,14 +760,15 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes )
 	nrT = 20;
 
 	std::list<data::Chunk> chunks3;
+
 	for ( unsigned int is = 0; is < nrS; is++ ) {
 		for ( unsigned int it = 0; it < nrT; it++ ) {
-			chunks3.push_back(genSlice<float>(nrX,nrY,is,is + it * nrS));
+			chunks3.push_back( genSlice<float>( nrX, nrY, is, is + it * nrS ) );
 		}
 	}
 
-	data::Image img3(chunks3);
-	BOOST_REQUIRE(img3.isClean());
+	data::Image img3( chunks3 );
+	BOOST_REQUIRE( img3.isClean() );
 
 	const size_t dummy3[] = {nrX, nrY, nrS, nrT};
 
@@ -760,14 +786,15 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes )
 	nrT = 20;
 
 	std::list<data::Chunk> chunks4;
+
 	for ( unsigned int is = 0; is < nrS; is++ ) {
 		for ( unsigned int it = 0; it < nrT; it++ ) {
-			chunks4.push_back(genSlice<float>(nrX,nrY,is,is + it * nrS));
+			chunks4.push_back( genSlice<float>( nrX, nrY, is, is + it * nrS ) );
 		}
 	}
 
-	data::Image img4(chunks4);
-	BOOST_REQUIRE(img4.isClean());
+	data::Image img4( chunks4 );
+	BOOST_REQUIRE( img4.isClean() );
 
 	const size_t dummy4[] = {nrX, nrY, nrS, nrT};
 
@@ -785,9 +812,10 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes )
 	nrT = 1;
 
 	std::list<data::Chunk> chunks5;
+
 	for ( unsigned int is = 0; is < nrS; is++ ) {
 		for ( unsigned int it = 0; it < nrT; it++ ) {
-			chunks5.push_back(genSlice<float>(nrX,nrY,is,is + it * nrS));
+			chunks5.push_back( genSlice<float>( nrX, nrY, is, is + it * nrS ) );
 		}
 	}
 
@@ -795,8 +823,9 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes )
 
 	const util::FixedVector<size_t, 4> sizeVec5( dummy5 );
 
-	data::Image img5(chunks5);
-	BOOST_REQUIRE(img5.isClean());
+	data::Image img5( chunks5 );
+
+	BOOST_REQUIRE( img5.isClean() );
 
 
 	BOOST_REQUIRE_EQUAL( img5.getSizeAsVector(), sizeVec5 );
@@ -811,13 +840,15 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes )
 	nrT = 0;
 
 	std::list<data::Chunk> empty;
-	data::Image img6(empty);
+
+	data::Image img6( empty );
 
 	const size_t dummy6[] = {nrX, nrY, nrS, nrT};
 
 	const util::FixedVector<size_t, 4> sizeVec6( dummy6 );
 
 	BOOST_REQUIRE( !img6.isClean() ); //reIndex on an empty image shall fail (size will be undefined)
+
 	BOOST_REQUIRE( !img6.isValid() ); //reIndex on an empty image shall fail (size will be undefined)
 }
 
@@ -829,7 +860,7 @@ BOOST_AUTO_TEST_CASE ( image_size_test )
 	original.setPropertyAs<util::fvector4>( "voxelSize", util::fvector4( 1, 1, 1 ) );
 	original.setPropertyAs<util::fvector4>( "rowVec", util::fvector4( 1, 0, 0 ) );
 	original.setPropertyAs<util::fvector4>( "columnVec", util::fvector4( 0, 1, 0 ) );
-	data::Image img(original);
+	data::Image img( original );
 	BOOST_REQUIRE( img.isClean() );
 	BOOST_REQUIRE( img.isValid() );
 	BOOST_REQUIRE( !img.isEmpty() );

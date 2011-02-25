@@ -29,11 +29,11 @@ BOOST_AUTO_TEST_CASE ( imageNameGenTest )
 	ch.setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
 	ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 
-	data::Image img(ch);
-	
+	data::Image img( ch );
+
 	BOOST_REQUIRE( img.isClean() );
 	BOOST_REQUIRE( img.isValid() );
-	
+
 	BOOST_CHECK_EQUAL( image_io::FileFormat::makeFilename( img, "/tmp/S{acquisitionNumber}.nii" ), "/tmp/S0.nii" );
 	BOOST_CHECK_EQUAL( image_io::FileFormat::makeFilename( img, "/tmp/S{nich da}.nii" ), "/tmp/S.nii" ); // {nich da} does not exist - so we just remove it from the string
 	BOOST_CHECK_EQUAL(
@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE ( imageUniqueName )
 {
 	data::MemChunk<uint8_t> ch1( 5, 5, 5 );
 	std::list<data::Chunk> chunks;
-	
+
 	ch1.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, 2 ) );
 	ch1.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
 	ch1.setPropertyAs<float>( "acquisitionTime", 0 );
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE ( imageUniqueName )
 		ch.setPropertyAs<uint32_t>( "acquisitionNumber", i );
 		chunks.push_back( ch );
 	}
-	
+
 
 	std::list<data::Image> images = data::IOFactory::chunkListToImageList( chunks );
 
