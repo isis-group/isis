@@ -57,7 +57,7 @@ public:
 	}
 	void generate( const ValuePtrBase &src, boost::scoped_ptr<ValuePtrBase>& dst, const scaling_pair &scaling )const {
 		//Create new "stuff" in memory
-		create( dst, src.length() );
+		create( dst, src.getLength() );
 		assert( dst );
 		convert( src, *dst, scaling );//and convert into that
 	}
@@ -94,9 +94,9 @@ public:
 	void convert( const ValuePtrBase &src, ValuePtrBase &dst, const scaling_pair &/*scaling*/ )const {
 		ValuePtr<SRC> &dstVal = dst.castToValuePtr<SRC>();
 		const SRC *srcPtr = &src.castToValuePtr<SRC>()[0];
-		LOG_IF( src.length() < dst.length(), Debug, info ) << "The target is longer than the the source (" << dst.length() << ">" << src.length() << "). Will only copy/convert " << src.length() << " elements";
-		LOG_IF( src.length() > dst.length(), Debug, error ) << "The target is shorter than the the source (" << dst.length() << "<" << src.length() << "). Will only copy/convert " << dst.length() << " elements";
-		dstVal.copyFromMem( srcPtr, std::min( src.length(), dstVal.length() ) );
+		LOG_IF( src.getLength() < dst.getLength(), Debug, info ) << "The target is longer than the the source (" << dst.getLength() << ">" << src.getLength() << "). Will only copy/convert " << src.getLength() << " elements";
+		LOG_IF( src.getLength() > dst.getLength(), Debug, error ) << "The target is shorter than the the source (" << dst.getLength() << "<" << src.getLength() << "). Will only copy/convert " << dst.getLength() << " elements";
+		dstVal.copyFromMem( srcPtr, std::min( src.getLength(), dstVal.getLength() ) );
 	}
 	virtual scaling_pair getScaling( const util::_internal::ValueBase &/*min*/, const util::_internal::ValueBase &/*max*/, autoscaleOption /*scaleopt*/ )const {
 		//as we're just copying - its 1/0

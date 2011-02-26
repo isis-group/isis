@@ -42,6 +42,8 @@ private:
 	bool clean;
 	size_t chunkVolume;
 
+	void deduplicateProperties();
+
 	/**
 	 * Get the pointer to the chunk in the internal lookup-table at position at.
 	 * The Chunk will only have metadata which are unique to it - so it might be invalid
@@ -101,14 +103,14 @@ protected:
 	 * (run join on it using the image as parameter to insert all non-unique-metadata).
 	 */
 	Chunk &chunkAt( size_t at );
+	/// Creates an empty Image object.
+	Image();
 public:
 	class ChunkOp : std::unary_function<Chunk &, bool>
 	{
 	public:
 		virtual bool operator()( Chunk &, util::FixedVector<size_t, 4> posInImage ) = 0;
 	};
-	/// Creates an empty Image object.
-	Image();
 
 	/**
 	 * Copy constructor.
@@ -117,12 +119,52 @@ public:
 	Image( const Image &ref );
 
 	/**
+	 * Create image from a list of Chunks or objects with the base Chunk.
+	 * Removes used chunks from the given list. So afterwards the list consists of the rejected chunks.
+	 */
+	template<typename T> Image( std::list<T> &chunks ) : _internal::NDimensional<4>(), util::PropertyMap(), set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ), clean( false ) {
+		BOOST_STATIC_ASSERT( ( boost::is_base_of<Chunk, T>::value ) );
+		addNeededFromString( neededProperties );
+		set.addSecondarySort( "acquisitionNumber" );
+		set.addSecondarySort( "acquisitionTime" );
+
+		size_t cnt = 0;
+
+		for ( typename std::list<T>::iterator i = chunks.begin(); i != chunks.end(); ) { // for all remaining chunks
+			if ( insertChunk( *i ) ) {
+				chunks.erase( i++ );
+				cnt++;
+			} else {
+				i++;
+			}
+		}
+
+		if ( ! isEmpty() ) {
+			LOG( Debug, info ) << "Reindexing image with " << cnt << " chunks.";
+
+			if( !reIndex() ) {
+				LOG( Runtime, error ) << "Failed to create image from " << cnt << " chunks.";
+			} else {
+				LOG_IF( !getMissing().empty(), Debug, warning )
+						<< "The created image is missing some properties: " << getMissing() << ". It will be invalid.";
+			}
+		}
+	}
+
+
+	/**
+	 * Create image from a single chunk.
+	 */
+	Image( const Chunk &chunk );
+
+	/**
 	 * Copy operator.
 	 * Copies all elements, only the voxel-data (in the chunks) are referenced.
 	 */
 	Image &operator=( const Image &ref );
 
 	bool checkMakeClean();
+	bool isClean();
 	/**
 	 * This method returns a reference to the voxel value at the given coordinates.
 	 *
@@ -326,8 +368,8 @@ public:
 	 * depend on correct image orientations won't work as expected. Use this method
 	 * with caution!
 	 */
-	void transformCoords( boost::numeric::ublas::matrix<float> transform ) {
-		isis::data::_internal::transformCoords( *this, transform );
+	void transformCoords( boost::numeric::ublas::matrix<float> transform_matrix ) {
+		isis::data::_internal::transformCoords( *this, transform_matrix );
 	}
 
 	/**
@@ -335,7 +377,7 @@ public:
 	 * If neccessary a conversion into T is done using min/max of the image.
 	 */
 	template<typename T> void copyToMem( T *dst )const {
-		if( checkMakeClean() ) {
+		if( clean ) {
 			scaling_pair scale = getScalingTo( ValuePtr<T>::staticID );
 			// we could do this using convertToType - but this solution does not need any additional temporary memory
 			BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
@@ -345,6 +387,8 @@ public:
 
 				dst += ref->getVolume(); // increment the cursor
 			}
+		} else {
+			LOG( Runtime, error ) << "Cannot copy from non clean images. Run reIndex first";
 		}
 	}
 	/**
@@ -425,11 +469,11 @@ public:
 		convertToType( ValuePtr<T>::staticID );
 		return *this;
 	}
-	void copyToMem( void *dst ){
-		Image::copyToMem<T>((T*)dst);
+	void copyToMem( void *dst ) {
+		Image::copyToMem<T>( ( T * )dst );
 	}
 	void copyToMem( void *dst )const {
-		Image::copyToMem<T>((T*)dst);
+		Image::copyToMem<T>( ( T * )dst );
 	}
 };
 

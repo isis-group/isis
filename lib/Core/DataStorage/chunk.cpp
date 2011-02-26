@@ -42,7 +42,7 @@ Chunk::Chunk( const ValuePtrReference &src, size_t nrOfColumns, size_t nrOfRows,
 	_internal::ChunkBase( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ),
 	ValuePtrReference( src )
 {
-	assert( ( *this )->length() == getVolume() );
+	assert( ( *this )->getLength() == getVolume() );
 }
 
 Chunk Chunk::cloneToNew( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps )const
@@ -130,9 +130,9 @@ void Chunk::copyRange( const size_t source_start[], const size_t source_end[], C
 	get()->copyRange( sstart, send, *dst, dstart );
 }
 
-size_t Chunk::compareRange( size_t start, size_t end, const Chunk &dst, size_t destination ) const
+size_t Chunk::compareRange( size_t flat_start, size_t flat_end, const Chunk &dst, size_t destination ) const
 {
-	return get()->compare( start, end, *dst, destination );
+	return get()->compare( flat_start, flat_end, *dst, destination );
 }
 size_t Chunk::compareRange( const size_t source_start[], const size_t source_end[], const Chunk &dst, const size_t destination[] ) const
 {

@@ -66,7 +66,7 @@ public:
 		return m_cast_to<ValuePtr<T> >();
 	}
 	/// \returns the length of the data pointed to
-	size_t length()const;
+	size_t getLength()const;
 
 	/**
 	 * Splice up the ValuePtr into equal sized blocks.

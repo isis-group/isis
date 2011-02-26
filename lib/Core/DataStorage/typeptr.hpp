@@ -42,7 +42,7 @@ template<typename T> struct getMinMaxImpl<T, true> {
 	std::pair<T, T> operator()( const ValuePtr<T> &ref ) const {
 		std::pair<T, T> result;
 
-		for ( size_t i = 0; i < ref.length(); i++ ) {
+		for ( size_t i = 0; i < ref.getLength(); i++ ) {
 			if ( result.second < ref[i] )result.second = ref[i];
 
 			if ( result.first > ref[i] )result.first = ref[i];
@@ -169,18 +169,18 @@ public:
 
 	/// Copy elements from raw memory
 	void copyFromMem( const TYPE *const src, size_t _length ) {
-		LOG_IF( _length > length(), Runtime, error )
-				<< "Amount of the elements to copy from memory (" << _length << ") exceeds the length of the array (" << length() << ")";
+		LOG_IF( _length > getLength(), Runtime, error )
+				<< "Amount of the elements to copy from memory (" << _length << ") exceeds the length of the array (" << getLength() << ")";
 		TYPE &dest = this->operator[]( 0 );
-		LOG( Debug, info ) << "Copying " << _length *sizeof( TYPE ) << " bytes of " << getTypeName() << " from " << src << " to " << &dest;
+		LOG( Debug, info ) << "Copying " << _length *sizeof( TYPE ) << " bytes from " << ValuePtr<TYPE>::staticName() << src << " to " << getTypeName() << &dest;
 		memcpy( &dest, src, _length * sizeof( TYPE ) );
 	}
 	/// Copy elements within a range [start,end] to raw memory
 	void copyToMem( size_t start, size_t end, TYPE *const dst )const {
 		assert( start <= end );
 		const size_t _length = end - start + 1;
-		LOG_IF( end >= length(), Runtime, error )
-				<< "End of the range (" << end << ") is behind the end of this ValuePtr (" << length() << ")";
+		LOG_IF( end >= getLength(), Runtime, error )
+				<< "End of the range (" << end << ") is behind the end of this ValuePtr (" << getLength() << ")";
 		const TYPE &source = this->operator[]( start );
 		memcpy( dst, &source, _length * sizeof( TYPE ) );
 	}
@@ -197,15 +197,15 @@ public:
 			return _length;
 		}
 
-		LOG_IF( end >= length(), Runtime, error )
-				<< "End of the range (" << end << ") is behind the end of this ValuePtr (" << length() << ")";
-		LOG_IF( _length + dst_start >= dst.length(), Runtime, error )
-				<< "End of the range (" << _length + dst_start << ") is behind the end of the destination (" << dst.length() << ")";
-		const ValuePtr<TYPE> &compare = dst.castToValuePtr<TYPE>();
-		LOG( Debug, verbose_info ) << "Comparing " << dst.getTypeName() << " at " << &operator[]( 0 ) << " and " << &compare[0];
+		LOG_IF( end >= getLength(), Runtime, error )
+				<< "End of the range (" << end << ") is behind the end of this ValuePtr (" << getLength() << ")";
+		LOG_IF( _length + dst_start >= dst.getLength(), Runtime, error )
+				<< "End of the range (" << _length + dst_start << ") is behind the end of the destination (" << dst.getLength() << ")";
+		const ValuePtr<TYPE> &cmp = dst.castToValuePtr<TYPE>();
+		LOG( Debug, verbose_info ) << "Comparing " << dst.getTypeName() << " at " << &operator[]( 0 ) << " and " << &cmp[0];
 
 		for ( size_t i = start; i < end; i++ ) {
-			if ( ! ( operator[]( i ) == compare[i] ) ) {
+			if ( ! ( operator[]( i ) == cmp[i] ) ) {
 				ret++;
 			}
 		}
@@ -270,7 +270,7 @@ public:
 	}
 
 	std::pair<util::ValueReference, util::ValueReference> getMinMax()const {
-		if ( length() == 0 ) {
+		if ( getLength() == 0 ) {
 			LOG( Runtime, warning ) << "Skipping computation of min/max on an empty ValuePtr";
 			std::pair<util::ValueReference, util::ValueReference>();
 		}
@@ -281,14 +281,14 @@ public:
 	}
 
 	std::vector<Reference> splice( size_t size )const {
-		if ( size >= length() ) {
+		if ( size >= getLength() ) {
 			LOG( Debug, warning )
-					<< "splicing data of the size " << length() << " up into blocks of the size " << size << " is kind of useless ...";
+					<< "splicing data of the size " << getLength() << " up into blocks of the size " << size << " is kind of useless ...";
 		}
 
-		const size_t fullSplices = length() / size;
+		const size_t fullSplices = getLength() / size;
 
-		const size_t lastSize = length() % size;//rest of the division - size of the last splice
+		const size_t lastSize = getLength() % size;//rest of the division - size of the last splice
 
 		const size_t splices = fullSplices + ( lastSize ? 1 : 0 );
 
