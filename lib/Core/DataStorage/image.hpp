@@ -415,8 +415,10 @@ public:
 
 
 	/**
-	 * Run a functor with the base VoxelOp on every cunk in the image.
-	 * This does not check the types of the images. So if your functor needs a specific type, use TypedImage.
+	 * Run a functor with the base VoxelOp on every chunk in the image.
+	 * If any chunk does not have the requested type it will be converted.
+	 * So the result is equivalent to TypedImage\<TYPE\>.
+	 * If these conversion failes no operation is done, and false is returned.
 	 * \param op a functor object which inherits ChunkOp
 	 */
 	template <typename TYPE> size_t foreachVoxel( Chunk::VoxelOp<TYPE> &op ) {
@@ -430,7 +432,7 @@ public:
 			}
 		};
 		_proxy prx( op );
-		return foreachChunk( prx, false );
+		return convertToType( data::ValuePtr<TYPE>::staticID ) && foreachChunk( prx, false );
 	}
 
 	/// \returns the number of rows of the image
