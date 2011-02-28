@@ -36,7 +36,7 @@ namespace util
 
 
 #define DEF_TYPE(TYPE,NAME)  \
-	template<> const char Value<TYPE>::m_typeName[]=#NAME;
+	template<> const char Value<TYPE>::m_typeName[]=#NAME
 
 DEF_TYPE( bool, boolean );
 
