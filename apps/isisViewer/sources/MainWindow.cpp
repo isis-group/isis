@@ -13,7 +13,7 @@ namespace isis
 namespace viewer
 {
 
-MainWindow::MainWindow( isis::data::ImageList imgList, QMainWindow *parent )
+MainWindow::MainWindow( std::list<data::Image> imgList, QMainWindow *parent )
 	: QMainWindow( parent ),
 	  my_RefreshIntensityDisplay( *this ),
 	  my_RefreshCoordsDisplay( *this ),

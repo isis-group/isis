@@ -33,13 +33,13 @@ QGLView::QGLView( QWidget *parent )
 void QGLView::initializeGL()
 {
 
-	isis::data::Chunk ch = *m_Image.getChunkList().front();
-	u_int32_t checkImage[ch.sizeToVector()[0]][ch.sizeToVector()[1]][ch.sizeToVector()[2]];
+	isis::data::Chunk ch = m_Image.getChunksAsVector().front();
+	u_int32_t checkImage[ch.getSizeAsVector()[0]][ch.getSizeAsVector()[1]][ch.getSizeAsVector()[2]];
 	int i,j,c;
 	u_int32_t *ptr = ch.voxel<u_int32_t>(0);
-	for (i=0;i<ch.sizeToVector()[0];i++) 
+	for (i=0;i<ch.getSizeAsVector()[0];i++) 
 	{
-		for (j=0;j<ch.sizeToVector()[1];j++)
+		for (j=0;j<ch.getSizeAsVector()[1];j++)
 		{
 			
 			for(unsigned short rgba=0;rgba<4;rgba++) 
@@ -65,8 +65,8 @@ void QGLView::initializeGL()
 					GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, 
 					GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ch.sizeToVector()[0], 
-					ch.sizeToVector()[1], 0, GL_RGBA, GL_UNSIGNED_BYTE, 
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ch.getSizeAsVector()[0], 
+					ch.getSizeAsVector()[1], 0, GL_RGBA, GL_UNSIGNED_BYTE, 
 					checkImage);
 }
 

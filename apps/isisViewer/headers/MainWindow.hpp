@@ -25,7 +25,7 @@ class MainWindow : public QMainWindow
 	Q_OBJECT
 
 public:
-	MainWindow( isis::data::ImageList, QMainWindow *parent = 0 );
+	MainWindow( std::list<data::Image>, QMainWindow *parent = 0 );
 
 private:
 	QGLView *viewAxial;
