@@ -14,7 +14,6 @@ ELSE(ISIS_RUNTIME_LOG)
 	ADD_DEFINITIONS(-D_ENABLE_LOG=0)
 ENDIF(ISIS_RUNTIME_LOG)
 
-# enable DEBUG_LOG
 IF(ISIS_DEBUG_LOG)
 	ADD_DEFINITIONS(-D_ENABLE_DEBUG=1)
 	MESSAGE(STATUS "Debug code enabled, this will will have a big impact on the performance")

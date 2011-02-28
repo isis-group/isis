@@ -50,11 +50,6 @@ add_executable(isisconv isisconv.cpp)
 target_link_libraries(isisconv ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
 SET_TARGET_PROPERTIES(isisconv PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-FIND_LIBRARY(LIB_MUPARSER "muparser")
-add_executable(isiscalc isiscalc.cpp)
-target_link_libraries(isiscalc ${LIB_MUPARSER} ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
-SET_TARGET_PROPERTIES(isiscalc PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
-
 add_executable(isisswap isisswap.cpp)
 target_link_libraries(isisswap ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
 SET_TARGET_PROPERTIES(isisswap PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
@@ -82,7 +77,6 @@ isisdump
 isisdiff
 isisconv
 isisswap
-isiscalc
 RUNTIME DESTINATION bin)
 
 MESSAGE(STATUS "Installing binary files to ${CMAKE_INSTALL_PREFIX}/bin")

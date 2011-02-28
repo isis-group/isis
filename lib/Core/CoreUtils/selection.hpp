@@ -1,11 +1,21 @@
 /*
- *  selection.hpp
- *  isis
- *
- *  Created by Enrico Reimer on 03.04.10.
- *  Copyright 2010 cbs.mpg.de. All rights reserved.
- *
+ Copyright (C) 2010  reimer@cbs.mpg.de
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
  */
+
 
 #ifndef SELECTION_HPP_INCLUDED
 #define SELECTION_HPP_INCLUDED
@@ -20,8 +30,11 @@ namespace util
 {
 
 /**
- * Enum-like class for string based selections.
- * The options are NOT case sensitive.
+ * Here, a Selection is one of our types (see types.hpp) and
+ * meant as an enumeration of "things" described by strings,
+ * e.g. properties for easy acces of several properties from a PopertyMap.
+ * It's using isis::util::istring, therefore
+ * the options are CASE INSENSITIVE.
  */
 class Selection
 {
@@ -55,17 +68,17 @@ public:
 	 * The numbers correspont to the order the options where given at the creation of the selection (first option -> 1, second option -> 2 ...)
 	 * \returns number corresponding the currently set option or "0" if none is set
 	 */
-	operator const int()const;
+	operator int()const;
 	/**
 	 * Implicit cast to string.
 	 * \returns the currently set option or "<<NOT_SET>>" if none is set
 	 */
-	operator const std::string()const;
+	operator std::string()const;
 	/**
 	 * Implicit cast to istring.
 	 * \returns the currently set option or "<<NOT_SET>>" if none is set
 	 */
-	operator const util::istring()const;
+	operator util::istring()const;
 	/**
 	 * Common comparison.
 	 * \returns true if both selection have the same options and are currently set to the the option. False otherwise.

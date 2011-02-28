@@ -38,8 +38,8 @@ using namespace isis;
 
 int main( int argc, char **argv )
 {
-	data::enable_log<util::DefaultMsgPrint>( warning );
-	image_io::enable_log<util::DefaultMsgPrint>( warning );
+	data::enableLog<util::DefaultMsgPrint>( warning );
+	image_io::enableLog<util::DefaultMsgPrint>( warning );
 
 	//  load the defautl NULL file
 	// std::string tmpfile = ( ( std::string )tmpnam( NULL ) ) + ".null";

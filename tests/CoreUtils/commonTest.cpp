@@ -1,4 +1,4 @@
-#define BOOST_TEST_MODULE TypeTest
+#define BOOST_TEST_MODULE ValueTest
 #define NOMINMAX 1
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
@@ -26,13 +26,14 @@ BOOST_AUTO_TEST_CASE( fuzzy_equal_test )
 	float b5 = -1000000000000000;
 	float a6 = 0.000000000000001;
 	float b6 = -0.000000000000001;
-	BOOST_CHECK( util::fuzzyEqual( a0, b0 ) );
+	BOOST_CHECK( !util::fuzzyEqual( a0, b0 ) );
+	BOOST_CHECK( util::fuzzyEqual( a0, b0, .0001 ) );
 	BOOST_CHECK( util::fuzzyEqual( a1, b1 ) );
 	BOOST_CHECK( util::fuzzyEqual( a2, b2 ) );
 	BOOST_CHECK( !util::fuzzyEqual( a3, b3 ) );
 	BOOST_CHECK( !util::fuzzyEqual( a4, b4 ) ); //double has double precision - so equality will be less fuzzy
 	BOOST_CHECK( !util::fuzzyEqual( a5, b5 ) );
-	BOOST_CHECK( util::fuzzyEqual( a6, b6 ) );
+	BOOST_CHECK( !util::fuzzyEqual( a6, b6 ) );
 }
 
 }

@@ -97,7 +97,7 @@ private:
 	vtkSmartPointer<vtkRenderer> m_RendererCoronal;
 
 	vtkSmartPointer<vtkPlaneWidget> m_PlaneWidgetAxial;
-	
+
 	vtkSmartPointer<vtkRenderWindow> m_WindowAxial;
 	vtkSmartPointer<vtkRenderWindow> m_WindowSagittal;
 	vtkSmartPointer<vtkRenderWindow> m_WindowCoronal;

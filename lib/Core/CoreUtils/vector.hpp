@@ -53,14 +53,14 @@ public:
 	typedef typename CONTAINER::iterator iterator;
 	typedef typename CONTAINER::const_iterator const_iterator;
 	typedef FixedVector<TYPE, SIZE, CONTAINER> this_class;
-public:
+protected:
 	/// Generic operations
-	template<typename OP> this_class binary_op( const this_class &src )const {
+	template<typename OP> this_class binaryOp ( const this_class &src )const {
 		this_class ret;
 		std::transform( CONTAINER::begin(), CONTAINER::end(), src.begin(), ret.begin(), OP() );
 		return ret;
 	}
-	template<typename OP> this_class binary_op( const TYPE &src )const {
+	template<typename OP> this_class binaryOp( const TYPE &src )const {
 		this_class ret;
 		iterator dst = ret.begin();
 		const OP op = OP();
@@ -70,12 +70,12 @@ public:
 
 		return ret;
 	}
-	template<typename OP> this_class unary_op()const {
+	template<typename OP> this_class unaryOp()const {
 		this_class ret;
 		std::transform( CONTAINER::begin(), CONTAINER::end(), ret.begin(), OP() );
 		return ret;
 	}
-
+public:
 	////////////////////////////////////////////////////////////////////////////////////
 	// Contructor stuff
 	////////////////////////////////////////////////////////////////////////////////////
@@ -149,18 +149,19 @@ public:
 		return !operator==( src );
 	}
 	/**
-	* Fuzzy comparison.
-	* Will raise a compiler error when not used with floating point vectors.
-	* @param other the other vector that should be compared with the current vector.
-	* @param boost a scaling factor to regulate the "fuzzyness" of the operation. A higher
-	* value will result in a more fuzzy check. Normally one would use multiple of 10.
-	* \returns true if the difference between the two types is significantly small compared to the values.
-	*/
-	bool fuzzyEqual( const this_class &other, unsigned short boost = 1 )const {
+	 * Fuzzy comparison.
+	 * Will raise a compiler error when not used with floating point vectors.
+	 * @param other the other vector that should be compared with the current vector.
+	 * @param thresh a threshold factor to set a minimal difference to be still considered equal independent of the values itself.
+	 * Eg. "1" means any difference less than the epsilon of the used floating point type will allways be considered equal.
+	 * If any of the values is greater than "1" the "allowed" difference will be bigger.
+	 * \returns true if the difference between the two types is significantly small compared to the values.
+	 */
+	bool fuzzyEqual( const this_class &other, TYPE thresh = 0 )const {
 		const_iterator b = other.begin();
 
 		for ( const_iterator a = CONTAINER::begin(); a != CONTAINER::end(); ++a, ++b ) {
-			if ( ! util::fuzzyEqual( *a, *b, boost ) )
+			if ( ! util::fuzzyEqual( *a, *b, thresh ) )
 				return false;
 		}
 
@@ -172,15 +173,20 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////
 	// Arithmetic operations
 	////////////////////////////////////////////////////////////////////////////////////
-	this_class operator-( const this_class &src )const {return binary_op<std::minus<TYPE>      >( src );}
-	this_class operator+( const this_class &src )const {return binary_op<std::plus<TYPE>       >( src );}
-	this_class operator*( const this_class &src )const {return binary_op<std::multiplies<TYPE> >( src );}
-	this_class operator/( const this_class &src )const {return binary_op<std::divides<TYPE>    >( src );}
+	this_class operator-( const this_class &src )const {return binaryOp<std::minus<TYPE>      >( src );}
+	this_class operator+( const this_class &src )const {return binaryOp<std::plus<TYPE>       >( src );}
+	this_class operator*( const this_class &src )const {return binaryOp<std::multiplies<TYPE> >( src );}
+	this_class operator/( const this_class &src )const {return binaryOp<std::divides<TYPE>    >( src );}
 
-	this_class operator-( const TYPE &src )const {return binary_op<std::minus<TYPE>      >( src );}
-	this_class operator+( const TYPE &src )const {return binary_op<std::plus<TYPE>       >( src );}
-	this_class operator*( const TYPE &src )const {return binary_op<std::multiplies<TYPE> >( src );}
-	this_class operator/( const TYPE &src )const {return binary_op<std::divides<TYPE>    >( src );}
+	this_class operator-( const TYPE &src )const {return binaryOp<std::minus<TYPE>      >( src );}
+	this_class operator+( const TYPE &src )const {return binaryOp<std::plus<TYPE>       >( src );}
+	this_class operator*( const TYPE &src )const {return binaryOp<std::multiplies<TYPE> >( src );}
+	this_class operator/( const TYPE &src )const {return binaryOp<std::divides<TYPE>    >( src );}
+
+	///\returns a negated copy
+	const this_class negate()const {
+		return unaryOp<std::negate<float> >();
+	}
 
 	/**
 	 * Get the inner product.
@@ -252,10 +258,10 @@ public:
 	}
 
 	/// copy the elements to somthing designed after the output iterator model
-	template<class InputIterator> void copyFrom( InputIterator start, InputIterator end ) {
-		LOG_IF( size_t( std::distance( start, end ) ) > SIZE, Runtime, error )
-				<< "Copying " << std::distance( start, end ) << " Elements into a vector of the size " << SIZE;
-		std::copy( start, end, CONTAINER::begin() );
+	template<class InputIterator> void copyFrom( InputIterator iter_start, InputIterator iter_end ) {
+		LOG_IF( size_t( std::distance( iter_start, iter_end ) ) > SIZE, Runtime, error )
+				<< "Copying " << std::distance( iter_start, iter_end ) << " Elements into a vector of the size " << SIZE;
+		std::copy( iter_start, iter_end, CONTAINER::begin() );
 	}
 	template<typename TYPE2, typename CONTAINER2> FixedVector( const FixedVector<TYPE2, SIZE, CONTAINER2> &src ) {
 		src.copyTo( CONTAINER::begin() );
@@ -263,7 +269,7 @@ public:
 
 	/// write the elements formated to basic_ostream
 	template<typename charT, typename traits> void writeTo( std::basic_ostream<charT, traits> &out )const {
-		util::write_list( CONTAINER::begin(), CONTAINER::end(), out, "|", "<", ">" );
+		util::listToOStream( CONTAINER::begin(), CONTAINER::end(), out, "|", "<", ">" );
 	}
 
 };
@@ -313,7 +319,7 @@ typedef vector4<int32_t> ivector4;
 template<typename TYPE, size_t SIZE, typename CONTAINER >
 ::isis::util::FixedVector<TYPE, SIZE, CONTAINER> operator-( const ::isis::util::FixedVector<TYPE, SIZE, CONTAINER>& s )
 {
-	return s.isis::util::FixedVector<TYPE, SIZE, CONTAINER>::template unary_op<std::negate<float> >();
+	return s.negate();
 }
 
 /// Streaming output for FixedVector

@@ -33,22 +33,22 @@ namespace util
 namespace _internal
 {
 
-class TypeBase;
-class TypeConverterBase
+class ValueBase;
+class ValueConverterBase
 {
 public:
-	virtual boost::numeric::range_check_result convert( const TypeBase &src, TypeBase &dst )const = 0;
-	virtual boost::numeric::range_check_result create( boost::scoped_ptr<TypeBase>& dst )const = 0;
-	virtual boost::numeric::range_check_result generate( const TypeBase &src, boost::scoped_ptr<TypeBase>& dst )const = 0;
-	static boost::shared_ptr<const TypeConverterBase> get() {return boost::shared_ptr<const TypeConverterBase>();}
+	virtual boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const = 0;
+	virtual void create( boost::scoped_ptr<ValueBase>& dst )const = 0;
+	virtual boost::numeric::range_check_result generate( const ValueBase &src, boost::scoped_ptr<ValueBase>& dst )const = 0;
+	static boost::shared_ptr<const ValueConverterBase> get() {return boost::shared_ptr<const ValueConverterBase>();}
 public:
-	virtual ~TypeConverterBase() {}
+	virtual ~ValueConverterBase() {}
 };
 
-class TypeConverterMap : public std::map< int , std::map<int, boost::shared_ptr<const TypeConverterBase> > >
+class ValueConverterMap : public std::map< int , std::map<int, boost::shared_ptr<const ValueConverterBase> > >
 {
 public:
-	TypeConverterMap();
+	ValueConverterMap();
 };
 
 }

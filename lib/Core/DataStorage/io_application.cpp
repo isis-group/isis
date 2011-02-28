@@ -60,13 +60,13 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 		std::map<unsigned short, std::string> types = util::getTypeMap( false, true );
 		// remove some types which are useless as representation
 		// "(unsigned short)" is needed because otherwise erase would take the reference of a static constant which is only there during compile time
-		types.erase( ( unsigned short )data::TypePtr<util::Selection>::staticID );
-		types.erase( ( unsigned short )data::TypePtr<std::string>::staticID );
-		types.erase( ( unsigned short )data::TypePtr<boost::posix_time::ptime>::staticID );
-		types.erase( ( unsigned short )data::TypePtr<boost::gregorian::date>::staticID );
-		types.erase( ( unsigned short )data::TypePtr<util::ilist>::staticID );
-		types.erase( ( unsigned short )data::TypePtr<util::dlist>::staticID );
-		types.erase( ( unsigned short )data::TypePtr<util::slist>::staticID );
+		types.erase( ( unsigned short )data::ValuePtr<util::Selection>::staticID );
+		types.erase( ( unsigned short )data::ValuePtr<std::string>::staticID );
+		types.erase( ( unsigned short )data::ValuePtr<boost::posix_time::ptime>::staticID );
+		types.erase( ( unsigned short )data::ValuePtr<boost::gregorian::date>::staticID );
+		types.erase( ( unsigned short )data::ValuePtr<util::ilist>::staticID );
+		types.erase( ( unsigned short )data::ValuePtr<util::dlist>::staticID );
+		types.erase( ( unsigned short )data::ValuePtr<util::slist>::staticID );
 
 		for( std::map<unsigned short, std::string>::iterator i = types.begin(); i != types.end(); i++ ) {
 			i->second.resize( i->second.find_last_not_of( '*' ) + 1 );
@@ -110,14 +110,14 @@ void IOApplication::printHelp( bool withHidden ) const
 		std::cerr << std::endl << "Available IO Plugins:" << std::endl;
 		data::IOFactory::FileFormatList plugins = data::IOFactory::getFormats();
 		BOOST_FOREACH( data::IOFactory::FileFormatList::const_reference pi, plugins ) {
-			std::cerr << std::endl << "\t" << pi->name() << " (" << pi->plugin_file.file_string() << ")" << std::endl;
+			std::cerr << std::endl << "\t" << pi->getName() << " (" << pi->plugin_file.file_string() << ")" << std::endl;
 			std::cerr << "\t=======================================" << std::endl;
 			const std::list<util::istring> suff = pi->getSuffixes();
-			const std::list<std::string> dialects = util::string2list<std::string>( pi->dialects( "" ) );
-			std::cerr << "\tsupported suffixes: " << util::list2string( suff.begin(), suff.end(), "\", \"", "\"", "\"" )  << std::endl;
+			const std::list<std::string> dialects = util::stringToList<std::string>( pi->dialects( "" ) );
+			std::cerr << "\tsupported suffixes: " << util::listToString( suff.begin(), suff.end(), "\", \"", "\"", "\"" )  << std::endl;
 
 			if( !dialects.empty() )
-				std::cerr << "\tsupported dialects: " << util::list2string( dialects.begin(), dialects.end(), "\", \"", "\"", "\"" )  << std::endl;
+				std::cerr << "\tsupported dialects: " << util::listToString( dialects.begin(), dialects.end(), "\", \"", "\"", "\"" )  << std::endl;
 		}
 	}
 }
@@ -162,7 +162,7 @@ bool IOApplication::autoload( bool exitOnError )
 
 bool IOApplication::autowrite( Image out_image, bool exitOnError )
 {
-	return autowrite( std::list<Image>(1,out_image), exitOnError );
+	return autowrite( std::list<Image>( 1, out_image ), exitOnError );
 }
 
 bool IOApplication::autowrite( std::list<Image> out_images, bool exitOnError )

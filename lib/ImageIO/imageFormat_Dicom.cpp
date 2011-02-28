@@ -35,13 +35,13 @@ class DicomChunk : public data::Chunk
 		data::Chunk( dat, del, width, height, 1, 1 ) {
 		LOG( Debug, verbose_info )
 				<< "Mapping greyscale pixeldata of " << del.m_filename << " at "
-				<< dat << " (" << data::TypePtr<TYPE>::staticName() << ")" ;
+				<< dat << " (" << data::ValuePtr<TYPE>::staticName() << ")" ;
 	}
 	template<typename TYPE>
 	static data::Chunk *copyColor( TYPE **source, size_t width, size_t height ) {
 		data::Chunk *ret = new data::MemChunk<util::color<TYPE> >( width, height );
-		data::TypePtr<util::color<TYPE> > &dest = ret->asTypePtr<util::color<TYPE> >();
-		const size_t pixels = dest.length();
+		data::ValuePtr<util::color<TYPE> > &dest = ret->asValuePtr<util::color<TYPE> >();
+		const size_t pixels = dest.getLength();
 
 		for ( size_t i = 0; i < pixels; i++ ) {
 			util::color<TYPE> &dvoxel = dest[i];
@@ -136,7 +136,7 @@ const char ImageFormat_Dicom::dicomTagTreeName[] = "DICOM";
 const char ImageFormat_Dicom::unknownTagName[] = "Unknown Tag";
 
 std::string ImageFormat_Dicom::suffixes()const {return std::string( ".ima .dcm" );}
-std::string ImageFormat_Dicom::name()const {return "Dicom";}
+std::string ImageFormat_Dicom::getName()const {return "Dicom";}
 std::string ImageFormat_Dicom::dialects( const std::string &filename )const {return "withExtProtocols nomosaic";}
 
 
@@ -147,7 +147,7 @@ ptime ImageFormat_Dicom::genTimeStamp( const date &date, const ptime &time )
 }
 
 
-void ImageFormat_Dicom::sanitise( util::PropertyMap &object, string dialect )
+void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string dialect )
 {
 	const util::istring prefix = util::istring( ImageFormat_Dicom::dicomTagTreeName ) + "/";
 	/////////////////////////////////////////////////////////////////////////////////
@@ -188,7 +188,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, string dialect )
 		if ( hasOrTell( prefix + "PixelSpacing", object, warning ) ) {
 			voxelSize = object.getPropertyAs<util::fvector4>( prefix + "PixelSpacing" );
 			object.remove( prefix + "PixelSpacing" );
-			std::swap( voxelSize[0], voxelSize[1] ); // the values are row-spacing (size in phase dir) /column spacing (size in read dir)
+			std::swap( voxelSize[0], voxelSize[1] ); // the values are row-spacing (size in column dir) /column spacing (size in row dir)
 		}
 
 		if ( hasOrTell( prefix + "SliceThickness", object, warning ) ) {
@@ -220,18 +220,18 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, string dialect )
 		util::dlist buff = object.getPropertyAs<util::dlist>( prefix + "ImageOrientationPatient" );
 
 		if ( buff.size() == 6 ) {
-			util::fvector4 read, phase;
+			util::fvector4 row, column;
 			util::dlist::iterator b = buff.begin();
 
-			for ( int i = 0; i < 3; i++ )read[i] = *b++;
+			for ( int i = 0; i < 3; i++ )row[i] = *b++;
 
-			for ( int i = 0; i < 3; i++ )phase[i] = *b++;
+			for ( int i = 0; i < 3; i++ )column[i] = *b++;
 
-			object.setPropertyAs( "readVec" , read );
-			object.setPropertyAs( "phaseVec", phase );
+			object.setPropertyAs( "rowVec" , row );
+			object.setPropertyAs( "columnVec", column );
 			object.remove( prefix + "ImageOrientationPatient" );
 		} else {
-			LOG( Runtime, error ) << "Could not extract read- and phaseVector from " << object.propertyValue( prefix + "ImageOrientationPatient" );
+			LOG( Runtime, error ) << "Could not extract row- and columnVector from " << object.propertyValue( prefix + "ImageOrientationPatient" );
 		}
 
 		if( object.hasProperty( prefix + "CSAImageHeaderInfo/SliceNormalVector" ) && !object.hasProperty( "sliceVec" ) ) {
@@ -243,9 +243,9 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, string dialect )
 			object.remove( prefix + "CSAImageHeaderInfo/SliceNormalVector" );
 		}
 	} else {
-		LOG( Runtime, warning ) << "Making up read and phase vector, because the image lacks this information";
-		object.setPropertyAs( "readVec" , util::fvector4( 1, 0, 0 ) );
-		object.setPropertyAs( "phaseVec", util::fvector4( 0, 1, 0 ) );
+		LOG( Runtime, warning ) << "Making up row and column vector, because the image lacks this information";
+		object.setPropertyAs( "rowVec" , util::fvector4( 1, 0, 0 ) );
+		object.setPropertyAs( "columnVec", util::fvector4( 0, 1, 0 ) );
 	}
 
 	if ( hasOrTell( prefix + "ImagePositionPatient", object, info ) ) {
@@ -338,15 +338,15 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, string dialect )
 
 	if ( object.hasProperty( prefix + "Unknown Tag(0051,100c)" ) ) { //@todo siemens only ?
 		std::string fov = object.getPropertyAs<std::string>( prefix + "Unknown Tag(0051,100c)" );
-		float read, phase;
+		float row, column;
 
-		if ( std::sscanf( fov.c_str(), "FoV %f*%f", &phase, &read ) == 2 ) {
-			object.setPropertyAs( "fov", util::fvector4( read, phase, invalid_float, invalid_float ) );
+		if ( std::sscanf( fov.c_str(), "FoV %f*%f", &column, &row ) == 2 ) {
+			object.setPropertyAs( "fov", util::fvector4( row, column, invalid_float, invalid_float ) );
 		}
 	}
 }
 
-int ImageFormat_Dicom::readMosaic( isis::data::Chunk source, list< isis::data::Chunk >& dest )
+int ImageFormat_Dicom::readMosaic( isis::data::Chunk source, std::list< isis::data::Chunk >& dest )
 {
 	// prepare some needed parameters
 	const util::istring prefix = util::istring( ImageFormat_Dicom::dicomTagTreeName ) + "/";
@@ -354,7 +354,7 @@ int ImageFormat_Dicom::readMosaic( isis::data::Chunk source, list< isis::data::C
 	std::replace( iType.begin(), iType.end(), std::string( "MOSAIC" ), std::string( "WAS_MOSAIC" ) );
 	util::istring NumberOfImagesInMosaicProp;
 
-	const unsigned short oldSize=dest.size();
+	const unsigned short oldSize = dest.size();
 
 	if ( source.hasProperty( prefix + "Unknown Tag(0019,100a)" ) ) {
 		NumberOfImagesInMosaicProp = prefix + "Unknown Tag(0019,100a)";
@@ -379,22 +379,22 @@ int ImageFormat_Dicom::readMosaic( isis::data::Chunk source, list< isis::data::C
 		voxelGap = source.getPropertyAs<util::fvector4>( "voxelGap" );
 
 	const util::fvector4 voxelSize = source.getPropertyAs<util::fvector4>( "voxelSize" );
-	const util::fvector4 &readVec = source.getPropertyAs<util::fvector4>( "readVec" );
-	const util::fvector4 &phaseVec = source.getPropertyAs<util::fvector4>( "phaseVec" );
+	const util::fvector4 &rowVec = source.getPropertyAs<util::fvector4>( "rowVec" );
+	const util::fvector4 &columnVec = source.getPropertyAs<util::fvector4>( "columnVec" );
 	//remove the additional mosaic offset
 	//eg. if there is a 10x10 Mosaic, substract the half size of 9 Images from the offset
 	const util::fvector4 fovCorr = ( voxelSize + voxelGap ) * size * ( matrixSize - 1 ) / 2; // @todo this will not include the voxelGap between the slices
 	util::fvector4 &origin = source.propertyValue( "indexOrigin" )->castTo<util::fvector4>();
-	origin = origin + ( readVec * fovCorr[0] ) + ( phaseVec * fovCorr[1] );
+	origin = origin + ( rowVec * fovCorr[0] ) + ( columnVec * fovCorr[1] );
 	source.remove( NumberOfImagesInMosaicProp ); // we dont need that anymore
 	source.setPropertyAs( prefix + "ImageType", iType );
 
 	// if we dont have a sliceVec - compute it
 	if( !source.hasProperty( "sliceVec" ) ) {
 		const util::fvector4 crossVec = util::fvector4(
-											readVec[1] * phaseVec[2] - readVec[2] * phaseVec[1],
-											readVec[2] * phaseVec[0] - readVec[0] * phaseVec[2],
-											readVec[0] * phaseVec[1] - readVec[1] * phaseVec[0]
+											rowVec[1] * columnVec[2] - rowVec[2] * columnVec[1],
+											rowVec[2] * columnVec[0] - rowVec[0] * columnVec[2],
+											rowVec[0] * columnVec[1] - rowVec[1] * columnVec[0]
 										);
 		source.setPropertyAs( "sliceVec", crossVec );
 		LOG( Debug, info ) << "Computed sliceVec as " << source.propertyValue( "sliceVec" );
@@ -425,15 +425,15 @@ int ImageFormat_Dicom::readMosaic( isis::data::Chunk source, list< isis::data::C
 	// for every slice
 	for ( size_t slice = 0; slice < images; slice++ ) {
 		dest.push_back( source.cloneToNew( size[0], size[1] ) );//create a new chunk at the end of the output
-		data::Chunk &working=dest.back(); // use this as working slice
+		data::Chunk &working = dest.back(); // use this as working slice
 
 		// copy the lines into the corresponding slice-chunk
-		for ( size_t phase = 0; phase < size[1]; phase++ ) {
-			const size_t dpos[] = {0, phase, 0, 0}; //begin of the target line
-			const size_t column = slice % matrixSize;
-			const size_t row = slice / matrixSize;
-			const size_t sstart[] = {column *size[0], row *size[1] + phase, 0, 0}; //begin of the source line
-			const size_t send[] = {sstart[0] + size[0] - 1, row *size[1] + phase, 0, 0}; //end of the source line
+		for ( size_t line = 0; line < size[1]; line++ ) {
+			const size_t dpos[] = {0, line, 0, 0}; //begin of the target line
+			const size_t column = slice % matrixSize; //column of the mosaic
+			const size_t row = slice / matrixSize; //row of the mosaic
+			const size_t sstart[] = {column *size[0], row *size[1] + line, 0, 0}; //begin of the source line
+			const size_t send[] = {sstart[0] + size[0] - 1, row *size[1] + line, 0, 0}; //end of the source line
 			source.copyRange( sstart, send, working, dpos );
 		}
 
@@ -458,12 +458,12 @@ int ImageFormat_Dicom::readMosaic( isis::data::Chunk source, list< isis::data::C
 		}
 
 		LOG( Debug, verbose_info )
-			<< "New slice " << slice << " at " << working.propertyValue( "indexOrigin" ).toString( false )
-			<< " with acquisitionNumber " << working.propertyValue( "acquisitionNumber" ).toString( false )
-			<< ( haveAcqTimeList ? std::string( " and acquisitionTime " ) + working.propertyValue( "acquisitionTime" ).toString( false ) : "" );
+				<< "New slice " << slice << " at " << working.propertyValue( "indexOrigin" ).toString( false )
+				<< " with acquisitionNumber " << working.propertyValue( "acquisitionNumber" ).toString( false )
+				<< ( haveAcqTimeList ? std::string( " and acquisitionTime " ) + working.propertyValue( "acquisitionTime" ).toString( false ) : "" );
 	}
 
-	return dest.size()-oldSize;
+	return dest.size() - oldSize;
 }
 
 

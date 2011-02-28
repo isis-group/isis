@@ -1,6 +1,5 @@
 /*
-    <one line to give the program's name and a brief idea of what it does.>
-    Copyright (C) <year>  <name of author>
+    Copyright (C) 2010  reimer@cbs.mpg.de
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,13 +31,18 @@ namespace data
 namespace _internal
 {
 
+/*
+ * This class sorts the inserted chunks by the given properties while construction.
+ * The rules of the sorting depends on the upper level using these chunkLists later on.
+ * See the special classes, e.g. MRImage to find details about sorting criterias.
+ */
 class SortedChunkList
 {
 public:
 	struct scalarPropCompare {
 		util::PropertyMap::KeyType propertyName;
 		scalarPropCompare( const util::PropertyMap::KeyType &prop_name );
-		bool operator()( const util::TypeValue &a, const util::TypeValue &b ) const;
+		bool operator()( const util::PropertyValue &a, const util::PropertyValue &b ) const;
 	};
 	struct posCompare {
 		bool operator()( const util::fvector4 &a, const util::fvector4 &b ) const;
@@ -48,7 +52,7 @@ public:
 		virtual ~chunkPtrOperator();
 	};
 private:
-	typedef std::map<util::TypeValue, boost::shared_ptr<Chunk>, scalarPropCompare> SecondaryMap;
+	typedef std::map<util::PropertyValue, boost::shared_ptr<Chunk>, scalarPropCompare> SecondaryMap;
 	typedef std::map<util::fvector4, SecondaryMap, posCompare> PrimaryMap;
 
 	std::stack<scalarPropCompare> secondarySort;
@@ -56,7 +60,7 @@ private:
 	PrimaryMap chunks;
 
 	// low level finding
-	boost::shared_ptr<Chunk> secondaryFind( const util::TypeValue &key, SecondaryMap &map );
+	boost::shared_ptr<Chunk> secondaryFind( const util::PropertyValue &key, SecondaryMap &map );
 	SecondaryMap *primaryFind( const util::fvector4 &key );
 
 	// low level inserting
@@ -70,7 +74,7 @@ public:
 	/**
 	 * Creates a sorted list and sets primary sorting as well as properties which should be equal across all chunks.
 	 */
-	SortedChunkList( util::PropertyMap::KeyType fvectorPropName, util::PropertyMap::KeyType comma_separated_equal_props );
+	SortedChunkList( util::PropertyMap::KeyType comma_separated_equal_props );
 
 	/**
 	 * Adds a property for secondary sorting.
@@ -86,8 +90,8 @@ public:
 	/// Tries to insert a chunk (a cheap copy of the chunk is done when inserted)
 	bool insert( const Chunk &ch );
 
-	/// \returns true if there is not chunk in the list
-	bool empty()const;
+	/// \returns true if there is no chunk in the list
+	bool isEmpty()const;
 
 	/// Empties the list.
 	void clear();

@@ -32,7 +32,7 @@ void FileFormat::write( const std::list<data::Image> &images, const std::string 
 			write( ref, uniquePath, dialect );
 		} catch ( std::runtime_error &e ) {
 			LOG( Runtime, warning )
-					<< "Failed to write image to " <<  uniquePath << " using " <<  name() << " (" << e.what() << ")";
+					<< "Failed to write image to " <<  uniquePath << " using " <<  getName() << " (" << e.what() << ")";
 		}
 	}
 }
@@ -59,7 +59,7 @@ void FileFormat::throwSystemError( int err, std::string desc )
 
 std::list< util::istring > FileFormat::getSuffixes()const
 {
-	std::list<util::istring> ret = util::string2list<util::istring>( suffixes(), boost::regex( "[[:space:]]" ) );
+	std::list<util::istring> ret = util::stringToList<util::istring>( suffixes(), boost::regex( "[[:space:]]" ) );
 	BOOST_FOREACH( util::istring & ref, ret ) {
 		ref.erase( 0, ref.find_first_not_of( '.' ) ); // remove leading . if there are some
 	}
@@ -69,10 +69,10 @@ std::list< util::istring > FileFormat::getSuffixes()const
 
 std::pair< std::string, std::string > FileFormat::makeBasename( const std::string &filename )const
 {
-	std::list<util::istring> suffixes = getSuffixes();
+	std::list<util::istring> supported_suffixes = getSuffixes();
 	util::istring ifilename( filename.begin(), filename.end() );
-	BOOST_FOREACH( const util::istring & suff, suffixes ) {
-		size_t at = ifilename.rfind( suff );
+	BOOST_FOREACH( const util::istring & suffix, supported_suffixes ) {
+		size_t at = ifilename.rfind( suffix );
 
 		if( at != ifilename.npos ) {
 			if( at && ifilename[at-1] == '.' )

@@ -63,10 +63,10 @@ Write a list of elements to a std::basic_ostream
 \param suffix will be send to the stream at the end (default: "")
 */
 template<class InputIterator, typename _CharT, typename _Traits> std::basic_ostream<_CharT, _Traits> &
-write_list( InputIterator start, InputIterator end,
-			std::basic_ostream<_CharT, _Traits> &o,
-			const std::string delim = ",",
-			const std::string prefix = "{", const std::string suffix = "}" )
+listToOStream( InputIterator start, InputIterator end,
+			   std::basic_ostream<_CharT, _Traits> &o,
+			   const std::string delim = ",",
+			   const std::string prefix = "{", const std::string suffix = "}" )
 {
 	o << prefix;
 
@@ -85,10 +85,10 @@ write_list( InputIterator start, InputIterator end,
 // specialization to print char-list as number lists, not strings
 //@todo check if this works for VC
 template<typename _CharT, typename _Traits> std::basic_ostream<_CharT, _Traits> &
-write_list( const unsigned char *start, const unsigned char *end,
-			std::basic_ostream<_CharT, _Traits> &o,
-			const std::string delim = ",",
-			const std::string prefix = "{", const std::string suffix = "}" )
+listToOStream( const unsigned char *start, const unsigned char *end,
+			   std::basic_ostream<_CharT, _Traits> &o,
+			   const std::string delim = ",",
+			   const std::string prefix = "{", const std::string suffix = "}" )
 {
 	o << prefix;
 
@@ -104,18 +104,18 @@ write_list( const unsigned char *start, const unsigned char *end,
 	return o;
 }
 
-/// use write_list to create a string from a list
-template<class InputIterator> std::string list2string(
+/// use listToOStream to create a string from a list
+template<class InputIterator> std::string listToString(
 	InputIterator start, InputIterator end,
 	const std::string delim = ",",
 	const std::string prefix = "{", const std::string suffix = "}" )
 {
 	std::ostringstream ret;
-	write_list( start, end, ret, delim, prefix, suffix );
+	listToOStream( start, end, ret, delim, prefix, suffix );
 	return ret.str();
 }
 /// do lexical_cast\<T\> on the elements of a list and return them
-template<typename T, typename InputIterator> std::list<T> list2list( InputIterator start, InputIterator end )
+template<typename T, typename InputIterator> std::list<T> listToList( InputIterator start, InputIterator end )
 {
 	std::list<T> ret;
 
@@ -137,7 +137,7 @@ template<typename T, typename InputIterator> std::list<T> list2list( InputIterat
  * ("$" if not given, will be added at the end)
  * \returns a list of the casted tokens
  */
-template<typename TARGET> std::list<TARGET> string2list(
+template<typename TARGET> std::list<TARGET> stringToList(
 	std::string source, const boost::regex &separator,
 	boost::regex prefix, boost::regex postfix )
 {
@@ -176,11 +176,11 @@ template<typename TARGET> std::list<TARGET> string2list(
  * \param separator string to delimit the tokens
  * \returns a list of the casted tokens
  */
-template<typename TARGET> std::list<TARGET> string2list(
+template<typename TARGET> std::list<TARGET> stringToList(
 	std::string source,
 	const boost::regex separator = boost::regex( "[[:space:]]" ) )
 {
-	return string2list<TARGET>( source, separator, separator, separator );
+	return stringToList<TARGET>( source, separator, separator, separator );
 }
 
 /**
@@ -197,7 +197,7 @@ template<typename TARGET> std::list<TARGET> string2list(
  */
 //@todo test
 template<typename TARGET, typename charT, typename traits> std::list<TARGET>
-string2list( const std::basic_string<charT, traits> &source,  charT separator )
+stringToList( const std::basic_string<charT, traits> &source,  charT separator )
 {
 	std::list<TARGET> ret;
 
@@ -215,87 +215,25 @@ string2list( const std::basic_string<charT, traits> &source,  charT separator )
 }
 
 /**
- * Continously searches in an sorted list using the given less-than comparison.
- * It starts at current and increments it until the referenced value is not less than the compare-value anymore.
- * Than it returns.
- * \param current the current-position-iterator for the sorted list.
- * This value is changed directly, so after the function returns is references the first entry of the list
- * which does not compare less than compare or, if such a value does not exit in the list, it will be equal to end.
- * \param end the end of the list
- * \param compare the compare-value
- * \param compOp the comparison functor. It must provide "bool operator()(T,T)".
- * \returns true if the value current currently refers to is equal to compare
- */
-template<typename ForwardIterator, typename T, typename CMP> bool
-continousFind( ForwardIterator &current, const ForwardIterator end, const T &compare, CMP compOp )
-{
-	//find the first iterator which is does not compare less
-	current = std::lower_bound( current, end, compare, compOp );
-
-	if ( current == end //if we're at the end
-		 || compOp( compare, *current ) //or compare is less than that iterator
-	   )
-		return false;//we didn't find a match
-	else
-		return true;//not(current <> compare) makes compare == current
-}
-
-/**
  * Fuzzy comparison between floating point values.
- * Will raise a compiler error when not used with floating point types.
+ * - Will return true if and only if the difference between two values is "small" compared to their magnitude.
+ * - Will raise a compiler error when not used with floating point types.
  * @param a first value to compare with
  * @param b second value to compare with
- * @param boost a scaling factor to regulate the "fuzzyness" of the operation. A higher
- * value will result in a more fuzzy check. Normally one would use multiple of 10.
- * \returns true if the difference between the two values is significantly small compared to their values.
+ * @param thresh a threshold factor to set a minimal difference to be still considered equal independent of the values itself.
+ * Eg. "1" means any difference less than the epsilon of the used floating point type will allways be considered equal.
+ * If any of the values is greater than "1" the "allowed" difference will be bigger.
+ * \returns \f[ |a-b| <= \varepsilon_T * \lceil |a|,|b|,|thresh| \rceil \f].
  */
-template<typename T> bool fuzzyEqual( T a, T b, unsigned short boost = 1 )
+template<typename T> bool fuzzyEqual( T a, T b, float thresh = 0 )
 {
 	BOOST_MPL_ASSERT( ( boost::is_float<T> ) );
+
 	const T epsilon = std::numeric_limits<T>::epsilon();
-
-	if ( a == b )
-		return true;
-
-	if( a < 0 && b > 0 ) {
-		b += -a;
-		a = 0;
-	} else if( a > 0 && b < 0 ) {
-		a += -b;
-		b = 0;
-	}
-
-	if( a == 0 && std::fabs( b ) < epsilon * boost )
-		return true;
-
-	if( b == 0 && std::fabs( a ) < epsilon * boost )
-		return true;
-
-	const T dist_fac = ( std::max( a, b ) / std::min( a, b ) ) - 1;
-	return  dist_fac <= epsilon * boost;
+	const T factor = std::max<T> ( std::max<T> ( std::abs( a ), std::abs( b ) ), std::abs( thresh ) );
+	return std::abs( a - b ) <= epsilon * factor;
 }
 
-/// @cond _internal
-namespace _internal
-{
-/**
- * Continously searches in an sorted list using std::less.
- * It starts at current and increments it until the referenced value is not less than the compare-value anymore.
- * Than it returns.
- * \param current the current-position-iterator for the sorted list.
- * This value is changed directly, so after the function returns is references the first entry of the list
- * which does not compare less than compare or, if such a value does not exit in the list, it will be equal to end.
- * \param end the end of the list
- * \param compare the compare-value
- * \returns true if the value current currently refers to is equal to compare
- */
-template<typename ForwardIterator, typename T> bool
-continousFind( ForwardIterator &current, const ForwardIterator end, const T &compare )
-{
-	return continousFind( current, end, compare, std::less<T>() );
-}
-}
-/// @endcond
 typedef CoreDebug Debug;
 typedef CoreLog Runtime;
 
@@ -307,7 +245,7 @@ typedef CoreLog Runtime;
  * So if you compile with "-D_ENABLE_DEBUG=0" against a library which (for example) was comiled with "-D_ENABLE_DEBUG=1",
  * you won't be able to change the logging level of the debug messages of these library.
  */
-template<typename HANDLE> void enable_log( LogLevel level )
+template<typename HANDLE> void enableLog( LogLevel level )
 {
 	ENABLE_LOG( CoreLog, HANDLE, level );
 	ENABLE_LOG( CoreDebug, HANDLE, level );
@@ -322,7 +260,7 @@ template<typename HANDLE> void enable_log( LogLevel level )
  * So if you compile with "-D_ENABLE_DEBUG=0" against a library which (for example) was comiled with "-D_ENABLE_DEBUG=1",
  * you won't be able to change the logging level of the debug messages of these library.
  */
-template<typename HANDLE> void enable_log_global( LogLevel level )
+template<typename HANDLE> void enableLogGlobal( LogLevel level )
 {
 	ENABLE_LOG( CoreLog, HANDLE, level );
 	ENABLE_LOG( CoreDebug, HANDLE, level );
@@ -346,7 +284,7 @@ operator<<( basic_ostream<charT, std::char_traits<charT> > &out, const pair<_FIR
 template<typename charT, typename _Key, typename _Tp, typename _Compare, typename _Alloc >
 basic_ostream<charT, std::char_traits<charT> >& operator<<( basic_ostream<charT, std::char_traits<charT> > &out, const map<_Key, _Tp, _Compare, _Alloc>& s )
 {
-	isis::util::write_list( s.begin(), s.end(), out, "\n", "", "" );
+	isis::util::listToOStream( s.begin(), s.end(), out, "\n", "", "" );
 	return out;
 }
 
@@ -375,14 +313,14 @@ basic_ostream<charT, std::char_traits<charT> >& operator<<( basic_ostream<charT,
 template<typename charT, typename _Tp, typename _Alloc >
 basic_ostream<charT, std::char_traits<charT> >& operator<<( basic_ostream<charT, std::char_traits<charT> > &out, const list<_Tp, _Alloc>& s )
 {
-	isis::util::write_list( s.begin(), s.end(), out );
+	isis::util::listToOStream( s.begin(), s.end(), out );
 	return out;
 }
 ///Streaming output for std::set
 template<typename charT, typename _Tp, typename _Alloc >
 basic_ostream<charT, std::char_traits<charT> >& operator<<( basic_ostream<charT, std::char_traits<charT> > &out, const set<_Tp, _Alloc>& s )
 {
-	isis::util::write_list( s.begin(), s.end(), out );
+	isis::util::listToOStream( s.begin(), s.end(), out );
 	return out;
 }
 

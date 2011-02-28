@@ -20,38 +20,38 @@ namespace util
 namespace _internal
 {
 
-bool GenericType::isSameType ( const GenericType &second ) const
+bool GenericValue::isSameType ( const GenericValue &second ) const
 {
-	return typeID() == second.typeID();
+	return getTypeID() == second.getTypeID();
 }
 
-TypeBase::~TypeBase() {}
+ValueBase::~ValueBase() {}
 
 
-const TypeConverterMap &TypeBase::converters()
+const ValueConverterMap &ValueBase::converters()
 {
-	return Singletons::get<_internal::TypeConverterMap, 0>();
+	return Singletons::get<_internal::ValueConverterMap, 0>();
 }
 
-const TypeBase::Converter &TypeBase::getConverterTo( unsigned short ID )const
+const ValueBase::Converter &ValueBase::getConverterTo( unsigned short ID )const
 {
-	const TypeConverterMap::const_iterator f1 = converters().find( typeID() );
+	const ValueConverterMap::const_iterator f1 = converters().find( getTypeID() );
 	assert( f1 != converters().end() );
-	const TypeConverterMap::mapped_type::const_iterator f2 = f1->second.find( ID );
+	const ValueConverterMap::mapped_type::const_iterator f2 = f1->second.find( ID );
 	assert( f2 != f1->second.end() );
 	return f2->second;
 }
-bool TypeBase::convert( const TypeBase &from, TypeBase &to )
+bool ValueBase::convert( const ValueBase &from, ValueBase &to )
 {
-	const Converter &conv = from.getConverterTo( to.typeID() );
+	const Converter &conv = from.getConverterTo( to.getTypeID() );
 
 	if ( conv ) {
 		switch ( conv->convert( from, to ) ) {
 		case boost::numeric::cPosOverflow:
-			LOG( Runtime, error ) << "Positive overflow when converting " << from.toString( true ) << " to " << to.typeName() << ".";
+			LOG( Runtime, error ) << "Positive overflow when converting " << from.toString( true ) << " to " << to.getTypeName() << ".";
 			break;
 		case boost::numeric::cNegOverflow:
-			LOG( Runtime, error ) << "Negative overflow when converting " << from.toString( true ) << " to " << to.typeName() << ".";
+			LOG( Runtime, error ) << "Negative overflow when converting " << from.toString( true ) << " to " << to.getTypeName() << ".";
 			break;
 		case boost::numeric::cInRange:
 			return true;
@@ -60,15 +60,15 @@ bool TypeBase::convert( const TypeBase &from, TypeBase &to )
 	} else {
 		LOG( Runtime, error )
 				<< "I dont know any conversion from "
-				<< MSubject( from.toString( true ) ) << " to " << MSubject( to.typeName() );
+				<< MSubject( from.toString( true ) ) << " to " << MSubject( to.getTypeName() );
 	}
 
 	return false;
 }
 
-bool TypeBase::fitsInto( short unsigned int ID ) const
+bool ValueBase::fitsInto( short unsigned int ID ) const
 {
-	boost::scoped_ptr<TypeBase> to;
+	boost::scoped_ptr<ValueBase> to;
 	const Converter &conv = getConverterTo( ID );
 
 	if ( conv ) {
@@ -81,9 +81,9 @@ bool TypeBase::fitsInto( short unsigned int ID ) const
 	}
 }
 
-TypeBase::Reference TypeBase::copyToNewByID( short unsigned int ID ) const
+ValueBase::Reference ValueBase::copyToNewByID( short unsigned int ID ) const
 {
-	boost::scoped_ptr<TypeBase> to;
+	boost::scoped_ptr<ValueBase> to;
 	const Converter &conv = getConverterTo( ID );
 
 	if ( conv ) {
@@ -98,7 +98,7 @@ TypeBase::Reference TypeBase::copyToNewByID( short unsigned int ID ) const
 			break;
 		}
 
-		return *to; // return the generated Type-Object - wrapping it into Reference
+		return *to; // return the generated Value-Object - wrapping it into Reference
 	} else {
 		LOG( Runtime, error )
 				<< "I dont know any conversion from "
