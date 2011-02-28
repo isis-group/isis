@@ -35,10 +35,23 @@ protected:
 		template<typename T> RawMemChunk(T *src,const Deleter &del, size_t width, size_t height, size_t slices=1, size_t timesteps=1)
 		:data::Chunk( src, del, width, height, slices, timesteps ){}
 	};
-
+	typedef std::map<std::string,unsigned short> typemap;
 public:
 	std::string getName()const {
 		return "raw data output";
+	}
+	virtual std::string dialects(const std::string& ) const{
+		std::string ret;
+		typemap types=util::getTransposedTypeMap(false,true);
+		types.erase("boolean*");
+		types.erase("date*");
+		types.erase("timestamp*");
+		types.erase("selection*");
+		BOOST_FOREACH(typemap::const_reference pair, types ){
+			ret+=pair.first.substr(0,pair.first.length()-1);
+			ret+=" ";
+		}
+		return ret;
 	}
 
 
@@ -61,10 +74,8 @@ public:
 			if( mmem == MAP_FAILED ) {
 				throwSystemError( errno, std::string( "Failed to map " ) + filename + " into memory" );
 			}
-	// 		std::map<unsigned short,std::string>::const_iterator found=util::getTypeMap().find(dialect);
-	// 		if(found==util::getTypeMap().end()){
-	// 			throwGenericError(std::string("Datatype \"")+dialect+"\" not found");
-	// 		}
+
+			typemap::const_iterator found=util::getTransposedTypeMap(false,true).find(dialect+"*");
 
 			Deleter del(mfile,filename);
 			chunks.push_back(RawMemChunk((uint16_t*)mmem,del,ssize,ssize));
