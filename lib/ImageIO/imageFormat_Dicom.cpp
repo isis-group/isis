@@ -428,12 +428,12 @@ int ImageFormat_Dicom::readMosaic( isis::data::Chunk source, std::list< isis::da
 		data::Chunk &working = dest.back(); // use this as working slice
 
 		// copy the lines into the corresponding slice-chunk
-		for ( size_t column = 0; column < size[1]; column++ ) {
-			const size_t dpos[] = {0, column, 0, 0}; //begin of the target line
-			const size_t column = slice % matrixSize;
-			const size_t row = slice / matrixSize;
-			const size_t sstart[] = {column *size[0], row *size[1] + column, 0, 0}; //begin of the source line
-			const size_t send[] = {sstart[0] + size[0] - 1, row *size[1] + column, 0, 0}; //end of the source line
+		for ( size_t line = 0; line < size[1]; line++ ) {
+			const size_t dpos[] = {0, line, 0, 0}; //begin of the target line
+			const size_t column = slice % matrixSize; //column of the mosaic
+			const size_t row = slice / matrixSize; //row of the mosaic
+			const size_t sstart[] = {column *size[0], row *size[1] + line, 0, 0}; //begin of the source line
+			const size_t send[] = {sstart[0] + size[0] - 1, row *size[1] + line, 0, 0}; //end of the source line
 			source.copyRange( sstart, send, working, dpos );
 		}
 
