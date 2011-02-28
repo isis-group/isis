@@ -1,11 +1,11 @@
-Source: isis-python
+Source: python-isis
 Section: science
 Priority: optional
 Maintainer: ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>
 Build-Depends: libboost-python1.35-dev | libboost-python-dev
 Standards-Version: 3.8.1
 
-Package: isis-python
+Package: python-isis
 Section: science
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
