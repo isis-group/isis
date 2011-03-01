@@ -12,6 +12,7 @@ namespace image_io
 
 class ImageFormat_raw: public FileFormat
 {
+	typedef std::map<std::string,unsigned short> typemap;
 protected:
 	std::string suffixes()const {
 		return std::string( "raw" );
@@ -35,7 +36,6 @@ protected:
 		template<typename T> RawMemChunk(T *src,const Deleter &del, size_t width, size_t height, size_t slices=1, size_t timesteps=1)
 		:data::Chunk( src, del, width, height, slices, timesteps ){}
 	};
-	typedef std::map<std::string,unsigned short> typemap;
 public:
 	std::string getName()const {
 		return "raw data output";
@@ -59,9 +59,11 @@ public:
 
 
 		const size_t fsize=boost::filesystem::file_size(filename);
-		const size_t ssize=sqrt(fsize/sizeof(uint16_t));
+		const unsigned short type=util::getTransposedTypeMap(false,true)[dialect+"*"];
+		const size_t elemSize=data::_internal::ValuePtrBase::createById(type,0)->bytesPerElem();
+		const size_t ssize=sqrt(fsize/elemSize);
 
-		if(ssize*ssize*sizeof(uint16_t) == fsize){
+		if(ssize*ssize*elemSize == fsize){
 			LOG(Runtime,info) << "Guessing size of read and phase to be " << ssize;
 
 			int mfile = open( filename.c_str(), O_RDONLY);
@@ -75,7 +77,6 @@ public:
 				throwSystemError( errno, std::string( "Failed to map " ) + filename + " into memory" );
 			}
 
-			typemap::const_iterator found=util::getTransposedTypeMap(false,true).find(dialect+"*");
 
 			Deleter del(mfile,filename);
 			chunks.push_back(RawMemChunk((uint16_t*)mmem,del,ssize,ssize));
@@ -83,8 +84,8 @@ public:
 			ch.setPropertyAs<uint16_t>("sequenceNumber",0);
 			ch.setPropertyAs<uint32_t>("acquisitionNumber",0);
 			ch.setPropertyAs("voxelSize",util::fvector4(1,1,1));
-			ch.setPropertyAs("readVec",util::fvector4(1,0));
-			ch.setPropertyAs("phaseVec",util::fvector4(0,1));
+			ch.setPropertyAs("rowVec",util::fvector4(1,0));
+			ch.setPropertyAs("columnVec",util::fvector4(0,1));
 			ch.setPropertyAs("indexOrigin",util::fvector4(0,0));
 			return 1;
 		} else {
