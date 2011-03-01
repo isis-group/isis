@@ -1,4 +1,4 @@
-python-isis (0.2.0-git310-g0573614) stable; urgency=low
+python-isis (0.2.0git312-0) stable; urgency=low
 
     * Initial Debian packaging attempt. This is the first version of
       a ISIS pthon debian package.
