@@ -43,7 +43,7 @@ namespace isis
                  *TIMESTAMPS
                  */
                 printf("IMAGE: %d\n", image_counter);
-                
+                //time(&startTime);
                 
                 
 				firstHeaderArrived = false;
@@ -61,29 +61,23 @@ namespace isis
 				if(length == 0) {
 					exit(0);
 				}
-                    
-                     //TODO: If this was the last volume return something empty, something like:
-                    // std::string lastVolume = <lastVolume>
-                    // if (memcmp(buffer, lastVolume.c_str(), sizeof(lastVolume) -1 ) == 0 ){
-                    //  return 0;}
-                    if (memcmp(buffer, session_terminus.c_str(), sizeof(session_terminus) - 1) == 0){
+                    if (memcmp(buffer, session_terminus.c_str(), session_terminus.size() - 1) == 0){
                         return 0;
                     }
-                        
-                    
                     
 				
-				if(memcmp(buffer, header_start.c_str(), sizeof(header_start) - 1) == 0) {
+				if(memcmp(buffer, header_start.c_str(), header_start.size() ) == 0) {
 					firstHeaderArrived = true;
-					//printf("[receiver2] received block with header\n");
 					data_received = 0L;
 					unsigned int header_length = 0;
-					while(memcmp(header_end.c_str(), (buffer + header_length), sizeof(header_end)) != 0) {
+					while(memcmp(header_end.c_str(), (buffer + header_length), header_end.size() ) != 0) {
 						header_length++;
 					}
-					header_length += sizeof(header_end);
-                    header = std::string(buffer, header_length);
-                    
+					header_length += header_end.size();
+					header = std::string(buffer, header_length);
+					//fprintf(headerFile,"%d\n\n", image_counter);
+                    //fprintf(headerFile,"%s",header.c_str());
+					//fprintf(headerFile,"\n BREAK ************************\n\n\n");
                     byteSize = atoi(getStringFromHeader("data_size_in_bytes", header).c_str());
 					
 					//printf("byteSize: '%i'\n", byteSize);
@@ -93,16 +87,18 @@ namespace isis
 					memcpy(dataBuffer, (buffer + header_length), sizeof(buffer) - header_length);
 					
 					data_received += sizeof(buffer) - header_length;
-                    time(&startTime);
+                    
 					
 				} else if (true == firstHeaderArrived) {
 					
-                   if(byteSize - data_received > 32768) {
+                   if(byteSize - data_received >= 32768) {
 						memcpy(dataBuffer + data_received, buffer, sizeof(buffer));
 						data_received += sizeof(buffer);
+					   
+					   printf("dataRec: '%ld'\n", data_received);
+					   printf("   imageNR: %d \n", image_counter);
 					} else {
 						// image complete
-                        
                         size_t width = atoi(getStringFromHeader("width", header).c_str());
                         bool moco = getStringFromHeader("motion_corrected", header).compare("yes") == 0 ? true : false;
                         size_t height = atoi(getStringFromHeader("height", header).c_str());
@@ -132,8 +128,8 @@ namespace isis
                         std::string slice_orient = getStringFromHeader("slice_orientation", header);
                         
                         //Fallunterscheidung
-                        // Wenn ((slice_orient == TRANSVERSE) gilt: (-45 < inplane_rot < 45)) ? -> COL : ROW -> phaseVec == col + readVec == row
-                        // Wenn ((slice_orient != TRANSVERSE) gilt: (-45 < inplane_rot < 45)) ? -> ROW : COL -> phaseVec == row + readVec == col
+                        // Wenn ((slice_orient == TRANSVERSE) gilt: (-45 < inplane_rot < 45)) ? -> COL : ROW -> columnVec == col + rowVec == row
+                        // Wenn ((slice_orient != TRANSVERSE) gilt: (-45 < inplane_rot < 45)) ? -> ROW : COL -> columnVec == row + rowVec == col
                         std::string InPlanePhaseEncodingDirection;
                         if (0 == slice_orient.compare(0, slice_orient.length(), "TRANSVERSE")) {
                             InPlanePhaseEncodingDirection = (-45 < inplane_rot && inplane_rot < 45 ) ? "COL" : "ROW";
@@ -156,6 +152,7 @@ namespace isis
 												
 						memcpy(dataBuffer + data_received, buffer, byteSize - data_received);
 						data_received += byteSize - data_received;
+						 printf("!!! ByteSize: %d      dataRec: %ld       imageNR: %d\n", byteSize, data_received, image_counter);
 						
 						// ... do something ...
 						/******************************/
@@ -196,13 +193,13 @@ namespace isis
                                 
 
                                 if ( 0 == InPlanePhaseEncodingDirection.compare(0, 3, "COL") ){
-                                    ch.setPropertyAs<util::fvector4>("readVec", phase_vec);
-                                    ch.setPropertyAs<util::fvector4>("phaseVec", read_vec);
+                                    ch.setPropertyAs<util::fvector4>("rowVec", phase_vec);
+                                    ch.setPropertyAs<util::fvector4>("columnVec", read_vec);
                                     ch.setPropertyAs<util::fvector4>("voxelSize", util::fvector4(fov_read/width_slice,fov_phase/height_slice,slice_thickness,0));
                                 }
                                 else {
-                                    ch.setPropertyAs<util::fvector4>("phaseVec", phase_vec);
-                                    ch.setPropertyAs<util::fvector4>("readVec", read_vec);
+                                    ch.setPropertyAs<util::fvector4>("columnVec", phase_vec);
+                                    ch.setPropertyAs<util::fvector4>("rowVec", read_vec);
                                     ch.setPropertyAs<util::fvector4>("voxelSize", util::fvector4(fov_phase/width_slice,fov_read/height_slice,slice_thickness,0));
                                 }
 
@@ -239,6 +236,10 @@ namespace isis
                             double_t diffTimestamps = (timestampCurrent - timestampPrevious);
                             fprintf(timediffRECO, "%.6lf\n", diffTimestamps );
                         }
+						//time(&endTime);
+						//double_t diffTiming = difftime(endTime, startTime);
+						//printf("Time to create Image: %.2lf s\n", diffTiming);
+						
    					return 0;
 					}
 					
@@ -257,6 +258,7 @@ namespace isis
 			{
                 fclose(timediffRECO);
                 fclose(timediffMOCO);
+				//fclose(headerFile);
             }
 			
 			
@@ -275,6 +277,7 @@ namespace isis
             static double_t timestampCurrentMOCO;
             static FILE* timediffMOCO;
             static FILE* timediffRECO;
+			//static FILE* headerFile;
             
 		private:
             time_t startTime;
@@ -318,6 +321,7 @@ namespace isis
         double_t ImageFormat_SiemensTcpIp::timestampPreviousMOCO;
         FILE* ImageFormat_SiemensTcpIp::timediffMOCO;
         FILE* ImageFormat_SiemensTcpIp::timediffRECO;
+		//FILE* ImageFormat_SiemensTcpIp::headerFile;
         		
 	}
 }
@@ -340,11 +344,23 @@ isis::image_io::FileFormat *factory()
 	pluginRtExport->image_counter = 0;
 	
 	pluginRtExport->timestampCurrent = 0;
-        pluginRtExport->timestampPrevious = 0;
-        pluginRtExport->timestampCurrentMOCO = 0;
-        pluginRtExport->timestampPreviousMOCO = 0;
-        pluginRtExport->timediffMOCO = fopen("/tmp/timediffMOCO.txt", "w");
-	pluginRtExport->timediffRECO = fopen("/tmp/timediffRECO.txt", "w");
+    pluginRtExport->timestampPrevious = 0;
+    pluginRtExport->timestampCurrentMOCO = 0;
+    pluginRtExport->timestampPreviousMOCO = 0;
+
+	struct tm* ptr;
+	time_t lt;
+	char fnameMOCO[80];
+	char fnameRECO[80];
+	//char fnameHEADER[80];
+	lt = time(NULL);
+	ptr = localtime(&lt);
+	strftime(fnameMOCO, 80, "/tmp/timediffMOCO_%y%m%d_%H_%M_%S.txt", ptr);
+	strftime(fnameRECO, 80, "/tmp/timediffRECO_%y%m%d_%H_%M_%S.txt", ptr);
+	//strftime(fnameHEADER, 80, "/tmp/timediffHEADER_%y%m%d_%H_%M_%S.txt", ptr);
+    pluginRtExport->timediffMOCO = fopen(fnameMOCO, "w");
+	pluginRtExport->timediffRECO = fopen(fnameRECO, "w");
+	//pluginRtExport->headerFile = fopen(fnameHEADER, "w");
 	
 	
 	return (isis::image_io::FileFormat*) pluginRtExport;
