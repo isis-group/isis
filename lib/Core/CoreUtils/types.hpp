@@ -34,7 +34,7 @@ namespace _internal
 using namespace boost::mpl;
 
 /// the supported types as mpl-vector
-typedef vector23 < //increase this if a type is added (if >30 consider including vector40 above)
+typedef vector25 < //increase this if a type is added (if >30 consider including vector40 above)
 bool
 , int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t
 , float, double
@@ -42,6 +42,7 @@ bool
 , fvector4, dvector4, ivector4
 , ilist, dlist, slist
 , std::string, isis::util::Selection
+, std::complex<float>,std::complex<double>
 , boost::posix_time::ptime, boost::gregorian::date
 > types;
 

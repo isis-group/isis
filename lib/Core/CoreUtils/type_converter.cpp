@@ -32,6 +32,8 @@
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
+#include <complex>
+
 
 /// @cond _internal
 namespace isis
@@ -65,6 +67,13 @@ public:
 template<bool NUMERIC, bool SAME, typename SRC, typename DST> class ValueConverter : public ValueGenerator<SRC, DST>
 {
 public:
+	//uncomment this to see which conversions are not generated - be carefull, thats f***king much
+	static boost::shared_ptr<const ValueConverterBase> get() {
+		std::cout <<
+			"There will be no " << (SAME?"copy":NUMERIC?"numeric":"non-numeric") <<  " conversion for " <<
+			util::Value<SRC>::staticName() << " to " << util::Value<DST>::staticName() << std::endl;
+		return boost::shared_ptr<const ValueConverterBase>();
+	}
 	virtual ~ValueConverter() {}
 };
 /////////////////////////////////////////////////////////////////////////////
@@ -89,7 +98,6 @@ public:
 	}
 	virtual ~ValueConverter() {}
 };
-
 
 /////////////////////////////////////////////////////////////////////////////
 // Numeric version -- uses boost::numeric_cast
@@ -129,6 +137,42 @@ public:
 	}
 	virtual ~ValueConverter() {}
 };
+
+///////////////////////////////////////////////////////////////////////////////
+// Conversion for complex numbers
+/////////////////////////////////////////////////////////////////////////////////
+template<typename SRC, typename DST> class ValueConverter<false, false, std::complex<SRC>, std::complex<DST> > : public ValueGenerator<std::complex<SRC>, std::complex<DST> >
+{
+	ValueConverter() {
+		LOG( Debug, verbose_info ) << "Creating numeric converter from " << Value<SRC>::staticName() << " to " << Value<DST>::staticName();
+	};
+public:
+	static boost::shared_ptr<const ValueConverterBase> get() {
+		ValueConverter<false, false, std::complex<SRC>, std::complex<DST> > *ret = new ValueConverter<false, false, std::complex<SRC>, std::complex<DST> >;
+		return boost::shared_ptr<const ValueConverterBase>( ret );
+	}
+	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
+		typedef boost::numeric::converter <
+			DST, SRC,
+			boost::numeric::conversion_traits<DST, SRC>,
+			NumericOverflowHandler,
+			boost::numeric::RoundEven<SRC>
+		> converter;
+		NumericOverflowHandler::result = boost::numeric::cInRange;
+		const std::complex<SRC> &srcVal = src.castTo<std::complex<SRC> >();
+		std::complex<DST> &dstVal = dst.castTo<std::complex<DST> >();
+
+		const DST real=converter::convert( srcVal.real() );
+		if(NumericOverflowHandler::result!=boost::numeric::cInRange)
+			return NumericOverflowHandler::result;
+		const DST imag=converter::convert( srcVal.imag() );
+
+		dstVal = std::complex<DST>(real,imag);
+		return NumericOverflowHandler::result;
+	}
+	virtual ~ValueConverter() {}
+};
+
 
 /////////////////////////////////////////////////////////////////////////////
 // vector4 version -- uses ValueConverter on every element
