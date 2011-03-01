@@ -3,6 +3,7 @@
 #include <iostream>
 #include <GL/gl.h>
 #include <DataStorage/io_factory.hpp>
+#include <DataStorage/image.hpp>
 
 #include "common.hpp"
 
@@ -22,7 +23,7 @@ int main( int argc, char *argv[] )
 	app.setLog<isis::ViewerLog>( app.getLLMap()[app.parameters["dViewer"]->as<isis::util::Selection>()] );
 	app.setLog<isis::ViewerDebug>( app.getLLMap()[app.parameters["dViewer"]->as<isis::util::Selection>()] );
 	isis::util::slist fileList = app.parameters["in"];
-	isis::data::ImageList imgList = isis::data::IOFactory::load(fileList.front());
+	std::list<isis::data::Image> imgList = isis::data::IOFactory::load(fileList.front());
 	isis::viewer::MainWindow isisViewerMainWindow(imgList);
 	isisViewerMainWindow.show();
 	return app.getQApplication().exec();
