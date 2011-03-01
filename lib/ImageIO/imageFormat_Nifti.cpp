@@ -63,6 +63,14 @@ public:
 		LOG( ImageIoDebug, info ) << "create NiftiChunk";
 	}
 
+	//TODO: This is really weird staff - the gcc4.2 on MAC and RedHat is complaining about
+	// the private copy constructor because he cannot resolve the template constructor when creating NiftiChunk
+	// e.g. in retList.push_back( _internal::NiftiChunk::makeNiftiChunk( static_cast<uint8_t *> (ni->data), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 )  );
+	// That's completely crazy but this workaround is a first solution - we hope to find a better one
+	template<typename T, typename D> static data::Chunk makeNiftiChunk( T *src, D del, size_t width, size_t height, size_t slices, size_t timesteps )  {
+		return NiftiChunk( src, del, width, height, slices, timesteps );
+	}
+
 private:
 	NiftiChunk( const NiftiChunk & ); // no standard copy constructor
 	NiftiChunk &operator=( const NiftiChunk & ); // no copy operator
@@ -105,7 +113,7 @@ public:
 		return std::string( "fsl spm" );
 	}
 
-	std::string name()const {
+	std::string getName()const {
 		//TODO: wahrscheinlich sollten die Namen irgendwie so aussehen "mpg.cbs.nii"?
 		return "Nifti";
 	}
@@ -129,8 +137,8 @@ public:
 
 		// TODO: at the moment scaling not supported due to data type changes
 		if ( 1.0 != scale ) {
-			//          throwGenericError( std::string( "Scaling is not supported at the moment. Scale Factor: " ) + util::Type<float>( scale ).toString() );
-			LOG( ImageIoDebug, warning ) << "Scaling is not supported at the moment. Scale Factor: "  + util::Type<float>( scale ).toString();
+			//          throwGenericError( std::string( "Scaling is not supported at the moment. Scale Factor: " ) + util::Value<float>( scale ).toString() );
+			LOG( ImageIoDebug, warning ) << "Scaling is not supported at the moment. Scale Factor: "  + util::Value<float>( scale ).toString();
 		}
 
 		LOG( ImageIoDebug, isis::info ) << "datatype to load from nifti " << ni->datatype;
@@ -138,31 +146,31 @@ public:
 
 		switch ( ni->datatype ) {
 		case DT_UINT8:
-			retList.push_back(_internal::NiftiChunk( static_cast<uint8_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
+			retList.push_back( _internal::NiftiChunk::makeNiftiChunk( static_cast<uint8_t *> ( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 )  );
 			break;
 		case DT_INT8:
-			retList.push_back(_internal::NiftiChunk( static_cast<int8_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
+			retList.push_back( _internal::NiftiChunk::makeNiftiChunk( static_cast<int8_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
 			break;
 		case DT_INT16:
-			retList.push_back(_internal::NiftiChunk( static_cast<int16_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
+			retList.push_back( _internal::NiftiChunk::makeNiftiChunk( static_cast<int16_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
 			break;
 		case DT_UINT16:
-			retList.push_back(_internal::NiftiChunk( static_cast<uint16_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
+			retList.push_back( _internal::NiftiChunk::makeNiftiChunk( static_cast<uint16_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
 			break;
 		case DT_UINT32:
-			retList.push_back(_internal::NiftiChunk( static_cast<uint32_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
+			retList.push_back( _internal::NiftiChunk::makeNiftiChunk( static_cast<uint32_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
 			break;
 		case DT_INT32:
-			retList.push_back(_internal::NiftiChunk( static_cast<int32_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
+			retList.push_back( _internal::NiftiChunk::makeNiftiChunk( static_cast<int32_t *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
 			break;
 		case DT_FLOAT32:
-			retList.push_back(_internal::NiftiChunk( static_cast<float *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
+			retList.push_back( _internal::NiftiChunk::makeNiftiChunk( static_cast<float *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
 			break;
 		case DT_FLOAT64:
-			retList.push_back(_internal::NiftiChunk( static_cast<double *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
+			retList.push_back( _internal::NiftiChunk::makeNiftiChunk( static_cast<double *>( ni->data ), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 ) );
 			break;
 		default:
-			throwGenericError( std::string( "Unsupported datatype " ) + util::Type<int>( ni->datatype ).toString() );
+			throwGenericError( std::string( "Unsupported datatype " ) + util::Value<int>( ni->datatype ).toString() );
 		}
 
 		// don't forget to take the properties with
@@ -175,7 +183,8 @@ public:
 		//          retList.push_back( *dst );
 		//          return 1;
 		//      }
-		// push the completed NiftiChunk into the list
+		//
+
 		return 1; // if there was an error, we wouldn't get here
 	}
 
@@ -198,7 +207,7 @@ public:
 		ni.data = NULL;
 		ni.fname = const_cast<char *>( filename.c_str() );
 		//orientation in isis LPS - but in nifti everything relative to RAS
-		// - so let's change read/phase direction and sign of indexOrigin
+		// - so let's change row/column direction and sign of indexOrigin
 		//now we try to transform
 		boost::numeric::ublas::matrix<float> matrix( 3, 3 );
 		matrix( 0, 0 ) = -1;
@@ -236,7 +245,7 @@ public:
 		LOG( ImageIoLog, isis::info ) << "image typename: " << image.getMajorTypeName();
 
 		switch ( image.getMajorTypeID() ) {
-		case data::TypePtr<int8_t>::staticID:
+		case data::ValuePtr<int8_t>::staticID:
 
 			if ( dialect == "fsl" ) { // fsl not compatible with int8, convert to uint8
 				data::TypedImage<uint8_t> fslCopy( image );
@@ -248,15 +257,15 @@ public:
 			ni.datatype = DT_INT8;
 			copyDataToNifti<int8_t>( image, ni );
 			break;
-		case data::TypePtr<uint8_t>::staticID:
+		case data::ValuePtr<uint8_t>::staticID:
 			ni.datatype = DT_UINT8;
 			copyDataToNifti<uint8_t>( image, ni );
 			break;
-		case data::TypePtr<int16_t>::staticID:
+		case data::ValuePtr<int16_t>::staticID:
 			ni.datatype = DT_INT16;
 			copyDataToNifti<int16_t>( image, ni );
 			break;
-		case data::TypePtr<uint16_t>::staticID:
+		case data::ValuePtr<uint16_t>::staticID:
 
 			if ( dialect == "fsl" ) {
 				//              image.print( std::cout );
@@ -269,11 +278,11 @@ public:
 			}
 
 			break;
-		case data::TypePtr<int32_t>::staticID:
+		case data::ValuePtr<int32_t>::staticID:
 			ni.datatype = DT_INT32;
 			copyDataToNifti<int32_t>( image, ni );
 			break;
-		case data::TypePtr<uint32_t>::staticID:
+		case data::ValuePtr<uint32_t>::staticID:
 
 			if ( dialect == "fsl" ) {
 				data::TypedImage<int32_t> fslCopy( image );
@@ -285,11 +294,11 @@ public:
 			ni.datatype = DT_UINT32;
 			copyDataToNifti<uint16_t>( image, ni );
 			break;
-		case data::TypePtr<float>::staticID:
+		case data::ValuePtr<float>::staticID:
 			ni.datatype = DT_FLOAT32;
 			copyDataToNifti<float>( image, ni );
 			break;
-		case data::TypePtr<double>::staticID:
+		case data::ValuePtr<double>::staticID:
 			ni.datatype = DT_FLOAT64;
 			copyDataToNifti<double>( image, ni );
 			break;
@@ -310,9 +319,9 @@ public:
 	 ****************************************/
 private:
 
-	void geometryFromNifti( util::TypeValue &read, util::TypeValue &phase, util::TypeValue &slice, const mat44 &geo, const util::fvector4 &div ) {
-		read->castTo<util::fvector4>() = util::fvector4( geo.m[0][0], geo.m[1][0], geo.m[2][0], geo.m[3][0] ) / div[0];
-		phase->castTo<util::fvector4>() = util::fvector4( geo.m[0][1], geo.m[1][1], geo.m[2][1], geo.m[3][1] ) / div[1];
+	void geometryFromNifti( util::PropertyValue &row, util::PropertyValue &column, util::PropertyValue &slice, const mat44 &geo, const util::fvector4 &div ) {
+		row->castTo<util::fvector4>() = util::fvector4( geo.m[0][0], geo.m[1][0], geo.m[2][0], geo.m[3][0] ) / div[0];
+		column->castTo<util::fvector4>() = util::fvector4( geo.m[0][1], geo.m[1][1], geo.m[2][1], geo.m[3][1] ) / div[1];
 		slice->castTo<util::fvector4>() = util::fvector4( geo.m[0][2], geo.m[1][2], geo.m[2][2], geo.m[3][2] ) / div[2];
 	}
 
@@ -326,7 +335,7 @@ private:
 			//retChunk.setPropertyAs("acquisitionTime", );
 			retChunk.setPropertyAs<uint32_t>( "acquisitionNumber", t );
 			retChunk.setPropertyAs<uint16_t>( "sequenceNumber", 1 );
-			// in nifti everything should be relative to RAS, in isis we use LPS coordinates - normally change read/phase dir and sign of indexOrigin
+			// in nifti everything should be relative to RAS, in isis we use LPS coordinates - normally change row/column dir and sign of indexOrigin
 			//TODO: has to be tested with different niftis - don't trust them!!!!!!!!!
 			retChunk.setPropertyAs( "indexOrigin", util::fvector4( ni.qoffset_x, ni.qoffset_y, ni.qoffset_z, 0 ) );
 
@@ -336,37 +345,37 @@ private:
 
 			if( ni.sform_code ) {
 				geometryFromNifti(
-					retChunk.setPropertyAs( "readVec", util::fvector4() ),
-					retChunk.setPropertyAs( "phaseVec", util::fvector4() ),
+					retChunk.setPropertyAs( "rowVec", util::fvector4() ),
+					retChunk.setPropertyAs( "columnVec", util::fvector4() ),
 					retChunk.setPropertyAs( "sliceVec", util::fvector4() ),
 					ni.sto_xyz, voxel_size
 				);
 				LOG( Debug, info ) << "Using sto_xyz as primary orientation "
-								   << retChunk.propertyValue( "readVec" ) << " " << retChunk.propertyValue( "phaseVec" ) << retChunk.propertyValue( "sliceVec" );
+								   << retChunk.propertyValue( "rowVec" ) << " " << retChunk.propertyValue( "columnVec" ) << retChunk.propertyValue( "sliceVec" );
 
 				if( ni.qform_code ) {
 					geometryFromNifti(
-						retChunk.setPropertyAs( "nifti/qreadVec", util::fvector4() ),
-						retChunk.setPropertyAs( "nifti/qphaseVec", util::fvector4() ),
+						retChunk.setPropertyAs( "nifti/qrowVec", util::fvector4() ),
+						retChunk.setPropertyAs( "nifti/qcolumnVec", util::fvector4() ),
 						retChunk.setPropertyAs( "nifti/qsliceVec", util::fvector4() ),
 						ni.qto_xyz, voxel_size
 					);
 					LOG( Debug, info ) << "Using qto_xyz as secondary orientation "
-									   << retChunk.propertyValue( "nifti/qreadVec" ) << " " << retChunk.propertyValue( "nifti/qphaseVec" ) << retChunk.propertyValue( "nifti/qsliceVec" );
+									   << retChunk.propertyValue( "nifti/qrowVec" ) << " " << retChunk.propertyValue( "nifti/qcolumnVec" ) << retChunk.propertyValue( "nifti/qsliceVec" );
 				}
 			} else if( ni.qform_code ) {
 				geometryFromNifti(
-					retChunk.setPropertyAs( "readVec", util::fvector4() ),
-					retChunk.setPropertyAs( "phaseVec", util::fvector4() ),
+					retChunk.setPropertyAs( "rowVec", util::fvector4() ),
+					retChunk.setPropertyAs( "columnVec", util::fvector4() ),
 					retChunk.setPropertyAs( "sliceVec", util::fvector4() ),
 					ni.qto_xyz, voxel_size
 				);
 				LOG( Debug, info ) << "Using qto_xyz as primary orientation "
-								   << retChunk.propertyValue( "readVec" ) << " " << retChunk.propertyValue( "phaseVec" ) << retChunk.propertyValue( "sliceVec" );
+								   << retChunk.propertyValue( "rowVec" ) << " " << retChunk.propertyValue( "columnVec" ) << retChunk.propertyValue( "sliceVec" );
 			} else {
 				LOG( Runtime, warning ) << "Neigther sform_code nor qform_code are set, using identity matrix for geometry";
-				retChunk.setPropertyAs( "readVec",  util::fvector4( 1, 0, 0 ) );
-				retChunk.setPropertyAs( "phaseVec", util::fvector4( 0, 1, 0 ) );
+				retChunk.setPropertyAs( "rowVec",  util::fvector4( 1, 0, 0 ) );
+				retChunk.setPropertyAs( "columnVec", util::fvector4( 0, 1, 0 ) );
 				retChunk.setPropertyAs( "sliceVec", util::fvector4( 0, 0, 1 ) );
 			}
 
@@ -395,9 +404,9 @@ private:
 			//just some LOGS
 			LOG( ImageIoLog, info ) << "dims at all " << dimensions;
 			LOG( ImageIoLog, info ) << "Offset values from nifti" << offsets;
-			LOG( ImageIoLog, info ) << "FOV read/phase/slice/voxelsize:"
-									<< retChunk.propertyValue( "readVec" ).toString( false )
-									<< " / " << retChunk.propertyValue( "phaseVec" ).toString( false )
+			LOG( ImageIoLog, info ) << "FOV row/column/slice/voxelsize:"
+									<< retChunk.propertyValue( "rowVec" ).toString( false )
+									<< " / " << retChunk.propertyValue( "columnVec" ).toString( false )
 									<< " / " << retChunk.propertyValue( "sliceVec" ).toString( false )
 									<< " / " << voxel_size;
 		}
@@ -513,11 +522,11 @@ private:
 
 	template<typename T>
 	void copyDataToNifti( const data::Image &image, nifti_image &ni ) {
-		ni.data = malloc( image.getBytesPerVoxel() * image.volume() );
+		ni.data = malloc( image.getBytesPerVoxel() * image.getVolume() );
 		T *refNii = ( T * ) ni.data;
 		const util::FixedVector<size_t, 4> csize = image.getChunk( 0, 0 ).getSizeAsVector();
 		const util::FixedVector<size_t, 4> isize = image.getSizeAsVector();
-		const data::scaling_pair scale = image.getScalingTo( data::TypePtr<T>::staticID );
+		const data::scaling_pair scale = image.getScalingTo( data::ValuePtr<T>::staticID );
 
 		for ( size_t t = 0; t < isize[3]; t += csize[3] ) {
 			for ( size_t z = 0; z < isize[2]; z += csize[2] ) {
@@ -526,7 +535,7 @@ private:
 						const size_t dim[] = {x, y, z, t};
 						const data::Chunk ch = image.getChunkAs<T>( scale, x, y, z, t );
 						T *target = refNii + image.getLinearIndex( dim );
-						ch.getTypePtr<T>().copyToMem( 0, ch.volume() - 1, target );
+						ch.getValuePtr<T>().copyToMem( 0, ch.getVolume() - 1, target );
 					}
 				}
 			}
@@ -539,10 +548,10 @@ private:
 		ni.cal_max = minmax.second;
 	}
 
-	void geometryToNifti( const util::fvector4 &read, const util::fvector4 &phase, const util::fvector4 &slice, const util::fvector4 &offset, mat44 &geo, const util::fvector4 &factor ) {
+	void geometryToNifti( const util::fvector4 &row, const util::fvector4 &column, const util::fvector4 &slice, const util::fvector4 &offset, mat44 &geo, const util::fvector4 &factor ) {
 		for ( int y = 0; y < 3; y++ ) {
-			geo.m[y][0] = read[y] * factor[0];
-			geo.m[y][1] = phase[y] * factor[1];
+			geo.m[y][0] = row[y] * factor[0];
+			geo.m[y][1] = column[y] * factor[1];
 			geo.m[y][2] = slice[y] * factor[2];
 			geo.m[y][3] = offset[y];
 		}
@@ -579,14 +588,14 @@ private:
 		ni.time_units = NIFTI_UNITS_MSEC;
 		util::fvector4 dimensions = image.getSizeAsVector();
 		LOG( ImageIoLog, info ) << dimensions;
-		ni.ndim = ni.dim[0] = image.relevantDims();
+		ni.ndim = ni.dim[0] = image.getRelevantDims();
 		ni.nx = ni.dim[1] = dimensions[0];
 		ni.ny = ni.dim[2] = dimensions[1];
 		ni.nz = ni.dim[3] = dimensions[2];
 		ni.nt = ni.dim[4] = dimensions[3];
-		ni.nvox = image.volume();
-		util::fvector4 readVec = image.getPropertyAs<util::fvector4>( "readVec" );
-		util::fvector4 phaseVec = image.getPropertyAs<util::fvector4>( "phaseVec" );
+		ni.nvox = image.getVolume();
+		util::fvector4 rowVec = image.getPropertyAs<util::fvector4>( "rowVec" );
+		util::fvector4 columnVec = image.getPropertyAs<util::fvector4>( "columnVec" );
 		util::fvector4 sliceVec = image.getPropertyAs<util::fvector4>( "sliceVec" );
 		util::fvector4 indexOrigin = image.getPropertyAs<util::fvector4>( "indexOrigin" );
 
@@ -630,16 +639,16 @@ private:
 		//create space tranformation matrices - transforms the space when reading _NOT_ the data
 		// thus ni.qto_xyz describes the orientation of the scanner space in the image space, not the orientation of image in the scanner space
 		//      ni.sform_code = ni.qform_code = NIFTI_XFORM_SCANNER_ANAT;//set scanner aligned space from nifti1.h
-		LOG( Debug, info ) << "ReadVec " << readVec << "  phaseVec" << phaseVec << "sliceVec" << sliceVec;
+		LOG( Debug, info ) << "rowVec " << rowVec << "  columnVec" << columnVec << "sliceVec" << sliceVec;
 
 
 		if( ni.sform_code ) { // if sform_code was set - sform was used as geometry
-			geometryToNifti( readVec, phaseVec, sliceVec, indexOrigin, ni.sto_xyz, voxelSizeVector + voxelGap );
+			geometryToNifti( rowVec, columnVec, sliceVec, indexOrigin, ni.sto_xyz, voxelSizeVector + voxelGap );
 
 			if( ni.qform_code ) { // if both was set - qform would be stored in "nifti/"
 				geometryToNifti(
-					image.getPropertyAs<util::fvector4>( "nifti/qreadVec" ),
-					image.getPropertyAs<util::fvector4>( "nifti/qphaseVec" ),
+					image.getPropertyAs<util::fvector4>( "nifti/qrowVec" ),
+					image.getPropertyAs<util::fvector4>( "nifti/qcolumnVec" ),
 					image.getPropertyAs<util::fvector4>( "nifti/qsliceVec" ),
 					indexOrigin, ni.qto_xyz, util::fvector4( 1, 1, 1 )
 				);
@@ -648,7 +657,7 @@ private:
 			if( !ni.qform_code ) //if none was set, default qform to NIFTI_XFORM_SCANNER_ANAT
 				ni.qform_code = NIFTI_XFORM_SCANNER_ANAT;
 
-			geometryToNifti( readVec, phaseVec, sliceVec, indexOrigin, ni.qto_xyz, util::fvector4( 1, 1, 1 ) );
+			geometryToNifti( rowVec, columnVec, sliceVec, indexOrigin, ni.qto_xyz, util::fvector4( 1, 1, 1 ) );
 		}
 
 		if( ni.qform_code ) {
@@ -660,9 +669,9 @@ private:
 				NULL, NULL, NULL,
 				&ni.qfac );
 
-			LOG( Debug, info ) << "ni.qto_xyz:" << util::list2string( ni.qto_xyz.m[0], ni.qto_xyz.m[0] + 3 );
-			LOG( Debug, info ) << "ni.qto_xyz:" << util::list2string( ni.qto_xyz.m[1], ni.qto_xyz.m[1] + 3 );
-			LOG( Debug, info ) << "ni.qto_xyz:" << util::list2string( ni.qto_xyz.m[2], ni.qto_xyz.m[2] + 3 );
+			LOG( Debug, info ) << "ni.qto_xyz:" << util::listToString( ni.qto_xyz.m[0], ni.qto_xyz.m[0] + 3 );
+			LOG( Debug, info ) << "ni.qto_xyz:" << util::listToString( ni.qto_xyz.m[1], ni.qto_xyz.m[1] + 3 );
+			LOG( Debug, info ) << "ni.qto_xyz:" << util::listToString( ni.qto_xyz.m[2], ni.qto_xyz.m[2] + 3 );
 			LOG( Debug, info ) << "ni.qfac:" << ni.qfac;
 		}
 	}

@@ -124,13 +124,13 @@ public:
 			std::set<std::string> ret;
 			data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( FileFormat::makeBasename( filename ).first );
 			BOOST_FOREACH( data::IOFactory::FileFormatList::const_reference ref, formats ) {
-				const std::list<std::string> dias = util::string2list<std::string>( ref->dialects( filename ) );
+				const std::list<std::string> dias = util::stringToList<std::string>( ref->dialects( filename ) );
 				ret.insert( dias.begin(), dias.end() );
 			}
-			return util::list2string( ret.begin(), ret.end(), ",", "", "" );
+			return util::listToString( ret.begin(), ret.end(), ",", "", "" );
 		}
 	}
-	std::string name()const {return "compression proxy for other formats";}
+	std::string getName()const {return "compression proxy for other formats";}
 
 	virtual std::pair<std::string, std::string> makeBasename( const std::string &filename )const {
 		const std::pair<std::string, std::string> proxyBase = FileFormat::makeBasename( filename ); // get rid of the the .gz
@@ -162,14 +162,17 @@ public:
 
 		file_uncompress( filename, tmpfile.file_string() );
 
-		std::list<data::Chunk>::iterator prev=chunks.end();--prev;
+		std::list<data::Chunk>::iterator prev = chunks.end();
+
+		--prev;
 
 		int ret = data::IOFactory::load( chunks, tmpfile.string(), "", dialect );
 
 		if( ret ) {
 			prev++;
-			LOG( Debug, info ) <<  "Setting source of all " << std::distance(prev,chunks.end()) << " chunks to " << util::MSubject( filename );
-			for( ;prev!=chunks.end();++prev ) {
+			LOG( Debug, info ) <<  "Setting source of all " << std::distance( prev, chunks.end() ) << " chunks to " << util::MSubject( filename );
+
+			for( ; prev != chunks.end(); ++prev ) {
 				prev->setPropertyAs( "source", filename );
 			}
 		}

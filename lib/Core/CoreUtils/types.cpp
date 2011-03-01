@@ -29,14 +29,14 @@ namespace util
 {
 
 /*
- * Define types for the Type<>-System here.
+ * Define types for the Value<>-System here.
  * There must be a streaming output available for every type used here.
  * template<typename charT, typename traits,typename TYPE > basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits> &out,const TYPE& s)
  */
 
 
 #define DEF_TYPE(TYPE,NAME)  \
-	template<> const char Type<TYPE>::m_typeName[]=#NAME;
+	template<> const char Value<TYPE>::m_typeName[]=#NAME
 
 DEF_TYPE( bool, boolean );
 
@@ -55,8 +55,8 @@ DEF_TYPE( uint64_t, u64bit );
 DEF_TYPE( float, float );
 DEF_TYPE( double, double );
 
-DEF_TYPE( rgb_color24, color<u8bit> );
-DEF_TYPE( rgb_color48, color<u16bit> );
+DEF_TYPE( color24, color24 );
+DEF_TYPE( color48, color48 );
 
 DEF_TYPE( fvector4, fvector4 );
 DEF_TYPE( dvector4, dvector4 );
@@ -75,30 +75,30 @@ namespace _internal
 {
 struct type_lister {
 	std::map< unsigned short, std::string > &m_map;
-	bool m_withTypes, m_withTypePtrs;
-	type_lister( std::map< unsigned short, std::string > &map, bool withTypes, bool withTypePtrs ): m_map( map ), m_withTypes( withTypes ), m_withTypePtrs( withTypePtrs ) {}
+	bool m_withValues, m_withValuePtrs;
+	type_lister( std::map< unsigned short, std::string > &map, bool withValues, bool withValuePtrs ): m_map( map ), m_withValues( withValues ), m_withValuePtrs( withValuePtrs ) {}
 	template<typename SRC> void operator()( SRC ) {//will be called by the mpl::for_each
-		if( m_withTypes )m_map.insert( std::make_pair( Type<SRC>::staticID, Type<SRC>::staticName() ) );
+		if( m_withValues )m_map.insert( std::make_pair( Value<SRC>::staticID, Value<SRC>::staticName() ) );
 
-		if( m_withTypePtrs )m_map.insert( std::make_pair( data::TypePtr<SRC>::staticID, data::TypePtr<SRC>::staticName() ) );
+		if( m_withValuePtrs )m_map.insert( std::make_pair( data::ValuePtr<SRC>::staticID, data::ValuePtr<SRC>::staticName() ) );
 	}
 };
 
 }
 
-std::map< unsigned short, std::string > getTypeMap( bool withTypes, bool withTypePtrs )
+std::map< unsigned short, std::string > getTypeMap( bool withValues, bool withValuePtrs )
 {
 	std::map< unsigned short, std::string > ret;
-	boost::mpl::for_each<_internal::types>( _internal::type_lister( ret, withTypes, withTypePtrs ) );
+	boost::mpl::for_each<_internal::types>( _internal::type_lister( ret, withValues, withValuePtrs ) );
 	return ret;
 }
 
-std::map< std::string, unsigned short > getTransposedTypeMap( bool withTypes, bool withTypePtrs )
+std::map< std::string, unsigned short > getTransposedTypeMap( bool withValues, bool withValuePtrs )
 {
 	typedef std::map< std::string, unsigned short> transposedMapType;
 	typedef std::map< unsigned short, std::string > mapType;
 	transposedMapType ret;
-	BOOST_FOREACH( mapType::const_reference ref, util::getTypeMap( withTypes, withTypePtrs ) ) {
+	BOOST_FOREACH( mapType::const_reference ref, util::getTypeMap( withValues, withValuePtrs ) ) {
 		ret[ref.second] = ref.first;
 	}
 	return ret;

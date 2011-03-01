@@ -35,6 +35,7 @@ BOOST_PYTHON_MODULE( _data )
 	.def( "autoload", &isis::data::IOApplication::autoload )
 	.def( "autowrite", &_IOApplication::_autowrite )
 	.def( "images", &_IOApplication::_images )
+	.def( "setDescroption" , &_IOApplication::_setDescription );
 	;
 	//#######################################################################################
 	//  Image
@@ -47,7 +48,8 @@ BOOST_PYTHON_MODULE( _data )
 	.def( "setVoxel", ( bool ( ::_Image:: * )( const isis::util::ivector4 &, const float & ) ) ( &_Image::_setVoxel ), ( arg( "coord" ), arg( "value" ) ) )
 	.def( "setVoxel", ( bool ( ::_Image:: * )( const size_t &, const size_t &, const size_t &, const size_t &, const float & ) ) ( &_Image::_setVoxel ), ( arg( "first" ), arg( "second" ), arg( "third" ), arg( "fourth" ), arg( "value" ) ) )
 	.def( "getSizeAsVector", &_Image::_getSizeAsVector )
-	.def( "getChunkList", &_Image::_getChunkList )
+	.def( "getChunkList", &_Image::_getChunksAsVector )
+	.def( "getChunksAsList", &_Image::_getChunksAsVector )
 	.def( "getMajorTypeID", &isis::data::Image::getMajorTypeID )
 	.def( "getChunkAt", &isis::data::Image::getChunkAt )
 	.def( "getChunk", ( isis::data::Chunk ( ::isis::data::Image:: * )( size_t, size_t, size_t, size_t, bool ) ) ( &isis::data::Image::getChunk ), ( arg( "first" ), arg( "second" ), arg( "third" ), arg( "fourth" ), arg( "copy_metadata" ) ) )
@@ -110,7 +112,7 @@ BOOST_PYTHON_MODULE( _data )
 	.def( "__delitem__", &std_list<CList>::del )
 	;
 	//#######################################################################################
-	//	IOFactory
+	//  IOFactory
 	//#######################################################################################
 	class_<_IOFactory>( "IOFactory", no_init )
  	.def( "writeImage", &_IOFactory::_writeImage )
@@ -128,6 +130,6 @@ BOOST_PYTHON_MODULE( _data )
 	.def( "chunkListToImageList", &_IOFactory::_chunkListToImageList )
 	.staticmethod( "chunkListToImageList" )
 	;
-	
+
 }
 #endif

@@ -28,9 +28,11 @@ BOOST_PYTHON_MODULE( _core )
 	.staticmethod( "getCoreVersion" )
 	//virtual bool init( int argc, char **argv, bool exitOnError = true );
 	.def( "init", &_Application::init )
-	.def( "addParameter", &_Application::addParameter )
-	.def( "setNeeded", &_Application::setNeeded )
-	.def( "setHidden", &_Application::setHidden )
+	.def( "addParameter", &_Application::_addParameter )
+	.def( "setNeeded", &_Application::_setNeeded )
+	.def( "setHidden", &_Application::_setHidden )
+	.def( "setDescription", &_Application::_setDescription )
+	.def( "getParameterAsString", &_Application::_getParameterAsString )
 	;
 	//#######################################################################################
 	//  PropertyMap
@@ -48,9 +50,9 @@ BOOST_PYTHON_MODULE( _core )
 	.def( "setPropertyAs", &_PropertyMap::_setPropertyAs )
 	;
 	//#######################################################################################
-	//  TypeValue
+	//  PropertyValue
 	//#######################################################################################
-	class_<isis::util::TypeValue, _TypeValue>( "TypeValue", init<>() )
+	class_<isis::util::PropertyValue, _TypeValue>( "PropertyValue", init<>() )
 	.def( init<_TypeValue>() )
 	.def( "toString", &_TypeValue::_toString )
 	;

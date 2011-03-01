@@ -49,14 +49,14 @@ int main( int argc, char **argv )
 	std::list<data::Image> finImageList;
 	unsigned int dim = alongMap[app.parameters["along"].toString()];
 	//go through every image
-	BOOST_FOREACH( data::Image &refImage, app.images ) {
+	BOOST_FOREACH( data::Image & refImage, app.images ) {
 		//map from pyhisical into image space
 		util::fvector4 sliceVec = refImage.getPropertyAs<util::fvector4>( "sliceVec" );
-		util::fvector4 phaseVec = refImage.getPropertyAs<util::fvector4>( "phaseVec" );
-		util::fvector4 readVec = refImage.getPropertyAs<util::fvector4>( "readVec" );
-		util::fvector4 f1( readVec[0], phaseVec[0], sliceVec[0], 0  );
-		util::fvector4 f2( readVec[1], phaseVec[1], sliceVec[1], 0  );
-		util::fvector4 f3( readVec[2], phaseVec[2], sliceVec[2], 0  );
+		util::fvector4 columnVec = refImage.getPropertyAs<util::fvector4>( "columnVec" );
+		util::fvector4 rowVec = refImage.getPropertyAs<util::fvector4>( "rowVec" );
+		util::fvector4 f1( rowVec[0], columnVec[0], sliceVec[0], 0  );
+		util::fvector4 f2( rowVec[1], columnVec[1], sliceVec[1], 0  );
+		util::fvector4 f3( rowVec[2], columnVec[2], sliceVec[2], 0  );
 
 		if( dim == 3 ) {
 			dim = getBiggestVecElem( f1 );
@@ -85,34 +85,34 @@ int main( int argc, char **argv )
 
 		if ( app.parameters["swap"].toString() == "image" || app.parameters["swap"].toString() == "both" ) {
 			switch ( refImage.getMajorTypeID() ) {
-			case data::TypePtr<uint8_t>::staticID:
+			case data::ValuePtr<uint8_t>::staticID:
 				newImage = voxelSwapZ<uint8_t>( refImage, dim );
 				break;
-			case data::TypePtr<int8_t>::staticID:
+			case data::ValuePtr<int8_t>::staticID:
 				newImage = voxelSwapZ<int8_t>( refImage, dim );
 				break;
-			case data::TypePtr<uint16_t>::staticID:
+			case data::ValuePtr<uint16_t>::staticID:
 				newImage = voxelSwapZ<uint16_t>( refImage, dim );
 				break;
-			case data::TypePtr<int16_t>::staticID:
+			case data::ValuePtr<int16_t>::staticID:
 				newImage = voxelSwapZ<int16_t>( refImage, dim );
 				break;
-			case data::TypePtr<uint32_t>::staticID:
+			case data::ValuePtr<uint32_t>::staticID:
 				newImage = voxelSwapZ<uint32_t>( refImage, dim );
 				break;
-			case data::TypePtr<int32_t>::staticID:
+			case data::ValuePtr<int32_t>::staticID:
 				newImage = voxelSwapZ<int32_t>( refImage, dim );
 				break;
-			case data::TypePtr<uint64_t>::staticID:
+			case data::ValuePtr<uint64_t>::staticID:
 				newImage = voxelSwapZ<uint64_t>( refImage, dim );
 				break;
-			case data::TypePtr<int64_t>::staticID:
+			case data::ValuePtr<int64_t>::staticID:
 				newImage = voxelSwapZ<int64_t>( refImage, dim );
 				break;
-			case data::TypePtr<float>::staticID:
+			case data::ValuePtr<float>::staticID:
 				newImage = voxelSwapZ<float>( refImage, dim );
 				break;
-			case data::TypePtr<double>::staticID:
+			case data::ValuePtr<double>::staticID:
 				newImage = voxelSwapZ<double>( refImage, dim );
 				break;
 			default:
@@ -122,7 +122,7 @@ int main( int argc, char **argv )
 
 		if ( app.parameters["swap"].toString() == "both" || app.parameters["swap"].toString() == "space" ) {
 			newImage.transformCoords( T );
-			std::vector<boost::shared_ptr< data::Chunk> > chList = newImage.getChunkList();
+			std::vector<boost::shared_ptr< data::Chunk> > chList = newImage.getChunksAsVector();
 			BOOST_FOREACH( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef, chList ) {
 				chRef->transformCoords( T );
 			}

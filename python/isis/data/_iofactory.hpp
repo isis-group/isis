@@ -50,11 +50,12 @@ public:
 	
 private:
 	PyObject *self;
-		
+
 };
 
 
 
-}} //end namespace
+}
+} //end namespace
 
 #endif

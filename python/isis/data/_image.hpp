@@ -26,31 +26,31 @@ public:
 	_Image ( PyObject *p, const isis::data::Image &base ) : isis::data::Image( base ), self( p ), boost::python::wrapper< isis::data::Image >()  {}
 
 	float _voxel( const size_t &first, const size_t &second, const size_t &third, const size_t &fourth ) {
-		data::Chunk ch = this->getChunk(first, second, third, fourth, false);
-		
-		switch( ch.typeID() ) {
-		case data::TypePtr<int8_t>::staticID:
+		data::Chunk ch = this->getChunk( first, second, third, fourth, false );
+
+		switch( ch.getTypeID() ) {
+		case data::ValuePtr<int8_t>::staticID:
 			return isis::data::Image::voxel<int8_t>( first, second, third, fourth );
 			break;
-		case data::TypePtr<uint8_t>::staticID:
+		case data::ValuePtr<uint8_t>::staticID:
 			return isis::data::Image::voxel<uint8_t>( first, second, third, fourth );
 			break;
-		case data::TypePtr<int16_t>::staticID:
+		case data::ValuePtr<int16_t>::staticID:
 			return isis::data::Image::voxel<int16_t>( first, second, third, fourth );
 			break;
-		case data::TypePtr<uint16_t>::staticID:
+		case data::ValuePtr<uint16_t>::staticID:
 			return isis::data::Image::voxel<uint16_t>( first, second, third, fourth );
 			break;
-		case data::TypePtr<int32_t>::staticID:
+		case data::ValuePtr<int32_t>::staticID:
 			return isis::data::Image::voxel<int32_t>( first, second, third, fourth );
 			break;
-		case data::TypePtr<uint32_t>::staticID:
+		case data::ValuePtr<uint32_t>::staticID:
 			return isis::data::Image::voxel<uint32_t>( first, second, third, fourth );
 			break;
-		case data::TypePtr<float>::staticID:
+		case data::ValuePtr<float>::staticID:
 			return isis::data::Image::voxel<float>( first, second, third, fourth );
 			break;
-		case data::TypePtr<double>::staticID:
+		case data::ValuePtr<double>::staticID:
 			return isis::data::Image::voxel<double>( first, second, third, fourth );
 			break;
 		default:
@@ -63,38 +63,38 @@ public:
 
 
 	bool _setVoxel( const size_t &first, const size_t &second, const size_t &third, const size_t &fourth, const float &value ) {
-		data::Chunk ch = this->getChunk(first, second, third, fourth, false);
+		data::Chunk ch = this->getChunk( first, second, third, fourth, false );
 
-		switch( ch.typeID() ) {
-		case data::TypePtr<int8_t>::staticID:
+		switch( ch.getTypeID() ) {
+		case data::ValuePtr<int8_t>::staticID:
 			isis::data::Image::voxel<int8_t>( first, second, third, fourth ) = value;
 			return true;
 			break;
-		case data::TypePtr<uint8_t>::staticID:
+		case data::ValuePtr<uint8_t>::staticID:
 			isis::data::Image::voxel<uint8_t>( first, second, third, fourth ) = value;
 			return true;
 			break;
-		case data::TypePtr<int16_t>::staticID:
+		case data::ValuePtr<int16_t>::staticID:
 			isis::data::Image::voxel<int16_t>( first, second, third, fourth ) = value;
 			return true;
 			break;
-		case data::TypePtr<uint16_t>::staticID:
+		case data::ValuePtr<uint16_t>::staticID:
 			isis::data::Image::voxel<uint16_t>( first, second, third, fourth ) = value;
 			return true;
 			break;
-		case data::TypePtr<int32_t>::staticID:
+		case data::ValuePtr<int32_t>::staticID:
 			isis::data::Image::voxel<int32_t>( first, second, third, fourth ) = value;
 			return true;
 			break;
-		case data::TypePtr<uint32_t>::staticID:
+		case data::ValuePtr<uint32_t>::staticID:
 			isis::data::Image::voxel<uint32_t>( first, second, third, fourth ) = value;
 			return true;
 			break;
-		case data::TypePtr<float>::staticID:
+		case data::ValuePtr<float>::staticID:
 			isis::data::Image::voxel<float>( first, second, third, fourth ) = value;
 			return true;
 			break;
-		case data::TypePtr<double>::staticID:
+		case data::ValuePtr<double>::staticID:
 			isis::data::Image::voxel<double>( first, second, third, fourth ) = value;
 			return true;
 			break;
@@ -107,9 +107,9 @@ public:
 		return _setVoxel( coord[0], coord[1], coord[2], coord[3], value );
 	}
 
-	std::list<isis::data::Chunk> _getChunkList( void ) {
+	std::list<isis::data::Chunk> _getChunksAsVector( void ) {
 		std::list<isis::data::Chunk> retChunkList;
-		std::vector<boost::shared_ptr<isis::data::Chunk> > chunkList( this->getChunkList() );
+		std::vector<boost::shared_ptr<isis::data::Chunk> > chunkList( this->getChunksAsVector() );
 		BOOST_FOREACH( std::vector<boost::shared_ptr<isis::data::Chunk> >::reference ref, chunkList ) {
 			retChunkList.push_back( *ref );
 		}
@@ -193,39 +193,39 @@ public:
 			return this->spliceDownTo( isis::data::sliceDim );
 		} else if ( boost::iequals( dim, "timeDim" ) ) {
 			return this->spliceDownTo( isis::data::timeDim );
-		} else if ( boost::iequals( dim, "readDim" ) ) {
-			return this->spliceDownTo( isis::data::readDim );
-		} else if ( boost::iequals( dim, "phaseDim" ) ) {
-			return this->spliceDownTo( isis::data::phaseDim );
+		} else if ( boost::iequals( dim, "rowDim" ) ) {
+			return this->spliceDownTo( isis::data::rowDim );
+		} else if ( boost::iequals( dim, "columnDim" ) ) {
+			return this->spliceDownTo( isis::data::columnDim );
 		} else {
-			LOG( Runtime, error ) << dim << " is an unknown dimension. Possible dimensions are readDim, phaseDim, sliceDim and timeDim.";
+			LOG( Runtime, error ) << dim << " is an unknown dimension. Possible dimensions are rowDim, columnDim, sliceDim and timeDim.";
 			return 0;
 		}
 	}
 	isis::data::Image _deepCopy( void ) {
 		switch( this->getMajorTypeID() ) {
-		case data::TypePtr<int8_t>::staticID:
+		case data::ValuePtr<int8_t>::staticID:
 			return isis::data::MemImage<int8_t>( *this );
 			break;
-		case data::TypePtr<uint8_t>::staticID:
+		case data::ValuePtr<uint8_t>::staticID:
 			return isis::data::MemImage<uint8_t>( *this );
 			break;
-		case data::TypePtr<int16_t>::staticID:
+		case data::ValuePtr<int16_t>::staticID:
 			return isis::data::MemImage<int16_t>( *this );
 			break;
-		case data::TypePtr<uint16_t>::staticID:
+		case data::ValuePtr<uint16_t>::staticID:
 			return isis::data::MemImage<uint16_t>( *this );
 			break;
-		case data::TypePtr<int32_t>::staticID:
+		case data::ValuePtr<int32_t>::staticID:
 			return isis::data::MemImage<int32_t>( *this );
 			break;
-		case data::TypePtr<uint32_t>::staticID:
+		case data::ValuePtr<uint32_t>::staticID:
 			return isis::data::MemImage<uint32_t>( *this );
 			break;
-		case data::TypePtr<float>::staticID:
+		case data::ValuePtr<float>::staticID:
 			return isis::data::MemImage<float>( *this );
 			break;
-		case data::TypePtr<double>::staticID:
+		case data::ValuePtr<double>::staticID:
 			return isis::data::MemImage<double>( *this );
 			break;
 		default:

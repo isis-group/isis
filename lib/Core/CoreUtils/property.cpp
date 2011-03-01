@@ -17,27 +17,27 @@ namespace isis
 namespace util
 {
 
-bool &TypeValue::needed() { return m_needed;}
-bool TypeValue::needed()const { return m_needed;}
+bool &PropertyValue::needed() { return m_needed;}
+bool PropertyValue::isNeeded()const { return m_needed;}
 
 
-bool TypeValue::operator== ( const util::TypeValue &second )const
+bool PropertyValue::operator== ( const util::PropertyValue &second )const
 {
-	return !second.empty() && operator==( *second );
+	return !second.isEmpty() && operator==( *second );
 }
-bool TypeValue::operator!= ( const util::TypeValue &second )const
+bool PropertyValue::operator!= ( const util::PropertyValue &second )const
 {
-	return !( ( second.empty() && empty() ) || operator==( second ) );
-}
-
-
-bool TypeValue::operator== ( const _internal::TypeBase &second )const
-{
-	return !empty() && get()->operator==( second );
+	return !( ( second.isEmpty() && isEmpty() ) || operator==( second ) );
 }
 
 
-TypeValue::TypeValue ( bool _needed ) : m_needed( _needed ) {}
+bool PropertyValue::operator== ( const _internal::ValueBase &second )const
+{
+	return !isEmpty() && get()->operator==( second );
+}
+
+
+PropertyValue::PropertyValue ( bool _needed ) : m_needed( _needed ) {}
 
 
 }

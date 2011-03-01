@@ -17,8 +17,8 @@ int main()
 	for ( size_t tstep = 0; tstep < tsteps; tstep++ ) {
 		for ( size_t slice = 0; slice < slices; slice++ ) {
 			data::MemChunk<short> chk( slice_size, slice_size );
-			chk.setPropertyAs( "readVec", util::fvector4( 1, 0 ) );
-			chk.setPropertyAs( "phaseVec", util::fvector4( 0, 1 ) );
+			chk.setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
+			chk.setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
 			chk.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, slice ) );
 			chk.setPropertyAs( "acquisitionNumber", ++acq );
 			chk.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1 ) );
@@ -36,9 +36,9 @@ int main()
 
 	for ( size_t tstep = 0; tstep < tsteps; tstep++ )
 		for ( size_t slice = 0; slice < slices; slice++ )
-			for ( size_t phase = 0; phase < slice_size; phase++ )
-				for ( size_t read = 0; read < slice_size; read++ ) {
-					short &ref = img.voxel<short>( read, phase, slice, tstep );
+			for ( size_t column = 0; column < slice_size; column++ )
+				for ( size_t row = 0; row < slice_size; row++ ) {
+					short &ref = img.voxel<short>( row, column, slice, tstep );
 					ref = 42;
 				}
 

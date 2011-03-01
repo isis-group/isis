@@ -20,19 +20,19 @@ template<typename T> struct color {
 	}
 };
 
-typedef color<uint8_t> rgb_color24;
-typedef color<uint16_t> rgb_color48;
+typedef color<uint8_t> color24;
+typedef color<uint16_t> color48;
 }
 }
 
 namespace std
 {
-///Streaming output for color using isis::util::write_list
+///Streaming output for color using isis::util::listToOStream
 template<typename charT, typename traits, typename T>
 basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::color<T>& s )
 {
 	const T *const begin = &s.r;
-	isis::util::write_list( begin, begin + 3, out );
+	isis::util::listToOStream( begin, begin + 3, out );
 	return out;
 }
 }

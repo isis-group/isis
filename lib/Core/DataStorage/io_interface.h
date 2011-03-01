@@ -51,6 +51,7 @@ protected:
 	}
 	/// \return the file-suffixes the plugin supports
 	virtual std::string suffixes()const = 0;
+	static const float invalid_float;
 public:
 	static void throwGenericError( std::string desc );
 	static void throwSystemError( int err, std::string desc = "" );
@@ -63,9 +64,9 @@ public:
 	std::list<std::string> makeUniqueFilenames( const std::list<data::Image> &images, const std::string &namePattern )const;
 
 
-	static const float invalid_float;
 	/// \return the name of the plugin
-	virtual std::string name()const = 0;
+	virtual std::string getName()const = 0;
+
 	/**
 	 * get all file suffixes a plugin suggests to handle
 	 * The string returned by suffixes is tokenized at the spaces and every leading "." is stripped.
@@ -77,9 +78,11 @@ public:
 
 
 	/// \return the dialects the plugin supports
-	virtual std::string dialects( const std::string &filename )const {return std::string();};
+	virtual std::string dialects( const std::string &/*filename*/ )const {return std::string();};
+
 	/// \return if the plugin is not part of the official distribution
 	virtual bool tainted()const {return true;}
+
 	/**
 	 * Load data into the given chunk list.
 	 * I case of an error std::runtime_error will be thrown.
@@ -89,6 +92,7 @@ public:
 	 * \returns the amount of loaded chunks.
 	 */
 	virtual int load( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) = 0; //@todo should be locked
+
 	/**
 	 * Write a single image to a file.
 	 * I case of an error std::runtime_error will be thrown.
@@ -96,6 +100,7 @@ public:
 	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
 	 */
 	virtual void write( const data::Image &image, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) = 0;
+
 	/**
 	 * Write a image list.
 	 * I case of an error std::runtime_error will be thrown.
@@ -104,6 +109,7 @@ public:
 	 * \param dialect the dialect to be used when loading the file (use "" to not define a dialect)
 	 */
 	virtual void write( const std::list<data::Image> &images, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & );
+
 	virtual ~FileFormat() {}
 };
 }
