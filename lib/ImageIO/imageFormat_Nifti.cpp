@@ -70,7 +70,6 @@ public:
 	template<typename T, typename D> static data::Chunk makeNiftiChunk( T *src, D del, size_t width, size_t height, size_t slices, size_t timesteps )  {
 		return NiftiChunk( src, del, width, height, slices, timesteps );
 	}
-	
 private:
 	NiftiChunk( const NiftiChunk & ); // no standard copy constructor
 	NiftiChunk &operator=( const NiftiChunk & ); // no copy operator
