@@ -17,13 +17,10 @@ MainWindow::MainWindow( std::list<data::Image> imgList, QMainWindow *parent )
 	: QMainWindow( parent ),
 	  my_RefreshIntensityDisplay( *this ),
 	  my_RefreshCoordsDisplay( *this ),
-	  viewAxial(new QGLView ),
-	  viewSagittal(new QGLView ),
-	  viewCoronal(new QGLView )
+	  viewAxial(new QGLView( imgList) )
 {
 	ui.setupUi( this );
 	ui.gridLayout->addWidget( viewAxial );
-	viewAxial->setImage( imgList );
 
 }
 

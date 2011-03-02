@@ -31,7 +31,7 @@ class QGLView : public QGLWidget
 {
 	Q_OBJECT
 public:
-	QGLView( QWidget *parent = 0);
+	QGLView( std::list<data::Image> ,QWidget *parent = 0);
 	void setImage( std::list<data::Image> img ) { m_Image = img.front(); };
 
 public Q_SLOTS:

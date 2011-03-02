@@ -22,72 +22,57 @@
 namespace isis {
 namespace viewer {
 	
-QGLView::QGLView( QWidget *parent )
-	: QGLWidget( parent ),
-	texname()
+QGLView::QGLView( std::list<data::Image> imgList, QWidget *parent )
+	: QGLWidget( parent ), 
+	texname(),
+	m_Image( imgList.front() )
 {
-		QObject::connect( this, SIGNAL( mousePressEvent(QMouseEvent*) ), this, SLOT( paint() ) );
+	
+	QObject::connect( this, SIGNAL( mousePressEvent(QMouseEvent*) ), this, SLOT( paint() ) );
 }
 
 
 void QGLView::initializeGL()
 {	
 	boost::shared_ptr<data::Chunk> ch = m_Image.getChunksAsVector().at(0);
-	u_int32_t checkImage[ch->getSizeAsVector()[0]][ch->getSizeAsVector()[1]][ch->getSizeAsVector()[2]];
-	int i,j,c;
-	u_int32_t ptr = ch->voxel<u_int32_t>(0);
-	for (i=0;i<ch->getSizeAsVector()[0];i++) 
-	{
-		for (j=0;j<ch->getSizeAsVector()[1];j++)
-		{
-			
-			for(unsigned short rgba=0;rgba<4;rgba++) 
-			{
-				std::cout << ptr << std::endl;
-				checkImage[i][j][rgba] = ptr;
-			}
-			ptr++;
-		}
-	}
+	uint8_t *ptr = (uint8_t*)malloc(ch->getVolume() * sizeof(uint8_t));
+	isis::data::scaling_pair scaling = ch->getScalingTo(ch->getTypeID());
+	ch->copyToMem<uint8_t>(ptr,scaling);
+	
 	glClearColor (0.0, 0.0, 0.0, 0.0);
 	glShadeModel(GL_FLAT);
 	glEnable(GL_DEPTH_TEST);
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
+	
 	glGenTextures(1, &texname);
-	glBindTexture(GL_TEXTURE_2D, texname);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, 
-					GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, 
-					GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ch->getSizeAsVector()[0], 
-					ch->getSizeAsVector()[1], 0, GL_RGBA, GL_UNSIGNED_BYTE, 
-					checkImage);
+	glBindTexture(GL_TEXTURE_3D, texname);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT);
+	glTexImage3D(GL_TEXTURE_3D, 0, GL_COLOR_INDEX, ch->getSizeAsVector()[0], 
+					ch->getSizeAsVector()[1], ch->getSizeAsVector()[2], 0, GL_RED, GL_UNSIGNED_SHORT, 
+					ptr);
+					
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_TEXTURE_3D);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+	glBindTexture(GL_TEXTURE_3D, texname);
+	glBegin(GL_QUADS);
+	glTexCoord3f(0.0, 0.0, 0.0); glVertex3f(-1.0, -1.0, 0.0);
+	glTexCoord3f(0.0, 1.0, 1.0); glVertex3f(-1.0, 1.0, 0.0);
+	glTexCoord3f(1.0, 1.0, 0.0); glVertex3f(1.0, 1.0, 0.0);
+	glTexCoord3f(1.0, 0.0, 0.0); glVertex3f(1.0, -1.0, 0.0);
+	glEnd();
+	glFlush();
+	glDisable(GL_TEXTURE_3D);
+	
 }
 
 void QGLView::paint( )
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_TEXTURE_2D);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-	glBindTexture(GL_TEXTURE_2D, texname);
-	glBegin(GL_QUADS);
-	glTexCoord2f(0.0, 0.0); glVertex3f(-1.0, -1.0, 0.0);
-	glTexCoord2f(0.0, 1.0); glVertex3f(-1.0, 1.0, 0.0);
-	glTexCoord2f(10.0, 1.0); glVertex3f(0.0, 1.0, 0.0);
-	glTexCoord2f(1.0, 0.0); glVertex3f(0.0, -1.0, 0.0);
-
-	glTexCoord2f(0.0, 0.0); glVertex3f(1.0, -1.0, 0.0);
-	glTexCoord2f(0.0, 1.0); glVertex3f(1.0, 1.0, 0.0);
-	glTexCoord2f(1.0, 1.0); glVertex3f(2.41421, 1.0, -1.41421);
-	glTexCoord2f(1.0, 0.0); glVertex3f(2.41421, -1.0, -1.41421);
-	glEnd();
-	glFlush();
-	glDisable(GL_TEXTURE_2D);
 	
 	updateGL();
 }
