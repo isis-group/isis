@@ -172,6 +172,11 @@ BOOST_AUTO_TEST_CASE( complex_conversion_test )
 
 	BOOST_CHECK_EQUAL( dRef.as<std::complex<double> >(), std::complex<double>(3.5415,3.5415) );
 
+	BOOST_CHECK_EQUAL( fRef.as<std::string>(),"(3.5415,3.5415)");
+	BOOST_CHECK_EQUAL( Value<std::string>("(3.5415,3.5415)").as<std::complex<float> >(),std::complex<float>(3.5415,3.5415));
+
+	BOOST_CHECK_EQUAL( Value<float>(3.5415).as<std::complex<float> >(),std::complex<float>(3.5415,0));
+	BOOST_CHECK_EQUAL( Value<int>(-5).as<std::complex<float> >(),std::complex<float>(-5,0));
 }
 
 }
