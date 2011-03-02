@@ -15,7 +15,7 @@ DEB_CMAKE_EXTRA_FLAGS = \
 	-DISIS_DIR=/usr/share/isis/cmake \
 	-DISIS_ADAPTER_ITK=ON \
 	-DISIS_ADAPTER_QT4=ON \
-	-DISIS_ADAPTER_VTK=ON
+	-DISIS_ADAPTER_VTK=OFF
 
 include /usr/share/cdbs/1/class/cmake.mk
 

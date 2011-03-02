@@ -19,17 +19,35 @@ namespace python
 class _IOFactory
 {
 public:
-	//_IOFactory( PyObject *p ) : self(p) {}
+// 	_IOFactory( PyObject *p ) : self(p) {}
 	_IOFactory() {}
-
-	static std::list<data::Image> _load( const std::string path, const std::string suffix_override, const std::string dialect ) {
-		std::list<isis::data::Image> tmpImageList;
-		data::ImageList tmpList = data::IOFactory::load( path, suffix_override, dialect );
-		BOOST_FOREACH( std::list<boost::shared_ptr<isis::data::Image> >::const_reference ref, tmpList ) {
-			tmpImageList.push_back( *ref );
-		}
-		return tmpImageList;
+	
+	static bool _writeImage( const data::Image& img, const std::string &path, const std::string &suffix_override, const std::string &dialect )
+	{
+		return data::IOFactory::write( img, path, suffix_override, dialect );
 	}
+	
+	static bool _writeImageList( const std::list<data::Image>& images, const std::string &path, const std::string &suffix_override, const std::string &dialect )
+	{
+		return data::IOFactory::write( images, path, suffix_override, dialect );
+	}
+	
+	std::list<data::Image> _loadImageList ( const std::string &path, const std::string &suffix_override, const std::string &dialect )
+	{
+		return isis::data::IOFactory::load( path, suffix_override, dialect );
+	}
+	
+	std::list<data::Chunk> _loadChunkList ( const std::string &path, const std::string &suffix_override, std::string &dialect )
+	{
+		std::list<data::Chunk> tmpChunkList;
+		data::IOFactory::load( tmpChunkList, path, suffix_override, dialect );
+		return tmpChunkList;
+	}
+	
+	std::list<data::Image> _chunkListToImageList( std::list<data::Chunk> &chunkList ) {
+		return data::IOFactory::chunkListToImageList( chunkList );
+	}
+	
 private:
 	PyObject *self;
 

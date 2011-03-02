@@ -71,7 +71,6 @@ public:
 		return NiftiChunk( src, del, width, height, slices, timesteps );
 	}
 	
-
 private:
 	NiftiChunk( const NiftiChunk & ); // no standard copy constructor
 	NiftiChunk &operator=( const NiftiChunk & ); // no copy operator
@@ -185,7 +184,6 @@ public:
 		//          return 1;
 		//      }
 		//
-		
 
 		return 1; // if there was an error, we wouldn't get here
 	}
