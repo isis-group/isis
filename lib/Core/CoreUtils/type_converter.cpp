@@ -153,21 +153,16 @@ public:
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
 		typedef boost::numeric::converter <
-			DST, SRC,
-			boost::numeric::conversion_traits<DST, SRC>,
+			std::complex<DST> , std::complex<SRC> ,
+			boost::numeric::conversion_traits<std::complex<DST>, std::complex<SRC> >,
 			NumericOverflowHandler,
-			boost::numeric::RoundEven<SRC>
+			boost::numeric::RoundEven<std::complex<SRC> >
 		> converter;
 		NumericOverflowHandler::result = boost::numeric::cInRange;
 		const std::complex<SRC> &srcVal = src.castTo<std::complex<SRC> >();
 		std::complex<DST> &dstVal = dst.castTo<std::complex<DST> >();
 
-		const DST real=converter::convert( srcVal.real() );
-		if(NumericOverflowHandler::result!=boost::numeric::cInRange)
-			return NumericOverflowHandler::result;
-		const DST imag=converter::convert( srcVal.imag() );
-
-		dstVal = std::complex<DST>(real,imag);
+		dstVal = converter::convert( srcVal );
 		return NumericOverflowHandler::result;
 	}
 	virtual ~ValueConverter() {}
@@ -510,7 +505,6 @@ public:
 ////////////////////////////////////////////////////////////////////////
 //OK, thats about the foreplay. Now we get to the dirty stuff.
 ////////////////////////////////////////////////////////////////////////
-
 
 ///generate a ValueConverter for conversions from SRC to any type from the "types" list
 template<typename SRC> struct inner_TypeConverter {

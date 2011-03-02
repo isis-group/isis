@@ -219,8 +219,11 @@ BOOST_AUTO_TEST_CASE( ValuePtr_complex_conversion_test )
 	data::ValuePtr<std::complex<float> > cfArray=data::ValuePtr<std::complex<float> >::allocate(12);
 	cfArray.copyFromMem(init,12);
 	data::ValuePtr<std::complex<double> > cdArray=cfArray.copyToNew<std::complex<double> >();
-	std::cout << cfArray << std::endl;
-	std::cout << cdArray << std::endl;
+
+	for(size_t i=0;i<12;i++){
+		BOOST_CHECK_EQUAL(cfArray[i],init[i]);
+		BOOST_CHECK_EQUAL(cdArray[i],std::complex<double>(init[i]));
+	}
 }
 
 
