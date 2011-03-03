@@ -30,9 +30,15 @@ private:
 	bool m_IsValid;
 	unsigned short m_TypeID;
 	util::fvector4 m_ImageSize;
+	util::PropertyMap m_PropMap;
+	std::vector< util::PropertyMap > m_ChunkProperties;
+	std::vector< util::PropertyMap > m_TimeStepProperties;
 	
 	// do not try this at home!!!
 	std::vector< data::_internal::ValuePtrBase::Reference > m_ImageVector;
+	
+	bool filterRelevantMetaInformation();
+	
 };
 
 }} //end namespace
