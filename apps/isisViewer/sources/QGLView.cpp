@@ -27,8 +27,6 @@ QGLView::QGLView( std::list<data::Image> imgList, QWidget *parent )
 	texname(),
 	m_Image( imgList.front() )
 {
-	x=-1.0;
-	
 	QObject::connect( this, SIGNAL( mousePressEvent(QMouseEvent*) ), this, SLOT( paint() ) );
 }
 
@@ -74,16 +72,15 @@ void QGLView::initializeGL()
 
 void QGLView::paint( )
 {
-	x+=0.1;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_TEXTURE_3D);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 	glBindTexture(GL_TEXTURE_3D, texname);
 	glBegin(GL_QUADS);
-	glTexCoord3f(x, 0.0,0.0); glVertex3f(-1.0, -1.0, 0.0);
-	glTexCoord3f(x, 0.0,1.0); glVertex3f(-1.0, 1.0, 0.0);
-	glTexCoord3f(x, 1.0,1.0); glVertex3f(1.0, 1.0, 0.0);
-	glTexCoord3f(x, 1.0,0.0); glVertex3f(1.0, -1.0, 0.0);
+	glTexCoord3f(0, 0.0,0.0); glVertex3f(-1.0, -1.0, 0.0);
+	glTexCoord3f(0, 0.0,1.0); glVertex3f(-1.0, 1.0, 0.0);
+	glTexCoord3f(0, 1.0,1.0); glVertex3f(1.0, 1.0, 0.0);
+	glTexCoord3f(0, 1.0,0.0); glVertex3f(1.0, -1.0, 0.0);
 	
 	glEnd();
 	glFlush();

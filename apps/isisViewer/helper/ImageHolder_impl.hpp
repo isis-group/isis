@@ -59,9 +59,8 @@ ImageHolder<TYPE>::setImage( data::Image image )
 		m_ChunkProperties.push_back( static_cast<util::PropertyMap>(*chRef) );
 	}
 	LOG( Debug, verbose_info ) << "Fetched " << m_ChunkProperties.size() << " chunk properties.";
-	//image seems to be ok
-	filterRelevantMetaInformation();
-	return true;
+	//image seems to be ok...i guess
+	return filterRelevantMetaInformation(); //only return true if filtering is successfully
 }
 
 template<typename TYPE>

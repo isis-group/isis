@@ -45,7 +45,6 @@ Q_SIGNALS:
 private:
 	GLuint texname;
 	isis::data::Image m_Image;
-	float x;
 };
 
 }

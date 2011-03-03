@@ -134,10 +134,6 @@ util::fvector4 MatrixHandler::transformOrigin( const util::fvector4 &origin, con
 		LOG( Runtime, error ) << "Cannot create transformed origin. First call setVectors.";
 		return origin;
 	} else {
-		//      return util::fvector4(origin[0] * voxelSize[0] / 2,
-		//          origin[1] * voxelSize[1] / 2,
-		//          origin[2] * voxelSize[2] / 2,
-		//          0);
 		return util::fvector4(  ( origin[0] * voxelSize[0] * matrix( 0, 0 ) + origin[1] * voxelSize[1] * matrix( 0, 1 ) + origin[2] * voxelSize[2] * matrix( 0, 2 ) ),
 								( origin[0] * voxelSize[0] * matrix( 1, 0 ) + origin[1] * voxelSize[1] * matrix( 1, 1 ) + origin[2] * voxelSize[2] * matrix( 1, 2 ) ),
 								( origin[0] * voxelSize[0] * matrix( 2, 0 ) + origin[1] * voxelSize[1] * matrix( 2, 1 ) + origin[2] * voxelSize[2] * matrix( 2, 2 ) ),
@@ -161,7 +157,7 @@ double MatrixHandler::determinant(MatrixType& mat_r)
     if( boost::numeric::ublas::lu_factorize(mat_r,pm) ) {
         det = 0.0;
     } else {
-        for(int i = 0; i < mat_r.size1(); i++) 
+        for(unsigned int i = 0; i < mat_r.size1(); i++) 
             det *= mat_r(i,i);
         det = det * determinant_sign( pm );
 		
