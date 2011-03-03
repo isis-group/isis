@@ -22,7 +22,7 @@ class ImageHolder
 	
 public:
 	ImageHolder();
-	bool setImage( const data::Image& );
+	bool setImage( data::Image );
 	
 	
 private:
@@ -31,15 +31,11 @@ private:
 	unsigned short m_TypeID;
 	util::fvector4 m_ImageSize;
 	
-	std::vector<boost::shared_ptr<TYPE> > m_ImageVector;
-	
-		
-	
-		
-	
+	// do not try this at home!!!
+	std::vector< data::_internal::ValuePtrBase::Reference > m_ImageVector;
 };
 
 }} //end namespace
 
-
+#include "ImageHolder_impl.hpp"
 #endif
