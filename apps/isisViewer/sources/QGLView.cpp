@@ -34,21 +34,6 @@ QGLView::QGLView( std::list<data::Image> imgList, QWidget *parent )
 void QGLView::initializeGL()
 {	
 	boost::shared_ptr<data::Chunk> ch = m_Image.getChunksAsVector().at(0);
-	size_t x = ch->getSizeAsVector()[0];
-	size_t y = ch->getSizeAsVector()[1];
-	size_t z = ch->getSizeAsVector()[2];
-	GLshort *ptr = (GLshort*)calloc(x * y * z , sizeof(GLshort));
-	isis::data::scaling_pair scaling = ch->getScalingTo(ch->getTypeID());
-	size_t index=-1;
-	for (unsigned int k = 0; k<z; k++) {
-		for (unsigned int j = 0; j<y;j++) {
-			for (unsigned int i = 0; i<x;i++) {
-				GLshort val = ch->voxel<GLshort>(i,j,k);
-				ptr[index++] = val;
-			}
-		}
-	}
-	// 	ch->copyToMem<uint8_t>(ptr,scaling);
 	
 	glClearColor (0.0, 0.0, 0.0, 0.0);
 	glShadeModel(GL_FLAT);
@@ -62,8 +47,8 @@ void QGLView::initializeGL()
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP);
-	glTexImage3D(GL_TEXTURE_3D, 0, 3, x, 
-					y, z, 0, GL_LUMINANCE, GL_SHORT, 
+	glTexImage3D(GL_TEXTURE_3D, 0, 3, ch->getSizeAsVector()[0], 
+					ch->getSizeAsVector()[1], ch->getSizeAsVector()[2], 0, GL_LUMINANCE, GL_SHORT, 
 					&ch->voxel<GLshort>(0));
 					
 
