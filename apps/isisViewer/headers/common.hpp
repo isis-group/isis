@@ -8,6 +8,10 @@
 #ifndef VIEWER_COMMON_HPP_
 #define VIEWER_COMMON_HPP_
 
+#include <vector>
+#include <DataStorage/chunk.hpp>
+#include <boost/shared_ptr.hpp>
+
 namespace isis
 {
 
@@ -17,6 +21,8 @@ struct ViewerDebug {static const char *name() {return "ViewerDebug";}; enum {use
 namespace viewer
 {
 
+typedef std::vector<boost::shared_ptr< data::Chunk > > ChunkVector;
+	
 typedef ViewerLog Runtime;
 typedef ViewerDebug Debug;
 template<typename HANDLE> void enable_log( LogLevel level )
