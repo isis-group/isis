@@ -24,6 +24,15 @@ public:
 	ImageHolder();
 	bool setImage( data::Image );
 	
+	std::vector< data::_internal::ValuePtrBase::Reference >
+		getImageVector() const { return m_ImageVector; }
+	std::vector< util::PropertyMap > 
+		getChunkProperties() const { return m_ChunkProperties; }
+	std::vector< util::PropertyMap >
+		getTimeStepProperties() const { return m_TimeStepProperties; }
+	util::PropertyMap 
+		getPropMap() const { return m_PropMap; }
+	
 	
 private:
 	size_t m_NumberOfTimeSteps;
