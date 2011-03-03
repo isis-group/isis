@@ -4,6 +4,7 @@
 #include <GL/gl.h>
 #include <DataStorage/io_factory.hpp>
 #include <DataStorage/image.hpp>
+#include <CoreUtils/log.hpp>
 
 #include "common.hpp"
 
