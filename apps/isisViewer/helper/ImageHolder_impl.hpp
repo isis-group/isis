@@ -5,11 +5,8 @@ namespace viewer {
 	
 template<class TYPE>
 ImageHolder<TYPE>::ImageHolder()
-	: m_NumberOfTimeSteps(0),
-	m_IsValid(false)
-{
-
-}
+	: m_NumberOfTimeSteps(0)
+{}
 
 template<class TYPE>
 bool
@@ -40,7 +37,13 @@ ImageHolder<TYPE>::setImage( data::Image image )
 	image.copyToMem<TYPE>( &imagePtr[0] );
 	LOG( Debug, verbose_info) << "Copied image to continuous memory space.";
 	//splice the image in its volumes -> we get a vector of t volumes
-	m_ImageVector = imagePtr.splice( m_ImageSize[0] * m_ImageSize[1] * m_ImageSize[2] );
+	if(m_NumberOfTimeSteps > 1) //splicing is only necessary if we got more than 1 timestep
+	{
+		m_ImageVector = imagePtr.splice( m_ImageSize[0] * m_ImageSize[1] * m_ImageSize[2] );
+	} else {
+		m_ImageVector.push_back( imagePtr );
+	}
+		
 	LOG_IF( m_ImageVector.empty(), Runtime, error ) << "Size of image vector is 0!";
 	if(m_ImageVector.size() != m_NumberOfTimeSteps) {
 		LOG( Runtime, error) << "The number of timesteps (" << m_NumberOfTimeSteps 

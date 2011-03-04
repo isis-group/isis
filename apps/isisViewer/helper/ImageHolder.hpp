@@ -1,7 +1,6 @@
 #ifndef IMAGEHOLDER_HPP
 #define IMAGEHOLDER_HPP
 
-#include <boost/shared_ptr.hpp>
 #include <boost/foreach.hpp>
 #include <vector>
 #include <CoreUtils/propmap.hpp>
@@ -12,8 +11,9 @@ namespace isis {
 namespace viewer {
 	
 /**
- * Class that holds one image in a vector of boost::shared_ptr.
- * It ensures the data is hold in continuous memory and one type.
+ * Class that holds one image in a vector of data::ValuePtr's
+ * It ensures the data is hold in continuous memory and only consists of one type.
+ * Furthermore this class handles the meta information of the image
  */
 
 template <class TYPE>
@@ -36,14 +36,13 @@ public:
 	
 private:
 	size_t m_NumberOfTimeSteps;
-	bool m_IsValid;
 	unsigned short m_TypeID;
 	util::fvector4 m_ImageSize;
 	util::PropertyMap m_PropMap;
 	std::vector< util::PropertyMap > m_ChunkProperties;
 	std::vector< util::PropertyMap > m_TimeStepProperties;
 	
-	// do not try this at home!!!
+	// ok, this looks a bit nasty
 	std::vector< data::_internal::ValuePtrBase::Reference > m_ImageVector;
 	
 	bool filterRelevantMetaInformation();

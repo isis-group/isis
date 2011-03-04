@@ -9,9 +9,9 @@
 
 namespace isis
 {
-
 namespace viewer
 {
+namespace _internal{
 
 MatrixHandler::MatrixHandler( void )
 	: m_Valid( false )
@@ -165,5 +165,4 @@ double MatrixHandler::determinant(MatrixType& mat_r)
     return det;
 } 
 
-}
-}
+}}} // end namespace

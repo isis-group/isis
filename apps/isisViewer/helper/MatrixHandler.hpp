@@ -14,11 +14,9 @@
 #include <boost/numeric/ublas/io.hpp>
 #include "common.hpp"
 
-namespace isis
-{
-
-namespace viewer
-{
+namespace isis {
+namespace viewer {
+namespace _internal {
 
 class MatrixHandler
 {
@@ -62,6 +60,6 @@ private:
 	int determinant_sign(const boost::numeric::ublas::permutation_matrix<size_t>& );
 };
 
-}
-}
+}}} // end namespace
+
 #endif /* MATRIXHANDLER_HPP_ */

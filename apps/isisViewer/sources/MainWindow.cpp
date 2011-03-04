@@ -6,7 +6,7 @@
  */
 
 #include "MainWindow.hpp"
-#include "../helper/ImageHolder.hpp"
+#include "ImageHolder.hpp"
 
 namespace isis
 {

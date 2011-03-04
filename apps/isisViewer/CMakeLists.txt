@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 2.6)
 file (GLOB HEADER_FILES headers/*.h headers/*.hpp)
 file (GLOB CPP_FILES sources/*.cpp *.cpp)
 file (GLOB UI_FILES forms/*.ui)
-file (GLOB HELPER_FILES helper/*.cpp)
+file (GLOB HELPER_FILES helper/*.cpp helper/*.hpp)
 
 ###########################################################
 # isis stuff
@@ -65,6 +65,7 @@ FIND_PACKAGE(Boost REQUIRED COMPONENTS signals)
 
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/headers)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/helper)
 
 #this flags has to be set due to use parallel with boos::signal
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DQT_NO_KEYWORDS -ftemplate-depth-100 -Wextra -Wshadow" )
