@@ -63,13 +63,14 @@ public:
 		LOG( ImageIoDebug, info ) << "create NiftiChunk";
 	}
 
-	//TODO: This is really weird staff - the gcc4.2 on MAC and RedHat is complaining about 
+	//TODO: This is really weird stuff - the gcc4.2 on MAC and RedHat is complaining about 
 	// the private copy constructor because he cannot resolve the template constructor when creating NiftiChunk
 	// e.g. in retList.push_back( _internal::NiftiChunk::makeNiftiChunk( static_cast<uint8_t *> (ni->data), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 )  );
 	// That's completely crazy but this workaround is a first solution - we hope to find a better one
 	template<typename T, typename D> static data::Chunk makeNiftiChunk( T *src, D del, size_t width, size_t height, size_t slices, size_t timesteps )  {
 		return NiftiChunk( src, del, width, height, slices, timesteps );
 	}
+
 private:
 	NiftiChunk( const NiftiChunk & ); // no standard copy constructor
 	NiftiChunk &operator=( const NiftiChunk & ); // no copy operator
