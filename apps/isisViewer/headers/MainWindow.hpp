@@ -8,43 +8,33 @@
 #ifndef MAINWINDOW_CPP_
 #define MAINWINDOW_CPP_
 
-#include "QGLView.h"
-#include <QtGui>
-#include <QtOpenGL>
-#include "ui_isisViewer.h"
-#include <DataStorage/image.hpp>
+#include "MainWindowBase.hpp"
+#include "ViewerCoreBase.hpp"
+#include "QGLWidgetImplementation.hpp"
 
-namespace isis
-{
+namespace isis {
+namespace viewer {
 
-namespace viewer
+class MainWindow : public MainWindowBase
 {
-
-class MainWindow : public QMainWindow
-{
-	Q_OBJECT
+	
 
 public:
-	MainWindow( std::list<data::Image>, QMainWindow *parent = 0 );
+	MainWindow( boost::shared_ptr<ViewerCoreBase> core  );
+	
 
 private:
-	QGLView *viewAxial;
-	QGLView *viewSagittal;
-	QGLView *viewCoronal;
-	
-	Ui::isisViewer ui;
 	struct Slot {
 		MainWindow &parent;
 		Slot( MainWindow &p ) : parent( p ) {}
 	};
+	
+	boost::shared_ptr<ViewerCoreBase> m_ViewerCore;
+	
+	boost::shared_ptr<QGLWidgetImplementation> axialWidget;
+	
 
-private Q_SLOTS:
 
-Q_SIGNALS:
-	void clicked( bool );
-	void valueChanged( int );
-
-	//slots
 private:
 	struct RefreshIntensityDisplay : Slot {
 		RefreshIntensityDisplay( MainWindow &p ): Slot( p ) {}

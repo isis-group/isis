@@ -22,10 +22,9 @@
 namespace isis {
 namespace viewer {
 	
-QGLView::QGLView( std::list<data::Image> imgList, QWidget *parent )
+QGLView::QGLView( QWidget *parent )
 	: QGLWidget( parent ), 
-	texname(),
-	m_Image( imgList.front() )
+	texname()
 {
 	QObject::connect( this, SIGNAL( mousePressEvent(QMouseEvent*) ), this, SLOT( paint() ) );
 }
@@ -33,6 +32,12 @@ QGLView::QGLView( std::list<data::Image> imgList, QWidget *parent )
 
 void QGLView::initializeGL()
 {	
+	
+
+}
+
+void QGLView::paint( )
+{
 	boost::shared_ptr<data::Chunk> ch = m_Image.getChunksAsVector().at(0);
 	
 	glClearColor (0.0, 0.0, 0.0, 0.0);
@@ -50,13 +55,6 @@ void QGLView::initializeGL()
 	glTexImage3D(GL_TEXTURE_3D, 0, 3, ch->getSizeAsVector()[0], 
 					ch->getSizeAsVector()[1], ch->getSizeAsVector()[2], 0, GL_LUMINANCE, GL_SHORT, 
 					&ch->voxel<GLshort>(0));
-					
-
-	
-}
-
-void QGLView::paint( )
-{
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_TEXTURE_3D);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);

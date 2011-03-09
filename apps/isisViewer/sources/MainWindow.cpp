@@ -6,31 +6,24 @@
  */
 
 #include "MainWindow.hpp"
-#include "ImageHolder.hpp"
+#include <common.hpp>
 
-namespace isis
-{
+namespace isis {
+namespace viewer {
 
-namespace viewer
-{
-
-MainWindow::MainWindow( std::list<data::Image> imgList, QMainWindow *parent )
-	: QMainWindow( parent ),
-	  my_RefreshIntensityDisplay( *this ),
+MainWindow::MainWindow( boost::shared_ptr<ViewerCoreBase> core )
+	: my_RefreshIntensityDisplay( *this ),
 	  my_RefreshCoordsDisplay( *this ),
-	  viewAxial(new QGLView( imgList) )
+	  m_ViewerCore( core ),
+	  axialWidget( boost::shared_ptr<QGLWidgetImplementation>( new QGLWidgetImplementation( m_ViewerCore ) ) )
 {
-	//just for test purpose
-	ImageHolder<GLshort> holder;
-	holder.setImage(imgList.front());
-	
-	
 	ui.setupUi( this );
-	ui.gridLayout->addWidget( viewAxial );
+	axialWidget->setParent( ui.widgetAxial );
+	m_ViewerCore->registerWidget( "DeineMuddi", axialWidget );
+	
+	m_ViewerCore->getWidgetAs<QGLWidgetImplementation>("DeineMuddi")->paint();
 	
 	
-
 }
 
-}
-}
+}} //end namespace

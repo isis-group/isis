@@ -1,5 +1,6 @@
 #include "Adapter/qtapplication.hpp"
 #include "MainWindow.hpp"
+#include "ViewerCoreBase.hpp"
 #include <iostream>
 #include <GL/gl.h>
 #include <DataStorage/io_factory.hpp>
@@ -25,7 +26,10 @@ int main( int argc, char *argv[] )
 	app.setLog<isis::ViewerDebug>( app.getLLMap()[app.parameters["dViewer"]->as<isis::util::Selection>()] );
 	isis::util::slist fileList = app.parameters["in"];
 	std::list<isis::data::Image> imgList = isis::data::IOFactory::load(fileList.front());
-	isis::viewer::MainWindow isisViewerMainWindow(imgList);
+	
+	boost::shared_ptr<isis::viewer::ViewerCoreBase> core ( new isis::viewer::ViewerCoreBase );
+	core->setImageList( imgList );
+	isis::viewer::MainWindow isisViewerMainWindow( core );
 	isisViewerMainWindow.show();
 	return app.getQApplication().exec();
 }

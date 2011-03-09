@@ -1,3 +1,0 @@
-
-
-#include "QGLWidgetAdapter.hpp"
