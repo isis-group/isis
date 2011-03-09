@@ -274,33 +274,17 @@ std::list< Image > IOFactory::chunkListToImageList( std::list<Chunk> &src )
 
 	while ( !src.empty() ) {
 		LOG( Debug, info ) << src.size() << " Chunks left to be distributed.";
-		Image buff;
-		size_t cnt = 0;
+		size_t before = src.size();
 
-		for ( std::list<Chunk>::iterator i = src.begin(); i != src.end(); ) { // for all remaining chunks
-			if ( buff.insertChunk( *i ) ) {
-				src.erase( i++ );
-				cnt++;
-			} else
-				i++;
-		}
+		Image buff( src );
 
-		if ( ! buff.isEmpty() ) {
-			LOG( Debug, info ) << "Reindexing image with " << cnt << " chunks.";
-
-			if ( buff.reIndex() ) {
-				if ( buff.isValid() ) { //if the image was successfully indexed and is valid, keep it
-					ret.push_back( buff );
-					LOG( Runtime, info ) << "Image " << ret.size() << " with size " << buff.getSizeAsString() <<  " and value range " << buff.getMinMax() << " done.";
-				} else {
-					LOG( Runtime, error )
-							<< "Cannot insert image. Missing properties: " << buff.getMissing();
-					errcnt += cnt;
-				}
-			} else {
-				LOG( Runtime, info ) << "Skipping broken image.";
-				errcnt += cnt;
-			}
+		if ( buff.isClean() && buff.isValid() ) { //if the image was successfully indexed and is valid, keep it
+			ret.push_back( buff );
+			LOG( Runtime, info ) << "Image " << ret.size() << " with size " << buff.getSizeAsString() <<  " and value range " << buff.getMinMax() << " done.";
+		} else {
+			LOG_IF( !buff.getMissing().empty(), Runtime, error )
+					<< "Cannot insert image. Missing properties: " << buff.getMissing();
+			errcnt += before - src.size();
 		}
 	}
 

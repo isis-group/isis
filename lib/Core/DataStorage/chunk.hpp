@@ -107,6 +107,8 @@ public:
 
 	/**
 	 * Run a functor on every Voxel in the chunk.
+	 * If the data of the chunk are not of type TYPE, behaviour is undefined.
+	 * (If _DEBUG_LOG is enabled you will get an error message before the progrmm will crash).
 	 * \param op a functor inheriting from VoxelOp
 	 * \param offset offset to be added to the voxel position before op is called
 	 * \returns amount of operations which returned false - so 0 is good!
