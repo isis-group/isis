@@ -28,24 +28,26 @@ BOOST_PYTHON_MODULE( _core )
 	.staticmethod( "getCoreVersion" )
 	//virtual bool init( int argc, char **argv, bool exitOnError = true );
 	.def( "init", &_Application::init )
-	.def( "addParameter", &_Application::addParameter )
-	.def( "setNeeded", &_Application::setNeeded )
-	.def( "setHidden", &_Application::setHidden )
+	.def( "addParameter", &_Application::_addParameter )
+	.def( "setNeeded", &_Application::_setNeeded )
+	.def( "setHidden", &_Application::_setHidden )
+	.def( "setDescription", &_Application::_setDescription )
+	.def( "getParameterAsString", &_Application::_getParameterAsString )
 	;
 	//#######################################################################################
-	//  PropMap
+	//  PropertyMap
 	//#######################################################################################
-	class_<isis::util::PropertyMap, _PropMap>( "PropMap", init<>() )
-	.def( init<_PropMap>() )
+	class_<isis::util::PropertyMap, _PropertyMap>( "PropertyMap", init<>() )
+	.def( init<_PropertyMap>() )
 	.def( "hasProperty", &isis::util::PropertyMap::hasProperty )
 	.def( "hasBranch", &isis::util::PropertyMap::hasBranch )
-	.def( "branch", &_PropMap::_branch )
+	.def( "branch", &_PropertyMap::_branch )
 	.def( "remove", ( bool ( ::isis::util::PropertyMap:: * )( const isis::util::istring & ) ) ( &isis::util::PropertyMap::remove ), ( arg( "key" ) ) )
 	.def( "remove", ( bool ( ::isis::util::PropertyMap:: * )( const isis::util::PropertyMap &, bool ) ) ( &isis::util::PropertyMap::remove ), ( arg( "removeMap" ), arg( "keep_needed" ) ) )
-	.def( "propertyValue", &_PropMap::_propertyValue )
-	.def( "valid", &isis::util::PropertyMap::valid )
-	.def( "empty", &isis::util::PropertyMap::isEmpty )
-	.def( "setPropertyAs", &_PropMap::_setPropertyAs )
+	.def( "propertyValue", &_PropertyMap::_propertyValue )
+	.def( "isValid", &isis::util::PropertyMap::isValid )
+	.def( "isEmpty", &isis::util::PropertyMap::isEmpty )
+	.def( "setPropertyAs", &_PropertyMap::_setPropertyAs )
 	;
 	//#######################################################################################
 	//  PropertyValue

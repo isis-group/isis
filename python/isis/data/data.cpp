@@ -35,6 +35,7 @@ BOOST_PYTHON_MODULE( _data )
 	.def( "autoload", &isis::data::IOApplication::autoload )
 	.def( "autowrite", &_IOApplication::_autowrite )
 	.def( "images", &_IOApplication::_images )
+	.def( "setDescroption" , &_IOApplication::_setDescription );
 	;
 	//#######################################################################################
 	//  Image
@@ -47,8 +48,9 @@ BOOST_PYTHON_MODULE( _data )
 	.def( "setVoxel", ( bool ( ::_Image:: * )( const isis::util::ivector4 &, const float & ) ) ( &_Image::_setVoxel ), ( arg( "coord" ), arg( "value" ) ) )
 	.def( "setVoxel", ( bool ( ::_Image:: * )( const size_t &, const size_t &, const size_t &, const size_t &, const float & ) ) ( &_Image::_setVoxel ), ( arg( "first" ), arg( "second" ), arg( "third" ), arg( "fourth" ), arg( "value" ) ) )
 	.def( "getSizeAsVector", &_Image::_getSizeAsVector )
-	.def( "getChunkList", &_Image::_getChunkList )
-	.def( "typeID", &isis::data::Image::typeID )
+	.def( "getChunkList", &_Image::_getChunksAsVector )
+	.def( "getChunksAsList", &_Image::_getChunksAsVector )
+	.def( "getMajorTypeID", &isis::data::Image::getMajorTypeID )
 	.def( "getChunkAt", &isis::data::Image::getChunkAt )
 	.def( "getChunk", ( isis::data::Chunk ( ::isis::data::Image:: * )( size_t, size_t, size_t, size_t, bool ) ) ( &isis::data::Image::getChunk ), ( arg( "first" ), arg( "second" ), arg( "third" ), arg( "fourth" ), arg( "copy_metadata" ) ) )
 	.def( "getChunk", ( isis::data::Chunk ( ::_Image:: * )( const isis::util::ivector4 &, bool ) ) ( &_Image::_getChunk ), ( arg( "coord" ), arg( "copy_metadata" ) ) )
@@ -56,7 +58,7 @@ BOOST_PYTHON_MODULE( _data )
 	.def( "getChunkAs", ( isis::data::Chunk ( ::_Image:: * )( const isis::util::ivector4 &, const std::string & ) ) ( &_Image::_getChunk ), ( arg( "coords" ), arg( "type" ) ) )
 	.def( "insertChunk", &isis::data::Image::insertChunk )
 	.def( "reIndex", &isis::data::Image::reIndex )
-	.def( "empty", &isis::data::Image::empty )
+	.def( "isEmpty", &isis::data::Image::isEmpty )
 	.def( "bytesPerVoxel", &isis::data::Image::getBytesPerVoxel )
 	.def( "getMin", &_Image::_getMin )
 	.def( "getMax", &_Image::_getMax )
@@ -87,6 +89,14 @@ BOOST_PYTHON_MODULE( _data )
 	//  Chunk
 	//#######################################################################################
 	class_<isis::data::Chunk, _Chunk> ( "Chunk", init<_Chunk>() )
+	.def( "getVoxel", ( float ( ::_Chunk:: * )( const isis::util::ivector4 & ) ) ( &_Chunk::_voxel ), ( arg( "coord" ) ) )
+	.def( "getVoxel", ( float ( ::_Chunk:: * )( const size_t &, const size_t &, const size_t &, const size_t & ) ) ( &_Chunk::_voxel ), ( arg( "first" ), arg( "second" ), arg( "third" ), arg( "fourth" ) ) )
+	.def( "setVoxel", ( bool ( ::_Chunk:: * )( const isis::util::ivector4 &, const float & ) ) ( &_Chunk::_setVoxel ), ( arg( "coord" ), arg( "value" ) ) )
+	.def( "setVoxel", ( bool ( ::_Chunk:: * )( const size_t &, const size_t &, const size_t &, const size_t &, const float & ) ) ( &_Chunk::_setVoxel ), ( arg( "first" ), arg( "second" ), arg( "third" ), arg( "fourth" ), arg( "value" ) ) )
+	.def( "useCount", &isis::data::Chunk::useCount )
+	.def( "cloneToNew", &isis::data::Chunk::cloneToNew )
+	.def( "convertToType", ( bool ( ::_Chunk:: * )( const unsigned short ) ) ( &_Chunk::_convertToType ), ( arg( "ID" ) ) )
+	.def( "convertToType", ( bool ( ::_Chunk:: * )( const unsigned short, float, size_t ) ) ( &_Chunk::_convertToType ), ( arg( "ID" ), arg( "scaling" ), arg( "offset" ) ) )
 	;
 	//#######################################################################################
 	//  ChunkList
@@ -105,10 +115,20 @@ BOOST_PYTHON_MODULE( _data )
 	//  IOFactory
 	//#######################################################################################
 	class_<_IOFactory>( "IOFactory", no_init )
-	//  .def( "write", &_IOFactory::_write )
-	//  .staticmethod( "write" )
-	.def( "load", &_IOFactory::_load )
+ 	.def( "writeImage", &_IOFactory::_writeImage )
+	.staticmethod( "writeImage" )
+	.def( "write", &_IOFactory::_writeImage )
+	.staticmethod( "write" )
+	.def( "writeImageList", &_IOFactory::_writeImageList )
+	.staticmethod( "writeImageList" )
+	.def( "loadImageList", &_IOFactory::_loadImageList )
+	.staticmethod( "loadImageList" )
+	.def( "load", &_IOFactory::_loadImageList )
 	.staticmethod( "load" )
+	.def( "loadChunkList", &_IOFactory::_loadChunkList )
+	.staticmethod( "loadChunkList" )
+	.def( "chunkListToImageList", &_IOFactory::_chunkListToImageList )
+	.staticmethod( "chunkListToImageList" )
 	;
 
 }
