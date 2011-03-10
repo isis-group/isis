@@ -33,7 +33,6 @@ public:
 	};
 	
 	DataContainer getDataContainer() const { return m_DataContainer; }
-	
 
 private:
 	//this is the container which actually holds all the images 

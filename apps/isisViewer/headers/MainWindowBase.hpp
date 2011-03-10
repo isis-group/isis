@@ -9,14 +9,14 @@ namespace viewer {
 
 class MainWindowBase : public QMainWindow
 {
-	Q_OBJECT
+// 	Q_OBJECT
 public:
 	MainWindowBase(QWidget* parent = 0);
 	
 	
-private Q_SLOTS:
+// private Q_SLOTS:
 	
-Q_SIGNALS:
+// Q_SIGNALS:
 		
 	
 protected:

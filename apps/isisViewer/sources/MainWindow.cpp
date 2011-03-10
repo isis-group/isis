@@ -7,15 +7,17 @@
 
 #include "MainWindow.hpp"
 #include <common.hpp>
+#include "QGLWidgetImplementation.hpp"
 
 namespace isis {
 namespace viewer {
 
-MainWindow::MainWindow( boost::shared_ptr<ViewerCoreBase> core )
+MainWindow::MainWindow( ViewerCore *core )
 	  : m_ViewerCore( core )
 {
 	ui.setupUi( this );
-	
+	QGLWidgetImplementation* axialWidget = new QGLWidgetImplementation( core, ui.widgetAxial );
+	m_ViewerCore->registerWidget("axialView", boost::shared_ptr<QGLWidgetImplementation> (axialWidget) );
 	
 	
 }

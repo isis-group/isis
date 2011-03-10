@@ -27,6 +27,9 @@ public:
 	template<class TYPE>
 	bool setImage( data::Image image ) 
 	{
+		//TODO debug
+		m_DebugImage = image;
+	
 		//some checks
 		if( image.isEmpty() ) {
 			LOG( Runtime, error) << "Getting an empty image? Obviously something went wrong.";
@@ -49,6 +52,8 @@ public:
 		
 		//copy the image into continuous memory space and assure consistent data type
 		data::ValuePtr<TYPE> imagePtr( ( TYPE* ) calloc( image.getVolume(), sizeof(TYPE) ), image.getVolume() );
+		LOG( Debug, verbose_info ) << "Needed memory: " << image.getVolume() << " * " << sizeof(TYPE) << " = " 
+			<< image.getVolume() * sizeof(TYPE) << ".";
 		image.copyToMem<TYPE>( &imagePtr[0] );
 		LOG( Debug, verbose_info) << "Copied image to continuous memory space.";
 		//splice the image in its volumes -> we get a vector of t volumes
@@ -78,7 +83,7 @@ public:
 		}
 		LOG( Debug, verbose_info ) << "Fetched " << m_ChunkProperties.size() << " chunk properties.";
 		//image seems to be ok...i guess
-		return filterRelevantMetaInformation(); //only return true if filtering is successfully
+		return filterRelevantMetaInformation(); //only return true if filtering was successfully
 	}
 
 		
@@ -90,17 +95,21 @@ public:
 		getTimeStepProperties() const { return m_TimeStepProperties; }
 	util::PropertyMap 
 		getPropMap() const { return m_PropMap; }
-	
+	util::FixedVector<size_t, 4> 
+		getImageSize() const { return m_ImageSize; }
+	//TODO debug
+	data::Image m_DebugImage;
 	
 private:
 	size_t m_NumberOfTimeSteps;
 	unsigned short m_TypeID;
-	util::fvector4 m_ImageSize;
+	util::FixedVector<size_t, 4> m_ImageSize;
 	util::PropertyMap m_PropMap;
 	std::vector< util::PropertyMap > m_ChunkProperties;
 	std::vector< util::PropertyMap > m_TimeStepProperties;
 	
 	std::vector< ImagePointerType > m_ImageVector;
+	
 	
 	bool filterRelevantMetaInformation();
 	
