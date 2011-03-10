@@ -2,11 +2,9 @@
 #ifndef VIEWERCOREBASE_HPP
 #define VIEWERCOREBASE_HPP
 
-#include "WidgetAdapterBase.hpp"
 #include "DataContainer.hpp"
 #include <QWidget>
 #include <map>
-#include <typeinfo>
 
 namespace isis {
 namespace viewer {
@@ -15,10 +13,10 @@ class ViewerCoreBase
 {
 
 public:
-	typedef std::map<std::string, boost::shared_ptr<WidgetAdapterBase> > WidgetMap;
+	typedef std::map<std::string, boost::shared_ptr<QWidget> > WidgetMap;
 	
 	void setImageList( const std::list<data::Image> );
-	bool registerWidget( std::string key, boost::shared_ptr<WidgetAdapterBase> widget);
+	bool registerWidget( std::string key, boost::shared_ptr<QWidget> widget);
 	
 	WidgetMap getWidgets() const { return m_WidgetMap; }
 	

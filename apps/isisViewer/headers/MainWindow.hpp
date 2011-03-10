@@ -10,7 +10,6 @@
 
 #include "MainWindowBase.hpp"
 #include "ViewerCoreBase.hpp"
-#include "QGLWidgetAdapter.hpp"
 
 namespace isis {
 namespace viewer {
@@ -29,7 +28,6 @@ private:
 		Slot( MainWindow &p ) : parent( p ) {}
 	};
 	boost::shared_ptr<ViewerCoreBase> m_ViewerCore;
-	boost::shared_ptr<QGLWidgetAdapter> axialWidget;
 	
 
 

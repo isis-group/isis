@@ -17,10 +17,10 @@ void ViewerCoreBase::setImageList( const std::list< data::Image > imageList )
 }
 
 bool 
-ViewerCoreBase::registerWidget( std::string key, boost::shared_ptr<WidgetAdapterBase> widget )
+ViewerCoreBase::registerWidget( std::string key, boost::shared_ptr<QWidget> widget )
 {
 	if( m_WidgetMap.find( key ) == m_WidgetMap.end() ){
-		m_WidgetMap.insert( std::make_pair< std::string, boost::shared_ptr< WidgetAdapterBase > >(key, widget) );
+		m_WidgetMap.insert( std::make_pair< std::string, boost::shared_ptr< QWidget > >(key, widget) );
 	} else {
 		LOG( Runtime, error ) << "A widget with the name " << key << " already exists! Wont add this";
 		return false;
