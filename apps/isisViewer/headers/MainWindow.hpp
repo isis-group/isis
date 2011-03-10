@@ -27,7 +27,7 @@ private:
 		MainWindow &parent;
 		Slot( MainWindow &p ) : parent( p ) {}
 	};
-	ViewerCoreBase* m_ViewerCore;
+	ViewerCore* m_ViewerCore;
 	
 
 

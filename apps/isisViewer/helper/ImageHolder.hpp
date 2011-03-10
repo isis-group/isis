@@ -99,6 +99,8 @@ public:
 		getImageSize() const { return m_ImageSize; }
 	//TODO debug
 	data::Image m_DebugImage;
+	unsigned short 
+		getMajorTypeID() const { return m_TypeID; }
 	
 private:
 	size_t m_NumberOfTimeSteps;
