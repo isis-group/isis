@@ -10,7 +10,7 @@
 
 #include "MainWindowBase.hpp"
 #include "ViewerCoreBase.hpp"
-#include "QGLWidgetImplementation.hpp"
+#include "QGLWidgetAdapter.hpp"
 
 namespace isis {
 namespace viewer {
@@ -28,22 +28,13 @@ private:
 		MainWindow &parent;
 		Slot( MainWindow &p ) : parent( p ) {}
 	};
-	
 	boost::shared_ptr<ViewerCoreBase> m_ViewerCore;
-	
-	boost::shared_ptr<QGLWidgetImplementation> axialWidget;
+	boost::shared_ptr<QGLWidgetAdapter> axialWidget;
 	
 
 
 private:
-	struct RefreshIntensityDisplay : Slot {
-		RefreshIntensityDisplay( MainWindow &p ): Slot( p ) {}
-		void operator() ( const size_t & );
-	} my_RefreshIntensityDisplay;
-	struct RefreshCoordsDisplay: Slot {
-		RefreshCoordsDisplay( MainWindow &p ) : Slot( p ) {}
-		void operator() ( const size_t &, const size_t &, const size_t &, const size_t & );
-	} my_RefreshCoordsDisplay;
+	
 };
 
 

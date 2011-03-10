@@ -13,9 +13,11 @@ class WidgetAdapterBase
 {
 public:
 	virtual void setParent( QWidget* parent ) = 0;
-	
-// 	WidgetAdapterBase() {};
 
+private:
+
+protected:
+	
 	
 };
 

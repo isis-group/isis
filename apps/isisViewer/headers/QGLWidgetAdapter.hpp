@@ -10,27 +10,33 @@ namespace isis {
 namespace viewer {
 	
 
-class QGLWidgetImplementation : public WidgetAdapterBase
+class QGLWidgetAdapter : public WidgetAdapterBase
 {
-	class QGLWidgetImpl : public QGLWidget
+	struct QGLWidgetImpl : public QGLWidget
 	{
+		QGLWidgetImpl( QWidget* p ) : QGLWidget( p ) {};
+		virtual void initializeGL()
+		{
+			std::cout << "gna" << std::endl;
+		}
 		
 	};
 	
 	
 	
+	
+	
 public:
-	QGLWidgetImplementation( boost::shared_ptr<ViewerCoreBase> core);
+	QGLWidgetAdapter( boost::shared_ptr<ViewerCoreBase> core);
 
 	void setParent( QWidget* parent );
 	
 	void paint() const;
 	
 private:
-	bool m_Valid;
-	boost::shared_ptr<QGLWidgetImpl> m_Target;
 	boost::shared_ptr<ViewerCoreBase> m_ViewerCore;
-	
+	boost::shared_ptr<QGLWidgetImpl> m_Target;
+	bool m_Valid;
 	
 	
 	
