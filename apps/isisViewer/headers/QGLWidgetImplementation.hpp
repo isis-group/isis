@@ -1,6 +1,8 @@
 #ifndef QGLWIDGETIMPLEMENTATION_HPP
 #define QGLWIDGETIMPLEMENTATION_HPP
 
+#define GL_GLEXT_PROTOTYPES
+
 #include <QtOpenGL/QGLWidget>
 #include "ViewerCore.hpp"
 #include <iostream>
@@ -51,6 +53,7 @@ private:
 		GLuint texture;
 		util::FixedVector<size_t, 4> size = m_ViewerCore->getDataContainer()[imageID].getImageSize();
 		TYPE* dataPtr = static_cast<TYPE*>( m_ViewerCore->getImageWeakPointer(imageID, timestep).lock().get() );
+		assert( dataPtr != 0 );
 		glGenTextures(1, &texture);
 		glBindTexture(GL_TEXTURE_3D, texture);
 		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
