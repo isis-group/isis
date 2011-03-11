@@ -22,7 +22,7 @@ class QGLWidgetImplementation : public QGLWidget
 public:
 	enum PlaneType { axial, sagittal, coronal };
 
-	QGLWidgetImplementation( ViewerCore *core, QWidget *parent = 0, const QGLWidget* share = 0, PlaneType plane = axial );
+	QGLWidgetImplementation( ViewerCore *core, QWidget *parent = 0, const QGLWidget *share = 0, PlaneType plane = axial );
 	virtual ~QGLWidgetImplementation() {};
 	void initializeGL();
 	void setPlaneType( PlaneType plane ) { m_PlaneType = plane;}

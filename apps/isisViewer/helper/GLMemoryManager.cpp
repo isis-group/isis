@@ -6,13 +6,9 @@ namespace viewer
 {
 
 
-GLMemoryManager::GLMemoryManager()
-{
-
-}
-
 void GLMemoryManager::copyAllImagesToTextures( const DataContainer &data )
 {
+	// here we only copy the first timestep of each image. Would take a while to do this for all timesteps
 	for ( size_t imageID = 0; imageID < data.size(); imageID++ ) {
 		copyImageToTexture( data, imageID, 0 );
 	}
@@ -23,7 +19,7 @@ GLuint GLMemoryManager::copyImageToTexture( const DataContainer &data, size_t im
 {
 	//check if we have already copied this volume to texture
 	if ( m_ImageMap[imageID].find( timestep ) != m_ImageMap[imageID].end() ) {
-		LOG( Debug, verbose_info ) << "We already copied image " << imageID << " and timestep " << timestep  << " to texture!";
+		LOG( Debug, verbose_info ) << "Texture for volume " << imageID << " and timestep " << timestep  << " already exists. Wont copy it.";
 		return 0;
 	}
 
@@ -62,4 +58,4 @@ GLuint GLMemoryManager::copyImageToTexture( const DataContainer &data, size_t im
 	}
 }
 }
-}
+} // end namespace

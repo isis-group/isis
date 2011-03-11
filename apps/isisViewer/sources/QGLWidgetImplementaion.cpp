@@ -7,7 +7,7 @@ namespace isis
 namespace viewer
 {
 
-QGLWidgetImplementation::QGLWidgetImplementation( ViewerCore *core, QWidget *parent, const QGLWidget* share, PlaneType plane )
+QGLWidgetImplementation::QGLWidgetImplementation( ViewerCore *core, QWidget *parent, const QGLWidget *share, PlaneType plane )
 	: QGLWidget( parent, share ),
 	  m_ViewerCore( boost::shared_ptr<ViewerCore>( core ) ),
 	  m_PlaneType( plane )
@@ -40,19 +40,20 @@ void QGLWidgetImplementation::mouseMoveEvent( QMouseEvent *e )
 	glBindTexture( GL_TEXTURE_3D, 1 );
 	glBegin( GL_QUADS );
 	glTexCoord3f( pos, 0.0, 0.0 );
-	glVertex3f( -1.0, -1.0, 0 );
-	glTexCoord3f( pos, 0.0, 1.0 );
-	glVertex3f( -1.0, 1.0, 0 );
-	glTexCoord3f( pos, 1.0, 1.0 );
 	glVertex3f( 1.0, 1.0, 0 );
-	glTexCoord3f( pos, 1.0, 0.0 );
+	glTexCoord3f( pos, 0.0, 1.0 );
 	glVertex3f( 1.0, -1.0, 0 );
+	glTexCoord3f( pos, 1.0, 1.0 );
+	glVertex3f( -1.0, -1.0, 0 );
+	glTexCoord3f( pos, 1.0, 0.0 );
+	glVertex3f( -1.0, 1.0, 0 );
 	glEnd();
 	glFlush();
 	glDisable( GL_TEXTURE_3D );
 	redraw();
 
 }
+
 
 
 

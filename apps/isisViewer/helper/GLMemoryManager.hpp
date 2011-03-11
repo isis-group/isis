@@ -17,8 +17,6 @@ class GLMemoryManager
 public:
 	typedef std::map<size_t, std::map<size_t, GLuint > > ImageMapType;
 
-	GLMemoryManager();
-
 	void copyAllImagesToTextures( const DataContainer &data );
 	GLuint copyImageToTexture( const DataContainer &data , size_t imageID, size_t timestep );
 	ImageMapType getImageMap() const { return m_ImageMap; }
