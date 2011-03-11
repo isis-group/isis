@@ -11,7 +11,8 @@ namespace isis
 {
 namespace viewer
 {
-namespace _internal{
+namespace _internal
+{
 
 MatrixHandler::MatrixHandler( void )
 	: m_Valid( false )
@@ -47,7 +48,7 @@ void MatrixHandler::setVectors( isis::util::fvector4 readVec, isis::util::fvecto
 
 bool MatrixHandler::correctMatrix( void )
 {
-	if ( determinant(m_origMatrix1) == 1.0 ) {
+	if ( determinant( m_origMatrix1 ) == 1.0 ) {
 		const isis::util::fvector4 crossVec1 = isis::util::fvector4( //we could use their cross-product as sliceVector
 				m_origMatrix1( 1, 0 )  * m_origMatrix1( 2, 1 ) - m_origMatrix1( 2, 0 ) * m_origMatrix1( 1, 1 ),
 				m_origMatrix1( 2, 0 ) * m_origMatrix1( 0, 1 ) - m_origMatrix1( 0, 0 ) * m_origMatrix1( 2, 1 ),
@@ -72,9 +73,9 @@ bool MatrixHandler::correctMatrix( void )
 
 void MatrixHandler::createMatricesForWidgets( void )
 {
-	MatrixType axialMatrix (3,3);
-	MatrixType sagittalMatrix (3,3);
-	MatrixType coronalMatrix (3,3);
+	MatrixType axialMatrix ( 3, 3 );
+	MatrixType sagittalMatrix ( 3, 3 );
+	MatrixType coronalMatrix ( 3, 3 );
 	/*setup axial matrix
 	*-1  0  0
 	* 0 -1  0
@@ -140,29 +141,36 @@ util::fvector4 MatrixHandler::transformOrigin( const util::fvector4 &origin, con
 								0 );
 	}
 }
-int MatrixHandler::determinant_sign(const boost::numeric::ublas::permutation_matrix<size_t>& pm)
+int MatrixHandler::determinant_sign( const boost::numeric::ublas::permutation_matrix<size_t>& pm )
 {
-    int pm_sign=1;
-    size_t size = pm.size();
-    for (size_t i = 0; i < size; ++i)
-        if (i != pm(i))
-            pm_sign *= -1.0; // swap_rows would swap a pair of rows here, so we change sign
-    return pm_sign;
+	int pm_sign = 1;
+	size_t size = pm.size();
+
+	for ( size_t i = 0; i < size; ++i )
+		if ( i != pm( i ) )
+			pm_sign *= -1.0; // swap_rows would swap a pair of rows here, so we change sign
+
+	return pm_sign;
 }
 
-double MatrixHandler::determinant(MatrixType& mat_r)
+double MatrixHandler::determinant( MatrixType &mat_r )
 {
-	boost::numeric::ublas::permutation_matrix<size_t> pm(mat_r.size1());
-    double det = 1.0;
-    if( boost::numeric::ublas::lu_factorize(mat_r,pm) ) {
-        det = 0.0;
-    } else {
-        for(unsigned int i = 0; i < mat_r.size1(); i++) 
-            det *= mat_r(i,i);
-        det = det * determinant_sign( pm );
-		
-    }
-    return det;
-} 
+	boost::numeric::ublas::permutation_matrix<size_t> pm( mat_r.size1() );
+	double det = 1.0;
 
-}}} // end namespace
+	if( boost::numeric::ublas::lu_factorize( mat_r, pm ) ) {
+		det = 0.0;
+	} else {
+		for( unsigned int i = 0; i < mat_r.size1(); i++ )
+			det *= mat_r( i, i );
+
+		det = det * determinant_sign( pm );
+
+	}
+
+	return det;
+}
+
+}
+}
+} // end namespace

@@ -1,7 +1,10 @@
 #include "ViewerCore.hpp"
 
-namespace isis {
-namespace viewer {
-	
-	
-}}
+namespace isis
+{
+namespace viewer
+{
+
+
+}
+}

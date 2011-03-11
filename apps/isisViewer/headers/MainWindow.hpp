@@ -12,28 +12,30 @@
 #include "ViewerCore.hpp"
 #include "QGLWidgetImplementation.hpp"
 
-namespace isis {
-namespace viewer {
+namespace isis
+{
+namespace viewer
+{
 
 class MainWindow : public MainWindowBase
 {
-	
+
 
 public:
-	MainWindow( ViewerCore* core  );
-	
+	MainWindow( ViewerCore *core  );
+
 
 private:
 	struct Slot {
 		MainWindow &parent;
 		Slot( MainWindow &p ) : parent( p ) {}
 	};
-	ViewerCore* m_ViewerCore;
-	
+	ViewerCore *m_ViewerCore;
+
 
 
 private:
-	QGLWidgetImplementation* axialWidget;
+	QGLWidgetImplementation *axialWidget;
 };
 
 

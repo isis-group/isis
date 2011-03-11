@@ -14,9 +14,12 @@
 #include <boost/numeric/ublas/io.hpp>
 #include "common.hpp"
 
-namespace isis {
-namespace viewer {
-namespace _internal {
+namespace isis
+{
+namespace viewer
+{
+namespace _internal
+{
 
 class MatrixHandler
 {
@@ -56,10 +59,12 @@ private:
 	MatrixType m_MatrixCoronal1;
 	bool correctMatrix( void );
 	void createMatricesForWidgets( void );
-	double determinant( MatrixType& );
-	int determinant_sign(const boost::numeric::ublas::permutation_matrix<size_t>& );
+	double determinant( MatrixType & );
+	int determinant_sign( const boost::numeric::ublas::permutation_matrix<size_t>& );
 };
 
-}}} // end namespace
+}
+}
+} // end namespace
 
 #endif /* MATRIXHANDLER_HPP_ */

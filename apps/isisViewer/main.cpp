@@ -25,8 +25,8 @@ int main( int argc, char *argv[] )
 	app.setLog<isis::ViewerLog>( app.getLLMap()[app.parameters["dViewer"]->as<isis::util::Selection>()] );
 	app.setLog<isis::ViewerDebug>( app.getLLMap()[app.parameters["dViewer"]->as<isis::util::Selection>()] );
 	isis::util::slist fileList = app.parameters["in"];
-	std::list<isis::data::Image> imgList = isis::data::IOFactory::load(fileList.front());
-	
+	std::list<isis::data::Image> imgList = isis::data::IOFactory::load( fileList.front() );
+
 	isis::viewer::ViewerCore *core = new isis::viewer::ViewerCore;
 	core->setImageList( imgList );
 	isis::viewer::MainWindow isisViewerMainWindow( core );

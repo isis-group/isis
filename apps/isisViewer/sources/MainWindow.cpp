@@ -9,17 +9,20 @@
 #include <common.hpp>
 
 
-namespace isis {
-namespace viewer {
+namespace isis
+{
+namespace viewer
+{
 
 MainWindow::MainWindow( ViewerCore *core )
-	  : m_ViewerCore( core )
+	: m_ViewerCore( core )
 {
 	ui.setupUi( this );
 	axialWidget = new QGLWidgetImplementation( core, ui.widgetAxial, QGLWidgetImplementation::axial );
- 	m_ViewerCore->registerWidget("axialView", axialWidget );
-	
-	
+	m_ViewerCore->registerWidget( "axialView", axialWidget );
+
+
 }
 
-}} //end namespace
+}
+} //end namespace
