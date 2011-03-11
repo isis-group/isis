@@ -7,8 +7,8 @@ namespace isis
 namespace viewer
 {
 
-QGLWidgetImplementation::QGLWidgetImplementation( ViewerCore *core, QWidget *parent, PlaneType plane )
-	: QGLWidget( parent ),
+QGLWidgetImplementation::QGLWidgetImplementation( ViewerCore *core, QWidget *parent, const QGLWidget* share, PlaneType plane )
+	: QGLWidget( parent, share ),
 	  m_ViewerCore( boost::shared_ptr<ViewerCore>( core ) ),
 	  m_PlaneType( plane )
 {

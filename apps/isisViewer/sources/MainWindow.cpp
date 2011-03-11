@@ -18,9 +18,9 @@ MainWindow::MainWindow( ViewerCore *core )
 	: m_ViewerCore( core )
 {
 	ui.setupUi( this );
-	m_AxialWidget = new QGLWidgetImplementation( core, ui.widgetAxial, QGLWidgetImplementation::axial );
+	m_AxialWidget = new QGLWidgetImplementation( core, ui.widgetAxial, 0, QGLWidgetImplementation::axial );
 	m_ViewerCore->registerWidget( "axialView", m_AxialWidget );
-	m_CoronalWidget = new QGLWidgetImplementation( core, ui.widgetCoronal, QGLWidgetImplementation::coronal );
+	m_CoronalWidget = new QGLWidgetImplementation( core, ui.widgetCoronal, m_AxialWidget, QGLWidgetImplementation::coronal );
 	m_ViewerCore->registerWidget( "coronalView", m_CoronalWidget );
 
 
