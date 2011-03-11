@@ -27,15 +27,11 @@ void QGLWidgetImplementation::initializeGL()
 	
 }
 
-
 void QGLWidgetImplementation::copyAllImageToTexture()
 {
 	for ( size_t imageID = 0; imageID < m_ViewerCore->getDataContainer().size(); imageID++ )
 	{
-		for ( size_t timestep = 0; timestep < m_ViewerCore->getDataContainer()[imageID].getImageVector().size(); timestep++ )
-		{
-			copyImageToTexture(imageID, timestep);
-		}
+		copyImageToTexture(imageID, 0);
 	}
 	
 }
