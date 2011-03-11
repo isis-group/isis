@@ -24,7 +24,6 @@ class MainWindow : public MainWindowBase
 public:
 	MainWindow( ViewerCore *core  );
 
-
 private:
 	struct Slot {
 		MainWindow &parent;

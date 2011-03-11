@@ -55,8 +55,7 @@ public:
 
 		//copy the image into continuous memory space and assure consistent data type
 		data::ValuePtr<TYPE> imagePtr( ( TYPE * ) calloc( image.getVolume(), sizeof( TYPE ) ), image.getVolume() );
-		LOG( Debug, verbose_info ) << "Needed memory: " << image.getVolume() << " * " << sizeof( TYPE ) << " = "
-								   << image.getVolume() * sizeof( TYPE ) << ".";
+		LOG( Debug, verbose_info ) << "Needed memory: " << image.getVolume() * sizeof( TYPE ) / (1024.0*1024.0) << " mb.";
 		image.copyToMem<TYPE>( &imagePtr[0] );
 		LOG( Debug, verbose_info ) << "Copied image to continuous memory space.";
 
