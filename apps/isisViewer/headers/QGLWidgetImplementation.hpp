@@ -20,7 +20,6 @@ public:
 	
 	QGLWidgetImplementation( ViewerCore* core, QWidget* parent = 0, PlaneType plane = axial ); 
 	
-	void paint();
 	void initializeGL();
 	void setPlaneType( PlaneType plane ) { m_PlaneType = plane;}
 	
@@ -31,6 +30,7 @@ private:
 
 public Q_SLOTS:
 	
+	void copyAllImageToTexture();
 	GLuint copyImageToTexture( size_t imageID, size_t timestep );
 	
 	protected:
@@ -66,6 +66,7 @@ private:
 				size[2], 0, GL_LUMINANCE, format, 
 				dataPtr);
 		m_ImageMap[imageID].insert( std::make_pair<size_t, GLuint >(timestep, texture) );
+		m_CurrentTextureID = texture;
 		return texture;
 	}
 	

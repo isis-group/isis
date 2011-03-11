@@ -23,15 +23,22 @@ void QGLWidgetImplementation::connectSignals()
 }
 void QGLWidgetImplementation::initializeGL()
 {
-	
+	copyAllImageToTexture();
 	
 }
 
-void QGLWidgetImplementation::paint()
+
+void QGLWidgetImplementation::copyAllImageToTexture()
 {
+	for ( size_t imageID = 0; imageID < m_ViewerCore->getDataContainer().size(); imageID++ )
+	{
+		for ( size_t timestep = 0; timestep < m_ViewerCore->getDataContainer()[imageID].getImageVector().size(); timestep++ )
+		{
+			copyImageToTexture(imageID, timestep);
+		}
+	}
 	
 }
-
 void QGLWidgetImplementation::mouseMoveEvent(QMouseEvent* e)
 {
 	//TODO debug
@@ -60,28 +67,28 @@ GLuint QGLWidgetImplementation::copyImageToTexture( size_t imageID, size_t times
 	switch( typeID )
 	{
 		case data::ValuePtr<int8_t>::staticID:
-			return internCopyImageToTexture<int8_t>( GL_BYTE, imageID, timestep );
+			return internCopyImageToTexture<GLbyte>( GL_BYTE, imageID, timestep );
 			break;
 		case data::ValuePtr<uint8_t>::staticID:
-			return internCopyImageToTexture<uint8_t>( GL_UNSIGNED_BYTE, imageID, timestep );
+			return internCopyImageToTexture<GLubyte>( GL_UNSIGNED_BYTE, imageID, timestep );
 			break;
 		case data::ValuePtr<int16_t>::staticID:
-			return internCopyImageToTexture<int16_t>( GL_SHORT, imageID, timestep );
+			return internCopyImageToTexture<GLshort>( GL_SHORT, imageID, timestep );
 			break;
 		case data::ValuePtr<uint16_t>::staticID:
-			return internCopyImageToTexture<uint16_t>( GL_UNSIGNED_SHORT, imageID, timestep );
+			return internCopyImageToTexture<GLushort>( GL_UNSIGNED_SHORT, imageID, timestep );
 			break;
 		case data::ValuePtr<int32_t>::staticID:
-			return internCopyImageToTexture<int32_t>( GL_INT, imageID, timestep );
+			return internCopyImageToTexture<GLint>( GL_INT, imageID, timestep );
 			break;
 		case data::ValuePtr<uint32_t>::staticID:
-			return internCopyImageToTexture<uint32_t>( GL_UNSIGNED_INT, imageID, timestep );
+			return internCopyImageToTexture<GLuint>( GL_UNSIGNED_INT, imageID, timestep );
 			break;
 		case data::ValuePtr<float>::staticID:
-			return internCopyImageToTexture<float>( GL_FLOAT, imageID, timestep );
+			return internCopyImageToTexture<GLfloat>( GL_FLOAT, imageID, timestep );
 			break;
 		case data::ValuePtr<double>::staticID:
-			return internCopyImageToTexture<double>( GL_DOUBLE, imageID, timestep );
+			return internCopyImageToTexture<GLdouble>( GL_DOUBLE, imageID, timestep );
 			break;
 		default:
 			LOG(Runtime, error) << "I do not know any type with ID " << typeID << "!";
