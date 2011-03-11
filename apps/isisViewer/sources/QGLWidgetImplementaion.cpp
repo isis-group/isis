@@ -16,7 +16,7 @@ QGLWidgetImplementation::QGLWidgetImplementation( ViewerCore *core, QWidget *par
 	( new QVBoxLayout( parent ) )->addWidget( this );
 	setMouseTracking( true );
 	connectSignals();
-	
+
 }
 
 void QGLWidgetImplementation::connectSignals()

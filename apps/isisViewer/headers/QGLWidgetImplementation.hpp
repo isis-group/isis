@@ -48,7 +48,7 @@ Q_SIGNALS:
 private:
 	void connectSignals();
 
-	
+
 
 	std::vector<GLuint> m_TextureIDVec;
 	PlaneType m_PlaneType;

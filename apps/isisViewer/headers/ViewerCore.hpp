@@ -12,11 +12,11 @@ class ViewerCore : public ViewerCoreBase
 {
 public:
 	ViewerCore();
-	
-	
+
+
 
 private:
-		
+
 };
 
 

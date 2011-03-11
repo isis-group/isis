@@ -7,23 +7,25 @@
 #include "ViewerCoreBase.hpp"
 #include "GL/gl.h"
 
-namespace isis {
-namespace viewer {
+namespace isis
+{
+namespace viewer
+{
 
 class GLMemoryManager
 {
 public:
 	typedef std::map<size_t, std::map<size_t, GLuint > > ImageMapType;
-	
+
 	GLMemoryManager();
-	
+
 	void copyAllImagesToTextures( const DataContainer &data );
-	GLuint copyImageToTexture( const DataContainer &data ,size_t imageID, size_t timestep );
+	GLuint copyImageToTexture( const DataContainer &data , size_t imageID, size_t timestep );
 	ImageMapType getImageMap() const { return m_ImageMap; }
 
 private:
 	ImageMapType m_ImageMap;
-	
+
 	template<typename TYPE>
 	GLuint internCopyImageToTexture( const DataContainer &data, GLenum format, size_t imageID, size_t timestep ) {
 		GLuint texture;
@@ -45,9 +47,10 @@ private:
 		m_ImageMap[imageID].insert( std::make_pair<size_t, GLuint >( timestep, texture ) );
 		return texture;
 	}
-		
+
 };
-	
-}}
+
+}
+}
 
 #endif

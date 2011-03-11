@@ -16,7 +16,7 @@ public:
 	boost::weak_ptr<void>
 	getImageWeakPointer( size_t imageID = 0, size_t timestep = 0 ) const {
 		LOG_IF( size() < imageID, Runtime, error ) << "There is no image with iamgeID " << imageID << "!";
-		return operator[](imageID).getImageVector()[timestep]->getRawAddress();
+		return operator[]( imageID ).getImageVector()[timestep]->getRawAddress();
 	}
 
 };
