@@ -31,8 +31,7 @@ private:
 
 public Q_SLOTS:
 	
-	void recreateTextureVector();
-	GLuint copyImageToTexture( unsigned short imageID, size_t timestep );
+	GLuint copyImageToTexture( size_t imageID, size_t timestep );
 	
 	protected:
 	virtual void mouseMoveEvent(QMouseEvent* e );
@@ -48,7 +47,7 @@ private:
 	void connectSignals();
 	
 	template<typename TYPE>
-	GLuint internCopyImageToTexture( GLenum format, unsigned int imageID, size_t timestep )
+	GLuint internCopyImageToTexture( GLenum format, size_t imageID, size_t timestep )
 	{
 		GLuint texture;
 		util::FixedVector<size_t, 4> size = m_ViewerCore->getDataContainer()[imageID].getImageSize();
@@ -66,11 +65,13 @@ private:
 				size[1], 
 				size[2], 0, GL_LUMINANCE, format, 
 				dataPtr);
+		m_ImageMap[imageID].insert( std::make_pair<size_t, GLuint >(timestep, texture) );
 		return texture;
 	}
 	
 	std::vector<GLuint> m_TextureIDVec;
 	PlaneType m_PlaneType;
+	std::map<size_t, std::map<size_t, GLuint > > m_ImageMap;
 		
 };
 

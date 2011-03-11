@@ -23,29 +23,19 @@ void QGLWidgetImplementation::connectSignals()
 }
 void QGLWidgetImplementation::initializeGL()
 {
+	
+	
 }
 
 void QGLWidgetImplementation::paint()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_TEXTURE_3D);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-	glBindTexture(GL_TEXTURE_3D, m_CurrentTextureID);
-	glBegin(GL_QUADS);
-	glTexCoord3f(0.2, 0.0,0.0); glVertex3f(-1.0, -1.0, 0.0);
-	glTexCoord3f(0.2, 0.0,1.0); glVertex3f(-1.0, 1.0, 0.0);
-	glTexCoord3f(0.2, 1.0,1.0); glVertex3f(1.0, 1.0, 0.0);
-	glTexCoord3f(0.2, 1.0,0.0); glVertex3f(1.0, -1.0, 0.0);
 	
-	glEnd();
-	glFlush();
-	glDisable(GL_TEXTURE_3D);
-	redraw();
 }
 
 void QGLWidgetImplementation::mouseMoveEvent(QMouseEvent* e)
-{//TODO debug
-	float pos = float(e->globalX()) / 300;
+{
+	//TODO debug
+	float pos = float(e->x()) / 300;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_TEXTURE_3D);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
@@ -55,7 +45,6 @@ void QGLWidgetImplementation::mouseMoveEvent(QMouseEvent* e)
 	glTexCoord3f(pos, 0.0,1.0); glVertex3f(-1.0, 1.0, 0);
 	glTexCoord3f(pos, 1.0,1.0); glVertex3f(1.0, 1.0, 0);
 	glTexCoord3f(pos, 1.0,0.0); glVertex3f(1.0, -1.0, 0);
-
 	glEnd();
 	glFlush();
 	glDisable(GL_TEXTURE_3D);
@@ -64,7 +53,7 @@ void QGLWidgetImplementation::mouseMoveEvent(QMouseEvent* e)
 }
 
 
-GLuint QGLWidgetImplementation::copyImageToTexture( unsigned short imageID, size_t timestep )
+GLuint QGLWidgetImplementation::copyImageToTexture( size_t imageID, size_t timestep )
 {
 	LOG(Debug, verbose_info) << "Copy volume with ID " << imageID << " and timestep " << timestep << " to GLTexture.";
 	unsigned short typeID = m_ViewerCore->getDataContainer()[imageID].getMajorTypeID();
@@ -80,7 +69,7 @@ GLuint QGLWidgetImplementation::copyImageToTexture( unsigned short imageID, size
 			return internCopyImageToTexture<int16_t>( GL_SHORT, imageID, timestep );
 			break;
 		case data::ValuePtr<uint16_t>::staticID:
-			return internCopyImageToTexture<int16_t>( GL_UNSIGNED_SHORT, imageID, timestep );
+			return internCopyImageToTexture<uint16_t>( GL_UNSIGNED_SHORT, imageID, timestep );
 			break;
 		case data::ValuePtr<int32_t>::staticID:
 			return internCopyImageToTexture<int32_t>( GL_INT, imageID, timestep );
@@ -101,9 +90,6 @@ GLuint QGLWidgetImplementation::copyImageToTexture( unsigned short imageID, size
 	}
 }
 
-void QGLWidgetImplementation::recreateTextureVector()
-{	
-}
 
 
 }} // end namespace

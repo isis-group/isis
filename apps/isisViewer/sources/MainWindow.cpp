@@ -18,7 +18,6 @@ MainWindow::MainWindow( ViewerCore *core )
 	ui.setupUi( this );
 	QGLWidgetImplementation* axialWidget = new QGLWidgetImplementation( core, ui.widgetAxial, QGLWidgetImplementation::axial );
 	m_ViewerCore->registerWidget("axialView", boost::shared_ptr<QGLWidgetImplementation> (axialWidget) );
-// 	m_ViewerCore->getWidgetAs<QGLWidgetImplementation>("axialView")->paint();
 	
 	
 }
