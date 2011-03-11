@@ -10,6 +10,7 @@
 
 #include "MainWindowBase.hpp"
 #include "ViewerCore.hpp"
+#include "QGLWidgetImplementation.hpp"
 
 namespace isis {
 namespace viewer {
@@ -32,7 +33,7 @@ private:
 
 
 private:
-	
+	QGLWidgetImplementation* axialWidget;
 };
 
 

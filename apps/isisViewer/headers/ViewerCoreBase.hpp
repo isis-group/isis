@@ -13,10 +13,10 @@ class ViewerCoreBase
 {
 
 public:
-	typedef std::map<std::string, boost::shared_ptr<QWidget> > WidgetMap;
+	typedef std::map<std::string, QWidget* > WidgetMap;
 	
 	void setImageList( const std::list<data::Image> );
-	bool registerWidget( std::string key, boost::shared_ptr<QWidget> widget);
+	bool registerWidget( std::string key, QWidget* widget);
 	
 	WidgetMap getWidgets() const { return m_WidgetMap; }
 	
