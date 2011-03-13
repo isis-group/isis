@@ -12,16 +12,27 @@ namespace isis
 namespace viewer
 {
 
+  /**
+   * This class is responsible for copying the image data to a GL_TEXTURE_3D. 
+   * It gets the data as a boost::weak_ptr and copies it to the texture.
+   */
+  
 class GLTextureHandler
 {
 public:
 	typedef std::map<size_t, std::map<size_t, GLuint > > ImageMapType;
 
-	void copyAllImagesToTextures( const DataContainer &data );
+	///Convinient function to copy all in DataContainer available images to a GL_TEXTURE_3D.
+	std::map<size_t, GLuint> copyAllImagesToTextures( const DataContainer &data );
+	
+	///Copies the given timestep of an image with the given imageID to a GL_TEXTURE_3D. Return the texture id.
 	GLuint copyImageToTexture( const DataContainer &data , size_t imageID, size_t timestep );
+	
+	///The image map is a mapping of the imageID and timestep to the texture of the GL_TEXTURE_3D.
 	ImageMapType getImageMap() const { return m_ImageMap; }
 
 private:
+  
 	ImageMapType m_ImageMap;
 
 	template<typename TYPE>

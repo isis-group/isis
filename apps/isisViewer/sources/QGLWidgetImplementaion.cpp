@@ -26,6 +26,7 @@ void QGLWidgetImplementation::connectSignals()
 }
 void QGLWidgetImplementation::initializeGL()
 {
+	//here we take a singleton to ensure having only one instance which manages the textures for all widgets
 	util::Singletons::get<GLTextureHandler, 10>().copyAllImagesToTextures( m_ViewerCore->getDataContainer() );
 }
 

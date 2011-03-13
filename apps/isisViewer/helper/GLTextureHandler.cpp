@@ -6,13 +6,15 @@ namespace viewer
 {
 
 
-void GLTextureHandler::copyAllImagesToTextures( const DataContainer &data )
+std::map<size_t, GLuint> GLTextureHandler::copyAllImagesToTextures( const DataContainer &data )
 {
 	// here we only copy the first timestep of each image. Would take a while to do this for all timesteps
+	std::map<size_t, GLuint> retIDList;
 	for ( size_t imageID = 0; imageID < data.size(); imageID++ ) {
-		copyImageToTexture( data, imageID, 0 );
+		retIDList[imageID] = copyImageToTexture( data, imageID, 0 );
 	}
-
+	return retIDList;
+	
 }
 
 GLuint GLTextureHandler::copyImageToTexture( const DataContainer &data, size_t imageID, size_t timestep )
