@@ -5,7 +5,7 @@
 
 #include <QtOpenGL/QGLWidget>
 #include "ViewerCore.hpp"
-#include "GLMemoryManager.hpp"
+#include "GLTextureHandler.hpp"
 #include <iostream>
 #include <DataStorage/chunk.hpp>
 #include <CoreUtils/singletons.hpp>

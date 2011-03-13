@@ -1,4 +1,4 @@
-#include "GLMemoryManager.hpp"
+#include "GLTextureHandler.hpp"
 
 namespace isis
 {
@@ -6,7 +6,7 @@ namespace viewer
 {
 
 
-void GLMemoryManager::copyAllImagesToTextures( const DataContainer &data )
+void GLTextureHandler::copyAllImagesToTextures( const DataContainer &data )
 {
 	// here we only copy the first timestep of each image. Would take a while to do this for all timesteps
 	for ( size_t imageID = 0; imageID < data.size(); imageID++ ) {
@@ -15,7 +15,7 @@ void GLMemoryManager::copyAllImagesToTextures( const DataContainer &data )
 
 }
 
-GLuint GLMemoryManager::copyImageToTexture( const DataContainer &data, size_t imageID, size_t timestep )
+GLuint GLTextureHandler::copyImageToTexture( const DataContainer &data, size_t imageID, size_t timestep )
 {
 	//check if we have already copied this volume to texture
 	if ( m_ImageMap[imageID].find( timestep ) != m_ImageMap[imageID].end() ) {

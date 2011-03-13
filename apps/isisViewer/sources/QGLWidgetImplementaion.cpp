@@ -26,7 +26,7 @@ void QGLWidgetImplementation::connectSignals()
 }
 void QGLWidgetImplementation::initializeGL()
 {
-	util::Singletons::get<GLMemoryManager, 10>().copyAllImagesToTextures( m_ViewerCore->getDataContainer() );
+	util::Singletons::get<GLTextureHandler, 10>().copyAllImagesToTextures( m_ViewerCore->getDataContainer() );
 }
 
 

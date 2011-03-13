@@ -12,7 +12,7 @@ namespace isis
 namespace viewer
 {
 
-class GLMemoryManager
+class GLTextureHandler
 {
 public:
 	typedef std::map<size_t, std::map<size_t, GLuint > > ImageMapType;
