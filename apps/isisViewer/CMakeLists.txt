@@ -61,7 +61,7 @@ include_directories(${OPENGL_INCLUDE_DIR})
 # boost and common stuff
 ###########################################################
 
-FIND_PACKAGE(Boost REQUIRED COMPONENTS signals)
+FIND_PACKAGE(Boost REQUIRED COMPONENTS thread)
 
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/headers)

@@ -16,9 +16,7 @@ public:
 	
 	static size_t getSliceIndex( const ImageHolder &image, PlaneOrientation orientation );
 	static size_t getNumberOfSlices( const ImageHolder &image, PlaneOrientation orientation );
-	static VertexMatrix getVertexMatrix( const ImageHolder &image, size_t slice, PlaneOrientation orientation );
-
-	
+	static VertexMatrix getVertexMatrix( const ImageHolder &image, size_t slice, PlaneOrientation orientation );	
 	
 };
 	

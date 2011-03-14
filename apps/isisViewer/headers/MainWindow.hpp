@@ -36,6 +36,7 @@ private:
 private:
 	QGLWidgetImplementation *m_AxialWidget;
 	QGLWidgetImplementation *m_CoronalWidget;
+	QGLWidgetImplementation *m_SagittalWidget;
 };
 
 
