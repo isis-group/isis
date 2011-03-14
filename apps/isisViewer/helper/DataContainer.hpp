@@ -21,6 +21,9 @@ public:
 	///simply adds an isis image to the vector
 	bool addImage( const data::Image & );
 	
+	///checks if a image with the given parameters exists
+	bool isImage( size_t imageID, size_t timestep = 0, size_t slice = 0 ) const;
+	
 	///returns a boost::weak_ptr of the images data. Actually this also is a convinient function.
 	boost::weak_ptr<void>
 	getImageWeakPointer( size_t imageID = 0, size_t timestep = 0 ) const {

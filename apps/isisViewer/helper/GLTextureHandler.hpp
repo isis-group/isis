@@ -22,7 +22,7 @@ class GLTextureHandler
 public:
 	typedef std::map<size_t, std::map<size_t, GLuint > > ImageMapType;
 
-	///Convinient function to copy all in DataContainer available images to a GL_TEXTURE_3D.
+	///Convinient function to copy all in DataContainer available volumes to a GL_TEXTURE_3D.
 	std::map<size_t, GLuint> copyAllImagesToTextures( const DataContainer &data );
 	
 	///Copies the given timestep of an image with the given imageID to a GL_TEXTURE_3D. Return the texture id.

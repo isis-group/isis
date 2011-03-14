@@ -20,16 +20,12 @@ class QGLWidgetImplementation : public QGLWidget
 {
 	Q_OBJECT
 public:
-	enum PlaneType { axial, sagittal, coronal };
-
-	QGLWidgetImplementation( ViewerCore *core, QWidget *parent = 0, const QGLWidget *share = 0, PlaneType plane = axial );
+	explicit QGLWidgetImplementation( ViewerCore *core, QWidget *parent = 0, const QGLWidget *share = 0, OrientationHandler::PlaneOrientation orienation = OrientationHandler::axial );
 	virtual ~QGLWidgetImplementation() {};
-	void initializeGL();
-	void setPlaneType( PlaneType plane ) { m_PlaneType = plane;}
-
-
+	virtual bool paintVolume( size_t imageID, size_t timestep, size_t slice );
+	
 private:
-	boost::shared_ptr<ViewerCore> m_ViewerCore;
+	ViewerCore* m_ViewerCore;
 	GLuint m_CurrentTextureID;
 
 public Q_SLOTS:
@@ -37,7 +33,8 @@ public Q_SLOTS:
 
 protected:
 	virtual void mouseMoveEvent( QMouseEvent *e );
-
+	virtual void initializeGL();
+	virtual void resizeGL(int w, int h);
 
 
 
@@ -51,7 +48,7 @@ private:
 
 
 	std::vector<GLuint> m_TextureIDVec;
-	PlaneType m_PlaneType;
+	OrientationHandler::PlaneOrientation m_PlaneOrientation;
 
 
 };

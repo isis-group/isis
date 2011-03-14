@@ -80,8 +80,8 @@ public:
 		m_PropMap = static_cast<util::PropertyMap>( image );
 
 		//workaround cause compiles do not understand to use getChunksAsVector directly in BOOST_FOREACH
-		_internal::ChunkVector chVec = image.getChunksAsVector();
-		BOOST_FOREACH( _internal::ChunkVector::const_reference chRef, chVec ) {
+		ChunkVector chVec = image.getChunksAsVector();
+		BOOST_FOREACH( ChunkVector::const_reference chRef, chVec ) {
 			m_ChunkProperties.push_back( static_cast<util::PropertyMap>( *chRef ) );
 		}
 		LOG( Debug, verbose_info ) << "Fetched " << m_ChunkProperties.size() << " chunk properties.";

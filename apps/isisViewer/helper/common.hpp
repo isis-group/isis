@@ -20,12 +20,13 @@ struct ViewerDebug {static const char *name() {return "ViewerDebug";}; enum {use
 
 namespace viewer
 {
-namespace _internal
-{
+
 // just some helper typedefs which we will need regularly
 typedef std::vector<boost::shared_ptr< data::Chunk > > ChunkVector;
 
-}
+
+
+
 typedef ViewerLog Runtime;
 typedef ViewerDebug Debug;
 template<typename HANDLE> void enable_log( LogLevel level )
