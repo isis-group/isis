@@ -20,13 +20,13 @@ MainWindow::MainWindow( ViewerCore *core )
 	m_AxialWidget = new QGLWidgetImplementation( core, ui.widgetAxial, OrientationHandler::axial );
 	m_ViewerCore->registerWidget( "axialView", m_AxialWidget );
 	
-// 	m_SagittalWidget = m_AxialWidget->createSharedWidget( ui.widgetSagittal, OrientationHandler::sagittal );
-// 	m_ViewerCore->registerWidget( "sagittalView", m_SagittalWidget );
+	m_SagittalWidget = m_AxialWidget->createSharedWidget( ui.widgetSagittal, OrientationHandler::sagittal );
+	m_ViewerCore->registerWidget( "sagittalView", m_SagittalWidget );
 
 	//TODO only view 2 widgets since my computer is too dumb to manage 3 ones
-	m_CoronalWidget = m_AxialWidget->createSharedWidget( ui.widgetCoronal, OrientationHandler::coronal );
-	m_ViewerCore->registerWidget( "coronalView", m_CoronalWidget );
-	
+// 	m_CoronalWidget = m_AxialWidget->createSharedWidget( ui.widgetCoronal, OrientationHandler::coronal );
+// 	m_ViewerCore->registerWidget( "coronalView", m_CoronalWidget );
+// 	
 
 }
 

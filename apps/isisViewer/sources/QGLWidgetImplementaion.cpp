@@ -72,7 +72,6 @@ bool QGLWidgetImplementation::paintVolume( size_t imageID, size_t timestep, size
 			", but no such image exists!";
 		return false;
 	}
-	
 	//copy the volume to openGL. If this already has happend GLTextureHandler does nothing.
 	GLuint textureID = util::Singletons::get<GLTextureHandler, 10>().copyImageToTexture( m_ViewerCore->getDataContainer(), imageID, timestep );
 	ImageHolder image = m_ViewerCore->getDataContainer()[imageID];
@@ -80,33 +79,36 @@ bool QGLWidgetImplementation::paintVolume( size_t imageID, size_t timestep, size
 	float matrix[16];
 	OrientationHandler::boostMatrix2Pointer(  OrientationHandler::orientation2TextureMatrix( orient ), matrix );
 
-// 	std::cout << objectName().toStdString() << std::endl;
-// 	std::cout << OrientationHandler::getNumberOfSlices(image, m_PlaneOrientation) << std::endl;
-// 	OrientationHandler::printMatrix(matrix);
-
 	float slicePos = (1.0 / OrientationHandler::getNumberOfSlices(image, m_PlaneOrientation)) * slice;
+	paintIntern(textureID, matrix, slicePos);
+	if(redrawFlag) {
+		redraw();
+	}
+}
+void QGLWidgetImplementation::paintIntern(GLuint textureID, const float *matrix, float slice)
+{
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+// 	glColor4i(slice, slice, slice, slice);
+	
+	
 	glMatrixMode(GL_TEXTURE);
 	glLoadIdentity();
 	glLoadMatrixf( matrix );
 	glEnable( GL_TEXTURE_3D );
 	glBindTexture( GL_TEXTURE_3D, textureID );
 	glBegin( GL_QUADS );
-	glTexCoord3f( 0, 0, slicePos );
+	glTexCoord3f( 0, 0, 0.5 );
 	glVertex2f( -1.0, -1.0 ); 
-	glTexCoord3f( 0, 1, slicePos);
+	glTexCoord3f( 0, 1, 0.5 );
 	glVertex2f( -1.0, 1.0 );
-	glTexCoord3f( 1, 1, slicePos );
+	glTexCoord3f( 1, 1, 0.5 );
 	glVertex2f( 1.0, 1.0 );
-	glTexCoord3f( 1, 0, slicePos);
+	glTexCoord3f( 1, 0, 0.5 );
 	glVertex2f( 1.0, -1.0 );		
 	glEnd();
 	glFlush();
 	glDisable( GL_TEXTURE_3D );
-	if(redrawFlag) {
-		redraw();
-	}
 }
-
 
 void QGLWidgetImplementation::mouseMoveEvent( QMouseEvent *e )
 {

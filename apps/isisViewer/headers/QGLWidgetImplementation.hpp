@@ -51,6 +51,7 @@ Q_SIGNALS:
 private:
 	void connectSignals();
 	void commonInit();
+	void paintIntern(GLuint textureID, const float *matrix, float slice);
 
 	std::vector<GLuint> m_TextureIDVec;
 	OrientationHandler::PlaneOrientation m_PlaneOrientation;

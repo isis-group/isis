@@ -19,6 +19,7 @@ std::map<size_t, GLuint> GLTextureHandler::copyAllImagesToTextures( const DataCo
 
 GLuint GLTextureHandler::copyImageToTexture( const DataContainer &data, size_t imageID, size_t timestep )
 {
+	typedef uint8_t TYPE;
 	//check if there is an image with this parameters
 	if ( !data.isImage( imageID, timestep ) )
 	{
@@ -34,39 +35,11 @@ GLuint GLTextureHandler::copyImageToTexture( const DataContainer &data, size_t i
 	}
 
 	LOG( Debug, verbose_info ) << "Copy volume with ID " << imageID << " and timestep " << timestep << " to GLTexture.";
-	unsigned short typeID = data[imageID].getMajorTypeID();
 
-	switch( typeID ) {
-	case data::ValuePtr<int8_t>::staticID:
-		return internCopyImageToTexture<GLbyte>( data, GL_BYTE, imageID, timestep );
-		break;
-	case data::ValuePtr<uint8_t>::staticID:
-		return internCopyImageToTexture<GLubyte>( data, GL_UNSIGNED_BYTE, imageID, timestep );
-		break;
-	case data::ValuePtr<int16_t>::staticID:
-		return internCopyImageToTexture<GLshort>( data, GL_SHORT, imageID, timestep );
-		break;
-	case data::ValuePtr<uint16_t>::staticID:
-		return internCopyImageToTexture<GLushort>( data, GL_UNSIGNED_SHORT, imageID, timestep );
-		break;
-	case data::ValuePtr<int32_t>::staticID:
-		return internCopyImageToTexture<GLint>( data, GL_INT, imageID, timestep );
-		break;
-	case data::ValuePtr<uint32_t>::staticID:
-		return internCopyImageToTexture<GLuint>( data, GL_UNSIGNED_INT, imageID, timestep );
-		break;
-	case data::ValuePtr<float>::staticID:
-		return internCopyImageToTexture<GLfloat>( data, GL_FLOAT, imageID, timestep );
-		break;
-	case data::ValuePtr<double>::staticID:
-		return internCopyImageToTexture<GLdouble>( data, GL_DOUBLE, imageID, timestep );
-		break;
-	default:
-		LOG( Runtime, error ) << "I do not know any type with ID " << typeID << "!";
-		return 0;
-
-	}
-
+	data::scaling_pair scaling = data[imageID].getImage().getScalingTo(data::ValuePtr<TYPE>::staticID);
+	
+	return internCopyImageToTexture<TYPE>( data, GL_UNSIGNED_BYTE, imageID, timestep, scaling.second->as<TYPE>(), scaling.first->as<float>() );
+	
 
 }
 }

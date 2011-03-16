@@ -6,6 +6,8 @@
 #include "DataContainer.hpp"
 #include "ViewerCoreBase.hpp"
 #include "GL/gl.h"
+#include <DataStorage/typeptr.hpp>
+#include <DataStorage/image.hpp>
 
 namespace isis
 {
@@ -36,11 +38,12 @@ private:
 	ImageMapType m_ImageMap;
 
 	template<typename TYPE>
-	GLuint internCopyImageToTexture( const DataContainer &data, GLenum format, size_t imageID, size_t timestep ) {
+	GLuint internCopyImageToTexture( const DataContainer &data, GLenum format, size_t imageID, size_t timestep, TYPE offset, float scaling ) {
 		GLuint texture;
 		util::FixedVector<size_t, 4> size = data[imageID].getImageSize();
 		TYPE *dataPtr = static_cast<TYPE *>( data.getImageWeakPointer( imageID, timestep ).lock().get() );
 		assert( dataPtr != 0 );
+				
 		glGenTextures( 1, &texture );
 		glBindTexture( GL_TEXTURE_3D, texture );
 		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
