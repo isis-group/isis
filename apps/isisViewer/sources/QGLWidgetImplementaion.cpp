@@ -81,21 +81,23 @@ bool QGLWidgetImplementation::paintVolume( size_t imageID, size_t timestep, size
 	OrientationHandler::boostMatrix2Pointer(  OrientationHandler::orientation2TextureMatrix( orient ), matrix );
 
 // 	std::cout << objectName().toStdString() << std::endl;
+// 	std::cout << OrientationHandler::getNumberOfSlices(image, m_PlaneOrientation) << std::endl;
 // 	OrientationHandler::printMatrix(matrix);
 
+	float slicePos = (1.0 / OrientationHandler::getNumberOfSlices(image, m_PlaneOrientation)) * slice;
 	glMatrixMode(GL_TEXTURE);
-// 	glLoadIdentity();
+	glLoadIdentity();
 	glLoadMatrixf( matrix );
 	glEnable( GL_TEXTURE_3D );
 	glBindTexture( GL_TEXTURE_3D, textureID );
 	glBegin( GL_QUADS );
-	glTexCoord3f( 0, 0, 0.5 );
+	glTexCoord3f( 0, 0, slicePos );
 	glVertex2f( -1.0, -1.0 ); 
-	glTexCoord3f( 0, 1, 0.5);
+	glTexCoord3f( 0, 1, slicePos);
 	glVertex2f( -1.0, 1.0 );
-	glTexCoord3f( 1, 1, 0.5 );
+	glTexCoord3f( 1, 1, slicePos );
 	glVertex2f( 1.0, 1.0 );
-	glTexCoord3f( 1, 0, 0.5);
+	glTexCoord3f( 1, 0, slicePos);
 	glVertex2f( 1.0, -1.0 );		
 	glEnd();
 	glFlush();
@@ -109,7 +111,6 @@ bool QGLWidgetImplementation::paintVolume( size_t imageID, size_t timestep, size
 void QGLWidgetImplementation::mouseMoveEvent( QMouseEvent *e )
 {
 	//TODO debug
-// 	float pos = float( e->x() ) / geometry().width();
 	paintVolume(0,0,e->x());
 
 }
