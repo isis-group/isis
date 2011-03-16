@@ -20,13 +20,13 @@ public:
 
 	void setImageList( const std::list<data::Image> );
 	bool registerWidget( std::string key, QWidget *widget );
-
+	
 	WidgetMap getWidgets() const { return m_WidgetMap; }
 
 	template<typename T>
-	boost::shared_ptr<T> getWidgetAs( std::string key ) {
-		if( boost::dynamic_pointer_cast<T>( m_WidgetMap[key] ) != 0 ) {
-			return boost::dynamic_pointer_cast<T>( m_WidgetMap[key] );
+	T* getWidgetAs( std::string key ) {
+		if( dynamic_cast<T*>( m_WidgetMap[key] ) != 0 ) {
+			return dynamic_cast<T*>( m_WidgetMap[key] );
 		} else {
 			LOG( Runtime, error ) << "Error while converting widget " << key << " !";
 		}

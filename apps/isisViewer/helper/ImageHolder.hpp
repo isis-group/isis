@@ -28,8 +28,6 @@ public:
 
 	template<class TYPE>
 	bool setImage( data::Image image ) {
-		//TODO debug
-		m_DebugImage = image;
 
 		//some checks
 		if( image.isEmpty() ) {
@@ -78,7 +76,7 @@ public:
 
 		//copy all the relevant meta information
 		m_PropMap = static_cast<util::PropertyMap>( image );
-
+		
 		//workaround cause compiles do not understand to use getChunksAsVector directly in BOOST_FOREACH
 		ChunkVector chVec = image.getChunksAsVector();
 		BOOST_FOREACH( ChunkVector::const_reference chRef, chVec ) {
@@ -100,10 +98,7 @@ public:
 	getPropMap() const { return m_PropMap; }
 	util::FixedVector<size_t, 4>
 	getImageSize() const { return m_ImageSize; }
-	//TODO debug
-	data::Image m_DebugImage;
-	unsigned short
-	getMajorTypeID() const { return m_TypeID; }
+	unsigned short getMajorTypeID() const { return m_TypeID; }
 
 private:
 	size_t m_NumberOfTimeSteps;
@@ -114,10 +109,7 @@ private:
 	std::vector< util::PropertyMap > m_TimeStepProperties;
 
 	std::vector< ImagePointerType > m_ImageVector;
-
-
 	bool filterRelevantMetaInformation();
-
 };
 
 }
