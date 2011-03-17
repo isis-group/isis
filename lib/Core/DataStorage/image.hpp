@@ -458,6 +458,7 @@ public:
 	/// \returns the number of timesteps of the image
 	size_t getNrOfTimesteps()const;
 
+	util::fvector4 getFoV()const;
 };
 
 /**
