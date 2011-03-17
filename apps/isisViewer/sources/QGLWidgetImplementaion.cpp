@@ -33,6 +33,43 @@ void QGLWidgetImplementation::commonInit()
 	setSizePolicy( QSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored ) );
 	setMouseTracking( true );
 	connectSignals();
+	
+	
+}
+
+bool QGLWidgetImplementation::isInViewPort( size_t _x, size_t _y ) const
+{
+	if(_x < m_CurrentViewPort.w + m_CurrentViewPort.x 
+		&& _x >= m_CurrentViewPort.x 
+		&& _y < m_CurrentViewPort.h  + m_CurrentViewPort.y
+		&& _y >= m_CurrentViewPort.y)
+	{	return true; }
+	else { return false; }
+}
+
+std::pair<float, float> QGLWidgetImplementation::widget2ViewPortCoordinates(size_t _x, size_t _y) const
+{
+	if(isInViewPort(_x,_y)) {
+		size_t viewPortX = _x - m_CurrentViewPort.x;
+		size_t viewPortY = _y - m_CurrentViewPort.y;
+		float normX = -1 + 1.0 / m_CurrentViewPort.w * viewPortX * 2;
+		float normY = -1 + 1.0 / m_CurrentViewPort.h * viewPortY * 2;
+		return std::make_pair<float,float>(normX, normY);
+	}
+	
+}
+
+void QGLWidgetImplementation::redrawCrosshair(size_t _x, size_t _y)
+{	
+	//look if we are inside the current viewport
+	if(isInViewPort(_x,_y))
+	{	
+		redrawAllActiveSlices();
+		std::pair<float,float> normCoords = widget2ViewPortCoordinates(_x,_y);
+		glTranslated(normCoords.first,-normCoords.second,0);
+		m_CrossHair.draw(normCoords.first, normCoords.second);
+		redraw();
+	}
 }
 
 QGLWidgetImplementation* QGLWidgetImplementation::createSharedWidget( QWidget *parent, OrientationHandler::PlaneOrientation orientation )
@@ -48,8 +85,15 @@ void QGLWidgetImplementation::connectSignals()
 
 void QGLWidgetImplementation::initializeGL()
 {
+	
 	LOG( Debug, verbose_info ) << "initializeGL " << objectName().toStdString();
-	util::Singletons::get<GLTextureHandler, 10>().copyAllImagesToTextures( m_ViewerCore->getDataContainer() );
+	util::Singletons::get<GLTextureHandler, 10>().copyAllImagesToTextures( m_ViewerCore->getDataContainer() );	
+	glEnable(GL_DEPTH_TEST);
+	glClearColor(0.0,0.0,0.0,0.0);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();	
+	m_CrosshairCoordinates.first = width() / 2;
+	m_CrosshairCoordinates.second = height() / 2;
 }
 
 
@@ -58,14 +102,35 @@ void QGLWidgetImplementation::resizeGL(int w, int h)
 	LOG(Debug, verbose_info) << "resizeGL " << objectName().toStdString();
 	
 	//TODO 
-	OrientationHandler::ViewPortCoords coords = 
-				OrientationHandler::calculateViewPortCoords( m_ViewerCore->getDataContainer()[0], m_PlaneOrientation, width(), height());
-	glViewport( coords.x, coords.y, coords.w, coords.h );
-	paintVolume(0,0,85);
+	m_CurrentViewPort = 
+				OrientationHandler::calculateViewPortCoords( width(), height());
+	glViewport( m_CurrentViewPort.x, m_CurrentViewPort.y, m_CurrentViewPort.w, m_CurrentViewPort.h );
+	paintSlice(0,0,85);
+	redrawCrosshair(m_CrosshairCoordinates.first, m_CrosshairCoordinates.second);
 }
 
+bool QGLWidgetImplementation::redrawAllActiveSlices()
+{
+	if( m_ActiveSlices.empty() )
+	{
+		LOG(Runtime, info) << "No slice active. Nothing to paint.";
+		return false;
+	}
+	std::list<bool> retValues;
+	BOOST_FOREACH( ActiveSlicesVec::const_reference currentSlice, m_ActiveSlices)
+	{
+		retValues.push_back( paintSlice( currentSlice.imageID, currentSlice.timestep, currentSlice.slice ) );
+	}
+	if ( std::find(retValues.begin(), retValues.end(), false ) != retValues.end() )
+	{
+		return false;
+	} else
+	{
+		return true;
+	}
+}
 
-bool QGLWidgetImplementation::paintVolume( size_t imageID, size_t timestep, size_t slice )
+bool QGLWidgetImplementation::paintSlice( size_t imageID, size_t timestep, size_t slice )
 {
 
 	//TODO this is only a prove of concept. has to be structured and optimized!!
@@ -77,21 +142,29 @@ bool QGLWidgetImplementation::paintVolume( size_t imageID, size_t timestep, size
 			", but no such image exists!";
 		return false;
 	}
+	//look if this slice is already in the list of currently shown images(slices). If not, add it.
+	ActiveSlices thisSlice(imageID, timestep, slice);
+	if(std::find( m_ActiveSlices.begin(), m_ActiveSlices.end(), thisSlice) == m_ActiveSlices.end()) {
+		m_ActiveSlices.push_back(thisSlice);
+	}
+	
 	//copy the volume to openGL. If this already has happend GLTextureHandler does nothing.
 	GLuint textureID = util::Singletons::get<GLTextureHandler, 10>().copyImageToTexture( m_ViewerCore->getDataContainer(), imageID, timestep );
 	ImageHolder image = m_ViewerCore->getDataContainer()[imageID];
 	OrientationHandler::MatrixType orient =  OrientationHandler::getOrientationMatrix(image, m_PlaneOrientation, true );
 	float matrix[16];
-	OrientationHandler::boostMatrix2Pointer(  OrientationHandler::orientation2TextureMatrix( orient ), matrix );
+	OrientationHandler::boostMatrix2Pointer( OrientationHandler::orientation2TextureMatrix( orient ), matrix );
 	
 	float slicePos = (1.0 / OrientationHandler::getNumberOfSlices(image, m_PlaneOrientation)) * slice;
 	
-	paintIntern(textureID, matrix, slicePos);
+	internPaintSlice(textureID, matrix, slicePos);
 	redraw();
 	
 }
-void QGLWidgetImplementation::paintIntern(GLuint textureID, const float *matrix, float slice)
+void QGLWidgetImplementation::internPaintSlice(GLuint textureID, const float *matrix, float slice)
 {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glColor3f(1,1,1);
 	glMatrixMode(GL_TEXTURE);
 	glLoadIdentity();
 	glLoadMatrixf( matrix );
@@ -108,14 +181,14 @@ void QGLWidgetImplementation::paintIntern(GLuint textureID, const float *matrix,
 	glVertex2f( 1.0, -1.0 );		
 	glEnd();
 	glFlush();
+	glMatrixMode(GL_PROJECTION);
 	glDisable( GL_TEXTURE_3D );
 }
 
 void QGLWidgetImplementation::mouseMoveEvent( QMouseEvent *e )
 {
 	//TODO debug
-	paintVolume(0,0,e->x());
-
+	redrawCrosshair(e->x(), e->y());
 }
 
 

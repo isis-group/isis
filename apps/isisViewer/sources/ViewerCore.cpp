@@ -5,9 +5,6 @@ namespace isis
 namespace viewer
 {
 
-ViewerCore::ViewerCore()
-{
-}
 
 }
 }

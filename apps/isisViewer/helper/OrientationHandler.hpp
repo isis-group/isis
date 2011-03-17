@@ -34,7 +34,7 @@ public:
 	static MatrixType transformMatrix( MatrixType origMatrix, PlaneOrientation orientation );
 	static MatrixType orientation2TextureMatrix( const MatrixType &origMatrix );
 	
-	static ViewPortCoords calculateViewPortCoords( const ImageHolder &image, PlaneOrientation orientation, size_t w, size_t h );
+	static ViewPortCoords calculateViewPortCoords( size_t w, size_t h );
 	
 	static void  boostMatrix2Pointer( MatrixType boostMatrix, float *ret );
 	
