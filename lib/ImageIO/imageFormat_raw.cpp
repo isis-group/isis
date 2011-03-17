@@ -60,6 +60,10 @@ public:
 
 		const size_t fsize=boost::filesystem::file_size(filename);
 		const unsigned short type=util::getTransposedTypeMap(false,true)[dialect+"*"];
+		if(type==0){
+			LOG(Runtime,error) << "No known datatype given, you have to give the type ofe the raw data as rdialect (eg. \"-rdialect u16bit\")";
+			throwGenericError("No known datatype");
+		}
 		const size_t elemSize=data::_internal::ValuePtrBase::createById(type,0)->bytesPerElem();
 		const size_t ssize=sqrt(fsize/elemSize);
 
