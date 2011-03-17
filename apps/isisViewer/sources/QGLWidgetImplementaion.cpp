@@ -50,17 +50,22 @@ void QGLWidgetImplementation::initializeGL()
 {
 	LOG( Debug, verbose_info ) << "initializeGL " << objectName().toStdString();
 	util::Singletons::get<GLTextureHandler, 10>().copyAllImagesToTextures( m_ViewerCore->getDataContainer() );
-	paintVolume(0,0,85, false);	
 }
 
 
 void QGLWidgetImplementation::resizeGL(int w, int h)
 {
 	LOG(Debug, verbose_info) << "resizeGL " << objectName().toStdString();
+	
+	//TODO 
+	OrientationHandler::ViewPortCoords coords = 
+				OrientationHandler::calculateViewPortCoords( m_ViewerCore->getDataContainer()[0], m_PlaneOrientation, width(), height());
+	glViewport( coords.x, coords.y, coords.w, coords.h );
+	paintVolume(0,0,85);
 }
 
 
-bool QGLWidgetImplementation::paintVolume( size_t imageID, size_t timestep, size_t slice, bool redrawFlag )
+bool QGLWidgetImplementation::paintVolume( size_t imageID, size_t timestep, size_t slice )
 {
 
 	//TODO this is only a prove of concept. has to be structured and optimized!!
@@ -78,32 +83,28 @@ bool QGLWidgetImplementation::paintVolume( size_t imageID, size_t timestep, size
 	OrientationHandler::MatrixType orient =  OrientationHandler::getOrientationMatrix(image, m_PlaneOrientation, true );
 	float matrix[16];
 	OrientationHandler::boostMatrix2Pointer(  OrientationHandler::orientation2TextureMatrix( orient ), matrix );
-
+	
 	float slicePos = (1.0 / OrientationHandler::getNumberOfSlices(image, m_PlaneOrientation)) * slice;
+	
 	paintIntern(textureID, matrix, slicePos);
-	if(redrawFlag) {
-		redraw();
-	}
+	redraw();
+	
 }
 void QGLWidgetImplementation::paintIntern(GLuint textureID, const float *matrix, float slice)
 {
-	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-// 	glColor4i(slice, slice, slice, slice);
-	
-	
 	glMatrixMode(GL_TEXTURE);
 	glLoadIdentity();
 	glLoadMatrixf( matrix );
 	glEnable( GL_TEXTURE_3D );
 	glBindTexture( GL_TEXTURE_3D, textureID );
 	glBegin( GL_QUADS );
-	glTexCoord3f( 0, 0, 0.5 );
+	glTexCoord3f( 0, 0, slice );
 	glVertex2f( -1.0, -1.0 ); 
-	glTexCoord3f( 0, 1, 0.5 );
+	glTexCoord3f( 0, 1, slice );
 	glVertex2f( -1.0, 1.0 );
-	glTexCoord3f( 1, 1, 0.5 );
+	glTexCoord3f( 1, 1, slice );
 	glVertex2f( 1.0, 1.0 );
-	glTexCoord3f( 1, 0, 0.5 );
+	glTexCoord3f( 1, 0, slice );
 	glVertex2f( 1.0, -1.0 );		
 	glEnd();
 	glFlush();

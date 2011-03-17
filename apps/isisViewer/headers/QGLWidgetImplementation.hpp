@@ -23,7 +23,7 @@ public:
 	QGLWidgetImplementation( ViewerCore *core, QWidget *parent = 0, QGLWidget *share = 0, OrientationHandler::PlaneOrientation orienation = OrientationHandler::axial );
 	QGLWidgetImplementation( ViewerCore *core, QWidget *parent = 0, OrientationHandler::PlaneOrientation orientation = OrientationHandler::axial );
 	
-	virtual bool paintVolume( size_t imageID, size_t timestep, size_t slice, bool redrawFlag = true );
+	virtual bool paintVolume( size_t imageID, size_t timestep, size_t slice );
 	
 	
 	QGLWidgetImplementation* createSharedWidget( QWidget *parent, OrientationHandler::PlaneOrientation orienation = OrientationHandler::axial );

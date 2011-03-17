@@ -162,5 +162,18 @@ OrientationHandler::MatrixType OrientationHandler::orientation2TextureMatrix( co
 	return retMat;
 }
 
+OrientationHandler::ViewPortCoords OrientationHandler::calculateViewPortCoords(const isis::viewer::ImageHolder& image, OrientationHandler::PlaneOrientation orientation, size_t w, size_t h)
+{
+	ViewPortCoords retCoords;	
+	float scaleH = (w < h) ? ((float)w / (float)h ) : 1;
+	float scaleW = (h < w) ? ((float)h / (float)w ) : 1;
 	
+	retCoords.h = h * scaleH;
+	retCoords.w = w * scaleW;
+	retCoords.x = (w - (w*scaleW)) / 2;
+	retCoords.y = (h - (h*scaleH)) / 2;
+	return retCoords;
+}
+
+
 }} // end namespace
