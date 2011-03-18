@@ -37,8 +37,9 @@ void MainWindow::go()
 	size_t x = ui.xEdit->text().toInt();
 	size_t y = ui.yEdit->text().toInt();
 	size_t z = ui.zEdit->text().toInt();
-	m_SagittalWidget->lookAtVoxel(x,y,z);
 	m_AxialWidget->lookAtVoxel(x,y,z);
+	m_SagittalWidget->lookAtVoxel(x,y,z);
+	
 // 	m_ViewerCore->getWidgetAs<QGLWidgetImplementation>("axialView")->lookAtVoxel(x,y,z);
 // 	m_ViewerCore->getWidgetAs<QGLWidgetImplementation>("sagittalView")->lookAtVoxel(x,y,z);
 // 	m_ViewerCore->getWidgetAs<QGLWidgetImplementation>("axialWidget")->lookAtVoxel(ui.xEdit->text().toInt());

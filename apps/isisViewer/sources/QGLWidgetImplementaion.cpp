@@ -65,7 +65,6 @@ void QGLWidgetImplementation::redrawCrosshair(size_t _x, size_t _y)
 	if(isInViewPort(_x,_y))
 	{	
 		std::pair<float,float> normCoords = widget2ViewPortCoordinates(_x,_y);
-		glTranslated(normCoords.first,-normCoords.second,0);
 		m_CrossHair.draw(normCoords.first, normCoords.second);
 		redraw();
 	}
@@ -87,9 +86,9 @@ void QGLWidgetImplementation::initializeGL()
 	
 	LOG( Debug, verbose_info ) << "initializeGL " << objectName().toStdString();
 	util::Singletons::get<GLTextureHandler, 10>().copyAllImagesToTextures( m_ViewerCore->getDataContainer() );	
-	glEnable(GL_DEPTH_TEST);
 	glClearColor(0.0,0.0,0.0,0.0);
 	glMatrixMode(GL_PROJECTION);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	glLoadIdentity();	
 	m_CrosshairCoordinates.first = width() / 2;
 	m_CrosshairCoordinates.second = height() / 2;
@@ -110,6 +109,7 @@ void QGLWidgetImplementation::resizeGL(int w, int h)
 
 void QGLWidgetImplementation::lookAtVoxel( size_t _x, size_t _y, size_t _z )
 {
+	LOG(Debug, verbose_info) << "lookAtVoxel in " << objectName().toStdString() << " " << _x << " : " <<  _y;
 	size_t planeZ;
 	size_t planeX;
 	size_t planeY;
@@ -132,7 +132,7 @@ void QGLWidgetImplementation::lookAtVoxel( size_t _x, size_t _y, size_t _z )
 			break;
 	}
 	paintSlice(0,0,planeZ);
-// 	redrawCrosshair(planeX, planeY);
+	redrawCrosshair(planeX, planeY);
 }
 
 bool QGLWidgetImplementation::paintSlice( size_t imageID, size_t timestep, size_t slice )
@@ -149,26 +149,26 @@ bool QGLWidgetImplementation::paintSlice( size_t imageID, size_t timestep, size_
 	}
 	
 	//copy the volume to openGL. If this already has happend GLTextureHandler does nothing.
+	
 	GLuint textureID = util::Singletons::get<GLTextureHandler, 10>().copyImageToTexture( m_ViewerCore->getDataContainer(), imageID, timestep );
 	ImageHolder image = m_ViewerCore->getDataContainer()[imageID];
 	OrientationHandler::MatrixType orient =  OrientationHandler::getOrientationMatrix(image, m_PlaneOrientation, true );
-	float matrix[16];
-	OrientationHandler::boostMatrix2Pointer( OrientationHandler::orientation2TextureMatrix( orient ), matrix );
-	
-	float slicePos = (1.0 / OrientationHandler::getNumberOfSlices(image, m_PlaneOrientation)) * slice;
-	
-	internPaintSlice(textureID, matrix, slicePos);
-	redraw();
-	
-}
-void QGLWidgetImplementation::internPaintSlice(GLuint textureID, const float *matrix, float slice)
-{
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glColor3f(1,1,1);
+	float textureMatrix[16];
+	OrientationHandler::boostMatrix2Pointer( OrientationHandler::orientation2TextureMatrix( orient ), textureMatrix );
 	glMatrixMode(GL_TEXTURE);
-	glLoadIdentity();
-	glLoadMatrixf( matrix );
-	glEnable( GL_TEXTURE_3D );
+	glLoadMatrixf(textureMatrix);
+	float slicePos = (1.0 / OrientationHandler::getNumberOfSlices(image, m_PlaneOrientation)) * slice;
+
+	internPaintSlice(textureID, textureMatrix, slicePos);
+}
+void QGLWidgetImplementation::internPaintSlice(GLuint textureID, const float *textureMatrix, float slice)
+{
+
+	redraw();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glMatrixMode(GL_TEXTURE);
+	glLoadMatrixf(textureMatrix);
+ 	glEnable( GL_TEXTURE_3D );
 	glBindTexture( GL_TEXTURE_3D, textureID );
 	glBegin( GL_QUADS );
 	glTexCoord3f( 0, 0, slice );
@@ -181,15 +181,20 @@ void QGLWidgetImplementation::internPaintSlice(GLuint textureID, const float *ma
 	glVertex2f( 1.0, -1.0 );		
 	glEnd();
 	glFlush();
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glDisable( GL_TEXTURE_3D );
+ 	glDisable( GL_TEXTURE_3D );	
+	redraw();
+}
+
+void QGLWidgetImplementation::paintGL()
+{
+	
+	
 }
 
 void QGLWidgetImplementation::mouseMoveEvent( QMouseEvent *e )
 {
 	//TODO debug
-// 	lookAtVoxel(e->x(), e->y(),50);
+	lookAtVoxel(e->x(), e->y(),50);
 }
 
 

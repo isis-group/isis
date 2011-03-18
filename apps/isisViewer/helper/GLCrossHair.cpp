@@ -5,10 +5,11 @@
 namespace isis {
 namespace viewer {
 	
-void GLCrossHair::draw(size_t x, size_t y)
+void GLCrossHair::draw(float _x, float _y)
 {
 	glMatrixMode(GL_PROJECTION);
-	glTranslated(x,-y,0);
+	glTranslated(_x,-_y,0);
+	glColor4f(0,0,0,0);
 	glColor4f(1,0,0,0);
 // 	glEnable(GL_LINE_STIPPLE);
 // 	glLineStipple(1,0x1C47);
@@ -21,7 +22,7 @@ void GLCrossHair::draw(size_t x, size_t y)
 	glVertex3f(0.1,0,-1); glVertex3d(2,0,-1);
 	glEnd();
 	glPointSize(2.0);
-	glEnable(GL_POINTS);
+	glBegin(GL_POINTS);
 	glVertex3d(0,0,-1);
 	glEnd();
 // 	glDisable(GL_LINE_STIPPLE);

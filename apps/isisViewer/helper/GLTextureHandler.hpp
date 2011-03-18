@@ -43,7 +43,9 @@ private:
 		util::FixedVector<size_t, 4> size = data[imageID].getImageSize();
 		TYPE *dataPtr = static_cast<TYPE *>( data.getImageWeakPointer( imageID, timestep ).lock().get() );
 		assert( dataPtr != 0 );
-				
+		glShadeModel(GL_FLAT);
+		glEnable(GL_DEPTH_TEST);
+		glPixelStorei(GL_UNPACK_ALIGNMENT,1);
 		glGenTextures( 1, &texture );
 		glBindTexture( GL_TEXTURE_3D, texture );
 		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );

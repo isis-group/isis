@@ -95,6 +95,9 @@
          <height>21</height>
         </rect>
        </property>
+       <property name="text">
+        <string>55</string>
+       </property>
       </widget>
       <widget class="QLineEdit" name="zEdit">
        <property name="geometry">
@@ -105,6 +108,9 @@
          <height>21</height>
         </rect>
        </property>
+       <property name="text">
+        <string>55</string>
+       </property>
       </widget>
       <widget class="QLineEdit" name="yEdit">
        <property name="geometry">
@@ -114,6 +120,9 @@
          <width>71</width>
          <height>21</height>
         </rect>
+       </property>
+       <property name="text">
+        <string>55</string>
        </property>
       </widget>
       <widget class="QPushButton" name="goButton">

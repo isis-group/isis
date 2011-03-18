@@ -33,8 +33,9 @@ private:
 	ViewerCore *m_ViewerCore;
 
 protected Q_SLOTS:
+	//TODO debug
 	void go();
-	
+
 
 private:
 	QGLWidgetImplementation *m_AxialWidget;

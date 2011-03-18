@@ -35,7 +35,6 @@ public:
 private:
 	QGLWidgetImplementation( ViewerCore *core, QWidget *parent, QGLWidget *share, QGLContext *context, OrientationHandler::PlaneOrientation orienation = OrientationHandler::axial );
 	ViewerCore* m_ViewerCore;
-	GLuint m_CurrentTextureID;
 	QGLWidget *m_ShareWidget;
 	
 public Q_SLOTS:
@@ -45,6 +44,7 @@ protected:
 	virtual void mouseMoveEvent( QMouseEvent *e );
 	virtual void initializeGL();
 	virtual void resizeGL(int w, int h);
+	virtual void paintGL();
 
 
 protected:
@@ -64,6 +64,8 @@ private:
 	
 	OrientationHandler::ViewPortCoords m_CurrentViewPort;
 	GLCrossHair m_CrossHair;
+	GLuint m_CurrentTextureID;
+	float m_CurrentSlice;
 
 };
 

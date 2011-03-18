@@ -11,7 +11,7 @@ class GLCrossHair
 public:
 	enum CrosshairType { dotted, dashed, dash_dot_dash };
 	enum CenterType { lonelyCenterPoint, noCenterPoint, noCenterSpec };
-	void draw( size_t x, size_t y);
+	void draw( float x, float y);
 	
 private:
 	CrosshairType m_CrossHairType;
