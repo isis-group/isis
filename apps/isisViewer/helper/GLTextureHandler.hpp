@@ -14,11 +14,11 @@ namespace isis
 namespace viewer
 {
 
-  /**
-   * This class is responsible for copying the image data to a GL_TEXTURE_3D. 
-   * It gets the data as a boost::weak_ptr and copies it to the texture.
-   */
-  
+/**
+ * This class is responsible for copying the image data to a GL_TEXTURE_3D.
+ * It gets the data as a boost::weak_ptr and copies it to the texture.
+ */
+
 class GLTextureHandler
 {
 public:
@@ -26,15 +26,15 @@ public:
 
 	///Convinient function to copy all in DataContainer available volumes to a GL_TEXTURE_3D.
 	std::map<size_t, GLuint> copyAllImagesToTextures( const DataContainer &data );
-	
+
 	///Copies the given timestep of an image with the given imageID to a GL_TEXTURE_3D. Return the texture id.
 	GLuint copyImageToTexture( const DataContainer &data , size_t imageID, size_t timestep );
-	
+
 	///The image map is a mapping of the imageID and timestep to the texture of the GL_TEXTURE_3D.
 	ImageMapType getImageMap() const { return m_ImageMap; }
 
 private:
-  
+
 	ImageMapType m_ImageMap;
 
 	template<typename TYPE>
@@ -43,9 +43,9 @@ private:
 		util::FixedVector<size_t, 4> size = data[imageID].getImageSize();
 		TYPE *dataPtr = static_cast<TYPE *>( data.getImageWeakPointer( imageID, timestep ).lock().get() );
 		assert( dataPtr != 0 );
-		glShadeModel(GL_FLAT);
-		glEnable(GL_DEPTH_TEST);
-		glPixelStorei(GL_UNPACK_ALIGNMENT,1);
+		glShadeModel( GL_FLAT );
+		glEnable( GL_DEPTH_TEST );
+		glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 		glGenTextures( 1, &texture );
 		glBindTexture( GL_TEXTURE_3D, texture );
 		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );

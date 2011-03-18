@@ -8,55 +8,56 @@
 #include <boost/numeric/ublas/lu.hpp>
 #include <boost/concept_check.hpp>
 
-namespace isis {
-namespace viewer {
-	
-	
+namespace isis
+{
+namespace viewer
+{
+
+
 class OrientationHandler
 {
 public:
 	typedef boost::numeric::ublas::matrix<float> MatrixType;
 	enum PlaneOrientation { axial, sagittal, coronal };
-	typedef util::FixedVector< util::FixedVector<float, 3>,4> VertexMatrix;
-	
-	struct ViewPortCoords 
-	{
+	typedef util::FixedVector< util::FixedVector<float, 3>, 4> VertexMatrix;
+
+	struct ViewPortCoords {
 		size_t w;
 		size_t h;
 		size_t x;
 		size_t y;
 	};
-	
+
 	static size_t getSliceIndex( const ImageHolder &image, PlaneOrientation orientation );
 	static size_t getNumberOfSlices( const ImageHolder &image, PlaneOrientation orientation );
 	static util::FixedVector<float, 3> getNormalizedScaling( const ImageHolder &image );
 	static MatrixType getOrientationMatrix( const ImageHolder &image, PlaneOrientation orientation, bool scaling = true );
 	static MatrixType transformMatrix( MatrixType origMatrix, PlaneOrientation orientation );
 	static MatrixType orientation2TextureMatrix( const MatrixType &origMatrix );
-	
+
 	static ViewPortCoords calculateViewPortCoords( size_t w, size_t h );
-	
+
 	static void  boostMatrix2Pointer( MatrixType boostMatrix, float *ret );
-	
-	static void printMatrix( const float *mat )
-	{
+
+	static void printMatrix( const float *mat ) {
 		size_t index = 0;
-		for (size_t i = 0; i<4; i++ )
-		{
-			for (size_t j = 0; j<4; j++ )
-			{
+
+		for ( size_t i = 0; i < 4; i++ ) {
+			for ( size_t j = 0; j < 4; j++ ) {
 				std::cout << mat[index++] << " ";
 			}
-		std::cout << std::endl;
+
+			std::cout << std::endl;
 		}
 	}
-	
-	
+
+
 };
-	
-	
-	
-}}// end namespace
+
+
+
+}
+}// end namespace
 
 
 

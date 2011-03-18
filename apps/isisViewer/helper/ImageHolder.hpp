@@ -26,7 +26,7 @@ public:
 
 	ImageHolder();
 
-	bool setImage( data::Image image );	
+	bool setImage( data::Image image );
 
 	std::vector< ImagePointerType > getImageVector() const { return m_ImageVector; }
 	std::vector< util::PropertyMap > getChunkProperties() const { return m_ChunkProperties; }
@@ -34,7 +34,7 @@ public:
 	util::PropertyMap getPropMap() const { return m_PropMap; }
 	util::FixedVector<size_t, 4> getImageSize() const { return m_ImageSize; }
 	data::Image getImage() const { return m_Image; }
-	
+
 private:
 	size_t m_NumberOfTimeSteps;
 	util::FixedVector<size_t, 4> m_ImageSize;

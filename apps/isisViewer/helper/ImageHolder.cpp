@@ -39,11 +39,12 @@ ImageHolder::filterRelevantMetaInformation()
 
 	return true;
 }
-bool ImageHolder::setImage( data::Image image ) {
+bool ImageHolder::setImage( data::Image image )
+{
 
 	//we convert the image to an uint8_t data type
 	typedef uint8_t TYPE;
-	
+
 	//some checks
 	if( image.isEmpty() ) {
 		LOG( Runtime, error ) << "Getting an empty image? Obviously something went wrong.";
@@ -77,7 +78,7 @@ bool ImageHolder::setImage( data::Image image ) {
 
 	if( m_ImageVector.size() != m_NumberOfTimeSteps ) {
 		LOG( Runtime, error ) << "The number of timesteps (" << m_NumberOfTimeSteps
-								<< ") does not coincide with the number of volumes ("  << m_ImageVector.size() << ").";
+							  << ") does not coincide with the number of volumes ("  << m_ImageVector.size() << ").";
 		return false;
 	}
 
@@ -85,7 +86,7 @@ bool ImageHolder::setImage( data::Image image ) {
 
 	//copy all the relevant meta information
 	m_PropMap = static_cast<util::PropertyMap>( image );
-	
+
 	//workaround cause compiles do not understand to use getChunksAsVector directly in BOOST_FOREACH
 	ChunkVector chVec = image.getChunksAsVector();
 	BOOST_FOREACH( ChunkVector::const_reference chRef, chVec ) {

@@ -16,7 +16,7 @@ public:
 	MainWindowBase( QWidget *parent = 0 );
 
 protected Q_SLOTS:
-	
+
 Q_SIGNALS:
 
 

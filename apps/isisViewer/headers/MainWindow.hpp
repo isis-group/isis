@@ -21,7 +21,7 @@ class MainWindow : public MainWindowBase
 {
 
 	Q_OBJECT
-	
+
 public:
 	MainWindow( ViewerCore *core  );
 
