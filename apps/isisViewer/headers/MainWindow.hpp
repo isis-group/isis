@@ -20,7 +20,8 @@ namespace viewer
 class MainWindow : public MainWindowBase
 {
 
-
+	Q_OBJECT
+	
 public:
 	MainWindow( ViewerCore *core  );
 
@@ -31,7 +32,9 @@ private:
 	};
 	ViewerCore *m_ViewerCore;
 
-
+protected Q_SLOTS:
+	void go();
+	
 
 private:
 	QGLWidgetImplementation *m_AxialWidget;

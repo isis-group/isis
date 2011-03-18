@@ -86,43 +86,47 @@
         <string/>
        </property>
       </widget>
-      <widget class="QSlider" name="verticalSlider">
+      <widget class="QLineEdit" name="xEdit">
        <property name="geometry">
         <rect>
-         <x>40</x>
-         <y>140</y>
-         <width>16</width>
-         <height>160</height>
+         <x>20</x>
+         <y>100</y>
+         <width>71</width>
+         <height>21</height>
         </rect>
        </property>
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
+      </widget>
+      <widget class="QLineEdit" name="zEdit">
+       <property name="geometry">
+        <rect>
+         <x>180</x>
+         <y>100</y>
+         <width>71</width>
+         <height>21</height>
+        </rect>
        </property>
       </widget>
-      <widget class="QSlider" name="verticalSlider_2">
+      <widget class="QLineEdit" name="yEdit">
        <property name="geometry">
         <rect>
          <x>100</x>
-         <y>140</y>
-         <width>16</width>
-         <height>160</height>
+         <y>100</y>
+         <width>71</width>
+         <height>21</height>
         </rect>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
        </property>
       </widget>
-      <widget class="QSlider" name="verticalSlider_3">
+      <widget class="QPushButton" name="goButton">
        <property name="geometry">
         <rect>
-         <x>160</x>
-         <y>140</y>
-         <width>16</width>
-         <height>160</height>
+         <x>270</x>
+         <y>100</y>
+         <width>71</width>
+         <height>21</height>
         </rect>
        </property>
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
+       <property name="text">
+        <string>GO!</string>
        </property>
       </widget>
      </widget>

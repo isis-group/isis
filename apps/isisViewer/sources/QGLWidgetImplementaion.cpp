@@ -64,7 +64,6 @@ void QGLWidgetImplementation::redrawCrosshair(size_t _x, size_t _y)
 	//look if we are inside the current viewport
 	if(isInViewPort(_x,_y))
 	{	
-		redrawAllActiveSlices();
 		std::pair<float,float> normCoords = widget2ViewPortCoordinates(_x,_y);
 		glTranslated(normCoords.first,-normCoords.second,0);
 		m_CrossHair.draw(normCoords.first, normCoords.second);
@@ -109,25 +108,31 @@ void QGLWidgetImplementation::resizeGL(int w, int h)
 	redrawCrosshair(m_CrosshairCoordinates.first, m_CrosshairCoordinates.second);
 }
 
-bool QGLWidgetImplementation::redrawAllActiveSlices()
+void QGLWidgetImplementation::lookAtVoxel( size_t _x, size_t _y, size_t _z )
 {
-	if( m_ActiveSlices.empty() )
+	size_t planeZ;
+	size_t planeX;
+	size_t planeY;
+	switch (m_PlaneOrientation)
 	{
-		LOG(Runtime, info) << "No slice active. Nothing to paint.";
-		return false;
+		case OrientationHandler::axial:
+			planeZ = _z;
+			planeX = _x;
+			planeY = _y;
+			break;
+		case OrientationHandler::sagittal:
+			planeZ = _x;
+			planeY = _z;
+			planeX = _y;
+			break;
+		case OrientationHandler::coronal:
+			planeZ = _y;
+			planeY = _z;
+			planeX = _x;
+			break;
 	}
-	std::list<bool> retValues;
-	BOOST_FOREACH( ActiveSlicesVec::const_reference currentSlice, m_ActiveSlices)
-	{
-		retValues.push_back( paintSlice( currentSlice.imageID, currentSlice.timestep, currentSlice.slice ) );
-	}
-	if ( std::find(retValues.begin(), retValues.end(), false ) != retValues.end() )
-	{
-		return false;
-	} else
-	{
-		return true;
-	}
+	paintSlice(0,0,planeZ);
+// 	redrawCrosshair(planeX, planeY);
 }
 
 bool QGLWidgetImplementation::paintSlice( size_t imageID, size_t timestep, size_t slice )
@@ -141,11 +146,6 @@ bool QGLWidgetImplementation::paintSlice( size_t imageID, size_t timestep, size_
 		LOG( Runtime, error ) << "Tried to paint image with id " << imageID << " and timestep " << timestep << 
 			", but no such image exists!";
 		return false;
-	}
-	//look if this slice is already in the list of currently shown images(slices). If not, add it.
-	ActiveSlices thisSlice(imageID, timestep, slice);
-	if(std::find( m_ActiveSlices.begin(), m_ActiveSlices.end(), thisSlice) == m_ActiveSlices.end()) {
-		m_ActiveSlices.push_back(thisSlice);
 	}
 	
 	//copy the volume to openGL. If this already has happend GLTextureHandler does nothing.
@@ -182,13 +182,14 @@ void QGLWidgetImplementation::internPaintSlice(GLuint textureID, const float *ma
 	glEnd();
 	glFlush();
 	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
 	glDisable( GL_TEXTURE_3D );
 }
 
 void QGLWidgetImplementation::mouseMoveEvent( QMouseEvent *e )
 {
 	//TODO debug
-	redrawCrosshair(e->x(), e->y());
+// 	lookAtVoxel(e->x(), e->y(),50);
 }
 
 

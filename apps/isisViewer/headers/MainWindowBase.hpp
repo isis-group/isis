@@ -15,8 +15,7 @@ class MainWindowBase : public QMainWindow
 public:
 	MainWindowBase( QWidget *parent = 0 );
 
-private Q_SLOTS:
-
+protected Q_SLOTS:
 	
 Q_SIGNALS:
 
