@@ -102,7 +102,7 @@ void QGLWidgetImplementation::resizeGL( int w, int h )
 	m_CurrentViewPort =
 		OrientationHandler::calculateViewPortCoords( width(), height() );
 	glViewport( m_CurrentViewPort.x, m_CurrentViewPort.y, m_CurrentViewPort.w, m_CurrentViewPort.h );
-	paintSlice( 0, 0, 85 );
+	paintSlice( 0, 0, 91 );
 	redrawCrosshair( m_CrosshairCoordinates.first, m_CrosshairCoordinates.second );
 }
 
@@ -112,17 +112,21 @@ void QGLWidgetImplementation::lookAtVoxel( size_t _x, size_t _y, size_t _z )
 	size_t planeZ;
 	size_t planeX;
 	size_t planeY;
-
+	
+	//here we have to recalculate to image voxel coordinates	
+	util::ivector4 imageCoords = OrientationHandler::transformWithImageOrientation<size_t>(m_ViewerCore->getDataContainer()[0], 
+		util::ivector4 (_x, _y,_z));
+		
 	switch ( m_PlaneOrientation ) {
 	case OrientationHandler::axial:
-		planeZ = _z;
-		planeX = _x;
-		planeY = _y;
+		planeZ = abs(imageCoords[2]);
+		planeX = abs(imageCoords[0]);
+		planeY = abs(imageCoords[1]);
 		break;
 	case OrientationHandler::sagittal:
-		planeZ = _x;
-		planeY = _z;
-		planeX = _y;
+		planeZ = abs(imageCoords[0]);
+		planeY = abs(imageCoords[2]);
+		planeX = abs(imageCoords[1]);
 		break;
 	case OrientationHandler::coronal:
 		planeZ = _y;
@@ -154,15 +158,13 @@ bool QGLWidgetImplementation::paintSlice( size_t imageID, size_t timestep, size_
 	OrientationHandler::MatrixType orient =  OrientationHandler::getOrientationMatrix( image, m_PlaneOrientation, true );
 	float textureMatrix[16];
 	OrientationHandler::boostMatrix2Pointer( OrientationHandler::orientation2TextureMatrix( orient ), textureMatrix );
-	glMatrixMode( GL_TEXTURE );
-	glLoadMatrixf( textureMatrix );
-	float slicePos = ( 1.0 / OrientationHandler::getNumberOfSlices( image, m_PlaneOrientation ) ) * slice;
-
+	std::cout << objectName().toStdString() << std::endl;
+	OrientationHandler::printMatrix(textureMatrix);
+	float slicePos = OrientationHandler::getNormalizedSlicePos(slice, image, textureMatrix, m_PlaneOrientation);
 	internPaintSlice( textureID, textureMatrix, slicePos );
 }
 void QGLWidgetImplementation::internPaintSlice( GLuint textureID, const float *textureMatrix, float slice )
 {
-
 	redraw();
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	glMatrixMode( GL_TEXTURE );

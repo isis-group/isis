@@ -34,6 +34,7 @@ MainWindow::MainWindow( ViewerCore *core )
 
 void MainWindow::go()
 {
+	//TODO debug
 	size_t x = ui.xEdit->text().toInt();
 	size_t y = ui.yEdit->text().toInt();
 	size_t z = ui.zEdit->text().toInt();

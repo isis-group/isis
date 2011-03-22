@@ -28,14 +28,41 @@ public:
 		size_t y;
 	};
 
-	static size_t getSliceIndex( const ImageHolder &image, PlaneOrientation orientation );
 	static size_t getNumberOfSlices( const ImageHolder &image, PlaneOrientation orientation );
 	static util::FixedVector<float, 3> getNormalizedScaling( const ImageHolder &image );
 	static MatrixType getOrientationMatrix( const ImageHolder &image, PlaneOrientation orientation, bool scaling = true );
 	static MatrixType transformMatrix( MatrixType origMatrix, PlaneOrientation orientation );
 	static MatrixType orientation2TextureMatrix( const MatrixType &origMatrix );
-
+	static float getNormalizedSlicePos( size_t slice, const ImageHolder &image, const float *textureMatrix, PlaneOrientation orientation );
+		
 	static ViewPortCoords calculateViewPortCoords( size_t w, size_t h );
+	
+
+	template <typename T>
+	static util::FixedVector<T,4> transformWithImageOrientation(const isis::viewer::ImageHolder& image, util::FixedVector<T,4> oldVec)
+	{
+		util::fvector4 sliceVec = image.getPropMap().getPropertyAs<util::fvector4>("sliceVec");
+		util::fvector4 rowVec = image.getPropMap().getPropertyAs<util::fvector4>("rowVec");
+		util::fvector4 columnVec = image.getPropMap().getPropertyAs<util::fvector4>("columnVec");	
+		boost::numeric::ublas::matrix<T> orient = boost::numeric::ublas::zero_matrix<T>(3,3);
+		boost::numeric::ublas::matrix<T> coords = boost::numeric::ublas::zero_matrix<T>(3,1);
+		boost::numeric::ublas::matrix<T> retCoords = boost::numeric::ublas::zero_matrix<T>(3,1);
+		for (size_t i = 0; i < 3; i++)
+		{
+			orient( i, 0 ) = rowVec[i] < 0 ? ceil( rowVec[i] - 0.5 ) : floor( rowVec[i] + 0.5 );
+			orient( i, 1 ) = columnVec[i] < 0 ? ceil( columnVec[i] - 0.5 ) : floor( columnVec[i] + 0.5 );
+			orient( i, 2 ) = sliceVec[i] < 0 ? ceil( sliceVec[i] - 0.5 ) : floor( sliceVec[i] + 0.5 );
+		}
+		coords(0,0) = oldVec[0];
+		coords(1,0) = oldVec[1];
+		coords(2,0) = oldVec[2];
+		retCoords = boost::numeric::ublas::prod(orient, coords);
+		util::FixedVector<T,4> retVec;
+		retVec[0] = retCoords(0,0);
+		retVec[1] = retCoords(1,0);
+		retVec[2] = retCoords(2,0);
+		return retVec;
+	}
 
 	static void  boostMatrix2Pointer( MatrixType boostMatrix, float *ret );
 

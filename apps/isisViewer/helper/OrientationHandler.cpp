@@ -6,25 +6,45 @@ namespace isis
 namespace viewer
 {
 
-size_t OrientationHandler::getSliceIndex( const ImageHolder &image, OrientationHandler::PlaneOrientation orientation )
-{
-	switch ( orientation ) {
-	case axial:
-		return getBiggestVecElem<float>( image.getPropMap().getPropertyAs<util::fvector4>( "sliceVec" ) );
-		break;
-	case sagittal:
-		return getBiggestVecElem<float>( image.getPropMap().getPropertyAs<util::fvector4>( "columnVec" ) );
-		break;
-	case coronal:
-		return getBiggestVecElem<float>( image.getPropMap().getPropertyAs<util::fvector4>( "rowVec" ) );
-		break;
-	}
-}
-
 size_t OrientationHandler::getNumberOfSlices( const ImageHolder &image, OrientationHandler::PlaneOrientation orientation )
 {
-	return image.getImageSize()[ getSliceIndex( image, orientation ) ];
+	util::ivector4 coords = image.getImageSize();
+	util::ivector4 transformedCoords = transformWithImageOrientation<size_t>(image, coords);
+	size_t retVal = transformedCoords[0];
+	switch (orientation)
+	{
+		case axial:
+			retVal = abs(transformedCoords[2]);
+			break;
+		case sagittal:
+			retVal = abs(transformedCoords[0]);
+			break;
+		case coronal: 
+			retVal = abs(transformedCoords[1]);
+			break;
+	}
+	return retVal;
 }
+
+float OrientationHandler::getNormalizedSlicePos(size_t slice, const isis::viewer::ImageHolder& image, const float* textureMatrix, OrientationHandler::PlaneOrientation orientation)
+{
+	//ok, do not try this at home...here we have to calculate back from our textureMatrix
+	using namespace boost::numeric::ublas;
+	util::fvector4 sliceVec = util::fvector4(textureMatrix[8], textureMatrix[9], textureMatrix[10], 0);
+	util::fvector4 translationVec = util::fvector4( textureMatrix[12], textureMatrix[13], textureMatrix[14], 0 );
+// 	std::cout << "sliceVec: " << sliceVec << std::endl;
+// 	std::cout << "transVec: " << translationVec << std::endl;
+// 	std::cout << "number of slices: " << getNumberOfSlices(image, orientation) << std::endl;
+	float oneHalfSlice = 1.0 / getNumberOfSlices(image, orientation) / 2;
+	float normedSlicePos = (1.0 / getNumberOfSlices(image, orientation)) * slice;
+	size_t relevantIndex = getBiggestVecElem<float>(sliceVec);
+// 	std::cout << "relevant: " << relevantIndex << std::endl;
+	normedSlicePos -= translationVec[relevantIndex];
+	normedSlicePos *= 1.0 / sliceVec[relevantIndex];
+	normedSlicePos += sliceVec[relevantIndex] < 0 ? -oneHalfSlice : oneHalfSlice;
+	return normedSlicePos;
+}
+
 
 util::FixedVector<float, 3> OrientationHandler::getNormalizedScaling( const ImageHolder &image )
 {
@@ -42,9 +62,9 @@ util::FixedVector<float, 3> OrientationHandler::getNormalizedScaling( const Imag
 	for ( size_t index = 0; index < 3; index++ ) {
 		retScaling[index] = 1.0 / physicalSize[biggestExtent] * physicalSize[index];
 	}
-
 	return retScaling;
 }
+
 
 OrientationHandler::MatrixType OrientationHandler::getOrientationMatrix( const ImageHolder &image, PlaneOrientation orientation, bool scaling )
 {
