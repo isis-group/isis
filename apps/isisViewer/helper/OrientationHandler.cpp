@@ -10,7 +10,7 @@ size_t OrientationHandler::getNumberOfSlices( const ImageHolder &image, Orientat
 {
 	util::ivector4 coords = image.getImageSize();
 	util::ivector4 transformedCoords = transformWithImageOrientation<size_t>(image, coords);
-	size_t retVal = transformedCoords[0];
+	size_t retVal = 0;
 	switch (orientation)
 	{
 		case axial:
@@ -26,25 +26,25 @@ size_t OrientationHandler::getNumberOfSlices( const ImageHolder &image, Orientat
 	return retVal;
 }
 
-float OrientationHandler::getNormalizedSlicePos(size_t slice, const isis::viewer::ImageHolder& image, const float* textureMatrix, OrientationHandler::PlaneOrientation orientation)
+OrientationHandler::ViewerCoordinates OrientationHandler::normalizeCoordinates(size_t slice, size_t x, size_t y, const isis::viewer::ImageHolder& image, const float* textureMatrix, OrientationHandler::ViewPortCoords viewport, OrientationHandler::PlaneOrientation orientation)
 {
-	//ok, do not try this at home...here we have to calculate back from our textureMatrix
+	ViewerCoordinates retCoords;
 	using namespace boost::numeric::ublas;
+	//here we normalize and transform the slice coords to work with our transformed matrix
 	util::fvector4 sliceVec = util::fvector4(textureMatrix[8], textureMatrix[9], textureMatrix[10], 0);
 	util::fvector4 translationVec = util::fvector4( textureMatrix[12], textureMatrix[13], textureMatrix[14], 0 );
-// 	std::cout << "sliceVec: " << sliceVec << std::endl;
-// 	std::cout << "transVec: " << translationVec << std::endl;
-// 	std::cout << "number of slices: " << getNumberOfSlices(image, orientation) << std::endl;
 	float oneHalfSlice = 1.0 / getNumberOfSlices(image, orientation) / 2;
-	float normedSlicePos = (1.0 / getNumberOfSlices(image, orientation)) * slice;
+	retCoords.slice = (1.0 / getNumberOfSlices(image, orientation)) * slice;
 	size_t relevantIndex = getBiggestVecElem<float>(sliceVec);
-// 	std::cout << "relevant: " << relevantIndex << std::endl;
-	normedSlicePos -= translationVec[relevantIndex];
-	normedSlicePos *= 1.0 / sliceVec[relevantIndex];
-	normedSlicePos += sliceVec[relevantIndex] < 0 ? -oneHalfSlice : oneHalfSlice;
-	return normedSlicePos;
-}
+	retCoords.slice -= translationVec[relevantIndex];
+	retCoords.slice *= 1.0 / sliceVec[relevantIndex];
+	retCoords.slice += sliceVec[relevantIndex] < 0 ? -oneHalfSlice : oneHalfSlice;
+	
+	
+	return retCoords;
 
+	
+}
 
 util::FixedVector<float, 3> OrientationHandler::getNormalizedScaling( const ImageHolder &image )
 {
@@ -183,6 +183,34 @@ OrientationHandler::MatrixType OrientationHandler::orientation2TextureMatrix( co
 
 	return retMat;
 }
+
+std::pair<size_t, size_t> OrientationHandler::voxelCoords2WidgetCoords(size_t _x, size_t _y, const isis::viewer::ImageHolder& image, OrientationHandler::PlaneOrientation orientation, OrientationHandler::ViewPortCoords viewport)
+{
+	util::ivector4 coords = image.getImageSize();
+	util::ivector4 transformedCoords = transformWithImageOrientation<size_t>(image, coords);
+	std::pair<size_t, size_t> retPair;
+	size_t xsize = 0;
+	size_t ysize = 0;
+	switch(orientation)
+	{
+		case axial:
+			xsize = abs(transformedCoords[0]);
+			ysize = abs(transformedCoords[1]);
+			break;
+		case sagittal:
+			xsize = abs(transformedCoords[1]);
+			ysize = abs(transformedCoords[2]);
+			break;
+		case coronal:
+			xsize = abs(transformedCoords[0]);
+			ysize = abs(transformedCoords[2]);
+			break;
+	}
+	retPair.first = viewport.x + (((float)viewport.w / (float)xsize) * _x);
+	retPair.second = viewport.y + (((float)viewport.h / (float)ysize) * _y);
+	return retPair;
+}
+
 
 OrientationHandler::ViewPortCoords OrientationHandler::calculateViewPortCoords( size_t w, size_t h )
 {

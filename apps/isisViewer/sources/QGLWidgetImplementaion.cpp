@@ -102,7 +102,7 @@ void QGLWidgetImplementation::resizeGL( int w, int h )
 	m_CurrentViewPort =
 		OrientationHandler::calculateViewPortCoords( width(), height() );
 	glViewport( m_CurrentViewPort.x, m_CurrentViewPort.y, m_CurrentViewPort.w, m_CurrentViewPort.h );
-	paintSlice( 0, 0, 91 );
+	paintSlice( 0, 0, 91,0,0 );
 	redrawCrosshair( m_CrosshairCoordinates.first, m_CrosshairCoordinates.second );
 }
 
@@ -113,9 +113,9 @@ void QGLWidgetImplementation::lookAtVoxel( size_t _x, size_t _y, size_t _z )
 	size_t planeX;
 	size_t planeY;
 	
+	ImageHolder image = m_ViewerCore->getDataContainer()[0];
 	//here we have to recalculate to image voxel coordinates	
-	util::ivector4 imageCoords = OrientationHandler::transformWithImageOrientation<size_t>(m_ViewerCore->getDataContainer()[0], 
-		util::ivector4 (_x, _y,_z));
+	util::ivector4 imageCoords = OrientationHandler::transformWithImageOrientation<size_t>(image, util::ivector4 (_x, _y,_z));
 		
 	switch ( m_PlaneOrientation ) {
 	case OrientationHandler::axial:
@@ -129,17 +129,18 @@ void QGLWidgetImplementation::lookAtVoxel( size_t _x, size_t _y, size_t _z )
 		planeX = abs(imageCoords[1]);
 		break;
 	case OrientationHandler::coronal:
-		planeZ = _y;
-		planeY = _z;
-		planeX = _x;
+		planeZ = abs(imageCoords[1]);
+		planeY = abs(imageCoords[2]);
+		planeX = abs(imageCoords[0]);
 		break;
 	}
 
-	paintSlice( 0, 0, planeZ );
-	redrawCrosshair( planeX, planeY );
+	paintSlice( 0, 0, planeZ, planeX, planeY );
+	
+// 	redrawCrosshair( normalizedCoords.first, normalizedCoords.second );
 }
 
-bool QGLWidgetImplementation::paintSlice( size_t imageID, size_t timestep, size_t slice )
+bool QGLWidgetImplementation::paintSlice( size_t imageID, size_t timestep, size_t slice, size_t _x, size_t _y )
 {
 
 	//TODO this is only a prove of concept. has to be structured and optimized!!
@@ -158,10 +159,10 @@ bool QGLWidgetImplementation::paintSlice( size_t imageID, size_t timestep, size_
 	OrientationHandler::MatrixType orient =  OrientationHandler::getOrientationMatrix( image, m_PlaneOrientation, true );
 	float textureMatrix[16];
 	OrientationHandler::boostMatrix2Pointer( OrientationHandler::orientation2TextureMatrix( orient ), textureMatrix );
-	std::cout << objectName().toStdString() << std::endl;
-	OrientationHandler::printMatrix(textureMatrix);
-	float slicePos = OrientationHandler::getNormalizedSlicePos(slice, image, textureMatrix, m_PlaneOrientation);
-	internPaintSlice( textureID, textureMatrix, slicePos );
+
+	OrientationHandler::ViewerCoordinates normalizedCoords = OrientationHandler::normalizeCoordinates( slice, _x, _y, image, textureMatrix, m_CurrentViewPort, m_PlaneOrientation);
+	
+	internPaintSlice( textureID, textureMatrix, normalizedCoords.slice );
 }
 void QGLWidgetImplementation::internPaintSlice( GLuint textureID, const float *textureMatrix, float slice )
 {

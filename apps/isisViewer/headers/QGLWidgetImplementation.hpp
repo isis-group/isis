@@ -24,7 +24,7 @@ public:
 	QGLWidgetImplementation( ViewerCore *core, QWidget *parent = 0, QGLWidget *share = 0, OrientationHandler::PlaneOrientation orienation = OrientationHandler::axial );
 	QGLWidgetImplementation( ViewerCore *core, QWidget *parent = 0, OrientationHandler::PlaneOrientation orientation = OrientationHandler::axial );
 
-	virtual bool paintSlice( size_t imageID, size_t timestep, size_t slice );
+	virtual bool paintSlice( size_t imageID, size_t timestep, size_t slice, size_t x, size_t y );
 	void redrawCrosshair( size_t x, size_t y );
 
 	virtual void lookAtVoxel( size_t x, size_t y, size_t z );

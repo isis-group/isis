@@ -27,17 +27,21 @@ public:
 		size_t x;
 		size_t y;
 	};
+	
+	struct ViewerCoordinates {
+		float slice;
+		size_t x;
+		size_t y;
+	};
 
 	static size_t getNumberOfSlices( const ImageHolder &image, PlaneOrientation orientation );
 	static util::FixedVector<float, 3> getNormalizedScaling( const ImageHolder &image );
 	static MatrixType getOrientationMatrix( const ImageHolder &image, PlaneOrientation orientation, bool scaling = true );
 	static MatrixType transformMatrix( MatrixType origMatrix, PlaneOrientation orientation );
 	static MatrixType orientation2TextureMatrix( const MatrixType &origMatrix );
-	static float getNormalizedSlicePos( size_t slice, const ImageHolder &image, const float *textureMatrix, PlaneOrientation orientation );
-		
 	static ViewPortCoords calculateViewPortCoords( size_t w, size_t h );
+	static ViewerCoordinates normalizeCoordinates(size_t slice, size_t x, size_t y, const ImageHolder &image, const float *textureMatrix, ViewPortCoords viewport, PlaneOrientation orientation);
 	
-
 	template <typename T>
 	static util::FixedVector<T,4> transformWithImageOrientation(const isis::viewer::ImageHolder& image, util::FixedVector<T,4> oldVec)
 	{
@@ -63,7 +67,8 @@ public:
 		retVec[2] = retCoords(2,0);
 		return retVec;
 	}
-
+	static std::pair<size_t,size_t> voxelCoords2WidgetCoords(size_t x, size_t y, const ImageHolder &image, OrientationHandler::PlaneOrientation orientation, ViewPortCoords viewport);
+	
 	static void  boostMatrix2Pointer( MatrixType boostMatrix, float *ret );
 
 	static void printMatrix( const float *mat ) {
