@@ -34,12 +34,25 @@ public:
 		size_t y;
 	};
 
-	static size_t getNumberOfSlices( const ImageHolder &image, PlaneOrientation orientation );
+	///gets the amount of slices along the normal of the plane specified by orientation
+	static util::FixedVector<size_t, 3> getTransformedImageSize ( const ImageHolder &image, PlaneOrientation orientation );
+	
+	///just a helper function to get the normalized (for texture transform) scaling of an image
 	static util::FixedVector<float, 3> getNormalizedScaling( const ImageHolder &image );
+	
+	///yields the orientation matrix with an optional scaling
 	static MatrixType getOrientationMatrix( const ImageHolder &image, PlaneOrientation orientation, bool scaling = true );
+	
+	///transforms the common orienation of an image into the specific orienation of one view (axial, coronal, sagittal)
 	static MatrixType transformMatrix( MatrixType origMatrix, PlaneOrientation orientation );
+	
+	///this function converts the specific orientation matrix for each view into the texture transformation matrix which then can be applied to the opengl texture
 	static MatrixType orientation2TextureMatrix( const MatrixType &origMatrix );
+	
+	///recalculate the size and position of the current viewport. This has to be done durring resize
 	static ViewPortCoords calculateViewPortCoords( size_t w, size_t h );
+	
+	///transform the voxelCoords into coords that can used by opengl. 
 	static ViewerCoordinates normalizeCoordinates(size_t slice, size_t x, size_t y, const ImageHolder &image, const float *textureMatrix, ViewPortCoords viewport, PlaneOrientation orientation);
 	
 	template <typename T>
@@ -48,9 +61,9 @@ public:
 		util::fvector4 sliceVec = image.getPropMap().getPropertyAs<util::fvector4>("sliceVec");
 		util::fvector4 rowVec = image.getPropMap().getPropertyAs<util::fvector4>("rowVec");
 		util::fvector4 columnVec = image.getPropMap().getPropertyAs<util::fvector4>("columnVec");	
-		boost::numeric::ublas::matrix<T> orient = boost::numeric::ublas::zero_matrix<T>(3,3);
-		boost::numeric::ublas::matrix<T> coords = boost::numeric::ublas::zero_matrix<T>(3,1);
-		boost::numeric::ublas::matrix<T> retCoords = boost::numeric::ublas::zero_matrix<T>(3,1);
+		boost::numeric::ublas::matrix<uint32_t> orient = boost::numeric::ublas::zero_matrix<uint32_t>(3,3);
+		boost::numeric::ublas::matrix<uint32_t> coords = boost::numeric::ublas::zero_matrix<uint32_t>(3,1);
+		boost::numeric::ublas::matrix<float> retCoords = boost::numeric::ublas::zero_matrix<float>(3,1);
 		for (size_t i = 0; i < 3; i++)
 		{
 			orient( i, 0 ) = rowVec[i] < 0 ? ceil( rowVec[i] - 0.5 ) : floor( rowVec[i] + 0.5 );
@@ -78,7 +91,6 @@ public:
 			for ( size_t j = 0; j < 4; j++ ) {
 				std::cout << mat[index++] << " ";
 			}
-
 			std::cout << std::endl;
 		}
 	}

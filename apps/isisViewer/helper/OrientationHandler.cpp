@@ -6,24 +6,30 @@ namespace isis
 namespace viewer
 {
 
-size_t OrientationHandler::getNumberOfSlices( const ImageHolder &image, OrientationHandler::PlaneOrientation orientation )
+util::FixedVector<size_t, 3>  OrientationHandler::getTransformedImageSize( const ImageHolder &image, OrientationHandler::PlaneOrientation orientation )
 {
 	util::ivector4 coords = image.getImageSize();
-	util::ivector4 transformedCoords = transformWithImageOrientation<size_t>(image, coords);
-	size_t retVal = 0;
+	util::ivector4 transformedSize = transformWithImageOrientation<size_t>(image, coords);
+	util::FixedVector<size_t, 3> retSize;
 	switch (orientation)
 	{
 		case axial:
-			retVal = abs(transformedCoords[2]);
+			retSize[0] = abs(transformedSize[0]);
+			retSize[1] = abs(transformedSize[1]);
+			retSize[2] = abs(transformedSize[2]);
 			break;
 		case sagittal:
-			retVal = abs(transformedCoords[0]);
+			retSize[0] = abs(transformedSize[1]);
+			retSize[1] = abs(transformedSize[2]);
+			retSize[2] = abs(transformedSize[0]);
 			break;
 		case coronal: 
-			retVal = abs(transformedCoords[1]);
+			retSize[0] = abs(transformedSize[0]);
+			retSize[1] = abs(transformedSize[2]);
+			retSize[2] = abs(transformedSize[1]);
 			break;
 	}
-	return retVal;
+	return retSize;
 }
 
 OrientationHandler::ViewerCoordinates OrientationHandler::normalizeCoordinates(size_t slice, size_t x, size_t y, const isis::viewer::ImageHolder& image, const float* textureMatrix, OrientationHandler::ViewPortCoords viewport, OrientationHandler::PlaneOrientation orientation)
@@ -31,14 +37,35 @@ OrientationHandler::ViewerCoordinates OrientationHandler::normalizeCoordinates(s
 	ViewerCoordinates retCoords;
 	using namespace boost::numeric::ublas;
 	//here we normalize and transform the slice coords to work with our transformed matrix
+	OrientationHandler::printMatrix(textureMatrix);
+	util::FixedVector<size_t, 3> transformedImageSize = getTransformedImageSize(image, orientation);
+	util::fvector4 xVec = util::fvector4(textureMatrix[0], textureMatrix[1], textureMatrix[2], 0);
+	util::fvector4 yVec = util::fvector4(textureMatrix[4], textureMatrix[5], textureMatrix[6], 0);
 	util::fvector4 sliceVec = util::fvector4(textureMatrix[8], textureMatrix[9], textureMatrix[10], 0);
 	util::fvector4 translationVec = util::fvector4( textureMatrix[12], textureMatrix[13], textureMatrix[14], 0 );
-	float oneHalfSlice = 1.0 / getNumberOfSlices(image, orientation) / 2;
-	retCoords.slice = (1.0 / getNumberOfSlices(image, orientation)) * slice;
-	size_t relevantIndex = getBiggestVecElem<float>(sliceVec);
-	retCoords.slice -= translationVec[relevantIndex];
-	retCoords.slice *= 1.0 / sliceVec[relevantIndex];
-	retCoords.slice += sliceVec[relevantIndex] < 0 ? -oneHalfSlice : oneHalfSlice;
+	size_t relevantIndexSlice = getBiggestVecElem<float>(sliceVec);
+	size_t relevantIndexX = getBiggestVecElem<float>(xVec);
+	size_t relevantIndexY = getBiggestVecElem<float>(yVec);
+	
+	float oneHalfSlice = 1.0 / transformedImageSize[2] / 2;
+	retCoords.slice = (1.0 / transformedImageSize[2]) * slice;
+	retCoords.slice -= translationVec[relevantIndexSlice];
+	retCoords.slice *= 1.0 / sliceVec[relevantIndexSlice];
+	retCoords.slice += sliceVec[relevantIndexSlice] < 0 ? -oneHalfSlice : oneHalfSlice;
+	//here we adapt our x, y coords to the current viewport
+	std::cout << "viewport.x: " << viewport.x << std::endl;
+	std::cout << "viewport.y: " << viewport.y << std::endl;
+	
+	size_t offsetX = viewport.x + ((float)viewport.w * (
+		fabs(translationVec[relevantIndexX]) >= 1 ? fabs(translationVec[relevantIndexX]) - 1 : fabs(translationVec[relevantIndexX]) ) );
+	size_t offsetY = viewport.y + ((float)viewport.h * (
+		fabs(translationVec[relevantIndexY]) >= 1 ? fabs(translationVec[relevantIndexY]) - 1 : fabs(translationVec[relevantIndexY]) ) );
+// 	size_t  _x = (transformedCoords[0] > 0 ? transformedImageSize[0] - transformedCoords[0] : transformedCoords[0]);
+// 	size_t  _y = (transformedCoords[1] < 0 ? transformedImageSize[1] - transformedCoords[1] : transformedCoords[1]);
+	retCoords.x = offsetX + ( ( (float)viewport.w * fabs(1.0 / xVec[relevantIndexX]) / (float)transformedImageSize[0] ) * x);//we also have to transform these coords to work with our texture matrix
+	retCoords.y = offsetY + ( ( (float)viewport.h * fabs(1.0 / yVec[relevantIndexY]) / (float)transformedImageSize[1] ) * y);
+	std::cout << retCoords.x << " : " << retCoords.y << std::endl;
+	
 	
 	
 	return retCoords;
@@ -51,10 +78,11 @@ util::FixedVector<float, 3> OrientationHandler::getNormalizedScaling( const Imag
 	util::FixedVector<float, 3> retScaling;
 	util::fvector4 size = image.getImageSize();
 	util::fvector4 scaling = image.getPropMap().getPropertyAs<util::fvector4>( "voxelSize" );
+	util::fvector4 voxelGap = image.getPropMap().getPropertyAs<util::fvector4>( "voxelGap" );
 	util::fvector4 physicalSize;
 
 	for ( size_t index = 0; index < 3; index++ ) {
-		physicalSize[index] = size[index] * scaling[index];
+		physicalSize[index] = size[index] * ( scaling[index] + voxelGap[index]);
 	}
 
 	size_t biggestExtent = getBiggestVecElem<float>( physicalSize );
