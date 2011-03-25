@@ -495,8 +495,8 @@ public:
 };
 
 /**
- * An Image which allways uses its own memory and a specific type.
- * Thus, creating this image from another Image allways does a deep copy
+ * An Image which always uses its own memory and a specific type.
+ * Thus, creating this image from another Image allways does a deep copy (and maybe a conversion).
  */
 template<typename T> class MemImage: public TypedImage<T>
 {
