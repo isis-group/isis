@@ -2,6 +2,7 @@
 #define IMAGEHOLDER_HPP
 
 #include <boost/foreach.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
 #include <vector>
 #include <CoreUtils/propmap.hpp>
 #include <DataStorage/image.hpp>
@@ -34,6 +35,8 @@ public:
 	util::PropertyMap getPropMap() const { return m_PropMap; }
 	util::FixedVector<size_t, 4> getImageSize() const { return m_ImageSize; }
 	data::Image getImage() const { return m_Image; }
+	boost::numeric::ublas::matrix<float> getNormalizedImageOrientation( bool transposed = false ) const;
+	boost::numeric::ublas::matrix<float> getImageOrientation( bool transposed = false ) const;
 
 private:
 	size_t m_NumberOfTimeSteps;

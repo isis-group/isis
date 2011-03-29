@@ -5,24 +5,15 @@ namespace isis
 {
 namespace viewer
 {
-util::fvector4 GLOrientationHandler::transformWithImageOrientation(const isis::viewer::ImageHolder& image, util::fvector4 oldVec)
+util::fvector4 GLOrientationHandler::transformVectorWithImageOrientation(const isis::viewer::ImageHolder& image, util::fvector4 vector)
 	{
-		util::fvector4 sliceVec = image.getPropMap().getPropertyAs<util::fvector4>("sliceVec");
-		util::fvector4 rowVec = image.getPropMap().getPropertyAs<util::fvector4>("rowVec");
-		util::fvector4 columnVec = image.getPropMap().getPropertyAs<util::fvector4>("columnVec");	
-		boost::numeric::ublas::matrix<float> orient = boost::numeric::ublas::zero_matrix<float>(3,3);
-		boost::numeric::ublas::matrix<float> coords = boost::numeric::ublas::zero_matrix<float>(3,1);
+		
+		boost::numeric::ublas::matrix<float> vectorAsMatrix = boost::numeric::ublas::zero_matrix<float>(3,1);
 		boost::numeric::ublas::matrix<float> retCoords = boost::numeric::ublas::zero_matrix<float>(3,1);
-		for (size_t i = 0; i < 3; i++)
-		{
-			orient( i, 0 ) = rowVec[i] < 0 ? ceil( rowVec[i] - 0.5 ) : floor( rowVec[i] + 0.5 );
-			orient( i, 1 ) = columnVec[i] < 0 ? ceil( columnVec[i] - 0.5 ) : floor( columnVec[i] + 0.5 );
-			orient( i, 2 ) = sliceVec[i] < 0 ? ceil( sliceVec[i] - 0.5 ) : floor( sliceVec[i] + 0.5 );
-		}
-		coords(0,0) = oldVec[0];
-		coords(1,0) = oldVec[1];
-		coords(2,0) = oldVec[2];
-		retCoords = boost::numeric::ublas::prod(orient, coords);
+		vectorAsMatrix(0,0) = vector[0];
+		vectorAsMatrix(1,0) = vector[1];
+		vectorAsMatrix(2,0) = vector[2];
+		retCoords = boost::numeric::ublas::prod(image.getNormalizedImageOrientation(), vectorAsMatrix);
 		util::fvector4 retVec;
 		retVec[0] = retCoords(0,0);
 		retVec[1] = retCoords(1,0);
@@ -54,25 +45,7 @@ util::FixedVector<float, 3> GLOrientationHandler::getNormalizedScaling( const Im
 
 GLOrientationHandler::MatrixType GLOrientationHandler::getOrientationMatrix( const ImageHolder &image, PlaneOrientation orientation, bool scaling )
 {
-
-	MatrixType retMat = boost::numeric::ublas::zero_matrix<float>( 4, 4 );
-	retMat( 3, 3 ) = 1;
-	util::fvector4 rowVec = image.getPropMap().getPropertyAs<util::fvector4>( "rowVec" );
-	util::fvector4 columnVec = image.getPropMap().getPropertyAs<util::fvector4>( "columnVec" );
-	util::fvector4 sliceVec = image.getPropMap().getPropertyAs<util::fvector4>( "sliceVec" );
-
-	for ( size_t i = 0; i < 3; i++ ) {
-		retMat( i, 0 ) = rowVec[i] < 0 ? ceil( rowVec[i] - 0.5 ) : floor( rowVec[i] + 0.5 );
-	}
-
-	for ( size_t i = 0; i < 3; i++ ) {
-		retMat( i, 1 ) = columnVec[i] < 0 ? ceil( columnVec[i] - 0.5 ) : floor( columnVec[i] + 0.5 );
-	}
-
-	for ( size_t i = 0; i < 3; i++ ) {
-		retMat( i, 2 ) = sliceVec[i] < 0 ? ceil( sliceVec[i] - 0.5 ) : floor( sliceVec[i] + 0.5 );
-	}
-
+	MatrixType retMat = image.getNormalizedImageOrientation();
 	if ( scaling ) {
 		MatrixType scaleMatrix = boost::numeric::ublas::identity_matrix<float>( 4, 4 );
 		util::FixedVector<float, 3> scaling = getNormalizedScaling( image );
@@ -81,17 +54,14 @@ GLOrientationHandler::MatrixType GLOrientationHandler::getOrientationMatrix( con
 		scaleMatrix( 2, 2 ) = scaling[2];
 		retMat = boost::numeric::ublas::prod( retMat, scaleMatrix );
 	}
-
 	retMat = transformToView( retMat, orientation );
-	//TODO debug
-	//  std::cout << retMat << std::endl;
 	return retMat;
 }
 
 
 GLOrientationHandler::MatrixType GLOrientationHandler::transformToView( GLOrientationHandler::MatrixType origMatrix, PlaneOrientation orientation )
 {
-	MatrixType transformMatrix = boost::numeric::ublas::identity_matrix<float>( 4, 4 );
+	MatrixType transformMatrix = boost::numeric::ublas::identity_matrix<float>( 3, 3 );
 
 	switch ( orientation ) {
 	case axial:

@@ -19,7 +19,7 @@ class GLOrientationHandler
 public:
 	typedef boost::numeric::ublas::matrix<float> MatrixType;
 	enum PlaneOrientation { axial, sagittal, coronal };
-	typedef util::FixedVector< util::FixedVector<float, 3>, 4> VertexMatrix;
+	typedef util::FixedVector< util::FixedVector<float, 3>, 4> TextureMatrixType;
 
 	struct ViewPortCoords {
 		size_t w;
@@ -49,7 +49,7 @@ public:
 	///recalculate the size and position of the current viewport. This has to be done durring resize
 	static ViewPortCoords calculateViewPort( size_t w, size_t h );
 	
-	static util::fvector4 transformWithImageOrientation(const isis::viewer::ImageHolder& image, util::fvector4 oldVec);
+	static util::fvector4 transformVectorWithImageOrientation(const isis::viewer::ImageHolder& image, util::fvector4 vector);
 
 	static void  boostMatrix2Pointer( MatrixType boostMatrix, float *ret );
 

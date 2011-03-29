@@ -100,7 +100,7 @@ void QGLWidgetImplementation::resizeGL( int w, int h )
 
 	//TODO
 	m_CurrentViewPort =
-		GLOrientationHandler::calculateViewPortCoords( width(), height() );
+		GLOrientationHandler::calculateViewPort( width(), height() );
 	glViewport( m_CurrentViewPort.x, m_CurrentViewPort.y, m_CurrentViewPort.w, m_CurrentViewPort.h );
 	redrawCrosshair( m_CrosshairCoordinates.first, m_CrosshairCoordinates.second );
 }

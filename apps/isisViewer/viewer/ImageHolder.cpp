@@ -39,6 +39,51 @@ ImageHolder::filterRelevantMetaInformation()
 
 	return true;
 }
+
+boost::numeric::ublas::matrix< float > ImageHolder::getNormalizedImageOrientation(bool transposed) const
+{
+	boost::numeric::ublas::matrix<float> retMatrix = boost::numeric::ublas::zero_matrix<float>(3,3);
+	util::fvector4 rowVec = m_Image.getPropertyAs<util::fvector4>( "rowVec" );
+	util::fvector4 columnVec = m_Image.getPropertyAs<util::fvector4>( "columnVec" );
+	util::fvector4 sliceVec = m_Image.getPropertyAs<util::fvector4>( "sliceVec" );
+	for ( size_t i = 0; i < 3; i++ ) {
+		if(!transposed) {
+			retMatrix( i, 0 ) = rowVec[i] < 0 ? ceil( rowVec[i] - 0.5 ) : floor( rowVec[i] + 0.5 );
+			retMatrix( i, 1 ) = columnVec[i] < 0 ? ceil( columnVec[i] - 0.5 ) : floor( columnVec[i] + 0.5 );
+			retMatrix( i, 2 ) = sliceVec[i] < 0 ? ceil( sliceVec[i] - 0.5 ) : floor( sliceVec[i] + 0.5 );
+		} else {
+			retMatrix( 0, i ) = rowVec[i] < 0 ? ceil( rowVec[i] - 0.5 ) : floor( rowVec[i] + 0.5 );
+			retMatrix( 1, i ) = columnVec[i] < 0 ? ceil( columnVec[i] - 0.5 ) : floor( columnVec[i] + 0.5 );
+			retMatrix( 2, i ) = sliceVec[i] < 0 ? ceil( sliceVec[i] - 0.5 ) : floor( sliceVec[i] + 0.5 );
+		}
+	}
+	return retMatrix;
+}
+
+boost::numeric::ublas::matrix< float > ImageHolder::getImageOrientation(bool transposed) const
+{
+	boost::numeric::ublas::matrix<float> retMatrix = boost::numeric::ublas::zero_matrix<float>(3,3);
+	util::fvector4 rowVec = m_Image.getPropertyAs<util::fvector4>( "rowVec" );
+	util::fvector4 columnVec = m_Image.getPropertyAs<util::fvector4>( "columnVec" );
+	util::fvector4 sliceVec = m_Image.getPropertyAs<util::fvector4>( "sliceVec" );
+	for ( size_t i = 0; i < 3; i++ ) {
+		if(!transposed) {
+			retMatrix( i, 0 ) = rowVec[i];
+			retMatrix( i, 1 ) = columnVec[i];
+			retMatrix( i, 2 ) = sliceVec[i];
+		} else {
+			retMatrix( 0, i ) = rowVec[i];
+			retMatrix( 1, i ) = columnVec[i];
+			retMatrix( 2, i ) = sliceVec[i];
+		}
+	}
+	return retMatrix;
+}
+
+
+
+
+
 bool ImageHolder::setImage( data::Image image )
 {
 
