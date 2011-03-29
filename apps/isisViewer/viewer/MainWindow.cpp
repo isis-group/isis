@@ -18,10 +18,10 @@ MainWindow::MainWindow( ViewerCore *core )
 {
 	connect( ui.goButton, SIGNAL( clicked() ), this, SLOT( go() ) );
 
-	m_AxialWidget = new QGLWidgetImplementation( core, ui.axialWidget, OrientationHandler::axial );
+	m_AxialWidget = new QGLWidgetImplementation( core, ui.axialWidget, GLOrientationHandler::axial );
 	m_ViewerCore->registerWidget( "axialView", m_AxialWidget );
 
-	m_SagittalWidget = m_AxialWidget->createSharedWidget( ui.sagittalWidget, OrientationHandler::sagittal );
+	m_SagittalWidget = m_AxialWidget->createSharedWidget( ui.sagittalWidget, GLOrientationHandler::sagittal );
 	m_ViewerCore->registerWidget( "sagittalView", m_SagittalWidget );
 
 	//TODO only view 2 widgets since my computer is too dumb to manage 3 ones

@@ -8,7 +8,7 @@ namespace viewer
 {
 
 
-QGLWidgetImplementation::QGLWidgetImplementation( ViewerCore *core, QWidget *parent, QGLWidget *share, OrientationHandler::PlaneOrientation orientation )
+QGLWidgetImplementation::QGLWidgetImplementation( ViewerCore *core, QWidget *parent, QGLWidget *share, GLOrientationHandler::PlaneOrientation orientation )
 	: QGLWidget( parent, share ),
 	  m_ViewerCore( core ),
 	  m_PlaneOrientation( orientation ),
@@ -18,7 +18,7 @@ QGLWidgetImplementation::QGLWidgetImplementation( ViewerCore *core, QWidget *par
 	commonInit();
 }
 
-QGLWidgetImplementation::QGLWidgetImplementation( ViewerCore *core, QWidget *parent, OrientationHandler::PlaneOrientation orientation )
+QGLWidgetImplementation::QGLWidgetImplementation( ViewerCore *core, QWidget *parent, GLOrientationHandler::PlaneOrientation orientation )
 	: QGLWidget( parent ),
 	  m_ViewerCore( core ),
 	  m_PlaneOrientation( orientation )
@@ -69,7 +69,7 @@ void QGLWidgetImplementation::redrawCrosshair( size_t _x, size_t _y )
 	redraw();
 }
 
-QGLWidgetImplementation *QGLWidgetImplementation::createSharedWidget( QWidget *parent, OrientationHandler::PlaneOrientation orientation )
+QGLWidgetImplementation *QGLWidgetImplementation::createSharedWidget( QWidget *parent, GLOrientationHandler::PlaneOrientation orientation )
 {
 	return new QGLWidgetImplementation( m_ViewerCore, parent, this, orientation );
 }
@@ -100,71 +100,18 @@ void QGLWidgetImplementation::resizeGL( int w, int h )
 
 	//TODO
 	m_CurrentViewPort =
-		OrientationHandler::calculateViewPortCoords( width(), height() );
+		GLOrientationHandler::calculateViewPortCoords( width(), height() );
 	glViewport( m_CurrentViewPort.x, m_CurrentViewPort.y, m_CurrentViewPort.w, m_CurrentViewPort.h );
-	paintSlice( 0, 0, 91,0,0 );
 	redrawCrosshair( m_CrosshairCoordinates.first, m_CrosshairCoordinates.second );
 }
 
 void QGLWidgetImplementation::lookAtVoxel( size_t _x, size_t _y, size_t _z )
 {
-	size_t planeZ;
-	size_t planeX;
-	size_t planeY;
-	//TODO get the correct data container
-	ImageHolder image = m_ViewerCore->getDataContainer()[0];
-	//here we have to recalculate to image voxel coordinates	
-	util::fvector4 imageCoords = OrientationHandler::transformWithImageOrientation(image, util::ivector4 (_x, _y,_z));
-	util::FixedVector<size_t,3> imageSize = OrientationHandler::getTransformedImageSize(image);
-	std::cout << "imageCoords: " << imageCoords << std::endl;
-	std::cout << "imageSize: " << imageSize[0] << " : " << imageSize[1] << " : " << imageSize[2] << std::endl;
-	switch ( m_PlaneOrientation ) {
-	case OrientationHandler::axial:
-		planeZ = imageCoords[2] < 0 ? -imageCoords[2] : imageCoords[2];
-		planeX = imageCoords[0] < 0 ? imageSize[0] + imageCoords[0] : imageCoords[0];
-		planeY = imageCoords[1] < 0 ? imageSize[1] - imageCoords[1] : imageCoords[1];
-		break;
-	case OrientationHandler::sagittal:
-		planeZ = imageCoords[0] <= 0 ? imageSize[0] + imageCoords[0] : imageCoords[0];
-		planeY = imageCoords[2] <= 0 ? -imageCoords[2] -4 : imageCoords[2];
-		planeX = imageCoords[1] < 0 ? imageSize[1] - imageCoords[1] : imageCoords[1];
-		break;
-	case OrientationHandler::coronal:
-		planeZ = abs(imageCoords[1]);
-		planeY = abs(imageCoords[2]);
-		planeX = abs(imageCoords[0]);
-		break;
-	}
-	std::cout << objectName().toStdString() << " " << planeZ << " : " << planeX << " : " << planeY << std::endl;
-	paintSlice( 0, 0, planeZ, planeX, planeY );
 	
-// 	redrawCrosshair( normalizedCoords.first, normalizedCoords.second );
+	
 }
 
-bool QGLWidgetImplementation::paintSlice( size_t imageID, size_t timestep, size_t slice, size_t _x, size_t _y )
-{
 
-	//TODO this is only a prove of concept. has to be structured and optimized!!
-
-	//check if the image is available at all
-	if( !m_ViewerCore->getDataContainer().isImage( imageID, timestep, slice ) ) {
-		LOG( Runtime, error ) << "Tried to paint image with id " << imageID << " and timestep " << timestep <<
-							  ", but no such image exists!";
-		return false;
-	}
-
-	//copy the volume to openGL. If this already has happend GLTextureHandler does nothing.
-
-	GLuint textureID = util::Singletons::get<GLTextureHandler, 10>().copyImageToTexture( m_ViewerCore->getDataContainer(), imageID, timestep );
-	ImageHolder image = m_ViewerCore->getDataContainer()[imageID];
-	OrientationHandler::MatrixType orient =  OrientationHandler::getOrientationMatrix( image, m_PlaneOrientation, true );
-	float textureMatrix[16];
-	OrientationHandler::boostMatrix2Pointer( OrientationHandler::orientation2TextureMatrix( orient ), textureMatrix );
-	OrientationHandler::ViewerCoordinates normalizedCoords = OrientationHandler::normalizeCoordinates( slice, _x, _y, image, textureMatrix, m_CurrentViewPort, m_PlaneOrientation);
-	
-	internPaintSlice( textureID, textureMatrix, normalizedCoords.slice );
-	redrawCrosshair( normalizedCoords.x, normalizedCoords.y );
-}
 void QGLWidgetImplementation::internPaintSlice( GLuint textureID, const float *textureMatrix, float slice )
 {
 	redraw();
@@ -186,12 +133,6 @@ void QGLWidgetImplementation::internPaintSlice( GLuint textureID, const float *t
 	glFlush();
 	glDisable( GL_TEXTURE_3D );
 // 	redraw();
-}
-
-void QGLWidgetImplementation::paintGL()
-{
-
-
 }
 
 void QGLWidgetImplementation::mouseMoveEvent( QMouseEvent *e )

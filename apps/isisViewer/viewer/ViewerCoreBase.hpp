@@ -3,7 +3,7 @@
 #define VIEWERCOREBASE_HPP
 
 #include "DataContainer.hpp"
-#include "OrientationHandler.hpp"
+#include "GLOrientationHandler.hpp"
 #include <QWidget>
 #include <map>
 

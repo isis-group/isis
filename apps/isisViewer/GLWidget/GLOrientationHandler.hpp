@@ -14,7 +14,7 @@ namespace viewer
 {
 
 
-class OrientationHandler
+class GLOrientationHandler
 {
 public:
 	typedef boost::numeric::ublas::matrix<float> MatrixType;
@@ -44,7 +44,7 @@ public:
 	static MatrixType getOrientationMatrix( const ImageHolder &image, PlaneOrientation orientation, bool scaling = true );
 	
 	///transforms the common orienation of an image into the specific orienation of one view (axial, coronal, sagittal)
-	static MatrixType transformMatrix( MatrixType origMatrix, PlaneOrientation orientation );
+	static MatrixType transformToView( MatrixType origMatrix, PlaneOrientation orientation );
 	
 	///this function converts the specific orientation matrix for each view into the texture transformation matrix which then can be applied to the opengl texture
 	static MatrixType orientation2TextureMatrix( const MatrixType &origMatrix );
@@ -57,7 +57,7 @@ public:
 	
 	static util::fvector4 transformWithImageOrientation(const isis::viewer::ImageHolder& image, util::fvector4 oldVec);
 
-	static std::pair<size_t,size_t> voxelCoords2WidgetCoords(size_t x, size_t y, const ImageHolder &image, OrientationHandler::PlaneOrientation orientation, ViewPortCoords viewport);
+	static std::pair<size_t,size_t> voxelCoords2WidgetCoords(size_t x, size_t y, const ImageHolder &image, GLOrientationHandler::PlaneOrientation orientation, ViewPortCoords viewport);
 	
 	static void  boostMatrix2Pointer( MatrixType boostMatrix, float *ret );
 

@@ -1,10 +1,11 @@
 cmake_minimum_required(VERSION 2.6)
 
 # collecting files
-file (GLOB HEADER_FILES headers/*.h headers/*.hpp)
-file (GLOB CPP_FILES sources/*.cpp *.cpp)
+file (GLOB VIEWER_FILES_HPP viewer/*.h viewer/*.hpp)
+file (GLOB VIEWER_FILES_CPP viewer/*.c viewer/*.cpp)
+file (GLOB GLWIDGET_FILES_HPP GLWidget/*.hpp GLWidget/*.h)
+file (GLOB GLWIDGET_FILES_CPP GLWidget/*.cpp GLWidget/*.c)
 file (GLOB UI_FILES forms/*.ui)
-file (GLOB HELPER_FILES helper/*.cpp)
 
 ###########################################################
 # isis stuff
@@ -43,7 +44,7 @@ set(QT_USE_QTOPENGL TRUE)
 set( QT_USE_OPENGL TRUE )
 
 
-qt4_wrap_cpp(isisViewer_moc_files ${HEADER_FILES})
+qt4_wrap_cpp(isisViewer_moc_files ${VIEWER_FILES_HPP} ${GLWIDGET_FILES_HPP})
 QT4_WRAP_UI(isisViewer_UIS_H ${UI_FILES})
 
 ###########################################################
@@ -64,8 +65,8 @@ include_directories(${OPENGL_INCLUDE_DIR})
 FIND_PACKAGE(Boost REQUIRED COMPONENTS thread)
 
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/headers)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/helper)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/GLWidget)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/viewer)
 
 #this flags has to be set due to use parallel with boos::signal
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DQT_NO_KEYWORDS -ftemplate-depth-100 -Wextra -Wshadow  -Wfatal-errors" )
@@ -73,7 +74,7 @@ SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DQT_NO_KEYWORDS -Wextra -Wshadow  -Wfatal-e
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-depth-100")
 
-add_executable(isisViewer ${CPP_FILES} ${HELPER_FILES} ${isisViewer_UIS_H} ${isisViewer_moc_files})
+add_executable(isisViewer main.cpp ${GLWIDGET_FILES_CPP} ${VIEWER_FILES_CPP} ${isisViewer_UIS_H} ${isisViewer_moc_files})
 
 set(NEEDED_LIBS
 	${OPENGL_LIBRARY} 

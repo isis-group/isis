@@ -21,19 +21,18 @@ class QGLWidgetImplementation : public QGLWidget
 {
 	Q_OBJECT
 public:
-	QGLWidgetImplementation( ViewerCore *core, QWidget *parent = 0, QGLWidget *share = 0, OrientationHandler::PlaneOrientation orienation = OrientationHandler::axial );
-	QGLWidgetImplementation( ViewerCore *core, QWidget *parent = 0, OrientationHandler::PlaneOrientation orientation = OrientationHandler::axial );
+	QGLWidgetImplementation( ViewerCore *core, QWidget *parent = 0, QGLWidget *share = 0, GLOrientationHandler::PlaneOrientation orienation = GLOrientationHandler::axial );
+	QGLWidgetImplementation( ViewerCore *core, QWidget *parent = 0, GLOrientationHandler::PlaneOrientation orientation = GLOrientationHandler::axial );
 
-	virtual bool paintSlice( size_t imageID, size_t timestep, size_t slice, size_t x, size_t y );
 	void redrawCrosshair( size_t x, size_t y );
 
 	virtual void lookAtVoxel( size_t x, size_t y, size_t z );
 
 
-	QGLWidgetImplementation *createSharedWidget( QWidget *parent, OrientationHandler::PlaneOrientation orienation = OrientationHandler::axial );
+	QGLWidgetImplementation *createSharedWidget( QWidget *parent, GLOrientationHandler::PlaneOrientation orienation = GLOrientationHandler::axial );
 
 private:
-	QGLWidgetImplementation( ViewerCore *core, QWidget *parent, QGLWidget *share, QGLContext *context, OrientationHandler::PlaneOrientation orienation = OrientationHandler::axial );
+	QGLWidgetImplementation( ViewerCore *core, QWidget *parent, QGLWidget *share, QGLContext *context, GLOrientationHandler::PlaneOrientation orienation = GLOrientationHandler::axial );
 	ViewerCore *m_ViewerCore;
 	QGLWidget *m_ShareWidget;
 
@@ -44,7 +43,6 @@ protected:
 	virtual void mouseMoveEvent( QMouseEvent *e );
 	virtual void initializeGL();
 	virtual void resizeGL( int w, int h );
-	virtual void paintGL();
 
 
 protected:
@@ -54,15 +52,15 @@ Q_SIGNALS:
 private:
 	void connectSignals();
 	void commonInit();
-	void internPaintSlice( GLuint textureID, const float *matrix, float slice );
+	void internPaintSlice( GLuint textureID, const float *matrix, float normalizedSlice );
 	bool isInViewPort( size_t x, size_t y ) const;
 	std::pair<float, float> widget2ViewPortCoordinates( size_t x, size_t y ) const;
 
 	std::vector<GLuint> m_TextureIDVec;
-	OrientationHandler::PlaneOrientation m_PlaneOrientation;
+	GLOrientationHandler::PlaneOrientation m_PlaneOrientation;
 	std::pair<size_t, size_t> m_CrosshairCoordinates;
 
-	OrientationHandler::ViewPortCoords m_CurrentViewPort;
+	GLOrientationHandler::ViewPortCoords m_CurrentViewPort;
 	GLCrossHair m_CrossHair;
 	GLuint m_CurrentTextureID;
 	float m_CurrentSlice;
