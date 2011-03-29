@@ -34,9 +34,6 @@ public:
 		size_t y;
 	};
 
-	///gets the amount of slices along the normal of the plane specified by orientation
-	static util::FixedVector<size_t, 3> getTransformedImageSize ( const ImageHolder &image );
-	
 	///just a helper function to get the normalized (for texture transform) scaling of an image
 	static util::FixedVector<float, 3> getNormalizedScaling( const ImageHolder &image );
 	
@@ -50,15 +47,10 @@ public:
 	static MatrixType orientation2TextureMatrix( const MatrixType &origMatrix );
 	
 	///recalculate the size and position of the current viewport. This has to be done durring resize
-	static ViewPortCoords calculateViewPortCoords( size_t w, size_t h );
-	
-	///transform the voxelCoords into coords that can used by opengl. 
-	static ViewerCoordinates normalizeCoordinates(size_t slice, size_t x, size_t y, const ImageHolder &image, const float *textureMatrix, ViewPortCoords viewport, PlaneOrientation orientation);
+	static ViewPortCoords calculateViewPort( size_t w, size_t h );
 	
 	static util::fvector4 transformWithImageOrientation(const isis::viewer::ImageHolder& image, util::fvector4 oldVec);
 
-	static std::pair<size_t,size_t> voxelCoords2WidgetCoords(size_t x, size_t y, const ImageHolder &image, GLOrientationHandler::PlaneOrientation orientation, ViewPortCoords viewport);
-	
 	static void  boostMatrix2Pointer( MatrixType boostMatrix, float *ret );
 
 	static void printMatrix( const float *mat ) {

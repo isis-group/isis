@@ -170,7 +170,7 @@ GLOrientationHandler::MatrixType GLOrientationHandler::orientation2TextureMatrix
 
 
 
-GLOrientationHandler::ViewPortCoords GLOrientationHandler::calculateViewPortCoords( size_t w, size_t h )
+GLOrientationHandler::ViewPortCoords GLOrientationHandler::calculateViewPort( size_t w, size_t h )
 {
 	ViewPortCoords retCoords;
 	float scaleH = ( w < h ) ? ( ( float )w / ( float )h ) : 1;
