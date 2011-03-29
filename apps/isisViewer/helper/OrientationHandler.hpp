@@ -35,7 +35,7 @@ public:
 	};
 
 	///gets the amount of slices along the normal of the plane specified by orientation
-	static util::FixedVector<size_t, 3> getTransformedImageSize ( const ImageHolder &image, PlaneOrientation orientation );
+	static util::FixedVector<size_t, 3> getTransformedImageSize ( const ImageHolder &image );
 	
 	///just a helper function to get the normalized (for texture transform) scaling of an image
 	static util::FixedVector<float, 3> getNormalizedScaling( const ImageHolder &image );
@@ -55,31 +55,8 @@ public:
 	///transform the voxelCoords into coords that can used by opengl. 
 	static ViewerCoordinates normalizeCoordinates(size_t slice, size_t x, size_t y, const ImageHolder &image, const float *textureMatrix, ViewPortCoords viewport, PlaneOrientation orientation);
 	
-	template <typename T>
-	static util::FixedVector<T,4> transformWithImageOrientation(const isis::viewer::ImageHolder& image, util::FixedVector<T,4> oldVec)
-	{
-		util::fvector4 sliceVec = image.getPropMap().getPropertyAs<util::fvector4>("sliceVec");
-		util::fvector4 rowVec = image.getPropMap().getPropertyAs<util::fvector4>("rowVec");
-		util::fvector4 columnVec = image.getPropMap().getPropertyAs<util::fvector4>("columnVec");	
-		boost::numeric::ublas::matrix<uint32_t> orient = boost::numeric::ublas::zero_matrix<uint32_t>(3,3);
-		boost::numeric::ublas::matrix<uint32_t> coords = boost::numeric::ublas::zero_matrix<uint32_t>(3,1);
-		boost::numeric::ublas::matrix<float> retCoords = boost::numeric::ublas::zero_matrix<float>(3,1);
-		for (size_t i = 0; i < 3; i++)
-		{
-			orient( i, 0 ) = rowVec[i] < 0 ? ceil( rowVec[i] - 0.5 ) : floor( rowVec[i] + 0.5 );
-			orient( i, 1 ) = columnVec[i] < 0 ? ceil( columnVec[i] - 0.5 ) : floor( columnVec[i] + 0.5 );
-			orient( i, 2 ) = sliceVec[i] < 0 ? ceil( sliceVec[i] - 0.5 ) : floor( sliceVec[i] + 0.5 );
-		}
-		coords(0,0) = oldVec[0];
-		coords(1,0) = oldVec[1];
-		coords(2,0) = oldVec[2];
-		retCoords = boost::numeric::ublas::prod(orient, coords);
-		util::FixedVector<T,4> retVec;
-		retVec[0] = retCoords(0,0);
-		retVec[1] = retCoords(1,0);
-		retVec[2] = retCoords(2,0);
-		return retVec;
-	}
+	static util::fvector4 transformWithImageOrientation(const isis::viewer::ImageHolder& image, util::fvector4 oldVec);
+
 	static std::pair<size_t,size_t> voxelCoords2WidgetCoords(size_t x, size_t y, const ImageHolder &image, OrientationHandler::PlaneOrientation orientation, ViewPortCoords viewport);
 	
 	static void  boostMatrix2Pointer( MatrixType boostMatrix, float *ret );
