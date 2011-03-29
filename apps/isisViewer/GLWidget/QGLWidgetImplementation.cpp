@@ -66,6 +66,7 @@ void QGLWidgetImplementation::redrawCrosshair( size_t _x, size_t _y )
 		std::pair<float, float> normCoords = widget2ViewPortCoordinates( _x, _y );
 		m_CrossHair.draw( normCoords.first, normCoords.second );
 	}
+
 	redraw();
 }
 
@@ -107,8 +108,8 @@ void QGLWidgetImplementation::resizeGL( int w, int h )
 
 void QGLWidgetImplementation::lookAtVoxel( size_t _x, size_t _y, size_t _z )
 {
-	
-	
+
+
 }
 
 
@@ -132,13 +133,13 @@ void QGLWidgetImplementation::internPaintSlice( GLuint textureID, const float *t
 	glEnd();
 	glFlush();
 	glDisable( GL_TEXTURE_3D );
-// 	redraw();
+	//  redraw();
 }
 
 void QGLWidgetImplementation::mouseMoveEvent( QMouseEvent *e )
 {
 	//TODO debug
-// 	lookAtVoxel( e->x(), e->y(), 50 );
+	//  lookAtVoxel( e->x(), e->y(), 50 );
 }
 
 

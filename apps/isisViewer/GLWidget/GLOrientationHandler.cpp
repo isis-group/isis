@@ -5,21 +5,21 @@ namespace isis
 {
 namespace viewer
 {
-util::fvector4 GLOrientationHandler::transformVectorWithImageOrientation(const isis::viewer::ImageHolder& image, util::fvector4 vector)
-	{
-		
-		boost::numeric::ublas::matrix<float> vectorAsMatrix = boost::numeric::ublas::zero_matrix<float>(3,1);
-		boost::numeric::ublas::matrix<float> retCoords = boost::numeric::ublas::zero_matrix<float>(3,1);
-		vectorAsMatrix(0,0) = vector[0];
-		vectorAsMatrix(1,0) = vector[1];
-		vectorAsMatrix(2,0) = vector[2];
-		retCoords = boost::numeric::ublas::prod(image.getNormalizedImageOrientation(), vectorAsMatrix);
-		util::fvector4 retVec;
-		retVec[0] = retCoords(0,0);
-		retVec[1] = retCoords(1,0);
-		retVec[2] = retCoords(2,0);
-		return retVec;
-	}
+util::fvector4 GLOrientationHandler::transformVectorWithImageOrientation( const isis::viewer::ImageHolder &image, util::fvector4 vector )
+{
+
+	boost::numeric::ublas::matrix<float> vectorAsMatrix = boost::numeric::ublas::zero_matrix<float>( 3, 1 );
+	boost::numeric::ublas::matrix<float> retCoords = boost::numeric::ublas::zero_matrix<float>( 3, 1 );
+	vectorAsMatrix( 0, 0 ) = vector[0];
+	vectorAsMatrix( 1, 0 ) = vector[1];
+	vectorAsMatrix( 2, 0 ) = vector[2];
+	retCoords = boost::numeric::ublas::prod( image.getNormalizedImageOrientation(), vectorAsMatrix );
+	util::fvector4 retVec;
+	retVec[0] = retCoords( 0, 0 );
+	retVec[1] = retCoords( 1, 0 );
+	retVec[2] = retCoords( 2, 0 );
+	return retVec;
+}
 
 
 util::FixedVector<float, 3> GLOrientationHandler::getNormalizedScaling( const ImageHolder &image )
@@ -31,7 +31,7 @@ util::FixedVector<float, 3> GLOrientationHandler::getNormalizedScaling( const Im
 	util::fvector4 physicalSize;
 
 	for ( size_t index = 0; index < 3; index++ ) {
-		physicalSize[index] = size[index] * ( scaling[index] + voxelGap[index]);
+		physicalSize[index] = size[index] * ( scaling[index] + voxelGap[index] );
 	}
 
 	size_t biggestExtent = getBiggestVecElem<float>( physicalSize );
@@ -39,6 +39,7 @@ util::FixedVector<float, 3> GLOrientationHandler::getNormalizedScaling( const Im
 	for ( size_t index = 0; index < 3; index++ ) {
 		retScaling[index] = 1.0 / physicalSize[biggestExtent] * physicalSize[index];
 	}
+
 	return retScaling;
 }
 
@@ -46,6 +47,7 @@ util::FixedVector<float, 3> GLOrientationHandler::getNormalizedScaling( const Im
 GLOrientationHandler::MatrixType GLOrientationHandler::getOrientationMatrix( const ImageHolder &image, PlaneOrientation orientation, bool scaling )
 {
 	MatrixType retMat = image.getNormalizedImageOrientation();
+
 	if ( scaling ) {
 		MatrixType scaleMatrix = boost::numeric::ublas::identity_matrix<float>( 4, 4 );
 		util::FixedVector<float, 3> scaling = getNormalizedScaling( image );
@@ -54,6 +56,7 @@ GLOrientationHandler::MatrixType GLOrientationHandler::getOrientationMatrix( con
 		scaleMatrix( 2, 2 ) = scaling[2];
 		retMat = boost::numeric::ublas::prod( retMat, scaleMatrix );
 	}
+
 	retMat = transformToView( retMat, orientation );
 	return retMat;
 }
@@ -126,6 +129,7 @@ GLOrientationHandler::MatrixType GLOrientationHandler::orientation2TextureMatrix
 
 		}
 	}
+
 	for ( size_t i = 0; i < 3; i++ ) {
 		for ( size_t j = 0; j < 3; j++ ) {
 			if( retMat( i, j ) < 0 ) {
@@ -135,6 +139,7 @@ GLOrientationHandler::MatrixType GLOrientationHandler::orientation2TextureMatrix
 			}
 		}
 	}
+
 	return retMat;
 }
 

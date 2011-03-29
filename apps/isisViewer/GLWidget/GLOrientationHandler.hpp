@@ -27,7 +27,7 @@ public:
 		size_t x;
 		size_t y;
 	};
-	
+
 	struct ViewerCoordinates {
 		float slice;
 		size_t x;
@@ -36,20 +36,20 @@ public:
 
 	///just a helper function to get the normalized (for texture transform) scaling of an image
 	static util::FixedVector<float, 3> getNormalizedScaling( const ImageHolder &image );
-	
+
 	///yields the orientation matrix with an optional scaling
 	static MatrixType getOrientationMatrix( const ImageHolder &image, PlaneOrientation orientation, bool scaling = true );
-	
+
 	///transforms the common orienation of an image into the specific orienation of one view (axial, coronal, sagittal)
 	static MatrixType transformToView( MatrixType origMatrix, PlaneOrientation orientation );
-	
+
 	///this function converts the specific orientation matrix for each view into the texture transformation matrix which then can be applied to the opengl texture
 	static MatrixType orientation2TextureMatrix( const MatrixType &origMatrix );
-	
+
 	///recalculate the size and position of the current viewport. This has to be done durring resize
 	static ViewPortCoords calculateViewPort( size_t w, size_t h );
-	
-	static util::fvector4 transformVectorWithImageOrientation(const isis::viewer::ImageHolder& image, util::fvector4 vector);
+
+	static util::fvector4 transformVectorWithImageOrientation( const isis::viewer::ImageHolder &image, util::fvector4 vector );
 
 	static void  boostMatrix2Pointer( MatrixType boostMatrix, float *ret );
 
@@ -60,6 +60,7 @@ public:
 			for ( size_t j = 0; j < 4; j++ ) {
 				std::cout << mat[index++] << " ";
 			}
+
 			std::cout << std::endl;
 		}
 	}
