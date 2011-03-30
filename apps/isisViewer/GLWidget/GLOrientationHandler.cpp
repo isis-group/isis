@@ -5,10 +5,13 @@ namespace isis
 {
 namespace viewer
 {
+
+const unsigned short GLOrientationHandler::textureSize = 4;
+	
 util::fvector4 GLOrientationHandler::transformVectorWithImageOrientation( const isis::viewer::ImageHolder &image, util::fvector4 vector )
 {
-	boost::numeric::ublas::matrix<float> vectorAsMatrix = boost::numeric::ublas::zero_matrix<float>( 3, 1 );
-	boost::numeric::ublas::matrix<float> retCoords = boost::numeric::ublas::zero_matrix<float>( 3, 1 );
+	boost::numeric::ublas::matrix<float> vectorAsMatrix = boost::numeric::ublas::zero_matrix<float>( textureSize, 1 );
+	boost::numeric::ublas::matrix<float> retCoords = boost::numeric::ublas::zero_matrix<float>( textureSize, 1 );
 	vectorAsMatrix( 0, 0 ) = vector[0];
 	vectorAsMatrix( 1, 0 ) = vector[1];
 	vectorAsMatrix( 2, 0 ) = vector[2];
@@ -24,20 +27,19 @@ util::fvector4 GLOrientationHandler::transformVectorWithImageAndPlaneOrientation
 {
 	//first we have to transform the voxels to our physical image space
 	util::fvector4 imageOrientedVector = GLOrientationHandler::transformVectorWithImageOrientation(image, vector);
-	GLOrientationHandler::MatrixType tmpVector = boost::numeric::ublas::zero_matrix<float>(3,1);
+	GLOrientationHandler::MatrixType tmpVector = boost::numeric::ublas::zero_matrix<float>(textureSize,1);
 	for (size_t i=0;i<3;i++)
 	{
 		tmpVector(i,0)=imageOrientedVector[i];
 	}
 	//now we have to transform these coords to our respective plane view
 	GLOrientationHandler::MatrixType planeOrientationMatrix = 
-		GLOrientationHandler::transformToView(boost::numeric::ublas::identity_matrix<float>(3,3), orientation );
+		GLOrientationHandler::transformToView(boost::numeric::ublas::identity_matrix<float>(textureSize,textureSize), orientation );
 	GLOrientationHandler::MatrixType transformedImageVoxels = boost::numeric::ublas::prod(planeOrientationMatrix, tmpVector);
-	
+	util::fvector4 retVec = util::fvector4(transformedImageVoxels(0,0), transformedImageVoxels(1,0), transformedImageVoxels(2,0));
+	return retVec;
 }
 	
-
-
 util::FixedVector<float, 3> GLOrientationHandler::getNormalizedScaling( const ImageHolder &image )
 {
 	util::FixedVector<float, 3> retScaling;
@@ -65,14 +67,13 @@ GLOrientationHandler::MatrixType GLOrientationHandler::getOrientationMatrix( con
 	MatrixType retMat = image.getNormalizedImageOrientation();
 
 	if ( scaling ) {
-		MatrixType scaleMatrix = boost::numeric::ublas::identity_matrix<float>( 4, 4 );
+		MatrixType scaleMatrix = boost::numeric::ublas::identity_matrix<float>( textureSize, textureSize );
 		util::FixedVector<float, 3> scaling = getNormalizedScaling( image );
 		scaleMatrix( 0, 0 ) = scaling[0];
 		scaleMatrix( 1, 1 ) = scaling[1];
 		scaleMatrix( 2, 2 ) = scaling[2];
 		retMat = boost::numeric::ublas::prod( retMat, scaleMatrix );
 	}
-
 	retMat = transformToView( retMat, orientation );
 	return retMat;
 }
@@ -80,7 +81,7 @@ GLOrientationHandler::MatrixType GLOrientationHandler::getOrientationMatrix( con
 
 GLOrientationHandler::MatrixType GLOrientationHandler::transformToView( GLOrientationHandler::MatrixType origMatrix, PlaneOrientation orientation )
 {
-	MatrixType transformMatrix = boost::numeric::ublas::identity_matrix<float>( 3, 3 );
+	MatrixType transformMatrix = boost::numeric::ublas::identity_matrix<float>( textureSize, textureSize );
 
 	switch ( orientation ) {
 	case axial:
@@ -128,8 +129,8 @@ void GLOrientationHandler::boostMatrix2Pointer( MatrixType boostMatrix, float *r
 {
 	size_t index = 0;
 
-	for ( size_t i = 0; i < 4; i++ ) {
-		for ( size_t j = 0; j < 4; j++ ) {
+	for ( size_t i = 0; i < textureSize; i++ ) {
+		for ( size_t j = 0; j < textureSize; j++ ) {
 			ret[index++] = boostMatrix( i, j );
 		}
 	}
@@ -139,13 +140,13 @@ GLOrientationHandler::MatrixType GLOrientationHandler::orientation2TextureMatrix
 {
 	MatrixType retMat = boost::numeric::ublas::zero_matrix<float>( 4, 4 );
 
-	for ( size_t i = 0; i < 4; i++ ) {
-		for ( size_t j = 0; j < 4; j++ ) {
+	for ( size_t i = 0; i < textureSize; i++ ) {
+		for ( size_t j = 0; j < textureSize; j++ ) {
 			retMat( i, j ) = origMatrix( i, j ) ? 1.0 / origMatrix( i, j ) : 0;
 
 		}
 	}
-
+	//add the offsets
 	for ( size_t i = 0; i < 3; i++ ) {
 		for ( size_t j = 0; j < 3; j++ ) {
 			if( retMat( i, j ) < 0 ) {

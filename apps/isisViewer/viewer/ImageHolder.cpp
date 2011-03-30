@@ -42,7 +42,8 @@ ImageHolder::filterRelevantMetaInformation()
 
 boost::numeric::ublas::matrix< float > ImageHolder::getNormalizedImageOrientation( bool transposed ) const
 {
-	boost::numeric::ublas::matrix<float> retMatrix = boost::numeric::ublas::zero_matrix<float>( 3, 3 );
+	boost::numeric::ublas::matrix<float> retMatrix = boost::numeric::ublas::zero_matrix<float>( 4, 4 );
+	retMatrix(3,3) = 1;
 	util::fvector4 rowVec = m_Image.getPropertyAs<util::fvector4>( "rowVec" );
 	util::fvector4 columnVec = m_Image.getPropertyAs<util::fvector4>( "columnVec" );
 	util::fvector4 sliceVec = m_Image.getPropertyAs<util::fvector4>( "sliceVec" );
@@ -64,7 +65,8 @@ boost::numeric::ublas::matrix< float > ImageHolder::getNormalizedImageOrientatio
 
 boost::numeric::ublas::matrix< float > ImageHolder::getImageOrientation( bool transposed ) const
 {
-	boost::numeric::ublas::matrix<float> retMatrix = boost::numeric::ublas::zero_matrix<float>( 3, 3 );
+	boost::numeric::ublas::matrix<float> retMatrix = boost::numeric::ublas::zero_matrix<float>( 4, 4 );
+	retMatrix(3,3) = 1;
 	util::fvector4 rowVec = m_Image.getPropertyAs<util::fvector4>( "rowVec" );
 	util::fvector4 columnVec = m_Image.getPropertyAs<util::fvector4>( "columnVec" );
 	util::fvector4 sliceVec = m_Image.getPropertyAs<util::fvector4>( "sliceVec" );

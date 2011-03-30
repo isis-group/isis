@@ -17,6 +17,7 @@ namespace viewer
 
 class GLOrientationHandler
 {
+	static const unsigned short textureSize;
 public:
 	typedef boost::numeric::ublas::matrix<float> MatrixType;
 	enum PlaneOrientation { axial, sagittal, coronal };
@@ -59,15 +60,24 @@ public:
 	static void printMatrix( const float *mat ) {
 		size_t index = 0;
 
-		for ( size_t i = 0; i < 4; i++ ) {
-			for ( size_t j = 0; j < 4; j++ ) {
+		for ( size_t i = 0; i < textureSize; i++ ) {
+			for ( size_t j = 0; j < textureSize; j++ ) {
 				std::cout << mat[index++] << " ";
 			}
 
 			std::cout << std::endl;
 		}
 	}
+	static void printMatrix( const MatrixType mat, unsigned short _i = textureSize, unsigned short _j = textureSize ) {
+		size_t index = 0;
 
+		for ( size_t i = 0; i < _i; i++ ) {
+			for ( size_t j = 0; j < _j; j++ ) {
+				std::cout << mat(i,j) << " ";
+			}
+			std::cout << std::endl;
+		}
+	}
 
 };
 

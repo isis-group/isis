@@ -27,7 +27,7 @@ public:
 	void redrawCrosshair( size_t x, size_t y );
 
 	///this function modifies the crosshair and the slice position to the given image voxel coords
-	virtual void lookAtVoxel( size_t x, size_t y, size_t z );
+	virtual void lookAtVoxel( size_t x, size_t y, size_t z, size_t t = 0 );
 
 
 	QGLWidgetImplementation *createSharedWidget( QWidget *parent, GLOrientationHandler::PlaneOrientation orienation = GLOrientationHandler::axial );
