@@ -61,9 +61,10 @@ std::pair<float, float> QGLWidgetImplementation::widget2ViewPortCoordinates( siz
 
 void QGLWidgetImplementation::redrawCrosshair( size_t _x, size_t _y )
 {
+	size_t y = height() - _y; // make the origin the left bottom corner
 	//look if we are inside the current viewport
-	if( isInViewPort( _x, _y ) ) {
-		std::pair<float, float> normCoords = widget2ViewPortCoordinates( _x, _y );
+	if( isInViewPort( _x, y ) ) {
+		std::pair<float, float> normCoords = widget2ViewPortCoordinates( _x, y );
 		m_CrossHair.draw( normCoords.first, normCoords.second );
 	}
 
@@ -108,8 +109,11 @@ void QGLWidgetImplementation::resizeGL( int w, int h )
 
 void QGLWidgetImplementation::lookAtVoxel( size_t _x, size_t _y, size_t _z )
 {
-
-
+	ImageHolder image = m_ViewerCore->getDataContainer()[0];
+	util::fvector4 transformedCoords =  
+		GLOrientationHandler::transformVectorWithImageAndPlaneOrientation( image, util::fvector4(_x,_y,_z,0), m_PlaneOrientation );
+	util::fvector4 transformedImageSize =
+		GLOrientationHandler::transformVectorWithImageAndPlaneOrientation( image, image.getImageSize(), m_PlaneOrientation );
 }
 
 
@@ -139,7 +143,7 @@ void QGLWidgetImplementation::internPaintSlice( GLuint textureID, const float *t
 void QGLWidgetImplementation::mouseMoveEvent( QMouseEvent *e )
 {
 	//TODO debug
-	//  lookAtVoxel( e->x(), e->y(), 50 );
+// 	lookAtVoxel( e->x(), e->y(), 50 );
 }
 
 

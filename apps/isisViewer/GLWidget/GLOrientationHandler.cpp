@@ -7,7 +7,6 @@ namespace viewer
 {
 util::fvector4 GLOrientationHandler::transformVectorWithImageOrientation( const isis::viewer::ImageHolder &image, util::fvector4 vector )
 {
-
 	boost::numeric::ublas::matrix<float> vectorAsMatrix = boost::numeric::ublas::zero_matrix<float>( 3, 1 );
 	boost::numeric::ublas::matrix<float> retCoords = boost::numeric::ublas::zero_matrix<float>( 3, 1 );
 	vectorAsMatrix( 0, 0 ) = vector[0];
@@ -20,6 +19,23 @@ util::fvector4 GLOrientationHandler::transformVectorWithImageOrientation( const 
 	retVec[2] = retCoords( 2, 0 );
 	return retVec;
 }
+
+util::fvector4 GLOrientationHandler::transformVectorWithImageAndPlaneOrientation(const isis::viewer::ImageHolder& image, util::fvector4 vector, GLOrientationHandler::PlaneOrientation orientation)
+{
+	//first we have to transform the voxels to our physical image space
+	util::fvector4 imageOrientedVector = GLOrientationHandler::transformVectorWithImageOrientation(image, vector);
+	GLOrientationHandler::MatrixType tmpVector = boost::numeric::ublas::zero_matrix<float>(3,1);
+	for (size_t i=0;i<3;i++)
+	{
+		tmpVector(i,0)=imageOrientedVector[i];
+	}
+	//now we have to transform these coords to our respective plane view
+	GLOrientationHandler::MatrixType planeOrientationMatrix = 
+		GLOrientationHandler::transformToView(boost::numeric::ublas::identity_matrix<float>(3,3), orientation );
+	GLOrientationHandler::MatrixType transformedImageVoxels = boost::numeric::ublas::prod(planeOrientationMatrix, tmpVector);
+	
+}
+	
 
 
 util::FixedVector<float, 3> GLOrientationHandler::getNormalizedScaling( const ImageHolder &image )

@@ -8,6 +8,7 @@
 #include <boost/numeric/ublas/lu.hpp>
 #include <boost/concept_check.hpp>
 
+struct stat;
 namespace isis
 {
 namespace viewer
@@ -51,6 +52,8 @@ public:
 
 	static util::fvector4 transformVectorWithImageOrientation( const isis::viewer::ImageHolder &image, util::fvector4 vector );
 
+	static util::fvector4 transformVectorWithImageAndPlaneOrientation( const ImageHolder &image, util::fvector4 vector, PlaneOrientation orientation );
+	
 	static void  boostMatrix2Pointer( MatrixType boostMatrix, float *ret );
 
 	static void printMatrix( const float *mat ) {

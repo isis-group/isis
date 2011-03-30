@@ -21,8 +21,8 @@ MainWindow::MainWindow( ViewerCore *core )
 	m_AxialWidget = new QGLWidgetImplementation( core, ui.axialWidget, GLOrientationHandler::axial );
 	m_ViewerCore->registerWidget( "axialView", m_AxialWidget );
 
-	m_SagittalWidget = m_AxialWidget->createSharedWidget( ui.sagittalWidget, GLOrientationHandler::sagittal );
-	m_ViewerCore->registerWidget( "sagittalView", m_SagittalWidget );
+// 	m_SagittalWidget = m_AxialWidget->createSharedWidget( ui.sagittalWidget, GLOrientationHandler::sagittal );
+// 	m_ViewerCore->registerWidget( "sagittalView", m_SagittalWidget );
 
 	//TODO only view 2 widgets since my computer is too dumb to manage 3 ones
 	//  m_CoronalWidget = m_AxialWidget->createSharedWidget( ui.coronalWidget, OrientationHandler::coronal );
@@ -39,7 +39,7 @@ void MainWindow::go()
 	size_t y = ui.yEdit->text().toInt();
 	size_t z = ui.zEdit->text().toInt();
 	m_AxialWidget->lookAtVoxel( x, y, z );
-	m_SagittalWidget->lookAtVoxel( x, y, z );
+// 	m_SagittalWidget->lookAtVoxel( x, y, z );
 
 	//  m_ViewerCore->getWidgetAs<QGLWidgetImplementation>("axialView")->lookAtVoxel(x,y,z);
 	//  m_ViewerCore->getWidgetAs<QGLWidgetImplementation>("sagittalView")->lookAtVoxel(x,y,z);
