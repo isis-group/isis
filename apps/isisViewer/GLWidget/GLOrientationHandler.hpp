@@ -54,7 +54,7 @@ public:
 	static util::fvector4 transformVectorWithImageOrientation( const isis::viewer::ImageHolder &image, util::fvector4 vector );
 
 	static util::fvector4 transformVectorWithImageAndPlaneOrientation( const ImageHolder &image, util::fvector4 vector, PlaneOrientation orientation );
-	
+
 	static void  boostMatrix2Pointer( MatrixType boostMatrix, float *ret );
 
 	static void printMatrix( const float *mat ) {
@@ -73,8 +73,9 @@ public:
 
 		for ( size_t i = 0; i < _i; i++ ) {
 			for ( size_t j = 0; j < _j; j++ ) {
-				std::cout << mat(i,j) << " ";
+				std::cout << mat( i, j ) << " ";
 			}
+
 			std::cout << std::endl;
 		}
 	}

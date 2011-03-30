@@ -7,7 +7,7 @@ namespace viewer
 {
 
 const unsigned short GLOrientationHandler::textureSize = 4;
-	
+
 util::fvector4 GLOrientationHandler::transformVectorWithImageOrientation( const isis::viewer::ImageHolder &image, util::fvector4 vector )
 {
 	boost::numeric::ublas::matrix<float> vectorAsMatrix = boost::numeric::ublas::zero_matrix<float>( textureSize, 1 );
@@ -23,23 +23,24 @@ util::fvector4 GLOrientationHandler::transformVectorWithImageOrientation( const 
 	return retVec;
 }
 
-util::fvector4 GLOrientationHandler::transformVectorWithImageAndPlaneOrientation(const isis::viewer::ImageHolder& image, util::fvector4 vector, GLOrientationHandler::PlaneOrientation orientation)
+util::fvector4 GLOrientationHandler::transformVectorWithImageAndPlaneOrientation( const isis::viewer::ImageHolder &image, util::fvector4 vector, GLOrientationHandler::PlaneOrientation orientation )
 {
 	//first we have to transform the voxels to our physical image space
-	util::fvector4 imageOrientedVector = GLOrientationHandler::transformVectorWithImageOrientation(image, vector);
-	GLOrientationHandler::MatrixType tmpVector = boost::numeric::ublas::zero_matrix<float>(textureSize,1);
-	for (size_t i=0;i<3;i++)
-	{
-		tmpVector(i,0)=imageOrientedVector[i];
+	util::fvector4 imageOrientedVector = GLOrientationHandler::transformVectorWithImageOrientation( image, vector );
+	GLOrientationHandler::MatrixType tmpVector = boost::numeric::ublas::zero_matrix<float>( textureSize, 1 );
+
+	for ( size_t i = 0; i < 3; i++ ) {
+		tmpVector( i, 0 ) = imageOrientedVector[i];
 	}
+
 	//now we have to transform these coords to our respective plane view
-	GLOrientationHandler::MatrixType planeOrientationMatrix = 
-		GLOrientationHandler::transformToView(boost::numeric::ublas::identity_matrix<float>(textureSize,textureSize), orientation );
-	GLOrientationHandler::MatrixType transformedImageVoxels = boost::numeric::ublas::prod(planeOrientationMatrix, tmpVector);
-	util::fvector4 retVec = util::fvector4(transformedImageVoxels(0,0), transformedImageVoxels(1,0), transformedImageVoxels(2,0));
+	GLOrientationHandler::MatrixType planeOrientationMatrix =
+		GLOrientationHandler::transformToView( boost::numeric::ublas::identity_matrix<float>( textureSize, textureSize ), orientation );
+	GLOrientationHandler::MatrixType transformedImageVoxels = boost::numeric::ublas::prod( planeOrientationMatrix, tmpVector );
+	util::fvector4 retVec = util::fvector4( transformedImageVoxels( 0, 0 ), transformedImageVoxels( 1, 0 ), transformedImageVoxels( 2, 0 ) );
 	return retVec;
 }
-	
+
 util::FixedVector<float, 3> GLOrientationHandler::getNormalizedScaling( const ImageHolder &image )
 {
 	util::FixedVector<float, 3> retScaling;
@@ -74,6 +75,7 @@ GLOrientationHandler::MatrixType GLOrientationHandler::getOrientationMatrix( con
 		scaleMatrix( 2, 2 ) = scaling[2];
 		retMat = boost::numeric::ublas::prod( retMat, scaleMatrix );
 	}
+
 	retMat = transformToView( retMat, orientation );
 	return retMat;
 }
@@ -146,6 +148,7 @@ GLOrientationHandler::MatrixType GLOrientationHandler::orientation2TextureMatrix
 
 		}
 	}
+
 	//add the offsets
 	for ( size_t i = 0; i < 3; i++ ) {
 		for ( size_t j = 0; j < 3; j++ ) {

@@ -7,7 +7,7 @@ namespace isis
 namespace viewer
 {
 
-	
+
 QGLWidgetImplementation::QGLWidgetImplementation( ViewerCore *core, QWidget *parent, QGLWidget *share, GLOrientationHandler::PlaneOrientation orientation )
 	: QGLWidget( parent, share ),
 	  m_ViewerCore( core ),
@@ -62,6 +62,7 @@ std::pair<float, float> QGLWidgetImplementation::widget2ViewPortCoordinates( siz
 void QGLWidgetImplementation::redrawCrosshair( size_t _x, size_t _y )
 {
 	size_t y = height() - _y; // make the origin the left bottom corner
+
 	//look if we are inside the current viewport
 	if( isInViewPort( _x, y ) ) {
 		std::pair<float, float> normCoords = widget2ViewPortCoordinates( _x, y );
@@ -111,55 +112,55 @@ void QGLWidgetImplementation::lookAtVoxel( size_t _x, size_t _y, size_t _z, size
 {
 	ImageHolder image = m_ViewerCore->getDataContainer()[0];
 	GLOrientationHandler::MatrixType orientationMatrix = GLOrientationHandler::getOrientationMatrix( image, m_PlaneOrientation );
-// 	//now we have to calculate the respective opgenGL coord for each transformedCoord
-// 	//first we do this for the crosshair
-	
-	GLOrientationHandler::MatrixType vector = boost::numeric::ublas::zero_matrix<float>(4,1);
-	GLOrientationHandler::MatrixType oneVector = boost::numeric::ublas::zero_matrix<float>(4,1);
-	oneVector(0,0) = 1;
-	oneVector(1,0) = 1;
-	oneVector(2,0) = 1;
-	oneVector(3,0) = 1;
-	vector(0,0) = _x;
-	vector(1,0) = _y;
-	vector(2,0) = _z;	
-	GLOrientationHandler::MatrixType transformedVector = 
-		boost::numeric::ublas::prod( GLOrientationHandler::getOrientationMatrix( image, m_PlaneOrientation, false), vector ) ;
-	util::fvector4 transformedImageSize =
- 		GLOrientationHandler::transformVectorWithImageAndPlaneOrientation( image, image.getImageSize(), m_PlaneOrientation );
-	GLOrientationHandler::MatrixType transformedScaling = 
-		boost::numeric::ublas::prod( orientationMatrix, oneVector );		
-	size_t vpos_x = transformedScaling(0,0) < 0 ? abs(transformedImageSize[0]) + transformedVector(0,0) : transformedVector(0,0);
-	size_t vpos_y = transformedScaling(1,0) < 0 ? abs(transformedImageSize[1]) + transformedVector(1,0) : transformedVector(1,0);
-	size_t vpos_z = transformedScaling(2,0) < 0 ? abs(transformedImageSize[2]) + transformedVector(2,0) - 1 : transformedVector(2,0);
+	//  //now we have to calculate the respective opgenGL coord for each transformedCoord
+	//  //first we do this for the crosshair
 
-	size_t offset_x = ((m_CurrentViewPort.w - ( m_CurrentViewPort.w * fabs(transformedScaling(0,0)) )) / 2 ) + m_CurrentViewPort.x;
-	size_t offset_y = ((m_CurrentViewPort.h - ( m_CurrentViewPort.h * fabs(transformedScaling(1,0)) )) / 2 ) + m_CurrentViewPort.y;
-	size_t pos_x = (float)(vpos_x * m_CurrentViewPort.w * fabs(transformedScaling(0,0))) / fabs(transformedImageSize[0]) + offset_x;
-	size_t pos_y = (float)(vpos_y * m_CurrentViewPort.h * fabs(transformedScaling(1,0))) / fabs(transformedImageSize[1]) + offset_y;
-	
+	GLOrientationHandler::MatrixType vector = boost::numeric::ublas::zero_matrix<float>( 4, 1 );
+	GLOrientationHandler::MatrixType oneVector = boost::numeric::ublas::zero_matrix<float>( 4, 1 );
+	oneVector( 0, 0 ) = 1;
+	oneVector( 1, 0 ) = 1;
+	oneVector( 2, 0 ) = 1;
+	oneVector( 3, 0 ) = 1;
+	vector( 0, 0 ) = _x;
+	vector( 1, 0 ) = _y;
+	vector( 2, 0 ) = _z;
+	GLOrientationHandler::MatrixType transformedVector =
+		boost::numeric::ublas::prod( GLOrientationHandler::getOrientationMatrix( image, m_PlaneOrientation, false ), vector ) ;
+	util::fvector4 transformedImageSize =
+		GLOrientationHandler::transformVectorWithImageAndPlaneOrientation( image, image.getImageSize(), m_PlaneOrientation );
+	GLOrientationHandler::MatrixType transformedScaling =
+		boost::numeric::ublas::prod( orientationMatrix, oneVector );
+	size_t vpos_x = transformedScaling( 0, 0 ) < 0 ? abs( transformedImageSize[0] ) + transformedVector( 0, 0 ) : transformedVector( 0, 0 );
+	size_t vpos_y = transformedScaling( 1, 0 ) < 0 ? abs( transformedImageSize[1] ) + transformedVector( 1, 0 ) : transformedVector( 1, 0 );
+	size_t vpos_z = transformedScaling( 2, 0 ) < 0 ? abs( transformedImageSize[2] ) + transformedVector( 2, 0 ) - 1 : transformedVector( 2, 0 );
+
+	size_t offset_x = ( ( m_CurrentViewPort.w - ( m_CurrentViewPort.w * fabs( transformedScaling( 0, 0 ) ) ) ) / 2 ) + m_CurrentViewPort.x;
+	size_t offset_y = ( ( m_CurrentViewPort.h - ( m_CurrentViewPort.h * fabs( transformedScaling( 1, 0 ) ) ) ) / 2 ) + m_CurrentViewPort.y;
+	size_t pos_x = ( float )( vpos_x * m_CurrentViewPort.w * fabs( transformedScaling( 0, 0 ) ) ) / fabs( transformedImageSize[0] ) + offset_x;
+	size_t pos_y = ( float )( vpos_y * m_CurrentViewPort.h * fabs( transformedScaling( 1, 0 ) ) ) / fabs( transformedImageSize[1] ) + offset_y;
+
 	float textureMatrix[16];
-	GLOrientationHandler::boostMatrix2Pointer( GLOrientationHandler::orientation2TextureMatrix(orientationMatrix), textureMatrix);
-	
+	GLOrientationHandler::boostMatrix2Pointer( GLOrientationHandler::orientation2TextureMatrix( orientationMatrix ), textureMatrix );
+
 	//now we have to get the normalized slice
 	util::fvector4 sliceScalingVector = util::fvector4( textureMatrix[8], textureMatrix[9], textureMatrix[10], 0 );
 	util::fvector4 textureTranslationVec = util::fvector4( textureMatrix[12], textureMatrix[13], textureMatrix[14], 0 );
-	size_t relevantSliceDim = getBiggestVecElem<float>(sliceScalingVector);
+	size_t relevantSliceDim = getBiggestVecElem<float>( sliceScalingVector );
 	float sliceTranslation = textureTranslationVec[relevantSliceDim];
 	float sliceScaling = sliceScalingVector[relevantSliceDim];
 	float oneHalfSlice = 1.0 / transformedImageSize[2] / 2;
-	float slice = (1.0 / transformedImageSize[2]) * vpos_z;
-	slice -= fabs(sliceTranslation) >= 1 ?  sliceTranslation - 1 : sliceTranslation;
+	float slice = ( 1.0 / transformedImageSize[2] ) * vpos_z;
+	slice -= fabs( sliceTranslation ) >= 1 ?  sliceTranslation - 1 : sliceTranslation;
 	slice *= 1.0 / sliceScaling;
 	slice += sliceScaling < 0 ? -oneHalfSlice : oneHalfSlice;
 	std::cout << "slice: " << slice << std::endl;
 	//finally copy the image to texture memory...if necessary
 	GLuint textureID = util::Singletons::get<GLTextureHandler, 10>().copyImageToTexture( m_ViewerCore->getDataContainer(), 0, _t );
-	internPaintSlice( textureID,textureMatrix, slice);
-	GLOrientationHandler::printMatrix(textureMatrix);
+	internPaintSlice( textureID, textureMatrix, slice );
+	GLOrientationHandler::printMatrix( textureMatrix );
 	redrawCrosshair( pos_x, pos_y );
-	
-	
+
+
 }
 
 
@@ -189,7 +190,7 @@ void QGLWidgetImplementation::internPaintSlice( GLuint textureID, const float *t
 void QGLWidgetImplementation::mouseMoveEvent( QMouseEvent *e )
 {
 	//TODO debug
-// 	lookAtVoxel( e->x(), e->y(), 50 );
+	//  lookAtVoxel( e->x(), e->y(), 50 );
 }
 
 
