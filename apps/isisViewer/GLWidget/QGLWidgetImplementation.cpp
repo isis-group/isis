@@ -67,9 +67,10 @@ void QGLWidgetImplementation::redrawCrosshair( size_t _x, size_t _y )
 	if( isInViewPort( _x, y ) ) {
 		std::pair<float, float> normCoords = widget2ViewPortCoordinates( _x, y );
 		m_CrossHair.draw( normCoords.first, normCoords.second );
+		redraw();
 	}
 
-	redraw();
+	
 }
 
 QGLWidgetImplementation *QGLWidgetImplementation::createSharedWidget( QWidget *parent, GLOrientationHandler::PlaneOrientation orientation )
@@ -122,8 +123,8 @@ void QGLWidgetImplementation::lookAtVoxel( size_t _x, size_t _y, size_t _z, size
 	//finally copy the image to texture memory...if necessary
 	GLuint textureID = util::Singletons::get<GLTextureHandler, 10>().copyImageToTexture( m_ViewerCore->getDataContainer(), 0, _t );
 	internPaintSlice( textureID, textureMatrix, glCoords.slice );
-	GLOrientationHandler::printMatrix( textureMatrix );
 	redrawCrosshair( glCoords.x, glCoords.y );
+	m_CurrentSlice = glCoords.slice;
 	
 }
 
@@ -153,8 +154,12 @@ void QGLWidgetImplementation::internPaintSlice( GLuint textureID, const float *t
 
 void QGLWidgetImplementation::mouseMoveEvent( QMouseEvent *e )
 {
-	//TODO debug
-	//  lookAtVoxel( e->x(), e->y(), 50 );
+	ImageHolder image = m_ViewerCore->getDataContainer()[0];
+	GLOrientationHandler::GLCoordinates glCoords;
+	glCoords.x = e->x();
+	glCoords.y = height() - e->y();
+	glCoords.slice = m_CurrentSlice;
+	std:: cout << GLOrientationHandler::transformGLCoords2ImageCoords(glCoords, image, m_CurrentViewPort, m_PlaneOrientation ) <<std::endl;
 }
 
 
