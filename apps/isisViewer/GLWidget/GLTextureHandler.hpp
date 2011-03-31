@@ -38,7 +38,7 @@ private:
 	ImageMapType m_ImageMap;
 
 	template<typename TYPE>
-	GLuint internCopyImageToTexture( const DataContainer &data, GLenum format, size_t imageID, size_t timestep, TYPE offset, float scaling ) {
+	GLuint internCopyImageToTexture( const DataContainer &data, GLenum format, size_t imageID, size_t timestep ) {
 		GLuint texture;
 		util::FixedVector<size_t, 4> size = data[imageID].getImageSize();
 		TYPE *dataPtr = static_cast<TYPE *>( data.getImageWeakPointer( imageID, timestep ).lock().get() );

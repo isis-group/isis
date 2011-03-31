@@ -56,24 +56,23 @@ public:
 	static util::fvector4 transformVectorWithImageAndPlaneOrientation( const ImageHolder &image, util::fvector4 vector, PlaneOrientation orientation );
 
 	static void  boostMatrix2Pointer( MatrixType boostMatrix, float *ret );
-	
+
 	static GLCoordinates transformImageCoords2GLCoords( const util::ivector4 imageCoords, const ImageHolder &image, const ViewPortCoords viewport, PlaneOrientation orientation );
 
 	static util::ivector4 transformGLCoords2ImageCoords( GLCoordinates glCoords, const ImageHolder &image, ViewPortCoords viewport, PlaneOrientation orienation );
-	
-	static MatrixType transposeMatrix( const MatrixType mat )
-	{
-		MatrixType retMat = boost::numeric::ublas::zero_matrix<float>(textureSize, textureSize);
-		for (size_t i = 0; i<textureSize;i++)
-		{
-			for (size_t j = 0; j< textureSize; j++ )
-			{
-				retMat(i,j) = mat(j,i);
+
+	static MatrixType transposeMatrix( const MatrixType mat ) {
+		MatrixType retMat = boost::numeric::ublas::zero_matrix<float>( textureSize, textureSize );
+
+		for ( size_t i = 0; i < textureSize; i++ ) {
+			for ( size_t j = 0; j < textureSize; j++ ) {
+				retMat( i, j ) = mat( j, i );
 			}
 		}
+
 		return retMat;
 	}
-	
+
 	static void printMatrix( const float *mat ) {
 		size_t index = 0;
 

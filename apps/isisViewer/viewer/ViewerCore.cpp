@@ -5,7 +5,7 @@ namespace isis
 namespace viewer
 {
 
-ViewerCore::ViewerCore( data::Image image ): ViewerCoreBase(image)
+ViewerCore::ViewerCore( data::Image image ): ViewerCoreBase( image )
 {
 
 }

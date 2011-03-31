@@ -62,7 +62,7 @@ util::FixedVector<float, 3> GLOrientationHandler::getNormalizedScaling( const Im
 	return retScaling;
 }
 
-GLOrientationHandler::GLCoordinates GLOrientationHandler::transformImageCoords2GLCoords(const isis::util::ivector4 imageCoords, const ImageHolder &image,const ViewPortCoords viewport, PlaneOrientation orientation )
+GLOrientationHandler::GLCoordinates GLOrientationHandler::transformImageCoords2GLCoords( const isis::util::ivector4 imageCoords, const ImageHolder &image, const ViewPortCoords viewport, PlaneOrientation orientation )
 {
 #warning function GLOrientationHandler::transformImageCoords2GLCoords has to be optimized
 	using namespace boost::numeric::ublas;
@@ -80,8 +80,8 @@ GLOrientationHandler::GLCoordinates GLOrientationHandler::transformImageCoords2G
 	util::fvector4 transformedImageSize =
 		transformVectorWithImageAndPlaneOrientation( image, image.getImageSize(), orientation );
 	MatrixType transformedScaling = prod( orientationMatrix, oneVector );
-	float vpos_x = transformedScaling( 0, 0 ) < 0 ? abs( transformedImageSize[0] ) + transformedVector( 0, 0 ) - 0.5: transformedVector( 0, 0 ) + 0.5;
-	float vpos_y = transformedScaling( 1, 0 ) < 0 ? abs( transformedImageSize[1] ) + transformedVector( 1, 0 ) - 0.5: transformedVector( 1, 0 ) + 0.5;
+	float vpos_x = transformedScaling( 0, 0 ) < 0 ? abs( transformedImageSize[0] ) + transformedVector( 0, 0 ) - 0.5 : transformedVector( 0, 0 ) + 0.5;
+	float vpos_y = transformedScaling( 1, 0 ) < 0 ? abs( transformedImageSize[1] ) + transformedVector( 1, 0 ) - 0.5 : transformedVector( 1, 0 ) + 0.5;
 	size_t vpos_z = transformedScaling( 2, 0 ) < 0 ? abs( transformedImageSize[2] ) + transformedVector( 2, 0 ) - 1 : transformedVector( 2, 0 );
 	float offset_x = ( ( viewport.w - ( viewport.w * fabs( transformedScaling( 0, 0 ) ) ) ) / 2 ) + viewport.x;
 	float offset_y = ( ( viewport.h - ( viewport.h * fabs( transformedScaling( 1, 0 ) ) ) ) / 2 ) + viewport.y;
@@ -99,7 +99,7 @@ GLOrientationHandler::GLCoordinates GLOrientationHandler::transformImageCoords2G
 	slice -= fabs( textureTranslationVec[relevantSliceDim] ) >= 1 ?  textureTranslationVec[relevantSliceDim] - 1 : textureTranslationVec[relevantSliceDim];
 	slice *= 1.0 / sliceScalingVector[relevantSliceDim];
 	slice += sliceScalingVector[relevantSliceDim] < 0 ? -oneHalfSlice : oneHalfSlice;
-	
+
 	GLCoordinates retCoords;
 	retCoords.x = pos_x;
 	retCoords.y = pos_y;
@@ -107,43 +107,45 @@ GLOrientationHandler::GLCoordinates GLOrientationHandler::transformImageCoords2G
 	return retCoords;
 }
 
-util::ivector4 GLOrientationHandler::transformGLCoords2ImageCoords(isis::viewer::GLOrientationHandler::GLCoordinates glCoords, const ImageHolder &image, ViewPortCoords viewport, PlaneOrientation orientation)
+util::ivector4 GLOrientationHandler::transformGLCoords2ImageCoords( isis::viewer::GLOrientationHandler::GLCoordinates glCoords, const ImageHolder &image, ViewPortCoords viewport, PlaneOrientation orientation )
 {
 #warning function GLOrientationHandler::transformGLCoords2ImageCoords has to be optimized
 	using namespace boost::numeric::ublas;
-	MatrixType imageSize = zero_matrix<float> (4,1);
-	for (size_t i = 0; i<3; i++) {
-		imageSize(i,0) = image.getImageSize()[i];
+	MatrixType imageSize = zero_matrix<float> ( 4, 1 );
+
+	for ( size_t i = 0; i < 3; i++ ) {
+		imageSize( i, 0 ) = image.getImageSize()[i];
 	}
+
 	MatrixType oneVector = zero_matrix<float>( 4, 1 );
 	oneVector( 0, 0 ) = 1;
 	oneVector( 1, 0 ) = 1;
 	oneVector( 2, 0 ) = 1;
 	oneVector( 3, 0 ) = 1;
-	MatrixType transformedScaling = prod( getOrientationMatrix(image, orientation), oneVector );
+	MatrixType transformedScaling = prod( getOrientationMatrix( image, orientation ), oneVector );
 	//get the transposed imagesize vector for the current planeView
-	MatrixType transformedImageSize = prod(  getOrientationMatrix(image, orientation, false) , imageSize );
+	MatrixType transformedImageSize = prod(  getOrientationMatrix( image, orientation, false ) , imageSize );
 	float textureMatrix[16];
-	boostMatrix2Pointer( orientation2TextureMatrix( getOrientationMatrix(image, orientation) ), textureMatrix );
+	boostMatrix2Pointer( orientation2TextureMatrix( getOrientationMatrix( image, orientation ) ), textureMatrix );
 	util::fvector4 sliceScalingVector = util::fvector4( textureMatrix[8], textureMatrix[9], textureMatrix[10], 0 );
 	util::fvector4 textureTranslationVec = util::fvector4( textureMatrix[12], textureMatrix[13], textureMatrix[14], 0 );
 	size_t relevantSliceDim = getBiggestVecElem<float>( sliceScalingVector );
-	float oneHalfSlice = 1.0 / transformedImageSize(2,0) / 2;
+	float oneHalfSlice = 1.0 / transformedImageSize( 2, 0 ) / 2;
 	glCoords.slice += oneHalfSlice;
 	glCoords.slice *= sliceScalingVector[relevantSliceDim];
 	glCoords.slice += fabs( textureTranslationVec[relevantSliceDim] ) >= 1 ?  textureTranslationVec[relevantSliceDim] - 1 : textureTranslationVec[relevantSliceDim];
-	size_t vpos_z = glCoords.slice < 0 ? abs(transformedImageSize(2,0)) - fabs(glCoords.slice) * abs(transformedImageSize(2,0))
-			-1 : glCoords.slice * abs(transformedImageSize(2,0)) - 1;
-	size_t vpos_x = (abs(transformedImageSize(0,0)) / (viewport.w * fabs(transformedScaling(0,0)))) * (glCoords.x - viewport.x - (viewport.w - (viewport.w * fabs(transformedScaling(0,0)))) / 2 );
-	size_t vpos_y = (abs(transformedImageSize(1,0)) / (viewport.w * fabs(transformedScaling(1,0)))) * (glCoords.y - viewport.y - (viewport.h - (viewport.h * fabs(transformedScaling(1,0)))) / 2 );
-	vpos_x = transformedImageSize(0,0) < 0 ? abs(transformedImageSize(0,0)) - vpos_x - 1 : vpos_x;
-	vpos_y = transformedImageSize(1,0) < 0 ? abs(transformedImageSize(1,0)) - vpos_y - 1 : vpos_y;
-	MatrixType retCoords = zero_matrix<float>(4,1);
-	retCoords(0,0) = vpos_x;
-	retCoords(1,0) = vpos_y;
-	retCoords(2,0) = vpos_z;
-	MatrixType transposedRetCoords = prod( transposeMatrix( getOrientationMatrix(image, orientation, false ) ), retCoords);
-	return util::ivector4(abs(transposedRetCoords(0,0)), abs(transposedRetCoords(1,0)), abs(transposedRetCoords(2,0)));
+	size_t vpos_z = glCoords.slice < 0 ? abs( transformedImageSize( 2, 0 ) ) - fabs( glCoords.slice ) * abs( transformedImageSize( 2, 0 ) )
+					- 1 : glCoords.slice * abs( transformedImageSize( 2, 0 ) ) - 1;
+	size_t vpos_x = ( abs( transformedImageSize( 0, 0 ) ) / ( viewport.w * fabs( transformedScaling( 0, 0 ) ) ) ) * ( glCoords.x - viewport.x - ( viewport.w - ( viewport.w * fabs( transformedScaling( 0, 0 ) ) ) ) / 2 );
+	size_t vpos_y = ( abs( transformedImageSize( 1, 0 ) ) / ( viewport.w * fabs( transformedScaling( 1, 0 ) ) ) ) * ( glCoords.y - viewport.y - ( viewport.h - ( viewport.h * fabs( transformedScaling( 1, 0 ) ) ) ) / 2 );
+	vpos_x = transformedImageSize( 0, 0 ) < 0 ? abs( transformedImageSize( 0, 0 ) ) - vpos_x - 1 : vpos_x;
+	vpos_y = transformedImageSize( 1, 0 ) < 0 ? abs( transformedImageSize( 1, 0 ) ) - vpos_y - 1 : vpos_y;
+	MatrixType retCoords = zero_matrix<float>( 4, 1 );
+	retCoords( 0, 0 ) = vpos_x;
+	retCoords( 1, 0 ) = vpos_y;
+	retCoords( 2, 0 ) = vpos_z;
+	MatrixType transposedRetCoords = prod( transposeMatrix( getOrientationMatrix( image, orientation, false ) ), retCoords );
+	return util::ivector4( abs( transposedRetCoords( 0, 0 ) ), abs( transposedRetCoords( 1, 0 ) ), abs( transposedRetCoords( 2, 0 ) ) );
 }
 
 
@@ -168,7 +170,7 @@ GLOrientationHandler::MatrixType GLOrientationHandler::getOrientationMatrix( con
 GLOrientationHandler::MatrixType GLOrientationHandler::transformToView( GLOrientationHandler::MatrixType origMatrix, PlaneOrientation orientation )
 {
 	MatrixType transformMatrix = boost::numeric::ublas::identity_matrix<float>( textureSize, textureSize );
-	
+
 	switch ( orientation ) {
 	case axial:
 		/*setup axial matrix

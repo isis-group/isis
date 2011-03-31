@@ -26,7 +26,7 @@ public:
 
 	void redrawCrosshair( size_t x, size_t y );
 
-	
+
 
 
 	QGLWidgetImplementation *createSharedWidget( QWidget *parent, GLOrientationHandler::PlaneOrientation orienation = GLOrientationHandler::axial );
@@ -47,7 +47,7 @@ protected:
 	virtual void initializeGL();
 	virtual void resizeGL( int w, int h );
 	///this function modifies the crosshair and the slice position to the given image voxel coords
-	
+
 
 
 protected:
@@ -71,7 +71,7 @@ private:
 	GLCrossHair m_CrossHair;
 	GLuint m_CurrentTextureID;
 	float m_CurrentSlice;
-	
+
 	//flags
 	bool buttonPressed;
 

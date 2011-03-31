@@ -38,9 +38,7 @@ GLuint GLTextureHandler::copyImageToTexture( const DataContainer &data, size_t i
 
 	LOG( Debug, verbose_info ) << "Copy volume with ID " << imageID << " and timestep " << timestep << " to GLTexture.";
 
-	data::scaling_pair scaling = data[imageID].getImage().getScalingTo( data::ValuePtr<TYPE>::staticID );
-
-	return internCopyImageToTexture<TYPE>( data, GL_UNSIGNED_BYTE, imageID, timestep, scaling.second->as<TYPE>(), scaling.first->as<float>() );
+	return internCopyImageToTexture<TYPE>( data, GL_UNSIGNED_BYTE, imageID, timestep );
 
 
 }
