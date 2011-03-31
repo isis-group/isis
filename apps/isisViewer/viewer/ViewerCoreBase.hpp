@@ -16,11 +16,16 @@ class ViewerCoreBase
 {
 
 public:
+	ViewerCoreBase();
+	
 	typedef std::map<std::string, QWidget * > WidgetMap;
 
 	void setImageList( const std::list<data::Image> );
 	bool registerWidget( std::string key, QWidget *widget );
-
+	
+	const ImageHolder& getCurrentImage() const { return m_CurrentImage; }
+	size_t getCurrentTimestep() const { return m_CurrentTimestep; }
+	
 	WidgetMap getWidgets() const { return m_WidgetMap; }
 
 	template<typename T>
@@ -46,6 +51,9 @@ private:
 
 	//this map holds the widgets associated with a given name
 	WidgetMap m_WidgetMap;
+	
+	ImageHolder m_CurrentImage;
+	size_t m_CurrentTimestep;
 
 
 };

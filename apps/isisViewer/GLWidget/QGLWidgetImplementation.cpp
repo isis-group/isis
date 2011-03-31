@@ -33,6 +33,9 @@ void QGLWidgetImplementation::commonInit()
 	setSizePolicy( QSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored ) );
 	setMouseTracking( true );
 	connectSignals();
+	//flags 
+	buttonPressed = false;
+	
 
 
 }
@@ -104,24 +107,23 @@ void QGLWidgetImplementation::resizeGL( int w, int h )
 	m_CurrentViewPort =
 		GLOrientationHandler::calculateViewPort( width(), height() );
 	glViewport( m_CurrentViewPort.x, m_CurrentViewPort.y, m_CurrentViewPort.w, m_CurrentViewPort.h );
-	lookAtVoxel(m_CurrentVoxelCoords[0], m_CurrentVoxelCoords[1], m_CurrentVoxelCoords[2], m_CurrentVoxelCoords[3]);
+	lookAtVoxel(m_CurrentVoxelCoords);
 }
 
-void QGLWidgetImplementation::lookAtVoxel( size_t _x, size_t _y, size_t _z, size_t _t )
+void QGLWidgetImplementation::lookAtVoxel( util::ivector4 coords )
 {
-	ImageHolder image = m_ViewerCore->getDataContainer()[0];
-	m_CurrentVoxelCoords = util::ivector4(_x,_y,_z, _t);
+	m_CurrentVoxelCoords = coords;
 	//  //now we have to calculate the respective opgenGL coord for each transformedCoord
 	//  //first we do this for the crosshair
 
 	GLOrientationHandler::GLCoordinates glCoords = 
-		GLOrientationHandler::transformImageCoords2GLCoords( util::ivector4(_x,_y,_z, 0),image, m_CurrentViewPort, m_PlaneOrientation );
-	GLOrientationHandler::MatrixType orientationMatrix = GLOrientationHandler::getOrientationMatrix( image, m_PlaneOrientation );
+		GLOrientationHandler::transformImageCoords2GLCoords( coords ,m_ViewerCore->getCurrentImage(), m_CurrentViewPort, m_PlaneOrientation );
+	GLOrientationHandler::MatrixType orientationMatrix = GLOrientationHandler::getOrientationMatrix( m_ViewerCore->getCurrentImage(), m_PlaneOrientation );
 	float textureMatrix[16];
 	GLOrientationHandler::boostMatrix2Pointer( GLOrientationHandler::orientation2TextureMatrix( orientationMatrix ), textureMatrix );
 	
 	//finally copy the image to texture memory...if necessary
-	GLuint textureID = util::Singletons::get<GLTextureHandler, 10>().copyImageToTexture( m_ViewerCore->getDataContainer(), 0, _t );
+	GLuint textureID = util::Singletons::get<GLTextureHandler, 10>().copyImageToTexture( m_ViewerCore->getDataContainer(), 0, m_CurrentVoxelCoords[3] );
 	internPaintSlice( textureID, textureMatrix, glCoords.slice );
 	redrawCrosshair( glCoords.x, glCoords.y );
 	m_CurrentSlice = glCoords.slice;
@@ -154,14 +156,33 @@ void QGLWidgetImplementation::internPaintSlice( GLuint textureID, const float *t
 
 void QGLWidgetImplementation::mouseMoveEvent( QMouseEvent *e )
 {
-	ImageHolder image = m_ViewerCore->getDataContainer()[0];
+	if ( buttonPressed ){
+		emitMousePressEvent(e);
+	}
+}
+
+void QGLWidgetImplementation::mousePressEvent(QMouseEvent* e)
+{
+	buttonPressed = true;
+	emitMousePressEvent(e);
+	
+}
+
+void QGLWidgetImplementation::emitMousePressEvent(QMouseEvent* e)
+{
 	GLOrientationHandler::GLCoordinates glCoords;
 	glCoords.x = e->x();
 	glCoords.y = height() - e->y();
 	glCoords.slice = m_CurrentSlice;
-	std:: cout << GLOrientationHandler::transformGLCoords2ImageCoords(glCoords, image, m_CurrentViewPort, m_PlaneOrientation ) <<std::endl;
+	util::ivector4 imageCoords = GLOrientationHandler::transformGLCoords2ImageCoords( glCoords, m_ViewerCore->getCurrentImage(), m_CurrentViewPort, m_PlaneOrientation );
+	Q_EMIT voxelCoordChanged( util::ivector4( imageCoords[0],imageCoords[1],imageCoords[2], m_ViewerCore->getCurrentTimestep() ));
 }
 
+
+void QGLWidgetImplementation::mouseReleaseEvent(QMouseEvent* e)
+{
+	buttonPressed = false;
+}
 
 
 

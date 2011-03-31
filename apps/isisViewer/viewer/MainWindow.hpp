@@ -35,12 +35,21 @@ private:
 protected Q_SLOTS:
 	//TODO debug
 	void go();
+	void voxelCoordChanged( util::ivector4 );
 
 
 private:
 	QGLWidgetImplementation *m_AxialWidget;
 	QGLWidgetImplementation *m_CoronalWidget;
 	QGLWidgetImplementation *m_SagittalWidget;
+	
+	template<typename TYPE> void displayIntensity(util::ivector4 coords )
+	{
+		QString str;
+		str.setNum(m_ViewerCore->getCurrentImage().getImage().voxel<TYPE>(coords[0], coords[1], coords[2], coords[3]));
+		ui.pxlIntensityContainer->display(str);
+	}
+	
 };
 
 

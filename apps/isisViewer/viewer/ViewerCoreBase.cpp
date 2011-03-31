@@ -5,6 +5,13 @@ namespace isis
 namespace viewer
 {
 
+ViewerCoreBase::ViewerCoreBase()
+	: m_CurrentTimestep(0)
+{
+
+}
+
+	
 void ViewerCoreBase::setImageList( const std::list< data::Image > imageList )
 {
 	if( !imageList.empty() ) {
@@ -15,6 +22,7 @@ void ViewerCoreBase::setImageList( const std::list< data::Image > imageList )
 	} else {
 		LOG( Runtime, warning ) << "The image list passed to the core is empty!";
 	}
+	m_CurrentImage = getDataContainer()[m_DataContainer.size() - 1];
 }
 
 bool

@@ -27,7 +27,7 @@ public:
 	void redrawCrosshair( size_t x, size_t y );
 
 	///this function modifies the crosshair and the slice position to the given image voxel coords
-	virtual void lookAtVoxel( size_t x, size_t y, size_t z, size_t t = 0 );
+	virtual void lookAtVoxel( util::ivector4 );
 
 
 	QGLWidgetImplementation *createSharedWidget( QWidget *parent, GLOrientationHandler::PlaneOrientation orienation = GLOrientationHandler::axial );
@@ -42,6 +42,8 @@ public Q_SLOTS:
 
 protected:
 	virtual void mouseMoveEvent( QMouseEvent *e );
+	virtual void mousePressEvent( QMouseEvent *e );
+	virtual void mouseReleaseEvent( QMouseEvent *e );
 	virtual void initializeGL();
 	virtual void resizeGL( int w, int h );
 
@@ -49,6 +51,7 @@ protected:
 protected:
 Q_SIGNALS:
 	void redraw();
+	void voxelCoordChanged( util::ivector4 );
 
 private:
 	void connectSignals();
@@ -56,6 +59,7 @@ private:
 	void internPaintSlice( GLuint textureID, const float *matrix, float normalizedSlice );
 	bool isInViewPort( size_t x, size_t y ) const;
 	std::pair<float, float> widget2ViewPortCoordinates( size_t x, size_t y ) const;
+	void emitMousePressEvent( QMouseEvent *e );
 
 	std::vector<GLuint> m_TextureIDVec;
 	GLOrientationHandler::PlaneOrientation m_PlaneOrientation;
@@ -65,6 +69,9 @@ private:
 	GLCrossHair m_CrossHair;
 	GLuint m_CurrentTextureID;
 	float m_CurrentSlice;
+	
+	//flags
+	bool buttonPressed;
 
 };
 

@@ -34,7 +34,7 @@ public:
 	std::vector< util::PropertyMap > getTimeStepProperties() const { return m_TimeStepProperties; }
 	util::PropertyMap getPropMap() const { return m_PropMap; }
 	util::FixedVector<size_t, 4> getImageSize() const { return m_ImageSize; }
-	data::Image getImage() const { return m_Image; }
+	const data::Image &getImage() const { return m_Image; }
 	boost::numeric::ublas::matrix<float> getNormalizedImageOrientation( bool transposed = false ) const;
 	boost::numeric::ublas::matrix<float> getImageOrientation( bool transposed = false ) const;
 
