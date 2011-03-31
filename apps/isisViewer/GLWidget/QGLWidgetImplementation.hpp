@@ -59,7 +59,7 @@ private:
 
 	std::vector<GLuint> m_TextureIDVec;
 	GLOrientationHandler::PlaneOrientation m_PlaneOrientation;
-	std::pair<size_t, size_t> m_CrosshairCoordinates;
+	util::ivector4 m_CurrentVoxelCoords;
 
 	GLOrientationHandler::ViewPortCoords m_CurrentViewPort;
 	GLCrossHair m_CrossHair;

@@ -86,8 +86,8 @@ GLOrientationHandler::GLCoordinates GLOrientationHandler::transformImageCoords2G
 
 	size_t offset_x = ( ( viewport.w - ( viewport.w * fabs( transformedScaling( 0, 0 ) ) ) ) / 2 ) + viewport.x;
 	size_t offset_y = ( ( viewport.h - ( viewport.h * fabs( transformedScaling( 1, 0 ) ) ) ) / 2 ) + viewport.y;
-	size_t pos_x = ( float )( vpos_x * viewport.w * fabs( transformedScaling( 0, 0 ) ) ) / fabs( transformedImageSize[0] ) + offset_x;
-	size_t pos_y = ( float )( vpos_y * viewport.h * fabs( transformedScaling( 1, 0 ) ) ) / fabs( transformedImageSize[1] ) + offset_y;
+	size_t pos_x = ( float )( ((float)vpos_x + 0.5) * viewport.w * fabs( transformedScaling( 0, 0 ) ) ) / fabs( transformedImageSize[0] ) + offset_x;
+	size_t pos_y = ( float )( ((float)vpos_y + 0.5) * viewport.h * fabs( transformedScaling( 1, 0 ) ) ) / fabs( transformedImageSize[1] ) + offset_y;
 	float textureMatrix[16];
 	boostMatrix2Pointer( orientation2TextureMatrix( orientationMatrix ), textureMatrix );
 

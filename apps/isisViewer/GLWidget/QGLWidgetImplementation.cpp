@@ -92,8 +92,6 @@ void QGLWidgetImplementation::initializeGL()
 	glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();
-	m_CrosshairCoordinates.first = width() / 2;
-	m_CrosshairCoordinates.second = height() / 2;
 }
 
 
@@ -105,13 +103,13 @@ void QGLWidgetImplementation::resizeGL( int w, int h )
 	m_CurrentViewPort =
 		GLOrientationHandler::calculateViewPort( width(), height() );
 	glViewport( m_CurrentViewPort.x, m_CurrentViewPort.y, m_CurrentViewPort.w, m_CurrentViewPort.h );
-	redrawCrosshair( m_CrosshairCoordinates.first, m_CrosshairCoordinates.second );
+	lookAtVoxel(m_CurrentVoxelCoords[0], m_CurrentVoxelCoords[1], m_CurrentVoxelCoords[2], m_CurrentVoxelCoords[3]);
 }
 
 void QGLWidgetImplementation::lookAtVoxel( size_t _x, size_t _y, size_t _z, size_t _t )
 {
 	ImageHolder image = m_ViewerCore->getDataContainer()[0];
-	
+	m_CurrentVoxelCoords = util::ivector4(_x,_y,_z, _t);
 	//  //now we have to calculate the respective opgenGL coord for each transformedCoord
 	//  //first we do this for the crosshair
 
@@ -126,6 +124,7 @@ void QGLWidgetImplementation::lookAtVoxel( size_t _x, size_t _y, size_t _z, size
 	internPaintSlice( textureID, textureMatrix, glCoords.slice );
 	GLOrientationHandler::printMatrix( textureMatrix );
 	redrawCrosshair( glCoords.x, glCoords.y );
+	
 }
 
 
