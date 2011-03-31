@@ -109,6 +109,7 @@ GLOrientationHandler::GLCoordinates GLOrientationHandler::transformImageCoords2G
 
 util::ivector4 GLOrientationHandler::transformGLCoords2ImageCoords(isis::viewer::GLOrientationHandler::GLCoordinates glCoords, const ImageHolder &image, ViewPortCoords viewport, PlaneOrientation orientation)
 {
+#warning function GLOrientationHandler::transformGLCoords2ImageCoords has to be optimized
 	using namespace boost::numeric::ublas;
 	MatrixType imageSize = zero_matrix<float> (4,1);
 	for (size_t i = 0; i<3; i++) {
@@ -137,7 +138,12 @@ util::ivector4 GLOrientationHandler::transformGLCoords2ImageCoords(isis::viewer:
 	size_t vpos_y = (abs(transformedImageSize(1,0)) / (viewport.w * fabs(transformedScaling(1,0)))) * (glCoords.y - viewport.y - (viewport.h - (viewport.h * fabs(transformedScaling(1,0)))) / 2 );
 	vpos_x = transformedImageSize(0,0) < 0 ? abs(transformedImageSize(0,0)) - vpos_x - 1 : vpos_x;
 	vpos_y = transformedImageSize(1,0) < 0 ? abs(transformedImageSize(1,0)) - vpos_y - 1 : vpos_y;
-	return util::ivector4(vpos_x, vpos_y, vpos_z);
+	MatrixType retCoords = zero_matrix<float>(4,1);
+	retCoords(0,0) = vpos_x;
+	retCoords(1,0) = vpos_y;
+	retCoords(2,0) = vpos_z;
+	MatrixType transposedRetCoords = prod( transposeMatrix( getOrientationMatrix(image, orientation, false ) ), retCoords);
+	return util::ivector4(abs(transposedRetCoords(0,0)), abs(transposedRetCoords(1,0)), abs(transposedRetCoords(2,0)));
 }
 
 
