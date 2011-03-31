@@ -42,6 +42,8 @@ private:
 	bool clean;
 	size_t chunkVolume;
 
+	void deduplicateProperties();
+
 	/**
 	 * Get the pointer to the chunk in the internal lookup-table at position at.
 	 * The Chunk will only have metadata which are unique to it - so it might be invalid
@@ -101,14 +103,14 @@ protected:
 	 * (run join on it using the image as parameter to insert all non-unique-metadata).
 	 */
 	Chunk &chunkAt( size_t at );
+	/// Creates an empty Image object.
+	Image();
 public:
 	class ChunkOp : std::unary_function<Chunk &, bool>
 	{
 	public:
 		virtual bool operator()( Chunk &, util::FixedVector<size_t, 4> posInImage ) = 0;
 	};
-	/// Creates an empty Image object.
-	Image();
 
 	/**
 	 * Copy constructor.
@@ -117,12 +119,52 @@ public:
 	Image( const Image &ref );
 
 	/**
+	 * Create image from a list of Chunks or objects with the base Chunk.
+	 * Removes used chunks from the given list. So afterwards the list consists of the rejected chunks.
+	 */
+	template<typename T> Image( std::list<T> &chunks ) : _internal::NDimensional<4>(), util::PropertyMap(), set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ), clean( false ) {
+		BOOST_STATIC_ASSERT( ( boost::is_base_of<Chunk, T>::value ) );
+		addNeededFromString( neededProperties );
+		set.addSecondarySort( "acquisitionNumber" );
+		set.addSecondarySort( "acquisitionTime" );
+
+		size_t cnt = 0;
+
+		for ( typename std::list<T>::iterator i = chunks.begin(); i != chunks.end(); ) { // for all remaining chunks
+			if ( insertChunk( *i ) ) {
+				chunks.erase( i++ );
+				cnt++;
+			} else {
+				i++;
+			}
+		}
+
+		if ( ! isEmpty() ) {
+			LOG( Debug, info ) << "Reindexing image with " << cnt << " chunks.";
+
+			if( !reIndex() ) {
+				LOG( Runtime, error ) << "Failed to create image from " << cnt << " chunks.";
+			} else {
+				LOG_IF( !getMissing().empty(), Debug, warning )
+						<< "The created image is missing some properties: " << getMissing() << ". It will be invalid.";
+			}
+		}
+	}
+
+
+	/**
+	 * Create image from a single chunk.
+	 */
+	Image( const Chunk &chunk );
+
+	/**
 	 * Copy operator.
 	 * Copies all elements, only the voxel-data (in the chunks) are referenced.
 	 */
 	Image &operator=( const Image &ref );
 
 	bool checkMakeClean();
+	bool isClean();
 	/**
 	 * This method returns a reference to the voxel value at the given coordinates.
 	 *
@@ -349,6 +391,20 @@ public:
 			LOG( Runtime, error ) << "Cannot copy from non clean images. Run reIndex first";
 		}
 	}
+
+	/**
+	 * Copy all voxel data into a new MemChunk.
+	 * This creates a MemChunk\<T\> of the requested type and the same size as the Image and then copies all voxeldata of the image into that Chunk.
+	 * If neccessary a conversion into T is done using min/max of the image.
+	 * \returns a MemChunk\<T\> containing the voxeldata of the Image (but not its Properties)
+	 */
+	template<typename T> MemChunk<T> copyToMemChunk()const {
+		const util::FixedVector<size_t,4> size=getSizeAsVector();
+		data::MemChunk<T> ret(size[0], size[1], size[2], size[3]);
+		copyToMem<T>(&ret.voxel(0,0,0,0));
+		return ret;
+	}
+
 	/**
 	 * Ensure, the image has the type with the requested ID.
 	 * If the typeID of any chunk is not equal to the requested ID, the data of the chunk is replaced by an converted version.
@@ -373,8 +429,10 @@ public:
 
 
 	/**
-	 * Run a functor with the base VoxelOp on every cunk in the image.
-	 * This does not check the types of the images. So if your functor needs a specific type, use TypedImage.
+	 * Run a functor with the base VoxelOp on every chunk in the image.
+	 * If any chunk does not have the requested type it will be converted.
+	 * So the result is equivalent to TypedImage\<TYPE\>.
+	 * If these conversion failes no operation is done, and false is returned.
 	 * \param op a functor object which inherits ChunkOp
 	 */
 	template <typename TYPE> size_t foreachVoxel( Chunk::VoxelOp<TYPE> &op ) {
@@ -388,7 +446,7 @@ public:
 			}
 		};
 		_proxy prx( op );
-		return foreachChunk( prx, false );
+		return convertToType( data::ValuePtr<TYPE>::staticID ) && foreachChunk( prx, false );
 	}
 
 	/// \returns the number of rows of the image

@@ -38,6 +38,20 @@ Image::Image ( ) : set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMas
 	set.addSecondarySort( "acquisitionTime" );
 }
 
+Image::Image ( const Chunk &chunk ) : _internal::NDimensional<4>(), util::PropertyMap(), set( "sequenceNumber,rowVec,columnVec,coilChannelMask,DICOM/EchoNumbers" ), clean( false )
+{
+	addNeededFromString( neededProperties );
+	set.addSecondarySort( "acquisitionNumber" );
+	set.addSecondarySort( "acquisitionTime" );
+
+	if ( ! ( insertChunk( chunk ) && reIndex() && isClean() ) ) {
+		LOG( Runtime, error ) << "Failed to create image from single chunk.";
+	} else if( !isValid() ) {
+		LOG_IF( !getMissing().empty(), Debug, warning )
+				<< "The created image is missing some properties: " << getMissing() << ". It will be invalid.";
+	}
+}
+
 Image::Image( const isis::data::Image &ref ): _internal::NDimensional<4>(), util::PropertyMap(),
 	set( "" )/*SortedChunkList has no default constructor - lets just make an empty (and invalid) set*/
 {
@@ -77,7 +91,36 @@ bool Image::checkMakeClean()
 
 	return clean;
 }
+bool Image::isClean()
+{
+	return clean;
+}
 
+void Image::deduplicateProperties()
+{
+	LOG_IF( lookup.empty(), Debug, error ) << "The lookup table is empty. Won't do anything.";
+	const boost::shared_ptr<Chunk> &first = lookup[0];
+	//@todo might fail if the image contains a prop that differs to that in the Chunks (which is equal in the chunks)
+	util::PropertyMap common;
+	util::PropertyMap::KeyList uniques;
+	first->toCommonUnique( common, uniques, true );
+
+	for ( size_t i = 1; i < lookup.size(); i++ ) {
+		lookup[i]->toCommonUnique( common, uniques, false );
+	}
+
+	LOG( Debug, info ) << uniques.size() << " Chunk-unique properties found in the Image";
+	LOG_IF( uniques.size(), Debug, verbose_info ) << util::listToString( uniques.begin(), uniques.end(), ", " );
+	join( common );
+	LOG_IF( ! common.isEmpty(), Debug, verbose_info ) << "common properties saved into the image " << common;
+
+	//remove common props from the chunks
+	for ( size_t i = 0; i != lookup.size(); i++ )
+		lookup[i]->remove( common, false ); //this _won't keep needed properties - so from here on the chunks of the image are invalid
+
+	LOG_IF( ! common.isEmpty(), Debug, verbose_info ) << "common properties removed from " << lookup.size() << " chunks: " << common;
+
+}
 
 bool Image::insertChunk ( const Chunk &chunk )
 {
@@ -93,15 +136,32 @@ bool Image::insertChunk ( const Chunk &chunk )
 		return false;
 	}
 
+	if( clean ) {
+		LOG( Debug, info ) << "Resetting image structure because of new insertion.";
+		LOG( Runtime, warning ) << "Inserting into already indexed images is inefficient. You should not do that.";
+
+		// re-gather all properties of the chunks from the image
+		BOOST_FOREACH( boost::shared_ptr<Chunk> &ref, lookup ) {
+			ref->join( *this );
+		}
+	}
+
+
 	LOG_IF( chunk.getPropertyAs<util::fvector4>( "indexOrigin" )[3] != 0, Debug, warning )
 			<< " inserting chunk with nonzero at the 4th position - you shouldn't use the fourth dim for the time (use acquisitionTime)";
 
-	if ( set.insert( chunk ) ) {
+	if( set.insert( chunk ) ) { // if the insertion was successful the image has to be reindexed anyway
 		clean = false;
 		lookup.clear();
 		return true;
-	} else
+	} else {
+		// if the insersion failed but the image was clean - de-duplicate properties again
+		// the image is still clean - no need reindex
+		if( clean )
+			deduplicateProperties();
+
 		return false;
+	}
 }
 
 
@@ -113,13 +173,12 @@ bool Image::reIndex()
 	}
 
 	if( !set.isRectangular() ) {
-		LOG( Runtime, error ) << "The image is incomplete. Aborting reindex.";
+		LOG( Runtime, error ) << "The image is incomplete. Aborting reindex. (horizontal size is " << set.getHorizontalSize() << ")";
 		return false;
 	}
 
 	//redo lookup table
 	lookup = set.getLookup();
-	const size_t chunks = lookup.size();
 	util::FixedVector<size_t, dims> structure_size; //storage for the size of the chunk structure
 	structure_size.fill( 1 );
 	//get primary attributes from geometrically first chunk - will be usefull
@@ -163,25 +222,7 @@ bool Image::reIndex()
 
 	assert( structure_size.product() == lookup.size() );
 	//Clean up the properties
-	//@todo might fail if the image contains a prop that differs to that in the Chunks (which is equal in the chunks)
-	util::PropertyMap common;
-	util::PropertyMap::KeyList uniques;
-	first.toCommonUnique( common, uniques, true );
-
-	for ( size_t i = 1; i < chunks; i++ ) {
-		chunkAt( i ).toCommonUnique( common, uniques, false );
-	}
-
-	LOG( Debug, info ) << uniques.size() << " Chunk-unique properties found in the Image";
-	LOG_IF( uniques.size(), Debug, verbose_info ) << util::listToString( uniques.begin(), uniques.end(), ", " );
-	join( common );
-	LOG_IF( ! common.isEmpty(), Debug, verbose_info ) << "common properties saved into the image " << common;
-
-	//remove common props from the chunks
-	for ( size_t i = 0; i != lookup.size(); i++ )
-		chunkAt( i ).remove( common, false ); //this _won't keep needed properties - so from here on the chunks of the image are invalid
-
-	LOG_IF( ! common.isEmpty(), Debug, verbose_info ) << "common properties removed from " << chunks << " chunks: " << common;
+	deduplicateProperties();
 
 	// add the chunk-size to the image-size
 	for ( unsigned short i = 0; i < chunk_dims; i++ )
@@ -248,8 +289,8 @@ bool Image::reIndex()
 				util::fvector4 &voxelGap = propertyValue( "voxelGap" )->castTo<util::fvector4>(); //if there is no voxelGap yet, we create it
 
 				if ( voxelGap[2] != inf ) {
-					if ( ! util::fuzzyEqual( voxelGap[2], sliceDist, 50 ) ) {
-						LOG_IF( ! util::fuzzyEqual( voxelGap[2], sliceDist, 50 ), Runtime, warning )
+					if ( ! util::fuzzyEqual( voxelGap[2], sliceDist ) ) {
+						LOG_IF( ! util::fuzzyEqual( voxelGap[2], sliceDist ), Runtime, warning )
 								<< "The existing slice distance (voxelGap[2]) " << util::MSubject( voxelGap[2] )
 								<< " differs from the distance between chunk 0 and 1, which is " << sliceDist;
 					}
@@ -276,7 +317,7 @@ bool Image::reIndex()
 
 		if ( hasProperty( "sliceVec" ) ) {
 			util::fvector4 &sliceVec = propertyValue( "sliceVec" )->castTo<util::fvector4>(); //get the slice vector
-			LOG_IF( ! crossVec.fuzzyEqual( sliceVec, 1000 ), Runtime, warning )
+			LOG_IF( ! crossVec.fuzzyEqual( sliceVec ), Runtime, warning )
 					<< "The existing sliceVec " << sliceVec
 					<< " differs from the cross product of the row- and column vector " << crossVec;
 		} else {
@@ -492,15 +533,15 @@ std::pair<util::ValueReference, util::ValueReference> Image::getMinMax () const
 
 std::pair< util::ValueReference, util::ValueReference > Image::getScalingTo( short unsigned int targetID, autoscaleOption scaleopt ) const
 {
-	LOG_IF( !clean, Runtime, error ) << "You should run reIndex before running this";
+	LOG_IF( !clean, Debug, error ) << "You should run reIndex before running this";
 	std::pair<util::ValueReference, util::ValueReference> minmax = getMinMax();
 
 	const std::vector<boost::shared_ptr<const Chunk> > chunks = getChunksAsVector();
 	BOOST_FOREACH( const boost::shared_ptr<const Chunk> &ref, chunks ) { //find a chunk which would be converted
 		if( targetID != ref->getTypeID() ) {
-			LOG_IF( ref->getScalingTo( targetID, minmax, scaleopt ).first.isEmpty() || ref->getScalingTo( targetID, minmax, scaleopt ).second.isEmpty(), Debug, error )
-					<< "Returning an invalid scaling. This is bad!";
-			return ref->getScalingTo( targetID, minmax, scaleopt ); // and ask that for the scaling
+			const scaling_pair scale=ref->getScalingTo( targetID, minmax, scaleopt );
+			LOG_IF( scale.first.isEmpty() || scale.second.isEmpty(), Debug, error )	<< "Returning an invalid scaling. This is bad!";
+			return scale; // and ask that for the scaling
 		}
 	}
 	return std::make_pair( //ok seems like no conversion is needed - return 1/0
@@ -603,7 +644,9 @@ unsigned short Image::getMajorTypeID() const
 		return minmax.first->getTypeID() << 8;
 	} else {
 		LOG( Runtime, error ) << "Sorry I dont know which datatype I should use. (" << minmax.first->getTypeName() << " or " << minmax.second->getTypeName() << ")";
-		throw( std::logic_error( "type selection failed" ) );
+		std::stringstream o;
+		o << "Type selection failed. Range was: " << minmax;
+		throw( std::logic_error( o.str() ) );
 		return std::numeric_limits<unsigned char>::max();
 	}
 }
