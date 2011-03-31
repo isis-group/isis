@@ -6,9 +6,13 @@ namespace isis
 namespace viewer
 {
 
-ImageHolder::ImageHolder()
-	: m_NumberOfTimeSteps( 0 )
-{}
+ImageHolder::ImageHolder( data::Image image )
+	: m_NumberOfTimeSteps( 0 ),
+	m_Image(image)
+{	
+	//ok we to do this since image has no empty constructor
+	setImage(image);
+}
 
 
 

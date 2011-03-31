@@ -11,7 +11,7 @@ namespace viewer
 class ViewerCore : public ViewerCoreBase
 {
 public:
-
+	ViewerCore( data::Image );
 
 private:
 

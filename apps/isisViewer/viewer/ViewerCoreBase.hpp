@@ -16,7 +16,7 @@ class ViewerCoreBase
 {
 
 public:
-	ViewerCoreBase();
+	ViewerCoreBase( data::Image );
 	
 	typedef std::map<std::string, QWidget * > WidgetMap;
 

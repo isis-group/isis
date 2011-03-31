@@ -25,7 +25,7 @@ class ImageHolder
 public:
 	typedef data::_internal::ValuePtrBase::Reference ImagePointerType;
 
-	ImageHolder();
+	ImageHolder( data::Image image );
 
 	bool setImage( data::Image image );
 

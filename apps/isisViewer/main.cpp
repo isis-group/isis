@@ -27,7 +27,7 @@ int main( int argc, char *argv[] )
 	isis::util::slist fileList = app.parameters["in"];
 	std::list<isis::data::Image> imgList = isis::data::IOFactory::load( fileList.front() );
 
-	isis::viewer::ViewerCore *core = new isis::viewer::ViewerCore;
+	isis::viewer::ViewerCore *core = new isis::viewer::ViewerCore(imgList.front());
 	core->setImageList( imgList );
 	isis::viewer::MainWindow isisViewerMainWindow( core );
 	isisViewerMainWindow.show();

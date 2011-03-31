@@ -5,8 +5,9 @@ namespace isis
 namespace viewer
 {
 
-ViewerCoreBase::ViewerCoreBase()
-	: m_CurrentTimestep(0)
+ViewerCoreBase::ViewerCoreBase( data::Image image)
+	: m_CurrentTimestep(0),
+	m_CurrentImage( image )
 {
 
 }
