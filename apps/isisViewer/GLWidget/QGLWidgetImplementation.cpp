@@ -113,6 +113,7 @@ void QGLWidgetImplementation::resizeGL( int w, int h )
 void QGLWidgetImplementation::lookAtVoxel( util::ivector4 coords )
 {
 	m_CurrentVoxelCoords = coords;
+	
 	//  //now we have to calculate the respective opgenGL coord for each transformedCoord
 	//  //first we do this for the crosshair
 
@@ -123,10 +124,11 @@ void QGLWidgetImplementation::lookAtVoxel( util::ivector4 coords )
 	GLOrientationHandler::boostMatrix2Pointer( GLOrientationHandler::orientation2TextureMatrix( orientationMatrix ), textureMatrix );
 	
 	//finally copy the image to texture memory...if necessary
-	GLuint textureID = util::Singletons::get<GLTextureHandler, 10>().copyImageToTexture( m_ViewerCore->getDataContainer(), 0, m_CurrentVoxelCoords[3] );
+	GLuint textureID = util::Singletons::get<GLTextureHandler, 10>().copyImageToTexture( m_ViewerCore->getDataContainer(), 0, m_ViewerCore->getCurrentTimestep() );
 	internPaintSlice( textureID, textureMatrix, glCoords.slice );
 	redrawCrosshair( glCoords.x, glCoords.y );
 	m_CurrentSlice = glCoords.slice;
+
 	
 }
 
@@ -177,6 +179,16 @@ void QGLWidgetImplementation::emitMousePressEvent(QMouseEvent* e)
 	util::ivector4 imageCoords = GLOrientationHandler::transformGLCoords2ImageCoords( glCoords, m_ViewerCore->getCurrentImage(), m_CurrentViewPort, m_PlaneOrientation );
 	Q_EMIT voxelCoordChanged( util::ivector4( imageCoords[0],imageCoords[1],imageCoords[2], m_ViewerCore->getCurrentTimestep() ));
 }
+
+void QGLWidgetImplementation::timestepChanged(int timestep)
+{
+	if(m_ViewerCore->setCurrentTimestep(timestep))
+	{
+		LOG(Debug, verbose_info) << "Timestep changed to " << timestep << ".";
+		lookAtVoxel( m_CurrentVoxelCoords );
+	}
+}
+
 
 
 void QGLWidgetImplementation::mouseReleaseEvent(QMouseEvent* e)

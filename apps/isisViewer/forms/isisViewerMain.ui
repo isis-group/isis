@@ -138,6 +138,16 @@
         <string>GO!</string>
        </property>
       </widget>
+      <widget class="QSpinBox" name="timestepSpinBox">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>140</y>
+         <width>55</width>
+         <height>28</height>
+        </rect>
+       </property>
+      </widget>
      </widget>
     </item>
     <item row="0" column="0">

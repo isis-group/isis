@@ -26,8 +26,7 @@ public:
 
 	void redrawCrosshair( size_t x, size_t y );
 
-	///this function modifies the crosshair and the slice position to the given image voxel coords
-	virtual void lookAtVoxel( util::ivector4 );
+	
 
 
 	QGLWidgetImplementation *createSharedWidget( QWidget *parent, GLOrientationHandler::PlaneOrientation orienation = GLOrientationHandler::axial );
@@ -38,7 +37,8 @@ private:
 	QGLWidget *m_ShareWidget;
 
 public Q_SLOTS:
-
+	virtual void lookAtVoxel( util::ivector4 );
+	virtual void timestepChanged( int );
 
 protected:
 	virtual void mouseMoveEvent( QMouseEvent *e );
@@ -46,6 +46,8 @@ protected:
 	virtual void mouseReleaseEvent( QMouseEvent *e );
 	virtual void initializeGL();
 	virtual void resizeGL( int w, int h );
+	///this function modifies the crosshair and the slice position to the given image voxel coords
+	
 
 
 protected:

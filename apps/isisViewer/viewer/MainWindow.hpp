@@ -36,6 +36,7 @@ protected Q_SLOTS:
 	//TODO debug
 	void go();
 	void voxelCoordChanged( util::ivector4 );
+	void timestepChanged(int);
 
 
 private:

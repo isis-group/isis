@@ -32,6 +32,7 @@ MainWindow::MainWindow( ViewerCore *core )
 	connect( m_AxialWidget, SIGNAL( voxelCoordChanged( util::ivector4 ) ), this, SLOT( voxelCoordChanged(util::ivector4) ) );
 	connect( m_SagittalWidget, SIGNAL( voxelCoordChanged( util::ivector4 ) ), this, SLOT( voxelCoordChanged(util::ivector4) ) );
 	connect( m_CoronalWidget, SIGNAL( voxelCoordChanged( util::ivector4 ) ), this, SLOT( voxelCoordChanged(util::ivector4) ) );
+	connect( ui.timestepSpinBox, SIGNAL( valueChanged(int) ), this, SLOT ( timestepChanged(int)));
 }
 
 
@@ -73,6 +74,13 @@ void MainWindow::voxelCoordChanged(util::ivector4 coords)
 }
 
 
+void MainWindow::timestepChanged(int timestep )
+{
+	BOOST_FOREACH( ViewerCoreBase::WidgetMap::const_reference widget, m_ViewerCore->getWidgets() )
+	{
+		dynamic_cast<QGLWidgetImplementation*>( widget.second )->timestepChanged(timestep);
+	}
+}
 
 
 void MainWindow::go()

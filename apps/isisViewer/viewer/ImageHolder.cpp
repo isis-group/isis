@@ -10,10 +10,9 @@ ImageHolder::ImageHolder( data::Image image )
 	: m_NumberOfTimeSteps( 0 ),
 	m_Image(image)
 {	
-	//ok we to do this since image has no empty constructor
+	//ok we have to do this since image has no empty constructor
 	setImage(image);
 }
-
 
 
 bool
