@@ -112,7 +112,36 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 // VC90 thinks bool is numeric - so tell him it isn't
 /////////////////////////////////////////////////////////////////////////////
-template<typename SRC> class ValuePtrConverter<true, false, SRC, bool> : public ValuePtrGenerator<SRC, bool> {virtual ~ValuePtrConverter() {}};
+template<typename SRC> class ValuePtrConverter<true, false, SRC, bool> : public ValuePtrGenerator<SRC, bool>
+{
+	ValuePtrConverter() {
+		LOG( Debug, verbose_info )
+		<< "to-boolean converter for " << ValuePtr<SRC>::staticName();
+	};
+public:
+	static boost::shared_ptr<const ValuePtrConverterBase> get() {
+		ValuePtrConverter<true, false, SRC, bool> *ret = new ValuePtrConverter<true, false, SRC, bool>;
+		return boost::shared_ptr<const ValuePtrConverterBase>( ret );
+	}
+	void convert( const ValuePtrBase &src, ValuePtrBase &dst, const scaling_pair &/*scaling*/ )const {
+		const SRC *srcPtr = &src.castToValuePtr<SRC>()[0];
+		bool *dstPtr = &dst.castToValuePtr<bool>()[0];
+		LOG_IF( src.getLength() < dst.getLength(), Debug, info ) << "The target is longer than the the source (" << dst.getLength() << ">" << src.getLength() << "). Will only copy/convert " << src.getLength() << " elements";
+		LOG_IF( src.getLength() > dst.getLength(), Debug, error ) << "The target is shorter than the the source (" << dst.getLength() << "<" << src.getLength() << "). Will only copy/convert " << dst.getLength() << " elements";
+
+		size_t i=std::min( src.getLength(), dst.getLength() );
+		while(i--)
+				*(dstPtr++)=(*(srcPtr++)!=0);
+	}
+	virtual scaling_pair getScaling( const util::_internal::ValueBase &/*min*/, const util::_internal::ValueBase &/*max*/, autoscaleOption /*scaleopt*/ )const {
+		//as we're just copying - its 1/0
+		return std::make_pair(
+			util::ValueReference( util::Value<uint8_t>( 1 ) ),
+							  util::ValueReference( util::Value<uint8_t>( 0 ) )
+		);
+	}
+	virtual ~ValuePtrConverter() {}
+};
 template<typename DST> class ValuePtrConverter<true, false, bool, DST> : public ValuePtrGenerator<bool, DST> {virtual ~ValuePtrConverter() {}};
 
 /////////////////////////////////////////////////////////////////////////////
