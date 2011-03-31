@@ -30,7 +30,7 @@ public:
 		size_t y;
 	};
 
-	struct ViewerCoordinates {
+	struct GLCoordinates {
 		float slice;
 		size_t x;
 		size_t y;
@@ -56,6 +56,8 @@ public:
 	static util::fvector4 transformVectorWithImageAndPlaneOrientation( const ImageHolder &image, util::fvector4 vector, PlaneOrientation orientation );
 
 	static void  boostMatrix2Pointer( MatrixType boostMatrix, float *ret );
+	
+	static GLCoordinates transformImageCoords2GLCoords( const util::ivector4 imageCoords, const ImageHolder &image, const ViewPortCoords viewport, PlaneOrientation orientation );
 
 	static void printMatrix( const float *mat ) {
 		size_t index = 0;
