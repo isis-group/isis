@@ -33,6 +33,8 @@ void QGLWidgetImplementation::commonInit()
 	setSizePolicy( QSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored ) );
 	setMouseTracking( true );
 	connectSignals();
+	m_Zoom.zoomFactor = 1;
+	m_Zoom.zoom = 1;
 	//flags
 	buttonPressed = false;
 
@@ -94,8 +96,9 @@ void QGLWidgetImplementation::initializeGL()
 	util::Singletons::get<GLTextureHandler, 10>().copyAllImagesToTextures( m_ViewerCore->getDataContainer() );
 	glClearColor( 0.0, 0.0, 0.0, 0.0 );
 	glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-	glMatrixMode( GL_PROJECTION );
-	glLoadIdentity();
+	glGetDoublev(GL_MODELVIEW_MATRIX, m_CurrentModelView);
+// 	glMatrixMode( GL_PROJECTION );
+// 	glLoadIdentity();
 }
 
 
@@ -110,8 +113,8 @@ void QGLWidgetImplementation::resizeGL( int w, int h )
 
 void QGLWidgetImplementation::lookAtVoxel( util::ivector4 coords )
 {
+// 	LOG(Debug, verbose_info) << objectName().toStdString() << " -> lookAtVoxel( " << coords << " ).";
 	m_CurrentVoxelCoords = coords;
-
 	//  //now we have to calculate the respective opgenGL coord for each transformedCoord
 	//  //first we do this for the crosshair
 
@@ -123,8 +126,12 @@ void QGLWidgetImplementation::lookAtVoxel( util::ivector4 coords )
 
 	//finally copy the image to texture memory...if necessary
 	GLuint textureID = util::Singletons::get<GLTextureHandler, 10>().copyImageToTexture( m_ViewerCore->getDataContainer(), 0, m_ViewerCore->getCurrentTimestep() );
+	
 	internPaintSlice( textureID, textureMatrix, glCoords.slice );
-	redrawCrosshair( glCoords.x, glCoords.y );
+// 	GLdouble position[3];
+// 	world2Object(glCoords.x, glCoords.y, position);
+// 	std::cout << position[0] << " : " << position[1] << std::endl;
+	redrawCrosshair(glCoords.x, glCoords.y );
 	m_CurrentSlice = glCoords.slice;
 
 
@@ -134,6 +141,11 @@ void QGLWidgetImplementation::lookAtVoxel( util::ivector4 coords )
 void QGLWidgetImplementation::internPaintSlice( GLuint textureID, const float *textureMatrix, float slice )
 {
 	redraw();
+	glMatrixMode(GL_MODELVIEW);
+	glScalef(m_Zoom.zoomFactor, m_Zoom.zoomFactor, 1);
+	glGetDoublev(GL_MODELVIEW_MATRIX, m_CurrentModelView);
+	m_Zoom.zoom *= m_Zoom.zoomFactor;
+	m_Zoom.zoomFactor = 1;
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	glMatrixMode( GL_TEXTURE );
 	glLoadMatrixf( textureMatrix );
@@ -172,10 +184,15 @@ void QGLWidgetImplementation::emitMousePressEvent( QMouseEvent *e )
 {
 	if(isInViewPort(e->x(), height() - e->y())) {
 		GLOrientationHandler::GLCoordinates glCoords;
-		glCoords.x = e->x();
-		glCoords.y = height() - e->y();
+		
 		glCoords.slice = m_CurrentSlice;
+		GLdouble worldCoords[3];
+		object2World(e->x(), (height() - e->y()), worldCoords);
+		glCoords.x = worldCoords[0];
+		glCoords.y = worldCoords[1];
+// 		std::cout << glCoords.x << " : " << glCoords.y << std::endl;
 		util::ivector4 imageCoords = GLOrientationHandler::transformGLCoords2ImageCoords( glCoords, m_ViewerCore->getCurrentImage(), m_CurrentViewPort, m_PlaneOrientation );
+// 		std::cout << imageCoords << std::endl;
 		Q_EMIT voxelCoordChanged( util::ivector4( imageCoords[0], imageCoords[1], imageCoords[2], m_ViewerCore->getCurrentTimestep() ) );
 	}
 }
@@ -188,6 +205,13 @@ void QGLWidgetImplementation::timestepChanged( int timestep )
 	}
 }
 
+void QGLWidgetImplementation::wheelEvent(QWheelEvent* e)
+{
+	if(e->delta() < 0) m_Zoom.zoomFactor = 0.5;
+	if(e->delta() > 0) m_Zoom.zoomFactor = 2;
+	lookAtVoxel(m_CurrentVoxelCoords);
+	
+}
 
 
 void QGLWidgetImplementation::mouseReleaseEvent( QMouseEvent *e )
@@ -195,6 +219,30 @@ void QGLWidgetImplementation::mouseReleaseEvent( QMouseEvent *e )
 	buttonPressed = false;
 }
 
+void QGLWidgetImplementation::object2World(int x,int y, GLdouble *world)
+{
+	GLdouble projectView[16];
+	GLint viewport[4];
+	glGetDoublev(GL_PROJECTION_MATRIX, projectView);
+	glGetIntegerv(GL_VIEWPORT, viewport);
+// 	for (size_t i = 0 ;i<16; i++) std::cout << m_CurrentModelView[i] << " ";
+// 	std::cout << std::endl;
+	gluUnProject(x,y, 0,m_CurrentModelView, projectView, viewport, &world[0], &world[1], &world[2]);
+	world[0] = (world[0] + 1) / 2 * m_CurrentViewPort.w + m_CurrentViewPort.x;
+	world[1] = (world[1] + 1) / 2 * m_CurrentViewPort.h + m_CurrentViewPort.y;
+}
+
+void QGLWidgetImplementation::world2Object(float x, float y, GLdouble *object)
+{
+	GLdouble projectView[16];
+	GLint viewport[4];
+	glGetDoublev(GL_PROJECTION_MATRIX, projectView);
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	gluProject(x,y, 0,m_CurrentModelView, projectView, viewport, &object[0], &object[1], &object[2]);
+	object[0] = object[0] / m_CurrentViewPort.w * 2;
+	object[1] = object[1] / m_CurrentViewPort.h * 2;
+
+}
 
 
 

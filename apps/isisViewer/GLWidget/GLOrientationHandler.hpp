@@ -3,7 +3,8 @@
 
 #include "ImageHolder.hpp"
 #include "common.hpp"
-
+#include <GL/glu.h>
+#include <GL/gl.h>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/lu.hpp>
 #include <boost/concept_check.hpp>

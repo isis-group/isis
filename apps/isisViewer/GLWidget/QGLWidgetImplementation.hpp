@@ -42,6 +42,7 @@ public Q_SLOTS:
 
 protected:
 	virtual void mouseMoveEvent( QMouseEvent *e );
+	virtual void wheelEvent( QWheelEvent *e );
 	virtual void mousePressEvent( QMouseEvent *e );
 	virtual void mouseReleaseEvent( QMouseEvent *e );
 	virtual void initializeGL();
@@ -62,6 +63,8 @@ private:
 	bool isInViewPort( size_t x, size_t y ) const;
 	std::pair<float, float> widget2ViewPortCoordinates( size_t x, size_t y ) const;
 	void emitMousePressEvent( QMouseEvent *e );
+	void object2World( int x, int y, GLdouble *world );
+	void world2Object( float x, float y, GLdouble *object );
 
 	std::vector<GLuint> m_TextureIDVec;
 	GLOrientationHandler::PlaneOrientation m_PlaneOrientation;
@@ -71,10 +74,18 @@ private:
 	GLCrossHair m_CrossHair;
 	GLuint m_CurrentTextureID;
 	float m_CurrentSlice;
+	GLdouble m_CurrentModelView[16];
+	struct {
+		float zoom;
+		float zoomFactor;
+		float xtrans;
+		float ytrans;
+	} m_Zoom;
+	
 
 	//flags
 	bool buttonPressed;
-
+	
 };
 
 

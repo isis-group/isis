@@ -110,6 +110,7 @@ GLOrientationHandler::GLCoordinates GLOrientationHandler::transformImageCoords2G
 util::ivector4 GLOrientationHandler::transformGLCoords2ImageCoords( isis::viewer::GLOrientationHandler::GLCoordinates glCoords, const ImageHolder &image, ViewPortCoords viewport, PlaneOrientation orientation )
 {
 #warning function GLOrientationHandler::transformGLCoords2ImageCoords has to be optimized
+
 	using namespace boost::numeric::ublas;
 	MatrixType imageSize = zero_matrix<float> ( 4, 1 );
 
