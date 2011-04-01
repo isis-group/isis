@@ -134,10 +134,25 @@ util::ivector4 GLOrientationHandler::transformGLCoords2ImageCoords( isis::viewer
 	glCoords.slice += oneHalfSlice;
 	glCoords.slice *= sliceScalingVector[relevantSliceDim];
 	glCoords.slice += fabs( textureTranslationVec[relevantSliceDim] ) >= 1 ?  textureTranslationVec[relevantSliceDim] - 1 : textureTranslationVec[relevantSliceDim];
+	
 	size_t vpos_z = glCoords.slice < 0 ? abs( transformedImageSize( 2, 0 ) ) - fabs( glCoords.slice ) * abs( transformedImageSize( 2, 0 ) )
 					- 1 : glCoords.slice * abs( transformedImageSize( 2, 0 ) ) - 1;
-	size_t vpos_x = ( abs( transformedImageSize( 0, 0 ) ) / ( viewport.w * fabs( transformedScaling( 0, 0 ) ) ) ) * ( glCoords.x - viewport.x - ( viewport.w - ( viewport.w * fabs( transformedScaling( 0, 0 ) ) ) ) / 2 );
-	size_t vpos_y = ( abs( transformedImageSize( 1, 0 ) ) / ( viewport.w * fabs( transformedScaling( 1, 0 ) ) ) ) * ( glCoords.y - viewport.y - ( viewport.h - ( viewport.h * fabs( transformedScaling( 1, 0 ) ) ) ) / 2 );
+					
+	float border_x = ( viewport.w - ( viewport.w * fabs( transformedScaling( 0, 0 ) ) ) )  / 2;
+	float border_y = ( viewport.h - ( viewport.h * fabs( transformedScaling( 1, 0 ) ) ) )  / 2;
+	if ( ( glCoords.x < (viewport.x + border_x) ) ) {
+		glCoords.x = viewport.x + border_x;
+	} else if ( glCoords.x >= (viewport.x + viewport.w - border_x) ) {
+		glCoords.x = viewport.x + viewport.w - border_x;
+	}	
+	size_t vpos_x = ( abs( transformedImageSize( 0, 0 ) ) / ( viewport.w * fabs( transformedScaling( 0, 0 ) ) ) ) * ( glCoords.x - viewport.x - border_x );
+	if ( ( glCoords.y < (viewport.y + border_y) ) ) {
+		glCoords.y = viewport.y + border_y;
+	} else if ( glCoords.y >= (viewport.y + viewport.h - border_y) ) {
+		glCoords.y = viewport.y + viewport.h - border_y;
+	}	
+	size_t vpos_y = ( abs( transformedImageSize( 1, 0 ) ) / ( viewport.w * fabs( transformedScaling( 1, 0 ) ) ) ) * ( glCoords.y - viewport.y - border_y );
+	
 	vpos_x = transformedImageSize( 0, 0 ) < 0 ? abs( transformedImageSize( 0, 0 ) ) - vpos_x - 1 : vpos_x;
 	vpos_y = transformedImageSize( 1, 0 ) < 0 ? abs( transformedImageSize( 1, 0 ) ) - vpos_y - 1 : vpos_y;
 	MatrixType retCoords = zero_matrix<float>( 4, 1 );

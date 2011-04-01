@@ -102,8 +102,6 @@ void QGLWidgetImplementation::initializeGL()
 void QGLWidgetImplementation::resizeGL( int w, int h )
 {
 	LOG( Debug, verbose_info ) << "resizeGL " << objectName().toStdString();
-
-	//TODO
 	m_CurrentViewPort =
 		GLOrientationHandler::calculateViewPort( width(), height() );
 	glViewport( m_CurrentViewPort.x, m_CurrentViewPort.y, m_CurrentViewPort.w, m_CurrentViewPort.h );
@@ -172,12 +170,14 @@ void QGLWidgetImplementation::mousePressEvent( QMouseEvent *e )
 
 void QGLWidgetImplementation::emitMousePressEvent( QMouseEvent *e )
 {
-	GLOrientationHandler::GLCoordinates glCoords;
-	glCoords.x = e->x();
-	glCoords.y = height() - e->y();
-	glCoords.slice = m_CurrentSlice;
-	util::ivector4 imageCoords = GLOrientationHandler::transformGLCoords2ImageCoords( glCoords, m_ViewerCore->getCurrentImage(), m_CurrentViewPort, m_PlaneOrientation );
-	Q_EMIT voxelCoordChanged( util::ivector4( imageCoords[0], imageCoords[1], imageCoords[2], m_ViewerCore->getCurrentTimestep() ) );
+	if(isInViewPort(e->x(), height() - e->y())) {
+		GLOrientationHandler::GLCoordinates glCoords;
+		glCoords.x = e->x();
+		glCoords.y = height() - e->y();
+		glCoords.slice = m_CurrentSlice;
+		util::ivector4 imageCoords = GLOrientationHandler::transformGLCoords2ImageCoords( glCoords, m_ViewerCore->getCurrentImage(), m_CurrentViewPort, m_PlaneOrientation );
+		Q_EMIT voxelCoordChanged( util::ivector4( imageCoords[0], imageCoords[1], imageCoords[2], m_ViewerCore->getCurrentTimestep() ) );
+	}
 }
 
 void QGLWidgetImplementation::timestepChanged( int timestep )

@@ -26,7 +26,7 @@ public:
 	const ImageHolder &getCurrentImage() const { return m_CurrentImage; }
 	size_t getCurrentTimestep() const { return m_CurrentTimestep; }
 	bool setCurrentTimestep( size_t timestep ) {
-		if(  m_CurrentImage.getImageSize()[3] > m_CurrentTimestep ) {
+		if(  m_CurrentImage.getImageSize()[3] > timestep ) {
 			m_CurrentTimestep = timestep;
 			return true;
 		} else { return false; }
