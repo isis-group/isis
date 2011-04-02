@@ -24,9 +24,6 @@ public:
 	QGLWidgetImplementation( ViewerCore *core, QWidget *parent = 0, QGLWidget *share = 0, GLOrientationHandler::PlaneOrientation orienation = GLOrientationHandler::axial );
 	QGLWidgetImplementation( ViewerCore *core, QWidget *parent = 0, GLOrientationHandler::PlaneOrientation orientation = GLOrientationHandler::axial );
 
-	void redrawCrosshair( size_t x, size_t y );
-
-
 
 
 	QGLWidgetImplementation *createSharedWidget( QWidget *parent, GLOrientationHandler::PlaneOrientation orienation = GLOrientationHandler::axial );
@@ -47,8 +44,8 @@ protected:
 	virtual void mouseReleaseEvent( QMouseEvent *e );
 	virtual void initializeGL();
 	virtual void resizeGL( int w, int h );
-	///this function modifies the crosshair and the slice position to the given image voxel coords
 
+	virtual void paintScene();	
 
 
 protected:
@@ -59,28 +56,22 @@ Q_SIGNALS:
 private:
 	void connectSignals();
 	void commonInit();
-	void internPaintSlice( GLuint textureID, const float *matrix, float normalizedSlice );
-	bool isInViewPort( size_t x, size_t y ) const;
-	std::pair<float, float> widget2ViewPortCoordinates( size_t x, size_t y ) const;
 	void emitMousePressEvent( QMouseEvent *e );
-	void object2World( int x, int y, GLdouble *world );
-	void world2Object( float x, float y, GLdouble *object );
 
 	std::vector<GLuint> m_TextureIDVec;
 	GLOrientationHandler::PlaneOrientation m_PlaneOrientation;
-	util::ivector4 m_CurrentVoxelCoords;
-
-	GLOrientationHandler::ViewPortCoords m_CurrentViewPort;
 	GLCrossHair m_CrossHair;
-	GLuint m_CurrentTextureID;
-	float m_CurrentSlice;
-	GLdouble m_CurrentModelView[16];
+	
 	struct {
-		float zoom;
-		float zoomFactor;
-		float xtrans;
-		float ytrans;
-	} m_Zoom;
+		GLdouble modelViewMatrix[16];
+		GLdouble textureMatrix[16];
+		GLdouble projectionMatrix[16];
+		GLint viewport[4];
+		float normalizedSlice;
+		GLuint textureID;
+		util::ivector4 voxelCoords;
+	} m_StateValues;
+
 	
 
 	//flags
