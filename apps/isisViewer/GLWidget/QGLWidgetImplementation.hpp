@@ -34,8 +34,16 @@ private:
 	QGLWidget *m_ShareWidget;
 
 public Q_SLOTS:
-	virtual void lookAtVoxel( util::ivector4 );
-	virtual void timestepChanged( int );
+	/**
+	 * The function lookAtVoxel is responsible for drawing an image with the given imageID.
+	 * If the imageID does not exist or the voxelCoords are outside the image it returns false.
+	 * Otherwise it will return true.
+	 * @param imageID The image that has to be drawn
+	 * @param voxelCoords The voxelCoords that has to be drawn. This also specifies the crosshair position
+	 * @return True if imageID exists and voxelCoords are inside the image. Otherwise returns false.
+	 */
+	virtual bool lookAtVoxel( const unsigned short imageID, const util::ivector4 &voxelCoords);
+	virtual bool timestepChanged( unsigned int timestep );
 
 protected:
 	virtual void mouseMoveEvent( QMouseEvent *e );

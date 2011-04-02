@@ -72,7 +72,7 @@ void QGLWidgetImplementation::resizeGL( int w, int h )
 	
 }
 
-void QGLWidgetImplementation::lookAtVoxel( util::ivector4 coords )
+bool QGLWidgetImplementation::lookAtVoxel( const unsigned short imageID, const util::ivector4 &coords )
 {
 	m_StateValues.voxelCoords = coords;
 
@@ -121,7 +121,7 @@ void QGLWidgetImplementation::emitMousePressEvent( QMouseEvent *e )
 	Q_EMIT voxelCoordChanged( m_StateValues.voxelCoords );
 }
 
-void QGLWidgetImplementation::timestepChanged( int timestep )
+bool QGLWidgetImplementation::timestepChanged( unsigned int timestep )
 {
 	
 }

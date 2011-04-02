@@ -22,6 +22,7 @@ namespace viewer
 class GLTextureHandler
 {
 public:
+	///The image map is a mapping of the imageID and timestep to the texture of the GL_TEXTURE_3D.
 	typedef std::map<size_t, std::map<size_t, GLuint > > ImageMapType;
 
 	///Convinient function to copy all in DataContainer available volumes to a GL_TEXTURE_3D.
