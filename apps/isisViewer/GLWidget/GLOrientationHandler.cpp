@@ -83,19 +83,34 @@ void GLOrientationHandler::addOffset(GLOrientationHandler::MatrixType& matrix)
 }
 
 
-/*
-GLOrientationHandler::ViewPortCoords GLOrientationHandler::calculateViewPort( size_t w, size_t h )
-{
-	ViewPortCoords retCoords;
-	float scaleH = ( w < h ) ? ( ( float )w / ( float )h ) : 1;
-	float scaleW = ( h < w ) ? ( ( float )h / ( float )w ) : 1;
 
-	retCoords.h = h * scaleH;
-	retCoords.w = w * scaleW;
-	retCoords.x = ( w - ( w * scaleW ) ) / 2;
-	retCoords.y = ( h - ( h * scaleH ) ) / 2;
-	return retCoords;
-}*/
+void GLOrientationHandler::recalculateViewport( size_t w, size_t h, const ImageHolder &image, const MatrixType &orientation, GLint *viewport )
+{
+	//first we have to map the imagesize and scaling to our current planeview
+	MatrixType imageSize = zero_matrix<float>( matrixSize, 1);
+	MatrixType imageScaling = zero_matrix<float>( matrixSize, 1);
+	util::fvector4 scaling = image.getPropMap().getPropertyAs<util::fvector4>("voxelSize") + image.getPropMap().getPropertyAs<util::fvector4>("voxelGap");
+	for (unsigned short i = 0; i<3; i++) {
+		imageSize(i,0) = image.getImageSize()[i];
+		imageScaling(i,0) = scaling[i];
+	}
+	MatrixType transformedScaling = prod( orientation, imageScaling );
+	MatrixType transformedSize = prod( orientation, imageSize );
+	util::fvector4 physicalSize;
+	for (unsigned short i = 0;i<3;i++)
+	{
+		physicalSize[i] = transformedScaling(i,0) * transformedSize(i,0);
+	}
+	float scalew = w / physicalSize[0];
+	float scaleh = h / physicalSize[1];
+	float normh = scalew < scaleh ? scalew / scaleh : 1;
+	float normw = scalew > scaleh ? scaleh / scalew : 1;
+	viewport[2] = w * normw;
+	viewport[3] = h * normh;
+	viewport[0] = (w-viewport[2]) / 2;
+	viewport[1] = (h-viewport[3]) / 2;
+	
+}
 
 
 }
