@@ -62,7 +62,7 @@ include_directories(${OPENGL_INCLUDE_DIR})
 # boost and common stuff
 ###########################################################
 
-FIND_PACKAGE(Boost REQUIRED COMPONENTS thread)
+FIND_PACKAGE(Boost REQUIRED)
 
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/GLWidget)
