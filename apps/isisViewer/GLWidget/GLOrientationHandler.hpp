@@ -6,6 +6,7 @@
 #include <GL/glu.h>
 #include <GL/gl.h>
 #include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/io.hpp>
 #include <boost/numeric/ublas/lu.hpp>
 #include <boost/concept_check.hpp>
 
@@ -30,6 +31,8 @@ public:
 	
 	//some helper functions
 	static void boostMatrix2Pointer( const MatrixType &boostMatrix, GLdouble *pointerMatrix );
+	
+	static void addOffset( MatrixType &matrix );
 	
 };
 

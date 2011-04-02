@@ -25,14 +25,14 @@ GLuint GLTextureHandler::copyImageToTexture( const DataContainer &data, const Im
 	typedef uint8_t TYPE;
 
 	//check if there is an image with this parameters
-	if ( image.getImageSize()[3] >= timestep )  {
-		LOG( Runtime, error ) << "Trying to copy timestep " << timestep << " to an openGL texture. But there is no such timestep in this image!";
+	if ( image.getImageSize()[3] <= timestep )  {
+		LOG( Runtime, error ) << "Trying to copy image " << image.getID() << " with timestep " << timestep << " to an openGL texture. But there is no such timestep in this image!";
 		return 0;
 	}
 
 	//check if we have already copied this volume to texture. If we have already copied the image return its texture id
 	if ( m_ImageMap[image].find( timestep ) != m_ImageMap[image].end() ) {
-		LOG( Debug, verbose_info ) << "Texture for volume " << image.getImage().getPropertyAs<std::string>("fileName") << " and timestep " << timestep  << " already exists. Wont copy it.";
+		LOG( Debug, verbose_info ) << "Texture for volume " << image.getID() << " and timestep " << timestep  << " already exists. Wont copy it.";
 		return m_ImageMap[image][timestep];
 	}
 

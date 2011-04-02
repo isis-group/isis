@@ -60,12 +60,17 @@ void QGLWidgetImplementation::initializeGL()
 	util::Singletons::get<GLTextureHandler, 10>().copyAllImagesToTextures( m_ViewerCore->getDataContainer() );
 	glClearColor( 0.0, 0.0, 0.0, 0.0 );
 	glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
 }
 
 
 void QGLWidgetImplementation::resizeGL( int w, int h )
 {
 	LOG( Debug, verbose_info ) << "resizeGL " << objectName().toStdString();
+	lookAtVoxel(util::ivector4(50,50,50,0));
 	
 }
 
@@ -77,7 +82,10 @@ void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const
 	//The texture matrix holds the orientation of the image and the orientation of the current widget. It does NOT hold the scaling of the image.
 	GLOrientationHandler::MatrixType planeOrientatioMatrix = 
 		GLOrientationHandler::transformToPlaneView( image.getNormalizedImageOrientation(), m_PlaneOrientation );
+	GLOrientationHandler::addOffset( planeOrientatioMatrix );
 	GLOrientationHandler::boostMatrix2Pointer( planeOrientatioMatrix, m_StateValues[image].textureMatrix );
+	//TODO debug
+	m_StateValues[image].normalizedSlice = 0.5;
 	
 	
 
@@ -86,7 +94,7 @@ void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const
 
 
 
-bool QGLWidgetImplementation::lookAtVoxel( const isis::util::ivector4& voxelCoords)
+bool QGLWidgetImplementation::lookAtVoxel( const isis::util::ivector4& voxelCoords )
 {
 	//someone has told the widget to paint a list of images with the respective ids. 
 	//So first we have to update the state values for each image
@@ -95,6 +103,7 @@ bool QGLWidgetImplementation::lookAtVoxel( const isis::util::ivector4& voxelCoor
 	{
 		updateStateValues( image, voxelCoords[3] );
 	}
+	paintScene();
 
 }
 
@@ -114,6 +123,7 @@ void QGLWidgetImplementation::paintScene()
 	BOOST_FOREACH( StateMap::const_reference currentImage, m_StateValues )
 	{
 		glMatrixMode( GL_TEXTURE );
+		glLoadIdentity();
 		glLoadMatrixd( currentImage.second.textureMatrix );
 		glEnable( GL_TEXTURE_3D );
 		glBindTexture( GL_TEXTURE_3D, currentImage.second.textureID );

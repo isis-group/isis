@@ -40,6 +40,7 @@ private:
 
 	template<typename TYPE>
 	GLuint internCopyImageToTexture( const DataContainer &data, GLenum format, const ImageHolder &image, size_t timestep ) {
+		LOG(Debug, info) << "Copy image " << image.getID() << " with timestep " << timestep << " to texture";
 		GLuint texture;
 		util::FixedVector<size_t, 4> size = image.getImageSize();
 		TYPE *dataPtr = static_cast<TYPE *>( data.getImageWeakPointer( image, timestep ).lock().get() );

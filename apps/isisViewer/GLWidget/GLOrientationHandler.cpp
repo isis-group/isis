@@ -64,12 +64,25 @@ GLOrientationHandler::MatrixType GLOrientationHandler::transformToPlaneView( con
 void GLOrientationHandler::boostMatrix2Pointer( const MatrixType &boostMatrix, GLdouble *ret )
 {
 	size_t index = 0;
-	for ( size_t column = 0; column < matrixSize; column++ ) {
-		for ( size_t row = 0; row < matrixSize; row++ ) {
-			ret[index++] = boostMatrix( row, column );
+	for ( size_t row = 0; row < matrixSize; row++ ) {
+		for ( size_t column = 0; column < matrixSize; column++ ) {
+			ret[index++] = boostMatrix( row, column);
 		}
 	}
 }
+void GLOrientationHandler::addOffset(GLOrientationHandler::MatrixType& matrix)
+{
+	for (size_t row = 0; row < matrixSize; row++ ) {
+		for (size_t column = 0; column < matrixSize-1; column++ ) {
+			if( matrix(row, column) < 0 ){
+				matrix(3,column) = 1;
+			}
+			
+		}
+	}
+}
+
+
 /*
 GLOrientationHandler::ViewPortCoords GLOrientationHandler::calculateViewPort( size_t w, size_t h )
 {
