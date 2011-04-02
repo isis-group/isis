@@ -3,6 +3,7 @@
 
 #include "ViewerCoreBase.hpp"
 #include "QGLWidgetImplementation.hpp"
+#include <QtGui>
 
 namespace isis
 {
@@ -13,10 +14,11 @@ class QViewerCore : public QObject, public ViewerCoreBase
 {
 	Q_OBJECT
 public:
+	enum Actions {not_specified, timestep_changed};
 	typedef std::map<std::string, QWidget * > WidgetMap;
 	QViewerCore( data::Image );
 	
-	virtual bool registerWidget( std::string key, QWidget *widget );
+	virtual bool registerWidget( std::string key, QWidget *widget, Actions = not_specified );
 	
 	const WidgetMap &getWidgets() const { return m_WidgetMap; }
 
@@ -36,7 +38,8 @@ public:
 	};
 	
 protected Q_SLOTS:
-	void voxelCoordChanged( util::ivector4 );
+	virtual void voxelCoordChanged( util::ivector4 );
+	virtual void timestepChanged( int );
 private:
 	//this map holds the widgets associated with a given name
 	WidgetMap m_WidgetMap;

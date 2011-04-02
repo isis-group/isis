@@ -151,7 +151,7 @@ void QGLWidgetImplementation::mousePressEvent( QMouseEvent *e )
 void QGLWidgetImplementation::emitMousePressEvent( QMouseEvent *e )
 {
 	
-// 	Q_EMIT voxelCoordChanged( m_StateValues.voxelCoords );
+	Q_EMIT voxelCoordChanged( util::ivector4(1,1,1,1) );
 }
 
 bool QGLWidgetImplementation::timestepChanged( unsigned int timestep )

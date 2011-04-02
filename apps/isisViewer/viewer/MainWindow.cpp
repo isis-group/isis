@@ -28,11 +28,11 @@ MainWindow::MainWindow( QViewerCore *core )
 	m_CoronalWidget = m_AxialWidget->createSharedWidget( ui.coronalWidget, GLOrientationHandler::coronal );
 	m_ViewerCore->registerWidget( "coronalView", m_CoronalWidget );
 
-	connect( ui.goButton, SIGNAL( clicked() ), this, SLOT( go() ) );
-	connect( m_AxialWidget, SIGNAL( voxelCoordChanged( util::ivector4 ) ), this, SLOT( voxelCoordChanged( util::ivector4 ) ) );
-	connect( m_SagittalWidget, SIGNAL( voxelCoordChanged( util::ivector4 ) ), this, SLOT( voxelCoordChanged( util::ivector4 ) ) );
-	connect( m_CoronalWidget, SIGNAL( voxelCoordChanged( util::ivector4 ) ), this, SLOT( voxelCoordChanged( util::ivector4 ) ) );
-	connect( ui.timestepSpinBox, SIGNAL( valueChanged( int ) ), this, SLOT ( timestepChanged( int ) ) );
+	m_ViewerCore->registerWidget( "timestepSpinBox", ui.timestepSpinBox, QViewerCore::timestep_changed );
+	
+// 	connect( m_AxialWidget, SIGNAL( voxelCoordChanged( util::ivector4 ) ), this, SLOT( voxelCoordChanged( util::ivector4 ) ) );
+// 	connect( m_SagittalWidget, SIGNAL( voxelCoordChanged( util::ivector4 ) ), this, SLOT( voxelCoordChanged( util::ivector4 ) ) );
+// 	connect( m_CoronalWidget, SIGNAL( voxelCoordChanged( util::ivector4 ) ), this, SLOT( voxelCoordChanged( util::ivector4 ) ) );
 }
 
 
@@ -80,24 +80,6 @@ void MainWindow::timestepChanged( int timestep )
 		dynamic_cast<QGLWidgetImplementation *>( widget.second )->timestepChanged( timestep );
 	}
 }
-
-
-void MainWindow::go()
-{
-	//TODO debug
-	//  size_t x = ui.xEdit->text().toInt();
-	//  size_t y = ui.yEdit->text().toInt();
-	//  size_t z = ui.zEdit->text().toInt();
-	//  m_AxialWidget->lookAtVoxel( x, y, z );
-	//  m_SagittalWidget->lookAtVoxel( x, y, z );
-	//  m_CoronalWidget->lookAtVoxel( x, y, z );
-
-	//  m_ViewerCore->getWidgetAs<QGLWidgetImplementation>("axialView")->lookAtVoxel(x,y,z);
-	//  m_ViewerCore->getWidgetAs<QGLWidgetImplementation>("sagittalView")->lookAtVoxel(x,y,z);
-	//  m_ViewerCore->getWidgetAs<QGLWidgetImplementation>("axialWidget")->lookAtVoxel(ui.xEdit->text().toInt());
-}
-
-
 
 }
 } //end namespace
