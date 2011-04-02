@@ -70,12 +70,13 @@ void QGLWidgetImplementation::initializeGL()
 void QGLWidgetImplementation::resizeGL( int w, int h )
 {
 	LOG( Debug, verbose_info ) << "resizeGL " << objectName().toStdString();
-	lookAtVoxel(util::ivector4(50,50,50,0));
+	lookAtVoxel(util::ivector4(50,50,100,0));
 	
 }
 
 void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const unsigned short timestep )
 {
+	LOG(Debug, verbose_info) << "Updating state values for widget " << objectName().toStdString();
 	//if not happend already copy the image to GLtexture memory and return the texture id
 	m_StateValues[image].textureID = util::Singletons::get<GLTextureHandler, 10>().copyImageToTexture( m_ViewerCore->getDataContainer(), image, timestep );	
 	//update the texture matrix. 
@@ -86,12 +87,10 @@ void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const
 	GLOrientationHandler::boostMatrix2Pointer( planeOrientatioMatrix, m_StateValues[image].textureMatrix );
 	
 	//to visualize with the correct scaling we take the viewport
-	GLOrientationHandler::recalculateViewport( width(), height(), image, planeOrientatioMatrix, m_StateValues[image].viewport, 100 );
+	GLOrientationHandler::recalculateViewport( width(), height(), image, planeOrientatioMatrix, m_StateValues[image].viewport );
 	
 	//TODO debug
 	m_StateValues[image].normalizedSlice = 0.5;
-	
-	
 
 }
 
@@ -106,15 +105,18 @@ bool QGLWidgetImplementation::lookAtVoxel( const isis::util::ivector4& voxelCoor
 	BOOST_FOREACH( DataContainer::const_reference image, m_ViewerCore->getDataContainer() )
 	{
 		updateStateValues( image, voxelCoords[3] );
+		m_StateValues[image].voxelCoords = voxelCoords;
 	}
 	paintScene();
 
 }
 
 
-bool QGLWidgetImplementation::lookAtVoxel( const ImageHolder &image, const util::ivector4 &coords )
+bool QGLWidgetImplementation::lookAtVoxel( const ImageHolder &image, const util::ivector4 &voxelCoords )
 {
-	m_StateValues[image].voxelCoords = coords;
+	m_StateValues[image].voxelCoords = voxelCoords;
+	updateStateValues( image, voxelCoords[3] );
+	paintScene();
 
 
 }
@@ -123,7 +125,7 @@ bool QGLWidgetImplementation::lookAtVoxel( const ImageHolder &image, const util:
 void QGLWidgetImplementation::paintScene()
 {
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	
+	redraw();
 	BOOST_FOREACH( StateMap::const_reference currentImage, m_StateValues )
 	{
 		glViewport( currentImage.second.viewport[0], currentImage.second.viewport[1], currentImage.second.viewport[2], currentImage.second.viewport[3] );
@@ -171,6 +173,15 @@ void QGLWidgetImplementation::emitMousePressEvent( QMouseEvent *e )
 
 bool QGLWidgetImplementation::timestepChanged( unsigned int timestep )
 {
+	BOOST_FOREACH( StateMap::reference currentImage, m_StateValues )
+	{
+		if(currentImage.first.getImageSize()[3] > timestep) {
+			currentImage.second.voxelCoords[3] = timestep;
+		} else {
+			currentImage.second.voxelCoords[3] = currentImage.first.getImageSize()[3] - 1;
+		}
+		lookAtVoxel( currentImage.first, currentImage.second.voxelCoords );
+	}
 	
 }
 

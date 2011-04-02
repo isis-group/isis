@@ -34,7 +34,6 @@ private:
 
 protected Q_SLOTS:
 	void voxelCoordChanged( util::ivector4 );
-	void timestepChanged( int );
 
 
 private:
