@@ -13,7 +13,7 @@ namespace isis
 namespace viewer
 {
 
-MainWindow::MainWindow( ViewerCore *core )
+MainWindow::MainWindow( QViewerCore *core )
 	: m_ViewerCore( core )
 {
 
@@ -38,7 +38,8 @@ MainWindow::MainWindow( ViewerCore *core )
 
 void MainWindow::voxelCoordChanged( util::ivector4 coords )
 {
-	BOOST_FOREACH( ViewerCoreBase::WidgetMap::const_reference widget, m_ViewerCore->getWidgets() ) {
+	//TODO where has this to be placed???
+	BOOST_FOREACH( QViewerCore::WidgetMap::const_reference widget, m_ViewerCore->getWidgets() ) {
 		dynamic_cast<QGLWidgetImplementation *>( widget.second )->lookAtVoxel( coords );
 	}
 	data::Chunk ch = m_ViewerCore->getCurrentImage().getImage().getChunk( coords[0], coords[1], coords[2], coords[3] );
@@ -75,7 +76,7 @@ void MainWindow::voxelCoordChanged( util::ivector4 coords )
 
 void MainWindow::timestepChanged( int timestep )
 {
-	BOOST_FOREACH( ViewerCoreBase::WidgetMap::const_reference widget, m_ViewerCore->getWidgets() ) {
+	BOOST_FOREACH( QViewerCore::WidgetMap::const_reference widget, m_ViewerCore->getWidgets() ) {
 		dynamic_cast<QGLWidgetImplementation *>( widget.second )->timestepChanged( timestep );
 	}
 }

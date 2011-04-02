@@ -29,7 +29,8 @@ public:
 	
 	
 	//some helper functions
-	static void boostMatrix2Pointer( const MatrixType &boostMatrix, float *pointerMatrix );
+	static void boostMatrix2Pointer( const MatrixType &boostMatrix, GLdouble *pointerMatrix );
+	
 };
 
 

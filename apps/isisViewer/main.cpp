@@ -1,6 +1,6 @@
 #include "Adapter/qtapplication.hpp"
 #include "MainWindow.hpp"
-#include "ViewerCore.hpp"
+#include "QViewerCore.hpp"
 #include <iostream>
 #include <GL/gl.h>
 #include <DataStorage/io_factory.hpp>
@@ -27,7 +27,7 @@ int main( int argc, char *argv[] )
 	isis::util::slist fileList = app.parameters["in"];
 	std::list<isis::data::Image> imgList = isis::data::IOFactory::load( fileList.front() );
 
-	isis::viewer::ViewerCore *core = new isis::viewer::ViewerCore( imgList.front() );
+	isis::viewer::QViewerCore *core = new isis::viewer::QViewerCore( imgList.front() );
 	core->setImageList( imgList );
 	isis::viewer::MainWindow isisViewerMainWindow( core );
 	isisViewerMainWindow.show();

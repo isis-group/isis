@@ -9,7 +9,7 @@
 #define MAINWINDOW_CPP_
 
 #include "MainWindowBase.hpp"
-#include "ViewerCore.hpp"
+#include "QViewerCore.hpp"
 #include "QGLWidgetImplementation.hpp"
 
 namespace isis
@@ -23,14 +23,14 @@ class MainWindow : public MainWindowBase
 	Q_OBJECT
 
 public:
-	MainWindow( ViewerCore *core  );
+	MainWindow( QViewerCore *core  );
 
 private:
 	struct Slot {
 		MainWindow &parent;
 		Slot( MainWindow &p ) : parent( p ) {}
 	};
-	ViewerCore *m_ViewerCore;
+	QViewerCore *m_ViewerCore;
 
 protected Q_SLOTS:
 	//TODO debug

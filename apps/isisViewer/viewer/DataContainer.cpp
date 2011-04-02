@@ -8,6 +8,7 @@ namespace viewer
 bool DataContainer::addImage( const data::Image &image )
 {
 	ImageHolder tmpHolder( image );
+	tmpHolder.setID( size() );
 	push_back( tmpHolder );
 	return true;
 }

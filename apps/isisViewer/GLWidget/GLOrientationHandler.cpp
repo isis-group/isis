@@ -60,7 +60,8 @@ GLOrientationHandler::MatrixType GLOrientationHandler::transformToPlaneView( con
 	}
 }
 
-void GLOrientationHandler::boostMatrix2Pointer( const MatrixType &boostMatrix, float *ret )
+
+void GLOrientationHandler::boostMatrix2Pointer( const MatrixType &boostMatrix, GLdouble *ret )
 {
 	size_t index = 0;
 	for ( size_t column = 0; column < matrixSize; column++ ) {

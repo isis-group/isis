@@ -8,7 +8,7 @@ namespace viewer
 {
 
 
-QGLWidgetImplementation::QGLWidgetImplementation( ViewerCore *core, QWidget *parent, QGLWidget *share, GLOrientationHandler::PlaneOrientation orientation )
+QGLWidgetImplementation::QGLWidgetImplementation( QViewerCore *core, QWidget *parent, QGLWidget *share, GLOrientationHandler::PlaneOrientation orientation )
 	: QGLWidget( parent, share ),
 	  m_ViewerCore( core ),
 	  m_PlaneOrientation( orientation ),
@@ -18,7 +18,7 @@ QGLWidgetImplementation::QGLWidgetImplementation( ViewerCore *core, QWidget *par
 	commonInit();
 }
 
-QGLWidgetImplementation::QGLWidgetImplementation( ViewerCore *core, QWidget *parent, GLOrientationHandler::PlaneOrientation orientation )
+QGLWidgetImplementation::QGLWidgetImplementation( QViewerCore *core, QWidget *parent, GLOrientationHandler::PlaneOrientation orientation )
 	: QGLWidget( parent ),
 	  m_ViewerCore( core ),
 	  m_PlaneOrientation( orientation )
@@ -60,9 +60,6 @@ void QGLWidgetImplementation::initializeGL()
 	util::Singletons::get<GLTextureHandler, 10>().copyAllImagesToTextures( m_ViewerCore->getDataContainer() );
 	glClearColor( 0.0, 0.0, 0.0, 0.0 );
 	glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-	glGetDoublev(GL_MODELVIEW_MATRIX, m_StateValues.modelViewMatrix);
-// 	glMatrixMode( GL_PROJECTION );
-// 	glLoadIdentity();
 }
 
 
@@ -72,9 +69,39 @@ void QGLWidgetImplementation::resizeGL( int w, int h )
 	
 }
 
-bool QGLWidgetImplementation::lookAtVoxel( const unsigned short imageID, const util::ivector4 &coords )
+void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const unsigned short timestep )
 {
-	m_StateValues.voxelCoords = coords;
+	//if not happend already copy the image to GLtexture memory and return the texture id
+	m_StateValues[image].textureID = util::Singletons::get<GLTextureHandler, 10>().copyImageToTexture( m_ViewerCore->getDataContainer(), image, timestep );	
+	//update the texture matrix. 
+	//The texture matrix holds the orientation of the image and the orientation of the current widget. It does NOT hold the scaling of the image.
+	GLOrientationHandler::MatrixType planeOrientatioMatrix = 
+		GLOrientationHandler::transformToPlaneView( image.getNormalizedImageOrientation(), m_PlaneOrientation );
+	GLOrientationHandler::boostMatrix2Pointer( planeOrientatioMatrix, m_StateValues[image].textureMatrix );
+	
+	
+
+}
+
+
+
+
+bool QGLWidgetImplementation::lookAtVoxel( const isis::util::ivector4& voxelCoords)
+{
+	//someone has told the widget to paint a list of images with the respective ids. 
+	//So first we have to update the state values for each image
+	m_StateValues.clear();
+	BOOST_FOREACH( DataContainer::const_reference image, m_ViewerCore->getDataContainer() )
+	{
+		updateStateValues( image, voxelCoords[3] );
+	}
+
+}
+
+
+bool QGLWidgetImplementation::lookAtVoxel( const ImageHolder &image, const util::ivector4 &coords )
+{
+	m_StateValues[image].voxelCoords = coords;
 
 
 }
@@ -83,22 +110,28 @@ bool QGLWidgetImplementation::lookAtVoxel( const unsigned short imageID, const u
 void QGLWidgetImplementation::paintScene()
 {
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	glMatrixMode( GL_TEXTURE );
-	glLoadMatrixd( m_StateValues.textureMatrix );
-	glEnable( GL_TEXTURE_3D );
-	glBindTexture( GL_TEXTURE_3D, m_StateValues.textureID );
-	glBegin( GL_QUADS );
-	glTexCoord3f( 0, 0, m_StateValues.normalizedSlice );
-	glVertex2f( -1.0, -1.0 );
-	glTexCoord3f( 0, 1, m_StateValues.normalizedSlice );
-	glVertex2f( -1.0, 1.0 );
-	glTexCoord3f( 1, 1, m_StateValues.normalizedSlice );
-	glVertex2f( 1.0, 1.0 );
-	glTexCoord3f( 1, 0, m_StateValues.normalizedSlice );
-	glVertex2f( 1.0, -1.0 );
-	glEnd();
+	
+	BOOST_FOREACH( StateMap::const_reference currentImage, m_StateValues )
+	{
+		glMatrixMode( GL_TEXTURE );
+		glLoadMatrixd( currentImage.second.textureMatrix );
+		glEnable( GL_TEXTURE_3D );
+		glBindTexture( GL_TEXTURE_3D, currentImage.second.textureID );
+		glBegin( GL_QUADS );
+		glTexCoord3f( 0, 0, currentImage.second.normalizedSlice );
+		glVertex2f( -1.0, -1.0 );
+		glTexCoord3f( 0, 1, currentImage.second.normalizedSlice );
+		glVertex2f( -1.0, 1.0 );
+		glTexCoord3f( 1, 1, currentImage.second.normalizedSlice );
+		glVertex2f( 1.0, 1.0 );
+		glTexCoord3f( 1, 0, currentImage.second.normalizedSlice );
+		glVertex2f( 1.0, -1.0 );
+		glEnd();
+		glDisable( GL_TEXTURE_3D );
+	}
 	glFlush();
-	glDisable( GL_TEXTURE_3D );
+	redraw();
+		
 }
 
 void QGLWidgetImplementation::mouseMoveEvent( QMouseEvent *e )
@@ -118,7 +151,7 @@ void QGLWidgetImplementation::mousePressEvent( QMouseEvent *e )
 void QGLWidgetImplementation::emitMousePressEvent( QMouseEvent *e )
 {
 	
-	Q_EMIT voxelCoordChanged( m_StateValues.voxelCoords );
+// 	Q_EMIT voxelCoordChanged( m_StateValues.voxelCoords );
 }
 
 bool QGLWidgetImplementation::timestepChanged( unsigned int timestep )

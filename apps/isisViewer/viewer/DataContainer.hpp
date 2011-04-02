@@ -26,9 +26,8 @@ public:
 
 	///returns a boost::weak_ptr of the images data. Actually this also is a convinient function.
 	boost::weak_ptr<void>
-	getImageWeakPointer( size_t imageID = 0, size_t timestep = 0 ) const {
-		LOG_IF( size() < imageID, Runtime, error ) << "There is no image with iamgeID " << imageID << "!";
-		return operator[]( imageID ).getImageVector()[timestep]->getRawAddress();
+	getImageWeakPointer( const ImageHolder &image, size_t timestep = 0 ) const {
+		return image.getImageVector()[timestep]->getRawAddress();
 	}
 
 };

@@ -23,13 +23,13 @@ class GLTextureHandler
 {
 public:
 	///The image map is a mapping of the imageID and timestep to the texture of the GL_TEXTURE_3D.
-	typedef std::map<size_t, std::map<size_t, GLuint > > ImageMapType;
+	typedef std::map<ImageHolder, std::map<size_t, GLuint > > ImageMapType;
 
 	///Convinient function to copy all in DataContainer available volumes to a GL_TEXTURE_3D.
-	std::map<size_t, GLuint> copyAllImagesToTextures( const DataContainer &data );
+	std::map<ImageHolder, GLuint> copyAllImagesToTextures( const DataContainer &data );
 
 	///Copies the given timestep of an image with the given imageID to a GL_TEXTURE_3D. Return the texture id.
-	GLuint copyImageToTexture( const DataContainer &data , size_t imageID, size_t timestep );
+	GLuint copyImageToTexture( const DataContainer &data, const ImageHolder &image, size_t timestep );
 
 	///The image map is a mapping of the imageID and timestep to the texture of the GL_TEXTURE_3D.
 	ImageMapType getImageMap() const { return m_ImageMap; }
@@ -39,10 +39,10 @@ private:
 	ImageMapType m_ImageMap;
 
 	template<typename TYPE>
-	GLuint internCopyImageToTexture( const DataContainer &data, GLenum format, size_t imageID, size_t timestep ) {
+	GLuint internCopyImageToTexture( const DataContainer &data, GLenum format, const ImageHolder &image, size_t timestep ) {
 		GLuint texture;
-		util::FixedVector<size_t, 4> size = data[imageID].getImageSize();
-		TYPE *dataPtr = static_cast<TYPE *>( data.getImageWeakPointer( imageID, timestep ).lock().get() );
+		util::FixedVector<size_t, 4> size = image.getImageSize();
+		TYPE *dataPtr = static_cast<TYPE *>( data.getImageWeakPointer( image, timestep ).lock().get() );
 		assert( dataPtr != 0 );
 		glShadeModel( GL_FLAT );
 		glEnable( GL_DEPTH_TEST );
@@ -59,7 +59,7 @@ private:
 					  size[1],
 					  size[2], 0, GL_LUMINANCE, format,
 					  dataPtr );
-		m_ImageMap[imageID].insert( std::make_pair<size_t, GLuint >( timestep, texture ) );
+		m_ImageMap[image].insert( std::make_pair<size_t, GLuint >( timestep, texture ) );
 		return texture;
 	}
 

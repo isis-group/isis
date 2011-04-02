@@ -29,6 +29,9 @@ public:
 
 	bool setImage( data::Image image );
 
+	unsigned short getID() const { return m_ID; }
+	void setID( const unsigned short id ) { m_ID = id; }
+	
 	std::vector< ImagePointerType > getImageVector() const { return m_ImageVector; }
 	std::vector< util::PropertyMap > getChunkProperties() const { return m_ChunkProperties; }
 	std::vector< util::PropertyMap > getTimeStepProperties() const { return m_TimeStepProperties; }
@@ -37,6 +40,8 @@ public:
 	const data::Image &getImage() const { return m_Image; }
 	boost::numeric::ublas::matrix<float> getNormalizedImageOrientation( bool transposed = false ) const;
 	boost::numeric::ublas::matrix<float> getImageOrientation( bool transposed = false ) const;
+	
+	bool operator<( const ImageHolder& h ) const { return m_ID < h.getID(); }
 
 private:
 	size_t m_NumberOfTimeSteps;
@@ -46,6 +51,7 @@ private:
 	std::vector< util::PropertyMap > m_TimeStepProperties;
 	std::pair<util::ValueReference, util::ValueReference> m_MinMax;
 	data::Image m_Image;
+	unsigned short m_ID;
 
 	std::vector< ImagePointerType > m_ImageVector;
 	bool filterRelevantMetaInformation();
