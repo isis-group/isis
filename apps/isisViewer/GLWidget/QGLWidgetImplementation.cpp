@@ -86,7 +86,7 @@ void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const
 	GLOrientationHandler::boostMatrix2Pointer( planeOrientatioMatrix, m_StateValues[image].textureMatrix );
 	
 	//to visualize with the correct scaling we take the viewport
-	GLOrientationHandler::recalculateViewport( width(), height(), image, planeOrientatioMatrix, m_StateValues[image].viewport );
+	GLOrientationHandler::recalculateViewport( width(), height(), image, planeOrientatioMatrix, m_StateValues[image].viewport, 100 );
 	
 	//TODO debug
 	m_StateValues[image].normalizedSlice = 0.5;
@@ -127,10 +127,6 @@ void QGLWidgetImplementation::paintScene()
 	BOOST_FOREACH( StateMap::const_reference currentImage, m_StateValues )
 	{
 		glViewport( currentImage.second.viewport[0], currentImage.second.viewport[1], currentImage.second.viewport[2], currentImage.second.viewport[3] );
-		std::cout << currentImage.second.viewport[0] << std::endl;
-		std::cout << currentImage.second.viewport[1] << std::endl;
-		std::cout << currentImage.second.viewport[2] << std::endl;
-		std::cout << currentImage.second.viewport[3] << std::endl;
 		glMatrixMode( GL_TEXTURE );
 		glLoadIdentity();
 		glLoadMatrixd( currentImage.second.textureMatrix );

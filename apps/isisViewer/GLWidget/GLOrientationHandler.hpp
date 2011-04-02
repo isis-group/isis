@@ -26,7 +26,7 @@ public:
 	
 	static MatrixType transformToPlaneView( const MatrixType &origMatrix, PlaneOrientation orientation, bool back=false );
 	
-	static void recalculateViewport( size_t w, size_t h, const ImageHolder &image, const MatrixType &orientation, GLint  *viewport );
+	static void recalculateViewport( size_t w, size_t h, const ImageHolder &image, const MatrixType &orientation, GLint  *viewport, size_t border = 0 );
 	
 	
 	//some helper functions

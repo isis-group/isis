@@ -84,7 +84,7 @@ void GLOrientationHandler::addOffset(GLOrientationHandler::MatrixType& matrix)
 
 
 
-void GLOrientationHandler::recalculateViewport( size_t w, size_t h, const ImageHolder &image, const MatrixType &orientation, GLint *viewport )
+void GLOrientationHandler::recalculateViewport( size_t w, size_t h, const ImageHolder &image, const MatrixType &orientation, GLint *viewport, size_t border )
 {
 	//first we have to map the imagesize and scaling to our current planeview
 	MatrixType imageSize = zero_matrix<float>( matrixSize, 1);
@@ -101,12 +101,14 @@ void GLOrientationHandler::recalculateViewport( size_t w, size_t h, const ImageH
 	{
 		physicalSize[i] = transformedScaling(i,0) * transformedSize(i,0);
 	}
-	float scalew = w / physicalSize[0];
-	float scaleh = h / physicalSize[1];
+	size_t wspace = w - 2*border;
+	size_t hspace = h - 2*border;
+	float scalew = wspace / physicalSize[0];
+	float scaleh = hspace / physicalSize[1];
 	float normh = scalew < scaleh ? scalew / scaleh : 1;
 	float normw = scalew > scaleh ? scaleh / scalew : 1;
-	viewport[2] = w * normw;
-	viewport[3] = h * normh;
+	viewport[2] = wspace * normw;
+	viewport[3] = hspace * normh;
 	viewport[0] = (w-viewport[2]) / 2;
 	viewport[1] = (h-viewport[3]) / 2;
 	
