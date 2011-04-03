@@ -11,8 +11,7 @@ std::map<ImageHolder, GLuint> GLTextureHandler::copyAllImagesToTextures( const D
 	// here we only copy the first timestep of each image. Would take a while to do this for all timesteps
 	std::map<ImageHolder, GLuint> retIDList;
 
-	BOOST_FOREACH( DataContainer::const_reference image, data) 
-	{
+	BOOST_FOREACH( DataContainer::const_reference image, data ) {
 		retIDList[image] = copyImageToTexture( data, image, 0 );
 	}
 

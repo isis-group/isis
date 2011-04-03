@@ -22,14 +22,14 @@ MainWindow::MainWindow( QViewerCore *core )
 	m_AxialWidget = new QGLWidgetImplementation( core, ui.axialWidget, GLOrientationHandler::axial );
 	m_ViewerCore->registerWidget( "axialView", m_AxialWidget );
 
-	
+
 	m_CoronalWidget = m_AxialWidget->createSharedWidget( ui.coronalWidget, GLOrientationHandler::coronal );
 	m_ViewerCore->registerWidget( "coronalView", m_CoronalWidget );
 
 	m_SagittalWidget = m_AxialWidget->createSharedWidget( ui.sagittalWidget, GLOrientationHandler::sagittal );
 	m_ViewerCore->registerWidget( "sagittalView", m_SagittalWidget );
 
-	
+
 	m_ViewerCore->registerWidget( "timestepSpinBox", ui.timestepSpinBox, QViewerCore::timestep_changed );
 }
 

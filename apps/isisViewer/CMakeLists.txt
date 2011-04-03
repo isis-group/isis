@@ -52,7 +52,6 @@ QT4_WRAP_UI(isisViewer_UIS_H ${UI_FILES})
 ###########################################################
 
 find_package(OpenGL REQUIRED)
-find_package(GLUT REQUIRED)
 
 message(STATUS "openGL library: ${OPENGL_LIBRARY}")
 

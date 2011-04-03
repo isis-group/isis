@@ -5,7 +5,6 @@
 
 #include <QtOpenGL/QGLWidget>
 #include "QViewerCore.hpp"
-#include "GLCrossHair.hpp"
 #include "GLTextureHandler.hpp"
 #include <iostream>
 #include <DataStorage/chunk.hpp>
@@ -44,8 +43,8 @@ public Q_SLOTS:
 	 * @param voxelCoords The voxelCoords that has to be drawn. This also specifies the crosshair position
 	 * @return True if imageID exists and voxelCoords are inside the image. Otherwise returns false.
 	 */
-	virtual bool lookAtVoxel( const ImageHolder &image, const util::ivector4 &voxelCoords);
-	virtual bool lookAtVoxel( const util::ivector4 &voxelCoords);
+	virtual bool lookAtVoxel( const ImageHolder &image, const util::ivector4 &voxelCoords );
+	virtual bool lookAtVoxel( const util::ivector4 &voxelCoords );
 	virtual bool timestepChanged( unsigned int timestep );
 
 protected:
@@ -56,28 +55,27 @@ protected:
 	virtual void initializeGL();
 	virtual void resizeGL( int w, int h );
 
-	virtual void paintScene();	
-	virtual void updateStateValues( const ImageHolder &image, const unsigned short timestep );
-	
+	virtual void paintScene();
+	virtual void updateStateValues( const ImageHolder &image, const util::ivector4 &voxelCoords );
+
 
 protected:
 Q_SIGNALS:
 	void redraw();
 	void voxelCoordChanged( util::ivector4 );
-	
+
 
 private:
 	void connectSignals();
 	void commonInit();
 	void emitMousePressEvent( QMouseEvent *e );
-	
+
 	std::pair<GLdouble, GLdouble> window2ObjectCoords( size_t winx, size_t winy ) const;
 	std::pair<size_t, size_t> object2WindowCoords( GLdouble objx, GLdouble objy ) const;
 
 
 	std::vector<GLuint> m_TextureIDVec;
 	GLOrientationHandler::PlaneOrientation m_PlaneOrientation;
-	GLCrossHair m_CrossHair;
 
 	struct State {
 		GLdouble modelViewMatrix[16];
@@ -87,13 +85,14 @@ private:
 		float normalizedSlice;
 		GLuint textureID;
 		util::ivector4 voxelCoords;
+		std::pair<size_t, size_t> crosshairCoords;
 	};
 	typedef std::map<ImageHolder, State> StateMap;
 	StateMap m_StateValues;
 
 	//flags
 	bool buttonPressed;
-	
+
 };
 
 

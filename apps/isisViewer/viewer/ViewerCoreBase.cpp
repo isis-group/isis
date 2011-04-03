@@ -11,7 +11,7 @@ ViewerCoreBase::ViewerCoreBase( data::Image image )
 {
 
 }
-void ViewerCoreBase::addImageList(const std::list< data::Image > imageList)
+void ViewerCoreBase::addImageList( const std::list< data::Image > imageList )
 {
 	if( !imageList.empty() ) {
 		BOOST_FOREACH( std::list< data::Image >::const_reference imageRef, imageList ) {
@@ -20,6 +20,7 @@ void ViewerCoreBase::addImageList(const std::list< data::Image > imageList)
 	} else {
 		LOG( Runtime, warning ) << "The image list passed to the core is empty!";
 	}
+
 	m_CurrentImage = getDataContainer()[m_DataContainer.size() - 1];
 
 }
