@@ -94,9 +94,9 @@ util::ivector4 GLOrientationHandler::transformObject2VoxelCoords( const util::fv
 	short voxelx =  image.getImageSize()[0] * transformedObjectCoords(0,0);
 	short voxely =  image.getImageSize()[1] * transformedObjectCoords(1,0);
 	short voxelz =  image.getImageSize()[2] * transformedObjectCoords(2,0);
-	voxelx = voxelx < 0 ? image.getImageSize()[0] + voxelx : voxelx;
-	voxely = voxely < 0 ? image.getImageSize()[1] + voxely : voxely;
-	voxelz = voxelz < 0 ? image.getImageSize()[2] + voxelz : voxelz;
+	voxelx = voxelx < 0 ? image.getImageSize()[0] + voxelx - 1 : voxelx;
+	voxely = voxely < 0 ? image.getImageSize()[1] + voxely - 1: voxely;
+	voxelz = voxelz < 0 ? image.getImageSize()[2] + voxelz - 1: voxelz;
 	return util::ivector4( voxelx, voxely, voxelz );
 	
 }
@@ -106,13 +106,16 @@ util::fvector4 GLOrientationHandler::transformVoxel2ObjectCoords(const isis::uti
 	GLOrientationHandler::MatrixType planeOrientatioMatrix = 
 		GLOrientationHandler::transformToPlaneView( image.getNormalizedImageOrientation(), orientation );
 	MatrixType objectCoords = zero_matrix<float>(matrixSize, 1);
+	MatrixType oneHalfVoxel = zero_matrix<float>(matrixSize, 1);
 	for (unsigned short i = 0; i<3;i++) {
 		objectCoords(i,0) = (1.0 / image.getImageSize()[i]) * voxelCoords[i];
+		oneHalfVoxel(i,0) = 1.0 / image.getImageSize()[i];
 	}
 	MatrixType transformedObjectCoords = prod( planeOrientatioMatrix, objectCoords);
+	MatrixType transformedOneHalfVoxel = prod( planeOrientatioMatrix, oneHalfVoxel);
 	util::fvector4 retVec;
-	retVec[0] = transformedObjectCoords(0,0) < 0 ? 1.0 + 2*transformedObjectCoords(0,0) : -1.0 +2*transformedObjectCoords(0,0);
-	retVec[1] = transformedObjectCoords(1,0) < 0 ? 1.0 + 2*transformedObjectCoords(1,0) : -1.0 +2*transformedObjectCoords(1,0);
+	retVec[0] = transformedObjectCoords(0,0) < 0 ? 1.0 + 2*transformedObjectCoords(0,0) + transformedOneHalfVoxel(0,0): -1.0 +2*transformedObjectCoords(0,0) + transformedOneHalfVoxel(0,0);
+	retVec[1] = transformedObjectCoords(1,0) < 0 ? 1.0 + 2*transformedObjectCoords(1,0) + transformedOneHalfVoxel(1,0): -1.0 +2*transformedObjectCoords(1,0) + transformedOneHalfVoxel(1,0);
 	retVec[2] = transformedObjectCoords(2,0) < 0 ? 1.0 + transformedObjectCoords(2,0) : transformedObjectCoords(2,0);
 	return retVec;
 	
