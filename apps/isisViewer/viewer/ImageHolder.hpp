@@ -41,7 +41,7 @@ public:
 	boost::numeric::ublas::matrix<float> getNormalizedImageOrientation( bool transposed = false ) const;
 	boost::numeric::ublas::matrix<float> getImageOrientation( bool transposed = false ) const;
 	
-	bool operator<( const ImageHolder& h ) const { return m_ID < h.getID(); }
+	bool operator<( const ImageHolder &ref ) const { return m_ID < ref.getID(); }
 
 private:
 	size_t m_NumberOfTimeSteps;

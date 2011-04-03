@@ -7,10 +7,8 @@ namespace isis
 namespace viewer
 {
 
-void GLCrossHair::draw( float _x, float _y )
+void GLCrossHair::draw( float x, float y )
 {
-	glMatrixMode( GL_PROJECTION );
-	glTranslated( _x, -_y, 0 );
 	glColor4f( 0, 0, 0, 0 );
 	glColor4f( 1, 0, 0, 0 );
 	//  glEnable(GL_LINE_STIPPLE);
@@ -29,7 +27,7 @@ void GLCrossHair::draw( float _x, float _y )
 	glEnd();
 	glPointSize( 2.0 );
 	glBegin( GL_POINTS );
-	glVertex3d( 0, 0, -1 );
+	glVertex3d( x, y, -1 );
 	glEnd();
 	//  glDisable(GL_LINE_STIPPLE);
 	glFlush();

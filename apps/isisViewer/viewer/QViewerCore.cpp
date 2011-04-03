@@ -7,8 +7,8 @@ namespace viewer
 
 QViewerCore::QViewerCore( data::Image image ): ViewerCoreBase( image )
 {
-	
 }
+
 
 
 bool

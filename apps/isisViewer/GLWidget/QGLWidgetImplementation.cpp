@@ -70,7 +70,7 @@ void QGLWidgetImplementation::initializeGL()
 void QGLWidgetImplementation::resizeGL( int w, int h )
 {
 	LOG( Debug, verbose_info ) << "resizeGL " << objectName().toStdString();
-	lookAtVoxel(util::ivector4(50,50,100,0));
+	lookAtVoxel(util::ivector4(90,109,91,0));
 	
 }
 
@@ -89,12 +89,30 @@ void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const
 	//to visualize with the correct scaling we take the viewport
 	GLOrientationHandler::recalculateViewport( width(), height(), image, planeOrientatioMatrix, m_StateValues[image].viewport );
 	
+	glGetDoublev(GL_MODELVIEW_MATRIX, m_StateValues[image].modelViewMatrix );
+	glGetDoublev(GL_PROJECTION_MATRIX, m_StateValues[image].projectionMatrix );
+	
 	//TODO debug
 	m_StateValues[image].normalizedSlice = 0.5;
 
 }
 
+std::pair<GLdouble, GLdouble> QGLWidgetImplementation::window2ObjectCoords(size_t winx, size_t winy) const
+{
+	State stateValue = m_StateValues.at(m_ViewerCore->getCurrentImage());
+	GLdouble pos[3];
+	gluUnProject(winx, winy, 0, stateValue.modelViewMatrix, stateValue.projectionMatrix, stateValue.viewport ,&pos[0], &pos[1], &pos[2] );
+	return std::make_pair<GLdouble, GLdouble>(pos[0], pos[1]);
+	
+}
 
+std::pair<size_t, size_t> QGLWidgetImplementation::object2WindowCoords(GLdouble objx, GLdouble objy) const
+{
+	State stateValue = m_StateValues.at(m_ViewerCore->getCurrentImage());
+	GLdouble win[3];
+	gluProject( objx, objy, 0, stateValue.modelViewMatrix, stateValue.projectionMatrix, stateValue.viewport, &win[0], &win[1], &win[2] );
+	return std::make_pair<size_t, size_t>( win[0], win[1] );
+}
 
 
 bool QGLWidgetImplementation::lookAtVoxel( const isis::util::ivector4& voxelCoords )
@@ -146,13 +164,49 @@ void QGLWidgetImplementation::paintScene()
 		glEnd();
 		glDisable( GL_TEXTURE_3D );
 	}
+	
+	//paint crosshair
+	util::fvector4 objectCoords = GLOrientationHandler::transformVoxel2ObjectCoords(m_StateValues.at(m_ViewerCore->getCurrentImage()).voxelCoords, m_ViewerCore->getCurrentImage(), m_PlaneOrientation);
+	std::pair<size_t, size_t> crosshairCoords = object2WindowCoords( objectCoords[0], objectCoords[1] );
+	glColor4f( 0, 0, 0, 0 );
+	glColor4f( 1, 0, 0, 0 );
+	glLineWidth( 1.0 );
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0,width(), 0, height(),-1,1);
+	glBegin( GL_LINES );
+	unsigned short gap = height() / 20;
+	glVertex3i( crosshairCoords.first , 0, -1 );
+	glVertex3i( crosshairCoords.first, crosshairCoords.second - gap ,-1 );
+	glVertex3i( crosshairCoords.first, crosshairCoords.second + gap, -1 );
+	glVertex3i( crosshairCoords.first, height(), -1 );
+
+	glVertex3i( 0, crosshairCoords.second, -1);
+	glVertex3i( crosshairCoords.first - gap, crosshairCoords.second, -1);
+	glVertex3i( crosshairCoords.first + gap, crosshairCoords.second, -1);
+	glVertex3i( width(), crosshairCoords.second, -1);
+	glEnd();
+	glPointSize( 2.0 );
+	glBegin( GL_POINTS );
+	glVertex3d( crosshairCoords.first, crosshairCoords.second, -1 );
+	glEnd();
 	glFlush();
+	glLoadIdentity();
 	redraw();
 		
 }
 
 void QGLWidgetImplementation::mouseMoveEvent( QMouseEvent *e )
 {
+	//TODO debug
+	std::cout << "mousePos: " << e->x() << " : " << (height() - e->y()) << std::endl;
+	std::pair<float, float> objectCoords = window2ObjectCoords( e->x(), (height() - e->y()) );
+	util::ivector4 voxelCoords = GLOrientationHandler::transformObject2VoxelCoords( util::fvector4(objectCoords.first, objectCoords.second, m_StateValues.at(m_ViewerCore->getCurrentImage() ).normalizedSlice ), m_ViewerCore->getCurrentImage(), m_PlaneOrientation );
+	std::cout << "voxelCoords: " << voxelCoords << std::endl;
+	util::fvector4 objectCoordsPost = GLOrientationHandler::transformVoxel2ObjectCoords( voxelCoords, m_ViewerCore->getCurrentImage(), m_PlaneOrientation );
+	std::pair<GLdouble, GLdouble> mousePosPost = object2WindowCoords( objectCoordsPost[0], objectCoordsPost[1] );
+	std::cout << "post: " << mousePosPost.first << " : " << mousePosPost.second << std::endl;
+
 	if ( buttonPressed ) {
 		emitMousePressEvent( e );
 	}

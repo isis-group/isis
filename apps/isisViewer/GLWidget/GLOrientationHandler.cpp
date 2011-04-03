@@ -82,6 +82,41 @@ void GLOrientationHandler::addOffset(GLOrientationHandler::MatrixType& matrix)
 	}
 }
 
+util::ivector4 GLOrientationHandler::transformObject2VoxelCoords( const util::fvector4 objectCoords, const isis::viewer::ImageHolder& image, GLOrientationHandler::PlaneOrientation orientation)
+{
+	GLOrientationHandler::MatrixType planeOrientatioMatrix = 
+		GLOrientationHandler::transformToPlaneView( image.getNormalizedImageOrientation(), orientation );
+	MatrixType objectCoordsMatrix = zero_matrix<float>( matrixSize, 1);
+	objectCoordsMatrix(0,0) = (objectCoords[0] + 1) / 2;
+	objectCoordsMatrix(1,0) = (objectCoords[1] + 1) / 2;
+	objectCoordsMatrix(2,0) = objectCoords[2];
+	MatrixType transformedObjectCoords = prod( trans(planeOrientatioMatrix), objectCoordsMatrix);
+	short voxelx =  image.getImageSize()[0] * transformedObjectCoords(0,0);
+	short voxely =  image.getImageSize()[1] * transformedObjectCoords(1,0);
+	short voxelz =  image.getImageSize()[2] * transformedObjectCoords(2,0);
+	voxelx = voxelx < 0 ? image.getImageSize()[0] + voxelx : voxelx;
+	voxely = voxely < 0 ? image.getImageSize()[1] + voxely : voxely;
+	voxelz = voxelz < 0 ? image.getImageSize()[2] + voxelz : voxelz;
+	return util::ivector4( voxelx, voxely, voxelz );
+	
+}
+
+util::fvector4 GLOrientationHandler::transformVoxel2ObjectCoords(const isis::util::ivector4 voxelCoords, const isis::viewer::ImageHolder& image, GLOrientationHandler::PlaneOrientation orientation)
+{
+	GLOrientationHandler::MatrixType planeOrientatioMatrix = 
+		GLOrientationHandler::transformToPlaneView( image.getNormalizedImageOrientation(), orientation );
+	MatrixType objectCoords = zero_matrix<float>(matrixSize, 1);
+	for (unsigned short i = 0; i<3;i++) {
+		objectCoords(i,0) = (1.0 / image.getImageSize()[i]) * voxelCoords[i];
+	}
+	MatrixType transformedObjectCoords = prod( planeOrientatioMatrix, objectCoords);
+	util::fvector4 retVec;
+	retVec[0] = transformedObjectCoords(0,0) < 0 ? 1.0 + 2*transformedObjectCoords(0,0) : -1.0 +2*transformedObjectCoords(0,0);
+	retVec[1] = transformedObjectCoords(1,0) < 0 ? 1.0 + 2*transformedObjectCoords(1,0) : -1.0 +2*transformedObjectCoords(1,0);
+	retVec[2] = transformedObjectCoords(2,0) < 0 ? 1.0 + transformedObjectCoords(2,0) : transformedObjectCoords(2,0);
+	return retVec;
+	
+}
 
 
 void GLOrientationHandler::recalculateViewport( size_t w, size_t h, const ImageHolder &image, const MatrixType &orientation, GLint *viewport, size_t border )

@@ -37,10 +37,10 @@ private:
 
 public Q_SLOTS:
 	/**
-	 * The function lookAtVoxel is responsible for drawing an image with the given imageID.
-	 * If the imageID does not exist or the voxelCoords are outside the image it returns false.
+	 * The function lookAtVoxel is responsible for drawing an image.
+	 * If the voxelCoords are outside the image it returns false.
 	 * Otherwise it will return true.
-	 * @param imageID The image that has to be drawn
+	 * @param image The image that has to be drawn
 	 * @param voxelCoords The voxelCoords that has to be drawn. This also specifies the crosshair position
 	 * @return True if imageID exists and voxelCoords are inside the image. Otherwise returns false.
 	 */
@@ -70,11 +70,15 @@ private:
 	void connectSignals();
 	void commonInit();
 	void emitMousePressEvent( QMouseEvent *e );
+	
+	std::pair<GLdouble, GLdouble> window2ObjectCoords( size_t winx, size_t winy ) const;
+	std::pair<size_t, size_t> object2WindowCoords( GLdouble objx, GLdouble objy ) const;
+
 
 	std::vector<GLuint> m_TextureIDVec;
 	GLOrientationHandler::PlaneOrientation m_PlaneOrientation;
 	GLCrossHair m_CrossHair;
-	
+
 	struct State {
 		GLdouble modelViewMatrix[16];
 		GLdouble textureMatrix[16];

@@ -19,7 +19,7 @@ public:
 	virtual void addImageList( const std::list<data::Image> imageList );
 	virtual void setImageList( const std::list<data::Image> imageList );
 	
-
+	void setCurrentImage( const ImageHolder &image ) { m_CurrentImage = image; }
 	const ImageHolder &getCurrentImage() const { return m_CurrentImage; }
 	size_t getCurrentTimestep() const { return m_CurrentTimestep; }
 	bool setCurrentTimestep( size_t timestep ) {

@@ -37,6 +37,7 @@ public:
 
 	};
 	
+	
 protected Q_SLOTS:
 	virtual void voxelCoordChanged( util::ivector4 );
 	virtual void timestepChanged( int );

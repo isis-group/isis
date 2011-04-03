@@ -28,6 +28,9 @@ public:
 	
 	static void recalculateViewport( size_t w, size_t h, const ImageHolder &image, const MatrixType &orientation, GLint  *viewport, size_t border = 0 );
 	
+	static util::ivector4 transformObject2VoxelCoords( const util::fvector4 objectCoords, const ImageHolder &image, PlaneOrientation orientation );
+	
+	static util::fvector4 transformVoxel2ObjectCoords( const util::ivector4 voxelCoords, const ImageHolder &image, PlaneOrientation orientation );
 	
 	//some helper functions
 	static void boostMatrix2Pointer( const MatrixType &boostMatrix, GLdouble *pointerMatrix );
