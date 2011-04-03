@@ -43,6 +43,7 @@ protected Q_SLOTS:
 	virtual void timestepChanged( int );
 	
 Q_SIGNALS:
+	void emitVoxelCoordChanged( util::ivector4 );
 	void emitTimeStepChange( unsigned int );
 private:
 	//this map holds the widgets associated with a given name
