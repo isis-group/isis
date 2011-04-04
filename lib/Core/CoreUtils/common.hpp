@@ -216,37 +216,22 @@ stringToList( const std::basic_string<charT, traits> &source,  charT separator )
 
 /**
  * Fuzzy comparison between floating point values.
- * Will raise a compiler error when not used with floating point types.
+ * - Will return true if and only if the difference between two values is "small" compared to their magnitude.
+ * - Will raise a compiler error when not used with floating point types.
  * @param a first value to compare with
  * @param b second value to compare with
- * @param boost a scaling factor to regulate the "fuzzyness" of the operation. A higher
- * value will result in a more fuzzy check. Normally one would use multiple of 10.
- * \returns true if the difference between the two values is significantly small compared to their values.
+ * @param thresh a threshold factor to set a minimal difference to be still considered equal independent of the values itself.
+ * Eg. "1" means any difference less than the epsilon of the used floating point type will allways be considered equal.
+ * If any of the values is greater than "1" the "allowed" difference will be bigger.
+ * \returns \f[ |a-b| <= \varepsilon_T * \lceil |a|,|b|,|thresh| \rceil \f].
  */
-template<typename T> bool fuzzyEqual( T a, T b, unsigned short boost = 1 )
+template<typename T> bool fuzzyEqual( T a, T b, float thresh = 0 )
 {
 	BOOST_MPL_ASSERT( ( boost::is_float<T> ) );
+
 	const T epsilon = std::numeric_limits<T>::epsilon();
-
-	if ( a == b )
-		return true;
-
-	if( a < 0 && b > 0 ) {
-		b += -a;
-		a = 0;
-	} else if( a > 0 && b < 0 ) {
-		a += -b;
-		b = 0;
-	}
-
-	if( a == 0 && std::fabs( b ) < epsilon * boost )
-		return true;
-
-	if( b == 0 && std::fabs( a ) < epsilon * boost )
-		return true;
-
-	const T dist_fac = ( std::max( a, b ) / std::min( a, b ) ) - 1;
-	return  dist_fac <= epsilon * boost;
+	const T factor = std::max<T> ( std::max<T> ( std::abs( a ), std::abs( b ) ), std::abs( thresh ) );
+	return std::abs( a - b ) <= epsilon * factor;
 }
 
 typedef CoreDebug Debug;

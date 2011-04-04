@@ -4,7 +4,7 @@
 #include <boost/mpl/vector/vector30.hpp>
 #include <boost/mpl/distance.hpp>
 #include <boost/mpl/plus.hpp>
-
+#include <boost/mpl/int.hpp>
 #include <boost/mpl/find.hpp>
 #include <boost/mpl/contains.hpp>
 
@@ -31,10 +31,9 @@ typedef std::list<std::string> slist;
 /// @cond _internal
 namespace _internal
 {
-using namespace boost::mpl;
 
 /// the supported types as mpl-vector
-typedef vector23 < //increase this if a type is added (if >30 consider including vector40 above)
+typedef boost::mpl::vector23 < //increase this if a type is added (if >30 consider including vector40 above)
 bool
 , int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t
 , float, double
@@ -52,7 +51,11 @@ bool
  * This is a compile-time-constant, so it can be used as a template parameter and has no impact at the runtime.
  */
 template<class T> struct TypeID {
-	typedef plus< int_<1>, typename distance<begin<types>::type, typename find<types, T>::type >::type > type;
+	typedef boost::mpl::plus<
+		boost::mpl::int_<1>,
+		typename boost::mpl::distance<boost::mpl::begin<types>::type,
+		typename boost::mpl::find<types, T>::type >::type
+	> type;
 	static const unsigned short value = type::value;
 };
 }
