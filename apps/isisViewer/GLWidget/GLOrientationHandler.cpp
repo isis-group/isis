@@ -158,6 +158,17 @@ void GLOrientationHandler::recalculateViewport( size_t w, size_t h, const ImageH
 
 }
 
+void GLOrientationHandler::makeIdentity(GLdouble* matrix)
+{
+	unsigned short index = 0;
+	for (unsigned short row = 0; row < matrixSize; row++ ) {
+		for (unsigned short column = 0; column < matrixSize; column++ )
+		{
+			matrix[index++] = row == column ? 1 : 0;
+		}
+	}
+}
+
 
 }
 } // end namespace

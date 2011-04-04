@@ -36,6 +36,8 @@ public:
 	static void boostMatrix2Pointer( const MatrixType &boostMatrix, GLdouble *pointerMatrix );
 
 	static void addOffset( MatrixType &matrix );
+	
+	static void makeIdentity( GLdouble *matrix );
 
 };
 

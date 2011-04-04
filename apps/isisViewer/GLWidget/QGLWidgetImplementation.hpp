@@ -70,14 +70,19 @@ private:
 	void commonInit();
 	void emitMousePressEvent( QMouseEvent *e );
 
-	std::pair<GLdouble, GLdouble> window2ObjectCoords( size_t winx, size_t winy ) const;
-	std::pair<size_t, size_t> object2WindowCoords( GLdouble objx, GLdouble objy ) const;
+	std::pair<GLdouble, GLdouble> window2ObjectCoords( int16_t winx, int16_t winy ) const;
+	std::pair<int16_t, int16_t> object2WindowCoords( GLdouble objx, GLdouble objy ) const;
 
 
 	std::vector<GLuint> m_TextureIDVec;
 	GLOrientationHandler::PlaneOrientation m_PlaneOrientation;
 
 	struct State {
+		State() { 
+			GLOrientationHandler::makeIdentity( modelViewMatrix );
+			GLOrientationHandler::makeIdentity( projectionMatrix );
+			GLOrientationHandler::makeIdentity( textureMatrix );
+		}
 		GLdouble modelViewMatrix[16];
 		GLdouble textureMatrix[16];
 		GLdouble projectionMatrix[16];
@@ -85,10 +90,19 @@ private:
 		float normalizedSlice;
 		GLuint textureID;
 		util::ivector4 voxelCoords;
-		std::pair<size_t, size_t> crosshairCoords;
+		std::pair<int16_t, int16_t> crosshairCoords;
 	};
 	typedef std::map<ImageHolder, State> StateMap;
 	StateMap m_StateValues;
+	
+	struct Zoom {
+		Zoom() { zoomFactor = 2.0; 
+				currentZoom = 1.0; 
+		}
+		float currentZoom;
+		float zoomFactor;
+	} m_Zoom;
+		
 
 	//flags
 	bool buttonPressed;

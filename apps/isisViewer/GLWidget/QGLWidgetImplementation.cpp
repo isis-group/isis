@@ -91,15 +91,14 @@ void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const
 	//to visualize with the correct scaling we take the viewport
 	GLOrientationHandler::recalculateViewport( width(), height(), image, planeOrientatioMatrix, m_StateValues[image].viewport );
 
-	glGetDoublev( GL_MODELVIEW_MATRIX, m_StateValues[image].modelViewMatrix );
-	glGetDoublev( GL_PROJECTION_MATRIX, m_StateValues[image].projectionMatrix );
-
 	util::fvector4 objectCoords = GLOrientationHandler::transformVoxel2ObjectCoords( m_StateValues[image].voxelCoords, image, m_PlaneOrientation );
 	m_StateValues[image].crosshairCoords = object2WindowCoords( objectCoords[0], objectCoords[1] );
+	//we have to look if the crosshair is inside the window. if not, we have to translate to make it visible
+	//TODO
 	m_StateValues[image].normalizedSlice = objectCoords[2];
 }
 
-std::pair<GLdouble, GLdouble> QGLWidgetImplementation::window2ObjectCoords( size_t winx, size_t winy ) const
+std::pair<GLdouble, GLdouble> QGLWidgetImplementation::window2ObjectCoords( int16_t winx, int16_t winy ) const
 {
 	State stateValue = m_StateValues.at( m_ViewerCore->getCurrentImage() );
 	GLdouble pos[3];
@@ -108,13 +107,13 @@ std::pair<GLdouble, GLdouble> QGLWidgetImplementation::window2ObjectCoords( size
 
 }
 
-std::pair<size_t, size_t> QGLWidgetImplementation::object2WindowCoords( GLdouble objx, GLdouble objy ) const
+std::pair<int16_t, int16_t> QGLWidgetImplementation::object2WindowCoords( GLdouble objx, GLdouble objy ) const
 {
 	State stateValue = m_StateValues.at( m_ViewerCore->getCurrentImage() );
 	GLdouble win[3];
 
 	gluProject( objx, objy, 0, stateValue.modelViewMatrix, stateValue.projectionMatrix, stateValue.viewport, &win[0], &win[1], &win[2] );
-	return std::make_pair<size_t, size_t>( win[0] - stateValue.viewport[0], win[1] - stateValue.viewport[1] );
+	return std::make_pair<int16_t, int16_t>( win[0] - stateValue.viewport[0], win[1] - stateValue.viewport[1] );
 }
 
 
@@ -122,7 +121,6 @@ bool QGLWidgetImplementation::lookAtVoxel( const isis::util::ivector4 &voxelCoor
 {
 	//someone has told the widget to paint a list of images with the respective ids.
 	//So first we have to update the state values for each image
-	m_StateValues.clear();
 	BOOST_FOREACH( DataContainer::const_reference image, m_ViewerCore->getDataContainer() ) {
 		updateStateValues( image, voxelCoords );
 	}
@@ -136,7 +134,6 @@ bool QGLWidgetImplementation::lookAtVoxel( const ImageHolder &image, const util:
 	updateStateValues( image, voxelCoords );
 	paintScene();
 
-
 }
 
 
@@ -146,6 +143,11 @@ void QGLWidgetImplementation::paintScene()
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	BOOST_FOREACH( StateMap::const_reference currentImage, m_StateValues ) {
 		glViewport( currentImage.second.viewport[0], currentImage.second.viewport[1], currentImage.second.viewport[2], currentImage.second.viewport[3] );
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glLoadMatrixd( currentImage.second.projectionMatrix );
+		glMatrixMode( GL_MODELVIEW );
+		glLoadMatrixd( currentImage.second.modelViewMatrix );
 		glMatrixMode( GL_TEXTURE );
 		glLoadIdentity();
 		glLoadMatrixd( currentImage.second.textureMatrix );
@@ -165,7 +167,6 @@ void QGLWidgetImplementation::paintScene()
 	}
 	//paint crosshair
 	State currentState = m_StateValues.at( m_ViewerCore->getCurrentImage() );
-
 	glColor4f( 1, 0, 0, 0 );
 	glLineWidth( 1.0 );
 	glMatrixMode( GL_PROJECTION );
@@ -233,7 +234,19 @@ bool QGLWidgetImplementation::timestepChanged( unsigned int timestep )
 
 void QGLWidgetImplementation::wheelEvent( QWheelEvent *e )
 {
-
+	float zoomFactor = 1;
+	if(e->delta() < 0 )
+	{
+		zoomFactor = m_Zoom.zoomFactor / 2;
+	} else if (e->delta() > 0 ) { zoomFactor = m_Zoom.zoomFactor; } 
+	m_Zoom.currentZoom *= zoomFactor;
+	glMatrixMode(GL_PROJECTION);
+	glLoadMatrixd(m_StateValues[m_ViewerCore->getCurrentImage()].projectionMatrix );
+	glScalef(zoomFactor, zoomFactor, 1);
+	glGetDoublev( GL_PROJECTION_MATRIX, m_StateValues[m_ViewerCore->getCurrentImage()].projectionMatrix );
+	glLoadIdentity();
+	lookAtVoxel(m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords);
+	
 
 }
 
