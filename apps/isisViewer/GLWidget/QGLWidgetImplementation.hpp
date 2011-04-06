@@ -72,6 +72,8 @@ private:
 
 	std::pair<GLdouble, GLdouble> window2ObjectCoords( int16_t winx, int16_t winy ) const;
 	std::pair<int16_t, int16_t> object2WindowCoords( GLdouble objx, GLdouble objy ) const;
+	
+	bool calculateTranslation( const ImageHolder &image );
 
 
 	std::vector<GLuint> m_TextureIDVec;
@@ -96,11 +98,15 @@ private:
 	StateMap m_StateValues;
 	
 	struct Zoom {
-		Zoom() { zoomFactor = 2.0; 
+		Zoom() { zoomFactorIn = 2.0; 
+				zoomFactorOut = 0.5;
 				currentZoom = 1.0; 
+				zoomBorder = 0.1;
 		}
 		float currentZoom;
-		float zoomFactor;
+		float zoomFactorIn;
+		float zoomFactorOut;
+		float zoomBorder;
 	} m_Zoom;
 		
 

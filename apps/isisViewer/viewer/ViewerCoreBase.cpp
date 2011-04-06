@@ -9,7 +9,7 @@ ViewerCoreBase::ViewerCoreBase( data::Image image )
 	: m_CurrentTimestep( 0 ),
 	  m_CurrentImage( image )
 {
-
+	setCurrentImage( image );
 }
 void ViewerCoreBase::addImageList( const std::list< data::Image > imageList )
 {

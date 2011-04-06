@@ -14,7 +14,7 @@ class ViewerCoreBase
 {
 
 public:
-	ViewerCoreBase( data::Image );
+	ViewerCoreBase( data::Image image );
 
 	virtual void addImageList( const std::list<data::Image> imageList );
 	virtual void setImageList( const std::list<data::Image> imageList );

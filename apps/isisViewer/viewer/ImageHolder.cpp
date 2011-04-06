@@ -89,10 +89,6 @@ boost::numeric::ublas::matrix< float > ImageHolder::getImageOrientation( bool tr
 	return retMatrix;
 }
 
-
-
-
-
 bool ImageHolder::setImage( data::Image image )
 {
 

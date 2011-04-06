@@ -71,7 +71,7 @@ void QGLWidgetImplementation::initializeGL()
 void QGLWidgetImplementation::resizeGL( int w, int h )
 {
 	LOG( Debug, verbose_info ) << "resizeGL " << objectName().toStdString();
-	lookAtVoxel( util::ivector4( 90, 109, 181, 0 ) );
+	lookAtVoxel( util::ivector4( 90, 109, 91, 0 ) );
 
 }
 
@@ -94,7 +94,8 @@ void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const
 	util::fvector4 objectCoords = GLOrientationHandler::transformVoxel2ObjectCoords( m_StateValues[image].voxelCoords, image, m_PlaneOrientation );
 	m_StateValues[image].crosshairCoords = object2WindowCoords( objectCoords[0], objectCoords[1] );
 	//we have to look if the crosshair is inside the window. if not, we have to translate to make it visible
-	//TODO
+	calculateTranslation( image );
+	
 	m_StateValues[image].normalizedSlice = objectCoords[2];
 }
 
@@ -116,6 +117,19 @@ std::pair<int16_t, int16_t> QGLWidgetImplementation::object2WindowCoords( GLdoub
 	return std::make_pair<int16_t, int16_t>( win[0] - stateValue.viewport[0], win[1] - stateValue.viewport[1] );
 }
 
+bool QGLWidgetImplementation::calculateTranslation( const ImageHolder &image )
+{
+	std::pair<int16_t, int16_t> center = std::make_pair<int16_t, int16_t>( width() / 2, height() / 2);
+	if(center.first != m_StateValues[image].crosshairCoords.first) {
+		m_StateValues[image].modelViewMatrix[12] = -(1.0 / m_StateValues[image].viewport[2] ) * (m_StateValues[image].crosshairCoords.first - center.first) ;	
+		m_StateValues[image].modelViewMatrix[13] = -(1.0 / m_StateValues[image].viewport[3] ) * (m_StateValues[image].crosshairCoords.second - center.second) ;
+	}
+	
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glLoadMatrixd( m_StateValues[image].modelViewMatrix );
+
+}
 
 bool QGLWidgetImplementation::lookAtVoxel( const isis::util::ivector4 &voxelCoords )
 {
@@ -237,18 +251,23 @@ void QGLWidgetImplementation::wheelEvent( QWheelEvent *e )
 	float zoomFactor = 1;
 	if(e->delta() < 0 )
 	{
-		zoomFactor = m_Zoom.zoomFactor / 2;
-	} else if (e->delta() > 0 ) { zoomFactor = m_Zoom.zoomFactor; } 
+		zoomFactor = m_Zoom.zoomFactorOut;
+	} else if (e->delta() > 0 ) { zoomFactor = m_Zoom.zoomFactorIn; } 
 	m_Zoom.currentZoom *= zoomFactor;
-	glMatrixMode(GL_PROJECTION);
-	glLoadMatrixd(m_StateValues[m_ViewerCore->getCurrentImage()].projectionMatrix );
-	glScalef(zoomFactor, zoomFactor, 1);
-	glGetDoublev( GL_PROJECTION_MATRIX, m_StateValues[m_ViewerCore->getCurrentImage()].projectionMatrix );
-	glLoadIdentity();
-	lookAtVoxel(m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords);
-	
+	if(m_Zoom.currentZoom >= 1) {
+		glMatrixMode(GL_PROJECTION);
+		glLoadMatrixd(m_StateValues[m_ViewerCore->getCurrentImage()].projectionMatrix );
+		glScalef(zoomFactor, zoomFactor, 1);
+		glGetDoublev( GL_PROJECTION_MATRIX, m_StateValues[m_ViewerCore->getCurrentImage()].projectionMatrix );
+		glLoadIdentity();
+		lookAtVoxel(m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords);
+	} else {
+		m_Zoom.currentZoom = 1;
+	}
 
 }
+
+
 
 
 void QGLWidgetImplementation::mouseReleaseEvent( QMouseEvent *e )
