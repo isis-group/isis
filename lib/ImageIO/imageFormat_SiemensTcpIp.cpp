@@ -1,4 +1,4 @@
-/*
+	/*
  *  imageFormat_SiemensTcpIp.cpp
  *  BARTApplication
  *
@@ -152,6 +152,7 @@ namespace isis
 												
 						memcpy(dataBuffer + data_received, buffer, byteSize - data_received);
 						data_received += byteSize - data_received;
+						
 						 printf("!!! ByteSize: %d      dataRec: %ld       imageNR: %d\n", byteSize, data_received, image_counter);
 						
 						// ... do something ...
@@ -178,7 +179,7 @@ namespace isis
                                 //*********
                                 
                                 // now, create chunks per slice and feed it with metadata
-                                data::Chunk chT(data::MemChunk<int16_t>((int16_t*)slice_buffer, height_slice,width_slice,1) );
+                                data::Chunk chT(data::MemChunk<uint16_t>((uint16_t*)slice_buffer, height_slice,width_slice,1) );
 								data::MemChunk<float> ch(chT);
                                 ch.setPropertyAs("indexOrigin", slice_pos_vec);
                                 ch.setPropertyAs<uint32_t>("acquisitionNumber", acq_nr);
