@@ -16,7 +16,7 @@ namespace isis
 namespace viewer
 {
 
-	
+
 class GLOrientationHandler
 {
 	static const unsigned short matrixSize;
@@ -37,23 +37,24 @@ public:
 	static void boostMatrix2Pointer( const MatrixType &boostMatrix, GLdouble *pointerMatrix );
 
 	static void addOffset( MatrixType &matrix );
-	
+
 	static void makeIdentity( GLdouble *matrix );
-	
+
 	template<typename TYPE>
-	static util::FixedVector<TYPE, 4> transformVector( util::FixedVector<TYPE,4> inVec, boost::numeric::ublas::matrix<TYPE> transform )
-	{
+	static util::FixedVector<TYPE, 4> transformVector( util::FixedVector<TYPE, 4> inVec, boost::numeric::ublas::matrix<TYPE> transform ) {
 		boost::numeric::ublas::vector<TYPE> tempVec( matrixSize );
-		for( size_t i = 0; i< matrixSize;i++)
-		{
+
+		for( size_t i = 0; i < matrixSize; i++ ) {
 			tempVec( i ) = inVec[i];
 		}
+
 		boost::numeric::ublas::vector<TYPE> result = boost::numeric::ublas::prod( transform, tempVec );
 		util::FixedVector<TYPE, 4> retVec;
-		for( size_t i = 0; i< matrixSize;i++)
-		{
+
+		for( size_t i = 0; i < matrixSize; i++ ) {
 			retVec[i] = result( i );
 		}
+
 		return retVec;
 	}
 

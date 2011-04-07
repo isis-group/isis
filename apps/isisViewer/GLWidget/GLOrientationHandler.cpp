@@ -127,9 +127,11 @@ void GLOrientationHandler::recalculateViewport( size_t w, size_t h, util::fvecto
 {
 	//first we have to map the imagesize and scaling to our current planeview
 	util::fvector4 physicalSize;
+
 	for ( unsigned short i = 0; i < 3; i++ ) {
 		physicalSize[i] = mappedVoxelSize[i] * mappedImageSize[i];
 	}
+
 	size_t wspace = w - 2 * border;
 	size_t hspace = h - 2 * border;
 	float scalew = wspace / physicalSize[0];
@@ -143,12 +145,12 @@ void GLOrientationHandler::recalculateViewport( size_t w, size_t h, util::fvecto
 
 }
 
-void GLOrientationHandler::makeIdentity(GLdouble* matrix)
+void GLOrientationHandler::makeIdentity( GLdouble *matrix )
 {
 	unsigned short index = 0;
-	for (unsigned short row = 0; row < matrixSize; row++ ) {
-		for (unsigned short column = 0; column < matrixSize; column++ )
-		{
+
+	for ( unsigned short row = 0; row < matrixSize; row++ ) {
+		for ( unsigned short column = 0; column < matrixSize; column++ ) {
 			matrix[index++] = row == column ? 1 : 0;
 		}
 	}

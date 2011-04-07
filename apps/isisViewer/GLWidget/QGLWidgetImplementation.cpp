@@ -36,8 +36,6 @@ void QGLWidgetImplementation::commonInit()
 	//flags
 	buttonPressed = false;
 
-
-
 }
 
 
@@ -71,7 +69,7 @@ void QGLWidgetImplementation::initializeGL()
 void QGLWidgetImplementation::resizeGL( int w, int h )
 {
 	LOG( Debug, verbose_info ) << "resizeGL " << objectName().toStdString();
-	lookAtVoxel( util::ivector4(90,109,91 ) );
+	lookAtVoxel( util::ivector4( 90, 109, 91 ) );
 }
 
 void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const util::ivector4 &voxelCoords )
@@ -79,21 +77,23 @@ void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const
 	LOG( Debug, verbose_info ) << "Updating state values for widget " << objectName().toStdString();
 	State &state = m_StateValues[image];
 	state.voxelCoords = voxelCoords;
-	
+
 	//if not happend already copy the image to GLtexture memory and return the texture id
 	state.textureID = util::Singletons::get<GLTextureHandler, 10>().copyImageToTexture( m_ViewerCore->getDataContainer(), image, voxelCoords[3] );
+
 	//update the texture matrix.
 	//The texture matrix holds the orientation of the image and the orientation of the current widget. It does NOT hold the scaling of the image.
-	if(! state.set ) {
+	if( ! state.set ) {
 		state.planeOrientation =
-		GLOrientationHandler::transformToPlaneView( image.getNormalizedImageOrientation(), m_PlaneOrientation );
+			GLOrientationHandler::transformToPlaneView( image.getNormalizedImageOrientation(), m_PlaneOrientation );
 		GLOrientationHandler::addOffset( state.planeOrientation );
 		GLOrientationHandler::boostMatrix2Pointer( state.planeOrientation, state.textureMatrix );
-		state.mappedVoxelSize = GLOrientationHandler::transformVector<float>(image.getPropMap().getPropertyAs<util::fvector4>("voxelSize") + image.getPropMap().getPropertyAs<util::fvector4>("voxelGap") , state.planeOrientation );
-		state.mappedImageSize = GLOrientationHandler::transformVector<int>(image.getImageSize(), state.planeOrientation );
+		state.mappedVoxelSize = GLOrientationHandler::transformVector<float>( image.getPropMap().getPropertyAs<util::fvector4>( "voxelSize" ) + image.getPropMap().getPropertyAs<util::fvector4>( "voxelGap" ) , state.planeOrientation );
+		state.mappedImageSize = GLOrientationHandler::transformVector<int>( image.getImageSize(), state.planeOrientation );
 		state.set = true;
 	}
-	state.mappedVoxelCoords = GLOrientationHandler::transformVector<int>(state.voxelCoords, state.planeOrientation);
+
+	state.mappedVoxelCoords = GLOrientationHandler::transformVector<int>( state.voxelCoords, state.planeOrientation );
 	//to visualize with the correct scaling we take the viewport
 	GLOrientationHandler::recalculateViewport( width(), height(), state.mappedVoxelSize, state.mappedImageSize, state.viewport );
 
@@ -101,7 +101,7 @@ void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const
 	state.crosshairCoords = object2WindowCoords( objectCoords[0], objectCoords[1] );
 	//we have to look if the crosshair is inside the window. if not, we have to translate to make it visible
 	calculateTranslation( image );
-	
+
 	m_StateValues[image].normalizedSlice = objectCoords[2];
 
 }
@@ -127,11 +127,11 @@ std::pair<int16_t, int16_t> QGLWidgetImplementation::object2WindowCoords( GLdoub
 bool QGLWidgetImplementation::calculateTranslation( const ImageHolder &image )
 {
 	State &state = m_StateValues[image];
-	std::pair<int16_t, int16_t> center = std::make_pair<int16_t, int16_t>( abs(state.mappedImageSize[0]) / 2, abs(state.mappedImageSize[1]) / 2);
-	state.modelViewMatrix[12] = (1.0 / abs(state.mappedImageSize[0]) ) * (m_Zoom.currentZoom * (abs(state.mappedVoxelCoords[0]) - center.first)) ;	
-	state.modelViewMatrix[13] = (1.0 / abs(state.mappedImageSize[1]) ) * (m_Zoom.currentZoom * (abs(state.mappedVoxelCoords[1]) - center.second)) ;
-	
-	glMatrixMode(GL_MODELVIEW);
+	std::pair<int16_t, int16_t> center = std::make_pair<int16_t, int16_t>( abs( state.mappedImageSize[0] ) / 2, abs( state.mappedImageSize[1] ) / 2 );
+	state.modelViewMatrix[12] = ( 1.0 / abs( state.mappedImageSize[0] ) ) * ( m_Zoom.currentZoom * ( abs( state.mappedVoxelCoords[0] ) - center.first ) ) ;
+	state.modelViewMatrix[13] = ( 1.0 / abs( state.mappedImageSize[1] ) ) * ( m_Zoom.currentZoom * ( abs( state.mappedVoxelCoords[1] ) - center.second ) ) ;
+
+	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
 	glLoadMatrixd( state.modelViewMatrix );
 
@@ -139,7 +139,7 @@ bool QGLWidgetImplementation::calculateTranslation( const ImageHolder &image )
 
 bool QGLWidgetImplementation::lookAtVoxel( const isis::util::ivector4 &voxelCoords )
 {
-	LOG(Debug, verbose_info) << "Looking at voxel: " << voxelCoords;
+	LOG( Debug, verbose_info ) << "Looking at voxel: " << voxelCoords;
 	//someone has told the widget to paint all available images.
 	//So first we have to update the state values for each image
 	BOOST_FOREACH( DataContainer::const_reference image, m_ViewerCore->getDataContainer() ) {
@@ -164,7 +164,7 @@ void QGLWidgetImplementation::paintScene()
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	BOOST_FOREACH( StateMap::const_reference currentImage, m_StateValues ) {
 		glViewport( currentImage.second.viewport[0], currentImage.second.viewport[1], currentImage.second.viewport[2], currentImage.second.viewport[3] );
-		glMatrixMode(GL_PROJECTION);
+		glMatrixMode( GL_PROJECTION );
 		glLoadIdentity();
 		glLoadMatrixd( currentImage.second.projectionMatrix );
 		glMatrixMode( GL_MODELVIEW );
@@ -256,18 +256,20 @@ bool QGLWidgetImplementation::timestepChanged( unsigned int timestep )
 void QGLWidgetImplementation::wheelEvent( QWheelEvent *e )
 {
 	float zoomFactor = 1;
-	if(e->delta() < 0 )
-	{
+
+	if( e->delta() < 0 ) {
 		zoomFactor = m_Zoom.zoomFactorOut;
-	} else if (e->delta() > 0 ) { zoomFactor = m_Zoom.zoomFactorIn; } 
+	} else if ( e->delta() > 0 ) { zoomFactor = m_Zoom.zoomFactorIn; }
+
 	m_Zoom.currentZoom *= zoomFactor;
-	if(m_Zoom.currentZoom >= 1) {
-		glMatrixMode(GL_PROJECTION);
-		glLoadMatrixd(m_StateValues[m_ViewerCore->getCurrentImage()].projectionMatrix );
-		glScalef(zoomFactor, zoomFactor, 1);
+
+	if( m_Zoom.currentZoom >= 1 ) {
+		glMatrixMode( GL_PROJECTION );
+		glLoadMatrixd( m_StateValues[m_ViewerCore->getCurrentImage()].projectionMatrix );
+		glScalef( zoomFactor, zoomFactor, 1 );
 		glGetDoublev( GL_PROJECTION_MATRIX, m_StateValues[m_ViewerCore->getCurrentImage()].projectionMatrix );
 		glLoadIdentity();
-		lookAtVoxel(m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords);
+		lookAtVoxel( m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords );
 	} else {
 		m_Zoom.currentZoom = 1;
 	}

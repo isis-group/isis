@@ -25,7 +25,7 @@ public:
 	QGLWidgetImplementation( QViewerCore *core, QWidget *parent = 0, QGLWidget *share = 0, GLOrientationHandler::PlaneOrientation orienation = GLOrientationHandler::axial );
 	QGLWidgetImplementation( QViewerCore *core, QWidget *parent = 0, GLOrientationHandler::PlaneOrientation orientation = GLOrientationHandler::axial );
 
-	
+
 
 	QGLWidgetImplementation *createSharedWidget( QWidget *parent, GLOrientationHandler::PlaneOrientation orienation = GLOrientationHandler::axial );
 
@@ -72,15 +72,15 @@ private:
 
 	std::pair<GLdouble, GLdouble> window2ObjectCoords( int16_t winx, int16_t winy ) const;
 	std::pair<int16_t, int16_t> object2WindowCoords( GLdouble objx, GLdouble objy ) const;
-	
+
 	bool calculateTranslation( const ImageHolder &image );
 
 
 	std::vector<GLuint> m_TextureIDVec;
 	GLOrientationHandler::PlaneOrientation m_PlaneOrientation;
-	
+
 	struct State {
-		State() { 
+		State() {
 			GLOrientationHandler::makeIdentity( modelViewMatrix );
 			GLOrientationHandler::makeIdentity( projectionMatrix );
 			GLOrientationHandler::makeIdentity( textureMatrix );
@@ -103,19 +103,20 @@ private:
 
 	typedef std::map<ImageHolder, State> StateMap;
 	StateMap m_StateValues;
-	
+
 	struct Zoom {
-		Zoom() { zoomFactorIn = 2.0; 
-				zoomFactorOut = 0.5;
-				currentZoom = 1.0; 
-				zoomBorder = 0.1;
+		Zoom() {
+			zoomFactorIn = 2.0;
+			zoomFactorOut = 0.5;
+			currentZoom = 1.0;
+			zoomBorder = 0.1;
 		}
 		float currentZoom;
 		float zoomFactorIn;
 		float zoomFactorOut;
 		float zoomBorder;
 	} m_Zoom;
-		
+
 
 	//flags
 	bool buttonPressed;
