@@ -25,7 +25,7 @@ public:
 	QGLWidgetImplementation( QViewerCore *core, QWidget *parent = 0, QGLWidget *share = 0, GLOrientationHandler::PlaneOrientation orienation = GLOrientationHandler::axial );
 	QGLWidgetImplementation( QViewerCore *core, QWidget *parent = 0, GLOrientationHandler::PlaneOrientation orientation = GLOrientationHandler::axial );
 
-
+	
 
 	QGLWidgetImplementation *createSharedWidget( QWidget *parent, GLOrientationHandler::PlaneOrientation orienation = GLOrientationHandler::axial );
 
@@ -78,13 +78,15 @@ private:
 
 	std::vector<GLuint> m_TextureIDVec;
 	GLOrientationHandler::PlaneOrientation m_PlaneOrientation;
-
+	
 	struct State {
 		State() { 
 			GLOrientationHandler::makeIdentity( modelViewMatrix );
 			GLOrientationHandler::makeIdentity( projectionMatrix );
 			GLOrientationHandler::makeIdentity( textureMatrix );
+			set = false;
 		}
+		bool set;
 		GLdouble modelViewMatrix[16];
 		GLdouble textureMatrix[16];
 		GLdouble projectionMatrix[16];
@@ -92,8 +94,13 @@ private:
 		float normalizedSlice;
 		GLuint textureID;
 		util::ivector4 voxelCoords;
+		util::ivector4 mappedVoxelCoords;
+		util::fvector4 mappedVoxelSize;
+		util::ivector4 mappedImageSize;
 		std::pair<int16_t, int16_t> crosshairCoords;
+		GLOrientationHandler::MatrixType planeOrientation;
 	};
+
 	typedef std::map<ImageHolder, State> StateMap;
 	StateMap m_StateValues;
 	

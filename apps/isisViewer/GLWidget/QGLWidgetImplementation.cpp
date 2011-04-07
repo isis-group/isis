@@ -71,32 +71,39 @@ void QGLWidgetImplementation::initializeGL()
 void QGLWidgetImplementation::resizeGL( int w, int h )
 {
 	LOG( Debug, verbose_info ) << "resizeGL " << objectName().toStdString();
-	lookAtVoxel( util::ivector4( 90, 109, 91, 0 ) );
-
+	lookAtVoxel( util::ivector4(90,109,91 ) );
 }
 
 void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const util::ivector4 &voxelCoords )
 {
 	LOG( Debug, verbose_info ) << "Updating state values for widget " << objectName().toStdString();
-	m_StateValues[image].voxelCoords = voxelCoords;
+	State &state = m_StateValues[image];
+	state.voxelCoords = voxelCoords;
+	
 	//if not happend already copy the image to GLtexture memory and return the texture id
-	m_StateValues[image].textureID = util::Singletons::get<GLTextureHandler, 10>().copyImageToTexture( m_ViewerCore->getDataContainer(), image, voxelCoords[3] );
+	state.textureID = util::Singletons::get<GLTextureHandler, 10>().copyImageToTexture( m_ViewerCore->getDataContainer(), image, voxelCoords[3] );
 	//update the texture matrix.
 	//The texture matrix holds the orientation of the image and the orientation of the current widget. It does NOT hold the scaling of the image.
-	GLOrientationHandler::MatrixType planeOrientatioMatrix =
+	if(! state.set ) {
+		state.planeOrientation =
 		GLOrientationHandler::transformToPlaneView( image.getNormalizedImageOrientation(), m_PlaneOrientation );
-	GLOrientationHandler::addOffset( planeOrientatioMatrix );
-	GLOrientationHandler::boostMatrix2Pointer( planeOrientatioMatrix, m_StateValues[image].textureMatrix );
-
+		GLOrientationHandler::addOffset( state.planeOrientation );
+		GLOrientationHandler::boostMatrix2Pointer( state.planeOrientation, state.textureMatrix );
+		state.mappedVoxelSize = GLOrientationHandler::transformVector<float>(image.getPropMap().getPropertyAs<util::fvector4>("voxelSize") + image.getPropMap().getPropertyAs<util::fvector4>("voxelGap") , state.planeOrientation );
+		state.mappedImageSize = GLOrientationHandler::transformVector<int>(image.getImageSize(), state.planeOrientation );
+		state.set = true;
+	}
+	state.mappedVoxelCoords = GLOrientationHandler::transformVector<int>(state.voxelCoords, state.planeOrientation);
 	//to visualize with the correct scaling we take the viewport
-	GLOrientationHandler::recalculateViewport( width(), height(), image, planeOrientatioMatrix, m_StateValues[image].viewport );
+	GLOrientationHandler::recalculateViewport( width(), height(), state.mappedVoxelSize, state.mappedImageSize, state.viewport );
 
-	util::fvector4 objectCoords = GLOrientationHandler::transformVoxel2ObjectCoords( m_StateValues[image].voxelCoords, image, m_PlaneOrientation );
-	m_StateValues[image].crosshairCoords = object2WindowCoords( objectCoords[0], objectCoords[1] );
+	util::fvector4 objectCoords = GLOrientationHandler::transformVoxel2ObjectCoords( state.voxelCoords, image, state.planeOrientation );
+	state.crosshairCoords = object2WindowCoords( objectCoords[0], objectCoords[1] );
 	//we have to look if the crosshair is inside the window. if not, we have to translate to make it visible
 	calculateTranslation( image );
 	
 	m_StateValues[image].normalizedSlice = objectCoords[2];
+
 }
 
 std::pair<GLdouble, GLdouble> QGLWidgetImplementation::window2ObjectCoords( int16_t winx, int16_t winy ) const
@@ -119,21 +126,21 @@ std::pair<int16_t, int16_t> QGLWidgetImplementation::object2WindowCoords( GLdoub
 
 bool QGLWidgetImplementation::calculateTranslation( const ImageHolder &image )
 {
-	std::pair<int16_t, int16_t> center = std::make_pair<int16_t, int16_t>( width() / 2, height() / 2);
-	if(center.first != m_StateValues[image].crosshairCoords.first) {
-		m_StateValues[image].modelViewMatrix[12] = -(1.0 / m_StateValues[image].viewport[2] ) * (m_StateValues[image].crosshairCoords.first - center.first) ;	
-		m_StateValues[image].modelViewMatrix[13] = -(1.0 / m_StateValues[image].viewport[3] ) * (m_StateValues[image].crosshairCoords.second - center.second) ;
-	}
+	State &state = m_StateValues[image];
+	std::pair<int16_t, int16_t> center = std::make_pair<int16_t, int16_t>( abs(state.mappedImageSize[0]) / 2, abs(state.mappedImageSize[1]) / 2);
+	state.modelViewMatrix[12] = (1.0 / abs(state.mappedImageSize[0]) ) * (m_Zoom.currentZoom * (abs(state.mappedVoxelCoords[0]) - center.first)) ;	
+	state.modelViewMatrix[13] = (1.0 / abs(state.mappedImageSize[1]) ) * (m_Zoom.currentZoom * (abs(state.mappedVoxelCoords[1]) - center.second)) ;
 	
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	glLoadMatrixd( m_StateValues[image].modelViewMatrix );
+	glLoadMatrixd( state.modelViewMatrix );
 
 }
 
 bool QGLWidgetImplementation::lookAtVoxel( const isis::util::ivector4 &voxelCoords )
 {
-	//someone has told the widget to paint a list of images with the respective ids.
+	LOG(Debug, verbose_info) << "Looking at voxel: " << voxelCoords;
+	//someone has told the widget to paint all available images.
 	//So first we have to update the state values for each image
 	BOOST_FOREACH( DataContainer::const_reference image, m_ViewerCore->getDataContainer() ) {
 		updateStateValues( image, voxelCoords );

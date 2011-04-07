@@ -102,49 +102,34 @@ util::ivector4 GLOrientationHandler::transformObject2VoxelCoords( const util::fv
 
 }
 
-util::fvector4 GLOrientationHandler::transformVoxel2ObjectCoords( const isis::util::ivector4 voxelCoords, const isis::viewer::ImageHolder &image, GLOrientationHandler::PlaneOrientation orientation )
+util::fvector4 GLOrientationHandler::transformVoxel2ObjectCoords( const isis::util::ivector4 voxelCoords, const isis::viewer::ImageHolder &image, MatrixType orientation )
 {
-	GLOrientationHandler::MatrixType planeOrientatioMatrix =
-		GLOrientationHandler::transformToPlaneView( image.getNormalizedImageOrientation(), orientation );
-	MatrixType objectCoords = zero_matrix<float>( matrixSize, 1 );
-	MatrixType oneHalfVoxel = zero_matrix<float>( matrixSize, 1 );
+	util::fvector4 objectCoords;
+	util::fvector4 oneHalfVoxel;
 
 	for ( unsigned short i = 0; i < 3; i++ ) {
-		objectCoords( i, 0 ) = ( 1.0 / image.getImageSize()[i] ) * voxelCoords[i];
-		oneHalfVoxel( i, 0 ) = 0.5 / image.getImageSize()[i];
+		objectCoords[i] = ( 1.0 / image.getImageSize()[i] ) * voxelCoords[i];
+		oneHalfVoxel[i] = 0.5 / image.getImageSize()[i];
 	}
 
-	MatrixType transformedObjectCoords = prod( planeOrientatioMatrix, objectCoords );
-	MatrixType transformedOneHalfVoxel = prod( planeOrientatioMatrix, oneHalfVoxel );
+	util::fvector4 transformedObjectCoords = transformVector<float>( objectCoords, orientation );
+	util::fvector4 transformedOneHalfVoxel = transformVector<float>( oneHalfVoxel, orientation );
 	util::fvector4 retVec;
-	retVec[0] = transformedObjectCoords( 0, 0 ) < 0 ? 1.0 + 2 * ( transformedObjectCoords( 0, 0 ) + transformedOneHalfVoxel( 0, 0 ) ) : -1.0 + 2 * ( transformedObjectCoords( 0, 0 ) + transformedOneHalfVoxel( 0, 0 ) );
-	retVec[1] = transformedObjectCoords( 1, 0 ) < 0 ? 1.0 + 2 * ( transformedObjectCoords( 1, 0 ) + transformedOneHalfVoxel( 1, 0 ) ) : -1.0 + 2 * ( transformedObjectCoords( 1, 0 ) + transformedOneHalfVoxel( 1, 0 ) );
-	retVec[2] = transformedObjectCoords( 2, 0 ) < 0 ? 1.0 + transformedObjectCoords( 2, 0 ) + transformedOneHalfVoxel( 2, 0 )  : transformedObjectCoords( 2, 0 ) + transformedOneHalfVoxel( 2, 0 );
+	retVec[0] = transformedObjectCoords[0] < 0 ? 1.0 + 2 * ( transformedObjectCoords[0] + transformedOneHalfVoxel[0] ) : -1.0 + 2 * ( transformedObjectCoords[0] + transformedOneHalfVoxel[0] );
+	retVec[1] = transformedObjectCoords[1] < 0 ? 1.0 + 2 * ( transformedObjectCoords[1] + transformedOneHalfVoxel[1] ) : -1.0 + 2 * ( transformedObjectCoords[1] + transformedOneHalfVoxel[1] );
+	retVec[2] = transformedObjectCoords[2] < 0 ? 1.0 + transformedObjectCoords[2] + transformedOneHalfVoxel[2]  : transformedObjectCoords[2] + transformedOneHalfVoxel[2];
 	return retVec;
 
 }
 
 
-void GLOrientationHandler::recalculateViewport( size_t w, size_t h, const ImageHolder &image, const MatrixType &orientation, GLint *viewport, size_t border )
+void GLOrientationHandler::recalculateViewport( size_t w, size_t h, util::fvector4 mappedVoxelSize, util::ivector4 mappedImageSize , GLint *viewport, size_t border )
 {
 	//first we have to map the imagesize and scaling to our current planeview
-	MatrixType imageSize = zero_matrix<float>( matrixSize, 1 );
-	MatrixType imageScaling = zero_matrix<float>( matrixSize, 1 );
-	util::fvector4 scaling = image.getPropMap().getPropertyAs<util::fvector4>( "voxelSize" ) + image.getPropMap().getPropertyAs<util::fvector4>( "voxelGap" );
-
-	for ( unsigned short i = 0; i < 3; i++ ) {
-		imageSize( i, 0 ) = image.getImageSize()[i];
-		imageScaling( i, 0 ) = scaling[i];
-	}
-
-	MatrixType transformedScaling = prod( orientation, imageScaling );
-	MatrixType transformedSize = prod( orientation, imageSize );
 	util::fvector4 physicalSize;
-
 	for ( unsigned short i = 0; i < 3; i++ ) {
-		physicalSize[i] = transformedScaling( i, 0 ) * transformedSize( i, 0 );
+		physicalSize[i] = mappedVoxelSize[i] * mappedImageSize[i];
 	}
-
 	size_t wspace = w - 2 * border;
 	size_t hspace = h - 2 * border;
 	float scalew = wspace / physicalSize[0];
