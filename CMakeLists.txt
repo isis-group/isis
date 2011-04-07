@@ -51,8 +51,8 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra"  )
 ############################################################
 if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
   message(STATUS "Compiling on x86_64. Using the '-fpic' option in any case")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC" )
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC"  )
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC" )
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC"  )
 endif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" )
 
 ############################################################
@@ -64,17 +64,17 @@ option(ISIS_DEBUG_LOG "Enable debug logging" ON)
 
 # enable RUNTIME_LOG
 if(ISIS_RUNTIME_LOG)
-	add_definitions(-D_ENABLE_LOG=1)
+  add_definitions(-D_ENABLE_LOG=1)
 else(ISIS_RUNTIME_LOG)
-	add_definitions(-D_ENABLE_LOG=0)
+  add_definitions(-D_ENABLE_LOG=0)
 endif(ISIS_RUNTIME_LOG)
 
 # enable DEBUG_LOG
 if(ISIS_DEBUG_LOG)
-	add_definitions(-D_ENABLE_DEBUG=1)
-	message(STATUS "Debug code enabled, this will will have a big impact on the performance")
+  add_definitions(-D_ENABLE_DEBUG=1)
+  message(STATUS "Debug code enabled, this will will have a big impact on the performance")
 else(ISIS_DEBUG_LOG)
-	add_definitions(-D_ENABLE_DEBUG=0)
+  add_definitions(-D_ENABLE_DEBUG=0)
 endif(ISIS_DEBUG_LOG)
 
 # since ISIS stongly depends on the boost libraries we will configure them
@@ -112,6 +112,7 @@ endif(GIT_REVISION)
 ############################################################
 option(ISIS_BUILD_TESTS "Build the ISIS test cases. They depend on Boost-Test" OFF)
 option(ISIS_BUILD_TOOLS "Build the ISIS command line tools (converter, diff, etc pp." OFF)
+option(ISIS_BUILD_PYTHON_EXT "Build the ISIS python extension. It provides access to the ISIS core image functions from python" OFF)
 
 ############################################################
 # set up doxygen
@@ -153,3 +154,7 @@ if(ISIS_BUILD_TESTS)
   add_subdirectory(tests)
 endif(ISIS_BUILD_TESTS)
 
+# build the ISIS python extension.
+if(ISIS_BUILD_PYTHON_EXT)
+  add_subdirectory(python)
+endif(ISIS_BUILD_PYTHON_EXT)
