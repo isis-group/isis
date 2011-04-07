@@ -182,6 +182,7 @@ FILE(GLOB DATASTORAGE_HDR_FILES "DataStorage/*.hpp" "DataStorage/*.h")
 
 # the core library shared and static build
 if(ISIS_BUILD_DYNAMIC)
+	SET(Boost_USE_STATIC_LIBS OFF)
 	SET(LIBS isis_core ${LIBS})
 	ADD_LIBRARY( isis_core SHARED ${CORE_SRC_FILES} )
 	TARGET_LINK_LIBRARIES( isis_core ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} ${LibOil_LIBRARY})
@@ -189,6 +190,7 @@ if(ISIS_BUILD_DYNAMIC)
 endif(ISIS_BUILD_DYNAMIC)
 
 if(ISIS_BUILD_STATIC)
+	SET(Boost_USE_STATIC_LIBS ON)
 	SET(LIBS isis_static ${LIBS})
 	ADD_LIBRARY( isis_static STATIC ${CORE_SRC_FILES} )
 	SET_TARGET_PROPERTIES( isis_static PROPERTIES ${ISIS_BUILD_PROPERTIES} OUTPUT_NAME "isis_core" )
