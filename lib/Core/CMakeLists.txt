@@ -32,7 +32,8 @@ add_definitions(-DDL_PREFIX="${CMAKE_SHARED_LIBRARY_PREFIX}")
 ############################################################
 # export library dependencies of isis_core
 ############################################################
-SET(ISIS_LIB_DEPENDS  ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} ${LibOil_LIBRARY})
+set(ISIS_LIB_DEPENDS  ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} ${LibOil_LIBRARY}
+  CACHE INTERNAL "Addition libraries ISIS depends on")
 
 ############################################################
 # Build config

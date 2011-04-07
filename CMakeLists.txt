@@ -26,7 +26,8 @@ add_definitions(-D_ISIS_VERSION_MINOR=${ISIS_VERSION_MINOR})
 add_definitions(-D_ISIS_VERSION_PATCH=${ISIS_VERSION_PATCH})
 
 set(ISIS_VERSION
-  ${ISIS_VERSION_MAJOR}.${ISIS_VERSION_MINOR}.${ISIS_VERSION_PATCH})
+  ${ISIS_VERSION_MAJOR}.${ISIS_VERSION_MINOR}.${ISIS_VERSION_PATCH}
+  CACHE INTERNAL "The current Version of the ISIS project")
 
 ############################################################
 # set install infix for plugin installation path
@@ -107,6 +108,12 @@ else(GIT_REVISION)
 endif(GIT_REVISION)
 
 ############################################################
+# optional components
+############################################################
+option(ISIS_BUILD_TESTS "Build the ISIS test cases. They depend on Boost-Test" OFF)
+option(ISIS_BUILD_TOOLS "Build the ISIS command line tools (converter, diff, etc pp." OFF)
+
+############################################################
 # set up doxygen
 ############################################################
 include(UseDoxygen)
@@ -135,3 +142,14 @@ message(STATUS "/plugins directory: ${CMAKE_INSTALL_PREFIX}/${ISIS_PLUGIN_INFIX}
 
 # build the ISIS libraries
 add_subdirectory(lib)
+
+# build the ISIS tools.
+if(ISIS_BUILD_TOOLS)
+  add_subdirectory(tools)
+endif(ISIS_BUILD_TOOLS)
+
+# build the ISIS tests.
+if(ISIS_BUILD_TESTS)
+  add_subdirectory(tests)
+endif(ISIS_BUILD_TESTS)
+
