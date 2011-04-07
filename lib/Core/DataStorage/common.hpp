@@ -44,7 +44,7 @@ namespace data
 
 namespace _internal
 {
-void transformCoords( isis::util::PropertyMap &, boost::numeric::ublas::matrix<float> );
+void transformCoords( isis::util::PropertyMap &, const isis::util::FixedVector<size_t, 4> size, boost::numeric::ublas::matrix<float> );
 }
 
 typedef DataLog Runtime;
