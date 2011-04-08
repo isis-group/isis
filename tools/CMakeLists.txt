@@ -60,11 +60,9 @@ set_target_properties(isisswap PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # the install targets.
 install(TARGETS
-isisdump
-isisdiff
-isisconv
-isisswap
-RUNTIME DESTINATION bin)
-
-message(STATUS "Installing binary files to ${CMAKE_INSTALL_PREFIX}/bin")
+  isisdump
+  isisdiff
+  isisconv
+  isisswap
+  RUNTIME DESTINATION bin)
 
