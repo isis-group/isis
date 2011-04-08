@@ -148,6 +148,9 @@ add_subdirectory(lib)
 # build the ISIS applications
 add_subdirectory(apps)
 
+# configure coding style tools
+add_subdirectory(design)
+
 # build the ISIS tools.
 if(ISIS_BUILD_TOOLS)
   add_subdirectory(tools)
