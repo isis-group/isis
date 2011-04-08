@@ -34,8 +34,8 @@ void QGLWidgetImplementation::commonInit()
 	setMouseTracking( true );
 	connectSignals();
 	//flags
-	buttonPressed = false;
-
+	leftButtonPressed = false;
+	rightButtonPressed = false;
 }
 
 
@@ -96,44 +96,55 @@ void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const
 	state.mappedVoxelCoords = GLOrientationHandler::transformVector<int>( state.voxelCoords, state.planeOrientation );
 	//to visualize with the correct scaling we take the viewport
 	GLOrientationHandler::recalculateViewport( width(), height(), state.mappedVoxelSize, state.mappedImageSize, state.viewport );
-
+	if( rightButtonPressed ) {
+		calculateTranslation( image );
+	}
 	util::fvector4 objectCoords = GLOrientationHandler::transformVoxel2ObjectCoords( state.voxelCoords, image, state.planeOrientation );
-	state.crosshairCoords = object2WindowCoords( objectCoords[0], objectCoords[1] );
-	//we have to look if the crosshair is inside the window. if not, we have to translate to make it visible
-	calculateTranslation( image );
-
-	m_StateValues[image].normalizedSlice = objectCoords[2];
+	
+	state.crosshairCoords = object2WindowCoords( objectCoords[0], objectCoords[1], image );
+	state.normalizedSlice = objectCoords[2];
 
 }
 
-std::pair<GLdouble, GLdouble> QGLWidgetImplementation::window2ObjectCoords( int16_t winx, int16_t winy ) const
+std::pair<GLdouble, GLdouble> QGLWidgetImplementation::window2ObjectCoords( int16_t winx, int16_t winy, const ImageHolder &image ) const
 {
-	State stateValue = m_StateValues.at( m_ViewerCore->getCurrentImage() );
+	const State &stateValue = m_StateValues.at(image);
 	GLdouble pos[3];
 	gluUnProject( winx, winy, 0, stateValue.modelViewMatrix, stateValue.projectionMatrix, stateValue.viewport , &pos[0], &pos[1], &pos[2] );
 	return std::make_pair<GLdouble, GLdouble>( pos[0], pos[1] );
 
 }
 
-std::pair<int16_t, int16_t> QGLWidgetImplementation::object2WindowCoords( GLdouble objx, GLdouble objy ) const
+std::pair<int16_t, int16_t> QGLWidgetImplementation::object2WindowCoords( GLdouble objx, GLdouble objy, const ImageHolder &image ) const
 {
-	State stateValue = m_StateValues.at( m_ViewerCore->getCurrentImage() );
+	const State &stateValue = m_StateValues.at( image );
 	GLdouble win[3];
-
-	gluProject( objx, objy, 0, stateValue.modelViewMatrix, stateValue.projectionMatrix, stateValue.viewport, &win[0], &win[1], &win[2] );
-	return std::make_pair<int16_t, int16_t>( win[0] - stateValue.viewport[0], win[1] - stateValue.viewport[1] );
+	GLdouble pro[16];
+	for (size_t i = 0; i<16;i++) {pro[i] =  stateValue.projectionMatrix[i];}
+	pro[0] = 1;
+	pro[5] = 1;
+	pro[10] = 1;
+	pro[15] = 1;
+	gluProject( objx, objy, 0, stateValue.modelViewMatrix, pro, stateValue.viewport, &win[0], &win[1], &win[2] );
+	return std::make_pair<int16_t, int16_t>( (win[0] - stateValue.viewport[0]), win[1] - stateValue.viewport[1] );
 }
 
 bool QGLWidgetImplementation::calculateTranslation( const ImageHolder &image )
 {
 	State &state = m_StateValues[image];
-	std::pair<int16_t, int16_t> center = std::make_pair<int16_t, int16_t>( abs( state.mappedImageSize[0] ) / 2, abs( state.mappedImageSize[1] ) / 2 );
-	state.modelViewMatrix[12] = ( 1.0 / abs( state.mappedImageSize[0] ) ) * ( m_Zoom.currentZoom * ( abs( state.mappedVoxelCoords[0] ) - center.first ) ) ;
-	state.modelViewMatrix[13] = ( 1.0 / abs( state.mappedImageSize[1] ) ) * ( m_Zoom.currentZoom * ( abs( state.mappedVoxelCoords[1] ) - center.second ) ) ;
-
+	std::pair<int16_t, int16_t> center = std::make_pair<int16_t, int16_t>( abs(state.mappedImageSize[0]) / 2, abs(state.mappedImageSize[1]) / 2 );
+	float shiftX = center.first - (state.mappedVoxelCoords[0] < 0 ? abs(state.mappedImageSize[0]) + state.mappedVoxelCoords[0] : state.mappedVoxelCoords[0]);
+	float shiftY =  center.second - (state.mappedVoxelCoords[1] < 0 ? abs(state.mappedImageSize[1]) + state.mappedVoxelCoords[1] : state.mappedVoxelCoords[1]);
+	GLdouble *mat = state.modelViewMatrix;
+	state.modelViewMatrix[12] = (1.0 / abs(state.mappedImageSize[0])) * shiftX ;
+	state.modelViewMatrix[13] = (1.0 / abs(state.mappedImageSize[1])) * shiftY ;
+	float factor = 1 + (0.5 * (m_Zoom.currentZoom / 2 - 1) );
+	mat[12] = state.modelViewMatrix[12] * factor ;
+	mat[13] = state.modelViewMatrix[13] * factor;
+	
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
-	glLoadMatrixd( state.modelViewMatrix );
+	glLoadMatrixd( mat );
 
 }
 
@@ -187,11 +198,11 @@ void QGLWidgetImplementation::paintScene()
 		glDisable( GL_TEXTURE_3D );
 	}
 	//paint crosshair
-	State currentState = m_StateValues.at( m_ViewerCore->getCurrentImage() );
+	const State &currentState = m_StateValues.at( m_ViewerCore->getCurrentImage() );
 	glColor4f( 1, 0, 0, 0 );
 	glLineWidth( 1.0 );
 	glMatrixMode( GL_PROJECTION );
-	glLoadIdentity();
+// 	glLoadIdentity();
 	glOrtho( 0, currentState.viewport[2], 0, currentState.viewport[3], -1, 1 );
 	glBegin( GL_LINES );
 	unsigned short gap = height() / 20;
@@ -219,21 +230,26 @@ void QGLWidgetImplementation::paintScene()
 void QGLWidgetImplementation::mouseMoveEvent( QMouseEvent *e )
 {
 
-	if ( buttonPressed ) {
+	if ( rightButtonPressed || leftButtonPressed ) {
 		emitMousePressEvent( e );
 	}
 }
 
 void QGLWidgetImplementation::mousePressEvent( QMouseEvent *e )
 {
-	buttonPressed = true;
+	if(e->button() == Qt::LeftButton ) {
+		leftButtonPressed = true;
+	}
+	if(e->button() == Qt::RightButton ) {
+		rightButtonPressed = true;
+	}
 	emitMousePressEvent( e );
 
 }
 
 void QGLWidgetImplementation::emitMousePressEvent( QMouseEvent *e )
 {
-	std::pair<float, float> objectCoords = window2ObjectCoords( e->x(), ( height() - e->y() ) );
+	std::pair<float, float> objectCoords = window2ObjectCoords( e->x(), ( height() - e->y() ), m_ViewerCore->getCurrentImage() );
 	util::ivector4 voxelCoords = GLOrientationHandler::transformObject2VoxelCoords( util::fvector4( objectCoords.first, objectCoords.second, m_StateValues.at( m_ViewerCore->getCurrentImage() ).normalizedSlice ), m_ViewerCore->getCurrentImage(), m_PlaneOrientation );
 
 	Q_EMIT voxelCoordChanged( voxelCoords );
@@ -280,8 +296,13 @@ void QGLWidgetImplementation::wheelEvent( QWheelEvent *e )
 
 
 void QGLWidgetImplementation::mouseReleaseEvent( QMouseEvent *e )
-{
-	buttonPressed = false;
+{	
+	if(e->button() == Qt::LeftButton ) {
+		leftButtonPressed = false;
+	}
+	if(e->button() == Qt::RightButton ) {
+		rightButtonPressed = false;
+	}
 }
 
 

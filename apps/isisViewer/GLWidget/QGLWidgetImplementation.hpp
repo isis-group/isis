@@ -70,8 +70,8 @@ private:
 	void commonInit();
 	void emitMousePressEvent( QMouseEvent *e );
 
-	std::pair<GLdouble, GLdouble> window2ObjectCoords( int16_t winx, int16_t winy ) const;
-	std::pair<int16_t, int16_t> object2WindowCoords( GLdouble objx, GLdouble objy ) const;
+	std::pair<GLdouble, GLdouble> window2ObjectCoords( int16_t winx, int16_t winy, const ImageHolder &image ) const;
+	std::pair<int16_t, int16_t> object2WindowCoords( GLdouble objx, GLdouble objy, const ImageHolder &image ) const;
 
 	bool calculateTranslation( const ImageHolder &image );
 
@@ -119,7 +119,8 @@ private:
 
 
 	//flags
-	bool buttonPressed;
+	bool leftButtonPressed;
+	bool rightButtonPressed;
 
 };
 
