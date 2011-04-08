@@ -137,12 +137,16 @@ include(UseDoxygen)
 # INCLUDE(CPack)
 
 # status messages
+message(STATUS "/bin directory: ${CMAKE_INSTALL_PREFIX}/bin")
 message(STATUS "/lib directory: ${CMAKE_INSTALL_PREFIX}/lib")
 message(STATUS "/include directory: ${CMAKE_INSTALL_PREFIX}/include")
 message(STATUS "/plugins directory: ${CMAKE_INSTALL_PREFIX}/${ISIS_PLUGIN_INFIX}")
 
 # build the ISIS libraries
 add_subdirectory(lib)
+
+# build the ISIS applications
+add_subdirectory(apps)
 
 # build the ISIS tools.
 if(ISIS_BUILD_TOOLS)
