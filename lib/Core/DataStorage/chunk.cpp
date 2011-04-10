@@ -208,7 +208,7 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 		voxelGap = propertyValue( "voxelGap" )->castTo<util::fvector4>();
 
 	const util::fvector4 distance = voxelSize + voxelGap;
-	int32_t atDim = getRelevantDims() - 1;
+	size_t atDim = getRelevantDims() - 1;
 
 	switch( atDim ) { // init offset with the given direction
 	case rowDim :
