@@ -25,6 +25,7 @@ class GLTextureHandler
 {
 public:
 	enum ScalingType { no_scaling, automatic_scaling, manual_scaling };
+	enum InterpolationType { neares_neighbor, linear };
 	
 	///The image map is a mapping of the imageID and timestep to the texture of the GL_TEXTURE_3D.
 	typedef std::map<ImageHolder, std::map<size_t, GLuint > > ImageMapType;
@@ -43,7 +44,7 @@ private:
 	ImageMapType m_ImageMap;
 
 	template<typename TYPE>
-	GLuint internCopyImageToTexture( const DataContainer &data, GLenum format, const ImageHolder &image, size_t timestep, ScalingType scalingType = automatic_scaling ) {
+	GLuint internCopyImageToTexture( const DataContainer &data, GLenum format, const ImageHolder &image, size_t timestep, ScalingType scalingType = automatic_scaling, InterpolationType interpolation = neares_neighbor  ) {
 		LOG( Debug, info ) << "Copy image " << image.getID() << " with timestep " << timestep << " to texture";
 		GLuint texture;
 		util::FixedVector<size_t, 4> size = image.getImageSize();
@@ -66,7 +67,6 @@ private:
 				pixelScaling += (1.0 / extent) * abs( maxImage - minImage );
 				LOG( Debug, info ) << "Automatic scaling -> scaling: " << pixelScaling << " -> bias: " << pixelBias;
 				break;
-			
 		}
 		glPixelTransferf( GL_RED_SCALE, pixelBias );
 		glPixelTransferf( GL_GREEN_SCALE, pixelBias );
@@ -74,13 +74,23 @@ private:
 		glPixelTransferf( GL_RED_SCALE, pixelScaling);
 		glPixelTransferf( GL_BLUE_SCALE, pixelScaling);
 		glPixelTransferf( GL_GREEN_SCALE, pixelScaling);
+		GLint interpolationType = 0;
+		switch (interpolation)
+		{
+			case neares_neighbor:
+				interpolationType = GL_NEAREST;
+				break;
+			case linear:
+				interpolationType = GL_LINEAR;
+				break;
+		}
 		glShadeModel( GL_FLAT );
 		glEnable( GL_DEPTH_TEST );
 		glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 		glGenTextures( 1, &texture );
 		glBindTexture( GL_TEXTURE_3D, texture );
-		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, interpolationType );
+		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, interpolationType );
 		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER );
 		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER );
 		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER );
