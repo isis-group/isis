@@ -69,7 +69,7 @@ void QGLWidgetImplementation::initializeGL()
 void QGLWidgetImplementation::resizeGL( int w, int h )
 {
 	LOG( Debug, verbose_info ) << "resizeGL " << objectName().toStdString();
-	lookAtVoxel( util::ivector4( 90, 109, 181 ) );
+	lookAtVoxel( util::ivector4( 90, 109, 91 ) );
 }
 
 void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const util::ivector4 &voxelCoords )
@@ -77,6 +77,8 @@ void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const
 	LOG( Debug, verbose_info ) << "Updating state values for widget " << objectName().toStdString();
 	State &state = m_StateValues[image];
 	state.voxelCoords = voxelCoords;
+	std::cout << objectName().toStdString() << std::endl;
+	std::cout << "voxelStateBegin: " << voxelCoords << std::endl;
 	//check if we are inside the image
 	for( size_t i = 0; i<4; i++) {
 		state.voxelCoords[i] = state.voxelCoords[i] < 0 ? 0 : state.voxelCoords[i];
@@ -88,22 +90,20 @@ void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const
 	//update the texture matrix.
 	//The texture matrix holds the orientation of the image and the orientation of the current widget. It does NOT hold the scaling of the image.
 	if( ! state.set ) {
-		state.planeOrientation =
+		state.planeOrientation = 
 			GLOrientationHandler::transformToPlaneView( image.getNormalizedImageOrientation(), m_PlaneOrientation );
-		GLOrientationHandler::addOffset( state.planeOrientation );
-		GLOrientationHandler::boostMatrix2Pointer( state.planeOrientation, state.textureMatrix );
+		GLOrientationHandler::boostMatrix2Pointer( GLOrientationHandler::addOffset( state.planeOrientation ), state.textureMatrix );
 		state.mappedVoxelSize = GLOrientationHandler::transformVector<float>( image.getPropMap().getPropertyAs<util::fvector4>( "voxelSize" ) + image.getPropMap().getPropertyAs<util::fvector4>( "voxelGap" ) , state.planeOrientation );
 		state.mappedImageSize = GLOrientationHandler::transformVector<int>( image.getImageSize(), state.planeOrientation );
 		state.set = true;
 	}
-	
-
 	state.mappedVoxelCoords = GLOrientationHandler::transformVector<int>( state.voxelCoords, state.planeOrientation );
 	//to visualize with the correct scaling we take the viewport
 	GLOrientationHandler::recalculateViewport( width(), height(), state.mappedVoxelSize, state.mappedImageSize, state.viewport );
 	if( rightButtonPressed ) {
 		calculateTranslation( image );
 	}
+	
 	util::fvector4 objectCoords = GLOrientationHandler::transformVoxel2ObjectCoords( state.voxelCoords, image, state.planeOrientation );
 	
 	state.crosshairCoords = object2WindowCoords( objectCoords[0], objectCoords[1], image );

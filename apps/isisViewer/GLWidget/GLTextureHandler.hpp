@@ -63,7 +63,6 @@ private:
 				pixelScaling += (1.0 / extent) * ( maxImage - minImage );
 				LOG( Debug, info ) << "Automatic scaling -> scaling: " << pixelScaling << " -> bias: " << pixelBias;
 				break;
-				
 		}
 		glPixelTransferf( GL_RED_SCALE, pixelBias );
 		glPixelTransferf( GL_GREEN_SCALE, pixelBias );

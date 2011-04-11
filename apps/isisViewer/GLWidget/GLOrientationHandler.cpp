@@ -14,7 +14,6 @@ using namespace boost::numeric::ublas;
 GLOrientationHandler::MatrixType GLOrientationHandler::transformToPlaneView( const MatrixType &origMatrix, PlaneOrientation orientation, bool back )
 {
 	MatrixType transformMatrix = identity_matrix<float>( matrixSize, matrixSize );
-
 	switch ( orientation ) {
 	case axial:
 		/*setup axial matrix
@@ -71,16 +70,18 @@ void GLOrientationHandler::boostMatrix2Pointer( const MatrixType &boostMatrix, G
 		}
 	}
 }
-void GLOrientationHandler::addOffset( GLOrientationHandler::MatrixType &matrix )
+GLOrientationHandler::MatrixType GLOrientationHandler::addOffset( const GLOrientationHandler::MatrixType &matrix )
 {
+	MatrixType retMat = matrix;
 	for ( size_t row = 0; row < matrixSize; row++ ) {
 		for ( size_t column = 0; column < matrixSize - 1; column++ ) {
 			if( matrix( row, column ) < 0 ) {
-				matrix( 3, column ) = 1;
+				retMat( 3, column ) = 1;
 			}
 
 		}
 	}
+	return retMat;
 }
 
 util::ivector4 GLOrientationHandler::transformObject2VoxelCoords( const util::fvector4 objectCoords, const isis::viewer::ImageHolder &image, GLOrientationHandler::PlaneOrientation orientation )
@@ -101,9 +102,9 @@ util::ivector4 GLOrientationHandler::transformObject2VoxelCoords( const util::fv
 	short voxelx =  image.getImageSize()[0] * transformedObjectCoords( 0 );
 	short voxely =  image.getImageSize()[1] * transformedObjectCoords( 1 );
 	short voxelz =  image.getImageSize()[2] * transformedObjectCoords( 2 );
-	voxelx = direction( 0 ) < 0 ? image.getImageSize()[0] + voxelx : voxelx;
-	voxely = direction( 1 ) < 0 ? image.getImageSize()[1] + voxely : voxely;
-	voxelz = direction( 2 ) < 0 ? image.getImageSize()[2] + voxelz : voxelz;
+	voxelx = direction( 0 ) < 0 ? image.getImageSize()[0] + voxelx - 1: voxelx;
+	voxely = direction( 1 ) < 0 ? image.getImageSize()[1] + voxely - 1: voxely;
+	voxelz = direction( 2 ) < 0 ? image.getImageSize()[2] + voxelz - 1 : voxelz;
 	return util::ivector4( voxelx, voxely, voxelz );
 
 }
@@ -112,7 +113,6 @@ util::fvector4 GLOrientationHandler::transformVoxel2ObjectCoords( const isis::ut
 {
 	util::fvector4 objectCoords;
 	util::fvector4 oneHalfVoxel;
-
 	for ( unsigned short i = 0; i < 3; i++ ) {
 		objectCoords[i] = ( 1.0 / image.getImageSize()[i] ) * voxelCoords[i];
 		oneHalfVoxel[i] = 0.5 / image.getImageSize()[i];
@@ -123,7 +123,7 @@ util::fvector4 GLOrientationHandler::transformVoxel2ObjectCoords( const isis::ut
 	util::fvector4 retVec;
 	retVec[0] = transformedObjectCoords[0] < 0 ? 1.0 + 2 * ( transformedObjectCoords[0] + transformedOneHalfVoxel[0] ) : -1.0 + 2 * ( transformedObjectCoords[0] + transformedOneHalfVoxel[0] );
 	retVec[1] = transformedObjectCoords[1] < 0 ? 1.0 + 2 * ( transformedObjectCoords[1] + transformedOneHalfVoxel[1] ) : -1.0 + 2 * ( transformedObjectCoords[1] + transformedOneHalfVoxel[1] );
-	retVec[2] = transformedObjectCoords[2] < 0 ? 1.0 + transformedObjectCoords[2] + transformedOneHalfVoxel[2]  : transformedObjectCoords[2] + transformedOneHalfVoxel[2];
+	retVec[2] = transformedObjectCoords[2] < 0 ? 1.0 + transformedObjectCoords[2] + transformedOneHalfVoxel[2] : transformedObjectCoords[2] + transformedOneHalfVoxel[2];
 	return retVec;
 
 }
