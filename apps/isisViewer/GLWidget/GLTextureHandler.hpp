@@ -9,6 +9,8 @@
 #include <DataStorage/typeptr.hpp>
 #include <DataStorage/image.hpp>
 
+#include <limits>
+
 namespace isis
 {
 namespace viewer
@@ -22,6 +24,8 @@ namespace viewer
 class GLTextureHandler
 {
 public:
+	enum ScalingType { no_scaling, automatic_scaling, manual_scaling };
+	
 	///The image map is a mapping of the imageID and timestep to the texture of the GL_TEXTURE_3D.
 	typedef std::map<ImageHolder, std::map<size_t, GLuint > > ImageMapType;
 
@@ -39,12 +43,34 @@ private:
 	ImageMapType m_ImageMap;
 
 	template<typename TYPE>
-	GLuint internCopyImageToTexture( const DataContainer &data, GLenum format, const ImageHolder &image, size_t timestep ) {
+	GLuint internCopyImageToTexture( const DataContainer &data, GLenum format, const ImageHolder &image, size_t timestep, ScalingType scaling = automatic_scaling ) {
 		LOG( Debug, info ) << "Copy image " << image.getID() << " with timestep " << timestep << " to texture";
 		GLuint texture;
 		util::FixedVector<size_t, 4> size = image.getImageSize();
 		TYPE *dataPtr = static_cast<TYPE *>( data.getImageWeakPointer( image, timestep ).lock().get() );
 		assert( dataPtr != 0 );
+		float pixelBias = 0;
+		float pixelScaling = 1;
+		switch (scaling) 
+		{
+			case automatic_scaling:
+				TYPE maxTypeValue = std::numeric_limits<TYPE>::max();
+				TYPE minTypeValue = std::numeric_limits<TYPE>::min();
+				TYPE extent = maxTypeValue - minTypeValue;
+				TYPE minImage = image.getMinMax().first->as<TYPE>();
+				TYPE maxImage = image.getMinMax().second->as<TYPE>();
+				pixelBias = (1.0 / extent) * (minTypeValue - minImage );
+				pixelScaling += (1.0 / extent) * ( maxImage - minImage );
+				LOG( Debug, info ) << "Automatic scaling -> scaling: " << pixelScaling << " -> bias: " << pixelBias;
+				break;
+				
+		}
+		glPixelTransferf( GL_RED_SCALE, pixelBias );
+		glPixelTransferf( GL_GREEN_SCALE, pixelBias );
+		glPixelTransferf( GL_BLUE_SCALE, pixelBias );
+		glPixelTransferf( GL_RED_SCALE, pixelScaling);
+		glPixelTransferf( GL_BLUE_SCALE, pixelScaling);
+		glPixelTransferf( GL_GREEN_SCALE, pixelScaling);
 		glShadeModel( GL_FLAT );
 		glEnable( GL_DEPTH_TEST );
 		glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );

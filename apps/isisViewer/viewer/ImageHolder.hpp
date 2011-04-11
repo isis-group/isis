@@ -40,6 +40,7 @@ public:
 	const data::Image &getImage() const { return m_Image; }
 	boost::numeric::ublas::matrix<float> getNormalizedImageOrientation( bool transposed = false ) const;
 	boost::numeric::ublas::matrix<float> getImageOrientation( bool transposed = false ) const;
+	std::pair<util::ValueReference, util::ValueReference> getMinMax() const { return m_MinMax; }
 
 	bool operator<( const ImageHolder &ref ) const { return m_ID < ref.getID(); }
 

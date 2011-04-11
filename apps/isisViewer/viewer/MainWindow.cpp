@@ -17,8 +17,6 @@ MainWindow::MainWindow( QViewerCore *core )
 	: m_ViewerCore( core )
 {
 
-
-
 	m_AxialWidget = new QGLWidgetImplementation( core, ui.axialWidget, GLOrientationHandler::axial );
 	m_ViewerCore->registerWidget( "axialView", m_AxialWidget );
 
