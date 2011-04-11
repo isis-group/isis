@@ -77,8 +77,6 @@ void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const
 	LOG( Debug, verbose_info ) << "Updating state values for widget " << objectName().toStdString();
 	State &state = m_StateValues[image];
 	state.voxelCoords = voxelCoords;
-	std::cout << objectName().toStdString() << std::endl;
-	std::cout << "voxelStateBegin: " << voxelCoords << std::endl;
 	//check if we are inside the image
 	for( size_t i = 0; i<4; i++) {
 		state.voxelCoords[i] = state.voxelCoords[i] < 0 ? 0 : state.voxelCoords[i];
