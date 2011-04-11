@@ -69,7 +69,7 @@ void QGLWidgetImplementation::initializeGL()
 void QGLWidgetImplementation::resizeGL( int w, int h )
 {
 	LOG( Debug, verbose_info ) << "resizeGL " << objectName().toStdString();
-	lookAtVoxel( util::ivector4( 90, 109, 91 ) );
+	lookAtVoxel( util::ivector4( 90, 109, 181 ) );
 }
 
 void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const util::ivector4 &voxelCoords )
@@ -77,7 +77,11 @@ void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const
 	LOG( Debug, verbose_info ) << "Updating state values for widget " << objectName().toStdString();
 	State &state = m_StateValues[image];
 	state.voxelCoords = voxelCoords;
-
+	//check if we are inside the image
+	for( size_t i = 0; i<4; i++) {
+		state.voxelCoords[i] = state.voxelCoords[i] < 0 ? 0 : state.voxelCoords[i];
+		state.voxelCoords[i] = state.voxelCoords[i] >= image.getImageSize()[i] ? image.getImageSize()[i] - 1 : state.voxelCoords[i];
+	}
 	//if not happend already copy the image to GLtexture memory and return the texture id
 	state.textureID = util::Singletons::get<GLTextureHandler, 10>().copyImageToTexture( m_ViewerCore->getDataContainer(), image, voxelCoords[3] );
 
@@ -92,6 +96,7 @@ void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const
 		state.mappedImageSize = GLOrientationHandler::transformVector<int>( image.getImageSize(), state.planeOrientation );
 		state.set = true;
 	}
+	
 
 	state.mappedVoxelCoords = GLOrientationHandler::transformVector<int>( state.voxelCoords, state.planeOrientation );
 	//to visualize with the correct scaling we take the viewport
@@ -247,12 +252,25 @@ void QGLWidgetImplementation::mousePressEvent( QMouseEvent *e )
 
 }
 
+bool QGLWidgetImplementation::isInViewport(size_t wx, size_t wy)
+{
+	GLint *viewport = m_StateValues[m_ViewerCore->getCurrentImage()].viewport;
+	if((wx > viewport[0] && wx < (viewport[0] + viewport[2])) && ( wy > viewport[1] && wy < (viewport[1] + viewport[3]))) 
+	{
+		return true;
+	} else {
+		return false;
+	}
+}
+
+
 void QGLWidgetImplementation::emitMousePressEvent( QMouseEvent *e )
 {
-	std::pair<float, float> objectCoords = window2ObjectCoords( e->x(), ( height() - e->y() ), m_ViewerCore->getCurrentImage() );
-	util::ivector4 voxelCoords = GLOrientationHandler::transformObject2VoxelCoords( util::fvector4( objectCoords.first, objectCoords.second, m_StateValues.at( m_ViewerCore->getCurrentImage() ).normalizedSlice ), m_ViewerCore->getCurrentImage(), m_PlaneOrientation );
-
-	Q_EMIT voxelCoordChanged( voxelCoords );
+	if( isInViewport( e->x(), e->y() ) ) {
+		std::pair<float, float> objectCoords = window2ObjectCoords( e->x(), height() - e->y(), m_ViewerCore->getCurrentImage() );
+		util::ivector4 voxelCoords = GLOrientationHandler::transformObject2VoxelCoords( util::fvector4( objectCoords.first, objectCoords.second, m_StateValues.at( m_ViewerCore->getCurrentImage() ).normalizedSlice ), m_ViewerCore->getCurrentImage(), m_PlaneOrientation );
+		Q_EMIT voxelCoordChanged( voxelCoords );
+	}
 }
 
 bool QGLWidgetImplementation::timestepChanged( unsigned int timestep )

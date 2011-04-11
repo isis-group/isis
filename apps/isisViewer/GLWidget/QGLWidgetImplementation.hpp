@@ -69,6 +69,7 @@ private:
 	void connectSignals();
 	void commonInit();
 	void emitMousePressEvent( QMouseEvent *e );
+	bool isInViewport( size_t wx, size_t wy );
 
 	std::pair<GLdouble, GLdouble> window2ObjectCoords( int16_t winx, int16_t winy, const ImageHolder &image ) const;
 	std::pair<int16_t, int16_t> object2WindowCoords( GLdouble objx, GLdouble objy, const ImageHolder &image ) const;

@@ -87,17 +87,23 @@ util::ivector4 GLOrientationHandler::transformObject2VoxelCoords( const util::fv
 {
 	GLOrientationHandler::MatrixType planeOrientatioMatrix =
 		GLOrientationHandler::transformToPlaneView( image.getNormalizedImageOrientation(), orientation );
-	MatrixType objectCoordsMatrix = zero_matrix<float>( matrixSize, 1 );
-	objectCoordsMatrix( 0, 0 ) = ( objectCoords[0] + 1 ) / 2;
-	objectCoordsMatrix( 1, 0 ) = ( objectCoords[1] + 1 ) / 2;
-	objectCoordsMatrix( 2, 0 ) = objectCoords[2];
-	MatrixType transformedObjectCoords = prod( trans( planeOrientatioMatrix ), objectCoordsMatrix );
-	short voxelx =  image.getImageSize()[0] * transformedObjectCoords( 0, 0 );
-	short voxely =  image.getImageSize()[1] * transformedObjectCoords( 1, 0 );
-	short voxelz =  image.getImageSize()[2] * transformedObjectCoords( 2, 0 );
-	voxelx = voxelx < 0 ? image.getImageSize()[0] + voxelx - 1 : voxelx;
-	voxely = voxely < 0 ? image.getImageSize()[1] + voxely - 1 : voxely;
-	voxelz = voxelz < 0 ? image.getImageSize()[2] + voxelz - 1 : voxelz;
+	VectorType objectCoordsMatrix ( matrixSize );
+	objectCoordsMatrix( 0 ) = ( objectCoords[0] + 1 ) / 2;
+	objectCoordsMatrix( 1 ) = ( objectCoords[1] + 1 ) / 2;
+	objectCoordsMatrix( 2 ) = objectCoords[2];
+	VectorType oneVector( matrixSize );
+	for(size_t i = 0; i<matrixSize; i++)
+	{
+		oneVector( i ) = 1;
+	}
+	VectorType direction = prod ( trans( planeOrientatioMatrix ), oneVector );
+	VectorType transformedObjectCoords = prod( trans( planeOrientatioMatrix ), objectCoordsMatrix );
+	short voxelx =  image.getImageSize()[0] * transformedObjectCoords( 0 );
+	short voxely =  image.getImageSize()[1] * transformedObjectCoords( 1 );
+	short voxelz =  image.getImageSize()[2] * transformedObjectCoords( 2 );
+	voxelx = direction( 0 ) < 0 ? image.getImageSize()[0] + voxelx : voxelx;
+	voxely = direction( 1 ) < 0 ? image.getImageSize()[1] + voxely : voxely;
+	voxelz = direction( 2 ) < 0 ? image.getImageSize()[2] + voxelz : voxelz;
 	return util::ivector4( voxelx, voxely, voxelz );
 
 }
