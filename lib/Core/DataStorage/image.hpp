@@ -391,6 +391,20 @@ public:
 			LOG( Runtime, error ) << "Cannot copy from non clean images. Run reIndex first";
 		}
 	}
+
+	/**
+	 * Copy all voxel data into a new MemChunk.
+	 * This creates a MemChunk\<T\> of the requested type and the same size as the Image and then copies all voxeldata of the image into that Chunk.
+	 * If neccessary a conversion into T is done using min/max of the image.
+	 * \returns a MemChunk\<T\> containing the voxeldata of the Image (but not its Properties)
+	 */
+	template<typename T> MemChunk<T> copyToMemChunk()const {
+		const util::FixedVector<size_t,4> size=getSizeAsVector();
+		data::MemChunk<T> ret(size[0], size[1], size[2], size[3]);
+		copyToMem<T>(&ret.voxel(0,0,0,0));
+		return ret;
+	}
+
 	/**
 	 * Ensure, the image has the type with the requested ID.
 	 * If the typeID of any chunk is not equal to the requested ID, the data of the chunk is replaced by an converted version.
