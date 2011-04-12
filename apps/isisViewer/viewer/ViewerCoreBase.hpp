@@ -29,8 +29,6 @@ public:
 		} else { return false; }
 	}
 
-
-
 	const DataContainer &getDataContainer() const { return m_DataContainer; }
 
 private:

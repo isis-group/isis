@@ -40,6 +40,7 @@ public:
 	boost::numeric::ublas::matrix<float> getNormalizedImageOrientation( bool transposed = false ) const;
 	boost::numeric::ublas::matrix<float> getImageOrientation( bool transposed = false ) const;
 	std::pair<util::ValueReference, util::ValueReference> getMinMax() const { return m_MinMax; }
+	std::pair<util::ValueReference, util::ValueReference> getInternMinMax() const { return m_InternMinMax; }
 	util::slist getFileNames() const { return m_Filenames; }
 
 	bool operator<( const ImageHolder &ref ) const { return m_ID < ref.getID(); }
@@ -50,6 +51,7 @@ private:
 	util::PropertyMap m_PropMap;
 	std::vector< util::PropertyMap > m_TimeStepProperties;
 	std::pair<util::ValueReference, util::ValueReference> m_MinMax;
+	std::pair<util::ValueReference, util::ValueReference> m_InternMinMax;
 	boost::shared_ptr<data::Image> m_Image;
 	util::slist m_Filenames;
 	unsigned short m_ID;

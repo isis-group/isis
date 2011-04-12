@@ -10,8 +10,6 @@ MainWindowBase::MainWindowBase( QWidget *parent )
 	: QMainWindow( parent )
 {
 	ui.setupUi( this );
-
-
 }
 
 }

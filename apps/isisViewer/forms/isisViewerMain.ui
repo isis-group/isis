@@ -86,58 +86,6 @@
         <string/>
        </property>
       </widget>
-      <widget class="QLineEdit" name="xEdit">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>100</y>
-         <width>71</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>55</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="zEdit">
-       <property name="geometry">
-        <rect>
-         <x>180</x>
-         <y>100</y>
-         <width>71</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>0</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="yEdit">
-       <property name="geometry">
-        <rect>
-         <x>100</x>
-         <y>100</y>
-         <width>71</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>55</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="goButton">
-       <property name="geometry">
-        <rect>
-         <x>270</x>
-         <y>100</y>
-         <width>71</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>GO!</string>
-       </property>
-      </widget>
       <widget class="QSpinBox" name="timestepSpinBox">
        <property name="geometry">
         <rect>
@@ -145,6 +93,16 @@
          <y>140</y>
          <width>55</width>
          <height>28</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QListWidget" name="imageStack">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>290</y>
+         <width>351</width>
+         <height>81</height>
         </rect>
        </property>
       </widget>
@@ -171,8 +129,45 @@
      <height>25</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menu_File">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <widget class="QMenu" name="menuOpen_Image_as">
+     <property name="title">
+      <string>Open Image as</string>
+     </property>
+     <addaction name="actionAnatomical_Image"/>
+     <addaction name="actionZ_Map"/>
+    </widget>
+    <addaction name="action_Open_Image"/>
+    <addaction name="menuOpen_Image_as"/>
+    <addaction name="separator"/>
+    <addaction name="action_Exit"/>
+   </widget>
+   <addaction name="menu_File"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="action_Open_Image">
+   <property name="text">
+    <string>&amp;Open Image</string>
+   </property>
+  </action>
+  <action name="action_Exit">
+   <property name="text">
+    <string>&amp;Exit</string>
+   </property>
+  </action>
+  <action name="actionAnatomical_Image">
+   <property name="text">
+    <string>Anatomical Image</string>
+   </property>
+  </action>
+  <action name="actionZ_Map">
+   <property name="text">
+    <string>Z-Map</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

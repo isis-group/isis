@@ -19,6 +19,9 @@ public:
 	QViewerCore( );
 
 	virtual bool registerWidget( std::string key, QWidget *widget, Actions = not_specified );
+	
+	virtual void addImageList( const std::list<data::Image> imageList, const util::slist &filenames = util::slist() );
+	virtual void setImageList( const std::list<data::Image> imageList, const util::slist &filenames = util::slist() );
 
 	const WidgetMap &getWidgets() const { return m_WidgetMap; }
 
@@ -45,6 +48,8 @@ protected Q_SLOTS:
 Q_SIGNALS:
 	void emitVoxelCoordChanged( util::ivector4 );
 	void emitTimeStepChange( unsigned int );
+	void emitImagesChanged( DataContainer::ImageFileMapType );
+	
 private:
 	//this map holds the widgets associated with a given name
 	WidgetMap m_WidgetMap;

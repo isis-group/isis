@@ -14,9 +14,20 @@ ViewerCoreBase::ViewerCoreBase( )
 
 void ViewerCoreBase::addImageList( const std::list< data::Image > imageList, const util::slist &filenames )
 {
+	bool ignoreFilenames = false;
+	if( filenames.size() != imageList.size() )
+	{
+		ignoreFilenames = true;
+		LOG( Runtime, error ) << "The size of the image list does not coincide with the amount of filenames. Ignoring filenames.";
+	}
+	util::slist::const_iterator filenameIterator = filenames.begin();
 	if( !imageList.empty() ) {
 		BOOST_FOREACH( std::list< data::Image >::const_reference imageRef, imageList ) {
-			m_DataContainer.addImage( imageRef );
+			if(!ignoreFilenames) {
+				m_DataContainer.addImage( imageRef, *(filenameIterator++) );
+			} else {
+				m_DataContainer.addImage( imageRef );
+			}
 		}
 	} else {
 		LOG( Runtime, warning ) << "The image list passed to the core is empty!";
@@ -32,7 +43,7 @@ void ViewerCoreBase::setImageList( const std::list< data::Image > imageList, con
 	if( !imageList.empty() ) {
 		m_DataContainer.clear();
 	}
-	addImageList( imageList, filenames );
+	ViewerCoreBase::addImageList( imageList, filenames );
 }
 
 

@@ -16,10 +16,11 @@ namespace viewer
 MainWindow::MainWindow( QViewerCore *core )
 	: m_ViewerCore( core )
 {
-
+	connect(ui.action_Exit, SIGNAL(triggered()), this, SLOT( exitProgram() ) );
+	connect(core, SIGNAL( emitImagesChanged(DataContainer::ImageFileMapType)), this, SLOT( imagesChanged(DataContainer::ImageFileMapType) ) );
+	
 	m_AxialWidget = new QGLWidgetImplementation( core, ui.axialWidget, GLOrientationHandler::axial );
 	m_ViewerCore->registerWidget( "axialView", m_AxialWidget );
-
 
 	m_CoronalWidget = m_AxialWidget->createSharedWidget( ui.coronalWidget, GLOrientationHandler::coronal );
 	m_ViewerCore->registerWidget( "coronalView", m_CoronalWidget );
@@ -67,6 +68,22 @@ void MainWindow::voxelCoordChanged( util::ivector4 coords )
 		break;
 	}
 
+}
+
+void MainWindow::imagesChanged(DataContainer::ImageFileMapType imageMap )
+{	
+	ui.imageStack->clear();
+	BOOST_FOREACH( DataContainer::ImageFileMapType::const_reference imageRef, imageMap )
+	{
+		QString entry = QString( imageRef.first.c_str() );
+		ui.imageStack->addItem(entry);
+	}
+}
+
+
+void MainWindow::exitProgram()
+{
+	close();
 }
 
 

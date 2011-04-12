@@ -38,13 +38,27 @@ QViewerCore::registerWidget( std::string key, QWidget *widget, QViewerCore::Acti
 
 void QViewerCore::voxelCoordChanged( util::ivector4 voxelCoords )
 {
-	Q_EMIT emitVoxelCoordChanged( voxelCoords );
+	emitVoxelCoordChanged( voxelCoords );
 }
 
 void QViewerCore::timestepChanged( int timestep )
 {
-	Q_EMIT emitTimeStepChange( timestep );
+	emitTimeStepChange( timestep );
 }
+
+void QViewerCore::addImageList(const std::list< data::Image > imageList, const isis::util::slist& filenames)
+{
+	isis::viewer::ViewerCoreBase::addImageList(imageList, filenames);
+	emitImagesChanged( getDataContainer().getFileNameMap() );
+}
+
+void QViewerCore::setImageList(const std::list< data::Image > imageList, const isis::util::slist& filenames)
+{
+	isis::viewer::ViewerCoreBase::setImageList(imageList, filenames);
+	emitImagesChanged( getDataContainer().getFileNameMap() );
+}
+
+
 
 }
 }

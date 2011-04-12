@@ -31,17 +31,21 @@ public:
 	typedef std::map<ImageHolder, std::map<size_t, GLuint > > ImageMapType;
 
 	///Convinient function to copy all in DataContainer available volumes to a GL_TEXTURE_3D.
-	std::map<ImageHolder, GLuint> copyAllImagesToTextures( const DataContainer &data );
+	std::map<ImageHolder, GLuint> copyAllImagesToTextures( const DataContainer &data, ScalingType scaling = automatic_scaling, InterpolationType interpolation = neares_neighbor );
 
 	///Copies the given timestep of an image with the given imageID to a GL_TEXTURE_3D. Return the texture id.
-	GLuint copyImageToTexture( const DataContainer &data, const ImageHolder &image, size_t timestep );
+	GLuint copyImageToTexture( const DataContainer &data, const ImageHolder &image, size_t timestep, ScalingType scaling = automatic_scaling, InterpolationType interpolation = neares_neighbor );
 
 	///The image map is a mapping of the imageID and timestep to the texture of the GL_TEXTURE_3D.
 	ImageMapType getImageMap() const { return m_ImageMap; }
+	
+	void setMinMax( const std::pair<double, double> minMax ) { m_MinMax = minMax; }
 
 private:
 
 	ImageMapType m_ImageMap;
+	//this is only needed if one specifies the manual scaling
+	std::pair<double, double> m_MinMax;
 
 	template<typename TYPE>
 	GLuint internCopyImageToTexture( const DataContainer &data, GLenum format, const ImageHolder &image, size_t timestep, ScalingType scalingType = automatic_scaling, InterpolationType interpolation = neares_neighbor  ) {
@@ -58,15 +62,28 @@ private:
 				LOG( Debug, info ) << "No scaling.";
 				break;
 			case automatic_scaling:
+			{
+				//actually this is only necessary if the image that is loaded is of type uint8_t or lower
+				//if it has a data type that can hold a wider range isis will do the scaling for us
 				TYPE maxTypeValue = std::numeric_limits<TYPE>::max();
 				TYPE minTypeValue = std::numeric_limits<TYPE>::min();
 				TYPE extent = maxTypeValue - minTypeValue;
-				TYPE minImage = image.getMinMax().first->as<TYPE>();
-				TYPE maxImage = image.getMinMax().second->as<TYPE>();
+				TYPE minImage = image.getInternMinMax().first->as<TYPE>();
+				TYPE maxImage = image.getInternMinMax().second->as<TYPE>();
 				pixelBias = (1.0 / extent) * (minTypeValue - minImage );
-				pixelScaling += (1.0 / extent) * abs( maxImage - minImage );
+				pixelScaling = extent / (maxImage - ( minTypeValue - minImage ));
 				LOG( Debug, info ) << "Automatic scaling -> scaling: " << pixelScaling << " -> bias: " << pixelBias;
 				break;
+			}
+			case manual_scaling:
+			{
+				double minImage = image.getMinMax().first->as<double>();
+				double maxImage = image.getMinMax().second->as<double>();;
+				double extent = maxImage - minImage;
+				pixelBias = (1.0 / extent) * (m_MinMax.first - minImage );
+				pixelScaling = extent / (m_MinMax.second - (m_MinMax.first - minImage));
+				break;
+			}
 		}
 		glPixelTransferf( GL_RED_SCALE, pixelBias );
 		glPixelTransferf( GL_GREEN_SCALE, pixelBias );
@@ -85,7 +102,7 @@ private:
 				break;
 		}
 		glShadeModel( GL_FLAT );
-		glEnable( GL_DEPTH_TEST );
+// 		glEnable( GL_DEPTH_TEST );
 		glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 		glGenTextures( 1, &texture );
 		glBindTexture( GL_TEXTURE_3D, texture );

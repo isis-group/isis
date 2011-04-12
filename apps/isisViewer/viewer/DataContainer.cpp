@@ -5,12 +5,13 @@ namespace isis
 namespace viewer
 {
 
-bool DataContainer::addImage( const data::Image &image )
+bool DataContainer::addImage( const data::Image &image, const std::string &filenames )
 {
 	ImageHolder tmpHolder;
-	tmpHolder.setImage( image );
+	tmpHolder.setImage( image, filenames );
 	tmpHolder.setID( size() );
 	push_back( tmpHolder );
+	m_FileNameMap[tmpHolder.getFileNames().front()] = tmpHolder;
 	return true;
 }
 

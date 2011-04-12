@@ -128,7 +128,7 @@ bool ImageHolder::setImage( const data::Image &image, const std::string &filenam
 	LOG( Debug, verbose_info ) << "Needed memory: " << image.getVolume() * sizeof( TYPE ) / ( 1024.0 * 1024.0 ) << " mb.";
 	image.copyToMem<TYPE>( &imagePtr[0] );
 	LOG( Debug, verbose_info ) << "Copied image to continuous memory space.";
-
+	m_InternMinMax = imagePtr.getMinMax();
 	//splice the image in its volumes -> we get a vector of t volumes
 	if( m_NumberOfTimeSteps > 1 ) { //splicing is only necessary if we got more than 1 timestep
 		m_ImageVector = imagePtr.splice( m_ImageSize[0] * m_ImageSize[1] * m_ImageSize[2] );

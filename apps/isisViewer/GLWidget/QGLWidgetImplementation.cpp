@@ -55,7 +55,8 @@ void QGLWidgetImplementation::initializeGL()
 {
 
 	LOG( Debug, verbose_info ) << "initializeGL " << objectName().toStdString();
-	util::Singletons::get<GLTextureHandler, 10>().copyAllImagesToTextures( m_ViewerCore->getDataContainer() );
+	util::Singletons::get<GLTextureHandler, 10>().setMinMax(std::make_pair<double,double>(0, 1000));
+	util::Singletons::get<GLTextureHandler, 10>().copyAllImagesToTextures( m_ViewerCore->getDataContainer(), GLTextureHandler::manual_scaling );
 	glClearColor( 0.0, 0.0, 0.0, 0.0 );
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
@@ -63,13 +64,17 @@ void QGLWidgetImplementation::initializeGL()
 	glLoadIdentity();
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();
+
 }
 
 
 void QGLWidgetImplementation::resizeGL( int w, int h )
 {
 	LOG( Debug, verbose_info ) << "resizeGL " << objectName().toStdString();
-	lookAtVoxel( util::ivector4( 90, 109, 91 ) );
+	if( m_ViewerCore->getDataContainer().size() ) {
+		//TODO show the center of the image
+		lookAtVoxel( util::ivector4( 90, 109, 91 ) );
+	}
 }
 
 void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const util::ivector4 &voxelCoords )

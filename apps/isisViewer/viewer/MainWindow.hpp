@@ -26,14 +26,13 @@ public:
 	MainWindow( QViewerCore *core  );
 
 private:
-	struct Slot {
-		MainWindow &parent;
-		Slot( MainWindow &p ) : parent( p ) {}
-	};
+
 	QViewerCore *m_ViewerCore;
 
 protected Q_SLOTS:
 	void voxelCoordChanged( util::ivector4 );
+	void exitProgram();
+	void imagesChanged( DataContainer::ImageFileMapType );
 
 
 private:

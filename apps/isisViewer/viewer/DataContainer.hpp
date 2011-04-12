@@ -17,9 +17,10 @@ namespace viewer
 class DataContainer : public std::vector<ImageHolder>
 {
 public:
-
+	typedef std::map<std::string, ImageHolder> ImageFileMapType;
+	
 	///simply adds an isis image to the vector
-	bool addImage( const data::Image & );
+	bool addImage( const data::Image &image, const std::string &filename = "" );
 
 	///checks if a image with the given parameters exists
 	bool isImage( size_t imageID, size_t timestep = 0, size_t slice = 0 ) const;
@@ -29,6 +30,11 @@ public:
 	getImageWeakPointer( const ImageHolder &image, size_t timestep = 0 ) const {
 		return image.getImageVector()[timestep]->getRawAddress();
 	}
+	
+	ImageFileMapType getFileNameMap() const { return m_FileNameMap; }
+	
+private:
+	ImageFileMapType m_FileNameMap;
 
 };
 
