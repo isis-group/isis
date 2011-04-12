@@ -33,6 +33,7 @@ void QGLWidgetImplementation::commonInit()
 	setSizePolicy( QSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored ) );
 	setMouseTracking( true );
 	connectSignals();
+	m_ScalingType = GLTextureHandler::automatic_scaling;
 	//flags
 	leftButtonPressed = false;
 	rightButtonPressed = false;
@@ -55,11 +56,11 @@ void QGLWidgetImplementation::initializeGL()
 {
 
 	LOG( Debug, verbose_info ) << "initializeGL " << objectName().toStdString();
-	util::Singletons::get<GLTextureHandler, 10>().setMinMax(std::make_pair<double,double>(0, 1000));
-	util::Singletons::get<GLTextureHandler, 10>().copyAllImagesToTextures( m_ViewerCore->getDataContainer(), GLTextureHandler::manual_scaling );
+	util::Singletons::get<GLTextureHandler, 10>().copyAllImagesToTextures( m_ViewerCore->getDataContainer() );
 	glClearColor( 0.0, 0.0, 0.0, 0.0 );
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
 	glMatrixMode( GL_PROJECTION );
@@ -88,7 +89,7 @@ void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const
 		state.voxelCoords[i] = state.voxelCoords[i] >= image.getImageSize()[i] ? image.getImageSize()[i] - 1 : state.voxelCoords[i];
 	}
 	//if not happend already copy the image to GLtexture memory and return the texture id
-	state.textureID = util::Singletons::get<GLTextureHandler, 10>().copyImageToTexture( m_ViewerCore->getDataContainer(), image, voxelCoords[3] );
+	state.textureID = util::Singletons::get<GLTextureHandler, 10>().copyImageToTexture( m_ViewerCore->getDataContainer(), image, voxelCoords[3], m_ScalingType );
 
 	//update the texture matrix.
 	//The texture matrix holds the orientation of the image and the orientation of the current widget. It does NOT hold the scaling of the image.
@@ -107,8 +108,7 @@ void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const
 		calculateTranslation( image );
 	}
 	
-	util::fvector4 objectCoords = GLOrientationHandler::transformVoxel2ObjectCoords( state.voxelCoords, image, state.planeOrientation );
-	
+	util::dvector4 objectCoords = GLOrientationHandler::transformVoxel2ObjectCoords( state.voxelCoords, image, state.planeOrientation );
 	state.crosshairCoords = object2WindowCoords( objectCoords[0], objectCoords[1], image );
 	state.normalizedSlice = objectCoords[2];
 
@@ -128,12 +128,7 @@ std::pair<int16_t, int16_t> QGLWidgetImplementation::object2WindowCoords( GLdoub
 	const State &stateValue = m_StateValues.at( image );
 	GLdouble win[3];
 	GLdouble pro[16];
-	for (size_t i = 0; i<16;i++) {pro[i] =  stateValue.projectionMatrix[i];}
-	pro[0] = 1;
-	pro[5] = 1;
-	pro[10] = 1;
-	pro[15] = 1;
-	gluProject( objx, objy, 0, stateValue.modelViewMatrix, pro, stateValue.viewport, &win[0], &win[1], &win[2] );
+	gluProject( objx, objy, 0, stateValue.modelViewMatrix, stateValue.projectionMatrix, stateValue.viewport, &win[0], &win[1], &win[2] );
 	return std::make_pair<int16_t, int16_t>( (win[0] - stateValue.viewport[0]), win[1] - stateValue.viewport[1] );
 }
 
@@ -210,7 +205,7 @@ void QGLWidgetImplementation::paintScene()
 	glColor4f( 1, 0, 0, 0 );
 	glLineWidth( 1.0 );
 	glMatrixMode( GL_PROJECTION );
-// 	glLoadIdentity();
+	glLoadIdentity();
 	glOrtho( 0, currentState.viewport[2], 0, currentState.viewport[3], -1, 1 );
 	glBegin( GL_LINES );
 	unsigned short gap = height() / 20;
@@ -313,9 +308,6 @@ void QGLWidgetImplementation::wheelEvent( QWheelEvent *e )
 
 }
 
-
-
-
 void QGLWidgetImplementation::mouseReleaseEvent( QMouseEvent *e )
 {	
 	if(e->button() == Qt::LeftButton ) {
@@ -326,6 +318,14 @@ void QGLWidgetImplementation::mouseReleaseEvent( QMouseEvent *e )
 	}
 }
 
+void QGLWidgetImplementation::setMinMaxRangeChanged( std::pair<double, double> minMax)
+{
+	util::Singletons::get<GLTextureHandler, 10>().setMinMax( minMax );
+	util::Singletons::get<GLTextureHandler, 10>().setForcing( true );
+	util::Singletons::get<GLTextureHandler, 10>().copyImageToTexture( m_ViewerCore->getDataContainer(), m_ViewerCore->getCurrentImage(),m_ViewerCore->getCurrentTimestep(), GLTextureHandler::manual_scaling );
+	lookAtVoxel( m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords );
+	util::Singletons::get<GLTextureHandler, 10>().setForcing( false );
+}
 
 
 }

@@ -29,7 +29,7 @@ private:
 
 	QViewerCore *m_ViewerCore;
 
-protected Q_SLOTS:
+public Q_SLOTS:
 	void voxelCoordChanged( util::ivector4 );
 	void exitProgram();
 	void imagesChanged( DataContainer::ImageFileMapType );

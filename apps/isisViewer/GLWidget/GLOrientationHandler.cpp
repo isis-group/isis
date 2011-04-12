@@ -109,18 +109,18 @@ util::ivector4 GLOrientationHandler::transformObject2VoxelCoords( const util::fv
 
 }
 
-util::fvector4 GLOrientationHandler::transformVoxel2ObjectCoords( const isis::util::ivector4 voxelCoords, const isis::viewer::ImageHolder &image, MatrixType orientation )
+util::dvector4 GLOrientationHandler::transformVoxel2ObjectCoords( const isis::util::ivector4 voxelCoords, const isis::viewer::ImageHolder &image, MatrixType orientation )
 {
-	util::fvector4 objectCoords;
-	util::fvector4 oneHalfVoxel;
+	util::dvector4 objectCoords;
+	util::dvector4 oneHalfVoxel;
 	for ( unsigned short i = 0; i < 3; i++ ) {
 		objectCoords[i] = ( 1.0 / image.getImageSize()[i] ) * voxelCoords[i];
 		oneHalfVoxel[i] = 0.5 / image.getImageSize()[i];
 	}
 
-	util::fvector4 transformedObjectCoords = transformVector<float>( objectCoords, orientation );
-	util::fvector4 transformedOneHalfVoxel = transformVector<float>( oneHalfVoxel, orientation );
-	util::fvector4 retVec;
+	util::dvector4 transformedObjectCoords = transformVector<float>( objectCoords, orientation );
+	util::dvector4 transformedOneHalfVoxel = transformVector<float>( oneHalfVoxel, orientation );
+	util::dvector4 retVec;
 	retVec[0] = transformedObjectCoords[0] < 0 ? 1.0 + 2 * ( transformedObjectCoords[0] + transformedOneHalfVoxel[0] ) : -1.0 + 2 * ( transformedObjectCoords[0] + transformedOneHalfVoxel[0] );
 	retVec[1] = transformedObjectCoords[1] < 0 ? 1.0 + 2 * ( transformedObjectCoords[1] + transformedOneHalfVoxel[1] ) : -1.0 + 2 * ( transformedObjectCoords[1] + transformedOneHalfVoxel[1] );
 	retVec[2] = transformedObjectCoords[2] < 0 ? 1.0 + transformedObjectCoords[2] + transformedOneHalfVoxel[2] : transformedObjectCoords[2] + transformedOneHalfVoxel[2];

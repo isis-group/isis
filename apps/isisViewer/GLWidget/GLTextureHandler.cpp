@@ -30,7 +30,7 @@ GLuint GLTextureHandler::copyImageToTexture( const DataContainer &data, const Im
 	}
 
 	//check if we have already copied this volume to texture. If we have already copied the image return its texture id
-	if ( m_ImageMap[image].find( timestep ) != m_ImageMap[image].end() ) {
+	if ( m_ImageMap[image].find( timestep ) != m_ImageMap[image].end() && !m_Force ) {
 		LOG( Debug, verbose_info ) << "Texture for volume " << image.getID() << " and timestep " << timestep  << " already exists. Wont copy it.";
 		return m_ImageMap[image][timestep];
 	}

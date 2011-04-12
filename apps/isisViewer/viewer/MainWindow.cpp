@@ -30,6 +30,7 @@ MainWindow::MainWindow( QViewerCore *core )
 
 
 	m_ViewerCore->registerWidget( "timestepSpinBox", ui.timestepSpinBox, QViewerCore::timestep_changed );
+	
 }
 
 

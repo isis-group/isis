@@ -46,6 +46,8 @@ public Q_SLOTS:
 	virtual bool lookAtVoxel( const ImageHolder &image, const util::ivector4 &voxelCoords );
 	virtual bool lookAtVoxel( const util::ivector4 &voxelCoords );
 	virtual bool timestepChanged( unsigned int timestep );
+	virtual void setMinMaxRangeChanged( std::pair<double, double> minMax );
+	virtual void setScalingType( GLTextureHandler::ScalingType scalingType ) { m_ScalingType = scalingType; }
 
 protected:
 	virtual void mouseMoveEvent( QMouseEvent *e );
@@ -118,7 +120,8 @@ private:
 		float zoomBorder;
 	} m_Zoom;
 
-
+	GLTextureHandler::ScalingType m_ScalingType;
+	
 	//flags
 	bool leftButtonPressed;
 	bool rightButtonPressed;

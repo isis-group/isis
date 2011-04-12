@@ -31,7 +31,7 @@ public:
 
 	static util::ivector4 transformObject2VoxelCoords( const util::fvector4 objectCoords, const ImageHolder &image, PlaneOrientation orientation );
 
-	static util::fvector4 transformVoxel2ObjectCoords( const util::ivector4 voxelCoords, const ImageHolder &image, MatrixType orientation );
+	static util::dvector4 transformVoxel2ObjectCoords( const util::ivector4 voxelCoords, const ImageHolder &image, MatrixType orientation );
 
 	//some helper functions
 	static void boostMatrix2Pointer( const MatrixType &boostMatrix, GLdouble *pointerMatrix );

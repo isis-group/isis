@@ -35,8 +35,8 @@ int main( int argc, char *argv[] )
 		}
 	}
 	isis::viewer::QViewerCore *core = new isis::viewer::QViewerCore;
-	core->setImageList( imgList, fileList );
 	isis::viewer::MainWindow isisViewerMainWindow( core );
+	core->setImageList( imgList, fileList );
 	isisViewerMainWindow.show();
 	return app.getQApplication().exec();
 }

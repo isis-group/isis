@@ -106,6 +106,19 @@
         </rect>
        </property>
       </widget>
+      <widget class="QLabel" name="label_2">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>110</y>
+         <width>71</width>
+         <height>18</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Timestep</string>
+       </property>
+      </widget>
      </widget>
     </item>
     <item row="0" column="0">

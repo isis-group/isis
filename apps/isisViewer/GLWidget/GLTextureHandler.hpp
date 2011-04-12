@@ -27,6 +27,8 @@ public:
 	enum ScalingType { no_scaling, automatic_scaling, manual_scaling };
 	enum InterpolationType { neares_neighbor, linear };
 	
+	GLTextureHandler() { minMaxSet = false; m_Force = false; }
+	
 	///The image map is a mapping of the imageID and timestep to the texture of the GL_TEXTURE_3D.
 	typedef std::map<ImageHolder, std::map<size_t, GLuint > > ImageMapType;
 
@@ -39,13 +41,16 @@ public:
 	///The image map is a mapping of the imageID and timestep to the texture of the GL_TEXTURE_3D.
 	ImageMapType getImageMap() const { return m_ImageMap; }
 	
-	void setMinMax( const std::pair<double, double> minMax ) { m_MinMax = minMax; }
+	void setMinMax( const std::pair<double, double> minMax ) { m_MinMax = minMax; minMaxSet = true; }
+	void setForcing( bool force ) { m_Force = force; }
 
 private:
 
 	ImageMapType m_ImageMap;
 	//this is only needed if one specifies the manual scaling
 	std::pair<double, double> m_MinMax;
+	bool minMaxSet;
+	bool m_Force;
 
 	template<typename TYPE>
 	GLuint internCopyImageToTexture( const DataContainer &data, GLenum format, const ImageHolder &image, size_t timestep, ScalingType scalingType = automatic_scaling, InterpolationType interpolation = neares_neighbor  ) {
@@ -56,6 +61,11 @@ private:
 		assert( dataPtr != 0 );
 		float pixelBias = 0;
 		float pixelScaling = 1;
+		if(!minMaxSet && scalingType == manual_scaling)
+		{
+			LOG(Runtime, warning) << "Trying to use manual scaling but no min/max was specified. Using no scaling!";
+			scalingType = no_scaling;
+		}
 		switch (scalingType) 
 		{
 			case no_scaling:
@@ -102,9 +112,13 @@ private:
 				break;
 		}
 		glShadeModel( GL_FLAT );
-// 		glEnable( GL_DEPTH_TEST );
 		glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-		glGenTextures( 1, &texture );
+		//if we force to reload the image
+		if(m_ImageMap[image].find( timestep ) != m_ImageMap[image].end() && m_Force ) {
+			texture = m_ImageMap[image][timestep];
+		} else {
+			glGenTextures( 1, &texture );
+		}
 		glBindTexture( GL_TEXTURE_3D, texture );
 		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, interpolationType );
 		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, interpolationType );
