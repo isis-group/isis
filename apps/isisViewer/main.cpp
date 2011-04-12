@@ -25,10 +25,17 @@ int main( int argc, char *argv[] )
 	app.setLog<isis::ViewerLog>( app.getLLMap()[app.parameters["dViewer"]->as<isis::util::Selection>()] );
 	app.setLog<isis::ViewerDebug>( app.getLLMap()[app.parameters["dViewer"]->as<isis::util::Selection>()] );
 	isis::util::slist fileList = app.parameters["in"];
-	std::list<isis::data::Image> imgList = isis::data::IOFactory::load( fileList.front() );
-
-	isis::viewer::QViewerCore *core = new isis::viewer::QViewerCore( imgList.front() );
-	core->setImageList( imgList );
+	std::list<isis::data::Image> imgList;
+	BOOST_FOREACH ( isis::util::slist::const_reference filename, fileList )
+	{
+		std::list< isis::data::Image > tmpList = isis::data::IOFactory::load( filename );
+		BOOST_FOREACH( std::list< isis::data::Image >::const_reference imgRef, tmpList )
+		{
+			imgList.push_back( imgRef );
+		}
+	}
+	isis::viewer::QViewerCore *core = new isis::viewer::QViewerCore;
+	core->setImageList( imgList, fileList );
 	isis::viewer::MainWindow isisViewerMainWindow( core );
 	isisViewerMainWindow.show();
 	return app.getQApplication().exec();

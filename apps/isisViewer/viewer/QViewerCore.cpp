@@ -5,7 +5,7 @@ namespace isis
 namespace viewer
 {
 
-QViewerCore::QViewerCore( data::Image image ): ViewerCoreBase( image )
+QViewerCore::QViewerCore( ): ViewerCoreBase( )
 {
 }
 

@@ -22,9 +22,6 @@ namespace viewer
 {
 
 // just some helper typedefs which we will need regularly
-typedef std::vector<boost::shared_ptr< data::Chunk > > ChunkVector;
-
-
 
 
 typedef ViewerLog Runtime;

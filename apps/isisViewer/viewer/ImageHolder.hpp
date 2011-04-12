@@ -25,22 +25,22 @@ class ImageHolder
 public:
 	typedef data::_internal::ValuePtrBase::Reference ImagePointerType;
 
-	ImageHolder( data::Image image  );
+	ImageHolder( );
 
-	bool setImage( data::Image image );
+	bool setImage( const data::Image &image, const std::string &filename = "" );
 
 	unsigned short getID() const { return m_ID; }
 	void setID( const unsigned short id ) { m_ID = id; }
 
 	std::vector< ImagePointerType > getImageVector() const { return m_ImageVector; }
-	std::vector< util::PropertyMap > getChunkProperties() const { return m_ChunkProperties; }
 	std::vector< util::PropertyMap > getTimeStepProperties() const { return m_TimeStepProperties; }
 	util::PropertyMap getPropMap() const { return m_PropMap; }
 	util::FixedVector<size_t, 4> getImageSize() const { return m_ImageSize; }
-	const data::Image &getImage() const { return m_Image; }
+	boost::shared_ptr< data::Image >getImage() const { return m_Image; }
 	boost::numeric::ublas::matrix<float> getNormalizedImageOrientation( bool transposed = false ) const;
 	boost::numeric::ublas::matrix<float> getImageOrientation( bool transposed = false ) const;
 	std::pair<util::ValueReference, util::ValueReference> getMinMax() const { return m_MinMax; }
+	util::slist getFileNames() const { return m_Filenames; }
 
 	bool operator<( const ImageHolder &ref ) const { return m_ID < ref.getID(); }
 
@@ -48,10 +48,10 @@ private:
 	size_t m_NumberOfTimeSteps;
 	util::FixedVector<size_t, 4> m_ImageSize;
 	util::PropertyMap m_PropMap;
-	std::vector< util::PropertyMap > m_ChunkProperties;
 	std::vector< util::PropertyMap > m_TimeStepProperties;
 	std::pair<util::ValueReference, util::ValueReference> m_MinMax;
-	data::Image m_Image;
+	boost::shared_ptr<data::Image> m_Image;
+	util::slist m_Filenames;
 	unsigned short m_ID;
 
 	std::vector< ImagePointerType > m_ImageVector;

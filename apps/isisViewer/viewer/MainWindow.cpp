@@ -38,7 +38,7 @@ void MainWindow::voxelCoordChanged( util::ivector4 coords )
 	BOOST_FOREACH( QViewerCore::WidgetMap::const_reference widget, m_ViewerCore->getWidgets() ) {
 		dynamic_cast<QGLWidgetImplementation *>( widget.second )->lookAtVoxel( coords );
 	}
-	data::Chunk ch = m_ViewerCore->getCurrentImage().getImage().getChunk( coords[0], coords[1], coords[2], coords[3] );
+	data::Chunk ch = m_ViewerCore->getCurrentImage().getImage()->getChunk( coords[0], coords[1], coords[2], coords[3] );
 
 	switch( ch.getTypeID() ) {
 	case data::ValuePtr<int8_t>::staticID:

@@ -6,30 +6,28 @@ namespace isis
 namespace viewer
 {
 
-ImageHolder::ImageHolder( data::Image image )
-	: m_NumberOfTimeSteps( 0 ),
-	  m_Image( image )
+ImageHolder::ImageHolder( )
+	: m_NumberOfTimeSteps( 0 )
 {
-	//ok we have to do this since image has no empty constructor
-	setImage( image );
 }
 
 
 bool
 ImageHolder::filterRelevantMetaInformation()
 {
+	std::vector<boost::shared_ptr< data::Chunk > > chunkList = m_Image->getChunksAsVector();
 	// in case we get more chunks than timesteps we should filter the chunk metadata
-	if( m_ChunkProperties.size() > m_NumberOfTimeSteps ) {
-		if( m_ChunkProperties.size() % m_NumberOfTimeSteps ) {
+	if( chunkList.size() > m_NumberOfTimeSteps ) {
+		if( chunkList.size() % m_NumberOfTimeSteps ) {
 			LOG( Runtime, warning ) << "Cannot filter the metadata for each timestep. Your image contains of "
-									<< m_ChunkProperties.size() << " chunks and " << m_NumberOfTimeSteps
+									<< chunkList.size() << " chunks and " << m_NumberOfTimeSteps
 									<< " timesteps. The number of chunks should be a multiple of number of timesteps!";
 			return false;
 		} else {
-			size_t factor = m_ChunkProperties.size() / m_NumberOfTimeSteps;
+			size_t factor = chunkList.size() / m_NumberOfTimeSteps;
 
-			for ( size_t t = 0; t < m_ChunkProperties.size(); t += factor ) {
-				m_TimeStepProperties.push_back( m_ChunkProperties[t] );
+			for ( size_t t = 0; t < chunkList.size(); t += factor ) {
+				m_TimeStepProperties.push_back( *(chunkList.operator[](t)) );
 			}
 
 			if( m_TimeStepProperties.size() != m_NumberOfTimeSteps ) {
@@ -47,9 +45,9 @@ boost::numeric::ublas::matrix< float > ImageHolder::getNormalizedImageOrientatio
 {
 	boost::numeric::ublas::matrix<float> retMatrix = boost::numeric::ublas::zero_matrix<float>( 4, 4 );
 	retMatrix( 3, 3 ) = 1;
-	util::fvector4 rowVec = m_Image.getPropertyAs<util::fvector4>( "rowVec" );
-	util::fvector4 columnVec = m_Image.getPropertyAs<util::fvector4>( "columnVec" );
-	util::fvector4 sliceVec = m_Image.getPropertyAs<util::fvector4>( "sliceVec" );
+	util::fvector4 rowVec = m_Image->getPropertyAs<util::fvector4>( "rowVec" );
+	util::fvector4 columnVec = m_Image->getPropertyAs<util::fvector4>( "columnVec" );
+	util::fvector4 sliceVec = m_Image->getPropertyAs<util::fvector4>( "sliceVec" );
 
 	for ( size_t i = 0; i < 3; i++ ) {
 		if( !transposed ) {
@@ -70,9 +68,9 @@ boost::numeric::ublas::matrix< float > ImageHolder::getImageOrientation( bool tr
 {
 	boost::numeric::ublas::matrix<float> retMatrix = boost::numeric::ublas::zero_matrix<float>( 4, 4 );
 	retMatrix( 3, 3 ) = 1;
-	util::fvector4 rowVec = m_Image.getPropertyAs<util::fvector4>( "rowVec" );
-	util::fvector4 columnVec = m_Image.getPropertyAs<util::fvector4>( "columnVec" );
-	util::fvector4 sliceVec = m_Image.getPropertyAs<util::fvector4>( "sliceVec" );
+	util::fvector4 rowVec = m_Image->getPropertyAs<util::fvector4>( "rowVec" );
+	util::fvector4 columnVec = m_Image->getPropertyAs<util::fvector4>( "columnVec" );
+	util::fvector4 sliceVec = m_Image->getPropertyAs<util::fvector4>( "sliceVec" );
 
 	for ( size_t i = 0; i < 3; i++ ) {
 		if( !transposed ) {
@@ -89,7 +87,7 @@ boost::numeric::ublas::matrix< float > ImageHolder::getImageOrientation( bool tr
 	return retMatrix;
 }
 
-bool ImageHolder::setImage( data::Image image )
+bool ImageHolder::setImage( const data::Image &image, const std::string &filename )
 {
 
 	//we convert the image to an uint8_t data type
@@ -101,9 +99,23 @@ bool ImageHolder::setImage( data::Image image )
 		return false;
 	}
 
-	//check if the TYPE corresponds to the typeID of the image
-	m_Image = image;
-
+	m_Image.reset( new data::Image( image ) );
+	//if no filename was specified we have to search for the filename by ourselfes
+	if(filename.empty()) {
+		// go through all the chunks and search for filenames. We use a set here to avoid redundantly filenames
+		std::set<std::string> filenameSet;
+		BOOST_FOREACH( std::vector<boost::shared_ptr< const data::Chunk > >::const_reference chRef, image.getChunksAsVector())
+		{
+			filenameSet.insert( chRef->getPropertyAs<std::string>("source") );
+		}
+		//now we pack our filenameSet into our slist of filenames
+		BOOST_FOREACH( std::set<std::string>::const_reference setRef, filenameSet)
+		{
+			m_Filenames.push_back( setRef );
+		}
+	} else {
+		m_Filenames.push_back( filename );
+	}
 	// get some image information
 	m_MinMax = image.getMinMax();
 	m_ImageSize = image.getSizeAsVector();
@@ -137,12 +149,6 @@ bool ImageHolder::setImage( data::Image image )
 	//copy all the relevant meta information
 	m_PropMap = static_cast<util::PropertyMap>( image );
 
-	//workaround cause compiles do not understand to use getChunksAsVector directly in BOOST_FOREACH
-	ChunkVector chVec = image.getChunksAsVector();
-	BOOST_FOREACH( ChunkVector::const_reference chRef, chVec ) {
-		m_ChunkProperties.push_back( static_cast<util::PropertyMap>( *chRef ) );
-	}
-	LOG( Debug, verbose_info ) << "Fetched " << m_ChunkProperties.size() << " chunk properties.";
 	//image seems to be ok...i guess
 	return filterRelevantMetaInformation(); //only return true if filtering was successfully
 }
