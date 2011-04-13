@@ -27,7 +27,7 @@ public:
 	enum ScalingType { no_scaling, automatic_scaling, manual_scaling };
 	enum InterpolationType { neares_neighbor, linear };
 	
-	GLTextureHandler() { minMaxSet = false; m_Force = false; }
+	GLTextureHandler() { m_CutAway = std::make_pair<float, float>(0.05,0.05); }
 	
 	///The image map is a mapping of the imageID and timestep to the texture of the GL_TEXTURE_3D.
 	typedef std::map<ImageHolder, std::map<size_t, GLuint > > ImageMapType;
@@ -41,17 +41,17 @@ public:
 	///The image map is a mapping of the imageID and timestep to the texture of the GL_TEXTURE_3D.
 	ImageMapType getImageMap() const { return m_ImageMap; }
 	
-	void setMinMax( const std::pair<double, double> minMax ) { m_MinMax = minMax; minMaxSet = true; }
-	void setForcing( bool force ) { m_Force = force; }
+	void setMinMax( const std::pair<double, double> minMax ) { m_MinMax = minMax; }
+	
+	void setCutAway( std::pair<float, float> cutAway ) const { m_CutAway = cutAway; }
 
 private:
 
 	ImageMapType m_ImageMap;
 	//this is only needed if one specifies the manual scaling
 	std::pair<double, double> m_MinMax;
-	bool minMaxSet;
-	bool m_Force;
-
+	std::pair<float, float> m_CutAway;
+	
 	template<typename TYPE>
 	GLuint internCopyImageToTexture( const DataContainer &data, GLenum format, const ImageHolder &image, size_t timestep, ScalingType scalingType = automatic_scaling, InterpolationType interpolation = neares_neighbor  ) {
 		LOG( Debug, info ) << "Copy image " << image.getID() << " with timestep " << timestep << " to texture";
@@ -61,11 +61,6 @@ private:
 		assert( dataPtr != 0 );
 		float pixelBias = 0;
 		float pixelScaling = 1;
-		if(!minMaxSet && scalingType == manual_scaling)
-		{
-			LOG(Runtime, warning) << "Trying to use manual scaling but no min/max was specified. Using no scaling!";
-			scalingType = no_scaling;
-		}
 		switch (scalingType) 
 		{
 			case no_scaling:
@@ -73,15 +68,46 @@ private:
 				break;
 			case automatic_scaling:
 			{
-				//actually this is only necessary if the image that is loaded is of type uint8_t or lower
-				//if it has a data type that can hold a wider range isis will do the scaling for us
 				TYPE maxTypeValue = std::numeric_limits<TYPE>::max();
 				TYPE minTypeValue = std::numeric_limits<TYPE>::min();
-				TYPE extent = maxTypeValue - minTypeValue;
 				TYPE minImage = image.getInternMinMax().first->as<TYPE>();
 				TYPE maxImage = image.getInternMinMax().second->as<TYPE>();
-				pixelBias = (1.0 / extent) * (minTypeValue - minImage );
-				pixelScaling = extent / (maxImage - ( minTypeValue - minImage ));
+				TYPE extent = maxImage - minImage;
+				double histogram[extent];
+				size_t stepSize = 2;
+				size_t volume = size[0] * size[1] * size[2];
+				size_t numberOfVoxels = volume / stepSize;
+				//initialize the histogram with 0
+				for( TYPE i = 0; i< extent; i++){
+					histogram[i] = 0;
+				}
+				//create the histogram
+				for( size_t i = 0;i< volume; i+=stepSize)
+				{
+					histogram[dataPtr[i]]++;
+				}
+				//normalize histogram
+				for( TYPE i = 0;i< extent; i++)
+				{
+					histogram[i] /= numberOfVoxels;
+				}
+				TYPE upperBorder = extent-1;
+				TYPE lowerBorder = 0;
+				double sum = 0;
+				//cut away 5% from top
+				while(sum < m_CutAway.second) 
+				{	
+					sum += histogram[upperBorder--];
+					
+				}
+				sum = 0;
+				//cut away 5% from below
+				while (sum < m_CutAway.first)
+				{
+					sum += histogram[lowerBorder++];
+				}
+				pixelBias = (1.0 / extent) * lowerBorder;
+				pixelScaling = (float)maxTypeValue / float(upperBorder - lowerBorder);
 				LOG( Debug, info ) << "Automatic scaling -> scaling: " << pixelScaling << " -> bias: " << pixelBias;
 				break;
 			}
@@ -113,12 +139,7 @@ private:
 		}
 		glShadeModel( GL_FLAT );
 		glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-		//if we force to reload the image
-		if(m_ImageMap[image].find( timestep ) != m_ImageMap[image].end() && m_Force ) {
-			texture = m_ImageMap[image][timestep];
-		} else {
-			glGenTextures( 1, &texture );
-		}
+		glGenTextures( 1, &texture );
 		glBindTexture( GL_TEXTURE_3D, texture );
 		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, interpolationType );
 		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, interpolationType );

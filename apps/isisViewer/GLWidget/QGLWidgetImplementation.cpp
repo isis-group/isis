@@ -320,11 +320,10 @@ void QGLWidgetImplementation::mouseReleaseEvent( QMouseEvent *e )
 
 void QGLWidgetImplementation::setMinMaxRangeChanged( std::pair<double, double> minMax)
 {
+	//TODO this is has to be implemented
 	util::Singletons::get<GLTextureHandler, 10>().setMinMax( minMax );
-	util::Singletons::get<GLTextureHandler, 10>().setForcing( true );
 	util::Singletons::get<GLTextureHandler, 10>().copyImageToTexture( m_ViewerCore->getDataContainer(), m_ViewerCore->getCurrentImage(),m_ViewerCore->getCurrentTimestep(), GLTextureHandler::manual_scaling );
 	lookAtVoxel( m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords );
-	util::Singletons::get<GLTextureHandler, 10>().setForcing( false );
 }
 
 
