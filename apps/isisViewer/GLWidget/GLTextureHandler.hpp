@@ -27,7 +27,7 @@ public:
 	enum ScalingType { no_scaling, automatic_scaling, manual_scaling };
 	enum InterpolationType { neares_neighbor, linear };
 	
-	GLTextureHandler() { m_CutAway = std::make_pair<float, float>(0.05,0.05); }
+	GLTextureHandler() { m_CutAway = std::make_pair<float, float>(0.05,0.03); }
 	
 	///The image map is a mapping of the imageID and timestep to the texture of the GL_TEXTURE_3D.
 	typedef std::map<ImageHolder, std::map<size_t, GLuint > > ImageMapType;
@@ -41,12 +41,13 @@ public:
 	///The image map is a mapping of the imageID and timestep to the texture of the GL_TEXTURE_3D.
 	ImageMapType getImageMap() const { return m_ImageMap; }
 	
+	///this is only of interest if you are using manual scaling. Specifies the min/max used for scaling the image
 	void setMinMax( const std::pair<double, double> minMax ) { m_MinMax = minMax; }
 	
-	void setCutAway( std::pair<float, float> cutAway ) const { m_CutAway = cutAway; }
+	///cut away is only of interest if you intend to do automatic scaling, Here you specify the trimming of the histogram
+	void setCutAway( std::pair<float, float> cutAway ) { m_CutAway = cutAway; }
 
 private:
-
 	ImageMapType m_ImageMap;
 	//this is only needed if one specifies the manual scaling
 	std::pair<double, double> m_MinMax;

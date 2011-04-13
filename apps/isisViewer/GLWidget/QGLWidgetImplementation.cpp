@@ -66,6 +66,7 @@ void QGLWidgetImplementation::initializeGL()
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();
 
+
 }
 
 
@@ -175,7 +176,7 @@ bool QGLWidgetImplementation::lookAtVoxel( const ImageHolder &image, const util:
 void QGLWidgetImplementation::paintScene()
 {
 	redraw();
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );	
 	BOOST_FOREACH( StateMap::const_reference currentImage, m_StateValues ) {
 		glViewport( currentImage.second.viewport[0], currentImage.second.viewport[1], currentImage.second.viewport[2], currentImage.second.viewport[3] );
 		glMatrixMode( GL_PROJECTION );
@@ -201,6 +202,16 @@ void QGLWidgetImplementation::paintScene()
 		glDisable( GL_TEXTURE_3D );
 	}
 	//paint crosshair
+	std::string stringSource = "void main() { gl_FragColor = vec4(0.2,0.4,0.8,1.0);}";
+	const GLcharARB * source  = stringSource.c_str();
+	GLuint myShader = glCreateShader(GL_FRAGMENT_SHADER);
+	GLuint my_program = glCreateProgram();
+	glShaderSource( myShader, 1 ,&source, NULL );
+	glCompileShader(myShader);
+	glAttachShader(my_program, myShader);
+	glLinkProgram(my_program);
+	glUseProgram(my_program);
+	
 	const State &currentState = m_StateValues.at( m_ViewerCore->getCurrentImage() );
 	glColor4f( 1, 0, 0, 0 );
 	glLineWidth( 1.0 );
@@ -225,8 +236,13 @@ void QGLWidgetImplementation::paintScene()
 	glEnd();
 	glFlush();
 	glLoadIdentity();
-
+	glUseProgram(0);
+	glDetachShader(my_program, myShader);
+	glDeleteShader(myShader);
+	glDeleteProgram(my_program);
 	redraw();
+
+	
 
 }
 
