@@ -10,6 +10,7 @@
 #include <DataStorage/chunk.hpp>
 #include <CoreUtils/singletons.hpp>
 #include "GLOrientationHandler.hpp"
+#include "GLShaderHandler.hpp"
 
 namespace isis
 {
@@ -78,6 +79,7 @@ private:
 
 	bool calculateTranslation( const ImageHolder &image );
 
+	GLShaderHandler m_ShaderHandler;
 
 	std::vector<GLuint> m_TextureIDVec;
 	GLOrientationHandler::PlaneOrientation m_PlaneOrientation;

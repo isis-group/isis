@@ -37,6 +37,8 @@ void QGLWidgetImplementation::commonInit()
 	//flags
 	leftButtonPressed = false;
 	rightButtonPressed = false;
+	
+	
 }
 
 
@@ -65,7 +67,9 @@ void QGLWidgetImplementation::initializeGL()
 	glLoadIdentity();
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();
-
+	std::string stringSource = "void main() { gl_FragColor = vec4(0.0, 0.4, 0.8, 1.0); }";
+	m_ShaderHandler.createContext();
+	m_ShaderHandler.addShader( "test", stringSource, GLShader::fragment );
 
 }
 
@@ -175,6 +179,7 @@ bool QGLWidgetImplementation::lookAtVoxel( const ImageHolder &image, const util:
 
 void QGLWidgetImplementation::paintScene()
 {
+	
 	redraw();
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );	
 	BOOST_FOREACH( StateMap::const_reference currentImage, m_StateValues ) {
@@ -202,15 +207,7 @@ void QGLWidgetImplementation::paintScene()
 		glDisable( GL_TEXTURE_3D );
 	}
 	//paint crosshair
-	std::string stringSource = "void main() { gl_FragColor = vec4(0.2,0.4,0.8,1.0);}";
-	const GLcharARB * source  = stringSource.c_str();
-	GLuint myShader = glCreateShader(GL_FRAGMENT_SHADER);
-	GLuint my_program = glCreateProgram();
-	glShaderSource( myShader, 1 ,&source, NULL );
-	glCompileShader(myShader);
-	glAttachShader(my_program, myShader);
-	glLinkProgram(my_program);
-	glUseProgram(my_program);
+	m_ShaderHandler.setEnabled( true );
 	
 	const State &currentState = m_StateValues.at( m_ViewerCore->getCurrentImage() );
 	glColor4f( 1, 0, 0, 0 );
@@ -236,10 +233,7 @@ void QGLWidgetImplementation::paintScene()
 	glEnd();
 	glFlush();
 	glLoadIdentity();
-	glUseProgram(0);
-	glDetachShader(my_program, myShader);
-	glDeleteShader(myShader);
-	glDeleteProgram(my_program);
+	m_ShaderHandler.setEnabled( false );
 	redraw();
 
 	
