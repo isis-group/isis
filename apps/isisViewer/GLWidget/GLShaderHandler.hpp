@@ -6,7 +6,7 @@
 #include <GL/gl.h>
 #include <iostream>
 #include <map>
-
+#include "common.hpp"
 
 namespace isis {
 namespace viewer {
@@ -43,12 +43,28 @@ public:
 	void createContext () { 
 		m_ProgramID = glCreateProgram(); 
 		glLinkProgram( m_ProgramID );
+		m_Context = true;
+	}
+	template <typename TYPE>
+	bool addVariable( const std::string &name, TYPE var ) 
+	{
+		if(m_Context)
+		{
+			GLint _var = glGetUniformLocation(m_ProgramID, name.c_str());
+			glUniform1f(_var, var); 
+			return true;
+		} else {
+			return false;
+		}
+		
+		
 	}
 	
 private:
 	ShaderMapType m_ShaderMap;
 	GLuint m_ProgramID;
 	bool m_isEnabled;
+	bool m_Context;
 };
 	
 	

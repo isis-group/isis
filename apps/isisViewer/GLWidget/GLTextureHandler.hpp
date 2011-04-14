@@ -54,10 +54,11 @@ private:
 	std::pair<float, float> m_CutAway;
 	
 	template<typename TYPE>
-	GLuint internCopyImageToTexture( const DataContainer &data, GLenum format, const ImageHolder &image, size_t timestep, ScalingType scalingType = automatic_scaling, InterpolationType interpolation = neares_neighbor  ) {
+	GLuint internCopyImageToTexture( const DataContainer &data, GLenum format, const ImageHolder &image, size_t timestep, bool alpha = true, ScalingType scalingType = automatic_scaling, InterpolationType interpolation = neares_neighbor  ) {
 		LOG( Debug, info ) << "Copy image " << image.getID() << " with timestep " << timestep << " to texture";
 		GLuint texture;
 		util::FixedVector<size_t, 4> size = image.getImageSize();
+		size_t volume = size[0] * size[1] * size[2];
 		TYPE *dataPtr = static_cast<TYPE *>( data.getImageWeakPointer( image, timestep ).lock().get() );
 		assert( dataPtr != 0 );
 		float pixelBias = 0;
@@ -76,7 +77,6 @@ private:
 				TYPE extent = maxImage - minImage;
 				double histogram[extent];
 				size_t stepSize = 2;
-				size_t volume = size[0] * size[1] * size[2];
 				size_t numberOfVoxels = volume / stepSize;
 				//initialize the histogram with 0
 				for( TYPE i = 0; i< extent; i++){
@@ -95,14 +95,12 @@ private:
 				TYPE upperBorder = extent-1;
 				TYPE lowerBorder = 0;
 				double sum = 0;
-				//cut away 5% from top
 				while(sum < m_CutAway.second) 
 				{	
 					sum += histogram[upperBorder--];
 					
 				}
 				sum = 0;
-				//cut away 5% from below
 				while (sum < m_CutAway.first)
 				{
 					sum += histogram[lowerBorder++];
@@ -139,7 +137,7 @@ private:
 				break;
 		}
 		glShadeModel( GL_FLAT );
-		glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+// 		glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 		glGenTextures( 1, &texture );
 		glBindTexture( GL_TEXTURE_3D, texture );
 		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, interpolationType );
@@ -147,11 +145,30 @@ private:
 		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER );
 		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER );
 		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER );
-		glTexImage3D( GL_TEXTURE_3D, 0, 3,
+		GLint internalFormat;
+		GLenum dataFormat;
+		if(alpha) {
+			TYPE *dataWithAplpha = (TYPE*) calloc(volume*2, sizeof(TYPE));
+			size_t index = 0;
+			for (size_t i = 0; i<volume*2; i+=2)
+			{
+				dataWithAplpha[i] = dataPtr[index++];
+				dataWithAplpha[i+1] = std::numeric_limits<TYPE>::max();
+			}
+			free(dataPtr);
+			glTexImage3D( GL_TEXTURE_3D, 0, GL_LUMINANCE12_ALPHA4,
+					  size[0],
+					  size[1],
+					  size[2], 0, GL_LUMINANCE_ALPHA, format,
+					  dataWithAplpha );
+		} else {
+			glTexImage3D( GL_TEXTURE_3D, 0, GL_LUMINANCE,
 					  size[0],
 					  size[1],
 					  size[2], 0, GL_LUMINANCE, format,
 					  dataPtr );
+		}
+		
 		m_ImageMap[image].insert( std::make_pair<size_t, GLuint >( timestep, texture ) );
 		return texture;
 	}

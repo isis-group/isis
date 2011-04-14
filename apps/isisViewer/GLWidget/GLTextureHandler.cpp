@@ -35,7 +35,7 @@ GLuint GLTextureHandler::copyImageToTexture( const DataContainer &data, const Im
 		return m_ImageMap[image][timestep];
 	}
 
-	return internCopyImageToTexture<TYPE>( data, GL_UNSIGNED_BYTE, image, timestep, scaling, interpolation );
+	return internCopyImageToTexture<TYPE>( data, GL_UNSIGNED_BYTE, image, timestep, true, scaling, interpolation );
 
 
 }

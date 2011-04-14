@@ -67,10 +67,16 @@ void QGLWidgetImplementation::initializeGL()
 	glLoadIdentity();
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();
-	std::string stringSource = "void main() { gl_FragColor = vec4(0.0, 0.4, 0.8, 1.0); }";
+	std::string vertexShader = "void main() { gl_TexCoord[0] = gl_MultiTexCoord0; gl_Position = ftransform(); }";
+	std::string fragmentShader = " uniform sampler3D imageTexture;  void main() { gl_FragColor = gl_FragColor; }";
+	std::string crossHairSource = "void main() { gl_FragColor.b = 1.0; }";
+	
+	// float i = texture3D(imageTexture, glTexCoord[0].xyz).r; uniform sampler3D imageTexture; 
 	m_ShaderHandler.createContext();
-	m_ShaderHandler.addShader( "test", stringSource, GLShader::fragment );
-
+	m_ShaderHandler.addShader( "crosshair_blue", crossHairSource, GLShader::fragment );
+// 	m_ShaderHandler.addShader( "vertex", vertexShader, GLShader::vertex );
+// 	m_ShaderHandler.addShader( "fragment", fragmentShader, GLShader::fragment );
+	
 }
 
 
@@ -182,7 +188,12 @@ void QGLWidgetImplementation::paintScene()
 	
 	redraw();
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );	
+	glEnable (GL_BLEND);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+// 	m_ShaderHandler.setEnabled( true );
+	
 	BOOST_FOREACH( StateMap::const_reference currentImage, m_StateValues ) {
+		
 		glViewport( currentImage.second.viewport[0], currentImage.second.viewport[1], currentImage.second.viewport[2], currentImage.second.viewport[3] );
 		glMatrixMode( GL_PROJECTION );
 		glLoadIdentity();
@@ -194,6 +205,7 @@ void QGLWidgetImplementation::paintScene()
 		glLoadMatrixd( currentImage.second.textureMatrix );
 		glEnable( GL_TEXTURE_3D );
 		glBindTexture( GL_TEXTURE_3D, currentImage.second.textureID );
+		m_ShaderHandler.addVariable<float>("textureImage", 0);
 		glBegin( GL_QUADS );
 		glTexCoord3f( 0, 0, currentImage.second.normalizedSlice );
 		glVertex2f( -1.0, -1.0 );
@@ -206,9 +218,9 @@ void QGLWidgetImplementation::paintScene()
 		glEnd();
 		glDisable( GL_TEXTURE_3D );
 	}
-	//paint crosshair
 	m_ShaderHandler.setEnabled( true );
-	
+	//paint crosshair
+	glDisable(GL_BLEND);
 	const State &currentState = m_StateValues.at( m_ViewerCore->getCurrentImage() );
 	glColor4f( 1, 0, 0, 0 );
 	glLineWidth( 1.0 );

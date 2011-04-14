@@ -6,7 +6,8 @@ namespace isis {
 namespace viewer {
 	
 GLShaderHandler::GLShaderHandler()
-	:m_isEnabled(false)
+	:m_isEnabled(false),
+	m_Context( false )
 {
 	
 }	
@@ -28,6 +29,16 @@ void GLShaderHandler::addShader(const std::string& name, const std::string& sour
 	const GLcharARB * csource  = source.c_str();
 	glShaderSource( shader.getShaderID(), 1, &csource, NULL );
 	glCompileShader( shader.getShaderID() );
+	GLint compileStatus;
+	glGetShaderiv(shader.getShaderID(), GL_COMPILE_STATUS, &compileStatus);
+	if(compileStatus == GL_FALSE)
+	{
+		LOG(Runtime, error) << "Error during compilation of shader " << name << " !";
+	} else {
+		LOG(Debug, info) << "Shader " << name << " with id " << shader.getShaderID() << " compiled successfully!";
+	}
+		
+	
 	glAttachShader( m_ProgramID, shader.getShaderID() );
 	m_ShaderMap[name] = shader;
 }
@@ -35,8 +46,8 @@ void GLShaderHandler::addShader(const std::string& name, const std::string& sour
 void GLShaderHandler::setEnabled(bool enable)
 {
 	if( enable ) {
-		BOOST_FOREACH( ShaderMapType::const_reference shaderRef, m_ShaderMap ) 
 		glLinkProgram( m_ProgramID );
+		glValidateProgram( m_ProgramID );
 		glUseProgram( m_ProgramID );
 		m_isEnabled = true;
 	} else {
