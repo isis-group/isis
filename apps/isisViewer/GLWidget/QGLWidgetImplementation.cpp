@@ -34,7 +34,8 @@ void QGLWidgetImplementation::commonInit()
 	setSizePolicy( QSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored ) );
 	setMouseTracking( true );
 	connectSignals();
-	m_ScalingType = GLTextureHandler::automatic_scaling;
+	m_ScalingType = automatic_scaling;
+	m_ScalingPair = std::make_pair<double, double>(0.0,1.0);
 	//flags
 	leftButtonPressed = false;
 	rightButtonPressed = false;
@@ -57,8 +58,6 @@ void QGLWidgetImplementation::connectSignals()
 
 void QGLWidgetImplementation::initializeGL()
 {
-
-	LOG( Debug, verbose_info ) << "initializeGL " << objectName().toStdString();
 	util::Singletons::get<GLTextureHandler, 10>().copyAllImagesToTextures( m_ViewerCore->getDataContainer() );
 	glClearColor( 0.0, 0.0, 0.0, 0.0 );
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -70,8 +69,8 @@ void QGLWidgetImplementation::initializeGL()
 	glLoadIdentity();
 	std::string scalingShader = " uniform float extent; uniform float bias; uniform float scaling; uniform sampler3D imageTexture;  void main() { vec4 color = texture3D(imageTexture, gl_TexCoord[0].xyz); gl_FragColor = (color + bias/extent) * scaling; }";
 	
-	m_ShaderHandler.createContext();
-	m_ShaderHandler.addShader( "scaling", scalingShader, GLShader::fragment );
+	m_ScalingShader.createContext();
+	m_ScalingShader.addShader( "scaling", scalingShader, GLShader::fragment );
 	
 }
 
@@ -96,7 +95,7 @@ void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const
 		state.voxelCoords[i] = state.voxelCoords[i] >= image.getImageSize()[i] ? image.getImageSize()[i] - 1 : state.voxelCoords[i];
 	}
 	//if not happend already copy the image to GLtexture memory and return the texture id
-	state.textureID = util::Singletons::get<GLTextureHandler, 10>().copyImageToTexture( m_ViewerCore->getDataContainer(), image, voxelCoords[3], m_ScalingType );
+	state.textureID = util::Singletons::get<GLTextureHandler, 10>().copyImageToTexture( m_ViewerCore->getDataContainer(), image, voxelCoords[3] );
 
 	//update the texture matrix.
 	//The texture matrix holds the orientation of the image and the orientation of the current widget. It does NOT hold the scaling of the image.
@@ -187,9 +186,19 @@ void QGLWidgetImplementation::paintScene()
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	
-	m_ShaderHandler.setEnabled( true );
+	m_ScalingShader.setEnabled( true );
 	BOOST_FOREACH( StateMap::const_reference currentImage, m_StateValues ) {
-		
+		double scaling, bias;
+		if(m_ScalingType == automatic_scaling) {
+			scaling = currentImage.first.getOptimalScalingPair().second;
+			bias = currentImage.first.getOptimalScalingPair().first;
+		} else if ( m_ScalingType == manual_scaling) {
+			scaling = m_ScalingPair.second;
+			bias = m_ScalingPair.first;
+		} else {
+			scaling = 1.0;
+			bias = 0.0;
+		}
 		glViewport( currentImage.second.viewport[0], currentImage.second.viewport[1], currentImage.second.viewport[2], currentImage.second.viewport[3] );
 		glMatrixMode( GL_PROJECTION );
 		glLoadIdentity();
@@ -201,11 +210,10 @@ void QGLWidgetImplementation::paintScene()
 		glLoadMatrixd( currentImage.second.textureMatrix );
 		glEnable( GL_TEXTURE_3D );
 		glBindTexture( GL_TEXTURE_3D, currentImage.second.textureID );
-		
-		m_ShaderHandler.addVariable<float>("textureImage", 0);
-		m_ShaderHandler.addVariable<float>("scaling", 1.4);
-		m_ShaderHandler.addVariable<float>("bias", 10);
-		m_ShaderHandler.addVariable<float>("extent", std::numeric_limits<GLubyte>::max());
+		m_ScalingShader.addVariable<float>("textureImage", 0);
+		m_ScalingShader.addVariable<float>("extent", std::numeric_limits<GLubyte>::max());
+		m_ScalingShader.addVariable<float>("scaling", scaling);
+		m_ScalingShader.addVariable<float>("bias", bias);
 		glBegin( GL_QUADS );
 		glTexCoord3f( 0, 0, currentImage.second.normalizedSlice );
 		glVertex2f( -1.0, -1.0 );
@@ -218,7 +226,7 @@ void QGLWidgetImplementation::paintScene()
 		glEnd();
 		glDisable( GL_TEXTURE_3D );
 	}
-	m_ShaderHandler.setEnabled( false );
+	m_ScalingShader.setEnabled( false );
 	//paint crosshair
 	glDisable(GL_BLEND);
 	const State &currentState = m_StateValues.at( m_ViewerCore->getCurrentImage() );
@@ -342,8 +350,7 @@ void QGLWidgetImplementation::mouseReleaseEvent( QMouseEvent *e )
 void QGLWidgetImplementation::setMinMaxRangeChanged( std::pair<double, double> minMax)
 {
 	//TODO this is has to be implemented
-	util::Singletons::get<GLTextureHandler, 10>().setMinMax( minMax );
-	util::Singletons::get<GLTextureHandler, 10>().copyImageToTexture( m_ViewerCore->getDataContainer(), m_ViewerCore->getCurrentImage(),m_ViewerCore->getCurrentTimestep(), GLTextureHandler::manual_scaling );
+	util::Singletons::get<GLTextureHandler, 10>().copyImageToTexture( m_ViewerCore->getDataContainer(), m_ViewerCore->getCurrentImage(),m_ViewerCore->getCurrentTimestep() );
 	lookAtVoxel( m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords );
 }
 

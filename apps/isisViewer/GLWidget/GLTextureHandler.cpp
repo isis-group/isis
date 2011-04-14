@@ -6,20 +6,20 @@ namespace viewer
 {
 
 
-std::map<ImageHolder, GLuint> GLTextureHandler::copyAllImagesToTextures( const DataContainer &data, GLTextureHandler::ScalingType scaling, GLTextureHandler::InterpolationType interpolation )
+std::map<ImageHolder, GLuint> GLTextureHandler::copyAllImagesToTextures( const DataContainer &data, GLTextureHandler::InterpolationType interpolation )
 {
 	// here we only copy the first timestep of each image. Would take a while to do this for all timesteps
 	std::map<ImageHolder, GLuint> retIDList;
 
 	BOOST_FOREACH( DataContainer::const_reference image, data ) {
-		retIDList[image] = copyImageToTexture( data, image, 0, scaling, interpolation );
+		retIDList[image] = copyImageToTexture( data, image, 0, interpolation );
 	}
 
 	return retIDList;
 
 }
 
-GLuint GLTextureHandler::copyImageToTexture( const DataContainer &data, const ImageHolder &image, size_t timestep, GLTextureHandler::ScalingType scaling, GLTextureHandler::InterpolationType interpolation )
+GLuint GLTextureHandler::copyImageToTexture( const DataContainer &data, const ImageHolder &image, size_t timestep, GLTextureHandler::InterpolationType interpolation )
 {
 	typedef uint8_t TYPE;
 
@@ -35,7 +35,7 @@ GLuint GLTextureHandler::copyImageToTexture( const DataContainer &data, const Im
 		return m_ImageMap[image][timestep];
 	}
 
-	return internCopyImageToTexture<TYPE>( data, GL_UNSIGNED_BYTE, image, timestep, true, scaling, interpolation );
+	return internCopyImageToTexture<TYPE>( data, GL_UNSIGNED_BYTE, image, timestep, true, interpolation );
 
 
 }

@@ -7,7 +7,8 @@ namespace viewer
 {
 
 ImageHolder::ImageHolder( )
-	: m_NumberOfTimeSteps( 0 )
+	: m_NumberOfTimeSteps( 0 ),
+	m_CutAwayPair(std::make_pair<double, double>(0.03,0.05))
 {
 }
 
@@ -148,7 +149,7 @@ bool ImageHolder::setImage( const data::Image &image, const std::string &filenam
 
 	//copy all the relevant meta information
 	m_PropMap = static_cast<util::PropertyMap>( image );
-
+	m_OptimalScalingPair = getOptimalScalingToForType<TYPE>(m_CutAwayPair);
 	//image seems to be ok...i guess
 	return filterRelevantMetaInformation(); //only return true if filtering was successfully
 }

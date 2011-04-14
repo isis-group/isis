@@ -23,10 +23,9 @@ class QGLWidgetImplementation : public QGLWidget
 {
 	Q_OBJECT
 public:
+	enum ScalingType { no_scaling, automatic_scaling, manual_scaling };
 	QGLWidgetImplementation( QViewerCore *core, QWidget *parent = 0, QGLWidget *share = 0, GLOrientationHandler::PlaneOrientation orienation = GLOrientationHandler::axial );
 	QGLWidgetImplementation( QViewerCore *core, QWidget *parent = 0, GLOrientationHandler::PlaneOrientation orientation = GLOrientationHandler::axial );
-
-
 
 	QGLWidgetImplementation *createSharedWidget( QWidget *parent, GLOrientationHandler::PlaneOrientation orienation = GLOrientationHandler::axial );
 
@@ -48,7 +47,7 @@ public Q_SLOTS:
 	virtual bool lookAtVoxel( const util::ivector4 &voxelCoords );
 	virtual bool timestepChanged( unsigned int timestep );
 	virtual void setMinMaxRangeChanged( std::pair<double, double> minMax );
-	virtual void setScalingType( GLTextureHandler::ScalingType scalingType ) { m_ScalingType = scalingType; }
+	virtual void setScalingType( ScalingType scalingType ) { m_ScalingType = scalingType; }
 
 protected:
 	virtual void mouseMoveEvent( QMouseEvent *e );
@@ -79,7 +78,7 @@ private:
 
 	bool calculateTranslation( const ImageHolder &image );
 
-	GLShaderHandler m_ShaderHandler;
+	GLShaderHandler m_ScalingShader;
 
 	std::vector<GLuint> m_TextureIDVec;
 	GLOrientationHandler::PlaneOrientation m_PlaneOrientation;
@@ -122,7 +121,8 @@ private:
 		float zoomBorder;
 	} m_Zoom;
 
-	GLTextureHandler::ScalingType m_ScalingType;
+	ScalingType m_ScalingType;
+	std::pair<double, double> m_ScalingPair;
 	
 	//flags
 	bool leftButtonPressed;
