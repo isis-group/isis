@@ -163,5 +163,6 @@ void GLOrientationHandler::makeIdentity( GLdouble *matrix )
 }
 
 
+
 }
 } // end namespace

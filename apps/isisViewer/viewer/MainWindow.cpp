@@ -18,7 +18,7 @@ MainWindow::MainWindow( QViewerCore *core )
 {
 	connect(ui.action_Exit, SIGNAL(triggered()), this, SLOT( exitProgram() ) );
 	connect(core, SIGNAL( emitImagesChanged(DataContainer::ImageFileMapType)), this, SLOT( imagesChanged(DataContainer::ImageFileMapType) ) );
-	connect(ui.dockWidget);
+	connect(ui.imageStack, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT( checkImageStack(QListWidgetItem*)));
 	
 	m_AxialWidget = new QGLWidgetImplementation( core, ui.axialWidget, GLOrientationHandler::axial );
 	m_ViewerCore->registerWidget( "axialView", m_AxialWidget );
@@ -80,7 +80,7 @@ void MainWindow::imagesChanged(DataContainer::ImageFileMapType imageMap )
 		QListWidgetItem *item = new QListWidgetItem;
 		QString sD = imageRef.second.getPropMap().getPropertyAs<std::string>("sequenceDescription").c_str();
 		if (!sD.toStdString().empty()) {
-			item->setText(QString( imageRef.first.first.c_str() ) + QString(" -> ") + sD);	
+			item->setText(QString( imageRef.first.first.c_str() ) );	
 		} else {
 			item->setText(QString( imageRef.first.first.c_str() ) );
 		}
@@ -94,6 +94,17 @@ void MainWindow::imagesChanged(DataContainer::ImageFileMapType imageMap )
 		ui.imageStack->addItem(item);
 		
 	}
+}
+
+void MainWindow::checkImageStack(QListWidgetItem* item)
+{
+	if(item->checkState() == Qt::Checked)
+	{
+		std::cout << item->text().toStdString() << " is active!" << std::endl << std::flush;
+	} else {
+		std::cout << item->text().toStdString() << " is not active!" << std::endl << std::flush;
+	}
+	
 }
 
 

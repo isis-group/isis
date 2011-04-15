@@ -33,6 +33,7 @@ QGLWidgetImplementation::QGLWidgetImplementation( QViewerCore *core, QWidget *pa
 void QGLWidgetImplementation::commonInit()
 {
 	setSizePolicy( QSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored ) );
+	setFocusPolicy(Qt::StrongFocus);
 	setMouseTracking( true );
 	connectSignals();
 	m_ScalingType = automatic_scaling;
@@ -40,7 +41,8 @@ void QGLWidgetImplementation::commonInit()
 	//flags
 	leftButtonPressed = false;
 	rightButtonPressed = false;	
-	m_ShowLabels = true;
+	m_ShowLabels = false;
+	
 }
 
 
@@ -410,6 +412,20 @@ void QGLWidgetImplementation::setMinMaxRangeChanged( std::pair<double, double> m
 	//TODO this is has to be implemented
 	util::Singletons::get<GLTextureHandler, 10>().copyImageToTexture( m_ViewerCore->getDataContainer(), m_ViewerCore->getCurrentImage(),m_ViewerCore->getCurrentTimestep() );
 	lookAtVoxel( m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords );
+}
+
+void QGLWidgetImplementation::keyPressEvent(QKeyEvent* e)
+{
+	if(e->key() == Qt::Key_Space)
+	{
+		BOOST_FOREACH( StateMap::reference ref, m_StateValues )
+		{
+			GLOrientationHandler::makeIdentity( ref.second.modelViewMatrix );
+			GLOrientationHandler::makeIdentity( ref.second.projectionMatrix );
+		}
+		m_Zoom.currentZoom = 1.0;
+		lookAtVoxel(m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords);
+	}
 }
 
 

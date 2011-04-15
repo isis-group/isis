@@ -56,6 +56,7 @@ protected:
 	virtual void wheelEvent( QWheelEvent *e );
 	virtual void mousePressEvent( QMouseEvent *e );
 	virtual void mouseReleaseEvent( QMouseEvent *e );
+	virtual void keyPressEvent( QKeyEvent *e);
 	virtual void initializeGL();
 	virtual void resizeGL( int w, int h );
 
