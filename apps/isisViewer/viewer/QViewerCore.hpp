@@ -4,6 +4,7 @@
 #include "ViewerCoreBase.hpp"
 #include "QGLWidgetImplementation.hpp"
 #include <QtGui>
+#include "Color.hpp"
 
 namespace isis
 {
@@ -24,6 +25,8 @@ public:
 	virtual void setImageList( const std::list<data::Image> imageList, const util::slist &filenames = util::slist() );
 
 	const WidgetMap &getWidgets() const { return m_WidgetMap; }
+	
+	std::vector< util::fvector4 > getRGBColorGradient() const { return m_RGBColorGradient; }
 
 	template<typename T>
 	T *getWidgetAs( std::string key ) {
@@ -37,7 +40,6 @@ public:
 		} else {
 			LOG( Runtime, error ) << "Error while converting widget " << key << " !";
 		}
-
 	};
 
 
@@ -53,6 +55,7 @@ Q_SIGNALS:
 private:
 	//this map holds the widgets associated with a given name
 	WidgetMap m_WidgetMap;
+	std::vector< util::fvector4 > m_RGBColorGradient;
 
 };
 

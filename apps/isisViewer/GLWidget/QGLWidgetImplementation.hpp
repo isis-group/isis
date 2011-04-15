@@ -11,6 +11,7 @@
 #include <CoreUtils/singletons.hpp>
 #include "GLOrientationHandler.hpp"
 #include "GLShaderHandler.hpp"
+#include "GLLookupTable.hpp"
 
 namespace isis
 {
@@ -79,7 +80,8 @@ private:
 	bool calculateTranslation( const ImageHolder &image );
 
 	GLShaderHandler m_ScalingShader;
-
+	GLShaderHandler m_LUTShader;
+	
 	std::vector<GLuint> m_TextureIDVec;
 	GLOrientationHandler::PlaneOrientation m_PlaneOrientation;
 
@@ -89,6 +91,7 @@ private:
 			GLOrientationHandler::makeIdentity( projectionMatrix );
 			GLOrientationHandler::makeIdentity( textureMatrix );
 			set = false;
+			opacity = 1.0;
 		}
 		bool set;
 		GLdouble modelViewMatrix[16];
@@ -101,6 +104,7 @@ private:
 		util::ivector4 mappedVoxelCoords;
 		util::fvector4 mappedVoxelSize;
 		util::ivector4 mappedImageSize;
+		float opacity;
 		std::pair<int16_t, int16_t> crosshairCoords;
 		GLOrientationHandler::MatrixType planeOrientation;
 	};
@@ -123,6 +127,8 @@ private:
 
 	ScalingType m_ScalingType;
 	std::pair<double, double> m_ScalingPair;
+
+	isis::viewer::GLLookUpTable m_LookUpTable;
 	
 	//flags
 	bool leftButtonPressed;

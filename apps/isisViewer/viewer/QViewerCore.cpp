@@ -1,5 +1,6 @@
 #include "QViewerCore.hpp"
 
+
 namespace isis
 {
 namespace viewer
@@ -7,6 +8,7 @@ namespace viewer
 
 QViewerCore::QViewerCore( ): ViewerCoreBase( )
 {
+	m_RGBColorGradient = Color::getColorGradientRGB();
 }
 
 

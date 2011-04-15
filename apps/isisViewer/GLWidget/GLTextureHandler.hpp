@@ -66,7 +66,7 @@ private:
 				interpolationType = GL_LINEAR;
 				break;
 		}
-		glShadeModel( GL_FLAT );
+		glPixelStorei(GL_UNPACK_ALIGNMENT,1);
 		glGenTextures( 1, &texture );
 		glBindTexture( GL_TEXTURE_3D, texture );
 		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, interpolationType );

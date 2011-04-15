@@ -46,12 +46,16 @@ public:
 		m_Context = true;
 	}
 	template <typename TYPE>
-	bool addVariable( const std::string &name, TYPE var ) 
+	bool addVariable( const std::string &name, TYPE var, bool integer = false ) 
 	{
 		if(m_Context)
 		{
-			GLint _var = glGetUniformLocation(m_ProgramID, name.c_str());
-			glUniform1f(_var, var); 
+			GLint location = glGetUniformLocation(m_ProgramID, name.c_str());
+			if(integer) {
+				glUniform1i(location, var);
+			} else {
+				glUniform1f(location, var); 
+			}
 			return true;
 		} else {
 			return false;
