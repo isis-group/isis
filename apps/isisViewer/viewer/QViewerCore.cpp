@@ -48,15 +48,15 @@ void QViewerCore::timestepChanged( int timestep )
 	emitTimeStepChange( timestep );
 }
 
-void QViewerCore::addImageList(const std::list< data::Image > imageList, const isis::util::slist& filenames)
+void QViewerCore::addImageList(const std::list< data::Image > imageList, const ImageHolder::ImageType &imageType, const isis::util::slist& filenames)
 {
-	isis::viewer::ViewerCoreBase::addImageList(imageList, filenames);
+	isis::viewer::ViewerCoreBase::addImageList(imageList, imageType, filenames);
 	emitImagesChanged( getDataContainer().getFileNameMap() );
 }
 
-void QViewerCore::setImageList(const std::list< data::Image > imageList, const isis::util::slist& filenames)
+void QViewerCore::setImageList(const std::list< data::Image > imageList, const ImageHolder::ImageType &imageType, const isis::util::slist& filenames)
 {
-	isis::viewer::ViewerCoreBase::setImageList(imageList, filenames);
+	isis::viewer::ViewerCoreBase::setImageList(imageList, imageType, filenames);
 	emitImagesChanged( getDataContainer().getFileNameMap() );
 }
 

@@ -88,7 +88,7 @@ boost::numeric::ublas::matrix< float > ImageHolder::getImageOrientation( bool tr
 	return retMatrix;
 }
 
-bool ImageHolder::setImage( const data::Image &image, const std::string &filename )
+bool ImageHolder::setImage( const data::Image &image, const ImageType &imageType, const std::string &filename )
 {
 
 	//we convert the image to an uint8_t data type
@@ -151,6 +151,7 @@ bool ImageHolder::setImage( const data::Image &image, const std::string &filenam
 	m_PropMap = static_cast<util::PropertyMap>( image );
 	m_OptimalScalingPair = getOptimalScalingToForType<TYPE>(m_CutAwayPair);
 	//image seems to be ok...i guess
+	setImageType( imageType );
 	return filterRelevantMetaInformation(); //only return true if filtering was successfully
 }
 

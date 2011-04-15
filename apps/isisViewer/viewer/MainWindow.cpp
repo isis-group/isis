@@ -76,7 +76,7 @@ void MainWindow::imagesChanged(DataContainer::ImageFileMapType imageMap )
 	ui.imageStack->clear();
 	BOOST_FOREACH( DataContainer::ImageFileMapType::const_reference imageRef, imageMap )
 	{
-		QString entry = QString( imageRef.first.c_str() );
+		QString entry = QString( imageRef.first.first.c_str() );
 		ui.imageStack->addItem(entry);
 	}
 }

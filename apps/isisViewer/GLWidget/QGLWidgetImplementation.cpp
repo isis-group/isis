@@ -187,7 +187,6 @@ void QGLWidgetImplementation::paintScene()
 	
 	
 	m_ScalingShader.setEnabled( true );
-	m_LUTShader.setEnabled( true );
 	BOOST_FOREACH( StateMap::const_reference currentImage, m_StateValues ) {
 		double scaling, bias;
 		if(m_ScalingType == automatic_scaling) {
@@ -210,14 +209,17 @@ void QGLWidgetImplementation::paintScene()
 		glLoadIdentity();
 		glLoadMatrixd( currentImage.second.textureMatrix );
 		
+		//if the image is declared as a zmap
+		if(currentImage.first.getImageType() == ImageHolder::z_map) {
+			m_LUTShader.setEnabled(true);
+			GLuint id = m_LookUpTable.getLookUpTableAsTexture();
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture( GL_TEXTURE_1D, id );
+			m_LUTShader.addVariable<float>("lut", 1, true );
+		}
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture( GL_TEXTURE_3D, currentImage.second.textureID );
 		m_LUTShader.addVariable<float>("imageTexture", 0, true );
-		glActiveTexture(GL_TEXTURE1);
-		GLuint id = m_LookUpTable.getLookUpTableAsTexture();
-		glBindTexture( GL_TEXTURE_1D, id );
-		m_LUTShader.addVariable<float>("lut", 1, true );
-		glActiveTexture(GL_TEXTURE0);
 		m_ScalingShader.addVariable<float>("extent", std::numeric_limits<GLubyte>::max());
 		m_ScalingShader.addVariable<float>("scaling", scaling);
 		m_ScalingShader.addVariable<float>("bias", bias);

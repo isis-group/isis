@@ -17,10 +17,10 @@ namespace viewer
 class DataContainer : public std::vector<ImageHolder>
 {
 public:
-	typedef std::map<std::string, ImageHolder> ImageFileMapType;
+	typedef std::map< std::pair<std::string, ImageHolder::ImageType>, ImageHolder> ImageFileMapType;
 	
 	///simply adds an isis image to the vector
-	bool addImage( const data::Image &image, const std::string &filename = "" );
+	bool addImage( const data::Image &image, const ImageHolder::ImageType &imageType, const std::string &filename = "" );
 
 	///checks if a image with the given parameters exists
 	bool isImage( size_t imageID, size_t timestep = 0, size_t slice = 0 ) const;

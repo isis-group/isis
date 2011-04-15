@@ -24,10 +24,11 @@ class ImageHolder
 
 public:
 	typedef data::_internal::ValuePtrBase::Reference ImagePointerType;
+	enum ImageType { anatomical_image, z_map };
 
 	ImageHolder( );
 
-	bool setImage( const data::Image &image, const std::string &filename = "" );
+	bool setImage( const data::Image &image, const ImageType &imageType, const std::string &filename = "" );
 
 	unsigned short getID() const { return m_ID; }
 	void setID( const unsigned short id ) { m_ID = id; }
@@ -42,6 +43,8 @@ public:
 	std::pair<util::ValueReference, util::ValueReference> getMinMax() const { return m_MinMax; }
 	std::pair<util::ValueReference, util::ValueReference> getInternMinMax() const { return m_InternMinMax; }
 	std::pair<double, double> getOptimalScalingPair() const { return m_OptimalScalingPair;  }
+	ImageType getImageType() const { return m_ImageType; }
+	void setImageType( ImageType type ) { m_ImageType = type; }
 	
 	util::slist getFileNames() const { return m_Filenames; }
 
@@ -105,6 +108,7 @@ private:
 	unsigned short m_ID;
 	std::pair<double, double> m_OptimalScalingPair;
 	std::pair<double, double> m_CutAwayPair;
+	ImageType m_ImageType;
 	
 	std::vector< ImagePointerType > m_ImageVector;
 	bool filterRelevantMetaInformation();

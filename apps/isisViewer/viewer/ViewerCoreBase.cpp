@@ -12,7 +12,7 @@ ViewerCoreBase::ViewerCoreBase( )
 
 
 
-void ViewerCoreBase::addImageList( const std::list< data::Image > imageList, const util::slist &filenames )
+void ViewerCoreBase::addImageList( const std::list< data::Image > imageList, const ImageHolder::ImageType &imageType, const util::slist &filenames )
 {
 	bool ignoreFilenames = false;
 	if( filenames.size() != imageList.size() )
@@ -24,9 +24,9 @@ void ViewerCoreBase::addImageList( const std::list< data::Image > imageList, con
 	if( !imageList.empty() ) {
 		BOOST_FOREACH( std::list< data::Image >::const_reference imageRef, imageList ) {
 			if(!ignoreFilenames) {
-				m_DataContainer.addImage( imageRef, *(filenameIterator++) );
+				m_DataContainer.addImage( imageRef, imageType, *(filenameIterator++) );
 			} else {
-				m_DataContainer.addImage( imageRef );
+				m_DataContainer.addImage( imageRef, imageType );
 			}
 		}
 	} else {
@@ -38,12 +38,12 @@ void ViewerCoreBase::addImageList( const std::list< data::Image > imageList, con
 
 
 
-void ViewerCoreBase::setImageList( const std::list< data::Image > imageList, const util::slist &filenames )
+void ViewerCoreBase::setImageList( const std::list< data::Image > imageList, const ImageHolder::ImageType &imageType, const util::slist &filenames )
 {
 	if( !imageList.empty() ) {
 		m_DataContainer.clear();
 	}
-	ViewerCoreBase::addImageList( imageList, filenames );
+	ViewerCoreBase::addImageList( imageList, imageType, filenames );
 }
 
 
