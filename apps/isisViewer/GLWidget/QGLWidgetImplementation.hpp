@@ -49,6 +49,7 @@ public Q_SLOTS:
 	virtual bool timestepChanged( unsigned int timestep );
 	virtual void setMinMaxRangeChanged( std::pair<double, double> minMax );
 	virtual void setScalingType( ScalingType scalingType ) { m_ScalingType = scalingType; }
+	virtual void setShowLabels( const bool show ) { m_ShowLabels = show; paintScene(); }
 
 protected:
 	virtual void mouseMoveEvent( QMouseEvent *e );
@@ -73,6 +74,7 @@ private:
 	void commonInit();
 	void emitMousePressEvent( QMouseEvent *e );
 	bool isInViewport( size_t wx, size_t wy );
+	void viewLabels() ;
 
 	std::pair<GLdouble, GLdouble> window2ObjectCoords( int16_t winx, int16_t winy, const ImageHolder &image ) const;
 	std::pair<int16_t, int16_t> object2WindowCoords( GLdouble objx, GLdouble objy, const ImageHolder &image ) const;
@@ -133,6 +135,7 @@ private:
 	//flags
 	bool leftButtonPressed;
 	bool rightButtonPressed;
+	bool m_ShowLabels;
 
 };
 

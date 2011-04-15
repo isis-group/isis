@@ -40,6 +40,7 @@ void QGLWidgetImplementation::commonInit()
 	//flags
 	leftButtonPressed = false;
 	rightButtonPressed = false;	
+	m_ShowLabels = true;
 }
 
 
@@ -107,7 +108,11 @@ void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const
 	}
 	state.mappedVoxelCoords = GLOrientationHandler::transformVector<int>( state.voxelCoords, state.planeOrientation );
 	//to visualize with the correct scaling we take the viewport
-	GLOrientationHandler::recalculateViewport( width(), height(), state.mappedVoxelSize, state.mappedImageSize, state.viewport );
+	unsigned short border = 0;
+	if(m_ShowLabels) {
+		border = 30;
+	}	
+	GLOrientationHandler::recalculateViewport( width(), height(), state.mappedVoxelSize, state.mappedImageSize, state.viewport, border );
 	if( rightButtonPressed ) {
 		calculateTranslation( image );
 	}
@@ -181,9 +186,6 @@ void QGLWidgetImplementation::paintScene()
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );	
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
-	
-	
 	BOOST_FOREACH( StateMap::const_reference currentImage, m_StateValues ) {
 		double scaling, bias;
 		if(m_ScalingType == automatic_scaling) {
@@ -205,7 +207,6 @@ void QGLWidgetImplementation::paintScene()
 		glMatrixMode( GL_TEXTURE );
 		glLoadIdentity();
 		glLoadMatrixd( currentImage.second.textureMatrix );
-		
 		//shader 
 		
 		//if the image is declared as a zmap
@@ -225,7 +226,7 @@ void QGLWidgetImplementation::paintScene()
 			m_ScalingShader.addVariable<float>("max", 255);
 			m_ScalingShader.addVariable<float>("min", -255);
 			m_ScalingShader.addVariable<float>("upper_threshold", 255);
-			m_ScalingShader.addVariable<float>("lower_threshold", -100);
+			m_ScalingShader.addVariable<float>("lower_threshold", -255);
 			m_ScalingShader.addVariable<float>("scaling", scaling);
 			m_ScalingShader.addVariable<float>("bias", bias);
 			m_ScalingShader.addVariable<float>("opacity", currentImage.second.opacity);
@@ -273,8 +274,50 @@ void QGLWidgetImplementation::paintScene()
 	glEnd();
 	glFlush();
 	glLoadIdentity();
+	if(m_ShowLabels) {
+		viewLabels();
+	}
 	redraw();
 }
+
+void QGLWidgetImplementation::viewLabels()
+{
+	QFont font;
+	font.setPointSize(15);
+	font.setPixelSize(15);
+	glColor4f(0.0,1.0,1.0, 1.0);
+	glViewport(0,0,width(),height());
+	switch(m_PlaneOrientation)
+	{
+		case GLOrientationHandler::axial:
+			glColor4f(0.0,1.0,0.0, 1.0);
+			renderText(width() / 2 - 7, 25, QString("A"), font);
+			renderText(width() / 2 - 7, height() - 10, QString("P"), font);
+			glColor4f(1.0,0.0,0.0, 1.0);
+			renderText(5, height() / 2, QString("L"), font);
+			renderText(width() - 15, height() / 2, QString("R"), font);
+			break;
+		case GLOrientationHandler::sagittal:
+			glColor4f(0.0,1.0,0.0, 1.0);
+			renderText(5, height() / 2, QString("A"), font);
+			renderText(width() - 15, height() / 2, QString("P"), font);
+			glColor4f(0.0,0.0,1.0, 1.0);
+			renderText(width() / 2 - 7, 25, QString("S"), font);
+			renderText(width() / 2 - 7, height() - 10, QString("I"), font);
+			break;
+		case GLOrientationHandler::coronal:
+			glColor4f(0.0,0.0,1.0, 1.0);
+			renderText(width() / 2 - 7, 25, QString("S"), font);
+			renderText(width() / 2 - 7, height() - 10, QString("I"), font);
+			glColor4f(1.0,0.0,0.0, 1.0);
+			renderText(5, height() / 2, QString("L"), font);
+			renderText(width() - 15, height() / 2, QString("R"), font);
+			break;
+	}
+	
+
+}
+
 
 void QGLWidgetImplementation::mouseMoveEvent( QMouseEvent *e )
 {
