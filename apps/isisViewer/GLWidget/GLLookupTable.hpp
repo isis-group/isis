@@ -11,7 +11,7 @@ class GLLookUpTable
 public:
 	
 	
-	GLuint getLookUpTableAsTexture(  ) const;
+	GLuint getLookUpTableAsTexture( const Color::LookUpTableType &lutType ) const;
 	
 	
 };	

@@ -1,6 +1,7 @@
 #include "QGLWidgetImplementation.hpp"
 #include <QVBoxLayout>
 #include <QMouseEvent>
+#include "GLShaderCode.hpp"
 
 
 namespace isis
@@ -64,13 +65,10 @@ void QGLWidgetImplementation::initializeGL()
 	glLoadIdentity();
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();
-	std::string colorTableShader = "uniform sampler3D imageTexture; uniform sampler1D lut; void main () { float i = texture3D(imageTexture, gl_TexCoord[0].xyz).r; gl_FragColor = texture1D(lut,i);  };";
-	std::string scalingShader = " uniform float opacity; uniform float extent; uniform float bias; uniform float scaling; uniform sampler3D imageTexture; void main() { vec4 color = texture3D(imageTexture, gl_TexCoord[0].xyz); color.a = opacity; gl_FragColor = (color + bias/extent) * scaling; }";
-	
 	m_ScalingShader.createContext();
 	m_LUTShader.createContext();
-	m_ScalingShader.addShader( "scaling", scalingShader, GLShader::fragment );
-	m_LUTShader.addShader( "lut", colorTableShader, GLShader::fragment );
+	m_ScalingShader.addShader( "scaling", scaling_shader_code, GLShader::fragment );
+	m_LUTShader.addShader( "lut", colormap_shader_code, GLShader::fragment );
 	
 }
 
@@ -186,7 +184,6 @@ void QGLWidgetImplementation::paintScene()
 	
 	
 	
-	m_ScalingShader.setEnabled( true );
 	BOOST_FOREACH( StateMap::const_reference currentImage, m_StateValues ) {
 		double scaling, bias;
 		if(m_ScalingType == automatic_scaling) {
@@ -209,21 +206,33 @@ void QGLWidgetImplementation::paintScene()
 		glLoadIdentity();
 		glLoadMatrixd( currentImage.second.textureMatrix );
 		
+		//shader 
+		
 		//if the image is declared as a zmap
 		if(currentImage.first.getImageType() == ImageHolder::z_map) {
+			m_ScalingShader.setEnabled( false );
 			m_LUTShader.setEnabled(true);
-			GLuint id = m_LookUpTable.getLookUpTableAsTexture();
+			GLuint id = m_LookUpTable.getLookUpTableAsTexture( Color::hsvLUT );
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture( GL_TEXTURE_1D, id );
 			m_LUTShader.addVariable<float>("lut", 1, true );
+			m_LUTShader.addVariable<float>("max", 255);
+			m_LUTShader.addVariable<float>("min", -255);
+			m_LUTShader.addVariable<float>("upper_threshold", 255);
+			m_LUTShader.addVariable<float>("lower_threshold", -100);
+		} else if (currentImage.first.getImageType() == ImageHolder::anatomical_image) {
+			m_ScalingShader.setEnabled( true );
+			m_ScalingShader.addVariable<float>("max", 255);
+			m_ScalingShader.addVariable<float>("min", -255);
+			m_ScalingShader.addVariable<float>("upper_threshold", 255);
+			m_ScalingShader.addVariable<float>("lower_threshold", -100);
+			m_ScalingShader.addVariable<float>("scaling", scaling);
+			m_ScalingShader.addVariable<float>("bias", bias);
+			m_ScalingShader.addVariable<float>("opacity", currentImage.second.opacity);
 		}
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture( GL_TEXTURE_3D, currentImage.second.textureID );
-		m_LUTShader.addVariable<float>("imageTexture", 0, true );
-		m_ScalingShader.addVariable<float>("extent", std::numeric_limits<GLubyte>::max());
-		m_ScalingShader.addVariable<float>("scaling", scaling);
-		m_ScalingShader.addVariable<float>("bias", bias);
-		m_ScalingShader.addVariable<float>("opacity", currentImage.second.opacity);
+
 		glBegin( GL_QUADS );
 		glTexCoord3f( 0, 0, currentImage.second.normalizedSlice );
 		glVertex2f( -1.0, -1.0 );

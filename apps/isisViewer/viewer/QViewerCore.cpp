@@ -8,7 +8,6 @@ namespace viewer
 
 QViewerCore::QViewerCore( ): ViewerCoreBase( )
 {
-	m_RGBColorGradient = Color::getColorGradientRGB();
 }
 
 
