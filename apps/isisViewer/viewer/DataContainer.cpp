@@ -12,7 +12,7 @@ bool DataContainer::addImage( const data::Image &image, const ImageHolder::Image
 	tmpHolder.setID( size() );
 	push_back( tmpHolder );
 	
-	std::pair<std::string, ImageHolder::ImageType> nameTypePair = std::make_pair<std::string, ImageHolder::ImageType>(tmpHolder.getFileNames().front(), tmpHolder.getImageType());
+	std::pair<std::string, ImageHolder::ImageType> nameTypePair = std::make_pair<std::string, ImageHolder::ImageType>(tmpHolder.getFileNames().front(), tmpHolder.getImageState().imageType);
 	m_FileNameMap[ nameTypePair ] = tmpHolder;
 	return true;
 }

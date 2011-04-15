@@ -59,16 +59,16 @@ int main( int argc, char *argv[] )
 	}
 	isis::viewer::QViewerCore *core = new isis::viewer::QViewerCore;
 	isis::viewer::MainWindow isisViewerMainWindow( core );
-	
-	if(app.parameters["z"].isSet()) {
-		core->addImageList( zImgList, ImageHolder::z_map, zmapFileList );
-	}
-	
 	if(app.parameters["type"].toString() == "anatomical" && app.parameters["in"].isSet()) {
 		core->addImageList( imgList, ImageHolder::anatomical_image, fileList );
 	} else if ( app.parameters["type"].toString() == "zmap" && app.parameters["in"].isSet()) {
 		core->addImageList( imgList, ImageHolder::z_map, fileList );
 	}
+	if(app.parameters["z"].isSet()) {
+		core->addImageList( zImgList, ImageHolder::z_map, zmapFileList );
+	}
+	
+	
 	isisViewerMainWindow.show();
 	return app.getQApplication().exec();
 }

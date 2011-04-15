@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>771</width>
-    <height>837</height>
+    <width>881</width>
+    <height>817</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,120 +15,184 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="2">
-     <widget class="QFrame" name="sagittalWidget">
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
+    <item row="0" column="0">
+     <widget class="QDockWidget" name="dockWidget">
+      <property name="floating">
+       <bool>false</bool>
       </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
+      <property name="features">
+       <set>QDockWidget::DockWidgetFeatureMask</set>
       </property>
+      <property name="windowTitle">
+       <string>Axial View</string>
+      </property>
+      <widget class="QWidget" name="dockWidgetContents_10">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QFrame" name="axialWidget">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QDockWidget" name="dockWidget_2">
+      <property name="floating">
+       <bool>false</bool>
+      </property>
+      <property name="features">
+       <set>QDockWidget::DockWidgetFeatureMask</set>
+      </property>
+      <property name="windowTitle">
+       <string>Sagittal View</string>
+      </property>
+      <widget class="QWidget" name="dockWidgetContents_11">
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QFrame" name="sagittalWidget">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
     <item row="1" column="0">
-     <widget class="QFrame" name="coronalWidget">
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
+     <widget class="QDockWidget" name="dockWidget_3">
+      <property name="floating">
+       <bool>false</bool>
       </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
+      <property name="features">
+       <set>QDockWidget::DockWidgetFeatureMask</set>
       </property>
-     </widget>
-    </item>
-    <item row="1" column="2">
-     <widget class="QWidget" name="widget" native="true">
-      <widget class="QCheckBox" name="checkPhysical">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>20</y>
-         <width>171</width>
-         <height>24</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Show in physical space</string>
-       </property>
-      </widget>
-      <widget class="QLCDNumber" name="pxlIntensityContainer">
-       <property name="geometry">
-        <rect>
-         <x>90</x>
-         <y>60</y>
-         <width>101</width>
-         <height>21</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>60</y>
-         <width>59</width>
-         <height>19</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Intensity</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="atLabel">
-       <property name="geometry">
-        <rect>
-         <x>210</x>
-         <y>60</y>
-         <width>171</width>
-         <height>19</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-      <widget class="QSpinBox" name="timestepSpinBox">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>140</y>
-         <width>55</width>
-         <height>28</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QListWidget" name="imageStack">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>290</y>
-         <width>351</width>
-         <height>81</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_2">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>110</y>
-         <width>71</width>
-         <height>18</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Timestep</string>
-       </property>
+      <property name="allowedAreas">
+       <set>Qt::AllDockWidgetAreas</set>
+      </property>
+      <property name="windowTitle">
+       <string>Coronal View</string>
+      </property>
+      <widget class="QWidget" name="dockWidgetContents_12">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QFrame" name="coronalWidget">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
-    <item row="0" column="0">
-     <widget class="QFrame" name="axialWidget">
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
+    <item row="1" column="1">
+     <widget class="QDockWidget" name="dockWidget_4">
+      <property name="floating">
+       <bool>false</bool>
       </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
+      <property name="features">
+       <set>QDockWidget::DockWidgetFeatureMask</set>
       </property>
+      <property name="allowedAreas">
+       <set>Qt::AllDockWidgetAreas</set>
+      </property>
+      <widget class="QWidget" name="dockWidgetContents_13">
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QWidget" name="widget" native="true">
+          <widget class="QCheckBox" name="checkPhysical">
+           <property name="geometry">
+            <rect>
+             <x>9</x>
+             <y>9</y>
+             <width>174</width>
+             <height>23</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Show in physical space</string>
+           </property>
+          </widget>
+          <widget class="QLCDNumber" name="pxlIntensityContainer">
+           <property name="geometry">
+            <rect>
+             <x>9</x>
+             <y>38</y>
+             <width>64</width>
+             <height>23</height>
+            </rect>
+           </property>
+          </widget>
+          <widget class="QLabel" name="label">
+           <property name="geometry">
+            <rect>
+             <x>9</x>
+             <y>67</y>
+             <width>54</width>
+             <height>18</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Intensity</string>
+           </property>
+          </widget>
+          <widget class="QSpinBox" name="timestepSpinBox">
+           <property name="geometry">
+            <rect>
+             <x>9</x>
+             <y>115</y>
+             <width>43</width>
+             <height>26</height>
+            </rect>
+           </property>
+          </widget>
+          <widget class="QListWidget" name="imageStack">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>190</y>
+             <width>391</width>
+             <height>101</height>
+            </rect>
+           </property>
+           <property name="editTriggers">
+            <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
+           </property>
+           <property name="dragEnabled">
+            <bool>true</bool>
+           </property>
+          </widget>
+          <widget class="QLabel" name="label_2">
+           <property name="geometry">
+            <rect>
+             <x>9</x>
+             <y>91</y>
+             <width>59</width>
+             <height>18</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Timestep</string>
+           </property>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -138,7 +202,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>771</width>
+     <width>881</width>
      <height>25</height>
     </rect>
    </property>

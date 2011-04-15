@@ -18,6 +18,7 @@ MainWindow::MainWindow( QViewerCore *core )
 {
 	connect(ui.action_Exit, SIGNAL(triggered()), this, SLOT( exitProgram() ) );
 	connect(core, SIGNAL( emitImagesChanged(DataContainer::ImageFileMapType)), this, SLOT( imagesChanged(DataContainer::ImageFileMapType) ) );
+	connect(ui.dockWidget);
 	
 	m_AxialWidget = new QGLWidgetImplementation( core, ui.axialWidget, GLOrientationHandler::axial );
 	m_ViewerCore->registerWidget( "axialView", m_AxialWidget );
@@ -76,8 +77,22 @@ void MainWindow::imagesChanged(DataContainer::ImageFileMapType imageMap )
 	ui.imageStack->clear();
 	BOOST_FOREACH( DataContainer::ImageFileMapType::const_reference imageRef, imageMap )
 	{
-		QString entry = QString( imageRef.first.first.c_str() );
-		ui.imageStack->addItem(entry);
+		QListWidgetItem *item = new QListWidgetItem;
+		QString sD = imageRef.second.getPropMap().getPropertyAs<std::string>("sequenceDescription").c_str();
+		if (!sD.toStdString().empty()) {
+			item->setText(QString( imageRef.first.first.c_str() ) + QString(" -> ") + sD);	
+		} else {
+			item->setText(QString( imageRef.first.first.c_str() ) );
+		}
+		item->setFlags( Qt::ItemIsEnabled | Qt::ItemIsUserCheckable );
+		
+		if( imageRef.second.getImageState().visible ) {
+			item->setCheckState(Qt::Checked);
+		} else {
+			item->setCheckState(Qt::Unchecked);
+		}
+		ui.imageStack->addItem(item);
+		
 	}
 }
 

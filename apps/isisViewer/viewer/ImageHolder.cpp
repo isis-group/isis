@@ -151,7 +151,8 @@ bool ImageHolder::setImage( const data::Image &image, const ImageType &imageType
 	m_PropMap = static_cast<util::PropertyMap>( image );
 	m_OptimalScalingPair = getOptimalScalingToForType<TYPE>(m_CutAwayPair);
 	//image seems to be ok...i guess
-	setImageType( imageType );
+	m_ImageState.imageType = imageType;
+	m_ImageState.visible = true;
 	return filterRelevantMetaInformation(); //only return true if filtering was successfully
 }
 

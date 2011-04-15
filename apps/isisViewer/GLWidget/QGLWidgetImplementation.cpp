@@ -54,6 +54,7 @@ QGLWidgetImplementation *QGLWidgetImplementation::createSharedWidget( QWidget *p
 void QGLWidgetImplementation::connectSignals()
 {
 	connect( this, SIGNAL( redraw() ), SLOT( updateGL() ) );
+	
 }
 
 void QGLWidgetImplementation::initializeGL()
@@ -210,7 +211,7 @@ void QGLWidgetImplementation::paintScene()
 		//shader 
 		
 		//if the image is declared as a zmap
-		if(currentImage.first.getImageType() == ImageHolder::z_map) {
+		if(currentImage.first.getImageState().imageType == ImageHolder::z_map) {
 			m_ScalingShader.setEnabled( false );
 			m_LUTShader.setEnabled(true);
 			GLuint id = m_LookUpTable.getLookUpTableAsTexture( Color::hsvLUT );
@@ -221,7 +222,7 @@ void QGLWidgetImplementation::paintScene()
 			m_LUTShader.addVariable<float>("min", -255);
 			m_LUTShader.addVariable<float>("upper_threshold", 255);
 			m_LUTShader.addVariable<float>("lower_threshold", -100);
-		} else if (currentImage.first.getImageType() == ImageHolder::anatomical_image) {
+		} else if (currentImage.first.getImageState().imageType == ImageHolder::anatomical_image) {
 			m_ScalingShader.setEnabled( true );
 			m_ScalingShader.addVariable<float>("max", 255);
 			m_ScalingShader.addVariable<float>("min", -255);
@@ -314,8 +315,6 @@ void QGLWidgetImplementation::viewLabels()
 			renderText(width() - 15, height() / 2, QString("R"), font);
 			break;
 	}
-	
-
 }
 
 
