@@ -333,19 +333,8 @@ bool Image::reIndex()
 
 	if ( hasProperty( "fov" ) ) {
 		util::fvector4 &propFoV = propertyValue( "fov" )->castTo<util::fvector4>();
-		util::fvector4 voxelGap;
 
-		if ( hasProperty( "voxelGap" ) ) {
-			voxelGap = getPropertyAs<util::fvector4>( "voxelGap" );
-
-			for ( size_t i = 0; i < dims; i++ )
-				if ( voxelGap[i] == -std::numeric_limits<float>::infinity() ) {
-					LOG( Runtime, info ) << "Ignoring unknown voxel gap in direction " << i;
-					voxelGap[i] = 0;
-				}
-		}
-
-		const util::fvector4 &calcFoV = getFoV( getPropertyAs<util::fvector4>( "voxelSize" ), voxelGap );
+		const util::fvector4 &calcFoV = getFoV();
 
 		bool ok = true;
 
@@ -768,6 +757,21 @@ size_t Image::getNrOfSlices() const
 size_t Image::getNrOfTimesteps() const
 {
 	return getDimSize( data::timeDim );
+}
+
+util::fvector4 Image::getFoV() const
+{
+	util::fvector4 voxelGap;
+	if ( hasProperty( "voxelGap" ) ) {
+		voxelGap = getPropertyAs<util::fvector4>( "voxelGap" );
+
+		for ( size_t i = 0; i < dims; i++ )
+			if ( voxelGap[i] == -std::numeric_limits<float>::infinity() ) {
+				LOG( Runtime, info ) << "Ignoring unknown voxel gap in direction " << i;
+				voxelGap[i] = 0;
+			}
+	}
+	return _internal::NDimensional<4>::getFoV( getPropertyAs<util::fvector4>( "voxelSize" ), voxelGap );
 }
 
 
