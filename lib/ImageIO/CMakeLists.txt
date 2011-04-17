@@ -176,6 +176,9 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_TAR)
 
   add_library(isisImageFormat_tar_proxy SHARED imageFormat_tar_proxy.cpp)
 
+  find_library(LIB_Z "z")
+  find_library(LIB_BZ2 "bz2")
+
   check_function_exists(fallocate HAVE_FALLOCATE)
   if(HAVE_FALLOCATE)
     set_target_properties(isisImageFormat_tar_proxy PROPERTIES COMPILE_DEFINITIONS HAVE_FALLOCATE)
@@ -186,7 +189,7 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_TAR)
     endif(HAVE_POSIX_FALLOCATE)
   endif(HAVE_FALLOCATE)
 
-  target_link_libraries(isisImageFormat_tar_proxy isis_core ${ISIS_LIB_DEPENDS} ${Boost_IOSTREAMS_LIBRARY})
+  target_link_libraries(isisImageFormat_tar_proxy isis_core ${ISIS_LIB_DEPENDS} ${Boost_IOSTREAMS_LIBRARY} ${LIB_Z} ${LIB_BZ2})
   set(TARGETS ${TARGETS} isisImageFormat_tar_proxy)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_TAR)
 
@@ -216,7 +219,7 @@ endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM)
 ############################################################
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_RAW)
   add_library(isisImageFormat_raw SHARED imageFormat_raw.cpp)
-  target_link_libraries(isisImageFormat_raw ${ISIS_LIB} ${ISIS_LIB_DEPENDS})
+  target_link_libraries(isisImageFormat_raw isis_core ${ISIS_LIB_DEPENDS})
   set(TARGETS ${TARGETS} isisImageFormat_raw)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_RAW)
 
@@ -233,12 +236,7 @@ endforeach(PLUGIN)
 ###########################################################
 # actual install
 ###########################################################
-install(TARGETS ${TARGETS}
-  LIBRARY DESTINATION ${ISIS_PLUGIN_INFIX} 
-  RUNTIME DESTINATION ${ISIS_PLUGIN_INFIX} 
-  ARCHIVE DESTINATION ${ISIS_PLUGIN_INFIX}
-  COMPONENT "IO Plugins"
-  )
+install(TARGETS ${TARGETS} DESTINATION ${ISIS_PLUGIN_INFIX} COMPONENT "IO plugins" )
 
 # # uninstall target
 # configure_file(
