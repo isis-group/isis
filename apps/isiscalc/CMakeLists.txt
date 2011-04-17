@@ -19,5 +19,5 @@ set_target_properties(isiscalc PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 ############################################################
 # the install targets.
 ############################################################
-install(TARGETS isiscalc RUNTIME DESTINATION bin)
+install(TARGETS isiscalc RUNTIME DESTINATION bin COMPONENT "CLI Tools")
 
