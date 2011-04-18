@@ -16,7 +16,7 @@ class QViewerCore : public QObject, public ViewerCoreBase
 {
 	Q_OBJECT
 public:
-	enum Actions {not_specified, timestep_changed};
+	enum Actions {not_specified, timestep_changed, show_labels};
 	typedef std::map<std::string, QWidget * > WidgetMap;
 	QViewerCore( );
 
@@ -47,11 +47,13 @@ public:
 protected Q_SLOTS:
 	virtual void voxelCoordChanged( util::ivector4 );
 	virtual void timestepChanged( int );
+	virtual void setShowLabels(int);
 
 Q_SIGNALS:
 	void emitVoxelCoordChanged( util::ivector4 );
 	void emitTimeStepChange( unsigned int );
 	void emitImagesChanged( DataContainer::ImageFileMapType );
+	void emitShowLabels(bool);
 	
 private:
 	//this map holds the widgets associated with a given name

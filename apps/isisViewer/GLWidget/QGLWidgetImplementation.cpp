@@ -2,6 +2,7 @@
 #include <QVBoxLayout>
 #include <QMouseEvent>
 #include "GLShaderCode.hpp"
+#include <sys/stat.h>
 
 
 namespace isis
@@ -37,8 +38,10 @@ void QGLWidgetImplementation::commonInit()
 	setMouseTracking( true );
 	connectSignals();
 	m_ScalingType = automatic_scaling;
+	m_InterplationType = GLTextureHandler::neares_neighbor;
 	m_ScalingPair = std::make_pair<double, double>(0.0,1.0);
 	//flags
+	zoomEventHappened = false;
 	leftButtonPressed = false;
 	rightButtonPressed = false;	
 	m_ShowLabels = false;
@@ -79,10 +82,11 @@ void QGLWidgetImplementation::initializeGL()
 
 void QGLWidgetImplementation::resizeGL( int w, int h )
 {
+	makeCurrent();
 	LOG( Debug, verbose_info ) << "resizeGL " << objectName().toStdString();
 	if( m_ViewerCore->getDataContainer().size() ) {
-		//TODO show the center of the image
-		lookAtVoxel( util::ivector4( 90, 109, 91 ) );
+		util::ivector4 size = m_ViewerCore->getCurrentImage().getImageSize();
+		lookAtVoxel( util::ivector4( size[0]/2, size[1]/2, size[2]/2 ) );
 	}
 }
 
@@ -97,7 +101,7 @@ void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const
 		state.voxelCoords[i] = state.voxelCoords[i] >= image.getImageSize()[i] ? image.getImageSize()[i] - 1 : state.voxelCoords[i];
 	}
 	//if not happend already copy the image to GLtexture memory and return the texture id
-	state.textureID = util::Singletons::get<GLTextureHandler, 10>().copyImageToTexture( m_ViewerCore->getDataContainer(), image, voxelCoords[3] );
+	state.textureID = util::Singletons::get<GLTextureHandler, 10>().copyImageToTexture( m_ViewerCore->getDataContainer(), image, voxelCoords[3], true, m_InterplationType );
 
 	//update the texture matrix.
 	//The texture matrix holds the orientation of the image and the orientation of the current widget. It does NOT hold the scaling of the image.
@@ -116,7 +120,8 @@ void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const
 		border = 30;
 	}	
 	GLOrientationHandler::recalculateViewport( width(), height(), state.mappedVoxelSize, state.mappedImageSize, state.viewport, border );
-	if( rightButtonPressed ) {
+	if( rightButtonPressed || zoomEventHappened ) {
+		zoomEventHappened = false;
 		calculateTranslation( image );
 	}
 	util::dvector4 objectCoords = GLOrientationHandler::transformVoxel2ObjectCoords( state.voxelCoords, image, state.planeOrientation );
@@ -152,9 +157,8 @@ bool QGLWidgetImplementation::calculateTranslation( const ImageHolder &image )
 	GLdouble *mat = state.modelViewMatrix;
 	state.modelViewMatrix[12] = (1.0 / abs(state.mappedImageSize[0])) * shiftX ;
 	state.modelViewMatrix[13] = (1.0 / abs(state.mappedImageSize[1])) * shiftY ;
-	float factor = 1 + (0.5 * (m_Zoom.currentZoom / 2 - 1) );
-	mat[12] = state.modelViewMatrix[12] * factor ;
-	mat[13] = state.modelViewMatrix[13] * factor;
+	mat[12] = state.modelViewMatrix[12] ;
+	mat[13] = state.modelViewMatrix[13] ;
 	
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
@@ -184,7 +188,7 @@ bool QGLWidgetImplementation::lookAtVoxel( const ImageHolder &image, const util:
 
 void QGLWidgetImplementation::paintScene()
 {
-	
+
 	redraw();
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );	
 	glEnable (GL_BLEND);
@@ -390,6 +394,7 @@ void QGLWidgetImplementation::wheelEvent( QWheelEvent *e )
 		glScalef( zoomFactor, zoomFactor, 1 );
 		glGetDoublev( GL_PROJECTION_MATRIX, m_StateValues[m_ViewerCore->getCurrentImage()].projectionMatrix );
 		glLoadIdentity();
+		zoomEventHappened = true;
 		lookAtVoxel( m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords );
 	} else {
 		m_Zoom.currentZoom = 1;
@@ -407,12 +412,6 @@ void QGLWidgetImplementation::mouseReleaseEvent( QMouseEvent *e )
 	}
 }
 
-void QGLWidgetImplementation::setMinMaxRangeChanged( std::pair<double, double> minMax)
-{
-	//TODO this is has to be implemented
-	util::Singletons::get<GLTextureHandler, 10>().copyImageToTexture( m_ViewerCore->getDataContainer(), m_ViewerCore->getCurrentImage(),m_ViewerCore->getCurrentTimestep() );
-	lookAtVoxel( m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords );
-}
 
 void QGLWidgetImplementation::keyPressEvent(QKeyEvent* e)
 {
@@ -424,8 +423,23 @@ void QGLWidgetImplementation::keyPressEvent(QKeyEvent* e)
 			GLOrientationHandler::makeIdentity( ref.second.projectionMatrix );
 		}
 		m_Zoom.currentZoom = 1.0;
-		lookAtVoxel(m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords);
+		size_t timestep = m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords[3];
+		util::ivector4 size = m_ViewerCore->getCurrentImage().getImageSize();
+		lookAtVoxel( util::ivector4( size[0]/2, size[1]/2, size[2]/2, timestep ) );
 	}
+}
+
+void  QGLWidgetImplementation::setShowLabels( bool show )
+{
+	m_ShowLabels = show; 
+	lookAtVoxel(m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords);
+
+}
+
+void QGLWidgetImplementation::setInterpolationType(const isis::viewer::GLTextureHandler::InterpolationType interpolation)
+{
+	m_InterplationType = interpolation;
+	lookAtVoxel(m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords);
 }
 
 

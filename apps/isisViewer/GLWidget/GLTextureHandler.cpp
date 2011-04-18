@@ -19,7 +19,7 @@ std::map<ImageHolder, GLuint> GLTextureHandler::copyAllImagesToTextures( const D
 
 }
 
-GLuint GLTextureHandler::copyImageToTexture( const DataContainer &data, const ImageHolder &image, size_t timestep, GLTextureHandler::InterpolationType interpolation )
+GLuint GLTextureHandler::copyImageToTexture( const DataContainer &data, const ImageHolder &image, size_t timestep, const bool withAlpha, GLTextureHandler::InterpolationType interpolation )
 {
 	typedef uint8_t TYPE;
 
@@ -35,7 +35,7 @@ GLuint GLTextureHandler::copyImageToTexture( const DataContainer &data, const Im
 		return m_ImageMap[image][timestep];
 	}
 
-	return internCopyImageToTexture<TYPE>( data, GL_UNSIGNED_BYTE, image, timestep, true, interpolation );
+	return internCopyImageToTexture<TYPE>( data, GL_UNSIGNED_BYTE, image, timestep, withAlpha, interpolation );
 
 
 }

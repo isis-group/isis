@@ -114,7 +114,7 @@
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
          <widget class="QWidget" name="widget" native="true">
-          <widget class="QCheckBox" name="checkPhysical">
+          <widget class="QCheckBox" name="checkLabels">
            <property name="geometry">
             <rect>
              <x>9</x>
@@ -124,7 +124,7 @@
             </rect>
            </property>
            <property name="text">
-            <string>Show in physical space</string>
+            <string>Show labels</string>
            </property>
           </widget>
           <widget class="QLCDNumber" name="pxlIntensityContainer">

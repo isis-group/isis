@@ -36,7 +36,7 @@ public:
 	std::map<ImageHolder, GLuint> copyAllImagesToTextures( const DataContainer &data, InterpolationType interpolation = neares_neighbor );
 
 	///Copies the given timestep of an image with the given imageID to a GL_TEXTURE_3D. Return the texture id.
-	GLuint copyImageToTexture( const DataContainer &data, const ImageHolder &image, size_t timestep, InterpolationType interpolation = neares_neighbor );
+	GLuint copyImageToTexture( const DataContainer &data, const ImageHolder &image, size_t timestep, const bool withAlpha = true, InterpolationType interpolation = neares_neighbor );
 
 	///The image map is a mapping of the imageID and timestep to the texture of the GL_TEXTURE_3D.
 	ImageMapType getImageMap() const { return m_ImageMap; }
@@ -51,7 +51,7 @@ private:
 	template<typename TYPE>
 	GLuint internCopyImageToTexture( const DataContainer &data, GLenum format, const ImageHolder &image, size_t timestep, bool alpha = true, InterpolationType interpolation = neares_neighbor  ) {
 		LOG( Debug, info ) << "Copy image " << image.getID() << " with timestep " << timestep << " to texture";
-		GLuint texture;
+		
 		util::FixedVector<size_t, 4> size = image.getImageSize();
 		size_t volume = size[0] * size[1] * size[2];
 		TYPE *dataPtr = static_cast<TYPE *>( data.getImageWeakPointer( image, timestep ).lock().get() );
@@ -67,6 +67,7 @@ private:
 				break;
 		}
 		glPixelStorei(GL_UNPACK_ALIGNMENT,1);
+		GLuint texture;
 		glGenTextures( 1, &texture );
 		glBindTexture( GL_TEXTURE_3D, texture );
 		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, interpolationType );
@@ -84,7 +85,6 @@ private:
 				dataWithAplpha[i] = dataPtr[index++];
 				dataWithAplpha[i+1] = std::numeric_limits<TYPE>::max();
 			}
-			free(dataPtr);
 			glTexImage3D( GL_TEXTURE_3D, 0, GL_LUMINANCE12_ALPHA4,
 					  size[0],
 					  size[1],
@@ -97,9 +97,15 @@ private:
 					  size[2], 0, GL_LUMINANCE, format,
 					  dataPtr );
 		}
-		
-		m_ImageMap[image].insert( std::make_pair<size_t, GLuint >( timestep, texture ) );
-		return texture;
+		GLenum glErrorCode = glGetError();
+		if(glErrorCode) {
+			LOG(Runtime, error) << "Error during loading image " << image.getID() 
+				<< " with timestep " << timestep << " to glTexture3D. Error code is " << glErrorCode;
+			return 0;
+		} else {
+			m_ImageMap[image].insert( std::make_pair<size_t, GLuint >( timestep, texture ) );
+			return texture;
+		}
 	}
 
 };

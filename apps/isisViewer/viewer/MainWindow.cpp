@@ -31,6 +31,7 @@ MainWindow::MainWindow( QViewerCore *core )
 
 
 	m_ViewerCore->registerWidget( "timestepSpinBox", ui.timestepSpinBox, QViewerCore::timestep_changed );
+	m_ViewerCore->registerWidget( "showLabels", ui.checkLabels, QViewerCore::show_labels );
 	
 }
 
@@ -106,6 +107,8 @@ void MainWindow::checkImageStack(QListWidgetItem* item)
 	}
 	
 }
+
+
 
 
 void MainWindow::exitProgram()

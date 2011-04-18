@@ -47,10 +47,10 @@ public Q_SLOTS:
 	virtual bool lookAtVoxel( const ImageHolder &image, const util::ivector4 &voxelCoords );
 	virtual bool lookAtVoxel( const util::ivector4 &voxelCoords );
 	virtual bool timestepChanged( unsigned int timestep );
-	virtual void setMinMaxRangeChanged( std::pair<double, double> minMax );
 	virtual void setScalingType( ScalingType scalingType ) { m_ScalingType = scalingType; }
-	virtual void setShowLabels( const bool show ) { m_ShowLabels = show; paintScene(); }
-
+	virtual void setShowLabels( const bool show );
+	virtual void setInterpolationType( const GLTextureHandler::InterpolationType interpolation );
+	
 protected:
 	virtual void mouseMoveEvent( QMouseEvent *e );
 	virtual void wheelEvent( QWheelEvent *e );
@@ -87,6 +87,7 @@ private:
 	
 	std::vector<GLuint> m_TextureIDVec;
 	GLOrientationHandler::PlaneOrientation m_PlaneOrientation;
+	GLTextureHandler::InterpolationType m_InterplationType;
 
 	struct State {
 		State() {
@@ -134,6 +135,7 @@ private:
 	isis::viewer::GLLookUpTable m_LookUpTable;
 	
 	//flags
+	bool zoomEventHappened;
 	bool leftButtonPressed;
 	bool rightButtonPressed;
 	bool m_ShowLabels;

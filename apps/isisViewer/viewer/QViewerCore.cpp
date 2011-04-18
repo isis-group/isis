@@ -23,13 +23,21 @@ QViewerCore::registerWidget( std::string key, QWidget *widget, QViewerCore::Acti
 			connect( dynamic_cast<QGLWidgetImplementation *>( widget ), SIGNAL( voxelCoordChanged( util::ivector4 ) ), this, SLOT( voxelCoordChanged ( util::ivector4 ) ) );
 			connect( this, SIGNAL( emitVoxelCoordChanged( util::ivector4 ) ), dynamic_cast<QGLWidgetImplementation *>( widget ), SLOT( lookAtVoxel( util::ivector4 ) ) );
 			connect( this, SIGNAL( emitTimeStepChange( unsigned int ) ), dynamic_cast<QGLWidgetImplementation *>( widget ), SLOT( timestepChanged( unsigned int ) ) );
+			connect( this, SIGNAL( emitShowLabels(bool)), dynamic_cast<QGLWidgetImplementation *>( widget ), SLOT( setShowLabels(bool)) );
 		} else if ( dynamic_cast< QSpinBox * >( widget ) ) {
 			switch ( action ) {
 			case QViewerCore::timestep_changed:
 				connect( dynamic_cast<QSpinBox *>( widget ), SIGNAL( valueChanged( int ) ), this, SLOT( timestepChanged( int ) ) );
 				break;
 			}
+		} else if ( dynamic_cast< QCheckBox * > (widget) ) {
+			switch (action) {
+				case QViewerCore::show_labels:
+				connect( dynamic_cast<QCheckBox *>(widget), SIGNAL( stateChanged(int)), this, SLOT( setShowLabels(int))	);
+				break;
+			}
 		}
+				
 
 	} else {
 		LOG( Runtime, error ) << "A widget with the name " << key << " already exists! Wont add this";
@@ -59,6 +67,14 @@ void QViewerCore::setImageList(const std::list< data::Image > imageList, const I
 	emitImagesChanged( getDataContainer().getFileNameMap() );
 }
 
+void QViewerCore::setShowLabels(int l)
+{
+	if(l) {
+		emitShowLabels(true);
+	} else {
+		emitShowLabels(false);
+	}
+}
 
 
 }
