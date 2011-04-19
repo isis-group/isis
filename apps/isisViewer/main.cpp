@@ -11,11 +11,11 @@
 
 int main( int argc, char *argv[] )
 {
-	
+
 	using namespace isis::viewer;
 	isis::util::Selection dbg_levels( "error,warning,info,verbose_info" );
 	dbg_levels.set( "warning" );
-	
+
 	isis::util::Selection image_types( "anatomical,zmap" );
 	image_types.set( "anatomical" );
 	isis::qt4::QtApplication app( "isisViewer" );
@@ -40,35 +40,33 @@ int main( int argc, char *argv[] )
 	std::list<isis::data::Image> imgList;
 	std::list<isis::data::Image> zImgList;
 	//load the anatomical images
-	BOOST_FOREACH ( isis::util::slist::const_reference filename, fileList )
-	{
+	BOOST_FOREACH ( isis::util::slist::const_reference filename, fileList ) {
 		std::list< isis::data::Image > tmpList = isis::data::IOFactory::load( filename );
-		BOOST_FOREACH( std::list< isis::data::Image >::const_reference imgRef, tmpList )
-		{
+		BOOST_FOREACH( std::list< isis::data::Image >::const_reference imgRef, tmpList ) {
 			imgList.push_back( imgRef );
 		}
 	}
 	//load the zmap images
-	BOOST_FOREACH ( isis::util::slist::const_reference filename, zmapFileList )
-	{
+	BOOST_FOREACH ( isis::util::slist::const_reference filename, zmapFileList ) {
 		std::list< isis::data::Image > tmpList = isis::data::IOFactory::load( filename );
-		BOOST_FOREACH( std::list< isis::data::Image >::const_reference imgRef, tmpList )
-		{
+		BOOST_FOREACH( std::list< isis::data::Image >::const_reference imgRef, tmpList ) {
 			zImgList.push_back( imgRef );
 		}
 	}
 	isis::viewer::QViewerCore *core = new isis::viewer::QViewerCore;
 	isis::viewer::MainWindow isisViewerMainWindow( core );
-	if(app.parameters["type"].toString() == "anatomical" && app.parameters["in"].isSet()) {
+
+	if( app.parameters["type"].toString() == "anatomical" && app.parameters["in"].isSet() ) {
 		core->addImageList( imgList, ImageHolder::anatomical_image, fileList );
-	} else if ( app.parameters["type"].toString() == "zmap" && app.parameters["in"].isSet()) {
+	} else if ( app.parameters["type"].toString() == "zmap" && app.parameters["in"].isSet() ) {
 		core->addImageList( imgList, ImageHolder::z_map, fileList );
 	}
-	if(app.parameters["z"].isSet()) {
+
+	if( app.parameters["z"].isSet() ) {
 		core->addImageList( zImgList, ImageHolder::z_map, zmapFileList );
 	}
-	
-	
+
+
 	isisViewerMainWindow.show();
 	return app.getQApplication().exec();
 }

@@ -50,16 +50,15 @@ public:
 	std::pair<util::ValueReference, util::ValueReference> getMinMax() const { return m_MinMax; }
 	std::pair<util::ValueReference, util::ValueReference> getInternMinMax() const { return m_InternMinMax; }
 	std::pair<double, double> getOptimalScalingPair() const { return m_OptimalScalingPair;  }
-	
+
 	util::slist getFileNames() const { return m_Filenames; }
 
 	bool operator<( const ImageHolder &ref ) const { return m_ID < ref.getID(); }
-	
+
 	const ImageState &getImageState() const { return m_ImageState; }
-	
+
 	template<typename TYPE>
-	std::pair<double, double> getOptimalScalingToForType( const std::pair<double,double> &cutAway ) const
-	{
+	std::pair<double, double> getOptimalScalingToForType( const std::pair<double, double> &cutAway ) const {
 		size_t volume = getImageSize()[0] * getImageSize()[1] * getImageSize()[2];
 		TYPE maxTypeValue = std::numeric_limits<TYPE>::max();
 		TYPE minTypeValue = std::numeric_limits<TYPE>::min();
@@ -69,45 +68,49 @@ public:
 		double histogram[extent];
 		size_t stepSize = 2;
 		size_t numberOfVoxels = volume / stepSize;
-		TYPE *dataPtr = static_cast<TYPE*>(getImageVector().front()->getRawAddress().lock().get());
+		TYPE *dataPtr = static_cast<TYPE *>( getImageVector().front()->getRawAddress().lock().get() );
+
 		//initialize the histogram with 0
-		for( TYPE i = 0; i< extent; i++){
+		for( TYPE i = 0; i < extent; i++ ) {
 			histogram[i] = 0;
 		}
+
 		//create the histogram
-		for( size_t i = 0;i< volume; i+=stepSize)
-		{
+		for( size_t i = 0; i < volume; i += stepSize ) {
 			histogram[dataPtr[i]]++;
 		}
+
 		//normalize histogram
-		for( TYPE i = 0;i< extent; i++)
-		{
+		for( TYPE i = 0; i < extent; i++ ) {
 			histogram[i] /= numberOfVoxels;
 		}
-		TYPE upperBorder = extent-1;
+
+		TYPE upperBorder = extent - 1;
 		TYPE lowerBorder = 0;
 		double sum = 0;
-		while(sum < cutAway.second) 
-		{	
+
+		while( sum < cutAway.second ) {
 			sum += histogram[upperBorder--];
-			
+
 		}
+
 		sum = 0;
-		while (sum < cutAway.first)
-		{
+
+		while ( sum < cutAway.first ) {
 			sum += histogram[lowerBorder++];
 		}
+
 		std::pair<double, double> retPair;
-		retPair.first = (1.0 / extent) * lowerBorder;
-		retPair.second = (float)maxTypeValue / float(upperBorder - lowerBorder);
+		retPair.first = ( 1.0 / extent ) * lowerBorder;
+		retPair.second = ( float )maxTypeValue / float( upperBorder - lowerBorder );
 		return retPair;
 	}
 
-	void setVisible(bool v) { m_ImageState.visible = v; }
+	void setVisible( bool v ) { m_ImageState.visible = v; }
 
 private:
-	
-	
+
+
 	size_t m_NumberOfTimeSteps;
 	util::FixedVector<size_t, 4> m_ImageSize;
 	util::PropertyMap m_PropMap;
@@ -120,11 +123,11 @@ private:
 	std::pair<double, double> m_OptimalScalingPair;
 	std::pair<double, double> m_CutAwayPair;
 	ImageState m_ImageState;
-	
+
 	std::vector< ImagePointerType > m_ImageVector;
 	bool filterRelevantMetaInformation();
-	
-	
+
+
 };
 
 }

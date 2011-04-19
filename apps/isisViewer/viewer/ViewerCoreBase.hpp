@@ -15,12 +15,12 @@ class ViewerCoreBase
 
 public:
 	ViewerCoreBase( );
-	
+
 	virtual void addImageList( const std::list<data::Image> imageList, const ImageHolder::ImageType &imageType, const util::slist &filenames = util::slist() );
 	virtual void setImageList( const std::list<data::Image> imageList, const ImageHolder::ImageType &imageType, const util::slist &filenames = util::slist() );
 
 	void setCurrentImage( const ImageHolder &image ) { m_CurrentImage = image; }
-	
+
 	ImageHolder &getCurrentImage() { return m_CurrentImage; }
 	const ImageHolder &getCurrentImage() const { return m_CurrentImage; }
 	size_t getCurrentTimestep() const { return m_CurrentTimestep; }

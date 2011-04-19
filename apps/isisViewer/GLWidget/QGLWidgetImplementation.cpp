@@ -34,18 +34,18 @@ QGLWidgetImplementation::QGLWidgetImplementation( QViewerCore *core, QWidget *pa
 void QGLWidgetImplementation::commonInit()
 {
 	setSizePolicy( QSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored ) );
-	setFocusPolicy(Qt::StrongFocus);
+	setFocusPolicy( Qt::StrongFocus );
 	setMouseTracking( true );
 	connectSignals();
 	m_ScalingType = no_scaling;
 	m_InterplationType = GLTextureHandler::neares_neighbor;
-	m_ScalingPair = std::make_pair<double, double>(0.0,1.0);
+	m_ScalingPair = std::make_pair<double, double>( 0.0, 1.0 );
 	//flags
 	zoomEventHappened = false;
 	leftButtonPressed = false;
-	rightButtonPressed = false;	
+	rightButtonPressed = false;
 	m_ShowLabels = false;
-	
+
 }
 
 
@@ -59,7 +59,7 @@ QGLWidgetImplementation *QGLWidgetImplementation::createSharedWidget( QWidget *p
 void QGLWidgetImplementation::connectSignals()
 {
 	connect( this, SIGNAL( redraw() ), SLOT( updateGL() ) );
-	
+
 }
 
 void QGLWidgetImplementation::initializeGL()
@@ -67,7 +67,7 @@ void QGLWidgetImplementation::initializeGL()
 	util::Singletons::get<GLTextureHandler, 10>().copyAllImagesToTextures( m_ViewerCore->getDataContainer() );
 	glClearColor( 0.0, 0.0, 0.0, 0.0 );
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	glShadeModel(GL_FLAT); 
+	glShadeModel( GL_FLAT );
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
 	glMatrixMode( GL_PROJECTION );
@@ -76,7 +76,7 @@ void QGLWidgetImplementation::initializeGL()
 	m_LUTShader.createContext();
 	m_ScalingShader.addShader( "scaling", scaling_shader_code, GLShader::fragment );
 	m_LUTShader.addShader( "lut", colormap_shader_code, GLShader::fragment );
-	
+
 }
 
 
@@ -84,9 +84,10 @@ void QGLWidgetImplementation::resizeGL( int w, int h )
 {
 	makeCurrent();
 	LOG( Debug, verbose_info ) << "resizeGL " << objectName().toStdString();
+
 	if( m_ViewerCore->getDataContainer().size() ) {
 		util::ivector4 size = m_ViewerCore->getCurrentImage().getImageSize();
-		lookAtVoxel( util::ivector4( size[0]/2, size[1]/2, size[2]/2 ) );
+		lookAtVoxel( util::ivector4( size[0] / 2, size[1] / 2, size[2] / 2 ) );
 	}
 }
 
@@ -95,35 +96,42 @@ void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const
 	LOG( Debug, verbose_info ) << "Updating state values for widget " << objectName().toStdString();
 	State &state = m_StateValues[image];
 	state.voxelCoords = voxelCoords;
+
 	//check if we are inside the image
-	for( size_t i = 0; i<4; i++) {
+	for( size_t i = 0; i < 4; i++ ) {
 		state.voxelCoords[i] = state.voxelCoords[i] < 0 ? 0 : state.voxelCoords[i];
 		state.voxelCoords[i] = state.voxelCoords[i] >= image.getImageSize()[i] ? image.getImageSize()[i] - 1 : state.voxelCoords[i];
 	}
+
 	//if not happend already copy the image to GLtexture memory and return the texture id
 	state.textureID = util::Singletons::get<GLTextureHandler, 10>().copyImageToTexture( m_ViewerCore->getDataContainer(), image, voxelCoords[3], true, m_InterplationType );
 
 	//update the texture matrix.
 	//The texture matrix holds the orientation of the image and the orientation of the current widget. It does NOT hold the scaling of the image.
 	if( ! state.set ) {
-		state.planeOrientation = 
+		state.planeOrientation =
 			GLOrientationHandler::transformToPlaneView( image.getNormalizedImageOrientation(), m_PlaneOrientation );
 		GLOrientationHandler::boostMatrix2Pointer( GLOrientationHandler::addOffset( state.planeOrientation ), state.textureMatrix );
 		state.mappedVoxelSize = GLOrientationHandler::transformVector<float>( image.getPropMap().getPropertyAs<util::fvector4>( "voxelSize" ) + image.getPropMap().getPropertyAs<util::fvector4>( "voxelGap" ) , state.planeOrientation );
 		state.mappedImageSize = GLOrientationHandler::transformVector<int>( image.getImageSize(), state.planeOrientation );
 		state.set = true;
 	}
+
 	state.mappedVoxelCoords = GLOrientationHandler::transformVector<int>( state.voxelCoords, state.planeOrientation );
 	//to visualize with the correct scaling we take the viewport
 	unsigned short border = 0;
-	if(m_ShowLabels) {
+
+	if( m_ShowLabels ) {
 		border = 30;
-	}	
+	}
+
 	GLOrientationHandler::recalculateViewport( width(), height(), state.mappedVoxelSize, state.mappedImageSize, state.viewport, border );
+
 	if( rightButtonPressed || zoomEventHappened ) {
 		zoomEventHappened = false;
 		calculateTranslation( image );
 	}
+
 	util::dvector4 objectCoords = GLOrientationHandler::transformVoxel2ObjectCoords( state.voxelCoords, image, state.planeOrientation );
 	state.crosshairCoords = object2WindowCoords( objectCoords[0], objectCoords[1], image );
 	state.normalizedSlice = objectCoords[2];
@@ -132,7 +140,7 @@ void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const
 
 std::pair<GLdouble, GLdouble> QGLWidgetImplementation::window2ObjectCoords( int16_t winx, int16_t winy, const ImageHolder &image ) const
 {
-	const State &stateValue = m_StateValues.at(image);
+	const State &stateValue = m_StateValues.at( image );
 	GLdouble pos[3];
 	gluUnProject( winx, winy, 0, stateValue.modelViewMatrix, stateValue.projectionMatrix, stateValue.viewport , &pos[0], &pos[1], &pos[2] );
 	return std::make_pair<GLdouble, GLdouble>( pos[0], pos[1] );
@@ -145,21 +153,21 @@ std::pair<int16_t, int16_t> QGLWidgetImplementation::object2WindowCoords( GLdoub
 	GLdouble win[3];
 	GLdouble pro[16];
 	gluProject( objx, objy, 0, stateValue.modelViewMatrix, stateValue.projectionMatrix, stateValue.viewport, &win[0], &win[1], &win[2] );
-	return std::make_pair<int16_t, int16_t>( (win[0] - stateValue.viewport[0]), win[1] - stateValue.viewport[1] );
+	return std::make_pair<int16_t, int16_t>( ( win[0] - stateValue.viewport[0] ), win[1] - stateValue.viewport[1] );
 }
 
 bool QGLWidgetImplementation::calculateTranslation( const ImageHolder &image )
 {
 	State &state = m_StateValues[image];
-	std::pair<int16_t, int16_t> center = std::make_pair<int16_t, int16_t>( abs(state.mappedImageSize[0]) / 2, abs(state.mappedImageSize[1]) / 2 );
-	float shiftX = center.first - (state.mappedVoxelCoords[0] < 0 ? abs(state.mappedImageSize[0]) + state.mappedVoxelCoords[0] : state.mappedVoxelCoords[0]);
-	float shiftY =  center.second - (state.mappedVoxelCoords[1] < 0 ? abs(state.mappedImageSize[1]) + state.mappedVoxelCoords[1] : state.mappedVoxelCoords[1]);
+	std::pair<int16_t, int16_t> center = std::make_pair<int16_t, int16_t>( abs( state.mappedImageSize[0] ) / 2, abs( state.mappedImageSize[1] ) / 2 );
+	float shiftX = center.first - ( state.mappedVoxelCoords[0] < 0 ? abs( state.mappedImageSize[0] ) + state.mappedVoxelCoords[0] : state.mappedVoxelCoords[0] );
+	float shiftY =  center.second - ( state.mappedVoxelCoords[1] < 0 ? abs( state.mappedImageSize[1] ) + state.mappedVoxelCoords[1] : state.mappedVoxelCoords[1] );
 	GLdouble *mat = state.modelViewMatrix;
-	state.modelViewMatrix[12] = (1.0 / abs(state.mappedImageSize[0])) * shiftX ;
-	state.modelViewMatrix[13] = (1.0 / abs(state.mappedImageSize[1])) * shiftY ;
+	state.modelViewMatrix[12] = ( 1.0 / abs( state.mappedImageSize[0] ) ) * shiftX ;
+	state.modelViewMatrix[13] = ( 1.0 / abs( state.mappedImageSize[1] ) ) * shiftY ;
 	mat[12] = state.modelViewMatrix[12] ;
 	mat[13] = state.modelViewMatrix[13] ;
-	
+
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
 	glLoadMatrixd( mat );
@@ -172,16 +180,17 @@ bool QGLWidgetImplementation::lookAtVoxel( const isis::util::ivector4 &voxelCoor
 	//someone has told the widget to paint all available images.
 	//So first we have to update the state values for each image
 	redraw();
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );	
-	glEnable (GL_BLEND);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	glEnable ( GL_BLEND );
+	glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+
 	BOOST_FOREACH( DataContainer::const_reference image, m_ViewerCore->getDataContainer() ) {
-		if(image.second.getImageState().visible) {
+		if( image.second.getImageState().visible ) {
 			updateStateValues( image.second, voxelCoords );
-			paintScene(image.second);
+			paintScene( image.second );
 		}
 	}
+
 	if( m_StateValues.size() ) {
 		paintCrosshair();
 	}
@@ -189,32 +198,35 @@ bool QGLWidgetImplementation::lookAtVoxel( const isis::util::ivector4 &voxelCoor
 
 bool QGLWidgetImplementation::lookAtVoxel( const ImageHolder &image, const util::ivector4 &voxelCoords )
 {
-	if(image.getImageState().visible) {
+	if( image.getImageState().visible ) {
 		updateStateValues( image, voxelCoords );
-		paintScene(image);
+		paintScene( image );
 	}
+
 	if( m_StateValues.size() ) {
 		paintCrosshair();
 	}
 }
 
 
-void QGLWidgetImplementation::paintScene( const ImageHolder &image)
+void QGLWidgetImplementation::paintScene( const ImageHolder &image )
 {
-	
+
 	State &state = m_StateValues[image];
 
 	double scaling, bias;
-	if(m_ScalingType == automatic_scaling) {
+
+	if( m_ScalingType == automatic_scaling ) {
 		scaling = image.getOptimalScalingPair().second;
 		bias = image.getOptimalScalingPair().first;
-	} else if ( m_ScalingType == manual_scaling) {
+	} else if ( m_ScalingType == manual_scaling ) {
 		scaling = m_ScalingPair.second;
 		bias = m_ScalingPair.first;
 	} else {
 		scaling = 1.0;
 		bias = 0.0;
 	}
+
 	glViewport( state.viewport[0], state.viewport[1], state.viewport[2], state.viewport[3] );
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();
@@ -224,34 +236,35 @@ void QGLWidgetImplementation::paintScene( const ImageHolder &image)
 	glMatrixMode( GL_TEXTURE );
 	glLoadIdentity();
 	glLoadMatrixd( state.textureMatrix );
-	//shader 
-	
+	//shader
+
 	//if the image is declared as a zmap
-	if( image.getImageState().imageType == ImageHolder::z_map) {
+	if( image.getImageState().imageType == ImageHolder::z_map ) {
 		m_ScalingShader.setEnabled( false );
-		m_LUTShader.setEnabled(true);
+		m_LUTShader.setEnabled( true );
 		GLuint id = m_LookUpTable.getLookUpTableAsTexture( Color::hsvLUT );
-		glActiveTexture(GL_TEXTURE1);
+		glActiveTexture( GL_TEXTURE1 );
 		glBindTexture( GL_TEXTURE_1D, id );
-		m_LUTShader.addVariable<float>("lut", 1, true );
-		m_LUTShader.addVariable<float>("max", image.getMinMax().second->as<float>());
-		m_LUTShader.addVariable<float>("min", image.getMinMax().first->as<float>());
-		m_LUTShader.addVariable<float>("upper_threshold", image.getImageState().threshold.second);
-		m_LUTShader.addVariable<float>("lower_threshold", image.getImageState().threshold.first);
-		m_LUTShader.addVariable<float>("bias", bias);
-		m_LUTShader.addVariable<float>("scaling", scaling);
-		m_LUTShader.addVariable<float>("opacity", image.getImageState().opacity);
-	} else if (image.getImageState().imageType == ImageHolder::anatomical_image) {
+		m_LUTShader.addVariable<float>( "lut", 1, true );
+		m_LUTShader.addVariable<float>( "max", image.getMinMax().second->as<float>() );
+		m_LUTShader.addVariable<float>( "min", image.getMinMax().first->as<float>() );
+		m_LUTShader.addVariable<float>( "upper_threshold", image.getImageState().threshold.second );
+		m_LUTShader.addVariable<float>( "lower_threshold", image.getImageState().threshold.first );
+		m_LUTShader.addVariable<float>( "bias", bias );
+		m_LUTShader.addVariable<float>( "scaling", scaling );
+		m_LUTShader.addVariable<float>( "opacity", image.getImageState().opacity );
+	} else if ( image.getImageState().imageType == ImageHolder::anatomical_image ) {
 		m_ScalingShader.setEnabled( true );
-		m_ScalingShader.addVariable<float>("max", image.getMinMax().second->as<float>());
-		m_ScalingShader.addVariable<float>("min", image.getMinMax().first->as<float>());
-		m_ScalingShader.addVariable<float>("upper_threshold",  image.getImageState().threshold.second);
-		m_ScalingShader.addVariable<float>("lower_threshold", image.getImageState().threshold.first);
-		m_ScalingShader.addVariable<float>("scaling", scaling);
-		m_ScalingShader.addVariable<float>("bias", bias);
-		m_ScalingShader.addVariable<float>("opacity", image.getImageState().opacity);
+		m_ScalingShader.addVariable<float>( "max", image.getMinMax().second->as<float>() );
+		m_ScalingShader.addVariable<float>( "min", image.getMinMax().first->as<float>() );
+		m_ScalingShader.addVariable<float>( "upper_threshold",  image.getImageState().threshold.second );
+		m_ScalingShader.addVariable<float>( "lower_threshold", image.getImageState().threshold.first );
+		m_ScalingShader.addVariable<float>( "scaling", scaling );
+		m_ScalingShader.addVariable<float>( "bias", bias );
+		m_ScalingShader.addVariable<float>( "opacity", image.getImageState().opacity );
 	}
-	glActiveTexture(GL_TEXTURE0);
+
+	glActiveTexture( GL_TEXTURE0 );
 	glBindTexture( GL_TEXTURE_3D, state.textureID );
 
 	glBegin( GL_QUADS );
@@ -265,16 +278,16 @@ void QGLWidgetImplementation::paintScene( const ImageHolder &image)
 	glVertex2f( 1.0, -1.0 );
 	glEnd();
 	glDisable( GL_TEXTURE_3D );
-	
+
 	m_ScalingShader.setEnabled( false );
 	m_LUTShader.setEnabled( false );
-	
+
 }
 
 void QGLWidgetImplementation::paintCrosshair()
 {
 	//paint crosshair
-	glDisable(GL_BLEND);
+	glDisable( GL_BLEND );
 	const State &currentState = m_StateValues.at( m_ViewerCore->getCurrentImage() );
 	glColor4f( 1, 0, 0, 0 );
 	glLineWidth( 1.0 );
@@ -299,9 +312,11 @@ void QGLWidgetImplementation::paintCrosshair()
 	glEnd();
 	glFlush();
 	glLoadIdentity();
-	if(m_ShowLabels) {
+
+	if( m_ShowLabels ) {
 		viewLabels();
 	}
+
 	redraw();
 }
 
@@ -310,36 +325,36 @@ void QGLWidgetImplementation::paintCrosshair()
 void QGLWidgetImplementation::viewLabels()
 {
 	QFont font;
-	font.setPointSize(15);
-	font.setPixelSize(15);
-	glColor4f(0.0,1.0,1.0, 1.0);
-	glViewport(0,0,width(),height());
-	switch(m_PlaneOrientation)
-	{
-		case axial:
-			glColor4f(0.0,1.0,0.0, 1.0);
-			renderText(width() / 2 - 7, 25, QString("A"), font);
-			renderText(width() / 2 - 7, height() - 10, QString("P"), font);
-			glColor4f(1.0,0.0,0.0, 1.0);
-			renderText(5, height() / 2, QString("L"), font);
-			renderText(width() - 15, height() / 2, QString("R"), font);
-			break;
-		case sagittal:
-			glColor4f(0.0,1.0,0.0, 1.0);
-			renderText(5, height() / 2, QString("A"), font);
-			renderText(width() - 15, height() / 2, QString("P"), font);
-			glColor4f(0.0,0.0,1.0, 1.0);
-			renderText(width() / 2 - 7, 25, QString("S"), font);
-			renderText(width() / 2 - 7, height() - 10, QString("I"), font);
-			break;
-		case coronal:
-			glColor4f(0.0,0.0,1.0, 1.0);
-			renderText(width() / 2 - 7, 25, QString("S"), font);
-			renderText(width() / 2 - 7, height() - 10, QString("I"), font);
-			glColor4f(1.0,0.0,0.0, 1.0);
-			renderText(5, height() / 2, QString("L"), font);
-			renderText(width() - 15, height() / 2, QString("R"), font);
-			break;
+	font.setPointSize( 15 );
+	font.setPixelSize( 15 );
+	glColor4f( 0.0, 1.0, 1.0, 1.0 );
+	glViewport( 0, 0, width(), height() );
+
+	switch( m_PlaneOrientation ) {
+	case axial:
+		glColor4f( 0.0, 1.0, 0.0, 1.0 );
+		renderText( width() / 2 - 7, 25, QString( "A" ), font );
+		renderText( width() / 2 - 7, height() - 10, QString( "P" ), font );
+		glColor4f( 1.0, 0.0, 0.0, 1.0 );
+		renderText( 5, height() / 2, QString( "L" ), font );
+		renderText( width() - 15, height() / 2, QString( "R" ), font );
+		break;
+	case sagittal:
+		glColor4f( 0.0, 1.0, 0.0, 1.0 );
+		renderText( 5, height() / 2, QString( "A" ), font );
+		renderText( width() - 15, height() / 2, QString( "P" ), font );
+		glColor4f( 0.0, 0.0, 1.0, 1.0 );
+		renderText( width() / 2 - 7, 25, QString( "S" ), font );
+		renderText( width() / 2 - 7, height() - 10, QString( "I" ), font );
+		break;
+	case coronal:
+		glColor4f( 0.0, 0.0, 1.0, 1.0 );
+		renderText( width() / 2 - 7, 25, QString( "S" ), font );
+		renderText( width() / 2 - 7, height() - 10, QString( "I" ), font );
+		glColor4f( 1.0, 0.0, 0.0, 1.0 );
+		renderText( 5, height() / 2, QString( "L" ), font );
+		renderText( width() - 15, height() / 2, QString( "R" ), font );
+		break;
 	}
 }
 
@@ -353,21 +368,23 @@ void QGLWidgetImplementation::mouseMoveEvent( QMouseEvent *e )
 
 void QGLWidgetImplementation::mousePressEvent( QMouseEvent *e )
 {
-	if(e->button() == Qt::LeftButton ) {
+	if( e->button() == Qt::LeftButton ) {
 		leftButtonPressed = true;
 	}
-	if(e->button() == Qt::RightButton ) {
+
+	if( e->button() == Qt::RightButton ) {
 		rightButtonPressed = true;
 	}
+
 	emitMousePressEvent( e );
 
 }
 
-bool QGLWidgetImplementation::isInViewport(size_t wx, size_t wy)
+bool QGLWidgetImplementation::isInViewport( size_t wx, size_t wy )
 {
 	GLint *viewport = m_StateValues[m_ViewerCore->getCurrentImage()].viewport;
-	if((wx > viewport[0] && wx < (viewport[0] + viewport[2])) && ( wy > viewport[1] && wy < (viewport[1] + viewport[3]))) 
-	{
+
+	if( ( wx > viewport[0] && wx < ( viewport[0] + viewport[2] ) ) && ( wy > viewport[1] && wy < ( viewport[1] + viewport[3] ) ) ) {
 		return true;
 	} else {
 		return false;
@@ -423,40 +440,39 @@ void QGLWidgetImplementation::wheelEvent( QWheelEvent *e )
 }
 
 void QGLWidgetImplementation::mouseReleaseEvent( QMouseEvent *e )
-{	
-	if(e->button() == Qt::LeftButton ) {
+{
+	if( e->button() == Qt::LeftButton ) {
 		leftButtonPressed = false;
 	}
-	if(e->button() == Qt::RightButton ) {
+
+	if( e->button() == Qt::RightButton ) {
 		rightButtonPressed = false;
 	}
 }
 
 
-void QGLWidgetImplementation::keyPressEvent(QKeyEvent* e)
+void QGLWidgetImplementation::keyPressEvent( QKeyEvent *e )
 {
-	if(e->key() == Qt::Key_Space)
-	{
-		BOOST_FOREACH( StateMap::reference ref, m_StateValues )
-		{
+	if( e->key() == Qt::Key_Space ) {
+		BOOST_FOREACH( StateMap::reference ref, m_StateValues ) {
 			GLOrientationHandler::makeIdentity( ref.second.modelViewMatrix );
 			GLOrientationHandler::makeIdentity( ref.second.projectionMatrix );
 		}
 		m_Zoom.currentZoom = 1.0;
 		size_t timestep = m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords[3];
 		util::ivector4 size = m_ViewerCore->getCurrentImage().getImageSize();
-		lookAtVoxel( util::ivector4( size[0]/2, size[1]/2, size[2]/2, timestep ) );
+		lookAtVoxel( util::ivector4( size[0] / 2, size[1] / 2, size[2] / 2, timestep ) );
 	}
 }
 
 void  QGLWidgetImplementation::setShowLabels( bool show )
 {
-	m_ShowLabels = show; 
+	m_ShowLabels = show;
 	updateScene();
 
 }
 
-void QGLWidgetImplementation::setInterpolationType(const isis::viewer::GLTextureHandler::InterpolationType interpolation)
+void QGLWidgetImplementation::setInterpolationType( const isis::viewer::GLTextureHandler::InterpolationType interpolation )
 {
 	m_InterplationType = interpolation;
 	updateScene();
@@ -464,7 +480,7 @@ void QGLWidgetImplementation::setInterpolationType(const isis::viewer::GLTexture
 
 void QGLWidgetImplementation::updateScene()
 {
-	lookAtVoxel(m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords);
+	lookAtVoxel( m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords );
 }
 
 

@@ -17,17 +17,17 @@ namespace viewer
 MainWindow::MainWindow( QViewerCore *core )
 	: m_ViewerCore( core )
 {
-	
-	connect(ui.action_Exit, SIGNAL(triggered()), this, SLOT( exitProgram() ) );
-	connect(ui.actionShow_labels, SIGNAL(toggled(bool)), m_ViewerCore, SLOT(setShowLabels(bool)));
-	connect(core, SIGNAL( emitImagesChanged(DataContainer)), this, SLOT( imagesChanged(DataContainer) ) );
-	connect(ui.imageStack, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT( checkImageStack(QListWidgetItem*)));
-	connect(ui.action_Open_Image, SIGNAL(triggered()), this, SLOT(openImage()));
-	
+
+	connect( ui.action_Exit, SIGNAL( triggered() ), this, SLOT( exitProgram() ) );
+	connect( ui.actionShow_labels, SIGNAL( toggled( bool ) ), m_ViewerCore, SLOT( setShowLabels( bool ) ) );
+	connect( core, SIGNAL( emitImagesChanged( DataContainer ) ), this, SLOT( imagesChanged( DataContainer ) ) );
+	connect( ui.imageStack, SIGNAL( itemClicked( QListWidgetItem * ) ), this, SLOT( checkImageStack( QListWidgetItem * ) ) );
+	connect( ui.action_Open_Image, SIGNAL( triggered() ), this, SLOT( openImage() ) );
+
 	//we need a master widget to keep opengl running in case all visible widgets were closed
-	
+
 	m_MasterWidget = new QGLWidgetImplementation( core, 0, axial );
-	
+
 	m_AxialWidget =  m_MasterWidget->createSharedWidget( ui.axialWidget, axial );
 	m_ViewerCore->registerWidget( "axialView", m_AxialWidget );
 
@@ -38,9 +38,9 @@ MainWindow::MainWindow( QViewerCore *core )
 	m_ViewerCore->registerWidget( "sagittalView", m_SagittalWidget );
 
 	m_ViewerCore->registerWidget( "timestepSpinBox", ui.timestepSpinBox, QViewerCore::timestep_changed );
-	ui.actionShow_labels->setCheckable(true);
-	ui.actionShow_labels->setChecked(false);
-	
+	ui.actionShow_labels->setCheckable( true );
+	ui.actionShow_labels->setChecked( false );
+
 }
 
 
@@ -83,67 +83,68 @@ void MainWindow::voxelCoordChanged( util::ivector4 coords )
 
 }
 
-void MainWindow::imagesChanged(DataContainer images )
-{	
+void MainWindow::imagesChanged( DataContainer images )
+{
 	ui.imageStack->clear();
-	BOOST_FOREACH( DataContainer::const_reference imageRef, images )
-	{
+	BOOST_FOREACH( DataContainer::const_reference imageRef, images ) {
 		QListWidgetItem *item = new QListWidgetItem;
-		QString sD = imageRef.second.getPropMap().getPropertyAs<std::string>("sequenceDescription").c_str();
-		if (!sD.toStdString().empty()) {
-			item->setText(QString( imageRef.second.getFileNames().front().c_str() ) );	
+		QString sD = imageRef.second.getPropMap().getPropertyAs<std::string>( "sequenceDescription" ).c_str();
+
+		if ( !sD.toStdString().empty() ) {
+			item->setText( QString( imageRef.second.getFileNames().front().c_str() ) );
 		} else {
-			item->setText(QString( imageRef.second.getFileNames().front().c_str() ) );
+			item->setText( QString( imageRef.second.getFileNames().front().c_str() ) );
 		}
+
 		item->setFlags( Qt::ItemIsEnabled | Qt::ItemIsUserCheckable );
-		
+
 		if( imageRef.second.getImageState().visible ) {
-			item->setCheckState(Qt::Checked);
+			item->setCheckState( Qt::Checked );
 		} else {
-			item->setCheckState(Qt::Unchecked);
+			item->setCheckState( Qt::Unchecked );
 		}
-		ui.imageStack->addItem(item);
+
+		ui.imageStack->addItem( item );
 	}
 }
 
 void MainWindow::openImage()
 {
-	QStringList filenames = QFileDialog::getOpenFileNames(this, 
-														  tr("Open images"), 
-														  m_CurrentPath,
-														  tr("Image Files (*.v *.nii *.hdr *.dcm *.ima"));
+	QStringList filenames = QFileDialog::getOpenFileNames( this,
+							tr( "Open images" ),
+							m_CurrentPath,
+							tr( "Image Files (*.v *.nii *.hdr *.dcm *.ima" ) );
 	QDir dir;
-	m_CurrentPath = dir.absoluteFilePath(filenames.front());
-	if(!filenames.empty()) {
+	m_CurrentPath = dir.absoluteFilePath( filenames.front() );
+
+	if( !filenames.empty() ) {
 		std::list<data::Image> imgList;
 		util::slist pathList;
-		BOOST_FOREACH( QStringList::const_reference filename, filenames)
-		{
-			std::list<data::Image> tempImgList = data::IOFactory::load( filename.toStdString() ,"", "");
+		BOOST_FOREACH( QStringList::const_reference filename, filenames ) {
+			std::list<data::Image> tempImgList = data::IOFactory::load( filename.toStdString() , "", "" );
 			pathList.push_back( filename.toStdString() );
-			BOOST_FOREACH(std::list<data::Image>::const_reference image, tempImgList)
-			{
-				imgList.push_back(image);
+			BOOST_FOREACH( std::list<data::Image>::const_reference image, tempImgList ) {
+				imgList.push_back( image );
 			}
-			
+
 		}
-		m_ViewerCore->addImageList(imgList, ImageHolder::anatomical_image, pathList );
+		m_ViewerCore->addImageList( imgList, ImageHolder::anatomical_image, pathList );
 		m_ViewerCore->updateScene();
 	}
 }
 
 
-void MainWindow::checkImageStack(QListWidgetItem* item)
+void MainWindow::checkImageStack( QListWidgetItem *item )
 {
-	if(item->checkState() == Qt::Checked)
-	{
-		m_ViewerCore->getDataContainer().at(item->text().toStdString()).setVisible(true);
-		
+	if( item->checkState() == Qt::Checked ) {
+		m_ViewerCore->getDataContainer().at( item->text().toStdString() ).setVisible( true );
+
 	} else if( item->checkState() == Qt::Unchecked ) {
-		m_ViewerCore->getDataContainer().at(item->text().toStdString()).setVisible(false);
+		m_ViewerCore->getDataContainer().at( item->text().toStdString() ).setVisible( false );
 	}
+
 	m_ViewerCore->updateScene();
-	
+
 }
 
 

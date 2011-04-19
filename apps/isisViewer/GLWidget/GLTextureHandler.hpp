@@ -26,9 +26,9 @@ class GLTextureHandler
 public:
 
 	enum InterpolationType { neares_neighbor, linear };
-	
+
 	GLTextureHandler() { m_Alpha = false; }
-	
+
 	///The image map is a mapping of the imageID and timestep to the texture of the GL_TEXTURE_3D.
 	typedef std::map<ImageHolder, std::map<size_t, GLuint > > ImageMapType;
 
@@ -40,33 +40,34 @@ public:
 
 	///The image map is a mapping of the imageID and timestep to the texture of the GL_TEXTURE_3D.
 	ImageMapType getImageMap() const { return m_ImageMap; }
-	
+
 	void setAlphaEnabled( bool enabled ) { m_Alpha = enabled; }
 
 private:
 	ImageMapType m_ImageMap;
 	//this is only needed if one specifies the manual scaling
 	bool m_Alpha;
-	
+
 	template<typename TYPE>
 	GLuint internCopyImageToTexture( const DataContainer &data, GLenum format, const ImageHolder &image, size_t timestep, bool alpha = true, InterpolationType interpolation = neares_neighbor  ) {
 		LOG( Debug, info ) << "Copy image " << image.getID() << " with timestep " << timestep << " to texture";
-		
+
 		util::FixedVector<size_t, 4> size = image.getImageSize();
 		size_t volume = size[0] * size[1] * size[2];
 		TYPE *dataPtr = static_cast<TYPE *>( data.getImageWeakPointer( image, timestep ).lock().get() );
 		assert( dataPtr != 0 );
 		GLint interpolationType = 0;
-		switch (interpolation)
-		{
-			case neares_neighbor:
-				interpolationType = GL_NEAREST;
-				break;
-			case linear:
-				interpolationType = GL_LINEAR;
-				break;
+
+		switch ( interpolation ) {
+		case neares_neighbor:
+			interpolationType = GL_NEAREST;
+			break;
+		case linear:
+			interpolationType = GL_LINEAR;
+			break;
 		}
-		glPixelStorei(GL_UNPACK_ALIGNMENT,1);
+
+		glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 		GLuint texture;
 		glGenTextures( 1, &texture );
 		glBindTexture( GL_TEXTURE_3D, texture );
@@ -77,30 +78,34 @@ private:
 		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER );
 		GLint internalFormat;
 		GLenum dataFormat;
-		if(alpha) {
-			TYPE *dataWithAplpha = (TYPE*) calloc(volume*2, sizeof(TYPE));
+
+		if( alpha ) {
+			TYPE *dataWithAplpha = ( TYPE * ) calloc( volume * 2, sizeof( TYPE ) );
 			size_t index = 0;
-			for (size_t i = 0; i<volume*2; i+=2)
-			{
+
+			for ( size_t i = 0; i < volume * 2; i += 2 ) {
 				dataWithAplpha[i] = dataPtr[index++];
-				dataWithAplpha[i+1] = std::numeric_limits<TYPE>::max();
+				dataWithAplpha[i + 1] = std::numeric_limits<TYPE>::max();
 			}
+
 			glTexImage3D( GL_TEXTURE_3D, 0, GL_LUMINANCE12_ALPHA4,
-					  size[0],
-					  size[1],
-					  size[2], 0, GL_LUMINANCE_ALPHA, format,
-					  dataWithAplpha );
+						  size[0],
+						  size[1],
+						  size[2], 0, GL_LUMINANCE_ALPHA, format,
+						  dataWithAplpha );
 		} else {
 			glTexImage3D( GL_TEXTURE_3D, 0, GL_LUMINANCE,
-					  size[0],
-					  size[1],
-					  size[2], 0, GL_LUMINANCE, format,
-					  dataPtr );
+						  size[0],
+						  size[1],
+						  size[2], 0, GL_LUMINANCE, format,
+						  dataPtr );
 		}
+
 		GLenum glErrorCode = glGetError();
-		if(glErrorCode) {
-			LOG(Runtime, error) << "Error during loading image " << image.getID() 
-				<< " with timestep " << timestep << " to glTexture3D. Error code is " << glErrorCode;
+
+		if( glErrorCode ) {
+			LOG( Runtime, error ) << "Error during loading image " << image.getID()
+								  << " with timestep " << timestep << " to glTexture3D. Error code is " << glErrorCode;
 			return 0;
 		} else {
 			m_ImageMap[image].insert( std::make_pair<size_t, GLuint >( timestep, texture ) );

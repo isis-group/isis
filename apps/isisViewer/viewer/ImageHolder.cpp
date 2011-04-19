@@ -8,7 +8,7 @@ namespace viewer
 
 ImageHolder::ImageHolder( )
 	: m_NumberOfTimeSteps( 0 ),
-	m_CutAwayPair(std::make_pair<double, double>(0.03,0.05))
+	  m_CutAwayPair( std::make_pair<double, double>( 0.03, 0.05 ) )
 {
 }
 
@@ -17,6 +17,7 @@ bool
 ImageHolder::filterRelevantMetaInformation()
 {
 	std::vector<boost::shared_ptr< data::Chunk > > chunkList = m_Image->getChunksAsVector();
+
 	// in case we get more chunks than timesteps we should filter the chunk metadata
 	if( chunkList.size() > m_NumberOfTimeSteps ) {
 		if( chunkList.size() % m_NumberOfTimeSteps ) {
@@ -28,7 +29,7 @@ ImageHolder::filterRelevantMetaInformation()
 			size_t factor = chunkList.size() / m_NumberOfTimeSteps;
 
 			for ( size_t t = 0; t < chunkList.size(); t += factor ) {
-				m_TimeStepProperties.push_back( *(chunkList.operator[](t)) );
+				m_TimeStepProperties.push_back( *( chunkList.operator[]( t ) ) );
 			}
 
 			if( m_TimeStepProperties.size() != m_NumberOfTimeSteps ) {
@@ -101,22 +102,22 @@ bool ImageHolder::setImage( const data::Image &image, const ImageType &imageType
 	}
 
 	m_Image.reset( new data::Image( image ) );
+
 	//if no filename was specified we have to search for the filename by ourselfes
-	if(filename.empty()) {
+	if( filename.empty() ) {
 		// go through all the chunks and search for filenames. We use a set here to avoid redundantly filenames
 		std::set<std::string> filenameSet;
-		BOOST_FOREACH( std::vector<boost::shared_ptr< const data::Chunk > >::const_reference chRef, image.getChunksAsVector())
-		{
-			filenameSet.insert( chRef->getPropertyAs<std::string>("source") );
+		BOOST_FOREACH( std::vector<boost::shared_ptr< const data::Chunk > >::const_reference chRef, image.getChunksAsVector() ) {
+			filenameSet.insert( chRef->getPropertyAs<std::string>( "source" ) );
 		}
 		//now we pack our filenameSet into our slist of filenames
-		BOOST_FOREACH( std::set<std::string>::const_reference setRef, filenameSet)
-		{
+		BOOST_FOREACH( std::set<std::string>::const_reference setRef, filenameSet ) {
 			m_Filenames.push_back( setRef );
 		}
 	} else {
 		m_Filenames.push_back( filename );
 	}
+
 	// get some image information
 	m_MinMax = image.getMinMax();
 	m_ImageSize = image.getSizeAsVector();
@@ -130,6 +131,7 @@ bool ImageHolder::setImage( const data::Image &image, const ImageType &imageType
 	image.copyToMem<TYPE>( &imagePtr[0] );
 	LOG( Debug, verbose_info ) << "Copied image to continuous memory space.";
 	m_InternMinMax = imagePtr.getMinMax();
+
 	//splice the image in its volumes -> we get a vector of t volumes
 	if( m_NumberOfTimeSteps > 1 ) { //splicing is only necessary if we got more than 1 timestep
 		m_ImageVector = imagePtr.splice( m_ImageSize[0] * m_ImageSize[1] * m_ImageSize[2] );
@@ -149,11 +151,11 @@ bool ImageHolder::setImage( const data::Image &image, const ImageType &imageType
 
 	//copy all the relevant meta information
 	m_PropMap = static_cast<util::PropertyMap>( image );
-	m_OptimalScalingPair = getOptimalScalingToForType<TYPE>(m_CutAwayPair);
+	m_OptimalScalingPair = getOptimalScalingToForType<TYPE>( m_CutAwayPair );
 	//image seems to be ok...i guess
 	m_ImageState.imageType = imageType;
 	m_ImageState.visible = true;
-	m_ImageState.threshold = std::make_pair<double, double>(m_MinMax.first->as<double>(), m_MinMax.second->as<double>() );
+	m_ImageState.threshold = std::make_pair<double, double>( m_MinMax.first->as<double>(), m_MinMax.second->as<double>() );
 	m_ImageState.opacity = 1.0;
 	return filterRelevantMetaInformation(); //only return true if filtering was successfully
 }

@@ -22,7 +22,7 @@ namespace viewer
 {
 
 // just some helper typedefs which we will need regularly
-	enum PlaneOrientation { axial, sagittal, coronal };
+enum PlaneOrientation { axial, sagittal, coronal };
 
 typedef ViewerLog Runtime;
 typedef ViewerDebug Debug;

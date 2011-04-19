@@ -10,8 +10,8 @@ bool DataContainer::addImage( const data::Image &image, const ImageHolder::Image
 	ImageHolder tmpHolder;
 	tmpHolder.setImage( image, imageType, filename );
 	tmpHolder.setID( size() );
-	insert( std::make_pair<std::string, ImageHolder>( filename, tmpHolder) );
-	
+	insert( std::make_pair<std::string, ImageHolder>( filename, tmpHolder ) );
+
 	return true;
 }
 

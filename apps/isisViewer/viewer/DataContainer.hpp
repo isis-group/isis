@@ -26,7 +26,7 @@ public:
 	getImageWeakPointer( const ImageHolder &image, size_t timestep = 0 ) const {
 		return image.getImageVector()[timestep]->getRawAddress();
 	}
-	
+
 
 };
 

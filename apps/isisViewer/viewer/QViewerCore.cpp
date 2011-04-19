@@ -22,24 +22,24 @@ QViewerCore::registerWidget( std::string key, QWidget *widget, QViewerCore::Acti
 		if( dynamic_cast<QGLWidgetImplementation *>( widget ) ) {
 			QGLWidgetImplementation *w = dynamic_cast<QGLWidgetImplementation *>( widget );
 			connect( w, SIGNAL( voxelCoordChanged( util::ivector4 ) ), this, SLOT( voxelCoordChanged ( util::ivector4 ) ) );
-			connect( this, SIGNAL( emitVoxelCoordChanged( util::ivector4 ) ),w, SLOT( lookAtVoxel( util::ivector4 ) ) );
+			connect( this, SIGNAL( emitVoxelCoordChanged( util::ivector4 ) ), w, SLOT( lookAtVoxel( util::ivector4 ) ) );
 			connect( this, SIGNAL( emitTimeStepChange( unsigned int ) ), w, SLOT( timestepChanged( unsigned int ) ) );
-			connect( this, SIGNAL( emitShowLabels(bool)), w, SLOT( setShowLabels(bool)) );
-			connect( this, SIGNAL( emitUpdateScene()), w, SLOT(updateScene()));
+			connect( this, SIGNAL( emitShowLabels( bool ) ), w, SLOT( setShowLabels( bool ) ) );
+			connect( this, SIGNAL( emitUpdateScene() ), w, SLOT( updateScene() ) );
 		} else if ( dynamic_cast< QSpinBox * >( widget ) ) {
 			switch ( action ) {
 			case QViewerCore::timestep_changed:
 				connect( dynamic_cast<QSpinBox *>( widget ), SIGNAL( valueChanged( int ) ), this, SLOT( timestepChanged( int ) ) );
 				break;
 			}
-		} else if ( dynamic_cast< QCheckBox * > (widget) ) {
-			switch (action) {
-				case QViewerCore::show_labels:
-				connect( dynamic_cast<QCheckBox *>(widget), SIGNAL( stateChanged(int)), this, SLOT( setShowLabels(int))	);
+		} else if ( dynamic_cast< QCheckBox * > ( widget ) ) {
+			switch ( action ) {
+			case QViewerCore::show_labels:
+				connect( dynamic_cast<QCheckBox *>( widget ), SIGNAL( stateChanged( int ) ), this, SLOT( setShowLabels( int ) ) );
 				break;
 			}
 		}
-				
+
 
 	} else {
 		LOG( Runtime, error ) << "A widget with the name " << key << " already exists! Wont add this";
@@ -57,28 +57,28 @@ void QViewerCore::timestepChanged( int timestep )
 	emitTimeStepChange( timestep );
 }
 
-void QViewerCore::addImageList(const std::list< data::Image > imageList, const ImageHolder::ImageType &imageType, const isis::util::slist& filenames)
+void QViewerCore::addImageList( const std::list< data::Image > imageList, const ImageHolder::ImageType &imageType, const isis::util::slist &filenames )
 {
-	isis::viewer::ViewerCoreBase::addImageList(imageList, imageType, filenames);
+	isis::viewer::ViewerCoreBase::addImageList( imageList, imageType, filenames );
 	emitImagesChanged( getDataContainer() );
 }
 
-void QViewerCore::setImageList(const std::list< data::Image > imageList, const ImageHolder::ImageType &imageType, const isis::util::slist& filenames)
+void QViewerCore::setImageList( const std::list< data::Image > imageList, const ImageHolder::ImageType &imageType, const isis::util::slist &filenames )
 {
-	isis::viewer::ViewerCoreBase::setImageList(imageList, imageType, filenames);
+	isis::viewer::ViewerCoreBase::setImageList( imageList, imageType, filenames );
 	emitImagesChanged( getDataContainer() );
 }
 
-void QViewerCore::setShowLabels(bool l)
+void QViewerCore::setShowLabels( bool l )
 {
-	if(l) {
-		emitShowLabels(true);
+	if( l ) {
+		emitShowLabels( true );
 	} else {
-		emitShowLabels(false);
+		emitShowLabels( false );
 	}
 }
 
-void QViewerCore::updateScene() 
+void QViewerCore::updateScene()
 {
 	emitUpdateScene();
 }

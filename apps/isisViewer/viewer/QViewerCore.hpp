@@ -21,12 +21,12 @@ public:
 	QViewerCore( );
 
 	virtual bool registerWidget( std::string key, QWidget *widget, Actions = not_specified );
-	
+
 	virtual void addImageList( const std::list<data::Image> imageList, const ImageHolder::ImageType &imageType, const util::slist &filenames = util::slist() );
 	virtual void setImageList( const std::list<data::Image> imageList, const ImageHolder::ImageType &imageType, const util::slist &filenames = util::slist() );
 
 	const WidgetMap &getWidgets() const { return m_WidgetMap; }
-	
+
 	std::vector< util::fvector4 > getRGBColorGradient() const { return m_RGBColorGradient; }
 
 	template<typename T>
@@ -47,16 +47,16 @@ public:
 public Q_SLOTS:
 	virtual void voxelCoordChanged( util::ivector4 );
 	virtual void timestepChanged( int );
-	virtual void setShowLabels(bool);
+	virtual void setShowLabels( bool );
 	virtual void updateScene();
 
 Q_SIGNALS:
 	void emitVoxelCoordChanged( util::ivector4 );
 	void emitTimeStepChange( unsigned int );
 	void emitImagesChanged( DataContainer );
-	void emitShowLabels(bool);
+	void emitShowLabels( bool );
 	void emitUpdateScene();
-	
+
 private:
 	//this map holds the widgets associated with a given name
 	WidgetMap m_WidgetMap;

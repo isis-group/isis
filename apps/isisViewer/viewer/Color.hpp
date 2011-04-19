@@ -4,20 +4,24 @@
 #include "common.hpp"
 #include <QColor>
 
-namespace isis {
-namespace viewer {
-	
-		
-class Color {
-	
+namespace isis
+{
+namespace viewer
+{
+
+
+class Color
+{
+
 public:
 	enum LookUpTableType { hsvLUT, hsvLUT_reverse };
 	static std::vector< util::fvector4 > getColorGradientRGB( const LookUpTableType &lutType, const size_t &numberOfEntries );
-	
-	
+
+
 };
-	
-}}
+
+}
+}
 
 
 
