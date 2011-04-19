@@ -235,7 +235,7 @@ public:
 	 * with caution!
 	 */
 	void transformCoords( boost::numeric::ublas::matrix<float> transform_matrix ) {
-		isis::data::_internal::transformCoords( *this, transform_matrix );
+		isis::data::_internal::transformCoords( *this, getSizeAsVector(), transform_matrix );
 	}
 
 };

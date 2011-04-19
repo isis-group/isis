@@ -48,14 +48,15 @@ template<typename SRC, typename DST> void numeric_convert_impl( const SRC *src, 
 
 template<typename T> void numeric_copy_impl( const T *src, T *dst, size_t count )
 {
-	LOG( Runtime, info )	<< "using memcpy-copy of " << ValuePtr<T>::staticName() << " without scaling";
-	memcpy(dst,src,count*sizeof(T));
+	LOG( Runtime, info )    << "using memcpy-copy of " << ValuePtr<T>::staticName() << " without scaling";
+	memcpy( dst, src, count * sizeof( T ) );
 }
-template<typename T> void numeric_copy_impl( const T *src, T *dst, size_t count,double scale, double offset )
+template<typename T> void numeric_copy_impl( const T *src, T *dst, size_t count, double scale, double offset )
 {
-	LOG( Runtime, info )	<< "using generic scaling copy of " << ValuePtr<T>::staticName() << " with scale/offset " << std::fixed << scale << "/" << offset;
+	LOG( Runtime, info )    << "using generic scaling copy of " << ValuePtr<T>::staticName() << " with scale/offset " << std::fixed << scale << "/" << offset;
+
 	for ( size_t i = 0; i < count; i++ )
-		dst[i] = src[i]*scale+offset;
+		dst[i] = src[i] * scale + offset;
 }
 
 #ifdef ISIS_USE_LIBOIL

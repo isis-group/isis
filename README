@@ -1,1 +1,10 @@
+The ISIS project aims to provide a framework to access a large variety
+of image processing libraries written in different programming
+languages and environments. 
 
+It's implemented in C++ and and extensible via a dynamic plugin
+system. At the current state of development only I/O plugins, for
+reading and writing image data files, are supported.
+
+It can also be used as a python library. This feature is still
+work in progress (see: ROADMAP).

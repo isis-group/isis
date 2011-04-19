@@ -50,11 +50,11 @@ public:
 			return 0;
 		}
 	}
-	
+
 	float _voxel( const isis::util::ivector4 &coord ) {
 		return _voxel( coord[0], coord[1], coord[2], coord[3] );
 	}
-	
+
 	bool _setVoxel( const size_t &first, const size_t &second, const size_t &third, const size_t &fourth, const float &value ) {
 
 		switch( getTypeID() ) {
@@ -94,19 +94,19 @@ public:
 			return false;
 		}
 	}
-	
+
 	bool _setVoxel( const isis::util::ivector4 &coord, const float &value ) {
 		return _setVoxel( coord[0], coord[1], coord[2], coord[3], value );
 	}
-	
+
 	bool _convertToType( const unsigned short ID ) {
 		return convertToType( ID );
 	}
-	
+
 	bool _convertToType( const unsigned short ID, float scaling, size_t offset ) {
-		return convertToType( ID, std::make_pair<util::Value<float>, util::Value<size_t> >(scaling, offset) );
+		return convertToType( ID, std::make_pair<util::Value<float>, util::Value<size_t> >( scaling, offset ) );
 	}
-	
+
 private:
 	PyObject *self;
 };

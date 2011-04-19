@@ -4,6 +4,7 @@
 #include <map>
 #include <boost/assign.hpp>
 #include <boost/foreach.hpp>
+#include <boost/numeric/ublas/io.hpp>
 
 using namespace isis;
 
@@ -119,7 +120,7 @@ int main( int argc, char **argv )
 				break;
 			}
 		}
-
+		std::cout << "**************************************Transform: " << T << std::endl;
 		if ( app.parameters["swap"].toString() == "both" || app.parameters["swap"].toString() == "space" ) {
 			newImage.transformCoords( T );
 			std::vector<boost::shared_ptr< data::Chunk> > chList = newImage.getChunksAsVector();
