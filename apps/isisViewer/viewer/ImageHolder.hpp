@@ -29,6 +29,8 @@ public:
 	enum ImageType { anatomical_image, z_map };
 	struct ImageState {
 		ImageType imageType;
+		std::pair<double, double> threshold;
+		float opacity;
 		bool visible;
 	};
 	ImageHolder( );
@@ -48,12 +50,12 @@ public:
 	std::pair<util::ValueReference, util::ValueReference> getMinMax() const { return m_MinMax; }
 	std::pair<util::ValueReference, util::ValueReference> getInternMinMax() const { return m_InternMinMax; }
 	std::pair<double, double> getOptimalScalingPair() const { return m_OptimalScalingPair;  }
-	ImageState &getImageState() { return m_ImageState; }
-	const ImageState &getImageState() const { return m_ImageState; }
 	
 	util::slist getFileNames() const { return m_Filenames; }
 
 	bool operator<( const ImageHolder &ref ) const { return m_ID < ref.getID(); }
+	
+	const ImageState &getImageState() const { return m_ImageState; }
 	
 	template<typename TYPE>
 	std::pair<double, double> getOptimalScalingToForType( const std::pair<double,double> &cutAway ) const
@@ -100,6 +102,8 @@ public:
 		retPair.second = (float)maxTypeValue / float(upperBorder - lowerBorder);
 		return retPair;
 	}
+
+	void setVisible(bool v) { m_ImageState.visible = v; }
 
 private:
 	

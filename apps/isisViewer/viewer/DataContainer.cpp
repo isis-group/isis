@@ -5,30 +5,28 @@ namespace isis
 namespace viewer
 {
 
-bool DataContainer::addImage( const data::Image &image, const ImageHolder::ImageType &imageType, const std::string &filenames )
+bool DataContainer::addImage( const data::Image &image, const ImageHolder::ImageType &imageType, const std::string &filename )
 {
 	ImageHolder tmpHolder;
-	tmpHolder.setImage( image, imageType, filenames );
+	tmpHolder.setImage( image, imageType, filename );
 	tmpHolder.setID( size() );
+	m_ImageMap[filename] = tmpHolder;
 	push_back( tmpHolder );
 	
-	std::pair<std::string, ImageHolder::ImageType> nameTypePair = std::make_pair<std::string, ImageHolder::ImageType>(tmpHolder.getFileNames().front(), tmpHolder.getImageState().imageType);
-	m_FileNameMap[ nameTypePair ] = tmpHolder;
 	return true;
 }
 
 
-bool DataContainer::isImage( size_t imageID, size_t timestep, size_t slice ) const
+ImageHolder &DataContainer::getImageHolder(const std::string& filename)
 {
-	if ( size() < imageID + 1 ) {
-		return false;
-	} else if ( operator[]( imageID ).getImageVector().size() < timestep + 1 ) {
-		return false;
+	if( m_ImageMap.find(filename) != m_ImageMap.end()) {
+		return m_ImageMap.find(filename)->second;
+	} else {
+		LOG(Runtime, warning) << "No image with filename " << filename << " was found.";
 	}
-
-	return true;
-
 }
+
+
 
 }
 } // end namespace

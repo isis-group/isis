@@ -22,7 +22,7 @@ Q_SIGNALS:
 
 protected:
 	Ui::isisViewerMain ui;
-
+	QString m_CurrentPath;
 };
 
 

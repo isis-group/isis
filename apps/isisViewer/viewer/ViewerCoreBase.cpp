@@ -47,5 +47,7 @@ void ViewerCoreBase::setImageList( const std::list< data::Image > imageList, con
 }
 
 
+
+
 }
 } // end namespace

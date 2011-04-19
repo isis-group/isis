@@ -44,16 +44,18 @@ public:
 	};
 
 
-protected Q_SLOTS:
+public Q_SLOTS:
 	virtual void voxelCoordChanged( util::ivector4 );
 	virtual void timestepChanged( int );
-	virtual void setShowLabels(int);
+	virtual void setShowLabels(bool);
+	virtual void updateScene();
 
 Q_SIGNALS:
 	void emitVoxelCoordChanged( util::ivector4 );
 	void emitTimeStepChange( unsigned int );
-	void emitImagesChanged( DataContainer::ImageFileMapType );
+	void emitImagesChanged( DataContainer::ImageMapType );
 	void emitShowLabels(bool);
+	void emitUpdateScene();
 	
 private:
 	//this map holds the widgets associated with a given name

@@ -25,13 +25,13 @@ class QGLWidgetImplementation : public QGLWidget
 	Q_OBJECT
 public:
 	enum ScalingType { no_scaling, automatic_scaling, manual_scaling };
-	QGLWidgetImplementation( QViewerCore *core, QWidget *parent = 0, QGLWidget *share = 0, GLOrientationHandler::PlaneOrientation orienation = GLOrientationHandler::axial );
-	QGLWidgetImplementation( QViewerCore *core, QWidget *parent = 0, GLOrientationHandler::PlaneOrientation orientation = GLOrientationHandler::axial );
+	QGLWidgetImplementation( QViewerCore *core, QWidget *parent = 0, QGLWidget *share = 0, PlaneOrientation orienation = axial );
+	QGLWidgetImplementation( QViewerCore *core, QWidget *parent = 0, PlaneOrientation orientation = axial );
 
-	QGLWidgetImplementation *createSharedWidget( QWidget *parent, GLOrientationHandler::PlaneOrientation orienation = GLOrientationHandler::axial );
+	QGLWidgetImplementation *createSharedWidget( QWidget *parent, PlaneOrientation orienation = axial );
 
 private:
-	QGLWidgetImplementation( QViewerCore *core, QWidget *parent, QGLWidget *share, QGLContext *context, GLOrientationHandler::PlaneOrientation orienation = GLOrientationHandler::axial );
+	QGLWidgetImplementation( QViewerCore *core, QWidget *parent, QGLWidget *share, QGLContext *context, PlaneOrientation orienation = axial );
 	QViewerCore *m_ViewerCore;
 	QGLWidget *m_ShareWidget;
 
@@ -50,6 +50,7 @@ public Q_SLOTS:
 	virtual void setScalingType( ScalingType scalingType ) { m_ScalingType = scalingType; }
 	virtual void setShowLabels( const bool show );
 	virtual void setInterpolationType( const GLTextureHandler::InterpolationType interpolation );
+	virtual void updateScene();
 	
 protected:
 	virtual void mouseMoveEvent( QMouseEvent *e );
@@ -60,7 +61,8 @@ protected:
 	virtual void initializeGL();
 	virtual void resizeGL( int w, int h );
 
-	virtual void paintScene();
+	virtual void paintScene( const ImageHolder &image );
+	virtual void paintCrosshair();
 	virtual void updateStateValues( const ImageHolder &image, const util::ivector4 &voxelCoords );
 
 
@@ -86,7 +88,7 @@ private:
 	GLShaderHandler m_LUTShader;
 	
 	std::vector<GLuint> m_TextureIDVec;
-	GLOrientationHandler::PlaneOrientation m_PlaneOrientation;
+	PlaneOrientation m_PlaneOrientation;
 	GLTextureHandler::InterpolationType m_InterplationType;
 
 	struct State {
@@ -95,7 +97,6 @@ private:
 			GLOrientationHandler::makeIdentity( projectionMatrix );
 			GLOrientationHandler::makeIdentity( textureMatrix );
 			set = false;
-			opacity = 1.0;
 		}
 		bool set;
 		GLdouble modelViewMatrix[16];
@@ -108,7 +109,6 @@ private:
 		util::ivector4 mappedVoxelCoords;
 		util::fvector4 mappedVoxelSize;
 		util::ivector4 mappedImageSize;
-		float opacity;
 		std::pair<int16_t, int16_t> crosshairCoords;
 		GLOrientationHandler::MatrixType planeOrientation;
 	};

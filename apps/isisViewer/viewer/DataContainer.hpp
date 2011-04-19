@@ -17,13 +17,11 @@ namespace viewer
 class DataContainer : public std::vector<ImageHolder>
 {
 public:
-	typedef std::map< std::pair<std::string, ImageHolder::ImageType>, ImageHolder> ImageFileMapType;
-	
+	typedef std::map<std::string, ImageHolder> ImageMapType;
 	///simply adds an isis image to the vector
 	bool addImage( const data::Image &image, const ImageHolder::ImageType &imageType, const std::string &filename = "" );
 
-	///checks if a image with the given parameters exists
-	bool isImage( size_t imageID, size_t timestep = 0, size_t slice = 0 ) const;
+	ImageHolder &getImageHolder( const std::string &filename );
 
 	///returns a boost::weak_ptr of the images data. Actually this also is a convinient function.
 	boost::weak_ptr<void>
@@ -31,10 +29,11 @@ public:
 		return image.getImageVector()[timestep]->getRawAddress();
 	}
 	
-	ImageFileMapType getFileNameMap() const { return m_FileNameMap; }
+	ImageMapType getImageMap() { return m_ImageMap; }
 	
 private:
-	ImageFileMapType m_FileNameMap;
+	ImageMapType m_ImageMap;
+		
 
 };
 

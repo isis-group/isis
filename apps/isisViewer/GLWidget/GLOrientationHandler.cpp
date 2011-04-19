@@ -84,7 +84,7 @@ GLOrientationHandler::MatrixType GLOrientationHandler::addOffset( const GLOrient
 	return retMat;
 }
 
-util::ivector4 GLOrientationHandler::transformObject2VoxelCoords( const util::fvector4 objectCoords, const isis::viewer::ImageHolder &image, GLOrientationHandler::PlaneOrientation orientation )
+util::ivector4 GLOrientationHandler::transformObject2VoxelCoords( const util::fvector4 objectCoords, const isis::viewer::ImageHolder &image, PlaneOrientation orientation )
 {
 	GLOrientationHandler::MatrixType planeOrientatioMatrix =
 		GLOrientationHandler::transformToPlaneView( image.getNormalizedImageOrientation(), orientation );

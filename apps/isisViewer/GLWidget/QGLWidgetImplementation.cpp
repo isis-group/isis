@@ -11,7 +11,7 @@ namespace viewer
 {
 
 
-QGLWidgetImplementation::QGLWidgetImplementation( QViewerCore *core, QWidget *parent, QGLWidget *share, GLOrientationHandler::PlaneOrientation orientation )
+QGLWidgetImplementation::QGLWidgetImplementation( QViewerCore *core, QWidget *parent, QGLWidget *share, PlaneOrientation orientation )
 	: QGLWidget( parent, share ),
 	  m_ViewerCore( core ),
 	  m_PlaneOrientation( orientation ),
@@ -21,7 +21,7 @@ QGLWidgetImplementation::QGLWidgetImplementation( QViewerCore *core, QWidget *pa
 	commonInit();
 }
 
-QGLWidgetImplementation::QGLWidgetImplementation( QViewerCore *core, QWidget *parent, GLOrientationHandler::PlaneOrientation orientation )
+QGLWidgetImplementation::QGLWidgetImplementation( QViewerCore *core, QWidget *parent, PlaneOrientation orientation )
 	: QGLWidget( parent ),
 	  m_ViewerCore( core ),
 	  m_PlaneOrientation( orientation )
@@ -37,7 +37,7 @@ void QGLWidgetImplementation::commonInit()
 	setFocusPolicy(Qt::StrongFocus);
 	setMouseTracking( true );
 	connectSignals();
-	m_ScalingType = automatic_scaling;
+	m_ScalingType = no_scaling;
 	m_InterplationType = GLTextureHandler::neares_neighbor;
 	m_ScalingPair = std::make_pair<double, double>(0.0,1.0);
 	//flags
@@ -50,7 +50,7 @@ void QGLWidgetImplementation::commonInit()
 
 
 
-QGLWidgetImplementation *QGLWidgetImplementation::createSharedWidget( QWidget *parent, GLOrientationHandler::PlaneOrientation orientation )
+QGLWidgetImplementation *QGLWidgetImplementation::createSharedWidget( QWidget *parent, PlaneOrientation orientation )
 {
 	return new QGLWidgetImplementation( m_ViewerCore, parent, this, orientation );
 }
@@ -171,90 +171,107 @@ bool QGLWidgetImplementation::lookAtVoxel( const isis::util::ivector4 &voxelCoor
 	LOG( Debug, verbose_info ) << "Looking at voxel: " << voxelCoords;
 	//someone has told the widget to paint all available images.
 	//So first we have to update the state values for each image
-	BOOST_FOREACH( DataContainer::const_reference image, m_ViewerCore->getDataContainer() ) {
-		updateStateValues( image, voxelCoords );
-	}
-	paintScene();
-
-}
-
-bool QGLWidgetImplementation::lookAtVoxel( const ImageHolder &image, const util::ivector4 &voxelCoords )
-{
-	updateStateValues( image, voxelCoords );
-	paintScene();
-
-}
-
-
-void QGLWidgetImplementation::paintScene()
-{
-
 	redraw();
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );	
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	BOOST_FOREACH( StateMap::const_reference currentImage, m_StateValues ) {
-		double scaling, bias;
-		if(m_ScalingType == automatic_scaling) {
-			scaling = currentImage.first.getOptimalScalingPair().second;
-			bias = currentImage.first.getOptimalScalingPair().first;
-		} else if ( m_ScalingType == manual_scaling) {
-			scaling = m_ScalingPair.second;
-			bias = m_ScalingPair.first;
-		} else {
-			scaling = 1.0;
-			bias = 0.0;
+	BOOST_FOREACH( DataContainer::const_reference image, m_ViewerCore->getDataContainer() ) {
+		if(image.getImageState().visible) {
+			updateStateValues( image, voxelCoords );
+			paintScene(image);
 		}
-		glViewport( currentImage.second.viewport[0], currentImage.second.viewport[1], currentImage.second.viewport[2], currentImage.second.viewport[3] );
-		glMatrixMode( GL_PROJECTION );
-		glLoadIdentity();
-		glLoadMatrixd( currentImage.second.projectionMatrix );
-		glMatrixMode( GL_MODELVIEW );
-		glLoadMatrixd( currentImage.second.modelViewMatrix );
-		glMatrixMode( GL_TEXTURE );
-		glLoadIdentity();
-		glLoadMatrixd( currentImage.second.textureMatrix );
-		//shader 
-		
-		//if the image is declared as a zmap
-		if(currentImage.first.getImageState().imageType == ImageHolder::z_map) {
-			m_ScalingShader.setEnabled( false );
-			m_LUTShader.setEnabled(true);
-			GLuint id = m_LookUpTable.getLookUpTableAsTexture( Color::hsvLUT );
-			glActiveTexture(GL_TEXTURE1);
-			glBindTexture( GL_TEXTURE_1D, id );
-			m_LUTShader.addVariable<float>("lut", 1, true );
-			m_LUTShader.addVariable<float>("max", 255);
-			m_LUTShader.addVariable<float>("min", -255);
-			m_LUTShader.addVariable<float>("upper_threshold", 255);
-			m_LUTShader.addVariable<float>("lower_threshold", -100);
-		} else if (currentImage.first.getImageState().imageType == ImageHolder::anatomical_image) {
-			m_ScalingShader.setEnabled( true );
-			m_ScalingShader.addVariable<float>("max", 255);
-			m_ScalingShader.addVariable<float>("min", -255);
-			m_ScalingShader.addVariable<float>("upper_threshold", 255);
-			m_ScalingShader.addVariable<float>("lower_threshold", -255);
-			m_ScalingShader.addVariable<float>("scaling", scaling);
-			m_ScalingShader.addVariable<float>("bias", bias);
-			m_ScalingShader.addVariable<float>("opacity", currentImage.second.opacity);
-		}
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture( GL_TEXTURE_3D, currentImage.second.textureID );
-
-		glBegin( GL_QUADS );
-		glTexCoord3f( 0, 0, currentImage.second.normalizedSlice );
-		glVertex2f( -1.0, -1.0 );
-		glTexCoord3f( 0, 1, currentImage.second.normalizedSlice );
-		glVertex2f( -1.0, 1.0 );
-		glTexCoord3f( 1, 1, currentImage.second.normalizedSlice );
-		glVertex2f( 1.0, 1.0 );
-		glTexCoord3f( 1, 0, currentImage.second.normalizedSlice );
-		glVertex2f( 1.0, -1.0 );
-		glEnd();
-		glDisable( GL_TEXTURE_3D );
 	}
+	if( m_StateValues.size() ) {
+		paintCrosshair();
+	}
+}
+
+bool QGLWidgetImplementation::lookAtVoxel( const ImageHolder &image, const util::ivector4 &voxelCoords )
+{
+	if(image.getImageState().visible) {
+		updateStateValues( image, voxelCoords );
+		paintScene(image);
+	}
+	if( m_StateValues.size() ) {
+		paintCrosshair();
+	}
+}
+
+
+void QGLWidgetImplementation::paintScene( const ImageHolder &image)
+{
+	
+	State &state = m_StateValues[image];
+
+	double scaling, bias;
+	if(m_ScalingType == automatic_scaling) {
+		scaling = image.getOptimalScalingPair().second;
+		bias = image.getOptimalScalingPair().first;
+	} else if ( m_ScalingType == manual_scaling) {
+		scaling = m_ScalingPair.second;
+		bias = m_ScalingPair.first;
+	} else {
+		scaling = 1.0;
+		bias = 0.0;
+	}
+	glViewport( state.viewport[0], state.viewport[1], state.viewport[2], state.viewport[3] );
+	glMatrixMode( GL_PROJECTION );
+	glLoadIdentity();
+	glLoadMatrixd( state.projectionMatrix );
+	glMatrixMode( GL_MODELVIEW );
+	glLoadMatrixd( state.modelViewMatrix );
+	glMatrixMode( GL_TEXTURE );
+	glLoadIdentity();
+	glLoadMatrixd( state.textureMatrix );
+	//shader 
+	
+	//if the image is declared as a zmap
+	if( image.getImageState().imageType == ImageHolder::z_map) {
+		m_ScalingShader.setEnabled( false );
+		m_LUTShader.setEnabled(true);
+		GLuint id = m_LookUpTable.getLookUpTableAsTexture( Color::hsvLUT );
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture( GL_TEXTURE_1D, id );
+		m_LUTShader.addVariable<float>("lut", 1, true );
+		m_LUTShader.addVariable<float>("max", image.getMinMax().second->as<float>());
+		m_LUTShader.addVariable<float>("min", image.getMinMax().first->as<float>());
+		m_LUTShader.addVariable<float>("upper_threshold", image.getImageState().threshold.second);
+		m_LUTShader.addVariable<float>("lower_threshold", image.getImageState().threshold.first);
+		m_LUTShader.addVariable<float>("bias", bias);
+		m_LUTShader.addVariable<float>("scaling", scaling);
+		m_LUTShader.addVariable<float>("opacity", image.getImageState().opacity);
+	} else if (image.getImageState().imageType == ImageHolder::anatomical_image) {
+		m_ScalingShader.setEnabled( true );
+		m_ScalingShader.addVariable<float>("max", image.getMinMax().second->as<float>());
+		m_ScalingShader.addVariable<float>("min", image.getMinMax().first->as<float>());
+		m_ScalingShader.addVariable<float>("upper_threshold",  image.getImageState().threshold.second);
+		m_ScalingShader.addVariable<float>("lower_threshold", image.getImageState().threshold.first);
+		m_ScalingShader.addVariable<float>("scaling", scaling);
+		m_ScalingShader.addVariable<float>("bias", bias);
+		m_ScalingShader.addVariable<float>("opacity", image.getImageState().opacity);
+	}
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture( GL_TEXTURE_3D, state.textureID );
+
+	glBegin( GL_QUADS );
+	glTexCoord3f( 0, 0, state.normalizedSlice );
+	glVertex2f( -1.0, -1.0 );
+	glTexCoord3f( 0, 1, state.normalizedSlice );
+	glVertex2f( -1.0, 1.0 );
+	glTexCoord3f( 1, 1, state.normalizedSlice );
+	glVertex2f( 1.0, 1.0 );
+	glTexCoord3f( 1, 0, state.normalizedSlice );
+	glVertex2f( 1.0, -1.0 );
+	glEnd();
+	glDisable( GL_TEXTURE_3D );
+	
 	m_ScalingShader.setEnabled( false );
 	m_LUTShader.setEnabled( false );
+	
+}
+
+void QGLWidgetImplementation::paintCrosshair()
+{
 	//paint crosshair
 	glDisable(GL_BLEND);
 	const State &currentState = m_StateValues.at( m_ViewerCore->getCurrentImage() );
@@ -287,6 +304,8 @@ void QGLWidgetImplementation::paintScene()
 	redraw();
 }
 
+
+
 void QGLWidgetImplementation::viewLabels()
 {
 	QFont font;
@@ -296,7 +315,7 @@ void QGLWidgetImplementation::viewLabels()
 	glViewport(0,0,width(),height());
 	switch(m_PlaneOrientation)
 	{
-		case GLOrientationHandler::axial:
+		case axial:
 			glColor4f(0.0,1.0,0.0, 1.0);
 			renderText(width() / 2 - 7, 25, QString("A"), font);
 			renderText(width() / 2 - 7, height() - 10, QString("P"), font);
@@ -304,7 +323,7 @@ void QGLWidgetImplementation::viewLabels()
 			renderText(5, height() / 2, QString("L"), font);
 			renderText(width() - 15, height() / 2, QString("R"), font);
 			break;
-		case GLOrientationHandler::sagittal:
+		case sagittal:
 			glColor4f(0.0,1.0,0.0, 1.0);
 			renderText(5, height() / 2, QString("A"), font);
 			renderText(width() - 15, height() / 2, QString("P"), font);
@@ -312,7 +331,7 @@ void QGLWidgetImplementation::viewLabels()
 			renderText(width() / 2 - 7, 25, QString("S"), font);
 			renderText(width() / 2 - 7, height() - 10, QString("I"), font);
 			break;
-		case GLOrientationHandler::coronal:
+		case coronal:
 			glColor4f(0.0,0.0,1.0, 1.0);
 			renderText(width() / 2 - 7, 25, QString("S"), font);
 			renderText(width() / 2 - 7, height() - 10, QString("I"), font);
@@ -432,13 +451,18 @@ void QGLWidgetImplementation::keyPressEvent(QKeyEvent* e)
 void  QGLWidgetImplementation::setShowLabels( bool show )
 {
 	m_ShowLabels = show; 
-	lookAtVoxel(m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords);
+	updateScene();
 
 }
 
 void QGLWidgetImplementation::setInterpolationType(const isis::viewer::GLTextureHandler::InterpolationType interpolation)
 {
 	m_InterplationType = interpolation;
+	updateScene();
+}
+
+void QGLWidgetImplementation::updateScene()
+{
 	lookAtVoxel(m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords);
 }
 

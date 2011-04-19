@@ -20,6 +20,8 @@ public:
 	virtual void setImageList( const std::list<data::Image> imageList, const ImageHolder::ImageType &imageType, const util::slist &filenames = util::slist() );
 
 	void setCurrentImage( const ImageHolder &image ) { m_CurrentImage = image; }
+	
+	ImageHolder &getCurrentImage() { return m_CurrentImage; }
 	const ImageHolder &getCurrentImage() const { return m_CurrentImage; }
 	size_t getCurrentTimestep() const { return m_CurrentTimestep; }
 	bool setCurrentTimestep( size_t timestep ) {
@@ -30,6 +32,7 @@ public:
 	}
 
 	const DataContainer &getDataContainer() const { return m_DataContainer; }
+	DataContainer &getDataContainer() { return m_DataContainer; }
 
 private:
 	//this is the container which actually holds all the images

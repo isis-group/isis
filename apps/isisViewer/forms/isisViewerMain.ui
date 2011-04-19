@@ -21,7 +21,7 @@
        <bool>false</bool>
       </property>
       <property name="features">
-       <set>QDockWidget::DockWidgetFeatureMask</set>
+       <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable|QDockWidget::DockWidgetVerticalTitleBar</set>
       </property>
       <property name="windowTitle">
        <string>Axial View</string>
@@ -48,7 +48,7 @@
        <bool>false</bool>
       </property>
       <property name="features">
-       <set>QDockWidget::DockWidgetFeatureMask</set>
+       <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable|QDockWidget::DockWidgetVerticalTitleBar</set>
       </property>
       <property name="windowTitle">
        <string>Sagittal View</string>
@@ -75,7 +75,7 @@
        <bool>false</bool>
       </property>
       <property name="features">
-       <set>QDockWidget::DockWidgetFeatureMask</set>
+       <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable|QDockWidget::DockWidgetVerticalTitleBar</set>
       </property>
       <property name="allowedAreas">
        <set>Qt::AllDockWidgetAreas</set>
@@ -105,7 +105,7 @@
        <bool>false</bool>
       </property>
       <property name="features">
-       <set>QDockWidget::DockWidgetFeatureMask</set>
+       <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable|QDockWidget::DockWidgetVerticalTitleBar</set>
       </property>
       <property name="allowedAreas">
        <set>Qt::AllDockWidgetAreas</set>
@@ -114,19 +114,6 @@
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
          <widget class="QWidget" name="widget" native="true">
-          <widget class="QCheckBox" name="checkLabels">
-           <property name="geometry">
-            <rect>
-             <x>9</x>
-             <y>9</y>
-             <width>174</width>
-             <height>23</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>Show labels</string>
-           </property>
-          </widget>
           <widget class="QLCDNumber" name="pxlIntensityContainer">
            <property name="geometry">
             <rect>
@@ -222,7 +209,20 @@
     <addaction name="separator"/>
     <addaction name="action_Exit"/>
    </widget>
+   <widget class="QMenu" name="menu_Preferences">
+    <property name="title">
+     <string>&amp;Preferences</string>
+    </property>
+    <widget class="QMenu" name="menuQuick_Settings">
+     <property name="title">
+      <string>&amp;Quick Settings</string>
+     </property>
+     <addaction name="actionShow_labels"/>
+    </widget>
+    <addaction name="menuQuick_Settings"/>
+   </widget>
    <addaction name="menu_File"/>
+   <addaction name="menu_Preferences"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_Open_Image">
@@ -243,6 +243,36 @@
   <action name="actionZ_Map">
    <property name="text">
     <string>Z-Map</string>
+   </property>
+  </action>
+  <action name="actionShow_labels">
+   <property name="text">
+    <string>Show &amp;labels</string>
+   </property>
+  </action>
+  <action name="actionShow_Toolbox">
+   <property name="text">
+    <string>Show &amp;Toolbox</string>
+   </property>
+  </action>
+  <action name="actionAxial">
+   <property name="text">
+    <string>Axial</string>
+   </property>
+  </action>
+  <action name="actionSagittal">
+   <property name="text">
+    <string>Sagittal</string>
+   </property>
+  </action>
+  <action name="actionCoronal">
+   <property name="text">
+    <string>Coronal</string>
+   </property>
+  </action>
+  <action name="actionSet">
+   <property name="text">
+    <string>Set</string>
    </property>
   </action>
  </widget>

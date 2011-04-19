@@ -7,7 +7,8 @@ namespace viewer
 {
 
 MainWindowBase::MainWindowBase( QWidget *parent )
-	: QMainWindow( parent )
+	: QMainWindow( parent ),
+	m_CurrentPath(QDir::currentPath())
 {
 	ui.setupUi( this );
 }

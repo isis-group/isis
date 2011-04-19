@@ -23,7 +23,6 @@ class GLOrientationHandler
 public:
 	typedef boost::numeric::ublas::matrix<float> MatrixType;
 	typedef boost::numeric::ublas::vector<float> VectorType;
-	enum PlaneOrientation { axial, sagittal, coronal };
 
 	static MatrixType transformToPlaneView( const MatrixType &origMatrix, PlaneOrientation orientation, bool back = false );
 
