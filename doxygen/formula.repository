@@ -5,3 +5,5 @@
 \form#4:\[ \prod_{i=0}^{SIZE-1} this_i \]
 \form#5:\[ \sum_{i=0}^{SIZE-1} this_i \]
 \form#6:$ \prod_{i=0}^{DIMS-1} dimSize(i) $
+\form#7:\[ |a-b| <= \varepsilon_T * \lceil |a|,|b|,|thresh| \rceil \]
+\form#8:$ \prod_{i=0}^{DIMS-1} getDimSize(i) $
