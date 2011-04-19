@@ -1,11 +1,11 @@
 ############################################################
 # The ISIS project
-# 
+#
 # Main CMake configuration file of the ISIS project.
 #
 # Author: Thomas Proeger <thomasproeger@googlemail.com>
 # Date: Tue, 05 Apr 2011 10:50:31 +0200
-# 
+#
 ############################################################
 
 cmake_minimum_required(VERSION 2.6)
@@ -18,7 +18,7 @@ project(ISIS)
 # set isis version number
 ############################################################
 set(ISIS_VERSION_MAJOR "0")
-set(ISIS_VERSION_MINOR "2")
+set(ISIS_VERSION_MINOR "3")
 set(ISIS_VERSION_PATCH "0")
 
 add_definitions(-D_ISIS_VERSION_MAJOR=${ISIS_VERSION_MAJOR})
