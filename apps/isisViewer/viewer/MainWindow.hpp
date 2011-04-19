@@ -32,7 +32,7 @@ private:
 public Q_SLOTS:
 	void voxelCoordChanged( util::ivector4 );
 	void exitProgram();
-	void imagesChanged( DataContainer::ImageMapType );
+	void imagesChanged( DataContainer );
 	void checkImageStack( QListWidgetItem* item );
 	void openImage();
 

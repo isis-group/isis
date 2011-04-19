@@ -26,13 +26,13 @@ void ViewerCoreBase::addImageList( const std::list< data::Image > imageList, con
 			if(!ignoreFilenames) {
 				m_DataContainer.addImage( imageRef, imageType, *(filenameIterator++) );
 			} else {
-				m_DataContainer.addImage( imageRef, imageType );
+				m_DataContainer.addImage( imageRef, imageType, filenames.front() );
 			}
 		}
 	} else {
 		LOG( Runtime, warning ) << "The image list passed to the core is empty!";
 	}
-	m_CurrentImage = getDataContainer()[m_DataContainer.size() - 1];
+	m_CurrentImage = getDataContainer().at(filenames.front());
 
 }
 

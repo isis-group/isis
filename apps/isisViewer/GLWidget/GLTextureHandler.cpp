@@ -12,7 +12,7 @@ std::map<ImageHolder, GLuint> GLTextureHandler::copyAllImagesToTextures( const D
 	std::map<ImageHolder, GLuint> retIDList;
 
 	BOOST_FOREACH( DataContainer::const_reference image, data ) {
-		retIDList[image] = copyImageToTexture( data, image, 0, interpolation );
+		retIDList[image.second] = copyImageToTexture( data, image.second, 0, interpolation );
 	}
 
 	return retIDList;

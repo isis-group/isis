@@ -60,13 +60,13 @@ void QViewerCore::timestepChanged( int timestep )
 void QViewerCore::addImageList(const std::list< data::Image > imageList, const ImageHolder::ImageType &imageType, const isis::util::slist& filenames)
 {
 	isis::viewer::ViewerCoreBase::addImageList(imageList, imageType, filenames);
-	emitImagesChanged( getDataContainer().getImageMap() );
+	emitImagesChanged( getDataContainer() );
 }
 
 void QViewerCore::setImageList(const std::list< data::Image > imageList, const ImageHolder::ImageType &imageType, const isis::util::slist& filenames)
 {
 	isis::viewer::ViewerCoreBase::setImageList(imageList, imageType, filenames);
-	emitImagesChanged( getDataContainer().getImageMap() );
+	emitImagesChanged( getDataContainer() );
 }
 
 void QViewerCore::setShowLabels(bool l)

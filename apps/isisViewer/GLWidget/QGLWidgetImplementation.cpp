@@ -175,10 +175,11 @@ bool QGLWidgetImplementation::lookAtVoxel( const isis::util::ivector4 &voxelCoor
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );	
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	
 	BOOST_FOREACH( DataContainer::const_reference image, m_ViewerCore->getDataContainer() ) {
-		if(image.getImageState().visible) {
-			updateStateValues( image, voxelCoords );
-			paintScene(image);
+		if(image.second.getImageState().visible) {
+			updateStateValues( image.second, voxelCoords );
+			paintScene(image.second);
 		}
 	}
 	if( m_StateValues.size() ) {

@@ -20,7 +20,7 @@ MainWindow::MainWindow( QViewerCore *core )
 	
 	connect(ui.action_Exit, SIGNAL(triggered()), this, SLOT( exitProgram() ) );
 	connect(ui.actionShow_labels, SIGNAL(toggled(bool)), m_ViewerCore, SLOT(setShowLabels(bool)));
-	connect(core, SIGNAL( emitImagesChanged(DataContainer::ImageMapType)), this, SLOT( imagesChanged(DataContainer::ImageMapType) ) );
+	connect(core, SIGNAL( emitImagesChanged(DataContainer)), this, SLOT( imagesChanged(DataContainer) ) );
 	connect(ui.imageStack, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT( checkImageStack(QListWidgetItem*)));
 	connect(ui.action_Open_Image, SIGNAL(triggered()), this, SLOT(openImage()));
 	
@@ -83,10 +83,10 @@ void MainWindow::voxelCoordChanged( util::ivector4 coords )
 
 }
 
-void MainWindow::imagesChanged(DataContainer::ImageMapType imageMap )
+void MainWindow::imagesChanged(DataContainer images )
 {	
 	ui.imageStack->clear();
-	BOOST_FOREACH( DataContainer::ImageMapType::const_reference imageRef, imageMap )
+	BOOST_FOREACH( DataContainer::const_reference imageRef, images )
 	{
 		QListWidgetItem *item = new QListWidgetItem;
 		QString sD = imageRef.second.getPropMap().getPropertyAs<std::string>("sequenceDescription").c_str();
@@ -137,12 +137,11 @@ void MainWindow::checkImageStack(QListWidgetItem* item)
 {
 	if(item->checkState() == Qt::Checked)
 	{
-		m_ViewerCore->getDataContainer().getImageHolder( item->text().toStdString() ).setVisible(true);
+		m_ViewerCore->getDataContainer().at(item->text().toStdString()).setVisible(true);
 		
 	} else if( item->checkState() == Qt::Unchecked ) {
-		m_ViewerCore->getDataContainer().getImageHolder( item->text().toStdString() ).setVisible(false);
+		m_ViewerCore->getDataContainer().at(item->text().toStdString()).setVisible(false);
 	}
-	
 	m_ViewerCore->updateScene();
 	
 }

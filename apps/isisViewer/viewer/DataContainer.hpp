@@ -14,14 +14,12 @@ namespace viewer
  * Furthermore it provides some convinient functions to add images and getting the
  * pointer to the image data.
  */
-class DataContainer : public std::vector<ImageHolder>
+class DataContainer : public std::map<std::string, ImageHolder>
 {
 public:
 	typedef std::map<std::string, ImageHolder> ImageMapType;
 	///simply adds an isis image to the vector
 	bool addImage( const data::Image &image, const ImageHolder::ImageType &imageType, const std::string &filename = "" );
-
-	ImageHolder &getImageHolder( const std::string &filename );
 
 	///returns a boost::weak_ptr of the images data. Actually this also is a convinient function.
 	boost::weak_ptr<void>
@@ -29,11 +27,6 @@ public:
 		return image.getImageVector()[timestep]->getRawAddress();
 	}
 	
-	ImageMapType getImageMap() { return m_ImageMap; }
-	
-private:
-	ImageMapType m_ImageMap;
-		
 
 };
 

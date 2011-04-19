@@ -53,7 +53,7 @@ public Q_SLOTS:
 Q_SIGNALS:
 	void emitVoxelCoordChanged( util::ivector4 );
 	void emitTimeStepChange( unsigned int );
-	void emitImagesChanged( DataContainer::ImageMapType );
+	void emitImagesChanged( DataContainer );
 	void emitShowLabels(bool);
 	void emitUpdateScene();
 	
