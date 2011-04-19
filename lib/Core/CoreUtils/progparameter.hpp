@@ -50,7 +50,7 @@ public:
 	 * Create a programm parameter using an initial value/type.
 	 * \param ref the intial value/type the programm parameter should get
 	 * (The value is used as default value if the parameter never gets to parse any other value)
-	 * \param needed flag if parameter is a needed one (default: true)
+	 * \param is_needed flag if parameter is a needed one (default: true)
 	 */
 	template<typename T> ProgParameter( const T &ref, bool is_needed = true ): PropertyValue( ref, is_needed ), m_hidden( false ), m_set( false ) {}
 	/**

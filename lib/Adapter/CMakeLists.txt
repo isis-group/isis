@@ -1,59 +1,78 @@
-# ths ISIS adapter module
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+############################################################
+# The ISIS project
+# 
+# CMake configuration file for the lib subdir
+#
+# Author: Thomas Proeger <thomasproeger@googlemail.com>
+# Date: Fri, 08 Apr 2011 13:11:34 +0200
+# 
+############################################################
 
-PROJECT(ISIS_ADAPTER)
+############################################################
+# include core header files
+############################################################
+include_directories(${CMAKE_SOURCE_DIR}/lib/Core)
 
-###########################################################
-# find and configure the isis core library
-###########################################################
-SET(ISIS_DIR /usr/share/isis/cmake CACHE PATH 
-    "The directory where the isis cmake configuration skript script is located.")
-FIND_PACKAGE(ISIS REQUIRED)
-INCLUDE_DIRECTORIES(${ISIS_INCLUDE_DIRS})
-MESSAGE(STATUS ${ISIS_INCLUDE_DIRS})
+############################################################
+# optional components
+############################################################
+option(ISIS_ITK "Enable adapter to the ITK library" OFF)
+# remove option until build issues are solved.
+# option(ISIS_VTK "Enable adapter to the VTK library" OFF)
+option(ISIS_QT4 "Enable adapter to the Qt4 library" OFF)
 
-# we use the log definitions of the core
-IF(ISIS_RUNTIME_LOG)
-	ADD_DEFINITIONS(-D_ENABLE_LOG=1)
-ELSE(ISIS_RUNTIME_LOG)
-	ADD_DEFINITIONS(-D_ENABLE_LOG=0)
-ENDIF(ISIS_RUNTIME_LOG)
+############################################################
+# use ITK component
+############################################################
+if(ISIS_ITK)
+  # export header files
+  set(ADAPTER_HDR_FILES 
+    itk/itkAdapter.hpp itk/itkAdapter_impl.hpp)
+endif(ISIS_ITK)
 
-# enable DEBUG_LOG
-IF(ISIS_DEBUG_LOG)
-	ADD_DEFINITIONS(-D_ENABLE_DEBUG=1)
-	MESSAGE(STATUS "Debug code enabled, this will will have a big impact on the performance")
-ELSE(ISIS_DEBUG_LOG)
-	ADD_DEFINITIONS(-D_ENABLE_DEBUG=0)
-ENDIF(ISIS_DEBUG_LOG)
-
-OPTION(${CMAKE_PROJECT_NAME}_ITK "Enable adapter to the ITK library" OFF)
-OPTION(${CMAKE_PROJECT_NAME}_VTK "Enable adapter to the VTK library" OFF)
-OPTION(${CMAKE_PROJECT_NAME}_QT4 "Enable adapter to the Qt4 library" OFF)
-
-if(${CMAKE_PROJECT_NAME}_ITK)
-    add_subdirectory(itk)
-    SET(ADAPTER_HDR_FILES ${ADAPTER_HDR_FILES} itk/itkAdapter.hpp itk/itkAdapter_impl.hpp)
-    SET(HELPER_HDR_FILES ${HELPER_HDR_FILES} itk/helpFiles/isisTimeStepExtractionFilter.hpp itk/helpFiles/isisTimeStepExtractionFilter_impl.hpp )
-    SET(HELPER_HDR_FILES ${HELPER_HDR_FILES} itk/helpFiles/isisIterationObserver.hpp)
-endif(${CMAKE_PROJECT_NAME}_ITK)
-
-if(${CMAKE_PROJECT_NAME}_VTK)
-	add_subdirectory(vtk)
-	SET(ADAPTER_HDR_FILES ${ADAPTER_HDR_FILES} vtk/vtkAdapter.hpp)
-endif(${CMAKE_PROJECT_NAME}_VTK)
-
-if(${CMAKE_PROJECT_NAME}_QT4)
-	add_subdirectory(qt4)
-	SET(ADAPTER_HDR_FILES ${ADAPTER_HDR_FILES} qt4/qtapplication.hpp)
-endif(${CMAKE_PROJECT_NAME}_QT4)
-
-# install adapter header files
-INSTALL(FILES ${ADAPTER_HDR_FILES} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/isis/Adapter COMPONENT Development)
-
-# install helper header files
-INSTALL(FILES ${HELPER_HDR_FILES} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/isis/extITK COMPONENT Development)
+############################################################
+# use QT4 component
+############################################################
+if(ISIS_QT4)
+  # find qt4
+  find_package(Qt4 REQUIRED)
+  include(${QT_USE_FILE})
   
-MESSAGE(STATUS "Targets: ${TARGETS}")
+  # configure target
+  add_library(isisAdapter_qt4 SHARED qt4/qtapplication.cpp)
+  target_link_libraries(isisAdapter_qt4 isis_core ${QT_LIBRARIES})
 
-INSTALL(TARGETS ${TARGETS} LIBRARY DESTINATION  ${CMAKE_INSTALL_PREFIX}/lib COMPONENT RuntimeLibraries)
+  # configure install destination
+  install(TARGETS isisAdapter_qt4
+    LIBRARY DESTINATION  ${CMAKE_INSTALL_PREFIX}/lib COMPONENT RuntimeLibraries)
+
+  # export header files
+  set(ADAPTER_HDR_FILES ${ADAPTER_HDR_FILES} qt4/qtapplication.hpp)  
+endif(ISIS_QT4)
+
+if(ISIS_VTK)
+  # finde vtk
+  find_package(VTK REQUIRED)
+  include(${USE_VTK_FILE})
+  
+  # configure target
+  add_library(isisAdapter_vtk SHARED vtk/vtkAdapter.cpp)
+  target_link_libraries(isisAdapter_vtk isis_core)
+  set_target_properties(isisAdapter_vtk PROPERTIES 
+    LINK_FLAGS "--no-undefined"
+    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} 
+    INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+  # configure install destination
+  install(TARGETS isisAdapter_vtk
+    LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib COMPONENT RuntimeLibraries)
+
+  # export header files
+  set(ADAPTER_HDR_FILES ${ADAPTER_HDR_FILES} vtk/vtkAdapter.hpp)  
+endif(ISIS_VTK)
+
+############################################################
+# Install header and helper files
+############################################################
+install(FILES 
+  ${ADAPTER_HDR_FILES} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/isis/Adapter COMPONENT Development)
