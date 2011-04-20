@@ -44,6 +44,8 @@ public Q_SLOTS:
 	 * @param voxelCoords The voxelCoords that has to be drawn. This also specifies the crosshair position
 	 * @return True if imageID exists and voxelCoords are inside the image. Otherwise returns false.
 	 */
+	virtual bool removeImage( const ImageHolder &image );
+	virtual void addImage( const ImageHolder &image );
 	virtual bool lookAtVoxel( const ImageHolder &image, const util::ivector4 &voxelCoords );
 	virtual bool lookAtVoxel( const util::ivector4 &voxelCoords );
 	virtual bool timestepChanged( unsigned int timestep );

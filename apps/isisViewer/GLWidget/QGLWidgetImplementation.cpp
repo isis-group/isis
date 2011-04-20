@@ -55,6 +55,16 @@ QGLWidgetImplementation *QGLWidgetImplementation::createSharedWidget( QWidget *p
 	return new QGLWidgetImplementation( m_ViewerCore, parent, this, orientation );
 }
 
+void QGLWidgetImplementation::addImage(const isis::viewer::ImageHolder& image)
+{
+	m_StateValues.insert( std::make_pair<ImageHolder, State>(image, State()));
+}
+
+bool QGLWidgetImplementation::removeImage(const isis::viewer::ImageHolder& image)
+{
+	return m_StateValues.erase(image);
+}
+
 
 void QGLWidgetImplementation::connectSignals()
 {
@@ -184,10 +194,10 @@ bool QGLWidgetImplementation::lookAtVoxel( const isis::util::ivector4 &voxelCoor
 	glEnable ( GL_BLEND );
 	glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
-	BOOST_FOREACH( DataContainer::const_reference image, m_ViewerCore->getDataContainer() ) {
-		if( image.second.getImageState().visible ) {
-			updateStateValues( image.second, voxelCoords );
-			paintScene( image.second );
+	BOOST_FOREACH( StateMap::const_reference state, m_StateValues ) {
+		if( state.first.getImageState().visible ) {
+			updateStateValues(  state.first, voxelCoords );
+			paintScene(  state.first );
 		}
 	}
 
