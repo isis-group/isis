@@ -219,7 +219,7 @@ getNumericScaling( const util::_internal::ValueBase &min, const util::_internal:
 		maxval = max.as<double>();
 		assert( minval < maxval );
 		LOG( Debug, info ) << "src Range:" << minval << "=>" << maxval;
-		LOG( Debug, info ) << "dst Domain:" << domain_min << "=>" << domain_max;
+		LOG( Debug, info ) << "dst Domain:" << static_cast<double>(domain_min) << "=>" << static_cast<double>(domain_max);
 		assert( domain_min < domain_max );//we also should assume this
 		//set offset for src
 		//if all src is completly on positive domain, or if there is no negative domain use minval

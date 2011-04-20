@@ -66,7 +66,6 @@ int main( int argc, char *argv[] )
 		core->addImageList( zImgList, ImageHolder::z_map, zmapFileList );
 	}
 
-
 	isisViewerMainWindow.show();
 	return app.getQApplication().exec();
 }

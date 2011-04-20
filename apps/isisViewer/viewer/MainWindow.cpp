@@ -145,9 +145,6 @@ void MainWindow::checkImageStack( QListWidgetItem *item )
 
 }
 
-
-
-
 void MainWindow::exitProgram()
 {
 	close();
