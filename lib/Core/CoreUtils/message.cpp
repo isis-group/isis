@@ -14,6 +14,7 @@
 #include "common.hpp"
 #include <sys/types.h>
 
+#define BOOST_FILESYSTEM_VERSION 2 //@todo switch to 3 as soon as we drop support for boost < 1.44
 #include <boost/filesystem/path.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp> //we need the to_string functions for the automatic conversion
 

@@ -21,6 +21,8 @@
 #pragma warning(disable:4996)
 #endif
 
+#define BOOST_FILESYSTEM_VERSION 2 //@todo switch to 3 as soon as we drop support for boost < 1.44
+
 #include "io_application.hpp"
 #include "io_factory.hpp"
 #include <boost/mpl/for_each.hpp>
