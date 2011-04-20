@@ -333,19 +333,8 @@ bool Image::reIndex()
 
 	if ( hasProperty( "fov" ) ) {
 		util::fvector4 &propFoV = propertyValue( "fov" )->castTo<util::fvector4>();
-		util::fvector4 voxelGap;
 
-		if ( hasProperty( "voxelGap" ) ) {
-			voxelGap = getPropertyAs<util::fvector4>( "voxelGap" );
-
-			for ( size_t i = 0; i < dims; i++ )
-				if ( voxelGap[i] == -std::numeric_limits<float>::infinity() ) {
-					LOG( Runtime, info ) << "Ignoring unknown voxel gap in direction " << i;
-					voxelGap[i] = 0;
-				}
-		}
-
-		const util::fvector4 &calcFoV = getFoV( getPropertyAs<util::fvector4>( "voxelSize" ), voxelGap );
+		const util::fvector4 &calcFoV = getFoV();
 
 		bool ok = true;
 
@@ -533,15 +522,15 @@ std::pair<util::ValueReference, util::ValueReference> Image::getMinMax () const
 
 std::pair< util::ValueReference, util::ValueReference > Image::getScalingTo( short unsigned int targetID, autoscaleOption scaleopt ) const
 {
-	LOG_IF( !clean, Runtime, error ) << "You should run reIndex before running this";
+	LOG_IF( !clean, Debug, error ) << "You should run reIndex before running this";
 	std::pair<util::ValueReference, util::ValueReference> minmax = getMinMax();
 
 	const std::vector<boost::shared_ptr<const Chunk> > chunks = getChunksAsVector();
 	BOOST_FOREACH( const boost::shared_ptr<const Chunk> &ref, chunks ) { //find a chunk which would be converted
 		if( targetID != ref->getTypeID() ) {
-			LOG_IF( ref->getScalingTo( targetID, minmax, scaleopt ).first.isEmpty() || ref->getScalingTo( targetID, minmax, scaleopt ).second.isEmpty(), Debug, error )
-					<< "Returning an invalid scaling. This is bad!";
-			return ref->getScalingTo( targetID, minmax, scaleopt ); // and ask that for the scaling
+			const scaling_pair scale = ref->getScalingTo( targetID, minmax, scaleopt );
+			LOG_IF( scale.first.isEmpty() || scale.second.isEmpty(), Debug, error ) << "Returning an invalid scaling. This is bad!";
+			return scale; // and ask that for the scaling
 		}
 	}
 	return std::make_pair( //ok seems like no conversion is needed - return 1/0
@@ -768,6 +757,23 @@ size_t Image::getNrOfSlices() const
 size_t Image::getNrOfTimesteps() const
 {
 	return getDimSize( data::timeDim );
+}
+
+util::fvector4 Image::getFoV() const
+{
+	util::fvector4 voxelGap;
+
+	if ( hasProperty( "voxelGap" ) ) {
+		voxelGap = getPropertyAs<util::fvector4>( "voxelGap" );
+
+		for ( size_t i = 0; i < dims; i++ )
+			if ( voxelGap[i] == -std::numeric_limits<float>::infinity() ) {
+				LOG( Runtime, info ) << "Ignoring unknown voxel gap in direction " << i;
+				voxelGap[i] = 0;
+			}
+	}
+
+	return _internal::NDimensional<4>::getFoV( getPropertyAs<util::fvector4>( "voxelSize" ), voxelGap );
 }
 
 

@@ -69,20 +69,16 @@ public:
 		parameters[name].hidden() = hidden;
 	}
 
-	const std::list<isis::data::Image> _images( void ) {
-		std::list<isis::data::Image> tmpImageList;
-		BOOST_FOREACH( std::list<boost::shared_ptr<isis::data::Image> >::const_reference ref, this->images ) {
-			tmpImageList.push_back( *ref );
-		}
-		return tmpImageList;
+	void _setDescription( const std::string name, const std::string desc ) {
+		parameters[name].setDescription( desc );
 	}
 
 	bool _autowrite( const std::list<isis::data::Image> &imgList, bool exitOnError ) {
-		isis::data::ImageList listToWrite;
-		BOOST_FOREACH( std::list<isis::data::Image>::const_reference ref, imgList ) {
-			listToWrite.push_back( boost::shared_ptr<isis::data::Image> ( new isis::data::Image ( ref ) ) );
-		}
-		return isis::data::IOApplication::autowrite( listToWrite, exitOnError );
+		return isis::data::IOApplication::autowrite( imgList, exitOnError );
+	}
+
+	std::list<data::Image> _images() {
+		return this->images;
 	}
 
 private:

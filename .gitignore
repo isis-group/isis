@@ -95,3 +95,8 @@ local.properties
 .loadpath
 # CDT-specific
 .cproject
+
+#Index files##############################
+TAGS
+tags
+BROWSE

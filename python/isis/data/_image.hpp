@@ -135,14 +135,10 @@ public:
 	}
 
 	float _getMin( ) {
-		float _min, _max;
-		this->getMinMax( _min, _max );
-		return _min;
+		return this->getMinMax().first->as<float>();
 	}
 	float _getMax( ) {
-		float _min, _max;
-		this->getMinMax( _min, _max );
-		return _max;
+		return this->getMinMax().second->as<float>();
 	}
 
 	const std::string _getMainOrientation( ) {
@@ -176,15 +172,13 @@ public:
 		}
 
 		boost::numeric::ublas::matrix<float> boostMatrix( 3, 3 );
-		boostMatrix( 0, 0 ) = boost::python::extract<float> ( rows[0][0] );
-		boostMatrix( 0, 1 ) = boost::python::extract<float> ( rows[0][1] );
-		boostMatrix( 0, 2 ) = boost::python::extract<float> ( rows[0][2] );
-		boostMatrix( 1, 0 ) = boost::python::extract<float> ( rows[1][0] );
-		boostMatrix( 1, 1 ) = boost::python::extract<float> ( rows[1][1] );
-		boostMatrix( 1, 2 ) = boost::python::extract<float> ( rows[1][2] );
-		boostMatrix( 2, 0 ) = boost::python::extract<float> ( rows[2][0] );
-		boostMatrix( 2, 1 ) = boost::python::extract<float> ( rows[2][1] );
-		boostMatrix( 2, 2 ) = boost::python::extract<float> ( rows[2][2] );
+
+		for ( unsigned short i = 0; i < 3; i++ ) {
+			for ( unsigned short j = 0; j < 3; j++ ) {
+				boostMatrix( i, j ) = boost::python::extract<float> ( rows[i][j] );
+			}
+		}
+
 		this->transformCoords( boostMatrix );
 	}
 
@@ -211,7 +205,7 @@ public:
 		}
 	}
 	isis::data::Image _deepCopy( void ) {
-		switch( this->getTypeID() ) {
+		switch( this->getMajorTypeID() ) {
 		case data::ValuePtr<int8_t>::staticID:
 			return isis::data::MemImage<int8_t>( *this );
 			break;

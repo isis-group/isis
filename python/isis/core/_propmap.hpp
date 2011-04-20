@@ -17,13 +17,13 @@ namespace python
 {
 
 
-// helper class PropMap
-class _PropMap : public PropMap, boost::python::wrapper< PropMap >
+// helper class PropertyMap
+class _PropertyMap : public PropertyMap, boost::python::wrapper< PropertyMap >
 {
 public:
-	_PropMap () : boost::python::wrapper< PropMap >() {}
-	_PropMap ( PyObject *p ) : self( p ), boost::python::wrapper< PropMap >() {}
-	_PropMap ( PyObject *p, const PropMap &base ) : PropMap( base ), self( p ), boost::python::wrapper< PropMap >() {}
+	_PropertyMap () : boost::python::wrapper< PropertyMap >() {}
+	_PropertyMap ( PyObject *p ) : self( p ), boost::python::wrapper< PropertyMap >() {}
+	_PropertyMap ( PyObject *p, const PropertyMap &base ) : PropertyMap( base ), self( p ), boost::python::wrapper< PropertyMap >() {}
 
 	isis::util::PropertyMap _branch ( const util::istring &key ) {
 		return this->branch( key );
@@ -35,7 +35,7 @@ public:
 	}
 
 
-	void _setPropertyAs( std::string key, PyObject *value, std::string type ) {
+	void _setPropertyAs( istring key, PyObject *value, std::string type ) {
 		if( PyFloat_Check( value ) ) {
 			internSetProperty<float>( key, value, type );
 		} else if( PyBool_Check( value ) ) {
