@@ -44,9 +44,9 @@ public Q_SLOTS:
 	 * @param voxelCoords The voxelCoords that has to be drawn. This also specifies the crosshair position
 	 * @return True if imageID exists and voxelCoords are inside the image. Otherwise returns false.
 	 */
-	virtual bool removeImage( const ImageHolder &image );
-	virtual void addImage( const ImageHolder &image );
-	virtual bool lookAtVoxel( const ImageHolder &image, const util::ivector4 &voxelCoords );
+	virtual bool removeImage( const boost::shared_ptr<ImageHolder> image );
+	virtual void addImage( const boost::shared_ptr<ImageHolder> image );
+	virtual bool lookAtVoxel( const boost::shared_ptr<ImageHolder> image, const util::ivector4 &voxelCoords );
 	virtual bool lookAtVoxel( const util::ivector4 &voxelCoords );
 	virtual bool timestepChanged( unsigned int timestep );
 	virtual void setScalingType( ScalingType scalingType ) { m_ScalingType = scalingType; }
@@ -63,9 +63,9 @@ protected:
 	virtual void initializeGL();
 	virtual void resizeGL( int w, int h );
 
-	virtual void paintScene( const ImageHolder &image );
+	virtual void paintScene( const boost::shared_ptr<ImageHolder> image );
 	virtual void paintCrosshair();
-	virtual void updateStateValues( const ImageHolder &image, const util::ivector4 &voxelCoords );
+	virtual void updateStateValues( const boost::shared_ptr<ImageHolder> image, const util::ivector4 &voxelCoords );
 
 
 protected:
@@ -81,10 +81,10 @@ private:
 	bool isInViewport( size_t wx, size_t wy );
 	void viewLabels() ;
 
-	std::pair<GLdouble, GLdouble> window2ObjectCoords( int16_t winx, int16_t winy, const ImageHolder &image ) const;
-	std::pair<int16_t, int16_t> object2WindowCoords( GLdouble objx, GLdouble objy, const ImageHolder &image ) const;
+	std::pair<GLdouble, GLdouble> window2ObjectCoords( int16_t winx, int16_t winy, const boost::shared_ptr<ImageHolder> image ) const;
+	std::pair<int16_t, int16_t> object2WindowCoords( GLdouble objx, GLdouble objy, const boost::shared_ptr<ImageHolder> image ) const;
 
-	bool calculateTranslation( const ImageHolder &image );
+	bool calculateTranslation( const boost::shared_ptr<ImageHolder> image );
 
 	GLShaderHandler m_ScalingShader;
 	GLShaderHandler m_LUTShader;
@@ -115,7 +115,7 @@ private:
 		GLOrientationHandler::MatrixType planeOrientation;
 	};
 
-	typedef std::map<ImageHolder, State> StateMap;
+	typedef std::map<boost::shared_ptr<ImageHolder>, State> StateMap;
 	StateMap m_StateValues;
 
 	struct Zoom {

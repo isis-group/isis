@@ -47,7 +47,7 @@ private:
 
 	template<typename TYPE> void displayIntensity( util::ivector4 coords ) {
 		QString str;
-		str.setNum( m_ViewerCore->getCurrentImage().getImage()->voxel<TYPE>( coords[0], coords[1], coords[2], coords[3] ) );
+		str.setNum( m_ViewerCore->getCurrentImage()->getImage()->voxel<TYPE>( coords[0], coords[1], coords[2], coords[3] ) );
 		ui.pxlIntensityContainer->display( str );
 	}
 

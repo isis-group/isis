@@ -6,10 +6,10 @@ namespace viewer
 {
 
 
-std::map<ImageHolder, GLuint> GLTextureHandler::copyAllImagesToTextures( const DataContainer &data, GLTextureHandler::InterpolationType interpolation )
+std::map<boost::shared_ptr<ImageHolder>, GLuint> GLTextureHandler::copyAllImagesToTextures( const DataContainer &data, GLTextureHandler::InterpolationType interpolation )
 {
 	// here we only copy the first timestep of each image. Would take a while to do this for all timesteps
-	std::map<ImageHolder, GLuint> retIDList;
+	std::map<boost::shared_ptr<ImageHolder>, GLuint> retIDList;
 
 	BOOST_FOREACH( DataContainer::const_reference image, data ) {
 		retIDList[image.second] = copyImageToTexture( data, image.second, 0, interpolation );
@@ -19,19 +19,19 @@ std::map<ImageHolder, GLuint> GLTextureHandler::copyAllImagesToTextures( const D
 
 }
 
-GLuint GLTextureHandler::copyImageToTexture( const DataContainer &data, const ImageHolder &image, size_t timestep, const bool withAlpha, GLTextureHandler::InterpolationType interpolation )
+GLuint GLTextureHandler::copyImageToTexture( const DataContainer &data, const boost::shared_ptr<ImageHolder> image, size_t timestep, const bool withAlpha, GLTextureHandler::InterpolationType interpolation )
 {
 	typedef uint8_t TYPE;
 
 	//check if there is an image with this parameters
-	if ( image.getImageSize()[3] <= timestep )  {
-		LOG( Runtime, error ) << "Trying to copy image " << image.getID() << " with timestep " << timestep << " to an openGL texture. But there is no such timestep in this image!";
+	if ( image->getImageSize()[3] <= timestep )  {
+		LOG( Runtime, error ) << "Trying to copy image " << image->getID() << " with timestep " << timestep << " to an openGL texture. But there is no such timestep in this image!";
 		return 0;
 	}
 
 	//check if we have already copied this volume to texture. If we have already copied the image return its texture id
 	if ( m_ImageMap[image].find( timestep ) != m_ImageMap[image].end() ) {
-		LOG( Debug, verbose_info ) << "Texture for volume " << image.getID() << " and timestep " << timestep  << " already exists. Wont copy it.";
+		LOG( Debug, verbose_info ) << "Texture for volume " << image->getID() << " and timestep " << timestep  << " already exists. Wont copy it.";
 		return m_ImageMap[image][timestep];
 	}
 

@@ -30,13 +30,13 @@ public:
 	GLTextureHandler() { m_Alpha = false; }
 
 	///The image map is a mapping of the imageID and timestep to the texture of the GL_TEXTURE_3D.
-	typedef std::map<ImageHolder, std::map<size_t, GLuint > > ImageMapType;
+	typedef std::map<boost::shared_ptr<ImageHolder>, std::map<size_t, GLuint > > ImageMapType;
 
 	///Convinient function to copy all in DataContainer available volumes to a GL_TEXTURE_3D.
-	std::map<ImageHolder, GLuint> copyAllImagesToTextures( const DataContainer &data, InterpolationType interpolation = neares_neighbor );
+	std::map<boost::shared_ptr<ImageHolder>, GLuint> copyAllImagesToTextures( const DataContainer &data, InterpolationType interpolation = neares_neighbor );
 
 	///Copies the given timestep of an image with the given imageID to a GL_TEXTURE_3D. Return the texture id.
-	GLuint copyImageToTexture( const DataContainer &data, const ImageHolder &image, size_t timestep, const bool withAlpha = true, InterpolationType interpolation = neares_neighbor );
+	GLuint copyImageToTexture( const DataContainer &data, const boost::shared_ptr<ImageHolder> image, size_t timestep, const bool withAlpha = true, InterpolationType interpolation = neares_neighbor );
 
 	///The image map is a mapping of the imageID and timestep to the texture of the GL_TEXTURE_3D.
 	ImageMapType getImageMap() const { return m_ImageMap; }
@@ -49,10 +49,10 @@ private:
 	bool m_Alpha;
 
 	template<typename TYPE>
-	GLuint internCopyImageToTexture( const DataContainer &data, GLenum format, const ImageHolder &image, size_t timestep, bool alpha = true, InterpolationType interpolation = neares_neighbor  ) {
-		LOG( Debug, info ) << "Copy image " << image.getID() << " with timestep " << timestep << " to texture";
+	GLuint internCopyImageToTexture( const DataContainer &data, GLenum format, const boost::shared_ptr<ImageHolder> image, size_t timestep, bool alpha = true, InterpolationType interpolation = neares_neighbor  ) {
+		LOG( Debug, info ) << "Copy image " << image->getID() << " with timestep " << timestep << " to texture";
 
-		util::FixedVector<size_t, 4> size = image.getImageSize();
+		util::FixedVector<size_t, 4> size = image->getImageSize();
 		size_t volume = size[0] * size[1] * size[2];
 		TYPE *dataPtr = static_cast<TYPE *>( data.getImageWeakPointer( image, timestep ).lock().get() );
 		assert( dataPtr != 0 );
@@ -104,7 +104,7 @@ private:
 		GLenum glErrorCode = glGetError();
 
 		if( glErrorCode ) {
-			LOG( Runtime, error ) << "Error during loading image " << image.getID()
+			LOG( Runtime, error ) << "Error during loading image " << image->getID()
 								  << " with timestep " << timestep << " to glTexture3D. Error code is " << glErrorCode;
 			return 0;
 		} else {

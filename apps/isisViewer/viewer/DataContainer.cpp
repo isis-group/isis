@@ -16,10 +16,10 @@ bool DataContainer::addImage( const data::Image &image, const ImageHolder::Image
 			newFileName = ss.str();
 		}
 	}
-	ImageHolder tmpHolder;
-	tmpHolder.setImage( image, imageType, newFileName );
-	tmpHolder.setID( size() );
-	insert( std::make_pair<std::string, ImageHolder>( newFileName, tmpHolder ) );
+	boost::shared_ptr<ImageHolder>  tmpHolder = boost::shared_ptr<ImageHolder> ( new ImageHolder ) ;
+	tmpHolder->setImage( image, imageType, newFileName );
+	tmpHolder->setID( size() );
+	insert( std::make_pair<std::string, boost::shared_ptr<ImageHolder> >( newFileName, tmpHolder ) );
 
 	return true;
 }

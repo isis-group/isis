@@ -19,13 +19,12 @@ public:
 	virtual void addImageList( const std::list<data::Image> imageList, const ImageHolder::ImageType &imageType, const util::slist &filenames = util::slist() );
 	virtual void setImageList( const std::list<data::Image> imageList, const ImageHolder::ImageType &imageType, const util::slist &filenames = util::slist() );
 
-	void setCurrentImage( const ImageHolder &image ) { m_CurrentImage = image; }
+	void setCurrentImage( const boost::shared_ptr<ImageHolder> image ) { m_CurrentImage = image; }
 
-	ImageHolder &getCurrentImage() { return m_CurrentImage; }
-	const ImageHolder &getCurrentImage() const { return m_CurrentImage; }
+	boost::shared_ptr<ImageHolder> getCurrentImage() { return m_CurrentImage; }
 	size_t getCurrentTimestep() const { return m_CurrentTimestep; }
 	bool setCurrentTimestep( size_t timestep ) {
-		if(  m_CurrentImage.getImageSize()[3] > timestep ) {
+		if(  m_CurrentImage->getImageSize()[3] > timestep ) {
 			m_CurrentTimestep = timestep;
 			return true;
 		} else { return false; }
@@ -37,7 +36,7 @@ public:
 private:
 	//this is the container which actually holds all the images
 	DataContainer m_DataContainer;
-	ImageHolder m_CurrentImage;
+	boost::shared_ptr<ImageHolder>  m_CurrentImage;
 	size_t m_CurrentTimestep;
 
 

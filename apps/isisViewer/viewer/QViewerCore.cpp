@@ -26,21 +26,7 @@ QViewerCore::registerWidget( std::string key, QWidget *widget, QViewerCore::Acti
 			connect( this, SIGNAL( emitTimeStepChange( unsigned int ) ), w, SLOT( timestepChanged( unsigned int ) ) );
 			connect( this, SIGNAL( emitShowLabels( bool ) ), w, SLOT( setShowLabels( bool ) ) );
 			connect( this, SIGNAL( emitUpdateScene() ), w, SLOT( updateScene() ) );
-		} else if ( dynamic_cast< QSpinBox * >( widget ) ) {
-			switch ( action ) {
-			case QViewerCore::timestep_changed:
-				connect( dynamic_cast<QSpinBox *>( widget ), SIGNAL( valueChanged( int ) ), this, SLOT( timestepChanged( int ) ) );
-				break;
-			}
-		} else if ( dynamic_cast< QCheckBox * > ( widget ) ) {
-			switch ( action ) {
-			case QViewerCore::show_labels:
-				connect( dynamic_cast<QCheckBox *>( widget ), SIGNAL( stateChanged( int ) ), this, SLOT( setShowLabels( int ) ) );
-				break;
-			}
-		}
-
-
+		} 
 	} else {
 		LOG( Runtime, error ) << "A widget with the name " << key << " already exists! Wont add this";
 		return false;
@@ -61,12 +47,22 @@ void QViewerCore::addImageList( const std::list< data::Image > imageList, const 
 {
 	isis::viewer::ViewerCoreBase::addImageList( imageList, imageType, filenames );
 	emitImagesChanged( getDataContainer() );
+	BOOST_FOREACH( WidgetMap::reference widget, m_WidgetMap) {
+		BOOST_FOREACH( DataContainer::const_reference data, getDataContainer() ) {
+			dynamic_cast<QGLWidgetImplementation *>(widget.second)->addImage( data.second );
+		}
+	}
 }
 
 void QViewerCore::setImageList( const std::list< data::Image > imageList, const ImageHolder::ImageType &imageType, const isis::util::slist &filenames )
 {
 	isis::viewer::ViewerCoreBase::setImageList( imageList, imageType, filenames );
 	emitImagesChanged( getDataContainer() );
+	BOOST_FOREACH( WidgetMap::reference widget, m_WidgetMap) {
+		BOOST_FOREACH( DataContainer::const_reference data, getDataContainer() ) {
+			dynamic_cast<QGLWidgetImplementation *>(widget.second)->addImage( data.second );
+		}
+	}
 }
 
 void QViewerCore::setShowLabels( bool l )

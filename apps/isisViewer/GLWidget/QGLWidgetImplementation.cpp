@@ -55,14 +55,14 @@ QGLWidgetImplementation *QGLWidgetImplementation::createSharedWidget( QWidget *p
 	return new QGLWidgetImplementation( m_ViewerCore, parent, this, orientation );
 }
 
-void QGLWidgetImplementation::addImage(const isis::viewer::ImageHolder& image)
+void QGLWidgetImplementation::addImage(const boost::shared_ptr<ImageHolder> image)
 {
-	m_StateValues.insert( std::make_pair<ImageHolder, State>(image, State()));
+	m_StateValues.insert( std::make_pair<boost::shared_ptr<ImageHolder>, State>
+		( image  , State()));
 }
 
-bool QGLWidgetImplementation::removeImage(const isis::viewer::ImageHolder& image)
+bool QGLWidgetImplementation::removeImage(const boost::shared_ptr<ImageHolder> image)
 {
-	return m_StateValues.erase(image);
 }
 
 
@@ -96,12 +96,12 @@ void QGLWidgetImplementation::resizeGL( int w, int h )
 	LOG( Debug, verbose_info ) << "resizeGL " << objectName().toStdString();
 
 	if( m_ViewerCore->getDataContainer().size() ) {
-		util::ivector4 size = m_ViewerCore->getCurrentImage().getImageSize();
+		util::ivector4 size = m_ViewerCore->getCurrentImage()->getImageSize();
 		lookAtVoxel( util::ivector4( size[0] / 2, size[1] / 2, size[2] / 2 ) );
 	}
 }
 
-void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const util::ivector4 &voxelCoords )
+void QGLWidgetImplementation::updateStateValues( boost::shared_ptr<ImageHolder> image, const util::ivector4 &voxelCoords )
 {
 	LOG( Debug, verbose_info ) << "Updating state values for widget " << objectName().toStdString();
 	State &state = m_StateValues[image];
@@ -110,7 +110,7 @@ void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const
 	//check if we are inside the image
 	for( size_t i = 0; i < 4; i++ ) {
 		state.voxelCoords[i] = state.voxelCoords[i] < 0 ? 0 : state.voxelCoords[i];
-		state.voxelCoords[i] = state.voxelCoords[i] >= image.getImageSize()[i] ? image.getImageSize()[i] - 1 : state.voxelCoords[i];
+		state.voxelCoords[i] = state.voxelCoords[i] >= image->getImageSize()[i] ? image->getImageSize()[i] - 1 : state.voxelCoords[i];
 	}
 
 	//if not happend already copy the image to GLtexture memory and return the texture id
@@ -120,10 +120,10 @@ void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const
 	//The texture matrix holds the orientation of the image and the orientation of the current widget. It does NOT hold the scaling of the image.
 	if( ! state.set ) {
 		state.planeOrientation =
-			GLOrientationHandler::transformToPlaneView( image.getNormalizedImageOrientation(), m_PlaneOrientation );
+			GLOrientationHandler::transformToPlaneView( image->getNormalizedImageOrientation(), m_PlaneOrientation );
 		GLOrientationHandler::boostMatrix2Pointer( GLOrientationHandler::addOffset( state.planeOrientation ), state.textureMatrix );
-		state.mappedVoxelSize = GLOrientationHandler::transformVector<float>( image.getPropMap().getPropertyAs<util::fvector4>( "voxelSize" ) + image.getPropMap().getPropertyAs<util::fvector4>( "voxelGap" ) , state.planeOrientation );
-		state.mappedImageSize = GLOrientationHandler::transformVector<int>( image.getImageSize(), state.planeOrientation );
+		state.mappedVoxelSize = GLOrientationHandler::transformVector<float>( image->getPropMap().getPropertyAs<util::fvector4>( "voxelSize" ) + image->getPropMap().getPropertyAs<util::fvector4>( "voxelGap" ) , state.planeOrientation );
+		state.mappedImageSize = GLOrientationHandler::transformVector<int>( image->getImageSize(), state.planeOrientation );
 		state.set = true;
 	}
 
@@ -148,7 +148,7 @@ void QGLWidgetImplementation::updateStateValues( const ImageHolder &image, const
 
 }
 
-std::pair<GLdouble, GLdouble> QGLWidgetImplementation::window2ObjectCoords( int16_t winx, int16_t winy, const ImageHolder &image ) const
+std::pair<GLdouble, GLdouble> QGLWidgetImplementation::window2ObjectCoords( int16_t winx, int16_t winy, const boost::shared_ptr<ImageHolder> image ) const
 {
 	const State &stateValue = m_StateValues.at( image );
 	GLdouble pos[3];
@@ -157,7 +157,7 @@ std::pair<GLdouble, GLdouble> QGLWidgetImplementation::window2ObjectCoords( int1
 
 }
 
-std::pair<int16_t, int16_t> QGLWidgetImplementation::object2WindowCoords( GLdouble objx, GLdouble objy, const ImageHolder &image ) const
+std::pair<int16_t, int16_t> QGLWidgetImplementation::object2WindowCoords( GLdouble objx, GLdouble objy, const boost::shared_ptr<ImageHolder> image ) const
 {
 	const State &stateValue = m_StateValues.at( image );
 	GLdouble win[3];
@@ -166,7 +166,7 @@ std::pair<int16_t, int16_t> QGLWidgetImplementation::object2WindowCoords( GLdoub
 	return std::make_pair<int16_t, int16_t>( ( win[0] - stateValue.viewport[0] ), win[1] - stateValue.viewport[1] );
 }
 
-bool QGLWidgetImplementation::calculateTranslation( const ImageHolder &image )
+bool QGLWidgetImplementation::calculateTranslation( const boost::shared_ptr<ImageHolder> image )
 {
 	State &state = m_StateValues[image];
 	std::pair<int16_t, int16_t> center = std::make_pair<int16_t, int16_t>( abs( state.mappedImageSize[0] ) / 2, abs( state.mappedImageSize[1] ) / 2 );
@@ -195,7 +195,7 @@ bool QGLWidgetImplementation::lookAtVoxel( const isis::util::ivector4 &voxelCoor
 	glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
 	BOOST_FOREACH( StateMap::const_reference state, m_StateValues ) {
-		if( state.first.getImageState().visible ) {
+		if( state.first->getImageState().visible ) {
 			updateStateValues(  state.first, voxelCoords );
 			paintScene(  state.first );
 		}
@@ -206,9 +206,9 @@ bool QGLWidgetImplementation::lookAtVoxel( const isis::util::ivector4 &voxelCoor
 	}
 }
 
-bool QGLWidgetImplementation::lookAtVoxel( const ImageHolder &image, const util::ivector4 &voxelCoords )
+bool QGLWidgetImplementation::lookAtVoxel( const boost::shared_ptr<ImageHolder> image, const util::ivector4 &voxelCoords )
 {
-	if( image.getImageState().visible ) {
+	if( image->getImageState().visible ) {
 		updateStateValues( image, voxelCoords );
 		paintScene( image );
 	}
@@ -219,7 +219,7 @@ bool QGLWidgetImplementation::lookAtVoxel( const ImageHolder &image, const util:
 }
 
 
-void QGLWidgetImplementation::paintScene( const ImageHolder &image )
+void QGLWidgetImplementation::paintScene( const boost::shared_ptr<ImageHolder> image )
 {
 
 	State &state = m_StateValues[image];
@@ -227,8 +227,8 @@ void QGLWidgetImplementation::paintScene( const ImageHolder &image )
 	double scaling, bias;
 
 	if( m_ScalingType == automatic_scaling ) {
-		scaling = image.getOptimalScalingPair().second;
-		bias = image.getOptimalScalingPair().first;
+		scaling = image->getOptimalScalingPair().second;
+		bias = image->getOptimalScalingPair().first;
 	} else if ( m_ScalingType == manual_scaling ) {
 		scaling = m_ScalingPair.second;
 		bias = m_ScalingPair.first;
@@ -249,29 +249,29 @@ void QGLWidgetImplementation::paintScene( const ImageHolder &image )
 	//shader
 
 	//if the image is declared as a zmap
-	if( image.getImageState().imageType == ImageHolder::z_map ) {
+	if( image->getImageState().imageType == ImageHolder::z_map ) {
 		m_ScalingShader.setEnabled( false );
 		m_LUTShader.setEnabled( true );
 		GLuint id = m_LookUpTable.getLookUpTableAsTexture( Color::hsvLUT );
 		glActiveTexture( GL_TEXTURE1 );
 		glBindTexture( GL_TEXTURE_1D, id );
 		m_LUTShader.addVariable<float>( "lut", 1, true );
-		m_LUTShader.addVariable<float>( "max", image.getMinMax().second->as<float>() );
-		m_LUTShader.addVariable<float>( "min", image.getMinMax().first->as<float>() );
-		m_LUTShader.addVariable<float>( "upper_threshold", image.getImageState().threshold.second );
-		m_LUTShader.addVariable<float>( "lower_threshold", image.getImageState().threshold.first );
+		m_LUTShader.addVariable<float>( "max", image->getMinMax().second->as<float>() );
+		m_LUTShader.addVariable<float>( "min", image->getMinMax().first->as<float>() );
+		m_LUTShader.addVariable<float>( "upper_threshold", image->getImageState().threshold.second );
+		m_LUTShader.addVariable<float>( "lower_threshold", image->getImageState().threshold.first );
 		m_LUTShader.addVariable<float>( "bias", bias );
 		m_LUTShader.addVariable<float>( "scaling", scaling );
-		m_LUTShader.addVariable<float>( "opacity", image.getImageState().opacity );
-	} else if ( image.getImageState().imageType == ImageHolder::anatomical_image ) {
+		m_LUTShader.addVariable<float>( "opacity", image->getImageState().opacity );
+	} else if ( image->getImageState().imageType == ImageHolder::anatomical_image ) {
 		m_ScalingShader.setEnabled( true );
-		m_ScalingShader.addVariable<float>( "max", image.getMinMax().second->as<float>() );
-		m_ScalingShader.addVariable<float>( "min", image.getMinMax().first->as<float>() );
-		m_ScalingShader.addVariable<float>( "upper_threshold",  image.getImageState().threshold.second );
-		m_ScalingShader.addVariable<float>( "lower_threshold", image.getImageState().threshold.first );
+		m_ScalingShader.addVariable<float>( "max", image->getMinMax().second->as<float>() );
+		m_ScalingShader.addVariable<float>( "min", image->getMinMax().first->as<float>() );
+		m_ScalingShader.addVariable<float>( "upper_threshold",  image->getImageState().threshold.second );
+		m_ScalingShader.addVariable<float>( "lower_threshold", image->getImageState().threshold.first );
 		m_ScalingShader.addVariable<float>( "scaling", scaling );
 		m_ScalingShader.addVariable<float>( "bias", bias );
-		m_ScalingShader.addVariable<float>( "opacity", image.getImageState().opacity );
+		m_ScalingShader.addVariable<float>( "opacity", image->getImageState().opacity );
 	}
 
 	glActiveTexture( GL_TEXTURE0 );
@@ -414,10 +414,10 @@ void QGLWidgetImplementation::emitMousePressEvent( QMouseEvent *e )
 bool QGLWidgetImplementation::timestepChanged( unsigned int timestep )
 {
 	BOOST_FOREACH( StateMap::reference currentImage, m_StateValues ) {
-		if( currentImage.first.getImageSize()[3] > timestep ) {
+		if( currentImage.first->getImageSize()[3] > timestep ) {
 			currentImage.second.voxelCoords[3] = timestep;
 		} else {
-			currentImage.second.voxelCoords[3] = currentImage.first.getImageSize()[3] - 1;
+			currentImage.second.voxelCoords[3] = currentImage.first->getImageSize()[3] - 1;
 		}
 
 		lookAtVoxel( currentImage.first, currentImage.second.voxelCoords );
@@ -470,7 +470,7 @@ void QGLWidgetImplementation::keyPressEvent( QKeyEvent *e )
 		}
 		m_Zoom.currentZoom = 1.0;
 		size_t timestep = m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords[3];
-		util::ivector4 size = m_ViewerCore->getCurrentImage().getImageSize();
+		util::ivector4 size = m_ViewerCore->getCurrentImage()->getImageSize();
 		lookAtVoxel( util::ivector4( size[0] / 2, size[1] / 2, size[2] / 2, timestep ) );
 	}
 }
