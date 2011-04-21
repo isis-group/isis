@@ -182,7 +182,7 @@ namespace isis
                                 data::Chunk chT(data::MemChunk<uint16_t>((uint16_t*)slice_buffer, height_slice,width_slice,1) );
 								data::MemChunk<float> ch(chT);
                                 ch.setPropertyAs("indexOrigin", slice_pos_vec);
-                                ch.setPropertyAs<uint32_t>("acquisitionNumber", acq_nr);
+                                ch.setPropertyAs<uint32_t>("acquisitionNumber", (acq_nr*iim)+_slice);
                                 //ch.setPropertyAs<>("acquisitionTime", acquisition_time);
                                 if (true == moco){
                                     ch.setPropertyAs<uint16_t>("sequenceNumber", 0);

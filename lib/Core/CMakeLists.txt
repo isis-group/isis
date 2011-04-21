@@ -47,7 +47,7 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
 ############################################################
 # general compiler flags
 ############################################################
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wshadow -pedantic" )
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra " )
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wshadow -pedantic"  )
 
 ############################################################

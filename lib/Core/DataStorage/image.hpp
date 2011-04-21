@@ -38,8 +38,8 @@ public:
 protected:
 	_internal::SortedChunkList set;
 	std::vector<boost::shared_ptr<Chunk> > lookup;
-private:
 	bool clean;
+private:
 	size_t chunkVolume;
 
 	void deduplicateProperties();
