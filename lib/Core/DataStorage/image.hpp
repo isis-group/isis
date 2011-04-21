@@ -111,8 +111,11 @@ protected:
 	void updateOrientationMatrices();
 	
 	util::fvector4 m_RowVec;
+	util::fvector4 m_RowVecInv;
 	util::fvector4 m_ColumnVec;
+	util::fvector4 m_ColumnVecInv;
 	util::fvector4 m_SliceVec;
+	util::fvector4 m_SliceVecInv;
 	util::fvector4 m_Offset;
 public:
 	class ChunkOp : std::unary_function<Chunk &, bool>

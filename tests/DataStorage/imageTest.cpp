@@ -879,6 +879,9 @@ BOOST_AUTO_TEST_CASE( image_get_coords_test )
 	BOOST_REQUIRE( !img.isEmpty() );
 	BOOST_CHECK_EQUAL( img.getPhysicalCoords( util::ivector4(0,0,0) ), img.getPropertyAs<util::fvector4>("indexOrigin") ) ;
 	BOOST_CHECK_EQUAL( img.getPhysicalCoords( util::ivector4(9,9,9) ), util::fvector4(-1,128.5,-104.3)  );
+	//and the other way round
+	BOOST_CHECK_EQUAL( img.getVoxelCoords( img.getPropertyAs<util::fvector4>("indexOrigin") ), util::ivector4(0,0,0) ) ;
+	BOOST_CHECK_EQUAL( img.getVoxelCoords( util::fvector4(-1,128.5,-104.3) ), util::ivector4(9,9,9) );
 
 }
 
