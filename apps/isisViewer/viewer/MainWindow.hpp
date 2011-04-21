@@ -30,11 +30,14 @@ private:
 	QViewerCore *m_ViewerCore;
 
 public Q_SLOTS:
-	void voxelCoordChanged( util::ivector4 );
+	void physicalCoordsChanged( util::fvector4 );
 	void exitProgram();
 	void imagesChanged( DataContainer );
 	void checkImageStack( QListWidgetItem *item );
 	void openImage();
+	
+	void upperThresholdChanged(int);
+	void lowerThresholdChanged(int);
 
 
 private:
@@ -46,9 +49,11 @@ private:
 
 
 	template<typename TYPE> void displayIntensity( util::ivector4 coords ) {
-		QString str;
-		str.setNum( m_ViewerCore->getCurrentImage()->getImage()->voxel<TYPE>( coords[0], coords[1], coords[2], coords[3] ) );
-		ui.pxlIntensityContainer->display( str );
+		const util::Value<TYPE> value( m_ViewerCore->getCurrentImage()->getImage()->voxel<TYPE>( coords[0], coords[1], coords[2], coords[3] ));
+		
+		ui.pxlIntensityContainer->setText( value.toString().c_str() );
+		
+		
 	}
 
 };

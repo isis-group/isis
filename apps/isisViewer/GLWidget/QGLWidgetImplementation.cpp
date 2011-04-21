@@ -44,6 +44,7 @@ void QGLWidgetImplementation::commonInit()
 	zoomEventHappened = false;
 	leftButtonPressed = false;
 	rightButtonPressed = false;
+	init = true;
 	m_ShowLabels = false;
 
 }
@@ -96,8 +97,14 @@ void QGLWidgetImplementation::resizeGL( int w, int h )
 	LOG( Debug, verbose_info ) << "resizeGL " << objectName().toStdString();
 
 	if( m_ViewerCore->getDataContainer().size() ) {
-		util::ivector4 size = m_ViewerCore->getCurrentImage()->getImageSize();
-		lookAtPhysicalCoords( m_ViewerCore->getCurrentImage()->getImage()->getPhysicalCoords(util::ivector4( size[0] / 2, size[1] / 2, size[2] / 2 )));
+		if(init) {
+			util::ivector4 size = m_ViewerCore->getCurrentImage()->getImageSize();
+			lookAtPhysicalCoords( m_ViewerCore->getCurrentImage()->getImage()->getPhysicalCoords(util::ivector4( size[0] / 2, size[1] / 2, size[2] / 2 )));
+			init = false;
+		} else {
+			updateScene();
+		}
+		
 	}
 }
 
@@ -196,8 +203,8 @@ bool QGLWidgetImplementation::lookAtPhysicalCoords(const isis::util::fvector4& p
 	glEnable ( GL_BLEND );
 	glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 	BOOST_FOREACH( StateMap::const_reference state, m_StateValues ) {
+		updateStateValues( state.first, state.first->getImage()->getVoxelCoords( physicalCoords ) );
 		if( state.first->getImageState().visible ) {
-			updateStateValues( state.first, state.first->getImage()->getVoxelCoords( physicalCoords ) );
 			paintScene( state.first );
 		}
 	}
@@ -218,8 +225,8 @@ bool QGLWidgetImplementation::lookAtVoxel( const isis::util::ivector4 &voxelCoor
 	glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
 	BOOST_FOREACH( StateMap::const_reference state, m_StateValues ) {
+		updateStateValues(  state.first, voxelCoords );
 		if( state.first->getImageState().visible ) {
-			updateStateValues(  state.first, voxelCoords );
 			paintScene(  state.first );
 		}
 	}
@@ -231,8 +238,8 @@ bool QGLWidgetImplementation::lookAtVoxel( const isis::util::ivector4 &voxelCoor
 
 bool QGLWidgetImplementation::lookAtVoxel( const boost::shared_ptr<ImageHolder> image, const util::ivector4 &voxelCoords )
 {
+	updateStateValues( image, voxelCoords );
 	if( image->getImageState().visible ) {
-		updateStateValues( image, voxelCoords );
 		paintScene( image );
 	}
 
@@ -282,7 +289,7 @@ void QGLWidgetImplementation::paintScene( const boost::shared_ptr<ImageHolder> i
 		m_LUTShader.addVariable<float>( "max", image->getMinMax().second->as<float>() );
 		m_LUTShader.addVariable<float>( "min", image->getMinMax().first->as<float>() );
 		m_LUTShader.addVariable<float>( "upper_threshold", image->getImageState().threshold.second );
-		m_LUTShader.addVariable<float>( "lower_threshold", -1 );
+		m_LUTShader.addVariable<float>( "lower_threshold", image->getImageState().threshold.first );
 		m_LUTShader.addVariable<float>( "bias", bias );
 		m_LUTShader.addVariable<float>( "scaling", scaling );
 		m_LUTShader.addVariable<float>( "opacity", image->getImageState().opacity );
@@ -322,7 +329,7 @@ void QGLWidgetImplementation::paintCrosshair()
 	//paint crosshair
 	glDisable( GL_BLEND );
 	const State &currentState = m_StateValues.at( m_ViewerCore->getCurrentImage() );
-	glColor4f( 1, 0, 0, 0 );
+	glColor4f( 1, 1, 1, 1 );
 	glLineWidth( 1.0 );
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();

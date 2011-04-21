@@ -144,6 +144,7 @@ private:
 	bool leftButtonPressed;
 	bool rightButtonPressed;
 	bool m_ShowLabels;
+	bool init;
 
 };
 
