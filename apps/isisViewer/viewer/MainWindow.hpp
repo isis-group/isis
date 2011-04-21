@@ -35,6 +35,8 @@ public Q_SLOTS:
 	void imagesChanged( DataContainer );
 	void checkImageStack( QListWidgetItem *item );
 	void openImage();
+	void contextMenuImageStack(QPoint);
+	void triggeredMakeCurrentImage( bool );
 	
 	void upperThresholdChanged(int);
 	void lowerThresholdChanged(int);
@@ -46,7 +48,7 @@ private:
 	QGLWidgetImplementation *m_SagittalWidget;
 	QGLWidgetImplementation *m_MasterWidget;
 
-
+	QAction *actionMakeCurrent;
 
 	template<typename TYPE> void displayIntensity( util::ivector4 coords ) {
 		const util::Value<TYPE> value( m_ViewerCore->getCurrentImage()->getImage()->voxel<TYPE>( coords[0], coords[1], coords[2], coords[3] ));

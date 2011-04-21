@@ -17,9 +17,11 @@ namespace viewer
 MainWindow::MainWindow( QViewerCore *core )
 	: m_ViewerCore( core )
 {
-
+	actionMakeCurrent = new QAction( "Make current", this);
+	
 	connect( ui.action_Exit, SIGNAL( triggered() ), this, SLOT( exitProgram() ) );
 	connect( ui.actionShow_labels, SIGNAL( toggled( bool ) ), m_ViewerCore, SLOT( setShowLabels( bool ) ) );
+	connect( actionMakeCurrent, SIGNAL( triggered(bool)), this, SLOT( triggeredMakeCurrentImage( bool) ) );
 	connect( core, SIGNAL( emitImagesChanged( DataContainer ) ), this, SLOT( imagesChanged( DataContainer ) ) );
 	connect( core, SIGNAL( emitPhysicalCoordsChanged(util::fvector4)), this, SLOT( physicalCoordsChanged(util::fvector4) ) );
 	connect( ui.imageStack, SIGNAL( itemClicked( QListWidgetItem * ) ), this, SLOT( checkImageStack( QListWidgetItem * ) ) );
@@ -42,11 +44,36 @@ MainWindow::MainWindow( QViewerCore *core )
 
 	ui.actionShow_labels->setCheckable( true );
 	ui.actionShow_labels->setChecked( false );
-	ui.lowerThreshold->setMinimum(0);
-
+	ui.imageStack->setContextMenuPolicy( Qt::CustomContextMenu );
+	connect( ui.imageStack, SIGNAL( customContextMenuRequested(QPoint)), this, SLOT( contextMenuImageStack(QPoint)));
+	
 }
 
 
+void MainWindow::contextMenuImageStack(QPoint position )
+{
+	QList<QAction *> actions;
+	
+	if( ui.imageStack->indexAt(position).isValid() ) {
+		actions.append(actionMakeCurrent );
+	}
+	QMenu::exec(actions, ui.imageStack->mapToGlobal(position));
+	
+}
+
+void MainWindow::triggeredMakeCurrentImage(bool triggered )
+{
+	m_ViewerCore->setCurrentImage( m_ViewerCore->getDataContainer().at( ui.imageStack->currentItem()->text().toStdString() ) );
+	double range = m_ViewerCore->getCurrentImage()->getMinMax().second->as<double>() - m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>();
+	ui.lowerThreshold->setSliderPosition( 
+		1000.0 / range * 
+		(m_ViewerCore->getCurrentImage()->getImageState().threshold.first - m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>()) );
+	ui.upperThreshold->setSliderPosition( 
+		1000.0 / range * 
+		(m_ViewerCore->getCurrentImage()->getImageState().threshold.second - m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>()) );	
+	
+		
+}
 
 
 void MainWindow::physicalCoordsChanged( util::fvector4 coords )
