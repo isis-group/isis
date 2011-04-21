@@ -288,6 +288,7 @@ void QGLWidgetImplementation::paintScene( const boost::shared_ptr<ImageHolder> i
 		m_LUTShader.addVariable<float>( "lut", 1, true );
 		m_LUTShader.addVariable<float>( "max", image->getMinMax().second->as<float>() );
 		m_LUTShader.addVariable<float>( "min", image->getMinMax().first->as<float>() );
+		m_LUTShader.addVariable<float>("killZeros", 1.0 );
 		m_LUTShader.addVariable<float>( "upper_threshold", image->getImageState().threshold.second );
 		m_LUTShader.addVariable<float>( "lower_threshold", image->getImageState().threshold.first );
 		m_LUTShader.addVariable<float>( "bias", bias );
