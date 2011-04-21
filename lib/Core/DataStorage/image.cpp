@@ -164,6 +164,32 @@ bool Image::insertChunk ( const Chunk &chunk )
 	}
 }
 
+util::fvector4 Image::getPhysicalCoords(const isis::util::ivector4& voxelCoords) const
+{
+	return  util::fvector4( voxelCoords[0] * m_RowVec[0] + voxelCoords[1] * m_ColumnVec[0] + voxelCoords[2] * m_SliceVec[0],
+							voxelCoords[0] * m_RowVec[1] + voxelCoords[1] * m_ColumnVec[1] + voxelCoords[2] * m_SliceVec[1],
+							voxelCoords[0] * m_RowVec[2] + voxelCoords[1] * m_ColumnVec[2] + voxelCoords[2] * m_SliceVec[2] )
+								+ m_Offset ;
+}
+
+
+void Image::updateOrientationMatrices()
+{
+	util::fvector4 rowVec = getPropertyAs<util::fvector4>("rowVec");
+	util::fvector4 columnVec = getPropertyAs<util::fvector4>("columnVec");
+	util::fvector4 sliceVec = getPropertyAs<util::fvector4>("sliceVec");
+	m_Offset = getPropertyAs<util::fvector4>("indexOrigin");
+	util::fvector4 spacing = getPropertyAs<util::fvector4>("voxelSize") + getPropertyAs<util::fvector4>("voxelGap");
+	m_RowVec = util::fvector4( rowVec[0] * spacing[0], rowVec[1] * spacing[0], rowVec[2] * spacing[0] );
+	m_ColumnVec = util::fvector4( columnVec[0] * spacing[1], columnVec[1] * spacing[1], columnVec[2] * spacing[1] );
+	m_SliceVec = util::fvector4( sliceVec[0] * spacing[2], sliceVec[1] * spacing[2], sliceVec[2] * spacing[2] );
+	LOG(Debug, verbose_info) << "Created orientation matrix: ";
+	LOG(Debug, verbose_info) << "[ " << m_RowVec[0] << " " << m_ColumnVec[0] << " " << m_SliceVec[0] << " ] + " << m_Offset[0];
+	LOG(Debug, verbose_info) << "[ " << m_RowVec[1] << " " << m_ColumnVec[1] << " " << m_SliceVec[1] << " ] + " << m_Offset[1];
+	LOG(Debug, verbose_info) << "[ " << m_RowVec[2] << " " << m_ColumnVec[2] << " " << m_SliceVec[2] << " ] + " << m_Offset[2];
+	
+}
+
 
 bool Image::reIndex()
 {
@@ -350,6 +376,9 @@ bool Image::reIndex()
 	}
 
 	LOG_IF( ! isValid(), Runtime, warning ) << "The image is not valid after reindexing. Missing properties: " << getMissing();
+	if( isValid() ) {
+		updateOrientationMatrices();
+	}
 	return clean = isValid();
 }
 bool Image::isEmpty()const

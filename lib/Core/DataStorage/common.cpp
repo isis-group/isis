@@ -44,7 +44,7 @@ void transformCoords( isis::util::PropertyMap &properties, util::FixedVector<siz
 		R_in( i, 1 ) = column[i];
 		R_in( i, 2 ) = slice[i];
 	}
-	std::cout << "R_in: " << R_in << std::endl;
+// 	std::cout << "R_in: " << R_in << std::endl;
 	// output matrix
 	matrix<float> R_out( 3, 3 );
 	R_out = prod( transform, R_in );
@@ -73,28 +73,28 @@ void transformCoords( isis::util::PropertyMap &properties, util::FixedVector<siz
 	for (unsigned short i = 0;i<3;i++) {
 		half_image( i ) = physicalSize( i ) * 0.5;
 	}
-	std::cout << "half_image: " << half_image << std::endl;
-	std::cout << "phyisicalSize: " << physicalSize << std::endl;
-	std::cout << "origin: " << origin_in << std::endl;
+// 	std::cout << "half_image: " << half_image << std::endl;
+// 	std::cout << "phyisicalSize: " << physicalSize << std::endl;
+// 	std::cout << "origin: " << origin_in << std::endl;
 	vector<float> center_image = prod(R_in, half_image) + origin_in;
 	
-	std::cout << "center image: " << center_image << std::endl;
+// 	std::cout << "center image: " << center_image << std::endl;
 	
 	//now translate this center to the center of the physical space and get the new image origin
 	vector<float> io_translated = origin_in - center_image;
-	std::cout << "io_translated: " << io_translated << std::endl;
+// 	std::cout << "io_translated: " << io_translated << std::endl;
 	//now multiply this translated origin with the inverse of the orientation matrix of the image
 	vector<float> io_ortho = prod(trans(R_in), io_translated);
-	std::cout << "io_ortho: " << io_ortho << std::endl;
+// 	std::cout << "io_ortho: " << io_ortho << std::endl;
 	//now transform this matrix with the actual transformation matrix
 	vector<float> transformed_io_ortho = prod(transform, io_ortho);
-	std::cout << "transformed_io_ortho: " << transformed_io_ortho << std::endl;
+// 	std::cout << "transformed_io_ortho: " << transformed_io_ortho << std::endl;
 	//now transform ths point back with the orientation matrix of the image
 	vector<float> transformed_io = prod( R_in, transformed_io_ortho);
-	std::cout << "transformed_io: " << transformed_io << std::endl;
+// 	std::cout << "transformed_io: " << transformed_io << std::endl;
 	//and finally we have to retranslate this origin to get the image to our old position in physical space
 	vector<float> origin_out = transformed_io + center_image + origin_in;
-	std::cout << "origin_out: " << origin_out << std::endl;
+// 	std::cout << "origin_out: " << origin_out << std::endl;
 	
 	vector<float> old_origin = prod(transform,origin_in);
 		for( int i = 0; i < 3; i++ ) {

@@ -156,6 +156,7 @@ void GLOrientationHandler::recalculateViewport( size_t w, size_t h, util::fvecto
 
 }
 
+
 void GLOrientationHandler::makeIdentity( GLdouble *matrix )
 {
 	unsigned short index = 0;

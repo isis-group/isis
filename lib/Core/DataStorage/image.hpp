@@ -20,6 +20,8 @@
 #include <vector>
 #include <boost/foreach.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/vector.hpp>
+#include <boost/numeric/ublas/io.hpp>
 #include <stack>
 #include "sortedchunklist.hpp"
 
@@ -105,6 +107,13 @@ protected:
 	Chunk &chunkAt( size_t at );
 	/// Creates an empty Image object.
 	Image();
+	
+	void updateOrientationMatrices();
+	
+	util::fvector4 m_RowVec;
+	util::fvector4 m_ColumnVec;
+	util::fvector4 m_SliceVec;
+	util::fvector4 m_Offset;
 public:
 	class ChunkOp : std::unary_function<Chunk &, bool>
 	{
@@ -372,6 +381,10 @@ public:
 		isis::data::_internal::transformCoords( *this, getSizeAsVector(), transform_matrix );
 	}
 
+	util::fvector4 getPhysicalCoords( const util::ivector4 &voxelCoords ) const;
+	
+	util::ivector4 getVoxelCoords( const util::fvector4 &physicalCoords ) const;
+	
 	/**
 	 * Copy all voxel data of the image into memory.
 	 * If neccessary a conversion into T is done using min/max of the image.
