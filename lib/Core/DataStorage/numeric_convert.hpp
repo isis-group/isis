@@ -226,10 +226,10 @@ getNumericScaling( const util::_internal::ValueBase &min, const util::_internal:
 		//else if src is completly on negative dmain, or if there is no positive domain use maxval
 		//elsewise leave it at 0 and scale both sides
 		if ( minval > 0 || !domain_min ) {
-			if ( ( maxval - domain_max ) > 0 ) // if the values completely fit into the domain we dont have to offset them
+// 			if ( ( maxval - domain_max ) > 0 ) // if the values completely fit into the domain we dont have to offset them
 				offset = -minval;
 		} else if ( ( 0 - maxval ) > 0 || !domain_max ) {
-			if ( ( domain_min - minval ) > 0  ) // if the values completely fit into the domain we dont have to offset them
+// 			if ( ( domain_min - minval ) > 0  ) // if the values completely fit into the domain we dont have to offset them
 				offset = -maxval;
 		}
 
@@ -254,8 +254,11 @@ getNumericScaling( const util::_internal::ValueBase &min, const util::_internal:
 				scale = 1;
 			}
 		}
-
-		offset *= scale;//calc offset for dst
+		if(scale==1){
+			if((minval - domain_min)>0 && (domain_max - maxval) > 0 )
+				offset=0; // if the source does fit into the domain, and we do not scale - we wont need an offset
+		} else
+			offset *= scale;//calc offset for dst
 	}
 
 	return std::make_pair( scale, offset );
