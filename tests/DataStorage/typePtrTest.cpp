@@ -166,15 +166,22 @@ BOOST_AUTO_TEST_CASE( ValuePtr_conv_scaling_test )
 {
 	const float init[] = { -2, -1.8, -1.5, -1.3, -0.6, -0.2, 2, 1.8, 1.5, 1.3, 0.6, 0.2};
 	data::ValuePtr<float> floatArray( ( float * )malloc( sizeof( float ) * 12 ), 12 );
-	//with automatic upscaling into integer
+
+	//scaling to itself should allways be 1/0
 	floatArray.copyFromMem( init, 12 );
 	data::scaling_pair scale = floatArray.getScalingTo( data::ValuePtr<float>::staticID );
 	BOOST_CHECK_EQUAL( scale.first->as<float>(), 1 );
 	BOOST_CHECK_EQUAL( scale.second->as<float>(), 0 );
 
+	//float=> integer should upscale
 	scale = floatArray.getScalingTo( data::ValuePtr<int32_t>::staticID );
 	BOOST_CHECK_EQUAL( scale.first->as<double>(), std::numeric_limits<int32_t>::max() / 2. );
 	BOOST_CHECK_EQUAL( scale.second->as<double>(), 0 );
+
+	//float=> unsigned integer should upscale and shift
+	scale = floatArray.getScalingTo( data::ValuePtr<uint8_t>::staticID );
+	BOOST_CHECK_EQUAL( scale.first->as<double>(), std::numeric_limits<uint8_t>::max() / 4. );
+	BOOST_CHECK_EQUAL( scale.second->as<double>(), 2 * scale.first->as<double>() );
 }
 
 BOOST_AUTO_TEST_CASE( ValuePtr_conversion_test )
