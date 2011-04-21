@@ -45,13 +45,15 @@ public:
 
 
 public Q_SLOTS:
-	virtual void voxelCoordChanged( util::ivector4 );
+	virtual void voxelCoordsChanged( util::ivector4 );
+	virtual void physicalCoordsChanged( util::fvector4 );
 	virtual void timestepChanged( int );
 	virtual void setShowLabels( bool );
 	virtual void updateScene();
 
 Q_SIGNALS:
 	void emitVoxelCoordChanged( util::ivector4 );
+	void emitPhysicalCoordsChanged( util::fvector4 );
 	void emitTimeStepChange( unsigned int );
 	void emitImagesChanged( DataContainer );
 	void emitShowLabels( bool );

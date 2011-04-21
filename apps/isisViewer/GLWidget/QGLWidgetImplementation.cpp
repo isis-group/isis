@@ -97,7 +97,7 @@ void QGLWidgetImplementation::resizeGL( int w, int h )
 
 	if( m_ViewerCore->getDataContainer().size() ) {
 		util::ivector4 size = m_ViewerCore->getCurrentImage()->getImageSize();
-		lookAtVoxel( util::ivector4( size[0] / 2, size[1] / 2, size[2] / 2 ) );
+		lookAtPhysicalCoords( m_ViewerCore->getCurrentImage()->getImage()->getPhysicalCoords(util::ivector4( size[0] / 2, size[1] / 2, size[2] / 2 )));
 	}
 }
 
@@ -184,6 +184,29 @@ bool QGLWidgetImplementation::calculateTranslation( const boost::shared_ptr<Imag
 
 }
 
+bool QGLWidgetImplementation::lookAtPhysicalCoords(const boost::shared_ptr< ImageHolder > image, const isis::util::fvector4& physicalCoords)
+{
+	lookAtVoxel( image, image->getImage()->getVoxelCoords( physicalCoords) );
+}
+
+bool QGLWidgetImplementation::lookAtPhysicalCoords(const isis::util::fvector4& physicalCoords)
+{
+	redraw();
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	glEnable ( GL_BLEND );
+	glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+	BOOST_FOREACH( StateMap::const_reference state, m_StateValues ) {
+		if( state.first->getImageState().visible ) {
+			updateStateValues( state.first, state.first->getImage()->getVoxelCoords( physicalCoords ) );
+			paintScene( state.first );
+		}
+	}
+	if( m_StateValues.size() ) {
+		paintCrosshair();
+	}
+}
+
+
 bool QGLWidgetImplementation::lookAtVoxel( const isis::util::ivector4 &voxelCoords )
 {
 	LOG( Debug, verbose_info ) << "Looking at voxel: " << voxelCoords;
@@ -259,7 +282,7 @@ void QGLWidgetImplementation::paintScene( const boost::shared_ptr<ImageHolder> i
 		m_LUTShader.addVariable<float>( "max", image->getMinMax().second->as<float>() );
 		m_LUTShader.addVariable<float>( "min", image->getMinMax().first->as<float>() );
 		m_LUTShader.addVariable<float>( "upper_threshold", image->getImageState().threshold.second );
-		m_LUTShader.addVariable<float>( "lower_threshold", image->getImageState().threshold.first );
+		m_LUTShader.addVariable<float>( "lower_threshold", -1 );
 		m_LUTShader.addVariable<float>( "bias", bias );
 		m_LUTShader.addVariable<float>( "scaling", scaling );
 		m_LUTShader.addVariable<float>( "opacity", image->getImageState().opacity );
@@ -407,7 +430,7 @@ void QGLWidgetImplementation::emitMousePressEvent( QMouseEvent *e )
 	if( isInViewport( e->x(), e->y() ) ) {
 		std::pair<float, float> objectCoords = window2ObjectCoords( e->x(), height() - e->y(), m_ViewerCore->getCurrentImage() );
 		util::ivector4 voxelCoords = GLOrientationHandler::transformObject2VoxelCoords( util::fvector4( objectCoords.first, objectCoords.second, m_StateValues.at( m_ViewerCore->getCurrentImage() ).normalizedSlice ), m_ViewerCore->getCurrentImage(), m_PlaneOrientation );
-		Q_EMIT voxelCoordChanged( voxelCoords );
+		physicalCoordsChanged( m_ViewerCore->getCurrentImage()->getImage()->getPhysicalCoords( voxelCoords) );
 	}
 }
 
@@ -420,7 +443,7 @@ bool QGLWidgetImplementation::timestepChanged( unsigned int timestep )
 			currentImage.second.voxelCoords[3] = currentImage.first->getImageSize()[3] - 1;
 		}
 
-		lookAtVoxel( currentImage.first, currentImage.second.voxelCoords );
+		updateScene();
 	}
 
 }
@@ -436,13 +459,15 @@ void QGLWidgetImplementation::wheelEvent( QWheelEvent *e )
 	m_Zoom.currentZoom *= zoomFactor;
 
 	if( m_Zoom.currentZoom >= 1 ) {
-		glMatrixMode( GL_PROJECTION );
-		glLoadMatrixd( m_StateValues[m_ViewerCore->getCurrentImage()].projectionMatrix );
-		glScalef( zoomFactor, zoomFactor, 1 );
-		glGetDoublev( GL_PROJECTION_MATRIX, m_StateValues[m_ViewerCore->getCurrentImage()].projectionMatrix );
-		glLoadIdentity();
+		BOOST_FOREACH( StateMap::reference state, m_StateValues) {
+			glMatrixMode( GL_PROJECTION );
+			glLoadMatrixd( state.second.projectionMatrix );
+			glScalef( zoomFactor, zoomFactor, 1 );
+			glGetDoublev( GL_PROJECTION_MATRIX, state.second.projectionMatrix );
+			glLoadIdentity();
+		}
 		zoomEventHappened = true;
-		lookAtVoxel( m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords );
+		updateScene();
 	} else {
 		m_Zoom.currentZoom = 1;
 	}
@@ -471,7 +496,7 @@ void QGLWidgetImplementation::keyPressEvent( QKeyEvent *e )
 		m_Zoom.currentZoom = 1.0;
 		size_t timestep = m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords[3];
 		util::ivector4 size = m_ViewerCore->getCurrentImage()->getImageSize();
-		lookAtVoxel( util::ivector4( size[0] / 2, size[1] / 2, size[2] / 2, timestep ) );
+		lookAtPhysicalCoords( m_ViewerCore->getCurrentImage()->getImage()->getPhysicalCoords(util::ivector4( size[0] / 2, size[1] / 2, size[2] / 2 )));
 	}
 }
 
@@ -490,7 +515,7 @@ void QGLWidgetImplementation::setInterpolationType( const isis::viewer::GLTextur
 
 void QGLWidgetImplementation::updateScene()
 {
-	lookAtVoxel( m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords );
+	lookAtPhysicalCoords( m_ViewerCore->getCurrentImage()->getImage()->getPhysicalCoords( m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords ) );
 }
 
 

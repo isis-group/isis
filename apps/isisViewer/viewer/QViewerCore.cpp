@@ -21,8 +21,10 @@ QViewerCore::registerWidget( std::string key, QWidget *widget, QViewerCore::Acti
 
 		if( dynamic_cast<QGLWidgetImplementation *>( widget ) ) {
 			QGLWidgetImplementation *w = dynamic_cast<QGLWidgetImplementation *>( widget );
-			connect( w, SIGNAL( voxelCoordChanged( util::ivector4 ) ), this, SLOT( voxelCoordChanged ( util::ivector4 ) ) );
+			connect( w, SIGNAL( voxelCoordsChanged( util::ivector4 ) ), this, SLOT( voxelCoordsChanged ( util::ivector4 ) ) );
+			connect( w, SIGNAL( physicalCoordsChanged( util::fvector4 ) ), this, SLOT( physicalCoordsChanged ( util::fvector4 ) ) );
 			connect( this, SIGNAL( emitVoxelCoordChanged( util::ivector4 ) ), w, SLOT( lookAtVoxel( util::ivector4 ) ) );
+			connect( this, SIGNAL( emitPhysicalCoordsChanged( util::fvector4 ) ), w, SLOT( lookAtPhysicalCoords( util::fvector4 ) ) );
 			connect( this, SIGNAL( emitTimeStepChange( unsigned int ) ), w, SLOT( timestepChanged( unsigned int ) ) );
 			connect( this, SIGNAL( emitShowLabels( bool ) ), w, SLOT( setShowLabels( bool ) ) );
 			connect( this, SIGNAL( emitUpdateScene() ), w, SLOT( updateScene() ) );
@@ -33,10 +35,16 @@ QViewerCore::registerWidget( std::string key, QWidget *widget, QViewerCore::Acti
 	}
 }
 
-void QViewerCore::voxelCoordChanged( util::ivector4 voxelCoords )
+void QViewerCore::voxelCoordsChanged( util::ivector4 voxelCoords )
 {
 	emitVoxelCoordChanged( voxelCoords );
 }
+
+void QViewerCore::physicalCoordsChanged(util::fvector4 physicalCoords )
+{
+	emitPhysicalCoordsChanged(physicalCoords);
+}
+
 
 void QViewerCore::timestepChanged( int timestep )
 {

@@ -47,7 +47,9 @@ public Q_SLOTS:
 	virtual bool removeImage( const boost::shared_ptr<ImageHolder> image );
 	virtual void addImage( const boost::shared_ptr<ImageHolder> image );
 	virtual bool lookAtVoxel( const boost::shared_ptr<ImageHolder> image, const util::ivector4 &voxelCoords );
+	virtual bool lookAtPhysicalCoords( const boost::shared_ptr<ImageHolder> image, const util::fvector4 &physicalCoords );
 	virtual bool lookAtVoxel( const util::ivector4 &voxelCoords );
+	virtual bool lookAtPhysicalCoords( const util::fvector4 &physicalCoords );
 	virtual bool timestepChanged( unsigned int timestep );
 	virtual void setScalingType( ScalingType scalingType ) { m_ScalingType = scalingType; }
 	virtual void setShowLabels( const bool show );
@@ -71,7 +73,8 @@ protected:
 protected:
 Q_SIGNALS:
 	void redraw();
-	void voxelCoordChanged( util::ivector4 );
+	void voxelCoordsChanged( util::ivector4 );
+	void physicalCoordsChanged( util::fvector4 );
 
 
 private:

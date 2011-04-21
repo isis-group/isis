@@ -394,9 +394,7 @@ bool Image::reIndex()
 	}
 
 	LOG_IF( ! isValid(), Runtime, warning ) << "The image is not valid after reindexing. Missing properties: " << getMissing();
-	if( isValid() ) {
-		updateOrientationMatrices();
-	}
+	updateOrientationMatrices();
 	return clean = isValid();
 }
 bool Image::isEmpty()const

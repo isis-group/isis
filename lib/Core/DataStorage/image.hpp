@@ -108,7 +108,7 @@ protected:
 	/// Creates an empty Image object.
 	Image();
 	
-	void updateOrientationMatrices();
+	
 	
 	util::fvector4 m_RowVec;
 	util::fvector4 m_RowVecInv;
@@ -475,6 +475,7 @@ public:
 	size_t getNrOfTimesteps()const;
 
 	util::fvector4 getFoV()const;
+	void updateOrientationMatrices();
 };
 
 /**
