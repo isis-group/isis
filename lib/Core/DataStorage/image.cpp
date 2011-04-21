@@ -173,6 +173,15 @@ util::fvector4 Image::getPhysicalCoords(const isis::util::ivector4& voxelCoords)
 }
 
 
+util::ivector4 Image::getVoxelCoords(const isis::util::fvector4& physicalCoords) const
+{
+	util::fvector4 vec1 = physicalCoords - m_Offset;
+	return util::ivector4( vec1[0] * m_RowVecInv[0] + vec1[1] * m_ColumnVecInv[0] + vec1[2] * m_SliceVecInv[0],
+							vec1[0] * m_RowVecInv[1] + vec1[1] * m_ColumnVecInv[1] + vec1[2] * m_SliceVecInv[1],
+							vec1[0] * m_RowVecInv[2] + vec1[1] * m_ColumnVecInv[2] + vec1[2] * m_SliceVecInv[2] );
+}
+
+
 void Image::updateOrientationMatrices()
 {
 	util::fvector4 rowVec = getPropertyAs<util::fvector4>("rowVec");
@@ -187,7 +196,16 @@ void Image::updateOrientationMatrices()
 	LOG(Debug, verbose_info) << "[ " << m_RowVec[0] << " " << m_ColumnVec[0] << " " << m_SliceVec[0] << " ] + " << m_Offset[0];
 	LOG(Debug, verbose_info) << "[ " << m_RowVec[1] << " " << m_ColumnVec[1] << " " << m_SliceVec[1] << " ] + " << m_Offset[1];
 	LOG(Debug, verbose_info) << "[ " << m_RowVec[2] << " " << m_ColumnVec[2] << " " << m_SliceVec[2] << " ] + " << m_Offset[2];
-	
+	//since we do not want to calculate the inverse matrix with every getVoxelCoords call again we do it here once
+	m_RowVecInv[0] = m_RowVec[0] != 0 ? 1.0 / m_RowVec[0] : 0;
+	m_RowVecInv[1] = m_ColumnVec[0] != 0 ? 1.0 / m_ColumnVec[0] : 0;
+	m_RowVecInv[2] = m_SliceVec[0] != 0 ? 1.0 / m_SliceVec[0] : 0;
+	m_ColumnVecInv[0] = m_RowVec[1] != 0 ? 1.0 / m_RowVec[1] : 0;
+	m_ColumnVecInv[1] = m_ColumnVec[1] != 0 ? 1.0 / m_ColumnVec[1] : 0;
+	m_ColumnVecInv[2] = m_SliceVec[1] != 0 ? 1.0 / m_SliceVec[1] : 0;
+	m_SliceVecInv[0] = m_RowVec[2] != 0 ? 1.0 / m_RowVec[2] : 0;
+	m_SliceVecInv[1] = m_ColumnVec[2] != 0 ? 1.0 / m_ColumnVec[2] : 0;
+	m_SliceVecInv[2] = m_SliceVec[2] != 0 ? 1.0 / m_SliceVec[2] : 0;
 }
 
 
@@ -376,9 +394,7 @@ bool Image::reIndex()
 	}
 
 	LOG_IF( ! isValid(), Runtime, warning ) << "The image is not valid after reindexing. Missing properties: " << getMissing();
-	if( isValid() ) {
-		updateOrientationMatrices();
-	}
+	updateOrientationMatrices();
 	return clean = isValid();
 }
 bool Image::isEmpty()const

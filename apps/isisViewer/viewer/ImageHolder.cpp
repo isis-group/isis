@@ -157,6 +157,7 @@ bool ImageHolder::setImage( const data::Image &image, const ImageType &imageType
 	m_ImageState.visible = true;
 	m_ImageState.threshold = std::make_pair<double, double>( m_MinMax.first->as<double>(), m_MinMax.second->as<double>() );
 	m_ImageState.opacity = 1.0;
+	m_Image->updateOrientationMatrices();
 	return filterRelevantMetaInformation(); //only return true if filtering was successfully
 }
 

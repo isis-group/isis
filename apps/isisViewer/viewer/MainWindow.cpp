@@ -17,12 +17,17 @@ namespace viewer
 MainWindow::MainWindow( QViewerCore *core )
 	: m_ViewerCore( core )
 {
-
+	actionMakeCurrent = new QAction( "Make current", this);
+	
 	connect( ui.action_Exit, SIGNAL( triggered() ), this, SLOT( exitProgram() ) );
 	connect( ui.actionShow_labels, SIGNAL( toggled( bool ) ), m_ViewerCore, SLOT( setShowLabels( bool ) ) );
+	connect( actionMakeCurrent, SIGNAL( triggered(bool)), this, SLOT( triggeredMakeCurrentImage( bool) ) );
 	connect( core, SIGNAL( emitImagesChanged( DataContainer ) ), this, SLOT( imagesChanged( DataContainer ) ) );
+	connect( core, SIGNAL( emitPhysicalCoordsChanged(util::fvector4)), this, SLOT( physicalCoordsChanged(util::fvector4) ) );
 	connect( ui.imageStack, SIGNAL( itemClicked( QListWidgetItem * ) ), this, SLOT( checkImageStack( QListWidgetItem * ) ) );
 	connect( ui.action_Open_Image, SIGNAL( triggered() ), this, SLOT( openImage() ) );
+	connect( ui.upperThreshold, SIGNAL( sliderMoved(int)), this, SLOT( upperThresholdChanged(int)));
+	connect( ui.lowerThreshold, SIGNAL( sliderMoved(int)), this, SLOT( lowerThresholdChanged(int)));
 
 	//we need a master widget to keep opengl running in case all visible widgets were closed
 
@@ -39,44 +44,67 @@ MainWindow::MainWindow( QViewerCore *core )
 
 	ui.actionShow_labels->setCheckable( true );
 	ui.actionShow_labels->setChecked( false );
-
+	ui.imageStack->setContextMenuPolicy( Qt::CustomContextMenu );
+	connect( ui.imageStack, SIGNAL( customContextMenuRequested(QPoint)), this, SLOT( contextMenuImageStack(QPoint)));
+	
 }
 
 
-
-
-void MainWindow::voxelCoordChanged( util::ivector4 coords )
+void MainWindow::contextMenuImageStack(QPoint position )
 {
-	//TODO where has this to be placed???
-	BOOST_FOREACH( QViewerCore::WidgetMap::const_reference widget, m_ViewerCore->getWidgets() ) {
-		dynamic_cast<QGLWidgetImplementation *>( widget.second )->lookAtVoxel( coords );
+	QList<QAction *> actions;
+	
+	if( ui.imageStack->indexAt(position).isValid() ) {
+		actions.append(actionMakeCurrent );
 	}
-	data::Chunk ch = m_ViewerCore->getCurrentImage()->getImage()->getChunk( coords[0], coords[1], coords[2], coords[3] );
+	QMenu::exec(actions, ui.imageStack->mapToGlobal(position));
+	
+}
+
+void MainWindow::triggeredMakeCurrentImage(bool triggered )
+{
+	m_ViewerCore->setCurrentImage( m_ViewerCore->getDataContainer().at( ui.imageStack->currentItem()->text().toStdString() ) );
+	double range = m_ViewerCore->getCurrentImage()->getMinMax().second->as<double>() - m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>();
+	ui.lowerThreshold->setSliderPosition( 
+		1000.0 / range * 
+		(m_ViewerCore->getCurrentImage()->getImageState().threshold.first - m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>()) );
+	ui.upperThreshold->setSliderPosition( 
+		1000.0 / range * 
+		(m_ViewerCore->getCurrentImage()->getImageState().threshold.second - m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>()) );	
+	
+		
+}
+
+
+void MainWindow::physicalCoordsChanged( util::fvector4 coords )
+{
+	util::ivector4 voxelCoords = m_ViewerCore->getCurrentImage()->getImage()->getVoxelCoords( coords );
+	data::Chunk ch = m_ViewerCore->getCurrentImage()->getImage()->getChunk( voxelCoords[0], voxelCoords[1], voxelCoords[2], voxelCoords[3] );
 
 	switch( ch.getTypeID() ) {
 	case data::ValuePtr<int8_t>::staticID:
-		displayIntensity<int8_t>( coords );
+		displayIntensity<int8_t>( voxelCoords );
 		break;
 	case data::ValuePtr<uint8_t>::staticID:
-		displayIntensity<uint8_t>( coords );
+		displayIntensity<uint8_t>( voxelCoords );
 		break;
 	case data::ValuePtr<int16_t>::staticID:
-		displayIntensity<int16_t>( coords );
+		displayIntensity<int16_t>( voxelCoords );
 		break;
 	case data::ValuePtr<uint16_t>::staticID:
-		displayIntensity<uint16_t>( coords );
+		displayIntensity<uint16_t>( voxelCoords );
 		break;
 	case data::ValuePtr<int32_t>::staticID:
-		displayIntensity<int32_t>( coords );
+		displayIntensity<int32_t>( voxelCoords );
 		break;
 	case data::ValuePtr<uint32_t>::staticID:
-		displayIntensity<uint32_t>( coords );
+		displayIntensity<uint32_t>( voxelCoords );
 		break;
 	case data::ValuePtr<float>::staticID:
-		displayIntensity<float>( coords );
+		displayIntensity<float>( voxelCoords );
 		break;
 	case data::ValuePtr<double>::staticID:
-		displayIntensity<double>( coords );
+		displayIntensity<double>( voxelCoords );
 		break;
 	}
 
@@ -105,6 +133,8 @@ void MainWindow::imagesChanged( DataContainer images )
 
 		ui.imageStack->addItem( item );
 	}
+	ui.minLabel->setText( QString(m_ViewerCore->getCurrentImage()->getMinMax().first.toString().c_str() ));
+	ui.maxLabel->setText( QString(m_ViewerCore->getCurrentImage()->getMinMax().second.toString().c_str() ));
 }
 
 void MainWindow::openImage()
@@ -148,6 +178,21 @@ void MainWindow::checkImageStack( QListWidgetItem *item )
 void MainWindow::exitProgram()
 {
 	close();
+}
+
+void MainWindow::lowerThresholdChanged(int lowerThreshold)
+{
+	double range = m_ViewerCore->getCurrentImage()->getMinMax().second->as<double>() - m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>();
+	m_ViewerCore->getCurrentImage()->setLowerThreshold( (range / 1000) * lowerThreshold + m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>() );
+	m_ViewerCore->updateScene();
+}
+
+void MainWindow::upperThresholdChanged(int upperThreshold )
+{
+	double range = m_ViewerCore->getCurrentImage()->getMinMax().second->as<double>() - m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>();
+	m_ViewerCore->getCurrentImage()->setUpperThreshold( (range / 1000) * upperThreshold + m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>() );
+	m_ViewerCore->updateScene();
+
 }
 
 
