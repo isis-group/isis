@@ -528,8 +528,8 @@ std::pair< util::ValueReference, util::ValueReference > Image::getScalingTo( sho
 	const std::vector<boost::shared_ptr<const Chunk> > chunks = getChunksAsVector();
 	BOOST_FOREACH( const boost::shared_ptr<const Chunk> &ref, chunks ) { //find a chunk which would be converted
 		if( targetID != ref->getTypeID() ) {
-			const scaling_pair scale=ref->getScalingTo( targetID, minmax, scaleopt );
-			LOG_IF( scale.first.isEmpty() || scale.second.isEmpty(), Debug, error )	<< "Returning an invalid scaling. This is bad!";
+			const scaling_pair scale = ref->getScalingTo( targetID, minmax, scaleopt );
+			LOG_IF( scale.first.isEmpty() || scale.second.isEmpty(), Debug, error ) << "Returning an invalid scaling. This is bad!";
 			return scale; // and ask that for the scaling
 		}
 	}
@@ -762,6 +762,7 @@ size_t Image::getNrOfTimesteps() const
 util::fvector4 Image::getFoV() const
 {
 	util::fvector4 voxelGap;
+
 	if ( hasProperty( "voxelGap" ) ) {
 		voxelGap = getPropertyAs<util::fvector4>( "voxelGap" );
 
@@ -771,6 +772,7 @@ util::fvector4 Image::getFoV() const
 				voxelGap[i] = 0;
 			}
 	}
+
 	return _internal::NDimensional<4>::getFoV( getPropertyAs<util::fvector4>( "voxelSize" ), voxelGap );
 }
 

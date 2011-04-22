@@ -115,7 +115,7 @@ BOOST_PYTHON_MODULE( _data )
 	//  IOFactory
 	//#######################################################################################
 	class_<_IOFactory>( "IOFactory", no_init )
- 	.def( "writeImage", &_IOFactory::_writeImage )
+	.def( "writeImage", &_IOFactory::_writeImage )
 	.staticmethod( "writeImage" )
 	.def( "write", &_IOFactory::_writeImage )
 	.staticmethod( "write" )

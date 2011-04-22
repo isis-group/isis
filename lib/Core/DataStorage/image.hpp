@@ -39,7 +39,6 @@ protected:
 	_internal::SortedChunkList set;
 	std::vector<boost::shared_ptr<Chunk> > lookup;
 private:
-	bool clean;
 	size_t chunkVolume;
 
 	void deduplicateProperties();
@@ -76,6 +75,7 @@ private:
 
 
 protected:
+	bool clean;
 	static const char *neededProperties;
 
 	/**
@@ -123,14 +123,32 @@ public:
 	 * Removes used chunks from the given list. So afterwards the list consists of the rejected chunks.
 	 */
 	template<typename T> Image( std::list<T> &chunks ) : _internal::NDimensional<4>(), util::PropertyMap(), set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ), clean( false ) {
-		BOOST_STATIC_ASSERT( ( boost::is_base_of<Chunk, T>::value ) );
 		addNeededFromString( neededProperties );
 		set.addSecondarySort( "acquisitionNumber" );
 		set.addSecondarySort( "acquisitionTime" );
+		insertChunksFromContainer(chunks);
+	}
+	/**
+	 * Create image from a vector of Chunks or objects with the base Chunk.
+	 * Removes used chunks from the given list. So afterwards the list consists of the rejected chunks.
+	 */
+	template<typename T> Image( std::vector<T> &chunks ) : _internal::NDimensional<4>(), util::PropertyMap(), set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ), clean( false ) {
+		addNeededFromString( neededProperties );
+		set.addSecondarySort( "acquisitionNumber" );
+		set.addSecondarySort( "acquisitionTime" );
+		insertChunksFromContainer(chunks);
+	}
 
+	/**
+	 * Insert Chunks or objects with the base Chunk from a sequence container into the Image.
+	 * Removes used chunks from the given sequence container. So afterwards the container consists of the rejected chunks.
+	 * \returns amount of successfully inserted chunks
+	 */
+	template<typename T> size_t insertChunksFromContainer( T &chunks ) {
+		BOOST_STATIC_ASSERT( ( boost::is_base_of<Chunk, typename T::value_type >::value ) );
 		size_t cnt = 0;
 
-		for ( typename std::list<T>::iterator i = chunks.begin(); i != chunks.end(); ) { // for all remaining chunks
+		for ( typename T::iterator i = chunks.begin(); i != chunks.end(); ) { // for all remaining chunks
 			if ( insertChunk( *i ) ) {
 				chunks.erase( i++ );
 				cnt++;
@@ -146,9 +164,10 @@ public:
 				LOG( Runtime, error ) << "Failed to create image from " << cnt << " chunks.";
 			} else {
 				LOG_IF( !getMissing().empty(), Debug, warning )
-						<< "The created image is missing some properties: " << getMissing() << ". It will be invalid.";
+				<< "The created image is missing some properties: " << getMissing() << ". It will be invalid.";
 			}
 		}
+		return cnt;
 	}
 
 
@@ -399,9 +418,9 @@ public:
 	 * \returns a MemChunk\<T\> containing the voxeldata of the Image (but not its Properties)
 	 */
 	template<typename T> MemChunk<T> copyToMemChunk()const {
-		const util::FixedVector<size_t,4> size=getSizeAsVector();
-		data::MemChunk<T> ret(size[0], size[1], size[2], size[3]);
-		copyToMem<T>(&ret.voxel<T>(0,0,0,0));
+		const util::FixedVector<size_t, 4> size = getSizeAsVector();
+		data::MemChunk<T> ret( size[0], size[1], size[2], size[3] );
+		copyToMem<T>( &ret.voxel<T>( 0, 0, 0, 0 ) );
 		return ret;
 	}
 

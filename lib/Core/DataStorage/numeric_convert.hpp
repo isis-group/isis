@@ -45,17 +45,23 @@ template<typename SRC, typename DST> void numeric_convert_impl( const SRC *src, 
 	for ( size_t i = 0; i < count; i++ )
 		dst[i] = converter( src[i] );
 }
+template<typename SRC, typename DST> void numeric_convert_impl( const std::complex<SRC> *src, std::complex<DST> *dst, size_t count, double scale, double offset )
+{
+	LOG( Debug, error )	<< "complex conversion with scaling is not yet supportet";
+	numeric_convert_impl( src, dst, count);
+}
 
 template<typename T> void numeric_copy_impl( const T *src, T *dst, size_t count )
 {
-	LOG( Runtime, info )	<< "using memcpy-copy of " << ValuePtr<T>::staticName() << " without scaling";
-	memcpy(dst,src,count*sizeof(T));
+	LOG( Runtime, info )    << "using memcpy-copy of " << ValuePtr<T>::staticName() << " without scaling";
+	memcpy( dst, src, count * sizeof( T ) );
 }
-template<typename T> void numeric_copy_impl( const T *src, T *dst, size_t count,double scale, double offset )
+template<typename T> void numeric_copy_impl( const T *src, T *dst, size_t count, double scale, double offset )
 {
-	LOG( Runtime, info )	<< "using generic scaling copy of " << ValuePtr<T>::staticName() << " with scale/offset " << std::fixed << scale << "/" << offset;
+	LOG( Runtime, info )    << "using generic scaling copy of " << ValuePtr<T>::staticName() << " with scale/offset " << std::fixed << scale << "/" << offset;
+
 	for ( size_t i = 0; i < count; i++ )
-		dst[i] = src[i]*scale+offset;
+		dst[i] = src[i] * scale + offset;
 }
 
 #ifdef ISIS_USE_LIBOIL
@@ -225,10 +231,10 @@ getNumericScaling( const util::_internal::ValueBase &min, const util::_internal:
 		//else if src is completly on negative dmain, or if there is no positive domain use maxval
 		//elsewise leave it at 0 and scale both sides
 		if ( minval > 0 || !domain_min ) {
-			if ( ( maxval - domain_max ) > 0 ) // if the values completely fit into the domain we dont have to offset them
+// 			if ( ( maxval - domain_max ) > 0 ) // if the values completely fit into the domain we dont have to offset them
 				offset = -minval;
 		} else if ( ( 0 - maxval ) > 0 || !domain_max ) {
-			if ( ( domain_min - minval ) > 0  ) // if the values completely fit into the domain we dont have to offset them
+// 			if ( ( domain_min - minval ) > 0  ) // if the values completely fit into the domain we dont have to offset them
 				offset = -maxval;
 		}
 
@@ -253,11 +259,20 @@ getNumericScaling( const util::_internal::ValueBase &min, const util::_internal:
 				scale = 1;
 			}
 		}
-
-		offset *= scale;//calc offset for dst
+		if(scale==1){
+			if((minval - domain_min)>0 && (domain_max - maxval) > 0 )
+				offset=0; // if the source does fit into the domain, and we do not scale - we wont need an offset
+		} else
+			offset *= scale;//calc offset for dst
 	}
 
 	return std::make_pair( scale, offset );
+}
+template<typename SRC, typename DST> std::pair<double, double>
+getComplexScaling( const util::_internal::ValueBase &/*min*/, const util::_internal::ValueBase &/*max*/, autoscaleOption /*scaleopt = autoscale*/ )
+{
+	LOG(Debug, error) << "Sorry scaling of complex values is not supportet yet";
+	return std::pair<double,double>(1,0);
 }
 
 /**

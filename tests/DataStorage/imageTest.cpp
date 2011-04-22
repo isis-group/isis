@@ -509,16 +509,6 @@ BOOST_AUTO_TEST_CASE( typediamge_test )
 		//Check if the metadata were copied correct
 		BOOST_CHECK_EQUAL( static_cast<util::PropertyMap>( img ), static_cast<util::PropertyMap>( img2 ) );
 
-		for ( int i = 0; i < 3; i++ )
-			for ( int j = 0; j < 3; j++ ) {
-				data::Chunk c1 = img.getChunk( 0, 0, j, i );
-				data::Chunk c2 = img2.getChunk( 0, 0, j, i );
-				BOOST_REQUIRE( c1.is<uint8_t>() ); // this was 8bit
-				BOOST_REQUIRE( c2.is<uint8_t>() ); // could be kept
-				// As TypedImage does cheap copy if possible this should still be the same memory
-				BOOST_CHECK_EQUAL( ( void * )&c1.voxel<uint8_t>( 0, 0 ), ( void * )&c2.voxel<uint8_t>( 0, 0 ) );
-			}
-
 		for ( int i = 3; i < 10; i++ )
 			for ( int j = 0; j < 3; j++ ) {
 				data::Chunk c1 = img.getChunk( 0, 0, j, i );

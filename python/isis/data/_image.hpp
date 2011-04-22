@@ -172,11 +172,13 @@ public:
 		}
 
 		boost::numeric::ublas::matrix<float> boostMatrix( 3, 3 );
-		for (unsigned short i=0;i<3;i++) {
-			for (unsigned short j=0;j<3;j++) {
+
+		for ( unsigned short i = 0; i < 3; i++ ) {
+			for ( unsigned short j = 0; j < 3; j++ ) {
 				boostMatrix( i, j ) = boost::python::extract<float> ( rows[i][j] );
 			}
 		}
+
 		this->transformCoords( boostMatrix );
 	}
 
