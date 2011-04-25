@@ -93,7 +93,7 @@ class ImageFormat_Nifti : public FileFormat
 			m_pNiImage( ni ), m_filename( filename ) {}
 
 		//the most important operator
-		void operator ()( void *at ) {
+		void operator ()( void * ) {
 			LOG_IF( NULL == m_pNiImage, ImageIoLog, error )
 					<<  "Trying to close non-existing nifti file: " << util::MSubject( m_filename );
 			LOG( ImageIoDebug, info ) << "Closing Nifti-Chunk file " << util::MSubject( m_filename );
@@ -109,7 +109,7 @@ public:
 	enum vectordirection {readDir = 0, phaseDir, sliceDir, indexOrigin, voxelSizeVec};
 
 
-	std::string dialects( const std::string &filename )const {
+	std::string dialects( const std::string &/*filename*/ )const {
 		return std::string( "fsl spm" );
 	}
 

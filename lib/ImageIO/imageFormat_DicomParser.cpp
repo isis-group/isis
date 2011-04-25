@@ -41,7 +41,7 @@ template<typename T> std::list<T> dcmtkListString2list( DcmElement *elem )
  */
 void ImageFormat_Dicom::parseAS( DcmElement *elem, const util::istring &name, util::PropertyMap &map )
 {
-	uint16_t duration;
+	uint16_t duration=0;
 	OFString buff;
 	elem->getOFString( buff, 0 );
 	static boost::numeric::converter <
