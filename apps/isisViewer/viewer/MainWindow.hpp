@@ -37,6 +37,7 @@ public Q_SLOTS:
 	void openImage();
 	void contextMenuImageStack( QPoint );
 	void triggeredMakeCurrentImage( bool );
+	void doubleClickedMakeCurrentImage( QListWidgetItem* );
 
 	void upperThresholdChanged( int );
 	void lowerThresholdChanged( int );

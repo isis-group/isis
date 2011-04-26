@@ -26,6 +26,7 @@ MainWindow::MainWindow( QViewerCore *core )
 	connect( core, SIGNAL( emitImagesChanged( DataContainer ) ), this, SLOT( imagesChanged( DataContainer ) ) );
 	connect( core, SIGNAL( emitPhysicalCoordsChanged( util::fvector4 ) ), this, SLOT( physicalCoordsChanged( util::fvector4 ) ) );
 	connect( ui.imageStack, SIGNAL( itemClicked( QListWidgetItem * ) ), this, SLOT( checkImageStack( QListWidgetItem * ) ) );
+	connect(ui.imageStack, SIGNAL( itemDoubleClicked(QListWidgetItem*)), this, SLOT( doubleClickedMakeCurrentImage( QListWidgetItem* ) ) );
 	connect( ui.action_Open_Image, SIGNAL( triggered() ), this, SLOT( openImage() ) );
 	connect( ui.upperThreshold, SIGNAL( sliderMoved( int ) ), this, SLOT( upperThresholdChanged( int ) ) );
 	connect( ui.lowerThreshold, SIGNAL( sliderMoved( int ) ), this, SLOT( lowerThresholdChanged( int ) ) );
@@ -74,8 +75,12 @@ void MainWindow::triggeredMakeCurrentImage( bool triggered )
 	ui.upperThreshold->setSliderPosition(
 		1000.0 / range *
 		( m_ViewerCore->getCurrentImage()->getImageState().threshold.second - m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>() ) );
-	ui.imageStack->currentItem()->setIcon(QIcon(":/common/icon_check.png"));
+	imagesChanged(m_ViewerCore->getDataContainer());
+}
 
+void MainWindow::doubleClickedMakeCurrentImage(QListWidgetItem* )
+{
+	triggeredMakeCurrentImage(true);
 }
 
 
@@ -176,7 +181,7 @@ void MainWindow::checkImageStack( QListWidgetItem *item )
 	} else if( item->checkState() == Qt::Unchecked ) {
 		m_ViewerCore->getDataContainer().at( item->text().toStdString() )->setVisible( false );
 	}
-
+	
 	m_ViewerCore->updateScene();
 
 }
