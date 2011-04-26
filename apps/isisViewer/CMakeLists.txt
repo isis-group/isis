@@ -6,6 +6,7 @@ file (GLOB VIEWER_FILES_CPP viewer/*.c viewer/*.cpp)
 file (GLOB GLWIDGET_FILES_HPP GLWidget/*.hpp GLWidget/*.h)
 file (GLOB GLWIDGET_FILES_CPP GLWidget/*.cpp GLWidget/*.c)
 file (GLOB UI_FILES forms/*.ui)
+file (GLOB RESOURCE_FILES resources/*.qrc)
 
 ###########################################################
 # isis stuff
@@ -43,9 +44,12 @@ set(QT_USE_QTUITOOLS TRUE)
 set(QT_USE_QTOPENGL TRUE)
 set( QT_USE_OPENGL TRUE )
 
+QT4_ADD_RESOURCES(isisViewer_rcc_files ${RESOURCE_FILES})
 
 qt4_wrap_cpp(isisViewer_moc_files ${VIEWER_FILES_HPP} ${GLWIDGET_FILES_HPP})
 QT4_WRAP_UI(isisViewer_UIS_H ${UI_FILES})
+
+
 
 ###########################################################
 # opengl stuff
@@ -73,7 +77,7 @@ SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DQT_NO_KEYWORDS -Wextra -Wshadow  -Wfatal-e
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-depth-100")
 
-add_executable(isisViewer main.cpp ${GLWIDGET_FILES_CPP} ${VIEWER_FILES_CPP} ${isisViewer_UIS_H} ${isisViewer_moc_files})
+add_executable(isisViewer main.cpp ${GLWIDGET_FILES_CPP} ${VIEWER_FILES_CPP} ${isisViewer_UIS_H} ${isisViewer_moc_files} ${isisViewer_rcc_files})
 
 set(NEEDED_LIBS
 	${OPENGL_LIBRARY} 

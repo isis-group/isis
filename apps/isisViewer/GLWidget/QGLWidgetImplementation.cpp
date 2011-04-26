@@ -177,12 +177,14 @@ bool QGLWidgetImplementation::calculateTranslation( const float &mousex, const f
 {
 	State &state = m_StateValues[m_ViewerCore->getCurrentImage()];
 	std::pair<int16_t, int16_t> center = std::make_pair<int16_t, int16_t>( state.viewport[2] / 2 + state.viewport[0], state.viewport[3] / 2 + state.viewport[1] );
-	GLdouble *mat = state.modelViewMatrix;
 	float shiftx = ( 1.0 / state.viewport[2] ) * ( center.first - mousex );
 	float shifty = ( 1.0 / state.viewport[3] ) * ( center.second - mousey );
-
-	mat[12] = shiftx;
-	mat[13] = shifty;
+	BOOST_FOREACH( StateMap::reference stateRef, m_StateValues) 
+	{
+		stateRef.second.modelViewMatrix[12] = shiftx;
+		stateRef.second.modelViewMatrix[13] = shifty;
+	}
+	
 
 }
 
@@ -438,7 +440,6 @@ void QGLWidgetImplementation::emitMousePressEvent( QMouseEvent *e )
 		if( rightButtonPressed ) {
 			calculateTranslation( e->x(), height() - e->y() );
 		}
-
 		std::pair<float, float> objectCoords = window2ObjectCoords( e->x(), height() - e->y(), m_ViewerCore->getCurrentImage() );
 		util::ivector4 voxelCoords = GLOrientationHandler::transformObject2VoxelCoords( util::fvector4( objectCoords.first, objectCoords.second, m_StateValues.at( m_ViewerCore->getCurrentImage() ).normalizedSlice ), m_ViewerCore->getCurrentImage(), m_PlaneOrientation );
 		physicalCoordsChanged( m_ViewerCore->getCurrentImage()->getImage()->getPhysicalCoords( voxelCoords ) );
@@ -526,8 +527,6 @@ void QGLWidgetImplementation::setInterpolationType( const isis::viewer::GLTextur
 
 void QGLWidgetImplementation::updateScene()
 {
-	util::fvector4 phys = m_ViewerCore->getCurrentImage()->getImage()->getPhysicalCoords( m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords );
-	util::ivector4 vox = m_ViewerCore->getCurrentImage()->getImage()->getVoxelCoords( phys );
 	lookAtPhysicalCoords( m_ViewerCore->getCurrentImage()->getImage()->getPhysicalCoords( m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords ) );
 }
 

@@ -50,6 +50,7 @@ public Q_SLOTS:
 	virtual void timestepChanged( int );
 	virtual void setShowLabels( bool );
 	virtual void updateScene();
+	virtual void setAutomaticScaling( bool );
 
 Q_SIGNALS:
 	void emitVoxelCoordChanged( util::ivector4 );
@@ -57,6 +58,7 @@ Q_SIGNALS:
 	void emitTimeStepChange( unsigned int );
 	void emitImagesChanged( DataContainer );
 	void emitShowLabels( bool );
+	void emitSetAutomaticScaling( bool );
 	void emitUpdateScene();
 
 private:

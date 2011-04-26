@@ -142,7 +142,7 @@
             <rect>
              <x>10</x>
              <y>240</y>
-             <width>191</width>
+             <width>231</width>
              <height>101</height>
             </rect>
            </property>
@@ -150,6 +150,18 @@
             <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
            </property>
            <property name="dragEnabled">
+            <bool>true</bool>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>16</width>
+             <height>16</height>
+            </size>
+           </property>
+           <property name="movement">
+            <enum>QListView::Free</enum>
+           </property>
+           <property name="selectionRectVisible">
             <bool>true</bool>
            </property>
           </widget>
@@ -182,7 +194,7 @@
           <widget class="QSlider" name="upperThreshold">
            <property name="geometry">
             <rect>
-             <x>210</x>
+             <x>250</x>
              <y>10</y>
              <width>19</width>
              <height>331</height>
@@ -213,7 +225,7 @@
           <widget class="QSlider" name="lowerThreshold">
            <property name="geometry">
             <rect>
-             <x>230</x>
+             <x>270</x>
              <y>10</y>
              <width>20</width>
              <height>331</height>
@@ -235,7 +247,7 @@
           <widget class="QLabel" name="maxLabel">
            <property name="geometry">
             <rect>
-             <x>250</x>
+             <x>290</x>
              <y>8</y>
              <width>91</width>
              <height>20</height>
@@ -248,7 +260,7 @@
           <widget class="QLabel" name="minLabel">
            <property name="geometry">
             <rect>
-             <x>250</x>
+             <x>290</x>
              <y>320</y>
              <width>91</width>
              <height>18</height>
@@ -300,8 +312,16 @@
       <string>&amp;Quick Settings</string>
      </property>
      <addaction name="actionShow_labels"/>
+     <addaction name="actionAutomatic_Scaling"/>
+    </widget>
+    <widget class="QMenu" name="menuSpatiality">
+     <property name="title">
+      <string>Spatiality</string>
+     </property>
+     <addaction name="actionIgnore_Orientation"/>
     </widget>
     <addaction name="menuQuick_Settings"/>
+    <addaction name="menuSpatiality"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Preferences"/>
@@ -334,6 +354,9 @@
    <property name="text">
     <string>Show &amp;labels</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
+   </property>
   </action>
   <action name="actionShow_Toolbox">
    <property name="text">
@@ -360,7 +383,28 @@
     <string>Set</string>
    </property>
   </action>
+  <action name="actionIgnore_Orientation">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Ignore Orientation</string>
+   </property>
+  </action>
+  <action name="actionAutomatic_Scaling">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Automatic scaling</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="../resources/viewer.qrc"/>
+ </resources>
  <connections/>
 </ui>

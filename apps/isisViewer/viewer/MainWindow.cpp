@@ -21,6 +21,7 @@ MainWindow::MainWindow( QViewerCore *core )
 
 	connect( ui.action_Exit, SIGNAL( triggered() ), this, SLOT( exitProgram() ) );
 	connect( ui.actionShow_labels, SIGNAL( toggled( bool ) ), m_ViewerCore, SLOT( setShowLabels( bool ) ) );
+	connect( ui.actionAutomatic_Scaling, SIGNAL( toggled(bool)), m_ViewerCore, SLOT( setAutomaticScaling( bool)));
 	connect( actionMakeCurrent, SIGNAL( triggered( bool ) ), this, SLOT( triggeredMakeCurrentImage( bool ) ) );
 	connect( core, SIGNAL( emitImagesChanged( DataContainer ) ), this, SLOT( imagesChanged( DataContainer ) ) );
 	connect( core, SIGNAL( emitPhysicalCoordsChanged( util::fvector4 ) ), this, SLOT( physicalCoordsChanged( util::fvector4 ) ) );
@@ -64,6 +65,7 @@ void MainWindow::contextMenuImageStack( QPoint position )
 
 void MainWindow::triggeredMakeCurrentImage( bool triggered )
 {
+	
 	m_ViewerCore->setCurrentImage( m_ViewerCore->getDataContainer().at( ui.imageStack->currentItem()->text().toStdString() ) );
 	double range = m_ViewerCore->getCurrentImage()->getMinMax().second->as<double>() - m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>();
 	ui.lowerThreshold->setSliderPosition(
@@ -72,7 +74,7 @@ void MainWindow::triggeredMakeCurrentImage( bool triggered )
 	ui.upperThreshold->setSliderPosition(
 		1000.0 / range *
 		( m_ViewerCore->getCurrentImage()->getImageState().threshold.second - m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>() ) );
-
+	ui.imageStack->currentItem()->setIcon(QIcon(":/common/icon_check.png"));
 
 }
 
@@ -124,14 +126,17 @@ void MainWindow::imagesChanged( DataContainer images )
 			item->setText( QString( imageRef.second->getFileNames().front().c_str() ) );
 		}
 
-		item->setFlags( Qt::ItemIsEnabled | Qt::ItemIsUserCheckable );
+		item->setFlags( Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsSelectable );
 
 		if( imageRef.second->getImageState().visible ) {
 			item->setCheckState( Qt::Checked );
 		} else {
 			item->setCheckState( Qt::Unchecked );
 		}
-
+		if(m_ViewerCore->getCurrentImage().get() == imageRef.second.get()) {
+			item->setIcon(QIcon(":/common/icon_check.png"));
+		}
+	
 		ui.imageStack->addItem( item );
 	}
 	ui.minLabel->setText( QString( m_ViewerCore->getCurrentImage()->getMinMax().first.toString().c_str() ) );
@@ -156,7 +161,6 @@ void MainWindow::openImage()
 			BOOST_FOREACH( std::list<data::Image>::const_reference image, tempImgList ) {
 				imgList.push_back( image );
 			}
-
 		}
 		m_ViewerCore->addImageList( imgList, ImageHolder::anatomical_image, pathList );
 		m_ViewerCore->updateScene();
