@@ -171,6 +171,28 @@ BOOST_AUTO_TEST_CASE ( minimal_image_test )
 	BOOST_CHECK( img.isValid() );
 	BOOST_CHECK_EQUAL( img.getSizeAsVector(), ( util::FixedVector<size_t, 4>( size ) ) );
 }
+BOOST_AUTO_TEST_CASE ( minindexdim_test )
+{
+	std::list<data::Chunk> chunks1;
+
+	for( int i = 0; i < 3; i++ ) {
+		chunks1.push_back( genSlice<float>( 4, 4, i ) );
+	}
+	std::list<data::Chunk> chunks2(chunks1);
+
+	data::Image img1( chunks1 );
+	data::Image img2( chunks2, data::timeDim );
+
+	const size_t size1[] = {4, 4, 3, 1};
+	const size_t size2[] = {4, 4, 1, 3};
+
+	BOOST_REQUIRE( img1.isClean() );BOOST_REQUIRE( img1.isValid() );
+	BOOST_REQUIRE( img2.isClean() );BOOST_REQUIRE( img2.isValid() );
+
+	BOOST_CHECK_EQUAL( img1.getSizeAsVector(), ( util::FixedVector<size_t, 4>( size1 ) ) );
+	BOOST_CHECK_EQUAL( img2.getSizeAsVector(), ( util::FixedVector<size_t, 4>( size2 ) ) );
+}
+
 
 BOOST_AUTO_TEST_CASE ( type_selection_test )
 {

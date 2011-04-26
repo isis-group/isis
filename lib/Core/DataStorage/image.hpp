@@ -32,7 +32,18 @@ class Image:
 	public _internal::NDimensional<4>,
 	public util::PropertyMap
 {
+	dimensions minIndexingDim;
 public:
+	/**
+	 * Enforce indexing to start at a given dimension.
+	 * Normally indexing starts at the dimensionality of the inserted chunks.
+	 * So, an Image of 2D-Chunks (slices) will start indexing at the 3rd dimension.
+	 * If the dimension given here is bigger than the dimensionality of the chunks reindexing will override that and start indexing at the given dimension.
+	 * E.g. setIndexingDim(timeDim) will enforce indexing of a Image of 10 30x30-slices at the time dimension resulting in an 30x30x1x10 image instead of an 30x30x10x1 image.
+	 * If the indexing dimension is set after the Image was indexed it will be indexed again.
+	 * \param d the minimal indexing dimension to be used
+	 */
+	 void setIndexingDim(dimensions d=rowDim);
 	enum orientation {axial, reversed_axial, sagittal, reversed_sagittal, coronal, reversed_coronal};
 
 protected:
@@ -122,7 +133,11 @@ public:
 	 * Create image from a list of Chunks or objects with the base Chunk.
 	 * Removes used chunks from the given list. So afterwards the list consists of the rejected chunks.
 	 */
-	template<typename T> Image( std::list<T> &chunks ) : _internal::NDimensional<4>(), util::PropertyMap(), set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ), clean( false ) {
+	template<typename T> Image( std::list<T> &chunks,dimensions min_dim=rowDim ) :
+		_internal::NDimensional<4>(), util::PropertyMap(),
+		set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ),
+		clean( false ),minIndexingDim(min_dim)
+	{
 		addNeededFromString( neededProperties );
 		set.addSecondarySort( "acquisitionNumber" );
 		set.addSecondarySort( "acquisitionTime" );
@@ -132,7 +147,11 @@ public:
 	 * Create image from a vector of Chunks or objects with the base Chunk.
 	 * Removes used chunks from the given list. So afterwards the list consists of the rejected chunks.
 	 */
-	template<typename T> Image( std::vector<T> &chunks ) : _internal::NDimensional<4>(), util::PropertyMap(), set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ), clean( false ) {
+	template<typename T> Image( std::vector<T> &chunks,dimensions min_dim=rowDim ) :
+		_internal::NDimensional<4>(), util::PropertyMap(),
+		set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ),
+		clean( false ),minIndexingDim(min_dim)
+	{
 		addNeededFromString( neededProperties );
 		set.addSecondarySort( "acquisitionNumber" );
 		set.addSecondarySort( "acquisitionTime" );
@@ -166,6 +185,8 @@ public:
 				LOG_IF( !getMissing().empty(), Debug, warning )
 				<< "The created image is missing some properties: " << getMissing() << ". It will be invalid.";
 			}
+		} else {
+			LOG(Debug,warning) << "Image is empty after inserting chunks.";
 		}
 		return cnt;
 	}
@@ -174,7 +195,7 @@ public:
 	/**
 	 * Create image from a single chunk.
 	 */
-	Image( const Chunk &chunk );
+	Image( const Chunk &chunk,dimensions min_dim=rowDim );
 
 	/**
 	 * Copy operator.

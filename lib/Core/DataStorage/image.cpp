@@ -38,7 +38,10 @@ Image::Image ( ) : set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMas
 	set.addSecondarySort( "acquisitionTime" );
 }
 
-Image::Image ( const Chunk &chunk ) : _internal::NDimensional<4>(), util::PropertyMap(), set( "sequenceNumber,rowVec,columnVec,coilChannelMask,DICOM/EchoNumbers" ), clean( false )
+Image::Image ( const Chunk &chunk,dimensions min_dim ) :
+	_internal::NDimensional<4>(), util::PropertyMap(),
+	set( "sequenceNumber,rowVec,columnVec,coilChannelMask,DICOM/EchoNumbers" ),
+	clean( false ),minIndexingDim(min_dim)
 {
 	addNeededFromString( neededProperties );
 	set.addSecondarySort( "acquisitionNumber" );
@@ -164,6 +167,15 @@ bool Image::insertChunk ( const Chunk &chunk )
 	}
 }
 
+void Image::setIndexingDim(dimensions d)
+{
+	minIndexingDim=d;
+	if(clean){
+		LOG(Debug,warning) << "Image was allready indexed. reIndexing ...";
+		reIndex();
+	}
+}
+
 
 bool Image::reIndex()
 {
@@ -183,7 +195,8 @@ bool Image::reIndex()
 	structure_size.fill( 1 );
 	//get primary attributes from geometrically first chunk - will be usefull
 	const Chunk &first = chunkAt( 0 );
-	const unsigned short chunk_dims = first.getRelevantDims();
+	//start indexing at eigther the chunk-size or the givem minIndexingDim (whichever is bigger)
+	const unsigned short chunk_dims = std::max<unsigned short>(first.getRelevantDims(),minIndexingDim);
 	chunkVolume = first.getVolume();
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Determine structure of the image by searching for dimensional breaks in the chunklist
