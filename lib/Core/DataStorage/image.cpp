@@ -176,9 +176,10 @@ util::fvector4 Image::getPhysicalCoords(const isis::util::ivector4& voxelCoords)
 util::ivector4 Image::getVoxelCoords(const isis::util::fvector4& physicalCoords) const
 {
 	util::fvector4 vec1 = physicalCoords - m_Offset;
-	return util::ivector4( vec1[0] * m_RowVecInv[0] + vec1[1] * m_ColumnVecInv[0] + vec1[2] * m_SliceVecInv[0],
+	util::fvector4 ret = util::fvector4( vec1[0] * m_RowVecInv[0] + vec1[1] * m_ColumnVecInv[0] + vec1[2] * m_SliceVecInv[0],
 							vec1[0] * m_RowVecInv[1] + vec1[1] * m_ColumnVecInv[1] + vec1[2] * m_SliceVecInv[1],
-							vec1[0] * m_RowVecInv[2] + vec1[1] * m_ColumnVecInv[2] + vec1[2] * m_SliceVecInv[2] );
+							vec1[0] * m_RowVecInv[2] + vec1[1] * m_ColumnVecInv[2] + vec1[2] * m_SliceVecInv[2]);
+	return  util::Value<util::fvector4>(ret).as<util::ivector4>();
 }
 
 
@@ -197,15 +198,16 @@ void Image::updateOrientationMatrices()
 	LOG(Debug, verbose_info) << "[ " << m_RowVec[1] << " " << m_ColumnVec[1] << " " << m_SliceVec[1] << " ] + " << m_Offset[1];
 	LOG(Debug, verbose_info) << "[ " << m_RowVec[2] << " " << m_ColumnVec[2] << " " << m_SliceVec[2] << " ] + " << m_Offset[2];
 	//since we do not want to calculate the inverse matrix with every getVoxelCoords call again we do it here once
-	m_RowVecInv[0] = m_RowVec[0] != 0 ? 1.0 / m_RowVec[0] : 0;
-	m_RowVecInv[1] = m_ColumnVec[0] != 0 ? 1.0 / m_ColumnVec[0] : 0;
-	m_RowVecInv[2] = m_SliceVec[0] != 0 ? 1.0 / m_SliceVec[0] : 0;
-	m_ColumnVecInv[0] = m_RowVec[1] != 0 ? 1.0 / m_RowVec[1] : 0;
-	m_ColumnVecInv[1] = m_ColumnVec[1] != 0 ? 1.0 / m_ColumnVec[1] : 0;
-	m_ColumnVecInv[2] = m_SliceVec[1] != 0 ? 1.0 / m_SliceVec[1] : 0;
-	m_SliceVecInv[0] = m_RowVec[2] != 0 ? 1.0 / m_RowVec[2] : 0;
-	m_SliceVecInv[1] = m_ColumnVec[2] != 0 ? 1.0 / m_ColumnVec[2] : 0;
-	m_SliceVecInv[2] = m_SliceVec[2] != 0 ? 1.0 / m_SliceVec[2] : 0;
+	for (size_t i = 0;i<3;i++) {
+		spacing[i] = spacing[i] ? 1.0 / spacing[i] : 0;
+	}
+	m_RowVecInv = util::fvector4( rowVec[0] * spacing[0], columnVec[0] * spacing[0], sliceVec[0] * spacing[0] );
+	m_ColumnVecInv = util::fvector4( rowVec[1] * spacing[1], columnVec[1] * spacing[1], sliceVec[1] * spacing[1] );
+	m_SliceVecInv = util::fvector4( rowVec[2] * spacing[2], columnVec[2] * spacing[2], sliceVec[2] * spacing[2] );
+	LOG(Debug, verbose_info) << "Created transposed orientation matrix: ";
+	LOG(Debug, verbose_info) << "[ " << m_RowVecInv[0] << " " << m_ColumnVecInv[0] << " " << m_SliceVecInv[0] << " ] + " << m_Offset[0];
+	LOG(Debug, verbose_info) << "[ " << m_RowVecInv[1] << " " << m_ColumnVecInv[1] << " " << m_SliceVecInv[1] << " ] + " << m_Offset[1];
+	LOG(Debug, verbose_info) << "[ " << m_RowVecInv[2] << " " << m_ColumnVecInv[2] << " " << m_SliceVecInv[2] << " ] + " << m_Offset[2];
 }
 
 

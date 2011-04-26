@@ -144,10 +144,10 @@ void QGLWidgetImplementation::updateStateValues( boost::shared_ptr<ImageHolder> 
 
 	GLOrientationHandler::recalculateViewport( width(), height(), state.mappedVoxelSize, state.mappedImageSize, state.viewport, border );
 
-	if( rightButtonPressed || zoomEventHappened ) {
-		zoomEventHappened = false;
-		calculateTranslation( image );
-	}
+// 	if( rightButtonPressed || zoomEventHappened ) {
+// 		zoomEventHappened = false;
+// 		calculateTranslation( image );
+// 	}
 
 	util::dvector4 objectCoords = GLOrientationHandler::transformVoxel2ObjectCoords( state.voxelCoords, image, state.planeOrientation );
 	state.crosshairCoords = object2WindowCoords( objectCoords[0], objectCoords[1], image );
@@ -173,22 +173,17 @@ std::pair<int16_t, int16_t> QGLWidgetImplementation::object2WindowCoords( GLdoub
 	return std::make_pair<int16_t, int16_t>( ( win[0] - stateValue.viewport[0] ), win[1] - stateValue.viewport[1] );
 }
 
-bool QGLWidgetImplementation::calculateTranslation( const boost::shared_ptr<ImageHolder> image )
+bool QGLWidgetImplementation::calculateTranslation( const float &mousex, const float &mousey )
 {
-	State &state = m_StateValues[image];
-	std::pair<int16_t, int16_t> center = std::make_pair<int16_t, int16_t>( abs( state.mappedImageSize[0] ) / 2, abs( state.mappedImageSize[1] ) / 2 );
-	float shiftX = center.first - ( state.mappedVoxelCoords[0] < 0 ? abs( state.mappedImageSize[0] ) + state.mappedVoxelCoords[0] : state.mappedVoxelCoords[0] );
-	float shiftY =  center.second - ( state.mappedVoxelCoords[1] < 0 ? abs( state.mappedImageSize[1] ) + state.mappedVoxelCoords[1] : state.mappedVoxelCoords[1] );
+	State &state = m_StateValues[m_ViewerCore->getCurrentImage()];
+	std::pair<int16_t, int16_t> center = std::make_pair<int16_t, int16_t>( state.viewport[2] / 2 + state.viewport[0], state.viewport[3] / 2 + state.viewport[1] );
 	GLdouble *mat = state.modelViewMatrix;
-	state.modelViewMatrix[12] = ( 1.0 / abs( state.mappedImageSize[0] ) ) * shiftX ;
-	state.modelViewMatrix[13] = ( 1.0 / abs( state.mappedImageSize[1] ) ) * shiftY ;
-	mat[12] = state.modelViewMatrix[12] ;
-	mat[13] = state.modelViewMatrix[13] ;
-
-	glMatrixMode( GL_MODELVIEW );
-	glLoadIdentity();
-	glLoadMatrixd( mat );
-
+	float shiftx = (1.0 / state.viewport[2]) * (center.first - mousex);
+	float shifty = (1.0 / state.viewport[3]) * (center.second - mousey);
+	
+	mat[12] = shiftx;
+	mat[13] = shifty;
+	
 }
 
 bool QGLWidgetImplementation::lookAtPhysicalCoords(const boost::shared_ptr< ImageHolder > image, const isis::util::fvector4& physicalCoords)
@@ -436,6 +431,9 @@ bool QGLWidgetImplementation::isInViewport( size_t wx, size_t wy )
 void QGLWidgetImplementation::emitMousePressEvent( QMouseEvent *e )
 {
 	if( isInViewport( e->x(), e->y() ) ) {
+		if(rightButtonPressed) {
+			calculateTranslation(e->x(), height() - e->y() );
+		}
 		std::pair<float, float> objectCoords = window2ObjectCoords( e->x(), height() - e->y(), m_ViewerCore->getCurrentImage() );
 		util::ivector4 voxelCoords = GLOrientationHandler::transformObject2VoxelCoords( util::fvector4( objectCoords.first, objectCoords.second, m_StateValues.at( m_ViewerCore->getCurrentImage() ).normalizedSlice ), m_ViewerCore->getCurrentImage(), m_PlaneOrientation );
 		physicalCoordsChanged( m_ViewerCore->getCurrentImage()->getImage()->getPhysicalCoords( voxelCoords) );
@@ -523,6 +521,12 @@ void QGLWidgetImplementation::setInterpolationType( const isis::viewer::GLTextur
 
 void QGLWidgetImplementation::updateScene()
 {
+	std::cout << "currentVoxel: " << m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords << std::endl;
+	util::fvector4 phys = m_ViewerCore->getCurrentImage()->getImage()->getPhysicalCoords( m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords );
+	std::cout << "physical: " << phys << std::endl;
+	util::ivector4 vox = m_ViewerCore->getCurrentImage()->getImage()->getVoxelCoords( phys );
+	std::cout << "voxel again: " << vox << std::endl;
+	
 	lookAtPhysicalCoords( m_ViewerCore->getCurrentImage()->getImage()->getPhysicalCoords( m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords ) );
 }
 
