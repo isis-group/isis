@@ -28,7 +28,7 @@ QViewerCore::registerWidget( std::string key, QWidget *widget, QViewerCore::Acti
 			connect( this, SIGNAL( emitTimeStepChange( unsigned int ) ), w, SLOT( timestepChanged( unsigned int ) ) );
 			connect( this, SIGNAL( emitShowLabels( bool ) ), w, SLOT( setShowLabels( bool ) ) );
 			connect( this, SIGNAL( emitUpdateScene() ), w, SLOT( updateScene() ) );
-		} 
+		}
 	} else {
 		LOG( Runtime, error ) << "A widget with the name " << key << " already exists! Wont add this";
 		return false;
@@ -40,9 +40,9 @@ void QViewerCore::voxelCoordsChanged( util::ivector4 voxelCoords )
 	emitVoxelCoordChanged( voxelCoords );
 }
 
-void QViewerCore::physicalCoordsChanged(util::fvector4 physicalCoords )
+void QViewerCore::physicalCoordsChanged( util::fvector4 physicalCoords )
 {
-	emitPhysicalCoordsChanged(physicalCoords);
+	emitPhysicalCoordsChanged( physicalCoords );
 }
 
 
@@ -55,9 +55,9 @@ void QViewerCore::addImageList( const std::list< data::Image > imageList, const 
 {
 	isis::viewer::ViewerCoreBase::addImageList( imageList, imageType, filenames );
 	emitImagesChanged( getDataContainer() );
-	BOOST_FOREACH( WidgetMap::reference widget, m_WidgetMap) {
+	BOOST_FOREACH( WidgetMap::reference widget, m_WidgetMap ) {
 		BOOST_FOREACH( DataContainer::const_reference data, getDataContainer() ) {
-			dynamic_cast<QGLWidgetImplementation *>(widget.second)->addImage( data.second );
+			dynamic_cast<QGLWidgetImplementation *>( widget.second )->addImage( data.second );
 		}
 	}
 }
@@ -66,9 +66,9 @@ void QViewerCore::setImageList( const std::list< data::Image > imageList, const 
 {
 	isis::viewer::ViewerCoreBase::setImageList( imageList, imageType, filenames );
 	emitImagesChanged( getDataContainer() );
-	BOOST_FOREACH( WidgetMap::reference widget, m_WidgetMap) {
+	BOOST_FOREACH( WidgetMap::reference widget, m_WidgetMap ) {
 		BOOST_FOREACH( DataContainer::const_reference data, getDataContainer() ) {
-			dynamic_cast<QGLWidgetImplementation *>(widget.second)->addImage( data.second );
+			dynamic_cast<QGLWidgetImplementation *>( widget.second )->addImage( data.second );
 		}
 	}
 }

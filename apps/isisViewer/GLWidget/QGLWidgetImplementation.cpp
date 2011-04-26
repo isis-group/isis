@@ -56,13 +56,13 @@ QGLWidgetImplementation *QGLWidgetImplementation::createSharedWidget( QWidget *p
 	return new QGLWidgetImplementation( m_ViewerCore, parent, this, orientation );
 }
 
-void QGLWidgetImplementation::addImage(const boost::shared_ptr<ImageHolder> image)
+void QGLWidgetImplementation::addImage( const boost::shared_ptr<ImageHolder> image )
 {
 	m_StateValues.insert( std::make_pair<boost::shared_ptr<ImageHolder>, State>
-		( image  , State()));
+						  ( image  , State() ) );
 }
 
-bool QGLWidgetImplementation::removeImage(const boost::shared_ptr<ImageHolder> image)
+bool QGLWidgetImplementation::removeImage( const boost::shared_ptr<ImageHolder> image )
 {
 }
 
@@ -97,14 +97,14 @@ void QGLWidgetImplementation::resizeGL( int w, int h )
 	LOG( Debug, verbose_info ) << "resizeGL " << objectName().toStdString();
 
 	if( m_ViewerCore->getDataContainer().size() ) {
-		if(init) {
+		if( init ) {
 			util::ivector4 size = m_ViewerCore->getCurrentImage()->getImageSize();
-			lookAtPhysicalCoords( m_ViewerCore->getCurrentImage()->getImage()->getPhysicalCoords(util::ivector4( size[0] / 2, size[1] / 2, size[2] / 2 )));
+			lookAtPhysicalCoords( m_ViewerCore->getCurrentImage()->getImage()->getPhysicalCoords( util::ivector4( size[0] / 2, size[1] / 2, size[2] / 2 ) ) );
 			init = false;
 		} else {
 			updateScene();
 		}
-		
+
 	}
 }
 
@@ -144,10 +144,10 @@ void QGLWidgetImplementation::updateStateValues( boost::shared_ptr<ImageHolder> 
 
 	GLOrientationHandler::recalculateViewport( width(), height(), state.mappedVoxelSize, state.mappedImageSize, state.viewport, border );
 
-// 	if( rightButtonPressed || zoomEventHappened ) {
-// 		zoomEventHappened = false;
-// 		calculateTranslation( image );
-// 	}
+	//  if( rightButtonPressed || zoomEventHappened ) {
+	//      zoomEventHappened = false;
+	//      calculateTranslation( image );
+	//  }
 
 	util::dvector4 objectCoords = GLOrientationHandler::transformVoxel2ObjectCoords( state.voxelCoords, image, state.planeOrientation );
 	state.crosshairCoords = object2WindowCoords( objectCoords[0], objectCoords[1], image );
@@ -178,20 +178,20 @@ bool QGLWidgetImplementation::calculateTranslation( const float &mousex, const f
 	State &state = m_StateValues[m_ViewerCore->getCurrentImage()];
 	std::pair<int16_t, int16_t> center = std::make_pair<int16_t, int16_t>( state.viewport[2] / 2 + state.viewport[0], state.viewport[3] / 2 + state.viewport[1] );
 	GLdouble *mat = state.modelViewMatrix;
-	float shiftx = (1.0 / state.viewport[2]) * (center.first - mousex);
-	float shifty = (1.0 / state.viewport[3]) * (center.second - mousey);
-	
+	float shiftx = ( 1.0 / state.viewport[2] ) * ( center.first - mousex );
+	float shifty = ( 1.0 / state.viewport[3] ) * ( center.second - mousey );
+
 	mat[12] = shiftx;
 	mat[13] = shifty;
-	
+
 }
 
-bool QGLWidgetImplementation::lookAtPhysicalCoords(const boost::shared_ptr< ImageHolder > image, const isis::util::fvector4& physicalCoords)
+bool QGLWidgetImplementation::lookAtPhysicalCoords( const boost::shared_ptr< ImageHolder > image, const isis::util::fvector4 &physicalCoords )
 {
-	lookAtVoxel( image, image->getImage()->getVoxelCoords( physicalCoords) );
+	lookAtVoxel( image, image->getImage()->getVoxelCoords( physicalCoords ) );
 }
 
-bool QGLWidgetImplementation::lookAtPhysicalCoords(const isis::util::fvector4& physicalCoords)
+bool QGLWidgetImplementation::lookAtPhysicalCoords( const isis::util::fvector4 &physicalCoords )
 {
 	redraw();
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -199,10 +199,12 @@ bool QGLWidgetImplementation::lookAtPhysicalCoords(const isis::util::fvector4& p
 	glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 	BOOST_FOREACH( StateMap::const_reference state, m_StateValues ) {
 		updateStateValues( state.first, state.first->getImage()->getVoxelCoords( physicalCoords ) );
+
 		if( state.first->getImageState().visible ) {
 			paintScene( state.first );
 		}
 	}
+
 	if( m_StateValues.size() ) {
 		paintCrosshair();
 	}
@@ -221,6 +223,7 @@ bool QGLWidgetImplementation::lookAtVoxel( const isis::util::ivector4 &voxelCoor
 
 	BOOST_FOREACH( StateMap::const_reference state, m_StateValues ) {
 		updateStateValues(  state.first, voxelCoords );
+
 		if( state.first->getImageState().visible ) {
 			paintScene(  state.first );
 		}
@@ -234,6 +237,7 @@ bool QGLWidgetImplementation::lookAtVoxel( const isis::util::ivector4 &voxelCoor
 bool QGLWidgetImplementation::lookAtVoxel( const boost::shared_ptr<ImageHolder> image, const util::ivector4 &voxelCoords )
 {
 	updateStateValues( image, voxelCoords );
+
 	if( image->getImageState().visible ) {
 		paintScene( image );
 	}
@@ -283,7 +287,7 @@ void QGLWidgetImplementation::paintScene( const boost::shared_ptr<ImageHolder> i
 		m_LUTShader.addVariable<float>( "lut", 1, true );
 		m_LUTShader.addVariable<float>( "max", image->getMinMax().second->as<float>() );
 		m_LUTShader.addVariable<float>( "min", image->getMinMax().first->as<float>() );
-		m_LUTShader.addVariable<float>("killZeros", 1.0 );
+		m_LUTShader.addVariable<float>( "killZeros", 1.0 );
 		m_LUTShader.addVariable<float>( "upper_threshold", image->getImageState().threshold.second );
 		m_LUTShader.addVariable<float>( "lower_threshold", image->getImageState().threshold.first );
 		m_LUTShader.addVariable<float>( "bias", bias );
@@ -431,12 +435,13 @@ bool QGLWidgetImplementation::isInViewport( size_t wx, size_t wy )
 void QGLWidgetImplementation::emitMousePressEvent( QMouseEvent *e )
 {
 	if( isInViewport( e->x(), e->y() ) ) {
-		if(rightButtonPressed) {
-			calculateTranslation(e->x(), height() - e->y() );
+		if( rightButtonPressed ) {
+			calculateTranslation( e->x(), height() - e->y() );
 		}
+
 		std::pair<float, float> objectCoords = window2ObjectCoords( e->x(), height() - e->y(), m_ViewerCore->getCurrentImage() );
 		util::ivector4 voxelCoords = GLOrientationHandler::transformObject2VoxelCoords( util::fvector4( objectCoords.first, objectCoords.second, m_StateValues.at( m_ViewerCore->getCurrentImage() ).normalizedSlice ), m_ViewerCore->getCurrentImage(), m_PlaneOrientation );
-		physicalCoordsChanged( m_ViewerCore->getCurrentImage()->getImage()->getPhysicalCoords( voxelCoords) );
+		physicalCoordsChanged( m_ViewerCore->getCurrentImage()->getImage()->getPhysicalCoords( voxelCoords ) );
 	}
 }
 
@@ -465,7 +470,7 @@ void QGLWidgetImplementation::wheelEvent( QWheelEvent *e )
 	m_Zoom.currentZoom *= zoomFactor;
 
 	if( m_Zoom.currentZoom >= 1 ) {
-		BOOST_FOREACH( StateMap::reference state, m_StateValues) {
+		BOOST_FOREACH( StateMap::reference state, m_StateValues ) {
 			glMatrixMode( GL_PROJECTION );
 			glLoadMatrixd( state.second.projectionMatrix );
 			glScalef( zoomFactor, zoomFactor, 1 );
@@ -502,7 +507,7 @@ void QGLWidgetImplementation::keyPressEvent( QKeyEvent *e )
 		m_Zoom.currentZoom = 1.0;
 		size_t timestep = m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords[3];
 		util::ivector4 size = m_ViewerCore->getCurrentImage()->getImageSize();
-		lookAtPhysicalCoords( m_ViewerCore->getCurrentImage()->getImage()->getPhysicalCoords(util::ivector4( size[0] / 2, size[1] / 2, size[2] / 2 )));
+		lookAtPhysicalCoords( m_ViewerCore->getCurrentImage()->getImage()->getPhysicalCoords( util::ivector4( size[0] / 2, size[1] / 2, size[2] / 2 ) ) );
 	}
 }
 
@@ -521,12 +526,8 @@ void QGLWidgetImplementation::setInterpolationType( const isis::viewer::GLTextur
 
 void QGLWidgetImplementation::updateScene()
 {
-	std::cout << "currentVoxel: " << m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords << std::endl;
 	util::fvector4 phys = m_ViewerCore->getCurrentImage()->getImage()->getPhysicalCoords( m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords );
-	std::cout << "physical: " << phys << std::endl;
 	util::ivector4 vox = m_ViewerCore->getCurrentImage()->getImage()->getVoxelCoords( phys );
-	std::cout << "voxel again: " << vox << std::endl;
-	
 	lookAtPhysicalCoords( m_ViewerCore->getCurrentImage()->getImage()->getPhysicalCoords( m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords ) );
 }
 

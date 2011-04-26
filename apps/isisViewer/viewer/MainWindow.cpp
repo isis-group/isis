@@ -17,17 +17,17 @@ namespace viewer
 MainWindow::MainWindow( QViewerCore *core )
 	: m_ViewerCore( core )
 {
-	actionMakeCurrent = new QAction( "Make current", this);
-	
+	actionMakeCurrent = new QAction( "Make current", this );
+
 	connect( ui.action_Exit, SIGNAL( triggered() ), this, SLOT( exitProgram() ) );
 	connect( ui.actionShow_labels, SIGNAL( toggled( bool ) ), m_ViewerCore, SLOT( setShowLabels( bool ) ) );
-	connect( actionMakeCurrent, SIGNAL( triggered(bool)), this, SLOT( triggeredMakeCurrentImage( bool) ) );
+	connect( actionMakeCurrent, SIGNAL( triggered( bool ) ), this, SLOT( triggeredMakeCurrentImage( bool ) ) );
 	connect( core, SIGNAL( emitImagesChanged( DataContainer ) ), this, SLOT( imagesChanged( DataContainer ) ) );
-	connect( core, SIGNAL( emitPhysicalCoordsChanged(util::fvector4)), this, SLOT( physicalCoordsChanged(util::fvector4) ) );
+	connect( core, SIGNAL( emitPhysicalCoordsChanged( util::fvector4 ) ), this, SLOT( physicalCoordsChanged( util::fvector4 ) ) );
 	connect( ui.imageStack, SIGNAL( itemClicked( QListWidgetItem * ) ), this, SLOT( checkImageStack( QListWidgetItem * ) ) );
 	connect( ui.action_Open_Image, SIGNAL( triggered() ), this, SLOT( openImage() ) );
-	connect( ui.upperThreshold, SIGNAL( sliderMoved(int)), this, SLOT( upperThresholdChanged(int)));
-	connect( ui.lowerThreshold, SIGNAL( sliderMoved(int)), this, SLOT( lowerThresholdChanged(int)));
+	connect( ui.upperThreshold, SIGNAL( sliderMoved( int ) ), this, SLOT( upperThresholdChanged( int ) ) );
+	connect( ui.lowerThreshold, SIGNAL( sliderMoved( int ) ), this, SLOT( lowerThresholdChanged( int ) ) );
 
 	//we need a master widget to keep opengl running in case all visible widgets were closed
 
@@ -45,34 +45,35 @@ MainWindow::MainWindow( QViewerCore *core )
 	ui.actionShow_labels->setCheckable( true );
 	ui.actionShow_labels->setChecked( false );
 	ui.imageStack->setContextMenuPolicy( Qt::CustomContextMenu );
-	connect( ui.imageStack, SIGNAL( customContextMenuRequested(QPoint)), this, SLOT( contextMenuImageStack(QPoint)));
-	
+	connect( ui.imageStack, SIGNAL( customContextMenuRequested( QPoint ) ), this, SLOT( contextMenuImageStack( QPoint ) ) );
+
 }
 
 
-void MainWindow::contextMenuImageStack(QPoint position )
+void MainWindow::contextMenuImageStack( QPoint position )
 {
 	QList<QAction *> actions;
-	
-	if( ui.imageStack->indexAt(position).isValid() ) {
-		actions.append(actionMakeCurrent );
+
+	if( ui.imageStack->indexAt( position ).isValid() ) {
+		actions.append( actionMakeCurrent );
 	}
-	QMenu::exec(actions, ui.imageStack->mapToGlobal(position));
-	
+
+	QMenu::exec( actions, ui.imageStack->mapToGlobal( position ) );
+
 }
 
-void MainWindow::triggeredMakeCurrentImage(bool triggered )
+void MainWindow::triggeredMakeCurrentImage( bool triggered )
 {
 	m_ViewerCore->setCurrentImage( m_ViewerCore->getDataContainer().at( ui.imageStack->currentItem()->text().toStdString() ) );
 	double range = m_ViewerCore->getCurrentImage()->getMinMax().second->as<double>() - m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>();
-	ui.lowerThreshold->setSliderPosition( 
-		1000.0 / range * 
-		(m_ViewerCore->getCurrentImage()->getImageState().threshold.first - m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>()) );
-	ui.upperThreshold->setSliderPosition( 
-		1000.0 / range * 
-		(m_ViewerCore->getCurrentImage()->getImageState().threshold.second - m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>()) );	
-	
-		
+	ui.lowerThreshold->setSliderPosition(
+		1000.0 / range *
+		( m_ViewerCore->getCurrentImage()->getImageState().threshold.first - m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>() ) );
+	ui.upperThreshold->setSliderPosition(
+		1000.0 / range *
+		( m_ViewerCore->getCurrentImage()->getImageState().threshold.second - m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>() ) );
+
+
 }
 
 
@@ -133,8 +134,8 @@ void MainWindow::imagesChanged( DataContainer images )
 
 		ui.imageStack->addItem( item );
 	}
-	ui.minLabel->setText( QString(m_ViewerCore->getCurrentImage()->getMinMax().first.toString().c_str() ));
-	ui.maxLabel->setText( QString(m_ViewerCore->getCurrentImage()->getMinMax().second.toString().c_str() ));
+	ui.minLabel->setText( QString( m_ViewerCore->getCurrentImage()->getMinMax().first.toString().c_str() ) );
+	ui.maxLabel->setText( QString( m_ViewerCore->getCurrentImage()->getMinMax().second.toString().c_str() ) );
 }
 
 void MainWindow::openImage()
@@ -171,6 +172,7 @@ void MainWindow::checkImageStack( QListWidgetItem *item )
 	} else if( item->checkState() == Qt::Unchecked ) {
 		m_ViewerCore->getDataContainer().at( item->text().toStdString() )->setVisible( false );
 	}
+
 	m_ViewerCore->updateScene();
 
 }
@@ -180,17 +182,17 @@ void MainWindow::exitProgram()
 	close();
 }
 
-void MainWindow::lowerThresholdChanged(int lowerThreshold)
+void MainWindow::lowerThresholdChanged( int lowerThreshold )
 {
 	double range = m_ViewerCore->getCurrentImage()->getMinMax().second->as<double>() - m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>();
-	m_ViewerCore->getCurrentImage()->setLowerThreshold( (range / 1000) * lowerThreshold + m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>() );
+	m_ViewerCore->getCurrentImage()->setLowerThreshold( ( range / 1000 ) * lowerThreshold + m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>() );
 	m_ViewerCore->updateScene();
 }
 
-void MainWindow::upperThresholdChanged(int upperThreshold )
+void MainWindow::upperThresholdChanged( int upperThreshold )
 {
 	double range = m_ViewerCore->getCurrentImage()->getMinMax().second->as<double>() - m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>();
-	m_ViewerCore->getCurrentImage()->setUpperThreshold( (range / 1000) * upperThreshold + m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>() );
+	m_ViewerCore->getCurrentImage()->setUpperThreshold( ( range / 1000 ) * upperThreshold + m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>() );
 	m_ViewerCore->updateScene();
 
 }
