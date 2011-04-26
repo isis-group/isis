@@ -110,6 +110,7 @@ public:
 	void setLowerThreshold( double lowerThreshold ) { m_ImageState.threshold.first = lowerThreshold ; }
 	void setUpperThreshold( double upperThreshold ) { m_ImageState.threshold.second = upperThreshold ; }
 	void setOpacity( float opacity ) { m_ImageState.opacity = opacity; }
+	void setImageType( ImageType imageType ) { m_ImageState.imageType = imageType; }
 
 private:
 

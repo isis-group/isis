@@ -112,7 +112,9 @@ void QGLWidgetImplementation::updateStateValues( boost::shared_ptr<ImageHolder> 
 {
 	LOG( Debug, verbose_info ) << "Updating state values for widget " << objectName().toStdString();
 	State &state = m_StateValues[image];
+	unsigned int timestep = state.voxelCoords[3];
 	state.voxelCoords = voxelCoords;
+	state.voxelCoords[3] = timestep;
 
 	//check if we are inside the image
 	for( size_t i = 0; i < 4; i++ ) {
@@ -121,7 +123,7 @@ void QGLWidgetImplementation::updateStateValues( boost::shared_ptr<ImageHolder> 
 	}
 
 	//if not happend already copy the image to GLtexture memory and return the texture id
-	state.textureID = util::Singletons::get<GLTextureHandler, 10>().copyImageToTexture( m_ViewerCore->getDataContainer(), image, voxelCoords[3], true, m_InterplationType );
+	state.textureID = util::Singletons::get<GLTextureHandler, 10>().copyImageToTexture( m_ViewerCore->getDataContainer(), image, state.voxelCoords[3], true, m_InterplationType );
 
 	//update the texture matrix.
 	//The texture matrix holds the orientation of the image and the orientation of the current widget. It does NOT hold the scaling of the image.

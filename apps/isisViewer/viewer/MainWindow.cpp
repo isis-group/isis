@@ -18,11 +18,14 @@ MainWindow::MainWindow( QViewerCore *core )
 	: m_ViewerCore( core )
 {
 	actionMakeCurrent = new QAction( "Make current", this );
+	actionAsZMap = new QAction( "Show as zmap", this );
+	actionAsZMap->setCheckable(true);
 
 	connect( ui.action_Exit, SIGNAL( triggered() ), this, SLOT( exitProgram() ) );
 	connect( ui.actionShow_labels, SIGNAL( toggled( bool ) ), m_ViewerCore, SLOT( setShowLabels( bool ) ) );
 	connect( ui.actionAutomatic_Scaling, SIGNAL( toggled(bool)), m_ViewerCore, SLOT( setAutomaticScaling( bool)));
 	connect( actionMakeCurrent, SIGNAL( triggered( bool ) ), this, SLOT( triggeredMakeCurrentImage( bool ) ) );
+	connect( actionAsZMap, SIGNAL( triggered( bool ) ), this, SLOT( triggeredMakeCurrentImageZmap( bool ) ) );
 	connect( core, SIGNAL( emitImagesChanged( DataContainer ) ), this, SLOT( imagesChanged( DataContainer ) ) );
 	connect( core, SIGNAL( emitPhysicalCoordsChanged( util::fvector4 ) ), this, SLOT( physicalCoordsChanged( util::fvector4 ) ) );
 	connect( ui.imageStack, SIGNAL( itemClicked( QListWidgetItem * ) ), this, SLOT( checkImageStack( QListWidgetItem * ) ) );
@@ -30,6 +33,7 @@ MainWindow::MainWindow( QViewerCore *core )
 	connect( ui.action_Open_Image, SIGNAL( triggered() ), this, SLOT( openImage() ) );
 	connect( ui.upperThreshold, SIGNAL( sliderMoved( int ) ), this, SLOT( upperThresholdChanged( int ) ) );
 	connect( ui.lowerThreshold, SIGNAL( sliderMoved( int ) ), this, SLOT( lowerThresholdChanged( int ) ) );
+	connect(ui.timestepSpinBox, SIGNAL( valueChanged(int)), m_ViewerCore, SLOT(timestepChanged(int) )) ;
 
 	//we need a master widget to keep opengl running in case all visible widgets were closed
 
@@ -58,8 +62,9 @@ void MainWindow::contextMenuImageStack( QPoint position )
 
 	if( ui.imageStack->indexAt( position ).isValid() ) {
 		actions.append( actionMakeCurrent );
+		actions.append( actionAsZMap );
 	}
-
+	
 	QMenu::exec( actions, ui.imageStack->mapToGlobal( position ) );
 
 }
@@ -76,7 +81,19 @@ void MainWindow::triggeredMakeCurrentImage( bool triggered )
 		1000.0 / range *
 		( m_ViewerCore->getCurrentImage()->getImageState().threshold.second - m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>() ) );
 	imagesChanged(m_ViewerCore->getDataContainer());
+	m_ViewerCore->updateScene();
 }
+
+void MainWindow::triggeredMakeCurrentImageZmap(bool triggered )
+{
+	if(triggered) {
+		m_ViewerCore->getDataContainer()[ui.imageStack->currentItem()->text().toStdString()]->setImageType( ImageHolder::z_map );
+	}else {
+		m_ViewerCore->getDataContainer()[ui.imageStack->currentItem()->text().toStdString()]->setImageType( ImageHolder::anatomical_image );
+	}
+	m_ViewerCore->updateScene();
+}
+
 
 void MainWindow::doubleClickedMakeCurrentImage(QListWidgetItem* )
 {

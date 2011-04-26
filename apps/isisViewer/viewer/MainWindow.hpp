@@ -37,6 +37,7 @@ public Q_SLOTS:
 	void openImage();
 	void contextMenuImageStack( QPoint );
 	void triggeredMakeCurrentImage( bool );
+	void triggeredMakeCurrentImageZmap( bool );
 	void doubleClickedMakeCurrentImage( QListWidgetItem* );
 
 	void upperThresholdChanged( int );
@@ -50,6 +51,7 @@ private:
 	QGLWidgetImplementation *m_MasterWidget;
 
 	QAction *actionMakeCurrent;
+	QAction *actionAsZMap;
 
 	template<typename TYPE> void displayIntensity( util::ivector4 coords ) {
 		const util::Value<TYPE> value( m_ViewerCore->getCurrentImage()->getImage()->voxel<TYPE>( coords[0], coords[1], coords[2], coords[3] ) );
