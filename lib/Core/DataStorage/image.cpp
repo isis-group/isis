@@ -183,7 +183,7 @@ util::ivector4 Image::getVoxelCoords(const isis::util::fvector4& physicalCoords)
 }
 
 
-void Image::updateOrientationMatrices()
+bool Image::updateOrientationMatrices()
 {
 	util::fvector4 rowVec = getPropertyAs<util::fvector4>("rowVec");
 	util::fvector4 columnVec = getPropertyAs<util::fvector4>("columnVec");
@@ -201,13 +201,33 @@ void Image::updateOrientationMatrices()
 	for (size_t i = 0;i<3;i++) {
 		spacing[i] = spacing[i] ? 1.0 / spacing[i] : 0;
 	}
-	m_RowVecInv = util::fvector4( rowVec[0] * spacing[0], columnVec[0] * spacing[0], sliceVec[0] * spacing[0] );
-	m_ColumnVecInv = util::fvector4( rowVec[1] * spacing[1], columnVec[1] * spacing[1], sliceVec[1] * spacing[1] );
-	m_SliceVecInv = util::fvector4( rowVec[2] * spacing[2], columnVec[2] * spacing[2], sliceVec[2] * spacing[2] );
+	//for inversion of the orientation we use boost::ublas
+	using namespace boost::numeric::ublas;
+	matrix<float> orientation = matrix<float>(3,3);
+	matrix<float> inverse = matrix<float>(3,3);
+	for(size_t i = 0; i<3; i++ ) {
+		orientation(i,0) = m_RowVec[i];
+		orientation(i,1) = m_ColumnVec[i];
+		orientation(i,2) = m_SliceVec[i];
+	}
+	permutation_matrix<float> pm(orientation.size1());
+	int res = lu_factorize(orientation, pm);
+	if(res != 0 ) {
+		LOG(Runtime, error) << "Could not create the inverse of the orientation matrix!";
+		return false;
+	}
+	inverse.assign(identity_matrix<float>(orientation.size1()));
+	lu_substitute(orientation, pm, inverse);
+	for(size_t i = 0; i< 3; i++ ) {
+		m_RowVecInv[i] = inverse(i,0);
+		m_ColumnVecInv[i] = inverse(i,1);
+		m_SliceVecInv[i] = inverse(i,2);
+	}
 	LOG(Debug, verbose_info) << "Created transposed orientation matrix: ";
 	LOG(Debug, verbose_info) << "[ " << m_RowVecInv[0] << " " << m_ColumnVecInv[0] << " " << m_SliceVecInv[0] << " ] + " << m_Offset[0];
 	LOG(Debug, verbose_info) << "[ " << m_RowVecInv[1] << " " << m_ColumnVecInv[1] << " " << m_SliceVecInv[1] << " ] + " << m_Offset[1];
 	LOG(Debug, verbose_info) << "[ " << m_RowVecInv[2] << " " << m_ColumnVecInv[2] << " " << m_SliceVecInv[2] << " ] + " << m_Offset[2];
+	return true;
 }
 
 

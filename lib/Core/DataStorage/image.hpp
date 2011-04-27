@@ -20,8 +20,8 @@
 #include <vector>
 #include <boost/foreach.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/io.hpp>
+#include <boost/numeric/ublas/lu.hpp>
 #include <stack>
 #include "sortedchunklist.hpp"
 
@@ -475,7 +475,7 @@ public:
 	size_t getNrOfTimesteps()const;
 
 	util::fvector4 getFoV()const;
-	void updateOrientationMatrices();
+	bool updateOrientationMatrices();
 };
 
 /**
