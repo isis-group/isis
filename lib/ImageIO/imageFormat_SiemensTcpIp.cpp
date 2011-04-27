@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include "boost/date_time/posix_time/posix_time.hpp"
 
 namespace isis
 {
@@ -159,30 +160,36 @@ namespace isis
 						/******************************/
 					
                        if ( 0 == data_type.compare("short")){
-                           char slice_buffer[width_slice * height_slice * sizeof(short)];
-                            for(unsigned int _slice = 0; _slice < iim; _slice++) {
-                                    for(unsigned int _row = 0; _row < height_slice; _row++) {
-                                        char* line_start = dataBuffer + (sizeof(short) * (((_slice / slices_in_row) * (slices_in_row * height_slice * width_slice)) + 
-                                                                                          (_row * width_slice * slices_in_row) + (_slice % slices_in_row * width_slice)));
+                           //char slice_buffer[width_slice * height_slice * sizeof(short)];
+                           // for(unsigned int _slice = 0; _slice < iim; _slice++) {
+                           //         for(unsigned int _row = 0; _row < height_slice; _row++) {
+                           //             char* line_start = dataBuffer + (sizeof(short) * (((_slice / slices_in_row) * (slices_in_row * height_slice * width_slice)) + 
+                           //                                                               (_row * width_slice * slices_in_row) + (_slice % slices_in_row * width_slice)));
 
-                                        memcpy(slice_buffer + (_row * width_slice * sizeof(short)), line_start, (width_slice * sizeof(short)));
-                                    }
+                           //             memcpy(slice_buffer + (_row * width_slice * sizeof(short)), line_start, (width_slice * sizeof(short)));
+                           //         }
                                 
                                 /********
                                 * get each slice position from header 
                                 */
-                                std::string slice_pos = "slice_position_";
-                                char buf[5];
-                                sprintf(buf, "%i", _slice);
-                                slice_pos.append(buf);
+                                std::string slice_pos = "slice_position_0";
+                                //char buf[5];
+                                //sprintf(buf, "%i", _slice);
+                                //slice_pos.append(buf);
                                 util::fvector4 slice_pos_vec = getVectorFromString(getStringFromHeader(slice_pos, header));//(val1, val2, val3);
                                 //*********
                                 
                                 // now, create chunks per slice and feed it with metadata
-                                data::Chunk chT(data::MemChunk<uint16_t>((uint16_t*)slice_buffer, height_slice,width_slice,1) );
-								data::MemChunk<float> ch(chT);
+                                //data::Chunk chT(data::MemChunk<uint16_t>((uint16_t*)slice_buffer, height_slice,width_slice,1) );
+                                //data::Chunk chT(data::MemChunk<uint16_t>((uint16_t*)slice_buffer, height_slice,width_slice,iim) );
+                                data::Chunk ch(data::MemChunk<uint16_t>((uint16_t*)dataBuffer, height_slice,width_slice,iim) );
+                           
+                                ch.convertToType(isis::data::ValuePtr<float>::staticID);
+								//data::MemChunk<float> ch(chT);
                                 ch.setPropertyAs("indexOrigin", slice_pos_vec);
-                                ch.setPropertyAs<uint32_t>("acquisitionNumber", (acq_nr*iim)+_slice);
+                               // ch.setPropertyAs<uint32_t>("acquisitionNumber", (acq_nr*iim)+_slice);
+                                ch.setPropertyAs<uint32_t>("acquisitionNumber", (acq_nr));
+                           
                                 //ch.setPropertyAs<>("acquisitionTime", acquisition_time);
                                 if (true == moco){
                                     ch.setPropertyAs<uint16_t>("sequenceNumber", 0);
@@ -209,8 +216,19 @@ namespace isis
                                 ch.setPropertyAs<uint16_t>("repetitionTime",rep_time);
                                 ch.setPropertyAs<std::string>("InPlanePhaseEncodingDirection",InPlanePhaseEncodingDirection);
                                 ch.setPropertyAs<util::fvector4>( "voxelGap", util::fvector4() );
+                                char nameForSource[80];
+                                struct tm* ptr;
+                                time_t lt;
+                                
+                                lt = time(NULL);
+                                ptr = localtime(&lt);
+                                
+                                std::string sn = boost::posix_time::to_simple_string(boost::posix_time::microsec_clock::local_time());
+                                //ptime microsec_clock boost::date_time
+                                strftime(nameForSource, 80, "%y%m%d_%H_%M_%S", ptr);
+                                ch.setPropertyAs<std::string>("source", sn);
                                 chunks.push_back(ch);
-                            }
+                            //}
                        }
                         else {
                             printf("DATATYPE NOT SUPPORTED\n");
@@ -362,7 +380,9 @@ isis::image_io::FileFormat *factory()
     pluginRtExport->timediffMOCO = fopen(fnameMOCO, "w");
 	pluginRtExport->timediffRECO = fopen(fnameRECO, "w");
 	//pluginRtExport->headerFile = fopen(fnameHEADER, "w");
-	
+	//Just a workaround to generate all the converters
+    isis::data::MemChunk<int32_t> test(2,3,4);
+    test.convertToType(isis::data::ValuePtr<float>::staticID);
 	
 	return (isis::image_io::FileFormat*) pluginRtExport;
 }
