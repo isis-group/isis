@@ -63,11 +63,11 @@ public:
 	void _setHidden( const std::string name, const bool hidden ) {
 		parameters[name].hidden() = hidden;
 	}
-	
+
 	void _setDescription( const std::string name, const std::string desc ) {
-		parameters[name].setDescription(desc);
+		parameters[name].setDescription( desc );
 	}
-		
+
 
 private:
 	PyObject *self;
