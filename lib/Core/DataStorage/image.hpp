@@ -384,9 +384,9 @@ public:
 		isis::data::_internal::transformCoords( *this, getSizeAsVector(), transform_matrix );
 	}
 
-	util::fvector4 getPhysicalCoords( const util::ivector4 &voxelCoords ) const;
+	util::fvector4 getPhysicalCoordsFromIndex( const util::ivector4 &index ) const;
 	
-	util::ivector4 getVoxelCoords( const util::fvector4 &physicalCoords ) const;
+	util::ivector4 getIndexFromPhysicalCoords( const util::fvector4 &physicalCoords ) const;
 	
 	/**
 	 * Copy all voxel data of the image into memory.

@@ -164,7 +164,7 @@ bool Image::insertChunk ( const Chunk &chunk )
 	}
 }
 
-util::fvector4 Image::getPhysicalCoords(const isis::util::ivector4& voxelCoords) const
+util::fvector4 Image::getPhysicalCoordsFromIndex(const isis::util::ivector4& voxelCoords) const
 {
 	return  util::fvector4( voxelCoords[0] * m_RowVec[0] + voxelCoords[1] * m_ColumnVec[0] + voxelCoords[2] * m_SliceVec[0],
 							voxelCoords[0] * m_RowVec[1] + voxelCoords[1] * m_ColumnVec[1] + voxelCoords[2] * m_SliceVec[1],
@@ -173,7 +173,7 @@ util::fvector4 Image::getPhysicalCoords(const isis::util::ivector4& voxelCoords)
 }
 
 
-util::ivector4 Image::getVoxelCoords(const isis::util::fvector4& physicalCoords) const
+util::ivector4 Image::getIndexFromPhysicalCoords(const isis::util::fvector4& physicalCoords) const
 {
 	util::fvector4 vec1 = physicalCoords - m_Offset;
 	util::fvector4 ret = util::fvector4( vec1[0] * m_RowVecInv[0] + vec1[1] * m_ColumnVecInv[0] + vec1[2] * m_SliceVecInv[0],

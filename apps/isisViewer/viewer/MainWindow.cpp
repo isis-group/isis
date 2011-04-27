@@ -103,7 +103,7 @@ void MainWindow::doubleClickedMakeCurrentImage(QListWidgetItem* )
 
 void MainWindow::physicalCoordsChanged( util::fvector4 coords )
 {
-	util::ivector4 voxelCoords = m_ViewerCore->getCurrentImage()->getImage()->getVoxelCoords( coords );
+	util::ivector4 voxelCoords = m_ViewerCore->getCurrentImage()->getImage()->getIndexFromPhysicalCoords( coords );
 	data::Chunk ch = m_ViewerCore->getCurrentImage()->getImage()->getChunk( voxelCoords[0], voxelCoords[1], voxelCoords[2], voxelCoords[3] );
 
 	switch( ch.getTypeID() ) {
