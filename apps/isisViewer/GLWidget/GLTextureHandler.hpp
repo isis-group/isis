@@ -33,7 +33,7 @@ public:
 	typedef std::map<boost::shared_ptr<ImageHolder>, std::map<size_t, GLuint > > ImageMapType;
 
 	///Convinient function to copy all in DataContainer available volumes to a GL_TEXTURE_3D.
-	std::map<boost::shared_ptr<ImageHolder>, GLuint> copyAllImagesToTextures( const DataContainer &data, InterpolationType interpolation = neares_neighbor );
+	std::map<boost::shared_ptr<ImageHolder>, GLuint> copyAllImagesToTextures( const DataContainer &data, const bool withAlpha = true, InterpolationType interpolation = neares_neighbor );
 
 	///Copies the given timestep of an image with the given imageID to a GL_TEXTURE_3D. Return the texture id.
 	GLuint copyImageToTexture( const DataContainer &data, const boost::shared_ptr<ImageHolder> image, size_t timestep, const bool withAlpha = true, InterpolationType interpolation = neares_neighbor );

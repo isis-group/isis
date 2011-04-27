@@ -75,7 +75,7 @@ void QGLWidgetImplementation::connectSignals()
 
 void QGLWidgetImplementation::initializeGL()
 {
-	util::Singletons::get<GLTextureHandler, 10>().copyAllImagesToTextures( m_ViewerCore->getDataContainer() );
+	util::Singletons::get<GLTextureHandler, 10>().copyAllImagesToTextures( m_ViewerCore->getDataContainer(), true, m_InterplationType );
 	glClearColor( 0.0, 0.0, 0.0, 0.0 );
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	glShadeModel( GL_FLAT );
@@ -111,7 +111,7 @@ void QGLWidgetImplementation::resizeGL( int w, int h )
 void QGLWidgetImplementation::updateStateValues( boost::shared_ptr<ImageHolder> image, const util::ivector4 &voxelCoords )
 {
 	LOG( Debug, verbose_info ) << "Updating state values for widget " << objectName().toStdString();
-	State &state = m_StateValues[image];
+	State &state = m_StateValues.at(image);
 	unsigned int timestep = state.voxelCoords[3];
 	state.voxelCoords = voxelCoords;
 	state.voxelCoords[3] = timestep;
@@ -135,7 +135,7 @@ void QGLWidgetImplementation::updateStateValues( boost::shared_ptr<ImageHolder> 
 		state.mappedImageSize = GLOrientationHandler::transformVector<int>( image->getImageSize(), state.planeOrientation );
 		state.set = true;
 	}
-
+	
 	state.mappedVoxelCoords = GLOrientationHandler::transformVector<int>( state.voxelCoords, state.planeOrientation );
 	//to visualize with the correct scaling we take the viewport
 	unsigned short border = 0;
@@ -145,11 +145,11 @@ void QGLWidgetImplementation::updateStateValues( boost::shared_ptr<ImageHolder> 
 	}
 
 	GLOrientationHandler::recalculateViewport( width(), height(), state.mappedVoxelSize, state.mappedImageSize, state.viewport, border );
-
-	 if( rightButtonPressed || zoomEventHappened ) {
-	     zoomEventHappened = false;
-	     calculateTranslation( );
-	 }
+	if( rightButtonPressed || zoomEventHappened ) {
+		zoomEventHappened = false;
+		calculateTranslation( state );
+	}
+	
 
 	util::dvector4 objectCoords = GLOrientationHandler::transformVoxel2ObjectCoords( state.voxelCoords, image, state.planeOrientation );
 	state.crosshairCoords = object2WindowCoords( objectCoords[0], objectCoords[1], image );
@@ -175,19 +175,17 @@ std::pair<int16_t, int16_t> QGLWidgetImplementation::object2WindowCoords( GLdoub
 	return std::make_pair<int16_t, int16_t>( ( win[0] - stateValue.viewport[0] ), win[1] - stateValue.viewport[1] );
 }
 
-bool QGLWidgetImplementation::calculateTranslation( )
+
+bool QGLWidgetImplementation::calculateTranslation( State &state )
 {
-	State &state = m_StateValues[m_ViewerCore->getCurrentImage()];
 	std::pair<int16_t, int16_t> center = std::make_pair<int16_t, int16_t>( abs( state.mappedImageSize[0] ) / 2, abs( state.mappedImageSize[1] ) / 2 );
 	float shiftX = center.first - ( state.mappedVoxelCoords[0] < 0 ? abs( state.mappedImageSize[0] ) + state.mappedVoxelCoords[0] : state.mappedVoxelCoords[0] );
 	float shiftY =  center.second - ( state.mappedVoxelCoords[1] < 0 ? abs( state.mappedImageSize[1] ) + state.mappedVoxelCoords[1] : state.mappedVoxelCoords[1] );
-	state.modelViewMatrix[12] = ( 1.0 / abs( state.mappedImageSize[0] ) ) * shiftX ;
-	state.modelViewMatrix[13] = ( 1.0 / abs( state.mappedImageSize[1] ) ) * shiftY ;
-	float zoomDependetShift = 1.0-(2.0/m_Zoom.currentZoom);
-	BOOST_FOREACH( StateMap::reference stateRef, m_StateValues) {
-		stateRef.second.modelViewMatrix[12] = state.modelViewMatrix[12] + zoomDependetShift * state.modelViewMatrix[12];
-		stateRef.second.modelViewMatrix[13] = state.modelViewMatrix[13] + zoomDependetShift * state.modelViewMatrix[13];;
-	}
+	shiftX = ( 1.0 / abs( state.mappedImageSize[0] ) ) * shiftX ;
+	shiftY = ( 1.0 / abs( state.mappedImageSize[1] ) ) * shiftY ;
+	float zoomDependentShift = 1.0 - ( 2.0 / m_Zoom.currentZoom );
+	state.modelViewMatrix[12] = shiftX + zoomDependentShift * shiftX;
+	state.modelViewMatrix[13] = shiftY + zoomDependentShift * shiftY;
 }
 
 bool QGLWidgetImplementation::lookAtPhysicalCoords( const boost::shared_ptr< ImageHolder > image, const isis::util::fvector4 &physicalCoords )
@@ -201,11 +199,15 @@ bool QGLWidgetImplementation::lookAtPhysicalCoords( const isis::util::fvector4 &
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	glEnable ( GL_BLEND );
 	glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-	BOOST_FOREACH( StateMap::const_reference state, m_StateValues ) {
-		updateStateValues( state.first, state.first->getImage()->getVoxelCoords( physicalCoords ) );
-
+	BOOST_FOREACH( StateMap::const_reference state, m_StateValues ) 
+	{
+		updateStateValues(  state.first, state.first->getImage()->getVoxelCoords( physicalCoords ) );
+	}
+	
+	BOOST_FOREACH( StateMap::const_reference state, m_StateValues ) 
+	{
 		if( state.first->getImageState().visible ) {
-			paintScene( state.first );
+			paintScene(  state.first );
 		}
 	}
 
@@ -225,9 +227,12 @@ bool QGLWidgetImplementation::lookAtVoxel( const isis::util::ivector4 &voxelCoor
 	glEnable ( GL_BLEND );
 	glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
-	BOOST_FOREACH( StateMap::const_reference state, m_StateValues ) {
+	BOOST_FOREACH( StateMap::const_reference state, m_StateValues ) 
+	{
 		updateStateValues(  state.first, voxelCoords );
-
+	}
+	BOOST_FOREACH( StateMap::const_reference state, m_StateValues ) 
+	{
 		if( state.first->getImageState().visible ) {
 			paintScene(  state.first );
 		}
@@ -241,11 +246,9 @@ bool QGLWidgetImplementation::lookAtVoxel( const isis::util::ivector4 &voxelCoor
 bool QGLWidgetImplementation::lookAtVoxel( const boost::shared_ptr<ImageHolder> image, const util::ivector4 &voxelCoords )
 {
 	updateStateValues( image, voxelCoords );
-
 	if( image->getImageState().visible ) {
 		paintScene( image );
 	}
-
 	if( m_StateValues.size() ) {
 		paintCrosshair();
 	}
@@ -255,7 +258,7 @@ bool QGLWidgetImplementation::lookAtVoxel( const boost::shared_ptr<ImageHolder> 
 void QGLWidgetImplementation::paintScene( const boost::shared_ptr<ImageHolder> image )
 {
 
-	State &state = m_StateValues[image];
+	const State &state = m_StateValues[image];
 
 	double scaling, bias;
 
@@ -269,12 +272,12 @@ void QGLWidgetImplementation::paintScene( const boost::shared_ptr<ImageHolder> i
 		scaling = 1.0;
 		bias = 0.0;
 	}
-
 	glViewport( state.viewport[0], state.viewport[1], state.viewport[2], state.viewport[3] );
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();
 	glLoadMatrixd( state.projectionMatrix );
 	glMatrixMode( GL_MODELVIEW );
+	glLoadIdentity();
 	glLoadMatrixd( state.modelViewMatrix );
 	glMatrixMode( GL_TEXTURE );
 	glLoadIdentity();

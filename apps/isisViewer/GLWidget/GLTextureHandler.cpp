@@ -6,13 +6,13 @@ namespace viewer
 {
 
 
-std::map<boost::shared_ptr<ImageHolder>, GLuint> GLTextureHandler::copyAllImagesToTextures( const DataContainer &data, GLTextureHandler::InterpolationType interpolation )
+std::map<boost::shared_ptr<ImageHolder>, GLuint> GLTextureHandler::copyAllImagesToTextures( const DataContainer &data, const bool withAlpha, GLTextureHandler::InterpolationType interpolation )
 {
 	// here we only copy the first timestep of each image. Would take a while to do this for all timesteps
 	std::map<boost::shared_ptr<ImageHolder>, GLuint> retIDList;
 
 	BOOST_FOREACH( DataContainer::const_reference image, data ) {
-		retIDList[image.second] = copyImageToTexture( data, image.second, 0, interpolation );
+		retIDList[image.second] = copyImageToTexture( data, image.second, 0, withAlpha, interpolation );
 	}
 
 	return retIDList;

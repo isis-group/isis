@@ -89,8 +89,6 @@ private:
 	std::pair<GLdouble, GLdouble> window2ObjectCoords( int16_t winx, int16_t winy, const boost::shared_ptr<ImageHolder> image ) const;
 	std::pair<int16_t, int16_t> object2WindowCoords( GLdouble objx, GLdouble objy, const boost::shared_ptr<ImageHolder> image ) const;
 
-	bool calculateTranslation( );
-
 	GLShaderHandler m_ScalingShader;
 	GLShaderHandler m_LUTShader;
 
@@ -119,6 +117,7 @@ private:
 		std::pair<int16_t, int16_t> crosshairCoords;
 		GLOrientationHandler::MatrixType planeOrientation;
 	};
+	bool calculateTranslation( State &state );
 
 	typedef std::map<boost::shared_ptr<ImageHolder>, State> StateMap;
 	StateMap m_StateValues;
