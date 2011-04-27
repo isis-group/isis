@@ -427,7 +427,6 @@ void QGLWidgetImplementation::mousePressEvent( QMouseEvent *e )
 bool QGLWidgetImplementation::isInViewport( size_t wx, size_t wy )
 {
 	GLint *viewport = m_StateValues[m_ViewerCore->getCurrentImage()].viewport;
-
 	if( ( wx > viewport[0] && wx < ( viewport[0] + viewport[2] ) ) && ( wy > viewport[1] && wy < ( viewport[1] + viewport[3] ) ) ) {
 		return true;
 	} else {
@@ -438,7 +437,7 @@ bool QGLWidgetImplementation::isInViewport( size_t wx, size_t wy )
 
 void QGLWidgetImplementation::emitMousePressEvent( QMouseEvent *e )
 {
-	if( isInViewport( e->x(), e->y() ) ) {
+	if( isInViewport( e->x(), height() - e->y() ) ) {
 		if( rightButtonPressed ) {
 			calculateTranslation( e->x(), height() - e->y() );
 		}
