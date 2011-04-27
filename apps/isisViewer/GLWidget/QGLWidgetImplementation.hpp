@@ -89,7 +89,7 @@ private:
 	std::pair<GLdouble, GLdouble> window2ObjectCoords( int16_t winx, int16_t winy, const boost::shared_ptr<ImageHolder> image ) const;
 	std::pair<int16_t, int16_t> object2WindowCoords( GLdouble objx, GLdouble objy, const boost::shared_ptr<ImageHolder> image ) const;
 
-	bool calculateTranslation( const float &mousex, const float &mousey );
+	bool calculateTranslation( );
 
 	GLShaderHandler m_ScalingShader;
 	GLShaderHandler m_LUTShader;

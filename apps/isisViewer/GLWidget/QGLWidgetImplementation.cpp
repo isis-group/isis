@@ -120,8 +120,8 @@ void QGLWidgetImplementation::updateStateValues( boost::shared_ptr<ImageHolder> 
 	for( size_t i = 0; i < 4; i++ ) {
 		state.voxelCoords[i] = state.voxelCoords[i] < 0 ? 0 : state.voxelCoords[i];
 		state.voxelCoords[i] = state.voxelCoords[i] >= image->getImageSize()[i] ? image->getImageSize()[i] - 1 : state.voxelCoords[i];
+		
 	}
-
 	//if not happend already copy the image to GLtexture memory and return the texture id
 	state.textureID = util::Singletons::get<GLTextureHandler, 10>().copyImageToTexture( m_ViewerCore->getDataContainer(), image, state.voxelCoords[3], true, m_InterplationType );
 
@@ -146,10 +146,10 @@ void QGLWidgetImplementation::updateStateValues( boost::shared_ptr<ImageHolder> 
 
 	GLOrientationHandler::recalculateViewport( width(), height(), state.mappedVoxelSize, state.mappedImageSize, state.viewport, border );
 
-	//  if( rightButtonPressed || zoomEventHappened ) {
-	//      zoomEventHappened = false;
-	//      calculateTranslation( image );
-	//  }
+	 if( rightButtonPressed || zoomEventHappened ) {
+	     zoomEventHappened = false;
+	     calculateTranslation( );
+	 }
 
 	util::dvector4 objectCoords = GLOrientationHandler::transformVoxel2ObjectCoords( state.voxelCoords, image, state.planeOrientation );
 	state.crosshairCoords = object2WindowCoords( objectCoords[0], objectCoords[1], image );
@@ -175,19 +175,19 @@ std::pair<int16_t, int16_t> QGLWidgetImplementation::object2WindowCoords( GLdoub
 	return std::make_pair<int16_t, int16_t>( ( win[0] - stateValue.viewport[0] ), win[1] - stateValue.viewport[1] );
 }
 
-bool QGLWidgetImplementation::calculateTranslation( const float &mousex, const float &mousey )
+bool QGLWidgetImplementation::calculateTranslation( )
 {
 	State &state = m_StateValues[m_ViewerCore->getCurrentImage()];
-	std::pair<int16_t, int16_t> center = std::make_pair<int16_t, int16_t>( state.viewport[2] / 2 + state.viewport[0], state.viewport[3] / 2 + state.viewport[1] );
-	float shiftx = ( 1.0 / state.viewport[2] ) * ( center.first - mousex );
-	float shifty = ( 1.0 / state.viewport[3] ) * ( center.second - mousey );
-	BOOST_FOREACH( StateMap::reference stateRef, m_StateValues) 
-	{
-		stateRef.second.modelViewMatrix[12] = shiftx;
-		stateRef.second.modelViewMatrix[13] = shifty;
+	std::pair<int16_t, int16_t> center = std::make_pair<int16_t, int16_t>( abs( state.mappedImageSize[0] ) / 2, abs( state.mappedImageSize[1] ) / 2 );
+	float shiftX = center.first - ( state.mappedVoxelCoords[0] < 0 ? abs( state.mappedImageSize[0] ) + state.mappedVoxelCoords[0] : state.mappedVoxelCoords[0] );
+	float shiftY =  center.second - ( state.mappedVoxelCoords[1] < 0 ? abs( state.mappedImageSize[1] ) + state.mappedVoxelCoords[1] : state.mappedVoxelCoords[1] );
+	state.modelViewMatrix[12] = ( 1.0 / abs( state.mappedImageSize[0] ) ) * shiftX ;
+	state.modelViewMatrix[13] = ( 1.0 / abs( state.mappedImageSize[1] ) ) * shiftY ;
+	float zoomDependetShift = 1.0-(2.0/m_Zoom.currentZoom);
+	BOOST_FOREACH( StateMap::reference stateRef, m_StateValues) {
+		stateRef.second.modelViewMatrix[12] = state.modelViewMatrix[12] + zoomDependetShift * state.modelViewMatrix[12];
+		stateRef.second.modelViewMatrix[13] = state.modelViewMatrix[13] + zoomDependetShift * state.modelViewMatrix[13];;
 	}
-	
-
 }
 
 bool QGLWidgetImplementation::lookAtPhysicalCoords( const boost::shared_ptr< ImageHolder > image, const isis::util::fvector4 &physicalCoords )
@@ -438,9 +438,6 @@ bool QGLWidgetImplementation::isInViewport( size_t wx, size_t wy )
 void QGLWidgetImplementation::emitMousePressEvent( QMouseEvent *e )
 {
 	if( isInViewport( e->x(), height() - e->y() ) ) {
-		if( rightButtonPressed ) {
-			calculateTranslation( e->x(), height() - e->y() );
-		}
 		std::pair<float, float> objectCoords = window2ObjectCoords( e->x(), height() - e->y(), m_ViewerCore->getCurrentImage() );
 		util::ivector4 voxelCoords = GLOrientationHandler::transformObject2VoxelCoords( util::fvector4( objectCoords.first, objectCoords.second, m_StateValues.at( m_ViewerCore->getCurrentImage() ).normalizedSlice ), m_ViewerCore->getCurrentImage(), m_PlaneOrientation );
 		physicalCoordsChanged( m_ViewerCore->getCurrentImage()->getImage()->getPhysicalCoords( voxelCoords ) );
