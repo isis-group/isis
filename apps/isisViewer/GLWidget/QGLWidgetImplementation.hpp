@@ -117,7 +117,7 @@ private:
 		std::pair<int16_t, int16_t> crosshairCoords;
 		GLOrientationHandler::MatrixType planeOrientation;
 	};
-	bool calculateTranslation( State &state );
+	bool calculateTranslation( );
 
 	typedef std::map<boost::shared_ptr<ImageHolder>, State> StateMap;
 	StateMap m_StateValues;

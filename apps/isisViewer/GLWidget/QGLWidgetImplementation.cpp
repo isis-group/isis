@@ -145,9 +145,9 @@ void QGLWidgetImplementation::updateStateValues( boost::shared_ptr<ImageHolder> 
 	}
 
 	GLOrientationHandler::recalculateViewport( width(), height(), state.mappedVoxelSize, state.mappedImageSize, state.viewport, border );
-	if( rightButtonPressed || zoomEventHappened ) {
+	if( rightButtonPressed || zoomEventHappened && image.get() == m_ViewerCore->getCurrentImage().get() ) {
 		zoomEventHappened = false;
-		calculateTranslation( state );
+		calculateTranslation( );
 	}
 	
 
@@ -176,16 +176,20 @@ std::pair<int16_t, int16_t> QGLWidgetImplementation::object2WindowCoords( GLdoub
 }
 
 
-bool QGLWidgetImplementation::calculateTranslation( State &state )
+bool QGLWidgetImplementation::calculateTranslation(  )
 {
+	State state = m_StateValues[m_ViewerCore->getCurrentImage()];
 	std::pair<int16_t, int16_t> center = std::make_pair<int16_t, int16_t>( abs( state.mappedImageSize[0] ) / 2, abs( state.mappedImageSize[1] ) / 2 );
 	float shiftX = center.first - ( state.mappedVoxelCoords[0] < 0 ? abs( state.mappedImageSize[0] ) + state.mappedVoxelCoords[0] : state.mappedVoxelCoords[0] );
 	float shiftY =  center.second - ( state.mappedVoxelCoords[1] < 0 ? abs( state.mappedImageSize[1] ) + state.mappedVoxelCoords[1] : state.mappedVoxelCoords[1] );
 	shiftX = ( 1.0 / abs( state.mappedImageSize[0] ) ) * shiftX ;
 	shiftY = ( 1.0 / abs( state.mappedImageSize[1] ) ) * shiftY ;
 	float zoomDependentShift = 1.0 - ( 2.0 / m_Zoom.currentZoom );
-	state.modelViewMatrix[12] = shiftX + zoomDependentShift * shiftX;
-	state.modelViewMatrix[13] = shiftY + zoomDependentShift * shiftY;
+	BOOST_FOREACH( StateMap::reference stateRef, m_StateValues )
+	{
+		stateRef.second.modelViewMatrix[12] = shiftX + zoomDependentShift * shiftX;
+		stateRef.second.modelViewMatrix[13] = shiftY + zoomDependentShift * shiftY;
+	}
 }
 
 bool QGLWidgetImplementation::lookAtPhysicalCoords( const boost::shared_ptr< ImageHolder > image, const isis::util::fvector4 &physicalCoords )
