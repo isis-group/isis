@@ -77,6 +77,7 @@ void QGLWidgetImplementation::initializeGL()
 {
 	util::Singletons::get<GLTextureHandler, 10>().copyAllImagesToTextures( m_ViewerCore->getDataContainer(), true, m_InterplationType );
 	glClearColor( 0.0, 0.0, 0.0, 0.0 );
+	glEnable( GL_DEPTH_TEST );
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	glShadeModel( GL_FLAT );
 	glMatrixMode( GL_MODELVIEW );
@@ -283,6 +284,9 @@ void QGLWidgetImplementation::paintScene( const boost::shared_ptr<ImageHolder> i
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
 	glLoadMatrixd( state.modelViewMatrix );
+	if(image.get() == m_ViewerCore->getCurrentImage().get()) {
+		glTranslatef(0.0,0.0,-0.1);
+	}
 	glMatrixMode( GL_TEXTURE );
 	glLoadIdentity();
 	glLoadMatrixd( state.textureMatrix );
@@ -343,6 +347,8 @@ void QGLWidgetImplementation::paintCrosshair()
 	glColor4f( 1, 1, 1, 1 );
 	glLineWidth( 1.0 );
 	glMatrixMode( GL_PROJECTION );
+	glLoadIdentity();
+	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
 	glOrtho( 0, currentState.viewport[2], 0, currentState.viewport[3], -1, 1 );
 	glBegin( GL_LINES );
