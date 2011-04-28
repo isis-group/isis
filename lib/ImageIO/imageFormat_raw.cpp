@@ -98,19 +98,30 @@ public:
 	}
 
 	void write( const data::Image &image, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
+		class WriteOp: public data::Image::ChunkOp{
+			std::ofstream out;
+			unsigned short typeID;
+		public:
+			WriteOp(std::string fname,unsigned short id):out( fname.c_str() ),typeID(id){
+				out.exceptions( std::ios::failbit | std::ios::badbit );
+			}
+			bool operator()(data::Chunk& ref, util::FixedVector<size_t, 4 > /*posInImage*/){
+				const boost::shared_ptr<void> data( ref.getValuePtrBase().getRawAddress() );
+				const size_t data_size = ref.bytesPerVoxel() * ref.getVolume();
+				out.write( static_cast<const char *>( data.get() ), data_size );
+			}
+		};
 		const std::pair<std::string, std::string> splitted = makeBasename( filename );
-		std::string type = image.getMajorTypeName();
-		type = type.substr( 0, type.find_last_not_of( '*' ) + 1 );
-		const std::string outName = splitted.first + "_" + image.getSizeAsString() + "_" + type + splitted.second ;
+		unsigned short type = image.getMajorTypeID();
 
-		LOG( ImageIoLog, info ) << "Writing image of size " << image.getSizeAsVector() << " and type " << type << " to " << outName;
-		std::ofstream out( outName.c_str() );
-		out.exceptions( std::ios::failbit | std::ios::badbit );
-		BOOST_FOREACH( const boost::shared_ptr<const data::Chunk > &ref, image.getChunksAsVector() ) {
-			const boost::shared_ptr<void> data( ref->getValuePtrBase().getRawAddress() );
-			const size_t data_size = ref->bytesPerVoxel() * ref->getVolume();
-			out.write( static_cast<const char *>( data.get() ), data_size );
-		}
+		std::string typeStr = util::getTypeMap(false)[type];
+		typeStr.erase( typeStr.find_last_not_of( '*' ) + 1 );
+
+		const std::string outName = splitted.first + "_" + image.getSizeAsString() + "_" + typeStr + splitted.second ;
+
+		LOG( ImageIoLog, info ) << "Writing image of size " << image.getSizeAsVector() << " and type " << typeStr << " to " << outName;
+		WriteOp writer(outName,type);
+		const_cast<data::Image &>(image).foreachChunk(writer);
 	}
 	bool tainted()const {return false;}//internal plugins are not tainted
 };

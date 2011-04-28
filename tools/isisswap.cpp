@@ -122,10 +122,6 @@ int main( int argc, char **argv )
 
 		if ( app.parameters["swap"].toString() == "both" || app.parameters["swap"].toString() == "space" ) {
 			newImage.transformCoords( T );
-			std::vector<boost::shared_ptr< data::Chunk> > chList = newImage.getChunksAsVector();
-			BOOST_FOREACH( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef, chList ) {
-				chRef->transformCoords( T );
-			}
 		}
 
 		finImageList.push_back(  newImage );

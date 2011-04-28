@@ -204,7 +204,7 @@ public:
 	Image &operator=( const Image &ref );
 
 	bool checkMakeClean();
-	bool isClean();
+	bool isClean()const;
 	/**
 	 * This method returns a reference to the voxel value at the given coordinates.
 	 *
@@ -297,16 +297,6 @@ public:
 	 * (Reminder: Chunk-copies are cheap, so the image data are NOT copied but referenced)
 	 */
 	Chunk getChunk( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true );
-
-	/**
-	 * Get a sorted list of pointers to the chunks of the image.
-	 * Note: this chunks only have metadata which are unique to them - so they might be invalid.
-	 * (run join on copies of them using the image as parameter to insert all non-unique-metadata).
-	 */
-	std::vector<boost::shared_ptr<Chunk> > getChunksAsVector();
-
-	/// \copydoc getChunksAsVector
-	std::vector<boost::shared_ptr<const Chunk> > getChunksAsVector()const;
 
 	/**
 	 * Get the chunk that contains the voxel at the given coordinates in the given type.
@@ -410,6 +400,9 @@ public:
 	 */
 	void transformCoords( boost::numeric::ublas::matrix<float> transform_matrix ) {
 		isis::data::_internal::transformCoords( *this, transform_matrix );
+		BOOST_FOREACH( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef, lookup ) {
+			chRef->transformCoords( transform_matrix );
+		}
 	}
 
 	/**
@@ -444,6 +437,24 @@ public:
 		copyToMem<T>( &ret.voxel<T>( 0, 0, 0, 0 ) );
 		return ret;
 	}
+	template<typename OutputIterator> void copyChunksTo(OutputIterator result,bool copy_metadata=false){
+		std::vector<boost::shared_ptr<Chunk> >::const_iterator at=lookup.begin();
+		const std::vector<boost::shared_ptr<Chunk> >::const_iterator end=lookup.end();
+		while (at!=end){
+			*result = **at++;
+			if(copy_metadata)
+				result->join(*this);
+			result++;
+		}
+	}
+
+	/**
+	* Get a sorted list of the chunks of the image.
+	* Note: this chunks are cheap copies, so changing them will change the image.
+	* Make MemChunks of them to get deep copies.
+	* \param copy_metadata set to false to prevent the metadata of the image to be copied into the results. This will improve performance, but the chunks may lack important properties.
+	*/
+	std::vector<isis::data::Chunk> copyChunksToVector(bool copy_metadata=true);
 
 	/**
 	 * Ensure, the image has the type with the requested ID.
@@ -570,7 +581,12 @@ public:
 		LOG( Debug, info ) << "Computed scaling for conversion from source image: [" << conv_op.scale << "]";
 
 		this->set.transform( conv_op );
-		this->lookup = this->set.getLookup(); // the lookup table still points to the old chunks
+		if(ref.isClean()){
+			this->lookup = this->set.getLookup(); // the lookup table still points to the old chunks
+		} else {
+			LOG(Debug,info) << "Copied unclean image. Running reIndex on the copy.";
+			this->reIndex();
+		}
 		return *this;
 	}
 };
