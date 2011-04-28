@@ -14,9 +14,9 @@ GLuint GLLookUpTable::getLookUpTableAsTexture( const Color::LookUpTableType &lut
 	GLfloat *colorTable = ( GLfloat * ) calloc( extent * 3, sizeof( GLfloat ) );
 	size_t index = 0;
 	BOOST_FOREACH( std::vector< util::fvector4 >::const_reference color, rgbColorGradient ) {
-		colorTable[index++] = color[0] / (extent-1);
-		colorTable[index++] = color[1] / (extent-1);
-		colorTable[index++] = color[2] / (extent-1);
+		colorTable[index++] = color[0] / ( extent - 1 );
+		colorTable[index++] = color[1] / ( extent - 1 );
+		colorTable[index++] = color[2] / ( extent - 1 );
 	}
 	GLuint id;
 	glEnable( GL_TEXTURE_1D );

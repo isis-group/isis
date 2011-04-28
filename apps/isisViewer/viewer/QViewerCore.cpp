@@ -28,7 +28,7 @@ QViewerCore::registerWidget( std::string key, QWidget *widget, QViewerCore::Acti
 			connect( this, SIGNAL( emitTimeStepChange( unsigned int ) ), w, SLOT( timestepChanged( unsigned int ) ) );
 			connect( this, SIGNAL( emitShowLabels( bool ) ), w, SLOT( setShowLabels( bool ) ) );
 			connect( this, SIGNAL( emitUpdateScene() ), w, SLOT( updateScene() ) );
-			connect( this, SIGNAL( emitSetAutomaticScaling(bool)), w, SLOT( setAutomaticScaling(bool)));
+			connect( this, SIGNAL( emitSetAutomaticScaling( bool ) ), w, SLOT( setAutomaticScaling( bool ) ) );
 		}
 	} else {
 		LOG( Runtime, error ) << "A widget with the name " << key << " already exists! Wont add this";
@@ -88,9 +88,9 @@ void QViewerCore::updateScene()
 	emitUpdateScene();
 }
 
-void QViewerCore::setAutomaticScaling(bool s)
+void QViewerCore::setAutomaticScaling( bool s )
 {
-	emitSetAutomaticScaling(s);
+	emitSetAutomaticScaling( s );
 }
 
 

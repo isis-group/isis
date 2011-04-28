@@ -55,8 +55,12 @@ public Q_SLOTS:
 	virtual void setShowLabels( const bool show );
 	virtual void setInterpolationType( const GLTextureHandler::InterpolationType interpolation );
 	virtual void updateScene();
-	virtual void setAutomaticScaling(bool scaling) { if(scaling) { m_ScalingType = automatic_scaling;} 
-													 else { m_ScalingType = manual_scaling; } updateScene();} 
+	virtual void setAutomaticScaling( bool scaling ) {
+		if( scaling ) { m_ScalingType = automatic_scaling;}
+		else { m_ScalingType = manual_scaling; }
+
+		updateScene();
+	}
 
 protected:
 	virtual void mouseMoveEvent( QMouseEvent *e );

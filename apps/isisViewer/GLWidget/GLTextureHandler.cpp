@@ -21,7 +21,7 @@ std::map<boost::shared_ptr<ImageHolder>, GLuint> GLTextureHandler::copyAllImages
 
 GLuint GLTextureHandler::copyImageToTexture(  const boost::shared_ptr<ImageHolder> image, size_t timestep, const bool withAlpha, GLTextureHandler::InterpolationType interpolation )
 {
-	
+
 
 	//check if there is an image with this parameters
 	if ( image->getImageSize()[3] <= timestep )  {
@@ -39,15 +39,13 @@ GLuint GLTextureHandler::copyImageToTexture(  const boost::shared_ptr<ImageHolde
 
 
 }
-bool GLTextureHandler::forceReloadingAllOfType(ImageHolder::ImageType imageType, InterpolationType interpolation, bool withAlpha )
+bool GLTextureHandler::forceReloadingAllOfType( ImageHolder::ImageType imageType, InterpolationType interpolation, bool withAlpha )
 {
 	typedef std::map< size_t, GLuint> TimeStepMap;
-	BOOST_FOREACH( ImageMapType::const_reference image, m_ImageMap )
-	{
-		if(image.first->getImageState().imageType == imageType) {
-			BOOST_FOREACH( TimeStepMap::const_reference timestep, image.second) 
-			{
-				internCopyImageToTexture<GLTextureHandler::TYPE>( GL_UNSIGNED_BYTE, image.first, timestep.first, withAlpha, interpolation);
+	BOOST_FOREACH( ImageMapType::const_reference image, m_ImageMap ) {
+		if( image.first->getImageState().imageType == imageType ) {
+			BOOST_FOREACH( TimeStepMap::const_reference timestep, image.second ) {
+				internCopyImageToTexture<GLTextureHandler::TYPE>( GL_UNSIGNED_BYTE, image.first, timestep.first, withAlpha, interpolation );
 			}
 		}
 	}

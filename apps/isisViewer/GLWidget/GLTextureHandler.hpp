@@ -41,7 +41,7 @@ public:
 
 	///The image map is a mapping of the imageID and timestep to the texture of the GL_TEXTURE_3D.
 	ImageMapType getImageMap() const { return m_ImageMap; }
-	
+
 	bool forceReloadingAllOfType( ImageHolder::ImageType imageType, InterpolationType interpolation = neares_neighbor, bool withAlpha = true ) ;
 
 	void setAlphaEnabled( bool enabled ) { m_Alpha = enabled; }
@@ -72,13 +72,14 @@ private:
 
 		glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 		GLuint texture;
+
 		//look if this texture already exists
-		if( m_ImageMap[image].find( timestep ) == m_ImageMap[image].end() )
-		{
+		if( m_ImageMap[image].find( timestep ) == m_ImageMap[image].end() ) {
 			glGenTextures( 1, &texture );
 		} else {
-			texture = m_ImageMap[image].at(timestep);
+			texture = m_ImageMap[image].at( timestep );
 		}
+
 		glBindTexture( GL_TEXTURE_3D, texture );
 		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, interpolationType );
 		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, interpolationType );

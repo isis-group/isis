@@ -19,22 +19,22 @@ MainWindow::MainWindow( QViewerCore *core )
 {
 	actionMakeCurrent = new QAction( "Make current", this );
 	actionAsZMap = new QAction( "Show as zmap", this );
-	actionAsZMap->setCheckable(true);
+	actionAsZMap->setCheckable( true );
 
 	connect( ui.action_Exit, SIGNAL( triggered() ), this, SLOT( exitProgram() ) );
 	connect( ui.actionShow_labels, SIGNAL( toggled( bool ) ), m_ViewerCore, SLOT( setShowLabels( bool ) ) );
-	connect( ui.actionAutomatic_Scaling, SIGNAL( toggled(bool)), m_ViewerCore, SLOT( setAutomaticScaling( bool)));
+	connect( ui.actionAutomatic_Scaling, SIGNAL( toggled( bool ) ), m_ViewerCore, SLOT( setAutomaticScaling( bool ) ) );
 	connect( actionMakeCurrent, SIGNAL( triggered( bool ) ), this, SLOT( triggeredMakeCurrentImage( bool ) ) );
 	connect( actionAsZMap, SIGNAL( triggered( bool ) ), this, SLOT( triggeredMakeCurrentImageZmap( bool ) ) );
 	connect( core, SIGNAL( emitImagesChanged( DataContainer ) ), this, SLOT( imagesChanged( DataContainer ) ) );
 	connect( core, SIGNAL( emitPhysicalCoordsChanged( util::fvector4 ) ), this, SLOT( physicalCoordsChanged( util::fvector4 ) ) );
 	connect( ui.imageStack, SIGNAL( itemClicked( QListWidgetItem * ) ), this, SLOT( checkImageStack( QListWidgetItem * ) ) );
-	connect(ui.imageStack, SIGNAL( itemDoubleClicked(QListWidgetItem*)), this, SLOT( doubleClickedMakeCurrentImage( QListWidgetItem* ) ) );
+	connect( ui.imageStack, SIGNAL( itemDoubleClicked( QListWidgetItem * ) ), this, SLOT( doubleClickedMakeCurrentImage( QListWidgetItem * ) ) );
 	connect( ui.action_Open_Image, SIGNAL( triggered() ), this, SLOT( openImage() ) );
 	connect( ui.upperThreshold, SIGNAL( sliderMoved( int ) ), this, SLOT( upperThresholdChanged( int ) ) );
 	connect( ui.lowerThreshold, SIGNAL( sliderMoved( int ) ), this, SLOT( lowerThresholdChanged( int ) ) );
-	connect(ui.timestepSpinBox, SIGNAL( valueChanged(int)), m_ViewerCore, SLOT(timestepChanged(int) )) ;
-	connect(ui.interpolationType, SIGNAL(currentIndexChanged(int)), this, SLOT(interpolationChanged(int)));
+	connect( ui.timestepSpinBox, SIGNAL( valueChanged( int ) ), m_ViewerCore, SLOT( timestepChanged( int ) ) ) ;
+	connect( ui.interpolationType, SIGNAL( currentIndexChanged( int ) ), this, SLOT( interpolationChanged( int ) ) );
 	//we need a master widget to keep opengl running in case all visible widgets were closed
 
 	m_MasterWidget = new QGLWidgetImplementation( core, 0, axial );
@@ -64,7 +64,7 @@ void MainWindow::contextMenuImageStack( QPoint position )
 		actions.append( actionMakeCurrent );
 		actions.append( actionAsZMap );
 	}
-	
+
 	QMenu::exec( actions, ui.imageStack->mapToGlobal( position ) );
 
 }
@@ -79,24 +79,25 @@ void MainWindow::triggeredMakeCurrentImage( bool triggered )
 	ui.upperThreshold->setSliderPosition(
 		1000.0 / range *
 		( m_ViewerCore->getCurrentImage()->getImageState().threshold.second - m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>() ) );
-	imagesChanged(m_ViewerCore->getDataContainer());
+	imagesChanged( m_ViewerCore->getDataContainer() );
 	m_ViewerCore->updateScene();
 }
 
-void MainWindow::triggeredMakeCurrentImageZmap(bool triggered )
+void MainWindow::triggeredMakeCurrentImageZmap( bool triggered )
 {
-	if(triggered) {
+	if( triggered ) {
 		m_ViewerCore->getDataContainer()[ui.imageStack->currentItem()->text().toStdString()]->setImageType( ImageHolder::z_map );
-	}else {
+	} else {
 		m_ViewerCore->getDataContainer()[ui.imageStack->currentItem()->text().toStdString()]->setImageType( ImageHolder::anatomical_image );
 	}
+
 	m_ViewerCore->updateScene();
 }
 
 
-void MainWindow::doubleClickedMakeCurrentImage(QListWidgetItem* )
+void MainWindow::doubleClickedMakeCurrentImage( QListWidgetItem * )
 {
-	triggeredMakeCurrentImage(true);
+	triggeredMakeCurrentImage( true );
 }
 
 
@@ -154,10 +155,11 @@ void MainWindow::imagesChanged( DataContainer images )
 		} else {
 			item->setCheckState( Qt::Unchecked );
 		}
-		if(m_ViewerCore->getCurrentImage().get() == imageRef.second.get()) {
-			item->setIcon(QIcon(":/common/icon_check.png"));
+
+		if( m_ViewerCore->getCurrentImage().get() == imageRef.second.get() ) {
+			item->setIcon( QIcon( ":/common/icon_check.png" ) );
 		}
-	
+
 		ui.imageStack->addItem( item );
 	}
 	ui.minLabel->setText( QString( m_ViewerCore->getCurrentImage()->getMinMax().first.toString().c_str() ) );
@@ -197,7 +199,7 @@ void MainWindow::checkImageStack( QListWidgetItem *item )
 	} else if( item->checkState() == Qt::Unchecked ) {
 		m_ViewerCore->getDataContainer().at( item->text().toStdString() )->setVisible( false );
 	}
-	
+
 	m_ViewerCore->updateScene();
 
 }
@@ -210,21 +212,21 @@ void MainWindow::exitProgram()
 void MainWindow::lowerThresholdChanged( int lowerThreshold )
 {
 	double range = m_ViewerCore->getCurrentImage()->getMinMax().second->as<double>() - m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>();
-	m_ViewerCore->getCurrentImage()->setLowerThreshold( ( range / 1000 ) * (lowerThreshold+1) + m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>() );
+	m_ViewerCore->getCurrentImage()->setLowerThreshold( ( range / 1000 ) * ( lowerThreshold + 1 ) + m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>() );
 	m_ViewerCore->updateScene();
 }
 
 void MainWindow::upperThresholdChanged( int upperThreshold )
 {
 	double range = m_ViewerCore->getCurrentImage()->getMinMax().second->as<double>() - m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>();
-	m_ViewerCore->getCurrentImage()->setUpperThreshold( ( range / 1000 ) * (upperThreshold+1)  + m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>() );
+	m_ViewerCore->getCurrentImage()->setUpperThreshold( ( range / 1000 ) * ( upperThreshold + 1 )  + m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>() );
 	m_ViewerCore->updateScene();
 
 }
 
-void MainWindow::interpolationChanged(int index)
+void MainWindow::interpolationChanged( int index )
 {
-	util::Singletons::get<GLTextureHandler, 10>().forceReloadingAllOfType( ImageHolder::z_map, static_cast<GLTextureHandler::InterpolationType>(index) );
+	util::Singletons::get<GLTextureHandler, 10>().forceReloadingAllOfType( ImageHolder::z_map, static_cast<GLTextureHandler::InterpolationType>( index ) );
 	m_ViewerCore->updateScene();
 
 }
