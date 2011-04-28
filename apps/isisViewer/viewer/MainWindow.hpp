@@ -39,6 +39,7 @@ public Q_SLOTS:
 	void triggeredMakeCurrentImage( bool );
 	void triggeredMakeCurrentImageZmap( bool );
 	void doubleClickedMakeCurrentImage( QListWidgetItem* );
+	void interpolationChanged( int );
 
 	void upperThresholdChanged( int );
 	void lowerThresholdChanged( int );

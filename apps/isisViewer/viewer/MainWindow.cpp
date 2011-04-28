@@ -34,7 +34,7 @@ MainWindow::MainWindow( QViewerCore *core )
 	connect( ui.upperThreshold, SIGNAL( sliderMoved( int ) ), this, SLOT( upperThresholdChanged( int ) ) );
 	connect( ui.lowerThreshold, SIGNAL( sliderMoved( int ) ), this, SLOT( lowerThresholdChanged( int ) ) );
 	connect(ui.timestepSpinBox, SIGNAL( valueChanged(int)), m_ViewerCore, SLOT(timestepChanged(int) )) ;
-
+	connect(ui.interpolationType, SIGNAL(currentIndexChanged(int)), this, SLOT(interpolationChanged(int)));
 	//we need a master widget to keep opengl running in case all visible widgets were closed
 
 	m_MasterWidget = new QGLWidgetImplementation( core, 0, axial );
@@ -71,7 +71,6 @@ void MainWindow::contextMenuImageStack( QPoint position )
 
 void MainWindow::triggeredMakeCurrentImage( bool triggered )
 {
-	
 	m_ViewerCore->setCurrentImage( m_ViewerCore->getDataContainer().at( ui.imageStack->currentItem()->text().toStdString() ) );
 	double range = m_ViewerCore->getCurrentImage()->getMinMax().second->as<double>() - m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>();
 	ui.lowerThreshold->setSliderPosition(
@@ -219,6 +218,13 @@ void MainWindow::upperThresholdChanged( int upperThreshold )
 {
 	double range = m_ViewerCore->getCurrentImage()->getMinMax().second->as<double>() - m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>();
 	m_ViewerCore->getCurrentImage()->setUpperThreshold( ( range / 1000 ) * (upperThreshold+1)  + m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>() );
+	m_ViewerCore->updateScene();
+
+}
+
+void MainWindow::interpolationChanged(int index)
+{
+	util::Singletons::get<GLTextureHandler, 10>().forceReloadingAllOfType( ImageHolder::z_map, static_cast<GLTextureHandler::InterpolationType>(index) );
 	m_ViewerCore->updateScene();
 
 }

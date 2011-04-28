@@ -39,7 +39,7 @@ GLuint GLTextureHandler::copyImageToTexture(  const boost::shared_ptr<ImageHolde
 
 
 }
-bool GLTextureHandler::forceReloading(GLTextureHandler::InterpolationType interpolation, bool withAlpha, ImageHolder::ImageType imageType )
+bool GLTextureHandler::forceReloadingAllOfType(ImageHolder::ImageType imageType, InterpolationType interpolation, bool withAlpha )
 {
 	typedef std::map< size_t, GLuint> TimeStepMap;
 	BOOST_FOREACH( ImageMapType::const_reference image, m_ImageMap )

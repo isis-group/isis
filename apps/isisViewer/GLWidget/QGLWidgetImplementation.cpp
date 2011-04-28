@@ -514,8 +514,6 @@ void QGLWidgetImplementation::keyPressEvent( QKeyEvent *e )
 		size_t timestep = m_StateValues[m_ViewerCore->getCurrentImage()].voxelCoords[3];
 		util::ivector4 size = m_ViewerCore->getCurrentImage()->getImageSize();
 		lookAtPhysicalCoords( m_ViewerCore->getCurrentImage()->getImage()->getPhysicalCoordsFromIndex( util::ivector4( size[0] / 2, size[1] / 2, size[2] / 2 ) ) );
-		util::Singletons::get<GLTextureHandler, 10>().forceReloading( GLTextureHandler::linear, true );
-		updateScene();
 	}
 }
 
