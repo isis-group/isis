@@ -1,4 +1,4 @@
-	/*
+/*
  *  imageFormat_SiemensTcpIp.cpp
  *  BARTApplication
  *
@@ -57,121 +57,125 @@ namespace isis
                 std::string header;
              	
 				for(;;){
-				memset(buffer, 0, sizeof(buffer));
-				unsigned int length = recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr*)&receiver_address, &receiver_address_length);
-				if(length == 0) {
-					exit(0);
-				}
+					memset(buffer, 0, sizeof(buffer));
+					unsigned int length = recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr*)&receiver_address, &receiver_address_length);
+					if(length == 0) {
+						exit(0);
+					}
                     if (memcmp(buffer, session_terminus.c_str(), session_terminus.size() - 1) == 0){
                         return 0;
                     }
                     
-				
-				if(memcmp(buffer, header_start.c_str(), header_start.size() ) == 0) {
-					firstHeaderArrived = true;
-					data_received = 0L;
-					unsigned int header_length = 0;
-					while(memcmp(header_end.c_str(), (buffer + header_length), header_end.size() ) != 0) {
-						header_length++;
-					}
-					header_length += header_end.size();
-					header = std::string(buffer, header_length);
-					//fprintf(headerFile,"%d\n\n", image_counter);
-                    //fprintf(headerFile,"%s",header.c_str());
-					//fprintf(headerFile,"\n BREAK ************************\n\n\n");
-                    byteSize = atoi(getStringFromHeader("data_size_in_bytes", header).c_str());
 					
-					//printf("byteSize: '%i'\n", byteSize);
-					dataBuffer = (char*)malloc(byteSize);
-					
-					// copy the first bit of data
-					memcpy(dataBuffer, (buffer + header_length), sizeof(buffer) - header_length);
-					
-					data_received += sizeof(buffer) - header_length;
-                    
-					
-				} else if (true == firstHeaderArrived) {
-					
-                   if(byteSize - data_received >= 32768) {
-						memcpy(dataBuffer + data_received, buffer, sizeof(buffer));
-						data_received += sizeof(buffer);
-					   
-					   printf("dataRec: '%ld'\n", data_received);
-					   printf("   imageNR: %d \n", image_counter);
-					} else {
-						// image complete
-                        size_t width = atoi(getStringFromHeader("width", header).c_str());
-                        bool moco = getStringFromHeader("motion_corrected", header).compare("yes") == 0 ? true : false;
-                        size_t height = atoi(getStringFromHeader("height", header).c_str());
-                        bool mosaic = getStringFromHeader("mosaic", header).compare("yes") == 0 ? true : false;
-                        size_t iim = 1;
-                        //printf("Header \n %s \n", header.c_str());
-                        if ( true == mosaic){
-                            iim = atoi(getStringFromHeader("images_in_mosaic", header).c_str());
-                        }
-                        
-                        std::string data_type = getStringFromHeader("data_type", header);
-                        
-                        // Mosaics are always quadratic, so don't bother 'bout only looking for the rows
-                        size_t slices_in_row = static_cast<size_t> (ceil(sqrt(static_cast<double_t> (iim) )));
-                        size_t width_slice = width / slices_in_row;
-                        size_t height_slice = height / slices_in_row;
-                        
-                        size_t acq_nr = atoi(getStringFromHeader("acquisition_number", header).c_str());
-                        std::string seq_descr = getStringFromHeader("sequence_description", header);
-                        size_t seq_number = atoi(getStringFromHeader("meas_uid", header).c_str());
-                        size_t acq_time = atoi(getStringFromHeader("acquisition_time", header).c_str());
-                        uint16_t rep_time = atol(getStringFromHeader("repetition_time", header).c_str());
-                        util::fvector4 read_vec = getVectorFromString(getStringFromHeader("read_vector", header));
-                        util::fvector4 phase_vec = getVectorFromString(getStringFromHeader("phase_vector", header));
-                        util::fvector4 slice_norm_vec = getVectorFromString(getStringFromHeader("slice_norm_vector", header));
-                        size_t inplane_rot = atoi(getStringFromHeader("implane_rotation", header).c_str());
-                        std::string slice_orient = getStringFromHeader("slice_orientation", header);
-                        
-                        //Fallunterscheidung
-                        // Wenn ((slice_orient == TRANSVERSE) gilt: (-45 < inplane_rot < 45)) ? -> COL : ROW -> columnVec == col + rowVec == row
-                        // Wenn ((slice_orient != TRANSVERSE) gilt: (-45 < inplane_rot < 45)) ? -> ROW : COL -> columnVec == row + rowVec == col
-                        std::string InPlanePhaseEncodingDirection;
-                        if (0 == slice_orient.compare(0, slice_orient.length(), "TRANSVERSE")) {
-                            InPlanePhaseEncodingDirection = (-45 < inplane_rot && inplane_rot < 45 ) ? "COL" : "ROW";
-                        }
-                        else {
-                            InPlanePhaseEncodingDirection = (-45 < inplane_rot && inplane_rot < 45 ) ? "ROW" : "COL";
-                        }
-
-                        size_t fov_read = atoi(getStringFromHeader("fov_read", header).c_str());
-                        size_t fov_phase = atoi(getStringFromHeader("fov_phase", header).c_str());
-                        size_t slice_thickness = atoi(getStringFromHeader("slice_thickness", header).c_str());
-                        size_t dimension_number = atoi(getStringFromHeader("dimension_number", header).c_str());
-                        // get voxelGap out of the distance (in percent!) between slices
-                        size_t distFactor = atoi(getStringFromHeader("distance_factor", header).c_str());
-                        util::fvector4 voxelGap(0, 0, slice_thickness*(distFactor/100));
-                        
-                        //*********
-                        
- 						image_counter++;
-												
-						memcpy(dataBuffer + data_received, buffer, byteSize - data_received);
-						data_received += byteSize - data_received;
+					if(memcmp(buffer, header_start.c_str(), header_start.size() ) == 0) {
+						firstHeaderArrived = true;
+						data_received = 0L;
+						unsigned int header_length = 0;
+						while(memcmp(header_end.c_str(), (buffer + header_length), header_end.size() ) != 0) {
+							header_length++;
+						}
+						header_length += header_end.size();
+						header = std::string(buffer, header_length);
+						//fprintf(headerFile,"%d\n\n", image_counter);
+						//fprintf(headerFile,"%s",header.c_str());
+						//fprintf(headerFile,"\n BREAK ************************\n\n\n");
+						byteSize = atoi(getStringFromHeader("data_size_in_bytes", header).c_str());
 						
-						 printf("!!! ByteSize: %d      dataRec: %ld       imageNR: %d\n", byteSize, data_received, image_counter);
+						//printf("byteSize: '%i'\n", byteSize);
+						dataBuffer = (char*)malloc(byteSize);
 						
-						// ... do something ...
-						/******************************/
-					
-                       if ( 0 == data_type.compare("short")){
-                           //char slice_buffer[width_slice * height_slice * sizeof(short)];
-                           // for(unsigned int _slice = 0; _slice < iim; _slice++) {
-                           //         for(unsigned int _row = 0; _row < height_slice; _row++) {
-                           //             char* line_start = dataBuffer + (sizeof(short) * (((_slice / slices_in_row) * (slices_in_row * height_slice * width_slice)) + 
-                           //                                                               (_row * width_slice * slices_in_row) + (_slice % slices_in_row * width_slice)));
-
-                           //             memcpy(slice_buffer + (_row * width_slice * sizeof(short)), line_start, (width_slice * sizeof(short)));
-                           //         }
+						// copy the first bit of data
+						memcpy(dataBuffer, (buffer + header_length), sizeof(buffer) - header_length);
+						
+						data_received += sizeof(buffer) - header_length;
+						
+						
+					} else if (true == firstHeaderArrived) {
+						
+						if(byteSize - data_received >= 32768) {
+							memcpy(dataBuffer + data_received, buffer, sizeof(buffer));
+							data_received += sizeof(buffer);
+							
+							printf("dataRec: '%ld'\n", data_received);
+							printf("   imageNR: %d \n", image_counter);
+						} else {
+							// image complete
+							size_t width = atoi(getStringFromHeader("width", header).c_str());
+							bool moco = getStringFromHeader("motion_corrected", header).compare("yes") == 0 ? true : false;
+							size_t height = atoi(getStringFromHeader("height", header).c_str());
+							bool mosaic = getStringFromHeader("mosaic", header).compare("yes") == 0 ? true : false;
+							size_t iim = 1;
+							//printf("Header \n %s \n", header.c_str());
+							if ( true == mosaic){
+								iim = atoi(getStringFromHeader("images_in_mosaic", header).c_str());
+							}
+							
+							std::string data_type = getStringFromHeader("data_type", header);
+							
+							// Mosaics are always quadratic, so don't bother 'bout only looking for the rows
+							size_t slices_in_row = static_cast<size_t> (ceil(sqrt(static_cast<double_t> (iim) )));
+							size_t width_slice = width / slices_in_row;
+							size_t height_slice = height / slices_in_row;
+							
+							size_t acq_nr = atoi(getStringFromHeader("acquisition_number", header).c_str());
+							std::string seq_descr = getStringFromHeader("sequence_description", header);
+							size_t seq_number = atoi(getStringFromHeader("meas_uid", header).c_str());
+							size_t acq_time = atoi(getStringFromHeader("acquisition_time", header).c_str());
+							uint16_t rep_time = atol(getStringFromHeader("repetition_time", header).c_str());
+							util::fvector4 read_vec = getVectorFromString(getStringFromHeader("read_vector", header));
+							util::fvector4 phase_vec = getVectorFromString(getStringFromHeader("phase_vector", header));
+							util::fvector4 slice_norm_vec = getVectorFromString(getStringFromHeader("slice_norm_vector", header));
+							size_t inplane_rot = atoi(getStringFromHeader("implane_rotation", header).c_str());
+							std::string slice_orient = getStringFromHeader("slice_orientation", header);
+							
+							//Fallunterscheidung
+							// Wenn ((slice_orient == TRANSVERSE) gilt: (-45 < inplane_rot < 45)) ? -> COL : ROW -> columnVec == col + rowVec == row
+							// Wenn ((slice_orient != TRANSVERSE) gilt: (-45 < inplane_rot < 45)) ? -> ROW : COL -> columnVec == row + rowVec == col
+							std::string InPlanePhaseEncodingDirection;
+							if (0 == slice_orient.compare(0, slice_orient.length(), "TRANSVERSE")) {
+								InPlanePhaseEncodingDirection = (-45 < inplane_rot && inplane_rot < 45 ) ? "COL" : "ROW";
+							}
+							else {
+								InPlanePhaseEncodingDirection = (-45 < inplane_rot && inplane_rot < 45 ) ? "ROW" : "COL";
+							}
+							
+							size_t fov_read = atoi(getStringFromHeader("fov_read", header).c_str());
+							size_t fov_phase = atoi(getStringFromHeader("fov_phase", header).c_str());
+							size_t slice_thickness = atoi(getStringFromHeader("slice_thickness", header).c_str());
+							size_t dimension_number = atoi(getStringFromHeader("dimension_number", header).c_str());
+							// get voxelGap out of the distance (in percent!) between slices
+							size_t distFactor = atoi(getStringFromHeader("distance_factor", header).c_str());
+							util::fvector4 voxelGap(0, 0, slice_thickness*(distFactor/100));
+							
+							//*********
+							
+							image_counter++;
+							
+							memcpy(dataBuffer + data_received, buffer, byteSize - data_received);
+							data_received += byteSize - data_received;
+							
+							printf("!!! ByteSize: %d      dataRec: %ld       imageNR: %d\n", byteSize, data_received, image_counter);
+							
+							// ... do something ...
+							/******************************/
+							
+							if ( 0 == data_type.compare("short")){
+								//char slice_buffer[width_slice * height_slice * sizeof(short)];
+								char slice_buffer[iim * width_slice * height_slice * sizeof(short)];
+								
+								for(unsigned int _slice = 0; _slice < iim; _slice++) {
+									for(unsigned int _row = 0; _row < height_slice; _row++) {
+										char* line_start = dataBuffer + (sizeof(short) * (((_slice / slices_in_row) * (slices_in_row * height_slice * width_slice)) + 
+																						  (_row * width_slice * slices_in_row) + (_slice % slices_in_row * width_slice)));
+										
+										//             memcpy(slice_buffer + (_row * width_slice * sizeof(short)), line_start, (width_slice * sizeof(short)));
+										memcpy(slice_buffer + ( (_slice*width_slice*height_slice + _row * width_slice) * sizeof(short)), line_start, (width_slice * sizeof(short)));
+									}
+								}
                                 
                                 /********
-                                * get each slice position from header 
-                                */
+								 * get each slice position from header 
+								 */
                                 std::string slice_pos = "slice_position_0";
                                 //char buf[5];
                                 //sprintf(buf, "%i", _slice);
@@ -182,14 +186,14 @@ namespace isis
                                 // now, create chunks per slice and feed it with metadata
                                 //data::Chunk chT(data::MemChunk<uint16_t>((uint16_t*)slice_buffer, height_slice,width_slice,1) );
                                 //data::Chunk chT(data::MemChunk<uint16_t>((uint16_t*)slice_buffer, height_slice,width_slice,iim) );
-                                data::Chunk ch(data::MemChunk<uint16_t>((uint16_t*)dataBuffer, height_slice,width_slice,iim) );
-                           
+                                data::Chunk ch(data::MemChunk<uint16_t>((uint16_t*)slice_buffer, height_slice, width_slice, iim) );
+								
                                 ch.convertToType(isis::data::ValuePtr<float>::staticID);
 								//data::MemChunk<float> ch(chT);
                                 ch.setPropertyAs("indexOrigin", slice_pos_vec);
-                               // ch.setPropertyAs<uint32_t>("acquisitionNumber", (acq_nr*iim)+_slice);
+								// ch.setPropertyAs<uint32_t>("acquisitionNumber", (acq_nr*iim)+_slice);
                                 ch.setPropertyAs<uint32_t>("acquisitionNumber", (acq_nr));
-                           
+								
                                 //ch.setPropertyAs<>("acquisitionTime", acquisition_time);
                                 if (true == moco){
                                     ch.setPropertyAs<uint16_t>("sequenceNumber", 0);
@@ -199,7 +203,7 @@ namespace isis
                                 }
                                 ch.setPropertyAs<std::string>("sequenceDescription", seq_descr);
                                 
-
+								
                                 if ( 0 == InPlanePhaseEncodingDirection.compare(0, 3, "COL") ){
                                     ch.setPropertyAs<util::fvector4>("rowVec", phase_vec);
                                     ch.setPropertyAs<util::fvector4>("columnVec", read_vec);
@@ -210,7 +214,7 @@ namespace isis
                                     ch.setPropertyAs<util::fvector4>("rowVec", read_vec);
                                     ch.setPropertyAs<util::fvector4>("voxelSize", util::fvector4(fov_phase/width_slice,fov_read/height_slice,slice_thickness,0));
                                 }
-
+								
                                 
                                 ch.setPropertyAs<util::fvector4>("sliceVec", slice_norm_vec);
                                 ch.setPropertyAs<uint16_t>("repetitionTime",rep_time);
@@ -228,44 +232,44 @@ namespace isis
                                 strftime(nameForSource, 80, "%y%m%d_%H_%M_%S", ptr);
                                 ch.setPropertyAs<std::string>("source", sn);
                                 chunks.push_back(ch);
-                            //}
-                       }
-                        else {
-                            printf("DATATYPE NOT SUPPORTED\n");
-                        }
-
-				
+								//}
+							}
+							else {
+								printf("DATATYPE NOT SUPPORTED\n");
+							}
+							
+							
+							
+							/******************************/
+							free(dataBuffer);
+							/*****************************/
+							
+							
+							// evaluate the sending timing
+							// TODO:: remove this stuff sometime
+							if (true == moco){
+								timestampPreviousMOCO = timestampCurrentMOCO;
+								timestampCurrentMOCO = atof(getStringFromHeader("time_stamp", header).c_str());
+								double_t diffTimestamps = (timestampCurrentMOCO - timestampPreviousMOCO);
+								fprintf(timediffMOCO, "%.6lf\n", diffTimestamps );
+							}
+							if (false == moco){
+								timestampPrevious = timestampCurrent;
+								timestampCurrent = atof(getStringFromHeader("time_stamp", header).c_str());
+								double_t diffTimestamps = (timestampCurrent - timestampPrevious);
+								fprintf(timediffRECO, "%.6lf\n", diffTimestamps );
+							}
+							//time(&endTime);
+							//double_t diffTiming = difftime(endTime, startTime);
+							//printf("Time to create Image: %.2lf s\n", diffTiming);
+							
+							return 0;
+						}
 						
-						/******************************/
-						free(dataBuffer);
-                        /*****************************/
-
-                        
-                        // evaluate the sending timing
-                        // TODO:: remove this stuff sometime
-                        if (true == moco){
-                            timestampPreviousMOCO = timestampCurrentMOCO;
-                            timestampCurrentMOCO = atof(getStringFromHeader("time_stamp", header).c_str());
-                            double_t diffTimestamps = (timestampCurrentMOCO - timestampPreviousMOCO);
-                            fprintf(timediffMOCO, "%.6lf\n", diffTimestamps );
-                        }
-                        if (false == moco){
-                            timestampPrevious = timestampCurrent;
-                            timestampCurrent = atof(getStringFromHeader("time_stamp", header).c_str());
-                            double_t diffTimestamps = (timestampCurrent - timestampPrevious);
-                            fprintf(timediffRECO, "%.6lf\n", diffTimestamps );
-                        }
-						//time(&endTime);
-						//double_t diffTiming = difftime(endTime, startTime);
-						//printf("Time to create Image: %.2lf s\n", diffTiming);
-						
-   					return 0;
 					}
+                    
 					
 				}
-                    
-				
-			}
 				return 0;
 			}
 			
@@ -311,7 +315,7 @@ namespace isis
                 prop_end.append(propName);
                 prop_end.append(">");
                 std::string propString = header.substr((header.find(prop_start)+prop_start.length()), 
-                                                         header.find(prop_end) - (header.find(prop_start)+prop_start.length()));
+													   header.find(prop_end) - (header.find(prop_start)+prop_start.length()));
                 return propString;
             }
             
@@ -341,7 +345,7 @@ namespace isis
         FILE* ImageFormat_SiemensTcpIp::timediffMOCO;
         FILE* ImageFormat_SiemensTcpIp::timediffRECO;
 		//FILE* ImageFormat_SiemensTcpIp::headerFile;
-        		
+		
 	}
 }
 isis::image_io::FileFormat *factory()
@@ -355,9 +359,9 @@ isis::image_io::FileFormat *factory()
 	pluginRtExport->receiver_address.sin_family      = PF_INET;
 	pluginRtExport->receiver_address.sin_addr.s_addr = INADDR_ANY;
 	pluginRtExport->receiver_address.sin_port        = htons(54321);
-		
+	
 	printf("[bind] --> %i\n", bind(pluginRtExport->sock, (struct sockaddr*)&pluginRtExport->receiver_address, sizeof(pluginRtExport->receiver_address)));
-		
+	
 	pluginRtExport->receiver_address_length = sizeof(pluginRtExport->receiver_address);
 	pluginRtExport->counter = 0;
 	pluginRtExport->image_counter = 0;
@@ -366,7 +370,7 @@ isis::image_io::FileFormat *factory()
     pluginRtExport->timestampPrevious = 0;
     pluginRtExport->timestampCurrentMOCO = 0;
     pluginRtExport->timestampPreviousMOCO = 0;
-
+	
 	struct tm* ptr;
 	time_t lt;
 	char fnameMOCO[80];
