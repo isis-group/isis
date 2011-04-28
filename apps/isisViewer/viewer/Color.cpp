@@ -16,7 +16,7 @@ std::vector< util::fvector4 > Color::getColorGradientRGB( const Color::LookUpTab
 	switch( lutType ) {
 	case Color::hsvLUT:
 		
-		for ( float angle = 0; angle < 360; angle += angleStep ) {
+		for ( float angle = 0; angle < 360.0; angle += angleStep ) {
 			rgbColor = QColor::fromHsv( util::Value<float>(angle).as<int>(), 255, 255 );
 			retRGBGradient.push_back( util::fvector4( rgbColor.red(), rgbColor.green(), rgbColor.blue() ) );
 		}
@@ -24,7 +24,7 @@ std::vector< util::fvector4 > Color::getColorGradientRGB( const Color::LookUpTab
 		break;
 	case Color::hsvLUT_reverse:
 
-		for ( float angle = 359; angle >= 0; angle -= angleStep ) {
+		for ( float angle = 359.0; angle >= 0; angle -= angleStep ) {
 			rgbColor = QColor::fromHsv( util::Value<float>(angle).as<int>(), 255, 255 );
 			retRGBGradient.push_back( util::fvector4( rgbColor.red(), rgbColor.green(), rgbColor.blue() ) );
 		}

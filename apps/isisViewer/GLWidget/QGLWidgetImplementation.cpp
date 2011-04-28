@@ -292,7 +292,7 @@ void QGLWidgetImplementation::paintScene( const boost::shared_ptr<ImageHolder> i
 	if( image->getImageState().imageType == ImageHolder::z_map ) {
 		m_ScalingShader.setEnabled( false );
 		m_LUTShader.setEnabled( true );
-		GLuint id = m_LookUpTable.getLookUpTableAsTexture( Color::hsvLUT );
+		GLuint id = m_LookUpTable.getLookUpTableAsTexture( Color::hsvLUT_reverse );
 		glActiveTexture( GL_TEXTURE1 );
 		glBindTexture( GL_TEXTURE_1D, id );
 		m_LUTShader.addVariable<float>( "lut", 1, true );
@@ -301,8 +301,8 @@ void QGLWidgetImplementation::paintScene( const boost::shared_ptr<ImageHolder> i
 		m_LUTShader.addVariable<float>( "killZeros", 1.0 );
 		m_LUTShader.addVariable<float>( "upper_threshold", image->getImageState().threshold.second );
 		m_LUTShader.addVariable<float>( "lower_threshold", image->getImageState().threshold.first );
-		m_LUTShader.addVariable<float>( "bias", bias );
-		m_LUTShader.addVariable<float>( "scaling", scaling );
+		m_LUTShader.addVariable<float>( "bias", 0.0 );
+		m_LUTShader.addVariable<float>( "scaling", 1.0 );
 		m_LUTShader.addVariable<float>( "opacity", image->getImageState().opacity );
 	} else if ( image->getImageState().imageType == ImageHolder::anatomical_image ) {
 		m_ScalingShader.setEnabled( true );
