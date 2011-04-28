@@ -6,22 +6,22 @@ namespace viewer
 {
 
 
-std::map<boost::shared_ptr<ImageHolder>, GLuint> GLTextureHandler::copyAllImagesToTextures( const DataContainer &data, GLTextureHandler::InterpolationType interpolation )
+std::map<boost::shared_ptr<ImageHolder>, GLuint> GLTextureHandler::copyAllImagesToTextures( const DataContainer &data, const bool withAlpha, GLTextureHandler::InterpolationType interpolation )
 {
 	// here we only copy the first timestep of each image. Would take a while to do this for all timesteps
 	std::map<boost::shared_ptr<ImageHolder>, GLuint> retIDList;
 
 	BOOST_FOREACH( DataContainer::const_reference image, data ) {
-		retIDList[image.second] = copyImageToTexture( data, image.second, 0, interpolation );
+		retIDList[image.second] = copyImageToTexture( image.second, 0, withAlpha, interpolation );
 	}
 
 	return retIDList;
 
 }
 
-GLuint GLTextureHandler::copyImageToTexture( const DataContainer &data, const boost::shared_ptr<ImageHolder> image, size_t timestep, const bool withAlpha, GLTextureHandler::InterpolationType interpolation )
+GLuint GLTextureHandler::copyImageToTexture(  const boost::shared_ptr<ImageHolder> image, size_t timestep, const bool withAlpha, GLTextureHandler::InterpolationType interpolation )
 {
-	typedef uint8_t TYPE;
+
 
 	//check if there is an image with this parameters
 	if ( image->getImageSize()[3] <= timestep )  {
@@ -35,9 +35,22 @@ GLuint GLTextureHandler::copyImageToTexture( const DataContainer &data, const bo
 		return m_ImageMap[image][timestep];
 	}
 
-	return internCopyImageToTexture<TYPE>( data, GL_UNSIGNED_BYTE, image, timestep, withAlpha, interpolation );
+	return internCopyImageToTexture<GLTextureHandler::TYPE>( GL_UNSIGNED_BYTE, image, timestep, withAlpha, interpolation );
 
 
 }
+bool GLTextureHandler::forceReloadingAllOfType( ImageHolder::ImageType imageType, InterpolationType interpolation, bool withAlpha )
+{
+	typedef std::map< size_t, GLuint> TimeStepMap;
+	BOOST_FOREACH( ImageMapType::const_reference image, m_ImageMap ) {
+		if( image.first->getImageState().imageType == imageType ) {
+			BOOST_FOREACH( TimeStepMap::const_reference timestep, image.second ) {
+				internCopyImageToTexture<GLTextureHandler::TYPE>( GL_UNSIGNED_BYTE, image.first, timestep.first, withAlpha, interpolation );
+			}
+		}
+	}
+}
+
+
 }
 } // end namespace

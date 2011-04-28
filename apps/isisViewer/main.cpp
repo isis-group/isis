@@ -11,7 +11,6 @@
 
 int main( int argc, char *argv[] )
 {
-
 	using namespace isis::viewer;
 	isis::util::Selection dbg_levels( "error,warning,info,verbose_info" );
 	dbg_levels.set( "warning" );
@@ -30,12 +29,12 @@ int main( int argc, char *argv[] )
 	app.parameters["adopt"] = bool();
 	app.parameters["adopt"] = false;
 	app.parameters["adopt"].needed() = false;
-	app.parameters["adopt"].setDescription("If the zmap has wrong orienation information this option can be used to adopt the orienation information of the anatomical image");
+	app.parameters["adopt"].setDescription( "If the zmap has wrong orienation information this option can be used to adopt the orienation information of the anatomical image" );
 	app.parameters["dViewer"] = dbg_levels;
 	app.parameters["dViewer"].setDescription( "Debugging level for the Viewer module" );
 	app.parameters["dViewer"].hidden() = true;
 	app.parameters["dViewer"].needed() = false;
-	app.init( argc, argv );
+	app.init( argc, argv, true );
 	app.setLog<isis::ViewerLog>( app.getLLMap()[app.parameters["dViewer"]->as<isis::util::Selection>()] );
 	app.setLog<isis::ViewerDebug>( app.getLLMap()[app.parameters["dViewer"]->as<isis::util::Selection>()] );
 	isis::util::slist fileList = app.parameters["in"];
@@ -56,16 +55,16 @@ int main( int argc, char *argv[] )
 			zImgList.push_back( imgRef );
 		}
 	}
-	if(app.parameters["adopt"]) {
-		BOOST_FOREACH( std::list<isis::data::Image>::reference zImage, zImgList )
-		{
-			zImage.setPropertyAs<isis::util::fvector4>("indexOrigin", imgList.front().getPropertyAs<isis::util::fvector4>("indexOrigin"));
-			zImage.setPropertyAs<isis::util::fvector4>("rowVec", imgList.front().getPropertyAs<isis::util::fvector4>("rowVec"));
-			zImage.setPropertyAs<isis::util::fvector4>("columnVec", imgList.front().getPropertyAs<isis::util::fvector4>("columnVec"));
-			zImage.setPropertyAs<isis::util::fvector4>("sliceVec", imgList.front().getPropertyAs<isis::util::fvector4>("sliceVec"));
+
+	if( app.parameters["adopt"] ) {
+		BOOST_FOREACH( std::list<isis::data::Image>::reference zImage, zImgList ) {
+			zImage.setPropertyAs<isis::util::fvector4>( "indexOrigin", imgList.front().getPropertyAs<isis::util::fvector4>( "indexOrigin" ) );
+			zImage.setPropertyAs<isis::util::fvector4>( "rowVec", imgList.front().getPropertyAs<isis::util::fvector4>( "rowVec" ) );
+			zImage.setPropertyAs<isis::util::fvector4>( "columnVec", imgList.front().getPropertyAs<isis::util::fvector4>( "columnVec" ) );
+			zImage.setPropertyAs<isis::util::fvector4>( "sliceVec", imgList.front().getPropertyAs<isis::util::fvector4>( "sliceVec" ) );
 		}
 	}
-	
+
 	isis::viewer::QViewerCore *core = new isis::viewer::QViewerCore;
 	isis::viewer::MainWindow isisViewerMainWindow( core );
 

@@ -13,18 +13,18 @@ std::string colormap_shader_code = STRINGIFY(
 									   uniform float killZeros;
 									   void main ()
 {
+	float err = 0.006;
 	float range = max - min;
 	float i = texture3D( imageTexture, gl_TexCoord[0].xyz ).r;
-	vec4 colorLut = texture1D( lut, i );
-	vec4 zeroColor = texture1D( lut, 0 );
+	vec4 colorLut = texture1D( lut, i - err );
 	colorLut.a = opacity;
 	float inormed = ( i * range ) + min;
 
-	if( inormed > upper_threshold || inormed < lower_threshold )  {
+	if( inormed > upper_threshold + err || inormed < lower_threshold )  {
 		colorLut.a = 0;
 	}
 
-	if( killZeros == 1 && ( inormed > -0.001 && inormed < 0.001 ) ) {
+	if( killZeros == 1 && ( inormed > -err && inormed < err ) ) {
 		colorLut.a = 0;
 	}
 

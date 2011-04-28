@@ -865,23 +865,30 @@ BOOST_AUTO_TEST_CASE ( image_size_test )
 
 BOOST_AUTO_TEST_CASE( image_get_coords_test )
 {
-	data::MemChunk<uint8_t> minChunk(10,10,10,1);
+	size_t imageSize = 20;
+	data::MemChunk<uint8_t> minChunk(imageSize,imageSize,imageSize,1);
 	minChunk.setPropertyAs<uint32_t>( "acquisitionNumber", 1 );
 	minChunk.setPropertyAs<uint16_t>( "sequenceNumber", 1 );
 	minChunk.setPropertyAs<util::fvector4>( "indexOrigin", util::fvector4(-10,110.5,-99.8));
-	minChunk.setPropertyAs<util::fvector4>( "rowVec", util::fvector4(1,0,0));
-	minChunk.setPropertyAs<util::fvector4>( "columnVec", util::fvector4(0,1,0));
-	minChunk.setPropertyAs<util::fvector4>( "sliceVec", util::fvector4(0,0,-1));
-	minChunk.setPropertyAs<util::fvector4>( "voxelSize", util::fvector4(1,2,0.5));
+	minChunk.setPropertyAs<util::fvector4>( "rowVec", util::fvector4(1,1.17296e-16,-9.64207e-17));
+	minChunk.setPropertyAs<util::fvector4>( "columnVec", util::fvector4(-1.05222e-16, 0.957823, -0.287361));
+	minChunk.setPropertyAs<util::fvector4>( "sliceVec", util::fvector4( -5.74721e-17, 0.287361, 0.957823));
+	minChunk.setPropertyAs<util::fvector4>( "voxelSize", util::fvector4(1,0.5,3.5));
 	data::Image img(minChunk);
 	BOOST_REQUIRE( img.isClean() );
 	BOOST_REQUIRE( img.isValid() );
 	BOOST_REQUIRE( !img.isEmpty() );
-	BOOST_CHECK_EQUAL( img.getPhysicalCoords( util::ivector4(0,0,0) ), img.getPropertyAs<util::fvector4>("indexOrigin") ) ;
-	BOOST_CHECK_EQUAL( img.getPhysicalCoords( util::ivector4(9,9,9) ), util::fvector4(-1,128.5,-104.3)  );
-	//and the other way round
-	BOOST_CHECK_EQUAL( img.getVoxelCoords( img.getPropertyAs<util::fvector4>("indexOrigin") ), util::ivector4(0,0,0) ) ;
-	BOOST_CHECK_EQUAL( img.getVoxelCoords( util::fvector4(-1,128.5,-104.3) ), util::ivector4(9,9,9) );
+	for(size_t z = 0; z<imageSize;z++) {
+		for(size_t y = 0; y<imageSize;y++) {
+			for (size_t x = 0; x<imageSize; x++) {
+				util::fvector4 physicalCoords = img.getPhysicalCoordsFromIndex(util::ivector4(x,y,z));
+				util::ivector4 index = img.getIndexFromPhysicalCoords( physicalCoords );
+				BOOST_CHECK_EQUAL( index, util::ivector4(x,y,z));
+			}
+		}
+			
+	}
+
 
 }
 

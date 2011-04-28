@@ -126,9 +126,9 @@ util::dvector4 GLOrientationHandler::transformVoxel2ObjectCoords( const isis::ut
 	util::dvector4 transformedObjectCoords = transformVector<float>( objectCoords, orientation );
 	util::dvector4 transformedOneHalfVoxel = transformVector<float>( oneHalfVoxel, orientation );
 	util::dvector4 retVec;
-	retVec[0] = transformedObjectCoords[0] < 0 ? 1.0 + 2 * ( transformedObjectCoords[0] + transformedOneHalfVoxel[0] ) : -1.0 + 2 * ( transformedObjectCoords[0] + transformedOneHalfVoxel[0] );
-	retVec[1] = transformedObjectCoords[1] < 0 ? 1.0 + 2 * ( transformedObjectCoords[1] + transformedOneHalfVoxel[1] ) : -1.0 + 2 * ( transformedObjectCoords[1] + transformedOneHalfVoxel[1] );
-	retVec[2] = transformedObjectCoords[2] < 0 ? 1.0 + transformedObjectCoords[2] + transformedOneHalfVoxel[2] : transformedObjectCoords[2] + transformedOneHalfVoxel[2];
+	retVec[0] = transformedObjectCoords[0] <= 0 ? 1.0 + 2 * ( transformedObjectCoords[0] + transformedOneHalfVoxel[0] ) : -1.0 + 2 * ( transformedObjectCoords[0] + transformedOneHalfVoxel[0] );
+	retVec[1] = transformedObjectCoords[1] <= 0 ? 1.0 + 2 * ( transformedObjectCoords[1] + transformedOneHalfVoxel[1] ) : -1.0 + 2 * ( transformedObjectCoords[1] + transformedOneHalfVoxel[1] );
+	retVec[2] = transformedObjectCoords[2] <= 0 ? 1.0 + transformedObjectCoords[2] + transformedOneHalfVoxel[2] : transformedObjectCoords[2] + transformedOneHalfVoxel[2];
 	return retVec;
 
 }
