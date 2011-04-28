@@ -22,6 +22,7 @@ namespace data
 namespace _internal
 {
 
+
 void transformCoords( isis::util::PropertyMap &properties, util::FixedVector<size_t,4> size, boost::numeric::ublas::matrix<float> transform )
 {
 	using namespace boost::numeric::ublas;

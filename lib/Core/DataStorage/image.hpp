@@ -21,9 +21,9 @@
 #include <boost/foreach.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
-#include <boost/numeric/ublas/lu.hpp>
 #include <stack>
 #include "sortedchunklist.hpp"
+#include "common.hpp"
 
 namespace isis
 {

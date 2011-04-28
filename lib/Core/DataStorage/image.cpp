@@ -210,14 +210,12 @@ bool Image::updateOrientationMatrices()
 		orientation(i,1) = m_ColumnVec[i];
 		orientation(i,2) = m_SliceVec[i];
 	}
-	permutation_matrix<float> pm(orientation.size1());
-	int res = lu_factorize(orientation, pm);
-	if(res != 0 ) {
+	if( !_internal::inverseMatrix<float>( orientation, inverse ) )
+	{
 		LOG(Runtime, error) << "Could not create the inverse of the orientation matrix!";
 		return false;
 	}
-	inverse.assign(identity_matrix<float>(orientation.size1()));
-	lu_substitute(orientation, pm, inverse);
+	;
 	for(size_t i = 0; i< 3; i++ ) {
 		m_RowVecInv[i] = inverse(i,0);
 		m_ColumnVecInv[i] = inverse(i,1);
