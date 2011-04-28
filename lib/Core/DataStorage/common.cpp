@@ -45,6 +45,8 @@ void transformCoords( isis::util::PropertyMap &properties, util::FixedVector<siz
 		R_in( i, 1 ) = column[i];
 		R_in( i, 2 ) = slice[i];
 	}
+	matrix<float> R_in_inverse(R_in);
+	_internal::inverseMatrix<float>(R_in, R_in_inverse);
 // 	std::cout << "R_in: " << R_in << std::endl;
 	// output matrix
 	matrix<float> R_out( 3, 3 );
@@ -85,7 +87,7 @@ void transformCoords( isis::util::PropertyMap &properties, util::FixedVector<siz
 	vector<float> io_translated = origin_in - center_image;
 // 	std::cout << "io_translated: " << io_translated << std::endl;
 	//now multiply this translated origin with the inverse of the orientation matrix of the image
-	vector<float> io_ortho = prod(trans(R_in), io_translated);
+	vector<float> io_ortho = prod(R_in_inverse, io_translated);
 // 	std::cout << "io_ortho: " << io_ortho << std::endl;
 	//now transform this matrix with the actual transformation matrix
 	vector<float> transformed_io_ortho = prod(transform, io_ortho);
