@@ -11,6 +11,8 @@
 #include <vector>
 #include <DataStorage/chunk.hpp>
 #include <boost/shared_ptr.hpp>
+#include <DataStorage/common.hpp>
+#include <CoreUtils/common.hpp>
 
 namespace isis
 {

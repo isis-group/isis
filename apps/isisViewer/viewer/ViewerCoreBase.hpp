@@ -3,6 +3,7 @@
 #define VIEWERCOREBASE_HPP
 
 #include "DataContainer.hpp"
+#include "ImageOps.hpp"
 #include <map>
 
 namespace isis
@@ -38,8 +39,7 @@ private:
 	DataContainer m_DataContainer;
 	boost::shared_ptr<ImageHolder>  m_CurrentImage;
 	size_t m_CurrentTimestep;
-
-
+	
 };
 
 

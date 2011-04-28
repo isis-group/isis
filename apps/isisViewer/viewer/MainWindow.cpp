@@ -228,7 +228,9 @@ void MainWindow::interpolationChanged( int index )
 {
 	util::Singletons::get<GLTextureHandler, 10>().forceReloadingAllOfType( ImageHolder::z_map, static_cast<GLTextureHandler::InterpolationType>( index ) );
 	m_ViewerCore->updateScene();
-
+	std::list<util::ivector4> pos = ImageOps::getPositionsWithValue( m_ViewerCore->getCurrentImage()->getMinMax().second->as<float>(), *m_ViewerCore->getCurrentImage()->getImage() );
+	m_ViewerCore->getWidgetAs<QGLWidgetImplementation>("axialView")->lookAtPhysicalCoords( m_ViewerCore->getCurrentImage()->getImage()->getPhysicalCoordsFromIndex( pos.front() ));
+	
 }
 
 

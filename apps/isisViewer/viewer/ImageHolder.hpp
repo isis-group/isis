@@ -7,6 +7,7 @@
 #include <CoreUtils/propmap.hpp>
 #include <DataStorage/image.hpp>
 #include "common.hpp"
+#include "ImageOps.hpp"
 
 namespace isis
 {
@@ -69,21 +70,16 @@ public:
 		TYPE minImage = getInternMinMax().first->as<TYPE>();
 		TYPE maxImage = getInternMinMax().second->as<TYPE>();
 		TYPE extent = maxImage - minImage;
-		double histogram[extent];
+// 		double histogram[extent];
+		double* histogram = (double*) calloc( extent+1, sizeof(double));
 		size_t stepSize = 2;
 		size_t numberOfVoxels = volume / stepSize;
 		TYPE *dataPtr = static_cast<TYPE *>( getImageVector().front()->getRawAddress().lock().get() );
-
-		//initialize the histogram with 0
-		for( TYPE i = 0; i < extent; i++ ) {
-			histogram[i] = 0;
-		}
 
 		//create the histogram
 		for( size_t i = 0; i < volume; i += stepSize ) {
 			histogram[dataPtr[i]]++;
 		}
-
 		//normalize histogram
 		for( TYPE i = 0; i < extent; i++ ) {
 			histogram[i] /= numberOfVoxels;
@@ -97,7 +93,6 @@ public:
 			sum += histogram[upperBorder--];
 
 		}
-
 		sum = 0;
 
 		while ( sum < cutAway.first ) {
@@ -107,6 +102,7 @@ public:
 		std::pair<double, double> retPair;
 		retPair.first = ( 1.0 / extent ) * lowerBorder;
 		retPair.second = ( float )maxTypeValue / float( upperBorder - lowerBorder );
+		delete[] histogram;
 		return retPair;
 	}
 

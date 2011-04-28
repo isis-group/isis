@@ -13,7 +13,7 @@ std::string colormap_shader_code = STRINGIFY(
 									   uniform float killZeros;
 									   void main ()
 {
-	float err = 0.005;
+	float err = 0.006;
 	float range = max - min;
 	float i = texture3D( imageTexture, gl_TexCoord[0].xyz ).r;
 	vec4 colorLut = texture1D( lut, i - err );
