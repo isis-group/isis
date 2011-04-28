@@ -151,20 +151,29 @@ protected:
 	}
 public:
 	static const unsigned short staticID = _internal::TypeID<TYPE>::value;
-	Value() {
+	Value():m_val() {
 		BOOST_MPL_ASSERT_RELATION( staticID, < , 0xFF );
 		checkType<TYPE>();
 	}
 	/**
-	 * Create a Value from any type of value-type.
-	 * If the type of the parameter is not the same as the content type of the object, the system tries to do a type conversion.
-	 * If that fails, boost::bad_lexical_cast is thrown.
+	 * Create a Value from any type.
+	 * If the type of the parameter is not the same as the content type of the object, the system tries to do a lexical cast.
+	 * - The lexical cast is _not_ a conversion so no rounding or range check is done
+	 * - _All_ types which can be lexically casted are allowed, not only types known to isis. But not all types will work.
+	 * - If the lexical cast fails, boost::bad_lexical_cast is thrown.
 	 */
 	template<typename T> Value( const T &value ) {
 		m_val = _internal::__cast_to<TYPE>()( this, value );
 		BOOST_MPL_ASSERT_RELATION( staticID, < , 0xFF );
 		checkType<TYPE>();
 	}
+	/**
+	 * Get the string representation of the Value.
+	 * This tries to use the isis type conversion to create a string from the Value.
+	 * If thats no available, it will fall back to boost::lexical_cast. And it will send a warning to CoreDebug.
+	 * If the lexical cast fails as well, boost::bad_lexical_cast is thrown.
+	 * \param labeled if true the typename will be appended to the resulting string in brackets.
+	 */
 	std::string toString( bool labeled = false )const {
 		std::string ret;
 		Reference ref = copyToNewByID( Value<std::string>::staticID );
@@ -187,7 +196,7 @@ public:
 		return staticID;
 	}
 
-	/// \returns true if and only if this and second contain the same value of the same type
+	/// \returns true if and only if this and second do contain the same value of the same type
 	virtual bool operator==( const ValueBase &second )const {
 		if ( second.is<TYPE>() ) {
 			return m_val == second.castTo<TYPE>();
