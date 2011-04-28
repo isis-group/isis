@@ -50,6 +50,10 @@ public:
 	std::pair<util::ValueReference, util::ValueReference> getMinMax() const { return m_MinMax; }
 	std::pair<util::ValueReference, util::ValueReference> getInternMinMax() const { return m_InternMinMax; }
 	std::pair<double, double> getOptimalScalingPair() const { return m_OptimalScalingPair;  }
+	boost::weak_ptr<void>
+	getImageWeakPointer( size_t timestep = 0 ) const {
+		return getImageVector()[timestep]->getRawAddress();
+	}
 
 	util::slist getFileNames() const { return m_Filenames; }
 

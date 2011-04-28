@@ -23,6 +23,7 @@ namespace viewer
 
 class GLTextureHandler
 {
+	typedef uint8_t TYPE;
 public:
 
 	enum InterpolationType { neares_neighbor, linear };
@@ -36,10 +37,12 @@ public:
 	std::map<boost::shared_ptr<ImageHolder>, GLuint> copyAllImagesToTextures( const DataContainer &data, const bool withAlpha = true, InterpolationType interpolation = neares_neighbor );
 
 	///Copies the given timestep of an image with the given imageID to a GL_TEXTURE_3D. Return the texture id.
-	GLuint copyImageToTexture( const DataContainer &data, const boost::shared_ptr<ImageHolder> image, size_t timestep, const bool withAlpha = true, InterpolationType interpolation = neares_neighbor );
+	GLuint copyImageToTexture( const boost::shared_ptr<ImageHolder> image, size_t timestep, const bool withAlpha = true, InterpolationType interpolation = neares_neighbor );
 
 	///The image map is a mapping of the imageID and timestep to the texture of the GL_TEXTURE_3D.
 	ImageMapType getImageMap() const { return m_ImageMap; }
+	
+	bool forceReloading( InterpolationType interpolation = neares_neighbor, bool withAlpha = true, ImageHolder::ImageType imageType = ImageHolder::z_map ) ;
 
 	void setAlphaEnabled( bool enabled ) { m_Alpha = enabled; }
 
@@ -49,12 +52,12 @@ private:
 	bool m_Alpha;
 
 	template<typename TYPE>
-	GLuint internCopyImageToTexture( const DataContainer &data, GLenum format, const boost::shared_ptr<ImageHolder> image, size_t timestep, bool alpha = true, InterpolationType interpolation = neares_neighbor  ) {
+	GLuint internCopyImageToTexture( GLenum format, const boost::shared_ptr<ImageHolder> image, size_t timestep, bool alpha = true, InterpolationType interpolation = neares_neighbor  ) {
 		LOG( Debug, info ) << "Copy image " << image->getID() << " with timestep " << timestep << " to texture";
 
 		util::FixedVector<size_t, 4> size = image->getImageSize();
 		size_t volume = size[0] * size[1] * size[2];
-		TYPE *dataPtr = static_cast<TYPE *>( data.getImageWeakPointer( image, timestep ).lock().get() );
+		TYPE *dataPtr = static_cast<TYPE *>( image->getImageWeakPointer( timestep ).lock().get() );
 		assert( dataPtr != 0 );
 		GLint interpolationType = 0;
 
