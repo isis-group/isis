@@ -16,7 +16,7 @@ int main( int argc, char *argv[] )
 	dbg_levels.set( "warning" );
 	isis::util::Selection image_types( "anatomical,zmap" );
 	image_types.set( "anatomical" );
-	isis::qt4::QtApplication app( "isisViewer" );
+	isis::qt4::IOQtApplication app( "isisViewer", false, false );
 	app.parameters["in"] = isis::util::slist();
 	app.parameters["in"].needed() = false;
 	app.parameters["in"].setDescription( "The input image file list." );
@@ -34,6 +34,10 @@ int main( int argc, char *argv[] )
 	app.parameters["dViewer"].setDescription( "Debugging level for the Viewer module" );
 	app.parameters["dViewer"].hidden() = true;
 	app.parameters["dViewer"].needed() = false;
+	app.parameters["rf"] = std::string();
+	app.parameters["rf"].needed() = false;
+	app.parameters["rf"].setDescription("Override automatic detection of file suffix for reading with given value");
+	app.parameters["rf"].hidden() = true;
 	app.init( argc, argv, true );
 	app.setLog<isis::ViewerLog>( app.getLLMap()[app.parameters["dViewer"]->as<isis::util::Selection>()] );
 	app.setLog<isis::ViewerDebug>( app.getLLMap()[app.parameters["dViewer"]->as<isis::util::Selection>()] );
@@ -43,14 +47,14 @@ int main( int argc, char *argv[] )
 	std::list<isis::data::Image> zImgList;
 	//load the anatomical images
 	BOOST_FOREACH ( isis::util::slist::const_reference filename, fileList ) {
-		std::list< isis::data::Image > tmpList = isis::data::IOFactory::load( filename );
+		std::list< isis::data::Image > tmpList = isis::data::IOFactory::load( filename, app.parameters["rf"].toString() );
 		BOOST_FOREACH( std::list< isis::data::Image >::const_reference imgRef, tmpList ) {
 			imgList.push_back( imgRef );
 		}
 	}
 	//load the zmap images
 	BOOST_FOREACH ( isis::util::slist::const_reference filename, zmapFileList ) {
-		std::list< isis::data::Image > tmpList = isis::data::IOFactory::load( filename );
+		std::list< isis::data::Image > tmpList = isis::data::IOFactory::load( filename, app.parameters["rf"].toString() );
 		BOOST_FOREACH( std::list< isis::data::Image >::const_reference imgRef, tmpList ) {
 			zImgList.push_back( imgRef );
 		}

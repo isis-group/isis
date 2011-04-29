@@ -22,6 +22,7 @@
 
 #include <QApplication>
 #include <CoreUtils/application.hpp>
+#include <DataStorage/io_application.hpp>
 #include <boost/scoped_ptr.hpp>
 
 namespace isis
@@ -38,6 +39,18 @@ public:
 	QApplication &getQApplication();
 	QtApplication( const char name[] );
 	virtual bool init( int argc, char **argv, bool exitOnError = true );
+};
+
+class IOQtApplication : public data::IOApplication
+{
+	int m_argc; //same as above
+	char **m_argv;
+	boost::scoped_ptr<QApplication> m_qapp;
+public:
+	QApplication &getQApplication();
+	IOQtApplication( const char name[], bool have_input = true, bool have_output = true );
+	virtual bool init( int argc, char **argv, bool exitOnError = true );
+		
 };
 }
 }
