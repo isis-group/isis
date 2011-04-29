@@ -824,8 +824,19 @@ BOOST_AUTO_TEST_CASE( image_get_coords_test )
 	}
 }*/
 
-BOOST_AUTO_TEST_CASE( image_transformCoords_test )
+BOOST_AUTO_TEST_CASE( image_transformCoords_test_spm )
 {
+	/*this first transformCoordsTest based on the outcome of the SPM8 dicom import. SPM flips the columnVec 
+	and so has to recalculate the index origin of the image. The flip of the columnVector is described by
+	he transform matrix.
+	At the end we compare the output of the our flipped isis image and the outcome of the spm dicom import.
+	*/
+	//ground truth (ironic, since it comes from SPM :-) )
+	util::fvector4 SPMIo = util::fvector4(92.5167, -159.366, -108.687);
+	util::fvector4 SPMrow = util::fvector4(-0.0105192,0.999945,-6.52652e-09);
+	util::fvector4 SPMcolumn = util::fvector4( -0.041812,-0.000439848, 0.999125 );
+	util::fvector4 SPMslice = util::fvector4(-0.99907, -0.01051, -0.0418143);
+	
 	data::MemChunk<uint8_t> minChunk(320,320,240,1);
 	minChunk.setPropertyAs<uint32_t>( "acquisitionNumber", 1 );
 	minChunk.setPropertyAs<uint16_t>( "sequenceNumber", 1 );
@@ -834,6 +845,7 @@ BOOST_AUTO_TEST_CASE( image_transformCoords_test )
 	minChunk.setPropertyAs<util::fvector4>( "columnVec", util::fvector4(0.041812,0.000439848,-0.999125));
 	minChunk.setPropertyAs<util::fvector4>( "sliceVec", util::fvector4(-0.99907, -0.01051, -0.0418143));
 	minChunk.setPropertyAs<util::fvector4>( "voxelSize", util::fvector4(0.7,0.7,0.7));
+	minChunk.setPropertyAs<util::fvector4>( "voxelGap", util::fvector4() );
 	data::Image img(minChunk);
 	BOOST_REQUIRE( img.isClean() );
 	BOOST_REQUIRE( img.isValid() );
@@ -842,7 +854,14 @@ BOOST_AUTO_TEST_CASE( image_transformCoords_test )
 	matrix<float> transformMatrix = identity_matrix<float>(3,3);
 	transformMatrix(1,1) = -1;
 	img.transformCoords(transformMatrix);
-	
+	float err = 0.0005; 
+	for (size_t i = 0;i<3;i++) {
+		//for some reason util::fuzzycheck does not work as expected so we do it our own way
+		BOOST_CHECK( fabs( SPMIo[i] - img.getPropertyAs<util::fvector4>("indexOrigin")[i]) < err );
+		BOOST_CHECK( fabs( SPMrow[i] - img.getPropertyAs<util::fvector4>("rowVec")[i]) < err );
+		BOOST_CHECK( fabs( SPMcolumn[i] - img.getPropertyAs<util::fvector4>("columnVec")[i]) < err );
+		BOOST_CHECK( fabs( SPMslice[i] - img.getPropertyAs<util::fvector4>("sliceVec")[i]) < err );
+	}
 }
 
 
