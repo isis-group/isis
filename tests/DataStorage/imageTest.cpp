@@ -527,72 +527,6 @@ BOOST_AUTO_TEST_CASE( typediamge_test )
 	}
 } // END typedimage_test
 
-// BOOST_AUTO_TEST_CASE ( image_transformCoords_test )
-// {
-// 	// dummy image
-// 	std::list<data::Image> images = data::IOFactory::load( "nix.null" );
-// 	BOOST_REQUIRE( !images.empty() );
-// 	data::Image &img = images.front();
-// 	//TODO rewrite this test to use BOST_UNIT_TEST_ASSERTS with the help of
-// 	// util::fuzzyEqual
-// 	// ************************************************************************
-// 	// Transformation: DICOM -> Nifti
-// 	// ************************************************************************
-// 	boost::numeric::ublas::matrix<float> T( 3, 3 );
-// 	T( 0, 0 ) = -1;
-// 	T( 0, 1 ) = 0;
-// 	T( 0, 2 ) = 0;
-// 	T( 1, 0 ) = 0;
-// 	T( 1, 1 ) = -1;
-// 	T( 1, 2 ) = 0;
-// 	T( 2, 0 ) = 0;
-// 	T( 2, 1 ) = 0;
-// 	T( 2, 2 ) = 1;
-// 	// **** AXIAL ****
-// 	// set orientation AXIAL in DCIOM space
-// 	img.setPropertyAs( "rowVec", util::fvector4( 1, 0, 0, 0 ) );
-// 	img.setPropertyAs( "columnVec", util::fvector4( 0, 1, 0, 0 ) );
-// 	img.setPropertyAs( "sliceVec", util::fvector4( 0, 0, 1, 0 ) );
-// 	// set index origin to DICOM space index origin
-// 	img.setPropertyAs( "indexOrigin", util::fvector4( -1, -2, -3, 0 ) );
-// 	// apply transformation
-// 	img.transformCoords( T );
-// 	// CHECKS
-// 	BOOST_CHECK( img.getPropertyAs<util::fvector4>( "rowVec" ).fuzzyEqual( util::fvector4( -1, 0, 0, 0 ) ) );
-// 	BOOST_CHECK( img.getPropertyAs<util::fvector4>( "columnVec" ).fuzzyEqual( util::fvector4( 0, -1, 0, 0 ) ) );
-// 	BOOST_CHECK( img.getPropertyAs<util::fvector4>( "sliceVec" ).fuzzyEqual( util::fvector4( 0, 0, 1, 0 ) ) );
-// 	BOOST_CHECK( img.getPropertyAs<util::fvector4>( "indexOrigin" ).fuzzyEqual( util::fvector4( 1, 2, -3, 0 ) ) );
-// 	;
-// 	// **** SAGITTAL ****
-// 	// set orientation SAGITTAL in DCIOM space
-// 	img.setPropertyAs( "rowVec", util::fvector4( 0, 1, 0, 0 ) );
-// 	img.setPropertyAs( "columnVec", util::fvector4( 0, 0, 1, 0 ) );
-// 	img.setPropertyAs( "sliceVec", util::fvector4( 1, 0, 0, 0 ) );
-// 	// set index origin to DICOM space index origin
-// 	img.setPropertyAs( "indexOrigin", util::fvector4( -3, -1, -2, 0 ) );
-// 	// apply transformation
-// 	img.transformCoords( T );
-// 	// CHECKS
-// 	BOOST_CHECK( img.getPropertyAs<util::fvector4>( "rowVec" ).fuzzyEqual( util::fvector4( 0, -1, 0, 0 ) ) );
-// 	BOOST_CHECK( img.getPropertyAs<util::fvector4>( "columnVec" ).fuzzyEqual( util::fvector4( 0, 0, -1, 0 ) ) );
-// 	BOOST_CHECK( img.getPropertyAs<util::fvector4>( "sliceVec" ).fuzzyEqual( util::fvector4( 1, 0, 0, 0 ) ) );
-// 	BOOST_CHECK( img.getPropertyAs<util::fvector4>( "indexOrigin" ).fuzzyEqual( util::fvector4( -3, 1, 2, 0 ) ) );
-// 	// **** CORONAL ****
-// 	// set orientation CORONAL in DCIOM space
-// 	img.setPropertyAs( "rowVec", util::fvector4( 1, 0, 0, 0 ) );
-// 	img.setPropertyAs( "columnVec", util::fvector4( 0, 0, 1, 0 ) );
-// 	img.setPropertyAs( "sliceVec", util::fvector4( 0, -1, 0, 0 ) );
-// 	// set index origin to DICOM space index origin
-// 	img.setPropertyAs( "indexOrigin", util::fvector4( -1, 3, -2, 0 ) );
-// 	// apply transformation
-// 	img.transformCoords( T );
-// 	// CHECKS
-// 	BOOST_CHECK( img.getPropertyAs<util::fvector4>( "rowVec" ).fuzzyEqual( util::fvector4( -1, 0, 0, 0 ) ) );
-// 	BOOST_CHECK( img.getPropertyAs<util::fvector4>( "columnVec" ).fuzzyEqual( util::fvector4( 0, 0, -1, 0 ) ) );
-// 	BOOST_CHECK( img.getPropertyAs<util::fvector4>( "sliceVec" ).fuzzyEqual( util::fvector4( 0, -1, 0, 0 ) ) );
-// 	BOOST_CHECK( img.getPropertyAs<util::fvector4>( "indexOrigin" ).fuzzyEqual( util::fvector4( 1, 3, 2, 0 ) ) );
-// } // END transformCoords_test
-
 BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
 {
 	unsigned int nrX = 45;
@@ -888,9 +822,25 @@ BOOST_AUTO_TEST_CASE( image_get_coords_test )
 		}
 			
 	}
-
-
 }
+
+BOOST_AUTO_TEST_CASE( image_transformCoords_test )
+{
+	data::MemChunk<uint8_t> minChunk(50,200,100,1);
+	minChunk.setPropertyAs<uint32_t>( "acquisitionNumber", 1 );
+	minChunk.setPropertyAs<uint16_t>( "sequenceNumber", 1 );
+	minChunk.setPropertyAs<util::fvector4>( "indexOrigin", util::fvector4(-10,110.5,-99.8));
+	minChunk.setPropertyAs<util::fvector4>( "rowVec", util::fvector4(1,1.17296e-16,-9.64207e-17));
+	minChunk.setPropertyAs<util::fvector4>( "columnVec", util::fvector4(-1.05222e-16, 0.957823, -0.287361));
+	minChunk.setPropertyAs<util::fvector4>( "sliceVec", util::fvector4( -5.74721e-17, 0.287361, 0.957823));
+	minChunk.setPropertyAs<util::fvector4>( "voxelSize", util::fvector4(1,0.5,3.5));
+	data::Image img(minChunk);
+	BOOST_REQUIRE( img.isClean() );
+	BOOST_REQUIRE( img.isValid() );
+	BOOST_REQUIRE( !img.isEmpty() );
+	
+}
+
 
 } // END namespace test
 } // END namespace isis
