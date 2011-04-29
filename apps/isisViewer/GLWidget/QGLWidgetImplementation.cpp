@@ -296,7 +296,7 @@ void QGLWidgetImplementation::paintScene( const boost::shared_ptr<ImageHolder> i
 	if( image->getImageState().imageType == ImageHolder::z_map ) {
 		m_ScalingShader.setEnabled( false );
 		m_LUTShader.setEnabled( true );
-		GLuint id = m_LookUpTable.getLookUpTableAsTexture( Color::hsvLUT_reverse );
+		GLuint id = m_LookUpTable.getLookUpTableAsTexture( Color::hsvLUT );
 		glActiveTexture( GL_TEXTURE1 );
 		glBindTexture( GL_TEXTURE_1D, id );
 		m_LUTShader.addVariable<float>( "lut", 1, true );
@@ -460,15 +460,15 @@ void QGLWidgetImplementation::emitMousePressEvent( QMouseEvent *e )
 
 bool QGLWidgetImplementation::timestepChanged( unsigned int timestep )
 {
-	BOOST_FOREACH( StateMap::reference currentImage, m_StateValues ) {
-		if( currentImage.first->getImageSize()[3] > timestep ) {
-			currentImage.second.voxelCoords[3] = timestep;
-		} else {
-			currentImage.second.voxelCoords[3] = currentImage.first->getImageSize()[3] - 1;
-		}
-
-		updateScene();
+	
+	if( m_ViewerCore->getCurrentImage()->getImageSize()[3] > timestep ) {
+		m_StateValues.at(m_ViewerCore->getCurrentImage()).voxelCoords[3] = timestep;
+	} else {
+		m_StateValues.at(m_ViewerCore->getCurrentImage()).voxelCoords[3] = m_ViewerCore->getCurrentImage()->getImageSize()[3] - 1;
 	}
+
+	updateScene();
+
 
 }
 

@@ -19,7 +19,7 @@ namespace isis
 {
 namespace test
 {
-
+/*
 template<typename T> data::Chunk genSlice( size_t columns = 4, size_t rows = 4, size_t at = 0, uint32_t acnum = 0 )
 {
 	data::MemChunk<T> ch( columns, rows );
@@ -34,7 +34,7 @@ template<typename T> data::Chunk genSlice( size_t columns = 4, size_t rows = 4, 
 	return ch;
 }
 
-/* create an image */
+// create an image
 BOOST_AUTO_TEST_CASE ( image_init_test )
 {
 	{
@@ -822,22 +822,26 @@ BOOST_AUTO_TEST_CASE( image_get_coords_test )
 		}
 			
 	}
-}
+}*/
 
 BOOST_AUTO_TEST_CASE( image_transformCoords_test )
 {
-	data::MemChunk<uint8_t> minChunk(50,200,100,1);
+	data::MemChunk<uint8_t> minChunk(320,320,240,1);
 	minChunk.setPropertyAs<uint32_t>( "acquisitionNumber", 1 );
 	minChunk.setPropertyAs<uint16_t>( "sequenceNumber", 1 );
-	minChunk.setPropertyAs<util::fvector4>( "indexOrigin", util::fvector4(-10,110.5,-99.8));
-	minChunk.setPropertyAs<util::fvector4>( "rowVec", util::fvector4(1,1.17296e-16,-9.64207e-17));
-	minChunk.setPropertyAs<util::fvector4>( "columnVec", util::fvector4(-1.05222e-16, 0.957823, -0.287361));
-	minChunk.setPropertyAs<util::fvector4>( "sliceVec", util::fvector4( -5.74721e-17, 0.287361, 0.957823));
-	minChunk.setPropertyAs<util::fvector4>( "voxelSize", util::fvector4(1,0.5,3.5));
+	minChunk.setPropertyAs<util::fvector4>( "indexOrigin", util::fvector4(83.1801,-159.464,114.418));
+	minChunk.setPropertyAs<util::fvector4>( "rowVec", util::fvector4(-0.0105192,0.999945,-6.52652e-09));
+	minChunk.setPropertyAs<util::fvector4>( "columnVec", util::fvector4(0.041812,0.000439848,-0.999125));
+	minChunk.setPropertyAs<util::fvector4>( "sliceVec", util::fvector4(-0.99907, -0.01051, -0.0418143));
+	minChunk.setPropertyAs<util::fvector4>( "voxelSize", util::fvector4(0.7,0.7,0.7));
 	data::Image img(minChunk);
 	BOOST_REQUIRE( img.isClean() );
 	BOOST_REQUIRE( img.isValid() );
 	BOOST_REQUIRE( !img.isEmpty() );
+	using namespace boost::numeric::ublas;
+	matrix<float> transformMatrix = identity_matrix<float>(3,3);
+	transformMatrix(1,1) = -1;
+	img.transformCoords(transformMatrix);
 	
 }
 
