@@ -871,7 +871,7 @@ BOOST_AUTO_TEST_CASE( image_transformCoords_test_common )
 	data::MemChunk<uint8_t> minChunk(100,100,100,1);
 	minChunk.setPropertyAs<uint32_t>( "acquisitionNumber", 1 );
 	minChunk.setPropertyAs<uint16_t>( "sequenceNumber", 1 );
-	minChunk.setPropertyAs<util::fvector4>("indexOrigin", util::fvector4(-50,-50,-50) );
+	minChunk.setPropertyAs<util::fvector4>("indexOrigin", util::fvector4(-49.5,-49.5,-49.5) );
 	minChunk.setPropertyAs<util::fvector4>("rowVec", util::fvector4(1,0,0) );
 	minChunk.setPropertyAs<util::fvector4>("columnVec", util::fvector4(0,1,0) );
 	minChunk.setPropertyAs<util::fvector4>("sliceVec", util::fvector4(0,0,1) );
@@ -886,11 +886,20 @@ BOOST_AUTO_TEST_CASE( image_transformCoords_test_common )
 	transform(2,0) = -1;
 	transform(1,1) = -1;
 	transform(0,2) = -1;
-	img.transformCoords(transform);	
-	BOOST_CHECK_EQUAL(img.getPropertyAs<util::fvector4>("indexOrigin"), util::fvector4(49,49,49));
+	img.transformCoords(transform);
+	BOOST_CHECK_EQUAL(img.getPropertyAs<util::fvector4>("indexOrigin"), util::fvector4(49.5,49.5,49.5));
 	BOOST_CHECK_EQUAL(img.getPropertyAs<util::fvector4>("rowVec"), util::fvector4(0,0,-1));
 	BOOST_CHECK_EQUAL(img.getPropertyAs<util::fvector4>("columnVec"), util::fvector4(0,-1,0));
 	BOOST_CHECK_EQUAL(img.getPropertyAs<util::fvector4>("sliceVec"), util::fvector4(-1,0,0));
+	//here we rotate 
+	transform = boost::numeric::ublas::zero_matrix<float>(3,3);
+	transform(0,0) = 1;
+	transform(1,1) = transform(2,2) = cos(45 * M_PI/180);
+	transform(1,2) = -sin(45 * M_PI/180);
+	transform(2,1) = sin(45 * M_PI/180);
+	img.transformCoords(transform);
+	std::cout << img.getPropertyAs<util::fvector4>("indexOrigin") << std::endl;
+	
 	
 }
 
