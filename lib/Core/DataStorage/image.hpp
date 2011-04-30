@@ -382,10 +382,26 @@ public:
 	 */
 	void transformCoords( boost::numeric::ublas::matrix<float> transform_matrix ) {
 		isis::data::_internal::transformCoords( *this, getSizeAsVector(), transform_matrix );
+		if(!updateOrientationMatrices()) {
+			LOG( Runtime, error ) << "Could not update the orientation matrices of the image!";
+		}
 	}
 
+	/** Computes the physical coordinates (in scanner space) of the given voxel index.
+	 *  This function does not perform any test if the voxel index is inside the image.
+	 *  See getIndexFromPhysicalCoords for vice versa purpose.
+	 *  \param index the voxel index from which you want to get the physical coordinates
+	 *  \return physical coordinates associated with the given voxel index
+	 */
 	util::fvector4 getPhysicalCoordsFromIndex( const util::ivector4 &index ) const;
 	
+	
+	/** Computes the voxel index of the given physical coordinates (coordinates in scanner space)
+	 *  This function does not perform any test if the physical coordinates are inside the image.
+	 *  See getPhysicalCoordsFromIndex for vice versa purpose.
+	 *  \param physicalCoords the physical coords from which you want to get the voxel index.
+	 *  \return voxel index associated with the given physicalCoords
+	 */
 	util::ivector4 getIndexFromPhysicalCoords( const util::fvector4 &physicalCoords ) const;
 	
 	/**

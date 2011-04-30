@@ -63,6 +63,7 @@ bool inverseMatrix( const matrix<TYPE> &inMatrix, matrix<TYPE> &inverse)
 }
 
 void transformCoords( isis::util::PropertyMap &, const isis::util::FixedVector<size_t, 4> size, boost::numeric::ublas::matrix<float> );
+
 }
 
 typedef DataLog Runtime;

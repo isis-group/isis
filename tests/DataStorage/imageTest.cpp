@@ -831,7 +831,7 @@ BOOST_AUTO_TEST_CASE( image_transformCoords_test_spm )
 	he transform matrix.
 	At the end we compare the output of the our flipped isis image and the outcome of the spm dicom import.
 	*/
-	//ground truth (ironic, since it comes from SPM :-) )
+	//ground truth (pure irony, since it comes from SPM :-) )
 	util::fvector4 SPMIo = util::fvector4(92.5167, -159.366, -108.687);
 	util::fvector4 SPMrow = util::fvector4(-0.0105192,0.999945,-6.52652e-09);
 	util::fvector4 SPMcolumn = util::fvector4( -0.041812,-0.000439848, 0.999125 );
@@ -856,12 +856,18 @@ BOOST_AUTO_TEST_CASE( image_transformCoords_test_spm )
 	img.transformCoords(transformMatrix);
 	float err = 0.0005; 
 	for (size_t i = 0;i<3;i++) {
-		//for some reason util::fuzzycheck does not work as expected so we do it our own way
+		//for some reason util::fuzzycheck does not work as expected - so we do it our own way
 		BOOST_CHECK( fabs( SPMIo[i] - img.getPropertyAs<util::fvector4>("indexOrigin")[i]) < err );
 		BOOST_CHECK( fabs( SPMrow[i] - img.getPropertyAs<util::fvector4>("rowVec")[i]) < err );
 		BOOST_CHECK( fabs( SPMcolumn[i] - img.getPropertyAs<util::fvector4>("columnVec")[i]) < err );
 		BOOST_CHECK( fabs( SPMslice[i] - img.getPropertyAs<util::fvector4>("sliceVec")[i]) < err );
 	}
+}
+
+BOOST_AUTO_TEST_CASE( image_transformCoords_test_common )
+{
+	data::MemChunk<uint8_t> minChunk(100,100,100,1);
+	
 }
 
 
