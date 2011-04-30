@@ -886,7 +886,7 @@ BOOST_AUTO_TEST_CASE( image_transformCoords_test_common )
 	transform(2,0) = -1;
 	transform(1,1) = -1;
 	transform(0,2) = -1;
-	img.transformCoords(transform);
+	img.transformCoords(transform);	
 	BOOST_CHECK_EQUAL(img.getPropertyAs<util::fvector4>("indexOrigin"), util::fvector4(49,49,49));
 	BOOST_CHECK_EQUAL(img.getPropertyAs<util::fvector4>("rowVec"), util::fvector4(0,0,-1));
 	BOOST_CHECK_EQUAL(img.getPropertyAs<util::fvector4>("columnVec"), util::fvector4(0,-1,0));
