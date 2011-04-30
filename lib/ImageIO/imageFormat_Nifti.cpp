@@ -175,16 +175,6 @@ public:
 
 		// don't forget to take the properties with
 		copyHeaderFromNifti( retList.back(), *ni );
-		//      if ( dialect == "spm" )
-		//      {
-		//          boost::shared_ptr<data::MemChunk<int16_t> >
-		//              dst( new data::MemChunk<int16_t>( ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ) ) ;
-		//          retChunk->swapAlong( *dst, 0 );
-		//          retList.push_back( *dst );
-		//          return 1;
-		//      }
-		//
-
 		return 1; // if there was an error, we wouldn't get here
 	}
 
@@ -238,6 +228,28 @@ public:
 		// FSL compatibility
 		if ( dialect != "fsl" ) { //@todo wtf ? shouldn't that be ==
 			//  stuffFslCompatibility(image, ni);
+		}
+		//SPM compatibility
+		if ( dialect == "spm" ) {
+			boost::numeric::ublas::matrix<float> spmTransform = boost::numeric::ublas::identity_matrix<float> (3,3);
+			spmTransform(1,1) = -1;
+			image.transformCoords(spmTransform);
+			
+			//set the description
+			std::stringstream description;
+			if(image.hasProperty("repetitionTime") ) {
+				description << " TR=" << image.getPropertyAs<uint16_t>("repetitionTime");
+			}
+			if(image.hasProperty("echoTime") ) {
+				description << " TE=" << image.getPropertyAs<float>("echoTime");
+			}
+			if(image.hasProperty("flipAngle") ) {
+				description << " FA=" << image.getPropertyAs<uint16_t>("flipAngle");
+			}
+			//TODO add timestamp
+			if(!description.str().empty() ) {
+				image.setPropertyAs<std::string>("spmDescription", description.str() );
+			}
 		}
 
 		// copy the data to the nifti image
@@ -620,10 +632,22 @@ private:
 		ni.dz = ni.pixdim[3] = voxelSizeVector[2] + voxelGap[2];
 		ni.dt = ni.pixdim[4] = voxelSizeVector[3];
 
-		if ( true == image.hasProperty( "sequenceDescription" ) ) {
+		if ( true == image.hasProperty( "sequenceDescription" ) && false == image.hasProperty( "spmDescription" ) ) {
 			std::string descrip = ( image.getPropertyAs<std::string>( "sequenceDescription" ) );
 			snprintf( ni.descrip, 80, "%s", descrip.c_str() );
 		}
+		
+		//if people want to convert with SPM convention they obviously losing the sequenceDescription
+		//but we are fair and add the sequenceDescription. Just hoping SPM will not crash
+		if( true == image.hasProperty( "spmDescription" ) ) {
+			std::stringstream desc;
+			desc << image.getPropertyAs<std::string>("spmDescription");
+			if( image.hasProperty( "sequenceDescription" ) ) {
+				desc << " | " << image.getPropertyAs<std::string>( "sequenceDescription" );
+			}
+			snprintf( ni.descrip, 80, "%s", desc.str().c_str() );
+		}
+		
 
 		if ( true == image.hasProperty( "StudyDescription" ) ) {
 			std::string descrip = ( image.getPropertyAs<std::string>( "StudyDescription" ) );

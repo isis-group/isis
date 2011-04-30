@@ -15,6 +15,9 @@
 #include <DataStorage/image.hpp>
 #include <DataStorage/io_factory.hpp>
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 namespace isis
 {
 namespace test
@@ -850,8 +853,7 @@ BOOST_AUTO_TEST_CASE( image_transformCoords_test_spm )
 	BOOST_REQUIRE( img.isClean() );
 	BOOST_REQUIRE( img.isValid() );
 	BOOST_REQUIRE( !img.isEmpty() );
-	using namespace boost::numeric::ublas;
-	matrix<float> transformMatrix = identity_matrix<float>(3,3);
+	boost::numeric::ublas::matrix<float> transformMatrix = boost::numeric::ublas::identity_matrix<float>(3,3);
 	transformMatrix(1,1) = -1;
 	img.transformCoords(transformMatrix);
 	float err = 0.0005; 
@@ -867,6 +869,28 @@ BOOST_AUTO_TEST_CASE( image_transformCoords_test_spm )
 BOOST_AUTO_TEST_CASE( image_transformCoords_test_common )
 {
 	data::MemChunk<uint8_t> minChunk(100,100,100,1);
+	minChunk.setPropertyAs<uint32_t>( "acquisitionNumber", 1 );
+	minChunk.setPropertyAs<uint16_t>( "sequenceNumber", 1 );
+	minChunk.setPropertyAs<util::fvector4>("indexOrigin", util::fvector4(-50,-50,-50) );
+	minChunk.setPropertyAs<util::fvector4>("rowVec", util::fvector4(1,0,0) );
+	minChunk.setPropertyAs<util::fvector4>("columnVec", util::fvector4(0,1,0) );
+	minChunk.setPropertyAs<util::fvector4>("sliceVec", util::fvector4(0,0,1) );
+	minChunk.setPropertyAs<util::fvector4>("voxelGap", util::fvector4() );
+	minChunk.setPropertyAs<util::fvector4>("voxelSize", util::fvector4(1,1,1) );
+	data::Image img(minChunk);
+	BOOST_REQUIRE( img.isClean() );
+	BOOST_REQUIRE( img.isValid() );
+	BOOST_REQUIRE( !img.isEmpty() );
+	boost::numeric::ublas::matrix<float> transform = boost::numeric::ublas::zero_matrix<float>(3,3);
+	//here we are flipping all vectors
+	transform(2,0) = -1;
+	transform(1,1) = -1;
+	transform(0,2) = -1;
+	img.transformCoords(transform);
+	BOOST_CHECK_EQUAL(img.getPropertyAs<util::fvector4>("indexOrigin"), util::fvector4(49,49,49));
+	BOOST_CHECK_EQUAL(img.getPropertyAs<util::fvector4>("rowVec"), util::fvector4(0,0,-1));
+	BOOST_CHECK_EQUAL(img.getPropertyAs<util::fvector4>("columnVec"), util::fvector4(0,-1,0));
+	BOOST_CHECK_EQUAL(img.getPropertyAs<util::fvector4>("sliceVec"), util::fvector4(-1,0,0));
 	
 }
 
