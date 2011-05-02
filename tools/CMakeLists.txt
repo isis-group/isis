@@ -14,7 +14,7 @@
 #                  given by two image files A and B.
 # isisconv    -    The ISIS data converter. It converts image data between all
 #                  different formats provided by the imageIO plugins
-# isisswap    -    Swaps the image orientation and voxel data along a given axis.
+# isisflip    -    Flips the image orientation and voxel data along a given axis.
 
 ###########################################################
 # find and configure the isis core library
@@ -37,15 +37,15 @@ add_executable(isisconv isisconv.cpp)
 target_link_libraries(isisconv isis_core ${ISIS_LIB_DEPENDS})
 set_target_properties(isisconv PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-add_executable(isisswap isisswap.cpp)
-target_link_libraries(isisswap isis_core ${ISIS_LIB_DEPENDS})
-set_target_properties(isisswap PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
+add_executable(isisflip isisflip.cpp)
+target_link_libraries(isisflip isis_core ${ISIS_LIB_DEPENDS})
+set_target_properties(isisflip PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # the install targets.
 install(TARGETS
   isisdump
   isisdiff
   isisconv
-  isisswap
+  isisflip
   RUNTIME DESTINATION bin COMPONENT "CLI Tools")
 

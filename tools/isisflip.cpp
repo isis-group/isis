@@ -34,18 +34,18 @@ int main( int argc, char **argv )
 	ENABLE_LOG( data::Runtime, util::DefaultMsgPrint, error );
 	const size_t getBiggestVecElem( const util::fvector4 & vec );
 	std::map<std::string, unsigned int> alongMap = boost::assign::map_list_of
-			( "x", 0 ) ( "y", 1 ) ( "z", 2 ) ( "sagittal", 3 ) ( "coronal", 4 ) ( "axial", 5 );
-	data::IOApplication app( "isisswap", true, true );
+			( "x", 0 ) ( "y", 1 ) ( "z", 2 ) ( "row", 3 ) ( "phase", 4 ) ( "slice", 5 );
+	data::IOApplication app( "isisflip", true, true );
 	util::Selection along( "x,y,z,sagittal,coronal,axial" );
-	util::Selection swap( "image,space,both" );
+	util::Selection flip( "image,space,both" );
 	along.set( "x" );
-	swap.set( "both" );
+	flip.set( "both" );
 	app.parameters["along"] = along;
 	app.parameters["along"].needed() = true;
-	app.parameters["along"].setDescription( "Swap along the specified axis" );
-	app.parameters["swap"] = swap;
-	app.parameters["swap"].needed() = true;
-	app.parameters["swap"].setDescription( "What has to be swapped" );
+	app.parameters["along"].setDescription( "Flip along the specified axis" );
+	app.parameters["flip"] = flip;
+	app.parameters["flip"].needed() = true;
+	app.parameters["flip"].setDescription( "What has to be flipped" );
 	app.init( argc, argv );
 	std::list<data::Image> finImageList;
 	unsigned int dim = alongMap[app.parameters["along"].toString()];
@@ -84,7 +84,7 @@ int main( int argc, char **argv )
 		T( dim, dim ) *= -1;
 		data::Image newImage = refImage;
 
-		if ( app.parameters["swap"].toString() == "image" || app.parameters["swap"].toString() == "both" ) {
+		if ( app.parameters["flip"].toString() == "image" || app.parameters["flip"].toString() == "both" ) {
 			switch ( refImage.getMajorTypeID() ) {
 			case data::ValuePtr<uint8_t>::staticID:
 				newImage = voxelSwapZ<uint8_t>( refImage, dim );
@@ -120,8 +120,7 @@ int main( int argc, char **argv )
 				break;
 			}
 		}
-		std::cout << "**************************************Transform: " << T << std::endl;
-		if ( app.parameters["swap"].toString() == "both" || app.parameters["swap"].toString() == "space" ) {
+		if ( app.parameters["flip"].toString() == "both" || app.parameters["flip"].toString() == "space" ) {
 			newImage.transformCoords( T );
 			std::vector<boost::shared_ptr< data::Chunk> > chList = newImage.getChunksAsVector();
 			BOOST_FOREACH( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef, chList ) {
