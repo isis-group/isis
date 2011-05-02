@@ -70,13 +70,13 @@ void transformCoords( isis::util::PropertyMap &properties, util::FixedVector<siz
 		boostScaling( i ) = scaling[i];
 	}
 	vector<float>scalingToRemove(3);
-	scalingToRemove = prod(R_in,boostScaling) - prod(R_out, boostScaling);
+// 	scalingToRemove = prod(R_in,boostScaling) - prod(R_out, boostScaling);
 	
 	// now we have to calculate the center of the image in physical space
 	vector<float> half_image( 3 );
 	for (unsigned short i = 0;i<3;i++) {
 		scalingToRemove( i ) *= 0.5;
-		half_image( i ) = physicalSize( i ) * 0.5;
+		half_image( i ) = ( physicalSize( i )  - boostScaling(i) ) * 0.5;
 	}
 /*	std::cout << scalingToRemove << std::endl;
  	std::cout << "half_image: " << half_image << std::endl;*/
@@ -99,7 +99,7 @@ void transformCoords( isis::util::PropertyMap &properties, util::FixedVector<siz
 	vector<float> transformed_io = prod( R_in, transformed_io_ortho);
 //  	std::cout << "transformed_io: " << transformed_io << std::endl;
 	//and finally we have to retranslate this origin to get the image to our old position in physical space
-	vector<float> origin_out = transformed_io + center_image - scalingToRemove;
+	vector<float> origin_out = transformed_io + center_image;
 //  	std::cout << "origin_out: " << origin_out << std::endl;
 	
 	
