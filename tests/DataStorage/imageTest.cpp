@@ -22,7 +22,7 @@ namespace isis
 {
 namespace test
 {
-/*
+
 template<typename T> data::Chunk genSlice( size_t columns = 4, size_t rows = 4, size_t at = 0, uint32_t acnum = 0 )
 {
 	data::MemChunk<T> ch( columns, rows );
@@ -825,7 +825,7 @@ BOOST_AUTO_TEST_CASE( image_get_coords_test )
 		}
 			
 	}
-}*/
+}
 
 BOOST_AUTO_TEST_CASE( image_transformCoords_test_spm )
 {
@@ -898,9 +898,19 @@ BOOST_AUTO_TEST_CASE( image_transformCoords_test_common )
 	transform(1,2) = -sin(45 * M_PI/180);
 	transform(2,1) = sin(45 * M_PI/180);
 	img.transformCoords(transform);
-	std::cout << img.getPropertyAs<util::fvector4>("indexOrigin") << std::endl;
-	
-	
+	float err = 0.0005;
+	//what we should get
+	util::fvector4 trueIO = util::fvector4(0,70.0036,49.5);
+	util::fvector4 trueRowVec = util::fvector4(0,0,-1);
+	util::fvector4 trueColumnVec = util::fvector4(-sqrt(2)*0.5,-sqrt(2)*0.5,0);
+	util::fvector4 trueSliceVec = util::fvector4(-sqrt(2)*0.5, sqrt(2)*0.5,0);
+	for (size_t i = 0;i<3;i++) {
+		//for some reason util::fuzzycheck does not work as expected - so we do it our own way
+		BOOST_CHECK( fabs( trueIO[i] - img.getPropertyAs<util::fvector4>("indexOrigin")[i]) < err );
+		BOOST_CHECK( fabs( trueRowVec[i] - img.getPropertyAs<util::fvector4>("rowVec")[i]) < err );
+		BOOST_CHECK( fabs( trueColumnVec[i] - img.getPropertyAs<util::fvector4>("columnVec")[i]) < err );
+		BOOST_CHECK( fabs( trueSliceVec[i] - img.getPropertyAs<util::fvector4>("sliceVec")[i]) < err );
+	}
 }
 
 
