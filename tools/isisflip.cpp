@@ -8,27 +8,6 @@
 
 using namespace isis;
 
-template<typename TYPE>
-data::Image voxelFlipZ( const data::Image &src, unsigned int dim )
-{
-	data::Image tmpImage = data::MemImage<TYPE> ( src );
-
-	for ( size_t t = 0; t < src.getSizeAsVector()[3]; t++ ) {
-		for ( size_t z = 0; z < src.getSizeAsVector()[2]; z++ ) {
-			for ( size_t y = 0; y < src.getSizeAsVector()[1]; y++ ) {
-				for ( size_t x = 0; x < src.getSizeAsVector()[0]; x++ ) {
-					tmpImage.voxel<TYPE>( x, y, z, t ) = src.voxel<TYPE>( dim == 0 ? ( src.getSizeAsVector()[0] - x ) - 1 : x,
-														 dim == 1 ? ( src.getSizeAsVector()[1] - y ) - 1 : y,
-														 dim == 2 ? ( src.getSizeAsVector()[2] - z ) - 1 : z,
-														 t );
-				}
-			}
-		}
-	}
-
-	return tmpImage;
-}
-
 class Flip : public data::Image::ChunkOp {
 	data::dimensions dim;
 public:
@@ -72,7 +51,6 @@ int main( int argc, char **argv )
 		util::fvector4 f3( rowVec[2], columnVec[2], sliceVec[2], 0  );
 		boost::numeric::ublas::matrix<float> T = boost::numeric::ublas::identity_matrix<float>( 3, 3 );
 		if(dim>2) {
-			std::cout << refImage.mapScannerAxesToImageDimension( static_cast<data::scannerAxis>( dim-3 ) ) << std::endl;
 			dim = refImage.mapScannerAxesToImageDimension( static_cast<data::scannerAxis>( dim-3 ) );
 		}
 		T( dim, dim ) *= -1;
