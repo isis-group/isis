@@ -107,9 +107,9 @@ protected:
 	Chunk &chunkAt( size_t at );
 	/// Creates an empty Image object.
 	Image();
-	
-	
-	
+
+
+
 	util::fvector4 m_RowVec;
 	util::fvector4 m_RowVecInv;
 	util::fvector4 m_ColumnVec;
@@ -382,7 +382,8 @@ public:
 	 */
 	void transformCoords( boost::numeric::ublas::matrix<float> transform_matrix ) {
 		isis::data::_internal::transformCoords( *this, getSizeAsVector(), transform_matrix );
-		if(!updateOrientationMatrices()) {
+
+		if( !updateOrientationMatrices() ) {
 			LOG( Runtime, error ) << "Could not update the orientation matrices of the image!";
 		}
 	}
@@ -394,8 +395,8 @@ public:
 	 *  \return physical coordinates associated with the given voxel index
 	 */
 	util::fvector4 getPhysicalCoordsFromIndex( const util::ivector4 &index ) const;
-	
-	
+
+
 	/** Computes the voxel index of the given physical coordinates (coordinates in scanner space)
 	 *  This function does not perform any test if the physical coordinates are inside the image.
 	 *  See getPhysicalCoordsFromIndex for vice versa purpose.
@@ -403,7 +404,7 @@ public:
 	 *  \return voxel index associated with the given physicalCoords
 	 */
 	util::ivector4 getIndexFromPhysicalCoords( const util::fvector4 &physicalCoords ) const;
-	
+
 	/**
 	 * Copy all voxel data of the image into memory.
 	 * If neccessary a conversion into T is done using min/max of the image.

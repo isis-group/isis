@@ -31,7 +31,7 @@ namespace _internal
 
 template<unsigned short DIM> size_t __dimStride( const size_t dim[] )
 {
-	return __dimStride < DIM - 1 > ( dim ) * dim[DIM-1];
+	return __dimStride < DIM - 1 > ( dim ) * dim[DIM - 1];
 }
 
 template<unsigned short DIM> size_t __dim2index( const size_t d[], const size_t dim[] )
@@ -39,10 +39,10 @@ template<unsigned short DIM> size_t __dim2index( const size_t d[], const size_t 
 	return d[DIM] * __dimStride<DIM>( dim ) + __dim2index < DIM - 1 > ( d, dim );
 }
 
-template<unsigned short DIM> void __index2dim(const size_t index, size_t d[], const size_t dim[],size_t vol )
+template<unsigned short DIM> void __index2dim( const size_t index, size_t d[], const size_t dim[], size_t vol )
 {
-	d[DIM]=index/vol;
-	__index2dim<DIM-1>(index%vol,d,dim,vol/dim[DIM-1]);
+	d[DIM] = index / vol;
+	__index2dim < DIM - 1 > ( index % vol, d, dim, vol / dim[DIM - 1] );
 }
 
 template<unsigned short DIM> bool __rangeCheck( const size_t d[], const size_t dim[] )
@@ -52,7 +52,7 @@ template<unsigned short DIM> bool __rangeCheck( const size_t d[], const size_t d
 
 template<> inline size_t __dimStride<0>( const size_t[] /*dim*/ ) {return 1;}
 template<> inline size_t __dim2index<0>( const size_t d[], const size_t dim[] ) {return d[0] * __dimStride<0>( dim );}
-template<> inline void __index2dim<0>( const size_t index, size_t d[], const size_t[],size_t vol ) {d[0]=index;}
+template<> inline void __index2dim<0>( const size_t index, size_t d[], const size_t[], size_t vol ) {d[0] = index;}
 template<> inline bool   __rangeCheck<0>( const size_t d[], const size_t dim[] ) {return d[0] < dim[0];}
 
 /// @endcond
@@ -92,8 +92,8 @@ public:
 	 * Compute linear index from n-dimensional index,
 	 * \param d array of indexes (d[0] is most iterating element / lowest dimension)
 	 */
-	void getCoordsFromLinIndex(const size_t index,size_t d[DIMS] )const {
-		__index2dim < DIMS - 1 > (index, d, m_dim,getVolume()/m_dim[DIMS - 1] );
+	void getCoordsFromLinIndex( const size_t index, size_t d[DIMS] )const {
+		__index2dim < DIMS - 1 > ( index, d, m_dim, getVolume() / m_dim[DIMS - 1] );
 	}
 	/**
 	 * Check if index fits into the dimensional size of the object.
@@ -133,7 +133,7 @@ public:
 		size_t ret = 0;
 
 		for ( unsigned short i = DIMS; i; i-- ) {
-			if ( m_dim[i-1] > 1 ) {
+			if ( m_dim[i - 1] > 1 ) {
 				ret = i;
 				break;
 			}

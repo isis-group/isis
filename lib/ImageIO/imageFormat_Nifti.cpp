@@ -229,26 +229,31 @@ public:
 		if ( dialect != "fsl" ) { //@todo wtf ? shouldn't that be ==
 			//  stuffFslCompatibility(image, ni);
 		}
+
 		//SPM compatibility
 		if ( dialect == "spm" ) {
-			boost::numeric::ublas::matrix<float> spmTransform = boost::numeric::ublas::identity_matrix<float> (3,3);
-			spmTransform(1,1) = -1;
-			image.transformCoords(spmTransform);
-			
+			boost::numeric::ublas::matrix<float> spmTransform = boost::numeric::ublas::identity_matrix<float> ( 3, 3 );
+			spmTransform( 1, 1 ) = -1;
+			image.transformCoords( spmTransform );
+
 			//set the description
 			std::stringstream description;
-			if(image.hasProperty("repetitionTime") ) {
-				description << " TR=" << image.getPropertyAs<uint16_t>("repetitionTime");
+
+			if( image.hasProperty( "repetitionTime" ) ) {
+				description << " TR=" << image.getPropertyAs<uint16_t>( "repetitionTime" );
 			}
-			if(image.hasProperty("echoTime") ) {
-				description << " TE=" << image.getPropertyAs<float>("echoTime");
+
+			if( image.hasProperty( "echoTime" ) ) {
+				description << " TE=" << image.getPropertyAs<float>( "echoTime" );
 			}
-			if(image.hasProperty("flipAngle") ) {
-				description << " FA=" << image.getPropertyAs<uint16_t>("flipAngle");
+
+			if( image.hasProperty( "flipAngle" ) ) {
+				description << " FA=" << image.getPropertyAs<uint16_t>( "flipAngle" );
 			}
+
 			//TODO add timestamp
-			if(!description.str().empty() ) {
-				image.setPropertyAs<std::string>("spmDescription", description.str() );
+			if( !description.str().empty() ) {
+				image.setPropertyAs<std::string>( "spmDescription", description.str() );
 			}
 		}
 
@@ -636,18 +641,20 @@ private:
 			std::string descrip = ( image.getPropertyAs<std::string>( "sequenceDescription" ) );
 			snprintf( ni.descrip, 80, "%s", descrip.c_str() );
 		}
-		
+
 		//if people want to convert with SPM convention they obviously losing the sequenceDescription
 		//but we are fair and add the sequenceDescription. Just hoping SPM will not crash
 		if( true == image.hasProperty( "spmDescription" ) ) {
 			std::stringstream desc;
-			desc << image.getPropertyAs<std::string>("spmDescription");
+			desc << image.getPropertyAs<std::string>( "spmDescription" );
+
 			if( image.hasProperty( "sequenceDescription" ) ) {
 				desc << " | " << image.getPropertyAs<std::string>( "sequenceDescription" );
 			}
+
 			snprintf( ni.descrip, 80, "%s", desc.str().c_str() );
 		}
-		
+
 
 		if ( true == image.hasProperty( "StudyDescription" ) ) {
 			std::string descrip = ( image.getPropertyAs<std::string>( "StudyDescription" ) );
@@ -656,7 +663,7 @@ private:
 
 		if ( image.hasProperty( "repetitionTime" ) ) {
 			LOG( ImageIoLog, info ) << "Setting pixdim[" << ni.ndim << "] to " << image.getPropertyAs<uint16_t>( "repetitionTime" );
-			ni.dt = ni.pixdim[ni.ndim+1] = ( float ) image.getPropertyAs<uint16_t>( "repetitionTime" ) / 1000; //nifti saves repTime s
+			ni.dt = ni.pixdim[ni.ndim + 1] = ( float ) image.getPropertyAs<uint16_t>( "repetitionTime" ) / 1000; //nifti saves repTime s
 		}
 
 		//the rotation matrix

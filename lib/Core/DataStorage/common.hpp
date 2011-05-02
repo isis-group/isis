@@ -46,19 +46,21 @@ namespace data
 namespace _internal
 {
 using namespace boost::numeric::ublas;
-	
+
 
 template <typename TYPE>
-bool inverseMatrix( const matrix<TYPE> &inMatrix, matrix<TYPE> &inverse) 
+bool inverseMatrix( const matrix<TYPE> &inMatrix, matrix<TYPE> &inverse )
 {
-	matrix<TYPE> A(inMatrix);
-	permutation_matrix<TYPE> pm(A.size1());
-	int res = lu_factorize(A, pm);
-	if(res != 0 ) {
+	matrix<TYPE> A( inMatrix );
+	permutation_matrix<TYPE> pm( A.size1() );
+	int res = lu_factorize( A, pm );
+
+	if( res != 0 ) {
 		return false;
 	}
-	inverse.assign(identity_matrix<TYPE>(inMatrix.size1()));
-	lu_substitute(A, pm, inverse);
+
+	inverse.assign( identity_matrix<TYPE>( inMatrix.size1() ) );
+	lu_substitute( A, pm, inverse );
 	return true;
 }
 

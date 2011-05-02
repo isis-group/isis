@@ -50,7 +50,7 @@ public:
 	QApplication &getQApplication();
 	IOQtApplication( const char name[], bool have_input = true, bool have_output = true );
 	virtual bool init( int argc, char **argv, bool exitOnError = true );
-		
+
 };
 }
 }

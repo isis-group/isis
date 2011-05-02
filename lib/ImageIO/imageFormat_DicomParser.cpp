@@ -46,10 +46,10 @@ void ImageFormat_Dicom::parseAS( DcmElement *elem, const util::istring &name, ut
 	elem->getOFString( buff, 0 );
 	static boost::numeric::converter <
 	uint16_t, double,
-			boost::numeric::conversion_traits<uint16_t, double>,
-			boost::numeric::def_overflow_handler,
-			boost::numeric::RoundEven<double>
-			> double2uint16;
+			  boost::numeric::conversion_traits<uint16_t, double>,
+			  boost::numeric::def_overflow_handler,
+			  boost::numeric::RoundEven<double>
+			  > double2uint16;
 
 	if ( _internal::try_cast( buff.substr( 0, 3 ), duration ) ) {
 		switch ( buff.at( buff.size() - 1 ) ) {

@@ -23,7 +23,7 @@ namespace _internal
 {
 
 
-void transformCoords( isis::util::PropertyMap &properties, util::FixedVector<size_t,4> size, boost::numeric::ublas::matrix<float> transform )
+void transformCoords( isis::util::PropertyMap &properties, util::FixedVector<size_t, 4> size, boost::numeric::ublas::matrix<float> transform )
 {
 	using namespace boost::numeric::ublas;
 	// this implementation assumes that the PropMap properties is either a
@@ -35,77 +35,71 @@ void transformCoords( isis::util::PropertyMap &properties, util::FixedVector<siz
 	isis::util::fvector4 slice = properties.getPropertyAs<util::fvector4>( "sliceVec" );
 	// get index origin from property map
 	isis::util::fvector4 indexorig = properties.getPropertyAs<util::fvector4>( "indexOrigin" );
-	isis::util::fvector4 scaling  = properties.getPropertyAs<util::fvector4>( "voxelSize" ) + properties.getPropertyAs<util::fvector4>("voxelGap");
+	isis::util::fvector4 scaling  = properties.getPropertyAs<util::fvector4>( "voxelSize" ) + properties.getPropertyAs<util::fvector4>( "voxelGap" );
 	// create boost::numeric data structures
 	// STEP 1 transform orientation matrix
 	// input matrix
 	matrix<float> R_in( 3, 3 );
+
 	for( int i = 0; i < 3; i++ ) {
 		R_in( i, 0 ) = row[i];
 		R_in( i, 1 ) = column[i];
 		R_in( i, 2 ) = slice[i];
 	}
-	matrix<float> R_in_inverse(R_in);
-	_internal::inverseMatrix<float>(R_in, R_in_inverse);
+
+	matrix<float> R_in_inverse( R_in );
+	_internal::inverseMatrix<float>( R_in, R_in_inverse );
 	matrix<float> R_out( 3, 3 );
 	R_out = prod( R_in, transform );
-	
+
 	for ( int i = 0; i < 3; i++ ) {
 		row[i] = R_out( i, 0 );
 		column[i] = R_out( i, 1 );
 		slice[i] = R_out( i, 2 );
 	}
-	
+
 	// STEP 2 transform index origin
 	vector<float> origin_in( 3 );
+
 	for( int i = 0; i < 3; i++ ) {
 		origin_in( i ) = indexorig[i];
 	}
+
 	//we have to map the indexes of the image size into the scanner space
-	
-	vector<float> physicalSize(3);
-	vector<float> boostScaling(3);
-	for (unsigned short i = 0;i<3;i++){
+
+	vector<float> physicalSize( 3 );
+	vector<float> boostScaling( 3 );
+
+	for ( unsigned short i = 0; i < 3; i++ ) {
 		physicalSize( i ) = size[i] * scaling[i];
 		boostScaling( i ) = scaling[i];
 	}
-	vector<float>scalingToRemove(3);
-// 	scalingToRemove = prod(R_in,boostScaling) - prod(R_out, boostScaling);
-	
+
+	vector<float>scalingToRemove( 3 );
+	//  scalingToRemove = prod(R_in,boostScaling) - prod(R_out, boostScaling);
+
 	// now we have to calculate the center of the image in physical space
 	vector<float> half_image( 3 );
-	for (unsigned short i = 0;i<3;i++) {
+
+	for ( unsigned short i = 0; i < 3; i++ ) {
 		scalingToRemove( i ) *= 0.5;
-		half_image( i ) = ( physicalSize( i )  - boostScaling(i) ) * 0.5;
+		half_image( i ) = ( physicalSize( i )  - boostScaling( i ) ) * 0.5;
 	}
-/*	std::cout << scalingToRemove << std::endl;
- 	std::cout << "half_image: " << half_image << std::endl;*/
-//  std::cout << "phyisicalSize: " << physicalSize << std::endl;
-// 	std::cout << "origin: " << origin_in << std::endl;
-	vector<float> center_image = prod(R_in, half_image) + origin_in ;
-	
-// 	std::cout << "center image: " << center_image << std::endl;
-	
+
+	vector<float> center_image = prod( R_in, half_image ) + origin_in ;
+
 	//now translate this center to the center of the physical space and get the new image origin
 	vector<float> io_translated = origin_in - center_image;
-//  	std::cout << "io_translated: " << io_translated << std::endl;
 	//now multiply this translated origin with the inverse of the orientation matrix of the image
-	vector<float> io_ortho = prod(R_in_inverse, io_translated);
-//  	std::cout << "io_ortho: " << io_ortho << std::endl;
+	vector<float> io_ortho = prod( R_in_inverse, io_translated );
 	//now transform this matrix with the actual transformation matrix
-	vector<float> transformed_io_ortho = prod(io_ortho, transform);
-//  	std::cout << "transformed_io_ortho: " << transformed_io_ortho << std::endl;
+	vector<float> transformed_io_ortho = prod( io_ortho, transform );
 	//now transform ths point back with the orientation matrix of the image
-	vector<float> transformed_io = prod( R_in, transformed_io_ortho);
-//  	std::cout << "transformed_io: " << transformed_io << std::endl;
+	vector<float> transformed_io = prod( R_in, transformed_io_ortho );
 	//and finally we have to retranslate this origin to get the image to our old position in physical space
 	vector<float> origin_out = transformed_io + center_image;
-//  	std::cout << "origin_out: " << origin_out << std::endl;
-	
-	
-	
-	vector<float> old_origin = prod(transform,origin_in);
-		for( int i = 0; i < 3; i++ ) {
+
+	for( int i = 0; i < 3; i++ ) {
 		indexorig[i] = origin_out( i );
 	}
 

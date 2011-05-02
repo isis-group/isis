@@ -75,7 +75,7 @@ std::pair< std::string, std::string > FileFormat::makeBasename( const std::strin
 		size_t at = ifilename.rfind( suffix );
 
 		if( at != ifilename.npos ) {
-			if( at && ifilename[at-1] == '.' )
+			if( at && ifilename[at - 1] == '.' )
 				at--;
 
 			return std::make_pair( filename.substr( 0, at ), filename.substr( at ) );

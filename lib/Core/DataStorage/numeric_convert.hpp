@@ -22,10 +22,10 @@ template<typename SRC, typename DST> void numeric_convert_impl( const SRC *src, 
 			<< " with scale/offset " << std::fixed << scale << "/" << offset;
 	static boost::numeric::converter <
 	DST, double,
-	   boost::numeric::conversion_traits<DST, double>,
-	   boost::numeric::def_overflow_handler,
-	   boost::numeric::RoundEven<double>
-	   > converter;
+		 boost::numeric::conversion_traits<DST, double>,
+		 boost::numeric::def_overflow_handler,
+		 boost::numeric::RoundEven<double>
+		 > converter;
 
 	for ( size_t i = 0; i < count; i++ ) {
 		dst[i] = converter( src[i] * scale + offset );
@@ -37,10 +37,10 @@ template<typename SRC, typename DST> void numeric_convert_impl( const SRC *src, 
 	LOG( Runtime, info ) << "using generic convert " << ValuePtr<SRC>::staticName() << " => " << ValuePtr<DST>::staticName() << " without scaling";
 	static boost::numeric::converter <
 	DST, SRC,
-	   boost::numeric::conversion_traits<DST, SRC>,
-	   boost::numeric::def_overflow_handler,
-	   boost::numeric::RoundEven<SRC>
-	   > converter;
+		 boost::numeric::conversion_traits<DST, SRC>,
+		 boost::numeric::def_overflow_handler,
+		 boost::numeric::RoundEven<SRC>
+		 > converter;
 
 	for ( size_t i = 0; i < count; i++ )
 		dst[i] = converter( src[i] );
@@ -219,18 +219,19 @@ getNumericScaling( const util::_internal::ValueBase &min, const util::_internal:
 		maxval = max.as<double>();
 		assert( minval < maxval );
 		LOG( Debug, info ) << "src Range:" << minval << "=>" << maxval;
-		LOG( Debug, info ) << "dst Domain:" << static_cast<double>(domain_min) << "=>" << static_cast<double>(domain_max);
+		LOG( Debug, info ) << "dst Domain:" << static_cast<double>( domain_min ) << "=>" << static_cast<double>( domain_max );
 		assert( domain_min < domain_max );//we also should assume this
+
 		//set offset for src
 		//if all src is completly on positive domain, or if there is no negative domain use minval
 		//else if src is completly on negative dmain, or if there is no positive domain use maxval
 		//elsewise leave it at 0 and scale both sides
 		if ( minval > 0 || !domain_min ) {
-// 			if ( ( maxval - domain_max ) > 0 ) // if the values completely fit into the domain we dont have to offset them
-				offset = -minval;
+			//          if ( ( maxval - domain_max ) > 0 ) // if the values completely fit into the domain we dont have to offset them
+			offset = -minval;
 		} else if ( ( 0 - maxval ) > 0 || !domain_max ) {
-// 			if ( ( domain_min - minval ) > 0  ) // if the values completely fit into the domain we dont have to offset them
-				offset = -maxval;
+			//          if ( ( domain_min - minval ) > 0  ) // if the values completely fit into the domain we dont have to offset them
+			offset = -maxval;
 		}
 
 		//calculate range of values which will be on postive/negative domain when offset is applied
@@ -254,9 +255,10 @@ getNumericScaling( const util::_internal::ValueBase &min, const util::_internal:
 				scale = 1;
 			}
 		}
-		if(scale==1){
-			if((minval - domain_min)>0 && (domain_max - maxval) > 0 )
-				offset=0; // if the source does fit into the domain, and we do not scale - we wont need an offset
+
+		if( scale == 1 ) {
+			if( ( minval - domain_min ) > 0 && ( domain_max - maxval ) > 0 )
+				offset = 0; // if the source does fit into the domain, and we do not scale - we wont need an offset
 		} else
 			offset *= scale;//calc offset for dst
 	}

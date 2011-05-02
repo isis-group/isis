@@ -119,7 +119,7 @@ public:
 		if( util::istring( dialect.c_str() ) == util::istring( "middle" ) ) { //save only the middle
 			LOG( Runtime, info ) << "Writing the slice " << chunks.size() / 2 + 1 << " of " << chunks.size() << " slices as png-image of size " << chunks.front()->getSizeAsString();
 
-			if( !write_png( filename, *chunks[chunks.size()/2] ) ) {
+			if( !write_png( filename, *chunks[chunks.size() / 2] ) ) {
 				throwGenericError( std::string( "Failed to write " ) + filename );
 			}
 		} else { //save all slices
