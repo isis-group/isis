@@ -244,7 +244,7 @@ public:
 		/**
 	* Swaps the image along a dimension dim in image space. 
 	*/
-	bool swapAlong( const size_t dim ) const;
+	bool swapAlong( const dimensions dim ) const;
 
 };
 

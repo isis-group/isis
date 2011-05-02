@@ -280,7 +280,7 @@ size_t Chunk::useCount() const
 	return getValuePtrBase().useCount();
 }
 
-bool Chunk::swapAlong( const size_t dim ) const
+bool Chunk::swapAlong( const dimensions dim ) const
 {
 	size_t dims[] = { getDimSize(0), getDimSize( 1 ), getDimSize( 2 ), getDimSize( 3 ) };
 	return get()->swapAlong( dim, dims ) ;

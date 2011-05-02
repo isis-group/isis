@@ -217,9 +217,7 @@ bool Image::updateOrientationMatrices()
 	if( !_internal::inverseMatrix<float>( orientation, inverse ) ) {
 		LOG( Runtime, error ) << "Could not create the inverse of the orientation matrix!";
 		return false;
-	}
-
-	;
+	};
 
 	for( size_t i = 0; i < 3; i++ ) {
 		m_RowVecInv[i] = inverse( i, 0 );
@@ -232,6 +230,24 @@ bool Image::updateOrientationMatrices()
 	LOG( Debug, verbose_info ) << "[ " << m_RowVecInv[1] << " " << m_ColumnVecInv[1] << " " << m_SliceVecInv[1] << " ] + " << m_Offset[1];
 	LOG( Debug, verbose_info ) << "[ " << m_RowVecInv[2] << " " << m_ColumnVecInv[2] << " " << m_SliceVecInv[2] << " ] + " << m_Offset[2];
 	return true;
+}
+
+
+dimensions Image::mapScannerAxesToImageDimension(scannerAxis scannerAxes) 
+{
+	updateOrientationMatrices();
+	boost::numeric::ublas::matrix<float> latchedOrientation = boost::numeric::ublas::zero_matrix<float>( 3, 3 );
+	boost::numeric::ublas::vector<float>mapping(3);
+	for ( size_t i = 0; i < 3; i++ ) {
+		latchedOrientation( i, 0 ) = abs(m_RowVec[i] < 0 ? ceil( m_RowVec[i] - 0.5 ) : floor( m_RowVec[i] + 0.5 ));
+		latchedOrientation( i, 1 ) = abs(m_ColumnVec[i] < 0 ? ceil( m_ColumnVec[i] - 0.5 ) : floor( m_ColumnVec[i] + 0.5 ));
+		latchedOrientation( i, 2 ) = abs(m_SliceVec[i] < 0 ? ceil( m_SliceVec[i] - 0.5 ) : floor( m_SliceVec[i] + 0.5 ));
+		mapping(i) = i;
+	}
+	return static_cast<dimensions>( boost::numeric::ublas::prod( latchedOrientation, mapping )(scannerAxes));
+	
+	
+	
 }
 
 

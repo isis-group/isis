@@ -55,6 +55,15 @@ namespace image_io
 namespace _internal
 {
 
+class Flip : public data::Image::ChunkOp {
+	data::dimensions dim;
+public:
+	Flip( data::dimensions d ) { dim = d; }
+	bool operator()( data::Chunk &ch, util::FixedVector<size_t, 4> posInImage ) {
+		ch.swapAlong( dim );
+	}	
+};
+	
 class NiftiChunk : public data::Chunk
 {
 public:
@@ -196,15 +205,12 @@ public:
 		ni.datatype = DT_UNKNOWN;
 		ni.data = NULL;
 		ni.fname = const_cast<char *>( filename.c_str() );
+		
 		if ( dialect == "spm" ) {
 			boost::numeric::ublas::matrix<float> spmTransform = boost::numeric::ublas::identity_matrix<float> ( 3, 3 );
 			spmTransform( 1, 1 ) = -1;
 			image.transformCoords( spmTransform, true );
-			struct : data::Image::ChunkOp {
-				bool operator()( data::Chunk &ch, util::FixedVector<size_t, 4> posInImage ) {
-					ch.swapAlong(1);
-				}	
-			} flipOp;
+			_internal::Flip flipOp( image.mapScannerAxesToImageDimension( data::z ) );
 			image.foreachChunk(flipOp);
 			//set the description
 			std::stringstream description;

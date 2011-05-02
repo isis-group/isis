@@ -394,6 +394,8 @@ public:
 		return true;
 	}
 
+	dimensions mapScannerAxesToImageDimension( scannerAxis scannerAxes );
+	
 	/** Computes the physical coordinates (in scanner space) of the given voxel index.
 	 *  This function does not perform any test if the voxel index is inside the image.
 	 *  See getIndexFromPhysicalCoords for vice versa purpose.

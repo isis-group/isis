@@ -71,6 +71,7 @@ bool transformCoords( isis::util::PropertyMap &, const isis::util::FixedVector<s
 typedef DataLog Runtime;
 typedef DataDebug Debug;
 enum dimensions {rowDim = 0, columnDim, sliceDim, timeDim};
+enum scannerAxis { x = 0, y, z };
 
 /**
  * Set logging level for the namespace data.

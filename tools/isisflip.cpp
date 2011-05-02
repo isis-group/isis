@@ -29,21 +29,29 @@ data::Image voxelFlipZ( const data::Image &src, unsigned int dim )
 	return tmpImage;
 }
 
+class Flip : public data::Image::ChunkOp {
+	data::dimensions dim;
+public:
+	Flip( data::dimensions d ) { dim = d; }
+	bool operator()( data::Chunk &ch, util::FixedVector<size_t, 4> posInImage ) {
+		ch.swapAlong( dim );
+	}	
+};
 int main( int argc, char **argv )
 {
 	ENABLE_LOG( data::Runtime, util::DefaultMsgPrint, error );
 	const size_t getBiggestVecElem( const util::fvector4 & vec );
 	std::map<std::string, unsigned int> alongMap = boost::assign::map_list_of
-		( "row", 0 ) ( "phase", 1 ) ( "slice", 2 );
+		( "row", 0 ) ( "column", 1 ) ( "slice", 2 ) ( "x", 3) ( "y", 4) ( "z", 5 );
 	data::IOApplication app( "isisflip", true, true );
-	util::Selection along( "x,y,z,row,column,slice" );
+	util::Selection along( "row,column,slice,x,y,z" );
 	util::Selection flip( "image,space,both" );
 	along.set( "x" );
 	flip.set( "both" );
 	app.parameters["image_center"] = bool();
+	app.parameters["image_center"] = false;
 	app.parameters["image_center"].needed() = false;
 	app.parameters["image_center"].setDescription("If activated the center of the image will be translated to the of the scanner space and after flipping back to its initial position" );
-	app.parameters["image_center"] = false;
 	app.parameters["along"] = along;
 	app.parameters["along"].needed() = true;
 	app.parameters["along"].setDescription( "Flip along the specified axis" );
@@ -63,66 +71,24 @@ int main( int argc, char **argv )
 		util::fvector4 f2( rowVec[1], columnVec[1], sliceVec[1], 0  );
 		util::fvector4 f3( rowVec[2], columnVec[2], sliceVec[2], 0  );
 		boost::numeric::ublas::matrix<float> T = boost::numeric::ublas::identity_matrix<float>( 3, 3 );
+		if(dim>2) {
+			std::cout << refImage.mapScannerAxesToImageDimension( static_cast<data::scannerAxis>( dim-3 ) ) << std::endl;
+			dim = refImage.mapScannerAxesToImageDimension( static_cast<data::scannerAxis>( dim-3 ) );
+		}
 		T( dim, dim ) *= -1;
 		data::Image newImage = refImage;
 
 		if ( app.parameters["flip"].toString() == "image" || app.parameters["flip"].toString() == "both" ) {
-			switch ( refImage.getMajorTypeID() ) {
-			case data::ValuePtr<uint8_t>::staticID:
-				newImage = voxelFlipZ<uint8_t>( refImage, dim );
-				break;
-			case data::ValuePtr<int8_t>::staticID:
-				newImage = voxelFlipZ<int8_t>( refImage, dim );
-				break;
-			case data::ValuePtr<uint16_t>::staticID:
-				newImage = voxelFlipZ<uint16_t>( refImage, dim );
-				break;
-			case data::ValuePtr<int16_t>::staticID:
-				newImage = voxelFlipZ<int16_t>( refImage, dim );
-				break;
-			case data::ValuePtr<uint32_t>::staticID:
-				newImage = voxelFlipZ<uint32_t>( refImage, dim );
-				break;
-			case data::ValuePtr<int32_t>::staticID:
-				newImage = voxelFlipZ<int32_t>( refImage, dim );
-				break;
-			case data::ValuePtr<uint64_t>::staticID:
-				newImage = voxelFlipZ<uint64_t>( refImage, dim );
-				break;
-			case data::ValuePtr<int64_t>::staticID:
-				newImage = voxelFlipZ<int64_t>( refImage, dim );
-				break;
-			case data::ValuePtr<float>::staticID:
-				newImage = voxelFlipZ<float>( refImage, dim );
-				break;
-			case data::ValuePtr<double>::staticID:
-				newImage = voxelFlipZ<double>( refImage, dim );
-				break;
-			default:
-				break;
-			}
+			Flip flipOp( static_cast<data::dimensions>( dim ) );
+			refImage.foreachChunk(flipOp);
 		}
+
 		if ( app.parameters["flip"].toString() == "both" || app.parameters["flip"].toString() == "space" ) {
-			newImage.transformCoords( T, app.parameters["image_center"] );
+			refImage.transformCoords( T, app.parameters["image_center"] );
 		}
-		finImageList.push_back(  newImage );
+		finImageList.push_back( refImage );
 	}
 	app.autowrite( finImageList );
 	return 0;
 };
 
-
-const size_t getBiggestVecElem( const util::fvector4 &vec )
-{
-	size_t biggestVecElem = 0;
-	float tmpValue = 0;
-
-	for ( size_t vecElem = 0; vecElem < 4; vecElem++ ) {
-		if ( fabs( vec[vecElem] ) > fabs( tmpValue ) ) {
-			biggestVecElem = vecElem;
-			tmpValue = vec[vecElem];
-		}
-	}
-
-	return biggestVecElem;
-}
