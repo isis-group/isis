@@ -9,7 +9,7 @@
 using namespace isis;
 
 template<typename TYPE>
-data::Image voxelSwapZ( const data::Image &src, unsigned int dim )
+data::Image voxelFlipZ( const data::Image &src, unsigned int dim )
 {
 	data::Image tmpImage = data::MemImage<TYPE> ( src );
 
@@ -34,9 +34,9 @@ int main( int argc, char **argv )
 	ENABLE_LOG( data::Runtime, util::DefaultMsgPrint, error );
 	const size_t getBiggestVecElem( const util::fvector4 & vec );
 	std::map<std::string, unsigned int> alongMap = boost::assign::map_list_of
-			( "x", 0 ) ( "y", 1 ) ( "z", 2 ) ( "row", 3 ) ( "phase", 4 ) ( "slice", 5 );
+		( "row", 0 ) ( "phase", 1 ) ( "slice", 2 );
 	data::IOApplication app( "isisflip", true, true );
-	util::Selection along( "x,y,z,sagittal,coronal,axial" );
+	util::Selection along( "x,y,z,row,column,slice" );
 	util::Selection flip( "image,space,both" );
 	along.set( "x" );
 	flip.set( "both" );
@@ -58,63 +58,41 @@ int main( int argc, char **argv )
 		util::fvector4 f1( rowVec[0], columnVec[0], sliceVec[0], 0  );
 		util::fvector4 f2( rowVec[1], columnVec[1], sliceVec[1], 0  );
 		util::fvector4 f3( rowVec[2], columnVec[2], sliceVec[2], 0  );
-
-		if( dim == 3 ) {
-			dim = getBiggestVecElem( f1 );
-		}
-
-		if( dim == 4 ) {
-			dim = getBiggestVecElem( f2 );
-		}
-
-		if( dim == 5 ) {
-			dim = getBiggestVecElem( f3 );
-		}
-
-		boost::numeric::ublas::matrix<float> T( 3, 3 );
-		T( 0, 0 ) = 1;
-		T( 0, 1 ) = 0;
-		T( 0, 2 ) = 0;
-		T( 1, 0 ) = 0;
-		T( 1, 1 ) = 1;
-		T( 1, 2 ) = 0;
-		T( 2, 0 ) = 0;
-		T( 2, 1 ) = 0;
-		T( 2, 2 ) = 1;
+		boost::numeric::ublas::matrix<float> T = boost::numeric::ublas::identity_matrix<float>( 3, 3 );
 		T( dim, dim ) *= -1;
 		data::Image newImage = refImage;
 
 		if ( app.parameters["flip"].toString() == "image" || app.parameters["flip"].toString() == "both" ) {
 			switch ( refImage.getMajorTypeID() ) {
 			case data::ValuePtr<uint8_t>::staticID:
-				newImage = voxelSwapZ<uint8_t>( refImage, dim );
+				newImage = voxelFlipZ<uint8_t>( refImage, dim );
 				break;
 			case data::ValuePtr<int8_t>::staticID:
-				newImage = voxelSwapZ<int8_t>( refImage, dim );
+				newImage = voxelFlipZ<int8_t>( refImage, dim );
 				break;
 			case data::ValuePtr<uint16_t>::staticID:
-				newImage = voxelSwapZ<uint16_t>( refImage, dim );
+				newImage = voxelFlipZ<uint16_t>( refImage, dim );
 				break;
 			case data::ValuePtr<int16_t>::staticID:
-				newImage = voxelSwapZ<int16_t>( refImage, dim );
+				newImage = voxelFlipZ<int16_t>( refImage, dim );
 				break;
 			case data::ValuePtr<uint32_t>::staticID:
-				newImage = voxelSwapZ<uint32_t>( refImage, dim );
+				newImage = voxelFlipZ<uint32_t>( refImage, dim );
 				break;
 			case data::ValuePtr<int32_t>::staticID:
-				newImage = voxelSwapZ<int32_t>( refImage, dim );
+				newImage = voxelFlipZ<int32_t>( refImage, dim );
 				break;
 			case data::ValuePtr<uint64_t>::staticID:
-				newImage = voxelSwapZ<uint64_t>( refImage, dim );
+				newImage = voxelFlipZ<uint64_t>( refImage, dim );
 				break;
 			case data::ValuePtr<int64_t>::staticID:
-				newImage = voxelSwapZ<int64_t>( refImage, dim );
+				newImage = voxelFlipZ<int64_t>( refImage, dim );
 				break;
 			case data::ValuePtr<float>::staticID:
-				newImage = voxelSwapZ<float>( refImage, dim );
+				newImage = voxelFlipZ<float>( refImage, dim );
 				break;
 			case data::ValuePtr<double>::staticID:
-				newImage = voxelSwapZ<double>( refImage, dim );
+				newImage = voxelFlipZ<double>( refImage, dim );
 				break;
 			default:
 				break;
@@ -122,12 +100,7 @@ int main( int argc, char **argv )
 		}
 		if ( app.parameters["flip"].toString() == "both" || app.parameters["flip"].toString() == "space" ) {
 			newImage.transformCoords( T );
-			std::vector<boost::shared_ptr< data::Chunk> > chList = newImage.getChunksAsVector();
-			BOOST_FOREACH( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef, chList ) {
-				chRef->transformCoords( T );
-			}
 		}
-
 		finImageList.push_back(  newImage );
 	}
 	app.autowrite( finImageList );
