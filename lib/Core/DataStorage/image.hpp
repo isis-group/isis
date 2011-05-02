@@ -380,12 +380,18 @@ public:
 	 * depend on correct image orientations won't work as expected. Use this method
 	 * with caution!
 	 */
-	void transformCoords( boost::numeric::ublas::matrix<float> transform_matrix ) {
-		isis::data::_internal::transformCoords( *this, getSizeAsVector(), transform_matrix );
+	bool transformCoords( boost::numeric::ublas::matrix<float> transform_matrix, bool transformCenterIsImageCenter = false ) {
+		
+		if( !isis::data::_internal::transformCoords( *this, getSizeAsVector(), transform_matrix, transformCenterIsImageCenter ) ) {
+			LOG( Runtime, error ) << "Error during transforming the coords of the image.";
+			return false;
+		}
 
 		if( !updateOrientationMatrices() ) {
 			LOG( Runtime, error ) << "Could not update the orientation matrices of the image!";
+			return false;
 		}
+		return true;
 	}
 
 	/** Computes the physical coordinates (in scanner space) of the given voxel index.

@@ -234,9 +234,17 @@ public:
 	 * depend on correct image orientations won't work as expected. Use this method
 	 * with caution!
 	 */
-	void transformCoords( boost::numeric::ublas::matrix<float> transform_matrix ) {
-		isis::data::_internal::transformCoords( *this, getSizeAsVector(), transform_matrix );
+	bool transformCoords( boost::numeric::ublas::matrix<float> transform_matrix, bool transformCenterIsImageCenter = false ) {
+		if( !isis::data::_internal::transformCoords( *this, getSizeAsVector(), transform_matrix, transformCenterIsImageCenter ) ) {
+			LOG( Runtime, error ) << "Error during transforming the coords of the chunk.";
+			return false;
+		}
+		return true;
 	}
+		/**
+	* Swaps the image along a dimension dim in image space. 
+	*/
+	bool swapAlong( const size_t dim ) const;
 
 };
 
@@ -367,7 +375,9 @@ public:
 	MemChunkNonDel &operator=( const MemChunkNonDel<TYPE> &ref ) { //this is needed, to prevent generation of default-copy operator
 		return operator=( static_cast<const Chunk &>( ref ) );
 	}
-};
+
+
+ };
 }
 }
 #endif // CHUNK_H

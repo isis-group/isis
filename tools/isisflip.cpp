@@ -40,6 +40,10 @@ int main( int argc, char **argv )
 	util::Selection flip( "image,space,both" );
 	along.set( "x" );
 	flip.set( "both" );
+	app.parameters["image_center"] = bool();
+	app.parameters["image_center"].needed() = false;
+	app.parameters["image_center"].setDescription("If activated the center of the image will be translated to the of the scanner space and after flipping back to its initial position" );
+	app.parameters["image_center"] = false;
 	app.parameters["along"] = along;
 	app.parameters["along"].needed() = true;
 	app.parameters["along"].setDescription( "Flip along the specified axis" );
@@ -99,7 +103,7 @@ int main( int argc, char **argv )
 			}
 		}
 		if ( app.parameters["flip"].toString() == "both" || app.parameters["flip"].toString() == "space" ) {
-			newImage.transformCoords( T );
+			newImage.transformCoords( T, app.parameters["image_center"] );
 		}
 		finImageList.push_back(  newImage );
 	}

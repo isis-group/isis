@@ -269,6 +269,8 @@ public:
 		return sizeof( TYPE );
 	}
 
+
+
 	std::pair<util::ValueReference, util::ValueReference> getMinMax()const {
 		if ( getLength() == 0 ) {
 			LOG( Runtime, warning ) << "Skipping computation of min/max on an empty ValuePtr";

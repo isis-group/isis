@@ -196,19 +196,42 @@ public:
 		ni.datatype = DT_UNKNOWN;
 		ni.data = NULL;
 		ni.fname = const_cast<char *>( filename.c_str() );
+		if ( dialect == "spm" ) {
+			boost::numeric::ublas::matrix<float> spmTransform = boost::numeric::ublas::identity_matrix<float> ( 3, 3 );
+			spmTransform( 1, 1 ) = -1;
+			image.transformCoords( spmTransform, true );
+			struct : data::Image::ChunkOp {
+				bool operator()( data::Chunk &ch, util::FixedVector<size_t, 4> posInImage ) {
+					ch.swapAlong(1);
+				}	
+			} flipOp;
+			image.foreachChunk(flipOp);
+			//set the description
+			std::stringstream description;
+
+			if( image.hasProperty( "repetitionTime" ) ) {
+				description << " TR=" << image.getPropertyAs<uint16_t>( "repetitionTime" ) << "ms";
+			}
+
+			if( image.hasProperty( "echoTime" ) ) {
+				description << "/TE=" << image.getPropertyAs<float>( "echoTime" ) << "ms";
+			}
+
+			if( image.hasProperty( "flipAngle" ) ) {
+				description << "/FA=" << image.getPropertyAs<uint16_t>( "flipAngle" ) << "deg";
+			}
+
+			//TODO add timestamp
+			if( !description.str().empty() ) {
+				image.setPropertyAs<std::string>( "spmDescription", description.str() );
+			}
+		}
 		//orientation in isis LPS - but in nifti everything relative to RAS
 		// - so let's change row/column direction and sign of indexOrigin
 		//now we try to transform
-		boost::numeric::ublas::matrix<float> matrix( 3, 3 );
+		boost::numeric::ublas::matrix<float> matrix = boost::numeric::ublas::identity_matrix<float>( 3, 3 );
 		matrix( 0, 0 ) = -1;
-		matrix( 0, 1 ) = 0;
-		matrix( 0, 2 ) = 0;
-		matrix( 1, 0 ) = 0;
 		matrix( 1, 1 ) = -1;
-		matrix( 1, 2 ) = 0;
-		matrix( 2, 0 ) = 0;
-		matrix( 2, 1 ) = 0;
-		matrix( 2, 2 ) = +1;
 		image.transformCoords( matrix );
 		//set the props from the image to the nifti file
 		copyHeaderToNifti( image, ni );
@@ -231,32 +254,7 @@ public:
 		}
 
 		//SPM compatibility
-		if ( dialect == "spm" ) {
-			boost::numeric::ublas::matrix<float> spmTransform = boost::numeric::ublas::identity_matrix<float> ( 3, 3 );
-			spmTransform( 1, 1 ) = -1;
-			image.transformCoords( spmTransform );
-
-			//set the description
-			std::stringstream description;
-
-			if( image.hasProperty( "repetitionTime" ) ) {
-				description << " TR=" << image.getPropertyAs<uint16_t>( "repetitionTime" );
-			}
-
-			if( image.hasProperty( "echoTime" ) ) {
-				description << " TE=" << image.getPropertyAs<float>( "echoTime" );
-			}
-
-			if( image.hasProperty( "flipAngle" ) ) {
-				description << " FA=" << image.getPropertyAs<uint16_t>( "flipAngle" );
-			}
-
-			//TODO add timestamp
-			if( !description.str().empty() ) {
-				image.setPropertyAs<std::string>( "spmDescription", description.str() );
-			}
-		}
-
+	
 		// copy the data to the nifti image
 		LOG( ImageIoLog, isis::info ) << "image typeid: " << image.getMajorTypeID();
 		LOG( ImageIoLog, isis::info ) << "image typename: " << image.getMajorTypeName();
@@ -264,7 +262,7 @@ public:
 		switch ( image.getMajorTypeID() ) {
 		case data::ValuePtr<int8_t>::staticID:
 
-			if ( dialect == "fsl" ) { // fsl not compatible with int8, convert to uint8
+			if ( dialect == "fsl" || dialect == "spm" ) { // fsl not compatible with int8, convert to uint8
 				data::TypedImage<uint8_t> fslCopy( image );
 				ni.datatype = DT_UINT8;
 				copyDataToNifti<uint8_t>( fslCopy, ni );
@@ -284,7 +282,7 @@ public:
 			break;
 		case data::ValuePtr<uint16_t>::staticID:
 
-			if ( dialect == "fsl" ) {
+			if ( dialect == "fsl" || dialect == "spm" ) {
 				//              image.print( std::cout );
 				data::TypedImage<int16_t> fslCopy( image );
 				ni.datatype = DT_INT16;

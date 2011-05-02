@@ -64,7 +64,7 @@ bool inverseMatrix( const matrix<TYPE> &inMatrix, matrix<TYPE> &inverse )
 	return true;
 }
 
-void transformCoords( isis::util::PropertyMap &, const isis::util::FixedVector<size_t, 4> size, boost::numeric::ublas::matrix<float> );
+bool transformCoords( isis::util::PropertyMap &, const isis::util::FixedVector<size_t, 4> size, boost::numeric::ublas::matrix<float>, bool transformCenterIsImageCenter = false );
 
 }
 
