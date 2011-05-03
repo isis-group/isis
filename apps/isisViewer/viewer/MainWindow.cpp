@@ -185,7 +185,7 @@ void MainWindow::openImage()
 				imgList.push_back( image );
 			}
 		}
-		m_ViewerCore->addImageList( imgList, ImageHolder::anatomical_image, pathList );
+		m_ViewerCore->addImageList( imgList, ImageHolder::anatomical_image );
 		m_ViewerCore->updateScene();
 	}
 }
