@@ -21,4 +21,5 @@ Singletons::~Singletons()
 Singletons::Singletons() {}
 Singletons::SingletonBase::~SingletonBase() {}
 
-}}
+}
+}

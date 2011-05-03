@@ -20,8 +20,10 @@
 #include <vector>
 #include <boost/foreach.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/io.hpp>
 #include <stack>
 #include "sortedchunklist.hpp"
+#include "common.hpp"
 
 namespace isis
 {
@@ -116,6 +118,16 @@ protected:
 	Chunk &chunkAt( size_t at );
 	/// Creates an empty Image object.
 	Image();
+
+
+
+	util::fvector4 m_RowVec;
+	util::fvector4 m_RowVecInv;
+	util::fvector4 m_ColumnVec;
+	util::fvector4 m_ColumnVecInv;
+	util::fvector4 m_SliceVec;
+	util::fvector4 m_SliceVecInv;
+	util::fvector4 m_Offset;
 public:
 	class ChunkOp : std::unary_function<Chunk &, bool>
 	{
@@ -398,12 +410,41 @@ public:
 	 * depend on correct image orientations won't work as expected. Use this method
 	 * with caution!
 	 */
-	void transformCoords( boost::numeric::ublas::matrix<float> transform_matrix ) {
-		isis::data::_internal::transformCoords( *this, transform_matrix );
-		BOOST_FOREACH( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef, lookup ) {
-			chRef->transformCoords( transform_matrix );
+	bool transformCoords( boost::numeric::ublas::matrix<float> transform_matrix, bool transformCenterIsImageCenter = false ) {
+		
+		if( !isis::data::_internal::transformCoords( *this, getSizeAsVector(), transform_matrix, transformCenterIsImageCenter ) ) {
+			LOG( Runtime, error ) << "Error during transforming the coords of the image.";
+			return false;
+//		BOOST_FOREACH( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef, lookup ) {
+//			chRef->transformCoords( transform_matrix );
+//		}
 		}
+
+		if( !updateOrientationMatrices() ) {
+			LOG( Runtime, error ) << "Could not update the orientation matrices of the image!";
+			return false;
+		}
+		return true;
 	}
+
+	dimensions mapScannerAxesToImageDimension( scannerAxis scannerAxes );
+	
+	/** Computes the physical coordinates (in scanner space) of the given voxel index.
+	 *  This function does not perform any test if the voxel index is inside the image.
+	 *  See getIndexFromPhysicalCoords for vice versa purpose.
+	 *  \param index the voxel index from which you want to get the physical coordinates
+	 *  \return physical coordinates associated with the given voxel index
+	 */
+	util::fvector4 getPhysicalCoordsFromIndex( const util::ivector4 &index ) const;
+
+
+	/** Computes the voxel index of the given physical coordinates (coordinates in scanner space)
+	 *  This function does not perform any test if the physical coordinates are inside the image.
+	 *  See getPhysicalCoordsFromIndex for vice versa purpose.
+	 *  \param physicalCoords the physical coords from which you want to get the voxel index.
+	 *  \return voxel index associated with the given physicalCoords
+	 */
+	util::ivector4 getIndexFromPhysicalCoords( const util::fvector4 &physicalCoords ) const;
 
 	/**
 	 * Copy all voxel data of the image into memory.
@@ -510,6 +551,7 @@ public:
 	size_t getNrOfTimesteps()const;
 
 	util::fvector4 getFoV()const;
+	bool updateOrientationMatrices();
 };
 
 /**

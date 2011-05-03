@@ -125,10 +125,10 @@ public:
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
 		typedef boost::numeric::converter <
 		DST, SRC,
-		   boost::numeric::conversion_traits<DST, SRC>,
-		   NumericOverflowHandler,
-		   boost::numeric::RoundEven<SRC>
-		   > converter;
+			 boost::numeric::conversion_traits<DST, SRC>,
+			 NumericOverflowHandler,
+			 boost::numeric::RoundEven<SRC>
+			 > converter;
 		DST &dstVal = dst.castTo<DST>();
 		const SRC &srcVal = src.castTo<SRC>();
 		NumericOverflowHandler::result = boost::numeric::cInRange;

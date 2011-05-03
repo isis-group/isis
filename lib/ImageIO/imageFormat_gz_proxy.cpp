@@ -20,7 +20,7 @@ class ImageFormat_CompProxy: public FileFormat
 {
 private:
 	static void gz_compress( std::ifstream &in, gzFile out ) {
-		char buf[2048*1024];
+		char buf[2048 * 1024];
 		int len;
 
 		for (
@@ -63,7 +63,7 @@ private:
 	}
 
 	static void gz_uncompress( gzFile in, std::ofstream &out ) {
-		char buf[2048*1024];
+		char buf[2048 * 1024];
 		int len;
 		size_t bytes = 0;
 

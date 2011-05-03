@@ -55,6 +55,15 @@ namespace image_io
 namespace _internal
 {
 
+class Flip : public data::Image::ChunkOp {
+	data::dimensions dim;
+public:
+	Flip( data::dimensions d ) { dim = d; }
+	bool operator()( data::Chunk &ch, util::FixedVector<size_t, 4> posInImage ) {
+		ch.swapAlong( dim );
+	}	
+};
+	
 class NiftiChunk : public data::Chunk
 {
 public:
@@ -175,16 +184,6 @@ public:
 
 		// don't forget to take the properties with
 		copyHeaderFromNifti( retList.back(), *ni );
-		//      if ( dialect == "spm" )
-		//      {
-		//          boost::shared_ptr<data::MemChunk<int16_t> >
-		//              dst( new data::MemChunk<int16_t>( ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ) ) ;
-		//          retChunk->swapAlong( *dst, 0 );
-		//          retList.push_back( *dst );
-		//          return 1;
-		//      }
-		//
-
 		return 1; // if there was an error, we wouldn't get here
 	}
 
@@ -206,19 +205,67 @@ public:
 		ni.datatype = DT_UNKNOWN;
 		ni.data = NULL;
 		ni.fname = const_cast<char *>( filename.c_str() );
+		
+		if ( dialect == "spm" ) {
+			boost::numeric::ublas::matrix<float> spmTransform = boost::numeric::ublas::identity_matrix<float> ( 3, 3 );
+			spmTransform( 1, 1 ) = -1;
+			image.transformCoords( spmTransform, true );
+			_internal::Flip flipOp( image.mapScannerAxesToImageDimension( data::z ) );
+			image.foreachChunk(flipOp);
+			//set the description
+			std::stringstream description;
+
+			if( image.hasProperty( "DICOM/MagneticFieldStrength" ) ) {
+				double fieldStrength = image.getPropertyAs<double>("DICOM/MagneticFieldStrength");
+				double d = pow( 10.0, 2);
+				description << floor(fieldStrength*d+0.5)/d << "T ";
+			}
+			
+			if( image.hasProperty( "DICOM/MRAcquisitionType" ) ) {
+				description << image.getPropertyAs<std::string>("DICOM/MRAcquisitionType") << " ";
+			}
+			if( image.hasProperty( "DICOM/ScanningSequence" ) ) {
+				util::slist scanningSequences = image.getPropertyAs<util::slist>("DICOM/ScanningSequence");
+				for( util::slist::const_iterator iter = scanningSequences.begin(); iter != scanningSequences.end(); iter++) {
+					if(! (*iter == scanningSequences.back()) ) {
+						description << *iter << "\\";
+					} else {
+						description << *iter;
+					}
+				}
+				description << " ";
+			}
+				
+			if( image.hasProperty( "repetitionTime" ) ) {
+				description << "TR=" << image.getPropertyAs<uint16_t>( "repetitionTime" ) << "ms";
+			}
+
+			if( image.hasProperty( "echoTime" ) ) {
+				description << "/TE=" << image.getPropertyAs<float>( "echoTime" ) << "ms";
+			}
+
+			if( image.hasProperty( "flipAngle" ) ) {
+				description << "/FA=" << image.getPropertyAs<uint16_t>( "flipAngle" ) << "deg";
+			}
+
+			//TODO add timestamp
+			if( image.hasProperty( "sequenceStart" ) && image.getChunk(0,0,0,0).hasProperty("acquisitionTime") ) {
+				boost::posix_time::ptime sequenceStart = image.getPropertyAs<boost::posix_time::ptime>("sequenceStart");
+				boost::posix_time::time_duration timeShift(0,0,image.getChunk(0,0,0,0).getPropertyAs<double>("acquisitionTime") / 1000 );
+				boost::posix_time::ptime realSequenceStart = sequenceStart + timeShift;
+				description << " " << realSequenceStart.date().day() << "-" << realSequenceStart.date().month() << "-" << realSequenceStart.date().year();
+				description << " " << realSequenceStart.time_of_day();			
+			}
+			if( !description.str().empty() ) {
+				image.setPropertyAs<std::string>( "spmDescription", description.str() );
+			}
+		}
 		//orientation in isis LPS - but in nifti everything relative to RAS
 		// - so let's change row/column direction and sign of indexOrigin
 		//now we try to transform
-		boost::numeric::ublas::matrix<float> matrix( 3, 3 );
+		boost::numeric::ublas::matrix<float> matrix = boost::numeric::ublas::identity_matrix<float>( 3, 3 );
 		matrix( 0, 0 ) = -1;
-		matrix( 0, 1 ) = 0;
-		matrix( 0, 2 ) = 0;
-		matrix( 1, 0 ) = 0;
 		matrix( 1, 1 ) = -1;
-		matrix( 1, 2 ) = 0;
-		matrix( 2, 0 ) = 0;
-		matrix( 2, 1 ) = 0;
-		matrix( 2, 2 ) = +1;
 		image.transformCoords( matrix );
 		//set the props from the image to the nifti file
 		copyHeaderToNifti( image, ni );
@@ -240,6 +287,8 @@ public:
 			//  stuffFslCompatibility(image, ni);
 		}
 
+		//SPM compatibility
+	
 		// copy the data to the nifti image
 		LOG( ImageIoLog, isis::info ) << "image typeid: " << image.getMajorTypeID();
 		LOG( ImageIoLog, isis::info ) << "image typename: " << image.getMajorTypeName();
@@ -247,7 +296,7 @@ public:
 		switch ( image.getMajorTypeID() ) {
 		case data::ValuePtr<int8_t>::staticID:
 
-			if ( dialect == "fsl" ) { // fsl not compatible with int8, convert to uint8
+			if ( dialect == "fsl" || dialect == "spm" ) { // fsl not compatible with int8, convert to uint8
 				data::TypedImage<uint8_t> fslCopy( image );
 				ni.datatype = DT_UINT8;
 				copyDataToNifti<uint8_t>( fslCopy, ni );
@@ -267,7 +316,7 @@ public:
 			break;
 		case data::ValuePtr<uint16_t>::staticID:
 
-			if ( dialect == "fsl" ) {
+			if ( dialect == "fsl" || dialect == "spm" ) {
 				//              image.print( std::cout );
 				data::TypedImage<int16_t> fslCopy( image );
 				ni.datatype = DT_INT16;
@@ -620,10 +669,24 @@ private:
 		ni.dz = ni.pixdim[3] = voxelSizeVector[2] + voxelGap[2];
 		ni.dt = ni.pixdim[4] = voxelSizeVector[3];
 
-		if ( true == image.hasProperty( "sequenceDescription" ) ) {
+		if ( true == image.hasProperty( "sequenceDescription" ) && false == image.hasProperty( "spmDescription" ) ) {
 			std::string descrip = ( image.getPropertyAs<std::string>( "sequenceDescription" ) );
 			snprintf( ni.descrip, 80, "%s", descrip.c_str() );
 		}
+
+		//if people want to convert with SPM convention they obviously losing the sequenceDescription
+		//but we are fair and add the sequenceDescription. Just hoping SPM will not crash
+		if( true == image.hasProperty( "spmDescription" ) ) {
+			std::stringstream desc;
+			desc << image.getPropertyAs<std::string>( "spmDescription" );
+
+			if( image.hasProperty( "sequenceDescription" ) ) {
+				desc << " | " << image.getPropertyAs<std::string>( "sequenceDescription" );
+			}
+
+			snprintf( ni.descrip, 80, "%s", desc.str().c_str() );
+		}
+
 
 		if ( true == image.hasProperty( "StudyDescription" ) ) {
 			std::string descrip = ( image.getPropertyAs<std::string>( "StudyDescription" ) );
@@ -632,7 +695,7 @@ private:
 
 		if ( image.hasProperty( "repetitionTime" ) ) {
 			LOG( ImageIoLog, info ) << "Setting pixdim[" << ni.ndim << "] to " << image.getPropertyAs<uint16_t>( "repetitionTime" );
-			ni.dt = ni.pixdim[ni.ndim+1] = ( float ) image.getPropertyAs<uint16_t>( "repetitionTime" ) / 1000; //nifti saves repTime s
+			ni.dt = ni.pixdim[ni.ndim + 1] = ( float ) image.getPropertyAs<uint16_t>( "repetitionTime" ) / 1000; //nifti saves repTime s
 		}
 
 		//the rotation matrix
