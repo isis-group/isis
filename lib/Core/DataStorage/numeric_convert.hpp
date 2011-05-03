@@ -3,9 +3,11 @@
 
 #include <limits>
 #include <assert.h>
-#include <boost/numeric/conversion/converter.hpp>
+#include <boost/mpl/bool.hpp>
+#include <boost/type_traits/is_arithmetic.hpp>
 #include "common.hpp"
 #include "typeptr.hpp"
+
 
 namespace isis
 {
@@ -15,35 +17,42 @@ enum autoscaleOption;
 namespace _internal
 {
 
+template<typename T> T round_impl(double x,boost::mpl::bool_<true>)
+{ 
+	const double ret(x < 0 ? x - 0.5 : x + 0.5);
+	
+	//shouldn't happen because of scaling, but you never know
+	LOG_IF(ret > std::numeric_limits<T>::max() + (x < 0 ? - 0.5 : 0.5),Debug,error) << ret << " is to big to be rounded into " << ValuePtr<T>::staticName();
+	LOG_IF(ret < std::numeric_limits<T>::min() + (x < 0 ? - 0.5 : 0.5),Debug,error) << ret << " is to small to be rounded into " << ValuePtr<T>::staticName();
+	
+	return static_cast<T>(ret);
+}
+template<typename T> T round_impl(double x,boost::mpl::bool_<false>){
+	return static_cast<T>(x); //@todo find a proper way to round from double to floating point (with range check !!)
+}
+template<typename T> T round(double x){
+	BOOST_MPL_ASSERT((boost::is_arithmetic<T>));
+	return round_impl<T>(x,boost::mpl::bool_<std::numeric_limits<T>::is_integer>()); //we do use overloading intead of (forbidden) partial specialization
+}
+
+size_t getConvertSize(const ValuePtrBase &src,const ValuePtrBase &dst);
+
 template<typename SRC, typename DST> void numeric_convert_impl( const SRC *src, DST *dst, size_t count, double scale, double offset )
 {
 	LOG( Runtime, info )
 			<< "using generic scaling convert " << ValuePtr<SRC>::staticName() << "=>" << ValuePtr<DST>::staticName()
 			<< " with scale/offset " << std::fixed << scale << "/" << offset;
-	static boost::numeric::converter <
-	DST, double,
-	   boost::numeric::conversion_traits<DST, double>,
-	   boost::numeric::def_overflow_handler,
-	   boost::numeric::RoundEven<double>
-	   > converter;
 
 	for ( size_t i = 0; i < count; i++ ) {
-		dst[i] = converter( src[i] * scale + offset );
+		dst[i] = round<DST>( src[i] * scale + offset );
 	}
 }
 
 template<typename SRC, typename DST> void numeric_convert_impl( const SRC *src, DST *dst, size_t count )
 {
 	LOG( Runtime, info ) << "using generic convert " << ValuePtr<SRC>::staticName() << " => " << ValuePtr<DST>::staticName() << " without scaling";
-	static boost::numeric::converter <
-	DST, SRC,
-	   boost::numeric::conversion_traits<DST, SRC>,
-	   boost::numeric::def_overflow_handler,
-	   boost::numeric::RoundEven<SRC>
-	   > converter;
-
 	for ( size_t i = 0; i < count; i++ )
-		dst[i] = converter( src[i] );
+		dst[i] = round<DST>( src[i] );
 }
 template<typename SRC, typename DST> void numeric_convert_impl( const std::complex<SRC> *src, std::complex<DST> *dst, size_t count, double /*scale*/, double /*offset*/ )
 {
@@ -270,12 +279,6 @@ getNumericScaling( const util::_internal::ValueBase &min, const util::_internal:
 
 	return std::make_pair( scale, offset );
 }
-template<typename SRC, typename DST> std::pair<double, double>
-getComplexScaling( const util::_internal::ValueBase &/*min*/, const util::_internal::ValueBase &/*max*/, autoscaleOption /*scaleopt = autoscale*/ )
-{
-	LOG( Debug, error ) << "Sorry scaling of complex values is not supportet yet";
-	return std::pair<double, double>( 1, 0 );
-}
 
 /**
  * Converts data from 'src' to the type of 'dst' and stores them there.
@@ -294,12 +297,7 @@ getComplexScaling( const util::_internal::ValueBase &/*min*/, const util::_inter
  */
 template<typename SRC, typename DST> void numeric_convert( const ValuePtr<SRC> &src, ValuePtr<DST> &dst, const double scale, const double offset )
 {
-	LOG_IF( src.getLength() > dst.getLength(), Runtime, error ) << "The " << src.getLength() << " elements of src wont fit into the destination. Will only convert " << dst.getLength() << " elements.";
-	LOG_IF( src.getLength() < dst.getLength(), Runtime, warning ) << "Source is shorter than destination. Will only convert " << src.getLength() << " values";
-
-	if ( src.getLength() == 0 )return;
-
-	const size_t size = std::min( src.getLength(), dst.getLength() );
+	const size_t size = _internal::getConvertSize(src,dst);
 
 	if ( ( scale != 1. || offset ) )
 		_internal::numeric_convert_impl( &src[0], &dst[0], size, scale, offset );
@@ -308,12 +306,7 @@ template<typename SRC, typename DST> void numeric_convert( const ValuePtr<SRC> &
 }
 template<typename T> void numeric_copy( const ValuePtr<T> &src, ValuePtr<T> &dst, const double scale, const double offset )
 {
-	LOG_IF( src.getLength() > dst.getLength(), Runtime, error ) << "The " << src.getLength() << " elements of src wont fit into the destination. Will only convert " << dst.getLength() << " elements.";
-	LOG_IF( src.getLength() < dst.getLength(), Runtime, warning ) << "Source is shorter than destination. Will only convert " << src.getLength() << " values";
-
-	if ( src.getLength() == 0 )return;
-
-	const size_t size = std::min( src.getLength(), dst.getLength() );
+	const size_t size = _internal::getConvertSize(src,dst);
 
 	if ( ( scale != 1. || offset ) )
 		_internal::numeric_copy_impl<T>( &src[0], &dst[0], size, scale, offset );
