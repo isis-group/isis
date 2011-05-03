@@ -215,8 +215,29 @@ public:
 			//set the description
 			std::stringstream description;
 
+			if( image.hasProperty( "DICOM/MagneticFieldStrength" ) ) {
+				double fieldStrength = image.getPropertyAs<double>("DICOM/MagneticFieldStrength");
+				double d = pow( 10.0, 2);
+				description << floor(fieldStrength*d+0.5)/d << "T ";
+			}
+			
+			if( image.hasProperty( "DICOM/MRAcquisitionType" ) ) {
+				description << image.getPropertyAs<std::string>("DICOM/MRAcquisitionType") << " ";
+			}
+			if( image.hasProperty( "DICOM/ScanningSequence" ) ) {
+				util::slist scanningSequences = image.getPropertyAs<util::slist>("DICOM/ScanningSequence");
+				for( util::slist::const_iterator iter = scanningSequences.begin(); iter != scanningSequences.end(); iter++) {
+					if(! (*iter == scanningSequences.back()) ) {
+						description << *iter << "\\";
+					} else {
+						description << *iter;
+					}
+				}
+				description << " ";
+			}
+				
 			if( image.hasProperty( "repetitionTime" ) ) {
-				description << " TR=" << image.getPropertyAs<uint16_t>( "repetitionTime" ) << "ms";
+				description << "TR=" << image.getPropertyAs<uint16_t>( "repetitionTime" ) << "ms";
 			}
 
 			if( image.hasProperty( "echoTime" ) ) {
@@ -228,6 +249,13 @@ public:
 			}
 
 			//TODO add timestamp
+			if( image.hasProperty( "sequenceStart" ) && image.getChunk(0,0,0,0).hasProperty("acquisitionTime") ) {
+				boost::posix_time::ptime sequenceStart = image.getPropertyAs<boost::posix_time::ptime>("sequenceStart");
+				boost::posix_time::time_duration timeShift(0,0,image.getChunk(0,0,0,0).getPropertyAs<double>("acquisitionTime") / 1000 );
+				boost::posix_time::ptime realSequenceStart = sequenceStart + timeShift;
+				description << " " << realSequenceStart.date().day() << "-" << realSequenceStart.date().month() << "-" << realSequenceStart.date().year();
+				description << " " << realSequenceStart.time_of_day();			
+			}
 			if( !description.str().empty() ) {
 				image.setPropertyAs<std::string>( "spmDescription", description.str() );
 			}
