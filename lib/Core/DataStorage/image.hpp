@@ -418,7 +418,9 @@ public:
 	bool transformCoords( boost::numeric::ublas::matrix<float> transform_matrix, bool transformCenterIsImageCenter = false ) {
 		
 		BOOST_FOREACH( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef, lookup ) {
-			chRef->transformCoords( transform_matrix, transformCenterIsImageCenter );
+			if(!chRef->transformCoords( transform_matrix, transformCenterIsImageCenter )) {
+				return false;
+			}
 		}
 		if( !isis::data::_internal::transformCoords( *this, getSizeAsVector(), transform_matrix, transformCenterIsImageCenter ) ) {
 			LOG( Runtime, error ) << "Error during transforming the coords of the image.";

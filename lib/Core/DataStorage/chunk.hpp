@@ -233,16 +233,19 @@ public:
 	 *
 	 * <B>IMPORTANT!</B>: If you call this function with a matrix other than the
 	 * identidy matrix, it's not guaranteed that the image is still in ISIS space
-	 * according to the DICOM conventions. Eventuelly some ISIS algorithms that
+	 * according to the DICOM conventions. Maybe some ISIS algorithms that
 	 * depend on correct image orientations won't work as expected. Use this method
 	 * with caution!
 	 */
 	bool transformCoords( boost::numeric::ublas::matrix<float> transform_matrix, bool transformCenterIsImageCenter = false ) {
-		if( !isis::data::_internal::transformCoords( *this, getSizeAsVector(), transform_matrix, transformCenterIsImageCenter ) ) {
-			LOG( Runtime, error ) << "Error during transforming the coords of the chunk.";
-			return false;
+		if( hasProperty( "rowVec" ) && hasProperty( "columnVec" ) && hasProperty( "sliceVec" )
+		&& hasProperty( "voxelSize" ) && hasProperty( "indexOrigin" ) ) {
+			if( !isis::data::_internal::transformCoords( *this, getSizeAsVector(), transform_matrix, transformCenterIsImageCenter ) ) {
+				LOG( Runtime, error ) << "Error during transforming the coords of the chunk.";
+				return false;
+			}
+			return true;
 		}
-
 		return true;
 	}
 	/**
