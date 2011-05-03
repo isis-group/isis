@@ -107,8 +107,8 @@ bool ImageHolder::setImage( const data::Image &image, const ImageType &imageType
 	if( filename.empty() ) {
 		// go through all the chunks and search for filenames. We use a set here to avoid redundantly filenames
 		std::set<std::string> filenameSet;
-		BOOST_FOREACH( std::vector<boost::shared_ptr< const data::Chunk > >::const_reference chRef, image.getChunksAsVector() ) {
-			filenameSet.insert( chRef->getPropertyAs<std::string>( "source" ) );
+		BOOST_FOREACH( std::vector< data::Chunk >::const_reference chRef, image.copyChunksToVector() ) {
+			filenameSet.insert( chRef.getPropertyAs<std::string>( "source" ) );
 		}
 		//now we pack our filenameSet into our slist of filenames
 		BOOST_FOREACH( std::set<std::string>::const_reference setRef, filenameSet ) {
