@@ -478,7 +478,7 @@ public:
 		copyToMem<T>( &ret.voxel<T>( 0, 0, 0, 0 ) );
 		return ret;
 	}
-	template<typename OutputIterator> void copyChunksTo( OutputIterator result, bool copy_metadata = false ) {
+	template<typename OutputIterator> void copyChunksTo( OutputIterator result, bool copy_metadata = false )const {
 		std::vector<boost::shared_ptr<Chunk> >::const_iterator at = lookup.begin();
 		const std::vector<boost::shared_ptr<Chunk> >::const_iterator end = lookup.end();
 
@@ -498,7 +498,7 @@ public:
 	* Make MemChunks of them to get deep copies.
 	* \param copy_metadata set to false to prevent the metadata of the image to be copied into the results. This will improve performance, but the chunks may lack important properties.
 	*/
-	std::vector<isis::data::Chunk> copyChunksToVector( bool copy_metadata = true );
+	std::vector<isis::data::Chunk> copyChunksToVector( bool copy_metadata = true )const;
 
 	/**
 	 * Ensure, the image has the type with the requested ID.

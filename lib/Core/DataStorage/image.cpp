@@ -496,7 +496,7 @@ const Chunk Image::getChunk ( size_t first, size_t second, size_t third, size_t 
 	const size_t index = commonGet( first, second, third, fourth ).first;
 	return getChunkAt( index, copy_metadata );
 }
-std::vector< Chunk > Image::copyChunksToVector( bool copy_metadata )
+std::vector< Chunk > Image::copyChunksToVector( bool copy_metadata )const
 {
 	std::vector<isis::data::Chunk> ret( lookup.size() );
 	copyChunksTo( ret.begin(), copy_metadata );
