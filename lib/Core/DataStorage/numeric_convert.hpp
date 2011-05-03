@@ -45,6 +45,11 @@ template<typename SRC, typename DST> void numeric_convert_impl( const SRC *src, 
 	for ( size_t i = 0; i < count; i++ )
 		dst[i] = converter( src[i] );
 }
+template<typename SRC, typename DST> void numeric_convert_impl( const std::complex<SRC> *src, std::complex<DST> *dst, size_t count, double /*scale*/, double /*offset*/ )
+{
+	LOG( Debug, error )	<< "complex conversion with scaling is not yet supportet";
+	numeric_convert_impl( src, dst, count);
+}
 
 template<typename T> void numeric_copy_impl( const T *src, T *dst, size_t count )
 {
@@ -262,6 +267,12 @@ getNumericScaling( const util::_internal::ValueBase &min, const util::_internal:
 	}
 
 	return std::make_pair( scale, offset );
+}
+template<typename SRC, typename DST> std::pair<double, double>
+getComplexScaling( const util::_internal::ValueBase &/*min*/, const util::_internal::ValueBase &/*max*/, autoscaleOption /*scaleopt = autoscale*/ )
+{
+	LOG(Debug, error) << "Sorry scaling of complex values is not supportet yet";
+	return std::pair<double,double>(1,0);
 }
 
 /**

@@ -24,11 +24,14 @@ int main( int argc, char *argv[] )
 		int count2 = 0;
 
 		if( app.parameters["chunks"] ) {
-			std::vector<boost::shared_ptr<data::Chunk> > chunks = ref.getChunksAsVector();
+			std::vector<data::Chunk> chunks = ref.copyChunksToVector(false);
 			const unsigned short chunkDigits = std::log10( chunks.size() ) + 1;
-			BOOST_FOREACH( const boost::shared_ptr<data::Chunk> &c, chunks ) {
-				std::cout << "======Image #" << std::setw( imageDigits )  << count1 << std::setw( 0 ) << "==Chunk #" << std::setw( chunkDigits )  << ++count2 << std::setw( 0 ) << " " << c->getSizeAsString() << c->getTypeName() << "======Metadata======" << std::endl;
-				c->print( std::cout, true );
+			BOOST_FOREACH( const data::Chunk &c, chunks ) {
+				std::cout
+					<< "======Image #" << std::setw( imageDigits )  << count1 << std::setw( 0 )
+					<< "==Chunk #" << std::setw( chunkDigits )  << ++count2 << std::setw( 0 ) << " "
+					<< c.getSizeAsString() << c.getTypeName() << "======Metadata======" << std::endl;
+				c.print( std::cout, true );
 			}
 		}
 	}

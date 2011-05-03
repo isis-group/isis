@@ -137,7 +137,7 @@ const char ImageFormat_Dicom::unknownTagName[] = "Unknown Tag";
 
 std::string ImageFormat_Dicom::suffixes()const {return std::string( ".ima .dcm" );}
 std::string ImageFormat_Dicom::getName()const {return "Dicom";}
-std::string ImageFormat_Dicom::dialects( const std::string &filename )const {return "withExtProtocols nomosaic";}
+std::string ImageFormat_Dicom::dialects( const std::string &/*filename*/ )const {return "withExtProtocols nomosaic";}
 
 
 
@@ -147,7 +147,7 @@ ptime ImageFormat_Dicom::genTimeStamp( const date &date, const ptime &time )
 }
 
 
-void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string dialect )
+void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*dialect*/ )
 {
 	const util::istring prefix = util::istring( ImageFormat_Dicom::dicomTagTreeName ) + "/";
 	/////////////////////////////////////////////////////////////////////////////////
@@ -500,7 +500,7 @@ int ImageFormat_Dicom::load( std::list<data::Chunk> &chunks, const std::string &
 	return 0;
 }
 
-void ImageFormat_Dicom::write( const data::Image &image, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & )
+void ImageFormat_Dicom::write( const data::Image &/*image*/, const std::string &/*filename*/, const std::string &/*dialect*/ ) throw( std::runtime_error & )
 {
 	throw( std::runtime_error( "writing dicom files is not yet supportet" ) );
 }

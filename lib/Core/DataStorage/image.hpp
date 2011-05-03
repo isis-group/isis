@@ -32,14 +32,24 @@ class Image:
 	public _internal::NDimensional<4>,
 	public util::PropertyMap
 {
+	dimensions minIndexingDim;
 public:
+	/**
+	 * Enforce indexing to start at a given dimension.
+	 * Normally indexing starts at the dimensionality of the inserted chunks.
+	 * So, an Image of 2D-Chunks (slices) will start indexing at the 3rd dimension.
+	 * If the dimension given here is bigger than the dimensionality of the chunks reindexing will override that and start indexing at the given dimension.
+	 * E.g. setIndexingDim(timeDim) will enforce indexing of a Image of 10 30x30-slices at the time dimension resulting in an 30x30x1x10 image instead of an 30x30x10x1 image.
+	 * If the indexing dimension is set after the Image was indexed it will be indexed again.
+	 * \param d the minimal indexing dimension to be used
+	 */
+	 void setIndexingDim(dimensions d=rowDim);
 	enum orientation {axial, reversed_axial, sagittal, reversed_sagittal, coronal, reversed_coronal};
 
 protected:
 	_internal::SortedChunkList set;
 	std::vector<boost::shared_ptr<Chunk> > lookup;
 private:
-	bool clean;
 	size_t chunkVolume;
 
 	void deduplicateProperties();
@@ -76,6 +86,7 @@ private:
 
 
 protected:
+	bool clean;
 	static const char *neededProperties;
 
 	/**
@@ -122,15 +133,41 @@ public:
 	 * Create image from a list of Chunks or objects with the base Chunk.
 	 * Removes used chunks from the given list. So afterwards the list consists of the rejected chunks.
 	 */
-	template<typename T> Image( std::list<T> &chunks ) : _internal::NDimensional<4>(), util::PropertyMap(), set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ), clean( false ) {
-		BOOST_STATIC_ASSERT( ( boost::is_base_of<Chunk, T>::value ) );
+	template<typename T> Image( std::list<T> &chunks,dimensions min_dim=rowDim ) :
+		_internal::NDimensional<4>(), util::PropertyMap(),
+		set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ),
+		clean( false ),minIndexingDim(min_dim)
+	{
 		addNeededFromString( neededProperties );
 		set.addSecondarySort( "acquisitionNumber" );
 		set.addSecondarySort( "acquisitionTime" );
+		insertChunksFromContainer(chunks);
+	}
+	/**
+	 * Create image from a vector of Chunks or objects with the base Chunk.
+	 * Removes used chunks from the given list. So afterwards the list consists of the rejected chunks.
+	 */
+	template<typename T> Image( std::vector<T> &chunks,dimensions min_dim=rowDim ) :
+		_internal::NDimensional<4>(), util::PropertyMap(),
+		set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ),
+		clean( false ),minIndexingDim(min_dim)
+	{
+		addNeededFromString( neededProperties );
+		set.addSecondarySort( "acquisitionNumber" );
+		set.addSecondarySort( "acquisitionTime" );
+		insertChunksFromContainer(chunks);
+	}
 
+	/**
+	 * Insert Chunks or objects with the base Chunk from a sequence container into the Image.
+	 * Removes used chunks from the given sequence container. So afterwards the container consists of the rejected chunks.
+	 * \returns amount of successfully inserted chunks
+	 */
+	template<typename T> size_t insertChunksFromContainer( T &chunks ) {
+		BOOST_STATIC_ASSERT( ( boost::is_base_of<Chunk, typename T::value_type >::value ) );
 		size_t cnt = 0;
 
-		for ( typename std::list<T>::iterator i = chunks.begin(); i != chunks.end(); ) { // for all remaining chunks
+		for ( typename T::iterator i = chunks.begin(); i != chunks.end(); ) { // for all remaining chunks
 			if ( insertChunk( *i ) ) {
 				chunks.erase( i++ );
 				cnt++;
@@ -146,16 +183,19 @@ public:
 				LOG( Runtime, error ) << "Failed to create image from " << cnt << " chunks.";
 			} else {
 				LOG_IF( !getMissing().empty(), Debug, warning )
-						<< "The created image is missing some properties: " << getMissing() << ". It will be invalid.";
+				<< "The created image is missing some properties: " << getMissing() << ". It will be invalid.";
 			}
+		} else {
+			LOG(Debug,warning) << "Image is empty after inserting chunks.";
 		}
+		return cnt;
 	}
 
 
 	/**
 	 * Create image from a single chunk.
 	 */
-	Image( const Chunk &chunk );
+	Image( const Chunk &chunk,dimensions min_dim=rowDim );
 
 	/**
 	 * Copy operator.
@@ -164,7 +204,7 @@ public:
 	Image &operator=( const Image &ref );
 
 	bool checkMakeClean();
-	bool isClean();
+	bool isClean()const;
 	/**
 	 * This method returns a reference to the voxel value at the given coordinates.
 	 *
@@ -257,16 +297,6 @@ public:
 	 * (Reminder: Chunk-copies are cheap, so the image data are NOT copied but referenced)
 	 */
 	Chunk getChunk( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true );
-
-	/**
-	 * Get a sorted list of pointers to the chunks of the image.
-	 * Note: this chunks only have metadata which are unique to them - so they might be invalid.
-	 * (run join on copies of them using the image as parameter to insert all non-unique-metadata).
-	 */
-	std::vector<boost::shared_ptr<Chunk> > getChunksAsVector();
-
-	/// \copydoc getChunksAsVector
-	std::vector<boost::shared_ptr<const Chunk> > getChunksAsVector()const;
 
 	/**
 	 * Get the chunk that contains the voxel at the given coordinates in the given type.
@@ -370,6 +400,9 @@ public:
 	 */
 	void transformCoords( boost::numeric::ublas::matrix<float> transform_matrix ) {
 		isis::data::_internal::transformCoords( *this, transform_matrix );
+		BOOST_FOREACH( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef, lookup ) {
+			chRef->transformCoords( transform_matrix );
+		}
 	}
 
 	/**
@@ -404,6 +437,24 @@ public:
 		copyToMem<T>( &ret.voxel<T>( 0, 0, 0, 0 ) );
 		return ret;
 	}
+	template<typename OutputIterator> void copyChunksTo(OutputIterator result,bool copy_metadata=false){
+		std::vector<boost::shared_ptr<Chunk> >::const_iterator at=lookup.begin();
+		const std::vector<boost::shared_ptr<Chunk> >::const_iterator end=lookup.end();
+		while (at!=end){
+			*result = **at++;
+			if(copy_metadata)
+				result->join(*this);
+			result++;
+		}
+	}
+
+	/**
+	* Get a sorted list of the chunks of the image.
+	* Note: this chunks are cheap copies, so changing them will change the image.
+	* Make MemChunks of them to get deep copies.
+	* \param copy_metadata set to false to prevent the metadata of the image to be copied into the results. This will improve performance, but the chunks may lack important properties.
+	*/
+	std::vector<isis::data::Chunk> copyChunksToVector(bool copy_metadata=true);
 
 	/**
 	 * Ensure, the image has the type with the requested ID.
@@ -530,7 +581,12 @@ public:
 		LOG( Debug, info ) << "Computed scaling for conversion from source image: [" << conv_op.scale << "]";
 
 		this->set.transform( conv_op );
-		this->lookup = this->set.getLookup(); // the lookup table still points to the old chunks
+		if(ref.isClean()){
+			this->lookup = this->set.getLookup(); // the lookup table still points to the old chunks
+		} else {
+			LOG(Debug,info) << "Copied unclean image. Running reIndex on the copy.";
+			this->reIndex();
+		}
 		return *this;
 	}
 };

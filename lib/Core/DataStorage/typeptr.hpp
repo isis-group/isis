@@ -305,8 +305,16 @@ public:
 		return ret;
 	}
 	//
-
+	scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const{
+		std::pair<util::ValueReference, util::ValueReference> minmax = getMinMax();
+		assert( ! ( minmax.first.isEmpty() || minmax.second.isEmpty() ) );
+		return ValuePtrBase::getScalingTo( typeID, minmax, scaleopt );
+	}
 };
+
+// specialisation for complex - there shall be no scaling - and we cannot compute minmax
+template<> scaling_pair ValuePtr<std::complex<float> >::getScalingTo( unsigned short /*typeID*/, autoscaleOption /*scaleopt*/ )const;
+template<> scaling_pair ValuePtr<std::complex<double> >::getScalingTo( unsigned short /*typeID*/, autoscaleOption /*scaleopt*/ )const;
 
 template<typename T> bool _internal::ValuePtrBase::is()const
 {

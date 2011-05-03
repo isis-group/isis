@@ -38,7 +38,10 @@ Image::Image ( ) : set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMas
 	set.addSecondarySort( "acquisitionTime" );
 }
 
-Image::Image ( const Chunk &chunk ) : _internal::NDimensional<4>(), util::PropertyMap(), set( "sequenceNumber,rowVec,columnVec,coilChannelMask,DICOM/EchoNumbers" ), clean( false )
+Image::Image ( const Chunk &chunk,dimensions min_dim ) :
+	_internal::NDimensional<4>(), util::PropertyMap(),
+	set( "sequenceNumber,rowVec,columnVec,coilChannelMask,DICOM/EchoNumbers" ),
+	clean( false ),minIndexingDim(min_dim)
 {
 	addNeededFromString( neededProperties );
 	set.addSecondarySort( "acquisitionNumber" );
@@ -67,6 +70,7 @@ Image &Image::operator=( const isis::data::Image &ref )
 	chunkVolume = ref.chunkVolume;
 	clean = ref.clean;
 	set = ref.set;
+	minIndexingDim=ref.minIndexingDim;
 	//replace all chunks (in set) by cheap copies of them
 	struct : public _internal::SortedChunkList::chunkPtrOperator {
 		boost::shared_ptr< Chunk > operator()( const boost::shared_ptr< Chunk >& ptr ) {
@@ -91,7 +95,7 @@ bool Image::checkMakeClean()
 
 	return clean;
 }
-bool Image::isClean()
+bool Image::isClean()const
 {
 	return clean;
 }
@@ -164,6 +168,15 @@ bool Image::insertChunk ( const Chunk &chunk )
 	}
 }
 
+void Image::setIndexingDim(dimensions d)
+{
+	minIndexingDim=d;
+	if(clean){
+		LOG(Debug,warning) << "Image was allready indexed. reIndexing ...";
+		reIndex();
+	}
+}
+
 
 bool Image::reIndex()
 {
@@ -183,7 +196,8 @@ bool Image::reIndex()
 	structure_size.fill( 1 );
 	//get primary attributes from geometrically first chunk - will be usefull
 	const Chunk &first = chunkAt( 0 );
-	const unsigned short chunk_dims = first.getRelevantDims();
+	//start indexing at eigther the chunk-size or the givem minIndexingDim (whichever is bigger)
+	const unsigned short chunk_dims = std::max<unsigned short>(first.getRelevantDims(),minIndexingDim);
 	chunkVolume = first.getVolume();
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Determine structure of the image by searching for dimensional breaks in the chunklist
@@ -390,18 +404,12 @@ const Chunk Image::getChunk ( size_t first, size_t second, size_t third, size_t 
 	const size_t index = commonGet( first, second, third, fourth ).first;
 	return getChunkAt( index, copy_metadata );
 }
-std::vector< boost::shared_ptr< Chunk > > Image::getChunksAsVector()
+std::vector< Chunk > Image::copyChunksToVector(bool copy_metadata)
 {
-	checkMakeClean();//lookup is filled by reIndex
-	return lookup;
+	std::vector<isis::data::Chunk> ret(lookup.size());
+	copyChunksTo(ret.begin(),copy_metadata);
+	return ret;
 }
-
-std::vector< boost::shared_ptr<const Chunk > > Image::getChunksAsVector()const
-{
-	LOG_IF( !clean, Debug, error ) << "You shouldn't do this on a non clean image. Run reIndex first.";
-	return std::vector< boost::shared_ptr<const Chunk > >( lookup.begin(), lookup.end() );
-}
-
 
 size_t Image::getChunkStride ( size_t base_stride )
 {
@@ -525,8 +533,7 @@ std::pair< util::ValueReference, util::ValueReference > Image::getScalingTo( sho
 	LOG_IF( !clean, Debug, error ) << "You should run reIndex before running this";
 	std::pair<util::ValueReference, util::ValueReference> minmax = getMinMax();
 
-	const std::vector<boost::shared_ptr<const Chunk> > chunks = getChunksAsVector();
-	BOOST_FOREACH( const boost::shared_ptr<const Chunk> &ref, chunks ) { //find a chunk which would be converted
+	BOOST_FOREACH( const boost::shared_ptr<const Chunk> &ref, lookup ) { //find a chunk which would be converted
 		if( targetID != ref->getTypeID() ) {
 			const scaling_pair scale = ref->getScalingTo( targetID, minmax, scaleopt );
 			LOG_IF( scale.first.isEmpty() || scale.second.isEmpty(), Debug, error ) << "Returning an invalid scaling. This is bad!";
