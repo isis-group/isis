@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		BOOST_REQUIRE( img.insertChunk( ch ) );
 		//Get a list of the sorted chunks
 		BOOST_REQUIRE( img.reIndex() );
-		std::vector<data::Chunk > list = img.copyChunksToVector(false);
+		std::vector<data::Chunk > list = img.copyChunksToVector( false );
 		BOOST_CHECK_EQUAL( list.size(), 3 ); // the should be 3 chunks in the list by now
 
 		for( unsigned int i = 0; i < list.size(); i++ ) {
@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		std::string str = "testString";
 		img.setPropertyAs<std::string>( "testProp", str );
 		BOOST_CHECK_EQUAL( img.getPropertyAs<std::string>( "testProp" ), str );
-		data::Chunk ch = img.copyChunksToVector(false).back();
+		data::Chunk ch = img.copyChunksToVector( false ).back();
 		//as all other chunks where timestep < 4 this must be at the end
 		BOOST_CHECK_EQUAL( ch.propertyValue( "indexOrigin" ), util::fvector4( 0, 0, 2 ) );
 		BOOST_CHECK_EQUAL( ch.propertyValue( "acquisitionNumber" ), 5  );
@@ -181,7 +181,8 @@ BOOST_AUTO_TEST_CASE ( minindexdim_test )
 	for( int i = 0; i < 3; i++ ) {
 		chunks1.push_back( genSlice<float>( 4, 4, i ) );
 	}
-	std::list<data::Chunk> chunks2(chunks1);
+
+	std::list<data::Chunk> chunks2( chunks1 );
 
 	data::Image img1( chunks1 );
 	data::Image img2( chunks2, data::timeDim );
@@ -189,8 +190,10 @@ BOOST_AUTO_TEST_CASE ( minindexdim_test )
 	const size_t size1[] = {4, 4, 3, 1};
 	const size_t size2[] = {4, 4, 1, 3};
 
-	BOOST_REQUIRE( img1.isClean() );BOOST_REQUIRE( img1.isValid() );
-	BOOST_REQUIRE( img2.isClean() );BOOST_REQUIRE( img2.isValid() );
+	BOOST_REQUIRE( img1.isClean() );
+	BOOST_REQUIRE( img1.isValid() );
+	BOOST_REQUIRE( img2.isClean() );
+	BOOST_REQUIRE( img2.isValid() );
 
 	BOOST_CHECK_EQUAL( img1.getSizeAsVector(), ( util::FixedVector<size_t, 4>( size1 ) ) );
 	BOOST_CHECK_EQUAL( img2.getSizeAsVector(), ( util::FixedVector<size_t, 4>( size2 ) ) );
@@ -221,7 +224,7 @@ BOOST_AUTO_TEST_CASE ( type_selection_test )
 	const size_t size[] = {4, 4, 4, 1};
 	BOOST_CHECK( img.isClean() );
 	BOOST_CHECK( img.isValid() );
-	BOOST_CHECK_EQUAL( img.copyChunksToVector(false).size(), 4 );
+	BOOST_CHECK_EQUAL( img.copyChunksToVector( false ).size(), 4 );
 	BOOST_CHECK_EQUAL( img.getSizeAsVector(), ( util::FixedVector<size_t, 4>( size ) ) );
 	BOOST_CHECK_EQUAL( img.getMajorTypeID(), data::ValuePtr<int16_t>( NULL, 0 ).getTypeID() );
 }
@@ -585,7 +588,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
 	const size_t dummy[] = {nrX, nrY, nrS, nrT};
 	const util::FixedVector<size_t, 4> sizeVec( dummy );
 
-	BOOST_REQUIRE_EQUAL( img.copyChunksToVector(false).size(), nrT * nrS );
+	BOOST_REQUIRE_EQUAL( img.copyChunksToVector( false ).size(), nrT * nrS );
 	BOOST_REQUIRE_EQUAL( img.getSizeAsVector(), sizeVec );
 
 	for ( unsigned int ix = 0; ix < nrX; ix++ ) {
@@ -641,7 +644,7 @@ BOOST_AUTO_TEST_CASE ( image_splice_test )
 	BOOST_REQUIRE( img.isValid() );
 	BOOST_REQUIRE( !img.isEmpty() );
 	img.spliceDownTo( data::sliceDim );
-	std::vector<data::Chunk > chunks = img.copyChunksToVector(false);
+	std::vector<data::Chunk > chunks = img.copyChunksToVector( false );
 	BOOST_CHECK_EQUAL( chunks.size(), 100 );
 
 	for( size_t i = 0; i < chunks.size(); i++ ) {

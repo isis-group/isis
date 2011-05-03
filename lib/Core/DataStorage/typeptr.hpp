@@ -307,7 +307,7 @@ public:
 		return ret;
 	}
 	//
-	scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const{
+	scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const {
 		std::pair<util::ValueReference, util::ValueReference> minmax = getMinMax();
 		assert( ! ( minmax.first.isEmpty() || minmax.second.isEmpty() ) );
 		return ValuePtrBase::getScalingTo( typeID, minmax, scaleopt );

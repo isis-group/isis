@@ -36,7 +36,7 @@ int main( int argc, char *argv[] )
 	app.parameters["dViewer"].needed() = false;
 	app.parameters["rf"] = std::string();
 	app.parameters["rf"].needed() = false;
-	app.parameters["rf"].setDescription("Override automatic detection of file suffix for reading with given value");
+	app.parameters["rf"].setDescription( "Override automatic detection of file suffix for reading with given value" );
 	app.parameters["rf"].hidden() = true;
 	app.init( argc, argv, true );
 	app.setLog<isis::ViewerLog>( app.getLLMap()[app.parameters["dViewer"]->as<isis::util::Selection>()] );

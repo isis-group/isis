@@ -38,10 +38,10 @@ Image::Image ( ) : set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMas
 	set.addSecondarySort( "acquisitionTime" );
 }
 
-Image::Image ( const Chunk &chunk,dimensions min_dim ) :
+Image::Image ( const Chunk &chunk, dimensions min_dim ) :
 	_internal::NDimensional<4>(), util::PropertyMap(),
 	set( "sequenceNumber,rowVec,columnVec,coilChannelMask,DICOM/EchoNumbers" ),
-	clean( false ),minIndexingDim(min_dim)
+	clean( false ), minIndexingDim( min_dim )
 {
 	addNeededFromString( neededProperties );
 	set.addSecondarySort( "acquisitionNumber" );
@@ -70,7 +70,7 @@ Image &Image::operator=( const isis::data::Image &ref )
 	chunkVolume = ref.chunkVolume;
 	clean = ref.clean;
 	set = ref.set;
-	minIndexingDim=ref.minIndexingDim;
+	minIndexingDim = ref.minIndexingDim;
 	//replace all chunks (in set) by cheap copies of them
 	struct : public _internal::SortedChunkList::chunkPtrOperator {
 		boost::shared_ptr< Chunk > operator()( const boost::shared_ptr< Chunk >& ptr ) {
@@ -168,11 +168,12 @@ bool Image::insertChunk ( const Chunk &chunk )
 	}
 }
 
-void Image::setIndexingDim(dimensions d)
+void Image::setIndexingDim( dimensions d )
 {
-	minIndexingDim=d;
-	if(clean){
-		LOG(Debug,warning) << "Image was allready indexed. reIndexing ...";
+	minIndexingDim = d;
+
+	if( clean ) {
+		LOG( Debug, warning ) << "Image was allready indexed. reIndexing ...";
 		reIndex();
 	}
 }
@@ -248,21 +249,23 @@ bool Image::updateOrientationMatrices()
 }
 
 
-dimensions Image::mapScannerAxesToImageDimension(scannerAxis scannerAxes) 
+dimensions Image::mapScannerAxesToImageDimension( scannerAxis scannerAxes )
 {
 	updateOrientationMatrices();
 	boost::numeric::ublas::matrix<float> latchedOrientation = boost::numeric::ublas::zero_matrix<float>( 3, 3 );
-	boost::numeric::ublas::vector<float>mapping(3);
+	boost::numeric::ublas::vector<float>mapping( 3 );
+
 	for ( size_t i = 0; i < 3; i++ ) {
-		latchedOrientation( i, 0 ) = abs(m_RowVec[i] < 0 ? ceil( m_RowVec[i] - 0.5 ) : floor( m_RowVec[i] + 0.5 ));
-		latchedOrientation( i, 1 ) = abs(m_ColumnVec[i] < 0 ? ceil( m_ColumnVec[i] - 0.5 ) : floor( m_ColumnVec[i] + 0.5 ));
-		latchedOrientation( i, 2 ) = abs(m_SliceVec[i] < 0 ? ceil( m_SliceVec[i] - 0.5 ) : floor( m_SliceVec[i] + 0.5 ));
-		mapping(i) = i;
+		latchedOrientation( i, 0 ) = abs( m_RowVec[i] < 0 ? ceil( m_RowVec[i] - 0.5 ) : floor( m_RowVec[i] + 0.5 ) );
+		latchedOrientation( i, 1 ) = abs( m_ColumnVec[i] < 0 ? ceil( m_ColumnVec[i] - 0.5 ) : floor( m_ColumnVec[i] + 0.5 ) );
+		latchedOrientation( i, 2 ) = abs( m_SliceVec[i] < 0 ? ceil( m_SliceVec[i] - 0.5 ) : floor( m_SliceVec[i] + 0.5 ) );
+		mapping( i ) = i;
 	}
-	return static_cast<dimensions>( boost::numeric::ublas::prod( latchedOrientation, mapping )(scannerAxes));
-	
-	
-	
+
+	return static_cast<dimensions>( boost::numeric::ublas::prod( latchedOrientation, mapping )( scannerAxes ) );
+
+
+
 }
 
 
@@ -285,7 +288,7 @@ bool Image::reIndex()
 	//get primary attributes from geometrically first chunk - will be usefull
 	const Chunk &first = chunkAt( 0 );
 	//start indexing at eigther the chunk-size or the givem minIndexingDim (whichever is bigger)
-	const unsigned short chunk_dims = std::max<unsigned short>(first.getRelevantDims(),minIndexingDim);
+	const unsigned short chunk_dims = std::max<unsigned short>( first.getRelevantDims(), minIndexingDim );
 	chunkVolume = first.getVolume();
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Determine structure of the image by searching for dimensional breaks in the chunklist
@@ -493,10 +496,10 @@ const Chunk Image::getChunk ( size_t first, size_t second, size_t third, size_t 
 	const size_t index = commonGet( first, second, third, fourth ).first;
 	return getChunkAt( index, copy_metadata );
 }
-std::vector< Chunk > Image::copyChunksToVector(bool copy_metadata)
+std::vector< Chunk > Image::copyChunksToVector( bool copy_metadata )
 {
-	std::vector<isis::data::Chunk> ret(lookup.size());
-	copyChunksTo(ret.begin(),copy_metadata);
+	std::vector<isis::data::Chunk> ret( lookup.size() );
+	copyChunksTo( ret.begin(), copy_metadata );
 	return ret;
 }
 

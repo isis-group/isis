@@ -55,15 +55,16 @@ namespace image_io
 namespace _internal
 {
 
-class Flip : public data::Image::ChunkOp {
+class Flip : public data::Image::ChunkOp
+{
 	data::dimensions dim;
 public:
 	Flip( data::dimensions d ) { dim = d; }
 	bool operator()( data::Chunk &ch, util::FixedVector<size_t, 4> posInImage ) {
 		ch.swapAlong( dim );
-	}	
+	}
 };
-	
+
 class NiftiChunk : public data::Chunk
 {
 public:
@@ -205,37 +206,40 @@ public:
 		ni.datatype = DT_UNKNOWN;
 		ni.data = NULL;
 		ni.fname = const_cast<char *>( filename.c_str() );
-		
+
 		if ( dialect == "spm" ) {
 			boost::numeric::ublas::matrix<float> spmTransform = boost::numeric::ublas::identity_matrix<float> ( 3, 3 );
 			spmTransform( 1, 1 ) = -1;
 			image.transformCoords( spmTransform, true );
 			_internal::Flip flipOp( image.mapScannerAxesToImageDimension( data::z ) );
-			image.foreachChunk(flipOp);
+			image.foreachChunk( flipOp );
 			//set the description
 			std::stringstream description;
 
 			if( image.hasProperty( "DICOM/MagneticFieldStrength" ) ) {
-				double fieldStrength = image.getPropertyAs<double>("DICOM/MagneticFieldStrength");
-				double d = pow( 10.0, 2);
-				description << floor(fieldStrength*d+0.5)/d << "T ";
+				double fieldStrength = image.getPropertyAs<double>( "DICOM/MagneticFieldStrength" );
+				double d = pow( 10.0, 2 );
+				description << floor( fieldStrength * d + 0.5 ) / d << "T ";
 			}
-			
+
 			if( image.hasProperty( "DICOM/MRAcquisitionType" ) ) {
-				description << image.getPropertyAs<std::string>("DICOM/MRAcquisitionType") << " ";
+				description << image.getPropertyAs<std::string>( "DICOM/MRAcquisitionType" ) << " ";
 			}
+
 			if( image.hasProperty( "DICOM/ScanningSequence" ) ) {
-				util::slist scanningSequences = image.getPropertyAs<util::slist>("DICOM/ScanningSequence");
-				for( util::slist::const_iterator iter = scanningSequences.begin(); iter != scanningSequences.end(); iter++) {
-					if(! (*iter == scanningSequences.back()) ) {
+				util::slist scanningSequences = image.getPropertyAs<util::slist>( "DICOM/ScanningSequence" );
+
+				for( util::slist::const_iterator iter = scanningSequences.begin(); iter != scanningSequences.end(); iter++ ) {
+					if( ! ( *iter == scanningSequences.back() ) ) {
 						description << *iter << "\\";
 					} else {
 						description << *iter;
 					}
 				}
+
 				description << " ";
 			}
-				
+
 			if( image.hasProperty( "repetitionTime" ) ) {
 				description << "TR=" << image.getPropertyAs<uint16_t>( "repetitionTime" ) << "ms";
 			}
@@ -249,17 +253,19 @@ public:
 			}
 
 			//TODO add timestamp
-			if( image.hasProperty( "sequenceStart" ) && image.getChunk(0,0,0,0).hasProperty("acquisitionTime") ) {
-				boost::posix_time::ptime sequenceStart = image.getPropertyAs<boost::posix_time::ptime>("sequenceStart");
-				boost::posix_time::time_duration timeShift(0,0,image.getChunk(0,0,0,0).getPropertyAs<double>("acquisitionTime") / 1000 );
+			if( image.hasProperty( "sequenceStart" ) && image.getChunk( 0, 0, 0, 0 ).hasProperty( "acquisitionTime" ) ) {
+				boost::posix_time::ptime sequenceStart = image.getPropertyAs<boost::posix_time::ptime>( "sequenceStart" );
+				boost::posix_time::time_duration timeShift( 0, 0, image.getChunk( 0, 0, 0, 0 ).getPropertyAs<double>( "acquisitionTime" ) / 1000 );
 				boost::posix_time::ptime realSequenceStart = sequenceStart + timeShift;
 				description << " " << realSequenceStart.date().day() << "-" << realSequenceStart.date().month() << "-" << realSequenceStart.date().year();
-				description << " " << realSequenceStart.time_of_day();			
+				description << " " << realSequenceStart.time_of_day();
 			}
+
 			if( !description.str().empty() ) {
 				image.setPropertyAs<std::string>( "spmDescription", description.str() );
 			}
 		}
+
 		//orientation in isis LPS - but in nifti everything relative to RAS
 		// - so let's change row/column direction and sign of indexOrigin
 		//now we try to transform
@@ -288,7 +294,7 @@ public:
 		}
 
 		//SPM compatibility
-	
+
 		// copy the data to the nifti image
 		LOG( ImageIoLog, isis::info ) << "image typeid: " << image.getMajorTypeID();
 		LOG( ImageIoLog, isis::info ) << "image typename: " << image.getMajorTypeName();

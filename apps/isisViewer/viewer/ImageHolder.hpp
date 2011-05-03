@@ -70,8 +70,8 @@ public:
 		TYPE minImage = getInternMinMax().first->as<TYPE>();
 		TYPE maxImage = getInternMinMax().second->as<TYPE>();
 		TYPE extent = maxImage - minImage;
-// 		double histogram[extent];
-		double* histogram = (double*) calloc( extent+1, sizeof(double));
+		//      double histogram[extent];
+		double *histogram = ( double * ) calloc( extent + 1, sizeof( double ) );
 		size_t stepSize = 2;
 		size_t numberOfVoxels = volume / stepSize;
 		TYPE *dataPtr = static_cast<TYPE *>( getImageVector().front()->getRawAddress().lock().get() );
@@ -80,6 +80,7 @@ public:
 		for( size_t i = 0; i < volume; i += stepSize ) {
 			histogram[dataPtr[i]]++;
 		}
+
 		//normalize histogram
 		for( TYPE i = 0; i < extent; i++ ) {
 			histogram[i] /= numberOfVoxels;
@@ -93,6 +94,7 @@ public:
 			sum += histogram[upperBorder--];
 
 		}
+
 		sum = 0;
 
 		while ( sum < cutAway.first ) {

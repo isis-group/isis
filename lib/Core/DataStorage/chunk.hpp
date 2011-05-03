@@ -37,7 +37,7 @@ class ChunkBase : public NDimensional<4>, public util::PropertyMap
 {
 protected:
 	static const char *neededProperties;
-	ChunkBase(){};//do not use this
+	ChunkBase() {}; //do not use this
 public:
 	//  static const dimensions dimension[n_dims]={rowDim,columnDim,sliceDim,timeDim};
 	typedef isis::util::_internal::ValueReference <ChunkBase > Reference;
@@ -70,7 +70,7 @@ protected:
 		_internal::ChunkBase( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ),
 		util::_internal::ValueReference<_internal::ValuePtrBase>( new ValuePtr<TYPE>( src, getVolume(), d ) ) {}
 	Chunk( const ValuePtrReference &src, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 );
-	Chunk(){};//do not use this
+	Chunk() {}; //do not use this
 public:
 	template <typename TYPE> class VoxelOp: std::unary_function<bool, TYPE>
 	{
@@ -242,11 +242,12 @@ public:
 			LOG( Runtime, error ) << "Error during transforming the coords of the chunk.";
 			return false;
 		}
+
 		return true;
 	}
-		/**
-	* Swaps the image along a dimension dim in image space. 
-	*/
+	/**
+	  * Swaps the image along a dimension dim in image space.
+	  */
 	bool swapAlong( const dimensions dim ) const;
 
 };
@@ -380,7 +381,7 @@ public:
 	}
 
 
- };
+};
 }
 }
 #endif // CHUNK_H

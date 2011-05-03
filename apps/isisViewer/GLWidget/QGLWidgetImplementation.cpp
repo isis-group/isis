@@ -284,9 +284,11 @@ void QGLWidgetImplementation::paintScene( const boost::shared_ptr<ImageHolder> i
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
 	glLoadMatrixd( state.modelViewMatrix );
-	if(image.get() == m_ViewerCore->getCurrentImage().get()) {
-		glTranslatef(0.0,0.0,-0.1);
+
+	if( image.get() == m_ViewerCore->getCurrentImage().get() ) {
+		glTranslatef( 0.0, 0.0, -0.1 );
 	}
+
 	glMatrixMode( GL_TEXTURE );
 	glLoadIdentity();
 	glLoadMatrixd( state.textureMatrix );
@@ -460,11 +462,11 @@ void QGLWidgetImplementation::emitMousePressEvent( QMouseEvent *e )
 
 bool QGLWidgetImplementation::timestepChanged( unsigned int timestep )
 {
-	
+
 	if( m_ViewerCore->getCurrentImage()->getImageSize()[3] > timestep ) {
-		m_StateValues.at(m_ViewerCore->getCurrentImage()).voxelCoords[3] = timestep;
+		m_StateValues.at( m_ViewerCore->getCurrentImage() ).voxelCoords[3] = timestep;
 	} else {
-		m_StateValues.at(m_ViewerCore->getCurrentImage()).voxelCoords[3] = m_ViewerCore->getCurrentImage()->getImageSize()[3] - 1;
+		m_StateValues.at( m_ViewerCore->getCurrentImage() ).voxelCoords[3] = m_ViewerCore->getCurrentImage()->getImageSize()[3] - 1;
 	}
 
 	updateScene();

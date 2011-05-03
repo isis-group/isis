@@ -209,8 +209,8 @@ template<typename SRC, typename DST> class ValuePtrConverter<false, false, std::
 {
 	ValuePtrConverter() {
 		LOG( Debug, verbose_info )
-		<< "Creating complex converter from "
-		   << ValuePtr<std::complex<SRC> >::staticName() << " to " << ValuePtr<std::complex<DST> >::staticName();
+				<< "Creating complex converter from "
+				<< ValuePtr<std::complex<SRC> >::staticName() << " to " << ValuePtr<std::complex<DST> >::staticName();
 	};
 public:
 	static boost::shared_ptr<const ValuePtrConverterBase> get() {
@@ -219,15 +219,15 @@ public:
 	}
 	void convert( const ValuePtrBase &src, ValuePtrBase &dst, const scaling_pair &scaling )const {
 		LOG_IF( scaling.first.isEmpty() || scaling.first.isEmpty(), Debug, error ) << "Running conversion with invalid scaling (" << scaling << ") this won't work";
-		LOG_IF( scaling.first->as<float>() != 1 || scaling.second->as<float>() != 0, Debug, warning)<< "Sorry scaling of complex values is not supportet yet";
+		LOG_IF( scaling.first->as<float>() != 1 || scaling.second->as<float>() != 0, Debug, warning ) << "Sorry scaling of complex values is not supportet yet";
 		numeric_convert( src.castToValuePtr<std::complex<SRC> >(), dst.castToValuePtr<std::complex<DST> >(), scaling.first->as<double>(), scaling.second->as<double>() );
 	}
 	scaling_pair getScaling( const util::_internal::ValueBase &min, const util::_internal::ValueBase &max, autoscaleOption scaleopt = autoscale )const {
 		const std::pair<double, double> scale = getComplexScaling<SRC, DST>( min, max, scaleopt );
 		return std::make_pair(
-			util::ValueReference( util::Value<double>( scale.first ) ),
-			util::ValueReference( util::Value<double>( scale.second ) )
-		);
+				   util::ValueReference( util::Value<double>( scale.first ) ),
+				   util::ValueReference( util::Value<double>( scale.second ) )
+			   );
 	}
 	virtual ~ValuePtrConverter() {}
 };
