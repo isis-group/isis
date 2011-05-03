@@ -12,7 +12,7 @@ ImageHolder::ImageHolder( )
 {
 }
 
-
+/*
 bool
 ImageHolder::filterRelevantMetaInformation()
 {
@@ -41,7 +41,7 @@ ImageHolder::filterRelevantMetaInformation()
 	}
 
 	return true;
-}
+}*/
 
 boost::numeric::ublas::matrix< float > ImageHolder::getNormalizedImageOrientation( bool transposed ) const
 {

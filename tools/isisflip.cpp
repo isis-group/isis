@@ -8,17 +8,18 @@
 
 using namespace isis;
 
-class Flip : public data::Image::ChunkOp
-{
-	data::dimensions dim;
-public:
-	Flip( data::dimensions d ) { dim = d; }
-	bool operator()( data::Chunk &ch, util::FixedVector<size_t, 4> posInImage ) {
-		ch.swapAlong( dim );
-	}
-};
+
 int main( int argc, char **argv )
-{
+{	
+	class : public data::Image::ChunkOp
+	{
+	public:
+		data::dimensions dim;
+		bool operator()( data::Chunk &ch, util::FixedVector<size_t, 4> posInImage ) {
+			ch.swapAlong( dim );
+		}
+	}flifu;
+	
 	ENABLE_LOG( data::Runtime, util::DefaultMsgPrint, error );
 	const size_t getBiggestVecElem( const util::fvector4 & vec );
 	std::map<std::string, unsigned int> alongMap = boost::assign::map_list_of
@@ -43,25 +44,16 @@ int main( int argc, char **argv )
 	unsigned int dim = alongMap[app.parameters["along"].toString()];
 	//go through every image
 	BOOST_FOREACH( data::Image & refImage, app.images ) {
-		//map from pyhisical into image space
-		util::fvector4 sliceVec = refImage.getPropertyAs<util::fvector4>( "sliceVec" );
-		util::fvector4 columnVec = refImage.getPropertyAs<util::fvector4>( "columnVec" );
-		util::fvector4 rowVec = refImage.getPropertyAs<util::fvector4>( "rowVec" );
-		util::fvector4 f1( rowVec[0], columnVec[0], sliceVec[0], 0  );
-		util::fvector4 f2( rowVec[1], columnVec[1], sliceVec[1], 0  );
-		util::fvector4 f3( rowVec[2], columnVec[2], sliceVec[2], 0  );
 		boost::numeric::ublas::matrix<float> T = boost::numeric::ublas::identity_matrix<float>( 3, 3 );
-
 		if( dim > 2 ) {
 			dim = refImage.mapScannerAxesToImageDimension( static_cast<data::scannerAxis>( dim - 3 ) );
 		}
-
 		T( dim, dim ) *= -1;
 		data::Image newImage = refImage;
 
 		if ( app.parameters["flip"].toString() == "image" || app.parameters["flip"].toString() == "both" ) {
-			Flip flipOp( static_cast<data::dimensions>( dim ) );
-			refImage.foreachChunk( flipOp );
+			flifu.dim=static_cast<data::dimensions>( dim );
+			refImage.foreachChunk( flifu );
 		}
 
 		if ( app.parameters["flip"].toString() == "both" || app.parameters["flip"].toString() == "space" ) {
