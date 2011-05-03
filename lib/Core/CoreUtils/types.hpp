@@ -18,6 +18,7 @@
 #include "color.hpp"
 #include "selection.hpp"
 
+#include <complex>
 
 namespace isis
 {
