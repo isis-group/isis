@@ -136,6 +136,7 @@ void QGLWidgetImplementation::updateStateValues( boost::shared_ptr<ImageHolder> 
 		state.mappedVoxelSize = GLOrientationHandler::transformVector<float>( image->getPropMap().getPropertyAs<util::fvector4>( "voxelSize" ) + image->getPropMap().getPropertyAs<util::fvector4>( "voxelGap" ) , state.planeOrientation );
 		state.mappedImageSize = GLOrientationHandler::transformVector<int>( image->getImageSize(), state.planeOrientation );
 		state.set = true;
+		state.lutID =  m_LookUpTable.getLookUpTableAsTexture( Color::wbryw );
 	}
 
 	state.mappedVoxelCoords = GLOrientationHandler::transformVector<int>( state.voxelCoords, state.planeOrientation );
@@ -298,9 +299,8 @@ void QGLWidgetImplementation::paintScene( const boost::shared_ptr<ImageHolder> i
 	if( image->getImageState().imageType == ImageHolder::z_map ) {
 		m_ScalingShader.setEnabled( false );
 		m_LUTShader.setEnabled( true );
-		GLuint id = m_LookUpTable.getLookUpTableAsTexture( Color::hsvLUT );
 		glActiveTexture( GL_TEXTURE1 );
-		glBindTexture( GL_TEXTURE_1D, id );
+		glBindTexture( GL_TEXTURE_1D, state.lutID );
 		m_LUTShader.addVariable<float>( "lut", 1, true );
 		m_LUTShader.addVariable<float>( "max", image->getMinMax().second->as<float>() );
 		m_LUTShader.addVariable<float>( "min", image->getMinMax().first->as<float>() );

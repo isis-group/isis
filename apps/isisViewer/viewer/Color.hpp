@@ -14,7 +14,7 @@ class Color
 {
 
 public:
-	enum LookUpTableType { hsvLUT, hsvLUT_reverse };
+	enum LookUpTableType { hsvLUT, hsvLUT_reverse, wbryw };
 	static std::vector< util::fvector4 > getColorGradientRGB( const LookUpTableType &lutType, const size_t &numberOfEntries );
 
 

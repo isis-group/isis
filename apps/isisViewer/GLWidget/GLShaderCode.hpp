@@ -16,7 +16,10 @@ std::string colormap_shader_code = STRINGIFY(
 	float err = 0.006;
 	float range = max - min;
 	float i = texture3D( imageTexture, gl_TexCoord[0].xyz ).r;
-	vec4 colorLut = texture1D( lut, i - err );
+	if(i<=0) {
+		err *= -1;
+	}
+	vec4 colorLut = texture1D( lut, i-err );
 	colorLut.a = opacity;
 	float inormed = ( i * range ) + min;
 

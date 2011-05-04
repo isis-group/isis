@@ -114,6 +114,7 @@ private:
 		GLint viewport[4];
 		float normalizedSlice;
 		GLuint textureID;
+		GLuint lutID;
 		util::ivector4 voxelCoords;
 		util::ivector4 mappedVoxelCoords;
 		util::fvector4 mappedVoxelSize;

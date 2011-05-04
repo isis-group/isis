@@ -212,7 +212,7 @@ void MainWindow::exitProgram()
 void MainWindow::lowerThresholdChanged( int lowerThreshold )
 {
 	double range = m_ViewerCore->getCurrentImage()->getMinMax().second->as<double>() - m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>();
-	m_ViewerCore->getCurrentImage()->setLowerThreshold( ( range / 1000 ) * ( lowerThreshold + 1 ) + m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>() );
+	m_ViewerCore->getCurrentImage()->setLowerThreshold( ( range / 1000 ) * ( lowerThreshold  ) + m_ViewerCore->getCurrentImage()->getMinMax().first->as<double>() );
 	m_ViewerCore->updateScene();
 }
 
