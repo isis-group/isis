@@ -21,7 +21,6 @@ int main( int argc, char **argv )
 	}flifu;
 	
 	ENABLE_LOG( data::Runtime, util::DefaultMsgPrint, error );
-	size_t getBiggestVecElem( const util::fvector4 & vec );
 	std::map<std::string, unsigned int> alongMap = boost::assign::map_list_of
 			( "row", 0 ) ( "column", 1 ) ( "slice", 2 ) ( "x", 3 ) ( "y", 4 ) ( "z", 5 );
 	data::IOApplication app( "isisflip", true, true );
