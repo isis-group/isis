@@ -1,4 +1,4 @@
-#include "Adapter/qtapplication.hpp"
+#include "Adapter/qt4/qtapplication.hpp"
 #include "MainWindow.hpp"
 #include "QViewerCore.hpp"
 #include <iostream>
