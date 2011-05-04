@@ -40,10 +40,9 @@ template<typename T, bool isNumber> struct getMinMaxImpl {
 };
 template<typename T> struct getMinMaxImpl<T, true> { // generic minmax for numbers (this _must_ not be run on empty ValuePtr)
 	std::pair<T, T> operator()( const ValuePtr<T> &ref ) const {
-		assert(ref.getLength() != 0);
 		std::pair<T, T> result(ref[0],ref[0]);
 
-		for ( size_t i = 1; i < ref.getLength(); i++ ) {
+		for ( size_t i = ref.getLength()-1; i; --i ) {
 			if ( result.second < ref[i] )result.second = ref[i];
 
 			if ( result.first > ref[i] )result.first = ref[i];
