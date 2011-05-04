@@ -2,7 +2,6 @@
 #include "MainWindow.hpp"
 #include "QViewerCore.hpp"
 #include <iostream>
-#include <GL/gl.h>
 #include <DataStorage/io_factory.hpp>
 #include <DataStorage/image.hpp>
 #include <CoreUtils/log.hpp>

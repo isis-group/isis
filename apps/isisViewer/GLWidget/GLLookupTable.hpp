@@ -2,7 +2,7 @@
 #define GLLOOKUPTABLE_HPP
 
 #include "Color.hpp"
-#include <GL/gl.h>
+#include "GLCommon.hpp"
 
 namespace isis
 {
