@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE ( imageUniqueName )
 	std::list<data::Image> images = data::IOFactory::chunkListToImageList( chunks );
 
 	BOOST_REQUIRE_EQUAL( images.size(), 5 );
-	int number = 0;
+// 	int number = 0;
 
 	// @todo this needs an actual io-plugin
 	/*  std::list<std::string> names=image_io::FileFormat::makeUniqueFilenames(images,"/tmp/S{acquisitionNumber}.nii");

@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE ( chunk_foreach_voxel_test )
 	class : public data::Chunk::VoxelOp<uint8_t>
 	{
 	public:
-		bool operator()( uint8_t &vox, const util::FixedVector< size_t, 4 >& pos ) {
+		bool operator()( uint8_t &vox, const util::FixedVector< size_t, 4 >& /*pos*/ ) {
 			return vox == 0;
 		}
 	} zero;

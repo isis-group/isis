@@ -52,7 +52,7 @@ template<unsigned short DIM> bool __rangeCheck( const size_t d[], const size_t d
 
 template<> inline size_t __dimStride<0>( const size_t[] /*dim*/ ) {return 1;}
 template<> inline size_t __dim2index<0>( const size_t d[], const size_t dim[] ) {return d[0] * __dimStride<0>( dim );}
-template<> inline void __index2dim<0>( const size_t index, size_t d[], const size_t[], size_t vol ) {d[0] = index;}
+template<> inline void __index2dim<0>( const size_t index, size_t d[], const size_t[], size_t /*vol*/ ) {d[0] = index;}
 template<> inline bool   __rangeCheck<0>( const size_t d[], const size_t dim[] ) {return d[0] < dim[0];}
 
 /// @endcond

@@ -109,8 +109,8 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 
 		chunks.clear();
 
-		for( int t = 0; t < nrTimesteps; t++ ) {
-			for( int s = 0; s < nrSlices; s++ ) {
+		for( unsigned int t = 0; t < nrTimesteps; t++ ) {
+			for( unsigned int s = 0; s < nrSlices; s++ ) {
 				chunks.push_back( genSlice<float>( nrCols, nrRows, s, s + t * nrSlices ) );
 			}
 		}
@@ -128,8 +128,8 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		nrSlices = 1;
 		chunks.clear();
 
-		for( int t = 0; t < nrTimesteps; t++ ) {
-			for( int s = 0; s < nrSlices; s++ ) {
+		for( unsigned int t = 0; t < nrTimesteps; t++ ) {
+			for( unsigned int s = 0; s < nrSlices; s++ ) {
 				chunks.push_back( genSlice<float>( nrCols, nrRows, s, s + t * nrSlices ) );
 			}
 		}
@@ -147,8 +147,8 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		nrSlices = 21;
 		chunks.clear();
 
-		for( int t = 0; t < nrTimesteps; t++ ) {
-			for( int s = 0; s < nrSlices; s++ ) {
+		for( unsigned int t = 0; t < nrTimesteps; t++ ) {
+			for( unsigned int s = 0; s < nrSlices; s++ ) {
 				chunks.push_back( genSlice<float>( nrCols, nrRows, s, s + t * nrSlices ) );
 			}
 		}
@@ -321,13 +321,13 @@ BOOST_AUTO_TEST_CASE ( image_foreach_chunk_test )
 		class : public data::Chunk::VoxelOp<uint8_t>
 		{
 		public:
-			bool operator()( uint8_t &vox, const util::FixedVector< size_t, 4 >& pos ) {
+			bool operator()( uint8_t &vox, const util::FixedVector< size_t, 4 >& /*pos*/ ) {
 				vox = 42;
 				return true;
 			}
 		} vox42;
 	public:
-		bool operator()( data::Chunk &ch, util::FixedVector<size_t, 4> posInImage ) {
+		bool operator()( data::Chunk &ch, util::FixedVector<size_t, 4> /*posInImage*/ ) {
 			return ch.foreachVoxel( vox42 ) == 0;
 		}
 	} set42;
