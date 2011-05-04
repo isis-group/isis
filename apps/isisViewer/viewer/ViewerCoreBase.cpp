@@ -6,48 +6,43 @@ namespace viewer
 {
 
 ViewerCoreBase::ViewerCoreBase( )
-	: m_CurrentTimestep( 0 )
+	: m_CurrentTimestep( 0 ),
+	m_AllImagesToIdentity( false )
+	
 {
 }
 
-
-
-void ViewerCoreBase::addImageList( const std::list< data::Image > imageList, const ImageHolder::ImageType &imageType, const util::slist &filenames )
+bool ViewerCoreBase::setAllImagesToIdentity(bool identity)
 {
-	bool ignoreFilenames = false;
-
-	if( filenames.size() != imageList.size() ) {
-		ignoreFilenames = true;
-		LOG( Runtime, error ) << "The size of the image list does not coincide with the amount of filenames. Ignoring filenames.";
+	BOOST_FOREACH( DataContainer::reference images, m_DataContainer ) {
+		
 	}
+}
 
-	util::slist::const_iterator filenameIterator = filenames.begin();
 
+void ViewerCoreBase::addImageList( const std::list< data::Image > imageList, const ImageHolder::ImageType &imageType )
+{
 	if( !imageList.empty() ) {
 		BOOST_FOREACH( std::list< data::Image >::const_reference imageRef, imageList ) {
-			if( !ignoreFilenames ) {
-				m_DataContainer.addImage( imageRef, imageType, *( filenameIterator++ ) );
-			} else {
-				m_DataContainer.addImage( imageRef, imageType, filenames.front() );
-			}
+			m_DataContainer.addImage( imageRef, imageType );
 		}
+		setCurrentImage( m_DataContainer.begin()->second );
 	} else {
 		LOG( Runtime, warning ) << "The image list passed to the core is empty!";
 	}
 
-	m_CurrentImage = getDataContainer().at( filenames.back() );
+	
 
 }
 
 
 
-void ViewerCoreBase::setImageList( const std::list< data::Image > imageList, const ImageHolder::ImageType &imageType, const util::slist &filenames )
+void ViewerCoreBase::setImageList( std::list< data::Image > imgList, const ImageHolder::ImageType &imageType )
 {
-	if( !imageList.empty() ) {
+	if( !imgList.empty() ) {
 		m_DataContainer.clear();
 	}
-
-	ViewerCoreBase::addImageList( imageList, imageType, filenames );
+	ViewerCoreBase::addImageList( imgList, imageType );
 }
 
 
