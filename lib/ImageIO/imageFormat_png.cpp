@@ -17,7 +17,7 @@ public:
 	std::string getName()const {
 		return "PNG (Portable Network Graphics)";
 	}
-	std::string dialects( const std::string &filename ) const {
+	std::string dialects( const std::string &/*filename*/ ) const {
 		return "middle";
 	}
 	bool write_png( const std::string &filename, const data::Chunk &buff ) {
@@ -99,7 +99,7 @@ public:
 	}
 
 
-	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
+	int load ( std::list<data::Chunk> &/*chunks*/, const std::string &/*filename*/, const std::string &/*dialect*/ )  throw( std::runtime_error & ) {
 		throwGenericError( "png loading is not supportted (yet)" );
 		return 0;
 	}

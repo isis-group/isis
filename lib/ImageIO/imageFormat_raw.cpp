@@ -99,10 +99,11 @@ public:
 			return 1;
 		} else {
 			LOG( Runtime, error ) << "Could not guess image size for " << fsize << " bytes of data";
+			return 0;
 		}
 	}
 
-	void write( const data::Image &image, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
+	void write( const data::Image &image, const std::string &filename, const std::string &/*dialect*/ )  throw( std::runtime_error & ) {
 		class WriteOp: public data::Image::ChunkOp
 		{
 			std::ofstream out;
@@ -115,6 +116,7 @@ public:
 				const boost::shared_ptr<void> data( ref.getValuePtrBase().getRawAddress() );
 				const size_t data_size = ref.bytesPerVoxel() * ref.getVolume();
 				out.write( static_cast<const char *>( data.get() ), data_size );
+				return true;
 			}
 		};
 		const std::pair<std::string, std::string> splitted = makeBasename( filename );

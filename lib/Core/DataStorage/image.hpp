@@ -146,9 +146,9 @@ public:
 	 * Removes used chunks from the given list. So afterwards the list consists of the rejected chunks.
 	 */
 	template<typename T> Image( std::list<T> &chunks, dimensions min_dim = rowDim ) :
-		_internal::NDimensional<4>(), util::PropertyMap(),
+		_internal::NDimensional<4>(), util::PropertyMap(),minIndexingDim( min_dim ), 
 		set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ),
-		clean( false ), minIndexingDim( min_dim ) {
+		clean( false ) {
 		addNeededFromString( neededProperties );
 		set.addSecondarySort( "acquisitionNumber" );
 		set.addSecondarySort( "acquisitionTime" );
