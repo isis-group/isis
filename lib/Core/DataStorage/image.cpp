@@ -38,10 +38,10 @@ Image::Image ( ) : set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMas
 	set.addSecondarySort( "acquisitionTime" );
 }
 
-Image::Image ( const Chunk &chunk,dimensions min_dim ) :
+Image::Image ( const Chunk &chunk, dimensions min_dim ) :
 	_internal::NDimensional<4>(), util::PropertyMap(),
 	set( "sequenceNumber,rowVec,columnVec,coilChannelMask,DICOM/EchoNumbers" ),
-	clean( false ),minIndexingDim(min_dim)
+	clean( false ), minIndexingDim( min_dim )
 {
 	addNeededFromString( neededProperties );
 	set.addSecondarySort( "acquisitionNumber" );
@@ -70,7 +70,7 @@ Image &Image::operator=( const isis::data::Image &ref )
 	chunkVolume = ref.chunkVolume;
 	clean = ref.clean;
 	set = ref.set;
-	minIndexingDim=ref.minIndexingDim;
+	minIndexingDim = ref.minIndexingDim;
 	//replace all chunks (in set) by cheap copies of them
 	struct : public _internal::SortedChunkList::chunkPtrOperator {
 		boost::shared_ptr< Chunk > operator()( const boost::shared_ptr< Chunk >& ptr ) {
@@ -168,13 +168,104 @@ bool Image::insertChunk ( const Chunk &chunk )
 	}
 }
 
-void Image::setIndexingDim(dimensions d)
+void Image::setIndexingDim( dimensions d )
 {
-	minIndexingDim=d;
-	if(clean){
-		LOG(Debug,warning) << "Image was allready indexed. reIndexing ...";
+	minIndexingDim = d;
+
+	if( clean ) {
+		LOG( Debug, warning ) << "Image was allready indexed. reIndexing ...";
 		reIndex();
 	}
+}
+
+util::fvector4 Image::getPhysicalCoordsFromIndex( const isis::util::ivector4 &voxelCoords ) const
+{
+	return  util::fvector4( voxelCoords[0] * m_RowVec[0] + voxelCoords[1] * m_ColumnVec[0] + voxelCoords[2] * m_SliceVec[0],
+							voxelCoords[0] * m_RowVec[1] + voxelCoords[1] * m_ColumnVec[1] + voxelCoords[2] * m_SliceVec[1],
+							voxelCoords[0] * m_RowVec[2] + voxelCoords[1] * m_ColumnVec[2] + voxelCoords[2] * m_SliceVec[2] )
+			+ m_Offset ;
+}
+
+
+
+
+util::ivector4 Image::getIndexFromPhysicalCoords( const isis::util::fvector4 &physicalCoords ) const
+{
+	util::fvector4 vec1 = physicalCoords - m_Offset;
+	util::fvector4 ret = util::fvector4( vec1[0] * m_RowVecInv[0] + vec1[1] * m_ColumnVecInv[0] + vec1[2] * m_SliceVecInv[0],
+										 vec1[0] * m_RowVecInv[1] + vec1[1] * m_ColumnVecInv[1] + vec1[2] * m_SliceVecInv[1],
+										 vec1[0] * m_RowVecInv[2] + vec1[1] * m_ColumnVecInv[2] + vec1[2] * m_SliceVecInv[2] );
+	return  util::Value<util::fvector4>( ret ).as<util::ivector4>();
+}
+
+
+bool Image::updateOrientationMatrices()
+{
+	util::fvector4 rowVec = getPropertyAs<util::fvector4>( "rowVec" );
+	util::fvector4 columnVec = getPropertyAs<util::fvector4>( "columnVec" );
+	util::fvector4 sliceVec = getPropertyAs<util::fvector4>( "sliceVec" );
+	m_Offset = getPropertyAs<util::fvector4>( "indexOrigin" );
+	util::fvector4 spacing = getPropertyAs<util::fvector4>( "voxelSize" ) + getPropertyAs<util::fvector4>( "voxelGap" );
+	m_RowVec = util::fvector4( rowVec[0] * spacing[0], rowVec[1] * spacing[0], rowVec[2] * spacing[0] );
+	m_ColumnVec = util::fvector4( columnVec[0] * spacing[1], columnVec[1] * spacing[1], columnVec[2] * spacing[1] );
+	m_SliceVec = util::fvector4( sliceVec[0] * spacing[2], sliceVec[1] * spacing[2], sliceVec[2] * spacing[2] );
+	LOG( Debug, verbose_info ) << "Created orientation matrix: ";
+	LOG( Debug, verbose_info ) << "[ " << m_RowVec[0] << " " << m_ColumnVec[0] << " " << m_SliceVec[0] << " ] + " << m_Offset[0];
+	LOG( Debug, verbose_info ) << "[ " << m_RowVec[1] << " " << m_ColumnVec[1] << " " << m_SliceVec[1] << " ] + " << m_Offset[1];
+	LOG( Debug, verbose_info ) << "[ " << m_RowVec[2] << " " << m_ColumnVec[2] << " " << m_SliceVec[2] << " ] + " << m_Offset[2];
+
+	//since we do not want to calculate the inverse matrix with every getVoxelCoords call again we do it here once
+	for ( size_t i = 0; i < 3; i++ ) {
+		spacing[i] = spacing[i] ? 1.0 / spacing[i] : 0;
+	}
+
+	//for inversion of the orientation we use boost::ublas
+	using namespace boost::numeric::ublas;
+	matrix<float> orientation = matrix<float>( 3, 3 );
+	matrix<float> inverse = matrix<float>( 3, 3 );
+
+	for( size_t i = 0; i < 3; i++ ) {
+		orientation( i, 0 ) = m_RowVec[i];
+		orientation( i, 1 ) = m_ColumnVec[i];
+		orientation( i, 2 ) = m_SliceVec[i];
+	}
+
+	if( !_internal::inverseMatrix<float>( orientation, inverse ) ) {
+		LOG( Runtime, error ) << "Could not create the inverse of the orientation matrix!";
+		return false;
+	};
+
+	for( size_t i = 0; i < 3; i++ ) {
+		m_RowVecInv[i] = inverse( i, 0 );
+		m_ColumnVecInv[i] = inverse( i, 1 );
+		m_SliceVecInv[i] = inverse( i, 2 );
+	}
+
+	LOG( Debug, verbose_info ) << "Created transposed orientation matrix: ";
+	LOG( Debug, verbose_info ) << "[ " << m_RowVecInv[0] << " " << m_ColumnVecInv[0] << " " << m_SliceVecInv[0] << " ] + " << m_Offset[0];
+	LOG( Debug, verbose_info ) << "[ " << m_RowVecInv[1] << " " << m_ColumnVecInv[1] << " " << m_SliceVecInv[1] << " ] + " << m_Offset[1];
+	LOG( Debug, verbose_info ) << "[ " << m_RowVecInv[2] << " " << m_ColumnVecInv[2] << " " << m_SliceVecInv[2] << " ] + " << m_Offset[2];
+	return true;
+}
+
+
+dimensions Image::mapScannerAxesToImageDimension( scannerAxis scannerAxes )
+{
+	updateOrientationMatrices();
+	boost::numeric::ublas::matrix<float> latchedOrientation = boost::numeric::ublas::zero_matrix<float>( 3, 3 );
+	boost::numeric::ublas::vector<float>mapping( 3 );
+
+	for ( size_t i = 0; i < 3; i++ ) {
+		latchedOrientation( i, 0 ) = abs( m_RowVec[i] < 0 ? ceil( m_RowVec[i] - 0.5 ) : floor( m_RowVec[i] + 0.5 ) );
+		latchedOrientation( i, 1 ) = abs( m_ColumnVec[i] < 0 ? ceil( m_ColumnVec[i] - 0.5 ) : floor( m_ColumnVec[i] + 0.5 ) );
+		latchedOrientation( i, 2 ) = abs( m_SliceVec[i] < 0 ? ceil( m_SliceVec[i] - 0.5 ) : floor( m_SliceVec[i] + 0.5 ) );
+		mapping( i ) = i;
+	}
+
+	return static_cast<dimensions>( boost::numeric::ublas::prod( latchedOrientation, mapping )( scannerAxes ) );
+
+
+
 }
 
 
@@ -197,7 +288,7 @@ bool Image::reIndex()
 	//get primary attributes from geometrically first chunk - will be usefull
 	const Chunk &first = chunkAt( 0 );
 	//start indexing at eigther the chunk-size or the givem minIndexingDim (whichever is bigger)
-	const unsigned short chunk_dims = std::max<unsigned short>(first.getRelevantDims(),minIndexingDim);
+	const unsigned short chunk_dims = std::max<unsigned short>( first.getRelevantDims(), minIndexingDim );
 	chunkVolume = first.getVolume();
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Determine structure of the image by searching for dimensional breaks in the chunklist
@@ -364,6 +455,7 @@ bool Image::reIndex()
 	}
 
 	LOG_IF( ! isValid(), Runtime, warning ) << "The image is not valid after reindexing. Missing properties: " << getMissing();
+	updateOrientationMatrices();
 	return clean = isValid();
 }
 bool Image::isEmpty()const
@@ -404,10 +496,10 @@ const Chunk Image::getChunk ( size_t first, size_t second, size_t third, size_t 
 	const size_t index = commonGet( first, second, third, fourth ).first;
 	return getChunkAt( index, copy_metadata );
 }
-std::vector< Chunk > Image::copyChunksToVector(bool copy_metadata)
+std::vector< Chunk > Image::copyChunksToVector( bool copy_metadata )const
 {
-	std::vector<isis::data::Chunk> ret(lookup.size());
-	copyChunksTo(ret.begin(),copy_metadata);
+	std::vector<isis::data::Chunk> ret( lookup.size() );
+	copyChunksTo( ret.begin(), copy_metadata );
 	return ret;
 }
 

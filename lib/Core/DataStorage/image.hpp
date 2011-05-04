@@ -20,8 +20,10 @@
 #include <vector>
 #include <boost/foreach.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/io.hpp>
 #include <stack>
 #include "sortedchunklist.hpp"
+#include "common.hpp"
 
 namespace isis
 {
@@ -43,7 +45,7 @@ public:
 	 * If the indexing dimension is set after the Image was indexed it will be indexed again.
 	 * \param d the minimal indexing dimension to be used
 	 */
-	 void setIndexingDim(dimensions d=rowDim);
+	void setIndexingDim( dimensions d = rowDim );
 	enum orientation {axial, reversed_axial, sagittal, reversed_sagittal, coronal, reversed_coronal};
 
 protected:
@@ -116,6 +118,16 @@ protected:
 	Chunk &chunkAt( size_t at );
 	/// Creates an empty Image object.
 	Image();
+
+
+
+	util::fvector4 m_RowVec;
+	util::fvector4 m_RowVecInv;
+	util::fvector4 m_ColumnVec;
+	util::fvector4 m_ColumnVecInv;
+	util::fvector4 m_SliceVec;
+	util::fvector4 m_SliceVecInv;
+	util::fvector4 m_Offset;
 public:
 	class ChunkOp : std::unary_function<Chunk &, bool>
 	{
@@ -133,29 +145,27 @@ public:
 	 * Create image from a list of Chunks or objects with the base Chunk.
 	 * Removes used chunks from the given list. So afterwards the list consists of the rejected chunks.
 	 */
-	template<typename T> Image( std::list<T> &chunks,dimensions min_dim=rowDim ) :
+	template<typename T> Image( std::list<T> &chunks, dimensions min_dim = rowDim ) :
 		_internal::NDimensional<4>(), util::PropertyMap(),
 		set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ),
-		clean( false ),minIndexingDim(min_dim)
-	{
+		clean( false ), minIndexingDim( min_dim ) {
 		addNeededFromString( neededProperties );
 		set.addSecondarySort( "acquisitionNumber" );
 		set.addSecondarySort( "acquisitionTime" );
-		insertChunksFromContainer(chunks);
+		insertChunksFromContainer( chunks );
 	}
 	/**
 	 * Create image from a vector of Chunks or objects with the base Chunk.
 	 * Removes used chunks from the given list. So afterwards the list consists of the rejected chunks.
 	 */
-	template<typename T> Image( std::vector<T> &chunks,dimensions min_dim=rowDim ) :
+	template<typename T> Image( std::vector<T> &chunks, dimensions min_dim = rowDim ) :
 		_internal::NDimensional<4>(), util::PropertyMap(),
 		set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ),
-		clean( false ),minIndexingDim(min_dim)
-	{
+		clean( false ), minIndexingDim( min_dim ) {
 		addNeededFromString( neededProperties );
 		set.addSecondarySort( "acquisitionNumber" );
 		set.addSecondarySort( "acquisitionTime" );
-		insertChunksFromContainer(chunks);
+		insertChunksFromContainer( chunks );
 	}
 
 	/**
@@ -183,11 +193,12 @@ public:
 				LOG( Runtime, error ) << "Failed to create image from " << cnt << " chunks.";
 			} else {
 				LOG_IF( !getMissing().empty(), Debug, warning )
-				<< "The created image is missing some properties: " << getMissing() << ". It will be invalid.";
+						<< "The created image is missing some properties: " << getMissing() << ". It will be invalid.";
 			}
 		} else {
-			LOG(Debug,warning) << "Image is empty after inserting chunks.";
+			LOG( Debug, warning ) << "Image is empty after inserting chunks.";
 		}
+
 		return cnt;
 	}
 
@@ -195,7 +206,7 @@ public:
 	/**
 	 * Create image from a single chunk.
 	 */
-	Image( const Chunk &chunk,dimensions min_dim=rowDim );
+	Image( const Chunk &chunk, dimensions min_dim = rowDim );
 
 	/**
 	 * Copy operator.
@@ -390,20 +401,71 @@ public:
 	 * Transforms the image coordinate system into an other system by multiplying
 	 * the orientation matrix with a user defined transformation matrix. Additionally,
 	 * the index origin will be transformed into the new coordinate system. This
-	 * function only changes the
+	 * function only changes the orientation information (rowVec, columnVec, sliceVec, indexOrigin)
+	 * of the image but will not change the image itself.
 	 *
 	 * <B>IMPORTANT!</B>: If you call this function with a matrix other than the
 	 * identidy matrix, it's not guaranteed that the image is still in ISIS space
 	 * according to the DICOM conventions. Eventuelly some ISIS algorithms that
 	 * depend on correct image orientations won't work as expected. Use this method
 	 * with caution!
+	 * \param transform_matrix the transformation matrix can be any type of rigid and affine transformation
+	 * \param transformCenterIsImageCenter if this parameter is true, the center of the image will be translated to the 
+	 *	isocenter of the scanner prior applying the transform_matrix. Eventually, it will be translated to its 
+	 *  initial position. For example this is the way SPM flips its images when converting from DICOM to nifti.
+	 * \return returns if the transformation was successfuly
 	 */
-	void transformCoords( boost::numeric::ublas::matrix<float> transform_matrix ) {
-		isis::data::_internal::transformCoords( *this, transform_matrix );
+	bool transformCoords( boost::numeric::ublas::matrix<float> transform_matrix, bool transformCenterIsImageCenter = false ) {
+		
 		BOOST_FOREACH( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef, lookup ) {
-			chRef->transformCoords( transform_matrix );
+			if(!chRef->transformCoords( transform_matrix, transformCenterIsImageCenter )) {
+				return false;
+			}
 		}
+		if( !isis::data::_internal::transformCoords( *this, getSizeAsVector(), transform_matrix, transformCenterIsImageCenter ) ) {
+			LOG( Runtime, error ) << "Error during transforming the coords of the image.";
+			return false;
+		}
+
+		if( !updateOrientationMatrices() ) {
+			LOG( Runtime, error ) << "Could not update the orientation matrices of the image!";
+			return false;
+		}
+
+		return true;
 	}
+
+	/** Maps the given scanner Axes to the dimension with the minimal angle.
+	 *  This is done by latching the orientation of the image by setting the biggest absolute 
+	 *  value of each orientation vector to 1 and the others to 0.
+	 *  Example:
+	 *  		(-0.8)		(1)
+	 *			( 0.2)  ->	(0)   (this is done for the rowVec, columnVec and sliceVec)
+	 *			(-0.1)		(0)
+	 *	
+	 *	This latched orientation is used to map from the scanner axes to the dimension.
+	 *	\param scannerAxes the axes of the scanner you want to map to dimension of the image.
+	 *	\return the mapped image dimension
+	 */
+	
+	dimensions mapScannerAxesToImageDimension( scannerAxis scannerAxes );
+
+	/** Computes the physical coordinates (in scanner space) of the given voxel index.
+	 *  This function does not perform any test if the voxel index is inside the image.
+	 *  See getIndexFromPhysicalCoords for vice versa purpose.
+	 *  \param index the voxel index from which you want to get the physical coordinates
+	 *  \return physical coordinates associated with the given voxel index
+	 */
+	util::fvector4 getPhysicalCoordsFromIndex( const util::ivector4 &index ) const;
+
+
+	/** Computes the voxel index of the given physical coordinates (coordinates in scanner space)
+	 *  This function does not perform any test if the physical coordinates are inside the image.
+	 *  See getPhysicalCoordsFromIndex for vice versa purpose.
+	 *  \param physicalCoords the physical coords from which you want to get the voxel index.
+	 *  \return voxel index associated with the given physicalCoords
+	 */
+	util::ivector4 getIndexFromPhysicalCoords( const util::fvector4 &physicalCoords ) const;
 
 	/**
 	 * Copy all voxel data of the image into memory.
@@ -437,13 +499,16 @@ public:
 		copyToMem<T>( &ret.voxel<T>( 0, 0, 0, 0 ) );
 		return ret;
 	}
-	template<typename OutputIterator> void copyChunksTo(OutputIterator result,bool copy_metadata=false){
-		std::vector<boost::shared_ptr<Chunk> >::const_iterator at=lookup.begin();
-		const std::vector<boost::shared_ptr<Chunk> >::const_iterator end=lookup.end();
-		while (at!=end){
+	template<typename OutputIterator> void copyChunksTo( OutputIterator result, bool copy_metadata = false )const {
+		std::vector<boost::shared_ptr<Chunk> >::const_iterator at = lookup.begin();
+		const std::vector<boost::shared_ptr<Chunk> >::const_iterator end = lookup.end();
+
+		while ( at != end ) {
 			*result = **at++;
-			if(copy_metadata)
-				result->join(*this);
+
+			if( copy_metadata )
+				result->join( *this );
+
 			result++;
 		}
 	}
@@ -454,7 +519,7 @@ public:
 	* Make MemChunks of them to get deep copies.
 	* \param copy_metadata set to false to prevent the metadata of the image to be copied into the results. This will improve performance, but the chunks may lack important properties.
 	*/
-	std::vector<isis::data::Chunk> copyChunksToVector(bool copy_metadata=true);
+	std::vector<isis::data::Chunk> copyChunksToVector( bool copy_metadata = true )const;
 
 	/**
 	 * Ensure, the image has the type with the requested ID.
@@ -510,6 +575,7 @@ public:
 	size_t getNrOfTimesteps()const;
 
 	util::fvector4 getFoV()const;
+	bool updateOrientationMatrices();
 };
 
 /**
@@ -581,12 +647,14 @@ public:
 		LOG( Debug, info ) << "Computed scaling for conversion from source image: [" << conv_op.scale << "]";
 
 		this->set.transform( conv_op );
-		if(ref.isClean()){
+
+		if( ref.isClean() ) {
 			this->lookup = this->set.getLookup(); // the lookup table still points to the old chunks
 		} else {
-			LOG(Debug,info) << "Copied unclean image. Running reIndex on the copy.";
+			LOG( Debug, info ) << "Copied unclean image. Running reIndex on the copy.";
 			this->reIndex();
 		}
+
 		return *this;
 	}
 };

@@ -223,7 +223,7 @@ public:
 			for ( size_t i = 0; i < m_len - 1; i++ )
 				ret += util::Value<TYPE>( ptr[i] ).toString( false ) + "|";
 
-			ret += util::Value<TYPE>( ptr[m_len-1] ).toString( labeled );
+			ret += util::Value<TYPE>( ptr[m_len - 1] ).toString( labeled );
 		}
 
 		return boost::lexical_cast<std::string>( m_len ) + "#" + ret;
@@ -269,6 +269,8 @@ public:
 		return sizeof( TYPE );
 	}
 
+
+
 	std::pair<util::ValueReference, util::ValueReference> getMinMax()const {
 		if ( getLength() == 0 ) {
 			LOG( Runtime, warning ) << "Skipping computation of min/max on an empty ValuePtr";
@@ -305,7 +307,7 @@ public:
 		return ret;
 	}
 	//
-	scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const{
+	scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const {
 		std::pair<util::ValueReference, util::ValueReference> minmax = getMinMax();
 		assert( ! ( minmax.first.isEmpty() || minmax.second.isEmpty() ) );
 		return ValuePtrBase::getScalingTo( typeID, minmax, scaleopt );

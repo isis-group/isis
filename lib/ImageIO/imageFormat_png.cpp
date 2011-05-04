@@ -111,14 +111,14 @@ public:
 
 		data::TypedImage<png_byte> tImg( image );
 		tImg.spliceDownTo( data::sliceDim );
-		std::vector<data::Chunk > chunks = tImg.copyChunksToVector(false);
+		std::vector<data::Chunk > chunks = tImg.copyChunksToVector( false );
 		unsigned short numLen = std::log10( chunks.size() ) + 1;
 		size_t number = 0;
 
 		if( util::istring( dialect.c_str() ) == util::istring( "middle" ) ) { //save only the middle
 			LOG( Runtime, info ) << "Writing the slice " << chunks.size() / 2 + 1 << " of " << chunks.size() << " slices as png-image of size " << chunks.front().getSizeAsString();
 
-			if( !write_png( filename, chunks[chunks.size()/2] ) ) {
+			if( !write_png( filename, chunks[chunks.size() / 2] ) ) {
 				throwGenericError( std::string( "Failed to write " ) + filename );
 			}
 		} else { //save all slices
@@ -127,7 +127,7 @@ public:
 					<< "Writing " << chunks.size() << " slices as png-images " << fname.first << "_"
 					<< std::string( numLen, 'X' ) << fname.second << " of size " << chunks.front().getSizeAsString();
 
-			BOOST_FOREACH( const data::Chunk &ref, chunks ) {
+			BOOST_FOREACH( const data::Chunk & ref, chunks ) {
 				const std::string num = boost::lexical_cast<std::string>( ++number );
 				const std::string name = fname.first + "_" + std::string( numLen - num.length(), '0' ) + num + fname.second;
 

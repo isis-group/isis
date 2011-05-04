@@ -1,4 +1,8 @@
+<<<<<<< HEAD:python/debian/changelog
+isis-python (0.2.0git331-0) stable; urgency=low
+=======
 python-isis (0.2.0git312-0) stable; urgency=low
+>>>>>>> gmaster:python/debian/changelog
 
     * Initial Debian packaging attempt. This is the first version of
       a ISIS pthon debian package.

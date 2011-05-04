@@ -454,7 +454,7 @@ int ImageFormat_Dicom::readMosaic( isis::data::Chunk source, std::list< isis::da
 		working.propertyValue( "acquisitionNumber" )->castTo<uint32_t>() += slice;
 
 		if( haveAcqTimeList ) {
-			working.setPropertyAs<float>( "acquisitionTime", acqTime +  *( acqTimeIt++ ) );
+			working.setPropertyAs<float>( "acquisitionTime", acqTime +  * ( acqTimeIt++ ) );
 		}
 
 		LOG( Debug, verbose_info )

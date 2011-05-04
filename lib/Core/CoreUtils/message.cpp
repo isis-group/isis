@@ -112,7 +112,7 @@ std::string Message::merge()const
 	found = 0;
 
 	while ( ( found = ret.find( "{s}", found ) ) != std::string::npos )
-		ret.replace( found, 3, std::string( "\"" ) + *( subj++ ) + "\"" );
+		ret.replace( found, 3, std::string( "\"" ) + * ( subj++ ) + "\"" );
 
 	return ret;
 }

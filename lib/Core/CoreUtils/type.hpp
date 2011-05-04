@@ -218,7 +218,7 @@ public:
 	 * In this case the function returns int which is then also implicitely converted to float.
 	 * \return a const reference to the stored value
 	 */
-	operator const TYPE&()const {return m_val;}
+	operator const TYPE &()const {return m_val;}
 
 	/**
 	 * Implicit conversion of Value to its value type.
@@ -231,7 +231,7 @@ public:
 	 * In this case the function returns int which is then also implicitely converted to float.
 	 * \return a reference to the stored value
 	 */
-	operator TYPE&() {return m_val;}
+	operator TYPE &() {return m_val;}
 
 	/**
 	 * Check if the value of this is greater than ref converted to TYPE.

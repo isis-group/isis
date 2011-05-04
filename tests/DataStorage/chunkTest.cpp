@@ -35,15 +35,15 @@ BOOST_AUTO_TEST_CASE ( chunk_init_test )
 BOOST_AUTO_TEST_CASE ( chunk_index_test )
 {
 	data::MemChunk<float> ch( 4, 3, 2, 1 );
-	size_t idx[4],ridx[4];
-	idx[0]=idx[1]=idx[2]=1;
-	idx[3]=0;
-	const size_t at=3*4+4+1;
-	ch.getCoordsFromLinIndex(at,ridx);
+	size_t idx[4], ridx[4];
+	idx[0] = idx[1] = idx[2] = 1;
+	idx[3] = 0;
+	const size_t at = 3 * 4 + 4 + 1;
+	ch.getCoordsFromLinIndex( at, ridx );
 
 
-	BOOST_CHECK_EQUAL( ch.getLinearIndex(idx),at);
-	BOOST_CHECK( memcmp(idx,ridx,4) == 0);
+	BOOST_CHECK_EQUAL( ch.getLinearIndex( idx ), at );
+	BOOST_CHECK( memcmp( idx, ridx, 4 ) == 0 );
 }
 
 BOOST_AUTO_TEST_CASE ( chunk_foreach_voxel_test )
