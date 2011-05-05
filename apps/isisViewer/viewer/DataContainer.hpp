@@ -1,8 +1,8 @@
 #ifndef DATACONTAINER_HPP
 #define DATACONTAINER_HPP
 
-#include <vector>
 #include "ImageHolder.hpp"
+#include <boost/filesystem/path.hpp>
 
 namespace isis
 {
@@ -18,7 +18,7 @@ class DataContainer : public std::map<std::string, boost::shared_ptr<ImageHolder
 {
 public:
 	///simply adds an isis image to the vector
-	bool addImage( const data::Image &image, const ImageHolder::ImageType &imageType, const std::string &filename = "" );
+	bool addImage( const data::Image &image, const ImageHolder::ImageType &imageType );
 
 	///returns a boost::weak_ptr of the images data. Actually this also is a convinient function.
 	boost::weak_ptr<void>

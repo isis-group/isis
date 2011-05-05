@@ -22,8 +22,8 @@ public:
 
 	virtual bool registerWidget( std::string key, QWidget *widget, Actions = not_specified );
 
-	virtual void addImageList( const std::list<data::Image> imageList, const ImageHolder::ImageType &imageType, const util::slist &filenames = util::slist() );
-	virtual void setImageList( const std::list<data::Image> imageList, const ImageHolder::ImageType &imageType, const util::slist &filenames = util::slist() );
+	virtual void addImageList( const std::list< data::Image > imageList, const ImageHolder::ImageType &imageType );
+	virtual void setImageList( const std::list< data::Image > imageList, const ImageHolder::ImageType &imageType );
 
 	const WidgetMap &getWidgets() const { return m_WidgetMap; }
 

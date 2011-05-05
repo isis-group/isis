@@ -3,10 +3,11 @@
 
 #define GL_GLEXT_PROTOTYPES
 
-#include <GL/gl.h>
+#include "GLCommon.hpp"
 #include <iostream>
 #include <map>
 #include "common.hpp"
+
 
 namespace isis
 {

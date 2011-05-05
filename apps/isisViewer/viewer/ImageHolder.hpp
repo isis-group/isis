@@ -133,7 +133,6 @@ private:
 	std::vector< ImagePointerType > m_ImageVector;
 	bool filterRelevantMetaInformation();
 
-
 };
 
 }
