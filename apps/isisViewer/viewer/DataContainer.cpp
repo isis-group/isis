@@ -5,16 +5,25 @@ namespace isis
 namespace viewer
 {
 
-bool DataContainer::addImage( const data::Image &image, const ImageHolder::ImageType &imageType, const std::string &filename )
+bool DataContainer::addImage( const data::Image &image, const ImageHolder::ImageType &imageType )
 {
-	std::string newFileName = filename;
+	std::string fileName;
 
-	if( find( filename ) != end() ) {
+	if( image.hasProperty( "source" ) ) {
+		fileName = image.getPropertyAs<std::string>( "source" );
+	} else {
+		boost::filesystem::path path = image.getChunk( 0 ).getPropertyAs<std::string>( "source" );
+		fileName = path.branch_path().string();
+	}
+
+	std::string newFileName = fileName;
+
+	if( find( fileName ) != end() ) {
 		size_t index = 0;
 
 		while ( find( newFileName ) != end() ) {
 			std::stringstream ss;
-			ss << filename << " (" << ++index << ")";
+			ss << fileName << " (" << ++index << ")";
 			newFileName = ss.str();
 		}
 	}

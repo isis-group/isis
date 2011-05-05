@@ -150,8 +150,6 @@ BOOST_AUTO_TEST_CASE( ValuePtr_splice_test )
 			//the shall be outer.size() references from the splices, plus one for the origin
 			BOOST_CHECK_EQUAL( dummy.use_count(), outer.size() + 1 );
 		}
-		boost::shared_ptr<int32_t> &dummy = outer.front()->castToValuePtr<int32_t>();
-
 		BOOST_CHECK_EQUAL( outer.front()->getLength(), 2 );// the first slices shall be of the size 2
 		BOOST_CHECK_EQUAL( outer.back()->getLength(), 1 );// the last slice shall be of the size 1 (5%2)
 		//we cannot ask for the use_count of the original because its hidden in DelProxy (outer[0].use_count will get the use_count of the splice)

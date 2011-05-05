@@ -52,9 +52,9 @@ void QViewerCore::timestepChanged( int timestep )
 	emitTimeStepChange( timestep );
 }
 
-void QViewerCore::addImageList( const std::list< data::Image > imageList, const ImageHolder::ImageType &imageType, const isis::util::slist &filenames )
+void QViewerCore::addImageList( const std::list< data::Image > imageList, const ImageHolder::ImageType &imageType )
 {
-	isis::viewer::ViewerCoreBase::addImageList( imageList, imageType, filenames );
+	isis::viewer::ViewerCoreBase::addImageList( imageList, imageType );
 	emitImagesChanged( getDataContainer() );
 	BOOST_FOREACH( WidgetMap::reference widget, m_WidgetMap ) {
 		BOOST_FOREACH( DataContainer::const_reference data, getDataContainer() ) {
@@ -63,9 +63,9 @@ void QViewerCore::addImageList( const std::list< data::Image > imageList, const 
 	}
 }
 
-void QViewerCore::setImageList( const std::list< data::Image > imageList, const ImageHolder::ImageType &imageType, const isis::util::slist &filenames )
+void QViewerCore::setImageList( const std::list< data::Image > imageList, const ImageHolder::ImageType &imageType )
 {
-	isis::viewer::ViewerCoreBase::setImageList( imageList, imageType, filenames );
+	isis::viewer::ViewerCoreBase::setImageList( imageList, imageType );
 	emitImagesChanged( getDataContainer() );
 	BOOST_FOREACH( WidgetMap::reference widget, m_WidgetMap ) {
 		BOOST_FOREACH( DataContainer::const_reference data, getDataContainer() ) {

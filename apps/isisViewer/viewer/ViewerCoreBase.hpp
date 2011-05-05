@@ -17,8 +17,8 @@ class ViewerCoreBase
 public:
 	ViewerCoreBase( );
 
-	virtual void addImageList( const std::list<data::Image> imageList, const ImageHolder::ImageType &imageType, const util::slist &filenames = util::slist() );
-	virtual void setImageList( const std::list<data::Image> imageList, const ImageHolder::ImageType &imageType, const util::slist &filenames = util::slist() );
+	virtual void addImageList( const std::list< data::Image > imageList, const ImageHolder::ImageType &imageType );
+	virtual void setImageList( const std::list< data::Image > imageList, const ImageHolder::ImageType &imageType );
 
 	void setCurrentImage( const boost::shared_ptr<ImageHolder> image ) { m_CurrentImage = image; }
 
@@ -31,6 +31,8 @@ public:
 		} else { return false; }
 	}
 
+	bool setAllImagesToIdentity( bool identity );
+
 	const DataContainer &getDataContainer() const { return m_DataContainer; }
 	DataContainer &getDataContainer() { return m_DataContainer; }
 
@@ -39,6 +41,7 @@ private:
 	DataContainer m_DataContainer;
 	boost::shared_ptr<ImageHolder>  m_CurrentImage;
 	size_t m_CurrentTimestep;
+	bool m_AllImagesToIdentity;
 
 };
 

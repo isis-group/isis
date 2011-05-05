@@ -29,6 +29,7 @@ bool transformCoords( isis::util::PropertyMap &properties, util::FixedVector<siz
 		|| !properties.hasProperty( "voxelSize" ) || !properties.hasProperty( "indexOrigin" ) ) {
 		return false;
 	}
+
 	using namespace boost::numeric::ublas;
 	// this implementation assumes that the PropMap properties is either a
 	// data::Chunk or a data::Image object. Hence it should contain the
@@ -80,10 +81,6 @@ bool transformCoords( isis::util::PropertyMap &properties, util::FixedVector<siz
 			return false;
 		}
 
-
-		// STEP 2 transform index origin
-
-
 		//we have to map the indexes of the image size into the scanner space
 
 		vector<float> physicalSize( 3 );
@@ -94,19 +91,14 @@ bool transformCoords( isis::util::PropertyMap &properties, util::FixedVector<siz
 			boostScaling( i ) = scaling[i];
 		}
 
-		vector<float>scalingToRemove( 3 );
-		//  scalingToRemove = prod(R_in,boostScaling) - prod(R_out, boostScaling);
-
 		// now we have to calculate the center of the image in physical space
 		vector<float> half_image( 3 );
 
 		for ( unsigned short i = 0; i < 3; i++ ) {
-			scalingToRemove( i ) *= 0.5;
 			half_image( i ) = ( physicalSize( i )  - boostScaling( i ) ) * 0.5;
 		}
 
 		vector<float> center_image = prod( R_in, half_image ) + origin_in ;
-
 		//now translate this center to the center of the physical space and get the new image origin
 		vector<float> io_translated = origin_in - center_image;
 		//now multiply this translated origin with the inverse of the orientation matrix of the image

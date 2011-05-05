@@ -180,7 +180,7 @@ public:
 		return ret;
 	}
 
-	void write( const data::Image &image, const std::string &/*filename*/, const std::string &/*dialect*/ )throw( std::runtime_error & ) {
+	void write( const data::Image &/*image*/, const std::string &/*filename*/, const std::string &/*dialect*/ )throw( std::runtime_error & ) {
 		throw( std::runtime_error( "Compressed write is not yet implemented" ) );
 	}
 	bool tainted()const {return false;}//internal plugins are not tainted

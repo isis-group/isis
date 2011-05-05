@@ -15,7 +15,10 @@ int main( int argc, char *argv[] )
 	app.parameters["chunks"].setDescription( "print detailed data about the chunks" );
 	app.init( argc, argv, false ); // if there is a problem, we just get no images and exit cleanly
 	unsigned short count1 = 0;
-	std::cout << "Got " << app.images.size() << " Images" << std::endl;
+
+	if( app.images.size() > 1 )
+		std::cout << "There are " << app.images.size() << " Images in the dataset." << std::endl;
+
 	const unsigned short imageDigits = std::log10( app.images.size() ) + 1;
 	std::cout.fill( '0' );
 	BOOST_FOREACH( data::Image & ref, app.images ) {

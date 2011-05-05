@@ -3,9 +3,9 @@
 
 #define GL_GLEXT_PROTOTYPES
 
+#include "GLCommon.hpp"
 #include "DataContainer.hpp"
 #include "ViewerCoreBase.hpp"
-#include "GL/gl.h"
 #include <DataStorage/typeptr.hpp>
 #include <DataStorage/image.hpp>
 

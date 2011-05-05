@@ -109,8 +109,8 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 
 		chunks.clear();
 
-		for( int t = 0; t < nrTimesteps; t++ ) {
-			for( int s = 0; s < nrSlices; s++ ) {
+		for( unsigned int t = 0; t < nrTimesteps; t++ ) {
+			for( unsigned int s = 0; s < nrSlices; s++ ) {
 				chunks.push_back( genSlice<float>( nrCols, nrRows, s, s + t * nrSlices ) );
 			}
 		}
@@ -128,8 +128,8 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		nrSlices = 1;
 		chunks.clear();
 
-		for( int t = 0; t < nrTimesteps; t++ ) {
-			for( int s = 0; s < nrSlices; s++ ) {
+		for( unsigned int t = 0; t < nrTimesteps; t++ ) {
+			for( unsigned int s = 0; s < nrSlices; s++ ) {
 				chunks.push_back( genSlice<float>( nrCols, nrRows, s, s + t * nrSlices ) );
 			}
 		}
@@ -147,8 +147,8 @@ BOOST_AUTO_TEST_CASE ( image_init_test )
 		nrSlices = 21;
 		chunks.clear();
 
-		for( int t = 0; t < nrTimesteps; t++ ) {
-			for( int s = 0; s < nrSlices; s++ ) {
+		for( unsigned int t = 0; t < nrTimesteps; t++ ) {
+			for( unsigned int s = 0; s < nrSlices; s++ ) {
 				chunks.push_back( genSlice<float>( nrCols, nrRows, s, s + t * nrSlices ) );
 			}
 		}
@@ -321,13 +321,13 @@ BOOST_AUTO_TEST_CASE ( image_foreach_chunk_test )
 		class : public data::Chunk::VoxelOp<uint8_t>
 		{
 		public:
-			bool operator()( uint8_t &vox, const util::FixedVector< size_t, 4 >& pos ) {
+			bool operator()( uint8_t &vox, const util::FixedVector< size_t, 4 >& /*pos*/ ) {
 				vox = 42;
 				return true;
 			}
 		} vox42;
 	public:
-		bool operator()( data::Chunk &ch, util::FixedVector<size_t, 4> posInImage ) {
+		bool operator()( data::Chunk &ch, util::FixedVector<size_t, 4> /*posInImage*/ ) {
 			return ch.foreachVoxel( vox42 ) == 0;
 		}
 	} set42;
@@ -881,7 +881,7 @@ BOOST_AUTO_TEST_CASE( image_transformCoords_test_spm )
 	BOOST_REQUIRE( !img.isEmpty() );
 	boost::numeric::ublas::matrix<float> transformMatrix = boost::numeric::ublas::identity_matrix<float>( 3, 3 );
 	transformMatrix( 1, 1 ) = -1;
-	BOOST_REQUIRE(img.transformCoords( transformMatrix, true ));
+	BOOST_REQUIRE( img.transformCoords( transformMatrix, true ) );
 	float err = 0.0005;
 
 	for ( size_t i = 0; i < 3; i++ ) {
@@ -913,7 +913,7 @@ BOOST_AUTO_TEST_CASE( image_transformCoords_test_common )
 	transform( 2, 0 ) = -1;
 	transform( 1, 1 ) = -1;
 	transform( 0, 2 ) = -1;
-	BOOST_REQUIRE(img.transformCoords( transform, true ));
+	BOOST_REQUIRE( img.transformCoords( transform, true ) );
 	BOOST_CHECK_EQUAL( img.getPropertyAs<util::fvector4>( "indexOrigin" ), util::fvector4( 49.5, 49.5, 49.5 ) );
 	BOOST_CHECK_EQUAL( img.getPropertyAs<util::fvector4>( "rowVec" ), util::fvector4( 0, 0, -1 ) );
 	BOOST_CHECK_EQUAL( img.getPropertyAs<util::fvector4>( "columnVec" ), util::fvector4( 0, -1, 0 ) );
@@ -924,7 +924,7 @@ BOOST_AUTO_TEST_CASE( image_transformCoords_test_common )
 	transform( 1, 1 ) = transform( 2, 2 ) = cos( 45 * M_PI / 180 );
 	transform( 1, 2 ) = -sin( 45 * M_PI / 180 );
 	transform( 2, 1 ) = sin( 45 * M_PI / 180 );
-	BOOST_REQUIRE(img.transformCoords( transform, true ));
+	BOOST_REQUIRE( img.transformCoords( transform, true ) );
 	float err = 0.0005;
 	//what we should get
 	util::fvector4 trueIO = util::fvector4( 0, 70.0036, 49.5 );

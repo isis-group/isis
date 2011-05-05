@@ -60,8 +60,8 @@ class Flip : public data::Image::ChunkOp
 	data::dimensions dim;
 public:
 	Flip( data::dimensions d ) { dim = d; }
-	bool operator()( data::Chunk &ch, util::FixedVector<size_t, 4> posInImage ) {
-		ch.swapAlong( dim );
+	bool operator()( data::Chunk &ch, util::FixedVector<size_t, 4> /*posInImage*/ ) {
+		return ch.swapAlong( dim );
 	}
 };
 

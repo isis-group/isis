@@ -12,36 +12,36 @@ ImageHolder::ImageHolder( )
 {
 }
 
-
+/*
 bool
 ImageHolder::filterRelevantMetaInformation()
 {
-	std::vector<boost::shared_ptr< data::Chunk > > chunkList = m_Image->getChunksAsVector();
+    std::vector<boost::shared_ptr< data::Chunk > > chunkList = m_Image->getChunksAsVector();
 
-	// in case we get more chunks than timesteps we should filter the chunk metadata
-	if( chunkList.size() > m_NumberOfTimeSteps ) {
-		if( chunkList.size() % m_NumberOfTimeSteps ) {
-			LOG( Runtime, warning ) << "Cannot filter the metadata for each timestep. Your image contains of "
-									<< chunkList.size() << " chunks and " << m_NumberOfTimeSteps
-									<< " timesteps. The number of chunks should be a multiple of number of timesteps!";
-			return false;
-		} else {
-			size_t factor = chunkList.size() / m_NumberOfTimeSteps;
+    // in case we get more chunks than timesteps we should filter the chunk metadata
+    if( chunkList.size() > m_NumberOfTimeSteps ) {
+        if( chunkList.size() % m_NumberOfTimeSteps ) {
+            LOG( Runtime, warning ) << "Cannot filter the metadata for each timestep. Your image contains of "
+                                    << chunkList.size() << " chunks and " << m_NumberOfTimeSteps
+                                    << " timesteps. The number of chunks should be a multiple of number of timesteps!";
+            return false;
+        } else {
+            size_t factor = chunkList.size() / m_NumberOfTimeSteps;
 
-			for ( size_t t = 0; t < chunkList.size(); t += factor ) {
-				m_TimeStepProperties.push_back( *( chunkList.operator[]( t ) ) );
-			}
+            for ( size_t t = 0; t < chunkList.size(); t += factor ) {
+                m_TimeStepProperties.push_back( *( chunkList.operator[]( t ) ) );
+            }
 
-			if( m_TimeStepProperties.size() != m_NumberOfTimeSteps ) {
-				LOG(  Runtime, warning ) << "Something went wrong while filtering the properties of each timestep. We got "
-										 << m_TimeStepProperties.size() << " timestep properties for " << m_NumberOfTimeSteps << " timestep.";
-				return false;
-			}
-		}
-	}
+            if( m_TimeStepProperties.size() != m_NumberOfTimeSteps ) {
+                LOG(  Runtime, warning ) << "Something went wrong while filtering the properties of each timestep. We got "
+                                         << m_TimeStepProperties.size() << " timestep properties for " << m_NumberOfTimeSteps << " timestep.";
+                return false;
+            }
+        }
+    }
 
-	return true;
-}
+    return true;
+}*/
 
 boost::numeric::ublas::matrix< float > ImageHolder::getNormalizedImageOrientation( bool transposed ) const
 {
@@ -107,8 +107,8 @@ bool ImageHolder::setImage( const data::Image &image, const ImageType &imageType
 	if( filename.empty() ) {
 		// go through all the chunks and search for filenames. We use a set here to avoid redundantly filenames
 		std::set<std::string> filenameSet;
-		BOOST_FOREACH( std::vector<boost::shared_ptr< const data::Chunk > >::const_reference chRef, image.getChunksAsVector() ) {
-			filenameSet.insert( chRef->getPropertyAs<std::string>( "source" ) );
+		BOOST_FOREACH( std::vector< data::Chunk >::const_reference chRef, image.copyChunksToVector() ) {
+			filenameSet.insert( chRef.getPropertyAs<std::string>( "source" ) );
 		}
 		//now we pack our filenameSet into our slist of filenames
 		BOOST_FOREACH( std::set<std::string>::const_reference setRef, filenameSet ) {
@@ -157,7 +157,7 @@ bool ImageHolder::setImage( const data::Image &image, const ImageType &imageType
 	m_ImageState.threshold = std::make_pair<double, double>( m_MinMax.first->as<double>(), m_MinMax.second->as<double>() );
 	m_ImageState.opacity = 1.0;
 	m_Image->updateOrientationMatrices();
-	return filterRelevantMetaInformation(); //only return true if filtering was successfully
+	return true;
 }
 
 }
