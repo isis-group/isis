@@ -404,7 +404,7 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 				// and voxel resolution. All chunks in the list splices are supposed
 				// to have the same index origin since they are from the same slice.
 				// get slice orientation of image
-				VAttrList attributes = VImageAttrList( vImageVector[nloaded-1] );
+				VAttrList attributes = VImageAttrList( vImageVector[nloaded - 1] );
 				VAttrListPosn posn;
 				val = NULL;
 

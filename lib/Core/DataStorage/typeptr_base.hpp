@@ -21,6 +21,7 @@
 
 #include "../CoreUtils/type_base.hpp"
 #include "typeptr_converter.hpp"
+#include "common.hpp"
 
 namespace isis
 {
@@ -83,9 +84,9 @@ public:
 	bool convertTo( ValuePtrBase &dst, const scaling_pair &scaling )const;
 
 	///get the scaling (and offset) which would be used in an convertTo
-	scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const;
-	scaling_pair getScalingTo( unsigned short typeID, const util::_internal::ValueBase &min, const util::_internal::ValueBase &max, autoscaleOption scaleopt = autoscale )const;
-	scaling_pair getScalingTo( unsigned short typeID, const std::pair<util::ValueReference, util::ValueReference> &minmax, autoscaleOption scaleopt = autoscale )const;
+	virtual scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const = 0;
+	virtual scaling_pair getScalingTo( unsigned short typeID, const util::_internal::ValueBase &min, const util::_internal::ValueBase &max, autoscaleOption scaleopt = autoscale )const;
+	virtual scaling_pair getScalingTo( unsigned short typeID, const std::pair<util::ValueReference, util::ValueReference> &minmax, autoscaleOption scaleopt = autoscale )const;
 
 
 	/// Convert (or Copy) data from this to existing memory of maybe another type and the given length.
@@ -165,6 +166,8 @@ public:
 
 	/// \returns the number of references using the same memory as this.
 	size_t useCount()const;
+
+	bool swapAlong( const dimensions dim, const size_t dims[] ) const;
 
 	/**
 	 * Get minimum/maximum of a ValuePtr.

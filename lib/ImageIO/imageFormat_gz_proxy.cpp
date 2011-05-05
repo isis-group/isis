@@ -20,7 +20,7 @@ class ImageFormat_CompProxy: public FileFormat
 {
 private:
 	static void gz_compress( std::ifstream &in, gzFile out ) {
-		char buf[2048*1024];
+		char buf[2048 * 1024];
 		int len;
 
 		for (
@@ -63,7 +63,7 @@ private:
 	}
 
 	static void gz_uncompress( gzFile in, std::ofstream &out ) {
-		char buf[2048*1024];
+		char buf[2048 * 1024];
 		int len;
 		size_t bytes = 0;
 
@@ -180,7 +180,7 @@ public:
 		return ret;
 	}
 
-	void write( const data::Image &image, const std::string &filename, const std::string &dialect )throw( std::runtime_error & ) {
+	void write( const data::Image &/*image*/, const std::string &/*filename*/, const std::string &/*dialect*/ )throw( std::runtime_error & ) {
 		throw( std::runtime_error( "Compressed write is not yet implemented" ) );
 	}
 	bool tainted()const {return false;}//internal plugins are not tainted

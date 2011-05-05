@@ -101,13 +101,6 @@ void ValuePtrBase::copyRange( size_t start, size_t end, ValuePtrBase &dst, size_
 	}
 }
 
-scaling_pair ValuePtrBase::getScalingTo( unsigned short typeID, autoscaleOption scaleopt )const
-{
-	std::pair<util::ValueReference, util::ValueReference> minmax = getMinMax();
-	assert( ! ( minmax.first.isEmpty() || minmax.second.isEmpty() ) );
-	return ValuePtrBase::getScalingTo( typeID, minmax, scaleopt );
-}
-
 scaling_pair ValuePtrBase::getScalingTo( unsigned short typeID, const std::pair<util::ValueReference, util::ValueReference> &minmax, autoscaleOption scaleopt )const
 {
 	LOG_IF( minmax.first.isEmpty() || minmax.second.isEmpty(), Debug, error ) << "One of the ValueReference's in minmax is empty(). This will crash...";
@@ -147,6 +140,70 @@ size_t ValuePtrBase::useCount() const
 {
 	return getRawAddress().use_count();
 }
+
+bool ValuePtrBase::swapAlong( const dimensions dim, const size_t dims[] ) const
+{
+	boost::shared_ptr<void> saddr = getRawAddress().lock();
+	int8_t *const  src = ( int8_t * )saddr.get();
+	int8_t *tmpOrigin;
+	int8_t *tmpDest;
+
+
+	if ( dim == data::rowDim ) {
+		size_t index_forward = 0;
+		size_t index_y = 0;
+		int8_t *dummy = ( int8_t * ) malloc( bytesPerElem() * sizeof( int8_t ) );
+
+		for ( size_t z = 0; z < dims[2]; z++ ) {
+			for ( size_t y = 0; y < dims[1]; y++ ) {
+				index_y++;
+
+				for ( size_t direction = 0; direction < dims[0] / 2 ; direction++ ) {
+					tmpOrigin = src + ( ( index_y * dims[0] ) - direction - 1 ) * bytesPerElem();
+					tmpDest = src + index_forward++ * bytesPerElem();
+					memcpy( dummy, tmpOrigin, bytesPerElem() );
+					memcpy( tmpOrigin, tmpDest, bytesPerElem() );
+					memcpy( tmpDest, dummy, bytesPerElem() );
+				}
+
+				index_forward += dims[0] - dims[0] / 2;
+			}
+		}
+
+		return true;
+	} else if ( dim == data::columnDim ) {
+		int8_t *dummy = ( int8_t * ) malloc( bytesPerElem() * dims[0] * sizeof( int8_t ) );
+
+		for ( size_t z = 0; z < dims[2]; z++ ) {
+			for ( size_t direction = 0; direction < dims[1] / 2; direction++ ) {
+				tmpOrigin = src + ( ( dims[0] * ( dims[1] - direction - 1 ) ) + z * dims[0] * dims[1] ) * bytesPerElem();
+				tmpDest = src + ( ( dims[0] * direction ) + z * dims[0] * dims[1] ) * bytesPerElem();
+				memcpy( dummy, tmpOrigin, bytesPerElem() * dims[0] );
+				memcpy( tmpOrigin, tmpDest, bytesPerElem() * dims[0] );
+				memcpy( tmpDest, dummy, bytesPerElem() * dims[0] );
+			}
+		}
+
+		return true;
+	} else if ( dim == data::sliceDim ) {
+		int8_t *dummy = ( int8_t * ) malloc( bytesPerElem() * dims[0] * dims[1] * sizeof( int8_t ) );
+
+		for ( size_t direction = 0; direction < dims[2] / 2; direction++ ) {
+			tmpOrigin = src + ( dims[2] - direction - 1 ) * dims[0] * dims[1] * bytesPerElem();
+			tmpDest = src + direction * dims[0] * dims[1] * bytesPerElem();
+			memcpy( dummy, tmpOrigin, bytesPerElem() * dims[0] * dims[1] );
+			memcpy( tmpOrigin, tmpDest, bytesPerElem() * dims[0] * dims[1] );
+			memcpy( tmpDest, dummy, bytesPerElem() * dims[0] * dims[1] );
+		}
+
+		return true;
+	} else {
+		LOG( Runtime, error ) << "Swapping along axis referred by " << dim << " is not possible!";
+		return false;
+	}
+}
+
+
 
 }
 }

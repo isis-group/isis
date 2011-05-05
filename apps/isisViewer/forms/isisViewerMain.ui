@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>isisViewerMain</class>
+ <widget class="QMainWindow" name="isisViewerMain">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>911</width>
+    <height>818</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>isisViewer</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QDockWidget" name="dockWidget">
+      <property name="floating">
+       <bool>false</bool>
+      </property>
+      <property name="features">
+       <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable|QDockWidget::DockWidgetVerticalTitleBar</set>
+      </property>
+      <property name="windowTitle">
+       <string>Axial View</string>
+      </property>
+      <widget class="QWidget" name="dockWidgetContents_10">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QFrame" name="axialWidget">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QDockWidget" name="dockWidget_2">
+      <property name="floating">
+       <bool>false</bool>
+      </property>
+      <property name="features">
+       <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable|QDockWidget::DockWidgetVerticalTitleBar</set>
+      </property>
+      <property name="windowTitle">
+       <string>Sagittal View</string>
+      </property>
+      <widget class="QWidget" name="dockWidgetContents_11">
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QFrame" name="sagittalWidget">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QDockWidget" name="dockWidget_3">
+      <property name="floating">
+       <bool>false</bool>
+      </property>
+      <property name="features">
+       <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable|QDockWidget::DockWidgetVerticalTitleBar</set>
+      </property>
+      <property name="allowedAreas">
+       <set>Qt::AllDockWidgetAreas</set>
+      </property>
+      <property name="windowTitle">
+       <string>Coronal View</string>
+      </property>
+      <widget class="QWidget" name="dockWidgetContents_12">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QFrame" name="coronalWidget">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QDockWidget" name="dockWidget_4">
+      <property name="floating">
+       <bool>false</bool>
+      </property>
+      <property name="features">
+       <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable|QDockWidget::DockWidgetVerticalTitleBar</set>
+      </property>
+      <property name="allowedAreas">
+       <set>Qt::AllDockWidgetAreas</set>
+      </property>
+      <widget class="QWidget" name="dockWidgetContents_13">
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QWidget" name="widget" native="true">
+          <widget class="QLabel" name="label">
+           <property name="geometry">
+            <rect>
+             <x>9</x>
+             <y>67</y>
+             <width>54</width>
+             <height>18</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Intensity</string>
+           </property>
+          </widget>
+          <widget class="QSpinBox" name="timestepSpinBox">
+           <property name="geometry">
+            <rect>
+             <x>9</x>
+             <y>115</y>
+             <width>43</width>
+             <height>26</height>
+            </rect>
+           </property>
+          </widget>
+          <widget class="QListWidget" name="imageStack">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>240</y>
+             <width>381</width>
+             <height>101</height>
+            </rect>
+           </property>
+           <property name="editTriggers">
+            <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
+           </property>
+           <property name="dragEnabled">
+            <bool>true</bool>
+           </property>
+           <property name="dragDropMode">
+            <enum>QAbstractItemView::InternalMove</enum>
+           </property>
+           <property name="alternatingRowColors">
+            <bool>true</bool>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>16</width>
+             <height>16</height>
+            </size>
+           </property>
+           <property name="movement">
+            <enum>QListView::Free</enum>
+           </property>
+           <property name="selectionRectVisible">
+            <bool>true</bool>
+           </property>
+          </widget>
+          <widget class="QLabel" name="label_2">
+           <property name="geometry">
+            <rect>
+             <x>9</x>
+             <y>91</y>
+             <width>59</width>
+             <height>18</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Timestep</string>
+           </property>
+          </widget>
+          <widget class="QLabel" name="pxlIntensityContainer">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>10</y>
+             <width>231</width>
+             <height>20</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+          <widget class="QSlider" name="upperThreshold">
+           <property name="geometry">
+            <rect>
+             <x>250</x>
+             <y>10</y>
+             <width>19</width>
+             <height>211</height>
+            </rect>
+           </property>
+           <property name="maximum">
+            <number>999</number>
+           </property>
+           <property name="singleStep">
+            <number>1</number>
+           </property>
+           <property name="pageStep">
+            <number>10</number>
+           </property>
+           <property name="value">
+            <number>999</number>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="invertedAppearance">
+            <bool>false</bool>
+           </property>
+           <property name="invertedControls">
+            <bool>false</bool>
+           </property>
+          </widget>
+          <widget class="QSlider" name="lowerThreshold">
+           <property name="geometry">
+            <rect>
+             <x>270</x>
+             <y>10</y>
+             <width>20</width>
+             <height>211</height>
+            </rect>
+           </property>
+           <property name="maximum">
+            <number>999</number>
+           </property>
+           <property name="pageStep">
+            <number>10</number>
+           </property>
+           <property name="tracking">
+            <bool>false</bool>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+          </widget>
+          <widget class="QLabel" name="maxLabel">
+           <property name="geometry">
+            <rect>
+             <x>290</x>
+             <y>8</y>
+             <width>91</width>
+             <height>20</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+          <widget class="QLabel" name="minLabel">
+           <property name="geometry">
+            <rect>
+             <x>290</x>
+             <y>200</y>
+             <width>91</width>
+             <height>21</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+          <widget class="QComboBox" name="interpolationType">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>170</y>
+             <width>231</width>
+             <height>27</height>
+            </rect>
+           </property>
+           <item>
+            <property name="text">
+             <string>Nearest Neighbor</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Linear</string>
+            </property>
+           </item>
+          </widget>
+          <widget class="QLabel" name="label_3">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>150</y>
+             <width>171</width>
+             <height>18</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>ZMap-Interpolation</string>
+           </property>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>911</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_File">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <widget class="QMenu" name="menuOpen_Image_as">
+     <property name="title">
+      <string>Open Image as</string>
+     </property>
+     <addaction name="actionAnatomical_Image"/>
+     <addaction name="actionZ_Map"/>
+    </widget>
+    <addaction name="action_Open_Image"/>
+    <addaction name="menuOpen_Image_as"/>
+    <addaction name="separator"/>
+    <addaction name="action_Exit"/>
+   </widget>
+   <widget class="QMenu" name="menu_Preferences">
+    <property name="title">
+     <string>&amp;Preferences</string>
+    </property>
+    <widget class="QMenu" name="menuQuick_Settings">
+     <property name="title">
+      <string>&amp;Quick Settings</string>
+     </property>
+     <addaction name="actionShow_labels"/>
+     <addaction name="actionAutomatic_Scaling"/>
+    </widget>
+    <widget class="QMenu" name="menuSpatiality">
+     <property name="title">
+      <string>Spatiality</string>
+     </property>
+     <addaction name="actionIgnore_Orientation"/>
+    </widget>
+    <addaction name="menuQuick_Settings"/>
+    <addaction name="menuSpatiality"/>
+   </widget>
+   <addaction name="menu_File"/>
+   <addaction name="menu_Preferences"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="action_Open_Image">
+   <property name="text">
+    <string>&amp;Open Image</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="action_Exit">
+   <property name="text">
+    <string>&amp;Exit</string>
+   </property>
+  </action>
+  <action name="actionAnatomical_Image">
+   <property name="text">
+    <string>Anatomical Image</string>
+   </property>
+  </action>
+  <action name="actionZ_Map">
+   <property name="text">
+    <string>Z-Map</string>
+   </property>
+  </action>
+  <action name="actionShow_labels">
+   <property name="text">
+    <string>Show &amp;labels</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
+   </property>
+  </action>
+  <action name="actionShow_Toolbox">
+   <property name="text">
+    <string>Show &amp;Toolbox</string>
+   </property>
+  </action>
+  <action name="actionAxial">
+   <property name="text">
+    <string>Axial</string>
+   </property>
+  </action>
+  <action name="actionSagittal">
+   <property name="text">
+    <string>Sagittal</string>
+   </property>
+  </action>
+  <action name="actionCoronal">
+   <property name="text">
+    <string>Coronal</string>
+   </property>
+  </action>
+  <action name="actionSet">
+   <property name="text">
+    <string>Set</string>
+   </property>
+  </action>
+  <action name="actionIgnore_Orientation">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Ignore Orientation</string>
+   </property>
+  </action>
+  <action name="actionAutomatic_Scaling">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Automatic scaling</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="../resources/viewer.qrc"/>
+ </resources>
+ <connections/>
+</ui>

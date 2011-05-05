@@ -19,6 +19,7 @@
 #include "type.hpp"
 #include "../DataStorage/typeptr.hpp"
 #include "types.hpp"
+#include <complex>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/mpl/for_each.hpp>
 #include <boost/foreach.hpp>
@@ -65,6 +66,9 @@ DEF_TYPE( ivector4, ivector4 );
 DEF_TYPE( ilist, list<int32_t> );
 DEF_TYPE( dlist, list<double> );
 DEF_TYPE( slist, list<string> );
+
+DEF_TYPE( std::complex<float>, complex<float> );
+DEF_TYPE( std::complex<double>, complex<double> );
 
 DEF_TYPE( std::string, string );
 DEF_TYPE( Selection, selection );

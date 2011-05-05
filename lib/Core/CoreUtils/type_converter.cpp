@@ -32,6 +32,8 @@
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
+#include <complex>
+
 
 /// @cond _internal
 namespace isis
@@ -65,6 +67,13 @@ public:
 template<bool NUMERIC, bool SAME, typename SRC, typename DST> class ValueConverter : public ValueGenerator<SRC, DST>
 {
 public:
+	//uncomment this to see which conversions are not generated - be carefull, thats f***king much
+	/*  static boost::shared_ptr<const ValueConverterBase> get() {
+	        std::cout <<
+	            "There will be no " << (SAME?"copy":NUMERIC?"numeric":"non-numeric") <<  " conversion for " <<
+	            util::Value<SRC>::staticName() << " to " << util::Value<DST>::staticName() << std::endl;
+	        return boost::shared_ptr<const ValueConverterBase>();
+	    }*/
 	virtual ~ValueConverter() {}
 };
 /////////////////////////////////////////////////////////////////////////////
@@ -90,11 +99,10 @@ public:
 	virtual ~ValueConverter() {}
 };
 
-
 /////////////////////////////////////////////////////////////////////////////
 // Numeric version -- uses boost::numeric_cast
 /////////////////////////////////////////////////////////////////////////////
-struct NumericOverflowHandler {
+struct NumericOverflowHandler { //@todo this is NOT thread-safe
 	static boost::numeric::range_check_result result;
 	void operator() ( boost::numeric::range_check_result r ) { // throw bad_numeric_conversion derived
 		result = r;
@@ -129,6 +137,75 @@ public:
 	}
 	virtual ~ValueConverter() {}
 };
+
+///////////////////////////////////////////////////////////////////////////////
+// Conversion for complex numbers
+/////////////////////////////////////////////////////////////////////////////////
+template<typename SRC, typename DST> class ValueConverter<false, false, std::complex<SRC>, std::complex<DST> > : public ValueGenerator<std::complex<SRC>, std::complex<DST> >
+{
+	ValueConverter() {
+		LOG( Debug, verbose_info ) << "Creating complex-complex converter from " << Value<std::complex<SRC> >::staticName() << " to " << Value<std::complex<DST> >::staticName();
+	};
+public:
+	static boost::shared_ptr<const ValueConverterBase> get() {
+		ValueConverter<false, false, std::complex<SRC>, std::complex<DST> > *ret = new ValueConverter<false, false, std::complex<SRC>, std::complex<DST> >;
+		return boost::shared_ptr<const ValueConverterBase>( ret );
+	}
+	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
+		typedef boost::numeric::converter <
+		std::complex<DST> , std::complex<SRC> ,
+			boost::numeric::conversion_traits<std::complex<DST>, std::complex<SRC> >,
+			NumericOverflowHandler,
+			boost::numeric::RoundEven<std::complex<SRC> >
+			> converter;
+		NumericOverflowHandler::result = boost::numeric::cInRange;
+		const std::complex<SRC> &srcVal = src.castTo<std::complex<SRC> >();
+		std::complex<DST> &dstVal = dst.castTo<std::complex<DST> >();
+
+		dstVal = converter::convert( srcVal );
+		return NumericOverflowHandler::result;
+	}
+	virtual ~ValueConverter() {}
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// Conversion for "normal" to complex numbers -- uses ValueConverter on the real part
+/////////////////////////////////////////////////////////////////////////////////
+template<typename SRC, typename DST> class ValueConverter<false, false, SRC, std::complex<DST> > : public ValueGenerator<SRC, std::complex<DST> >
+{
+	boost::shared_ptr<const ValueConverterBase> m_conv;
+	ValueConverter( boost::shared_ptr<const ValueConverterBase> elem_conv ): m_conv( elem_conv ) {
+		LOG( Debug, verbose_info )
+				<< "Creating number-complex converter from "
+				<< Value<SRC>::staticName() << " to " << Value<std::complex<DST> >::staticName();
+	};
+public:
+	static boost::shared_ptr<const ValueConverterBase> get() {
+		typedef boost::mpl::and_<boost::is_arithmetic<SRC>, boost::is_arithmetic<DST> > is_num;
+		typedef boost::is_same<SRC, DST> is_same;
+		boost::shared_ptr<const ValueConverterBase> elem_conv =
+			ValueConverter<is_num::value, is_same::value, SRC, DST>::get();
+
+		if ( elem_conv ) { // if there is a conversion from SRC to DST create a conversion SRC => complex<DST> using that
+			ValueConverter<false, false, SRC, std::complex<DST> > *ret = new ValueConverter<false, false, SRC, std::complex<DST> >( elem_conv );
+			return boost::shared_ptr<const ValueConverterBase>( ret );
+		} else {
+			return boost::shared_ptr<const ValueConverterBase>();
+		}
+	}
+	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
+		std::complex<DST> &dstVal = dst.castTo<std::complex<DST> >();
+		Value<DST> real;
+		boost::numeric::range_check_result ret = m_conv->convert( src, real );
+
+		if( ret == boost::numeric::cInRange )
+			dstVal = std::complex<DST>( ( DST )real, DST() );
+
+		return NumericOverflowHandler::result;
+	}
+	virtual ~ValueConverter() {}
+};
+
 
 /////////////////////////////////////////////////////////////////////////////
 // vector4 version -- uses ValueConverter on every element
@@ -242,6 +319,25 @@ public:
 		DST &dstVal = dst.castTo<DST>();
 		const std::string &srcVal = src.castTo<std::string>();
 		dstVal = boost::lexical_cast<DST>( srcVal );
+		return boost::numeric::cInRange; //@todo handle bad casts
+	}
+	virtual ~ValueConverter() {}
+};
+template<typename DST> class ValueConverter<false, false, std::string, std::complex<DST> > : public ValueGenerator<std::string, std::complex<DST> >
+{
+	ValueConverter() {
+		LOG( Debug, verbose_info )
+				<< "Creating from-string converter for " << Value<std::complex<DST> >::staticName();
+	};
+public:
+	static boost::shared_ptr<const ValueConverterBase> get() {
+		ValueConverter<false, false, std::string, std::complex<DST> > *ret = new ValueConverter<false, false, std::string, std::complex<DST> >;
+		return boost::shared_ptr<const ValueConverterBase>( ret );
+	}
+	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
+		std::complex<DST> &dstVal = dst.castTo<std::complex<DST> >();
+		const std::string &srcVal = src.castTo<std::string>();
+		dstVal = boost::lexical_cast<std::complex<DST> >( srcVal );
 		return boost::numeric::cInRange; //@todo handle bad casts
 	}
 	virtual ~ValueConverter() {}
@@ -410,7 +506,6 @@ public:
 ////////////////////////////////////////////////////////////////////////
 //OK, thats about the foreplay. Now we get to the dirty stuff.
 ////////////////////////////////////////////////////////////////////////
-
 
 ///generate a ValueConverter for conversions from SRC to any type from the "types" list
 template<typename SRC> struct inner_TypeConverter {
