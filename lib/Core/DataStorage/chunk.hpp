@@ -239,13 +239,15 @@ public:
 	 */
 	bool transformCoords( boost::numeric::ublas::matrix<float> transform_matrix, bool transformCenterIsImageCenter = false ) {
 		if( hasProperty( "rowVec" ) && hasProperty( "columnVec" ) && hasProperty( "sliceVec" )
-		&& hasProperty( "voxelSize" ) && hasProperty( "indexOrigin" ) ) {
+			&& hasProperty( "voxelSize" ) && hasProperty( "indexOrigin" ) ) {
 			if( !isis::data::_internal::transformCoords( *this, getSizeAsVector(), transform_matrix, transformCenterIsImageCenter ) ) {
 				LOG( Runtime, error ) << "Error during transforming the coords of the chunk.";
 				return false;
 			}
+
 			return true;
 		}
+
 		return true;
 	}
 	/**

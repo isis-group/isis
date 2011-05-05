@@ -44,7 +44,7 @@ int main( int argc, char *argv[] )
 	isis::util::slist zmapFileList = app.parameters["z"];
 	std::list< isis::data::Image > imgList;
 	std::list< isis::data::Image > zImgList;
-	
+
 	//load the anatomical images
 	BOOST_FOREACH ( isis::util::slist::const_reference fileName, fileList ) {
 		std::list< isis::data::Image > tmpList = isis::data::IOFactory::load( fileName, app.parameters["rf"].toString() );
@@ -60,7 +60,7 @@ int main( int argc, char *argv[] )
 		}
 	}
 	isis::viewer::QViewerCore *core = new isis::viewer::QViewerCore;
-	
+
 	isis::viewer::MainWindow isisViewerMainWindow( core );
 
 	if( app.parameters["type"].toString() == "anatomical" && app.parameters["in"].isSet() ) {
@@ -72,6 +72,7 @@ int main( int argc, char *argv[] )
 	if( app.parameters["z"].isSet() ) {
 		core->addImageList( zImgList, ImageHolder::z_map );
 	}
+
 	core->setAllImagesToIdentity( app.parameters["adopt"] );
 	isisViewerMainWindow.show();
 	return app.getQApplication().exec();

@@ -46,8 +46,9 @@ namespace data
 namespace _internal
 {
 
-size_t getConvertSize(const ValuePtrBase &src,const ValuePtrBase &dst){
-	
+size_t getConvertSize( const ValuePtrBase &src, const ValuePtrBase &dst )
+{
+
 	LOG_IF( src.getLength() > dst.getLength(), Runtime, error ) << "The " << src.getLength() << " elements of src wont fit into the destination. Will only convert " << dst.getLength() << " elements.";
 	LOG_IF( src.getLength() < dst.getLength(), Runtime, warning ) << "Source is shorter than destination. Will only convert " << src.getLength() << " values";
 	return std::min( src.getLength(), dst.getLength() );
@@ -227,14 +228,16 @@ public:
 	void convert( const ValuePtrBase &src, ValuePtrBase &dst, const scaling_pair &scaling )const {
 		LOG_IF( scaling.first.isEmpty() || scaling.first.isEmpty(), Debug, error ) << "Running conversion with invalid scaling (" << scaling << ") this won't work";
 		LOG_IF( scaling.first->as<float>() != 1 || scaling.second->as<float>() != 0, Debug, warning ) << "Sorry scaling of complex values is not supportet yet";
-		
-		const std::complex<SRC> *sp=&src.castToValuePtr<std::complex<SRC> >()[0];
-		const std::complex<SRC> *end=sp+_internal::getConvertSize(src,dst);
-		std::complex<DST> *dp=&dst.castToValuePtr<std::complex<DST> >()[0];
-		while(sp!=end){
-			dp->real()=_internal::round<DST>(sp->real());
-			dp->imag()=_internal::round<DST>(sp->imag());
-			++sp;++dp;
+
+		const std::complex<SRC> *sp = &src.castToValuePtr<std::complex<SRC> >()[0];
+		const std::complex<SRC> *end = sp + _internal::getConvertSize( src, dst );
+		std::complex<DST> *dp = &dst.castToValuePtr<std::complex<DST> >()[0];
+
+		while( sp != end ) {
+			dp->real() = _internal::round<DST>( sp->real() );
+			dp->imag() = _internal::round<DST>( sp->imag() );
+			++sp;
+			++dp;
 		}
 	}
 	scaling_pair getScaling( const util::_internal::ValueBase &/*min*/, const util::_internal::ValueBase &/*max*/, autoscaleOption /*scaleopt*/ = autoscale )const {

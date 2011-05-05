@@ -16,9 +16,9 @@ file (GLOB GLWIDGET_FILES_CPP GLWidget/*.cpp GLWidget/*.c)
 file (GLOB UI_FILES forms/*.ui)
 file (GLOB RESOURCE_FILES resources/*.qrc)
 
-# extended search space for header 
+# extended search space for header
 include_directories(
-  ${CMAKE_SOURCE_DIR}/lib 	#find qt4 adapter header 
+  ${CMAKE_SOURCE_DIR}/lib 	#find qt4 adapter header
   ${CMAKE_CURRENT_BINARY_DIR})	#find moc generated header files
 
 ###########################################################
@@ -58,8 +58,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/GLWidget)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/viewer)
 
 #this flags has to be set due to use parallel with boos::signal
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DQT_NO_KEYWORDS -ftemplate-depth-100 -Wextra -Wshadow  -Wfatal-errors" )
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DQT_NO_KEYWORDS -Wextra -Wshadow  -Wfatal-errors " )
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DQT_NO_KEYWORDS -ftemplate-depth-100 -Wextra -Wfatal-errors" )
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DQT_NO_KEYWORDS -Wextra -Wfatal-errors " )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-depth-100")
 
@@ -67,7 +67,7 @@ add_executable(isisViewer main.cpp ${GLWIDGET_FILES_CPP} ${VIEWER_FILES_CPP} ${i
 find_library(isisqt4_LIBRARY "isisAdapter_qt4")
 
 set(NEEDED_LIBS
-	${OPENGL_LIBRARY} 
+	${OPENGL_LIBRARY}
 	${QT_LIBRARIES}
 	${Boost_LIBRARIES}
 	${ISIS_LIB}

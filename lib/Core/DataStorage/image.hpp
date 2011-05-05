@@ -146,7 +146,7 @@ public:
 	 * Removes used chunks from the given list. So afterwards the list consists of the rejected chunks.
 	 */
 	template<typename T> Image( std::list<T> &chunks, dimensions min_dim = rowDim ) :
-		_internal::NDimensional<4>(), util::PropertyMap(),minIndexingDim( min_dim ),
+		_internal::NDimensional<4>(), util::PropertyMap(), minIndexingDim( min_dim ),
 		set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ),
 		clean( false ) {
 		addNeededFromString( neededProperties );
@@ -411,17 +411,18 @@ public:
 	 * with caution!
 	 * \param transform_matrix the transformation matrix can be any type of rigid and affine transformation
 	 * \param transformCenterIsImageCenter if this parameter is true, the center of the image will be translated to the
-	 *	isocenter of the scanner prior applying the transform_matrix. Eventually, it will be translated to its
+	 *  isocenter of the scanner prior applying the transform_matrix. Eventually, it will be translated to its
 	 *  initial position. For example this is the way SPM flips its images when converting from DICOM to nifti.
 	 * \return returns if the transformation was successfuly
 	 */
 	bool transformCoords( boost::numeric::ublas::matrix<float> transform_matrix, bool transformCenterIsImageCenter = false ) {
 
 		BOOST_FOREACH( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef, lookup ) {
-			if(!chRef->transformCoords( transform_matrix, transformCenterIsImageCenter )) {
+			if( !chRef->transformCoords( transform_matrix, transformCenterIsImageCenter ) ) {
 				return false;
 			}
 		}
+
 		if( !isis::data::_internal::transformCoords( *this, getSizeAsVector(), transform_matrix, transformCenterIsImageCenter ) ) {
 			LOG( Runtime, error ) << "Error during transforming the coords of the image.";
 			return false;
@@ -439,13 +440,13 @@ public:
 	 *  This is done by latching the orientation of the image by setting the biggest absolute
 	 *  value of each orientation vector to 1 and the others to 0.
 	 *  Example:
-	 *  		(-0.8)		(1)
-	 *			( 0.2)  ->	(0)   (this is done for the rowVec, columnVec and sliceVec)
-	 *			(-0.1)		(0)
+	 *          (-0.8)      (1)
+	 *          ( 0.2)  ->  (0)   (this is done for the rowVec, columnVec and sliceVec)
+	 *          (-0.1)      (0)
 	 *
-	 *	This latched orientation is used to map from the scanner axes to the dimension.
-	 *	\param scannerAxes the axes of the scanner you want to map to dimension of the image.
-	 *	\return the mapped image dimension
+	 *  This latched orientation is used to map from the scanner axes to the dimension.
+	 *  \param scannerAxes the axes of the scanner you want to map to dimension of the image.
+	 *  \return the mapped image dimension
 	 */
 
 	dimensions mapScannerAxesToImageDimension( scannerAxis scannerAxes );
