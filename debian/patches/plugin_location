@@ -1,0 +1,19 @@
+commit 1eb6b47c6ec73336c6c3bf0453fbea76ddeb7d52
+Author: Michael Hanke <michael.hanke@gmail.com>
+Date:   Thu May 5 21:25:57 2011 -0400
+
+    Plugins are binary and need to go into (/usr)/lib.
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 6090720..89e6ffa 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -32,7 +32,7 @@ set(ISIS_VERSION
+ ############################################################
+ # set install infix for plugin installation path
+ ############################################################
+-set(ISIS_PLUGIN_INFIX share/isis/plugins)
++set(ISIS_PLUGIN_INFIX lib/isis/plugins)
+ 
+ ############################################################
+ # set project specific module path

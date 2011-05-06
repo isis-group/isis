@@ -1,23 +1,5 @@
-isis (0.3.1gite7210b-0) stable; urgency=low
+isis (0.3.1-1) UNRELEASED; urgency=low
 
-    * major changes in the project structure. All former ISIS subprojects are now part of an overall ISIS project.
+  * Initial Debian packaging.
 
-    * added the application 'isiscalc' which performs arithmetical operations on voxel data.
-
-    * make the core additionally search in ISIS_PLUGIN_PATH (if given and env) and in $HOME/isis/plugins for plugins
-
-    * fixed several bugs in the type conversion and file IO.
-
-    * added several new IO-plugins like: imageFormat_raw for raw image output, tar input proxy, imageFormat_png to
-      read and write PNG images,
-
-    * major changes in the core API. The programmers interface has been completely revised.
-
- -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Thu, 05 May 2011 15:38:35 +0200
-
-isis (0.2.0git312-0) stable; urgency=low
-
-    * Initial Debian packaging attempt. This is the first version of
-      an ISIS debian package.
-
- -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Wed, 13 Oct 2010 19:43:07 +0100
+ -- Michael Hanke <mih@debian.org>  Thu, 05 May 2011 10:08:35 -0400

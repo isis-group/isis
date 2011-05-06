@@ -1,24 +1,87 @@
 #!/usr/bin/make -f
+# -*- makefile -*-
 
-include /usr/share/cdbs/1/rules/debhelper.mk
-include /usr/share/cdbs/1/class/cmake.mk
+srcpkg = $(shell LC_ALL=C dpkg-parsechangelog | grep '^Source:' | cut -d ' ' -f 2,2)
+debver = $(shell LC_ALL=C dpkg-parsechangelog | grep '^Version:' | cut -d ' ' -f 2,2 )
+upstreamver = $(shell echo $(debver) | cut -d '-' -f 1,1 )
 
-DEB_CMAKE_EXTRA_FLAGS = \
-	-DCMAKE_BUILD_TYPE="Release" \
-	-DCMAKE_C_COMPILER="/usr/bin/gcc" \
-	-DBUILD_SHARED_LIBS:BOOL=ON \
-	-DCMAKE_SKIP_RPATH:BOOL=OFF \
-	-DISIS_CORE_DEBUG_LOG:BOOL=OFF \
-	-DISIS_APPS_CALC:BOOL=ON \
-	-DISIS_BUILD_TOOLS:BOOL=ON \
-	-DISIS_IOPLUGIN_DICOM:BOOL=ON \
-	-DISIS_IOPLUGIN_NIFTI:BOOL=ON \
-	-DISIS_IOPLUGIN_PNG:BOOL=ON \
-	-DISIS_IOPLUGIN_VISTA:BOOL=ON
+static_build_path=DEB_build_static
+shared_build_path=DEB_build_shared
 
-# get number of parallel builds from the default environment
-# variable DEB_BUILD_OPTIONS. The expected value is 'parrallel=#'.
-ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
-	NUMJOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
-    MAKEFLAGS += -j$(NUMJOBS)
-endif
+# one ring to rule them all ...
+%:
+	dh $@ --buildsystem=cmake
+
+# this enables everything that upstream considers to be ready for production
+# currently tests only get built but do not run as the test suite assumes
+# an already installed package -- upstream is working on a fix
+CMAKE_FLAGS=-DCMAKE_INSTALL_PREFIX:PATH=/usr \
+            -DCMAKE_SHARED_LINKER_FLAGS="-Wl,--no-undefined" \
+            -DCMAKE_EXE_LINKER_FLAGS="-Wl,--no-undefined" \
+            -DISIS_APPS_CALC:BOOL=ON \
+            -DISIS_APPS_VIEWER:BOOL=OFF \
+            -DISIS_BUILD_TESTS:BOOL=ON \
+            -DISIS_BUILD_STATIC:BOOL=OFF \
+            -DISIS_BUILD_TOOLS:BOOL=ON \
+            -DISIS_BUILD_PYTHON_EXT:BOOL=OFF \
+            -DISIS_IOPLUGIN_DICOM:BOOL=ON \
+            -DISIS_IOPLUGIN_GZ:BOOL=ON \
+            -DISIS_IOPLUGIN_NIFTI:BOOL=ON \
+            -DISIS_IOPLUGIN_NULL:BOOL=ON \
+            -DISIS_IOPLUGIN_PNG:BOOL=ON \
+            -DISIS_IOPLUGIN_RAW:BOOL=ON \
+            -DISIS_IOPLUGIN_TAR:BOOL=ON \
+            -DISIS_IOPLUGIN_VISTA:BOOL=ON \
+            -DISIS_ITK:BOOL=OFF \
+            -DISIS_QT4:BOOL=OFF \
+            -DISIS_USE_LIBOIL:BOOL=OFF \
+            -DISIS_RUNTIME_LOG:BOOL=ON \
+            -DISIS_DEBUG_LOG:BOOL=OFF \
+            -DCMAKE_INSTALL_RPATH:STRING="/usr/lib/isis" \
+            -DGIT_REVISION="Debian-$(debver)"
+
+# turn everything off the build only the static lib for the -dev package
+CMAKE_STATICLIB_FLAGS=-DCMAKE_INSTALL_PREFIX:PATH=/usr \
+            -DISIS_APPS_CALC:BOOL=OFF \
+            -DISIS_APPS_VIEWER:BOOL=OFF \
+            -DISIS_BUILD_TESTS:BOOL=OFF \
+            -DISIS_BUILD_STATIC:BOOL=ON \
+            -DISIS_BUILD_TOOLS:BOOL=OFF \
+            -DISIS_BUILD_PYTHON_EXT:BOOL=OFF \
+            -DISIS_IOPLUGIN_DICOM:BOOL=OFF \
+            -DISIS_IOPLUGIN_GZ:BOOL=OFF \
+            -DISIS_IOPLUGIN_NIFTI:BOOL=OFF \
+            -DISIS_IOPLUGIN_NULL:BOOL=OFF \
+            -DISIS_IOPLUGIN_PNG:BOOL=OFF \
+            -DISIS_IOPLUGIN_RAW:BOOL=OFF \
+            -DISIS_IOPLUGIN_TAR:BOOL=OFF \
+            -DISIS_IOPLUGIN_VISTA:BOOL=OFF \
+            -DISIS_ITK:BOOL=OFF \
+            -DISIS_QT4:BOOL=OFF \
+            -DISIS_USE_LIBOIL:BOOL=OFF \
+            -DISIS_RUNTIME_LOG:BOOL=ON \
+            -DISIS_DEBUG_LOG:BOOL=OFF \
+            -DGIT_REVISION="Debian-$(debver)"
+
+
+
+override_dh_auto_configure:
+	dh_auto_configure --builddirectory=$(static_build_path) -- $(CMAKE_STATICLIB_FLAGS)
+	dh_auto_configure --builddirectory=$(shared_build_path) -- $(CMAKE_FLAGS)
+# TODO compile for mutliple python versions
+# dh_auto_configure --builddirectory=build-$*-dbg -- \
+#        -DCMAKE_BUILDTYPE:STRING="Debug" \
+#        -DCMAKE_SKIP_RPATH=true \
+#        -DCMAKE_PYTHON_VERSION=$*-dbg \
+#        -DCMAKE_PYTHONLIB_VERSION="$*_d;$*" \
+
+override_dh_auto_build:
+	dh_auto_build --builddirectory=$(static_build_path)
+	dh_auto_build --builddirectory=$(shared_build_path)
+
+override_dh_auto_install:
+	dh_auto_install --builddirectory=$(static_build_path)
+	dh_auto_install --builddirectory=$(shared_build_path)
+
+override_dh_auto_clean:
+	-rm -rf $(static_build_path) $(shared_build_path)

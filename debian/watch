@@ -1,0 +1,3 @@
+version=3
+opts="filenamemangle=s/.*\/(.*)/isis-$1\.tar\.gz/" \
+  http://github.com/isis-group/isis/downloads .*tarball/([\d\.a-z]+)
