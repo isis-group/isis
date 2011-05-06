@@ -32,7 +32,7 @@ set(ISIS_VERSION
 ############################################################
 # set install infix for plugin installation path
 ############################################################
-set(ISIS_PLUGIN_INFIX share/isis/plugins)
+set(ISIS_PLUGIN_INFIX lib/isis/plugins)
 
 ############################################################
 # set project specific module path
