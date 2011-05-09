@@ -1,0 +1,4 @@
+# RPM post install script file
+
+# run ldconfig
+/sbin/ldconfig
