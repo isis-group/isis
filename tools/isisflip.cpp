@@ -10,7 +10,7 @@ using namespace isis;
 
 
 int main( int argc, char **argv )
-{	
+{
 	class : public data::Image::ChunkOp
 	{
 	public:
@@ -18,8 +18,8 @@ int main( int argc, char **argv )
 		bool operator()( data::Chunk &ch, util::FixedVector<size_t, 4> /*posInImage*/ ) {
 			return ch.swapAlong( dim );
 		}
-	}flifu;
-	
+	} flifu;
+
 	ENABLE_LOG( data::Runtime, util::DefaultMsgPrint, error );
 	std::map<std::string, unsigned int> alongMap = boost::assign::map_list_of
 			( "row", 0 ) ( "column", 1 ) ( "slice", 2 ) ( "x", 3 ) ( "y", 4 ) ( "z", 5 );
@@ -44,14 +44,16 @@ int main( int argc, char **argv )
 	//go through every image
 	BOOST_FOREACH( data::Image & refImage, app.images ) {
 		boost::numeric::ublas::matrix<float> T = boost::numeric::ublas::identity_matrix<float>( 3, 3 );
+
 		if( dim > 2 ) {
 			dim = refImage.mapScannerAxesToImageDimension( static_cast<data::scannerAxis>( dim - 3 ) );
 		}
+
 		T( dim, dim ) *= -1;
 		data::Image newImage = refImage;
 
 		if ( app.parameters["flip"].toString() == "image" || app.parameters["flip"].toString() == "both" ) {
-			flifu.dim=static_cast<data::dimensions>( dim );
+			flifu.dim = static_cast<data::dimensions>( dim );
 			refImage.foreachChunk( flifu );
 		}
 

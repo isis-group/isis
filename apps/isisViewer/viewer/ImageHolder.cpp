@@ -16,31 +16,31 @@ ImageHolder::ImageHolder( )
 bool
 ImageHolder::filterRelevantMetaInformation()
 {
-	std::vector<boost::shared_ptr< data::Chunk > > chunkList = m_Image->getChunksAsVector();
+    std::vector<boost::shared_ptr< data::Chunk > > chunkList = m_Image->getChunksAsVector();
 
-	// in case we get more chunks than timesteps we should filter the chunk metadata
-	if( chunkList.size() > m_NumberOfTimeSteps ) {
-		if( chunkList.size() % m_NumberOfTimeSteps ) {
-			LOG( Runtime, warning ) << "Cannot filter the metadata for each timestep. Your image contains of "
-									<< chunkList.size() << " chunks and " << m_NumberOfTimeSteps
-									<< " timesteps. The number of chunks should be a multiple of number of timesteps!";
-			return false;
-		} else {
-			size_t factor = chunkList.size() / m_NumberOfTimeSteps;
+    // in case we get more chunks than timesteps we should filter the chunk metadata
+    if( chunkList.size() > m_NumberOfTimeSteps ) {
+        if( chunkList.size() % m_NumberOfTimeSteps ) {
+            LOG( Runtime, warning ) << "Cannot filter the metadata for each timestep. Your image contains of "
+                                    << chunkList.size() << " chunks and " << m_NumberOfTimeSteps
+                                    << " timesteps. The number of chunks should be a multiple of number of timesteps!";
+            return false;
+        } else {
+            size_t factor = chunkList.size() / m_NumberOfTimeSteps;
 
-			for ( size_t t = 0; t < chunkList.size(); t += factor ) {
-				m_TimeStepProperties.push_back( *( chunkList.operator[]( t ) ) );
-			}
+            for ( size_t t = 0; t < chunkList.size(); t += factor ) {
+                m_TimeStepProperties.push_back( *( chunkList.operator[]( t ) ) );
+            }
 
-			if( m_TimeStepProperties.size() != m_NumberOfTimeSteps ) {
-				LOG(  Runtime, warning ) << "Something went wrong while filtering the properties of each timestep. We got "
-										 << m_TimeStepProperties.size() << " timestep properties for " << m_NumberOfTimeSteps << " timestep.";
-				return false;
-			}
-		}
-	}
+            if( m_TimeStepProperties.size() != m_NumberOfTimeSteps ) {
+                LOG(  Runtime, warning ) << "Something went wrong while filtering the properties of each timestep. We got "
+                                         << m_TimeStepProperties.size() << " timestep properties for " << m_NumberOfTimeSteps << " timestep.";
+                return false;
+            }
+        }
+    }
 
-	return true;
+    return true;
 }*/
 
 boost::numeric::ublas::matrix< float > ImageHolder::getNormalizedImageOrientation( bool transposed ) const

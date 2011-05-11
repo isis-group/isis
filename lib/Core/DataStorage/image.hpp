@@ -146,7 +146,7 @@ public:
 	 * Removes used chunks from the given list. So afterwards the list consists of the rejected chunks.
 	 */
 	template<typename T> Image( std::list<T> &chunks, dimensions min_dim = rowDim ) :
-		_internal::NDimensional<4>(), util::PropertyMap(),minIndexingDim( min_dim ), 
+		_internal::NDimensional<4>(), util::PropertyMap(), minIndexingDim( min_dim ),
 		set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ),
 		clean( false ) {
 		addNeededFromString( neededProperties );
@@ -410,18 +410,19 @@ public:
 	 * depend on correct image orientations won't work as expected. Use this method
 	 * with caution!
 	 * \param transform_matrix the transformation matrix can be any type of rigid and affine transformation
-	 * \param transformCenterIsImageCenter if this parameter is true, the center of the image will be translated to the 
-	 *	isocenter of the scanner prior applying the transform_matrix. Eventually, it will be translated to its 
+	 * \param transformCenterIsImageCenter if this parameter is true, the center of the image will be translated to the
+	 *  isocenter of the scanner prior applying the transform_matrix. Eventually, it will be translated to its
 	 *  initial position. For example this is the way SPM flips its images when converting from DICOM to nifti.
 	 * \return returns if the transformation was successfuly
 	 */
 	bool transformCoords( boost::numeric::ublas::matrix<float> transform_matrix, bool transformCenterIsImageCenter = false ) {
-		
+
 		BOOST_FOREACH( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef, lookup ) {
-			if(!chRef->transformCoords( transform_matrix, transformCenterIsImageCenter )) {
+			if( !chRef->transformCoords( transform_matrix, transformCenterIsImageCenter ) ) {
 				return false;
 			}
 		}
+
 		if( !isis::data::_internal::transformCoords( *this, getSizeAsVector(), transform_matrix, transformCenterIsImageCenter ) ) {
 			LOG( Runtime, error ) << "Error during transforming the coords of the image.";
 			return false;
@@ -436,18 +437,18 @@ public:
 	}
 
 	/** Maps the given scanner Axes to the dimension with the minimal angle.
-	 *  This is done by latching the orientation of the image by setting the biggest absolute 
+	 *  This is done by latching the orientation of the image by setting the biggest absolute
 	 *  value of each orientation vector to 1 and the others to 0.
 	 *  Example:
-	 *  		(-0.8)		(1)
-	 *			( 0.2)  ->	(0)   (this is done for the rowVec, columnVec and sliceVec)
-	 *			(-0.1)		(0)
-	 *	
-	 *	This latched orientation is used to map from the scanner axes to the dimension.
-	 *	\param scannerAxes the axes of the scanner you want to map to dimension of the image.
-	 *	\return the mapped image dimension
+	 *          (-0.8)      (1)
+	 *          ( 0.2)  ->  (0)   (this is done for the rowVec, columnVec and sliceVec)
+	 *          (-0.1)      (0)
+	 *
+	 *  This latched orientation is used to map from the scanner axes to the dimension.
+	 *  \param scannerAxes the axes of the scanner you want to map to dimension of the image.
+	 *  \return the mapped image dimension
 	 */
-	
+
 	dimensions mapScannerAxesToImageDimension( scannerAxis scannerAxes );
 
 	/** Computes the physical coordinates (in scanner space) of the given voxel index.
@@ -515,7 +516,7 @@ public:
 
 	/**
 	* Get a sorted list of the chunks of the image.
-	* Note: this chunks are cheap copies, so changing them will change the image.
+	* Note: These chunks are cheap copies, so changing their voxels will change the voxels of the image.
 	* Make MemChunks of them to get deep copies.
 	* \param copy_metadata set to false to prevent the metadata of the image to be copied into the results. This will improve performance, but the chunks may lack important properties.
 	*/

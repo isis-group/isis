@@ -7,16 +7,16 @@ namespace viewer
 
 ViewerCoreBase::ViewerCoreBase( )
 	: m_CurrentTimestep( 0 ),
-	m_AllImagesToIdentity( false )
-	
+	  m_AllImagesToIdentity( false )
+
 {
 }
 
-bool ViewerCoreBase::setAllImagesToIdentity(bool identity)
+bool ViewerCoreBase::setAllImagesToIdentity( bool identity )
 {
 #warning implement setAllImagesToIdentity
 	BOOST_FOREACH( DataContainer::reference images, m_DataContainer ) {
-		
+
 	}
 }
 
@@ -32,7 +32,7 @@ void ViewerCoreBase::addImageList( const std::list< data::Image > imageList, con
 		LOG( Runtime, warning ) << "The image list passed to the core is empty!";
 	}
 
-	
+
 
 }
 
@@ -43,6 +43,7 @@ void ViewerCoreBase::setImageList( std::list< data::Image > imgList, const Image
 	if( !imgList.empty() ) {
 		m_DataContainer.clear();
 	}
+
 	ViewerCoreBase::addImageList( imgList, imageType );
 }
 

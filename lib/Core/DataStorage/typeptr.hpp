@@ -38,11 +38,11 @@ template<typename T, bool isNumber> struct getMinMaxImpl {
 		return std::pair<T, T>();
 	}
 };
-template<typename T> struct getMinMaxImpl<T, true> {
+template<typename T> struct getMinMaxImpl<T, true> { // generic minmax for numbers (this _must_ not be run on empty ValuePtr)
 	std::pair<T, T> operator()( const ValuePtr<T> &ref ) const {
-		std::pair<T, T> result;
+		std::pair<T, T> result( ref[0], ref[0] );
 
-		for ( size_t i = 0; i < ref.getLength(); i++ ) {
+		for ( size_t i = ref.getLength() - 1; i; --i ) {
 			if ( result.second < ref[i] )result.second = ref[i];
 
 			if ( result.first > ref[i] )result.first = ref[i];
@@ -273,13 +273,14 @@ public:
 
 	std::pair<util::ValueReference, util::ValueReference> getMinMax()const {
 		if ( getLength() == 0 ) {
-			LOG( Runtime, warning ) << "Skipping computation of min/max on an empty ValuePtr";
-			std::pair<util::ValueReference, util::ValueReference>();
+			LOG( Debug, error ) << "Skipping computation of min/max on an empty ValuePtr";
+			return std::pair<util::ValueReference, util::ValueReference>();
+		} else {
+
+			const std::pair<util::Value<TYPE>, util::Value<TYPE> > result = _internal::getMinMaxImpl<TYPE, boost::is_arithmetic<TYPE>::value>()( *this );
+
+			return std::make_pair( util::ValueReference( result.first ), util::ValueReference( result.second ) );
 		}
-
-		const std::pair<util::Value<TYPE>, util::Value<TYPE> > result = _internal::getMinMaxImpl<TYPE, boost::is_arithmetic<TYPE>::value>()( *this );
-
-		return std::make_pair( util::ValueReference( result.first ), util::ValueReference( result.second ) );
 	}
 
 	std::vector<Reference> splice( size_t size )const {

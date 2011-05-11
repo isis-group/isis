@@ -17,25 +17,27 @@ enum autoscaleOption;
 namespace _internal
 {
 
-template<typename T> T round_impl(double x,boost::mpl::bool_<true>)
-{ 
-	const double ret(x < 0 ? x - 0.5 : x + 0.5);
-	
+template<typename T> T round_impl( double x, boost::mpl::bool_<true> )
+{
+	const double ret( x < 0 ? x - 0.5 : x + 0.5 );
+
 	//shouldn't happen because of scaling, but you never know
-	LOG_IF(ret > std::numeric_limits<T>::max() + (x < 0 ? - 0.5 : 0.5),Debug,error) << ret << " is to big to be rounded into " << ValuePtr<T>::staticName();
-	LOG_IF(ret < std::numeric_limits<T>::min() + (x < 0 ? - 0.5 : 0.5),Debug,error) << ret << " is to small to be rounded into " << ValuePtr<T>::staticName();
-	
-	return static_cast<T>(ret);
+	LOG_IF( ret > std::numeric_limits<T>::max() + ( x < 0 ? - 0.5 : 0.5 ), Debug, error ) << ret << " is to big to be rounded into " << ValuePtr<T>::staticName();
+	LOG_IF( ret < std::numeric_limits<T>::min() + ( x < 0 ? - 0.5 : 0.5 ), Debug, error ) << ret << " is to small to be rounded into " << ValuePtr<T>::staticName();
+
+	return static_cast<T>( ret );
 }
-template<typename T> T round_impl(double x,boost::mpl::bool_<false>){
-	return static_cast<T>(x); //@todo find a proper way to round from double to floating point (with range check !!)
+template<typename T> T round_impl( double x, boost::mpl::bool_<false> )
+{
+	return static_cast<T>( x ); //@todo find a proper way to round from double to floating point (with range check !!)
 }
-template<typename T> T round(double x){
-	BOOST_MPL_ASSERT((boost::is_arithmetic<T>));
-	return round_impl<T>(x,boost::mpl::bool_<std::numeric_limits<T>::is_integer>()); //we do use overloading intead of (forbidden) partial specialization
+template<typename T> T round( double x )
+{
+	BOOST_MPL_ASSERT( ( boost::is_arithmetic<T> ) );
+	return round_impl<T>( x, boost::mpl::bool_<std::numeric_limits<T>::is_integer>() ); //we do use overloading intead of (forbidden) partial specialization
 }
 
-size_t getConvertSize(const ValuePtrBase &src,const ValuePtrBase &dst);
+size_t getConvertSize( const ValuePtrBase &src, const ValuePtrBase &dst );
 
 template<typename SRC, typename DST> void numeric_convert_impl( const SRC *src, DST *dst, size_t count, double scale, double offset )
 {
@@ -51,6 +53,7 @@ template<typename SRC, typename DST> void numeric_convert_impl( const SRC *src, 
 template<typename SRC, typename DST> void numeric_convert_impl( const SRC *src, DST *dst, size_t count )
 {
 	LOG( Runtime, info ) << "using generic convert " << ValuePtr<SRC>::staticName() << " => " << ValuePtr<DST>::staticName() << " without scaling";
+
 	for ( size_t i = 0; i < count; i++ )
 		dst[i] = round<DST>( src[i] );
 }
@@ -297,7 +300,7 @@ getNumericScaling( const util::_internal::ValueBase &min, const util::_internal:
  */
 template<typename SRC, typename DST> void numeric_convert( const ValuePtr<SRC> &src, ValuePtr<DST> &dst, const double scale, const double offset )
 {
-	const size_t size = _internal::getConvertSize(src,dst);
+	const size_t size = _internal::getConvertSize( src, dst );
 
 	if ( ( scale != 1. || offset ) )
 		_internal::numeric_convert_impl( &src[0], &dst[0], size, scale, offset );
@@ -306,7 +309,7 @@ template<typename SRC, typename DST> void numeric_convert( const ValuePtr<SRC> &
 }
 template<typename T> void numeric_copy( const ValuePtr<T> &src, ValuePtr<T> &dst, const double scale, const double offset )
 {
-	const size_t size = _internal::getConvertSize(src,dst);
+	const size_t size = _internal::getConvertSize( src, dst );
 
 	if ( ( scale != 1. || offset ) )
 		_internal::numeric_copy_impl<T>( &src[0], &dst[0], size, scale, offset );
