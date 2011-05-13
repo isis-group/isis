@@ -127,8 +127,7 @@ void Application::printHelp( bool withHidden )const
 			pref = ". Default: \"" + iP->second.toString() + "\"";
 		}
 
-		if( not iP->second->is<bool>() ) //there switches do not have a parameter
-			std::cerr << "\t-" << iP->first << " <" << iP->second->getTypeName() << ">" << std::endl;
+		std::cerr << "\t-" << iP->first << " <" << iP->second->getTypeName() << ">" << std::endl;
 
 		if ( iP->second->is<Selection>() ) {
 			const Selection &ref = iP->second->castTo<Selection>();
