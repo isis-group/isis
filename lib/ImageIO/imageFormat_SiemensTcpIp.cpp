@@ -119,6 +119,8 @@ namespace isis
 							
 							size_t acq_nr = atoi(getStringFromHeader("acquisition_number", header).c_str());
 							std::string seq_descr = getStringFromHeader("sequence_description", header);
+							std::string subject_name = getStringFromHeader("patient_name", header);
+							size_t subject_gender = atoi(getStringFromHeader("patient_sex", header).c_str());
 							size_t seq_number = atoi(getStringFromHeader("meas_uid", header).c_str());
 							size_t acq_time = atoi(getStringFromHeader("acquisition_time", header).c_str());
 							uint16_t rep_time = atol(getStringFromHeader("repetition_time", header).c_str());
@@ -193,6 +195,18 @@ namespace isis
                                 ch.setPropertyAs("indexOrigin", slice_pos_vec);
 								// ch.setPropertyAs<uint32_t>("acquisitionNumber", (acq_nr*iim)+_slice);
                                 ch.setPropertyAs<uint32_t>("acquisitionNumber", (acq_nr));
+								ch.setPropertyAs<std::string>("subjectName", subject_name);
+								isis::util::Selection isisGender( "male,female,other" );
+								if ( 1 == subject_gender){
+									isisGender.set("male");
+								}
+								else if (2 == subject_gender){
+									isisGender.set("female");
+								}
+								else {
+									isisGender.set("other");
+								}
+								ch.setPropertyAs<isis::util::Selection>("subjectGender", isisGender);
 								
                                 //ch.setPropertyAs<>("acquisitionTime", acquisition_time);
                                 if (true == moco){
