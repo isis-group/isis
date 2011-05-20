@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE ( chunk_property_test )
 	//an basic Chunk must be invalid
 	BOOST_CHECK( !ch.isValid() );
 	BOOST_CHECK( !ch.hasProperty( "indexOrigin" ) );
-	//with an position and an orientation its valid
+	//with a position and an orientation its valid
 	util::fvector4 pos( 1, 1, 1 );
 	ch.setPropertyAs( "indexOrigin", pos );
 	BOOST_CHECK( !ch.isValid() );

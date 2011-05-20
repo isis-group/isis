@@ -272,21 +272,7 @@ public:
 		boost::numeric::ublas::matrix<float> matrix = boost::numeric::ublas::identity_matrix<float>( 3, 3 );
 		matrix( 0, 0 ) = -1;
 		matrix( 1, 1 ) = -1;
-		image.transformCoords( matrix );
-		//if one uses the fsl dialect we should adopt the qform to the sform. Otherwise FSL will wail about things
-		//that a nifti conform....
-		if(dialect == "fsl") {
-			if( image.getPropertyAs<util::fvector4>("nifti/qrowVec") != image.getPropertyAs<util::fvector4>("rowVec") 
-				|| image.getPropertyAs<util::fvector4>("nifti/qcolumnVec") != image.getPropertyAs<util::fvector4>("columnVec") 
-				|| image.getPropertyAs<util::fvector4>("nifti/qsliceVec") != image.getPropertyAs<util::fvector4>("sliceVec") ) {
-				LOG( Runtime, warning ) << "The qform and sform of the image do not coincide. The fsl-dialect will adopt the qform to the sform to prevent an error message from FSL!";
-				image.setPropertyAs<util::fvector4>( "nifti/qrowVec", image.getPropertyAs<util::fvector4>("rowVec"));
-				image.setPropertyAs<util::fvector4>( "nifti/qcolumnVec", image.getPropertyAs<util::fvector4>("columnVec"));
-				image.setPropertyAs<util::fvector4>( "nifti/qsliceVec", image.getPropertyAs<util::fvector4>("sliceVec"));
-			}
-			
-		}
-		
+		image.transformCoords( matrix );		
 		//set the props from the image to the nifti file
 		copyHeaderToNifti( image, ni );
 		// set filename for resulting image(s) due to Analyze vs. Nifti
