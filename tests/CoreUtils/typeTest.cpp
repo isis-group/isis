@@ -160,23 +160,23 @@ BOOST_AUTO_TEST_CASE( type_conversion_test )
 
 BOOST_AUTO_TEST_CASE( complex_conversion_test )
 {
-	Value<std::complex<float> > tFloat1( std::complex<float>(3.5415,3.5415) );
-	Value<std::complex<double> > tDouble1( std::complex<double>(3.5415,3.5415) );
+	Value<std::complex<float> > tFloat1( std::complex<float>( 3.5415, 3.5415 ) );
+	Value<std::complex<double> > tDouble1( std::complex<double>( 3.5415, 3.5415 ) );
 	ValueBase &fRef = tFloat1;
 	ValueBase &dRef = tDouble1;
 
 	//because of rounding std::complex<double>(3.5415,3.5415) wont be equal to std::complex<float>(3.5415,3.5415)
-	BOOST_CHECK_EQUAL( fRef.as<std::complex<double> >(), std::complex<double>((float)3.5415,(float)3.5415) );
+	BOOST_CHECK_EQUAL( fRef.as<std::complex<double> >(), std::complex<double>( ( float )3.5415, ( float )3.5415 ) );
 
-	BOOST_CHECK_EQUAL( dRef.as<std::complex<float> >(), std::complex<float>(3.5415,3.5415) );
+	BOOST_CHECK_EQUAL( dRef.as<std::complex<float> >(), std::complex<float>( 3.5415, 3.5415 ) );
 
-	BOOST_CHECK_EQUAL( dRef.as<std::complex<double> >(), std::complex<double>(3.5415,3.5415) );
+	BOOST_CHECK_EQUAL( dRef.as<std::complex<double> >(), std::complex<double>( 3.5415, 3.5415 ) );
 
-	BOOST_CHECK_EQUAL( fRef.as<std::string>(),"(3.5415,3.5415)");
-	BOOST_CHECK_EQUAL( Value<std::string>("(3.5415,3.5415)").as<std::complex<float> >(),std::complex<float>(3.5415,3.5415));
+	BOOST_CHECK_EQUAL( fRef.as<std::string>(), "(3.5415,3.5415)" );
+	BOOST_CHECK_EQUAL( Value<std::string>( "(3.5415,3.5415)" ).as<std::complex<float> >(), std::complex<float>( 3.5415, 3.5415 ) );
 
-	BOOST_CHECK_EQUAL( Value<float>(3.5415).as<std::complex<float> >(),std::complex<float>(3.5415,0));
-	BOOST_CHECK_EQUAL( Value<int>(-5).as<std::complex<float> >(),std::complex<float>(-5,0));
+	BOOST_CHECK_EQUAL( Value<float>( 3.5415 ).as<std::complex<float> >(), std::complex<float>( 3.5415, 0 ) );
+	BOOST_CHECK_EQUAL( Value<int>( -5 ).as<std::complex<float> >(), std::complex<float>( -5, 0 ) );
 }
 
 }

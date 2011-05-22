@@ -110,7 +110,7 @@ private:
 			}
 
 			void operator()( void *p ) {
-				LOG( Debug, info ) << "Freeing VImage pointer";
+				LOG( Debug, info ) << "Freeing VImage pointer " << p;
 				VDestroyImage( m_image );
 			}
 		};

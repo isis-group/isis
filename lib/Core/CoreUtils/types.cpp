@@ -67,8 +67,8 @@ DEF_TYPE( ilist, list<int32_t> );
 DEF_TYPE( dlist, list<double> );
 DEF_TYPE( slist, list<string> );
 
-DEF_TYPE( std::complex<float>, complex<float>);
-DEF_TYPE( std::complex<double>, complex<double>);
+DEF_TYPE( std::complex<float>, complex<float> );
+DEF_TYPE( std::complex<double>, complex<double> );
 
 DEF_TYPE( std::string, string );
 DEF_TYPE( Selection, selection );

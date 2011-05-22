@@ -38,11 +38,11 @@ template<typename T, bool isNumber> struct getMinMaxImpl {
 		return std::pair<T, T>();
 	}
 };
-template<typename T> struct getMinMaxImpl<T, true> {
+template<typename T> struct getMinMaxImpl<T, true> { // generic minmax for numbers (this _must_ not be run on empty ValuePtr)
 	std::pair<T, T> operator()( const ValuePtr<T> &ref ) const {
-		std::pair<T, T> result;
+		std::pair<T, T> result( ref[0], ref[0] );
 
-		for ( size_t i = 0; i < ref.getLength(); i++ ) {
+		for ( size_t i = ref.getLength() - 1; i; --i ) {
 			if ( result.second < ref[i] )result.second = ref[i];
 
 			if ( result.first > ref[i] )result.first = ref[i];
@@ -223,7 +223,7 @@ public:
 			for ( size_t i = 0; i < m_len - 1; i++ )
 				ret += util::Value<TYPE>( ptr[i] ).toString( false ) + "|";
 
-			ret += util::Value<TYPE>( ptr[m_len-1] ).toString( labeled );
+			ret += util::Value<TYPE>( ptr[m_len - 1] ).toString( labeled );
 		}
 
 		return boost::lexical_cast<std::string>( m_len ) + "#" + ret;
@@ -269,15 +269,18 @@ public:
 		return sizeof( TYPE );
 	}
 
+
+
 	std::pair<util::ValueReference, util::ValueReference> getMinMax()const {
 		if ( getLength() == 0 ) {
-			LOG( Runtime, warning ) << "Skipping computation of min/max on an empty ValuePtr";
-			std::pair<util::ValueReference, util::ValueReference>();
+			LOG( Debug, error ) << "Skipping computation of min/max on an empty ValuePtr";
+			return std::pair<util::ValueReference, util::ValueReference>();
+		} else {
+
+			const std::pair<util::Value<TYPE>, util::Value<TYPE> > result = _internal::getMinMaxImpl<TYPE, boost::is_arithmetic<TYPE>::value>()( *this );
+
+			return std::make_pair( util::ValueReference( result.first ), util::ValueReference( result.second ) );
 		}
-
-		const std::pair<util::Value<TYPE>, util::Value<TYPE> > result = _internal::getMinMaxImpl<TYPE, boost::is_arithmetic<TYPE>::value>()( *this );
-
-		return std::make_pair( util::ValueReference( result.first ), util::ValueReference( result.second ) );
 	}
 
 	std::vector<Reference> splice( size_t size )const {
@@ -305,7 +308,7 @@ public:
 		return ret;
 	}
 	//
-	scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const{
+	scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const {
 		std::pair<util::ValueReference, util::ValueReference> minmax = getMinMax();
 		assert( ! ( minmax.first.isEmpty() || minmax.second.isEmpty() ) );
 		return ValuePtrBase::getScalingTo( typeID, minmax, scaleopt );

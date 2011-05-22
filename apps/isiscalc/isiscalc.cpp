@@ -23,6 +23,7 @@ public:
 		voxBuff = vox; //using parser.DefineVar every time would slow down the evaluation
 		posBuff = pos;
 		vox = parser.Eval();
+		return true;
 	}
 
 };

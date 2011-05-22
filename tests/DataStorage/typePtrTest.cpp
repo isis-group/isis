@@ -150,8 +150,6 @@ BOOST_AUTO_TEST_CASE( ValuePtr_splice_test )
 			//the shall be outer.size() references from the splices, plus one for the origin
 			BOOST_CHECK_EQUAL( dummy.use_count(), outer.size() + 1 );
 		}
-		boost::shared_ptr<int32_t> &dummy = outer.front()->castToValuePtr<int32_t>();
-
 		BOOST_CHECK_EQUAL( outer.front()->getLength(), 2 );// the first slices shall be of the size 2
 		BOOST_CHECK_EQUAL( outer.back()->getLength(), 1 );// the last slice shall be of the size 1 (5%2)
 		//we cannot ask for the use_count of the original because its hidden in DelProxy (outer[0].use_count will get the use_count of the splice)
@@ -223,13 +221,13 @@ BOOST_AUTO_TEST_CASE( ValuePtr_conversion_test )
 BOOST_AUTO_TEST_CASE( ValuePtr_complex_conversion_test )
 {
 	const std::complex<float> init[] = { -2, -1.8, -1.5, -1.3, -0.6, -0.2, 2, 1.8, 1.5, 1.3, 0.6, 0.2};
-	data::ValuePtr<std::complex<float> > cfArray=data::ValuePtr<std::complex<float> >::allocate(12);
-	cfArray.copyFromMem(init,12);
-	data::ValuePtr<std::complex<double> > cdArray=cfArray.copyToNew<std::complex<double> >();
+	data::ValuePtr<std::complex<float> > cfArray = data::ValuePtr<std::complex<float> >::allocate( 12 );
+	cfArray.copyFromMem( init, 12 );
+	data::ValuePtr<std::complex<double> > cdArray = cfArray.copyToNew<std::complex<double> >();
 
-	for(size_t i=0;i<12;i++){
-		BOOST_CHECK_EQUAL(cfArray[i],init[i]);
-		BOOST_CHECK_EQUAL(cdArray[i],std::complex<double>(init[i]));
+	for( size_t i = 0; i < 12; i++ ) {
+		BOOST_CHECK_EQUAL( cfArray[i], init[i] );
+		BOOST_CHECK_EQUAL( cdArray[i], std::complex<double>( init[i] ) );
 	}
 }
 

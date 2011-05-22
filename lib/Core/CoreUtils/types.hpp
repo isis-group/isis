@@ -18,6 +18,7 @@
 #include "color.hpp"
 #include "selection.hpp"
 
+#include <complex>
 
 namespace isis
 {
@@ -41,7 +42,7 @@ bool //1
 , fvector4, dvector4, ivector4 // 16
 , ilist, dlist, slist // 19
 , std::string, isis::util::Selection //21
-, std::complex<float>,std::complex<double> //23
+, std::complex<float>, std::complex<double> //23
 , boost::posix_time::ptime, boost::gregorian::date //25
 > types;
 
@@ -52,13 +53,13 @@ bool //1
  * This is a compile-time-constant, so it can be used as a template parameter and has no impact at the runtime.
  */
 template<class T> struct TypeID {
-	typedef boost::mpl::plus<
-		boost::mpl::int_<1>,
-		typename boost::mpl::distance<
-			boost::mpl::begin<types>::type,
-			typename boost::mpl::find<types, T>::type
-		>::type
-	> type;
+	typedef boost::mpl::plus <
+	boost::mpl::int_<1>,
+		  typename boost::mpl::distance <
+		  boost::mpl::begin<types>::type,
+		  typename boost::mpl::find<types, T>::type
+		  >::type
+		  > type;
 	static const unsigned short value = type::value;
 };
 }
