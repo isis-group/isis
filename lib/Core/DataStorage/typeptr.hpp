@@ -32,23 +32,39 @@ namespace data
 
 namespace _internal
 {
-template<typename T, bool isNumber> struct getMinMaxImpl {
+template<typename T, bool isNumber> struct getMinMaxImpl { // fallback for unsupportet types
 	std::pair<T, T> operator()( const ValuePtr<T> &/*ref*/ ) const {
-		LOG( Debug, error ) << "min/max comparison of " << util::Value<T>::staticName() << " is not supportet";
+		LOG( Debug, error ) << "min/max computation of " << util::Value<T>::staticName() << " is not supportet";
 		return std::pair<T, T>();
 	}
 };
+template<typename T> std::pair<T, T> calcMinMax(const T *data,size_t len){
+    std::pair<T, T> result( data[0], data[0] );
+    LOG( Runtime, verbose_info ) << "using generic min/max computation for " << util::Value<T>::staticName();
+    while ( --len ) {
+        if ( result.second < data[len] )result.second = data[len];
+        if ( result.first > data[len] )result.first = data[len];
+    }
+    return result;
+}
+
+#ifdef __SSE2__
+////////////////////////////////////////////////    
+// specialize calcMinMax for (u)int(8,16,32)_t /
+////////////////////////////////////////////////
+
+template<> std::pair< uint8_t,  uint8_t> calcMinMax(const  uint8_t *data,size_t len);
+template<> std::pair<uint16_t, uint16_t> calcMinMax(const uint16_t *data,size_t len);
+template<> std::pair<uint32_t, uint32_t> calcMinMax(const uint32_t *data,size_t len);
+
+template<> std::pair< int8_t,  int8_t> calcMinMax(const  int8_t *data,size_t len);
+template<> std::pair<int16_t, int16_t> calcMinMax(const int16_t *data,size_t len);
+template<> std::pair<int32_t, int32_t> calcMinMax(const int32_t *data,size_t len);
+#endif //__SSE2__
+
 template<typename T> struct getMinMaxImpl<T, true> { // generic minmax for numbers (this _must_ not be run on empty ValuePtr)
 	std::pair<T, T> operator()( const ValuePtr<T> &ref ) const {
-		std::pair<T, T> result( ref[0], ref[0] );
-
-		for ( size_t i = ref.getLength() - 1; i; --i ) {
-			if ( result.second < ref[i] )result.second = ref[i];
-
-			if ( result.first > ref[i] )result.first = ref[i];
-		}
-
-		return result;
+		return calcMinMax(&ref[0],ref.getLength());
 	}
 };
 

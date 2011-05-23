@@ -20,11 +20,6 @@ namespace _internal
 template<typename T> T round_impl( double x, boost::mpl::bool_<true> )
 {
 	const double ret( x < 0 ? x - 0.5 : x + 0.5 );
-
-	//shouldn't happen because of scaling, but you never know
-	LOG_IF( ret > std::numeric_limits<T>::max() + ( x < 0 ? - 0.5 : 0.5 ), Debug, error ) << ret << " is to big to be rounded into " << ValuePtr<T>::staticName();
-	LOG_IF( ret < std::numeric_limits<T>::min() + ( x < 0 ? - 0.5 : 0.5 ), Debug, error ) << ret << " is to small to be rounded into " << ValuePtr<T>::staticName();
-
 	return static_cast<T>( ret );
 }
 template<typename T> T round_impl( double x, boost::mpl::bool_<false> )
@@ -229,8 +224,8 @@ getNumericScaling( const util::_internal::ValueBase &min, const util::_internal:
 	}
 
 	if ( doScale ) {
-		const DST domain_min = std::numeric_limits<DST>::min();//negative value domain of this dst
-		const DST domain_max = std::numeric_limits<DST>::max();//positive value domain of this dst
+		const DST domain_min = std::numeric_limits<DST>::min();//negative value domain of this dst [min .. -1]
+		const DST domain_max = std::numeric_limits<DST>::max();//positive value domain of this dst [0 .. max]
 		double minval, maxval;
 		minval = min.as<double>();
 		maxval = max.as<double>();
