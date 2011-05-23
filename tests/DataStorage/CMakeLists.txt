@@ -18,6 +18,7 @@ add_executable( imageTest imageTest.cpp )
 add_executable( imageListTest imageListTest.cpp )
 add_executable( imageStresstest imageStresstest.cpp )
 add_executable( typePtrTest typePtrTest.cpp )
+add_executable( typePtrStresstest typePtrStresstest.cpp )
 
 target_link_libraries( typePtrTest ${Boost_LIBRARIES} isis_core ${ISIS_LIB_DEPENDS} )
 target_link_libraries( chunkTest ${Boost_LIBRARIES} isis_core ${ISIS_LIB_DEPENDS} )
@@ -25,4 +26,5 @@ target_link_libraries( sortedchunklistTest ${Boost_LIBRARIES} isis_core ${ISIS_L
 target_link_libraries( imageTest ${Boost_LIBRARIES} isis_core ${ISIS_LIB_DEPENDS} )
 target_link_libraries( imageListTest ${Boost_LIBRARIES} isis_core ${ISIS_LIB_DEPENDS} )
 target_link_libraries( imageStresstest ${Boost_LIBRARIES} isis_core ${ISIS_LIB_DEPENDS} )
+target_link_libraries( typePtrStresstest ${Boost_LIBRARIES} isis_core ${ISIS_LIB_DEPENDS} )
 
