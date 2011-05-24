@@ -110,7 +110,8 @@ bool ParameterMap::parse( int argc, char **argv )
 					matchingStringStream << stringRef << " ";
 				}
 				LOG( Runtime, error ) << "The paramter \"" << pName 
-					<< "\" is ambiguous. The parameters \"" << matchingStringStream.str() 
+					<< "\" is ambiguous. The parameters \"" 
+					<< matchingStringStream.str().erase( matchingStringStream.str().size() - 1, 1 ) 
 					<< "\" are possible. Ignoring this parameter!";
 			} else if ( !matchingStrings.size() ) {
 				LOG( Runtime, warning ) << "Ignoring unknown parameter " << MSubject( std::string( "-" ) + pName + " " + listToString( argv + start, argv + i, " ", "", "" ) );
