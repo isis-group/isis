@@ -109,7 +109,7 @@ bool ParameterMap::parse( int argc, char **argv )
 				BOOST_FOREACH( std::list<std::string>::const_reference stringRef, matchingStrings ) {
 					matchingStringStream << stringRef << " ";
 				}
-				LOG( Runtime, error ) << "The parameter \"" << pName 
+				LOG( Runtime, warning ) << "The parameter \"" << pName 
 					<< "\" is ambiguous. The parameters \"" 
 					<< matchingStringStream.str().erase( matchingStringStream.str().size() - 1, 1 ) 
 					<< "\" are possible. Ignoring this parameter!";
