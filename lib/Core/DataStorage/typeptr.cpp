@@ -29,8 +29,8 @@ template<typename T> struct _TypeVector;
 #define DEF_VECTOR_SI(TYPE,KEY)                              \
 template<> struct _TypeVector<TYPE>{                         \
 	typedef TYPE vector __attribute__ ((vector_size (16)));  \
-	static vector gt(vector a,vector b){return (vector)_mm_cmpgt_epi ## KEY (a, b);}                                                        \
-	static vector lt(vector a,vector b){return (vector)_mm_cmplt_epi ## KEY (a, b);}                                                        \
+	static vector gt(vector a,vector b){return (vector)_mm_cmpgt_epi ## KEY ((__m128i)a, (__m128i)b);}                                                        \
+	static vector lt(vector a,vector b){return (vector)_mm_cmplt_epi ## KEY ((__m128i)a, (__m128i)b);}                                                        \
 };
 DEF_VECTOR_SI( int8_t, 8);
 DEF_VECTOR_SI(int16_t,16);
@@ -50,8 +50,8 @@ template<typename T> __m128i _getAddV(){
 template<> struct _TypeVector<TYPE>{                            \
 	typedef TYPE vector __attribute__ ((vector_size (16)));     \
 	static __m128i addv;                                        \
-	static inline vector gt(vector a,vector b){return (vector)_mm_cmpgt_epi ## KEY (_mm_add_epi ## KEY(a,addv), _mm_add_epi ## KEY(b,addv));} \
-	static inline vector lt(vector a,vector b){return (vector)_mm_cmplt_epi ## KEY (_mm_add_epi ## KEY(a,addv), _mm_add_epi ## KEY(b,addv));} \
+	static inline vector gt(vector a,vector b){return (vector)_mm_cmpgt_epi ## KEY (_mm_add_epi ## KEY((__m128i)a,addv), _mm_add_epi ## KEY((__m128i)b,addv));} \
+	static inline vector lt(vector a,vector b){return (vector)_mm_cmplt_epi ## KEY (_mm_add_epi ## KEY((__m128i)a,addv), _mm_add_epi ## KEY((__m128i)b,addv));} \
 };\
 __m128i _TypeVector<TYPE>::addv=_getAddV<TYPE>();
     
