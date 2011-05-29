@@ -32,7 +32,7 @@ set(ISIS_VERSION
 ############################################################
 # set install infix for plugin installation path
 ############################################################
-set(ISIS_PLUGIN_INFIX share/isis/plugins)
+set(ISIS_PLUGIN_INFIX lib/isis/plugins)
 
 ############################################################
 # set project specific module path
@@ -166,3 +166,7 @@ endif(ISIS_BUILD_TESTS)
 if(ISIS_BUILD_PYTHON_EXT)
   add_subdirectory(python)
 endif(ISIS_BUILD_PYTHON_EXT)
+
+# uninstall target
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake//cmake_uninstall.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake" IMMEDIATE @ONLY)
+add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
