@@ -55,8 +55,8 @@ BOOST_AUTO_TEST_CASE( ValuePtr_init_test )
 {
 	BOOST_CHECK( ! Deleter::deleted );
 	{
-		data::ValuePtr<int32_t> outer;
-		// default constructor must create an empty pointer
+		data::ValuePtr<int32_t> outer(0);
+		// must create an empty pointer
 		BOOST_CHECK_EQUAL( outer.getLength(), 0 );
 		BOOST_CHECK( ! ( boost::shared_ptr<int32_t> )outer );
 		BOOST_CHECK_EQUAL( ( ( boost::shared_ptr<int32_t> )outer ).use_count(), 0 );
