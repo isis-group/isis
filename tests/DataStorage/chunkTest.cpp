@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE ( chunk_foreach_voxel_test )
 	data::MemChunk<uint8_t> ch( 4, 3, 2, 1 );
 	memset( &ch.asValuePtr<uint8_t>()[0], 1, ch.getVolume() );
 
-	class : public data::Chunk::VoxelOp<uint8_t>
+	class : public data::VoxelOp<uint8_t>
 	{
 	public:
 		bool operator()( uint8_t &vox, const util::FixedVector< size_t, 4 >& /*pos*/ ) {
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE ( chunk_foreach_voxel_test )
 		}
 	} zero;
 
-	class setIdx: public data::Chunk::VoxelOp<uint8_t>
+	class setIdx: public data::VoxelOp<uint8_t>
 	{
 		data::_internal::NDimensional<4> chunkGeometry;
 	public:
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE ( chunk_foreach_voxel_test )
 			return true;
 		}
 	};
-	class checkIdx: public data::Chunk::VoxelOp<uint8_t>
+	class checkIdx: public data::VoxelOp<uint8_t>
 	{
 		data::_internal::NDimensional<4> chunkGeometry;
 	public:
@@ -275,7 +275,7 @@ BOOST_AUTO_TEST_CASE ( chunk_swap_test_row )
 {
 	for( size_t sizeRange = 10; sizeRange < 21; sizeRange++ ) {
 		data::MemChunk<float> ch1( sizeRange, sizeRange, sizeRange );
-		data::MemChunk<float> ch2( sizeRange, sizeRange, sizeRange ); 
+		data::MemChunk<float> ch2( sizeRange, sizeRange, sizeRange );
 		ch1.setPropertyAs( "indexOrigin", util::fvector4() );
 		ch1.setPropertyAs( "rowVec", util::fvector4( 1, 0, 0 ) );
 		ch1.setPropertyAs( "columnVec", util::fvector4( 0, 1, 0 ) );
@@ -306,7 +306,7 @@ BOOST_AUTO_TEST_CASE ( chunk_swap_test_row )
 			}
 		}
 	}
-	
+
 }
 
 
@@ -314,7 +314,7 @@ BOOST_AUTO_TEST_CASE ( chunk_swap_test_column )
 {
 	for( size_t sizeRange = 10; sizeRange < 21; sizeRange++ ) {
 		data::MemChunk<float> ch1( sizeRange, sizeRange, sizeRange );
-		data::MemChunk<float> ch2( sizeRange, sizeRange, sizeRange ); 
+		data::MemChunk<float> ch2( sizeRange, sizeRange, sizeRange );
 		ch1.setPropertyAs( "indexOrigin", util::fvector4() );
 		ch1.setPropertyAs( "rowVec", util::fvector4( 1, 0, 0 ) );
 		ch1.setPropertyAs( "columnVec", util::fvector4( 0, 1, 0 ) );
@@ -345,14 +345,14 @@ BOOST_AUTO_TEST_CASE ( chunk_swap_test_column )
 			}
 		}
 	}
-	
+
 }
 
 BOOST_AUTO_TEST_CASE ( chunk_swap_test_slice )
 {
 	for( size_t sizeRange = 10; sizeRange < 21; sizeRange++ ) {
 		data::MemChunk<float> ch1( sizeRange, sizeRange, sizeRange );
-		data::MemChunk<float> ch2( sizeRange, sizeRange, sizeRange ); 
+		data::MemChunk<float> ch2( sizeRange, sizeRange, sizeRange );
 		ch1.setPropertyAs( "indexOrigin", util::fvector4() );
 		ch1.setPropertyAs( "rowVec", util::fvector4( 1, 0, 0 ) );
 		ch1.setPropertyAs( "columnVec", util::fvector4( 0, 1, 0 ) );
@@ -383,7 +383,7 @@ BOOST_AUTO_TEST_CASE ( chunk_swap_test_slice )
 			}
 		}
 	}
-	
+
 }
 
 BOOST_AUTO_TEST_CASE ( chunk_copyLine_Test )

@@ -47,6 +47,13 @@ public:
 };
 }
 
+/// Base class for operators used for foreachVoxel
+template <typename TYPE> class VoxelOp: std::unary_function<bool, TYPE>
+{
+public:
+	virtual bool operator()( TYPE &vox, const util::FixedVector<size_t, 4> &pos ) = 0;
+};
+
 /**
  * Main class for four-dimensional random-access data blocks.
  * Like in ValuePtr, the copy of a Chunk will reference the same data. (cheap copy)
@@ -72,11 +79,6 @@ protected:
 	Chunk( const ValuePtrReference &src, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 );
 	Chunk() {}; //do not use this
 public:
-	template <typename TYPE> class VoxelOp: std::unary_function<bool, TYPE>
-	{
-	public:
-		virtual bool operator()( TYPE &vox, const util::FixedVector<size_t, 4> &pos ) = 0;
-	};
 	/**
 	 * Gets a reference to the element at a given index.
 	 * If index is invalid, behaviour is undefined. Most probably it will crash.

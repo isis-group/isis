@@ -30,6 +30,14 @@ namespace isis
 namespace data
 {
 
+/// Base class for operators used for foreachChunk
+class ChunkOp : std::unary_function<Chunk &, bool>
+{
+public:
+	virtual bool operator()( Chunk &, util::FixedVector<size_t, 4> posInImage ) = 0;
+};
+
+/// Main class for generic 4D-images
 class Image:
 	public _internal::NDimensional<4>,
 	public util::PropertyMap
@@ -129,12 +137,6 @@ protected:
 	util::fvector4 m_SliceVecInv;
 	util::fvector4 m_Offset;
 public:
-	class ChunkOp : std::unary_function<Chunk &, bool>
-	{
-	public:
-		virtual bool operator()( Chunk &, util::FixedVector<size_t, 4> posInImage ) = 0;
-	};
-
 	/**
 	 * Copy constructor.
 	 * Copies all elements, only the voxel-data (in the chunks) are referenced.
@@ -552,12 +554,12 @@ public:
 	 * If these conversion failes no operation is done, and false is returned.
 	 * \param op a functor object which inherits ChunkOp
 	 */
-	template <typename TYPE> size_t foreachVoxel( Chunk::VoxelOp<TYPE> &op ) {
+	template <typename TYPE> size_t foreachVoxel( VoxelOp<TYPE> &op ) {
 		class _proxy: public ChunkOp
 		{
-			Chunk::VoxelOp<TYPE> &op;
+			VoxelOp<TYPE> &op;
 		public:
-			_proxy( Chunk::VoxelOp<TYPE> &_op ): op( _op ) {}
+			_proxy( VoxelOp<TYPE> &_op ): op( _op ) {}
 			bool operator()( Chunk &ch, util::FixedVector<size_t, 4 > posInImage ) {
 				return ch.foreachVoxel<TYPE>( op, posInImage ) == 0;
 			}

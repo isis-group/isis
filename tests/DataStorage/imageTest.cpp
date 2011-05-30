@@ -316,9 +316,9 @@ BOOST_AUTO_TEST_CASE ( image_foreach_chunk_test )
 
 	data::Image img( chunks );
 
-	class : public data::Image::ChunkOp
+	class : public data::ChunkOp
 	{
-		class : public data::Chunk::VoxelOp<uint8_t>
+		class : public data::VoxelOp<uint8_t>
 		{
 		public:
 			bool operator()( uint8_t &vox, const util::FixedVector< size_t, 4 >& /*pos*/ ) {
@@ -332,7 +332,7 @@ BOOST_AUTO_TEST_CASE ( image_foreach_chunk_test )
 		}
 	} set42;
 
-	class setIdx: public data::Chunk::VoxelOp<uint8_t>
+	class setIdx: public data::VoxelOp<uint8_t>
 	{
 		data::_internal::NDimensional<4> geometry;
 	public:

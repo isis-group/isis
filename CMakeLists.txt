@@ -50,7 +50,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra"  )
 # compiler flags on 64Bit cpus
 ############################################################
 if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
-  message(STATUS "Compiling on x86_64. Using the '-fpic' option in any case")
+  message(STATUS "Compiling on x86_64. Using the '-fPIC' option in any case")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC" )
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC"  )
 endif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" )

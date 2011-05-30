@@ -11,7 +11,7 @@ using namespace isis;
 
 int main( int argc, char **argv )
 {
-	class : public data::Image::ChunkOp
+	class : public data::ChunkOp
 	{
 	public:
 		data::dimensions dim;

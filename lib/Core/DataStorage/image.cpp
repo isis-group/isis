@@ -816,7 +816,7 @@ size_t Image::spliceDownTo( dimensions dim ) //rowDim = 0, columnDim, sliceDim, 
 	return lookup.size();
 }
 
-size_t Image::foreachChunk( Image::ChunkOp &op, bool copyMetaData )
+size_t Image::foreachChunk( ChunkOp &op, bool copyMetaData )
 {
 	size_t err = 0;
 	checkMakeClean();

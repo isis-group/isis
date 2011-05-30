@@ -55,7 +55,7 @@ namespace image_io
 namespace _internal
 {
 
-class Flip : public data::Image::ChunkOp
+class Flip : public data::ChunkOp
 {
 	data::dimensions dim;
 public:
@@ -272,7 +272,7 @@ public:
 		boost::numeric::ublas::matrix<float> matrix = boost::numeric::ublas::identity_matrix<float>( 3, 3 );
 		matrix( 0, 0 ) = -1;
 		matrix( 1, 1 ) = -1;
-		image.transformCoords( matrix );		
+		image.transformCoords( matrix );
 		//set the props from the image to the nifti file
 		copyHeaderToNifti( image, ni );
 		// set filename for resulting image(s) due to Analyze vs. Nifti

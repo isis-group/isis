@@ -5,7 +5,7 @@
 
 using namespace isis;
 
-class VoxelOp : public data::Chunk::VoxelOp<double>
+class VoxelOp : public data::VoxelOp<double>
 {
 	mu::Parser parser;
 	double voxBuff;
