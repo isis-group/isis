@@ -82,7 +82,7 @@ struct type_lister {
 	bool m_withValues, m_withValuePtrs;
 	type_lister( std::map< unsigned short, std::string > &map, bool withValues, bool withValuePtrs ): m_map( map ), m_withValues( withValues ), m_withValuePtrs( withValuePtrs ) {}
 	template<typename SRC> void operator()( SRC ) {//will be called by the mpl::for_each
-		if( m_withValues )m_map.insert( std::make_pair( Value<SRC>::staticID, Value<SRC>::staticName() ) );
+		if( m_withValues )m_map.insert( std::make_pair( util::Value<SRC>::staticID, util::Value<SRC>::staticName() ) );
 
 		if( m_withValuePtrs )m_map.insert( std::make_pair( data::ValuePtr<SRC>::staticID, data::ValuePtr<SRC>::staticName() ) );
 	}

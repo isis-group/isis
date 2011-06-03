@@ -42,8 +42,9 @@ namespace _internal
 template<typename T, bool isNumber> class type_compare
 {
 public:
-	bool operator()( const Value<T> &/*first*/, const ValueBase &/*second*/ )const {
-		LOG( Debug, error ) << "comparison of " << Value<T>::staticName() << " is not supportet";
+	type_compare() {} // c++0x says we need a user defined constructor here
+	bool operator()( const util::Value<T> &/*first*/, const ValueBase &/*second*/ )const {
+		LOG( Debug, error ) << "comparison of " << util::Value<T>::staticName() << " is not supportet";
 		return false;
 	}
 };
@@ -61,70 +62,83 @@ public:
 template<typename T> class type_compare<T, true>
 {
 protected:
-	virtual bool posOverflow( const Value<T> &/*first*/, const Value<T> &/*second*/ )const {return false;} //default to false
-	virtual bool negOverflow( const Value<T> &/*first*/, const Value<T> &/*second*/ )const {return false;} //default to false
-	virtual bool inRange( const Value<T> &/*first*/, const Value<T> &/*second*/ )const {return false;} //default to false
+	virtual bool posOverflow( const util::Value<T> &/*first*/, const util::Value<T> &/*second*/ )const {return false;} //default to false
+	virtual bool negOverflow( const util::Value<T> &/*first*/, const util::Value<T> &/*second*/ )const {return false;} //default to false
+	virtual bool inRange( const util::Value<T> &/*first*/, const util::Value<T> &/*second*/ )const {return false;} //default to false
 public:
-	bool operator()( const Value<T> &first, const ValueBase &second )const {
+	bool operator()( const util::Value<T> &first, const ValueBase &second )const {
 		// ask second for a converter from itself to Value<T>
-		const ValueBase::Converter conv = second.getConverterTo( Value<T>::staticID );
+		const ValueBase::Converter conv = second.getConverterTo( util::Value<T>::staticID );
 
 		if ( conv ) {
 			//try to convert second into T and handle results
-			Value<T> buff;
+			util::Value<T> buff;
 
 			switch ( conv->convert( second, buff ) ) {
 			case boost::numeric::cPosOverflow:
-				LOG( Debug, info ) << "Positive overflow when converting " << second.toString( true ) << " to " << Value<T>::staticName() << ".";
+				LOG( Debug, info ) << "Positive overflow when converting " << second.toString( true ) << " to " << util::Value<T>::staticName() << ".";
 				return posOverflow( first, buff );
 			case boost::numeric::cNegOverflow:
-				LOG( Debug, info ) << "Negative overflow when converting " << second.toString( true ) << " to " << Value<T>::staticName() << ".";
+				LOG( Debug, info ) << "Negative overflow when converting " << second.toString( true ) << " to " << util::Value<T>::staticName() << ".";
 				return negOverflow( first, buff );
 			case boost::numeric::cInRange:
 				return inRange( first, buff );
 			}
 		} else {
-			LOG( Debug, error ) << "No conversion of " << second.getTypeName() << " to " << Value<T>::staticName() << " available";
+			LOG( Debug, error ) << "No conversion of " << second.getTypeName() << " to " << util::Value<T>::staticName() << " available";
 			return false;
 		}
 
 		return false;
 	}
+	type_compare() {} // c++0x says we need a user defined constructor here
 	virtual ~type_compare() {}
 };
 
-template<typename T, bool isNumber> class type_less : public type_compare<T, isNumber> {};// we are going to specialize this for numeric T below
-template<typename T, bool isNumber> class type_greater : public type_compare<T, isNumber> {};
+template<typename T, bool isNumber> class type_less : public type_compare<T, isNumber> {
+public: // c++0x says we need a user defined constructor here
+    type_less(){}
+};// we are going to specialize this for numeric T below
+template<typename T, bool isNumber> class type_greater : public type_compare<T, isNumber> {
+public: // c++0x says we need a user defined constructor here
+    type_greater(){}
+};
 template<typename T, bool isNumber> class type_eq : public type_compare<T, isNumber>
 {
 protected:
-	bool inRange( const Value<T> &first, const Value<T> &second )const {
-		return ( T )first == ( T )second;
+	bool inRange( const util::Value<T> &first, const util::Value<T> &second )const {
+		return static_cast<const T&>( first ) == static_cast<const T&>( second );
 	}
+public: // c++0x says we need a user defined constructor here
+    type_eq(){}
 };
 
 /// less-than comparison for arithmetic types
 template<typename T> class type_less<T, true> : public type_compare<T, true>
 {
 protected:
-	bool posOverflow( const Value<T> &/*first*/, const Value<T> &/*second*/ )const {
+	bool posOverflow( const util::Value<T> &/*first*/, const util::Value<T> &/*second*/ )const {
 		return true; //getting an positive overflow when trying to convert second into T, obviously means first is less
 	}
-	bool inRange( const Value<T> &first, const Value<T> &second )const {
-		return ( T )first < ( T )second;
+	bool inRange( const util::Value<T> &first, const util::Value<T> &second )const {
+		return static_cast<const T&>( first ) < static_cast<const T&>( second );
 	}
+public: // c++0x says we need a user defined constructor here
+    type_less(){}
 };
 
 /// greater-than comparison for arithmetic types
 template<typename T> class type_greater<T, true> : public type_compare<T, true>
 {
 protected:
-	bool negOverflow( const Value<T> &/*first*/, const Value<T> &/*second*/ )const {
+	bool negOverflow( const util::Value<T> &/*first*/, const util::Value<T> &/*second*/ )const {
 		return true; //getting an negative overflow when trying to convert second into T, obviously means first is greater
 	}
-	bool inRange( const Value<T> &first, const Value<T> &second )const {
-		return ( T )first > ( T )second;
+	bool inRange( const util::Value<T> &first, const util::Value<T> &second )const {
+		return static_cast<const T&>( first ) > static_cast<const T&>( second );
 	}
+public: // c++0x says we need a user defined constructor here
+    type_greater(){}
 };
 
 /// @endcond _hidden
@@ -151,20 +165,29 @@ protected:
 	}
 public:
 	static const unsigned short staticID = _internal::TypeID<TYPE>::value;
-	Value() {
+	Value():m_val() {
 		BOOST_MPL_ASSERT_RELATION( staticID, < , 0xFF );
 		checkType<TYPE>();
 	}
 	/**
-	 * Create a Value from any type of value-type.
-	 * If the type of the parameter is not the same as the content type of the object, the system tries to do a type conversion.
-	 * If that fails, boost::bad_lexical_cast is thrown.
+	 * Create a Value from any type.
+	 * If the type of the parameter is not the same as the content type of the object, the system tries to do a lexical cast.
+	 * - The lexical cast is _not_ a conversion so no rounding or range check is done
+	 * - _All_ types which can be lexically casted are allowed, not only types known to isis. But not all types will work.
+	 * - If the lexical cast fails, boost::bad_lexical_cast is thrown.
 	 */
 	template<typename T> Value( const T &value ) {
 		m_val = _internal::__cast_to<TYPE>()( this, value );
 		BOOST_MPL_ASSERT_RELATION( staticID, < , 0xFF );
 		checkType<TYPE>();
 	}
+	/**
+	 * Get the string representation of the Value.
+	 * This tries to use the isis type conversion to create a string from the Value.
+	 * If thats no available, it will fall back to boost::lexical_cast. And it will send a warning to CoreDebug.
+	 * If the lexical cast fails as well, boost::bad_lexical_cast is thrown.
+	 * \param labeled if true the typename will be appended to the resulting string in brackets.
+	 */
 	std::string toString( bool labeled = false )const {
 		std::string ret;
 		Reference ref = copyToNewByID( Value<std::string>::staticID );
@@ -187,7 +210,7 @@ public:
 		return staticID;
 	}
 
-	/// \returns true if and only if this and second contain the same value of the same type
+	/// \returns true if and only if this and second do contain the same value of the same type
 	virtual bool operator==( const ValueBase &second )const {
 		if ( second.is<TYPE>() ) {
 			return m_val == second.castTo<TYPE>();
@@ -234,7 +257,8 @@ public:
 	 * \retval false if there is no know conversion from ref to TYPE
 	 */
 	bool gt( const _internal::ValueBase &ref )const {
-		return _internal::type_greater<TYPE, boost::is_arithmetic<TYPE>::value >()( *this, ref );
+        static const _internal::type_greater<TYPE, boost::is_arithmetic<TYPE>::value > greater;
+		return greater.operator()( *this, ref );
 	}
 
 	/**
@@ -247,7 +271,8 @@ public:
 	 * \retval false if there is no know conversion from ref to TYPE
 	 */
 	bool lt( const _internal::ValueBase &ref )const {
-		return _internal::type_less<TYPE, boost::is_arithmetic<TYPE>::value >()( *this, ref );
+        static const _internal::type_less<TYPE, boost::is_arithmetic<TYPE>::value > less;
+		return less( *this, ref );
 	}
 
 	/**
@@ -260,37 +285,38 @@ public:
 	 * \retval false if there is no know conversion from ref to TYPE
 	 */
 	bool eq( const _internal::ValueBase &ref )const {
-		return _internal::type_eq<TYPE, boost::is_arithmetic<TYPE>::value >()( *this, ref );
+        static const _internal::type_eq<TYPE, boost::is_arithmetic<TYPE>::value > equal;
+		return equal( *this, ref );
 	}
 
 	virtual ~Value() {}
 };
 
-template<typename T> const Value<T>& _internal::ValueBase::castToType() const
+template<typename T> const util::Value<T>& _internal::ValueBase::castToType() const
 {
 	checkType<T>();
-	return m_cast_to<Value<T> >();
+	return m_cast_to<util::Value<T> >();
 }
 template<typename T> const T &_internal::ValueBase::castTo() const
 {
-	const Value<T> &ret = castToType<T>();
+	const util::Value<T> &ret = castToType<T>();
 	return ret.operator const T & ();
 }
-template<typename T> Value<T>& _internal::ValueBase::castToType()
+template<typename T> util::Value<T>& _internal::ValueBase::castToType()
 {
 	checkType<T>();
-	return m_cast_to<Value<T> >();
+	return m_cast_to<util::Value<T> >();
 }
 template<typename T> T &_internal::ValueBase::castTo()
 {
-	Value<T> &ret = castToType<T>();
+    util::Value<T> &ret = castToType<T>();
 	return ret.operator T & ();
 }
 
 template<typename T> bool _internal::ValueBase::is()const
 {
 	checkType<T>();
-	return getTypeID() == Value<T>::staticID;
+	return getTypeID() == util::Value<T>::staticID;
 }
 
 }

@@ -1,6 +1,6 @@
 #include <DataStorage/io_application.hpp>
 #include <DataStorage/io_factory.hpp>
-#include <muParser/muParser.h>
+#include <muParser.h>
 
 
 using namespace isis;
