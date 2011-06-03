@@ -255,7 +255,7 @@ public:
 	/**
 	  * Swaps the image along a dimension dim in image space.
 	  */
-	bool swapAlong( const dimensions dim ) const;
+	void swapAlong( const dimensions dim ) const;
 
 };
 

@@ -280,11 +280,35 @@ size_t Chunk::useCount() const
 	return getValuePtrBase().useCount();
 }
 
-bool Chunk::swapAlong( const dimensions dim ) const
+void Chunk::swapAlong( const dimensions dim ) const
 {
-	size_t dims[] = { getDimSize( 0 ), getDimSize( 1 ), getDimSize( 2 ), getDimSize( 3 ) };
-	return get()->swapAlong( dim, dims ) ;
+	struct scoped_buffer{ //auto_ptr<void> is not allowed
+		void *p;
+		scoped_buffer(size_t s):p(malloc(s)){}
+		~scoped_buffer(){free(p);}
+		void *get(){return p;}
+	};
+	
+	const size_t elSize=bytesPerVoxel();
+	const util::FixedVector<size_t,4> whole_size=getSizeAsVector();
+	size_t block_volume=whole_size.product();
+	for(int i=data::timeDim;i>=dim;i--){
+		assert((block_volume%getDimSize(i))==0);
+		block_volume/=getDimSize(i);
+	}
 
+	assert(block_volume);
+	block_volume*=elSize;
+	scoped_buffer buff(block_volume);
+
+	boost::shared_ptr<void> p=get()->getRawAddress().lock();
+	void* a=p.get(); //first block
+	void* b=a+getVolume()*bytesPerVoxel()-block_volume; //last block
+	for(;a<b;a+=block_volume,b-=block_volume){ // grow a, shrink b 
+		memcpy(buff.get(),a,block_volume);
+		memcpy(a,b,block_volume);
+		memcpy(b,buff.get(),block_volume);
+	}
 }
 }
 }

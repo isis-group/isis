@@ -16,7 +16,8 @@ int main( int argc, char **argv )
 	public:
 		data::dimensions dim;
 		bool operator()( data::Chunk &ch, util::FixedVector<size_t, 4> /*posInImage*/ ) {
-			return ch.swapAlong( dim );
+			ch.swapAlong( dim );
+			return true;
 		}
 	} flifu;
 

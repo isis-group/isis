@@ -305,6 +305,22 @@ BOOST_AUTO_TEST_CASE ( chunk_swap_test_row )
 				}
 			}
 		}
+		ch1.swapAlong( data::sliceDim );
+		for (size_t z = 0; z < sizeRange; z++ ) {
+			for (size_t y = 0; y < sizeRange; y++ ) {
+				for (size_t x = 0; x < sizeRange; x++ ) {
+					BOOST_CHECK_EQUAL( ch1.voxel<float>(x,y,sizeRange-1-z), ch2.voxel<float>(x,y,z) );
+				}
+			}
+		}
+		ch1.swapAlong( data::sliceDim );
+		for (size_t z = 0; z < sizeRange; z++ ) {
+			for (size_t y = 0; y < sizeRange; y++ ) {
+				for (size_t x = 0; x < sizeRange; x++ ) {
+					BOOST_CHECK_EQUAL( ch1.voxel<float>(x,y,z), ch2.voxel<float>(x,y,z) );
+				}
+			}
+		}
 	}
 
 }
