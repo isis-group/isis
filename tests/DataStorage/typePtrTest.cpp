@@ -221,13 +221,27 @@ BOOST_AUTO_TEST_CASE( ValuePtr_conversion_test )
 BOOST_AUTO_TEST_CASE( ValuePtr_complex_conversion_test )
 {
 	const std::complex<float> init[] = { -2, -1.8, -1.5, -1.3, -0.6, -0.2, 2, 1.8, 1.5, 1.3, 0.6, 0.2};
-	data::ValuePtr<std::complex<float> > cfArray = data::ValuePtr<std::complex<float> >::allocate( 12 );
+	data::ValuePtr<std::complex<float> > cfArray( 12 );
 	cfArray.copyFromMem( init, 12 );
 	data::ValuePtr<std::complex<double> > cdArray = cfArray.copyToNew<std::complex<double> >();
 
 	for( size_t i = 0; i < 12; i++ ) {
 		BOOST_CHECK_EQUAL( cfArray[i], init[i] );
 		BOOST_CHECK_EQUAL( cdArray[i], std::complex<double>( init[i] ) );
+	}
+}
+
+BOOST_AUTO_TEST_CASE( ValuePtr_boolean_conversion_test )
+{
+	const float init[] = { -2, -1.8, -1.5, -1.3, -0.6, 0, 2, 1.8, 1.5, 1.3, 0.6, 0.2};
+	data::ValuePtr<float> cfArray( 12 );
+	cfArray.copyFromMem( init, 12 );
+	data::ValuePtr<bool> bArray = cfArray.copyToNew<bool>();
+	data::ValuePtr<float> fArray= bArray.copyToNew<float>();
+
+	for( size_t i = 0; i < 12; i++ ) {
+		BOOST_CHECK_EQUAL( bArray[i], (bool)init[i] );
+		BOOST_CHECK_EQUAL( fArray[i], (init[i] ?1:0) );
 	}
 }
 

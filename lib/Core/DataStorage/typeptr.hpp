@@ -170,15 +170,6 @@ public:
 	virtual ~ValuePtr() {}
 
 	/**
-	 * Create a new ValuePtr which uses newly allocated memory.
-	 * \param len requested size of the memory block in elements
-	 * \returns a ValuePtr\<TYPE\> of given len
-	 */
-	static ValuePtr allocate( size_t len ) {
-		return ValuePtr( ( TYPE * )malloc( len * sizeof( TYPE ) ), len );
-	}
-
-	/**
 	 * Get the raw address the ValuePtr points to.
 	 * \returns a weak_ptr\<void\> with the memory address of the data handled by this ValuePtr.
 	 */
