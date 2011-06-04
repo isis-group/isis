@@ -60,6 +60,8 @@ if(ISIS_BUILD_STATIC)
 	set_target_properties( isis_core PROPERTIES	${ISIS_BUILD_PROPERTIES} VERSION ${${CMAKE_PROJECT_NAME}_VERSION} INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
 endif(ISIS_BUILD_STATIC)
 
+set_source_files_properties( "DataStorage/typeptr.cpp" PROPERTIES COMPILE_FLAGS "-O" ) #anything >= "-O2" will break minmax on amd
+
 ############################################################
 # Installation
 ############################################################
