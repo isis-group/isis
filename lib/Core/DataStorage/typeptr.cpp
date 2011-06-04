@@ -83,6 +83,78 @@ template<typename T> std::pair<__m128i,__m128i> _getMinMaxBlockLoop(const __m128
 	return ret;
 }
 
+// specialiced versions using processor opcodes for min/max
+template<> std::pair<__m128i,__m128i> _getMinMaxBlockLoop<uint8_t>(const __m128i *data,size_t blocks){ //PMAXUB
+	std::pair<__m128i,__m128i> ret(*data,*data);
+	LOG( Runtime, verbose_info ) << "using optimized min/max computation for " << util::Value<uint8_t>::staticName() << " (direct mode)";
+
+	while (--blocks) {
+		const __m128i &at=data[blocks];
+		ret.first = _mm_min_epu8(ret.first,at);
+		ret.second = _mm_max_epu8(ret.second,at);
+	}
+	return ret;
+}
+template<> std::pair<__m128i,__m128i> _getMinMaxBlockLoop<int16_t>(const __m128i *data,size_t blocks){ //PMAXSW
+	std::pair<__m128i,__m128i> ret(*data,*data);
+	LOG( Runtime, verbose_info ) << "using optimized min/max computation for " << util::Value<int16_t>::staticName() << " (direct mode)";
+
+	while (--blocks) {
+		const __m128i &at=data[blocks];
+		ret.first = _mm_min_epi16(ret.first,at);
+		ret.second = _mm_max_epi16(ret.second,at);
+	}
+	return ret;
+}
+
+#ifdef __SSE4_1__
+#include <smmintrin.h>
+template<> std::pair<__m128i,__m128i> _getMinMaxBlockLoop<int8_t>(const __m128i *data,size_t blocks){ //PMAXSB
+	std::pair<__m128i,__m128i> ret(*data,*data);
+	LOG( Runtime, verbose_info ) << "using optimized min/max computation for " << util::Value<int8_t>::staticName() << " (direct mode)";
+
+	while (--blocks) {
+		const __m128i &at=data[blocks];
+		ret.first = _mm_min_epi8(ret.first,at);
+		ret.second = _mm_max_epi8(ret.second,at);
+	}
+	return ret;
+}
+template<> std::pair<__m128i,__m128i> _getMinMaxBlockLoop<uint16_t>(const __m128i *data,size_t blocks){ //PMAXUW
+	std::pair<__m128i,__m128i> ret(*data,*data);
+	LOG( Runtime, verbose_info ) << "using optimized min/max computation for " << util::Value<uint16_t>::staticName() << " (direct mode)";
+
+	while (--blocks) {
+		const __m128i &at=data[blocks];
+		ret.first = _mm_min_epu16(ret.first,at);
+		ret.second = _mm_max_epu16(ret.second,at);
+	}
+	return ret;
+}
+template<> std::pair<__m128i,__m128i> _getMinMaxBlockLoop<int32_t>(const __m128i *data,size_t blocks){ //PMAXSD
+	std::pair<__m128i,__m128i> ret(*data,*data);
+	LOG( Runtime, verbose_info ) << "using optimized min/max computation for " << util::Value<int32_t>::staticName() << " (direct mode)";
+
+	while (--blocks) {
+		const __m128i &at=data[blocks];
+		ret.first = _mm_min_epi32(ret.first,at);
+		ret.second = _mm_max_epi32(ret.second,at);
+	}
+	return ret;
+}
+template<> std::pair<__m128i,__m128i> _getMinMaxBlockLoop<uint32_t>(const __m128i *data,size_t blocks){ //PMAXSD
+	std::pair<__m128i,__m128i> ret(*data,*data);
+	LOG( Runtime, verbose_info ) << "using optimized min/max computation for " << util::Value<uint32_t>::staticName() << " (direct mode)";
+
+	while (--blocks) {
+		const __m128i &at=data[blocks];
+		ret.first = _mm_min_epu32(ret.first,at);
+		ret.second = _mm_max_epu32(ret.second,at);
+	}
+	return ret;
+}
+#endif
+
 template<typename T> std::pair<T,T> _getMinMax(const T *data,size_t len){
 	LOG_IF((reinterpret_cast<size_t>(data) & 0xF),Runtime,error)<< "Computing min/max of unaligned data. This is gonna fail..";
 
