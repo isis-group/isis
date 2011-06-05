@@ -142,7 +142,7 @@ template<> std::pair<__m128i,__m128i> _getMinMaxBlockLoop<int32_t>(const __m128i
 	}
 	return ret;
 }
-template<> std::pair<__m128i,__m128i> _getMinMaxBlockLoop<uint32_t>(const __m128i *data,size_t blocks){ //PMAXSD
+template<> std::pair<__m128i,__m128i> _getMinMaxBlockLoop<uint32_t>(const __m128i *data,size_t blocks){ //PMAXUD
 	std::pair<__m128i,__m128i> ret(*data,*data);
 	LOG( Runtime, verbose_info ) << "using optimized min/max computation for " << util::Value<uint32_t>::staticName() << " (direct mode)";
 
@@ -153,7 +153,7 @@ template<> std::pair<__m128i,__m128i> _getMinMaxBlockLoop<uint32_t>(const __m128
 	}
 	return ret;
 }
-#endif
+#endif //__SSE4_1__
 
 template<typename T> std::pair<T,T> _getMinMax(const T *data,size_t len){
 	LOG_IF((reinterpret_cast<size_t>(data) & 0xF),Runtime,error)<< "Computing min/max of unaligned data. This is gonna fail..";

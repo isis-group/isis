@@ -228,8 +228,7 @@ public:
 		std::complex<DST> *dp = &dst.castToValuePtr<std::complex<DST> >()[0];
 
 		while( sp != end ) {
-			dp->real() = _internal::round<DST>( sp->real() );
-			dp->imag() = _internal::round<DST>( sp->imag() );
+			*dp = std::complex<DST>(_internal::round<DST>( sp->real() ),_internal::round<DST>( sp->imag() ));
 			++sp;
 			++dp;
 		}
