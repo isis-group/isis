@@ -251,10 +251,10 @@ public:
 	 * Check if the value of this is greater than ref converted to TYPE.
 	 * The function tries to convert ref to the type of this and compare the result.
 	 * If there is no conversion an error is send to the debug logging, and false is returned.
-	 * \returns value_of_this > converted_value_of_ref if the conversion was successfull
-	 * \returns true if the conversion failed because the value of ref was to low for TYPE (negative overflow)
-	 * \returns false if the conversion failed because the value of ref was to high for TYPE (positive overflow)
-	 * \returns false if there is no know conversion from ref to TYPE
+	 * \retval value_of_this>converted_value_of_ref if the conversion was successfull
+	 * \retval true if the conversion failed because the value of ref was to low for TYPE (negative overflow)
+	 * \retval false if the conversion failed because the value of ref was to high for TYPE (positive overflow)
+	 * \retval false if there is no know conversion from ref to TYPE
 	 */
 	bool gt( const _internal::ValueBase &ref )const {
         static const _internal::type_greater<TYPE, boost::is_arithmetic<TYPE>::value > greater;
@@ -265,10 +265,10 @@ public:
 	 * Check if the value of this is less than ref converted to TYPE.
 	 * The funkcion tries to convert ref to the type of this and compare the result.
 	 * If there is no conversion an error is send to the debug logging, and false is returned.
-	 * \returns value_of_this < converted_value_of_ref if the conversion was successfull
-	 * \returns false if the conversion failed because the value of ref was to low for TYPE (negative overflow)
-	 * \returns true if the conversion failed because the value of ref was to high for TYPE (positive overflow)
-	 * \returns false if there is no know conversion from ref to TYPE
+	 * \retval value_of_this<converted_value_of_ref if the conversion was successfull
+	 * \retval false if the conversion failed because the value of ref was to low for TYPE (negative overflow)
+	 * \retval true if the conversion failed because the value of ref was to high for TYPE (positive overflow)
+	 * \retval false if there is no know conversion from ref to TYPE
 	 */
 	bool lt( const _internal::ValueBase &ref )const {
         static const _internal::type_less<TYPE, boost::is_arithmetic<TYPE>::value > less;
@@ -276,13 +276,13 @@ public:
 	}
 
 	/**
-	 * Check if the value of this is less than ref converted to TYPE.
+	 * Check if the value of this is equal to ref converted to TYPE.
 	 * The funktion tries to convert ref to the type of this and compare the result.
 	 * If there is no conversion an error is send to the debug logging, and false is returned.
-	 * \returns value_of_this == converted_value_of_ref if the conversion was successfull
-	 * \returns false if the conversion failed because the value of ref was to low for TYPE (negative overflow)
-	 * \returns false if the conversion failed because the value of ref was to high for TYPE (positive overflow)
-	 * \returns false if there is no know conversion from ref to TYPE
+	 * \retval value_of_this==converted_value_of_ref if the conversion was successfull
+	 * \retval false if the conversion failed because the value of ref was to low for TYPE (negative overflow)
+	 * \retval false if the conversion failed because the value of ref was to high for TYPE (positive overflow)
+	 * \retval false if there is no know conversion from ref to TYPE
 	 */
 	bool eq( const _internal::ValueBase &ref )const {
         static const _internal::type_eq<TYPE, boost::is_arithmetic<TYPE>::value > equal;

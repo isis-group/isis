@@ -273,133 +273,44 @@ BOOST_AUTO_TEST_CASE ( chunk_splice_test )//Copy chunks
 
 BOOST_AUTO_TEST_CASE ( chunk_swap_test_row )
 {
-	for( size_t sizeRange = 10; sizeRange < 21; sizeRange++ ) {
-		data::MemChunk<float> ch1( sizeRange, sizeRange, sizeRange );
-		data::MemChunk<float> ch2( sizeRange, sizeRange, sizeRange );
-		ch1.setPropertyAs( "indexOrigin", util::fvector4() );
-		ch1.setPropertyAs( "rowVec", util::fvector4( 1, 0, 0 ) );
-		ch1.setPropertyAs( "columnVec", util::fvector4( 0, 1, 0 ) );
-		ch1.setPropertyAs( "sliceVec", util::fvector4( 0, 0, 1 ) );
+	class :public data::Chunk::VoxelOp<int>{
+		bool operator()( int &vox, const util::FixedVector<size_t, 4> & ){
+			vox=rand();
+			return true;
+		}
+	}randomize;
+	class SwapCheck:public data::Chunk::VoxelOp<int>{
+		size_t swapidx,sizeRange;
+	public:
+		data::MemChunk<int> orig;
+		SwapCheck(data::MemChunk<int> &_orig,size_t _swapidx, size_t _sizeRange):orig(_orig),swapidx(_swapidx),sizeRange(_sizeRange){}
+		bool operator()( int &vox, const util::FixedVector<size_t, 4> &pos ){
+			util::FixedVector<size_t, 4> opos=pos;
+			opos[swapidx]=sizeRange-1-opos[swapidx];
+//			if(orig.voxel<int>(opos[0],opos[1],opos[2],opos[3])!=vox)
+//				std::cout << "Comparing " << pos << " against " << opos 
+//					<< "(" << vox << "!=" << orig.voxel<int>(opos[0],opos[1],opos[2],opos[3]) 
+//					<< ")" << std::endl;
+			return orig.voxel<int>(opos[0],opos[1],opos[2],opos[3])==vox;
+		}
+	};
+	
+	for (int dim=data::rowDim; dim<=data::timeDim; dim++) {
+		for( size_t sizeRange = 10; sizeRange < 21; sizeRange++ ) {
+			//create chunk with random content
+			data::MemChunk<int> ch1( sizeRange, sizeRange, sizeRange, sizeRange );
+			ch1.foreachVoxel(randomize);
+			
+			//store a copy of the original data and the rest in the checker
+			SwapCheck swap_check(ch1,data::rowDim,sizeRange);
+			
+			ch1.swapAlong( data::rowDim );//swap it
+			BOOST_CHECK_EQUAL(ch1.foreachVoxel(swap_check), 0);//run check for swapped data
 
-		for (size_t z = 0; z < sizeRange; z++ ) {
-			for (size_t y = 0; y < sizeRange; y++ ) {
-				for (size_t x = 0; x < sizeRange; x++ ) {
-					ch1.voxel<float>(x,y,z) = x;
-					ch2.voxel<float>(x,y,z) = x;
-				}
-			}
-		}
-		ch1.swapAlong( data::rowDim );
-		for (size_t z = 0; z < sizeRange; z++ ) {
-			for (size_t y = 0; y < sizeRange; y++ ) {
-				for (size_t x = 0; x < sizeRange; x++ ) {
-					BOOST_CHECK_EQUAL( ch1.voxel<float>(sizeRange-1-x,y,z), ch2.voxel<float>(x,y,z) );
-				}
-			}
-		}
-		ch1.swapAlong( data::rowDim );
-		for (size_t z = 0; z < sizeRange; z++ ) {
-			for (size_t y = 0; y < sizeRange; y++ ) {
-				for (size_t x = 0; x < sizeRange; x++ ) {
-					BOOST_CHECK_EQUAL( ch1.voxel<float>(x,y,z), ch2.voxel<float>(x,y,z) );
-				}
-			}
-		}
-		ch1.swapAlong( data::sliceDim );
-		for (size_t z = 0; z < sizeRange; z++ ) {
-			for (size_t y = 0; y < sizeRange; y++ ) {
-				for (size_t x = 0; x < sizeRange; x++ ) {
-					BOOST_CHECK_EQUAL( ch1.voxel<float>(x,y,sizeRange-1-z), ch2.voxel<float>(x,y,z) );
-				}
-			}
-		}
-		ch1.swapAlong( data::sliceDim );
-		for (size_t z = 0; z < sizeRange; z++ ) {
-			for (size_t y = 0; y < sizeRange; y++ ) {
-				for (size_t x = 0; x < sizeRange; x++ ) {
-					BOOST_CHECK_EQUAL( ch1.voxel<float>(x,y,z), ch2.voxel<float>(x,y,z) );
-				}
-			}
+			ch1.swapAlong( data::rowDim );//swap it back
+			BOOST_CHECK(ch1.compareRange(0,ch1.getVolume()-1,swap_check.orig,0)==0); //check for equality
 		}
 	}
-
-}
-
-
-BOOST_AUTO_TEST_CASE ( chunk_swap_test_column )
-{
-	for( size_t sizeRange = 10; sizeRange < 21; sizeRange++ ) {
-		data::MemChunk<float> ch1( sizeRange, sizeRange, sizeRange );
-		data::MemChunk<float> ch2( sizeRange, sizeRange, sizeRange );
-		ch1.setPropertyAs( "indexOrigin", util::fvector4() );
-		ch1.setPropertyAs( "rowVec", util::fvector4( 1, 0, 0 ) );
-		ch1.setPropertyAs( "columnVec", util::fvector4( 0, 1, 0 ) );
-		ch1.setPropertyAs( "sliceVec", util::fvector4( 0, 0, 1 ) );
-
-		for (size_t z = 0; z < sizeRange; z++ ) {
-			for (size_t y = 0; y < sizeRange; y++ ) {
-				for (size_t x = 0; x < sizeRange; x++ ) {
-					ch1.voxel<float>(x,y,z) = y;
-					ch2.voxel<float>(x,y,z) = y;
-				}
-			}
-		}
-		ch1.swapAlong( data::columnDim );
-		for (size_t z = 0; z < sizeRange; z++ ) {
-			for (size_t y = 0; y < sizeRange; y++ ) {
-				for (size_t x = 0; x < sizeRange; x++ ) {
-					BOOST_CHECK_EQUAL( ch1.voxel<float>(x,sizeRange-1-y,z), ch2.voxel<float>(x,y,z) );
-				}
-			}
-		}
-		ch1.swapAlong( data::columnDim );
-		for (size_t z = 0; z < sizeRange; z++ ) {
-			for (size_t y = 0; y < sizeRange; y++ ) {
-				for (size_t x = 0; x < sizeRange; x++ ) {
-					BOOST_CHECK_EQUAL( ch1.voxel<float>(x,y,z), ch2.voxel<float>(x,y,z) );
-				}
-			}
-		}
-	}
-
-}
-
-BOOST_AUTO_TEST_CASE ( chunk_swap_test_slice )
-{
-	for( size_t sizeRange = 10; sizeRange < 21; sizeRange++ ) {
-		data::MemChunk<float> ch1( sizeRange, sizeRange, sizeRange );
-		data::MemChunk<float> ch2( sizeRange, sizeRange, sizeRange );
-		ch1.setPropertyAs( "indexOrigin", util::fvector4() );
-		ch1.setPropertyAs( "rowVec", util::fvector4( 1, 0, 0 ) );
-		ch1.setPropertyAs( "columnVec", util::fvector4( 0, 1, 0 ) );
-		ch1.setPropertyAs( "sliceVec", util::fvector4( 0, 0, 1 ) );
-
-		for (size_t z = 0; z < sizeRange; z++ ) {
-			for (size_t y = 0; y < sizeRange; y++ ) {
-				for (size_t x = 0; x < sizeRange; x++ ) {
-					ch1.voxel<float>(x,y,z) = z;
-					ch2.voxel<float>(x,y,z) = z;
-				}
-			}
-		}
-		ch1.swapAlong( data::sliceDim );
-		for (size_t z = 0; z < sizeRange; z++ ) {
-			for (size_t y = 0; y < sizeRange; y++ ) {
-				for (size_t x = 0; x < sizeRange; x++ ) {
-					BOOST_CHECK_EQUAL( ch1.voxel<float>(x,y,sizeRange-1-z), ch2.voxel<float>(x,y,z) );
-				}
-			}
-		}
-		ch1.swapAlong( data::sliceDim );
-		for (size_t z = 0; z < sizeRange; z++ ) {
-			for (size_t y = 0; y < sizeRange; y++ ) {
-				for (size_t x = 0; x < sizeRange; x++ ) {
-					BOOST_CHECK_EQUAL( ch1.voxel<float>(x,y,z), ch2.voxel<float>(x,y,z) );
-				}
-			}
-		}
-	}
-
 }
 
 BOOST_AUTO_TEST_CASE ( chunk_copyLine_Test )
