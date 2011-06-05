@@ -282,13 +282,6 @@ size_t Chunk::useCount() const
 
 void Chunk::swapAlong( const dimensions dim ) const
 {
-	struct scoped_buffer{ //auto_ptr<void> is not allowed
-		void *p;
-		scoped_buffer(size_t s):p(malloc(s)){}
-		~scoped_buffer(){free(p);}
-		void *get(){return p;}
-	};
-	
 	const size_t elSize=bytesPerVoxel();
 	const util::FixedVector<size_t,4> whole_size=getSizeAsVector();
 	size_t block_volume=whole_size.product();
@@ -299,11 +292,11 @@ void Chunk::swapAlong( const dimensions dim ) const
 
 	assert(block_volume);
 	block_volume*=elSize;
-	scoped_buffer buff(block_volume);
+	std::auto_ptr<uint8_t> buff(static_cast<uint8_t*>(malloc(block_volume)));
 
-	boost::shared_ptr<void> p=get()->getRawAddress().lock();
-	void* a=p.get(); //first block
-	void* b=a+getVolume()*bytesPerVoxel()-block_volume; //last block
+	boost::shared_ptr<uint8_t> p=boost::shared_static_cast<uint8_t>(get()->getRawAddress().lock());
+	uint8_t* a=p.get(); //first block
+	uint8_t* b=a+getVolume()*bytesPerVoxel()-block_volume; //last block
 	for(;a<b;a+=block_volume,b-=block_volume){ // grow a, shrink b 
 		memcpy(buff.get(),a,block_volume);
 		memcpy(a,b,block_volume);

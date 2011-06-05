@@ -273,13 +273,13 @@ BOOST_AUTO_TEST_CASE ( chunk_splice_test )//Copy chunks
 
 BOOST_AUTO_TEST_CASE ( chunk_swap_test_row )
 {
-	class :public data::Chunk::VoxelOp<int>{
+	class :public data::VoxelOp<int>{
 		bool operator()( int &vox, const util::FixedVector<size_t, 4> & ){
 			vox=rand();
 			return true;
 		}
 	}randomize;
-	class SwapCheck:public data::Chunk::VoxelOp<int>{
+	class SwapCheck:public data::VoxelOp<int>{
 		size_t swapidx,sizeRange;
 	public:
 		data::MemChunk<int> orig;
