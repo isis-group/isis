@@ -70,7 +70,7 @@ DEF_VECTOR_UI(uint32_t,32);
 
 // generic fallback using cmpgt and some bitmask voodoo
 template<typename T> std::pair<__m128i,__m128i> _getMinMaxBlockLoop(const __m128i *data,size_t blocks){
-	std::pair<__m128i,__m128i> ret(*data,*data);
+	std::pair<__m128i,__m128i> ret(_mm_loadu_si128(data),_mm_loadu_si128(data));
 	LOG( Runtime, verbose_info ) << "using optimized min/max computation for " << util::Value<T>::staticName() << " (masked mode)";
 	static const __m128i one=_mm_set_epi16(0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF);
 	
@@ -92,7 +92,7 @@ template<typename T> std::pair<__m128i,__m128i> _getMinMaxBlockLoop(const __m128
 
 // specialiced versions using processor opcodes for min/max
 template<> std::pair<__m128i,__m128i> _getMinMaxBlockLoop<uint8_t>(const __m128i *data,size_t blocks){ //PMAXUB
-	std::pair<__m128i,__m128i> ret(*data,*data);
+	std::pair<__m128i,__m128i> ret(_mm_loadu_si128(data),_mm_loadu_si128(data));
 	LOG( Runtime, verbose_info ) << "using optimized min/max computation for " << util::Value<uint8_t>::staticName() << " (direct mode)";
 
 	while (--blocks) {
@@ -103,7 +103,7 @@ template<> std::pair<__m128i,__m128i> _getMinMaxBlockLoop<uint8_t>(const __m128i
 	return ret;
 }
 template<> std::pair<__m128i,__m128i> _getMinMaxBlockLoop<int16_t>(const __m128i *data,size_t blocks){ //PMAXSW
-	std::pair<__m128i,__m128i> ret(*data,*data);
+	std::pair<__m128i,__m128i> ret(_mm_loadu_si128(data),_mm_loadu_si128(data));
 	LOG( Runtime, verbose_info ) << "using optimized min/max computation for " << util::Value<int16_t>::staticName() << " (direct mode)";
 
 	while (--blocks) {
@@ -117,7 +117,7 @@ template<> std::pair<__m128i,__m128i> _getMinMaxBlockLoop<int16_t>(const __m128i
 #ifdef __SSE4_1__
 #include <smmintrin.h>
 template<> std::pair<__m128i,__m128i> _getMinMaxBlockLoop<int8_t>(const __m128i *data,size_t blocks){ //PMAXSB
-	std::pair<__m128i,__m128i> ret(*data,*data);
+	std::pair<__m128i,__m128i> ret(_mm_loadu_si128(data),_mm_loadu_si128(data));
 	LOG( Runtime, verbose_info ) << "using optimized min/max computation for " << util::Value<int8_t>::staticName() << " (direct mode)";
 
 	while (--blocks) {
@@ -128,7 +128,7 @@ template<> std::pair<__m128i,__m128i> _getMinMaxBlockLoop<int8_t>(const __m128i 
 	return ret;
 }
 template<> std::pair<__m128i,__m128i> _getMinMaxBlockLoop<uint16_t>(const __m128i *data,size_t blocks){ //PMAXUW
-	std::pair<__m128i,__m128i> ret(*data,*data);
+	std::pair<__m128i,__m128i> ret(_mm_loadu_si128(data),_mm_loadu_si128(data));
 	LOG( Runtime, verbose_info ) << "using optimized min/max computation for " << util::Value<uint16_t>::staticName() << " (direct mode)";
 
 	while (--blocks) {
@@ -139,7 +139,7 @@ template<> std::pair<__m128i,__m128i> _getMinMaxBlockLoop<uint16_t>(const __m128
 	return ret;
 }
 template<> std::pair<__m128i,__m128i> _getMinMaxBlockLoop<int32_t>(const __m128i *data,size_t blocks){ //PMAXSD
-	std::pair<__m128i,__m128i> ret(*data,*data);
+	std::pair<__m128i,__m128i> ret(_mm_loadu_si128(data),_mm_loadu_si128(data));
 	LOG( Runtime, verbose_info ) << "using optimized min/max computation for " << util::Value<int32_t>::staticName() << " (direct mode)";
 
 	while (--blocks) {
@@ -150,7 +150,7 @@ template<> std::pair<__m128i,__m128i> _getMinMaxBlockLoop<int32_t>(const __m128i
 	return ret;
 }
 template<> std::pair<__m128i,__m128i> _getMinMaxBlockLoop<uint32_t>(const __m128i *data,size_t blocks){ //PMAXSD
-	std::pair<__m128i,__m128i> ret(*data,*data);
+	std::pair<__m128i,__m128i> ret(_mm_loadu_si128(data),_mm_loadu_si128(data));
 	LOG( Runtime, verbose_info ) << "using optimized min/max computation for " << util::Value<uint32_t>::staticName() << " (direct mode)";
 
 	while (--blocks) {
