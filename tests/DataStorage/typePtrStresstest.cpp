@@ -16,7 +16,7 @@ template<typename T> void testMinMax(size_t size){
 }
 int main()
 {
-	data::enableLog<util::DefaultMsgPrint>( error ); //set to "verbose_info" to see which alg is used
+	data::enableLog<util::DefaultMsgPrint>( verbose_info ); //set to "verbose_info" to see which alg is used
 
 	testMinMax< int8_t>(1024*1024*512);
 	testMinMax<int16_t>(1024*1024*512);

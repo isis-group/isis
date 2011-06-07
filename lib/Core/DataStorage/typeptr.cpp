@@ -23,14 +23,19 @@ namespace _internal{
 //////////////////////////////////////////////////////////    
 // some voodo to get the vector types into the templates /
 //////////////////////////////////////////////////////////
-    
+template<typename T> struct _VectorUnion{
+	union {__m128i reg;T elem[16/sizeof(T)];} vec;
+	_VectorUnion(const T * el){std::copy(el,el+16/sizeof(T),vec.elem);}
+	_VectorUnion(__m128i _reg){vec.reg=_reg;}
+	_VectorUnion(){}
+};
 template<typename T> struct _TypeVector;
+
 // mapping for signed types
 #define DEF_VECTOR_SI(TYPE,KEY)                              \
 template<> struct _TypeVector<TYPE>{                         \
-	typedef TYPE vector __attribute__ ((vector_size (16)));  \
-	static vector gt(vector a,vector b){return (vector)_mm_cmpgt_epi ## KEY ((__m128i)a, (__m128i)b);}                                                        \
-	static vector lt(vector a,vector b){return (vector)_mm_cmplt_epi ## KEY ((__m128i)a, (__m128i)b);}                                                        \
+	static __m128i gt(__m128i a,__m128i b){return _mm_cmpgt_epi ## KEY (a, b);}                                                        \
+	static __m128i lt(__m128i a,__m128i b){return _mm_cmplt_epi ## KEY (a, b);}                                                        \
 };
 DEF_VECTOR_SI( int8_t, 8);
 DEF_VECTOR_SI(int16_t,16);
@@ -38,20 +43,18 @@ DEF_VECTOR_SI(int32_t,32);
     
 // value offset to compare unsigned int as signed (there is no compare for unsigned in SSE2)
 template<typename T> __m128i _getAddV(){
-	__m128i ret;
-	T *at=reinterpret_cast<T*>(&ret);
+	_VectorUnion<T> ret;
 	const T filler= 1<<(sizeof(T)*8-1);
-	std::fill(at, at+16/sizeof(T), filler);
-	return ret;
+	std::fill(ret.vec.elem, ret.vec.elem+16/sizeof(T), filler);
+	return ret.vec.reg;
 }
-    
+
 // mapping for unsigned types
 #define DEF_VECTOR_UI(TYPE,KEY)                                 \
 template<> struct _TypeVector<TYPE>{                            \
-	typedef TYPE vector __attribute__ ((vector_size (16)));     \
 	static __m128i addv;                                        \
-	static inline vector gt(vector a,vector b){return (vector)_mm_cmpgt_epi ## KEY (_mm_add_epi ## KEY((__m128i)a,addv), _mm_add_epi ## KEY((__m128i)b,addv));} \
-	static inline vector lt(vector a,vector b){return (vector)_mm_cmplt_epi ## KEY (_mm_add_epi ## KEY((__m128i)a,addv), _mm_add_epi ## KEY((__m128i)b,addv));} \
+	static inline __m128i gt(__m128i a,__m128i b){return _mm_cmpgt_epi ## KEY (_mm_add_epi ## KEY(a,addv), _mm_add_epi ## KEY(b,addv));} \
+	static inline __m128i lt(__m128i a,__m128i b){return _mm_cmplt_epi ## KEY (_mm_add_epi ## KEY(a,addv), _mm_add_epi ## KEY(b,addv));} \
 };\
 __m128i _TypeVector<TYPE>::addv=_getAddV<TYPE>();
     
@@ -59,40 +62,119 @@ DEF_VECTOR_UI( uint8_t, 8);
 DEF_VECTOR_UI(uint16_t,16);
 DEF_VECTOR_UI(uint32_t,32);
 
+
+
 ////////////////////////////////////////////    
 // optimized min/max function for integers /
 ////////////////////////////////////////////
-	
-template<typename T> std::pair<T,T> _getMinMax(const T *data,size_t len){
-	assert((reinterpret_cast<size_t>(data) & 0xF)==0); //make sure its 16-aligned
-	LOG( Runtime, verbose_info ) << "using optimized min/max computation for " << util::Value<T>::staticName();
 
+// generic fallback using cmpgt and some bitmask voodoo
+template<typename T> std::pair<__m128i,__m128i> _getMinMaxBlockLoop(const __m128i *data,size_t blocks){
+	std::pair<__m128i,__m128i> ret(*data,*data);
+	LOG( Runtime, verbose_info ) << "using optimized min/max computation for " << util::Value<T>::staticName() << " (masked mode)";
+	static const __m128i one=_mm_set_epi16(0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF);
+	
+	while (--blocks) {
+		const __m128i at=_mm_loadu_si128(++data);
+
+		const __m128i less_mask=_TypeVector<T>::lt(at, ret.first);
+		const __m128i greater_mask=_TypeVector<T>::gt(at, ret.second);
+
+		ret.first =
+			(ret.first&(less_mask^one)) //remove bigger values from current min
+			| (at&less_mask);//put in the lesser values from at
+		ret.second =
+			(ret.second&(greater_mask^one))//remove lesser values from current max
+			| (at&greater_mask);//put in the bigger values from at
+	}
+	return ret;
+}
+
+// specialiced versions using processor opcodes for min/max
+template<> std::pair<__m128i,__m128i> _getMinMaxBlockLoop<uint8_t>(const __m128i *data,size_t blocks){ //PMAXUB
+	std::pair<__m128i,__m128i> ret(*data,*data);
+	LOG( Runtime, verbose_info ) << "using optimized min/max computation for " << util::Value<uint8_t>::staticName() << " (direct mode)";
+
+	while (--blocks) {
+		const __m128i at=_mm_loadu_si128(++data);
+		ret.first = _mm_min_epu8(ret.first,at);
+		ret.second = _mm_max_epu8(ret.second,at);
+	}
+	return ret;
+}
+template<> std::pair<__m128i,__m128i> _getMinMaxBlockLoop<int16_t>(const __m128i *data,size_t blocks){ //PMAXSW
+	std::pair<__m128i,__m128i> ret(*data,*data);
+	LOG( Runtime, verbose_info ) << "using optimized min/max computation for " << util::Value<int16_t>::staticName() << " (direct mode)";
+
+	while (--blocks) {
+		const __m128i at=_mm_loadu_si128(++data);
+		ret.first = _mm_min_epi16(ret.first,at);
+		ret.second = _mm_max_epi16(ret.second,at);
+	}
+	return ret;
+}
+
+#ifdef __SSE4_1__
+#include <smmintrin.h>
+template<> std::pair<__m128i,__m128i> _getMinMaxBlockLoop<int8_t>(const __m128i *data,size_t blocks){ //PMAXSB
+	std::pair<__m128i,__m128i> ret(*data,*data);
+	LOG( Runtime, verbose_info ) << "using optimized min/max computation for " << util::Value<int8_t>::staticName() << " (direct mode)";
+
+	while (--blocks) {
+		const __m128i at=_mm_loadu_si128(++data);
+		ret.first = _mm_min_epi8(ret.first,at);
+		ret.second = _mm_max_epi8(ret.second,at);
+	}
+	return ret;
+}
+template<> std::pair<__m128i,__m128i> _getMinMaxBlockLoop<uint16_t>(const __m128i *data,size_t blocks){ //PMAXUW
+	std::pair<__m128i,__m128i> ret(*data,*data);
+	LOG( Runtime, verbose_info ) << "using optimized min/max computation for " << util::Value<uint16_t>::staticName() << " (direct mode)";
+
+	while (--blocks) {
+		const __m128i at=_mm_loadu_si128(++data);
+		ret.first = _mm_min_epu16(ret.first,at);
+		ret.second = _mm_max_epu16(ret.second,at);
+	}
+	return ret;
+}
+template<> std::pair<__m128i,__m128i> _getMinMaxBlockLoop<int32_t>(const __m128i *data,size_t blocks){ //PMAXSD
+	std::pair<__m128i,__m128i> ret(*data,*data);
+	LOG( Runtime, verbose_info ) << "using optimized min/max computation for " << util::Value<int32_t>::staticName() << " (direct mode)";
+
+	while (--blocks) {
+		const __m128i at=_mm_loadu_si128(++data);
+		ret.first = _mm_min_epi32(ret.first,at);
+		ret.second = _mm_max_epi32(ret.second,at);
+	}
+	return ret;
+}
+template<> std::pair<__m128i,__m128i> _getMinMaxBlockLoop<uint32_t>(const __m128i *data,size_t blocks){ //PMAXSD
+	std::pair<__m128i,__m128i> ret(*data,*data);
+	LOG( Runtime, verbose_info ) << "using optimized min/max computation for " << util::Value<uint32_t>::staticName() << " (direct mode)";
+
+	while (--blocks) {
+		const __m128i at=_mm_loadu_si128(++data);
+		ret.first = _mm_min_epu32(ret.first,at);
+		ret.second = _mm_max_epu32(ret.second,at);
+	}
+	return ret;
+}
+#endif
+
+template<typename T> std::pair<T,T> _getMinMax(const T *data,size_t len){
 	size_t blocks=len/(16/sizeof(T));
 	
-	typedef typename _TypeVector<T>::vector block;
-	const block *bdata=reinterpret_cast<const block*>(data);
+	std::pair<__m128i,__m128i> minmax=_getMinMaxBlockLoop<T>(reinterpret_cast<const __m128i*>(data),blocks);
 	
-	block min=*bdata,max=*bdata;
-	while (--blocks) {
-		const block &at=bdata[blocks];
-		
-		const block less_mask=_TypeVector<T>::lt(at, min);
-		min&=~less_mask;//remove bigger values from current min
-		min|=at&less_mask;//put in the lesser values from at
-		
-		const block greater_mask=_TypeVector<T>::gt(at, max);
-		max&=~greater_mask;//remove lesser values from current min
-		max|=at&greater_mask;//put in the bigger values from at
-	}
 	
 	// compute the min/max of the blocks bmin/bmax
-	const T *smin=reinterpret_cast<const T*>(&min);
-	const T *smax=reinterpret_cast<const T*>(&max);
-	const T bmin=*std::min_element(smin, smin+16/sizeof(T));
-	const T bmax=*std::max_element(smax, smax+16/sizeof(T));
+	const _VectorUnion<T> smin=minmax.first;
+	const _VectorUnion<T> smax=minmax.second;
+	const T bmin=*std::min_element(smin.vec.elem, smin.vec.elem+16/sizeof(T));
+	const T bmax=*std::max_element(smax.vec.elem, smax.vec.elem+16/sizeof(T));
 	
 	// if there are some remaining elements
-	blocks=len/(16/sizeof(T));
 	if(data+blocks*16/sizeof(T) < data+len){
 		const T rmin=*std::min_element(data+blocks*16/sizeof(T), data+len);
 		const T rmax=*std::max_element(data+blocks*16/sizeof(T), data+len);
