@@ -32,7 +32,7 @@ set(ISIS_VERSION
 ############################################################
 # set install infix for plugin installation path
 ############################################################
-set(ISIS_PLUGIN_INFIX share/isis/plugins)
+set(ISIS_PLUGIN_INFIX lib/isis/plugins)
 
 ############################################################
 # set project specific module path
@@ -43,8 +43,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
 ############################################################
 # general compiler flags
 ############################################################
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra" )
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra"  )
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wstrict-aliasing=2" )
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wstrict-aliasing=2"  )
 
 ############################################################
 # compiler flags on 64Bit cpus
@@ -166,3 +166,7 @@ endif(ISIS_BUILD_TESTS)
 if(ISIS_BUILD_PYTHON_EXT)
   add_subdirectory(python)
 endif(ISIS_BUILD_PYTHON_EXT)
+
+# uninstall target
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake//cmake_uninstall.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake" IMMEDIATE @ONLY)
+add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)

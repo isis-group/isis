@@ -272,7 +272,7 @@ public:
 		boost::numeric::ublas::matrix<float> matrix = boost::numeric::ublas::identity_matrix<float>( 3, 3 );
 		matrix( 0, 0 ) = -1;
 		matrix( 1, 1 ) = -1;
-		image.transformCoords( matrix );
+		image.transformCoords( matrix );		
 		//set the props from the image to the nifti file
 		copyHeaderToNifti( image, ni );
 		// set filename for resulting image(s) due to Analyze vs. Nifti
@@ -653,7 +653,6 @@ private:
 		util::fvector4 columnVec = image.getPropertyAs<util::fvector4>( "columnVec" );
 		util::fvector4 sliceVec = image.getPropertyAs<util::fvector4>( "sliceVec" );
 		util::fvector4 indexOrigin = image.getPropertyAs<util::fvector4>( "indexOrigin" );
-
 		if( image.hasProperty( "nifti/qform_code" ) )
 			ni.qform_code =  image.getPropertyAs<int>( "nifti/qform_code" );
 

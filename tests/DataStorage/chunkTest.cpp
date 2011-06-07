@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE ( chunk_property_test )
 	//an basic Chunk must be invalid
 	BOOST_CHECK( !ch.isValid() );
 	BOOST_CHECK( !ch.hasProperty( "indexOrigin" ) );
-	//with an position and an orientation its valid
+	//with a position and an orientation its valid
 	util::fvector4 pos( 1, 1, 1 );
 	ch.setPropertyAs( "indexOrigin", pos );
 	BOOST_CHECK( !ch.isValid() );
@@ -271,56 +271,119 @@ BOOST_AUTO_TEST_CASE ( chunk_splice_test )//Copy chunks
 	}
 }
 
-BOOST_AUTO_TEST_CASE ( chunk_swap_test )
+BOOST_AUTO_TEST_CASE ( chunk_swap_test_row )
 {
-	//TODO
-	//  data::MemChunk<float> ch1( 3, 3, 3, 1 );
-	//  ch1.setPropertyAs( "indexOrigin", util::fvector4( 1, 1, 1, 1 ) );
-	//  ch1.setPropertyAs( "rowVec", util::fvector4( 1, 0, 0 ) );
-	//  ch1.setPropertyAs( "columnVec", util::fvector4( 0, 1, 0 ) );
-	//  ch1.setPropertyAs( "sliceVec", util::fvector4( 0, 0, 1 ) );
-	//  ch1.setPropertyAs( "dummyProp", std::string( "dummy" ) );
-	//
-	//  for ( size_t i = 0; i < ch1.getVolume(); i++ )
-	//      ch1.asValuePtr<float>()[i] = i;
-	//
-	//  data::MemChunk<float> ch2( 3, 3, 3, 1 );
-	//  data::MemChunk<float> ch3( 3, 3, 3, 1 );
-	//
-	//  //transform will not be changed...
-	//  for ( size_t dim = 0; dim < 3; dim++ ) {
-	//      ch1.swapAlong( ch2, dim, false );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "indexOrigin" ), ch2.getPropertyAs<util::fvector4>( "indexOrigin" ) );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "rowVec" ), ch2.getPropertyAs<util::fvector4>( "rowVec" ) );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "columnVec" ), ch2.getPropertyAs<util::fvector4>( "columnVec" ) );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "sliceVec" ), ch2.getPropertyAs<util::fvector4>( "sliceVec" ) );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<std::string>( "dummyProp" ), ch2.getPropertyAs<std::string>( "dummyProp" ) );
-	//      ch2.swapAlong( ch3, dim, false );
-	//
-	//      for ( size_t i = 0; i < ch1.getVolume(); i++ ) {
-	//          BOOST_CHECK_EQUAL( ch1.asValuePtr<float>()[i], ch3.asValuePtr<float>()[i] );
-	//      }
-	//  }
-	//
-	//  //transform will be changed
-	//  for ( size_t dim = 0; dim < 3; dim++ ) {
-	//      ch1.swapAlong( ch2, dim, true );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "indexOrigin" )[dim], -ch2.getPropertyAs<util::fvector4>( "indexOrigin" )[dim] );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "rowVec" )[dim], -ch2.getPropertyAs<util::fvector4>( "rowVec" )[dim] );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "columnVec" )[dim], -ch2.getPropertyAs<util::fvector4>( "columnVec" )[dim] );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "sliceVec" )[dim], -ch2.getPropertyAs<util::fvector4>( "sliceVec" )[dim] );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<std::string>( "dummyProp" ), ch2.getPropertyAs<std::string>( "dummyProp" ) );
-	//      ch2.swapAlong( ch3, dim, true );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "indexOrigin" ), ch3.getPropertyAs<util::fvector4>( "indexOrigin" ) );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "rowVec" ), ch3.getPropertyAs<util::fvector4>( "rowVec" ) );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "columnVec" ), ch3.getPropertyAs<util::fvector4>( "columnVec" ) );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "sliceVec" ), ch3.getPropertyAs<util::fvector4>( "sliceVec" ) );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<std::string>( "dummyProp" ), ch3.getPropertyAs<std::string>( "dummyProp" ) );
-	//
-	//      for ( size_t i = 0; i < ch1.getVolume(); i++ ) {
-	//          BOOST_CHECK_EQUAL( ch1.asValuePtr<float>()[i], ch3.asValuePtr<float>()[i] );
-	//      }
-	//  }
+	for( size_t sizeRange = 10; sizeRange < 21; sizeRange++ ) {
+		data::MemChunk<float> ch1( sizeRange, sizeRange, sizeRange );
+		data::MemChunk<float> ch2( sizeRange, sizeRange, sizeRange ); 
+		ch1.setPropertyAs( "indexOrigin", util::fvector4() );
+		ch1.setPropertyAs( "rowVec", util::fvector4( 1, 0, 0 ) );
+		ch1.setPropertyAs( "columnVec", util::fvector4( 0, 1, 0 ) );
+		ch1.setPropertyAs( "sliceVec", util::fvector4( 0, 0, 1 ) );
+
+		for (size_t z = 0; z < sizeRange; z++ ) {
+			for (size_t y = 0; y < sizeRange; y++ ) {
+				for (size_t x = 0; x < sizeRange; x++ ) {
+					ch1.voxel<float>(x,y,z) = x;
+					ch2.voxel<float>(x,y,z) = x;
+				}
+			}
+		}
+		ch1.swapAlong( data::rowDim );
+		for (size_t z = 0; z < sizeRange; z++ ) {
+			for (size_t y = 0; y < sizeRange; y++ ) {
+				for (size_t x = 0; x < sizeRange; x++ ) {
+					BOOST_CHECK_EQUAL( ch1.voxel<float>(sizeRange-1-x,y,z), ch2.voxel<float>(x,y,z) );
+				}
+			}
+		}
+		ch1.swapAlong( data::rowDim );
+		for (size_t z = 0; z < sizeRange; z++ ) {
+			for (size_t y = 0; y < sizeRange; y++ ) {
+				for (size_t x = 0; x < sizeRange; x++ ) {
+					BOOST_CHECK_EQUAL( ch1.voxel<float>(x,y,z), ch2.voxel<float>(x,y,z) );
+				}
+			}
+		}
+	}
+	
+}
+
+
+BOOST_AUTO_TEST_CASE ( chunk_swap_test_column )
+{
+	for( size_t sizeRange = 10; sizeRange < 21; sizeRange++ ) {
+		data::MemChunk<float> ch1( sizeRange, sizeRange, sizeRange );
+		data::MemChunk<float> ch2( sizeRange, sizeRange, sizeRange ); 
+		ch1.setPropertyAs( "indexOrigin", util::fvector4() );
+		ch1.setPropertyAs( "rowVec", util::fvector4( 1, 0, 0 ) );
+		ch1.setPropertyAs( "columnVec", util::fvector4( 0, 1, 0 ) );
+		ch1.setPropertyAs( "sliceVec", util::fvector4( 0, 0, 1 ) );
+
+		for (size_t z = 0; z < sizeRange; z++ ) {
+			for (size_t y = 0; y < sizeRange; y++ ) {
+				for (size_t x = 0; x < sizeRange; x++ ) {
+					ch1.voxel<float>(x,y,z) = y;
+					ch2.voxel<float>(x,y,z) = y;
+				}
+			}
+		}
+		ch1.swapAlong( data::columnDim );
+		for (size_t z = 0; z < sizeRange; z++ ) {
+			for (size_t y = 0; y < sizeRange; y++ ) {
+				for (size_t x = 0; x < sizeRange; x++ ) {
+					BOOST_CHECK_EQUAL( ch1.voxel<float>(x,sizeRange-1-y,z), ch2.voxel<float>(x,y,z) );
+				}
+			}
+		}
+		ch1.swapAlong( data::columnDim );
+		for (size_t z = 0; z < sizeRange; z++ ) {
+			for (size_t y = 0; y < sizeRange; y++ ) {
+				for (size_t x = 0; x < sizeRange; x++ ) {
+					BOOST_CHECK_EQUAL( ch1.voxel<float>(x,y,z), ch2.voxel<float>(x,y,z) );
+				}
+			}
+		}
+	}
+	
+}
+
+BOOST_AUTO_TEST_CASE ( chunk_swap_test_slice )
+{
+	for( size_t sizeRange = 10; sizeRange < 21; sizeRange++ ) {
+		data::MemChunk<float> ch1( sizeRange, sizeRange, sizeRange );
+		data::MemChunk<float> ch2( sizeRange, sizeRange, sizeRange ); 
+		ch1.setPropertyAs( "indexOrigin", util::fvector4() );
+		ch1.setPropertyAs( "rowVec", util::fvector4( 1, 0, 0 ) );
+		ch1.setPropertyAs( "columnVec", util::fvector4( 0, 1, 0 ) );
+		ch1.setPropertyAs( "sliceVec", util::fvector4( 0, 0, 1 ) );
+
+		for (size_t z = 0; z < sizeRange; z++ ) {
+			for (size_t y = 0; y < sizeRange; y++ ) {
+				for (size_t x = 0; x < sizeRange; x++ ) {
+					ch1.voxel<float>(x,y,z) = z;
+					ch2.voxel<float>(x,y,z) = z;
+				}
+			}
+		}
+		ch1.swapAlong( data::sliceDim );
+		for (size_t z = 0; z < sizeRange; z++ ) {
+			for (size_t y = 0; y < sizeRange; y++ ) {
+				for (size_t x = 0; x < sizeRange; x++ ) {
+					BOOST_CHECK_EQUAL( ch1.voxel<float>(x,y,sizeRange-1-z), ch2.voxel<float>(x,y,z) );
+				}
+			}
+		}
+		ch1.swapAlong( data::sliceDim );
+		for (size_t z = 0; z < sizeRange; z++ ) {
+			for (size_t y = 0; y < sizeRange; y++ ) {
+				for (size_t x = 0; x < sizeRange; x++ ) {
+					BOOST_CHECK_EQUAL( ch1.voxel<float>(x,y,z), ch2.voxel<float>(x,y,z) );
+				}
+			}
+		}
+	}
+	
 }
 
 BOOST_AUTO_TEST_CASE ( chunk_copyLine_Test )

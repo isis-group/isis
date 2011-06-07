@@ -98,17 +98,30 @@ bool ParameterMap::parse( int argc, char **argv )
 				i++;
 			}
 
-			iterator found = find( pName );
-
-			if( found == end() ) {
+			std::list<std::string> matchingStrings;
+			BOOST_FOREACH( ParameterMap::const_reference parameterRef, *this ) {
+				if(parameterRef.first.find( pName ) == 0 ) {
+					matchingStrings.push_back( parameterRef.first );
+				}
+			}
+			if( matchingStrings.size() > 1 ) {
+				std::stringstream matchingStringStream;
+				BOOST_FOREACH( std::list<std::string>::const_reference stringRef, matchingStrings ) {
+					matchingStringStream << stringRef << " ";
+				}
+				LOG( Runtime, warning ) << "The parameter \"" << pName 
+					<< "\" is ambiguous. The parameters \"" 
+					<< matchingStringStream.str().erase( matchingStringStream.str().size() - 1, 1 ) 
+					<< "\" are possible. Ignoring this parameter!";
+			} else if ( !matchingStrings.size() ) {
 				LOG( Runtime, warning ) << "Ignoring unknown parameter " << MSubject( std::string( "-" ) + pName + " " + listToString( argv + start, argv + i, " ", "", "" ) );
-			} else if ( found->second.parse( listToString( argv + start, argv + i, ",", "", "" ) ) ) { // parse the collected properties
-				found->second.needed() = false;//remove needed flag, because the value is set (aka "not needed anymore")
+			} else if ( at(matchingStrings.front()).parse( listToString( argv + start, argv + i, ",", "", "" ) ) ) { // parse the collected properties
+				at(matchingStrings.front()).needed() = false;//remove needed flag, because the value is set (aka "not needed anymore")
 			} else {
 				LOG( Runtime, error )
 						<< "Failed to parse value(s) "
 						<< MSubject( listToString( argv + start, argv + i, " ", "", "" ) )
-						<< " for "  << found->first << "(" << found->second->getTypeName() << ")";
+						<< " for "  << matchingStrings.front() << "(" << at(matchingStrings.front())->getTypeName() << ")";
 				parsed = false;
 			}
 		}
