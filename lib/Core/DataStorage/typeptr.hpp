@@ -132,11 +132,15 @@ public:
 		};
 	};
 	/**
-	 * Contructor for empty pointer.
-	 * length will be 0 and every attempt to dereference it will raise an exception.
+	 * Creates a ValuePtr pointing to a newly allocated array of elements of the given type.
+	 * The array is zero-initialized.
+	 * If the requested length is 0 no memory will be allocated and the pointer be "empty".
+	 * \param length amount of elements in the new array
 	 */
-	ValuePtr() {
-		LOG( Debug, warning ) << "Creating an empty ValuePtr of type " << util::MSubject( staticName() ) << " you should overwrite it with a usefull pointer before using it";
+	ValuePtr(size_t length):_internal::ValuePtrBase( length ) {
+		if(length)
+			m_val.reset( (TYPE*)calloc(length,sizeof(TYPE)), BasicDeleter() );
+		LOG_IF( length==0,Debug, warning ) << "Creating an empty ValuePtr of type " << util::MSubject( staticName() ) << " you should overwrite it with a usefull pointer before using it";
 	}
 
 	/**
@@ -148,8 +152,7 @@ public:
 	 * \param length the length of the used array (ValuePtr does NOT check for length,
 	 * this is just here for child classes which may want to check)
 	 */
-	ValuePtr( TYPE *const ptr, size_t length ):
-		_internal::ValuePtrBase( length ), m_val( ptr, BasicDeleter() ) {}
+	ValuePtr( TYPE *const ptr, size_t length ):	_internal::ValuePtrBase( length ), m_val( ptr, BasicDeleter() ) {}
 
 	/**
 	 * Creates ValuePtr from a pointer of type TYPE.
@@ -165,15 +168,6 @@ public:
 		_internal::ValuePtrBase( length ), m_val( ptr, d ) {}
 
 	virtual ~ValuePtr() {}
-
-	/**
-	 * Create a new ValuePtr which uses newly allocated memory.
-	 * \param len requested size of the memory block in elements
-	 * \returns a ValuePtr\<TYPE\> of given len
-	 */
-	static ValuePtr allocate( size_t len ) {
-		return ValuePtr( ( TYPE * )malloc( len * sizeof( TYPE ) ), len );
-	}
 
 	/**
 	 * Get the raw address the ValuePtr points to.
