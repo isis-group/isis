@@ -22,14 +22,6 @@ else(ISIS_USE_LIBOIL)
 endif(ISIS_USE_LIBOIL)
 
 ############################################################
-# set the plugin directory and the system dependend shared
-# library naming conventions
-############################################################
-add_definitions(-DPLUGIN_PATH="${CMAKE_INSTALL_PREFIX}/${ISIS_PLUGIN_INFIX}")
-add_definitions(-DDL_SUFFIX="${CMAKE_SHARED_LIBRARY_SUFFIX}")
-add_definitions(-DDL_PREFIX="${CMAKE_SHARED_LIBRARY_PREFIX}")
-
-############################################################
 # export library dependencies of isis_core
 ############################################################
 set(ISIS_LIB_DEPENDS  ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} ${LibOil_LIBRARY}
@@ -59,6 +51,14 @@ if(ISIS_BUILD_STATIC)
 	target_link_libraries( isis_core ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} ${LibOil_LIBRARY})
 	set_target_properties( isis_core PROPERTIES	${ISIS_BUILD_PROPERTIES} VERSION ${${CMAKE_PROJECT_NAME}_VERSION} INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
 endif(ISIS_BUILD_STATIC)
+
+############################################################
+# set the plugin directory and the system dependend shared
+# library naming conventions
+############################################################
+set_source_files_properties( "DataStorage/io_factory.cpp" PROPERTIES COMPILE_FLAGS
+	"-DPLUGIN_PATH=\\\"${CMAKE_INSTALL_PREFIX}/${ISIS_PLUGIN_INFIX}\\\" -DDL_SUFFIX=\\\"${CMAKE_SHARED_LIBRARY_SUFFIX}\\\" -DDL_PREFIX=\\\"${CMAKE_SHARED_LIBRARY_PREFIX}\\\""
+)
 
 ############################################################
 # Installation
