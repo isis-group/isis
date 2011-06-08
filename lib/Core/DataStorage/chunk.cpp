@@ -269,7 +269,7 @@ std::list<Chunk> Chunk::splice ( dimensions atDim )const
 	const ValuePtrList pointers = this->getValuePtrBase().splice( spliceSize.product() );
 	//create new Chunks from this ValuePtr's
 	BOOST_FOREACH( ValuePtrList::const_reference ref, pointers ) {
-		ret.push_back( Chunk( ref, spliceSize[0], spliceSize[1], spliceSize[2], spliceSize[3] ) ); //@todo make sure zhis is only one copy-operation
+		ret.push_back( Chunk( ref, spliceSize[0], spliceSize[1], spliceSize[2], spliceSize[3] ) ); //@todo make sure this is only one copy-operation
 		static_cast<util::PropertyMap &>( ret.back() ) = static_cast<const util::PropertyMap &>( *this ); //copy my metadate into all spliced
 	}
 	return ret;
@@ -284,23 +284,33 @@ void Chunk::swapAlong( const dimensions dim ) const
 {
 	const size_t elSize=bytesPerVoxel();
 	const util::FixedVector<size_t,4> whole_size=getSizeAsVector();
+	const util::FixedVector<size_t,4> outer_size=whole_size;
+
+	uint8_t* swap_start=boost::shared_static_cast<uint8_t>(get()->getRawAddress().lock()).get();
+	const uint8_t *const swap_end=swap_start+whole_size.product()*elSize;
+
 	size_t block_volume=whole_size.product();
 	for(int i=data::timeDim;i>=dim;i--){
-		assert((block_volume%getDimSize(i))==0);
-		block_volume/=getDimSize(i);
+		assert((block_volume%whole_size[i])==0);
+		block_volume/=whole_size[i];
 	}
 
 	assert(block_volume);
 	block_volume*=elSize;
-	std::auto_ptr<uint8_t> buff(static_cast<uint8_t*>(malloc(block_volume)));
+	const size_t swap_volume=block_volume*whole_size[dim];
+	const std::auto_ptr<uint8_t> buff(static_cast<uint8_t*>(malloc(block_volume)));
 
-	boost::shared_ptr<uint8_t> p=boost::shared_static_cast<uint8_t>(get()->getRawAddress().lock());
-	uint8_t* a=p.get(); //first block
-	uint8_t* b=a+getVolume()*bytesPerVoxel()-block_volume; //last block
-	for(;a<b;a+=block_volume,b-=block_volume){ // grow a, shrink b 
-		memcpy(buff.get(),a,block_volume);
-		memcpy(a,b,block_volume);
-		memcpy(b,buff.get(),block_volume);
+	//iterate over all swap-volumes
+	for(;swap_start<swap_end;swap_start+=swap_volume){ //outer loop
+		// swap each block with the one at the oppsite end of the swap_volume
+		uint8_t* a=swap_start; //first block
+		uint8_t* b=swap_start+swap_volume-block_volume; //last block within the swap-volume
+		for(;a<b;a+=block_volume,b-=block_volume){ // grow a, shrink b (inner loop)
+			memcpy(buff.get(),a,block_volume);
+			memcpy(a,b,block_volume);
+			memcpy(b,buff.get(),block_volume);
+		}
+		
 	}
 }
 }
