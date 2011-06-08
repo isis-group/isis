@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE ( chunk_foreach_voxel_test )
 	data::MemChunk<uint8_t> ch( 4, 3, 2, 1 );
 	memset( &ch.asValuePtr<uint8_t>()[0], 1, ch.getVolume() );
 
-	class : public data::Chunk::VoxelOp<uint8_t>
+	class : public data::VoxelOp<uint8_t>
 	{
 	public:
 		bool operator()( uint8_t &vox, const util::FixedVector< size_t, 4 >& /*pos*/ ) {
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE ( chunk_foreach_voxel_test )
 		}
 	} zero;
 
-	class setIdx: public data::Chunk::VoxelOp<uint8_t>
+	class setIdx: public data::VoxelOp<uint8_t>
 	{
 		data::_internal::NDimensional<4> chunkGeometry;
 	public:
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE ( chunk_foreach_voxel_test )
 			return true;
 		}
 	};
-	class checkIdx: public data::Chunk::VoxelOp<uint8_t>
+	class checkIdx: public data::VoxelOp<uint8_t>
 	{
 		data::_internal::NDimensional<4> chunkGeometry;
 	public:
@@ -273,13 +273,13 @@ BOOST_AUTO_TEST_CASE ( chunk_splice_test )//Copy chunks
 
 BOOST_AUTO_TEST_CASE ( chunk_swap_test )
 {
-	class :public data::Chunk::VoxelOp<int>{
+	class :public data::VoxelOp<int>{
 		bool operator()( int &vox, const util::FixedVector<size_t, 4> & ){
 			vox=rand();
 			return true;
 		}
 	}randomize;
-	class SwapCheck:public data::Chunk::VoxelOp<int>{
+	class SwapCheck:public data::VoxelOp<int>{
 		size_t swapidx,sizeRange;
 	public:
 		data::MemChunk<int> orig;

@@ -167,8 +167,6 @@ public:
 	/// \returns the number of references using the same memory as this.
 	size_t useCount()const;
 
-	bool swapAlong( const dimensions dim, const size_t dims[] ) const;
-
 	/**
 	 * Get minimum/maximum of a ValuePtr.
 	 * This computes the minimum and maximum value of the stored data and stores them in ValueReference-Objects.

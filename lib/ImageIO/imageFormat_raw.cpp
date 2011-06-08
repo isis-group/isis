@@ -104,7 +104,7 @@ public:
 	}
 
 	void write( const data::Image &image, const std::string &filename, const std::string &/*dialect*/ )  throw( std::runtime_error & ) {
-		class WriteOp: public data::Image::ChunkOp
+		class WriteOp: public data::ChunkOp
 		{
 			std::ofstream out;
 			unsigned short typeID;

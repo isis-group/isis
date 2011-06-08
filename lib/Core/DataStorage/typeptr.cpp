@@ -21,7 +21,7 @@ namespace _internal{
 
 
 //////////////////////////////////////////////////////////    
-// some voodo to get the vector types into the templates /
+// some voodoo to get the vector types into the templates /
 //////////////////////////////////////////////////////////
 template<typename T> struct _VectorUnion{
 	union {__m128i reg;T elem[16/sizeof(T)];} vec;
