@@ -164,15 +164,18 @@ template<> std::pair<__m128i,__m128i> _getMinMaxBlockLoop<uint32_t>(const __m128
 
 template<typename T> std::pair<T,T> _getMinMax(const T *data,size_t len){
 	size_t blocks=len/(16/sizeof(T));
-	
-	std::pair<__m128i,__m128i> minmax=_getMinMaxBlockLoop<T>(reinterpret_cast<const __m128i*>(data),blocks);
-	
-	
-	// compute the min/max of the blocks bmin/bmax
-	const _VectorUnion<T> smin=minmax.first;
-	const _VectorUnion<T> smax=minmax.second;
-	const T bmin=*std::min_element(smin.vec.elem, smin.vec.elem+16/sizeof(T));
-	const T bmax=*std::max_element(smax.vec.elem, smax.vec.elem+16/sizeof(T));
+
+	T bmin=std::numeric_limits<T>::max();
+	T bmax=std::numeric_limits<T>::min();
+
+	if(blocks){// if there are 16byte-blocks of values
+		std::pair<__m128i,__m128i> minmax=_getMinMaxBlockLoop<T>(reinterpret_cast<const __m128i*>(data),blocks);
+		// compute the min/max of the blocks bmin/bmax
+		const _VectorUnion<T> smin=minmax.first;
+		const _VectorUnion<T> smax=minmax.second;
+		bmin=*std::min_element(smin.vec.elem, smin.vec.elem+16/sizeof(T));
+		bmax=*std::max_element(smax.vec.elem, smax.vec.elem+16/sizeof(T));
+	}
 	
 	// if there are some remaining elements
 	if(data+blocks*16/sizeof(T) < data+len){
