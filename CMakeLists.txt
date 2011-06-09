@@ -56,8 +56,7 @@ if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
 endif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" )
 
 ############################################################
-# Logging options are global for all components using the
-# core library.
+# Logging options are global for all components in the tree
 ############################################################
 option(ISIS_RUNTIME_LOG "Enable runtime logging" ON)
 option(ISIS_DEBUG_LOG "Enable debug logging" ON)

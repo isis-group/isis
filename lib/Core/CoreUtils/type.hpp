@@ -95,22 +95,24 @@ public:
 	virtual ~type_compare() {}
 };
 
-template<typename T, bool isNumber> class type_less : public type_compare<T, isNumber> {
+template<typename T, bool isNumber> class type_less : public type_compare<T, isNumber>
+{
 public: // c++0x says we need a user defined constructor here
-    type_less(){}
+	type_less() {}
 };// we are going to specialize this for numeric T below
-template<typename T, bool isNumber> class type_greater : public type_compare<T, isNumber> {
+template<typename T, bool isNumber> class type_greater : public type_compare<T, isNumber>
+{
 public: // c++0x says we need a user defined constructor here
-    type_greater(){}
+	type_greater() {}
 };
 template<typename T, bool isNumber> class type_eq : public type_compare<T, isNumber>
 {
 protected:
 	bool inRange( const util::Value<T> &first, const util::Value<T> &second )const {
-		return static_cast<const T&>( first ) == static_cast<const T&>( second );
+		return static_cast<const T &>( first ) == static_cast<const T &>( second );
 	}
 public: // c++0x says we need a user defined constructor here
-    type_eq(){}
+	type_eq() {}
 };
 
 /// less-than comparison for arithmetic types
@@ -121,10 +123,10 @@ protected:
 		return true; //getting an positive overflow when trying to convert second into T, obviously means first is less
 	}
 	bool inRange( const util::Value<T> &first, const util::Value<T> &second )const {
-		return static_cast<const T&>( first ) < static_cast<const T&>( second );
+		return static_cast<const T &>( first ) < static_cast<const T &>( second );
 	}
 public: // c++0x says we need a user defined constructor here
-    type_less(){}
+	type_less() {}
 };
 
 /// greater-than comparison for arithmetic types
@@ -135,10 +137,10 @@ protected:
 		return true; //getting an negative overflow when trying to convert second into T, obviously means first is greater
 	}
 	bool inRange( const util::Value<T> &first, const util::Value<T> &second )const {
-		return static_cast<const T&>( first ) > static_cast<const T&>( second );
+		return static_cast<const T &>( first ) > static_cast<const T &>( second );
 	}
 public: // c++0x says we need a user defined constructor here
-    type_greater(){}
+	type_greater() {}
 };
 
 /// @endcond _hidden
@@ -165,7 +167,7 @@ protected:
 	}
 public:
 	static const unsigned short staticID = _internal::TypeID<TYPE>::value;
-	Value():m_val() {
+	Value(): m_val() {
 		BOOST_MPL_ASSERT_RELATION( staticID, < , 0xFF );
 		checkType<TYPE>();
 	}
@@ -257,7 +259,7 @@ public:
 	 * \retval false if there is no know conversion from ref to TYPE
 	 */
 	bool gt( const _internal::ValueBase &ref )const {
-        static const _internal::type_greater<TYPE, boost::is_arithmetic<TYPE>::value > greater;
+		static const _internal::type_greater<TYPE, boost::is_arithmetic<TYPE>::value > greater;
 		return greater.operator()( *this, ref );
 	}
 
@@ -271,7 +273,7 @@ public:
 	 * \retval false if there is no know conversion from ref to TYPE
 	 */
 	bool lt( const _internal::ValueBase &ref )const {
-        static const _internal::type_less<TYPE, boost::is_arithmetic<TYPE>::value > less;
+		static const _internal::type_less<TYPE, boost::is_arithmetic<TYPE>::value > less;
 		return less( *this, ref );
 	}
 
@@ -285,7 +287,7 @@ public:
 	 * \retval false if there is no know conversion from ref to TYPE
 	 */
 	bool eq( const _internal::ValueBase &ref )const {
-        static const _internal::type_eq<TYPE, boost::is_arithmetic<TYPE>::value > equal;
+		static const _internal::type_eq<TYPE, boost::is_arithmetic<TYPE>::value > equal;
 		return equal( *this, ref );
 	}
 
@@ -309,7 +311,7 @@ template<typename T> util::Value<T>& _internal::ValueBase::castToType()
 }
 template<typename T> T &_internal::ValueBase::castTo()
 {
-    util::Value<T> &ret = castToType<T>();
+	util::Value<T> &ret = castToType<T>();
 	return ret.operator T & ();
 }
 
