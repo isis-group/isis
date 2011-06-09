@@ -148,7 +148,6 @@ bool ValuePtrBase::swapAlong( const dimensions dim, const size_t dims[] ) const
 	int8_t *tmpOrigin;
 	int8_t *tmpDest;
 
-
 	if ( dim == data::rowDim ) {
 		size_t index_forward = 0;
 		size_t index_y = 0;
