@@ -96,7 +96,6 @@ public:
 	void fill( const TYPE &val ) {
 		std::fill( CONTAINER::begin(), CONTAINER::end(), val );
 	}
-	/// Get the biggest vector element (absolute)
 	size_t getBiggestVecElemAbs( ) const
 	{
 		size_t biggestVecElem = 0;
