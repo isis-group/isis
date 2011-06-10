@@ -170,7 +170,7 @@
 <a name="l00139"></a>00139     T( 2, 1 ) = 0;
 <a name="l00140"></a>00140     T( 2, 2 ) = 1;
 <a name="l00141"></a>00141     <span class="comment">// apply transformation to local isis image copy</span>
-<a name="l00142"></a>00142     m_ImageISIS.<a class="code" href="classisis_1_1data_1_1Image.html#a9ed78842da8e8f0af4f2f14d71dae2ee" title="Transforms the image coordinate system into an other system by multiplying the orientation matrix wit...">transformCoords</a>( T );
+<a name="l00142"></a>00142     m_ImageISIS.<a class="code" href="classisis_1_1data_1_1Image.html#a10667fe639484021089fd983caaf58ea" title="Transforms the image coordinate system into an other system by multiplying the orientation matrix wit...">transformCoords</a>( T );
 <a name="l00143"></a>00143     <span class="comment">//getting the required metadata from the isis image</span>
 <a name="l00144"></a>00144     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3">dimensions</a>( m_ImageISIS.<a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a498b4ebaa5ef654ebe41eacebe813e66" title="generates a FixedVector&amp;lt;DIMS&amp;gt; representing the size">getSizeAsVector</a>() );
 <a name="l00145"></a>00145     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> indexOrigin( m_ImageISIS.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#abcf0e682869605ab103504ab05fc7624" title="Request a property via the given key in the given type.">getPropertyAs</a>&lt;<a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>&gt;( <span class="stringliteral">&quot;indexOrigin&quot;</span> ) );
@@ -360,7 +360,7 @@
 <a name="l00329"></a>00329 }
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Apr 19 2011 16:19:13 for ISIS Core Library by&nbsp;
+<hr class="footer"/><address class="footer"><small>Generated on Fri Jun 10 2011 10:57:20 for ISIS Core Library by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.1 </small></address>
 </body>

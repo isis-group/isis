@@ -34,284 +34,291 @@
 <a name="l00003"></a>00003 <span class="preprocessor"></span>
 <a name="l00004"></a>00004 <span class="preprocessor">#include &lt;limits&gt;</span>
 <a name="l00005"></a>00005 <span class="preprocessor">#include &lt;assert.h&gt;</span>
-<a name="l00006"></a>00006 <span class="preprocessor">#include &lt;boost/numeric/conversion/converter.hpp&gt;</span>
-<a name="l00007"></a>00007 <span class="preprocessor">#include &quot;<a class="code" href="DataStorage_2common_8hpp.html">common.hpp</a>&quot;</span>
-<a name="l00008"></a>00008 <span class="preprocessor">#include &quot;<a class="code" href="typeptr_8hpp.html">typeptr.hpp</a>&quot;</span>
-<a name="l00009"></a>00009 
-<a name="l00010"></a>00010 <span class="keyword">namespace </span>isis
-<a name="l00011"></a>00011 {
-<a name="l00012"></a>00012 <span class="keyword">namespace </span>data
+<a name="l00006"></a>00006 <span class="preprocessor">#include &lt;boost/mpl/bool.hpp&gt;</span>
+<a name="l00007"></a>00007 <span class="preprocessor">#include &lt;boost/type_traits/is_arithmetic.hpp&gt;</span>
+<a name="l00008"></a>00008 <span class="preprocessor">#include &quot;<a class="code" href="DataStorage_2common_8hpp.html">common.hpp</a>&quot;</span>
+<a name="l00009"></a>00009 <span class="preprocessor">#include &quot;<a class="code" href="typeptr_8hpp.html">typeptr.hpp</a>&quot;</span>
+<a name="l00010"></a>00010 
+<a name="l00011"></a>00011 
+<a name="l00012"></a>00012 <span class="keyword">namespace </span>isis
 <a name="l00013"></a>00013 {
-<a name="l00014"></a>00014 <span class="keyword">enum</span> autoscaleOption;
-<a name="l00015"></a>00015 <span class="keyword">namespace </span>_internal
-<a name="l00016"></a>00016 {
-<a name="l00017"></a>00017 
-<a name="l00018"></a><a class="code" href="namespaceisis_1_1data_1_1__internal.html#a77de5b076e75f8dbc3001b727450f244">00018</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> SRC, <span class="keyword">typename</span> DST&gt; <span class="keywordtype">void</span> <a class="code" href="namespaceisis_1_1data_1_1__internal.html#a77de5b076e75f8dbc3001b727450f244">numeric_convert_impl</a>( <span class="keyword">const</span> SRC *src, DST *dst, <span class="keywordtype">size_t</span> count, <span class="keywordtype">double</span> scale, <span class="keywordtype">double</span> offset )
-<a name="l00019"></a>00019 {
-<a name="l00020"></a>00020     <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> )
-<a name="l00021"></a>00021             &lt;&lt; <span class="stringliteral">&quot;using generic scaling convert &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr&lt;SRC&gt;::staticName</a>() &lt;&lt; <span class="stringliteral">&quot;=&gt;&quot;</span> &lt;&lt; <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr&lt;DST&gt;::staticName</a>()
-<a name="l00022"></a>00022             &lt;&lt; <span class="stringliteral">&quot; with scale/offset &quot;</span> &lt;&lt; std::fixed &lt;&lt; scale &lt;&lt; <span class="stringliteral">&quot;/&quot;</span> &lt;&lt; offset;
-<a name="l00023"></a>00023     <span class="keyword">static</span> boost::numeric::converter &lt;
-<a name="l00024"></a>00024     DST, double,
-<a name="l00025"></a>00025        boost::numeric::conversion_traits&lt;DST, double&gt;,
-<a name="l00026"></a>00026        boost::numeric::def_overflow_handler,
-<a name="l00027"></a>00027        boost::numeric::RoundEven&lt;double&gt;
-<a name="l00028"></a>00028        &gt; converter;
-<a name="l00029"></a>00029 
-<a name="l00030"></a>00030     <span class="keywordflow">for</span> ( <span class="keywordtype">size_t</span> i = 0; i &lt; count; i++ ) {
-<a name="l00031"></a>00031         dst[i] = converter( src[i] * scale + offset );
-<a name="l00032"></a>00032     }
+<a name="l00014"></a>00014 <span class="keyword">namespace </span>data
+<a name="l00015"></a>00015 {
+<a name="l00016"></a>00016 <span class="keyword">enum</span> autoscaleOption;
+<a name="l00017"></a>00017 <span class="keyword">namespace </span>_internal
+<a name="l00018"></a>00018 {
+<a name="l00019"></a>00019 
+<a name="l00020"></a><a class="code" href="namespaceisis_1_1data_1_1__internal.html#aee7cb606448fd33439952238dda1b9d5">00020</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; T <a class="code" href="namespaceisis_1_1data_1_1__internal.html#aee7cb606448fd33439952238dda1b9d5">round_impl</a>( <span class="keywordtype">double</span> <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a4a8e9c237b3decda2f60f508fa860398">x</a>, boost::mpl::bool_&lt;true&gt; )
+<a name="l00021"></a>00021 {
+<a name="l00022"></a>00022     <span class="keyword">const</span> <span class="keywordtype">double</span> ret( x &lt; 0 ? x - 0.5 : x + 0.5 );
+<a name="l00023"></a>00023     <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span>T<span class="keyword">&gt;</span>( ret );
+<a name="l00024"></a>00024 }
+<a name="l00025"></a><a class="code" href="namespaceisis_1_1data_1_1__internal.html#ae739276776001aa07831929f3279d592">00025</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; T <a class="code" href="namespaceisis_1_1data_1_1__internal.html#aee7cb606448fd33439952238dda1b9d5">round_impl</a>( <span class="keywordtype">double</span> <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a4a8e9c237b3decda2f60f508fa860398">x</a>, boost::mpl::bool_&lt;false&gt; )
+<a name="l00026"></a>00026 {
+<a name="l00027"></a>00027     <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span>T<span class="keyword">&gt;</span>( x ); <span class="comment">//@todo find a proper way to round from double to floating point (with range check !!)</span>
+<a name="l00028"></a>00028 }
+<a name="l00029"></a><a class="code" href="namespaceisis_1_1data_1_1__internal.html#a3502ce271464b9958f330371d41c0872">00029</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; T <a class="code" href="namespaceisis_1_1data_1_1__internal.html#a3502ce271464b9958f330371d41c0872">round</a>( <span class="keywordtype">double</span> <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a4a8e9c237b3decda2f60f508fa860398">x</a> )
+<a name="l00030"></a>00030 {
+<a name="l00031"></a>00031     BOOST_MPL_ASSERT( ( boost::is_arithmetic&lt;T&gt; ) );
+<a name="l00032"></a>00032     <span class="keywordflow">return</span> round_impl&lt;T&gt;( x, boost::mpl::bool_&lt;std::numeric_limits&lt;T&gt;::is_integer&gt;() ); <span class="comment">//we do use overloading intead of (forbidden) partial specialization</span>
 <a name="l00033"></a>00033 }
 <a name="l00034"></a>00034 
-<a name="l00035"></a><a class="code" href="namespaceisis_1_1data_1_1__internal.html#a7578a010ce4d066ccc4b71741877d33f">00035</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> SRC, <span class="keyword">typename</span> DST&gt; <span class="keywordtype">void</span> <a class="code" href="namespaceisis_1_1data_1_1__internal.html#a77de5b076e75f8dbc3001b727450f244">numeric_convert_impl</a>( <span class="keyword">const</span> SRC *src, DST *dst, <span class="keywordtype">size_t</span> count )
-<a name="l00036"></a>00036 {
-<a name="l00037"></a>00037     <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;using generic convert &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr&lt;SRC&gt;::staticName</a>() &lt;&lt; <span class="stringliteral">&quot; =&gt; &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr&lt;DST&gt;::staticName</a>() &lt;&lt; <span class="stringliteral">&quot; without scaling&quot;</span>;
-<a name="l00038"></a>00038     <span class="keyword">static</span> boost::numeric::converter &lt;
-<a name="l00039"></a>00039     DST, SRC,
-<a name="l00040"></a>00040        boost::numeric::conversion_traits&lt;DST, SRC&gt;,
-<a name="l00041"></a>00041        boost::numeric::def_overflow_handler,
-<a name="l00042"></a>00042        boost::numeric::RoundEven&lt;SRC&gt;
-<a name="l00043"></a>00043        &gt; converter;
-<a name="l00044"></a>00044 
-<a name="l00045"></a>00045     <span class="keywordflow">for</span> ( <span class="keywordtype">size_t</span> i = 0; i &lt; count; i++ )
-<a name="l00046"></a>00046         dst[i] = converter( src[i] );
-<a name="l00047"></a>00047 }
-<a name="l00048"></a>00048 
-<a name="l00049"></a><a class="code" href="namespaceisis_1_1data_1_1__internal.html#a95cd6f91be5a05eb52dfe2cd93c5e16a">00049</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="keywordtype">void</span> <a class="code" href="namespaceisis_1_1data_1_1__internal.html#a95cd6f91be5a05eb52dfe2cd93c5e16a">numeric_copy_impl</a>( <span class="keyword">const</span> T *src, T *dst, <span class="keywordtype">size_t</span> count )
-<a name="l00050"></a>00050 {
-<a name="l00051"></a>00051     <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> )    &lt;&lt; <span class="stringliteral">&quot;using memcpy-copy of &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr&lt;T&gt;::staticName</a>() &lt;&lt; <span class="stringliteral">&quot; without scaling&quot;</span>;
-<a name="l00052"></a>00052     memcpy( dst, src, count * <span class="keyword">sizeof</span>( T ) );
-<a name="l00053"></a>00053 }
-<a name="l00054"></a><a class="code" href="namespaceisis_1_1data_1_1__internal.html#a09d9dd3a94187f1253288106927e5c21">00054</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="keywordtype">void</span> <a class="code" href="namespaceisis_1_1data_1_1__internal.html#a95cd6f91be5a05eb52dfe2cd93c5e16a">numeric_copy_impl</a>( <span class="keyword">const</span> T *src, T *dst, <span class="keywordtype">size_t</span> count, <span class="keywordtype">double</span> scale, <span class="keywordtype">double</span> offset )
-<a name="l00055"></a>00055 {
-<a name="l00056"></a>00056     <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> )    &lt;&lt; <span class="stringliteral">&quot;using generic scaling copy of &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr&lt;T&gt;::staticName</a>() &lt;&lt; <span class="stringliteral">&quot; with scale/offset &quot;</span> &lt;&lt; std::fixed &lt;&lt; scale &lt;&lt; <span class="stringliteral">&quot;/&quot;</span> &lt;&lt; offset;
-<a name="l00057"></a>00057 
-<a name="l00058"></a>00058     <span class="keywordflow">for</span> ( <span class="keywordtype">size_t</span> i = 0; i &lt; count; i++ )
-<a name="l00059"></a>00059         dst[i] = src[i] * scale + offset;
-<a name="l00060"></a>00060 }
-<a name="l00061"></a>00061 
-<a name="l00062"></a>00062 <span class="preprocessor">#ifdef ISIS_USE_LIBOIL</span>
-<a name="l00063"></a>00063 <span class="preprocessor"></span><span class="preprocessor">#define DECL_CONVERT(SRC_TYPE,DST_TYPE)        template&lt;&gt; void numeric_convert_impl&lt;SRC_TYPE,DST_TYPE&gt;( const SRC_TYPE *src, DST_TYPE *dst, size_t count )</span>
-<a name="l00064"></a>00064 <span class="preprocessor"></span><span class="preprocessor">#define DECL_SCALED_CONVERT(SRC_TYPE,DST_TYPE) template&lt;&gt; void numeric_convert_impl&lt;SRC_TYPE,DST_TYPE&gt;( const SRC_TYPE *src, DST_TYPE *dst, size_t count, double scale, double offset )</span>
-<a name="l00065"></a>00065 <span class="preprocessor"></span><span class="comment">// storage class for explicit specilisations is not allowed (http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_defects.html#605)</span>
-<a name="l00066"></a>00066 
-<a name="l00067"></a>00067 <span class="comment">//&gt;&gt;s32</span>
-<a name="l00068"></a>00068 DECL_CONVERT( <span class="keywordtype">float</span>, int32_t );
-<a name="l00069"></a>00069 DECL_CONVERT( <span class="keywordtype">double</span>, int32_t );
-<a name="l00070"></a>00070 DECL_CONVERT( uint32_t, int32_t );
-<a name="l00071"></a>00071 DECL_CONVERT( int16_t, int32_t );
-<a name="l00072"></a>00072 DECL_CONVERT( uint16_t, int32_t );
-<a name="l00073"></a>00073 DECL_CONVERT( int8_t, int32_t );
-<a name="l00074"></a>00074 DECL_CONVERT( uint8_t, int32_t );
-<a name="l00075"></a>00075 
-<a name="l00076"></a>00076 <span class="comment">//&gt;&gt;u32</span>
-<a name="l00077"></a>00077 <span class="comment">//DECL_CONVERT(float,uint32_t); conversion to u32 is broken (https://bugs.freedesktop.org/show_bug.cgi?ID=16524)</span>
-<a name="l00078"></a>00078 <span class="comment">//DECL_CONVERT(double,uint32_t);</span>
-<a name="l00079"></a>00079 DECL_CONVERT( int32_t, uint32_t );
-<a name="l00080"></a>00080 <span class="comment">//DECL_CONVERT(int16_t,uint32_t); ** Not available in liboil - but should be imho</span>
-<a name="l00081"></a>00081 DECL_CONVERT( uint16_t, uint32_t );
-<a name="l00082"></a>00082 <span class="comment">//DECL_CONVERT(int8_t,uint32_t); ** Not available in liboil - but should be imho</span>
-<a name="l00083"></a>00083 DECL_CONVERT( uint8_t, uint32_t );
-<a name="l00084"></a>00084 
-<a name="l00085"></a>00085 <span class="comment">//&gt;&gt;s16</span>
-<a name="l00086"></a>00086 DECL_CONVERT( <span class="keywordtype">float</span>, int16_t );
-<a name="l00087"></a>00087 DECL_CONVERT( <span class="keywordtype">double</span>, int16_t );
-<a name="l00088"></a>00088 DECL_CONVERT( int32_t, int16_t );
-<a name="l00089"></a>00089 DECL_CONVERT( uint32_t, int16_t );
-<a name="l00090"></a>00090 DECL_CONVERT( uint16_t, int16_t );
-<a name="l00091"></a>00091 DECL_CONVERT( int8_t, int16_t );
-<a name="l00092"></a>00092 DECL_CONVERT( uint8_t, int16_t );
-<a name="l00093"></a>00093 
-<a name="l00094"></a>00094 <span class="comment">//&gt;&gt;u16</span>
-<a name="l00095"></a>00095 DECL_CONVERT( <span class="keywordtype">float</span>, uint16_t );
-<a name="l00096"></a>00096 DECL_CONVERT( <span class="keywordtype">double</span>, uint16_t );
-<a name="l00097"></a>00097 DECL_CONVERT( int32_t, uint16_t );
-<a name="l00098"></a>00098 DECL_CONVERT( uint32_t, uint16_t );
-<a name="l00099"></a>00099 DECL_CONVERT( int16_t, uint16_t );
-<a name="l00100"></a>00100 <span class="comment">//DECL_CONVERT(int8_t,uint16_t); ** Not available in liboil - but should be imho</span>
-<a name="l00101"></a>00101 DECL_CONVERT( uint8_t, uint16_t );
-<a name="l00102"></a>00102 
-<a name="l00103"></a>00103 <span class="comment">//&gt;&gt;s8</span>
-<a name="l00104"></a>00104 DECL_CONVERT( <span class="keywordtype">float</span>, int8_t );
-<a name="l00105"></a>00105 DECL_CONVERT( <span class="keywordtype">double</span>, int8_t );
-<a name="l00106"></a>00106 DECL_CONVERT( int32_t, int8_t );
-<a name="l00107"></a>00107 DECL_CONVERT( uint32_t, int8_t );
-<a name="l00108"></a>00108 DECL_CONVERT( int16_t, int8_t );
-<a name="l00109"></a>00109 DECL_CONVERT( uint16_t, int8_t );
-<a name="l00110"></a>00110 DECL_CONVERT( uint8_t, int8_t );
-<a name="l00111"></a>00111 
-<a name="l00112"></a>00112 <span class="comment">//&gt;&gt;u8</span>
-<a name="l00113"></a>00113 DECL_CONVERT( <span class="keywordtype">float</span>, uint8_t );
-<a name="l00114"></a>00114 DECL_CONVERT( <span class="keywordtype">double</span>, uint8_t );
-<a name="l00115"></a>00115 DECL_CONVERT( int32_t, uint8_t );
-<a name="l00116"></a>00116 DECL_CONVERT( uint32_t, uint8_t );
-<a name="l00117"></a>00117 DECL_CONVERT( int16_t, uint8_t );
-<a name="l00118"></a>00118 DECL_CONVERT( uint16_t, uint8_t );
-<a name="l00119"></a>00119 DECL_CONVERT( int8_t, uint8_t );
-<a name="l00120"></a>00120 
-<a name="l00121"></a>00121 <span class="comment">//&gt;&gt;f32</span>
-<a name="l00122"></a>00122 DECL_CONVERT( <span class="keywordtype">double</span>, <span class="keywordtype">float</span> );
-<a name="l00123"></a>00123 DECL_CONVERT( int32_t, <span class="keywordtype">float</span> );
-<a name="l00124"></a>00124 DECL_CONVERT( uint32_t, <span class="keywordtype">float</span> );
-<a name="l00125"></a>00125 DECL_CONVERT( int16_t, <span class="keywordtype">float</span> );
-<a name="l00126"></a>00126 DECL_CONVERT( uint16_t, <span class="keywordtype">float</span> );
-<a name="l00127"></a>00127 DECL_CONVERT( int8_t, <span class="keywordtype">float</span> );
-<a name="l00128"></a>00128 DECL_CONVERT( uint8_t, <span class="keywordtype">float</span> );
-<a name="l00129"></a>00129 
-<a name="l00130"></a>00130 <span class="comment">//&gt;&gt;f64</span>
-<a name="l00131"></a>00131 DECL_CONVERT( <span class="keywordtype">float</span>, <span class="keywordtype">double</span> );
-<a name="l00132"></a>00132 DECL_CONVERT( int32_t, <span class="keywordtype">double</span> );
-<a name="l00133"></a>00133 DECL_CONVERT( uint32_t, <span class="keywordtype">double</span> );
-<a name="l00134"></a>00134 DECL_CONVERT( int16_t, <span class="keywordtype">double</span> );
-<a name="l00135"></a>00135 DECL_CONVERT( uint16_t, <span class="keywordtype">double</span> );
-<a name="l00136"></a>00136 DECL_CONVERT( int8_t, <span class="keywordtype">double</span> );
-<a name="l00137"></a>00137 DECL_CONVERT( uint8_t, <span class="keywordtype">double</span> );
-<a name="l00138"></a>00138 
-<a name="l00139"></a>00139 <span class="comment">//scale&gt;&gt;s32</span>
-<a name="l00140"></a>00140 DECL_SCALED_CONVERT( <span class="keywordtype">float</span>, int32_t );
-<a name="l00141"></a>00141 DECL_SCALED_CONVERT( <span class="keywordtype">double</span>, int32_t );
-<a name="l00142"></a>00142 
-<a name="l00143"></a>00143 <span class="comment">//scale&gt;&gt;u32</span>
-<a name="l00144"></a>00144 <span class="comment">//DECL_SCALED_CONVERT(float,uint32_t); conversion to u32 is broken (https://bugs.freedesktop.org/show_bug.cgi?ID=16524)</span>
-<a name="l00145"></a>00145 <span class="comment">//DECL_SCALED_CONVERT(double,uint32_t);</span>
-<a name="l00146"></a>00146 
-<a name="l00147"></a>00147 <span class="comment">//scale&gt;&gt;s16</span>
-<a name="l00148"></a>00148 DECL_SCALED_CONVERT( <span class="keywordtype">float</span>, int16_t );
-<a name="l00149"></a>00149 DECL_SCALED_CONVERT( <span class="keywordtype">double</span>, int16_t );
+<a name="l00035"></a>00035 <span class="keywordtype">size_t</span> <a class="code" href="namespaceisis_1_1data_1_1__internal.html#a645ee7399f56ed23de7f63b40fe2744f">getConvertSize</a>( <span class="keyword">const</span> ValuePtrBase &amp;src, <span class="keyword">const</span> ValuePtrBase &amp;dst );
+<a name="l00036"></a>00036 
+<a name="l00037"></a><a class="code" href="namespaceisis_1_1data_1_1__internal.html#a77de5b076e75f8dbc3001b727450f244">00037</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> SRC, <span class="keyword">typename</span> DST&gt; <span class="keywordtype">void</span> <a class="code" href="namespaceisis_1_1data_1_1__internal.html#a77de5b076e75f8dbc3001b727450f244">numeric_convert_impl</a>( <span class="keyword">const</span> SRC *src, DST *dst, <span class="keywordtype">size_t</span> count, <span class="keywordtype">double</span> scale, <span class="keywordtype">double</span> offset )
+<a name="l00038"></a>00038 {
+<a name="l00039"></a>00039     <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> )
+<a name="l00040"></a>00040             &lt;&lt; <span class="stringliteral">&quot;using generic scaling convert &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr&lt;SRC&gt;::staticName</a>() &lt;&lt; <span class="stringliteral">&quot;=&gt;&quot;</span> &lt;&lt; <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr&lt;DST&gt;::staticName</a>()
+<a name="l00041"></a>00041             &lt;&lt; <span class="stringliteral">&quot; with scale/offset &quot;</span> &lt;&lt; std::fixed &lt;&lt; scale &lt;&lt; <span class="stringliteral">&quot;/&quot;</span> &lt;&lt; offset;
+<a name="l00042"></a>00042 
+<a name="l00043"></a>00043     <span class="keywordflow">for</span> ( <span class="keywordtype">size_t</span> i = 0; i &lt; count; i++ ) {
+<a name="l00044"></a>00044         dst[i] = round&lt;DST&gt;( src[i] * scale + offset );
+<a name="l00045"></a>00045     }
+<a name="l00046"></a>00046 }
+<a name="l00047"></a>00047 
+<a name="l00048"></a><a class="code" href="namespaceisis_1_1data_1_1__internal.html#a7578a010ce4d066ccc4b71741877d33f">00048</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> SRC, <span class="keyword">typename</span> DST&gt; <span class="keywordtype">void</span> <a class="code" href="namespaceisis_1_1data_1_1__internal.html#a77de5b076e75f8dbc3001b727450f244">numeric_convert_impl</a>( <span class="keyword">const</span> SRC *src, DST *dst, <span class="keywordtype">size_t</span> count )
+<a name="l00049"></a>00049 {
+<a name="l00050"></a>00050     <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;using generic convert &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr&lt;SRC&gt;::staticName</a>() &lt;&lt; <span class="stringliteral">&quot; =&gt; &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr&lt;DST&gt;::staticName</a>() &lt;&lt; <span class="stringliteral">&quot; without scaling&quot;</span>;
+<a name="l00051"></a>00051 
+<a name="l00052"></a>00052     <span class="keywordflow">for</span> ( <span class="keywordtype">size_t</span> i = 0; i &lt; count; i++ )
+<a name="l00053"></a>00053         dst[i] = round&lt;DST&gt;( src[i] );
+<a name="l00054"></a>00054 }
+<a name="l00055"></a><a class="code" href="namespaceisis_1_1data_1_1__internal.html#a50e1e4df64c489df444b3f19c465478a">00055</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> SRC, <span class="keyword">typename</span> DST&gt; <span class="keywordtype">void</span> <a class="code" href="namespaceisis_1_1data_1_1__internal.html#a77de5b076e75f8dbc3001b727450f244">numeric_convert_impl</a>( <span class="keyword">const</span> std::complex&lt;SRC&gt; *src, std::complex&lt;DST&gt; *dst, <span class="keywordtype">size_t</span> count, <span class="keywordtype">double</span> <span class="comment">/*scale*/</span>, <span class="keywordtype">double</span> <span class="comment">/*offset*/</span> )
+<a name="l00056"></a>00056 {
+<a name="l00057"></a>00057     <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;complex conversion with scaling is not yet supportet&quot;</span>;
+<a name="l00058"></a>00058     <a class="code" href="namespaceisis_1_1data_1_1__internal.html#a77de5b076e75f8dbc3001b727450f244">numeric_convert_impl</a>( src, dst, count );
+<a name="l00059"></a>00059 }
+<a name="l00060"></a>00060 
+<a name="l00061"></a><a class="code" href="namespaceisis_1_1data_1_1__internal.html#a95cd6f91be5a05eb52dfe2cd93c5e16a">00061</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="keywordtype">void</span> <a class="code" href="namespaceisis_1_1data_1_1__internal.html#a95cd6f91be5a05eb52dfe2cd93c5e16a">numeric_copy_impl</a>( <span class="keyword">const</span> T *src, T *dst, <span class="keywordtype">size_t</span> count )
+<a name="l00062"></a>00062 {
+<a name="l00063"></a>00063     <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> )    &lt;&lt; <span class="stringliteral">&quot;using memcpy-copy of &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr&lt;T&gt;::staticName</a>() &lt;&lt; <span class="stringliteral">&quot; without scaling&quot;</span>;
+<a name="l00064"></a>00064     memcpy( dst, src, count * <span class="keyword">sizeof</span>( T ) );
+<a name="l00065"></a>00065 }
+<a name="l00066"></a><a class="code" href="namespaceisis_1_1data_1_1__internal.html#a09d9dd3a94187f1253288106927e5c21">00066</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="keywordtype">void</span> <a class="code" href="namespaceisis_1_1data_1_1__internal.html#a95cd6f91be5a05eb52dfe2cd93c5e16a">numeric_copy_impl</a>( <span class="keyword">const</span> T *src, T *dst, <span class="keywordtype">size_t</span> count, <span class="keywordtype">double</span> scale, <span class="keywordtype">double</span> offset )
+<a name="l00067"></a>00067 {
+<a name="l00068"></a>00068     <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> )    &lt;&lt; <span class="stringliteral">&quot;using generic scaling copy of &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr&lt;T&gt;::staticName</a>() &lt;&lt; <span class="stringliteral">&quot; with scale/offset &quot;</span> &lt;&lt; std::fixed &lt;&lt; scale &lt;&lt; <span class="stringliteral">&quot;/&quot;</span> &lt;&lt; offset;
+<a name="l00069"></a>00069 
+<a name="l00070"></a>00070     <span class="keywordflow">for</span> ( <span class="keywordtype">size_t</span> i = 0; i &lt; count; i++ )
+<a name="l00071"></a>00071         dst[i] = src[i] * scale + offset;
+<a name="l00072"></a>00072 }
+<a name="l00073"></a>00073 
+<a name="l00074"></a>00074 <span class="preprocessor">#ifdef ISIS_USE_LIBOIL</span>
+<a name="l00075"></a>00075 <span class="preprocessor"></span><span class="preprocessor">#define DECL_CONVERT(SRC_TYPE,DST_TYPE)        template&lt;&gt; void numeric_convert_impl&lt;SRC_TYPE,DST_TYPE&gt;( const SRC_TYPE *src, DST_TYPE *dst, size_t count )</span>
+<a name="l00076"></a>00076 <span class="preprocessor"></span><span class="preprocessor">#define DECL_SCALED_CONVERT(SRC_TYPE,DST_TYPE) template&lt;&gt; void numeric_convert_impl&lt;SRC_TYPE,DST_TYPE&gt;( const SRC_TYPE *src, DST_TYPE *dst, size_t count, double scale, double offset )</span>
+<a name="l00077"></a>00077 <span class="preprocessor"></span><span class="comment">// storage class for explicit specilisations is not allowed (http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_defects.html#605)</span>
+<a name="l00078"></a>00078 
+<a name="l00079"></a>00079 <span class="comment">//&gt;&gt;s32</span>
+<a name="l00080"></a>00080 DECL_CONVERT( <span class="keywordtype">float</span>, int32_t );
+<a name="l00081"></a>00081 DECL_CONVERT( <span class="keywordtype">double</span>, int32_t );
+<a name="l00082"></a>00082 DECL_CONVERT( uint32_t, int32_t );
+<a name="l00083"></a>00083 DECL_CONVERT( int16_t, int32_t );
+<a name="l00084"></a>00084 DECL_CONVERT( uint16_t, int32_t );
+<a name="l00085"></a>00085 DECL_CONVERT( int8_t, int32_t );
+<a name="l00086"></a>00086 DECL_CONVERT( uint8_t, int32_t );
+<a name="l00087"></a>00087 
+<a name="l00088"></a>00088 <span class="comment">//&gt;&gt;u32</span>
+<a name="l00089"></a>00089 <span class="comment">//DECL_CONVERT(float,uint32_t); conversion to u32 is broken (https://bugs.freedesktop.org/show_bug.cgi?ID=16524)</span>
+<a name="l00090"></a>00090 <span class="comment">//DECL_CONVERT(double,uint32_t);</span>
+<a name="l00091"></a>00091 DECL_CONVERT( int32_t, uint32_t );
+<a name="l00092"></a>00092 <span class="comment">//DECL_CONVERT(int16_t,uint32_t); ** Not available in liboil - but should be imho</span>
+<a name="l00093"></a>00093 DECL_CONVERT( uint16_t, uint32_t );
+<a name="l00094"></a>00094 <span class="comment">//DECL_CONVERT(int8_t,uint32_t); ** Not available in liboil - but should be imho</span>
+<a name="l00095"></a>00095 DECL_CONVERT( uint8_t, uint32_t );
+<a name="l00096"></a>00096 
+<a name="l00097"></a>00097 <span class="comment">//&gt;&gt;s16</span>
+<a name="l00098"></a>00098 DECL_CONVERT( <span class="keywordtype">float</span>, int16_t );
+<a name="l00099"></a>00099 DECL_CONVERT( <span class="keywordtype">double</span>, int16_t );
+<a name="l00100"></a>00100 DECL_CONVERT( int32_t, int16_t );
+<a name="l00101"></a>00101 DECL_CONVERT( uint32_t, int16_t );
+<a name="l00102"></a>00102 DECL_CONVERT( uint16_t, int16_t );
+<a name="l00103"></a>00103 DECL_CONVERT( int8_t, int16_t );
+<a name="l00104"></a>00104 DECL_CONVERT( uint8_t, int16_t );
+<a name="l00105"></a>00105 
+<a name="l00106"></a>00106 <span class="comment">//&gt;&gt;u16</span>
+<a name="l00107"></a>00107 DECL_CONVERT( <span class="keywordtype">float</span>, uint16_t );
+<a name="l00108"></a>00108 DECL_CONVERT( <span class="keywordtype">double</span>, uint16_t );
+<a name="l00109"></a>00109 DECL_CONVERT( int32_t, uint16_t );
+<a name="l00110"></a>00110 DECL_CONVERT( uint32_t, uint16_t );
+<a name="l00111"></a>00111 DECL_CONVERT( int16_t, uint16_t );
+<a name="l00112"></a>00112 <span class="comment">//DECL_CONVERT(int8_t,uint16_t); ** Not available in liboil - but should be imho</span>
+<a name="l00113"></a>00113 DECL_CONVERT( uint8_t, uint16_t );
+<a name="l00114"></a>00114 
+<a name="l00115"></a>00115 <span class="comment">//&gt;&gt;s8</span>
+<a name="l00116"></a>00116 DECL_CONVERT( <span class="keywordtype">float</span>, int8_t );
+<a name="l00117"></a>00117 DECL_CONVERT( <span class="keywordtype">double</span>, int8_t );
+<a name="l00118"></a>00118 DECL_CONVERT( int32_t, int8_t );
+<a name="l00119"></a>00119 DECL_CONVERT( uint32_t, int8_t );
+<a name="l00120"></a>00120 DECL_CONVERT( int16_t, int8_t );
+<a name="l00121"></a>00121 DECL_CONVERT( uint16_t, int8_t );
+<a name="l00122"></a>00122 DECL_CONVERT( uint8_t, int8_t );
+<a name="l00123"></a>00123 
+<a name="l00124"></a>00124 <span class="comment">//&gt;&gt;u8</span>
+<a name="l00125"></a>00125 DECL_CONVERT( <span class="keywordtype">float</span>, uint8_t );
+<a name="l00126"></a>00126 DECL_CONVERT( <span class="keywordtype">double</span>, uint8_t );
+<a name="l00127"></a>00127 DECL_CONVERT( int32_t, uint8_t );
+<a name="l00128"></a>00128 DECL_CONVERT( uint32_t, uint8_t );
+<a name="l00129"></a>00129 DECL_CONVERT( int16_t, uint8_t );
+<a name="l00130"></a>00130 DECL_CONVERT( uint16_t, uint8_t );
+<a name="l00131"></a>00131 DECL_CONVERT( int8_t, uint8_t );
+<a name="l00132"></a>00132 
+<a name="l00133"></a>00133 <span class="comment">//&gt;&gt;f32</span>
+<a name="l00134"></a>00134 DECL_CONVERT( <span class="keywordtype">double</span>, <span class="keywordtype">float</span> );
+<a name="l00135"></a>00135 DECL_CONVERT( int32_t, <span class="keywordtype">float</span> );
+<a name="l00136"></a>00136 DECL_CONVERT( uint32_t, <span class="keywordtype">float</span> );
+<a name="l00137"></a>00137 DECL_CONVERT( int16_t, <span class="keywordtype">float</span> );
+<a name="l00138"></a>00138 DECL_CONVERT( uint16_t, <span class="keywordtype">float</span> );
+<a name="l00139"></a>00139 DECL_CONVERT( int8_t, <span class="keywordtype">float</span> );
+<a name="l00140"></a>00140 DECL_CONVERT( uint8_t, <span class="keywordtype">float</span> );
+<a name="l00141"></a>00141 
+<a name="l00142"></a>00142 <span class="comment">//&gt;&gt;f64</span>
+<a name="l00143"></a>00143 DECL_CONVERT( <span class="keywordtype">float</span>, <span class="keywordtype">double</span> );
+<a name="l00144"></a>00144 DECL_CONVERT( int32_t, <span class="keywordtype">double</span> );
+<a name="l00145"></a>00145 DECL_CONVERT( uint32_t, <span class="keywordtype">double</span> );
+<a name="l00146"></a>00146 DECL_CONVERT( int16_t, <span class="keywordtype">double</span> );
+<a name="l00147"></a>00147 DECL_CONVERT( uint16_t, <span class="keywordtype">double</span> );
+<a name="l00148"></a>00148 DECL_CONVERT( int8_t, <span class="keywordtype">double</span> );
+<a name="l00149"></a>00149 DECL_CONVERT( uint8_t, <span class="keywordtype">double</span> );
 <a name="l00150"></a>00150 
-<a name="l00151"></a>00151 <span class="comment">//scale&gt;&gt;u16</span>
-<a name="l00152"></a>00152 DECL_SCALED_CONVERT( <span class="keywordtype">float</span>, uint16_t );
-<a name="l00153"></a>00153 DECL_SCALED_CONVERT( <span class="keywordtype">double</span>, uint16_t );
+<a name="l00151"></a>00151 <span class="comment">//scale&gt;&gt;s32</span>
+<a name="l00152"></a>00152 DECL_SCALED_CONVERT( <span class="keywordtype">float</span>, int32_t );
+<a name="l00153"></a>00153 DECL_SCALED_CONVERT( <span class="keywordtype">double</span>, int32_t );
 <a name="l00154"></a>00154 
-<a name="l00155"></a>00155 <span class="comment">//scale&gt;&gt;s8</span>
-<a name="l00156"></a>00156 DECL_SCALED_CONVERT( <span class="keywordtype">float</span>, int8_t );
-<a name="l00157"></a>00157 DECL_SCALED_CONVERT( <span class="keywordtype">double</span>, int8_t );
+<a name="l00155"></a>00155 <span class="comment">//scale&gt;&gt;u32</span>
+<a name="l00156"></a>00156 <span class="comment">//DECL_SCALED_CONVERT(float,uint32_t); conversion to u32 is broken (https://bugs.freedesktop.org/show_bug.cgi?ID=16524)</span>
+<a name="l00157"></a>00157 <span class="comment">//DECL_SCALED_CONVERT(double,uint32_t);</span>
 <a name="l00158"></a>00158 
-<a name="l00159"></a>00159 <span class="comment">//scale&gt;&gt;u8</span>
-<a name="l00160"></a>00160 DECL_SCALED_CONVERT( <span class="keywordtype">float</span>, uint8_t );
-<a name="l00161"></a>00161 DECL_SCALED_CONVERT( <span class="keywordtype">double</span>, uint8_t );
+<a name="l00159"></a>00159 <span class="comment">//scale&gt;&gt;s16</span>
+<a name="l00160"></a>00160 DECL_SCALED_CONVERT( <span class="keywordtype">float</span>, int16_t );
+<a name="l00161"></a>00161 DECL_SCALED_CONVERT( <span class="keywordtype">double</span>, int16_t );
 <a name="l00162"></a>00162 
-<a name="l00163"></a>00163 <span class="comment">//scale&gt;&gt;f32</span>
-<a name="l00164"></a>00164 DECL_SCALED_CONVERT( int32_t, <span class="keywordtype">float</span> );
-<a name="l00165"></a>00165 DECL_SCALED_CONVERT( uint32_t, <span class="keywordtype">float</span> );
-<a name="l00166"></a>00166 DECL_SCALED_CONVERT( int16_t, <span class="keywordtype">float</span> );
-<a name="l00167"></a>00167 DECL_SCALED_CONVERT( uint16_t, <span class="keywordtype">float</span> );
-<a name="l00168"></a>00168 DECL_SCALED_CONVERT( int8_t, <span class="keywordtype">float</span> );
-<a name="l00169"></a>00169 DECL_SCALED_CONVERT( uint8_t, <span class="keywordtype">float</span> );
+<a name="l00163"></a>00163 <span class="comment">//scale&gt;&gt;u16</span>
+<a name="l00164"></a>00164 DECL_SCALED_CONVERT( <span class="keywordtype">float</span>, uint16_t );
+<a name="l00165"></a>00165 DECL_SCALED_CONVERT( <span class="keywordtype">double</span>, uint16_t );
+<a name="l00166"></a>00166 
+<a name="l00167"></a>00167 <span class="comment">//scale&gt;&gt;s8</span>
+<a name="l00168"></a>00168 DECL_SCALED_CONVERT( <span class="keywordtype">float</span>, int8_t );
+<a name="l00169"></a>00169 DECL_SCALED_CONVERT( <span class="keywordtype">double</span>, int8_t );
 <a name="l00170"></a>00170 
-<a name="l00171"></a>00171 <span class="comment">//scale&gt;&gt;f64</span>
-<a name="l00172"></a>00172 DECL_SCALED_CONVERT( int32_t, <span class="keywordtype">double</span> );
-<a name="l00173"></a>00173 DECL_SCALED_CONVERT( uint32_t, <span class="keywordtype">double</span> );
-<a name="l00174"></a>00174 DECL_SCALED_CONVERT( int16_t, <span class="keywordtype">double</span> );
-<a name="l00175"></a>00175 DECL_SCALED_CONVERT( uint16_t, <span class="keywordtype">double</span> );
-<a name="l00176"></a>00176 DECL_SCALED_CONVERT( int8_t, <span class="keywordtype">double</span> );
-<a name="l00177"></a>00177 DECL_SCALED_CONVERT( uint8_t, <span class="keywordtype">double</span> );
-<a name="l00178"></a>00178 
-<a name="l00179"></a>00179 <span class="preprocessor">#undef DECL_CONVERT</span>
-<a name="l00180"></a>00180 <span class="preprocessor"></span><span class="preprocessor">#undef DECL_SCALED_CONVERT</span>
-<a name="l00181"></a>00181 <span class="preprocessor"></span><span class="preprocessor">#endif //ISIS_USE_LIBOIL</span>
-<a name="l00182"></a>00182 <span class="preprocessor"></span>
-<a name="l00183"></a>00183 }
-<a name="l00184"></a>00184 
-<a name="l00202"></a>00202 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> SRC, <span class="keyword">typename</span> DST&gt; std::pair&lt;double, double&gt;
-<a name="l00203"></a><a class="code" href="namespaceisis_1_1data.html#a0d2323b3e931946a3fd24d1198ecbd84">00203</a> <a class="code" href="namespaceisis_1_1data.html#a0d2323b3e931946a3fd24d1198ecbd84" title="Computes scaling and offset between two scalar value domains.">getNumericScaling</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1__internal_1_1ValueBase.html">util::_internal::ValueBase</a> &amp;min, <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1__internal_1_1ValueBase.html">util::_internal::ValueBase</a> &amp;max, <a class="code" href="namespaceisis_1_1data.html#a69354ef53dcb79cbe577ae5fe8764e49">autoscaleOption</a> scaleopt = <a class="code" href="namespaceisis_1_1data.html#a69354ef53dcb79cbe577ae5fe8764e49a3a9ca3fecf5ccbb0f9d787d31a9edd2f">autoscale</a> )
-<a name="l00204"></a>00204 {
-<a name="l00205"></a>00205     <span class="keywordtype">double</span> scale = 1.0;
-<a name="l00206"></a>00206     <span class="keywordtype">double</span> offset = 0.0;
-<a name="l00207"></a>00207     <span class="keywordtype">bool</span> doScale = ( scaleopt != <a class="code" href="namespaceisis_1_1data.html#a69354ef53dcb79cbe577ae5fe8764e49aa894be70ea495f1b8804c1ab79b7407c">noscale</a> &amp;&amp; std::numeric_limits&lt;DST&gt;::is_integer ); <span class="comment">//only do scale if scaleopt!=noscale and the target is an integer (scaling into float is useless)</span>
-<a name="l00208"></a>00208 
-<a name="l00209"></a>00209     <span class="keywordflow">if</span> ( scaleopt == <a class="code" href="namespaceisis_1_1data.html#a69354ef53dcb79cbe577ae5fe8764e49a3a9ca3fecf5ccbb0f9d787d31a9edd2f">autoscale</a> &amp;&amp; std::numeric_limits&lt;SRC&gt;::is_integer ) {
-<a name="l00210"></a>00210         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> ) &lt;&lt; <span class="stringliteral">&quot;Won&#39;t upscale, because the source datatype is discrete (&quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1Value.html" title="Generic class for type aware variables.">util::Value&lt;SRC&gt;::staticName</a>() &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;
-<a name="l00211"></a>00211         scaleopt = noupscale; <span class="comment">//dont scale up if SRC is an integer</span>
-<a name="l00212"></a>00212     }
-<a name="l00213"></a>00213 
-<a name="l00214"></a>00214     <span class="keywordflow">if</span> ( doScale ) {
-<a name="l00215"></a>00215         <span class="keyword">const</span> DST domain_min = std::numeric_limits&lt;DST&gt;::min();<span class="comment">//negative value domain of this dst</span>
-<a name="l00216"></a>00216         <span class="keyword">const</span> DST domain_max = std::numeric_limits&lt;DST&gt;::max();<span class="comment">//positive value domain of this dst</span>
-<a name="l00217"></a>00217         <span class="keywordtype">double</span> minval, maxval;
-<a name="l00218"></a>00218         minval = min.<a class="code" href="group__util.html#gad6170a1d8d8f85bfb6a65e197f45ad9b" title="Interpret the value as value of any (other) type.">as</a>&lt;<span class="keywordtype">double</span>&gt;();
-<a name="l00219"></a>00219         maxval = max.<a class="code" href="group__util.html#gad6170a1d8d8f85bfb6a65e197f45ad9b" title="Interpret the value as value of any (other) type.">as</a>&lt;<span class="keywordtype">double</span>&gt;();
-<a name="l00220"></a>00220         assert( minval &lt; maxval );
-<a name="l00221"></a>00221         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;src Range:&quot;</span> &lt;&lt; minval &lt;&lt; <span class="stringliteral">&quot;=&gt;&quot;</span> &lt;&lt; maxval;
-<a name="l00222"></a>00222         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;dst Domain:&quot;</span> &lt;&lt; domain_min &lt;&lt; <span class="stringliteral">&quot;=&gt;&quot;</span> &lt;&lt; domain_max;
-<a name="l00223"></a>00223         assert( domain_min &lt; domain_max );<span class="comment">//we also should assume this</span>
-<a name="l00224"></a>00224         <span class="comment">//set offset for src</span>
-<a name="l00225"></a>00225         <span class="comment">//if all src is completly on positive domain, or if there is no negative domain use minval</span>
-<a name="l00226"></a>00226         <span class="comment">//else if src is completly on negative dmain, or if there is no positive domain use maxval</span>
-<a name="l00227"></a>00227         <span class="comment">//elsewise leave it at 0 and scale both sides</span>
-<a name="l00228"></a>00228         <span class="keywordflow">if</span> ( minval &gt; 0 || !domain_min ) {
-<a name="l00229"></a>00229             <span class="keywordflow">if</span> ( ( maxval - domain_max ) &gt; 0 ) <span class="comment">// if the values completely fit into the domain we dont have to offset them</span>
-<a name="l00230"></a>00230                 offset = -minval;
-<a name="l00231"></a>00231         } <span class="keywordflow">else</span> <span class="keywordflow">if</span> ( ( 0 - maxval ) &gt; 0 || !domain_max ) {
-<a name="l00232"></a>00232             <span class="keywordflow">if</span> ( ( domain_min - minval ) &gt; 0  ) <span class="comment">// if the values completely fit into the domain we dont have to offset them</span>
-<a name="l00233"></a>00233                 offset = -maxval;
-<a name="l00234"></a>00234         }
-<a name="l00235"></a>00235 
-<a name="l00236"></a>00236         <span class="comment">//calculate range of values which will be on postive/negative domain when offset is applied</span>
-<a name="l00237"></a>00237         <span class="keyword">const</span> <span class="keywordtype">double</span> range_max = maxval + offset; <span class="comment">//allways &gt;=0</span>
-<a name="l00238"></a>00238         <span class="keyword">const</span> <span class="keywordtype">double</span> range_min = minval + offset; <span class="comment">//allways &lt;=0</span>
-<a name="l00239"></a>00239         <span class="comment">//set scaling factor to fit src-range into dst domain</span>
-<a name="l00240"></a>00240         <span class="comment">//some compilers dont make x/0 = inf, so we use std::numeric_limits&lt;double&gt;::max() instead, in this case</span>
-<a name="l00241"></a>00241         <span class="keyword">const</span> <span class="keywordtype">double</span> scale_max =
-<a name="l00242"></a>00242             range_max != 0 ? domain_max / range_max :
-<a name="l00243"></a>00243             std::numeric_limits&lt;double&gt;::max();
-<a name="l00244"></a>00244         <span class="keyword">const</span> <span class="keywordtype">double</span> scale_min =
-<a name="l00245"></a>00245             range_min != 0 ? domain_min / range_min :
-<a name="l00246"></a>00246             std::numeric_limits&lt;double&gt;::max();
-<a name="l00247"></a>00247         scale = std::min( scale_max ? scale_max : std::numeric_limits&lt;double&gt;::max(), scale_min ? scale_min : std::numeric_limits&lt;double&gt;::max() );<span class="comment">//get the smaller scaling factor which is not zero so the bigger range will fit into his domain</span>
+<a name="l00171"></a>00171 <span class="comment">//scale&gt;&gt;u8</span>
+<a name="l00172"></a>00172 DECL_SCALED_CONVERT( <span class="keywordtype">float</span>, uint8_t );
+<a name="l00173"></a>00173 DECL_SCALED_CONVERT( <span class="keywordtype">double</span>, uint8_t );
+<a name="l00174"></a>00174 
+<a name="l00175"></a>00175 <span class="comment">//scale&gt;&gt;f32</span>
+<a name="l00176"></a>00176 DECL_SCALED_CONVERT( int32_t, <span class="keywordtype">float</span> );
+<a name="l00177"></a>00177 DECL_SCALED_CONVERT( uint32_t, <span class="keywordtype">float</span> );
+<a name="l00178"></a>00178 DECL_SCALED_CONVERT( int16_t, <span class="keywordtype">float</span> );
+<a name="l00179"></a>00179 DECL_SCALED_CONVERT( uint16_t, <span class="keywordtype">float</span> );
+<a name="l00180"></a>00180 DECL_SCALED_CONVERT( int8_t, <span class="keywordtype">float</span> );
+<a name="l00181"></a>00181 DECL_SCALED_CONVERT( uint8_t, <span class="keywordtype">float</span> );
+<a name="l00182"></a>00182 
+<a name="l00183"></a>00183 <span class="comment">//scale&gt;&gt;f64</span>
+<a name="l00184"></a>00184 DECL_SCALED_CONVERT( int32_t, <span class="keywordtype">double</span> );
+<a name="l00185"></a>00185 DECL_SCALED_CONVERT( uint32_t, <span class="keywordtype">double</span> );
+<a name="l00186"></a>00186 DECL_SCALED_CONVERT( int16_t, <span class="keywordtype">double</span> );
+<a name="l00187"></a>00187 DECL_SCALED_CONVERT( uint16_t, <span class="keywordtype">double</span> );
+<a name="l00188"></a>00188 DECL_SCALED_CONVERT( int8_t, <span class="keywordtype">double</span> );
+<a name="l00189"></a>00189 DECL_SCALED_CONVERT( uint8_t, <span class="keywordtype">double</span> );
+<a name="l00190"></a>00190 
+<a name="l00191"></a>00191 <span class="preprocessor">#undef DECL_CONVERT</span>
+<a name="l00192"></a>00192 <span class="preprocessor"></span><span class="preprocessor">#undef DECL_SCALED_CONVERT</span>
+<a name="l00193"></a>00193 <span class="preprocessor"></span><span class="preprocessor">#endif //ISIS_USE_LIBOIL</span>
+<a name="l00194"></a>00194 <span class="preprocessor"></span>
+<a name="l00195"></a>00195 }
+<a name="l00196"></a>00196 
+<a name="l00214"></a>00214 <span class="keyword">template</span>&lt;<span class="keyword">typename</span> SRC, <span class="keyword">typename</span> DST&gt; std::pair&lt;double, double&gt;
+<a name="l00215"></a><a class="code" href="namespaceisis_1_1data.html#a0d2323b3e931946a3fd24d1198ecbd84">00215</a> <a class="code" href="namespaceisis_1_1data.html#a0d2323b3e931946a3fd24d1198ecbd84" title="Computes scaling and offset between two scalar value domains.">getNumericScaling</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1__internal_1_1ValueBase.html">util::_internal::ValueBase</a> &amp;min, <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1__internal_1_1ValueBase.html">util::_internal::ValueBase</a> &amp;max, <a class="code" href="namespaceisis_1_1data.html#a69354ef53dcb79cbe577ae5fe8764e49">autoscaleOption</a> scaleopt = <a class="code" href="namespaceisis_1_1data.html#a69354ef53dcb79cbe577ae5fe8764e49a3a9ca3fecf5ccbb0f9d787d31a9edd2f">autoscale</a> )
+<a name="l00216"></a>00216 {
+<a name="l00217"></a>00217     <span class="keywordtype">double</span> scale = 1.0;
+<a name="l00218"></a>00218     <span class="keywordtype">double</span> offset = 0.0;
+<a name="l00219"></a>00219     <span class="keywordtype">bool</span> doScale = ( scaleopt != <a class="code" href="namespaceisis_1_1data.html#a69354ef53dcb79cbe577ae5fe8764e49aa894be70ea495f1b8804c1ab79b7407c">noscale</a> &amp;&amp; std::numeric_limits&lt;DST&gt;::is_integer ); <span class="comment">//only do scale if scaleopt!=noscale and the target is an integer (scaling into float is useless)</span>
+<a name="l00220"></a>00220 
+<a name="l00221"></a>00221     <span class="keywordflow">if</span> ( scaleopt == <a class="code" href="namespaceisis_1_1data.html#a69354ef53dcb79cbe577ae5fe8764e49a3a9ca3fecf5ccbb0f9d787d31a9edd2f">autoscale</a> &amp;&amp; std::numeric_limits&lt;SRC&gt;::is_integer ) {
+<a name="l00222"></a>00222         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> ) &lt;&lt; <span class="stringliteral">&quot;Won&#39;t upscale, because the source datatype is discrete (&quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1Value.html" title="Generic class for type aware variables.">util::Value&lt;SRC&gt;::staticName</a>() &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;
+<a name="l00223"></a>00223         scaleopt = noupscale; <span class="comment">//dont scale up if SRC is an integer</span>
+<a name="l00224"></a>00224     }
+<a name="l00225"></a>00225 
+<a name="l00226"></a>00226     <span class="keywordflow">if</span> ( doScale ) {
+<a name="l00227"></a>00227         <span class="keyword">const</span> DST domain_min = std::numeric_limits&lt;DST&gt;::min();<span class="comment">//negative value domain of this dst [min .. -1]</span>
+<a name="l00228"></a>00228         <span class="keyword">const</span> DST domain_max = std::numeric_limits&lt;DST&gt;::max();<span class="comment">//positive value domain of this dst [0 .. max]</span>
+<a name="l00229"></a>00229         <span class="keywordtype">double</span> minval, maxval;
+<a name="l00230"></a>00230         minval = min.<a class="code" href="group__util.html#gad6170a1d8d8f85bfb6a65e197f45ad9b" title="Interpret the value as value of any (other) type.">as</a>&lt;<span class="keywordtype">double</span>&gt;();
+<a name="l00231"></a>00231         maxval = max.<a class="code" href="group__util.html#gad6170a1d8d8f85bfb6a65e197f45ad9b" title="Interpret the value as value of any (other) type.">as</a>&lt;<span class="keywordtype">double</span>&gt;();
+<a name="l00232"></a>00232         assert( minval &lt; maxval );
+<a name="l00233"></a>00233         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;src Range:&quot;</span> &lt;&lt; minval &lt;&lt; <span class="stringliteral">&quot;=&gt;&quot;</span> &lt;&lt; maxval;
+<a name="l00234"></a>00234         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;dst Domain:&quot;</span> &lt;&lt; <span class="keyword">static_cast&lt;</span><span class="keywordtype">double</span><span class="keyword">&gt;</span>( domain_min ) &lt;&lt; <span class="stringliteral">&quot;=&gt;&quot;</span> &lt;&lt; static_cast&lt;double&gt;( domain_max );
+<a name="l00235"></a>00235         assert( domain_min &lt; domain_max );<span class="comment">//we also should assume this</span>
+<a name="l00236"></a>00236 
+<a name="l00237"></a>00237         <span class="comment">//set offset for src</span>
+<a name="l00238"></a>00238         <span class="comment">//if all src is completly on positive domain, or if there is no negative domain use minval</span>
+<a name="l00239"></a>00239         <span class="comment">//else if src is completly on negative dmain, or if there is no positive domain use maxval</span>
+<a name="l00240"></a>00240         <span class="comment">//elsewise leave it at 0 and scale both sides</span>
+<a name="l00241"></a>00241         <span class="keywordflow">if</span> ( minval &gt; 0 || !domain_min ) {
+<a name="l00242"></a>00242             <span class="comment">//          if ( ( maxval - domain_max ) &gt; 0 ) // if the values completely fit into the domain we dont have to offset them</span>
+<a name="l00243"></a>00243             offset = -minval;
+<a name="l00244"></a>00244         } <span class="keywordflow">else</span> <span class="keywordflow">if</span> ( ( 0 - maxval ) &gt; 0 || !domain_max ) {
+<a name="l00245"></a>00245             <span class="comment">//          if ( ( domain_min - minval ) &gt; 0  ) // if the values completely fit into the domain we dont have to offset them</span>
+<a name="l00246"></a>00246             offset = -maxval;
+<a name="l00247"></a>00247         }
 <a name="l00248"></a>00248 
-<a name="l00249"></a>00249         <span class="keywordflow">if</span> ( scale &lt; 1 ) {
-<a name="l00250"></a>00250             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;Downscaling your values by Factor &quot;</span> &lt;&lt; scale &lt;&lt; <span class="stringliteral">&quot; you might lose information.&quot;</span>;
-<a name="l00251"></a>00251         } <span class="keywordflow">else</span> <span class="keywordflow">if</span> ( scaleopt == <a class="code" href="namespaceisis_1_1data.html#a69354ef53dcb79cbe577ae5fe8764e49ae0f4f5a8a42628127f1b79310c4fd70e">noupscale</a> ) {
-<a name="l00252"></a>00252             <span class="keywordflow">if</span> ( scale &gt; 1 ) {
-<a name="l00253"></a>00253                 <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;upscale not given, clamping scale &quot;</span> &lt;&lt; scale &lt;&lt; <span class="stringliteral">&quot; to 1&quot;</span>;
-<a name="l00254"></a>00254                 scale = 1;
-<a name="l00255"></a>00255             }
-<a name="l00256"></a>00256         }
-<a name="l00257"></a>00257 
-<a name="l00258"></a>00258         offset *= scale;<span class="comment">//calc offset for dst</span>
-<a name="l00259"></a>00259     }
-<a name="l00260"></a>00260 
-<a name="l00261"></a>00261     <span class="keywordflow">return</span> std::make_pair( scale, offset );
-<a name="l00262"></a>00262 }
-<a name="l00263"></a>00263 
-<a name="l00279"></a><a class="code" href="namespaceisis_1_1data.html#a96dabec5c1bb02cf1f5b8548854e6646">00279</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> SRC, <span class="keyword">typename</span> DST&gt; <span class="keywordtype">void</span> <a class="code" href="namespaceisis_1_1data.html#a96dabec5c1bb02cf1f5b8548854e6646" title="Converts data from &amp;#39;src&amp;#39; to the type of &amp;#39;dst&amp;#39; and stores them there.">numeric_convert</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr&lt;SRC&gt;</a> &amp;src, <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr&lt;DST&gt;</a> &amp;dst, <span class="keyword">const</span> <span class="keywordtype">double</span> scale, <span class="keyword">const</span> <span class="keywordtype">double</span> offset )
-<a name="l00280"></a>00280 {
-<a name="l00281"></a>00281     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( src.<a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a8dbcc5e2ef0688856a04ecdb00ab2a31">getLength</a>() &gt; dst.<a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a8dbcc5e2ef0688856a04ecdb00ab2a31">getLength</a>(), Runtime, error ) &lt;&lt; <span class="stringliteral">&quot;The &quot;</span> &lt;&lt; src.<a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a8dbcc5e2ef0688856a04ecdb00ab2a31">getLength</a>() &lt;&lt; <span class="stringliteral">&quot; elements of src wont fit into the destination. Will only convert &quot;</span> &lt;&lt; dst.<a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a8dbcc5e2ef0688856a04ecdb00ab2a31">getLength</a>() &lt;&lt; <span class="stringliteral">&quot; elements.&quot;</span>;
-<a name="l00282"></a>00282     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( src.<a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a8dbcc5e2ef0688856a04ecdb00ab2a31">getLength</a>() &lt; dst.<a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a8dbcc5e2ef0688856a04ecdb00ab2a31">getLength</a>(), Runtime, warning ) &lt;&lt; <span class="stringliteral">&quot;Source is shorter than destination. Will only convert &quot;</span> &lt;&lt; src.<a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a8dbcc5e2ef0688856a04ecdb00ab2a31">getLength</a>() &lt;&lt; <span class="stringliteral">&quot; values&quot;</span>;
-<a name="l00283"></a>00283 
-<a name="l00284"></a>00284     <span class="keywordflow">if</span> ( src.<a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a8dbcc5e2ef0688856a04ecdb00ab2a31">getLength</a>() == 0 )<span class="keywordflow">return</span>;
-<a name="l00285"></a>00285 
-<a name="l00286"></a>00286     <span class="keyword">const</span> <span class="keywordtype">size_t</span> size = std::min( src.<a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a8dbcc5e2ef0688856a04ecdb00ab2a31">getLength</a>(), dst.<a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a8dbcc5e2ef0688856a04ecdb00ab2a31">getLength</a>() );
-<a name="l00287"></a>00287 
-<a name="l00288"></a>00288     <span class="keywordflow">if</span> ( ( scale != 1. || offset ) )
-<a name="l00289"></a>00289         <a class="code" href="namespaceisis_1_1data_1_1__internal.html#a77de5b076e75f8dbc3001b727450f244">_internal::numeric_convert_impl</a>( &amp;src[0], &amp;dst[0], size, scale, offset );
-<a name="l00290"></a>00290     <span class="keywordflow">else</span>
-<a name="l00291"></a>00291         <a class="code" href="namespaceisis_1_1data_1_1__internal.html#a77de5b076e75f8dbc3001b727450f244">_internal::numeric_convert_impl</a>( &amp;src[0], &amp;dst[0], size );
-<a name="l00292"></a>00292 }
-<a name="l00293"></a><a class="code" href="namespaceisis_1_1data.html#a79e9fc5312bde6344ddd372ced767385">00293</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="keywordtype">void</span> <a class="code" href="namespaceisis_1_1data.html#a79e9fc5312bde6344ddd372ced767385">numeric_copy</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr&lt;T&gt;</a> &amp;src, <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr&lt;T&gt;</a> &amp;dst, <span class="keyword">const</span> <span class="keywordtype">double</span> scale, <span class="keyword">const</span> <span class="keywordtype">double</span> offset )
-<a name="l00294"></a>00294 {
-<a name="l00295"></a>00295     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( src.<a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a8dbcc5e2ef0688856a04ecdb00ab2a31">getLength</a>() &gt; dst.<a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a8dbcc5e2ef0688856a04ecdb00ab2a31">getLength</a>(), Runtime, error ) &lt;&lt; <span class="stringliteral">&quot;The &quot;</span> &lt;&lt; src.<a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a8dbcc5e2ef0688856a04ecdb00ab2a31">getLength</a>() &lt;&lt; <span class="stringliteral">&quot; elements of src wont fit into the destination. Will only convert &quot;</span> &lt;&lt; dst.<a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a8dbcc5e2ef0688856a04ecdb00ab2a31">getLength</a>() &lt;&lt; <span class="stringliteral">&quot; elements.&quot;</span>;
-<a name="l00296"></a>00296     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( src.<a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a8dbcc5e2ef0688856a04ecdb00ab2a31">getLength</a>() &lt; dst.<a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a8dbcc5e2ef0688856a04ecdb00ab2a31">getLength</a>(), Runtime, warning ) &lt;&lt; <span class="stringliteral">&quot;Source is shorter than destination. Will only convert &quot;</span> &lt;&lt; src.<a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a8dbcc5e2ef0688856a04ecdb00ab2a31">getLength</a>() &lt;&lt; <span class="stringliteral">&quot; values&quot;</span>;
-<a name="l00297"></a>00297 
-<a name="l00298"></a>00298     <span class="keywordflow">if</span> ( src.<a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a8dbcc5e2ef0688856a04ecdb00ab2a31">getLength</a>() == 0 )<span class="keywordflow">return</span>;
+<a name="l00249"></a>00249         <span class="comment">//calculate range of values which will be on postive/negative domain when offset is applied</span>
+<a name="l00250"></a>00250         <span class="keyword">const</span> <span class="keywordtype">double</span> range_max = maxval + offset; <span class="comment">//allways &gt;=0</span>
+<a name="l00251"></a>00251         <span class="keyword">const</span> <span class="keywordtype">double</span> range_min = minval + offset; <span class="comment">//allways &lt;=0</span>
+<a name="l00252"></a>00252         <span class="comment">//set scaling factor to fit src-range into dst domain</span>
+<a name="l00253"></a>00253         <span class="comment">//some compilers dont make x/0 = inf, so we use std::numeric_limits&lt;double&gt;::max() instead, in this case</span>
+<a name="l00254"></a>00254         <span class="keyword">const</span> <span class="keywordtype">double</span> scale_max =
+<a name="l00255"></a>00255             range_max != 0 ? domain_max / range_max :
+<a name="l00256"></a>00256             std::numeric_limits&lt;double&gt;::max();
+<a name="l00257"></a>00257         <span class="keyword">const</span> <span class="keywordtype">double</span> scale_min =
+<a name="l00258"></a>00258             range_min != 0 ? domain_min / range_min :
+<a name="l00259"></a>00259             std::numeric_limits&lt;double&gt;::max();
+<a name="l00260"></a>00260         scale = std::min( scale_max ? scale_max : std::numeric_limits&lt;double&gt;::max(), scale_min ? scale_min : std::numeric_limits&lt;double&gt;::max() );<span class="comment">//get the smaller scaling factor which is not zero so the bigger range will fit into his domain</span>
+<a name="l00261"></a>00261 
+<a name="l00262"></a>00262         <span class="keywordflow">if</span> ( scale &lt; 1 ) {
+<a name="l00263"></a>00263             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;Downscaling your values by Factor &quot;</span> &lt;&lt; scale &lt;&lt; <span class="stringliteral">&quot; you might lose information.&quot;</span>;
+<a name="l00264"></a>00264         } <span class="keywordflow">else</span> <span class="keywordflow">if</span> ( scaleopt == <a class="code" href="namespaceisis_1_1data.html#a69354ef53dcb79cbe577ae5fe8764e49ae0f4f5a8a42628127f1b79310c4fd70e">noupscale</a> ) {
+<a name="l00265"></a>00265             <span class="keywordflow">if</span> ( scale &gt; 1 ) {
+<a name="l00266"></a>00266                 <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;upscale not given, clamping scale &quot;</span> &lt;&lt; scale &lt;&lt; <span class="stringliteral">&quot; to 1&quot;</span>;
+<a name="l00267"></a>00267                 scale = 1;
+<a name="l00268"></a>00268             }
+<a name="l00269"></a>00269         }
+<a name="l00270"></a>00270 
+<a name="l00271"></a>00271         <span class="keywordflow">if</span>( scale == 1 ) {
+<a name="l00272"></a>00272             <span class="keywordflow">if</span>( ( minval - domain_min ) &gt; 0 &amp;&amp; ( domain_max - maxval ) &gt; 0 )
+<a name="l00273"></a>00273                 offset = 0; <span class="comment">// if the source does fit into the domain, and we do not scale - we wont need an offset</span>
+<a name="l00274"></a>00274         } <span class="keywordflow">else</span>
+<a name="l00275"></a>00275             offset *= scale;<span class="comment">//calc offset for dst</span>
+<a name="l00276"></a>00276     }
+<a name="l00277"></a>00277 
+<a name="l00278"></a>00278     <span class="keywordflow">return</span> std::make_pair( scale, offset );
+<a name="l00279"></a>00279 }
+<a name="l00280"></a>00280 
+<a name="l00296"></a><a class="code" href="namespaceisis_1_1data.html#a96dabec5c1bb02cf1f5b8548854e6646">00296</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> SRC, <span class="keyword">typename</span> DST&gt; <span class="keywordtype">void</span> <a class="code" href="namespaceisis_1_1data.html#a96dabec5c1bb02cf1f5b8548854e6646" title="Converts data from &amp;#39;src&amp;#39; to the type of &amp;#39;dst&amp;#39; and stores them there.">numeric_convert</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr&lt;SRC&gt;</a> &amp;src, <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr&lt;DST&gt;</a> &amp;dst, <span class="keyword">const</span> <span class="keywordtype">double</span> scale, <span class="keyword">const</span> <span class="keywordtype">double</span> offset )
+<a name="l00297"></a>00297 {
+<a name="l00298"></a>00298     <span class="keyword">const</span> <span class="keywordtype">size_t</span> size = <a class="code" href="namespaceisis_1_1data_1_1__internal.html#a645ee7399f56ed23de7f63b40fe2744f">_internal::getConvertSize</a>( src, dst );
 <a name="l00299"></a>00299 
-<a name="l00300"></a>00300     <span class="keyword">const</span> <span class="keywordtype">size_t</span> size = std::min( src.<a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a8dbcc5e2ef0688856a04ecdb00ab2a31">getLength</a>(), dst.<a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#a8dbcc5e2ef0688856a04ecdb00ab2a31">getLength</a>() );
-<a name="l00301"></a>00301 
-<a name="l00302"></a>00302     <span class="keywordflow">if</span> ( ( scale != 1. || offset ) )
-<a name="l00303"></a>00303         _internal::numeric_copy_impl&lt;T&gt;( &amp;src[0], &amp;dst[0], size, scale, offset );
-<a name="l00304"></a>00304     <span class="keywordflow">else</span>
-<a name="l00305"></a>00305         _internal::numeric_copy_impl&lt;T&gt;( &amp;src[0], &amp;dst[0], size );
-<a name="l00306"></a>00306 }
-<a name="l00307"></a>00307 
-<a name="l00308"></a>00308 }
-<a name="l00309"></a>00309 }
-<a name="l00310"></a>00310 
-<a name="l00311"></a>00311 
-<a name="l00312"></a>00312 <span class="preprocessor">#endif // NUMERIC_CONVERT_HPP</span>
+<a name="l00300"></a>00300     <span class="keywordflow">if</span> ( ( scale != 1. || offset ) )
+<a name="l00301"></a>00301         <a class="code" href="namespaceisis_1_1data_1_1__internal.html#a77de5b076e75f8dbc3001b727450f244">_internal::numeric_convert_impl</a>( &amp;src[0], &amp;dst[0], size, scale, offset );
+<a name="l00302"></a>00302     <span class="keywordflow">else</span>
+<a name="l00303"></a>00303         <a class="code" href="namespaceisis_1_1data_1_1__internal.html#a77de5b076e75f8dbc3001b727450f244">_internal::numeric_convert_impl</a>( &amp;src[0], &amp;dst[0], size );
+<a name="l00304"></a>00304 }
+<a name="l00305"></a><a class="code" href="namespaceisis_1_1data.html#a79e9fc5312bde6344ddd372ced767385">00305</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <span class="keywordtype">void</span> <a class="code" href="namespaceisis_1_1data.html#a79e9fc5312bde6344ddd372ced767385">numeric_copy</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr&lt;T&gt;</a> &amp;src, <a class="code" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr&lt;T&gt;</a> &amp;dst, <span class="keyword">const</span> <span class="keywordtype">double</span> scale, <span class="keyword">const</span> <span class="keywordtype">double</span> offset )
+<a name="l00306"></a>00306 {
+<a name="l00307"></a>00307     <span class="keyword">const</span> <span class="keywordtype">size_t</span> size = <a class="code" href="namespaceisis_1_1data_1_1__internal.html#a645ee7399f56ed23de7f63b40fe2744f">_internal::getConvertSize</a>( src, dst );
+<a name="l00308"></a>00308 
+<a name="l00309"></a>00309     <span class="keywordflow">if</span> ( ( scale != 1. || offset ) )
+<a name="l00310"></a>00310         _internal::numeric_copy_impl&lt;T&gt;( &amp;src[0], &amp;dst[0], size, scale, offset );
+<a name="l00311"></a>00311     <span class="keywordflow">else</span>
+<a name="l00312"></a>00312         _internal::numeric_copy_impl&lt;T&gt;( &amp;src[0], &amp;dst[0], size );
+<a name="l00313"></a>00313 }
+<a name="l00314"></a>00314 
+<a name="l00315"></a>00315 }
+<a name="l00316"></a>00316 }
+<a name="l00317"></a>00317 
+<a name="l00318"></a>00318 
+<a name="l00319"></a>00319 <span class="preprocessor">#endif // NUMERIC_CONVERT_HPP</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Apr 19 2011 16:19:19 for ISIS Core Library by&nbsp;
+<hr class="footer"/><address class="footer"><small>Generated on Fri Jun 10 2011 10:57:23 for ISIS Core Library by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.1 </small></address>
 </body>

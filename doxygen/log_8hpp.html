@@ -43,8 +43,8 @@
 <tr><td colspan="2"><h2><a name="define-members"></a>
 Defines</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8hpp.html#a7677022a9a5e546a60e378a156b598b5">ENABLE_LOG</a>(MODULE, HANDLE_CLASS, set)&nbsp;&nbsp;&nbsp;if(!MODULE::use);else isis::util::_internal::Log&lt;MODULE&gt;::enable&lt;HANDLE_CLASS&gt;(set)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>(MODULE, LEVEL)&nbsp;&nbsp;&nbsp;if(!MODULE::use);else isis::util::_internal::Log&lt;MODULE&gt;::send(__FILE__,__PRETTY_FUNCTION__,__LINE__,LEVEL)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>(PRED, MODULE, LEVEL)&nbsp;&nbsp;&nbsp;if(!(MODULE::use &amp;&amp; (PRED)));else isis::util::_internal::Log&lt;MODULE&gt;::send(__FILE__,__PRETTY_FUNCTION__,__LINE__,LEVEL)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>(MODULE, LEVEL)&nbsp;&nbsp;&nbsp;if(!MODULE::use);else isis::util::_internal::Log&lt;MODULE&gt;::send(__FILE__,__FUNCTION__,__LINE__,LEVEL)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>(PRED, MODULE, LEVEL)&nbsp;&nbsp;&nbsp;if(!(MODULE::use &amp;&amp; (PRED)));else isis::util::_internal::Log&lt;MODULE&gt;::send(__FILE__,__FUNCTION__,__LINE__,LEVEL)</td></tr>
 </table>
 <hr/><h2>Define Documentation</h2>
 <a class="anchor" id="a7677022a9a5e546a60e378a156b598b5"></a><!-- doxytag: member="log.hpp::ENABLE_LOG" ref="a7677022a9a5e546a60e378a156b598b5" args="(MODULE, HANDLE_CLASS, set)" -->
@@ -101,7 +101,7 @@ Defines</h2></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td></td><td>&nbsp;&nbsp;&nbsp;if(!MODULE::use);else isis::util::_internal::Log&lt;MODULE&gt;::send(__FILE__,__PRETTY_FUNCTION__,__LINE__,LEVEL)</td>
+          <td></td><td></td><td>&nbsp;&nbsp;&nbsp;if(!MODULE::use);else isis::util::_internal::Log&lt;MODULE&gt;::send(__FILE__,__FUNCTION__,__LINE__,LEVEL)</td>
         </tr>
       </table>
 </div>
@@ -136,7 +136,7 @@ Defines</h2></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td></td><td>&nbsp;&nbsp;&nbsp;if(!(MODULE::use &amp;&amp; (PRED)));else isis::util::_internal::Log&lt;MODULE&gt;::send(__FILE__,__PRETTY_FUNCTION__,__LINE__,LEVEL)</td>
+          <td></td><td></td><td>&nbsp;&nbsp;&nbsp;if(!(MODULE::use &amp;&amp; (PRED)));else isis::util::_internal::Log&lt;MODULE&gt;::send(__FILE__,__FUNCTION__,__LINE__,LEVEL)</td>
         </tr>
       </table>
 </div>
@@ -147,7 +147,7 @@ Defines</h2></td></tr>
 </div>
 </div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Apr 19 2011 16:19:20 for ISIS Core Library by&nbsp;
+<hr class="footer"/><address class="footer"><small>Generated on Fri Jun 10 2011 10:57:25 for ISIS Core Library by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.1 </small></address>
 </body>

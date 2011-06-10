@@ -160,7 +160,7 @@
 <a name="l00152"></a>00152     }
 <a name="l00153"></a>00153 
 <a name="l00154"></a>00154     <span class="keywordflow">if</span> ( ! postfix.empty() ) {
-<a name="l00155"></a>00155         <span class="keywordflow">if</span> ( postfix.str()[postfix.size()-1] != <span class="charliteral">&#39;$&#39;</span> )
+<a name="l00155"></a>00155         <span class="keywordflow">if</span> ( postfix.str()[postfix.size() - 1] != <span class="charliteral">&#39;$&#39;</span> )
 <a name="l00156"></a>00156             postfix = boost::regex( postfix.str() + <span class="stringliteral">&quot;$&quot;</span>, postfix.flags() );
 <a name="l00157"></a>00157 
 <a name="l00158"></a>00158         source = boost::regex_replace( source, postfix, <span class="stringliteral">&quot;&quot;</span>, boost::format_first_only | boost::match_default );
@@ -283,7 +283,7 @@
 <a name="l00328"></a>00328 <span class="preprocessor">#endif //CORE_COMMON_HPP</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Apr 19 2011 16:19:13 for ISIS Core Library by&nbsp;
+<hr class="footer"/><address class="footer"><small>Generated on Fri Jun 10 2011 10:57:20 for ISIS Core Library by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.1 </small></address>
 </body>

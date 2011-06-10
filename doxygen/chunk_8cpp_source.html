@@ -56,7 +56,7 @@
 <a name="l00025"></a>00025 <span class="keyword">namespace </span>_internal
 <a name="l00026"></a>00026 {
 <a name="l00027"></a>00027 
-<a name="l00028"></a>00028 <a class="code" href="classisis_1_1data_1_1__internal_1_1ChunkBase.html#a20095e8bce4b289f89f15da02c104064">ChunkBase::ChunkBase</a> ( <span class="keywordtype">size_t</span> nrOfColumns, <span class="keywordtype">size_t</span> nrOfRows, <span class="keywordtype">size_t</span> nrOfSlices, <span class="keywordtype">size_t</span> nrOfTimesteps )
+<a name="l00028"></a>00028 <a class="code" href="classisis_1_1data_1_1__internal_1_1ChunkBase.html#a197c223e4a5a1f2e0aa1aa7d7aa31539">ChunkBase::ChunkBase</a> ( <span class="keywordtype">size_t</span> nrOfColumns, <span class="keywordtype">size_t</span> nrOfRows, <span class="keywordtype">size_t</span> nrOfSlices, <span class="keywordtype">size_t</span> nrOfTimesteps )
 <a name="l00029"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1ChunkBase.html#a185384c22ed988f0d06a97c182f7239c">00029</a> {
 <a name="l00030"></a>00030     <span class="keyword">const</span> <span class="keywordtype">size_t</span> idx[] = {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps};
 <a name="l00031"></a>00031     <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#aed41e361800d007912e85190f1c4452f" title="Initializes the size-vector.">init</a>( idx );
@@ -69,7 +69,7 @@
 <a name="l00038"></a>00038 
 <a name="l00039"></a>00039 }
 <a name="l00040"></a>00040 
-<a name="l00041"></a>00041 <a class="code" href="classisis_1_1data_1_1Chunk.html#a67c188b4fcfe9bf446950e5324291036" title="Creates an data-block from existing data.">Chunk::Chunk</a>( <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1data.html#a034202f5fd7fbf274481b9c93c59d6ef">ValuePtrReference</a> &amp;src, <span class="keywordtype">size_t</span> nrOfColumns, <span class="keywordtype">size_t</span> nrOfRows, <span class="keywordtype">size_t</span> nrOfSlices, <span class="keywordtype">size_t</span> nrOfTimesteps ):
+<a name="l00041"></a>00041 <a class="code" href="classisis_1_1data_1_1Chunk.html#aaa4b99977be32d5e1b28ccd8a05f7433">Chunk::Chunk</a>( <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1data.html#a034202f5fd7fbf274481b9c93c59d6ef">ValuePtrReference</a> &amp;src, <span class="keywordtype">size_t</span> nrOfColumns, <span class="keywordtype">size_t</span> nrOfRows, <span class="keywordtype">size_t</span> nrOfSlices, <span class="keywordtype">size_t</span> nrOfTimesteps ):
 <a name="l00042"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#aae5a9140e2d25148d176e3caf4891cdb">00042</a>     _internal::ChunkBase( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ),
 <a name="l00043"></a>00043     <a class="code" href="classisis_1_1util_1_1__internal_1_1ValueReference.html" title="Base class to store and handle references to Value and ValuePtr objects.">ValuePtrReference</a>( src )
 <a name="l00044"></a>00044 {
@@ -89,7 +89,7 @@
 <a name="l00058"></a>00058     <span class="keywordflow">if</span> ( nrOfTimesteps )newSize[3] = nrOfTimesteps;
 <a name="l00059"></a>00059 
 <a name="l00060"></a>00060     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1__internal_1_1ValueReference.html" title="Base class to store and handle references to Value and ValuePtr objects.">ValuePtrReference</a> cloned( <span class="keyword">get</span>()-&gt;<a class="code" href="classisis_1_1data_1_1Chunk.html#aae5a9140e2d25148d176e3caf4891cdb">cloneToNew</a>( newSize.<a class="code" href="classisis_1_1util_1_1FixedVector.html#aa1fd806e4a644673d3ac867b574498b9" title="Compute the product of all elements.">product</a>() ) );
-<a name="l00061"></a>00061     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#a67c188b4fcfe9bf446950e5324291036" title="Creates an data-block from existing data.">Chunk</a>( cloned, newSize[0], newSize[1], newSize[2], newSize[3] );
+<a name="l00061"></a>00061     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#aaa4b99977be32d5e1b28ccd8a05f7433">Chunk</a>( cloned, newSize[0], newSize[1], newSize[2], newSize[3] );
 <a name="l00062"></a>00062 }
 <a name="l00063"></a>00063 
 <a name="l00064"></a>00064 <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#ab1244bb372b89f0221503edd728a1893" title="Ensure, the chunk has the type with the requested ID.">Chunk::convertToType</a>( <span class="keywordtype">short</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ID )
@@ -242,7 +242,7 @@
 <a name="l00211"></a>00211         voxelGap = <a class="code" href="classisis_1_1util_1_1PropertyMap.html#a31a2cf308def21205a6c3e7fed02752e" title="Access the property referenced by the path-key.">propertyValue</a>( <span class="stringliteral">&quot;voxelGap&quot;</span> )-&gt;castTo&lt;<a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>&gt;();
 <a name="l00212"></a>00212 
 <a name="l00213"></a>00213     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> distance = voxelSize + voxelGap;
-<a name="l00214"></a>00214     int32_t atDim = <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#ad5e59bb1c93f616a20be4c5ed5e818ff" title="get amount of relevant dimensions (last dim with size&amp;gt;1) e.g.">getRelevantDims</a>() - 1;
+<a name="l00214"></a>00214     <span class="keywordtype">size_t</span> atDim = <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#ad5e59bb1c93f616a20be4c5ed5e818ff" title="get amount of relevant dimensions (last dim with size&amp;gt;1) e.g.">getRelevantDims</a>() - 1;
 <a name="l00215"></a>00215 
 <a name="l00216"></a>00216     <span class="keywordflow">switch</span>( atDim ) { <span class="comment">// init offset with the given direction</span>
 <a name="l00217"></a>00217     <span class="keywordflow">case</span> <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3a9f473e3b41b1b75c9c3f0428c2712178">rowDim</a> :
@@ -276,7 +276,7 @@
 <a name="l00245"></a>00245     <span class="keywordtype">size_t</span> cnt = 0;
 <a name="l00246"></a>00246     <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;Splicing chunk at dimenstion &quot;</span> &lt;&lt; atDim + 1 &lt;&lt; <span class="stringliteral">&quot; with indexOrigin stride &quot;</span> &lt;&lt; indexOriginOffset &lt;&lt; <span class="stringliteral">&quot; and acquisitionNumberStride &quot;</span> &lt;&lt; acquisitionNumberStride;
 <a name="l00247"></a>00247     std::list&lt;Chunk&gt; ret = <a class="code" href="classisis_1_1data_1_1Chunk.html#a6225923327f21aeb5979d59ea756b26b" title="Splices the chunk at the given dimension and all dimensions above.">splice</a>( ( <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3">dimensions</a> )atDim ); <span class="comment">// do low level splice - get the chunklist</span>
-<a name="l00248"></a>00248     BOOST_FOREACH( <a class="code" href="classisis_1_1data_1_1Chunk.html#a67c188b4fcfe9bf446950e5324291036" title="Creates an data-block from existing data.">Chunk</a> &amp; ref, ret ) { <span class="comment">// adapt some metadata in them</span>
+<a name="l00248"></a>00248     BOOST_FOREACH( <a class="code" href="classisis_1_1data_1_1Chunk.html#aaa4b99977be32d5e1b28ccd8a05f7433">Chunk</a> &amp; ref, ret ) { <span class="comment">// adapt some metadata in them</span>
 <a name="l00249"></a>00249         <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a> &amp;orig = ref.propertyValue( <span class="stringliteral">&quot;indexOrigin&quot;</span> )-&gt;castTo&lt;<a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a>&gt;();
 <a name="l00250"></a>00250         uint32_t &amp;acq = ref.propertyValue( <span class="stringliteral">&quot;acquisitionNumber&quot;</span> )-&gt;castTo&lt;uint32_t&gt;();
 <a name="l00251"></a>00251         orig = orig + indexOriginOffset * ( float )cnt;
@@ -300,23 +300,57 @@
 <a name="l00269"></a>00269     <span class="keyword">const</span> ValuePtrList pointers = this-&gt;<a class="code" href="classisis_1_1data_1_1Chunk.html#a73ab9d7ca753a2e6c061f86b76408541">getValuePtrBase</a>().splice( spliceSize.<a class="code" href="classisis_1_1util_1_1FixedVector.html#aa1fd806e4a644673d3ac867b574498b9" title="Compute the product of all elements.">product</a>() );
 <a name="l00270"></a>00270     <span class="comment">//create new Chunks from this ValuePtr&#39;s</span>
 <a name="l00271"></a>00271     BOOST_FOREACH( ValuePtrList::const_reference ref, pointers ) {
-<a name="l00272"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#ab284b6701ba78592f5a0f20621bb6c93">00272</a>         ret.push_back( <a class="code" href="classisis_1_1data_1_1Chunk.html#a67c188b4fcfe9bf446950e5324291036" title="Creates an data-block from existing data.">Chunk</a>( ref, spliceSize[0], spliceSize[1], spliceSize[2], spliceSize[3] ) ); <span class="comment">//@todo make sure zhis is only one copy-operation</span>
+<a name="l00272"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#ab284b6701ba78592f5a0f20621bb6c93">00272</a>         ret.push_back( <a class="code" href="classisis_1_1data_1_1Chunk.html#aaa4b99977be32d5e1b28ccd8a05f7433">Chunk</a>( ref, spliceSize[0], spliceSize[1], spliceSize[2], spliceSize[3] ) ); <span class="comment">//@todo make sure this is only one copy-operation</span>
 <a name="l00273"></a>00273         <span class="keyword">static_cast&lt;</span><a class="code" href="classisis_1_1util_1_1PropertyMap.html" title="This class contains a mapping tree to store all kinds of properties (path/key : value) It&amp;#39;s also ...">util::PropertyMap</a> &amp;<span class="keyword">&gt;</span>( ret.back() ) = static_cast&lt;const util::PropertyMap &amp;&gt;( *<span class="keyword">this</span> ); <span class="comment">//copy my metadate into all spliced</span>
 <a name="l00274"></a>00274     }
 <a name="l00275"></a>00275     <span class="keywordflow">return</span> ret;
 <a name="l00276"></a>00276 }
-<a name="l00277"></a>00277 
+<a name="l00277"></a><a class="code" href="classisis_1_1data_1_1Chunk.html#a1c9b1f32d102d104c2d3824ecfc867e1">00277</a> 
 <a name="l00278"></a>00278 <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#ab284b6701ba78592f5a0f20621bb6c93">Chunk::useCount</a>()<span class="keyword"> const</span>
 <a name="l00279"></a>00279 <span class="keyword"></span>{
-<a name="l00280"></a>00280     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#a73ab9d7ca753a2e6c061f86b76408541">getValuePtrBase</a>().useCount();
+<a name="l00280"></a>00280     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#a73ab9d7ca753a2e6c061f86b76408541">getValuePtrBase</a>().<a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html#af03a537a67063663a3c58d7b394bb622">useCount</a>();
 <a name="l00281"></a>00281 }
 <a name="l00282"></a>00282 
-<a name="l00283"></a>00283 }
-<a name="l00284"></a>00284 }
-<a name="l00285"></a>00285 
+<a name="l00283"></a>00283 <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1Chunk.html#a1c9b1f32d102d104c2d3824ecfc867e1" title="Swaps the image along a dimension dim in image space.">Chunk::swapAlong</a>( <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3">dimensions</a> dim )<span class="keyword"> const</span>
+<a name="l00284"></a>00284 <span class="keyword"></span>{
+<a name="l00285"></a>00285     <span class="keyword">const</span> <span class="keywordtype">size_t</span> elSize = <a class="code" href="classisis_1_1data_1_1Chunk.html#ab29816f5d460bf0b903e3e3bb2e79066">bytesPerVoxel</a>();
+<a name="l00286"></a>00286     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector&lt;size_t, 4&gt;</a> whole_size = <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a498b4ebaa5ef654ebe41eacebe813e66" title="generates a FixedVector&amp;lt;DIMS&amp;gt; representing the size">getSizeAsVector</a>();
+<a name="l00287"></a>00287     <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector&lt;size_t, 4&gt;</a> outer_size = whole_size;
+<a name="l00288"></a>00288 
+<a name="l00289"></a>00289     uint8_t *swap_start = boost::shared_static_cast&lt;uint8_t&gt;( <span class="keyword">get</span>()-&gt;getRawAddress().lock() ).<span class="keyword">get</span>();
+<a name="l00290"></a>00290     <span class="keyword">const</span> uint8_t *<span class="keyword">const</span> swap_end = swap_start + whole_size.<a class="code" href="classisis_1_1util_1_1FixedVector.html#aa1fd806e4a644673d3ac867b574498b9" title="Compute the product of all elements.">product</a>() * elSize;
+<a name="l00291"></a>00291 
+<a name="l00292"></a>00292     <span class="keywordtype">size_t</span> block_volume = whole_size.<a class="code" href="classisis_1_1util_1_1FixedVector.html#aa1fd806e4a644673d3ac867b574498b9" title="Compute the product of all elements.">product</a>();
+<a name="l00293"></a>00293 
+<a name="l00294"></a>00294     <span class="keywordflow">for</span>( <span class="keywordtype">int</span> i = <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3a4dbae8110b827f0716817c3ae5e44b55">data::timeDim</a>; i &gt;= dim; i-- ) {
+<a name="l00295"></a>00295         assert( ( block_volume % whole_size[i] ) == 0 );
+<a name="l00296"></a>00296         block_volume /= whole_size[i];
+<a name="l00297"></a>00297     }
+<a name="l00298"></a>00298 
+<a name="l00299"></a>00299     assert( block_volume );
+<a name="l00300"></a>00300     block_volume *= elSize;
+<a name="l00301"></a>00301     <span class="keyword">const</span> <span class="keywordtype">size_t</span> swap_volume = block_volume * whole_size[dim];
+<a name="l00302"></a>00302     <span class="keyword">const</span> std::auto_ptr&lt;uint8_t&gt; buff( static_cast&lt;uint8_t *&gt;( malloc( block_volume ) ) );
+<a name="l00303"></a>00303 
+<a name="l00304"></a>00304     <span class="comment">//iterate over all swap-volumes</span>
+<a name="l00305"></a>00305     <span class="keywordflow">for</span>( ; swap_start &lt; swap_end; swap_start += swap_volume ) { <span class="comment">//outer loop</span>
+<a name="l00306"></a>00306         <span class="comment">// swap each block with the one at the oppsite end of the swap_volume</span>
+<a name="l00307"></a>00307         uint8_t *a = swap_start; <span class="comment">//first block</span>
+<a name="l00308"></a>00308         uint8_t *b = swap_start + swap_volume - block_volume; <span class="comment">//last block within the swap-volume</span>
+<a name="l00309"></a>00309 
+<a name="l00310"></a>00310         <span class="keywordflow">for</span>( ; a &lt; b; a += block_volume, b -= block_volume ) { <span class="comment">// grow a, shrink b (inner loop)</span>
+<a name="l00311"></a>00311             memcpy( buff.get(), a, block_volume );
+<a name="l00312"></a>00312             memcpy( a, b, block_volume );
+<a name="l00313"></a>00313             memcpy( b, buff.get(), block_volume );
+<a name="l00314"></a>00314         }
+<a name="l00315"></a>00315 
+<a name="l00316"></a>00316     }
+<a name="l00317"></a>00317 }
+<a name="l00318"></a>00318 }
+<a name="l00319"></a>00319 }
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Apr 19 2011 16:19:15 for ISIS Core Library by&nbsp;
+<hr class="footer"/><address class="footer"><small>Generated on Fri Jun 10 2011 10:57:22 for ISIS Core Library by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.1 </small></address>
 </body>

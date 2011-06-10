@@ -50,6 +50,8 @@
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#ad8fa2f30a32d312c81ed3c974b34a66c">getCoordsFromLinIndex</a> (const size_t index, size_t d[DIMS]) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Compute coordinates from linear index,.  <a href="#ad8fa2f30a32d312c81ed3c974b34a66c"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">size_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a77f1e5850aceb61e0141f03ebfa0645f">getDimSize</a> (size_t idx) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector</a>&lt; float, DIMS &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a25ef6fa6a2c792769d69b5b7de49b1f6">getFoV</a> (const <a class="el" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector</a>&lt; float, DIMS &gt; &amp;voxelSize, const <a class="el" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector</a>&lt; float, DIMS &gt; &amp;voxelGap) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">size_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#ada01b000f0bccc84df97c149b4b827e0">getLinearIndex</a> (const size_t d[DIMS]) const </td></tr>
@@ -81,7 +83,7 @@ Protected Member Functions</h2></td></tr>
 
 <p>Base class for anything that has dimensional size </p>
 
-<p>Definition at line <a class="el" href="ndimensional_8hpp_source.html#l00054">54</a> of file <a class="el" href="ndimensional_8hpp_source.html">ndimensional.hpp</a>.</p>
+<p>Definition at line <a class="el" href="ndimensional_8hpp_source.html#l00061">61</a> of file <a class="el" href="ndimensional_8hpp_source.html">ndimensional.hpp</a>.</p>
 <hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a3176ed9830494aed59c944eef256bf1b"></a><!-- doxytag: member="isis::data::_internal::NDimensional::NDimensional" ref="a3176ed9830494aed59c944eef256bf1b" args="()" -->
 <div class="memitem">
@@ -100,7 +102,7 @@ template&lt;unsigned short DIMS&gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="ndimensional_8hpp_source.html#l00058">58</a> of file <a class="el" href="ndimensional_8hpp_source.html">ndimensional.hpp</a>.</p>
+<p>Definition at line <a class="el" href="ndimensional_8hpp_source.html#l00065">65</a> of file <a class="el" href="ndimensional_8hpp_source.html">ndimensional.hpp</a>.</p>
 
 </div>
 </div>
@@ -122,11 +124,51 @@ template&lt;unsigned short DIMS&gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="ndimensional_8hpp_source.html#l00074">74</a> of file <a class="el" href="ndimensional_8hpp_source.html">ndimensional.hpp</a>.</p>
+<p>Definition at line <a class="el" href="ndimensional_8hpp_source.html#l00081">81</a> of file <a class="el" href="ndimensional_8hpp_source.html">ndimensional.hpp</a>.</p>
 
 </div>
 </div>
 <hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="ad8fa2f30a32d312c81ed3c974b34a66c"></a><!-- doxytag: member="isis::data::_internal::NDimensional::getCoordsFromLinIndex" ref="ad8fa2f30a32d312c81ed3c974b34a66c" args="(const size_t index, size_t d[DIMS]) const " -->
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned short DIMS&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classisis_1_1data_1_1__internal_1_1NDimensional.html">isis::data::_internal::NDimensional</a>&lt; DIMS &gt;::getCoordsFromLinIndex </td>
+          <td>(</td>
+          <td class="paramtype">const size_t&nbsp;</td>
+          <td class="paramname"> <em>index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&nbsp;</td>
+          <td class="paramname"> <em>d</em>[DIMS]</td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td> const<code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Compute coordinates from linear index,. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>d</em>&nbsp;</td><td>array to put the computed coordinates in (d[0] will be most iterating element / lowest dimension) </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>index</em>&nbsp;</td><td>the linear index to compute the coordinates from </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="ndimensional_8hpp_source.html#l00096">96</a> of file <a class="el" href="ndimensional_8hpp_source.html">ndimensional.hpp</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a77f1e5850aceb61e0141f03ebfa0645f"></a><!-- doxytag: member="isis::data::_internal::NDimensional::getDimSize" ref="a77f1e5850aceb61e0141f03ebfa0645f" args="(size_t idx) const " -->
 <div class="memitem">
 <div class="memproto">
@@ -146,7 +188,7 @@ template&lt;unsigned short DIMS&gt; </div>
 <div class="memdoc">
 <dl class="return"><dt><b>Returns:</b></dt><dd>the size of the object in the given dimension </dd></dl>
 
-<p>Definition at line <a class="el" href="ndimensional_8hpp_source.html#l00100">100</a> of file <a class="el" href="ndimensional_8hpp_source.html">ndimensional.hpp</a>.</p>
+<p>Definition at line <a class="el" href="ndimensional_8hpp_source.html#l00115">115</a> of file <a class="el" href="ndimensional_8hpp_source.html">ndimensional.hpp</a>.</p>
 
 </div>
 </div>
@@ -177,7 +219,7 @@ template&lt;unsigned short DIMS&gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="ndimensional_8hpp_source.html#l00130">130</a> of file <a class="el" href="ndimensional_8hpp_source.html">ndimensional.hpp</a>.</p>
+<p>Definition at line <a class="el" href="ndimensional_8hpp_source.html#l00145">145</a> of file <a class="el" href="ndimensional_8hpp_source.html">ndimensional.hpp</a>.</p>
 
 </div>
 </div>
@@ -207,7 +249,7 @@ template&lt;unsigned short DIMS&gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="ndimensional_8hpp_source.html#l00081">81</a> of file <a class="el" href="ndimensional_8hpp_source.html">ndimensional.hpp</a>.</p>
+<p>Definition at line <a class="el" href="ndimensional_8hpp_source.html#l00088">88</a> of file <a class="el" href="ndimensional_8hpp_source.html">ndimensional.hpp</a>.</p>
 
 </div>
 </div>
@@ -231,7 +273,7 @@ template&lt;unsigned short DIMS&gt; </div>
 <p>get amount of relevant dimensions (last dim with size&gt;1) e.g. </p>
 <p>on a slice (1x64x1x1) it will be 2 </p>
 
-<p>Definition at line <a class="el" href="ndimensional_8hpp_source.html#l00118">118</a> of file <a class="el" href="ndimensional_8hpp_source.html">ndimensional.hpp</a>.</p>
+<p>Definition at line <a class="el" href="ndimensional_8hpp_source.html#l00133">133</a> of file <a class="el" href="ndimensional_8hpp_source.html">ndimensional.hpp</a>.</p>
 
 </div>
 </div>
@@ -255,7 +297,7 @@ template&lt;unsigned short DIMS&gt; </div>
 
 <p>generates a string representing the size </p>
 
-<p>Definition at line <a class="el" href="ndimensional_8hpp_source.html#l00105">105</a> of file <a class="el" href="ndimensional_8hpp_source.html">ndimensional.hpp</a>.</p>
+<p>Definition at line <a class="el" href="ndimensional_8hpp_source.html#l00120">120</a> of file <a class="el" href="ndimensional_8hpp_source.html">ndimensional.hpp</a>.</p>
 
 </div>
 </div>
@@ -278,7 +320,7 @@ template&lt;unsigned short DIMS&gt; </div>
 
 <p>generates a FixedVector&lt;DIMS&gt; representing the size </p>
 
-<p>Definition at line <a class="el" href="ndimensional_8hpp_source.html#l00110">110</a> of file <a class="el" href="ndimensional_8hpp_source.html">ndimensional.hpp</a>.</p>
+<p>Definition at line <a class="el" href="ndimensional_8hpp_source.html#l00125">125</a> of file <a class="el" href="ndimensional_8hpp_source.html">ndimensional.hpp</a>.</p>
 
 </div>
 </div>
@@ -302,7 +344,29 @@ template&lt;unsigned short DIMS&gt; </div>
 <p>Get the size of the object in elements of TYPE. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd><img class="formulaInl" alt="$ \prod_{i=0}^{DIMS-1} getDimSize(i) $" src="form_8.png"/> </dd></dl>
 
-<p>Definition at line <a class="el" href="ndimensional_8hpp_source.html#l00096">96</a> of file <a class="el" href="ndimensional_8hpp_source.html">ndimensional.hpp</a>.</p>
+<p>Definition at line <a class="el" href="ndimensional_8hpp_source.html#l00111">111</a> of file <a class="el" href="ndimensional_8hpp_source.html">ndimensional.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a2c1e16191966fa579c1285fea87b5202"></a><!-- doxytag: member="isis::data::_internal::NDimensional::init" ref="a2c1e16191966fa579c1285fea87b5202" args="(const util::FixedVector&lt; size_t, DIMS &gt; &amp;d)" -->
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned short DIMS&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classisis_1_1data_1_1__internal_1_1NDimensional.html">isis::data::_internal::NDimensional</a>&lt; DIMS &gt;::init </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector</a>&lt; size_t, DIMS &gt; &amp;&nbsp;</td>
+          <td class="paramname"> <em>d</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="ndimensional_8hpp_source.html#l00077">77</a> of file <a class="el" href="ndimensional_8hpp_source.html">ndimensional.hpp</a>.</p>
 
 </div>
 </div>
@@ -333,29 +397,7 @@ template&lt;unsigned short DIMS&gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="ndimensional_8hpp_source.html#l00066">66</a> of file <a class="el" href="ndimensional_8hpp_source.html">ndimensional.hpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a2c1e16191966fa579c1285fea87b5202"></a><!-- doxytag: member="isis::data::_internal::NDimensional::init" ref="a2c1e16191966fa579c1285fea87b5202" args="(const util::FixedVector&lt; size_t, DIMS &gt; &amp;d)" -->
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;unsigned short DIMS&gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classisis_1_1data_1_1__internal_1_1NDimensional.html">isis::data::_internal::NDimensional</a>&lt; DIMS &gt;::init </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector</a>&lt; size_t, DIMS &gt; &amp;&nbsp;</td>
-          <td class="paramname"> <em>d</em></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td><code> [inline]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="ndimensional_8hpp_source.html#l00070">70</a> of file <a class="el" href="ndimensional_8hpp_source.html">ndimensional.hpp</a>.</p>
+<p>Definition at line <a class="el" href="ndimensional_8hpp_source.html#l00073">73</a> of file <a class="el" href="ndimensional_8hpp_source.html">ndimensional.hpp</a>.</p>
 
 </div>
 </div>
@@ -386,7 +428,7 @@ template&lt;unsigned short DIMS&gt; </div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>true if given index will get a reasonable result when used for getLinearIndex </dd></dl>
 
-<p>Definition at line <a class="el" href="ndimensional_8hpp_source.html#l00089">89</a> of file <a class="el" href="ndimensional_8hpp_source.html">ndimensional.hpp</a>.</p>
+<p>Definition at line <a class="el" href="ndimensional_8hpp_source.html#l00104">104</a> of file <a class="el" href="ndimensional_8hpp_source.html">ndimensional.hpp</a>.</p>
 
 </div>
 </div>
@@ -404,7 +446,7 @@ template&lt;unsigned short DIMS&gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="ndimensional_8hpp_source.html#l00060">60</a> of file <a class="el" href="ndimensional_8hpp_source.html">ndimensional.hpp</a>.</p>
+<p>Definition at line <a class="el" href="ndimensional_8hpp_source.html#l00067">67</a> of file <a class="el" href="ndimensional_8hpp_source.html">ndimensional.hpp</a>.</p>
 
 </div>
 </div>
@@ -412,7 +454,7 @@ template&lt;unsigned short DIMS&gt; </div>
 <li>/scr/thulium1/isis/lib/Core/DataStorage/<a class="el" href="ndimensional_8hpp_source.html">ndimensional.hpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Apr 19 2011 16:19:30 for ISIS Core Library by&nbsp;
+<hr class="footer"/><address class="footer"><small>Generated on Fri Jun 10 2011 10:57:35 for ISIS Core Library by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.1 </small></address>
 </body>

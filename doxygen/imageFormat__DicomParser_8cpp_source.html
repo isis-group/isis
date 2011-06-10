@@ -66,7 +66,7 @@
 <a name="l00035"></a>00035 }
 <a name="l00042"></a>00042 <span class="keywordtype">void</span> ImageFormat_Dicom::parseAS( DcmElement *elem, <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1util.html#a85956c20207215d2b77e4c0935e494d5">util::istring</a> &amp;name, <a class="code" href="classisis_1_1util_1_1PropertyMap.html" title="This class contains a mapping tree to store all kinds of properties (path/key : value) It&amp;#39;s also ...">util::PropertyMap</a> &amp;map )
 <a name="l00043"></a>00043 {
-<a name="l00044"></a>00044     uint16_t duration;
+<a name="l00044"></a>00044     uint16_t duration = 0;
 <a name="l00045"></a>00045     OFString buff;
 <a name="l00046"></a>00046     elem-&gt;getOFString( buff, 0 );
 <a name="l00047"></a>00047     <span class="keyword">static</span> boost::numeric::converter &lt;
@@ -576,7 +576,7 @@
 <a name="l00579"></a>00579 }
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Apr 19 2011 16:19:19 for ISIS Core Library by&nbsp;
+<hr class="footer"/><address class="footer"><small>Generated on Fri Jun 10 2011 10:57:24 for ISIS Core Library by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.1 </small></address>
 </body>

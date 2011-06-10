@@ -38,6 +38,7 @@
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-static-attribs">Static Protected Attributes</a>  </div>
   <div class="headertitle">
 <h1>isis::data::_internal::ChunkBase Class Reference</h1>  </div>
@@ -51,13 +52,14 @@ Inheritance diagram for isis::data::_internal::ChunkBase:</div>
  <div class="center">
   <img src="classisis_1_1data_1_1__internal_1_1ChunkBase.png" usemap="#isis::data::_internal::ChunkBase_map" alt=""/>
   <map id="isis::data::_internal::ChunkBase_map" name="isis::data::_internal::ChunkBase_map">
-<area href="classisis_1_1data_1_1__internal_1_1NDimensional.html" alt="isis::data::_internal::NDimensional&lt; 4 &gt;" shape="rect" coords="239,0,468,24"/>
-<area href="classisis_1_1util_1_1PropertyMap.html" alt="isis::util::PropertyMap" shape="rect" coords="478,0,707,24"/>
-<area href="classisis_1_1data_1_1Chunk.html" alt="isis::data::Chunk" shape="rect" coords="358,112,587,136"/>
-<area href="classisis_1_1data_1_1MemChunk.html" alt="isis::data::MemChunk&lt; TYPE &gt;" shape="rect" coords="0,168,229,192"/>
-<area href="classisis_1_1data_1_1MemChunkNonDel.html" alt="isis::data::MemChunkNonDel&lt; TYPE &gt;" shape="rect" coords="239,168,468,192"/>
-<area href="classisis_1_1image__io_1_1__internal_1_1DicomChunk.html" alt="isis::image_io::_internal::DicomChunk" shape="rect" coords="478,168,707,192"/>
-<area href="classisis_1_1image__io_1_1__internal_1_1NiftiChunk.html" alt="isis::image_io::_internal::NiftiChunk" shape="rect" coords="717,168,946,192"/>
+<area href="classisis_1_1data_1_1__internal_1_1NDimensional.html" alt="isis::data::_internal::NDimensional&lt; 4 &gt;" shape="rect" coords="442,0,727,24"/>
+<area href="classisis_1_1util_1_1PropertyMap.html" alt="isis::util::PropertyMap" shape="rect" coords="737,0,1022,24"/>
+<area href="classisis_1_1data_1_1Chunk.html" alt="isis::data::Chunk" shape="rect" coords="590,112,875,136"/>
+<area href="classisis_1_1data_1_1MemChunk.html" alt="isis::data::MemChunk&lt; TYPE &gt;" shape="rect" coords="0,168,285,192"/>
+<area href="classisis_1_1data_1_1MemChunkNonDel.html" alt="isis::data::MemChunkNonDel&lt; TYPE &gt;" shape="rect" coords="295,168,580,192"/>
+<area href="classisis_1_1image__io_1_1__internal_1_1DicomChunk.html" alt="isis::image_io::_internal::DicomChunk" shape="rect" coords="590,168,875,192"/>
+<area href="classisis_1_1image__io_1_1__internal_1_1NiftiChunk.html" alt="isis::image_io::_internal::NiftiChunk" shape="rect" coords="885,168,1170,192"/>
+<area href="classisis_1_1image__io_1_1ImageFormat__raw_1_1RawMemChunk.html" alt="isis::image_io::ImageFormat_raw::RawMemChunk" shape="rect" coords="1180,168,1465,192"/>
 </map>
 </div>
 
@@ -72,6 +74,9 @@ Public Types</h2></td></tr>
 Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1ChunkBase.html#a20095e8bce4b289f89f15da02c104064">ChunkBase</a> (size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1ChunkBase.html#a185384c22ed988f0d06a97c182f7239c">~ChunkBase</a> ()</td></tr>
+<tr><td colspan="2"><h2><a name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1ChunkBase.html#a197c223e4a5a1f2e0aa1aa7d7aa31539">ChunkBase</a> ()</td></tr>
 <tr><td colspan="2"><h2><a name="pro-static-attribs"></a>
 Static Protected Attributes</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">static const char *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1__internal_1_1ChunkBase.html#af74b3cb30cbca0f4e19bb246415520ce">neededProperties</a></td></tr>
@@ -91,11 +96,30 @@ Static Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00042">42</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00040">40</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
 <hr/><h2>Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="a197c223e4a5a1f2e0aa1aa7d7aa31539"></a><!-- doxytag: member="isis::data::_internal::ChunkBase::ChunkBase" ref="a197c223e4a5a1f2e0aa1aa7d7aa31539" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">isis::data::_internal::ChunkBase::ChunkBase </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inline, protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00040">40</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a20095e8bce4b289f89f15da02c104064"></a><!-- doxytag: member="isis::data::_internal::ChunkBase::ChunkBase" ref="a20095e8bce4b289f89f15da02c104064" args="(size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps)" -->
 <div class="memitem">
 <div class="memproto">
@@ -185,7 +209,7 @@ Static Protected Attributes</h2></td></tr>
 <li>/scr/thulium1/isis/lib/Core/DataStorage/<a class="el" href="needed_8cpp_source.html">needed.cpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Apr 19 2011 16:19:29 for ISIS Core Library by&nbsp;
+<hr class="footer"/><address class="footer"><small>Generated on Fri Jun 10 2011 10:57:34 for ISIS Core Library by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.1 </small></address>
 </body>

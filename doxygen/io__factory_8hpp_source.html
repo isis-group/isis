@@ -50,67 +50,68 @@
 <a name="l00019"></a>00019 <span class="preprocessor">#include &lt;string&gt;</span>
 <a name="l00020"></a>00020 <span class="preprocessor">#include &lt;boost/shared_ptr.hpp&gt;</span>
 <a name="l00021"></a>00021 <span class="preprocessor">#include &lt;boost/regex.hpp&gt;</span>
-<a name="l00022"></a>00022 <span class="preprocessor">#include &lt;boost/filesystem.hpp&gt;</span>
-<a name="l00023"></a>00023 
-<a name="l00024"></a>00024 <span class="preprocessor">#include &quot;<a class="code" href="io__interface_8h.html">io_interface.h</a>&quot;</span>
-<a name="l00025"></a>00025 <span class="preprocessor">#include &quot;../CoreUtils/progressfeedback.hpp&quot;</span>
-<a name="l00026"></a>00026 
-<a name="l00027"></a>00027 <span class="comment">//????</span>
-<a name="l00028"></a>00028 <span class="preprocessor">#include &quot;<a class="code" href="chunk_8hpp.html">chunk.hpp</a>&quot;</span>
-<a name="l00029"></a>00029 <span class="preprocessor">#include &quot;<a class="code" href="image_8hpp.html">image.hpp</a>&quot;</span>
-<a name="l00030"></a>00030 
-<a name="l00031"></a>00031 <span class="keyword">namespace </span>isis
-<a name="l00032"></a>00032 {
-<a name="l00033"></a>00033 <span class="keyword">namespace </span>data
-<a name="l00034"></a>00034 {
-<a name="l00035"></a>00035 
-<a name="l00036"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html">00036</a> <span class="keyword">class </span><a class="code" href="classisis_1_1data_1_1IOFactory.html">IOFactory</a>
-<a name="l00037"></a>00037 {
-<a name="l00038"></a>00038 <span class="keyword">public</span>:
-<a name="l00039"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#a9a757e6a835f38e1b43a4c92ddd25dfc">00039</a>     <span class="keyword">typedef</span> boost::shared_ptr&lt; ::isis::image_io::FileFormat&gt; FileFormatPtr;
-<a name="l00040"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">00040</a>     <span class="keyword">typedef</span> std::list&lt;FileFormatPtr&gt; FileFormatList;
-<a name="l00041"></a>00041 <span class="keyword">private</span>:
-<a name="l00042"></a>00042     <a class="code" href="classisis_1_1util_1_1ProgressFeedback.html">util::ProgressFeedback</a> *m_feedback;
-<a name="l00043"></a>00043 <span class="keyword">public</span>:
-<a name="l00052"></a>00052     <span class="keyword">static</span> std::list&lt;data::Image&gt; <a class="code" href="classisis_1_1data_1_1IOFactory.html#a000cf7092de70db16134db5d486f6734" title="Load a data file with given filename and dialect.">load</a>( <span class="keyword">const</span> std::string &amp;path, std::string suffix_override = <span class="stringliteral">&quot;&quot;</span>, std::string dialect = <span class="stringliteral">&quot;&quot;</span> );
-<a name="l00061"></a>00061     <span class="keyword">static</span> <span class="keywordtype">int</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a000cf7092de70db16134db5d486f6734" title="Load a data file with given filename and dialect.">load</a>( std::list&lt;data::Chunk&gt; &amp;chunks, <span class="keyword">const</span> std::string &amp;path, std::string suffix_override = <span class="stringliteral">&quot;&quot;</span>, std::string dialect = <span class="stringliteral">&quot;&quot;</span> );
-<a name="l00062"></a>00062 
-<a name="l00063"></a>00063     <span class="keyword">static</span> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#acc7b67e9689ff8a861a0cfb9b7dee477">write</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Image.html">data::Image</a> &amp;image, <span class="keyword">const</span> std::string &amp;path, std::string suffix_override, <span class="keyword">const</span> std::string &amp;dialect );
-<a name="l00064"></a>00064     <span class="keyword">static</span> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#acc7b67e9689ff8a861a0cfb9b7dee477">write</a>( std::list&lt;data::Image&gt; images, <span class="keyword">const</span> std::string &amp;path, std::string suffix_override, <span class="keyword">const</span> std::string &amp;dialect );
-<a name="l00065"></a>00065 
-<a name="l00066"></a>00066     <span class="keyword">static</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">FileFormatList</a> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a52611ba56dfb78eb53125fcacad7f6d2">getFormats</a>();
-<a name="l00067"></a>00067 
-<a name="l00068"></a>00068     <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a9d2722e311a05d2e8443e51272877c8f">setProgressFeedback</a>( <a class="code" href="classisis_1_1util_1_1ProgressFeedback.html">util::ProgressFeedback</a> *feedback );
-<a name="l00069"></a>00069     <span class="keyword">static</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">FileFormatList</a> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a08d036ba67174cfabc170c433b69f1e5">getFileFormatList</a>( std::string filename, std::string suffix_override = <span class="stringliteral">&quot;&quot;</span>, std::string dialect = <span class="stringliteral">&quot;&quot;</span> );
-<a name="l00077"></a>00077     <span class="keyword">static</span> std::list&lt;data::Image&gt; <a class="code" href="classisis_1_1data_1_1IOFactory.html#aeb4016ec8b46a0ca884336b4da991cce" title="Make images out of a (unordered) list of chunks.">chunkListToImageList</a>( std::list&lt;Chunk&gt; &amp;chunks );
-<a name="l00078"></a>00078 <span class="keyword">protected</span>:
-<a name="l00079"></a>00079     <span class="keywordtype">int</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a648603b8f4c25b483ba207235c9eefb0">loadFile</a>( std::list&lt;Chunk&gt; &amp;ret, <span class="keyword">const</span> boost::filesystem::path &amp;filename, std::string suffix_override, std::string dialect );
-<a name="l00080"></a>00080     <span class="keywordtype">int</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a31189ac7426fd90a0f97e1e613d1711a">loadPath</a>( std::list&lt;Chunk&gt; &amp;ret, <span class="keyword">const</span> boost::filesystem::path &amp;path, std::string suffix_override, std::string dialect );
-<a name="l00081"></a>00081 
-<a name="l00082"></a>00082     <span class="keyword">static</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html">IOFactory</a> &amp;<span class="keyword">get</span>();
-<a name="l00083"></a>00083     <a class="code" href="classisis_1_1data_1_1IOFactory.html#adab7c3ade45c59ac221accb9daafef1f">IOFactory</a>();<span class="comment">//shall not be created directly</span>
-<a name="l00084"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#ae048ad7e6f058601b5f0b85e799a9f28">00084</a>     <a class="code" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">FileFormatList</a> <a class="code" href="classisis_1_1data_1_1IOFactory.html#ae048ad7e6f058601b5f0b85e799a9f28">io_formats</a>;
-<a name="l00085"></a>00085 
-<a name="l00086"></a>00086     <span class="comment">/*</span>
-<a name="l00087"></a>00087 <span class="comment">     * each ImageFormat will be registered in a map after plugin has been loaded</span>
-<a name="l00088"></a>00088 <span class="comment">     * @param plugin pointer to the plugin to register</span>
-<a name="l00089"></a>00089 <span class="comment">     *</span>
-<a name="l00090"></a>00090 <span class="comment">     * @return true if registration was successful, false otherwise</span>
-<a name="l00091"></a>00091 <span class="comment">     * */</span>
-<a name="l00092"></a>00092     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a907eb6020814a299bb282037c4f131cb">registerFileFormat</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a9a757e6a835f38e1b43a4c92ddd25dfc">FileFormatPtr</a> plugin );
-<a name="l00093"></a>00093     <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a91311f23e4ad7f5e5cbbb029af480688">findPlugins</a>( <span class="keyword">const</span> std::string &amp;path );
-<a name="l00094"></a>00094 <span class="keyword">private</span>:
-<a name="l00099"></a>00099     std::map&lt;util::istring, FileFormatList&gt; io_suffix;
-<a name="l00100"></a>00100     <a class="code" href="classisis_1_1data_1_1IOFactory.html">IOFactory</a> &amp;operator =( <a class="code" href="classisis_1_1data_1_1IOFactory.html">IOFactory</a> &amp; ); <span class="comment">//dont do that</span>
-<a name="l00101"></a>00101 };
-<a name="l00102"></a>00102 
-<a name="l00103"></a>00103 }
+<a name="l00022"></a><a class="code" href="io__factory_8hpp.html#a7b03a7555e481d771c4ca8c611e331b0">00022</a> <span class="preprocessor">#define BOOST_FILESYSTEM_VERSION 2 //@todo switch to 3 as soon as we drop support for boost &lt; 1.44</span>
+<a name="l00023"></a>00023 <span class="preprocessor"></span><span class="preprocessor">#include &lt;boost/filesystem.hpp&gt;</span>
+<a name="l00024"></a>00024 
+<a name="l00025"></a>00025 <span class="preprocessor">#include &quot;<a class="code" href="io__interface_8h.html">io_interface.h</a>&quot;</span>
+<a name="l00026"></a>00026 <span class="preprocessor">#include &quot;../CoreUtils/progressfeedback.hpp&quot;</span>
+<a name="l00027"></a>00027 
+<a name="l00028"></a>00028 <span class="comment">//????</span>
+<a name="l00029"></a>00029 <span class="preprocessor">#include &quot;<a class="code" href="chunk_8hpp.html">chunk.hpp</a>&quot;</span>
+<a name="l00030"></a>00030 <span class="preprocessor">#include &quot;<a class="code" href="image_8hpp.html">image.hpp</a>&quot;</span>
+<a name="l00031"></a>00031 
+<a name="l00032"></a>00032 <span class="keyword">namespace </span>isis
+<a name="l00033"></a>00033 {
+<a name="l00034"></a>00034 <span class="keyword">namespace </span>data
+<a name="l00035"></a>00035 {
+<a name="l00036"></a>00036 
+<a name="l00037"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html">00037</a> <span class="keyword">class </span><a class="code" href="classisis_1_1data_1_1IOFactory.html">IOFactory</a>
+<a name="l00038"></a>00038 {
+<a name="l00039"></a>00039 <span class="keyword">public</span>:
+<a name="l00040"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#a9a757e6a835f38e1b43a4c92ddd25dfc">00040</a>     <span class="keyword">typedef</span> boost::shared_ptr&lt; ::isis::image_io::FileFormat&gt; FileFormatPtr;
+<a name="l00041"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">00041</a>     <span class="keyword">typedef</span> std::list&lt;FileFormatPtr&gt; FileFormatList;
+<a name="l00042"></a>00042 <span class="keyword">private</span>:
+<a name="l00043"></a>00043     <a class="code" href="classisis_1_1util_1_1ProgressFeedback.html">util::ProgressFeedback</a> *m_feedback;
+<a name="l00044"></a>00044 <span class="keyword">public</span>:
+<a name="l00053"></a>00053     <span class="keyword">static</span> std::list&lt;data::Image&gt; <a class="code" href="classisis_1_1data_1_1IOFactory.html#a000cf7092de70db16134db5d486f6734" title="Load a data file with given filename and dialect.">load</a>( <span class="keyword">const</span> std::string &amp;path, std::string suffix_override = <span class="stringliteral">&quot;&quot;</span>, std::string dialect = <span class="stringliteral">&quot;&quot;</span> );
+<a name="l00062"></a>00062     <span class="keyword">static</span> <span class="keywordtype">int</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a000cf7092de70db16134db5d486f6734" title="Load a data file with given filename and dialect.">load</a>( std::list&lt;data::Chunk&gt; &amp;chunks, <span class="keyword">const</span> std::string &amp;path, std::string suffix_override = <span class="stringliteral">&quot;&quot;</span>, std::string dialect = <span class="stringliteral">&quot;&quot;</span> );
+<a name="l00063"></a>00063 
+<a name="l00064"></a>00064     <span class="keyword">static</span> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#acc7b67e9689ff8a861a0cfb9b7dee477">write</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">data::Image</a> &amp;image, <span class="keyword">const</span> std::string &amp;path, std::string suffix_override, <span class="keyword">const</span> std::string &amp;dialect );
+<a name="l00065"></a>00065     <span class="keyword">static</span> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#acc7b67e9689ff8a861a0cfb9b7dee477">write</a>( std::list&lt;data::Image&gt; images, <span class="keyword">const</span> std::string &amp;path, std::string suffix_override, <span class="keyword">const</span> std::string &amp;dialect );
+<a name="l00066"></a>00066 
+<a name="l00067"></a>00067     <span class="keyword">static</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">FileFormatList</a> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a52611ba56dfb78eb53125fcacad7f6d2">getFormats</a>();
+<a name="l00068"></a>00068 
+<a name="l00069"></a>00069     <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a9d2722e311a05d2e8443e51272877c8f">setProgressFeedback</a>( <a class="code" href="classisis_1_1util_1_1ProgressFeedback.html">util::ProgressFeedback</a> *feedback );
+<a name="l00070"></a>00070     <span class="keyword">static</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">FileFormatList</a> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a08d036ba67174cfabc170c433b69f1e5">getFileFormatList</a>( std::string filename, std::string suffix_override = <span class="stringliteral">&quot;&quot;</span>, std::string dialect = <span class="stringliteral">&quot;&quot;</span> );
+<a name="l00078"></a>00078     <span class="keyword">static</span> std::list&lt;data::Image&gt; <a class="code" href="classisis_1_1data_1_1IOFactory.html#aeb4016ec8b46a0ca884336b4da991cce" title="Make images out of a (unordered) list of chunks.">chunkListToImageList</a>( std::list&lt;Chunk&gt; &amp;chunks );
+<a name="l00079"></a>00079 <span class="keyword">protected</span>:
+<a name="l00080"></a>00080     <span class="keywordtype">int</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a648603b8f4c25b483ba207235c9eefb0">loadFile</a>( std::list&lt;Chunk&gt; &amp;ret, <span class="keyword">const</span> boost::filesystem::path &amp;filename, std::string suffix_override, std::string dialect );
+<a name="l00081"></a>00081     <span class="keywordtype">int</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a31189ac7426fd90a0f97e1e613d1711a">loadPath</a>( std::list&lt;Chunk&gt; &amp;ret, <span class="keyword">const</span> boost::filesystem::path &amp;path, std::string suffix_override, std::string dialect );
+<a name="l00082"></a>00082 
+<a name="l00083"></a>00083     <span class="keyword">static</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html">IOFactory</a> &amp;<span class="keyword">get</span>();
+<a name="l00084"></a>00084     <a class="code" href="classisis_1_1data_1_1IOFactory.html#adab7c3ade45c59ac221accb9daafef1f">IOFactory</a>();<span class="comment">//shall not be created directly</span>
+<a name="l00085"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#ae048ad7e6f058601b5f0b85e799a9f28">00085</a>     <a class="code" href="classisis_1_1data_1_1IOFactory.html#aee77679b34cee11c2adb65202b7c4517">FileFormatList</a> <a class="code" href="classisis_1_1data_1_1IOFactory.html#ae048ad7e6f058601b5f0b85e799a9f28">io_formats</a>;
+<a name="l00086"></a>00086 
+<a name="l00087"></a>00087     <span class="comment">/*</span>
+<a name="l00088"></a>00088 <span class="comment">     * each ImageFormat will be registered in a map after plugin has been loaded</span>
+<a name="l00089"></a>00089 <span class="comment">     * @param plugin pointer to the plugin to register</span>
+<a name="l00090"></a>00090 <span class="comment">     *</span>
+<a name="l00091"></a>00091 <span class="comment">     * @return true if registration was successful, false otherwise</span>
+<a name="l00092"></a>00092 <span class="comment">     * */</span>
+<a name="l00093"></a>00093     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a907eb6020814a299bb282037c4f131cb">registerFileFormat</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a9a757e6a835f38e1b43a4c92ddd25dfc">FileFormatPtr</a> plugin );
+<a name="l00094"></a>00094     <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#a91311f23e4ad7f5e5cbbb029af480688">findPlugins</a>( <span class="keyword">const</span> std::string &amp;path );
+<a name="l00095"></a>00095 <span class="keyword">private</span>:
+<a name="l00100"></a>00100     std::map&lt;util::istring, FileFormatList&gt; io_suffix;
+<a name="l00101"></a>00101     <a class="code" href="classisis_1_1data_1_1IOFactory.html">IOFactory</a> &amp;operator =( <a class="code" href="classisis_1_1data_1_1IOFactory.html">IOFactory</a> &amp; ); <span class="comment">//dont do that</span>
+<a name="l00102"></a>00102 };
+<a name="l00103"></a>00103 
 <a name="l00104"></a>00104 }
-<a name="l00105"></a>00105 
-<a name="l00106"></a>00106 <span class="preprocessor">#endif //IO_FACTORY_H</span>
+<a name="l00105"></a>00105 }
+<a name="l00106"></a>00106 
+<a name="l00107"></a>00107 <span class="preprocessor">#endif //IO_FACTORY_H</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Apr 19 2011 16:19:18 for ISIS Core Library by&nbsp;
+<hr class="footer"/><address class="footer"><small>Generated on Fri Jun 10 2011 10:57:23 for ISIS Core Library by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.1 </small></address>
 </body>

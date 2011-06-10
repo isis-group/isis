@@ -221,7 +221,7 @@
 <a name="l00196"></a>00196     std::pair&lt;boost::shared_ptr&lt;Chunk&gt;, <span class="keywordtype">bool</span>&gt; inserted = primaryInsert( ch );
 <a name="l00197"></a>00197 
 <a name="l00198"></a>00198     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( inserted.first &amp;&amp; !inserted.second, <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> )
-<a name="l00199"></a>00199             &lt;&lt; <span class="stringliteral">&quot;Not inserting chunk because there is allready a Chunk at the same position (&quot;</span> &lt;&lt; ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a31a2cf308def21205a6c3e7fed02752e" title="Access the property referenced by the path-key.">propertyValue</a>( <span class="stringliteral">&quot;indexOrigin&quot;</span> ) &lt;&lt; <span class="stringliteral">&quot;) with the equal property &quot;</span>
+<a name="l00199"></a>00199             &lt;&lt; <span class="stringliteral">&quot;Not inserting chunk because there is already a Chunk at the same position (&quot;</span> &lt;&lt; ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a31a2cf308def21205a6c3e7fed02752e" title="Access the property referenced by the path-key.">propertyValue</a>( <span class="stringliteral">&quot;indexOrigin&quot;</span> ) &lt;&lt; <span class="stringliteral">&quot;) with the equal property &quot;</span>
 <a name="l00200"></a>00200             &lt;&lt; std::make_pair( prop2, ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a31a2cf308def21205a6c3e7fed02752e" title="Access the property referenced by the path-key.">propertyValue</a>( prop2 ) );
 <a name="l00201"></a>00201 
 <a name="l00202"></a>00202     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>(
@@ -279,7 +279,7 @@
 <a name="l00254"></a>00254 
 <a name="l00255"></a>00255             <span class="keywordflow">for</span>( <span class="keywordtype">size_t</span> v = 0; v &lt; vertical; v++, iS++ ) { <span class="comment">// inner loop iterates verticaly (through the secondary sorting)</span>
 <a name="l00256"></a>00256                 assert( iS != iP-&gt;second.end() );
-<a name="l00257"></a>00257                 ret[h+v *horizontal] = iS-&gt;second; <span class="comment">// insert horizontally - primary sorting is the fastest running index (read the sorting matrix horizontaly)</span>
+<a name="l00257"></a>00257                 ret[h + v *horizontal] = iS-&gt;second;  <span class="comment">// insert horizontally - primary sorting is the fastest running index (read the sorting matrix horizontaly)</span>
 <a name="l00258"></a>00258             }
 <a name="l00259"></a>00259         }
 <a name="l00260"></a>00260 
@@ -303,7 +303,7 @@
 <a name="l00278"></a>00278 }
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Apr 19 2011 16:19:19 for ISIS Core Library by&nbsp;
+<hr class="footer"/><address class="footer"><small>Generated on Fri Jun 10 2011 10:57:23 for ISIS Core Library by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.1 </small></address>
 </body>

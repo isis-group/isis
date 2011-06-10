@@ -54,39 +54,40 @@
 <a name="l00023"></a>00023 <span class="preprocessor"></span>
 <a name="l00024"></a>00024 <span class="preprocessor">#include &lt;stdio.h&gt;</span>
 <a name="l00025"></a>00025 <span class="preprocessor">#include &lt;fstream&gt;</span>
-<a name="l00026"></a>00026 <span class="preprocessor">#include &lt;boost/filesystem/operations.hpp&gt;</span>
-<a name="l00027"></a>00027 <span class="preprocessor">#include &quot;<a class="code" href="tmpfile_8hpp.html">tmpfile.hpp</a>&quot;</span>
-<a name="l00028"></a>00028 <span class="preprocessor">#include &quot;<a class="code" href="message_8hpp.html">message.hpp</a>&quot;</span>
-<a name="l00029"></a>00029 <span class="preprocessor">#include &quot;<a class="code" href="DataStorage_2common_8hpp.html">common.hpp</a>&quot;</span>
-<a name="l00030"></a><a class="code" href="classisis_1_1util_1_1TmpFile.html#a93502497a7c3ace5e964bba877635fa3">00030</a> 
-<a name="l00031"></a>00031 <span class="keyword">namespace </span>isis
-<a name="l00032"></a>00032 {
-<a name="l00033"></a>00033 <span class="keyword">namespace </span>util
-<a name="l00034"></a>00034 {
-<a name="l00035"></a>00035 
-<a name="l00036"></a>00036 TmpFile::TmpFile( std::string prefix, std::string sufix )
-<a name="l00037"></a>00037 {
-<a name="l00038"></a>00038     <span class="comment">// @todo critical block - should be locked</span>
-<a name="l00039"></a><a class="code" href="classisis_1_1util_1_1TmpFile.html#ae1a57a4394ea27e2cbf8cec4a947c16b">00039</a>     boost::filesystem::path dummy( tmpnam( NULL ) );
-<a name="l00040"></a>00040     boost::filesystem::path::operator=( dummy.branch_path() / boost::filesystem::path( prefix + dummy.leaf() + sufix ) );
-<a name="l00041"></a>00041     <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;Creating temporary file &quot;</span> &lt;&lt; string();
-<a name="l00042"></a>00042     std::ofstream( <span class="keywordtype">string</span>().c_str() );
-<a name="l00043"></a>00043 }
-<a name="l00044"></a>00044 
-<a name="l00045"></a>00045 <a class="code" href="classisis_1_1util_1_1TmpFile.html#ae1a57a4394ea27e2cbf8cec4a947c16b" title="Will delete the temporary file if its still there.">TmpFile::~TmpFile</a>()
-<a name="l00046"></a>00046 {
-<a name="l00047"></a>00047     <span class="keywordflow">if</span> ( boost::filesystem::exists( *<span class="keyword">this</span> ) ) {
-<a name="l00048"></a>00048         boost::filesystem::remove( *<span class="keyword">this</span> );
-<a name="l00049"></a>00049         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> ) &lt;&lt; <span class="stringliteral">&quot;Removing temporary &quot;</span> &lt;&lt; file_string();
-<a name="l00050"></a>00050     } <span class="keywordflow">else</span> {
-<a name="l00051"></a>00051         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;Temporary file &quot;</span> &lt;&lt; file_string() &lt;&lt; <span class="stringliteral">&quot; does not exist, won&#39;t delete it&quot;</span>;
-<a name="l00052"></a>00052     }
-<a name="l00053"></a>00053 }
+<a name="l00026"></a><a class="code" href="tmpfile_8cpp.html#a7b03a7555e481d771c4ca8c611e331b0">00026</a> <span class="preprocessor">#define BOOST_FILESYSTEM_VERSION 2 //@todo switch to 3 as soon as we drop support for boost &lt; 1.44</span>
+<a name="l00027"></a>00027 <span class="preprocessor"></span><span class="preprocessor">#include &lt;boost/filesystem/operations.hpp&gt;</span>
+<a name="l00028"></a>00028 <span class="preprocessor">#include &quot;<a class="code" href="tmpfile_8hpp.html">tmpfile.hpp</a>&quot;</span>
+<a name="l00029"></a>00029 <span class="preprocessor">#include &quot;<a class="code" href="message_8hpp.html">message.hpp</a>&quot;</span>
+<a name="l00030"></a>00030 <span class="preprocessor">#include &quot;<a class="code" href="DataStorage_2common_8hpp.html">common.hpp</a>&quot;</span>
+<a name="l00031"></a><a class="code" href="classisis_1_1util_1_1TmpFile.html#a93502497a7c3ace5e964bba877635fa3">00031</a> 
+<a name="l00032"></a>00032 <span class="keyword">namespace </span>isis
+<a name="l00033"></a>00033 {
+<a name="l00034"></a>00034 <span class="keyword">namespace </span>util
+<a name="l00035"></a>00035 {
+<a name="l00036"></a>00036 
+<a name="l00037"></a>00037 TmpFile::TmpFile( std::string prefix, std::string sufix )
+<a name="l00038"></a>00038 {
+<a name="l00039"></a>00039     <span class="comment">// @todo critical block - should be locked</span>
+<a name="l00040"></a><a class="code" href="classisis_1_1util_1_1TmpFile.html#ae1a57a4394ea27e2cbf8cec4a947c16b">00040</a>     boost::filesystem::path dummy( tmpnam( NULL ) );
+<a name="l00041"></a>00041     boost::filesystem::path::operator=( dummy.branch_path() / boost::filesystem::path( prefix + dummy.leaf() + sufix ) );
+<a name="l00042"></a>00042     <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;Creating temporary file &quot;</span> &lt;&lt; string();
+<a name="l00043"></a>00043     std::ofstream( <span class="keywordtype">string</span>().c_str() );
+<a name="l00044"></a>00044 }
+<a name="l00045"></a>00045 
+<a name="l00046"></a>00046 <a class="code" href="classisis_1_1util_1_1TmpFile.html#ae1a57a4394ea27e2cbf8cec4a947c16b" title="Will delete the temporary file if its still there.">TmpFile::~TmpFile</a>()
+<a name="l00047"></a>00047 {
+<a name="l00048"></a>00048     <span class="keywordflow">if</span> ( boost::filesystem::exists( *<span class="keyword">this</span> ) ) {
+<a name="l00049"></a>00049         boost::filesystem::remove( *<span class="keyword">this</span> );
+<a name="l00050"></a>00050         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a> ) &lt;&lt; <span class="stringliteral">&quot;Removing temporary &quot;</span> &lt;&lt; file_string();
+<a name="l00051"></a>00051     } <span class="keywordflow">else</span> {
+<a name="l00052"></a>00052         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;Temporary file &quot;</span> &lt;&lt; file_string() &lt;&lt; <span class="stringliteral">&quot; does not exist, won&#39;t delete it&quot;</span>;
+<a name="l00053"></a>00053     }
 <a name="l00054"></a>00054 }
 <a name="l00055"></a>00055 }
+<a name="l00056"></a>00056 }
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Apr 19 2011 16:19:14 for ISIS Core Library by&nbsp;
+<hr class="footer"/><address class="footer"><small>Generated on Fri Jun 10 2011 10:57:22 for ISIS Core Library by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.1 </small></address>
 </body>

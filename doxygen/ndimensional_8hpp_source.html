@@ -61,7 +61,7 @@
 <a name="l00031"></a>00031 
 <a name="l00032"></a>00032 <span class="keyword">template</span>&lt;<span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> DIM&gt; <span class="keywordtype">size_t</span> __dimStride( <span class="keyword">const</span> <span class="keywordtype">size_t</span> dim[] )
 <a name="l00033"></a>00033 {
-<a name="l00034"></a>00034     <span class="keywordflow">return</span> __dimStride &lt; DIM - 1 &gt; ( dim ) * dim[DIM-1];
+<a name="l00034"></a>00034     <span class="keywordflow">return</span> __dimStride &lt; DIM - 1 &gt; ( dim ) * dim[DIM - 1];
 <a name="l00035"></a>00035 }
 <a name="l00036"></a>00036 
 <a name="l00037"></a>00037 <span class="keyword">template</span>&lt;<span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> DIM&gt; <span class="keywordtype">size_t</span> __dim2index( <span class="keyword">const</span> <span class="keywordtype">size_t</span> d[], <span class="keyword">const</span> <span class="keywordtype">size_t</span> dim[] )
@@ -69,83 +69,93 @@
 <a name="l00039"></a>00039     <span class="keywordflow">return</span> d[DIM] * __dimStride&lt;DIM&gt;( dim ) + __dim2index &lt; DIM - 1 &gt; ( d, dim );
 <a name="l00040"></a>00040 }
 <a name="l00041"></a>00041 
-<a name="l00042"></a>00042 <span class="keyword">template</span>&lt;<span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> DIM&gt; <span class="keywordtype">bool</span> __rangeCheck( <span class="keyword">const</span> <span class="keywordtype">size_t</span> d[], <span class="keyword">const</span> <span class="keywordtype">size_t</span> dim[] )
+<a name="l00042"></a>00042 <span class="keyword">template</span>&lt;<span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> DIM&gt; <span class="keywordtype">void</span> __index2dim( <span class="keyword">const</span> <span class="keywordtype">size_t</span> index, <span class="keywordtype">size_t</span> d[], <span class="keyword">const</span> <span class="keywordtype">size_t</span> dim[], <span class="keywordtype">size_t</span> vol )
 <a name="l00043"></a>00043 {
-<a name="l00044"></a>00044     <span class="keywordflow">return</span> ( d[DIM] &lt; dim[DIM] ) &amp;&amp; __rangeCheck &lt; DIM - 1 &gt; ( d, dim );
-<a name="l00045"></a>00045 }
-<a name="l00046"></a>00046 
-<a name="l00047"></a>00047 <span class="keyword">template</span>&lt;&gt; <span class="keyword">inline</span> <span class="keywordtype">size_t</span> __dimStride&lt;0&gt;( <span class="keyword">const</span> <span class="keywordtype">size_t</span>[] <span class="comment">/*dim*/</span> ) {<span class="keywordflow">return</span> 1;}
-<a name="l00048"></a>00048 <span class="keyword">template</span>&lt;&gt; <span class="keyword">inline</span> <span class="keywordtype">size_t</span> __dim2index&lt;0&gt;( <span class="keyword">const</span> <span class="keywordtype">size_t</span> d[], <span class="keyword">const</span> <span class="keywordtype">size_t</span> dim[] ) {<span class="keywordflow">return</span> d[0] * __dimStride&lt;0&gt;( dim );}
-<a name="l00049"></a>00049 <span class="keyword">template</span>&lt;&gt; <span class="keyword">inline</span> <span class="keywordtype">bool</span>   __rangeCheck&lt;0&gt;( <span class="keyword">const</span> <span class="keywordtype">size_t</span> d[], <span class="keyword">const</span> <span class="keywordtype">size_t</span> dim[] ) {<span class="keywordflow">return</span> d[0] &lt; dim[0];}
-<a name="l00050"></a>00050 
+<a name="l00044"></a>00044     d[DIM] = index / vol;
+<a name="l00045"></a>00045     __index2dim &lt; DIM - 1 &gt; ( index % vol, d, dim, vol / dim[DIM - 1] );
+<a name="l00046"></a>00046 }
+<a name="l00047"></a>00047 
+<a name="l00048"></a>00048 <span class="keyword">template</span>&lt;<span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> DIM&gt; <span class="keywordtype">bool</span> __rangeCheck( <span class="keyword">const</span> <span class="keywordtype">size_t</span> d[], <span class="keyword">const</span> <span class="keywordtype">size_t</span> dim[] )
+<a name="l00049"></a>00049 {
+<a name="l00050"></a>00050     <span class="keywordflow">return</span> ( d[DIM] &lt; dim[DIM] ) &amp;&amp; __rangeCheck &lt; DIM - 1 &gt; ( d, dim );
+<a name="l00051"></a>00051 }
 <a name="l00052"></a>00052 
-<a name="l00054"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html">00054</a> <span class="keyword">template</span>&lt;<span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> DIMS&gt; <span class="keyword">class </span><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html">NDimensional</a>
-<a name="l00055"></a>00055 {
-<a name="l00056"></a>00056     <span class="keywordtype">size_t</span> m_dim[DIMS];
-<a name="l00057"></a>00057 <span class="keyword">protected</span>:
-<a name="l00058"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a3176ed9830494aed59c944eef256bf1b">00058</a>     <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a3176ed9830494aed59c944eef256bf1b">NDimensional</a>() {}
-<a name="l00059"></a>00059 <span class="keyword">public</span>:
-<a name="l00060"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a9002217e0b6108bcfa016d6ed52aaafe">00060</a>     <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a9002217e0b6108bcfa016d6ed52aaafe">dims</a> = DIMS;
-<a name="l00066"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#aed41e361800d007912e85190f1c4452f">00066</a>     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#aed41e361800d007912e85190f1c4452f" title="Initializes the size-vector.">init</a>( <span class="keyword">const</span> <span class="keywordtype">size_t</span> d[DIMS] ) {
-<a name="l00067"></a>00067         std::copy( d, d + DIMS, m_dim );
-<a name="l00068"></a>00068         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5268e73b64b56929ec91d15204e29b4a" title="Get the size of the object in elements of TYPE.">getVolume</a>() == 0, <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Creating object with volume of 0&quot;</span>;
-<a name="l00069"></a>00069     }
-<a name="l00070"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a2c1e16191966fa579c1285fea87b5202">00070</a>     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a2c1e16191966fa579c1285fea87b5202">init</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector&lt;size_t, DIMS&gt;</a>&amp; d ) {
-<a name="l00071"></a>00071         d.<a class="code" href="classisis_1_1util_1_1FixedVector.html#a55f7f4c81ad3c791ca14299e24715dd6" title="copy the elements to somthing designed after the output iterator model">copyTo</a>( m_dim );
-<a name="l00072"></a>00072         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5268e73b64b56929ec91d15204e29b4a" title="Get the size of the object in elements of TYPE.">getVolume</a>() == 0, <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Creating object with volume of 0&quot;</span>;
-<a name="l00073"></a>00073     }
-<a name="l00074"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#ab3c391fa2de9123b28e7f6b26fb8e369">00074</a>     <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#ab3c391fa2de9123b28e7f6b26fb8e369">NDimensional</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html">NDimensional</a> &amp;src ) {<span class="comment">//@todo default copier should do the job</span>
-<a name="l00075"></a>00075         <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#aed41e361800d007912e85190f1c4452f" title="Initializes the size-vector.">init</a>( src.m_dim );
+<a name="l00053"></a>00053 <span class="keyword">template</span>&lt;&gt; <span class="keyword">inline</span> <span class="keywordtype">size_t</span> __dimStride&lt;0&gt;( <span class="keyword">const</span> <span class="keywordtype">size_t</span>[] <span class="comment">/*dim*/</span> ) {<span class="keywordflow">return</span> 1;}
+<a name="l00054"></a>00054 <span class="keyword">template</span>&lt;&gt; <span class="keyword">inline</span> <span class="keywordtype">size_t</span> __dim2index&lt;0&gt;( <span class="keyword">const</span> <span class="keywordtype">size_t</span> d[], <span class="keyword">const</span> <span class="keywordtype">size_t</span> dim[] ) {<span class="keywordflow">return</span> d[0] * __dimStride&lt;0&gt;( dim );}
+<a name="l00055"></a>00055 <span class="keyword">template</span>&lt;&gt; <span class="keyword">inline</span> <span class="keywordtype">void</span> __index2dim&lt;0&gt;( <span class="keyword">const</span> <span class="keywordtype">size_t</span> index, <span class="keywordtype">size_t</span> d[], <span class="keyword">const</span> <span class="keywordtype">size_t</span>[], <span class="keywordtype">size_t</span> <span class="comment">/*vol*/</span> ) {d[0] = index;}
+<a name="l00056"></a>00056 <span class="keyword">template</span>&lt;&gt; <span class="keyword">inline</span> <span class="keywordtype">bool</span>   __rangeCheck&lt;0&gt;( <span class="keyword">const</span> <span class="keywordtype">size_t</span> d[], <span class="keyword">const</span> <span class="keywordtype">size_t</span> dim[] ) {<span class="keywordflow">return</span> d[0] &lt; dim[0];}
+<a name="l00057"></a>00057 
+<a name="l00059"></a>00059 
+<a name="l00061"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html">00061</a> <span class="keyword">template</span>&lt;<span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> DIMS&gt; <span class="keyword">class </span><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html">NDimensional</a>
+<a name="l00062"></a>00062 {
+<a name="l00063"></a>00063     <span class="keywordtype">size_t</span> m_dim[DIMS];
+<a name="l00064"></a>00064 <span class="keyword">protected</span>:
+<a name="l00065"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a3176ed9830494aed59c944eef256bf1b">00065</a>     <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a3176ed9830494aed59c944eef256bf1b">NDimensional</a>() {}
+<a name="l00066"></a>00066 <span class="keyword">public</span>:
+<a name="l00067"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a9002217e0b6108bcfa016d6ed52aaafe">00067</a>     <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a9002217e0b6108bcfa016d6ed52aaafe">dims</a> = DIMS;
+<a name="l00073"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#aed41e361800d007912e85190f1c4452f">00073</a>     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#aed41e361800d007912e85190f1c4452f" title="Initializes the size-vector.">init</a>( <span class="keyword">const</span> <span class="keywordtype">size_t</span> d[DIMS] ) {
+<a name="l00074"></a>00074         std::copy( d, d + DIMS, m_dim );
+<a name="l00075"></a>00075         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5268e73b64b56929ec91d15204e29b4a" title="Get the size of the object in elements of TYPE.">getVolume</a>() == 0, <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Creating object with volume of 0&quot;</span>;
 <a name="l00076"></a>00076     }
-<a name="l00081"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#ada01b000f0bccc84df97c149b4b827e0">00081</a>     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#ada01b000f0bccc84df97c149b4b827e0" title="Compute linear index from n-dimensional index,.">getLinearIndex</a>( <span class="keyword">const</span> <span class="keywordtype">size_t</span> d[DIMS] )<span class="keyword">const </span>{
-<a name="l00082"></a>00082         <span class="keywordflow">return</span> __dim2index &lt; DIMS - 1 &gt; ( d, m_dim );
+<a name="l00077"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a2c1e16191966fa579c1285fea87b5202">00077</a>     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a2c1e16191966fa579c1285fea87b5202">init</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector&lt;size_t, DIMS&gt;</a>&amp; d ) {
+<a name="l00078"></a>00078         d.<a class="code" href="classisis_1_1util_1_1FixedVector.html#a55f7f4c81ad3c791ca14299e24715dd6" title="copy the elements to somthing designed after the output iterator model">copyTo</a>( m_dim );
+<a name="l00079"></a>00079         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5268e73b64b56929ec91d15204e29b4a" title="Get the size of the object in elements of TYPE.">getVolume</a>() == 0, <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;Creating object with volume of 0&quot;</span>;
+<a name="l00080"></a>00080     }
+<a name="l00081"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#ab3c391fa2de9123b28e7f6b26fb8e369">00081</a>     <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#ab3c391fa2de9123b28e7f6b26fb8e369">NDimensional</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html">NDimensional</a> &amp;src ) {<span class="comment">//@todo default copier should do the job</span>
+<a name="l00082"></a>00082         <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#aed41e361800d007912e85190f1c4452f" title="Initializes the size-vector.">init</a>( src.m_dim );
 <a name="l00083"></a>00083     }
-<a name="l00089"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a25357b6c09d29da78456e2c2504d479e">00089</a>     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a25357b6c09d29da78456e2c2504d479e" title="Check if index fits into the dimensional size of the object.">isInRange</a>( <span class="keyword">const</span> <span class="keywordtype">size_t</span> d[DIMS] )<span class="keyword">const </span>{
-<a name="l00090"></a>00090         <span class="keywordflow">return</span> __rangeCheck &lt; DIMS - 1 &gt; ( d, m_dim );
-<a name="l00091"></a>00091     }
-<a name="l00096"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5268e73b64b56929ec91d15204e29b4a">00096</a>     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5268e73b64b56929ec91d15204e29b4a" title="Get the size of the object in elements of TYPE.">getVolume</a>()<span class="keyword">const </span>{
-<a name="l00097"></a>00097         <span class="keywordflow">return</span> __dimStride&lt;DIMS&gt;( m_dim );
+<a name="l00088"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#ada01b000f0bccc84df97c149b4b827e0">00088</a>     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#ada01b000f0bccc84df97c149b4b827e0" title="Compute linear index from n-dimensional index,.">getLinearIndex</a>( <span class="keyword">const</span> <span class="keywordtype">size_t</span> d[DIMS] )<span class="keyword">const </span>{
+<a name="l00089"></a>00089         <span class="keywordflow">return</span> __dim2index &lt; DIMS - 1 &gt; ( d, m_dim );
+<a name="l00090"></a>00090     }
+<a name="l00096"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#ad8fa2f30a32d312c81ed3c974b34a66c">00096</a>     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#ad8fa2f30a32d312c81ed3c974b34a66c" title="Compute coordinates from linear index,.">getCoordsFromLinIndex</a>( <span class="keyword">const</span> <span class="keywordtype">size_t</span> index, <span class="keywordtype">size_t</span> d[DIMS] )<span class="keyword">const </span>{
+<a name="l00097"></a>00097         __index2dim &lt; DIMS - 1 &gt; ( index, d, m_dim, <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5268e73b64b56929ec91d15204e29b4a" title="Get the size of the object in elements of TYPE.">getVolume</a>() / m_dim[DIMS - 1] );
 <a name="l00098"></a>00098     }
-<a name="l00100"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a77f1e5850aceb61e0141f03ebfa0645f">00100</a>     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a77f1e5850aceb61e0141f03ebfa0645f">getDimSize</a>( <span class="keywordtype">size_t</span> idx )<span class="keyword">const </span>{
-<a name="l00101"></a>00101         <span class="keywordflow">return</span> m_dim[idx];
-<a name="l00102"></a>00102     }
-<a name="l00103"></a>00103 
-<a name="l00105"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5987df3c819b04abd031e0049a87f3e7">00105</a>     std::string <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5987df3c819b04abd031e0049a87f3e7" title="generates a string representing the size">getSizeAsString</a>( std::string delim = <span class="stringliteral">&quot;x&quot;</span> )<span class="keyword">const </span>{
-<a name="l00106"></a>00106         <span class="keywordflow">return</span> <a class="code" href="namespaceisis_1_1util.html#a8eedeaea8a5e6fb7849880fc5b4d4648" title="use listToOStream to create a string from a list">util::listToString</a>( m_dim, m_dim + DIMS, delim, <span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;&quot;</span> );
-<a name="l00107"></a>00107     }
-<a name="l00108"></a>00108 
-<a name="l00110"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a498b4ebaa5ef654ebe41eacebe813e66">00110</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector&lt;size_t, DIMS&gt;</a> <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a498b4ebaa5ef654ebe41eacebe813e66" title="generates a FixedVector&amp;lt;DIMS&amp;gt; representing the size">getSizeAsVector</a>()<span class="keyword">const </span>{
-<a name="l00111"></a>00111         <span class="keywordflow">return</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector&lt;size_t, DIMS&gt;</a>( m_dim );
-<a name="l00112"></a>00112     }
-<a name="l00113"></a>00113 
-<a name="l00118"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#ad5e59bb1c93f616a20be4c5ed5e818ff">00118</a>     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#ad5e59bb1c93f616a20be4c5ed5e818ff" title="get amount of relevant dimensions (last dim with size&amp;gt;1) e.g.">getRelevantDims</a>()<span class="keyword">const </span>{
-<a name="l00119"></a>00119         <span class="keywordtype">size_t</span> ret = 0;
-<a name="l00120"></a>00120 
-<a name="l00121"></a>00121         <span class="keywordflow">for</span> ( <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> i = DIMS; i; i-- ) {
-<a name="l00122"></a>00122             <span class="keywordflow">if</span> ( m_dim[i-1] &gt; 1 ) {
-<a name="l00123"></a>00123                 ret = i;
-<a name="l00124"></a>00124                 <span class="keywordflow">break</span>;
-<a name="l00125"></a>00125             }
-<a name="l00126"></a>00126         }
-<a name="l00127"></a>00127 
-<a name="l00128"></a>00128         <span class="keywordflow">return</span> ret;
-<a name="l00129"></a>00129     }
-<a name="l00130"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a25ef6fa6a2c792769d69b5b7de49b1f6">00130</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector&lt;float, DIMS&gt;</a> <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a25ef6fa6a2c792769d69b5b7de49b1f6">getFoV</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector&lt;float, DIMS&gt;</a> &amp;voxelSize, <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector&lt;float, DIMS&gt;</a> &amp;voxelGap )<span class="keyword">const </span>{
-<a name="l00131"></a>00131         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5268e73b64b56929ec91d15204e29b4a" title="Get the size of the object in elements of TYPE.">getVolume</a>() == 0, DataLog, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;Calculating FoV of empty data&quot;</span>;
-<a name="l00132"></a>00132         <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector&lt;size_t, DIMS&gt;</a> voxels = <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a498b4ebaa5ef654ebe41eacebe813e66" title="generates a FixedVector&amp;lt;DIMS&amp;gt; representing the size">getSizeAsVector</a>();
-<a name="l00133"></a>00133         <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> gapSize = voxelGap * ( voxels - 1 );
-<a name="l00134"></a>00134         <span class="keywordflow">return</span> voxelSize * voxels + gapSize;
-<a name="l00135"></a>00135     }
-<a name="l00136"></a>00136 };
-<a name="l00137"></a>00137 
-<a name="l00138"></a>00138 }
-<a name="l00139"></a>00139 }
-<a name="l00140"></a>00140 }
-<a name="l00141"></a>00141 
-<a name="l00142"></a>00142 <span class="preprocessor">#endif // NDIMENSIONAL_H</span>
+<a name="l00104"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a25357b6c09d29da78456e2c2504d479e">00104</a>     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a25357b6c09d29da78456e2c2504d479e" title="Check if index fits into the dimensional size of the object.">isInRange</a>( <span class="keyword">const</span> <span class="keywordtype">size_t</span> d[DIMS] )<span class="keyword">const </span>{
+<a name="l00105"></a>00105         <span class="keywordflow">return</span> __rangeCheck &lt; DIMS - 1 &gt; ( d, m_dim );
+<a name="l00106"></a>00106     }
+<a name="l00111"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5268e73b64b56929ec91d15204e29b4a">00111</a>     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5268e73b64b56929ec91d15204e29b4a" title="Get the size of the object in elements of TYPE.">getVolume</a>()<span class="keyword">const </span>{
+<a name="l00112"></a>00112         <span class="keywordflow">return</span> __dimStride&lt;DIMS&gt;( m_dim );
+<a name="l00113"></a>00113     }
+<a name="l00115"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a77f1e5850aceb61e0141f03ebfa0645f">00115</a>     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a77f1e5850aceb61e0141f03ebfa0645f">getDimSize</a>( <span class="keywordtype">size_t</span> idx )<span class="keyword">const </span>{
+<a name="l00116"></a>00116         <span class="keywordflow">return</span> m_dim[idx];
+<a name="l00117"></a>00117     }
+<a name="l00118"></a>00118 
+<a name="l00120"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5987df3c819b04abd031e0049a87f3e7">00120</a>     std::string <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5987df3c819b04abd031e0049a87f3e7" title="generates a string representing the size">getSizeAsString</a>( std::string delim = <span class="stringliteral">&quot;x&quot;</span> )<span class="keyword">const </span>{
+<a name="l00121"></a>00121         <span class="keywordflow">return</span> <a class="code" href="namespaceisis_1_1util.html#a8eedeaea8a5e6fb7849880fc5b4d4648" title="use listToOStream to create a string from a list">util::listToString</a>( m_dim, m_dim + DIMS, delim, <span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;&quot;</span> );
+<a name="l00122"></a>00122     }
+<a name="l00123"></a>00123 
+<a name="l00125"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a498b4ebaa5ef654ebe41eacebe813e66">00125</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector&lt;size_t, DIMS&gt;</a> <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a498b4ebaa5ef654ebe41eacebe813e66" title="generates a FixedVector&amp;lt;DIMS&amp;gt; representing the size">getSizeAsVector</a>()<span class="keyword">const </span>{
+<a name="l00126"></a>00126         <span class="keywordflow">return</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector&lt;size_t, DIMS&gt;</a>( m_dim );
+<a name="l00127"></a>00127     }
+<a name="l00128"></a>00128 
+<a name="l00133"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#ad5e59bb1c93f616a20be4c5ed5e818ff">00133</a>     <span class="keywordtype">size_t</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#ad5e59bb1c93f616a20be4c5ed5e818ff" title="get amount of relevant dimensions (last dim with size&amp;gt;1) e.g.">getRelevantDims</a>()<span class="keyword">const </span>{
+<a name="l00134"></a>00134         <span class="keywordtype">size_t</span> ret = 0;
+<a name="l00135"></a>00135 
+<a name="l00136"></a>00136         <span class="keywordflow">for</span> ( <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> i = DIMS; i; i-- ) {
+<a name="l00137"></a>00137             <span class="keywordflow">if</span> ( m_dim[i - 1] &gt; 1 ) {
+<a name="l00138"></a>00138                 ret = i;
+<a name="l00139"></a>00139                 <span class="keywordflow">break</span>;
+<a name="l00140"></a>00140             }
+<a name="l00141"></a>00141         }
+<a name="l00142"></a>00142 
+<a name="l00143"></a>00143         <span class="keywordflow">return</span> ret;
+<a name="l00144"></a>00144     }
+<a name="l00145"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a25ef6fa6a2c792769d69b5b7de49b1f6">00145</a>     <a class="code" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector&lt;float, DIMS&gt;</a> <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a25ef6fa6a2c792769d69b5b7de49b1f6">getFoV</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector&lt;float, DIMS&gt;</a> &amp;voxelSize, <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector&lt;float, DIMS&gt;</a> &amp;voxelGap )<span class="keyword">const </span>{
+<a name="l00146"></a>00146         <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5268e73b64b56929ec91d15204e29b4a" title="Get the size of the object in elements of TYPE.">getVolume</a>() == 0, DataLog, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;Calculating FoV of empty data&quot;</span>;
+<a name="l00147"></a>00147         <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector&lt;size_t, DIMS&gt;</a> voxels = <a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a498b4ebaa5ef654ebe41eacebe813e66" title="generates a FixedVector&amp;lt;DIMS&amp;gt; representing the size">getSizeAsVector</a>();
+<a name="l00148"></a>00148         <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a> gapSize = voxelGap * ( voxels - 1 );
+<a name="l00149"></a>00149         <span class="keywordflow">return</span> voxelSize * voxels + gapSize;
+<a name="l00150"></a>00150     }
+<a name="l00151"></a>00151 };
+<a name="l00152"></a>00152 
+<a name="l00153"></a>00153 }
+<a name="l00154"></a>00154 }
+<a name="l00155"></a>00155 }
+<a name="l00156"></a>00156 
+<a name="l00157"></a>00157 <span class="preprocessor">#endif // NDIMENSIONAL_H</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Apr 19 2011 16:19:18 for ISIS Core Library by&nbsp;
+<hr class="footer"/><address class="footer"><small>Generated on Fri Jun 10 2011 10:57:23 for ISIS Core Library by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.1 </small></address>
 </body>

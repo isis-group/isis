@@ -84,7 +84,7 @@
 <a name="l00068"></a><a class="code" href="classisis_1_1image__io_1_1ImageFormat__Vista.html#a0370415fff35037c2df62f5f1b01268f">00068</a>     std::string <a class="code" href="classisis_1_1image__io_1_1ImageFormat__Vista.html#a0370415fff35037c2df62f5f1b01268f" title="This plugin supports the following dialects:">dialects</a>( <span class="keyword">const</span> std::string &amp;filename )<span class="keyword">const </span>{<span class="keywordflow">return</span> std::string( <span class="stringliteral">&quot;functional map anatomical&quot;</span> );}
 <a name="l00069"></a>00069     <span class="keywordtype">int</span> <a class="code" href="classisis_1_1image__io_1_1ImageFormat__Vista.html#a4a82549305d301abf05548640778e978">load</a>( std::list&lt;data::Chunk&gt; &amp;chunks, <span class="keyword">const</span> std::string &amp;filename,
 <a name="l00070"></a>00070               <span class="keyword">const</span> std::string &amp;dialect ) <span class="keywordflow">throw</span>( std::runtime_error &amp; );
-<a name="l00071"></a>00071     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1image__io_1_1ImageFormat__Vista.html#aa6bff2bcf19166da74f83ad71bd62a7f">write</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Image.html">data::Image</a> &amp;image, <span class="keyword">const</span> std::string &amp;filename,
+<a name="l00071"></a>00071     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1image__io_1_1ImageFormat__Vista.html#aa6bff2bcf19166da74f83ad71bd62a7f">write</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">data::Image</a> &amp;image, <span class="keyword">const</span> std::string &amp;filename,
 <a name="l00072"></a>00072                 <span class="keyword">const</span> std::string &amp;dialect ) <span class="keywordflow">throw</span>( std::runtime_error &amp; );
 <a name="l00073"></a>00073 
 <a name="l00077"></a><a class="code" href="classisis_1_1image__io_1_1ImageFormat__Vista.html#abaebfdc4fe0fdc88a34396ef355d5698">00077</a>     <a class="code" href="classisis_1_1image__io_1_1ImageFormat__Vista.html#abaebfdc4fe0fdc88a34396ef355d5698" title="Default constructor.">ImageFormat_Vista</a>() : <a class="code" href="io__interface_8h.html#ad534fde7b54f25d7d340da0fbc40753f">FileFormat</a>(),
@@ -115,7 +115,7 @@
 <a name="l00110"></a>00110             }
 <a name="l00111"></a>00111 
 <a name="l00112"></a>00112             <span class="keywordtype">void</span> operator()( <span class="keywordtype">void</span> *p ) {
-<a name="l00113"></a>00113                 <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1image__io.html#a79a319eba04b38c999695a820f5804ed">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;Freeing VImage pointer&quot;</span>;
+<a name="l00113"></a>00113                 <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1image__io.html#a79a319eba04b38c999695a820f5804ed">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;Freeing VImage pointer &quot;</span> &lt;&lt; p;
 <a name="l00114"></a>00114                 VDestroyImage( m_image );
 <a name="l00115"></a>00115             }
 <a name="l00116"></a>00116         };
@@ -137,7 +137,7 @@
 <a name="l00138"></a>00138                     VGetAttrValue( &amp;posn, NULL, VStringRepn, &amp;val );
 <a name="l00139"></a>00139                     std::list&lt;float&gt; flist = util::stringToList&lt;float&gt;( std::string( ( <span class="keywordtype">char</span> * )val ) );
 <a name="l00140"></a>00140                     std::list&lt;float&gt;::const_iterator iter = flist.begin();
-<a name="l00141"></a>00141                     <span class="keywordtype">float</span> x = *iter++, y = *iter++, z = *iter;
+<a name="l00141"></a>00141                     <span class="keywordtype">float</span> <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a4a8e9c237b3decda2f60f508fa860398">x</a> = *iter++, <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a3fb550d7fa564e7e08d5aab0a804dd23">y</a> = *iter++, <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a2d3b0a88d3baa2206c283d49f1a90c55">z</a> = *iter;
 <a name="l00142"></a>00142                     chunk.setPropertyAs&lt;<a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a>&gt;( <span class="stringliteral">&quot;voxelSize&quot;</span>, <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a>( x, y, z, 1 ) );
 <a name="l00143"></a>00143                     <span class="keywordflow">continue</span>;
 <a name="l00144"></a>00144                 }
@@ -289,7 +289,7 @@
 <a name="l00290"></a>00290                     VGetAttrValue( &amp;posn, NULL, VStringRepn, &amp;val );
 <a name="l00291"></a>00291                     std::list&lt;float&gt; flist = util::stringToList&lt;float&gt;( std::string( ( <span class="keywordtype">char</span> * )val ) );
 <a name="l00292"></a>00292                     std::list&lt;float&gt;::const_iterator iter = flist.begin();
-<a name="l00293"></a>00293                     <span class="keywordtype">float</span> x = *iter++, y = *iter++, z = *iter;
+<a name="l00293"></a>00293                     <span class="keywordtype">float</span> <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a4a8e9c237b3decda2f60f508fa860398">x</a> = *iter++, <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a3fb550d7fa564e7e08d5aab0a804dd23">y</a> = *iter++, <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a2d3b0a88d3baa2206c283d49f1a90c55">z</a> = *iter;
 <a name="l00294"></a>00294                     chunk.setPropertyAs&lt;<a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a>&gt;( <span class="stringliteral">&quot;indexOrigin&quot;</span>, <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a>( x, y, z, 0 ) );
 <a name="l00295"></a>00295                     <span class="keywordflow">continue</span>;
 <a name="l00296"></a>00296                 }
@@ -483,7 +483,7 @@
 <a name="l00515"></a>00515 <span class="preprocessor">#endif </span><span class="comment">/* IMAGEFORMAT_VISTA_H_ */</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Apr 19 2011 16:19:20 for ISIS Core Library by&nbsp;
+<hr class="footer"/><address class="footer"><small>Generated on Fri Jun 10 2011 10:57:24 for ISIS Core Library by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.1 </small></address>
 </body>

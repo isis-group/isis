@@ -71,26 +71,25 @@
 <a name="l00040"></a>00040     <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrConverterBase.html#ae96a776c044c51be41fe1d43862a1706">convert</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html">ValuePtrBase</a> &amp;src, <a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html">ValuePtrBase</a> &amp;dst, <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a> &amp;scaling )<span class="keyword">const</span>;
 <a name="l00041"></a>00041     <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrConverterBase.html#a2d0c4a0c91bb6d3707fe3d08b330d5d8">generate</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrBase.html">ValuePtrBase</a> &amp;src, boost::scoped_ptr&lt;ValuePtrBase&gt;&amp; dst, <span class="keyword">const</span> <a class="code" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a> &amp;scaling )<span class="keyword">const</span> = 0;
 <a name="l00042"></a>00042     <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrConverterBase.html#a9494b8868d9f41b2e0497f35095b6f54">create</a>( boost::scoped_ptr&lt;ValuePtrBase&gt;&amp; dst, <span class="keywordtype">size_t</span> len )<span class="keyword">const</span> = 0;
-<a name="l00043"></a>00043     <span class="keyword">virtual</span> <a class="code" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a> <a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrConverterBase.html#ad5ab327b9ce0961aabe187eda36ac5cd">getScaling</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1__internal_1_1ValueBase.html">util::_internal::ValueBase</a> &amp;min, <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1__internal_1_1ValueBase.html">util::_internal::ValueBase</a> &amp;max, <a class="code" href="namespaceisis_1_1data.html#a69354ef53dcb79cbe577ae5fe8764e49">autoscaleOption</a> scaleopt = <a class="code" href="namespaceisis_1_1data.html#a69354ef53dcb79cbe577ae5fe8764e49a3a9ca3fecf5ccbb0f9d787d31a9edd2f">autoscale</a> )<span class="keyword">const</span> = 0;
+<a name="l00043"></a>00043     <span class="keyword">virtual</span> <a class="code" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a> <a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrConverterBase.html#a76d929a632d2d36ea98936b63158104b">getScaling</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1__internal_1_1ValueBase.html">util::_internal::ValueBase</a> &amp;min, <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1__internal_1_1ValueBase.html">util::_internal::ValueBase</a> &amp;max, <a class="code" href="namespaceisis_1_1data.html#a69354ef53dcb79cbe577ae5fe8764e49">autoscaleOption</a> scaleopt = <a class="code" href="namespaceisis_1_1data.html#a69354ef53dcb79cbe577ae5fe8764e49a3a9ca3fecf5ccbb0f9d787d31a9edd2f">autoscale</a> )<span class="keyword">const</span>;
 <a name="l00044"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrConverterBase.html#aa4ab197c5cdfc3f305e46e01f4b7dbd0">00044</a>     <span class="keyword">static</span> boost::shared_ptr&lt;const ValuePtrConverterBase&gt; <span class="keyword">get</span>() {<span class="keywordflow">return</span> boost::shared_ptr&lt;const ValuePtrConverterBase&gt;();}
-<a name="l00045"></a>00045 <span class="keyword">public</span>:
-<a name="l00046"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrConverterBase.html#ad9d392adff6865ac16cabc6c6f790df7">00046</a>     <span class="keyword">virtual</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrConverterBase.html#ad9d392adff6865ac16cabc6c6f790df7">~ValuePtrConverterBase</a>() {}
-<a name="l00047"></a>00047 };
-<a name="l00048"></a>00048 
-<a name="l00049"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrConverterMap.html">00049</a> <span class="keyword">class </span><a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrConverterMap.html">ValuePtrConverterMap</a> : <span class="keyword">public</span> std::map&lt; int , std::map&lt;int, boost::shared_ptr&lt;const ValuePtrConverterBase&gt; &gt; &gt;
-<a name="l00050"></a>00050 {
-<a name="l00051"></a>00051 <span class="keyword">public</span>:
-<a name="l00052"></a>00052     <a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrConverterMap.html#a2646a325b8172c6c7b37c13ebfe71d66">ValuePtrConverterMap</a>();
-<a name="l00053"></a>00053 };
-<a name="l00054"></a>00054 
+<a name="l00045"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrConverterBase.html#ad9d392adff6865ac16cabc6c6f790df7">00045</a>     <span class="keyword">virtual</span> <a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrConverterBase.html#ad9d392adff6865ac16cabc6c6f790df7">~ValuePtrConverterBase</a>() {}
+<a name="l00046"></a>00046 };
+<a name="l00047"></a>00047 
+<a name="l00048"></a><a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrConverterMap.html">00048</a> <span class="keyword">class </span><a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrConverterMap.html">ValuePtrConverterMap</a> : <span class="keyword">public</span> std::map&lt; int , std::map&lt;int, boost::shared_ptr&lt;const ValuePtrConverterBase&gt; &gt; &gt;
+<a name="l00049"></a>00049 {
+<a name="l00050"></a>00050 <span class="keyword">public</span>:
+<a name="l00051"></a>00051     <a class="code" href="classisis_1_1data_1_1__internal_1_1ValuePtrConverterMap.html#a2646a325b8172c6c7b37c13ebfe71d66">ValuePtrConverterMap</a>();
+<a name="l00052"></a>00052 };
+<a name="l00053"></a>00053 
+<a name="l00054"></a>00054 }
 <a name="l00055"></a>00055 }
 <a name="l00056"></a>00056 }
-<a name="l00057"></a>00057 }
-<a name="l00058"></a>00058 
-<a name="l00059"></a>00059 <span class="preprocessor">#endif // TYPEPTR_CONVERTER_H</span>
+<a name="l00057"></a>00057 
+<a name="l00058"></a>00058 <span class="preprocessor">#endif // TYPEPTR_CONVERTER_H</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Apr 19 2011 16:19:19 for ISIS Core Library by&nbsp;
+<hr class="footer"/><address class="footer"><small>Generated on Fri Jun 10 2011 10:57:24 for ISIS Core Library by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.1 </small></address>
 </body>

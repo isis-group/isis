@@ -49,93 +49,94 @@
 <a name="l00018"></a>00018 <span class="preprocessor">#include &lt;ctime&gt;</span>
 <a name="l00019"></a>00019 <span class="preprocessor">#include &lt;list&gt;</span>
 <a name="l00020"></a>00020 <span class="preprocessor">#include &lt;iostream&gt;</span>
-<a name="l00021"></a>00021 <span class="preprocessor">#include &lt;boost/filesystem/path.hpp&gt;</span>
-<a name="l00022"></a>00022 <span class="preprocessor">#include &lt;boost/weak_ptr.hpp&gt;</span>
-<a name="l00023"></a>00023 <span class="preprocessor">#include &lt;boost/date_time/posix_time/posix_time_types.hpp&gt;</span>
-<a name="l00024"></a>00024 
-<a name="l00025"></a>00025 <span class="keyword">namespace </span>isis
-<a name="l00026"></a>00026 {
-<a name="l00031"></a><a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">00031</a> <span class="keyword">enum</span> <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> {<a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> = 1, warning, info, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a>};
-<a name="l00032"></a>00032 <span class="keyword">namespace </span>util
-<a name="l00033"></a>00033 {
-<a name="l00034"></a>00034 
-<a name="l00035"></a><a class="code" href="classisis_1_1util_1_1MSubject.html">00035</a> <span class="keyword">class </span><a class="code" href="classisis_1_1util_1_1MSubject.html">MSubject</a> : <span class="keyword">public</span> std::string
-<a name="l00036"></a>00036 {
-<a name="l00037"></a>00037 <span class="keyword">public</span>:
-<a name="l00038"></a><a class="code" href="classisis_1_1util_1_1MSubject.html#acfd2aba2bd2343f6884f37d4c6f2f5be">00038</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <a class="code" href="classisis_1_1util_1_1MSubject.html#acfd2aba2bd2343f6884f37d4c6f2f5be">MSubject</a>( <span class="keyword">const</span> T &amp;cont ) {
-<a name="l00039"></a>00039         std::ostringstream text;
-<a name="l00040"></a>00040         text &lt;&lt; cont;
-<a name="l00041"></a>00041         assign( text.str() );
-<a name="l00042"></a>00042     }
-<a name="l00043"></a>00043 };
-<a name="l00044"></a>00044 
-<a name="l00046"></a>00046 <span class="keyword">namespace </span>_internal
-<a name="l00047"></a>00047 {
-<a name="l00048"></a>00048 
-<a name="l00049"></a>00049 <span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="namespaceisis_1_1util_1_1__internal.html#a0c30f550c7105a9b870db3692bce1b19">logLevelNames</a>( <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> level );
-<a name="l00050"></a>00050 
-<a name="l00051"></a>00051 <span class="keyword">template</span>&lt;<span class="keyword">class</span> MODULE&gt; <span class="keyword">class </span>Log;
-<a name="l00052"></a>00052 <span class="keyword">class </span>Message;
-<a name="l00053"></a>00053 
-<a name="l00054"></a>00054 <span class="keyword">class </span>MessageHandlerBase
-<a name="l00055"></a>00055 {
-<a name="l00056"></a>00056     <span class="keyword">static</span> <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> m_stop_below;
-<a name="l00057"></a>00057 <span class="keyword">protected</span>:
-<a name="l00058"></a>00058     MessageHandlerBase( <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> level ): m_level( level ) {}
-<a name="l00059"></a>00059     <span class="keyword">virtual</span> ~MessageHandlerBase() {}
-<a name="l00060"></a>00060 <span class="keyword">public</span>:
-<a name="l00061"></a>00061     <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> m_level;
-<a name="l00062"></a>00062     <span class="keyword">virtual</span> <span class="keywordtype">void</span> commit( <span class="keyword">const</span> Message &amp;msg ) = 0;
-<a name="l00063"></a>00063     <span class="keyword">static</span> <span class="keywordtype">void</span> stopBelow( <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> = <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> );
-<a name="l00064"></a>00064     <span class="keywordtype">bool</span> requestStop( <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> _level );
-<a name="l00065"></a>00065 };
-<a name="l00066"></a>00066 
-<a name="l00067"></a>00067 <span class="keyword">class </span>Message: <span class="keyword">public</span> std::ostringstream
-<a name="l00068"></a>00068 {
-<a name="l00069"></a>00069     boost::weak_ptr&lt;MessageHandlerBase&gt; commitTo;
-<a name="l00070"></a>00070 <span class="keyword">public</span>:
-<a name="l00071"></a>00071     std::string m_object, m_module;
-<a name="l00072"></a>00072     boost::filesystem::path m_file;
-<a name="l00073"></a>00073     std::list&lt;std::string&gt; m_subjects;
-<a name="l00074"></a>00074     boost::posix_time::ptime m_timeStamp;
-<a name="l00075"></a>00075     <span class="keywordtype">int</span> m_line;
-<a name="l00076"></a>00076     <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> m_level;
-<a name="l00077"></a>00077     Message( std::string <span class="keywordtype">object</span>, std::string module, std::string file, <span class="keywordtype">int</span> line, <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> m_level, boost::weak_ptr&lt;MessageHandlerBase&gt; commitTo );
-<a name="l00078"></a>00078     Message( <span class="keyword">const</span> Message &amp;src );
-<a name="l00079"></a>00079     ~Message();
-<a name="l00080"></a>00080     std::string merge()<span class="keyword">const</span>;
-<a name="l00081"></a>00081     std::string strTime()<span class="keyword">const</span>;
-<a name="l00082"></a>00082     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; Message &amp;<a class="code" href="namespacestd.html#aad0fbf35da088a95292c2f56e81ae646" title="Streaming output for color using isis::util::listToOStream.">operator &lt;&lt; </a>( T val ) {
-<a name="l00083"></a>00083         *( ( std::ostringstream * )<span class="keyword">this</span> ) &lt;&lt; val;
-<a name="l00084"></a>00084         <span class="keywordflow">return</span> *<span class="keyword">this</span>;
-<a name="l00085"></a>00085     }
-<a name="l00086"></a>00086     Message &amp;<a class="code" href="namespacestd.html#aad0fbf35da088a95292c2f56e81ae646" title="Streaming output for color using isis::util::listToOStream.">operator &lt;&lt; </a>( <span class="keyword">const</span> MSubject &amp;subj ) {
-<a name="l00087"></a>00087         m_subjects.push_back( subj );
-<a name="l00088"></a>00088         *( ( std::ostringstream * )<span class="keyword">this</span> ) &lt;&lt; <span class="stringliteral">&quot;{s}&quot;</span>;
-<a name="l00089"></a>00089         <span class="keywordflow">return</span> *<span class="keyword">this</span>;
-<a name="l00090"></a>00090     }
-<a name="l00091"></a>00091     <span class="keywordtype">bool</span> shouldCommit()<span class="keyword">const</span>;
-<a name="l00092"></a>00092 };
-<a name="l00093"></a>00093 }
-<a name="l00095"></a>00095 
-<a name="l00102"></a><a class="code" href="classisis_1_1util_1_1DefaultMsgPrint.html">00102</a> <span class="keyword">class </span><a class="code" href="classisis_1_1util_1_1DefaultMsgPrint.html" title="Default message output class.">DefaultMsgPrint</a> : <span class="keyword">public</span> _internal::MessageHandlerBase
-<a name="l00103"></a>00103 {
-<a name="l00104"></a>00104 <span class="keyword">protected</span>:
-<a name="l00105"></a><a class="code" href="classisis_1_1util_1_1DefaultMsgPrint.html#a0cc0a4025e9c3a9127631cc5d26ee950">00105</a>     <span class="keyword">static</span> std::ostream *<a class="code" href="classisis_1_1util_1_1DefaultMsgPrint.html#a0cc0a4025e9c3a9127631cc5d26ee950">o</a>;
-<a name="l00106"></a><a class="code" href="classisis_1_1util_1_1DefaultMsgPrint.html#a3283cfd081f74b3eca951391eb851dff">00106</a>     std::string <a class="code" href="classisis_1_1util_1_1DefaultMsgPrint.html#a3283cfd081f74b3eca951391eb851dff">last</a>;
-<a name="l00107"></a>00107 <span class="keyword">public</span>:
-<a name="l00108"></a><a class="code" href="classisis_1_1util_1_1DefaultMsgPrint.html#a4f20fa6e51b795a8748ccbbb66cf9436">00108</a>     <a class="code" href="classisis_1_1util_1_1DefaultMsgPrint.html#a4f20fa6e51b795a8748ccbbb66cf9436">DefaultMsgPrint</a>( <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> level ): _internal::MessageHandlerBase( level ) {}
-<a name="l00109"></a><a class="code" href="classisis_1_1util_1_1DefaultMsgPrint.html#a22290bfe93e6484bc499859f760543e8">00109</a>     <span class="keyword">virtual</span> <a class="code" href="classisis_1_1util_1_1DefaultMsgPrint.html#a22290bfe93e6484bc499859f760543e8">~DefaultMsgPrint</a>() {}
-<a name="l00110"></a>00110     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1DefaultMsgPrint.html#a3dce3496a9115f7cc1860259836b9aad">commit</a>( <span class="keyword">const</span> _internal::Message &amp;mesg );
-<a name="l00111"></a>00111     <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1DefaultMsgPrint.html#a3a08cf428eddeeb40d31d56039705637">setStream</a>( std::ostream &amp;_o );
-<a name="l00112"></a>00112 };
-<a name="l00113"></a>00113 
-<a name="l00114"></a>00114 }
-<a name="l00116"></a>00116 }
-<a name="l00117"></a>00117 <span class="preprocessor">#endif //MESSAGE_H</span>
+<a name="l00021"></a><a class="code" href="message_8hpp.html#a7b03a7555e481d771c4ca8c611e331b0">00021</a> <span class="preprocessor">#define BOOST_FILESYSTEM_VERSION 2 //@todo switch to 3 as soon as we drop support for boost &lt; 1.44</span>
+<a name="l00022"></a>00022 <span class="preprocessor"></span><span class="preprocessor">#include &lt;boost/filesystem/path.hpp&gt;</span>
+<a name="l00023"></a>00023 <span class="preprocessor">#include &lt;boost/weak_ptr.hpp&gt;</span>
+<a name="l00024"></a>00024 <span class="preprocessor">#include &lt;boost/date_time/posix_time/posix_time_types.hpp&gt;</span>
+<a name="l00025"></a>00025 
+<a name="l00026"></a>00026 <span class="keyword">namespace </span>isis
+<a name="l00027"></a>00027 {
+<a name="l00032"></a><a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">00032</a> <span class="keyword">enum</span> <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> {<a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> = 1, warning, info, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a4a77c4cb6cc08ac20f9b3769e4470d6c">verbose_info</a>};
+<a name="l00033"></a>00033 <span class="keyword">namespace </span>util
+<a name="l00034"></a>00034 {
+<a name="l00035"></a>00035 
+<a name="l00036"></a><a class="code" href="classisis_1_1util_1_1MSubject.html">00036</a> <span class="keyword">class </span><a class="code" href="classisis_1_1util_1_1MSubject.html">MSubject</a> : <span class="keyword">public</span> std::string
+<a name="l00037"></a>00037 {
+<a name="l00038"></a>00038 <span class="keyword">public</span>:
+<a name="l00039"></a><a class="code" href="classisis_1_1util_1_1MSubject.html#acfd2aba2bd2343f6884f37d4c6f2f5be">00039</a>     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; <a class="code" href="classisis_1_1util_1_1MSubject.html#acfd2aba2bd2343f6884f37d4c6f2f5be">MSubject</a>( <span class="keyword">const</span> T &amp;cont ) {
+<a name="l00040"></a>00040         std::ostringstream text;
+<a name="l00041"></a>00041         text &lt;&lt; cont;
+<a name="l00042"></a>00042         assign( text.str() );
+<a name="l00043"></a>00043     }
+<a name="l00044"></a>00044 };
+<a name="l00045"></a>00045 
+<a name="l00047"></a>00047 <span class="keyword">namespace </span>_internal
+<a name="l00048"></a>00048 {
+<a name="l00049"></a>00049 
+<a name="l00050"></a>00050 <span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="namespaceisis_1_1util_1_1__internal.html#a0c30f550c7105a9b870db3692bce1b19">logLevelNames</a>( <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> level );
+<a name="l00051"></a>00051 
+<a name="l00052"></a>00052 <span class="keyword">template</span>&lt;<span class="keyword">class</span> MODULE&gt; <span class="keyword">class </span>Log;
+<a name="l00053"></a>00053 <span class="keyword">class </span>Message;
+<a name="l00054"></a>00054 
+<a name="l00055"></a>00055 <span class="keyword">class </span>MessageHandlerBase
+<a name="l00056"></a>00056 {
+<a name="l00057"></a>00057     <span class="keyword">static</span> <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> m_stop_below;
+<a name="l00058"></a>00058 <span class="keyword">protected</span>:
+<a name="l00059"></a>00059     MessageHandlerBase( <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> level ): m_level( level ) {}
+<a name="l00060"></a>00060     <span class="keyword">virtual</span> ~MessageHandlerBase() {}
+<a name="l00061"></a>00061 <span class="keyword">public</span>:
+<a name="l00062"></a>00062     <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> m_level;
+<a name="l00063"></a>00063     <span class="keyword">virtual</span> <span class="keywordtype">void</span> commit( <span class="keyword">const</span> Message &amp;msg ) = 0;
+<a name="l00064"></a>00064     <span class="keyword">static</span> <span class="keywordtype">void</span> stopBelow( <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> = <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> );
+<a name="l00065"></a>00065     <span class="keywordtype">bool</span> requestStop( <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> _level );
+<a name="l00066"></a>00066 };
+<a name="l00067"></a>00067 
+<a name="l00068"></a>00068 <span class="keyword">class </span>Message: <span class="keyword">public</span> std::ostringstream
+<a name="l00069"></a>00069 {
+<a name="l00070"></a>00070     boost::weak_ptr&lt;MessageHandlerBase&gt; commitTo;
+<a name="l00071"></a>00071 <span class="keyword">public</span>:
+<a name="l00072"></a>00072     std::string m_object, m_module;
+<a name="l00073"></a>00073     boost::filesystem::path m_file;
+<a name="l00074"></a>00074     std::list&lt;std::string&gt; m_subjects;
+<a name="l00075"></a>00075     boost::posix_time::ptime m_timeStamp;
+<a name="l00076"></a>00076     <span class="keywordtype">int</span> m_line;
+<a name="l00077"></a>00077     <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> m_level;
+<a name="l00078"></a>00078     Message( std::string <span class="keywordtype">object</span>, std::string module, std::string file, <span class="keywordtype">int</span> line, <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> m_level, boost::weak_ptr&lt;MessageHandlerBase&gt; commitTo );
+<a name="l00079"></a>00079     Message( <span class="keyword">const</span> Message &amp;src );
+<a name="l00080"></a>00080     ~Message();
+<a name="l00081"></a>00081     std::string merge()<span class="keyword">const</span>;
+<a name="l00082"></a>00082     std::string strTime()<span class="keyword">const</span>;
+<a name="l00083"></a>00083     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; Message &amp;<a class="code" href="namespacestd.html#aad0fbf35da088a95292c2f56e81ae646" title="Streaming output for color using isis::util::listToOStream.">operator &lt;&lt; </a>( T val ) {
+<a name="l00084"></a>00084         *( ( std::ostringstream * )<span class="keyword">this</span> ) &lt;&lt; val;
+<a name="l00085"></a>00085         <span class="keywordflow">return</span> *<span class="keyword">this</span>;
+<a name="l00086"></a>00086     }
+<a name="l00087"></a>00087     Message &amp;<a class="code" href="namespacestd.html#aad0fbf35da088a95292c2f56e81ae646" title="Streaming output for color using isis::util::listToOStream.">operator &lt;&lt; </a>( <span class="keyword">const</span> MSubject &amp;subj ) {
+<a name="l00088"></a>00088         m_subjects.push_back( subj );
+<a name="l00089"></a>00089         *( ( std::ostringstream * )<span class="keyword">this</span> ) &lt;&lt; <span class="stringliteral">&quot;{s}&quot;</span>;
+<a name="l00090"></a>00090         <span class="keywordflow">return</span> *<span class="keyword">this</span>;
+<a name="l00091"></a>00091     }
+<a name="l00092"></a>00092     <span class="keywordtype">bool</span> shouldCommit()<span class="keyword">const</span>;
+<a name="l00093"></a>00093 };
+<a name="l00094"></a>00094 }
+<a name="l00096"></a>00096 
+<a name="l00103"></a><a class="code" href="classisis_1_1util_1_1DefaultMsgPrint.html">00103</a> <span class="keyword">class </span><a class="code" href="classisis_1_1util_1_1DefaultMsgPrint.html" title="Default message output class.">DefaultMsgPrint</a> : <span class="keyword">public</span> _internal::MessageHandlerBase
+<a name="l00104"></a>00104 {
+<a name="l00105"></a>00105 <span class="keyword">protected</span>:
+<a name="l00106"></a><a class="code" href="classisis_1_1util_1_1DefaultMsgPrint.html#a0cc0a4025e9c3a9127631cc5d26ee950">00106</a>     <span class="keyword">static</span> std::ostream *<a class="code" href="classisis_1_1util_1_1DefaultMsgPrint.html#a0cc0a4025e9c3a9127631cc5d26ee950">o</a>;
+<a name="l00107"></a><a class="code" href="classisis_1_1util_1_1DefaultMsgPrint.html#a3283cfd081f74b3eca951391eb851dff">00107</a>     std::string <a class="code" href="classisis_1_1util_1_1DefaultMsgPrint.html#a3283cfd081f74b3eca951391eb851dff">last</a>;
+<a name="l00108"></a>00108 <span class="keyword">public</span>:
+<a name="l00109"></a><a class="code" href="classisis_1_1util_1_1DefaultMsgPrint.html#a4f20fa6e51b795a8748ccbbb66cf9436">00109</a>     <a class="code" href="classisis_1_1util_1_1DefaultMsgPrint.html#a4f20fa6e51b795a8748ccbbb66cf9436">DefaultMsgPrint</a>( <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> level ): _internal::MessageHandlerBase( level ) {}
+<a name="l00110"></a><a class="code" href="classisis_1_1util_1_1DefaultMsgPrint.html#a22290bfe93e6484bc499859f760543e8">00110</a>     <span class="keyword">virtual</span> <a class="code" href="classisis_1_1util_1_1DefaultMsgPrint.html#a22290bfe93e6484bc499859f760543e8">~DefaultMsgPrint</a>() {}
+<a name="l00111"></a>00111     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1DefaultMsgPrint.html#a3dce3496a9115f7cc1860259836b9aad">commit</a>( <span class="keyword">const</span> _internal::Message &amp;mesg );
+<a name="l00112"></a>00112     <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="classisis_1_1util_1_1DefaultMsgPrint.html#a3a08cf428eddeeb40d31d56039705637">setStream</a>( std::ostream &amp;_o );
+<a name="l00113"></a>00113 };
+<a name="l00114"></a>00114 
+<a name="l00115"></a>00115 }
+<a name="l00117"></a>00117 }
+<a name="l00118"></a>00118 <span class="preprocessor">#endif //MESSAGE_H</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Apr 19 2011 16:19:14 for ISIS Core Library by&nbsp;
+<hr class="footer"/><address class="footer"><small>Generated on Fri Jun 10 2011 10:57:21 for ISIS Core Library by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.1 </small></address>
 </body>

@@ -307,9 +307,9 @@
 <a name="l00276"></a>00276         <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; src.size() &lt;&lt; <span class="stringliteral">&quot; Chunks left to be distributed.&quot;</span>;
 <a name="l00277"></a>00277         <span class="keywordtype">size_t</span> before = src.size();
 <a name="l00278"></a>00278 
-<a name="l00279"></a>00279         <a class="code" href="classisis_1_1data_1_1Image.html">Image</a> buff( src );
+<a name="l00279"></a>00279         <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">Image</a> buff( src );
 <a name="l00280"></a>00280 
-<a name="l00281"></a>00281         <span class="keywordflow">if</span> ( buff.<a class="code" href="classisis_1_1data_1_1Image.html#a904fef2b4511f9c978be51bf9b7fe8f1">isClean</a>() &amp;&amp; buff.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a7f4ea1b7c43edfce313d70dc7f68addc" title="Check if every needed property is set.">isValid</a>() ) { <span class="comment">//if the image was successfully indexed and is valid, keep it</span>
+<a name="l00281"></a>00281         <span class="keywordflow">if</span> ( buff.<a class="code" href="classisis_1_1data_1_1Image.html#a102fa197eedd6a7cc8642254be953656">isClean</a>() &amp;&amp; buff.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a7f4ea1b7c43edfce313d70dc7f68addc" title="Check if every needed property is set.">isValid</a>() ) { <span class="comment">//if the image was successfully indexed and is valid, keep it</span>
 <a name="l00282"></a>00282             ret.push_back( buff );
 <a name="l00283"></a>00283             <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82ad97a38c0fafe61d63fdb883c85d0067a">info</a> ) &lt;&lt; <span class="stringliteral">&quot;Image &quot;</span> &lt;&lt; ret.size() &lt;&lt; <span class="stringliteral">&quot; with size &quot;</span> &lt;&lt; buff.<a class="code" href="classisis_1_1data_1_1__internal_1_1NDimensional.html#a5987df3c819b04abd031e0049a87f3e7" title="generates a string representing the size">getSizeAsString</a>() &lt;&lt;  <span class="stringliteral">&quot; and value range &quot;</span> &lt;&lt; buff.<a class="code" href="classisis_1_1data_1_1Image.html#ab437a008e59944a63c9fdc844c673ad6" title="Get the maximum and the minimum voxel value of the image as a pair of ValueReference-objects.">getMinMax</a>() &lt;&lt; <span class="stringliteral">&quot; done.&quot;</span>;
 <a name="l00284"></a>00284         } <span class="keywordflow">else</span> {
@@ -371,7 +371,7 @@
 <a name="l00340"></a>00340     <span class="keywordflow">return</span> loaded;
 <a name="l00341"></a>00341 }
 <a name="l00342"></a>00342 
-<a name="l00343"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#acc7b67e9689ff8a861a0cfb9b7dee477">00343</a> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#acc7b67e9689ff8a861a0cfb9b7dee477">IOFactory::write</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Image.html">data::Image</a> &amp;image, <span class="keyword">const</span> std::string &amp;path, std::string suffix_override, <span class="keyword">const</span> std::string &amp;dialect )
+<a name="l00343"></a><a class="code" href="classisis_1_1data_1_1IOFactory.html#acc7b67e9689ff8a861a0cfb9b7dee477">00343</a> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#acc7b67e9689ff8a861a0cfb9b7dee477">IOFactory::write</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">data::Image</a> &amp;image, <span class="keyword">const</span> std::string &amp;path, std::string suffix_override, <span class="keyword">const</span> std::string &amp;dialect )
 <a name="l00344"></a>00344 {
 <a name="l00345"></a>00345     <span class="keywordflow">return</span> <a class="code" href="classisis_1_1data_1_1IOFactory.html#acc7b67e9689ff8a861a0cfb9b7dee477">write</a>( std::list&lt;data::Image&gt;( 1, image ), path, suffix_override, dialect );
 <a name="l00346"></a>00346 }
@@ -434,7 +434,7 @@
 <a name="l00403"></a>00403 } <span class="comment">// namespaces data isis</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Apr 19 2011 16:19:17 for ISIS Core Library by&nbsp;
+<hr class="footer"/><address class="footer"><small>Generated on Fri Jun 10 2011 10:57:23 for ISIS Core Library by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.1 </small></address>
 </body>

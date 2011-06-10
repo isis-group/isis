@@ -49,45 +49,67 @@
 <a name="l00018"></a>00018 <span class="preprocessor">#include &quot;../CoreUtils/propmap.hpp&quot;</span>
 <a name="l00019"></a>00019 
 <a name="l00020"></a>00020 <span class="preprocessor">#include &lt;boost/numeric/ublas/matrix.hpp&gt;</span>
-<a name="l00021"></a>00021 
-<a name="l00022"></a>00022 <span class="keyword">namespace </span>isis
-<a name="l00023"></a>00023 {
-<a name="l00024"></a>00024 
-<a name="l00030"></a><a class="code" href="namespaceisis_1_1image__io.html">00030</a> <span class="keyword">namespace </span>image_io
-<a name="l00031"></a>00031 {
-<a name="l00032"></a><a class="code" href="namespaceisis_1_1image__io.html#ad95ad94c644019674b1532c4a2ac05c8">00032</a> <span class="keyword">typedef</span> ImageIoLog Runtime;
-<a name="l00033"></a><a class="code" href="namespaceisis_1_1image__io.html#a79a319eba04b38c999695a820f5804ed">00033</a> <span class="keyword">typedef</span> ImageIoDebug Debug;
-<a name="l00034"></a>00034 
-<a name="l00035"></a><a class="code" href="namespaceisis_1_1image__io.html#a6ba1dc7a299f51eafa3de8b5b16bee4a">00035</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> HANDLE&gt; <span class="keywordtype">void</span> <a class="code" href="namespaceisis_1_1image__io.html#a6ba1dc7a299f51eafa3de8b5b16bee4a">enableLog</a>( <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> level )
-<a name="l00036"></a>00036 {
-<a name="l00037"></a>00037     <a class="code" href="log_8hpp.html#a7677022a9a5e546a60e378a156b598b5">ENABLE_LOG</a>( <a class="code" href="namespaceisis_1_1image__io.html#ad95ad94c644019674b1532c4a2ac05c8">Runtime</a>, HANDLE, level );
-<a name="l00038"></a>00038     <a class="code" href="log_8hpp.html#a7677022a9a5e546a60e378a156b598b5">ENABLE_LOG</a>( <a class="code" href="namespaceisis_1_1image__io.html#a79a319eba04b38c999695a820f5804ed">Debug</a>, HANDLE, level );
-<a name="l00039"></a>00039 }
-<a name="l00040"></a>00040 } <span class="comment">//namespace image_io</span>
-<a name="l00041"></a>00041 
-<a name="l00042"></a>00042 <span class="keyword">namespace </span>data
-<a name="l00043"></a>00043 {
-<a name="l00044"></a>00044 
-<a name="l00045"></a>00045 <span class="keyword">namespace </span>_internal
-<a name="l00046"></a>00046 {
-<a name="l00047"></a>00047 <span class="keywordtype">void</span> <a class="code" href="namespaceisis_1_1data_1_1__internal.html#a250c57d5da4b23eb3ef5e2cdbab93fd2">transformCoords</a>( <a class="code" href="classisis_1_1util_1_1PropertyMap.html" title="This class contains a mapping tree to store all kinds of properties (path/key : value) It&amp;#39;s also ...">isis::util::PropertyMap</a> &amp;, boost::numeric::ublas::matrix&lt;float&gt; );
-<a name="l00048"></a>00048 }
+<a name="l00021"></a>00021 <span class="preprocessor">#include &lt;boost/numeric/ublas/lu.hpp&gt;</span>
+<a name="l00022"></a>00022 
+<a name="l00023"></a>00023 <span class="keyword">namespace </span>isis
+<a name="l00024"></a>00024 {
+<a name="l00025"></a>00025 
+<a name="l00031"></a><a class="code" href="namespaceisis_1_1image__io.html">00031</a> <span class="keyword">namespace </span>image_io
+<a name="l00032"></a>00032 {
+<a name="l00033"></a><a class="code" href="namespaceisis_1_1image__io.html#ad95ad94c644019674b1532c4a2ac05c8">00033</a> <span class="keyword">typedef</span> ImageIoLog Runtime;
+<a name="l00034"></a><a class="code" href="namespaceisis_1_1image__io.html#a79a319eba04b38c999695a820f5804ed">00034</a> <span class="keyword">typedef</span> ImageIoDebug Debug;
+<a name="l00035"></a>00035 
+<a name="l00036"></a><a class="code" href="namespaceisis_1_1image__io.html#a6ba1dc7a299f51eafa3de8b5b16bee4a">00036</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> HANDLE&gt; <span class="keywordtype">void</span> <a class="code" href="namespaceisis_1_1image__io.html#a6ba1dc7a299f51eafa3de8b5b16bee4a">enableLog</a>( <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> level )
+<a name="l00037"></a>00037 {
+<a name="l00038"></a>00038     <a class="code" href="log_8hpp.html#a7677022a9a5e546a60e378a156b598b5">ENABLE_LOG</a>( <a class="code" href="namespaceisis_1_1image__io.html#ad95ad94c644019674b1532c4a2ac05c8">Runtime</a>, HANDLE, level );
+<a name="l00039"></a>00039     <a class="code" href="log_8hpp.html#a7677022a9a5e546a60e378a156b598b5">ENABLE_LOG</a>( <a class="code" href="namespaceisis_1_1image__io.html#a79a319eba04b38c999695a820f5804ed">Debug</a>, HANDLE, level );
+<a name="l00040"></a>00040 }
+<a name="l00041"></a>00041 } <span class="comment">//namespace image_io</span>
+<a name="l00042"></a>00042 
+<a name="l00043"></a>00043 <span class="keyword">namespace </span>data
+<a name="l00044"></a>00044 {
+<a name="l00045"></a>00045 
+<a name="l00046"></a>00046 <span class="keyword">namespace </span>_internal
+<a name="l00047"></a>00047 {
+<a name="l00048"></a>00048 <span class="keyword">using namespace </span>boost::numeric::ublas;
 <a name="l00049"></a>00049 
-<a name="l00050"></a><a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">00050</a> <span class="keyword">typedef</span> DataLog Runtime;
-<a name="l00051"></a><a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">00051</a> <span class="keyword">typedef</span> DataDebug Debug;
-<a name="l00052"></a><a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3a4dbae8110b827f0716817c3ae5e44b55">00052</a> <span class="keyword">enum</span> <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3">dimensions</a> {<a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3a9f473e3b41b1b75c9c3f0428c2712178">rowDim</a> = 0, columnDim, sliceDim, <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3a4dbae8110b827f0716817c3ae5e44b55">timeDim</a>};
-<a name="l00053"></a>00053 
-<a name="l00062"></a><a class="code" href="namespaceisis_1_1data.html#a465a70c53d5fc5a7be8916b70c37df18">00062</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> HANDLE&gt; <span class="keywordtype">void</span> <a class="code" href="namespaceisis_1_1data.html#a465a70c53d5fc5a7be8916b70c37df18" title="Set logging level for the namespace data.">enableLog</a>( <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> level )
-<a name="l00063"></a>00063 {
-<a name="l00064"></a>00064     <a class="code" href="log_8hpp.html#a7677022a9a5e546a60e378a156b598b5">ENABLE_LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, HANDLE, level );
-<a name="l00065"></a>00065     <a class="code" href="log_8hpp.html#a7677022a9a5e546a60e378a156b598b5">ENABLE_LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, HANDLE, level );
-<a name="l00066"></a>00066 }
-<a name="l00067"></a>00067 }
+<a name="l00050"></a>00050 
+<a name="l00051"></a>00051 <span class="keyword">template</span> &lt;<span class="keyword">typename</span> TYPE&gt;
+<a name="l00052"></a><a class="code" href="namespaceisis_1_1data_1_1__internal.html#a35d55c3b417bd1a0153c928b42fe09aa">00052</a> <span class="keywordtype">bool</span> <a class="code" href="namespaceisis_1_1data_1_1__internal.html#a35d55c3b417bd1a0153c928b42fe09aa">inverseMatrix</a>( <span class="keyword">const</span> matrix&lt;TYPE&gt; &amp;inMatrix, matrix&lt;TYPE&gt; &amp;inverse )
+<a name="l00053"></a>00053 {
+<a name="l00054"></a>00054     matrix&lt;TYPE&gt; A( inMatrix );
+<a name="l00055"></a>00055     permutation_matrix&lt;TYPE&gt; pm( A.size1() );
+<a name="l00056"></a>00056     <span class="keywordtype">int</span> res = lu_factorize( A, pm );
+<a name="l00057"></a>00057 
+<a name="l00058"></a>00058     <span class="keywordflow">if</span>( res != 0 ) {
+<a name="l00059"></a>00059         <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00060"></a>00060     }
+<a name="l00061"></a>00061 
+<a name="l00062"></a>00062     inverse.assign( identity_matrix&lt;TYPE&gt;( inMatrix.size1() ) );
+<a name="l00063"></a>00063     lu_substitute( A, pm, inverse );
+<a name="l00064"></a>00064     <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00065"></a>00065 }
+<a name="l00066"></a>00066 
+<a name="l00067"></a>00067 <span class="keywordtype">bool</span> <a class="code" href="namespaceisis_1_1data_1_1__internal.html#a1ad04bf8bb562413f0a02065bfe4b721">transformCoords</a>( <a class="code" href="classisis_1_1util_1_1PropertyMap.html" title="This class contains a mapping tree to store all kinds of properties (path/key : value) It&amp;#39;s also ...">isis::util::PropertyMap</a> &amp;, <span class="keyword">const</span> <a class="code" href="classisis_1_1util_1_1FixedVector.html">isis::util::FixedVector&lt;size_t, 4&gt;</a> size, boost::numeric::ublas::matrix&lt;float&gt;, <span class="keywordtype">bool</span> transformCenterIsImageCenter = <span class="keyword">false</span> );
+<a name="l00068"></a>00068 
 <a name="l00069"></a>00069 }
-<a name="l00070"></a>00070 <span class="preprocessor">#endif //DATA_COMMON_HPP</span>
+<a name="l00070"></a>00070 
+<a name="l00071"></a><a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">00071</a> <span class="keyword">typedef</span> DataLog Runtime;
+<a name="l00072"></a><a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">00072</a> <span class="keyword">typedef</span> DataDebug Debug;
+<a name="l00073"></a><a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3a4dbae8110b827f0716817c3ae5e44b55">00073</a> <span class="keyword">enum</span> <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3">dimensions</a> {<a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3a9f473e3b41b1b75c9c3f0428c2712178">rowDim</a> = 0, columnDim, sliceDim, <a class="code" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3a4dbae8110b827f0716817c3ae5e44b55">timeDim</a>};
+<a name="l00074"></a><a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a2d3b0a88d3baa2206c283d49f1a90c55">00074</a> <span class="keyword">enum</span> <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99">scannerAxis</a> { <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a4a8e9c237b3decda2f60f508fa860398">x</a> = 0, y, <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a2d3b0a88d3baa2206c283d49f1a90c55">z</a> };
+<a name="l00075"></a>00075 
+<a name="l00084"></a><a class="code" href="namespaceisis_1_1data.html#a465a70c53d5fc5a7be8916b70c37df18">00084</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> HANDLE&gt; <span class="keywordtype">void</span> <a class="code" href="namespaceisis_1_1data.html#a465a70c53d5fc5a7be8916b70c37df18" title="Set logging level for the namespace data.">enableLog</a>( <a class="code" href="group__util.html#gafe55030315ca143f9be26fd278df9f82">LogLevel</a> level )
+<a name="l00085"></a>00085 {
+<a name="l00086"></a>00086     <a class="code" href="log_8hpp.html#a7677022a9a5e546a60e378a156b598b5">ENABLE_LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a15b301b1e8962fdf9562e683d7be5d9f">Runtime</a>, HANDLE, level );
+<a name="l00087"></a>00087     <a class="code" href="log_8hpp.html#a7677022a9a5e546a60e378a156b598b5">ENABLE_LOG</a>( <a class="code" href="namespaceisis_1_1data.html#a1fa5e73edba41053e31839cba7134dbd">Debug</a>, HANDLE, level );
+<a name="l00088"></a>00088 }
+<a name="l00089"></a>00089 }
+<a name="l00091"></a>00091 }
+<a name="l00092"></a>00092 <span class="preprocessor">#endif //DATA_COMMON_HPP</span>
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Apr 19 2011 16:19:13 for ISIS Core Library by&nbsp;
+<hr class="footer"/><address class="footer"><small>Generated on Fri Jun 10 2011 10:57:21 for ISIS Core Library by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.1 </small></address>
 </body>

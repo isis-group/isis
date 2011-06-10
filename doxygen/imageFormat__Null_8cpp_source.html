@@ -31,75 +31,131 @@
 <div class="contents">
 <a href="imageFormat__Null_8cpp.html">Go to the documentation of this file.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="preprocessor">#include &lt;<a class="code" href="io__interface_8h.html">DataStorage/io_interface.h</a>&gt;</span>
 <a name="l00002"></a>00002 
-<a name="l00003"></a>00003 
-<a name="l00004"></a>00004 <span class="keyword">namespace </span>isis
-<a name="l00005"></a>00005 {
-<a name="l00006"></a>00006 <span class="keyword">namespace </span>image_io
-<a name="l00007"></a>00007 {
-<a name="l00008"></a>00008 
-<a name="l00009"></a><a class="code" href="classisis_1_1image__io_1_1ImageFormat__Null.html">00009</a> <span class="keyword">class </span><a class="code" href="classisis_1_1image__io_1_1ImageFormat__Null.html">ImageFormat_Null</a>: <span class="keyword">public</span> <a class="code" href="io__interface_8h.html#ad534fde7b54f25d7d340da0fbc40753f">FileFormat</a>
-<a name="l00010"></a>00010 {
-<a name="l00011"></a>00011 <span class="keyword">protected</span>:
-<a name="l00012"></a><a class="code" href="classisis_1_1image__io_1_1ImageFormat__Null.html#a92e30d345cb832f32fea08a407b3ac08">00012</a>     std::string <a class="code" href="classisis_1_1image__io_1_1ImageFormat__Null.html#a92e30d345cb832f32fea08a407b3ac08">suffixes</a>()<span class="keyword">const </span>{
-<a name="l00013"></a>00013         <span class="keywordflow">return</span> std::string( <span class="stringliteral">&quot;.null .null.gz&quot;</span> );
-<a name="l00014"></a>00014     }
-<a name="l00015"></a>00015 <span class="keyword">public</span>:
-<a name="l00016"></a><a class="code" href="classisis_1_1image__io_1_1ImageFormat__Null.html#a53ac357a80ed2707eb4c721bdafe4904">00016</a>     std::string <a class="code" href="classisis_1_1image__io_1_1ImageFormat__Null.html#a53ac357a80ed2707eb4c721bdafe4904">getName</a>()<span class="keyword">const </span>{
-<a name="l00017"></a>00017         <span class="keywordflow">return</span> <span class="stringliteral">&quot;Null&quot;</span>;
-<a name="l00018"></a>00018     }
-<a name="l00019"></a>00019 
-<a name="l00020"></a><a class="code" href="classisis_1_1image__io_1_1ImageFormat__Null.html#adec64c3d2338393bcba54758baac4a14">00020</a>     <span class="keywordtype">int</span> <a class="code" href="classisis_1_1image__io_1_1ImageFormat__Null.html#adec64c3d2338393bcba54758baac4a14">load</a> ( std::list&lt;data::Chunk&gt; &amp;chunks, <span class="keyword">const</span> std::string &amp;filename, <span class="keyword">const</span> std::string &amp;dialect )  <span class="keywordflow">throw</span>( std::runtime_error &amp; ) {
-<a name="l00021"></a>00021         <span class="keyword">const</span> <span class="keywordtype">size_t</span> images = 5;
-<a name="l00022"></a>00022         <span class="keyword">const</span> <span class="keywordtype">size_t</span> timesteps = 10;
+<a name="l00003"></a>00003 <span class="preprocessor">#include &lt;time.h&gt;</span>
+<a name="l00004"></a>00004 
+<a name="l00005"></a>00005 <span class="keyword">namespace </span>isis
+<a name="l00006"></a>00006 {
+<a name="l00007"></a>00007 <span class="keyword">namespace </span>image_io
+<a name="l00008"></a>00008 {
+<a name="l00009"></a>00009 
+<a name="l00010"></a><a class="code" href="classisis_1_1image__io_1_1ImageFormat__Null.html">00010</a> <span class="keyword">class </span><a class="code" href="classisis_1_1image__io_1_1ImageFormat__Null.html">ImageFormat_Null</a>: <span class="keyword">public</span> <a class="code" href="io__interface_8h.html#ad534fde7b54f25d7d340da0fbc40753f">FileFormat</a>
+<a name="l00011"></a>00011 {
+<a name="l00012"></a>00012 <span class="keyword">protected</span>:
+<a name="l00013"></a><a class="code" href="classisis_1_1image__io_1_1ImageFormat__Null.html#a92e30d345cb832f32fea08a407b3ac08">00013</a>     std::string <a class="code" href="classisis_1_1image__io_1_1ImageFormat__Null.html#a92e30d345cb832f32fea08a407b3ac08">suffixes</a>()<span class="keyword">const </span>{
+<a name="l00014"></a>00014         <span class="keywordflow">return</span> std::string( <span class="stringliteral">&quot;.null .null.gz&quot;</span> );
+<a name="l00015"></a>00015     }
+<a name="l00016"></a>00016 <span class="keyword">public</span>:
+<a name="l00017"></a><a class="code" href="classisis_1_1image__io_1_1ImageFormat__Null.html#a53ac357a80ed2707eb4c721bdafe4904">00017</a>     std::string <a class="code" href="classisis_1_1image__io_1_1ImageFormat__Null.html#a53ac357a80ed2707eb4c721bdafe4904">getName</a>()<span class="keyword">const </span>{
+<a name="l00018"></a>00018         <span class="keywordflow">return</span> <span class="stringliteral">&quot;Null&quot;</span>;
+<a name="l00019"></a>00019     }
+<a name="l00020"></a><a class="code" href="classisis_1_1image__io_1_1ImageFormat__Null.html#a2e9410eae71771c9383458c241d54cc4">00020</a>     std::string <a class="code" href="classisis_1_1image__io_1_1ImageFormat__Null.html#a2e9410eae71771c9383458c241d54cc4">dialects</a>( <span class="keyword">const</span> std::string &amp;<span class="comment">/*filename*/</span> )<span class="keyword">const </span>{
+<a name="l00021"></a>00021         <span class="keywordflow">return</span> std::string( <span class="stringliteral">&quot;memimage_50 memimage_500 memimage_1000 memimage_2000&quot;</span> );
+<a name="l00022"></a>00022     }
 <a name="l00023"></a>00023 
-<a name="l00024"></a>00024         <span class="keywordflow">for</span> ( <span class="keywordtype">size_t</span> i = 0; i &lt; timesteps; i++ ) {
-<a name="l00025"></a>00025             <span class="keywordflow">for</span> ( <span class="keywordtype">size_t</span> c = 0; c &lt; images; c++ ) {
-<a name="l00026"></a>00026 
-<a name="l00027"></a>00027                 <a class="code" href="classisis_1_1data_1_1MemChunk.html" title="Chunk class for memory-based buffers.">data::MemChunk&lt;uint8_t&gt;</a> ch( 50, 50, 50 );
-<a name="l00028"></a>00028                 ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a61e21dbea881e669cd9e0d3d507920b2" title="Set the given property to a given value/type.">setPropertyAs</a>( <span class="stringliteral">&quot;indexOrigin&quot;</span>, <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>( 1, 2, 3 ) );
-<a name="l00029"></a>00029                 ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a61e21dbea881e669cd9e0d3d507920b2" title="Set the given property to a given value/type.">setPropertyAs</a>&lt;uint32_t&gt;( <span class="stringliteral">&quot;acquisitionNumber&quot;</span>, i );
-<a name="l00030"></a>00030                 ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a61e21dbea881e669cd9e0d3d507920b2" title="Set the given property to a given value/type.">setPropertyAs</a>&lt;uint16_t&gt;( <span class="stringliteral">&quot;sequenceNumber&quot;</span>, c );
-<a name="l00031"></a>00031                 ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a61e21dbea881e669cd9e0d3d507920b2" title="Set the given property to a given value/type.">setPropertyAs</a>( <span class="stringliteral">&quot;performingPhysician&quot;</span>, std::string( <span class="stringliteral">&quot;Dr. Jon Doe&quot;</span> ) );
-<a name="l00032"></a>00032                 ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a61e21dbea881e669cd9e0d3d507920b2" title="Set the given property to a given value/type.">setPropertyAs</a>( <span class="stringliteral">&quot;rowVec&quot;</span>, <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>(   ( <span class="keywordtype">float</span> )1 / sqrtf( 2 ), ( <span class="keywordtype">float</span> )1 / sqrtf( 2 ) ) ); <span class="comment">//rotated by pi/4 (45°)</span>
-<a name="l00033"></a>00033                 ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a61e21dbea881e669cd9e0d3d507920b2" title="Set the given property to a given value/type.">setPropertyAs</a>( <span class="stringliteral">&quot;columnVec&quot;</span>, <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>( ( <span class="keywordtype">float</span> ) - 1 / sqrtf( 2 ), ( <span class="keywordtype">float</span> )1 / sqrtf( 2 ) ) );
-<a name="l00034"></a>00034                 ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a61e21dbea881e669cd9e0d3d507920b2" title="Set the given property to a given value/type.">setPropertyAs</a>( <span class="stringliteral">&quot;sliceVec&quot;</span>, <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>( 0, 0, 1 ) );
-<a name="l00035"></a>00035                 ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a61e21dbea881e669cd9e0d3d507920b2" title="Set the given property to a given value/type.">setPropertyAs</a>( <span class="stringliteral">&quot;voxelSize&quot;</span>, <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>( 1, 2, 3 ) );
-<a name="l00036"></a>00036                 ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a61e21dbea881e669cd9e0d3d507920b2" title="Set the given property to a given value/type.">setPropertyAs</a>( <span class="stringliteral">&quot;repetitionTime&quot;</span>, 1234 );
-<a name="l00037"></a>00037 
-<a name="l00038"></a>00038                 <span class="keywordflow">for</span> ( <span class="keywordtype">int</span> x = 10; x &lt; 40; x++ )
-<a name="l00039"></a>00039                     <span class="keywordflow">for</span> ( <span class="keywordtype">int</span> y = 10; y &lt; 40; y++ )
-<a name="l00040"></a>00040                         <span class="keywordflow">for</span> ( <span class="keywordtype">int</span> z = 0; z &lt; 40; z++ )
-<a name="l00041"></a>00041                             ch.<a class="code" href="classisis_1_1data_1_1Chunk.html#acf9c5e0311d80bed02a16362e2e0fc42" title="Gets a reference to the element at a given index.">voxel</a>&lt;uint8_t&gt;( x, y, z ) = 255 - i * 20;
-<a name="l00042"></a>00042 
-<a name="l00043"></a>00043                 ch.<a class="code" href="classisis_1_1data_1_1Chunk.html#acf9c5e0311d80bed02a16362e2e0fc42" title="Gets a reference to the element at a given index.">voxel</a>&lt;uint8_t&gt;( 0, 0 ) = c * 40;
-<a name="l00044"></a>00044                 chunks.push_back( ch );
-<a name="l00045"></a>00045             }
-<a name="l00046"></a>00046         }
-<a name="l00047"></a>00047 
-<a name="l00048"></a>00048         <span class="keywordflow">return</span> timesteps * images;;
-<a name="l00049"></a>00049     }
-<a name="l00050"></a>00050 
-<a name="l00051"></a><a class="code" href="classisis_1_1image__io_1_1ImageFormat__Null.html#a2997c1d78a3df9722bc24077f3c5c826">00051</a>     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1image__io_1_1ImageFormat__Null.html#a2997c1d78a3df9722bc24077f3c5c826">write</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Image.html">data::Image</a> &amp;image, <span class="keyword">const</span> std::string &amp;filename, <span class="keyword">const</span> std::string &amp;dialect )  <span class="keywordflow">throw</span>( std::runtime_error &amp; ) {
-<a name="l00052"></a>00052         <span class="keywordflow">if</span> ( image.getSizeAsVector() != <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a>( 50, 50, 50, 10 ) )
-<a name="l00053"></a>00053             <span class="keywordflow">throw</span>( std::runtime_error( <span class="stringliteral">&quot;Size mismatch (&quot;</span> + image.getSizeAsString() + <span class="stringliteral">&quot;!=&quot;</span> + boost::lexical_cast&lt;std::string&gt;( <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a>( 50, 50, 50, 10 ) ) + <span class="stringliteral">&quot;)&quot;</span> ) );
-<a name="l00054"></a>00054 
-<a name="l00055"></a>00055         <span class="keyword">const</span> <span class="keywordtype">int</span> snum = image.getPropertyAs&lt;int32_t&gt;( <span class="stringliteral">&quot;sequenceNumber&quot;</span> );
+<a name="l00024"></a><a class="code" href="classisis_1_1image__io_1_1ImageFormat__Null.html#adec64c3d2338393bcba54758baac4a14">00024</a>     <span class="keywordtype">int</span> <a class="code" href="classisis_1_1image__io_1_1ImageFormat__Null.html#adec64c3d2338393bcba54758baac4a14">load</a> ( std::list&lt;data::Chunk&gt; &amp;chunks, <span class="keyword">const</span> std::string &amp;filename, <span class="keyword">const</span> std::string &amp;dialect )  <span class="keywordflow">throw</span>( std::runtime_error &amp; ) {
+<a name="l00025"></a>00025         <span class="keywordflow">if</span>( dialect == <span class="stringliteral">&quot;&quot;</span> ) {
+<a name="l00026"></a>00026             <span class="comment">//##################################################################################################</span>
+<a name="l00027"></a>00027             <span class="comment">//## standard null image</span>
+<a name="l00028"></a>00028             <span class="comment">//##################################################################################################</span>
+<a name="l00029"></a>00029             <span class="keyword">const</span> <span class="keywordtype">size_t</span> images = 5;
+<a name="l00030"></a>00030             <span class="keyword">const</span> <span class="keywordtype">size_t</span> timesteps = 10;
+<a name="l00031"></a>00031 
+<a name="l00032"></a>00032             <span class="keywordflow">for</span> ( <span class="keywordtype">size_t</span> i = 0; i &lt; timesteps; i++ ) {
+<a name="l00033"></a>00033                 <span class="keywordflow">for</span> ( <span class="keywordtype">size_t</span> c = 0; c &lt; images; c++ ) {
+<a name="l00034"></a>00034 
+<a name="l00035"></a>00035                     <a class="code" href="classisis_1_1data_1_1MemChunk.html" title="Chunk class for memory-based buffers.">data::MemChunk&lt;uint8_t&gt;</a> ch( 50, 50, 50 );
+<a name="l00036"></a>00036                     ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a61e21dbea881e669cd9e0d3d507920b2" title="Set the given property to a given value/type.">setPropertyAs</a>( <span class="stringliteral">&quot;indexOrigin&quot;</span>, <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>( 1, 2, 3 ) );
+<a name="l00037"></a>00037                     ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a61e21dbea881e669cd9e0d3d507920b2" title="Set the given property to a given value/type.">setPropertyAs</a>&lt;uint32_t&gt;( <span class="stringliteral">&quot;acquisitionNumber&quot;</span>, i );
+<a name="l00038"></a>00038                     ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a61e21dbea881e669cd9e0d3d507920b2" title="Set the given property to a given value/type.">setPropertyAs</a>&lt;uint16_t&gt;( <span class="stringliteral">&quot;sequenceNumber&quot;</span>, c );
+<a name="l00039"></a>00039                     ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a61e21dbea881e669cd9e0d3d507920b2" title="Set the given property to a given value/type.">setPropertyAs</a>( <span class="stringliteral">&quot;performingPhysician&quot;</span>, std::string( <span class="stringliteral">&quot;Dr. Jon Doe&quot;</span> ) );
+<a name="l00040"></a>00040                     ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a61e21dbea881e669cd9e0d3d507920b2" title="Set the given property to a given value/type.">setPropertyAs</a>( <span class="stringliteral">&quot;rowVec&quot;</span>, <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>(   ( <span class="keywordtype">float</span> )1 / sqrtf( 2 ), ( <span class="keywordtype">float</span> )1 / sqrtf( 2 ) ) ); <span class="comment">//rotated by pi/4 (45°)</span>
+<a name="l00041"></a>00041                     ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a61e21dbea881e669cd9e0d3d507920b2" title="Set the given property to a given value/type.">setPropertyAs</a>( <span class="stringliteral">&quot;columnVec&quot;</span>, <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>( ( <span class="keywordtype">float</span> ) - 1 / sqrtf( 2 ), ( <span class="keywordtype">float</span> )1 / sqrtf( 2 ) ) );
+<a name="l00042"></a>00042                     ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a61e21dbea881e669cd9e0d3d507920b2" title="Set the given property to a given value/type.">setPropertyAs</a>( <span class="stringliteral">&quot;sliceVec&quot;</span>, <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>( 0, 0, 1 ) );
+<a name="l00043"></a>00043                     ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a61e21dbea881e669cd9e0d3d507920b2" title="Set the given property to a given value/type.">setPropertyAs</a>( <span class="stringliteral">&quot;voxelSize&quot;</span>, <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>( 1, 2, 3 ) );
+<a name="l00044"></a>00044                     ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a61e21dbea881e669cd9e0d3d507920b2" title="Set the given property to a given value/type.">setPropertyAs</a>( <span class="stringliteral">&quot;repetitionTime&quot;</span>, 1234 );
+<a name="l00045"></a>00045                     ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a61e21dbea881e669cd9e0d3d507920b2" title="Set the given property to a given value/type.">setPropertyAs</a>( <span class="stringliteral">&quot;nullDescription&quot;</span>, std::string( <span class="stringliteral">&quot;The standard null image&quot;</span> ) );
+<a name="l00046"></a>00046 
+<a name="l00047"></a>00047                     <span class="keywordflow">for</span> ( <span class="keywordtype">int</span> <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a4a8e9c237b3decda2f60f508fa860398">x</a> = 10; <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a4a8e9c237b3decda2f60f508fa860398">x</a> &lt; 40; <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a4a8e9c237b3decda2f60f508fa860398">x</a>++ )
+<a name="l00048"></a>00048                         <span class="keywordflow">for</span> ( <span class="keywordtype">int</span> <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a3fb550d7fa564e7e08d5aab0a804dd23">y</a> = 10; <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a3fb550d7fa564e7e08d5aab0a804dd23">y</a> &lt; 40; <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a3fb550d7fa564e7e08d5aab0a804dd23">y</a>++ )
+<a name="l00049"></a>00049                             <span class="keywordflow">for</span> ( <span class="keywordtype">int</span> <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a2d3b0a88d3baa2206c283d49f1a90c55">z</a> = 0; <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a2d3b0a88d3baa2206c283d49f1a90c55">z</a> &lt; 40; <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a2d3b0a88d3baa2206c283d49f1a90c55">z</a>++ )
+<a name="l00050"></a>00050                                 ch.<a class="code" href="classisis_1_1data_1_1Chunk.html#acf9c5e0311d80bed02a16362e2e0fc42" title="Gets a reference to the element at a given index.">voxel</a>&lt;uint8_t&gt;( <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a4a8e9c237b3decda2f60f508fa860398">x</a>, <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a3fb550d7fa564e7e08d5aab0a804dd23">y</a>, <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a2d3b0a88d3baa2206c283d49f1a90c55">z</a> ) = 255 - i * 20;
+<a name="l00051"></a>00051 
+<a name="l00052"></a>00052                     ch.<a class="code" href="classisis_1_1data_1_1Chunk.html#acf9c5e0311d80bed02a16362e2e0fc42" title="Gets a reference to the element at a given index.">voxel</a>&lt;uint8_t&gt;( 0, 0 ) = c * 40;
+<a name="l00053"></a>00053                     chunks.push_back( ch );
+<a name="l00054"></a>00054                 }
+<a name="l00055"></a>00055             }
 <a name="l00056"></a>00056 
-<a name="l00057"></a>00057         <span class="keywordflow">for</span> ( <span class="keywordtype">int</span> i = 0; i &lt; 10; i++ )
-<a name="l00058"></a>00058             <span class="keywordflow">if</span> ( image.voxel&lt;uint8_t&gt;( 0, 0 ) != snum )
-<a name="l00059"></a>00059                 <span class="keywordflow">throw</span>( std::runtime_error( <span class="stringliteral">&quot;Data mismatch&quot;</span> ) );
-<a name="l00060"></a>00060     }
-<a name="l00061"></a><a class="code" href="classisis_1_1image__io_1_1ImageFormat__Null.html#ae41c8faaca4e7f30f1869b2dc051b0b2">00061</a>     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1image__io_1_1ImageFormat__Null.html#ae41c8faaca4e7f30f1869b2dc051b0b2">tainted</a>()<span class="keyword">const </span>{<span class="keywordflow">return</span> <span class="keyword">false</span>;}<span class="comment">//internal plugins are not tainted</span>
-<a name="l00062"></a>00062 };
-<a name="l00063"></a>00063 }
-<a name="l00064"></a>00064 }
-<a name="l00065"></a><a class="code" href="imageFormat__Null_8cpp.html#aa8b483f374fb36a1a13eccaa9e5e70ab">00065</a> <a class="code" href="io__interface_8h.html#ad534fde7b54f25d7d340da0fbc40753f">isis::image_io::FileFormat</a> *<a class="code" href="io__interface_8h.html#a9fe54fdfd8fa19863f55927c0d089847">factory</a>()
-<a name="l00066"></a>00066 {
-<a name="l00067"></a>00067     <span class="keywordflow">return</span> <span class="keyword">new</span> <a class="code" href="classisis_1_1image__io_1_1ImageFormat__Null.html">isis::image_io::ImageFormat_Null</a>();
-<a name="l00068"></a>00068 }
+<a name="l00057"></a>00057             <span class="keywordflow">return</span> timesteps * images;
+<a name="l00058"></a>00058         } <span class="keywordflow">else</span> <span class="keywordflow">if</span> ( dialect.find( <span class="stringliteral">&quot;memimage_&quot;</span> ) == 0 ) {
+<a name="l00059"></a>00059             <span class="comment">//##################################################################################################</span>
+<a name="l00060"></a>00060             <span class="comment">//## variable image</span>
+<a name="l00061"></a>00061             <span class="comment">//##################################################################################################</span>
+<a name="l00062"></a>00062             <span class="keyword">typedef</span> uint8_t IMAGE_TYPE;
+<a name="l00063"></a>00063             time_t secondsStart = std::time( NULL );
+<a name="l00064"></a>00064             std::stringstream sizeInMBStream( dialect.substr( 9, dialect.size() ) );
+<a name="l00065"></a>00065             <span class="keywordtype">size_t</span> imageSizeMB;
+<a name="l00066"></a>00066             sizeInMBStream &gt;&gt; imageSizeMB;
+<a name="l00067"></a>00067             imageSizeMB *= ( 1024 * 1024 ) / <span class="keyword">sizeof</span>( IMAGE_TYPE );
+<a name="l00068"></a>00068             <span class="keywordtype">size_t</span> imageSize = pow( imageSizeMB, 1.0 / 4.0 );
+<a name="l00069"></a>00069             <span class="keywordtype">float</span> voxelSize = 1.0;
+<a name="l00070"></a>00070             <a class="code" href="classisis_1_1data_1_1MemChunk.html" title="Chunk class for memory-based buffers.">data::MemChunk&lt;uint8_t&gt;</a> ch ( imageSize, imageSize, imageSize, imageSize );
+<a name="l00071"></a>00071             ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a61e21dbea881e669cd9e0d3d507920b2" title="Set the given property to a given value/type.">setPropertyAs</a>( <span class="stringliteral">&quot;indexOrigin&quot;</span>, <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>() );
+<a name="l00072"></a>00072             ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a61e21dbea881e669cd9e0d3d507920b2" title="Set the given property to a given value/type.">setPropertyAs</a>&lt;uint32_t&gt;( <span class="stringliteral">&quot;acquisitionNumber&quot;</span>, 1 );
+<a name="l00073"></a>00073             ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a61e21dbea881e669cd9e0d3d507920b2" title="Set the given property to a given value/type.">setPropertyAs</a>&lt;uint16_t&gt;( <span class="stringliteral">&quot;sequenceNumber&quot;</span>, 1 );
+<a name="l00074"></a>00074             ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a61e21dbea881e669cd9e0d3d507920b2" title="Set the given property to a given value/type.">setPropertyAs</a>( <span class="stringliteral">&quot;rowVec&quot;</span>, <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>( 1, 0, 0 ) );
+<a name="l00075"></a>00075             ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a61e21dbea881e669cd9e0d3d507920b2" title="Set the given property to a given value/type.">setPropertyAs</a>( <span class="stringliteral">&quot;columnVec&quot;</span>, <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>( 0, 1, 0 ) );
+<a name="l00076"></a>00076             ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a61e21dbea881e669cd9e0d3d507920b2" title="Set the given property to a given value/type.">setPropertyAs</a>( <span class="stringliteral">&quot;sliceVec&quot;</span>, <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>( 0, 0, 1 )  );
+<a name="l00077"></a>00077             ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a61e21dbea881e669cd9e0d3d507920b2" title="Set the given property to a given value/type.">setPropertyAs</a>( <span class="stringliteral">&quot;voxelGap&quot;</span>, <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>() );
+<a name="l00078"></a>00078             ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a61e21dbea881e669cd9e0d3d507920b2" title="Set the given property to a given value/type.">setPropertyAs</a>( <span class="stringliteral">&quot;voxelSize&quot;</span>, <a class="code" href="classisis_1_1util_1_1vector4.html">util::fvector4</a>( voxelSize, voxelSize, voxelSize ) );
+<a name="l00079"></a>00079             std::stringstream imageSizeMBExact;
+<a name="l00080"></a>00080             imageSizeMBExact &lt;&lt; ( float )( pow( imageSize, 4 ) * <span class="keyword">sizeof</span>( IMAGE_TYPE ) ) / ( 1024 * 1024 ) &lt;&lt; <span class="stringliteral">&quot; mb&quot;</span>;
+<a name="l00081"></a>00081             ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a61e21dbea881e669cd9e0d3d507920b2" title="Set the given property to a given value/type.">setPropertyAs</a>( <span class="stringliteral">&quot;imageSize&quot;</span>, imageSizeMBExact.str() );
+<a name="l00082"></a>00082             std::stringstream nullDescription;
+<a name="l00083"></a>00083             nullDescription &lt;&lt; <span class="stringliteral">&quot;Image with image size &quot;</span> &lt;&lt; imageSize &lt;&lt; <span class="stringliteral">&quot;x&quot;</span> &lt;&lt; imageSize &lt;&lt; <span class="stringliteral">&quot;x&quot;</span> &lt;&lt; imageSize &lt;&lt; <span class="stringliteral">&quot;x&quot;</span> &lt;&lt; imageSize;
+<a name="l00084"></a>00084             nullDescription &lt;&lt; <span class="stringliteral">&quot; and voxelSize &quot;</span> &lt;&lt; voxelSize &lt;&lt; <span class="stringliteral">&quot;x&quot;</span> &lt;&lt; voxelSize &lt;&lt; <span class="stringliteral">&quot;x&quot;</span> &lt;&lt; voxelSize &lt;&lt; <span class="stringliteral">&quot;x&quot;</span> &lt;&lt; voxelSize;
+<a name="l00085"></a>00085             ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a61e21dbea881e669cd9e0d3d507920b2" title="Set the given property to a given value/type.">setPropertyAs</a>( <span class="stringliteral">&quot;nullDescription&quot;</span>, nullDescription.str() );
+<a name="l00086"></a>00086             IMAGE_TYPE intensity;
+<a name="l00087"></a>00087 
+<a name="l00088"></a>00088             <span class="keywordflow">for</span> ( <span class="keywordtype">size_t</span> <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a4a8e9c237b3decda2f60f508fa860398">x</a> = 0; <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a4a8e9c237b3decda2f60f508fa860398">x</a> &lt; imageSize; <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a4a8e9c237b3decda2f60f508fa860398">x</a>++ ) {
+<a name="l00089"></a>00089                 intensity = ( ( float )( std::numeric_limits&lt;IMAGE_TYPE&gt;::max() - std::numeric_limits&lt;IMAGE_TYPE&gt;::min() ) / imageSize ) * x;
+<a name="l00090"></a>00090 
+<a name="l00091"></a>00091                 <span class="keywordflow">for</span> ( <span class="keywordtype">size_t</span> <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a3fb550d7fa564e7e08d5aab0a804dd23">y</a> = 0; <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a3fb550d7fa564e7e08d5aab0a804dd23">y</a> &lt; imageSize; <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a3fb550d7fa564e7e08d5aab0a804dd23">y</a>++ ) {
+<a name="l00092"></a>00092                     <span class="keywordflow">for</span> ( <span class="keywordtype">size_t</span> <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a2d3b0a88d3baa2206c283d49f1a90c55">z</a> = 0; <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a2d3b0a88d3baa2206c283d49f1a90c55">z</a> &lt; imageSize; <a class="code" href="namespaceisis_1_1data.html#addc0484ee8054d9e855bbd264c978b99a2d3b0a88d3baa2206c283d49f1a90c55">z</a>++ ) {
+<a name="l00093"></a>00093                         <span class="keywordflow">for</span> ( <span class="keywordtype">size_t</span> t = 0; t &lt; imageSize ; t++ ) {
+<a name="l00094"></a>00094                             ch.<a class="code" href="classisis_1_1data_1_1Chunk.html#acf9c5e0311d80bed02a16362e2e0fc42" title="Gets a reference to the element at a given index.">voxel</a>&lt;IMAGE_TYPE&gt;( x, y, z, t ) = intensity;
+<a name="l00095"></a>00095                         }
+<a name="l00096"></a>00096                     }
+<a name="l00097"></a>00097                 }
+<a name="l00098"></a>00098             }
+<a name="l00099"></a>00099 
+<a name="l00100"></a>00100             ch.<a class="code" href="classisis_1_1util_1_1PropertyMap.html#a61e21dbea881e669cd9e0d3d507920b2" title="Set the given property to a given value/type.">setPropertyAs</a>&lt;<span class="keywordtype">size_t</span>&gt;( <span class="stringliteral">&quot;timeUsedInS&quot;</span>, ( ( float )( std::time( NULL ) - secondsStart ) ) ) ;
+<a name="l00101"></a>00101             chunks.push_back( ch );
+<a name="l00102"></a>00102         }
+<a name="l00103"></a>00103 
+<a name="l00104"></a>00104 
+<a name="l00105"></a>00105     }
+<a name="l00106"></a>00106 
+<a name="l00107"></a><a class="code" href="classisis_1_1image__io_1_1ImageFormat__Null.html#a2997c1d78a3df9722bc24077f3c5c826">00107</a>     <span class="keywordtype">void</span> <a class="code" href="classisis_1_1image__io_1_1ImageFormat__Null.html#a2997c1d78a3df9722bc24077f3c5c826">write</a>( <span class="keyword">const</span> <a class="code" href="classisis_1_1data_1_1Image.html" title="Main class for generic 4D-images.">data::Image</a> &amp;image, <span class="keyword">const</span> std::string &amp;filename, <span class="keyword">const</span> std::string &amp;dialect )  <span class="keywordflow">throw</span>( std::runtime_error &amp; ) {
+<a name="l00108"></a>00108         <span class="keywordflow">if</span> ( image.getSizeAsVector() != <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a>( 50, 50, 50, 10 ) )
+<a name="l00109"></a>00109             <span class="keywordflow">throw</span>( std::runtime_error( <span class="stringliteral">&quot;Size mismatch (&quot;</span> + image.getSizeAsString() + <span class="stringliteral">&quot;!=&quot;</span> + boost::lexical_cast&lt;std::string&gt;( <a class="code" href="namespaceisis_1_1util.html#a620d9422050c6984bbac79fd7429b468">util::fvector4</a>( 50, 50, 50, 10 ) ) + <span class="stringliteral">&quot;)&quot;</span> ) );
+<a name="l00110"></a>00110 
+<a name="l00111"></a>00111         <span class="keyword">const</span> <span class="keywordtype">int</span> snum = image.getPropertyAs&lt;int32_t&gt;( <span class="stringliteral">&quot;sequenceNumber&quot;</span> );
+<a name="l00112"></a>00112 
+<a name="l00113"></a>00113         <span class="keywordflow">for</span> ( <span class="keywordtype">int</span> i = 0; i &lt; 10; i++ )
+<a name="l00114"></a>00114             <span class="keywordflow">if</span> ( image.voxel&lt;uint8_t&gt;( 0, 0 ) != snum )
+<a name="l00115"></a>00115                 <span class="keywordflow">throw</span>( std::runtime_error( <span class="stringliteral">&quot;Data mismatch&quot;</span> ) );
+<a name="l00116"></a>00116     }
+<a name="l00117"></a><a class="code" href="classisis_1_1image__io_1_1ImageFormat__Null.html#ae41c8faaca4e7f30f1869b2dc051b0b2">00117</a>     <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1image__io_1_1ImageFormat__Null.html#ae41c8faaca4e7f30f1869b2dc051b0b2">tainted</a>()<span class="keyword">const </span>{<span class="keywordflow">return</span> <span class="keyword">false</span>;}<span class="comment">//internal plugins are not tainted</span>
+<a name="l00118"></a>00118 };
+<a name="l00119"></a>00119 }
+<a name="l00120"></a>00120 }
+<a name="l00121"></a><a class="code" href="imageFormat__Null_8cpp.html#aa8b483f374fb36a1a13eccaa9e5e70ab">00121</a> <a class="code" href="io__interface_8h.html#ad534fde7b54f25d7d340da0fbc40753f">isis::image_io::FileFormat</a> *<a class="code" href="io__interface_8h.html#a9fe54fdfd8fa19863f55927c0d089847">factory</a>()
+<a name="l00122"></a>00122 {
+<a name="l00123"></a>00123     <span class="keywordflow">return</span> <span class="keyword">new</span> <a class="code" href="classisis_1_1image__io_1_1ImageFormat__Null.html">isis::image_io::ImageFormat_Null</a>();
+<a name="l00124"></a>00124 }
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Apr 19 2011 16:19:19 for ISIS Core Library by&nbsp;
+<hr class="footer"/><address class="footer"><small>Generated on Fri Jun 10 2011 10:57:24 for ISIS Core Library by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.1 </small></address>
 </body>

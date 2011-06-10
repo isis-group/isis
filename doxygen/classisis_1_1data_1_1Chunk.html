@@ -35,7 +35,6 @@
 </div>
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#friends">Friends</a>  </div>
@@ -54,22 +53,20 @@ Inheritance diagram for isis::data::Chunk:</div>
  <div class="center">
   <img src="classisis_1_1data_1_1Chunk.png" usemap="#isis::data::Chunk_map" alt=""/>
   <map id="isis::data::Chunk_map" name="isis::data::Chunk_map">
-<area href="classisis_1_1data_1_1__internal_1_1ChunkBase.html" alt="isis::data::_internal::ChunkBase" shape="rect" coords="316,56,622,80"/>
-<area href="classisis_1_1util_1_1__internal_1_1ValueReference.html" alt="isis::util::_internal::ValueReference&lt; TYPE_TYPE &gt;" shape="rect" coords="632,56,938,80"/>
-<area href="classisis_1_1data_1_1__internal_1_1NDimensional.html" alt="isis::data::_internal::NDimensional&lt; 4 &gt;" shape="rect" coords="158,0,464,24"/>
-<area href="classisis_1_1util_1_1PropertyMap.html" alt="isis::util::PropertyMap" shape="rect" coords="474,0,780,24"/>
+<area href="classisis_1_1data_1_1__internal_1_1ChunkBase.html" alt="isis::data::_internal::ChunkBase" shape="rect" coords="474,56,780,80"/>
+<area href="classisis_1_1util_1_1__internal_1_1ValueReference.html" alt="isis::util::_internal::ValueReference&lt; TYPE_TYPE &gt;" shape="rect" coords="790,56,1096,80"/>
+<area href="classisis_1_1data_1_1__internal_1_1NDimensional.html" alt="isis::data::_internal::NDimensional&lt; 4 &gt;" shape="rect" coords="316,0,622,24"/>
+<area href="classisis_1_1util_1_1PropertyMap.html" alt="isis::util::PropertyMap" shape="rect" coords="632,0,938,24"/>
 <area href="classisis_1_1data_1_1MemChunk.html" alt="isis::data::MemChunk&lt; TYPE &gt;" shape="rect" coords="0,168,306,192"/>
 <area href="classisis_1_1data_1_1MemChunkNonDel.html" alt="isis::data::MemChunkNonDel&lt; TYPE &gt;" shape="rect" coords="316,168,622,192"/>
 <area href="classisis_1_1image__io_1_1__internal_1_1DicomChunk.html" alt="isis::image_io::_internal::DicomChunk" shape="rect" coords="632,168,938,192"/>
 <area href="classisis_1_1image__io_1_1__internal_1_1NiftiChunk.html" alt="isis::image_io::_internal::NiftiChunk" shape="rect" coords="948,168,1254,192"/>
+<area href="classisis_1_1image__io_1_1ImageFormat__raw_1_1RawMemChunk.html" alt="isis::image_io::ImageFormat_raw::RawMemChunk" shape="rect" coords="1264,168,1570,192"/>
 </map>
 </div>
 
 <p><a href="classisis_1_1data_1_1Chunk-members.html">List of all members.</a></p>
 <table class="memberdecls">
-<tr><td colspan="2"><h2><a name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">class &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk_1_1VoxelOp.html">VoxelOp</a></td></tr>
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename TYPE &gt; </td></tr>
@@ -93,10 +90,10 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a150c81e23bd86466e7a62bab6ef4ba6a">copyToMem</a> (T *dst, const <a class="el" href="namespaceisis_1_1data.html#ac2873e5e7a9637d4ac68253dcf140ff4">scaling_pair</a> &amp;scaling) const </td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename TYPE &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">size_t&nbsp;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#af7d1aea5c86c996274f4700efd20776e">foreachVoxel</a> (<a class="el" href="classisis_1_1data_1_1Chunk_1_1VoxelOp.html">VoxelOp</a>&lt; TYPE &gt; &amp;op)</td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">size_t&nbsp;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#af7d1aea5c86c996274f4700efd20776e">foreachVoxel</a> (<a class="el" href="classisis_1_1data_1_1VoxelOp.html">VoxelOp</a>&lt; TYPE &gt; &amp;op)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Run a functor on every Voxel in the chunk.  <a href="#af7d1aea5c86c996274f4700efd20776e"></a><br/></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename TYPE &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">size_t&nbsp;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#af0439cc46bc1000ef0b3d8762a41d885">foreachVoxel</a> (<a class="el" href="classisis_1_1data_1_1Chunk_1_1VoxelOp.html">VoxelOp</a>&lt; TYPE &gt; &amp;op, <a class="el" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector</a>&lt; size_t, 4 &gt; offset)</td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">size_t&nbsp;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#af0439cc46bc1000ef0b3d8762a41d885">foreachVoxel</a> (<a class="el" href="classisis_1_1data_1_1VoxelOp.html">VoxelOp</a>&lt; TYPE &gt; &amp;op, <a class="el" href="classisis_1_1util_1_1FixedVector.html">util::FixedVector</a>&lt; size_t, 4 &gt; offset)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Run a functor on every Voxel in the chunk.  <a href="#af0439cc46bc1000ef0b3d8762a41d885"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::pair<br class="typebreak"/>
 &lt; <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">util::ValueReference</a>, <br class="typebreak"/>
@@ -115,8 +112,10 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a> &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#af781a7daa56e2f1e4f73574727cca020">operator=</a> (const <a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a> &amp;ref)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::list&lt; <a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a> &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a6225923327f21aeb5979d59ea756b26b">splice</a> (<a class="el" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3">dimensions</a> atDim) const </td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Splices the chunk at the given dimension and all dimensions above.  <a href="#a6225923327f21aeb5979d59ea756b26b"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a0fea5c67bebe076e474147a573f0f603">transformCoords</a> (boost::numeric::ublas::matrix&lt; float &gt; transform_matrix)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Transforms the image coordinate system into an other system by multiplying the orientation matrix with a user defined transformation matrix.  <a href="#a0fea5c67bebe076e474147a573f0f603"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a1c9b1f32d102d104c2d3824ecfc867e1">swapAlong</a> (const <a class="el" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3">dimensions</a> dim) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Swaps the image along a dimension dim in image space.  <a href="#a1c9b1f32d102d104c2d3824ecfc867e1"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a16aa9a83e1a33ab98889d50b61b6e726">transformCoords</a> (boost::numeric::ublas::matrix&lt; float &gt; transform_matrix, bool transformCenterIsImageCenter=false)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Transforms the image coordinate system into an other system by multiplying the orientation matrix with a user defined transformation matrix.  <a href="#a16aa9a83e1a33ab98889d50b61b6e726"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">size_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#ab284b6701ba78592f5a0f20621bb6c93">useCount</a> () const </td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename TYPE &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">TYPE &amp;&nbsp;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#acf9c5e0311d80bed02a16362e2e0fc42">voxel</a> (size_t nrOfColumns, size_t nrOfRows=0, size_t nrOfSlices=0, size_t nrOfTimesteps=0)</td></tr>
@@ -129,16 +128,18 @@ Protected Member Functions</h2></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename TYPE , typename D &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">&nbsp;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a67c188b4fcfe9bf446950e5324291036">Chunk</a> (TYPE *src, D d, size_t nrOfColumns, size_t nrOfRows=1, size_t nrOfSlices=1, size_t nrOfTimesteps=1)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Creates an data-block from existing data.  <a href="#a67c188b4fcfe9bf446950e5324291036"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#aaa4b99977be32d5e1b28ccd8a05f7433">Chunk</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a0b5d8ab1b3d61a47d1e7354301b03434">Chunk</a> (const <a class="el" href="classisis_1_1util_1_1__internal_1_1ValueReference.html">ValuePtrReference</a> &amp;src, size_t nrOfColumns, size_t nrOfRows=1, size_t nrOfSlices=1, size_t nrOfTimesteps=1)</td></tr>
 <tr><td colspan="2"><h2><a name="friends"></a>
 Friends</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#a5d6b29a75202aeeaef335faca9eb55e2">Image</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">class&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classisis_1_1data_1_1Chunk.html#ab08c7a17dcab7b971ff06806810da47f">std::vector&lt; Chunk &gt;</a></td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <p>Main class for four-dimensional random-access data blocks. </p>
 <p>Like in <a class="el" href="classisis_1_1data_1_1ValuePtr.html" title="Generic class for type (and length) - aware pointers.">ValuePtr</a>, the copy of a <a class="el" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> will reference the same data. (cheap copy) (If you want to make a memory based deep copy of a <a class="el" href="classisis_1_1data_1_1Chunk.html" title="Main class for four-dimensional random-access data blocks.">Chunk</a> create a <a class="el" href="classisis_1_1data_1_1MemChunk.html" title="Chunk class for memory-based buffers.">MemChunk</a> from it) </p>
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00054">54</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00062">62</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 <hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a67c188b4fcfe9bf446950e5324291036"></a><!-- doxytag: member="isis::data::Chunk::Chunk" ref="a67c188b4fcfe9bf446950e5324291036" args="(TYPE *src, D d, size_t nrOfColumns, size_t nrOfRows=1, size_t nrOfSlices=1, size_t nrOfTimesteps=1)" -->
 <div class="memitem">
@@ -204,7 +205,7 @@ template&lt;typename TYPE , typename D &gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00067">67</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00076">76</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -255,6 +256,25 @@ template&lt;typename TYPE , typename D &gt; </div>
 
 </div>
 </div>
+<a class="anchor" id="aaa4b99977be32d5e1b28ccd8a05f7433"></a><!-- doxytag: member="isis::data::Chunk::Chunk" ref="aaa4b99977be32d5e1b28ccd8a05f7433" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">isis::data::Chunk::Chunk </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inline, protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00080">80</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+
+</div>
+</div>
 <hr/><h2>Member Function Documentation</h2>
 <a class="anchor" id="a606c40ac8393596b16dcd2a07ec6f8f2"></a><!-- doxytag: member="isis::data::Chunk::asValuePtr" ref="a606c40ac8393596b16dcd2a07ec6f8f2" args="()" -->
 <div class="memitem">
@@ -273,7 +293,7 @@ template&lt;typename TYPE &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00147">147</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00152">152</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -292,7 +312,7 @@ template&lt;typename TYPE &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00141">141</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00146">146</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -794,7 +814,7 @@ template&lt;typename T &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00173">173</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00178">178</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -807,7 +827,7 @@ template&lt;typename TYPE &gt; </div>
         <tr>
           <td class="memname">size_t isis::data::Chunk::foreachVoxel </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classisis_1_1data_1_1Chunk_1_1VoxelOp.html">VoxelOp</a>&lt; TYPE &gt; &amp;&nbsp;</td>
+          <td class="paramtype"><a class="el" href="classisis_1_1data_1_1VoxelOp.html">VoxelOp</a>&lt; TYPE &gt; &amp;&nbsp;</td>
           <td class="paramname"> <em>op</em></td>
           <td>&nbsp;)&nbsp;</td>
           <td><code> [inline]</code></td>
@@ -819,13 +839,13 @@ template&lt;typename TYPE &gt; </div>
 <p>Run a functor on every Voxel in the chunk. </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>op</em>&nbsp;</td><td>a functor inheriting from <a class="el" href="classisis_1_1data_1_1Chunk_1_1VoxelOp.html">VoxelOp</a> </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>op</em>&nbsp;</td><td>a functor inheriting from <a class="el" href="classisis_1_1data_1_1VoxelOp.html" title="Base class for operators used for foreachVoxel.">VoxelOp</a> </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>amount of operations which returned false - so 0 is good! </dd></dl>
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00137">137</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00142">142</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -838,7 +858,7 @@ template&lt;typename TYPE &gt; </div>
         <tr>
           <td class="memname">size_t isis::data::Chunk::foreachVoxel </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classisis_1_1data_1_1Chunk_1_1VoxelOp.html">VoxelOp</a>&lt; TYPE &gt; &amp;&nbsp;</td>
+          <td class="paramtype"><a class="el" href="classisis_1_1data_1_1VoxelOp.html">VoxelOp</a>&lt; TYPE &gt; &amp;&nbsp;</td>
           <td class="paramname"> <em>op</em>, </td>
         </tr>
         <tr>
@@ -860,14 +880,14 @@ template&lt;typename TYPE &gt; </div>
 <p>If the data of the chunk are not of type TYPE, behaviour is undefined. (If _DEBUG_LOG is enabled you will get an error message before the progrmm will crash). </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>op</em>&nbsp;</td><td>a functor inheriting from <a class="el" href="classisis_1_1data_1_1Chunk_1_1VoxelOp.html">VoxelOp</a> </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>op</em>&nbsp;</td><td>a functor inheriting from <a class="el" href="classisis_1_1data_1_1VoxelOp.html" title="Base class for operators used for foreachVoxel.">VoxelOp</a> </td></tr>
     <tr><td valign="top"></td><td valign="top"><em>offset</em>&nbsp;</td><td>offset to be added to the voxel position before op is called </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>amount of operations which returned false - so 0 is good! </dd></dl>
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00116">116</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00121">121</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -1052,7 +1072,7 @@ template&lt;typename TYPE &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00150">150</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00155">155</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -1071,7 +1091,7 @@ template&lt;typename TYPE &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00144">144</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00149">149</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -1092,7 +1112,7 @@ template&lt;typename T &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00188">188</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00193">193</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -1145,17 +1165,48 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a0fea5c67bebe076e474147a573f0f603"></a><!-- doxytag: member="isis::data::Chunk::transformCoords" ref="a0fea5c67bebe076e474147a573f0f603" args="(boost::numeric::ublas::matrix&lt; float &gt; transform_matrix)" -->
+<a class="anchor" id="a1c9b1f32d102d104c2d3824ecfc867e1"></a><!-- doxytag: member="isis::data::Chunk::swapAlong" ref="a1c9b1f32d102d104c2d3824ecfc867e1" args="(const dimensions dim) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void isis::data::Chunk::transformCoords </td>
+          <td class="memname">void isis::data::Chunk::swapAlong </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespaceisis_1_1data.html#a157a8a81ce7fb08f84af9c27b7d251a3">dimensions</a>&nbsp;</td>
+          <td class="paramname"> <em>dim</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Swaps the image along a dimension dim in image space. </p>
+
+<p>Definition at line <a class="el" href="chunk_8cpp_source.html#l00277">277</a> of file <a class="el" href="chunk_8cpp_source.html">chunk.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a16aa9a83e1a33ab98889d50b61b6e726"></a><!-- doxytag: member="isis::data::Chunk::transformCoords" ref="a16aa9a83e1a33ab98889d50b61b6e726" args="(boost::numeric::ublas::matrix&lt; float &gt; transform_matrix, bool transformCenterIsImageCenter=false)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool isis::data::Chunk::transformCoords </td>
           <td>(</td>
           <td class="paramtype">boost::numeric::ublas::matrix&lt; float &gt;&nbsp;</td>
-          <td class="paramname"> <em>transform_matrix</em></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td><code> [inline]</code></td>
+          <td class="paramname"> <em>transform_matrix</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&nbsp;</td>
+          <td class="paramname"> <em>transformCenterIsImageCenter</em> = <code>false</code></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td><code> [inline]</code></td>
         </tr>
       </table>
 </div>
@@ -1163,9 +1214,9 @@ template&lt;typename T &gt; </div>
 
 <p>Transforms the image coordinate system into an other system by multiplying the orientation matrix with a user defined transformation matrix. </p>
 <p>Additionally, the index origin will be transformed into the new coordinate system. This function only changes the</p>
-<p><b>IMPORTANT!</b>: If you call this function with a matrix other than the identidy matrix, it's not guaranteed that the image is still in ISIS space according to the DICOM conventions. Eventuelly some ISIS algorithms that depend on correct image orientations won't work as expected. Use this method with caution! </p>
+<p><b>IMPORTANT!</b>: If you call this function with a matrix other than the identidy matrix, it's not guaranteed that the image is still in ISIS space according to the DICOM conventions. Maybe some ISIS algorithms that depend on correct image orientations won't work as expected. Use this method with caution! </p>
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00237">237</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00242">242</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -1231,7 +1282,7 @@ template&lt;typename TYPE &gt; </div>
 <p>Gets a reference to the element at a given index. </p>
 <p>If index is invalid, behaviour is undefined. Most probably it will crash. If _ENABLE_DATA_DEBUG is true an error message will be send (but it will _not_ stop). </p>
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00082">82</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00087">87</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -1277,7 +1328,7 @@ template&lt;typename TYPE &gt; </div>
 <p>Gets a const reference of the element at a given index. </p>
 <p>If index is invalid, behaviour is undefined. Most probably it will crash. If _ENABLE_DATA_DEBUG is true an error message will be send (but it will _not_ stop). </p>
  
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00094">94</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00099">99</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -1293,7 +1344,22 @@ template&lt;typename TYPE &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00056">56</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00064">64</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ab08c7a17dcab7b971ff06806810da47f"></a><!-- doxytag: member="isis::data::Chunk::std::vector&lt; Chunk &gt;" ref="ab08c7a17dcab7b971ff06806810da47f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">friend class std::vector&lt; <a class="el" href="classisis_1_1data_1_1Chunk.html">Chunk</a> &gt;<code> [friend]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="chunk_8hpp_source.html#l00065">65</a> of file <a class="el" href="chunk_8hpp_source.html">chunk.hpp</a>.</p>
 
 </div>
 </div>
@@ -1302,7 +1368,7 @@ template&lt;typename TYPE &gt; </div>
 <li>/scr/thulium1/isis/lib/Core/DataStorage/<a class="el" href="chunk_8cpp_source.html">chunk.cpp</a></li>
 </ul>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Apr 19 2011 16:19:27 for ISIS Core Library by&nbsp;
+<hr class="footer"/><address class="footer"><small>Generated on Fri Jun 10 2011 10:57:32 for ISIS Core Library by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.1 </small></address>
 </body>

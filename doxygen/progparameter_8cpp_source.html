@@ -129,44 +129,58 @@
 <a name="l00098"></a>00098                 i++;
 <a name="l00099"></a>00099             }
 <a name="l00100"></a>00100 
-<a name="l00101"></a>00101             iterator found = find( pName );
-<a name="l00102"></a>00102 
-<a name="l00103"></a>00103             <span class="keywordflow">if</span>( found == end() ) {
-<a name="l00104"></a>00104                 <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a4a3b00679646637c274dc4d13b6b8abb">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;Ignoring unknown parameter &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">MSubject</a>( std::string( <span class="stringliteral">&quot;-&quot;</span> ) + pName + <span class="stringliteral">&quot; &quot;</span> + <a class="code" href="namespaceisis_1_1util.html#a8eedeaea8a5e6fb7849880fc5b4d4648" title="use listToOStream to create a string from a list">listToString</a>( argv + start, argv + i, <span class="stringliteral">&quot; &quot;</span>, <span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;&quot;</span> ) );
-<a name="l00105"></a>00105             } <span class="keywordflow">else</span> <span class="keywordflow">if</span> ( found-&gt;second.parse( <a class="code" href="namespaceisis_1_1util.html#a8eedeaea8a5e6fb7849880fc5b4d4648" title="use listToOStream to create a string from a list">listToString</a>( argv + start, argv + i, <span class="stringliteral">&quot;,&quot;</span>, <span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;&quot;</span> ) ) ) { <span class="comment">// parse the collected properties</span>
-<a name="l00106"></a>00106                 found-&gt;second.needed() = <span class="keyword">false</span>;<span class="comment">//remove needed flag, because the value is set (aka &quot;not needed anymore&quot;)</span>
-<a name="l00107"></a>00107             } <span class="keywordflow">else</span> {
-<a name="l00108"></a>00108                 <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a4a3b00679646637c274dc4d13b6b8abb">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )
-<a name="l00109"></a>00109                         &lt;&lt; <span class="stringliteral">&quot;Failed to parse value(s) &quot;</span>
-<a name="l00110"></a>00110                         &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">MSubject</a>( <a class="code" href="namespaceisis_1_1util.html#a8eedeaea8a5e6fb7849880fc5b4d4648" title="use listToOStream to create a string from a list">listToString</a>( argv + start, argv + i, <span class="stringliteral">&quot; &quot;</span>, <span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;&quot;</span> ) )
-<a name="l00111"></a>00111                         &lt;&lt; <span class="stringliteral">&quot; for &quot;</span>  &lt;&lt; found-&gt;first &lt;&lt; <span class="stringliteral">&quot;(&quot;</span> &lt;&lt; found-&gt;second-&gt;getTypeName() &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;
-<a name="l00112"></a>00112                 parsed = <span class="keyword">false</span>;
-<a name="l00113"></a>00113             }
-<a name="l00114"></a>00114         }
-<a name="l00115"></a>00115     }
-<a name="l00116"></a>00116 
-<a name="l00117"></a>00117     <span class="keywordflow">return</span> parsed ;
-<a name="l00118"></a>00118 }
-<a name="l00119"></a><a class="code" href="classisis_1_1util_1_1ParameterMap.html#a29557f68b2f42266e8c64d6d842cd5ab">00119</a> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1ParameterMap.html#a29557f68b2f42266e8c64d6d842cd5ab">ParameterMap::isComplete</a>()<span class="keyword">const</span>
-<a name="l00120"></a>00120 <span class="keyword"></span>{
-<a name="l00121"></a>00121     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( ! parsed, <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;You did not run parse() yet. This is very likely an error&quot;</span>;
-<a name="l00122"></a>00122     <span class="keywordflow">return</span> std::find_if( begin(), end(), neededP() ) == end();
-<a name="l00123"></a>00123 }
-<a name="l00124"></a>00124 
-<a name="l00125"></a><a class="code" href="classisis_1_1util_1_1ProgParameter.html#a05fe01bb5e99d1fce7712b9fef72be4c">00125</a> ProgParameter::operator boost::scoped_ptr&lt;_internal::ValueBase&gt;::unspecified_bool_type()<span class="keyword">const</span>
-<a name="l00126"></a>00126 <span class="keyword"></span>{
-<a name="l00127"></a>00127     boost::scoped_ptr&lt;_internal::ValueBase&gt; dummy;
-<a name="l00128"></a>00128 
-<a name="l00129"></a>00129     <span class="keywordflow">if</span>( ( *this )-&gt;castTo&lt;<span class="keywordtype">bool</span>&gt;() )dummy.reset( <span class="keyword">new</span> <a class="code" href="classisis_1_1util_1_1Value.html" title="Generic class for type aware variables.">Value&lt;int16_t&gt;</a> );
+<a name="l00101"></a>00101             std::list&lt;std::string&gt; matchingStrings;
+<a name="l00102"></a>00102             BOOST_FOREACH( ParameterMap::const_reference parameterRef, *<span class="keyword">this</span> ) {
+<a name="l00103"></a>00103                 <span class="keywordflow">if</span>( parameterRef.first.find( pName ) == 0 ) {
+<a name="l00104"></a>00104                     matchingStrings.push_back( parameterRef.first );
+<a name="l00105"></a>00105                 }
+<a name="l00106"></a>00106             }
+<a name="l00107"></a>00107 
+<a name="l00108"></a>00108             <span class="keywordflow">if</span>( matchingStrings.size() &gt; 1 ) {
+<a name="l00109"></a>00109                 std::stringstream matchingStringStream;
+<a name="l00110"></a>00110                 BOOST_FOREACH( std::list&lt;std::string&gt;::const_reference stringRef, matchingStrings ) {
+<a name="l00111"></a>00111                     matchingStringStream &lt;&lt; stringRef &lt;&lt; <span class="stringliteral">&quot; &quot;</span>;
+<a name="l00112"></a>00112                 }
+<a name="l00113"></a>00113                 <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a4a3b00679646637c274dc4d13b6b8abb">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> )
+<a name="l00114"></a>00114                         &lt;&lt; <span class="stringliteral">&quot;The parameter \&quot;&quot;</span> &lt;&lt; pName &lt;&lt; <span class="stringliteral">&quot;\&quot; is ambiguous. The parameters \&quot;&quot;</span>
+<a name="l00115"></a>00115                         &lt;&lt; matchingStringStream.str().erase( matchingStringStream.str().size() - 1, 1 )
+<a name="l00116"></a>00116                         &lt;&lt; <span class="stringliteral">&quot;\&quot; are possible. Ignoring this parameter!&quot;</span>;
+<a name="l00117"></a>00117             } <span class="keywordflow">else</span> <span class="keywordflow">if</span> ( !matchingStrings.size() ) {
+<a name="l00118"></a>00118                 <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a4a3b00679646637c274dc4d13b6b8abb">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a5e3b72b2efcd89afa9487c776fb12d19">warning</a> ) &lt;&lt; <span class="stringliteral">&quot;Ignoring unknown parameter &quot;</span> &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">MSubject</a>( std::string( <span class="stringliteral">&quot;-&quot;</span> ) + pName + <span class="stringliteral">&quot; &quot;</span> + <a class="code" href="namespaceisis_1_1util.html#a8eedeaea8a5e6fb7849880fc5b4d4648" title="use listToOStream to create a string from a list">listToString</a>( argv + start, argv + i, <span class="stringliteral">&quot; &quot;</span>, <span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;&quot;</span> ) );
+<a name="l00119"></a>00119             } <span class="keywordflow">else</span> <span class="keywordflow">if</span> ( at( matchingStrings.front() ).<a class="code" href="classisis_1_1util_1_1ParameterMap.html#aa7687a42f9087453f7c05f5bb041e11b" title="Reads and tokenizes argv, detecs the parameter names (names are preceded by a &amp;quot;-&amp;quot;) and send...">parse</a>( <a class="code" href="namespaceisis_1_1util.html#a8eedeaea8a5e6fb7849880fc5b4d4648" title="use listToOStream to create a string from a list">listToString</a>( argv + start, argv + i, <span class="stringliteral">&quot;,&quot;</span>, <span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;&quot;</span> ) ) ) { <span class="comment">// parse the collected properties</span>
+<a name="l00120"></a>00120                 at( matchingStrings.front() ).needed() = <span class="keyword">false</span>; <span class="comment">//remove needed flag, because the value is set (aka &quot;not needed anymore&quot;)</span>
+<a name="l00121"></a>00121             } <span class="keywordflow">else</span> {
+<a name="l00122"></a>00122                 <a class="code" href="log_8hpp.html#adf04aa30f03b88d867f551c7d349f738">LOG</a>( <a class="code" href="namespaceisis_1_1util.html#a4a3b00679646637c274dc4d13b6b8abb">Runtime</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> )
+<a name="l00123"></a>00123                         &lt;&lt; <span class="stringliteral">&quot;Failed to parse value(s) &quot;</span>
+<a name="l00124"></a>00124                         &lt;&lt; <a class="code" href="classisis_1_1util_1_1MSubject.html">MSubject</a>( <a class="code" href="namespaceisis_1_1util.html#a8eedeaea8a5e6fb7849880fc5b4d4648" title="use listToOStream to create a string from a list">listToString</a>( argv + start, argv + i, <span class="stringliteral">&quot; &quot;</span>, <span class="stringliteral">&quot;&quot;</span>, <span class="stringliteral">&quot;&quot;</span> ) )
+<a name="l00125"></a>00125                         &lt;&lt; <span class="stringliteral">&quot; for &quot;</span>  &lt;&lt; matchingStrings.front() &lt;&lt; <span class="stringliteral">&quot;(&quot;</span> &lt;&lt; at( matchingStrings.front() )-&gt;getTypeName() &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;
+<a name="l00126"></a>00126                 parsed = <span class="keyword">false</span>;
+<a name="l00127"></a>00127             }
+<a name="l00128"></a>00128         }
+<a name="l00129"></a>00129     }
 <a name="l00130"></a>00130 
-<a name="l00131"></a>00131     <span class="keywordflow">return</span>  dummy;
+<a name="l00131"></a>00131     <span class="keywordflow">return</span> parsed ;
 <a name="l00132"></a>00132 }
-<a name="l00133"></a>00133 
-<a name="l00134"></a>00134 }
-<a name="l00135"></a>00135 }
+<a name="l00133"></a><a class="code" href="classisis_1_1util_1_1ParameterMap.html#a29557f68b2f42266e8c64d6d842cd5ab">00133</a> <span class="keywordtype">bool</span> <a class="code" href="classisis_1_1util_1_1ParameterMap.html#a29557f68b2f42266e8c64d6d842cd5ab">ParameterMap::isComplete</a>()<span class="keyword">const</span>
+<a name="l00134"></a>00134 <span class="keyword"></span>{
+<a name="l00135"></a>00135     <a class="code" href="log_8hpp.html#a977f6c27373576d6ffe1523fc2afb8b6">LOG_IF</a>( ! parsed, <a class="code" href="namespaceisis_1_1util.html#a5009e783638181127c5e094542db1a93">Debug</a>, <a class="code" href="group__util.html#ggafe55030315ca143f9be26fd278df9f82a41a0a4591faa6079940551ad22c43597">error</a> ) &lt;&lt; <span class="stringliteral">&quot;You did not run parse() yet. This is very likely an error&quot;</span>;
+<a name="l00136"></a>00136     <span class="keywordflow">return</span> std::find_if( begin(), end(), neededP() ) == end();
+<a name="l00137"></a>00137 }
+<a name="l00138"></a>00138 
+<a name="l00139"></a><a class="code" href="classisis_1_1util_1_1ProgParameter.html#a05fe01bb5e99d1fce7712b9fef72be4c">00139</a> ProgParameter::operator boost::scoped_ptr&lt;_internal::ValueBase&gt;::unspecified_bool_type()<span class="keyword">const</span>
+<a name="l00140"></a>00140 <span class="keyword"></span>{
+<a name="l00141"></a>00141     boost::scoped_ptr&lt;_internal::ValueBase&gt; dummy;
+<a name="l00142"></a>00142 
+<a name="l00143"></a>00143     <span class="keywordflow">if</span>( ( *this )-&gt;castTo&lt;<span class="keywordtype">bool</span>&gt;() )dummy.reset( <span class="keyword">new</span> <a class="code" href="classisis_1_1util_1_1Value.html" title="Generic class for type aware variables.">Value&lt;int16_t&gt;</a> );
+<a name="l00144"></a>00144 
+<a name="l00145"></a>00145     <span class="keywordflow">return</span>  dummy;
+<a name="l00146"></a>00146 }
+<a name="l00147"></a>00147 
+<a name="l00148"></a>00148 }
+<a name="l00149"></a>00149 }
 </pre></div></div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Apr 19 2011 16:19:14 for ISIS Core Library by&nbsp;
+<hr class="footer"/><address class="footer"><small>Generated on Fri Jun 10 2011 10:57:21 for ISIS Core Library by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.1 </small></address>
 </body>
