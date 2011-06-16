@@ -35,6 +35,7 @@ namespace util
 namespace _internal
 {
 /// @cond _hidden
+/// @cond _hidden
 template<typename TYPE> struct __cast_to {
 	template<typename SOURCE> TYPE operator()( Value<TYPE>*, const SOURCE &value ) {
 		return boost::lexical_cast<TYPE>( value ); //generic version types are different - so do lexical cast
@@ -45,13 +46,16 @@ template<typename TYPE> struct __cast_to {
 };
 template<> struct __cast_to<uint8_t> { // we cannot lexical_cast to uint8_t - we'll get "characters" (1 => '1' == 49)
 	template<typename SOURCE> uint8_t operator()( Value<uint8_t>*, const SOURCE &value ) {
+		// lexical cast to unsigned short
+		const unsigned short val=boost::lexical_cast<unsigned short>( value );
+
 		// have to check by hand because the lexical cast will only check against unsigned short
-		if( value > std::numeric_limits<uint8_t>::max() ) {
+		if( val > std::numeric_limits<uint8_t>::max() ) {
 			throw boost::bad_lexical_cast( typeid( SOURCE ), typeid( uint8_t ) );
 		}
 
-		// lexical cast to unsigned short and then static_cast to uint8_t
-		return static_cast<uint8_t>( boost::lexical_cast<unsigned short>( value ) );
+		// and then static_cast to uint8_t
+		return static_cast<uint8_t>( val );
 	}
 	uint8_t operator()( Value<uint8_t> *, const uint8_t &value ) {
 		return value; //special version types are same - so just return the value
