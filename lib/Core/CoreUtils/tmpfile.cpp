@@ -40,7 +40,7 @@ TmpFile::TmpFile( std::string prefix, std::string sufix )
 	boost::filesystem::path dummy( tmpnam( NULL ) );
 	boost::filesystem::path::operator=( dummy.branch_path() / boost::filesystem::path( prefix + dummy.leaf() + sufix ) );
 	LOG( Debug, info ) << "Creating temporary file " << string();
-	std::ofstream( string().c_str() );
+	std::ofstream( string().c_str() ).exceptions( std::ios::failbit | std::ios::badbit );
 }
 
 TmpFile::~TmpFile()
