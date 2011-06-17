@@ -39,11 +39,11 @@ namespace image_io
 {
 
 // unfortunately VBit is not clearly defined - so adapt to what the system thinks it is
-typedef boost::mpl::if_<
-	boost::is_unsigned<VBit>::type,
-	uint8_t,
-	int8_t
-	>::type vista_bitmask_type;
+typedef boost::mpl::if_ <
+boost::is_unsigned<VBit>::type,
+	  uint8_t,
+	  int8_t
+	  >::type vista_bitmask_type;
 
 
 void

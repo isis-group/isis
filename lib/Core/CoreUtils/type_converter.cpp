@@ -309,7 +309,8 @@ template<typename DST> class ValueConverter<false, false, std::string, DST> : pu
 	boost::shared_ptr<const ValueConverterBase> inner_conv;
 	ValueConverter() {
 		typedef boost::is_arithmetic<DST> is_num;
-		if(is_num::value) // if DST is a number we can got via double to do a proper conversion
+
+		if( is_num::value ) // if DST is a number we can got via double to do a proper conversion
 			inner_conv =
 				ValueConverter<is_num::value, boost::is_same<double, DST>::value, double, DST>::get();
 
@@ -324,11 +325,11 @@ public:
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
 		const std::string &srcVal = src.castTo<std::string>();
 
-		if(inner_conv){ // if the target is a number first map to double and then convert that into DST
-			return inner_conv->convert(Value<double>(srcVal),dst);
+		if( inner_conv ) { // if the target is a number first map to double and then convert that into DST
+			return inner_conv->convert( Value<double>( srcVal ), dst );
 		} else { // otherwise try direct mapping (rounding will fail)
 			LOG( Debug, warning ) << "using lexical_cast to convert from string to "
-				<< Value<DST>::staticName() << " no rounding can be done.";
+								  << Value<DST>::staticName() << " no rounding can be done.";
 			DST &dstVal = dst.castTo<DST>();
 			dstVal = boost::lexical_cast<DST>( srcVal );
 			return boost::numeric::cInRange; //@todo handle bad casts

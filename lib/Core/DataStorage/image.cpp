@@ -183,7 +183,7 @@ util::fvector4 Image::getPhysicalCoordsFromIndex( const isis::util::ivector4 &vo
 	return  util::fvector4( voxelCoords[0] * m_RowVec[0] + voxelCoords[1] * m_ColumnVec[0] + voxelCoords[2] * m_SliceVec[0],
 							voxelCoords[0] * m_RowVec[1] + voxelCoords[1] * m_ColumnVec[1] + voxelCoords[2] * m_SliceVec[1],
 							voxelCoords[0] * m_RowVec[2] + voxelCoords[1] * m_ColumnVec[2] + voxelCoords[2] * m_SliceVec[2],
-							voxelCoords[3])
+							voxelCoords[3] )
 			+ m_Offset ;
 }
 
@@ -196,7 +196,7 @@ util::ivector4 Image::getIndexFromPhysicalCoords( const isis::util::fvector4 &ph
 	util::fvector4 ret = util::fvector4( vec1[0] * m_RowVecInv[0] + vec1[1] * m_ColumnVecInv[0] + vec1[2] * m_SliceVecInv[0],
 										 vec1[0] * m_RowVecInv[1] + vec1[1] * m_ColumnVecInv[1] + vec1[2] * m_SliceVecInv[1],
 										 vec1[0] * m_RowVecInv[2] + vec1[1] * m_ColumnVecInv[2] + vec1[2] * m_SliceVecInv[2],
-										 vec1[3]);
+										 vec1[3] );
 	return  util::Value<util::fvector4>( ret ).as<util::ivector4>();
 }
 
@@ -259,9 +259,11 @@ dimensions Image::mapScannerAxesToImageDimension( scannerAxis scannerAxes )
 	latchedOrientation( m_RowVec.getBiggestVecElemAbs(), 0 ) = m_RowVec[m_RowVec.getBiggestVecElemAbs()] < 0 ? -1 : 1;
 	latchedOrientation( m_ColumnVec.getBiggestVecElemAbs(), 1 ) = m_ColumnVec[m_ColumnVec.getBiggestVecElemAbs()] < 0 ? -1 : 1;
 	latchedOrientation( m_SliceVec.getBiggestVecElemAbs(), 2 ) = m_SliceVec[m_SliceVec.getBiggestVecElemAbs()] < 0 ? -1 : 1;
-	for(size_t i = 0; i<3; i++ ) {
+
+	for( size_t i = 0; i < 3; i++ ) {
 		mapping( i ) = i;
 	}
+
 	return static_cast<dimensions>( boost::numeric::ublas::prod( latchedOrientation, mapping )( scannerAxes ) );
 
 
