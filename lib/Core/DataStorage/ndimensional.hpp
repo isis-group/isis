@@ -89,8 +89,9 @@ public:
 		return __dim2index < DIMS - 1 > ( d, m_dim );
 	}
 	/**
-	 * Compute linear index from n-dimensional index,
-	 * \param d array of indexes (d[0] is most iterating element / lowest dimension)
+	 * Compute coordinates from linear index,
+	 * \param d array to put the computed coordinates in (d[0] will be most iterating element / lowest dimension)
+	 * \param index the linear index to compute the coordinates from
 	 */
 	void getCoordsFromLinIndex( const size_t index, size_t d[DIMS] )const {
 		__index2dim < DIMS - 1 > ( index, d, m_dim, getVolume() / m_dim[DIMS - 1] );

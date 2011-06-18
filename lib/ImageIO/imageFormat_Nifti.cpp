@@ -654,6 +654,7 @@ private:
 		util::fvector4 columnVec = image.getPropertyAs<util::fvector4>( "columnVec" );
 		util::fvector4 sliceVec = image.getPropertyAs<util::fvector4>( "sliceVec" );
 		util::fvector4 indexOrigin = image.getPropertyAs<util::fvector4>( "indexOrigin" );
+
 		if( image.hasProperty( "nifti/qform_code" ) )
 			ni.qform_code =  image.getPropertyAs<int>( "nifti/qform_code" );
 

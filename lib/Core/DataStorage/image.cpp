@@ -182,7 +182,8 @@ util::fvector4 Image::getPhysicalCoordsFromIndex( const isis::util::ivector4 &vo
 {
 	return  util::fvector4( voxelCoords[0] * m_RowVec[0] + voxelCoords[1] * m_ColumnVec[0] + voxelCoords[2] * m_SliceVec[0],
 							voxelCoords[0] * m_RowVec[1] + voxelCoords[1] * m_ColumnVec[1] + voxelCoords[2] * m_SliceVec[1],
-							voxelCoords[0] * m_RowVec[2] + voxelCoords[1] * m_ColumnVec[2] + voxelCoords[2] * m_SliceVec[2] )
+							voxelCoords[0] * m_RowVec[2] + voxelCoords[1] * m_ColumnVec[2] + voxelCoords[2] * m_SliceVec[2],
+							voxelCoords[3] )
 			+ m_Offset ;
 }
 
@@ -194,7 +195,8 @@ util::ivector4 Image::getIndexFromPhysicalCoords( const isis::util::fvector4 &ph
 	util::fvector4 vec1 = physicalCoords - m_Offset;
 	util::fvector4 ret = util::fvector4( vec1[0] * m_RowVecInv[0] + vec1[1] * m_ColumnVecInv[0] + vec1[2] * m_SliceVecInv[0],
 										 vec1[0] * m_RowVecInv[1] + vec1[1] * m_ColumnVecInv[1] + vec1[2] * m_SliceVecInv[1],
-										 vec1[0] * m_RowVecInv[2] + vec1[1] * m_ColumnVecInv[2] + vec1[2] * m_SliceVecInv[2] );
+										 vec1[0] * m_RowVecInv[2] + vec1[1] * m_ColumnVecInv[2] + vec1[2] * m_SliceVecInv[2],
+										 vec1[3] );
 	return  util::Value<util::fvector4>( ret ).as<util::ivector4>();
 }
 
@@ -254,11 +256,11 @@ dimensions Image::mapScannerAxesToImageDimension( scannerAxis scannerAxes )
 	updateOrientationMatrices();
 	boost::numeric::ublas::matrix<float> latchedOrientation = boost::numeric::ublas::zero_matrix<float>( 3, 3 );
 	boost::numeric::ublas::vector<float>mapping( 3 );
+	latchedOrientation( m_RowVec.getBiggestVecElemAbs(), 0 ) = m_RowVec[m_RowVec.getBiggestVecElemAbs()] < 0 ? -1 : 1;
+	latchedOrientation( m_ColumnVec.getBiggestVecElemAbs(), 1 ) = m_ColumnVec[m_ColumnVec.getBiggestVecElemAbs()] < 0 ? -1 : 1;
+	latchedOrientation( m_SliceVec.getBiggestVecElemAbs(), 2 ) = m_SliceVec[m_SliceVec.getBiggestVecElemAbs()] < 0 ? -1 : 1;
 
-	for ( size_t i = 0; i < 3; i++ ) {
-		latchedOrientation( i, 0 ) = abs( m_RowVec[i] < 0 ? ceil( m_RowVec[i] - 0.5 ) : floor( m_RowVec[i] + 0.5 ) );
-		latchedOrientation( i, 1 ) = abs( m_ColumnVec[i] < 0 ? ceil( m_ColumnVec[i] - 0.5 ) : floor( m_ColumnVec[i] + 0.5 ) );
-		latchedOrientation( i, 2 ) = abs( m_SliceVec[i] < 0 ? ceil( m_SliceVec[i] - 0.5 ) : floor( m_SliceVec[i] + 0.5 ) );
+	for( size_t i = 0; i < 3; i++ ) {
 		mapping( i ) = i;
 	}
 

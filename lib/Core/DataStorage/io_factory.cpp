@@ -56,7 +56,8 @@ struct dialect_missing {
 	std::string dialect;
 	std::string filename;
 	bool operator()( IOFactory::FileFormatList::reference ref )const {
-		std::list<std::string> splitted = util::stringToList<std::string>( ref->dialects( filename ), ' ' );
+		const std::string dia=ref->dialects( filename );
+		std::list<std::string> splitted = util::stringToList<std::string>( dia, ' ' );
 		const bool ret = ( std::find( splitted.begin(), splitted.end(), dialect ) == splitted.end() );
 		LOG_IF( ret, Runtime, warning ) << ref->getName() << " does not support the requested dialect " << util::MSubject( dialect );
 		return ret;
@@ -86,7 +87,7 @@ IOFactory::IOFactory(): m_feedback( NULL )
 		if( boost::filesystem::exists( home ) ) {
 			findPlugins( home.directory_string() );
 		} else {
-			LOG( Runtime, info ) << home.directory_string() << "does not exist. Won't check for plugins there";
+			LOG( Runtime, info ) << home.directory_string() << " does not exist. Won't check for plugins there";
 		}
 	}
 

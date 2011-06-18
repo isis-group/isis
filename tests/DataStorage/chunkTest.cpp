@@ -273,42 +273,44 @@ BOOST_AUTO_TEST_CASE ( chunk_splice_test )//Copy chunks
 
 BOOST_AUTO_TEST_CASE ( chunk_swap_test )
 {
-	class :public data::VoxelOp<int>{
-		bool operator()( int &vox, const util::FixedVector<size_t, 4> & ){
-			vox=rand();
+	class : public data::VoxelOp<int>
+	{
+		bool operator()( int &vox, const util::FixedVector<size_t, 4> & ) {
+			vox = rand();
 			return true;
 		}
-	}randomize;
-	class SwapCheck:public data::VoxelOp<int>{
-		size_t swapidx,sizeRange;
+	} randomize;
+	class SwapCheck: public data::VoxelOp<int>
+	{
+		size_t swapidx, sizeRange;
 	public:
 		data::MemChunk<int> orig;
-		SwapCheck(data::MemChunk<int> &_orig,size_t _swapidx, size_t _sizeRange):orig(_orig),swapidx(_swapidx),sizeRange(_sizeRange){}
-		bool operator()( int &vox, const util::FixedVector<size_t, 4> &pos ){
-			util::FixedVector<size_t, 4> opos=pos;
-			opos[swapidx]=sizeRange-1-opos[swapidx];
-//			if(orig.voxel<int>(opos[0],opos[1],opos[2],opos[3])!=vox)
-//				std::cout << "Comparing " << pos << " against " << opos 
-//					<< "(" << vox << "!=" << orig.voxel<int>(opos[0],opos[1],opos[2],opos[3]) 
-//					<< ")" << std::endl;
-			return orig.voxel<int>(opos[0],opos[1],opos[2],opos[3])==vox;
+		SwapCheck( data::MemChunk<int> &_orig, size_t _swapidx, size_t _sizeRange ): orig( _orig ), swapidx( _swapidx ), sizeRange( _sizeRange ) {}
+		bool operator()( int &vox, const util::FixedVector<size_t, 4> &pos ) {
+			util::FixedVector<size_t, 4> opos = pos;
+			opos[swapidx] = sizeRange - 1 - opos[swapidx];
+			//          if(orig.voxel<int>(opos[0],opos[1],opos[2],opos[3])!=vox)
+			//              std::cout << "Comparing " << pos << " against " << opos
+			//                  << "(" << vox << "!=" << orig.voxel<int>(opos[0],opos[1],opos[2],opos[3])
+			//                  << ")" << std::endl;
+			return orig.voxel<int>( opos[0], opos[1], opos[2], opos[3] ) == vox;
 		}
 	};
-	
-	for (int dim=data::rowDim; dim<=data::timeDim; dim++) {// for each dim
+
+	for ( int dim = data::rowDim; dim <= data::timeDim; dim++ ) { // for each dim
 		for( size_t sizeRange = 10; sizeRange < 21; sizeRange++ ) { // check with chunks of the size 10³-21³
 			//create chunk with random content
 			data::MemChunk<int> ch1( sizeRange, sizeRange, sizeRange, sizeRange );
-			ch1.foreachVoxel(randomize);
-			
+			ch1.foreachVoxel( randomize );
+
 			//store a copy of the original data and the rest in the checker
-			SwapCheck swap_check(ch1,data::rowDim,sizeRange);
-			
+			SwapCheck swap_check( ch1, data::rowDim, sizeRange );
+
 			ch1.swapAlong( data::rowDim );//swap ch1
-			BOOST_CHECK_EQUAL(ch1.foreachVoxel(swap_check), 0);//run check for swapped ch1 and and original copy in swap_check
+			BOOST_CHECK_EQUAL( ch1.foreachVoxel( swap_check ), 0 ); //run check for swapped ch1 and and original copy in swap_check
 
 			ch1.swapAlong( data::rowDim );//swap it back
-			BOOST_CHECK(ch1.compareRange(0,ch1.getVolume()-1,swap_check.orig,0)==0); //check for equality with the original copy in swap_check
+			BOOST_CHECK( ch1.compareRange( 0, ch1.getVolume() - 1, swap_check.orig, 0 ) == 0 ); //check for equality with the original copy in swap_check
 		}
 	}
 }

@@ -18,8 +18,8 @@ project(ISIS)
 # set isis version number
 ############################################################
 set(ISIS_VERSION_MAJOR "0")
-set(ISIS_VERSION_MINOR "4")
-set(ISIS_VERSION_PATCH "0")
+set(ISIS_VERSION_MINOR "3")
+set(ISIS_VERSION_PATCH "2")
 
 add_definitions(-D_ISIS_VERSION_MAJOR=${ISIS_VERSION_MAJOR})
 add_definitions(-D_ISIS_VERSION_MINOR=${ISIS_VERSION_MINOR})
@@ -56,8 +56,7 @@ if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
 endif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" )
 
 ############################################################
-# Logging options are global for all components using the
-# core library.
+# Logging options are global for all components in the tree
 ############################################################
 option(ISIS_RUNTIME_LOG "Enable runtime logging" ON)
 option(ISIS_DEBUG_LOG "Enable debug logging" ON)
