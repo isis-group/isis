@@ -792,7 +792,7 @@ size_t Image::spliceDownTo( dimensions dim ) //rowDim = 0, columnDim, sliceDim, 
 				const size_t subSize = m_image.getSizeAsVector()[topDim];
 				assert( !( m_amount % subSize ) ); // there must not be any "remaining"
 				splicer sub( m_dim, m_amount / subSize, m_image );
-				BOOST_FOREACH( const Chunk & ref, ch.autoSplice( m_amount / subSize ) ) {
+				BOOST_FOREACH( const Chunk & ref, ch.autoSplice( uint32_t( m_amount / subSize ) ) ) {
 					sub( ref );
 				}
 			} else { // seems like we're done - insert it into the image

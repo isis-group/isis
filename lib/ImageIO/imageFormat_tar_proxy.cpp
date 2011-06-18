@@ -163,7 +163,7 @@ public:
 #elif HAVE_POSIX_FALLOCATE
 					const int err = posix_fallocate( mfile, 0, size ); // slower posix compatible version
 #else
-					const int err = ( lseek( mfile, size - 1, SEEK_SET ) == size - 1 && ::write( mfile, " ", 1 ) ) ? 0 : errno; //workaround in case there is no fallocate
+					const int err = ( lseek( mfile, size - 1, SEEK_SET ) == off_t(size - 1) && ::write( mfile, " ", 1 ) ) ? 0 : errno; //workaround in case there is no fallocate
 #endif
 
 					if( err ) {
@@ -208,7 +208,7 @@ public:
 		return ret;
 	}
 
-	void write( const data::Image &image, const std::string &filename, const std::string &dialect )throw( std::runtime_error & ) {
+	void write( const data::Image &/*image*/, const std::string &/*filename*/, const std::string &/*dialect*/ )throw( std::runtime_error & ) {
 		throw( std::runtime_error( "Writing to tar is not (yet) implemented" ) );
 	}
 	bool tainted()const {return false;}//internal plugins are not tainted

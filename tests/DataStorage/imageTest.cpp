@@ -251,7 +251,6 @@ BOOST_AUTO_TEST_CASE ( type_scale_test )
 	chunks.back().voxel<uint16_t>( 0, 0, 0 ) = 2500;
 
 	data::Image img( chunks );
-	const size_t size[] = {4, 4, 4, 1};
 	BOOST_CHECK( img.isClean() );
 	BOOST_CHECK( img.isValid() );
 

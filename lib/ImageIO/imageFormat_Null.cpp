@@ -29,8 +29,8 @@ public:
 			const size_t images = 5;
 			const size_t timesteps = 10;
 
-			for ( size_t i = 0; i < timesteps; i++ ) {
-				for ( size_t c = 0; c < images; c++ ) {
+			for ( uint32_t i = 0; i < timesteps; i++ ) {
+				for ( uint32_t c = 0; c < images; c++ ) {
 
 					data::MemChunk<uint8_t> ch( 50, 50, 50 );
 					ch.setPropertyAs( "indexOrigin", util::fvector4( 1, 2, 3 ) );
@@ -99,9 +99,9 @@ public:
 
 			ch.setPropertyAs<size_t>( "timeUsedInS", ( ( float )( std::time( NULL ) - secondsStart ) ) ) ;
 			chunks.push_back( ch );
+			return 1;
 		}
-
-
+		return 0;
 	}
 
 	void write( const data::Image &image, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
