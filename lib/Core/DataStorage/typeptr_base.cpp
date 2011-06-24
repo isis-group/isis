@@ -137,15 +137,10 @@ void ValuePtrBase::copyRange( size_t start, size_t end, ValuePtrBase &dst, size_
 scaling_pair ValuePtrBase::getScalingTo( unsigned short typeID, const std::pair<util::ValueReference, util::ValueReference> &minmax, autoscaleOption scaleopt )const
 {
 	LOG_IF( minmax.first.isEmpty() || minmax.second.isEmpty(), Debug, error ) << "One of the ValueReference's in minmax is empty(). This will crash...";
-	return getScalingTo( typeID, *minmax.first, *minmax.second, scaleopt );
-}
-
-scaling_pair ValuePtrBase::getScalingTo( unsigned short typeID, const util::_internal::ValueBase &min, const util::_internal::ValueBase &max, autoscaleOption scaleopt )const
-{
 	const Converter &conv = getConverterTo( typeID );
 
 	if ( conv ) {
-		return conv->getScaling( min, max, scaleopt );
+		return conv->getScaling( *minmax.first, *minmax.second, scaleopt );
 	} else {
 		LOG( Runtime, error )
 				<< "I dont know any conversion from " << util::MSubject( getTypeName() ) << " to " << util::MSubject( util::getTypeMap( false, true )[typeID] );
