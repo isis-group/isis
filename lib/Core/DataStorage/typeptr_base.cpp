@@ -39,6 +39,39 @@ size_t ValuePtrBase::compare( const ValuePtrBase &comp )const
 	return getLength() - comp.getLength() + compare( 0, std::min( getLength(), comp.getLength() ) - 1, comp, 0 );
 }
 
+size_t ValuePtrBase::compare( size_t start, size_t end, const _internal::ValuePtrBase &dst, size_t dst_start ) const {
+	assert( start <= end );
+	size_t ret = 0;
+	size_t _length = end - start;
+
+	if ( dst.getTypeID() != getTypeID() ) {
+		LOG( Debug, error )
+				<< "Comparing to a ValuePtr of different type(" << dst.getTypeName() << ", not " << getTypeName()
+				<< "). Assuming all voxels to be different";
+		return _length;
+	}
+
+	LOG_IF( end >= getLength(), Runtime, error )
+			<< "End of the range (" << end << ") is behind the end of this ValuePtr (" << getLength() << ")";
+	LOG_IF( _length + dst_start >= dst.getLength(), Runtime, error )
+			<< "End of the range (" << _length + dst_start << ") is behind the end of the destination (" << dst.getLength() << ")";
+
+	// lock the memory so we can mem-compare the elements (use uint8_t because some compilers do not like arith on void*)
+	const boost::shared_ptr<const uint8_t>
+		src_s = boost::static_pointer_cast<const uint8_t>(getRawAddress().lock()),
+		dst_s = boost::static_pointer_cast<const uint8_t>(dst.getRawAddress().lock());
+	const uint8_t *src_p=src_s.get(),*dst_p=dst_s.get();
+	const size_t el_size=bytesPerElem();
+
+	for ( size_t i = start; i < end; i++ ) {
+		if ( memcmp(src_p+(i*el_size), dst_p+(i*el_size), el_size) != 0)
+			ret++;
+	}
+
+	return ret;
+}
+
+
 ValuePtrBase::Reference ValuePtrBase::copyToNewByID( unsigned short ID ) const
 {
 	return copyToNewByID( ID, getScalingTo( ID ) );

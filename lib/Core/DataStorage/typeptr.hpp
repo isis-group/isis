@@ -200,34 +200,6 @@ public:
 		memcpy( dst, &source, _length * sizeof( TYPE ) );
 	}
 
-	size_t compare( size_t start, size_t end, const _internal::ValuePtrBase &dst, size_t dst_start ) const {
-		assert( start <= end );
-		size_t ret = 0;
-		size_t _length = end - start;
-
-		if ( dst.getTypeID() != getTypeID() ) {
-			LOG( Debug, error )
-					<< "Comparing to a ValuePtr of different type(" << dst.getTypeName() << ", not " << getTypeName()
-					<< "). Assuming all voxels to be different";
-			return _length;
-		}
-
-		LOG_IF( end >= getLength(), Runtime, error )
-				<< "End of the range (" << end << ") is behind the end of this ValuePtr (" << getLength() << ")";
-		LOG_IF( _length + dst_start >= dst.getLength(), Runtime, error )
-				<< "End of the range (" << _length + dst_start << ") is behind the end of the destination (" << dst.getLength() << ")";
-		const ValuePtr<TYPE> &cmp = dst.castToValuePtr<TYPE>();
-		LOG( Debug, verbose_info ) << "Comparing " << dst.getTypeName() << " at " << &operator[]( 0 ) << " and " << &cmp[0];
-
-		for ( size_t i = start; i < end; i++ ) {
-			if ( ! ( operator[]( i ) == cmp[i] ) ) {
-				ret++;
-			}
-		}
-
-		return ret;
-	}
-
 	/// @copydoc util::Value::toString
 	virtual std::string toString( bool labeled = false )const {
 		std::string ret;

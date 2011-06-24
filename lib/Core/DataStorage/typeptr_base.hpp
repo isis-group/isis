@@ -192,7 +192,7 @@ public:
 	 * \param dst_start the first element in the given TyprPtr, which schould be compared to the first element in this
 	 * \returns the amount of elements which actually differ in both ValuePtr or the whole length of the range when the types are not equal.
 	 */
-	virtual size_t compare( size_t start, size_t end, const ValuePtrBase &dst, size_t dst_start )const = 0;
+	size_t compare( size_t start, size_t end, const ValuePtrBase &dst, size_t dst_start )const;
 
 	/**
 	 * Compare to another ValuePtr.
