@@ -285,7 +285,7 @@ BOOST_AUTO_TEST_CASE ( chunk_swap_test )
 		size_t swapidx, sizeRange;
 	public:
 		data::MemChunk<int> orig;
-		SwapCheck( data::MemChunk<int> &_orig, size_t _swapidx, size_t _sizeRange ): orig( _orig ), swapidx( _swapidx ), sizeRange( _sizeRange ) {}
+		SwapCheck( data::MemChunk<int> &_orig, size_t _swapidx, size_t _sizeRange ): swapidx( _swapidx ), sizeRange( _sizeRange ), orig( _orig ) {}
 		bool operator()( int &vox, const util::FixedVector<size_t, 4> &pos ) {
 			util::FixedVector<size_t, 4> opos = pos;
 			opos[swapidx] = sizeRange - 1 - opos[swapidx];

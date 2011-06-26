@@ -340,15 +340,22 @@ bool Image::reIndex()
 	//reconstruct some redundant information, if its missing
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	const util::PropertyMap::KeyType vectors[] = {"rowVec", "columnVec", "sliceVec"};
+	int oneCnt=0;
 	BOOST_FOREACH( const util::PropertyMap::KeyType & ref, vectors ) {
 		if ( hasProperty( ref ) ) {
 			util::PropertyValue &prop = propertyValue( ref );
 			LOG_IF( !prop->is<util::fvector4>(), Debug, error ) << "Using " << prop->getTypeName() << " as " << util::Value<util::fvector4>::staticName();
 			util::fvector4 &vec = prop->castTo<util::fvector4>();
-			LOG_IF( vec.len() == 0, Runtime, error )
-					<< "The existing " << ref << " " << vec << " has the length zero. Thats bad, because I'm going to normalize it.";
+			if(vec.sqlen() == 0){
+				util::fvector4  v_one;
+				v_one[oneCnt]=1;
+				LOG(Runtime, error )
+					<< "The existing " << ref << " " << vec << (hasProperty("source")? " from "+getPropertyAs<std::string>("source"):"") << " has the length zero. Falling back to " << v_one <<".";
+				vec=v_one;
+			}
 			vec.norm();
 		}
+		oneCnt++;
 	}
 
 	//if we have at least two slides (and have slides (with different positions) at all)
@@ -792,7 +799,7 @@ size_t Image::spliceDownTo( dimensions dim ) //rowDim = 0, columnDim, sliceDim, 
 				const size_t subSize = m_image.getSizeAsVector()[topDim];
 				assert( !( m_amount % subSize ) ); // there must not be any "remaining"
 				splicer sub( m_dim, m_amount / subSize, m_image );
-				BOOST_FOREACH( const Chunk & ref, ch.autoSplice( m_amount / subSize ) ) {
+				BOOST_FOREACH( const Chunk & ref, ch.autoSplice( uint32_t( m_amount / subSize ) ) ) {
 					sub( ref );
 				}
 			} else { // seems like we're done - insert it into the image
