@@ -190,15 +190,6 @@ public:
 		LOG( Debug, info ) << "Copying " << _length *sizeof( TYPE ) << " bytes from " << ValuePtr<TYPE>::staticName() << src << " to " << getTypeName() << &dest;
 		memcpy( &dest, src, _length * sizeof( TYPE ) );
 	}
-	/// Copy elements within a range [start,end] to raw memory
-	void copyToMem( size_t start, size_t end, TYPE *const dst )const {
-		assert( start <= end );
-		const size_t _length = end - start + 1;
-		LOG_IF( end >= getLength(), Runtime, error )
-				<< "End of the range (" << end << ") is behind the end of this ValuePtr (" << getLength() << ")";
-		const TYPE &source = this->operator[]( start );
-		memcpy( dst, &source, _length * sizeof( TYPE ) );
-	}
 
 	/// @copydoc util::Value::toString
 	virtual std::string toString( bool labeled = false )const {

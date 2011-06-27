@@ -87,10 +87,28 @@ ValuePtrBase::Reference ValuePtrBase::copyToNewByID( unsigned short ID, const sc
 	} else {
 		LOG( Runtime, error )
 				<< "I dont know any conversion from "
-				<< util::MSubject( toString( true ) ) << " to " << util::MSubject( util::getTypeMap( false, true )[ID] );
+				<< util::MSubject( getTypeName() ) << " to " << util::MSubject( util::getTypeMap( false, true )[ID] );
 		return Reference(); // return an empty Reference
 	}
 }
+
+bool ValuePtrBase::copyTo(isis::data::_internal::ValuePtrBase& dst, scaling_pair scaling) const
+{
+	const unsigned short dID=dst.getTypeID();
+	const Converter &conv = getConverterTo( dID );
+
+	if(!(scaling.first.isEmpty() && scaling.second.isEmpty()))
+		scaling=getScalingTo(dID);
+
+	if( conv ) {
+		conv->convert(*this,dst,scaling);
+		return true;
+	} else {
+		LOG( Runtime, error ) << "I dont know any conversion from "	<< util::MSubject( toString( true ) ) << " to " << dst.getTypeName();
+		return false;
+	}
+}
+
 
 ValuePtrBase::Reference ValuePtrBase::createById( unsigned short id, size_t len )
 {

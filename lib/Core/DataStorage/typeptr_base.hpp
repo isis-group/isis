@@ -88,12 +88,6 @@ public:
 	virtual scaling_pair getScalingTo( unsigned short typeID, const std::pair<util::ValueReference, util::ValueReference> &minmax, autoscaleOption scaleopt = autoscale )const;
 
 
-	/// Convert (or Copy) data from this to existing memory of maybe another type and the given length.
-	template<typename T> bool convertTo( T *dst, size_t len ) const {
-		ValuePtr<T> dest( dst, len, ValuePtr<T>::NonDeleter() );
-		return convertTo( dest );
-	}
-
 	/**
 	 * Create new data in memory containg a (converted) copy of this.
 	 * Allocates new memory of the requested ID and copies the content of this into that memory.
@@ -106,6 +100,34 @@ public:
 	 * \param scaling the scaling to be used if a conversion is necessary
 	 */
 	Reference copyToNewByID( unsigned short ID, const scaling_pair &scaling ) const;
+
+	
+	/**
+	 * Copies elements from this into another ValuePtr.
+	 * This is allways a deep copy, regardless of the types.
+	 * If necessary, a conversion will be done.
+	 * If the this and the target are not of the same length:
+	 * - the shorter length will be used
+	 * - a warning about it will be sent to Debug
+	 * \param dst the ValuePtr-object to copy into
+	 * \param scaling the scaling to be used if a conversion is done (computed automatically if not given)
+	 */
+	bool copyTo(isis::data::_internal::ValuePtrBase& dst, scaling_pair scaling=scaling_pair() )const;
+
+	/**
+	 * Copies elements from this into raw memory.
+	 * This is allways a deep copy, regardless of the types.
+	 * If the this and the target are not of the same length:
+	 * - the shorter length will be used
+	 * - a warning about it will be sent to Debug
+	 * \param dst pointer to the target memory
+	 * \param len size (in elements) of the target memory
+	 * \param scaling the scaling to be used if a conversion is done (computed automatically if not given)
+	 */
+	template<typename T> bool copyToMem(T *dst, size_t len, scaling_pair scaling=scaling_pair())const{
+		ValuePtr<T> cont(dst,len, typename ValuePtr<T>::NonDeleter());
+		return copyTo(cont,scaling);
+	}
 
 	/**
 	 * Create a ValuePtr of given type and length.
