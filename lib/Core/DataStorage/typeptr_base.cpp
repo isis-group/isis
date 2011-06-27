@@ -72,13 +72,12 @@ size_t ValuePtrBase::compare( size_t start, size_t end, const _internal::ValuePt
 }
 
 
-ValuePtrBase::Reference ValuePtrBase::copyToNewByID( unsigned short ID ) const
-{
-	return copyToNewByID( ID, getScalingTo( ID ) );
-}
-ValuePtrBase::Reference ValuePtrBase::copyToNewByID( unsigned short ID, const scaling_pair &scaling ) const
+ValuePtrBase::Reference ValuePtrBase::copyToNewByID( unsigned short ID, scaling_pair scaling ) const
 {
 	const Converter &conv = getConverterTo( ID );
+
+	if(!(scaling.first.isEmpty() && scaling.second.isEmpty()))
+		scaling=getScalingTo(ID);
 
 	if( conv ) {
 		boost::scoped_ptr<ValuePtrBase> ret;
@@ -163,23 +162,6 @@ scaling_pair ValuePtrBase::getScalingTo( unsigned short typeID, const std::pair<
 		LOG( Runtime, error )
 				<< "I dont know any conversion from " << util::MSubject( getTypeName() ) << " to " << util::MSubject( util::getTypeMap( false, true )[typeID] );
 		return scaling_pair();
-	}
-}
-bool ValuePtrBase::convertTo( ValuePtrBase &dst )const
-{
-	return convertTo( dst, getScalingTo( dst.getTypeID() ) );
-}
-bool ValuePtrBase::convertTo( ValuePtrBase &dst, const scaling_pair &scaling ) const
-{
-	const Converter &conv = getConverterTo( dst.getTypeID() );
-
-	if ( conv ) {
-		conv->convert( *this, dst, scaling );
-		return true;
-	} else {
-		LOG( Runtime, error )
-				<< "I dont know any conversion from " << util::MSubject( getTypeName() ) << " to " << util::MSubject( dst.getTypeName() );
-		return false;
 	}
 }
 size_t ValuePtrBase::useCount() const

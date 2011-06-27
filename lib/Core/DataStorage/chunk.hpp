@@ -174,10 +174,8 @@ public:
 	 */
 	bool convertToType( unsigned short ID, const scaling_pair &scaling );
 
-	template<typename T> bool copyToMem( T *dst, const scaling_pair &scaling )const {
-		// wrap the raw memory at into an non-deleting ValuePtr of the length of the chunk
-		ValuePtr<T> dstPtr( dst, getVolume(), typename ValuePtr<T>::NonDeleter() );
-		return getValuePtrBase().convertTo( dstPtr, scaling ); // copy-convert the data into dstPtr
+	template<typename T> bool copyToMem( T *dst, size_t len, scaling_pair scaling = scaling_pair() )const {
+		return getValuePtrBase().copyToMem<T>( dst, len,  scaling ); // use copyToMem of ValuePtrBase
 	}
 
 	///get the scaling (and offset) which would be used in an conversion to the given type

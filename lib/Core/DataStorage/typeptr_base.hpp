@@ -79,27 +79,17 @@ public:
 	 */
 	virtual std::vector<Reference> splice( size_t size )const = 0;
 
-	/// Copy (or Convert) data from this to another ValuePtr of maybe another type and the same length.
-	bool convertTo( ValuePtrBase &dst )const;
-	bool convertTo( ValuePtrBase &dst, const scaling_pair &scaling )const;
-
 	///get the scaling (and offset) which would be used in an convertTo
 	virtual scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const = 0;
 	virtual scaling_pair getScalingTo( unsigned short typeID, const std::pair<util::ValueReference, util::ValueReference> &minmax, autoscaleOption scaleopt = autoscale )const;
 
 
 	/**
-	 * Create new data in memory containg a (converted) copy of this.
-	 * Allocates new memory of the requested ID and copies the content of this into that memory.
-	 * \param ID the ID of the type the new ValuePtr (referenced by the Reference returned) should have
-	 */
-	Reference copyToNewByID( unsigned short ID ) const;
-	/**
 	 * @copydoc copyToNewByID
 	 * \param ID the ID of the type the new ValuePtr (referenced by the Reference returned) should have
-	 * \param scaling the scaling to be used if a conversion is necessary
+	 * \param scaling the scaling to be used if a conversion is necessary (computed automatically if not given)
 	 */
-	Reference copyToNewByID( unsigned short ID, const scaling_pair &scaling ) const;
+	Reference copyToNewByID( unsigned short ID, scaling_pair scaling = scaling_pair() ) const;
 
 	
 	/**
@@ -110,7 +100,7 @@ public:
 	 * - the shorter length will be used
 	 * - a warning about it will be sent to Debug
 	 * \param dst the ValuePtr-object to copy into
-	 * \param scaling the scaling to be used if a conversion is done (computed automatically if not given)
+	 * \param scaling the scaling to be used if a conversion is necessary (computed automatically if not given)
 	 */
 	bool copyTo(isis::data::_internal::ValuePtrBase& dst, scaling_pair scaling=scaling_pair() )const;
 
@@ -122,7 +112,7 @@ public:
 	 * - a warning about it will be sent to Debug
 	 * \param dst pointer to the target memory
 	 * \param len size (in elements) of the target memory
-	 * \param scaling the scaling to be used if a conversion is done (computed automatically if not given)
+	 * \param scaling the scaling to be used if a conversion is necessary (computed automatically if not given)
 	 */
 	template<typename T> bool copyToMem(T *dst, size_t len, scaling_pair scaling=scaling_pair())const{
 		ValuePtr<T> cont(dst,len, typename ValuePtr<T>::NonDeleter());
