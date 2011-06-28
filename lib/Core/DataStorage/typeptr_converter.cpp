@@ -55,9 +55,9 @@ size_t getConvertSize( const ValuePtrBase &src, const ValuePtrBase &dst )
 }
 
 //default implementation of ValuePtrConverterBase::getScaling - allways returns scaling of 1/0 - should be overridden by real converters if they do use a scaling
-scaling_pair ValuePtrConverterBase::getScaling(const isis::util::_internal::ValueBase& /*min*/, const isis::util::_internal::ValueBase& /*max*/, autoscaleOption /*scaleopt*/) const
+scaling_pair ValuePtrConverterBase::getScaling( const isis::util::_internal::ValueBase& /*min*/, const isis::util::_internal::ValueBase& /*max*/, autoscaleOption /*scaleopt*/ ) const
 {
-	static const scaling_pair ret(util::ValueReference( util::Value<uint8_t>( 1 ) ),util::ValueReference( util::Value<uint8_t>( 0 ) ));
+	static const scaling_pair ret( util::ValueReference( util::Value<uint8_t>( 1 ) ), util::ValueReference( util::Value<uint8_t>( 0 ) ) );
 	return ret;
 }
 
@@ -99,7 +99,7 @@ public:
 template<typename SRC, typename DST> class ValuePtrConverter<true, true, SRC, DST> : public ValuePtrGenerator<SRC, DST>
 {
 	ValuePtrConverter() {
-		LOG( Debug, verbose_info )	<< "Creating trivial copy converter for " << ValuePtr<SRC>::staticName();
+		LOG( Debug, verbose_info )  << "Creating trivial copy converter for " << ValuePtr<SRC>::staticName();
 	};
 public:
 	static boost::shared_ptr<const ValuePtrConverterBase> get() {
@@ -116,7 +116,7 @@ public:
 template<typename SRC, typename DST> class ValuePtrConverter<false, true, SRC, DST> : public ValuePtrGenerator<SRC, DST>
 {
 	ValuePtrConverter() {
-		LOG( Debug, verbose_info )	<< "Creating trivial copy converter for " << ValuePtr<SRC>::staticName();
+		LOG( Debug, verbose_info )  << "Creating trivial copy converter for " << ValuePtr<SRC>::staticName();
 	};
 public:
 	static boost::shared_ptr<const ValuePtrConverterBase> get() {
@@ -128,7 +128,7 @@ public:
 		ValuePtr<SRC> &dstVal = dst.castToValuePtr<SRC>();
 		const SRC *srcPtr = &src.castToValuePtr<SRC>()[0];
 		LOG_IF( !( scaling.first->eq( one ) && scaling.first->eq( zero ) ), Runtime, error ) << "Scaling is ignored when copying data of type " << src.getTypeName();
-		dstVal.copyFromMem( srcPtr,  getConvertSize(src,dst));
+		dstVal.copyFromMem( srcPtr,  getConvertSize( src, dst ) );
 	}
 	virtual ~ValuePtrConverter() {}
 };
@@ -140,7 +140,7 @@ public:
 template<typename SRC> class ValuePtrConverter<true, false, SRC, bool> : public ValuePtrGenerator<SRC, bool>
 {
 	ValuePtrConverter() {
-		LOG( Debug, verbose_info )	<< "Creating to-boolean converter for " << ValuePtr<SRC>::staticName();
+		LOG( Debug, verbose_info )  << "Creating to-boolean converter for " << ValuePtr<SRC>::staticName();
 	};
 public:
 	static boost::shared_ptr<const ValuePtrConverterBase> get() {
@@ -150,16 +150,17 @@ public:
 	void convert( const ValuePtrBase &src, ValuePtrBase &dst, const scaling_pair &/*scaling*/ )const {
 		const SRC *srcPtr = &src.castToValuePtr<SRC>()[0];
 		bool *dstPtr = &dst.castToValuePtr<bool>()[0];
-		size_t i = getConvertSize(src,dst);
+		size_t i = getConvertSize( src, dst );
 
 		while( i-- )
 			*( dstPtr++ ) = ( *( srcPtr++ ) != 0 );
 	}
 	virtual ~ValuePtrConverter() {}
 };
-template<typename DST> class ValuePtrConverter<true, false, bool, DST> : public ValuePtrGenerator<bool, DST> {
+template<typename DST> class ValuePtrConverter<true, false, bool, DST> : public ValuePtrGenerator<bool, DST>
+{
 	ValuePtrConverter() {
-		LOG( Debug, verbose_info )	<< "Creating from-boolean converter for " << ValuePtr<DST>::staticName();
+		LOG( Debug, verbose_info )  << "Creating from-boolean converter for " << ValuePtr<DST>::staticName();
 	};
 public:
 	static boost::shared_ptr<const ValuePtrConverterBase> get() {
@@ -169,10 +170,10 @@ public:
 	void convert( const ValuePtrBase &src, ValuePtrBase &dst, const scaling_pair &/*scaling*/ )const {
 		const bool *srcPtr = &src.castToValuePtr<bool>()[0];
 		DST *dstPtr = &dst.castToValuePtr<DST>()[0];
-		size_t i = getConvertSize(src,dst);
+		size_t i = getConvertSize( src, dst );
 
 		while( i-- )
-			*( dstPtr++ ) = *( srcPtr++ )? 1:0 ;
+			*( dstPtr++ ) = *( srcPtr++ ) ? 1 : 0 ;
 	}
 	virtual ~ValuePtrConverter() {}
 };
@@ -228,8 +229,7 @@ public:
 		std::complex<DST> *dp = &dst.castToValuePtr<std::complex<DST> >()[0];
 
 		while( sp != end ) {
-			dp->real() = _internal::round<DST>( sp->real() );
-			dp->imag() = _internal::round<DST>( sp->imag() );
+			*dp = std::complex<DST>( _internal::round<DST>( sp->real() ), _internal::round<DST>( sp->imag() ) );
 			++sp;
 			++dp;
 		}

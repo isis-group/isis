@@ -55,13 +55,14 @@ namespace image_io
 namespace _internal
 {
 
-class Flip : public data::Image::ChunkOp
+class Flip : public data::ChunkOp
 {
 	data::dimensions dim;
 public:
 	Flip( data::dimensions d ) { dim = d; }
 	bool operator()( data::Chunk &ch, util::FixedVector<size_t, 4> /*posInImage*/ ) {
-		return ch.swapAlong( dim );
+		ch.swapAlong( dim );
+		return true;
 	}
 };
 
@@ -135,7 +136,7 @@ public:
 	/***********************
 	 * load file
 	 ************************/
-	int load( std::list<data::Chunk> &retList, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
+	int load( std::list<data::Chunk> &retList, const std::string &filename, const std::string &/*dialect*/)  throw( std::runtime_error & ) {
 		//read the file with the function from nifti1_io.h
 		nifti_image *ni = nifti_image_read( filename.c_str(), true );
 
@@ -272,7 +273,7 @@ public:
 		boost::numeric::ublas::matrix<float> matrix = boost::numeric::ublas::identity_matrix<float>( 3, 3 );
 		matrix( 0, 0 ) = -1;
 		matrix( 1, 1 ) = -1;
-		image.transformCoords( matrix );		
+		image.transformCoords( matrix );
 		//set the props from the image to the nifti file
 		copyHeaderToNifti( image, ni );
 		// set filename for resulting image(s) due to Analyze vs. Nifti
@@ -653,6 +654,7 @@ private:
 		util::fvector4 columnVec = image.getPropertyAs<util::fvector4>( "columnVec" );
 		util::fvector4 sliceVec = image.getPropertyAs<util::fvector4>( "sliceVec" );
 		util::fvector4 indexOrigin = image.getPropertyAs<util::fvector4>( "indexOrigin" );
+
 		if( image.hasProperty( "nifti/qform_code" ) )
 			ni.qform_code =  image.getPropertyAs<int>( "nifti/qform_code" );
 
