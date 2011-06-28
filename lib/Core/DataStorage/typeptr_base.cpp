@@ -33,12 +33,6 @@ const ValuePtrBase::Converter &ValuePtrBase::getConverterTo( unsigned short ID )
 	return f2->second;
 }
 
-size_t ValuePtrBase::compare( const ValuePtrBase &comp )const
-{
-	LOG_IF( getLength() != comp.getLength(), Runtime, info ) << "Comparing data of different length. The difference will be added to the returned value.";
-	return getLength() - comp.getLength() + compare( 0, std::min( getLength(), comp.getLength() ) - 1, comp, 0 );
-}
-
 size_t ValuePtrBase::compare( size_t start, size_t end, const _internal::ValuePtrBase &dst, size_t dst_start ) const {
 	assert( start <= end );
 	size_t ret = 0;
@@ -125,6 +119,11 @@ ValuePtrBase::Reference ValuePtrBase::createById( unsigned short id, size_t len 
 		return Reference(); // return an empty Reference
 	}
 }
+ValuePtrBase::Reference ValuePtrBase::cloneToNew(size_t length) const
+{
+	return createById(getTypeID(),length);
+}
+
 
 void ValuePtrBase::copyRange( size_t start, size_t end, ValuePtrBase &dst, size_t dst_start )const
 {

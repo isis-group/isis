@@ -169,8 +169,7 @@ public:
 	 * \param d the deleter to be used when the data shall be deleted ( d() is called then )
 	 */
 
-	template<typename D> ValuePtr( TYPE *const ptr, size_t length, D d ):
-		_internal::ValuePtrBase( length ), m_val( ptr, d ) {}
+	template<typename D> ValuePtr( TYPE *const ptr, size_t length, D d ):_internal::ValuePtrBase( length ), m_val( ptr, d ) {}
 
 	virtual ~ValuePtr() {}
 
@@ -180,15 +179,6 @@ public:
 	 */
 	const boost::weak_ptr<void> getRawAddress()const {
 		return boost::weak_ptr<void>( m_val );
-	}
-
-	/// Copy elements from raw memory
-	void copyFromMem( const TYPE *const src, size_t _length ) {
-		LOG_IF( _length > getLength(), Runtime, error )
-				<< "Amount of the elements to copy from memory (" << _length << ") exceeds the length of the array (" << getLength() << ")";
-		TYPE &dest = this->operator[]( 0 );
-		LOG( Debug, info ) << "Copying " << _length *sizeof( TYPE ) << " bytes from " << ValuePtr<TYPE>::staticName() << src << " to " << getTypeName() << &dest;
-		memcpy( &dest, src, _length * sizeof( TYPE ) );
 	}
 
 	/// @copydoc util::Value::toString
@@ -239,15 +229,7 @@ public:
 	operator boost::shared_ptr<TYPE>&() {return m_val;}
 	operator const boost::shared_ptr<TYPE>&()const {return m_val;}
 
-	ValuePtrBase::Reference cloneToNew( size_t _length ) const {
-		return ValuePtrBase::Reference( new ValuePtr( ( TYPE * )malloc( _length * sizeof( TYPE ) ), _length ) );
-	}
-
-	size_t bytesPerElem() const {
-		return sizeof( TYPE );
-	}
-
-
+	size_t bytesPerElem()const{return sizeof( TYPE );}
 
 	std::pair<util::ValueReference, util::ValueReference> getMinMax()const {
 		if ( getLength() == 0 ) {

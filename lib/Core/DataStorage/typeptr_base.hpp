@@ -50,23 +50,26 @@ public:
 	template<typename T> bool is()const;
 
 	const Converter &getConverterTo( unsigned short ID )const;
+	
 	/**
 	* Dynamically cast the ValueBase up to its actual ValuePtr\<T\>. Constant version.
 	* Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
-	* \returns a constant reference of the pointer.
+	* \returns a constant reference of the ValuePtr.
 	*/
 	template<typename T> const ValuePtr<T>& castToValuePtr() const {
 		return m_cast_to<ValuePtr<T> >();
 	}
+	
 	/**
 	 * Dynamically cast the ValueBase up to its actual ValuePtr\<T\>. Referenced version.
 	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
-	 * \returns a reference of the pointer.
+	 * \returns a reference of the ValuePtr.
 	 */
 	template<typename T> ValuePtr<T>& castToValuePtr() {
 		return m_cast_to<ValuePtr<T> >();
 	}
-	/// \returns the length of the data pointed to
+	
+	/// \returns the length (in elements) of the data pointed to
 	size_t getLength()const;
 
 	/**
@@ -83,7 +86,6 @@ public:
 	virtual scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const = 0;
 	virtual scaling_pair getScalingTo( unsigned short typeID, const std::pair<util::ValueReference, util::ValueReference> &minmax, autoscaleOption scaleopt = autoscale )const;
 
-
 	/**
 	 * @copydoc copyToNewByID
 	 * \param ID the ID of the type the new ValuePtr (referenced by the Reference returned) should have
@@ -91,7 +93,6 @@ public:
 	 */
 	Reference copyToNewByID( unsigned short ID, scaling_pair scaling = scaling_pair() ) const;
 
-	
 	/**
 	 * Copies elements from this into another ValuePtr.
 	 * This is allways a deep copy, regardless of the types.
@@ -119,6 +120,13 @@ public:
 		return copyTo(cont,scaling);
 	}
 
+	/// Copy elements from raw memory
+	template<typename T> bool copyFromMem( const T *const src, size_t _length, scaling_pair scaling=scaling_pair() ) {
+		ValuePtr<T> cont(const_cast<T*>(src),_length, typename ValuePtr<T>::NonDeleter()); //its ok - we're no going to change it
+		return cont.copyTo(cont,scaling);
+	}
+
+
 	/**
 	 * Create a ValuePtr of given type and length.
 	 * This allocates memory as needed but does not initialize it.
@@ -133,33 +141,17 @@ public:
 	 * If the conversion fails, an error will be send to CoreLog and the data of the newly created ValuePtr will be undefined.
 	 * \returns a the newly created ValuePtr
 	 */
-	template<typename T> ValuePtr<T> copyToNew( const scaling_pair &scaling )const {
+	template<typename T> ValuePtr<T> copyToNew( scaling_pair scaling = scaling_pair() )const {
 		Reference ret = copyToNewByID( ValuePtr<T>::staticID, scaling );
 		return ret->castToValuePtr<T>();
 	}
-	/**
-	 * Copy this to a new ValuePtr\<T\> using newly allocated memory.
-	 * This will create a new ValuePtr of type T and the length of this.
-	 * The memory will be allocated and the data of this will be copy-converted to T.
-	 * If the conversion fails, an error will be send to CoreLog and the data of the newly created ValuePtr will be undefined.
-	 * \returns a the newly created ValuePtr
-	 */
-	template<typename T> ValuePtr<T> copyToNew()const {
-		Reference ret = copyToNewByID( ValuePtr<T>::staticID );
-		return ret->castToValuePtr<T>();
-	}
+	
 	/**
 	 * Create a new ValuePtr, of the same type, but differnent size in memory.
 	 * (The actual data are _not_ copied)
 	 * \param length length of the new memory block in elements of the given TYPE
 	 */
-	virtual ValuePtrBase::Reference cloneToNew( size_t length )const = 0;
-
-	/**
-	 * Create a new ValuePtr, of the same type and size in memory.
-	 * (The actual data are _not_ copied - use copyToNew())
-	 */
-	ValuePtrBase::Reference cloneToNew();
+	ValuePtrBase::Reference cloneToNew( size_t length )const;
 
 	/// \returns the byte-size of the type of the data this ValuePtr points to.
 	virtual size_t bytesPerElem()const = 0;
@@ -204,12 +196,6 @@ public:
 	 * \returns the amount of elements which actually differ in both ValuePtr or the whole length of the range when the types are not equal.
 	 */
 	size_t compare( size_t start, size_t end, const ValuePtrBase &dst, size_t dst_start )const;
-
-	/**
-	 * Compare to another ValuePtr.
-	 * Short hand version of compare( size_t start, size_t end, const ValuePtrBase &dst, size_t dst_start )const
-	 */
-	size_t compare( const ValuePtrBase &comp )const;
 };
 }
 
