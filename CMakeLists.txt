@@ -158,6 +158,8 @@ endif(ISIS_BUILD_TOOLS)
 
 # build the ISIS tests.
 if(ISIS_BUILD_TESTS)
+  message(STATUS "Building unit tests")
+  enable_testing()
   add_subdirectory(tests)
 endif(ISIS_BUILD_TESTS)
 

@@ -16,3 +16,11 @@ include_directories(${Boost_INCLUDE_DIR})
 add_subdirectory(CoreUtils)
 add_subdirectory(DataStorage)
 add_subdirectory(ImageIO)
+
+# addition option: build benchmarks
+option(ISIS_BUILD_BENCHMARKS "Build the ISIS stress tests. For internal use only" OFF)
+
+if(ISIS_BUILD_BENCHMARKS)
+  message(STATUS "Building stress tests")
+  add_subdirectory(benchmarks)
+endif(ISIS_BUILD_BENCHMARKS)
