@@ -82,7 +82,7 @@ public:
 	 */
 	virtual std::vector<Reference> splice( size_t size )const = 0;
 
-	///get the scaling (and offset) which would be used in an convertTo
+	///get the scaling (and offset) which would be used in an conversion
 	virtual scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const = 0;
 	virtual scaling_pair getScalingTo( unsigned short typeID, const std::pair<util::ValueReference, util::ValueReference> &minmax, autoscaleOption scaleopt = autoscale )const;
 
@@ -125,7 +125,6 @@ public:
 		ValuePtr<T> cont(const_cast<T*>(src),_length, typename ValuePtr<T>::NonDeleter()); //its ok - we're no going to change it
 		return cont.copyTo(cont,scaling);
 	}
-
 
 	/**
 	 * Create a ValuePtr of given type and length.

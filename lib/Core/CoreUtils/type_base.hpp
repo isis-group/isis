@@ -35,7 +35,6 @@ namespace util
 namespace _internal
 {
 /// @cond _hidden
-/// @cond _hidden
 template<typename TYPE> struct __cast_to {
 	template<typename SOURCE> TYPE operator()( Value<TYPE>*, const SOURCE &value ) {
 		return boost::lexical_cast<TYPE>( value ); //generic version types are different - so do lexical cast

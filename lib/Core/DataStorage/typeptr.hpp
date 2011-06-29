@@ -52,6 +52,8 @@ template<typename T> std::pair<T, T> calcMinMax( const T *data, size_t len )
 	return result;
 }
 
+/// @cond _hidden
+
 #ifdef __SSE2__
 ////////////////////////////////////////////////
 // specialize calcMinMax for (u)int(8,16,32)_t /
@@ -71,7 +73,7 @@ template<typename T> struct getMinMaxImpl<T, true> { // generic minmax for numbe
 		return calcMinMax( &ref[0], ref.getLength() );
 	}
 };
-
+/// @endcond
 }
 
 /**
@@ -80,7 +82,7 @@ template<typename T> struct getMinMaxImpl<T, true> { // generic minmax for numbe
  * by just use "1" for the length.
  * The pointers are reference counted and will be deleted automatically by a customizable deleter.
  * The copy is cheap, thus the copy of a ValuePtr will reference the same data.
- * The usual dereferencing pointer interface ("*" and "->") is supported.
+ * The usual pointer dereferencing interface ("*", "->" and "[]") is supported.
  */
 template<typename TYPE> class ValuePtr: public _internal::ValuePtrBase
 {
@@ -274,11 +276,11 @@ public:
 		return ValuePtrBase::getScalingTo( typeID, minmax, scaleopt );
 	}
 };
-
+/// @cond _hidden
 // specialisation for complex - there shall be no scaling - and we cannot compute minmax
 template<> scaling_pair ValuePtr<std::complex<float> >::getScalingTo( unsigned short /*typeID*/, autoscaleOption /*scaleopt*/ )const;
 template<> scaling_pair ValuePtr<std::complex<double> >::getScalingTo( unsigned short /*typeID*/, autoscaleOption /*scaleopt*/ )const;
-
+/// @endcond
 template<typename T> bool _internal::ValuePtrBase::is()const
 {
 	util::checkType<T>();
