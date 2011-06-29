@@ -502,19 +502,6 @@ public:
 		copyToMem<T>( &ret.voxel<T>( 0, 0, 0, 0 ) );
 		return ret;
 	}
-	template<typename OutputIterator> void copyChunksTo( OutputIterator result, bool copy_metadata = false )const {
-		std::vector<boost::shared_ptr<Chunk> >::const_iterator at = lookup.begin();
-		const std::vector<boost::shared_ptr<Chunk> >::const_iterator end = lookup.end();
-
-		while ( at != end ) {
-			*result = **at++;
-
-			if( copy_metadata )
-				result->join( *this );
-
-			result++;
-		}
-	}
 
 	/**
 	* Get a sorted list of the chunks of the image.
