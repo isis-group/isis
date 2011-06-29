@@ -70,7 +70,7 @@ ValuePtrBase::Reference ValuePtrBase::copyToNewByID( unsigned short ID, scaling_
 {
 	const Converter &conv = getConverterTo( ID );
 
-	if(!(scaling.first.isEmpty() && scaling.second.isEmpty()))
+	if(scaling.first.isEmpty() || scaling.second.isEmpty())
 		scaling=getScalingTo(ID);
 
 	if( conv ) {
@@ -90,7 +90,7 @@ bool ValuePtrBase::copyTo(isis::data::_internal::ValuePtrBase& dst, scaling_pair
 	const unsigned short dID=dst.getTypeID();
 	const Converter &conv = getConverterTo( dID );
 
-	if(!(scaling.first.isEmpty() && scaling.second.isEmpty()))
+	if(scaling.first.isEmpty() || scaling.second.isEmpty())
 		scaling=getScalingTo(dID);
 
 	if( conv ) {
