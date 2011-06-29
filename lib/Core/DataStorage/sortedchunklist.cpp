@@ -254,7 +254,7 @@ std::vector< boost::shared_ptr< Chunk > > SortedChunkList::getLookup()
 
 			for( size_t v = 0; v < vertical; v++, iS++ ) { // inner loop iterates verticaly (through the secondary sorting)
 				assert( iS != iP->second.end() );
-				ret[h+v *horizontal] = iS->second; // insert horizontally - primary sorting is the fastest running index (read the sorting matrix horizontaly)
+				ret[h + v *horizontal] = iS->second;  // insert horizontally - primary sorting is the fastest running index (read the sorting matrix horizontaly)
 			}
 		}
 

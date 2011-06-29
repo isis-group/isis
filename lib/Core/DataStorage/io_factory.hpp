@@ -19,6 +19,7 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include <boost/regex.hpp>
+#define BOOST_FILESYSTEM_VERSION 2 //@todo switch to 3 as soon as we drop support for boost < 1.44
 #include <boost/filesystem.hpp>
 
 #include "io_interface.h"
@@ -63,9 +64,17 @@ public:
 	static bool write( const data::Image &image, const std::string &path, std::string suffix_override, const std::string &dialect );
 	static bool write( std::list<data::Image> images, const std::string &path, std::string suffix_override, const std::string &dialect );
 
+	/// Get a list of all known file-formats (aka. io-plugins loaded)
 	static FileFormatList getFormats();
 
 	static void setProgressFeedback( util::ProgressFeedback *feedback );
+
+	/**
+	 * Get all formats which should be able to read/write the given file.
+	 * \param filename the file which should be red/written
+	 * \param suffix_override if given, it will override the suffix of the given file (and thus enforce usage of a format)
+	 * \param dialect if given, the plugins supporting the dialect are preferred
+	 */
 	static FileFormatList getFileFormatList( std::string filename, std::string suffix_override = "", std::string dialect = "" );
 	/**
 	 *  Make images out of a (unordered) list of chunks.

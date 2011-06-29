@@ -22,14 +22,6 @@ else(ISIS_USE_LIBOIL)
 endif(ISIS_USE_LIBOIL)
 
 ############################################################
-# set the plugin directory and the system dependend shared
-# library naming conventions
-############################################################
-add_definitions(-DPLUGIN_PATH="${CMAKE_INSTALL_PREFIX}/${ISIS_PLUGIN_INFIX}")
-add_definitions(-DDL_SUFFIX="${CMAKE_SHARED_LIBRARY_SUFFIX}")
-add_definitions(-DDL_PREFIX="${CMAKE_SHARED_LIBRARY_PREFIX}")
-
-############################################################
 # export library dependencies of isis_core
 ############################################################
 set(ISIS_LIB_DEPENDS  ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} ${LibOil_LIBRARY}
@@ -39,8 +31,8 @@ set(ISIS_LIB_DEPENDS  ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} ${LibOil_LIBRARY}
 # Build config
 ############################################################
 set(ISIS_BUILD_PROPERTIES LINK_FLAGS "--no-undefined" CLEAN_DIRECT_OUTPUT 1)
-set(ISIS_BUILD_STATIC ON CACHE BOOL "enable build of the static library" )
-set(ISIS_BUILD_DYNAMIC ON CACHE BOOL "enable build of the dynamic library" )
+set(ISIS_BUILD_STATIC OFF CACHE BOOL "enable build of the static library. If OFF a dynamic library will be build and
+linked." )
 
 ############################################################
 # build core
@@ -52,25 +44,28 @@ file(GLOB COREUTILS_HDR_FILES "CoreUtils/*.hpp" "CoreUtils/*.h")
 file(GLOB DATASTORAGE_HDR_FILES "DataStorage/*.hpp" "DataStorage/*.h")
 
 # the core library shared and static build
-if(ISIS_BUILD_DYNAMIC)
-	set(LIBS isis_core ${LIBS})
+if(ISIS_BUILD_STATIC)
+	add_library( isis_core STATIC ${CORE_SRC_FILES} )
+    else(ISIS_BUILD_STATIC)
 	add_library( isis_core SHARED ${CORE_SRC_FILES} )
 	target_link_libraries( isis_core ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} ${LibOil_LIBRARY})
 	set_target_properties( isis_core PROPERTIES	${ISIS_BUILD_PROPERTIES} VERSION ${${CMAKE_PROJECT_NAME}_VERSION} INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
-endif(ISIS_BUILD_DYNAMIC)
-
-if(ISIS_BUILD_STATIC)
-	set(LIBS isis_static ${LIBS})
-	add_library( isis_static STATIC ${CORE_SRC_FILES} )
-	set_target_properties( isis_static PROPERTIES ${ISIS_BUILD_PROPERTIES} OUTPUT_NAME "isis_core" )
 endif(ISIS_BUILD_STATIC)
+
+############################################################
+# set the plugin directory and the system dependend shared
+# library naming conventions
+############################################################
+set_source_files_properties( "DataStorage/io_factory.cpp" PROPERTIES COMPILE_FLAGS
+	"-DPLUGIN_PATH=\\\"${CMAKE_INSTALL_PREFIX}/${ISIS_PLUGIN_INFIX}\\\" -DDL_SUFFIX=\\\"${CMAKE_SHARED_LIBRARY_SUFFIX}\\\" -DDL_PREFIX=\\\"${CMAKE_SHARED_LIBRARY_PREFIX}\\\""
+)
 
 ############################################################
 # Installation
 ############################################################
 
 # install libraries
-install (TARGETS ${LIBS}
+install (TARGETS isis_core
   LIBRARY DESTINATION lib COMPONENT RuntimeLibraries
   ARCHIVE DESTINATION lib COMPONENT Development)
 
@@ -84,7 +79,3 @@ configure_file(cmake/isis_corecfg.cmake.in ${CMAKE_BINARY_DIR}/ISISConfig.cmake 
 # install cmake configuration files
 install(FILES ${CMAKE_BINARY_DIR}/ISISConfig.cmake DESTINATION share/isis/cmake COMPONENT Development)
 
-# uninstall target
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake//cmake_uninstall.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake" IMMEDIATE @ONLY)
-
-add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)

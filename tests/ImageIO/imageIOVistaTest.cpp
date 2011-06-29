@@ -36,7 +36,7 @@ using namespace isis;
 
 //BOOST_AUTO_TEST_CASE( loadsaveTest )
 
-int main( int argc, char **argv )
+int main( int /*argc*/, char **/*argv*/ )
 {
 	data::enableLog<util::DefaultMsgPrint>( warning );
 	image_io::enableLog<util::DefaultMsgPrint>( warning );

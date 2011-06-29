@@ -31,20 +31,35 @@ BOOST_AUTO_TEST_CASE ( chunk_init_test )
 	BOOST_CHECK_EQUAL( ch.getDimSize( data::timeDim ), 1 );
 }
 
+
+BOOST_AUTO_TEST_CASE ( chunk_index_test )
+{
+	data::MemChunk<float> ch( 4, 3, 2, 1 );
+	size_t idx[4], ridx[4];
+	idx[0] = idx[1] = idx[2] = 1;
+	idx[3] = 0;
+	const size_t at = 3 * 4 + 4 + 1;
+	ch.getCoordsFromLinIndex( at, ridx );
+
+
+	BOOST_CHECK_EQUAL( ch.getLinearIndex( idx ), at );
+	BOOST_CHECK( memcmp( idx, ridx, 4 ) == 0 );
+}
+
 BOOST_AUTO_TEST_CASE ( chunk_foreach_voxel_test )
 {
 	data::MemChunk<uint8_t> ch( 4, 3, 2, 1 );
 	memset( &ch.asValuePtr<uint8_t>()[0], 1, ch.getVolume() );
 
-	class : public data::Chunk::VoxelOp<uint8_t>
+	class : public data::VoxelOp<uint8_t>
 	{
 	public:
-		bool operator()( uint8_t &vox, const util::FixedVector< size_t, 4 >& pos ) {
+		bool operator()( uint8_t &vox, const util::FixedVector< size_t, 4 >& /*pos*/ ) {
 			return vox == 0;
 		}
 	} zero;
 
-	class setIdx: public data::Chunk::VoxelOp<uint8_t>
+	class setIdx: public data::VoxelOp<uint8_t>
 	{
 		data::_internal::NDimensional<4> chunkGeometry;
 	public:
@@ -54,7 +69,7 @@ BOOST_AUTO_TEST_CASE ( chunk_foreach_voxel_test )
 			return true;
 		}
 	};
-	class checkIdx: public data::Chunk::VoxelOp<uint8_t>
+	class checkIdx: public data::VoxelOp<uint8_t>
 	{
 		data::_internal::NDimensional<4> chunkGeometry;
 	public:
@@ -92,7 +107,7 @@ BOOST_AUTO_TEST_CASE ( chunk_property_test )
 	//an basic Chunk must be invalid
 	BOOST_CHECK( !ch.isValid() );
 	BOOST_CHECK( !ch.hasProperty( "indexOrigin" ) );
-	//with an position and an orientation its valid
+	//with a position and an orientation its valid
 	util::fvector4 pos( 1, 1, 1 );
 	ch.setPropertyAs( "indexOrigin", pos );
 	BOOST_CHECK( !ch.isValid() );
@@ -258,54 +273,46 @@ BOOST_AUTO_TEST_CASE ( chunk_splice_test )//Copy chunks
 
 BOOST_AUTO_TEST_CASE ( chunk_swap_test )
 {
-	//TODO
-	//  data::MemChunk<float> ch1( 3, 3, 3, 1 );
-	//  ch1.setPropertyAs( "indexOrigin", util::fvector4( 1, 1, 1, 1 ) );
-	//  ch1.setPropertyAs( "rowVec", util::fvector4( 1, 0, 0 ) );
-	//  ch1.setPropertyAs( "columnVec", util::fvector4( 0, 1, 0 ) );
-	//  ch1.setPropertyAs( "sliceVec", util::fvector4( 0, 0, 1 ) );
-	//  ch1.setPropertyAs( "dummyProp", std::string( "dummy" ) );
-	//
-	//  for ( size_t i = 0; i < ch1.getVolume(); i++ )
-	//      ch1.asValuePtr<float>()[i] = i;
-	//
-	//  data::MemChunk<float> ch2( 3, 3, 3, 1 );
-	//  data::MemChunk<float> ch3( 3, 3, 3, 1 );
-	//
-	//  //transform will not be changed...
-	//  for ( size_t dim = 0; dim < 3; dim++ ) {
-	//      ch1.swapAlong( ch2, dim, false );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "indexOrigin" ), ch2.getPropertyAs<util::fvector4>( "indexOrigin" ) );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "rowVec" ), ch2.getPropertyAs<util::fvector4>( "rowVec" ) );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "columnVec" ), ch2.getPropertyAs<util::fvector4>( "columnVec" ) );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "sliceVec" ), ch2.getPropertyAs<util::fvector4>( "sliceVec" ) );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<std::string>( "dummyProp" ), ch2.getPropertyAs<std::string>( "dummyProp" ) );
-	//      ch2.swapAlong( ch3, dim, false );
-	//
-	//      for ( size_t i = 0; i < ch1.getVolume(); i++ ) {
-	//          BOOST_CHECK_EQUAL( ch1.asValuePtr<float>()[i], ch3.asValuePtr<float>()[i] );
-	//      }
-	//  }
-	//
-	//  //transform will be changed
-	//  for ( size_t dim = 0; dim < 3; dim++ ) {
-	//      ch1.swapAlong( ch2, dim, true );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "indexOrigin" )[dim], -ch2.getPropertyAs<util::fvector4>( "indexOrigin" )[dim] );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "rowVec" )[dim], -ch2.getPropertyAs<util::fvector4>( "rowVec" )[dim] );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "columnVec" )[dim], -ch2.getPropertyAs<util::fvector4>( "columnVec" )[dim] );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "sliceVec" )[dim], -ch2.getPropertyAs<util::fvector4>( "sliceVec" )[dim] );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<std::string>( "dummyProp" ), ch2.getPropertyAs<std::string>( "dummyProp" ) );
-	//      ch2.swapAlong( ch3, dim, true );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "indexOrigin" ), ch3.getPropertyAs<util::fvector4>( "indexOrigin" ) );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "rowVec" ), ch3.getPropertyAs<util::fvector4>( "rowVec" ) );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "columnVec" ), ch3.getPropertyAs<util::fvector4>( "columnVec" ) );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<util::fvector4>( "sliceVec" ), ch3.getPropertyAs<util::fvector4>( "sliceVec" ) );
-	//      BOOST_CHECK_EQUAL( ch1.getPropertyAs<std::string>( "dummyProp" ), ch3.getPropertyAs<std::string>( "dummyProp" ) );
-	//
-	//      for ( size_t i = 0; i < ch1.getVolume(); i++ ) {
-	//          BOOST_CHECK_EQUAL( ch1.asValuePtr<float>()[i], ch3.asValuePtr<float>()[i] );
-	//      }
-	//  }
+	class : public data::VoxelOp<int>
+	{
+		bool operator()( int &vox, const util::FixedVector<size_t, 4> & ) {
+			vox = rand();
+			return true;
+		}
+	} randomize;
+	class SwapCheck: public data::VoxelOp<int>
+	{
+		size_t swapidx, sizeRange;
+	public:
+		data::MemChunk<int> orig;
+		SwapCheck( data::MemChunk<int> &_orig, size_t _swapidx, size_t _sizeRange ): orig( _orig ), swapidx( _swapidx ), sizeRange( _sizeRange ) {}
+		bool operator()( int &vox, const util::FixedVector<size_t, 4> &pos ) {
+			util::FixedVector<size_t, 4> opos = pos;
+			opos[swapidx] = sizeRange - 1 - opos[swapidx];
+			//          if(orig.voxel<int>(opos[0],opos[1],opos[2],opos[3])!=vox)
+			//              std::cout << "Comparing " << pos << " against " << opos
+			//                  << "(" << vox << "!=" << orig.voxel<int>(opos[0],opos[1],opos[2],opos[3])
+			//                  << ")" << std::endl;
+			return orig.voxel<int>( opos[0], opos[1], opos[2], opos[3] ) == vox;
+		}
+	};
+
+	for ( int dim = data::rowDim; dim <= data::timeDim; dim++ ) { // for each dim
+		for( size_t sizeRange = 10; sizeRange < 21; sizeRange++ ) { // check with chunks of the size 10³-21³
+			//create chunk with random content
+			data::MemChunk<int> ch1( sizeRange, sizeRange, sizeRange, sizeRange );
+			ch1.foreachVoxel( randomize );
+
+			//store a copy of the original data and the rest in the checker
+			SwapCheck swap_check( ch1, data::rowDim, sizeRange );
+
+			ch1.swapAlong( data::rowDim );//swap ch1
+			BOOST_CHECK_EQUAL( ch1.foreachVoxel( swap_check ), 0 ); //run check for swapped ch1 and and original copy in swap_check
+
+			ch1.swapAlong( data::rowDim );//swap it back
+			BOOST_CHECK( ch1.compareRange( 0, ch1.getVolume() - 1, swap_check.orig, 0 ) == 0 ); //check for equality with the original copy in swap_check
+		}
+	}
 }
 
 BOOST_AUTO_TEST_CASE ( chunk_copyLine_Test )

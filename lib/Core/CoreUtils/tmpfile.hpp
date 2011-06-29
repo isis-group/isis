@@ -19,6 +19,7 @@
 #ifndef TMPFILE_H
 #define TMPFILE_H
 #include <string>
+#define BOOST_FILESYSTEM_VERSION 2 //@todo switch to 3 as soon as we drop support for boost < 1.44
 #include <boost/filesystem/path.hpp>
 
 namespace isis

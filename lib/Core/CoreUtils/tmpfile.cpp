@@ -23,6 +23,7 @@
 
 #include <stdio.h>
 #include <fstream>
+#define BOOST_FILESYSTEM_VERSION 2 //@todo switch to 3 as soon as we drop support for boost < 1.44
 #include <boost/filesystem/operations.hpp>
 #include "tmpfile.hpp"
 #include "message.hpp"
@@ -39,7 +40,7 @@ TmpFile::TmpFile( std::string prefix, std::string sufix )
 	boost::filesystem::path dummy( tmpnam( NULL ) );
 	boost::filesystem::path::operator=( dummy.branch_path() / boost::filesystem::path( prefix + dummy.leaf() + sufix ) );
 	LOG( Debug, info ) << "Creating temporary file " << string();
-	std::ofstream( string().c_str() );
+	std::ofstream( string().c_str() ).exceptions( std::ios::failbit | std::ios::badbit );
 }
 
 TmpFile::~TmpFile()
