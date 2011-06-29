@@ -269,19 +269,21 @@ public:
 	 * Create a MemChunk as copy of a given raw memory block
 	 * This will create a MemChunk of the given size and fill it with the data at the given address.
 	 * No range check will be done.
+	 * An automatic conversion will be done if necessary.
 	 * \param org pointer to the raw data which shall be copied
 	 * \param nrOfColumns
 	 * \param nrOfRows
 	 * \param nrOfSlices
 	 * \param nrOfTimesteps size of the resulting image
 	 */
-	MemChunk( const TYPE *const org, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 ):
+	template<typename T> MemChunk( const T *const org, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 ):
 		Chunk(
 			( TYPE * )malloc( sizeof( TYPE )*nrOfTimesteps *nrOfSlices *nrOfRows *nrOfColumns ),
 			typename ValuePtr<TYPE>::BasicDeleter(),
 			nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps
 		) {
-		asValuePtr<TYPE>().copyFromMem( org, getVolume() );
+		util::checkType<T>();
+		asValuePtrBase().copyFromMem( org, getVolume() );
 	}
 	/// Create a deep copy of a given Chunk (automatic conversion will be used if datatype does not fit)
 	MemChunk( const Chunk &ref ): Chunk( ref ) {
@@ -334,19 +336,21 @@ public:
 	 * This chunk won't be deleted automatically - HAVE TO BE DELETED MANUALLY
 	 * This will create a MemChunkNoDel of the given size and fill it with the data at the given address.
 	 * No range check will be done.
+	 * An automatic conversion will be done if necessary.
 	 * \param org pointer to the raw data which shall be copied
 	 * \param nrOfColumns
 	 * \param nrOfRows
 	 * \param nrOfSlices
 	 * \param nrOfTimesteps size of the resulting image
 	 */
-	MemChunkNonDel( const TYPE *const org, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 ):
+	template<typename T> MemChunkNonDel( const T *const org, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 ):
 		Chunk(
 			( TYPE * )malloc( sizeof( TYPE )*nrOfTimesteps *nrOfSlices *nrOfRows *nrOfColumns ),
 			typename ValuePtr<TYPE>::NonDeleter(),
 			nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps
 		) {
-		asValuePtr<TYPE>().copyFromMem( org, getVolume() );
+		util::checkType<T>();
+		asValuePtrBase().copyFromMem( org, getVolume() );
 	}
 	/// Create a deep copy of a given Chunk (automatic conversion will be used if datatype does not fit)
 	MemChunkNonDel( const Chunk &ref ): Chunk( ref ) {
