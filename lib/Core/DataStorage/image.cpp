@@ -207,7 +207,7 @@ bool Image::updateOrientationMatrices()
 	util::fvector4 columnVec = getPropertyAs<util::fvector4>( "columnVec" );
 	util::fvector4 sliceVec = getPropertyAs<util::fvector4>( "sliceVec" );
 	m_Offset = getPropertyAs<util::fvector4>( "indexOrigin" );
-	util::fvector4 spacing = getPropertyAs<util::fvector4>( "voxelSize" ) + getPropertyAs<util::fvector4>( "voxelGap" );
+	util::fvector4 spacing = getPropertyAs<util::fvector4>( "voxelSize" ) + (hasProperty("voxelGap")? getPropertyAs<util::fvector4>( "voxelGap" ):util::fvector4(0,0,0));
 	m_RowVec = util::fvector4( rowVec[0] * spacing[0], rowVec[1] * spacing[0], rowVec[2] * spacing[0] );
 	m_ColumnVec = util::fvector4( columnVec[0] * spacing[1], columnVec[1] * spacing[1], columnVec[2] * spacing[1] );
 	m_SliceVec = util::fvector4( sliceVec[0] * spacing[2], sliceVec[1] * spacing[2], sliceVec[2] * spacing[2] );
@@ -505,10 +505,19 @@ const Chunk Image::getChunk ( size_t first, size_t second, size_t third, size_t 
 	const size_t index = commonGet( first, second, third, fourth ).first;
 	return getChunkAt( index, copy_metadata );
 }
+
 std::vector< Chunk > Image::copyChunksToVector( bool copy_metadata )const
 {
-	std::vector<isis::data::Chunk> ret( lookup.size() );
-	copyChunksTo( ret.begin(), copy_metadata );
+	std::vector<isis::data::Chunk> ret;
+	ret.reserve( lookup.size() );
+	std::vector<boost::shared_ptr<Chunk> >::const_iterator at = lookup.begin();
+	const std::vector<boost::shared_ptr<Chunk> >::const_iterator end = lookup.end();
+
+	while ( at != end ) {
+		ret.push_back(**(at++));
+		if( copy_metadata )
+			ret.back().join( *this );
+	}
 	return ret;
 }
 
