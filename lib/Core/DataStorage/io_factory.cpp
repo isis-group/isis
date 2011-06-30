@@ -56,7 +56,7 @@ struct dialect_missing {
 	std::string dialect;
 	std::string filename;
 	bool operator()( IOFactory::FileFormatList::reference ref )const {
-		const std::string dia=ref->dialects( filename );
+		const std::string dia = ref->dialects( filename );
 		std::list<std::string> splitted = util::stringToList<std::string>( dia, ' ' );
 		const bool ret = ( std::find( splitted.begin(), splitted.end(), dialect ) == splitted.end() );
 		LOG_IF( ret, Runtime, warning ) << ref->getName() << " does not support the requested dialect " << util::MSubject( dialect );
@@ -297,8 +297,8 @@ size_t IOFactory::load( std::list<data::Chunk> &chunks, const std::string &path,
 {
 	const boost::filesystem::path p( path );
 	const size_t loaded = boost::filesystem::is_directory( p ) ?
-					   get().loadPath( chunks, p, suffix_override, dialect ) :
-					   get().loadFile( chunks, p, suffix_override, dialect );
+						  get().loadPath( chunks, p, suffix_override, dialect ) :
+						  get().loadFile( chunks, p, suffix_override, dialect );
 	BOOST_FOREACH( Chunk & ref, chunks ) {
 		if ( ! ref.hasProperty( "source" ) )
 			ref.setPropertyAs( "source", p.file_string() );

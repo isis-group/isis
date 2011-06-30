@@ -207,7 +207,7 @@ bool Image::updateOrientationMatrices()
 	util::fvector4 columnVec = getPropertyAs<util::fvector4>( "columnVec" );
 	util::fvector4 sliceVec = getPropertyAs<util::fvector4>( "sliceVec" );
 	m_Offset = getPropertyAs<util::fvector4>( "indexOrigin" );
-	util::fvector4 spacing = getPropertyAs<util::fvector4>( "voxelSize" ) + (hasProperty("voxelGap")? getPropertyAs<util::fvector4>( "voxelGap" ):util::fvector4(0,0,0));
+	util::fvector4 spacing = getPropertyAs<util::fvector4>( "voxelSize" ) + ( hasProperty( "voxelGap" ) ? getPropertyAs<util::fvector4>( "voxelGap" ) : util::fvector4( 0, 0, 0 ) );
 	m_RowVec = util::fvector4( rowVec[0] * spacing[0], rowVec[1] * spacing[0], rowVec[2] * spacing[0] );
 	m_ColumnVec = util::fvector4( columnVec[0] * spacing[1], columnVec[1] * spacing[1], columnVec[2] * spacing[1] );
 	m_SliceVec = util::fvector4( sliceVec[0] * spacing[2], sliceVec[1] * spacing[2], sliceVec[2] * spacing[2] );
@@ -340,21 +340,24 @@ bool Image::reIndex()
 	//reconstruct some redundant information, if its missing
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	const util::PropertyMap::KeyType vectors[] = {"rowVec", "columnVec", "sliceVec"};
-	int oneCnt=0;
+	int oneCnt = 0;
 	BOOST_FOREACH( const util::PropertyMap::KeyType & ref, vectors ) {
 		if ( hasProperty( ref ) ) {
 			util::PropertyValue &prop = propertyValue( ref );
 			LOG_IF( !prop->is<util::fvector4>(), Debug, error ) << "Using " << prop->getTypeName() << " as " << util::Value<util::fvector4>::staticName();
 			util::fvector4 &vec = prop->castTo<util::fvector4>();
-			if(vec.sqlen() == 0){
+
+			if( vec.sqlen() == 0 ) {
 				util::fvector4  v_one;
-				v_one[oneCnt]=1;
-				LOG(Runtime, error )
-					<< "The existing " << ref << " " << vec << (hasProperty("source")? " from "+getPropertyAs<std::string>("source"):"") << " has the length zero. Falling back to " << v_one <<".";
-				vec=v_one;
+				v_one[oneCnt] = 1;
+				LOG( Runtime, error )
+						<< "The existing " << ref << " " << vec << ( hasProperty( "source" ) ? " from " + getPropertyAs<std::string>( "source" ) : "" ) << " has the length zero. Falling back to " << v_one << ".";
+				vec = v_one;
 			}
+
 			vec.norm();
 		}
+
 		oneCnt++;
 	}
 
@@ -514,10 +517,12 @@ std::vector< Chunk > Image::copyChunksToVector( bool copy_metadata )const
 	const std::vector<boost::shared_ptr<Chunk> >::const_iterator end = lookup.end();
 
 	while ( at != end ) {
-		ret.push_back(**(at++));
+		ret.push_back( **( at++ ) );
+
 		if( copy_metadata )
 			ret.back().join( *this );
 	}
+
 	return ret;
 }
 
