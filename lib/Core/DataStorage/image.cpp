@@ -743,7 +743,7 @@ unsigned short Image::getMajorTypeID() const
 	LOG( Debug, info ) << "Determining  datatype of image with the value range " << minmax;
 
 	if( minmax.first->getTypeID() == minmax.second->getTypeID() ) { // ok min and max are the same type - trivial case
-		return minmax.first->getTypeID() << 8; // btw: we do the shift, because min and max are Value - but we want the id's ValuePtr
+		return minmax.first->getTypeID() << 8; // btw: we do the shift, because min and max are Value - but we want the ID's ValuePtr
 	} else if( minmax.first->fitsInto( minmax.second->getTypeID() ) ) { // if min fits into the type of max, use that
 		return minmax.second->getTypeID() << 8; //@todo maybe use a global static function here instead of a obscure shit operation
 	} else if( minmax.second->fitsInto( minmax.first->getTypeID() ) ) { // if max fits into the type of min, use that

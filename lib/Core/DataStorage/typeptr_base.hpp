@@ -34,6 +34,7 @@ class ValuePtrBase : public util::_internal::GenericValue
 {
 	friend class util::_internal::ValueReference<ValuePtrBase>;
 	static const _internal::ValuePtrConverterMap &converters();
+	scaling_pair getScaling(const scaling_pair &scale,unsigned short ID)const;
 protected:
 	size_t m_len;
 	ValuePtrBase( size_t len = 0 );
@@ -131,7 +132,7 @@ public:
 	 * This allocates memory as needed but does not initialize it.
 	 * \returns a Reference to a ValuePtr pointing to the allocated memory. Or an empty Reference if the creation failed.
 	 */
-	static Reference createById( unsigned short id, size_t len );
+	static Reference createByID( unsigned short ID, size_t len );
 
 	/**
 	 * Copy this to a new ValuePtr\<T\> using newly allocated memory.
@@ -145,6 +146,37 @@ public:
 		return ret->castToValuePtr<T>();
 	}
 	
+	/**
+	 * Get this as a ValuePtr of a specific type.
+	 * This does an automatic conversion into a new ValuePtr if one of following is true:
+	 * - the target type is not the current type
+	 * - scaling.first (the scaling factor) is not 1
+	 * - scaling.first (the scaling offset) is not 0
+	 *
+	 * Otherwise a cheap copy is done.
+	 * \param ID the ID of the requeseted type (use ValuePtr::staticID)
+	 * \param scaling the scaling to be used (determined automatically if not given)
+	 * \returns a reference of eigther a cheap copy or a newly created ValuePtr
+	 */
+	ValuePtrBase::Reference  convertToID( unsigned short ID, scaling_pair scaling = scaling_pair() );
+
+
+	/**
+	 * Get this as a ValuePtr of a specific type.
+	 * This does an automatic conversion into a new ValuePtr if one of following is true:
+	 * - the target type is not the current type
+	 * - scaling.first (the scaling factor) is not 1
+	 * - scaling.first (the scaling offset) is not 0
+	 *
+	 * Otherwise a cheap copy is done.
+	 * \param ID the ID of the requeseted type (use ValuePtr::staticID)
+	 * \param scaling the scaling to be used (determined automatically if not given)
+	 * \returns eigther a cheap copy or a newly created ValuePtr
+	 */
+	template<typename T> ValuePtr<T> as(scaling_pair scaling = scaling_pair()){
+		return convertToID(ValuePtr<T>::staticID)->castToValuePtr<T>();
+	}
+
 	/**
 	 * Create a new ValuePtr, of the same type, but differnent size in memory.
 	 * (The actual data are _not_ copied)

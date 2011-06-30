@@ -75,8 +75,8 @@ bool Chunk::convertToType( short unsigned int ID, const scaling_pair &scaling )
 	static const util::Value<uint8_t> one( 1 );
 	static const util::Value<uint8_t> zero( 0 );
 
-	if( getTypeID() != ID || !( scaling.first->eq( one ) && scaling.second->eq( zero ) ) ) { // if its not the same type - replace the internal ValuePtr by a new returned from ValuePtrBase::copyToNewById
-		ValuePtrReference newPtr = getValuePtrBase().copyToNewByID( ID, scaling ); // create a new ValuePtr of type id and store it in a ValuePtrReference
+	if( getTypeID() != ID || !( scaling.first->eq( one ) && scaling.second->eq( zero ) ) ) { // if its not the same type - replace the internal ValuePtr by a new returned from ValuePtrBase::copyToNewByID
+		ValuePtrReference newPtr = getValuePtrBase().copyToNewByID( ID, scaling ); // create a new ValuePtr of type ID and store it in a ValuePtrReference
 
 		if( newPtr.isEmpty() ) // if the reference is empty the conversion failed
 			return false;

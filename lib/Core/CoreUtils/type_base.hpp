@@ -162,11 +162,11 @@ public:
 	/// \returns true if and only if the types of this and second are equal and the values are equal
 	virtual bool operator==( const ValueBase &second )const = 0;
 
-	/// creates a copy of the stored value using a type referenced by its id
+	/// creates a copy of the stored value using a type referenced by its ID
 	Reference copyToNewByID( unsigned short ID ) const;
 
 	/**
-	 * Check if the stored value would also fit into another type referenced by its id
+	 * Check if the stored value would also fit into another type referenced by its ID
 	 * \returns true if the stored value would fit into the target type, false otherwise
 	 */
 	bool fitsInto( unsigned short ID ) const;
