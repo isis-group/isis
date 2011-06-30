@@ -13,6 +13,12 @@ namespace data
 namespace _internal
 {
 
+/**
+ * Helper to sanitise scaling.
+ * \retval scaling if !(scaling.first.isEmpty() || scaling.second.isEmpty())
+ * \retval 1/0 if current type is equal to the requested type
+ * \retval ValuePtrBase::getScalingTo elswise
+ */
 scaling_pair ValuePtrBase::getScaling(const scaling_pair& scaling, short unsigned int ID)const
 {
 	if(scaling.first.isEmpty() || scaling.second.isEmpty())
@@ -124,7 +130,11 @@ ValuePtrBase::Reference ValuePtrBase::createByID( unsigned short ID, size_t len 
 
 ValuePtrBase::Reference ValuePtrBase::convertToID(short unsigned int ID, scaling_pair scaling)
 {
-	if(scaling.first.isEmpty() && scaling.second.isEmpty() && getTypeID()==ID ){ // if type is the same, scaling is not given
+	scaling=getScaling(scaling,ID);
+	static const util::Value<uint8_t> one( 1 );
+	static const util::Value<uint8_t> zero( 0 );
+
+	if(scaling.first->eq(one) && scaling.second->eq(zero) && getTypeID()==ID ){ // if type is the same and scaling is 1/0
 		return *this; //cheap copy
 	} else {
 		return copyToNewByID(ID,scaling); // convert into new
