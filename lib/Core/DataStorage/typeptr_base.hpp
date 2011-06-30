@@ -151,7 +151,8 @@ public:
 	 * \returns a the newly created ValuePtr
 	 */
 	template<typename T> ValuePtr<T> copyAs( scaling_pair scaling = scaling_pair() )const {
-		return copyToNewByID( ValuePtr<T>::staticID, scaling )->castToValuePtr<T>();
+		Reference erg=copyToNewByID( ValuePtr<T>::staticID, scaling );
+		return erg.isEmpty() ? ValuePtr<T>(0):erg->castToValuePtr<T>();
 	}
 	
 	/**
@@ -182,7 +183,8 @@ public:
 	 * \returns eigther a cheap copy or a newly created ValuePtr
 	 */
 	template<typename T> ValuePtr<T> as(scaling_pair scaling = scaling_pair()){
-		return convertToID(ValuePtr<T>::staticID,scaling)->castToValuePtr<T>();
+		Reference erg=convertToID(ValuePtr<T>::staticID,scaling);
+		return erg.isEmpty() ? ValuePtr<T>(0):erg->castToValuePtr<T>();
 	}
 
 	/**
