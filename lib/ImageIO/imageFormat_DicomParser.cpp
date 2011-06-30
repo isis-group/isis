@@ -51,7 +51,7 @@ void ImageFormat_Dicom::parseAS( DcmElement *elem, const util::istring &name, ut
 			boost::numeric::RoundEven<double>
 			> double2uint16;
 
-	if ( _internal::try_cast( buff.substr( 0, 3 ), duration ) ) {
+	if ( _internal::try_cast( buff.substr( 0, buff.find_last_of("0123456789")+1 ), duration ) ) {
 		switch ( buff.at( buff.size() - 1 ) ) {
 		case 'D':
 		case 'd':
