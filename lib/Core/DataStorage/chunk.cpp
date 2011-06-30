@@ -16,7 +16,6 @@
 
 #include "chunk.hpp"
 #include <boost/foreach.hpp>
-#include <limits>
 
 namespace isis
 {
@@ -57,47 +56,34 @@ Chunk Chunk::cloneToNew( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices,
 
 	if ( nrOfTimesteps )newSize[3] = nrOfTimesteps;
 
-	const ValuePtrReference cloned( get()->cloneToNew( newSize.product() ) );
+	const ValuePtrReference cloned( getValuePtrBase().cloneToNew( newSize.product() ) );
 	return Chunk( cloned, newSize[0], newSize[1], newSize[2], newSize[3] );
 }
 
-bool Chunk::convertToType( short unsigned int ID )
+bool Chunk::convertToType( short unsigned int ID, scaling_pair scaling )
 {
-	if( getTypeID() != ID ) {
-		return convertToType( ID, getScalingTo( ID ) );
-	}
+	//get a converted ValuePtr (will be a cheap copy if no conv was needed)
+	ValuePtrReference newPtr = asValuePtrBase().convertToID(ID,scaling);
 
-	return true;
-}
-
-bool Chunk::convertToType( short unsigned int ID, const scaling_pair &scaling )
-{
-	static const util::Value<uint8_t> one( 1 );
-	static const util::Value<uint8_t> zero( 0 );
-
-	if( getTypeID() != ID || !( scaling.first->eq( one ) && scaling.second->eq( zero ) ) ) { // if its not the same type - replace the internal ValuePtr by a new returned from ValuePtrBase::copyToNewByID
-		ValuePtrReference newPtr = getValuePtrBase().copyToNewByID( ID, scaling ); // create a new ValuePtr of type ID and store it in a ValuePtrReference
-
-		if( newPtr.isEmpty() ) // if the reference is empty the conversion failed
-			return false;
-
+	if( newPtr.isEmpty() ) // if the reference is empty the conversion failed
+		return false;
+	else 
 		static_cast<ValuePtrReference &>( *this ) = newPtr; // otherwise replace my own ValuePtr with the new one
-	}
 
 	return true;
 }
 
 size_t Chunk::bytesPerVoxel()const
 {
-	return get()->bytesPerElem();
+	return getValuePtrBase().bytesPerElem();
 }
 std::string Chunk::getTypeName()const
 {
-	return get()->getTypeName();
+	return getValuePtrBase().getTypeName();
 }
 unsigned short Chunk::getTypeID()const
 {
-	return get()->getTypeID();
+	return getValuePtrBase().getTypeID();
 }
 
 void Chunk::copyLine( size_t secondDimS, size_t thirdDimS, size_t fourthDimS, Chunk &dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD ) const
@@ -130,12 +116,12 @@ void Chunk::copyRange( const size_t source_start[], const size_t source_end[], C
 	const size_t sstart = getLinearIndex( source_start );
 	const size_t send = getLinearIndex( source_end );
 	const size_t dstart = dst.getLinearIndex( destination );
-	get()->copyRange( sstart, send, *dst, dstart );
+	getValuePtrBase().copyRange( sstart, send, *dst, dstart );
 }
 
 size_t Chunk::compareRange( size_t flat_start, size_t flat_end, const Chunk &dst, size_t destination ) const
 {
-	return get()->compare( flat_start, flat_end, *dst, destination );
+	return getValuePtrBase().compare( flat_start, flat_end, *dst, destination );
 }
 size_t Chunk::compareRange( const size_t source_start[], const size_t source_end[], const Chunk &dst, const size_t destination[] ) const
 {
@@ -156,6 +142,7 @@ size_t Chunk::compareRange( const size_t source_start[], const size_t source_end
 	const size_t dstart = dst.getLinearIndex( destination );
 	return compareRange( sstart, send, dst, dstart );
 }
+
 size_t Chunk::compareLine( size_t secondDimS, size_t thirdDimS, size_t fourthDimS, const Chunk &dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD ) const
 {
 	const size_t idx1[] = {0, secondDimS, thirdDimS, fourthDimS};
@@ -163,6 +150,7 @@ size_t Chunk::compareLine( size_t secondDimS, size_t thirdDimS, size_t fourthDim
 	const size_t idx3[] = {getSizeAsVector()[0] - 1, secondDimD, thirdDimD, fourthDimD};
 	return compareRange( idx1, idx2, dst, idx3 );
 }
+
 size_t Chunk::compareSlice( size_t thirdDimS, size_t fourthDimS, const Chunk &dst, size_t thirdDimD, size_t fourthDimD ) const
 {
 	const size_t idx1[] = {0, 0, thirdDimS, fourthDimS};
@@ -170,18 +158,19 @@ size_t Chunk::compareSlice( size_t thirdDimS, size_t fourthDimS, const Chunk &ds
 	const size_t idx3[] = {getSizeAsVector()[0] - 1, getSizeAsVector()[1] - 1, thirdDimD, fourthDimD};
 	return compareRange( idx1, idx2, dst, idx3 );
 }
+
 std::pair<util::ValueReference, util::ValueReference> Chunk::getMinMax ( ) const
 {
-	return operator*().getMinMax();
+	return getValuePtrBase().getMinMax();
 }
 
 scaling_pair Chunk::getScalingTo( unsigned short typeID, autoscaleOption scaleopt )const
 {
-	return getScalingTo( typeID, getMinMax(), scaleopt );
+	return getValuePtrBase().getScalingTo( typeID, scaleopt );
 }
 scaling_pair Chunk::getScalingTo( unsigned short typeID, const std::pair<util::ValueReference, util::ValueReference> &minmax, autoscaleOption scaleopt )const
 {
-	return operator*().getScalingTo( typeID, minmax, scaleopt );
+	return getValuePtrBase().getScalingTo( typeID, minmax, scaleopt );
 }
 
 Chunk &Chunk::operator=( const Chunk &ref )

@@ -152,7 +152,7 @@ void ValuePtrBase::copyRange( size_t start, size_t end, ValuePtrBase &dst, size_
 	assert( start <= end );
 	const size_t len = end - start + 1;
 	LOG_IF( ! dst.isSameType( *this ), Debug, error )
-			<< "Copying into a ValuePtr of different type. Its " << dst.getTypeName() << " not " << getTypeName();
+			<< "Range copy into a ValuePtr of different type is not supportet. Its " << dst.getTypeName() << " not " << getTypeName();
 
 	if( end >= getLength() ) {
 		LOG( Runtime, error )
