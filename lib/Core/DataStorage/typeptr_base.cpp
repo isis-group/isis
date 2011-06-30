@@ -13,6 +13,20 @@ namespace data
 namespace _internal
 {
 
+/**
+ * Helper to sanitise scaling.
+ * \retval scaling if !(scaling.first.isEmpty() || scaling.second.isEmpty())
+ * \retval 1/0 if current type is equal to the requested type
+ * \retval ValuePtrBase::getScalingTo elswise
+ */
+scaling_pair ValuePtrBase::getScaling(const scaling_pair& scaling, short unsigned int ID)const
+{
+	if(scaling.first.isEmpty() || scaling.second.isEmpty())
+		return getScalingTo(ID);
+	else
+		return scaling;
+}
+
 ValuePtrBase::ValuePtrBase( size_t length ): m_len( length ) {}
 
 size_t ValuePtrBase::getLength() const { return m_len;}
@@ -70,12 +84,9 @@ ValuePtrBase::Reference ValuePtrBase::copyToNewByID( unsigned short ID, scaling_
 {
 	const Converter &conv = getConverterTo( ID );
 
-	if(scaling.first.isEmpty() || scaling.second.isEmpty())
-		scaling=getScalingTo(ID);
-
 	if( conv ) {
 		boost::scoped_ptr<ValuePtrBase> ret;
-		conv->generate( *this, ret, scaling );
+		conv->generate( *this, ret, getScaling(scaling,ID) );
 		return *ret;
 	} else {
 		LOG( Runtime, error )
@@ -90,11 +101,8 @@ bool ValuePtrBase::copyTo(isis::data::_internal::ValuePtrBase& dst, scaling_pair
 	const unsigned short dID=dst.getTypeID();
 	const Converter &conv = getConverterTo( dID );
 
-	if(scaling.first.isEmpty() || scaling.second.isEmpty())
-		scaling=getScalingTo(dID);
-
 	if( conv ) {
-		conv->convert(*this,dst,scaling);
+		conv->convert(*this,dst,getScaling(scaling,dID));
 		return true;
 	} else {
 		LOG( Runtime, error ) << "I dont know any conversion from "	<< util::MSubject( toString( true ) ) << " to " << dst.getTypeName();
@@ -103,25 +111,39 @@ bool ValuePtrBase::copyTo(isis::data::_internal::ValuePtrBase& dst, scaling_pair
 }
 
 
-ValuePtrBase::Reference ValuePtrBase::createById( unsigned short id, size_t len )
+ValuePtrBase::Reference ValuePtrBase::createByID( unsigned short ID, size_t len )
 {
-	const ValuePtrConverterMap::const_iterator f1 = converters().find( id );
+	const ValuePtrConverterMap::const_iterator f1 = converters().find( ID );
 	ValuePtrConverterMap::mapped_type::const_iterator f2;
 
 	// try to get a converter to convert the requestet type into itself - they 're there for all known types
-	if( f1 != converters().end() && ( f2 = f1->second.find( id ) ) != f1->second.end() ) {
+	if( f1 != converters().end() && ( f2 = f1->second.find( ID ) ) != f1->second.end() ) {
 		const _internal::ValuePtrConverterBase &conv = *( f2->second );
 		boost::scoped_ptr<ValuePtrBase> ret;
 		conv.create( ret, len );
 		return *ret;
 	} else {
-		LOG( Debug, error ) << "There is no known creator for " << util::getTypeMap()[id];
+		LOG( Debug, error ) << "There is no known creator for " << util::getTypeMap()[ID];
 		return Reference(); // return an empty Reference
 	}
 }
+
+ValuePtrBase::Reference ValuePtrBase::convertToID(short unsigned int ID, scaling_pair scaling)
+{
+	scaling=getScaling(scaling,ID);
+	static const util::Value<uint8_t> one( 1 );
+	static const util::Value<uint8_t> zero( 0 );
+
+	if(scaling.first->eq(one) && scaling.second->eq(zero) && getTypeID()==ID ){ // if type is the same and scaling is 1/0
+		return *this; //cheap copy
+	} else {
+		return copyToNewByID(ID,scaling); // convert into new
+	}
+}
+
 ValuePtrBase::Reference ValuePtrBase::cloneToNew(size_t length) const
 {
-	return createById(getTypeID(),length);
+	return createByID(getTypeID(),length);
 }
 
 
@@ -130,7 +152,7 @@ void ValuePtrBase::copyRange( size_t start, size_t end, ValuePtrBase &dst, size_
 	assert( start <= end );
 	const size_t len = end - start + 1;
 	LOG_IF( ! dst.isSameType( *this ), Debug, error )
-			<< "Copying into a ValuePtr of different type. Its " << dst.getTypeName() << " not " << getTypeName();
+			<< "Range copy into a ValuePtr of different type is not supportet. Its " << dst.getTypeName() << " not " << getTypeName();
 
 	if( end >= getLength() ) {
 		LOG( Runtime, error )

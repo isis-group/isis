@@ -74,9 +74,10 @@ protected:
 	 * \param nrOfTimesteps size in the fourth dimension
 	 */
 	template<typename TYPE, typename D> Chunk( TYPE *src, D d, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 ):
-		_internal::ChunkBase( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ),
-		util::_internal::ValueReference<_internal::ValuePtrBase>( new ValuePtr<TYPE>( src, getVolume(), d ) ) {}
+		_internal::ChunkBase( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ),ValuePtrReference( ValuePtr<TYPE>( src, getVolume(), d ) ) {}
+
 	Chunk( const ValuePtrReference &src, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 );
+
 	Chunk() {}; //do not use this
 public:
 	/**
@@ -91,6 +92,7 @@ public:
 		ValuePtr<TYPE> &ret = asValuePtr<TYPE>();
 		return ret[getLinearIndex( idx )];
 	}
+
 	/**
 	 * Gets a const reference of the element at a given index.
 	 * \copydetails Chunk::voxel
@@ -133,6 +135,7 @@ public:
 
 		return ret;
 	}
+
 	/**
 	 * Run a functor on every Voxel in the chunk.
 	 * \param op a functor inheriting from VoxelOp
@@ -142,18 +145,11 @@ public:
 		return foreachVoxel<TYPE>( op, util::FixedVector<size_t, 4>() );
 	}
 
-	_internal::ValuePtrBase &asValuePtrBase() {
-		return operator*();
-	}
-	const _internal::ValuePtrBase &getValuePtrBase()const {
-		return operator*();
-	}
-	template<typename TYPE> ValuePtr<TYPE> &asValuePtr() {
-		return asValuePtrBase().castToValuePtr<TYPE>();
-	}
-	template<typename TYPE> const ValuePtr<TYPE> getValuePtr()const {
-		return getValuePtrBase().castToValuePtr<TYPE>();
-	}
+	_internal::ValuePtrBase &asValuePtrBase() {return operator*();}
+	const _internal::ValuePtrBase &getValuePtrBase()const {return operator*();}
+	
+	template<typename TYPE> ValuePtr<TYPE> &asValuePtr() {return asValuePtrBase().castToValuePtr<TYPE>();}
+	template<typename TYPE> const ValuePtr<TYPE> getValuePtr()const {return getValuePtrBase().castToValuePtr<TYPE>();}
 
 	/// \returns the number of cheap-copy-chunks using the same memory as this
 	size_t useCount()const;
@@ -162,17 +158,9 @@ public:
 	/**
 	 * Ensure, the chunk has the type with the requested ID.
 	 * If the typeID of the chunk is not equal to the requested ID, the data of the chunk is replaced by an converted version.
-	 * The conversion is done using the value range of the old data.
 	 * \returns false if there was an error
 	 */
-	bool convertToType( unsigned short ID );
-	/**
-	 * Ensure, the chunk has the type with the requested ID.
-	 * If the typeID of the chunk is not equal to the requested ID, the data of the chunk is replaced by an converted version.
-	 * The conversion is done using the value range given via min and max.
-	 * \returns false if there was an error
-	 */
-	bool convertToType( unsigned short ID, const scaling_pair &scaling );
+	bool convertToType( short unsigned int ID, scaling_pair scaling = scaling_pair() );
 
 	template<typename T> bool copyToMem( T *dst, size_t len, scaling_pair scaling = scaling_pair() )const {
 		return getValuePtrBase().copyToMem<T>( dst, len,  scaling ); // use copyToMem of ValuePtrBase
@@ -185,9 +173,7 @@ public:
 	size_t bytesPerVoxel()const;
 	std::string getTypeName()const;
 	unsigned short getTypeID()const;
-	template<typename T> bool is()const {
-		return get()->is<T>();
-	}
+	template<typename T> bool is()const {return getValuePtrBase().is<T>();}
 
 	void copyRange( const size_t source_start[], const size_t source_end[], Chunk &dst, const size_t destination[] )const;
 	void copyLine( size_t secondDimS, size_t thirdDimS, size_t fourthDimS, Chunk &dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD )const;
@@ -260,11 +246,7 @@ template<typename TYPE> class MemChunk : public Chunk
 public:
 	/// Create an empty MemChunk with the given size
 	MemChunk( size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 ):
-		Chunk(
-			( TYPE * )calloc( nrOfTimesteps *nrOfSlices *nrOfRows *nrOfColumns, sizeof( TYPE ) ),
-			typename ValuePtr<TYPE>::BasicDeleter(),
-			nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps
-		) {}
+		Chunk( ValuePtrReference(ValuePtr<TYPE>( getVolume() )),nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps){}
 	/**
 	 * Create a MemChunk as copy of a given raw memory block
 	 * This will create a MemChunk of the given size and fill it with the data at the given address.
@@ -277,11 +259,8 @@ public:
 	 * \param nrOfTimesteps size of the resulting image
 	 */
 	template<typename T> MemChunk( const T *const org, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 ):
-		Chunk(
-			( TYPE * )malloc( sizeof( TYPE )*nrOfTimesteps *nrOfSlices *nrOfRows *nrOfColumns ),
-			typename ValuePtr<TYPE>::BasicDeleter(),
-			nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps
-		) {
+		Chunk( ValuePtrReference(ValuePtr<TYPE>( getVolume() )),nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps)
+	{
 		util::checkType<T>();
 		asValuePtrBase().copyFromMem( org, getVolume() );
 	}
@@ -385,8 +364,6 @@ public:
 	MemChunkNonDel &operator=( const MemChunkNonDel<TYPE> &ref ) { //this is needed, to prevent generation of default-copy operator
 		return operator=( static_cast<const Chunk &>( ref ) );
 	}
-
-
 };
 }
 }

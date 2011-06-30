@@ -66,7 +66,7 @@ public:
 			throwGenericError( "No known datatype" );
 		}
 
-		const size_t elemSize = data::_internal::ValuePtrBase::createById( type, 0 )->bytesPerElem();
+		const size_t elemSize = data::_internal::ValuePtrBase::createByID( type, 0 )->bytesPerElem();
 
 		const size_t ssize = sqrt( fsize / elemSize );
 
@@ -109,7 +109,7 @@ public:
 			std::ofstream out;
 			unsigned short typeID;
 		public:
-			WriteOp( std::string fname, unsigned short id ): out( fname.c_str() ), typeID( id ) {
+			WriteOp( std::string fname, unsigned short ID ): out( fname.c_str() ), typeID( ID ) {
 				out.exceptions( std::ios::failbit | std::ios::badbit );
 			}
 			bool operator()( data::Chunk &ref, util::FixedVector<size_t, 4 > /*posInImage*/ ) {

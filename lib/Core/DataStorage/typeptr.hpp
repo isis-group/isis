@@ -271,9 +271,16 @@ public:
 	}
 	//
 	scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const {
-		std::pair<util::ValueReference, util::ValueReference> minmax = getMinMax();
-		assert( ! ( minmax.first.isEmpty() || minmax.second.isEmpty() ) );
-		return ValuePtrBase::getScalingTo( typeID, minmax, scaleopt );
+		if(typeID==staticID && scaleopt==autoscale) // if id is the same and autoscale is requested
+		{
+			static const util::Value<uint8_t> one( 1 );
+			static const util::Value<uint8_t> zero( 0 );
+			return std::pair<util::ValueReference, util::ValueReference>(one,zero); // the result is always 1/0
+		} else { // get min/max and compute the scaling
+			std::pair<util::ValueReference, util::ValueReference> minmax = getMinMax();
+			assert( ! ( minmax.first.isEmpty() || minmax.second.isEmpty() ) );
+			return ValuePtrBase::getScalingTo( typeID, minmax, scaleopt ); 
+		}
 	}
 };
 /// @cond _hidden
