@@ -192,7 +192,7 @@ BOOST_AUTO_TEST_CASE( ValuePtr_conversion_test )
 	for ( int i = 0; i < 12; i++ )
 		BOOST_REQUIRE_EQUAL( floatArray[i], init[i] );
 
-	data::ValuePtr<int32_t> intArray = floatArray.copyToNew<int32_t>();
+	data::ValuePtr<int32_t> intArray = floatArray.copyAs<int32_t>();
 	double scale = std::numeric_limits<int32_t>::max() / 2.;
 
 	for ( int i = 0; i < 12; i++ ) // Conversion from float to integer will scale up to maximum, to map the fraction as exact as possible
@@ -204,15 +204,15 @@ BOOST_AUTO_TEST_CASE( ValuePtr_conversion_test )
 	for ( int i = 0; i < 12; i++ )
 		floatArray[i] = init[i] * 1e5;
 
-	data::ValuePtr<short> shortArray = floatArray.copyToNew<short>();
-	data::ValuePtr<uint8_t> byteArray = shortArray.copyToNew<uint8_t>();
+	data::ValuePtr<short> shortArray = floatArray.copyAs<short>();
+	data::ValuePtr<uint8_t> byteArray = shortArray.copyAs<uint8_t>();
 
 	for ( int i = 0; i < 12; i++ )
 		BOOST_CHECK_EQUAL( shortArray[i], ceil( init[i] * 1e5 * scale - .5 ) );
 
 	//with offset and scale
 	const double uscale = std::numeric_limits< unsigned short >::max() / 4e5;
-	data::ValuePtr<unsigned short> ushortArray = floatArray.copyToNew<unsigned short>();
+	data::ValuePtr<unsigned short> ushortArray = floatArray.copyAs<unsigned short>();
 
 	for ( int i = 0; i < 12; i++ )
 		BOOST_CHECK_EQUAL( ushortArray[i], ceil( init[i] * 1e5 * uscale + 32767.5 - .5 ) );
@@ -223,7 +223,7 @@ BOOST_AUTO_TEST_CASE( ValuePtr_complex_conversion_test )
 	const std::complex<float> init[] = { -2, -1.8, -1.5, -1.3, -0.6, -0.2, 2, 1.8, 1.5, 1.3, 0.6, 0.2};
 	data::ValuePtr<std::complex<float> > cfArray( 12 );
 	cfArray.copyFromMem( init, 12 );
-	data::ValuePtr<std::complex<double> > cdArray = cfArray.copyToNew<std::complex<double> >();
+	data::ValuePtr<std::complex<double> > cdArray = cfArray.copyAs<std::complex<double> >();
 
 	for( size_t i = 0; i < 12; i++ ) {
 		BOOST_CHECK_EQUAL( cfArray[i], init[i] );
@@ -236,8 +236,8 @@ BOOST_AUTO_TEST_CASE( ValuePtr_boolean_conversion_test )
 	const float init[] = { -2, -1.8, -1.5, -1.3, -0.6, 0, 2, 1.8, 1.5, 1.3, 0.6, 0.2};
 	data::ValuePtr<float> cfArray( 12 );
 	cfArray.copyFromMem( init, 12 );
-	data::ValuePtr<bool> bArray = cfArray.copyToNew<bool>();
-	data::ValuePtr<float> fArray = bArray.copyToNew<float>();
+	data::ValuePtr<bool> bArray = cfArray.copyAs<bool>();
+	data::ValuePtr<float> fArray = bArray.copyAs<float>();
 
 	for( size_t i = 0; i < 12; i++ ) {
 		BOOST_CHECK_EQUAL( bArray[i], ( bool )init[i] );

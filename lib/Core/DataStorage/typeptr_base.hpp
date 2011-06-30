@@ -121,7 +121,16 @@ public:
 		return copyTo(cont,scaling);
 	}
 
-	/// Copy elements from raw memory
+	/**
+	 * Copies elements from this into raw memory.
+	 * This is allways a deep copy, regardless of the types.
+	 * If the this and the target are not of the same length:
+	 * - the shorter length will be used
+	 * - a warning about it will be sent to Debug
+	 * \param dst pointer to the target memory
+	 * \param len size (in elements) of the target memory
+	 * \param scaling the scaling to be used if a conversion is necessary (computed automatically if not given)
+	 */
 	template<typename T> bool copyFromMem( const T *const src, size_t _length, scaling_pair scaling=scaling_pair() ) {
 		ValuePtr<T> cont(const_cast<T*>(src),_length, typename ValuePtr<T>::NonDeleter()); //its ok - we're no going to change it
 		return cont.copyTo(cont,scaling);
@@ -141,9 +150,8 @@ public:
 	 * If the conversion fails, an error will be send to CoreLog and the data of the newly created ValuePtr will be undefined.
 	 * \returns a the newly created ValuePtr
 	 */
-	template<typename T> ValuePtr<T> copyToNew( scaling_pair scaling = scaling_pair() )const {
-		Reference ret = copyToNewByID( ValuePtr<T>::staticID, scaling );
-		return ret->castToValuePtr<T>();
+	template<typename T> ValuePtr<T> copyAs( scaling_pair scaling = scaling_pair() )const {
+		return copyToNewByID( ValuePtr<T>::staticID, scaling )->castToValuePtr<T>();
 	}
 	
 	/**
@@ -174,7 +182,7 @@ public:
 	 * \returns eigther a cheap copy or a newly created ValuePtr
 	 */
 	template<typename T> ValuePtr<T> as(scaling_pair scaling = scaling_pair()){
-		return convertToID(ValuePtr<T>::staticID)->castToValuePtr<T>();
+		return convertToID(ValuePtr<T>::staticID,scaling)->castToValuePtr<T>();
 	}
 
 	/**
