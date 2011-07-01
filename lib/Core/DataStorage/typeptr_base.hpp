@@ -42,7 +42,8 @@ protected:
 	virtual ValuePtrBase *clone()const = 0;
 
 public:
-	virtual const boost::weak_ptr<void> getRawAddress()const = 0;
+	virtual boost::weak_ptr<const void> getRawAddress()const = 0;
+	virtual boost::weak_ptr<void> getRawAddress() = 0;
 
 	typedef util::_internal::ValueReference<ValuePtrBase> Reference;
 	typedef ValuePtrConverterMap::mapped_type::mapped_type Converter;

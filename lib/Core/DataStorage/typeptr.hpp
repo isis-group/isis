@@ -178,9 +178,8 @@ public:
 	 * Get the raw address the ValuePtr points to.
 	 * \returns a weak_ptr\<void\> with the memory address of the data handled by this ValuePtr.
 	 */
-	const boost::weak_ptr<void> getRawAddress()const {
-		return boost::weak_ptr<void>( m_val );
-	}
+	boost::weak_ptr<const void> getRawAddress()const {return boost::weak_ptr<const void>( m_val );}
+	boost::weak_ptr<void> getRawAddress(){return boost::weak_ptr<void>( m_val );}
 
 	/// Copy elements from raw memory
 	void copyFromMem( const TYPE *const src, size_t _length ) {
