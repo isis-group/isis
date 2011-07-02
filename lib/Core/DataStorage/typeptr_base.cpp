@@ -80,7 +80,7 @@ size_t ValuePtrBase::compare( size_t start, size_t end, const _internal::ValuePt
 }
 
 
-ValuePtrBase::Reference ValuePtrBase::copyToNewByID( unsigned short ID, scaling_pair scaling ) const
+ValuePtrBase::Reference ValuePtrBase::copyByID( unsigned short ID, scaling_pair scaling ) const
 {
 	const Converter &conv = getConverterTo( ID );
 
@@ -128,7 +128,7 @@ ValuePtrBase::Reference ValuePtrBase::createByID( unsigned short ID, size_t len 
 	}
 }
 
-ValuePtrBase::Reference ValuePtrBase::convertToID(short unsigned int ID, scaling_pair scaling)
+ValuePtrBase::Reference ValuePtrBase::convertByID(short unsigned int ID, scaling_pair scaling)
 {
 	scaling=getScaling(scaling,ID);
 	static const util::Value<uint8_t> one( 1 );
@@ -137,7 +137,7 @@ ValuePtrBase::Reference ValuePtrBase::convertToID(short unsigned int ID, scaling
 	if(scaling.first->eq(one) && scaling.second->eq(zero) && getTypeID()==ID ){ // if type is the same and scaling is 1/0
 		return *this; //cheap copy
 	} else {
-		return copyToNewByID(ID,scaling); // convert into new
+		return copyByID(ID,scaling); // convert into new
 	}
 }
 

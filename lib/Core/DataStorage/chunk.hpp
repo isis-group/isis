@@ -267,7 +267,7 @@ public:
 	/// Create a deep copy of a given Chunk (automatic conversion will be used if datatype does not fit)
 	MemChunk( const Chunk &ref ): Chunk( ref ) {
 		//get rid of my ValuePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		ValuePtrReference::operator=( ref.getValuePtrBase().copyToNewByID( ValuePtr<TYPE>::staticID ) );
+		ValuePtrReference::operator=( ref.getValuePtrBase().copyByID( ValuePtr<TYPE>::staticID ) );
 	}
 	/**
 	 * Create a deep copy of a given Chunk.
@@ -277,11 +277,11 @@ public:
 	 */
 	MemChunk( const Chunk &ref, const scaling_pair &scaling ): Chunk( ref ) {
 		//get rid of my ValuePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		ValuePtrReference::operator=( ref.getValuePtrBase().copyToNewByID( ValuePtr<TYPE>::staticID, scaling ) );
+		ValuePtrReference::operator=( ref.getValuePtrBase().copyByID( ValuePtr<TYPE>::staticID, scaling ) );
 	}
 	MemChunk( const MemChunk<TYPE> &ref ): Chunk( ref ) { //this is needed, to prevent generation of default-copy constructor
 		//get rid of my ValuePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		ValuePtrReference::operator=( ref.getValuePtrBase().copyToNewByID( ValuePtr<TYPE>::staticID ) );
+		ValuePtrReference::operator=( ref.getValuePtrBase().copyByID( ValuePtr<TYPE>::staticID ) );
 	}
 	/// Create a deep copy of a given Chunk (automatic conversion will be used if datatype does not fit)
 	MemChunk &operator=( const Chunk &ref ) {
@@ -289,7 +289,7 @@ public:
 				<< "Not overwriting current chunk memory (which is still used by " << useCount() - 1 << " other chunk(s)).";
 		Chunk::operator=( ref ); //copy the chunk of ref
 		//get rid of my ValuePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		ValuePtrReference::operator=( ref.getValuePtrBase().copyToNewByID( ValuePtr<TYPE>::staticID ) );
+		ValuePtrReference::operator=( ref.getValuePtrBase().copyByID( ValuePtr<TYPE>::staticID ) );
 		return *this;
 	}
 	/// Create a deep copy of a given MemChunk (automatic conversion will be used if datatype does not fit)
@@ -334,7 +334,7 @@ public:
 	/// Create a deep copy of a given Chunk (automatic conversion will be used if datatype does not fit)
 	MemChunkNonDel( const Chunk &ref ): Chunk( ref ) {
 		//get rid of my ValuePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		ValuePtrReference::operator=( ref.getValuePtrBase().copyToNewByID( ValuePtr<TYPE>::staticID ) );
+		ValuePtrReference::operator=( ref.getValuePtrBase().copyByID( ValuePtr<TYPE>::staticID ) );
 	}
 	/**
 	 * Create a deep copy of a given Chunk.
@@ -345,11 +345,11 @@ public:
 	 */
 	MemChunkNonDel( const Chunk &ref, const util::_internal::ValueBase &min, const  util::_internal::ValueBase &max ): Chunk( ref ) {
 		//get rid of my ValuePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		ValuePtrReference::operator=( ref.getValuePtrBase().copyToNewByID( ValuePtr<TYPE>::staticID, min, max ) );
+		ValuePtrReference::operator=( ref.getValuePtrBase().copyByID( ValuePtr<TYPE>::staticID, min, max ) );
 	}
 	MemChunkNonDel( const MemChunk<TYPE> &ref ): Chunk( ref ) { //this is needed, to prevent generation of default-copy constructor
 		//get rid of my ValuePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		ValuePtrReference::operator=( ref.getValuePtrBase().copyToNewByID( ValuePtr<TYPE>::staticID ) );
+		ValuePtrReference::operator=( ref.getValuePtrBase().copyByID( ValuePtr<TYPE>::staticID ) );
 	}
 	/// Create a deep copy of a given Chunk (automatic conversion will be used if datatype does not fit)
 	MemChunkNonDel &operator=( const Chunk &ref ) {
@@ -357,7 +357,7 @@ public:
 				<< "Not overwriting current chunk memory (which is still used by " << useCount() - 1 << " other chunk(s)).";
 		Chunk::operator=( ref ); //copy the chunk of ref
 		//get rid of my ValuePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
-		ValuePtrReference::operator=( ref.getValuePtrBase().copyToNewByID( ValuePtr<TYPE>::staticID ) );
+		ValuePtrReference::operator=( ref.getValuePtrBase().copyByID( ValuePtr<TYPE>::staticID ) );
 		return *this;
 	}
 	/// Create a deep copy of a given MemChunk (automatic conversion will be used if datatype does not fit)

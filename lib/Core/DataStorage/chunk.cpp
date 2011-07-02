@@ -63,7 +63,7 @@ Chunk Chunk::cloneToNew( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices,
 bool Chunk::convertToType( short unsigned int ID, scaling_pair scaling )
 {
 	//get a converted ValuePtr (will be a cheap copy if no conv was needed)
-	ValuePtrReference newPtr = asValuePtrBase().convertToID(ID,scaling);
+	ValuePtrReference newPtr = asValuePtrBase().convertByID(ID,scaling);
 
 	if( newPtr.isEmpty() ) // if the reference is empty the conversion failed
 		return false;
