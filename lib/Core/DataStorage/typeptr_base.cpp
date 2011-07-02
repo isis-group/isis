@@ -162,7 +162,7 @@ void ValuePtrBase::copyRange( size_t start, size_t end, ValuePtrBase &dst, size_
 				<< "End of the range (" << len + dst_start << ") is behind the end of the destination (" << dst.getLength() << ")";
 	} else {
 		boost::shared_ptr<void> daddr = dst.getRawAddress().lock();
-		boost::shared_ptr<void> saddr = getRawAddress().lock();
+		const boost::shared_ptr<const void> saddr = getRawAddress().lock();
 		const size_t soffset = bytesPerElem() * start; //source offset in bytes
 		const int8_t *const  src = ( int8_t * )saddr.get();
 		const size_t doffset = bytesPerElem() * dst_start;//destination offset in bytes
