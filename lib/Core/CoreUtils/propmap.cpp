@@ -434,7 +434,7 @@ bool PropertyMap::transform( key_type from,  key_type to, int dstID, bool delSou
 			}
 		} else {
 			LOG_IF( from == to, Debug, warning ) << "Transforming " << MSubject( found ) << " in place.";
-			dst = found->copyToNewByID( dstID );
+			dst = found->copyByID( dstID );
 			ret = !dst.isEmpty();
 		}
 	}

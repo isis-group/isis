@@ -192,7 +192,7 @@ public:
 	 */
 	std::string toString( bool labeled = false )const {
 		std::string ret;
-		Reference ref = copyToNewByID( Value<std::string>::staticID );
+		Reference ref = copyByID( Value<std::string>::staticID );
 
 		if ( ref.isEmpty() ) {
 			LOG( Debug, warning ) << "Automatic conversion of " << *this << " to string failed. Falling back to boost::lexical_cast<std::string>";

@@ -114,7 +114,7 @@ public:
 		} else if ( ! isEmpty() ) { // otherwise try to make me T and compare that
 			LOG( Debug, info )
 					<< *this << " is not " << Value<T>::staticName() << " trying to convert.";
-			ValueReference dst = ( *this )->copyToNewByID( Value<T>::staticID );
+			ValueReference dst = ( *this )->copyByID( Value<T>::staticID );
 
 			if ( !dst.isEmpty() )
 				return dst->castTo<T>() == second;

@@ -116,7 +116,7 @@ public:
 		if( is<T>() )
 			return castTo<T>();
 
-		Reference ret = copyToNewByID( Value<T>::staticID );
+		Reference ret = copyByID( Value<T>::staticID );
 
 		if ( ret.isEmpty() ) {
 			LOG( Debug, error )
@@ -163,7 +163,7 @@ public:
 	virtual bool operator==( const ValueBase &second )const = 0;
 
 	/// creates a copy of the stored value using a type referenced by its ID
-	Reference copyToNewByID( unsigned short ID ) const;
+	Reference copyByID( unsigned short ID ) const;
 
 	/**
 	 * Check if the stored value would also fit into another type referenced by its ID
