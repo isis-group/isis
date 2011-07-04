@@ -43,7 +43,8 @@ protected:
 	virtual ValuePtrBase *clone()const = 0;
 
 public:
-	virtual const boost::weak_ptr<void> getRawAddress()const = 0;
+	virtual boost::weak_ptr<const void> getRawAddress()const = 0;
+	virtual boost::weak_ptr<void> getRawAddress() = 0;
 
 	typedef util::_internal::ValueReference<ValuePtrBase> Reference;
 	typedef ValuePtrConverterMap::mapped_type::mapped_type Converter;
@@ -88,11 +89,11 @@ public:
 	virtual scaling_pair getScalingTo( unsigned short typeID, const std::pair<util::ValueReference, util::ValueReference> &minmax, autoscaleOption scaleopt = autoscale )const;
 
 	/**
-	 * @copydoc copyToNewByID
+	 * @copydoc copyByID
 	 * \param ID the ID of the type the new ValuePtr (referenced by the Reference returned) should have
 	 * \param scaling the scaling to be used if a conversion is necessary (computed automatically if not given)
 	 */
-	Reference copyToNewByID( unsigned short ID, scaling_pair scaling = scaling_pair() ) const;
+	Reference copyByID( unsigned short ID, scaling_pair scaling = scaling_pair() ) const;
 
 	/**
 	 * Copies elements from this into another ValuePtr.
@@ -122,17 +123,17 @@ public:
 	}
 
 	/**
-	 * Copies elements from this into raw memory.
+	 * Copies elements from raw memory into  this.
 	 * This is allways a deep copy, regardless of the types.
 	 * If the this and the target are not of the same length:
 	 * - the shorter length will be used
 	 * - a warning about it will be sent to Debug
-	 * \param dst pointer to the target memory
+	 * \param src pointer to the target memory
 	 * \param len size (in elements) of the target memory
 	 * \param scaling the scaling to be used if a conversion is necessary (computed automatically if not given)
 	 */
-	template<typename T> bool copyFromMem( const T *const src, size_t _length, scaling_pair scaling=scaling_pair() ) {
-		ValuePtr<T> cont(const_cast<T*>(src),_length, typename ValuePtr<T>::NonDeleter()); //its ok - we're no going to change it
+	template<typename T> bool copyFromMem( const T *const src, size_t len, scaling_pair scaling=scaling_pair() ) {
+		ValuePtr<T> cont(const_cast<T*>(src),len, typename ValuePtr<T>::NonDeleter()); //its ok - we're no going to change it
 		return cont.copyTo(cont,scaling);
 	}
 
@@ -151,7 +152,7 @@ public:
 	 * \returns a the newly created ValuePtr
 	 */
 	template<typename T> ValuePtr<T> copyAs( scaling_pair scaling = scaling_pair() )const {
-		Reference erg=copyToNewByID( ValuePtr<T>::staticID, scaling );
+		Reference erg=copyByID( ValuePtr<T>::staticID, scaling );
 		return erg.isEmpty() ? ValuePtr<T>(0):erg->castToValuePtr<T>();
 	}
 	
@@ -167,7 +168,7 @@ public:
 	 * \param scaling the scaling to be used (determined automatically if not given)
 	 * \returns a reference of eigther a cheap copy or a newly created ValuePtr
 	 */
-	ValuePtrBase::Reference  convertToID( unsigned short ID, scaling_pair scaling = scaling_pair() );
+	ValuePtrBase::Reference  convertByID( unsigned short ID, scaling_pair scaling = scaling_pair() );
 
 
 	/**
@@ -178,12 +179,11 @@ public:
 	 * - scaling.first (the scaling offset) is not 0
 	 *
 	 * Otherwise a cheap copy is done.
-	 * \param ID the ID of the requeseted type (use ValuePtr::staticID)
 	 * \param scaling the scaling to be used (determined automatically if not given)
 	 * \returns eigther a cheap copy or a newly created ValuePtr
 	 */
 	template<typename T> ValuePtr<T> as(scaling_pair scaling = scaling_pair()){
-		Reference erg=convertToID(ValuePtr<T>::staticID,scaling);
+		Reference erg=convertByID(ValuePtr<T>::staticID,scaling);
 		return erg.isEmpty() ? ValuePtr<T>(0):erg->castToValuePtr<T>();
 	}
 
