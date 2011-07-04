@@ -684,7 +684,7 @@ size_t Image::compare( const isis::data::Image &comp ) const
 		LOG( Debug, verbose_info )
 				<< "Start positions are " << c1pair1.second << " and " << c2pair1.second
 				<< " and the length is " << c1pair2.second - c1pair1.second;
-		ret += c1.compareRange( c1pair1.second, c1pair2.second, c2, c2pair1.second );
+		ret += c1.getValuePtrBase().compare( c1pair1.second, c1pair2.second, c2.getValuePtrBase(), c2pair1.second );
 	}
 
 	return ret;

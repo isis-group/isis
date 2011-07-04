@@ -119,10 +119,6 @@ void Chunk::copyRange( const size_t source_start[], const size_t source_end[], C
 	getValuePtrBase().copyRange( sstart, send, *dst, dstart );
 }
 
-size_t Chunk::compareRange( size_t flat_start, size_t flat_end, const Chunk &dst, size_t destination ) const
-{
-	return getValuePtrBase().compare( flat_start, flat_end, *dst, destination );
-}
 size_t Chunk::compareRange( const size_t source_start[], const size_t source_end[], const Chunk &dst, const size_t destination[] ) const
 {
 	LOG_IF( ! isInRange( source_start ), Debug, error )
@@ -140,24 +136,16 @@ size_t Chunk::compareRange( const size_t source_start[], const size_t source_end
 	const size_t sstart = getLinearIndex( source_start );
 	const size_t send = getLinearIndex( source_end );
 	const size_t dstart = dst.getLinearIndex( destination );
-	return compareRange( sstart, send, dst, dstart );
+	return getValuePtrBase().compare( sstart, send, dst.getValuePtrBase(), dstart );
+}
+size_t Chunk::compare(const isis::data::Chunk& dst) const
+{
+	if(getSizeAsVector()==dst.getSizeAsVector())
+		return getValuePtrBase().compare( 0, getVolume() - 1, dst.getValuePtrBase(), 0 );
+	else
+		return std::max(getVolume(),dst.getVolume());
 }
 
-size_t Chunk::compareLine( size_t secondDimS, size_t thirdDimS, size_t fourthDimS, const Chunk &dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD ) const
-{
-	const size_t idx1[] = {0, secondDimS, thirdDimS, fourthDimS};
-	const size_t idx2[] = {0, secondDimD, thirdDimD, fourthDimD};
-	const size_t idx3[] = {getSizeAsVector()[0] - 1, secondDimD, thirdDimD, fourthDimD};
-	return compareRange( idx1, idx2, dst, idx3 );
-}
-
-size_t Chunk::compareSlice( size_t thirdDimS, size_t fourthDimS, const Chunk &dst, size_t thirdDimD, size_t fourthDimD ) const
-{
-	const size_t idx1[] = {0, 0, thirdDimS, fourthDimS};
-	const size_t idx2[] = {0, 0, thirdDimD, fourthDimD};
-	const size_t idx3[] = {getSizeAsVector()[0] - 1, getSizeAsVector()[1] - 1, thirdDimD, fourthDimD};
-	return compareRange( idx1, idx2, dst, idx3 );
-}
 
 std::pair<util::ValueReference, util::ValueReference> Chunk::getMinMax ( ) const
 {

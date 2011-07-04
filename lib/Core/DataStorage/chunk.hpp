@@ -179,10 +179,8 @@ public:
 	void copyLine( size_t secondDimS, size_t thirdDimS, size_t fourthDimS, Chunk &dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD )const;
 	void copySlice( size_t thirdDimS, size_t fourthDimS, Chunk &dst, size_t thirdDimD, size_t fourthDimD )const;
 
-	size_t compareRange( size_t start, size_t end, const Chunk &dst, size_t destination )const;
+	size_t compare( const Chunk &dst )const;
 	size_t compareRange( const size_t source_start[], const size_t source_end[], const Chunk &dst, const size_t destination[] )const;
-	size_t compareLine( size_t secondDimS, size_t thirdDimS, size_t fourthDimS, const Chunk &dst, size_t secondDimD, size_t thirdDimD, size_t fourthDimD )const;
-	size_t compareSlice( size_t thirdDimS, size_t fourthDimS, const Chunk &dst, size_t thirdDimD, size_t fourthDimD )const;
 
 	std::pair<util::ValueReference, util::ValueReference> getMinMax()const;
 
