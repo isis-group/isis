@@ -30,7 +30,7 @@ set(ISIS_LIB_DEPENDS  ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} ${LibOil_LIBRARY}
 ############################################################
 # Build config
 ############################################################
-set(ISIS_BUILD_PROPERTIES LINK_FLAGS "--no-undefined" CLEAN_DIRECT_OUTPUT 1)
+set(ISIS_BUILD_PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 set(ISIS_BUILD_STATIC OFF CACHE BOOL "enable build of the static library. If OFF a dynamic library will be build and
 linked." )
 
