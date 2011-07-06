@@ -197,14 +197,12 @@ public:
 
 		return boost::lexical_cast<std::string>( m_len ) + "#" + ret;
 	}
-	/// @copydoc util::Value::getTypeName
-	virtual std::string getTypeName()const {
-		return staticName();
-	}
-	/// @copydoc util::Value::getTypeID
-	virtual unsigned short getTypeID()const {
-		return staticID;
-	}
+
+	std::string getTypeName()const {return staticName();}
+	unsigned short getTypeID()const {return staticID;}
+	bool isFloat() const{return boost::is_float< TYPE >::value;}
+	bool isInteger() const{return boost::is_integral< TYPE >::value;}
+
 	/// @copydoc util::Value::staticName
 	static std::string staticName() {
 		return std::string( util::Value<TYPE>::staticName() ) + "*";

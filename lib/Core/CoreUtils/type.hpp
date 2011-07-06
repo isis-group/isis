@@ -18,6 +18,8 @@
 
 #include <string>
 #include <functional>
+#include <boost/type_traits/is_float.hpp>
+#include <boost/type_traits/is_integral.hpp>
 
 namespace isis
 {
@@ -205,13 +207,12 @@ public:
 
 		return ret;
 	}
-	virtual std::string getTypeName()const {
-		return staticName();
-	}
-	virtual unsigned short getTypeID()const {
-		return staticID;
-	}
-
+	
+	std::string getTypeName()const {return staticName();}
+	unsigned short getTypeID()const {return staticID;}
+	bool isFloat() const{return boost::is_float< TYPE >::value;}
+	bool isInteger() const{return boost::is_integral< TYPE >::value;}
+	
 	/// \returns true if and only if this and second do contain the same value of the same type
 	virtual bool operator==( const ValueBase &second )const {
 		if ( second.is<TYPE>() ) {
