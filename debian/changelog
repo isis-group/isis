@@ -1,3 +1,20 @@
+isis (0.3.3gitg71597cb-0) stable; urgency=low
+
+   * use int64_t instead of platform dependent size_t (or time_t) - fixes
+     compile for gcc/mac
+  
+   * do the copying directly in copyChunksToVector - prevent warning about
+     empty object creation
+  
+   * enabled CTest support. Added CoreUtils and DataStorage tests as CTest
+     targets.
+   
+   * make tar-proxy use the dialect to enforce the format used to read the
+    files inside
+
+ -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Thu, 23 Jun 2011 15:38:35 +0200
+
+
 isis (0.3.1gite7210b-0) stable; urgency=low
 
     * major changes in the project structure. All former ISIS subprojects are now part of an overall ISIS project.

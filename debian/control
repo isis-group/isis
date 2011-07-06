@@ -2,7 +2,7 @@ Source: isis
 Section: science
 Priority: optional
 Maintainer: ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>
-Build-Depends: libdcmtk1-dev, libnifti1-dev | libnifti-dev | libniftiio-dev, libtiff-dev
+Build-Depends: libnifti1-dev | libnifti-dev | libniftiio-dev, libtiff-dev
 Standards-Version: 3.8.1
 
 Package: libisiscore0
