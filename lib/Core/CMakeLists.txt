@@ -59,7 +59,7 @@ endmacro( build_shared )
 
 # the core library shared and static build
 
-#for debian packaging purpose we want to build both, shared and static with one build_command
+#for packaging purpose we want to build both, shared and static with one build_command
 #however this capability is not provided by an option in the cmake menu
 if(ISIS_BUILD_STATIC_AND_SHARED)
     build_static( isis_core_static )
