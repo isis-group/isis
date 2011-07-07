@@ -1,2 +1,2 @@
-debian/tmp/usr/lib/Adapter/*.so
+debian/tmp/usr/lib/libisisAdapter_qt4.so
 
