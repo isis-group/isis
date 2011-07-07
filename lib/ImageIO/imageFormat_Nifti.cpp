@@ -136,7 +136,7 @@ public:
 	/***********************
 	 * load file
 	 ************************/
-	int load( std::list<data::Chunk> &retList, const std::string &filename, const std::string &/*dialect*/)  throw( std::runtime_error & ) {
+	int load( std::list<data::Chunk> &retList, const std::string &filename, const std::string &/*dialect*/ )  throw( std::runtime_error & ) {
 		//read the file with the function from nifti1_io.h
 		nifti_image *ni = nifti_image_read( filename.c_str(), true );
 

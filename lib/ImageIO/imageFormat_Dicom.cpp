@@ -259,23 +259,26 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 
 	if ( hasOrTell( prefix + "PatientsSex", object, warning ) ) {
 		util::Selection isisGender( "male,female,other" );
-		bool set=false;
+		bool set = false;
 
 		switch ( object.getPropertyAs<std::string>( prefix + "PatientsSex" )[0] ) {
 		case 'M':
-			isisGender.set( "male" );set=true;
+			isisGender.set( "male" );
+			set = true;
 			break;
 		case 'F':
-			isisGender.set( "female" );set=true;
+			isisGender.set( "female" );
+			set = true;
 			break;
 		case 'O':
-			isisGender.set( "other" );set=true;
+			isisGender.set( "other" );
+			set = true;
 			break;
 		default:
 			LOG( Runtime, warning ) << "Dicom gender code " << util::MSubject( object.propertyValue( prefix + "PatientsSex" ) ) <<  " not known";
 		}
 
-		if(set){
+		if( set ) {
 			object.propertyValue( "subjectGender" ) = isisGender;
 			object.remove( prefix + "PatientsSex" );
 		}
