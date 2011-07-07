@@ -29,7 +29,6 @@ bool transformCoords( isis::util::PropertyMap &properties, util::FixedVector<siz
 		|| !properties.hasProperty( "voxelSize" ) || !properties.hasProperty( "indexOrigin" ) ) {
 		return false;
 	}
-
 	using namespace boost::numeric::ublas;
 	// this implementation assumes that the PropMap properties is either a
 	// data::Chunk or a data::Image object. Hence it should contain the
@@ -113,7 +112,6 @@ bool transformCoords( isis::util::PropertyMap &properties, util::FixedVector<siz
 	} else {
 		origin_out = prod( transform, origin_in );
 	}
-
 	for( int i = 0; i < 3; i++ ) {
 		indexorig[i] = origin_out( i );
 	}
