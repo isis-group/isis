@@ -113,7 +113,7 @@ public:
 			return second == cmp; //compare our values
 		} else if ( ! isEmpty() ) { // otherwise try to make me T and compare that
 			LOG( Debug, info )
-					<< *this << " is not " << Value<T>::staticName() << " trying to convert.";
+					<< *this << " is not " << Value<T>::staticName() << ", trying to convert.";
 			ValueReference dst = ( *this )->copyToNewByID( Value<T>::staticID );
 
 			if ( !dst.isEmpty() )

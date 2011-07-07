@@ -145,7 +145,7 @@ public:
 				data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( org_file.file_string(), dialect ); // and get the reading pluging for that
 
 				if( formats.empty() ) {
-					LOG( Runtime, info ) << "Skipping " << org_file << " from " << filename << " because no plugin was found to read it"; // skip if we found none
+					LOG( Runtime, notice ) << "Skipping " << org_file << " from " << filename << " because no plugin was found to read it"; // skip if we found none
 				} else {
 					LOG( Debug, info ) << "Got " << org_file << " from " << filename << " there are " << formats.size() << " plugins which should be able to read it";
 

@@ -216,8 +216,14 @@ size_t IOFactory::loadFile( std::list<Chunk> &ret, const boost::filesystem::path
 			try {
 				return it->load( ret, filename.file_string(), dialect );
 			} catch ( std::runtime_error &e ) {
-				LOG( Runtime, formatReader.size() > 1 ? warning : error )
+				if(suffix_override.empty()){
+					LOG( Runtime, formatReader.size() > 1 ? warning : error )
 						<< "Failed to load " <<  filename << " using " <<  it->getName() << with_dialect << " ( " << e.what() << " )";
+				} else {
+					LOG( Runtime, warning )
+						<< "The enforced format " << it->getName()  << " failed to read " << filename << with_dialect
+						<< " ( " << e.what() << " ), maybe it just wasn't the right format";
+				}
 			}
 		}
 		LOG_IF( boost::filesystem::exists( filename ) && formatReader.size() > 1, Runtime, error ) << "No plugin was able to load: "   << util::MSubject( filename ) << with_dialect;
