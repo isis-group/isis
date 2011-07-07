@@ -642,12 +642,14 @@ BOOST_AUTO_TEST_CASE ( image_splice_test )
 	BOOST_REQUIRE( img.isClean() );
 	BOOST_REQUIRE( img.isValid() );
 	BOOST_REQUIRE( !img.isEmpty() );
+
 	img.spliceDownTo( data::sliceDim );
 	std::vector<data::Chunk > chunks = img.copyChunksToVector( false );
 	BOOST_CHECK_EQUAL( chunks.size(), 100 );
 
 	for( size_t i = 0; i < chunks.size(); i++ ) {
 		BOOST_CHECK_EQUAL( chunks[i].getPropertyAs<int32_t>( "acquisitionNumber" ), i + 1 );
+		BOOST_CHECK_EQUAL( chunks[i].getPropertyAs<util::fvector4>( "indexOrigin"), util::fvector4(0,0,i%10,0) );
 	}
 }
 
