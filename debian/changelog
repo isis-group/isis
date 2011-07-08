@@ -1,3 +1,11 @@
+isis (0.3.3gitg71597cb-1) stable; urgency=low
+
+   * Fixed wrong dependencies
+
+   * isis core should be build without debug log
+
+ -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Thu, 23 Jun  2011 15:38:35 +0200
+
 isis (0.3.3gitg71597cb-0) stable; urgency=low
 
    * use int64_t instead of platform dependent size_t (or time_t) - fixes

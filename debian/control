@@ -8,7 +8,7 @@ Standards-Version: 3.8.1
 Package: libisiscore0
 Section: science
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (>= 0.3.3)
 Description: The ISIS package provides a general I/O framework for neuroimaging
  data.  Being started with fMRI data, it can handle several established data
  formats, like Nifti, Analyze, DICOM and vista. A first application based on this
@@ -21,7 +21,7 @@ Description: The ISIS package provides a general I/O framework for neuroimaging
 Package: libisiscore0-dev
 Section: science
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (>= 0.3.3)
 Description: The ISIS package provides a general I/O framework for neuroimaging
  data.  Being started with fMRI data, it can handle several established data
  formats, like Nifti, Analyze, DICOM and vista. A first application based on this
@@ -34,7 +34,7 @@ Description: The ISIS package provides a general I/O framework for neuroimaging
 Package: isisio0-dicom
 Section: science
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (>= 0.3.3)
 Description: The ISIS package provides a general I/O framework for neuroimaging
  data.  Being started with fMRI data, it can handle several established data
  formats, like Nifti, Analyze, DICOM and vista. A first application based on this
@@ -46,7 +46,7 @@ Description: The ISIS package provides a general I/O framework for neuroimaging
 Package: isisio0-nifti
 Section: science
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (>= 0.3.3)
 Description: The ISIS package provides a general I/O framework for neuroimaging
  data.  Being started with fMRI data, it can handle several established data
  formats, like Nifti, Analyze, DICOM and vista. A first application based on this
@@ -58,7 +58,7 @@ Description: The ISIS package provides a general I/O framework for neuroimaging
 Package: isisio0-vista
 Section: science
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (>= 0.3.3)
 Description: The ISIS package provides a general I/O framework for neuroimaging
  data.  Being started with fMRI data, it can handle several established data
  formats, like Nifti, Analyze, DICOM and vista. A first application based on this
@@ -67,23 +67,10 @@ Description: The ISIS package provides a general I/O framework for neuroimaging
  .
  This Package provides the ISIS I/O plugins for the VISTA support.
 
-Package: isisio0-null
-Section: science
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: The ISIS package provides a general I/O framework for neuroimaging
- data.  Being started with fMRI data, it can handle several established data
- formats, like Nifti, Analyze, DICOM and vista. A first application based on this
- project is a data converter that allows an easy and unified handling of fMRI
- data from various MRI scanners. 
- .
- This Package provides the ISIS I/O plugins for the NULL image support. The NULL 
- image is an artificial image for testing and debugging purpose.
-
 Package: isisio0-gz-proxy
 Section: science
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (>= 0.3.3)
 Description: The ISIS package provides a general I/O framework for neuroimaging
  data.  Being started with fMRI data, it can handle several established data
  formats, like Nifti, Analyze, DICOM and vista. A first application based on this
@@ -97,7 +84,7 @@ Description: The ISIS package provides a general I/O framework for neuroimaging
 Package: isisio0-tar-proxy
 Section: science
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (>= 0.3.3)
 Description: The ISIS package provides a general I/O framework for neuroimaging
  data.  Being started with fMRI data, it can handle several established data
  formats, like Nifti, Analyze, DICOM and vista. A first application based on this
@@ -109,7 +96,7 @@ Description: The ISIS package provides a general I/O framework for neuroimaging
 Package: isisio0-raw
 Section: science
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (>= 0.3.3)
 Description: The ISIS package provides a general I/O framework for neuroimaging
  data.  Being started with fMRI data, it can handle several established data
  formats, like Nifti, Analyze, DICOM and vista. A first application based on this
@@ -121,7 +108,7 @@ Description: The ISIS package provides a general I/O framework for neuroimaging
 Package: isisio0-png
 Section: science
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (>= 0.3.3)
 Description: The ISIS package provides a general I/O framework for neuroimaging
  data.  Being started with fMRI data, it can handle several established data
  formats, like Nifti, Analyze, DICOM and vista. A first application based on this
@@ -133,7 +120,7 @@ Description: The ISIS package provides a general I/O framework for neuroimaging
 Package: isis-utils
 Section: science
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (>= 0.3.3)
 Description: The ISIS package provides a general I/O framework for neuroimaging
  data.  Being started with fMRI data, it can handle several established data
  formats, like Nifti, Analyze, DICOM and vista. A first application based on this
@@ -146,7 +133,7 @@ Description: The ISIS package provides a general I/O framework for neuroimaging
 Package: isis-qt4
 Section: science
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (>= 0.3.3)
 Description: The ISIS package provides a general I/O framework for neuroimaging
  data.  Being started with fMRI data, it can handle several established data
  formats, like Nifti, Analyze, DICOM and vista. A first application based on this
