@@ -61,7 +61,7 @@ int main( int argc, char *argv[] )
 		return 1;
 	}
 
-	std::pair<std::string, int> in1 = parseFilename( files.front() ), in2 = parseFilename( files.back() );
+	std::pair<std::string, int > in1 = parseFilename( files.front() ), in2 = parseFilename( files.back() );
 	std::list<data::Image> images1, images2;
 
 	if( in1.second >= 0 || in2.second >= 0 ) { // seems like we got numbers

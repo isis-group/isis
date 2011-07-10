@@ -2,6 +2,7 @@
 #include "DataStorage/io_interface.h"
 #include <DataStorage/io_factory.hpp>
 #include <CoreUtils/tmpfile.hpp>
+#include <DataStorage/io_factory.hpp>
 
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -83,18 +84,17 @@ protected:
 		return std::string( "tar tar.gz tgz tar.bz2 tbz tar.Z taz" );
 	}
 public:
-	std::string dialects( const std::string &filename )const {
-		/*      if( filename.isEmpty() ) {*/
-		return std::string();
-		/*      } else {
-		            std::set<std::string> ret;
-		            data::IOFactory::FileFormatList formats = data::IOFactory::get().getFormatInterface( FileFormat::makeBasename( filename ).first );
-		            BOOST_FOREACH( data::IOFactory::FileFormatList::const_reference ref, formats ) {
-		                const std::list<std::string> dias = util::stringToList<std::string>( ref->dialects( filename ) );
-		                ret.insert( dias.begin(), dias.end() );
-		            }
-		            return util::listToString( ret.begin(), ret.end(), ",", "", "" );
-		        }*/
+	std::string dialects( const std::string &/*filename*/ )const {
+
+		std::list<util::istring> suffixes;
+		BOOST_FOREACH( data::IOFactory::FileFormatPtr format, data::IOFactory::getFormats() ) {
+			const std::list<util::istring> s = format->getSuffixes();
+			suffixes.insert( suffixes.end(), s.begin(), s.end() );
+		}
+		suffixes.sort();
+		suffixes.unique();
+
+		return std::string( util::listToString( suffixes.begin(), suffixes.end(), " ", "", "" ) );
 	}
 	std::string getName()const {return "tar decompression proxy for other formats";}
 
@@ -142,7 +142,7 @@ public:
 
 			if( tar_header.typeflag == AREGTYPE || tar_header.typeflag == REGTYPE ) {
 
-				data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( org_file.file_string() ); // and get the reading pluging for that
+				data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( org_file.file_string(), dialect ); // and get the reading pluging for that
 
 				if( formats.empty() ) {
 					LOG( Runtime, info ) << "Skipping " << org_file << " from " << filename << " because no plugin was found to read it"; // skip if we found none
@@ -151,7 +151,7 @@ public:
 
 					const std::pair<std::string, std::string> base = formats.front()->makeBasename( org_file.file_string() );//ask any of the plugins for the suffix
 					util::TmpFile tmpfile( "", base.second );//create a temporary file with this suffix
-					int mfile = open( tmpfile.file_string().c_str(), O_CREAT | O_RDWR, S_IRUSR | S_IWUSR );
+					int mfile = open( tmpfile.file_string().c_str(), O_RDWR, S_IRUSR | S_IWUSR );
 
 					if( mfile == -1 ) {
 						throwSystemError( errno, std::string( "Failed to open temporary " ) + tmpfile.file_string() );
@@ -159,18 +159,18 @@ public:
 
 					// set it to the given size - otherwise mmap will be very sad
 #ifdef HAVE_FALLOCATE
-					const int err = fallocate( mfile, FALLOC_FL_KEEP_SIZE, 0, size ); //fast preallocation using features of ome linux-filesystems
+					const int err = fallocate( mfile, 0, 0, size ); //fast preallocation using features of ome linux-filesystems
 #elif HAVE_POSIX_FALLOCATE
 					const int err = posix_fallocate( mfile, 0, size ); // slower posix compatible version
 #else
-					const int err = ( lseek( mfile, size - 1, SEEK_SET ) == size - 1 && ::write( mfile, " ", 1 ) ) ? 0 : errno; //workaround in case there is no fallocate
+					const int err = ( lseek( mfile, size - 1, SEEK_SET ) == off_t( size - 1 ) && ::write( mfile, " ", 1 ) ) ? 0 : errno; //workaround in case there is no fallocate
 #endif
 
 					if( err ) {
 						throwSystemError( err, std::string( "Failed grow " ) + tmpfile.file_string() + " to size " + boost::lexical_cast<std::string>( size ) );
 					}
 
-					char *mmem = ( char * )mmap( NULL, size, PROT_WRITE, MAP_SHARED, mfile, 0 ); //map it into memory
+					char *mmem = ( char * )mmap( NULL, size,  PROT_WRITE, MAP_SHARED, mfile, 0 ); //map it into memory
 
 					if( mmem == MAP_FAILED ) {
 						throwSystemError( errno, std::string( "Failed to map temporary " ) + tmpfile.file_string() + " into memory" );
@@ -192,7 +192,7 @@ public:
 					// read the temporary file
 					std::list<data::Chunk>::iterator prev = chunks.end();
 					--prev;
-					ret += data::IOFactory::load( chunks, tmpfile.string(), "", dialect );
+					ret += data::IOFactory::load( chunks, tmpfile.string(), dialect );
 
 					for( ; prev != chunks.end(); ++prev ) { // set the source property of the red chunks to something more usefull
 						prev->setPropertyAs( "source", ( boost::filesystem::path( filename ) / org_file ).file_string() );
@@ -208,7 +208,7 @@ public:
 		return ret;
 	}
 
-	void write( const data::Image &image, const std::string &filename, const std::string &dialect )throw( std::runtime_error & ) {
+	void write( const data::Image &/*image*/, const std::string &/*filename*/, const std::string &/*dialect*/ )throw( std::runtime_error & ) {
 		throw( std::runtime_error( "Writing to tar is not (yet) implemented" ) );
 	}
 	bool tainted()const {return false;}//internal plugins are not tainted

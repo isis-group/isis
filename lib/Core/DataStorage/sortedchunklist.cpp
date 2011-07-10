@@ -37,7 +37,7 @@ SortedChunkList::scalarPropCompare::scalarPropCompare( const util::PropertyMap::
 bool SortedChunkList::posCompare::operator()( const util::fvector4 &posA, const util::fvector4 &posB ) const
 {
 	if ( posA.lexical_less_reverse( posB ) ) { //if chunk is "under" the other - put it there
-		LOG( Debug, verbose_info ) << "Successfully sorted chunks by position (" << posA << " below " << posB << ")";
+		LOG( Debug, verbose_info ) << "Successfully sorted chunks by in-image position (" << posA << " below " << posB << ")";
 		return true;
 	}
 
@@ -124,7 +124,7 @@ std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::primaryInsert( const 
 
 	if( ch.hasProperty( "sliceVec" ) )
 		sliceVec = ch.propertyValue( "sliceVec" )->castTo<util::fvector4>();
-	else {
+	else { //@todo should not be neccesary
 		sliceVec = util::fvector4(
 					   rowVec[1] * columnVec[2] - rowVec[2] * columnVec[1],
 					   rowVec[2] * columnVec[0] - rowVec[0] * columnVec[2],
@@ -254,7 +254,7 @@ std::vector< boost::shared_ptr< Chunk > > SortedChunkList::getLookup()
 
 			for( size_t v = 0; v < vertical; v++, iS++ ) { // inner loop iterates verticaly (through the secondary sorting)
 				assert( iS != iP->second.end() );
-				ret[h+v *horizontal] = iS->second; // insert horizontally - primary sorting is the fastest running index (read the sorting matrix horizontaly)
+				ret[h + v *horizontal] = iS->second;  // insert horizontally - primary sorting is the fastest running index (read the sorting matrix horizontaly)
 			}
 		}
 

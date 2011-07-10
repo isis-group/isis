@@ -96,7 +96,19 @@ public:
 	void fill( const TYPE &val ) {
 		std::fill( CONTAINER::begin(), CONTAINER::end(), val );
 	}
+	size_t getBiggestVecElemAbs( ) const {
+		size_t biggestVecElem = 0;
+		TYPE tmpValue = 0;
 
+		for ( size_t vecElem = 0; vecElem < SIZE; vecElem++ ) {
+			if ( fabs( operator[]( vecElem ) ) > fabs( tmpValue ) ) {
+				biggestVecElem = vecElem;
+				tmpValue = operator[]( vecElem );
+			}
+		}
+
+		return biggestVecElem;
+	}
 	////////////////////////////////////////////////////////////////////////////////////
 	// Accessors
 	////////////////////////////////////////////////////////////////////////////////////
