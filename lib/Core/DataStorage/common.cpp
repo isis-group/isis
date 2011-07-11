@@ -57,7 +57,7 @@ bool transformCoords( isis::util::PropertyMap &properties, util::FixedVector<siz
 	if( transformCenterIsImageCenter ) {
 		R_out = prod( R_in, transform );
 	} else {
-		R_out = prod( transform, R_in );
+		R_out = prod( R_in, transform );
 	}
 
 	for ( int i = 0; i < 3; i++ ) {
