@@ -418,13 +418,14 @@ public:
 	 * \return returns if the transformation was successfuly
 	 */
 	bool transformCoords( boost::numeric::ublas::matrix<float> transform_matrix, bool transformCenterIsImageCenter = false ) {
+		//for transforming we have to ensure to have the below properties in our chunks and image
 		std::list<std::string > neededProps;
 		neededProps.push_back("indexOrigin");
 		neededProps.push_back("rowVec");
 		neededProps.push_back("columnVec");
 		neededProps.push_back("sliceVec");
 		neededProps.push_back("voxelSize");
-	
+		//propagate needed properties to chunks
 		BOOST_FOREACH( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef, lookup ) {
 		    BOOST_FOREACH(std::list<std::string>::reference props, neededProps )
 		    {
@@ -436,6 +437,7 @@ public:
 				return false;
 			}
 		}
+		//establish initial state
 		deduplicateProperties();
 		if( !isis::data::_internal::transformCoords( *this, getSizeAsVector(), transform_matrix, transformCenterIsImageCenter ) ) {
 			LOG( Runtime, error ) << "Error during transforming the coords of the image.";

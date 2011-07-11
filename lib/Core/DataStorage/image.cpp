@@ -266,8 +266,6 @@ dimensions Image::mapScannerAxesToImageDimension( scannerAxis scannerAxes )
 
 	return static_cast<dimensions>( boost::numeric::ublas::prod( latchedOrientation, mapping )( scannerAxes ) );
 
-
-
 }
 
 
