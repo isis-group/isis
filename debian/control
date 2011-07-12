@@ -20,7 +20,7 @@ Description: data format plugins for the ISIS framework
  neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
  is extensible with plugins to add support for additional data formats.
  .
- This packages provides plugins for data in DICOM, NIfTI, PNG, VISTA format,
+ This package provides plugins for data in DICOM, NIfTI, PNG, VISTA format,
  raw-data access, as well as plugins for gzip-compression and tar-archive
  support.
 
@@ -34,7 +34,7 @@ Description: I/O framework for neuroimaging data
  neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
  is extensible with plugins to add support for additional data formats.
  .
- This packages provides headers and library to develop applications with ISIS.
+ This package provides headers and library to develop applications with ISIS.
 
 
 Package: isis-utils
@@ -46,5 +46,5 @@ Description: utilities for the ISIS neuroimaging data I/O framework
  neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
  is extensible with plugins to add support for additional data formats.
  .
- This Package provides a number of utilities to process neuroimaging data. This
+ This package provides a number of utilities to process neuroimaging data. This
  includes a multi-format converter and tools to inspect image meta data.

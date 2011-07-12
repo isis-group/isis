@@ -85,3 +85,8 @@ override_dh_auto_install:
 
 override_dh_auto_clean:
 	-rm -rf $(static_build_path) $(shared_build_path)
+
+# do not put ldconfig call in postinst, the installed shared lib is only for
+# private consumption by the binaries in this package
+override_dh_makeshlibs:
+	dh_makeshlibs -n

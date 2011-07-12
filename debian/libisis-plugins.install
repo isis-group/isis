@@ -1,2 +1,2 @@
 debian/tmp/usr/lib/isis/* usr/lib/isis/
-debian/tmp/usr/lib/*_core.so* usr/lib/isis/
+debian/tmp/usr/lib/*.so.* usr/lib/isis/

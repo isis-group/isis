@@ -1,0 +1,6 @@
+isis-utils: binary-or-shlib-defines-rpath usr/bin/isiscalc /usr/lib/isis
+isis-utils: binary-or-shlib-defines-rpath usr/bin/isisconv /usr/lib/isis
+isis-utils: binary-or-shlib-defines-rpath usr/bin/isisdiff /usr/lib/isis
+isis-utils: binary-or-shlib-defines-rpath usr/bin/isisdump /usr/lib/isis
+isis-utils: binary-or-shlib-defines-rpath usr/bin/isisflip /usr/lib/isis
+
