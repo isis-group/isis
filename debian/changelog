@@ -1,10 +1,16 @@
+isis (0.3.4g7cc5b66-0) stable; urgency=low
+
+   * Fixed bug in transformCoords
+
+ -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Tue, 12 Jul 2011 12:48:00 +0200
+
 isis (0.3.3gitg71597cb-1) stable; urgency=low
 
    * Fixed wrong dependencies
 
    * isis core should be build without debug log
 
- -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Thu, 23 Jun  2011 15:38:35 +0200
+ -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Thu, 23 Jun 2011 15:38:35 +0200
 
 isis (0.3.3gitg71597cb-0) stable; urgency=low
 
