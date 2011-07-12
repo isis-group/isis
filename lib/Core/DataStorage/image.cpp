@@ -256,17 +256,15 @@ dimensions Image::mapScannerAxesToImageDimension( scannerAxis scannerAxes )
 	updateOrientationMatrices();
 	boost::numeric::ublas::matrix<float> latchedOrientation = boost::numeric::ublas::zero_matrix<float>( 3, 3 );
 	boost::numeric::ublas::vector<float>mapping( 3 );
-	latchedOrientation( m_RowVec.getBiggestVecElemAbs(), 0 ) = m_RowVec[m_RowVec.getBiggestVecElemAbs()] < 0 ? -1 : 1;
-	latchedOrientation( m_ColumnVec.getBiggestVecElemAbs(), 1 ) = m_ColumnVec[m_ColumnVec.getBiggestVecElemAbs()] < 0 ? -1 : 1;
-	latchedOrientation( m_SliceVec.getBiggestVecElemAbs(), 2 ) = m_SliceVec[m_SliceVec.getBiggestVecElemAbs()] < 0 ? -1 : 1;
+	latchedOrientation( m_RowVec.getBiggestVecElemAbs(), 0 ) = 1;
+	latchedOrientation( m_ColumnVec.getBiggestVecElemAbs(), 1 ) = 1;
+	latchedOrientation( m_SliceVec.getBiggestVecElemAbs(), 2 ) = 1;
 
 	for( size_t i = 0; i < 3; i++ ) {
 		mapping( i ) = i;
 	}
 
 	return static_cast<dimensions>( boost::numeric::ublas::prod( latchedOrientation, mapping )( scannerAxes ) );
-
-
 
 }
 
@@ -818,6 +816,7 @@ size_t Image::spliceDownTo( dimensions dim ) //rowDim = 0, columnDim, sliceDim, 
 				}
 			} else { // seems like we're done - insert it into the image
 				assert( ch.getRelevantDims() == ( size_t ) m_dim ); // index of the higest dim>1 (ch.getRelevantDims()-1) shall be equal to the dim below the requested splicing (m_dim-1)
+				LOG(Debug,verbose_info) << "Inserting splice result of size " << ch.getSizeAsVector() << " at " << ch.propertyValue("indexOrigin");
 				m_image.insertChunk( ch );
 			}
 		}
