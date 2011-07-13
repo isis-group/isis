@@ -53,8 +53,8 @@ bool transformCoords( isis::util::PropertyMap &properties, util::FixedVector<siz
 	}
 
 	matrix<float> R_out( 3, 3 );
-
 	R_out = prod( R_in, transform );
+	
 
 	for ( int i = 0; i < 3; i++ ) {
 		row[i] = R_out( i, 0 );

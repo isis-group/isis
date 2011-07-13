@@ -429,7 +429,7 @@ public:
 		BOOST_FOREACH( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef, lookup ) {
 		    BOOST_FOREACH(std::list<std::string>::reference props, neededProps )
 		    {
-			if(hasProperty(props.c_str()) ) {
+			if(hasProperty(props.c_str()) && !chRef->hasProperty(props.c_str()) ) {
 			    chRef->setPropertyAs<util::fvector4>(props.c_str(), getPropertyAs<util::fvector4>(props.c_str()));
 			}
 		    }
@@ -437,8 +437,8 @@ public:
 				return false;
 			}
 		}
-		//establish initial state
-		deduplicateProperties();
+// 		establish initial state
+
 		if( !isis::data::_internal::transformCoords( *this, getSizeAsVector(), transform_matrix, transformCenterIsImageCenter ) ) {
 			LOG( Runtime, error ) << "Error during transforming the coords of the image.";
 			return false;
@@ -448,7 +448,7 @@ public:
 			LOG( Runtime, error ) << "Could not update the orientation matrices of the image!";
 			return false;
 		}
-
+		deduplicateProperties();
 		return true;
 	}
 
