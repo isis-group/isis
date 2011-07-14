@@ -153,27 +153,24 @@ unsigned int IOFactory::findPlugins( const std::string &path )
 						io_class->plugin_file = pluginName;
 						ret++;
 					} else {
-						LOG( Runtime, error ) << "failed to register plugin " << util::MSubject( pluginName );
+						LOG( Runtime, warning ) << "failed to register plugin " << util::MSubject( pluginName );
 					}
 				} else {
 #ifdef WIN32
-					LOG( Runtime, error )
+					LOG( Runtime, warning )
 							<< "could not get format factory function from " << util::MSubject( pluginName );
 					FreeLibrary( handle );
 #else
-					LOG( Runtime, error )
+					LOG( Runtime, warning )
 							<< "could not get format factory function from " << util::MSubject( pluginName ) << ":" << util::MSubject( dlerror() );
 					dlclose( handle );
 #endif
 				}
 			} else
 #ifdef WIN32
-				LOG( Runtime, error )
-						<< "Could not load library " << pluginName;
-
+				LOG( Runtime, warning ) << "Could not load library " << util::MSubject( pluginName );
 #else
-				LOG( Runtime, error )
-						<< "Could not load library " << pluginName << ":" << util::MSubject( dlerror() );
+				LOG( Runtime, warning ) << "Could not load library " << util::MSubject( pluginName ) << ":" <<  util::MSubject( dlerror() );
 #endif
 		} else {
 			LOG( Runtime, verbose_info )
