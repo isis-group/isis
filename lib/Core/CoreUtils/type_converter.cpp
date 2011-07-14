@@ -44,13 +44,14 @@ namespace _internal
 {
 
 // define special string conversions
-template<typename T> std::string toStringConv(const T &src){
+template<typename T> std::string toStringConv( const T &src )
+{
 	std::stringstream s;
 	s << std::boolalpha << src; // bool will be converted to true/false
 	return s.str();
 }
-template<> std::string toStringConv<uint8_t>(const uint8_t &src){return toStringConv(static_cast<uint16_t>(src));}
-template<> std::string toStringConv<int8_t> (const  int8_t &src){return toStringConv(static_cast< int16_t>(src));}
+template<> std::string toStringConv<uint8_t>( const uint8_t &src ) {return toStringConv( static_cast<uint16_t>( src ) );}
+template<> std::string toStringConv<int8_t> ( const  int8_t &src ) {return toStringConv( static_cast< int16_t>( src ) );}
 
 //Define generator - this can be global because its using convert internally
 template<typename SRC, typename DST> class ValueGenerator: public ValueConverterBase
@@ -333,20 +334,21 @@ public:
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
 		const std::string &srcVal = src.castTo<std::string>();
 
-		try{
+		try {
 			if( inner_conv ) { // if the target is a number first map to double and then convert that into DST
 				return inner_conv->convert( Value<double>( srcVal ), dst );
 			} else { // otherwise try direct mapping (rounding will fail)
 				LOG( Debug, warning ) << "using lexical_cast to convert from string to "
-									<< Value<DST>::staticName() << " no rounding can be done.";
+									  << Value<DST>::staticName() << " no rounding can be done.";
 				DST &dstVal = dst.castTo<DST>();
 				dstVal = boost::lexical_cast<DST>( srcVal );
 			}
-		} catch(const boost::bad_lexical_cast &){
-			dst.castTo<DST>()=DST();
-			LOG(Runtime,error) << "Miserably failed to interpret " << MSubject(srcVal) << " as " << Value<DST>::staticName() << " returning " << MSubject( DST());
+		} catch( const boost::bad_lexical_cast & ) {
+			dst.castTo<DST>() = DST();
+			LOG( Runtime, error ) << "Miserably failed to interpret " << MSubject( srcVal ) << " as " << Value<DST>::staticName() << " returning " << MSubject( DST() );
 		}
-		return boost::numeric::cInRange; 
+
+		return boost::numeric::cInRange;
 	}
 	virtual ~ValueConverter() {}
 };
@@ -381,7 +383,7 @@ public:
 		return boost::shared_ptr<const ValueConverterBase>( ret );
 	}
 	boost::numeric::range_check_result convert( const ValueBase &src, ValueBase &dst )const {
-		dst.castTo<std::string>() = toStringConv(src.castTo<SRC>());
+		dst.castTo<std::string>() = toStringConv( src.castTo<SRC>() );
 		return boost::numeric::cInRange; // this should allways be ok
 	}
 	virtual ~ValueConverter() {}

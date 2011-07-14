@@ -30,7 +30,7 @@ set(ISIS_LIB_DEPENDS  ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} ${LibOil_LIBRARY}
 ############################################################
 # Build config
 ############################################################
-set(ISIS_BUILD_PROPERTIES LINK_FLAGS "--no-undefined" CLEAN_DIRECT_OUTPUT 1)
+set(ISIS_BUILD_PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 set(ISIS_BUILD_STATIC OFF CACHE BOOL "enable build of the static library. If OFF a dynamic library will be build and
 linked." )
 
@@ -43,14 +43,33 @@ file(GLOB CORE_SRC_FILES "DataStorage/*.cpp" "CoreUtils/*.cpp")
 file(GLOB COREUTILS_HDR_FILES "CoreUtils/*.hpp" "CoreUtils/*.h")
 file(GLOB DATASTORAGE_HDR_FILES "DataStorage/*.hpp" "DataStorage/*.h")
 
+############################################################
 # the core library shared and static build
-if(ISIS_BUILD_STATIC)
-	add_library( isis_core STATIC ${CORE_SRC_FILES} )
+############################################################
+macro( build_core name type)
+    add_library( ${name} ${type} ${CORE_SRC_FILES} )
+	target_link_libraries( ${name} ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} ${LibOil_LIBRARY})
+    set_target_properties( ${name} PROPERTIES
+		${ISIS_BUILD_PROPERTIES}
+		VERSION ${${CMAKE_PROJECT_NAME}_VERSION}
+		INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
+		OUTPUT_NAME "isis_core")
+    set(target_list ${target_list} ${name})
+endmacro( build_core )
+
+#for packaging purpose we want to build both, shared and static with one build_command
+#however this capability is not provided by an option in the cmake menu
+if(ISIS_BUILD_STATIC_AND_SHARED)
+    build_core( isis_core_static STATIC)
+    build_core( isis_core SHARED)
+else(ISIS_BUILD_STATIC_AND_SHARED)
+    if(ISIS_BUILD_STATIC)
+		build_core( isis_core STATIC)
     else(ISIS_BUILD_STATIC)
-	add_library( isis_core SHARED ${CORE_SRC_FILES} )
-	target_link_libraries( isis_core ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} ${LibOil_LIBRARY})
-	set_target_properties( isis_core PROPERTIES	${ISIS_BUILD_PROPERTIES} VERSION ${${CMAKE_PROJECT_NAME}_VERSION} INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
-endif(ISIS_BUILD_STATIC)
+		build_core( isis_core SHARED)
+    endif(ISIS_BUILD_STATIC)
+endif(ISIS_BUILD_STATIC_AND_SHARED)
+
 
 ############################################################
 # set the plugin directory and the system dependend shared
@@ -65,7 +84,7 @@ set_source_files_properties( "DataStorage/io_factory.cpp" PROPERTIES COMPILE_FLA
 ############################################################
 
 # install libraries
-install (TARGETS isis_core
+install (TARGETS ${target_list}
   LIBRARY DESTINATION lib COMPONENT RuntimeLibraries
   ARCHIVE DESTINATION lib COMPONENT Development)
 

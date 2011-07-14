@@ -207,7 +207,7 @@ bool Image::updateOrientationMatrices()
 	util::fvector4 columnVec = getPropertyAs<util::fvector4>( "columnVec" );
 	util::fvector4 sliceVec = getPropertyAs<util::fvector4>( "sliceVec" );
 	m_Offset = getPropertyAs<util::fvector4>( "indexOrigin" );
-	util::fvector4 spacing = getPropertyAs<util::fvector4>( "voxelSize" ) + getPropertyAs<util::fvector4>( "voxelGap" );
+	util::fvector4 spacing = getPropertyAs<util::fvector4>( "voxelSize" ) + ( hasProperty( "voxelGap" ) ? getPropertyAs<util::fvector4>( "voxelGap" ) : util::fvector4( 0, 0, 0 ) );
 	m_RowVec = util::fvector4( rowVec[0] * spacing[0], rowVec[1] * spacing[0], rowVec[2] * spacing[0] );
 	m_ColumnVec = util::fvector4( columnVec[0] * spacing[1], columnVec[1] * spacing[1], columnVec[2] * spacing[1] );
 	m_SliceVec = util::fvector4( sliceVec[0] * spacing[2], sliceVec[1] * spacing[2], sliceVec[2] * spacing[2] );
@@ -256,17 +256,15 @@ dimensions Image::mapScannerAxesToImageDimension( scannerAxis scannerAxes )
 	updateOrientationMatrices();
 	boost::numeric::ublas::matrix<float> latchedOrientation = boost::numeric::ublas::zero_matrix<float>( 3, 3 );
 	boost::numeric::ublas::vector<float>mapping( 3 );
-	latchedOrientation( m_RowVec.getBiggestVecElemAbs(), 0 ) = m_RowVec[m_RowVec.getBiggestVecElemAbs()] < 0 ? -1 : 1;
-	latchedOrientation( m_ColumnVec.getBiggestVecElemAbs(), 1 ) = m_ColumnVec[m_ColumnVec.getBiggestVecElemAbs()] < 0 ? -1 : 1;
-	latchedOrientation( m_SliceVec.getBiggestVecElemAbs(), 2 ) = m_SliceVec[m_SliceVec.getBiggestVecElemAbs()] < 0 ? -1 : 1;
+	latchedOrientation( m_RowVec.getBiggestVecElemAbs(), 0 ) = 1;
+	latchedOrientation( m_ColumnVec.getBiggestVecElemAbs(), 1 ) = 1;
+	latchedOrientation( m_SliceVec.getBiggestVecElemAbs(), 2 ) = 1;
 
 	for( size_t i = 0; i < 3; i++ ) {
 		mapping( i ) = i;
 	}
 
 	return static_cast<dimensions>( boost::numeric::ublas::prod( latchedOrientation, mapping )( scannerAxes ) );
-
-
 
 }
 
@@ -340,21 +338,24 @@ bool Image::reIndex()
 	//reconstruct some redundant information, if its missing
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	const util::PropertyMap::KeyType vectors[] = {"rowVec", "columnVec", "sliceVec"};
-	int oneCnt=0;
+	int oneCnt = 0;
 	BOOST_FOREACH( const util::PropertyMap::KeyType & ref, vectors ) {
 		if ( hasProperty( ref ) ) {
 			util::PropertyValue &prop = propertyValue( ref );
 			LOG_IF( !prop->is<util::fvector4>(), Debug, error ) << "Using " << prop->getTypeName() << " as " << util::Value<util::fvector4>::staticName();
 			util::fvector4 &vec = prop->castTo<util::fvector4>();
-			if(vec.sqlen() == 0){
+
+			if( vec.sqlen() == 0 ) {
 				util::fvector4  v_one;
-				v_one[oneCnt]=1;
-				LOG(Runtime, error )
-					<< "The existing " << ref << " " << vec << (hasProperty("source")? " from "+getPropertyAs<std::string>("source"):"") << " has the length zero. Falling back to " << v_one <<".";
-				vec=v_one;
+				v_one[oneCnt] = 1;
+				LOG( Runtime, error )
+						<< "The existing " << ref << " " << vec << ( hasProperty( "source" ) ? " from " + getPropertyAs<std::string>( "source" ) : "" ) << " has the length zero. Falling back to " << v_one << ".";
+				vec = v_one;
 			}
+
 			vec.norm();
 		}
+
 		oneCnt++;
 	}
 
@@ -505,10 +506,21 @@ const Chunk Image::getChunk ( size_t first, size_t second, size_t third, size_t 
 	const size_t index = commonGet( first, second, third, fourth ).first;
 	return getChunkAt( index, copy_metadata );
 }
+
 std::vector< Chunk > Image::copyChunksToVector( bool copy_metadata )const
 {
-	std::vector<isis::data::Chunk> ret( lookup.size() );
-	copyChunksTo( ret.begin(), copy_metadata );
+	std::vector<isis::data::Chunk> ret;
+	ret.reserve( lookup.size() );
+	std::vector<boost::shared_ptr<Chunk> >::const_iterator at = lookup.begin();
+	const std::vector<boost::shared_ptr<Chunk> >::const_iterator end = lookup.end();
+
+	while ( at != end ) {
+		ret.push_back( **( at++ ) );
+
+		if( copy_metadata )
+			ret.back().join( *this );
+	}
+
 	return ret;
 }
 
@@ -804,6 +816,7 @@ size_t Image::spliceDownTo( dimensions dim ) //rowDim = 0, columnDim, sliceDim, 
 				}
 			} else { // seems like we're done - insert it into the image
 				assert( ch.getRelevantDims() == ( size_t ) m_dim ); // index of the higest dim>1 (ch.getRelevantDims()-1) shall be equal to the dim below the requested splicing (m_dim-1)
+				LOG(Debug,verbose_info) << "Inserting splice result of size " << ch.getSizeAsVector() << " at " << ch.propertyValue("indexOrigin");
 				m_image.insertChunk( ch );
 			}
 		}

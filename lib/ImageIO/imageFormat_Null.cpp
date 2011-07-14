@@ -97,10 +97,11 @@ public:
 				}
 			}
 
-			ch.setPropertyAs<size_t>( "timeUsedInS", ( ( float )( std::time( NULL ) - secondsStart ) ) ) ;
+			ch.setPropertyAs<int64_t>( "timeUsedInS", std::time( NULL ) - secondsStart ) ;
 			chunks.push_back( ch );
 			return 1;
 		}
+
 		return 0;
 	}
 

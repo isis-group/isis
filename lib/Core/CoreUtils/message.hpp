@@ -29,7 +29,7 @@ namespace isis
  *  Additional documentation for group `mygrp'
  *  @{
  */
-enum LogLevel {error = 1, warning, info, verbose_info};
+enum LogLevel {error = 1, warning, notice, info, verbose_info};
 namespace util
 {
 

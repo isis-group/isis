@@ -137,7 +137,7 @@ const char ImageFormat_Dicom::unknownTagName[] = "Unknown Tag";
 
 std::string ImageFormat_Dicom::suffixes()const {return std::string( ".ima .dcm" );}
 std::string ImageFormat_Dicom::getName()const {return "Dicom";}
-std::string ImageFormat_Dicom::dialects( const std::string &/*filename*/ )const {return "withExtProtocols nomosaic";}
+std::string ImageFormat_Dicom::dialects( const std::string &/*filename*/ )const {return "withExtProtocols keepmosaic";}
 
 
 
@@ -259,23 +259,26 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 
 	if ( hasOrTell( prefix + "PatientsSex", object, warning ) ) {
 		util::Selection isisGender( "male,female,other" );
-		bool set=false;
+		bool set = false;
 
 		switch ( object.getPropertyAs<std::string>( prefix + "PatientsSex" )[0] ) {
 		case 'M':
-			isisGender.set( "male" );set=true;
+			isisGender.set( "male" );
+			set = true;
 			break;
 		case 'F':
-			isisGender.set( "female" );set=true;
+			isisGender.set( "female" );
+			set = true;
 			break;
 		case 'O':
-			isisGender.set( "other" );set=true;
+			isisGender.set( "other" );
+			set = true;
 			break;
 		default:
 			LOG( Runtime, warning ) << "Dicom gender code " << util::MSubject( object.propertyValue( prefix + "PatientsSex" ) ) <<  " not known";
 		}
 
-		if(set){
+		if( set ) {
 			object.propertyValue( "subjectGender" ) = isisGender;
 			object.remove( prefix + "PatientsSex" );
 		}
@@ -484,8 +487,8 @@ int ImageFormat_Dicom::load( std::list<data::Chunk> &chunks, const std::string &
 		const util::slist iType = chunk.getPropertyAs<util::slist>( util::istring( ImageFormat_Dicom::dicomTagTreeName ) + "/" + "ImageType" );
 
 		if ( std::find( iType.begin(), iType.end(), "MOSAIC" ) != iType.end() ) { // if its a mosaic
-			if( dialect == "nomosaic" ) {
-				LOG( Runtime, info ) << "This seems to be an mosaic image, but dialect \"nomosaic\" was selected";
+			if( dialect == "keepmosaic" ) {
+				LOG( Runtime, info ) << "This seems to be an mosaic image, but dialect \"keepmosaic\" was selected";
 				chunks.push_back( chunk );
 				return 1;
 			} else {
