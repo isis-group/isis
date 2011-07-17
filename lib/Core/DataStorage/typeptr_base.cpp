@@ -33,6 +33,21 @@ size_t ValuePtrBase::getLength() const { return m_len;}
 
 ValuePtrBase::~ValuePtrBase() {}
 
+ValuePtrBase::DelProxy::DelProxy(const isis::data::_internal::ValuePtrBase& master): boost::shared_ptr<const void>( master.getRawAddress() )
+{
+	LOG( Debug, verbose_info ) << "Creating DelProxy for " << this->get();
+}
+
+void ValuePtrBase::DelProxy::operator()(const void* at)
+{
+	LOG( Debug, verbose_info )
+			<< "Deletion for " << this->get() << " called from proxy at offset "
+			<< static_cast<const uint8_t*>( at ) - static_cast<const uint8_t*>( this->get() )
+			<< ", current use_count: " << this->use_count();
+	this->reset();//actually not needed, but we keep it here to keep obfuscation low
+}
+
+
 const ValuePtrConverterMap &ValuePtrBase::converters()
 {
 	return util::Singletons::get<_internal::ValuePtrConverterMap, 0>();

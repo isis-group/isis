@@ -43,6 +43,20 @@ protected:
 	virtual ValuePtrBase *clone()const = 0;
 
 public:
+	/// Proxy-Deleter to encapsulate the real deleter/shared_ptr when creating shared_ptr for parts of a shared_ptr
+	class DelProxy : public boost::shared_ptr<const void>
+	{
+	public:
+		/**
+		 * Create a proxy for a given master shared_ptr
+		 * This increments the use_count of the master and thus keeps the
+		 * master from being deleted while parts of it are still in use.
+		 */
+		DelProxy( const ValuePtrBase &master );
+		/// decrement the use_count of the master when a specific part is not referenced anymore
+		void operator()( const void* at );
+	};
+
 	virtual boost::shared_ptr<const void> getRawAddress()const = 0;
 	virtual boost::shared_ptr<void> getRawAddress() = 0;
 
