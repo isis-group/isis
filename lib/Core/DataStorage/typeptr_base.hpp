@@ -148,7 +148,7 @@ public:
 	 */
 	template<typename T> bool copyFromMem( const T *const src, size_t len, scaling_pair scaling=scaling_pair() ) {
 		ValuePtr<T> cont(const_cast<T*>(src),len, typename ValuePtr<T>::NonDeleter()); //its ok - we're no going to change it
-		return cont.copyTo(cont,scaling);
+		return cont.copyTo(*this,scaling);
 	}
 
 	/**

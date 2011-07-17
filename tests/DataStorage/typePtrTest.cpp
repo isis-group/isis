@@ -55,7 +55,9 @@ BOOST_AUTO_TEST_CASE( ValuePtr_init_test )
 {
 	BOOST_CHECK( ! Deleter::deleted );
 	{
+		data::enableLog<util::DefaultMsgPrint>(error);
 		data::ValuePtr<int32_t> outer( 0 );
+		data::enableLog<util::DefaultMsgPrint>(warning);
 		// must create an empty pointer
 		BOOST_CHECK_EQUAL( outer.getLength(), 0 );
 		BOOST_CHECK( ! ( boost::shared_ptr<int32_t> )outer );
@@ -163,7 +165,7 @@ BOOST_AUTO_TEST_CASE( ValuePtr_splice_test )
 BOOST_AUTO_TEST_CASE( ValuePtr_conv_scaling_test )
 {
 	const float init[] = { -2, -1.8, -1.5, -1.3, -0.6, -0.2, 2, 1.8, 1.5, 1.3, 0.6, 0.2};
-	data::ValuePtr<float> floatArray( ( float * )malloc( sizeof( float ) * 12 ), 12 );
+	data::ValuePtr<float> floatArray( 12 );
 
 	//scaling to itself should allways be 1/0
 	floatArray.copyFromMem( init, 12 );
@@ -185,7 +187,7 @@ BOOST_AUTO_TEST_CASE( ValuePtr_conv_scaling_test )
 BOOST_AUTO_TEST_CASE( ValuePtr_conversion_test )
 {
 	const float init[] = { -2, -1.8, -1.5, -1.3, -0.6, -0.2, 2, 1.8, 1.5, 1.3, 0.6, 0.2};
-	data::ValuePtr<float> floatArray( ( float * )malloc( sizeof( float ) * 12 ), 12 );
+	data::ValuePtr<float> floatArray( 12 );
 	//with automatic upscaling into integer
 	floatArray.copyFromMem( init, 12 );
 
@@ -204,15 +206,20 @@ BOOST_AUTO_TEST_CASE( ValuePtr_conversion_test )
 	for ( int i = 0; i < 12; i++ )
 		floatArray[i] = init[i] * 1e5;
 
+	data::enableLog<util::DefaultMsgPrint>(error);
 	data::ValuePtr<short> shortArray = floatArray.copyAs<short>();
 	data::ValuePtr<uint8_t> byteArray = shortArray.copyAs<uint8_t>();
+	data::enableLog<util::DefaultMsgPrint>(warning);
 
 	for ( int i = 0; i < 12; i++ )
 		BOOST_CHECK_EQUAL( shortArray[i], ceil( init[i] * 1e5 * scale - .5 ) );
 
 	//with offset and scale
 	const double uscale = std::numeric_limits< unsigned short >::max() / 4e5;
+	data::enableLog<util::DefaultMsgPrint>(error);
 	data::ValuePtr<unsigned short> ushortArray = floatArray.copyAs<unsigned short>();
+	data::enableLog<util::DefaultMsgPrint>(warning);
+
 
 	for ( int i = 0; i < 12; i++ )
 		BOOST_CHECK_EQUAL( ushortArray[i], ceil( init[i] * 1e5 * uscale + 32767.5 - .5 ) );
@@ -248,7 +255,7 @@ BOOST_AUTO_TEST_CASE( ValuePtr_boolean_conversion_test )
 BOOST_AUTO_TEST_CASE( ValuePtr_minmax_test )
 {
 	const float init[] = { -1.8, -1.5, -1.3, -0.6, -0.2, 1.8, 1.5, 1.3, 0.6, 0.2};
-	data::ValuePtr<float> floatArray( ( float * )malloc( sizeof( float ) * 10 ), 10 );
+	data::ValuePtr<float> floatArray( 10 );
 	//without scaling
 	floatArray.copyFromMem( init, 10 );
 	{
@@ -262,7 +269,7 @@ BOOST_AUTO_TEST_CASE( ValuePtr_minmax_test )
 
 template<typename T> void minMaxInt()
 {
-	data::ValuePtr<T> array( ( T * )malloc( sizeof( T ) * 1024 ), 1024 );
+	data::ValuePtr<T> array( 1024 );
 	double div = static_cast<double>( RAND_MAX ) / std::numeric_limits<T>::max();
 
 	for( int i = 0; i < 1024; i++ )
