@@ -87,14 +87,14 @@ public:
 	std::string dialects( const std::string &/*filename*/ )const {
 
 		std::list<util::istring> suffixes;
-		BOOST_FOREACH(data::IOFactory::FileFormatPtr format,data::IOFactory::getFormats()){
-			const std::list<util::istring> s=format->getSuffixes();
-			suffixes.insert(suffixes.end(),s.begin(),s.end());
+		BOOST_FOREACH( data::IOFactory::FileFormatPtr format, data::IOFactory::getFormats() ) {
+			const std::list<util::istring> s = format->getSuffixes();
+			suffixes.insert( suffixes.end(), s.begin(), s.end() );
 		}
 		suffixes.sort();
 		suffixes.unique();
 
-		return std::string(util::listToString(suffixes.begin(),suffixes.end()," ","",""));
+		return std::string( util::listToString( suffixes.begin(), suffixes.end(), " ", "", "" ) );
 	}
 	std::string getName()const {return "tar decompression proxy for other formats";}
 
@@ -145,7 +145,7 @@ public:
 				data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( org_file.file_string(), dialect ); // and get the reading pluging for that
 
 				if( formats.empty() ) {
-					LOG( Runtime, info ) << "Skipping " << org_file << " from " << filename << " because no plugin was found to read it"; // skip if we found none
+					LOG( Runtime, notice ) << "Skipping " << org_file << " from " << filename << " because no plugin was found to read it"; // skip if we found none
 				} else {
 					LOG( Debug, info ) << "Got " << org_file << " from " << filename << " there are " << formats.size() << " plugins which should be able to read it";
 
@@ -163,7 +163,7 @@ public:
 #elif HAVE_POSIX_FALLOCATE
 					const int err = posix_fallocate( mfile, 0, size ); // slower posix compatible version
 #else
-					const int err = ( lseek( mfile, size - 1, SEEK_SET ) == off_t(size - 1) && ::write( mfile, " ", 1 ) ) ? 0 : errno; //workaround in case there is no fallocate
+					const int err = ( lseek( mfile, size - 1, SEEK_SET ) == off_t( size - 1 ) && ::write( mfile, " ", 1 ) ) ? 0 : errno; //workaround in case there is no fallocate
 #endif
 
 					if( err ) {

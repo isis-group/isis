@@ -204,6 +204,7 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 	BOOST_FOREACH( Chunk & ref, ret ) { // adapt some metadata in them
 		util::fvector4 &orig = ref.propertyValue( "indexOrigin" )->castTo<util::fvector4>();
 		uint32_t &acq = ref.propertyValue( "acquisitionNumber" )->castTo<uint32_t>();
+		LOG(Debug,verbose_info) << "Origin was " << orig << " will be moved by " << indexOriginOffset << "*"  << cnt;
 		orig = orig + indexOriginOffset * ( float )cnt;
 		acq += acquisitionNumberStride * cnt; //@todo this might cause trouble if we try to insert this chunks into an image
 		cnt++;

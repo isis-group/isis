@@ -88,7 +88,7 @@ public:
 	template<typename TYPE> TYPE &voxel( size_t nrOfColumns, size_t nrOfRows = 0, size_t nrOfSlices = 0, size_t nrOfTimesteps = 0 ) {
 		const size_t idx[] = {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps};
 		LOG_IF( ! isInRange( idx ), Debug, isis::error )
-				<< "Index " << util::FixedVector<size_t,4>( idx ) << " is out of range " << getSizeAsString();
+				<< "Index " << util::FixedVector<size_t, 4>( idx ) << " is out of range " << getSizeAsString();
 		ValuePtr<TYPE> &ret = asValuePtr<TYPE>();
 		return ret[getLinearIndex( idx )];
 	}

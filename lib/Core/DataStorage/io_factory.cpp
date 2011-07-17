@@ -56,7 +56,7 @@ struct dialect_missing {
 	std::string dialect;
 	std::string filename;
 	bool operator()( IOFactory::FileFormatList::reference ref )const {
-		const std::string dia=ref->dialects( filename );
+		const std::string dia = ref->dialects( filename );
 		std::list<std::string> splitted = util::stringToList<std::string>( dia, ' ' );
 		const bool ret = ( std::find( splitted.begin(), splitted.end(), dialect ) == splitted.end() );
 		LOG_IF( ret, Runtime, warning ) << ref->getName() << " does not support the requested dialect " << util::MSubject( dialect );
@@ -153,27 +153,24 @@ unsigned int IOFactory::findPlugins( const std::string &path )
 						io_class->plugin_file = pluginName;
 						ret++;
 					} else {
-						LOG( Runtime, error ) << "failed to register plugin " << util::MSubject( pluginName );
+						LOG( Runtime, warning ) << "failed to register plugin " << util::MSubject( pluginName );
 					}
 				} else {
 #ifdef WIN32
-					LOG( Runtime, error )
+					LOG( Runtime, warning )
 							<< "could not get format factory function from " << util::MSubject( pluginName );
 					FreeLibrary( handle );
 #else
-					LOG( Runtime, error )
+					LOG( Runtime, warning )
 							<< "could not get format factory function from " << util::MSubject( pluginName ) << ":" << util::MSubject( dlerror() );
 					dlclose( handle );
 #endif
 				}
 			} else
 #ifdef WIN32
-				LOG( Runtime, error )
-						<< "Could not load library " << pluginName;
-
+				LOG( Runtime, warning ) << "Could not load library " << util::MSubject( pluginName );
 #else
-				LOG( Runtime, error )
-						<< "Could not load library " << pluginName << ":" << util::MSubject( dlerror() );
+				LOG( Runtime, warning ) << "Could not load library " << util::MSubject( pluginName ) << ":" <<  util::MSubject( dlerror() );
 #endif
 		} else {
 			LOG( Runtime, verbose_info )
@@ -216,8 +213,14 @@ size_t IOFactory::loadFile( std::list<Chunk> &ret, const boost::filesystem::path
 			try {
 				return it->load( ret, filename.file_string(), dialect );
 			} catch ( std::runtime_error &e ) {
-				LOG( Runtime, formatReader.size() > 1 ? warning : error )
+				if(suffix_override.empty()){
+					LOG( Runtime, formatReader.size() > 1 ? warning : error )
 						<< "Failed to load " <<  filename << " using " <<  it->getName() << with_dialect << " ( " << e.what() << " )";
+				} else {
+					LOG( Runtime, warning )
+						<< "The enforced format " << it->getName()  << " failed to read " << filename << with_dialect
+						<< " ( " << e.what() << " ), maybe it just wasn't the right format";
+				}
 			}
 		}
 		LOG_IF( boost::filesystem::exists( filename ) && formatReader.size() > 1, Runtime, error ) << "No plugin was able to load: "   << util::MSubject( filename ) << with_dialect;
@@ -297,8 +300,8 @@ size_t IOFactory::load( std::list<data::Chunk> &chunks, const std::string &path,
 {
 	const boost::filesystem::path p( path );
 	const size_t loaded = boost::filesystem::is_directory( p ) ?
-					   get().loadPath( chunks, p, suffix_override, dialect ) :
-					   get().loadFile( chunks, p, suffix_override, dialect );
+						  get().loadPath( chunks, p, suffix_override, dialect ) :
+						  get().loadFile( chunks, p, suffix_override, dialect );
 	BOOST_FOREACH( Chunk & ref, chunks ) {
 		if ( ! ref.hasProperty( "source" ) )
 			ref.setPropertyAs( "source", p.file_string() );

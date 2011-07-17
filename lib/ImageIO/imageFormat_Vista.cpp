@@ -68,6 +68,7 @@ throw( std::runtime_error & )
 		LOG( Runtime, info ) << "Writing a functional vista image, so falling back to representation short!";
 		data::TypedImage<VShort> shortImage( image );
 		shortImage.spliceDownTo( data::sliceDim );
+		
 		vimages = ( VImage * )malloc( sizeof( VImage ) * dims[2] );
 		nimages = dims[2];
 		//we have to go through all slices and calculate the offset of the slicetimes
@@ -93,7 +94,6 @@ throw( std::runtime_error & )
 					}
 				}
 			}
-
 			copyHeaderToVista( shortImage, vimages[z], sliceTimeOffset, true, z );
 			VAppendAttr( attrList, "image", NULL, VImageRepn, vimages[z] );
 		}
@@ -683,7 +683,6 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 	VAppendAttr( list, "sliceVec", NULL, VStringRepn, vstr.str().c_str() );
 	// index origin
 	util::fvector4 indexOrigin;
-
 	if( functional ) {
 		indexOrigin = image.getChunk( 0, 0, slice, 0 ).getPropertyAs<util::fvector4>( "indexOrigin" );
 	} else {

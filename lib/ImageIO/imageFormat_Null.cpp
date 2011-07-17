@@ -101,6 +101,7 @@ public:
 			chunks.push_back( ch );
 			return 1;
 		}
+
 		return 0;
 	}
 

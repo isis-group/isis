@@ -19,7 +19,7 @@ project(ISIS)
 ############################################################
 set(ISIS_VERSION_MAJOR "0")
 set(ISIS_VERSION_MINOR "3")
-set(ISIS_VERSION_PATCH "2")
+set(ISIS_VERSION_PATCH "4")
 
 add_definitions(-D_ISIS_VERSION_MAJOR=${ISIS_VERSION_MAJOR})
 add_definitions(-D_ISIS_VERSION_MINOR=${ISIS_VERSION_MINOR})
@@ -158,6 +158,8 @@ endif(ISIS_BUILD_TOOLS)
 
 # build the ISIS tests.
 if(ISIS_BUILD_TESTS)
+  message(STATUS "Building unit tests")
+  enable_testing()
   add_subdirectory(tests)
 endif(ISIS_BUILD_TESTS)
 
