@@ -66,8 +66,8 @@ size_t ValuePtrBase::compare( size_t start, size_t end, const _internal::ValuePt
 
 	// lock the memory so we can mem-compare the elements (use uint8_t because some compilers do not like arith on void*)
 	const boost::shared_ptr<const uint8_t>
-		src_s = boost::static_pointer_cast<const uint8_t>(getRawAddress().lock()),
-		dst_s = boost::static_pointer_cast<const uint8_t>(dst.getRawAddress().lock());
+		src_s = boost::static_pointer_cast<const uint8_t>(getRawAddress()),
+		dst_s = boost::static_pointer_cast<const uint8_t>(dst.getRawAddress());
 	const uint8_t *src_p=src_s.get(),*dst_p=dst_s.get();
 	const size_t el_size=bytesPerElem();
 
@@ -161,8 +161,8 @@ void ValuePtrBase::copyRange( size_t start, size_t end, ValuePtrBase &dst, size_
 		LOG( Runtime, error )
 				<< "End of the range (" << len + dst_start << ") is behind the end of the destination (" << dst.getLength() << ")";
 	} else {
-		boost::shared_ptr<void> daddr = dst.getRawAddress().lock();
-		const boost::shared_ptr<const void> saddr = getRawAddress().lock();
+		boost::shared_ptr<void> daddr = dst.getRawAddress();
+		const boost::shared_ptr<const void> saddr = getRawAddress();
 		const size_t soffset = bytesPerElem() * start; //source offset in bytes
 		const int8_t *const  src = ( int8_t * )saddr.get();
 		const size_t doffset = bytesPerElem() * dst_start;//destination offset in bytes

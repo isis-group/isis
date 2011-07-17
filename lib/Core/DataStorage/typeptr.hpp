@@ -179,8 +179,8 @@ public:
 	 * Get the raw address the ValuePtr points to.
 	 * \returns a weak_ptr\<void\> with the memory address of the data handled by this ValuePtr.
 	 */
-	boost::weak_ptr<const void> getRawAddress()const {return boost::weak_ptr<const void>( m_val );}
-	boost::weak_ptr<void> getRawAddress(){return boost::weak_ptr<void>( m_val );}
+	boost::shared_ptr<const void> getRawAddress()const {return boost::static_pointer_cast<const void>( m_val );}
+	boost::shared_ptr<void> getRawAddress(){return boost::static_pointer_cast<void>( m_val );}
 
 	/// @copydoc util::Value::toString
 	virtual std::string toString( bool labeled = false )const {
