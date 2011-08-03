@@ -215,6 +215,15 @@ public:
 	bool hasProperty( const KeyType &key )const;
 
 	/**
+	 * Search for the property/branch in the whole Tree.
+	 * \param key the single key for the branch/property to search for (paths will be stripped to the rightmost key)
+	 * \param allowProperty if false the search will ignore properties
+	 * \param allowBranch if false the search will ignore branches (it will still search into the branches, but the branches themself won't be considered a valid finding)
+	 * \returns full "path" to the property (including the properties name) if it is found, empty string elsewhise
+	 */
+	KeyType find(KeyType key,bool allowProperty=true,bool allowBranch=false)const;
+
+	/**
 	 * check if branch of the tree is available
 	 * \param key the "path" to the branch
 	 * \returns true if the given branch does exist and is not empty, false otherwise

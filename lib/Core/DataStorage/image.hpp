@@ -399,6 +399,7 @@ public:
 	size_t compare( const Image &comp )const;
 
 	orientation getMainOrientation()const;
+	
 	/**
 	 * Transforms the image coordinate system into an other system by multiplying
 	 * the orientation matrix with a user defined transformation matrix. Additionally,

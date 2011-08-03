@@ -73,7 +73,7 @@ PropertyMap::mapped_type &PropertyMap::fetchEntry( const key_type &key )
 }
 /**
  * Follow a "Path" to a property to get it.
- * This will create branches on its way if necessary.
+ * This will create branches and the property on its way if necessary.
  */
 PropertyMap::mapped_type &PropertyMap::fetchEntry(
 	PropertyMap &root,
@@ -82,7 +82,7 @@ PropertyMap::mapped_type &PropertyMap::fetchEntry(
 	propPath::const_iterator next = at;
 	next++;
 	Container &rootRef = root;
-	iterator found = root.find( *at );
+	iterator found = static_cast<Container&>(root).find( *at );
 
 	if ( next != pathEnd ) {//we are not at the end of the path (a proposed leaf in the PropMap)
 		if ( found != root.end() ) {//and we found the entry
@@ -102,11 +102,6 @@ PropertyMap::mapped_type &PropertyMap::fetchEntry(
 	}
 }
 
-const PropertyMap::mapped_type *PropertyMap::findEntry( const key_type &key )const
-{
-	const propPath path = util::stringToList<key_type>( key, pathSeperator );
-	return findEntry( *this, path.begin(), path.end() );
-}
 /**
  * Find property following the given "path".
  * If the "path" or the property does not exist NULL is returned.
@@ -117,7 +112,7 @@ const PropertyMap::mapped_type *PropertyMap::findEntry(
 {
 	propPathIterator next = at;
 	next++;
-	util::PropertyMap::const_iterator found = root.find( *at );
+	util::PropertyMap::const_iterator found = static_cast<const Container&>(root).find( *at );
 
 	if ( next != pathEnd ) {//we are not at the end of the path (aka the leaf)
 		if ( found != root.end() ) {//and we found the entry
@@ -137,7 +132,7 @@ bool PropertyMap::recursiveRemove( PropertyMap &root, const propPathIterator pat
 	if ( path_it != pathEnd ) {
 		propPathIterator next = path_it;
 		next++;
-		iterator found = root.find( *path_it );
+		iterator found = static_cast<Container&>(root).find( *path_it );
 
 		if ( found != root.end() ) {
 			mapped_type &ref = found->second;
@@ -476,14 +471,42 @@ void PropertyMap::addNeededFromString( const std::string &needed )
 	}
 }
 
-/// \returns true if a leaf exists at the given path and the property is not empty
 bool PropertyMap::hasProperty( const key_type &key ) const
 {
 	const propPath path = util::stringToList<key_type>( key, pathSeperator );
 	const mapped_type *ref = findEntry( *this, path.begin(), path.end() );
 	return ( ref && ref->is_leaf() && ! ref->getLeaf().isEmpty() );
 }
-/// \returns true if a leaf exists at the given path and the property is not empty
+
+isis::util::PropertyMap::KeyType PropertyMap::find(isis::util::PropertyMap::KeyType key, bool allowProperty, bool allowBranch) const
+{
+	// make sure we only get the last part of the path if its one
+	const propPath path = util::stringToList<key_type>( key, pathSeperator );
+	if(path.empty()){
+		LOG(Debug,error) << "Search key " << util::MSubject(key) << " is invalid, won't search";
+		return KeyType();
+	} else if(path.size()>1){
+		LOG(Debug,warning) << "Stripping search key " << util::MSubject(key) << " to " << path.back();
+	}
+	key=path.back();
+
+	// if the searched key is on this brach return its name
+	const Container &map=static_cast<const Container&>(*this);
+	Container::const_iterator found=map.find(key);
+	if(found!=map.end() &&
+		((found->second.is_leaf() && allowProperty) || (!found->second.is_leaf() && allowBranch))
+	){
+		return found->first;
+	} else { // otherwise search in the branches (getBranch() returns an empty PropMap for leaves - we wont have to check for that)
+		BOOST_FOREACH(Container::const_reference ref,map){
+			const KeyType foundKey=ref.second.getBranch().find(key,allowProperty,allowBranch);
+			if(!foundKey.empty()) // if the key is found abort search and return it with its branch-name
+				return ref.first+"/"+foundKey;
+		}
+	}
+	return KeyType(); // nothing found
+}
+
 bool PropertyMap::hasBranch( const key_type &key ) const
 {
 	const propPath path = util::stringToList<key_type>( key, pathSeperator );
@@ -539,6 +562,14 @@ std::ostream &PropertyMap::print( std::ostream &out, bool label )const
 
 	return out;
 }
+
+const PropertyMap::mapped_type *PropertyMap::findEntry( const key_type &key )const
+{
+	const propPath path = util::stringToList<key_type>( key, pathSeperator );
+	return findEntry( *this, path.begin(), path.end() );
+}
+
+
 
 bool PropertyMap::trueP::operator()( const PropertyMap::value_type &/*ref*/ ) const
 {
