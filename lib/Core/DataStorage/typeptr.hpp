@@ -155,12 +155,17 @@ public:
 
 	virtual ~ValuePtr() {}
 
-	/**
-	 * Get the raw address the ValuePtr points to.
-	 * \returns a weak_ptr\<void\> with the memory address of the data handled by this ValuePtr.
-	 */
-	boost::shared_ptr<const void> getRawAddress()const {return boost::static_pointer_cast<const void>( m_val );}
-	boost::shared_ptr<void> getRawAddress(){return boost::static_pointer_cast<void>( m_val );}
+	boost::shared_ptr<const void> getRawAddress(size_t offset=0)const {
+		if(offset){
+			DelProxy proxy(*this);
+			const uint8_t * const b_ptr=reinterpret_cast<const uint8_t*>( m_val.get() )+offset;
+			return boost::shared_ptr<const void>(b_ptr,proxy);
+		} else
+			return boost::static_pointer_cast<const void>( m_val );
+	}
+	boost::shared_ptr<void> getRawAddress(size_t offset=0){ // use the const version and cast away the const
+		return boost::const_pointer_cast<void>( const_cast<const ValuePtr*>(this)->getRawAddress(offset) );
+	}
 
 	/// @copydoc util::Value::toString
 	virtual std::string toString( bool labeled = false )const {

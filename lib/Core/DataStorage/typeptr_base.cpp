@@ -35,7 +35,7 @@ ValuePtrBase::~ValuePtrBase() {}
 
 ValuePtrBase::DelProxy::DelProxy(const isis::data::_internal::ValuePtrBase& master): boost::shared_ptr<const void>( master.getRawAddress() )
 {
-	LOG( Debug, verbose_info ) << "Creating DelProxy for " << this->get();
+	LOG( Debug, verbose_info ) << "Creating DelProxy for " << master.getTypeName() << " at " << this->get();
 }
 
 void ValuePtrBase::DelProxy::operator()(const void* at)

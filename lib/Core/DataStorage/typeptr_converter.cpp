@@ -127,7 +127,7 @@ public:
 		static const util::Value<uint8_t> one( 1 ), zero( 0 );
 		SRC *dstPtr = &dst.castToValuePtr<SRC>()[0];
 		const SRC *srcPtr = &src.castToValuePtr<SRC>()[0];
-		LOG_IF( !( scaling.first->eq( one ) && scaling.first->eq( zero ) ), Runtime, error ) << "Scaling is ignored when copying data of type " << src.getTypeName();
+		LOG_IF( !( scaling.first->eq( one ) && scaling.second->eq( zero ) ), Runtime, error ) << "Scaling is ignored when copying data of type " << src.getTypeName();
 		memcpy(dstPtr,srcPtr,getConvertSize( src, dst )*src.bytesPerElem());
 	}
 	virtual ~ValuePtrConverter() {}

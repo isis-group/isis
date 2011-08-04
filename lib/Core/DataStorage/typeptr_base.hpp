@@ -57,8 +57,17 @@ public:
 		void operator()( const void* at );
 	};
 
-	virtual boost::shared_ptr<const void> getRawAddress()const = 0;
-	virtual boost::shared_ptr<void> getRawAddress() = 0;
+	/**
+	 * Get the raw address the ValuePtr points to.
+	 * An offset can be added to the result. If it is not zero, the resulting shared_ptr will use DelProxy as deleter.
+	 * Thus, it will increase  the reference count of the original pointer by one and decrease it when the deletion of the offset pointer is triggered.
+	 * \param offset ammount of bytes to displace the resulting pointer from the actual pointer	
+	 * \returns a shared_ptr with the memory address of the data handled by this ValuePtr.
+	 */
+	virtual boost::shared_ptr<const void> getRawAddress(size_t offset=0)const = 0;
+
+	/// \copydoc getRawAddress
+	virtual boost::shared_ptr<void> getRawAddress(size_t offset=0) = 0;
 
 	typedef util::_internal::ValueReference<ValuePtrBase> Reference;
 	typedef ValuePtrConverterMap::mapped_type::mapped_type Converter;
