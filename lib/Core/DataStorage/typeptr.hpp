@@ -87,7 +87,6 @@ template<typename T> struct getMinMaxImpl<T, true> { // generic minmax for numbe
 template<typename TYPE> class ValuePtr: public _internal::ValuePtrBase
 {
 	boost::shared_ptr<TYPE> m_val;
-	template<typename T> ValuePtr( const util::Value<T>& value ); // Dont do this
 protected:
 	ValuePtrBase *clone() const {
 		return new ValuePtr( *this );
