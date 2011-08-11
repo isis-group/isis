@@ -101,13 +101,6 @@ void ValuePtrBase::copyRange( size_t start, size_t end, ValuePtrBase &dst, size_
 	}
 }
 
-scaling_pair ValuePtrBase::getScalingTo( unsigned short typeID, autoscaleOption scaleopt )const
-{
-	std::pair<util::ValueReference, util::ValueReference> minmax = getMinMax();
-	assert( ! ( minmax.first.isEmpty() || minmax.second.isEmpty() ) );
-	return ValuePtrBase::getScalingTo( typeID, minmax, scaleopt );
-}
-
 scaling_pair ValuePtrBase::getScalingTo( unsigned short typeID, const std::pair<util::ValueReference, util::ValueReference> &minmax, autoscaleOption scaleopt )const
 {
 	LOG_IF( minmax.first.isEmpty() || minmax.second.isEmpty(), Debug, error ) << "One of the ValueReference's in minmax is empty(). This will crash...";
