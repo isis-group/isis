@@ -27,7 +27,7 @@ void FileFormat::write( const std::list<data::Image> &images, const std::string 
 	std::list<std::string>::const_iterator inames = names.begin();
 	BOOST_FOREACH( std::list<data::Image>::const_reference ref, images ) {
 		std::string uniquePath = *( inames++ );
-		LOG( Runtime, notice )   << "Writing image to " <<  uniquePath;
+		LOG( Runtime, notice )   << "Writing image of size " << ref.getSizeAsVector() << " to " <<  uniquePath;
 
 		try {
 			write( ref, uniquePath, dialect );
