@@ -88,6 +88,7 @@ template<typename TYPE> class ValuePtr: public _internal::ValuePtrBase
 {
 	boost::shared_ptr<TYPE> m_val;
 protected:
+	ValuePtr(){} // should only be used by child classed who initialize the pointer themself
 	ValuePtrBase *clone() const {
 		return new ValuePtr( *this );
 	}
@@ -126,8 +127,16 @@ public:
 		if( length )
 			m_val.reset( ( TYPE * )calloc( length, sizeof( TYPE ) ), BasicDeleter() );
 
-		LOG_IF( length == 0, Debug, warning ) << "Creating an empty ValuePtr of type " << util::MSubject( staticName() ) << " you should overwrite it with a usefull pointer before using it";
+		LOG_IF( length == 0, Debug, warning ) 
+		<< "Creating an empty ValuePtr of type " << util::MSubject( staticName() ) 
+		<< " you should overwrite it with a usefull pointer before using it";
 	}
+
+	/**
+	 * Creates ValuePtr from a boost:shared_ptr of the same type.
+	 * It will inherit the deleter of the shared_ptr. 
+	 */
+	ValuePtr(const boost::shared_ptr<TYPE> &ptr, size_t length ): _internal::ValuePtrBase( length ), m_val(ptr) {}
 
 	/**
 	 * Creates ValuePtr from a pointer of type TYPE.
