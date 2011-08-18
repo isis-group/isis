@@ -134,7 +134,10 @@ public:
 
 	/**
 	 * Creates ValuePtr from a boost:shared_ptr of the same type.
-	 * It will inherit the deleter of the shared_ptr. 
+	 * It will inherit the deleter of the shared_ptr.
+	 * \param ptr the shared_ptr to share the data with
+	 * \param length the length of the used array (ValuePtr does NOT check for length,
+	 * this is just here for child classes which may want to check)
 	 */
 	ValuePtr(const boost::shared_ptr<TYPE> &ptr, size_t length ): _internal::ValuePtrBase( length ), m_val(ptr) {}
 
