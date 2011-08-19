@@ -315,5 +315,59 @@ BOOST_AUTO_TEST_CASE ( chunk_swap_test )
 	}
 }
 
+BOOST_AUTO_TEST_CASE ( chunk_copySlice_Test )
+{
+	size_t rows = 13;
+	size_t cols = 12;
+	size_t slices = 24;
+	size_t steps = 10;
+	data::MemChunk<float> ch( cols, rows, slices, steps );
+
+	for ( size_t ix = 0; ix < rows; ix++ ) {
+		for ( size_t iy = 0; iy < cols; iy++ ) {
+			for ( size_t is = 0; is < slices; is++ ) {
+				for ( size_t it = 0; it < steps; it++ ) {
+					ch.voxel<float>( iy, ix, is, it ) = ix + iy + is + it;
+				}
+			}
+		}
+	}
+
+	data::MemChunk<float> chSlice( cols, rows );
+	size_t slGet = 7;
+	size_t stepGet = 1;
+	ch.copySlice( slGet, stepGet, chSlice, 0, 0 );
+
+	for( size_t i = 0; i < cols; i++ ) {
+		for( size_t j = 0; j < rows; j++ ) {
+			BOOST_CHECK_EQUAL( chSlice.voxel<float>( i, j, 0, 0 ), slGet + stepGet + i + j );
+		}
+	}
+
+	//first slice
+	data::MemChunk<float> chSlice5( cols, rows );
+	slGet = 0;
+	stepGet = 2;
+	ch.copySlice( slGet, stepGet, chSlice5, 0, 0 );
+
+	for( size_t i = 0; i < cols; i++ ) {
+		for( size_t j = 0; j < rows; j++ ) {
+			BOOST_CHECK_EQUAL( chSlice5.voxel<float>( i, j, 0, 0 ), slGet + stepGet + i + j );
+		}
+	}
+
+	//lastslice
+	data::MemChunk<float> chSlice6( cols, rows );
+	slGet = 23;
+	stepGet = 7;
+	ch.copySlice( slGet, stepGet, chSlice6, 0, 0 );
+
+	for( size_t i = 0; i < cols; i++ ) {
+		for( size_t j = 0; j < rows; j++ ) {
+			BOOST_CHECK_EQUAL( chSlice6.voxel<float>( i, j, 0, 0 ), slGet + stepGet + i + j );
+		}
+	}
+}
+
 }
 }

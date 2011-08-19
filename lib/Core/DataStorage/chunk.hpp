@@ -111,6 +111,8 @@ public:
 		return ret[getLinearIndex( idx )];
 	}
 
+	void copySlice( size_t thirdDimS, size_t fourthDimS, Chunk &dst, size_t thirdDimD, size_t fourthDimD ) const;
+
 	/**
 	 * Run a functor on every Voxel in the chunk.
 	 * If the data of the chunk are not of type TYPE, behaviour is undefined.

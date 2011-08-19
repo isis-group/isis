@@ -86,6 +86,14 @@ unsigned short Chunk::getTypeID()const
 	return getValuePtrBase().getTypeID();
 }
 
+void Chunk::copySlice( size_t thirdDimS, size_t fourthDimS, Chunk &dst, size_t thirdDimD, size_t fourthDimD ) const
+{
+	const size_t idx1[] = {0, 0, thirdDimS, fourthDimS};
+	const size_t idx2[] = {getSizeAsVector()[0] - 1, getSizeAsVector()[1] - 1, thirdDimS, fourthDimS};
+	const size_t idx3[] = {0, 0, thirdDimD, fourthDimD};
+	copyRange( idx1, idx2, dst, idx3 );
+}
+
 void Chunk::copyRange( const size_t source_start[], const size_t source_end[], Chunk &dst, const size_t destination[] ) const
 {
 	LOG_IF( ! isInRange( source_start ), Debug, error )
