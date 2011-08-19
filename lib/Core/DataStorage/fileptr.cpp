@@ -10,6 +10,7 @@
 #include "fileptr.hpp"
 #include <sys/mman.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 namespace isis {
 namespace data {
@@ -29,7 +30,9 @@ void FilePtr::Closer::operator()(void *p){
 }
 	
 bool FilePtr::map(int file, size_t len, bool write,const boost::filesystem::path &filename){
-	void *const ptr=mmap(0, len, write ? PROT_WRITE:PROT_READ, write ? MAP_SHARED:MAP_PRIVATE, file, 0);
+	const int flags = write ? MAP_SHARED:MAP_PRIVATE;
+	
+	void *const ptr=mmap64(0, len, PROT_WRITE|PROT_READ, flags , file, 0); // yes we say PROT_WRITE here also if the file is opened ro - its for the mapping, not for the file
 	if(ptr==MAP_FAILED){
 		LOG(Debug, error) << "Failed to map file, error was " << strerror(errno);
 		return false;
@@ -44,14 +47,9 @@ size_t FilePtr::checkSize(bool write,int file,const boost::filesystem::path &fil
 	const size_t currSize=boost::filesystem::file_size(filename);
 	if(write){ // if we're writing
 		assert(size>0);
+
 		if(size>currSize){ // and the file is shorter than requested, resize it
-#ifdef HAVE_FALLOCATE
-			const int err = fallocate( file, 0, 0, size ); //fast preallocation using features of some linux-filesystems
-#elif HAVE_POSIX_FALLOCATE
-			const int err = posix_fallocate( file, 0, size ); // slower posix compatible version
-#else
-			const int err = ( lseek( file, size - 1, SEEK_SET ) == off_t( size - 1 ) && ::write( file, " ", 1 ) ) ? 0 : errno; //workaround in case there is no fallocate
-#endif
+			const int err = ftruncate64( file, size )? errno:0;
 			if(err){ // could not resize the file => fail
 				LOG(Runtime,error) 
 				<< "Failed to resize " << util::MSubject(filename) 
@@ -75,7 +73,7 @@ size_t FilePtr::checkSize(bool write,int file,const boost::filesystem::path &fil
 }
 
 	
-FilePtr::FilePtr(const boost::filesystem::path &filename,size_t len,bool write){
+FilePtr::FilePtr(const boost::filesystem::path &filename,size_t len,bool write):m_good(false){
 	const int oflag = write ? 
 		O_CREAT|O_RDWR: //create file if its not there
 		O_RDONLY; //open file readonly
@@ -87,9 +85,11 @@ FilePtr::FilePtr(const boost::filesystem::path &filename,size_t len,bool write){
 	}
 	const size_t map_size=checkSize(write, file, filename,len); // get the mapping size
 	if(map_size)
-		map(file, map_size, write, filename); //and do the mapping
+		m_good=map(file, map_size, write, filename); //and do the mapping
 	// from here on the pointer will be set if mapping succeded
 }
+
+bool FilePtr::good(){return m_good;}
 	
 }
 }

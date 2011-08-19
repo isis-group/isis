@@ -30,6 +30,7 @@ class FilePtr:public ValuePtr<uint8_t> {
 
 	bool map(int file,size_t len,bool write,const boost::filesystem::path &filename);
 	size_t checkSize(bool write,int file, const boost::filesystem::path &filename,size_t size=0);
+	bool m_good;
 public:
 	/**
 	 * Create a FilePtr, mapping the given file.
@@ -74,6 +75,8 @@ public:
 		LOG_IF(len*sizeof(T)>(getLength()-offset),Debug,error) << "The requested length will be " << len-(getLength()-offset) << " bytes behind the end of the source.";
 		return data::ValuePtr<T>(ptr,len);
 	}
+
+	bool good();
 };
 
 }
