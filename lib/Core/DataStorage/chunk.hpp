@@ -242,7 +242,7 @@ template<typename TYPE> class MemChunk : public Chunk
 public:
 	/// Create an empty MemChunk with the given size
 	MemChunk( size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 ):
-		Chunk( ValuePtrReference(ValuePtr<TYPE>( getVolume() )),nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps){}
+		Chunk( ValuePtrReference(ValuePtr<TYPE>( nrOfColumns*nrOfRows*nrOfSlices*nrOfTimesteps )),nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps){}
 	/**
 	 * Create a MemChunk as copy of a given raw memory block
 	 * This will create a MemChunk of the given size and fill it with the data at the given address.
@@ -255,7 +255,7 @@ public:
 	 * \param nrOfTimesteps size of the resulting image
 	 */
 	template<typename T> MemChunk( const T *const org, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 ):
-		Chunk( ValuePtrReference(ValuePtr<TYPE>( getVolume() )),nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps)
+		Chunk( ValuePtrReference(ValuePtr<TYPE>( nrOfColumns*nrOfRows*nrOfSlices*nrOfTimesteps )),nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps)
 	{
 		util::checkType<T>();
 		asValuePtrBase().copyFromMem( org, getVolume() );
