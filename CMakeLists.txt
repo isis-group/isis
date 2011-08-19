@@ -21,12 +21,12 @@ include(CheckFunctionExists)
 check_function_exists(fallocate HAVE_FALLOCATE)
 if(HAVE_FALLOCATE)
 	add_definitions(-DHAVE_FALLOCATE)
-else(HAVE_FALLOCATE)
-	check_function_exists(posix_fallocate HAVE_POSIX_FALLOCATE)
-	if(HAVE_POSIX_FALLOCATE)
-		add_definitions(-DHAVE_POSIX_FALLOCATE)
-	endif(HAVE_POSIX_FALLOCATE)
 endif(HAVE_FALLOCATE)
+
+check_function_exists(posix_fallocate HAVE_POSIX_FALLOCATE)
+if(HAVE_POSIX_FALLOCATE)
+	add_definitions(-DHAVE_POSIX_FALLOCATE)
+endif(HAVE_POSIX_FALLOCATE)
 
 
 ############################################################

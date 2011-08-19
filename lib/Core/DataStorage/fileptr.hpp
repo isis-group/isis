@@ -19,6 +19,11 @@ namespace data{
 /**
  * Class to map files into memory.
  * This can be used read only, or for read/write.
+ * 
+ * Writing to a FilePtr mapping a file read-only is valid. It will not change the mapped file.
+ * 
+ * This is inherting from ValuePtr. Thus this, and all ValuePtr created from it will be managed.
+ * The mapped file will automatically unmapped and closed after all pointers a deleted.
  */
 class FilePtr:public ValuePtr<uint8_t> {
 	struct Closer{
@@ -49,8 +54,7 @@ public:
 	 * - if write is false and len is greater then the length of the file or the file does not exist
 	 *
 	 * \param filename the file to map into memory
-	 * \param len the requested length of the resulting ValuePtr (automatically set if 0)
-	 * Note that this is in elements, not in bytes.
+	 * \param len the requested length of the resulting ValuePtr in bytes (automatically set if 0)
 	 * \param write the file be opened for writing (writing to the mapped memory will write to the file, otherwise it will cause a copy-on-write)
 	 */	
 	FilePtr(const boost::filesystem::path &filename,size_t len=0,bool write=false);
@@ -62,7 +66,7 @@ public:
 	 * 
 	 * If the FilePtr was opened writing, writing access to this ValuePtr objects will result in writes to the file. Otherwise it will just write into memory.
 	 * \param offset the position in the file to start from (in bytes)
-	 * \param len the requested length of the resulting ValuePtr (if that will go behind the end of the file, a warning will be issued).
+	 * \param len the requested length of the resulting ValuePtr in elements (if that will go behind the end of the file, a warning will be issued).
 	 */
 	template<typename T> ValuePtr<T> at(size_t offset,size_t len=0){
 		boost::shared_ptr<T> ptr=boost::static_pointer_cast<T>(getRawAddress(offset));

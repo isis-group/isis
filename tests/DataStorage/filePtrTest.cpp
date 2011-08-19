@@ -1,0 +1,71 @@
+#define BOOST_TEST_MODULE ValuePtrTest
+#define BOOST_TEST_DYN_LINK
+#include <boost/test/unit_test.hpp>
+
+#include <CoreUtils/tmpfile.hpp>
+#include <DataStorage/fileptr.hpp>
+#include <boost/filesystem.hpp>
+#include <fstream>
+
+namespace isis
+{
+namespace test
+{
+
+BOOST_AUTO_TEST_CASE( FilePtr_init_test )
+{
+	util::TmpFile testfile;
+	BOOST_REQUIRE_EQUAL(boost::filesystem::file_size(testfile),0);
+	data::FilePtr fptr1(testfile.file_string(),1024,true); // create a file for writing
+	BOOST_REQUIRE(fptr1.good()); // it should be "good"
+	BOOST_REQUIRE_EQUAL(boost::filesystem::file_size(testfile),1024); // and it should have the size 1024 by now
+	BOOST_CHECK_EQUAL(fptr1.getLength(),1024);
+
+	data::FilePtr fptr2(testfile.file_string()); // create a file for reading
+	BOOST_REQUIRE(fptr2.good()); // it should be "good"
+	BOOST_CHECK_EQUAL(fptr2.getLength(),boost::filesystem::file_size(testfile)); // should get the length of the file
+}
+
+BOOST_AUTO_TEST_CASE( FilePtr_write_test )
+{
+	util::TmpFile testfile;
+	{
+		data::FilePtr fptr1(testfile.file_string(),1024,true); // create a file for writing
+		BOOST_REQUIRE(fptr1.good()); // it should be "good"
+		BOOST_REQUIRE_EQUAL(fptr1.getLength(),1024);
+
+		data::ValuePtr<uint8_t> ptr=fptr1.at<uint8_t>(5);
+		strcpy((char*)&ptr[0],"Hello_world!\n"); // writing to a ValuePtr created from a writing fileptr should write into the file
+
+		std::ifstream in(testfile.file_string().c_str());
+		BOOST_REQUIRE(in.good());
+
+		in.seekg(5);
+		std::string red;
+		in >> red;
+		BOOST_CHECK_EQUAL(red,"Hello_world!");
+	}
+
+	{
+		data::FilePtr fptr2(testfile.file_string()); // create a file for reading
+		BOOST_REQUIRE_EQUAL(fptr2.getLength(),1024);
+		BOOST_REQUIRE(fptr2.good());
+		data::ValuePtr<uint8_t> ptr=fptr2.at<uint8_t>(5);
+		BOOST_CHECK_EQUAL(std::string((char*)&ptr[0]),"Hello_world!\n"); // reading should get the content of the file
+		strcpy((char*)&ptr[0],"Hello_you!\n"); // writing to a ValuePtr created from a reading fileptr should _NOT_ trigger a copy-on-write
+		BOOST_CHECK_EQUAL(std::string((char*)&ptr[0]),"Hello_you!\n"); // so next reading should get the new content of the memory
+
+		std::ifstream in(testfile.file_string().c_str());
+		BOOST_REQUIRE(in.good());
+
+		in.seekg(5);
+		std::string red;
+		in >> red;
+		BOOST_CHECK_EQUAL(red,"Hello_world!"); // but the file behind should not be changed
+	}
+	
+}
+
+
+}
+}
