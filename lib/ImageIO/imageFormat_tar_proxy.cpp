@@ -158,13 +158,7 @@ public:
 					}
 
 					// set it to the given size - otherwise mmap will be very sad
-#ifdef HAVE_FALLOCATE
-					const int err = fallocate( mfile, 0, 0, size ); //fast preallocation using features of ome linux-filesystems
-#elif HAVE_POSIX_FALLOCATE
-					const int err = posix_fallocate( mfile, 0, size ); // slower posix compatible version
-#else
-					const int err = ( lseek( mfile, size - 1, SEEK_SET ) == off_t( size - 1 ) && ::write( mfile, " ", 1 ) ) ? 0 : errno; //workaround in case there is no fallocate
-#endif
+					const int err = ftruncate( mfile, size )? errno:0;
 
 					if( err ) {
 						throwSystemError( err, std::string( "Failed grow " ) + tmpfile.file_string() + " to size " + boost::lexical_cast<std::string>( size ) );
