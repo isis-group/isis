@@ -81,6 +81,7 @@ public:
 	}
 
 	bool good();
+	void close();
 };
 
 }

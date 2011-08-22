@@ -22,7 +22,7 @@ void FilePtr::Closer::operator()(void *p){
 		<< "Unmapping of " << util::MSubject(filename) 
 		<< " failed, the error was: " << util::MSubject(strerror(errno));
 	}
-	if(close(file)!=0){
+	if(::close(file)!=0){
 		LOG(Runtime,warning) 
 		<< "Closing of " << util::MSubject(filename) 
 		<< " failed, the error was: " << util::MSubject(strerror(errno));
@@ -90,6 +90,12 @@ FilePtr::FilePtr(const boost::filesystem::path &filename,size_t len,bool write):
 }
 
 bool FilePtr::good(){return m_good;}
+
+void FilePtr::close(){
+	static_cast<boost::shared_ptr<uint8_t>&>(*this).reset();
+	m_good=false;
+}
+
 	
 }
 }
