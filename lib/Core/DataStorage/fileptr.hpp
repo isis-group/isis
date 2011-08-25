@@ -32,6 +32,18 @@ class FilePtr:public ValuePtr<uint8_t> {
 		boost::filesystem::path filename;
 		void operator()(void *p);
 	};
+	typedef data::ValuePtrReference(*generator_type)(data::FilePtr&,size_t,size_t);
+	struct GeneratorMap: public std::map<unsigned short,generator_type> {
+		GeneratorMap();
+		template<class T> static data::ValuePtrReference generator(data::FilePtr &mfile,size_t offset, size_t len){return mfile.at<T>(offset,len);}
+		struct proc{
+			std::map<unsigned short,generator_type> *m_map;
+			proc(std::map<unsigned short,generator_type> *map):m_map(map){}
+			template<class T> void operator()(const T&){
+				m_map->insert(std::make_pair(ValuePtr<T>::staticID,&generator<T>));
+			}
+		};
+	};
 
 	bool map(int file,size_t len,bool write,const boost::filesystem::path &filename);
 	size_t checkSize(bool write,int file, const boost::filesystem::path &filename,size_t size=0);
@@ -79,6 +91,7 @@ public:
 		LOG_IF(len*sizeof(T)>(getLength()-offset),Debug,error) << "The requested length will be " << len-(getLength()-offset) << " bytes behind the end of the source.";
 		return data::ValuePtr<T>(ptr,len);
 	}
+	data::ValuePtrReference atByID(unsigned short ID, size_t offset,size_t len=0);
 
 	bool good();
 	void close();

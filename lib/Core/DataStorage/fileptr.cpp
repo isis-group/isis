@@ -11,6 +11,12 @@
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <boost/mpl/for_each.hpp>
+#include "../CoreUtils/singletons.hpp"
+
+// we need that, because boost::mpl::for_each will instantiate all types - and this needs the output stream operations
+#include <boost/date_time/gregorian/gregorian_io.hpp>
+#include <boost/date_time/posix_time/posix_time_io.hpp>
 
 namespace isis {
 namespace data {
@@ -28,6 +34,14 @@ void FilePtr::Closer::operator()(void *p){
 		<< " failed, the error was: " << util::MSubject(strerror(errno));
 	}
 }
+
+FilePtr::GeneratorMap::GeneratorMap()
+{
+	boost::mpl::for_each<util::_internal::types>(proc(this));
+	assert(!empty());
+}
+
+
 	
 bool FilePtr::map(int file, size_t len, bool write,const boost::filesystem::path &filename){
 	const int flags = write ? MAP_SHARED:MAP_PRIVATE;
@@ -94,6 +108,15 @@ bool FilePtr::good(){return m_good;}
 void FilePtr::close(){
 	static_cast<boost::shared_ptr<uint8_t>&>(*this).reset();
 	m_good=false;
+}
+
+ValuePtrReference FilePtr::atByID(short unsigned int ID, size_t offset, size_t len)
+{
+	GeneratorMap &map=util::Singletons::get<GeneratorMap,0>();
+	assert(!map.empty());
+	const generator_type gen=map[ID];
+	assert(gen);
+	return gen(*this,offset,len);
 }
 
 	
