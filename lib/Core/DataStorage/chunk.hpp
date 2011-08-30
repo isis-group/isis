@@ -236,6 +236,14 @@ public:
 	  */
 	void swapAlong( const dimensions dim ) const;
 
+	/**
+	 * Access properties of the next lower dimension (e.g. slice-timings in volumes)
+	 * This is there for effiency on IO only (you don't have to split up chunks just to store some properties).
+	 * It will be resolved by reindexing anyway. So, in an clean Image Chunks will never have such sub-properties.
+	 */
+	util::PropertyValue &propertyValueAt(const PropertyMap::KeyType &key,size_t at);
+	/// \copydoc propertyValueAt
+	const util::PropertyValue &propertyValueAt(const PropertyMap::KeyType &key,size_t at)const;
 };
 
 /// Chunk class for memory-based buffers
