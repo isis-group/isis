@@ -281,5 +281,24 @@ void Chunk::swapAlong( const dimensions dim ) const
 
 	}
 }
+
+util::PropertyValue& Chunk::propertyValueAt(const util::PropertyMap::KeyType& key, size_t at)
+{
+	std::vector< util::PropertyValue > &vec=propertyValueVec(key);
+	const size_t cSize=getSizeAsVector()[getRelevantDims()-1];
+	if(vec.size()!=cSize){
+		LOG(Debug,info) << "Resizing sub-property " << key << " to size of the chunk (" << cSize  << ")";
+		vec.resize(cSize);
+	}
+	return vec.at(at);
+}
+const util::PropertyValue& Chunk::propertyValueAt(const util::PropertyMap::KeyType& key, size_t at) const
+{
+	const std::vector< util::PropertyValue > &vec=propertyValueVec(key);
+	const size_t cSize=getSizeAsVector()[getRelevantDims()-1];
+	LOG_IF(vec.size()!=cSize,Debug,warning) << "Sub-property " << key << " does not have the size of the chunk (" << cSize  << ")";
+	return vec.at(at);
+}
+
 }
 }
