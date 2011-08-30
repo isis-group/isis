@@ -46,7 +46,7 @@ FilePtr::GeneratorMap::GeneratorMap()
 bool FilePtr::map(int file, size_t len, bool write,const boost::filesystem::path &filename){
 	const int flags = write ? MAP_SHARED:MAP_PRIVATE;
 	
-	void *const ptr=mmap64(0, len, PROT_WRITE|PROT_READ, flags , file, 0); // yes we say PROT_WRITE here also if the file is opened ro - its for the mapping, not for the file
+	void *const ptr=mmap(0, len, PROT_WRITE|PROT_READ, flags , file, 0); // yes we say PROT_WRITE here also if the file is opened ro - its for the mapping, not for the file
 	if(ptr==MAP_FAILED){
 		LOG(Debug, error) << "Failed to map file, error was " << strerror(errno);
 		return false;
@@ -58,12 +58,12 @@ bool FilePtr::map(int file, size_t len, bool write,const boost::filesystem::path
 }
 	
 size_t FilePtr::checkSize(bool write,int file,const boost::filesystem::path &filename,size_t size){
-	const size_t currSize=boost::filesystem::file_size(filename);
+	const boost::uintmax_t currSize=boost::filesystem::file_size(filename);
 	if(write){ // if we're writing
 		assert(size>0);
 
 		if(size>currSize){ // and the file is shorter than requested, resize it
-			const int err = ftruncate64( file, size )? errno:0;
+			const int err = ftruncate( file, size )? errno:0;
 			if(err){ // could not resize the file => fail
 				LOG(Runtime,error) 
 				<< "Failed to resize " << util::MSubject(filename) 
@@ -74,9 +74,14 @@ size_t FilePtr::checkSize(bool write,int file,const boost::filesystem::path &fil
 		} else
 			return size; // no resizing needed
 	} else { // if we're reading
-		if(size==0)
-			return currSize; // autmotacially select size of the file
-		else if(size<=currSize)
+		if(size==0){
+			if (std::numeric_limits<size_t>::max()<currSize) {
+				LOG(Runtime, error) << "Sorry cannot map files larger than " << std::numeric_limits<size_t>::max() 
+				<< " bytes on this platform";
+				return 0;
+			} else
+				return currSize; // automatically select size of the file
+		} else if(size<=currSize)
 			return size; // keep the requested size (will fit into the file)
 		else{ // size will not fit into the file (and we cannot resize) => fail
 			LOG(Runtime,error) << "The requested size for readonly mapping of " << util::MSubject(filename) 
