@@ -12,6 +12,7 @@
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
 #include "CoreUtils/vector.hpp"
+#include "CoreUtils/matrix.hpp"
 #include <string.h>
 
 namespace isis
@@ -57,5 +58,61 @@ BOOST_AUTO_TEST_CASE( vector_op_test )
 	BOOST_CHECK_EQUAL( test2 - test1, test2 ); // 42-0 = 42
 	BOOST_CHECK_EQUAL( test2 + test2, test2 * 2 ); // 42+42 = 42*2
 }
+
+BOOST_AUTO_TEST_CASE( matrix_init_test )
+{
+	const uint8_t buff[]={
+		0, 1, 2,
+		3, 4, 5,
+		6, 7, 8,
+		9,10,11
+	};
+	util::FixedMatrix<uint8_t,3,4> test(buff);
+
+	for(int i=0;i<3;i++)
+		for(int j=0;j<4;j++)
+			BOOST_CHECK_EQUAL( test.elem(i,j),i+j*3 );
+}
+
+BOOST_AUTO_TEST_CASE( matrix4x4_init_test )
+{
+	util::vector4<uint8_t> b1(0, 1, 2, 3);
+	util::vector4<uint8_t> b2(4, 5, 6, 7);
+	util::vector4<uint8_t> b3(8, 9,10,11);
+	util::vector4<uint8_t> b4(12,13,14,15);
+
+
+	util::Matrix4x4<uint8_t> test(b1,b2,b3,b4);
+
+	for(int i=0;i<4;i++)
+		for(int j=0;j<4;j++)
+			BOOST_CHECK_EQUAL( test.elem(i,j),i+j*4 );
+}
+
+BOOST_AUTO_TEST_CASE( matrix_dot_test )
+{
+	util::vector4<float> b1(1/sqrt(2), -1/sqrt(2));
+	util::vector4<float> b2(1/sqrt(2), 1/sqrt(2));
+
+	util::Matrix4x4<float> test(b1,b2);
+
+	float E[]={
+		1,0,0,0,
+		0,1,0,0,
+		0,0,1,0,
+		0,0,0,1
+	};
+	// an orthogonal matrix mult with its transpose is E
+	util::Matrix4x4<float> d=test.dot(test.transpose());
+	BOOST_CHECK(d.fuzzyEqual(util::Matrix4x4<float>(E))); 
+
+	// applying two transformations on a vector has the same result as applying their "dot" on the vector
+	BOOST_CHECK(
+		test.dot(test).dot(fvector4(1,2)).fuzzyEqual(test.dot(test.dot(fvector4(1,2))))
+	);
+}
+
+
+
 }
 }
