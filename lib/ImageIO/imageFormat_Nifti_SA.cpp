@@ -152,9 +152,35 @@ protected:
 		props.setPropertyAs<uint16_t>("sequenceNumber",0);
 		props.setPropertyAs<uint16_t>("acquisitionNumber",0);
 		props.setPropertyAs<std::string>("sequenceDescription",head->descrip);
+
 		props.setPropertyAs( "indexOrigin", util::fvector4( head->qoffset_x, head->qoffset_y, head->qoffset_z, 0 ) );
-		
-		
+		props.setPropertyAs( "nifti/qform_code", head->qform_code );
+		props.setPropertyAs( "nifti/sform_code", head->sform_code );
+
+
+		if( head->sform_code ) { // get srow if sform_code>0
+			props.setPropertyAs( "nifti/srow_x", util::fvector4() )->as<util::fvector4>().copyFrom(head->srow_x,head->srow_x+4);;
+			props.setPropertyAs( "nifti/srow_y", util::fvector4() )->as<util::fvector4>().copyFrom(head->srow_y,head->srow_y+4);;
+			props.setPropertyAs( "nifti/srow_z", util::fvector4() )->as<util::fvector4>().copyFrom(head->srow_z,head->srow_z+4);;
+		}
+
+		if( head->qform_code ) { // get the quaternion if qform_code>0
+			props.setPropertyAs( "nifti/quatern_b", head->quatern_b);
+			props.setPropertyAs( "nifti/quatern_c", head->quatern_c);
+			props.setPropertyAs( "nifti/quatern_d", head->quatern_d);
+		}
+
+		if(head->sform_code){ // if sform_code is set, use that regardless of qform
+			useSForm(props);
+		} else if(head->qform_code){ // if qform_code is set, but no sform use that (thats the "normal" case)
+			useQForm(props);
+		} else {
+			LOG( Runtime, warning ) << "Neigther sform_code nor qform_code are set, using identity matrix for geometry";
+			props.setPropertyAs( "rowVec",  util::fvector4( 1, 0, 0 ) );
+			props.setPropertyAs( "columnVec", util::fvector4( 0, 1, 0 ) );
+			props.setPropertyAs( "sliceVec", util::fvector4( 0, 0, 1 ) );
+		}
+
 		return props;
 	}
 public:
@@ -181,9 +207,31 @@ public:
 	void write( const data::Image &image, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
 	}
 	bool tainted()const {return false;}//internal plugins are not tainted
+private:
+// The nifti coord system:
+// The (x,y,z) coordinates refer to the CENTER of a voxel.
+// In methods 2 and 3, the (x,y,z) axes refer to a subject-based coordinate system, with +x = Right  +y = Anterior  +z = Superior.
+// So, the transform from nifti to isis is:
+// [-1  0  0  0]
+// [ 0 -1  0  0]
+// [ 0  0  1  0]
+// [ 0  0  0  1]
+	void useSForm(util::PropertyMap &props){
+		// srow_? is the linear map from image space to nifti space (not isis space)
+		// [x] [ nifti/srow_x ]   [i]
+		// [y]=[ nifti/srow_y ] * [j]
+		// [z] [ nifti/srow_z ]   [k]
+		props.transform("nifti/srow_x","nifti/rowVec");
+		props.transform("nifti/srow_y","nifti/columnVec");
+		props.transform("nifti/srow_z","nifti/sliceVec");
+	}
+	void useQForm(util::PropertyMap &props);
 };
+
+
 }
 }
+
 isis::image_io::FileFormat *factory()
 {
 	return new isis::image_io::ImageFormat_NiftiSa();
