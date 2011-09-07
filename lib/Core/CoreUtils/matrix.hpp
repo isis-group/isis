@@ -65,7 +65,7 @@ public:
 	dot(const FixedMatrix<TYPE2,COLS2,COLS,CONTAINER2> &right)const{
 		// transpose the right, so we can use columns as rows
 		const FixedMatrix<TYPE2,COLS,COLS2,CONTAINER2> rightT=right.transpose();
-		const FixedMatrix<TYPE2,COLS,ROWS,CONTAINER> &left=*this;
+		const FixedMatrix<TYPE,COLS,ROWS,CONTAINER> &left=*this;
 		FixedMatrix<TYPE2,COLS2,ROWS,CONTAINER2> ret;
 		
 		for(size_t c=0;c<right.columns;c++){ //result has as much columns as right
@@ -90,6 +90,13 @@ public:
 				const TYPE *lstart=&elem(0,r),*lend=lstart+left.columns;
 				ret[r]=std::inner_product(lstart,lend,rstart,TYPE2());
 			}
+		return ret;
+	}
+
+	FixedVector<TYPE,COLS,CONTAINER> getRow(size_t rownum){
+		FixedVector<TYPE,COLS,CONTAINER> ret;
+		TYPE *start=&elem(0,rownum),*end=start+COLS;
+		ret.copyFrom(start,end);
 		return ret;
 	}
 };
