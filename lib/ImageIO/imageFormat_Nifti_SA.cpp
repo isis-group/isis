@@ -1,5 +1,6 @@
 #include <DataStorage/io_interface.h>
 #include <DataStorage/fileptr.hpp>
+#include <CoreUtils/matrix.hpp>
 
 #define NIFTI_TYPE_UINT8           2
 #define NIFTI_TYPE_UINT16        512
@@ -106,6 +107,7 @@ struct nifti_1_header {
 	
 class ImageFormat_NiftiSa: public FileFormat
 {
+	static const util::Matrix4x4<short> nifti2isis;
 public:
 	ImageFormat_NiftiSa(){
 		nii2isis[NIFTI_TYPE_INT8 ]=data::ValuePtr< int8_t>::staticID;
@@ -129,7 +131,7 @@ protected:
 		return std::string( ".nii" );
 	}
 	std::map<short,unsigned short> nii2isis;
-	util::PropertyMap header2PropMap(const _internal::nifti_1_header *head){
+	static util::PropertyMap header2PropMap(const _internal::nifti_1_header *head){
 		util::PropertyMap props;
 		unsigned short dims=head->dim[0];
 		double time_fac=1;
@@ -208,29 +210,85 @@ public:
 	}
 	bool tainted()const {return false;}//internal plugins are not tainted
 private:
-// The nifti coord system:
-// The (x,y,z) coordinates refer to the CENTER of a voxel.
-// In methods 2 and 3, the (x,y,z) axes refer to a subject-based coordinate system, with +x = Right  +y = Anterior  +z = Superior.
-// So, the transform from nifti to isis is:
-// [-1  0  0  0]
-// [ 0 -1  0  0]
-// [ 0  0  1  0]
-// [ 0  0  0  1]
-	void useSForm(util::PropertyMap &props){
+	static void useSForm(util::PropertyMap &props){
 		// srow_? is the linear map from image space to nifti space (not isis space)
 		// [x] [ nifti/srow_x ]   [i]
 		// [y]=[ nifti/srow_y ] * [j]
 		// [z] [ nifti/srow_z ]   [k]
-		props.transform("nifti/srow_x","nifti/rowVec");
-		props.transform("nifti/srow_y","nifti/columnVec");
-		props.transform("nifti/srow_z","nifti/sliceVec");
+
+		LOG(Debug,info) << "Using sform" <<
+			util::MSubject( props.propertyValue("nifti/srow_x") ) << ", " <<
+			util::MSubject( props.propertyValue("nifti/srow_y") ) << ", " <<
+			util::MSubject( props.propertyValue("nifti/srow_z") );
+
+
+		// transform from image space to nifti space
+		const util::Matrix4x4<float> image2nifti(
+			props.getPropertyAs<util::fvector4>("nifti/srow_x"),
+			props.getPropertyAs<util::fvector4>("nifti/srow_y"),
+			props.getPropertyAs<util::fvector4>("nifti/srow_z")
+		);
+		util::Matrix4x4<float> image2isis=nifti2isis.dot(image2nifti); // add transform to isis-space
+
+		//get position of image-voxel 0,0,0,0 in isis space
+		const util::fvector4 origin=image2isis.dot(util::fvector4(0,0)); 
+
+		//remove offset from image2isis
+		image2isis=util::Matrix4x4<float>(
+			util::fvector4(1,0,0,-origin[0]),
+			util::fvector4(0,1,0,-origin[1]),
+			util::fvector4(0,0,1,-origin[2]),
+			util::fvector4(0,0,0,1)
+		).dot(image2isis);
+		
+		const util::fvector4 voxelSize( // get voxel sizes by transforming othogonal vectors of one voxel from image to isis
+			image2isis.dot(util::fvector4(1,0,0)).len(),
+			image2isis.dot(util::fvector4(0,1,0)).len(),
+			image2isis.dot(util::fvector4(0,0,1)).len()
+		);
+
+		//remove scaling from image2isis
+		image2isis=image2isis.dot(util::Matrix4x4<float>(
+			util::fvector4(1/voxelSize[0],0,0),
+			util::fvector4(0,1/voxelSize[1],0),
+			util::fvector4(0,0,1/voxelSize[2])
+		));
+
+		props.setPropertyAs<util::fvector4>("rowVec",image2isis.getRow(0));
+		props.setPropertyAs<util::fvector4>("columnVec",image2isis.getRow(1));
+		props.setPropertyAs<util::fvector4>("sliceVec",image2isis.getRow(2));
+		props.setPropertyAs<util::fvector4>("voxelSize",voxelSize);
+		props.setPropertyAs<util::fvector4>("indexOrigin",origin);
+
+		LOG(Debug,info)
+			<< "Computed rowVec=" << props.getPropertyAs<util::fvector4>("rowVec") << ", "
+			<< "columnVec=" << props.getPropertyAs<util::fvector4>("columnVec") << ", "
+			<< "sliceVec=" << props.getPropertyAs<util::fvector4>("sliceVec") << ", "
+			<< "voxelSize=" << props.getPropertyAs<util::fvector4>("voxelSize") << " and "
+			<< "indexOrigin=" << props.getPropertyAs<util::fvector4>("indexOrigin") << " from sform";
+
+		props.remove("nifti/srow_x");
+		props.remove("nifti/srow_y");
+		props.remove("nifti/srow_z");
 	}
-	void useQForm(util::PropertyMap &props);
+	static void useQForm(util::PropertyMap &props);
 };
 
+// The nifti coord system:
+// The (x,y,z) coordinates refer to the CENTER of a voxel.
+// In methods 2 and 3, the (x,y,z) axes refer to a subject-based coordinate system, with +x = Right  +y = Anterior  +z = Superior.
+// So, the transform from nifti to isis is:
+const util::Matrix4x4<short> ImageFormat_NiftiSa::nifti2isis(
+	util::vector4<short>(-1, 0, 0, 0),
+	util::vector4<short>( 0,-1, 0, 0),
+	util::vector4<short>( 0, 0, 1, 0),
+	util::vector4<short>( 0, 0, 0, 1)
+);
 
 }
 }
+
+
 
 isis::image_io::FileFormat *factory()
 {
