@@ -63,6 +63,7 @@ public:
 	 * \returns true if the option was set, false otherwise.
 	 */
 	bool set( const char *entry );
+	bool set( unsigned short entry );
 	/**
 	 * Implicit cast to int.
 	 * The numbers correspont to the order the options where given at the creation of the selection (first option -> 1, second option -> 2 ...)
