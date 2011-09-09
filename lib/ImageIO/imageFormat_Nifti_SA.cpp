@@ -147,29 +147,33 @@ protected:
 			case NIFTI_UNITS_USEC:time_fac=1e-3;break;
 		}
 
-		// voxel size
-		util::fvector4 v_size;v_size.copyFrom(head->pixdim,head->pixdim+std::min<unsigned short>(dims,3));
-		props.setPropertyAs<util::fvector4>("voxelSize",v_size*size_fac);
 
 		props.setPropertyAs<uint16_t>("sequenceNumber",0);
 		props.setPropertyAs<uint16_t>("acquisitionNumber",0);
 		props.setPropertyAs<std::string>("sequenceDescription",head->descrip);
 
-		props.setPropertyAs( "indexOrigin", util::fvector4( head->qoffset_x, head->qoffset_y, head->qoffset_z, 0 ) );
-		props.setPropertyAs( "nifti/qform_code", head->qform_code );
-		props.setPropertyAs( "nifti/sform_code", head->sform_code );
+		util::Selection formCode("UNKNOWN,SCANNER_ANAT,ALIGNED_ANAT,TALAIRACH,MNI_152");
+
+		props.setPropertyAs( "nifti/qform_code", formCode )->castTo<util::Selection>().set(head->qform_code);
+		props.setPropertyAs( "nifti/sform_code", formCode )->castTo<util::Selection>().set(head->sform_code);
 
 
 		if( head->sform_code ) { // get srow if sform_code>0
-			props.setPropertyAs( "nifti/srow_x", util::fvector4() )->as<util::fvector4>().copyFrom(head->srow_x,head->srow_x+4);;
-			props.setPropertyAs( "nifti/srow_y", util::fvector4() )->as<util::fvector4>().copyFrom(head->srow_y,head->srow_y+4);;
-			props.setPropertyAs( "nifti/srow_z", util::fvector4() )->as<util::fvector4>().copyFrom(head->srow_z,head->srow_z+4);;
+			props.setPropertyAs( "nifti/srow_x", util::fvector4() )->castTo<util::fvector4>().copyFrom(head->srow_x,head->srow_x+4);;
+			props.setPropertyAs( "nifti/srow_y", util::fvector4() )->castTo<util::fvector4>().copyFrom(head->srow_y,head->srow_y+4);;
+			props.setPropertyAs( "nifti/srow_z", util::fvector4() )->castTo<util::fvector4>().copyFrom(head->srow_z,head->srow_z+4);;
 		}
 
 		if( head->qform_code ) { // get the quaternion if qform_code>0
 			props.setPropertyAs( "nifti/quatern_b", head->quatern_b);
 			props.setPropertyAs( "nifti/quatern_c", head->quatern_c);
 			props.setPropertyAs( "nifti/quatern_d", head->quatern_d);
+			props.setPropertyAs( "nifti/qoffset", util::fvector4( head->qoffset_x, head->qoffset_y, head->qoffset_z, 0 ) );
+			props.setPropertyAs( "nifti/qfac", (head->dim[0]==-1) ?:1 );
+
+			// voxel size
+			util::fvector4 v_size;v_size.copyFrom(head->pixdim+1,head->pixdim+std::min<unsigned short>(dims,3)+1);
+			props.setPropertyAs<util::fvector4>("nifti/pixdim",v_size*size_fac);
 		}
 
 		if(head->sform_code){ // if sform_code is set, use that regardless of qform
@@ -181,6 +185,7 @@ protected:
 			props.setPropertyAs( "rowVec",  util::fvector4( 1, 0, 0 ) );
 			props.setPropertyAs( "columnVec", util::fvector4( 0, 1, 0 ) );
 			props.setPropertyAs( "sliceVec", util::fvector4( 0, 0, 1 ) );
+			props.setPropertyAs( "voxelSize", util::fvector4(head->pixdim[1],head->pixdim[2],head->pixdim[3]) );
 		}
 
 		return props;
@@ -203,6 +208,7 @@ public:
 
 		data::ValuePtrReference data=mfile.atByID(nii2isis[header->datatype],header->vox_offset);
 		LOG(Runtime,info) << "Mapping nifti image as " << data->getTypeName() << " of length " << data->getLength();
+
 		return 0;
 	}
 
@@ -216,10 +222,11 @@ private:
 		// [y]=[ nifti/srow_y ] * [j]
 		// [z] [ nifti/srow_z ]   [k]
 
-		LOG(Debug,info) << "Using sform" <<
-			util::MSubject( props.propertyValue("nifti/srow_x") ) << ", " <<
-			util::MSubject( props.propertyValue("nifti/srow_y") ) << ", " <<
-			util::MSubject( props.propertyValue("nifti/srow_z") );
+		LOG(Debug,info) << "Using sform (" << props.propertyValue( "nifti/sform_code").toString() << ") " << util::MSubject(
+			props.propertyValue("nifti/srow_x").toString()+"-"+
+			props.propertyValue("nifti/srow_y").toString()+"-"+
+			props.propertyValue("nifti/srow_z").toString()
+		) << " to calc orientation";
 
 
 		// transform from image space to nifti space
@@ -231,14 +238,15 @@ private:
 		util::Matrix4x4<float> image2isis=nifti2isis.dot(image2nifti); // add transform to isis-space
 
 		//get position of image-voxel 0,0,0,0 in isis space
-		const util::fvector4 origin=image2isis.dot(util::fvector4(0,0)); 
+		const util::fvector4 origin=image2isis.dot(util::fvector4(0,0,0,1));
+		props.setPropertyAs<util::fvector4>("indexOrigin",origin)->castTo<util::fvector4>()[data::timeDim]=0; // timedim is 1 from the matrix calc
+		LOG(Debug,info) << "Computed indexOrigin=" << props.getPropertyAs<util::fvector4>("indexOrigin") << " from sform";
 
 		//remove offset from image2isis
 		image2isis=util::Matrix4x4<float>(
 			util::fvector4(1,0,0,-origin[0]),
 			util::fvector4(0,1,0,-origin[1]),
-			util::fvector4(0,0,1,-origin[2]),
-			util::fvector4(0,0,0,1)
+			util::fvector4(0,0,1,-origin[2])
 		).dot(image2isis);
 		
 		const util::fvector4 voxelSize( // get voxel sizes by transforming othogonal vectors of one voxel from image to isis
@@ -246,6 +254,9 @@ private:
 			image2isis.dot(util::fvector4(0,1,0)).len(),
 			image2isis.dot(util::fvector4(0,0,1)).len()
 		);
+		props.setPropertyAs<util::fvector4>("voxelSize",voxelSize)->castTo<util::fvector4>()[data::timeDim]=0; // timedim is 1 from the matrix calc
+		LOG(Debug,info)	<< "Computed voxelSize=" << props.getPropertyAs<util::fvector4>("voxelSize") << " from sform";
+
 
 		//remove scaling from image2isis
 		image2isis=image2isis.dot(util::Matrix4x4<float>(
@@ -257,21 +268,61 @@ private:
 		props.setPropertyAs<util::fvector4>("rowVec",image2isis.getRow(0));
 		props.setPropertyAs<util::fvector4>("columnVec",image2isis.getRow(1));
 		props.setPropertyAs<util::fvector4>("sliceVec",image2isis.getRow(2));
-		props.setPropertyAs<util::fvector4>("voxelSize",voxelSize);
-		props.setPropertyAs<util::fvector4>("indexOrigin",origin);
 
 		LOG(Debug,info)
 			<< "Computed rowVec=" << props.getPropertyAs<util::fvector4>("rowVec") << ", "
-			<< "columnVec=" << props.getPropertyAs<util::fvector4>("columnVec") << ", "
-			<< "sliceVec=" << props.getPropertyAs<util::fvector4>("sliceVec") << ", "
-			<< "voxelSize=" << props.getPropertyAs<util::fvector4>("voxelSize") << " and "
-			<< "indexOrigin=" << props.getPropertyAs<util::fvector4>("indexOrigin") << " from sform";
+			<< "columnVec=" << props.getPropertyAs<util::fvector4>("columnVec") << " and "
+			<< "sliceVec=" << props.getPropertyAs<util::fvector4>("sliceVec") << " from sform";
 
 		props.remove("nifti/srow_x");
 		props.remove("nifti/srow_y");
 		props.remove("nifti/srow_z");
 	}
-	static void useQForm(util::PropertyMap &props);
+	static void useQForm(util::PropertyMap &props){
+		
+		// orientation //////////////////////////////////////////////////////////////////////////////////
+		//see http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/quatern.html
+		//and http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/qformExt.jpg
+		double b=props.getPropertyAs<double>( "nifti/quatern_b");
+		double c=props.getPropertyAs<double>( "nifti/quatern_c");
+		double d=props.getPropertyAs<double>( "nifti/quatern_d");
+		double a=sqrt(1.0-(b*b+c*c+d*d));
+
+		LOG(Debug,info)
+			<< "Using qform (" << props.propertyValue( "nifti/qform_code").toString()
+			<< ") quaternion=" << util::fvector4(a,b,c,d) << " with qfac=" << props.propertyValue("nifti/qfac").toString()
+			<< ", pixdim=" << props.propertyValue("nifti/pixdim").toString()
+			<< " and qoffset= " << props.propertyValue("nifti/qoffset").toString();
+
+		const util::Matrix4x4<double> M(
+			util::fvector4(a*a+b*b-c*c-d*d,2*b*c-2*a*d,2*b*d+2*a*c),
+			util::fvector4(2*b*c+2*a*d,a*a+c*c-b*b-d*d,2*c*d-2*a*b),
+			util::fvector4(2*b*d-2*a*c,2*c*d+2*a*b,a*a+d*d-c*c-b*b)
+		);
+		const util::Matrix4x4<double> image2isis=nifti2isis.dot(M);
+
+		props.setPropertyAs<util::fvector4>("rowVec",image2isis.getRow(0));
+		props.setPropertyAs<util::fvector4>("columnVec",image2isis.getRow(1));
+		props.setPropertyAs<util::fvector4>("sliceVec",image2isis.getRow(2));
+
+		LOG(Debug,info)
+			<< "Computed rowVec=" << props.getPropertyAs<util::fvector4>("rowVec") << ", "
+			<< "columnVec=" << props.getPropertyAs<util::fvector4>("columnVec") << " and "
+			<< "sliceVec=" << props.getPropertyAs<util::fvector4>("sliceVec") << " from qform";
+
+		props.remove("nifti/quatern_b");
+		props.remove("nifti/quatern_c");
+		props.remove("nifti/quatern_d");
+
+		// indexOrigin //////////////////////////////////////////////////////////////////////////////////
+		props.setPropertyAs<util::fvector4>("indexOrigin",nifti2isis.dot(props.getPropertyAs<util::fvector4>( "nifti/qoffset")));
+		LOG(Debug,info) << "Computed indexOrigin=" << props.getPropertyAs<util::fvector4>("indexOrigin") << " from qform";
+		props.remove("nifti/qoffset");
+
+		// voxelSize //////////////////////////////////////////////////////////////////////////////////
+		props.transform<util::fvector4>("nifti/pixdim","voxelSize");
+		LOG(Debug,info)	<< "Computed voxelSize=" << props.getPropertyAs<util::fvector4>("voxelSize") << " from qform";
+	}
 };
 
 // The nifti coord system:
