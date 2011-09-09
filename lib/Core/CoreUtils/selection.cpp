@@ -43,6 +43,7 @@ Selection::operator std::string()const
 	return std::string( buff.begin(), buff.end() );
 }
 
+bool Selection::set(unsigned short entry){m_set=entry;}
 bool Selection::set( const char *entry )
 {
 	MapType::const_iterator found = ent_map.find( entry );
