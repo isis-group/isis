@@ -109,9 +109,9 @@ public:
 
 	std::list<isis::data::Chunk> _getChunksAsVector( void ) {
 		std::list<isis::data::Chunk> retChunkList;
-		std::vector<boost::shared_ptr<isis::data::Chunk> > chunkList( this->getChunksAsVector() );
-		BOOST_FOREACH( std::vector<boost::shared_ptr<isis::data::Chunk> >::reference ref, chunkList ) {
-			retChunkList.push_back( *ref );
+		std::vector<isis::data::Chunk>  chunkList( this->copyChunksToVector() );
+		BOOST_FOREACH( std::vector<isis::data::Chunk> ::reference ref, chunkList ) {
+			retChunkList.push_back( ref );
 		}
 		return retChunkList;
 	}

@@ -22,8 +22,8 @@ configure_file(__init__.py
 # configure installation
 ############################################################
 install(FILES __init__.py 
-  DESTINATION ${CMAKE_INSTALL_PREFIX}/${ISIS_PYTHON_INSTALL_DIR}/core)
+  DESTINATION  ${PYTHON_SITE_PACKAGES}/core)
 
 install(TARGETS _core
-     LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/${ISIS_PYTHON_INSTALL_DIR}/core
+     LIBRARY DESTINATION  ${PYTHON_SITE_PACKAGES}/core
      COMPONENT RuntimeLibraries)

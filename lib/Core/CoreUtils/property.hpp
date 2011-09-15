@@ -59,9 +59,8 @@ public:
 	/**
 	 * Empty constructor.
 	 * Creates an empty property value. So PropertyValue().isEmpty() will allways be true.
-	 * \param _needed flag if this PropertyValue is needed an thus not allowed to be empty (a.k.a. undefined)
 	 */
-	PropertyValue( bool _needed = false );
+	PropertyValue();
 	/// returns true if PropertyValue is marked as needed, false otherwise
 	bool &needed();
 	///\copydoc needed
@@ -107,6 +106,10 @@ public:
 	 */
 	template<typename T> bool operator ==( const T &second )const {
 		checkType<T>();
+
+		if(isEmpty()){
+			return false;
+		}
 
 		if ( get()->is<T>() ) { // If I'm of the same type as the comparator
 			const T &cmp = get()->castTo<T>();
