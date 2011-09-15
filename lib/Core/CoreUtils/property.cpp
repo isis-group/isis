@@ -37,7 +37,7 @@ bool PropertyValue::operator== ( const _internal::ValueBase &second )const
 }
 
 
-PropertyValue::PropertyValue ( bool _needed ) : m_needed( _needed ) {}
+PropertyValue::PropertyValue ( ) : m_needed( false ) {}
 
 
 }
