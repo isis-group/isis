@@ -591,7 +591,7 @@ private:
 						const size_t dim[] = {x, y, z, t};
 						const data::Chunk ch = image.getChunkAs<T>( scale, x, y, z, t );
 						T *target = refNii + image.getLinearIndex( dim );
-						ch.getValuePtr<T>().copyToMem( 0, ch.getVolume() - 1, target );
+						ch.getValuePtr<T>().copyToMem( target, ch.getVolume() );
 					}
 				}
 			}

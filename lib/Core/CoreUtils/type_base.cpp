@@ -81,7 +81,7 @@ bool ValueBase::fitsInto( short unsigned int ID ) const
 	}
 }
 
-ValueBase::Reference ValueBase::copyToNewByID( short unsigned int ID ) const
+ValueBase::Reference ValueBase::copyByID( short unsigned int ID ) const
 {
 	boost::scoped_ptr<ValueBase> to;
 	const Converter &conv = getConverterTo( ID );

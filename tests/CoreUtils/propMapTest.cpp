@@ -161,5 +161,25 @@ BOOST_AUTO_TEST_CASE( propMap_transform_test )
 	BOOST_CHECK_EQUAL( map.propertyValue( "Test1int" ), ( int32_t )6 );
 	BOOST_CHECK_EQUAL( map.propertyValue( "Test3int" ), util::ivector4( 1, 1, 1, 1 ) );
 }
+
+BOOST_AUTO_TEST_CASE( propMap_find_test )
+{
+	util::PropertyMap map;
+	map.propertyValue( "Test1" ) = 6.4;
+	map.propertyValue( "Test2" ) = ( int32_t )5;
+	map.propertyValue( "Test3" ) = util::fvector4( 1, 1, 1, 1 );
+	map.propertyValue( "Test4" ) = std::string( "Hallo" );
+	map.propertyValue( "sub1/subProp1" ) = ( int32_t )1;
+	map.propertyValue( "sub2/subProp2" ) = ( int32_t )2;
+	map.propertyValue( "sub2/sub1/subsubProp2" ) = ( int32_t )2;
+
+	BOOST_CHECK_EQUAL( map.find( "subProp1" ), "sub1/subProp1" );
+	BOOST_CHECK_EQUAL( map.find( "subProp2" ), "sub2/subProp2" );
+	BOOST_CHECK( map.find( "sub" ).empty() );
+
+	map.propertyValue( "sub1/sub1" ) = ( int32_t )1;
+	BOOST_CHECK_EQUAL( map.find( "sub1" ), "sub1/sub1" );
+	BOOST_CHECK_EQUAL( map.find( "sub1", false, true ), "sub1" ); // this is the branch "sub1"
+}
 }
 }

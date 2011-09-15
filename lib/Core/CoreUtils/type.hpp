@@ -18,6 +18,8 @@
 
 #include <string>
 #include <functional>
+#include <boost/type_traits/is_float.hpp>
+#include <boost/type_traits/is_integral.hpp>
 
 namespace isis
 {
@@ -192,7 +194,7 @@ public:
 	 */
 	std::string toString( bool labeled = false )const {
 		std::string ret;
-		Reference ref = copyToNewByID( Value<std::string>::staticID );
+		Reference ref = copyByID( Value<std::string>::staticID );
 
 		if ( ref.isEmpty() ) {
 			LOG( Debug, warning ) << "Automatic conversion of " << *this << " to string failed. Falling back to boost::lexical_cast<std::string>";
@@ -205,12 +207,11 @@ public:
 
 		return ret;
 	}
-	virtual std::string getTypeName()const {
-		return staticName();
-	}
-	virtual unsigned short getTypeID()const {
-		return staticID;
-	}
+
+	std::string getTypeName()const {return staticName();}
+	unsigned short getTypeID()const {return staticID;}
+	bool isFloat() const {return boost::is_float< TYPE >::value;}
+	bool isInteger() const {return boost::is_integral< TYPE >::value;}
 
 	/// \returns true if and only if this and second do contain the same value of the same type
 	virtual bool operator==( const ValueBase &second )const {

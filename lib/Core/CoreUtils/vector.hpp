@@ -195,6 +195,19 @@ public:
 	this_class operator*( const TYPE &src )const {return binaryOp<std::multiplies<TYPE> >( src );}
 	this_class operator/( const TYPE &src )const {return binaryOp<std::divides<TYPE>    >( src );}
 
+	////////////////////////////////////////////////////////////////////////////////////
+	// applying Arithmetic operations
+	////////////////////////////////////////////////////////////////////////////////////
+	this_class operator-=( const this_class &src ) {return *this = *this - src;}
+	this_class operator+=( const this_class &src ) {return *this = *this + src;}
+	this_class operator*=( const this_class &src ) {return *this = *this * src;}
+	this_class operator/=( const this_class &src ) {return *this = *this / src;}
+
+	this_class operator-=( const TYPE &src ) {return *this = *this - src;}
+	this_class operator+=( const TYPE &src ) {return *this = *this + src;}
+	this_class operator*=( const TYPE &src ) {return *this = *this * src;}
+	this_class operator/=( const TYPE &src ) {return *this = *this / src;}
+
 	///\returns a negated copy
 	const this_class negate()const {
 		return unaryOp<std::negate<float> >();

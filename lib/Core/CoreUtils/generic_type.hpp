@@ -59,6 +59,12 @@ public:
 	/// \returns the ID of its actual type
 	virtual unsigned short getTypeID()const = 0;
 
+	/// \returns true if the type is a floating point scalar
+	virtual bool isFloat()const = 0;
+
+	/// \returns true if the type is a integral scalar
+	virtual bool isInteger()const = 0;
+
 	/// \returns true if type of this and second are equal
 	bool isSameType( const GenericValue &second )const;
 	virtual ~GenericValue() {}
