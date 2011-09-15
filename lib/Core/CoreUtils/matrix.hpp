@@ -93,9 +93,9 @@ public:
 		return ret;
 	}
 
-	FixedVector<TYPE,COLS,CONTAINER> getRow(size_t rownum){
+	FixedVector<TYPE,COLS,CONTAINER> getRow(size_t rownum)const{
 		FixedVector<TYPE,COLS,CONTAINER> ret;
-		TYPE *start=&elem(0,rownum),*end=start+COLS;
+		const TYPE *start=&elem(0,rownum),*end=start+COLS;
 		ret.copyFrom(start,end);
 		return ret;
 	}
