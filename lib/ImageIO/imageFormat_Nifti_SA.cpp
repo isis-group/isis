@@ -22,6 +22,11 @@
 
 #define NIFTI_TYPE_RGB24         128
 
+#define NIFTI_SLICE_SEQ_INC  1
+#define NIFTI_SLICE_SEQ_DEC  2
+#define NIFTI_SLICE_ALT_INC  3
+#define NIFTI_SLICE_ALT_DEC  4
+
 
 #define NIFTI_UNITS_UNKNOWN 0
 #define NIFTI_UNITS_METER   1
@@ -131,8 +136,7 @@ protected:
 		return std::string( ".nii" );
 	}
 	std::map<short,unsigned short> nii2isis;
-	static util::PropertyMap header2PropMap(const _internal::nifti_1_header *head){
-		util::PropertyMap props;
+	static void header2PropMap(const _internal::nifti_1_header *head,data::Chunk &props){
 		unsigned short dims=head->dim[0];
 		double time_fac=1;
 		double size_fac=1;
@@ -149,22 +153,19 @@ protected:
 
 
 		props.setPropertyAs<uint16_t>("sequenceNumber",0);
-		props.setPropertyAs<uint16_t>("acquisitionNumber",0);
 		props.setPropertyAs<std::string>("sequenceDescription",head->descrip);
 
-		util::Selection formCode("UNKNOWN,SCANNER_ANAT,ALIGNED_ANAT,TALAIRACH,MNI_152");
-
-		props.setPropertyAs( "nifti/qform_code", formCode )->castTo<util::Selection>().set(head->qform_code);
-		props.setPropertyAs( "nifti/sform_code", formCode )->castTo<util::Selection>().set(head->sform_code);
-
+		const util::Selection formCode("SCANNER_ANAT,ALIGNED_ANAT,TALAIRACH,MNI_152");
 
 		if( head->sform_code ) { // get srow if sform_code>0
+			props.setPropertyAs( "nifti/sform_code", formCode )->castTo<util::Selection>().set(head->sform_code);
 			props.setPropertyAs( "nifti/srow_x", util::fvector4() )->castTo<util::fvector4>().copyFrom(head->srow_x,head->srow_x+4);;
 			props.setPropertyAs( "nifti/srow_y", util::fvector4() )->castTo<util::fvector4>().copyFrom(head->srow_y,head->srow_y+4);;
 			props.setPropertyAs( "nifti/srow_z", util::fvector4() )->castTo<util::fvector4>().copyFrom(head->srow_z,head->srow_z+4);;
 		}
 
 		if( head->qform_code ) { // get the quaternion if qform_code>0
+			props.setPropertyAs( "nifti/qform_code", formCode )->castTo<util::Selection>().set(head->qform_code);
 			props.setPropertyAs( "nifti/quatern_b", head->quatern_b);
 			props.setPropertyAs( "nifti/quatern_c", head->quatern_c);
 			props.setPropertyAs( "nifti/quatern_d", head->quatern_d);
@@ -182,13 +183,57 @@ protected:
 			useQForm(props);
 		} else {
 			LOG( Runtime, warning ) << "Neigther sform_code nor qform_code are set, using identity matrix for geometry";
-			props.setPropertyAs( "rowVec",  util::fvector4( 1, 0, 0 ) );
-			props.setPropertyAs( "columnVec", util::fvector4( 0, 1, 0 ) );
-			props.setPropertyAs( "sliceVec", util::fvector4( 0, 0, 1 ) );
-			props.setPropertyAs( "voxelSize", util::fvector4(head->pixdim[1],head->pixdim[2],head->pixdim[3]) );
+			props.setPropertyAs<util::fvector4>( "rowVec",    nifti2isis.getRow(0) ); // we use the transformation from nifti to isis as unity
+			props.setPropertyAs<util::fvector4>( "columnVec", nifti2isis.getRow(1) ); // because the image will very likely be in nifti space
+			props.setPropertyAs<util::fvector4>( "sliceVec",  nifti2isis.getRow(2) );
+			props.setPropertyAs<util::fvector4>( "voxelSize", util::fvector4(head->pixdim[1],head->pixdim[2],head->pixdim[3]) );
+		}
+		// set space unit factors
+		props.propertyValue( "voxelSize")->castTo<util::fvector4>()*=size_fac;
+		props.propertyValue( "indexOrigin")->castTo<util::fvector4>()*=size_fac;
+
+		// set slice ordering
+		if(dims==3){
+			const int interl[]={0,1,-1};
+			switch(head->slice_code){
+				case 0:
+				case NIFTI_SLICE_SEQ_INC:
+					for(short i=0;i<head->dim[3];i++){
+						props.propertyValueAt("acquisitionNumber",i)=i;
+						props.propertyValueAt("acquisitionTime",  i)=i*head->slice_duration*time_fac;
+					}
+					break;
+				case NIFTI_SLICE_SEQ_DEC:
+					for(short i=0;i<head->dim[3];i++){
+						props.propertyValueAt("acquisitionNumber",head->dim[3]-i-1)=i;
+						props.propertyValueAt("acquisitionTime",  head->dim[3]-i-1)=i*head->slice_duration*time_fac;
+					}
+					break;
+				case NIFTI_SLICE_ALT_INC:
+					for(short i=0;i<head->dim[3];i++){
+						props.propertyValueAt("acquisitionNumber",i)=i+interl[i%3];
+						props.propertyValueAt("acquisitionTime",  i)=(i+interl[i%3])*head->slice_duration*time_fac;
+					}
+					break;
+				case NIFTI_SLICE_ALT_DEC:
+					for(short i=0;i<head->dim[3];i++){
+						props.propertyValueAt("acquisitionNumber",head->dim[3]-i-1)=i+interl[i%3];
+						props.propertyValueAt("acquisitionTime",  head->dim[3]-i-1)=(i+interl[i%3])*head->slice_duration*time_fac;
+					}
+					break;
+
+				default:LOG(Runtime,error) << "Unknown slice code " << util::MSubject(head->slice_code);break;
+			}
+		} else {
+			LOG_IF(head->slice_code,Runtime,warning) << "Sorry slice_code!=0 is currently only supportet for 3D-images, ignoring it.";
 		}
 
-		return props;
+		// Tr
+		if(dims>4)
+			props.setPropertyAs<uint16_t>("repetitionTime",head->pixdim[4]*time_fac);
+
+		// sequenceDescription
+		props.setPropertyAs<std::string>("sequenceDescription",head->descrip);
 	}
 public:
 	std::string getName()const {return "Nifti standalone";}
@@ -198,7 +243,10 @@ public:
 
 		//get the header - we use it directly from the file
 		_internal::nifti_1_header *header= reinterpret_cast<_internal::nifti_1_header*>(&mfile[0]);
-		util::PropertyMap props=header2PropMap(header);
+
+		if(header->intent_code!=0){
+			throwGenericError(std::string("only intent_code==0 is supportet"));
+		}
 
 		//set up the size - copy dim[0] values from dim[1]..dim[dim[0]]
 		util::FixedVector<size_t,4> size;
@@ -208,8 +256,14 @@ public:
 
 		data::ValuePtrReference data=mfile.atByID(nii2isis[header->datatype],header->vox_offset);
 		LOG(Runtime,info) << "Mapping nifti image as " << data->getTypeName() << " of length " << data->getLength();
+		LOG_IF((size_t)header->bitpix!=data->bytesPerElem()*8,Runtime,warning)
+			<< "nifti field bitpix does not fit the bytesize of the given datatype ("
+			<< data->getTypeName() << "/" << header->bitpix <<  ")";
 
-		return 0;
+		chunks.push_back(data::Chunk(data,size[0],size[1],size[2],size[3]));
+		header2PropMap(header,chunks.back());
+
+		return 1;
 	}
 
 	void write( const data::Image &image, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
@@ -265,9 +319,9 @@ private:
 			util::fvector4(0,0,1/voxelSize[2])
 		));
 
-		props.setPropertyAs<util::fvector4>("rowVec",image2isis.getRow(0));
-		props.setPropertyAs<util::fvector4>("columnVec",image2isis.getRow(1));
-		props.setPropertyAs<util::fvector4>("sliceVec",image2isis.getRow(2));
+		props.setPropertyAs<util::fvector4>("rowVec",image2isis.transpose().getRow(0));
+		props.setPropertyAs<util::fvector4>("columnVec",image2isis.transpose().getRow(1));
+		props.setPropertyAs<util::fvector4>("sliceVec",image2isis.transpose().getRow(2));
 
 		LOG(Debug,info)
 			<< "Computed rowVec=" << props.getPropertyAs<util::fvector4>("rowVec") << ", "
@@ -301,9 +355,9 @@ private:
 		);
 		const util::Matrix4x4<double> image2isis=nifti2isis.dot(M);
 
-		props.setPropertyAs<util::fvector4>("rowVec",image2isis.getRow(0));
-		props.setPropertyAs<util::fvector4>("columnVec",image2isis.getRow(1));
-		props.setPropertyAs<util::fvector4>("sliceVec",image2isis.getRow(2));
+		props.setPropertyAs<util::fvector4>("rowVec",image2isis.transpose().getRow(0));
+		props.setPropertyAs<util::fvector4>("columnVec",image2isis.transpose().getRow(1));
+		props.setPropertyAs<util::fvector4>("sliceVec",image2isis.transpose().getRow(2));
 
 		LOG(Debug,info)
 			<< "Computed rowVec=" << props.getPropertyAs<util::fvector4>("rowVec") << ", "
