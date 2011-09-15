@@ -489,13 +489,20 @@ public:
 	 * Copy all voxel data of the image into memory.
 	 * If neccessary a conversion into T is done using min/max of the image.
 	 */
-	template<typename T> void copyToMem( T *dst )const {
+	template<typename T> void copyToMem( T *dst, size_t len )const {
 		if( clean ) {
 			scaling_pair scale = getScalingTo( ValuePtr<T>::staticID );
 			// we could do this using convertToType - but this solution does not need any additional temporary memory
 			BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
-				if( !ref->copyToMem<T>( dst, scale ) ) {
+				const size_t cSize=ref->getSizeAsVector().product();
+				if( !ref->copyToMem<T>( dst, len,scale ) ) {
 					LOG( Runtime, error ) << "Failed to copy raw data of type " << ref->getTypeName() << " from image into memory of type " << ValuePtr<T>::staticName();
+				} else {
+					if(len<cSize){
+						LOG(Runtime,error) << "Abborting copy, because there is no space left in the target";
+						break;
+					}
+					len-=cSize;
 				}
 
 				dst += ref->getVolume(); // increment the cursor

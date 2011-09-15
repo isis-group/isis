@@ -159,7 +159,7 @@ bool Image::insertChunk ( const Chunk &chunk )
 		lookup.clear();
 		return true;
 	} else {
-		// if the insersion failed but the image was clean - de-duplicate properties again
+		// if the insertion failed but the image was clean - de-duplicate properties again
 		// the image is still clean - no need reindex
 		if( clean )
 			deduplicateProperties();
@@ -784,7 +784,7 @@ size_t Image::spliceDownTo( dimensions dim ) //rowDim = 0, columnDim, sliceDim, 
 		LOG( Debug, error ) << "The dimensionality of the chunks of this image is already below " << dim << " cannot splice it.";
 		return 0;
 	} else if( lookup[0]->getRelevantDims() == ( size_t ) dim ) {
-		LOG( Debug, info ) << "Skipping useless splicing, relevantDims is allready " << lookup[0]->getRelevantDims();
+		LOG( Debug, info ) << "Skipping useless splicing, relevantDims is already " << lookup[0]->getRelevantDims();
 		return lookup.size();
 	}
 
