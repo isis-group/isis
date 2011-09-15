@@ -198,15 +198,15 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////
 	// applying Arithmetic operations
 	////////////////////////////////////////////////////////////////////////////////////
-	this_class operator-=( const this_class &src ){return *this=*this-src;}
-	this_class operator+=( const this_class &src ){return *this=*this+src;}
-	this_class operator*=( const this_class &src ){return *this=*this*src;}
-	this_class operator/=( const this_class &src ){return *this=*this/src;}
+	this_class operator-=( const this_class &src ) {return *this = *this - src;}
+	this_class operator+=( const this_class &src ) {return *this = *this + src;}
+	this_class operator*=( const this_class &src ) {return *this = *this * src;}
+	this_class operator/=( const this_class &src ) {return *this = *this / src;}
 
-	this_class operator-=( const TYPE &src ){return *this=*this-src;}
-	this_class operator+=( const TYPE &src ){return *this=*this+src;}
-	this_class operator*=( const TYPE &src ){return *this=*this*src;}
-	this_class operator/=( const TYPE &src ){return *this=*this/src;}
+	this_class operator-=( const TYPE &src ) {return *this = *this - src;}
+	this_class operator+=( const TYPE &src ) {return *this = *this + src;}
+	this_class operator*=( const TYPE &src ) {return *this = *this * src;}
+	this_class operator/=( const TYPE &src ) {return *this = *this / src;}
 
 	///\returns a negated copy
 	const this_class negate()const {

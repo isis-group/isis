@@ -816,7 +816,7 @@ size_t Image::spliceDownTo( dimensions dim ) //rowDim = 0, columnDim, sliceDim, 
 				}
 			} else { // seems like we're done - insert it into the image
 				assert( ch.getRelevantDims() == ( size_t ) m_dim ); // index of the higest dim>1 (ch.getRelevantDims()-1) shall be equal to the dim below the requested splicing (m_dim-1)
-				LOG(Debug,verbose_info) << "Inserting splice result of size " << ch.getSizeAsVector() << " at " << ch.propertyValue("indexOrigin");
+				LOG( Debug, verbose_info ) << "Inserting splice result of size " << ch.getSizeAsVector() << " at " << ch.propertyValue( "indexOrigin" );
 				m_image.insertChunk( ch );
 			}
 		}

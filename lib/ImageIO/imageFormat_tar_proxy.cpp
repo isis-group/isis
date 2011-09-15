@@ -145,21 +145,22 @@ public:
 					const std::pair<std::string, std::string> base = formats.front()->makeBasename( org_file.file_string() );//ask any of the plugins for the suffix
 					util::TmpFile tmpfile( "", base.second );//create a temporary file with this suffix
 
-					data::FilePtr mfile(tmpfile,size,true);
+					data::FilePtr mfile( tmpfile, size, true );
+
 					if( !mfile.good() ) {
 						throwSystemError( errno, std::string( "Failed to open temporary " ) + tmpfile.file_string() );
 					}
 
 					LOG( Debug, info ) << "Mapped " << size << " bytes of " << mfile.getLength() << " at " << ( void * )&mfile[0];
 
-					size_t red = boost::iostreams::read( in, (char*)&mfile[0], size ); // read data from the stream into the mapped memory
+					size_t red = boost::iostreams::read( in, ( char * )&mfile[0], size ); // read data from the stream into the mapped memory
 					next_header_in -= red;
 					mfile.close(); //close and unmap the temporary file/mapped memory
 
 					if( red != size ) { // read the data from the stream
 						LOG( Runtime, warning ) << "Could not read all " << size << " bytes for " << tmpfile.file_string();
 					}
-					
+
 					// read the temporary file
 					std::list<data::Chunk>::iterator prev = chunks.end();
 					--prev;

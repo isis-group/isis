@@ -82,7 +82,7 @@ PropertyMap::mapped_type &PropertyMap::fetchEntry(
 	propPath::const_iterator next = at;
 	next++;
 	Container &rootRef = root;
-	iterator found = static_cast<Container&>(root).find( *at );
+	iterator found = static_cast<Container &>( root ).find( *at );
 
 	if ( next != pathEnd ) {//we are not at the end of the path (a proposed leaf in the PropMap)
 		if ( found != root.end() ) {//and we found the entry
@@ -112,7 +112,7 @@ const PropertyMap::mapped_type *PropertyMap::findEntry(
 {
 	propPathIterator next = at;
 	next++;
-	util::PropertyMap::const_iterator found = static_cast<const Container&>(root).find( *at );
+	util::PropertyMap::const_iterator found = static_cast<const Container &>( root ).find( *at );
 
 	if ( next != pathEnd ) {//we are not at the end of the path (aka the leaf)
 		if ( found != root.end() ) {//and we found the entry
@@ -132,7 +132,7 @@ bool PropertyMap::recursiveRemove( PropertyMap &root, const propPathIterator pat
 	if ( path_it != pathEnd ) {
 		propPathIterator next = path_it;
 		next++;
-		iterator found = static_cast<Container&>(root).find( *path_it );
+		iterator found = static_cast<Container &>( root ).find( *path_it );
 
 		if ( found != root.end() ) {
 			mapped_type &ref = found->second;
@@ -159,7 +159,7 @@ bool PropertyMap::recursiveRemove( PropertyMap &root, const propPathIterator pat
 // Generic interface for accessing elements
 ////////////////////////////////////////////////////////////////////////////////////
 
-const std::vector< PropertyValue >& PropertyMap::propertyValueVec(const PropertyMap::KeyType& key) const
+const std::vector< PropertyValue >& PropertyMap::propertyValueVec( const PropertyMap::KeyType &key ) const
 {
 	const propPath path = util::stringToList<key_type>( key, pathSeperator );
 	const mapped_type *ref = findEntry( *this, path.begin(), path.end() );
@@ -172,7 +172,7 @@ const std::vector< PropertyValue >& PropertyMap::propertyValueVec(const Property
 	}
 }
 
-std::vector< PropertyValue >& PropertyMap::propertyValueVec(const PropertyMap::KeyType& key)
+std::vector< PropertyValue >& PropertyMap::propertyValueVec( const PropertyMap::KeyType &key )
 {
 	const propPath path = util::stringToList<key_type>( key, pathSeperator );
 	mapped_type &n = fetchEntry( *this, path.begin(), path.end() );
@@ -183,12 +183,12 @@ std::vector< PropertyValue >& PropertyMap::propertyValueVec(const PropertyMap::K
 
 const PropertyValue &PropertyMap::propertyValue( const key_type &key )const
 {
-	return propertyValueVec(key)[0];
+	return propertyValueVec( key )[0];
 }
 
 PropertyValue &PropertyMap::propertyValue( const key_type &key )
 {
-	return propertyValueVec(key)[0];
+	return propertyValueVec( key )[0];
 }
 
 const PropertyMap &PropertyMap::branch( const key_type &key ) const
@@ -490,32 +490,37 @@ bool PropertyMap::hasProperty( const key_type &key ) const
 	return ( ref && ref->is_leaf() && ! ref->getLeaf()[0].isEmpty() );
 }
 
-isis::util::PropertyMap::KeyType PropertyMap::find(isis::util::PropertyMap::KeyType key, bool allowProperty, bool allowBranch) const
+isis::util::PropertyMap::KeyType PropertyMap::find( isis::util::PropertyMap::KeyType key, bool allowProperty, bool allowBranch ) const
 {
 	// make sure we only get the last part of the path if its one
 	const propPath path = util::stringToList<key_type>( key, pathSeperator );
-	if(path.empty()){
-		LOG(Debug,error) << "Search key " << util::MSubject(key) << " is invalid, won't search";
+
+	if( path.empty() ) {
+		LOG( Debug, error ) << "Search key " << util::MSubject( key ) << " is invalid, won't search";
 		return KeyType();
-	} else if(path.size()>1){
-		LOG(Debug,warning) << "Stripping search key " << util::MSubject(key) << " to " << path.back();
+	} else if( path.size() > 1 ) {
+		LOG( Debug, warning ) << "Stripping search key " << util::MSubject( key ) << " to " << path.back();
 	}
-	key=path.back();
+
+	key = path.back();
 
 	// if the searched key is on this brach return its name
-	const Container &map=static_cast<const Container&>(*this);
-	Container::const_iterator found=map.find(key);
-	if(found!=map.end() &&
-		((found->second.is_leaf() && allowProperty) || (!found->second.is_leaf() && allowBranch))
-	){
+	const Container &map = static_cast<const Container &>( *this );
+	Container::const_iterator found = map.find( key );
+
+	if( found != map.end() &&
+		( ( found->second.is_leaf() && allowProperty ) || ( !found->second.is_leaf() && allowBranch ) )
+	  ) {
 		return found->first;
 	} else { // otherwise search in the branches (getBranch() returns an empty PropMap for leaves - we wont have to check for that)
-		BOOST_FOREACH(Container::const_reference ref,map){
-			const KeyType foundKey=ref.second.getBranch().find(key,allowProperty,allowBranch);
-			if(!foundKey.empty()) // if the key is found abort search and return it with its branch-name
-				return ref.first+"/"+foundKey;
+		BOOST_FOREACH( Container::const_reference ref, map ) {
+			const KeyType foundKey = ref.second.getBranch().find( key, allowProperty, allowBranch );
+
+			if( !foundKey.empty() ) // if the key is found abort search and return it with its branch-name
+				return ref.first + "/" + foundKey;
 		}
 	}
+
 	return KeyType(); // nothing found
 }
 

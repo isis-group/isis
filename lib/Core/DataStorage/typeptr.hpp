@@ -88,7 +88,7 @@ template<typename TYPE> class ValuePtr: public _internal::ValuePtrBase
 {
 	boost::shared_ptr<TYPE> m_val;
 protected:
-	ValuePtr(){} // should only be used by child classed who initialize the pointer themself
+	ValuePtr() {} // should only be used by child classed who initialize the pointer themself
 	ValuePtrBase *clone() const {
 		return new ValuePtr( *this );
 	}
@@ -127,9 +127,9 @@ public:
 		if( length )
 			m_val.reset( ( TYPE * )calloc( length, sizeof( TYPE ) ), BasicDeleter() );
 
-		LOG_IF( length == 0, Debug, warning ) 
-		<< "Creating an empty ValuePtr of type " << util::MSubject( staticName() ) 
-		<< " you should overwrite it with a usefull pointer before using it";
+		LOG_IF( length == 0, Debug, warning )
+				<< "Creating an empty ValuePtr of type " << util::MSubject( staticName() )
+				<< " you should overwrite it with a usefull pointer before using it";
 	}
 
 	/**
@@ -139,7 +139,7 @@ public:
 	 * \param length the length of the used array (ValuePtr does NOT check for length,
 	 * this is just here for child classes which may want to check)
 	 */
-	ValuePtr(const boost::shared_ptr<TYPE> &ptr, size_t length ): _internal::ValuePtrBase( length ), m_val(ptr) {}
+	ValuePtr( const boost::shared_ptr<TYPE> &ptr, size_t length ): _internal::ValuePtrBase( length ), m_val( ptr ) {}
 
 	/**
 	 * Creates ValuePtr from a pointer of type TYPE.
@@ -162,20 +162,20 @@ public:
 	 * \param d the deleter to be used when the data shall be deleted ( d() is called then )
 	 */
 
-	template<typename D> ValuePtr( TYPE *const ptr, size_t length, D d ):_internal::ValuePtrBase( length ), m_val( ptr, d ) {}
+	template<typename D> ValuePtr( TYPE *const ptr, size_t length, D d ): _internal::ValuePtrBase( length ), m_val( ptr, d ) {}
 
 	virtual ~ValuePtr() {}
 
-	boost::shared_ptr<const void> getRawAddress(size_t offset=0)const {
-		if(offset){
-			DelProxy proxy(*this);
-			const uint8_t * const b_ptr=reinterpret_cast<const uint8_t*>( m_val.get() )+offset;
-			return boost::shared_ptr<const void>(b_ptr,proxy);
+	boost::shared_ptr<const void> getRawAddress( size_t offset = 0 )const {
+		if( offset ) {
+			DelProxy proxy( *this );
+			const uint8_t *const b_ptr = reinterpret_cast<const uint8_t *>( m_val.get() ) + offset;
+			return boost::shared_ptr<const void>( b_ptr, proxy );
 		} else
 			return boost::static_pointer_cast<const void>( m_val );
 	}
-	boost::shared_ptr<void> getRawAddress(size_t offset=0){ // use the const version and cast away the const
-		return boost::const_pointer_cast<void>( const_cast<const ValuePtr*>(this)->getRawAddress(offset) );
+	boost::shared_ptr<void> getRawAddress( size_t offset = 0 ) { // use the const version and cast away the const
+		return boost::const_pointer_cast<void>( const_cast<const ValuePtr *>( this )->getRawAddress( offset ) );
 	}
 
 	/// @copydoc util::Value::toString
@@ -196,8 +196,8 @@ public:
 
 	std::string getTypeName()const {return staticName();}
 	unsigned short getTypeID()const {return staticID;}
-	bool isFloat() const{return boost::is_float< TYPE >::value;}
-	bool isInteger() const{return boost::is_integral< TYPE >::value;}
+	bool isFloat() const {return boost::is_float< TYPE >::value;}
+	bool isInteger() const {return boost::is_integral< TYPE >::value;}
 
 	/// @copydoc util::Value::staticName
 	static std::string staticName() {
@@ -224,7 +224,7 @@ public:
 	operator boost::shared_ptr<TYPE>&() {return m_val;}
 	operator const boost::shared_ptr<TYPE>&()const {return m_val;}
 
-	size_t bytesPerElem()const{return sizeof( TYPE );}
+	size_t bytesPerElem()const {return sizeof( TYPE );}
 
 	std::pair<util::ValueReference, util::ValueReference> getMinMax()const {
 		if ( getLength() == 0 ) {
@@ -264,15 +264,14 @@ public:
 	}
 	//
 	scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const {
-		if(typeID==staticID && scaleopt==autoscale) // if id is the same and autoscale is requested
-		{
+		if( typeID == staticID && scaleopt == autoscale ) { // if id is the same and autoscale is requested
 			static const util::Value<uint8_t> one( 1 );
 			static const util::Value<uint8_t> zero( 0 );
-			return std::pair<util::ValueReference, util::ValueReference>(one,zero); // the result is always 1/0
+			return std::pair<util::ValueReference, util::ValueReference>( one, zero ); // the result is always 1/0
 		} else { // get min/max and compute the scaling
 			std::pair<util::ValueReference, util::ValueReference> minmax = getMinMax();
 			assert( ! ( minmax.first.isEmpty() || minmax.second.isEmpty() ) );
-			return ValuePtrBase::getScalingTo( typeID, minmax, scaleopt ); 
+			return ValuePtrBase::getScalingTo( typeID, minmax, scaleopt );
 		}
 	}
 };

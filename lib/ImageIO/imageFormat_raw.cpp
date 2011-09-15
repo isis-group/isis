@@ -39,12 +39,14 @@ public:
 
 	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
 
-		data::FilePtr mfile(filename);
+		data::FilePtr mfile( filename );
+
 		if( !mfile.good() ) {
 			throwSystemError( errno, std::string( "Failed to open " ) + filename );
 		}
 
 		const size_t fsize = mfile.getLength();
+
 		const unsigned short type = util::getTransposedTypeMap( false, true )[dialect+"*"];
 
 		if( type == 0 ) {
@@ -52,8 +54,8 @@ public:
 			throwGenericError( "No known datatype" );
 		}
 
-		
-		data::ValuePtrReference dataRef=mfile.atByID(type,0);
+
+		data::ValuePtrReference dataRef = mfile.atByID( type, 0 );
 		const size_t elemSize = dataRef->bytesPerElem();
 
 		const size_t ssize = sqrt( fsize / elemSize );
@@ -61,7 +63,7 @@ public:
 		if( ssize *ssize *elemSize == fsize ) {
 			LOG( Runtime, info ) << "Guessing size of read and phase to be " << ssize;
 
-			chunks.push_back( data::Chunk(dataRef, ssize, ssize ) );
+			chunks.push_back( data::Chunk( dataRef, ssize, ssize ) );
 			data::Chunk &ch = chunks.back();
 			ch.setPropertyAs<uint16_t>( "sequenceNumber", 0 );
 			ch.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
@@ -110,6 +112,6 @@ public:
 }
 isis::image_io::FileFormat *factory()
 {
-	isis::image_io::ImageFormat_raw *ret=new isis::image_io::ImageFormat_raw;
+	isis::image_io::ImageFormat_raw *ret = new isis::image_io::ImageFormat_raw;
 	return ret;
 }

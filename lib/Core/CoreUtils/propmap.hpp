@@ -236,7 +236,7 @@ public:
 	 * \param allowBranch if false the search will ignore branches (it will still search into the branches, but the branches themself won't be considered a valid finding)
 	 * \returns full "path" to the property (including the properties name) if it is found, empty string elsewhise
 	 */
-	KeyType find(KeyType key,bool allowProperty=true,bool allowBranch=false)const;
+	KeyType find( KeyType key, bool allowProperty = true, bool allowBranch = false )const;
 
 	/**
 	 * check if branch of the tree is available
@@ -416,7 +416,7 @@ class treeNode
 	PropertyMap m_branch;
 	std::vector<PropertyValue> m_leaf;
 public:
-	treeNode():m_leaf(1) {}
+	treeNode(): m_leaf( 1 ) {}
 	bool empty()const {
 		return m_branch.isEmpty() && m_leaf[0].isEmpty();
 	}
@@ -498,9 +498,9 @@ namespace std
 template<typename charT, typename traits>
 basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::_internal::treeNode &s )
 {
-	if( s.is_leaf() ){
-		vector< isis::util::PropertyValue > vec=s.getLeaf();
-		isis::util::listToOStream(vec.begin(),vec.end(),out);
+	if( s.is_leaf() ) {
+		vector< isis::util::PropertyValue > vec = s.getLeaf();
+		isis::util::listToOStream( vec.begin(), vec.end(), out );
 	} else
 		out << "[[Subtree with " << s.getBranch().getKeys().size() << " elements]]";
 

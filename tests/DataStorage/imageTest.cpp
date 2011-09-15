@@ -620,7 +620,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
 	data::MemChunk<float> chSlice( nrX, nrY );
 
 
-	const data::Chunk cpSource=img.getChunk( 0, 0, 12, 8, false );
+	const data::Chunk cpSource = img.getChunk( 0, 0, 12, 8, false );
 	const size_t S1[] = {0, 0, 0, 0};
 	const size_t S2[] = {cpSource.getSizeAsVector()[0] - 1, cpSource.getSizeAsVector()[1] - 1, 0, 0};
 	const size_t D[] = {0, 0, 0, 0};
@@ -656,7 +656,7 @@ BOOST_AUTO_TEST_CASE ( image_splice_test )
 
 	for( size_t i = 0; i < chunks.size(); i++ ) {
 		BOOST_CHECK_EQUAL( chunks[i].getPropertyAs<int32_t>( "acquisitionNumber" ), i + 1 );
-		BOOST_CHECK_EQUAL( chunks[i].getPropertyAs<util::fvector4>( "indexOrigin"), util::fvector4(0,0,i%10,0) );
+		BOOST_CHECK_EQUAL( chunks[i].getPropertyAs<util::fvector4>( "indexOrigin" ), util::fvector4( 0, 0, i % 10, 0 ) );
 	}
 }
 

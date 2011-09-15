@@ -63,11 +63,11 @@ Chunk Chunk::cloneToNew( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices,
 bool Chunk::convertToType( short unsigned int ID, scaling_pair scaling )
 {
 	//get a converted ValuePtr (will be a cheap copy if no conv was needed)
-	ValuePtrReference newPtr = asValuePtrBase().convertByID(ID,scaling);
+	ValuePtrReference newPtr = asValuePtrBase().convertByID( ID, scaling );
 
 	if( newPtr.isEmpty() ) // if the reference is empty the conversion failed
 		return false;
-	else 
+	else
 		static_cast<ValuePtrReference &>( *this ) = newPtr; // otherwise replace my own ValuePtr with the new one
 
 	return true;
@@ -130,12 +130,12 @@ size_t Chunk::compareRange( const size_t source_start[], const size_t source_end
 	const size_t dstart = dst.getLinearIndex( destination );
 	return getValuePtrBase().compare( sstart, send, dst.getValuePtrBase(), dstart );
 }
-size_t Chunk::compare(const isis::data::Chunk& dst) const
+size_t Chunk::compare( const isis::data::Chunk &dst ) const
 {
-	if(getSizeAsVector()==dst.getSizeAsVector())
+	if( getSizeAsVector() == dst.getSizeAsVector() )
 		return getValuePtrBase().compare( 0, getVolume() - 1, dst.getValuePtrBase(), 0 );
 	else
-		return std::max(getVolume(),dst.getVolume());
+		return std::max( getVolume(), dst.getVolume() );
 }
 
 
@@ -212,7 +212,7 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 	BOOST_FOREACH( Chunk & ref, ret ) { // adapt some metadata in them
 		util::fvector4 &orig = ref.propertyValue( "indexOrigin" )->castTo<util::fvector4>();
 		uint32_t &acq = ref.propertyValue( "acquisitionNumber" )->castTo<uint32_t>();
-		LOG(Debug,verbose_info) << "Origin was " << orig << " will be moved by " << indexOriginOffset << "*"  << cnt;
+		LOG( Debug, verbose_info ) << "Origin was " << orig << " will be moved by " << indexOriginOffset << "*"  << cnt;
 		orig = orig + indexOriginOffset * ( float )cnt;
 		acq += acquisitionNumberStride * cnt; //@todo this might cause trouble if we try to insert this chunks into an image
 		cnt++;
@@ -251,8 +251,8 @@ void Chunk::swapAlong( const dimensions dim ) const
 	const util::FixedVector<size_t, 4> whole_size = getSizeAsVector();
 	const util::FixedVector<size_t, 4> outer_size = whole_size;
 
-	boost::shared_ptr<uint8_t> swap_ptr= boost::shared_static_cast<uint8_t>( get()->getRawAddress());
-	uint8_t * swap_start = swap_ptr.get();
+	boost::shared_ptr<uint8_t> swap_ptr = boost::shared_static_cast<uint8_t>( get()->getRawAddress() );
+	uint8_t *swap_start = swap_ptr.get();
 	const uint8_t *const swap_end = swap_start + whole_size.product() * elSize;
 
 	size_t block_volume = whole_size.product();
@@ -282,22 +282,24 @@ void Chunk::swapAlong( const dimensions dim ) const
 	}
 }
 
-util::PropertyValue& Chunk::propertyValueAt(const util::PropertyMap::KeyType& key, size_t at)
+util::PropertyValue &Chunk::propertyValueAt( const util::PropertyMap::KeyType &key, size_t at )
 {
-	std::vector< util::PropertyValue > &vec=propertyValueVec(key);
-	const size_t cSize=getSizeAsVector()[getRelevantDims()-1];
-	if(vec.size()!=cSize){
-		LOG(Debug,info) << "Resizing sub-property " << key << " to size of the chunk (" << cSize  << ")";
-		vec.resize(cSize);
+	std::vector< util::PropertyValue > &vec = propertyValueVec( key );
+	const size_t cSize = getSizeAsVector()[getRelevantDims()-1];
+
+	if( vec.size() != cSize ) {
+		LOG( Debug, info ) << "Resizing sub-property " << key << " to size of the chunk (" << cSize  << ")";
+		vec.resize( cSize );
 	}
-	return vec.at(at);
+
+	return vec.at( at );
 }
-const util::PropertyValue& Chunk::propertyValueAt(const util::PropertyMap::KeyType& key, size_t at) const
+const util::PropertyValue &Chunk::propertyValueAt( const util::PropertyMap::KeyType &key, size_t at ) const
 {
-	const std::vector< util::PropertyValue > &vec=propertyValueVec(key);
-	const size_t cSize=getSizeAsVector()[getRelevantDims()-1];
-	LOG_IF(vec.size()!=cSize,Debug,warning) << "Sub-property " << key << " does not have the size of the chunk (" << cSize  << ")";
-	return vec.at(at);
+	const std::vector< util::PropertyValue > &vec = propertyValueVec( key );
+	const size_t cSize = getSizeAsVector()[getRelevantDims()-1];
+	LOG_IF( vec.size() != cSize, Debug, warning ) << "Sub-property " << key << " does not have the size of the chunk (" << cSize  << ")";
+	return vec.at( at );
 }
 
 }
