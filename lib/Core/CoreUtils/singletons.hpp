@@ -18,7 +18,7 @@ namespace util
  * The special issues for these Singletons are: \n
  * 1) it's a template class - can be used for every type \n
  * 2) they have a priority used for destroying the Singletons AFTER the application ends:
- * - singletons are deleted in ascending order of int values
+ * - singletons are deleted in ascending order of int values (0 first, INT_MAX last)
  * - singletons of the same priority are deleted in the opposite order they where created (LIFO)
  * By this, one can count for dependencies of destroying objects, e.g. general objects as the log module
  * to be deleted latest.

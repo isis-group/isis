@@ -74,7 +74,7 @@ private:
 	template<typename TYPE>
 	void internAddParameter ( const std::string name, PyObject *value, std::string type ) {
 		util::Value<TYPE> val( static_cast<TYPE>( boost::python::extract<TYPE>( value ) ) );
-		val.copyToNewByID( util::getTransposedTypeMap( true, true )[type] );
+		val.copyByID( util::getTransposedTypeMap( true, true )[type] );
 		parameters[name] = val;
 		parameters[name].needed() = false;
 	}

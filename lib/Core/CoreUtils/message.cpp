@@ -35,6 +35,8 @@ const char *logLevelNames( LogLevel level )
 		return "error";
 	case warning:
 		return "warning";
+	case notice:
+		return "notice";
 	case info:
 		return "info";
 	case verbose_info:
