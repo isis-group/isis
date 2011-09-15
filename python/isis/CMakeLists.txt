@@ -11,8 +11,8 @@
 ############################################################
 # configure python module
 ############################################################
-set(ISIS_PYTHON_INSTALL_DIR 
-  "lib/python${CURRENT_PYTHON_VERSION}/site-packages/isis")
+
+execute_process ( COMMAND python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()" OUTPUT_VARIABLE PYTHON_SITE_PACKAGES OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 configure_file(__init__.py
   ${CMAKE_BINARY_DIR}/python/isis/__init__.py COPYONLY)
@@ -21,9 +21,10 @@ configure_file(__init__.py
 # installation
 ############################################################
 message(STATUS 
-  "Installing python modules to ${CMAKE_INSTALL_PREFIX}/${ISIS_PYTHON_INSTALL_DIR}") 
+  "Installing python modules to ${PYTHON_SITE_PACKAGES}") 
 install(FILES __init__.py
-  DESTINATION ${CMAKE_INSTALL_PREFIX}/${ISIS_PYTHON_INSTALL_DIR})
+  DESTINATION ${PYTHON_SITE_PACKAGES})
+
 
 add_subdirectory(core)
 add_subdirectory(data)
