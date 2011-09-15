@@ -4,6 +4,7 @@ namespace isis
 {
 namespace data
 {
+/// @cond _hidden
 // specialisation for complex - there shall be no scaling - and we cannot compute minmax
 template<> scaling_pair ValuePtr<std::complex<float> >::getScalingTo( unsigned short /*typeID*/, autoscaleOption /*scaleopt*/ )const
 {
@@ -21,7 +22,7 @@ namespace _internal
 {
 
 
-//////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
 // some voodoo to get the vector types into the templates /
 //////////////////////////////////////////////////////////
 template<typename T> struct _VectorUnion {
@@ -220,7 +221,7 @@ template<> std::pair<int32_t, int32_t> calcMinMax( const int32_t *data, size_t l
 #else
 #warning Optimized min/max functions are not used because SSE2 is not enabled
 #endif
-
+/// @endcond
 }
 }
 
