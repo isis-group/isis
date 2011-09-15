@@ -107,7 +107,7 @@ public:
 	template<typename T> bool operator ==( const T &second )const {
 		checkType<T>();
 
-		if(isEmpty()){
+		if( isEmpty() ) {
 			return false;
 		}
 

@@ -19,10 +19,10 @@ namespace _internal
  * \retval 1/0 if current type is equal to the requested type
  * \retval ValuePtrBase::getScalingTo elswise
  */
-scaling_pair ValuePtrBase::getScaling(const scaling_pair& scaling, short unsigned int ID)const
+scaling_pair ValuePtrBase::getScaling( const scaling_pair &scaling, short unsigned int ID )const
 {
-	if(scaling.first.isEmpty() || scaling.second.isEmpty())
-		return getScalingTo(ID);
+	if( scaling.first.isEmpty() || scaling.second.isEmpty() )
+		return getScalingTo( ID );
 	else
 		return scaling;
 }
@@ -33,16 +33,16 @@ size_t ValuePtrBase::getLength() const { return m_len;}
 
 ValuePtrBase::~ValuePtrBase() {}
 
-ValuePtrBase::DelProxy::DelProxy(const isis::data::_internal::ValuePtrBase& master): boost::shared_ptr<const void>( master.getRawAddress() )
+ValuePtrBase::DelProxy::DelProxy( const isis::data::_internal::ValuePtrBase &master ): boost::shared_ptr<const void>( master.getRawAddress() )
 {
 	LOG( Debug, verbose_info ) << "Creating DelProxy for " << master.getTypeName() << " at " << this->get();
 }
 
-void ValuePtrBase::DelProxy::operator()(const void* at)
+void ValuePtrBase::DelProxy::operator()( const void *at )
 {
 	LOG( Debug, verbose_info )
 			<< "Deletion for " << this->get() << " called from proxy at offset "
-			<< static_cast<const uint8_t*>( at ) - static_cast<const uint8_t*>( this->get() )
+			<< static_cast<const uint8_t *>( at ) - static_cast<const uint8_t *>( this->get() )
 			<< ", current use_count: " << this->use_count();
 	this->reset();//actually not needed, but we keep it here to keep obfuscation low
 }
@@ -62,7 +62,8 @@ const ValuePtrBase::Converter &ValuePtrBase::getConverterTo( unsigned short ID )
 	return f2->second;
 }
 
-size_t ValuePtrBase::compare( size_t start, size_t end, const _internal::ValuePtrBase &dst, size_t dst_start ) const {
+size_t ValuePtrBase::compare( size_t start, size_t end, const _internal::ValuePtrBase &dst, size_t dst_start ) const
+{
 	assert( start <= end );
 	size_t ret = 0;
 	size_t _length = end - start;
@@ -81,13 +82,13 @@ size_t ValuePtrBase::compare( size_t start, size_t end, const _internal::ValuePt
 
 	// lock the memory so we can mem-compare the elements (use uint8_t because some compilers do not like arith on void*)
 	const boost::shared_ptr<const uint8_t>
-		src_s = boost::static_pointer_cast<const uint8_t>(getRawAddress()),
-		dst_s = boost::static_pointer_cast<const uint8_t>(dst.getRawAddress());
-	const uint8_t *src_p=src_s.get(),*dst_p=dst_s.get();
-	const size_t el_size=bytesPerElem();
+	src_s = boost::static_pointer_cast<const uint8_t>( getRawAddress() ),
+	dst_s = boost::static_pointer_cast<const uint8_t>( dst.getRawAddress() );
+	const uint8_t *src_p = src_s.get(), *dst_p = dst_s.get();
+	const size_t el_size = bytesPerElem();
 
 	for ( size_t i = start; i < end; i++ ) {
-		if ( memcmp(src_p+(i*el_size), dst_p+(i*el_size), el_size) != 0)
+		if ( memcmp( src_p + ( i * el_size ), dst_p + ( i * el_size ), el_size ) != 0 )
 			ret++;
 	}
 
@@ -101,7 +102,7 @@ ValuePtrBase::Reference ValuePtrBase::copyByID( unsigned short ID, scaling_pair 
 
 	if( conv ) {
 		boost::scoped_ptr<ValuePtrBase> ret;
-		conv->generate( *this, ret, getScaling(scaling,ID) );
+		conv->generate( *this, ret, getScaling( scaling, ID ) );
 		return *ret;
 	} else {
 		LOG( Runtime, error )
@@ -111,16 +112,16 @@ ValuePtrBase::Reference ValuePtrBase::copyByID( unsigned short ID, scaling_pair 
 	}
 }
 
-bool ValuePtrBase::copyTo(isis::data::_internal::ValuePtrBase& dst, scaling_pair scaling) const
+bool ValuePtrBase::copyTo( isis::data::_internal::ValuePtrBase &dst, scaling_pair scaling ) const
 {
-	const unsigned short dID=dst.getTypeID();
+	const unsigned short dID = dst.getTypeID();
 	const Converter &conv = getConverterTo( dID );
 
 	if( conv ) {
-		conv->convert(*this,dst,getScaling(scaling,dID));
+		conv->convert( *this, dst, getScaling( scaling, dID ) );
 		return true;
 	} else {
-		LOG( Runtime, error ) << "I dont know any conversion from "	<< util::MSubject( toString( true ) ) << " to " << dst.getTypeName();
+		LOG( Runtime, error ) << "I dont know any conversion from " << util::MSubject( toString( true ) ) << " to " << dst.getTypeName();
 		return false;
 	}
 }
@@ -143,22 +144,22 @@ ValuePtrBase::Reference ValuePtrBase::createByID( unsigned short ID, size_t len 
 	}
 }
 
-ValuePtrBase::Reference ValuePtrBase::convertByID(short unsigned int ID, scaling_pair scaling)
+ValuePtrBase::Reference ValuePtrBase::convertByID( short unsigned int ID, scaling_pair scaling )
 {
-	scaling=getScaling(scaling,ID);
+	scaling = getScaling( scaling, ID );
 	static const util::Value<uint8_t> one( 1 );
 	static const util::Value<uint8_t> zero( 0 );
 
-	if(scaling.first->eq(one) && scaling.second->eq(zero) && getTypeID()==ID ){ // if type is the same and scaling is 1/0
+	if( scaling.first->eq( one ) && scaling.second->eq( zero ) && getTypeID() == ID ) { // if type is the same and scaling is 1/0
 		return *this; //cheap copy
 	} else {
-		return copyByID(ID,scaling); // convert into new
+		return copyByID( ID, scaling ); // convert into new
 	}
 }
 
-ValuePtrBase::Reference ValuePtrBase::cloneToNew(size_t length) const
+ValuePtrBase::Reference ValuePtrBase::cloneToNew( size_t length ) const
 {
-	return createByID(getTypeID(),length);
+	return createByID( getTypeID(), length );
 }
 
 

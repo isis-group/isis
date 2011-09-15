@@ -169,6 +169,7 @@ unsigned int IOFactory::findPlugins( const std::string &path )
 			} else
 #ifdef WIN32
 				LOG( Runtime, warning ) << "Could not load library " << util::MSubject( pluginName );
+
 #else
 				LOG( Runtime, warning ) << "Could not load library " << util::MSubject( pluginName ) << ":" <<  util::MSubject( dlerror() );
 #endif
@@ -213,13 +214,13 @@ size_t IOFactory::loadFile( std::list<Chunk> &ret, const boost::filesystem::path
 			try {
 				return it->load( ret, filename.file_string(), dialect );
 			} catch ( std::runtime_error &e ) {
-				if(suffix_override.empty()){
+				if( suffix_override.empty() ) {
 					LOG( Runtime, formatReader.size() > 1 ? warning : error )
-						<< "Failed to load " <<  filename << " using " <<  it->getName() << with_dialect << " ( " << e.what() << " )";
+							<< "Failed to load " <<  filename << " using " <<  it->getName() << with_dialect << " ( " << e.what() << " )";
 				} else {
 					LOG( Runtime, warning )
-						<< "The enforced format " << it->getName()  << " failed to read " << filename << with_dialect
-						<< " ( " << e.what() << " ), maybe it just wasn't the right format";
+							<< "The enforced format " << it->getName()  << " failed to read " << filename << with_dialect
+							<< " ( " << e.what() << " ), maybe it just wasn't the right format";
 				}
 			}
 		}

@@ -34,7 +34,7 @@ class ValuePtrBase : public util::_internal::GenericValue
 {
 	friend class util::_internal::ValueReference<ValuePtrBase>;
 	static const _internal::ValuePtrConverterMap &converters();
-	scaling_pair getScaling(const scaling_pair &scale,unsigned short ID)const;
+	scaling_pair getScaling( const scaling_pair &scale, unsigned short ID )const;
 protected:
 	size_t m_len;
 	ValuePtrBase( size_t len = 0 );
@@ -54,20 +54,20 @@ public:
 		 */
 		DelProxy( const ValuePtrBase &master );
 		/// decrement the use_count of the master when a specific part is not referenced anymore
-		void operator()( const void* at );
+		void operator()( const void *at );
 	};
 
 	/**
 	 * Get the raw address the ValuePtr points to.
 	 * An offset can be added to the result. If it is not zero, the resulting shared_ptr will use DelProxy as deleter.
 	 * Thus, it will increase  the reference count of the original pointer by one and decrease it when the deletion of the offset pointer is triggered.
-	 * \param offset ammount of bytes to displace the resulting pointer from the actual pointer	
+	 * \param offset ammount of bytes to displace the resulting pointer from the actual pointer
 	 * \returns a shared_ptr with the memory address of the data handled by this ValuePtr.
 	 */
-	virtual boost::shared_ptr<const void> getRawAddress(size_t offset=0)const = 0;
+	virtual boost::shared_ptr<const void> getRawAddress( size_t offset = 0 )const = 0;
 
 	/// \copydoc getRawAddress
-	virtual boost::shared_ptr<void> getRawAddress(size_t offset=0) = 0;
+	virtual boost::shared_ptr<void> getRawAddress( size_t offset = 0 ) = 0;
 
 	typedef util::_internal::ValueReference<ValuePtrBase> Reference;
 	typedef ValuePtrConverterMap::mapped_type::mapped_type Converter;
@@ -75,7 +75,7 @@ public:
 	template<typename T> bool is()const;
 
 	const Converter &getConverterTo( unsigned short ID )const;
-	
+
 	/**
 	* Dynamically cast the ValueBase up to its actual ValuePtr\<T\>. Constant version.
 	* Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
@@ -84,7 +84,7 @@ public:
 	template<typename T> const ValuePtr<T>& castToValuePtr() const {
 		return m_cast_to<ValuePtr<T> >();
 	}
-	
+
 	/**
 	 * Dynamically cast the ValueBase up to its actual ValuePtr\<T\>. Referenced version.
 	 * Will send an error if T is not the actual type and _ENABLE_CORE_LOG is true.
@@ -93,7 +93,7 @@ public:
 	template<typename T> ValuePtr<T>& castToValuePtr() {
 		return m_cast_to<ValuePtr<T> >();
 	}
-	
+
 	/// \returns the length (in elements) of the data pointed to
 	size_t getLength()const;
 
@@ -128,7 +128,7 @@ public:
 	 * \param dst the ValuePtr-object to copy into
 	 * \param scaling the scaling to be used if a conversion is necessary (computed automatically if not given)
 	 */
-	bool copyTo(isis::data::_internal::ValuePtrBase& dst, scaling_pair scaling=scaling_pair() )const;
+	bool copyTo( isis::data::_internal::ValuePtrBase &dst, scaling_pair scaling = scaling_pair() )const;
 
 	/**
 	 * Copies elements from this into raw memory.
@@ -140,9 +140,9 @@ public:
 	 * \param len size (in elements) of the target memory
 	 * \param scaling the scaling to be used if a conversion is necessary (computed automatically if not given)
 	 */
-	template<typename T> bool copyToMem(T *dst, size_t len, scaling_pair scaling=scaling_pair())const{
-		ValuePtr<T> cont(dst,len, typename ValuePtr<T>::NonDeleter());
-		return copyTo(cont,scaling);
+	template<typename T> bool copyToMem( T *dst, size_t len, scaling_pair scaling = scaling_pair() )const {
+		ValuePtr<T> cont( dst, len, typename ValuePtr<T>::NonDeleter() );
+		return copyTo( cont, scaling );
 	}
 
 	/**
@@ -155,9 +155,9 @@ public:
 	 * \param len size (in elements) of the target memory
 	 * \param scaling the scaling to be used if a conversion is necessary (computed automatically if not given)
 	 */
-	template<typename T> bool copyFromMem( const T *const src, size_t len, scaling_pair scaling=scaling_pair() ) {
-		ValuePtr<T> cont(const_cast<T*>(src),len, typename ValuePtr<T>::NonDeleter()); //its ok - we're no going to change it
-		return cont.copyTo(*this,scaling);
+	template<typename T> bool copyFromMem( const T *const src, size_t len, scaling_pair scaling = scaling_pair() ) {
+		ValuePtr<T> cont( const_cast<T *>( src ), len, typename ValuePtr<T>::NonDeleter() ); //its ok - we're no going to change it
+		return cont.copyTo( *this, scaling );
 	}
 
 	/**
@@ -175,10 +175,10 @@ public:
 	 * \returns a the newly created ValuePtr
 	 */
 	template<typename T> ValuePtr<T> copyAs( scaling_pair scaling = scaling_pair() )const {
-		Reference erg=copyByID( ValuePtr<T>::staticID, scaling );
-		return erg.isEmpty() ? ValuePtr<T>(0):erg->castToValuePtr<T>();
+		Reference erg = copyByID( ValuePtr<T>::staticID, scaling );
+		return erg.isEmpty() ? ValuePtr<T>( 0 ) : erg->castToValuePtr<T>();
 	}
-	
+
 	/**
 	 * Get this as a ValuePtr of a specific type.
 	 * This does an automatic conversion into a new ValuePtr if one of following is true:
@@ -205,9 +205,9 @@ public:
 	 * \param scaling the scaling to be used (determined automatically if not given)
 	 * \returns eigther a cheap copy or a newly created ValuePtr
 	 */
-	template<typename T> ValuePtr<T> as(scaling_pair scaling = scaling_pair()){
-		Reference erg=convertByID(ValuePtr<T>::staticID,scaling);
-		return erg.isEmpty() ? ValuePtr<T>(0):erg->castToValuePtr<T>();
+	template<typename T> ValuePtr<T> as( scaling_pair scaling = scaling_pair() ) {
+		Reference erg = convertByID( ValuePtr<T>::staticID, scaling );
+		return erg.isEmpty() ? ValuePtr<T>( 0 ) : erg->castToValuePtr<T>();
 	}
 
 	/**

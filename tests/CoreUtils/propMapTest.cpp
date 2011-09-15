@@ -173,13 +173,13 @@ BOOST_AUTO_TEST_CASE( propMap_find_test )
 	map.propertyValue( "sub2/subProp2" ) = ( int32_t )2;
 	map.propertyValue( "sub2/sub1/subsubProp2" ) = ( int32_t )2;
 
-	BOOST_CHECK_EQUAL(map.find("subProp1"),"sub1/subProp1");
-	BOOST_CHECK_EQUAL(map.find("subProp2"),"sub2/subProp2");
-	BOOST_CHECK(map.find("sub").empty());
+	BOOST_CHECK_EQUAL( map.find( "subProp1" ), "sub1/subProp1" );
+	BOOST_CHECK_EQUAL( map.find( "subProp2" ), "sub2/subProp2" );
+	BOOST_CHECK( map.find( "sub" ).empty() );
 
 	map.propertyValue( "sub1/sub1" ) = ( int32_t )1;
-	BOOST_CHECK_EQUAL(map.find("sub1"),"sub1/sub1");
-	BOOST_CHECK_EQUAL(map.find("sub1",false,true),"sub1"); // this is the branch "sub1"
+	BOOST_CHECK_EQUAL( map.find( "sub1" ), "sub1/sub1" );
+	BOOST_CHECK_EQUAL( map.find( "sub1", false, true ), "sub1" ); // this is the branch "sub1"
 }
 }
 }

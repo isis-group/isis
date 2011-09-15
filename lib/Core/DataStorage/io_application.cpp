@@ -200,7 +200,7 @@ bool IOApplication::autowrite( std::list<Image> out_images, bool exitOnError )
 
 Image IOApplication::fetchImage()
 {
-	assert(!images.empty());
+	assert( !images.empty() );
 	Image ret = images.front();
 	images.pop_front();
 	return ret;

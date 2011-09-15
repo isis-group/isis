@@ -55,9 +55,9 @@ BOOST_AUTO_TEST_CASE( ValuePtr_init_test )
 {
 	BOOST_CHECK( ! Deleter::deleted );
 	{
-		data::enableLog<util::DefaultMsgPrint>(error);
+		data::enableLog<util::DefaultMsgPrint>( error );
 		data::ValuePtr<int32_t> outer( 0 );
-		data::enableLog<util::DefaultMsgPrint>(warning);
+		data::enableLog<util::DefaultMsgPrint>( warning );
 		// must create an empty pointer
 		BOOST_CHECK_EQUAL( outer.getLength(), 0 );
 		BOOST_CHECK( ! ( boost::shared_ptr<int32_t> )outer );
@@ -206,19 +206,19 @@ BOOST_AUTO_TEST_CASE( ValuePtr_conversion_test )
 	for ( int i = 0; i < 12; i++ )
 		floatArray[i] = init[i] * 1e5;
 
-	data::enableLog<util::DefaultMsgPrint>(error);
+	data::enableLog<util::DefaultMsgPrint>( error );
 	data::ValuePtr<short> shortArray = floatArray.copyAs<short>();
 	data::ValuePtr<uint8_t> byteArray = shortArray.copyAs<uint8_t>();
-	data::enableLog<util::DefaultMsgPrint>(warning);
+	data::enableLog<util::DefaultMsgPrint>( warning );
 
 	for ( int i = 0; i < 12; i++ )
 		BOOST_CHECK_EQUAL( shortArray[i], ceil( init[i] * 1e5 * scale - .5 ) );
 
 	//with offset and scale
 	const double uscale = std::numeric_limits< unsigned short >::max() / 4e5;
-	data::enableLog<util::DefaultMsgPrint>(error);
+	data::enableLog<util::DefaultMsgPrint>( error );
 	data::ValuePtr<unsigned short> ushortArray = floatArray.copyAs<unsigned short>();
-	data::enableLog<util::DefaultMsgPrint>(warning);
+	data::enableLog<util::DefaultMsgPrint>( warning );
 
 
 	for ( int i = 0; i < 12; i++ )

@@ -74,7 +74,7 @@ protected:
 	 * \param nrOfTimesteps size in the fourth dimension
 	 */
 	template<typename TYPE, typename D> Chunk( TYPE *src, D d, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 ):
-		_internal::ChunkBase( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ),ValuePtrReference( ValuePtr<TYPE>( src, getVolume(), d ) ) {}
+		_internal::ChunkBase( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ), ValuePtrReference( ValuePtr<TYPE>( src, getVolume(), d ) ) {}
 
 	Chunk() {}; //do not use this
 public:
@@ -149,7 +149,7 @@ public:
 
 	_internal::ValuePtrBase &asValuePtrBase() {return operator*();}
 	const _internal::ValuePtrBase &getValuePtrBase()const {return operator*();}
-	
+
 	template<typename TYPE> ValuePtr<TYPE> &asValuePtr() {return asValuePtrBase().castToValuePtr<TYPE>();}
 	template<typename TYPE> const ValuePtr<TYPE> getValuePtr()const {return getValuePtrBase().castToValuePtr<TYPE>();}
 
@@ -241,9 +241,9 @@ public:
 	 * This is there for effiency on IO only (you don't have to split up chunks just to store some properties).
 	 * It will be resolved by reindexing anyway. So, in an clean Image Chunks will never have such sub-properties.
 	 */
-	util::PropertyValue &propertyValueAt(const PropertyMap::KeyType &key,size_t at);
+	util::PropertyValue &propertyValueAt( const PropertyMap::KeyType &key, size_t at );
 	/// \copydoc propertyValueAt
-	const util::PropertyValue &propertyValueAt(const PropertyMap::KeyType &key,size_t at)const;
+	const util::PropertyValue &propertyValueAt( const PropertyMap::KeyType &key, size_t at )const;
 };
 
 /// Chunk class for memory-based buffers
@@ -252,7 +252,7 @@ template<typename TYPE> class MemChunk : public Chunk
 public:
 	/// Create an empty MemChunk with the given size
 	MemChunk( size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 ):
-		Chunk( ValuePtrReference(ValuePtr<TYPE>( nrOfColumns*nrOfRows*nrOfSlices*nrOfTimesteps )),nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps){}
+		Chunk( ValuePtrReference( ValuePtr<TYPE>( nrOfColumns *nrOfRows *nrOfSlices *nrOfTimesteps ) ), nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ) {}
 	/**
 	 * Create a MemChunk as copy of a given raw memory block
 	 * This will create a MemChunk of the given size and fill it with the data at the given address.
@@ -265,8 +265,7 @@ public:
 	 * \param nrOfTimesteps size of the resulting image
 	 */
 	template<typename T> MemChunk( const T *const org, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 ):
-		Chunk( ValuePtrReference(ValuePtr<TYPE>( nrOfColumns*nrOfRows*nrOfSlices*nrOfTimesteps )),nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps)
-	{
+		Chunk( ValuePtrReference( ValuePtr<TYPE>( nrOfColumns *nrOfRows *nrOfSlices *nrOfTimesteps ) ), nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ) {
 		util::checkType<T>();
 		asValuePtrBase().copyFromMem( org, getVolume() );
 	}

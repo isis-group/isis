@@ -121,12 +121,12 @@ std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::primaryInsert( const 
 	const util::fvector4 &rowVec = ch.propertyValue( "rowVec" )->castTo<util::fvector4>();
 	const util::fvector4 &columnVec = ch.propertyValue( "columnVec" )->castTo<util::fvector4>();
 	const util::fvector4 sliceVec = ch.hasProperty( "sliceVec" ) ?
-		ch.propertyValue( "sliceVec" )->castTo<util::fvector4>() :
-		util::fvector4(
-			rowVec[1] * columnVec[2] - rowVec[2] * columnVec[1],
-			rowVec[2] * columnVec[0] - rowVec[0] * columnVec[2],
-			rowVec[0] * columnVec[1] - rowVec[1] * columnVec[0]
-	   );
+									ch.propertyValue( "sliceVec" )->castTo<util::fvector4>() :
+									util::fvector4(
+										rowVec[1] * columnVec[2] - rowVec[2] * columnVec[1],
+										rowVec[2] * columnVec[0] - rowVec[0] * columnVec[2],
+										rowVec[0] * columnVec[1] - rowVec[1] * columnVec[0]
+									);
 
 
 	// this is actually not the complete transform (it lacks the scaling for the voxel size), but its enough

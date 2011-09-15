@@ -13,40 +13,43 @@
 #include <boost/filesystem.hpp>
 #include "typeptr.hpp"
 
-namespace isis{
-namespace data{
+namespace isis
+{
+namespace data
+{
 
 /**
  * Class to map files into memory.
  * This can be used read only, or for read/write.
- * 
+ *
  * Writing to a FilePtr mapping a file read-only is valid. It will not change the mapped file.
- * 
+ *
  * This is inherting from ValuePtr. Thus this, and all ValuePtr created from it will be managed.
  * The mapped file will automatically unmapped and closed after all pointers a deleted.
  */
-class FilePtr:public ValuePtr<uint8_t> {
-	struct Closer{
+class FilePtr: public ValuePtr<uint8_t>
+{
+	struct Closer {
 		int file;
 		size_t len;
 		boost::filesystem::path filename;
-		void operator()(void *p);
+		void operator()( void *p );
 	};
-	typedef data::ValuePtrReference(*generator_type)(data::FilePtr&,size_t,size_t);
-	struct GeneratorMap: public std::map<unsigned short,generator_type> {
+	typedef data::ValuePtrReference( *generator_type )( data::FilePtr &, size_t, size_t );
+	struct GeneratorMap: public std::map<unsigned short, generator_type> {
 		GeneratorMap();
-		template<class T> static data::ValuePtrReference generator(data::FilePtr &mfile,size_t offset, size_t len){return mfile.at<T>(offset,len);}
-		struct proc{
-			std::map<unsigned short,generator_type> *m_map;
-			proc(std::map<unsigned short,generator_type> *map):m_map(map){}
-			template<class T> void operator()(const T&){
-				m_map->insert(std::make_pair(ValuePtr<T>::staticID,&generator<T>));
+		template<class T> static data::ValuePtrReference generator( data::FilePtr &mfile, size_t offset, size_t len ) {return mfile.at<T>( offset, len );}
+		struct proc {
+			std::map<unsigned short, generator_type> *m_map;
+			proc( std::map<unsigned short, generator_type> *map ): m_map( map ) {}
+			template<class T> void operator()( const T & ) {
+				m_map->insert( std::make_pair( ValuePtr<T>::staticID, &generator<T> ) );
 			}
 		};
 	};
 
-	bool map(int file,size_t len,bool write,const boost::filesystem::path &filename);
-	size_t checkSize(bool write,int file, const boost::filesystem::path &filename,size_t size=0);
+	bool map( int file, size_t len, bool write, const boost::filesystem::path &filename );
+	size_t checkSize( bool write, int file, const boost::filesystem::path &filename, size_t size = 0 );
 	bool m_good;
 public:
 	/**
@@ -68,30 +71,32 @@ public:
 	 * \param filename the file to map into memory
 	 * \param len the requested length of the resulting ValuePtr in bytes (automatically set if 0)
 	 * \param write the file be opened for writing (writing to the mapped memory will write to the file, otherwise it will cause a copy-on-write)
-	 */	
-	FilePtr(const boost::filesystem::path &filename,size_t len=0,bool write=false);
+	 */
+	FilePtr( const boost::filesystem::path &filename, size_t len = 0, bool write = false );
 
 	/**
 	 * Get a ValuePtr representing the data in the file.
 	 * The resulting ValuePtr will use a proxy deleter to keep track of the mapped file.
 	 * So the file will be unmapped and closed if, and only if all ValuePtr created by this function and the FilePtr are closed.
-	 * 
+	 *
 	 * If the FilePtr was opened writing, writing access to this ValuePtr objects will result in writes to the file. Otherwise it will just write into memory.
 	 * \param offset the position in the file to start from (in bytes)
 	 * \param len the requested length of the resulting ValuePtr in elements (if that will go behind the end of the file, a warning will be issued).
 	 */
-	template<typename T> ValuePtr<T> at(size_t offset,size_t len=0){
-		boost::shared_ptr<T> ptr=boost::static_pointer_cast<T>(getRawAddress(offset));
-		if(len==0){
-			len=(getLength()-offset)/sizeof(T);
-			LOG_IF((getLength()-offset)%sizeof(T),Runtime,warning)
-				<< "The remaining filesize " << getLength()-offset << " does not fit the bytesize of the requested type "
-				<< util::Value<T>::staticName();
+	template<typename T> ValuePtr<T> at( size_t offset, size_t len = 0 ) {
+		boost::shared_ptr<T> ptr = boost::static_pointer_cast<T>( getRawAddress( offset ) );
+
+		if( len == 0 ) {
+			len = ( getLength() - offset ) / sizeof( T );
+			LOG_IF( ( getLength() - offset ) % sizeof( T ), Runtime, warning )
+					<< "The remaining filesize " << getLength() - offset << " does not fit the bytesize of the requested type "
+					<< util::Value<T>::staticName();
 		}
-		LOG_IF(len*sizeof(T)>(getLength()-offset),Debug,error) << "The requested length will be " << len-(getLength()-offset) << " bytes behind the end of the source.";
-		return data::ValuePtr<T>(ptr,len);
+
+		LOG_IF( len * sizeof( T ) > ( getLength() - offset ), Debug, error ) << "The requested length will be " << len - ( getLength() - offset ) << " bytes behind the end of the source.";
+		return data::ValuePtr<T>( ptr, len );
 	}
-	data::ValuePtrReference atByID(unsigned short ID, size_t offset,size_t len=0);
+	data::ValuePtrReference atByID( unsigned short ID, size_t offset, size_t len = 0 );
 
 	bool good();
 	void close();
