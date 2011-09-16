@@ -24,8 +24,8 @@ configure_file(__init__.py
 # configure installation
 ############################################################
 install(FILES __init__.py 
-  DESTINATION  ${PYTHON_SITE_PACKAGES}/data)
+  DESTINATION  ${PYTHON_INSTALL_PATH}/data)
 
 install(TARGETS _data
-  LIBRARY DESTINATION  ${PYTHON_SITE_PACKAGES}/data 
+  LIBRARY DESTINATION  ${PYTHON_INSTALL_PATH}/data 
   COMPONENT RuntimeLibraries)
