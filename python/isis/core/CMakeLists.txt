@@ -22,8 +22,8 @@ configure_file(__init__.py
 # configure installation
 ############################################################
 install(FILES __init__.py 
-  DESTINATION  ${PYTHON_SITE_PACKAGES}/core)
+  DESTINATION  ${PYTHON_INSTALL_PATH}/core)
 
 install(TARGETS _core
-     LIBRARY DESTINATION  ${PYTHON_SITE_PACKAGES}/core
+     LIBRARY DESTINATION  ${PYTHON_INSTALL_PATH}/core
      COMPONENT RuntimeLibraries)
