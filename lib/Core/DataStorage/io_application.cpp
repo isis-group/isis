@@ -32,7 +32,9 @@ namespace isis
 {
 namespace data
 {
-IOApplication::IOApplication( const char name[], bool have_input, bool have_output ): Application( name ), m_input( have_input ), m_output( have_output )
+IOApplication::IOApplication( const char name[], bool have_input, bool have_output ):
+	Application( name ), feedback(new util::ConsoleFeedback),
+	m_input( have_input ), m_output( have_output )
 {
 	if ( have_input ) {
 		parameters["in"] = std::string();
@@ -90,7 +92,7 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 
 IOApplication::~IOApplication()
 {
-	data::IOFactory::setProgressFeedback( 0 );
+	data::IOFactory::setProgressFeedback( boost::shared_ptr<util::ProgressFeedback>() );
 }
 
 bool IOApplication::init( int argc, char **argv, bool exitOnError )
@@ -137,7 +139,7 @@ bool IOApplication::autoload( bool exitOnError )
 			<< ( dl.empty() ? "" : std::string( " using the dialect: " ) + dl );
 
 	if( !no_progress ) {
-		data::IOFactory::setProgressFeedback( &feedback );
+		data::IOFactory::setProgressFeedback( feedback );
 	}
 
 	images = data::IOFactory::load( input, rf, dl );
@@ -187,7 +189,7 @@ bool IOApplication::autowrite( std::list<Image> out_images, bool exitOnError )
 		}
 	}
 
-	data::IOFactory::setProgressFeedback( &feedback );
+	data::IOFactory::setProgressFeedback( feedback );
 
 	if ( ! IOFactory::write( out_images, output, wf, dl ) ) {
 		if ( exitOnError )
