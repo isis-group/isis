@@ -72,7 +72,7 @@ bool invalid_and_tell( Chunk &candidate )
 
 }
 
-IOFactory::IOFactory(): m_feedback( NULL )
+IOFactory::IOFactory()
 {
 	const char *env_path = getenv( "ISIS_PLUGIN_PATH" );
 	const char *env_home = getenv( "HOME" );
@@ -389,7 +389,7 @@ bool IOFactory::write( std::list<data::Image> images, const std::string &path, s
 
 	return false;
 }
-void IOFactory::setProgressFeedback( util::ProgressFeedback *feedback )
+void IOFactory::setProgressFeedback( boost::shared_ptr<util::ProgressFeedback> feedback )
 {
 	IOFactory &This = get();
 

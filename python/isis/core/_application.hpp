@@ -17,8 +17,8 @@ namespace python
 class _Application : public util::Application, boost::python::wrapper<util::Application>
 {
 public:
-	_Application( PyObject *p, const char name[] ) : util::Application( name ), self( p ), boost::python::wrapper<util::Application>() {}
-	_Application( PyObject *p, const util::Application &base ) : util::Application( base ), self( p ), boost::python::wrapper<util::Application>() {}
+	_Application( PyObject *p, const char name[] ) : util::Application( name ), boost::python::wrapper<util::Application>(), self( p ) {}
+	_Application( PyObject *p, const util::Application &base ) : util::Application( base ), boost::python::wrapper<util::Application>(), self( p ) {}
 
 	//wrapper function to convert a python list into a **char
 	virtual bool init( int argc, boost::python::list pyargv, bool exitOnError = true ) {
