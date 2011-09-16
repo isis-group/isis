@@ -33,8 +33,8 @@ namespace isis
 namespace data
 {
 IOApplication::IOApplication( const char name[], bool have_input, bool have_output ):
-	Application( name ), feedback(new util::ConsoleFeedback),
-	m_input( have_input ), m_output( have_output )
+	Application( name ),
+	m_input( have_input ), m_output( have_output ), feedback(new util::ConsoleFeedback)
 {
 	if ( have_input ) {
 		parameters["in"] = std::string();

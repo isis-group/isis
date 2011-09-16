@@ -22,7 +22,7 @@ class _IOApplication : public data::IOApplication, boost::python::wrapper<data::
 
 public:
 	_IOApplication( PyObject *p, const char name[], const bool &input, const bool &output ) : data::IOApplication( name, input, output ),  boost::python::wrapper<data::IOApplication>(), self( p ) {}
-	_IOApplication( PyObject *p, const data::IOApplication &base ) : data::IOApplication( "", true, true ),  boost::python::wrapper<data::IOApplication>(), self( p ) {}
+	_IOApplication( PyObject *p, const data::IOApplication &base ) : data::IOApplication( base ),  boost::python::wrapper<data::IOApplication>(), self( p ) {}
 
 	virtual bool init( int argc, boost::python::list pyargv, bool exitOnError = true ) {
 		char *argv[argc];
