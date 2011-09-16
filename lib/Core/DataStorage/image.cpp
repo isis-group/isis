@@ -115,6 +115,10 @@ void Image::deduplicateProperties()
 
 	LOG( Debug, info ) << uniques.size() << " Chunk-unique properties found in the Image";
 	LOG_IF( uniques.size(), Debug, verbose_info ) << util::listToString( uniques.begin(), uniques.end(), ", " );
+
+	// list should not be unified - they belong into their chunk even if they are common
+	common.remove(common.findLists());
+	
 	join( common );
 	LOG_IF( ! common.isEmpty(), Debug, verbose_info ) << "common properties saved into the image " << common;
 
@@ -465,6 +469,17 @@ bool Image::reIndex()
 	}
 
 	LOG_IF( ! isValid(), Runtime, warning ) << "The image is not valid after reindexing. Missing properties: " << getMissing();
+
+	// check if there is a list in any chunk
+	bool found=false;
+	for ( size_t i = 0; i < lookup.size() && found==false; i++ ) {
+		found= !lookup[i]->findLists().empty();
+	}
+	if(found){// splice down the image one step if there are some
+		spliceDownTo(static_cast<data::dimensions>( lookup[0]->getRelevantDims()-1));
+	}
+
+	
 	updateOrientationMatrices();
 	return clean = isValid();
 }
