@@ -20,10 +20,11 @@ namespace python
 // helper class PropertyMap
 class _PropertyMap : public PropertyMap, boost::python::wrapper< PropertyMap >
 {
+
 public:
 	_PropertyMap () : boost::python::wrapper< PropertyMap >() {}
-	_PropertyMap ( PyObject *p ) : self( p ), boost::python::wrapper< PropertyMap >() {}
-	_PropertyMap ( PyObject *p, const PropertyMap &base ) : PropertyMap( base ), self( p ), boost::python::wrapper< PropertyMap >() {}
+	_PropertyMap ( PyObject *p ) : boost::python::wrapper< PropertyMap >(), self( p ) {}
+	_PropertyMap ( PyObject *p, const PropertyMap &base ) : PropertyMap( base ), boost::python::wrapper< PropertyMap >(), self( p ) {}
 
 	isis::util::PropertyMap _branch ( const util::istring &key ) {
 		return this->branch( key );

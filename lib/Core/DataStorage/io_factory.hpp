@@ -40,7 +40,7 @@ public:
 	typedef boost::shared_ptr< ::isis::image_io::FileFormat> FileFormatPtr;
 	typedef std::list<FileFormatPtr> FileFormatList;
 private:
-	util::ProgressFeedback *m_feedback;
+	boost::shared_ptr<util::ProgressFeedback> m_feedback;
 public:
 	/**
 	 * Load a data file with given filename and dialect.
@@ -67,7 +67,7 @@ public:
 	/// Get a list of all known file-formats (aka. io-plugins loaded)
 	static FileFormatList getFormats();
 
-	static void setProgressFeedback( util::ProgressFeedback *feedback );
+	static void setProgressFeedback( boost::shared_ptr<util::ProgressFeedback> feedback );
 
 	/**
 	 * Get all formats which should be able to read/write the given file.
