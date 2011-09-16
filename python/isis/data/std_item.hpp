@@ -31,30 +31,24 @@ public:
 		x.push_back( v );
 	}
 
-	static V &get( T &x, int i ) {
-		if( i < 0 ) i += x.size();
-
-		if( i >= 0 && i < x.size() ) {
-			typename T::iterator iter = x.begin();
-			std::advance( iter, i );
-			return *iter;
+	static V &get( T &x, size_t i ) {
+		if( i >= x.size() ) {
+		    IndexError();
 		}
-
-		IndexError();
+		
+		typename T::iterator iter = x.begin();
+		std::advance( iter, i );
+		return *iter;
 	}
-	static void set( T &x, int i, V const &v ) {
-		if( i < 0 ) i += x.size();
-
-		if( i >= 0 && i < x.size() ) {
+	static void set( T &x, size_t i, V const &v ) {
+		if( i < x.size() ) {
 			typename T::iterator iter = x.begin();
 			std::advance( iter, i );
 			*iter = v;
 		} else IndexError();
 	}
-	static void del( T &x, int i ) {
-		if( i < 0 ) i += x.size();
-
-		if( i >= 0 && i < x.size() ) {
+	static void del( T &x, size_t i ) {
+		if( i < x.size() ) {
 			typename T::iterator iter = x.begin();
 			std::advance( iter, i );
 			x.erase( iter );

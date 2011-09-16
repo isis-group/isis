@@ -21,7 +21,7 @@ public:
 		return std::string( "memimage_50 memimage_500 memimage_1000 memimage_2000" );
 	}
 
-	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
+	int load ( std::list<data::Chunk> &chunks, const std::string &/*filename*/, const std::string &dialect )  throw( std::runtime_error & ) {
 		if( dialect == "" ) {
 			//##################################################################################################
 			//## standard null image
@@ -105,7 +105,7 @@ public:
 		return 0;
 	}
 
-	void write( const data::Image &image, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
+	void write( const data::Image &image, const std::string &/*filename*/, const std::string &/*dialect*/ )  throw( std::runtime_error & ) {
 		if ( image.getSizeAsVector() != util::fvector4( 50, 50, 50, 10 ) )
 			throw( std::runtime_error( "Size mismatch (" + image.getSizeAsString() + "!=" + boost::lexical_cast<std::string>( util::fvector4( 50, 50, 50, 10 ) ) + ")" ) );
 
