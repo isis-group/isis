@@ -133,7 +133,7 @@ Description: The ISIS package provides a general I/O framework for neuroimaging
 Package: isis-qt4
 Section: science
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (>= 0.3.4)
+Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0-dev (>= 0.3.4)
 Description: The ISIS package provides a general I/O framework for neuroimaging
  data.  Being started with fMRI data, it can handle several established data
  formats, like Nifti, Analyze, DICOM and vista. A first application based on this
@@ -141,6 +141,20 @@ Description: The ISIS package provides a general I/O framework for neuroimaging
  data from various MRI scanners. 
  .
  This Package provides a bridge to qt4 applications.
+
+Package: isis-itk
+Section: science
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0-dev (>= 0.3.4)
+Recommends: libinsighttoolkit3-dev (>= 3.6.0 )
+Description: The ISIS package provides a general I/O framework for neuroimaging
+ data.  Being started with fMRI data, it can handle several established data
+ formats, like Nifti, Analyze, DICOM and vista. A first application based on this
+ project is a data converter that allows an easy and unified handling of fMRI
+ data from various MRI scanners. 
+ .
+ This Package provides a bridge to itk insight toolkit library.
+
 
 Package: isis-python
 Section: science
