@@ -473,10 +473,14 @@ bool Image::reIndex()
 	// check if there is a list in any chunk
 	bool found=false;
 	for ( size_t i = 0; i < lookup.size() && found==false; i++ ) {
-		found= !lookup[i]->findLists().empty();
+		const KeyList lists_list=lookup[i]->findLists();
+		LOG_IF(!lists_list.empty(),Debug,info) << "Found property-lists " << util::MSubject(lists_list) << " in chunk number " << i << " going to splice the image";
+		found= !lists_list.empty();
 	}
 	if(found){// splice down the image one step if there are some
-		spliceDownTo(static_cast<data::dimensions>( lookup[0]->getRelevantDims()-1));
+		const size_t relDims=lookup[0]->getRelevantDims();
+		assert(relDims>1);
+		spliceDownTo(static_cast<data::dimensions>( relDims-1));
 	}
 
 	

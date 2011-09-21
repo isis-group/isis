@@ -186,12 +186,17 @@ BOOST_AUTO_TEST_CASE ( proplist_image_test )
 	ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 
 	for(int i=0;i<4;i++){
-		ch.propertyValueAt( "acquisitionNumber", i )=(uint32_t)i; //change the acquisitionNumber of that to 1
-		ch.propertyValueAt( "acquisitionTime", i )=(uint32_t)i;
+		ch.propertyValueAt( "acquisitionNumber", 3-i )=(uint32_t)i; //change the acquisitionNumber of that to 1
+		ch.propertyValueAt( "acquisitionTime", 3-i )=(uint32_t)i;
 	}
 
 	data::Image img( ch );
-	const size_t size[] = {4, 4, 1, 2};
+	BOOST_REQUIRE_EQUAL(img.getChunk(0).getRelevantDims(),2); // the dim should be 2 now
+
+	for(size_t i=0;i<4;i++){
+		BOOST_CHECK_EQUAL(img.getChunk(0,0,3-i).propertyValue("acquisitionTime"),i);
+		BOOST_CHECK_EQUAL(img.getChunk(0,0,3-i).propertyValue("acquisitionNumber"),i);
+	}
 }
 
 BOOST_AUTO_TEST_CASE ( minindexdim_test )

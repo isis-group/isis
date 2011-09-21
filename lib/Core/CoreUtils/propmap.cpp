@@ -188,6 +188,7 @@ const PropertyValue &PropertyMap::propertyValue( const key_type &key )const
 
 PropertyValue &PropertyMap::propertyValue( const key_type &key )
 {
+	propertyValueVec( key ).resize(1);// the user is expecting only one entry, so remove the others 
 	return propertyValueVec( key )[0];
 }
 
