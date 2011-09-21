@@ -65,7 +65,7 @@ public:
 	 * </ul>
 	 *
 	 */
-	std::string dialects( const std::string &filename )const {return std::string( "functional map anatomical" );}
+	std::string dialects( const std::string &/*filename*/ )const {return std::string( "functional map anatomical" );}
 	int load( std::list<data::Chunk> &chunks, const std::string &filename,
 			  const std::string &dialect ) throw( std::runtime_error & );
 	void write( const data::Image &image, const std::string &filename,
@@ -463,7 +463,7 @@ private:
 		 * Default constructor. Create a VistaChunk out of a vista image.
 		 */
 
-		VistaChunk( VImage image, const bool functional, size_t nslices = 0 ):
+		VistaChunk( VImage image, const bool functional, size_t /*nslices*/ = 0 ):
 			data::Chunk( static_cast<TYPE *>( image->data ), VImageDeleter( image ),
 						 VImageNColumns( image ), VImageNRows( image ), functional ? 1 : VImageNBands( image ), functional ? VImageNBands( image ) : 1 ) {
 			copyHeaderFromVista( image, *this, functional );
