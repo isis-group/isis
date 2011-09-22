@@ -1,6 +1,8 @@
 #include <DataStorage/io_interface.h>
 #include <DataStorage/fileptr.hpp>
 #include <CoreUtils/matrix.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/date_time/gregorian/gregorian.hpp>
 
 #define NIFTI_TYPE_UINT8           2
 #define NIFTI_TYPE_UINT16        512
@@ -136,6 +138,36 @@ protected:
 		return std::string( ".nii" );
 	}
 	std::map<short,unsigned short> nii2isis;
+	static bool parseDescrip(util::PropertyMap &props, const char desc[]){
+		//check description for tr, te and fa and date which is written by spm8
+		boost::regex descriptionRegex(
+			".*TR=([[:digit:]]{1,})ms.*TE=([[:digit:]]{1,})ms.*FA=([[:digit:]]{1,})deg\\ *([[:digit:]]{1,2}).([[:word:]]{3}).([[:digit:]]{4})\\ *([[:digit:]]{1,2}):([[:digit:]]{1,2}):([[:digit:]]{1,2}).*"
+		);
+		boost::cmatch results;
+
+		if ( boost::regex_match( desc, results,  descriptionRegex ) ) {
+			props.propertyValue("repetitionTime")=util::Value<uint16_t>( results.str( 1 ) );
+			props.propertyValue("echoTime")=util::Value<uint16_t>( results.str( 2 ) );
+			props.propertyValue("flipAngle")=util::Value<uint16_t>( results.str( 2 ) );
+
+			const util::Value<int> day=results.str( 4 ), month=results.str( 5 ), year=results.str( 6 );
+			const util::Value<uint8_t> hours=boost::lexical_cast<uint8_t>( results.str( 7 ) ), minutes=boost::lexical_cast<uint8_t>( results.str( 8 ) ), seconds=boost::lexical_cast<uint8_t>( results.str( 9 ) );
+
+			boost::posix_time::ptime sequenceStart=boost::posix_time::ptime(
+				boost::gregorian::date((int)year,(int)month,(int)day),
+				boost::posix_time::time_duration( hours, minutes, seconds )
+			);
+			props.setPropertyAs<boost::posix_time::ptime>( "sequenceStart", sequenceStart );
+
+			LOG( ImageIoLog, info )
+				<< "Using Tr=" << props.propertyValue("repetitionTime") << ", Te=" << props.propertyValue("echoTime") 
+				<< ", flipAngle=" << props.propertyValue("flipAngle") << " and sequenceStart=" << props.propertyValue("sequenceStart")
+				<< " from SPM8 description.";
+
+			return true;
+		} else
+			return false;
+	}
 	static void header2PropMap(const _internal::nifti_1_header *head,data::Chunk &props){
 		unsigned short dims=head->dim[0];
 		double time_fac=1;
@@ -145,7 +177,7 @@ protected:
 			case NIFTI_UNITS_METER:size_fac=1e3;break;
 			case NIFTI_UNITS_MICRON:size_fac=1e-3;break;
 		}
-		
+
 		switch(head->xyzt_units & 0x38){
 			case NIFTI_UNITS_SEC:time_fac=1e3;break;
 			case NIFTI_UNITS_USEC:time_fac=1e-3;break;
@@ -182,7 +214,7 @@ protected:
 		} else if(head->qform_code){ // if qform_code is set, but no sform use that (thats the "normal" case)
 			useQForm(props);
 		} else {
-			LOG( Runtime, warning ) << "Neigther sform_code nor qform_code are set, using identity matrix for geometry";
+			LOG( Runtime, warning ) << "Neither sform_code nor qform_code are set, using identity matrix for geometry";
 			props.setPropertyAs<util::fvector4>( "rowVec",    nifti2isis.getRow(0) ); // we use the transformation from nifti to isis as unity
 			props.setPropertyAs<util::fvector4>( "columnVec", nifti2isis.getRow(1) ); // because the image will very likely be in nifti space
 			props.setPropertyAs<util::fvector4>( "sliceVec",  nifti2isis.getRow(2) );
@@ -233,8 +265,19 @@ protected:
 			props.setPropertyAs<uint16_t>("repetitionTime",head->pixdim[4]*time_fac);
 
 		// sequenceDescription
-		props.setPropertyAs<std::string>("sequenceDescription",head->descrip);
+		if(!parseDescrip(props, head->descrip)) // if descrip dos not hold Te,Tr and stuff (SPM dialect)
+			props.setPropertyAs<std::string>("sequenceDescription",head->descrip);// use it the usual way
+
+		// TODO: at the moment scaling not supported due to data type changes
+		if ( head->scl_slope != 1 || head->scl_inter>0 ) {
+			//          throwGenericError( std::string( "Scaling is not supported at the moment. Scale Factor: " ) + util::Value<float>( scale ).toString() );
+			LOG( Runtime, error ) << "Scaling is not supported at the moment.";
+		}
+
+
+
 	}
+
 public:
 	std::string getName()const {return "Nifti standalone";}
 
