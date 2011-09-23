@@ -3,6 +3,7 @@
 #include <CoreUtils/matrix.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/type_traits/make_signed.hpp>
 
 #define NIFTI_TYPE_UINT8           2
 #define NIFTI_TYPE_UINT16        512
@@ -117,18 +118,23 @@ class ImageFormat_NiftiSa: public FileFormat
 	static const util::Matrix4x4<short> nifti2isis;
 public:
 	ImageFormat_NiftiSa(){
-		nii2isis[NIFTI_TYPE_INT8 ]=data::ValuePtr< int8_t>::staticID;
-		nii2isis[NIFTI_TYPE_INT16]=data::ValuePtr<int16_t>::staticID;
-		nii2isis[NIFTI_TYPE_INT32]=data::ValuePtr<int32_t>::staticID;
-		nii2isis[NIFTI_TYPE_INT64]=data::ValuePtr<int64_t>::staticID;
+		nifti_type2isis_type[NIFTI_TYPE_INT8 ]=data::ValuePtr< int8_t>::staticID;
+		nifti_type2isis_type[NIFTI_TYPE_INT16]=data::ValuePtr<int16_t>::staticID;
+		nifti_type2isis_type[NIFTI_TYPE_INT32]=data::ValuePtr<int32_t>::staticID;
+		nifti_type2isis_type[NIFTI_TYPE_INT64]=data::ValuePtr<int64_t>::staticID;
 
-		nii2isis[NIFTI_TYPE_UINT8 ]=data::ValuePtr< uint8_t>::staticID;
-		nii2isis[NIFTI_TYPE_UINT16]=data::ValuePtr<uint16_t>::staticID;
-		nii2isis[NIFTI_TYPE_UINT32]=data::ValuePtr<uint32_t>::staticID;
-		nii2isis[NIFTI_TYPE_UINT64]=data::ValuePtr<uint64_t>::staticID;
+		nifti_type2isis_type[NIFTI_TYPE_UINT8 ]=data::ValuePtr< uint8_t>::staticID;
+		nifti_type2isis_type[NIFTI_TYPE_UINT16]=data::ValuePtr<uint16_t>::staticID;
+		nifti_type2isis_type[NIFTI_TYPE_UINT32]=data::ValuePtr<uint32_t>::staticID;
+		nifti_type2isis_type[NIFTI_TYPE_UINT64]=data::ValuePtr<uint64_t>::staticID;
 
-		nii2isis[NIFTI_TYPE_FLOAT32]=data::ValuePtr<float>::staticID;
-		nii2isis[NIFTI_TYPE_FLOAT64]=data::ValuePtr<double>::staticID;
+		nifti_type2isis_type[NIFTI_TYPE_FLOAT32]=data::ValuePtr<float>::staticID;
+		nifti_type2isis_type[NIFTI_TYPE_FLOAT64]=data::ValuePtr<double>::staticID;
+
+		typedef std::map<short,unsigned short>::const_reference ref_type;
+		BOOST_FOREACH(ref_type ref, nifti_type2isis_type){
+			isis_type2nifti_type[ref.second]=ref.first;
+		}
 
 /*		nii2isis[NIFTI_TYPE_COMPLEX64 ]=data::ValuePtr<std::complex< float > >::staticID;
 		nii2isis[NIFTI_TYPE_COMPLEX128]=data::ValuePtr<std::complex< double > >::staticID;*/
@@ -137,7 +143,14 @@ protected:
 	std::string suffixes()const {
 		return std::string( ".nii" );
 	}
-	std::map<short,unsigned short> nii2isis;
+	std::map<short,unsigned short> nifti_type2isis_type;
+	std::map<unsigned short,short> isis_type2nifti_type;
+	template<typename T> static unsigned short typeFallBack(){
+		typedef typename boost::make_signed<T>::type NEW_T;
+		LOG(Runtime,info) << util::Value<T>::staticName() <<  " is not supported by fsl falling back to " << util::Value<NEW_T>::staticName();
+		return util::Value<NEW_T>::staticID;
+	}
+	static uint8_t guessSliceOrdering(const data::Image img){}
 	static bool parseDescrip(util::PropertyMap &props, const char desc[]){
 		//check description for tr, te and fa and date which is written by spm8
 		boost::regex descriptionRegex(
@@ -167,6 +180,10 @@ protected:
 			return true;
 		} else
 			return false;
+	}
+	static void propMap2Header(const util::PropertyMap &props,_internal::nifti_1_header *head){
+		head->intent_code=0;
+		
 	}
 	static void header2PropMap(const _internal::nifti_1_header *head,data::Chunk &props){
 		unsigned short dims=head->dim[0];
@@ -230,25 +247,29 @@ protected:
 			switch(head->slice_code){
 				case 0:
 				case NIFTI_SLICE_SEQ_INC:
-					for(short i=0;i<head->dim[3];i++){
-						props.propertyValueAt("acquisitionNumber",i)=i;
-						props.propertyValueAt("acquisitionTime",  i)=i*head->slice_duration*time_fac;
+					if(head->slice_duration){ // if there is no slice duration, and the sequence is "normal" there is no use in numbering
+						for(uint32_t i=0;i<head->dim[3];i++){
+							props.propertyValueAt("acquisitionNumber",i)=i;
+							props.propertyValueAt("acquisitionTime",  i)=i*head->slice_duration*time_fac;
+							}
+					} else {
+						props.propertyValue("acquisitionNumber")=0;
 					}
 					break;
 				case NIFTI_SLICE_SEQ_DEC:
-					for(short i=0;i<head->dim[3];i++){
+					for(uint32_t i=0;i<head->dim[3];i++){
 						props.propertyValueAt("acquisitionNumber",head->dim[3]-i-1)=i;
 						props.propertyValueAt("acquisitionTime",  head->dim[3]-i-1)=i*head->slice_duration*time_fac;
 					}
 					break;
 				case NIFTI_SLICE_ALT_INC:
-					for(short i=0;i<head->dim[3];i++){
+					for(uint32_t i=0;i<head->dim[3];i++){
 						props.propertyValueAt("acquisitionNumber",i)=i+interl[i%3];
 						props.propertyValueAt("acquisitionTime",  i)=(i+interl[i%3])*head->slice_duration*time_fac;
 					}
 					break;
 				case NIFTI_SLICE_ALT_DEC:
-					for(short i=0;i<head->dim[3];i++){
+					for(uint32_t i=0;i<head->dim[3];i++){
 						props.propertyValueAt("acquisitionNumber",head->dim[3]-i-1)=i+interl[i%3];
 						props.propertyValueAt("acquisitionTime",  head->dim[3]-i-1)=(i+interl[i%3])*head->slice_duration*time_fac;
 					}
@@ -269,7 +290,7 @@ protected:
 			props.setPropertyAs<std::string>("sequenceDescription",head->descrip);// use it the usual way
 
 		// TODO: at the moment scaling not supported due to data type changes
-		if ( head->scl_slope != 1 || head->scl_inter>0 ) {
+		if ( !(head->scl_slope == 1 || head->scl_inter==0) ) {
 			//          throwGenericError( std::string( "Scaling is not supported at the moment. Scale Factor: " ) + util::Value<float>( scale ).toString() );
 			LOG( Runtime, error ) << "Scaling is not supported at the moment.";
 		}
@@ -281,11 +302,11 @@ protected:
 public:
 	std::string getName()const {return "Nifti standalone";}
 
-	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
+	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &/*dialect*/ )  throw( std::runtime_error & ) {
 		data::FilePtr mfile(filename);
 
 		//get the header - we use it directly from the file
-		_internal::nifti_1_header *header= reinterpret_cast<_internal::nifti_1_header*>(&mfile[0]);
+		const _internal::nifti_1_header *header= reinterpret_cast<const _internal::nifti_1_header*>(&mfile[0]);
 
 		if(header->intent_code!=0){
 			throwGenericError(std::string("only intent_code==0 is supportet"));
@@ -297,7 +318,7 @@ public:
 
 		size.copyFrom(header->dim+1,header->dim+1+header->dim[0]);
 
-		data::ValuePtrReference data=mfile.atByID(nii2isis[header->datatype],header->vox_offset);
+		data::ValuePtrReference data=mfile.atByID(nifti_type2isis_type[header->datatype],header->vox_offset);
 		LOG(Runtime,info) << "Mapping nifti image as " << data->getTypeName() << " of length " << data->getLength();
 		LOG_IF((size_t)header->bitpix!=data->bytesPerElem()*8,Runtime,warning)
 			<< "nifti field bitpix does not fit the bytesize of the given datatype ("
@@ -310,6 +331,50 @@ public:
 	}
 
 	void write( const data::Image &image, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
+		class CopyOp:public data::ChunkOp{
+			data::FilePtr &m_out;
+			const data::Image &m_image;
+			const unsigned short m_ID;
+			const size_t m_bytesPerPixel;
+			const data::scaling_pair m_scale;
+		public:
+			CopyOp(const data::Image &image,data::FilePtr &out):
+				m_image(image),m_out(out),m_ID(image.getMajorTypeID()),m_bytesPerPixel(image.getBytesPerVoxel()),m_scale(image.getScalingTo( m_ID )){}
+            bool operator()(data::Chunk &ch, util::FixedVector< size_t, 4 > posInImage){
+				size_t offset=384+m_image.getLinearIndex(posInImage)*m_bytesPerPixel;
+				data::ValuePtrReference out_data=m_out.atByID(m_ID,offset,ch.getVolume());
+				ch.asValuePtrBase().copyTo(*out_data,m_scale);
+			}
+		};
+		
+		const size_t bpv=image.getBytesPerVoxel();
+		unsigned short target_id=image.getMajorTypeID();
+
+		if(util::istring(dialect.c_str())=="fsl"){
+			switch(target_id){
+				case util::Value<uint16_t>::staticID:target_id=typeFallBack<uint16_t>();break;
+				case util::Value<uint32_t>::staticID:target_id=typeFallBack<uint32_t>();break;
+			}
+		}
+		
+		const size_t datasize=image.getVolume()*bpv;
+		if(isis_type2nifti_type[target_id]){ // "normal types"
+		
+			data::FilePtr out(filename,datasize+384,true);
+
+			_internal::nifti_1_header *header= reinterpret_cast<_internal::nifti_1_header*>(&out[0]);
+			memset(header,0,sizeof(_internal::nifti_1_header));
+			header->sizeof_hdr=header->vox_offset=sizeof(_internal::nifti_1_header);
+			header->bitpix=bpv*8;
+			header->datatype=isis_type2nifti_type[target_id];
+
+			CopyOp do_copy(image,out);
+			const_cast<data::Image&>( image).foreachChunk(do_copy); // @todo we _do_ need a const version of foreachChunk/Voxel
+		} else {
+			LOG(Runtime,error) << "Sorry, the datatype " << util::MSubject( image.getMajorTypeName() )<< " is not supportet for nifti output";
+			throwGenericError("unsupported datatype");
+		}
+
 	}
 	bool tainted()const {return false;}//internal plugins are not tainted
 private:
@@ -419,6 +484,12 @@ private:
 		// voxelSize //////////////////////////////////////////////////////////////////////////////////
 		props.transform<util::fvector4>("nifti/pixdim","voxelSize");
 		LOG(Debug,info)	<< "Computed voxelSize=" << props.getPropertyAs<util::fvector4>("voxelSize") << " from qform";
+	}
+	static void writeQForm(const util::PropertyMap &props,_internal::nifti_1_header *head){
+		
+	}
+	static void writeSForm(const util::PropertyMap &props,_internal::nifti_1_header *head){
+
 	}
 };
 
