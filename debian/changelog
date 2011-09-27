@@ -1,5 +1,5 @@
-isis (0.3.3-1) UNRELEASED; urgency=low
+isis (0.3.4+git100-g81f2d00-1) UNRELEASED; urgency=low
 
   * Initial Debian packaging (Closes: #633677).
 
- -- Michael Hanke <mih@debian.org>  Thu, 05 May 2011 10:08:35 -0400
+ -- Michael Hanke <mih@debian.org>  Tue, 27 Sep 2011 13:51:38 +0200
