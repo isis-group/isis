@@ -30,7 +30,7 @@ namespace util
 /*
  * Basic class for any feedback given from longlasting processes about its progress (e.g. file loading)
  */
-class ProgressFeedback
+class ProgressFeedback: boost::noncopyable // ProgressFeedback should not be copyable - would break the progress counting
 {
 public:
 	/**

@@ -35,7 +35,7 @@ class IOApplication: public util::Application
 	template< typename TYPE > std::list<data::TypedImage<TYPE> > convertTo( const std::list<data::Image> &src ) {
 		return std::list<data::TypedImage<TYPE> >( src.begin(), src.end() );
 	}
-	util::ConsoleFeedback feedback;
+	boost::shared_ptr<util::ConsoleFeedback> feedback;
 
 public:
 	std::list<data::Image> images;

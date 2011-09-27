@@ -20,10 +20,11 @@ namespace python
 {
 class _Image : public isis::data::Image, boost::python::wrapper<isis::data::Image>
 {
+
 public:
 
-	_Image ( PyObject *p ) : self( p ), boost::python::wrapper< isis::data::Image >() {}
-	_Image ( PyObject *p, const isis::data::Image &base ) : isis::data::Image( base ), self( p ), boost::python::wrapper< isis::data::Image >()  {}
+	_Image ( PyObject *p ) : boost::python::wrapper< isis::data::Image >(), self( p ) {}
+	_Image ( PyObject *p, const isis::data::Image &base ) : isis::data::Image( base ), boost::python::wrapper< isis::data::Image >(), self( p ) {}
 
 	float _voxel( const size_t &first, const size_t &second, const size_t &third, const size_t &fourth ) {
 		data::Chunk ch = this->getChunk( first, second, third, fourth, false );
@@ -109,9 +110,9 @@ public:
 
 	std::list<isis::data::Chunk> _getChunksAsVector( void ) {
 		std::list<isis::data::Chunk> retChunkList;
-		std::vector<boost::shared_ptr<isis::data::Chunk> > chunkList( this->getChunksAsVector() );
-		BOOST_FOREACH( std::vector<boost::shared_ptr<isis::data::Chunk> >::reference ref, chunkList ) {
-			retChunkList.push_back( *ref );
+		std::vector<isis::data::Chunk>  chunkList( this->copyChunksToVector() );
+		BOOST_FOREACH( std::vector<isis::data::Chunk> ::reference ref, chunkList ) {
+			retChunkList.push_back( ref );
 		}
 		return retChunkList;
 	}
@@ -161,6 +162,9 @@ public:
 		case reversed_coronal:
 			return std::string( "reversed_coronal" );
 			break;
+		default:
+		    return std::string( "unknown" );
+		    break;
 		}
 	}
 
@@ -232,6 +236,7 @@ public:
 			break;
 		default:
 			LOG( Runtime, error ) << "Unregistered pixel type " << getTypeMap()[this->getMajorTypeID()] << ".";
+			return isis::data::MemImage<int8_t>( *this );
 		}
 	}
 

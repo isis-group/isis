@@ -13,15 +13,8 @@
 #include <boost/lexical_cast.hpp>
 
 #include <tar.h>
-#include <fcntl.h>
-#include <sys/mman.h>
 #include <fstream>
-
-#ifdef HAVE_FALLOCATE
-#include <linux/falloc.h>
-#elif defined HAVE_POSIX_FALLOCATE
-#include <fcntl.h>
-#endif
+#include "DataStorage/fileptr.hpp"
 
 namespace isis
 {
@@ -30,7 +23,7 @@ namespace image_io
 
 /**
  * IO-Proxy handling tar files.
- * This might not work for OS with broken file handling (eg. Windows).
+ * \todo This might not work for OS with broken file handling (eg. Windows).
  */
 class ImageFormat_TarProxy: public FileFormat
 {
@@ -145,49 +138,28 @@ public:
 				data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( org_file.file_string(), dialect ); // and get the reading pluging for that
 
 				if( formats.empty() ) {
-					LOG( Runtime, info ) << "Skipping " << org_file << " from " << filename << " because no plugin was found to read it"; // skip if we found none
+					LOG( Runtime, notice ) << "Skipping " << org_file << " from " << filename << " because no plugin was found to read it"; // skip if we found none
 				} else {
 					LOG( Debug, info ) << "Got " << org_file << " from " << filename << " there are " << formats.size() << " plugins which should be able to read it";
 
 					const std::pair<std::string, std::string> base = formats.front()->makeBasename( org_file.file_string() );//ask any of the plugins for the suffix
 					util::TmpFile tmpfile( "", base.second );//create a temporary file with this suffix
-					int mfile = open( tmpfile.file_string().c_str(), O_RDWR, S_IRUSR | S_IWUSR );
 
-					if( mfile == -1 ) {
+					data::FilePtr mfile( tmpfile, size, true );
+
+					if( !mfile.good() ) {
 						throwSystemError( errno, std::string( "Failed to open temporary " ) + tmpfile.file_string() );
 					}
 
-					// set it to the given size - otherwise mmap will be very sad
-#ifdef HAVE_FALLOCATE
-					const int err = fallocate( mfile, 0, 0, size ); //fast preallocation using features of ome linux-filesystems
-#elif HAVE_POSIX_FALLOCATE
-					const int err = posix_fallocate( mfile, 0, size ); // slower posix compatible version
-#else
-					const int err = ( lseek( mfile, size - 1, SEEK_SET ) == off_t( size - 1 ) && ::write( mfile, " ", 1 ) ) ? 0 : errno; //workaround in case there is no fallocate
-#endif
+					LOG( Debug, info ) << "Mapped " << size << " bytes of " << mfile.getLength() << " at " << ( void * )&mfile[0];
 
-					if( err ) {
-						throwSystemError( err, std::string( "Failed grow " ) + tmpfile.file_string() + " to size " + boost::lexical_cast<std::string>( size ) );
-					}
-
-					char *mmem = ( char * )mmap( NULL, size,  PROT_WRITE, MAP_SHARED, mfile, 0 ); //map it into memory
-
-					if( mmem == MAP_FAILED ) {
-						throwSystemError( errno, std::string( "Failed to map temporary " ) + tmpfile.file_string() + " into memory" );
-					}
-
-					LOG( Debug, info ) << "Mapped " << size << " bytes of " << tmpfile.file_string() << " at " << ( void * )mmem;
-
-					size_t red = boost::iostreams::read( in, mmem, size ); // read data from the stream into the mapped memory
+					size_t red = boost::iostreams::read( in, ( char * )&mfile[0], size ); // read data from the stream into the mapped memory
 					next_header_in -= red;
+					mfile.close(); //close and unmap the temporary file/mapped memory
 
 					if( red != size ) { // read the data from the stream
 						LOG( Runtime, warning ) << "Could not read all " << size << " bytes for " << tmpfile.file_string();
 					}
-
-					//unmap and close the file
-					munmap( mmem, size );
-					close( mfile );
 
 					// read the temporary file
 					std::list<data::Chunk>::iterator prev = chunks.end();

@@ -19,4 +19,3 @@ include_directories(${PYTHON_INCLUDE_PATH})
 
 add_subdirectory(isis)
 
-

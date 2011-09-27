@@ -88,6 +88,10 @@ public:
 	size_t getLinearIndex( const size_t d[DIMS] )const {
 		return __dim2index < DIMS - 1 > ( d, m_dim );
 	}
+	/// \copydoc getLinearIndex
+	size_t getLinearIndex( const util::FixedVector<size_t, DIMS> &d )const {
+		return __dim2index < DIMS - 1 > ( &d[0], m_dim );
+	}
 	/**
 	 * Compute coordinates from linear index,
 	 * \param d array to put the computed coordinates in (d[0] will be most iterating element / lowest dimension)

@@ -399,6 +399,7 @@ public:
 	size_t compare( const Image &comp )const;
 
 	orientation getMainOrientation()const;
+
 	/**
 	 * Transforms the image coordinate system into an other system by multiplying
 	 * the orientation matrix with a user defined transformation matrix. Additionally,
@@ -418,12 +419,26 @@ public:
 	 * \return returns if the transformation was successfuly
 	 */
 	bool transformCoords( boost::numeric::ublas::matrix<float> transform_matrix, bool transformCenterIsImageCenter = false ) {
-
+		//for transforming we have to ensure to have the below properties in our chunks and image
+		std::list<std::string > neededProps;
+		neededProps.push_back( "indexOrigin" );
+		neededProps.push_back( "rowVec" );
+		neededProps.push_back( "columnVec" );
+		neededProps.push_back( "sliceVec" );
+		neededProps.push_back( "voxelSize" );
+		//propagate needed properties to chunks
 		BOOST_FOREACH( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef, lookup ) {
+			BOOST_FOREACH( std::list<std::string>::reference props, neededProps ) {
+				if( hasProperty( props.c_str() ) && !chRef->hasProperty( props.c_str() ) ) {
+					chRef->setPropertyAs<util::fvector4>( props.c_str(), getPropertyAs<util::fvector4>( props.c_str() ) );
+				}
+			}
+
 			if( !chRef->transformCoords( transform_matrix, transformCenterIsImageCenter ) ) {
 				return false;
 			}
 		}
+		//      establish initial state
 
 		if( !isis::data::_internal::transformCoords( *this, getSizeAsVector(), transform_matrix, transformCenterIsImageCenter ) ) {
 			LOG( Runtime, error ) << "Error during transforming the coords of the image.";
@@ -435,6 +450,7 @@ public:
 			return false;
 		}
 
+		deduplicateProperties();
 		return true;
 	}
 
@@ -474,13 +490,22 @@ public:
 	 * Copy all voxel data of the image into memory.
 	 * If neccessary a conversion into T is done using min/max of the image.
 	 */
-	template<typename T> void copyToMem( T *dst )const {
+	template<typename T> void copyToMem( T *dst, size_t len )const {
 		if( clean ) {
 			scaling_pair scale = getScalingTo( ValuePtr<T>::staticID );
 			// we could do this using convertToType - but this solution does not need any additional temporary memory
 			BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
-				if( !ref->copyToMem<T>( dst, scale ) ) {
+				const size_t cSize = ref->getSizeAsVector().product();
+
+				if( !ref->copyToMem<T>( dst, len, scale ) ) {
 					LOG( Runtime, error ) << "Failed to copy raw data of type " << ref->getTypeName() << " from image into memory of type " << ValuePtr<T>::staticName();
+				} else {
+					if( len < cSize ) {
+						LOG( Runtime, error ) << "Abborting copy, because there is no space left in the target";
+						break;
+					}
+
+					len -= cSize;
 				}
 
 				dst += ref->getVolume(); // increment the cursor
