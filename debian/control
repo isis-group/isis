@@ -8,13 +8,25 @@ Standards-Version: 3.9.2
 Homepage: https://github.com/isis-group
 Vcs-Browser: http://git.debian.org/?p=pkg-exppsy/isis.git
 Vcs-Git: git://git.debian.org/git/pkg-exppsy/isis.git
-XS-DM-Upload-Allowed: yes
+
+
+Package: libisis0
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: I/O framework for neuroimaging data
+ This framework aids access of and conversion between various established
+ neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
+ is extensible with plugins to add support for additional data formats.
+ .
+ This Package provides the core library needed by all applications that
+ are build upon ISIS.
 
 
 Package: libisis-plugins
 Section: libs
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: libisis0 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: data format plugins for the ISIS framework
  This framework aids access of and conversion between various established
  neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
@@ -28,7 +40,7 @@ Description: data format plugins for the ISIS framework
 Package: libisis-dev
 Section: libdevel
 Architecture: any
-Depends: libisis-plugins (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Depends: libisis0 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: I/O framework for neuroimaging data
  This framework aids access of and conversion between various established
  neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
@@ -40,7 +52,7 @@ Description: I/O framework for neuroimaging data
 Package: isis-utils
 Section: science
 Architecture: any
-Depends: libisis-plugins (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Depends: libisis0 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: utilities for the ISIS neuroimaging data I/O framework
  This framework aids access of and conversion between various established
  neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
