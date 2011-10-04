@@ -152,7 +152,7 @@ template<typename TARGET> std::list<TARGET> stringToList(
 	}
 
 	if ( ! postfix.empty() ) {
-		if ( postfix.str()[postfix.size()-1] != '$' )
+		if ( postfix.str()[postfix.size() - 1] != '$' )
 			postfix = boost::regex( postfix.str() + "$", postfix.flags() );
 
 		source = boost::regex_replace( source, postfix, "", boost::format_first_only | boost::match_default );

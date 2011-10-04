@@ -45,13 +45,16 @@ template<typename TYPE> struct __cast_to {
 };
 template<> struct __cast_to<uint8_t> { // we cannot lexical_cast to uint8_t - we'll get "characters" (1 => '1' == 49)
 	template<typename SOURCE> uint8_t operator()( Value<uint8_t>*, const SOURCE &value ) {
+		// lexical cast to unsigned short
+		const unsigned short val = boost::lexical_cast<unsigned short>( value );
+
 		// have to check by hand because the lexical cast will only check against unsigned short
-		if( value > std::numeric_limits<uint8_t>::max() ) {
+		if( val > std::numeric_limits<uint8_t>::max() ) {
 			throw boost::bad_lexical_cast( typeid( SOURCE ), typeid( uint8_t ) );
 		}
 
-		// lexical cast to unsigned short and then static_cast to uint8_t
-		return static_cast<uint8_t>( boost::lexical_cast<unsigned short>( value ) );
+		// and then static_cast to uint8_t
+		return static_cast<uint8_t>( val );
 	}
 	uint8_t operator()( Value<uint8_t> *, const uint8_t &value ) {
 		return value; //special version types are same - so just return the value
@@ -113,7 +116,7 @@ public:
 		if( is<T>() )
 			return castTo<T>();
 
-		Reference ret = copyToNewByID( Value<T>::staticID );
+		Reference ret = copyByID( Value<T>::staticID );
 
 		if ( ret.isEmpty() ) {
 			LOG( Debug, error )
@@ -159,11 +162,11 @@ public:
 	/// \returns true if and only if the types of this and second are equal and the values are equal
 	virtual bool operator==( const ValueBase &second )const = 0;
 
-	/// creates a copy of the stored value using a type referenced by its id
-	Reference copyToNewByID( unsigned short ID ) const;
+	/// creates a copy of the stored value using a type referenced by its ID
+	Reference copyByID( unsigned short ID ) const;
 
 	/**
-	 * Check if the stored value would also fit into another type referenced by its id
+	 * Check if the stored value would also fit into another type referenced by its ID
 	 * \returns true if the stored value would fit into the target type, false otherwise
 	 */
 	bool fitsInto( unsigned short ID ) const;

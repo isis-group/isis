@@ -39,7 +39,7 @@ template<class MODULE> class Log
 		boost::shared_ptr<util::_internal::MessageHandlerBase> &handle = Singletons::get < Log<MODULE>, INT_MAX - 1 > ().m_handle;
 		return handle;
 	}
-	Log(): m_handle( new DefaultMsgPrint( warning ) ) {}
+	Log(): m_handle( new DefaultMsgPrint( notice ) ) {}
 public:
 	template<class HANDLE_CLASS> static void enable( LogLevel enable ) {
 		setHandler( boost::shared_ptr<MessageHandlerBase>( enable ? new HANDLE_CLASS( enable ) : 0 ) );
@@ -63,9 +63,9 @@ public:
 	if(!MODULE::use);else isis::util::_internal::Log<MODULE>::enable<HANDLE_CLASS>(set)
 
 #define LOG(MODULE,LEVEL)\
-	if(!MODULE::use);else isis::util::_internal::Log<MODULE>::send(__FILE__,__PRETTY_FUNCTION__,__LINE__,LEVEL)
+	if(!MODULE::use);else isis::util::_internal::Log<MODULE>::send(__FILE__,__FUNCTION__,__LINE__,LEVEL)
 
 #define LOG_IF(PRED,MODULE,LEVEL)\
-	if(!(MODULE::use && (PRED)));else isis::util::_internal::Log<MODULE>::send(__FILE__,__PRETTY_FUNCTION__,__LINE__,LEVEL)
+	if(!(MODULE::use && (PRED)));else isis::util::_internal::Log<MODULE>::send(__FILE__,__FUNCTION__,__LINE__,LEVEL)
 
 #endif

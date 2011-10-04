@@ -18,6 +18,7 @@
 #include "color.hpp"
 #include "selection.hpp"
 
+#include <complex>
 
 namespace isis
 {
@@ -33,28 +34,31 @@ namespace _internal
 {
 
 /// the supported types as mpl-vector
-typedef boost::mpl::vector23 < //increase this if a type is added (if >30 consider including vector40 above)
-bool
-, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t
-, float, double
-, color24, color48
-, fvector4, dvector4, ivector4
-, ilist, dlist, slist
-, std::string, isis::util::Selection
-, boost::posix_time::ptime, boost::gregorian::date
+typedef boost::mpl::vector25 < //increase this if a type is added (if >30 consider including vector40 above)
+bool //1
+, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t // 9
+, float, double // 11
+, color24, color48 // 13
+, fvector4, dvector4, ivector4 // 16
+, ilist, dlist, slist // 19
+, std::string, isis::util::Selection //21
+, std::complex<float>, std::complex<double> //23
+, boost::posix_time::ptime, boost::gregorian::date //25
 > types;
 
 /**
  * Templated pseudo struct to generate the ID of a supported type.
  * The ID is stored in TypeID\<T\>::value.
- * The ID is the position of the type in the mpl::vector types, starting with 1 (so there is no id==0)
+ * The ID is the position of the type in the mpl::vector types, starting with 1 (so there is no ID==0)
  * This is a compile-time-constant, so it can be used as a template parameter and has no impact at the runtime.
  */
 template<class T> struct TypeID {
 	typedef boost::mpl::plus <
 	boost::mpl::int_<1>,
-		  typename boost::mpl::distance < boost::mpl::begin<types>::type,
-		  typename boost::mpl::find<types, T>::type >::type
+		  typename boost::mpl::distance <
+		  boost::mpl::begin<types>::type,
+		  typename boost::mpl::find<types, T>::type
+		  >::type
 		  > type;
 	static const unsigned short value = type::value;
 };

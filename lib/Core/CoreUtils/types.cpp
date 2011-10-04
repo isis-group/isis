@@ -19,6 +19,7 @@
 #include "type.hpp"
 #include "../DataStorage/typeptr.hpp"
 #include "types.hpp"
+#include <complex>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/mpl/for_each.hpp>
 #include <boost/foreach.hpp>
@@ -66,6 +67,9 @@ DEF_TYPE( ilist, list<int32_t> );
 DEF_TYPE( dlist, list<double> );
 DEF_TYPE( slist, list<string> );
 
+DEF_TYPE( std::complex<float>, complex<float> );
+DEF_TYPE( std::complex<double>, complex<double> );
+
 DEF_TYPE( std::string, string );
 DEF_TYPE( Selection, selection );
 DEF_TYPE( boost::posix_time::ptime, timestamp );
@@ -78,7 +82,7 @@ struct type_lister {
 	bool m_withValues, m_withValuePtrs;
 	type_lister( std::map< unsigned short, std::string > &map, bool withValues, bool withValuePtrs ): m_map( map ), m_withValues( withValues ), m_withValuePtrs( withValuePtrs ) {}
 	template<typename SRC> void operator()( SRC ) {//will be called by the mpl::for_each
-		if( m_withValues )m_map.insert( std::make_pair( Value<SRC>::staticID, Value<SRC>::staticName() ) );
+		if( m_withValues )m_map.insert( std::make_pair( util::Value<SRC>::staticID, util::Value<SRC>::staticName() ) );
 
 		if( m_withValuePtrs )m_map.insert( std::make_pair( data::ValuePtr<SRC>::staticID, data::ValuePtr<SRC>::staticName() ) );
 	}

@@ -18,6 +18,7 @@
 #include <ctime>
 #include <list>
 #include <iostream>
+#define BOOST_FILESYSTEM_VERSION 2 //@todo switch to 3 as soon as we drop support for boost < 1.44
 #include <boost/filesystem/path.hpp>
 #include <boost/weak_ptr.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
@@ -28,7 +29,7 @@ namespace isis
  *  Additional documentation for group `mygrp'
  *  @{
  */
-enum LogLevel {error = 1, warning, info, verbose_info};
+enum LogLevel {error = 1, warning, notice, info, verbose_info};
 namespace util
 {
 

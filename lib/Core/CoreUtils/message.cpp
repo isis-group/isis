@@ -14,6 +14,7 @@
 #include "common.hpp"
 #include <sys/types.h>
 
+#define BOOST_FILESYSTEM_VERSION 2 //@todo switch to 3 as soon as we drop support for boost < 1.44
 #include <boost/filesystem/path.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp> //we need the to_string functions for the automatic conversion
 
@@ -34,6 +35,8 @@ const char *logLevelNames( LogLevel level )
 		return "error";
 	case warning:
 		return "warning";
+	case notice:
+		return "notice";
 	case info:
 		return "info";
 	case verbose_info:
@@ -111,7 +114,7 @@ std::string Message::merge()const
 	found = 0;
 
 	while ( ( found = ret.find( "{s}", found ) ) != std::string::npos )
-		ret.replace( found, 3, std::string( "\"" ) + *( subj++ ) + "\"" );
+		ret.replace( found, 3, std::string( "\"" ) + * ( subj++ ) + "\"" );
 
 	return ret;
 }

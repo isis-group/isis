@@ -65,7 +65,7 @@ public:
 	 * </ul>
 	 *
 	 */
-	std::string dialects( const std::string &filename )const {return std::string( "functional map anatomical" );}
+	std::string dialects( const std::string &/*filename*/ )const {return std::string( "functional map anatomical" );}
 	int load( std::list<data::Chunk> &chunks, const std::string &filename,
 			  const std::string &dialect ) throw( std::runtime_error & );
 	void write( const data::Image &image, const std::string &filename,
@@ -110,7 +110,7 @@ private:
 			}
 
 			void operator()( void *p ) {
-				LOG( Debug, info ) << "Freeing VImage pointer";
+				LOG( Debug, info ) << "Freeing VImage pointer " << p;
 				VDestroyImage( m_image );
 			}
 		};
@@ -119,7 +119,7 @@ private:
 		 * This function copies all metadata from Vista image header attributes to
 		 * the corresponding fields in the target Vista image.
 		 * @param image The target chunk where all data will be copied to.
-		 * @oaram chunk The source image that provides the Vista metadata attributes.
+		 * @param chunk The source image that provides the Vista metadata attributes.
 		 */
 		void copyHeaderFromVista( const VImage &image, data::Chunk &chunk, bool functional ) {
 			// traverse through attribute list and set metadata
@@ -463,7 +463,7 @@ private:
 		 * Default constructor. Create a VistaChunk out of a vista image.
 		 */
 
-		VistaChunk( VImage image, const bool functional, size_t nslices = 0 ):
+		VistaChunk( VImage image, const bool functional, size_t /*nslices*/ = 0 ):
 			data::Chunk( static_cast<TYPE *>( image->data ), VImageDeleter( image ),
 						 VImageNColumns( image ), VImageNRows( image ), functional ? 1 : VImageNBands( image ), functional ? VImageNBands( image ) : 1 ) {
 			copyHeaderFromVista( image, *this, functional );

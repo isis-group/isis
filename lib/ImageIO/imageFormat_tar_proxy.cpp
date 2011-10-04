@@ -2,6 +2,7 @@
 #include "DataStorage/io_interface.h"
 #include <DataStorage/io_factory.hpp>
 #include <CoreUtils/tmpfile.hpp>
+#include <DataStorage/io_factory.hpp>
 
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -12,15 +13,8 @@
 #include <boost/lexical_cast.hpp>
 
 #include <tar.h>
-#include <fcntl.h>
-#include <sys/mman.h>
 #include <fstream>
-
-#ifdef HAVE_FALLOCATE
-#include <linux/falloc.h>
-#elif defined HAVE_POSIX_FALLOCATE
-#include <fcntl.h>
-#endif
+#include "DataStorage/fileptr.hpp"
 
 namespace isis
 {
@@ -29,7 +23,7 @@ namespace image_io
 
 /**
  * IO-Proxy handling tar files.
- * This might not work for OS with broken file handling (eg. Windows).
+ * \todo This might not work for OS with broken file handling (eg. Windows).
  */
 class ImageFormat_TarProxy: public FileFormat
 {
@@ -83,18 +77,17 @@ protected:
 		return std::string( "tar tar.gz tgz tar.bz2 tbz tar.Z taz" );
 	}
 public:
-	std::string dialects( const std::string &filename )const {
-		/*      if( filename.isEmpty() ) {*/
-		return std::string();
-		/*      } else {
-		            std::set<std::string> ret;
-		            data::IOFactory::FileFormatList formats = data::IOFactory::get().getFormatInterface( FileFormat::makeBasename( filename ).first );
-		            BOOST_FOREACH( data::IOFactory::FileFormatList::const_reference ref, formats ) {
-		                const std::list<std::string> dias = util::stringToList<std::string>( ref->dialects( filename ) );
-		                ret.insert( dias.begin(), dias.end() );
-		            }
-		            return util::listToString( ret.begin(), ret.end(), ",", "", "" );
-		        }*/
+	std::string dialects( const std::string &/*filename*/ )const {
+
+		std::list<util::istring> suffixes;
+		BOOST_FOREACH( data::IOFactory::FileFormatPtr format, data::IOFactory::getFormats() ) {
+			const std::list<util::istring> s = format->getSuffixes();
+			suffixes.insert( suffixes.end(), s.begin(), s.end() );
+		}
+		suffixes.sort();
+		suffixes.unique();
+
+		return std::string( util::listToString( suffixes.begin(), suffixes.end(), " ", "", "" ) );
 	}
 	std::string getName()const {return "tar decompression proxy for other formats";}
 
@@ -142,57 +135,36 @@ public:
 
 			if( tar_header.typeflag == AREGTYPE || tar_header.typeflag == REGTYPE ) {
 
-				data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( org_file.file_string() ); // and get the reading pluging for that
+				data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( org_file.file_string(), dialect ); // and get the reading pluging for that
 
 				if( formats.empty() ) {
-					LOG( Runtime, info ) << "Skipping " << org_file << " from " << filename << " because no plugin was found to read it"; // skip if we found none
+					LOG( Runtime, notice ) << "Skipping " << org_file << " from " << filename << " because no plugin was found to read it"; // skip if we found none
 				} else {
 					LOG( Debug, info ) << "Got " << org_file << " from " << filename << " there are " << formats.size() << " plugins which should be able to read it";
 
 					const std::pair<std::string, std::string> base = formats.front()->makeBasename( org_file.file_string() );//ask any of the plugins for the suffix
 					util::TmpFile tmpfile( "", base.second );//create a temporary file with this suffix
-					int mfile = open( tmpfile.file_string().c_str(), O_CREAT | O_RDWR, S_IRUSR | S_IWUSR );
 
-					if( mfile == -1 ) {
+					data::FilePtr mfile( tmpfile, size, true );
+
+					if( !mfile.good() ) {
 						throwSystemError( errno, std::string( "Failed to open temporary " ) + tmpfile.file_string() );
 					}
 
-					// set it to the given size - otherwise mmap will be very sad
-#ifdef HAVE_FALLOCATE
-					const int err = fallocate( mfile, FALLOC_FL_KEEP_SIZE, 0, size ); //fast preallocation using features of ome linux-filesystems
-#elif HAVE_POSIX_FALLOCATE
-					const int err = posix_fallocate( mfile, 0, size ); // slower posix compatible version
-#else
-					const int err = ( lseek( mfile, size - 1, SEEK_SET ) == size - 1 && ::write( mfile, " ", 1 ) ) ? 0 : errno; //workaround in case there is no fallocate
-#endif
+					LOG( Debug, info ) << "Mapped " << size << " bytes of " << mfile.getLength() << " at " << ( void * )&mfile[0];
 
-					if( err ) {
-						throwSystemError( err, std::string( "Failed grow " ) + tmpfile.file_string() + " to size " + boost::lexical_cast<std::string>( size ) );
-					}
-
-					char *mmem = ( char * )mmap( NULL, size, PROT_WRITE, MAP_SHARED, mfile, 0 ); //map it into memory
-
-					if( mmem == MAP_FAILED ) {
-						throwSystemError( errno, std::string( "Failed to map temporary " ) + tmpfile.file_string() + " into memory" );
-					}
-
-					LOG( Debug, info ) << "Mapped " << size << " bytes of " << tmpfile.file_string() << " at " << ( void * )mmem;
-
-					size_t red = boost::iostreams::read( in, mmem, size ); // read data from the stream into the mapped memory
+					size_t red = boost::iostreams::read( in, ( char * )&mfile[0], size ); // read data from the stream into the mapped memory
 					next_header_in -= red;
+					mfile.close(); //close and unmap the temporary file/mapped memory
 
 					if( red != size ) { // read the data from the stream
 						LOG( Runtime, warning ) << "Could not read all " << size << " bytes for " << tmpfile.file_string();
 					}
 
-					//unmap and close the file
-					munmap( mmem, size );
-					close( mfile );
-
 					// read the temporary file
 					std::list<data::Chunk>::iterator prev = chunks.end();
 					--prev;
-					ret += data::IOFactory::load( chunks, tmpfile.string(), "", dialect );
+					ret += data::IOFactory::load( chunks, tmpfile.string(), dialect );
 
 					for( ; prev != chunks.end(); ++prev ) { // set the source property of the red chunks to something more usefull
 						prev->setPropertyAs( "source", ( boost::filesystem::path( filename ) / org_file ).file_string() );
@@ -208,7 +180,7 @@ public:
 		return ret;
 	}
 
-	void write( const data::Image &image, const std::string &filename, const std::string &dialect )throw( std::runtime_error & ) {
+	void write( const data::Image &/*image*/, const std::string &/*filename*/, const std::string &/*dialect*/ )throw( std::runtime_error & ) {
 		throw( std::runtime_error( "Writing to tar is not (yet) implemented" ) );
 	}
 	bool tainted()const {return false;}//internal plugins are not tainted

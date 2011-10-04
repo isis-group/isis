@@ -20,10 +20,11 @@ namespace python
 // helper class PropertyMap
 class _PropertyMap : public PropertyMap, boost::python::wrapper< PropertyMap >
 {
+
 public:
 	_PropertyMap () : boost::python::wrapper< PropertyMap >() {}
-	_PropertyMap ( PyObject *p ) : self( p ), boost::python::wrapper< PropertyMap >() {}
-	_PropertyMap ( PyObject *p, const PropertyMap &base ) : PropertyMap( base ), self( p ), boost::python::wrapper< PropertyMap >() {}
+	_PropertyMap ( PyObject *p ) : boost::python::wrapper< PropertyMap >(), self( p ) {}
+	_PropertyMap ( PyObject *p, const PropertyMap &base ) : PropertyMap( base ), boost::python::wrapper< PropertyMap >(), self( p ) {}
 
 	isis::util::PropertyMap _branch ( const util::istring &key ) {
 		return this->branch( key );
@@ -62,7 +63,7 @@ private:
 	template<typename TYPE>
 	void internSetProperty ( const util::istring key, PyObject *value, std::string type ) {
 		util::Value<TYPE> val( static_cast<TYPE>( boost::python::extract<TYPE>( value ) ) );
-		val.copyToNewByID( util::getTransposedTypeMap( true, true )[type] );
+		val.copyByID( util::getTransposedTypeMap( true, true )[type] );
 		this->setPropertyAs<TYPE>( key, val );
 	}
 };

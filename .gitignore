@@ -1,6 +1,8 @@
 *~
 *.kdev4
+*.xcode
 files
+.kdev_include_paths
 *.log
 *.substvars
 # cmake build dirs
@@ -100,3 +102,4 @@ local.properties
 TAGS
 tags
 BROWSE
+*.orig

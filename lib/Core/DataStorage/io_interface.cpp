@@ -3,6 +3,7 @@
 #endif
 
 #include <boost/foreach.hpp>
+#define BOOST_FILESYSTEM_VERSION 2 //@todo switch to 3 as soon as we drop support for boost < 1.44
 #include <boost/filesystem.hpp>
 #include <iomanip>
 #include <iostream>
@@ -26,7 +27,7 @@ void FileFormat::write( const std::list<data::Image> &images, const std::string 
 	std::list<std::string>::const_iterator inames = names.begin();
 	BOOST_FOREACH( std::list<data::Image>::const_reference ref, images ) {
 		std::string uniquePath = *( inames++ );
-		LOG( Runtime, info )   << "Writing image to " <<  uniquePath;
+		LOG( Runtime, notice )   << "Writing image of size " << ref.getSizeAsVector() << " to " <<  uniquePath;
 
 		try {
 			write( ref, uniquePath, dialect );
@@ -75,7 +76,7 @@ std::pair< std::string, std::string > FileFormat::makeBasename( const std::strin
 		size_t at = ifilename.rfind( suffix );
 
 		if( at != ifilename.npos ) {
-			if( at && ifilename[at-1] == '.' )
+			if( at && ifilename[at - 1] == '.' )
 				at--;
 
 			return std::make_pair( filename.substr( 0, at ), filename.substr( at ) );

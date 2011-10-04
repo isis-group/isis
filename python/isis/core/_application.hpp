@@ -17,8 +17,8 @@ namespace python
 class _Application : public util::Application, boost::python::wrapper<util::Application>
 {
 public:
-	_Application( PyObject *p, const char name[] ) : util::Application( name ), self( p ), boost::python::wrapper<util::Application>() {}
-	_Application( PyObject *p, const util::Application &base ) : util::Application( base ), self( p ), boost::python::wrapper<util::Application>() {}
+	_Application( PyObject *p, const char name[] ) : util::Application( name ), boost::python::wrapper<util::Application>(), self( p ) {}
+	_Application( PyObject *p, const util::Application &base ) : util::Application( base ), boost::python::wrapper<util::Application>(), self( p ) {}
 
 	//wrapper function to convert a python list into a **char
 	virtual bool init( int argc, boost::python::list pyargv, bool exitOnError = true ) {
@@ -74,7 +74,7 @@ private:
 	template<typename TYPE>
 	void internAddParameter ( const std::string name, PyObject *value, std::string type ) {
 		util::Value<TYPE> val( static_cast<TYPE>( boost::python::extract<TYPE>( value ) ) );
-		val.copyToNewByID( util::getTransposedTypeMap( true, true )[type] );
+		val.copyByID( util::getTransposedTypeMap( true, true )[type] );
 		parameters[name] = val;
 		parameters[name].needed() = false;
 	}

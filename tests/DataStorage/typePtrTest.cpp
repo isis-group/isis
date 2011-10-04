@@ -9,7 +9,7 @@
 #define BOOST_TEST_MODULE ValuePtrTest
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
-#include "DataStorage/typeptr.hpp"
+#include <DataStorage/typeptr.hpp>
 #include <cmath>
 
 
@@ -55,8 +55,10 @@ BOOST_AUTO_TEST_CASE( ValuePtr_init_test )
 {
 	BOOST_CHECK( ! Deleter::deleted );
 	{
-		data::ValuePtr<int32_t> outer;
-		// default constructor must create an empty pointer
+		data::enableLog<util::DefaultMsgPrint>( error );
+		data::ValuePtr<int32_t> outer( 0 );
+		data::enableLog<util::DefaultMsgPrint>( warning );
+		// must create an empty pointer
 		BOOST_CHECK_EQUAL( outer.getLength(), 0 );
 		BOOST_CHECK( ! ( boost::shared_ptr<int32_t> )outer );
 		BOOST_CHECK_EQUAL( ( ( boost::shared_ptr<int32_t> )outer ).use_count(), 0 );
@@ -150,8 +152,6 @@ BOOST_AUTO_TEST_CASE( ValuePtr_splice_test )
 			//the shall be outer.size() references from the splices, plus one for the origin
 			BOOST_CHECK_EQUAL( dummy.use_count(), outer.size() + 1 );
 		}
-		boost::shared_ptr<int32_t> &dummy = outer.front()->castToValuePtr<int32_t>();
-
 		BOOST_CHECK_EQUAL( outer.front()->getLength(), 2 );// the first slices shall be of the size 2
 		BOOST_CHECK_EQUAL( outer.back()->getLength(), 1 );// the last slice shall be of the size 1 (5%2)
 		//we cannot ask for the use_count of the original because its hidden in DelProxy (outer[0].use_count will get the use_count of the splice)
@@ -165,7 +165,7 @@ BOOST_AUTO_TEST_CASE( ValuePtr_splice_test )
 BOOST_AUTO_TEST_CASE( ValuePtr_conv_scaling_test )
 {
 	const float init[] = { -2, -1.8, -1.5, -1.3, -0.6, -0.2, 2, 1.8, 1.5, 1.3, 0.6, 0.2};
-	data::ValuePtr<float> floatArray( ( float * )malloc( sizeof( float ) * 12 ), 12 );
+	data::ValuePtr<float> floatArray( 12 );
 
 	//scaling to itself should allways be 1/0
 	floatArray.copyFromMem( init, 12 );
@@ -187,14 +187,14 @@ BOOST_AUTO_TEST_CASE( ValuePtr_conv_scaling_test )
 BOOST_AUTO_TEST_CASE( ValuePtr_conversion_test )
 {
 	const float init[] = { -2, -1.8, -1.5, -1.3, -0.6, -0.2, 2, 1.8, 1.5, 1.3, 0.6, 0.2};
-	data::ValuePtr<float> floatArray( ( float * )malloc( sizeof( float ) * 12 ), 12 );
+	data::ValuePtr<float> floatArray( 12 );
 	//with automatic upscaling into integer
 	floatArray.copyFromMem( init, 12 );
 
 	for ( int i = 0; i < 12; i++ )
 		BOOST_REQUIRE_EQUAL( floatArray[i], init[i] );
 
-	data::ValuePtr<int32_t> intArray = floatArray.copyToNew<int32_t>();
+	data::ValuePtr<int32_t> intArray = floatArray.copyAs<int32_t>();
 	double scale = std::numeric_limits<int32_t>::max() / 2.;
 
 	for ( int i = 0; i < 12; i++ ) // Conversion from float to integer will scale up to maximum, to map the fraction as exact as possible
@@ -206,24 +206,56 @@ BOOST_AUTO_TEST_CASE( ValuePtr_conversion_test )
 	for ( int i = 0; i < 12; i++ )
 		floatArray[i] = init[i] * 1e5;
 
-	data::ValuePtr<short> shortArray = floatArray.copyToNew<short>();
-	data::ValuePtr<uint8_t> byteArray = shortArray.copyToNew<uint8_t>();
+	data::enableLog<util::DefaultMsgPrint>( error );
+	data::ValuePtr<short> shortArray = floatArray.copyAs<short>();
+	data::ValuePtr<uint8_t> byteArray = shortArray.copyAs<uint8_t>();
+	data::enableLog<util::DefaultMsgPrint>( warning );
 
 	for ( int i = 0; i < 12; i++ )
 		BOOST_CHECK_EQUAL( shortArray[i], ceil( init[i] * 1e5 * scale - .5 ) );
 
 	//with offset and scale
 	const double uscale = std::numeric_limits< unsigned short >::max() / 4e5;
-	data::ValuePtr<unsigned short> ushortArray = floatArray.copyToNew<unsigned short>();
+	data::enableLog<util::DefaultMsgPrint>( error );
+	data::ValuePtr<unsigned short> ushortArray = floatArray.copyAs<unsigned short>();
+	data::enableLog<util::DefaultMsgPrint>( warning );
+
 
 	for ( int i = 0; i < 12; i++ )
 		BOOST_CHECK_EQUAL( ushortArray[i], ceil( init[i] * 1e5 * uscale + 32767.5 - .5 ) );
 }
 
+BOOST_AUTO_TEST_CASE( ValuePtr_complex_conversion_test )
+{
+	const std::complex<float> init[] = { -2, -1.8, -1.5, -1.3, -0.6, -0.2, 2, 1.8, 1.5, 1.3, 0.6, 0.2};
+	data::ValuePtr<std::complex<float> > cfArray( 12 );
+	cfArray.copyFromMem( init, 12 );
+	data::ValuePtr<std::complex<double> > cdArray = cfArray.copyAs<std::complex<double> >();
+
+	for( size_t i = 0; i < 12; i++ ) {
+		BOOST_CHECK_EQUAL( cfArray[i], init[i] );
+		BOOST_CHECK_EQUAL( cdArray[i], std::complex<double>( init[i] ) );
+	}
+}
+
+BOOST_AUTO_TEST_CASE( ValuePtr_boolean_conversion_test )
+{
+	const float init[] = { -2, -1.8, -1.5, -1.3, -0.6, 0, 2, 1.8, 1.5, 1.3, 0.6, 0.2};
+	data::ValuePtr<float> cfArray( 12 );
+	cfArray.copyFromMem( init, 12 );
+	data::ValuePtr<bool> bArray = cfArray.copyAs<bool>();
+	data::ValuePtr<float> fArray = bArray.copyAs<float>();
+
+	for( size_t i = 0; i < 12; i++ ) {
+		BOOST_CHECK_EQUAL( bArray[i], ( bool )init[i] );
+		BOOST_CHECK_EQUAL( fArray[i], ( init[i] ? 1 : 0 ) );
+	}
+}
+
 BOOST_AUTO_TEST_CASE( ValuePtr_minmax_test )
 {
 	const float init[] = { -1.8, -1.5, -1.3, -0.6, -0.2, 1.8, 1.5, 1.3, 0.6, 0.2};
-	data::ValuePtr<float> floatArray( ( float * )malloc( sizeof( float ) * 10 ), 10 );
+	data::ValuePtr<float> floatArray( 10 );
 	//without scaling
 	floatArray.copyFromMem( init, 10 );
 	{
@@ -234,5 +266,37 @@ BOOST_AUTO_TEST_CASE( ValuePtr_minmax_test )
 		BOOST_CHECK_EQUAL( minmax.second->as<float>(), 1.8f );
 	}
 }
+
+template<typename T> void minMaxInt()
+{
+	data::ValuePtr<T> array( 1024 );
+	double div = static_cast<double>( RAND_MAX ) / std::numeric_limits<T>::max();
+
+	for( int i = 0; i < 1024; i++ )
+		array[i] = rand() / div;
+
+	array[40] = std::numeric_limits<T>::max();
+	array[42] = std::numeric_limits<T>::min();
+
+	std::pair<util::ValueReference, util::ValueReference> minmax = array.getMinMax();
+	BOOST_CHECK( minmax.first->is<T>() );
+	BOOST_CHECK( minmax.second->is<T>() );
+	BOOST_CHECK_EQUAL( minmax.first->as<T>(), std::numeric_limits<T>::min() );
+	BOOST_CHECK_EQUAL( minmax.second->as<T>(), std::numeric_limits<T>::max() );
+}
+BOOST_AUTO_TEST_CASE( ValuePtr_rnd_minmax_test )
+{
+	minMaxInt< uint8_t>();
+	minMaxInt<uint16_t>();
+	minMaxInt<uint32_t>();
+
+	minMaxInt< int8_t>();
+	minMaxInt<int16_t>();
+	minMaxInt<int32_t>();
+
+	minMaxInt< float>();
+	minMaxInt<double>();
+}
+
 }
 }

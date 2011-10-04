@@ -41,12 +41,12 @@ protected:
 	template<typename T> T &m_cast_to() {
 		LOG_IF( getTypeID() != T::staticID, Debug, error ) << "using " << getTypeName() << " at " << this << " as " << T::staticName() << " aborting ...";
 		assert( getTypeID() == T::staticID );
-		return *reinterpret_cast<T *>( this );
+		return *dynamic_cast<T *>( this );// @todo maybe Mac doesn't like that (http://www.cocoabuilder.com/archive/xcode/247376-rtti-dynamic-cast-across-shared-module-boundaries.html)
 	}
 	template<typename T> const T &m_cast_to()const {
 		LOG_IF( getTypeID() != T::staticID, Debug, error ) << "using " << getTypeName() << " at " << this << " as " << T::staticName() << " aborting ...";
 		assert( getTypeID() == T::staticID );
-		return *reinterpret_cast<const T *>( this );
+		return *dynamic_cast<const T *>( this );// @todo maybe Mac doesn't like that (http://www.cocoabuilder.com/archive/xcode/247376-rtti-dynamic-cast-across-shared-module-boundaries.html)
 	}
 
 public:
@@ -58,6 +58,12 @@ public:
 
 	/// \returns the ID of its actual type
 	virtual unsigned short getTypeID()const = 0;
+
+	/// \returns true if the type is a floating point scalar
+	virtual bool isFloat()const = 0;
+
+	/// \returns true if the type is a integral scalar
+	virtual bool isInteger()const = 0;
 
 	/// \returns true if type of this and second are equal
 	bool isSameType( const GenericValue &second )const;

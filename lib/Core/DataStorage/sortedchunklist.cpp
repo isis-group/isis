@@ -37,7 +37,7 @@ SortedChunkList::scalarPropCompare::scalarPropCompare( const util::PropertyMap::
 bool SortedChunkList::posCompare::operator()( const util::fvector4 &posA, const util::fvector4 &posB ) const
 {
 	if ( posA.lexical_less_reverse( posB ) ) { //if chunk is "under" the other - put it there
-		LOG( Debug, verbose_info ) << "Successfully sorted chunks by position (" << posA << " below " << posB << ")";
+		LOG( Debug, verbose_info ) << "Successfully sorted chunks by in-image position (" << posA << " below " << posB << ")";
 		return true;
 	}
 
@@ -120,21 +120,17 @@ std::pair<boost::shared_ptr<Chunk>, bool> SortedChunkList::primaryInsert( const 
 	// [ 0 0 0 1 ]
 	const util::fvector4 &rowVec = ch.propertyValue( "rowVec" )->castTo<util::fvector4>();
 	const util::fvector4 &columnVec = ch.propertyValue( "columnVec" )->castTo<util::fvector4>();
-	util::fvector4 sliceVec;
+	const util::fvector4 sliceVec = ch.hasProperty( "sliceVec" ) ?
+									ch.propertyValue( "sliceVec" )->castTo<util::fvector4>() :
+									util::fvector4(
+										rowVec[1] * columnVec[2] - rowVec[2] * columnVec[1],
+										rowVec[2] * columnVec[0] - rowVec[0] * columnVec[2],
+										rowVec[0] * columnVec[1] - rowVec[1] * columnVec[0]
+									);
 
-	if( ch.hasProperty( "sliceVec" ) )
-		sliceVec = ch.propertyValue( "sliceVec" )->castTo<util::fvector4>();
-	else {
-		sliceVec = util::fvector4(
-					   rowVec[1] * columnVec[2] - rowVec[2] * columnVec[1],
-					   rowVec[2] * columnVec[0] - rowVec[0] * columnVec[2],
-					   rowVec[0] * columnVec[1] - rowVec[1] * columnVec[0]
-				   );
-	}
-
-	const util::fvector4 key( origin.dot( rowVec ), origin.dot( columnVec ), origin.dot( sliceVec ), origin[3] );
 
 	// this is actually not the complete transform (it lacks the scaling for the voxel size), but its enough
+	const util::fvector4 key( origin.dot( rowVec ), origin.dot( columnVec ), origin.dot( sliceVec ), origin[3] );
 	const scalarPropCompare &secondaryComp = secondarySort.top();
 
 	// get the reference of the secondary map for "key" (create and insert a new if neccessary)
@@ -196,7 +192,7 @@ bool SortedChunkList::insert( const Chunk &ch )
 	std::pair<boost::shared_ptr<Chunk>, bool> inserted = primaryInsert( ch );
 
 	LOG_IF( inserted.first && !inserted.second, Debug, verbose_info )
-			<< "Not inserting chunk because there is allready a Chunk at the same position (" << ch.propertyValue( "indexOrigin" ) << ") with the equal property "
+			<< "Not inserting chunk because there is already a Chunk at the same position (" << ch.propertyValue( "indexOrigin" ) << ") with the equal property "
 			<< std::make_pair( prop2, ch.propertyValue( prop2 ) );
 
 	LOG_IF(
@@ -254,7 +250,7 @@ std::vector< boost::shared_ptr< Chunk > > SortedChunkList::getLookup()
 
 			for( size_t v = 0; v < vertical; v++, iS++ ) { // inner loop iterates verticaly (through the secondary sorting)
 				assert( iS != iP->second.end() );
-				ret[h+v *horizontal] = iS->second; // insert horizontally - primary sorting is the fastest running index (read the sorting matrix horizontaly)
+				ret[h + v *horizontal] = iS->second;  // insert horizontally - primary sorting is the fastest running index (read the sorting matrix horizontaly)
 			}
 		}
 

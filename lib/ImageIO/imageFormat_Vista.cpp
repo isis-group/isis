@@ -29,6 +29,8 @@
 #include <sstream>
 #include <algorithm>
 #include <viaio/option.h>
+#include <boost/mpl/if.hpp>
+#include <boost/type_traits/is_unsigned.hpp>
 
 namespace isis
 {
@@ -36,9 +38,17 @@ namespace isis
 namespace image_io
 {
 
+// unfortunately VBit is not clearly defined - so adapt to what the system thinks it is
+typedef boost::mpl::if_ <
+boost::is_unsigned<VBit>::type,
+	  uint8_t,
+	  int8_t
+	  >::type vista_bitmask_type;
+
+
 void
 ImageFormat_Vista::write( const data::Image &image,
-						  const std::string &filename, const std::string &dialect )
+						  const std::string &filename, const std::string &/*dialect*/ )
 throw( std::runtime_error & )
 {
 	LOG( Debug, info ) << "Writing image of size " << image.getSizeAsString() << " and type " << util::getTypeMap()[image.getMajorTypeID()] << " as vista";
@@ -58,6 +68,7 @@ throw( std::runtime_error & )
 		LOG( Runtime, info ) << "Writing a functional vista image, so falling back to representation short!";
 		data::TypedImage<VShort> shortImage( image );
 		shortImage.spliceDownTo( data::sliceDim );
+
 		vimages = ( VImage * )malloc( sizeof( VImage ) * dims[2] );
 		nimages = dims[2];
 		//we have to go through all slices and calculate the offset of the slicetimes
@@ -99,9 +110,9 @@ throw( std::runtime_error & )
 		// from the chunk since the chunks can have different types.
 		switch( image.getMajorTypeID() ) {
 			// VBit
-		case data::ValuePtr<VBit>::staticID:
+		case data::ValuePtr<bool>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VBitRepn );
-			copyImageToVista<uint8_t>( image, vimages[0] );
+			copyImageToVista<vista_bitmask_type>( image, vimages[0] );
 			break;
 			// VUByte
 		case data::ValuePtr<VUByte>::staticID:
@@ -404,7 +415,7 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 				// and voxel resolution. All chunks in the list splices are supposed
 				// to have the same index origin since they are from the same slice.
 				// get slice orientation of image
-				VAttrList attributes = VImageAttrList( vImageVector[nloaded-1] );
+				VAttrList attributes = VImageAttrList( vImageVector[nloaded - 1] );
 				VAttrListPosn posn;
 				val = NULL;
 
@@ -598,7 +609,7 @@ bool ImageFormat_Vista::switchHandle( VImage &image, std::list<data::Chunk> &chu
 {
 	switch( VPixelRepn( image ) ) {
 	case VBitRepn:
-		addChunk<uint8_t>( chunks, image );
+		addChunk<vista_bitmask_type>( chunks, image );
 		return true;
 		break;
 	case VUByteRepn:
@@ -890,7 +901,7 @@ template <typename T> bool ImageFormat_Vista::copyImageToVista( const data::Imag
 		for ( size_t y = 0; y < isize[1]; y += csize[1] ) {
 			for ( size_t x = 0; x < isize[0]; x += csize[0] ) {
 				data::Chunk ch = image.getChunkAs<T>( scale, x, y, z, 0 );
-				ch.getValuePtr<T>().copyToMem( 0, csize.product() - 1, &VPixel( vimage, z, y, x, T ) );
+				ch.getValuePtr<T>().copyToMem( &VPixel( vimage, z, y, x, T ), csize.product() );
 			}
 		}
 	}

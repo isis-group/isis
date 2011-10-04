@@ -171,7 +171,6 @@ endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ)
 # TAR proxy plugin
 ############################################################
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_TAR)
-  include(CheckFunctionExists)
   find_package(Boost REQUIRED COMPONENTS iostreams)
 
   add_library(isisImageFormat_tar_proxy SHARED imageFormat_tar_proxy.cpp)
@@ -179,11 +178,9 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_TAR)
   find_library(LIB_Z "z")
   find_library(LIB_BZ2 "bz2")
 
-  check_function_exists(fallocate HAVE_FALLOCATE)
   if(HAVE_FALLOCATE)
     set_target_properties(isisImageFormat_tar_proxy PROPERTIES COMPILE_DEFINITIONS HAVE_FALLOCATE)
   else(HAVE_FALLOCATE)
-    check_function_exists(posix_fallocate HAVE_POSIX_FALLOCATE)
     if(HAVE_POSIX_FALLOCATE)
       set_target_properties(isisImageFormat_tar_proxy PROPERTIES COMPILE_DEFINITIONS HAVE_POSIX_FALLOCATE)
     endif(HAVE_POSIX_FALLOCATE)

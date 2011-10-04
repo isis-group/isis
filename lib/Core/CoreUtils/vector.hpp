@@ -96,7 +96,19 @@ public:
 	void fill( const TYPE &val ) {
 		std::fill( CONTAINER::begin(), CONTAINER::end(), val );
 	}
+	size_t getBiggestVecElemAbs( ) const {
+		size_t biggestVecElem = 0;
+		TYPE tmpValue = 0;
 
+		for ( size_t vecElem = 0; vecElem < SIZE; vecElem++ ) {
+			if ( fabs( operator[]( vecElem ) ) > fabs( tmpValue ) ) {
+				biggestVecElem = vecElem;
+				tmpValue = operator[]( vecElem );
+			}
+		}
+
+		return biggestVecElem;
+	}
 	////////////////////////////////////////////////////////////////////////////////////
 	// Accessors
 	////////////////////////////////////////////////////////////////////////////////////
@@ -182,6 +194,19 @@ public:
 	this_class operator+( const TYPE &src )const {return binaryOp<std::plus<TYPE>       >( src );}
 	this_class operator*( const TYPE &src )const {return binaryOp<std::multiplies<TYPE> >( src );}
 	this_class operator/( const TYPE &src )const {return binaryOp<std::divides<TYPE>    >( src );}
+
+	////////////////////////////////////////////////////////////////////////////////////
+	// applying Arithmetic operations
+	////////////////////////////////////////////////////////////////////////////////////
+	this_class operator-=( const this_class &src ) {return *this = *this - src;}
+	this_class operator+=( const this_class &src ) {return *this = *this + src;}
+	this_class operator*=( const this_class &src ) {return *this = *this * src;}
+	this_class operator/=( const this_class &src ) {return *this = *this / src;}
+
+	this_class operator-=( const TYPE &src ) {return *this = *this - src;}
+	this_class operator+=( const TYPE &src ) {return *this = *this + src;}
+	this_class operator*=( const TYPE &src ) {return *this = *this * src;}
+	this_class operator/=( const TYPE &src ) {return *this = *this / src;}
 
 	///\returns a negated copy
 	const this_class negate()const {

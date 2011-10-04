@@ -19,6 +19,7 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include <boost/regex.hpp>
+#define BOOST_FILESYSTEM_VERSION 2 //@todo switch to 3 as soon as we drop support for boost < 1.44
 #include <boost/filesystem.hpp>
 
 #include "io_interface.h"
@@ -39,7 +40,7 @@ public:
 	typedef boost::shared_ptr< ::isis::image_io::FileFormat> FileFormatPtr;
 	typedef std::list<FileFormatPtr> FileFormatList;
 private:
-	util::ProgressFeedback *m_feedback;
+	boost::shared_ptr<util::ProgressFeedback> m_feedback;
 public:
 	/**
 	 * Load a data file with given filename and dialect.
@@ -58,14 +59,22 @@ public:
 	 * @param dialect dialect of the fileformat to load
 	 * @return list of chunks (part of an image)
 	 */
-	static int load( std::list<data::Chunk> &chunks, const std::string &path, std::string suffix_override = "", std::string dialect = "" );
+	static size_t load( std::list<data::Chunk> &chunks, const std::string &path, std::string suffix_override = "", std::string dialect = "" );
 
 	static bool write( const data::Image &image, const std::string &path, std::string suffix_override, const std::string &dialect );
 	static bool write( std::list<data::Image> images, const std::string &path, std::string suffix_override, const std::string &dialect );
 
+	/// Get a list of all known file-formats (aka. io-plugins loaded)
 	static FileFormatList getFormats();
 
-	static void setProgressFeedback( util::ProgressFeedback *feedback );
+	static void setProgressFeedback( boost::shared_ptr<util::ProgressFeedback> feedback );
+
+	/**
+	 * Get all formats which should be able to read/write the given file.
+	 * \param filename the file which should be red/written
+	 * \param suffix_override if given, it will override the suffix of the given file (and thus enforce usage of a format)
+	 * \param dialect if given, the plugins supporting the dialect are preferred
+	 */
 	static FileFormatList getFileFormatList( std::string filename, std::string suffix_override = "", std::string dialect = "" );
 	/**
 	 *  Make images out of a (unordered) list of chunks.
@@ -76,8 +85,8 @@ public:
 	 */
 	static std::list<data::Image> chunkListToImageList( std::list<Chunk> &chunks );
 protected:
-	int loadFile( std::list<Chunk> &ret, const boost::filesystem::path &filename, std::string suffix_override, std::string dialect );
-	int loadPath( std::list<Chunk> &ret, const boost::filesystem::path &path, std::string suffix_override, std::string dialect );
+	size_t loadFile( std::list<Chunk> &ret, const boost::filesystem::path &filename, std::string suffix_override, std::string dialect );
+	size_t loadPath( std::list<Chunk> &ret, const boost::filesystem::path &path, std::string suffix_override, std::string dialect );
 
 	static IOFactory &get();
 	IOFactory();//shall not be created directly
