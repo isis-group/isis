@@ -32,43 +32,23 @@ namespace data
 
 namespace _internal
 {
-template<typename T, bool isNumber> struct getMinMaxImpl { // fallback for unsupportet types
+template<typename T, bool isNumber> struct getMinMaxImpl {
 	std::pair<T, T> operator()( const ValuePtr<T> &/*ref*/ ) const {
-		LOG( Debug, error ) << "min/max computation of " << util::Value<T>::staticName() << " is not supportet";
+		LOG( Debug, error ) << "min/max comparison of " << util::Value<T>::staticName() << " is not supportet";
 		return std::pair<T, T>();
 	}
 };
-template<typename T> std::pair<T, T> calcMinMax( const T *data, size_t len )
-{
-	std::pair<T, T> result( data[0], data[0] );
-	LOG( Runtime, verbose_info ) << "using generic min/max computation for " << util::Value<T>::staticName();
-
-	while ( --len ) {
-		if ( result.second < data[len] )result.second = data[len];
-
-		if ( result.first > data[len] )result.first = data[len];
-	}
-
-	return result;
-}
-
-#ifdef __SSE2__
-////////////////////////////////////////////////
-// specialize calcMinMax for (u)int(8,16,32)_t /
-////////////////////////////////////////////////
-
-template<> std::pair< uint8_t,  uint8_t> calcMinMax( const  uint8_t *data, size_t len );
-template<> std::pair<uint16_t, uint16_t> calcMinMax( const uint16_t *data, size_t len );
-template<> std::pair<uint32_t, uint32_t> calcMinMax( const uint32_t *data, size_t len );
-
-template<> std::pair< int8_t,  int8_t> calcMinMax( const  int8_t *data, size_t len );
-template<> std::pair<int16_t, int16_t> calcMinMax( const int16_t *data, size_t len );
-template<> std::pair<int32_t, int32_t> calcMinMax( const int32_t *data, size_t len );
-#endif //__SSE2__
-
-template<typename T> struct getMinMaxImpl<T, true> { // generic minmax for numbers (this _must_ not be run on empty ValuePtr)
+template<typename T> struct getMinMaxImpl<T, true> {
 	std::pair<T, T> operator()( const ValuePtr<T> &ref ) const {
-		return calcMinMax( &ref[0], ref.getLength() );
+		std::pair<T, T> result;
+
+		for ( size_t i = 0; i < ref.getLength(); i++ ) {
+			if ( result.second < ref[i] )result.second = ref[i];
+
+			if ( result.first > ref[i] )result.first = ref[i];
+		}
+
+		return result;
 	}
 };
 
@@ -136,16 +116,11 @@ public:
 		};
 	};
 	/**
-	 * Creates a ValuePtr pointing to a newly allocated array of elements of the given type.
-	 * The array is zero-initialized.
-	 * If the requested length is 0 no memory will be allocated and the pointer be "empty".
-	 * \param length amount of elements in the new array
+	 * Contructor for empty pointer.
+	 * length will be 0 and every attempt to dereference it will raise an exception.
 	 */
-	ValuePtr( size_t length ): _internal::ValuePtrBase( length ) {
-		if( length )
-			m_val.reset( ( TYPE * )calloc( length, sizeof( TYPE ) ), BasicDeleter() );
-
-		LOG_IF( length == 0, Debug, warning ) << "Creating an empty ValuePtr of type " << util::MSubject( staticName() ) << " you should overwrite it with a usefull pointer before using it";
+	ValuePtr() {
+		LOG( Debug, warning ) << "Creating an empty ValuePtr of type " << util::MSubject( staticName() ) << " you should overwrite it with a usefull pointer before using it";
 	}
 
 	/**
@@ -157,7 +132,8 @@ public:
 	 * \param length the length of the used array (ValuePtr does NOT check for length,
 	 * this is just here for child classes which may want to check)
 	 */
-	ValuePtr( TYPE *const ptr, size_t length ): _internal::ValuePtrBase( length ), m_val( ptr, BasicDeleter() ) {}
+	ValuePtr( TYPE *const ptr, size_t length ):
+		_internal::ValuePtrBase( length ), m_val( ptr, BasicDeleter() ) {}
 
 	/**
 	 * Creates ValuePtr from a pointer of type TYPE.
@@ -173,6 +149,15 @@ public:
 		_internal::ValuePtrBase( length ), m_val( ptr, d ) {}
 
 	virtual ~ValuePtr() {}
+
+	/**
+	 * Create a new ValuePtr which uses newly allocated memory.
+	 * \param len requested size of the memory block in elements
+	 * \returns a ValuePtr\<TYPE\> of given len
+	 */
+	static ValuePtr allocate( size_t len ) {
+		return ValuePtr( ( TYPE * )malloc( len * sizeof( TYPE ) ), len );
+	}
 
 	/**
 	 * Get the raw address the ValuePtr points to.
@@ -238,7 +223,7 @@ public:
 			for ( size_t i = 0; i < m_len - 1; i++ )
 				ret += util::Value<TYPE>( ptr[i] ).toString( false ) + "|";
 
-			ret += util::Value<TYPE>( ptr[m_len - 1] ).toString( labeled );
+			ret += util::Value<TYPE>( ptr[m_len-1] ).toString( labeled );
 		}
 
 		return boost::lexical_cast<std::string>( m_len ) + "#" + ret;
@@ -284,18 +269,15 @@ public:
 		return sizeof( TYPE );
 	}
 
-
-
 	std::pair<util::ValueReference, util::ValueReference> getMinMax()const {
 		if ( getLength() == 0 ) {
-			LOG( Debug, error ) << "Skipping computation of min/max on an empty ValuePtr";
-			return std::pair<util::ValueReference, util::ValueReference>();
-		} else {
-
-			const std::pair<util::Value<TYPE>, util::Value<TYPE> > result = _internal::getMinMaxImpl<TYPE, boost::is_arithmetic<TYPE>::value>()( *this );
-
-			return std::make_pair( util::ValueReference( result.first ), util::ValueReference( result.second ) );
+			LOG( Runtime, warning ) << "Skipping computation of min/max on an empty ValuePtr";
+			std::pair<util::ValueReference, util::ValueReference>();
 		}
+
+		const std::pair<util::Value<TYPE>, util::Value<TYPE> > result = _internal::getMinMaxImpl<TYPE, boost::is_arithmetic<TYPE>::value>()( *this );
+
+		return std::make_pair( util::ValueReference( result.first ), util::ValueReference( result.second ) );
 	}
 
 	std::vector<Reference> splice( size_t size )const {
@@ -323,16 +305,8 @@ public:
 		return ret;
 	}
 	//
-	scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const {
-		std::pair<util::ValueReference, util::ValueReference> minmax = getMinMax();
-		assert( ! ( minmax.first.isEmpty() || minmax.second.isEmpty() ) );
-		return ValuePtrBase::getScalingTo( typeID, minmax, scaleopt );
-	}
-};
 
-// specialisation for complex - there shall be no scaling - and we cannot compute minmax
-template<> scaling_pair ValuePtr<std::complex<float> >::getScalingTo( unsigned short /*typeID*/, autoscaleOption /*scaleopt*/ )const;
-template<> scaling_pair ValuePtr<std::complex<double> >::getScalingTo( unsigned short /*typeID*/, autoscaleOption /*scaleopt*/ )const;
+};
 
 template<typename T> bool _internal::ValuePtrBase::is()const
 {

@@ -1,6 +1,5 @@
 *~
 *.kdev4
-*.xcode
 files
 *.log
 *.substvars

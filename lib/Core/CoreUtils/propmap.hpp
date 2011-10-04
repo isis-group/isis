@@ -392,7 +392,6 @@ class treeNode
 	PropertyMap m_branch;
 	PropertyValue m_leaf;
 public:
-	treeNode() {} //c++0x wants it so
 	bool empty()const {
 		return m_branch.isEmpty() && m_leaf.isEmpty();
 	}

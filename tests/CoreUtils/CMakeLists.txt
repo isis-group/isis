@@ -30,15 +30,3 @@ target_link_libraries( singletonTest ${Boost_LIBRARIES} isis_core ${ISIS_LIB_DEP
 target_link_libraries( selectionTest ${Boost_LIBRARIES} isis_core ${ISIS_LIB_DEPENDS})
 target_link_libraries( istringTest ${Boost_LIBRARIES} isis_core ${ISIS_LIB_DEPENDS})
 
-############################################################
-# add ctest targets
-############################################################
-
-add_test(NAME propertyTest COMMAND propertyTest)
-add_test(NAME commonTest COMMAND commonTest)
-add_test(NAME typeTest COMMAND typeTest)
-add_test(NAME vectorTest COMMAND vectorTest)
-add_test(NAME propMapTest COMMAND propMapTest)
-add_test(NAME singletonTest COMMAND singletonTest)
-add_test(NAME selectionTest COMMAND selectionTest)
-add_test(NAME istringTest COMMAND istringTest)

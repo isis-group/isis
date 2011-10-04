@@ -77,7 +77,7 @@ public:
 	std::list<util::istring> getSuffixes()const;
 
 
-	/// \return a space separated list of the dialects the plugin supports
+	/// \return the dialects the plugin supports
 	virtual std::string dialects( const std::string &/*filename*/ )const {return std::string();};
 
 	/// \return if the plugin is not part of the official distribution

@@ -42,27 +42,4 @@ bool isis::qt4::QtApplication::init( int argc, char **argv, bool exitOnError )
 }
 
 
-isis::qt4::IOQtApplication::IOQtApplication( const char name[], bool have_input, bool have_output ):
-	IOApplication( name, have_input, have_output )
-{}
-
-QApplication &isis::qt4::IOQtApplication::getQApplication()
-{
-	LOG_IF( not m_qapp, util::Debug, error ) << "The QApplication was not yet created, you should run init() before using getQApplication.";
-	return *m_qapp;
-}
-
-bool isis::qt4::IOQtApplication::init( int argc, char **argv, bool exitOnError )
-{
-	if( m_qapp ) {
-		LOG( util::Debug, error ) << "The QApplication allready exists. This should not happen. I'll not touch it";
-	} else {
-		m_argc = argc;
-		m_argv = argv;
-		m_qapp.reset( new QApplication( m_argc, m_argv ) );
-	}
-
-	return isis::data::IOApplication::init( argc, argv, exitOnError );
-}
-
 

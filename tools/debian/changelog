@@ -1,0 +1,6 @@
+isis (0.2.0git312-0) unstable; urgency=low
+
+    * Initial Debian packaging attempt. This is the first version of
+      a ISIS utils debian package.
+
+ -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Wed, 12 Jan 2011 16:13:29 +0100

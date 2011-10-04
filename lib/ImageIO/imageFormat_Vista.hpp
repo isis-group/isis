@@ -110,7 +110,7 @@ private:
 			}
 
 			void operator()( void *p ) {
-				LOG( Debug, info ) << "Freeing VImage pointer " << p;
+				LOG( Debug, info ) << "Freeing VImage pointer";
 				VDestroyImage( m_image );
 			}
 		};
@@ -119,7 +119,7 @@ private:
 		 * This function copies all metadata from Vista image header attributes to
 		 * the corresponding fields in the target Vista image.
 		 * @param image The target chunk where all data will be copied to.
-		 * @param chunk The source image that provides the Vista metadata attributes.
+		 * @oaram chunk The source image that provides the Vista metadata attributes.
 		 */
 		void copyHeaderFromVista( const VImage &image, data::Chunk &chunk, bool functional ) {
 			// traverse through attribute list and set metadata

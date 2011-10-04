@@ -37,7 +37,6 @@ class ChunkBase : public NDimensional<4>, public util::PropertyMap
 {
 protected:
 	static const char *neededProperties;
-	ChunkBase() {}; //do not use this
 public:
 	//  static const dimensions dimension[n_dims]={rowDim,columnDim,sliceDim,timeDim};
 	typedef isis::util::_internal::ValueReference <ChunkBase > Reference;
@@ -47,13 +46,6 @@ public:
 };
 }
 
-/// Base class for operators used for foreachVoxel
-template <typename TYPE> class VoxelOp: std::unary_function<bool, TYPE>
-{
-public:
-	virtual bool operator()( TYPE &vox, const util::FixedVector<size_t, 4> &pos ) = 0;
-};
-
 /**
  * Main class for four-dimensional random-access data blocks.
  * Like in ValuePtr, the copy of a Chunk will reference the same data. (cheap copy)
@@ -62,7 +54,6 @@ public:
 class Chunk : public _internal::ChunkBase, protected ValuePtrReference
 {
 	friend class Image;
-	friend class std::vector<Chunk>;
 protected:
 	/**
 	 * Creates an data-block from existing data.
@@ -77,8 +68,12 @@ protected:
 		_internal::ChunkBase( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ),
 		util::_internal::ValueReference<_internal::ValuePtrBase>( new ValuePtr<TYPE>( src, getVolume(), d ) ) {}
 	Chunk( const ValuePtrReference &src, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 );
-	Chunk() {}; //do not use this
 public:
+	template <typename TYPE> class VoxelOp: std::unary_function<bool, TYPE>
+	{
+	public:
+		virtual bool operator()( TYPE &vox, const util::FixedVector<size_t, 4> &pos ) = 0;
+	};
 	/**
 	 * Gets a reference to the element at a given index.
 	 * If index is invalid, behaviour is undefined. Most probably it will crash.
@@ -87,7 +82,8 @@ public:
 	template<typename TYPE> TYPE &voxel( size_t nrOfColumns, size_t nrOfRows = 0, size_t nrOfSlices = 0, size_t nrOfTimesteps = 0 ) {
 		const size_t idx[] = {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps};
 		LOG_IF( ! isInRange( idx ), Debug, isis::error )
-				<< "Index " << util::FixedVector<size_t, 4>( idx ) << " is out of range " << getSizeAsString();
+				<< "Index " << util::ivector4( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps )
+				<< " is out of range " << getSizeAsString();
 		ValuePtr<TYPE> &ret = asValuePtr<TYPE>();
 		return ret[getLinearIndex( idx )];
 	}
@@ -234,27 +230,13 @@ public:
 	 *
 	 * <B>IMPORTANT!</B>: If you call this function with a matrix other than the
 	 * identidy matrix, it's not guaranteed that the image is still in ISIS space
-	 * according to the DICOM conventions. Maybe some ISIS algorithms that
+	 * according to the DICOM conventions. Eventuelly some ISIS algorithms that
 	 * depend on correct image orientations won't work as expected. Use this method
 	 * with caution!
 	 */
-	bool transformCoords( boost::numeric::ublas::matrix<float> transform_matrix, bool transformCenterIsImageCenter = false ) {
-		if( hasProperty( "rowVec" ) && hasProperty( "columnVec" ) && hasProperty( "sliceVec" )
-			&& hasProperty( "voxelSize" ) && hasProperty( "indexOrigin" ) ) {
-			if( !isis::data::_internal::transformCoords( *this, getSizeAsVector(), transform_matrix, transformCenterIsImageCenter ) ) {
-				LOG( Runtime, error ) << "Error during transforming the coords of the chunk.";
-				return false;
-			}
-
-			return true;
-		}
-
-		return true;
+	void transformCoords( boost::numeric::ublas::matrix<float> transform_matrix ) {
+		isis::data::_internal::transformCoords( *this, transform_matrix );
 	}
-	/**
-	  * Swaps the image along a dimension dim in image space.
-	  */
-	void swapAlong( const dimensions dim ) const;
 
 };
 
@@ -385,8 +367,6 @@ public:
 	MemChunkNonDel &operator=( const MemChunkNonDel<TYPE> &ref ) { //this is needed, to prevent generation of default-copy operator
 		return operator=( static_cast<const Chunk &>( ref ) );
 	}
-
-
 };
 }
 }

@@ -18,7 +18,6 @@
 #include "../CoreUtils/propmap.hpp"
 
 #include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/lu.hpp>
 
 namespace isis
 {
@@ -45,33 +44,12 @@ namespace data
 
 namespace _internal
 {
-using namespace boost::numeric::ublas;
-
-
-template <typename TYPE>
-bool inverseMatrix( const matrix<TYPE> &inMatrix, matrix<TYPE> &inverse )
-{
-	matrix<TYPE> A( inMatrix );
-	permutation_matrix<TYPE> pm( A.size1() );
-	int res = lu_factorize( A, pm );
-
-	if( res != 0 ) {
-		return false;
-	}
-
-	inverse.assign( identity_matrix<TYPE>( inMatrix.size1() ) );
-	lu_substitute( A, pm, inverse );
-	return true;
-}
-
-bool transformCoords( isis::util::PropertyMap &, const isis::util::FixedVector<size_t, 4> size, boost::numeric::ublas::matrix<float>, bool transformCenterIsImageCenter = false );
-
+void transformCoords( isis::util::PropertyMap &, boost::numeric::ublas::matrix<float> );
 }
 
 typedef DataLog Runtime;
 typedef DataDebug Debug;
 enum dimensions {rowDim = 0, columnDim, sliceDim, timeDim};
-enum scannerAxis { x = 0, y, z };
 
 /**
  * Set logging level for the namespace data.

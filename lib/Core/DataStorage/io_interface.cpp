@@ -3,7 +3,6 @@
 #endif
 
 #include <boost/foreach.hpp>
-#define BOOST_FILESYSTEM_VERSION 2 //@todo switch to 3 as soon as we drop support for boost < 1.44
 #include <boost/filesystem.hpp>
 #include <iomanip>
 #include <iostream>
@@ -76,7 +75,7 @@ std::pair< std::string, std::string > FileFormat::makeBasename( const std::strin
 		size_t at = ifilename.rfind( suffix );
 
 		if( at != ifilename.npos ) {
-			if( at && ifilename[at - 1] == '.' )
+			if( at && ifilename[at-1] == '.' )
 				at--;
 
 			return std::make_pair( filename.substr( 0, at ), filename.substr( at ) );

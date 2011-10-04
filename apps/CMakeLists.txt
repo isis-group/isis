@@ -13,7 +13,14 @@ include_directories(${CMAKE_SOURCE_DIR}/lib/Core)
 ############################################################
 # optional components
 ############################################################
+option(ISIS_APPS_VIEWER "Build the ISIS image viewer" OFF)
 option(ISIS_APPS_CALC "Build the ISIS image calculator" OFF)
+
+# isisViewer
+if(ISIS_APPS_VIEWER)
+  set(APPS isisViewer)
+  add_subdirectory(isisViewer)
+endif(ISIS_APPS_VIEWER)
 
 # isiscalc
 if(ISIS_APPS_CALC)

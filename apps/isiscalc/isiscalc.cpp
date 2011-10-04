@@ -1,11 +1,11 @@
 #include <DataStorage/io_application.hpp>
 #include <DataStorage/io_factory.hpp>
-#include <muParser.h>
+#include <muParser/muParser.h>
 
 
 using namespace isis;
 
-class VoxelOp : public data::VoxelOp<double>
+class VoxelOp : public data::Chunk::VoxelOp<double>
 {
 	mu::Parser parser;
 	double voxBuff;
@@ -23,7 +23,6 @@ public:
 		voxBuff = vox; //using parser.DefineVar every time would slow down the evaluation
 		posBuff = pos;
 		vox = parser.Eval();
-		return true;
 	}
 
 };

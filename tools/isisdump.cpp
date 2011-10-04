@@ -15,10 +15,7 @@ int main( int argc, char *argv[] )
 	app.parameters["chunks"].setDescription( "print detailed data about the chunks" );
 	app.init( argc, argv, false ); // if there is a problem, we just get no images and exit cleanly
 	unsigned short count1 = 0;
-
-	if( app.images.size() > 1 )
-		std::cout << "There are " << app.images.size() << " Images in the dataset." << std::endl;
-
+	std::cout << "Got " << app.images.size() << " Images" << std::endl;
 	const unsigned short imageDigits = std::log10( app.images.size() ) + 1;
 	std::cout.fill( '0' );
 	BOOST_FOREACH( data::Image & ref, app.images ) {
@@ -27,14 +24,11 @@ int main( int argc, char *argv[] )
 		int count2 = 0;
 
 		if( app.parameters["chunks"] ) {
-			std::vector<data::Chunk> chunks = ref.copyChunksToVector( false );
+			std::vector<boost::shared_ptr<data::Chunk> > chunks = ref.getChunksAsVector();
 			const unsigned short chunkDigits = std::log10( chunks.size() ) + 1;
-			BOOST_FOREACH( const data::Chunk & c, chunks ) {
-				std::cout
-						<< "======Image #" << std::setw( imageDigits )  << count1 << std::setw( 0 )
-						<< "==Chunk #" << std::setw( chunkDigits )  << ++count2 << std::setw( 0 ) << " "
-						<< c.getSizeAsString() << c.getTypeName() << "======Metadata======" << std::endl;
-				c.print( std::cout, true );
+			BOOST_FOREACH( const boost::shared_ptr<data::Chunk> &c, chunks ) {
+				std::cout << "======Image #" << std::setw( imageDigits )  << count1 << std::setw( 0 ) << "==Chunk #" << std::setw( chunkDigits )  << ++count2 << std::setw( 0 ) << " " << c->getSizeAsString() << c->getTypeName() << "======Metadata======" << std::endl;
+				c->print( std::cout, true );
 			}
 		}
 	}
