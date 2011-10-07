@@ -83,6 +83,7 @@ namespace isis
 						
 						//printf("byteSize: '%i'\n", byteSize);
 						dataBuffer = (char*)malloc(byteSize);
+                        memset(dataBuffer, 0, byteSize);
 						
 						// copy the first bit of data
 						memcpy(dataBuffer, (buffer + header_length), sizeof(buffer) - header_length);
@@ -100,34 +101,41 @@ namespace isis
 							printf("   imageNR: %d \n", image_counter);
 						} else {
 							// image complete
+                            
+                            // ... read out header for the data ...
+							/******************************/
+							
 							size_t width = atoi(getStringFromHeader("width", header).c_str());
 							bool moco = getStringFromHeader("motion_corrected", header).compare("yes") == 0 ? true : false;
 							size_t height = atoi(getStringFromHeader("height", header).c_str());
 							bool mosaic = getStringFromHeader("mosaic", header).compare("yes") == 0 ? true : false;
-							size_t iim = 1;
-							//printf("Header \n %s \n", header.c_str());
-							if ( true == mosaic){
+                            
+                            // Mosaics have to be handled special
+                            size_t iim = 1; //number of images in mosaic
+							size_t slices_in_row = 1;
+							size_t width_slice = width;
+							size_t height_slice = height;
+                            if ( true == mosaic){
 								iim = atoi(getStringFromHeader("images_in_mosaic", header).c_str());
+                                slices_in_row = static_cast<size_t> (ceil(sqrt(static_cast<double_t> (iim) )));
+                                // Mosaics are always quadratic, so don't bother 'bout only looking for the rows
+                                width_slice = width / slices_in_row;
+                                height_slice = height / slices_in_row;
 							}
 							
 							std::string data_type = getStringFromHeader("data_type", header);
-							
-							// Mosaics are always quadratic, so don't bother 'bout only looking for the rows
-							size_t slices_in_row = static_cast<size_t> (ceil(sqrt(static_cast<double_t> (iim) )));
-							size_t width_slice = width / slices_in_row;
-							size_t height_slice = height / slices_in_row;
 							
 							size_t acq_nr = atoi(getStringFromHeader("acquisition_number", header).c_str());
 							std::string seq_descr = getStringFromHeader("sequence_description", header);
 							std::string subject_name = getStringFromHeader("patient_name", header);
 							size_t subject_gender = atoi(getStringFromHeader("patient_sex", header).c_str());
-							size_t seq_number = atoi(getStringFromHeader("meas_uid", header).c_str());
+							uint16_t seq_number = atol(getStringFromHeader("meas_uid", header).c_str());
 							size_t acq_time = atoi(getStringFromHeader("acquisition_time", header).c_str());
 							uint16_t rep_time = atol(getStringFromHeader("repetition_time", header).c_str());
 							util::fvector4 read_vec = getVectorFromString(getStringFromHeader("read_vector", header));
 							util::fvector4 phase_vec = getVectorFromString(getStringFromHeader("phase_vector", header));
 							util::fvector4 slice_norm_vec = getVectorFromString(getStringFromHeader("slice_norm_vector", header));
-							size_t inplane_rot = atoi(getStringFromHeader("implane_rotation", header).c_str());
+							int16_t inplane_rot = atoi(getStringFromHeader("inplane_rotation", header).c_str());
 							std::string slice_orient = getStringFromHeader("slice_orientation", header);
 							
 							//Fallunterscheidung
@@ -149,108 +157,142 @@ namespace isis
 							size_t distFactor = atoi(getStringFromHeader("distance_factor", header).c_str());
 							util::fvector4 voxelGap(0, 0, slice_thickness*(distFactor/100));
 							
-							//*********
+							// ... copy the data ...
+							/******************************/
 							
 							image_counter++;
 							
 							memcpy(dataBuffer + data_received, buffer, byteSize - data_received);
 							data_received += byteSize - data_received;
 							
-							printf("!!! ByteSize: %d      dataRec: %ld       imageNR: %d\n", byteSize, data_received, image_counter);
+                            //							printf("!!! ByteSize: %d      dataRec: %ld       imageNR: %d\n", byteSize, data_received, image_counter);
 							
-							// ... do something ...
+							// ... create a chunk from data ...
 							/******************************/
+                            
+                            //divide for the data types
+                            unsigned short tID = 0;
+                            unsigned short tSize = 0;
+                            if ( 0 == data_type.compare("byte")){
+                                tID = data::ValuePtr<uint8_t>::staticID;
+                                tSize = sizeof(uint8_t);
+                                
+                            }
+                            else if ( 0 == data_type.compare("short")){
+                                tID = data::ValuePtr<uint16_t>::staticID;
+                                tSize = sizeof(uint16_t);
+                                
+                            }
+                            else if ( 0 == data_type.compare("long")){
+                                tID = data::ValuePtr<uint32_t>::staticID;
+                                tSize = sizeof(uint32_t);
+                                
+                            }
+                            else if ( 0 == data_type.compare("float")){
+                                tID = data::ValuePtr<float>::staticID;
+                                tSize = sizeof(float);
+                            }
+                            else{
+                                LOG( isis::image_io::Runtime, isis::error) << "Retrieving data over TCP/IP with an unknown datatype: " << tID;
+                                //TODO :REMOVE this
+                                printf("DATATYPE NOT SUPPORTED\n");
+                                free(dataBuffer);
+                                
+                                return 0;
+                            }
+                            
+                            
+                            isis::data::ValuePtrReference valPtrBuffer = isis::data::_internal::ValuePtrBase::createByID(tID, byteSize);
 							
-							if ( 0 == data_type.compare("short")){
-								//char slice_buffer[width_slice * height_slice * sizeof(short)];
-								char slice_buffer[iim * width_slice * height_slice * sizeof(short)];
-								
-								for(unsigned int _slice = 0; _slice < iim; _slice++) {
-									for(unsigned int _row = 0; _row < height_slice; _row++) {
-										char* line_start = dataBuffer + (sizeof(short) * (((_slice / slices_in_row) * (slices_in_row * height_slice * width_slice)) + 
-																						  (_row * width_slice * slices_in_row) + (_slice % slices_in_row * width_slice)));
-										
-										//             memcpy(slice_buffer + (_row * width_slice * sizeof(short)), line_start, (width_slice * sizeof(short)));
-										memcpy(slice_buffer + ( (_slice*width_slice*height_slice + _row * width_slice) * sizeof(short)), line_start, (width_slice * sizeof(short)));
-									}
-								}
-                                
-                                /********
-								 * get each slice position from header 
-								 */
-                                std::string slice_pos = "slice_position_0";
-                                //char buf[5];
-                                //sprintf(buf, "%i", _slice);
-                                //slice_pos.append(buf);
-                                util::fvector4 slice_pos_vec = getVectorFromString(getStringFromHeader(slice_pos, header));//(val1, val2, val3);
-                                //*********
-                                
-                                // now, create chunks per slice and feed it with metadata
-                                //data::Chunk chT(data::MemChunk<uint16_t>((uint16_t*)slice_buffer, height_slice,width_slice,1) );
-                                //data::Chunk chT(data::MemChunk<uint16_t>((uint16_t*)slice_buffer, height_slice,width_slice,iim) );
-                                data::Chunk ch(data::MemChunk<uint16_t>((uint16_t*)slice_buffer, height_slice, width_slice, iim) );
-								
-                                ch.convertToType(isis::data::ValuePtr<float>::staticID);
-								//data::MemChunk<float> ch(chT);
-                                ch.setPropertyAs("indexOrigin", slice_pos_vec);
-								// ch.setPropertyAs<uint32_t>("acquisitionNumber", (acq_nr*iim)+_slice);
-                                ch.setPropertyAs<uint32_t>("acquisitionNumber", (acq_nr));
-								ch.setPropertyAs<std::string>("subjectName", subject_name);
-								isis::util::Selection isisGender( "male,female,other" );
-								if ( 1 == subject_gender){
-									isisGender.set("male");
-								}
-								else if (2 == subject_gender){
-									isisGender.set("female");
-								}
-								else {
-									isisGender.set("other");
-								}
-								ch.setPropertyAs<isis::util::Selection>("subjectGender", isisGender);
-								
-                                //ch.setPropertyAs<>("acquisitionTime", acquisition_time);
-                                if (true == moco){
-                                    ch.setPropertyAs<uint16_t>("sequenceNumber", 0);
+                            char slice_buffer[iim * width_slice * height_slice * tSize];
+                            for(unsigned int _slice = 0; _slice < iim; _slice++) {
+                                for(unsigned int _row = 0; _row < height_slice; _row++) {
+                                    char* line_start = dataBuffer + (tSize * (((_slice / slices_in_row) * (slices_in_row * height_slice * width_slice)) + 
+                                                                              (_row * width_slice * slices_in_row) + (_slice % slices_in_row * width_slice)));
+                                    
+                                    //             memcpy(slice_buffer + (_row * width_slice * sizeof(short)), line_start, (width_slice * sizeof(short)));
+                                    memcpy(slice_buffer + ( (_slice*width_slice*height_slice + _row * width_slice) * tSize), line_start, (width_slice * tSize));
                                 }
-                                else {
-                                    ch.setPropertyAs<uint16_t>("sequenceNumber", 1);
-                                }
-                                ch.setPropertyAs<std::string>("sequenceDescription", seq_descr);
-                                
-								
-                                if ( 0 == InPlanePhaseEncodingDirection.compare(0, 3, "COL") ){
-                                    ch.setPropertyAs<util::fvector4>("rowVec", phase_vec);
-                                    ch.setPropertyAs<util::fvector4>("columnVec", read_vec);
-                                    ch.setPropertyAs<util::fvector4>("voxelSize", util::fvector4(fov_read/width_slice,fov_phase/height_slice,slice_thickness,0));
-                                }
-                                else {
-                                    ch.setPropertyAs<util::fvector4>("columnVec", phase_vec);
-                                    ch.setPropertyAs<util::fvector4>("rowVec", read_vec);
-                                    ch.setPropertyAs<util::fvector4>("voxelSize", util::fvector4(fov_phase/width_slice,fov_read/height_slice,slice_thickness,0));
-                                }
-								
-                                
-                                ch.setPropertyAs<util::fvector4>("sliceVec", slice_norm_vec);
-                                ch.setPropertyAs<uint16_t>("repetitionTime",rep_time);
-                                ch.setPropertyAs<std::string>("InPlanePhaseEncodingDirection",InPlanePhaseEncodingDirection);
-                                ch.setPropertyAs<util::fvector4>( "voxelGap", util::fvector4() );
-                                char nameForSource[80];
-                                struct tm* ptr;
-                                time_t lt;
-                                
-                                lt = time(NULL);
-                                ptr = localtime(&lt);
-                                
-                                std::string sn = boost::posix_time::to_simple_string(boost::posix_time::microsec_clock::local_time());
-                                //ptime microsec_clock boost::date_time
-                                strftime(nameForSource, 80, "%y%m%d_%H_%M_%S", ptr);
-                                ch.setPropertyAs<std::string>("source", sn);
-                                chunks.push_back(ch);
-								//}
-							}
-							else {
-								printf("DATATYPE NOT SUPPORTED\n");
-							}
+                            }
+                            
+                            /********
+                             * get each slice position from header 
+                             */
+                            std::string slice_pos = "slice_position_0";
+                            //char buf[5];
+                            //sprintf(buf, "%i", _slice);
+                            //slice_pos.append(buf);
+                            util::fvector4 slice_pos_vec = getVectorFromString(getStringFromHeader(slice_pos, header));//(val1, val2, val3);
+                            //*********
+                            
+                            // now, create a real chunk in memory and convert it to float data
+                            data::Chunk myChunk( valPtrBuffer, width_slice, height_slice, iim );    
+                            myChunk.convertToType(isis::data::ValuePtr<float>::staticID);
+                         
+                            // set all the general properties - i.e. feed the generated chunk with metadata
+                            
+                            myChunk.setPropertyAs("indexOrigin", slice_pos_vec);
+                            myChunk.setPropertyAs<uint32_t>("acquisitionNumber", (acq_nr));
+                            myChunk.setPropertyAs<std::string>("subjectName", subject_name);
+                            isis::util::Selection isisGender( "male,female,other" );
+                            if ( 1 == subject_gender){
+                                isisGender.set("male");
+                            }
+                            else if (2 == subject_gender){
+                                isisGender.set("female");
+                            }
+                            else {
+                                isisGender.set("other");
+                            }
+                            myChunk.setPropertyAs<isis::util::Selection>("subjectGender", isisGender);
+                            
+                            //myChunk.setPropertyAs<>("acquisitionTime", acquisition_time);
+                            if ((true == moco) && (true == mosaic)){
+                                myChunk.setPropertyAs<uint16_t>("sequenceNumber", seq_number + 10000); // This is to make the sequenceNumber unique - so it's a nasty assumption there won't be more than 10000 scans in one session
+                                myChunk.setPropertyAs<std::string>("DICOM/ImageType", "MOCO\\WAS_MOSAIC");
+                            }
+                            else if (true == mosaic)
+                            {
+                                myChunk.setPropertyAs<uint16_t>("sequenceNumber", seq_number);
+                                myChunk.setPropertyAs<std::string>("DICOM/ImageType", "WAS_MOSAIC");
+                            }
+                            else {
+                                myChunk.setPropertyAs<uint16_t>("sequenceNumber", seq_number);
+                                myChunk.setPropertyAs<std::string>("DICOM/ImageType", "");
+                            }
+                            
+                            myChunk.setPropertyAs<std::string>("sequenceDescription", seq_descr);
+                            
+                            if ( 0 == InPlanePhaseEncodingDirection.compare(0, 3, "COL") ){
+                                myChunk.setPropertyAs<util::fvector4>("rowVec", phase_vec);
+                                myChunk.setPropertyAs<util::fvector4>("columnVec", read_vec);
+                                myChunk.setPropertyAs<util::fvector4>("voxelSize", util::fvector4(fov_read/width_slice,fov_phase/height_slice,slice_thickness,0));
+                            }
+                            else {
+                                myChunk.setPropertyAs<util::fvector4>("columnVec", phase_vec);
+                                myChunk.setPropertyAs<util::fvector4>("rowVec", read_vec);
+                                myChunk.setPropertyAs<util::fvector4>("voxelSize", util::fvector4(fov_phase/width_slice,fov_read/height_slice,slice_thickness,0));
+                            }
+                            
+                            
+                            myChunk.setPropertyAs<util::fvector4>("sliceVec", slice_norm_vec);
+                            myChunk.setPropertyAs<uint16_t>("repetitionTime",rep_time);
+                            myChunk.setPropertyAs<std::string>("InPlanePhaseEncodingDirection",InPlanePhaseEncodingDirection);
+                            myChunk.setPropertyAs<util::fvector4>( "voxelGap", util::fvector4() );
+                            //                                char nameForSource[80];
+                            //                                struct tm* ptr;
+                            //                                time_t lt;
+                            
+                            //                                lt = time(NULL);
+                            //                                ptr = localtime(&lt);
+                            
+                            std::string sn = boost::posix_time::to_simple_string(boost::posix_time::microsec_clock::local_time());
+                            //ptime microsec_clock boost::date_time
+                            //                                strftime(nameForSource, 80, "%y%m%d_%H_%M_%S", ptr);
+                            myChunk.setPropertyAs<std::string>("source", sn);
+                            chunks.push_back(myChunk);
+                            //}
+							
 							
 							
 							
@@ -261,18 +303,18 @@ namespace isis
 							
 							// evaluate the sending timing
 							// TODO:: remove this stuff sometime
-							if (true == moco){
-								timestampPreviousMOCO = timestampCurrentMOCO;
-								timestampCurrentMOCO = atof(getStringFromHeader("time_stamp", header).c_str());
-								double_t diffTimestamps = (timestampCurrentMOCO - timestampPreviousMOCO);
-								fprintf(timediffMOCO, "%.6lf\n", diffTimestamps );
-							}
-							if (false == moco){
-								timestampPrevious = timestampCurrent;
-								timestampCurrent = atof(getStringFromHeader("time_stamp", header).c_str());
-								double_t diffTimestamps = (timestampCurrent - timestampPrevious);
-								fprintf(timediffRECO, "%.6lf\n", diffTimestamps );
-							}
+                            //							if (true == moco){
+                            //								timestampPreviousMOCO = timestampCurrentMOCO;
+                            //								timestampCurrentMOCO = atof(getStringFromHeader("time_stamp", header).c_str());
+                            //								double_t diffTimestamps = (timestampCurrentMOCO - timestampPreviousMOCO);
+                            //								fprintf(timediffMOCO, "%.6lf\n", diffTimestamps );
+                            //							}
+                            //							if (false == moco){
+                            //								timestampPrevious = timestampCurrent;
+                            //								timestampCurrent = atof(getStringFromHeader("time_stamp", header).c_str());
+                            //								double_t diffTimestamps = (timestampCurrent - timestampPrevious);
+                            //								fprintf(timediffRECO, "%.6lf\n", diffTimestamps );
+                            //							}
 							//time(&endTime);
 							//double_t diffTiming = difftime(endTime, startTime);
 							//printf("Time to create Image: %.2lf s\n", diffTiming);
@@ -293,8 +335,8 @@ namespace isis
 			
 			~ImageFormat_SiemensTcpIp()
 			{
-                fclose(timediffRECO);
-                fclose(timediffMOCO);
+                //                fclose(timediffRECO);
+                //                fclose(timediffMOCO);
 				//fclose(headerFile);
             }
 			
@@ -308,12 +350,12 @@ namespace isis
 			
 			static unsigned int receiver_address_length;
 			static bool firstHeaderArrived;
-            static double_t timestampPrevious;
-            static double_t timestampCurrent;
-            static double_t timestampPreviousMOCO;
-            static double_t timestampCurrentMOCO;
-            static FILE* timediffMOCO;
-            static FILE* timediffRECO;
+            //            static double_t timestampPrevious;
+            //            static double_t timestampCurrent;
+            //            static double_t timestampPreviousMOCO;
+            //            static double_t timestampCurrentMOCO;
+            ////            static FILE* timediffMOCO;
+            //            static FILE* timediffRECO;
 			//static FILE* headerFile;
             
 		private:
@@ -352,12 +394,12 @@ namespace isis
 		
 		unsigned int ImageFormat_SiemensTcpIp::receiver_address_length;
 		bool ImageFormat_SiemensTcpIp::firstHeaderArrived;
-        double_t ImageFormat_SiemensTcpIp::timestampCurrent;
-        double_t ImageFormat_SiemensTcpIp::timestampPrevious;
-        double_t ImageFormat_SiemensTcpIp::timestampCurrentMOCO;
-        double_t ImageFormat_SiemensTcpIp::timestampPreviousMOCO;
-        FILE* ImageFormat_SiemensTcpIp::timediffMOCO;
-        FILE* ImageFormat_SiemensTcpIp::timediffRECO;
+        //        double_t ImageFormat_SiemensTcpIp::timestampCurrent;
+        //        double_t ImageFormat_SiemensTcpIp::timestampPrevious;
+        //        double_t ImageFormat_SiemensTcpIp::timestampCurrentMOCO;
+        //        double_t ImageFormat_SiemensTcpIp::timestampPreviousMOCO;
+        //        FILE* ImageFormat_SiemensTcpIp::timediffMOCO;
+        //        FILE* ImageFormat_SiemensTcpIp::timediffRECO;
 		//FILE* ImageFormat_SiemensTcpIp::headerFile;
 		
 	}
@@ -380,27 +422,27 @@ isis::image_io::FileFormat *factory()
 	pluginRtExport->counter = 0;
 	pluginRtExport->image_counter = 0;
 	
-	pluginRtExport->timestampCurrent = 0;
-    pluginRtExport->timestampPrevious = 0;
-    pluginRtExport->timestampCurrentMOCO = 0;
-    pluginRtExport->timestampPreviousMOCO = 0;
+    //	pluginRtExport->timestampCurrent = 0;
+    //    pluginRtExport->timestampPrevious = 0;
+    //    pluginRtExport->timestampCurrentMOCO = 0;
+    //    pluginRtExport->timestampPreviousMOCO = 0;
 	
-	struct tm* ptr;
-	time_t lt;
-	char fnameMOCO[80];
-	char fnameRECO[80];
-	//char fnameHEADER[80];
-	lt = time(NULL);
-	ptr = localtime(&lt);
-	strftime(fnameMOCO, 80, "/tmp/timediffMOCO_%y%m%d_%H_%M_%S.txt", ptr);
-	strftime(fnameRECO, 80, "/tmp/timediffRECO_%y%m%d_%H_%M_%S.txt", ptr);
-	//strftime(fnameHEADER, 80, "/tmp/timediffHEADER_%y%m%d_%H_%M_%S.txt", ptr);
-    pluginRtExport->timediffMOCO = fopen(fnameMOCO, "w");
-	pluginRtExport->timediffRECO = fopen(fnameRECO, "w");
-	//pluginRtExport->headerFile = fopen(fnameHEADER, "w");
-	//Just a workaround to generate all the converters
-    isis::data::MemChunk<int32_t> test(2,3,4);
-    test.convertToType(isis::data::ValuePtr<float>::staticID);
+    //	struct tm* ptr;
+    //	time_t lt;
+    //	char fnameMOCO[80];
+    //	char fnameRECO[80];
+    //	//char fnameHEADER[80];
+    //	lt = time(NULL);
+    //	ptr = localtime(&lt);
+    //	strftime(fnameMOCO, 80, "/tmp/timediffMOCO_%y%m%d_%H_%M_%S.txt", ptr);
+    //	strftime(fnameRECO, 80, "/tmp/timediffRECO_%y%m%d_%H_%M_%S.txt", ptr);
+    //	//strftime(fnameHEADER, 80, "/tmp/timediffHEADER_%y%m%d_%H_%M_%S.txt", ptr);
+    //    pluginRtExport->timediffMOCO = fopen(fnameMOCO, "w");
+    //	pluginRtExport->timediffRECO = fopen(fnameRECO, "w");
+    //	//pluginRtExport->headerFile = fopen(fnameHEADER, "w");
+    //	//Just a workaround to generate all the converters
+    //    isis::data::MemChunk<int32_t> test(2,3,4);
+    //    test.convertToType(isis::data::ValuePtr<float>::staticID);
 	
 	return (isis::image_io::FileFormat*) pluginRtExport;
 }
