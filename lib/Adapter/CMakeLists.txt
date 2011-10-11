@@ -50,27 +50,6 @@ if(ISIS_QT4)
   set(ADAPTER_HDR_FILES ${ADAPTER_HDR_FILES} qt4/qtapplication.hpp)  
 endif(ISIS_QT4)
 
-if(ISIS_VTK)
-  # finde vtk
-  find_package(VTK REQUIRED)
-  include(${USE_VTK_FILE})
-  
-  # configure target
-  add_library(isisAdapter_vtk SHARED vtk/vtkAdapter.cpp)
-  target_link_libraries(isisAdapter_vtk isis_core)
-  set_target_properties(isisAdapter_vtk PROPERTIES 
-    LINK_FLAGS "--no-undefined"
-    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} 
-    INSTALL_RPATH_USE_LINK_PATH TRUE)
-
-  # configure install destination
-  install(TARGETS isisAdapter_vtk
-    LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib COMPONENT RuntimeLibraries)
-
-  # export header files
-  set(ADAPTER_HDR_FILES ${ADAPTER_HDR_FILES} vtk/vtkAdapter.hpp)  
-endif(ISIS_VTK)
-
 ############################################################
 # Install header and helper files
 ############################################################

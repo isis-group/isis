@@ -24,11 +24,11 @@
 #ifndef ITKADAPTER_HPP_
 #define ITKADAPTER_HPP_
 
-#include <DataStorage/image.hpp>
-#include <CoreUtils/log.hpp>
-#include <CoreUtils/common.hpp>
-#include <CoreUtils/vector.hpp>
-#include <DataStorage/numeric_convert.hpp>
+#include "DataStorage/image.hpp"
+#include "CoreUtils/log.hpp"
+#include "CoreUtils/common.hpp"
+#include "CoreUtils/vector.hpp"
+#include "DataStorage/numeric_convert.hpp"
 
 //external includes
 #include <boost/shared_ptr.hpp>
@@ -66,7 +66,7 @@ public:
 	  *  \returns an itk smartpointer on the itkImage object
 	  */
 	template<typename TImage> typename TImage::Pointer
-	makeItkImageObject( const boost::shared_ptr<data::Image> src, const bool behaveAsItkReader = true );
+	makeItkImageObject( const data::Image &src, const bool behaveAsItkReader = true );
 
 	/**
 	  * Converts an itk image object in an isis image object.
@@ -81,26 +81,26 @@ public:
 	  *  If set to false, orientation matrix will not be changed.
 	  *  \returns an isis::data::ImageList.
 	  */
-	template<typename TImage> data::ImageList
+	template<typename TImage> std::list<data::Image>
 	makeIsisImageObject( const typename TImage::Pointer src, const bool behaveAsItkWriter = true );
 
 protected:
 	//should not be loaded directly
-	itkAdapter( const boost::shared_ptr<data::Image> src ) : m_ImageISIS( *src ) {};
+	itkAdapter( const boost::shared_ptr<data::Image> src ) : m_ImageISIS( src ) {};
 	itkAdapter( const itkAdapter & ) {};
 
 private:
 
-	//  boost::shared_ptr<data::Image> m_ImageISIS;
-	data::Image m_ImageISIS;
+	boost::shared_ptr<data::Image> m_ImageISIS;
+// 	data::Image m_ImageISIS;
 	unsigned short m_TypeID;
-	std::vector< boost::shared_ptr<util::PropertyMap> > m_ChunkPropMapVector;
-	util::PropertyMap m_ImagePropMap;
+	std::vector< boost::shared_ptr<util::PropertyMap> > m_ChunkPropertyMapVector;
+	util::PropertyMap m_ImagePropertyMap;
 	size_t m_RelevantDim;
 
 	template<typename TInput, typename TOutput> typename TOutput::Pointer internCreateItk( const bool behaveAsItkReader );
 
-	template<typename TImageITK, typename TOutputISIS> data::ImageList internCreateISIS( const typename TImageITK::Pointer src, const bool behaveAsItkWriter );
+	template<typename TImageITK, typename TOutputISIS> std::list<data::Image> internCreateISIS( const typename TImageITK::Pointer src, const bool behaveAsItkWriter );
 };
 
 }

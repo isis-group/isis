@@ -29,7 +29,7 @@ configure_file(__init__.py
 message(STATUS 
   "Installing python modules to ${PYTHON_INSTALL_PATH}") 
 install(FILES __init__.py
-  DESTINATION ${PYTHON_INSTALL_PATH})
+  DESTINATION ${PYTHON_INSTALL_PATH}/isis)
 
 
 add_subdirectory(core)
