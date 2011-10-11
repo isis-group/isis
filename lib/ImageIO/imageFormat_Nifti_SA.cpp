@@ -150,8 +150,59 @@ protected:
 		LOG(Runtime,info) << util::Value<T>::staticName() <<  " is not supported by fsl falling back to " << util::Value<NEW_T>::staticName();
 		return util::Value<NEW_T>::staticID;
 	}
-	static uint8_t guessSliceOrdering(const data::Image img){}
-	static bool parseDescrip(util::PropertyMap &props, const char desc[]){
+	static void guessSliceOrdering(const data::Image img,char &slice_code, float &slice_duration){
+		std::list< util::PropertyValue > dummy=img.getChunksProperties("acquisitionNumber");
+		const std::vector< util::PropertyValue > acnums(dummy.begin(),dummy.end());
+
+		dummy=img.getChunksProperties("acquisitionTime");
+		const std::vector< util::PropertyValue > actimes(dummy.begin(),dummy.end());
+		
+		if(acnums.size()<=1){ // seems like there is only one chunk - slice ordering doesnt matter - just choose NIFTI_SLICE_SEQ_INC
+			slice_code=NIFTI_SLICE_SEQ_INC;
+		} else if(acnums[0].isEmpty()){
+			LOG(Runtime,error) << "There is no acquisitionNumber for the first chunk, assuming normal slice ordering.";
+			slice_code=NIFTI_SLICE_SEQ_INC;
+		} else {
+			const util::PropertyValue first=acnums.front();
+			const util::PropertyValue second=acnums[1];
+			const util::PropertyValue middle=acnums[acnums.size()/2+.5];
+			
+			if(first->gt(*second)){ // second slice has a lower number than the first => decrementing
+				if(middle->gt(*second)){ // if the middle number is greater than the second its interleaved
+					LOG(Runtime,info)
+						<< "The \"middle\" acquisitionNumber (" << middle.toString() << ") is greater than the second (" << second.toString()
+						<< ") assuming decrementing interleaved slice order";
+					slice_code=NIFTI_SLICE_ALT_DEC;
+				} else { // assume "normal" otherwise
+					LOG(Runtime,info)
+						<< "The first acquisitionNumber (" << first.toString() << ") is greater than the second (" << second.toString()
+						<< ") assuming decrementing slice order";
+					slice_code=NIFTI_SLICE_SEQ_DEC;
+				}
+			} else { // assume incrementing
+				if(middle->lt(*second)){ // if the middle number is less than the second ist interleaved
+					LOG(Runtime,info)
+						<< "The \"middle\" acquisitionNumber (" << middle.toString() << ") is less than the second (" << second.toString()
+						<< ") assuming incrementing interleaved slice order";
+					slice_code=NIFTI_SLICE_ALT_INC;
+				} else { // assume "normal" otherwise
+					LOG(Runtime,info)
+						<< "The first acquisitionNumber (" << first.toString() << ") is not greater than the second (" << second.toString()
+						<< ") assuming incrementing slice order";
+					slice_code=NIFTI_SLICE_SEQ_INC;
+				}
+			}
+		}
+
+		if(actimes.size()>1 && !actimes[1].isEmpty()){
+			slice_duration=fabs(actimes[1]->as<float>()-actimes[0]->as<float>());
+			if(slice_code==NIFTI_SLICE_SEQ_INC || slice_code==NIFTI_SLICE_SEQ_DEC){ // if its interleaved there was another slice between 0 and 1
+				slice_duration/=2;
+			}
+		}
+
+	}
+	static bool parseDescripForSPM(util::PropertyMap &props, const char desc[]){
 		//check description for tr, te and fa and date which is written by spm8
 		boost::regex descriptionRegex(
 			".*TR=([[:digit:]]{1,})ms.*TE=([[:digit:]]{1,})ms.*FA=([[:digit:]]{1,})deg\\ *([[:digit:]]{1,2}).([[:word:]]{3}).([[:digit:]]{4})\\ *([[:digit:]]{1,2}):([[:digit:]]{1,2}):([[:digit:]]{1,2}).*"
@@ -181,11 +232,48 @@ protected:
 		} else
 			return false;
 	}
-	static void propMap2Header(const util::PropertyMap &props,_internal::nifti_1_header *head){
+	static void storeHeader(const util::PropertyMap &props,_internal::nifti_1_header *head){
+		// implicit stuff
 		head->intent_code=0;
-		
+		head->slice_start=0;
+		head->slice_end=head->dim[3];
+
+		//in isis length is allways mm and time duration is allways msecs
+		head->xyzt_units=NIFTI_UNITS_MM|NIFTI_UNITS_MSEC;
+
+		//store description if there is one
+		if(props.hasProperty("sequenceDescription"))
+			strncpy(head->descrip,props.getPropertyAs<std::string>("sequenceDescription").c_str(),80);
+
+		// store niftis original sform if its there
+		if(props.hasProperty("nifti/sform_code")){
+			head->sform_code=props.getPropertyAs<short>("nifti/sform_code");
+			if(props.hasProperty("nifti/srow_x") && props.hasProperty("nifti/srow_y") && props.hasProperty("nifti/srow_z")){
+				props.getPropertyAs<util::fvector4>("nifti/srow_x").copyTo(head->srow_x);
+				props.getPropertyAs<util::fvector4>("nifti/srow_y").copyTo(head->srow_y);
+				props.getPropertyAs<util::fvector4>("nifti/srow_z").copyTo(head->srow_z);
+			}
+		}
+		// store niftis original qform if its there
+		if(props.hasProperty("nifti/qform_code")){
+			head->qform_code=props.getPropertyAs<short>("nifti/qform_code");
+			if( props.hasProperty("nifti/quatern_b") && props.hasProperty("nifti/quatern_c") && props.hasProperty("nifti/quatern_d") &&
+			    props.hasProperty("nifti/qoffset") && props.hasProperty("nifti/qfac")
+			){
+				const util::fvector4 offset=props.getPropertyAs<util::fvector4>("nifti/qoffset");
+				head->quatern_b = props.getPropertyAs<float>("nifti/quatern_b");
+				head->quatern_c = props.getPropertyAs<float>("nifti/quatern_c");
+				head->quatern_d = props.getPropertyAs<float>("nifti/quatern_d");
+				head->pixdim[0] = props.getPropertyAs<float>("nifti/qfac");
+				head->qoffset_x=offset[0];head->qoffset_y=offset[1];head->qoffset_z=offset[2];
+			}
+		}
+
+		//store current orientation (may override values set above)
+		if(!storeQForm(props,head)) //try to encode as quaternion
+			storeSForm(props,head); //fall back to normal matrix
 	}
-	static void header2PropMap(const _internal::nifti_1_header *head,data::Chunk &props){
+	static void parseHeader(const _internal::nifti_1_header *head,data::Chunk &props){
 		unsigned short dims=head->dim[0];
 		double time_fac=1;
 		double size_fac=1;
@@ -243,39 +331,41 @@ protected:
 
 		// set slice ordering
 		if(dims==3){
-			const int interl[]={0,1,-1};
-			switch(head->slice_code){
+			switch(head->slice_code){ //@todo check this
 				case 0:
 				case NIFTI_SLICE_SEQ_INC:
 					if(head->slice_duration){ // if there is no slice duration, and the sequence is "normal" there is no use in numbering
-						for(uint32_t i=0;i<head->dim[3];i++){
+						for(uint32_t i=0;i<head->dim[3];i++)
 							props.propertyValueAt("acquisitionNumber",i)=i;
-							props.propertyValueAt("acquisitionTime",  i)=i*head->slice_duration*time_fac;
-							}
 					} else {
 						props.propertyValue("acquisitionNumber")=0;
 					}
 					break;
 				case NIFTI_SLICE_SEQ_DEC:
-					for(uint32_t i=0;i<head->dim[3];i++){
+					for(uint32_t i=0;i<head->dim[3];i++)
 						props.propertyValueAt("acquisitionNumber",head->dim[3]-i-1)=i;
-						props.propertyValueAt("acquisitionTime",  head->dim[3]-i-1)=i*head->slice_duration*time_fac;
-					}
 					break;
-				case NIFTI_SLICE_ALT_INC:
-					for(uint32_t i=0;i<head->dim[3];i++){
-						props.propertyValueAt("acquisitionNumber",i)=i+interl[i%3];
-						props.propertyValueAt("acquisitionTime",  i)=(i+interl[i%3])*head->slice_duration*time_fac;
-					}
-					break;
-				case NIFTI_SLICE_ALT_DEC:
-					for(uint32_t i=0;i<head->dim[3];i++){
-						props.propertyValueAt("acquisitionNumber",head->dim[3]-i-1)=i+interl[i%3];
-						props.propertyValueAt("acquisitionTime",  head->dim[3]-i-1)=(i+interl[i%3])*head->slice_duration*time_fac;
-					}
-					break;
-
+				case NIFTI_SLICE_ALT_INC:{
+					uint32_t i=0,cnt;
+					for(cnt=0;i<floor(head->dim[3]/2+.5);i++,cnt+=2)
+						props.propertyValueAt("acquisitionNumber",i)=cnt;
+					for(cnt=1;i<head->dim[3];i++,cnt+=2)
+						props.propertyValueAt("acquisitionNumber",i)=cnt;
+					}break;
+				case NIFTI_SLICE_ALT_DEC:{
+					uint32_t i=0,cnt;
+					for(cnt=0;i<floor(head->dim[3]/2+.5);i++,cnt+=2)
+						props.propertyValueAt("acquisitionNumber",head->dim[3]-i-1)=cnt;
+					for(cnt=1;i<head->dim[3];i++,cnt+=2)
+						props.propertyValueAt("acquisitionNumber",head->dim[3]-i-1)=cnt;
+					}break;
 				default:LOG(Runtime,error) << "Unknown slice code " << util::MSubject(head->slice_code);break;
+			}
+
+			if(head->slice_duration ){
+				for(uint32_t i=0;i<head->dim[3];i++){
+					props.propertyValueAt("acquisitionTime",  i)=props.propertyValueAt("acquisitionNumber",i)->as<float>()*head->slice_duration*time_fac;
+				}
 			}
 		} else {
 			LOG_IF(head->slice_code,Runtime,warning) << "Sorry slice_code!=0 is currently only supportet for 3D-images, ignoring it.";
@@ -286,7 +376,7 @@ protected:
 			props.setPropertyAs<uint16_t>("repetitionTime",head->pixdim[4]*time_fac);
 
 		// sequenceDescription
-		if(!parseDescrip(props, head->descrip)) // if descrip dos not hold Te,Tr and stuff (SPM dialect)
+		if(!parseDescripForSPM(props, head->descrip)) // if descrip dos not hold Te,Tr and stuff (SPM dialect)
 			props.setPropertyAs<std::string>("sequenceDescription",head->descrip);// use it the usual way
 
 		// TODO: at the moment scaling not supported due to data type changes
@@ -325,7 +415,7 @@ public:
 			<< data->getTypeName() << "/" << header->bitpix <<  ")";
 
 		chunks.push_back(data::Chunk(data,size[0],size[1],size[2],size[3]));
-		header2PropMap(header,chunks.back());
+		parseHeader(header,chunks.back());
 
 		return 1;
 	}
@@ -359,14 +449,28 @@ public:
 		
 		const size_t datasize=image.getVolume()*bpv;
 		if(isis_type2nifti_type[target_id]){ // "normal types"
-		
+
+			// open/map the new file
 			data::FilePtr out(filename,datasize+384,true);
 
+			// get the first 384 bytes as header
 			_internal::nifti_1_header *header= reinterpret_cast<_internal::nifti_1_header*>(&out[0]);
 			memset(header,0,sizeof(_internal::nifti_1_header));
+
+			// set the datatype
 			header->sizeof_hdr=header->vox_offset=sizeof(_internal::nifti_1_header);
 			header->bitpix=bpv*8;
 			header->datatype=isis_type2nifti_type[target_id];
+
+			// store the image size in dim and fill up the rest with "1" (to prevent fsl from exploding)
+			header->dim[0]=image.getRelevantDims();
+			image.getSizeAsVector().copyTo(header->dim+1);
+			std::fill(header->dim+5,header->dim+8,1);
+
+			guessSliceOrdering(image,header->slice_code,header->slice_duration);
+
+			std::pair< float, float > minmax=image.getMinMaxAs<float>();
+			header->cal_min=minmax.first;header->cal_max=minmax.second;
 
 			CopyOp do_copy(image,out);
 			const_cast<data::Image&>( image).foreachChunk(do_copy); // @todo we _do_ need a const version of foreachChunk/Voxel
@@ -485,10 +589,11 @@ private:
 		props.transform<util::fvector4>("nifti/pixdim","voxelSize");
 		LOG(Debug,info)	<< "Computed voxelSize=" << props.getPropertyAs<util::fvector4>("voxelSize") << " from qform";
 	}
-	static void writeQForm(const util::PropertyMap &props,_internal::nifti_1_header *head){
+	static bool storeQForm(const util::PropertyMap &props,_internal::nifti_1_header *head){
 		
+		return true;
 	}
-	static void writeSForm(const util::PropertyMap &props,_internal::nifti_1_header *head){
+	static void storeSForm(const util::PropertyMap &props,_internal::nifti_1_header *head){
 
 	}
 };
