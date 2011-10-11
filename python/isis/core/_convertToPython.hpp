@@ -1,5 +1,5 @@
-#ifndef _TYPES_HPP
-#define _TYPES_HPP
+#ifndef CONVERTTOPYTHON_HPP
+#define CONVERTTOPYTHON_HPP
 
 
 #include <map>
@@ -17,9 +17,8 @@ namespace python {
 
 namespace _internal {
 	
-std::list<std::string> knownTypes = isis::util::stringToList<std::string>( "bool list str float double int ivector4 dvector4 fvector4 selection" );
-
-
+	
+	
 struct PyObjectGeneratorBase
 {
 	virtual api::object convert( util::_internal::ValueBase &value ) = 0;
@@ -133,9 +132,11 @@ std::map<unsigned short, boost::shared_ptr<PyObjectGeneratorBase> > typesMap;
 void createTypeMap() {
 	boost::mpl::for_each<util::_internal::types>( Generator( typesMap ) );
 }
-
-
+	
+	
+	
+	
 }}} // end namespace
 
-#endif
 
+#endif

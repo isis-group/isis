@@ -235,7 +235,7 @@ public:
 			return isis::data::MemImage<double>( *this );
 			break;
 		default:
-			LOG( Runtime, error ) << "Unregistered pixel type " << getTypeMap()[this->getMajorTypeID()] << ".";
+			LOG( Runtime, error ) << "Unregistered pixel type " << util::getTypeMap()[this->getMajorTypeID()] << ".";
 			return isis::data::MemImage<int8_t>( *this );
 		}
 	}
