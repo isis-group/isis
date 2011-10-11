@@ -285,7 +285,7 @@ std::list< Image > IOFactory::chunkListToImageList( std::list<Chunk> &src )
 
 		if ( buff.isClean() && buff.isValid() ) { //if the image was successfully indexed and is valid, keep it
 			ret.push_back( buff );
-			LOG( Runtime, info ) << "Image " << ret.size() << " with size " << buff.getSizeAsString() <<  " and value range " << buff.getMinMax() << " done.";
+			LOG( Runtime, info ) << "Image " << ret.size() << " with size " << buff.getSizeAsString() << " done.";
 		} else {
 			LOG_IF( !buff.getMissing().empty(), Runtime, error )
 					<< "Cannot insert image. Missing properties: " << buff.getMissing();
