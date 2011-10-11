@@ -41,7 +41,14 @@
 #define NIFTI_UNITS_HZ     32
 #define NIFTI_UNITS_PPM    40
 #define NIFTI_UNITS_RADS   48
-							   
+
+#define NIFTI_XFORM_UNKNOWN      0 /* Arbitrary coordinates (Method 1). */
+#define NIFTI_XFORM_SCANNER_ANAT 1 /* Scanner-based anatomical coordinates */
+#define NIFTI_XFORM_ALIGNED_ANAT 2 /* Coordinates aligned to another file's, or to anatomical "truth". */
+#define NIFTI_XFORM_TALAIRACH    3 /* Coordinates aligned to Talairach-Tournoux Atlas; (0,0,0)=AC, etc. */
+#define NIFTI_XFORM_MNI_152      4 /* MNI 152 normalized coordinates. */
+
+
 namespace isis
 {
 namespace image_io
@@ -269,6 +276,9 @@ protected:
 			}
 		}
 
+		//store voxel size
+		props.getPropertyAs<util::fvector4>("voxelSize").copyTo(head->pixdim+1);
+
 		//store current orientation (may override values set above)
 		if(!storeQForm(props,head)) //try to encode as quaternion
 			storeSForm(props,head); //fall back to normal matrix
@@ -456,6 +466,7 @@ public:
 			// get the first 384 bytes as header
 			_internal::nifti_1_header *header= reinterpret_cast<_internal::nifti_1_header*>(&out[0]);
 			memset(header,0,sizeof(_internal::nifti_1_header));
+			storeHeader(image,header);
 
 			// set the datatype
 			header->sizeof_hdr=header->vox_offset=sizeof(_internal::nifti_1_header);
@@ -590,6 +601,29 @@ private:
 		LOG(Debug,info)	<< "Computed voxelSize=" << props.getPropertyAs<util::fvector4>("voxelSize") << " from qform";
 	}
 	static bool storeQForm(const util::PropertyMap &props,_internal::nifti_1_header *head){
+		const util::Matrix4x4<float> image2isis=util::Matrix4x4<float>(
+			props.getPropertyAs<util::fvector4>("rowVec"),
+			props.getPropertyAs<util::fvector4>("columnVec"),
+			props.getPropertyAs<util::fvector4>("sliceVec")
+		).transpose();// the columns of the transform matrix are row-, slice- and
+
+		util::Matrix4x4<float> image2nifti=nifti2isis.transpose().dot(image2isis); // apply inverse transform from nifti to isis
+
+		const float a_square=1+image2nifti.elem(0,0)+image2nifti.elem(1,1)+image2nifti.elem(2,2);
+		if(a_square<=0) // fail if a is 0 or negative @todo implement special cases
+			return false;
+		
+		const float a = 0.5  * sqrt(a_square);
+		head->quatern_b = 0.25 * (image2nifti.elem(2,1)-image2nifti.elem(1,2)) / a;
+		head->quatern_c = 0.25 * (image2nifti.elem(0,2)-image2nifti.elem(2,0)) / a;
+		head->quatern_d = 0.25 * (image2nifti.elem(1,0)-image2nifti.elem(0,1)) / a;
+		head->qform_code=NIFTI_XFORM_SCANNER_ANAT;
+		head->pixdim[0]=1; //qfac to store "non-proper" transforms
+
+		const util::fvector4 nifti_offset=nifti2isis.transpose().dot(props.getPropertyAs<util::fvector4>("indexOrigin"));
+		head->qoffset_x=nifti_offset[0];
+		head->qoffset_y=nifti_offset[1];
+		head->qoffset_z=nifti_offset[2];
 		
 		return true;
 	}
