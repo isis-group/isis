@@ -40,10 +40,9 @@ BOOST_PYTHON_MODULE( _core )
 	.def( init<_PropertyMap>() )
 	.def( "hasProperty", &isis::util::PropertyMap::hasProperty )
 	.def( "hasBranch", &isis::util::PropertyMap::hasBranch )
-	.def( "branch", &_PropertyMap::_branch )
+	.def( "getBranch", &_PropertyMap::_branch )
 	.def( "remove", ( bool ( ::isis::util::PropertyMap:: * )( const isis::util::istring & ) ) ( &isis::util::PropertyMap::remove ), ( arg( "key" ) ) )
 	.def( "remove", ( bool ( ::isis::util::PropertyMap:: * )( const isis::util::PropertyMap &, bool ) ) ( &isis::util::PropertyMap::remove ), ( arg( "removeMap" ), arg( "keep_needed" ) ) )
-	.def( "propertyValue", &_PropertyMap::_propertyValue )
 	.def( "isValid", &isis::util::PropertyMap::isValid )
 	.def( "isEmpty", &isis::util::PropertyMap::isEmpty )
 	.def( "setProperty", &_PropertyMap::_setProperty )
@@ -76,5 +75,35 @@ BOOST_PYTHON_MODULE( _core )
 	.def( "__getitem__", &_Vector4<double>::getItem )
 	.def( init<>() )
 	;
+	//#######################################################################################
+	//  enums for types
+	//#######################################################################################
+	using namespace isis::python::_internal;
+	enum_<types>("types")
+	.value("INT8_T", INT8_T)
+	.value("UINT8_T", UINT8_T)
+	.value("INT16_T", INT16_T)
+	.value("UINT16_T",UINT16_T)
+	.value("INT32_T", INT32_T)
+	.value("UINT32_T", UINT32_T)
+	.value("INT64_T", INT64_T)
+	.value("UINT64_T", UINT64_T)
+	.value("FLOAT", FLOAT)
+	.value("DOUBLE", DOUBLE)
+	.value("FVECTOR4", FVECTOR4)
+	.value("IVECTOR4", IVECTOR4)
+	.value("DVECTOR4", DVECTOR4)
+	.value("ILIST", ILIST)
+	.value("SLIST", SLIST)
+	.value("DLIST", DLIST)
+	.value("STD_STRING", STDSTRING)
+	.value("STRING", STDSTRING)
+	.value("SELECTION", SELECTION)
+	.value("COMPLEX_FLOAT", COMPLEX_FLOAT)
+	.value("COMPLEX_DOUBLE", COMPLEX_DOUBLE)
+	.value("BOOST_PTIME", BOOST_PTIME)
+	.value("BOOST_DATE", BOOST_DATE)	
+	;
+
 }
 #endif
