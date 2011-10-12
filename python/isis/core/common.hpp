@@ -30,6 +30,7 @@ template<typename HANDLE> void enable_log( LogLevel level )
 	ENABLE_LOG( Runtime, HANDLE, level );
 	ENABLE_LOG( Debug, HANDLE, level );
 }
+
 } //namespace python
 
 } //namespace isis

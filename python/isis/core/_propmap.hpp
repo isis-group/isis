@@ -12,7 +12,7 @@
 #include "boost/python.hpp"
 #include "_convertFromPython.hpp"
 #include "_convertToPython.hpp"
-#include <object.h>
+#include "CoreUtils/singletons.hpp"
 
 using namespace boost::python;
 
@@ -27,42 +27,22 @@ class _PropertyMap : public util::PropertyMap, boost::python::wrapper< util::Pro
 {
 
 public:
-	_PropertyMap () : boost::python::wrapper< PropertyMap >() { _internal::createTypeMap(); }
-	_PropertyMap ( PyObject *p ) : boost::python::wrapper< PropertyMap >(), self( p ) { _internal::createTypeMap(); }
-	_PropertyMap ( PyObject *p, const PropertyMap &base ) : PropertyMap( base ), boost::python::wrapper< PropertyMap >(), self( p ) { _internal::createTypeMap(); }
+	_PropertyMap ();
+	_PropertyMap ( PyObject *p );
+	_PropertyMap ( PyObject *p, const PropertyMap &base );
 
-	isis::util::PropertyMap _branch ( const util::istring &key ) {
-		return this->branch( key );
-		return this->branch( key );
-	}
+	isis::util::PropertyMap _branch ( const util::istring &key );
 
-	isis::util::PropertyValue _propertyValue( const util::istring &key ) {
-		return this->propertyValue( key );
-	}
+	isis::util::PropertyValue _propertyValue( const util::istring &key );
 
-
-	void _setProperty( const std::string &key, api::object value ) {
-		propertyValue(key.c_str()) = m_Converter.convert(value);		
-	}
+	void _setProperty( const std::string &key, api::object value );
 	
-	
-	api::object _getProperty( const std::string &key ) {
-		return _internal::typesMap.at( propertyValue( key.c_str() )->getTypeID() )->convert( *propertyValue( key.c_str() ) );
-		
-	}
-	
+	api::object _getProperty( const std::string &key );
 	
 
 private:
 	PyObject *self;
-	_internal::ConvertFromPython m_Converter;
-	
-	
-	
-
-	
-	
-	
+	_internal::ConvertFromPython m_ConverterFromPyton;
 	
 	
 };

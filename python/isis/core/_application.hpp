@@ -7,6 +7,12 @@
 #include "CoreUtils/progparameter.hpp"
 #include "CoreUtils/types.hpp"
 
+#include "_convertFromPython.hpp"
+#include "_convertToPython.hpp"
+
+#include <boost/python.hpp>
+
+using namespace boost::python;
 
 namespace isis
 {
@@ -17,54 +23,25 @@ namespace python
 class _Application : public util::Application, boost::python::wrapper<util::Application>
 {
 public:
-	_Application( PyObject *p, const char name[] ) : util::Application( name ), boost::python::wrapper<util::Application>(), self( p ) {}
-	_Application( PyObject *p, const util::Application &base ) : util::Application( base ), boost::python::wrapper<util::Application>(), self( p ) {}
+	_Application( PyObject *p, const char name[] );
+	_Application( PyObject *p, const util::Application &base );
 
 	//wrapper function to convert a python list into a **char
-	virtual bool init( int argc, boost::python::list pyargv, bool exitOnError = true ) {
-		char *argv[argc];
-		size_t n = boost::python::len( pyargv );
+	virtual bool init( int argc, list pyargv, bool exitOnError = true );
 
-		for( size_t i = 0; i < n; i++ ) {
-			argv[i] = boost::python::extract<char *>( pyargv[i] );
-		}
+	void _addParameter( const std::string &name, api::object value );
 
-		return Application::init( argc, argv, exitOnError );
-	}
-
-	void _addParameter( const std::string name, PyObject *value, std::string type ) {
-		if( PyFloat_Check( value ) ) {
-			internAddParameter<float>( name, value, type );
-		} else if( PyBool_Check( value ) ) {
-			internAddParameter<bool>( name, value, type );
-		} else if( PyInt_Check( value ) ) {
-			internAddParameter<int64_t>( name, value, type );
-		} else if( PyString_Check( value ) ) {
-			internAddParameter<std::string>( name, value, type );
-		} else if ( boost::iequals( type, "ivector4" ) ) {
-			internAddParameter<isis::util::ivector4>( name, value, type );
-		} else if ( boost::iequals( type, "dvector4" ) ) {
-			internAddParameter<isis::util::dvector4>( name, value, type );
-		} else if ( boost::iequals( type, "fvector4" ) ) {
-			internAddParameter<isis::util::fvector4>( name, value, type );
-		} else if ( boost::iequals( type, "selection" ) ) {
-			internAddParameter<isis::util::Selection>( name, value, type );
-		} else {
-			LOG( Runtime, error ) << "Value " << type << " is not registered.";
-		}
-	}
-	std::string _getParameterAsString( const std::string name ) {
-		return parameters[name];
-	}
-	void _setNeeded( const std::string name, const bool needed ) {
+	api::object _getParameter( const std::string &name ) const;
+	
+	void _setNeeded( const std::string &name, const bool needed ) {
 		parameters[name].needed() = needed;
 	}
 
-	void _setHidden( const std::string name, const bool hidden ) {
+	void _setHidden( const std::string &name, const bool hidden ) {
 		parameters[name].hidden() = hidden;
 	}
 
-	void _setDescription( const std::string name, const std::string desc ) {
+	void _setDescription( const std::string &name, const std::string &desc ) {
 		parameters[name].setDescription( desc );
 	}
 
@@ -78,7 +55,8 @@ private:
 		parameters[name] = val;
 		parameters[name].needed() = false;
 	}
-
+	
+	_internal::ConvertFromPython m_ConverterFromPython;
 };
 
 

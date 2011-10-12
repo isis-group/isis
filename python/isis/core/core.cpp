@@ -9,7 +9,6 @@
 #include "_application.hpp"
 #include "_vector.hpp"
 #include "_propmap.hpp"
-#include "_property.hpp"
 #include "CoreUtils/selection.hpp"
 
 using namespace boost::python;
@@ -29,10 +28,10 @@ BOOST_PYTHON_MODULE( _core )
 	//virtual bool init( int argc, char **argv, bool exitOnError = true );
 	.def( "init", &_Application::init )
 	.def( "addParameter", &_Application::_addParameter )
+	.def( "getParameter", &_Application::_getParameter )
 	.def( "setNeeded", &_Application::_setNeeded )
 	.def( "setHidden", &_Application::_setHidden )
 	.def( "setDescription", &_Application::_setDescription )
-	.def( "getParameterAsString", &_Application::_getParameterAsString )
 	;
 	//#######################################################################################
 	//  PropertyMap
@@ -49,13 +48,6 @@ BOOST_PYTHON_MODULE( _core )
 	.def( "isEmpty", &isis::util::PropertyMap::isEmpty )
 	.def( "setProperty", &_PropertyMap::_setProperty )
 	.def( "getProperty", &_PropertyMap::_getProperty )
-	;
-	//#######################################################################################
-	//  PropertyValue
-	//#######################################################################################
-	class_<isis::util::PropertyValue, _PropertyValue>( "PropertyValue", init<>() )
-	.def( init<_PropertyValue>() )
-	.def( "toString", &_PropertyValue::_toString )
 	;
 	//#######################################################################################
 	//  Selection

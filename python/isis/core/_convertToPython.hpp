@@ -6,8 +6,12 @@
 #include <list>
 #include "CoreUtils/common.hpp"
 #include "CoreUtils/property.hpp"
-#include "boost/python.hpp"
-#include "boost/shared_ptr.hpp"
+#include <boost/python.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/date_time/gregorian/gregorian_io.hpp>
+#include <boost/date_time/posix_time/posix_time_io.hpp>
+#include <datetime.h>
+
 
 using namespace boost::python;
 
@@ -43,6 +47,40 @@ struct PyObjectGenerator<false, T> : PyObjectGeneratorBase
 	virtual api::object convert( util::_internal::ValueBase &value ) {
 		return api::object( value.as<T>());
 	}
+};
+
+//dates
+template<>
+struct PyObjectGenerator<false, boost::gregorian::date> : PyObjectGeneratorBase
+{
+	virtual api::object convert( util::_internal::ValueBase &value ) {
+		PyDateTime_IMPORT;
+		boost::gregorian::date date = value.as<boost::gregorian::date>();
+		return api::object(handle<>(borrowed( PyDate_FromDate( static_cast<int>( date.year() ), 
+								static_cast<int>(date.month() ), 
+								static_cast<int>(date.day() ) ) ) ) ); 
+								
+		
+	}
+};
+
+//ptime
+template<>
+struct  PyObjectGenerator<false, boost::posix_time::ptime> : PyObjectGeneratorBase
+{
+	virtual api::object convert( util::_internal::ValueBase &value ) {
+		PyDateTime_IMPORT;
+		boost::posix_time::ptime time = value.as<boost::posix_time::ptime>();
+		return api::object(handle<>(borrowed( PyDateTime_FromDateAndTime( static_cast<int>( time.date().year() ),
+										  static_cast<int>( time.date().month() ),
+										  static_cast<int>( time.date().day() ),
+										  static_cast<int>( time.time_of_day().hours() ),
+										  static_cast<int>( time.time_of_day().minutes() ),
+										  static_cast<int>( time.time_of_day().seconds() ),
+										  static_cast<int>( time.time_of_day().total_milliseconds() ) ))));
+										  
+	}
+	
 };
 
 //vectors
@@ -109,9 +147,6 @@ struct PyObjectGenerator<false, util::slist> : PyObjectGeneratorBase
 	}
 };
 
-
-
-
 struct Generator 
 {
 	Generator( std::map<unsigned short, boost::shared_ptr<PyObjectGeneratorBase> > &tMap) : typeMap(tMap) {}
@@ -127,12 +162,14 @@ struct Generator
 };
 
 
+class TypesMap : public std::map<unsigned short, boost::shared_ptr<PyObjectGeneratorBase> >
+{
+public:
+	void create() {
+		boost::mpl::for_each<util::_internal::types>( Generator( *this ) );
+	}
+};
 
-std::map<unsigned short, boost::shared_ptr<PyObjectGeneratorBase> > typesMap;
-void createTypeMap() {
-	boost::mpl::for_each<util::_internal::types>( Generator( typesMap ) );
-}
-	
 	
 	
 	
