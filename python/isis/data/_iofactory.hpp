@@ -33,17 +33,17 @@ public:
 		return IOFactory::write( images, path, suffix_override, dialect );
 	}
 
-	std::list<Image> _loadImageList ( const std::string &path, const std::string &suffix_override, const std::string &dialect ) {
+	static std::list<Image> _loadImageList ( const std::string &path, const std::string &suffix_override, const std::string &dialect ) {
 		return IOFactory::load( path, suffix_override, dialect );
 	}
 
-	std::list<Chunk> _loadChunkList ( const std::string &path, const std::string &suffix_override, std::string &dialect ) {
+	static std::list<Chunk> _loadChunkList ( const std::string &path, const std::string &suffix_override, std::string &dialect ) {
 		std::list<Chunk> tmpChunkList;
 		IOFactory::load( tmpChunkList, path, suffix_override, dialect );
 		return tmpChunkList;
 	}
 
-	std::list<Image> _chunkListToImageList( std::list<Chunk> &chunkList ) {
+	static std::list<Image> _chunkListToImageList( std::list<Chunk> &chunkList ) {
 		return IOFactory::chunkListToImageList( chunkList );
 	}
 
