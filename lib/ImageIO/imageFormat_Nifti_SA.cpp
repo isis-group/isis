@@ -282,6 +282,8 @@ protected:
 		//store current orientation (may override values set above)
 		if(!storeQForm(props,head)) //try to encode as quaternion
 			storeSForm(props,head); //fall back to normal matrix
+
+		strcpy(head->magic,"n+1");
 	}
 	static void parseHeader(const _internal::nifti_1_header *head,data::Chunk &props){
 		unsigned short dims=head->dim[0];
@@ -607,18 +609,56 @@ private:
 			props.getPropertyAs<util::fvector4>("sliceVec")
 		).transpose();// the columns of the transform matrix are row-, slice- and
 
-		util::Matrix4x4<float> image2nifti=nifti2isis.transpose().dot(image2isis); // apply inverse transform from nifti to isis
+		const util::Matrix4x4<float> image2nifti=nifti2isis.transpose().dot(image2isis);// apply inverse transform from nifti to isis
 
-		const float a_square=1+image2nifti.elem(0,0)+image2nifti.elem(1,1)+image2nifti.elem(2,2);
-		if(a_square<=0) // fail if a is 0 or negative @todo implement special cases
-			return false;
+		// take values of the 3x3 matrix == analog to the nifti reference implementation
+		float r11=image2nifti.elem(0,0),r21=image2nifti.elem(0,1),r31=image2nifti.elem(0,2);//first column
+		float r12=image2nifti.elem(1,0),r22=image2nifti.elem(1,1),r32=image2nifti.elem(1,2);//second column
+		float r13=image2nifti.elem(2,0),r23=image2nifti.elem(2,1),r33=image2nifti.elem(2,2);//third column
+
+		// compute the determinant to determine if the transformation is proper
+		if(r11*r22*r33-r11*r32*r23-r21*r12*r33+r21*r32*r13+r31*r12*r23-r31*r22*r13 > 0){
+			head->pixdim[0]=1;
+		} else { // improper => flip 3rd column
+			r13 = -r13 ; r23 = -r23 ; r33 = -r33 ;
+			head->pixdim[0]=-1;
+		}
 		
-		const float a = 0.5  * sqrt(a_square);
-		head->quatern_b = 0.25 * (image2nifti.elem(2,1)-image2nifti.elem(1,2)) / a;
-		head->quatern_c = 0.25 * (image2nifti.elem(0,2)-image2nifti.elem(2,0)) / a;
-		head->quatern_d = 0.25 * (image2nifti.elem(1,0)-image2nifti.elem(0,1)) / a;
 		head->qform_code=NIFTI_XFORM_SCANNER_ANAT;
-		head->pixdim[0]=1; //qfac to store "non-proper" transforms
+		// the following was more or less stolen from the nifti reference implementation
+		const float a_square=r11 + r22 + r33 + 1;
+		if(a_square>0.5) { // simple case
+			const float a = 0.5  * sqrt(a_square);
+			head->quatern_b = 0.25 * (r32-r23) / a;
+			head->quatern_c = 0.25 * (r13-r31) / a;
+			head->quatern_d = 0.25 * (r21-r12) / a;
+		} else {                       /* trickier case */
+			float xd = 1.0 + r11 - (r22+r33) ;  /* 4*b*b */
+			float yd = 1.0 + r22 - (r11+r33) ;  /* 4*c*c */
+			float zd = 1.0 + r33 - (r11+r22) ;  /* 4*d*d */
+			float a;
+			if( xd > 1.0 ){
+				head->quatern_b = 0.5l * sqrt(xd) ;
+				head->quatern_c = 0.25l* (r12+r21) / head->quatern_b ;
+				head->quatern_d = 0.25l* (r13+r31) / head->quatern_b ;
+				a = 0.25l* (r32-r23) / head->quatern_b ;
+			} else if( yd > 1.0 ){
+				head->quatern_c = 0.5l * sqrt(yd) ;
+				head->quatern_b = 0.25l* (r12+r21) / head->quatern_c ;
+				head->quatern_d = 0.25l* (r23+r32) / head->quatern_c ;
+				a = 0.25l* (r13-r31) / head->quatern_c ;
+			} else {
+				head->quatern_d = 0.5l * sqrt(zd) ;
+				head->quatern_b = 0.25l* (r13+r31) / head->quatern_d ;
+				head->quatern_c = 0.25l* (r23+r32) / head->quatern_d ;
+				a = 0.25* (r21-r12) / head->quatern_d ;
+			}
+			if( a < 0.0 ){
+				head->quatern_b=-head->quatern_b ;
+				head->quatern_c=-head->quatern_c ;
+				head->quatern_d=-head->quatern_d;
+			}
+		}
 
 		const util::fvector4 nifti_offset=nifti2isis.transpose().dot(props.getPropertyAs<util::fvector4>("indexOrigin"));
 		head->qoffset_x=nifti_offset[0];
