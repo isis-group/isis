@@ -18,6 +18,7 @@ namespace isis
 {
 namespace python
 {
+namespace core {
 
 // helper class application
 class _Application : public util::Application, boost::python::wrapper<util::Application>
@@ -59,7 +60,7 @@ private:
 	_internal::ConvertFromPython m_ConverterFromPython;
 };
 
-
+}
 }
 }
 #endif

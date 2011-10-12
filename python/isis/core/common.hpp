@@ -23,6 +23,8 @@ struct PythonDebug {static const char *name() {return "PythonDebug";}; enum {use
 
 namespace python
 {
+namespace core 
+{
 typedef PythonLog Runtime;
 typedef PythonDebug Debug;
 
@@ -38,7 +40,9 @@ UINT32_T, INT64_T, UINT64_T, FLOAT, DOUBLE,
 FVECTOR4, DVECTOR4, IVECTOR4, ILIST, DLIST, 
 SLIST, STDSTRING, SELECTION, COMPLEX_FLOAT, 
 COMPLEX_DOUBLE, BOOST_PTIME, BOOST_DATE };
-}
+} // namespace _internal
+
+} // namespace core 
 
 } //namespace python
 

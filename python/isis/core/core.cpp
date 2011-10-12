@@ -12,7 +12,7 @@
 #include "CoreUtils/selection.hpp"
 
 using namespace boost::python;
-using namespace isis::python;
+using namespace isis::python::core;
 
 BOOST_PYTHON_MODULE( _core )
 {
@@ -78,7 +78,7 @@ BOOST_PYTHON_MODULE( _core )
 	//#######################################################################################
 	//  enums for types
 	//#######################################################################################
-	using namespace isis::python::_internal;
+	using namespace isis::python::core::_internal;
 	enum_<types>("types")
 	.value("INT8_T", INT8_T)
 	.value("UINT8_T", UINT8_T)

@@ -5,7 +5,7 @@ namespace isis
 {
 namespace python
 {
-
+namespace core {
 
 _PropertyMap::_PropertyMap()
 	: boost::python::wrapper< PropertyMap >()
@@ -52,6 +52,6 @@ util::PropertyValue _PropertyMap::_propertyValue( const isis::util::istring &key
 }
 
 
-
+}
 }
 } // end namespace

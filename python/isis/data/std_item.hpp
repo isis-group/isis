@@ -14,6 +14,8 @@ namespace isis
 {
 namespace python
 {
+namespace data 
+{
 void IndexError()
 {
 	PyErr_SetString( PyExc_IndexError, "Index out of range" );
@@ -55,6 +57,7 @@ public:
 		} else IndexError();
 	}
 };
+}
 }
 }
 #endif /* STD_ITEM_HPP_ */

@@ -14,6 +14,8 @@ namespace isis
 {
 namespace python
 {
+namespace core 
+{
 namespace _internal
 {
 
@@ -58,7 +60,7 @@ private:
 	std::list<std::string> m_KnownTypes;
 };
 
-
+}
 }
 }
 } // end namespace

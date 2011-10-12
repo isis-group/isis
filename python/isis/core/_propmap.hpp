@@ -20,7 +20,8 @@ namespace isis
 {
 namespace python
 {
-
+namespace core 
+{
 
 // helper class PropertyMap
 class _PropertyMap : public util::PropertyMap, boost::python::wrapper< util::PropertyMap >
@@ -46,6 +47,7 @@ private:
 
 
 };
+}
 }
 }
 #endif /* _PROPMAP_HPP_ */

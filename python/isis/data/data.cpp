@@ -18,16 +18,17 @@
 #include "_iofactory.hpp"
 #include "std_item.hpp"
 #include "../core/_application.hpp"
+#include "../core/_propmap.hpp"
 
 using namespace boost::python;
-using namespace isis::python;
+using namespace isis::python::data;
 
 BOOST_PYTHON_MODULE( _data )
 {
 	//#######################################################################################
 	//  IOApplication
 	//#######################################################################################
-	class_<isis::data::IOApplication, _IOApplication, bases< _Application> > ( "IOApplication", init<const char *, bool, bool>() )
+	class_<isis::data::IOApplication, _IOApplication, bases< isis::python::core::_Application> > ( "IOApplication", init<const char *, bool, bool>() )
 	.def( "autoload", &isis::data::IOApplication::autoload )
 	.def( "autowrite", &_IOApplication::_autowrite )
 	.def( "images", &_IOApplication::_images )
@@ -36,7 +37,7 @@ BOOST_PYTHON_MODULE( _data )
 	//#######################################################################################
 	//  Image
 	//#######################################################################################
-	class_<isis::data::Image, _Image, bases<isis::util::PropertyMap> >( "Image", init<>() )
+	class_<isis::data::Image, _Image, bases<isis::python::core::_PropertyMap> >( "Image", init<>() )
 	.def( init<isis::data::Image>() )
 	.def( "checkMakeClean", &isis::data::Image::checkMakeClean )
 	.def( "getVoxel", ( float ( ::_Image:: * )( const isis::util::ivector4 & ) ) ( &_Image::_voxel ), ( arg( "coord" ) ) )

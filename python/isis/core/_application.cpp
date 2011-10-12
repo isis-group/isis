@@ -4,7 +4,8 @@ namespace isis
 {
 namespace python
 {
-
+namespace core 
+{
 
 _Application::_Application( PyObject *p, const char name[] )
 	: util::Application( name ),
@@ -33,7 +34,7 @@ bool _Application::init( int argc, list pyargv, bool exitOnError )
 		argv[i] = boost::python::extract<char *>( pyargv[i] );
 	}
 
-	return Application::init( argc, argv, exitOnError );
+	return util::Application::init( argc, argv, exitOnError );
 }
 
 void _Application::_addParameter( const std::string &name, boost::python::api::object value )
@@ -48,6 +49,6 @@ api::object _Application::_getParameter( const std::string &name ) const
 }
 
 
-
+}
 }
 } // end namespace

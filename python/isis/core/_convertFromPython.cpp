@@ -4,6 +4,8 @@ namespace isis
 {
 namespace python
 {
+namespace core 
+{
 namespace _internal
 {
 
@@ -132,7 +134,7 @@ util::PropertyValue ConvertFromPython::getList( api::object value )
 	return util::PropertyValue();
 }
 
-
+}
 }
 }
 } // end namespace

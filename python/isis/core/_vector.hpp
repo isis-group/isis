@@ -9,7 +9,8 @@ namespace isis
 {
 namespace python
 {
-
+namespace core 
+{
 
 // helper class vector
 template<class T>
@@ -44,6 +45,7 @@ private:
 
 };
 
+}
 }
 }
 #endif
