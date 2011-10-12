@@ -19,7 +19,7 @@ namespace python
 class _IOFactory
 {
 public:
-	_IOFactory( PyObject *p ) : self(p) {}
+	_IOFactory( PyObject *p ) : self( p ) {}
 	_IOFactory() {}
 
 	static bool _writeImage( const data::Image &img, const std::string &path, const std::string &suffix_override, const std::string &dialect ) {

@@ -9,6 +9,7 @@
 #define PYTHON_COMMON_HPP
 
 #include "CoreUtils/log.hpp"
+#include "CoreUtils/common.hpp"
 
 /*! \addtogroup python
 *  Additional documentation for group `mygrp'

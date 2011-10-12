@@ -36,15 +36,15 @@ public:
 	isis::util::PropertyValue _propertyValue( const util::istring &key );
 
 	void _setProperty( const std::string &key, api::object value );
-	
+
 	api::object _getProperty( const std::string &key );
-	
+
 
 private:
 	PyObject *self;
 	_internal::ConvertFromPython m_ConverterFromPyton;
-	
-	
+
+
 };
 }
 }

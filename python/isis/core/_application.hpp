@@ -32,7 +32,7 @@ public:
 	void _addParameter( const std::string &name, api::object value );
 
 	api::object _getParameter( const std::string &name ) const;
-	
+
 	void _setNeeded( const std::string &name, const bool needed ) {
 		parameters[name].needed() = needed;
 	}
@@ -55,7 +55,7 @@ private:
 		parameters[name] = val;
 		parameters[name].needed() = false;
 	}
-	
+
 	_internal::ConvertFromPython m_ConverterFromPython;
 };
 

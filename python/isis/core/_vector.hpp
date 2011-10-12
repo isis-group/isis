@@ -40,7 +40,7 @@ public:
 
 
 private:
-    PyObject *self;
+	PyObject *self;
 
 };
 

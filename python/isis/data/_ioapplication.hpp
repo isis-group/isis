@@ -83,7 +83,7 @@ public:
 	}
 
 private:
-    	PyObject *self;
+	PyObject *self;
 	template<typename TYPE>
 	void internAddParameter ( const std::string name, PyObject *value ) {
 		util::Value<TYPE> val( static_cast<TYPE>( boost::python::extract<TYPE>( value ) ) );
