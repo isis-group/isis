@@ -15,8 +15,9 @@ namespace isis
 {
 namespace python
 {
-namespace data {
-	
+namespace data
+{
+
 // helper class ioapplication
 class _IOApplication : public isis::data::IOApplication, boost::python::wrapper<isis::data::IOApplication>
 {

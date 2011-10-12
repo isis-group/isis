@@ -37,7 +37,7 @@ BOOST_PYTHON_MODULE( _data )
 	//#######################################################################################
 	//  Image
 	//#######################################################################################
-	class_<isis::data::Image, _Image, bases<isis::python::core::_PropertyMap> >( "Image", init<>() )
+	class_<isis::data::Image, _Image >( "Image", init<>() )
 	.def( init<isis::data::Image>() )
 	.def( "checkMakeClean", &isis::data::Image::checkMakeClean )
 	.def( "getVoxel", ( float ( ::_Image:: * )( const isis::util::ivector4 & ) ) ( &_Image::_voxel ), ( arg( "coord" ) ) )
@@ -68,6 +68,7 @@ BOOST_PYTHON_MODULE( _data )
 	.def( "deepCopy", ( isis::data::Image ( ::_Image:: * )( void ) ) ( &_Image::_deepCopy ) )
 	.def( "deepCopy", ( isis::data::Image ( ::_Image:: * )( std::string ) ) ( &_Image::_deepCopy ), ( arg( "type" ) ) )
 	.def( "cheapCopy", ( isis::data::Image ( ::_Image:: * )( void ) ) ( &_Image::_cheapCopy ) )
+	.def( "getPropertyMap", ( isis::util::PropertyMap ( ::isis::python::core::_PropertyMap:: * )( void ) ) ( &_Image::_getPropMap ) )
 	;
 	//#######################################################################################
 	//  ImageList

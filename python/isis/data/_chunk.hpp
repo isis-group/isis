@@ -16,8 +16,9 @@ namespace isis
 {
 namespace python
 {
-namespace data {
-	
+namespace data
+{
+
 class _Chunk : public Chunk, boost::python::wrapper<Chunk>
 {
 public:

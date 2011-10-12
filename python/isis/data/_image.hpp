@@ -11,6 +11,8 @@
 #include "DataStorage/image.hpp"
 #include "CoreUtils/vector.hpp"
 #include <vector>
+#include <boost/algorithm/string.hpp>
+#include "common.hpp"
 
 #include "core/_propmap.hpp"
 
@@ -20,16 +22,16 @@ namespace isis
 {
 namespace python
 {
-namespace data 
+namespace data
 {
-	
+
 class _Image : public Image, boost::python::wrapper<Image>
 {
 
 public:
 
-	_Image ( PyObject *p ) : boost::python::wrapper< Image >(), self( p ) {}
-	_Image ( PyObject *p, const Image &base ) : Image( base ), boost::python::wrapper< Image >(), self( p ) {}
+	_Image ( PyObject *p );
+	_Image ( PyObject *p, const Image &base );
 
 	float _voxel( const size_t &first, const size_t &second, const size_t &third, const size_t &fourth ) {
 		Chunk ch = this->getChunk( first, second, third, fourth, false );
@@ -209,7 +211,7 @@ public:
 		} else if ( boost::iequals( dim, "columnDim" ) ) {
 			return this->spliceDownTo( columnDim );
 		} else {
-			LOG( Runtime, error ) << dim << " is an unknown dimension. Possible dimensions are rowDim, columnDim, sliceDim and timeDim.";
+			LOG( isis::python::Runtime, error ) << dim << " is an unknown dimension. Possible dimensions are rowDim, columnDim, sliceDim and timeDim.";
 			return 0;
 		}
 	}
@@ -253,8 +255,8 @@ public:
 		Image retImage = _deepCopy();
 
 		if ( ! isis::util::getTransposedTypeMap()[type] ) {
-			LOG( isis::python::Runtime, isis::error ) << "Unable to convert to type "
-					<< type << ". Keeping type.";
+			LOG( Runtime, isis::error ) << "Unable to convert to type "
+										<< type << ". Keeping type.";
 		} else {
 			retImage.convertToType( isis::util::getTransposedTypeMap()[type] );
 		}
@@ -266,7 +268,7 @@ public:
 		return *this;
 	}
 
-	isis::util::PropertyMap &_getPropMap() {
+	isis::util::PropertyMap _getPropMap() {
 		isis::util::PropertyMap &retMap = static_cast<isis::util::PropertyMap &>( *this );
 		return retMap;
 	}

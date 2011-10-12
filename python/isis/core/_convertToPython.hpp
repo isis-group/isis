@@ -20,7 +20,7 @@ namespace isis
 
 namespace python
 {
-namespace core 
+namespace core
 {
 namespace _internal
 {
@@ -71,15 +71,15 @@ struct  PyObjectGenerator<false, boost::posix_time::ptime> : PyObjectGeneratorBa
 	virtual api::object convert( util::_internal::ValueBase &value ) {
 		PyDateTime_IMPORT;
 		boost::posix_time::ptime time = value.as<boost::posix_time::ptime>();
-		return api::object( 
-			handle<>( borrowed( PyDateTime_FromDateAndTime( 
-							static_cast<int>( time.date().year() ),
-							static_cast<int>( time.date().month() ),
-							static_cast<int>( time.date().day() ),
-							static_cast<int>( time.time_of_day().hours() ),
-							static_cast<int>( time.time_of_day().minutes() ),
-							static_cast<int>( time.time_of_day().seconds() ),
-							static_cast<int>( time.time_of_day().total_milliseconds() ) ) ) ) );
+		return api::object(
+				   handle<>( borrowed( PyDateTime_FromDateAndTime(
+										   static_cast<int>( time.date().year() ),
+										   static_cast<int>( time.date().month() ),
+										   static_cast<int>( time.date().day() ),
+										   static_cast<int>( time.time_of_day().hours() ),
+										   static_cast<int>( time.time_of_day().minutes() ),
+										   static_cast<int>( time.time_of_day().seconds() ),
+										   static_cast<int>( time.time_of_day().total_milliseconds() ) ) ) ) );
 
 	}
 

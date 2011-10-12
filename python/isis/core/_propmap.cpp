@@ -5,7 +5,8 @@ namespace isis
 {
 namespace python
 {
-namespace core {
+namespace core
+{
 
 _PropertyMap::_PropertyMap()
 	: boost::python::wrapper< PropertyMap >()

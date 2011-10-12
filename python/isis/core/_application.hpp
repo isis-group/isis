@@ -18,7 +18,8 @@ namespace isis
 {
 namespace python
 {
-namespace core {
+namespace core
+{
 
 // helper class application
 class _Application : public util::Application, boost::python::wrapper<util::Application>

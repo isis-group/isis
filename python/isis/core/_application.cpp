@@ -4,7 +4,7 @@ namespace isis
 {
 namespace python
 {
-namespace core 
+namespace core
 {
 
 _Application::_Application( PyObject *p, const char name[] )

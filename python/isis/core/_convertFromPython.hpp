@@ -14,7 +14,7 @@ namespace isis
 {
 namespace python
 {
-namespace core 
+namespace core
 {
 namespace _internal
 {

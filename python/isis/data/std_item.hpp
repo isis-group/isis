@@ -14,7 +14,7 @@ namespace isis
 {
 namespace python
 {
-namespace data 
+namespace data
 {
 void IndexError()
 {
