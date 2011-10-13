@@ -30,6 +30,11 @@ template<typename HANDLE> void enable_log( LogLevel level )
 	ENABLE_LOG( Runtime, HANDLE, level );
 	ENABLE_LOG( Debug, HANDLE, level );
 }
+namespace data {
+namespace _internal {
+enum image_types { BOOL, INT8_T, UINT8_T, INT16_T, UINT16_T, INT32_T, UINT32_T, INT64_T, UINT64_T, FLOAT, DOUBLE };
+}
+}
 } //namespace python
 
 } //namespace isis

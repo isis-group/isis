@@ -13,6 +13,7 @@
 #include <boost/algorithm/string.hpp>
 #include "common.hpp"
 #include "_ioapplication.hpp"
+#include "_ndimensional.hpp"
 #include "_image.hpp"
 #include "_chunk.hpp"
 #include "_iofactory.hpp"
@@ -34,6 +35,27 @@ BOOST_PYTHON_MODULE( _data )
 	.def( "images", &_IOApplication::_images )
 
 	;
+	//#######################################################################################
+	//  NDimensional<4>
+	//#######################################################################################
+	class_<isis::data::_internal::NDimensional<4>, _NDimensional > ( "NDimensional4", init<const isis::util::ivector4&>() )
+	.def( init<>() )
+	.def( "init", ( void ( ::_NDimensional:: * )( const isis::util::ivector4& ) ) ( &_NDimensional::_init ), ( arg( "dims" ) ) )
+	.def( "init", ( void ( ::_NDimensional:: * )( const size_t &, const size_t&, const size_t&, const size_t& ) ) ( &_NDimensional::_init ), ( arg( "first"), arg("second"), arg("third"), arg("fourth") ) )
+	.def( "getLinearIndex", ( size_t ( ::_NDimensional:: * )( const isis::util::ivector4& ) ) (  &_NDimensional::_getLinearIndex ), ( arg( "dims" ) ) )
+	.def( "getLinearIndex", ( size_t ( ::_NDimensional:: * )( const size_t&, const size_t&, const size_t&, const size_t& ) ) ( &_NDimensional::_getLinearIndex), ( arg("first"), arg("second"), arg("third"), arg("fourth") ) )
+	.def( "getCoordsFromLinIndex", &_NDimensional::_getCoordsFromLinIndex )
+	.def( "isInRange", ( bool ( ::_NDimensional:: * ) ( const isis::util::ivector4& ) ) ( &_NDimensional::_isInRange), ( arg( "dims") ) )
+	.def( "isInRange", ( bool ( ::_NDimensional:: * ) ( const size_t &, const size_t&, const size_t&, const size_t& ) ) ( &_NDimensional::_isInRange ), ( arg( "first"), arg("second"), arg("third"), arg("fourth") ) )
+	.def( "getVolume", &isis::data::_internal::NDimensional<4>::getVolume )
+	.def( "getDimSize", &isis::data::_internal::NDimensional<4>::getDimSize )
+	.def( "getSizeAsString", &isis::data::_internal::NDimensional<4>::getSizeAsString )
+	.def( "getSizeAsString", &_NDimensional::_getSizeAsString ) // this is for the one that has no argument
+	.def( "getSizeAsVector", &_NDimensional::_getSizeAsVector )
+	.def( "getRelevantDims", &isis::data::_internal::NDimensional<4>::getRelevantDims )
+	.def( "getFoV", &_NDimensional::_getFoV )
+	;
+	
 	//#######################################################################################
 	//  Image
 	//#######################################################################################
@@ -82,6 +104,7 @@ BOOST_PYTHON_MODULE( _data )
 	.def( "__getitem__", &std_list<IList>::get, return_value_policy<copy_non_const_reference>() )
 	.def( "__setitem__", &std_list<IList>::set, with_custodian_and_ward<1, 2>() )
 	.def( "__delitem__", &std_list<IList>::del )
+	.def("__iter__", iterator< std::list< isis::data::Image > > () )
 	;
 	//#######################################################################################
 	//  Chunk
@@ -108,6 +131,8 @@ BOOST_PYTHON_MODULE( _data )
 	.def( "__getitem__", &std_list<CList>::get, return_value_policy<copy_non_const_reference>() )
 	.def( "__setitem__", &std_list<CList>::set, with_custodian_and_ward<1, 2>() )
 	.def( "__delitem__", &std_list<CList>::del )
+	.def( "__iter__", iterator<std::list< isis::data::Chunk> > () ) 
+	
 	;
 	//#######################################################################################
 	//  IOFactory
@@ -128,6 +153,24 @@ BOOST_PYTHON_MODULE( _data )
 	.def( "chunkListToImageList", &_IOFactory::_chunkListToImageList )
 	.staticmethod( "chunkListToImageList" )
 	;
+	//#######################################################################################
+	//  enums for image_types
+	//#######################################################################################
+	using namespace isis::python::data::_internal;
+	enum_<image_types>( "image_types" )
+	.value( "INT8_T", INT8_T )
+	.value( "UINT8_T", UINT8_T )
+	.value( "INT16_T", INT16_T )
+	.value( "UINT16_T", UINT16_T )
+	.value( "INT32_T", INT32_T )
+	.value( "UINT32_T", UINT32_T )
+	.value( "INT64_T", INT64_T )
+	.value( "UINT64_T", UINT64_T )
+	.value( "FLOAT", FLOAT )
+	.value( "DOUBLE", DOUBLE )
+	;
+	
+	
 
 }
 #endif
