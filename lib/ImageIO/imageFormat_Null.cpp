@@ -19,7 +19,7 @@ class ImageFormat_Null: public FileFormat
 			for ( uint32_t s = 0; s < size; s++ ) {
 
 				data::MemChunk<uint8_t> ch( size, size );
-				ch.setPropertyAs( "indexOrigin", util::fvector4( 0, -150/2, s*150./size-150/2 ) );
+				ch.setPropertyAs( "indexOrigin", util::fvector4( 0, -150/2, s*100./size-100/2 ) );
 				ch.setPropertyAs<uint16_t>( "sequenceNumber", 0 );
 				ch.setPropertyAs( "performingPhysician", std::string( "Dr. Jon Doe" ) );
 				ch.setPropertyAs( "rowVec",    util::fvector4(  1./sqrt(2), 1./sqrt(2) ) ); //rotated by pi/4 (45°)
