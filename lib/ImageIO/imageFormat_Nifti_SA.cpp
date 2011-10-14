@@ -690,7 +690,11 @@ private:
 		return true;
 	}
 	static void storeSForm(const util::PropertyMap &props,_internal::nifti_1_header *head){
-		
+		util::Matrix4x4<float> sform=getNiftiMatrix(props);
+		head->sform_code=1;
+		getNiftiMatrix(props).getRow(0).copyTo(head->srow_x);
+		getNiftiMatrix(props).getRow(1).copyTo(head->srow_y);
+		getNiftiMatrix(props).getRow(2).copyTo(head->srow_z);
 	}
 };
 
