@@ -248,6 +248,8 @@ protected:
 		//in isis length is allways mm and time duration is allways msecs
 		head->xyzt_units=NIFTI_UNITS_MM|NIFTI_UNITS_MSEC;
 
+		head->dim_info= 1 | (2>>2) | (3 >> 4); //readDim=1 phaseDim=2 sliceDim=3
+
 		//store description if there is one
 		if(props.hasProperty("sequenceDescription"))
 			strncpy(head->descrip,props.getPropertyAs<std::string>("sequenceDescription").c_str(),80);
@@ -275,9 +277,6 @@ protected:
 				head->qoffset_x=offset[0];head->qoffset_y=offset[1];head->qoffset_z=offset[2];
 			}
 		}
-
-		//store voxel size
-		props.getPropertyAs<util::fvector4>("voxelSize").copyTo(head->pixdim+1);
 
 		//store current orientation (may override values set above)
 		if(!storeQForm(props,head)) //try to encode as quaternion
@@ -392,7 +391,7 @@ protected:
 			props.setPropertyAs<std::string>("sequenceDescription",head->descrip);// use it the usual way
 
 		// TODO: at the moment scaling not supported due to data type changes
-		if ( !(head->scl_slope == 1 || head->scl_inter==0) ) {
+		if ( !head->scl_slope==0 && !(head->scl_slope == 1 || head->scl_inter==0) ) {
 			//          throwGenericError( std::string( "Scaling is not supported at the moment. Scale Factor: " ) + util::Value<float>( scale ).toString() );
 			LOG( Runtime, error ) << "Scaling is not supported at the moment.";
 		}
@@ -443,7 +442,7 @@ public:
 			CopyOp(const data::Image &image,data::FilePtr &out):
 				m_image(image),m_out(out),m_ID(image.getMajorTypeID()),m_bytesPerPixel(image.getBytesPerVoxel()),m_scale(image.getScalingTo( m_ID )){}
             bool operator()(data::Chunk &ch, util::FixedVector< size_t, 4 > posInImage){
-				size_t offset=384+m_image.getLinearIndex(posInImage)*m_bytesPerPixel;
+				size_t offset=348+m_image.getLinearIndex(posInImage)*m_bytesPerPixel;
 				data::ValuePtrReference out_data=m_out.atByID(m_ID,offset,ch.getVolume());
 				ch.asValuePtrBase().copyTo(*out_data,m_scale);
 			}
@@ -452,6 +451,7 @@ public:
 		const size_t bpv=image.getBytesPerVoxel();
 		unsigned short target_id=image.getMajorTypeID();
 
+		// fsl cannot deal with some types
 		if(util::istring(dialect.c_str())=="fsl"){
 			switch(target_id){
 				case util::Value<uint16_t>::staticID:target_id=typeFallBack<uint16_t>();break;
@@ -463,15 +463,15 @@ public:
 		if(isis_type2nifti_type[target_id]){ // "normal types"
 
 			// open/map the new file
-			data::FilePtr out(filename,datasize+384,true);
+			data::FilePtr out(filename,348+datasize,true);
 
-			// get the first 384 bytes as header
+			// get the first 348 bytes as header
 			_internal::nifti_1_header *header= reinterpret_cast<_internal::nifti_1_header*>(&out[0]);
 			memset(header,0,sizeof(_internal::nifti_1_header));
 			storeHeader(image,header);
 
 			// set the datatype
-			header->sizeof_hdr=header->vox_offset=sizeof(_internal::nifti_1_header);
+			header->sizeof_hdr=header->vox_offset=348; // must be 348
 			header->bitpix=bpv*8;
 			header->datatype=isis_type2nifti_type[target_id];
 
@@ -495,6 +495,28 @@ public:
 	}
 	bool tainted()const {return false;}//internal plugins are not tainted
 private:
+	/// get the tranformation matrix from image space to Nifti space using row-,column and sliceVec from the given PropertyMap
+	static util::Matrix4x4<float> getNiftiMatrix(const util::PropertyMap &props){
+		util::fvector4 scale=props.getPropertyAs<util::fvector4>("voxelSize");//used to put the scaling into the transformation
+		util::fvector4 offset=props.getPropertyAs<util::fvector4>("indexOrigin");
+
+		if(props.hasProperty("voxelGap")){
+			const util::fvector4 gap=props.getPropertyAs<util::fvector4>("voxelGap");
+			scale+=gap;//nifti does not know about gaps, just add it to the voxel size
+			offset-=gap/2;//shift the beginning by half the gap (which we just added to the voxel extends - and thus the extends of the image)
+		}
+			
+		util::Matrix4x4<float> image2isis=util::Matrix4x4<float>(
+			props.getPropertyAs<util::fvector4>("rowVec")*scale[data::rowDim],
+			props.getPropertyAs<util::fvector4>("columnVec")*scale[data::columnDim],
+			props.getPropertyAs<util::fvector4>("sliceVec")*scale[data::sliceDim],
+			props.getPropertyAs<util::fvector4>("indexOrigin")
+		).transpose();// the columns of the transform matrix are the scaled row-, column-, sliceVec and the offset
+		image2isis.elem(3,3)=1;// element 4/4 must be "1"
+
+		return nifti2isis.transpose().dot(image2isis);// apply inverse transform from nifti to isis => return transformation from image to nifti space
+	}
+
 	static void useSForm(util::PropertyMap &props){
 		// srow_? is the linear map from image space to nifti space (not isis space)
 		// [x] [ nifti/srow_x ]   [i]
@@ -603,55 +625,56 @@ private:
 		LOG(Debug,info)	<< "Computed voxelSize=" << props.getPropertyAs<util::fvector4>("voxelSize") << " from qform";
 	}
 	static bool storeQForm(const util::PropertyMap &props,_internal::nifti_1_header *head){
-		const util::Matrix4x4<float> image2isis=util::Matrix4x4<float>(
-			props.getPropertyAs<util::fvector4>("rowVec"),
-			props.getPropertyAs<util::fvector4>("columnVec"),
-			props.getPropertyAs<util::fvector4>("sliceVec")
-		).transpose();// the columns of the transform matrix are row-, slice- and
-
-		const util::Matrix4x4<float> image2nifti=nifti2isis.transpose().dot(image2isis);// apply inverse transform from nifti to isis
 
 		// take values of the 3x3 matrix == analog to the nifti reference implementation
-		float r11=image2nifti.elem(0,0),r21=image2nifti.elem(0,1),r31=image2nifti.elem(0,2);//first column
-		float r12=image2nifti.elem(1,0),r22=image2nifti.elem(1,1),r32=image2nifti.elem(1,2);//second column
-		float r13=image2nifti.elem(2,0),r23=image2nifti.elem(2,1),r33=image2nifti.elem(2,2);//third column
+		const isis::util::Matrix4x4< float > nifti2image = getNiftiMatrix(props).transpose(); //use the inverse of image2nifti to extract direction vectors easier
 
+		util::fvector4 col[3];
+		for(int i=0;i<3;i++){
+			col[i]=nifti2image.getRow(i);//nth column in image2nifti
+			head->pixdim[i+1]=col[i].len();//store voxel size (don't use voxelSize, thats without voxelGap)
+			col[i].norm(); // normalize the columns
+		}
+		
 		// compute the determinant to determine if the transformation is proper
-		if(r11*r22*r33-r11*r32*r23-r21*r12*r33+r21*r32*r13+r31*r12*r23-r31*r22*r13 > 0){
+		const float determinant=
+			col[0][0]*col[1][1]*col[2][2]-col[0][0]*col[1][2]*col[2][1]-col[0][1]*col[1][0]*col[2][2]+
+			col[0][1]*col[1][2]*col[2][0]+col[0][2]*col[1][0]*col[2][1]-col[0][2]*col[1][1]*col[2][0];
+		if( determinant > 0){
 			head->pixdim[0]=1;
 		} else { // improper => flip 3rd column
-			r13 = -r13 ; r23 = -r23 ; r33 = -r33 ;
+			col[2][0] = -col[2][0] ; col[2][1] = -col[2][1] ; col[2][2] = -col[2][2] ;
 			head->pixdim[0]=-1;
 		}
 		
 		head->qform_code=NIFTI_XFORM_SCANNER_ANAT;
 		// the following was more or less stolen from the nifti reference implementation
-		const float a_square=r11 + r22 + r33 + 1;
+		const float a_square=col[0][0] + col[1][1] + col[2][2] + 1;
 		if(a_square>0.5) { // simple case
 			const float a = 0.5  * sqrt(a_square);
-			head->quatern_b = 0.25 * (r32-r23) / a;
-			head->quatern_c = 0.25 * (r13-r31) / a;
-			head->quatern_d = 0.25 * (r21-r12) / a;
+			head->quatern_b = 0.25 * (col[1][2]-col[2][1]) / a;
+			head->quatern_c = 0.25 * (col[2][0]-col[0][2]) / a;
+			head->quatern_d = 0.25 * (col[0][1]-col[1][0]) / a;
 		} else {                       /* trickier case */
-			float xd = 1.0 + r11 - (r22+r33) ;  /* 4*b*b */
-			float yd = 1.0 + r22 - (r11+r33) ;  /* 4*c*c */
-			float zd = 1.0 + r33 - (r11+r22) ;  /* 4*d*d */
+			float xd = 1.0 + col[0][0] - (col[1][1]+col[2][2]) ;  /* 4*b*b */
+			float yd = 1.0 + col[1][1] - (col[0][0]+col[2][2]) ;  /* 4*c*c */
+			float zd = 1.0 + col[2][2] - (col[0][0]+col[1][1]) ;  /* 4*d*d */
 			float a;
 			if( xd > 1.0 ){
 				head->quatern_b = 0.5l * sqrt(xd) ;
-				head->quatern_c = 0.25l* (r12+r21) / head->quatern_b ;
-				head->quatern_d = 0.25l* (r13+r31) / head->quatern_b ;
-				a = 0.25l* (r32-r23) / head->quatern_b ;
+				head->quatern_c = 0.25l* (col[1][0]+col[0][1]) / head->quatern_b ;
+				head->quatern_d = 0.25l* (col[2][0]+col[0][2]) / head->quatern_b ;
+				a = 0.25l* (col[1][2]-col[2][1]) / head->quatern_b ;
 			} else if( yd > 1.0 ){
 				head->quatern_c = 0.5l * sqrt(yd) ;
-				head->quatern_b = 0.25l* (r12+r21) / head->quatern_c ;
-				head->quatern_d = 0.25l* (r23+r32) / head->quatern_c ;
-				a = 0.25l* (r13-r31) / head->quatern_c ;
+				head->quatern_b = 0.25l* (col[1][0]+col[0][1]) / head->quatern_c ;
+				head->quatern_d = 0.25l* (col[2][1]+col[1][2]) / head->quatern_c ;
+				a = 0.25l* (col[2][0]-col[0][2]) / head->quatern_c ;
 			} else {
 				head->quatern_d = 0.5l * sqrt(zd) ;
-				head->quatern_b = 0.25l* (r13+r31) / head->quatern_d ;
-				head->quatern_c = 0.25l* (r23+r32) / head->quatern_d ;
-				a = 0.25* (r21-r12) / head->quatern_d ;
+				head->quatern_b = 0.25l* (col[2][0]+col[0][2]) / head->quatern_d ;
+				head->quatern_c = 0.25l* (col[2][1]+col[1][2]) / head->quatern_d ;
+				a = 0.25* (col[0][1]-col[1][0]) / head->quatern_d ;
 			}
 			if( a < 0.0 ){
 				head->quatern_b=-head->quatern_b ;
@@ -660,15 +683,14 @@ private:
 			}
 		}
 
-		const util::fvector4 nifti_offset=nifti2isis.transpose().dot(props.getPropertyAs<util::fvector4>("indexOrigin"));
-		head->qoffset_x=nifti_offset[0];
-		head->qoffset_y=nifti_offset[1];
-		head->qoffset_z=nifti_offset[2];
+		head->qoffset_x=nifti2image.elem(0,3);
+		head->qoffset_y=nifti2image.elem(1,3);
+		head->qoffset_z=nifti2image.elem(2,3);
 		
 		return true;
 	}
 	static void storeSForm(const util::PropertyMap &props,_internal::nifti_1_header *head){
-
+		
 	}
 };
 
