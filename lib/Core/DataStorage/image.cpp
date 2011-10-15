@@ -31,6 +31,9 @@ namespace isis
 namespace data
 {
 
+ChunkOp::~ChunkOp(){}
+
+
 Image::Image ( ) : set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ), clean( false )
 {
 	addNeededFromString( neededProperties );

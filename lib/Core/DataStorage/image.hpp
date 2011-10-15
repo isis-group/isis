@@ -35,6 +35,7 @@ class ChunkOp : std::unary_function<Chunk &, bool>
 {
 public:
 	virtual bool operator()( Chunk &, util::FixedVector<size_t, 4> posInImage ) = 0;
+	virtual ~ChunkOp();
 };
 
 /// Main class for generic 4D-images
