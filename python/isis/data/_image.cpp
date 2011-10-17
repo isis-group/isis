@@ -9,23 +9,11 @@ namespace data
 
 _Image::_Image( PyObject *p )
 	: boost::python::wrapper< Image >(), self( p )
-{
-	init();
-}
+{}
 
 _Image::_Image( PyObject *p, const isis::data::Image &base )
 	: Image( base ), boost::python::wrapper< Image >(), self( p )
-{
-	init();
-}
-
-void _Image::init()
-{
-	m_Min = util::Singletons::get<isis::python::core::_internal::TypesMap, 10>().at(
-			getMinMax().first->getTypeID() )->convert( *getMinMax().first );
-	m_Max = util::Singletons::get<isis::python::core::_internal::TypesMap, 10>().at(
-			getMinMax().second->getTypeID() )->convert( *getMinMax().second );
-}
+{}
 
 std::list< Chunk > _Image::_getChunksAsVector(void )
 {
@@ -44,7 +32,7 @@ Chunk _Image::_getChunkAs(const size_t& first, const size_t& second, const size_
 	return ret;
 }
 
-const std::string _Image::_getMainOrientation()
+std::string _Image::_getMainOrientationAsString()
 {
 	switch( getMainOrientation() ) {
 	case sagittal:

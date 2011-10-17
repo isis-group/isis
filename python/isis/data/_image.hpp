@@ -71,13 +71,15 @@ public:
 	}
 
 	api::object _getMin( ) {
-		return m_Min;
+		return  util::Singletons::get<isis::python::core::_internal::TypesMap, 10>().at(
+			getMinMax().first->getTypeID() )->convert( *getMinMax().first );
 	}
 	api::object _getMax( ) {
-		return m_Max;
+		return  util::Singletons::get<isis::python::core::_internal::TypesMap, 10>().at(
+			getMinMax().second->getTypeID() )->convert( *getMinMax().second );
 	}
 
-	const std::string _getMainOrientation();
+	std::string _getMainOrientationAsString();
 
 	void _transformCoords( boost::python::list matrix, const bool &center );
 
@@ -95,9 +97,6 @@ public:
 
 private:
 	PyObject *self;
-	api::object m_Min;
-	api::object m_Max;
-	void init();
 
 };
 
