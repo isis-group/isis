@@ -9,6 +9,9 @@
 #define CHUNK_HPP_
 
 #include "DataStorage/chunk.hpp"
+#include <boost/python.hpp>
+#include "../core/_convertToPython.hpp"
+#include "common.hpp"
 
 using namespace isis::data;
 
@@ -23,84 +26,24 @@ class _Chunk : public Chunk, boost::python::wrapper<Chunk>
 {
 public:
 	//  _Chunk ( PyObject *p ) : self( p ) {}
-	_Chunk ( PyObject *p, const Chunk &base ) : Chunk( base ), self( p ) {}
-
-	float _voxel( const size_t &first, const size_t &second, const size_t &third, const size_t &fourth ) {
-		switch( getTypeID() ) {
-		case ValuePtr<int8_t>::staticID:
-			return Chunk::voxel<int8_t>( first, second, third, fourth );
-			break;
-		case ValuePtr<uint8_t>::staticID:
-			return Chunk::voxel<uint8_t>( first, second, third, fourth );
-			break;
-		case ValuePtr<int16_t>::staticID:
-			return Chunk::voxel<int16_t>( first, second, third, fourth );
-			break;
-		case ValuePtr<uint16_t>::staticID:
-			return Chunk::voxel<uint16_t>( first, second, third, fourth );
-			break;
-		case ValuePtr<int32_t>::staticID:
-			return Chunk::voxel<int32_t>( first, second, third, fourth );
-			break;
-		case ValuePtr<uint32_t>::staticID:
-			return Chunk::voxel<uint32_t>( first, second, third, fourth );
-			break;
-		case ValuePtr<float>::staticID:
-			return Chunk::voxel<float>( first, second, third, fourth );
-			break;
-		case ValuePtr<double>::staticID:
-			return Chunk::voxel<double>( first, second, third, fourth );
-			break;
-		default:
-			return 0;
-		}
+	_Chunk ( PyObject *p, const Chunk &base ) : Chunk( base ), self( p ) {
+		
 	}
 
-	float _voxel( const isis::util::ivector4 &coord ) {
+	boost::python::api::object _voxel( const size_t &first, const size_t &second, const size_t &third, const size_t &fourth ) {
+		return isis::python::data::_internal::VoxelOp::getVoxelAsPyObject( *this, first, second, third, fourth );
+	}
+
+	boost::python::api::object _voxel( const isis::util::ivector4 &coord ) {
 		return _voxel( coord[0], coord[1], coord[2], coord[3] );
 	}
 
-	bool _setVoxel( const size_t &first, const size_t &second, const size_t &third, const size_t &fourth, const float &value ) {
-
-		switch( getTypeID() ) {
-		case ValuePtr<int8_t>::staticID:
-			Chunk::voxel<int8_t>( first, second, third, fourth ) = value;
-			return true;
-			break;
-		case ValuePtr<uint8_t>::staticID:
-			Chunk::voxel<uint8_t>( first, second, third, fourth ) = value;
-			return true;
-			break;
-		case ValuePtr<int16_t>::staticID:
-			Chunk::voxel<int16_t>( first, second, third, fourth ) = value;
-			return true;
-			break;
-		case ValuePtr<uint16_t>::staticID:
-			Chunk::voxel<uint16_t>( first, second, third, fourth ) = value;
-			return true;
-			break;
-		case ValuePtr<int32_t>::staticID:
-			Chunk::voxel<int32_t>( first, second, third, fourth ) = value;
-			return true;
-			break;
-		case ValuePtr<uint32_t>::staticID:
-			Chunk::voxel<uint32_t>( first, second, third, fourth ) = value;
-			return true;
-			break;
-		case ValuePtr<float>::staticID:
-			Chunk::voxel<float>( first, second, third, fourth ) = value;
-			return true;
-			break;
-		case ValuePtr<double>::staticID:
-			Chunk::voxel<double>( first, second, third, fourth ) = value;
-			return true;
-			break;
-		default:
-			return false;
-		}
+	bool _setVoxel( const size_t &first, const size_t &second, const size_t &third, const size_t &fourth, const api::object &value ) {
+		return isis::python::data::_internal::VoxelOp::setVoxelAsPyObject( *this, first, second, third, fourth, value );
 	}
+	
 
-	bool _setVoxel( const isis::util::ivector4 &coord, const float &value ) {
+	bool _setVoxel( const isis::util::ivector4 &coord, const api::object &value ) {
 		return _setVoxel( coord[0], coord[1], coord[2], coord[3], value );
 	}
 
@@ -114,6 +57,7 @@ public:
 
 private:
 	PyObject *self;
+
 };
 }
 }

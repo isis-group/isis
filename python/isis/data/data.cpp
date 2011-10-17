@@ -70,10 +70,10 @@ BOOST_PYTHON_MODULE( _data )
 	class_<isis::data::Image, _Image, bases< isis::data::_internal::NDimensional<4>, isis::util::PropertyMap > >( "Image", init<>() )
 	.def( init<isis::data::Image>() )
 	.def( "checkMakeClean", &isis::data::Image::checkMakeClean )
-	.def( "getVoxel", ( float ( ::_Image:: * )( const isis::util::ivector4 & ) ) ( &_Image::_voxel ), ( arg( "coord" ) ) )
-	.def( "getVoxel", ( float ( ::_Image:: * )( const size_t &, const size_t &, const size_t &, const size_t & ) ) ( &_Image::_voxel ), ( arg( "first" ), arg( "second" ), arg( "third" ), arg( "fourth" ) ) )
-	.def( "setVoxel", ( bool ( ::_Image:: * )( const isis::util::ivector4 &, const float & ) ) ( &_Image::_setVoxel ), ( arg( "coord" ), arg( "value" ) ) )
-	.def( "setVoxel", ( bool ( ::_Image:: * )( const size_t &, const size_t &, const size_t &, const size_t &, const float & ) ) ( &_Image::_setVoxel ), ( arg( "first" ), arg( "second" ), arg( "third" ), arg( "fourth" ), arg( "value" ) ) )
+	.def( "getVoxel", ( api::object ( ::_Image:: * )( const isis::util::ivector4 & ) ) ( &_Image::_voxel ), ( arg( "coord" ) ) )
+	.def( "getVoxel", ( api::object ( ::_Image:: * )( const size_t &, const size_t &, const size_t &, const size_t & ) ) ( &_Image::_voxel ), ( arg( "first" ), arg( "second" ), arg( "third" ), arg( "fourth" ) ) )
+	.def( "setVoxel", ( bool ( ::_Image:: * )( const isis::util::ivector4 &, const api::object & ) ) ( &_Image::_setVoxel ), ( arg( "coord" ), arg( "value" ) ) )
+	.def( "setVoxel", ( bool ( ::_Image:: * )( const size_t &, const size_t &, const size_t &, const size_t &, const api::object & ) ) ( &_Image::_setVoxel ), ( arg( "first" ), arg( "second" ), arg( "third" ), arg( "fourth" ), arg( "value" ) ) )
 	.def( "getChunkList", &_Image::_getChunksAsVector )
 	.def( "getChunksAsList", &_Image::_getChunksAsVector )
 	.def( "getMajorTypeID", &isis::data::Image::getMajorTypeID )
@@ -92,11 +92,11 @@ BOOST_PYTHON_MODULE( _data )
 	.def( "transformCoords", &_Image::_transformCoords )
 	.def( "getMainOrientation", &_Image::_getMainOrientation )
 	.def( "convertToType", &isis::data::Image::convertToType )
-	.def( "makeOfTypeName", &_Image::_makeOfTypeName )
+	.def( "makeOfType", &_Image::_makeOfType )
 	.def( "spliceDownTo", &_Image::_spliceDownTo )
-	.def( "deepCopy", ( isis::data::Image ( ::_Image:: * )( void ) ) ( &_Image::_deepCopy ) )
-	.def( "deepCopy", ( isis::data::Image ( ::_Image:: * )( std::string ) ) ( &_Image::_deepCopy ), ( arg( "type" ) ) )
-	.def( "cheapCopy", ( isis::data::Image ( ::_Image:: * )( void ) ) ( &_Image::_cheapCopy ) )
+	.def( "getDeepCopy", ( isis::data::Image ( ::_Image:: * )( void ) ) ( &_Image::_deepCopy ) )
+	.def( "getDeepCopyAs", ( isis::data::Image ( ::_Image:: * )( isis::python::data::_internal::image_types ) ) ( &_Image::_deepCopy ), ( arg( "type" ) ) )
+	.def( "getCheapCopy", ( isis::data::Image ( ::_Image:: * )( void ) ) ( &_Image::_cheapCopy ) )
 	;
 	//#######################################################################################
 	//  ImageList
@@ -115,11 +115,11 @@ BOOST_PYTHON_MODULE( _data )
 	//#######################################################################################
 	//  Chunk
 	//#######################################################################################
-	class_<isis::data::Chunk, _Chunk> ( "Chunk", init<_Chunk>() )
-	.def( "getVoxel", ( float ( ::_Chunk:: * )( const isis::util::ivector4 & ) ) ( &_Chunk::_voxel ), ( arg( "coord" ) ) )
-	.def( "getVoxel", ( float ( ::_Chunk:: * )( const size_t &, const size_t &, const size_t &, const size_t & ) ) ( &_Chunk::_voxel ), ( arg( "first" ), arg( "second" ), arg( "third" ), arg( "fourth" ) ) )
-	.def( "setVoxel", ( bool ( ::_Chunk:: * )( const isis::util::ivector4 &, const float & ) ) ( &_Chunk::_setVoxel ), ( arg( "coord" ), arg( "value" ) ) )
-	.def( "setVoxel", ( bool ( ::_Chunk:: * )( const size_t &, const size_t &, const size_t &, const size_t &, const float & ) ) ( &_Chunk::_setVoxel ), ( arg( "first" ), arg( "second" ), arg( "third" ), arg( "fourth" ), arg( "value" ) ) )
+	class_<isis::data::Chunk, _Chunk, bases< isis::data::_internal::NDimensional<4>, isis::util::PropertyMap> > ( "Chunk", init<_Chunk>() )
+	.def( "getVoxel", ( api::object ( ::_Chunk:: *) ( const isis::util::ivector4 & ) ) ( &_Chunk::_voxel ), ( arg( "coord" ) ) )
+	.def( "getVoxel", ( api::object ( ::_Chunk:: *) ( const size_t &, const size_t &, const size_t &, const size_t & ) ) ( &_Chunk::_voxel ), ( arg( "first" ), arg("second"), arg("third"), arg("fourth") ) )
+	.def( "setVoxel", ( bool ( ::_Chunk:: * )( const isis::util::ivector4 &, const api::object & ) ) ( &_Chunk::_setVoxel ), ( arg( "coord" ), arg( "value" ) ) )
+	.def( "setVoxel", ( bool ( ::_Chunk:: * )( const size_t &, const size_t &, const size_t &, const size_t &, const api::object & ) ) ( &_Chunk::_setVoxel ), ( arg( "first" ), arg( "second" ), arg( "third" ), arg( "fourth" ), arg( "value" ) ) )
 	.def( "useCount", &isis::data::Chunk::useCount )
 	.def( "cloneToNew", &isis::data::Chunk::cloneToNew )
 	.def( "convertToType", ( bool ( ::_Chunk:: * )( const unsigned short ) ) ( &_Chunk::_convertToType ), ( arg( "ID" ) ) )
@@ -175,6 +175,27 @@ BOOST_PYTHON_MODULE( _data )
 	.value( "FLOAT", FLOAT )
 	.value( "DOUBLE", DOUBLE )
 	;
+	//#######################################################################################
+	//  enums for orientations
+	//#######################################################################################
+	enum_<isis::data::Image::orientation>("orientation")
+	.value( "AXIAL", isis::data::Image::axial )
+	.value( "REVERSED_AXIAL", isis::data::Image::reversed_axial)
+	.value( "SAGITTAL", isis::data::Image::sagittal)
+	.value( "REVERSED_SAGITTAL", isis::data::Image::reversed_sagittal )
+	.value( "CORONAL", isis::data::Image::coronal )
+	.value( "REVERSED_CORONAL", isis::data::Image::reversed_coronal )
+	;
+	//#######################################################################################
+	//  enums for dimensions
+	//#######################################################################################
+	enum_<isis::data::dimensions>("dimensions")
+	.value( "ROW_DIM", rowDim )
+	.value( "COLUMN_DIM", columnDim )
+	.value( "SLICE_DIM", sliceDim )
+	.value( "TIME_DIM", timeDim )
+	;
+	
 	
 	
 
