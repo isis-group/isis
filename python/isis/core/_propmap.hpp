@@ -23,30 +23,16 @@ namespace python
 namespace core
 {
 
-// helper class PropertyMap
-class _PropertyMap : public util::PropertyMap, boost::python::wrapper< util::PropertyMap >
-{
+namespace PropertyMap {
 
-public:
-	_PropertyMap ();
-	_PropertyMap ( PyObject *p );
-	_PropertyMap ( PyObject *p, const PropertyMap &base );
-
-	isis::util::PropertyMap _branch ( const util::istring &key );
-
-	isis::util::PropertyValue _propertyValue( const util::istring &key );
-
-	void _setProperty( const std::string &key, api::object value );
-
-	api::object _getProperty( const std::string &key );
+void _setProperty( isis::util::PropertyMap &base, const std::string &key, api::object value );
+	
+api::object _getProperty( const isis::util::PropertyMap &base, const std::string &key );
 
 
-private:
-	PyObject *self;
-	_internal::ConvertFromPython m_ConverterFromPyton;
+isis::util::PropertyMap _branch( const isis::util::PropertyMap &base, const std::string &key );
 
-
-};
+} // end namespace PropertyMap
 }
 }
 }

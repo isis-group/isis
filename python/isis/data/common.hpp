@@ -22,6 +22,7 @@ struct PythonDebug {static const char *name() {return "PythonDebug";}; enum {use
 
 namespace python
 {
+	
 typedef PythonLog Runtime;
 typedef PythonDebug Debug;
 

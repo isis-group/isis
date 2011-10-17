@@ -7,46 +7,49 @@
 #include <boost/algorithm/string.hpp>
 #include "common.hpp"
 #include "_application.hpp"
+#include "_convertToPython.hpp"
 #include "_vector.hpp"
 #include "_propmap.hpp"
 #include "CoreUtils/selection.hpp"
+#include "../data/_ioapplication.hpp"
+#include "CoreUtils/singletons.hpp"
 
 using namespace boost::python;
 using namespace isis::python::core;
 
 BOOST_PYTHON_MODULE( _core )
 {
+	isis::util::Singletons::get<isis::python::core::_internal::TypesMap, 10>().create();
 	//#######################################################################################
 	//  Application
 	//#######################################################################################
-	class_<isis::util::Application, _Application>( "Application", init<const char *>() )
+	class_<isis::util::Application>( "Application", init<const char *>() )
 	//virtual void printHelp()const;
 	.def( "printHelp", &isis::util::Application::printHelp )
 	//static const std::string getCoreVersion( void );
 	.def( "getCoreVersion", &isis::util::Application::getCoreVersion )
 	.staticmethod( "getCoreVersion" )
 	//virtual bool init( int argc, char **argv, bool exitOnError = true );
-	.def( "init", &_Application::init )
-	.def( "addParameter", &_Application::_addParameter )
-	.def( "getParameter", &_Application::_getParameter )
-	.def( "setNeeded", &_Application::_setNeeded )
-	.def( "setHidden", &_Application::_setHidden )
-	.def( "setDescription", &_Application::_setDescription )
+	.def( "init", &isis::python::core::Application::_init )
+	.def( "addParameter", &isis::python::core::Application::_addParameter )
+	.def( "getParameter", &isis::python::core::Application::_getParameter )
+	.def( "setNeeded", &isis::python::core::Application::_setNeeded )
+	.def( "setHidden", &isis::python::core::Application::_setHidden )
+	.def( "setDescription", &isis::python::core::Application::_setDescription )
 	;
 	//#######################################################################################
 	//  PropertyMap
 	//#######################################################################################
-	class_<isis::util::PropertyMap, _PropertyMap>( "PropertyMap", init<>() )
-	.def( init<_PropertyMap>() )
+	class_<isis::util::PropertyMap>( "PropertyMap", init<>() )
 	.def( "hasProperty", &isis::util::PropertyMap::hasProperty )
 	.def( "hasBranch", &isis::util::PropertyMap::hasBranch )
-	.def( "getBranch", &_PropertyMap::_branch )
+	.def( "getBranch", &isis::python::core::PropertyMap::_branch )
 	.def( "remove", ( bool ( ::isis::util::PropertyMap:: * )( const isis::util::istring & ) ) ( &isis::util::PropertyMap::remove ), ( arg( "key" ) ) )
 	.def( "remove", ( bool ( ::isis::util::PropertyMap:: * )( const isis::util::PropertyMap &, bool ) ) ( &isis::util::PropertyMap::remove ), ( arg( "removeMap" ), arg( "keep_needed" ) ) )
 	.def( "isValid", &isis::util::PropertyMap::isValid )
 	.def( "isEmpty", &isis::util::PropertyMap::isEmpty )
-	.def( "setProperty", &_PropertyMap::_setProperty )
-	.def( "getProperty", &_PropertyMap::_getProperty )
+	.def( "setProperty", &isis::python::core::PropertyMap::_setProperty )
+	.def( "getProperty", &isis::python::core::PropertyMap::_getProperty )
 	;
 	//#######################################################################################
 	//  Selection

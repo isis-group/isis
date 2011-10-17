@@ -26,47 +26,54 @@ using namespace isis::python::data;
 
 BOOST_PYTHON_MODULE( _data )
 {
+	
 	//#######################################################################################
 	//  IOApplication
 	//#######################################################################################
-	class_<isis::data::IOApplication, _IOApplication, bases< isis::python::core::_Application> > ( "IOApplication", init<const char *, bool, bool>() )
+	class_<isis::data::IOApplication, _IOApplication, bases< isis::util::Application> > ( "IOApplication", init<const char *, bool, bool>() )
 	.def( "autoload", &isis::data::IOApplication::autoload )
 	.def( "autowrite", &_IOApplication::_autowrite )
 	.def( "images", &_IOApplication::_images )
-
 	;
 	//#######################################################################################
 	//  NDimensional<4>
 	//#######################################################################################
+	//function pointers
+	void ( *_init1 ) ( isis::data::_internal::NDimensional<4>&, const isis::util::ivector4 & ) = isis::python::data::NDimensional::_init;
+	void ( *_init2 ) ( isis::data::_internal::NDimensional<4>&, const size_t&, const size_t&, const size_t&, const size_t& ) = isis::python::data::NDimensional::_init;
+	size_t ( *_getLinearIndex1 ) ( const isis::data::_internal::NDimensional<4>&, const isis::util::ivector4 & ) = isis::python::data::NDimensional::_getLinearIndex;
+	size_t ( *_getLinearIndex2 ) ( const isis::data::_internal::NDimensional<4>&, const size_t&, const size_t&, const size_t&, const size_t& ) = isis::python::data::NDimensional::_getLinearIndex;
+	bool ( *_isInRange1 ) ( const isis::data::_internal::NDimensional<4>&, const isis::util::ivector4& ) = isis::python::data::NDimensional::_isInRange;
+	bool ( *_isInRange2 ) ( const isis::data::_internal::NDimensional<4>&,  const size_t &, const size_t&, const size_t&, const size_t& ) = isis::python::data::NDimensional::_isInRange;
+	// the class itself
 	class_<isis::data::_internal::NDimensional<4>, _NDimensional > ( "NDimensional4", init<const isis::util::ivector4&>() )
 	.def( init<>() )
-	.def( "init", ( void ( ::_NDimensional:: * )( const isis::util::ivector4& ) ) ( &_NDimensional::_init ), ( arg( "dims" ) ) )
-	.def( "init", ( void ( ::_NDimensional:: * )( const size_t &, const size_t&, const size_t&, const size_t& ) ) ( &_NDimensional::_init ), ( arg( "first"), arg("second"), arg("third"), arg("fourth") ) )
-	.def( "getLinearIndex", ( size_t ( ::_NDimensional:: * )( const isis::util::ivector4& ) ) (  &_NDimensional::_getLinearIndex ), ( arg( "dims" ) ) )
-	.def( "getLinearIndex", ( size_t ( ::_NDimensional:: * )( const size_t&, const size_t&, const size_t&, const size_t& ) ) ( &_NDimensional::_getLinearIndex), ( arg("first"), arg("second"), arg("third"), arg("fourth") ) )
-	.def( "getCoordsFromLinIndex", &_NDimensional::_getCoordsFromLinIndex )
-	.def( "isInRange", ( bool ( ::_NDimensional:: * ) ( const isis::util::ivector4& ) ) ( &_NDimensional::_isInRange), ( arg( "dims") ) )
-	.def( "isInRange", ( bool ( ::_NDimensional:: * ) ( const size_t &, const size_t&, const size_t&, const size_t& ) ) ( &_NDimensional::_isInRange ), ( arg( "first"), arg("second"), arg("third"), arg("fourth") ) )
+	.def( "init", _init1, ( arg( "dims" ) ) )
+	.def( "init", _init2, ( arg( "first"), arg("second"), arg("third"), arg("fourth") ) )
+	.def( "getLinearIndex", _getLinearIndex1, ( arg( "dims" ) ) )
+	.def( "getLinearIndex", _getLinearIndex2, ( arg("first"), arg("second"), arg("third"), arg("fourth") ) )
+	.def( "getCoordsFromLinIndex", &isis::python::data::NDimensional::_getCoordsFromLinIndex )
+	.def( "isInRange", _isInRange1, ( arg( "dims") ) )
+	.def( "isInRange", _isInRange2, ( arg( "first"), arg("second"), arg("third"), arg("fourth") ) )
 	.def( "getVolume", &isis::data::_internal::NDimensional<4>::getVolume )
 	.def( "getDimSize", &isis::data::_internal::NDimensional<4>::getDimSize )
 	.def( "getSizeAsString", &isis::data::_internal::NDimensional<4>::getSizeAsString )
-	.def( "getSizeAsString", &_NDimensional::_getSizeAsString ) // this is for the one that has no argument
-	.def( "getSizeAsVector", &_NDimensional::_getSizeAsVector )
+	.def( "getSizeAsString", &isis::python::data::NDimensional::_getSizeAsString ) // this is for the one that has no argument
+	.def( "getSizeAsVector", &isis::python::data::NDimensional::_getSizeAsVector )
 	.def( "getRelevantDims", &isis::data::_internal::NDimensional<4>::getRelevantDims )
-	.def( "getFoV", &_NDimensional::_getFoV )
+	.def( "getFoV", &isis::python::data::NDimensional::_getFoV )
 	;
 	
 	//#######################################################################################
 	//  Image
 	//#######################################################################################
-	class_<isis::data::Image, _Image >( "Image", init<>() )
+	class_<isis::data::Image, _Image, bases< isis::data::_internal::NDimensional<4>, isis::util::PropertyMap > >( "Image", init<>() )
 	.def( init<isis::data::Image>() )
 	.def( "checkMakeClean", &isis::data::Image::checkMakeClean )
 	.def( "getVoxel", ( float ( ::_Image:: * )( const isis::util::ivector4 & ) ) ( &_Image::_voxel ), ( arg( "coord" ) ) )
 	.def( "getVoxel", ( float ( ::_Image:: * )( const size_t &, const size_t &, const size_t &, const size_t & ) ) ( &_Image::_voxel ), ( arg( "first" ), arg( "second" ), arg( "third" ), arg( "fourth" ) ) )
 	.def( "setVoxel", ( bool ( ::_Image:: * )( const isis::util::ivector4 &, const float & ) ) ( &_Image::_setVoxel ), ( arg( "coord" ), arg( "value" ) ) )
 	.def( "setVoxel", ( bool ( ::_Image:: * )( const size_t &, const size_t &, const size_t &, const size_t &, const float & ) ) ( &_Image::_setVoxel ), ( arg( "first" ), arg( "second" ), arg( "third" ), arg( "fourth" ), arg( "value" ) ) )
-	.def( "getSizeAsVector", &_Image::_getSizeAsVector )
 	.def( "getChunkList", &_Image::_getChunksAsVector )
 	.def( "getChunksAsList", &_Image::_getChunksAsVector )
 	.def( "getMajorTypeID", &isis::data::Image::getMajorTypeID )
@@ -90,7 +97,6 @@ BOOST_PYTHON_MODULE( _data )
 	.def( "deepCopy", ( isis::data::Image ( ::_Image:: * )( void ) ) ( &_Image::_deepCopy ) )
 	.def( "deepCopy", ( isis::data::Image ( ::_Image:: * )( std::string ) ) ( &_Image::_deepCopy ), ( arg( "type" ) ) )
 	.def( "cheapCopy", ( isis::data::Image ( ::_Image:: * )( void ) ) ( &_Image::_cheapCopy ) )
-	.def( "getPropertyMap", ( isis::util::PropertyMap ( ::isis::python::core::_PropertyMap:: * )( void ) ) ( &_Image::_getPropMap ) )
 	;
 	//#######################################################################################
 	//  ImageList

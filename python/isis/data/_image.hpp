@@ -25,7 +25,7 @@ namespace python
 namespace data
 {
 
-class _Image : public Image, boost::python::wrapper<Image>
+class _Image : public Image, public boost::python::wrapper<Image>
 {
 
 public:

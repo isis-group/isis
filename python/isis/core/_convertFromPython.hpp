@@ -36,19 +36,16 @@ class ConvertFromPython
 {
 
 public:
-
-	ConvertFromPython();
-	util::PropertyValue convert( api::object value );
-
-	std::list<std::string> getKnownTypes() const { return m_KnownTypes; }
+	static const std::list<std::string> knownTypes; 
+	static util::PropertyValue convert( api::object value );
 
 private:
 
 
-	util::PropertyValue getList( api::object value );
+	static util::PropertyValue getList( api::object value );
 
 	template<typename TYPE>
-	std::list<TYPE> extractFromList( api::object value ) {
+	static std::list<TYPE> extractFromList( api::object value ) {
 		std::list<TYPE> retList;
 
 		for( Py_ssize_t i = 0; i < PyList_Size( value.ptr() ); i++ ) {
@@ -57,7 +54,7 @@ private:
 
 		return retList;
 	}
-	std::list<std::string> m_KnownTypes;
+	
 };
 
 }

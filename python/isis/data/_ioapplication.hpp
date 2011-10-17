@@ -9,7 +9,7 @@
 #define _IOAPPLICATION_HPP_
 
 #include "DataStorage/io_application.hpp"
-#include "core/_application.hpp"
+#include <boost/python.hpp>
 
 namespace isis
 {
@@ -37,6 +37,8 @@ private:
 	PyObject *self;
 
 };
+
+
 }
 }
 }
