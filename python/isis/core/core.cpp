@@ -11,7 +11,6 @@
 #include "_vector.hpp"
 #include "_propmap.hpp"
 #include "CoreUtils/selection.hpp"
-#include "../data/_ioapplication.hpp"
 #include "CoreUtils/singletons.hpp"
 
 using namespace boost::python;

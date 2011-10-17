@@ -9,7 +9,9 @@
 #define _IOAPPLICATION_HPP_
 
 #include "DataStorage/io_application.hpp"
+#include "DataStorage/image.hpp"
 #include <boost/python.hpp>
+#include "common.hpp"
 
 namespace isis
 {
@@ -26,11 +28,17 @@ public:
 	_IOApplication( PyObject *p, const char name[], const bool &input, const bool &output );
 	_IOApplication( PyObject *p, const isis::data::IOApplication &base );
 
-	bool _autowrite( const std::list<isis::data::Image> &imgList, bool exitOnError ) {
-		return isis::data::IOApplication::autowrite( imgList, exitOnError );
-	}
 	std::list<isis::data::Image> _images() {
 		return images;
+	}
+	
+	isis::data::Image _fetchImageAs( isis::python::data::_internal::image_types type );
+	
+	bool _autowrite( std::list<isis::data::Image> imageList ) {
+		return autowrite( imageList );
+	}
+	bool _autowrite( isis::data::Image image ) {
+		return autowrite(image);
 	}
 
 private:

@@ -31,7 +31,7 @@ namespace Application {
 	
 	void _setNeeded( isis::util::Application &base, const std::string &name, const bool &needed );
 
-	bool _init( isis::util::Application &base, int argc, list pyargv, bool exitOnError = true );
+	bool _init( isis::util::Application &base, list pyargv, bool exitOnError = true );
 }
 
 }

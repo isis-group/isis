@@ -32,8 +32,14 @@ BOOST_PYTHON_MODULE( _data )
 	//#######################################################################################
 	class_<isis::data::IOApplication, _IOApplication, bases< isis::util::Application> > ( "IOApplication", init<const char *, bool, bool>() )
 	.def( "autoload", &isis::data::IOApplication::autoload )
-	.def( "autowrite", &_IOApplication::_autowrite )
+	.def( "autowrite", ( bool ( ::IOApplication:: * )( std::list<isis::data::Image>, bool ) ) ( &isis::data::IOApplication::autowrite ), ( arg( "imageList" ), arg("exitOnError") ) ) 
+	.def( "autowrite", ( bool ( ::IOApplication:: * )( isis::data::Image, bool ) ) ( &isis::data::IOApplication::autowrite ), ( arg( "image" ), arg("exitOnError") ) ) 
+	//wrappings for standard values
+	.def( "autowrite", ( bool ( ::_IOApplication:: * )( std::list<isis::data::Image> ) ) ( &_IOApplication::_autowrite ), ( arg( "imageList" ), arg("exitOnError") ) ) 
+	.def( "autowrite", ( bool ( ::_IOApplication:: * )( isis::data::Image ) ) ( &_IOApplication::_autowrite ), ( arg( "image" ), arg("exitOnError") ) ) 
 	.def( "images", &_IOApplication::_images )
+	.def( "fetchImage", &IOApplication::fetchImage )
+	.def( "fetchImageAs", &_IOApplication::_fetchImageAs )
 	;
 	//#######################################################################################
 	//  NDimensional<4>

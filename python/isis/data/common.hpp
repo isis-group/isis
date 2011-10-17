@@ -17,6 +17,8 @@
 *  Additional documentation for group `mygrp'
 *  @{
 */
+
+using namespace isis::data;
 namespace isis
 {
 
@@ -36,7 +38,8 @@ template<typename HANDLE> void enable_log( LogLevel level )
 }
 namespace data {
 namespace _internal {
-using namespace isis::data;
+
+
 enum image_types { BOOL = ValuePtr<bool>::staticID,
 INT8_T = ValuePtr<int8_t>::staticID, 
 UINT8_T = ValuePtr<uint8_t>::staticID, 

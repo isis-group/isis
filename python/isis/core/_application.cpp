@@ -34,15 +34,15 @@ void _setNeeded(util::Application& base, const std::string& name, const bool& ne
 	base.parameters.at( name ).needed() = needed;
 }
 
-bool _init(util::Application& base, int argc, boost::python::list pyargv, bool exitOnError)
-{
-	char *argv[argc];
+bool _init(util::Application& base, boost::python::list pyargv, bool exitOnError)
+{	
 	size_t n = boost::python::len( pyargv );
+	char *argv[n];
 
 	for( size_t i = 0; i < n; i++ ) {
 		argv[i] = boost::python::extract<char *>( pyargv[i] );
 	}
-	return base.init( argc, argv, exitOnError );
+	return base.init( n, argv, exitOnError );
 
 }
 
