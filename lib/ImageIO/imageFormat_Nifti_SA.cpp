@@ -42,12 +42,6 @@
 #define NIFTI_UNITS_PPM    40
 #define NIFTI_UNITS_RADS   48
 
-#define NIFTI_XFORM_UNKNOWN      0 /* Arbitrary coordinates (Method 1). */
-#define NIFTI_XFORM_SCANNER_ANAT 1 /* Scanner-based anatomical coordinates */
-#define NIFTI_XFORM_ALIGNED_ANAT 2 /* Coordinates aligned to another file's, or to anatomical "truth". */
-#define NIFTI_XFORM_TALAIRACH    3 /* Coordinates aligned to Talairach-Tournoux Atlas; (0,0,0)=AC, etc. */
-#define NIFTI_XFORM_MNI_152      4 /* MNI 152 normalized coordinates. */
-
 
 namespace isis
 {
@@ -123,6 +117,8 @@ struct nifti_1_header {
 class ImageFormat_NiftiSa: public FileFormat
 {
 	static const util::Matrix4x4<short> nifti2isis;
+	static const util::Selection formCode;
+
 public:
 	ImageFormat_NiftiSa(){
 		nifti_type2isis_type[NIFTI_TYPE_INT8 ]=data::ValuePtr< int8_t>::staticID;
@@ -265,7 +261,7 @@ protected:
 		}
 		// store niftis original qform if its there
 		if(props.hasProperty("nifti/qform_code")){
-			head->qform_code=props.getPropertyAs<short>("nifti/qform_code");
+			head->qform_code=props.getPropertyAs<util::Selection>("nifti/qform_code");
 			if( props.hasProperty("nifti/quatern_b") && props.hasProperty("nifti/quatern_c") && props.hasProperty("nifti/quatern_d") &&
 			    props.hasProperty("nifti/qoffset") && props.hasProperty("nifti/qfac")
 			){
@@ -281,6 +277,9 @@ protected:
 		//store current orientation (may override values set above)
 		if(!storeQForm(props,head)) //try to encode as quaternion
 			storeSForm(props,head); //fall back to normal matrix
+
+		if(props.hasProperty("repetitionTime"))
+			head->pixdim[head->dim[0]]=props.getPropertyAs<float>("repetitionTime");
 
 		strcpy(head->magic,"n+1");
 	}
@@ -302,8 +301,6 @@ protected:
 
 		props.setPropertyAs<uint16_t>("sequenceNumber",0);
 		props.setPropertyAs<std::string>("sequenceDescription",head->descrip);
-
-		const util::Selection formCode("SCANNER_ANAT,ALIGNED_ANAT,TALAIRACH,MNI_152");
 
 		if( head->sform_code ) { // get srow if sform_code>0
 			props.setPropertyAs( "nifti/sform_code", formCode )->castTo<util::Selection>().set(head->sform_code);
@@ -349,7 +346,7 @@ protected:
 						for(uint32_t i=0;i<head->dim[3];i++)
 							props.propertyValueAt("acquisitionNumber",i)=i;
 					} else {
-						props.propertyValue("acquisitionNumber")=0;
+						props.setPropertyAs<uint32_t>("acquisitionNumber",0);
 					}
 					break;
 				case NIFTI_SLICE_SEQ_DEC:
@@ -379,12 +376,13 @@ protected:
 				}
 			}
 		} else {
-			LOG_IF(head->slice_code,Runtime,warning) << "Sorry slice_code!=0 is currently only supportet for 3D-images, ignoring it.";
+			props.setPropertyAs<uint32_t>("acquisitionNumber",0);
+			LOG_IF(head->slice_code>1,Runtime,warning) << "Sorry slice_code>1 is currently only supportet for 3D-images, ignoring it.";
 		}
 
 		// Tr
-		if(dims>4)
-			props.setPropertyAs<uint16_t>("repetitionTime",head->pixdim[4]*time_fac);
+		if(head->pixdim[dims]!=0) // if pixdim is given for the uppermost dim, assume its repetitionTime
+			props.setPropertyAs<uint16_t>("repetitionTime",head->pixdim[dims]*time_fac);
 
 		// sequenceDescription
 		if(!parseDescripForSPM(props, head->descrip)) // if descrip dos not hold Te,Tr and stuff (SPM dialect)
@@ -468,7 +466,6 @@ public:
 			// get the first 348 bytes as header
 			_internal::nifti_1_header *header= reinterpret_cast<_internal::nifti_1_header*>(&out[0]);
 			memset(header,0,sizeof(_internal::nifti_1_header));
-			storeHeader(image,header);
 
 			// set the datatype
 			header->sizeof_hdr=header->vox_offset=348; // must be 348
@@ -485,6 +482,8 @@ public:
 			std::pair< float, float > minmax=image.getMinMaxAs<float>();
 			header->cal_min=minmax.first;header->cal_max=minmax.second;
 
+			storeHeader(image,header);
+
 			CopyOp do_copy(image,out);
 			const_cast<data::Image&>( image).foreachChunk(do_copy); // @todo we _do_ need a const version of foreachChunk/Voxel
 		} else {
@@ -496,21 +495,27 @@ public:
 	bool tainted()const {return false;}//internal plugins are not tainted
 private:
 	/// get the tranformation matrix from image space to Nifti space using row-,column and sliceVec from the given PropertyMap
-	static util::Matrix4x4<float> getNiftiMatrix(const util::PropertyMap &props){
-		util::fvector4 scale=props.getPropertyAs<util::fvector4>("voxelSize");//used to put the scaling into the transformation
-		util::fvector4 offset=props.getPropertyAs<util::fvector4>("indexOrigin");
+	static util::Matrix4x4<double> getNiftiMatrix(const util::PropertyMap &props){
+		util::dvector4 scale=props.getPropertyAs<util::dvector4>("voxelSize");//used to put the scaling into the transformation
+		util::dvector4 offset=props.getPropertyAs<util::dvector4>("indexOrigin");
 
 		if(props.hasProperty("voxelGap")){
-			const util::fvector4 gap=props.getPropertyAs<util::fvector4>("voxelGap");
+			const util::dvector4 gap=props.getPropertyAs<util::dvector4>("voxelGap");
 			scale+=gap;//nifti does not know about gaps, just add it to the voxel size
-			offset-=gap/2;//shift the beginning by half the gap (which we just added to the voxel extends - and thus the extends of the image)
 		}
-			
-		util::Matrix4x4<float> image2isis=util::Matrix4x4<float>(
-			props.getPropertyAs<util::fvector4>("rowVec")*scale[data::rowDim],
-			props.getPropertyAs<util::fvector4>("columnVec")*scale[data::columnDim],
-			props.getPropertyAs<util::fvector4>("sliceVec")*scale[data::sliceDim],
-			props.getPropertyAs<util::fvector4>("indexOrigin")
+
+		// the direction vectors should be normalized (says the isis-doc) but we get them in a higher precission than usual - so lets re-norm them
+		util::dvector4 mat_rows[3];const char *row_names[]={"rowVec","columnVec","sliceVec"};
+		for(int i=0;i<3;i++){
+			mat_rows[i]=props.getPropertyAs<util::dvector4>(row_names[i]);
+			mat_rows[i].norm();
+		}
+
+		util::Matrix4x4<double> image2isis=util::Matrix4x4<double>(
+			mat_rows[data::rowDim]*scale[data::rowDim],
+			mat_rows[data::columnDim]*scale[data::columnDim],
+			mat_rows[data::sliceDim]*scale[data::sliceDim],
+			props.getPropertyAs<util::dvector4>("indexOrigin")
 		).transpose();// the columns of the transform matrix are the scaled row-, column-, sliceVec and the offset
 		image2isis.elem(3,3)=1;// element 4/4 must be "1"
 
@@ -614,6 +619,7 @@ private:
 		props.remove("nifti/quatern_b");
 		props.remove("nifti/quatern_c");
 		props.remove("nifti/quatern_d");
+		props.remove("nifti/qfac");
 
 		// indexOrigin //////////////////////////////////////////////////////////////////////////////////
 		props.setPropertyAs<util::fvector4>("indexOrigin",nifti2isis.dot(props.getPropertyAs<util::fvector4>( "nifti/qoffset")));
@@ -627,7 +633,7 @@ private:
 	static bool storeQForm(const util::PropertyMap &props,_internal::nifti_1_header *head){
 
 		// take values of the 3x3 matrix == analog to the nifti reference implementation
-		const isis::util::Matrix4x4< float > nifti2image = getNiftiMatrix(props).transpose(); //use the inverse of image2nifti to extract direction vectors easier
+		const isis::util::Matrix4x4< double > nifti2image = getNiftiMatrix(props).transpose(); //use the inverse of image2nifti to extract direction vectors easier
 
 		util::fvector4 col[3];
 		for(int i=0;i<3;i++){
@@ -646,8 +652,9 @@ private:
 			col[2][0] = -col[2][0] ; col[2][1] = -col[2][1] ; col[2][2] = -col[2][2] ;
 			head->pixdim[0]=-1;
 		}
-		
-		head->qform_code=NIFTI_XFORM_SCANNER_ANAT;
+
+		util::Selection tformCode(formCode);tformCode.set("SCANNER_ANAT");
+		head->qform_code=tformCode;
 		// the following was more or less stolen from the nifti reference implementation
 		const float a_square=col[0][0] + col[1][1] + col[2][2] + 1;
 		if(a_square>0.5) { // simple case
@@ -655,7 +662,7 @@ private:
 			head->quatern_b = 0.25 * (col[1][2]-col[2][1]) / a;
 			head->quatern_c = 0.25 * (col[2][0]-col[0][2]) / a;
 			head->quatern_d = 0.25 * (col[0][1]-col[1][0]) / a;
-		} else {                       /* trickier case */
+		} else {                       // trickier case
 			float xd = 1.0 + col[0][0] - (col[1][1]+col[2][2]) ;  /* 4*b*b */
 			float yd = 1.0 + col[1][1] - (col[0][0]+col[2][2]) ;  /* 4*c*c */
 			float zd = 1.0 + col[2][2] - (col[0][0]+col[1][1]) ;  /* 4*d*d */
@@ -690,7 +697,7 @@ private:
 		return true;
 	}
 	static void storeSForm(const util::PropertyMap &props,_internal::nifti_1_header *head){
-		util::Matrix4x4<float> sform=getNiftiMatrix(props);
+		util::Matrix4x4<double> sform=getNiftiMatrix(props);
 		head->sform_code=1;
 		getNiftiMatrix(props).getRow(0).copyTo(head->srow_x);
 		getNiftiMatrix(props).getRow(1).copyTo(head->srow_y);
@@ -708,6 +715,14 @@ const util::Matrix4x4<short> ImageFormat_NiftiSa::nifti2isis(
 	util::vector4<short>( 0, 0, 1, 0),
 	util::vector4<short>( 0, 0, 0, 1)
 );
+
+// define form codes
+// UNKNOWN=0      this is implizit as undef
+// SCANNER_ANAT=1 scanner-based anatomical coordinates
+// ALIGNED_ANAT=2 coordinates aligned to another file's, or to anatomical "truth".
+// TALAIRACH    3 coordinates aligned to Talairach-Tournoux Atlas; (0,0,0)=AC, etc
+// MNI_152      4 MNI 152 normalized coordinates
+const util::Selection ImageFormat_NiftiSa::formCode("SCANNER_ANAT,ALIGNED_ANAT,TALAIRACH,MNI_152");
 
 }
 }
