@@ -150,21 +150,30 @@ BOOST_PYTHON_MODULE( _data )
 	//#######################################################################################
 	//  IOFactory
 	//#######################################################################################
+	bool ( *_writeImage1 ) (const isis::data::Image &, const std::string &, const std::string &, const std::string & ) = isis::python::data::_IOFactory::_write;
+	bool ( *_writeImage2 ) (const isis::data::Image &, const std::string &, const std::string & ) = isis::python::data::_IOFactory::_write;
+	bool ( *_writeImage3 ) (const isis::data::Image &, const std::string & ) = isis::python::data::_IOFactory::_write;
+	bool ( *_writeImages1 ) (std::list<isis::data::Image> &, const std::string &, const std::string &, const std::string & ) = isis::python::data::_IOFactory::_write;
+	bool ( *_writeImages2 ) (std::list<isis::data::Image> &, const std::string &, const std::string & ) = isis::python::data::_IOFactory::_write;
+	bool ( *_writeImages3 ) (std::list<isis::data::Image> &, const std::string & ) = isis::python::data::_IOFactory::_write;
+	std::list<isis::data::Image> ( *_loadImages1 ) ( const std::string &, const std::string &, const std::string & ) = isis::python::data::_IOFactory::_load;
+	std::list<isis::data::Image> ( *_loadImages2 ) ( const std::string &, const std::string & ) = isis::python::data::_IOFactory::_load;
+	std::list<isis::data::Image> ( *_loadImages3 ) ( const std::string & ) = isis::python::data::_IOFactory::_load;
+	
 	class_< _IOFactory>( "IOFactory", no_init )
-	.def( "writeImage", &_IOFactory::_writeImage )
-	.staticmethod( "writeImage" )
-	.def( "write", &_IOFactory::_writeImage )
+	.def( "write", _writeImage1, ( arg("image"), arg("path"), arg("suffix_override"), arg("dialect") ) )
+	.def( "write",_writeImage2, ( arg("image"), arg("path"), arg("suffix_override") ) )
+	.def( "write", _writeImage3, ( arg("image"), arg("path") ) )
+	.def( "write", _writeImages1, ( arg("images"), arg("path"), arg("suffix_override"), arg("dialect") ) )
+	.def( "write", _writeImages2, ( arg("images"), arg("path"), arg("suffix_override") ) )
+	.def( "write", _writeImages3, ( arg("images"), arg("path") ) )
 	.staticmethod( "write" )
-	.def( "writeImageList", &_IOFactory::_writeImageList )
-	.staticmethod( "writeImageList" )
-	.def( "loadImageList", &_IOFactory::_loadImageList )
-	.staticmethod( "loadImageList" )
-	.def( "load", &_IOFactory::_loadImageList )
-	.staticmethod( "load" )
-	.def( "loadChunkList", &_IOFactory::_loadChunkList )
-	.staticmethod( "loadChunkList" )
-	.def( "chunkListToImageList", &_IOFactory::_chunkListToImageList )
-	.staticmethod( "chunkListToImageList" )
+	.def( "load", _loadImages1, ( arg("path"), arg("suffix_override"), arg("dialect") ) )
+	.def( "load", _loadImages2, ( arg("path"), arg("suffix_override") ) )
+	.def( "load", _loadImages3, ( arg("path") ) )
+	.staticmethod( "load")
+	.def( "getFormats", &_IOFactory::_getFormats )
+	.staticmethod( "getFormats" )
 	;
 	//#######################################################################################
 	//  enums for image_types
