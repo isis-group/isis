@@ -220,18 +220,31 @@ stringToList( const std::basic_string<charT, traits> &source,  charT separator )
  * - Will raise a compiler error when not used with floating point types.
  * @param a first value to compare with
  * @param b second value to compare with
- * @param thresh a threshold factor to set a minimal difference to be still considered equal independent of the values itself.
- * Eg. "1" means any difference less than the epsilon of the used floating point type will allways be considered equal.
+ * @param scale scaling factor to determine which multiplies of the types floating point resolution (epsilon) should be considered equal
+ * Eg. "1" means any difference less than the epsilon of the used floating point type will be considered equal.
  * If any of the values is greater than "1" the "allowed" difference will be bigger.
  * \returns \f[ |a-b| <= \varepsilon_T * \lceil |a|,|b|,|thresh| \rceil \f].
  */
-template<typename T> bool fuzzyEqual( T a, T b, float thresh = 0 )
+template<typename T> bool fuzzyEqual( T a, T b, unsigned short scale=10)
 {
 	BOOST_MPL_ASSERT( ( boost::is_float<T> ) );
 
-	const T epsilon = std::numeric_limits<T>::epsilon();
-	const T factor = std::max<T> ( std::max<T> ( std::abs( a ), std::abs( b ) ), std::abs( thresh ) );
-	return std::abs( a - b ) <= epsilon * factor;
+	const T epsilon = std::numeric_limits<T>::epsilon(); // get the distange between 1 and the next representable value
+	T bigger,smaller;
+
+	a=std::abs(a);b=std::abs(b);
+
+	if(a<b){
+		bigger=b;smaller=a;
+	} else {
+		smaller=b;bigger=a;
+	}
+
+	if(smaller==0)
+		return bigger < std::numeric_limits<T>::min()*scale;
+
+	const T factor = 1/smaller; // scale smaller to that value
+	return (bigger*factor) <= (1+epsilon*scale); //scaled bigger should be between 1 and the next representable value
 }
 
 typedef CoreDebug Debug;
