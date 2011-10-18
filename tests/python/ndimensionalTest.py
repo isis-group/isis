@@ -90,7 +90,3 @@ class TestNDimensional(unittest.TestCase):
 		self.assertTrue( self.ndim.getFoV( core.fvector4(0.5,0.5,0.5,0.5), core.fvector4(1,1,1,1) )[2] == 149 )
 		self.assertTrue( self.ndim.getFoV( core.fvector4(0.5,0.5,0.5,0.5), core.fvector4(1,1,1,1) )[3] == 14 )
 		
-	
-		
-if __name__ == "__main__":
-	unittest.main()
