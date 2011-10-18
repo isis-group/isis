@@ -36,7 +36,7 @@ class ConvertFromPython
 {
 
 public:
-	static const std::list<std::string> knownTypes; 
+	static const std::list<std::string> knownTypes;
 	static util::PropertyValue convert( api::object value );
 
 private:
@@ -54,7 +54,7 @@ private:
 
 		return retList;
 	}
-	
+
 };
 
 }

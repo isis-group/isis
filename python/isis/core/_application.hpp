@@ -20,18 +20,19 @@ namespace python
 {
 namespace core
 {
-namespace Application {
-	void _addParameter( isis::util::Application &base, const std::string &name, api::object value );
-	
-	api::object _getParameter( const isis::util::Application &base, const std::string &name );
-	
-	void _setDescription( isis::util::Application &base, const std::string &name, const std::string &desc );
-	
-	void _setHidden( isis::util::Application &base, const std::string &name, const bool &hidden );
-	
-	void _setNeeded( isis::util::Application &base, const std::string &name, const bool &needed );
+namespace Application
+{
+void _addParameter( isis::util::Application &base, const std::string &name, api::object value );
 
-	bool _init( isis::util::Application &base, list pyargv, bool exitOnError = true );
+api::object _getParameter( const isis::util::Application &base, const std::string &name );
+
+void _setDescription( isis::util::Application &base, const std::string &name, const std::string &desc );
+
+void _setHidden( isis::util::Application &base, const std::string &name, const bool &hidden );
+
+void _setNeeded( isis::util::Application &base, const std::string &name, const bool &needed );
+
+bool _init( isis::util::Application &base, list pyargv, bool exitOnError = true );
 }
 
 }

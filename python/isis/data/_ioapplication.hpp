@@ -31,14 +31,14 @@ public:
 	std::list<isis::data::Image> _images() {
 		return images;
 	}
-	
+
 	isis::data::Image _fetchImageAs( isis::python::data::_internal::image_types type );
-	
+
 	bool _autowrite( std::list<isis::data::Image> imageList ) {
 		return autowrite( imageList );
 	}
 	bool _autowrite( isis::data::Image image ) {
-		return autowrite(image);
+		return autowrite( image );
 	}
 
 private:

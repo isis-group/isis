@@ -27,7 +27,7 @@ class _Chunk : public Chunk, boost::python::wrapper<Chunk>
 public:
 	//  _Chunk ( PyObject *p ) : self( p ) {}
 	_Chunk ( PyObject *p, const Chunk &base ) : Chunk( base ), self( p ) {
-		
+
 	}
 
 	boost::python::api::object _voxel( const size_t &first, const size_t &second, const size_t &third, const size_t &fourth ) {
@@ -41,7 +41,7 @@ public:
 	bool _setVoxel( const size_t &first, const size_t &second, const size_t &third, const size_t &fourth, const api::object &value ) {
 		return isis::python::data::_internal::VoxelOp::setVoxelAsPyObject( *this, first, second, third, fourth, value );
 	}
-	
+
 
 	bool _setVoxel( const isis::util::ivector4 &coord, const api::object &value ) {
 		return _setVoxel( coord[0], coord[1], coord[2], coord[3], value );

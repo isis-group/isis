@@ -26,17 +26,17 @@ using namespace isis::python::data;
 
 BOOST_PYTHON_MODULE( _data )
 {
-	
+
 	//#######################################################################################
 	//  IOApplication
 	//#######################################################################################
 	class_<isis::data::IOApplication, _IOApplication, bases< isis::util::Application> > ( "IOApplication", init<const char *, bool, bool>() )
 	.def( "autoload", &isis::data::IOApplication::autoload )
-	.def( "autowrite", ( bool ( ::IOApplication:: * )( std::list<isis::data::Image>, bool ) ) ( &isis::data::IOApplication::autowrite ), ( arg( "imageList" ), arg("exitOnError") ) ) 
-	.def( "autowrite", ( bool ( ::IOApplication:: * )( isis::data::Image, bool ) ) ( &isis::data::IOApplication::autowrite ), ( arg( "image" ), arg("exitOnError") ) ) 
+	.def( "autowrite", ( bool ( ::IOApplication:: * )( std::list<isis::data::Image>, bool ) ) ( &isis::data::IOApplication::autowrite ), ( arg( "imageList" ), arg( "exitOnError" ) ) )
+	.def( "autowrite", ( bool ( ::IOApplication:: * )( isis::data::Image, bool ) ) ( &isis::data::IOApplication::autowrite ), ( arg( "image" ), arg( "exitOnError" ) ) )
 	//wrappings for standard values
-	.def( "autowrite", ( bool ( ::_IOApplication:: * )( std::list<isis::data::Image> ) ) ( &_IOApplication::_autowrite ), ( arg( "imageList" ), arg("exitOnError") ) ) 
-	.def( "autowrite", ( bool ( ::_IOApplication:: * )( isis::data::Image ) ) ( &_IOApplication::_autowrite ), ( arg( "image" ), arg("exitOnError") ) ) 
+	.def( "autowrite", ( bool ( ::_IOApplication:: * )( std::list<isis::data::Image> ) ) ( &_IOApplication::_autowrite ), ( arg( "imageList" ), arg( "exitOnError" ) ) )
+	.def( "autowrite", ( bool ( ::_IOApplication:: * )( isis::data::Image ) ) ( &_IOApplication::_autowrite ), ( arg( "image" ), arg( "exitOnError" ) ) )
 	.def( "images", &_IOApplication::_images )
 	.def( "fetchImage", &IOApplication::fetchImage )
 	.def( "fetchImageAs", &_IOApplication::_fetchImageAs )
@@ -46,21 +46,21 @@ BOOST_PYTHON_MODULE( _data )
 	//#######################################################################################
 	//function pointers
 	void ( *_init1 ) ( isis::data::_internal::NDimensional<4>&, const isis::util::ivector4 & ) = isis::python::data::NDimensional::_init;
-	void ( *_init2 ) ( isis::data::_internal::NDimensional<4>&, const size_t&, const size_t&, const size_t&, const size_t& ) = isis::python::data::NDimensional::_init;
+	void ( *_init2 ) ( isis::data::_internal::NDimensional<4>&, const size_t &, const size_t &, const size_t &, const size_t & ) = isis::python::data::NDimensional::_init;
 	size_t ( *_getLinearIndex1 ) ( const isis::data::_internal::NDimensional<4>&, const isis::util::ivector4 & ) = isis::python::data::NDimensional::_getLinearIndex;
-	size_t ( *_getLinearIndex2 ) ( const isis::data::_internal::NDimensional<4>&, const size_t&, const size_t&, const size_t&, const size_t& ) = isis::python::data::NDimensional::_getLinearIndex;
-	bool ( *_isInRange1 ) ( const isis::data::_internal::NDimensional<4>&, const isis::util::ivector4& ) = isis::python::data::NDimensional::_isInRange;
-	bool ( *_isInRange2 ) ( const isis::data::_internal::NDimensional<4>&,  const size_t &, const size_t&, const size_t&, const size_t& ) = isis::python::data::NDimensional::_isInRange;
+	size_t ( *_getLinearIndex2 ) ( const isis::data::_internal::NDimensional<4>&, const size_t &, const size_t &, const size_t &, const size_t & ) = isis::python::data::NDimensional::_getLinearIndex;
+	bool ( *_isInRange1 ) ( const isis::data::_internal::NDimensional<4>&, const isis::util::ivector4 & ) = isis::python::data::NDimensional::_isInRange;
+	bool ( *_isInRange2 ) ( const isis::data::_internal::NDimensional<4>&,  const size_t &, const size_t &, const size_t &, const size_t & ) = isis::python::data::NDimensional::_isInRange;
 	// the class itself
-	class_<isis::data::_internal::NDimensional<4>, _NDimensional > ( "NDimensional4", init<const isis::util::ivector4&>() )
+	class_<isis::data::_internal::NDimensional<4>, _NDimensional > ( "NDimensional4", init<const isis::util::ivector4 &>() )
 	.def( init<>() )
 	.def( "init", _init1, ( arg( "dims" ) ) )
-	.def( "init", _init2, ( arg( "first"), arg("second"), arg("third"), arg("fourth") ) )
+	.def( "init", _init2, ( arg( "first" ), arg( "second" ), arg( "third" ), arg( "fourth" ) ) )
 	.def( "getLinearIndex", _getLinearIndex1, ( arg( "dims" ) ) )
-	.def( "getLinearIndex", _getLinearIndex2, ( arg("first"), arg("second"), arg("third"), arg("fourth") ) )
+	.def( "getLinearIndex", _getLinearIndex2, ( arg( "first" ), arg( "second" ), arg( "third" ), arg( "fourth" ) ) )
 	.def( "getCoordsFromLinIndex", &isis::python::data::NDimensional::_getCoordsFromLinIndex )
-	.def( "isInRange", _isInRange1, ( arg( "dims") ) )
-	.def( "isInRange", _isInRange2, ( arg( "first"), arg("second"), arg("third"), arg("fourth") ) )
+	.def( "isInRange", _isInRange1, ( arg( "dims" ) ) )
+	.def( "isInRange", _isInRange2, ( arg( "first" ), arg( "second" ), arg( "third" ), arg( "fourth" ) ) )
 	.def( "getVolume", &isis::data::_internal::NDimensional<4>::getVolume )
 	.def( "getDimSize", &isis::data::_internal::NDimensional<4>::getDimSize )
 	.def( "getSizeAsString", &isis::data::_internal::NDimensional<4>::getSizeAsString )
@@ -69,7 +69,7 @@ BOOST_PYTHON_MODULE( _data )
 	.def( "getRelevantDims", &isis::data::_internal::NDimensional<4>::getRelevantDims )
 	.def( "getFoV", &isis::python::data::NDimensional::_getFoV )
 	;
-	
+
 	//#######################################################################################
 	//  Image
 	//#######################################################################################
@@ -117,14 +117,14 @@ BOOST_PYTHON_MODULE( _data )
 	.def( "__getitem__", &std_list<IList>::get, return_value_policy<copy_non_const_reference>() )
 	.def( "__setitem__", &std_list<IList>::set, with_custodian_and_ward<1, 2>() )
 	.def( "__delitem__", &std_list<IList>::del )
-	.def("__iter__", iterator< std::list< isis::data::Image > > () )
+	.def( "__iter__", iterator< std::list< isis::data::Image > > () )
 	;
 	//#######################################################################################
 	//  Chunk
 	//#######################################################################################
 	class_<isis::data::Chunk, _Chunk, bases< isis::data::_internal::NDimensional<4>, isis::util::PropertyMap> > ( "Chunk", init<_Chunk>() )
-	.def( "getVoxel", ( api::object ( ::_Chunk:: *) ( const isis::util::ivector4 & ) ) ( &_Chunk::_voxel ), ( arg( "coord" ) ) )
-	.def( "getVoxel", ( api::object ( ::_Chunk:: *) ( const size_t &, const size_t &, const size_t &, const size_t & ) ) ( &_Chunk::_voxel ), ( arg( "first" ), arg("second"), arg("third"), arg("fourth") ) )
+	.def( "getVoxel", ( api::object ( ::_Chunk:: * ) ( const isis::util::ivector4 & ) ) ( &_Chunk::_voxel ), ( arg( "coord" ) ) )
+	.def( "getVoxel", ( api::object ( ::_Chunk:: * ) ( const size_t &, const size_t &, const size_t &, const size_t & ) ) ( &_Chunk::_voxel ), ( arg( "first" ), arg( "second" ), arg( "third" ), arg( "fourth" ) ) )
 	.def( "setVoxel", ( bool ( ::_Chunk:: * )( const isis::util::ivector4 &, const api::object & ) ) ( &_Chunk::_setVoxel ), ( arg( "coord" ), arg( "value" ) ) )
 	.def( "setVoxel", ( bool ( ::_Chunk:: * )( const size_t &, const size_t &, const size_t &, const size_t &, const api::object & ) ) ( &_Chunk::_setVoxel ), ( arg( "first" ), arg( "second" ), arg( "third" ), arg( "fourth" ), arg( "value" ) ) )
 	.def( "useCount", &isis::data::Chunk::useCount )
@@ -144,34 +144,34 @@ BOOST_PYTHON_MODULE( _data )
 	.def( "__getitem__", &std_list<CList>::get, return_value_policy<copy_non_const_reference>() )
 	.def( "__setitem__", &std_list<CList>::set, with_custodian_and_ward<1, 2>() )
 	.def( "__delitem__", &std_list<CList>::del )
-	.def( "__iter__", iterator<std::list< isis::data::Chunk> > () ) 
-	
+	.def( "__iter__", iterator<std::list< isis::data::Chunk> > () )
+
 	;
 	//#######################################################################################
 	//  IOFactory
 	//#######################################################################################
-	bool ( *_writeImage1 ) (const isis::data::Image &, const std::string &, const std::string &, const std::string & ) = isis::python::data::_IOFactory::_write;
-	bool ( *_writeImage2 ) (const isis::data::Image &, const std::string &, const std::string & ) = isis::python::data::_IOFactory::_write;
-	bool ( *_writeImage3 ) (const isis::data::Image &, const std::string & ) = isis::python::data::_IOFactory::_write;
-	bool ( *_writeImages1 ) (std::list<isis::data::Image> &, const std::string &, const std::string &, const std::string & ) = isis::python::data::_IOFactory::_write;
-	bool ( *_writeImages2 ) (std::list<isis::data::Image> &, const std::string &, const std::string & ) = isis::python::data::_IOFactory::_write;
-	bool ( *_writeImages3 ) (std::list<isis::data::Image> &, const std::string & ) = isis::python::data::_IOFactory::_write;
+	bool ( *_writeImage1 ) ( const isis::data::Image &, const std::string &, const std::string &, const std::string & ) = isis::python::data::_IOFactory::_write;
+	bool ( *_writeImage2 ) ( const isis::data::Image &, const std::string &, const std::string & ) = isis::python::data::_IOFactory::_write;
+	bool ( *_writeImage3 ) ( const isis::data::Image &, const std::string & ) = isis::python::data::_IOFactory::_write;
+	bool ( *_writeImages1 ) ( std::list<isis::data::Image> &, const std::string &, const std::string &, const std::string & ) = isis::python::data::_IOFactory::_write;
+	bool ( *_writeImages2 ) ( std::list<isis::data::Image> &, const std::string &, const std::string & ) = isis::python::data::_IOFactory::_write;
+	bool ( *_writeImages3 ) ( std::list<isis::data::Image> &, const std::string & ) = isis::python::data::_IOFactory::_write;
 	std::list<isis::data::Image> ( *_loadImages1 ) ( const std::string &, const std::string &, const std::string & ) = isis::python::data::_IOFactory::_load;
 	std::list<isis::data::Image> ( *_loadImages2 ) ( const std::string &, const std::string & ) = isis::python::data::_IOFactory::_load;
 	std::list<isis::data::Image> ( *_loadImages3 ) ( const std::string & ) = isis::python::data::_IOFactory::_load;
-	
+
 	class_< _IOFactory>( "IOFactory", no_init )
-	.def( "write", _writeImage1, ( arg("image"), arg("path"), arg("suffix_override"), arg("dialect") ) )
-	.def( "write",_writeImage2, ( arg("image"), arg("path"), arg("suffix_override") ) )
-	.def( "write", _writeImage3, ( arg("image"), arg("path") ) )
-	.def( "write", _writeImages1, ( arg("images"), arg("path"), arg("suffix_override"), arg("dialect") ) )
-	.def( "write", _writeImages2, ( arg("images"), arg("path"), arg("suffix_override") ) )
-	.def( "write", _writeImages3, ( arg("images"), arg("path") ) )
+	.def( "write", _writeImage1, ( arg( "image" ), arg( "path" ), arg( "suffix_override" ), arg( "dialect" ) ) )
+	.def( "write", _writeImage2, ( arg( "image" ), arg( "path" ), arg( "suffix_override" ) ) )
+	.def( "write", _writeImage3, ( arg( "image" ), arg( "path" ) ) )
+	.def( "write", _writeImages1, ( arg( "images" ), arg( "path" ), arg( "suffix_override" ), arg( "dialect" ) ) )
+	.def( "write", _writeImages2, ( arg( "images" ), arg( "path" ), arg( "suffix_override" ) ) )
+	.def( "write", _writeImages3, ( arg( "images" ), arg( "path" ) ) )
 	.staticmethod( "write" )
-	.def( "load", _loadImages1, ( arg("path"), arg("suffix_override"), arg("dialect") ) )
-	.def( "load", _loadImages2, ( arg("path"), arg("suffix_override") ) )
-	.def( "load", _loadImages3, ( arg("path") ) )
-	.staticmethod( "load")
+	.def( "load", _loadImages1, ( arg( "path" ), arg( "suffix_override" ), arg( "dialect" ) ) )
+	.def( "load", _loadImages2, ( arg( "path" ), arg( "suffix_override" ) ) )
+	.def( "load", _loadImages3, ( arg( "path" ) ) )
+	.staticmethod( "load" )
 	.def( "getFormats", &_IOFactory::_getFormats )
 	.staticmethod( "getFormats" )
 	;
@@ -194,10 +194,10 @@ BOOST_PYTHON_MODULE( _data )
 	//#######################################################################################
 	//  enums for orientations
 	//#######################################################################################
-	enum_<isis::data::Image::orientation>("orientation")
+	enum_<isis::data::Image::orientation>( "orientation" )
 	.value( "AXIAL", isis::data::Image::axial )
-	.value( "REVERSED_AXIAL", isis::data::Image::reversed_axial)
-	.value( "SAGITTAL", isis::data::Image::sagittal)
+	.value( "REVERSED_AXIAL", isis::data::Image::reversed_axial )
+	.value( "SAGITTAL", isis::data::Image::sagittal )
 	.value( "REVERSED_SAGITTAL", isis::data::Image::reversed_sagittal )
 	.value( "CORONAL", isis::data::Image::coronal )
 	.value( "REVERSED_CORONAL", isis::data::Image::reversed_coronal )
@@ -205,15 +205,15 @@ BOOST_PYTHON_MODULE( _data )
 	//#######################################################################################
 	//  enums for dimensions
 	//#######################################################################################
-	enum_<isis::data::dimensions>("dimensions")
+	enum_<isis::data::dimensions>( "dimensions" )
 	.value( "ROW_DIM", rowDim )
 	.value( "COLUMN_DIM", columnDim )
 	.value( "SLICE_DIM", sliceDim )
 	.value( "TIME_DIM", timeDim )
 	;
-	
-	
-	
+
+
+
 
 }
 #endif

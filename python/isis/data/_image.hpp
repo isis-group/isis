@@ -46,8 +46,8 @@ public:
 	bool _setVoxel( const size_t &first, const size_t &second, const size_t &third, const size_t &fourth, const api::object &value ) {
 		Chunk ch = getChunk( first, second, third, fourth, false );
 		return isis::python::data::_internal::VoxelOp::setVoxelAsPyObject( ch, first, second, third, fourth, value );
-		
-		
+
+
 	}
 
 	bool _setVoxel( const isis::util::ivector4 &coord, const api::object &value ) {
@@ -72,11 +72,11 @@ public:
 
 	api::object _getMin( ) {
 		return  util::Singletons::get<isis::python::core::_internal::TypesMap, 10>().at(
-			getMinMax().first->getTypeID() )->convert( *getMinMax().first );
+					getMinMax().first->getTypeID() )->convert( *getMinMax().first );
 	}
 	api::object _getMax( ) {
 		return  util::Singletons::get<isis::python::core::_internal::TypesMap, 10>().at(
-			getMinMax().second->getTypeID() )->convert( *getMinMax().second );
+					getMinMax().second->getTypeID() )->convert( *getMinMax().second );
 	}
 
 	std::string _getMainOrientationAsString();
@@ -84,9 +84,9 @@ public:
 	void _transformCoords( boost::python::list matrix, const bool &center );
 
 	bool _makeOfType( isis::python::data::_internal::image_types type  );
-	
+
 	size_t _spliceDownTo( const isis::data::dimensions dims );
-	
+
 	Image _deepCopy();
 
 	Image _deepCopy( isis::python::data::_internal::image_types type );

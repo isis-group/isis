@@ -15,7 +15,7 @@ _Image::_Image( PyObject *p, const isis::data::Image &base )
 	: Image( base ), boost::python::wrapper< Image >(), self( p )
 {}
 
-std::list< Chunk > _Image::_getChunksAsVector(void )
+std::list< Chunk > _Image::_getChunksAsVector( void )
 {
 	std::list<Chunk> retChunkList;
 	std::vector<Chunk>  chunkList( copyChunksToVector() );
@@ -25,7 +25,7 @@ std::list< Chunk > _Image::_getChunksAsVector(void )
 	return retChunkList;
 }
 
-Chunk _Image::_getChunkAs(const size_t& first, const size_t& second, const size_t& third, const size_t& fourth, const std::string& type)
+Chunk _Image::_getChunkAs( const size_t &first, const size_t &second, const size_t &third, const size_t &fourth, const std::string &type )
 {
 	Chunk ret = getChunk( first, second, third, fourth ); // get a cheap copy
 	ret.convertToType( util::getTransposedTypeMap( true, true )[type] );
@@ -59,12 +59,14 @@ std::string _Image::_getMainOrientationAsString()
 	}
 }
 
-void _Image::_transformCoords(boost::python::list matrix, const bool& center)
+void _Image::_transformCoords( boost::python::list matrix, const bool &center )
 {
 	std::vector< boost::python::list > rows;
+
 	for ( boost::python::ssize_t i = 0; i < boost::python::len( matrix ); ++i ) {
 		rows.push_back( boost::python::extract< boost::python::list >( matrix[i] ) );
 	}
+
 	boost::numeric::ublas::matrix<float> boostMatrix( 3, 3 );
 
 	for ( unsigned short i = 0; i < 3; i++ ) {
@@ -72,15 +74,16 @@ void _Image::_transformCoords(boost::python::list matrix, const bool& center)
 			boostMatrix( i, j ) = boost::python::extract<float> ( rows[i][j] );
 		}
 	}
+
 	transformCoords( boostMatrix, center );
 }
 
 bool _Image::_makeOfType( _internal::image_types type )
 {
-	return convertToType( static_cast<unsigned short>(type) );
+	return convertToType( static_cast<unsigned short>( type ) );
 }
 
-size_t _Image::_spliceDownTo(const isis::data::dimensions dims )
+size_t _Image::_spliceDownTo( const isis::data::dimensions dims )
 {
 	return spliceDownTo( dims );
 }
@@ -117,9 +120,9 @@ Image _Image::_deepCopy()
 	}
 }
 
-Image _Image::_deepCopy(_internal::image_types type)
+Image _Image::_deepCopy( _internal::image_types type )
 {
-	
+
 	Image retImage = _deepCopy();
 	retImage.convertToType( static_cast<unsigned short> ( type ) );
 

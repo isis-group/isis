@@ -9,9 +9,9 @@ namespace core
 namespace _internal
 {
 
-	
+
 const std::list<std::string> ConvertFromPython::knownTypes = util::stringToList<std::string>( "complex datetime.datetime datetime.date bool list str float double int ivector4 dvector4 fvector4 Selection" );
-	
+
 template<>
 void getValueFromPyObject<boost::gregorian::date> ( util::Value<boost::gregorian::date> &ref, api::object value )
 {
@@ -41,7 +41,7 @@ void getValueFromPyObject< boost::posix_time::ptime >( util::Value< boost::posix
 
 
 util::PropertyValue ConvertFromPython::convert( api::object value )
-{	
+{
 	PyDateTime_IMPORT;
 	std::string typeName = value.ptr()->ob_type->tp_name;
 

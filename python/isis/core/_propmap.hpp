@@ -23,10 +23,11 @@ namespace python
 namespace core
 {
 
-namespace PropertyMap {
+namespace PropertyMap
+{
 
 void _setProperty( isis::util::PropertyMap &base, const std::string &key, api::object value );
-	
+
 api::object _getProperty( const isis::util::PropertyMap &base, const std::string &key );
 
 
