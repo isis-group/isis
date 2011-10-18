@@ -49,6 +49,7 @@ BOOST_PYTHON_MODULE( _core )
 	.def( "isEmpty", &isis::util::PropertyMap::isEmpty )
 	.def( "setProperty", &isis::python::core::PropertyMap::_setProperty )
 	.def( "getProperty", &isis::python::core::PropertyMap::_getProperty )
+	.def( "setPropertyAs", &isis::python::core::PropertyMap::_setPropertyAs )
 	;
 	//#######################################################################################
 	//  Selection

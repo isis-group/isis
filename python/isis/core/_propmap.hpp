@@ -8,11 +8,14 @@
 #ifndef _PROPMAP_HPP_
 #define _PROPMAP_HPP_
 
+#include "_types.hpp"
+#include "common.hpp"
 #include "CoreUtils/propmap.hpp"
 #include "boost/python.hpp"
 #include "_convertFromPython.hpp"
 #include "_convertToPython.hpp"
 #include "CoreUtils/singletons.hpp"
+
 
 using namespace boost::python;
 
@@ -26,6 +29,8 @@ namespace core
 namespace PropertyMap
 {
 
+void _setPropertyAs( isis::util::PropertyMap &base, const std::string &key, api::object value, isis::python::core::types type);
+	
 void _setProperty( isis::util::PropertyMap &base, const std::string &key, api::object value );
 
 api::object _getProperty( const isis::util::PropertyMap &base, const std::string &key );

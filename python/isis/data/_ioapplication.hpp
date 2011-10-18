@@ -8,6 +8,7 @@
 #ifndef _IOAPPLICATION_HPP_
 #define _IOAPPLICATION_HPP_
 
+#include "_types.hpp"
 #include "DataStorage/io_application.hpp"
 #include "DataStorage/image.hpp"
 #include <boost/python.hpp>
@@ -32,7 +33,7 @@ public:
 		return images;
 	}
 
-	isis::data::Image _fetchImageAs( isis::python::data::_internal::image_types type );
+	isis::data::Image _fetchImageAs( isis::python::data::image_types type );
 
 	bool _autowrite( std::list<isis::data::Image> imageList ) {
 		return autowrite( imageList );

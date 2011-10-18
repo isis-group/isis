@@ -98,11 +98,10 @@ BOOST_PYTHON_MODULE( _data )
 	.def( "transformCoords", &_Image::_transformCoords )
 	.def( "getMainOrientationAsString", &_Image::_getMainOrientationAsString )
 	.def( "getMainOrientation", &Image::getMainOrientation )
-	.def( "convertToType", &isis::data::Image::convertToType )
-	.def( "makeOfType", &_Image::_makeOfType )
+	.def( "convertToType", &_Image::_makeOfType )
 	.def( "spliceDownTo", &_Image::_spliceDownTo )
 	.def( "getDeepCopy", ( isis::data::Image ( ::_Image:: * )( void ) ) ( &_Image::_deepCopy ) )
-	.def( "getDeepCopyAs", ( isis::data::Image ( ::_Image:: * )( isis::python::data::_internal::image_types ) ) ( &_Image::_deepCopy ), ( arg( "type" ) ) )
+	.def( "getDeepCopyAs", ( isis::data::Image ( ::_Image:: * )( isis::python::data::image_types ) ) ( &_Image::_deepCopy ), ( arg( "type" ) ) )
 	.def( "getCheapCopy", ( isis::data::Image ( ::_Image:: * )( void ) ) ( &_Image::_cheapCopy ) )
 	;
 	//#######################################################################################

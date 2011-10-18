@@ -8,10 +8,12 @@
 #ifndef _IMAGE_HPP_
 #define _IMAGE_HPP_
 
+#include "_types.hpp"
 #include "DataStorage/image.hpp"
 #include "CoreUtils/vector.hpp"
 #include <vector>
 #include <boost/algorithm/string.hpp>
+#include "../core/common.hpp"
 #include "common.hpp"
 #include "../core/_convertToPython.hpp"
 
@@ -83,13 +85,13 @@ public:
 
 	void _transformCoords( boost::python::list matrix, const bool &center );
 
-	bool _makeOfType( isis::python::data::_internal::image_types type  );
+	bool _makeOfType( isis::python::data::image_types type  );
 
 	size_t _spliceDownTo( const isis::data::dimensions dims );
 
 	Image _deepCopy();
 
-	Image _deepCopy( isis::python::data::_internal::image_types type );
+	Image _deepCopy( isis::python::data::image_types type );
 
 	Image _cheapCopy( void ) {
 		return *this;

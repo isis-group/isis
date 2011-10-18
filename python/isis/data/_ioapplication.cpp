@@ -25,7 +25,7 @@ _IOApplication::_IOApplication( PyObject *p, const isis::data::IOApplication &ba
 {
 }
 
-isis::data::Image _IOApplication::_fetchImageAs( _internal::image_types type )
+isis::data::Image _IOApplication::_fetchImageAs( isis::python::data::image_types type )
 {
 	isis::data::Image tmpImage = fetchImage();
 	tmpImage.convertToType( static_cast<unsigned short>( type ) );

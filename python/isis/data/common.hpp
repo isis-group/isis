@@ -5,8 +5,8 @@
  *      Author: tuerke
  */
 
-#ifndef PYTHON_COMMON_HPP
-#define PYTHON_COMMON_HPP
+#ifndef PYTHON_COMMON_DATA_HPP
+#define PYTHON_COMMON_DATA_HPP
 
 #include "CoreUtils/log.hpp"
 #include "DataStorage/chunk.hpp"
@@ -21,42 +21,11 @@
 using namespace isis::data;
 namespace isis
 {
-
-struct PythonLog {static const char *name() {return "Python";}; enum {use = _ENABLE_LOG};};
-struct PythonDebug {static const char *name() {return "PythonDebug";}; enum {use = _ENABLE_DEBUG};};
-
-namespace python
-{
-
-typedef PythonLog Runtime;
-typedef PythonDebug Debug;
-
-template<typename HANDLE> void enable_log( LogLevel level )
-{
-	ENABLE_LOG( Runtime, HANDLE, level );
-	ENABLE_LOG( Debug, HANDLE, level );
-}
+namespace python {
 namespace data
 {
 namespace _internal
 {
-
-
-enum image_types { BOOL = ValuePtr<bool>::staticID,
-				   INT8_T = ValuePtr<int8_t>::staticID,
-				   UINT8_T = ValuePtr<uint8_t>::staticID,
-				   INT16_T = ValuePtr<int16_t>::staticID,
-				   UINT16_T = ValuePtr<uint16_t>::staticID,
-				   INT32_T = ValuePtr<int32_t>::staticID,
-				   UINT32_T = ValuePtr<uint32_t>::staticID,
-				   INT64_T = ValuePtr<int64_t>::staticID,
-				   UINT64_T = ValuePtr<uint64_t>::staticID,
-				   FLOAT = ValuePtr<float>::staticID,
-				   DOUBLE = ValuePtr<double>::staticID
-				 };
-
-
-using namespace isis::data;
 using namespace boost::python;
 
 struct VoxelOp {

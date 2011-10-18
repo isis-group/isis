@@ -78,7 +78,7 @@ void _Image::_transformCoords( boost::python::list matrix, const bool &center )
 	transformCoords( boostMatrix, center );
 }
 
-bool _Image::_makeOfType( _internal::image_types type )
+bool _Image::_makeOfType( image_types type )
 {
 	return convertToType( static_cast<unsigned short>( type ) );
 }
@@ -120,7 +120,7 @@ Image _Image::_deepCopy()
 	}
 }
 
-Image _Image::_deepCopy( _internal::image_types type )
+Image _Image::_deepCopy( image_types type )
 {
 
 	Image retImage = _deepCopy();
