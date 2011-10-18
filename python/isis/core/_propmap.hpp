@@ -29,8 +29,8 @@ namespace core
 namespace PropertyMap
 {
 
-void _setPropertyAs( isis::util::PropertyMap &base, const std::string &key, api::object value, isis::python::core::types type);
-	
+void _setPropertyAs( isis::util::PropertyMap &base, const std::string &key, api::object value, isis::python::core::types type );
+
 void _setProperty( isis::util::PropertyMap &base, const std::string &key, api::object value );
 
 api::object _getProperty( const isis::util::PropertyMap &base, const std::string &key );

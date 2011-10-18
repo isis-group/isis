@@ -21,7 +21,8 @@
 using namespace isis::data;
 namespace isis
 {
-namespace python {
+namespace python
+{
 namespace data
 {
 namespace _internal
