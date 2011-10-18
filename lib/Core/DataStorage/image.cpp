@@ -807,7 +807,6 @@ size_t Image::spliceDownTo( dimensions dim ) //rowDim = 0, columnDim, sliceDim, 
 		return lookup.size();
 	}
 
-	LOG_IF( lookup[0]->getRelevantDims() == ( size_t ) dim, Debug, info ) << "Running useless splice, the dimensionality of the chunks of this image is already " << dim;
 	LOG_IF( hasProperty( "acquisitionTime" ) || lookup[0]->hasProperty( "acquisitionTime" ), Debug, warning ) << "Splicing images with acquisitionTime will cause you lots of trouble. You should remove that before.";
 	util::FixedVector<size_t, 4> image_size = getSizeAsVector();
 
@@ -843,11 +842,13 @@ size_t Image::spliceDownTo( dimensions dim ) //rowDim = 0, columnDim, sliceDim, 
 	std::vector<boost::shared_ptr<Chunk> > buffer = lookup; // store the old lookup table
 	lookup.clear();
 	set.clear(); // clear the image, so we can insert the splices
+	clean=false; // mark the image for reIndexing
 	//static_cast<util::PropertyMap::base_type*>(this)->clear(); we can keep the common properties - they will be merged with thier own copies from the chunks on the next reIndex
 	splicer splice( dim, image_size.product(), *this );
 	BOOST_FOREACH( boost::shared_ptr<Chunk> &ref, buffer ) {
 		BOOST_FOREACH( const util::PropertyMap::KeyType & need, needed ) { //get back properties needed for the
 			if( !ref->hasProperty( need ) && this->hasProperty( need ) ) {
+				LOG(Debug,info) << "Copying " << need << "=" << this->propertyValue( need ) << " from the image to the chunk for splicing";
 				ref->propertyValue( need ) = this->propertyValue( need );
 			}
 		}
