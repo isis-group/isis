@@ -50,7 +50,7 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI)
 
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI_SA)
-  add_library(isisImageFormat_Nifti_sa SHARED imageFormat_Nifti_SA.cpp)
+  add_library(isisImageFormat_Nifti_sa SHARED imageFormat_nifti_sa.cpp)
   target_link_libraries(isisImageFormat_Nifti_sa isis_core  ${ISIS_LIB_DEPENDS})
   set(TARGETS ${TARGETS} isisImageFormat_Nifti_sa)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI_SA)
