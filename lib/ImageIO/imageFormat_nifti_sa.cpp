@@ -86,6 +86,19 @@ void ImageFormat_NiftiSa::guessSliceOrdering(const data::Image img,char &slice_c
 	}
 
 }
+
+void ImageFormat_NiftiSa::storeDescripForSPM(const util::PropertyMap &props, char desc[]){
+	std::list<std::string> ret;
+	typedef const char* prop_pair[3];
+	const prop_pair  pairs[]={{"TR","repetitionTime","ms"},{"TE","echoTime","ms"},{"FA","flipAngle","deg"},{"timestamp","sequenceStart",""}};
+	BOOST_FOREACH(const prop_pair &p,pairs){
+		if(props.hasProperty(p[1])){
+			ret.push_back(std::string(p[0])+"="+props.getPropertyAs<std::string>(p[1])+p[2]);
+		}
+	}
+	strncpy(desc,util::listToString(ret.begin(),ret.end(),"/","","").c_str(),80);
+}
+
 bool ImageFormat_NiftiSa::parseDescripForSPM(util::PropertyMap &props, const char desc[]){
 	//check description for tr, te and fa and date which is written by spm8
 	boost::regex descriptionRegex(
@@ -224,35 +237,35 @@ void ImageFormat_NiftiSa::parseHeader(const _internal::nifti_1_header *head,data
 			case 0:
 			case NIFTI_SLICE_SEQ_INC:
 				if(head->slice_duration){ // if there is no slice duration, and the sequence is "normal" there is no use in numbering
-					for(uint32_t i=0;i<head->dim[3];i++)
+					for(uint32_t i=0;i<(uint32_t)head->dim[3];i++)
 						props.propertyValueAt("acquisitionNumber",i)=i;
 				} else {
 					props.setPropertyAs<uint32_t>("acquisitionNumber",0);
 				}
 				break;
 			case NIFTI_SLICE_SEQ_DEC:
-				for(uint32_t i=0;i<head->dim[3];i++)
+				for(uint32_t i=0;i<(uint32_t)head->dim[3];i++)
 					props.propertyValueAt("acquisitionNumber",head->dim[3]-i-1)=i;
 				break;
 			case NIFTI_SLICE_ALT_INC:{
 				uint32_t i=0,cnt;
 				for(cnt=0;i<floor(head->dim[3]/2+.5);i++,cnt+=2)
 					props.propertyValueAt("acquisitionNumber",i)=cnt;
-				for(cnt=1;i<head->dim[3];i++,cnt+=2)
+				for(cnt=1;i<(uint32_t)head->dim[3];i++,cnt+=2)
 					props.propertyValueAt("acquisitionNumber",i)=cnt;
 				}break;
 			case NIFTI_SLICE_ALT_DEC:{
 				uint32_t i=0,cnt;
 				for(cnt=0;i<floor(head->dim[3]/2+.5);i++,cnt+=2)
 					props.propertyValueAt("acquisitionNumber",head->dim[3]-i-1)=cnt;
-				for(cnt=1;i<head->dim[3];i++,cnt+=2)
+				for(cnt=1;i<(uint32_t)head->dim[3];i++,cnt+=2)
 					props.propertyValueAt("acquisitionNumber",head->dim[3]-i-1)=cnt;
 				}break;
 			default:LOG(Runtime,error) << "Unknown slice code " << util::MSubject(head->slice_code);break;
 		}
 
 		if(head->slice_duration ){
-			for(uint32_t i=0;i<head->dim[3];i++){
+			for(uint32_t i=0;i<(uint32_t)head->dim[3];i++){
 				props.propertyValueAt("acquisitionTime",  i)=props.propertyValueAt("acquisitionNumber",i)->as<float>()*head->slice_duration*time_fac;
 			}
 		}
@@ -311,18 +324,31 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 
 void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
 	class CopyOp:public data::ChunkOp{
+		data::Image m_image;
 		data::FilePtr &m_out;
-		const data::Image &m_image;
 		const unsigned short m_ID;
 		const size_t m_bytesPerPixel;
 		const data::scaling_pair m_scale;
+		const bool m_doFlip;
+		data::dimensions flip_dim;
 	public:
-		CopyOp(const data::Image &image,data::FilePtr &out):
-			m_image(image),m_out(out),m_ID(image.getMajorTypeID()),m_bytesPerPixel(image.getBytesPerVoxel()),m_scale(image.getScalingTo( m_ID )){}
+		CopyOp(const data::Image &image,data::FilePtr &out,bool doFlip):
+			m_image(image),m_out(out),m_ID(image.getMajorTypeID()),m_bytesPerPixel(image.getBytesPerVoxel()),m_scale(image.getScalingTo( m_ID )),m_doFlip(doFlip) {
+				if(doFlip)
+					flip_dim=m_image.mapScannerAxesToImageDimension( data::z );
+			}
 		bool operator()(data::Chunk &ch, util::FixedVector< size_t, 4 > posInImage){
 			size_t offset=348+m_image.getLinearIndex(posInImage)*m_bytesPerPixel;
 			data::ValuePtrReference out_data=m_out.atByID(m_ID,offset,ch.getVolume());
 			ch.asValuePtrBase().copyTo(*out_data,m_scale);
+
+			if(m_doFlip){
+				// wrap the copied part back into a Chunk to flip it
+				util::FixedVector< size_t,4 > sz = ch.getSizeAsVector();
+				data::Chunk cp(out_data,sz[data::rowDim],sz[data::columnDim],sz[data::sliceDim],sz[data::timeDim]); // this is a cheap copy
+				cp.swapAlong(flip_dim); // .. so changing its data, will also change the data we just copied
+			}
+			return true;
 		}
 	};
 
@@ -330,13 +356,13 @@ void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &fi
 	unsigned short target_id=image.getMajorTypeID();
 
 	// fsl cannot deal with some types
-	if(util::istring(dialect.c_str())=="fsl"){
+	if(util::istring(dialect.c_str())=="fsl spm"){
 		switch(target_id){
 			case util::Value<uint16_t>::staticID:target_id=typeFallBack<uint16_t>();break;
 			case util::Value<uint32_t>::staticID:target_id=typeFallBack<uint32_t>();break;
 		}
 	}
-
+	
 	const size_t datasize=image.getVolume()*bpv;
 	if(isis_type2nifti_type[target_id]){ // "normal types"
 
@@ -359,12 +385,17 @@ void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &fi
 
 		guessSliceOrdering(image,header->slice_code,header->slice_duration);
 
-		std::pair< float, float > minmax=image.getMinMaxAs<float>();
+		const std::pair< float, float > minmax=image.getMinMaxAs<float>();
 		header->cal_min=minmax.first;header->cal_max=minmax.second;
 
-		storeHeader(image,header);
+		storeHeader(image.getChunk(0,0),header); // store header using properties of the "lowest" chunk merged with the image's properties
 
-		CopyOp do_copy(image,out);
+		if(util::istring(dialect.c_str())=="spm"){ // override "normal" description with the "spm-description"
+			storeDescripForSPM(image.getChunk(0,0),header->descrip);
+		}
+
+		// copy the data
+		CopyOp do_copy(image,out,(util::istring(dialect.c_str())=="spm"));// we have to flip the copied data for the spm dialect
 		const_cast<data::Image&>( image).foreachChunk(do_copy); // @todo we _do_ need a const version of foreachChunk/Voxel
 	} else {
 		LOG(Runtime,error) << "Sorry, the datatype " << util::MSubject( image.getMajorTypeName() )<< " is not supportet for nifti output";

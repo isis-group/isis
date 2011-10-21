@@ -152,6 +152,7 @@ class ImageFormat_NiftiSa: public FileFormat
 	}
 	static void guessSliceOrdering(const data::Image img,char &slice_code, float &slice_duration);
 	static bool parseDescripForSPM(util::PropertyMap &props, const char desc[]);
+	static void storeDescripForSPM(const isis::util::PropertyMap& props, char desc[]);
 	static void storeHeader(const util::PropertyMap &props,_internal::nifti_1_header *head);
 	static void parseHeader(const _internal::nifti_1_header *head,data::Chunk &props);
 public:
