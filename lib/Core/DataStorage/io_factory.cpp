@@ -345,13 +345,13 @@ size_t IOFactory::loadPath( std::list<Chunk> &ret, const boost::filesystem::path
 	return loaded;
 }
 
-bool IOFactory::write( const data::Image &image, const std::string &path, std::string suffix_override, const std::string &dialect )
+bool IOFactory::write( const data::Image &image, const std::string &path, std::string suffix_override, std::string dialect )
 {
 	return write( std::list<data::Image>( 1, image ), path, suffix_override, dialect );
 }
 
 
-bool IOFactory::write( std::list<data::Image> images, const std::string &path, std::string suffix_override, const std::string &dialect )
+bool IOFactory::write( std::list<data::Image> images, const std::string &path, std::string suffix_override, std::string dialect )
 {
 	const FileFormatList formatWriter = get().getFileFormatList( path, suffix_override, dialect );
 

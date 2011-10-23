@@ -170,11 +170,11 @@ public:
 	 * If any of the values is greater than "1" the "allowed" difference will be bigger.
 	 * \returns true if the difference between the two types is significantly small compared to the values.
 	 */
-	bool fuzzyEqual( const this_class &other, TYPE thresh = 0 )const {
+	bool fuzzyEqual( const this_class &other, unsigned short scale=10)const {
 		const_iterator b = other.begin();
 
 		for ( const_iterator a = CONTAINER::begin(); a != CONTAINER::end(); ++a, ++b ) {
-			if ( ! util::fuzzyEqual( *a, *b, thresh ) )
+			if ( ! util::fuzzyEqual( *a, *b, scale ) )
 				return false;
 		}
 

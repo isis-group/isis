@@ -19,13 +19,13 @@ class ImageFormat_Null: public FileFormat
 			for ( uint32_t s = 0; s < size; s++ ) {
 
 				data::MemChunk<uint8_t> ch( size, size );
-				ch.setPropertyAs( "indexOrigin", util::fvector4( 0, -150/2, s*100./size-100/2 ) );
+				ch.setPropertyAs( "indexOrigin", util::fvector4( 0, -150/2, s*110./size-100/2 ) );//don't use s*100./size-100/2 because we want a small gap
 				ch.setPropertyAs<uint16_t>( "sequenceNumber", 0 );
 				ch.setPropertyAs( "performingPhysician", std::string( "Dr. Jon Doe" ) );
-				ch.setPropertyAs( "rowVec",    util::fvector4(  1./sqrt(2), 1./sqrt(2) ) ); //rotated by pi/4 (45°)
-				ch.setPropertyAs( "columnVec", util::fvector4( -1./sqrt(2), 1./sqrt(2) ) ); // @todo also rotate the sliceVec
+				ch.setPropertyAs( "rowVec",    util::fvector4(  cos(M_PI/8), -sin(M_PI/8) ) ); //rotated by pi/8
+				ch.setPropertyAs( "columnVec", util::fvector4(  sin(M_PI/8),  cos(M_PI/8) ) ); // @todo also rotate the sliceVec
 				ch.setPropertyAs( "voxelSize", util::fvector4( 150./size, 150./size, 100./size ) );
-				ch.setPropertyAs( "repetitionTime", 1234 );
+				ch.setPropertyAs<uint16_t>( "repetitionTime", 1234 );
 				ch.setPropertyAs( "sequenceDescription", desc );
 
 				for ( int x = 10; x < 40; x++ )
