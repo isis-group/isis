@@ -194,20 +194,21 @@ endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_TAR)
 # Dicom
 ############################################################
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM)
-  find_library(LIB_DCMIMGLE dcmimgle)
-  find_library(LIB_DCMIMAGE dcmimage)
-  find_library(LIB_DCMDATA dcmdata)
-  find_library(LIB_OFSTD ofstd)
+  find_package(DCMTK)
+  include_directories(${DCMTK_INCLUDE_DIRS})
+
   find_library(LIB_Z z)
   find_library(LIB_TIFF tiff)
   find_library(LIB_PNG png12)
 
-  find_path(INCPATH_DCMTK "dcmtk/dcmdata/dcfilefo.h")
-  include_directories(${INCPATH_DCMTK})
-
   add_library(isisImageFormat_Dicom SHARED imageFormat_Dicom.cpp imageFormat_DicomParser.cpp)
-  target_link_libraries(isisImageFormat_Dicom ${LIB_DCMDATA} ${LIB_DCMIMGLE} ${LIB_OFSTD} ${LIB_Z} isis_core ${ISIS_LIB_DEPENDS} ${LIB_DCMIMAGE} ${LIB_TIFF} ${LIB_PNG})
-
+  target_link_libraries(isisImageFormat_Dicom 
+    ${DCMTK_dcmdata_LIBRARY} ${DCMTK_dcmimgle_LIBRARY} ${DCMTK_ofstd_LIBRARY} ${DCMTK_dcmimage_LIBRARY} 
+    ${LIB_Z} ${LIB_TIFF} ${LIB_PNG}
+    isis_core 
+    ${ISIS_LIB_DEPENDS}
+  )
+# 
   set(TARGETS ${TARGETS} isisImageFormat_Dicom)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM)
 
