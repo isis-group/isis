@@ -28,7 +28,7 @@ namespace isis
 namespace util
 {
 
-template < typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = _internal::array<TYPE, ROWS *COLS> >
+template < typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typename FixedVector<TYPE, ROWS*COLS>::container_type >
 class FixedMatrix : public FixedVector<TYPE, ROWS *COLS, CONTAINER>
 {
 public:
@@ -98,9 +98,10 @@ public:
 		return ret;
 	}
 
-	FixedVector<TYPE, COLS, CONTAINER> getRow( size_t rownum )const {
-		FixedVector<TYPE, COLS, CONTAINER> ret;
-		const TYPE *start = &elem( 0, rownum ), *end = start + COLS;
+	FixedVector<TYPE, COLS> getRow( size_t rownum )const {
+		FixedVector<TYPE, COLS> ret;
+		const typename FixedVector<TYPE, ROWS *COLS, CONTAINER>::const_iterator start = FixedVector<TYPE, ROWS *COLS, CONTAINER>::begin()+rownum*COLS;
+		const typename FixedVector<TYPE, ROWS *COLS, CONTAINER>::const_iterator end = start + COLS;
 		ret.copyFrom( start, end );
 		return ret;
 	}
@@ -114,10 +115,10 @@ public:
 
 	Matrix4x4( const TYPE src[16] ): FixedMatrix<TYPE, 4, 4>( src ) {}
 	template<typename TYPE2> Matrix4x4(
-		const vector4<TYPE2> &row1,
-		const vector4<TYPE2> &row2,
-		const vector4<TYPE2> &row3 = vector4<TYPE2>( 0, 0, 1, 0 ),
-		const vector4<TYPE2> &row4 = vector4<TYPE2>( 0, 0, 0, 1 )
+		const FixedVector<TYPE2, 4> &row1,
+		const FixedVector<TYPE2, 4> &row2,
+		const FixedVector<TYPE2, 4> &row3 = vector4<TYPE2>( 0, 0, 1, 0 ),
+		const FixedVector<TYPE2, 4> &row4 = vector4<TYPE2>( 0, 0, 0, 1 )
 	) {
 		const vector4<TYPE2> src[4] = {row1, row2, row3, row4};
 		copyFrom( src );
