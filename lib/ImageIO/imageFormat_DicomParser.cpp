@@ -2,8 +2,8 @@
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <DataStorage/common.hpp>
-#include <dcdict.h>
-#include <dcdicent.h>
+#include <dcmtk/dcmdata/dcdict.h>
+#include <dcmtk/dcmdata/dcdicent.h>
 
 namespace isis
 {
