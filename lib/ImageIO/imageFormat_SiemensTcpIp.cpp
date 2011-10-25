@@ -46,8 +46,7 @@ namespace isis
                 printf("IMAGE: %d\n", image_counter);
                 //time(&startTime);
                 
-                
-				firstHeaderArrived = false;
+              	firstHeaderArrived = false;
 				unsigned long data_received = 0L;
                 std::string header_start = "<data_block_header>";
                 std::string header_end =  "</data_block_header>";
@@ -151,11 +150,11 @@ namespace isis
 							
 							size_t fov_read = atoi(getStringFromHeader("fov_read", header).c_str());
 							size_t fov_phase = atoi(getStringFromHeader("fov_phase", header).c_str());
-							size_t slice_thickness = atoi(getStringFromHeader("slice_thickness", header).c_str());
+							float slice_thickness = atof(getStringFromHeader("slice_thickness", header).c_str());
 							size_t dimension_number = atoi(getStringFromHeader("dimension_number", header).c_str());
 							// get voxelGap out of the distance (in percent!) between slices
 							size_t distFactor = atoi(getStringFromHeader("distance_factor", header).c_str());
-							util::fvector4 voxelGap(0, 0, slice_thickness*(distFactor/100));
+							util::fvector4 voxelGap(0, 0, slice_thickness*(static_cast<float>(distFactor)/100.0));
 							
 							// ... copy the data ...
 							/******************************/
@@ -202,16 +201,17 @@ namespace isis
                             }
                             
                             
-                            isis::data::ValuePtrReference valPtrBuffer = isis::data::_internal::ValuePtrBase::createByID(tID, byteSize);
+                            isis::data::ValuePtrReference valPtrBuffer = isis::data::_internal::ValuePtrBase::createByID(tID, byteSize / tSize);
 							
-                            char slice_buffer[iim * width_slice * height_slice * tSize];
+                            //char slice_buffer[iim * width_slice * height_slice * tSize];
                             for(unsigned int _slice = 0; _slice < iim; _slice++) {
                                 for(unsigned int _row = 0; _row < height_slice; _row++) {
                                     char* line_start = dataBuffer + (tSize * (((_slice / slices_in_row) * (slices_in_row * height_slice * width_slice)) + 
                                                                               (_row * width_slice * slices_in_row) + (_slice % slices_in_row * width_slice)));
                                     
                                     //             memcpy(slice_buffer + (_row * width_slice * sizeof(short)), line_start, (width_slice * sizeof(short)));
-                                    memcpy(slice_buffer + ( (_slice*width_slice*height_slice + _row * width_slice) * tSize), line_start, (width_slice * tSize));
+                                    //memcpy(slice_buffer + ( (_slice*width_slice*height_slice + _row * width_slice) * tSize), line_start, (width_slice * tSize));
+                                    memcpy(valPtrBuffer->getRawAddress((_slice*width_slice*height_slice + _row * width_slice) * tSize).get(), line_start, (width_slice * tSize));
                                 }
                             }
                             
@@ -260,8 +260,8 @@ namespace isis
                                 myChunk.setPropertyAs<uint16_t>("sequenceNumber", seq_number);
                                 myChunk.setPropertyAs<std::string>("DICOM/ImageType", "");
                             }
-                            
-                            myChunk.setPropertyAs<std::string>("sequenceDescription", seq_descr);
+                            //myChunk.setPropertyAs<std::string>("sequenceDescription", seq_descr);
+                            myChunk.setPropertyAs<std::string>("sequenceDescription", "rtMPISiemensExport");
                             
                             if ( 0 == InPlanePhaseEncodingDirection.compare(0, 3, "COL") ){
                                 myChunk.setPropertyAs<util::fvector4>("rowVec", phase_vec);
@@ -440,9 +440,9 @@ isis::image_io::FileFormat *factory()
     //    pluginRtExport->timediffMOCO = fopen(fnameMOCO, "w");
     //	pluginRtExport->timediffRECO = fopen(fnameRECO, "w");
     //	//pluginRtExport->headerFile = fopen(fnameHEADER, "w");
-    //	//Just a workaround to generate all the converters
-    //    isis::data::MemChunk<int32_t> test(2,3,4);
-    //    test.convertToType(isis::data::ValuePtr<float>::staticID);
+    //Just a workaround to generate all the converters
+    isis::data::MemChunk<int32_t> test(2,3,4);
+    test.convertToType(isis::data::ValuePtr<float>::staticID);
 	
 	return (isis::image_io::FileFormat*) pluginRtExport;
 }
