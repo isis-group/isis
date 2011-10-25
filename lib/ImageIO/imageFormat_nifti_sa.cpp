@@ -35,21 +35,13 @@ ImageFormat_NiftiSa::ImageFormat_NiftiSa(){
 std::string ImageFormat_NiftiSa::suffixes()const {return std::string( ".nii" );}
 
 void ImageFormat_NiftiSa::guessSliceOrdering(const data::Image img,char &slice_code, float &slice_duration){
-	std::list< util::PropertyValue > dummy=img.getChunksProperties("acquisitionNumber");
-	const std::vector< util::PropertyValue > acnums(dummy.begin(),dummy.end());
 
-	dummy=img.getChunksProperties("acquisitionTime");
-	const std::vector< util::PropertyValue > actimes(dummy.begin(),dummy.end());
-
-	if(acnums.size()<=1){ // seems like there is only one chunk - slice ordering doesnt matter - just choose NIFTI_SLICE_SEQ_INC
-		slice_code=NIFTI_SLICE_SEQ_INC;
-	} else if(acnums[0].isEmpty()){
-		LOG(Runtime,error) << "There is no acquisitionNumber for the first chunk, assuming normal slice ordering.";
+	if(img.getChunk(0,0,0,0,false).getRelevantDims()==img.getRelevantDims()){ // seems like there is only one chunk - slice ordering doesnt matter - just choose NIFTI_SLICE_SEQ_INC
 		slice_code=NIFTI_SLICE_SEQ_INC;
 	} else {
-		const util::PropertyValue first=acnums.front();
-		const util::PropertyValue second=acnums[1];
-		const util::PropertyValue middle=acnums[acnums.size()/2+.5];
+		const util::PropertyValue first=img.getChunk(0,0,0,0,false).propertyValue("acquisitionNumber"); // acquisitionNumber _must_ chunk-unique - so it is there even without a join
+		const util::PropertyValue second=img.getChunk(0,0,1,0,false).propertyValue("acquisitionNumber");
+		const util::PropertyValue middle=img.getChunk(0,0,img.getSizeAsVector()[data::sliceDim]/2+.5,0,false).propertyValue("acquisitionNumber");
 
 		if(first->gt(*second)){ // second slice has a lower number than the first => decrementing
 			if(middle->gt(*second)){ // if the middle number is greater than the second its interleaved
@@ -76,10 +68,7 @@ void ImageFormat_NiftiSa::guessSliceOrdering(const data::Image img,char &slice_c
 				slice_code=NIFTI_SLICE_SEQ_INC;
 			}
 		}
-	}
-
-	if(actimes.size()>1 && !actimes[1].isEmpty()){
-		slice_duration=fabs(actimes[1]->as<float>()-actimes[0]->as<float>());
+		slice_duration=fabs(second->as<float>()-second->as<float>());
 		if(slice_code==NIFTI_SLICE_SEQ_INC || slice_code==NIFTI_SLICE_SEQ_DEC){ // if its interleaved there was another slice between 0 and 1
 			slice_duration/=2;
 		}
