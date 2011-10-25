@@ -46,9 +46,10 @@ class IOQtApplication : public data::IOApplication
 	int m_argc; //same as above
 	char **m_argv;
 	boost::scoped_ptr<QApplication> m_qapp;
+	std::string m_GraphicalSystem;
 public:
 	QApplication &getQApplication();
-	IOQtApplication( const char name[], bool have_input = true, bool have_output = true );
+	IOQtApplication( const char name[], bool have_input = true, bool have_output = true, const std::string &graphicalSystem = std::string("raster") );
 	virtual bool init( int argc, char **argv, bool exitOnError = true );
 
 };
