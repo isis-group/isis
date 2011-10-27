@@ -319,7 +319,7 @@ namespace isis
 							//double_t diffTiming = difftime(endTime, startTime);
 							//printf("Time to create Image: %.2lf s\n", diffTiming);
 							
-							return 0;
+							return chunks.size();
 						}
 						
 					}
@@ -417,10 +417,13 @@ isis::image_io::FileFormat *factory()
 	pluginRtExport->receiver_address.sin_port        = htons(54321);
 	
 	printf("[bind] --> %i\n", bind(pluginRtExport->sock, (struct sockaddr*)&pluginRtExport->receiver_address, sizeof(pluginRtExport->receiver_address)));
-	
+	printf("after bind\n");
 	pluginRtExport->receiver_address_length = sizeof(pluginRtExport->receiver_address);
+    printf("+1\n");
 	pluginRtExport->counter = 0;
+    printf("+2\n");
 	pluginRtExport->image_counter = 0;
+    printf("+3\n");
 	
     //	pluginRtExport->timestampCurrent = 0;
     //    pluginRtExport->timestampPrevious = 0;
@@ -443,7 +446,7 @@ isis::image_io::FileFormat *factory()
     //Just a workaround to generate all the converters
     isis::data::MemChunk<int32_t> test(2,3,4);
     test.convertToType(isis::data::ValuePtr<float>::staticID);
-	
+	printf("end of plugin load\n");
 	return (isis::image_io::FileFormat*) pluginRtExport;
 }
 
