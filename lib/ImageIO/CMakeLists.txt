@@ -196,7 +196,7 @@ endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_TAR)
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM)
   find_package(DCMTK)
   set(DCM_LIBS ${DCMTK_dcmdata_LIBRARY} ${DCMTK_dcmimgle_LIBRARY} ${DCMTK_ofstd_LIBRARY} ${DCMTK_dcmimage_LIBRARY})
-  include_directories(${DCMTK_INCLUDE_DIRS})
+  include_directories("${DCMTK_DIR}/..")
 
   find_library(LIB_Z z)
   find_library(LIB_TIFF tiff)

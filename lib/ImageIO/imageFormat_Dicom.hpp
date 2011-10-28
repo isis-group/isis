@@ -24,7 +24,7 @@
 
 #define HAVE_CONFIG_H // this is needed for autoconf configured dcmtk (e.g. the debian package)
 
-#include <dcfilefo.h>
+#include <dcmtk/dcmdata/dcfilefo.h>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
 namespace isis
