@@ -87,7 +87,7 @@ IOFactory::IOFactory()
 		if( boost::filesystem::exists( home ) ) {
 			findPlugins( home.directory_string() );
 		} else {
-			LOG( Runtime, warning ) << home.directory_string() << " does not exist. Won't check for plugins there";
+			LOG( Runtime, info ) << home.directory_string() << " does not exist. Won't check for plugins there";
 		}
 	}
 
