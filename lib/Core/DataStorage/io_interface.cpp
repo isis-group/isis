@@ -27,10 +27,15 @@ void FileFormat::write( const std::list<data::Image> &images, const std::string 
 	std::list<std::string>::const_iterator inames = names.begin();
 	BOOST_FOREACH( std::list<data::Image>::const_reference ref, images ) {
 		std::string uniquePath = *( inames++ );
-		LOG( Runtime, notice )   << "Writing image of size " << ref.getSizeAsVector() << " to " <<  uniquePath;
 
 		try {
 			write( ref, uniquePath, dialect );
+			LOG( Runtime, notice )
+				<< "Image of size " << ref.getSizeAsVector() << " written to " <<  uniquePath
+				<< " using " <<  getName() << (dialect.empty() ?
+					std::string():
+					std::string(" and dialect ")+dialect
+				);
 		} catch ( std::runtime_error &e ) {
 			LOG( Runtime, warning )
 					<< "Failed to write image to " <<  uniquePath << " using " <<  getName() << " (" << e.what() << ")";

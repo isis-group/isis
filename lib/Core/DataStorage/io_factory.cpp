@@ -87,7 +87,7 @@ IOFactory::IOFactory()
 		if( boost::filesystem::exists( home ) ) {
 			findPlugins( home.directory_string() );
 		} else {
-			LOG( Runtime, warning ) << home.directory_string() << " does not exist. Won't check for plugins there";
+			LOG( Runtime, info ) << home.directory_string() << " does not exist. Won't check for plugins there";
 		}
 	}
 
@@ -174,9 +174,7 @@ unsigned int IOFactory::findPlugins( const std::string &path )
 				LOG( Runtime, warning ) << "Could not load library " << util::MSubject( pluginName ) << ":" <<  util::MSubject( dlerror() );
 #endif
 		} else {
-			LOG( Runtime, verbose_info )
-					<< "Ignoring " << util::MSubject( itr->path() )
-					<< " because it doesn't match " << pluginFilter.str();
+			LOG( Runtime, verbose_info ) << "Ignoring " << *itr << " because it doesn't match " << pluginFilter.str();
 		}
 	}
 

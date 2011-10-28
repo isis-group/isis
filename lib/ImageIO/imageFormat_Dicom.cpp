@@ -1,9 +1,9 @@
 #include "imageFormat_Dicom.hpp"
 #include <DataStorage/common.hpp>
 #include <CoreUtils/istring.hpp>
-#include <dcdict.h>
-#include <dcmimage.h>
-#include <diregist.h> //for color support
+#include <dcmtk/dcmdata/dcdict.h>
+#include <dcmtk/dcmimgle/dcmimage.h>
+#include <dcmtk/dcmimage/diregist.h> //for color support
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace isis
