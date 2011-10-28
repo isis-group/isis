@@ -109,7 +109,7 @@ bool ImageFormat_NiftiSa::parseDescripForSPM(util::PropertyMap &props, const cha
 		);
 		props.setPropertyAs<boost::posix_time::ptime>( "sequenceStart", sequenceStart );
 
-		LOG( ImageIoLog, info )
+		LOG( Runtime, info )
 			<< "Using Tr=" << props.propertyValue("repetitionTime") << ", Te=" << props.propertyValue("echoTime")
 			<< ", flipAngle=" << props.propertyValue("flipAngle") << " and sequenceStart=" << props.propertyValue("sequenceStart")
 			<< " from SPM8 description.";
@@ -135,7 +135,7 @@ void ImageFormat_NiftiSa::storeHeader(const util::PropertyMap &props,_internal::
 
 	// store niftis original sform if its there
 	if(props.hasProperty("nifti/sform_code")){
-		head->sform_code=props.getPropertyAs<short>("nifti/sform_code");
+		head->sform_code=props.getPropertyAs<util::Selection>("nifti/sform_code");
 		if(props.hasProperty("nifti/srow_x") && props.hasProperty("nifti/srow_y") && props.hasProperty("nifti/srow_z")){
 			props.getPropertyAs<util::fvector4>("nifti/srow_x").copyTo(head->srow_x);
 			props.getPropertyAs<util::fvector4>("nifti/srow_y").copyTo(head->srow_y);
@@ -316,18 +316,20 @@ void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &fi
 		data::Image m_image;
 		data::FilePtr &m_out;
 		const unsigned short m_ID;
-		const size_t m_bytesPerPixel;
+		const size_t m_bytesPerPixel,m_voxelstart;
 		const data::scaling_pair m_scale;
 		const bool m_doFlip;
 		data::dimensions flip_dim;
 	public:
-		CopyOp(const data::Image &image,data::FilePtr &out,bool doFlip):
-			m_image(image),m_out(out),m_ID(image.getMajorTypeID()),m_bytesPerPixel(image.getBytesPerVoxel()),m_scale(image.getScalingTo( m_ID )),m_doFlip(doFlip) {
-				if(doFlip)
-					flip_dim=m_image.mapScannerAxesToImageDimension( data::z );
-			}
+		CopyOp(const data::Image &image,data::FilePtr &out,size_t voxelstart,bool doFlip):
+			m_image(image),m_out(out),m_ID(image.getMajorTypeID()),m_bytesPerPixel(image.getBytesPerVoxel()),m_voxelstart(voxelstart),
+			m_scale(image.getScalingTo( m_ID )),m_doFlip(doFlip)
+		{
+			if(doFlip)
+				flip_dim=m_image.mapScannerAxesToImageDimension( data::z );
+		}
 		bool operator()(data::Chunk &ch, util::FixedVector< size_t, 4 > posInImage){
-			size_t offset=348+m_image.getLinearIndex(posInImage)*m_bytesPerPixel;
+			size_t offset=m_voxelstart+m_image.getLinearIndex(posInImage)*m_bytesPerPixel;
 			data::ValuePtrReference out_data=m_out.atByID(m_ID,offset,ch.getVolume());
 			ch.asValuePtrBase().copyTo(*out_data,m_scale);
 
@@ -354,16 +356,18 @@ void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &fi
 	
 	const size_t datasize=image.getVolume()*bpv;
 	if(isis_type2nifti_type[target_id]){ // "normal types"
+		const size_t voxel_offset=352;// must be >=352 (and multiple of 16)  (http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/vox_offset.html)
 
 		// open/map the new file
-		data::FilePtr out(filename,348+datasize,true);
+		data::FilePtr out(filename,voxel_offset+datasize,true);
 
 		// get the first 348 bytes as header
 		_internal::nifti_1_header *header= reinterpret_cast<_internal::nifti_1_header*>(&out[0]);
 		memset(header,0,sizeof(_internal::nifti_1_header));
 
 		// set the datatype
-		header->sizeof_hdr=header->vox_offset=348; // must be 348
+		header->sizeof_hdr=348; // must be 348
+		header->vox_offset=voxel_offset; 
 		header->bitpix=bpv*8;
 		header->datatype=isis_type2nifti_type[target_id];
 
@@ -384,7 +388,7 @@ void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &fi
 		}
 
 		// copy the data
-		CopyOp do_copy(image,out,(util::istring(dialect.c_str())=="spm"));// we have to flip the copied data for the spm dialect
+		CopyOp do_copy(image,out,header->vox_offset,(util::istring(dialect.c_str())=="spm"));// we have to flip the copied data for the spm dialect
 		const_cast<data::Image&>( image).foreachChunk(do_copy); // @todo we _do_ need a const version of foreachChunk/Voxel
 	} else {
 		LOG(Runtime,error) << "Sorry, the datatype " << util::MSubject( image.getMajorTypeName() )<< " is not supportet for nifti output";
