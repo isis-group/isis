@@ -174,9 +174,7 @@ unsigned int IOFactory::findPlugins( const std::string &path )
 				LOG( Runtime, warning ) << "Could not load library " << util::MSubject( pluginName ) << ":" <<  util::MSubject( dlerror() );
 #endif
 		} else {
-			LOG( Runtime, verbose_info )
-					<< "Ignoring " << util::MSubject( itr->path() )
-					<< " because it doesn't match " << pluginFilter.str();
+			LOG( Runtime, verbose_info ) << "Ignoring " << *itr << " because it doesn't match " << pluginFilter.str();
 		}
 	}
 
