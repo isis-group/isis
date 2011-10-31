@@ -370,8 +370,11 @@ namespace isis
                 std::string prop_end = "\n</";
                 prop_end.append(propName);
                 prop_end.append(">");
-                std::string propString = header.substr((header.find(prop_start)+prop_start.length()), 
-													   header.find(prop_end) - (header.find(prop_start)+prop_start.length()));
+                std::string propString = "";
+                if ( std::string::npos != (header.find(prop_start) )){
+                    propString = header.substr((header.find(prop_start)+prop_start.length()), 
+                                                header.find(prop_end) - (header.find(prop_start)+prop_start.length()));
+                }
                 return propString;
             }
             
