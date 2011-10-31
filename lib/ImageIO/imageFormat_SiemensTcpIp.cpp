@@ -40,11 +40,7 @@ namespace isis
 			int load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
 				
                 
-                /*
-                 *TIMESTAMPS
-                 */
                 printf("IMAGE: %d\n", image_counter);
-                //time(&startTime);
                 
               	firstHeaderArrived = false;
 				unsigned long data_received = 0L;
@@ -75,12 +71,8 @@ namespace isis
 						}
 						header_length += header_end.size();
 						header = std::string(buffer, header_length);
-						//fprintf(headerFile,"%d\n\n", image_counter);
-						//fprintf(headerFile,"%s",header.c_str());
-						//fprintf(headerFile,"\n BREAK ************************\n\n\n");
 						byteSize = atoi(getStringFromHeader("data_size_in_bytes", header).c_str());
 						
-						//printf("byteSize: '%i'\n", byteSize);
 						dataBuffer = (char*)malloc(byteSize);
                         memset(dataBuffer, 0, byteSize);
 						
@@ -164,7 +156,6 @@ namespace isis
 							memcpy(dataBuffer + data_received, buffer, byteSize - data_received);
 							data_received += byteSize - data_received;
 							
-                            //							printf("!!! ByteSize: %d      dataRec: %ld       imageNR: %d\n", byteSize, data_received, image_counter);
 							
 							// ... create a chunk from data ...
 							/******************************/
@@ -200,17 +191,14 @@ namespace isis
                                 return 0;
                             }
                             
-                            
-                            isis::data::ValuePtrReference valPtrBuffer = isis::data::_internal::ValuePtrBase::createByID(tID, byteSize / tSize);
+                           size_t size_to_alloc = iim * width_slice * height_slice; 
+                            isis::data::ValuePtrReference valPtrBuffer = isis::data::_internal::ValuePtrBase::createByID(tID, size_to_alloc);
 							
-                            //char slice_buffer[iim * width_slice * height_slice * tSize];
                             for(unsigned int _slice = 0; _slice < iim; _slice++) {
                                 for(unsigned int _row = 0; _row < height_slice; _row++) {
                                     char* line_start = dataBuffer + (tSize * (((_slice / slices_in_row) * (slices_in_row * height_slice * width_slice)) + 
                                                                               (_row * width_slice * slices_in_row) + (_slice % slices_in_row * width_slice)));
                                     
-                                    //             memcpy(slice_buffer + (_row * width_slice * sizeof(short)), line_start, (width_slice * sizeof(short)));
-                                    //memcpy(slice_buffer + ( (_slice*width_slice*height_slice + _row * width_slice) * tSize), line_start, (width_slice * tSize));
                                     memcpy(valPtrBuffer->getRawAddress((_slice*width_slice*height_slice + _row * width_slice) * tSize).get(), line_start, (width_slice * tSize));
                                 }
                             }
@@ -219,9 +207,6 @@ namespace isis
                              * get each slice position from header 
                              */
                             std::string slice_pos = "slice_position_0";
-                            //char buf[5];
-                            //sprintf(buf, "%i", _slice);
-                            //slice_pos.append(buf);
                             util::fvector4 slice_pos_vec = getVectorFromString(getStringFromHeader(slice_pos, header));//(val1, val2, val3);
                             //*********
                             
@@ -260,8 +245,9 @@ namespace isis
                                 myChunk.setPropertyAs<uint16_t>("sequenceNumber", seq_number);
                                 myChunk.setPropertyAs<std::string>("DICOM/ImageType", "");
                             }
-                            //myChunk.setPropertyAs<std::string>("sequenceDescription", seq_descr);
-                            myChunk.setPropertyAs<std::string>("sequenceDescription", "rtMPISiemensExport");
+                            
+			    seq_descr.append("_rtMPISiemensExport");
+                            myChunk.setPropertyAs<std::string>("sequenceDescription", seq_descr);
                             
                             if ( 0 == InPlanePhaseEncodingDirection.compare(0, 3, "COL") ){
                                 myChunk.setPropertyAs<util::fvector4>("rowVec", phase_vec);
@@ -279,46 +265,16 @@ namespace isis
                             myChunk.setPropertyAs<uint16_t>("repetitionTime",rep_time);
                             myChunk.setPropertyAs<std::string>("InPlanePhaseEncodingDirection",InPlanePhaseEncodingDirection);
                             myChunk.setPropertyAs<util::fvector4>( "voxelGap", util::fvector4() );
-                            //                                char nameForSource[80];
-                            //                                struct tm* ptr;
-                            //                                time_t lt;
-                            
-                            //                                lt = time(NULL);
-                            //                                ptr = localtime(&lt);
-                            
                             std::string sn = boost::posix_time::to_simple_string(boost::posix_time::microsec_clock::local_time());
-                            //ptime microsec_clock boost::date_time
-                            //                                strftime(nameForSource, 80, "%y%m%d_%H_%M_%S", ptr);
                             myChunk.setPropertyAs<std::string>("source", sn);
                             chunks.push_back(myChunk);
-                            //}
 							
 							
+			/******************************/
+				free(dataBuffer);
+				/*****************************/
 							
-							
-							/******************************/
-							free(dataBuffer);
-							/*****************************/
-							
-							
-							// evaluate the sending timing
-							// TODO:: remove this stuff sometime
-                            //							if (true == moco){
-                            //								timestampPreviousMOCO = timestampCurrentMOCO;
-                            //								timestampCurrentMOCO = atof(getStringFromHeader("time_stamp", header).c_str());
-                            //								double_t diffTimestamps = (timestampCurrentMOCO - timestampPreviousMOCO);
-                            //								fprintf(timediffMOCO, "%.6lf\n", diffTimestamps );
-                            //							}
-                            //							if (false == moco){
-                            //								timestampPrevious = timestampCurrent;
-                            //								timestampCurrent = atof(getStringFromHeader("time_stamp", header).c_str());
-                            //								double_t diffTimestamps = (timestampCurrent - timestampPrevious);
-                            //								fprintf(timediffRECO, "%.6lf\n", diffTimestamps );
-                            //							}
-							//time(&endTime);
-							//double_t diffTiming = difftime(endTime, startTime);
-							//printf("Time to create Image: %.2lf s\n", diffTiming);
-							
+	
 							return chunks.size();
 						}
 						
@@ -335,9 +291,6 @@ namespace isis
 			
 			~ImageFormat_SiemensTcpIp()
 			{
-                //                fclose(timediffRECO);
-                //                fclose(timediffMOCO);
-				//fclose(headerFile);
             }
 			
 			
@@ -350,13 +303,6 @@ namespace isis
 			
 			static unsigned int receiver_address_length;
 			static bool firstHeaderArrived;
-            //            static double_t timestampPrevious;
-            //            static double_t timestampCurrent;
-            //            static double_t timestampPreviousMOCO;
-            //            static double_t timestampCurrentMOCO;
-            ////            static FILE* timediffMOCO;
-            //            static FILE* timediffRECO;
-			//static FILE* headerFile;
             
 		private:
             time_t startTime;
@@ -397,13 +343,6 @@ namespace isis
 		
 		unsigned int ImageFormat_SiemensTcpIp::receiver_address_length;
 		bool ImageFormat_SiemensTcpIp::firstHeaderArrived;
-        //        double_t ImageFormat_SiemensTcpIp::timestampCurrent;
-        //        double_t ImageFormat_SiemensTcpIp::timestampPrevious;
-        //        double_t ImageFormat_SiemensTcpIp::timestampCurrentMOCO;
-        //        double_t ImageFormat_SiemensTcpIp::timestampPreviousMOCO;
-        //        FILE* ImageFormat_SiemensTcpIp::timediffMOCO;
-        //        FILE* ImageFormat_SiemensTcpIp::timediffRECO;
-		//FILE* ImageFormat_SiemensTcpIp::headerFile;
 		
 	}
 }
@@ -420,32 +359,10 @@ isis::image_io::FileFormat *factory()
 	pluginRtExport->receiver_address.sin_port        = htons(54321);
 	
 	printf("[bind] --> %i\n", bind(pluginRtExport->sock, (struct sockaddr*)&pluginRtExport->receiver_address, sizeof(pluginRtExport->receiver_address)));
-	printf("after bind\n");
 	pluginRtExport->receiver_address_length = sizeof(pluginRtExport->receiver_address);
-    printf("+1\n");
 	pluginRtExport->counter = 0;
-    printf("+2\n");
 	pluginRtExport->image_counter = 0;
-    printf("+3\n");
 	
-    //	pluginRtExport->timestampCurrent = 0;
-    //    pluginRtExport->timestampPrevious = 0;
-    //    pluginRtExport->timestampCurrentMOCO = 0;
-    //    pluginRtExport->timestampPreviousMOCO = 0;
-	
-    //	struct tm* ptr;
-    //	time_t lt;
-    //	char fnameMOCO[80];
-    //	char fnameRECO[80];
-    //	//char fnameHEADER[80];
-    //	lt = time(NULL);
-    //	ptr = localtime(&lt);
-    //	strftime(fnameMOCO, 80, "/tmp/timediffMOCO_%y%m%d_%H_%M_%S.txt", ptr);
-    //	strftime(fnameRECO, 80, "/tmp/timediffRECO_%y%m%d_%H_%M_%S.txt", ptr);
-    //	//strftime(fnameHEADER, 80, "/tmp/timediffHEADER_%y%m%d_%H_%M_%S.txt", ptr);
-    //    pluginRtExport->timediffMOCO = fopen(fnameMOCO, "w");
-    //	pluginRtExport->timediffRECO = fopen(fnameRECO, "w");
-    //	//pluginRtExport->headerFile = fopen(fnameHEADER, "w");
     //Just a workaround to generate all the converters
     isis::data::MemChunk<int32_t> test(2,3,4);
     test.convertToType(isis::data::ValuePtr<float>::staticID);
