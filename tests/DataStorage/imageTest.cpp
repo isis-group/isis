@@ -825,7 +825,7 @@ BOOST_AUTO_TEST_CASE ( image_size_test )
 	BOOST_REQUIRE( img.isValid() );
 	BOOST_REQUIRE( !img.isEmpty() );
 
-	BOOST_CHECK_EQUAL( img.getNrOfColumms(), 11 );
+	BOOST_CHECK_EQUAL( img.getNrOfColumns(), 11 );
 	BOOST_CHECK_EQUAL( img.getNrOfRows(), 23 );
 	BOOST_CHECK_EQUAL( img.getNrOfSlices(), 90 );
 	BOOST_CHECK_EQUAL( img.getNrOfTimesteps(), 12 );
