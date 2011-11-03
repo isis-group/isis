@@ -10,8 +10,11 @@ namespace image_io
 class ImageFormat_png: public FileFormat
 {
 protected:
-	std::string suffixes()const {
-		return std::string( ".png" );
+	std::string suffixes(io_modes modes=both)const {
+		if(modes==read_only)
+			return std::string();
+		else
+			return std::string( ".png" );
 	}
 public:
 	std::string getName()const {

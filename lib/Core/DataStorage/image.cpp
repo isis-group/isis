@@ -885,7 +885,7 @@ size_t Image::foreachChunk( ChunkOp &op, bool copyMetaData )
 	return err;
 }
 
-size_t Image::getNrOfColumms() const
+size_t Image::getNrOfColumns() const
 {
 	return getDimSize( data::rowDim );
 }
