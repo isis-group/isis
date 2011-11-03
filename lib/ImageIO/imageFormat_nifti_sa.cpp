@@ -32,7 +32,7 @@ ImageFormat_NiftiSa::ImageFormat_NiftiSa(){
 /*		nii2isis[NIFTI_TYPE_COMPLEX64 ]=data::ValuePtr<std::complex< float > >::staticID;
 	nii2isis[NIFTI_TYPE_COMPLEX128]=data::ValuePtr<std::complex< double > >::staticID;*/
 }
-std::string ImageFormat_NiftiSa::suffixes()const {return std::string( ".nii" );}
+std::string ImageFormat_NiftiSa::suffixes(io_modes /*mode*/)const {return std::string( ".nii" );}
 
 void ImageFormat_NiftiSa::guessSliceOrdering(const data::Image img,char &slice_code, float &slice_duration){
 
