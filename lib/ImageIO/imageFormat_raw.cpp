@@ -15,7 +15,7 @@ class ImageFormat_raw: public FileFormat
 {
 	typedef std::map<std::string, unsigned short> typemap;
 protected:
-	std::string suffixes()const {
+	std::string suffixes(io_modes /*modes=both*/)const {
 		return std::string( "raw" );
 	}
 public:
