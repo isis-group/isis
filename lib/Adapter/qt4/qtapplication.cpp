@@ -42,9 +42,8 @@ bool isis::qt4::QtApplication::init( int argc, char **argv, bool exitOnError )
 }
 
 
-isis::qt4::IOQtApplication::IOQtApplication( const char name[], bool have_input, bool have_output, const std::string &graphicalSystem ):
-	IOApplication( name, have_input, have_output ),
-	m_GraphicalSystem(graphicalSystem)
+isis::qt4::IOQtApplication::IOQtApplication( const char name[], bool have_input, bool have_output ):
+	IOApplication( name, have_input, have_output )
 {}
 
 QApplication &isis::qt4::IOQtApplication::getQApplication()
@@ -60,7 +59,6 @@ bool isis::qt4::IOQtApplication::init( int argc, char **argv, bool exitOnError )
 	} else {
 		m_argc = argc;
 		m_argv = argv;
-		m_qapp->setGraphicsSystem( m_GraphicalSystem.c_str() );
 		m_qapp.reset( new QApplication( m_argc, m_argv ) );
 		
 	}
