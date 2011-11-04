@@ -164,7 +164,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 		const ptime sequenceStart = genTimeStamp( object.getPropertyAs<date>( prefix + "SeriesDate" ), object.getPropertyAs<ptime>( prefix + "SeriesTime" ) );
 
 		// compute acquisitionTime
-		if ( hasOrTell( prefix + "AcquisitionTime", object, warning ) and hasOrTell( prefix + "AcquisitionDate", object, warning ) ) {
+		if ( hasOrTell( prefix + "AcquisitionTime", object, info ) and hasOrTell( prefix + "AcquisitionDate", object, warning ) ) {
 			const ptime acTime = genTimeStamp( object.getPropertyAs<date>( prefix + "AcquisitionDate" ), object.getPropertyAs<ptime>( prefix + "AcquisitionTime" ) );
 			const boost::posix_time::time_duration acDist = acTime - sequenceStart;
 			const float fAcDist = float( acDist.ticks() ) / acDist.ticks_per_second() * 1000;
@@ -181,11 +181,11 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 	}
 
 	transformOrTell<uint16_t>  ( prefix + "SeriesNumber",     "sequenceNumber",     object, warning );
-	transformOrTell<uint16_t>  ( prefix + "PatientsAge",     "subjectAge",     object, warning );
+	transformOrTell<uint16_t>  ( prefix + "PatientsAge",     "subjectAge",     object, info );
 	transformOrTell<std::string>( prefix + "SeriesDescription", "sequenceDescription", object, warning );
-	transformOrTell<std::string>( prefix + "PatientsName",     "subjectName",        object, warning );
+	transformOrTell<std::string>( prefix + "PatientsName",     "subjectName",        object, info );
 	transformOrTell<date>       ( prefix + "PatientsBirthDate", "subjectBirth",       object, info );
-	transformOrTell<uint16_t>  ( prefix + "PatientsWeight",   "subjectWeigth",      object, warning );
+	transformOrTell<uint16_t>  ( prefix + "PatientsWeight",   "subjectWeigth",      object, info );
 	// compute voxelSize and gap
 	{
 		util::fvector4 voxelSize( invalid_float, invalid_float, invalid_float, 0 );
@@ -204,7 +204,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 		object.setPropertyAs( "voxelSize", voxelSize );
 		transformOrTell<uint16_t>( prefix + "RepetitionTime", "repetitionTime", object, warning );
 		transformOrTell<float>( prefix + "EchoTime", "echoTime", object, warning );
-		transformOrTell<std::string>( prefix + "TransmitCoilName", "transmitCoil", object, warning );
+		transformOrTell<std::string>( prefix + "TransmitCoilName", "transmitCoil", object, info );
 		transformOrTell<int16_t>( prefix + "FlipAngle", "flipAngle", object, warning );
 
 		if ( hasOrTell( prefix + "SpacingBetweenSlices", object, info ) ) {
@@ -262,7 +262,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 
 	transformOrTell<uint32_t>( prefix + "InstanceNumber", "acquisitionNumber", object, error );
 
-	if ( hasOrTell( prefix + "PatientsSex", object, warning ) ) {
+	if ( hasOrTell( prefix + "PatientsSex", object, info ) ) {
 		util::Selection isisGender( "male,female,other" );
 		bool set = false;
 
