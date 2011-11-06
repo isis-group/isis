@@ -193,7 +193,7 @@ BOOST_AUTO_TEST_CASE ( proplist_image_test )
 	data::Image img( ch );
 	BOOST_REQUIRE_EQUAL(img.getChunk(0).getRelevantDims(),2); // the dim should be 2 now
 
-	for(size_t i=0;i<4;i++){
+	for(uint32_t i=0;i<4;i++){
 		BOOST_CHECK_EQUAL(img.getChunk(0,0,3-i).propertyValue("acquisitionTime"),i);
 		BOOST_CHECK_EQUAL(img.getChunk(0,0,3-i).propertyValue("acquisitionNumber"),i);
 	}
