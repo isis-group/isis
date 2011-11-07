@@ -37,8 +37,8 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 	m_input( have_input ), m_output( have_output ), feedback(new util::ConsoleFeedback)
 {
 	if ( have_input ) {
-		parameters["in"] = std::string();
-		parameters["in"].setDescription( "input file or dataset" );
+		parameters["in"] = util::slist();
+		parameters["in"].setDescription( "input file(s) or directory(s)" );
 		parameters["rf"] = std::string();
 		parameters["rf"].needed() = false;
 		parameters["rf"].hidden() = true;
@@ -128,7 +128,7 @@ void IOApplication::printHelp( bool withHidden ) const
 
 bool IOApplication::autoload( bool exitOnError )
 {
-	std::string input = parameters["in"];
+	util::slist input = parameters["in"];
 	std::string rf = parameters["rf"];
 	std::string dl = parameters["rdialect"];
 	bool no_progress = parameters["np"];
@@ -142,7 +142,10 @@ bool IOApplication::autoload( bool exitOnError )
 		data::IOFactory::setProgressFeedback( feedback );
 	}
 
-	images = data::IOFactory::load( input, rf, dl );
+	BOOST_FOREACH(util::slist::const_reference ref,input){
+		const std::list< Image > tImages=data::IOFactory::load( ref, rf, dl );
+		images.insert(images.end(),tImages.begin(),tImages.end());
+	}
 
 	if ( images.empty() ) {
 		if ( exitOnError )
