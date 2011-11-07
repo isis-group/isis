@@ -79,7 +79,7 @@ ParameterMap::ParameterMap(): parsed( false ) {}
 bool ParameterMap::parse( int argc, char **argv )
 {
 	parsed = true;
-	std::string pName;
+	util::istring pName;
 
 	for ( int i = 1; i < argc; ) { // scan through the command line, to find next parameter
 		if ( argv[i][0] == '-' ) { //seems like we found a new parameter here
@@ -98,7 +98,7 @@ bool ParameterMap::parse( int argc, char **argv )
 				i++;
 			}
 
-			std::list<std::string> matchingStrings;
+			std::list<util::istring> matchingStrings;
 			BOOST_FOREACH( ParameterMap::const_reference parameterRef, *this ) {
 				if( parameterRef.first.find( pName ) == 0 ) {
 					matchingStrings.push_back( parameterRef.first );
@@ -107,7 +107,7 @@ bool ParameterMap::parse( int argc, char **argv )
 
 			if( matchingStrings.size() > 1 ) {
 				std::stringstream matchingStringStream;
-				BOOST_FOREACH( std::list<std::string>::const_reference stringRef, matchingStrings ) {
+				BOOST_FOREACH( std::list<util::istring>::const_reference stringRef, matchingStrings ) {
 					matchingStringStream << stringRef << " ";
 				}
 				LOG( Runtime, warning )
@@ -115,7 +115,7 @@ bool ParameterMap::parse( int argc, char **argv )
 						<< matchingStringStream.str().erase( matchingStringStream.str().size() - 1, 1 )
 						<< "\" are possible. Ignoring this parameter!";
 			} else if ( !matchingStrings.size() ) {
-				LOG( Runtime, warning ) << "Ignoring unknown parameter " << MSubject( std::string( "-" ) + pName + " " + listToString( argv + start, argv + i, " ", "", "" ) );
+				LOG( Runtime, warning ) << "Ignoring unknown parameter " << MSubject( util::istring( "-" ) + pName + " " + listToString( argv + start, argv + i, " ", "", "" ).c_str() );
 			} else if ( at( matchingStrings.front() ).parse( listToString( argv + start, argv + i, ",", "", "" ) ) ) { // parse the collected properties
 				at( matchingStrings.front() ).needed() = false; //remove needed flag, because the value is set (aka "not needed anymore")
 			} else {
