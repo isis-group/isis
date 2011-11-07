@@ -557,6 +557,13 @@ void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, isis::util::Pr
 		} else if ( name == "MedComHistoryInformation" ) {
 			//@todo special handling needed
 			LOG( Debug, info ) << "Ignoring MedComHistoryInformation at " << tag.toString();
+		} else if ( obj->getTag()==DcmTag(0x0008,0x0032) ) {
+			OFString buff;
+			dynamic_cast<DcmElement *>( obj )->getOFString(buff,0);
+			if(buff.length()<8){
+				LOG(Runtime,warning) << "The Acquisition Time " << util::MSubject(buff) << " is not precise enough, ignoring it";
+				continue;
+			}
 		} else if ( obj->isLeaf() ) {
 			DcmElement *elem = dynamic_cast<DcmElement *>( obj );
 			const size_t mult = obj->getVM();
