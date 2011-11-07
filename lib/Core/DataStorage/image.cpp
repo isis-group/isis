@@ -34,7 +34,7 @@ namespace data
 ChunkOp::~ChunkOp(){}
 
 
-Image::Image ( ) : set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ), clean( false )
+Image::Image ( ) : set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers,DICOM/AcquisitionNumber" ), clean( false )
 {
 	addNeededFromString( neededProperties );
 	set.addSecondarySort( "acquisitionNumber" );
@@ -43,7 +43,7 @@ Image::Image ( ) : set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMas
 
 Image::Image ( const Chunk &chunk, dimensions min_dim ) :
 	_internal::NDimensional<4>(), util::PropertyMap(), minIndexingDim( min_dim ),
-	set( "sequenceNumber,rowVec,columnVec,coilChannelMask,DICOM/EchoNumbers" ),
+	set( "sequenceNumber,rowVec,columnVec,coilChannelMask,DICOM/EchoNumbers,DICOM/AcquisitionNumber" ),
 	clean( false )
 {
 	addNeededFromString( neededProperties );
