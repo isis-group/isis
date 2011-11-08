@@ -208,6 +208,12 @@ Image IOApplication::fetchImage()
 	return ret;
 }
 
+boost::shared_ptr< util::_internal::MessageHandlerBase > IOApplication::getLogHandler(std::string module, LogLevel level) const
+{
+	return isis::util::Application::getLogHandler(module, level);
+}
+
+
 }
 }
 

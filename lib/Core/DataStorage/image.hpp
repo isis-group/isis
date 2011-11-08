@@ -149,7 +149,7 @@ public:
 	 */
 	template<typename T> Image( std::list<T> &chunks, dimensions min_dim = rowDim ) :
 		_internal::NDimensional<4>(), util::PropertyMap(), minIndexingDim( min_dim ),
-		set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ),
+		set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers,DICOM/AcquisitionNumber" ),
 		clean( false ) {
 		addNeededFromString( neededProperties );
 		set.addSecondarySort( "acquisitionNumber" );
@@ -162,7 +162,7 @@ public:
 	 */
 	template<typename T> Image( std::vector<T> &chunks, dimensions min_dim = rowDim ) :
 		_internal::NDimensional<4>(), util::PropertyMap(),
-		set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ),
+		set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers,DICOM/AcquisitionNumber" ),
 		clean( false ), minIndexingDim( min_dim ) {
 		addNeededFromString( neededProperties );
 		set.addSecondarySort( "acquisitionNumber" );
@@ -583,7 +583,7 @@ public:
 	/// \returns the number of rows of the image
 	size_t getNrOfRows()const;
 	/// \returns the number of columns of the image
-	size_t getNrOfColumms()const;
+	size_t getNrOfColumns()const;
 	/// \returns the number of slices of the image
 	size_t getNrOfSlices()const;
 	/// \returns the number of timesteps of the image
