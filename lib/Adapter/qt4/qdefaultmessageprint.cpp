@@ -13,7 +13,7 @@ void isis::qt4::QDefaultMessagePrint::commit(const isis::util::_internal::Messag
 	qMessage.m_object = msg.m_object;
 	qMessage.m_subjects = msg.m_subjects;
 	qMessage.m_timeStamp = msg.m_timeStamp;
-	qMessage.message = msg.strTime();
+	qMessage.message = msg.str();
 	qMessage.time_str = msg.strTime();
 	commitMessage( qMessage );
 }
