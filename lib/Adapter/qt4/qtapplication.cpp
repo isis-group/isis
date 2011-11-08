@@ -67,3 +67,8 @@ bool isis::qt4::IOQtApplication::init( int argc, char **argv, bool exitOnError )
 }
 
 
+boost::shared_ptr< isis::util::_internal::MessageHandlerBase > isis::qt4::IOQtApplication::getLogHandler( std::string /*module*/, isis::LogLevel level )const
+{
+	return boost::shared_ptr< isis::util::_internal::MessageHandlerBase >( level ? new isis::qt4::QDefaultMessagePrint( level ) : 0 );
+}
+
