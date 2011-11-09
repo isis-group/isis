@@ -151,10 +151,12 @@ class ImageFormat_NiftiSa: public FileFormat
 		return util::Value<NEW_T>::staticID;
 	}
 	static void guessSliceOrdering(const data::Image img,char &slice_code, float &slice_duration);
+	static std::list<data::Chunk> parseSliceOrdering(const _internal::nifti_1_header* head, data::Chunk current);
+
 	static bool parseDescripForSPM(util::PropertyMap &props, const char desc[]);
 	static void storeDescripForSPM(const isis::util::PropertyMap& props, char desc[]);
 	static void storeHeader(const util::PropertyMap &props,_internal::nifti_1_header *head);
-	static void parseHeader(const _internal::nifti_1_header *head,data::Chunk &props);
+	static std::list<data::Chunk> parseHeader(const _internal::nifti_1_header *head,data::Chunk props);
 public:
 	ImageFormat_NiftiSa();
 	std::string getName()const;

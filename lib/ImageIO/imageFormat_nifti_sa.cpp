@@ -76,6 +76,73 @@ void ImageFormat_NiftiSa::guessSliceOrdering(const data::Image img,char &slice_c
 
 }
 
+std::list<data::Chunk> ImageFormat_NiftiSa::parseSliceOrdering(const _internal::nifti_1_header* head, data::Chunk current)
+{
+	double time_fac;
+	switch(head->xyzt_units & 0x38){
+		case NIFTI_UNITS_SEC:time_fac=1e3;break;
+		case NIFTI_UNITS_USEC:time_fac=1e-3;break;
+		default: time_fac=1;break;
+	}
+
+	//if the sequence is "normal"
+	current.setPropertyAs<uint32_t>("acquisitionNumber",0);
+	const size_t dims=current.getRelevantDims();
+	assert(dims<=4); // more than 4 dimenstions are ... well, not expected
+
+	if(head->slice_code == 0 || head->slice_code == NIFTI_SLICE_SEQ_INC){
+		if(head->slice_duration==0){ // and there is no slice duration, there is no use in numbering
+			return std::list<data::Chunk>(1,current);
+		}
+	}
+	if(dims<3){ // if there is only one slice, there is no use in numbering
+		return std::list<data::Chunk>(1,current);
+	} else {// if there are timesteps we have to get a bit dirty
+		std::list< data::Chunk > newChList= (dims==4 ? current.autoSplice():std::list<data::Chunk>(1,current)); // make sure we have a list of 3D-Chunks
+		uint32_t offset=0;
+
+		BOOST_FOREACH(data::Chunk &ch,newChList){
+			
+			switch(head->slice_code){ //set sub-property "acquisitionNumber" based on the slice_code and the offset
+				case 0:
+				case NIFTI_SLICE_SEQ_INC:
+					for(uint32_t i=0;i<(uint32_t)head->dim[3];i++)
+							ch.propertyValueAt("acquisitionNumber",i)=i+offset;
+					break;
+				case NIFTI_SLICE_SEQ_DEC:
+					for(uint32_t i=0;i<(uint32_t)head->dim[3];i++)
+						ch.propertyValueAt("acquisitionNumber",head->dim[3]-i-1)=i+offset;
+					break;
+				case NIFTI_SLICE_ALT_INC:{
+					uint32_t i=0,cnt;
+					for(cnt=0;i<floor(head->dim[3]/2+.5);i++,cnt+=2)
+						ch.propertyValueAt("acquisitionNumber",i)=cnt+offset;
+					for(cnt=1;i<(uint32_t)head->dim[3];i++,cnt+=2)
+						ch.propertyValueAt("acquisitionNumber",i)=cnt+offset;
+					}break;
+				case NIFTI_SLICE_ALT_DEC:{
+					uint32_t i=0,cnt;
+					for(cnt=0;i<floor(head->dim[3]/2+.5);i++,cnt+=2)
+						ch.propertyValueAt("acquisitionNumber",head->dim[3]-i-1)=cnt+offset;
+					for(cnt=1;i<(uint32_t)head->dim[3];i++,cnt+=2)
+						ch.propertyValueAt("acquisitionNumber",head->dim[3]-i-1)=cnt+offset;
+					}break;
+				default:LOG(Runtime,error) << "Unknown slice code " << util::MSubject(head->slice_code);break;
+			}
+
+			if(head->slice_duration ){ 
+				for(uint32_t i=0;i<(uint32_t)head->dim[3];i++){ // set su-property "acquisitionTime" based of the slice number
+					ch.propertyValueAt("acquisitionTime",  i)=ch.propertyValueAt("acquisitionNumber",i)->as<float>()*head->slice_duration*time_fac;
+				}
+			}
+
+			offset+=head->dim[3];// increase offset by the number of slices per volume
+		}
+		return newChList;
+	}
+}
+
+
 void ImageFormat_NiftiSa::storeDescripForSPM(const util::PropertyMap &props, char desc[]){
 	std::list<std::string> ret;
 	typedef const char* prop_pair[3];
@@ -88,7 +155,7 @@ void ImageFormat_NiftiSa::storeDescripForSPM(const util::PropertyMap &props, cha
 	strncpy(desc,util::listToString(ret.begin(),ret.end(),"/","","").c_str(),80);
 }
 
-bool ImageFormat_NiftiSa::parseDescripForSPM(util::PropertyMap &props, const char desc[]){
+bool ImageFormat_NiftiSa::parseDescripForSPM(isis::util::PropertyMap& props, const char desc[]){
 	//check description for tr, te and fa and date which is written by spm8
 	boost::regex descriptionRegex(
 		".*TR=([[:digit:]]{1,})ms.*TE=([[:digit:]]{1,})ms.*FA=([[:digit:]]{1,})deg\\ *([[:digit:]]{1,2}).([[:word:]]{3}).([[:digit:]]{4})\\ *([[:digit:]]{1,2}):([[:digit:]]{1,2}):([[:digit:]]{1,2}).*"
@@ -166,7 +233,7 @@ void ImageFormat_NiftiSa::storeHeader(const util::PropertyMap &props,_internal::
 
 	strcpy(head->magic,"n+1");
 }
-void ImageFormat_NiftiSa::parseHeader(const _internal::nifti_1_header *head,data::Chunk &props){
+std::list< data::Chunk > ImageFormat_NiftiSa::parseHeader(const isis::image_io::_internal::nifti_1_header* head,isis::data::Chunk props){
 	unsigned short dims=head->dim[0];
 	double time_fac=1;
 	double size_fac=1;
@@ -220,49 +287,6 @@ void ImageFormat_NiftiSa::parseHeader(const _internal::nifti_1_header *head,data
 	props.propertyValue( "voxelSize")->castTo<util::fvector4>()*=size_fac;
 	props.propertyValue( "indexOrigin")->castTo<util::fvector4>()*=size_fac;
 
-	// set slice ordering
-	if(dims==3){
-		switch(head->slice_code){ //@todo check this
-			case 0:
-			case NIFTI_SLICE_SEQ_INC:
-				if(head->slice_duration){ // if there is no slice duration, and the sequence is "normal" there is no use in numbering
-					for(uint32_t i=0;i<(uint32_t)head->dim[3];i++)
-						props.propertyValueAt("acquisitionNumber",i)=i;
-				} else {
-					props.setPropertyAs<uint32_t>("acquisitionNumber",0);
-				}
-				break;
-			case NIFTI_SLICE_SEQ_DEC:
-				for(uint32_t i=0;i<(uint32_t)head->dim[3];i++)
-					props.propertyValueAt("acquisitionNumber",head->dim[3]-i-1)=i;
-				break;
-			case NIFTI_SLICE_ALT_INC:{
-				uint32_t i=0,cnt;
-				for(cnt=0;i<floor(head->dim[3]/2+.5);i++,cnt+=2)
-					props.propertyValueAt("acquisitionNumber",i)=cnt;
-				for(cnt=1;i<(uint32_t)head->dim[3];i++,cnt+=2)
-					props.propertyValueAt("acquisitionNumber",i)=cnt;
-				}break;
-			case NIFTI_SLICE_ALT_DEC:{
-				uint32_t i=0,cnt;
-				for(cnt=0;i<floor(head->dim[3]/2+.5);i++,cnt+=2)
-					props.propertyValueAt("acquisitionNumber",head->dim[3]-i-1)=cnt;
-				for(cnt=1;i<(uint32_t)head->dim[3];i++,cnt+=2)
-					props.propertyValueAt("acquisitionNumber",head->dim[3]-i-1)=cnt;
-				}break;
-			default:LOG(Runtime,error) << "Unknown slice code " << util::MSubject(head->slice_code);break;
-		}
-
-		if(head->slice_duration ){
-			for(uint32_t i=0;i<(uint32_t)head->dim[3];i++){
-				props.propertyValueAt("acquisitionTime",  i)=props.propertyValueAt("acquisitionNumber",i)->as<float>()*head->slice_duration*time_fac;
-			}
-		}
-	} else {
-		props.setPropertyAs<uint32_t>("acquisitionNumber",0);
-		LOG_IF(head->slice_code>1,Runtime,warning) << "Sorry slice_code>1 is currently only supportet for 3D-images, ignoring it.";
-	}
-
 	// Tr
 	if(head->pixdim[dims]!=0) // if pixdim is given for the uppermost dim, assume its repetitionTime
 		props.setPropertyAs<uint16_t>("repetitionTime",head->pixdim[dims]*time_fac);
@@ -277,8 +301,7 @@ void ImageFormat_NiftiSa::parseHeader(const _internal::nifti_1_header *head,data
 		LOG( Runtime, error ) << "Scaling is not supported at the moment.";
 	}
 
-
-
+	return parseSliceOrdering(head,props);
 }
 
 std::string ImageFormat_NiftiSa::getName()const {return "Nifti standalone";}
@@ -305,10 +328,9 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 		<< "nifti field bitpix does not fit the bytesize of the given datatype ("
 		<< data->getTypeName() << "/" << header->bitpix <<  ")";
 
-	chunks.push_back(data::Chunk(data,size[0],size[1],size[2],size[3]));
-	parseHeader(header,chunks.back());
-
-	return 1;
+	std::list<data::Chunk> newChunks=parseHeader(header,data::Chunk(data,size[0],size[1],size[2],size[3]));
+	chunks.insert(chunks.begin(), newChunks.begin(),newChunks.end());
+	return newChunks.size();
 }
 
 void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
