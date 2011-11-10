@@ -590,8 +590,8 @@ private:
 					for ( size_t x = 0; x < isize[0]; x += csize[0] ) {
 						const size_t dim[] = {x, y, z, t};
 						T *target = refNii + image.getLinearIndex( dim );
-						const data::Chunk ch=image.getChunk( x, y, z, t, false );
-						ch.copyToMem(target, ch.getVolume(), scale );
+						const data::Chunk ch = image.getChunk( x, y, z, t, false );
+						ch.copyToMem( target, ch.getVolume(), scale );
 					}
 				}
 			}

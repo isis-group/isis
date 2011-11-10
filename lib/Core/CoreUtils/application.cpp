@@ -81,18 +81,18 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 	}
 
 	if( parameters["dCore"].isSet() ) {
-		setLog<CoreDebug>( (LogLevel)(uint16_t)parameters["dCore"]->as<Selection>() );//trigger explicit cast from Selection to int and then to LogLevel
-		setLog<CoreLog>( (LogLevel)(uint16_t)parameters["dCore"]->as<Selection>() );
+		setLog<CoreDebug>( ( LogLevel )( uint16_t )parameters["dCore"]->as<Selection>() ); //trigger explicit cast from Selection to int and then to LogLevel
+		setLog<CoreLog>( ( LogLevel )( uint16_t )parameters["dCore"]->as<Selection>() );
 	}
 
 	if( parameters["dData"].isSet() ) {
-		setLog<DataDebug>( (LogLevel)(uint16_t)parameters["dData"]->as<Selection>() );
-		setLog<DataLog>( (LogLevel)(uint16_t)parameters["dData"]->as<Selection>() );
+		setLog<DataDebug>( ( LogLevel )( uint16_t )parameters["dData"]->as<Selection>() );
+		setLog<DataLog>( ( LogLevel )( uint16_t )parameters["dData"]->as<Selection>() );
 	}
 
 	if( parameters["dImageIO"].isSet() ) {
-		setLog<ImageIoDebug>( (LogLevel)(uint16_t)parameters["dImageIO"]->as<Selection>() );
-		setLog<ImageIoLog>( (LogLevel)(uint16_t)parameters["dImageIO"]->as<Selection>() );
+		setLog<ImageIoDebug>( ( LogLevel )( uint16_t )parameters["dImageIO"]->as<Selection>() );
+		setLog<ImageIoLog>( ( LogLevel )( uint16_t )parameters["dImageIO"]->as<Selection>() );
 	}
 
 	if ( err ) {

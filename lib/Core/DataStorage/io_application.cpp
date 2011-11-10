@@ -142,9 +142,9 @@ bool IOApplication::autoload( bool exitOnError )
 		data::IOFactory::setProgressFeedback( feedback );
 	}
 
-	BOOST_FOREACH(util::slist::const_reference ref,input){
-		const std::list< Image > tImages=data::IOFactory::load( ref, rf, dl );
-		images.insert(images.end(),tImages.begin(),tImages.end());
+	BOOST_FOREACH( util::slist::const_reference ref, input ) {
+		const std::list< Image > tImages = data::IOFactory::load( ref, rf, dl );
+		images.insert( images.end(), tImages.begin(), tImages.end() );
 	}
 
 	if ( images.empty() ) {

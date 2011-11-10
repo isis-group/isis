@@ -81,7 +81,7 @@ private:
 	struct invalidP {   bool operator()( const_reference ref )const;};
 	/// true when entry is a leaf, needed and empty of entry is a invalid branch
 	struct treeInvalidP {   bool operator()( const_reference ref )const;};
-	/// true when entry is not a scalar 
+	/// true when entry is not a scalar
 	struct listP {  bool operator()( const_reference ref )const;};
 
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -233,7 +233,7 @@ public:
 	 * \param keep_needed flag
 	 * \returns true if all properties removed succesfully, false otherwise
 	 */
-	bool remove( const KeyList& removeList, bool keep_needed = false );
+	bool remove( const KeyList &removeList, bool keep_needed = false );
 
 	/**
 	 * check if property is available

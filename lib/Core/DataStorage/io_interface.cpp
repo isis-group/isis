@@ -31,11 +31,11 @@ void FileFormat::write( const std::list<data::Image> &images, const std::string 
 		try {
 			write( ref, uniquePath, dialect );
 			LOG( Runtime, notice )
-				<< "Image of size " << ref.getSizeAsVector() << " written to " <<  uniquePath
-				<< " using " <<  getName() << (dialect.empty() ?
-					std::string():
-					std::string(" and dialect ")+dialect
-				);
+					<< "Image of size " << ref.getSizeAsVector() << " written to " <<  uniquePath
+					<< " using " <<  getName() << ( dialect.empty() ?
+													std::string() :
+													std::string( " and dialect " ) + dialect
+												  );
 		} catch ( std::runtime_error &e ) {
 			LOG( Runtime, warning )
 					<< "Failed to write image to " <<  uniquePath << " using " <<  getName() << " (" << e.what() << ")";
