@@ -35,6 +35,7 @@ class ChunkOp : std::unary_function<Chunk &, bool>
 {
 public:
 	virtual bool operator()( Chunk &, util::FixedVector<size_t, 4> posInImage ) = 0;
+	virtual ~ChunkOp();
 };
 
 /// Main class for generic 4D-images
@@ -149,7 +150,7 @@ public:
 	 */
 	template<typename T> Image( std::list<T> &chunks, dimensions min_dim = rowDim ) :
 		_internal::NDimensional<4>(), util::PropertyMap(), minIndexingDim( min_dim ),
-		set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ),
+		set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers,DICOM/AcquisitionNumber" ),
 		clean( false ) {
 		addNeededFromString( neededProperties );
 		set.addSecondarySort( "acquisitionNumber" );
@@ -162,7 +163,7 @@ public:
 	 */
 	template<typename T> Image( std::vector<T> &chunks, dimensions min_dim = rowDim ) :
 		_internal::NDimensional<4>(), util::PropertyMap(),
-		set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ),
+		set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers,DICOM/AcquisitionNumber" ),
 		clean( false ), minIndexingDim( min_dim ) {
 		addNeededFromString( neededProperties );
 		set.addSecondarySort( "acquisitionNumber" );
@@ -524,7 +525,7 @@ public:
 	template<typename T> MemChunk<T> copyToMemChunk()const {
 		const util::FixedVector<size_t, 4> size = getSizeAsVector();
 		data::MemChunk<T> ret( size[0], size[1], size[2], size[3] );
-		copyToMem<T>( &ret.voxel<T>( 0, 0, 0, 0 ) );
+		copyToMem<T>( &ret.voxel<T>( 0, 0, 0, 0 ), ret.getVolume() );
 		return ret;
 	}
 
@@ -583,7 +584,7 @@ public:
 	/// \returns the number of rows of the image
 	size_t getNrOfRows()const;
 	/// \returns the number of columns of the image
-	size_t getNrOfColumms()const;
+	size_t getNrOfColumns()const;
 	/// \returns the number of slices of the image
 	size_t getNrOfSlices()const;
 	/// \returns the number of timesteps of the image

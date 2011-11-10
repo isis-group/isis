@@ -34,7 +34,7 @@ template<typename TImage> typename TImage::Pointer
 itkAdapter::makeItkImageObject( const data::Image &src, const bool behaveAsItkReader )
 {
 	typedef TImage OutputImageType;
-	m_ImageISIS = boost::shared_ptr< data::Image >( new data::Image(src) );
+	m_ImageISIS = boost::shared_ptr< data::Image >( new data::Image( src ) );
 	m_TypeID = m_ImageISIS->getChunkAt( 0 ).getTypeID();
 
 	switch ( m_TypeID ) {
@@ -121,7 +121,7 @@ typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkRea
 	typename OutputImageType::DirectionType itkDirection;
 	typename OutputImageType::SizeType itkSize;
 	typename OutputImageType::RegionType itkRegion;
- //	util::DefaultMsgPrint::stopBelow( warning );
+	// util::DefaultMsgPrint::stopBelow( warning );
 	PropKeyListType propKeyList;
 	//itk::MetaDataDictionary myItkDict;
 	// since ITK uses a dialect of the Nifti image space, we need to transform
@@ -150,8 +150,11 @@ typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkRea
 	if( spacing[3] == 0 ) { spacing[3] = 1; }
 
 	const util::fvector4 readVec = m_ImageISIS->getPropertyAs<util::fvector4>( "rowVec" );
+
 	const util::fvector4 phaseVec = m_ImageISIS->getPropertyAs<util::fvector4>( "columnVec" );
+
 	const util::fvector4 sliceVec = m_ImageISIS->getPropertyAs<util::fvector4>( "sliceVec" );
+
 	//  std::cout << "indexOrigin: " << indexOrigin << std::endl;
 	//  std::cout << "readVec: " << readVec << std::endl;
 	//  std::cout << "phaseVec: " << phaseVec << std::endl;
@@ -244,6 +247,7 @@ template<typename TImageITK, typename TOutputISIS> std::list<data::Image> itkAda
 		indexOrigin[0] = -indexOrigin[0];
 		indexOrigin[1] = -indexOrigin[1];
 	}
+
 	data::Chunk
 	tmpChunk ( data::MemChunk< ITKRepn >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) ) ;
 	//we have to convert the datatype of retChunk to the desired TOutputISIS type to avoid autoscaling
@@ -265,9 +269,9 @@ template<typename TImageITK, typename TOutputISIS> std::list<data::Image> itkAda
 
 	//do not try to grasp that in a sober state!!
 	//workaround to create a TypedImage out of a MemChunk
-	std::list<data::Chunk> tmpChList = std::list<data::Chunk>(1,retChunk);
-	std::list<data::Image> isisImageList = data::IOFactory::chunkListToImageList(tmpChList);
-	data::TypedImage< TOutputISIS >  retImage (data::TypedImage<TOutputISIS> ( isisImageList.front() ) );
+	std::list<data::Chunk> tmpChList = std::list<data::Chunk>( 1, retChunk );
+	std::list<data::Image> isisImageList = data::IOFactory::chunkListToImageList( tmpChList );
+	data::TypedImage< TOutputISIS >  retImage ( data::TypedImage<TOutputISIS> ( isisImageList.front() ) );
 	//these are properties eventually manipulated by itk. So we can not take the
 	//parameters from the isis image which was handed over to the itkAdapter
 	retImage.setPropertyAs( "indexOrigin", util::fvector4( indexOrigin[0], indexOrigin[1], indexOrigin[2], indexOrigin[3] ) );

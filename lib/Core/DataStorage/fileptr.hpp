@@ -80,6 +80,8 @@ public:
 	 * So the file will be unmapped and closed if, and only if all ValuePtr created by this function and the FilePtr are closed.
 	 *
 	 * If the FilePtr was opened writing, writing access to this ValuePtr objects will result in writes to the file. Otherwise it will just write into memory.
+	 *
+	 * Note that there is no conversion done, just reinterpretation of the raw data in the file.
 	 * \param offset the position in the file to start from (in bytes)
 	 * \param len the requested length of the resulting ValuePtr in elements (if that will go behind the end of the file, a warning will be issued).
 	 */
@@ -96,6 +98,17 @@ public:
 		LOG_IF( len * sizeof( T ) > ( getLength() - offset ), Debug, error ) << "The requested length will be " << len - ( getLength() - offset ) << " bytes behind the end of the source.";
 		return data::ValuePtr<T>( ptr, len );
 	}
+
+	/**
+	 * Get a ValuePtrReference to a ValuePtr of the requested type.
+	 * The resulting ValuePtr will use a proxy deleter to keep track of the mapped file.
+	 * So the file will be unmapped and closed if, and only if all ValuePtr created by this function and the FilePtr are closed.
+	 *
+	 * If the FilePtr was opened writing, writing access to this ValuePtr objects will result in writes to the file. Otherwise it will just write into memory.
+	 * \param ID the requested type (note that there is no conversion done, just reinterpretation of the raw data in the file)
+	 * \param offset the position in the file to start from (in bytes)
+	 * \param len the requested length of the resulting ValuePtr in elements (if that will go behind the end of the file, a warning will be issued).
+	 */
 	data::ValuePtrReference atByID( unsigned short ID, size_t offset, size_t len = 0 );
 
 	bool good();

@@ -55,7 +55,7 @@ size_t getConvertSize( const ValuePtrBase &src, const ValuePtrBase &dst )
 }
 
 //default implementation of ValuePtrConverterBase::getScaling - allways returns scaling of 1/0 - should be overridden by real converters if they do use a scaling
-scaling_pair ValuePtrConverterBase::getScaling( const isis::util::_internal::ValueBase& /*min*/, const isis::util::_internal::ValueBase& /*max*/, autoscaleOption /*scaleopt*/ ) const
+scaling_pair ValuePtrConverterBase::getScaling( const isis::util::_internal::ValueBase & /*min*/, const isis::util::_internal::ValueBase & /*max*/, autoscaleOption /*scaleopt*/ ) const
 {
 	static const scaling_pair ret( util::ValueReference( util::Value<uint8_t>( 1 ) ), util::ValueReference( util::Value<uint8_t>( 0 ) ) );
 	return ret;

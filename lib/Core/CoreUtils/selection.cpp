@@ -43,15 +43,15 @@ Selection::operator std::string()const
 	return std::string( buff.begin(), buff.end() );
 }
 
-bool Selection::set( unsigned short entry ) 
+bool Selection::set( unsigned short entry )
 {
-    if( getEntries().size() > entry ) {
-	m_set = entry; 
-	return true;
-    } else {
-	return false;
-    }
-    
+	if( getEntries().size() > entry ) {
+		m_set = entry;
+		return true;
+	} else {
+		return false;
+	}
+
 }
 bool Selection::set( const char *entry )
 {

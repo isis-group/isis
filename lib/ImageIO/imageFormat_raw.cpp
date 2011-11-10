@@ -15,7 +15,7 @@ class ImageFormat_raw: public FileFormat
 {
 	typedef std::map<std::string, unsigned short> typemap;
 protected:
-	std::string suffixes()const {
+	std::string suffixes( io_modes /*modes=both*/ )const {
 		return std::string( "raw" );
 	}
 public:
@@ -47,7 +47,7 @@ public:
 
 		const size_t fsize = mfile.getLength();
 
-		const unsigned short type = util::getTransposedTypeMap( false, true )[dialect+"*"];
+		const unsigned short type = util::getTransposedTypeMap( false, true )[dialect + "*"];
 
 		if( type == 0 ) {
 			LOG( Runtime, error ) << "No known datatype given, you have to give the type of the raw data as rdialect (eg. \"-rdialect u16bit\")";
