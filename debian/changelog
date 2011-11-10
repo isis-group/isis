@@ -1,3 +1,43 @@
+isis (0.4.0g9140af9-0) stable; urgency=low
+
+  * add first version for python support
+  * add support for dcmtk 3.6
+
+  * let ValuePtr::getRawAddress() return boost::shared_ptr<void> instead of boost::weak_ptr<void>, was a bit overdesigned
+  * fix typo in ValuePtr::copyFromMem and suppress some correct warnings in typePtrTest.cpp
+  * tell the user the size of the image written 
+  * add PropertyMap::find to search single keys in the property tree
+  * remove a private constructor in ValuePtr which prevented copy-construction from Value (should not be necessary)
+  * add FilePtr to handle memory mapped data 
+  * use mmap64 instead of mmap and ftruncate64 instead of fallocate 
+  * fix bug in MemChunk creation which caused the underlying ValuePtr to have a length of 0
+  * get back Chunk::copySlice
+  * fallocate seems not to work on ubuntu - replace by more generic ftruncate
+  * add FilePtr::close to explicitely unmap and close the mapped file 
+  * use FilePtr in io-plugins raw and tar-proxy 
+  * make PropertyMap entries two dimensional to be able to store lists of properties (this is just the storage / not in the interface)
+  * added basic matrix class to do some matrix-algebra on FixedVector 
+  * PropertyValue(bool needed) removed - was in conflict with creation from value
+  * add length check to Image::copyToMem 
+  * add aplying operators *=,/=,+= and -= to FixedVector 
+  * make ProgressFeedback in IOApplication and IOFactory shared_ptr to make them more robust against copying
+  * add some code to handle two dimensional properties (e.g. set by propertyValueAt) when reIndex-ing Images
+  * add stl-compatible begin/end to FixedVector 
+  * fix bug which caused the result of FixedMatrix::getRow to have the wrong internal size and use iterators instead of pointers there
+  * fix wrong warning about inserting chunks into existing image when splicing
+  * fix dicom build on mac
+  * workaround for apparently still/again broken dynamic_cast on MacOS Lion 
+  * remove dedundant LLMap from util::Application
+  * add optional parameter to FileFormat::getSuffixes to specify which IO is meant
+  * dont use Acquisition Time if its not precise enough and be less strict with expected properties - helps with GE data
+  * fix compiles with prehistoric boost versions (<=1.35) 
+  * add DICOM/AcquisitionNumber as attribute to differ between images 
+  * add qdefaultmessageprint class to qt4 adapter
+  * add rdialect onlyfirst to vistaio. This is needed by the viewer to only load the first image in zmaps
+
+ -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Thu, 10 Nov 2011  12:48:00 +0200
+
+
 isis (0.3.4g5ae6013-0) stable; urgency=low
 
    * Fixed bug in transformCoords
