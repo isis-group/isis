@@ -206,32 +206,36 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 	// prepare some attributes
 	assert( util::fuzzyEqual<float>( offset.sqlen(), 1 ) ); // it should be norm here
 	const util::fvector4 indexOriginOffset = offset * distance[atDim];
-	
+
 	LOG( Debug, info ) << "Splicing chunk at dimenstion " << atDim + 1 << " with indexOrigin stride " << indexOriginOffset << " and acquisitionNumberStride " << acquisitionNumberStride;
 	std::list<Chunk> ret = splice( ( dimensions )atDim ); // do low level splice - get the chunklist
 
-	std::list<Chunk>::iterator it=ret.begin();it++;// skip the first one
-	
-	for(size_t cnt=1;it!=ret.end();it++,cnt++) { // adapt some metadata in them
+	std::list<Chunk>::iterator it = ret.begin();
+	it++;// skip the first one
+
+	for( size_t cnt = 1; it != ret.end(); it++, cnt++ ) { // adapt some metadata in them
 		util::fvector4 &orig = it->propertyValue( "indexOrigin" )->castTo<util::fvector4>();
-		if(orig==ret.front().getPropertyAs<util::fvector4>( "indexOrigin" )){ // fix pos if its the same as for the first
+
+		if( orig == ret.front().getPropertyAs<util::fvector4>( "indexOrigin" ) ) { // fix pos if its the same as for the first
 			LOG( Debug, verbose_info ) << "Origin was " << orig << " will be moved by " << indexOriginOffset << "*"  << cnt;
 			orig = orig + indexOriginOffset * ( float )cnt;
 		}
 
 		uint32_t &acq = it->propertyValue( "acquisitionNumber" )->castTo<uint32_t>();
-		if(acq==ret.front().getPropertyAs<uint32_t>("acquisitionNumber")){
+
+		if( acq == ret.front().getPropertyAs<uint32_t>( "acquisitionNumber" ) ) {
 			LOG( Debug, verbose_info ) << "acquisitionNumber was " << acq << " will be moved by " << acquisitionNumberStride << "*"  << cnt;
 			acq += acquisitionNumberStride * cnt; //@todo this might cause trouble if we try to insert this chunks into an image
 		}
 	}
+
 	return ret;
 }
 
 std::list<Chunk> Chunk::splice ( dimensions atDim )const
 {
 	std::list<Chunk> ret;
-	
+
 	//@todo should be locking
 	typedef std::vector<ValuePtrReference> ValuePtrList;
 	const util::FixedVector<size_t, dims> wholesize = getSizeAsVector();
@@ -242,17 +246,17 @@ std::list<Chunk> Chunk::splice ( dimensions atDim )const
 	//get the spliced ValuePtr's (the volume of the requested dims is the split-size - in case of sliceDim it is rows*columns)
 	const ValuePtrList pointers = this->getValuePtrBase().splice( spliceSize.product() );
 
-	const util::PropertyMap::KeyList lists=this->findLists();
-	size_t list_idx=0;
+	const util::PropertyMap::KeyList lists = this->findLists();
+	size_t list_idx = 0;
 
 	//create new Chunks from this ValuePtr's
 	BOOST_FOREACH( ValuePtrList::const_reference ref, pointers ) {
 		ret.push_back( Chunk( ref, spliceSize[0], spliceSize[1], spliceSize[2], spliceSize[3] ) ); //@todo make sure this is only one copy-operation
 		static_cast<util::PropertyMap &>( ret.back() ) = static_cast<const util::PropertyMap &>( *this ); // copy all props into the splices
-		BOOST_FOREACH(const util::PropertyMap::KeyType &key,lists){ // override list-entries in the splices with their respective entries
-			ret.back().propertyValue(key)=this->propertyValueAt(key,list_idx);
+		BOOST_FOREACH( const util::PropertyMap::KeyType & key, lists ) { // override list-entries in the splices with their respective entries
+			ret.back().propertyValue( key ) = this->propertyValueAt( key, list_idx );
 		}
-// 		std::cout << static_cast<util::PropertyMap &>( ret.back() ) << std::endl;
+		//      std::cout << static_cast<util::PropertyMap &>( ret.back() ) << std::endl;
 		list_idx++;
 	}
 	return ret;

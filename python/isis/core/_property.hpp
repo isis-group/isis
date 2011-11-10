@@ -28,8 +28,8 @@ public:
 
 	std::string _toString( bool label ) { return this->toString( label ); }
 private:
-        PyObject *self;
-	
+	PyObject *self;
+
 };
 }
 }

@@ -60,7 +60,7 @@ bool isis::qt4::IOQtApplication::init( int argc, char **argv, bool exitOnError )
 		m_argc = argc;
 		m_argv = argv;
 		m_qapp.reset( new QApplication( m_argc, m_argv ) );
-		
+
 	}
 
 	return isis::data::IOApplication::init( argc, argv, exitOnError );

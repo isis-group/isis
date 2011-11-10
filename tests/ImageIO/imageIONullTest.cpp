@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE ( loadsaveImages )
 	std::list<data::Image> images = data::IOFactory::load( "nix.null" );
 
 	BOOST_CHECK_EQUAL( images.size(), 2 );
-	BOOST_CHECK(data::IOFactory::write(images,"nix.null"));
+	BOOST_CHECK( data::IOFactory::write( images, "nix.null" ) );
 }
 
 BOOST_AUTO_TEST_SUITE_END ()

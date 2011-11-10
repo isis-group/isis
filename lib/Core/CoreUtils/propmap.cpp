@@ -188,7 +188,7 @@ const PropertyValue &PropertyMap::propertyValue( const key_type &key )const
 
 PropertyValue &PropertyMap::propertyValue( const key_type &key )
 {
-	propertyValueVec( key ).resize(1);// the user is expecting only one entry, so remove the others 
+	propertyValueVec( key ).resize( 1 ); // the user is expecting only one entry, so remove the others
 	return propertyValueVec( key )[0];
 }
 
@@ -218,13 +218,13 @@ bool PropertyMap::remove( const key_type &key )
 	return recursiveRemove( *this, path.begin(), path.end() );
 }
 
-bool PropertyMap::remove(const KeyList& removeList, bool keep_needed)
+bool PropertyMap::remove( const KeyList &removeList, bool keep_needed )
 {
-	bool ret=true;
-	BOOST_FOREACH(const KeyType &key,removeList){ 
-		if(hasProperty(key)){// remove everything which is there
-			if(!(propertyValue(key).isNeeded() && keep_needed)){ // if its not needed or keep_need is not true
-				ret &= remove(key);
+	bool ret = true;
+	BOOST_FOREACH( const KeyType & key, removeList ) {
+		if( hasProperty( key ) ) { // remove everything which is there
+			if( !( propertyValue( key ).isNeeded() && keep_needed ) ) { // if its not needed or keep_need is not true
+				ret &= remove( key );
 			}
 		}
 	}
@@ -610,9 +610,9 @@ const PropertyMap::mapped_type *PropertyMap::findEntry( const key_type &key )con
 }
 
 
-bool PropertyMap::listP::operator()(const std::pair< const isis::util::istring, _internal::treeNode >& ref) const
+bool PropertyMap::listP::operator()( const std::pair< const isis::util::istring, _internal::treeNode >& ref ) const
 {
-	return ref.second.is_leaf() && ref.second.getLeaf().size()>1;
+	return ref.second.is_leaf() && ref.second.getLeaf().size() > 1;
 }
 
 bool PropertyMap::trueP::operator()( const PropertyMap::value_type &/*ref*/ ) const

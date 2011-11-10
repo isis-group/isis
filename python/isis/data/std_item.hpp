@@ -33,9 +33,9 @@ public:
 
 	static V &get( T &x, size_t i ) {
 		if( i >= x.size() ) {
-		    IndexError();
+			IndexError();
 		}
-		
+
 		typename T::iterator iter = x.begin();
 		std::advance( iter, i );
 		return *iter;

@@ -525,7 +525,7 @@ public:
 	template<typename T> MemChunk<T> copyToMemChunk()const {
 		const util::FixedVector<size_t, 4> size = getSizeAsVector();
 		data::MemChunk<T> ret( size[0], size[1], size[2], size[3] );
-		copyToMem<T>( &ret.voxel<T>( 0, 0, 0, 0 ),ret.getVolume() );
+		copyToMem<T>( &ret.voxel<T>( 0, 0, 0, 0 ), ret.getVolume() );
 		return ret;
 	}
 

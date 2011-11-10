@@ -34,7 +34,7 @@ namespace data
 {
 IOApplication::IOApplication( const char name[], bool have_input, bool have_output ):
 	Application( name ),
-	m_input( have_input ), m_output( have_output ), feedback(new util::ConsoleFeedback)
+	m_input( have_input ), m_output( have_output ), feedback( new util::ConsoleFeedback )
 {
 	if ( have_input ) {
 		parameters["in"] = util::slist();
@@ -142,9 +142,9 @@ bool IOApplication::autoload( bool exitOnError )
 		data::IOFactory::setProgressFeedback( feedback );
 	}
 
-	BOOST_FOREACH(util::slist::const_reference ref,input){
-		const std::list< Image > tImages=data::IOFactory::load( ref, rf, dl );
-		images.insert(images.end(),tImages.begin(),tImages.end());
+	BOOST_FOREACH( util::slist::const_reference ref, input ) {
+		const std::list< Image > tImages = data::IOFactory::load( ref, rf, dl );
+		images.insert( images.end(), tImages.begin(), tImages.end() );
 	}
 
 	if ( images.empty() ) {

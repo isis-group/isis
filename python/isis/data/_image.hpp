@@ -163,8 +163,8 @@ public:
 			return std::string( "reversed_coronal" );
 			break;
 		default:
-		    return std::string( "unknown" );
-		    break;
+			return std::string( "unknown" );
+			break;
 		}
 	}
 

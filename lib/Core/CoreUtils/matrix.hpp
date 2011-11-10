@@ -28,7 +28,7 @@ namespace isis
 namespace util
 {
 
-template < typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typename FixedVector<TYPE, ROWS*COLS>::container_type >
+template < typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typename FixedVector<TYPE, ROWS *COLS>::container_type >
 class FixedMatrix : public FixedVector<TYPE, ROWS *COLS, CONTAINER>
 {
 public:
@@ -100,7 +100,7 @@ public:
 
 	FixedVector<TYPE, COLS> getRow( size_t rownum )const {
 		FixedVector<TYPE, COLS> ret;
-		const typename FixedVector<TYPE, ROWS *COLS, CONTAINER>::const_iterator start = FixedVector<TYPE, ROWS *COLS, CONTAINER>::begin()+rownum*COLS;
+		const typename FixedVector<TYPE, ROWS *COLS, CONTAINER>::const_iterator start = FixedVector<TYPE, ROWS * COLS, CONTAINER>::begin() + rownum * COLS;
 		const typename FixedVector<TYPE, ROWS *COLS, CONTAINER>::const_iterator end = start + COLS;
 		ret.copyFrom( start, end );
 		return ret;
