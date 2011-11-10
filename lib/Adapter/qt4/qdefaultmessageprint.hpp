@@ -5,9 +5,11 @@
 #include <QString>
 #include <QObject>
 
-namespace isis {
-namespace qt4 {
-	
+namespace isis
+{
+namespace qt4
+{
+
 class QMessage
 {
 public:
@@ -16,28 +18,29 @@ public:
 	std::list<std::string> m_subjects;
 	boost::posix_time::ptime m_timeStamp;
 	int m_line;
-	LogLevel m_level;	
+	LogLevel m_level;
 	std::string message;
 	std::string time_str;
 };
-	
+
 class QDefaultMessagePrint : public QObject, public util::_internal::MessageHandlerBase
 {
 	Q_OBJECT
 public:
 Q_SIGNALS:
 	void commitMessage( qt4::QMessage message );
-	
+
 public:
 	virtual void commit( const util::_internal::Message &msg );
-	QDefaultMessagePrint(LogLevel level);
+	QDefaultMessagePrint( LogLevel level );
 	virtual ~QDefaultMessagePrint();
-	
-	
-	
+
+
+
 };
-	
-}}
+
+}
+}
 
 
 #endif

@@ -113,7 +113,7 @@ class ImageFormat_Nifti : public FileFormat
 		}
 	};
 protected:
-	std::string suffixes(io_modes /*modes=both*/)const {
+	std::string suffixes( io_modes /*modes=both*/ )const {
 		return std::string( ".nii.gz .nii .hdr" );
 	}
 public:

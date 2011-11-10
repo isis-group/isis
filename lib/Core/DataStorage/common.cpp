@@ -41,13 +41,15 @@ bool transformCoords( isis::util::PropertyMap &properties, util::FixedVector<siz
 	// get index origin from property map
 	isis::util::fvector4 indexorig = properties.getPropertyAs<util::fvector4>( "indexOrigin" );
 	vector<float> origin_out = vector<float>( 3 );
-	//check if we have a property "voxelGap" to prevent isis from throwing a warning "blabla" 
+	//check if we have a property "voxelGap" to prevent isis from throwing a warning "blabla"
 	isis::util::fvector4 scaling;
+
 	if( properties.hasProperty( "voxelGap" ) ) {
 		scaling  = properties.getPropertyAs<util::fvector4>( "voxelSize" ) +  properties.getPropertyAs<util::fvector4>( "voxelGap" );
 	} else {
 		scaling  = properties.getPropertyAs<util::fvector4>( "voxelSize" );
 	}
+
 	// create boost::numeric data structures
 	// STEP 1 transform orientation matrix
 	// input matrix

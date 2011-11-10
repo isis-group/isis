@@ -238,9 +238,10 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 
 	// enable "info" log level
 	// image_io::enable_log<util::DefaultMsgPrint>( info );
-	if( myDialect == std::string("onlyfirst") ) {
+	if( myDialect == std::string( "onlyfirst" ) ) {
 		nimages = 1;
 	}
+
 	LOG( image_io::Runtime, info ) << "found " << nimages << " images.";
 	/*****************************************
 	 * Save vista file history if available
