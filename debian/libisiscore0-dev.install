@@ -1,3 +1,4 @@
-debian/tmp/usr/include/*
+debian/tmp/usr/include/isis/CoreUtils/*
+debian/tmp/usr/include/isis/DataStorage/*
 debian/tmp/usr/lib/*.a*
 debian/tmp/usr/share/isis/cmake/*
