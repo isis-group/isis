@@ -68,6 +68,8 @@ public:
 	bool autoload( bool exitOnError = false );
 	bool autowrite( std::list<data::Image> out_images, bool exitOnError = false );
 	bool autowrite( Image out_image, bool exitOnError = false );
+protected:
+	virtual boost::shared_ptr<util::_internal::MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;
 };
 
 }

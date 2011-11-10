@@ -34,7 +34,7 @@ namespace data
 {
 IOApplication::IOApplication( const char name[], bool have_input, bool have_output ):
 	Application( name ),
-	m_input( have_input ), m_output( have_output ), feedback(new util::ConsoleFeedback)
+	m_input( have_input ), m_output( have_output ), feedback( new util::ConsoleFeedback )
 {
 	if ( have_input ) {
 		parameters["in"] = util::slist();
@@ -210,6 +210,12 @@ Image IOApplication::fetchImage()
 	images.pop_front();
 	return ret;
 }
+
+boost::shared_ptr< util::_internal::MessageHandlerBase > IOApplication::getLogHandler( std::string module, LogLevel level ) const
+{
+	return isis::util::Application::getLogHandler( module, level );
+}
+
 
 }
 }

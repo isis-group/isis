@@ -298,10 +298,10 @@ public:
 		util::listToOStream( CONTAINER::begin(), CONTAINER::end(), out, "|", "<", ">" );
 	}
 
-	iterator begin(){return CONTAINER::begin();}
-	iterator end(){return CONTAINER::end();}
-	const_iterator begin()const{return CONTAINER::begin();}
-	const_iterator end()const{return CONTAINER::end();}
+	iterator begin() {return CONTAINER::begin();}
+	iterator end() {return CONTAINER::end();}
+	const_iterator begin()const {return CONTAINER::begin();}
+	const_iterator end()const {return CONTAINER::end();}
 };
 
 template<typename TYPE>

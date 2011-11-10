@@ -9,6 +9,8 @@
 #define PYTHON_COMMON_HPP
 
 #include "CoreUtils/log.hpp"
+#include "CoreUtils/common.hpp"
+#include "CoreUtils/type.hpp"
 
 /*! \addtogroup python
 *  Additional documentation for group `mygrp'
@@ -30,6 +32,7 @@ template<typename HANDLE> void enable_log( LogLevel level )
 	ENABLE_LOG( Runtime, HANDLE, level );
 	ENABLE_LOG( Debug, HANDLE, level );
 }
+
 } //namespace python
 
 } //namespace isis

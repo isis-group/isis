@@ -46,10 +46,10 @@ void ImageFormat_Dicom::parseAS( DcmElement *elem, const util::istring &name, ut
 	elem->getOFString( buff, 0 );
 	static boost::numeric::converter <
 	uint16_t, double,
-			boost::numeric::conversion_traits<uint16_t, double>,
-			boost::numeric::def_overflow_handler,
-			boost::numeric::RoundEven<double>
-			> double2uint16;
+			  boost::numeric::conversion_traits<uint16_t, double>,
+			  boost::numeric::def_overflow_handler,
+			  boost::numeric::RoundEven<double>
+			  > double2uint16;
 
 	if ( _internal::try_cast( buff.substr( 0, buff.find_last_of( "0123456789" ) + 1 ), duration ) ) {
 		switch ( buff.at( buff.size() - 1 ) ) {
@@ -557,11 +557,12 @@ void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, isis::util::Pr
 		} else if ( name == "MedComHistoryInformation" ) {
 			//@todo special handling needed
 			LOG( Debug, info ) << "Ignoring MedComHistoryInformation at " << tag.toString();
-		} else if ( obj->getTag()==DcmTag(0x0008,0x0032) ) {
+		} else if ( obj->getTag() == DcmTag( 0x0008, 0x0032 ) ) {
 			OFString buff;
-			dynamic_cast<DcmElement *>( obj )->getOFString(buff,0);
-			if(buff.length()<8){
-				LOG(Runtime,warning) << "The Acquisition Time " << util::MSubject(buff) << " is not precise enough, ignoring it";
+			dynamic_cast<DcmElement *>( obj )->getOFString( buff, 0 );
+
+			if( buff.length() < 8 ) {
+				LOG( Runtime, warning ) << "The Acquisition Time " << util::MSubject( buff ) << " is not precise enough, ignoring it";
 				continue;
 			}
 		} else if ( obj->isLeaf() ) {
