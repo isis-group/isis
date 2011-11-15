@@ -416,6 +416,14 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 					VGetAttrValue( &pos, NULL, VStringRepn, &val );
 					VAppendAttr( list, "slice_time", NULL, VStringRepn, VString( val ) );
 				}
+				if( ( strcmp( name, "ca" ) == 0 ) ) {
+					VGetAttrValue( &pos, NULL, VStringRepn, &val );
+					VAppendAttr( list, "ca", NULL, VStringRepn, VString( val ) );
+				}
+				if( ( strcmp( name, "cp" ) == 0 ) ) {
+					VGetAttrValue( &pos, NULL, VStringRepn, &val );
+					VAppendAttr( list, "cp", NULL, VStringRepn, VString( val ) );
+				}
 			}
 			VFillImage( image, 0, 0 );
 			vImageVector.insert(iter, image );
