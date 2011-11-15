@@ -357,6 +357,9 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 				vImageVector.push_back( images[k] );
 			}
 		}
+
+//############################# hack to support vista images that consist of slices with size   1x1x1 (to be honest....the whole plugin is a hack ;-)
+
 		util::ivector4 dims( 0, 0, 0, 0 );
 		for( unsigned int k = 0; k < vImageVector.size(); k++ ) 
 		{
@@ -388,6 +391,30 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 				if( ( strcmp( name, "voxel" ) == 0 ) ) {
 					VGetAttrValue( &pos, NULL, VStringRepn, &val );
 					VAppendAttr( list, "voxel", NULL, VStringRepn, VString( val ) );
+				}
+				if( ( strcmp( name, "repetition_time" ) == 0 ) ) {
+					VGetAttrValue( &pos, NULL, VStringRepn, &val );
+					VAppendAttr( list, "repetition_time", NULL, VStringRepn, VString( val ) );
+				}
+				if( ( strcmp( name, "indexOrigin" ) == 0 ) ) {
+					VGetAttrValue( &pos, NULL, VStringRepn, &val );
+					VAppendAttr( list, "indexOrigin", NULL, VStringRepn, VString( val ) );
+				}
+				if( ( strcmp( name, "rowVec" ) == 0 ) ) {
+					VGetAttrValue( &pos, NULL, VStringRepn, &val );
+					VAppendAttr( list, "rowVec", NULL, VStringRepn, VString( val ) );
+				}
+				if( ( strcmp( name, "columnVec" ) == 0 ) ) {
+					VGetAttrValue( &pos, NULL, VStringRepn, &val );
+					VAppendAttr( list, "columnVec", NULL, VStringRepn, VString( val ) );
+				}
+				if( ( strcmp( name, "sliceVec" ) == 0 ) ) {
+					VGetAttrValue( &pos, NULL, VStringRepn, &val );
+					VAppendAttr( list, "sliceVec", NULL, VStringRepn, VString( val ) );
+				}
+				if( ( strcmp( name, "slice_time" ) == 0 ) ) {
+					VGetAttrValue( &pos, NULL, VStringRepn, &val );
+					VAppendAttr( list, "slice_time", NULL, VStringRepn, VString( val ) );
 				}
 			}
 			VFillImage( image, 0, 0 );
