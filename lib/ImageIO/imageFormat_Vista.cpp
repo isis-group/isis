@@ -353,22 +353,27 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 		for( unsigned int k = 0; k < nimages; k++ ) {
 			if( VPixelRepn( images[k] ) != VShortRepn ) {
 				residualVImages.push_back( images[k] );
-			} else vImageVector.push_back( images[k] );
+			} else {
+				vImageVector.push_back( images[k] );
+			}
 		}
 		util::ivector4 dims( 0, 0, 0, 0 );
-
-		if( vImageVector.size() > 0 ) {
-			dims[0] = VImageNColumns( vImageVector.back() );
-			dims[1] = VImageNRows( vImageVector.back() );
-			dims[2] = vImageVector.size();
-			dims[3] = VImageNBands( vImageVector.back() );
+		for( unsigned int k = 0; k < vImageVector.size(); k++ ) 
+		{
+			if( VImageNColumns( vImageVector[k] )  > 1 && VImageNRows( vImageVector[k] ) ) {
+				dims[0] = VImageNColumns( vImageVector[k] );
+				dims[1] = VImageNRows( vImageVector[k] );
+				dims[2] = vImageVector.size();
+				dims[3] = VImageNBands( vImageVector[k] );
+				break;
+			}
 		}
+
 		//remove the images with size 1x1 from the imageVector
 		VAttrList refList = VImageAttrList( vImageVector.front() );
 		BOOST_FOREACH( std::vector< VImage >::const_reference oneVoxelImage, emptySlices ) 
 		{
 			std::vector< VImage >::iterator iter = std::find( vImageVector.begin(), vImageVector.end(), oneVoxelImage);
-			
 			vImageVector.erase( iter );
 			VImage image = VCreateImage( dims[3], dims[1], dims[0], VShortRepn );
 			VAttrList list = VImageAttrList( image );
@@ -385,9 +390,10 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 					VAppendAttr( list, "voxel", NULL, VStringRepn, VString( val ) );
 				}
 			}
+			VFillImage( image, 0, 0 );
 			vImageVector.insert(iter, image );
 		}
-
+		
 		std::list<VistaChunk<VShort> > vistaChunkList;
 		//if we have no repetitionTime we have to calculate it with the help of the biggest slicetime
 		uint16_t biggest_slice_time = 0;
