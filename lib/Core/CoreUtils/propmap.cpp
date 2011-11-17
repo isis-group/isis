@@ -45,7 +45,6 @@ continousFind( ForwardIterator &current, const ForwardIterator end, const T &com
 		return true;//not(current <> compare) makes compare == current
 }
 }
-const PropertyMap::mapped_type PropertyMap::emptyEntry;//dummy to be able to return an empty Property
 
 
 ///////////////////////////////////////////////////////////////////
@@ -168,6 +167,7 @@ const std::vector< PropertyValue >& PropertyMap::propertyValueVec( const Propert
 		return ref->getLeaf();
 	} else {
 		LOG( Debug, warning ) << "Property " << key << " not found. Returning empty property.";
+		static const _internal::treeNode emptyEntry;
 		return emptyEntry.getLeaf();
 	}
 }
@@ -199,6 +199,7 @@ const PropertyMap &PropertyMap::branch( const key_type &key ) const
 
 	if( ! ref ) {
 		LOG( Runtime, warning ) << "Trying to access non existing branch " << key << ".";
+		static const _internal::treeNode emptyEntry;
 		return emptyEntry.getBranch();
 	} else {
 		LOG_IF( ref->getBranch().isEmpty(), Runtime, warning ) << "Accessing empty branch " << key;
