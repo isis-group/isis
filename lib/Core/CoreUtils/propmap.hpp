@@ -69,8 +69,6 @@ private:
 	typedef propPath::const_iterator propPathIterator;
 
 	static const char pathSeperator = '/';
-	static const mapped_type emptyEntry;//dummy to be able to return an empty Property/branch
-
 
 	/////////////////////////////////////////////////////////////////////////////////////////
 	// internal predicats

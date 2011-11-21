@@ -283,7 +283,7 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 	//if we have a vista image with functional data and one or more anatomical scans, we
 	//can not reject the anatomical images. So we store them in a vector and handle them later.
 	std::vector<VImage> residualVImages;
-
+	std::vector<VImage> emptySlices;
 	if( myDialect.empty() ) {
 		if( nimages > 1 ) {
 			//test for functional data
@@ -300,6 +300,10 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 					nShortRepn++;
 					columnsSet.insert( VImageNColumns( images[k] ) );
 					rowsSet.insert( VImageNRows( images[k] ) );
+					//hack to detect images of size 1x1 
+					if( VImageNColumns( images[k] ) == 1 && VImageNRows( images[k] ) == 1 )  {
+						emptySlices.push_back( images[k] );
+					}
 					VAttrList attributes = VImageAttrList( images[k] );
 					VAttrListPosn posn;
 
@@ -317,7 +321,7 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 				}
 			}
 
-			if ( nShortRepn > 1 && voxelSet.size() == 1 && rowsSet.size() == 1 && columnsSet.size() == 1 ) {
+			if ( ( nShortRepn > 1 && voxelSet.size() == 1 ) && ((rowsSet.size() == 1 && columnsSet.size() == 1) || emptySlices.size() ) ) {
 				LOG( isis::DataDebug, info ) << "Autodetect Dialect: Multiple VShort images found. Assuming a functional vista image";
 				myDialect = "functional";
 			} else {
@@ -349,22 +353,88 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 		for( unsigned int k = 0; k < nimages; k++ ) {
 			if( VPixelRepn( images[k] ) != VShortRepn ) {
 				residualVImages.push_back( images[k] );
-			} else vImageVector.push_back( images[k] );
+			} else {
+				vImageVector.push_back( images[k] );
+			}
 		}
 
+//############################# hack to support vista images that consist of slices with size   1x1x1 (to be honest....the whole plugin is a hack ;-)
+
+		util::ivector4 dims( 0, 0, 0, 0 );
+		for( unsigned int k = 0; k < vImageVector.size(); k++ ) 
+		{
+			if( VImageNColumns( vImageVector[k] )  > 1 && VImageNRows( vImageVector[k] ) ) {
+				dims[0] = VImageNColumns( vImageVector[k] );
+				dims[1] = VImageNRows( vImageVector[k] );
+				dims[2] = vImageVector.size();
+				dims[3] = VImageNBands( vImageVector[k] );
+				break;
+			}
+		}
+
+		//remove the images with size 1x1 from the imageVector
+		VAttrList refList = VImageAttrList( vImageVector.front() );
+		BOOST_FOREACH( std::vector< VImage >::const_reference oneVoxelImage, emptySlices ) 
+		{
+			std::vector< VImage >::iterator iter = std::find( vImageVector.begin(), vImageVector.end(), oneVoxelImage);
+			vImageVector.erase( iter );
+			VImage image = VCreateImage( dims[3], dims[1], dims[0], VShortRepn );
+			VAttrList list = VImageAttrList( image );
+			VAttrListPosn pos;
+			for( VFirstAttr( refList, &pos ); VAttrExists( &pos ); VNextAttr( &pos ) ) {
+				const char *name = VGetAttrName( &pos );
+				VPointer val;
+				if( ( strcmp( name, "orientation" ) == 0 ) ) {
+					VGetAttrValue( &pos, NULL, VStringRepn, &val );
+					VAppendAttr( list, "orientation", NULL, VStringRepn, VString( val ) );
+				}
+				if( ( strcmp( name, "voxel" ) == 0 ) ) {
+					VGetAttrValue( &pos, NULL, VStringRepn, &val );
+					VAppendAttr( list, "voxel", NULL, VStringRepn, VString( val ) );
+				}
+				if( ( strcmp( name, "repetition_time" ) == 0 ) ) {
+					VGetAttrValue( &pos, NULL, VStringRepn, &val );
+					VAppendAttr( list, "repetition_time", NULL, VStringRepn, VString( val ) );
+				}
+				if( ( strcmp( name, "indexOrigin" ) == 0 ) ) {
+					VGetAttrValue( &pos, NULL, VStringRepn, &val );
+					VAppendAttr( list, "indexOrigin", NULL, VStringRepn, VString( val ) );
+				}
+				if( ( strcmp( name, "rowVec" ) == 0 ) ) {
+					VGetAttrValue( &pos, NULL, VStringRepn, &val );
+					VAppendAttr( list, "rowVec", NULL, VStringRepn, VString( val ) );
+				}
+				if( ( strcmp( name, "columnVec" ) == 0 ) ) {
+					VGetAttrValue( &pos, NULL, VStringRepn, &val );
+					VAppendAttr( list, "columnVec", NULL, VStringRepn, VString( val ) );
+				}
+				if( ( strcmp( name, "sliceVec" ) == 0 ) ) {
+					VGetAttrValue( &pos, NULL, VStringRepn, &val );
+					VAppendAttr( list, "sliceVec", NULL, VStringRepn, VString( val ) );
+				}
+				if( ( strcmp( name, "slice_time" ) == 0 ) ) {
+					VGetAttrValue( &pos, NULL, VStringRepn, &val );
+					VAppendAttr( list, "slice_time", NULL, VStringRepn, VString( val ) );
+				}
+				if( ( strcmp( name, "ca" ) == 0 ) ) {
+					VGetAttrValue( &pos, NULL, VStringRepn, &val );
+					VAppendAttr( list, "ca", NULL, VStringRepn, VString( val ) );
+				}
+				if( ( strcmp( name, "cp" ) == 0 ) ) {
+					VGetAttrValue( &pos, NULL, VStringRepn, &val );
+					VAppendAttr( list, "cp", NULL, VStringRepn, VString( val ) );
+				}
+			}
+			VFillImage( image, 0, 0 );
+			vImageVector.insert(iter, image );
+		}
+		
 		std::list<VistaChunk<VShort> > vistaChunkList;
 		//if we have no repetitionTime we have to calculate it with the help of the biggest slicetime
 		uint16_t biggest_slice_time = 0;
 		// the geometrical dimension of the 3D image according to the slice geometry
 		// and the number of slices.
-		util::ivector4 dims( 0, 0, 0, 0 );
 
-		if( vImageVector.size() > 0 ) {
-			dims[0] = VImageNColumns( vImageVector.back() );
-			dims[1] = VImageNRows( vImageVector.back() );
-			dims[2] = vImageVector.size();
-			dims[3] = VImageNBands( vImageVector.back() );
-		}
 
 		std::set<util::fvector4, data::_internal::SortedChunkList::posCompare> originCheckSet;
 		//first we have to create a vista chunkList so we can get the number of slices
