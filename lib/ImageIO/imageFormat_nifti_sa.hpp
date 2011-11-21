@@ -147,8 +147,8 @@ class ImageFormat_NiftiSa: public FileFormat
 	std::map<unsigned short,short> isis_type2nifti_type;
 	template<typename T> static unsigned short typeFallBack(){
 		typedef typename boost::make_signed<T>::type NEW_T;
-		LOG(Runtime,info) << util::Value<T>::staticName() <<  " is not supported by fsl falling back to " << util::Value<NEW_T>::staticName();
-		return util::Value<NEW_T>::staticID;
+		LOG(Runtime,info) << data::ValuePtr<T>::staticName() <<  " is not supported by fsl falling back to " << data::ValuePtr<NEW_T>::staticName();
+		return data::ValuePtr<NEW_T>::staticID;
 	}
 	static void guessSliceOrdering(const data::Image img,char &slice_code, float &slice_duration);
 	static std::list<data::Chunk> parseSliceOrdering(const _internal::nifti_1_header* head, data::Chunk current);

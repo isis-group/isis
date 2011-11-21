@@ -369,10 +369,10 @@ void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &fi
 	unsigned short target_id=image.getMajorTypeID();
 
 	// fsl cannot deal with some types
-	if(util::istring(dialect.c_str())=="fsl spm"){
+	if(util::istring(dialect.c_str())=="fsl"){
 		switch(target_id){
-			case util::Value<uint16_t>::staticID:target_id=typeFallBack<uint16_t>();break;
-			case util::Value<uint32_t>::staticID:target_id=typeFallBack<uint32_t>();break;
+			case data::ValuePtr<uint16_t>::staticID:target_id=typeFallBack<uint16_t>();break;
+			case data::ValuePtr<uint32_t>::staticID:target_id=typeFallBack<uint32_t>();break;
 		}
 	}
 	
