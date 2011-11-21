@@ -73,10 +73,10 @@ private:
 	}
 
 protected:
-	std::string suffixes(io_modes modes=both)const {
-		if(modes==write_only)
+	std::string suffixes( io_modes modes = both )const {
+		if( modes == write_only )
 			return std::string();
-		else 
+		else
 			return std::string( "tar tar.gz tgz tar.bz2 tbz tar.Z taz" );
 	}
 public:

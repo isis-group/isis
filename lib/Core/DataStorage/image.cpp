@@ -31,10 +31,9 @@ namespace isis
 namespace data
 {
 
-ChunkOp::~ChunkOp(){}
+ChunkOp::~ChunkOp() {}
 
-
-Image::Image ( ) : set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers,DICOM/AcquisitionNumber" ), clean( false )
+Image::Image ( ) : set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ), clean( false )
 {
 	addNeededFromString( neededProperties );
 	set.addSecondarySort( "acquisitionNumber" );
@@ -43,7 +42,7 @@ Image::Image ( ) : set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMas
 
 Image::Image ( const Chunk &chunk, dimensions min_dim ) :
 	_internal::NDimensional<4>(), util::PropertyMap(), minIndexingDim( min_dim ),
-	set( "sequenceNumber,rowVec,columnVec,coilChannelMask,DICOM/EchoNumbers,DICOM/AcquisitionNumber" ),
+	set( "sequenceNumber,rowVec,columnVec,coilChannelMask,DICOM/EchoNumbers" ),
 	clean( false )
 {
 	addNeededFromString( neededProperties );
@@ -120,8 +119,8 @@ void Image::deduplicateProperties()
 	LOG_IF( uniques.size(), Debug, verbose_info ) << util::listToString( uniques.begin(), uniques.end(), ", " );
 
 	// list should not be unified - they belong into their chunk even if they are common
-	common.remove(common.findLists());
-	
+	common.remove( common.findLists() );
+
 	join( common );
 	LOG_IF( ! common.isEmpty(), Debug, verbose_info ) << "common properties saved into the image " << common;
 
@@ -474,19 +473,21 @@ bool Image::reIndex()
 	LOG_IF( ! isValid(), Runtime, warning ) << "The image is not valid after reindexing. Missing properties: " << getMissing();
 
 	// check if there is a list in any chunk
-	bool found=false;
-	for ( size_t i = 0; i < lookup.size() && found==false; i++ ) {
-		const KeyList lists_list=lookup[i]->findLists();
-		LOG_IF(!lists_list.empty(),Debug,info) << "Found property-lists " << util::MSubject(lists_list) << " in chunk number " << i << " going to splice the image";
-		found= !lists_list.empty();
-	}
-	if(found){// splice down the image one step if there are some
-		const size_t relDims=lookup[0]->getRelevantDims();
-		assert(relDims>1);
-		spliceDownTo(static_cast<data::dimensions>( relDims-1));
+	bool found = false;
+
+	for ( size_t i = 0; i < lookup.size() && found == false; i++ ) {
+		const KeyList lists_list = lookup[i]->findLists();
+		LOG_IF( !lists_list.empty(), Debug, info ) << "Found property-lists " << util::MSubject( lists_list ) << " in chunk number " << i << " going to splice the image";
+		found = !lists_list.empty();
 	}
 
-	
+	if( found ) { // splice down the image one step if there are some
+		const size_t relDims = lookup[0]->getRelevantDims();
+		assert( relDims > 1 );
+		spliceDownTo( static_cast<data::dimensions>( relDims - 1 ) );
+	}
+
+
 	updateOrientationMatrices();
 	return clean = isValid();
 }
@@ -844,13 +845,13 @@ size_t Image::spliceDownTo( dimensions dim ) //rowDim = 0, columnDim, sliceDim, 
 	std::vector<boost::shared_ptr<Chunk> > buffer = lookup; // store the old lookup table
 	lookup.clear();
 	set.clear(); // clear the image, so we can insert the splices
-	clean=false; // mark the image for reIndexing
+	clean = false; // mark the image for reIndexing
 	//static_cast<util::PropertyMap::base_type*>(this)->clear(); we can keep the common properties - they will be merged with thier own copies from the chunks on the next reIndex
 	splicer splice( dim, image_size.product(), *this );
 	BOOST_FOREACH( boost::shared_ptr<Chunk> &ref, buffer ) {
 		BOOST_FOREACH( const util::PropertyMap::KeyType & need, needed ) { //get back properties needed for the
 			if( !ref->hasProperty( need ) && this->hasProperty( need ) ) {
-				LOG(Debug,info) << "Copying " << need << "=" << this->propertyValue( need ) << " from the image to the chunk for splicing";
+				LOG( Debug, info ) << "Copying " << need << "=" << this->propertyValue( need ) << " from the image to the chunk for splicing";
 				ref->propertyValue( need ) = this->propertyValue( need );
 			}
 		}

@@ -150,7 +150,7 @@ public:
 	 */
 	template<typename T> Image( std::list<T> &chunks, dimensions min_dim = rowDim ) :
 		_internal::NDimensional<4>(), util::PropertyMap(), minIndexingDim( min_dim ),
-		set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers,DICOM/AcquisitionNumber" ),
+		set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ),
 		clean( false ) {
 		addNeededFromString( neededProperties );
 		set.addSecondarySort( "acquisitionNumber" );
@@ -163,7 +163,7 @@ public:
 	 */
 	template<typename T> Image( std::vector<T> &chunks, dimensions min_dim = rowDim ) :
 		_internal::NDimensional<4>(), util::PropertyMap(),
-		set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers,DICOM/AcquisitionNumber" ),
+		set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ),
 		clean( false ), minIndexingDim( min_dim ) {
 		addNeededFromString( neededProperties );
 		set.addSecondarySort( "acquisitionNumber" );
@@ -525,7 +525,7 @@ public:
 	template<typename T> MemChunk<T> copyToMemChunk()const {
 		const util::FixedVector<size_t, 4> size = getSizeAsVector();
 		data::MemChunk<T> ret( size[0], size[1], size[2], size[3] );
-		copyToMem<T>( &ret.voxel<T>( 0, 0, 0, 0 ),ret.getVolume() );
+		copyToMem<T>( &ret.voxel<T>( 0, 0, 0, 0 ), ret.getVolume() );
 		return ret;
 	}
 

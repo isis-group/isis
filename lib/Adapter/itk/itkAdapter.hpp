@@ -92,7 +92,7 @@ protected:
 private:
 
 	boost::shared_ptr<data::Image> m_ImageISIS;
-// 	data::Image m_ImageISIS;
+	//  data::Image m_ImageISIS;
 	unsigned short m_TypeID;
 	std::vector< boost::shared_ptr<util::PropertyMap> > m_ChunkPropertyMapVector;
 	util::PropertyMap m_ImagePropertyMap;

@@ -31,7 +31,7 @@ ProgressFeedback &ProgressFeedback::operator++()
 	return *this;
 }
 
-ProgressFeedback::~ProgressFeedback(){}
+ProgressFeedback::~ProgressFeedback() {}
 
 void ConsoleFeedback::show( size_t max, std::string header )
 {

@@ -14,6 +14,8 @@ namespace isis
 {
 namespace python
 {
+namespace data
+{
 void IndexError()
 {
 	PyErr_SetString( PyExc_IndexError, "Index out of range" );
@@ -33,9 +35,9 @@ public:
 
 	static V &get( T &x, size_t i ) {
 		if( i >= x.size() ) {
-		    IndexError();
+			IndexError();
 		}
-		
+
 		typename T::iterator iter = x.begin();
 		std::advance( iter, i );
 		return *iter;
@@ -55,6 +57,7 @@ public:
 		} else IndexError();
 	}
 };
+}
 }
 }
 #endif /* STD_ITEM_HPP_ */

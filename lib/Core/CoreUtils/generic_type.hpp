@@ -41,14 +41,14 @@ protected:
 	template<typename T> T &m_cast_to() {
 		LOG_IF( getTypeID() != T::staticID, Debug, error ) << "using " << getTypeName() << " at " << this << " as " << T::staticName() << " aborting ...";
 		assert( getTypeID() == T::staticID );
-//		return *dynamic_cast<T *>( this );// @todo Mac doesn't like that (http://www.cocoabuilder.com/archive/xcode/247376-rtti-dynamic-cast-across-shared-module-boundaries.html)
-		return *(getTypeID() == T::staticID ? reinterpret_cast<T *>( this ):NULL);//minic dynamic_cast
+		//      return *dynamic_cast<T *>( this );// @todo Mac doesn't like that (http://www.cocoabuilder.com/archive/xcode/247376-rtti-dynamic-cast-across-shared-module-boundaries.html)
+		return *( getTypeID() == T::staticID ? reinterpret_cast<T *>( this ) : NULL ); //minic dynamic_cast
 	}
 	template<typename T> const T &m_cast_to()const {
 		LOG_IF( getTypeID() != T::staticID, Debug, error ) << "using " << getTypeName() << " at " << this << " as " << T::staticName() << " aborting ...";
 		assert( getTypeID() == T::staticID );
-//		return *dynamic_cast<const T *>( this );// @todo Mac doesn't like that (http://www.cocoabuilder.com/archive/xcode/247376-rtti-dynamic-cast-across-shared-module-boundaries.html)
-		return *(getTypeID() == T::staticID ? reinterpret_cast<const T *>( this ):NULL);//minic dynamic_cast
+		//      return *dynamic_cast<const T *>( this );// @todo Mac doesn't like that (http://www.cocoabuilder.com/archive/xcode/247376-rtti-dynamic-cast-across-shared-module-boundaries.html)
+		return *( getTypeID() == T::staticID ? reinterpret_cast<const T *>( this ) : NULL ); //minic dynamic_cast
 	}
 
 public:

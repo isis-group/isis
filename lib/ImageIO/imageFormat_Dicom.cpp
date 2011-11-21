@@ -135,8 +135,9 @@ using boost::gregorian::date;
 const char ImageFormat_Dicom::dicomTagTreeName[] = "DICOM";
 const char ImageFormat_Dicom::unknownTagName[] = "Unknown Tag";
 
-std::string ImageFormat_Dicom::suffixes(io_modes modes)const {
-	if(modes==write_only)
+std::string ImageFormat_Dicom::suffixes( io_modes modes )const
+{
+	if( modes == write_only )
 		return std::string();
 	else
 		return std::string( ".ima .dcm" );
@@ -164,7 +165,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 		const ptime sequenceStart = genTimeStamp( object.getPropertyAs<date>( prefix + "SeriesDate" ), object.getPropertyAs<ptime>( prefix + "SeriesTime" ) );
 
 		// compute acquisitionTime
-		if ( hasOrTell( prefix + "AcquisitionTime", object, info ) and hasOrTell( prefix + "AcquisitionDate", object, warning ) ) {
+		if ( hasOrTell( prefix + "AcquisitionTime", object, warning ) and hasOrTell( prefix + "AcquisitionDate", object, warning ) ) {
 			const ptime acTime = genTimeStamp( object.getPropertyAs<date>( prefix + "AcquisitionDate" ), object.getPropertyAs<ptime>( prefix + "AcquisitionTime" ) );
 			const boost::posix_time::time_duration acDist = acTime - sequenceStart;
 			const float fAcDist = float( acDist.ticks() ) / acDist.ticks_per_second() * 1000;
