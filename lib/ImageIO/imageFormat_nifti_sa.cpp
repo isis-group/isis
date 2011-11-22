@@ -228,9 +228,6 @@ void ImageFormat_NiftiSa::storeHeader(const util::PropertyMap &props,_internal::
 	if(!storeQForm(props,head)) //try to encode as quaternion
 		storeSForm(props,head); //fall back to normal matrix
 
-	if(props.hasProperty("repetitionTime"))
-		head->pixdim[head->dim[0]]=props.getPropertyAs<float>("repetitionTime");
-
 	strcpy(head->magic,"n+1");
 }
 std::list< data::Chunk > ImageFormat_NiftiSa::parseHeader(const isis::image_io::_internal::nifti_1_header* head,isis::data::Chunk props){
@@ -404,6 +401,9 @@ void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &fi
 		header->cal_min=minmax.first;header->cal_max=minmax.second;
 
 		storeHeader(image.getChunk(0,0),header); // store header using properties of the "lowest" chunk merged with the image's properties
+
+		if(image.getSizeAsVector()[data::timeDim]>1 && image.hasProperty("repetitionTime"))
+			header->pixdim[data::timeDim+1]=image.getPropertyAs<float>("repetitionTime");
 
 		if(util::istring(dialect.c_str())=="spm"){ // override "normal" description with the "spm-description"
 			storeDescripForSPM(image.getChunk(0,0),header->descrip);
