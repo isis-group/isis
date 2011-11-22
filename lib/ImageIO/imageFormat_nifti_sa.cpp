@@ -190,11 +190,13 @@ void ImageFormat_NiftiSa::storeHeader(const util::PropertyMap &props,_internal::
 	head->intent_code=0;
 	head->slice_start=0;
 	head->slice_end=head->dim[3];
+	head->scl_slope=1;
+	head->scl_inter=0;
 
 	//in isis length is allways mm and time duration is allways msecs
 	head->xyzt_units=NIFTI_UNITS_MM|NIFTI_UNITS_MSEC;
 
-	head->dim_info= 1 | (2>>2) | (3 >> 4); //readDim=1 phaseDim=2 sliceDim=3
+	head->dim_info= 1 | (2<<2) | (3 << 4); //readDim=1 phaseDim=2 sliceDim=3
 
 	//store description if there is one
 	if(props.hasProperty("sequenceDescription"))
