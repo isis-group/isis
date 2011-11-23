@@ -150,7 +150,7 @@ public:
 	 */
 	template<typename T> Image( std::list<T> &chunks, dimensions min_dim = rowDim ) :
 		_internal::NDimensional<4>(), util::PropertyMap(), minIndexingDim( min_dim ),
-		set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers,DICOM/AcquisitionNumber" ),
+		set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ),
 		clean( false ) {
 		addNeededFromString( neededProperties );
 		set.addSecondarySort( "acquisitionNumber" );
@@ -163,7 +163,7 @@ public:
 	 */
 	template<typename T> Image( std::vector<T> &chunks, dimensions min_dim = rowDim ) :
 		_internal::NDimensional<4>(), util::PropertyMap(),
-		set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers,DICOM/AcquisitionNumber" ),
+		set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ),
 		clean( false ), minIndexingDim( min_dim ) {
 		addNeededFromString( neededProperties );
 		set.addSecondarySort( "acquisitionNumber" );
