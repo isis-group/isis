@@ -29,8 +29,11 @@ namespace isis
 		{
 			
 		protected:
-			std::string suffixes()const {
-				return std::string( ".tcpip" );
+			std::string suffixes(isis::image_io::FileFormat::io_modes iomode)const {
+				if (write_only == iomode){
+					return std::string();}
+				else{
+					return std::string( ".tcpip" );}
 			}
 		public:
 			std::string getName()const {
@@ -39,8 +42,8 @@ namespace isis
 			
 			int load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
 				
-                
-                printf("IMAGE: %d\n", image_counter);
+		
+		printf("IMAGE: %d\n", image_counter);
                 
               	firstHeaderArrived = false;
 				unsigned long data_received = 0L;
