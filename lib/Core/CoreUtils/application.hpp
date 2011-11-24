@@ -48,7 +48,6 @@ class Application
 {
 	const std::string m_name;
 	std::string m_filename;
-	static const LogLevel LLMap[];
 
 protected:
 	virtual boost::shared_ptr<_internal::MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;
@@ -90,9 +89,6 @@ public:
 	}
 	//get the version of the coreutils
 	static const std::string getCoreVersion( void );
-
-	//get the LLMap
-	static const LogLevel *getLLMap( void ) { return LLMap; }
 };
 }
 }

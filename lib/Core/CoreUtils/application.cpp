@@ -31,11 +31,9 @@ namespace isis
 namespace util
 {
 
-const LogLevel Application::LLMap[] = {LogLevel( 0 ), error, warning, info, verbose_info};
-
 Application::Application( const char name[] ): m_name( name )
 {
-	Selection dbg_levels( "error,warning,info,verbose_info" );
+	Selection dbg_levels( "error,warning,notice,info,verbose_info" );
 	dbg_levels.set( "warning" );
 	parameters["dCore"] = dbg_levels;
 	parameters["dCore"].setDescription( "Debugging level for the Core module" );
@@ -83,18 +81,18 @@ bool Application::init( int argc, char **argv, bool exitOnError )
 	}
 
 	if( parameters["dCore"].isSet() ) {
-		setLog<CoreDebug>( LLMap[parameters["dCore"]->as<Selection>()] );
-		setLog<CoreLog>( LLMap[parameters["dCore"]->as<Selection>()] );
+		setLog<CoreDebug>( ( LogLevel )( uint16_t )parameters["dCore"]->as<Selection>() ); //trigger explicit cast from Selection to int and then to LogLevel
+		setLog<CoreLog>( ( LogLevel )( uint16_t )parameters["dCore"]->as<Selection>() );
 	}
 
 	if( parameters["dData"].isSet() ) {
-		setLog<DataDebug>( LLMap[parameters["dData"]->as<Selection>()] );
-		setLog<DataLog>( LLMap[parameters["dData"]->as<Selection>()] );
+		setLog<DataDebug>( ( LogLevel )( uint16_t )parameters["dData"]->as<Selection>() );
+		setLog<DataLog>( ( LogLevel )( uint16_t )parameters["dData"]->as<Selection>() );
 	}
 
 	if( parameters["dImageIO"].isSet() ) {
-		setLog<ImageIoDebug>( LLMap[parameters["dImageIO"]->as<Selection>()] );
-		setLog<ImageIoLog>( LLMap[parameters["dImageIO"]->as<Selection>()] );
+		setLog<ImageIoDebug>( ( LogLevel )( uint16_t )parameters["dImageIO"]->as<Selection>() );
+		setLog<ImageIoLog>( ( LogLevel )( uint16_t )parameters["dImageIO"]->as<Selection>() );
 	}
 
 	if ( err ) {

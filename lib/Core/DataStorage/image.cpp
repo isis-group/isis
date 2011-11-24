@@ -31,6 +31,8 @@ namespace isis
 namespace data
 {
 
+ChunkOp::~ChunkOp() {}
+
 Image::Image ( ) : set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ), clean( false )
 {
 	addNeededFromString( neededProperties );
@@ -115,6 +117,10 @@ void Image::deduplicateProperties()
 
 	LOG( Debug, info ) << uniques.size() << " Chunk-unique properties found in the Image";
 	LOG_IF( uniques.size(), Debug, verbose_info ) << util::listToString( uniques.begin(), uniques.end(), ", " );
+
+	// list should not be unified - they belong into their chunk even if they are common
+	common.remove( common.findLists() );
+
 	join( common );
 	LOG_IF( ! common.isEmpty(), Debug, verbose_info ) << "common properties saved into the image " << common;
 
@@ -190,13 +196,21 @@ util::fvector4 Image::getPhysicalCoordsFromIndex( const isis::util::ivector4 &vo
 
 
 
-util::ivector4 Image::getIndexFromPhysicalCoords( const isis::util::fvector4 &physicalCoords ) const
+util::ivector4 Image::getIndexFromPhysicalCoords( const isis::util::fvector4 &physicalCoords, bool restrictedToImageBox ) const
 {
 	util::fvector4 vec1 = physicalCoords - m_Offset;
 	util::fvector4 ret = util::fvector4( vec1[0] * m_RowVecInv[0] + vec1[1] * m_ColumnVecInv[0] + vec1[2] * m_SliceVecInv[0],
-										 vec1[0] * m_RowVecInv[1] + vec1[1] * m_ColumnVecInv[1] + vec1[2] * m_SliceVecInv[1],
-										 vec1[0] * m_RowVecInv[2] + vec1[1] * m_ColumnVecInv[2] + vec1[2] * m_SliceVecInv[2],
-										 vec1[3] );
+											vec1[0] * m_RowVecInv[1] + vec1[1] * m_ColumnVecInv[1] + vec1[2] * m_SliceVecInv[1],
+											vec1[0] * m_RowVecInv[2] + vec1[1] * m_ColumnVecInv[2] + vec1[2] * m_SliceVecInv[2],
+											vec1[3] );
+	if( restrictedToImageBox ) 
+	{		
+		util::ivector4 size = getSizeAsVector();
+		for( unsigned short i = 0; i < 4; i ++ ) {
+			ret[i] = ret[i] < 0 ? 0 : ret[i];
+			ret[i] = ret[i] >= size[i] ? size[i] - 1 : ret[i];
+		}
+	}
 	return  util::Value<util::fvector4>( ret ).as<util::ivector4>();
 }
 
@@ -465,6 +479,23 @@ bool Image::reIndex()
 	}
 
 	LOG_IF( ! isValid(), Runtime, warning ) << "The image is not valid after reindexing. Missing properties: " << getMissing();
+
+	// check if there is a list in any chunk
+	bool found = false;
+
+	for ( size_t i = 0; i < lookup.size() && found == false; i++ ) {
+		const KeyList lists_list = lookup[i]->findLists();
+		LOG_IF( !lists_list.empty(), Debug, info ) << "Found property-lists " << util::MSubject( lists_list ) << " in chunk number " << i << " going to splice the image";
+		found = !lists_list.empty();
+	}
+
+	if( found ) { // splice down the image one step if there are some
+		const size_t relDims = lookup[0]->getRelevantDims();
+		assert( relDims > 1 );
+		spliceDownTo( static_cast<data::dimensions>( relDims - 1 ) );
+	}
+
+
 	updateOrientationMatrices();
 	return clean = isValid();
 }
@@ -788,7 +819,6 @@ size_t Image::spliceDownTo( dimensions dim ) //rowDim = 0, columnDim, sliceDim, 
 		return lookup.size();
 	}
 
-	LOG_IF( lookup[0]->getRelevantDims() == ( size_t ) dim, Debug, info ) << "Running useless splice, the dimensionality of the chunks of this image is already " << dim;
 	LOG_IF( hasProperty( "acquisitionTime" ) || lookup[0]->hasProperty( "acquisitionTime" ), Debug, warning ) << "Splicing images with acquisitionTime will cause you lots of trouble. You should remove that before.";
 	util::FixedVector<size_t, 4> image_size = getSizeAsVector();
 
@@ -824,11 +854,13 @@ size_t Image::spliceDownTo( dimensions dim ) //rowDim = 0, columnDim, sliceDim, 
 	std::vector<boost::shared_ptr<Chunk> > buffer = lookup; // store the old lookup table
 	lookup.clear();
 	set.clear(); // clear the image, so we can insert the splices
+	clean = false; // mark the image for reIndexing
 	//static_cast<util::PropertyMap::base_type*>(this)->clear(); we can keep the common properties - they will be merged with thier own copies from the chunks on the next reIndex
 	splicer splice( dim, image_size.product(), *this );
 	BOOST_FOREACH( boost::shared_ptr<Chunk> &ref, buffer ) {
 		BOOST_FOREACH( const util::PropertyMap::KeyType & need, needed ) { //get back properties needed for the
 			if( !ref->hasProperty( need ) && this->hasProperty( need ) ) {
+				LOG( Debug, info ) << "Copying " << need << "=" << this->propertyValue( need ) << " from the image to the chunk for splicing";
 				ref->propertyValue( need ) = this->propertyValue( need );
 			}
 		}
@@ -862,7 +894,7 @@ size_t Image::foreachChunk( ChunkOp &op, bool copyMetaData )
 	return err;
 }
 
-size_t Image::getNrOfColumms() const
+size_t Image::getNrOfColumns() const
 {
 	return getDimSize( data::rowDim );
 }
