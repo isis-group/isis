@@ -24,6 +24,7 @@
 #include <CoreUtils/application.hpp>
 #include <DataStorage/io_application.hpp>
 #include <boost/scoped_ptr.hpp>
+#include "qdefaultmessageprint.hpp"
 
 namespace isis
 {
@@ -50,6 +51,8 @@ public:
 	QApplication &getQApplication();
 	IOQtApplication( const char name[], bool have_input = true, bool have_output = true );
 	virtual bool init( int argc, char **argv, bool exitOnError = true );
+protected:
+	virtual boost::shared_ptr<util::_internal::MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;
 
 };
 }

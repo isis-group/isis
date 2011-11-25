@@ -32,11 +32,13 @@ namespace isis
 {
 namespace data
 {
-IOApplication::IOApplication( const char name[], bool have_input, bool have_output ): Application( name ), m_input( have_input ), m_output( have_output )
+IOApplication::IOApplication( const char name[], bool have_input, bool have_output ):
+	Application( name ),
+	m_input( have_input ), m_output( have_output ), feedback( new util::ConsoleFeedback )
 {
 	if ( have_input ) {
-		parameters["in"] = std::string();
-		parameters["in"].setDescription( "input file or dataset" );
+		parameters["in"] = util::slist();
+		parameters["in"].setDescription( "input file(s) or directory(s)" );
 		parameters["rf"] = std::string();
 		parameters["rf"].needed() = false;
 		parameters["rf"].hidden() = true;
@@ -58,7 +60,7 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 
 		parameters["wdialect"] = std::string();
 		parameters["wdialect"].needed() = false;
-		parameters["wdialect"].setDescription( "choose dialect for writing. The available dialects depend on the capabilities of IO plugins" );
+		parameters["wdialect"].setDescription( "choose dialect for writing. Use \"--help\" for a list of the plugins and their supported dialects" );
 		std::map<unsigned short, std::string> types = util::getTypeMap( false, true );
 		// remove some types which are useless as representation
 		// "(unsigned short)" is needed because otherwise erase would take the reference of a static constant which is only there during compile time
@@ -90,7 +92,7 @@ IOApplication::IOApplication( const char name[], bool have_input, bool have_outp
 
 IOApplication::~IOApplication()
 {
-	data::IOFactory::setProgressFeedback( 0 );
+	data::IOFactory::setProgressFeedback( boost::shared_ptr<util::ProgressFeedback>() );
 }
 
 bool IOApplication::init( int argc, char **argv, bool exitOnError )
@@ -126,7 +128,7 @@ void IOApplication::printHelp( bool withHidden ) const
 
 bool IOApplication::autoload( bool exitOnError )
 {
-	std::string input = parameters["in"];
+	util::slist input = parameters["in"];
 	std::string rf = parameters["rf"];
 	std::string dl = parameters["rdialect"];
 	bool no_progress = parameters["np"];
@@ -137,10 +139,13 @@ bool IOApplication::autoload( bool exitOnError )
 			<< ( dl.empty() ? "" : std::string( " using the dialect: " ) + dl );
 
 	if( !no_progress ) {
-		data::IOFactory::setProgressFeedback( &feedback );
+		data::IOFactory::setProgressFeedback( feedback );
 	}
 
-	images = data::IOFactory::load( input, rf, dl );
+	BOOST_FOREACH( util::slist::const_reference ref, input ) {
+		const std::list< Image > tImages = data::IOFactory::load( ref, rf, dl );
+		images.insert( images.end(), tImages.begin(), tImages.end() );
+	}
 
 	if ( images.empty() ) {
 		if ( exitOnError )
@@ -187,7 +192,7 @@ bool IOApplication::autowrite( std::list<Image> out_images, bool exitOnError )
 		}
 	}
 
-	data::IOFactory::setProgressFeedback( &feedback );
+	data::IOFactory::setProgressFeedback( feedback );
 
 	if ( ! IOFactory::write( out_images, output, wf, dl ) ) {
 		if ( exitOnError )
@@ -200,10 +205,17 @@ bool IOApplication::autowrite( std::list<Image> out_images, bool exitOnError )
 
 Image IOApplication::fetchImage()
 {
+	assert( !images.empty() );
 	Image ret = images.front();
 	images.pop_front();
 	return ret;
 }
+
+boost::shared_ptr< util::_internal::MessageHandlerBase > IOApplication::getLogHandler( std::string module, LogLevel level ) const
+{
+	return isis::util::Application::getLogHandler( module, level );
+}
+
 
 }
 }

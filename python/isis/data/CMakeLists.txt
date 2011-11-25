@@ -13,9 +13,10 @@ include_directories(${CMAKE_SOURCE_DIR}/python/isis)
 ############################################################
 # configure targets
 ############################################################
-add_library(_data SHARED data.cpp _image.hpp )
+
+add_library(_data SHARED data.cpp _image.cpp _chunk.hpp _ioapplication.cpp  _ndimensional.cpp _iofactory.hpp)
 set_target_properties(_data PROPERTIES PREFIX "")
-target_link_libraries( _data ${ISIS_LIB_DEPENDS} isis_core ${PYTHON_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries( _data ${ISIS_LIB_DEPENDS} isis_core _core ${PYTHON_LIBRARIES} ${Boost_LIBRARIES})
 
 configure_file(__init__.py 
   ${CMAKE_BINARY_DIR}/python/isis/data/__init__.py COPYONLY)
@@ -24,8 +25,8 @@ configure_file(__init__.py
 # configure installation
 ############################################################
 install(FILES __init__.py 
-  DESTINATION ${CMAKE_INSTALL_PREFIX}/${ISIS_PYTHON_INSTALL_DIR}/data)
+  DESTINATION  ${PYTHON_INSTALL_PATH}/isis/data)
 
 install(TARGETS _data
-  LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/${ISIS_PYTHON_INSTALL_DIR}/data 
+  LIBRARY DESTINATION  ${PYTHON_INSTALL_PATH}/isis/data 
   COMPONENT RuntimeLibraries)

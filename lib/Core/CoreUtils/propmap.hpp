@@ -69,8 +69,6 @@ private:
 	typedef propPath::const_iterator propPathIterator;
 
 	static const char pathSeperator = '/';
-	static const mapped_type emptyEntry;//dummy to be able to return an empty Property/branch
-
 
 	/////////////////////////////////////////////////////////////////////////////////////////
 	// internal predicats
@@ -81,6 +79,9 @@ private:
 	struct invalidP {   bool operator()( const_reference ref )const;};
 	/// true when entry is a leaf, needed and empty of entry is a invalid branch
 	struct treeInvalidP {   bool operator()( const_reference ref )const;};
+	/// true when entry is not a scalar
+	struct listP {  bool operator()( const_reference ref )const;};
+
 	/////////////////////////////////////////////////////////////////////////////////////////
 	// internal functors
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -102,10 +103,12 @@ private:
 
 	/// internal recursion-function for remove
 	bool recursiveRemove( util::PropertyMap &root, const propPathIterator at, const propPathIterator pathEnd );
+
 protected:
 	/////////////////////////////////////////////////////////////////////////////////////////
 	// rw-backends
 	/////////////////////////////////////////////////////////////////////////////////////////
+
 	/// create a list of keys for every entry for which the given scalar predicate is true.
 	template<class Predicate> const KeyList genKeyList()const {
 		KeyList k;
@@ -147,6 +150,21 @@ protected:
 
 	///copy the tree into a flat key/property-map
 	void makeFlatMap( FlatMap &out, KeyType key_prefix = "" )const;
+
+	/**
+	 * Access the property vector referenced by the path-key.
+	 * If the property does not exist, an empty dummy will returned.
+	 * \param key the "path" to the property
+	 * \returns a reference to the PropertyValue
+	 */
+	const std::vector<PropertyValue> &propertyValueVec( const KeyType &key )const;
+
+	/**
+	 * Access the property vector referenced by the path-key, create it if its not there.
+	 * \param key the "path" to the property
+	 * \returns a reference to the PropertyValue
+	 */
+	std::vector<PropertyValue> &propertyValueVec( const KeyType &key );
 public:
 	/////////////////////////////////////////////////////////////////////////////////////////
 	// constructors
@@ -205,7 +223,15 @@ public:
 	 * \param keep_needed flag
 	 * \returns true if all properties removed succesfully, false otherwise
 	 */
-	bool remove( const isis::util::PropertyMap &removeMap, bool keep_needed = false );
+	bool remove( const PropertyMap &removeMap, bool keep_needed = false );
+
+	/**
+	 * remove every property which is also in the given list (regardless of the value)
+	 * \param removeMap the map of properties to be removed
+	 * \param keep_needed flag
+	 * \returns true if all properties removed succesfully, false otherwise
+	 */
+	bool remove( const KeyList &removeList, bool keep_needed = false );
 
 	/**
 	 * check if property is available
@@ -213,6 +239,18 @@ public:
 	 * \returns true if the given property does exist and is not empty, false otherwise
 	 */
 	bool hasProperty( const KeyType &key )const;
+
+	/**
+	 * Search for the property/branch in the whole Tree.
+	 * \param key the single key for the branch/property to search for (paths will be stripped to the rightmost key)
+	 * \param allowProperty if false the search will ignore properties
+	 * \param allowBranch if false the search will ignore branches (it will still search into the branches, but the branches themself won't be considered a valid finding)
+	 * \returns full "path" to the property (including the properties name) if it is found, empty string elsewhise
+	 */
+	KeyType find( KeyType key, bool allowProperty = true, bool allowBranch = false )const;
+
+	/// find all non scalar entries
+	KeyList findLists()const;
 
 	/**
 	 * check if branch of the tree is available
@@ -390,14 +428,14 @@ namespace _internal
 class treeNode
 {
 	PropertyMap m_branch;
-	PropertyValue m_leaf;
+	std::vector<PropertyValue> m_leaf;
 public:
-	treeNode() {} //c++0x wants it so
+	treeNode(): m_leaf( 1 ) {}
 	bool empty()const {
-		return m_branch.isEmpty() && m_leaf.isEmpty();
+		return m_branch.isEmpty() && m_leaf[0].isEmpty();
 	}
 	bool is_leaf()const {
-		LOG_IF( ! ( m_branch.isEmpty() || m_leaf.isEmpty() ), Debug, error ) << "There is a non empty leaf at a branch. This should not be.";
+		LOG_IF( ! ( m_branch.isEmpty() || m_leaf[0].isEmpty() ), Debug, error ) << "There is a non empty leaf at a branch. This should not be.";
 		return m_branch.isEmpty();
 	}
 	const PropertyMap &getBranch()const {
@@ -406,11 +444,11 @@ public:
 	PropertyMap &getBranch() {
 		return m_branch;
 	}
-	PropertyValue &getLeaf() {
+	std::vector<PropertyValue> &getLeaf() {
 		assert( is_leaf() );
 		return m_leaf;
 	}
-	const PropertyValue &getLeaf()const {
+	const std::vector<PropertyValue> &getLeaf()const {
 		assert( is_leaf() );
 		return m_leaf;
 	}
@@ -454,7 +492,7 @@ template<typename T> T PropertyMap::getPropertyAs( const KeyType &key ) const
 	const mapped_type *entry = findEntry( util::istring( key ) );
 
 	if( entry ) {
-		const PropertyValue &ref = entry->getLeaf();
+		const PropertyValue &ref = entry->getLeaf()[0];
 
 		if( !ref.isEmpty() )
 			return ref->as<T>();
@@ -474,9 +512,10 @@ namespace std
 template<typename charT, typename traits>
 basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::_internal::treeNode &s )
 {
-	if( s.is_leaf() )
-		out << s.getLeaf();
-	else
+	if( s.is_leaf() ) {
+		vector< isis::util::PropertyValue > vec = s.getLeaf();
+		isis::util::listToOStream( vec.begin(), vec.end(), out );
+	} else
 		out << "[[Subtree with " << s.getBranch().getKeys().size() << " elements]]";
 
 	return out;

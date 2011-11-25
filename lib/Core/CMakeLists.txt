@@ -43,32 +43,30 @@ file(GLOB CORE_SRC_FILES "DataStorage/*.cpp" "CoreUtils/*.cpp")
 file(GLOB COREUTILS_HDR_FILES "CoreUtils/*.hpp" "CoreUtils/*.h")
 file(GLOB DATASTORAGE_HDR_FILES "DataStorage/*.hpp" "DataStorage/*.h")
 
-
-macro( build_static target)
-    add_library( ${target} STATIC ${CORE_SRC_FILES} )
-    set_target_properties( ${target} PROPERTIES OUTPUT_NAME "isis_core")
-    set(target_list ${target_list} ${target})
-endmacro( build_static )
-
-macro( build_shared target)
-    add_library( ${target}  SHARED ${CORE_SRC_FILES} )
-    target_link_libraries( isis_core ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} ${LibOil_LIBRARY})
-    set_target_properties( isis_core PROPERTIES	${ISIS_BUILD_PROPERTIES} VERSION ${${CMAKE_PROJECT_NAME}_VERSION} INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
-    set(target_list ${target_list} ${target})
-endmacro( build_shared )
-
+############################################################
 # the core library shared and static build
+############################################################
+macro( build_core name type)
+    add_library( ${name} ${type} ${CORE_SRC_FILES} )
+	target_link_libraries( ${name} ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} ${LibOil_LIBRARY})
+    set_target_properties( ${name} PROPERTIES
+		${ISIS_BUILD_PROPERTIES}
+		VERSION ${${CMAKE_PROJECT_NAME}_VERSION}
+		INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
+		OUTPUT_NAME "isis_core")
+    set(target_list ${target_list} ${name})
+endmacro( build_core )
 
 #for packaging purpose we want to build both, shared and static with one build_command
 #however this capability is not provided by an option in the cmake menu
 if(ISIS_BUILD_STATIC_AND_SHARED)
-    build_static( isis_core_static )
-    build_shared( isis_core )
+    build_core( isis_core_static STATIC)
+    build_core( isis_core SHARED)
 else(ISIS_BUILD_STATIC_AND_SHARED)
     if(ISIS_BUILD_STATIC)
-	build_static( isis_core )
+		build_core( isis_core STATIC)
     else(ISIS_BUILD_STATIC)
-	build_shared( isis_core )
+		build_core( isis_core SHARED)
     endif(ISIS_BUILD_STATIC)
 endif(ISIS_BUILD_STATIC_AND_SHARED)
 

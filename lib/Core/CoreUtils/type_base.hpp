@@ -35,7 +35,6 @@ namespace util
 namespace _internal
 {
 /// @cond _hidden
-/// @cond _hidden
 template<typename TYPE> struct __cast_to {
 	template<typename SOURCE> TYPE operator()( Value<TYPE>*, const SOURCE &value ) {
 		return boost::lexical_cast<TYPE>( value ); //generic version types are different - so do lexical cast
@@ -117,7 +116,7 @@ public:
 		if( is<T>() )
 			return castTo<T>();
 
-		Reference ret = copyToNewByID( Value<T>::staticID );
+		Reference ret = copyByID( Value<T>::staticID );
 
 		if ( ret.isEmpty() ) {
 			LOG( Debug, error )
@@ -163,11 +162,11 @@ public:
 	/// \returns true if and only if the types of this and second are equal and the values are equal
 	virtual bool operator==( const ValueBase &second )const = 0;
 
-	/// creates a copy of the stored value using a type referenced by its id
-	Reference copyToNewByID( unsigned short ID ) const;
+	/// creates a copy of the stored value using a type referenced by its ID
+	Reference copyByID( unsigned short ID ) const;
 
 	/**
-	 * Check if the stored value would also fit into another type referenced by its id
+	 * Check if the stored value would also fit into another type referenced by its ID
 	 * \returns true if the stored value would fit into the target type, false otherwise
 	 */
 	bool fitsInto( unsigned short ID ) const;

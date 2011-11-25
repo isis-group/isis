@@ -8,91 +8,47 @@
 #ifndef _IOAPPLICATION_HPP_
 #define _IOAPPLICATION_HPP_
 
+#include "_types.hpp"
 #include "DataStorage/io_application.hpp"
-#include "core/_application.hpp"
+#include "DataStorage/image.hpp"
+#include <boost/python.hpp>
+#include "common.hpp"
 
 namespace isis
 {
 namespace python
 {
+namespace data
+{
 
 // helper class ioapplication
-class _IOApplication : public data::IOApplication, boost::python::wrapper<data::IOApplication>
+class _IOApplication : public isis::data::IOApplication, boost::python::wrapper<isis::data::IOApplication>
 {
+
 public:
-	_IOApplication( PyObject *p, const char name[], const bool &input, const bool &output ) : data::IOApplication( name, input, output ), self( p ),  boost::python::wrapper<data::IOApplication>() {}
-	_IOApplication( PyObject *p, const data::IOApplication &base ) : data::IOApplication( "", true, true ), self( p ),  boost::python::wrapper<data::IOApplication>() {}
+	_IOApplication( PyObject *p, const char name[], const bool &input, const bool &output );
+	_IOApplication( PyObject *p, const isis::data::IOApplication &base );
 
-	virtual bool init( int argc, boost::python::list pyargv, bool exitOnError = true ) {
-		char *argv[argc];
-		size_t n = boost::python::len( pyargv );
-
-		for( size_t i = 0; i < n; i++ ) {
-			argv[i] = boost::python::extract<char *>( pyargv[i] );
-		}
-
-		return IOApplication::init( argc, argv, exitOnError );
+	std::list<isis::data::Image> _images() {
+		return images;
 	}
 
+	isis::data::Image _fetchImageAs( isis::python::data::image_types type );
 
-	void _addParameter( const std::string &name, PyObject *value, const std::string &type ) {
-		if( PyFloat_Check( value ) ) {
-			internAddParameter<float>( name, value, type );
-		} else if( PyBool_Check( value ) ) {
-			internAddParameter<bool>( name, value, type );
-		} else if( PyInt_Check( value ) ) {
-			internAddParameter<int64_t>( name, value, type );
-		} else if( PyString_Check( value ) ) {
-			internAddParameter<std::string>( name, value, type );
-		} else if ( boost::iequals( type, "ivector4" ) ) {
-			internAddParameter<isis::util::ivector4>( name, value, type );
-		} else if ( boost::iequals( type, "dvector4" ) ) {
-			internAddParameter<isis::util::dvector4>( name, value, type );
-		} else if ( boost::iequals( type, "fvector4" ) ) {
-			internAddParameter<isis::util::fvector4>( name, value, type );
-		} else if ( boost::iequals( type, "selection" ) ) {
-			internAddParameter<isis::util::Selection>( name, value, type );
-		} else {
-			LOG( Runtime, error ) << "Value " << type << " is not registered.";
-		}
+	bool _autowrite( std::list<isis::data::Image> imageList ) {
+		return autowrite( imageList );
 	}
-
-	std::string _getParameterAsString( const std::string name ) {
-		return parameters[name];
-	}
-
-	void _setNeeded( const std::string name, const bool needed ) {
-		parameters[name].needed() = needed;
-	}
-
-	void _setHidden( const std::string name, const bool hidden ) {
-		parameters[name].hidden() = hidden;
-	}
-
-	void _setDescription( const std::string name, const std::string desc ) {
-		parameters[name].setDescription( desc );
-	}
-
-	bool _autowrite( const std::list<isis::data::Image> &imgList, bool exitOnError ) {
-		return isis::data::IOApplication::autowrite( imgList, exitOnError );
-	}
-
-	std::list<data::Image> _images() {
-		return this->images;
+	bool _autowrite( isis::data::Image image ) {
+		return autowrite( image );
 	}
 
 private:
 	PyObject *self;
-	template<typename TYPE>
-	void internAddParameter ( const std::string name, PyObject *value, std::string type ) {
-		util::Value<TYPE> val( static_cast<TYPE>( boost::python::extract<TYPE>( value ) ) );
-		//      if(!type.empty()) {
-		//          val.copyToNewByID( util::getTransposedTypeMap(true, true)[type] );
-		//      }
-		parameters[name] = val;
-		parameters[name].needed() = false;
-	}
+
 };
+
+
+}
 }
 }
 #endif /* _IOAPPLICATION_HPP_ */

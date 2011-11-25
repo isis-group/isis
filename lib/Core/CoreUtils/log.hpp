@@ -39,7 +39,7 @@ template<class MODULE> class Log
 		boost::shared_ptr<util::_internal::MessageHandlerBase> &handle = Singletons::get < Log<MODULE>, INT_MAX - 1 > ().m_handle;
 		return handle;
 	}
-	Log(): m_handle( new DefaultMsgPrint( warning ) ) {}
+	Log(): m_handle( new DefaultMsgPrint( notice ) ) {}
 public:
 	template<class HANDLE_CLASS> static void enable( LogLevel enable ) {
 		setHandler( boost::shared_ptr<MessageHandlerBase>( enable ? new HANDLE_CLASS( enable ) : 0 ) );

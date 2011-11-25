@@ -45,7 +45,7 @@ namespace image_io
 class ImageFormat_Vista: public FileFormat
 {
 protected:
-	std::string suffixes()const {return std::string( ".v" );}
+	std::string suffixes( io_modes /*modes=both*/ )const {return std::string( ".v" );}
 public:
 	std::string getName()const { return std::string( "Vista" );}
 	bool tainted()const {return false;}//internal plugins are not tainted
@@ -65,7 +65,7 @@ public:
 	 * </ul>
 	 *
 	 */
-	std::string dialects( const std::string &filename )const {return std::string( "functional map anatomical" );}
+	std::string dialects( const std::string &/*filename*/ )const {return std::string( "functional map anatomical onlyfirst" );}
 	int load( std::list<data::Chunk> &chunks, const std::string &filename,
 			  const std::string &dialect ) throw( std::runtime_error & );
 	void write( const data::Image &image, const std::string &filename,
@@ -440,12 +440,11 @@ private:
 
 			//if not set yet, set row, column and slice vector.
 			// DEFAULT: axial
-			if( not chunk.hasProperty( "rowVec" ) ) {
+			if( !chunk.hasProperty( "rowVec" ) ) {
 				chunk.setPropertyAs<util::fvector4>( "rowVec", util::fvector4( 1, 0, 0, 0 ) );
 				chunk.setPropertyAs<util::fvector4>( "columnVec", util::fvector4( 0, 1, 0, 0 ) );
 				chunk.setPropertyAs<util::fvector4>( "sliceVec", util::fvector4( 0, 0, 1, 0 ) );
 			}
-
 			// set voxel gap tp (0,0,0,0) since there is no gap information available
 			// in vista images.
 			chunk.setPropertyAs<util::fvector4>( "voxelGap", util::fvector4( 0, 0, 0, 0 ) );
@@ -463,7 +462,7 @@ private:
 		 * Default constructor. Create a VistaChunk out of a vista image.
 		 */
 
-		VistaChunk( VImage image, const bool functional, size_t nslices = 0 ):
+		VistaChunk( VImage image, const bool functional, size_t /*nslices*/ = 0 ):
 			data::Chunk( static_cast<TYPE *>( image->data ), VImageDeleter( image ),
 						 VImageNColumns( image ), VImageNRows( image ), functional ? 1 : VImageNBands( image ), functional ? VImageNBands( image ) : 1 ) {
 			copyHeaderFromVista( image, *this, functional );

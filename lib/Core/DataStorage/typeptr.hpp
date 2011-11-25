@@ -52,6 +52,8 @@ template<typename T> std::pair<T, T> calcMinMax( const T *data, size_t len )
 	return result;
 }
 
+/// @cond _hidden
+
 #ifdef __SSE2__
 ////////////////////////////////////////////////
 // specialize calcMinMax for (u)int(8,16,32)_t /
@@ -71,7 +73,7 @@ template<typename T> struct getMinMaxImpl<T, true> { // generic minmax for numbe
 		return calcMinMax( &ref[0], ref.getLength() );
 	}
 };
-
+/// @endcond
 }
 
 /**
@@ -80,36 +82,16 @@ template<typename T> struct getMinMaxImpl<T, true> { // generic minmax for numbe
  * by just use "1" for the length.
  * The pointers are reference counted and will be deleted automatically by a customizable deleter.
  * The copy is cheap, thus the copy of a ValuePtr will reference the same data.
- * The usual dereferencing pointer interface ("*" and "->") is supported.
+ * The usual pointer dereferencing interface ("*", "->" and "[]") is supported.
  */
 template<typename TYPE> class ValuePtr: public _internal::ValuePtrBase
 {
 	boost::shared_ptr<TYPE> m_val;
-	template<typename T> ValuePtr( const util::Value<T>& value ); // Dont do this
 protected:
+	ValuePtr() {} // should only be used by child classed who initialize the pointer themself
 	ValuePtrBase *clone() const {
 		return new ValuePtr( *this );
 	}
-	/// Proxy-Deleter to encapsulate the real deleter/shared_ptr when creating shared_ptr for parts of a shared_ptr
-	class DelProxy : public boost::shared_ptr<TYPE>
-	{
-	public:
-		/**
-		 * Create a proxy for a given master shared_ptr
-		 * This increments the use_count of the master and thus keeps the
-		 * master from being deleted while parts of it are still in use.
-		 */
-		DelProxy( const ValuePtr<TYPE> &master ): boost::shared_ptr<TYPE>( master ) {
-			LOG( Debug, verbose_info ) << "Creating DelProxy for " << this->get();
-		}
-		/// decrement the use_count of the master when a specific part is not referenced anymore
-		void operator()( TYPE *at ) {
-			LOG( Debug, verbose_info )
-					<< "Deletion for " << this->get() << " called from splice at offset "   << at - this->get()
-					<< ", current use_count: " << this->use_count();
-			this->reset();//actually not needed, but we keep it here to keep obfuscation low
-		}
-	};
 public:
 	static const unsigned short staticID = util::_internal::TypeID<TYPE>::value << 8;
 	/// delete-functor which does nothing (in case someone else manages the data).
@@ -145,8 +127,19 @@ public:
 		if( length )
 			m_val.reset( ( TYPE * )calloc( length, sizeof( TYPE ) ), BasicDeleter() );
 
-		LOG_IF( length == 0, Debug, warning ) << "Creating an empty ValuePtr of type " << util::MSubject( staticName() ) << " you should overwrite it with a usefull pointer before using it";
+		LOG_IF( length == 0, Debug, warning )
+				<< "Creating an empty ValuePtr of type " << util::MSubject( staticName() )
+				<< " you should overwrite it with a usefull pointer before using it";
 	}
+
+	/**
+	 * Creates ValuePtr from a boost:shared_ptr of the same type.
+	 * It will inherit the deleter of the shared_ptr.
+	 * \param ptr the shared_ptr to share the data with
+	 * \param length the length of the used array (ValuePtr does NOT check for length,
+	 * this is just here for child classes which may want to check)
+	 */
+	ValuePtr( const boost::shared_ptr<TYPE> &ptr, size_t length ): _internal::ValuePtrBase( length ), m_val( ptr ) {}
 
 	/**
 	 * Creates ValuePtr from a pointer of type TYPE.
@@ -169,63 +162,20 @@ public:
 	 * \param d the deleter to be used when the data shall be deleted ( d() is called then )
 	 */
 
-	template<typename D> ValuePtr( TYPE *const ptr, size_t length, D d ):
-		_internal::ValuePtrBase( length ), m_val( ptr, d ) {}
+	template<typename D> ValuePtr( TYPE *const ptr, size_t length, D d ): _internal::ValuePtrBase( length ), m_val( ptr, d ) {}
 
 	virtual ~ValuePtr() {}
 
-	/**
-	 * Get the raw address the ValuePtr points to.
-	 * \returns a weak_ptr\<void\> with the memory address of the data handled by this ValuePtr.
-	 */
-	const boost::weak_ptr<void> getRawAddress()const {
-		return boost::weak_ptr<void>( m_val );
+	boost::shared_ptr<const void> getRawAddress( size_t offset = 0 )const {
+		if( offset ) {
+			DelProxy proxy( *this );
+			const uint8_t *const b_ptr = reinterpret_cast<const uint8_t *>( m_val.get() ) + offset;
+			return boost::shared_ptr<const void>( b_ptr, proxy );
+		} else
+			return boost::static_pointer_cast<const void>( m_val );
 	}
-
-	/// Copy elements from raw memory
-	void copyFromMem( const TYPE *const src, size_t _length ) {
-		LOG_IF( _length > getLength(), Runtime, error )
-				<< "Amount of the elements to copy from memory (" << _length << ") exceeds the length of the array (" << getLength() << ")";
-		TYPE &dest = this->operator[]( 0 );
-		LOG( Debug, info ) << "Copying " << _length *sizeof( TYPE ) << " bytes from " << ValuePtr<TYPE>::staticName() << src << " to " << getTypeName() << &dest;
-		memcpy( &dest, src, _length * sizeof( TYPE ) );
-	}
-	/// Copy elements within a range [start,end] to raw memory
-	void copyToMem( size_t start, size_t end, TYPE *const dst )const {
-		assert( start <= end );
-		const size_t _length = end - start + 1;
-		LOG_IF( end >= getLength(), Runtime, error )
-				<< "End of the range (" << end << ") is behind the end of this ValuePtr (" << getLength() << ")";
-		const TYPE &source = this->operator[]( start );
-		memcpy( dst, &source, _length * sizeof( TYPE ) );
-	}
-
-	size_t compare( size_t start, size_t end, const _internal::ValuePtrBase &dst, size_t dst_start ) const {
-		assert( start <= end );
-		size_t ret = 0;
-		size_t _length = end - start;
-
-		if ( dst.getTypeID() != getTypeID() ) {
-			LOG( Debug, error )
-					<< "Comparing to a ValuePtr of different type(" << dst.getTypeName() << ", not " << getTypeName()
-					<< "). Assuming all voxels to be different";
-			return _length;
-		}
-
-		LOG_IF( end >= getLength(), Runtime, error )
-				<< "End of the range (" << end << ") is behind the end of this ValuePtr (" << getLength() << ")";
-		LOG_IF( _length + dst_start >= dst.getLength(), Runtime, error )
-				<< "End of the range (" << _length + dst_start << ") is behind the end of the destination (" << dst.getLength() << ")";
-		const ValuePtr<TYPE> &cmp = dst.castToValuePtr<TYPE>();
-		LOG( Debug, verbose_info ) << "Comparing " << dst.getTypeName() << " at " << &operator[]( 0 ) << " and " << &cmp[0];
-
-		for ( size_t i = start; i < end; i++ ) {
-			if ( ! ( operator[]( i ) == cmp[i] ) ) {
-				ret++;
-			}
-		}
-
-		return ret;
+	boost::shared_ptr<void> getRawAddress( size_t offset = 0 ) { // use the const version and cast away the const
+		return boost::const_pointer_cast<void>( const_cast<const ValuePtr *>( this )->getRawAddress( offset ) );
 	}
 
 	/// @copydoc util::Value::toString
@@ -235,22 +185,22 @@ public:
 		if ( m_len ) {
 			const TYPE *ptr = m_val.get();
 
+			// if you get trouble with to_tm here include <boost/date_time/gregorian/gregorian.hpp> or <boost/date_time/posix_time/posix_time.hpp> in your cpp
 			for ( size_t i = 0; i < m_len - 1; i++ )
 				ret += util::Value<TYPE>( ptr[i] ).toString( false ) + "|";
+
 
 			ret += util::Value<TYPE>( ptr[m_len - 1] ).toString( labeled );
 		}
 
 		return boost::lexical_cast<std::string>( m_len ) + "#" + ret;
 	}
-	/// @copydoc util::Value::getTypeName
-	virtual std::string getTypeName()const {
-		return staticName();
-	}
-	/// @copydoc util::Value::getTypeID
-	virtual unsigned short getTypeID()const {
-		return staticID;
-	}
+
+	std::string getTypeName()const {return staticName();}
+	unsigned short getTypeID()const {return staticID;}
+	bool isFloat() const {return boost::is_float< TYPE >::value;}
+	bool isInteger() const {return boost::is_integral< TYPE >::value;}
+
 	/// @copydoc util::Value::staticName
 	static std::string staticName() {
 		return std::string( util::Value<TYPE>::staticName() ) + "*";
@@ -276,15 +226,7 @@ public:
 	operator boost::shared_ptr<TYPE>&() {return m_val;}
 	operator const boost::shared_ptr<TYPE>&()const {return m_val;}
 
-	ValuePtrBase::Reference cloneToNew( size_t _length ) const {
-		return ValuePtrBase::Reference( new ValuePtr( ( TYPE * )malloc( _length * sizeof( TYPE ) ), _length ) );
-	}
-
-	size_t bytesPerElem() const {
-		return sizeof( TYPE );
-	}
-
-
+	size_t bytesPerElem()const {return sizeof( TYPE );}
 
 	std::pair<util::ValueReference, util::ValueReference> getMinMax()const {
 		if ( getLength() == 0 ) {
@@ -324,16 +266,22 @@ public:
 	}
 	//
 	scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const {
-		std::pair<util::ValueReference, util::ValueReference> minmax = getMinMax();
-		assert( ! ( minmax.first.isEmpty() || minmax.second.isEmpty() ) );
-		return ValuePtrBase::getScalingTo( typeID, minmax, scaleopt );
+		if( typeID == staticID && scaleopt == autoscale ) { // if id is the same and autoscale is requested
+			static const util::Value<uint8_t> one( 1 );
+			static const util::Value<uint8_t> zero( 0 );
+			return std::pair<util::ValueReference, util::ValueReference>( one, zero ); // the result is always 1/0
+		} else { // get min/max and compute the scaling
+			std::pair<util::ValueReference, util::ValueReference> minmax = getMinMax();
+			assert( ! ( minmax.first.isEmpty() || minmax.second.isEmpty() ) );
+			return ValuePtrBase::getScalingTo( typeID, minmax, scaleopt );
+		}
 	}
 };
-
+/// @cond _hidden
 // specialisation for complex - there shall be no scaling - and we cannot compute minmax
 template<> scaling_pair ValuePtr<std::complex<float> >::getScalingTo( unsigned short /*typeID*/, autoscaleOption /*scaleopt*/ )const;
 template<> scaling_pair ValuePtr<std::complex<double> >::getScalingTo( unsigned short /*typeID*/, autoscaleOption /*scaleopt*/ )const;
-
+/// @endcond
 template<typename T> bool _internal::ValuePtrBase::is()const
 {
 	util::checkType<T>();

@@ -29,6 +29,7 @@ bool transformCoords( isis::util::PropertyMap &properties, util::FixedVector<siz
 		|| !properties.hasProperty( "voxelSize" ) || !properties.hasProperty( "indexOrigin" ) ) {
 		return false;
 	}
+
 	using namespace boost::numeric::ublas;
 	// this implementation assumes that the PropMap properties is either a
 	// data::Chunk or a data::Image object. Hence it should contain the
@@ -40,7 +41,15 @@ bool transformCoords( isis::util::PropertyMap &properties, util::FixedVector<siz
 	// get index origin from property map
 	isis::util::fvector4 indexorig = properties.getPropertyAs<util::fvector4>( "indexOrigin" );
 	vector<float> origin_out = vector<float>( 3 );
-	isis::util::fvector4 scaling  = properties.getPropertyAs<util::fvector4>( "voxelSize" ) + properties.getPropertyAs<util::fvector4>( "voxelGap" );
+	//check if we have a property "voxelGap" to prevent isis from throwing a warning "blabla"
+	isis::util::fvector4 scaling;
+
+	if( properties.hasProperty( "voxelGap" ) ) {
+		scaling  = properties.getPropertyAs<util::fvector4>( "voxelSize" ) +  properties.getPropertyAs<util::fvector4>( "voxelGap" );
+	} else {
+		scaling  = properties.getPropertyAs<util::fvector4>( "voxelSize" );
+	}
+
 	// create boost::numeric data structures
 	// STEP 1 transform orientation matrix
 	// input matrix
@@ -53,11 +62,11 @@ bool transformCoords( isis::util::PropertyMap &properties, util::FixedVector<siz
 	}
 
 	matrix<float> R_out( 3, 3 );
-	
+
 	if( transformCenterIsImageCenter ) {
-	    R_out = prod( R_in, transform );
+		R_out = prod( R_in, transform );
 	} else {
-	    R_out = prod( transform, R_in );
+		R_out = prod( transform, R_in );
 	}
 
 	for ( int i = 0; i < 3; i++ ) {
@@ -112,6 +121,7 @@ bool transformCoords( isis::util::PropertyMap &properties, util::FixedVector<siz
 	} else {
 		origin_out = prod( transform, origin_in );
 	}
+
 	for( int i = 0; i < 3; i++ ) {
 		indexorig[i] = origin_out( i );
 	}

@@ -35,6 +35,7 @@ class ChunkOp : std::unary_function<Chunk &, bool>
 {
 public:
 	virtual bool operator()( Chunk &, util::FixedVector<size_t, 4> posInImage ) = 0;
+	virtual ~ChunkOp();
 };
 
 /// Main class for generic 4D-images
@@ -399,6 +400,7 @@ public:
 	size_t compare( const Image &comp )const;
 
 	orientation getMainOrientation()const;
+
 	/**
 	 * Transforms the image coordinate system into an other system by multiplying
 	 * the orientation matrix with a user defined transformation matrix. Additionally,
@@ -420,24 +422,24 @@ public:
 	bool transformCoords( boost::numeric::ublas::matrix<float> transform_matrix, bool transformCenterIsImageCenter = false ) {
 		//for transforming we have to ensure to have the below properties in our chunks and image
 		std::list<std::string > neededProps;
-		neededProps.push_back("indexOrigin");
-		neededProps.push_back("rowVec");
-		neededProps.push_back("columnVec");
-		neededProps.push_back("sliceVec");
-		neededProps.push_back("voxelSize");
+		neededProps.push_back( "indexOrigin" );
+		neededProps.push_back( "rowVec" );
+		neededProps.push_back( "columnVec" );
+		neededProps.push_back( "sliceVec" );
+		neededProps.push_back( "voxelSize" );
 		//propagate needed properties to chunks
 		BOOST_FOREACH( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef, lookup ) {
-		    BOOST_FOREACH(std::list<std::string>::reference props, neededProps )
-		    {
-			if(hasProperty(props.c_str()) && !chRef->hasProperty(props.c_str()) ) {
-			    chRef->setPropertyAs<util::fvector4>(props.c_str(), getPropertyAs<util::fvector4>(props.c_str()));
+			BOOST_FOREACH( std::list<std::string>::reference props, neededProps ) {
+				if( hasProperty( props.c_str() ) && !chRef->hasProperty( props.c_str() ) ) {
+					chRef->setPropertyAs<util::fvector4>( props.c_str(), getPropertyAs<util::fvector4>( props.c_str() ) );
+				}
 			}
-		    }
-		    if( !chRef->transformCoords( transform_matrix, transformCenterIsImageCenter ) ) {
+
+			if( !chRef->transformCoords( transform_matrix, transformCenterIsImageCenter ) ) {
 				return false;
 			}
 		}
-// 		establish initial state
+		//      establish initial state
 
 		if( !isis::data::_internal::transformCoords( *this, getSizeAsVector(), transform_matrix, transformCenterIsImageCenter ) ) {
 			LOG( Runtime, error ) << "Error during transforming the coords of the image.";
@@ -448,6 +450,7 @@ public:
 			LOG( Runtime, error ) << "Could not update the orientation matrices of the image!";
 			return false;
 		}
+
 		deduplicateProperties();
 		return true;
 	}
@@ -482,19 +485,28 @@ public:
 	 *  \param physicalCoords the physical coords from which you want to get the voxel index.
 	 *  \return voxel index associated with the given physicalCoords
 	 */
-	util::ivector4 getIndexFromPhysicalCoords( const util::fvector4 &physicalCoords ) const;
+	util::ivector4 getIndexFromPhysicalCoords( const util::fvector4 &physicalCoords, bool restrictedToImageBox = false ) const;
 
 	/**
 	 * Copy all voxel data of the image into memory.
 	 * If neccessary a conversion into T is done using min/max of the image.
 	 */
-	template<typename T> void copyToMem( T *dst )const {
+	template<typename T> void copyToMem( T *dst, size_t len )const {
 		if( clean ) {
 			scaling_pair scale = getScalingTo( ValuePtr<T>::staticID );
 			// we could do this using convertToType - but this solution does not need any additional temporary memory
 			BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
-				if( !ref->copyToMem<T>( dst, scale ) ) {
+				const size_t cSize = ref->getSizeAsVector().product();
+
+				if( !ref->copyToMem<T>( dst, len, scale ) ) {
 					LOG( Runtime, error ) << "Failed to copy raw data of type " << ref->getTypeName() << " from image into memory of type " << ValuePtr<T>::staticName();
+				} else {
+					if( len < cSize ) {
+						LOG( Runtime, error ) << "Abborting copy, because there is no space left in the target";
+						break;
+					}
+
+					len -= cSize;
 				}
 
 				dst += ref->getVolume(); // increment the cursor
@@ -513,7 +525,7 @@ public:
 	template<typename T> MemChunk<T> copyToMemChunk()const {
 		const util::FixedVector<size_t, 4> size = getSizeAsVector();
 		data::MemChunk<T> ret( size[0], size[1], size[2], size[3] );
-		copyToMem<T>( &ret.voxel<T>( 0, 0, 0, 0 ) );
+		copyToMem<T>( &ret.voxel<T>( 0, 0, 0, 0 ), ret.getVolume() );
 		return ret;
 	}
 
@@ -572,7 +584,7 @@ public:
 	/// \returns the number of rows of the image
 	size_t getNrOfRows()const;
 	/// \returns the number of columns of the image
-	size_t getNrOfColumms()const;
+	size_t getNrOfColumns()const;
 	/// \returns the number of slices of the image
 	size_t getNrOfSlices()const;
 	/// \returns the number of timesteps of the image

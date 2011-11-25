@@ -9,111 +9,165 @@ namespace image_io
 
 class ImageFormat_Null: public FileFormat
 {
+	static const size_t timesteps = 20;
+	std::list<data::Chunk> makeImage( unsigned short size, uint16_t sequence, std::string desc ) {
+		//##################################################################################################
+		//## standard null image
+		//##################################################################################################
+		std::list<data::Chunk> ret;
+
+		for ( uint32_t t = 0; t < timesteps; t++ ) {
+			for ( uint32_t s = 0; s < size; s++ ) {
+
+				data::MemChunk<uint8_t> ch( size, size );
+				ch.setPropertyAs( "indexOrigin", util::fvector4( 0, -150 / 2, s * 110. / size - 100 / 2 ) ); //don't use s*100./size-100/2 because we want a small gap
+				ch.setPropertyAs<uint16_t>( "sequenceNumber", sequence );
+				ch.setPropertyAs( "performingPhysician", std::string( "Dr. Jon Doe" ) );
+				ch.setPropertyAs( "rowVec",    util::fvector4(  cos( M_PI / 8 ), -sin( M_PI / 8 ) ) ); //rotated by pi/8
+				ch.setPropertyAs( "columnVec", util::fvector4(  sin( M_PI / 8 ),  cos( M_PI / 8 ) ) ); // @todo also rotate the sliceVec
+				ch.setPropertyAs( "voxelSize", util::fvector4( 150. / size, 150. / size, 100. / size ) );
+				ch.setPropertyAs<uint16_t>( "repetitionTime", 1234 );
+				ch.setPropertyAs( "sequenceDescription", desc );
+
+				for ( int x = 10; x < 40; x++ )
+					for ( int y = 10; y < 40; y++ )
+						ch.voxel<uint8_t>( x, y ) = 255 - s * 20;
+
+				ch.voxel<uint8_t>( 0, 0 ) = t * 40;
+				ret.push_back( ch );
+			}
+		}
+
+		return ret;
+	}
 protected:
-	std::string suffixes()const {
+	std::string suffixes( io_modes /*modes=both*/ )const {
 		return std::string( ".null .null.gz" );
+	}
+	size_t getSize( const std::string &dialect ) {
+		size_t size = 10;
+
+		if( !dialect.empty() )
+			size = boost::lexical_cast<unsigned short>( dialect );
+
+		size = pow( size * 1024 * 1024 / timesteps, 1. / 3. ); //get qubic root for size volumes
+		return size;
 	}
 public:
 	std::string getName()const {
 		return "Null";
 	}
 	std::string dialects( const std::string &/*filename*/ )const {
-		return std::string( "memimage_50 memimage_500 memimage_1000 memimage_2000" );
+		return std::string( "50 500 1000 2000" );
 	}
 
-	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
-		if( dialect == "" ) {
-			//##################################################################################################
-			//## standard null image
-			//##################################################################################################
-			const size_t images = 5;
-			const size_t timesteps = 10;
+	int load ( std::list<data::Chunk> &chunks, const std::string &/*filename*/, const std::string &dialect )  throw( std::runtime_error & ) {
 
-			for ( uint32_t i = 0; i < timesteps; i++ ) {
-				for ( uint32_t c = 0; c < images; c++ ) {
+		size_t size = getSize( dialect );
 
-					data::MemChunk<uint8_t> ch( 50, 50, 50 );
-					ch.setPropertyAs( "indexOrigin", util::fvector4( 1, 2, 3 ) );
-					ch.setPropertyAs<uint32_t>( "acquisitionNumber", i );
-					ch.setPropertyAs<uint16_t>( "sequenceNumber", c );
-					ch.setPropertyAs( "performingPhysician", std::string( "Dr. Jon Doe" ) );
-					ch.setPropertyAs( "rowVec", util::fvector4(   ( float )1 / sqrtf( 2 ), ( float )1 / sqrtf( 2 ) ) ); //rotated by pi/4 (45°)
-					ch.setPropertyAs( "columnVec", util::fvector4( ( float ) - 1 / sqrtf( 2 ), ( float )1 / sqrtf( 2 ) ) );
-					ch.setPropertyAs( "sliceVec", util::fvector4( 0, 0, 1 ) );
-					ch.setPropertyAs( "voxelSize", util::fvector4( 1, 2, 3 ) );
-					ch.setPropertyAs( "repetitionTime", 1234 );
-					ch.setPropertyAs( "nullDescription", std::string( "The standard null image" ) );
+		// normal sequencial image
+		std::list<data::Chunk> ret = makeImage( size, 0, "normal sequencial Image" );
+		uint32_t s = 0;
+		BOOST_FOREACH( data::Chunk & ref, ret ) {
+			ref.setPropertyAs<uint32_t>( "acquisitionNumber", s++ );
+		}
+		chunks.insert( chunks.end(), ret.begin(), ret.end() );
 
-					for ( int x = 10; x < 40; x++ )
-						for ( int y = 10; y < 40; y++ )
-							for ( int z = 0; z < 40; z++ )
-								ch.voxel<uint8_t>( x, y, z ) = 255 - i * 20;
+		// interleaved image
+		ret = makeImage( size, 1, "interleaved Image" );
+		std::list< data::Chunk >::iterator ch = ret.begin();
 
-					ch.voxel<uint8_t>( 0, 0 ) = c * 40;
-					chunks.push_back( ch );
-				}
+		for ( uint32_t t = 0; t < timesteps; t++ ) {
+			//even numbers
+			for ( uint32_t s = 0; s < ( size / 2. ); s++ ) { //eg. size==5  2 < (5/2.) => 2 < 2.5 == true
+				( ch++ )->setPropertyAs<uint32_t>( "acquisitionNumber", s * 2 + t * size );
 			}
 
-			return timesteps * images;
-		} else if ( dialect.find( "memimage_" ) == 0 ) {
-			//##################################################################################################
-			//## variable image
-			//##################################################################################################
-			typedef uint8_t IMAGE_TYPE;
-			time_t secondsStart = std::time( NULL );
-			std::stringstream sizeInMBStream( dialect.substr( 9, dialect.size() ) );
-			size_t imageSizeMB;
-			sizeInMBStream >> imageSizeMB;
-			imageSizeMB *= ( 1024 * 1024 ) / sizeof( IMAGE_TYPE );
-			size_t imageSize = pow( imageSizeMB, 1.0 / 4.0 );
-			float voxelSize = 1.0;
-			data::MemChunk<uint8_t> ch ( imageSize, imageSize, imageSize, imageSize );
-			ch.setPropertyAs( "indexOrigin", util::fvector4() );
-			ch.setPropertyAs<uint32_t>( "acquisitionNumber", 1 );
-			ch.setPropertyAs<uint16_t>( "sequenceNumber", 1 );
-			ch.setPropertyAs( "rowVec", util::fvector4( 1, 0, 0 ) );
-			ch.setPropertyAs( "columnVec", util::fvector4( 0, 1, 0 ) );
-			ch.setPropertyAs( "sliceVec", util::fvector4( 0, 0, 1 )  );
-			ch.setPropertyAs( "voxelGap", util::fvector4() );
-			ch.setPropertyAs( "voxelSize", util::fvector4( voxelSize, voxelSize, voxelSize ) );
-			std::stringstream imageSizeMBExact;
-			imageSizeMBExact << ( float )( pow( imageSize, 4 ) * sizeof( IMAGE_TYPE ) ) / ( 1024 * 1024 ) << " mb";
-			ch.setPropertyAs( "imageSize", imageSizeMBExact.str() );
-			std::stringstream nullDescription;
-			nullDescription << "Image with image size " << imageSize << "x" << imageSize << "x" << imageSize << "x" << imageSize;
-			nullDescription << " and voxelSize " << voxelSize << "x" << voxelSize << "x" << voxelSize << "x" << voxelSize;
-			ch.setPropertyAs( "nullDescription", nullDescription.str() );
-			IMAGE_TYPE intensity;
-
-			for ( size_t x = 0; x < imageSize; x++ ) {
-				intensity = ( ( float )( std::numeric_limits<IMAGE_TYPE>::max() - std::numeric_limits<IMAGE_TYPE>::min() ) / imageSize ) * x;
-
-				for ( size_t y = 0; y < imageSize; y++ ) {
-					for ( size_t z = 0; z < imageSize; z++ ) {
-						for ( size_t t = 0; t < imageSize ; t++ ) {
-							ch.voxel<IMAGE_TYPE>( x, y, z, t ) = intensity;
-						}
-					}
-				}
+			//uneven numbers
+			for ( uint32_t s = 0; s < ( size / 2 ); s++ ) { //eg. size==5  2 < (5/2) => 2 < 2 == false
+				( ch++ )->setPropertyAs<uint32_t>( "acquisitionNumber", s * 2 + 1 + t * size );
 			}
-
-			ch.setPropertyAs<int64_t>( "timeUsedInS", std::time( NULL ) - secondsStart ) ;
-			chunks.push_back( ch );
-			return 1;
 		}
 
-		return 0;
+		assert( ch == ret.end() );
+		chunks.insert( chunks.end(), ret.begin(), ret.end() );
+
+		return timesteps * size;
 	}
 
-	void write( const data::Image &image, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
-		if ( image.getSizeAsVector() != util::fvector4( 50, 50, 50, 10 ) )
-			throw( std::runtime_error( "Size mismatch (" + image.getSizeAsString() + "!=" + boost::lexical_cast<std::string>( util::fvector4( 50, 50, 50, 10 ) ) + ")" ) );
+	void write( const data::Image &img, const std::string &/*filename*/, const std::string &/*dialect*/ )  throw( std::runtime_error & ) {
+		data::Image image = img;
 
-		const int snum = image.getPropertyAs<int32_t>( "sequenceNumber" );
+		// set by the core, thus the newChunks cannot have one
+		image.remove( "source" );
+		image.remove( "voxelGap" );
+		image.remove( "sliceVec" );
 
-		for ( int i = 0; i < 10; i++ )
-			if ( image.voxel<uint8_t>( 0, 0 ) != snum )
-				throw( std::runtime_error( "Data mismatch" ) );
+		size_t size = image.getSizeAsVector()[0];
+		std::list< data::Chunk > newChunks;
+		std::vector< data::Chunk > oldChunks = image.copyChunksToVector();
+		std::list< data::Chunk >::iterator iCh;
+		uint32_t s = 0;
+
+		switch( image.getPropertyAs<int>( "sequenceNumber" ) ) {
+		case 0: //image 0 is a "normal" image
+			newChunks = makeImage( size, 0, "normal sequencial Image" );
+			BOOST_FOREACH( data::Chunk & ref, newChunks ) {
+				ref.setPropertyAs<uint32_t>( "acquisitionNumber", s++ );
+			}
+			break;
+		case 1: //image 1 is a "interleaved" image
+			newChunks = makeImage( size, 1, "interleaved Image" );
+			iCh = newChunks.begin();
+
+			for ( uint32_t t = 0; t < timesteps; t++ ) {
+				//even numbers
+				for ( uint32_t s = 0; s < ( size / 2. ); s++ ) { //eg. size==5  2 < (5/2.) => 2 < 2.5 == true
+					( iCh++ )->setPropertyAs<uint32_t>( "acquisitionNumber", s * 2 + t * size );
+				}
+
+				//uneven numbers
+				for ( uint32_t s = 0; s < ( size / 2 ); s++ ) { //eg. size==5  2 < (5/2) => 2 < 2 == false
+					( iCh++ )->setPropertyAs<uint32_t>( "acquisitionNumber", s * 2 + 1 + t * size );
+				}
+			}
+
+			assert( iCh == newChunks.end() );
+			break;
+		default:
+			throwGenericError( "unknown Image" );
+		}
+
+		if( newChunks.size() != oldChunks.size() )
+			throwGenericError( "ammount of chunks differs" );
+
+		std::list< data::Chunk >::iterator newCH = newChunks.begin();
+
+		for( size_t i = 0; i < oldChunks.size(); ++i, ++newCH ) {
+			// check for the orientation seperately
+			if(
+				newCH->getPropertyAs<util::fvector4>( "columnVec" ).fuzzyEqual( oldChunks[i].getPropertyAs<util::fvector4>( "columnVec" ) ) == false ||
+				newCH->getPropertyAs<util::fvector4>( "rowVec" ).fuzzyEqual( oldChunks[i].getPropertyAs<util::fvector4>( "rowVec" ) ) == false
+			) {
+				throwGenericError( "orientation is not equal" );
+			} else {
+				newCH->remove( "rowVec" );
+				newCH->remove( "columnVec" );
+				oldChunks[i].remove( "rowVec" );
+				oldChunks[i].remove( "columnVec" );
+			}
+
+			util::PropertyMap::DiffMap metaDiff = newCH->getDifference( oldChunks[i] );
+
+			if( metaDiff.size() ) {
+				std::cerr << metaDiff << std::endl;
+				throwGenericError( "differences in the metainformation found" );
+			}
+
+			if( newCH->compare( oldChunks[i] ) ) {
+				throwGenericError( "voxels do not fit" );
+			}
+		}
 	}
 	bool tainted()const {return false;}//internal plugins are not tainted
 };

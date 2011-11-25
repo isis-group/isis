@@ -40,7 +40,7 @@ public:
 	typedef boost::shared_ptr< ::isis::image_io::FileFormat> FileFormatPtr;
 	typedef std::list<FileFormatPtr> FileFormatList;
 private:
-	util::ProgressFeedback *m_feedback;
+	boost::shared_ptr<util::ProgressFeedback> m_feedback;
 public:
 	/**
 	 * Load a data file with given filename and dialect.
@@ -61,13 +61,13 @@ public:
 	 */
 	static size_t load( std::list<data::Chunk> &chunks, const std::string &path, std::string suffix_override = "", std::string dialect = "" );
 
-	static bool write( const data::Image &image, const std::string &path, std::string suffix_override, const std::string &dialect );
-	static bool write( std::list<data::Image> images, const std::string &path, std::string suffix_override, const std::string &dialect );
+	static bool write( const data::Image &image, const std::string &path, std::string suffix_override = "", std::string dialect = "" );
+	static bool write( std::list<data::Image> images, const std::string &path, std::string suffix_override = "", std::string dialect = "" );
 
 	/// Get a list of all known file-formats (aka. io-plugins loaded)
 	static FileFormatList getFormats();
 
-	static void setProgressFeedback( util::ProgressFeedback *feedback );
+	static void setProgressFeedback( boost::shared_ptr<util::ProgressFeedback> feedback );
 
 	/**
 	 * Get all formats which should be able to read/write the given file.
@@ -85,8 +85,8 @@ public:
 	 */
 	static std::list<data::Image> chunkListToImageList( std::list<Chunk> &chunks );
 protected:
-	size_t loadFile( std::list<Chunk> &ret, const boost::filesystem::path &filename, std::string suffix_override, std::string dialect );
-	size_t loadPath( std::list<Chunk> &ret, const boost::filesystem::path &path, std::string suffix_override, std::string dialect );
+	size_t loadFile( std::list<Chunk> &ret, const boost::filesystem::path &filename, std::string suffix_override = "", std::string dialect = "" );
+	size_t loadPath( std::list<Chunk> &ret, const boost::filesystem::path &path, std::string suffix_override = "", std::string dialect = "" );
 
 	static IOFactory &get();
 	IOFactory();//shall not be created directly

@@ -30,11 +30,8 @@ namespace util
 /**
  * A very generic class to store values of properties.
  * PropertyValue may store a value of any type (defined in types.cpp) otherwise it's empty.
- * Empty ValueValues are never equal to anything (not even to empty ValueValues).
  * Non-empty ValueValues are equal-compareable.
- * They only store a value but no name, because they will get a name when they are stored (in PropertyMap).
- * IMPORTANT: for this class "not equal" (not ==) does NOT mean "unequal" (!=) in case of both ValueValues empty
- * see operators documentation below.
+ * But empty PropertyValues are neigther equal nor unequal to anything (not even to empty ValueValues).
  * @author Enrico Reimer
  */
 class PropertyValue: public ValueReference
@@ -59,9 +56,8 @@ public:
 	/**
 	 * Empty constructor.
 	 * Creates an empty property value. So PropertyValue().isEmpty() will allways be true.
-	 * \param _needed flag if this PropertyValue is needed an thus not allowed to be empty (a.k.a. undefined)
 	 */
-	PropertyValue( bool _needed = false );
+	PropertyValue();
 	/// returns true if PropertyValue is marked as needed, false otherwise
 	bool &needed();
 	///\copydoc needed
@@ -108,13 +104,17 @@ public:
 	template<typename T> bool operator ==( const T &second )const {
 		checkType<T>();
 
+		if( isEmpty() ) {
+			return false;
+		}
+
 		if ( get()->is<T>() ) { // If I'm of the same type as the comparator
 			const T &cmp = get()->castTo<T>();
 			return second == cmp; //compare our values
 		} else if ( ! isEmpty() ) { // otherwise try to make me T and compare that
 			LOG( Debug, info )
-					<< *this << " is not " << Value<T>::staticName() << " trying to convert.";
-			ValueReference dst = ( *this )->copyToNewByID( Value<T>::staticID );
+					<< *this << " is not " << Value<T>::staticName() << ", trying to convert.";
+			ValueReference dst = ( *this )->copyByID( Value<T>::staticID );
 
 			if ( !dst.isEmpty() )
 				return dst->castTo<T>() == second;

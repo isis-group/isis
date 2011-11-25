@@ -1,0 +1,3 @@
+[submodule "isisgroup"]
+	path = isisgroup
+	url = git@github.com:isis-group/isis.git

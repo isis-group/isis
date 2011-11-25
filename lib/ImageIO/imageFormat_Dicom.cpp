@@ -135,9 +135,15 @@ using boost::gregorian::date;
 const char ImageFormat_Dicom::dicomTagTreeName[] = "DICOM";
 const char ImageFormat_Dicom::unknownTagName[] = "Unknown Tag";
 
-std::string ImageFormat_Dicom::suffixes()const {return std::string( ".ima .dcm" );}
+std::string ImageFormat_Dicom::suffixes( io_modes modes )const
+{
+	if( modes == write_only )
+		return std::string();
+	else
+		return std::string( ".ima .dcm" );
+}
 std::string ImageFormat_Dicom::getName()const {return "Dicom";}
-std::string ImageFormat_Dicom::dialects( const std::string &/*filename*/ )const {return "withExtProtocols nomosaic";}
+std::string ImageFormat_Dicom::dialects( const std::string &/*filename*/ )const {return "withExtProtocols keepmosaic";}
 
 
 
@@ -176,11 +182,11 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 	}
 
 	transformOrTell<uint16_t>  ( prefix + "SeriesNumber",     "sequenceNumber",     object, warning );
-	transformOrTell<uint16_t>  ( prefix + "PatientsAge",     "subjectAge",     object, warning );
+	transformOrTell<uint16_t>  ( prefix + "PatientsAge",     "subjectAge",     object, info );
 	transformOrTell<std::string>( prefix + "SeriesDescription", "sequenceDescription", object, warning );
-	transformOrTell<std::string>( prefix + "PatientsName",     "subjectName",        object, warning );
+	transformOrTell<std::string>( prefix + "PatientsName",     "subjectName",        object, info );
 	transformOrTell<date>       ( prefix + "PatientsBirthDate", "subjectBirth",       object, info );
-	transformOrTell<uint16_t>  ( prefix + "PatientsWeight",   "subjectWeigth",      object, warning );
+	transformOrTell<uint16_t>  ( prefix + "PatientsWeight",   "subjectWeigth",      object, info );
 	// compute voxelSize and gap
 	{
 		util::fvector4 voxelSize( invalid_float, invalid_float, invalid_float, 0 );
@@ -199,7 +205,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 		object.setPropertyAs( "voxelSize", voxelSize );
 		transformOrTell<uint16_t>( prefix + "RepetitionTime", "repetitionTime", object, warning );
 		transformOrTell<float>( prefix + "EchoTime", "echoTime", object, warning );
-		transformOrTell<std::string>( prefix + "TransmitCoilName", "transmitCoil", object, warning );
+		transformOrTell<std::string>( prefix + "TransmitCoilName", "transmitCoil", object, info );
 		transformOrTell<int16_t>( prefix + "FlipAngle", "flipAngle", object, warning );
 
 		if ( hasOrTell( prefix + "SpacingBetweenSlices", object, info ) ) {
@@ -257,7 +263,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 
 	transformOrTell<uint32_t>( prefix + "InstanceNumber", "acquisitionNumber", object, error );
 
-	if ( hasOrTell( prefix + "PatientsSex", object, warning ) ) {
+	if ( hasOrTell( prefix + "PatientsSex", object, info ) ) {
 		util::Selection isisGender( "male,female,other" );
 		bool set = false;
 
@@ -487,8 +493,8 @@ int ImageFormat_Dicom::load( std::list<data::Chunk> &chunks, const std::string &
 		const util::slist iType = chunk.getPropertyAs<util::slist>( util::istring( ImageFormat_Dicom::dicomTagTreeName ) + "/" + "ImageType" );
 
 		if ( std::find( iType.begin(), iType.end(), "MOSAIC" ) != iType.end() ) { // if its a mosaic
-			if( dialect == "nomosaic" ) {
-				LOG( Runtime, info ) << "This seems to be an mosaic image, but dialect \"nomosaic\" was selected";
+			if( dialect == "keepmosaic" ) {
+				LOG( Runtime, info ) << "This seems to be an mosaic image, but dialect \"keepmosaic\" was selected";
 				chunks.push_back( chunk );
 				return 1;
 			} else {

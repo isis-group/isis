@@ -8,64 +8,38 @@
 #ifndef _PROPMAP_HPP_
 #define _PROPMAP_HPP_
 
+#include "_types.hpp"
+#include "common.hpp"
 #include "CoreUtils/propmap.hpp"
-using namespace isis::util;
+#include "boost/python.hpp"
+#include "_convertFromPython.hpp"
+#include "_convertToPython.hpp"
+#include "CoreUtils/singletons.hpp"
+
+
+using namespace boost::python;
 
 namespace isis
 {
 namespace python
 {
-
-
-// helper class PropertyMap
-class _PropertyMap : public PropertyMap, boost::python::wrapper< PropertyMap >
+namespace core
 {
-public:
-	_PropertyMap () : boost::python::wrapper< PropertyMap >() {}
-	_PropertyMap ( PyObject *p ) : self( p ), boost::python::wrapper< PropertyMap >() {}
-	_PropertyMap ( PyObject *p, const PropertyMap &base ) : PropertyMap( base ), self( p ), boost::python::wrapper< PropertyMap >() {}
 
-	isis::util::PropertyMap _branch ( const util::istring &key ) {
-		return this->branch( key );
-		return this->branch( key );
-	}
+namespace PropertyMap
+{
 
-	isis::util::PropertyValue _propertyValue( const util::istring &key ) {
-		return this->propertyValue( key );
-	}
+void _setPropertyAs( isis::util::PropertyMap &base, const std::string &key, api::object value, isis::python::core::types type );
+
+void _setProperty( isis::util::PropertyMap &base, const std::string &key, api::object value );
+
+api::object _getProperty( const isis::util::PropertyMap &base, const std::string &key );
 
 
-	void _setPropertyAs( istring key, PyObject *value, std::string type ) {
-		if( PyFloat_Check( value ) ) {
-			internSetProperty<float>( key, value, type );
-		} else if( PyBool_Check( value ) ) {
-			internSetProperty<bool>( key, value, type );
-		} else if( PyInt_Check( value ) ) {
-			internSetProperty<int64_t>( key, value, type );
-		} else if( PyString_Check( value ) ) {
-			internSetProperty<std::string>( key, value, type );
-		} else if ( boost::iequals( type, "ivector4" ) ) {
-			internSetProperty<isis::util::ivector4>( key, value, type );
-		} else if ( boost::iequals( type, "dvector4" ) ) {
-			internSetProperty<isis::util::dvector4>( key, value, type );
-		} else if ( boost::iequals( type, "fvector4" ) ) {
-			internSetProperty<isis::util::fvector4>( key, value, type );
-		} else if ( boost::iequals( type, "selection" ) ) {
-			internSetProperty<isis::util::Selection>( key, value, type );
-		} else {
-			LOG( Runtime, error ) << "Value " << type << " is not registered.";
-		}
-	}
+isis::util::PropertyMap _branch( const isis::util::PropertyMap &base, const std::string &key );
 
-private:
-	PyObject *self;
-	template<typename TYPE>
-	void internSetProperty ( const util::istring key, PyObject *value, std::string type ) {
-		util::Value<TYPE> val( static_cast<TYPE>( boost::python::extract<TYPE>( value ) ) );
-		val.copyToNewByID( util::getTransposedTypeMap( true, true )[type] );
-		this->setPropertyAs<TYPE>( key, val );
-	}
-};
+} // end namespace PropertyMap
+}
 }
 }
 #endif /* _PROPMAP_HPP_ */

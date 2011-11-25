@@ -35,7 +35,7 @@ class IOApplication: public util::Application
 	template< typename TYPE > std::list<data::TypedImage<TYPE> > convertTo( const std::list<data::Image> &src ) {
 		return std::list<data::TypedImage<TYPE> >( src.begin(), src.end() );
 	}
-	util::ConsoleFeedback feedback;
+	boost::shared_ptr<util::ConsoleFeedback> feedback;
 
 public:
 	std::list<data::Image> images;
@@ -68,6 +68,8 @@ public:
 	bool autoload( bool exitOnError = false );
 	bool autowrite( std::list<data::Image> out_images, bool exitOnError = false );
 	bool autowrite( Image out_image, bool exitOnError = false );
+protected:
+	virtual boost::shared_ptr<util::_internal::MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;
 };
 
 }
