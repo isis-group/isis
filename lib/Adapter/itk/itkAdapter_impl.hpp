@@ -34,7 +34,7 @@ template<typename TImage> typename TImage::Pointer
 itkAdapter::makeItkImageObject( const data::Image &src, const bool behaveAsItkReader )
 {
 	typedef TImage OutputImageType;
-	m_ImageISIS = boost::shared_ptr< data::Image >( new data::Image(src) );
+	m_ImageISIS = boost::shared_ptr< data::Image >( new data::Image( src ) );
 	m_TypeID = m_ImageISIS->getChunkAt( 0 ).getTypeID();
 
 	switch ( m_TypeID ) {
@@ -121,7 +121,7 @@ typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkRea
 	typename OutputImageType::DirectionType itkDirection;
 	typename OutputImageType::SizeType itkSize;
 	typename OutputImageType::RegionType itkRegion;
- //	util::DefaultMsgPrint::stopBelow( warning );
+	// util::DefaultMsgPrint::stopBelow( warning );
 	PropKeyListType propKeyList;
 	//itk::MetaDataDictionary myItkDict;
 	// since ITK uses a dialect of the Nifti image space, we need to transform
@@ -150,8 +150,11 @@ typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkRea
 	if( spacing[3] == 0 ) { spacing[3] = 1; }
 
 	const util::fvector4 readVec = m_ImageISIS->getPropertyAs<util::fvector4>( "rowVec" );
+
 	const util::fvector4 phaseVec = m_ImageISIS->getPropertyAs<util::fvector4>( "columnVec" );
+
 	const util::fvector4 sliceVec = m_ImageISIS->getPropertyAs<util::fvector4>( "sliceVec" );
+
 	//  std::cout << "indexOrigin: " << indexOrigin << std::endl;
 	//  std::cout << "readVec: " << readVec << std::endl;
 	//  std::cout << "phaseVec: " << phaseVec << std::endl;
@@ -207,7 +210,7 @@ typename TOutput::Pointer itkAdapter::internCreateItk( const bool behaveAsItkRea
 	BOOST_FOREACH(  std::vector<data::Chunk >::reference ref, chList ) {
 		data::Chunk &chRef = ref;
 		typename InputImageType::PixelType *target = refTarget + chunkIndex++ * chRef.getVolume();
-		chRef.getValuePtr<typename InputImageType::PixelType>().copyToMem( 0, ( chRef.getVolume() - 1 ), target );
+		chRef.getValuePtr<typename InputImageType::PixelType>().copyToMem( target,  chRef.getVolume() );
 		boost::shared_ptr<util::PropertyMap> tmpMap ( new util::PropertyMap ( static_cast<util::PropertyMap>( chRef ) ) );
 		m_ChunkPropertyMapVector.push_back( tmpMap );
 	}
@@ -230,10 +233,6 @@ template<typename TImageITK, typename TOutputISIS> std::list<data::Image> itkAda
 	typedef typename TImageITK::PixelType ITKRepn;
 	typedef TOutputISIS ISISRepn;
 
-	if ( TImageITK::ImageDimension < 4 ) {
-		imageSize[3] = 1;
-	}
-
 	if ( behaveAsItkWriter ) {
 		imageDirection[0][0] = -imageDirection[0][0];
 		imageDirection[0][1] = -imageDirection[0][1];
@@ -244,10 +243,11 @@ template<typename TImageITK, typename TOutputISIS> std::list<data::Image> itkAda
 		indexOrigin[0] = -indexOrigin[0];
 		indexOrigin[1] = -indexOrigin[1];
 	}
+
 	data::Chunk
-	tmpChunk ( data::MemChunk< ITKRepn >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) ) ;
+	tmpChunk ( data::MemChunk< ITKRepn >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], (TImageITK::ImageDimension == 4 ? imageSize[3] : 1) ) ) ;
 	//we have to convert the datatype of retChunk to the desired TOutputISIS type to avoid autoscaling
-    data::Chunk retChunk ( data::MemChunk<ISISRepn>( imageSize[0], imageSize[1], imageSize[2], (TImageITK::GetImageDimension()==4) ? imageSize[3] : 1 ) );
+	data::Chunk retChunk ( data::MemChunk<ISISRepn>( imageSize[0], imageSize[1], imageSize[2], (TImageITK::ImageDimension == 4 ? imageSize[3] : 1) ) );
 	const data::scaling_pair scale = tmpChunk.getScalingTo( data::ValuePtr<ISISRepn>::staticID, data::noscale );
 	//
 	data::numeric_convert<ITKRepn, ISISRepn>(
@@ -263,25 +263,18 @@ template<typename TImageITK, typename TOutputISIS> std::list<data::Image> itkAda
 	if ( !retChunk.hasProperty( "acqisitionNumber" ) )
 		retChunk.setPropertyAs( "acquisitionNumber", static_cast<u_int32_t>( 1 ) );
 
-	retChunk.setPropertyAs( "indexOrigin", util::fvector4( indexOrigin[0], indexOrigin[1], indexOrigin[2], indexOrigin[3] ) );
-	retChunk.setPropertyAs( "rowVec", util::fvector4( imageDirection[0][0], imageDirection[1][0], imageDirection[2][0], 0 ) );
-	retChunk.setPropertyAs( "columnVec", util::fvector4( imageDirection[0][1], imageDirection[1][1], imageDirection[2][1], 0 ) );
-	retChunk.setPropertyAs( "sliceVec", util::fvector4( imageDirection[0][2], imageDirection[1][2], imageDirection[2][2], 0 ) );
-	retChunk.setPropertyAs( "voxelSize", util::fvector4( imageSpacing[0], imageSpacing[1], imageSpacing[2], imageSpacing[3] ) );
-
-    //do not try to grasp that in a sober state!!
+	//do not try to grasp that in a sober state!!
 	//workaround to create a TypedImage out of a MemChunk
-	std::list<data::Chunk> tmpChList = std::list<data::Chunk>(1,retChunk);
-	std::list<data::Image> isisImageList = data::IOFactory::chunkListToImageList(tmpChList);
-	data::TypedImage< TOutputISIS >  retImage (isisImageList.front());
-    std::cout << retImage << std::endl;
+	std::list<data::Chunk> tmpChList = std::list<data::Chunk>( 1, retChunk );
+	std::list<data::Image> isisImageList = data::IOFactory::chunkListToImageList( tmpChList );
+	data::TypedImage< TOutputISIS >  retImage ( data::TypedImage<TOutputISIS> ( isisImageList.front() ) );
 	//these are properties eventually manipulated by itk. So we can not take the
 	//parameters from the isis image which was handed over to the itkAdapter
-//	retImage.setPropertyAs( "indexOrigin", util::fvector4( indexOrigin[0], indexOrigin[1], indexOrigin[2], indexOrigin[3] ) );
-//	retImage.setPropertyAs( "rowVec", util::fvector4( imageDirection[0][0], imageDirection[1][0], imageDirection[2][0], 0 ) );
-//	retImage.setPropertyAs( "columnVec", util::fvector4( imageDirection[0][1], imageDirection[1][1], imageDirection[2][1], 0 ) );
-//	retImage.setPropertyAs( "sliceVec", util::fvector4( imageDirection[0][2], imageDirection[1][2], imageDirection[2][2], 0 ) );
-//	retImage.setPropertyAs( "voxelSize", util::fvector4( imageSpacing[0], imageSpacing[1], imageSpacing[2], imageSpacing[3] ) );
+	retImage.setPropertyAs( "indexOrigin", util::fvector4( indexOrigin[0], indexOrigin[1], indexOrigin[2], indexOrigin[3] ) );
+	retImage.setPropertyAs( "rowVec", util::fvector4( imageDirection[0][0], imageDirection[1][0], imageDirection[2][0], 0 ) );
+	retImage.setPropertyAs( "columnVec", util::fvector4( imageDirection[0][1], imageDirection[1][1], imageDirection[2][1], 0 ) );
+	retImage.setPropertyAs( "sliceVec", util::fvector4( imageDirection[0][2], imageDirection[1][2], imageDirection[2][2], 0 ) );
+	retImage.setPropertyAs( "voxelSize", util::fvector4( imageSpacing[0], imageSpacing[1], imageSpacing[2], imageSpacing[3] ) );
 	//this will splice down the image the same way it was handed over to the itkAdapter
 	retImage.spliceDownTo( static_cast<data::dimensions> ( m_RelevantDim ) );
 
@@ -296,14 +289,12 @@ template<typename TImageITK, typename TOutputISIS> std::list<data::Image> itkAda
 		//the size of the m_ChunkPropertyMapVector the size of the image was changed in itk.
 		//Thus we have to interpolate the parameters (sliceTime so far)
 		chRef.join( static_cast<util::PropertyMap &>( retImage ), false );
-        
-        if (!m_ChunkPropertyMapVector.empty()) {
-            chRef.join( *m_ChunkPropertyMapVector[chunkCounter], false );
-        }
 
 		if( chunkCounter < ( m_ChunkPropertyMapVector.size() - 1 ) ) {
 			chunkCounter++;
-        }
+		}
+
+		chRef.join( *m_ChunkPropertyMapVector[chunkCounter], false );
 	}
 	std::list<data::Image> retList;
 	retList.push_back( retImage );
