@@ -21,7 +21,7 @@ Description: The ISIS package provides a general I/O framework for neuroimaging
 Package: libisiscore0-dev
 Section: science
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (>= 0.4.1), libboost-filesystem-dev | libboost-filesystem1.35-dev, libboost-regex-dev | libboost-regex1.35-dev, libboost-date-time-dev | libboost-date-time1.35-dev, libboost-system-dev| libboost-system1.35-dev, libboost-iostreams-dev | libboost-iostreams1.35-dev
+Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (>= 0.4.1), libboost-filesystem1.35-dev | libboost-filesystem-dev, libboost-regex1.35-dev | libboost-regex-dev, libboost-date-time1.35-dev | libboost-date-time-dev, libboost-system1.35-dev | libboost-system-dev, libboost-iostreams1.35-dev | libboost-iostreams-dev 
 Description: The ISIS package provides a general I/O framework for neuroimaging
  data.  Being started with fMRI data, it can handle several established data
  formats, like Nifti, Analyze, DICOM and vista. A first application based on this
