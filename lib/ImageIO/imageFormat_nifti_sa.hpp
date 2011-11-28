@@ -69,8 +69,8 @@ namespace _internal
 
 //define the nifti-header (brazenly stolen from nifti1.h)
 struct nifti_1_header {
-	                     /* NIFTI-1 usage         */    /* ANALYZE 7.5 field(s) */
-                                                        /*--- was header_key substruct ---*/
+	/* NIFTI-1 usage         */    /* ANALYZE 7.5 field(s) */
+	/*--- was header_key substruct ---*/
 	int   sizeof_hdr;    /*!< MUST be 348           */  /* int sizeof_hdr;      */
 	char  data_type[10]; /*!< ++UNUSED++            */  /* char data_type[10];  */
 	char  db_name[18];   /*!< ++UNUSED++            */  /* char db_name[18];    */
@@ -79,14 +79,14 @@ struct nifti_1_header {
 	char  regular;       /*!< ++UNUSED++            */  /* char regular;        */
 	char  dim_info;      /*!< MRI slice ordering.   */  /* char hkey_un0;       */
 
-										/*--- was image_dimension substruct ---*/
+	/*--- was image_dimension substruct ---*/
 	short dim[8];        /*!< Data array dimensions.*/  /* short dim[8];        */
 	float intent_p1 ;    /*!< 1st intent parameter. */  /* short unused8;       */
-														/* short unused9;       */
+	/* short unused9;       */
 	float intent_p2 ;    /*!< 2nd intent parameter. */  /* short unused10;      */
-														/* short unused11;      */
+	/* short unused11;      */
 	float intent_p3 ;    /*!< 3rd intent parameter. */  /* short unused12;      */
-														/* short unused13;      */
+	/* short unused13;      */
 	short intent_code ;  /*!< NIFTI_INTENT_* code.  */  /* short unused14;      */
 	short datatype;      /*!< Defines data type!    */  /* short datatype;      */
 	short bitpix;        /*!< Number bits/voxel.    */  /* short bitpix;        */
@@ -105,13 +105,13 @@ struct nifti_1_header {
 	int   glmax;         /*!< ++UNUSED++            */  /* int glmax;           */
 	int   glmin;         /*!< ++UNUSED++            */  /* int glmin;           */
 
-											/*--- was data_history substruct ---*/
+	/*--- was data_history substruct ---*/
 	char  descrip[80];   /*!< any text you like.    */  /* char descrip[80];    */
 	char  aux_file[24];  /*!< auxiliary filename.   */  /* char aux_file[24];   */
 
 	short qform_code ;   /*!< NIFTI_XFORM_* code.   */  /*-- all ANALYZE 7.5 ---*/
 	short sform_code ;   /*!< NIFTI_XFORM_* code.   */  /*   fields below here  */
-														/*   are replaced       */
+	/*   are replaced       */
 	float quatern_b ;    /*!< Quaternion b param.   */
 	float quatern_c ;    /*!< Quaternion c param.   */
 	float quatern_d ;    /*!< Quaternion d param.   */
@@ -138,25 +138,25 @@ class ImageFormat_NiftiSa: public FileFormat
 	static const util::Selection formCode;
 
 	/// get the tranformation matrix from image space to Nifti space using row-,column and sliceVec from the given PropertyMap
-	static util::Matrix4x4<double> getNiftiMatrix(const util::PropertyMap &props);
-	static void useSForm(util::PropertyMap &props);
-	static void useQForm(util::PropertyMap &props);
-	static bool storeQForm(const util::PropertyMap &props,_internal::nifti_1_header *head);
-	static void storeSForm(const util::PropertyMap &props,_internal::nifti_1_header *head);
-	std::map<short,unsigned short> nifti_type2isis_type;
-	std::map<unsigned short,short> isis_type2nifti_type;
-	template<typename T> static unsigned short typeFallBack(){
+	static util::Matrix4x4<double> getNiftiMatrix( const util::PropertyMap &props );
+	static void useSForm( util::PropertyMap &props );
+	static void useQForm( util::PropertyMap &props );
+	static bool storeQForm( const util::PropertyMap &props, _internal::nifti_1_header *head );
+	static void storeSForm( const util::PropertyMap &props, _internal::nifti_1_header *head );
+	std::map<short, unsigned short> nifti_type2isis_type;
+	std::map<unsigned short, short> isis_type2nifti_type;
+	template<typename T> static unsigned short typeFallBack() {
 		typedef typename boost::make_signed<T>::type NEW_T;
-		LOG(Runtime,info) << data::ValuePtr<T>::staticName() <<  " is not supported by fsl falling back to " << data::ValuePtr<NEW_T>::staticName();
+		LOG( Runtime, info ) << data::ValuePtr<T>::staticName() <<  " is not supported by fsl falling back to " << data::ValuePtr<NEW_T>::staticName();
 		return data::ValuePtr<NEW_T>::staticID;
 	}
-	static void guessSliceOrdering(const data::Image img,char &slice_code, float &slice_duration);
-	static std::list<data::Chunk> parseSliceOrdering(const _internal::nifti_1_header* head, data::Chunk current);
+	static void guessSliceOrdering( const data::Image img, char &slice_code, float &slice_duration );
+	static std::list<data::Chunk> parseSliceOrdering( const _internal::nifti_1_header *head, data::Chunk current );
 
-	static bool parseDescripForSPM(util::PropertyMap &props, const char desc[]);
-	static void storeDescripForSPM(const isis::util::PropertyMap& props, char desc[]);
-	static void storeHeader(const util::PropertyMap &props,_internal::nifti_1_header *head);
-	static std::list<data::Chunk> parseHeader(const _internal::nifti_1_header *head,data::Chunk props);
+	static bool parseDescripForSPM( util::PropertyMap &props, const char desc[] );
+	static void storeDescripForSPM( const isis::util::PropertyMap &props, char desc[] );
+	static void storeHeader( const util::PropertyMap &props, _internal::nifti_1_header *head );
+	static std::list<data::Chunk> parseHeader( const _internal::nifti_1_header *head, data::Chunk props );
 public:
 	ImageFormat_NiftiSa();
 	std::string getName()const;
@@ -166,9 +166,10 @@ public:
 	std::string dialects( const std::string &/*filename*/ )const {return std::string( "fsl spm" );}
 
 protected:
-	std::string suffixes(io_modes mode=both)const;
+	std::string suffixes( io_modes mode = both )const;
 };
 
 
-}}
+}
+}
 #endif // IMAGEFORMAT_NIFTI_SA_HPP

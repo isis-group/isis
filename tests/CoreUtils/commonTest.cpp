@@ -13,15 +13,15 @@ namespace test
 BOOST_AUTO_TEST_CASE( fuzzy_equal_test )
 {
 	float a0 = 1;
-	float b0 = 1+std::numeric_limits< float >::epsilon();
-	float a1 = 1-std::numeric_limits< float >::epsilon();
+	float b0 = 1 + std::numeric_limits< float >::epsilon();
+	float a1 = 1 - std::numeric_limits< float >::epsilon();
 	float b1 = 1;
 	float a2 = 1;
-	float b2 = 1+std::numeric_limits< float >::epsilon()*2;
+	float b2 = 1 + std::numeric_limits< float >::epsilon() * 2;
 	double a3 = 1;
-	double b3 = 1+std::numeric_limits< float >::epsilon();
+	double b3 = 1 + std::numeric_limits< float >::epsilon();
 	double a4 = 1;
-	double b4 = 1+std::numeric_limits< double >::epsilon();
+	double b4 = 1 + std::numeric_limits< double >::epsilon();
 
 	BOOST_CHECK( util::fuzzyEqual( a0, b0, 1 ) ); // distance of epsilon is considered equal with scaling of "1"
 	BOOST_CHECK( util::fuzzyEqual( a1, b1, 1 ) ); // distance of epsilon is considered equal with scaling of "1"
