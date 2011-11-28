@@ -94,78 +94,59 @@ std::string FileFormat::makeFilename( const util::PropertyMap &props, std::strin
 {
     boost::regex reg( "\\{[^{}]+\\}" );
     boost::regex regFormatInt( "%d_" ); // add leading zeros to int values - always as much as possible
-    //NOTE: can also be done for rounding floats, but at the moment not required and that for not done right now
+    //NOTE: can also be done for rounding floats, but at the moment not required so not done right now
     
     boost::match_results<std::string::iterator> what;
     std::string::iterator pos = namePattern.begin();
-    bool isFormatUsed = false;
+    
     
     while( boost::regex_search( pos, namePattern.end() , what, reg ) ) {
-        
+
+        bool isFormatUsed = false;
         boost::cmatch m;
-        LOG(Debug, info) << "Will regex matchen." << namePattern;
-  //      LOG(Debug, info) << "size regFormatFloat " << regFormatFloat.size();
         size_t mSize = 1;
         
         if (boost::regex_match( what[0].str().substr(1, regFormatInt.size() ).c_str(), m, regFormatInt) ) {
-            LOG(Runtime, error) << what[0].str().substr(1,3).c_str();
-            LOG(Runtime, error) << m[0].str().c_str();
             mSize += regFormatInt.size();
             isFormatUsed = true;
-            LOG(Debug, info) << "mSize " << mSize;
         }
         
         util::PropertyMap::KeyType prop( what[0].str().substr( mSize, what.length() - 1 - mSize ).c_str() );
         const std::string::iterator start = what[0].first, end = what[0].second;
         
         if( props.hasProperty( prop ) ) {
-            
             std::string pstring;
-            //#####
             if (true == isFormatUsed){
-                size_t overallDigits = 10;
+                size_t overallDigits = 0;
                 unsigned short tID = (*props.propertyValue(prop)).getTypeID();
                 switch (tID = (*props.propertyValue(prop)).getTypeID()) {
                     case util::Value<uint8_t>::staticID:
-                        overallDigits = std::numeric_limits<uint8_t>::digits;
-                        LOG(Debug, info) << "overallDigits u8" << overallDigits;
+                        overallDigits = ceil( log10(std::numeric_limits<uint8_t>::max()) );
                         break;
                     case util::Value<int8_t>::staticID:
-                        overallDigits = std::numeric_limits<int8_t>::digits;
-                        LOG(Debug, info) << "overallDigits 8" << overallDigits;
+                        overallDigits = ceil( log10(std::numeric_limits<int8_t>::max()) );
                         break;
                     case util::Value<uint16_t>::staticID:
-                        overallDigits = std::numeric_limits<uint16_t>::digits;
-                        LOG(Debug, info) << "overallDigits u16" << overallDigits;
+                        overallDigits = ceil( log10(std::numeric_limits<uint16_t>::max()) );
                         break;
                     case util::Value<int16_t>::staticID:
-                        overallDigits = std::numeric_limits<int16_t>::digits;
-                        LOG(Debug, info) << "overallDigits 16" << overallDigits;
+                        overallDigits = ceil( log10(std::numeric_limits<int16_t>::max()) );
                         break;
                     case util::Value<uint32_t>::staticID:
-                        overallDigits =(std::numeric_limits<uint32_t>::digits10);
-                        LOG(Debug, info) << "overallDigits u32 " << overallDigits;
-                        LOG(Debug, info) << "sizeof u32 " << sizeof(uint32_t);
-                        //LOG(Debug, info) << "max u32 " << std::string(std::numeric_limits<uint32_t>::max()).length();
+                        overallDigits =ceil( log10(std::numeric_limits<uint32_t>::max()) );
                         break;
                     case util::Value<int32_t>::staticID:
-                        overallDigits = std::numeric_limits<int32_t>::digits;
-                        LOG(Debug, info) << "overallDigits 32" << overallDigits;
+                        overallDigits = ceil( log10(std::numeric_limits<int32_t>::max()) );
                         break;
                     default:
-                        LOG(Debug, info) << "default: " ;
                         break;
                 }
-                LOG(Debug, info) << "overallDigits " << overallDigits;
-                //overallDigits = 6;
                 pstring =  boost::regex_replace( props.getPropertyAs<std::string>( prop ), boost::regex( "[[:space:]/\\\\]" ), "_" );
-                size_t zerosToFill = overallDigits - pstring.length();
-                pstring.insert(0, zerosToFill, '0');
-                LOG(Debug, info) << "pString  " << pstring;
-
+                if (0 < overallDigits){
+                    size_t zerosToFill = overallDigits - pstring.length();
+                    pstring.insert(0, zerosToFill, '0');}
             }
             else{
-            //#####
                 pstring =  boost::regex_replace( props.getPropertyAs<std::string>( prop ), boost::regex( "[[:space:]/\\\\]" ), "_" );
             }
             const size_t dist = start - namePattern.begin();
