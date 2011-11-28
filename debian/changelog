@@ -1,3 +1,9 @@
+isis (0.4.1ge179836-2) stable; urgency=low
+
+  * add missing install file for isisio0-raw
+
+ -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Thu, 28 Nov 2011 14:48:00 +0200
+
 isis (0.4.1ge179836-1) stable; urgency=low
 
   * fixed dependencies for lenny package (libboost)  
