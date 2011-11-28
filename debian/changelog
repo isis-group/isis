@@ -1,3 +1,10 @@
+isis (0.4.1g9140af9-0) stable; urgency=low
+	
+  * add new nifti standalone plugins
+  * add first version of isis python bridge
+
+ -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Thu, 28 Nov 2011  12:48:00 +0200
+
 isis (0.4.0g9140af9-0) stable; urgency=low
 
   * add first version for python support
