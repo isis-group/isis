@@ -107,7 +107,7 @@ FilePtr::FilePtr( const boost::filesystem::path &filename, size_t len, bool writ
 	const int oflag = write ?
 					  O_CREAT | O_RDWR : //create file if its not there
 					  O_RDONLY; //open file readonly
-	const int file = open( filename.file_string().c_str(), oflag, S_IRUSR | S_IWUSR );
+	const int file = open( filename.file_string().c_str(), oflag, 0666 );
 
 	if( file == -1 ) {
 		LOG( Runtime, error ) << "Failed to open " << util::MSubject( filename )
