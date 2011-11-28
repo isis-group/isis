@@ -445,6 +445,7 @@ private:
 				chunk.setPropertyAs<util::fvector4>( "columnVec", util::fvector4( 0, 1, 0, 0 ) );
 				chunk.setPropertyAs<util::fvector4>( "sliceVec", util::fvector4( 0, 0, 1, 0 ) );
 			}
+
 			// set voxel gap tp (0,0,0,0) since there is no gap information available
 			// in vista images.
 			chunk.setPropertyAs<util::fvector4>( "voxelGap", util::fvector4( 0, 0, 0, 0 ) );
