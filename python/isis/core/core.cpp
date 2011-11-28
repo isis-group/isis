@@ -22,6 +22,7 @@ BOOST_PYTHON_MODULE( _core )
 	//#######################################################################################
 	//  Application
 	//#######################################################################################
+	using namespace isis::python::core::Application;
 	class_<isis::util::Application>( "Application", init<const char *>() )
 	//virtual void printHelp()const;
 	.def( "printHelp", &isis::util::Application::printHelp )
@@ -29,27 +30,28 @@ BOOST_PYTHON_MODULE( _core )
 	.def( "getCoreVersion", &isis::util::Application::getCoreVersion )
 	.staticmethod( "getCoreVersion" )
 	//virtual bool init( int argc, char **argv, bool exitOnError = true );
-	.def( "init", &isis::python::core::Application::_init )
-	.def( "addParameter", &isis::python::core::Application::_addParameter )
-	.def( "getParameter", &isis::python::core::Application::_getParameter )
-	.def( "setNeeded", &isis::python::core::Application::_setNeeded )
-	.def( "setHidden", &isis::python::core::Application::_setHidden )
-	.def( "setDescription", &isis::python::core::Application::_setDescription )
+	.def( "init", &_init )
+	.def( "addParameter", &_addParameter )
+	.def( "getParameter", &_getParameter )
+	.def( "setNeeded", &_setNeeded )
+	.def( "setHidden", &_setHidden )
+	.def( "setDescription", &_setDescription )
 	;
 	//#######################################################################################
 	//  PropertyMap
 	//#######################################################################################
+	using namespace isis::python::core::PropertyMap;
 	class_<isis::util::PropertyMap>( "PropertyMap", init<>() )
 	.def( "hasProperty", &isis::util::PropertyMap::hasProperty )
 	.def( "hasBranch", &isis::util::PropertyMap::hasBranch )
-	.def( "getBranch", &isis::python::core::PropertyMap::_branch )
+	.def( "getBranch", &_branch )
 	.def( "remove", ( bool ( ::isis::util::PropertyMap:: * )( const isis::util::istring & ) ) ( &isis::util::PropertyMap::remove ), ( arg( "key" ) ) )
 	.def( "remove", ( bool ( ::isis::util::PropertyMap:: * )( const isis::util::PropertyMap &, bool ) ) ( &isis::util::PropertyMap::remove ), ( arg( "removeMap" ), arg( "keep_needed" ) ) )
 	.def( "isValid", &isis::util::PropertyMap::isValid )
 	.def( "isEmpty", &isis::util::PropertyMap::isEmpty )
-	.def( "setProperty", &isis::python::core::PropertyMap::_setProperty )
-	.def( "getProperty", &isis::python::core::PropertyMap::_getProperty )
-	.def( "setPropertyAs", &isis::python::core::PropertyMap::_setPropertyAs )
+	.def( "setProperty", &_setProperty )
+	.def( "getProperty", &_getProperty )
+	.def( "setPropertyAs", &_setPropertyAs )
 	;
 	//#######################################################################################
 	//  Selection
