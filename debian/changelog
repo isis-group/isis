@@ -1,9 +1,9 @@
-isis (0.4.1g9140af9-0) stable; urgency=low
-	
+isis (0.4.1ge179836-0) stable; urgency=low
+
   * add new nifti standalone plugins
   * add first version of isis python bridge
 
- -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Thu, 28 Nov 2011  12:48:00 +0200
+ -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Thu, 28 Nov 2011 14:48:00 +0200
 
 isis (0.4.0g9140af9-0) stable; urgency=low
 
@@ -42,7 +42,7 @@ isis (0.4.0g9140af9-0) stable; urgency=low
   * add qdefaultmessageprint class to qt4 adapter
   * add rdialect onlyfirst to vistaio. This is needed by the viewer to only load the first image in zmaps
 
- -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Thu, 10 Nov 2011  12:48:00 +0200
+ -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Thu, 10 Nov 2011 12:48:00 +0200
 
 
 isis (0.3.4g5ae6013-0) stable; urgency=low
