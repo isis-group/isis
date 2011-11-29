@@ -20,6 +20,7 @@ DEB_CMAKE_EXTRA_FLAGS = \
 	-DISIS_QT4:BOOL=ON \
 	-DISIS_ITK:BOOL=ON \
 	-DISIS_BUILD_PYTHON_EXT:BOOL=ON \
+	-DISIS_USE_LIBOIL:BOOL=ON \
 	-DQT_QMAKE_EXECUTABLE=/usr/bin/qmake-qt4 \
 	-DLIB_DCMDATA=/usr/lib/libdcmdata.a \
 	-DLIB_DCMIMAGE=/usr/lib/libdcmimage.a \
