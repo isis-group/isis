@@ -68,11 +68,11 @@ BOOST_AUTO_TEST_CASE( loadsaveImage )
 			nullChunks[i].remove( "indexOrigin" );
 
 			// nifti cannot store sequenceNumber - so its allways "0"
-			niiChunks[i].remove("sequenceNumber");
-			nullChunks[i].remove("sequenceNumber");
+			niiChunks[i].remove( "sequenceNumber" );
+			nullChunks[i].remove( "sequenceNumber" );
 
 			// because of the quaternions we get some rounding errors in rowVec and columnVec
-			const char *fuzzies[]={"rowVec","columnVec","voxelSize"};
+			const char *fuzzies[] = {"rowVec", "columnVec", "voxelSize"};
 			BOOST_FOREACH( const char * fuzz, fuzzies ) {
 				const util::fvector4 niiVec = niiChunks[i].getPropertyAs<util::fvector4>( fuzz );
 				const util::fvector4 nullVec = nullChunks[i].getPropertyAs<util::fvector4>( fuzz );

@@ -372,12 +372,13 @@ public:
 };
 }
 }
-namespace std{
+namespace std
+{
 /// Streaming output for Chunk (forward to PropertyMap)
 template<typename charT, typename traits>
 basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::data::Chunk &s )
 {
-	return out << static_cast<const isis::util::PropertyMap&>(s);
+	return out << static_cast<const isis::util::PropertyMap &>( s );
 }
 }
 #endif // CHUNK_H
