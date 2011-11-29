@@ -373,7 +373,7 @@ public:
 }
 }
 namespace std{
-/// Streaming output for Chunk (forward to PropMap)
+/// Streaming output for Chunk (forward to PropertyMap)
 template<typename charT, typename traits>
 basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::data::Chunk &s )
 {
