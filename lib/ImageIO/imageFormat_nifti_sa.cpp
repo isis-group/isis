@@ -3,6 +3,7 @@
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/type_traits/make_signed.hpp>
 #include "imageFormat_nifti_sa.hpp"
+#include <errno.h>
 
 
 namespace isis
@@ -352,6 +353,14 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 {
 	data::FilePtr mfile( filename );
 
+	if( !mfile.good() ) {
+		if( errno ) {
+			throwSystemError( errno, filename + " could not be opened" );
+			errno = 0;
+		} else
+			throwGenericError( filename + " could not be opened" );
+	}
+
 	//get the header - we use it directly from the file
 	const _internal::nifti_1_header *header = reinterpret_cast<const _internal::nifti_1_header *>( &mfile[0] );
 
@@ -378,7 +387,7 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 
 void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & )
 {
-	class CopyOp: public data::ChunkOp
+	class CommonCopyOp: public data::ChunkOp
 	{
 		data::Image m_image;
 		data::FilePtr &m_out;
@@ -388,7 +397,7 @@ void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &fi
 		const bool m_doFlip;
 		data::dimensions flip_dim;
 	public:
-		CopyOp( const data::Image &image, data::FilePtr &out, size_t voxelstart, bool doFlip ):
+		CommonCopyOp( const data::Image &image, data::FilePtr &out, size_t voxelstart, bool doFlip ):
 			m_image( image ), m_out( out ), m_ID( image.getMajorTypeID() ), m_bytesPerPixel( image.getBytesPerVoxel() ), m_voxelstart( voxelstart ),
 			m_scale( image.getScalingTo( m_ID ) ), m_doFlip( doFlip ) {
 			if( doFlip )
@@ -433,6 +442,15 @@ void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &fi
 		// open/map the new file
 		data::FilePtr out( filename, voxel_offset + datasize, true );
 
+		if( !out.good() ) {
+			if( errno ) {
+				throwSystemError( errno, filename + " could not be opened" );
+				errno = 0;
+			} else
+				throwGenericError( filename + " could not be opened" );
+		}
+
+
 		// get the first 348 bytes as header
 		_internal::nifti_1_header *header = reinterpret_cast<_internal::nifti_1_header *>( &out[0] );
 		memset( header, 0, sizeof( _internal::nifti_1_header ) );
@@ -464,7 +482,7 @@ void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &fi
 		}
 
 		// copy the data
-		CopyOp do_copy( image, out, header->vox_offset, ( util::istring( dialect.c_str() ) == "spm" ) ); // we have to flip the copied data for the spm dialect
+		CommonCopyOp do_copy( image, out, header->vox_offset, ( util::istring( dialect.c_str() ) == "spm" ) ); // we have to flip the copied data for the spm dialect
 		const_cast<data::Image &>( image ).foreachChunk( do_copy ); // @todo we _do_ need a const version of foreachChunk/Voxel
 	} else {
 		LOG( Runtime, error ) << "Sorry, the datatype " << util::MSubject( image.getMajorTypeName() ) << " is not supportet for nifti output";
