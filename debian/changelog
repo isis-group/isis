@@ -1,21 +1,28 @@
+isis (0.4.1ge179836-3) stable; urgency=low
+
+  * add isisio0-common package
+  * all packages are EXACTLY dependet from 0.4.1
+
+ -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Tue, 29 Nov 2011 14:28:00 +0200
+
 isis (0.4.1ge179836-2) stable; urgency=low
 
   * add missing install file for isisio0-raw
 
- -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Thu, 28 Nov 2011 14:48:00 +0200
+ -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Mon, 28 Nov 2011 14:48:00 +0200
 
 isis (0.4.1ge179836-1) stable; urgency=low
 
   * fixed dependencies for lenny package (libboost)  
 
- -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Thu, 28 Nov 2011 14:48:00 +0200
+ -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Mon, 28 Nov 2011 14:48:00 +0200
 
 isis (0.4.1ge179836-0) stable; urgency=low
 
   * add new nifti standalone plugins
   * add first version of isis python bridge
 
- -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Thu, 28 Nov 2011 14:48:00 +0200
+ -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Mon, 28 Nov 2011 14:48:00 +0200
 
 isis (0.4.0g9140af9-0) stable; urgency=low
 
