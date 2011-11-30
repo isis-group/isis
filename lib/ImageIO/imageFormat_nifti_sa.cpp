@@ -26,6 +26,11 @@ ImageFormat_NiftiSa::ImageFormat_NiftiSa()
 	nifti_type2isis_type[NIFTI_TYPE_FLOAT32] = data::ValuePtr<float>::staticID;
 	nifti_type2isis_type[NIFTI_TYPE_FLOAT64] = data::ValuePtr<double>::staticID;
 
+	nifti_type2isis_type[NIFTI_TYPE_RGB24] = data::ValuePtr<util::color24>::staticID;
+
+	nifti_type2isis_type[NIFTI_TYPE_COMPLEX64] = data::ValuePtr<std::complex<float> >::staticID;
+	nifti_type2isis_type[NIFTI_TYPE_COMPLEX128] = data::ValuePtr<std::complex<double> >::staticID;
+
 	typedef std::map<short, unsigned short>::const_reference ref_type;
 	BOOST_FOREACH( ref_type ref, nifti_type2isis_type ) {
 		isis_type2nifti_type[ref.second] = ref.first;
