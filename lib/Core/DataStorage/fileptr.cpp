@@ -101,6 +101,8 @@ size_t FilePtr::checkSize( bool write, int file, const boost::filesystem::path &
 	}
 }
 
+FilePtr::FilePtr():m_good(false){}
+
 
 FilePtr::FilePtr( const boost::filesystem::path &filename, size_t len, bool write ): m_good( false )
 {
@@ -125,7 +127,7 @@ FilePtr::FilePtr( const boost::filesystem::path &filename, size_t len, bool writ
 
 bool FilePtr::good() {return m_good;}
 
-void FilePtr::close()
+void FilePtr::release()
 {
 	static_cast<boost::shared_ptr<uint8_t>&>( *this ).reset();
 	m_good = false;
@@ -133,6 +135,8 @@ void FilePtr::close()
 
 ValuePtrReference FilePtr::atByID( short unsigned int ID, size_t offset, size_t len )
 {
+	LOG_IF(static_cast<boost::shared_ptr<uint8_t>&>( *this ).get()!=0,Debug,error)
+		<< "There is no mapped data for this FilePtr - I'm very likely gonna crash soon ..";
 	GeneratorMap &map = util::Singletons::get<GeneratorMap, 0>();
 	assert( !map.empty() );
 	const generator_type gen = map[ID];
