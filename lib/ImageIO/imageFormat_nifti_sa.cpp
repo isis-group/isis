@@ -11,6 +11,62 @@ namespace isis
 namespace image_io
 {
 
+namespace _internal{
+CopyOp::CopyOp(const data::Image& image, size_t bitsPerVoxel, bool doFlip):m_image(image),m_doFlip(doFlip),m_bpv(bitsPerVoxel){
+	if( doFlip )
+		flip_dim = m_image.mapScannerAxesToImageDimension( data::z );
+}
+size_t CopyOp::getDataSize(){return m_image.getVolume()*m_bpv/8;}
+
+bool CopyOp::setOutput(const std::string &filename, size_t voxelstart){
+	m_out=data::FilePtr( filename, voxelstart + getDataSize(), true );
+	m_voxelstart=voxelstart;
+	if(m_out.good()){
+		nifti_1_header* header=getHeader();
+		header->sizeof_hdr = 348; // must be 348
+		header->vox_offset = m_voxelstart;
+		header->bitpix = m_bpv;
+		return m_out.good();
+	} else
+		return false;
+}
+
+nifti_1_header* CopyOp::getHeader(){return reinterpret_cast<nifti_1_header *>( &m_out[0] );}
+
+bool CopyOp::operator()( data::Chunk &ch, util::FixedVector< size_t, 4 > posInImage ) {
+	if(doCopy(ch,posInImage))
+		return true;
+	else {
+		LOG(Runtime,error) << "Failed to copy chunk at " << posInImage;
+		return true;
+	}
+}
+class CommonCopyOp: public CopyOp
+{
+	const unsigned short m_targetId;
+	const data::scaling_pair m_scale;
+public:
+	CommonCopyOp( const data::Image &image, unsigned short targetId, size_t bitsPerVoxel, bool doFlip=false):
+		CopyOp(image,bitsPerVoxel,doFlip),
+		m_targetId( targetId ), m_scale( image.getScalingTo( m_targetId ) ) {}
+	bool doCopy( data::Chunk &ch, util::FixedVector< size_t, 4 > posInImage ) {
+		size_t offset = m_voxelstart + m_image.getLinearIndex( posInImage ) * m_bpv/8;
+		data::ValuePtrReference out_data = m_out.atByID( m_targetId, offset, ch.getVolume() );
+		ch.asValuePtrBase().copyTo( *out_data, m_scale );
+
+		if( m_doFlip ) {
+			// wrap the copied part back into a Chunk to flip it
+			util::FixedVector< size_t, 4 > sz = ch.getSizeAsVector();
+			data::Chunk cp( out_data, sz[data::rowDim], sz[data::columnDim], sz[data::sliceDim], sz[data::timeDim] ); // this is a cheap copy
+			cp.swapAlong( flip_dim ); // .. so changing its data, will also change the data we just copied
+		}
+	}
+    short unsigned int getTypeId(){return m_targetId;}
+};
+
+
+}
+
 ImageFormat_NiftiSa::ImageFormat_NiftiSa()
 {
 	nifti_type2isis_type[NIFTI_TYPE_INT8 ] = data::ValuePtr< int8_t>::staticID;
@@ -367,7 +423,7 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 	}
 
 	//get the header - we use it directly from the file
-	const _internal::nifti_1_header *header = reinterpret_cast<const _internal::nifti_1_header *>( &mfile[0] );
+	const _internal::nifti_1_header *header = ;
 
 	if( header->intent_code != 0 ) {
 		throwGenericError( std::string( "only intent_code==0 is supportet" ) );
@@ -390,64 +446,41 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 	return newChunks.size();
 }
 
-void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & )
+std::auto_ptr< _internal::CopyOp > ImageFormat_NiftiSa::getCopyOp(const isis::data::Image& src, isis::util::istring dialect)
 {
-	class CommonCopyOp: public data::ChunkOp
-	{
-		data::Image m_image;
-		data::FilePtr &m_out;
-		const unsigned short m_ID;
-		const size_t m_bytesPerPixel, m_voxelstart;
-		const data::scaling_pair m_scale;
-		const bool m_doFlip;
-		data::dimensions flip_dim;
-	public:
-		CommonCopyOp( const data::Image &image, data::FilePtr &out, size_t voxelstart, bool doFlip ):
-			m_image( image ), m_out( out ), m_ID( image.getMajorTypeID() ), m_bytesPerPixel( image.getBytesPerVoxel() ), m_voxelstart( voxelstart ),
-			m_scale( image.getScalingTo( m_ID ) ), m_doFlip( doFlip ) {
-			if( doFlip )
-				flip_dim = m_image.mapScannerAxesToImageDimension( data::z );
-		}
-		bool operator()( data::Chunk &ch, util::FixedVector< size_t, 4 > posInImage ) {
-			size_t offset = m_voxelstart + m_image.getLinearIndex( posInImage ) * m_bytesPerPixel;
-			data::ValuePtrReference out_data = m_out.atByID( m_ID, offset, ch.getVolume() );
-			ch.asValuePtrBase().copyTo( *out_data, m_scale );
-
-			if( m_doFlip ) {
-				// wrap the copied part back into a Chunk to flip it
-				util::FixedVector< size_t, 4 > sz = ch.getSizeAsVector();
-				data::Chunk cp( out_data, sz[data::rowDim], sz[data::columnDim], sz[data::sliceDim], sz[data::timeDim] ); // this is a cheap copy
-				cp.swapAlong( flip_dim ); // .. so changing its data, will also change the data we just copied
-			}
-
-			return true;
-		}
-	};
-
-	const size_t bpv = image.getBytesPerVoxel();
-	unsigned short target_id = image.getMajorTypeID();
-
+	const size_t bpv = src.getBytesPerVoxel()*8;
+	const unsigned short target_id = src.getMajorTypeID();
 	// fsl cannot deal with some types
-	if( util::istring( dialect.c_str() ) == "fsl" ) {
+	if( dialect == "fsl" ) {
 		switch( target_id ) {
 		case data::ValuePtr<uint16_t>::staticID:
-			target_id = typeFallBack<uint16_t>();
+			return std::auto_ptr<_internal::CopyOp>(new _internal::CommonCopyOp(src,typeFallBack<uint16_t>(),bpv,false));
 			break;
 		case data::ValuePtr<uint32_t>::staticID:
-			target_id = typeFallBack<uint32_t>();
+			return std::auto_ptr<_internal::CopyOp>(new _internal::CommonCopyOp(src,typeFallBack<uint32_t>(),bpv,false));
+			break;
+		case data::ValuePtr<util::color24>::staticID:
+			LOG( Runtime, info ) << data::ValuePtr<util::color24>::staticName() <<  " is not supported by fsl falling back to color encoded in 4th dimension";
+			return std::auto_ptr<_internal::CopyOp>(new _internal::CommonCopyOp(src,data::ValuePtr<uint8_t>::staticID,8,false));
 			break;
 		}
+	} else {
+		return std::auto_ptr<_internal::CopyOp>(new _internal::CommonCopyOp(src,target_id,bpv,(dialect == "spm")));
 	}
+}
 
-	const size_t datasize = image.getVolume() * bpv;
 
-	if( isis_type2nifti_type[target_id] ) { // "normal types"
-		const size_t voxel_offset = 352; // must be >=352 (and multiple of 16)  (http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/vox_offset.html)
+void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & )
+{
+	const size_t voxel_offset = 352; // must be >=352 (and multiple of 16)  (http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/vox_offset.html)
+	std::auto_ptr< _internal::CopyOp > writer=getCopyOp(image,dialect);
+	const unsigned int target_id = nifti_type2isis_type[writer->getTypeId()];
+
+	if( target_id ) { //we do know the nifti_id
 
 		// open/map the new file
-		data::FilePtr out( filename, voxel_offset + datasize, true );
 
-		if( !out.good() ) {
+		if( writer->setOutput(filename,voxel_offset) ) {
 			if( errno ) {
 				throwSystemError( errno, filename + " could not be opened" );
 				errno = 0;
@@ -457,14 +490,10 @@ void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &fi
 
 
 		// get the first 348 bytes as header
-		_internal::nifti_1_header *header = reinterpret_cast<_internal::nifti_1_header *>( &out[0] );
+		_internal::nifti_1_header *header = writer->getHeader();
 		memset( header, 0, sizeof( _internal::nifti_1_header ) );
 
-		// set the datatype
-		header->sizeof_hdr = 348; // must be 348
-		header->vox_offset = voxel_offset;
-		header->bitpix = bpv * 8;
-		header->datatype = isis_type2nifti_type[target_id];
+		header->datatype = target_id;
 
 		// store the image size in dim and fill up the rest with "1" (to prevent fsl from exploding)
 		header->dim[0] = image.getRelevantDims();
@@ -487,8 +516,7 @@ void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &fi
 		}
 
 		// copy the data
-		CommonCopyOp do_copy( image, out, header->vox_offset, ( util::istring( dialect.c_str() ) == "spm" ) ); // we have to flip the copied data for the spm dialect
-		const_cast<data::Image &>( image ).foreachChunk( do_copy ); // @todo we _do_ need a const version of foreachChunk/Voxel
+		const_cast<data::Image &>( image ).foreachChunk( *writer ); // @todo we _do_ need a const version of foreachChunk/Voxel
 	} else {
 		LOG( Runtime, error ) << "Sorry, the datatype " << util::MSubject( image.getMajorTypeName() ) << " is not supportet for nifti output";
 		throwGenericError( "unsupported datatype" );
