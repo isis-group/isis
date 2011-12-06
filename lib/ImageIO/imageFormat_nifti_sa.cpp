@@ -12,13 +12,13 @@ namespace image_io
 {
 
 namespace _internal{
-CopyOp::CopyOp(const data::Image& image, size_t bitsPerVoxel, bool doFlip):m_image(image),m_doFlip(doFlip),m_bpv(bitsPerVoxel){
+WriteOp::WriteOp(const data::Image& image, size_t bitsPerVoxel, bool doFlip):m_image(image),m_doFlip(doFlip),m_bpv(bitsPerVoxel){
 	if( doFlip )
 		flip_dim = m_image.mapScannerAxesToImageDimension( data::z );
 }
-size_t CopyOp::getDataSize(){return m_image.getVolume()*m_bpv/8;}
+size_t WriteOp::getDataSize(){return m_image.getVolume()*m_bpv/8;}
 
-bool CopyOp::setOutput(const std::string &filename, size_t voxelstart){
+bool WriteOp::setOutput(const std::string &filename, size_t voxelstart){
 	m_out=data::FilePtr( filename, voxelstart + getDataSize(), true );
 	m_voxelstart=voxelstart;
 	if(m_out.good()){
@@ -31,9 +31,9 @@ bool CopyOp::setOutput(const std::string &filename, size_t voxelstart){
 		return false;
 }
 
-nifti_1_header* CopyOp::getHeader(){return reinterpret_cast<nifti_1_header *>( &m_out[0] );}
+nifti_1_header* WriteOp::getHeader(){return reinterpret_cast<nifti_1_header *>( &m_out[0] );}
 
-bool CopyOp::operator()( data::Chunk &ch, util::FixedVector< size_t, 4 > posInImage ) {
+bool WriteOp::operator()( data::Chunk &ch, util::FixedVector< size_t, 4 > posInImage ) {
 	if(doCopy(ch,posInImage))
 		return true;
 	else {
@@ -41,14 +41,15 @@ bool CopyOp::operator()( data::Chunk &ch, util::FixedVector< size_t, 4 > posInIm
 		return true;
 	}
 }
-class CommonCopyOp: public CopyOp
+class CommonWriteOp: public WriteOp
 {
 	const unsigned short m_targetId;
 	const data::scaling_pair m_scale;
 public:
-	CommonCopyOp( const data::Image &image, unsigned short targetId, size_t bitsPerVoxel, bool doFlip=false):
-		CopyOp(image,bitsPerVoxel,doFlip),
+	CommonWriteOp( const data::Image &image, unsigned short targetId, size_t bitsPerVoxel, bool doFlip=false):
+		WriteOp(image,bitsPerVoxel,doFlip),
 		m_targetId( targetId ), m_scale( image.getScalingTo( m_targetId ) ) {}
+		
 	bool doCopy( data::Chunk &ch, util::FixedVector< size_t, 4 > posInImage ) {
 		size_t offset = m_voxelstart + m_image.getLinearIndex( posInImage ) * m_bpv/8;
 		data::ValuePtrReference out_data = m_out.atByID( m_targetId, offset, ch.getVolume() );
@@ -61,9 +62,9 @@ public:
 			cp.swapAlong( flip_dim ); // .. so changing its data, will also change the data we just copied
 		}
 	}
+	
     short unsigned int getTypeId(){return m_targetId;}
 };
-
 
 }
 
@@ -423,7 +424,7 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 	}
 
 	//get the header - we use it directly from the file
-	const _internal::nifti_1_header *header = ;
+	const _internal::nifti_1_header *header = reinterpret_cast<const _internal::nifti_1_header*>(&mfile[0]);
 
 	if( header->intent_code != 0 ) {
 		throwGenericError( std::string( "only intent_code==0 is supportet" ) );
@@ -446,7 +447,7 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 	return newChunks.size();
 }
 
-std::auto_ptr< _internal::CopyOp > ImageFormat_NiftiSa::getCopyOp(const isis::data::Image& src, isis::util::istring dialect)
+std::auto_ptr< _internal::WriteOp > ImageFormat_NiftiSa::getWriteOp(const isis::data::Image& src, isis::util::istring dialect)
 {
 	const size_t bpv = src.getBytesPerVoxel()*8;
 	const unsigned short target_id = src.getMajorTypeID();
@@ -454,32 +455,30 @@ std::auto_ptr< _internal::CopyOp > ImageFormat_NiftiSa::getCopyOp(const isis::da
 	if( dialect == "fsl" ) {
 		switch( target_id ) {
 		case data::ValuePtr<uint16_t>::staticID:
-			return std::auto_ptr<_internal::CopyOp>(new _internal::CommonCopyOp(src,typeFallBack<uint16_t>(),bpv,false));
+			return std::auto_ptr<_internal::WriteOp>(new _internal::CommonWriteOp(src,typeFallBack<uint16_t>(),bpv,false));
 			break;
 		case data::ValuePtr<uint32_t>::staticID:
-			return std::auto_ptr<_internal::CopyOp>(new _internal::CommonCopyOp(src,typeFallBack<uint32_t>(),bpv,false));
+			return std::auto_ptr<_internal::WriteOp>(new _internal::CommonWriteOp(src,typeFallBack<uint32_t>(),bpv,false));
 			break;
 		case data::ValuePtr<util::color24>::staticID:
 			LOG( Runtime, info ) << data::ValuePtr<util::color24>::staticName() <<  " is not supported by fsl falling back to color encoded in 4th dimension";
-			return std::auto_ptr<_internal::CopyOp>(new _internal::CommonCopyOp(src,data::ValuePtr<uint8_t>::staticID,8,false));
+			return std::auto_ptr<_internal::WriteOp>(new _internal::CommonWriteOp(src,data::ValuePtr<uint8_t>::staticID,8,false));
 			break;
 		}
-	} else {
-		return std::auto_ptr<_internal::CopyOp>(new _internal::CommonCopyOp(src,target_id,bpv,(dialect == "spm")));
 	}
+	return std::auto_ptr<_internal::WriteOp>(new _internal::CommonWriteOp(src,target_id,bpv,(dialect == "spm"))); // default case (no fsl dialect or type can be used directly)
 }
 
 
 void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & )
 {
 	const size_t voxel_offset = 352; // must be >=352 (and multiple of 16)  (http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/vox_offset.html)
-	std::auto_ptr< _internal::CopyOp > writer=getCopyOp(image,dialect);
-	const unsigned int target_id = nifti_type2isis_type[writer->getTypeId()];
+	std::auto_ptr< _internal::WriteOp > writer=getWriteOp(image,dialect.c_str()); // get a fitting writer for the datatype
+	const unsigned int target_id = nifti_type2isis_type[writer->getTypeId()]; // get the nifti datatype corresponding to our datatype
 
-	if( target_id ) { //we do know the nifti_id
+	if( target_id ) { // there is a corresponding nifti datatype 
 
 		// open/map the new file
-
 		if( writer->setOutput(filename,voxel_offset) ) {
 			if( errno ) {
 				throwSystemError( errno, filename + " could not be opened" );
@@ -515,7 +514,7 @@ void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &fi
 			storeDescripForSPM( image.getChunk( 0, 0 ), header->descrip );
 		}
 
-		// copy the data
+		// actually copy the data from each chunk of the image
 		const_cast<data::Image &>( image ).foreachChunk( *writer ); // @todo we _do_ need a const version of foreachChunk/Voxel
 	} else {
 		LOG( Runtime, error ) << "Sorry, the datatype " << util::MSubject( image.getMajorTypeName() ) << " is not supportet for nifti output";
