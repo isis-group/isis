@@ -378,7 +378,7 @@ bool Image::reIndex()
 	util::fvector4 &voxeSize = propertyValue("voxelSize" )->castTo<util::fvector4>();
 
 	for(int i =0; i<4;i++){
-		if(isinf(voxeSize[i])){
+		if(std::isinf(voxeSize[i])){
 			LOG(Runtime,warning) << "voxelSize[" << i << "] is invalid, using 1";
 			voxeSize[i]=1;
 		}
