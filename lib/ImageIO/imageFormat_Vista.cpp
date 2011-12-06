@@ -131,7 +131,7 @@ throw( std::runtime_error & )
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VShortRepn );
 			copyImageToVista<VShort>( image, vimages[0] );
 			break;
-#if defined(_M_X64) || defined(__amd64__)
+#if defined(_M_X64) || defined(__amd64__) && not defined (__APPLE__)
 			// VLong
 		case data::ValuePtr<VLong>::staticID:
 			vimages[0] = VCreateImage( dims[2], dims[1], dims[0], VLongRepn );
@@ -712,7 +712,7 @@ bool ImageFormat_Vista::switchHandle( VImage &image, std::list<data::Chunk> &chu
 		addChunk<VShort>( chunks, image );
 		return true;
 		break;
-#if defined(_M_X64) || defined(__amd64__)
+#if defined(_M_X64) || defined(__amd64__) && not defined (__APPLE__)
 	case VLongRepn:
 		addChunk<VLong>( chunks, image );
 		return true;
@@ -938,7 +938,7 @@ void ImageFormat_Vista::copyHeaderToVista( const data::Image &image, VImage &vim
 				continue;
 			}
 
-#if defined(_M_X64) || defined(__amd64__)
+#if defined(_M_X64) || defined(__amd64__) && not defined(__APPLE__)
 
 			// VLong -> VLong (char *)
 			if( pv->is<VLong>() ) {
