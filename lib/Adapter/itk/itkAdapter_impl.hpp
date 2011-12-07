@@ -270,26 +270,26 @@ template<typename TImageITK, typename TOutputISIS> std::list<data::Image> itkAda
 	data::TypedImage< TOutputISIS >  retImage ( data::TypedImage<TOutputISIS> ( isisImageList.front() ) );
 	//these are properties eventually manipulated by itk. So we can not take the
 	//parameters from the isis image which was handed over to the itkAdapter
-	retImage.setPropertyAs( "indexOrigin", util::fvector4( static_cast<uint32_t>(indexOrigin[0]), 
-                                                           static_cast<uint32_t>(indexOrigin[1]), 
-                                                           static_cast<uint32_t>(indexOrigin[2]), 
-                                                           static_cast<uint32_t>(indexOrigin[3]) ) );
-	retImage.setPropertyAs( "rowVec"     , util::fvector4( static_cast<uint32_t>(imageDirection[0][0]), 
-                                                           static_cast<uint32_t>(imageDirection[1][0]), 
-                                                           static_cast<uint32_t>(imageDirection[2][0]), 
+	retImage.setPropertyAs( "indexOrigin", util::fvector4( static_cast<float>(indexOrigin[0]), 
+                                                           static_cast<float>(indexOrigin[1]), 
+                                                           static_cast<float>(indexOrigin[2]), 
+                                                           static_cast<float>(indexOrigin[3]) ) );
+	retImage.setPropertyAs( "rowVec"     , util::fvector4( static_cast<float>(imageDirection[0][0]), 
+                                                           static_cast<float>(imageDirection[1][0]), 
+                                                           static_cast<float>(imageDirection[2][0]), 
                                                            0 ) );
 	retImage.setPropertyAs( "columnVec"  , util::fvector4( (imageDirection[0][1]), 
                                                            (imageDirection[1][1]), 
                                                            (imageDirection[2][1]), 
                                                            0 ) );
-	retImage.setPropertyAs( "sliceVec"   , util::fvector4( static_cast<uint32_t>(imageDirection[0][2]), 
-                                                           static_cast<uint32_t>(imageDirection[1][2]), 
-                                                           static_cast<uint32_t>(imageDirection[2][2]), 
+	retImage.setPropertyAs( "sliceVec"   , util::fvector4( static_cast<float>(imageDirection[0][2]), 
+                                                           static_cast<float>(imageDirection[1][2]), 
+                                                           static_cast<float>(imageDirection[2][2]), 
                                                            0 ) );
-	retImage.setPropertyAs( "voxelSize"  , util::fvector4( static_cast<uint32_t>(imageSpacing[0]), 
-                                                           static_cast<uint32_t>(imageSpacing[1]), 
-                                                           static_cast<uint32_t>(imageSpacing[2]), 
-                                                           static_cast<uint32_t>(imageSpacing[3]) ) );
+	retImage.setPropertyAs( "voxelSize"  , util::fvector4( static_cast<float>(imageSpacing[0]), 
+                                                           static_cast<float>(imageSpacing[1]), 
+                                                           static_cast<float>(imageSpacing[2]), 
+                                                           static_cast<float>(imageSpacing[3]) ) );
 
 	//this will splice down the image the same way it was handed over to the itkAdapter
     if (0 < m_RelevantDim) {
