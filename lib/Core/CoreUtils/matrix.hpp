@@ -28,7 +28,7 @@ namespace isis
 namespace util
 {
 
-template < typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typename FixedVector<TYPE, ROWS*COLS>::container_type >
+template < typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER = typename FixedVector<TYPE, ROWS *COLS>::container_type >
 class FixedMatrix : public FixedVector<TYPE, ROWS *COLS, CONTAINER>
 {
 public:
@@ -52,8 +52,8 @@ public:
 	FixedMatrix( const FixedVector<TYPE2, COLS, CONTAINER2> src[ROWS] ) {copyFrom( src );}
 
 
-	TYPE &elem( size_t column, size_t row ) {return ( *this )[column+row*COLS];}
-	const TYPE &elem( size_t column, size_t row )const {return ( *this )[column+row*COLS];}
+	TYPE &elem( size_t column, size_t row ) {return ( *this )[column + row * COLS];}
+	const TYPE &elem( size_t column, size_t row )const {return ( *this )[column + row * COLS];}
 
 	FixedMatrix<TYPE, ROWS, COLS> transpose()const {
 		FixedMatrix<TYPE, ROWS, COLS> ret;
@@ -100,7 +100,7 @@ public:
 
 	FixedVector<TYPE, COLS> getRow( size_t rownum )const {
 		FixedVector<TYPE, COLS> ret;
-		const typename FixedVector<TYPE, ROWS *COLS, CONTAINER>::const_iterator start = FixedVector<TYPE, ROWS *COLS, CONTAINER>::begin()+rownum*COLS;
+		const typename FixedVector<TYPE, ROWS *COLS, CONTAINER>::const_iterator start = FixedVector<TYPE, ROWS * COLS, CONTAINER>::begin() + rownum * COLS;
 		const typename FixedVector<TYPE, ROWS *COLS, CONTAINER>::const_iterator end = start + COLS;
 		ret.copyFrom( start, end );
 		return ret;

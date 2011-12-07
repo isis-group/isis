@@ -18,6 +18,7 @@ include_directories(${CMAKE_SOURCE_DIR}/lib/Core)
 ############################################################
 
 option(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI "Enable Nifti-IO plugin" OFF)
+option(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI_SA "Enable standalone Nifti-IO plugin" OFF)
 option(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL "Enable Null-IO plugin" ON)
 option(${CMAKE_PROJECT_NAME}_IOPLUGIN_PNG "Enable Null-IO plugin" OFF)
 option(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM "Enable Dicom-IO plugin" OFF)
@@ -47,6 +48,13 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI)
 
   set(TARGETS ${TARGETS} isisImageFormat_Nifti)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI)
+
+if(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI_SA)
+  add_library(isisImageFormat_Nifti_sa SHARED imageFormat_nifti_sa.cpp)
+  target_link_libraries(isisImageFormat_Nifti_sa isis_core  ${ISIS_LIB_DEPENDS})
+  set(TARGETS ${TARGETS} isisImageFormat_Nifti_sa)
+endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI_SA)
+
 
 ############################################################
 # vista

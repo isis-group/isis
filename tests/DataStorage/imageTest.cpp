@@ -178,24 +178,24 @@ BOOST_AUTO_TEST_CASE ( minimal_image_test )
 BOOST_AUTO_TEST_CASE ( proplist_image_test )
 {
 	data::MemChunk<uint8_t> ch( 4, 4, 4 ); //create a volume of size 4x4x4
-	
+
 	ch.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, 0 ) );
 	ch.setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
 	ch.setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
 	ch.setPropertyAs( "sliceVec", util::fvector4( 0, 0, 1 ) );
 	ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
 
-	for(int i=0;i<4;i++){
-		ch.propertyValueAt( "acquisitionNumber", 3-i )=(uint32_t)i; //change the acquisitionNumber of that to 1
-		ch.propertyValueAt( "acquisitionTime", 3-i )=(uint32_t)i;
+	for( int i = 0; i < 4; i++ ) {
+		ch.propertyValueAt( "acquisitionNumber", 3 - i ) = ( uint32_t )i; //change the acquisitionNumber of that to 1
+		ch.propertyValueAt( "acquisitionTime", 3 - i ) = ( uint32_t )i;
 	}
 
 	data::Image img( ch );
-	BOOST_REQUIRE_EQUAL(img.getChunk(0).getRelevantDims(),2); // the dim should be 2 now
+	BOOST_REQUIRE_EQUAL( img.getChunk( 0 ).getRelevantDims(), 2 ); // the dim should be 2 now
 
-	for(uint32_t i=0;i<4;i++){
-		BOOST_CHECK_EQUAL(img.getChunk(0,0,3-i).propertyValue("acquisitionTime"),i);
-		BOOST_CHECK_EQUAL(img.getChunk(0,0,3-i).propertyValue("acquisitionNumber"),i);
+	for( uint32_t i = 0; i < 4; i++ ) {
+		BOOST_CHECK_EQUAL( img.getChunk( 0, 0, 3 - i ).propertyValue( "acquisitionTime" ), i );
+		BOOST_CHECK_EQUAL( img.getChunk( 0, 0, 3 - i ).propertyValue( "acquisitionNumber" ), i );
 	}
 }
 

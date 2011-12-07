@@ -60,10 +60,15 @@ bool isis::qt4::IOQtApplication::init( int argc, char **argv, bool exitOnError )
 		m_argc = argc;
 		m_argv = argv;
 		m_qapp.reset( new QApplication( m_argc, m_argv ) );
-		
+
 	}
 
 	return isis::data::IOApplication::init( argc, argv, exitOnError );
 }
 
+
+boost::shared_ptr< isis::util::_internal::MessageHandlerBase > isis::qt4::IOQtApplication::getLogHandler( std::string /*module*/, isis::LogLevel level )const
+{
+	return boost::shared_ptr< isis::util::_internal::MessageHandlerBase >( level ? new isis::qt4::QDefaultMessagePrint( level ) : 0 );
+}
 
