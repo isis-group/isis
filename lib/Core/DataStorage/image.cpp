@@ -375,6 +375,16 @@ bool Image::reIndex()
 		oneCnt++;
 	}
 
+	util::fvector4 &voxeSize = propertyValue("voxelSize" )->castTo<util::fvector4>();
+
+	for(int i =0; i<4;i++){
+		if(std::isinf(voxeSize[i])){
+			LOG(Runtime,warning) << "voxelSize[" << i << "] is invalid, using 1";
+			voxeSize[i]=1;
+		}
+	}
+
+
 	//if we have at least two slides (and have slides (with different positions) at all)
 	if ( chunk_dims == 2 && structure_size[2] > 1 && first.hasProperty( "indexOrigin" ) ) {
 		const util::fvector4 thisV = first.getPropertyAs<util::fvector4>( "indexOrigin" );
@@ -402,7 +412,7 @@ bool Image::reIndex()
 			}
 		}
 
-		const util::fvector4 &voxeSize = getPropertyAs<util::fvector4>( "voxelSize" );
+		const util::fvector4 &voxeSize = propertyValue("voxelSize" )->castTo<util::fvector4>();
 
 		const Chunk &next = chunkAt( 1 );
 
