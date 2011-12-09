@@ -485,7 +485,7 @@ public:
 	 *  \param physicalCoords the physical coords from which you want to get the voxel index.
 	 *  \return voxel index associated with the given physicalCoords
 	 */
-	util::ivector4 getIndexFromPhysicalCoords( const util::fvector4 &physicalCoords ) const;
+	util::ivector4 getIndexFromPhysicalCoords( const util::fvector4 &physicalCoords, bool restrictedToImageBox = false ) const;
 
 	/**
 	 * Copy all voxel data of the image into memory.
