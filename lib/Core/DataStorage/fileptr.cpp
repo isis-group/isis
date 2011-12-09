@@ -109,7 +109,7 @@ FilePtr::FilePtr( const boost::filesystem::path &filename, size_t len, bool writ
 	const int oflag = write ?
 					  O_CREAT | O_RDWR : //create file if its not there
 					  O_RDONLY; //open file readonly
-	const int file = open( filename.file_string().c_str(), oflag, S_IRUSR | S_IWUSR );
+	const int file = open( filename.file_string().c_str(), oflag, 0666 );
 
 	if( file == -1 ) {
 		LOG( Runtime, error ) << "Failed to open " << util::MSubject( filename )
@@ -135,7 +135,7 @@ void FilePtr::release()
 
 ValuePtrReference FilePtr::atByID( short unsigned int ID, size_t offset, size_t len )
 {
-	LOG_IF(static_cast<boost::shared_ptr<uint8_t>&>( *this ).get()!=0,Debug,error)
+	LOG_IF(static_cast<boost::shared_ptr<uint8_t>&>( *this ).get()==0,Debug,error)
 		<< "There is no mapped data for this FilePtr - I'm very likely gonna crash soon ..";
 	GeneratorMap &map = util::Singletons::get<GeneratorMap, 0>();
 	assert( !map.empty() );

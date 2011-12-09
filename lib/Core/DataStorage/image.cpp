@@ -196,13 +196,23 @@ util::fvector4 Image::getPhysicalCoordsFromIndex( const isis::util::ivector4 &vo
 
 
 
-util::ivector4 Image::getIndexFromPhysicalCoords( const isis::util::fvector4 &physicalCoords ) const
+util::ivector4 Image::getIndexFromPhysicalCoords( const isis::util::fvector4 &physicalCoords, bool restrictedToImageBox ) const
 {
 	util::fvector4 vec1 = physicalCoords - m_Offset;
 	util::fvector4 ret = util::fvector4( vec1[0] * m_RowVecInv[0] + vec1[1] * m_ColumnVecInv[0] + vec1[2] * m_SliceVecInv[0],
 										 vec1[0] * m_RowVecInv[1] + vec1[1] * m_ColumnVecInv[1] + vec1[2] * m_SliceVecInv[1],
 										 vec1[0] * m_RowVecInv[2] + vec1[1] * m_ColumnVecInv[2] + vec1[2] * m_SliceVecInv[2],
 										 vec1[3] );
+
+	if( restrictedToImageBox ) {
+		util::ivector4 size = getSizeAsVector();
+
+		for( unsigned short i = 0; i < 4; i ++ ) {
+			ret[i] = ret[i] < 0 ? 0 : ret[i];
+			ret[i] = ret[i] >= size[i] ? size[i] - 1 : ret[i];
+		}
+	}
+
 	return  util::Value<util::fvector4>( ret ).as<util::ivector4>();
 }
 
@@ -365,6 +375,16 @@ bool Image::reIndex()
 		oneCnt++;
 	}
 
+	util::fvector4 &voxeSize = propertyValue("voxelSize" )->castTo<util::fvector4>();
+
+	for(int i =0; i<4;i++){
+		if(isinf(voxeSize[i])){
+			LOG(Runtime,warning) << "voxelSize[" << i << "] is invalid, using 1";
+			voxeSize[i]=1;
+		}
+	}
+
+
 	//if we have at least two slides (and have slides (with different positions) at all)
 	if ( chunk_dims == 2 && structure_size[2] > 1 && first.hasProperty( "indexOrigin" ) ) {
 		const util::fvector4 thisV = first.getPropertyAs<util::fvector4>( "indexOrigin" );
@@ -392,7 +412,7 @@ bool Image::reIndex()
 			}
 		}
 
-		const util::fvector4 &voxeSize = getPropertyAs<util::fvector4>( "voxelSize" );
+		const util::fvector4 &voxeSize = propertyValue("voxelSize" )->castTo<util::fvector4>();
 
 		const Chunk &next = chunkAt( 1 );
 

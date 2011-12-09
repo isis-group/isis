@@ -439,7 +439,7 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 				}
 			}
 
-			VFillImage( image, 0, 0 );
+			//          VFillImage( image, 0, 0 );
 			vImageVector.insert( iter, image );
 		}
 
@@ -587,7 +587,7 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 				// axial (x,y,z) -> (x,y,z)
 				else {
 					LOG( DataLog, verbose_info ) << "computing ioprop with axial: += " <<  ( nloaded - 1 ) * v3[2];
-					ioprob[2] += ( nloaded - 1 ) * v3[2];
+					ioprob[2] -= ( nloaded - 1 ) * v3[2];
 				}
 			}
 

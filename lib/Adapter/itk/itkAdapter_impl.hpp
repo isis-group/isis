@@ -233,10 +233,6 @@ template<typename TImageITK, typename TOutputISIS> std::list<data::Image> itkAda
 	typedef typename TImageITK::PixelType ITKRepn;
 	typedef TOutputISIS ISISRepn;
 
-	if ( TImageITK::ImageDimension < 4 ) {
-		imageSize[3] = 1;
-	}
-
 	if ( behaveAsItkWriter ) {
 		imageDirection[0][0] = -imageDirection[0][0];
 		imageDirection[0][1] = -imageDirection[0][1];
@@ -249,9 +245,9 @@ template<typename TImageITK, typename TOutputISIS> std::list<data::Image> itkAda
 	}
 
 	data::Chunk
-	tmpChunk ( data::MemChunk< ITKRepn >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) ) ;
+	tmpChunk ( data::MemChunk< ITKRepn >( src->GetBufferPointer(), imageSize[0], imageSize[1], imageSize[2], ( TImageITK::ImageDimension == 4 ? imageSize[3] : 1 ) ) ) ;
 	//we have to convert the datatype of retChunk to the desired TOutputISIS type to avoid autoscaling
-	data::Chunk retChunk ( data::MemChunk<ISISRepn>( imageSize[0], imageSize[1], imageSize[2], imageSize[3] ) );
+	data::Chunk retChunk ( data::MemChunk<ISISRepn>( imageSize[0], imageSize[1], imageSize[2], ( TImageITK::ImageDimension == 4 ? imageSize[3] : 1 ) ) );
 	const data::scaling_pair scale = tmpChunk.getScalingTo( data::ValuePtr<ISISRepn>::staticID, data::noscale );
 	//
 	data::numeric_convert<ITKRepn, ISISRepn>(
