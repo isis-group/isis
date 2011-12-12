@@ -229,7 +229,7 @@ getNumericScaling( const util::_internal::ValueBase &min, const util::_internal:
 		double minval, maxval;
 		minval = min.as<double>();
 		maxval = max.as<double>();
-		assert( minval < maxval );
+		assert( minval <= maxval );
 		LOG( Debug, info ) << "src Range:" << minval << "=>" << maxval;
 		LOG( Debug, info ) << "dst Domain:" << static_cast<double>( domain_min ) << "=>" << static_cast<double>( domain_max );
 		assert( domain_min < domain_max );//we also should assume this
