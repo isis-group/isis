@@ -12,17 +12,26 @@ namespace image_io
 {
 
 namespace _internal{
-WriteOp::WriteOp(const data::Image& image, size_t bitsPerVoxel, bool doFlip):m_image(image),m_doFlip(doFlip),m_bpv(bitsPerVoxel){
-	if( doFlip )
-		flip_dim = m_image.mapScannerAxesToImageDimension( data::z );
+WriteOp::WriteOp(const data::Image& image, size_t bitsPerVoxel, bool doFlip):data::_internal::NDimensional<4>(image),m_doFlip(doFlip),m_bpv(bitsPerVoxel){
+	if( doFlip ){
+		data::Image dummy(image);
+		flip_dim = dummy.mapScannerAxesToImageDimension( data::z );
+	}
 }
-size_t WriteOp::getDataSize(){return m_image.getVolume()*m_bpv/8;}
+size_t WriteOp::getDataSize(){return getVolume()*m_bpv/8;}
 
 bool WriteOp::setOutput(const std::string &filename, size_t voxelstart){
 	m_out=data::FilePtr( filename, voxelstart + getDataSize(), true );
 	m_voxelstart=voxelstart;
 	if(m_out.good()){
 		nifti_1_header* header=getHeader();
+		memset( header, 0, sizeof( _internal::nifti_1_header ) );
+
+		// store the image size in dim and fill up the rest with "1" (to prevent fsl from exploding)
+		header->dim[0] = getRelevantDims();
+		getSizeAsVector().copyTo( header->dim + 1 );
+		std::fill( header->dim + 5, header->dim + 8, 1 );
+
 		header->sizeof_hdr = 348; // must be 348
 		header->vox_offset = m_voxelstart;
 		header->bitpix = m_bpv;
@@ -51,7 +60,7 @@ public:
 		m_targetId( targetId ), m_scale( image.getScalingTo( m_targetId ) ) {}
 		
 	bool doCopy( data::Chunk &ch, util::FixedVector< size_t, 4 > posInImage ) {
-		size_t offset = m_voxelstart + m_image.getLinearIndex( posInImage ) * m_bpv/8;
+		size_t offset = m_voxelstart + getLinearIndex( posInImage ) * m_bpv/8;
 		data::ValuePtrReference out_data = m_out.atByID( m_targetId, offset, ch.getVolume() );
 		ch.asValuePtrBase().copyTo( *out_data, m_scale );
 
@@ -61,10 +70,55 @@ public:
 			data::Chunk cp( out_data, sz[data::rowDim], sz[data::columnDim], sz[data::sliceDim], sz[data::timeDim] ); // this is a cheap copy
 			cp.swapAlong( flip_dim ); // .. so changing its data, will also change the data we just copied
 		}
+		return true;
 	}
 	
     short unsigned int getTypeId(){return m_targetId;}
 };
+
+class FslRgbWriteOp: public WriteOp
+{
+	const data::scaling_pair m_scale;
+	struct VoxelCp:data::VoxelOp<util::color24>{
+		int mode;
+		uint8_t *ptr;
+        virtual bool operator()(util::color24& vox, const isis::util::FixedVector< size_t, 4 >& /*pos*/){
+			switch(mode){
+				case 0:*ptr=vox.r;break;
+				case 1:*ptr=vox.g;break;
+				case 2:*ptr=vox.b;break;
+			}
+			ptr++;
+			return true;
+		}
+	};
+public:
+	FslRgbWriteOp( const data::Image &image):
+		WriteOp(image,8),m_scale( util::ValueReference( util::Value<uint8_t>( 1 ) ), util::ValueReference( util::Value<uint8_t>( 0 ) )) {
+			assert(image.getDimSize(3)==1); //make sure the image has only one timestep
+			size_t dims[4];image.getSizeAsVector().copyTo(dims);dims[3]=3;
+			init(dims);// reset our shape to use 3 timesteps as colors
+		}
+
+	bool doCopy( data::Chunk &src, util::FixedVector< size_t, 4 > posInImage ) {
+		data::Chunk ch=src;ch.convertToType(data::ValuePtr<util::color24>::staticID,m_scale);
+		VoxelCp cp;
+		assert(posInImage[data::timeDim]==0);
+
+		for(;posInImage[data::timeDim]<3;posInImage[data::timeDim]++){
+			const size_t offset = m_voxelstart + getLinearIndex( posInImage ) * m_bpv/8;
+			data::ValuePtr<uint8_t> out_data = m_out.at<uint8_t>( offset, ch.getVolume() );
+			cp.ptr=&out_data[0];
+			cp.mode=posInImage[data::timeDim];
+			ch.foreachVoxel(cp);
+			assert(cp.ptr==&out_data[0]+out_data.getLength());
+		}
+		return true;
+	}
+
+    short unsigned int getTypeId(){return data::ValuePtr<uint8_t>::staticID;}
+};
+
 
 }
 
@@ -461,8 +515,13 @@ std::auto_ptr< _internal::WriteOp > ImageFormat_NiftiSa::getWriteOp(const isis::
 			return std::auto_ptr<_internal::WriteOp>(new _internal::CommonWriteOp(src,typeFallBack<uint32_t>(),bpv,false));
 			break;
 		case data::ValuePtr<util::color24>::staticID:
-			LOG( Runtime, info ) << data::ValuePtr<util::color24>::staticName() <<  " is not supported by fsl falling back to color encoded in 4th dimension";
-			return std::auto_ptr<_internal::WriteOp>(new _internal::CommonWriteOp(src,data::ValuePtr<uint8_t>::staticID,8,false));
+			if(src.getRelevantDims()>=data::timeDim){
+				LOG( Runtime, error ) << "Cannot store color image of size " << src.getSizeAsString() << " using fsl dialect (4th dim is needed for the colors)";
+				throwGenericError( "unsupported datatype" );
+			} else {
+				LOG( Runtime, info ) << data::ValuePtr<util::color24>::staticName() <<  " is not supported by fsl falling back to color encoded in 4th dimension";
+				return std::auto_ptr<_internal::WriteOp>(new _internal::FslRgbWriteOp(src));
+			}
 			break;
 		}
 	}
@@ -474,12 +533,12 @@ void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &fi
 {
 	const size_t voxel_offset = 352; // must be >=352 (and multiple of 16)  (http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/vox_offset.html)
 	std::auto_ptr< _internal::WriteOp > writer=getWriteOp(image,dialect.c_str()); // get a fitting writer for the datatype
-	const unsigned int target_id = nifti_type2isis_type[writer->getTypeId()]; // get the nifti datatype corresponding to our datatype
+	const unsigned int target_id = isis_type2nifti_type[writer->getTypeId()]; // get the nifti datatype corresponding to our datatype
 
 	if( target_id ) { // there is a corresponding nifti datatype 
 
 		// open/map the new file
-		if( writer->setOutput(filename,voxel_offset) ) {
+		if( !writer->setOutput(filename,voxel_offset) ) {
 			if( errno ) {
 				throwSystemError( errno, filename + " could not be opened" );
 				errno = 0;
@@ -490,22 +549,20 @@ void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &fi
 
 		// get the first 348 bytes as header
 		_internal::nifti_1_header *header = writer->getHeader();
-		memset( header, 0, sizeof( _internal::nifti_1_header ) );
-
 		header->datatype = target_id;
-
-		// store the image size in dim and fill up the rest with "1" (to prevent fsl from exploding)
-		header->dim[0] = image.getRelevantDims();
-		image.getSizeAsVector().copyTo( header->dim + 1 );
-		std::fill( header->dim + 5, header->dim + 8, 1 );
 
 		guessSliceOrdering( image, header->slice_code, header->slice_duration );
 
-		const std::pair< float, float > minmax = image.getMinMaxAs<float>();
-		header->cal_min = minmax.first;
-		header->cal_max = minmax.second;
+		if(image.getMajorTypeID()==data::ValuePtr<util::color24>::staticID){
+			header->cal_min = 0;
+			header->cal_max = 255;
+		} else {
+			const std::pair< float, float > minmax = image.getMinMaxAs<float>();
+			header->cal_min = minmax.first;
+			header->cal_max = minmax.second;
+		}
 
-		storeHeader( image.getChunk( 0, 0 ), header ); // store header using properties of the "lowest" chunk merged with the image's properties
+		storeHeader( image.getChunk( 0, 0 ), header ); // store properties of the "lowest" chunk merged with the image's properties into the header
 
 		if( image.getSizeAsVector()[data::timeDim] > 1 && image.hasProperty( "repetitionTime" ) )
 			header->pixdim[data::timeDim+1] = image.getPropertyAs<float>( "repetitionTime" );
@@ -741,11 +798,11 @@ bool ImageFormat_NiftiSa::storeQForm( const util::PropertyMap &props, _internal:
 }
 void ImageFormat_NiftiSa::storeSForm( const util::PropertyMap &props, _internal::nifti_1_header *head )
 {
-	util::Matrix4x4<double> sform = getNiftiMatrix( props );
+	const util::Matrix4x4<double> sform = getNiftiMatrix( props );
 	head->sform_code = 1;
-	getNiftiMatrix( props ).getRow( 0 ).copyTo( head->srow_x );
-	getNiftiMatrix( props ).getRow( 1 ).copyTo( head->srow_y );
-	getNiftiMatrix( props ).getRow( 2 ).copyTo( head->srow_z );
+	sform.getRow( 0 ).copyTo( head->srow_x );
+	sform.getRow( 1 ).copyTo( head->srow_y );
+	sform.getRow( 2 ).copyTo( head->srow_z );
 }
 
 // The nifti coord system:

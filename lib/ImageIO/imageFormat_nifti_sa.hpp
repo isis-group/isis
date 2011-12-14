@@ -130,11 +130,10 @@ struct nifti_1_header {
 
 } ;                   /**** 348 bytes total ****/
 
-class WriteOp: public data::ChunkOp
+class WriteOp: public data::ChunkOp, protected data::_internal::NDimensional<4>
 {
 protected:
 	const bool m_doFlip;
-	data::Image m_image;
 	data::dimensions flip_dim;
 	data::FilePtr m_out;
 	size_t m_voxelstart,m_bpv;
