@@ -196,7 +196,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 			object.remove( prefix + "PixelSpacing" );
 			std::swap( voxelSize[0], voxelSize[1] ); // the values are row-spacing (size in column dir) /column spacing (size in row dir)
 		} else {
-			voxelSize[3]=1/object.getPropertyAs<float>("DICOM/CSASeriesHeaderInfo/SliceResolution");
+			voxelSize[2]=1/object.getPropertyAs<float>("DICOM/CSASeriesHeaderInfo/SliceResolution");
 		}
 
 		if ( hasOrTell( prefix + "SliceThickness", object, warning ) ) {

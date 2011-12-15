@@ -531,7 +531,7 @@ std::auto_ptr< _internal::WriteOp > ImageFormat_NiftiSa::getWriteOp(const isis::
 			return std::auto_ptr<_internal::WriteOp>(new _internal::CommonWriteOp(src,typeFallBack<uint32_t>(),bpv,false));
 			break;
 		case data::ValuePtr<util::color24>::staticID:
-			if(src.getRelevantDims()>=data::timeDim){
+			if(src.getRelevantDims()>3){
 				LOG( Runtime, error ) << "Cannot store color image of size " << src.getSizeAsString() << " using fsl dialect (4th dim is needed for the colors)";
 				throwGenericError( "unsupported datatype" );
 			} else {
