@@ -147,8 +147,6 @@ ImageFormat_NiftiSa::ImageFormat_NiftiSa()
 		isis_type2nifti_type[ref.second] = ref.first;
 	}
 
-	/*      nii2isis[NIFTI_TYPE_COMPLEX64 ]=data::ValuePtr<std::complex< float > >::staticID;
-	    nii2isis[NIFTI_TYPE_COMPLEX128]=data::ValuePtr<std::complex< double > >::staticID;*/
 }
 std::string ImageFormat_NiftiSa::suffixes( io_modes /*mode*/ )const {return std::string( ".nii" );}
 
@@ -465,7 +463,7 @@ std::list< data::Chunk > ImageFormat_NiftiSa::parseHeader( const isis::image_io:
 
 std::string ImageFormat_NiftiSa::getName()const {return "Nifti standalone";}
 
-int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &/*dialect*/ )  throw( std::runtime_error & )
+int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string & dialect )  throw( std::runtime_error & )
 {
 	data::FilePtr mfile( filename );
 
@@ -489,14 +487,32 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 	size.fill( 1 );
 
 	size.copyFrom( header->dim + 1, header->dim + 1 + header->dim[0] );
+	data::ValuePtrReference data_src;
 
-	data::ValuePtrReference data = mfile.atByID( nifti_type2isis_type[header->datatype], header->vox_offset );
-	LOG( Runtime, info ) << "Mapping nifti image as " << data->getTypeName() << " of length " << data->getLength();
-	LOG_IF( ( size_t )header->bitpix != data->bytesPerElem() * 8, Runtime, warning )
+	if(util::istring("fsl")==dialect.c_str() && header->datatype == NIFTI_TYPE_UINT8 && size[data::timeDim]==3){ //if its fsl-three-volume-color copy the volumes
+		LOG(Runtime,notice) << "The image has 3 timesteps and its type is UINT8, assuming it is an fsl color image.";
+		const size_t volume=size.product()/3;
+		data::ValuePtr<util::color24> buff(volume);
+		const data::ValuePtr<uint8_t> src=mfile.at<uint8_t>( header->vox_offset);
+
+		for(size_t v=0;v<volume;v++){
+			buff[v].r=src[v];
+			buff[v].g=src[v+volume];
+			buff[v].b=src[v+volume*2];
+		}
+		data_src=buff;
+		size[data::timeDim]=1;
+	} else {
+		data_src = mfile.atByID( nifti_type2isis_type[header->datatype], header->vox_offset );
+	}
+
+	
+	LOG( Runtime, info ) << "Mapping nifti image as " << data_src->getTypeName() << " of length " << data_src->getLength();
+	LOG_IF( ( size_t )header->bitpix != data_src->bytesPerElem() * 8, Runtime, warning )
 			<< "nifti field bitpix does not fit the bytesize of the given datatype ("
-	<< data->getTypeName() << "/" << header->bitpix <<  ")";
+	<< data_src->getTypeName() << "/" << header->bitpix <<  ")";
 
-	std::list<data::Chunk> newChunks = parseHeader( header, data::Chunk( data, size[0], size[1], size[2], size[3] ) );
+	std::list<data::Chunk> newChunks = parseHeader( header, data::Chunk( data_src, size[0], size[1], size[2], size[3] ) );
 	chunks.insert( chunks.begin(), newChunks.begin(), newChunks.end() );
 	return newChunks.size();
 }
