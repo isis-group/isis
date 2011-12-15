@@ -17,6 +17,7 @@
 // we need that, because boost::mpl::for_each will instantiate all types - and this needs the output stream operations
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <utime.h>
 
 namespace isis
 {
@@ -33,6 +34,11 @@ void FilePtr::Closer::operator()( void *p )
 				<< " failed, the error was: " << util::MSubject( strerror( errno ) );
 	}
 
+	if(write && futimes(file, NULL)!=0){
+		LOG( Runtime, warning )
+			<< "Setting access time of " << util::MSubject( filename )
+			<< " failed, the error was: " << util::MSubject( strerror( errno ) );
+	}
 	if( ::close( file ) != 0 ) {
 		LOG( Runtime, warning )
 				<< "Closing of " << util::MSubject( filename )
@@ -58,7 +64,7 @@ bool FilePtr::map( int file, size_t len, bool write, const boost::filesystem::pa
 		LOG( Debug, error ) << "Failed to map file, error was " << strerror( errno );
 		return false;
 	} else {
-		const Closer cl = {file, len, filename};
+		const Closer cl = {file, len, filename, write};
 		static_cast<ValuePtr<uint8_t>&>( *this ) = ValuePtr<uint8_t>( static_cast<uint8_t * const>( ptr ), len, cl );
 		return true;
 	}

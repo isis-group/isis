@@ -33,6 +33,7 @@ class FilePtr: public ValuePtr<uint8_t>
 		int file;
 		size_t len;
 		boost::filesystem::path filename;
+		bool write;
 		void operator()( void *p );
 	};
 	typedef data::ValuePtrReference( *generator_type )( data::FilePtr &, size_t, size_t );
