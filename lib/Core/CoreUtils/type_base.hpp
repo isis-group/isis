@@ -71,7 +71,7 @@ template<> struct __cast_to<uint8_t> { // we cannot lexical_cast to uint8_t - we
 class ValueBase : public GenericValue
 {
 	static const ValueConverterMap &converters();
-	friend class ValueReference<ValueBase>;
+	friend class _internal::GenericReference<ValueBase>;
 protected:
 	/**
 	* Create a copy of this.
@@ -81,7 +81,7 @@ protected:
 	*/
 	virtual ValueBase *clone()const = 0;
 public:
-	typedef ValueReference<ValueBase> Reference;
+	typedef _internal::GenericReference<ValueBase> Reference;
 	typedef ValueConverterMap::mapped_type::mapped_type Converter;
 
 	template<typename T> bool is()const;
@@ -195,7 +195,7 @@ operator<<( basic_ostream<charT, traits> &out, const isis::util::_internal::Gene
 }
 /// /// Streaming output for Value referencing classes
 template<typename charT, typename traits, typename TYPE_TYPE> basic_ostream<charT, traits>&
-operator<<( basic_ostream<charT, traits> &out, const isis::util::_internal::ValueReference<TYPE_TYPE> &s )
+operator<<( basic_ostream<charT, traits> &out, const isis::util::_internal::GenericReference<TYPE_TYPE> &s )
 {
 	return out << s.toString( true );
 }

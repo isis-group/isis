@@ -32,7 +32,7 @@ namespace _internal
 
 class ValuePtrBase : public util::_internal::GenericValue
 {
-	friend class util::_internal::ValueReference<ValuePtrBase>;
+	friend class util::_internal::GenericReference<ValuePtrBase>;
 	static const _internal::ValuePtrConverterMap &converters();
 	scaling_pair getScaling( const scaling_pair &scale, unsigned short ID )const;
 protected:
@@ -69,7 +69,7 @@ public:
 	/// \copydoc getRawAddress
 	virtual boost::shared_ptr<void> getRawAddress( size_t offset = 0 ) = 0;
 
-	typedef util::_internal::ValueReference<ValuePtrBase> Reference;
+	typedef util::_internal::GenericReference<ValuePtrBase> Reference;
 	typedef ValuePtrConverterMap::mapped_type::mapped_type Converter;
 
 	template<typename T> bool is()const;

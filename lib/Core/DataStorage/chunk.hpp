@@ -40,7 +40,7 @@ protected:
 	ChunkBase() {}; //do not use this
 public:
 	//  static const dimensions dimension[n_dims]={rowDim,columnDim,sliceDim,timeDim};
-	typedef isis::util::_internal::ValueReference <ChunkBase > Reference;
+	typedef isis::util::_internal::GenericReference<ChunkBase > Reference;
 
 	ChunkBase( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps );
 	virtual ~ChunkBase(); //needed to make it polymorphic
