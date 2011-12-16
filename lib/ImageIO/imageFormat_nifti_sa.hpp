@@ -136,15 +136,15 @@ protected:
 	const bool m_doFlip;
 	data::dimensions flip_dim;
 	data::FilePtr m_out;
-	size_t m_voxelstart,m_bpv;
-	WriteOp(const data::Image &image, size_t bitsPerVoxel, bool doFlip=false);
-	virtual bool doCopy(data::Chunk &ch, util::FixedVector< size_t, 4 > posInImage)=0;
+	size_t m_voxelstart, m_bpv;
+	WriteOp( const data::Image &image, size_t bitsPerVoxel, bool doFlip = false );
+	virtual bool doCopy( data::Chunk &ch, util::FixedVector< size_t, 4 > posInImage ) = 0;
 public:
 	nifti_1_header *getHeader();
-	virtual unsigned short getTypeId()=0;
+	virtual unsigned short getTypeId() = 0;
 	virtual size_t getDataSize();
 	bool operator()( data::Chunk &ch, util::FixedVector< size_t, 4 > posInImage );
-	bool setOutput(const std::string& filename, size_t voxelstart = 352);
+	bool setOutput( const std::string &filename, size_t voxelstart = 352 );
 };
 
 }
@@ -175,7 +175,7 @@ class ImageFormat_NiftiSa: public FileFormat
 	static void storeDescripForSPM( const isis::util::PropertyMap &props, char desc[] );
 	static void storeHeader( const util::PropertyMap &props, _internal::nifti_1_header *head );
 	static std::list<data::Chunk> parseHeader( const _internal::nifti_1_header *head, data::Chunk props );
-	std::auto_ptr<_internal::WriteOp> getWriteOp(const data::Image& src, util::istring dialect);
+	std::auto_ptr<_internal::WriteOp> getWriteOp( const data::Image &src, util::istring dialect );
 public:
 	ImageFormat_NiftiSa();
 	std::string getName()const;

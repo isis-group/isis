@@ -196,7 +196,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 			object.remove( prefix + "PixelSpacing" );
 			std::swap( voxelSize[0], voxelSize[1] ); // the values are row-spacing (size in column dir) /column spacing (size in row dir)
 		} else {
-			voxelSize[2]=1/object.getPropertyAs<float>("DICOM/CSASeriesHeaderInfo/SliceResolution");
+			voxelSize[2] = 1 / object.getPropertyAs<float>( "DICOM/CSASeriesHeaderInfo/SliceResolution" );
 		}
 
 		if ( hasOrTell( prefix + "SliceThickness", object, warning ) ) {
@@ -258,9 +258,9 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 
 	if ( hasOrTell( prefix + "ImagePositionPatient", object, info ) ) {
 		object.setPropertyAs( "indexOrigin", object.getPropertyAs<util::fvector4>( prefix + "ImagePositionPatient" ) );
-	} else if(object.hasProperty("DICOM/CSAImageHeaderInfo/ProtocolSliceNumber")) {
-		util::fvector4 orig(0,0,object.getPropertyAs<float>("DICOM/CSAImageHeaderInfo/ProtocolSliceNumber")/object.getPropertyAs<float>("DICOM/CSASeriesHeaderInfo/SliceResolution"));
-		LOG(Runtime,info) << "Synthesize missing indexOrigin from CSAImageHeaderInfo/ProtocolSliceNumber as " << orig;
+	} else if( object.hasProperty( "DICOM/CSAImageHeaderInfo/ProtocolSliceNumber" ) ) {
+		util::fvector4 orig( 0, 0, object.getPropertyAs<float>( "DICOM/CSAImageHeaderInfo/ProtocolSliceNumber" ) / object.getPropertyAs<float>( "DICOM/CSASeriesHeaderInfo/SliceResolution" ) );
+		LOG( Runtime, info ) << "Synthesize missing indexOrigin from CSAImageHeaderInfo/ProtocolSliceNumber as " << orig;
 		object.setPropertyAs( "indexOrigin", orig );
 	} else {
 		object.setPropertyAs( "indexOrigin", util::fvector4() );

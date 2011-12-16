@@ -375,12 +375,12 @@ bool Image::reIndex()
 		oneCnt++;
 	}
 
-	util::fvector4 &voxeSize = propertyValue("voxelSize" )->castTo<util::fvector4>();
+	util::fvector4 &voxeSize = propertyValue( "voxelSize" )->castTo<util::fvector4>();
 
-	for(int i =0; i<4;i++){
-		if(isinf(voxeSize[i])){
-			LOG(Runtime,warning) << "voxelSize[" << i << "] is invalid, using 1";
-			voxeSize[i]=1;
+	for( int i = 0; i < 4; i++ ) {
+		if( isinf( voxeSize[i] ) ) {
+			LOG( Runtime, warning ) << "voxelSize[" << i << "] is invalid, using 1";
+			voxeSize[i] = 1;
 		}
 	}
 
@@ -412,7 +412,7 @@ bool Image::reIndex()
 			}
 		}
 
-		const util::fvector4 &voxeSize = propertyValue("voxelSize" )->castTo<util::fvector4>();
+		const util::fvector4 &voxeSize = propertyValue( "voxelSize" )->castTo<util::fvector4>();
 
 		const Chunk &next = chunkAt( 1 );
 
@@ -785,32 +785,34 @@ Image::orientation Image::getMainOrientation()const
 
 unsigned short Image::getMajorTypeID() const
 {
-	switch(getChunk(0).getTypeID()){ // dont do smart typeID detection for types who cant do minmax
-		case data::ValuePtr<util::color24>::staticID:
-		case data::ValuePtr<util::color48>::staticID:
-		case data::ValuePtr<std::complex< float >  >::staticID:
-		case data::ValuePtr<std::complex< double > >::staticID:
-			LOG(Debug,info) << "Using flat typeID for " << getChunk(0).getTypeName() << " because I cannot compute min/max";
-			return getChunk(0).getTypeID();
-			break;
-		default:
-			std::pair<util::ValueReference, util::ValueReference> minmax = getMinMax();
-			LOG( Debug, info ) << "Determining  datatype of image with the value range " << minmax;
+	switch( getChunk( 0 ).getTypeID() ) { // dont do smart typeID detection for types who cant do minmax
+	case data::ValuePtr<util::color24>::staticID:
+	case data::ValuePtr<util::color48>::staticID:
+	case data::ValuePtr<std::complex< float >  >::staticID:
+	case data::ValuePtr<std::complex< double > >::staticID:
+		LOG( Debug, info ) << "Using flat typeID for " << getChunk( 0 ).getTypeName() << " because I cannot compute min/max";
+		return getChunk( 0 ).getTypeID();
+		break;
+	default:
+		std::pair<util::ValueReference, util::ValueReference> minmax = getMinMax();
+		LOG( Debug, info ) << "Determining  datatype of image with the value range " << minmax;
 
-			if( minmax.first->getTypeID() == minmax.second->getTypeID() ) { // ok min and max are the same type - trivial case
-				return minmax.first->getTypeID() << 8; // btw: we do the shift, because min and max are Value - but we want the ID's ValuePtr
-			} else if( minmax.first->fitsInto( minmax.second->getTypeID() ) ) { // if min fits into the type of max, use that
-				return minmax.second->getTypeID() << 8; //@todo maybe use a global static function here instead of a obscure shit operation
-			} else if( minmax.second->fitsInto( minmax.first->getTypeID() ) ) { // if max fits into the type of min, use that
-				return minmax.first->getTypeID() << 8;
-			} else {
-				LOG( Runtime, error ) << "Sorry I dont know which datatype I should use. (" << minmax.first->getTypeName() << " or " << minmax.second->getTypeName() << ")";
-				std::stringstream o;
-				o << "Type selection failed. Range was: " << minmax;
-				throw( std::logic_error( o.str() ) );
-			}
+		if( minmax.first->getTypeID() == minmax.second->getTypeID() ) { // ok min and max are the same type - trivial case
+			return minmax.first->getTypeID() << 8; // btw: we do the shift, because min and max are Value - but we want the ID's ValuePtr
+		} else if( minmax.first->fitsInto( minmax.second->getTypeID() ) ) { // if min fits into the type of max, use that
+			return minmax.second->getTypeID() << 8; //@todo maybe use a global static function here instead of a obscure shit operation
+		} else if( minmax.second->fitsInto( minmax.first->getTypeID() ) ) { // if max fits into the type of min, use that
+			return minmax.first->getTypeID() << 8;
+		} else {
+			LOG( Runtime, error ) << "Sorry I dont know which datatype I should use. (" << minmax.first->getTypeName() << " or " << minmax.second->getTypeName() << ")";
+			std::stringstream o;
+			o << "Type selection failed. Range was: " << minmax;
+			throw( std::logic_error( o.str() ) );
+		}
+
 		break;
 	}
+
 	return 0; // id 0 is invalid
 }
 std::string Image::getMajorTypeName() const
