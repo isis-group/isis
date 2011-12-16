@@ -30,10 +30,9 @@ namespace isis
 {
 namespace util
 {
+class ValueBase;
 namespace _internal
 {
-
-class ValueBase;
 class ValueConverterBase
 {
 public:

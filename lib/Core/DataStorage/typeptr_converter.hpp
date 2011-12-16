@@ -41,7 +41,7 @@ public:
 	virtual void generate( const ValuePtrBase &src, boost::scoped_ptr<ValuePtrBase>& dst, const scaling_pair &scaling )const = 0;
 	/// Create a ValuePtr based on the ID - if len==0 a pointer to NULL is created
 	virtual void create( boost::scoped_ptr<ValuePtrBase>& dst, size_t len )const = 0;
-	virtual scaling_pair getScaling( const util::_internal::ValueBase &min, const util::_internal::ValueBase &max, autoscaleOption scaleopt = autoscale )const;
+	virtual scaling_pair getScaling( const util::ValueBase &min, const util::ValueBase &max, autoscaleOption scaleopt = autoscale )const;
 	static boost::shared_ptr<const ValuePtrConverterBase> get() {return boost::shared_ptr<const ValuePtrConverterBase>();}
 	virtual ~ValuePtrConverterBase() {}
 };

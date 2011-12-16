@@ -29,7 +29,7 @@ namespace test
 using util::Value;
 using util::fvector4;
 using util::ivector4;
-using util::_internal::ValueBase;
+using util::ValueBase;
 
 // TestCase object instantiation
 BOOST_AUTO_TEST_CASE( test_type_init )

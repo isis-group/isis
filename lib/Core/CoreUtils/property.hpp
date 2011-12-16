@@ -89,7 +89,7 @@ public:
 	 * - both stored values are equal
 	 * \returns true if both contain the same value of type T, false otherwise.
 	 */
-	bool operator ==( const _internal::ValueBase &second )const;
+	bool operator ==( const ValueBase &second )const;
 	/**
 	 * Equality to a Value of type T (convenience function).
 	 * Properties are ONLY equal to Values if:

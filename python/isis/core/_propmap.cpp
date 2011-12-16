@@ -12,7 +12,7 @@ namespace PropertyMap
 
 void _setPropertyAs( util::PropertyMap &base, const std::string &key, boost::python::api::object value, isis::python::core::types type )
 {
-	static_cast<isis::util::_internal::ValueBase::Reference &>( base.propertyValue( key.c_str() ) ) = _internal::ConvertFromPython::convert( value )->copyByID( static_cast<unsigned short>( type ) );
+	static_cast<isis::util::ValueBase::Reference &>( base.propertyValue( key.c_str() ) ) = _internal::ConvertFromPython::convert( value )->copyByID( static_cast<unsigned short>( type ) );
 }
 
 

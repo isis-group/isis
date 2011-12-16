@@ -348,7 +348,7 @@ public:
 	 * \param min
 	 * \param max the value range of the source to be used when the scaling for the conversion is computed
 	 */
-	MemChunkNonDel( const Chunk &ref, const util::_internal::ValueBase &min, const  util::_internal::ValueBase &max ): Chunk( ref ) {
+	MemChunkNonDel( const Chunk &ref, const util::ValueBase &min, const  util::ValueBase &max ): Chunk( ref ) {
 		//get rid of my ValuePtr and make a new copying/converting the data of ref (use the reset-function of the scoped_ptr Chunk is made of)
 		ValuePtrReference::operator=( ref.getValuePtrBase().copyByID( ValuePtr<TYPE>::staticID, min, max ) );
 	}

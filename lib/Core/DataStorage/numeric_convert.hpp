@@ -212,7 +212,7 @@ DECL_SCALED_CONVERT( uint8_t, double );
  * \param scaleopt enum to tweak the scaling strategy
  */
 template<typename SRC, typename DST> std::pair<double, double>
-getNumericScaling( const util::_internal::ValueBase &min, const util::_internal::ValueBase &max, autoscaleOption scaleopt = autoscale )
+getNumericScaling( const util::ValueBase &min, const util::ValueBase &max, autoscaleOption scaleopt = autoscale )
 {
 	double scale = 1.0;
 	double offset = 0.0;

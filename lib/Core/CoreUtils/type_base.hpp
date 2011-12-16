@@ -61,6 +61,7 @@ template<> struct __cast_to<uint8_t> { // we cannot lexical_cast to uint8_t - we
 	}
 };
 /// @endcond
+}
 
 /*
  * This is the mostly abstract base class for all scalar values (see types.hpp).
@@ -68,9 +69,9 @@ template<> struct __cast_to<uint8_t> { // we cannot lexical_cast to uint8_t - we
  * Both are derived from GenericValue containing the description of the actual value type.
  */
 
-class ValueBase : public GenericValue
+class ValueBase : public _internal::GenericValue
 {
-	static const ValueConverterMap &converters();
+	static const _internal::ValueConverterMap &converters();
 	friend class _internal::GenericReference<ValueBase>;
 protected:
 	/**
@@ -82,7 +83,7 @@ protected:
 	virtual ValueBase *clone()const = 0;
 public:
 	typedef _internal::GenericReference<ValueBase> Reference;
-	typedef ValueConverterMap::mapped_type::mapped_type Converter;
+	typedef _internal::ValueConverterMap::mapped_type::mapped_type Converter;
 
 	template<typename T> bool is()const;
 
@@ -173,14 +174,13 @@ public:
 
 	virtual ~ValueBase();
 
-	virtual bool gt( const _internal::ValueBase &ref )const = 0;
-	virtual bool lt( const _internal::ValueBase &ref )const = 0;
-	virtual bool eq( const _internal::ValueBase &ref )const = 0;
+	virtual bool gt( const ValueBase &ref )const = 0;
+	virtual bool lt( const ValueBase &ref )const = 0;
+	virtual bool eq( const ValueBase &ref )const = 0;
 };
 
-}
 
-typedef _internal::ValueBase::Reference ValueReference;
+typedef ValueBase::Reference ValueReference;
 
 }
 }

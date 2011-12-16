@@ -19,25 +19,25 @@ namespace util
 {
 namespace _internal
 {
-
 bool GenericValue::isSameType ( const GenericValue &second ) const
 {
 	return getTypeID() == second.getTypeID();
+}
 }
 
 ValueBase::~ValueBase() {}
 
 
-const ValueConverterMap &ValueBase::converters()
+const _internal::ValueConverterMap &ValueBase::converters()
 {
 	return Singletons::get<_internal::ValueConverterMap, 0>();
 }
 
 const ValueBase::Converter &ValueBase::getConverterTo( unsigned short ID )const
 {
-	const ValueConverterMap::const_iterator f1 = converters().find( getTypeID() );
+	const _internal::ValueConverterMap::const_iterator f1 = converters().find( getTypeID() );
 	assert( f1 != converters().end() );
-	const ValueConverterMap::mapped_type::const_iterator f2 = f1->second.find( ID );
+	const _internal::ValueConverterMap::mapped_type::const_iterator f2 = f1->second.find( ID );
 	assert( f2 != f1->second.end() );
 	return f2->second;
 }
@@ -107,6 +107,5 @@ ValueBase::Reference ValueBase::copyByID( short unsigned int ID ) const
 	}
 }
 
-}
 }
 }
