@@ -376,7 +376,7 @@ public:
 	 */
 	std::list<util::PropertyValue> getChunksProperties( const util::PropertyMap::KeyType &key, bool unique = false )const;
 
-	/// get the size of every voxel (in bytes)
+	/// get the voxelsize (in bytes) for the major type in the image
 	size_t getBytesPerVoxel()const;
 
 	/**
