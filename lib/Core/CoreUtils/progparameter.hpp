@@ -93,7 +93,7 @@ public:
  * A Map of all current Program Parameters when reading from the commandline.
  * Handles instances of ProgParameter for every expected programm parameter and sets them by reading an argc/argv pair.
  */
-class ParameterMap: public std::map<std::string, ProgParameter>
+class ParameterMap: public std::map<util::istring, ProgParameter>
 {
 	struct neededP {
 		bool operator()( const_reference ref )const {return ref.second.isNeeded();}
