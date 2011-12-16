@@ -53,6 +53,8 @@ class FilePtr: public ValuePtr<uint8_t>
 	size_t checkSize( bool write, int file, const boost::filesystem::path &filename, size_t size = 0 );
 	bool m_good;
 public:
+	/// empty creator - result will not be usefull until filled
+	FilePtr();
 	/**
 	 * Create a FilePtr, mapping the given file.
 	 * if the write is true:
@@ -113,7 +115,7 @@ public:
 	data::ValuePtrReference atByID( unsigned short ID, size_t offset, size_t len = 0 );
 
 	bool good();
-	void close();
+	void release();
 };
 
 }

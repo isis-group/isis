@@ -20,6 +20,7 @@
 #ifndef IMAGEFORMAT_NIFTI_SA_HPP
 #define IMAGEFORMAT_NIFTI_SA_HPP
 
+#define NIFTI_TYPE_BINARY          1
 #define NIFTI_TYPE_UINT8           2
 #define NIFTI_TYPE_UINT16        512
 #define NIFTI_TYPE_UINT32        768
@@ -36,7 +37,6 @@
 
 #define NIFTI_TYPE_COMPLEX64      32
 #define NIFTI_TYPE_COMPLEX128   1792
-#define NIFTI_TYPE_COMPLEX256   2048
 
 #define NIFTI_TYPE_RGB24         128
 
@@ -59,6 +59,7 @@
 
 #include <DataStorage/io_interface.h>
 #include <CoreUtils/matrix.hpp>
+#include <sys/stat.h>
 
 namespace isis
 {
@@ -129,6 +130,23 @@ struct nifti_1_header {
 
 } ;                   /**** 348 bytes total ****/
 
+class WriteOp: public data::ChunkOp, protected data::_internal::NDimensional<4>
+{
+protected:
+	const bool m_doFlip;
+	data::dimensions flip_dim;
+	data::FilePtr m_out;
+	size_t m_voxelstart, m_bpv;
+	WriteOp( const data::Image &image, size_t bitsPerVoxel, bool doFlip = false );
+	virtual bool doCopy( data::Chunk &ch, util::FixedVector< size_t, 4 > posInImage ) = 0;
+public:
+	nifti_1_header *getHeader();
+	virtual unsigned short getTypeId() = 0;
+	virtual size_t getDataSize();
+	bool operator()( data::Chunk &ch, util::FixedVector< size_t, 4 > posInImage );
+	bool setOutput( const std::string &filename, size_t voxelstart = 352 );
+};
+
 }
 
 
@@ -157,6 +175,7 @@ class ImageFormat_NiftiSa: public FileFormat
 	static void storeDescripForSPM( const isis::util::PropertyMap &props, char desc[] );
 	static void storeHeader( const util::PropertyMap &props, _internal::nifti_1_header *head );
 	static std::list<data::Chunk> parseHeader( const _internal::nifti_1_header *head, data::Chunk props );
+	std::auto_ptr<_internal::WriteOp> getWriteOp( const data::Image &src, util::istring dialect );
 public:
 	ImageFormat_NiftiSa();
 	std::string getName()const;
