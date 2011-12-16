@@ -84,7 +84,7 @@ template<typename T> struct getMinMaxImpl<T, true> { // generic minmax for numbe
  * The copy is cheap, thus the copy of a ValuePtr will reference the same data.
  * The usual pointer dereferencing interface ("*", "->" and "[]") is supported.
  */
-template<typename TYPE> class ValuePtr: public _internal::ValuePtrBase
+template<typename TYPE> class ValuePtr: public ValuePtrBase
 {
 	boost::shared_ptr<TYPE> m_val;
 protected:
@@ -123,7 +123,7 @@ public:
 	 * If the requested length is 0 no memory will be allocated and the pointer be "empty".
 	 * \param length amount of elements in the new array
 	 */
-	ValuePtr( size_t length ): _internal::ValuePtrBase( length ) {
+	ValuePtr( size_t length ): ValuePtrBase( length ) {
 		if( length )
 			m_val.reset( ( TYPE * )calloc( length, sizeof( TYPE ) ), BasicDeleter() );
 
@@ -139,7 +139,7 @@ public:
 	 * \param length the length of the used array (ValuePtr does NOT check for length,
 	 * this is just here for child classes which may want to check)
 	 */
-	ValuePtr( const boost::shared_ptr<TYPE> &ptr, size_t length ): _internal::ValuePtrBase( length ), m_val( ptr ) {}
+	ValuePtr( const boost::shared_ptr<TYPE> &ptr, size_t length ): ValuePtrBase( length ), m_val( ptr ) {}
 
 	/**
 	 * Creates ValuePtr from a pointer of type TYPE.
@@ -150,7 +150,7 @@ public:
 	 * \param length the length of the used array (ValuePtr does NOT check for length,
 	 * this is just here for child classes which may want to check)
 	 */
-	ValuePtr( TYPE *const ptr, size_t length ): _internal::ValuePtrBase( length ), m_val( ptr, BasicDeleter() ) {}
+	ValuePtr( TYPE *const ptr, size_t length ): ValuePtrBase( length ), m_val( ptr, BasicDeleter() ) {}
 
 	/**
 	 * Creates ValuePtr from a pointer of type TYPE.
@@ -162,7 +162,7 @@ public:
 	 * \param d the deleter to be used when the data shall be deleted ( d() is called then )
 	 */
 
-	template<typename D> ValuePtr( TYPE *const ptr, size_t length, D d ): _internal::ValuePtrBase( length ), m_val( ptr, d ) {}
+	template<typename D> ValuePtr( TYPE *const ptr, size_t length, D d ): ValuePtrBase( length ), m_val( ptr, d ) {}
 
 	virtual ~ValuePtr() {}
 
@@ -282,7 +282,7 @@ public:
 template<> scaling_pair ValuePtr<std::complex<float> >::getScalingTo( unsigned short /*typeID*/, autoscaleOption /*scaleopt*/ )const;
 template<> scaling_pair ValuePtr<std::complex<double> >::getScalingTo( unsigned short /*typeID*/, autoscaleOption /*scaleopt*/ )const;
 /// @endcond
-template<typename T> bool _internal::ValuePtrBase::is()const
+template<typename T> bool ValuePtrBase::is()const
 {
 	util::checkType<T>();
 	return getTypeID() == ValuePtr<T>::staticID;

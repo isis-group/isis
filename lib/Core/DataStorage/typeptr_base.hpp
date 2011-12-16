@@ -27,8 +27,6 @@ namespace isis
 {
 namespace data
 {
-namespace _internal
-{
 
 class ValuePtrBase : public util::_internal::GenericValue
 {
@@ -70,7 +68,7 @@ public:
 	virtual boost::shared_ptr<void> getRawAddress( size_t offset = 0 ) = 0;
 
 	typedef util::_internal::GenericReference<ValuePtrBase> Reference;
-	typedef ValuePtrConverterMap::mapped_type::mapped_type Converter;
+	typedef _internal::ValuePtrConverterMap::mapped_type::mapped_type Converter;
 
 	template<typename T> bool is()const;
 
@@ -128,7 +126,7 @@ public:
 	 * \param dst the ValuePtr-object to copy into
 	 * \param scaling the scaling to be used if a conversion is necessary (computed automatically if not given)
 	 */
-	bool copyTo( isis::data::_internal::ValuePtrBase &dst, scaling_pair scaling = scaling_pair() )const;
+	bool copyTo( isis::data::ValuePtrBase &dst, scaling_pair scaling = scaling_pair() )const;
 
 	/**
 	 * Copies elements from this into raw memory.
@@ -261,9 +259,9 @@ public:
 	 */
 	size_t compare( size_t start, size_t end, const ValuePtrBase &dst, size_t dst_start )const;
 };
-}
 
-typedef _internal::ValuePtrBase::Reference ValuePtrReference;
+
+typedef ValuePtrBase::Reference ValuePtrReference;
 
 }
 }

@@ -147,8 +147,8 @@ public:
 		return foreachVoxel<TYPE>( op, util::FixedVector<size_t, 4>() );
 	}
 
-	_internal::ValuePtrBase &asValuePtrBase() {return operator*();}
-	const _internal::ValuePtrBase &getValuePtrBase()const {return operator*();}
+	ValuePtrBase &asValuePtrBase() {return operator*();}
+	const ValuePtrBase &getValuePtrBase()const {return operator*();}
 
 	template<typename TYPE> ValuePtr<TYPE> &asValuePtr() {return asValuePtrBase().castToValuePtr<TYPE>();}
 	template<typename TYPE> const ValuePtr<TYPE> getValuePtr()const {return getValuePtrBase().castToValuePtr<TYPE>();}

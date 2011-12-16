@@ -31,9 +31,9 @@ namespace data
 {
 enum autoscaleOption {noscale, autoscale, noupscale, upscale};
 typedef std::pair<util::ValueReference, util::ValueReference> scaling_pair;
+class ValuePtrBase;
 namespace _internal
 {
-class ValuePtrBase;
 class ValuePtrConverterBase
 {
 public:
