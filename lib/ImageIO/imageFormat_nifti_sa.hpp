@@ -176,6 +176,7 @@ class ImageFormat_NiftiSa: public FileFormat
 	static void storeHeader( const util::PropertyMap &props, _internal::nifti_1_header *head );
 	static std::list<data::Chunk> parseHeader( const _internal::nifti_1_header *head, data::Chunk props );
 	std::auto_ptr<_internal::WriteOp> getWriteOp( const data::Image &src, util::istring dialect );
+	data::ValuePtr<bool> bitRead(isis::data::ValuePtr< uint8_t > src, size_t length);
 public:
 	ImageFormat_NiftiSa();
 	std::string getName()const;
