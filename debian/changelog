@@ -1,3 +1,10 @@
+isis (0.4.2g12c919d-0) stable; urgency=low
+
+  * add support for fsl color images
+  * bug fixes
+
+ -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Fri, 16 Dec  2011 14:28:00 +0200
+
 isis (0.4.1ge179836-3) stable; urgency=low
 
   * add isisio0-common package
