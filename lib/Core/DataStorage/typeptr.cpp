@@ -26,7 +26,7 @@ namespace _internal
 // some voodoo to get the vector types into the templates /
 //////////////////////////////////////////////////////////
 template<typename T> struct _VectorUnion {
-	union {__m128i reg; T elem[16/sizeof( T )];} vec;
+	union {__m128i reg; T elem[16 / sizeof( T )];} vec;
 	_VectorUnion( const T *el ) {std::copy( el, el + 16 / sizeof( T ), vec.elem );}
 	_VectorUnion( __m128i _reg ) {vec.reg = _reg;}
 	_VectorUnion() {}

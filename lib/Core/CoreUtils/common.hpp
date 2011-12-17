@@ -225,26 +225,29 @@ stringToList( const std::basic_string<charT, traits> &source,  charT separator )
  * If any of the values is greater than "1" the "allowed" difference will be bigger.
  * \returns \f[ |a-b| <= \varepsilon_T * \lceil |a|,|b|,|thresh| \rceil \f].
  */
-template<typename T> bool fuzzyEqual( T a, T b, unsigned short scale=10)
+template<typename T> bool fuzzyEqual( T a, T b, unsigned short scale = 10 )
 {
 	BOOST_MPL_ASSERT( ( boost::is_float<T> ) );
 
 	const T epsilon = std::numeric_limits<T>::epsilon(); // get the distange between 1 and the next representable value
-	T bigger,smaller;
+	T bigger, smaller;
 
-	a=std::abs(a);b=std::abs(b);
+	a = std::abs( a );
+	b = std::abs( b );
 
-	if(a<b){
-		bigger=b;smaller=a;
+	if( a < b ) {
+		bigger = b;
+		smaller = a;
 	} else {
-		smaller=b;bigger=a;
+		smaller = b;
+		bigger = a;
 	}
 
-	if(smaller==0)
-		return bigger < std::numeric_limits<T>::min()*scale;
+	if( smaller == 0 )
+		return bigger < std::numeric_limits<T>::min() * scale;
 
-	const T factor = 1/smaller; // scale smaller to that value
-	return (bigger*factor) <= (1+epsilon*scale); //scaled bigger should be between 1 and the next representable value
+	const T factor = 1 / smaller; // scale smaller to that value
+	return ( bigger * factor ) <= ( 1 + epsilon * scale ); //scaled bigger should be between 1 and the next representable value
 }
 
 typedef CoreDebug Debug;

@@ -45,7 +45,7 @@ namespace image_io
 class ImageFormat_Vista: public FileFormat
 {
 protected:
-	std::string suffixes(io_modes /*modes=both*/)const {return std::string( ".v" );}
+	std::string suffixes( io_modes /*modes=both*/ )const {return std::string( ".v" );}
 public:
 	std::string getName()const { return std::string( "Vista" );}
 	bool tainted()const {return false;}//internal plugins are not tainted
@@ -65,7 +65,7 @@ public:
 	 * </ul>
 	 *
 	 */
-	std::string dialects( const std::string &/*filename*/ )const {return std::string( "functional map anatomical" );}
+	std::string dialects( const std::string &/*filename*/ )const {return std::string( "functional map anatomical onlyfirst" );}
 	int load( std::list<data::Chunk> &chunks, const std::string &filename,
 			  const std::string &dialect ) throw( std::runtime_error & );
 	void write( const data::Image &image, const std::string &filename,
@@ -440,7 +440,7 @@ private:
 
 			//if not set yet, set row, column and slice vector.
 			// DEFAULT: axial
-			if( not chunk.hasProperty( "rowVec" ) ) {
+			if( !chunk.hasProperty( "rowVec" ) ) {
 				chunk.setPropertyAs<util::fvector4>( "rowVec", util::fvector4( 1, 0, 0, 0 ) );
 				chunk.setPropertyAs<util::fvector4>( "columnVec", util::fvector4( 0, 1, 0, 0 ) );
 				chunk.setPropertyAs<util::fvector4>( "sliceVec", util::fvector4( 0, 0, 1, 0 ) );

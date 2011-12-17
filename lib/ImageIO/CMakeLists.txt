@@ -16,7 +16,6 @@ include_directories(${CMAKE_SOURCE_DIR}/lib/Core)
 ############################################################
 # add global options
 ############################################################
-
 option(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI "Enable Nifti-IO plugin" OFF)
 option(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI_SA "Enable standalone Nifti-IO plugin" OFF)
 option(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL "Enable Null-IO plugin" ON)
@@ -26,6 +25,7 @@ option(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA "Enable Vista-IO plugin" OFF)
 option(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ "Enable proxy plugin for compressed files" ON)
 option(${CMAKE_PROJECT_NAME}_IOPLUGIN_TAR "Enable proxy plugin for tar datasets" ON)
 option(${CMAKE_PROJECT_NAME}_IOPLUGIN_RAW "Enable plugin for raw data output" ON)
+OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_SIEMENSTCPIP "Enable plugin for Siemens data coming on TCP Port" OFF)
 
 ############################################################
 # the plugins ...
@@ -235,6 +235,17 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_RAW)
   target_link_libraries(isisImageFormat_raw isis_core ${ISIS_LIB_DEPENDS})
   set(TARGETS ${TARGETS} isisImageFormat_raw)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_RAW)
+
+#################################################################################################
+# Siemens TCPIP
+#################################################################################################
+
+if (${CMAKE_PROJECT_NAME}_IOPLUGIN_SIEMENSTCPIP)
+	add_library(isisImageFormat_SiemensTcpIp SHARED imageFormat_SiemensTcpIp.cpp)
+	message(STATUS ${ISIS_LIB_DEPENDS})
+	target_link_libraries(isisImageFormat_SiemensTcpIp isis_core ${ISIS_LIB_DEPENDS})
+	set(TARGETS ${TARGETS} isisImageFormat_SiemensTcpIp)
+endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_SIEMENSTCPIP)
 
 ###########################################################################
 # prepare all plugins for installation

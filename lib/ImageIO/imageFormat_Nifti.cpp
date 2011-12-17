@@ -74,7 +74,7 @@ public:
 		LOG( ImageIoDebug, info ) << "create NiftiChunk";
 	}
 
-	//TODO: This is really weird staff - the gcc4.2 on MAC and RedHat is complaining about
+	//TODO: This is really weird stuff - the gcc4.2 on MAC and RedHat is complaining about
 	// the private copy constructor because he cannot resolve the template constructor when creating NiftiChunk
 	// e.g. in retList.push_back( _internal::NiftiChunk::makeNiftiChunk( static_cast<uint8_t *> (ni->data), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 )  );
 	// That's completely crazy but this workaround is a first solution - we hope to find a better one
@@ -113,7 +113,7 @@ class ImageFormat_Nifti : public FileFormat
 		}
 	};
 protected:
-	std::string suffixes(io_modes /*modes=both*/)const {
+	std::string suffixes( io_modes /*modes=both*/ )const {
 		return std::string( ".nii.gz .nii .hdr" );
 	}
 public:
@@ -590,8 +590,8 @@ private:
 					for ( size_t x = 0; x < isize[0]; x += csize[0] ) {
 						const size_t dim[] = {x, y, z, t};
 						T *target = refNii + image.getLinearIndex( dim );
-						const data::Chunk ch=image.getChunk( x, y, z, t, false );
-						ch.copyToMem(target, ch.getVolume(), scale );
+						const data::Chunk ch = image.getChunk( x, y, z, t, false );
+						ch.copyToMem( target, ch.getVolume(), scale );
 					}
 				}
 			}
