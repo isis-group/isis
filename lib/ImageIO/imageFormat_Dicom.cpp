@@ -5,6 +5,7 @@
 #include <dcmtk/dcmimgle/dcmimage.h>
 #include <dcmtk/dcmimage/diregist.h> //for color support
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <dcmtk/dcmdata/dcdicent.h>
 
 namespace isis
 {
@@ -55,7 +56,7 @@ class DicomChunk : public data::Chunk
 public:
 	//this uses auto_ptr by intention
 	//the ownership of the DcmFileFormat-pointer shall be transfered to this function, because it has to decide if it should be deleted
-	static data::Chunk makeChunk( std::string filename, std::auto_ptr<DcmFileFormat> dcfile, const std::string &dialect ) {
+	static data::Chunk makeChunk( const ImageFormat_Dicom &loader,std::string filename, std::auto_ptr<DcmFileFormat> dcfile, const std::string &dialect ) {
 		std::auto_ptr<data::Chunk> ret;
 		std::auto_ptr<DicomImage> img( new DicomImage( dcfile.get(), EXS_Unknown ) );
 
@@ -96,7 +97,7 @@ public:
 						//OK, the source image and file pointer are managed by the chunk, we must release them
 						img.release();
 						dcfile.release();
-						ImageFormat_Dicom::dcmObject2PropMap( dcdata, ret->branch( ImageFormat_Dicom::dicomTagTreeName ), dialect );
+						loader.dcmObject2PropMap( dcdata, ret->branch( ImageFormat_Dicom::dicomTagTreeName ), dialect );
 					}
 				} else if ( pix->getPlanes() == 3 ) { //try to load data as color image
 					// if there are 3 planes data is actually an array of 3 pointers
@@ -112,7 +113,7 @@ public:
 					}
 
 					if ( ret.get() ) {
-						ImageFormat_Dicom::dcmObject2PropMap( dcdata, ret->branch( ImageFormat_Dicom::dicomTagTreeName ), dialect );
+						loader.dcmObject2PropMap( dcdata, ret->branch( ImageFormat_Dicom::dicomTagTreeName ), dialect );
 					}
 				} else {
 					FileFormat::throwGenericError( "Unsupported pixel type." );
@@ -150,6 +151,18 @@ std::string ImageFormat_Dicom::dialects( const std::string &/*filename*/ )const 
 ptime ImageFormat_Dicom::genTimeStamp( const date &date, const ptime &time )
 {
 	return ptime( date, time.time_of_day() );
+}
+
+void ImageFormat_Dicom::addDicomDict()
+{
+	DcmDataDictionary &dict=dcmDataDict.wrlock();
+	for(DcmHashDictIterator i=dict.normalBegin();i!=dict.normalEnd();i++){
+		const DcmDictEntry *entry=*i;
+		const DcmTagKey key=entry->getKey();
+		const char *name=entry->getTagName();
+		dictionary[key]=util::istring( ImageFormat_Dicom::dicomTagTreeName ) + "/"+name;
+	}
+	dcmDataDict.unlock();
 }
 
 
@@ -492,7 +505,7 @@ int ImageFormat_Dicom::load( std::list<data::Chunk> &chunks, const std::string &
 	OFCondition loaded = dcfile->loadFile( filename.c_str() );
 
 	if ( loaded.good() ) {
-		data::Chunk chunk = _internal::DicomChunk::makeChunk( filename, dcfile, dialect );
+		data::Chunk chunk = _internal::DicomChunk::makeChunk( *this,filename, dcfile, dialect );
 		//we got a chunk from the file
 		sanitise( chunk, "" );
 		chunk.setPropertyAs( "source", filename );
@@ -529,11 +542,16 @@ bool ImageFormat_Dicom::tainted()const {return false;}//internal plugins are not
 
 isis::image_io::FileFormat *factory()
 {
-	if ( not dcmDataDict.isDictionaryLoaded() ) {
-		LOG( isis::image_io::Runtime, isis::error )
-				<< "No data dictionary loaded, check environment variable DCMDICTPATH"; //set DCMDICTPATH or fix DCM_DICT_DEFAULT_PATH in cfunix.h of dcmtk
-		return NULL;
+	isis::image_io::ImageFormat_Dicom *ret=new isis::image_io::ImageFormat_Dicom();
+	
+	if (dcmDataDict.isDictionaryLoaded() ) {
+		ret->addDicomDict();
+	} else {
+		// check /usr/share/doc/dcmtk/datadict.txt.gz and/or
+		// set DCMDICTPATH or fix DCM_DICT_DEFAULT_PATH in cfunix.h of dcmtk
+		LOG( isis::image_io::Runtime, isis::warning ) << "No official data dictionary loaded, will only use known attributes";
 	}
 
-	return new isis::image_io::ImageFormat_Dicom();
+	
+	return ret;
 }

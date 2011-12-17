@@ -56,16 +56,18 @@ class ImageFormat_Dicom: public FileFormat
 	static bool parseCSAValue( const std::string &val, const util::istring &name, const util::istring &vr, isis::util::PropertyMap &map );
 	static bool parseCSAValueList( const isis::util::slist &val, const util::istring &name, const util::istring &vr, isis::util::PropertyMap &map );
 	static int readMosaic( data::Chunk source, std::list<data::Chunk> &dest );
+	std::map<DcmTagKey,util::istring> dictionary;
 protected:
 	std::string suffixes( io_modes modes = both )const;
 public:
+	void addDicomDict();
 	static const char dicomTagTreeName[];
 	static const char unknownTagName[];
 	static void parseCSA( DcmElement *elem, isis::util::PropertyMap &map, const std::string &dialect );
 	static void parseScalar( DcmElement *elem, const util::istring &name, util::PropertyMap &map );
 	static void parseVector( DcmElement *elem, const util::istring &name, isis::util::PropertyMap &map );
 	static void parseList( DcmElement *elem, const util::istring &name, isis::util::PropertyMap &map );
-	static void dcmObject2PropMap( DcmObject *master_obj, isis::util::PropertyMap &map, const std::string &dialect );
+	void dcmObject2PropMap( DcmObject *master_obj, isis::util::PropertyMap &map, const std::string &dialect )const;
 	static void sanitise( util::PropertyMap &object, std::string dialect );
 	std::string getName()const;
 	std::string dialects( const std::string &filename )const;

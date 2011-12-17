@@ -31,8 +31,9 @@ template<typename T> std::list<T> dcmtkListString2list( DcmElement *elem )
 	elem->getOFStringArray( buff );
 	return util::stringToList<T>( std::string( buff.c_str() ), '\\' );
 }
-
 }
+
+
 /**
  * Parses the Age String
  * A string of characters with one of the following formats -- nnnD, nnnW, nnnM, nnnY;
@@ -522,27 +523,23 @@ bool ImageFormat_Dicom::parseCSAValueList( const util::slist &val, const util::i
 	} else if ( vr == "DS" or vr == "FD" ) {
 		map.propertyValue( name ) = util::listToList<double>( val.begin(), val.end() );
 	} else {
-		LOG( Runtime, error ) << "Dont know how to parse CSA entry " << std::make_pair( name, val ) << " type is " << util::MSubject( vr );
+		LOG( Runtime, error ) << "Don't know how to parse CSA entry " << std::make_pair( name, val ) << " type is " << util::MSubject( vr );
 		return false;
 	}
 
 	return true;
 }
 
-void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, isis::util::PropertyMap &map, const std::string &dialect )
+void ImageFormat_Dicom::dcmObject2PropMap( DcmObject* master_obj, isis::util::PropertyMap& map, const std::string& dialect)const
 {
 	for ( DcmObject *obj = master_obj->nextInContainer( NULL ); obj; obj = master_obj->nextInContainer( obj ) ) {
-		const DcmTag &tag = obj->getTag();
-		util::istring name;
-		const DcmDataDictionary &globalDataDict = dcmDataDict.rdlock();
-		const DcmDictEntry *dictRef = globalDataDict.findEntry( tag, tag.getPrivateCreator() );
+		const DcmTagKey &tag = obj->getTag();
+		
+		std::map< DcmTagKey, util::istring >::const_iterator entry = dictionary.find(tag);
+		const util::istring name = ( entry == dictionary.end() ) ?
+			entry->second:
+			(util::istring( unknownTagName ) + tag.toString().c_str());
 
-		if ( dictRef )
-			name = dictRef->getTagName();
-		else
-			name = util::istring( unknownTagName ) + tag.toString().c_str();
-
-		dcmDataDict.unlock();
 
 		if ( name == "PixelData" )
 			continue;//skip the image data
