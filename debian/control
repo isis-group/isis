@@ -157,7 +157,7 @@ Description: The ISIS package provides a general I/O framework for neuroimaging
 Package: libisis-qt4-dev
 Section: science
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0-dev (= 0.4.2g12c919d-0), isis-qt4, libqt4-dev
+Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0-dev (= 0.4.2g12c919d-0), libisis-qt4, libqt4-dev
 Description: The ISIS package provides a general I/O framework for neuroimaging
  data.  Being started with fMRI data, it can handle several established data
  formats, like Nifti, Analyze, DICOM and vista. A first application based on this
