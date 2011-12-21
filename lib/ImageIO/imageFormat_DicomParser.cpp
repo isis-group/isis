@@ -535,26 +535,20 @@ void ImageFormat_Dicom::dcmObject2PropMap( DcmObject* master_obj, isis::util::Pr
 	for ( DcmObject *obj = master_obj->nextInContainer( NULL ); obj; obj = master_obj->nextInContainer( obj ) ) {
 		const DcmTagKey &tag = obj->getTag();
 		
-		std::map< DcmTagKey, util::istring >::const_iterator entry = dictionary.find(tag);
-		const util::istring name = ( entry == dictionary.end() ) ?
-			entry->second:
-			(util::istring( unknownTagName ) + tag.toString().c_str());
-
-
-		if ( name == "PixelData" )
+		if ( tag == DcmTagKey( 0x7fe0, 0x0010 ) )
 			continue;//skip the image data
-		else if ( name == "CSAImageHeaderInfo" || tag == DcmTagKey( 0x0029, 0x1010 ) ) {
+		else if ( tag == DcmTagKey( 0x0029, 0x1010 ) ) { //CSAImageHeaderInfo
 			LOG( Debug, info ) << "Using " << tag.toString() << " as CSAImageHeaderInfo";
 			DcmElement *elem = dynamic_cast<DcmElement *>( obj );
 			parseCSA( elem, map.branch( "CSAImageHeaderInfo" ), dialect );
-		} else if ( name == "CSASeriesHeaderInfo" || tag == DcmTagKey( 0x0029, 0x1020 ) ) {
+		} else if ( tag == DcmTagKey( 0x0029, 0x1020 ) ) { //CSASeriesHeaderInfo
 			LOG( Debug, info ) << "Using " << tag.toString() << " as CSASeriesHeaderInfo";
 			DcmElement *elem = dynamic_cast<DcmElement *>( obj );
 			parseCSA( elem, map.branch( "CSASeriesHeaderInfo" ), dialect );
-		} else if ( name == "MedComHistoryInformation" ) {
+		} else if ( tag == DcmTagKey( 0x0029, 0x0020 ) ) { //MedComHistoryInformation
 			//@todo special handling needed
 			LOG( Debug, info ) << "Ignoring MedComHistoryInformation at " << tag.toString();
-		} else if ( obj->isLeaf() ) {
+		} else if ( obj->isLeaf() ) { // common case
 			if ( obj->getTag() == DcmTag( 0x0008, 0x0032 ) ) {
 				OFString buff;
 				dynamic_cast<DcmElement *>( obj )->getOFString( buff, 0 );
@@ -569,15 +563,15 @@ void ImageFormat_Dicom::dcmObject2PropMap( DcmObject* master_obj, isis::util::Pr
 			const size_t mult = obj->getVM();
 
 			if ( mult == 0 )
-				LOG( Runtime, verbose_info ) << "Skipping empty Dicom-Tag " << name;
+				LOG( Runtime, verbose_info ) << "Skipping empty Dicom-Tag " << util::MSubject(tag2Name(tag));
 			else if ( mult == 1 )
-				parseScalar( elem, name, map );
+				parseScalar( elem, tag2Name(tag), map );
 			else if ( mult <= 4 )
-				parseVector( elem, name, map );
+				parseVector( elem, tag2Name(tag), map );
 			else
-				parseList( elem, name, map ); // for any other value
+				parseList( elem, tag2Name(tag), map ); // for any other value
 		} else {
-			dcmObject2PropMap( obj, map.branch( name ), dialect );
+			dcmObject2PropMap( obj, map.branch( tag2Name(tag) ), dialect );
 		}
 	}
 }

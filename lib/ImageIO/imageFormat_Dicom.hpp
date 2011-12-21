@@ -25,6 +25,8 @@
 #define HAVE_CONFIG_H // this is needed for autoconf configured dcmtk (e.g. the debian package)
 
 #include <dcmtk/dcmdata/dcfilefo.h>
+#include <dcmtk/dcmdata/dcdict.h>
+
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
 namespace isis
@@ -59,8 +61,10 @@ class ImageFormat_Dicom: public FileFormat
 	std::map<DcmTagKey,util::istring> dictionary;
 protected:
 	std::string suffixes( io_modes modes = both )const;
+	util::istring tag2Name(const DcmTagKey& tag) const;
 public:
-	void addDicomDict();
+	ImageFormat_Dicom();
+	void addDicomDict(DcmDataDictionary& dict);
 	static const char dicomTagTreeName[];
 	static const char unknownTagName[];
 	static void parseCSA( DcmElement *elem, isis::util::PropertyMap &map, const std::string &dialect );

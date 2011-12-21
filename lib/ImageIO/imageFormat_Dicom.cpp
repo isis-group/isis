@@ -1,7 +1,6 @@
 #include "imageFormat_Dicom.hpp"
 #include <DataStorage/common.hpp>
 #include <CoreUtils/istring.hpp>
-#include <dcmtk/dcmdata/dcdict.h>
 #include <dcmtk/dcmimgle/dcmimage.h>
 #include <dcmtk/dcmimage/diregist.h> //for color support
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -134,7 +133,7 @@ using boost::posix_time::ptime;
 using boost::gregorian::date;
 
 const char ImageFormat_Dicom::dicomTagTreeName[] = "DICOM";
-const char ImageFormat_Dicom::unknownTagName[] = "Unknown Tag";
+const char ImageFormat_Dicom::unknownTagName[] = "UnknownTag/";
 
 std::string ImageFormat_Dicom::suffixes( io_modes modes )const
 {
@@ -153,25 +152,28 @@ ptime ImageFormat_Dicom::genTimeStamp( const date &date, const ptime &time )
 	return ptime( date, time.time_of_day() );
 }
 
-void ImageFormat_Dicom::addDicomDict()
+void ImageFormat_Dicom::addDicomDict(DcmDataDictionary &dict)
 {
-	DcmDataDictionary &dict=dcmDataDict.wrlock();
 	for(DcmHashDictIterator i=dict.normalBegin();i!=dict.normalEnd();i++){
 		const DcmDictEntry *entry=*i;
 		const DcmTagKey key=entry->getKey();
 		const char *name=entry->getTagName();
-		dictionary[key]=util::istring( ImageFormat_Dicom::dicomTagTreeName ) + "/"+name;
+		dictionary[key]=name;
 	}
-	dcmDataDict.unlock();
 }
 
 
 void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*dialect*/ )
 {
 	const util::istring prefix = util::istring( ImageFormat_Dicom::dicomTagTreeName ) + "/";
+	util::PropertyMap &dicomTree=object.branch(dicomTagTreeName);
 	/////////////////////////////////////////////////////////////////////////////////
 	// Transform known DICOM-Tags into default-isis-properties
 	/////////////////////////////////////////////////////////////////////////////////
+
+	if(dicomTree.hasProperty(util::istring(unknownTagName) + "(0019,100a)")){ // if its still there image was no mosaic, so I guess it should be used according to the standard
+		dicomTree.rename(util::istring(unknownTagName) + "(0019,100a)","SliceOrientation");
+	}
 
 	// compute sequenceStart and acquisitionTime (have a look at table C.10.8 in the standart)
 	if ( hasOrTell( prefix + "SeriesTime", object, warning ) && hasOrTell( prefix + "SeriesDate", object, warning ) ) {
@@ -387,8 +389,8 @@ int ImageFormat_Dicom::readMosaic( isis::data::Chunk source, std::list< isis::da
 
 	const unsigned short oldSize = dest.size();
 
-	if ( source.hasProperty( prefix + "Unknown Tag(0019,100a)" ) ) {
-		NumberOfImagesInMosaicProp = prefix + "Unknown Tag(0019,100a)";
+	if ( source.hasProperty( util::istring(unknownTagName) + "(0019,100a)" ) ) {
+		NumberOfImagesInMosaicProp = util::istring(unknownTagName) + "(0019,100a)";
 	} else if ( source.hasProperty( prefix + "CSAImageHeaderInfo/NumberOfImagesInMosaic" ) ) {
 		NumberOfImagesInMosaicProp = prefix + "CSAImageHeaderInfo/NumberOfImagesInMosaic";
 	} else {
@@ -537,21 +539,43 @@ void ImageFormat_Dicom::write( const data::Image &/*image*/, const std::string &
 }
 
 bool ImageFormat_Dicom::tainted()const {return false;}//internal plugins are not tainted
-}
-}
 
-isis::image_io::FileFormat *factory()
+ImageFormat_Dicom::ImageFormat_Dicom()
 {
-	isis::image_io::ImageFormat_Dicom *ret=new isis::image_io::ImageFormat_Dicom();
-	
+	//first read external dictionary if available
 	if (dcmDataDict.isDictionaryLoaded() ) {
-		ret->addDicomDict();
+		DcmDataDictionary &dict=dcmDataDict.wrlock();
+		addDicomDict(dict);
+		dcmDataDict.unlock();
 	} else {
 		// check /usr/share/doc/dcmtk/datadict.txt.gz and/or
 		// set DCMDICTPATH or fix DCM_DICT_DEFAULT_PATH in cfunix.h of dcmtk
 		LOG( isis::image_io::Runtime, isis::warning ) << "No official data dictionary loaded, will only use known attributes";
 	}
+	// than override known entries
+	dictionary[DcmTag( 0x0010, 0x0010 )]="PatientsName";
+	dictionary[DcmTag( 0x0010, 0x0030 )]="PatientsBirthDate";
+	dictionary[DcmTag( 0x0010, 0x0040 )]="PatientsSex";
+	dictionary[DcmTag( 0x0010, 0x1010 )]="PatientsAge";
+	dictionary[DcmTag( 0x0010, 0x1030 )]="PatientsWeight";
 
-	
+	dictionary[DcmTag( 0x0008, 0x1050 )]="PerformingPhysiciansName";
+
+	// override 0x0019, 0x100a with "unknown" because it is SliceOrientation in the standard and mosaic-size for siemens - well figure out while sanitizing
+	dictionary[DcmTag( 0x0019, 0x100a )]=util::istring(unknownTagName) + "(0019,100a)";
+}
+util::istring ImageFormat_Dicom::tag2Name(const DcmTagKey &tag)const
+{
+	std::map< DcmTagKey, util::istring >::const_iterator entry = dictionary.find(tag);
+	return ( entry != dictionary.end() ) ? entry->second : (util::istring( unknownTagName ) + tag.toString().c_str());
+}
+
+
+}
+}
+
+isis::image_io::FileFormat *factory()
+{
+	isis::image_io::ImageFormat_Dicom *ret=new isis::image_io::ImageFormat_Dicom;
 	return ret;
 }
