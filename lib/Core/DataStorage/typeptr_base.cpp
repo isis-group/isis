@@ -48,7 +48,8 @@ void ValuePtrBase::DelProxy::operator()( const void *at )
 
 const _internal::ValuePtrConverterMap &ValuePtrBase::converters()
 {
-	return util::Singletons::get<_internal::ValuePtrConverterMap, 0>();
+	static _internal::ValuePtrConverterMap ret; //@todo not using class Singleton because ValuePtrConverterMap is hidden
+	return ret;
 }
 
 const ValuePtrBase::Converter &ValuePtrBase::getConverterTo( unsigned short ID )const

@@ -30,7 +30,8 @@ ValueBase::~ValueBase() {}
 
 const _internal::ValueConverterMap &ValueBase::converters()
 {
-	return Singletons::get<_internal::ValueConverterMap, 0>();
+	static _internal::ValueConverterMap ret; //@todo not using class Singleton because ValuePtrConverterMap is hidden
+	return ret;
 }
 
 const ValueBase::Converter &ValueBase::getConverterTo( unsigned short ID )const

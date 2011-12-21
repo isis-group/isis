@@ -32,6 +32,7 @@ namespace data
 enum autoscaleOption {noscale, autoscale, noupscale, upscale};
 typedef std::pair<util::ValueReference, util::ValueReference> scaling_pair;
 class ValuePtrBase;
+#pragma GCC visibility push(hidden)
 namespace _internal
 {
 class ValuePtrConverterBase
@@ -53,6 +54,7 @@ public:
 };
 
 }
+#pragma GCC visibility pop
 }
 }
 

@@ -29,6 +29,7 @@ namespace isis
 {
 namespace data
 {
+#pragma GCC visibility push(hidden)
 namespace _internal
 {
 
@@ -166,6 +167,7 @@ IMPL_SCALED_CONVERT( uint8_t, double, u8, f64 )
 #undef IMPL_CONVERT
 #undef IMPL_SCALED_CONVERT
 }
+#pragma GCC visibility pop
 }
 }
 #endif //ISIS_USE_LIBOIL
