@@ -177,23 +177,23 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 
 	// compute sequenceStart and acquisitionTime (have a look at table C.10.8 in the standart)
 	if ( hasOrTell( prefix + "SeriesTime", object, warning ) && hasOrTell( prefix + "SeriesDate", object, warning ) ) {
-		const ptime sequenceStart = genTimeStamp( object.getPropertyAs<date>( prefix + "SeriesDate" ), object.getPropertyAs<ptime>( prefix + "SeriesTime" ) );
+		const ptime sequenceStart = genTimeStamp( dicomTree.getPropertyAs<date>( "SeriesDate" ), dicomTree.getPropertyAs<ptime>( "SeriesTime" ) );
 
 		// compute acquisitionTime
 		if ( hasOrTell( prefix + "AcquisitionTime", object, warning ) and hasOrTell( prefix + "AcquisitionDate", object, warning ) ) {
-			const ptime acTime = genTimeStamp( object.getPropertyAs<date>( prefix + "AcquisitionDate" ), object.getPropertyAs<ptime>( prefix + "AcquisitionTime" ) );
+			const ptime acTime = genTimeStamp( dicomTree.getPropertyAs<date>( "AcquisitionDate" ), dicomTree.getPropertyAs<ptime>( "AcquisitionTime" ) );
 			const boost::posix_time::time_duration acDist = acTime - sequenceStart;
 			const float fAcDist = float( acDist.ticks() ) / acDist.ticks_per_second() * 1000;
 			LOG( Debug, verbose_info ) << "Computed acquisitionTime as " << fAcDist;
 			object.setPropertyAs( "acquisitionTime", fAcDist );
-			object.remove( prefix + "AcquisitionTime" );
-			object.remove( prefix + "AcquisitionDate" );
+			dicomTree.remove( "AcquisitionTime" );
+			dicomTree.remove( "AcquisitionDate" );
 		}
 
 		LOG( Debug, verbose_info ) << "Computed sequenceStart as " << sequenceStart;
 		object.setPropertyAs( "sequenceStart", sequenceStart );
-		object.remove( prefix + "SeriesTime" );
-		object.remove( prefix + "SeriesDate" );
+		dicomTree.remove( "SeriesTime" );
+		dicomTree.remove( "SeriesDate" );
 	}
 
 	transformOrTell<uint16_t>  ( prefix + "SeriesNumber",     "sequenceNumber",     object, warning );
@@ -207,16 +207,16 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 		util::fvector4 voxelSize( invalid_float, invalid_float, invalid_float, 0 );
 
 		if ( hasOrTell( prefix + "PixelSpacing", object, warning ) ) {
-			voxelSize = object.getPropertyAs<util::fvector4>( prefix + "PixelSpacing" );
-			object.remove( prefix + "PixelSpacing" );
+			voxelSize = dicomTree.getPropertyAs<util::fvector4>( "PixelSpacing" );
+			dicomTree.remove( "PixelSpacing" );
 			std::swap( voxelSize[0], voxelSize[1] ); // the values are row-spacing (size in column dir) /column spacing (size in row dir)
 		} else {
 			voxelSize[2] = 1 / object.getPropertyAs<float>( "DICOM/CSASeriesHeaderInfo/SliceResolution" );
 		}
 
 		if ( hasOrTell( prefix + "SliceThickness", object, warning ) ) {
-			voxelSize[2] = object.getPropertyAs<float>( prefix + "SliceThickness" );
-			object.remove( prefix + "SliceThickness" );
+			voxelSize[2] = dicomTree.getPropertyAs<float>( "SliceThickness" );
+			dicomTree.remove( "SliceThickness" );
 		}
 
 		object.setPropertyAs( "voxelSize", voxelSize );
@@ -227,8 +227,8 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 
 		if ( hasOrTell( prefix + "SpacingBetweenSlices", object, info ) ) {
 			if ( voxelSize[2] != invalid_float ) {
-				object.setPropertyAs( "voxelGap", util::fvector4( 0, 0, object.getPropertyAs<float>( prefix + "SpacingBetweenSlices" ) - voxelSize[2] ) );
-				object.remove( prefix + "SpacingBetweenSlices" );
+				object.setPropertyAs( "voxelGap", util::fvector4( 0, 0, dicomTree.getPropertyAs<float>( "SpacingBetweenSlices" ) - voxelSize[2] ) );
+				dicomTree.remove( "SpacingBetweenSlices" );
 			} else
 				LOG( Runtime, warning )
 						<< "Cannot compute the voxel gap from the slice spacing ("
@@ -240,7 +240,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 	transformOrTell<uint16_t>     ( prefix + "NumberOfAverages",        "numberOfAverages",   object, warning );
 
 	if ( hasOrTell( prefix + "ImageOrientationPatient", object, info ) ) {
-		util::dlist buff = object.getPropertyAs<util::dlist>( prefix + "ImageOrientationPatient" );
+		util::dlist buff = dicomTree.getPropertyAs<util::dlist>( "ImageOrientationPatient" );
 
 		if ( buff.size() == 6 ) {
 			util::fvector4 row, column;
@@ -252,18 +252,18 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 
 			object.setPropertyAs( "rowVec" , row );
 			object.setPropertyAs( "columnVec", column );
-			object.remove( prefix + "ImageOrientationPatient" );
+			dicomTree.remove( "ImageOrientationPatient" );
 		} else {
-			LOG( Runtime, error ) << "Could not extract row- and columnVector from " << object.propertyValue( prefix + "ImageOrientationPatient" );
+			LOG( Runtime, error ) << "Could not extract row- and columnVector from " << dicomTree.propertyValue( "ImageOrientationPatient" );
 		}
 
 		if( object.hasProperty( prefix + "CSAImageHeaderInfo/SliceNormalVector" ) && !object.hasProperty( "sliceVec" ) ) {
-			LOG( Debug, info ) << "Extracting sliceVec from CSAImageHeaderInfo/SliceNormalVector " << object.propertyValue( prefix + "CSAImageHeaderInfo/SliceNormalVector" );
-			util::dlist list = object.getPropertyAs<util::dlist >( prefix + "CSAImageHeaderInfo/SliceNormalVector" );
+			LOG( Debug, info ) << "Extracting sliceVec from CSAImageHeaderInfo/SliceNormalVector " << dicomTree.propertyValue( "CSAImageHeaderInfo/SliceNormalVector" );
+			util::dlist list = dicomTree.getPropertyAs<util::dlist >( "CSAImageHeaderInfo/SliceNormalVector" );
 			util::fvector4 vec;
 			vec.copyFrom( list.begin(), list.end() );
 			object.setPropertyAs( "sliceVec", vec );
-			object.remove( prefix + "CSAImageHeaderInfo/SliceNormalVector" );
+			dicomTree.remove( "CSAImageHeaderInfo/SliceNormalVector" );
 		}
 	} else {
 		LOG( Runtime, warning ) << "Making up row and column vector, because the image lacks this information";
@@ -272,7 +272,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 	}
 
 	if ( hasOrTell( prefix + "ImagePositionPatient", object, info ) ) {
-		object.setPropertyAs( "indexOrigin", object.getPropertyAs<util::fvector4>( prefix + "ImagePositionPatient" ) );
+		object.setPropertyAs( "indexOrigin", dicomTree.getPropertyAs<util::fvector4>( "ImagePositionPatient" ) );
 	} else if( object.hasProperty( "DICOM/CSAImageHeaderInfo/ProtocolSliceNumber" ) ) {
 		util::fvector4 orig( 0, 0, object.getPropertyAs<float>( "DICOM/CSAImageHeaderInfo/ProtocolSliceNumber" ) / object.getPropertyAs<float>( "DICOM/CSASeriesHeaderInfo/SliceResolution" ) );
 		LOG( Runtime, info ) << "Synthesize missing indexOrigin from CSAImageHeaderInfo/ProtocolSliceNumber as " << orig;
@@ -288,7 +288,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 		util::Selection isisGender( "male,female,other" );
 		bool set = false;
 
-		switch ( object.getPropertyAs<std::string>( prefix + "PatientsSex" )[0] ) {
+		switch ( dicomTree.getPropertyAs<std::string>( "PatientsSex" )[0] ) {
 		case 'M':
 			isisGender.set( "male" );
 			set = true;
@@ -307,7 +307,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 
 		if( set ) {
 			object.propertyValue( "subjectGender" ) = isisGender;
-			object.remove( prefix + "PatientsSex" );
+			dicomTree.remove( "PatientsSex" );
 		}
 	}
 
@@ -319,12 +319,12 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 	bool foundDiff = true;
 
 	// find the B-Value
-	if ( object.hasProperty( prefix + "DiffusionBValue" ) ) { //in case someone actually used the right Tag
-		bValue = object.getPropertyAs<int32_t>( prefix + "DiffusionBValue" );
-		object.remove( prefix + "DiffusionBValue" );
-	} else if ( object.hasProperty( prefix + "Unknown Tag(0019,100c)" ) ) { //fallback for siemens
-		bValue = object.getPropertyAs<int32_t>( prefix + "Unknown Tag(0019,100c)" );
-		object.remove( prefix + "Unknown Tag(0019,100c)" );
+	if ( dicomTree.hasProperty( "DiffusionBValue" ) ) { //in case someone actually used the right Tag
+		bValue = dicomTree.getPropertyAs<int32_t>( "DiffusionBValue" );
+		dicomTree.remove( "DiffusionBValue" );
+	} else if ( dicomTree.hasProperty( util::istring(unknownTagName)+ "(0019,100c)" ) ) { //fallback for siemens
+		bValue = dicomTree.getPropertyAs<int32_t>( util::istring(unknownTagName)+ "(0019,100c)" );
+		dicomTree.remove( util::istring(unknownTagName) + "(0019,100c)" );
 	} else foundDiff = false;
 
 	// If we do have DWI here, create a property diffusionGradient (which defaults to 0,0,0,0)
@@ -332,12 +332,12 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 		util::fvector4 &diff = object.setPropertyAs( "diffusionGradient", util::fvector4() )->castTo<util::fvector4>();
 
 		if( bValue ) { // if bValue is not zero multiply the diffusionGradient by it
-			if( object.hasProperty( prefix + "DiffusionGradientOrientation" ) ) {
-				diff = object.getPropertyAs<util::fvector4>( prefix + "DiffusionGradientOrientation" ) * bValue;
-				object.remove( prefix + "DiffusionGradientOrientation" );
-			} else if( object.hasProperty( prefix + "Unknown Tag(0019,100e)" ) ) {
-				diff = object.getPropertyAs<util::fvector4>( prefix + "Unknown Tag(0019,100e)" ) * bValue;
-				object.remove( prefix + "Unknown Tag(0019,100e)" );
+			if( dicomTree.hasProperty( "DiffusionGradientOrientation" ) ) {
+				diff = dicomTree.getPropertyAs<util::fvector4>( "DiffusionGradientOrientation" ) * bValue;
+				dicomTree.remove( "DiffusionGradientOrientation" );
+			} else if( dicomTree.hasProperty( util::istring(unknownTagName) + "(0019,100e)" ) ) {
+				diff = dicomTree.getPropertyAs<util::fvector4>( util::istring(unknownTagName) + "(0019,100e)" ) * bValue;
+				dicomTree.remove( util::istring(unknownTagName) + "(0019,100e)" );
 			} else {
 				LOG( Runtime, error ) << "Found no diffusion direction for DiffusionBValue " << util::MSubject( bValue );
 			}
@@ -349,28 +349,28 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 	////////////////////////////////////////////////////////////////
 	// Do some sanity checks on redundant tags
 	////////////////////////////////////////////////////////////////
-	if ( object.hasProperty( prefix + "Unknown Tag(0019,1015)" ) ) {
+	if ( dicomTree.hasProperty( util::istring(unknownTagName) + "(0019,1015)" ) ) {
 		const util::fvector4 org = object.getPropertyAs<util::fvector4>( "indexOrigin" );
-		const util::fvector4 comp = object.getPropertyAs<util::fvector4>( prefix + "Unknown Tag(0019,1015)" );
+		const util::fvector4 comp = dicomTree.getPropertyAs<util::fvector4>( util::istring(unknownTagName) + "(0019,1015)" );
 
 		if ( comp.fuzzyEqual( org ) )
-			object.remove( prefix + "Unknown Tag(0019,1015)" );
+			dicomTree.remove( util::istring(unknownTagName) + "(0019,1015)" );
 		else
 			LOG( Debug, warning )
-					<< prefix + "Unknown Tag(0019,1015):" << object.propertyValue( prefix + "Unknown Tag(0019,1015)" )
+					<< prefix + util::istring(unknownTagName) + "(0019,1015):" << dicomTree.propertyValue( util::istring(unknownTagName) + "(0019,1015)" )
 					<< " differs from indexOrigin:" << object.propertyValue( "indexOrigin" ) << ", won't remove it";
 	}
 
 	if(
-		object.hasProperty( prefix + "CSAImageHeaderInfo/MosaicRefAcqTimes" ) &&
-		object.hasProperty( prefix + "Unknown Tag(0019,1029)" ) &&
-		object.propertyValue( prefix + "Unknown Tag(0019,1029)" ) == object.propertyValue( prefix + "CSAImageHeaderInfo/MosaicRefAcqTimes" )
+		dicomTree.hasProperty( "CSAImageHeaderInfo/MosaicRefAcqTimes" ) &&
+		dicomTree.hasProperty( util::istring(unknownTagName) + "(0019,1029)" ) &&
+		dicomTree.propertyValue( util::istring(unknownTagName) + "(0019,1029)" ) == dicomTree.propertyValue( "CSAImageHeaderInfo/MosaicRefAcqTimes" )
 	) {
-		object.remove( prefix + "Unknown Tag(0019,1029)" );
+		dicomTree.remove( util::istring(unknownTagName) + "(0019,1029)" );
 	}
 
-	if ( object.hasProperty( prefix + "Unknown Tag(0051,100c)" ) ) { //@todo siemens only ?
-		std::string fov = object.getPropertyAs<std::string>( prefix + "Unknown Tag(0051,100c)" );
+	if ( dicomTree.hasProperty( util::istring(unknownTagName) + "(0051,100c)" ) ) { //@todo siemens only ?
+		std::string fov = dicomTree.getPropertyAs<std::string>( util::istring(unknownTagName) + "(0051,100c)" );
 		float row, column;
 
 		if ( std::sscanf( fov.c_str(), "FoV %f*%f", &column, &row ) == 2 ) {
