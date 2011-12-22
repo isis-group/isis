@@ -171,8 +171,8 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 	// Transform known DICOM-Tags into default-isis-properties
 	/////////////////////////////////////////////////////////////////////////////////
 
-	if(dicomTree.hasProperty(util::istring(unknownTagName) + "(0019,100a)")){ // if its still there image was no mosaic, so I guess it should be used according to the standard
-		dicomTree.rename(util::istring(unknownTagName) + "(0019,100a)","SliceOrientation");
+	if(dicomTree.hasProperty("SiemensNumberOfImagesInMosaic")){ // if its still there image was no mosaic, so I guess it should be used according to the standard
+		dicomTree.rename("SiemensNumberOfImagesInMosaic","SliceOrientation");
 	}
 
 	// compute sequenceStart and acquisitionTime (have a look at table C.10.8 in the standart)
@@ -222,7 +222,6 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 		object.setPropertyAs( "voxelSize", voxelSize );
 		transformOrTell<uint16_t>( prefix + "RepetitionTime", "repetitionTime", object, warning );
 		transformOrTell<float>( prefix + "EchoTime", "echoTime", object, warning );
-		transformOrTell<std::string>( prefix + "TransmitCoilName", "transmitCoil", object, info );
 		transformOrTell<int16_t>( prefix + "FlipAngle", "flipAngle", object, warning );
 
 		if ( hasOrTell( prefix + "SpacingBetweenSlices", object, info ) ) {
@@ -389,8 +388,8 @@ int ImageFormat_Dicom::readMosaic( isis::data::Chunk source, std::list< isis::da
 
 	const unsigned short oldSize = dest.size();
 
-	if ( source.hasProperty( util::istring(unknownTagName) + "(0019,100a)" ) ) {
-		NumberOfImagesInMosaicProp = util::istring(unknownTagName) + "(0019,100a)";
+	if ( source.hasProperty( prefix + "SiemensNumberOfImagesInMosaic" ) ) {
+		NumberOfImagesInMosaicProp = prefix + "SiemensNumberOfImagesInMosaic";
 	} else if ( source.hasProperty( prefix + "CSAImageHeaderInfo/NumberOfImagesInMosaic" ) ) {
 		NumberOfImagesInMosaicProp = prefix + "CSAImageHeaderInfo/NumberOfImagesInMosaic";
 	} else {
@@ -550,7 +549,7 @@ ImageFormat_Dicom::ImageFormat_Dicom()
 	} else {
 		// check /usr/share/doc/dcmtk/datadict.txt.gz and/or
 		// set DCMDICTPATH or fix DCM_DICT_DEFAULT_PATH in cfunix.h of dcmtk
-		LOG( isis::image_io::Runtime, isis::warning ) << "No official data dictionary loaded, will only use known attributes";
+		LOG( Runtime, warning ) << "No official data dictionary loaded, will only use known attributes";
 	}
 	// than override known entries
 	dictionary[DcmTag( 0x0010, 0x0010 )]="PatientsName";
@@ -561,8 +560,8 @@ ImageFormat_Dicom::ImageFormat_Dicom()
 
 	dictionary[DcmTag( 0x0008, 0x1050 )]="PerformingPhysiciansName";
 
-	// override 0x0019, 0x100a with "unknown" because it is SliceOrientation in the standard and mosaic-size for siemens - well figure out while sanitizing
-	dictionary[DcmTag( 0x0019, 0x100a )]=util::istring(unknownTagName) + "(0019,100a)";
+	// override 0x0019, 0x100a with "SiemensNumberOfImagesInMosaic" because it is SliceOrientation in the standard and mosaic-size for siemens - we will figure out while sanitizing
+	dictionary[DcmTag( 0x0019, 0x100a )]="SiemensNumberOfImagesInMosaic";
 }
 util::istring ImageFormat_Dicom::tag2Name(const DcmTagKey &tag)const
 {
