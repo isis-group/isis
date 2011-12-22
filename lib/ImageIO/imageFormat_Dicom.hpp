@@ -57,7 +57,7 @@ class ImageFormat_Dicom: public FileFormat
 	static size_t parseCSAEntry( Uint8 *at, isis::util::PropertyMap &map, const std::string &dialect );
 	static bool parseCSAValue( const std::string &val, const util::PropertyMap::PropPath &name, const util::istring &vr, isis::util::PropertyMap &map );
 	static bool parseCSAValueList( const isis::util::slist &val, const util::PropertyMap::PropPath &name, const util::istring &vr, isis::util::PropertyMap &map );
-	static int readMosaic( data::Chunk source, std::list<data::Chunk> &dest );
+	static data::Chunk readMosaic( data::Chunk source );
 	std::map<DcmTagKey,util::PropertyMap::PropPath> dictionary;
 protected:
 	std::string suffixes( io_modes modes = both )const;

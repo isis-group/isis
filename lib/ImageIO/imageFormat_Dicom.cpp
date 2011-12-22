@@ -378,15 +378,13 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 	}
 }
 
-int ImageFormat_Dicom::readMosaic( isis::data::Chunk source, std::list< isis::data::Chunk >& dest )
+data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source)
 {
 	// prepare some needed parameters
 	const util::istring prefix = util::istring( ImageFormat_Dicom::dicomTagTreeName ) + "/";
 	util::slist iType = source.getPropertyAs<util::slist>( prefix + "ImageType" );
 	std::replace( iType.begin(), iType.end(), std::string( "MOSAIC" ), std::string( "WAS_MOSAIC" ) );
 	util::istring NumberOfImagesInMosaicProp;
-
-	const unsigned short oldSize = dest.size();
 
 	if ( source.hasProperty( prefix + "SiemensNumberOfImagesInMosaic" ) ) {
 		NumberOfImagesInMosaicProp = prefix + "SiemensNumberOfImagesInMosaic";
@@ -402,8 +400,8 @@ int ImageFormat_Dicom::readMosaic( isis::data::Chunk source, std::list< isis::da
 	const uint16_t matrixSize = std::ceil( std::sqrt( images ) );
 	size[0] /= matrixSize;
 	size[1] /= matrixSize;
-	assert( size[3] == 1 );
-	LOG( Debug, info ) << "Decomposing a " << source.getSizeAsString() << " mosaic-image into " << images << " " << size << " slices";
+	size[2] = images;
+	LOG( Debug, info ) << "Decomposing a " << source.getSizeAsString() << " mosaic-image into a " << size << " volume";
 	// fix the properties of the source (we 'll need them later)
 	util::fvector4 voxelGap;
 
@@ -454,48 +452,37 @@ int ImageFormat_Dicom::readMosaic( isis::data::Chunk source, std::list< isis::da
 		acqTime = source.propertyValue( "acquisitionTime" )->castTo<float>();
 	}
 
+	data::Chunk dest=source.cloneToNew( size[0], size[1], size[2] );
+	static_cast<util::PropertyMap &>( dest ) = static_cast<const util::PropertyMap &>( source ); //copy _only_ the Properties of source
+	// update origin
+	dest.setPropertyAs( "indexOrigin", origin );
+	// update fov
+	if ( dest.hasProperty( "fov" ) ) {
+		util::fvector4 &ref = dest.propertyValue( "fov" )->castTo<util::fvector4>();
+		ref[0] /= matrixSize;
+		ref[1] /= matrixSize;
+		ref[2] = voxelSize[2]*images+voxelGap[2]*(images-1);
+	}
+
 	// for every slice
 	for ( size_t slice = 0; slice < images; slice++ ) {
-		dest.push_back( source.cloneToNew( size[0], size[1] ) );//create a new chunk at the end of the output
-		data::Chunk &working = dest.back(); // use this as working slice
-
 		// copy the lines into the corresponding slice-chunk
 		for ( size_t line = 0; line < size[1]; line++ ) {
-			const size_t dpos[] = {0, line, 0, 0}; //begin of the target line
+			const size_t dpos[] = {0, line, slice, 0}; //begin of the target line
 			const size_t column = slice % matrixSize; //column of the mosaic
 			const size_t row = slice / matrixSize; //row of the mosaic
 			const size_t sstart[] = {column *size[0], row *size[1] + line, 0, 0}; //begin of the source line
 			const size_t send[] = {sstart[0] + size[0] - 1, row *size[1] + line, 0, 0}; //end of the source line
-			source.copyRange( sstart, send, working, dpos );
+			source.copyRange( sstart, send, dest, dpos );
 		}
-
-		// and "fix" its properties
-		static_cast<util::PropertyMap &>( working ) = static_cast<const util::PropertyMap &>( source ); //copy _only_ the Properties of source
-		// update origin
-		util::fvector4 &origin = working.propertyValue( "indexOrigin" )->castTo<util::fvector4>();
-		origin = origin + ( sliceVec * slice );
-
-		// update fov
-		if ( working.hasProperty( "fov" ) ) {
-			util::fvector4 &ref = working.propertyValue( "fov" )->castTo<util::fvector4>();
-			ref[0] /= matrixSize;
-			ref[1] /= matrixSize;
-		}
-
-		// fix/set acquisitionNumber and acquisitionTime
-		working.propertyValue( "acquisitionNumber" )->castTo<uint32_t>() += slice;
-
+/*		// fix/set acquisitionNumber and acquisitionTime
+		dest.propertyValueAt( "acquisitionNumber",slice )->castTo<uint32_t>() += slice;*/
 		if( haveAcqTimeList ) {
-			working.setPropertyAs<float>( "acquisitionTime", acqTime +  * ( acqTimeIt++ ) );
+			dest.propertyValueAt( "acquisitionTime", slice) = float(acqTime +  * ( acqTimeIt++ ) );
 		}
-
-		LOG( Debug, verbose_info )
-				<< "New slice " << slice << " at " << working.propertyValue( "indexOrigin" ).toString( false )
-				<< " with acquisitionNumber " << working.propertyValue( "acquisitionNumber" ).toString( false )
-				<< ( haveAcqTimeList ? std::string( " and acquisitionTime " ) + working.propertyValue( "acquisitionTime" ).toString( false ) : "" );
 	}
 
-	return dest.size() - oldSize;
+	return dest;
 }
 
 
@@ -516,15 +503,13 @@ int ImageFormat_Dicom::load( std::list<data::Chunk> &chunks, const std::string &
 			if( dialect == "keepmosaic" ) {
 				LOG( Runtime, info ) << "This seems to be an mosaic image, but dialect \"keepmosaic\" was selected";
 				chunks.push_back( chunk );
-				return 1;
 			} else {
-				LOG( Runtime, verbose_info ) << "This seems to be an mosaic image, will decompose it";
-				return readMosaic( chunk, chunks );
+				chunks.push_back( readMosaic( chunk ) );
 			}
 		} else {
 			chunks.push_back( chunk );
-			return 1;
 		}
+		return 1;
 	} else {
 		FileFormat::throwGenericError( std::string( "Failed to open file: " ) + loaded.text() );
 	}
