@@ -63,10 +63,15 @@ public:
 	 * a map, using complete key-paths as keys for the corresponding values
 	 */
 	typedef std::map<KeyType, PropertyValue> FlatMap;
+	struct PropPath:public std::list<KeyType>{
+		PropPath(){}
+		PropPath(const char *key):std::list<KeyType>(util::stringToList<KeyType>( util::istring(key), pathSeperator )){}
+		PropPath(const KeyType &key):std::list<KeyType>(util::stringToList<KeyType>( key, pathSeperator )){}
+		PropPath(const std::list<KeyType> &path):std::list<KeyType>(path){}
+	};
 private:
 	typedef std::map<KeyType, mapped_type, key_compare> Container;
-	typedef std::list<KeyType> propPath;
-	typedef propPath::const_iterator propPathIterator;
+	typedef PropPath::const_iterator propPathIterator;
 
 	static const char pathSeperator = '/';
 
@@ -96,10 +101,10 @@ private:
 	void diffTree( const PropertyMap &other, PropertyMap::DiffMap &ret, KeyType prefix ) const;
 
 	static mapped_type &fetchEntry( util::PropertyMap &root, const propPathIterator at, const propPathIterator pathEnd );
-	mapped_type &fetchEntry( const KeyType &key );
+	mapped_type &fetchEntry( const PropPath &path );
 
 	static const mapped_type *findEntry( const util::PropertyMap &root, const propPathIterator at, const propPathIterator pathEnd );
-	const mapped_type *findEntry( const KeyType &key )const;
+	const mapped_type *findEntry( const PropPath &path )const;
 
 	/// internal recursion-function for remove
 	bool recursiveRemove( util::PropertyMap &root, const propPathIterator at, const propPathIterator pathEnd );
@@ -154,17 +159,17 @@ protected:
 	/**
 	 * Access the property vector referenced by the path-key.
 	 * If the property does not exist, an empty dummy will returned.
-	 * \param key the "path" to the property
+	 * \param path the "path" to the property
 	 * \returns a reference to the PropertyValue
 	 */
-	const std::vector<PropertyValue> &propertyValueVec( const KeyType &key )const;
+	const std::vector<PropertyValue> &propertyValueVec( const PropPath &path )const;
 
 	/**
 	 * Access the property vector referenced by the path-key, create it if its not there.
-	 * \param key the "path" to the property
+	 * \param path the "path" to the property
 	 * \returns a reference to the PropertyValue
 	 */
-	std::vector<PropertyValue> &propertyValueVec( const KeyType &key );
+	std::vector<PropertyValue> &propertyValueVec( const PropPath &path );
 public:
 	/////////////////////////////////////////////////////////////////////////////////////////
 	// constructors
@@ -183,21 +188,21 @@ public:
 	 * \param key the "path" to the property
 	 * \returns a reference to the PropertyValue
 	 */
-	const PropertyValue &propertyValue( const KeyType &key )const;
+	const PropertyValue &propertyValue( const PropPath &path )const;
 
 	/**
 	 * Access the property referenced by the path-key, create it if its not there.
 	 * \param key the "path" to the property
 	 * \returns a reference to the PropertyValue
 	 */
-	PropertyValue &propertyValue( const KeyType &key );
+	PropertyValue &propertyValue( const PropPath &path );
 
 	/**
 	 * Access the branch referenced by the path-key, create it if its not there.
 	 * \param key the "path" to the branch
 	 * \returns a reference to the branching PropertyMap
 	 */
-	PropertyMap &branch( const KeyType &key );
+	PropertyMap &branch( const PropPath &path );
 
 	/**
 	 * Access the branch referenced by the path-key.
@@ -205,7 +210,7 @@ public:
 	 * \param key the "path" to the branch
 	 * \returns a reference to the branching PropertyMap
 	 */
-	const PropertyMap &branch( const KeyType &key )const;
+	const PropertyMap &branch( const PropPath &path )const;
 
 	/**
 	 * Remove the property adressed by the key.
@@ -215,7 +220,7 @@ public:
 	 * \param key the "path" to the property
 	 * \returns true if successful, false otherwise
 	 */
-	bool remove( const KeyType &key );
+	bool remove( const PropPath &path );
 
 	/**
 	 * remove every property which is also in the given map (regardless of the value)
@@ -238,7 +243,7 @@ public:
 	 * \param key the "path" to the property
 	 * \returns true if the given property does exist and is not empty, false otherwise
 	 */
-	bool hasProperty( const KeyType &key )const;
+	bool hasProperty( const PropPath &path )const;
 
 	/**
 	 * Search for the property/branch in the whole Tree.
@@ -257,7 +262,7 @@ public:
 	 * \param key the "path" to the branch
 	 * \returns true if the given branch does exist and is not empty, false otherwise
 	 */
-	bool hasBranch( const KeyType &key )const;
+	bool hasBranch( const PropPath &path )const;
 
 	////////////////////////////////////////////////////////////////////////////////////////
 	// tools
@@ -319,7 +324,7 @@ public:
 	 * \param delSource if the original property shall be deleted after the tramsformation was done
 	 * \returns true if the transformation was done
 	 */
-	bool transform( KeyType from, KeyType to, int dstID, bool delSource = true );
+	bool transform( const PropPath &from, const PropPath &to, int dstID, bool delSource = true );
 
 	/**
 	 * Transform an existing property into another (statically typed version).
@@ -330,7 +335,7 @@ public:
 	 * \param delSource if the original property shall be deleted after the tramsformation was done
 	 * \returns true if the transformation was done, false otherwise
 	 */
-	template<typename DST> bool transform( KeyType from, KeyType to, bool delSource = true ) {
+	template<typename DST> bool transform( const PropPath &from, const PropPath &to, bool delSource = true ) {
 		checkType<DST>();
 		return transform( from, to, Value<DST>::staticID, delSource );
 	}
@@ -351,8 +356,8 @@ public:
 	 * \returns a reference to the PropertyValue (this can be used later, e.g. if a vector is filled step by step
 	 * the reference can be used to not ask for the Property everytime)
 	 */
-	template<typename T> PropertyValue &setPropertyAs( const KeyType &key, const T &val ) {
-		PropertyValue &ret = propertyValue( key );
+	template<typename T> PropertyValue &setPropertyAs( const PropPath &path, const T &val ) {
+		PropertyValue &ret = propertyValue( path );
 
 		if( ret.isEmpty() ) {
 			const bool needed = ret.isNeeded();
@@ -360,7 +365,7 @@ public:
 		} else if( ret->is<T>() ) {
 			ret->castTo<T>() = val;
 		} else { // don't overwrite already set properties with a different type
-			LOG( Runtime, error ) << "Property " << MSubject( key ) << " is already set to " << MSubject( ret.toString( true ) ) << " won't override with " << MSubject( Value<T>( val ).toString( true ) );
+			LOG( Runtime, error ) << "Property " << MSubject( path ) << " is already set to " << MSubject( ret.toString( true ) ) << " won't override with " << MSubject( Value<T>( val ).toString( true ) );
 		}
 
 		return ret;
@@ -375,7 +380,7 @@ public:
 	 * \param key the "path" to the property
 	 * \returns the property with given type, if not set yet T() is returned.
 	 */
-	template<typename T> T getPropertyAs( const KeyType &key )const;
+	template<typename T> T getPropertyAs( const PropPath &path )const;
 
 	/**
 	 * Rename a given property/branch.
@@ -384,7 +389,7 @@ public:
 	 * - if the source does not exist a warning will be send and nothing is done
 	 * \returns true if renaming/moving was successful
 	 */
-	bool rename( KeyType oldname, KeyType newname );
+	bool rename( const PropPath &from, const PropPath &to );
 
 	/**
 	 * \returns a flat representation of the whole property tree
@@ -487,9 +492,9 @@ template<class Predicate> struct PropertyMap::walkTree {
 };
 
 // as well as PropertyMap::getProperty ...
-template<typename T> T PropertyMap::getPropertyAs( const KeyType &key ) const
+template<typename T> T PropertyMap::getPropertyAs( const PropPath& path ) const
 {
-	const mapped_type *entry = findEntry( util::istring( key ) );
+	const mapped_type *entry = findEntry( path );
 
 	if( entry ) {
 		const PropertyValue &ref = entry->getLeaf()[0];
@@ -498,7 +503,7 @@ template<typename T> T PropertyMap::getPropertyAs( const KeyType &key ) const
 			return ref->as<T>();
 	}
 
-	LOG( Debug, warning ) << "Returning " << Value<T>().toString( true ) << " because property " << key << " does not exist";
+	LOG( Debug, warning ) << "Returning " << Value<T>().toString( true ) << " because property " << path << " does not exist";
 	return T();
 }
 
@@ -508,6 +513,13 @@ template<typename T> T PropertyMap::getPropertyAs( const KeyType &key ) const
 // and finally define the streaming output for treeNode
 namespace std
 {
+/// Streaming output for PropertyMap::PropPath
+template<typename charT, typename traits>
+basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::PropertyMap::PropPath &s )
+{
+	isis::util::listToOStream(s.begin(),s.end(),out,"/","","");
+	return out;
+}
 /// Streaming output for PropertyMap::node
 template<typename charT, typename traits>
 basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::_internal::treeNode &s )
