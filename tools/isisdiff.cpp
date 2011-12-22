@@ -61,13 +61,13 @@ int main( int argc, char *argv[] )
 		return 1;
 	}
 
-	std::pair<std::string, unsigned int > in1 = parseFilename( files.front() ), in2 = parseFilename( files.back() );
+	std::pair<std::string, int > in1 = parseFilename( files.front() ), in2 = parseFilename( files.back() );
 	std::list<data::Image> images1, images2;
 
 	if( in1.second >= 0 || in2.second >= 0 ) { // seems like we got numbers
 		assert( !in1.first.empty() );
 		std::list<data::Image> erg = data::IOFactory::load( in1.first );
-		assert( erg.size() > in1.second );
+		assert( erg.size() > (unsigned int)in1.second );
 		std::list<data::Image>::iterator at = erg.begin();
 
 		if( in1.second >= 0 )
@@ -79,7 +79,7 @@ int main( int argc, char *argv[] )
 			erg = data::IOFactory::load( in2.first );
 		}
 
-		assert( erg.size() > in2.second );
+		assert( erg.size() > (unsigned int)in2.second );
 		at = erg.begin();
 
 		if( in2.second >= 0 )
