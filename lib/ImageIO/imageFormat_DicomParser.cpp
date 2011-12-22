@@ -40,7 +40,7 @@ template<typename T> std::list<T> dcmtkListString2list( DcmElement *elem )
  * where nnn shall contain the number of days for D, weeks for W, months for M, or years for Y.
  * Example - "018M" would represent an age of 18 months.
  */
-void ImageFormat_Dicom::parseAS( DcmElement *elem, const util::istring &name, util::PropertyMap &map )
+void ImageFormat_Dicom::parseAS( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map )
 {
 	uint16_t duration = 0;
 	OFString buff;
@@ -92,7 +92,7 @@ void ImageFormat_Dicom::parseAS( DcmElement *elem, const util::istring &name, ut
  * For reasons of backward compatibility with versions of this standard prior to V3.0,
  * it is recommended that implementations also support a string of characters of the format yyyy.mm.dd for this VR.
  */
-void ImageFormat_Dicom::parseDA( DcmElement *elem, const util::istring &name, util::PropertyMap &map )
+void ImageFormat_Dicom::parseDA( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map )
 {
 	//@todo if we drop support for old yyyy.mm.dd this would be much easier
 	boost::regex reg( "^([[:digit:]]{4})\\.?([[:digit:]]{2})\\.?([[:digit:]]{2})$" );
@@ -133,7 +133,7 @@ void ImageFormat_Dicom::parseDA( DcmElement *elem, const util::istring &name, ut
  * For reasons of backward compatibility with versions of this standard prior to V3.0, it is
  * recommended that implementations also support a string of characters of the format hh:mm:ss.frac for this VR.
  */
-void ImageFormat_Dicom::parseTM( DcmElement *elem, const util::istring &name, util::PropertyMap &map )
+void ImageFormat_Dicom::parseTM( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map )
 {
 	short shift = 0;
 	OFString buff;
@@ -170,7 +170,7 @@ void ImageFormat_Dicom::parseTM( DcmElement *elem, const util::istring &name, ut
 				<< "Cannot parse Time string \"" << buff << "\" in the field \"" << name << "\"";
 }
 
-void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::istring &name, util::PropertyMap &map )
+void ImageFormat_Dicom::parseScalar( DcmElement* elem, const util::PropertyMap::PropPath& name, util::PropertyMap& map )
 {
 	OFString buff;
 
@@ -257,7 +257,7 @@ void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::istring &name
 	}
 }
 
-void ImageFormat_Dicom::parseVector( DcmElement *elem, const util::istring &name, isis::util::PropertyMap &map )
+void ImageFormat_Dicom::parseVector( DcmElement* elem, const util::PropertyMap::PropPath& name, util::PropertyMap& map )
 {
 	OFString buff;
 	size_t len = elem->getVM();
@@ -339,7 +339,7 @@ void ImageFormat_Dicom::parseVector( DcmElement *elem, const util::istring &name
 	LOG( Debug, verbose_info ) << "Parsed the vector " << name << " as " << map.propertyValue( name );
 }
 
-void ImageFormat_Dicom::parseList( DcmElement *elem, const util::istring &name, isis::util::PropertyMap &map )
+void ImageFormat_Dicom::parseList( DcmElement* elem, const util::PropertyMap::PropPath& name, util::PropertyMap& map )
 {
 	OFString buff;
 	size_t len = elem->getVM();
@@ -407,7 +407,7 @@ void ImageFormat_Dicom::parseList( DcmElement *elem, const util::istring &name, 
 	LOG( Debug, verbose_info ) << "Parsed the list " << name << " as " << map.propertyValue( name );
 }
 
-void ImageFormat_Dicom::parseCSA( DcmElement *elem, isis::util::PropertyMap &map, const std::string &dialect )
+void ImageFormat_Dicom::parseCSA( DcmElement *elem, util::PropertyMap &map, const std::string &dialect )
 {
 	Uint8 *array;
 	elem->getUint8Array( array );
@@ -417,7 +417,7 @@ void ImageFormat_Dicom::parseCSA( DcmElement *elem, isis::util::PropertyMap &map
 		pos += parseCSAEntry( array + pos, map, dialect );
 	}
 }
-size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, isis::util::PropertyMap &map, const std::string &dialect )
+size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, util::PropertyMap &map, const std::string &dialect )
 {
 	size_t pos = 0;
 	const char *const name = ( char * )at + pos;
@@ -471,13 +471,14 @@ size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, isis::util::PropertyMap &map
 		}
 
 		try {
+			util::PropertyMap::PropPath path;path.push_back(name);
 			if ( ret.size() == 1 ) {
-				if ( parseCSAValue( ret.front(), name, vr, map ) ) {
-					LOG( Debug, verbose_info ) << "Found scalar entry " << name << ":" << map.propertyValue( name ) << " in CSA header";
+				if ( parseCSAValue( ret.front(),path , vr, map ) ) {
+					LOG( Debug, verbose_info ) << "Found scalar entry " << path << ":" << map.propertyValue( path ) << " in CSA header";
 				}
 			} else if ( ret.size() > 1 ) {
-				if ( parseCSAValueList( ret, name, vr, map ) ) {
-					LOG( Debug, verbose_info ) << "Found list entry " << name << ":" << map.propertyValue( name ) << " in CSA header";
+				if ( parseCSAValueList( ret, path, vr, map ) ) {
+					LOG( Debug, verbose_info ) << "Found list entry " << path << ":" << map.propertyValue( path ) << " in CSA header";
 				}
 			}
 		} catch ( boost::bad_lexical_cast e ) {
@@ -491,7 +492,7 @@ size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, isis::util::PropertyMap &map
 	return pos;
 }
 
-bool ImageFormat_Dicom::parseCSAValue( const std::string &val, const util::istring &name, const util::istring &vr, isis::util::PropertyMap &map )
+bool ImageFormat_Dicom::parseCSAValue( const std::string &val, const util::PropertyMap::PropPath &name, const util::istring &vr, util::PropertyMap &map )
 {
 	if ( vr == "IS" or vr == "SL" ) {
 		map.propertyValue( name ) = boost::lexical_cast<int32_t>( val );
@@ -512,7 +513,7 @@ bool ImageFormat_Dicom::parseCSAValue( const std::string &val, const util::istri
 
 	return true;
 }
-bool ImageFormat_Dicom::parseCSAValueList( const util::slist &val, const util::istring &name, const util::istring &vr, isis::util::PropertyMap &map )
+bool ImageFormat_Dicom::parseCSAValueList( const util::slist &val, const util::PropertyMap::PropPath &name, const util::istring &vr, util::PropertyMap &map )
 {
 	if ( vr == "IS" or vr == "SL" or vr == "US" or vr == "SS" ) {
 		map.propertyValue( name ) = util::listToList<int32_t>( val.begin(), val.end() );
@@ -530,7 +531,7 @@ bool ImageFormat_Dicom::parseCSAValueList( const util::slist &val, const util::i
 	return true;
 }
 
-void ImageFormat_Dicom::dcmObject2PropMap( DcmObject* master_obj, isis::util::PropertyMap& map, const std::string& dialect)const
+void ImageFormat_Dicom::dcmObject2PropMap( DcmObject* master_obj, util::PropertyMap& map, const std::string& dialect)const
 {
 	for ( DcmObject *obj = master_obj->nextInContainer( NULL ); obj; obj = master_obj->nextInContainer( obj ) ) {
 		const DcmTagKey &tag = obj->getTag();

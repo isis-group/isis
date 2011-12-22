@@ -563,10 +563,10 @@ ImageFormat_Dicom::ImageFormat_Dicom()
 	// override 0x0019, 0x100a with "SiemensNumberOfImagesInMosaic" because it is SliceOrientation in the standard and mosaic-size for siemens - we will figure out while sanitizing
 	dictionary[DcmTag( 0x0019, 0x100a )]="SiemensNumberOfImagesInMosaic";
 }
-util::istring ImageFormat_Dicom::tag2Name(const DcmTagKey &tag)const
+util::PropertyMap::PropPath ImageFormat_Dicom::tag2Name(const DcmTagKey &tag)const
 {
-	std::map< DcmTagKey, util::istring >::const_iterator entry = dictionary.find(tag);
-	return ( entry != dictionary.end() ) ? entry->second : (util::istring( unknownTagName ) + tag.toString().c_str());
+	std::map< DcmTagKey,util::PropertyMap::PropPath >::const_iterator entry = dictionary.find(tag);
+	return ( entry != dictionary.end() ) ? entry->second : util::PropertyMap::PropPath(util::istring( unknownTagName ) + tag.toString().c_str());
 }
 
 
