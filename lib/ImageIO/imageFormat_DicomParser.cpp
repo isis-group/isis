@@ -31,8 +31,9 @@ template<typename T> std::list<T> dcmtkListString2list( DcmElement *elem )
 	elem->getOFStringArray( buff );
 	return util::stringToList<T>( std::string( buff.c_str() ), '\\' );
 }
-
 }
+
+
 /**
  * Parses the Age String
  * A string of characters with one of the following formats -- nnnD, nnnW, nnnM, nnnY;
@@ -522,42 +523,32 @@ bool ImageFormat_Dicom::parseCSAValueList( const util::slist &val, const util::i
 	} else if ( vr == "DS" or vr == "FD" ) {
 		map.propertyValue( name ) = util::listToList<double>( val.begin(), val.end() );
 	} else {
-		LOG( Runtime, error ) << "Dont know how to parse CSA entry " << std::make_pair( name, val ) << " type is " << util::MSubject( vr );
+		LOG( Runtime, error ) << "Don't know how to parse CSA entry " << std::make_pair( name, val ) << " type is " << util::MSubject( vr );
 		return false;
 	}
 
 	return true;
 }
 
-void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, isis::util::PropertyMap &map, const std::string &dialect )
+void ImageFormat_Dicom::dcmObject2PropMap( DcmObject* master_obj, isis::util::PropertyMap& map, const std::string& dialect)const
 {
 	for ( DcmObject *obj = master_obj->nextInContainer( NULL ); obj; obj = master_obj->nextInContainer( obj ) ) {
-		const DcmTag &tag = obj->getTag();
-		util::istring name;
-		const DcmDataDictionary &globalDataDict = dcmDataDict.rdlock();
-		const DcmDictEntry *dictRef = globalDataDict.findEntry( tag, tag.getPrivateCreator() );
-
-		if ( dictRef )
-			name = dictRef->getTagName();
-		else
-			name = util::istring( unknownTagName ) + tag.toString().c_str();
-
-		dcmDataDict.unlock();
-
-		if ( name == "PixelData" )
+		const DcmTagKey &tag = obj->getTag();
+		
+		if ( tag == DcmTagKey( 0x7fe0, 0x0010 ) )
 			continue;//skip the image data
-		else if ( name == "CSAImageHeaderInfo" || tag == DcmTagKey( 0x0029, 0x1010 ) ) {
+		else if ( tag == DcmTagKey( 0x0029, 0x1010 ) ) { //CSAImageHeaderInfo
 			LOG( Debug, info ) << "Using " << tag.toString() << " as CSAImageHeaderInfo";
 			DcmElement *elem = dynamic_cast<DcmElement *>( obj );
 			parseCSA( elem, map.branch( "CSAImageHeaderInfo" ), dialect );
-		} else if ( name == "CSASeriesHeaderInfo" || tag == DcmTagKey( 0x0029, 0x1020 ) ) {
+		} else if ( tag == DcmTagKey( 0x0029, 0x1020 ) ) { //CSASeriesHeaderInfo
 			LOG( Debug, info ) << "Using " << tag.toString() << " as CSASeriesHeaderInfo";
 			DcmElement *elem = dynamic_cast<DcmElement *>( obj );
 			parseCSA( elem, map.branch( "CSASeriesHeaderInfo" ), dialect );
-		} else if ( name == "MedComHistoryInformation" ) {
+		} else if ( tag == DcmTagKey( 0x0029, 0x0020 ) ) { //MedComHistoryInformation
 			//@todo special handling needed
 			LOG( Debug, info ) << "Ignoring MedComHistoryInformation at " << tag.toString();
-		} else if ( obj->isLeaf() ) {
+		} else if ( obj->isLeaf() ) { // common case
 			if ( obj->getTag() == DcmTag( 0x0008, 0x0032 ) ) {
 				OFString buff;
 				dynamic_cast<DcmElement *>( obj )->getOFString( buff, 0 );
@@ -572,15 +563,15 @@ void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, isis::util::Pr
 			const size_t mult = obj->getVM();
 
 			if ( mult == 0 )
-				LOG( Runtime, verbose_info ) << "Skipping empty Dicom-Tag " << name;
+				LOG( Runtime, verbose_info ) << "Skipping empty Dicom-Tag " << util::MSubject(tag2Name(tag));
 			else if ( mult == 1 )
-				parseScalar( elem, name, map );
+				parseScalar( elem, tag2Name(tag), map );
 			else if ( mult <= 4 )
-				parseVector( elem, name, map );
+				parseVector( elem, tag2Name(tag), map );
 			else
-				parseList( elem, name, map ); // for any other value
+				parseList( elem, tag2Name(tag), map ); // for any other value
 		} else {
-			dcmObject2PropMap( obj, map.branch( name ), dialect );
+			dcmObject2PropMap( obj, map.branch( tag2Name(tag) ), dialect );
 		}
 	}
 }
