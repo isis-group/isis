@@ -34,11 +34,12 @@ void FilePtr::Closer::operator()( void *p )
 				<< " failed, the error was: " << util::MSubject( strerror( errno ) );
 	}
 
-	if(write && futimes(file, NULL)!=0){
+	if( write && futimes( file, NULL ) != 0 ) {
 		LOG( Runtime, warning )
-			<< "Setting access time of " << util::MSubject( filename )
-			<< " failed, the error was: " << util::MSubject( strerror( errno ) );
+				<< "Setting access time of " << util::MSubject( filename )
+				<< " failed, the error was: " << util::MSubject( strerror( errno ) );
 	}
+
 	if( ::close( file ) != 0 ) {
 		LOG( Runtime, warning )
 				<< "Closing of " << util::MSubject( filename )
