@@ -44,7 +44,7 @@ namespace _internal
 template<typename T, bool isNumber> class type_compare
 {
 public:
-	type_compare() {} // c++0x says we need a user defined constructor here
+	type_compare() {} // c++11 says we need a user defined constructor here
 	bool operator()( const util::Value<T> &/*first*/, const ValueBase &/*second*/ )const {
 		LOG( Debug, error ) << "comparison of " << util::Value<T>::staticName() << " is not supportet";
 		return false;
@@ -93,18 +93,18 @@ public:
 
 		return false;
 	}
-	type_compare() {} // c++0x says we need a user defined constructor here
+	type_compare() {} // c++11 says we need a user defined constructor here
 	virtual ~type_compare() {}
 };
 
 template<typename T, bool isNumber> class type_less : public type_compare<T, isNumber>
 {
-public: // c++0x says we need a user defined constructor here
+public: // c++11 says we need a user defined constructor here
 	type_less() {}
 };// we are going to specialize this for numeric T below
 template<typename T, bool isNumber> class type_greater : public type_compare<T, isNumber>
 {
-public: // c++0x says we need a user defined constructor here
+public: // c++11 says we need a user defined constructor here
 	type_greater() {}
 };
 template<typename T, bool isNumber> class type_eq : public type_compare<T, isNumber>
@@ -113,7 +113,7 @@ protected:
 	bool inRange( const util::Value<T> &first, const util::Value<T> &second )const {
 		return static_cast<const T &>( first ) == static_cast<const T &>( second );
 	}
-public: // c++0x says we need a user defined constructor here
+public: // c++11 says we need a user defined constructor here
 	type_eq() {}
 };
 
@@ -127,7 +127,7 @@ protected:
 	bool inRange( const util::Value<T> &first, const util::Value<T> &second )const {
 		return static_cast<const T &>( first ) < static_cast<const T &>( second );
 	}
-public: // c++0x says we need a user defined constructor here
+public: // c++11 says we need a user defined constructor here
 	type_less() {}
 };
 
@@ -141,7 +141,7 @@ protected:
 	bool inRange( const util::Value<T> &first, const util::Value<T> &second )const {
 		return static_cast<const T &>( first ) > static_cast<const T &>( second );
 	}
-public: // c++0x says we need a user defined constructor here
+public: // c++11 says we need a user defined constructor here
 	type_greater() {}
 };
 
