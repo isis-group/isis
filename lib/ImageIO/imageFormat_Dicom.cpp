@@ -551,6 +551,8 @@ ImageFormat_Dicom::ImageFormat_Dicom()
 
 	// override 0x0019, 0x100a with "SiemensNumberOfImagesInMosaic" because it is SliceOrientation in the standard and mosaic-size for siemens - we will figure out while sanitizing
 	dictionary[DcmTag( 0x0019, 0x100a )] = "SiemensNumberOfImagesInMosaic";
+
+	dictionary[DcmTag( 0x0029, 0x0010 )] = "PrivateCreator";
 }
 util::PropertyMap::PropPath ImageFormat_Dicom::tag2Name( const DcmTagKey &tag )const
 {
