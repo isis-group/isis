@@ -36,28 +36,32 @@ public:
 	std::string getName()const {return "process proxy (gets filenames from child process given in the filename)";}
 
 	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) {
-		size_t red=0;
-		LOG(Runtime,info) << "Running " << util::MSubject(filename);
-		FILE *in=popen(filename.c_str(),"r");
-		if(in==NULL){
-			std::string err="Failed to run \"";err+=filename+"\"";
-			throwSystemError(errno,err);
+		size_t red = 0;
+		LOG( Runtime, info ) << "Running " << util::MSubject( filename );
+		FILE *in = popen( filename.c_str(), "r" );
+
+		if( in == NULL ) {
+			std::string err = "Failed to run \"";
+			err += filename + "\"";
+			throwSystemError( errno, err );
 		}
+
 		char got;
 		std::string fname;
 
-		while((got=fgetc(in))!=EOF){
-			if(got=='\n'){
-				if(!fname.empty()){
-					LOG(Runtime,info) << "Got " << util::MSubject(fname) << " from " << util::MSubject(filename);
-					red+=data::IOFactory::load(chunks,fname,dialect,"");
+		while( ( got = fgetc( in ) ) != EOF ) {
+			if( got == '\n' ) {
+				if( !fname.empty() ) {
+					LOG( Runtime, info ) << "Got " << util::MSubject( fname ) << " from " << util::MSubject( filename );
+					red += data::IOFactory::load( chunks, fname, dialect, "" );
 					fname.clear();
 				}
 			} else {
-				fname+=got;
+				fname += got;
 			}
 		}
-		pclose(in);
+
+		pclose( in );
 		return red;
 	}
 

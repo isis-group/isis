@@ -55,7 +55,7 @@ class DicomChunk : public data::Chunk
 public:
 	//this uses auto_ptr by intention
 	//the ownership of the DcmFileFormat-pointer shall be transfered to this function, because it has to decide if it should be deleted
-	static data::Chunk makeChunk( const ImageFormat_Dicom &loader,std::string filename, std::auto_ptr<DcmFileFormat> dcfile, const std::string &dialect ) {
+	static data::Chunk makeChunk( const ImageFormat_Dicom &loader, std::string filename, std::auto_ptr<DcmFileFormat> dcfile, const std::string &dialect ) {
 		std::auto_ptr<data::Chunk> ret;
 		std::auto_ptr<DicomImage> img( new DicomImage( dcfile.get(), EXS_Unknown ) );
 
@@ -152,13 +152,13 @@ ptime ImageFormat_Dicom::genTimeStamp( const date &date, const ptime &time )
 	return ptime( date, time.time_of_day() );
 }
 
-void ImageFormat_Dicom::addDicomDict(DcmDataDictionary &dict)
+void ImageFormat_Dicom::addDicomDict( DcmDataDictionary &dict )
 {
-	for(DcmHashDictIterator i=dict.normalBegin();i!=dict.normalEnd();i++){
-		const DcmDictEntry *entry=*i;
-		const DcmTagKey key=entry->getKey();
-		const char *name=entry->getTagName();
-		dictionary[key]=name;
+	for( DcmHashDictIterator i = dict.normalBegin(); i != dict.normalEnd(); i++ ) {
+		const DcmDictEntry *entry = *i;
+		const DcmTagKey key = entry->getKey();
+		const char *name = entry->getTagName();
+		dictionary[key] = name;
 	}
 }
 
@@ -166,13 +166,13 @@ void ImageFormat_Dicom::addDicomDict(DcmDataDictionary &dict)
 void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*dialect*/ )
 {
 	const util::istring prefix = util::istring( ImageFormat_Dicom::dicomTagTreeName ) + "/";
-	util::PropertyMap &dicomTree=object.branch(dicomTagTreeName);
+	util::PropertyMap &dicomTree = object.branch( dicomTagTreeName );
 	/////////////////////////////////////////////////////////////////////////////////
 	// Transform known DICOM-Tags into default-isis-properties
 	/////////////////////////////////////////////////////////////////////////////////
 
-	if(dicomTree.hasProperty("SiemensNumberOfImagesInMosaic")){ // if its still there image was no mosaic, so I guess it should be used according to the standard
-		dicomTree.rename("SiemensNumberOfImagesInMosaic","SliceOrientation");
+	if( dicomTree.hasProperty( "SiemensNumberOfImagesInMosaic" ) ) { // if its still there image was no mosaic, so I guess it should be used according to the standard
+		dicomTree.rename( "SiemensNumberOfImagesInMosaic", "SliceOrientation" );
 	}
 
 	// compute sequenceStart and acquisitionTime (have a look at table C.10.8 in the standart)
@@ -321,9 +321,9 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 	if ( dicomTree.hasProperty( "DiffusionBValue" ) ) { //in case someone actually used the right Tag
 		bValue = dicomTree.getPropertyAs<int32_t>( "DiffusionBValue" );
 		dicomTree.remove( "DiffusionBValue" );
-	} else if ( dicomTree.hasProperty( util::istring(unknownTagName)+ "(0019,100c)" ) ) { //fallback for siemens
-		bValue = dicomTree.getPropertyAs<int32_t>( util::istring(unknownTagName)+ "(0019,100c)" );
-		dicomTree.remove( util::istring(unknownTagName) + "(0019,100c)" );
+	} else if ( dicomTree.hasProperty( util::istring( unknownTagName ) + "(0019,100c)" ) ) { //fallback for siemens
+		bValue = dicomTree.getPropertyAs<int32_t>( util::istring( unknownTagName ) + "(0019,100c)" );
+		dicomTree.remove( util::istring( unknownTagName ) + "(0019,100c)" );
 	} else foundDiff = false;
 
 	// If we do have DWI here, create a property diffusionGradient (which defaults to 0,0,0,0)
@@ -334,9 +334,9 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 			if( dicomTree.hasProperty( "DiffusionGradientOrientation" ) ) {
 				diff = dicomTree.getPropertyAs<util::fvector4>( "DiffusionGradientOrientation" ) * bValue;
 				dicomTree.remove( "DiffusionGradientOrientation" );
-			} else if( dicomTree.hasProperty( util::istring(unknownTagName) + "(0019,100e)" ) ) {
-				diff = dicomTree.getPropertyAs<util::fvector4>( util::istring(unknownTagName) + "(0019,100e)" ) * bValue;
-				dicomTree.remove( util::istring(unknownTagName) + "(0019,100e)" );
+			} else if( dicomTree.hasProperty( util::istring( unknownTagName ) + "(0019,100e)" ) ) {
+				diff = dicomTree.getPropertyAs<util::fvector4>( util::istring( unknownTagName ) + "(0019,100e)" ) * bValue;
+				dicomTree.remove( util::istring( unknownTagName ) + "(0019,100e)" );
 			} else {
 				LOG( Runtime, error ) << "Found no diffusion direction for DiffusionBValue " << util::MSubject( bValue );
 			}
@@ -348,28 +348,28 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 	////////////////////////////////////////////////////////////////
 	// Do some sanity checks on redundant tags
 	////////////////////////////////////////////////////////////////
-	if ( dicomTree.hasProperty( util::istring(unknownTagName) + "(0019,1015)" ) ) {
+	if ( dicomTree.hasProperty( util::istring( unknownTagName ) + "(0019,1015)" ) ) {
 		const util::fvector4 org = object.getPropertyAs<util::fvector4>( "indexOrigin" );
-		const util::fvector4 comp = dicomTree.getPropertyAs<util::fvector4>( util::istring(unknownTagName) + "(0019,1015)" );
+		const util::fvector4 comp = dicomTree.getPropertyAs<util::fvector4>( util::istring( unknownTagName ) + "(0019,1015)" );
 
 		if ( comp.fuzzyEqual( org ) )
-			dicomTree.remove( util::istring(unknownTagName) + "(0019,1015)" );
+			dicomTree.remove( util::istring( unknownTagName ) + "(0019,1015)" );
 		else
 			LOG( Debug, warning )
-					<< prefix + util::istring(unknownTagName) + "(0019,1015):" << dicomTree.propertyValue( util::istring(unknownTagName) + "(0019,1015)" )
+					<< prefix + util::istring( unknownTagName ) + "(0019,1015):" << dicomTree.propertyValue( util::istring( unknownTagName ) + "(0019,1015)" )
 					<< " differs from indexOrigin:" << object.propertyValue( "indexOrigin" ) << ", won't remove it";
 	}
 
 	if(
 		dicomTree.hasProperty( "CSAImageHeaderInfo/MosaicRefAcqTimes" ) &&
-		dicomTree.hasProperty( util::istring(unknownTagName) + "(0019,1029)" ) &&
-		dicomTree.propertyValue( util::istring(unknownTagName) + "(0019,1029)" ) == dicomTree.propertyValue( "CSAImageHeaderInfo/MosaicRefAcqTimes" )
+		dicomTree.hasProperty( util::istring( unknownTagName ) + "(0019,1029)" ) &&
+		dicomTree.propertyValue( util::istring( unknownTagName ) + "(0019,1029)" ) == dicomTree.propertyValue( "CSAImageHeaderInfo/MosaicRefAcqTimes" )
 	) {
-		dicomTree.remove( util::istring(unknownTagName) + "(0019,1029)" );
+		dicomTree.remove( util::istring( unknownTagName ) + "(0019,1029)" );
 	}
 
-	if ( dicomTree.hasProperty( util::istring(unknownTagName) + "(0051,100c)" ) ) { //@todo siemens only ?
-		std::string fov = dicomTree.getPropertyAs<std::string>( util::istring(unknownTagName) + "(0051,100c)" );
+	if ( dicomTree.hasProperty( util::istring( unknownTagName ) + "(0051,100c)" ) ) { //@todo siemens only ?
+		std::string fov = dicomTree.getPropertyAs<std::string>( util::istring( unknownTagName ) + "(0051,100c)" );
 		float row, column;
 
 		if ( std::sscanf( fov.c_str(), "FoV %f*%f", &column, &row ) == 2 ) {
@@ -378,7 +378,7 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 	}
 }
 
-data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source)
+data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 {
 	// prepare some needed parameters
 	const util::istring prefix = util::istring( ImageFormat_Dicom::dicomTagTreeName ) + "/";
@@ -452,16 +452,17 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source)
 		acqTime = source.propertyValue( "acquisitionTime" )->castTo<float>();
 	}
 
-	data::Chunk dest=source.cloneToNew( size[0], size[1], size[2] );
+	data::Chunk dest = source.cloneToNew( size[0], size[1], size[2] );
 	static_cast<util::PropertyMap &>( dest ) = static_cast<const util::PropertyMap &>( source ); //copy _only_ the Properties of source
 	// update origin
 	dest.setPropertyAs( "indexOrigin", origin );
+
 	// update fov
 	if ( dest.hasProperty( "fov" ) ) {
 		util::fvector4 &ref = dest.propertyValue( "fov" )->castTo<util::fvector4>();
 		ref[0] /= matrixSize;
 		ref[1] /= matrixSize;
-		ref[2] = voxelSize[2]*images+voxelGap[2]*(images-1);
+		ref[2] = voxelSize[2] * images + voxelGap[2] * ( images - 1 );
 	}
 
 	// for every slice
@@ -475,10 +476,11 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source)
 			const size_t send[] = {sstart[0] + size[0] - 1, row *size[1] + line, 0, 0}; //end of the source line
 			source.copyRange( sstart, send, dest, dpos );
 		}
-/*		// fix/set acquisitionNumber and acquisitionTime
-		dest.propertyValueAt( "acquisitionNumber",slice )->castTo<uint32_t>() += slice;*/
+
+		/*      // fix/set acquisitionNumber and acquisitionTime
+		        dest.propertyValueAt( "acquisitionNumber",slice )->castTo<uint32_t>() += slice;*/
 		if( haveAcqTimeList ) {
-			dest.propertyValueAt( "acquisitionTime", slice) = float(acqTime +  * ( acqTimeIt++ ) );
+			dest.propertyValueAt( "acquisitionTime", slice ) = float( acqTime +  * ( acqTimeIt++ ) );
 		}
 	}
 
@@ -493,7 +495,7 @@ int ImageFormat_Dicom::load( std::list<data::Chunk> &chunks, const std::string &
 	OFCondition loaded = dcfile->loadFile( filename.c_str() );
 
 	if ( loaded.good() ) {
-		data::Chunk chunk = _internal::DicomChunk::makeChunk( *this,filename, dcfile, dialect );
+		data::Chunk chunk = _internal::DicomChunk::makeChunk( *this, filename, dcfile, dialect );
 		//we got a chunk from the file
 		sanitise( chunk, "" );
 		chunk.setPropertyAs( "source", filename );
@@ -509,6 +511,7 @@ int ImageFormat_Dicom::load( std::list<data::Chunk> &chunks, const std::string &
 		} else {
 			chunks.push_back( chunk );
 		}
+
 		return 1;
 	} else {
 		FileFormat::throwGenericError( std::string( "Failed to open file: " ) + loaded.text() );
@@ -527,31 +530,34 @@ bool ImageFormat_Dicom::tainted()const {return false;}//internal plugins are not
 ImageFormat_Dicom::ImageFormat_Dicom()
 {
 	//first read external dictionary if available
-	if (dcmDataDict.isDictionaryLoaded() ) {
-		DcmDataDictionary &dict=dcmDataDict.wrlock();
-		addDicomDict(dict);
+	if ( dcmDataDict.isDictionaryLoaded() ) {
+		DcmDataDictionary &dict = dcmDataDict.wrlock();
+		addDicomDict( dict );
 		dcmDataDict.unlock();
 	} else {
 		// check /usr/share/doc/dcmtk/datadict.txt.gz and/or
 		// set DCMDICTPATH or fix DCM_DICT_DEFAULT_PATH in cfunix.h of dcmtk
 		LOG( Runtime, warning ) << "No official data dictionary loaded, will only use known attributes";
 	}
-	// than override known entries
-	dictionary[DcmTag( 0x0010, 0x0010 )]="PatientsName";
-	dictionary[DcmTag( 0x0010, 0x0030 )]="PatientsBirthDate";
-	dictionary[DcmTag( 0x0010, 0x0040 )]="PatientsSex";
-	dictionary[DcmTag( 0x0010, 0x1010 )]="PatientsAge";
-	dictionary[DcmTag( 0x0010, 0x1030 )]="PatientsWeight";
 
-	dictionary[DcmTag( 0x0008, 0x1050 )]="PerformingPhysiciansName";
+	// than override known entries
+	dictionary[DcmTag( 0x0010, 0x0010 )] = "PatientsName";
+	dictionary[DcmTag( 0x0010, 0x0030 )] = "PatientsBirthDate";
+	dictionary[DcmTag( 0x0010, 0x0040 )] = "PatientsSex";
+	dictionary[DcmTag( 0x0010, 0x1010 )] = "PatientsAge";
+	dictionary[DcmTag( 0x0010, 0x1030 )] = "PatientsWeight";
+
+	dictionary[DcmTag( 0x0008, 0x1050 )] = "PerformingPhysiciansName";
 
 	// override 0x0019, 0x100a with "SiemensNumberOfImagesInMosaic" because it is SliceOrientation in the standard and mosaic-size for siemens - we will figure out while sanitizing
-	dictionary[DcmTag( 0x0019, 0x100a )]="SiemensNumberOfImagesInMosaic";
+	dictionary[DcmTag( 0x0019, 0x100a )] = "SiemensNumberOfImagesInMosaic";
+
+	dictionary[DcmTag( 0x0029, 0x0010 )] = "PrivateCreator";
 }
-util::PropertyMap::PropPath ImageFormat_Dicom::tag2Name(const DcmTagKey &tag)const
+util::PropertyMap::PropPath ImageFormat_Dicom::tag2Name( const DcmTagKey &tag )const
 {
-	std::map< DcmTagKey,util::PropertyMap::PropPath >::const_iterator entry = dictionary.find(tag);
-	return ( entry != dictionary.end() ) ? entry->second : util::PropertyMap::PropPath(util::istring( unknownTagName ) + tag.toString().c_str());
+	std::map< DcmTagKey, util::PropertyMap::PropPath >::const_iterator entry = dictionary.find( tag );
+	return ( entry != dictionary.end() ) ? entry->second : util::PropertyMap::PropPath( util::istring( unknownTagName ) + tag.toString().c_str() );
 }
 
 
@@ -560,6 +566,6 @@ util::PropertyMap::PropPath ImageFormat_Dicom::tag2Name(const DcmTagKey &tag)con
 
 isis::image_io::FileFormat *factory()
 {
-	isis::image_io::ImageFormat_Dicom *ret=new isis::image_io::ImageFormat_Dicom;
+	isis::image_io::ImageFormat_Dicom *ret = new isis::image_io::ImageFormat_Dicom;
 	return ret;
 }

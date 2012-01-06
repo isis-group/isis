@@ -173,7 +173,7 @@ void ImageFormat_NiftiSa::guessSliceOrdering( const data::Image img, char &slice
 	if( img.getChunk( 0, 0, 0, 0, false ).getRelevantDims() == img.getRelevantDims() ) { // seems like there is only one chunk - slice ordering doesnt matter - just choose NIFTI_SLICE_SEQ_INC
 		slice_code = NIFTI_SLICE_SEQ_INC;
 	} else {
-		util::PropertyMap::PropPath order = img.getChunk( 0, 0, 0, 0, false ).hasProperty( "acquisitionTime" ) ? "acquisitionTime":"acquisitionNumber";
+		util::PropertyMap::PropPath order = img.getChunk( 0, 0, 0, 0, false ).hasProperty( "acquisitionTime" ) ? "acquisitionTime" : "acquisitionNumber";
 		const util::PropertyValue first = img.getChunk( 0, 0, 0, 0, false ).propertyValue( order ); // acquisitionNumber _must_ be chunk-unique - so it is there even without a join
 		const util::PropertyValue second = img.getChunk( 0, 0, 1, 0, false ).propertyValue( order );
 		const util::PropertyValue middle = img.getChunk( 0, 0, img.getSizeAsVector()[data::sliceDim] / 2 + .5, 0, false ).propertyValue( order );
@@ -181,7 +181,7 @@ void ImageFormat_NiftiSa::guessSliceOrdering( const data::Image img, char &slice
 		if( first->gt( *second ) ) { // second slice has a lower number than the first => decrementing
 			if( middle->gt( *second ) ) { // if the middle number is greater than the second its interleaved
 				LOG( Runtime, info )
-						<< "The \"middle\" "<< order << " (" << middle.toString() << ") is greater than the second (" << second.toString()
+						<< "The \"middle\" " << order << " (" << middle.toString() << ") is greater than the second (" << second.toString()
 						<< ") assuming decrementing interleaved slice order";
 				slice_code = NIFTI_SLICE_ALT_DEC;
 			} else { // assume "normal" otherwise
@@ -193,12 +193,12 @@ void ImageFormat_NiftiSa::guessSliceOrdering( const data::Image img, char &slice
 		} else { // assume incrementing
 			if( middle->lt( *second ) ) { // if the middle number is less than the second ist interleaved
 				LOG( Runtime, info )
-						<< "The \"middle\" "<< order << " (" << middle.toString() << ") is less than the second (" << second.toString()
+						<< "The \"middle\" " << order << " (" << middle.toString() << ") is less than the second (" << second.toString()
 						<< ") assuming incrementing interleaved slice order";
 				slice_code = NIFTI_SLICE_ALT_INC;
 			} else { // assume "normal" otherwise
 				LOG( Runtime, info )
-						<< "The first "<< order <<" (" << first.toString() << ") is not greater than the second (" << second.toString()
+						<< "The first " << order << " (" << first.toString() << ") is not greater than the second (" << second.toString()
 						<< ") assuming incrementing slice order";
 				slice_code = NIFTI_SLICE_SEQ_INC;
 			}
@@ -456,6 +456,7 @@ std::list< data::Chunk > ImageFormat_NiftiSa::parseHeader( const isis::image_io:
 		props.setPropertyAs<util::fvector4>( "columnVec", nifti2isis.getRow( 1 ) ); // because the image will very likely be in nifti space
 		props.setPropertyAs<util::fvector4>( "sliceVec",  nifti2isis.getRow( 2 ) );
 		props.setPropertyAs<util::fvector4>( "voxelSize", util::fvector4( head->pixdim[1], head->pixdim[2], head->pixdim[3] ) );
+		props.setPropertyAs<util::fvector4>( "indexOrigin", util::fvector4( 0, 0, 0, 0 ) );
 	}
 
 	// set space unit factors
