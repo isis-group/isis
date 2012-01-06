@@ -456,6 +456,7 @@ std::list< data::Chunk > ImageFormat_NiftiSa::parseHeader( const isis::image_io:
 		props.setPropertyAs<util::fvector4>( "columnVec", nifti2isis.getRow( 1 ) ); // because the image will very likely be in nifti space
 		props.setPropertyAs<util::fvector4>( "sliceVec",  nifti2isis.getRow( 2 ) );
 		props.setPropertyAs<util::fvector4>( "voxelSize", util::fvector4( head->pixdim[1], head->pixdim[2], head->pixdim[3] ) );
+		props.setPropertyAs<util::fvector4>( "indexOrigin", util::fvector4( 0, 0, 0, 0 ) );
 	}
 
 	// set space unit factors
