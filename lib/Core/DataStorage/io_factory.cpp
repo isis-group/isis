@@ -174,9 +174,7 @@ unsigned int IOFactory::findPlugins( const std::string &path )
 				LOG( Runtime, warning ) << "Could not load library " << util::MSubject( pluginName ) << ":" <<  util::MSubject( dlerror() );
 #endif
 		} else {
-			LOG( Runtime, verbose_info )
-					<< "Ignoring " << util::MSubject( itr->path() )
-					<< " because it doesn't match " << pluginFilter.str();
+			LOG( Runtime, verbose_info ) << "Ignoring " << *itr << " because it doesn't match " << pluginFilter.str();
 		}
 	}
 
@@ -285,7 +283,7 @@ std::list< Image > IOFactory::chunkListToImageList( std::list<Chunk> &src )
 
 		if ( buff.isClean() && buff.isValid() ) { //if the image was successfully indexed and is valid, keep it
 			ret.push_back( buff );
-			LOG( Runtime, info ) << "Image " << ret.size() << " with size " << buff.getSizeAsString() <<  " and value range " << buff.getMinMax() << " done.";
+			LOG( Runtime, info ) << "Image " << ret.size() << " with size " << buff.getSizeAsString() << " done.";
 		} else {
 			LOG_IF( !buff.getMissing().empty(), Runtime, error )
 					<< "Cannot insert image. Missing properties: " << buff.getMissing();
@@ -345,13 +343,13 @@ size_t IOFactory::loadPath( std::list<Chunk> &ret, const boost::filesystem::path
 	return loaded;
 }
 
-bool IOFactory::write( const data::Image &image, const std::string &path, std::string suffix_override, const std::string &dialect )
+bool IOFactory::write( const data::Image &image, const std::string &path, std::string suffix_override, std::string dialect )
 {
 	return write( std::list<data::Image>( 1, image ), path, suffix_override, dialect );
 }
 
 
-bool IOFactory::write( std::list<data::Image> images, const std::string &path, std::string suffix_override, const std::string &dialect )
+bool IOFactory::write( std::list<data::Image> images, const std::string &path, std::string suffix_override, std::string dialect )
 {
 	const FileFormatList formatWriter = get().getFileFormatList( path, suffix_override, dialect );
 

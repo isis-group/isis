@@ -28,6 +28,8 @@ namespace image_io
 /// Base class for image-io-plugins
 class FileFormat
 {
+public:
+	enum io_modes{read_only=1,write_only=2,both=3};
 protected:
 	/**
 	 * Check if a given property exists in the given PropMap.
@@ -50,7 +52,7 @@ protected:
 		return false;
 	}
 	/// \return the file-suffixes the plugin supports
-	virtual std::string suffixes()const = 0;
+	virtual std::string suffixes(io_modes modes=both)const = 0;
 	static const float invalid_float;
 public:
 	static void throwGenericError( std::string desc );
@@ -71,10 +73,13 @@ public:
 	 * get all file suffixes a plugin suggests to handle
 	 * The string returned by suffixes is tokenized at the spaces and every leading "." is stripped.
 	 * The result is returned in a string-list sorted by the length of the suffix (longest first).
-	 * @param reader the plugin to ask
+	 * @param mode the io mode you are asking for
+	 * - read_only explicitely ask for reading - the plugin will give all suffixes it can read (maybe none)
+	 * - write_only explicitely ask for writing - the plugin will give all suffixes it can write (maybe none)
+	 * - both ask for suffixes which can be red \b or written (sould never be empty)
 	 * @return a list of suffixes the plugin handles
 	 */
-	std::list<util::istring> getSuffixes()const;
+	std::list<util::istring> getSuffixes(io_modes mode = both)const;
 
 
 	/// \return a space separated list of the dialects the plugin supports

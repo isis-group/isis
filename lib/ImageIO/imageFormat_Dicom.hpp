@@ -22,11 +22,7 @@
 
 #include <DataStorage/io_interface.h>
 
-#ifdef _WIN32 // workaround for broken dcmtk/config/osconfig.h
-#include <dcmtk/config/cfwin32.h>
-#else
-#include <dcmtk/config/cfunix.h>
-#endif //_WIN32
+#define HAVE_CONFIG_H // this is needed for autoconf configured dcmtk (e.g. the debian package)
 
 #include <dcmtk/dcmdata/dcfilefo.h>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
@@ -61,7 +57,7 @@ class ImageFormat_Dicom: public FileFormat
 	static bool parseCSAValueList( const isis::util::slist &val, const util::istring &name, const util::istring &vr, isis::util::PropertyMap &map );
 	static int readMosaic( data::Chunk source, std::list<data::Chunk> &dest );
 protected:
-	std::string suffixes()const;
+	std::string suffixes( io_modes modes = both )const;
 public:
 	static const char dicomTagTreeName[];
 	static const char unknownTagName[];

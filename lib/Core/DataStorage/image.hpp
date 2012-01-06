@@ -35,6 +35,7 @@ class ChunkOp : std::unary_function<Chunk &, bool>
 {
 public:
 	virtual bool operator()( Chunk &, util::FixedVector<size_t, 4> posInImage ) = 0;
+	virtual ~ChunkOp();
 };
 
 /// Main class for generic 4D-images
@@ -375,7 +376,7 @@ public:
 	 */
 	std::list<util::PropertyValue> getChunksProperties( const util::PropertyMap::KeyType &key, bool unique = false )const;
 
-	/// get the size of every voxel (in bytes)
+	/// get the voxelsize (in bytes) for the major type in the image
 	size_t getBytesPerVoxel()const;
 
 	/**
@@ -484,7 +485,7 @@ public:
 	 *  \param physicalCoords the physical coords from which you want to get the voxel index.
 	 *  \return voxel index associated with the given physicalCoords
 	 */
-	util::ivector4 getIndexFromPhysicalCoords( const util::fvector4 &physicalCoords ) const;
+	util::ivector4 getIndexFromPhysicalCoords( const util::fvector4 &physicalCoords, bool restrictedToImageBox = false ) const;
 
 	/**
 	 * Copy all voxel data of the image into memory.
@@ -524,7 +525,7 @@ public:
 	template<typename T> MemChunk<T> copyToMemChunk()const {
 		const util::FixedVector<size_t, 4> size = getSizeAsVector();
 		data::MemChunk<T> ret( size[0], size[1], size[2], size[3] );
-		copyToMem<T>( &ret.voxel<T>( 0, 0, 0, 0 ),ret.getVolume() );
+		copyToMem<T>( &ret.voxel<T>( 0, 0, 0, 0 ), ret.getVolume() );
 		return ret;
 	}
 
@@ -583,7 +584,7 @@ public:
 	/// \returns the number of rows of the image
 	size_t getNrOfRows()const;
 	/// \returns the number of columns of the image
-	size_t getNrOfColumms()const;
+	size_t getNrOfColumns()const;
 	/// \returns the number of slices of the image
 	size_t getNrOfSlices()const;
 	/// \returns the number of timesteps of the image

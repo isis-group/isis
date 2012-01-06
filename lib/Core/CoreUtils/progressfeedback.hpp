@@ -52,6 +52,7 @@ public:
 	virtual size_t getMax() = 0;
 	/// Increment the "progress" by one
 	ProgressFeedback &operator++();
+	virtual ~ProgressFeedback();
 };
 
 /*

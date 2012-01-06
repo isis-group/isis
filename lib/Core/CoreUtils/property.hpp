@@ -30,11 +30,8 @@ namespace util
 /**
  * A very generic class to store values of properties.
  * PropertyValue may store a value of any type (defined in types.cpp) otherwise it's empty.
- * Empty ValueValues are never equal to anything (not even to empty ValueValues).
  * Non-empty ValueValues are equal-compareable.
- * They only store a value but no name, because they will get a name when they are stored (in PropertyMap).
- * IMPORTANT: for this class "not equal" (not ==) does NOT mean "unequal" (!=) in case of both ValueValues empty
- * see operators documentation below.
+ * But empty PropertyValues are neigther equal nor unequal to anything (not even to empty ValueValues).
  * @author Enrico Reimer
  */
 class PropertyValue: public ValueReference

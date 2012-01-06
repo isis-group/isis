@@ -29,14 +29,16 @@ BOOST_AUTO_TEST_CASE( FilePtr_init_test )
 BOOST_AUTO_TEST_CASE( FilePtr_write_test )
 {
 	util::TmpFile testfile;
+	// creating a new file and write into it
 	{
-		data::FilePtr fptr1( testfile.file_string(), 1024, true ); // create a file for writing
-		BOOST_REQUIRE( fptr1.good() ); // it should be "good"
-		BOOST_REQUIRE_EQUAL( fptr1.getLength(), 1024 );
+		{
+			data::FilePtr fptr( testfile.file_string(), 1024, true ); // create a file for writing
+			BOOST_REQUIRE( fptr.good() ); // it should be "good"
+			BOOST_REQUIRE_EQUAL( fptr.getLength(), 1024 );
 
-		data::ValuePtr<uint8_t> ptr = fptr1.at<uint8_t>( 5 );
-		strcpy( ( char * )&ptr[0], "Hello_world!\n" ); // writing to a ValuePtr created from a writing fileptr should write into the file
-
+			data::ValuePtr<uint8_t> ptr = fptr.at<uint8_t>( 5 );
+			strcpy( ( char * )&ptr[0], "Hello_world!\n" ); // writing to a ValuePtr created from a writing fileptr should write into the file
+		}
 		std::ifstream in( testfile.file_string().c_str() );
 		BOOST_REQUIRE( in.good() );
 
@@ -46,15 +48,17 @@ BOOST_AUTO_TEST_CASE( FilePtr_write_test )
 		BOOST_CHECK_EQUAL( red, "Hello_world!" );
 	}
 
+	// open existing file for reading
 	{
-		data::FilePtr fptr2( testfile.file_string() ); // create a file for reading
-		BOOST_REQUIRE_EQUAL( fptr2.getLength(), 1024 );
-		BOOST_REQUIRE( fptr2.good() );
-		data::ValuePtr<uint8_t> ptr = fptr2.at<uint8_t>( 5 );
-		BOOST_CHECK_EQUAL( std::string( ( char * )&ptr[0] ), "Hello_world!\n" ); // reading should get the content of the file
-		strcpy( ( char * )&ptr[0], "Hello_you!\n" ); // writing to a ValuePtr created from a reading fileptr should _NOT_ trigger a copy-on-write
-		BOOST_CHECK_EQUAL( std::string( ( char * )&ptr[0] ), "Hello_you!\n" ); // so next reading should get the new content of the memory
-
+		{
+			data::FilePtr fptr( testfile.file_string() ); // create a file for reading
+			BOOST_REQUIRE_EQUAL( fptr.getLength(), 1024 );
+			BOOST_REQUIRE( fptr.good() );
+			data::ValuePtr<uint8_t> ptr = fptr.at<uint8_t>( 5 );
+			BOOST_CHECK_EQUAL( std::string( ( char * )&ptr[0] ), "Hello_world!\n" ); // reading should get the content of the file
+			strcpy( ( char * )&ptr[0], "Hello_you!\n" ); // writing to a ValuePtr created from a reading fileptr should _NOT_ trigger a copy-on-write
+			BOOST_CHECK_EQUAL( std::string( ( char * )&ptr[0] ), "Hello_you!\n" ); // so next reading should get the new content of the memory
+		}
 		std::ifstream in( testfile.file_string().c_str() );
 		BOOST_REQUIRE( in.good() );
 
@@ -62,6 +66,25 @@ BOOST_AUTO_TEST_CASE( FilePtr_write_test )
 		std::string red;
 		in >> red;
 		BOOST_CHECK_EQUAL( red, "Hello_world!" ); // but the file behind should not be changed
+	}
+	
+	// re-use existing file for (over)writing
+	{
+		{
+			data::FilePtr fptr( testfile.file_string(), 1024, true ); // create a file for writing
+			BOOST_REQUIRE( fptr.good() ); // it should be "good"
+			BOOST_REQUIRE_EQUAL( fptr.getLength(), 1024 );
+			
+			data::ValuePtr<uint8_t> ptr = fptr.at<uint8_t>( 5 );
+			strcpy( ( char * )&ptr[0], "Hello_universe!\n" ); // writing to a ValuePtr created from a writing fileptr should write into the file
+		}	
+		std::ifstream in( testfile.file_string().c_str() );
+		BOOST_REQUIRE( in.good() );
+		
+		in.seekg( 5 );
+		std::string red;
+		in >> red;
+		BOOST_CHECK_EQUAL( red, "Hello_universe!" );
 	}
 
 }

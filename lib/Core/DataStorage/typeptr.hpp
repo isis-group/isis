@@ -185,8 +185,10 @@ public:
 		if ( m_len ) {
 			const TYPE *ptr = m_val.get();
 
+			// if you get trouble with to_tm here include <boost/date_time/gregorian/gregorian.hpp> or <boost/date_time/posix_time/posix_time.hpp> in your cpp
 			for ( size_t i = 0; i < m_len - 1; i++ )
 				ret += util::Value<TYPE>( ptr[i] ).toString( false ) + "|";
+
 
 			ret += util::Value<TYPE>( ptr[m_len - 1] ).toString( labeled );
 		}

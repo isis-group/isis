@@ -73,8 +73,11 @@ private:
 	}
 
 protected:
-	std::string suffixes()const {
-		return std::string( "tar tar.gz tgz tar.bz2 tbz tar.Z taz" );
+	std::string suffixes( io_modes modes = both )const {
+		if( modes == write_only )
+			return std::string();
+		else
+			return std::string( "tar tar.gz tgz tar.bz2 tbz tar.Z taz" );
 	}
 public:
 	std::string dialects( const std::string &/*filename*/ )const {
@@ -155,7 +158,7 @@ public:
 
 					size_t red = boost::iostreams::read( in, ( char * )&mfile[0], size ); // read data from the stream into the mapped memory
 					next_header_in -= red;
-					mfile.close(); //close and unmap the temporary file/mapped memory
+					mfile.release(); //close and unmap the temporary file/mapped memory
 
 					if( red != size ) { // read the data from the stream
 						LOG( Runtime, warning ) << "Could not read all " << size << " bytes for " << tmpfile.file_string();

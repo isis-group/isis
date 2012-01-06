@@ -15,8 +15,9 @@
 #include "../CoreUtils/singletons.hpp"
 
 // we need that, because boost::mpl::for_each will instantiate all types - and this needs the output stream operations
-#include <boost/date_time/gregorian/gregorian_io.hpp>
-#include <boost/date_time/posix_time/posix_time_io.hpp>
+#include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <utime.h>
 
 namespace isis
 {
@@ -33,6 +34,11 @@ void FilePtr::Closer::operator()( void *p )
 				<< " failed, the error was: " << util::MSubject( strerror( errno ) );
 	}
 
+	if(write && futimes(file, NULL)!=0){
+		LOG( Runtime, warning )
+			<< "Setting access time of " << util::MSubject( filename )
+			<< " failed, the error was: " << util::MSubject( strerror( errno ) );
+	}
 	if( ::close( file ) != 0 ) {
 		LOG( Runtime, warning )
 				<< "Closing of " << util::MSubject( filename )
@@ -58,7 +64,7 @@ bool FilePtr::map( int file, size_t len, bool write, const boost::filesystem::pa
 		LOG( Debug, error ) << "Failed to map file, error was " << strerror( errno );
 		return false;
 	} else {
-		const Closer cl = {file, len, filename};
+		const Closer cl = {file, len, filename, write};
 		static_cast<ValuePtr<uint8_t>&>( *this ) = ValuePtr<uint8_t>( static_cast<uint8_t * const>( ptr ), len, cl );
 		return true;
 	}
@@ -101,13 +107,15 @@ size_t FilePtr::checkSize( bool write, int file, const boost::filesystem::path &
 	}
 }
 
+FilePtr::FilePtr(): m_good( false ) {}
+
 
 FilePtr::FilePtr( const boost::filesystem::path &filename, size_t len, bool write ): m_good( false )
 {
 	const int oflag = write ?
 					  O_CREAT | O_RDWR : //create file if its not there
 					  O_RDONLY; //open file readonly
-	const int file = open( filename.file_string().c_str(), oflag, S_IRUSR | S_IWUSR );
+	const int file = open( filename.file_string().c_str(), oflag, 0666 );
 
 	if( file == -1 ) {
 		LOG( Runtime, error ) << "Failed to open " << util::MSubject( filename )
@@ -125,7 +133,7 @@ FilePtr::FilePtr( const boost::filesystem::path &filename, size_t len, bool writ
 
 bool FilePtr::good() {return m_good;}
 
-void FilePtr::close()
+void FilePtr::release()
 {
 	static_cast<boost::shared_ptr<uint8_t>&>( *this ).reset();
 	m_good = false;
@@ -133,6 +141,8 @@ void FilePtr::close()
 
 ValuePtrReference FilePtr::atByID( short unsigned int ID, size_t offset, size_t len )
 {
+	LOG_IF( static_cast<boost::shared_ptr<uint8_t>&>( *this ).get() == 0, Debug, error )
+			<< "There is no mapped data for this FilePtr - I'm very likely gonna crash soon ..";
 	GeneratorMap &map = util::Singletons::get<GeneratorMap, 0>();
 	assert( !map.empty() );
 	const generator_type gen = map[ID];

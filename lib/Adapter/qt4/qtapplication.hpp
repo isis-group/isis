@@ -24,6 +24,7 @@
 #include <CoreUtils/application.hpp>
 #include <DataStorage/io_application.hpp>
 #include <boost/scoped_ptr.hpp>
+#include "qdefaultmessageprint.hpp"
 
 namespace isis
 {
@@ -46,11 +47,12 @@ class IOQtApplication : public data::IOApplication
 	int m_argc; //same as above
 	char **m_argv;
 	boost::scoped_ptr<QApplication> m_qapp;
-	std::string m_GraphicalSystem;
 public:
 	QApplication &getQApplication();
-	IOQtApplication( const char name[], bool have_input = true, bool have_output = true, const std::string &graphicalSystem = std::string("raster") );
+	IOQtApplication( const char name[], bool have_input = true, bool have_output = true );
 	virtual bool init( int argc, char **argv, bool exitOnError = true );
+protected:
+	virtual boost::shared_ptr<util::_internal::MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;
 
 };
 }

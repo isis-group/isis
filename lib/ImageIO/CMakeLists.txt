@@ -17,6 +17,7 @@ include_directories(${CMAKE_SOURCE_DIR}/lib/Core)
 # add global options
 ############################################################
 option(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI "Enable Nifti-IO plugin" OFF)
+option(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI_SA "Enable standalone Nifti-IO plugin" OFF)
 option(${CMAKE_PROJECT_NAME}_IOPLUGIN_NULL "Enable Null-IO plugin" ON)
 option(${CMAKE_PROJECT_NAME}_IOPLUGIN_PNG "Enable Null-IO plugin" OFF)
 option(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM "Enable Dicom-IO plugin" OFF)
@@ -47,6 +48,13 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI)
 
   set(TARGETS ${TARGETS} isisImageFormat_Nifti)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI)
+
+if(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI_SA)
+  add_library(isisImageFormat_Nifti_sa SHARED imageFormat_nifti_sa.cpp)
+  target_link_libraries(isisImageFormat_Nifti_sa isis_core  ${ISIS_LIB_DEPENDS})
+  set(TARGETS ${TARGETS} isisImageFormat_Nifti_sa)
+endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI_SA)
+
 
 ############################################################
 # vista
@@ -194,21 +202,29 @@ endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_TAR)
 # Dicom
 ############################################################
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM)
-  find_library(LIB_DCMIMGLE dcmimgle)
-  find_library(LIB_DCMIMAGE dcmimage)
-  find_library(LIB_DCMDATA dcmdata)
-  find_library(LIB_OFSTD ofstd)
-  find_library(LIB_Z z)
-  find_library(LIB_TIFF tiff)
-  find_library(LIB_PNG png12)
+	find_library(LIB_DCMIMGLE dcmimgle)
+	find_library(LIB_DCMIMAGE dcmimage)
+	find_library(LIB_DCMDATA dcmdata)
+	find_library(LIB_OFSTD ofstd)
 
-  find_path(INCPATH_DCMTK "dcmtk/dcmdata/dcfilefo.h")
-  include_directories(${INCPATH_DCMTK})
+	find_library(LIB_Z z)
+	find_library(LIB_TIFF tiff)
+	find_library(LIB_PNG png12)
 
-  add_library(isisImageFormat_Dicom SHARED imageFormat_Dicom.cpp imageFormat_DicomParser.cpp)
-  target_link_libraries(isisImageFormat_Dicom ${LIB_DCMDATA} ${LIB_DCMIMGLE} ${LIB_OFSTD} ${LIB_Z} isis_core ${ISIS_LIB_DEPENDS} ${LIB_DCMIMAGE} ${LIB_TIFF} ${LIB_PNG})
+	set(DCM_LIBS ${LIB_DCMIMGLE} ${LIB_DCMIMAGE}  ${LIB_DCMDATA}  ${LIB_OFSTD}  ${LIB_Z} ${LIB_TIFF} ${LIB_PNG})
 
-  set(TARGETS ${TARGETS} isisImageFormat_Dicom)
+	find_path(INCPATH_DCMTK "dcmtk/dcmdata/dcfilefo.h")
+	include_directories(${INCPATH_DCMTK})
+	
+	find_library(LIB_DCM_LOG "oflog")
+	if(LIB_DCM_LOG)
+		message(STATUS "dcmtk 3.6 found - linking against ${LIB_DCM_LOG}")
+		list(APPEND DCM_LIBS ${LIB_DCM_LOG} )
+	endif(LIB_DCM_LOG)
+	add_library(isisImageFormat_Dicom SHARED imageFormat_Dicom.cpp imageFormat_DicomParser.cpp)
+
+	target_link_libraries(isisImageFormat_Dicom ${DCM_LIBS} isis_core ${ISIS_LIB_DEPENDS})
+	set(TARGETS ${TARGETS} isisImageFormat_Dicom)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM)
 
 ############################################################
