@@ -23,6 +23,7 @@
 #else
 #include <strings.h>
 #endif
+#include <algorithm>
 
 namespace isis
 {
@@ -54,10 +55,14 @@ bool ichar_traits::lt( const char &c1, const char &c2 )
 
 const char *ichar_traits::find( const char *s, size_t n, const char &a )
 {
-	for( size_t i = 0; i < n; i++, s++ ) {
-		if( eq( *s, a ) )
-			return s;
-	}
+	const char lowA = std::tolower( a ), upA = std::toupper( a );
+
+	if( lowA == upA ) { // if a has no cases we can do naive search
+		return std::find( s, s + n, a );
+	} else for( size_t i = 0; i < n; i++, s++ ) {
+			if( std::tolower( *s ) == a )
+				return s;
+		}
 
 	return NULL;
 }

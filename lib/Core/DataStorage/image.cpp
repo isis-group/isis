@@ -204,13 +204,16 @@ util::ivector4 Image::getIndexFromPhysicalCoords( const isis::util::fvector4 &ph
 										 vec1[0] * m_RowVecInv[2] + vec1[1] * m_ColumnVecInv[2] + vec1[2] * m_SliceVecInv[2],
 										 vec1[3] );
 	util::ivector4 retAsIvector4 = util::Value<util::fvector4>( ret ).as<util::ivector4>();
+
 	if( restrictedToImageBox ) {
 		const util::ivector4 size = getSizeAsVector();
+
 		for( unsigned short i = 0; i < 4; i ++ ) {
 			retAsIvector4[i] = retAsIvector4[i] < 0 ? 0 : retAsIvector4[i];
 			retAsIvector4[i] = retAsIvector4[i] >= size[i] ? size[i] - 1 : retAsIvector4[i];
 		}
 	}
+
 	return  retAsIvector4;
 }
 
@@ -376,7 +379,7 @@ bool Image::reIndex()
 	util::fvector4 &voxeSize = propertyValue( "voxelSize" )->castTo<util::fvector4>();
 
 	for( int i = 0; i < 4; i++ ) {
-		if(std::isinf(voxeSize[i] ) ){
+		if( std::isinf( voxeSize[i] ) ) {
 			LOG( Runtime, warning ) << "voxelSize[" << i << "] is invalid, using 1";
 			voxeSize[i] = 1;
 		}
