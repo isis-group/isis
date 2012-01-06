@@ -155,6 +155,7 @@ public:
 
 	/// \returns the number of cheap-copy-chunks using the same memory as this
 	size_t useCount()const;
+	/// Creates a new empty Chunk of different size and without properties, but of the same datatype as this.
 	Chunk cloneToNew( size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 )const;
 
 	/**
@@ -164,6 +165,14 @@ public:
 	 */
 	bool convertToType( short unsigned int ID, scaling_pair scaling = scaling_pair() );
 
+	/**
+	 * Copy all voxel data of the chunk into memory.
+	 * If neccessary a conversion into T is done using min/max of the image.
+	 * \param dst c-pointer for the memory to copy into
+	 * \param len the allocated size of that memory in elements
+	 * \param scaling the scaling to be used when converting the data (will be determined automatically if not given)
+	 * \return true if copying was (at least partly) successful
+	 */
 	template<typename T> bool copyToMem( T *dst, size_t len, scaling_pair scaling = scaling_pair() )const {
 		return getValuePtrBase().copyToMem<T>( dst, len,  scaling ); // use copyToMem of ValuePtrBase
 	}
