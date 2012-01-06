@@ -24,7 +24,7 @@ option(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM "Enable Dicom-IO plugin" OFF)
 option(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA "Enable Vista-IO plugin" OFF)
 option(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ "Enable proxy plugin for compressed files" ON)
 option(${CMAKE_PROJECT_NAME}_IOPLUGIN_TAR "Enable proxy plugin for tar datasets" ON)
-option(${CMAKE_PROJECT_NAME}_IOPLUGIN_STDIN "Enable proxy plugin which gets filenames to be red from stdin" ON)
+option(${CMAKE_PROJECT_NAME}_IOPLUGIN_FLIST "Enable proxy plugin which gets filenames to be red from a file or stdin" ON)
 option(${CMAKE_PROJECT_NAME}_IOPLUGIN_PROCESS "Enable proxy plugin which gets filenames to be red from a child process" ON)
 option(${CMAKE_PROJECT_NAME}_IOPLUGIN_RAW "Enable plugin for raw data output" ON)
 OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_SIEMENSTCPIP "Enable plugin for Siemens data coming on TCP Port" OFF)
@@ -201,13 +201,13 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_TAR)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_TAR)
 
 ############################################################
-# STDIN proxy plugin
+# FLIST proxy plugin
 ############################################################
-if(${CMAKE_PROJECT_NAME}_IOPLUGIN_STDIN)
-	add_library(isisImageFormat_stdin SHARED imageFormat_stdin.cpp)
-	target_link_libraries(isisImageFormat_stdin isis_core ${ISIS_LIB_DEPENDS} ${Boost_IOSTREAMS_LIBRARY} ${LIB_Z} ${LIB_BZ2})
-	set(TARGETS ${TARGETS} isisImageFormat_stdin)
-endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_STDIN)
+if(${CMAKE_PROJECT_NAME}_IOPLUGIN_FLIST)
+	add_library(isisImageFormat_flist SHARED imageFormat_flist.cpp)
+	target_link_libraries(isisImageFormat_flist isis_core ${ISIS_LIB_DEPENDS} ${Boost_IOSTREAMS_LIBRARY} ${LIB_Z} ${LIB_BZ2})
+	set(TARGETS ${TARGETS} isisImageFormat_flist)
+endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_FLIST)
 
 ############################################################
 # PROCESS proxy plugin

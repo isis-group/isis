@@ -120,7 +120,7 @@ bool ParameterMap::parse( int argc, char **argv )
 				if(at(matchingStrings.front())->is<util::slist>()){ //dont do tokenizing if the target is an slist (is already done by the shell)
 					at(matchingStrings.front())->castTo<util::slist>()=util::slist(argv + start, argv + i);//and parsing into strings is superfluous
 					at(matchingStrings.front() ).needed() = false; //remove needed flag, because the value is set (aka "not needed anymore")
-					LOG( Debug, warning )
+					LOG( Debug, info )
 						<< "Copied " << MSubject( listToString( argv + start, argv + i, ",", "", "" ) )
 						<< " as " << at(matchingStrings.front())->toString( true );					
 				}else if ( at( matchingStrings.front() ).parse( listToString( argv + start, argv + i, ",", "", "" ) ) ) { // parse the collected properties
