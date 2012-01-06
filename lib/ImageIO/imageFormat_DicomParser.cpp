@@ -170,7 +170,7 @@ void ImageFormat_Dicom::parseTM( DcmElement *elem, const util::PropertyMap::Prop
 				<< "Cannot parse Time string \"" << buff << "\" in the field \"" << name << "\"";
 }
 
-void ImageFormat_Dicom::parseScalar( DcmElement* elem, const util::PropertyMap::PropPath& name, util::PropertyMap& map )
+void ImageFormat_Dicom::parseScalar( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map )
 {
 	OFString buff;
 
@@ -257,7 +257,7 @@ void ImageFormat_Dicom::parseScalar( DcmElement* elem, const util::PropertyMap::
 	}
 }
 
-void ImageFormat_Dicom::parseVector( DcmElement* elem, const util::PropertyMap::PropPath& name, util::PropertyMap& map )
+void ImageFormat_Dicom::parseVector( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map )
 {
 	OFString buff;
 	size_t len = elem->getVM();
@@ -339,7 +339,7 @@ void ImageFormat_Dicom::parseVector( DcmElement* elem, const util::PropertyMap::
 	LOG( Debug, verbose_info ) << "Parsed the vector " << name << " as " << map.propertyValue( name );
 }
 
-void ImageFormat_Dicom::parseList( DcmElement* elem, const util::PropertyMap::PropPath& name, util::PropertyMap& map )
+void ImageFormat_Dicom::parseList( DcmElement *elem, const util::PropertyMap::PropPath &name, util::PropertyMap &map )
 {
 	OFString buff;
 	size_t len = elem->getVM();
@@ -471,9 +471,11 @@ size_t ImageFormat_Dicom::parseCSAEntry( Uint8 *at, util::PropertyMap &map, cons
 		}
 
 		try {
-			util::PropertyMap::PropPath path;path.push_back(name);
+			util::PropertyMap::PropPath path;
+			path.push_back( name );
+
 			if ( ret.size() == 1 ) {
-				if ( parseCSAValue( ret.front(),path , vr, map ) ) {
+				if ( parseCSAValue( ret.front(), path , vr, map ) ) {
 					LOG( Debug, verbose_info ) << "Found scalar entry " << path << ":" << map.propertyValue( path ) << " in CSA header";
 				}
 			} else if ( ret.size() > 1 ) {
@@ -531,11 +533,11 @@ bool ImageFormat_Dicom::parseCSAValueList( const util::slist &val, const util::P
 	return true;
 }
 
-void ImageFormat_Dicom::dcmObject2PropMap( DcmObject* master_obj, util::PropertyMap& map, const std::string& dialect)const
+void ImageFormat_Dicom::dcmObject2PropMap( DcmObject *master_obj, util::PropertyMap &map, const std::string &dialect )const
 {
 	for ( DcmObject *obj = master_obj->nextInContainer( NULL ); obj; obj = master_obj->nextInContainer( obj ) ) {
 		const DcmTagKey &tag = obj->getTag();
-		
+
 		if ( tag == DcmTagKey( 0x7fe0, 0x0010 ) )
 			continue;//skip the image data
 		else if ( tag == DcmTagKey( 0x0029, 0x1010 ) ) { //CSAImageHeaderInfo
@@ -564,15 +566,15 @@ void ImageFormat_Dicom::dcmObject2PropMap( DcmObject* master_obj, util::Property
 			const size_t mult = obj->getVM();
 
 			if ( mult == 0 )
-				LOG( Runtime, verbose_info ) << "Skipping empty Dicom-Tag " << util::MSubject(tag2Name(tag));
+				LOG( Runtime, verbose_info ) << "Skipping empty Dicom-Tag " << util::MSubject( tag2Name( tag ) );
 			else if ( mult == 1 )
-				parseScalar( elem, tag2Name(tag), map );
+				parseScalar( elem, tag2Name( tag ), map );
 			else if ( mult <= 4 )
-				parseVector( elem, tag2Name(tag), map );
+				parseVector( elem, tag2Name( tag ), map );
 			else
-				parseList( elem, tag2Name(tag), map ); // for any other value
+				parseList( elem, tag2Name( tag ), map ); // for any other value
 		} else {
-			dcmObject2PropMap( obj, map.branch( tag2Name(tag) ), dialect );
+			dcmObject2PropMap( obj, map.branch( tag2Name( tag ) ), dialect );
 		}
 	}
 }

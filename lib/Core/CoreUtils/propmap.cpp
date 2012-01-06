@@ -157,7 +157,7 @@ bool PropertyMap::recursiveRemove( PropertyMap &root, const propPathIterator pat
 // Generic interface for accessing elements
 ////////////////////////////////////////////////////////////////////////////////////
 
-const std::vector< PropertyValue >& PropertyMap::propertyValueVec( const isis::util::PropertyMap::PropPath& path ) const
+const std::vector< PropertyValue >& PropertyMap::propertyValueVec( const isis::util::PropertyMap::PropPath &path ) const
 {
 	const mapped_type *ref = findEntry( *this, path.begin(), path.end() );
 
@@ -170,7 +170,7 @@ const std::vector< PropertyValue >& PropertyMap::propertyValueVec( const isis::u
 	}
 }
 
-std::vector< PropertyValue >& PropertyMap::propertyValueVec( const isis::util::PropertyMap::PropPath& path )
+std::vector< PropertyValue >& PropertyMap::propertyValueVec( const isis::util::PropertyMap::PropPath &path )
 {
 	mapped_type &n = fetchEntry( *this, path.begin(), path.end() );
 	LOG_IF( ! n.is_leaf(), Debug, error ) << "Using branch " << path << " as PropertyValue";
@@ -178,19 +178,19 @@ std::vector< PropertyValue >& PropertyMap::propertyValueVec( const isis::util::P
 }
 
 
-const PropertyValue &PropertyMap::propertyValue( const isis::util::PropertyMap::PropPath& path )const
+const PropertyValue &PropertyMap::propertyValue( const isis::util::PropertyMap::PropPath &path )const
 {
 	return propertyValueVec( path )[0];
 }
 
-PropertyValue &PropertyMap::propertyValue( const isis::util::PropertyMap::PropPath& path )
+PropertyValue &PropertyMap::propertyValue( const isis::util::PropertyMap::PropPath &path )
 {
-	std::vector< PropertyValue > &p=propertyValueVec( path );
+	std::vector< PropertyValue > &p = propertyValueVec( path );
 	p.resize( 1 ); // the user is expecting only one entry, so remove the others
 	return p[0];
 }
 
-const PropertyMap &PropertyMap::branch( const isis::util::PropertyMap::PropPath& path ) const
+const PropertyMap &PropertyMap::branch( const isis::util::PropertyMap::PropPath &path ) const
 {
 	const mapped_type *ref = findEntry( *this, path.begin(), path.end() );
 
@@ -203,13 +203,13 @@ const PropertyMap &PropertyMap::branch( const isis::util::PropertyMap::PropPath&
 		return ref->getBranch();
 	}
 }
-PropertyMap &PropertyMap::branch( const PropPath& path )
+PropertyMap &PropertyMap::branch( const PropPath &path )
 {
 	mapped_type &n = fetchEntry( *this, path.begin(), path.end() );
 	return n.getBranch();
 }
 
-bool PropertyMap::remove( const PropPath& path )
+bool PropertyMap::remove( const PropPath &path )
 {
 	return recursiveRemove( *this, path.begin(), path.end() );
 }
@@ -435,7 +435,7 @@ PropertyMap::FlatMap PropertyMap::getFlatMap() const
 }
 
 
-bool PropertyMap::transform(const PropPath& from,  const PropPath& to, int dstID, bool delSource )
+bool PropertyMap::transform( const PropPath &from,  const PropPath &to, int dstID, bool delSource )
 {
 	const PropertyValue &found = propertyValue( from );
 	bool ret = false;
@@ -502,7 +502,7 @@ void PropertyMap::addNeededFromString( const std::string &needed )
 	}
 }
 
-bool PropertyMap::hasProperty( const PropPath& path ) const
+bool PropertyMap::hasProperty( const PropPath &path ) const
 {
 	const mapped_type *ref = findEntry( *this, path.begin(), path.end() );
 	return ( ref && ref->is_leaf() && ! ref->getLeaf()[0].isEmpty() );
@@ -542,13 +542,13 @@ isis::util::PropertyMap::KeyType PropertyMap::find( isis::util::PropertyMap::Key
 	return KeyType(); // nothing found
 }
 
-bool PropertyMap::hasBranch( const PropPath& path ) const
+bool PropertyMap::hasBranch( const PropPath &path ) const
 {
 	const mapped_type *ref = findEntry( *this, path.begin(), path.end() );
 	return ( ref && ! ref->is_leaf()  );
 }
 
-bool PropertyMap::rename( const PropPath& oldname,  const PropPath& newname )
+bool PropertyMap::rename( const PropPath &oldname,  const PropPath &newname )
 {
 	const mapped_type *old_e = findEntry( oldname );
 	const mapped_type *new_e = findEntry( newname );

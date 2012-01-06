@@ -34,29 +34,31 @@ public:
 	}
 	std::string getName()const {return "filelist proxy (gets filenames from files or stdin)";}
 
-	size_t doLoad(std::istream &in,std::list<data::Chunk> &chunks, const std::string &dialect){
-		size_t red=0;
-		const boost::regex linebreak("[[.newline.][.carriage-return.]]");
+	size_t doLoad( std::istream &in, std::list<data::Chunk> &chunks, const std::string &dialect ) {
+		size_t red = 0;
+		const boost::regex linebreak( "[[.newline.][.carriage-return.]]" );
 		std::string fnames;
-		while(!in.eof()){
+
+		while( !in.eof() ) {
 			in >> fnames ;
-			BOOST_FOREACH(const std::string fname,util::stringToList<std::string>(fnames,linebreak)){
-				LOG(Runtime,info) << "loading " << fname; 
+			BOOST_FOREACH( const std::string fname, util::stringToList<std::string>( fnames, linebreak ) ) {
+				LOG( Runtime, info ) << "loading " << fname;
 				red += data::IOFactory::load( chunks, fname, "", dialect );
 			}
 		}
+
 		return red;
 	}
 
 	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect ) throw( std::runtime_error & ) {
-		if(filename.empty()){
-			LOG(Runtime,info) << "Getting filelist from stdin";
-			return doLoad(std::cin,chunks,dialect);
+		if( filename.empty() ) {
+			LOG( Runtime, info ) << "Getting filelist from stdin";
+			return doLoad( std::cin, chunks, dialect );
 		} else {
-			LOG(Runtime,info) << "Getting filelist from " << filename;
-			std::ifstream in(filename.c_str());
+			LOG( Runtime, info ) << "Getting filelist from " << filename;
+			std::ifstream in( filename.c_str() );
 			in.exceptions( std::ios::badbit );
-			return doLoad(in,chunks,dialect);
+			return doLoad( in, chunks, dialect );
 		}
 	}
 

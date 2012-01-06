@@ -63,11 +63,11 @@ public:
 	 * a map, using complete key-paths as keys for the corresponding values
 	 */
 	typedef std::map<KeyType, PropertyValue> FlatMap;
-	struct PropPath:public std::list<KeyType>{
-		PropPath(){}
-		PropPath(const char *key):std::list<KeyType>(util::stringToList<KeyType>( util::istring(key), pathSeperator )){}
-		PropPath(const KeyType &key):std::list<KeyType>(util::stringToList<KeyType>( key, pathSeperator )){}
-		PropPath(const std::list<KeyType> &path):std::list<KeyType>(path){}
+	struct PropPath: public std::list<KeyType> {
+		PropPath() {}
+		PropPath( const char *key ): std::list<KeyType>( util::stringToList<KeyType>( util::istring( key ), pathSeperator ) ) {}
+		PropPath( const KeyType &key ): std::list<KeyType>( util::stringToList<KeyType>( key, pathSeperator ) ) {}
+		PropPath( const std::list<KeyType> &path ): std::list<KeyType>( path ) {}
 	};
 private:
 	typedef std::map<KeyType, mapped_type, key_compare> Container;
@@ -492,7 +492,7 @@ template<class Predicate> struct PropertyMap::walkTree {
 };
 
 // as well as PropertyMap::getProperty ...
-template<typename T> T PropertyMap::getPropertyAs( const PropPath& path ) const
+template<typename T> T PropertyMap::getPropertyAs( const PropPath &path ) const
 {
 	const mapped_type *entry = findEntry( path );
 
@@ -517,7 +517,7 @@ namespace std
 template<typename charT, typename traits>
 basic_ostream<charT, traits>& operator<<( basic_ostream<charT, traits> &out, const isis::util::PropertyMap::PropPath &s )
 {
-	isis::util::listToOStream(s.begin(),s.end(),out,"/","","");
+	isis::util::listToOStream( s.begin(), s.end(), out, "/", "", "" );
 	return out;
 }
 /// Streaming output for PropertyMap::node
