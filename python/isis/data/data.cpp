@@ -103,6 +103,8 @@ BOOST_PYTHON_MODULE( _data )
 	.def( "getDeepCopy", ( isis::data::Image ( ::_Image:: * )( void ) ) ( &_Image::_deepCopy ) )
 	.def( "getDeepCopyAs", ( isis::data::Image ( ::_Image:: * )( isis::python::data::image_types ) ) ( &_Image::_deepCopy ), ( arg( "type" ) ) )
 	.def( "getCheapCopy", ( isis::data::Image ( ::_Image:: * )( void ) ) ( &_Image::_cheapCopy ) )
+	.def( "createImage", &_Image::_createImage )
+	.staticmethod( "createImage" )
 	;
 	//#######################################################################################
 	//  ImageList

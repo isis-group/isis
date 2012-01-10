@@ -27,6 +27,7 @@ bool transformCoords( isis::util::PropertyMap &properties, util::FixedVector<siz
 {
 	if( !properties.hasProperty( "rowVec" ) || !properties.hasProperty( "columnVec" ) || !properties.hasProperty( "sliceVec" )
 		|| !properties.hasProperty( "voxelSize" ) || !properties.hasProperty( "indexOrigin" ) ) {
+		LOG( Runtime, error ) << "Missing one of the properties (rowVec, columnVec, sliceVec, voxelSize, indexOrigin)";
 		return false;
 	}
 
@@ -86,6 +87,7 @@ bool transformCoords( isis::util::PropertyMap &properties, util::FixedVector<siz
 		matrix<float> R_in_inverse( R_in );
 
 		if( !_internal::inverseMatrix<float>( R_in, R_in_inverse ) ) {
+			LOG( Runtime, error ) << "Can not inverse orientation matrix: " << R_in;
 			return false;
 		}
 
