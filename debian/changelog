@@ -1,4 +1,4 @@
-isis (0.4.3gc8d3c2b-0) stable; urgency=low
+isis (0.4.3g322ed3e-0) stable; urgency=low
 
   * api changes in PropertyMap
   * fixed bug in nifti-sa-plugin
