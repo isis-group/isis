@@ -346,6 +346,8 @@ bool ImageFormat_NiftiSa::parseDescripForSPM( isis::util::PropertyMap &props, co
 }
 void ImageFormat_NiftiSa::storeHeader( const util::PropertyMap &props, _internal::nifti_1_header *head )
 {
+	bool saved=false;
+	
 	// implicit stuff
 	head->intent_code = 0;
 	head->slice_start = 0;
@@ -370,7 +372,9 @@ void ImageFormat_NiftiSa::storeHeader( const util::PropertyMap &props, _internal
 			props.getPropertyAs<util::fvector4>( "nifti/srow_x" ).copyTo( head->srow_x );
 			props.getPropertyAs<util::fvector4>( "nifti/srow_y" ).copyTo( head->srow_y );
 			props.getPropertyAs<util::fvector4>( "nifti/srow_z" ).copyTo( head->srow_z );
-		}
+		} else
+			storeSForm(props,head);
+		saved=true;
 	}
 
 	// store niftis original qform if its there
@@ -388,11 +392,13 @@ void ImageFormat_NiftiSa::storeHeader( const util::PropertyMap &props, _internal
 			head->qoffset_x = offset[0];
 			head->qoffset_y = offset[1];
 			head->qoffset_z = offset[2];
-		}
+			saved=true;
+		} else
+			saved = storeQForm(props,head);
 	}
 
 	//store current orientation (may override values set above)
-	if( !storeQForm( props, head ) ) //try to encode as quaternion
+	if(!saved && !storeQForm( props, head ) ) //try to encode as quaternion
 		storeSForm( props, head ); //fall back to normal matrix
 
 	strcpy( head->magic, "n+1" );
@@ -786,9 +792,8 @@ bool ImageFormat_NiftiSa::storeQForm( const util::PropertyMap &props, _internal:
 		head->pixdim[0] = -1;
 	}
 
-	util::Selection tformCode( formCode );
-	tformCode.set( "SCANNER_ANAT" );
-	head->qform_code = tformCode;
+	if(!head->qform_code)head->qform_code = 1; // default to 1 if not set till now
+
 	// the following was more or less stolen from the nifti reference implementation
 	const float a_square = col[0][0] + col[1][1] + col[2][2] + 1;
 
@@ -836,7 +841,7 @@ bool ImageFormat_NiftiSa::storeQForm( const util::PropertyMap &props, _internal:
 void ImageFormat_NiftiSa::storeSForm( const util::PropertyMap &props, _internal::nifti_1_header *head )
 {
 	const util::Matrix4x4<double> sform = getNiftiMatrix( props );
-	head->sform_code = 1;
+	if(!head->sform_code)head->sform_code = 1; // default to 1 if not set till now
 	sform.getRow( 0 ).copyTo( head->srow_x );
 	sform.getRow( 1 ).copyTo( head->srow_y );
 	sform.getRow( 2 ).copyTo( head->srow_z );
