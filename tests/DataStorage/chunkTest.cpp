@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE ( chunk_foreach_voxel_test )
 
 BOOST_AUTO_TEST_CASE ( chunk_mem_init_test )
 {
-	const short data[3*3] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+	const short data[3 * 3] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
 	data::MemChunk<short> ch( data, 3, 3 );
 	BOOST_CHECK_EQUAL( ch.getVolume(), 3 * 3 );
 
