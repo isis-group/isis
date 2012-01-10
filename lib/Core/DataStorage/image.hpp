@@ -490,6 +490,8 @@ public:
 	/**
 	 * Copy all voxel data of the image into memory.
 	 * If neccessary a conversion into T is done using min/max of the image.
+	 * \param dst c-pointer for the memory to copy into
+	 * \param len the allocated size of that memory in elements
 	 */
 	template<typename T> void copyToMem( T *dst, size_t len )const {
 		if( clean ) {

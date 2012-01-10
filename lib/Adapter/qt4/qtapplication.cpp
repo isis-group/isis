@@ -57,9 +57,7 @@ bool isis::qt4::IOQtApplication::init( int argc, char **argv, bool exitOnError )
 	if( m_qapp ) {
 		LOG( util::Debug, error ) << "The QApplication allready exists. This should not happen. I'll not touch it";
 	} else {
-		m_argc = argc;
-		m_argv = argv;
-		m_qapp.reset( new QApplication( m_argc, m_argv ) );
+		m_qapp.reset( new QApplication( argc, argv ) );
 
 	}
 

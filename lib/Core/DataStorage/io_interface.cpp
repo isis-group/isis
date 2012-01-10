@@ -48,7 +48,7 @@ bool FileFormat::hasOrTell( const util::PropertyMap::KeyType &name, const isis::
 	if ( object.hasProperty( name ) ) {
 		return true;
 	} else {
-		LOG( Runtime, level ) << "Missing property " << util::MSubject( name );
+		LOG( Runtime, level ) << "Missing property " << name;
 		return false;
 	}
 }
