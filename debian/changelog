@@ -1,3 +1,10 @@
+isis (0.4.3gc8d3c2b-0) stable; urgency=low
+
+  * api changes in PropertyMap
+  * fixed bug in nifti-sa-plugin
+
+ -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Tue, 10 Jan  2012 14:12:00 +0200
+
 isis (0.4.2g12c919d-1) stable; urgency=low
 
   * fixed dependency bug in libisis-qt4-dev package
