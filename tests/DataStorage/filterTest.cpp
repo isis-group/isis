@@ -15,6 +15,8 @@ BOOST_AUTO_TEST_CASE( filter_test )
 	class TestFilter : public isis::filter::ChunkFilter<2, 1>
 	{
 	public:
+        virtual std::string getFilterName() const { return std::string("TestFilter" ); }
+    protected:
 		virtual bool process() {
 			std::cout <<  m_input[0]->getSizeAsVector() << std::endl;
 			return true;
@@ -33,7 +35,7 @@ BOOST_AUTO_TEST_CASE( filter_test )
 	chList.push_back( ch2 );
 	myTestProcess.setInput( chList );
 	BOOST_CHECK( myTestProcess.isValid() );
-	myTestProcess.process();
+	myTestProcess.run();
 
 
 }

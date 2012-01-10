@@ -1,8 +1,9 @@
 #ifndef ISIS_FILTER_HPP
 #define ISIS_FILTER_HPP
 
-#include "DataStorage/chunk.hpp"
-#include "DataStorage/image.hpp"
+#include "chunk.hpp"
+#include "image.hpp"
+#include "../CoreUtils/progressfeedback.hpp"
 
 #include <list>
 
@@ -16,12 +17,14 @@ namespace _internal
 class FilterBase
 {
 public:
-	virtual bool process() = 0;
-	bool isValid() const { return valid; }
-protected:
-	bool valid;
-	FilterBase() {};
+	bool run( boost::shared_ptr<util::ProgressFeedback> = boost::shared_ptr<util::ProgressFeedback> () ) ;
 
+	bool isValid() const { return valid; }
+	virtual std::string getFilterName() const = 0;
+protected:
+	virtual bool process() = 0;
+	bool valid;
+	boost::shared_ptr< util::ProgressFeedback > progressfeedback;
 };
 
 template<typename TYPE, int NInput>
@@ -30,8 +33,10 @@ class HasNInput : public FilterBase
 public:
 	void setInput( std::list<TYPE> inputList ) {
 		if( inputList.size() != NInput ) {
-			LOG( isis::util::Runtime, error ) << "The size of the input list (" << inputList.size()
-											  << ") does not coincide with the expected size (" << NInput << ") !";
+			LOG( data::Runtime, warning ) << "The size of the input list (" << inputList.size()
+										  << ") passed to the filter \"" << getFilterName()
+										  << "\" does not coincide with the expected size ("
+										  << NInput << "). Filter object is not valid !";
 			valid = false;
 			return;
 		}
@@ -95,12 +100,23 @@ protected:
 template< typename InType, typename OutType, int NOutput>
 class Filter < InType, OutType, -1, NOutput > : public FilterBase, public HasNOutput<OutType, NOutput>
 {
+	void setInput( std::list<InType> inputList ) {
+		if( inputList.size() == 0 ) {
+			LOG( data::Runtime, warning ) << "The list passed to the filter \""
+										  << getFilterName() << "\" is empty. Filter object is not valid!";
+		}
 
-
+		BOOST_FOREACH( typename std::list<InType>::const_reference elem, inputList ) {
+			m_input.push_back( boost::shared_ptr<InType> ( new InType( elem ) ) );
+		}
+		valid = true;
+	}
 protected:
 	std::vector<boost::shared_ptr<InType> > m_input;
 };
 
+
+//specialization for having 0 inputs and fixed outputsize
 
 
 }

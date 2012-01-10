@@ -44,7 +44,7 @@ class treeNode; //predeclare treeNode -- we'll need it in PropertyMap
  * the needed properties. For all the other play-around with PropertyMaps see extensive documentation below!!!
  *
  */
-class PropertyMap : private std::map<util::istring, _internal::treeNode>
+class PropertyMap : protected std::map<util::istring, _internal::treeNode>
 {
 public:
 	/**
