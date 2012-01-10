@@ -67,20 +67,20 @@ BOOST_AUTO_TEST_CASE( FilePtr_write_test )
 		in >> red;
 		BOOST_CHECK_EQUAL( red, "Hello_world!" ); // but the file behind should not be changed
 	}
-	
+
 	// re-use existing file for (over)writing
 	{
 		{
 			data::FilePtr fptr( testfile.file_string(), 1024, true ); // create a file for writing
 			BOOST_REQUIRE( fptr.good() ); // it should be "good"
 			BOOST_REQUIRE_EQUAL( fptr.getLength(), 1024 );
-			
+
 			data::ValuePtr<uint8_t> ptr = fptr.at<uint8_t>( 5 );
 			strcpy( ( char * )&ptr[0], "Hello_universe!\n" ); // writing to a ValuePtr created from a writing fileptr should write into the file
-		}	
+		}
 		std::ifstream in( testfile.file_string().c_str() );
 		BOOST_REQUIRE( in.good() );
-		
+
 		in.seekg( 5 );
 		std::string red;
 		in >> red;

@@ -129,6 +129,49 @@ Image _Image::_deepCopy( image_types type )
 	return retImage;
 }
 
+Image _Image::_createImage( image_types type, const size_t &first, const size_t &second, const size_t &third, const size_t &fourth )
+{
+	switch( type ) {
+	case BOOL:
+		return _internCreateImage<bool> ( first, second, third, fourth ) ;
+		break;
+	case INT8_T:
+		return _internCreateImage<int8_t>( first, second, third, fourth ) ;
+		break;
+	case UINT8_T:
+		return _internCreateImage<uint8_t>( first, second, third, fourth ) ;
+		break;
+	case INT16_T:
+		return _internCreateImage<int16_t>( first, second, third, fourth );
+		break;
+	case UINT16_T:
+		return _internCreateImage<uint16_t>( first, second, third, fourth );
+		break;
+	case INT32_T:
+		return _internCreateImage<int32_t>( first, second, third, fourth );
+		break;
+	case UINT32_T:
+		return _internCreateImage<uint32_t>( first, second, third, fourth );
+		break;
+	case INT64_T:
+		return _internCreateImage<int64_t>( first, second, third, fourth );
+		break;
+	case UINT64_T:
+		return _internCreateImage<uint64_t>( first, second, third, fourth );
+		break;
+	case FLOAT:
+		return _internCreateImage<float>( first, second, third, fourth );
+		break;
+	case DOUBLE:
+		return _internCreateImage<double>( first, second, third, fourth );
+		break;
+	default:
+		LOG( Runtime, error ) << "Unregistered pixel type ";
+		break;
+	}
+
+	return Image( data::MemChunk<bool>( 0, 0, 0, 0 ) );
+}
 
 }
 }

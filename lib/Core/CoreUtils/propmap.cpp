@@ -65,9 +65,8 @@ PropertyMap::PropertyMap() {}
 ///////////////////////////////////////////////////////////////////
 // The core tree traversal functions
 ///////////////////////////////////////////////////////////////////
-PropertyMap::mapped_type &PropertyMap::fetchEntry( const key_type &key )
+PropertyMap::mapped_type &PropertyMap::fetchEntry( const PropPath &path )
 {
-	const propPath path = util::stringToList<key_type>( key, pathSeperator );
 	return fetchEntry( *this, path.begin(), path.end() );
 }
 /**
@@ -78,7 +77,7 @@ PropertyMap::mapped_type &PropertyMap::fetchEntry(
 	PropertyMap &root,
 	const isis::util::PropertyMap::propPathIterator at, const isis::util::PropertyMap::propPathIterator pathEnd )
 {
-	propPath::const_iterator next = at;
+	PropPath::const_iterator next = at;
 	next++;
 	Container &rootRef = root;
 	iterator found = static_cast<Container &>( root ).find( *at );
@@ -158,64 +157,60 @@ bool PropertyMap::recursiveRemove( PropertyMap &root, const propPathIterator pat
 // Generic interface for accessing elements
 ////////////////////////////////////////////////////////////////////////////////////
 
-const std::vector< PropertyValue >& PropertyMap::propertyValueVec( const PropertyMap::KeyType &key ) const
+const std::vector< PropertyValue >& PropertyMap::propertyValueVec( const isis::util::PropertyMap::PropPath &path ) const
 {
-	const propPath path = util::stringToList<key_type>( key, pathSeperator );
 	const mapped_type *ref = findEntry( *this, path.begin(), path.end() );
 
 	if( ref && ref->is_leaf() ) {
 		return ref->getLeaf();
 	} else {
-		LOG( Debug, warning ) << "Property " << key << " not found. Returning empty property.";
+		LOG( Debug, warning ) << "Property " << path << " not found. Returning empty property.";
 		static const _internal::treeNode emptyEntry;
 		return emptyEntry.getLeaf();
 	}
 }
 
-std::vector< PropertyValue >& PropertyMap::propertyValueVec( const PropertyMap::KeyType &key )
+std::vector< PropertyValue >& PropertyMap::propertyValueVec( const isis::util::PropertyMap::PropPath &path )
 {
-	const propPath path = util::stringToList<key_type>( key, pathSeperator );
 	mapped_type &n = fetchEntry( *this, path.begin(), path.end() );
-	LOG_IF( ! n.is_leaf(), Debug, error ) << "Using branch " << key << " as PropertyValue";
+	LOG_IF( ! n.is_leaf(), Debug, error ) << "Using branch " << path << " as PropertyValue";
 	return n.getLeaf();
 }
 
 
-const PropertyValue &PropertyMap::propertyValue( const key_type &key )const
+const PropertyValue &PropertyMap::propertyValue( const isis::util::PropertyMap::PropPath &path )const
 {
-	return propertyValueVec( key )[0];
+	return propertyValueVec( path )[0];
 }
 
-PropertyValue &PropertyMap::propertyValue( const key_type &key )
+PropertyValue &PropertyMap::propertyValue( const isis::util::PropertyMap::PropPath &path )
 {
-	propertyValueVec( key ).resize( 1 ); // the user is expecting only one entry, so remove the others
-	return propertyValueVec( key )[0];
+	std::vector< PropertyValue > &p = propertyValueVec( path );
+	p.resize( 1 ); // the user is expecting only one entry, so remove the others
+	return p[0];
 }
 
-const PropertyMap &PropertyMap::branch( const key_type &key ) const
+const PropertyMap &PropertyMap::branch( const isis::util::PropertyMap::PropPath &path ) const
 {
-	const propPath path = util::stringToList<key_type>( key, pathSeperator );
 	const mapped_type *ref = findEntry( *this, path.begin(), path.end() );
 
 	if( ! ref ) {
-		LOG( Runtime, warning ) << "Trying to access non existing branch " << key << ".";
+		LOG( Runtime, warning ) << "Trying to access non existing branch " << path << ".";
 		static const _internal::treeNode emptyEntry;
 		return emptyEntry.getBranch();
 	} else {
-		LOG_IF( ref->getBranch().isEmpty(), Runtime, warning ) << "Accessing empty branch " << key;
+		LOG_IF( ref->getBranch().isEmpty(), Runtime, warning ) << "Accessing empty branch " << path;
 		return ref->getBranch();
 	}
 }
-PropertyMap &PropertyMap::branch( const key_type &key )
+PropertyMap &PropertyMap::branch( const PropPath &path )
 {
-	const propPath path = util::stringToList<key_type>( key, pathSeperator );
 	mapped_type &n = fetchEntry( *this, path.begin(), path.end() );
 	return n.getBranch();
 }
 
-bool PropertyMap::remove( const key_type &key )
+bool PropertyMap::remove( const PropPath &path )
 {
-	const propPath path = util::stringToList<key_type>( key, pathSeperator );
 	return recursiveRemove( *this, path.begin(), path.end() );
 }
 
@@ -292,7 +287,7 @@ void PropertyMap::diffTree( const PropertyMap &other, PropertyMap::DiffMap &ret,
 
 	//insert everything that is in this, but not in second or is on both but differs
 	for ( const_iterator thisIt = begin(); thisIt != end(); thisIt++ ) {
-		const propPath::value_type pathname = prefix + thisIt->first;
+		const PropPath::value_type pathname = prefix + thisIt->first;
 
 		//find the closest match for thisIt->first in other (use the value-comparison-functor of PropMap)
 		if ( _internal::continousFind( otherIt, other.end(), *thisIt, value_comp() ) ) { //otherIt->first == thisIt->first - so its the same property
@@ -329,7 +324,7 @@ void PropertyMap::diffTree( const PropertyMap &other, PropertyMap::DiffMap &ret,
 	const_iterator thisIt = begin();
 
 	for ( otherIt = other.begin(); otherIt != other.end(); otherIt++ ) {
-		const propPath::value_type pathname = prefix + otherIt->first;
+		const PropPath::value_type pathname = prefix + otherIt->first;
 
 		if ( ! _internal::continousFind( thisIt, end(), *otherIt, value_comp() ) ) { //there is nothing in this which has the same key as ref
 			const PropertyValue secondVal = otherIt->second.is_leaf() ? otherIt->second.getLeaf()[0] : PropertyValue( Value<std::string>( otherIt->second.toString() ) );
@@ -440,7 +435,7 @@ PropertyMap::FlatMap PropertyMap::getFlatMap() const
 }
 
 
-bool PropertyMap::transform( key_type from,  key_type to, int dstID, bool delSource )
+bool PropertyMap::transform( const PropPath &from,  const PropPath &to, int dstID, bool delSource )
 {
 	const PropertyValue &found = propertyValue( from );
 	bool ret = false;
@@ -507,9 +502,8 @@ void PropertyMap::addNeededFromString( const std::string &needed )
 	}
 }
 
-bool PropertyMap::hasProperty( const key_type &key ) const
+bool PropertyMap::hasProperty( const PropPath &path ) const
 {
-	const propPath path = util::stringToList<key_type>( key, pathSeperator );
 	const mapped_type *ref = findEntry( *this, path.begin(), path.end() );
 	return ( ref && ref->is_leaf() && ! ref->getLeaf()[0].isEmpty() );
 }
@@ -517,7 +511,7 @@ bool PropertyMap::hasProperty( const key_type &key ) const
 isis::util::PropertyMap::KeyType PropertyMap::find( isis::util::PropertyMap::KeyType key, bool allowProperty, bool allowBranch ) const
 {
 	// make sure we only get the last part of the path if its one
-	const propPath path = util::stringToList<key_type>( key, pathSeperator );
+	const PropPath path = util::stringToList<key_type>( key, pathSeperator );
 
 	if( path.empty() ) {
 		LOG( Debug, error ) << "Search key " << util::MSubject( key ) << " is invalid, won't search";
@@ -548,14 +542,13 @@ isis::util::PropertyMap::KeyType PropertyMap::find( isis::util::PropertyMap::Key
 	return KeyType(); // nothing found
 }
 
-bool PropertyMap::hasBranch( const key_type &key ) const
+bool PropertyMap::hasBranch( const PropPath &path ) const
 {
-	const propPath path = util::stringToList<key_type>( key, pathSeperator );
 	const mapped_type *ref = findEntry( *this, path.begin(), path.end() );
 	return ( ref && ! ref->is_leaf()  );
 }
 
-bool PropertyMap::rename( key_type oldname, key_type newname )
+bool PropertyMap::rename( const PropPath &oldname,  const PropPath &newname )
 {
 	const mapped_type *old_e = findEntry( oldname );
 	const mapped_type *new_e = findEntry( newname );
@@ -604,9 +597,8 @@ std::ostream &PropertyMap::print( std::ostream &out, bool label )const
 	return out;
 }
 
-const PropertyMap::mapped_type *PropertyMap::findEntry( const key_type &key )const
+const PropertyMap::mapped_type *PropertyMap::findEntry( const PropPath &path )const
 {
-	const propPath path = util::stringToList<key_type>( key, pathSeperator );
 	return findEntry( *this, path.begin(), path.end() );
 }
 
