@@ -18,7 +18,6 @@
 #include "../core/_convertToPython.hpp"
 
 #include "core/_propmap.hpp"
-#include <CL/cl_platform.h>
 #include "DataStorage/chunk.hpp"
 
 using namespace isis::data;

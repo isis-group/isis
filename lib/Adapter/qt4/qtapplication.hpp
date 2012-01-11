@@ -17,8 +17,8 @@
 
 */
 
-#ifndef APPLICATION_H
-#define APPLICATION_H
+#ifndef QT_APPLICATION_HPP
+#define QT_APPLICATION_HPP
 
 #include <QApplication>
 #include <CoreUtils/application.hpp>
@@ -33,8 +33,6 @@ namespace qt4
 
 class QtApplication : public util::Application
 {
-	int m_argc; //we need local copies here, so we can give references to QApplication
-	char **m_argv;
 	boost::scoped_ptr<QApplication> m_qapp;
 public:
 	QApplication &getQApplication();
@@ -58,4 +56,4 @@ protected:
 }
 }
 
-#endif // APPLICATION_H
+#endif // QT_APPLICATION_HPP
