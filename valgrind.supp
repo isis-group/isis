@@ -1,20 +1,15 @@
-{                                                                                                                                                                                   
-   <glitch in boost34 http://groups.google.com/group/boost-list/browse_thread/thread/a8c3af4f6e87c0ac/9458330270cb2188?#9458330270cb2188>                                                                                                                                                 
-   Memcheck:Param                                                                                                                                                                   
-   sigaltstack(ss)                                                                                                                                                                  
-   fun:sigaltstack                                                                                                                                                                  
-   fun:_ZN5boost6detail14signal_handlerD1Ev                                                                                                                                         
-   fun:_ZN5boost17execution_monitor13catch_signalsERKNS_9unit_test9callback0IiEE                                                                                                    
-   fun:_ZN5boost17execution_monitor7executeERKNS_9unit_test9callback0IiEE                                                                                                           
-   fun:_ZN5boost9unit_test9framework4initEPFPNS0_10test_suiteEiPPcEiS5_                                                                                                             
-   fun:_ZN5boost9unit_test14unit_test_mainEPFPNS0_10test_suiteEiPPcEiS4_                                                                                                            
-   fun:main                                                                                                                                                                         
+{
+   <libdl leak -- see http://www.linuxquestions.org/questions/programming-9/dlopen-and-dlclose-memory-leak.-730926>
+   Memcheck:Leak
+   fun:?alloc
+   ...
+   fun:dlopen*
 }
 {
-   <dlopen leak -- see http://www.linuxquestions.org/questions/programming-9/dlopen-and-dlclose-memory-leak.-730926>
+   <libdl leak -- see http://www.linuxquestions.org/questions/programming-9/dlopen-and-dlclose-memory-leak.-730926>
    Memcheck:Leak
-   fun:calloc
-   obj:/lib/libdl-2.7.so
-   fun:dlopen
-   fun:_ZN4isis4data9IOFactory11findPluginsERKSs
+   fun:?alloc
+   ...
+   fun:dlclose
+   fun:_ZN4isis4data9_internal13pluginDeleterclEPNS_8image_io10FileFormatE
 }
