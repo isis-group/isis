@@ -1,3 +1,11 @@
+isis (0.4.4gca0af59-0) stable; urgency=low
+
+  * add png grayscale reading support
+  * add parameter scaling to Image::copyToMem()
+  * fixed bugs
+
+ -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Tue, 12 Jan  2012 17:03:00 +0200
+
 isis (0.4.3g322ed3e-0) stable; urgency=low
 
   * api changes in PropertyMap
