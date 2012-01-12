@@ -13,7 +13,31 @@ protected:
 	std::string suffixes( io_modes /*modes = both */)const {
 			return std::string( ".png");
 	}
+	struct Reader{
+		virtual data::Chunk operator()(png_structp png_ptr,png_infop info_ptr)const=0;
+	};
+	template<typename TYPE> struct GenericReader:Reader{
+		data::Chunk operator()(png_structp png_ptr,png_infop info_ptr)const{
+			data::Chunk ret= data::MemChunk<TYPE >( info_ptr->width, info_ptr->height );
+
+			/* png needs a pointer to each row */
+			png_bytep *row_pointers = ( png_bytep * ) malloc( sizeof( png_bytep ) * info_ptr->height );
+
+			for ( unsigned short r = 0; r < info_ptr->height; r++ )
+				row_pointers[r] = ( png_bytep )&ret.voxel<TYPE>( 0, r );
+
+			png_read_image( png_ptr, row_pointers );
+			return ret;
+		}
+	};
+	std::map<png_byte,std::map<png_byte,boost::shared_ptr<Reader> > > readers;
 public:
+	ImageFormat_png(){
+		readers[PNG_COLOR_TYPE_GRAY][8].reset(new GenericReader<uint8_t>);
+		readers[PNG_COLOR_TYPE_GRAY][16].reset(new GenericReader<uint16_t>);
+		readers[PNG_COLOR_TYPE_RGB][8].reset(new GenericReader<util::color24>);
+		readers[PNG_COLOR_TYPE_RGB][16].reset(new GenericReader<util::color48>);
+	}
 	std::string getName()const {
 		return "PNG (Portable Network Graphics)";
 	}
@@ -130,27 +154,19 @@ public:
 
 		png_init_io( png_ptr, fp );
 		png_set_sig_bytes( png_ptr, 8 );
-
 		png_read_info( png_ptr, info_ptr );
-
-
-		data::MemChunk<uint8_t> ret( info_ptr->width, info_ptr->height );
-
 		png_set_interlace_handling( png_ptr );
+		png_read_update_info( png_ptr, info_ptr );
+		
 		LOG( Debug, info ) << "color_type " << ( int )info_ptr->color_type << " bit_depth " << ( int )info_ptr->bit_depth;
 
-		if( info_ptr->color_type != PNG_COLOR_TYPE_GRAY )
-			throwGenericError( filename + " is not a grayscale PNG file" );
+		boost::shared_ptr< Reader > reader = readers[info_ptr->color_type][info_ptr->bit_depth];
+		if(!reader){
+			LOG( Runtime, error) << "Sorry, the color type " << ( int )info_ptr->color_type << " with " << ( int )info_ptr->bit_depth << " bits is not supportet.";
+			throwGenericError("Wrong color type");
+		}
 
-		png_read_update_info( png_ptr, info_ptr );
-
-		/* png needs a pointer to each row */
-		png_bytep *row_pointers = ( png_bytep * ) malloc( sizeof( png_bytep ) * info_ptr->height );
-
-		for ( unsigned short r = 0; r < info_ptr->height; r++ )
-			row_pointers[r] = ( png_bytep )&ret.voxel<uint8_t>( 0, r );
-
-		png_read_image( png_ptr, row_pointers );
+		data::Chunk ret = (*reader)(png_ptr,info_ptr);
 
 		fclose( fp );
 		LOG( Runtime, notice ) << ret.getSizeAsString() << "-image loaded from png. Making up acquisitionNumber,columnVec,indexOrigin,rowVec and voxelSize";
