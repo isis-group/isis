@@ -492,15 +492,18 @@ public:
 	 * If neccessary a conversion into T is done using min/max of the image.
 	 * \param dst c-pointer for the memory to copy into
 	 * \param len the allocated size of that memory in elements
+     * \param scaling the scaling to be used when converting the data (will be determined automatically if not given)
 	 */
-	template<typename T> void copyToMem( T *dst, size_t len )const {
+	template<typename T> void copyToMem( T *dst, size_t len,  scaling_pair scaling = scaling_pair()   )const {
 		if( clean ) {
-			scaling_pair scale = getScalingTo( ValuePtr<T>::staticID );
+            if( scaling.first.isEmpty() || scaling.second.isEmpty() ) {
+                 scaling = getScalingTo( ValuePtr<T>::staticID );
+            }
 			// we could do this using convertToType - but this solution does not need any additional temporary memory
 			BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
 				const size_t cSize = ref->getSizeAsVector().product();
 
-				if( !ref->copyToMem<T>( dst, len, scale ) ) {
+				if( !ref->copyToMem<T>( dst, len, scaling ) ) {
 					LOG( Runtime, error ) << "Failed to copy raw data of type " << ref->getTypeName() << " from image into memory of type " << ValuePtr<T>::staticName();
 				} else {
 					if( len < cSize ) {
