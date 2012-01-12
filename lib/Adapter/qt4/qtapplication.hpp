@@ -37,7 +37,8 @@ class QtApplication : public util::Application
 public:
 	QApplication &getQApplication();
 	QtApplication( const char name[] );
-	virtual bool init( int argc, char **argv, bool exitOnError = true );
+	/// see http://developer.qt.nokia.com/doc/qt-4.8/qapplication.html#QApplication
+	virtual bool init( int &argc, char **argv, bool exitOnError = true );
 };
 
 class IOQtApplication : public data::IOApplication
@@ -48,7 +49,8 @@ class IOQtApplication : public data::IOApplication
 public:
 	QApplication &getQApplication();
 	IOQtApplication( const char name[], bool have_input = true, bool have_output = true );
-	virtual bool init( int argc, char **argv, bool exitOnError = true );
+	/// see http://developer.qt.nokia.com/doc/qt-4.8/qapplication.html#QApplication
+	virtual bool init( int &argc, char **argv, bool exitOnError = true );
 protected:
 	virtual boost::shared_ptr<util::_internal::MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;
 
