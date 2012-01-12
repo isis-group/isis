@@ -10,11 +10,8 @@ namespace image_io
 class ImageFormat_png: public FileFormat
 {
 protected:
-	std::string suffixes( io_modes modes = both )const {
-		if( modes == read_only )
-			return std::string();
-		else
-			return std::string( ".png" );
+	std::string suffixes( io_modes /*modes = both */)const {
+			return std::string( ".png");
 	}
 public:
 	std::string getName()const {
@@ -111,7 +108,11 @@ public:
 			throwSystemError( errno, std::string( "Could not open " ) + filename );
 		}
 
-		fread( header, 1, 8, fp );
+		if(fread( header, 1, 8, fp )!=8){
+			throwSystemError( errno, std::string( "Could not open " ) + filename );
+		}
+			
+		;
 
 		if ( png_sig_cmp( header, 0, 8 ) ) {
 			throwGenericError( filename + " is not recognized as a PNG file" );
@@ -133,7 +134,7 @@ public:
 		png_read_info( png_ptr, info_ptr );
 
 
-		data::MemChunk<uint8_t> ret( info_ptr->height, info_ptr->width );
+		data::MemChunk<uint8_t> ret( info_ptr->width, info_ptr->height );
 
 		png_set_interlace_handling( png_ptr );
 		LOG( Debug, info ) << "color_type " << ( int )info_ptr->color_type << " bit_depth " << ( int )info_ptr->bit_depth;
