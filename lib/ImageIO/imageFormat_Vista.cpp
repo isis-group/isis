@@ -352,7 +352,6 @@ int ImageFormat_Vista::load( std::list<data::Chunk> &chunks, const std::string &
 		util::fvector4 indexOrigin;
 		// traverse images and collect all VShort images.
 		std::vector<VImage> vImageVector;
-
 		for( unsigned int k = 0; k < nimages; k++ ) {
 			if( VPixelRepn( images[k] ) != VShortRepn ) {
 				residualVImages.push_back( images[k] );
