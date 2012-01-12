@@ -101,9 +101,67 @@ public:
 		return true;
 	}
 
+	data::Chunk read_png( const std::string &filename ) {
+		png_byte header[8]; // 8 is the maximum size that can be checked
 
-	int load ( std::list<data::Chunk> &/*chunks*/, const std::string &/*filename*/, const std::string &/*dialect*/ )  throw( std::runtime_error & ) {
-		throwGenericError( "png loading is not supportted (yet)" );
+		/* open file and test for it being a png */
+		FILE *fp = fopen( filename.c_str(), "rb" );
+
+		if ( !fp ) {
+			throwSystemError( errno, std::string( "Could not open " ) + filename );
+		}
+
+		fread( header, 1, 8, fp );
+
+		if ( png_sig_cmp( header, 0, 8 ) ) {
+			throwGenericError( filename + " is not recognized as a PNG file" );
+		}
+
+		png_structp png_ptr;
+		png_infop info_ptr;
+
+		/* initialize stuff */
+		png_ptr = png_create_read_struct( PNG_LIBPNG_VER_STRING, NULL, NULL, NULL );
+		assert( png_ptr );
+
+		info_ptr = png_create_info_struct( png_ptr );
+		assert( info_ptr );
+
+		png_init_io( png_ptr, fp );
+		png_set_sig_bytes( png_ptr, 8 );
+
+		png_read_info( png_ptr, info_ptr );
+
+
+		data::MemChunk<uint8_t> ret( info_ptr->height, info_ptr->width );
+
+		png_set_interlace_handling( png_ptr );
+		LOG( Debug, info ) << "color_type " << ( int )info_ptr->color_type << " bit_depth " << ( int )info_ptr->bit_depth;
+
+		if( info_ptr->color_type != PNG_COLOR_TYPE_GRAY )
+			throwGenericError( filename + " is not a grayscale PNG file" );
+
+		png_read_update_info( png_ptr, info_ptr );
+
+		/* png needs a pointer to each row */
+		png_bytep *row_pointers = ( png_bytep * ) malloc( sizeof( png_bytep ) * info_ptr->height );
+
+		for ( unsigned short r = 0; r < info_ptr->height; r++ )
+			row_pointers[r] = ( png_bytep )&ret.voxel<uint8_t>( 0, r );
+
+		png_read_image( png_ptr, row_pointers );
+
+		fclose( fp );
+		LOG( Runtime, notice ) << ret.getSizeAsString() << "-image loaded from png. Making up acquisitionNumber,columnVec,indexOrigin,rowVec and voxelSize";
+		ret.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
+		ret.setPropertyAs<util::fvector4>( "rowVec", util::fvector4( 1, 0 ) );
+		ret.setPropertyAs<util::fvector4>( "columnVec", util::fvector4( 0, 1 ) );
+		ret.setPropertyAs<util::fvector4>( "indexOrigin", util::fvector4( 0, 0 ) );
+		ret.setPropertyAs<util::fvector4>( "voxelSize", util::fvector4( 1, 1, 1 ) );
+		return ret;
+	}
+	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &/*dialect*/ )  throw( std::runtime_error & ) {
+		chunks.push_back( read_png( filename ) );
 		return 0;
 	}
 

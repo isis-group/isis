@@ -16,6 +16,7 @@
 
 #include "chunk.hpp"
 #include <boost/foreach.hpp>
+#include <boost/scoped_ptr.hpp>
 
 namespace isis
 {
@@ -285,20 +286,21 @@ void Chunk::swapAlong( const dimensions dim ) const
 	}
 
 	assert( block_volume );
-	block_volume *= elSize;
 	const size_t swap_volume = block_volume * whole_size[dim];
-	const std::auto_ptr<uint8_t> buff( static_cast<uint8_t *>( malloc( block_volume ) ) );
+	const boost::scoped_array<uint8_t> buff( new uint8_t[block_volume ] );
+
+	const size_t block_volume_bytes = block_volume * elSize;
 
 	//iterate over all swap-volumes
 	for( ; swap_start < swap_end; swap_start += swap_volume ) { //outer loop
 		// swap each block with the one at the oppsite end of the swap_volume
 		uint8_t *a = swap_start; //first block
-		uint8_t *b = swap_start + swap_volume - block_volume; //last block within the swap-volume
+		uint8_t *b = swap_start + swap_volume - block_volume_bytes; //last block within the swap-volume
 
-		for( ; a < b; a += block_volume, b -= block_volume ) { // grow a, shrink b (inner loop)
-			memcpy( buff.get(), a, block_volume );
-			memcpy( a, b, block_volume );
-			memcpy( b, buff.get(), block_volume );
+		for( ; a < b; a += block_volume_bytes, b -= block_volume_bytes ) { // grow a, shrink b (inner loop)
+			memcpy( buff.get(), a, block_volume_bytes );
+			memcpy( a, b, block_volume_bytes );
+			memcpy( b, buff.get(), block_volume_bytes );
 		}
 
 	}
