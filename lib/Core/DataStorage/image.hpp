@@ -492,6 +492,7 @@ public:
 	 * If neccessary a conversion into T is done using min/max of the image.
 	 * \param dst c-pointer for the memory to copy into
 	 * \param len the allocated size of that memory in elements
+     * \param scaling the scaling to be used when converting the data (will be determined automatically if not given)
 	 */
 	template<typename T> void copyToMem( T *dst, size_t len,  scaling_pair scaling = scaling_pair()   )const {
 		if( clean ) {
