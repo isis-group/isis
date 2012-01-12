@@ -157,6 +157,7 @@ Package: isis-utils
 Section: science
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (= 0.4.3g322ed3e-0)
+Recommends: isisio0-common
 Description: The ISIS package provides a general I/O framework for neuroimaging
  data.  Being started with fMRI data, it can handle several established data
  formats, like Nifti, Analyze, DICOM and vista. A first application based on this
@@ -220,7 +221,7 @@ Description: The ISIS package provides a general I/O framework for neuroimaging
 Package: isisio0-common
 Section: science
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (= 0.4.3g322ed3e-0), isisio0-nifti-sa, isisio0-raw, isisio0-tar-proxy, isisio0-gz-proxy
+Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (= 0.4.3g322ed3e-0), isisio0-nifti-sa, isisio0-raw, isisio0-tar-proxy, isisio0-gz-proxy, isisio0-flist-proxy, isisio0-process-proxy
 Description: The ISIS package provides a general I/O framework for neuroimaging
  data.  Being started with fMRI data, it can handle several established data
  formats, like Nifti, Analyze, DICOM and vista. A first application based on this
