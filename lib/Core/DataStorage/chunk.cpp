@@ -289,7 +289,7 @@ void Chunk::swapAlong( const dimensions dim ) const
 	const size_t swap_volume = block_volume * whole_size[dim];
 	const boost::scoped_array<uint8_t> buff( new uint8_t[block_volume ] );
 
-	const size_t block_volume_bytes = block_volume* elSize;
+	const size_t block_volume_bytes = block_volume * elSize;
 
 	//iterate over all swap-volumes
 	for( ; swap_start < swap_end; swap_start += swap_volume ) { //outer loop

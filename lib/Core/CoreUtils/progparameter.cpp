@@ -60,11 +60,11 @@ bool ProgParameter::parse( const Value<std::string> &props )
 
 	return ret;
 }
-bool ProgParameter::parse_list(const isis::util::Value< slist >& props_list)
+bool ProgParameter::parse_list( const isis::util::Value< slist >& props_list )
 {
 	_internal::ValueBase &me = **this;
 	bool ret = false;
-	const util::slist &theList=props_list.castTo<util::slist>();
+	const util::slist &theList = props_list.castTo<util::slist>();
 
 	if ( theList.empty() ) {
 		//there is nothing like a bool-list (yet)
@@ -73,7 +73,7 @@ bool ProgParameter::parse_list(const isis::util::Value< slist >& props_list)
 	}
 
 	LOG_IF( ret, Debug, info )
-		<< "Parsed parameter list " << MSubject( util::listToString(theList.begin(),theList.end()," ","","") ) << " as " << me.toString( true );
+			<< "Parsed parameter list " << MSubject( util::listToString( theList.begin(), theList.end(), " ", "", "" ) ) << " as " << me.toString( true );
 
 	if( ret )m_set = true;
 
@@ -138,11 +138,11 @@ bool ParameterMap::parse( int argc, char **argv )
 			} else if ( !matchingStrings.size() ) {
 				LOG( Runtime, warning ) << "Ignoring unknown parameter " << MSubject( std::string( "-" ) + pName + " " + listToString( argv + start, argv + i, " ", "", "" ) );
 			} else {
-				if(	at( matchingStrings.front())->is<util::slist>() &&
-					at( matchingStrings.front() ).parse_list( util::slist(argv + start, argv + i) )
-				){ //dont do tokenizing if the target is an slist (is already done by the shell)
-					at(matchingStrings.front() ).needed() = false; //remove needed flag, because the value is set (aka "not needed anymore")
-				}else if ( at( matchingStrings.front() ).parse( listToString( argv + start, argv + i, ",", "", "" ) ) ) { // parse the collected properties
+				if( at( matchingStrings.front() )->is<util::slist>() &&
+					at( matchingStrings.front() ).parse_list( util::slist( argv + start, argv + i ) )
+				  ) { //dont do tokenizing if the target is an slist (is already done by the shell)
+					at( matchingStrings.front() ).needed() = false; //remove needed flag, because the value is set (aka "not needed anymore")
+				} else if ( at( matchingStrings.front() ).parse( listToString( argv + start, argv + i, ",", "", "" ) ) ) { // parse the collected properties
 					at( matchingStrings.front() ).needed() = false; //remove needed flag, because the value is set (aka "not needed anymore")
 				} else {
 					LOG( Runtime, error )
@@ -151,7 +151,7 @@ bool ParameterMap::parse( int argc, char **argv )
 							<< " for "  << matchingStrings.front() << "(" << at( matchingStrings.front() )->getTypeName() << ")";
 					parsed = false;
 				}
-				
+
 			}
 		}
 	}
