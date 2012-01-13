@@ -10,15 +10,15 @@ namespace image_io
 class ImageFormat_png: public FileFormat
 {
 protected:
-	std::string suffixes( io_modes /*modes = both */)const {
-			return std::string( ".png");
+	std::string suffixes( io_modes /*modes = both */ )const {
+		return std::string( ".png" );
 	}
-	struct Reader{
-		virtual data::Chunk operator()(png_structp png_ptr,png_infop info_ptr)const=0;
+	struct Reader {
+		virtual data::Chunk operator()( png_structp png_ptr, png_infop info_ptr )const = 0;
 	};
-	template<typename TYPE> struct GenericReader:Reader{
-		data::Chunk operator()(png_structp png_ptr,png_infop info_ptr)const{
-			data::Chunk ret= data::MemChunk<TYPE >( info_ptr->width, info_ptr->height );
+	template<typename TYPE> struct GenericReader: Reader {
+		data::Chunk operator()( png_structp png_ptr, png_infop info_ptr )const {
+			data::Chunk ret = data::MemChunk<TYPE >( info_ptr->width, info_ptr->height );
 
 			/* png needs a pointer to each row */
 			png_bytep *row_pointers = ( png_bytep * ) malloc( sizeof( png_bytep ) * info_ptr->height );
@@ -30,13 +30,13 @@ protected:
 			return ret;
 		}
 	};
-	std::map<png_byte,std::map<png_byte,boost::shared_ptr<Reader> > > readers;
+	std::map<png_byte, std::map<png_byte, boost::shared_ptr<Reader> > > readers;
 public:
-	ImageFormat_png(){
-		readers[PNG_COLOR_TYPE_GRAY][8].reset(new GenericReader<uint8_t>);
-		readers[PNG_COLOR_TYPE_GRAY][16].reset(new GenericReader<uint16_t>);
-		readers[PNG_COLOR_TYPE_RGB][8].reset(new GenericReader<util::color24>);
-		readers[PNG_COLOR_TYPE_RGB][16].reset(new GenericReader<util::color48>);
+	ImageFormat_png() {
+		readers[PNG_COLOR_TYPE_GRAY][8].reset( new GenericReader<uint8_t> );
+		readers[PNG_COLOR_TYPE_GRAY][16].reset( new GenericReader<uint16_t> );
+		readers[PNG_COLOR_TYPE_RGB][8].reset( new GenericReader<util::color24> );
+		readers[PNG_COLOR_TYPE_RGB][16].reset( new GenericReader<util::color48> );
 	}
 	std::string getName()const {
 		return "PNG (Portable Network Graphics)";
@@ -49,7 +49,7 @@ public:
 		png_structp png_ptr;
 		png_infop info_ptr;
 		assert( buff.getRelevantDims() == 2 );
-		util::FixedVector<size_t, 4> size = buff.getSizeAsVector();
+		util::vector4<size_t> size = buff.getSizeAsVector();
 
 		/* open the file */
 		fp = fopen( filename.c_str(), "wb" );
@@ -132,10 +132,10 @@ public:
 			throwSystemError( errno, std::string( "Could not open " ) + filename );
 		}
 
-		if(fread( header, 1, 8, fp )!=8){
+		if( fread( header, 1, 8, fp ) != 8 ) {
 			throwSystemError( errno, std::string( "Could not open " ) + filename );
 		}
-			
+
 		;
 
 		if ( png_sig_cmp( header, 0, 8 ) ) {
@@ -157,16 +157,17 @@ public:
 		png_read_info( png_ptr, info_ptr );
 		png_set_interlace_handling( png_ptr );
 		png_read_update_info( png_ptr, info_ptr );
-		
+
 		LOG( Debug, info ) << "color_type " << ( int )info_ptr->color_type << " bit_depth " << ( int )info_ptr->bit_depth;
 
 		boost::shared_ptr< Reader > reader = readers[info_ptr->color_type][info_ptr->bit_depth];
-		if(!reader){
-			LOG( Runtime, error) << "Sorry, the color type " << ( int )info_ptr->color_type << " with " << ( int )info_ptr->bit_depth << " bits is not supportet.";
-			throwGenericError("Wrong color type");
+
+		if( !reader ) {
+			LOG( Runtime, error ) << "Sorry, the color type " << ( int )info_ptr->color_type << " with " << ( int )info_ptr->bit_depth << " bits is not supportet.";
+			throwGenericError( "Wrong color type" );
 		}
 
-		data::Chunk ret = (*reader)(png_ptr,info_ptr);
+		data::Chunk ret = ( *reader )( png_ptr, info_ptr );
 
 		fclose( fp );
 		LOG( Runtime, notice ) << ret.getSizeAsString() << "-image loaded from png. Making up acquisitionNumber,columnVec,indexOrigin,rowVec and voxelSize";

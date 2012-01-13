@@ -203,14 +203,16 @@ util::ivector4 Image::getIndexFromPhysicalCoords( const isis::util::fvector4 &ph
 										 vec1[0] * m_RowVecInv[1] + vec1[1] * m_ColumnVecInv[1] + vec1[2] * m_SliceVecInv[1],
 										 vec1[0] * m_RowVecInv[2] + vec1[1] * m_ColumnVecInv[2] + vec1[2] * m_SliceVecInv[2],
 										 vec1[3] );
+
 	util::ivector4 retAsIvector4 = util::Value<util::fvector4>( ret ).as<util::ivector4>();
 
 	if( restrictedToImageBox ) {
-		const util::ivector4 size = getSizeAsVector();
+		const util::vector4<size_t> size = getSizeAsVector();
 
 		for( unsigned short i = 0; i < 4; i ++ ) {
-			retAsIvector4[i] = retAsIvector4[i] < 0 ? 0 : retAsIvector4[i];
-			retAsIvector4[i] = retAsIvector4[i] >= size[i] ? size[i] - 1 : retAsIvector4[i];
+			if( retAsIvector4[i] < 0 )retAsIvector4[i] =  0;
+
+			if( retAsIvector4[i] >= size[i] )retAsIvector4[i] =  static_cast<int>( size[i] - 1 );
 		}
 	}
 
@@ -845,7 +847,7 @@ size_t Image::spliceDownTo( dimensions dim ) //rowDim = 0, columnDim, sliceDim, 
 		return lookup.size();
 	}
 
-	util::FixedVector<size_t, 4> image_size = getSizeAsVector();
+	util::vector4<size_t> image_size = getSizeAsVector();
 
 	for( int i = 0; i < dim; i++ )
 		image_size[i] = 1;
@@ -899,9 +901,9 @@ size_t Image::foreachChunk( ChunkOp &op, bool copyMetaData )
 {
 	size_t err = 0;
 	checkMakeClean();
-	util::FixedVector<size_t, 4> imgSize = getSizeAsVector();
-	util::FixedVector<size_t, 4> chunkSize = getChunk( 0, 0, 0, 0 ).getSizeAsVector();
-	util::FixedVector<size_t, 4> pos;
+	util::vector4<size_t> imgSize = getSizeAsVector();
+	util::vector4<size_t> chunkSize = getChunk( 0, 0, 0, 0 ).getSizeAsVector();
+	util::vector4<size_t> pos;
 
 	for( pos[timeDim] = 0; pos[timeDim] < imgSize[timeDim]; pos[timeDim] += chunkSize[timeDim] ) {
 		for( pos[sliceDim] = 0; pos[sliceDim] < imgSize[sliceDim]; pos[sliceDim] += chunkSize[sliceDim] ) {

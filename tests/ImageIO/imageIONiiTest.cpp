@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE( loadsaveNullImage )
 BOOST_AUTO_TEST_CASE( loadsaveSFormImage )
 {
 	const size_t tsize[] = {128, 128, 2, 1};
-	util::FixedVector<size_t, 4> size ( tsize );
+	util::vector4<size_t> size ( tsize );
 	util::Selection aligned = formCodes;
 	aligned.set( "ALIGNED_ANAT" );
 
