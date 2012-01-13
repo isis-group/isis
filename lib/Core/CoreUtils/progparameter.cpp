@@ -62,14 +62,14 @@ bool ProgParameter::parse( const Value<std::string> &props )
 }
 bool ProgParameter::parse_list( const isis::util::Value< slist >& props_list )
 {
-	_internal::ValueBase &me = **this;
+	ValueBase &me = **this;
 	bool ret = false;
 	const util::slist &theList = props_list.castTo<util::slist>();
 
 	if ( theList.empty() ) {
 		//there is nothing like a bool-list (yet)
 	} else {
-		ret = _internal::ValueBase::convert( props_list, me );
+		ret = ValueBase::convert( props_list, me );
 	}
 
 	LOG_IF( ret, Debug, info )
