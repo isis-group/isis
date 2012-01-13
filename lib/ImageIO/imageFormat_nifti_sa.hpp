@@ -138,12 +138,12 @@ protected:
 	data::FilePtr m_out;
 	size_t m_voxelstart, m_bpv;
 	WriteOp( const data::Image &image, size_t bitsPerVoxel, bool doFlip = false );
-	virtual bool doCopy( data::Chunk &ch, util::FixedVector< size_t, 4 > posInImage ) = 0;
+	virtual bool doCopy( data::Chunk &ch, util::vector4<size_t> posInImage ) = 0;
 public:
 	nifti_1_header *getHeader();
 	virtual unsigned short getTypeId() = 0;
 	virtual size_t getDataSize();
-	bool operator()( data::Chunk &ch, util::FixedVector< size_t, 4 > posInImage );
+	bool operator()( data::Chunk &ch, util::vector4<size_t> posInImage );
 	bool setOutput( const std::string &filename, size_t voxelstart = 352 );
 };
 

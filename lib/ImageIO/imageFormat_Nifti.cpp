@@ -60,7 +60,7 @@ class Flip : public data::ChunkOp
 	data::dimensions dim;
 public:
 	Flip( data::dimensions d ) { dim = d; }
-	bool operator()( data::Chunk &ch, util::FixedVector<size_t, 4> /*posInImage*/ ) {
+	bool operator()( data::Chunk &ch, util::vector4<size_t> /*posInImage*/ ) {
 		ch.swapAlong( dim );
 		return true;
 	}
@@ -580,8 +580,8 @@ private:
 	void copyDataToNifti( const data::Image &image, nifti_image &ni ) {
 		ni.data = malloc( image.getBytesPerVoxel() * image.getVolume() );
 		T *refNii = ( T * ) ni.data;
-		const util::FixedVector<size_t, 4> csize = image.getChunk( 0, 0 ).getSizeAsVector();
-		const util::FixedVector<size_t, 4> isize = image.getSizeAsVector();
+		const util::vector4<size_t> csize = image.getChunk( 0, 0 ).getSizeAsVector();
+		const util::vector4<size_t> isize = image.getSizeAsVector();
 		const data::scaling_pair scale = image.getScalingTo( data::ValuePtr<T>::staticID );
 
 		for ( size_t t = 0; t < isize[3]; t += csize[3] ) {

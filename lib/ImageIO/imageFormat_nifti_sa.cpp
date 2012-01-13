@@ -46,7 +46,7 @@ bool WriteOp::setOutput( const std::string &filename, size_t voxelstart )
 
 nifti_1_header *WriteOp::getHeader() {return reinterpret_cast<nifti_1_header *>( &m_out[0] );}
 
-bool WriteOp::operator()( data::Chunk &ch, util::FixedVector< size_t, 4 > posInImage )
+bool WriteOp::operator()( data::Chunk &ch, util::vector4<size_t> posInImage )
 {
 	if( doCopy( ch, posInImage ) )
 		return true;
@@ -64,14 +64,14 @@ public:
 		WriteOp( image, bitsPerVoxel, doFlip ),
 		m_targetId( targetId ), m_scale( image.getScalingTo( m_targetId ) ) {}
 
-	bool doCopy( data::Chunk &ch, util::FixedVector< size_t, 4 > posInImage ) {
+	bool doCopy( data::Chunk &ch, util::vector4<size_t> posInImage ) {
 		size_t offset = m_voxelstart + getLinearIndex( posInImage ) * m_bpv / 8;
 		data::ValuePtrReference out_data = m_out.atByID( m_targetId, offset, ch.getVolume() );
 		ch.asValuePtrBase().copyTo( *out_data, m_scale );
 
 		if( m_doFlip ) {
 			// wrap the copied part back into a Chunk to flip it
-			util::FixedVector< size_t, 4 > sz = ch.getSizeAsVector();
+			util::vector4<size_t> sz = ch.getSizeAsVector();
 			data::Chunk cp( out_data, sz[data::rowDim], sz[data::columnDim], sz[data::sliceDim], sz[data::timeDim] ); // this is a cheap copy
 			cp.swapAlong( flip_dim ); // .. so changing its data, will also change the data we just copied
 		}
@@ -88,7 +88,7 @@ class FslRgbWriteOp: public WriteOp
 	struct VoxelCp: data::VoxelOp<util::color24> {
 		int mode;
 		uint8_t *ptr;
-		virtual bool operator()( util::color24 &vox, const isis::util::FixedVector< size_t, 4 >& /*pos*/ ) {
+		virtual bool operator()( util::color24 &vox, const isis::util::vector4<size_t>& /*pos*/ ) {
 			switch( mode ) {
 			case 0:
 				*ptr = vox.r;
@@ -115,7 +115,7 @@ public:
 		init( dims ); // reset our shape to use 3 timesteps as colors
 	}
 
-	bool doCopy( data::Chunk &src, util::FixedVector< size_t, 4 > posInImage ) {
+	bool doCopy( data::Chunk &src, util::vector4<size_t> posInImage ) {
 		data::Chunk ch = src;
 		ch.convertToType( data::ValuePtr<util::color24>::staticID, m_scale );
 		VoxelCp cp;
@@ -173,31 +173,32 @@ void ImageFormat_NiftiSa::guessSliceOrdering( const data::Image img, char &slice
 	if( img.getChunk( 0, 0, 0, 0, false ).getRelevantDims() == img.getRelevantDims() ) { // seems like there is only one chunk - slice ordering doesnt matter - just choose NIFTI_SLICE_SEQ_INC
 		slice_code = NIFTI_SLICE_SEQ_INC;
 	} else {
-		const util::PropertyValue first = img.getChunk( 0, 0, 0, 0, false ).propertyValue( "acquisitionNumber" ); // acquisitionNumber _must_ chunk-unique - so it is there even without a join
-		const util::PropertyValue second = img.getChunk( 0, 0, 1, 0, false ).propertyValue( "acquisitionNumber" );
-		const util::PropertyValue middle = img.getChunk( 0, 0, img.getSizeAsVector()[data::sliceDim] / 2 + .5, 0, false ).propertyValue( "acquisitionNumber" );
+		util::PropertyMap::PropPath order = img.getChunk( 0, 0, 0, 0, false ).hasProperty( "acquisitionTime" ) ? "acquisitionTime" : "acquisitionNumber";
+		const util::PropertyValue first = img.getChunk( 0, 0, 0, 0, false ).propertyValue( order ); // acquisitionNumber _must_ be chunk-unique - so it is there even without a join
+		const util::PropertyValue second = img.getChunk( 0, 0, 1, 0, false ).propertyValue( order );
+		const util::PropertyValue middle = img.getChunk( 0, 0, img.getSizeAsVector()[data::sliceDim] / 2 + .5, 0, false ).propertyValue( order );
 
 		if( first->gt( *second ) ) { // second slice has a lower number than the first => decrementing
 			if( middle->gt( *second ) ) { // if the middle number is greater than the second its interleaved
 				LOG( Runtime, info )
-						<< "The \"middle\" acquisitionNumber (" << middle.toString() << ") is greater than the second (" << second.toString()
+						<< "The \"middle\" " << order << " (" << middle.toString() << ") is greater than the second (" << second.toString()
 						<< ") assuming decrementing interleaved slice order";
 				slice_code = NIFTI_SLICE_ALT_DEC;
 			} else { // assume "normal" otherwise
 				LOG( Runtime, info )
-						<< "The first acquisitionNumber (" << first.toString() << ") is greater than the second (" << second.toString()
+						<< "The first " << order << " (" << first.toString() << ") is greater than the second (" << second.toString()
 						<< ") assuming decrementing slice order";
 				slice_code = NIFTI_SLICE_SEQ_DEC;
 			}
 		} else { // assume incrementing
 			if( middle->lt( *second ) ) { // if the middle number is less than the second ist interleaved
 				LOG( Runtime, info )
-						<< "The \"middle\" acquisitionNumber (" << middle.toString() << ") is less than the second (" << second.toString()
+						<< "The \"middle\" " << order << " (" << middle.toString() << ") is less than the second (" << second.toString()
 						<< ") assuming incrementing interleaved slice order";
 				slice_code = NIFTI_SLICE_ALT_INC;
 			} else { // assume "normal" otherwise
 				LOG( Runtime, info )
-						<< "The first acquisitionNumber (" << first.toString() << ") is not greater than the second (" << second.toString()
+						<< "The first " << order << " (" << first.toString() << ") is not greater than the second (" << second.toString()
 						<< ") assuming incrementing slice order";
 				slice_code = NIFTI_SLICE_SEQ_INC;
 			}
@@ -345,6 +346,8 @@ bool ImageFormat_NiftiSa::parseDescripForSPM( isis::util::PropertyMap &props, co
 }
 void ImageFormat_NiftiSa::storeHeader( const util::PropertyMap &props, _internal::nifti_1_header *head )
 {
+	bool saved = false;
+
 	// implicit stuff
 	head->intent_code = 0;
 	head->slice_start = 0;
@@ -369,7 +372,10 @@ void ImageFormat_NiftiSa::storeHeader( const util::PropertyMap &props, _internal
 			props.getPropertyAs<util::fvector4>( "nifti/srow_x" ).copyTo( head->srow_x );
 			props.getPropertyAs<util::fvector4>( "nifti/srow_y" ).copyTo( head->srow_y );
 			props.getPropertyAs<util::fvector4>( "nifti/srow_z" ).copyTo( head->srow_z );
-		}
+		} else
+			storeSForm( props, head );
+
+		saved = true;
 	}
 
 	// store niftis original qform if its there
@@ -387,11 +393,13 @@ void ImageFormat_NiftiSa::storeHeader( const util::PropertyMap &props, _internal
 			head->qoffset_x = offset[0];
 			head->qoffset_y = offset[1];
 			head->qoffset_z = offset[2];
-		}
+			saved = true;
+		} else
+			saved = storeQForm( props, head );
 	}
 
 	//store current orientation (may override values set above)
-	if( !storeQForm( props, head ) ) //try to encode as quaternion
+	if( !saved && !storeQForm( props, head ) ) //try to encode as quaternion
 		storeSForm( props, head ); //fall back to normal matrix
 
 	strcpy( head->magic, "n+1" );
@@ -455,6 +463,7 @@ std::list< data::Chunk > ImageFormat_NiftiSa::parseHeader( const isis::image_io:
 		props.setPropertyAs<util::fvector4>( "columnVec", nifti2isis.getRow( 1 ) ); // because the image will very likely be in nifti space
 		props.setPropertyAs<util::fvector4>( "sliceVec",  nifti2isis.getRow( 2 ) );
 		props.setPropertyAs<util::fvector4>( "voxelSize", util::fvector4( head->pixdim[1], head->pixdim[2], head->pixdim[3] ) );
+		props.setPropertyAs<util::fvector4>( "indexOrigin", util::fvector4( 0, 0, 0, 0 ) );
 	}
 
 	// set space unit factors
@@ -500,7 +509,7 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 	}
 
 	//set up the size - copy dim[0] values from dim[1]..dim[dim[0]]
-	util::FixedVector<size_t, 4> size;
+	util::vector4<size_t> size;
 	size.fill( 1 );
 
 	size.copyFrom( header->dim + 1, header->dim + 1 + header->dim[0] );
@@ -514,8 +523,8 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 
 		for( size_t v = 0; v < volume; v++ ) {
 			buff[v].r = src[v];
-			buff[v].g = src[v+volume];
-			buff[v].b = src[v+volume*2];
+			buff[v].g = src[v + volume];
+			buff[v].b = src[v + volume * 2];
 		}
 
 		data_src = buff;
@@ -600,7 +609,7 @@ void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &fi
 		storeHeader( image.getChunk( 0, 0 ), header ); // store properties of the "lowest" chunk merged with the image's properties into the header
 
 		if( image.getSizeAsVector()[data::timeDim] > 1 && image.hasProperty( "repetitionTime" ) )
-			header->pixdim[data::timeDim+1] = image.getPropertyAs<float>( "repetitionTime" );
+			header->pixdim[data::timeDim + 1] = image.getPropertyAs<float>( "repetitionTime" );
 
 		if( util::istring( dialect.c_str() ) == "spm" ) { // override "normal" description with the "spm-description"
 			storeDescripForSPM( image.getChunk( 0, 0 ), header->descrip );
@@ -766,7 +775,7 @@ bool ImageFormat_NiftiSa::storeQForm( const util::PropertyMap &props, _internal:
 
 	for( int i = 0; i < 3; i++ ) {
 		col[i] = nifti2image.getRow( i ); //nth column in image2nifti
-		head->pixdim[i+1] = col[i].len(); //store voxel size (don't use voxelSize, thats without voxelGap)
+		head->pixdim[i + 1] = col[i].len(); //store voxel size (don't use voxelSize, thats without voxelGap)
 		col[i].norm(); // normalize the columns
 	}
 
@@ -784,9 +793,8 @@ bool ImageFormat_NiftiSa::storeQForm( const util::PropertyMap &props, _internal:
 		head->pixdim[0] = -1;
 	}
 
-	util::Selection tformCode( formCode );
-	tformCode.set( "SCANNER_ANAT" );
-	head->qform_code = tformCode;
+	if( !head->qform_code )head->qform_code = 1; // default to 1 if not set till now
+
 	// the following was more or less stolen from the nifti reference implementation
 	const float a_square = col[0][0] + col[1][1] + col[2][2] + 1;
 
@@ -834,7 +842,9 @@ bool ImageFormat_NiftiSa::storeQForm( const util::PropertyMap &props, _internal:
 void ImageFormat_NiftiSa::storeSForm( const util::PropertyMap &props, _internal::nifti_1_header *head )
 {
 	const util::Matrix4x4<double> sform = getNiftiMatrix( props );
-	head->sform_code = 1;
+
+	if( !head->sform_code )head->sform_code = 1; // default to 1 if not set till now
+
 	sform.getRow( 0 ).copyTo( head->srow_x );
 	sform.getRow( 1 ).copyTo( head->srow_y );
 	sform.getRow( 2 ).copyTo( head->srow_z );

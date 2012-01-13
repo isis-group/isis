@@ -18,6 +18,7 @@
 #include "../core/_convertToPython.hpp"
 
 #include "core/_propmap.hpp"
+#include "DataStorage/chunk.hpp"
 
 using namespace isis::data;
 
@@ -97,8 +98,22 @@ public:
 		return *this;
 	}
 
+	static Image _createImage(  isis::python::data::image_types type, const size_t &first, const size_t &second, const size_t &third, const size_t &fourth );
+
 private:
 	PyObject *self;
+
+	template<typename TYPE>
+	static Image _internCreateImage( const size_t &first, const size_t &second, const size_t &third, const size_t &fourth ) {
+		data::MemChunk<TYPE> chunk ( first, second, third, fourth );
+		chunk.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
+		chunk.setPropertyAs<util::fvector4>( "rowVec", util::fvector4( 1, 0, 0, 0 ) );
+		chunk.setPropertyAs<util::fvector4>( "columnVec", util::fvector4( 0, 1, 0, 0 ) );
+		chunk.setPropertyAs<util::fvector4>( "sliceVec", util::fvector4( 0, 0, 1, 0 ) );
+		chunk.setPropertyAs<util::fvector4>( "voxelSize", util::fvector4( 1, 1, 1, 1 ) );
+		chunk.setPropertyAs<util::fvector4>( "indexOrigin", util::fvector4() );
+		return Image( chunk );
+	}
 
 };
 

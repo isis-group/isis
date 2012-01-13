@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE ( chunk_foreach_voxel_test )
 	class : public data::VoxelOp<uint8_t>
 	{
 	public:
-		bool operator()( uint8_t &vox, const util::FixedVector< size_t, 4 >& /*pos*/ ) {
+		bool operator()( uint8_t &vox, const util::vector4<size_t>& /*pos*/ ) {
 			return vox == 0;
 		}
 	} zero;
@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE ( chunk_foreach_voxel_test )
 		data::_internal::NDimensional<4> chunkGeometry;
 	public:
 		setIdx( data::_internal::NDimensional<4> geo ): chunkGeometry( geo ) {}
-		bool operator()( uint8_t &vox, const util::FixedVector< size_t, 4 >& pos ) {
+		bool operator()( uint8_t &vox, const util::vector4<size_t>& pos ) {
 			vox = chunkGeometry.getLinearIndex( &pos[0] );
 			return true;
 		}
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE ( chunk_foreach_voxel_test )
 		data::_internal::NDimensional<4> chunkGeometry;
 	public:
 		checkIdx( data::_internal::NDimensional<4> geo ): chunkGeometry( geo ) {}
-		bool operator()( uint8_t &vox, const util::FixedVector< size_t, 4 >& pos ) {
+		bool operator()( uint8_t &vox, const util::vector4<size_t>& pos ) {
 			return vox == chunkGeometry.getLinearIndex( &pos[0] );
 		}
 	};
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE ( chunk_foreach_voxel_test )
 
 BOOST_AUTO_TEST_CASE ( chunk_mem_init_test )
 {
-	const short data[3*3] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+	const short data[3 * 3] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
 	data::MemChunk<short> ch( data, 3, 3 );
 	BOOST_CHECK_EQUAL( ch.getVolume(), 3 * 3 );
 
@@ -275,7 +275,7 @@ BOOST_AUTO_TEST_CASE ( chunk_swap_test )
 {
 	class : public data::VoxelOp<int>
 	{
-		bool operator()( int &vox, const util::FixedVector<size_t, 4> & ) {
+		bool operator()( int &vox, const util::vector4<size_t> & ) {
 			vox = rand();
 			return true;
 		}
@@ -286,8 +286,8 @@ BOOST_AUTO_TEST_CASE ( chunk_swap_test )
 	public:
 		data::MemChunk<int> orig;
 		SwapCheck( data::MemChunk<int> &_orig, size_t _swapidx, size_t _sizeRange ): swapidx( _swapidx ), sizeRange( _sizeRange ), orig( _orig ) {}
-		bool operator()( int &vox, const util::FixedVector<size_t, 4> &pos ) {
-			util::FixedVector<size_t, 4> opos = pos;
+		bool operator()( int &vox, const util::vector4<size_t> &pos ) {
+			util::vector4<size_t> opos = pos;
 			opos[swapidx] = sizeRange - 1 - opos[swapidx];
 			//          if(orig.voxel<int>(opos[0],opos[1],opos[2],opos[3])!=vox)
 			//              std::cout << "Comparing " << pos << " against " << opos

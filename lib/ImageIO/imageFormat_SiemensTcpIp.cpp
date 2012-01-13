@@ -155,7 +155,7 @@ public:
 					size_t dimension_number = atoi( getStringFromHeader( "dimension_number", header ).c_str() );
 					// get voxelGap out of the distance (in percent!) between slices
 					size_t distFactor = atoi( getStringFromHeader( "distance_factor", header ).c_str() );
-					util::fvector4 voxelGap( 0, 0, slice_thickness*( static_cast<float>( distFactor ) / 100.0 ) );
+					util::fvector4 voxelGap( 0, 0, slice_thickness * ( static_cast<float>( distFactor ) / 100.0 ) );
 
 					// ... copy the data ...
 					/******************************/

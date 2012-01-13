@@ -62,6 +62,7 @@ public:
 	 * \return true if parsing was succesful, false otherwise
 	 */
 	bool parse( const isis::util::Value< std::string >& props );
+	bool parse_list( const isis::util::Value< util::slist >& props_list );
 	/// \return the description string
 	const std::string &description()const;
 	/* set the description string

@@ -51,7 +51,7 @@ public:
 template <typename TYPE> class VoxelOp: std::unary_function<bool, TYPE>
 {
 public:
-	virtual bool operator()( TYPE &vox, const util::FixedVector<size_t, 4> &pos ) = 0;
+	virtual bool operator()( TYPE &vox, const util::vector4<size_t> &pos ) = 0;
 };
 
 /**
@@ -88,7 +88,7 @@ public:
 	template<typename TYPE> TYPE &voxel( size_t nrOfColumns, size_t nrOfRows = 0, size_t nrOfSlices = 0, size_t nrOfTimesteps = 0 ) {
 		const size_t idx[] = {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps};
 		LOG_IF( ! isInRange( idx ), Debug, isis::error )
-				<< "Index " << util::FixedVector<size_t, 4>( idx ) << " is out of range " << getSizeAsString();
+				<< "Index " << util::vector4<size_t>( idx ) << " is out of range " << getSizeAsString();
 		ValuePtr<TYPE> &ret = asValuePtr<TYPE>();
 		return ret[getLinearIndex( idx )];
 	}
@@ -121,9 +121,9 @@ public:
 	 * \param offset offset to be added to the voxel position before op is called
 	 * \returns amount of operations which returned false - so 0 is good!
 	 */
-	template <typename TYPE> size_t foreachVoxel( VoxelOp<TYPE> &op, util::FixedVector<size_t, 4> offset ) {
-		const util::FixedVector<size_t, 4> imagesize = getSizeAsVector();
-		util::FixedVector<size_t, 4> pos;
+	template <typename TYPE> size_t foreachVoxel( VoxelOp<TYPE> &op, util::vector4<size_t> offset ) {
+		const util::vector4<size_t> imagesize = getSizeAsVector();
+		util::vector4<size_t> pos;
 		TYPE *vox = &asValuePtr<TYPE>()[0];
 		size_t ret = 0;
 
@@ -144,7 +144,7 @@ public:
 	 * \returns amount of operations which returned false - so 0 is good!
 	 */
 	template<typename TYPE> size_t foreachVoxel( VoxelOp<TYPE> &op ) {
-		return foreachVoxel<TYPE>( op, util::FixedVector<size_t, 4>() );
+		return foreachVoxel<TYPE>( op, util::vector4<size_t>() );
 	}
 
 	ValuePtrBase &asValuePtrBase() {return operator*();}
@@ -155,6 +155,7 @@ public:
 
 	/// \returns the number of cheap-copy-chunks using the same memory as this
 	size_t useCount()const;
+	/// Creates a new empty Chunk of different size and without properties, but of the same datatype as this.
 	Chunk cloneToNew( size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 )const;
 
 	/**
@@ -164,6 +165,14 @@ public:
 	 */
 	bool convertToType( short unsigned int ID, scaling_pair scaling = scaling_pair() );
 
+	/**
+	 * Copy all voxel data of the chunk into memory.
+	 * If neccessary a conversion into T is done using min/max of the image.
+	 * \param dst c-pointer for the memory to copy into
+	 * \param len the allocated size of that memory in elements
+	 * \param scaling the scaling to be used when converting the data (will be determined automatically if not given)
+	 * \return true if copying was (at least partly) successful
+	 */
 	template<typename T> bool copyToMem( T *dst, size_t len, scaling_pair scaling = scaling_pair() )const {
 		return getValuePtrBase().copyToMem<T>( dst, len,  scaling ); // use copyToMem of ValuePtrBase
 	}

@@ -23,14 +23,15 @@ namespace isis
 {
 namespace test
 {
+const util::Selection formCodes( "SCANNER_ANAT,ALIGNED_ANAT,TALAIRACH,MNI_152" );
 
 BOOST_AUTO_TEST_SUITE ( imageIONii_NullTests )
 
-BOOST_AUTO_TEST_CASE( loadsaveImage )
+BOOST_AUTO_TEST_CASE( loadsaveNullImage )
 {
 	//  data::enableLog<util::DefaultMsgPrint>(info);
 	//  image_io::enableLog<util::DefaultMsgPrint>( info );
-	util::Selection formCode( "SCANNER_ANAT,ALIGNED_ANAT,TALAIRACH,MNI_152" );
+	util::Selection formCode = formCodes;
 	formCode.set( "SCANNER_ANAT" );
 
 	std::list<data::Image> images = data::IOFactory::load( "nix.null" );
@@ -90,6 +91,57 @@ BOOST_AUTO_TEST_CASE( loadsaveImage )
 		}
 
 	}
+}
+
+BOOST_AUTO_TEST_CASE( loadsaveSFormImage )
+{
+	const size_t tsize[] = {128, 128, 2, 1};
+	util::vector4<size_t> size ( tsize );
+	util::Selection aligned = formCodes;
+	aligned.set( "ALIGNED_ANAT" );
+
+	data::MemChunk<short> ch( size[0], size[1] );
+	ch.setPropertyAs( "indexOrigin", util::fvector4( 0, 0, 0 ) );
+	ch.setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
+	ch.setPropertyAs( "columnVec", util::fvector4( 0, 1 ) );
+	ch.setPropertyAs( "sliceVec", util::fvector4( 0, 0, 1 ) );
+	ch.setPropertyAs( "voxelSize", util::fvector4( 1, 1, 1, 0 ) );
+
+	ch.setPropertyAs( "acquisitionNumber", ( uint32_t )0 );
+	ch.setPropertyAs( "sequenceNumber", ( uint16_t )0 );
+	ch.setPropertyAs( "acquisitionTime", ( float )0 );
+
+
+	std::list<data::MemChunk<float> > chunks( 2, ch ); //make a list with two copies of that
+	chunks.back().setPropertyAs<uint32_t>( "acquisitionNumber", 1 ); //change the acquisitionNumber of that to 1
+	chunks.back().setPropertyAs<float>( "acquisitionTime", 1 );
+	chunks.back().setPropertyAs( "indexOrigin", util::fvector4( 0, 0, 1 ) );
+
+	data::Image img( chunks );
+	BOOST_CHECK( img.isClean() );
+	BOOST_CHECK( img.isValid() );
+	img.setPropertyAs( "nifti/sform_code", aligned );
+	img.setPropertyAs<std::string>( "sequenceDescription", "aligned sform" );
+
+
+	BOOST_CHECK_EQUAL( img.getSizeAsVector(), size );
+
+	util::TmpFile niifile( "", ".nii" );
+	BOOST_REQUIRE( data::IOFactory::write( img, niifile.file_string() ) );
+
+	data::Image img2 = data::IOFactory::load( niifile.file_string() ).front();
+
+
+	img2.remove( "acquisitionNumber" ); //unique in the source, but since we get the back as one big chunk they are common now
+	img2.remove( "source" ); //the original image obviously does not have a source
+
+	const util::PropertyMap::DiffMap diff = img2.getDifference( img ) ;
+
+	if( !diff.empty() )
+		std::cout << diff << std::endl;
+
+	BOOST_CHECK( diff.empty() );
+
 }
 
 BOOST_AUTO_TEST_SUITE_END()
