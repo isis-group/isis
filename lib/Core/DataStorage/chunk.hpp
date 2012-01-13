@@ -51,7 +51,7 @@ public:
 template <typename TYPE> class VoxelOp: std::unary_function<bool, TYPE>
 {
 public:
-	virtual bool operator()( TYPE &vox, const util::FixedVector<size_t, 4> &pos ) = 0;
+	virtual bool operator()( TYPE &vox, const util::vector4<size_t> &pos ) = 0;
 };
 
 /**
@@ -88,7 +88,7 @@ public:
 	template<typename TYPE> TYPE &voxel( size_t nrOfColumns, size_t nrOfRows = 0, size_t nrOfSlices = 0, size_t nrOfTimesteps = 0 ) {
 		const size_t idx[] = {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps};
 		LOG_IF( ! isInRange( idx ), Debug, isis::error )
-				<< "Index " << util::FixedVector<size_t, 4>( idx ) << " is out of range " << getSizeAsString();
+				<< "Index " << util::vector4<size_t>( idx ) << " is out of range " << getSizeAsString();
 		ValuePtr<TYPE> &ret = asValuePtr<TYPE>();
 		return ret[getLinearIndex( idx )];
 	}
@@ -121,9 +121,9 @@ public:
 	 * \param offset offset to be added to the voxel position before op is called
 	 * \returns amount of operations which returned false - so 0 is good!
 	 */
-	template <typename TYPE> size_t foreachVoxel( VoxelOp<TYPE> &op, util::FixedVector<size_t, 4> offset ) {
-		const util::FixedVector<size_t, 4> imagesize = getSizeAsVector();
-		util::FixedVector<size_t, 4> pos;
+	template <typename TYPE> size_t foreachVoxel( VoxelOp<TYPE> &op, util::vector4<size_t> offset ) {
+		const util::vector4<size_t> imagesize = getSizeAsVector();
+		util::vector4<size_t> pos;
 		TYPE *vox = &asValuePtr<TYPE>()[0];
 		size_t ret = 0;
 
@@ -144,7 +144,7 @@ public:
 	 * \returns amount of operations which returned false - so 0 is good!
 	 */
 	template<typename TYPE> size_t foreachVoxel( VoxelOp<TYPE> &op ) {
-		return foreachVoxel<TYPE>( op, util::FixedVector<size_t, 4>() );
+		return foreachVoxel<TYPE>( op, util::vector4<size_t>() );
 	}
 
 	_internal::ValuePtrBase &asValuePtrBase() {return operator*();}

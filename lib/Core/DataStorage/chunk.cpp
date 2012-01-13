@@ -16,6 +16,7 @@
 
 #include "chunk.hpp"
 #include <boost/foreach.hpp>
+#include <boost/scoped_ptr.hpp>
 
 namespace isis
 {
@@ -46,7 +47,7 @@ Chunk::Chunk( const ValuePtrReference &src, size_t nrOfColumns, size_t nrOfRows,
 
 Chunk Chunk::cloneToNew( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps )const
 {
-	util::FixedVector<size_t, 4> newSize = getSizeAsVector();
+	util::vector4<size_t> newSize = getSizeAsVector();
 
 	if ( nrOfColumns )newSize[0] = nrOfColumns;
 
@@ -97,13 +98,13 @@ void Chunk::copySlice( size_t thirdDimS, size_t fourthDimS, Chunk &dst, size_t t
 void Chunk::copyRange( const size_t source_start[], const size_t source_end[], Chunk &dst, const size_t destination[] ) const
 {
 	LOG_IF( ! isInRange( source_start ), Debug, error )
-			<< "Copy start " << util::FixedVector<size_t, 4>( source_start )
+			<< "Copy start " << util::vector4<size_t>( source_start )
 			<< " is out of range (" << getSizeAsString() << ") at the source chunk";
 	LOG_IF( ! isInRange( source_end ), Debug, error )
-			<< "Copy end " << util::FixedVector<size_t, 4>( source_end )
+			<< "Copy end " << util::vector4<size_t>( source_end )
 			<< " is out of range (" << getSizeAsString() << ") at the source chunk";
 	LOG_IF( ! dst.isInRange( destination ), Debug, error )
-			<< "Index " << util::FixedVector<size_t, 4>( destination )
+			<< "Index " << util::vector4<size_t>( destination )
 			<< " is out of range (" << getSizeAsString() << ") at the destination chunk";
 	const size_t sstart = getLinearIndex( source_start );
 	const size_t send = getLinearIndex( source_end );
@@ -114,17 +115,17 @@ void Chunk::copyRange( const size_t source_start[], const size_t source_end[], C
 size_t Chunk::compareRange( const size_t source_start[], const size_t source_end[], const Chunk &dst, const size_t destination[] ) const
 {
 	LOG_IF( ! isInRange( source_start ), Debug, error )
-			<< "memcmp start " << util::FixedVector<size_t, 4>( source_start )
+			<< "memcmp start " << util::vector4<size_t>( source_start )
 			<< " is out of range (" << getSizeAsString() << ") at the first chunk";
 	LOG_IF( ! isInRange( source_end ), Debug, error )
-			<< "memcmp end " << util::FixedVector<size_t, 4>( source_end )
+			<< "memcmp end " << util::vector4<size_t>( source_end )
 			<< " is out of range (" << getSizeAsString() << ") at the first chunk";
 	LOG_IF( ! dst.isInRange( destination ), Debug, error )
-			<< "Index " << util::FixedVector<size_t, 4>( destination )
+			<< "Index " << util::vector4<size_t>( destination )
 			<< " is out of range (" << getSizeAsString() << ") at the second chunk";
 	LOG( Debug, verbose_info )
-			<< "Comparing range from " << util::FixedVector<size_t, 4>( source_start ) << " to " << util::FixedVector<size_t, 4>( source_end )
-			<< " and " << util::FixedVector<size_t, 4>( destination );
+			<< "Comparing range from " << util::vector4<size_t>( source_start ) << " to " << util::vector4<size_t>( source_end )
+			<< " and " << util::vector4<size_t>( destination );
 	const size_t sstart = getLinearIndex( source_start );
 	const size_t send = getLinearIndex( source_end );
 	const size_t dstart = dst.getLinearIndex( destination );
@@ -270,8 +271,8 @@ size_t Chunk::useCount() const
 void Chunk::swapAlong( const dimensions dim ) const
 {
 	const size_t elSize = bytesPerVoxel();
-	const util::FixedVector<size_t, 4> whole_size = getSizeAsVector();
-	const util::FixedVector<size_t, 4> outer_size = whole_size;
+	const util::vector4<size_t> whole_size = getSizeAsVector();
+	const util::vector4<size_t> outer_size = whole_size;
 
 	boost::shared_ptr<uint8_t> swap_ptr = boost::shared_static_cast<uint8_t>( get()->getRawAddress() );
 	uint8_t *swap_start = swap_ptr.get();
@@ -287,7 +288,7 @@ void Chunk::swapAlong( const dimensions dim ) const
 	assert( block_volume );
 	block_volume *= elSize;
 	const size_t swap_volume = block_volume * whole_size[dim];
-	const std::auto_ptr<uint8_t> buff( static_cast<uint8_t *>( malloc( block_volume ) ) );
+	const boost::scoped_array<uint8_t> buff( new uint8_t[ block_volume ] );
 
 	//iterate over all swap-volumes
 	for( ; swap_start < swap_end; swap_start += swap_volume ) { //outer loop

@@ -10,13 +10,34 @@ namespace image_io
 class ImageFormat_png: public FileFormat
 {
 protected:
-	std::string suffixes( io_modes modes = both )const {
-		if( modes == read_only )
-			return std::string();
-		else
-			return std::string( ".png" );
+	std::string suffixes( io_modes /*modes = both */ )const {
+		return std::string( ".png" );
 	}
+	struct Reader {
+		virtual data::Chunk operator()( png_structp png_ptr, png_infop info_ptr )const = 0;
+	};
+	template<typename TYPE> struct GenericReader: Reader {
+		data::Chunk operator()( png_structp png_ptr, png_infop info_ptr )const {
+			data::Chunk ret = data::MemChunk<TYPE >( info_ptr->width, info_ptr->height );
+
+			/* png needs a pointer to each row */
+			png_bytep *row_pointers = ( png_bytep * ) malloc( sizeof( png_bytep ) * info_ptr->height );
+
+			for ( unsigned short r = 0; r < info_ptr->height; r++ )
+				row_pointers[r] = ( png_bytep )&ret.voxel<TYPE>( 0, r );
+
+			png_read_image( png_ptr, row_pointers );
+			return ret;
+		}
+	};
+	std::map<png_byte, std::map<png_byte, boost::shared_ptr<Reader> > > readers;
 public:
+	ImageFormat_png() {
+		readers[PNG_COLOR_TYPE_GRAY][8].reset( new GenericReader<uint8_t> );
+		readers[PNG_COLOR_TYPE_GRAY][16].reset( new GenericReader<uint16_t> );
+		readers[PNG_COLOR_TYPE_RGB][8].reset( new GenericReader<util::color24> );
+		readers[PNG_COLOR_TYPE_RGB][16].reset( new GenericReader<util::color48> );
+	}
 	std::string getName()const {
 		return "PNG (Portable Network Graphics)";
 	}
@@ -28,7 +49,7 @@ public:
 		png_structp png_ptr;
 		png_infop info_ptr;
 		assert( buff.getRelevantDims() == 2 );
-		util::FixedVector<size_t, 4> size = buff.getSizeAsVector();
+		util::vector4<size_t> size = buff.getSizeAsVector();
 
 		/* open the file */
 		fp = fopen( filename.c_str(), "wb" );
@@ -101,9 +122,64 @@ public:
 		return true;
 	}
 
+	data::Chunk read_png( const std::string &filename ) {
+		png_byte header[8]; // 8 is the maximum size that can be checked
 
-	int load ( std::list<data::Chunk> &/*chunks*/, const std::string &/*filename*/, const std::string &/*dialect*/ )  throw( std::runtime_error & ) {
-		throwGenericError( "png loading is not supportted (yet)" );
+		/* open file and test for it being a png */
+		FILE *fp = fopen( filename.c_str(), "rb" );
+
+		if ( !fp ) {
+			throwSystemError( errno, std::string( "Could not open " ) + filename );
+		}
+
+		if( fread( header, 1, 8, fp ) != 8 ) {
+			throwSystemError( errno, std::string( "Could not open " ) + filename );
+		}
+
+		;
+
+		if ( png_sig_cmp( header, 0, 8 ) ) {
+			throwGenericError( filename + " is not recognized as a PNG file" );
+		}
+
+		png_structp png_ptr;
+		png_infop info_ptr;
+
+		/* initialize stuff */
+		png_ptr = png_create_read_struct( PNG_LIBPNG_VER_STRING, NULL, NULL, NULL );
+		assert( png_ptr );
+
+		info_ptr = png_create_info_struct( png_ptr );
+		assert( info_ptr );
+
+		png_init_io( png_ptr, fp );
+		png_set_sig_bytes( png_ptr, 8 );
+		png_read_info( png_ptr, info_ptr );
+		png_set_interlace_handling( png_ptr );
+		png_read_update_info( png_ptr, info_ptr );
+
+		LOG( Debug, info ) << "color_type " << ( int )info_ptr->color_type << " bit_depth " << ( int )info_ptr->bit_depth;
+
+		boost::shared_ptr< Reader > reader = readers[info_ptr->color_type][info_ptr->bit_depth];
+
+		if( !reader ) {
+			LOG( Runtime, error ) << "Sorry, the color type " << ( int )info_ptr->color_type << " with " << ( int )info_ptr->bit_depth << " bits is not supportet.";
+			throwGenericError( "Wrong color type" );
+		}
+
+		data::Chunk ret = ( *reader )( png_ptr, info_ptr );
+
+		fclose( fp );
+		LOG( Runtime, notice ) << ret.getSizeAsString() << "-image loaded from png. Making up acquisitionNumber,columnVec,indexOrigin,rowVec and voxelSize";
+		ret.setPropertyAs<uint32_t>( "acquisitionNumber", 0 );
+		ret.setPropertyAs<util::fvector4>( "rowVec", util::fvector4( 1, 0 ) );
+		ret.setPropertyAs<util::fvector4>( "columnVec", util::fvector4( 0, 1 ) );
+		ret.setPropertyAs<util::fvector4>( "indexOrigin", util::fvector4( 0, 0 ) );
+		ret.setPropertyAs<util::fvector4>( "voxelSize", util::fvector4( 1, 1, 1 ) );
+		return ret;
+	}
+	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &/*dialect*/ )  throw( std::runtime_error & ) {
+		chunks.push_back( read_png( filename ) );
 		return 0;
 	}
 

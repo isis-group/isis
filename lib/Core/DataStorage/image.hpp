@@ -34,7 +34,7 @@ namespace data
 class ChunkOp : std::unary_function<Chunk &, bool>
 {
 public:
-	virtual bool operator()( Chunk &, util::FixedVector<size_t, 4> posInImage ) = 0;
+	virtual bool operator()( Chunk &, util::vector4<size_t> posInImage ) = 0;
 	virtual ~ChunkOp();
 };
 
@@ -90,7 +90,7 @@ private:
 		LOG_IF( set.isEmpty(), Debug, error )
 				<< "Getting data from a empty image will result in undefined behavior.";
 		LOG_IF( !isInRange( idx ), Debug, isis::error )
-				<< "Index " << util::listToString( idx, idx + 4, "|" ) << " is out of range (" << getSizeAsString() << ")";
+				<< "Index " << util::vector4<size_t>( idx ) << " is out of range (" << getSizeAsString() << ")";
 		const size_t index = getLinearIndex( idx );
 		return std::make_pair( index / chunkVolume, index % chunkVolume );
 	}
@@ -492,15 +492,19 @@ public:
 	 * If neccessary a conversion into T is done using min/max of the image.
 	 * \param dst c-pointer for the memory to copy into
 	 * \param len the allocated size of that memory in elements
+	 * \param scaling the scaling to be used when converting the data (will be determined automatically if not given)
 	 */
-	template<typename T> void copyToMem( T *dst, size_t len )const {
+	template<typename T> void copyToMem( T *dst, size_t len,  scaling_pair scaling = scaling_pair()   )const {
 		if( clean ) {
-			scaling_pair scale = getScalingTo( ValuePtr<T>::staticID );
+			if( scaling.first.isEmpty() || scaling.second.isEmpty() ) {
+				scaling = getScalingTo( ValuePtr<T>::staticID );
+			}
+
 			// we could do this using convertToType - but this solution does not need any additional temporary memory
 			BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
 				const size_t cSize = ref->getSizeAsVector().product();
 
-				if( !ref->copyToMem<T>( dst, len, scale ) ) {
+				if( !ref->copyToMem<T>( dst, len, scaling ) ) {
 					LOG( Runtime, error ) << "Failed to copy raw data of type " << ref->getTypeName() << " from image into memory of type " << ValuePtr<T>::staticName();
 				} else {
 					if( len < cSize ) {
@@ -525,7 +529,7 @@ public:
 	 * \returns a MemChunk\<T\> containing the voxeldata of the Image (but not its Properties)
 	 */
 	template<typename T> MemChunk<T> copyToMemChunk()const {
-		const util::FixedVector<size_t, 4> size = getSizeAsVector();
+		const util::vector4<size_t> size = getSizeAsVector();
 		data::MemChunk<T> ret( size[0], size[1], size[2], size[3] );
 		copyToMem<T>( &ret.voxel<T>( 0, 0, 0, 0 ), ret.getVolume() );
 		return ret;
@@ -575,7 +579,7 @@ public:
 			VoxelOp<TYPE> &op;
 		public:
 			_proxy( VoxelOp<TYPE> &_op ): op( _op ) {}
-			bool operator()( Chunk &ch, util::FixedVector<size_t, 4 > posInImage ) {
+			bool operator()( Chunk &ch, util::vector4<size_t> posInImage ) {
 				return ch.foreachVoxel<TYPE>( op, posInImage ) == 0;
 			}
 		};
