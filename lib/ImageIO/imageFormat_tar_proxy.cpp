@@ -12,7 +12,6 @@
 #include <boost/iostreams/filter/bzip2.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include <tar.h>
 #include <fstream>
 #include "DataStorage/fileptr.hpp"
 
@@ -136,7 +135,7 @@ public:
 			if( size == 0 ) //if there is no content skip this entry (there are allways two "empty" blocks at the end of a tar)
 				continue;
 
-			if( tar_header.typeflag == AREGTYPE || tar_header.typeflag == REGTYPE ) {
+			if( tar_header.typeflag == '\0' || tar_header.typeflag == '0' ) { //only do regulars files
 
 				data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( org_file.file_string(), dialect ); // and get the reading pluging for that
 

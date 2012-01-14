@@ -6,9 +6,14 @@
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
-#include <iostream>
 #include "fileptr.hpp"
+
+#ifdef WIN32
+#else
 #include <sys/mman.h>
+#endif
+
+#include <iostream>
 #include <fcntl.h>
 #include <unistd.h>
 #include <boost/mpl/for_each.hpp>
@@ -28,19 +33,31 @@ void FilePtr::Closer::operator()( void *p )
 {
 	LOG( Debug, info ) << "Unmapping and closing " << util::MSubject( filename );
 
-	if( munmap( p, len ) != 0 ) {
+	bool unmapped=false;
+#ifdef WIN32
+	unmapped=UnmapViewOfFile(p);
+#else
+	ok=munmap( p, len );
+#endif
+	if( unmapped != 0 ) {
 		LOG( Runtime, warning )
 				<< "Unmapping of " << util::MSubject( filename )
 				<< " failed, the error was: " << util::MSubject( strerror( errno ) );
 	}
 
+#ifdef __APPLE__
 	if( write && futimes( file, NULL ) != 0 ) {
 		LOG( Runtime, warning )
 				<< "Setting access time of " << util::MSubject( filename )
 				<< " failed, the error was: " << util::MSubject( strerror( errno ) );
 	}
+#endif
 
+#ifdef WIN32
+	if(!CloseHandle(file)){
+#else
 	if( ::close( file ) != 0 ) {
+#endif
 		LOG( Runtime, warning )
 				<< "Closing of " << util::MSubject( filename )
 				<< " failed, the error was: " << util::MSubject( strerror( errno ) );
@@ -54,14 +71,23 @@ FilePtr::GeneratorMap::GeneratorMap()
 }
 
 
-
-bool FilePtr::map( int file, size_t len, bool write, const boost::filesystem::path &filename )
+bool FilePtr::map( FILE_HANDLE file, size_t len, bool write, const boost::filesystem::path &filename )
 {
+	void *ptr=NULL;
+#ifdef WIN32 //mmap is broken on windows - workaround stolen from http://crupp.de/2007/11/14/howto-port-unix-mmap-to-win32/
+	HANDLE mmaph = CreateFileMapping(file, 0, write ? PAGE_READWRITE : PAGE_WRITECOPY, 0, len, filename.file_string().c_str());
+	if(mmaph)
+		ptr = MapViewOfFile(file, write ? FILE_MAP_WRITE : FILE_MAP_COPY, 0, 0, len);
+#else
 	const int flags = write ? MAP_SHARED : MAP_PRIVATE;
+	ptr = mmap( 0, len, PROT_WRITE | PROT_READ, flags , file, 0 ); // yes we say PROT_WRITE here also if the file is opened ro - its for the mapping, not for the file
+#endif
 
-	void *const ptr = mmap( 0, len, PROT_WRITE | PROT_READ, flags , file, 0 ); // yes we say PROT_WRITE here also if the file is opened ro - its for the mapping, not for the file
-
+#ifdef WIN32
+	if( ptr == NULL ) {
+#else
 	if( ptr == MAP_FAILED ) {
+#endif
 		LOG( Debug, error ) << "Failed to map file, error was " << strerror( errno );
 		return false;
 	} else {
@@ -71,13 +97,14 @@ bool FilePtr::map( int file, size_t len, bool write, const boost::filesystem::pa
 	}
 }
 
-size_t FilePtr::checkSize( bool write, int file, const boost::filesystem::path &filename, size_t size )
+size_t FilePtr::checkSize( bool write, FILE_HANDLE file, const boost::filesystem::path &filename, size_t size )
 {
 	const boost::uintmax_t currSize = boost::filesystem::file_size( filename );
 
 	if( write ) { // if we're writing
 		assert( size > 0 );
 
+#ifndef WIN32
 		if( size > currSize ) { // and the file is shorter than requested, resize it
 			const int err = ftruncate( file, size ) ? errno : 0;
 
@@ -89,6 +116,7 @@ size_t FilePtr::checkSize( bool write, int file, const boost::filesystem::path &
 			} else
 				return size; // ok now the file has the right size
 		} else
+#endif
 			return size; // no resizing needed
 	} else { // if we're reading
 		if( size == 0 ) {
@@ -113,12 +141,23 @@ FilePtr::FilePtr(): m_good( false ) {}
 
 FilePtr::FilePtr( const boost::filesystem::path &filename, size_t len, bool write ): m_good( false )
 {
+#ifdef WIN32
+	const FILE_HANDLE invalid=INVALID_HANDLE_VALUE;
+	const int oflag = write ?
+					  GENERIC_READ | GENERIC_WRITE :
+					  GENERIC_READ; //open file readonly
+	const FILE_HANDLE file =
+			CreateFile(filename.file_string().c_str(),oflag,write ? 0:FILE_SHARE_READ,NULL,OPEN_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
+#else
+	const FILE_HANDLE invalid=-1;
 	const int oflag = write ?
 					  O_CREAT | O_RDWR : //create file if its not there
 					  O_RDONLY; //open file readonly
-	const int file = open( filename.file_string().c_str(), oflag, 0666 );
+	const FILE_HANDLE file =
+			open( filename.file_string().c_str(), oflag, 0666 );
+#endif
 
-	if( file == -1 ) {
+	if( file == invalid ) {
 		LOG( Runtime, error ) << "Failed to open " << util::MSubject( filename )
 							  << ", the error was: " << util::MSubject( strerror( errno ) );
 		return;

@@ -1,6 +1,5 @@
 #define BOOST_TEST_MODULE ValueTest
 #define NOMINMAX 1
-#define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
 #include <DataStorage/filter.hpp>
 
