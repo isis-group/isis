@@ -37,7 +37,7 @@ namespace data
 class FilePtr: public ValuePtr<uint8_t>
 {
 	struct Closer {
-		FILE_HANDLE file;
+		FILE_HANDLE file,mmaph;
 		size_t len;
 		boost::filesystem::path filename;
 		bool write;
