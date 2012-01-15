@@ -196,7 +196,7 @@ size_t IOFactory::loadFile( std::list<Chunk> &ret, const boost::filesystem::path
 
 	if ( formatReader.empty() ) {
 		if( !boost::filesystem::exists( filename ) ) {
-			LOG( Runtime, error ) << util::MSubject( filename )
+			LOG( Runtime, error ) << util::MSubject( filename.file_string() )
 								  << " does not exist as file, and no suitable plugin was found to generate data from "
 								  << ( suffix_override.empty() ? std::string( "that name" ) : std::string( "the suffix \"" ) + suffix_override + "\"" );
 		} else if( suffix_override.empty() ) {
@@ -207,22 +207,22 @@ size_t IOFactory::loadFile( std::list<Chunk> &ret, const boost::filesystem::path
 	} else {
 		BOOST_FOREACH( FileFormatList::const_reference it, formatReader ) {
 			LOG( ImageIoDebug, info )
-					<< "plugin to load file" << with_dialect << " " << util::MSubject( filename ) << ": " << it->getName();
+					<< "plugin to load file" << with_dialect << " " << util::MSubject( filename.file_string() ) << ": " << it->getName();
 
 			try {
 				return it->load( ret, filename.file_string(), dialect );
 			} catch ( std::runtime_error &e ) {
 				if( suffix_override.empty() ) {
 					LOG( Runtime, formatReader.size() > 1 ? warning : error )
-							<< "Failed to load " <<  filename << " using " <<  it->getName() << with_dialect << " ( " << e.what() << " )";
+							<< "Failed to load " <<  filename.file_string() << " using " <<  it->getName() << with_dialect << " ( " << e.what() << " )";
 				} else {
 					LOG( Runtime, warning )
-							<< "The enforced format " << it->getName()  << " failed to read " << filename << with_dialect
+							<< "The enforced format " << it->getName()  << " failed to read " << filename.file_string() << with_dialect
 							<< " ( " << e.what() << " ), maybe it just wasn't the right format";
 				}
 			}
 		}
-		LOG_IF( boost::filesystem::exists( filename ) && formatReader.size() > 1, Runtime, error ) << "No plugin was able to load: "   << util::MSubject( filename ) << with_dialect;
+		LOG_IF( boost::filesystem::exists( filename ) && formatReader.size() > 1, Runtime, error ) << "No plugin was able to load: "   << util::MSubject( filename.file_string() ) << with_dialect;
 	}
 
 	return ret.size() - nimgs_old;//no plugin of proposed list could load file
