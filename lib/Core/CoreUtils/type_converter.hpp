@@ -44,7 +44,9 @@ public:
 	virtual ~ValueConverterBase() {}
 };
 
+#ifndef WIN32
 #pragma GCC visibility push(hidden)
+#endif
 class ValueConverterMap : public std::map< int , std::map<int, boost::shared_ptr<const ValueConverterBase> > >
 {
 public:
@@ -52,7 +54,9 @@ public:
 };
 
 }
+#ifndef WIN32
 #pragma GCC visibility pop
+#endif
 }
 }
 #endif // CONVERTER_HPP

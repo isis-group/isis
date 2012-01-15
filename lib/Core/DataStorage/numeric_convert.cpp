@@ -29,7 +29,9 @@ namespace isis
 {
 namespace data
 {
+#ifndef WIN32
 #pragma GCC visibility push(hidden)
+#endif
 namespace _internal
 {
 

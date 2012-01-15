@@ -43,7 +43,9 @@ namespace isis
 {
 namespace data
 {
+#ifndef WIN32
 #pragma GCC visibility push(hidden)
+#endif
 namespace _internal
 {
 
@@ -282,8 +284,9 @@ ValuePtrConverterMap::ValuePtrConverterMap()
 }
 
 }
+#ifndef WIN32
 #pragma GCC visibility pop
-
+#endif
 }
 }
 

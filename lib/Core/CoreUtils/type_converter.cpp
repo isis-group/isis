@@ -40,7 +40,9 @@ namespace isis
 {
 namespace util
 {
+#ifndef WIN32
 #pragma GCC visibility push(hidden)
+#endif
 namespace _internal
 {
 
@@ -549,6 +551,8 @@ ValueConverterMap::ValueConverterMap()
 }
 
 }
+#ifndef WIN32
 #pragma GCC visibility pop
+#endif
 }
 }

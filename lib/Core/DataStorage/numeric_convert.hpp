@@ -14,7 +14,9 @@ namespace isis
 namespace data
 {
 enum autoscaleOption;
+#ifndef WIN32
 #pragma GCC visibility push(hidden)
+#endif
 namespace _internal
 {
 
@@ -194,7 +196,9 @@ DECL_SCALED_CONVERT( uint8_t, double );
 #endif //ISIS_USE_LIBOIL
 
 }
+#ifndef WIN32
 #pragma GCC visibility pop
+#endif
 /**
  * Computes scaling and offset between two scalar value domains.
  * The rules are:
