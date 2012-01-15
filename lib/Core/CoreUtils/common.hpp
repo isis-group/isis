@@ -30,8 +30,11 @@
 #include "log.hpp"
 #include "log_modules.hpp"
 
-#ifdef _MSC_VER
+#ifdef WIN32
 #include <Windows.h>
+#endif
+
+#ifdef _MSC_VER
 typedef boost::int8_t   int8_t;
 typedef boost::int16_t  int16_t;
 typedef boost::int32_t  int32_t;
@@ -52,6 +55,8 @@ typedef ::size_t size_t;
 #endif
 namespace util
 {
+
+std::string getLastSystemError();
 
 /**
 Write a list of elements to a std::basic_ostream

@@ -172,7 +172,7 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ)
   include_directories(${INCPATH_GZIP})
 
   add_library(isisImageFormat_gz_proxy SHARED imageFormat_gz_proxy.cpp)
-  target_link_libraries(isisImageFormat_gz_proxy ${LIB_Z} isis_core ${ISIS_LIB_DEPENDS})
+  target_link_libraries(isisImageFormat_gz_proxy isis_core ${ISIS_LIB_DEPENDS} ${LIB_Z} )
 
   set(TARGETS ${TARGETS} isisImageFormat_gz_proxy)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ)

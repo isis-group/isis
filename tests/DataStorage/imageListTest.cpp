@@ -6,7 +6,6 @@
  */
 
 #define BOOST_TEST_MODULE ImageListTest
-#define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
 #include <boost/foreach.hpp>
 #include "DataStorage/image.hpp"

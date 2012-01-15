@@ -13,6 +13,13 @@
 #include <boost/filesystem.hpp>
 #include "typeptr.hpp"
 
+#ifdef WIN32
+#include <windows.h>
+#define FILE_HANDLE HANDLE
+#else
+#define FILE_HANDLE int
+#endif
+
 namespace isis
 {
 namespace data
@@ -30,7 +37,7 @@ namespace data
 class FilePtr: public ValuePtr<uint8_t>
 {
 	struct Closer {
-		int file;
+		FILE_HANDLE file, mmaph;
 		size_t len;
 		boost::filesystem::path filename;
 		bool write;
@@ -49,8 +56,9 @@ class FilePtr: public ValuePtr<uint8_t>
 		};
 	};
 
-	bool map( int file, size_t len, bool write, const boost::filesystem::path &filename );
-	size_t checkSize( bool write, int file, const boost::filesystem::path &filename, size_t size = 0 );
+	bool map( FILE_HANDLE file, size_t len, bool write, const boost::filesystem::path &filename );
+
+	size_t checkSize( bool write, FILE_HANDLE file, const boost::filesystem::path &filename, size_t size = 0 );
 	bool m_good;
 public:
 	/// empty creator - result will not be usefull until filled
