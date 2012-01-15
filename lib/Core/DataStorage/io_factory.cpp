@@ -13,6 +13,8 @@
 #include "io_factory.hpp"
 #ifdef WIN32
 #include <windows.h>
+#include <Winbase.h>
+#include <boost/filesystem/path.hpp>
 #else
 #include <dlfcn.h>
 #endif
@@ -91,7 +93,27 @@ IOFactory::IOFactory()
 		}
 	}
 
+#ifdef WIN32
+	TCHAR lpExeName[2048];
+	DWORD lExeName=GetModuleFileName(NULL,lpExeName,2048);
+	bool w32_path_ok=false;
+	if(lExeName==0){
+		LOG(Runtime,error) << "Failed to get the process name " << util::MSubject(util::getLastSystemError());
+	} else if(lExeName<2048){
+		lpExeName[lExeName]='\0';
+		boost::filesystem::path prog_name(lpExeName);
+		if(boost::filesystem::exists(prog_name)){
+			w32_path_ok=true;
+			LOG(Runtime,info) << "Determined the path of the executable as " << util::MSubject(prog_name.file_string()) << " will search for plugins there..";
+			findPlugins(prog_name.remove_filename().directory_string());
+		}
+	} else
+		LOG(Runtime,error) << "Sorry, the path of the process is to long (must be less than 2048 characters) ";
+
+	LOG_IF(!w32_path_ok, Runtime,warning) << "Could not determine the path of the executable, won't search for plugins there..";
+#else
 	findPlugins( std::string( PLUGIN_PATH ) );
+#endif
 }
 
 bool IOFactory::registerFileFormat( const FileFormatPtr plugin )
@@ -115,12 +137,12 @@ unsigned int IOFactory::findPlugins( const std::string &path )
 	boost::filesystem::path p( path );
 
 	if ( !exists( p ) ) {
-		LOG( Runtime, warning ) << util::MSubject( p.native_file_string() ) << " not found";
+		LOG( Runtime, warning ) << util::MSubject( p.file_string() ) << " not found";
 		return 0;
 	}
 
 	if ( !boost::filesystem::is_directory( p ) ) {
-		LOG( Runtime, warning ) << util::MSubject( p.native_file_string() ) << " is no directory";
+		LOG( Runtime, warning ) << util::MSubject( p.file_string() ) << " is no directory";
 		return 0;
 	}
 

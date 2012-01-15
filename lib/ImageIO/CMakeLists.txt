@@ -158,7 +158,7 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_PNG)
   include_directories(${INCPATH_PNG})
 
   add_library(isisImageFormat_png SHARED imageFormat_png.cpp)
-  target_link_libraries(isisImageFormat_png ${LIB_Z} isis_core ${ISIS_LIB_DEPENDS} ${LIB_PNG})
+  target_link_libraries(isisImageFormat_png isis_core ${ISIS_LIB_DEPENDS} ${LIB_PNG} ${LIB_Z})
 
   set(TARGETS ${TARGETS} isisImageFormat_png)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_PNG)
@@ -270,7 +270,11 @@ endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_SIEMENSTCPIP)
 ###########################################################################
 # prepare all plugins for installation
 ###########################################################################
+if(WIN32)
+message(STATUS "Installing following plugins to ${CMAKE_INSTALL_PREFIX}/bin")
+else(WIN32)
 message(STATUS "Installing following plugins to ${CMAKE_INSTALL_PREFIX}/${ISIS_PLUGIN_INFIX}")
+endif(WIN32)
 
 foreach(PLUGIN ${TARGETS})
   message(STATUS " == ${PLUGIN}")
@@ -280,7 +284,11 @@ endforeach(PLUGIN)
 ###########################################################
 # actual install
 ###########################################################
-install(TARGETS ${TARGETS} DESTINATION ${ISIS_PLUGIN_INFIX} COMPONENT "IO plugins" )
+if(WIN32)
+install(TARGETS ${TARGETS} RUNTIME DESTINATION bin COMPONENT "IO_plugins")
+else(WIN32)
+install(TARGETS ${TARGETS} DESTINATION ${ISIS_PLUGIN_INFIX} COMPONENT "IO_plugins" )
+endif(WIN32)
 
 # # uninstall target
 # configure_file(
