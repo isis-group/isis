@@ -41,11 +41,14 @@ if(ISIS_QT4)
   qt4_wrap_cpp(qdefaultmessageprint_moc qt4/qdefaultmessageprint.hpp)
   # configure target
   add_library(isisAdapter_qt4 SHARED qt4/qtapplication.cpp ${qdefaultmessageprint_moc} qt4/qdefaultmessageprint.cpp )
-  target_link_libraries(isisAdapter_qt4 isis_core ${QT_LIBRARIES})
+  target_link_libraries(isisAdapter_qt4 isis_core ${ISIS_LIB_DEPENDS} ${QT_LIBRARIES} ${CMAKE_C_STANDARD_LIBRARIES})
 
   # configure install destination
-  install(TARGETS isisAdapter_qt4
-    LIBRARY DESTINATION  ${CMAKE_INSTALL_PREFIX}/lib COMPONENT RuntimeLibraries)
+  install (TARGETS isisAdapter_qt4
+	RUNTIME DESTINATION bin COMPONENT RuntimeLibraries
+	LIBRARY DESTINATION lib COMPONENT RuntimeLibraries
+	ARCHIVE DESTINATION lib COMPONENT Development
+  )
 
   # export header files
   set(ADAPTER_HDR_FILES ${ADAPTER_HDR_FILES} qt4/qtapplication.hpp qt4/qdefaultmessageprint.hpp )  
