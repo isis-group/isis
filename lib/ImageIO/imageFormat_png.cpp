@@ -44,7 +44,7 @@ public:
 	std::string dialects( const std::string &/*filename*/ ) const {
 		return "middle";
 	}
-	bool write_png( const std::string &filename, const data::Chunk &buff ) {
+	bool write_png( const std::string &filename, const data::Chunk &buff, int color_type, int bit_depth ) {
 		FILE *fp;
 		png_structp png_ptr;
 		png_infop info_ptr;
@@ -95,13 +95,14 @@ public:
 
 		/* set up the output control if you are using standard C streams */
 		png_init_io( png_ptr, fp );
-		png_set_IHDR( png_ptr, info_ptr, size[0], size[1], 8, PNG_COLOR_TYPE_GRAY, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT );
+		png_set_IHDR( png_ptr, info_ptr, size[0], size[1], bit_depth, color_type, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT );
 
 		/* png needs a pointer to each row */
 		png_byte **row_pointers = new png_byte*[size[1]];
+		row_pointers[0]=( png_byte * )buff.getValuePtrBase().getRawAddress().get();
 
-		for ( unsigned short r = 0; r < size[1]; r++ )
-			row_pointers[r] = ( png_byte * )&buff.voxel<png_byte>( 0, r );
+		for ( unsigned short r = 1; r < size[1]; r++ )
+			row_pointers[r] = row_pointers[0]+ (buff.bytesPerVoxel()*buff.getLinearIndex(util::vector4<size_t>(0,r,0,0)));
 
 		png_set_rows( png_ptr, info_ptr, row_pointers );
 
@@ -184,23 +185,42 @@ public:
 	}
 
 	void write( const data::Image &image, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
-		if( image.getRelevantDims() < 2 ) {
+		const short unsigned int isis_data_type=image.getMajorTypeID();
+
+		data::Image tImg=image;
+		tImg.convertToType(isis_data_type); // make image have unique type
+		if( image.getRelevantDims() < 2 ) { // ... make sure its made of slices
 			throwGenericError( "Cannot write png when image is made of stripes" );
 		}
-
-		data::TypedImage<png_byte> tImg( image );
 		tImg.spliceDownTo( data::sliceDim );
-		std::vector<data::Chunk > chunks = tImg.copyChunksToVector( false );
-		unsigned short numLen = std::log10( chunks.size() ) + 1;
-		size_t number = 0;
+		std::vector<data::Chunk > chunks = tImg.copyChunksToVector( false ); // and get a list of the slices
+
+		int color_type,bit_depth=chunks.front().bytesPerVoxel()*8;
+		switch(isis_data_type){
+			case data::ValuePtr<uint8_t>::staticID:
+			case data::ValuePtr<uint16_t>::staticID:
+				color_type=PNG_COLOR_TYPE_GRAY;
+				break;
+			case data::ValuePtr<util::color24>::staticID:
+			case data::ValuePtr<util::color48>::staticID:
+				color_type=PNG_COLOR_TYPE_RGB;
+				bit_depth/=3;
+				break;
+			default:
+				LOG(Runtime,error) << "Sorry, writing images of type " << image.getMajorTypeName() << " is not supportet";
+				throwGenericError("unsupported data type");
+		}
+
 
 		if( util::istring( dialect.c_str() ) == util::istring( "middle" ) ) { //save only the middle
 			LOG( Runtime, info ) << "Writing the slice " << chunks.size() / 2 + 1 << " of " << chunks.size() << " slices as png-image of size " << chunks.front().getSizeAsString();
 
-			if( !write_png( filename, chunks[chunks.size() / 2] ) ) {
+			if( !write_png( filename, chunks[chunks.size() / 2],color_type,bit_depth ) ) {
 				throwGenericError( std::string( "Failed to write " ) + filename );
 			}
 		} else { //save all slices
+			size_t number = 0;
+			unsigned short numLen = std::log10( chunks.size() ) + 1;
 			const std::pair<std::string, std::string> fname = makeBasename( filename );
 			LOG( Runtime, info )
 					<< "Writing " << chunks.size() << " slices as png-images " << fname.first << "_"
@@ -210,7 +230,7 @@ public:
 				const std::string num = boost::lexical_cast<std::string>( ++number );
 				const std::string name = fname.first + "_" + std::string( numLen - num.length(), '0' ) + num + fname.second;
 
-				if( !write_png( name, ref ) ) {
+				if( !write_png( name, ref,color_type,bit_depth ) ) {
 					throwGenericError( std::string( "Failed to write " ) + name );;
 				}
 			}
