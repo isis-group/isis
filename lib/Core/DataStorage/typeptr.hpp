@@ -32,6 +32,7 @@ namespace data
 
 namespace _internal
 {
+/// @cond _hidden
 template<typename T, bool isNumber> struct getMinMaxImpl { // fallback for unsupportet types
 	std::pair<T, T> operator()( const ValuePtr<T> &/*ref*/ ) const {
 		LOG( Debug, error ) << "min/max computation of " << util::Value<T>::staticName() << " is not supportet";
@@ -51,8 +52,6 @@ template<typename T> std::pair<T, T> calcMinMax( const T *data, size_t len )
 
 	return result;
 }
-
-/// @cond _hidden
 
 #ifdef __SSE2__
 ////////////////////////////////////////////////
@@ -74,6 +73,49 @@ template<typename T> struct getMinMaxImpl<T, true> { // generic minmax for numbe
 	}
 };
 /// @endcond
+
+/**
+ * Basic iterator for ValuePtr.
+ * This is a common iterator following the random access iterator modell.
+ * It is not part of the reference counting used in ValuePtr. So make shure you keep the ValuePtr you created it from while you use this iterator.
+ */
+template<typename TYPE> class ValuePtrIterator: public std::iterator<std::random_access_iterator_tag,TYPE>
+{
+	TYPE *p;
+public:
+	ValuePtrIterator():p(NULL){}
+	ValuePtrIterator(TYPE *_p):p(_p){}
+
+	ValuePtrIterator<TYPE>& operator++() {++p;return *this;}
+	ValuePtrIterator<TYPE>& operator--() {--p;return *this;}
+
+	ValuePtrIterator<TYPE>  operator++(int) {ValuePtrIterator<TYPE> tmp = *this;++*this;return tmp;}
+	ValuePtrIterator<TYPE>  operator--(int) {ValuePtrIterator<TYPE> tmp = *this;--*this;return tmp;}
+
+	TYPE& operator*() const { return *p; }
+	TYPE* operator->() const { return p; }
+
+	bool operator==(const ValuePtrIterator<TYPE> &cmp)const {return p==cmp.p;}
+	bool operator!=(const ValuePtrIterator<TYPE> &cmp)const {return !(*this == cmp);}
+
+	bool operator>(const ValuePtrIterator<TYPE> &cmp)const {return p>cmp.p;}
+	bool operator<(const ValuePtrIterator<TYPE> &cmp)const {return p<cmp.p;}
+
+	bool operator>=(const ValuePtrIterator<TYPE> &cmp)const {return p>=cmp.p;}
+	bool operator<=(const ValuePtrIterator<TYPE> &cmp)const {return p<=cmp.p;}
+
+	ValuePtrIterator<TYPE> operator+(size_t n)const {return ValuePtrIterator<TYPE>(p+n);}
+	ValuePtrIterator<TYPE> operator-(size_t n)const {return ValuePtrIterator<TYPE>(p-n);}
+
+	typename std::iterator<std::random_access_iterator_tag,TYPE>::difference_type
+	operator-(const ValuePtrIterator<TYPE> cmp)const {return p-cmp.p;}
+
+	ValuePtrIterator<TYPE> &operator+=(size_t n) {p+=n; return *this;}
+	ValuePtrIterator<TYPE> &operator-=(size_t n) {p-=n; return *this;}
+
+	TYPE operator[](size_t n)const {return *(p+n);}
+};
+
 }
 
 /**
@@ -93,6 +135,8 @@ protected:
 		return new ValuePtr( *this );
 	}
 public:
+	typedef _internal::ValuePtrIterator<TYPE> iterator;
+	typedef _internal::ValuePtrIterator<const TYPE> const_iterator;
 	static const unsigned short staticID = util::_internal::TypeID<TYPE>::value << 8;
 	/// delete-functor which does nothing (in case someone else manages the data).
 	struct NonDeleter {
@@ -107,14 +151,6 @@ public:
 			//we have to cast the pointer to void* here, because in case of u_int8_t it will try to print the "string"
 			LOG( Debug, verbose_info ) << "Freeing pointer " << ( void * )p << " (" << ValuePtr<TYPE>::staticName() << ") ";
 			free( p );
-		};
-	};
-	/// Default delete-functor for arrays of objects (uses delete[]).
-	struct ObjectArrayDeleter {
-		void operator()( TYPE *p ) {
-			//we have to cast the pointer to void* here, because in case of u_int8_t it will try to print the "string"
-			LOG( Debug, info ) << "Deleting object array at " << ( void * )p << " (" << ValuePtr<TYPE>::staticName() << ") ";
-			delete[] p;
 		};
 	};
 	/**
@@ -177,6 +213,11 @@ public:
 	boost::shared_ptr<void> getRawAddress( size_t offset = 0 ) { // use the const version and cast away the const
 		return boost::const_pointer_cast<void>( const_cast<const ValuePtr *>( this )->getRawAddress( offset ) );
 	}
+
+	iterator begin(){return iterator(m_val.get());}
+	iterator end(){return iterator(m_val.get()+m_len);};
+	const_iterator begin()const{return const_iterator(m_val.get());}
+	const_iterator end()const{return const_iterator(m_val.get()+m_len);}
 
 	/// @copydoc util::Value::toString
 	virtual std::string toString( bool labeled = false )const {
