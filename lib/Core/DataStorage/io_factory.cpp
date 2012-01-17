@@ -13,6 +13,8 @@
 #include "io_factory.hpp"
 #ifdef WIN32
 #include <windows.h>
+#include <Winbase.h>
+#include <boost/filesystem/path.hpp>
 #else
 #include <dlfcn.h>
 #endif
@@ -91,7 +93,29 @@ IOFactory::IOFactory()
 		}
 	}
 
+#ifdef WIN32
+	TCHAR lpExeName[2048];
+	DWORD lExeName = GetModuleFileName( NULL, lpExeName, 2048 );
+	bool w32_path_ok = false;
+
+	if( lExeName == 0 ) {
+		LOG( Runtime, error ) << "Failed to get the process name " << util::MSubject( util::getLastSystemError() );
+	} else if( lExeName < 2048 ) {
+		lpExeName[lExeName] = '\0';
+		boost::filesystem::path prog_name( lpExeName );
+
+		if( boost::filesystem::exists( prog_name ) ) {
+			w32_path_ok = true;
+			LOG( Runtime, info ) << "Determined the path of the executable as " << util::MSubject( prog_name.file_string() ) << " will search for plugins there..";
+			findPlugins( prog_name.remove_filename().directory_string() );
+		}
+	} else
+		LOG( Runtime, error ) << "Sorry, the path of the process is to long (must be less than 2048 characters) ";
+
+	LOG_IF( !w32_path_ok, Runtime, warning ) << "Could not determine the path of the executable, won't search for plugins there..";
+#else
 	findPlugins( std::string( PLUGIN_PATH ) );
+#endif
 }
 
 bool IOFactory::registerFileFormat( const FileFormatPtr plugin )
@@ -115,12 +139,12 @@ unsigned int IOFactory::findPlugins( const std::string &path )
 	boost::filesystem::path p( path );
 
 	if ( !exists( p ) ) {
-		LOG( Runtime, warning ) << util::MSubject( p.native_file_string() ) << " not found";
+		LOG( Runtime, warning ) << util::MSubject( p.file_string() ) << " not found";
 		return 0;
 	}
 
 	if ( !boost::filesystem::is_directory( p ) ) {
-		LOG( Runtime, warning ) << util::MSubject( p.native_file_string() ) << " is no directory";
+		LOG( Runtime, warning ) << util::MSubject( p.file_string() ) << " is no directory";
 		return 0;
 	}
 
@@ -196,7 +220,7 @@ size_t IOFactory::loadFile( std::list<Chunk> &ret, const boost::filesystem::path
 
 	if ( formatReader.empty() ) {
 		if( !boost::filesystem::exists( filename ) ) {
-			LOG( Runtime, error ) << util::MSubject( filename )
+			LOG( Runtime, error ) << util::MSubject( filename.file_string() )
 								  << " does not exist as file, and no suitable plugin was found to generate data from "
 								  << ( suffix_override.empty() ? std::string( "that name" ) : std::string( "the suffix \"" ) + suffix_override + "\"" );
 		} else if( suffix_override.empty() ) {
@@ -207,22 +231,22 @@ size_t IOFactory::loadFile( std::list<Chunk> &ret, const boost::filesystem::path
 	} else {
 		BOOST_FOREACH( FileFormatList::const_reference it, formatReader ) {
 			LOG( ImageIoDebug, info )
-					<< "plugin to load file" << with_dialect << " " << util::MSubject( filename ) << ": " << it->getName();
+					<< "plugin to load file" << with_dialect << " " << util::MSubject( filename.file_string() ) << ": " << it->getName();
 
 			try {
 				return it->load( ret, filename.file_string(), dialect );
 			} catch ( std::runtime_error &e ) {
 				if( suffix_override.empty() ) {
 					LOG( Runtime, formatReader.size() > 1 ? warning : error )
-							<< "Failed to load " <<  filename << " using " <<  it->getName() << with_dialect << " ( " << e.what() << " )";
+							<< "Failed to load " <<  filename.file_string() << " using " <<  it->getName() << with_dialect << " ( " << e.what() << " )";
 				} else {
 					LOG( Runtime, warning )
-							<< "The enforced format " << it->getName()  << " failed to read " << filename << with_dialect
+							<< "The enforced format " << it->getName()  << " failed to read " << filename.file_string() << with_dialect
 							<< " ( " << e.what() << " ), maybe it just wasn't the right format";
 				}
 			}
 		}
-		LOG_IF( boost::filesystem::exists( filename ) && formatReader.size() > 1, Runtime, error ) << "No plugin was able to load: "   << util::MSubject( filename ) << with_dialect;
+		LOG_IF( boost::filesystem::exists( filename ) && formatReader.size() > 1, Runtime, error ) << "No plugin was able to load: "   << util::MSubject( filename.file_string() ) << with_dialect;
 	}
 
 	return ret.size() - nimgs_old;//no plugin of proposed list could load file

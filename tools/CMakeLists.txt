@@ -47,5 +47,5 @@ install(TARGETS
   isisdiff
   isisconv
   isisflip
-  RUNTIME DESTINATION bin COMPONENT "CLI Tools")
+  RUNTIME DESTINATION bin COMPONENT "CLI_Tools")
 

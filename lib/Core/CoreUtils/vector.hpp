@@ -310,6 +310,7 @@ class vector4 : public FixedVector<TYPE, 4>
 public:
 	vector4() {}
 	template<typename TYPE2, typename CONTAINER2> vector4( const FixedVector<TYPE2, 4, CONTAINER2> &src ) : FixedVector< TYPE, 4> ( src ) {}
+	vector4( const TYPE src[4] ): FixedVector< TYPE, 4>( src ) {}
 	vector4( TYPE first, TYPE second, TYPE third = 0, TYPE fourth = 0 ) {
 		this->operator[]( 3 ) = fourth;
 		this->operator[]( 2 ) = third;

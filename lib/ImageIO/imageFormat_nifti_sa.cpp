@@ -46,7 +46,7 @@ bool WriteOp::setOutput( const std::string &filename, size_t voxelstart )
 
 nifti_1_header *WriteOp::getHeader() {return reinterpret_cast<nifti_1_header *>( &m_out[0] );}
 
-bool WriteOp::operator()( data::Chunk &ch, util::FixedVector< size_t, 4 > posInImage )
+bool WriteOp::operator()( data::Chunk &ch, util::vector4<size_t> posInImage )
 {
 	if( doCopy( ch, posInImage ) )
 		return true;
@@ -64,14 +64,14 @@ public:
 		WriteOp( image, bitsPerVoxel, doFlip ),
 		m_targetId( targetId ), m_scale( image.getScalingTo( m_targetId ) ) {}
 
-	bool doCopy( data::Chunk &ch, util::FixedVector< size_t, 4 > posInImage ) {
+	bool doCopy( data::Chunk &ch, util::vector4<size_t> posInImage ) {
 		size_t offset = m_voxelstart + getLinearIndex( posInImage ) * m_bpv / 8;
 		data::ValuePtrReference out_data = m_out.atByID( m_targetId, offset, ch.getVolume() );
 		ch.asValuePtrBase().copyTo( *out_data, m_scale );
 
 		if( m_doFlip ) {
 			// wrap the copied part back into a Chunk to flip it
-			util::FixedVector< size_t, 4 > sz = ch.getSizeAsVector();
+			util::vector4<size_t> sz = ch.getSizeAsVector();
 			data::Chunk cp( out_data, sz[data::rowDim], sz[data::columnDim], sz[data::sliceDim], sz[data::timeDim] ); // this is a cheap copy
 			cp.swapAlong( flip_dim ); // .. so changing its data, will also change the data we just copied
 		}
@@ -88,7 +88,7 @@ class FslRgbWriteOp: public WriteOp
 	struct VoxelCp: data::VoxelOp<util::color24> {
 		int mode;
 		uint8_t *ptr;
-		virtual bool operator()( util::color24 &vox, const isis::util::FixedVector< size_t, 4 >& /*pos*/ ) {
+		virtual bool operator()( util::color24 &vox, const isis::util::vector4<size_t>& /*pos*/ ) {
 			switch( mode ) {
 			case 0:
 				*ptr = vox.r;
@@ -115,7 +115,7 @@ public:
 		init( dims ); // reset our shape to use 3 timesteps as colors
 	}
 
-	bool doCopy( data::Chunk &src, util::FixedVector< size_t, 4 > posInImage ) {
+	bool doCopy( data::Chunk &src, util::vector4<size_t> posInImage ) {
 		data::Chunk ch = src;
 		ch.convertToType( data::ValuePtr<util::color24>::staticID, m_scale );
 		VoxelCp cp;
@@ -445,7 +445,7 @@ std::list< data::Chunk > ImageFormat_NiftiSa::parseHeader( const isis::image_io:
 		props.setPropertyAs( "nifti/quatern_c", head->quatern_c );
 		props.setPropertyAs( "nifti/quatern_d", head->quatern_d );
 		props.setPropertyAs( "nifti/qoffset", util::fvector4( head->qoffset_x, head->qoffset_y, head->qoffset_z, 0 ) );
-		props.setPropertyAs( "nifti/qfac", ( head->dim[0] == -1 ) ? : 1 );
+		props.setPropertyAs( "nifti/qfac", ( head->pixdim[0] == -1 ) ? -1 : 1 );
 
 		// voxel size
 		util::fvector4 v_size;
@@ -509,7 +509,7 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 	}
 
 	//set up the size - copy dim[0] values from dim[1]..dim[dim[0]]
-	util::FixedVector<size_t, 4> size;
+	util::vector4<size_t> size;
 	size.fill( 1 );
 
 	size.copyFrom( header->dim + 1, header->dim + 1 + header->dim[0] );
@@ -628,7 +628,7 @@ void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &fi
 util::Matrix4x4<double> ImageFormat_NiftiSa::getNiftiMatrix( const util::PropertyMap &props )
 {
 	util::dvector4 scale = props.getPropertyAs<util::dvector4>( "voxelSize" ); //used to put the scaling into the transformation
-	util::dvector4 offset = props.getPropertyAs<util::dvector4>( "indexOrigin" );
+	const util::dvector4 offset = props.getPropertyAs<util::dvector4>( "indexOrigin" );
 
 	if( props.hasProperty( "voxelGap" ) ) {
 		const util::dvector4 gap = props.getPropertyAs<util::dvector4>( "voxelGap" );
@@ -648,7 +648,7 @@ util::Matrix4x4<double> ImageFormat_NiftiSa::getNiftiMatrix( const util::Propert
 		mat_rows[data::rowDim] * scale[data::rowDim],
 		mat_rows[data::columnDim] * scale[data::columnDim],
 		mat_rows[data::sliceDim] * scale[data::sliceDim],
-		props.getPropertyAs<util::dvector4>( "indexOrigin" )
+		offset
 	).transpose();// the columns of the transform matrix are the scaled row-, column-, sliceVec and the offset
 	image2isis.elem( 3, 3 ) = 1; // element 4/4 must be "1"
 

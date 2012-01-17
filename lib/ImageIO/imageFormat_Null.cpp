@@ -42,7 +42,7 @@ class ImageFormat_Null: public FileFormat
 	}
 protected:
 	std::string suffixes( io_modes /*modes=both*/ )const {
-		return std::string( ".null .null.gz" );
+		return std::string( ".null" );
 	}
 	size_t getSize( const std::string &dialect ) {
 		size_t size = 10;

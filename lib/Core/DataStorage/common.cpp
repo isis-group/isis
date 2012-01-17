@@ -23,7 +23,7 @@ namespace _internal
 {
 
 
-bool transformCoords( isis::util::PropertyMap &properties, util::FixedVector<size_t, 4> size, boost::numeric::ublas::matrix<float> transform, bool transformCenterIsImageCenter  )
+bool transformCoords( isis::util::PropertyMap &properties, util::vector4<size_t> size, boost::numeric::ublas::matrix<float> transform, bool transformCenterIsImageCenter  )
 {
 	if( !properties.hasProperty( "rowVec" ) || !properties.hasProperty( "columnVec" ) || !properties.hasProperty( "sliceVec" )
 		|| !properties.hasProperty( "voxelSize" ) || !properties.hasProperty( "indexOrigin" ) ) {

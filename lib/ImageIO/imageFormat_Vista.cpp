@@ -979,8 +979,8 @@ template <typename TInput> void ImageFormat_Vista::addChunk( std::list< isis::da
 
 template <typename T> bool ImageFormat_Vista::copyImageToVista( const data::Image &image, VImage &vimage )
 {
-	const util::FixedVector<size_t, 4> csize = image.getChunk( 0, 0 ).getSizeAsVector();
-	const util::FixedVector<size_t, 4> isize = image.getSizeAsVector();
+	const util::vector4<size_t> csize = image.getChunk( 0, 0 ).getSizeAsVector();
+	const util::vector4<size_t> isize = image.getSizeAsVector();
 	LOG_IF( isize[3] > 1, Debug, error ) << "Vista cannot store 4D-Data in one VImage.";
 	const data::scaling_pair scale = image.getScalingTo( data::ValuePtr<T>::staticID );
 

@@ -7,7 +7,6 @@
 
 #define BOOST_TEST_MODULE ImageTest
 #define NOMINMAX 1
-#define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
@@ -172,7 +171,7 @@ BOOST_AUTO_TEST_CASE ( minimal_image_test )
 	const size_t size[] = {4, 4, 1, 2};
 	BOOST_CHECK( img.isClean() );
 	BOOST_CHECK( img.isValid() );
-	BOOST_CHECK_EQUAL( img.getSizeAsVector(), ( util::FixedVector<size_t, 4>( size ) ) );
+	BOOST_CHECK_EQUAL( img.getSizeAsVector(), ( util::vector4<size_t>( size ) ) );
 }
 
 BOOST_AUTO_TEST_CASE ( proplist_image_test )
@@ -220,8 +219,8 @@ BOOST_AUTO_TEST_CASE ( minindexdim_test )
 	BOOST_REQUIRE( img2.isClean() );
 	BOOST_REQUIRE( img2.isValid() );
 
-	BOOST_CHECK_EQUAL( img1.getSizeAsVector(), ( util::FixedVector<size_t, 4>( size1 ) ) );
-	BOOST_CHECK_EQUAL( img2.getSizeAsVector(), ( util::FixedVector<size_t, 4>( size2 ) ) );
+	BOOST_CHECK_EQUAL( img1.getSizeAsVector(), ( util::vector4<size_t>( size1 ) ) );
+	BOOST_CHECK_EQUAL( img2.getSizeAsVector(), ( util::vector4<size_t>( size2 ) ) );
 }
 
 
@@ -250,7 +249,7 @@ BOOST_AUTO_TEST_CASE ( type_selection_test )
 	BOOST_CHECK( img.isClean() );
 	BOOST_CHECK( img.isValid() );
 	BOOST_CHECK_EQUAL( img.copyChunksToVector( false ).size(), 4 );
-	BOOST_CHECK_EQUAL( img.getSizeAsVector(), ( util::FixedVector<size_t, 4>( size ) ) );
+	BOOST_CHECK_EQUAL( img.getSizeAsVector(), ( util::vector4<size_t>( size ) ) );
 	BOOST_CHECK_EQUAL( img.getMajorTypeID(), data::ValuePtr<int16_t>( NULL, 0 ).getTypeID() );
 }
 
@@ -345,13 +344,13 @@ BOOST_AUTO_TEST_CASE ( image_foreach_chunk_test )
 		class : public data::VoxelOp<uint8_t>
 		{
 		public:
-			bool operator()( uint8_t &vox, const util::FixedVector< size_t, 4 >& /*pos*/ ) {
+			bool operator()( uint8_t &vox, const util::vector4<size_t>& /*pos*/ ) {
 				vox = 42;
 				return true;
 			}
 		} vox42;
 	public:
-		bool operator()( data::Chunk &ch, util::FixedVector<size_t, 4> /*posInImage*/ ) {
+		bool operator()( data::Chunk &ch, util::vector4<size_t> /*posInImage*/ ) {
 			return ch.foreachVoxel( vox42 ) == 0;
 		}
 	} set42;
@@ -361,7 +360,7 @@ BOOST_AUTO_TEST_CASE ( image_foreach_chunk_test )
 		data::_internal::NDimensional<4> geometry;
 	public:
 		setIdx( data::_internal::NDimensional<4> geo ): geometry( geo ) {}
-		bool operator()( uint8_t &vox, const util::FixedVector< size_t, 4 >& pos ) {
+		bool operator()( uint8_t &vox, const util::vector4<size_t>& pos ) {
 			vox = geometry.getLinearIndex( &pos[0] );
 			return true;
 		}
@@ -369,7 +368,7 @@ BOOST_AUTO_TEST_CASE ( image_foreach_chunk_test )
 
 	BOOST_REQUIRE_EQUAL( img.foreachChunk( set42 ), 0 );
 
-	util::FixedVector<size_t, 4> imgSize = img.getSizeAsVector();
+	util::vector4<size_t> imgSize = img.getSizeAsVector();
 
 	for( size_t t = 0; t < imgSize[data::timeDim]; t++ ) {
 		for( size_t z = 0; z < imgSize[data::sliceDim]; z++ ) {
@@ -610,7 +609,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes_and_values )
 
 	srand ( time( NULL ) );
 	const size_t dummy[] = {nrX, nrY, nrS, nrT};
-	const util::FixedVector<size_t, 4> sizeVec( dummy );
+	const util::vector4<size_t> sizeVec( dummy );
 
 	BOOST_REQUIRE_EQUAL( img.copyChunksToVector( false ).size(), nrT * nrS );
 	BOOST_REQUIRE_EQUAL( img.getSizeAsVector(), sizeVec );
@@ -702,7 +701,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes )
 
 	const size_t dummy[] = {nrX, nrY, nrS, nrT};
 
-	const util::FixedVector<size_t, 4> sizeVec( dummy );
+	const util::vector4<size_t> sizeVec( dummy );
 
 	data::Image img( chunks );
 
@@ -730,7 +729,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes )
 
 	const size_t dummy2[] = {nrX, nrS, 1, nrT};
 
-	const util::FixedVector<size_t, 4> sizeVec2( dummy2 );
+	const util::vector4<size_t> sizeVec2( dummy2 );
 
 
 	BOOST_REQUIRE_EQUAL( img2.getSizeAsVector(), sizeVec2 );
@@ -757,7 +756,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes )
 
 	const size_t dummy3[] = {nrX, nrY, nrS, nrT};
 
-	const util::FixedVector<size_t, 4> sizeVec3( dummy3 );
+	const util::vector4<size_t> sizeVec3( dummy3 );
 
 	BOOST_REQUIRE_EQUAL( img3.getSizeAsVector(), sizeVec3 );
 
@@ -783,7 +782,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes )
 
 	const size_t dummy4[] = {nrX, nrY, nrS, nrT};
 
-	const util::FixedVector<size_t, 4> sizeVec4( dummy4 );
+	const util::vector4<size_t> sizeVec4( dummy4 );
 
 	BOOST_REQUIRE_EQUAL( img4.getSizeAsVector(), sizeVec4 );
 
@@ -806,7 +805,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes )
 
 	const size_t dummy5[] = {nrX, nrY, nrS, nrT};
 
-	const util::FixedVector<size_t, 4> sizeVec5( dummy5 );
+	const util::vector4<size_t> sizeVec5( dummy5 );
 
 	data::Image img5( chunks5 );
 
@@ -830,7 +829,7 @@ BOOST_AUTO_TEST_CASE ( image_init_test_sizes )
 
 	const size_t dummy6[] = {nrX, nrY, nrS, nrT};
 
-	const util::FixedVector<size_t, 4> sizeVec6( dummy6 );
+	const util::vector4<size_t> sizeVec6( dummy6 );
 
 	BOOST_REQUIRE( !img6.isClean() ); //reIndex on an empty image shall fail (size will be undefined)
 

@@ -73,11 +73,17 @@ endif(ISIS_BUILD_STATIC_AND_SHARED)
 
 ############################################################
 # set the plugin directory and the system dependend shared
-# library naming conventions
+# library naming conventions for DataStorage/io_factory.cpp
 ############################################################
+if(WIN32)
+set_source_files_properties( "DataStorage/io_factory.cpp" PROPERTIES COMPILE_FLAGS
+	"-DDL_SUFFIX=\\\"${CMAKE_SHARED_LIBRARY_SUFFIX}\\\" -DDL_PREFIX=\\\"${CMAKE_SHARED_LIBRARY_PREFIX}\\\""
+)
+else(WIN32)
 set_source_files_properties( "DataStorage/io_factory.cpp" PROPERTIES COMPILE_FLAGS
 	"-DPLUGIN_PATH=\\\"${CMAKE_INSTALL_PREFIX}/${ISIS_PLUGIN_INFIX}\\\" -DDL_SUFFIX=\\\"${CMAKE_SHARED_LIBRARY_SUFFIX}\\\" -DDL_PREFIX=\\\"${CMAKE_SHARED_LIBRARY_PREFIX}\\\""
 )
+endif(WIN32)
 
 ############################################################
 # Installation
@@ -85,8 +91,10 @@ set_source_files_properties( "DataStorage/io_factory.cpp" PROPERTIES COMPILE_FLA
 
 # install libraries
 install (TARGETS ${target_list}
+  RUNTIME DESTINATION bin COMPONENT RuntimeLibraries
   LIBRARY DESTINATION lib COMPONENT RuntimeLibraries
-  ARCHIVE DESTINATION lib COMPONENT Development)
+  ARCHIVE DESTINATION lib COMPONENT Development
+)
 
 # install header files
 install(FILES ${COREUTILS_HDR_FILES} DESTINATION include/isis/CoreUtils COMPONENT Development)

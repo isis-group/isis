@@ -15,7 +15,7 @@ int main( int argc, char **argv )
 	{
 	public:
 		data::dimensions dim;
-		bool operator()( data::Chunk &ch, util::FixedVector<size_t, 4> /*posInImage*/ ) {
+		bool operator()( data::Chunk &ch, util::vector4<size_t> /*posInImage*/ ) {
 			ch.swapAlong( dim );
 			return true;
 		}
