@@ -15,18 +15,21 @@ protected:
 	}
 	struct Reader {
 		virtual data::Chunk operator()( png_structp png_ptr, png_infop info_ptr )const = 0;
+		virtual ~Reader(){}
 	};
 	template<typename TYPE> struct GenericReader: Reader {
 		data::Chunk operator()( png_structp png_ptr, png_infop info_ptr )const {
-			data::Chunk ret = data::MemChunk<TYPE >( info_ptr->width, info_ptr->height );
+			const png_uint_32 width=png_get_image_width (png_ptr, info_ptr);
+			const png_uint_32 height=png_get_image_width (png_ptr, info_ptr);
+			data::Chunk ret = data::MemChunk<TYPE >( width, height );
 
 			/* png needs a pointer to each row */
-			png_bytep *row_pointers = ( png_bytep * ) malloc( sizeof( png_bytep ) * info_ptr->height );
+			boost::scoped_array<png_bytep> row_pointers(new png_bytep[height]);
 
-			for ( unsigned short r = 0; r < info_ptr->height; r++ )
+			for ( unsigned short r = 0; r < height; r++ )
 				row_pointers[r] = ( png_bytep )&ret.voxel<TYPE>( 0, r );
 
-			png_read_image( png_ptr, row_pointers );
+			png_read_image( png_ptr, row_pointers.get() );
 			return ret;
 		}
 	};
@@ -50,7 +53,7 @@ public:
 		png_infop info_ptr;
 		assert( buff.getRelevantDims() == 2 );
 		util::vector4<size_t> size = buff.getSizeAsVector();
-
+		
 		/* open the file */
 		fp = fopen( filename.c_str(), "wb" );
 
@@ -93,9 +96,17 @@ public:
 			return false;
 		}
 
+		// check the image sizes		
+		if(size[data::rowDim]>png_get_user_width_max(png_ptr)){
+			LOG(Runtime,error) << "Sorry the image is to wide to be written as PNG (maximum is " << png_get_user_width_max(png_ptr) << ")";
+		}
+		if(size[data::columnDim]>png_get_user_height_max(png_ptr)){
+			LOG(Runtime,error) << "Sorry the image is to high to be written as PNG (maximum is " << png_get_user_height_max(png_ptr) << ")";
+		}
+
 		/* set up the output control if you are using standard C streams */
 		png_init_io( png_ptr, fp );
-		png_set_IHDR( png_ptr, info_ptr, size[0], size[1], bit_depth, color_type, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT );
+		png_set_IHDR( png_ptr, info_ptr, (png_uint_32)size[0], (png_uint_32)size[1], bit_depth, color_type, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT );
 
 		/* png needs a pointer to each row */
 		png_byte **row_pointers = new png_byte*[size[1]];
@@ -158,13 +169,12 @@ public:
 		png_read_info( png_ptr, info_ptr );
 		png_set_interlace_handling( png_ptr );
 		png_read_update_info( png_ptr, info_ptr );
-
-		LOG( Debug, info ) << "color_type " << ( int )info_ptr->color_type << " bit_depth " << ( int )info_ptr->bit_depth;
-
-		boost::shared_ptr< Reader > reader = readers[info_ptr->color_type][info_ptr->bit_depth];
+		const png_byte color_type = png_get_color_type (png_ptr, info_ptr);
+		const png_byte bit_depth = png_get_bit_depth(png_ptr, info_ptr);
+		boost::shared_ptr< Reader > reader = readers[color_type][bit_depth];
 
 		if( !reader ) {
-			LOG( Runtime, error ) << "Sorry, the color type " << ( int )info_ptr->color_type << " with " << ( int )info_ptr->bit_depth << " bits is not supportet.";
+			LOG( Runtime, error ) << "Sorry, the color type " << ( int )color_type << " with " << ( int )bit_depth << " bits is not supportet.";
 			throwGenericError( "Wrong color type" );
 		}
 
@@ -195,7 +205,7 @@ public:
 		tImg.spliceDownTo( data::sliceDim );
 		std::vector<data::Chunk > chunks = tImg.copyChunksToVector( false ); // and get a list of the slices
 
-		int color_type,bit_depth=chunks.front().bytesPerVoxel()*8;
+		png_byte color_type,bit_depth=(png_byte)chunks.front().bytesPerVoxel()*8;
 		switch(isis_data_type){
 			case data::ValuePtr<uint8_t>::staticID:
 			case data::ValuePtr<uint16_t>::staticID:
