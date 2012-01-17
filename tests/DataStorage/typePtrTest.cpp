@@ -297,5 +297,25 @@ BOOST_AUTO_TEST_CASE( ValuePtr_rnd_minmax_test )
 	minMaxInt<double>();
 }
 
+
+BOOST_AUTO_TEST_CASE( ValuePtr_iterator_test )
+{
+	data::ValuePtr<short> array( 1024 );
+
+	for( int i = 0; i < 1024; i++ )
+		array[i] = i+1;
+
+	size_t cnt=0;
+	for(data::ValuePtr< short >::iterator i=array.begin();i!=array.end();i++,cnt++){
+		BOOST_CHECK_EQUAL(*i,cnt+1); // normal increment
+		BOOST_CHECK_EQUAL(*(array.begin()+cnt),cnt+1); //+=
+	}
+	BOOST_CHECK_EQUAL(*std::min_element(array.begin(),array.end()),1);
+	BOOST_CHECK_EQUAL(*std::max_element(array.begin(),array.end()),*(array.end()-1));
+
+	BOOST_CHECK_EQUAL(std::distance(array.begin(),array.end()),1024);
+
+	BOOST_CHECK_EQUAL(std::accumulate(array.begin(),array.end(),0),1024*(1024+1)/2); //gauss is my homie :-D
+}
 }
 }
