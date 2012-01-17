@@ -1,3 +1,13 @@
+isis (0.4.5gb918f62-0) stable; urgency=low
+
+  * add support for writing 24/48bit rgb, and for 16bit grayscale images as
+    PNG
+  * dicom plugin builds on WIN32
+  * fix bug which caused Chunk::swapAlong to fail for non 8bit data
+  * add support for reading 24/48bit rgb, and for 16bit grayscale images (PNG)
+
+ -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Tue, 17 Jan  2012 13:22:00 +0200
+
 isis (0.4.4gca0af59-0) stable; urgency=low
 
   * add png grayscale reading support
