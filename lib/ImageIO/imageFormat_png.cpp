@@ -15,16 +15,16 @@ protected:
 	}
 	struct Reader {
 		virtual data::Chunk operator()( png_structp png_ptr, png_infop info_ptr )const = 0;
-		virtual ~Reader(){}
+		virtual ~Reader() {}
 	};
 	template<typename TYPE> struct GenericReader: Reader {
 		data::Chunk operator()( png_structp png_ptr, png_infop info_ptr )const {
-			const png_uint_32 width=png_get_image_width (png_ptr, info_ptr);
-			const png_uint_32 height=png_get_image_width (png_ptr, info_ptr);
+			const png_uint_32 width = png_get_image_width ( png_ptr, info_ptr );
+			const png_uint_32 height = png_get_image_height ( png_ptr, info_ptr );
 			data::Chunk ret = data::MemChunk<TYPE >( width, height );
 
 			/* png needs a pointer to each row */
-			boost::scoped_array<png_bytep> row_pointers(new png_bytep[height]);
+			boost::scoped_array<png_bytep> row_pointers( new png_bytep[height] );
 
 			for ( unsigned short r = 0; r < height; r++ )
 				row_pointers[r] = ( png_bytep )&ret.voxel<TYPE>( 0, r );
@@ -53,7 +53,7 @@ public:
 		png_infop info_ptr;
 		assert( buff.getRelevantDims() == 2 );
 		util::vector4<size_t> size = buff.getSizeAsVector();
-		
+
 		/* open the file */
 		fp = fopen( filename.c_str(), "wb" );
 
@@ -96,24 +96,25 @@ public:
 			return false;
 		}
 
-		// check the image sizes		
-		if(size[data::rowDim]>png_get_user_width_max(png_ptr)){
-			LOG(Runtime,error) << "Sorry the image is to wide to be written as PNG (maximum is " << png_get_user_width_max(png_ptr) << ")";
+		// check the image sizes
+		if( size[data::rowDim] > png_get_user_width_max( png_ptr ) ) {
+			LOG( Runtime, error ) << "Sorry the image is to wide to be written as PNG (maximum is " << png_get_user_width_max( png_ptr ) << ")";
 		}
-		if(size[data::columnDim]>png_get_user_height_max(png_ptr)){
-			LOG(Runtime,error) << "Sorry the image is to high to be written as PNG (maximum is " << png_get_user_height_max(png_ptr) << ")";
+
+		if( size[data::columnDim] > png_get_user_height_max( png_ptr ) ) {
+			LOG( Runtime, error ) << "Sorry the image is to high to be written as PNG (maximum is " << png_get_user_height_max( png_ptr ) << ")";
 		}
 
 		/* set up the output control if you are using standard C streams */
 		png_init_io( png_ptr, fp );
-		png_set_IHDR( png_ptr, info_ptr, (png_uint_32)size[0], (png_uint_32)size[1], bit_depth, color_type, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT );
+		png_set_IHDR( png_ptr, info_ptr, ( png_uint_32 )size[0], ( png_uint_32 )size[1], bit_depth, color_type, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT );
 
 		/* png needs a pointer to each row */
 		png_byte **row_pointers = new png_byte*[size[1]];
-		row_pointers[0]=( png_byte * )buff.getValuePtrBase().getRawAddress().get();
+		row_pointers[0] = ( png_byte * )buff.getValuePtrBase().getRawAddress().get();
 
 		for ( unsigned short r = 1; r < size[1]; r++ )
-			row_pointers[r] = row_pointers[0]+ (buff.bytesPerVoxel()*buff.getLinearIndex(util::vector4<size_t>(0,r,0,0)));
+			row_pointers[r] = row_pointers[0] + ( buff.bytesPerVoxel() * buff.getLinearIndex( util::vector4<size_t>( 0, r, 0, 0 ) ) );
 
 		png_set_rows( png_ptr, info_ptr, row_pointers );
 
@@ -169,8 +170,8 @@ public:
 		png_read_info( png_ptr, info_ptr );
 		png_set_interlace_handling( png_ptr );
 		png_read_update_info( png_ptr, info_ptr );
-		const png_byte color_type = png_get_color_type (png_ptr, info_ptr);
-		const png_byte bit_depth = png_get_bit_depth(png_ptr, info_ptr);
+		const png_byte color_type = png_get_color_type ( png_ptr, info_ptr );
+		const png_byte bit_depth = png_get_bit_depth( png_ptr, info_ptr );
 		boost::shared_ptr< Reader > reader = readers[color_type][bit_depth];
 
 		if( !reader ) {
@@ -195,37 +196,40 @@ public:
 	}
 
 	void write( const data::Image &image, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & ) {
-		const short unsigned int isis_data_type=image.getMajorTypeID();
+		const short unsigned int isis_data_type = image.getMajorTypeID();
 
-		data::Image tImg=image;
-		tImg.convertToType(isis_data_type); // make image have unique type
+		data::Image tImg = image;
+		tImg.convertToType( isis_data_type ); // make image have unique type
+
 		if( image.getRelevantDims() < 2 ) { // ... make sure its made of slices
 			throwGenericError( "Cannot write png when image is made of stripes" );
 		}
+
 		tImg.spliceDownTo( data::sliceDim );
 		std::vector<data::Chunk > chunks = tImg.copyChunksToVector( false ); // and get a list of the slices
 
-		png_byte color_type,bit_depth=(png_byte)chunks.front().bytesPerVoxel()*8;
-		switch(isis_data_type){
-			case data::ValuePtr<uint8_t>::staticID:
-			case data::ValuePtr<uint16_t>::staticID:
-				color_type=PNG_COLOR_TYPE_GRAY;
-				break;
-			case data::ValuePtr<util::color24>::staticID:
-			case data::ValuePtr<util::color48>::staticID:
-				color_type=PNG_COLOR_TYPE_RGB;
-				bit_depth/=3;
-				break;
-			default:
-				LOG(Runtime,error) << "Sorry, writing images of type " << image.getMajorTypeName() << " is not supportet";
-				throwGenericError("unsupported data type");
+		png_byte color_type, bit_depth = ( png_byte )chunks.front().bytesPerVoxel() * 8;
+
+		switch( isis_data_type ) {
+		case data::ValuePtr<uint8_t>::staticID:
+		case data::ValuePtr<uint16_t>::staticID:
+			color_type = PNG_COLOR_TYPE_GRAY;
+			break;
+		case data::ValuePtr<util::color24>::staticID:
+		case data::ValuePtr<util::color48>::staticID:
+			color_type = PNG_COLOR_TYPE_RGB;
+			bit_depth /= 3;
+			break;
+		default:
+			LOG( Runtime, error ) << "Sorry, writing images of type " << image.getMajorTypeName() << " is not supportet";
+			throwGenericError( "unsupported data type" );
 		}
 
 
 		if( util::istring( dialect.c_str() ) == util::istring( "middle" ) ) { //save only the middle
 			LOG( Runtime, info ) << "Writing the slice " << chunks.size() / 2 + 1 << " of " << chunks.size() << " slices as png-image of size " << chunks.front().getSizeAsString();
 
-			if( !write_png( filename, chunks[chunks.size() / 2],color_type,bit_depth ) ) {
+			if( !write_png( filename, chunks[chunks.size() / 2], color_type, bit_depth ) ) {
 				throwGenericError( std::string( "Failed to write " ) + filename );
 			}
 		} else { //save all slices
@@ -240,7 +244,7 @@ public:
 				const std::string num = boost::lexical_cast<std::string>( ++number );
 				const std::string name = fname.first + "_" + std::string( numLen - num.length(), '0' ) + num + fname.second;
 
-				if( !write_png( name, ref,color_type,bit_depth ) ) {
+				if( !write_png( name, ref, color_type, bit_depth ) ) {
 					throwGenericError( std::string( "Failed to write " ) + name );;
 				}
 			}

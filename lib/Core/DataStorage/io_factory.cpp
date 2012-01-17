@@ -95,22 +95,24 @@ IOFactory::IOFactory()
 
 #ifdef WIN32
 	TCHAR lpExeName[2048];
-	DWORD lExeName=GetModuleFileName(NULL,lpExeName,2048);
-	bool w32_path_ok=false;
-	if(lExeName==0){
-		LOG(Runtime,error) << "Failed to get the process name " << util::MSubject(util::getLastSystemError());
-	} else if(lExeName<2048){
-		lpExeName[lExeName]='\0';
-		boost::filesystem::path prog_name(lpExeName);
-		if(boost::filesystem::exists(prog_name)){
-			w32_path_ok=true;
-			LOG(Runtime,info) << "Determined the path of the executable as " << util::MSubject(prog_name.file_string()) << " will search for plugins there..";
-			findPlugins(prog_name.remove_filename().directory_string());
+	DWORD lExeName = GetModuleFileName( NULL, lpExeName, 2048 );
+	bool w32_path_ok = false;
+
+	if( lExeName == 0 ) {
+		LOG( Runtime, error ) << "Failed to get the process name " << util::MSubject( util::getLastSystemError() );
+	} else if( lExeName < 2048 ) {
+		lpExeName[lExeName] = '\0';
+		boost::filesystem::path prog_name( lpExeName );
+
+		if( boost::filesystem::exists( prog_name ) ) {
+			w32_path_ok = true;
+			LOG( Runtime, info ) << "Determined the path of the executable as " << util::MSubject( prog_name.file_string() ) << " will search for plugins there..";
+			findPlugins( prog_name.remove_filename().directory_string() );
 		}
 	} else
-		LOG(Runtime,error) << "Sorry, the path of the process is to long (must be less than 2048 characters) ";
+		LOG( Runtime, error ) << "Sorry, the path of the process is to long (must be less than 2048 characters) ";
 
-	LOG_IF(!w32_path_ok, Runtime,warning) << "Could not determine the path of the executable, won't search for plugins there..";
+	LOG_IF( !w32_path_ok, Runtime, warning ) << "Could not determine the path of the executable, won't search for plugins there..";
 #else
 	findPlugins( std::string( PLUGIN_PATH ) );
 #endif
