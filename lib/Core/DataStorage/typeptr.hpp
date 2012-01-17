@@ -33,9 +33,9 @@ namespace data
 namespace _internal
 {
 /// @cond _hidden
-template<typename T, bool isNumber> struct getMinMaxImpl { // fallback for unsupportet types
+template<typename T, bool isNumber> struct getMinMaxImpl { // fallback for unsupported types
 	std::pair<T, T> operator()( const ValuePtr<T> &/*ref*/ ) const {
-		LOG( Debug, error ) << "min/max computation of " << util::Value<T>::staticName() << " is not supportet";
+		LOG( Debug, error ) << "min/max computation of " << util::Value<T>::staticName() << " is not supported";
 		return std::pair<T, T>();
 	}
 };
@@ -67,7 +67,7 @@ template<> std::pair<int16_t, int16_t> calcMinMax( const int16_t *data, size_t l
 template<> std::pair<int32_t, int32_t> calcMinMax( const int32_t *data, size_t len );
 #endif //__SSE2__
 
-template<typename T> struct getMinMaxImpl<T, true> { // generic minmax for numbers (this _must_ not be run on empty ValuePtr)
+template<typename T> struct getMinMaxImpl<T, true> { // generic min-max for numbers (this _must_ not be run on empty ValuePtr)
 	std::pair<T, T> operator()( const ValuePtr<T> &ref ) const {
 		return calcMinMax( &ref[0], ref.getLength() );
 	}
@@ -76,8 +76,8 @@ template<typename T> struct getMinMaxImpl<T, true> { // generic minmax for numbe
 
 /**
  * Basic iterator for ValuePtr.
- * This is a common iterator following the random access iterator modell.
- * It is not part of the reference counting used in ValuePtr. So make shure you keep the ValuePtr you created it from while you use this iterator.
+ * This is a common iterator following the random access iterator model.
+ * It is not part of the reference counting used in ValuePtr. So make sure you keep the ValuePtr you created it from while you use this iterator.
  */
 template<typename TYPE> class ValuePtrIterator: public std::iterator<std::random_access_iterator_tag,TYPE>
 {
@@ -113,7 +113,7 @@ public:
 	ValuePtrIterator<TYPE> &operator+=(size_t n) {p+=n; return *this;}
 	ValuePtrIterator<TYPE> &operator-=(size_t n) {p-=n; return *this;}
 
-	TYPE operator[](size_t n)const {return *(p+n);}
+	TYPE& operator[](size_t n)const {return *(p+n);}
 };
 
 }
@@ -130,7 +130,7 @@ template<typename TYPE> class ValuePtr: public _internal::ValuePtrBase
 {
 	boost::shared_ptr<TYPE> m_val;
 protected:
-	ValuePtr() {} // should only be used by child classed who initialize the pointer themself
+	ValuePtr() {} // should only be used by child classed who initialize the pointer them self
 	ValuePtrBase *clone() const {
 		return new ValuePtr( *this );
 	}
@@ -141,14 +141,14 @@ public:
 	/// delete-functor which does nothing (in case someone else manages the data).
 	struct NonDeleter {
 		void operator()( TYPE *p ) {
-			//we have to cast the pointer to void* here, because in case of u_int8_t it will try to print the "string"
+			//we have to cast the pointer to void* here, because in case of uint8_t it will try to print the "string"
 			LOG( Debug, info ) << "Not freeing pointer " << ( void * )p << " (" << ValuePtr<TYPE>::staticName() << ") ";
 		};
 	};
 	/// Default delete-functor for c-arrays (uses free()).
 	struct BasicDeleter {
 		void operator()( TYPE *p ) {
-			//we have to cast the pointer to void* here, because in case of u_int8_t it will try to print the "string"
+			//we have to cast the pointer to void* here, because in case of uint8_t it will try to print the "string"
 			LOG( Debug, verbose_info ) << "Freeing pointer " << ( void * )p << " (" << ValuePtr<TYPE>::staticName() << ") ";
 			free( p );
 		};
@@ -165,11 +165,11 @@ public:
 
 		LOG_IF( length == 0, Debug, warning )
 				<< "Creating an empty ValuePtr of type " << util::MSubject( staticName() )
-				<< " you should overwrite it with a usefull pointer before using it";
+				<< " you should overwrite it with a useful pointer before using it";
 	}
 
 	/**
-	 * Creates ValuePtr from a boost:shared_ptr of the same type.
+	 * Creates ValuePtr from a boost::shared_ptr of the same type.
 	 * It will inherit the deleter of the shared_ptr.
 	 * \param ptr the shared_ptr to share the data with
 	 * \param length the length of the used array (ValuePtr does NOT check for length,
@@ -180,8 +180,6 @@ public:
 	/**
 	 * Creates ValuePtr from a pointer of type TYPE.
 	 * The pointers are automatically deleted by an instance of BasicDeleter and should not be used outside once used here.
-	 * If ptr is a pointer to C++ objects (delete[] needed) you must use
-	 * ValuePtr(ptr,len,ValuePtr\<TYPE\>::ObjectArrayDeleter())!
 	 * \param ptr the pointer to the used array
 	 * \param length the length of the used array (ValuePtr does NOT check for length,
 	 * this is just here for child classes which may want to check)
@@ -215,23 +213,21 @@ public:
 	}
 
 	iterator begin(){return iterator(m_val.get());}
-	iterator end(){return iterator(m_val.get()+m_len);};
+	iterator end(){return begin()+m_len;};
 	const_iterator begin()const{return const_iterator(m_val.get());}
-	const_iterator end()const{return const_iterator(m_val.get()+m_len);}
+	const_iterator end()const{return begin()+m_len;}
 
 	/// @copydoc util::Value::toString
 	virtual std::string toString( bool labeled = false )const {
 		std::string ret;
 
 		if ( m_len ) {
-			const TYPE *ptr = m_val.get();
-
 			// if you get trouble with to_tm here include <boost/date_time/gregorian/gregorian.hpp> or <boost/date_time/posix_time/posix_time.hpp> in your cpp
-			for ( size_t i = 0; i < m_len - 1; i++ )
-				ret += util::Value<TYPE>( ptr[i] ).toString( false ) + "|";
+			for ( const_iterator i = begin(); i < end() - 1; i++ )
+				ret += util::Value<TYPE>( *i ).toString( false ) + "|";
 
 
-			ret += util::Value<TYPE>( ptr[m_len - 1] ).toString( labeled );
+			ret += util::Value<TYPE>( *(end()-1) ).toString( labeled );
 		}
 
 		return boost::lexical_cast<std::string>( m_len ) + "#" + ret;
@@ -253,10 +249,10 @@ public:
 	 * \return reference to element at at given index.
 	 */
 	TYPE &operator[]( size_t idx ) {
-		return ( m_val.get() )[idx];
+		return begin()[idx];
 	}
 	const TYPE &operator[]( size_t idx )const {
-		return ( m_val.get() )[idx];
+		return begin()[idx];
 	}
 	/**
 	 * Implicit conversion to boost::shared_ptr\<TYPE\>
