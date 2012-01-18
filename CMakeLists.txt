@@ -29,10 +29,12 @@ set(ISIS_VERSION
   ${ISIS_VERSION_MAJOR}.${ISIS_VERSION_MINOR}.${ISIS_VERSION_PATCH}
   CACHE INTERNAL "The current Version of the ISIS project")
 
+if(NOT WIN32)
 ############################################################
 # set install infix for plugin installation path
 ############################################################
 set(ISIS_PLUGIN_INFIX lib/isis/plugins)
+endif(NOT WIN32)
 
 ############################################################
 # set project specific module path
@@ -90,6 +92,7 @@ endif(ISIS_DEBUG_LOG)
 # since ISIS stongly depends on the boost libraries we will configure them
 # globally.
 find_package(Boost REQUIRED COMPONENTS filesystem regex system date_time)
+
 include_directories(${Boost_INCLUDE_DIR})
 
 ############################################################
@@ -137,7 +140,7 @@ SET(CPACK_PACKAGE_VENDOR "the friendly isis team")
 SET(CPACK_PACKAGE_CONTACT "reimer@cbs.mpg.de")
 SET(CPACK_PACKAGE_NAME "isis-core")
 SET(CPACK_BUNDLE_NAME ${CPACK_PACKAGE_NAME})
-SET(CPACK_COMPONENTS_ALL "CLI Tools" "IO plugins" "Development" "RuntimeLibraries")
+SET(CPACK_COMPONENTS_ALL "CLI_Tools" "IO_plugins" "Development" "RuntimeLibraries")
 #SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/ReadMe.txt")
 SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/COPYING.txt")
 SET(CPACK_PACKAGE_VERSION_MAJOR ${${CMAKE_PROJECT_NAME}_VERSION_MAJOR})
@@ -145,13 +148,19 @@ SET(CPACK_PACKAGE_VERSION_MINOR ${${CMAKE_PROJECT_NAME}_VERSION_MINOR})
 SET(CPACK_PACKAGE_VERSION_PATCH ${${CMAKE_PROJECT_NAME}_VERSION_PATCH})
 SET(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${ISIS_CORE_REV_STRING}-${CMAKE_SYSTEM_NAME}-${PROCESSOR}-${CMAKE_BUILD_TYPE})
 #SET(CPACK_PACKAGE_INSTALL_DIRECTORY "CMake ${${CMAKE_PROJECT_NAME}_VERSION_MAJOR}.${${CMAKE_PROJECT_NAME}_VERSION_MINOR}")
+SET(CPACK_NSIS_MODIFY_PATH ON)
+SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\isis-group.github.com/isis")
 INCLUDE(CPack)
 
 # status messages
 message(STATUS "/bin directory: ${CMAKE_INSTALL_PREFIX}/bin")
 message(STATUS "/lib directory: ${CMAKE_INSTALL_PREFIX}/lib")
 message(STATUS "/include directory: ${CMAKE_INSTALL_PREFIX}/include")
+if(WIN32)
+message(STATUS "/plugins directory: ${CMAKE_INSTALL_PREFIX}/bin")
+else(WIN32)
 message(STATUS "/plugins directory: ${CMAKE_INSTALL_PREFIX}/${ISIS_PLUGIN_INFIX}")
+endif(WIN32)
 
 # build the ISIS libraries
 add_subdirectory(lib)

@@ -32,9 +32,10 @@ namespace data
 
 namespace _internal
 {
-template<typename T, bool isNumber> struct getMinMaxImpl { // fallback for unsupportet types
+/// @cond _hidden
+template<typename T, bool isNumber> struct getMinMaxImpl { // fallback for unsupported types
 	std::pair<T, T> operator()( const ValuePtr<T> &/*ref*/ ) const {
-		LOG( Debug, error ) << "min/max computation of " << util::Value<T>::staticName() << " is not supportet";
+		LOG( Debug, error ) << "min/max computation of " << util::Value<T>::staticName() << " is not supported";
 		return std::pair<T, T>();
 	}
 };
@@ -52,8 +53,6 @@ template<typename T> std::pair<T, T> calcMinMax( const T *data, size_t len )
 	return result;
 }
 
-/// @cond _hidden
-
 #ifdef __SSE2__
 ////////////////////////////////////////////////
 // specialize calcMinMax for (u)int(8,16,32)_t /
@@ -68,12 +67,55 @@ template<> std::pair<int16_t, int16_t> calcMinMax( const int16_t *data, size_t l
 template<> std::pair<int32_t, int32_t> calcMinMax( const int32_t *data, size_t len );
 #endif //__SSE2__
 
-template<typename T> struct getMinMaxImpl<T, true> { // generic minmax for numbers (this _must_ not be run on empty ValuePtr)
+template<typename T> struct getMinMaxImpl<T, true> { // generic min-max for numbers (this _must_ not be run on empty ValuePtr)
 	std::pair<T, T> operator()( const ValuePtr<T> &ref ) const {
 		return calcMinMax( &ref[0], ref.getLength() );
 	}
 };
 /// @endcond
+
+/**
+ * Basic iterator for ValuePtr.
+ * This is a common iterator following the random access iterator model.
+ * It is not part of the reference counting used in ValuePtr. So make sure you keep the ValuePtr you created it from while you use this iterator.
+ */
+template<typename TYPE> class ValuePtrIterator: public std::iterator<std::random_access_iterator_tag,TYPE>
+{
+	TYPE *p;
+	typedef typename std::iterator<std::random_access_iterator_tag,TYPE>::difference_type distance;
+public:
+	ValuePtrIterator():p(NULL){}
+	ValuePtrIterator(TYPE *_p):p(_p){}
+
+	ValuePtrIterator<TYPE>& operator++() {++p;return *this;}
+	ValuePtrIterator<TYPE>& operator--() {--p;return *this;}
+
+	ValuePtrIterator<TYPE>  operator++(int) {ValuePtrIterator<TYPE> tmp = *this;++*this;return tmp;}
+	ValuePtrIterator<TYPE>  operator--(int) {ValuePtrIterator<TYPE> tmp = *this;--*this;return tmp;}
+
+	TYPE& operator*() const { return *p; }
+	TYPE* operator->() const { return p; }
+
+	bool operator==(const ValuePtrIterator<TYPE> &cmp)const {return p==cmp.p;}
+	bool operator!=(const ValuePtrIterator<TYPE> &cmp)const {return !(*this == cmp);}
+
+	bool operator>(const ValuePtrIterator<TYPE> &cmp)const {return p>cmp.p;}
+	bool operator<(const ValuePtrIterator<TYPE> &cmp)const {return p<cmp.p;}
+
+	bool operator>=(const ValuePtrIterator<TYPE> &cmp)const {return p>=cmp.p;}
+	bool operator<=(const ValuePtrIterator<TYPE> &cmp)const {return p<=cmp.p;}
+
+	ValuePtrIterator<TYPE> operator+(distance n)const {return ValuePtrIterator<TYPE>(p+n);}
+	ValuePtrIterator<TYPE> operator-(distance n)const {return ValuePtrIterator<TYPE>(p-n);}
+
+	distance operator-(const ValuePtrIterator<TYPE> &cmp)const {return p-cmp.p;}
+
+	ValuePtrIterator<TYPE> &operator+=(distance n) {p+=n; return *this;}
+	ValuePtrIterator<TYPE> &operator-=(distance n) {p-=n; return *this;}
+
+	TYPE &operator[](distance n)const {return *(p+n);}
+};
+
 }
 
 /**
@@ -87,34 +129,34 @@ template<typename T> struct getMinMaxImpl<T, true> { // generic minmax for numbe
 template<typename TYPE> class ValuePtr: public _internal::ValuePtrBase
 {
 	boost::shared_ptr<TYPE> m_val;
+	static const util::ValueReference getValueFrom(const void* p){
+		return util::Value<TYPE>(*reinterpret_cast<const TYPE*>(p));
+	}
+	static void setValueInto(void* p,const util::_internal::ValueBase& val){
+		*reinterpret_cast<TYPE*>(p) = val.as<TYPE>();
+	}
 protected:
-	ValuePtr() {} // should only be used by child classed who initialize the pointer themself
+	ValuePtr() {} // should only be used by child classed who initialize the pointer them self
 	ValuePtrBase *clone() const {
 		return new ValuePtr( *this );
 	}
 public:
+	typedef _internal::ValuePtrIterator<TYPE> iterator;
+	typedef _internal::ValuePtrIterator<const TYPE> const_iterator;
 	static const unsigned short staticID = util::_internal::TypeID<TYPE>::value << 8;
 	/// delete-functor which does nothing (in case someone else manages the data).
 	struct NonDeleter {
 		void operator()( TYPE *p ) {
-			//we have to cast the pointer to void* here, because in case of u_int8_t it will try to print the "string"
+			//we have to cast the pointer to void* here, because in case of uint8_t it will try to print the "string"
 			LOG( Debug, info ) << "Not freeing pointer " << ( void * )p << " (" << ValuePtr<TYPE>::staticName() << ") ";
 		};
 	};
 	/// Default delete-functor for c-arrays (uses free()).
 	struct BasicDeleter {
 		void operator()( TYPE *p ) {
-			//we have to cast the pointer to void* here, because in case of u_int8_t it will try to print the "string"
+			//we have to cast the pointer to void* here, because in case of uint8_t it will try to print the "string"
 			LOG( Debug, verbose_info ) << "Freeing pointer " << ( void * )p << " (" << ValuePtr<TYPE>::staticName() << ") ";
 			free( p );
-		};
-	};
-	/// Default delete-functor for arrays of objects (uses delete[]).
-	struct ObjectArrayDeleter {
-		void operator()( TYPE *p ) {
-			//we have to cast the pointer to void* here, because in case of u_int8_t it will try to print the "string"
-			LOG( Debug, info ) << "Deleting object array at " << ( void * )p << " (" << ValuePtr<TYPE>::staticName() << ") ";
-			delete[] p;
 		};
 	};
 	/**
@@ -129,11 +171,11 @@ public:
 
 		LOG_IF( length == 0, Debug, warning )
 				<< "Creating an empty ValuePtr of type " << util::MSubject( staticName() )
-				<< " you should overwrite it with a usefull pointer before using it";
+				<< " you should overwrite it with a useful pointer before using it";
 	}
 
 	/**
-	 * Creates ValuePtr from a boost:shared_ptr of the same type.
+	 * Creates ValuePtr from a boost::shared_ptr of the same type.
 	 * It will inherit the deleter of the shared_ptr.
 	 * \param ptr the shared_ptr to share the data with
 	 * \param length the length of the used array (ValuePtr does NOT check for length,
@@ -144,8 +186,6 @@ public:
 	/**
 	 * Creates ValuePtr from a pointer of type TYPE.
 	 * The pointers are automatically deleted by an instance of BasicDeleter and should not be used outside once used here.
-	 * If ptr is a pointer to C++ objects (delete[] needed) you must use
-	 * ValuePtr(ptr,len,ValuePtr\<TYPE\>::ObjectArrayDeleter())!
 	 * \param ptr the pointer to the used array
 	 * \param length the length of the used array (ValuePtr does NOT check for length,
 	 * this is just here for child classes which may want to check)
@@ -177,20 +217,26 @@ public:
 	boost::shared_ptr<void> getRawAddress( size_t offset = 0 ) { // use the const version and cast away the const
 		return boost::const_pointer_cast<void>( const_cast<const ValuePtr *>( this )->getRawAddress( offset ) );
 	}
+    virtual _internal::GenericValueIterator beginGeneric(){
+		return _internal::GenericValueIterator(m_val.get(),bytesPerElem(),getValueFrom,setValueInto);
+	}
+
+	iterator begin(){return iterator(m_val.get());}
+	iterator end(){return begin()+m_len;};
+	const_iterator begin()const{return const_iterator(m_val.get());}
+	const_iterator end()const{return begin()+m_len;}
 
 	/// @copydoc util::Value::toString
 	virtual std::string toString( bool labeled = false )const {
 		std::string ret;
 
 		if ( m_len ) {
-			const TYPE *ptr = m_val.get();
-
 			// if you get trouble with to_tm here include <boost/date_time/gregorian/gregorian.hpp> or <boost/date_time/posix_time/posix_time.hpp> in your cpp
-			for ( size_t i = 0; i < m_len - 1; i++ )
-				ret += util::Value<TYPE>( ptr[i] ).toString( false ) + "|";
+			for ( const_iterator i = begin(); i < end() - 1; i++ )
+				ret += util::Value<TYPE>( *i ).toString( false ) + "|";
 
 
-			ret += util::Value<TYPE>( ptr[m_len - 1] ).toString( labeled );
+			ret += util::Value<TYPE>( *(end()-1) ).toString( labeled );
 		}
 
 		return boost::lexical_cast<std::string>( m_len ) + "#" + ret;
@@ -212,10 +258,10 @@ public:
 	 * \return reference to element at at given index.
 	 */
 	TYPE &operator[]( size_t idx ) {
-		return ( m_val.get() )[idx];
+		return begin()[idx];
 	}
 	const TYPE &operator[]( size_t idx )const {
-		return ( m_val.get() )[idx];
+		return begin()[idx];
 	}
 	/**
 	 * Implicit conversion to boost::shared_ptr\<TYPE\>

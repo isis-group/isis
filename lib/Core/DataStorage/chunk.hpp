@@ -52,6 +52,7 @@ template <typename TYPE> class VoxelOp: std::unary_function<bool, TYPE>
 {
 public:
 	virtual bool operator()( TYPE &vox, const util::vector4<size_t> &pos ) = 0;
+	virtual ~VoxelOp() {}
 };
 
 /**

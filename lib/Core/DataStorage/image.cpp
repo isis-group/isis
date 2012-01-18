@@ -415,8 +415,6 @@ bool Image::reIndex()
 			}
 		}
 
-		const util::fvector4 &voxeSize = propertyValue( "voxelSize" )->castTo<util::fvector4>();
-
 		const Chunk &next = chunkAt( 1 );
 
 		if ( next.hasProperty( "indexOrigin" ) ) {

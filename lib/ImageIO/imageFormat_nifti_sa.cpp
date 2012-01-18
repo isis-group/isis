@@ -445,7 +445,7 @@ std::list< data::Chunk > ImageFormat_NiftiSa::parseHeader( const isis::image_io:
 		props.setPropertyAs( "nifti/quatern_c", head->quatern_c );
 		props.setPropertyAs( "nifti/quatern_d", head->quatern_d );
 		props.setPropertyAs( "nifti/qoffset", util::fvector4( head->qoffset_x, head->qoffset_y, head->qoffset_z, 0 ) );
-		props.setPropertyAs( "nifti/qfac", ( head->dim[0] == -1 ) ? : 1 );
+		props.setPropertyAs( "nifti/qfac", ( head->pixdim[0] == -1 ) ? -1 : 1 );
 
 		// voxel size
 		util::fvector4 v_size;
@@ -566,10 +566,17 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 		throwGenericError("unsupported format");
 // 		data_src=bitRead(mfile.at<uint8_t>( header->vox_offset),size.product());
 	} else {
-		data_src = mfile.atByID( nifti_type2isis_type[header->datatype], header->vox_offset );
-		LOG( Runtime, info ) << "Mapping nifti image as " << data_src->getTypeName() << " of length " << data_src->getLength();
-		LOG_IF( ( size_t )header->bitpix != data_src->bytesPerElem() * 8, Runtime, warning )
-				<< "nifti field bitpix does not fit the bytesize of the given datatype (" << data_src->getTypeName() << "/" << header->bitpix <<  ")";
+		unsigned int type=nifti_type2isis_type[header->datatype];
+		if(type){
+			data_src = mfile.atByID(type, header->vox_offset );
+			LOG( Runtime, info ) << "Mapping nifti image as " << data_src->getTypeName() << " of length " << data_src->getLength();
+			LOG_IF( ( size_t )header->bitpix != data_src->bytesPerElem() * 8, Runtime, warning )
+					<< "nifti field bitpix does not fit the bytesize of the given datatype (" << data_src->getTypeName() << "/" << header->bitpix <<  ")";
+
+		} else {
+			LOG(Runtime,error) << "Sorry, the nifti datatype " << header->datatype << " is not (yet) supported";
+			throwGenericError("unsupported datatype");
+		}
 	}
 
 	std::list<data::Chunk> newChunks = parseHeader( header, data::Chunk( data_src, size[0], size[1], size[2], size[3] ) );
@@ -664,7 +671,7 @@ void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &fi
 util::Matrix4x4<double> ImageFormat_NiftiSa::getNiftiMatrix( const util::PropertyMap &props )
 {
 	util::dvector4 scale = props.getPropertyAs<util::dvector4>( "voxelSize" ); //used to put the scaling into the transformation
-	util::dvector4 offset = props.getPropertyAs<util::dvector4>( "indexOrigin" );
+	const util::dvector4 offset = props.getPropertyAs<util::dvector4>( "indexOrigin" );
 
 	if( props.hasProperty( "voxelGap" ) ) {
 		const util::dvector4 gap = props.getPropertyAs<util::dvector4>( "voxelGap" );
@@ -684,7 +691,7 @@ util::Matrix4x4<double> ImageFormat_NiftiSa::getNiftiMatrix( const util::Propert
 		mat_rows[data::rowDim] * scale[data::rowDim],
 		mat_rows[data::columnDim] * scale[data::columnDim],
 		mat_rows[data::sliceDim] * scale[data::sliceDim],
-		props.getPropertyAs<util::dvector4>( "indexOrigin" )
+		offset
 	).transpose();// the columns of the transform matrix are the scaled row-, column-, sliceVec and the offset
 	image2isis.elem( 3, 3 ) = 1; // element 4/4 must be "1"
 

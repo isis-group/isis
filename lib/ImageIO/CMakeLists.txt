@@ -24,10 +24,10 @@ option(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM "Enable Dicom-IO plugin" OFF)
 option(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA "Enable Vista-IO plugin" OFF)
 option(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ "Enable proxy plugin for compressed files" ON)
 option(${CMAKE_PROJECT_NAME}_IOPLUGIN_TAR "Enable proxy plugin for tar datasets" ON)
-option(${CMAKE_PROJECT_NAME}_IOPLUGIN_FLIST "Enable proxy plugin which gets filenames to be red from a file or stdin" ON)
-option(${CMAKE_PROJECT_NAME}_IOPLUGIN_PROCESS "Enable proxy plugin which gets filenames to be red from a child process" ON)
+option(${CMAKE_PROJECT_NAME}_IOPLUGIN_FLIST "Enable proxy plugin which gets filenames from a file or stdin" ON)
+option(${CMAKE_PROJECT_NAME}_IOPLUGIN_PROCESS "Enable proxy plugin which gets filenames from a child process" ON)
 option(${CMAKE_PROJECT_NAME}_IOPLUGIN_RAW "Enable plugin for raw data output" ON)
-OPTION(${CMAKE_PROJECT_NAME}_IOPLUGIN_SIEMENSTCPIP "Enable plugin for Siemens data coming on TCP Port" OFF)
+option(${CMAKE_PROJECT_NAME}_IOPLUGIN_SIEMENSTCPIP "Enable plugin for Siemens data coming on TCP Port" OFF)
 
 ############################################################
 # the plugins ...
@@ -158,7 +158,7 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_PNG)
   include_directories(${INCPATH_PNG})
 
   add_library(isisImageFormat_png SHARED imageFormat_png.cpp)
-  target_link_libraries(isisImageFormat_png ${LIB_Z} isis_core ${ISIS_LIB_DEPENDS} ${LIB_PNG})
+  target_link_libraries(isisImageFormat_png isis_core ${ISIS_LIB_DEPENDS} ${LIB_PNG} ${LIB_Z})
 
   set(TARGETS ${TARGETS} isisImageFormat_png)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_PNG)
@@ -172,7 +172,7 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ)
   include_directories(${INCPATH_GZIP})
 
   add_library(isisImageFormat_gz_proxy SHARED imageFormat_gz_proxy.cpp)
-  target_link_libraries(isisImageFormat_gz_proxy ${LIB_Z} isis_core ${ISIS_LIB_DEPENDS})
+  target_link_libraries(isisImageFormat_gz_proxy isis_core ${ISIS_LIB_DEPENDS} ${LIB_Z} )
 
   set(TARGETS ${TARGETS} isisImageFormat_gz_proxy)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_GZ)
@@ -231,7 +231,7 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM)
 	find_library(LIB_TIFF tiff)
 	find_library(LIB_PNG png12)
 
-	set(DCM_LIBS ${LIB_DCMIMGLE} ${LIB_DCMIMAGE}  ${LIB_DCMDATA}  ${LIB_OFSTD}  ${LIB_Z} ${LIB_TIFF} ${LIB_PNG})
+	set(DCM_LIBS ${LIB_DCMIMGLE} ${LIB_DCMIMAGE}  ${LIB_DCMDATA}) #higher functions
 
 	find_path(INCPATH_DCMTK "dcmtk/dcmdata/dcfilefo.h")
 	include_directories(${INCPATH_DCMTK})
@@ -241,7 +241,14 @@ if(${CMAKE_PROJECT_NAME}_IOPLUGIN_DICOM)
 		message(STATUS "dcmtk 3.6 found - linking against ${LIB_DCM_LOG}")
 		list(APPEND DCM_LIBS ${LIB_DCM_LOG} )
 	endif(LIB_DCM_LOG)
+
+	list(APPEND DCM_LIBS ${LIB_OFSTD}  ${LIB_Z} ${LIB_TIFF} ${LIB_PNG}) #low level functions
+
 	add_library(isisImageFormat_Dicom SHARED imageFormat_Dicom.cpp imageFormat_DicomParser.cpp)
+
+	if(WIN32)
+	list(APPEND DCM_LIBS ws2_32 netapi32 wsock32)
+	endif(WIN32)
 
 	target_link_libraries(isisImageFormat_Dicom ${DCM_LIBS} isis_core ${ISIS_LIB_DEPENDS})
 	set(TARGETS ${TARGETS} isisImageFormat_Dicom)
@@ -270,7 +277,11 @@ endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_SIEMENSTCPIP)
 ###########################################################################
 # prepare all plugins for installation
 ###########################################################################
+if(WIN32)
+message(STATUS "Installing following plugins to ${CMAKE_INSTALL_PREFIX}/bin")
+else(WIN32)
 message(STATUS "Installing following plugins to ${CMAKE_INSTALL_PREFIX}/${ISIS_PLUGIN_INFIX}")
+endif(WIN32)
 
 foreach(PLUGIN ${TARGETS})
   message(STATUS " == ${PLUGIN}")
@@ -280,7 +291,11 @@ endforeach(PLUGIN)
 ###########################################################
 # actual install
 ###########################################################
-install(TARGETS ${TARGETS} DESTINATION ${ISIS_PLUGIN_INFIX} COMPONENT "IO plugins" )
+if(WIN32)
+install(TARGETS ${TARGETS} RUNTIME DESTINATION bin COMPONENT "IO_plugins")
+else(WIN32)
+install(TARGETS ${TARGETS} DESTINATION ${ISIS_PLUGIN_INFIX} COMPONENT "IO_plugins" )
+endif(WIN32)
 
 # # uninstall target
 # configure_file(

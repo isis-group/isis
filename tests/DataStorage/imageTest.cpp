@@ -7,7 +7,6 @@
 
 #define BOOST_TEST_MODULE ImageTest
 #define NOMINMAX 1
-#define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
