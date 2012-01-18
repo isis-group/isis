@@ -205,6 +205,51 @@ size_t ValuePtrBase::useCount() const
 {
 	return getRawAddress().use_count();
 }
+GenericValueIterator ValuePtrBase::endGeneric()
+{
+	return beginGeneric()+m_len;
+}
+
+
+GenericValueIterator::GenericValueIterator():p(NULL),byteSize(0),getValueFunc(NULL),setValueFunc(NULL){}
+GenericValueIterator::GenericValueIterator(void* _p, size_t _byteSize, ValueAdapter::Getter _getValueFunc, ValueAdapter::Setter _setValueFunc):
+	p((uint8_t*)_p),byteSize(_byteSize),getValueFunc(_getValueFunc),setValueFunc(_setValueFunc){}
+
+GenericValueIterator& GenericValueIterator::operator++() {p+=byteSize;return *this;}
+GenericValueIterator& GenericValueIterator::operator--(){p-=byteSize;return *this;}
+
+GenericValueIterator& GenericValueIterator::operator++(int ){GenericValueIterator& tmp = *this;++*this;return tmp;}
+GenericValueIterator& GenericValueIterator::operator--(int ){GenericValueIterator& tmp = *this;--*this;return tmp;}
+
+GenericValueIterator::reference GenericValueIterator::operator*() const
+{
+	assert(getValueFunc);
+	return ValueAdapter(p,getValueFunc,setValueFunc);
+}
+
+GenericValueIterator::pointer GenericValueIterator::operator->() const{return operator*();}
+
+bool GenericValueIterator::operator==(const GenericValueIterator& cmp) const{return p==cmp.p;}
+bool GenericValueIterator::operator!=(const GenericValueIterator& cmp) const{return !(*this == cmp);}
+
+bool GenericValueIterator::operator>(const GenericValueIterator& cmp) const{return p>cmp.p;}
+bool GenericValueIterator::operator<(const GenericValueIterator& cmp) const{return p<cmp.p;}
+
+bool GenericValueIterator::operator>=(const GenericValueIterator& cmp) const{return p>=cmp.p;}
+bool GenericValueIterator::operator<=(const GenericValueIterator& cmp) const{return p<=cmp.p;}
+
+ptrdiff_t GenericValueIterator::operator-(const GenericValueIterator& cmp) const{return (p-cmp.p)/byteSize;}
+
+GenericValueIterator GenericValueIterator::operator+(ptrdiff_t n) const{return (GenericValueIterator(*this)+=n);}
+GenericValueIterator GenericValueIterator::operator-(ptrdiff_t n) const{return (GenericValueIterator(*this)-=n);}
+
+GenericValueIterator& GenericValueIterator::operator+=(ptrdiff_t n){p+=(n*byteSize); return *this;}
+GenericValueIterator& GenericValueIterator::operator-=(ptrdiff_t n){p-=(n*byteSize); return *this;}
+
+GenericValueIterator::reference GenericValueIterator::operator[](ptrdiff_t n) const{
+#warning implement me
+	return *((*this)+n);
+}
 
 }
 }

@@ -82,6 +82,7 @@ template<typename T> struct getMinMaxImpl<T, true> { // generic min-max for numb
 template<typename TYPE> class ValuePtrIterator: public std::iterator<std::random_access_iterator_tag,TYPE>
 {
 	TYPE *p;
+	typedef typename std::iterator<std::random_access_iterator_tag,TYPE>::difference_type distance;
 public:
 	ValuePtrIterator():p(NULL){}
 	ValuePtrIterator(TYPE *_p):p(_p){}
@@ -104,16 +105,15 @@ public:
 	bool operator>=(const ValuePtrIterator<TYPE> &cmp)const {return p>=cmp.p;}
 	bool operator<=(const ValuePtrIterator<TYPE> &cmp)const {return p<=cmp.p;}
 
-	ValuePtrIterator<TYPE> operator+(size_t n)const {return ValuePtrIterator<TYPE>(p+n);}
-	ValuePtrIterator<TYPE> operator-(size_t n)const {return ValuePtrIterator<TYPE>(p-n);}
+	ValuePtrIterator<TYPE> operator+(distance n)const {return ValuePtrIterator<TYPE>(p+n);}
+	ValuePtrIterator<TYPE> operator-(distance n)const {return ValuePtrIterator<TYPE>(p-n);}
 
-	typename std::iterator<std::random_access_iterator_tag,TYPE>::difference_type
-	operator-(const ValuePtrIterator<TYPE> cmp)const {return p-cmp.p;}
+	distance operator-(const ValuePtrIterator<TYPE> &cmp)const {return p-cmp.p;}
 
-	ValuePtrIterator<TYPE> &operator+=(size_t n) {p+=n; return *this;}
-	ValuePtrIterator<TYPE> &operator-=(size_t n) {p-=n; return *this;}
+	ValuePtrIterator<TYPE> &operator+=(distance n) {p+=n; return *this;}
+	ValuePtrIterator<TYPE> &operator-=(distance n) {p-=n; return *this;}
 
-	TYPE& operator[](size_t n)const {return *(p+n);}
+	TYPE &operator[](distance n)const {return *(p+n);}
 };
 
 }
@@ -129,6 +129,12 @@ public:
 template<typename TYPE> class ValuePtr: public _internal::ValuePtrBase
 {
 	boost::shared_ptr<TYPE> m_val;
+	static const util::ValueReference getValueFrom(const void* p){
+		return util::Value<TYPE>(*reinterpret_cast<const TYPE*>(p));
+	}
+	static void setValueInto(void* p,const util::_internal::ValueBase& val){
+		*reinterpret_cast<TYPE*>(p) = val.as<TYPE>();
+	}
 protected:
 	ValuePtr() {} // should only be used by child classed who initialize the pointer them self
 	ValuePtrBase *clone() const {
@@ -210,6 +216,9 @@ public:
 	}
 	boost::shared_ptr<void> getRawAddress( size_t offset = 0 ) { // use the const version and cast away the const
 		return boost::const_pointer_cast<void>( const_cast<const ValuePtr *>( this )->getRawAddress( offset ) );
+	}
+    virtual _internal::GenericValueIterator beginGeneric(){
+		return _internal::GenericValueIterator(m_val.get(),bytesPerElem(),getValueFrom,setValueInto);
 	}
 
 	iterator begin(){return iterator(m_val.get());}
