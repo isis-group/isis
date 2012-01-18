@@ -500,7 +500,7 @@ isis::data::ValuePtr< bool > ImageFormat_NiftiSa::bitRead(data::ValuePtr< uint8_
 	isis::data::ValuePtr< bool > ret(size);
 	for(size_t i=0;i<size;i++){
 		const size_t byte=i/8;
-		const uint8_t mask=1<<(i%8);
+		const uint8_t mask=128>>(i%8);
 		ret[i]=mask&src[byte];
 	}
 	return ret;
@@ -562,9 +562,7 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 		data_src = buff;
 		size[data::timeDim] = 1;
 	} else if(header->datatype == NIFTI_TYPE_BINARY){ // image is binary encoded - needs special decoding
-		LOG(Runtime,error) << "Sorry, bitmasks are not supported yet";
-		throwGenericError("unsupported format");
-// 		data_src=bitRead(mfile.at<uint8_t>( header->vox_offset),size.product());
+		data_src=bitRead(mfile.at<uint8_t>( header->vox_offset),size.product());
 	} else {
 		unsigned int type=nifti_type2isis_type[header->datatype];
 		if(type){
