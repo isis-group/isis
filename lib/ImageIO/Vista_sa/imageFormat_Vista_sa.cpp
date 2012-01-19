@@ -17,14 +17,16 @@
 */
 
 #include "imageFormat_Vista_sa.hpp"
-#include "boost/spirit.hpp"
 
 #include "DataStorage/fileptr.hpp"
 
 
-namespace isis {
+namespace isis
+{
 
-namespace image_io {
+namespace image_io
+{
+
 
 
 ImageFormat_VistaSa::ImageFormat_VistaSa()
@@ -32,27 +34,55 @@ ImageFormat_VistaSa::ImageFormat_VistaSa()
 
 }
 
-std::string ImageFormat_VistaSa::getName() const { return std::string("Vista standalone"); }
-std::string ImageFormat_VistaSa::suffixes(FileFormat::io_modes mode) const { return std::string( ".v" ); }
-
-
-int ImageFormat_VistaSa::load(std::list< data::Chunk >& chunks, const std::string& filename, const std::string& ) throw( std::runtime_error & )
+std::string ImageFormat_VistaSa::getName() const
 {
-	data::FilePtr mfile( filename );
-	if( !mfile.good() ) {
-		if( errno ) {
-			throwSystemError( errno, filename + " could not be opened" );
-			errno = 0;
-		} else
-			throwGenericError( filename + " could not be opened" );
-	}
+	return std::string ( "Vista standalone" );
+}
+std::string ImageFormat_VistaSa::suffixes ( FileFormat::io_modes mode ) const
+{
+	return std::string ( ".v" );
+}
 
+
+int ImageFormat_VistaSa::load ( std::list< data::Chunk >& chunks, const std::string& filename, const std::string& ) throw ( std::runtime_error & )
+{
+	using namespace boost::spirit;
+
+	data::FilePtr mfile ( filename );
+	if ( !mfile.good() )
+	{
+		if ( errno )
+		{
+			throwSystemError ( errno, filename + " could not be opened" );
+			errno = 0;
+		}
+		else
+			throwGenericError ( filename + " could not be opened" );
+	}
+	//parse the vista header
+
+	_internal::VistaSaParser vParser ( mfile );
+	_internal::VistaSaParser::HeaderObjectListType headerObjectMap = vParser.getHeaderObjectMap();
+
+
+	// 	data::FilePtr::iterator begin = mfile.begin();
+	// 	std::list< data::ValuePtr< uint8_t > > d;
+	// 	bool r = qi::parse<data::FilePtr::iterator >( begin,mfile.end() , lit("V-data 2") >> *ascii::space
+	// 																		>> '{',
+	// 						d );
+	// 	std::cout << r << std::endl;
+	// 	BOOST_FOREACH( std::list< data::ValuePtr< uint8_t > >::const_reference number, d)
+	// 	{
+	// 		std::cout << number << std::endl;
+	// 	}
+	// // 	bool r = qi::parse< data::FilePtr::const_iterator >( mfile.begin(), mfile.end(),  );
+	// // 	if(r) std::cout << "§fsjkhfksdh" << std::endl;
 }
 
 
 
 
-void ImageFormat_VistaSa::write(const data::Image& image, const std::string& filename, const std::string& dialect) throw( std::runtime_error & )
+void ImageFormat_VistaSa::write ( const data::Image& image, const std::string& filename, const std::string& dialect ) throw ( std::runtime_error & )
 {
 
 }
@@ -65,5 +95,5 @@ void ImageFormat_VistaSa::write(const data::Image& image, const std::string& fil
 
 isis::image_io::FileFormat *factory()
 {
-    return new isis::image_io::ImageFormat_VistaSa();
+	return new isis::image_io::ImageFormat_VistaSa();
 }

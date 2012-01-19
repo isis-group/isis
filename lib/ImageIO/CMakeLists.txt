@@ -63,9 +63,10 @@ endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_NIFTI_SA)
 ############################################################
 if(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA_SA)
 
-	set(VISTA_SRC_FILES Vista_sa/imageFormat_Vista_sa.cpp)
+	set(VISTA_SRC_FILES Vista_sa/imageFormat_Vista_sa.cpp Vista_sa/VistaSaParser.cpp )
 	include_directories(${Boost_INCLUDE_DIR})
 	add_library(isisImageFormat_Vista_sa SHARED ${VISTA_SRC_FILES})
+	add_definitions(-DPHOENIX_LIMIT=10)
 	target_link_libraries(isisImageFormat_Vista_sa isis_core  ${ISIS_LIB_DEPENDS} ${Boost_LIBRARIES})
 	set(TARGETS ${TARGETS} isisImageFormat_Vista_sa)
 endif(${CMAKE_PROJECT_NAME}_IOPLUGIN_VISTA_SA)
