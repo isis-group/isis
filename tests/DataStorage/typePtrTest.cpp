@@ -254,9 +254,9 @@ BOOST_AUTO_TEST_CASE( ValuePtr_boolean_conversion_test )
 BOOST_AUTO_TEST_CASE( ValuePtr_minmax_test )
 {
 	const float init[] = {-1./0., -1.8, -1.5, -1.3, -0.6, -0.2, 1.8, 1.5, 1.3, sqrt(-1),1./0, 0.6, 0.2};
-	data::ValuePtr<float> floatArray( 10 );
+	data::ValuePtr<float> floatArray( sizeof(init)/sizeof(float) );
 	//without scaling
-	floatArray.copyFromMem( init, 10 );
+	floatArray.copyFromMem( init, sizeof(init)/sizeof(float) );
 	{
 		std::pair<util::ValueReference, util::ValueReference> minmax = floatArray.getMinMax();
 		BOOST_CHECK( minmax.first->is<float>() );
