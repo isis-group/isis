@@ -23,11 +23,10 @@ DEB_CMAKE_EXTRA_FLAGS = \
 	-DISIS_ITK:BOOL=ON \
 	-DISIS_BUILD_PYTHON_EXT:BOOL=ON \
 	-DISIS_USE_LIBOIL:BOOL=ON \
-	-DQT_QMAKE_EXECUTABLE=/usr/bin/qmake-qt4 \
-	-DLIB_DCMDATA=/usr/lib/libdcmdata.a \
-	-DLIB_DCMIMAGE=/usr/lib/libdcmimage.a \
-	-DLIB_DCMIMGLE=/usr/lib/libdcmimgle.a \
-	-DLIB_OFSTD=/usr/lib/libofstd.a \
+	-DQT_QMAKE_EXECUTABLE=/usr/bin/qmake-qt4
+
+#CFLAGS += -fvisibility-inlines-hidden
+#CXXFLAGS += -fvisibility-inlines-hidden
 
 # get number of parallel builds from the default environment
 # variable DEB_BUILD_OPTIONS. The expected value is 'parrallel=#'.
