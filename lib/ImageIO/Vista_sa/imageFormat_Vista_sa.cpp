@@ -19,6 +19,9 @@
 #include "imageFormat_Vista_sa.hpp"
 #include "boost/spirit.hpp"
 
+#include "DataStorage/fileptr.hpp"
+
+
 namespace isis {
 
 namespace image_io {
@@ -33,15 +36,23 @@ std::string ImageFormat_VistaSa::getName() const { return std::string("Vista sta
 std::string ImageFormat_VistaSa::suffixes(FileFormat::io_modes mode) const { return std::string( ".v" ); }
 
 
-int ImageFormat_VistaSa::load(std::list< data::Chunk >& chunks, const std::string& filename, const std::string& )
+int ImageFormat_VistaSa::load(std::list< data::Chunk >& chunks, const std::string& filename, const std::string& ) throw( std::runtime_error & )
 {
+	data::FilePtr mfile( filename );
+	if( !mfile.good() ) {
+		if( errno ) {
+			throwSystemError( errno, filename + " could not be opened" );
+			errno = 0;
+		} else
+			throwGenericError( filename + " could not be opened" );
+	}
 
 }
 
 
 
 
-void ImageFormat_VistaSa::write(const data::Image& image, const std::string& filename, const std::string& dialect)
+void ImageFormat_VistaSa::write(const data::Image& image, const std::string& filename, const std::string& dialect) throw( std::runtime_error & )
 {
 
 }
