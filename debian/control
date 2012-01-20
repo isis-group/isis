@@ -46,6 +46,7 @@ Description: The ISIS package provides a general I/O framework for neuroimaging
 Package: isisio0-nifti
 Section: science
 Architecture: any
+Conflicts: isisio0-nifti-sa
 Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (= 0.4.5gb918f62-0)
 Description: The ISIS package provides a general I/O framework for neuroimaging
  data.  Being started with fMRI data, it can handle several established data
@@ -58,6 +59,7 @@ Description: The ISIS package provides a general I/O framework for neuroimaging
 Package: isisio0-nifti-sa
 Section: science
 Architecture: any
+Conflicts: isisio0-nifti
 Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (= 0.4.5gb918f62-0)
 Description: The ISIS package provides a general I/O framework for neuroimaging
  data.  Being started with fMRI data, it can handle several established data
