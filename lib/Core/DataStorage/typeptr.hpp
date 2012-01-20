@@ -20,7 +20,7 @@
 #ifndef TYPEPTR_HPP
 #define TYPEPTR_HPP
 
-#include <boost/type_traits/is_float.hpp>
+#include <boost/static_assert.hpp>
 
 #include "typeptr_base.hpp"
 #include "typeptr_converter.hpp"
@@ -42,11 +42,18 @@ template<typename T, bool isNumber> struct getMinMaxImpl { // fallback for unsup
 };
 template<typename T> std::pair<T, T> calcMinMax( const T *data, size_t len )
 {
-	std::pair<T, T> result( std::numeric_limits<T>::max(), std::numeric_limits<T>::min() );
+	BOOST_MPL_ASSERT_RELATION(std::numeric_limits<float>::has_denorm,!=,std::denorm_indeterminate);//well we're pretty f**ed in this case
+	std::pair<T, T> result(
+		std::numeric_limits<T>::max(),
+		std::numeric_limits<float>::has_denorm ? -std::numeric_limits<T>::max(): std::numeric_limits<T>::min() //for types with denormalization min is _not_ the lowest value
+	);
 	LOG( Runtime, verbose_info ) << "using generic min/max computation for " << util::Value<T>::staticName();
 
 	for (const T* i=data;i<data+len; ++i ) {
-		if(boost::is_float<T>::value && isinf(*i))
+		if(
+			std::numeric_limits<T>::has_infinity &&
+			(*i==std::numeric_limits<T>::infinity() || *i==-std::numeric_limits<T>::infinity())
+		)
 			continue; // skip this one if its inf
 
 		if ( *i > result.second )result.second = *i; //*i is the new max if its bigger than the current (gets rid of nan as well)
