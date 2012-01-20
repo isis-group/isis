@@ -29,6 +29,59 @@ namespace isis
 {
 namespace data
 {
+namespace _internal{
+	/**
+	 * Generic iterator for voxels im images.
+	 * It automatically jumps from chunk to chunk.
+	 * It needs the chunks and the image to be there for to work properly (so don't delete the image, and dont reIndex it),
+	 * It assumes that all Chunks have the same size (which is a rule for Image as well, so this should be given)
+	 */
+	class GenericImageIterator:public std::iterator<
+		std::random_access_iterator_tag,
+		GenericValueIterator::value_type,
+		GenericValueIterator::difference_type,
+		GenericValueIterator::pointer,
+		GenericValueIterator::reference
+	>
+{
+		std::vector<boost::shared_ptr<Chunk> >::iterator first_chit,current_chit,last_chit;
+		Chunk::iterator current_it;
+		difference_type ch_len;
+		Chunk::iterator::difference_type currentDist()const;
+	public:
+		GenericImageIterator();
+		GenericImageIterator(std::vector<boost::shared_ptr<Chunk> >::iterator _first_chit,std::vector<boost::shared_ptr<Chunk> >::iterator _last_chit);
+		
+		GenericImageIterator& operator++();
+		GenericImageIterator& operator--();
+
+		GenericImageIterator operator++(int);
+		GenericImageIterator operator--(int);
+
+		GenericImageIterator::reference operator*() const;
+		GenericImageIterator::pointer  operator->() const;
+
+		bool operator==(const GenericImageIterator& cmp)const;
+		bool operator!=(const GenericImageIterator& cmp)const;
+
+		bool operator>(const GenericImageIterator &cmp)const;
+		bool operator<(const GenericImageIterator &cmp)const;
+
+		bool operator>=(const GenericImageIterator &cmp)const;
+		bool operator<=(const GenericImageIterator &cmp)const;
+
+		difference_type operator-(const GenericImageIterator &cmp)const;
+
+		GenericImageIterator operator+(difference_type n)const;
+		GenericImageIterator operator-(difference_type n)const;
+
+
+		GenericImageIterator &operator+=(difference_type n);
+		GenericImageIterator &operator-=(difference_type n);
+
+		GenericImageIterator::reference operator[](difference_type n)const;
+	};
+}
 
 /// Base class for operators used for foreachChunk
 class ChunkOp : std::unary_function<Chunk &, bool>
@@ -56,7 +109,7 @@ public:
 	 */
 	void setIndexingDim( dimensions d = rowDim );
 	enum orientation {axial, reversed_axial, sagittal, reversed_sagittal, coronal, reversed_coronal};
-
+	typedef _internal::GenericImageIterator iterator;
 protected:
 	_internal::SortedChunkList set;
 	std::vector<boost::shared_ptr<Chunk> > lookup;
@@ -276,6 +329,9 @@ public:
 	/// \returns the typename correspondig to the result of typeID
 	std::string getMajorTypeName() const;
 
+	iterator begin();
+	iterator end();
+	
 	/**
 	 * Get a chunk via index (and the lookup table).
 	 * The returned chunk will be a cheap copy of the original chunk.
