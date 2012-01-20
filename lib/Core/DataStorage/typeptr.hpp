@@ -230,7 +230,7 @@ public:
 		return boost::const_pointer_cast<void>( const_cast<const ValuePtr *>( this )->getRawAddress( offset ) );
 	}
     virtual _internal::GenericValueIterator beginGeneric(){
-		return _internal::GenericValueIterator(m_val.get(),bytesPerElem(),getValueFrom,setValueInto);
+		return _internal::GenericValueIterator(m_val.get(),m_val.get(),bytesPerElem(),getValueFrom,setValueInto);
 	}
 
 	iterator begin(){return iterator(m_val.get());}
