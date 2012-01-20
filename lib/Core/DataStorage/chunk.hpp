@@ -79,6 +79,9 @@ protected:
 
 	Chunk() {}; //do not use this
 public:
+
+	typedef _internal::GenericValueIterator iterator;
+	
 	Chunk( const ValuePtrReference &src, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 );
 
 	/**
@@ -147,6 +150,9 @@ public:
 	template<typename TYPE> size_t foreachVoxel( VoxelOp<TYPE> &op ) {
 		return foreachVoxel<TYPE>( op, util::vector4<size_t>() );
 	}
+
+	iterator begin();
+	iterator end();
 
 	_internal::ValuePtrBase &asValuePtrBase() {return operator*();}
 	const _internal::ValuePtrBase &getValuePtrBase()const {return operator*();}
