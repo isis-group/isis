@@ -22,6 +22,7 @@
 #include "../CoreUtils/type_base.hpp"
 #include "typeptr_converter.hpp"
 #include "common.hpp"
+#include <boost/mpl/if.hpp>
 
 namespace isis
 {
@@ -29,6 +30,74 @@ namespace data
 {
 namespace _internal
 {
+class ValueAdapter:public util::ValueReference
+{
+public:
+	typedef const util::ValueReference (*Getter)(const void*);
+	typedef	void (*Setter)(void*,const util::_internal::ValueBase&);
+private:
+	uint8_t *const p;
+	Setter setValueFunc;
+public:
+	ValueAdapter(uint8_t *const _p,Getter _getValueFunc,Setter _setValueFunc):util::ValueReference(_getValueFunc(_p)),p(_p),setValueFunc(_setValueFunc){}
+	ValueAdapter operator=(const util::ValueReference& val){
+		assert(setValueFunc);
+		setValueFunc(p,*val);
+		return *this;
+	}
+	// to make some algorithms work
+	bool operator==(const util::ValueReference& val)const{return (*this)->eq(*val);}
+	bool operator!=(const util::ValueReference& val)const{return !operator==(val);}
+
+	bool operator<(const util::ValueReference& val)const{return (*this)->lt(*val);}
+	bool operator>(const util::ValueReference& val)const{return (*this)->gt(*val);}
+};
+
+class GenericValueIterator :
+	public std::iterator<std::random_access_iterator_tag,
+		ValueAdapter,
+		ptrdiff_t,
+		ValueAdapter,
+		ValueAdapter
+	>
+{
+	uint8_t *p;
+	size_t byteSize;
+	ValueAdapter::Getter getValueFunc;
+	ValueAdapter::Setter setValueFunc;
+public:
+	GenericValueIterator();
+	GenericValueIterator(void* _p,size_t _byteSize,ValueAdapter::Getter _getValueFunc,ValueAdapter::Setter _setValueFunc);
+
+	GenericValueIterator& operator++();
+	GenericValueIterator& operator--();
+
+	GenericValueIterator& operator++(int);
+	GenericValueIterator& operator--(int);
+
+	GenericValueIterator::reference operator*() const;
+	GenericValueIterator::pointer  operator->() const;
+
+	bool operator==(const GenericValueIterator& cmp)const;
+	bool operator!=(const GenericValueIterator& cmp)const;
+
+	bool operator>(const GenericValueIterator &cmp)const;
+	bool operator<(const GenericValueIterator &cmp)const;
+
+	bool operator>=(const GenericValueIterator &cmp)const;
+	bool operator<=(const GenericValueIterator &cmp)const;
+
+	ptrdiff_t operator-(const GenericValueIterator &cmp)const;
+
+	GenericValueIterator operator+(ptrdiff_t n)const;
+	GenericValueIterator operator-(ptrdiff_t n)const;
+
+
+	GenericValueIterator &operator+=(ptrdiff_t n);
+	GenericValueIterator &operator-=(ptrdiff_t n);
+
+	GenericValueIterator::reference operator[](ptrdiff_t n)const;
+};
 
 class ValuePtrBase : public util::_internal::GenericValue
 {
@@ -41,8 +110,9 @@ protected:
 
 	/// Create a ValuePtr of the same type pointing at the same address.
 	virtual ValuePtrBase *clone()const = 0;
-
+	
 public:
+
 	/// Proxy-Deleter to encapsulate the real deleter/shared_ptr when creating shared_ptr for parts of a shared_ptr
 	class DelProxy : public boost::shared_ptr<const void>
 	{
@@ -68,6 +138,9 @@ public:
 
 	/// \copydoc getRawAddress
 	virtual boost::shared_ptr<void> getRawAddress( size_t offset = 0 ) = 0;
+
+	virtual GenericValueIterator beginGeneric()=0;
+	GenericValueIterator endGeneric();
 
 	typedef util::_internal::ValueReference<ValuePtrBase> Reference;
 	typedef ValuePtrConverterMap::mapped_type::mapped_type Converter;
