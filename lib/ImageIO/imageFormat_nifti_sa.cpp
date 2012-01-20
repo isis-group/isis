@@ -530,10 +530,17 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 		data_src = buff;
 		size[data::timeDim] = 1;
 	} else {
-		data_src = mfile.atByID( nifti_type2isis_type[header->datatype], header->vox_offset );
-		LOG( Runtime, info ) << "Mapping nifti image as " << data_src->getTypeName() << " of length " << data_src->getLength();
-		LOG_IF( ( size_t )header->bitpix != data_src->bytesPerElem() * 8, Runtime, warning )
-				<< "nifti field bitpix does not fit the bytesize of the given datatype (" << data_src->getTypeName() << "/" << header->bitpix <<  ")";
+		unsigned int type=nifti_type2isis_type[header->datatype];
+		if(type){
+			data_src = mfile.atByID(type, header->vox_offset );
+			LOG( Runtime, info ) << "Mapping nifti image as " << data_src->getTypeName() << " of length " << data_src->getLength();
+			LOG_IF( ( size_t )header->bitpix != data_src->bytesPerElem() * 8, Runtime, warning )
+					<< "nifti field bitpix does not fit the bytesize of the given datatype (" << data_src->getTypeName() << "/" << header->bitpix <<  ")";
+
+		} else {
+			LOG(Runtime,error) << "Sorry, the nifti datatype " << header->datatype << " is not (yet) supported";
+			throwGenericError("unsupported datatype");
+		}
 	}
 
 	std::list<data::Chunk> newChunks = parseHeader( header, data::Chunk( data_src, size[0], size[1], size[2], size[3] ) );
