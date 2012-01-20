@@ -18,24 +18,46 @@
 
 #include "VistaSaParser.hpp"
 
-namespace isis {
-namespace image_io {
-namespace _internal {
+
+namespace isis
+{
+namespace image_io
+{
+namespace _internal
+{
 
 
-VistaSaParser::VistaHeader ( data::FilePtr fPtr )
-	: m_filePtr(fPtr) {}
+VistaSaParser::VistaSaParser ( data::FilePtr fPtr )
+	: m_filePtr ( fPtr ) {}
 
 VistaSaParser::HeaderObjectListType VistaSaParser::getHeaderObjectMap ()
 {
-       m_vheader = parseHeader();
+	m_vheader = parseHeader();
 }
 
 VistaSaParser::HeaderListType VistaSaParser::parseHeader ()
 {
 
+	using namespace boost::spirit;
+	std::list< uint8_t > instream;
 	data::FilePtr::iterator begin = m_filePtr.begin();
+
+	bool parsed = qi::parse<data::FilePtr::iterator> ( begin, m_filePtr.end(),
+				  qi::lit ( "V-data 2" )
+				  >> ascii::char_
+				  >> '{'
+				  >> *ascii::char_
+				  >> '}',
+				  instream );
+	BOOST_FOREACH ( std::list<uint8_t>::const_reference g, instream )
+	{
+		std::cout << g ;
+	}
+	std::cout << "end" << std::endl;
+
 }
 
 
-}}}
+}
+}
+}
