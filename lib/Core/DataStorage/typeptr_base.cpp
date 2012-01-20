@@ -211,15 +211,15 @@ GenericValueIterator ValuePtrBase::endGeneric()
 }
 
 
-GenericValueIterator::GenericValueIterator():p(NULL),byteSize(0),getValueFunc(NULL),setValueFunc(NULL){}
-GenericValueIterator::GenericValueIterator(void* _p, size_t _byteSize, ValueAdapter::Getter _getValueFunc, ValueAdapter::Setter _setValueFunc):
-	p((uint8_t*)_p),byteSize(_byteSize),getValueFunc(_getValueFunc),setValueFunc(_setValueFunc){}
+GenericValueIterator::GenericValueIterator():p(NULL),start(p),byteSize(0),getValueFunc(NULL),setValueFunc(NULL){}
+GenericValueIterator::GenericValueIterator(void* _p,void *_start, size_t _byteSize, ValueAdapter::Getter _getValueFunc, ValueAdapter::Setter _setValueFunc):
+	p((uint8_t*)_p),start((uint8_t*)_start),byteSize(_byteSize),getValueFunc(_getValueFunc),setValueFunc(_setValueFunc){}
 
 GenericValueIterator& GenericValueIterator::operator++() {p+=byteSize;return *this;}
 GenericValueIterator& GenericValueIterator::operator--(){p-=byteSize;return *this;}
 
-GenericValueIterator& GenericValueIterator::operator++(int ){GenericValueIterator& tmp = *this;++*this;return tmp;}
-GenericValueIterator& GenericValueIterator::operator--(int ){GenericValueIterator& tmp = *this;--*this;return tmp;}
+GenericValueIterator GenericValueIterator::operator++(int ){GenericValueIterator tmp = *this;++*this;return tmp;}
+GenericValueIterator GenericValueIterator::operator--(int ){GenericValueIterator tmp = *this;--*this;return tmp;}
 
 GenericValueIterator::reference GenericValueIterator::operator*() const
 {
@@ -238,17 +238,17 @@ bool GenericValueIterator::operator<(const GenericValueIterator& cmp) const{retu
 bool GenericValueIterator::operator>=(const GenericValueIterator& cmp) const{return p>=cmp.p;}
 bool GenericValueIterator::operator<=(const GenericValueIterator& cmp) const{return p<=cmp.p;}
 
-ptrdiff_t GenericValueIterator::operator-(const GenericValueIterator& cmp) const{return (p-cmp.p)/byteSize;}
+GenericValueIterator::difference_type GenericValueIterator::operator-(const GenericValueIterator& cmp) const{return (p-cmp.p)/byteSize;}
 
-GenericValueIterator GenericValueIterator::operator+(ptrdiff_t n) const{return (GenericValueIterator(*this)+=n);}
-GenericValueIterator GenericValueIterator::operator-(ptrdiff_t n) const{return (GenericValueIterator(*this)-=n);}
+GenericValueIterator GenericValueIterator::operator+(difference_type n) const{return (GenericValueIterator(*this)+=n);}
+GenericValueIterator GenericValueIterator::operator-(difference_type n) const{return (GenericValueIterator(*this)-=n);}
 
-GenericValueIterator& GenericValueIterator::operator+=(ptrdiff_t n){p+=(n*byteSize); return *this;}
-GenericValueIterator& GenericValueIterator::operator-=(ptrdiff_t n){p-=(n*byteSize); return *this;}
+GenericValueIterator& GenericValueIterator::operator+=(difference_type n){p+=(n*byteSize); return *this;}
+GenericValueIterator& GenericValueIterator::operator-=(difference_type n){p-=(n*byteSize); return *this;}
 
-GenericValueIterator::reference GenericValueIterator::operator[](ptrdiff_t n) const{
-#warning implement me
-	return *((*this)+n);
+GenericValueIterator::reference GenericValueIterator::operator[](difference_type n) const{
+	//the book says it has to be the n-th elements of the whole object, so we have to start from what is hopefully the beginning
+	return *(GenericValueIterator(start,start,byteSize,getValueFunc,setValueFunc)+=n);
 }
 
 }

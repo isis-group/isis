@@ -61,19 +61,19 @@ class GenericValueIterator :
 		ValueAdapter
 	>
 {
-	uint8_t *p;
+	uint8_t *p,*start;//we need the starting position for operator[]
 	size_t byteSize;
 	ValueAdapter::Getter getValueFunc;
 	ValueAdapter::Setter setValueFunc;
 public:
 	GenericValueIterator();
-	GenericValueIterator(void* _p,size_t _byteSize,ValueAdapter::Getter _getValueFunc,ValueAdapter::Setter _setValueFunc);
+	GenericValueIterator( void* _p, void* _start, size_t _byteSize, isis::data::_internal::ValueAdapter::Getter _getValueFunc, isis::data::_internal::ValueAdapter::Setter _setValueFunc );
 
 	GenericValueIterator& operator++();
 	GenericValueIterator& operator--();
 
-	GenericValueIterator& operator++(int);
-	GenericValueIterator& operator--(int);
+	GenericValueIterator operator++(int);
+	GenericValueIterator operator--(int);
 
 	GenericValueIterator::reference operator*() const;
 	GenericValueIterator::pointer  operator->() const;
@@ -87,16 +87,16 @@ public:
 	bool operator>=(const GenericValueIterator &cmp)const;
 	bool operator<=(const GenericValueIterator &cmp)const;
 
-	ptrdiff_t operator-(const GenericValueIterator &cmp)const;
+	difference_type operator-(const GenericValueIterator &cmp)const;
 
-	GenericValueIterator operator+(ptrdiff_t n)const;
-	GenericValueIterator operator-(ptrdiff_t n)const;
+	GenericValueIterator operator+(difference_type n)const;
+	GenericValueIterator operator-(difference_type n)const;
 
 
-	GenericValueIterator &operator+=(ptrdiff_t n);
-	GenericValueIterator &operator-=(ptrdiff_t n);
+	GenericValueIterator &operator+=(difference_type n);
+	GenericValueIterator &operator-=(difference_type n);
 
-	GenericValueIterator::reference operator[](ptrdiff_t n)const;
+	GenericValueIterator::reference operator[](difference_type n)const;
 };
 
 class ValuePtrBase : public util::_internal::GenericValue
