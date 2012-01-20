@@ -20,6 +20,8 @@
 #ifndef TYPEPTR_HPP
 #define TYPEPTR_HPP
 
+#include <boost/type_traits/is_float.hpp>
+
 #include "typeptr_base.hpp"
 #include "typeptr_converter.hpp"
 #include "../CoreUtils/type.hpp"
@@ -41,13 +43,16 @@ template<typename T, bool isNumber> struct getMinMaxImpl { // fallback for unsup
 };
 template<typename T> std::pair<T, T> calcMinMax( const T *data, size_t len )
 {
-	std::pair<T, T> result( data[0], data[0] );
+	std::pair<T, T> result( std::numeric_limits<T>::max(), std::numeric_limits<T>::min() );
 	LOG( Runtime, verbose_info ) << "using generic min/max computation for " << util::Value<T>::staticName();
 
-	while ( --len ) {
-		if ( result.second < data[len] )result.second = data[len];
+	for (const T* i=data;i<data+len; ++i ) {
+		if(boost::is_float<T>::value && isinf(*i))
+			continue; // skip this one if its inf
 
-		if ( result.first > data[len] )result.first = data[len];
+		if ( *i > result.second )result.second = *i; //*i is the new max if its bigger than the current (gets rid of nan as well)
+
+		if ( *i < result.first )result.first = *i; //*i is the new min if its smaller than the current (gets rid of nan as well)
 	}
 
 	return result;
