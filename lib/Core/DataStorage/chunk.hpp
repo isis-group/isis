@@ -98,6 +98,9 @@ public:
 		return ret[getLinearIndex( idx )];
 	}
 
+	const util::ValueReference getVoxelValue( size_t nrOfColumns, size_t nrOfRows = 0, size_t nrOfSlices = 0, size_t nrOfTimesteps = 0 )const;
+	void setVoxelValue( const util::ValueReference &val, size_t nrOfColumns, size_t nrOfRows = 0, size_t nrOfSlices = 0, size_t nrOfTimesteps = 0 );
+
 	/**
 	 * Gets a const reference of the element at a given index.
 	 * \copydetails Chunk::voxel

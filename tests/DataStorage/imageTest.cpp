@@ -501,6 +501,35 @@ BOOST_AUTO_TEST_CASE ( image_iterator_test )
 	BOOST_CHECK_EQUAL( std::distance( start, i ), img.getLinearIndex( util::vector4<size_t>( 1, 1, 1 ) ) ); //we should be exactly at the position of the second 42 now
 }
 
+BOOST_AUTO_TEST_CASE ( image_voxel_value_test )
+{
+	//  get a voxel from inside and outside the image
+	std::list<data::Chunk> chunks;
+
+	for( int i = 0; i < 3; i++ )
+		chunks.push_back( genSlice<float>( 3, 3, i, i ) );
+
+	std::list<data::Chunk>::iterator k = chunks.begin();
+	( k++ )->voxel<float>( 0, 0 ) = 42.0;
+	( k++ )->voxel<float>( 1, 1 ) = 42.0;
+	( k++ )->voxel<float>( 2, 2 ) = 42;
+
+	data::Image img( chunks );
+	BOOST_REQUIRE( img.isClean() );
+	BOOST_CHECK( img.isValid() );
+
+
+	for ( int i = 0; i < 3; i++ ) {
+		BOOST_CHECK_EQUAL( img.getVoxelValue( i, i, i )->as<int>(), 42 );
+		img.setVoxelValue( util::Value<int>( 23 ), i, i, i );
+	}
+
+	/// check for setting voxel data
+	for ( int i = 0; i < 3; i++ ) {
+		BOOST_CHECK_EQUAL( img.getVoxelValue( i, i, i )->as<int>(), 23 );
+	}
+}
+
 BOOST_AUTO_TEST_CASE( image_minmax_test )
 {
 	std::list<data::Chunk> chunks;

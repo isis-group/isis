@@ -959,5 +959,15 @@ Image::value_iterator Image::end() {return begin() + getVolume();}
 Image::const_value_iterator Image::begin()const {return const_value_iterator( lookup.begin(), lookup.end() );}
 Image::const_value_iterator Image::end()const {return begin() + getVolume();}
 
+const util::ValueReference Image::getVoxelValue ( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps ) const
+{
+	return begin()[getLinearIndex( util::vector4<size_t>( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ) )];
+}
+void Image::setVoxelValue ( const util::ValueReference &val, size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps )
+{
+	begin()[getLinearIndex( util::vector4<size_t>( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ) )] = val;
+}
+
+
 } // END namespace data
 } // END namespace isis

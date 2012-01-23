@@ -378,6 +378,8 @@ public:
 		return data[index.second];
 	}
 
+	const util::ValueReference getVoxelValue( size_t nrOfColumns, size_t nrOfRows = 0, size_t nrOfSlices = 0, size_t nrOfTimesteps = 0 )const;
+	void setVoxelValue( const util::ValueReference &val, size_t nrOfColumns, size_t nrOfRows = 0, size_t nrOfSlices = 0, size_t nrOfTimesteps = 0 );
 
 	/**
 	 * Get the type of the chunk with "biggest" type.
