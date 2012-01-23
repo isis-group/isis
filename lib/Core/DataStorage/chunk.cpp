@@ -325,14 +325,23 @@ const util::PropertyValue &Chunk::propertyValueAt( const util::PropertyMap::KeyT
 	return vec.at( at );
 }
 
-Chunk::iterator Chunk::begin()
+Chunk::value_iterator Chunk::begin()
 {
 	return asValuePtrBase().beginGeneric();
 }
 
-Chunk::iterator Chunk::end()
+Chunk::value_iterator Chunk::end()
 {
 	return asValuePtrBase().endGeneric();
+}
+Chunk::const_value_iterator Chunk::begin()const
+{
+	return getValuePtrBase().beginGeneric();
+}
+
+Chunk::const_value_iterator Chunk::end()const
+{
+	return getValuePtrBase().endGeneric();
 }
 
 }

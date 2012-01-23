@@ -49,8 +49,7 @@ VistaSaParser::HeaderListType VistaSaParser::parseHeader ()
 				  >> *ascii::char_
 				  >> '}',
 				  instream );
-	BOOST_FOREACH ( std::list<uint8_t>::const_reference g, instream )
-	{
+	BOOST_FOREACH ( std::list<uint8_t>::const_reference g, instream ) {
 		std::cout << g ;
 	}
 	std::cout << "end" << std::endl;

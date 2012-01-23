@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE( loadsaveNullImage )
 	BOOST_FOREACH( data::Image & null, images ) {
 		util::TmpFile vfile( "", ".v" );
 		BOOST_REQUIRE( data::IOFactory::write( null, vfile.file_string() ) );
-    }
+	}
 }
 BOOST_AUTO_TEST_SUITE_END()
 

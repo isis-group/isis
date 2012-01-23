@@ -253,10 +253,10 @@ BOOST_AUTO_TEST_CASE( ValuePtr_boolean_conversion_test )
 
 BOOST_AUTO_TEST_CASE( ValuePtr_minmax_test )
 {
-	const float init[] = {-1./0., -1.8, -1.5, -1.3, -0.6, -0.2, 1.8, 1.5, 1.3, sqrt(-1),1./0, 0.6, 0.2};
-	data::ValuePtr<float> floatArray( sizeof(init)/sizeof(float) );
+	const float init[] = { -1. / 0., -1.8, -1.5, -1.3, -0.6, -0.2, 1.8, 1.5, 1.3, sqrt( -1 ), 1. / 0, 0.6, 0.2};
+	data::ValuePtr<float> floatArray( sizeof( init ) / sizeof( float ) );
 	//without scaling
-	floatArray.copyFromMem( init, sizeof(init)/sizeof(float) );
+	floatArray.copyFromMem( init, sizeof( init ) / sizeof( float ) );
 	{
 		std::pair<util::ValueReference, util::ValueReference> minmax = floatArray.getMinMax();
 		BOOST_CHECK( minmax.first->is<float>() );
@@ -303,44 +303,47 @@ BOOST_AUTO_TEST_CASE( ValuePtr_iterator_test )
 	data::ValuePtr<short> array( 1024 );
 
 	for( int i = 0; i < 1024; i++ )
-		array[i] = i+1;
+		array[i] = i + 1;
 
-	size_t cnt=0;
-	for(data::ValuePtr< short >::iterator i=array.begin();i!=array.end();i++,cnt++){
-		BOOST_CHECK_EQUAL(*i,cnt+1); // normal increment
-		BOOST_CHECK_EQUAL(*(array.begin()+cnt),cnt+1); //+=
+	size_t cnt = 0;
+
+	for( data::ValuePtr< short >::typed_iterator i = array.begin(); i != array.end(); i++, cnt++ ) {
+		BOOST_CHECK_EQUAL( *i, cnt + 1 ); // normal increment
+		BOOST_CHECK_EQUAL( *( array.begin() + cnt ), cnt + 1 ); //+=
 	}
-	BOOST_CHECK_EQUAL(*std::min_element(array.begin(),array.end()),1);
-	BOOST_CHECK_EQUAL(*std::max_element(array.begin(),array.end()),*(array.end()-1));
 
-	BOOST_CHECK_EQUAL(std::distance(array.begin(),array.end()),1024);
+	BOOST_CHECK_EQUAL( *std::min_element( array.begin(), array.end() ), 1 );
+	BOOST_CHECK_EQUAL( *std::max_element( array.begin(), array.end() ), *( array.end() - 1 ) );
 
-	BOOST_CHECK_EQUAL(std::accumulate(array.begin(),array.end(),0),1024*(1024+1)/2); //gauss is my homie :-D
+	BOOST_CHECK_EQUAL( std::distance( array.begin(), array.end() ), 1024 );
 
-	std::fill(array.begin(),array.end(),0);
-	BOOST_CHECK_EQUAL(std::accumulate(array.begin(),array.end(),0),0);
+	BOOST_CHECK_EQUAL( std::accumulate( array.begin(), array.end(), 0 ), 1024 * ( 1024 + 1 ) / 2 ); //gauss is my homie :-D
+
+	std::fill( array.begin(), array.end(), 0 );
+	BOOST_CHECK_EQUAL( std::accumulate( array.begin(), array.end(), 0 ), 0 );
 }
 BOOST_AUTO_TEST_CASE( ValuePtr_generic_iterator_test )
 {
 	data::ValuePtr<short> array( 1024 );
-	data::_internal::ValuePtrBase& generic_array=array;
+	data::_internal::ValuePtrBase &generic_array = array;
 
 	// filling, using generic access
 	for( int i = 0; i < 1024; i++ )
-		generic_array.beginGeneric()[i] = util::Value<int>(i+1);//(miss)using the iterator for indexed access
+		generic_array.beginGeneric()[i] = util::Value<int>( i + 1 ); //(miss)using the iterator for indexed access
 
 	// check the content
-	size_t cnt=0;
-	for(data::_internal::GenericValueIterator i=generic_array.beginGeneric();i!=generic_array.endGeneric();i++,cnt++){
-		BOOST_CHECK_EQUAL(*i,util::Value<int>(cnt+1));//this is using ValueBase::eq
+	size_t cnt = 0;
+
+	for( data::_internal::ValuePtrBase::value_iterator i = generic_array.beginGeneric(); i != generic_array.endGeneric(); i++, cnt++ ) {
+		BOOST_CHECK_EQUAL( *i, util::Value<int>( cnt + 1 ) ); //this is using ValueBase::eq
 	}
 
 	//check searching operations
-	BOOST_CHECK_EQUAL(*std::min_element(generic_array.beginGeneric(),generic_array.endGeneric()),*generic_array.beginGeneric());
-	BOOST_CHECK_EQUAL(*std::max_element(generic_array.beginGeneric(),generic_array.endGeneric()),*(generic_array.endGeneric()-1));
-	BOOST_CHECK(std::find(generic_array.beginGeneric(),generic_array.endGeneric(),util::Value<int>(5))==generic_array.beginGeneric()+4);//"1+4"
+	BOOST_CHECK_EQUAL( *std::min_element( generic_array.beginGeneric(), generic_array.endGeneric() ), *generic_array.beginGeneric() );
+	BOOST_CHECK_EQUAL( *std::max_element( generic_array.beginGeneric(), generic_array.endGeneric() ), *( generic_array.endGeneric() - 1 ) );
+	BOOST_CHECK( std::find( generic_array.beginGeneric(), generic_array.endGeneric(), util::Value<int>( 5 ) ) == generic_array.beginGeneric() + 4 ); //"1+4"
 
-	BOOST_CHECK_EQUAL(std::distance(array.begin(),array.end()),1024);
+	BOOST_CHECK_EQUAL( std::distance( array.begin(), array.end() ), 1024 );
 }
 }
 }

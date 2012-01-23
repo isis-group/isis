@@ -22,9 +22,11 @@
 
 #include "VistaSaParser.hpp"
 
-namespace isis {
+namespace isis
+{
 
-namespace image_io {
+namespace image_io
+{
 
 class ImageFormat_VistaSa: public FileFormat
 {
@@ -35,7 +37,7 @@ public:
 	int load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &/*dialect*/ )  throw( std::runtime_error & );
 	void write( const data::Image &image, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & );
 	bool tainted()const {return false;}//internal plugins are not tainted
-	std::string dialects(const std::string &/*filename*/ )const {return std::string( "fsl spm" );}
+	std::string dialects( const std::string &/*filename*/ )const {return std::string( "fsl spm" );}
 
 protected:
 	std::string suffixes( io_modes mode = both )const;

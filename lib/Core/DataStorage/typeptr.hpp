@@ -43,17 +43,17 @@ template<typename T, bool isNumber> struct getMinMaxImpl { // fallback for unsup
 };
 template<typename T> std::pair<T, T> calcMinMax( const T *data, size_t len )
 {
-	BOOST_MPL_ASSERT_RELATION(std::numeric_limits<T>::has_denorm,!=,std::denorm_indeterminate);//well we're pretty f**ed in this case
+	BOOST_MPL_ASSERT_RELATION( std::numeric_limits<T>::has_denorm, != , std::denorm_indeterminate ); //well we're pretty f**ed in this case
 	std::pair<T, T> result(
 		std::numeric_limits<T>::max(),
-		std::numeric_limits<T>::has_denorm ? -std::numeric_limits<T>::max(): std::numeric_limits<T>::min() //for types with denormalization min is _not_ the lowest value
+		std::numeric_limits<T>::has_denorm ? -std::numeric_limits<T>::max() : std::numeric_limits<T>::min() //for types with denormalization min is _not_ the lowest value
 	);
 	LOG( Runtime, verbose_info ) << "using generic min/max computation for " << util::Value<T>::staticName();
 
-	for (const T* i=data;i<data+len; ++i ) {
+	for ( const T *i = data; i < data + len; ++i ) {
 		if(
 			std::numeric_limits<T>::has_infinity &&
-			(*i==std::numeric_limits<T>::infinity() || *i==-std::numeric_limits<T>::infinity())
+			( *i == std::numeric_limits<T>::infinity() || *i == -std::numeric_limits<T>::infinity() )
 		)
 			continue; // skip this one if its inf
 
@@ -91,41 +91,41 @@ template<typename T> struct getMinMaxImpl<T, true> { // generic min-max for numb
  * This is a common iterator following the random access iterator model.
  * It is not part of the reference counting used in ValuePtr. So make sure you keep the ValuePtr you created it from while you use this iterator.
  */
-template<typename TYPE> class ValuePtrIterator: public std::iterator<std::random_access_iterator_tag,TYPE>
+template<typename TYPE> class ValuePtrIterator: public std::iterator<std::random_access_iterator_tag, TYPE>
 {
 	TYPE *p;
-	typedef typename std::iterator<std::random_access_iterator_tag,TYPE>::difference_type distance;
+	typedef typename std::iterator<std::random_access_iterator_tag, TYPE>::difference_type distance;
 public:
-	ValuePtrIterator():p(NULL){}
-	ValuePtrIterator(TYPE *_p):p(_p){}
+	ValuePtrIterator(): p( NULL ) {}
+	ValuePtrIterator( TYPE *_p ): p( _p ) {}
 
-	ValuePtrIterator<TYPE>& operator++() {++p;return *this;}
-	ValuePtrIterator<TYPE>& operator--() {--p;return *this;}
+	ValuePtrIterator<TYPE>& operator++() {++p; return *this;}
+	ValuePtrIterator<TYPE>& operator--() {--p; return *this;}
 
-	ValuePtrIterator<TYPE>  operator++(int) {ValuePtrIterator<TYPE> tmp = *this;++*this;return tmp;}
-	ValuePtrIterator<TYPE>  operator--(int) {ValuePtrIterator<TYPE> tmp = *this;--*this;return tmp;}
+	ValuePtrIterator<TYPE>  operator++( int ) {ValuePtrIterator<TYPE> tmp = *this; ++*this; return tmp;}
+	ValuePtrIterator<TYPE>  operator--( int ) {ValuePtrIterator<TYPE> tmp = *this; --*this; return tmp;}
 
-	TYPE& operator*() const { return *p; }
-	TYPE* operator->() const { return p; }
+	TYPE &operator*() const { return *p; }
+	TYPE *operator->() const { return p; }
 
-	bool operator==(const ValuePtrIterator<TYPE> &cmp)const {return p==cmp.p;}
-	bool operator!=(const ValuePtrIterator<TYPE> &cmp)const {return !(*this == cmp);}
+	bool operator==( const ValuePtrIterator<TYPE> &cmp )const {return p == cmp.p;}
+	bool operator!=( const ValuePtrIterator<TYPE> &cmp )const {return !( *this == cmp );}
 
-	bool operator>(const ValuePtrIterator<TYPE> &cmp)const {return p>cmp.p;}
-	bool operator<(const ValuePtrIterator<TYPE> &cmp)const {return p<cmp.p;}
+	bool operator>( const ValuePtrIterator<TYPE> &cmp )const {return p > cmp.p;}
+	bool operator<( const ValuePtrIterator<TYPE> &cmp )const {return p < cmp.p;}
 
-	bool operator>=(const ValuePtrIterator<TYPE> &cmp)const {return p>=cmp.p;}
-	bool operator<=(const ValuePtrIterator<TYPE> &cmp)const {return p<=cmp.p;}
+	bool operator>=( const ValuePtrIterator<TYPE> &cmp )const {return p >= cmp.p;}
+	bool operator<=( const ValuePtrIterator<TYPE> &cmp )const {return p <= cmp.p;}
 
-	ValuePtrIterator<TYPE> operator+(distance n)const {return ValuePtrIterator<TYPE>(p+n);}
-	ValuePtrIterator<TYPE> operator-(distance n)const {return ValuePtrIterator<TYPE>(p-n);}
+	ValuePtrIterator<TYPE> operator+( distance n )const {return ValuePtrIterator<TYPE>( p + n );}
+	ValuePtrIterator<TYPE> operator-( distance n )const {return ValuePtrIterator<TYPE>( p - n );}
 
-	distance operator-(const ValuePtrIterator<TYPE> &cmp)const {return p-cmp.p;}
+	distance operator-( const ValuePtrIterator<TYPE> &cmp )const {return p - cmp.p;}
 
-	ValuePtrIterator<TYPE> &operator+=(distance n) {p+=n; return *this;}
-	ValuePtrIterator<TYPE> &operator-=(distance n) {p-=n; return *this;}
+	ValuePtrIterator<TYPE> &operator+=( distance n ) {p += n; return *this;}
+	ValuePtrIterator<TYPE> &operator-=( distance n ) {p -= n; return *this;}
 
-	TYPE &operator[](distance n)const {return *(p+n);}
+	TYPE &operator[]( distance n )const {return *( p + n );}
 };
 
 }
@@ -141,11 +141,11 @@ public:
 template<typename TYPE> class ValuePtr: public _internal::ValuePtrBase
 {
 	boost::shared_ptr<TYPE> m_val;
-	static const util::ValueReference getValueFrom(const void* p){
-		return util::Value<TYPE>(*reinterpret_cast<const TYPE*>(p));
+	static const util::ValueReference getValueFrom( const void *p ) {
+		return util::Value<TYPE>( *reinterpret_cast<const TYPE *>( p ) );
 	}
-	static void setValueInto(void* p,const util::_internal::ValueBase& val){
-		*reinterpret_cast<TYPE*>(p) = val.as<TYPE>();
+	static void setValueInto( void *p, const util::_internal::ValueBase &val ) {
+		*reinterpret_cast<TYPE *>( p ) = val.as<TYPE>();
 	}
 protected:
 	ValuePtr() {} // should only be used by child classed who initialize the pointer them self
@@ -153,8 +153,8 @@ protected:
 		return new ValuePtr( *this );
 	}
 public:
-	typedef _internal::ValuePtrIterator<TYPE> iterator;
-	typedef _internal::ValuePtrIterator<const TYPE> const_iterator;
+	typedef _internal::ValuePtrIterator<TYPE> typed_iterator;
+	typedef _internal::ValuePtrIterator<const TYPE> const_typed_iterator;
 	static const unsigned short staticID = util::_internal::TypeID<TYPE>::value << 8;
 	/// delete-functor which does nothing (in case someone else manages the data).
 	struct NonDeleter {
@@ -229,14 +229,17 @@ public:
 	boost::shared_ptr<void> getRawAddress( size_t offset = 0 ) { // use the const version and cast away the const
 		return boost::const_pointer_cast<void>( const_cast<const ValuePtr *>( this )->getRawAddress( offset ) );
 	}
-    virtual _internal::GenericValueIterator beginGeneric(){
-		return _internal::GenericValueIterator(m_val.get(),m_val.get(),bytesPerElem(),getValueFrom,setValueInto);
+	virtual value_iterator beginGeneric() {
+		return value_iterator( ( uint8_t * )m_val.get(), ( uint8_t * )m_val.get(), bytesPerElem(), getValueFrom, setValueInto );
+	}
+	virtual const_value_iterator beginGeneric()const {
+		return const_value_iterator( ( uint8_t * )m_val.get(), ( uint8_t * )m_val.get(), bytesPerElem(), getValueFrom, setValueInto );
 	}
 
-	iterator begin(){return iterator(m_val.get());}
-	iterator end(){return begin()+m_len;};
-	const_iterator begin()const{return const_iterator(m_val.get());}
-	const_iterator end()const{return begin()+m_len;}
+	typed_iterator begin() {return typed_iterator( m_val.get() );}
+	typed_iterator end() {return begin() + m_len;};
+	const_typed_iterator begin()const {return const_typed_iterator( m_val.get() );}
+	const_typed_iterator end()const {return begin() + m_len;}
 
 	/// @copydoc util::Value::toString
 	virtual std::string toString( bool labeled = false )const {
@@ -244,11 +247,11 @@ public:
 
 		if ( m_len ) {
 			// if you get trouble with to_tm here include <boost/date_time/gregorian/gregorian.hpp> or <boost/date_time/posix_time/posix_time.hpp> in your cpp
-			for ( const_iterator i = begin(); i < end() - 1; i++ )
+			for ( const_typed_iterator i = begin(); i < end() - 1; i++ )
 				ret += util::Value<TYPE>( *i ).toString( false ) + "|";
 
 
-			ret += util::Value<TYPE>( *(end()-1) ).toString( labeled );
+			ret += util::Value<TYPE>( *( end() - 1 ) ).toString( labeled );
 		}
 
 		return boost::lexical_cast<std::string>( m_len ) + "#" + ret;

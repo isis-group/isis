@@ -423,6 +423,45 @@ BOOST_AUTO_TEST_CASE ( image_voxel_test )
 	BOOST_CHECK( img.voxel<float>( 2, 2, 2, 0 ) == 23 );
 }
 
+BOOST_AUTO_TEST_CASE ( image_const_iterator_test )
+{
+	//  get a voxel from inside and outside the image
+	std::list<data::Chunk> chunks;
+
+	for( int i = 0; i < 3; i++ )
+		chunks.push_back( genSlice<float>( 3, 3, i, i ) );
+
+	std::list<data::Chunk>::iterator k = chunks.begin();
+	( k++ )->voxel<float>( 0, 0 ) = 42.0;
+	( k++ )->voxel<float>( 1, 1 ) = 42.0;
+	( k++ )->voxel<float>( 2, 2 ) = 42;
+
+	const data::Image img( chunks );
+	BOOST_REQUIRE( img.isClean() );
+	BOOST_CHECK( img.isValid() );
+
+	const data::Image::const_value_iterator start = img.begin();
+	const data::Image::const_value_iterator end = img.end();
+	data::Image::const_value_iterator i = start;
+
+	BOOST_CHECK_EQUAL( std::distance( start, end ), img.getVolume() );
+	BOOST_CHECK_EQUAL( std::distance( end, start ), -img.getVolume() );
+
+	BOOST_CHECK( start + img.getVolume() == end );
+
+	BOOST_CHECK_EQUAL( *i, util::Value<int>( 42 ) ); // first voxel should be 42
+	BOOST_CHECK_EQUAL( *( ++i ), util::Value<int>( 0 ) ); // but the second should be 0
+
+	i += img.getLinearIndex( util::vector4<size_t>( 1, 1, 1 ) );
+	BOOST_CHECK_EQUAL( *i, util::Value<int>( 0 ) ); // we missed the next 42 just by one voxel
+	BOOST_CHECK_EQUAL( *( --i ), util::Value<int>( 42 ) ); // here it is
+
+	BOOST_CHECK_EQUAL( std::distance( start, i ), img.getLinearIndex( util::vector4<size_t>( 1, 1, 1 ) ) ); //we should be exactly at the position of the second 42 now
+
+	// this must not compile
+	//(*i)=util::Value<int>(23);
+}
+
 BOOST_AUTO_TEST_CASE ( image_iterator_test )
 {
 	//  get a voxel from inside and outside the image
@@ -440,23 +479,26 @@ BOOST_AUTO_TEST_CASE ( image_iterator_test )
 	BOOST_REQUIRE( img.isClean() );
 	BOOST_CHECK( img.isValid() );
 
-	const data::Image::iterator start=img.begin();
-	const data::Image::iterator end=img.end();
-	data::Image::iterator i=start;
+	const data::Image::value_iterator start = img.begin();
+	const data::Image::value_iterator end = img.end();
+	data::Image::value_iterator i = start;
 
-	BOOST_CHECK_EQUAL(std::distance(start,end),img.getVolume());
-	BOOST_CHECK_EQUAL(std::distance(end,start),-img.getVolume());
+	BOOST_CHECK_EQUAL( std::distance( start, end ), img.getVolume() );
+	BOOST_CHECK_EQUAL( std::distance( end, start ), -img.getVolume() );
 
-	BOOST_CHECK(start+img.getVolume()==end);
+	BOOST_CHECK( start + img.getVolume() == end );
 
-	BOOST_CHECK_EQUAL(*i,util::Value<int>(42)); // first voxel should be 42
-	BOOST_CHECK_EQUAL(*(++i),util::Value<int>(0)); // but the second should be 0
+	BOOST_CHECK_EQUAL( *i, util::Value<int>( 42 ) ); // first voxel should be 42
+	BOOST_CHECK_EQUAL( *( ++i ), util::Value<int>( 0 ) ); // but the second should be 0
 
-	i+=img.getLinearIndex(util::vector4<size_t>(1,1,1));
-	BOOST_CHECK_EQUAL(*i,util::Value<int>(0)); // we missed the next 42 by one voxel
-	BOOST_CHECK_EQUAL(*(--i),util::Value<int>(42)); // here it is
+	i += img.getLinearIndex( util::vector4<size_t>( 1, 1, 1 ) );
+	BOOST_CHECK_EQUAL( *i, util::Value<int>( 0 ) ); // we missed the next 42 just by one voxel
+	BOOST_CHECK_EQUAL( *( --i ), util::Value<int>( 42 ) ); // here it is
 
-	BOOST_CHECK_EQUAL(std::distance(start,i),img.getLinearIndex(util::vector4<size_t>(1,1,1)));//we should be exactly at the position of the second 42 now
+	( *i ) = util::Value<int>( 23 );
+	BOOST_CHECK_EQUAL( *i, util::Value<int>( 23 ) ); // not anymore
+
+	BOOST_CHECK_EQUAL( std::distance( start, i ), img.getLinearIndex( util::vector4<size_t>( 1, 1, 1 ) ) ); //we should be exactly at the position of the second 42 now
 }
 
 BOOST_AUTO_TEST_CASE( image_minmax_test )

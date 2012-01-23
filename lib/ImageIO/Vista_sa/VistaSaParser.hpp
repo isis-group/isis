@@ -52,11 +52,9 @@ struct VistaHeader
 
 
 template<typename Iterator>
-struct vista_header_grammer : qi::grammar<Iterator, VistaHeader(), ascii::space_type >
-{
+struct vista_header_grammer : qi::grammar<Iterator, VistaHeader(), ascii::space_type > {
 
-	vista_header_grammer() : vista_header_grammer::base_type ( vista_header )
-{
+	vista_header_grammer() : vista_header_grammer::base_type ( vista_header ) {
 	using qi::lit;
 	using qi::lexeme;
 	using ascii::char_;
@@ -79,8 +77,7 @@ qi::rule<Iterator, void ( std::string ), ascii::space_type> end_tag;
 
 
 
-struct VistaObject
-{
+struct VistaObject {
 	data::ValuePtrReference data;
 };
 

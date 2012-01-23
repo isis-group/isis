@@ -954,90 +954,10 @@ util::fvector4 Image::getFoV() const
 	return _internal::NDimensional<4>::getFoV( getPropertyAs<util::fvector4>( "voxelSize" ), voxelGap );
 }
 
-Image::iterator Image::begin(){return iterator(lookup.begin(),lookup.end());}
-Image::iterator Image::end(){return begin()+getVolume();}
-
-
-namespace _internal{
-
-Chunk::iterator::difference_type GenericImageIterator::currentDist()const{
-	if(current_chit>=last_chit)
-		return 0; // if we're behind the last chunk assume we are at the "start" of the "end"-chunk
-	else
-		return std::distance((*current_chit)->begin(),current_it);
-}
-
-GenericImageIterator::GenericImageIterator(){};
-GenericImageIterator::GenericImageIterator(std::vector<boost::shared_ptr<Chunk> >::iterator _first_chit,std::vector<boost::shared_ptr<Chunk> >::iterator _last_chit):
-	first_chit(_first_chit),
-	current_chit(_first_chit),
-	last_chit(_last_chit),
-	current_it((*current_chit)->begin()),
-	ch_len(std::distance(current_it,(*current_chit)->end()))
-{}
-
-GenericImageIterator& GenericImageIterator::operator++(){return operator+=(1);}
-GenericImageIterator& GenericImageIterator::operator--(){return operator-=(1);}
-
-GenericImageIterator GenericImageIterator::operator++ ( int ){GenericImageIterator tmp=*this;operator++();return tmp;}
-GenericImageIterator GenericImageIterator::operator-- ( int ){GenericImageIterator tmp=*this;operator--();return tmp;}
-
-GenericImageIterator::reference GenericImageIterator::operator*() const{return current_it.operator*();}
-GenericImageIterator::pointer GenericImageIterator::operator->() const{return current_it.operator->();}
-
-bool GenericImageIterator::operator== ( const GenericImageIterator& cmp ) const{
-	return
-		current_chit==cmp.current_chit &&
-		current_it==cmp.current_it;
-}
-bool GenericImageIterator::operator!= ( const GenericImageIterator& cmp ) const{return !operator==(cmp);}
-
-bool GenericImageIterator::operator> ( const GenericImageIterator& cmp ) const{
-	return
-		current_chit>cmp.current_chit ||
-		(current_chit==cmp.current_chit && current_it>cmp.current_it);
-}
-bool GenericImageIterator::operator< ( const GenericImageIterator& cmp ) const{
-	return
-		current_chit<cmp.current_chit ||
-		(current_chit==cmp.current_chit && current_it<cmp.current_it);
-}
-bool GenericImageIterator::operator>= ( const GenericImageIterator& cmp ) const{return operator>(cmp) || operator==(cmp);}
-bool GenericImageIterator::operator<= ( const GenericImageIterator& cmp ) const{return operator<(cmp) || operator==(cmp);}
-
-GenericImageIterator::difference_type GenericImageIterator::operator- ( const GenericImageIterator& cmp ) const
-{
-	difference_type dist=(current_chit-cmp.current_chit)*ch_len; // get the (virtual) distance from my current block to cmp's current block
-	if(current_chit>=cmp.current_chit){//if I'm beyond cmp add my current pos to the distance, and substract his
-		dist+=currentDist()-cmp.currentDist();
-	} else {
-		dist+=cmp.currentDist()-currentDist();
-	}
-	return dist;
-}
-
-GenericImageIterator GenericImageIterator::operator+ ( difference_type n ) const{return GenericImageIterator(*this)+=n;}
-GenericImageIterator GenericImageIterator::operator- ( difference_type n ) const{return GenericImageIterator(*this)-=n;}
-
-GenericImageIterator& GenericImageIterator::operator+= ( difference_type n )
-{
-	n+=currentDist();//start from current begin (add current_it-(begin of the current chunk) to n)
-	std::advance(current_chit,n/ch_len);//if neccesary jump to next chunk
-	if(current_chit<last_chit)
-		current_it=(*current_chit)->begin()+n%ch_len; //set new current iterator in new chunk
-	else
-		current_it=(*(last_chit-1))->end() ; //set current_it to the last chunks end iterator if we are behind it
-	return *this;
-}
-GenericImageIterator& GenericImageIterator::operator-= ( difference_type n ){return operator+=(-n);}
-
-ValueAdapter GenericImageIterator::operator[] ( difference_type n ) const
-{
-	return *(GenericImageIterator(first_chit,last_chit)+=n);
-}
-
-
-} //_internal
+Image::value_iterator Image::begin() {return value_iterator( lookup.begin(), lookup.end() );}
+Image::value_iterator Image::end() {return begin() + getVolume();}
+Image::const_value_iterator Image::begin()const {return const_value_iterator( lookup.begin(), lookup.end() );}
+Image::const_value_iterator Image::end()const {return begin() + getVolume();}
 
 } // END namespace data
 } // END namespace isis
