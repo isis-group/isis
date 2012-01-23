@@ -325,5 +325,34 @@ const util::PropertyValue &Chunk::propertyValueAt( const util::PropertyMap::KeyT
 	return vec.at( at );
 }
 
+Chunk::value_iterator Chunk::begin()
+{
+	return asValuePtrBase().beginGeneric();
+}
+
+Chunk::value_iterator Chunk::end()
+{
+	return asValuePtrBase().endGeneric();
+}
+Chunk::const_value_iterator Chunk::begin()const
+{
+	return getValuePtrBase().beginGeneric();
+}
+
+Chunk::const_value_iterator Chunk::end()const
+{
+	return getValuePtrBase().endGeneric();
+}
+
+const util::ValueReference Chunk::getVoxelValue ( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps ) const
+{
+	return begin()[getLinearIndex( util::vector4<size_t>( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ) )];
+}
+void Chunk::setVoxelValue ( const util::ValueReference &val, size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps )
+{
+	begin()[getLinearIndex( util::vector4<size_t>( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ) )] = val;
+}
+
+
 }
 }

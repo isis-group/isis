@@ -19,7 +19,7 @@ project(ISIS)
 ############################################################
 set(ISIS_VERSION_MAJOR "0")
 set(ISIS_VERSION_MINOR "4")
-set(ISIS_VERSION_PATCH "4")
+set(ISIS_VERSION_PATCH "5")
 
 add_definitions(-D_ISIS_VERSION_MAJOR=${ISIS_VERSION_MAJOR})
 add_definitions(-D_ISIS_VERSION_MINOR=${ISIS_VERSION_MINOR})
@@ -54,7 +54,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wstrict-aliasing=2"  )
 
 if(${APPLE})
   if(${CMAKE_OSX_ARCHITECTURES})
-    set(PROCESSOR ${CMAKE_SYSTEM_PROCESSOR})
+    set(PROCESSOR ${CMAKE_OSX_ARCHITECTURES})
   else(${CMAKE_OSX_ARCHITECTURES})
     set(PROCESSOR "x86_64")
   endif(${CMAKE_OSX_ARCHITECTURES})  

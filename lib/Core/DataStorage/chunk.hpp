@@ -79,6 +79,10 @@ protected:
 
 	Chunk() {}; //do not use this
 public:
+
+	typedef ValuePtrBase::value_iterator value_iterator;
+	typedef ValuePtrBase::const_value_iterator const_value_iterator;
+
 	Chunk( const ValuePtrReference &src, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 );
 
 	/**
@@ -93,6 +97,9 @@ public:
 		ValuePtr<TYPE> &ret = asValuePtr<TYPE>();
 		return ret[getLinearIndex( idx )];
 	}
+
+	const util::ValueReference getVoxelValue( size_t nrOfColumns, size_t nrOfRows = 0, size_t nrOfSlices = 0, size_t nrOfTimesteps = 0 )const;
+	void setVoxelValue( const util::ValueReference &val, size_t nrOfColumns, size_t nrOfRows = 0, size_t nrOfSlices = 0, size_t nrOfTimesteps = 0 );
 
 	/**
 	 * Gets a const reference of the element at a given index.
@@ -147,6 +154,11 @@ public:
 	template<typename TYPE> size_t foreachVoxel( VoxelOp<TYPE> &op ) {
 		return foreachVoxel<TYPE>( op, util::vector4<size_t>() );
 	}
+
+	value_iterator begin();
+	value_iterator end();
+	const_value_iterator begin()const;
+	const_value_iterator end()const;
 
 	ValuePtrBase &asValuePtrBase() {return operator*();}
 	const ValuePtrBase &getValuePtrBase()const {return operator*();}

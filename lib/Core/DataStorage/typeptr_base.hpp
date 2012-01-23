@@ -22,11 +22,103 @@
 #include "../CoreUtils/type_base.hpp"
 #include "typeptr_converter.hpp"
 #include "common.hpp"
+#include <boost/mpl/if.hpp>
+#include <boost/utility/enable_if.hpp>
 
 namespace isis
 {
 namespace data
 {
+namespace _internal
+{
+class ConstValueAdapter: public util::ValueReference
+{
+public:
+	typedef const util::ValueReference ( *Getter )( const void * );
+	typedef void ( *Setter )( void *, const util::ValueBase & );
+protected:
+	const uint8_t *const p;
+public:
+	ConstValueAdapter( const uint8_t *const _p, Getter _getValueFunc );
+	// to make some algorithms work
+	bool operator==( const util::ValueReference &val )const;
+	bool operator!=( const util::ValueReference &val )const;
+
+	bool operator<( const util::ValueReference &val )const;
+	bool operator>( const util::ValueReference &val )const;
+};
+class WritingValueAdapter: public ConstValueAdapter
+{
+	Setter setValueFunc;
+public:
+	WritingValueAdapter( uint8_t *const _p, Getter _getValueFunc, Setter _setValueFunc );
+	WritingValueAdapter operator=( const util::ValueReference &val );
+};
+
+template<bool IS_CONST> class GenericValueIterator :
+	public std::iterator < std::random_access_iterator_tag,
+	typename boost::mpl::if_c<IS_CONST, ConstValueAdapter, WritingValueAdapter>::type,
+	ptrdiff_t,
+	typename boost::mpl::if_c<IS_CONST, ConstValueAdapter, WritingValueAdapter>::type,
+	typename boost::mpl::if_c<IS_CONST, ConstValueAdapter, WritingValueAdapter>::type
+	>
+{
+	typedef typename boost::mpl::if_c<IS_CONST, const uint8_t *, uint8_t *>::type ptr_type;
+	ptr_type p, start; //we need the starting position for operator[]
+	size_t byteSize;
+	ConstValueAdapter::Getter getValueFunc;
+	ConstValueAdapter::Setter setValueFunc;
+	friend class GenericValueIterator<true>; //yes, I'm my own friend, sometimes :-) (enables the constructor below)
+public:
+	GenericValueIterator( const GenericValueIterator<false> &src ): //will become additional constructor from non const if this is const, otherwise overrride the default copy contructor
+		p( src.p ), start( src.p ), byteSize( src.byteSize ), getValueFunc( src.getValueFunc ), setValueFunc( src.setValueFunc ) {}
+	GenericValueIterator(): p( NULL ), start( p ), byteSize( 0 ), getValueFunc( NULL ), setValueFunc( NULL ) {}
+	GenericValueIterator( ptr_type _p, ptr_type _start, size_t _byteSize, ConstValueAdapter::Getter _getValueFunc, ConstValueAdapter::Setter _setValueFunc ):
+		p( _p ), start( _start ), byteSize( _byteSize ), getValueFunc( _getValueFunc ), setValueFunc( _setValueFunc )
+	{}
+
+	GenericValueIterator<IS_CONST>& operator++() {p += byteSize; return *this;}
+	GenericValueIterator<IS_CONST>& operator--() {p -= byteSize; return *this;}
+
+	GenericValueIterator<IS_CONST> operator++( int ) {GenericValueIterator<IS_CONST> tmp = *this; ++*this; return tmp;}
+	GenericValueIterator<IS_CONST> operator--( int ) {GenericValueIterator<IS_CONST> tmp = *this; --*this; return tmp;}
+
+	typename GenericValueIterator<IS_CONST>::reference operator*() const;
+	typename GenericValueIterator<IS_CONST>::pointer  operator->() const {return operator*();}
+
+	bool operator==( const GenericValueIterator<IS_CONST>& cmp )const {return p == cmp.p;}
+	bool operator!=( const GenericValueIterator<IS_CONST>& cmp )const {return !( *this == cmp );}
+
+	bool operator>( const GenericValueIterator<IS_CONST> &cmp )const {return p > cmp.p;}
+	bool operator<( const GenericValueIterator<IS_CONST> &cmp )const {return p < cmp.p;}
+
+	bool operator>=( const GenericValueIterator<IS_CONST> &cmp )const {return p >= cmp.p;}
+	bool operator<=( const GenericValueIterator<IS_CONST> &cmp )const {return p <= cmp.p;}
+
+	typename GenericValueIterator<IS_CONST>::difference_type operator-( const GenericValueIterator<IS_CONST> &cmp )const {return ( p - cmp.p ) / byteSize;}
+
+	GenericValueIterator<IS_CONST> operator+( typename GenericValueIterator<IS_CONST>::difference_type n )const
+	{return ( GenericValueIterator<IS_CONST>( *this ) += n );}
+	GenericValueIterator<IS_CONST> operator-( typename GenericValueIterator<IS_CONST>::difference_type n )const
+	{return ( GenericValueIterator<IS_CONST>( *this ) -= n );}
+
+
+	GenericValueIterator<IS_CONST> &operator+=( typename GenericValueIterator<IS_CONST>::difference_type n )
+	{p += ( n * byteSize ); return *this;}
+	GenericValueIterator<IS_CONST> &operator-=( typename GenericValueIterator<IS_CONST>::difference_type n )
+	{p -= ( n * byteSize ); return *this;}
+
+	typename GenericValueIterator<IS_CONST>::reference operator[]( typename GenericValueIterator<IS_CONST>::difference_type n )const {
+		//the book says it has to be the n-th elements of the whole object, so we have to start from what is hopefully the beginning
+		return *( GenericValueIterator<IS_CONST>( start, start, byteSize, getValueFunc, setValueFunc ) += n );
+	}
+
+};
+//specialise the dereferencing operators. They have to return (and create) different objects with different constructors
+template<> GenericValueIterator<true>::reference GenericValueIterator<true>::operator*() const;
+template<> GenericValueIterator<false>::reference GenericValueIterator<false>::operator*() const;
+
+} //namespace _internal
 
 class ValuePtrBase : public util::_internal::GenericValue
 {
@@ -41,6 +133,8 @@ protected:
 	virtual ValuePtrBase *clone()const = 0;
 
 public:
+	typedef _internal::GenericValueIterator<false> value_iterator;
+	typedef _internal::GenericValueIterator<true> const_value_iterator;
 	/// Proxy-Deleter to encapsulate the real deleter/shared_ptr when creating shared_ptr for parts of a shared_ptr
 	class DelProxy : public boost::shared_ptr<const void>
 	{
@@ -66,6 +160,11 @@ public:
 
 	/// \copydoc getRawAddress
 	virtual boost::shared_ptr<void> getRawAddress( size_t offset = 0 ) = 0;
+
+	virtual value_iterator beginGeneric() = 0;
+	value_iterator endGeneric();
+	virtual const_value_iterator beginGeneric()const = 0;
+	const_value_iterator endGeneric()const;
 
 	typedef util::_internal::GenericReference<ValuePtrBase> Reference;
 	typedef _internal::ValuePtrConverterMap::mapped_type::mapped_type Converter;

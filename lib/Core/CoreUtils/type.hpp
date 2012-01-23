@@ -14,7 +14,6 @@
 #define ISISTYPE_HPP
 
 #include "type_base.hpp"
-#include "string.h"
 
 #include <string>
 #include <functional>
