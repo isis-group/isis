@@ -225,7 +225,19 @@ template<> GenericValueIterator<false>::reference GenericValueIterator<false>::o
 	return WritingValueAdapter( p, getValueFunc, setValueFunc );
 }
 
+ConstValueAdapter::ConstValueAdapter( const uint8_t *const _p, Getter _getValueFunc ): util::ValueReference( _getValueFunc( _p ) ), p( _p ) {}
+bool ConstValueAdapter::operator==( const util::ValueReference &val )const {return ( *this )->eq( *val );}
+bool ConstValueAdapter::operator!=( const util::ValueReference &val )const {return !operator==( val );}
 
+bool ConstValueAdapter::operator<( const util::ValueReference &val )const {return ( *this )->lt( *val );}
+bool ConstValueAdapter::operator>( const util::ValueReference &val )const {return ( *this )->gt( *val );}
+
+WritingValueAdapter::WritingValueAdapter( uint8_t *const _p, Getter _getValueFunc, Setter _setValueFunc ):ConstValueAdapter( _p, _getValueFunc ), setValueFunc( _setValueFunc ) {}
+WritingValueAdapter WritingValueAdapter::operator=( const util::ValueReference &val ) {
+	assert( setValueFunc );
+	setValueFunc( const_cast<uint8_t * const>( p ), *val );
+	return *this;
+}
 
 }
 }

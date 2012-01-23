@@ -39,25 +39,20 @@ public:
 protected:
 	const uint8_t *const p;
 public:
-	ConstValueAdapter( const uint8_t *const _p, Getter _getValueFunc ): util::ValueReference( _getValueFunc( _p ) ), p( _p ) {}
+	ConstValueAdapter( const uint8_t *const _p, Getter _getValueFunc );
 	// to make some algorithms work
-	bool operator==( const util::ValueReference &val )const {return ( *this )->eq( *val );}
-	bool operator!=( const util::ValueReference &val )const {return !operator==( val );}
+	bool operator==( const util::ValueReference &val )const;
+	bool operator!=( const util::ValueReference &val )const;
 
-	bool operator<( const util::ValueReference &val )const {return ( *this )->lt( *val );}
-	bool operator>( const util::ValueReference &val )const {return ( *this )->gt( *val );}
+	bool operator<( const util::ValueReference &val )const;
+	bool operator>( const util::ValueReference &val )const;
 };
 class WritingValueAdapter: public ConstValueAdapter
 {
 	Setter setValueFunc;
 public:
-	WritingValueAdapter( uint8_t *const _p, Getter _getValueFunc, Setter _setValueFunc ):
-		ConstValueAdapter( _p, _getValueFunc ), setValueFunc( _setValueFunc ) {}
-	WritingValueAdapter operator=( const util::ValueReference &val ) {
-		assert( setValueFunc );
-		setValueFunc( const_cast<uint8_t * const>( p ), *val );
-		return *this;
-	}
+	WritingValueAdapter( uint8_t *const _p, Getter _getValueFunc, Setter _setValueFunc );
+	WritingValueAdapter operator=( const util::ValueReference &val );
 };
 
 template<bool IS_CONST> class GenericValueIterator :
