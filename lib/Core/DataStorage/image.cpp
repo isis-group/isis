@@ -961,11 +961,17 @@ Image::const_value_iterator Image::end()const {return begin() + getVolume();}
 
 const util::ValueReference Image::getVoxelValue ( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps ) const
 {
-	return begin()[getLinearIndex( util::vector4<size_t>( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ) )];
+	const size_t idx[] = {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps};
+	LOG_IF( !isInRange( idx ), Debug, isis::error )
+			<< "Index " << util::vector4<size_t>( idx ) << " is out of range (" << getSizeAsString() << ")";
+	return begin()[getLinearIndex( idx )];
 }
 void Image::setVoxelValue ( const util::ValueReference &val, size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps )
 {
-	begin()[getLinearIndex( util::vector4<size_t>( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ) )] = val;
+	const size_t idx[] = {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps};
+	LOG_IF( !isInRange( idx ), Debug, isis::error )
+			<< "Index " << util::vector4<size_t>( idx ) << " is out of range (" << getSizeAsString() << ")";
+	begin()[getLinearIndex( idx )] = val;
 }
 
 

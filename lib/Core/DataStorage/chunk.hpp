@@ -110,7 +110,7 @@ public:
 
 		if ( !isInRange( idx ) ) {
 			LOG( Debug, isis::error )
-					<< "Index " << nrOfColumns << "|" << nrOfRows << "|" << nrOfSlices << "|" << nrOfTimesteps
+					<< "Index " << util::vector4<size_t>( idx ) << nrOfTimesteps
 					<< " is out of range (" << getSizeAsString() << ")";
 		}
 
