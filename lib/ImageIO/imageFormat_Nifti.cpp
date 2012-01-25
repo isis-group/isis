@@ -212,7 +212,7 @@ public:
 			boost::numeric::ublas::matrix<float> spmTransform = boost::numeric::ublas::identity_matrix<float> ( 3, 3 );
 			spmTransform( 1, 1 ) = -1;
 			image.transformCoords( spmTransform, true );
-			_internal::Flip flipOp( image.mapScannerAxesToImageDimension( data::z ) );
+			_internal::Flip flipOp( image.mapScannerAxisToImageDimension( data::z ) );
 			image.foreachChunk( flipOp );
 			//set the description
 			std::stringstream description;

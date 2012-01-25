@@ -212,7 +212,7 @@ util::ivector4 Image::getIndexFromPhysicalCoords( const isis::util::fvector4 &ph
 		for( unsigned short i = 0; i < 4; i ++ ) {
 			if( retAsIvector4[i] < 0 )retAsIvector4[i] =  0;
 
-			if( retAsIvector4[i] >= size[i] )retAsIvector4[i] =  static_cast<int>( size[i] - 1 );
+			if( retAsIvector4[i] >= static_cast<int>( size[i] ) )retAsIvector4[i] =  static_cast<int>( size[i] - 1 );
 		}
 	}
 
@@ -270,16 +270,17 @@ bool Image::updateOrientationMatrices()
 }
 
 
-dimensions Image::mapScannerAxesToImageDimension( scannerAxis scannerAxes )
+dimensions Image::mapScannerAxisToImageDimension( scannerAxis scannerAxes )
 {
 	updateOrientationMatrices();
-	boost::numeric::ublas::matrix<float> latchedOrientation = boost::numeric::ublas::zero_matrix<float>( 3, 3 );
-	boost::numeric::ublas::vector<float>mapping( 3 );
+	boost::numeric::ublas::matrix<float> latchedOrientation = boost::numeric::ublas::zero_matrix<float>( 4, 4 );
+	boost::numeric::ublas::vector<float>mapping( 4 );
 	latchedOrientation( m_RowVec.getBiggestVecElemAbs(), 0 ) = 1;
 	latchedOrientation( m_ColumnVec.getBiggestVecElemAbs(), 1 ) = 1;
 	latchedOrientation( m_SliceVec.getBiggestVecElemAbs(), 2 ) = 1;
+	latchedOrientation( 3, 3 ) = 1;
 
-	for( size_t i = 0; i < 3; i++ ) {
+	for( size_t i = 0; i < 4; i++ ) {
 		mapping( i ) = i;
 	}
 
