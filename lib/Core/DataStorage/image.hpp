@@ -724,6 +724,8 @@ template<typename T> class TypedImage: public Image
 protected:
 	TypedImage() {} // to be used only by inheriting classes
 public:
+	typedef _internal::ImageIteratorTemplate<data::ValuePtr<T> > iterator;
+	typedef _internal::ImageIteratorTemplate<const data::ValuePtr<T> > const_iterator;
 	/// cheap copy another Image and make sure all chunks have type T
 	TypedImage( const Image &src ): Image( src ) { // ok we just copied the whole image
 		//but we want it to be of type T
@@ -746,6 +748,30 @@ public:
 	void copyToMem( void *dst )const {
 		Image::copyToMem<T>( ( T * )dst );
 	}
+	iterator begin(){
+		if(checkMakeClean()){
+			std::vector<data::ValuePtr<T>*> vec(lookup.size());
+			for(size_t i=0;i<lookup.size();i++)
+				vec[i]=&lookup[i]->asValuePtr<T>();
+			return iterator( vec );
+		} else {
+			LOG( Debug, error )  << "Image is not clean. Returning empty iterator ...";
+			return iterator();
+		}
+	}
+	iterator end(){return begin()+getVolume();};
+	const_iterator begin()const{
+		if(isClean()){
+			std::vector<const data::ValuePtr<T>*> vec(lookup.size());
+			for(size_t i=0;i<lookup.size();i++)
+				vec[i]=&lookup[i]->asValuePtr<T>();
+			return const_iterator( vec );
+		} else {
+			LOG( Debug, error )  << "Image is not clean. Returning empty iterator ...";
+			return const_iterator();
+		}
+	}
+	const_iterator end()const{return begin()+getVolume();};
 };
 
 /**

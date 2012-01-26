@@ -26,6 +26,7 @@
 #include "typeptr_converter.hpp"
 #include "../CoreUtils/type.hpp"
 #include "common.hpp"
+#include <boost/type_traits/remove_const.hpp>
 
 namespace isis
 {
@@ -95,9 +96,11 @@ template<typename TYPE> class ValuePtrIterator: public std::iterator<std::random
 {
 	TYPE *p;
 	typedef typename std::iterator<std::random_access_iterator_tag, TYPE>::difference_type distance;
+	friend class ValuePtrIterator<const TYPE>;
 public:
 	ValuePtrIterator(): p( NULL ) {}
 	ValuePtrIterator( TYPE *_p ): p( _p ) {}
+	ValuePtrIterator( const ValuePtrIterator<typename boost::remove_const<TYPE>::type > &src ): p( src.p ) {}
 
 	ValuePtrIterator<TYPE>& operator++() {++p; return *this;}
 	ValuePtrIterator<TYPE>& operator--() {--p; return *this;}
