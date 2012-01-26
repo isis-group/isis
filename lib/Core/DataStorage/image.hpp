@@ -21,6 +21,7 @@
 #include <boost/foreach.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
+#include <boost/type_traits/remove_const.hpp>
 #include <stack>
 #include "sortedchunklist.hpp"
 #include "common.hpp"
@@ -32,88 +33,78 @@ namespace data
 namespace _internal
 {
 /**
- * Generic iterator for voxels im images.
- * It automatically jumps from chunk to chunk.
+ * Generic iterator for voxels in Images.
+ * It automatically jumps from chunk to Chunk.
  * It needs the chunks and the image to be there for to work properly (so don't delete the image, and dont reIndex it),
  * It assumes that all Chunks have the same size (which is a rule for Image as well, so this should be given)
  */
-template<bool IS_CONST> class GenericImageIterator: public std::iterator <
+template<typename CHUNK_TYPE> class ImageIteratorTemplate: public std::iterator <
 	std::random_access_iterator_tag,
-	typename _internal::GenericValueIterator<IS_CONST>::value_type,
-	typename _internal::GenericValueIterator<IS_CONST>::difference_type,
-	typename _internal::GenericValueIterator<IS_CONST>::pointer,
-	typename _internal::GenericValueIterator<IS_CONST>::reference
+	typename boost::mpl::if_<boost::is_const<CHUNK_TYPE>,typename CHUNK_TYPE::const_iterator,typename CHUNK_TYPE::iterator>::type::value_type,
+	typename boost::mpl::if_<boost::is_const<CHUNK_TYPE>,typename CHUNK_TYPE::const_iterator,typename CHUNK_TYPE::iterator>::type::difference_type,
+	typename boost::mpl::if_<boost::is_const<CHUNK_TYPE>,typename CHUNK_TYPE::const_iterator,typename CHUNK_TYPE::iterator>::type::pointer,
+	typename boost::mpl::if_<boost::is_const<CHUNK_TYPE>,typename CHUNK_TYPE::const_iterator,typename CHUNK_TYPE::iterator>::type::reference
 	>
 {
-	typedef _internal::GenericValueIterator<IS_CONST> inner_iterator;
-	typedef typename boost::mpl::if_c<IS_CONST, std::vector<boost::shared_ptr<Chunk> >::const_iterator, std::vector<boost::shared_ptr<Chunk> >::iterator>::type outer_iterator;
-	typedef typename boost::mpl::if_c<IS_CONST, const Chunk, Chunk>::type chunk_type;
+protected:
+	typedef typename boost::mpl::if_<boost::is_const<CHUNK_TYPE>,typename CHUNK_TYPE::const_iterator,typename CHUNK_TYPE::iterator>::type inner_iterator;
+	typedef CHUNK_TYPE chunk_type;
+	typedef ImageIteratorTemplate<CHUNK_TYPE> ThisType;
 
-	outer_iterator first_chit, current_chit, last_chit;
+	std::vector<chunk_type*> chunks;
+	size_t ch_idx;
 	inner_iterator current_it;
 	typename inner_iterator::difference_type ch_len;
+
 	typename inner_iterator::difference_type currentDist()const {
-		if( current_chit >= last_chit )
+		if( ch_idx >= chunks.size() )
 			return 0; // if we're behind the last chunk assume we are at the "start" of the "end"-chunk
 		else {
-			inner_iterator chit_begin = boost::const_pointer_cast<chunk_type>( *current_chit )->begin(); // cast in a const or cast out a non existing one
+			const inner_iterator chit_begin = chunks[ch_idx]->begin(); // cast in a const or cast out a non existing one
 			return std::distance( chit_begin, current_it ); // so we use same iterators here
 		}
 	}
-	friend class GenericImageIterator<false>;//yes, I'm my own friend, sometimes :-) (enables the constructor below)
+	friend class ImageIteratorTemplate<const CHUNK_TYPE>; //yes, I'm my own friend, sometimes :-) (enables the constructor below)
 public:
-	GenericImageIterator( const GenericImageIterator<false> &src ): //will become additional constructor from non const if this is const, otherwise overrride the default copy contructor
-		first_chit( src.first_chit ),
-		current_chit( src.current_chit ),
-		last_chit( src.last_chit ),
-		current_it( src.current_it ),
-		ch_len( src.ch_len )
-	{}
-	GenericImageIterator() {}
-	GenericImageIterator( outer_iterator _first_chit, outer_iterator _last_chit ):
-		first_chit( _first_chit ),
-		current_chit( _first_chit ),
-		last_chit( _last_chit ),
-		current_it( ( *current_chit )->begin() ),
-		ch_len( std::distance( current_it, boost::const_pointer_cast<chunk_type>( *current_chit )->end() ) )
+	//will become additional constructor from non const if this is const, otherwise overrride the default copy contructor
+	ImageIteratorTemplate( const ImageIteratorTemplate<typename boost::remove_const<CHUNK_TYPE>::type > &src ):
+		chunks(src.chunks.begin(),src.chunks.end()),ch_idx(src.ch_idx),
+		current_it(src.current_it),
+		ch_len(src.ch_len)
 	{}
 
+	// empty constructor
+	ImageIteratorTemplate():ch_idx(0),ch_len(0){}
 
-	GenericImageIterator<IS_CONST>& operator++() {return operator+=( 1 );}
-	GenericImageIterator<IS_CONST>& operator--() {return operator-=( 1 );}
+	// normal conytructor
+	explicit ImageIteratorTemplate(const std::vector<chunk_type*>& _chunks):
+		chunks(_chunks),ch_idx(0),
+		current_it( chunks[0]->begin() ),
+		ch_len( std::distance( current_it, chunks[0]->end() ) )
+	{}
 
-	GenericImageIterator<IS_CONST> operator++( int ) {GenericImageIterator<IS_CONST> tmp = *this; operator++(); return tmp;}
-	GenericImageIterator<IS_CONST> operator--( int ) {GenericImageIterator<IS_CONST> tmp = *this; operator--(); return tmp;}
+	ThisType& operator++() {return operator+=( 1 );}
+	ThisType& operator--() {return operator-=( 1 );}
 
-	typename GenericImageIterator<IS_CONST>::reference operator*() const {return current_it.operator * ();}
-	typename GenericImageIterator<IS_CONST>::pointer  operator->() const {return current_it.operator->();}
+	ThisType operator++( int ) {ThisType tmp = *this; operator++(); return tmp;}
+	ThisType operator--( int ) {ThisType tmp = *this; operator--(); return tmp;}
 
-	bool operator==( const GenericImageIterator<IS_CONST>& cmp )const {
-		return
-			current_chit == cmp.current_chit &&
-			current_it == cmp.current_it;
-	}
-	bool operator!=( const GenericImageIterator<IS_CONST>& cmp )const {return !operator==( cmp );}
+	typename inner_iterator::reference operator*() const {return current_it.operator * ();}
+	typename inner_iterator::pointer  operator->() const {return current_it.operator->();}
 
-	bool operator>( const GenericImageIterator<IS_CONST> &cmp )const {
-		return
-			current_chit > cmp.current_chit ||
-			( current_chit == cmp.current_chit && current_it > cmp.current_it );
-	}
-	bool operator<( const GenericImageIterator<IS_CONST> &cmp )const {
-		return
-			current_chit < cmp.current_chit ||
-			( current_chit == cmp.current_chit && current_it < cmp.current_it );
-	}
+	bool operator==( const ThisType& cmp )const {return ch_idx == cmp.ch_idx && current_it == cmp.current_it;}
+	bool operator!=( const ThisType& cmp )const {return !operator==( cmp );}
 
+	bool operator>( const ThisType& cmp )const {return ch_idx > cmp.ch_idx || ( ch_idx == cmp.ch_idx && current_it > cmp.current_it );}
+	bool operator<( const ThisType& cmp )const {return ch_idx < cmp.ch_idx || ( ch_idx == cmp.ch_idx && current_it < cmp.current_it );}
 
-	bool operator>=( const GenericImageIterator<IS_CONST> &cmp )const {return operator>( cmp ) || operator==( cmp );}
-	bool operator<=( const GenericImageIterator<IS_CONST> &cmp )const {return operator<( cmp ) || operator==( cmp );}
+	bool operator>=( const ThisType& cmp )const {return operator>( cmp ) || operator==( cmp );}
+	bool operator<=( const ThisType& cmp )const {return operator<( cmp ) || operator==( cmp );}
 
-	typename GenericImageIterator<IS_CONST>::difference_type operator-( const GenericImageIterator<IS_CONST> &cmp )const {
-		typename GenericImageIterator<IS_CONST>::difference_type dist = ( current_chit - cmp.current_chit ) * ch_len; // get the (virtual) distance from my current block to cmp's current block
+	typename inner_iterator::difference_type operator-( const ThisType& cmp )const {
+		typename inner_iterator::difference_type dist = ( ch_idx - cmp.ch_idx ) * ch_len; // get the (virtual) distance from my current block to cmp's current block
 
-		if( current_chit >= cmp.current_chit ) { //if I'm beyond cmp add my current pos to the distance, and substract his
+		if( ch_idx >= cmp.ch_idx ) { //if I'm beyond cmp add my current pos to the distance, and substract his
 			dist += currentDist() - cmp.currentDist();
 		} else {
 			dist += cmp.currentDist() - currentDist();
@@ -122,25 +113,25 @@ public:
 		return dist;
 	}
 
-	GenericImageIterator<IS_CONST> operator+( typename GenericImageIterator<IS_CONST>::difference_type n )const {return GenericImageIterator<IS_CONST>( *this ) += n;}
-	GenericImageIterator<IS_CONST> operator-( typename GenericImageIterator<IS_CONST>::difference_type n )const {return GenericImageIterator<IS_CONST>( *this ) -= n;}
+	ThisType operator+( typename ThisType::difference_type n )const {return ThisType( *this ) += n;}
+	ThisType operator-( typename ThisType::difference_type n )const {return ThisType( *this ) -= n;}
 
-
-	GenericImageIterator<IS_CONST> &operator+=( typename GenericImageIterator<IS_CONST>::difference_type n ) {
+	ThisType &operator+=( typename inner_iterator::difference_type n ) {
 		n += currentDist(); //start from current begin (add current_it-(begin of the current chunk) to n)
-		std::advance( current_chit, n / ch_len ); //if neccesary jump to next chunk
+		assert(( n / ch_len + static_cast<typename ThisType::difference_type>(ch_idx)  ) >= 0);
+		ch_idx+= n / ch_len; //if neccesary jump to next chunk
 
-		if( current_chit < last_chit )
-			current_it = ( *current_chit )->begin() + n % ch_len; //set new current iterator in new chunk
+		if( ch_idx < chunks.size() )
+			current_it = chunks[ch_idx]->begin() + n % ch_len; //set new current iterator in new chunk plus the "rest"
 		else
-			current_it = ( *( last_chit - 1 ) )->end() ; //set current_it to the last chunks end iterator if we are behind it
+			current_it = ( *( chunks.end() - 1 ) )->end() ; //set current_it to the last chunks end iterator if we are behind it
 
 		return *this;
 	}
-	GenericImageIterator<IS_CONST> &operator-=( typename GenericImageIterator<IS_CONST>::difference_type n ) {return operator+=( -n );}
+	ThisType &operator-=( typename inner_iterator::difference_type n ) {return operator+=( -n );}
 
-	typename GenericImageIterator<IS_CONST>::reference operator[]( typename GenericImageIterator<IS_CONST>::difference_type n )const {
-		return *( GenericImageIterator<IS_CONST>( first_chit, last_chit ) += n );
+	typename ThisType::reference operator[]( typename inner_iterator::difference_type n )const {
+		return *( ThisType( chunks) += n );
 	}
 
 };
@@ -172,8 +163,8 @@ public:
 	 */
 	void setIndexingDim( dimensions d = rowDim );
 	enum orientation {axial, reversed_axial, sagittal, reversed_sagittal, coronal, reversed_coronal};
-	typedef _internal::GenericImageIterator<false> value_iterator;
-	typedef _internal::GenericImageIterator<true> const_value_iterator;
+	typedef _internal::ImageIteratorTemplate<Chunk> iterator;
+	typedef _internal::ImageIteratorTemplate<const Chunk> const_iterator;
 protected:
 	_internal::SortedChunkList set;
 	std::vector<boost::shared_ptr<Chunk> > lookup;
@@ -395,10 +386,10 @@ public:
 	/// \returns the typename correspondig to the result of typeID
 	std::string getMajorTypeName() const;
 
-	value_iterator begin();
-	value_iterator end();
-	const_value_iterator begin()const;
-	const_value_iterator end()const;
+	iterator begin();
+	iterator end();
+	const_iterator begin()const;
+	const_iterator end()const;
 
 	/**
 	 * Get a chunk via index (and the lookup table).

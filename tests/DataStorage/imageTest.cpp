@@ -437,13 +437,16 @@ BOOST_AUTO_TEST_CASE ( image_const_iterator_test )
 	( k++ )->voxel<float>( 2, 2 ) = 42;
 
 	const data::Image img( chunks );
+
+	std::list<data::Chunk> empty;
 	BOOST_REQUIRE( img.isClean() );
 	BOOST_CHECK( img.isValid() );
 
-	const data::Image::const_value_iterator start = img.begin();
-	const data::Image::const_value_iterator end = img.end();
-	data::Image::const_value_iterator i = start;
+	const data::Image::const_iterator start = img.begin();
+	const data::Image::const_iterator end = img.end();
+	data::Image::const_iterator i = start;
 
+	BOOST_CHECK( start < end );
 	BOOST_CHECK_EQUAL( std::distance( start, end ), img.getVolume() );
 	BOOST_CHECK_EQUAL( std::distance( end, start ), -img.getVolume() );
 
@@ -457,6 +460,12 @@ BOOST_AUTO_TEST_CASE ( image_const_iterator_test )
 	BOOST_CHECK_EQUAL( *( --i ), util::Value<int>( 42 ) ); // here it is
 
 	BOOST_CHECK_EQUAL( std::distance( start, i ), img.getLinearIndex( util::vector4<size_t>( 1, 1, 1 ) ) ); //we should be exactly at the position of the second 42 now
+
+// @todo does not work yet
+// 	const data::Image invalid(empty);
+// 
+// 	BOOST_REQUIRE( !invalid.isClean() );
+// 	BOOST_CHECK( invalid.begin() == invalid.end() ); // in an empty image begin should be equal to end
 
 	// this must not compile
 	//(*i)=util::Value<int>(23);
@@ -479,9 +488,10 @@ BOOST_AUTO_TEST_CASE ( image_iterator_test )
 	BOOST_REQUIRE( img.isClean() );
 	BOOST_CHECK( img.isValid() );
 
-	const data::Image::value_iterator start = img.begin();
-	const data::Image::value_iterator end = img.end();
-	data::Image::value_iterator i = start;
+	const data::Image::iterator start = img.begin();
+	const data::Image::iterator end = img.end();
+	data::Image::iterator i = start;
+	data::Image::const_iterator j=i;
 
 	BOOST_CHECK_EQUAL( std::distance( start, end ), img.getVolume() );
 	BOOST_CHECK_EQUAL( std::distance( end, start ), -img.getVolume() );
