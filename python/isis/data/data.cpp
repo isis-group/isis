@@ -105,6 +105,7 @@ BOOST_PYTHON_MODULE( _data )
 	.def( "getCheapCopy", ( isis::data::Image ( ::_Image:: * )( void ) ) ( &_Image::_cheapCopy ) )
 	.def( "createImage", &_Image::_createImage )
 	.staticmethod( "createImage" )
+	.def( "__iter__", iterator<isis::data::Image>() )
 	;
 	//#######################################################################################
 	//  ImageList

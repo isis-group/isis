@@ -52,95 +52,146 @@ template<bool IS_CONST> class GenericImageIterator: public std::iterator <
 	outer_iterator first_chit, current_chit, last_chit;
 	inner_iterator current_it;
 	typename inner_iterator::difference_type ch_len;
-	typename inner_iterator::difference_type currentDist()const {
-		if( current_chit >= last_chit )
+	typename inner_iterator::difference_type currentDist() const
+	{
+		if ( current_chit >= last_chit )
 			return 0; // if we're behind the last chunk assume we are at the "start" of the "end"-chunk
-		else {
-			inner_iterator chit_begin = boost::const_pointer_cast<chunk_type>( *current_chit )->begin(); // cast in a const or cast out a non existing one
-			return std::distance( chit_begin, current_it ); // so we use same iterators here
+		else
+		{
+			inner_iterator chit_begin = boost::const_pointer_cast<chunk_type> ( *current_chit )->begin(); // cast in a const or cast out a non existing one
+			return std::distance ( chit_begin, current_it ); // so we use same iterators here
 		}
 	}
 	friend class GenericImageIterator<false>;//yes, I'm my own friend, sometimes :-) (enables the constructor below)
 public:
-	GenericImageIterator( const GenericImageIterator<false> &src ): //will become additional constructor from non const if this is const, otherwise overrride the default copy contructor
-		first_chit( src.first_chit ),
-		current_chit( src.current_chit ),
-		last_chit( src.last_chit ),
-		current_it( src.current_it ),
-		ch_len( src.ch_len )
+	GenericImageIterator ( const GenericImageIterator<false> &src ) : //will become additional constructor from non const if this is const, otherwise overrride the default copy contructor
+		first_chit ( src.first_chit ),
+		current_chit ( src.current_chit ),
+		last_chit ( src.last_chit ),
+		current_it ( src.current_it ),
+		ch_len ( src.ch_len )
 	{}
 	GenericImageIterator() {}
-	GenericImageIterator( outer_iterator _first_chit, outer_iterator _last_chit ):
-		first_chit( _first_chit ),
-		current_chit( _first_chit ),
-		last_chit( _last_chit ),
-		current_it( ( *current_chit )->begin() ),
-		ch_len( std::distance( current_it, boost::const_pointer_cast<chunk_type>( *current_chit )->end() ) )
+	GenericImageIterator ( outer_iterator _first_chit, outer_iterator _last_chit ) :
+		first_chit ( _first_chit ),
+		current_chit ( _first_chit ),
+		last_chit ( _last_chit ),
+		current_it ( ( *current_chit )->begin() ),
+		ch_len ( std::distance ( current_it, boost::const_pointer_cast<chunk_type> ( *current_chit )->end() ) )
 	{}
 
 
-	GenericImageIterator<IS_CONST>& operator++() {return operator+=( 1 );}
-	GenericImageIterator<IS_CONST>& operator--() {return operator-=( 1 );}
+	GenericImageIterator<IS_CONST>& operator++()
+	{
+		return operator+= ( 1 );
+	}
+	GenericImageIterator<IS_CONST>& operator--()
+	{
+		return operator-= ( 1 );
+	}
 
-	GenericImageIterator<IS_CONST> operator++( int ) {GenericImageIterator<IS_CONST> tmp = *this; operator++(); return tmp;}
-	GenericImageIterator<IS_CONST> operator--( int ) {GenericImageIterator<IS_CONST> tmp = *this; operator--(); return tmp;}
+	GenericImageIterator<IS_CONST> operator++ ( int )
+	{
+		GenericImageIterator<IS_CONST> tmp = *this;
+		operator++();
+		return tmp;
+	}
+	GenericImageIterator<IS_CONST> operator-- ( int )
+	{
+		GenericImageIterator<IS_CONST> tmp = *this;
+		operator--();
+		return tmp;
+	}
 
-	typename GenericImageIterator<IS_CONST>::reference operator*() const {return current_it.operator * ();}
-	typename GenericImageIterator<IS_CONST>::pointer  operator->() const {return current_it.operator->();}
+	typename GenericImageIterator<IS_CONST>::reference operator*() const
+	{
+		return current_it.operator * ();
+	}
+	typename GenericImageIterator<IS_CONST>::pointer  operator->() const
+	{
+		return current_it.operator->();
+	}
 
-	bool operator==( const GenericImageIterator<IS_CONST>& cmp )const {
+	bool operator== ( const GenericImageIterator<IS_CONST>& cmp ) const
+	{
 		return
 			current_chit == cmp.current_chit &&
 			current_it == cmp.current_it;
 	}
-	bool operator!=( const GenericImageIterator<IS_CONST>& cmp )const {return !operator==( cmp );}
+	bool operator!= ( const GenericImageIterator<IS_CONST>& cmp ) const
+	{
+		return !operator== ( cmp );
+	}
 
-	bool operator>( const GenericImageIterator<IS_CONST> &cmp )const {
+	bool operator> ( const GenericImageIterator<IS_CONST> &cmp ) const
+	{
 		return
 			current_chit > cmp.current_chit ||
 			( current_chit == cmp.current_chit && current_it > cmp.current_it );
 	}
-	bool operator<( const GenericImageIterator<IS_CONST> &cmp )const {
+	bool operator< ( const GenericImageIterator<IS_CONST> &cmp ) const
+	{
 		return
 			current_chit < cmp.current_chit ||
 			( current_chit == cmp.current_chit && current_it < cmp.current_it );
 	}
 
 
-	bool operator>=( const GenericImageIterator<IS_CONST> &cmp )const {return operator>( cmp ) || operator==( cmp );}
-	bool operator<=( const GenericImageIterator<IS_CONST> &cmp )const {return operator<( cmp ) || operator==( cmp );}
+	bool operator>= ( const GenericImageIterator<IS_CONST> &cmp ) const
+	{
+		return operator> ( cmp ) || operator== ( cmp );
+	}
+	bool operator<= ( const GenericImageIterator<IS_CONST> &cmp ) const
+	{
+		return operator< ( cmp ) || operator== ( cmp );
+	}
 
-	typename GenericImageIterator<IS_CONST>::difference_type operator-( const GenericImageIterator<IS_CONST> &cmp )const {
+	typename GenericImageIterator<IS_CONST>::difference_type operator- ( const GenericImageIterator<IS_CONST> &cmp ) const
+	{
 		typename GenericImageIterator<IS_CONST>::difference_type dist = ( current_chit - cmp.current_chit ) * ch_len; // get the (virtual) distance from my current block to cmp's current block
 
-		if( current_chit >= cmp.current_chit ) { //if I'm beyond cmp add my current pos to the distance, and substract his
+		if ( current_chit >= cmp.current_chit )  //if I'm beyond cmp add my current pos to the distance, and substract his
+		{
 			dist += currentDist() - cmp.currentDist();
-		} else {
+		}
+		else
+		{
 			dist += cmp.currentDist() - currentDist();
 		}
 
 		return dist;
 	}
 
-	GenericImageIterator<IS_CONST> operator+( typename GenericImageIterator<IS_CONST>::difference_type n )const {return GenericImageIterator<IS_CONST>( *this ) += n;}
-	GenericImageIterator<IS_CONST> operator-( typename GenericImageIterator<IS_CONST>::difference_type n )const {return GenericImageIterator<IS_CONST>( *this ) -= n;}
+	GenericImageIterator<IS_CONST> operator+ ( typename GenericImageIterator<IS_CONST>::difference_type n ) const
+	{
+		return GenericImageIterator<IS_CONST> ( *this ) += n;
+	}
+	GenericImageIterator<IS_CONST> operator- ( typename GenericImageIterator<IS_CONST>::difference_type n ) const
+	{
+		return GenericImageIterator<IS_CONST> ( *this ) -= n;
+	}
 
 
-	GenericImageIterator<IS_CONST> &operator+=( typename GenericImageIterator<IS_CONST>::difference_type n ) {
+	GenericImageIterator<IS_CONST> &operator+= ( typename GenericImageIterator<IS_CONST>::difference_type n )
+	{
 		n += currentDist(); //start from current begin (add current_it-(begin of the current chunk) to n)
-		std::advance( current_chit, n / ch_len ); //if neccesary jump to next chunk
+		std::advance ( current_chit, n / ch_len ); //if neccesary jump to next chunk
 
-		if( current_chit < last_chit )
+		if ( current_chit < last_chit )
 			current_it = ( *current_chit )->begin() + n % ch_len; //set new current iterator in new chunk
 		else
-			current_it = ( *( last_chit - 1 ) )->end() ; //set current_it to the last chunks end iterator if we are behind it
+			current_it = ( * ( last_chit - 1 ) )->end() ; //set current_it to the last chunks end iterator if we are behind it
 
 		return *this;
 	}
-	GenericImageIterator<IS_CONST> &operator-=( typename GenericImageIterator<IS_CONST>::difference_type n ) {return operator+=( -n );}
+	GenericImageIterator<IS_CONST> &operator-= ( typename GenericImageIterator<IS_CONST>::difference_type n )
+	{
+		return operator+= ( -n );
+	}
 
-	typename GenericImageIterator<IS_CONST>::reference operator[]( typename GenericImageIterator<IS_CONST>::difference_type n )const {
-		return *( GenericImageIterator<IS_CONST>( first_chit, last_chit ) += n );
+	typename GenericImageIterator<IS_CONST>::reference operator[] ( typename GenericImageIterator<IS_CONST>::difference_type n ) const
+	{
+		return * ( GenericImageIterator<IS_CONST> ( first_chit, last_chit ) += n );
 	}
 
 };
@@ -150,7 +201,7 @@ public:
 class ChunkOp : std::unary_function<Chunk &, bool>
 {
 public:
-	virtual bool operator()( Chunk &, util::vector4<size_t> posInImage ) = 0;
+	virtual bool operator() ( Chunk &, util::vector4<size_t> posInImage ) = 0;
 	virtual ~ChunkOp();
 };
 
@@ -170,10 +221,12 @@ public:
 	 * If the indexing dimension is set after the Image was indexed it will be indexed again.
 	 * \param d the minimal indexing dimension to be used
 	 */
-	void setIndexingDim( dimensions d = rowDim );
+	void setIndexingDim ( dimensions d = rowDim );
 	enum orientation {axial, reversed_axial, sagittal, reversed_sagittal, coronal, reversed_coronal};
 	typedef _internal::GenericImageIterator<false> value_iterator;
 	typedef _internal::GenericImageIterator<true> const_value_iterator;
+	typedef value_iterator iterator;
+
 protected:
 	_internal::SortedChunkList set;
 	std::vector<boost::shared_ptr<Chunk> > lookup;
@@ -187,7 +240,7 @@ private:
 	 * The Chunk will only have metadata which are unique to it - so it might be invalid
 	 * (run join on it using the image as parameter to insert all non-unique-metadata).
 	 */
-	const boost::shared_ptr<Chunk> &chunkPtrAt( size_t at )const;
+	const boost::shared_ptr<Chunk> &chunkPtrAt ( size_t at ) const;
 
 	/**
 	 * Computes chunk- and voxel- indices.
@@ -200,16 +253,17 @@ private:
 	 * Additionally an error will be sent if Debug is enabled.
 	 * \returns a std::pair\<chunk-index,voxel-index\>
 	 */
-	inline std::pair<size_t, size_t> commonGet ( size_t first, size_t second, size_t third, size_t fourth ) const {
+	inline std::pair<size_t, size_t> commonGet ( size_t first, size_t second, size_t third, size_t fourth ) const
+	{
 		const size_t idx[] = {first, second, third, fourth};
-		LOG_IF( ! clean, Debug, error )
+		LOG_IF ( ! clean, Debug, error )
 				<< "Getting data from a non indexed image will result in undefined behavior. Run reIndex first.";
-		LOG_IF( set.isEmpty(), Debug, error )
+		LOG_IF ( set.isEmpty(), Debug, error )
 				<< "Getting data from a empty image will result in undefined behavior.";
-		LOG_IF( !isInRange( idx ), Debug, isis::error )
-				<< "Index " << util::vector4<size_t>( idx ) << " is out of range (" << getSizeAsString() << ")";
-		const size_t index = getLinearIndex( idx );
-		return std::make_pair( index / chunkVolume, index % chunkVolume );
+		LOG_IF ( !isInRange ( idx ), Debug, isis::error )
+				<< "Index " << util::vector4<size_t> ( idx ) << " is out of range (" << getSizeAsString() << ")";
+		const size_t index = getLinearIndex ( idx );
+		return std::make_pair ( index / chunkVolume, index % chunkVolume );
 	}
 
 
@@ -235,13 +289,13 @@ protected:
 	 * dimension, one "line" for the second and soon...)
 	 * \returns the length of this chunk-"line" / the stride
 	 */
-	size_t getChunkStride( size_t base_stride = 1 );
+	size_t getChunkStride ( size_t base_stride = 1 );
 	/**
 	 * Access a chunk via index (and the lookup table)
 	 * The Chunk will only have metadata which are unique to it - so it might be invalid
 	 * (run join on it using the image as parameter to insert all non-unique-metadata).
 	 */
-	Chunk &chunkAt( size_t at );
+	Chunk &chunkAt ( size_t at );
 	/// Creates an empty Image object.
 	Image();
 
@@ -259,33 +313,35 @@ public:
 	 * Copy constructor.
 	 * Copies all elements, only the voxel-data (in the chunks) are referenced.
 	 */
-	Image( const Image &ref );
+	Image ( const Image &ref );
 
 	/**
 	 * Create image from a list of Chunks or objects with the base Chunk.
 	 * Removes used chunks from the given list. So afterwards the list consists of the rejected chunks.
 	 */
-	template<typename T> Image( std::list<T> &chunks, dimensions min_dim = rowDim ) :
-		_internal::NDimensional<4>(), util::PropertyMap(), minIndexingDim( min_dim ),
-		set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ),
-		clean( false ) {
-		addNeededFromString( neededProperties );
-		set.addSecondarySort( "acquisitionNumber" );
-		set.addSecondarySort( "acquisitionTime" );
-		insertChunksFromContainer( chunks );
+	template<typename T> Image ( std::list<T> &chunks, dimensions min_dim = rowDim ) :
+		_internal::NDimensional<4>(), util::PropertyMap(), minIndexingDim ( min_dim ),
+		set ( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ),
+		clean ( false )
+	{
+		addNeededFromString ( neededProperties );
+		set.addSecondarySort ( "acquisitionNumber" );
+		set.addSecondarySort ( "acquisitionTime" );
+		insertChunksFromContainer ( chunks );
 	}
 	/**
 	 * Create image from a vector of Chunks or objects with the base Chunk.
 	 * Removes used chunks from the given list. So afterwards the list consists of the rejected chunks.
 	 */
-	template<typename T> Image( std::vector<T> &chunks, dimensions min_dim = rowDim ) :
+	template<typename T> Image ( std::vector<T> &chunks, dimensions min_dim = rowDim ) :
 		_internal::NDimensional<4>(), util::PropertyMap(),
-		set( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ),
-		clean( false ), minIndexingDim( min_dim ) {
-		addNeededFromString( neededProperties );
-		set.addSecondarySort( "acquisitionNumber" );
-		set.addSecondarySort( "acquisitionTime" );
-		insertChunksFromContainer( chunks );
+		set ( "sequenceNumber,rowVec,columnVec,sliceVec,coilChannelMask,DICOM/EchoNumbers" ),
+		clean ( false ), minIndexingDim ( min_dim )
+	{
+		addNeededFromString ( neededProperties );
+		set.addSecondarySort ( "acquisitionNumber" );
+		set.addSecondarySort ( "acquisitionTime" );
+		insertChunksFromContainer ( chunks );
 	}
 
 	/**
@@ -293,30 +349,41 @@ public:
 	 * Removes used chunks from the given sequence container. So afterwards the container consists of the rejected chunks.
 	 * \returns amount of successfully inserted chunks
 	 */
-	template<typename T> size_t insertChunksFromContainer( T &chunks ) {
-		BOOST_STATIC_ASSERT( ( boost::is_base_of<Chunk, typename T::value_type >::value ) );
+	template<typename T> size_t insertChunksFromContainer ( T &chunks )
+	{
+		BOOST_STATIC_ASSERT ( ( boost::is_base_of<Chunk, typename T::value_type >::value ) );
 		size_t cnt = 0;
 
-		for ( typename T::iterator i = chunks.begin(); i != chunks.end(); ) { // for all remaining chunks
-			if ( insertChunk( *i ) ) {
-				chunks.erase( i++ );
+		for ( typename T::iterator i = chunks.begin(); i != chunks.end(); )   // for all remaining chunks
+		{
+			if ( insertChunk ( *i ) )
+			{
+				chunks.erase ( i++ );
 				cnt++;
-			} else {
+			}
+			else
+			{
 				i++;
 			}
 		}
 
-		if ( ! isEmpty() ) {
-			LOG( Debug, info ) << "Reindexing image with " << cnt << " chunks.";
+		if ( ! isEmpty() )
+		{
+			LOG ( Debug, info ) << "Reindexing image with " << cnt << " chunks.";
 
-			if( !reIndex() ) {
-				LOG( Runtime, error ) << "Failed to create image from " << cnt << " chunks.";
-			} else {
-				LOG_IF( !getMissing().empty(), Debug, warning )
+			if ( !reIndex() )
+			{
+				LOG ( Runtime, error ) << "Failed to create image from " << cnt << " chunks.";
+			}
+			else
+			{
+				LOG_IF ( !getMissing().empty(), Debug, warning )
 						<< "The created image is missing some properties: " << getMissing() << ". It will be invalid.";
 			}
-		} else {
-			LOG( Debug, warning ) << "Image is empty after inserting chunks.";
+		}
+		else
+		{
+			LOG ( Debug, warning ) << "Image is empty after inserting chunks.";
 		}
 
 		return cnt;
@@ -326,16 +393,16 @@ public:
 	/**
 	 * Create image from a single chunk.
 	 */
-	Image( const Chunk &chunk, dimensions min_dim = rowDim );
+	Image ( const Chunk &chunk, dimensions min_dim = rowDim );
 
 	/**
 	 * Copy operator.
 	 * Copies all elements, only the voxel-data (in the chunks) are referenced.
 	 */
-	Image &operator=( const Image &ref );
+	Image &operator= ( const Image &ref );
 
 	bool checkMakeClean();
-	bool isClean()const;
+	bool isClean() const;
 	/**
 	 * This method returns a reference to the voxel value at the given coordinates.
 	 *
@@ -353,10 +420,11 @@ public:
 	 * \returns A reference to the addressed voxel value. Reading and writing access
 	 * is provided.
 	 */
-	template <typename T> T &voxel( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 ) {
+	template <typename T> T &voxel ( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )
+	{
 		checkMakeClean();
-		const std::pair<size_t, size_t> index = commonGet( first, second, third, fourth );
-		ValuePtr<T> &data = chunkAt( index.first ).asValuePtr<T>();
+		const std::pair<size_t, size_t> index = commonGet ( first, second, third, fourth );
+		ValuePtr<T> &data = chunkAt ( index.first ).asValuePtr<T>();
 		return data[index.second];
 	}
 
@@ -372,14 +440,15 @@ public:
 	 *
 	 * \returns A reference to the addressed voxel value. Only reading access is provided
 	 */
-	template <typename T> const T &voxel( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 )const {
-		const std::pair<size_t, size_t> index = commonGet( first, second, third, fourth );
-		const ValuePtr<T> &data = chunkPtrAt( index.first )->getValuePtr<T>();
+	template <typename T> const T &voxel ( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0 ) const
+	{
+		const std::pair<size_t, size_t> index = commonGet ( first, second, third, fourth );
+		const ValuePtr<T> &data = chunkPtrAt ( index.first )->getValuePtr<T>();
 		return data[index.second];
 	}
 
-	const util::ValueReference getVoxelValue( size_t nrOfColumns, size_t nrOfRows = 0, size_t nrOfSlices = 0, size_t nrOfTimesteps = 0 )const;
-	void setVoxelValue( const util::ValueReference &val, size_t nrOfColumns, size_t nrOfRows = 0, size_t nrOfSlices = 0, size_t nrOfTimesteps = 0 );
+	const util::ValueReference getVoxelValue ( size_t nrOfColumns, size_t nrOfRows = 0, size_t nrOfSlices = 0, size_t nrOfTimesteps = 0 ) const;
+	void setVoxelValue ( const util::ValueReference &val, size_t nrOfColumns, size_t nrOfRows = 0, size_t nrOfSlices = 0, size_t nrOfTimesteps = 0 );
 
 	/**
 	 * Get the type of the chunk with "biggest" type.
@@ -397,15 +466,15 @@ public:
 
 	value_iterator begin();
 	value_iterator end();
-	const_value_iterator begin()const;
-	const_value_iterator end()const;
+	const_value_iterator begin() const;
+	const_value_iterator end() const;
 
 	/**
 	 * Get a chunk via index (and the lookup table).
 	 * The returned chunk will be a cheap copy of the original chunk.
 	 * If copy_metadata is true the metadata of the image is copied into the chunk.
 	 */
-	Chunk getChunkAt( size_t at, bool copy_metadata = true )const;
+	Chunk getChunkAt ( size_t at, bool copy_metadata = true ) const;
 
 	/**
 	 * Get the chunk that contains the voxel at the given coordinates.
@@ -420,7 +489,7 @@ public:
 	 * \returns a copy of the chunk that contains the voxel at the given coordinates.
 	 * (Reminder: Chunk-copies are cheap, so the image data are NOT copied but referenced)
 	 */
-	const Chunk getChunk( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true )const;
+	const Chunk getChunk ( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true ) const;
 
 	/**
 	 * Get the chunk that contains the voxel at the given coordinates.
@@ -434,7 +503,7 @@ public:
 	 * \returns a copy of the chunk that contains the voxel at the given coordinates.
 	 * (Reminder: Chunk-copies are cheap, so the image data are NOT copied but referenced)
 	 */
-	Chunk getChunk( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true );
+	Chunk getChunk ( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true );
 
 	/**
 	 * Get the chunk that contains the voxel at the given coordinates in the given type.
@@ -449,8 +518,9 @@ public:
 	 * \param copy_metadata if true the metadata of the image are merged into the returned chunk
 	 * \returns a (maybe converted) chunk containing the voxel value at the given coordinates.
 	 */
-	template<typename TYPE> Chunk getChunkAs( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true )const {
-		return getChunkAs<TYPE>( getScalingTo( ValuePtr<TYPE>::staticID ), first, second, third, fourth, copy_metadata );
+	template<typename TYPE> Chunk getChunkAs ( size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true ) const
+	{
+		return getChunkAs<TYPE> ( getScalingTo ( ValuePtr<TYPE>::staticID ), first, second, third, fourth, copy_metadata );
 	}
 	/**
 	 * Get the chunk that contains the voxel at the given coordinates in the given type (fast version).
@@ -464,14 +534,15 @@ public:
 	 * \param copy_metadata if true the metadata of the image are merged into the returned chunk
 	 * \returns a (maybe converted) chunk containing the voxel value at the given coordinates.
 	 */
-	template<typename TYPE> Chunk getChunkAs( const scaling_pair &scaling, size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true )const {
-		Chunk ret = getChunk( first, second, third, fourth, copy_metadata ); // get a cheap copy
-		ret.convertToType( ValuePtr<TYPE>::staticID, scaling ); // make it of type T
+	template<typename TYPE> Chunk getChunkAs ( const scaling_pair &scaling, size_t first, size_t second = 0, size_t third = 0, size_t fourth = 0, bool copy_metadata = true ) const
+	{
+		Chunk ret = getChunk ( first, second, third, fourth, copy_metadata ); // get a cheap copy
+		ret.convertToType ( ValuePtr<TYPE>::staticID, scaling ); // make it of type T
 		return ret; //return that
 	}
 
 	///for each chunk get the scaling (and offset) which would be used in an conversion to the given type
-	scaling_pair getScalingTo( unsigned short typeID, autoscaleOption scaleopt = autoscale )const;
+	scaling_pair getScalingTo ( unsigned short typeID, autoscaleOption scaleopt = autoscale ) const;
 
 
 	/**
@@ -482,7 +553,7 @@ public:
 	 * \param chunk The Chunk to be inserted
 	 * \returns true if the Chunk was inserted, false otherwise.
 	 */
-	bool insertChunk( const Chunk &chunk );
+	bool insertChunk ( const Chunk &chunk );
 	/**
 	 * (Re)computes the image layout and metadata.
 	 * The image will be "clean" on success.
@@ -491,39 +562,40 @@ public:
 	bool reIndex();
 
 	/// \returns true if there is no chunk in the image
-	bool isEmpty()const;
+	bool isEmpty() const;
 
 	/**
 	 * Get a list of the properties of the chunks for the given key
 	 * \param key the name of the property to search for
 	 * \param unique when true empty or consecutive duplicates wont be added
 	 */
-	std::list<util::PropertyValue> getChunksProperties( const util::PropertyMap::KeyType &key, bool unique = false )const;
+	std::list<util::PropertyValue> getChunksProperties ( const util::PropertyMap::KeyType &key, bool unique = false ) const;
 
 	/// get the voxelsize (in bytes) for the major type in the image
-	size_t getBytesPerVoxel()const;
+	size_t getBytesPerVoxel() const;
 
 	/**
 	 * Get the maximum and the minimum voxel value of the image.
 	 * The results are converted to T. If they dont fit an error ist send.
 	 * \returns a pair of T storing the minimum and maximum values of the image.
 	 */
-	template<typename T> std::pair<T, T> getMinMaxAs()const {
+	template<typename T> std::pair<T, T> getMinMaxAs() const
+	{
 		util::checkType<T>();// works only for T from _internal::types
 		std::pair<util::ValueReference, util::ValueReference> minmax = getMinMax();
-		return std::make_pair( minmax.first->as<T>(), minmax.second->as<T>() );
+		return std::make_pair ( minmax.first->as<T>(), minmax.second->as<T>() );
 	}
 
 	/// Get the maximum and the minimum voxel value of the image as a pair of ValueReference-objects.
-	std::pair<util::ValueReference, util::ValueReference> getMinMax()const;
+	std::pair<util::ValueReference, util::ValueReference> getMinMax() const;
 
 	/**
 	 * Compares the voxel-values of this image to the given.
 	 * \returns the amount of the different voxels
 	 */
-	size_t compare( const Image &comp )const;
+	size_t compare ( const Image &comp ) const;
 
-	orientation getMainOrientation()const;
+	orientation getMainOrientation() const;
 
 	/**
 	 * Transforms the image coordinate system into an other system by multiplying
@@ -543,35 +615,42 @@ public:
 	 *  initial position. For example this is the way SPM flips its images when converting from DICOM to nifti.
 	 * \return returns if the transformation was successfuly
 	 */
-	bool transformCoords( boost::numeric::ublas::matrix<float> transform_matrix, bool transformCenterIsImageCenter = false ) {
+	bool transformCoords ( boost::numeric::ublas::matrix<float> transform_matrix, bool transformCenterIsImageCenter = false )
+	{
 		//for transforming we have to ensure to have the below properties in our chunks and image
 		std::list<std::string > neededProps;
-		neededProps.push_back( "indexOrigin" );
-		neededProps.push_back( "rowVec" );
-		neededProps.push_back( "columnVec" );
-		neededProps.push_back( "sliceVec" );
-		neededProps.push_back( "voxelSize" );
+		neededProps.push_back ( "indexOrigin" );
+		neededProps.push_back ( "rowVec" );
+		neededProps.push_back ( "columnVec" );
+		neededProps.push_back ( "sliceVec" );
+		neededProps.push_back ( "voxelSize" );
 		//propagate needed properties to chunks
-		BOOST_FOREACH( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef, lookup ) {
-			BOOST_FOREACH( std::list<std::string>::reference props, neededProps ) {
-				if( hasProperty( props.c_str() ) && !chRef->hasProperty( props.c_str() ) ) {
-					chRef->setPropertyAs<util::fvector4>( props.c_str(), getPropertyAs<util::fvector4>( props.c_str() ) );
+		BOOST_FOREACH ( std::vector<boost::shared_ptr< data::Chunk> >::reference chRef, lookup )
+		{
+			BOOST_FOREACH ( std::list<std::string>::reference props, neededProps )
+			{
+				if ( hasProperty ( props.c_str() ) && !chRef->hasProperty ( props.c_str() ) )
+				{
+					chRef->setPropertyAs<util::fvector4> ( props.c_str(), getPropertyAs<util::fvector4> ( props.c_str() ) );
 				}
 			}
 
-			if( !chRef->transformCoords( transform_matrix, transformCenterIsImageCenter ) ) {
+			if ( !chRef->transformCoords ( transform_matrix, transformCenterIsImageCenter ) )
+			{
 				return false;
 			}
 		}
 		//      establish initial state
 
-		if( !isis::data::_internal::transformCoords( *this, getSizeAsVector(), transform_matrix, transformCenterIsImageCenter ) ) {
-			LOG( Runtime, error ) << "Error during transforming the coords of the image.";
+		if ( !isis::data::_internal::transformCoords ( *this, getSizeAsVector(), transform_matrix, transformCenterIsImageCenter ) )
+		{
+			LOG ( Runtime, error ) << "Error during transforming the coords of the image.";
 			return false;
 		}
 
-		if( !updateOrientationMatrices() ) {
-			LOG( Runtime, error ) << "Could not update the orientation matrices of the image!";
+		if ( !updateOrientationMatrices() )
+		{
+			LOG ( Runtime, error ) << "Could not update the orientation matrices of the image!";
 			return false;
 		}
 
@@ -592,7 +671,7 @@ public:
 	 *  \return the mapped image dimension
 	 */
 
-	dimensions mapScannerAxisToImageDimension( scannerAxis scannerAxes );
+	dimensions mapScannerAxisToImageDimension ( scannerAxis scannerAxes );
 
 	/** Computes the physical coordinates (in scanner space) of the given voxel index.
 	 *  This function does not perform any test if the voxel index is inside the image.
@@ -600,7 +679,7 @@ public:
 	 *  \param index the voxel index from which you want to get the physical coordinates
 	 *  \return physical coordinates associated with the given voxel index
 	 */
-	util::fvector4 getPhysicalCoordsFromIndex( const util::ivector4 &index ) const;
+	util::fvector4 getPhysicalCoordsFromIndex ( const util::ivector4 &index ) const;
 
 
 	/** Computes the voxel index of the given physical coordinates (coordinates in scanner space)
@@ -609,7 +688,7 @@ public:
 	 *  \param physicalCoords the physical coords from which you want to get the voxel index.
 	 *  \return voxel index associated with the given physicalCoords
 	 */
-	util::ivector4 getIndexFromPhysicalCoords( const util::fvector4 &physicalCoords, bool restrictedToImageBox = false ) const;
+	util::ivector4 getIndexFromPhysicalCoords ( const util::fvector4 &physicalCoords, bool restrictedToImageBox = false ) const;
 
 	/**
 	 * Copy all voxel data of the image into memory.
@@ -618,21 +697,29 @@ public:
 	 * \param len the allocated size of that memory in elements
 	 * \param scaling the scaling to be used when converting the data (will be determined automatically if not given)
 	 */
-	template<typename T> void copyToMem( T *dst, size_t len,  scaling_pair scaling = scaling_pair()   )const {
-		if( clean ) {
-			if( scaling.first.isEmpty() || scaling.second.isEmpty() ) {
-				scaling = getScalingTo( ValuePtr<T>::staticID );
+	template<typename T> void copyToMem ( T *dst, size_t len,  scaling_pair scaling = scaling_pair() ) const
+	{
+		if ( clean )
+		{
+			if ( scaling.first.isEmpty() || scaling.second.isEmpty() )
+			{
+				scaling = getScalingTo ( ValuePtr<T>::staticID );
 			}
 
 			// we could do this using convertToType - but this solution does not need any additional temporary memory
-			BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
+			BOOST_FOREACH ( const boost::shared_ptr<Chunk> &ref, lookup )
+			{
 				const size_t cSize = ref->getSizeAsVector().product();
 
-				if( !ref->copyToMem<T>( dst, len, scaling ) ) {
-					LOG( Runtime, error ) << "Failed to copy raw data of type " << ref->getTypeName() << " from image into memory of type " << ValuePtr<T>::staticName();
-				} else {
-					if( len < cSize ) {
-						LOG( Runtime, error ) << "Abborting copy, because there is no space left in the target";
+				if ( !ref->copyToMem<T> ( dst, len, scaling ) )
+				{
+					LOG ( Runtime, error ) << "Failed to copy raw data of type " << ref->getTypeName() << " from image into memory of type " << ValuePtr<T>::staticName();
+				}
+				else
+				{
+					if ( len < cSize )
+					{
+						LOG ( Runtime, error ) << "Abborting copy, because there is no space left in the target";
 						break;
 					}
 
@@ -641,8 +728,10 @@ public:
 
 				dst += ref->getVolume(); // increment the cursor
 			}
-		} else {
-			LOG( Runtime, error ) << "Cannot copy from non clean images. Run reIndex first";
+		}
+		else
+		{
+			LOG ( Runtime, error ) << "Cannot copy from non clean images. Run reIndex first";
 		}
 	}
 
@@ -652,10 +741,11 @@ public:
 	 * If neccessary a conversion into T is done using min/max of the image.
 	 * \returns a MemChunk\<T\> containing the voxeldata of the Image (but not its Properties)
 	 */
-	template<typename T> MemChunk<T> copyToMemChunk()const {
+	template<typename T> MemChunk<T> copyToMemChunk() const
+	{
 		const util::vector4<size_t> size = getSizeAsVector();
-		data::MemChunk<T> ret( size[0], size[1], size[2], size[3] );
-		copyToMem<T>( &ret.voxel<T>( 0, 0, 0, 0 ), ret.getVolume() );
+		data::MemChunk<T> ret ( size[0], size[1], size[2], size[3] );
+		copyToMem<T> ( &ret.voxel<T> ( 0, 0, 0, 0 ), ret.getVolume() );
 		return ret;
 	}
 
@@ -665,7 +755,7 @@ public:
 	* Make MemChunks of them to get deep copies.
 	* \param copy_metadata set to false to prevent the metadata of the image to be copied into the results. This will improve performance, but the chunks may lack important properties.
 	*/
-	std::vector<isis::data::Chunk> copyChunksToVector( bool copy_metadata = true )const;
+	std::vector<isis::data::Chunk> copyChunksToVector ( bool copy_metadata = true ) const;
 
 	/**
 	 * Ensure, the image has the type with the requested ID.
@@ -673,13 +763,13 @@ public:
 	 * The conversion is done using the value range of the image.
 	 * \returns false if there was an error
 	 */
-	bool convertToType( unsigned short ID );
+	bool convertToType ( unsigned short ID );
 
 	/**
 	 * Automatically splice the given dimension and all dimensions above.
 	 * e.g. spliceDownTo(sliceDim) will result in an image made of slices (aka 2d-chunks).
 	 */
-	size_t spliceDownTo( dimensions dim );
+	size_t spliceDownTo ( dimensions dim );
 
 	/**
 	 * Run a functor with the base ChunkOp on every cunk in the image.
@@ -687,7 +777,7 @@ public:
 	 * \param op a functor object which inherits ChunkOP
 	 * \param copyMetaData if true the metadata of the image are copied into the chunks before calling the functor
 	 */
-	size_t foreachChunk( ChunkOp &op, bool copyMetaData = false );
+	size_t foreachChunk ( ChunkOp &op, bool copyMetaData = false );
 
 
 	/**
@@ -697,30 +787,32 @@ public:
 	 * If these conversion failes no operation is done, and false is returned.
 	 * \param op a functor object which inherits ChunkOp
 	 */
-	template <typename TYPE> size_t foreachVoxel( VoxelOp<TYPE> &op ) {
+	template <typename TYPE> size_t foreachVoxel ( VoxelOp<TYPE> &op )
+	{
 		class _proxy: public ChunkOp
 		{
 			VoxelOp<TYPE> &op;
 		public:
-			_proxy( VoxelOp<TYPE> &_op ): op( _op ) {}
-			bool operator()( Chunk &ch, util::vector4<size_t> posInImage ) {
-				return ch.foreachVoxel<TYPE>( op, posInImage ) == 0;
+			_proxy ( VoxelOp<TYPE> &_op ) : op ( _op ) {}
+			bool operator() ( Chunk &ch, util::vector4<size_t> posInImage )
+			{
+				return ch.foreachVoxel<TYPE> ( op, posInImage ) == 0;
 			}
 		};
-		_proxy prx( op );
-		return convertToType( data::ValuePtr<TYPE>::staticID ) && foreachChunk( prx, false );
+		_proxy prx ( op );
+		return convertToType ( data::ValuePtr<TYPE>::staticID ) && foreachChunk ( prx, false );
 	}
 
 	/// \returns the number of rows of the image
-	size_t getNrOfRows()const;
+	size_t getNrOfRows() const;
 	/// \returns the number of columns of the image
-	size_t getNrOfColumns()const;
+	size_t getNrOfColumns() const;
 	/// \returns the number of slices of the image
-	size_t getNrOfSlices()const;
+	size_t getNrOfSlices() const;
 	/// \returns the number of timesteps of the image
-	size_t getNrOfTimesteps()const;
+	size_t getNrOfTimesteps() const;
 
-	util::fvector4 getFoV()const;
+	util::fvector4 getFoV() const;
 	bool updateOrientationMatrices();
 };
 
@@ -734,26 +826,31 @@ protected:
 	TypedImage() {} // to be used only by inheriting classes
 public:
 	/// cheap copy another Image and make sure all chunks have type T
-	TypedImage( const Image &src ): Image( src ) { // ok we just copied the whole image
+	TypedImage ( const Image &src ) : Image ( src ) // ok we just copied the whole image
+	{
 		//but we want it to be of type T
-		convertToType( ValuePtr<T>::staticID );
+		convertToType ( ValuePtr<T>::staticID );
 	}
 	/// cheap copy another TypedImage
-	TypedImage &operator=( const TypedImage &ref ) { //its already of the given type - so just copy it
-		Image::operator=( ref );
+	TypedImage &operator= ( const TypedImage &ref )  //its already of the given type - so just copy it
+	{
+		Image::operator= ( ref );
 		return *this;
 	}
 	/// cheap copy another Image and make sure all chunks have type T
-	TypedImage &operator=( const Image &ref ) { // copy the image, and make sure its of the given type
-		Image::operator=( ref );
-		convertToType( ValuePtr<T>::staticID );
+	TypedImage &operator= ( const Image &ref )  // copy the image, and make sure its of the given type
+	{
+		Image::operator= ( ref );
+		convertToType ( ValuePtr<T>::staticID );
 		return *this;
 	}
-	void copyToMem( void *dst ) {
-		Image::copyToMem<T>( ( T * )dst );
+	void copyToMem ( void *dst )
+	{
+		Image::copyToMem<T> ( ( T * ) dst );
 	}
-	void copyToMem( void *dst )const {
-		Image::copyToMem<T>( ( T * )dst );
+	void copyToMem ( void *dst ) const
+	{
+		Image::copyToMem<T> ( ( T * ) dst );
 	}
 };
 
@@ -769,8 +866,9 @@ public:
 	 * This makes a deep copy of the given image.
 	 * The image data are converted to T if necessary.
 	 */
-	MemImage( const Image &src ) {
-		operator=( src );
+	MemImage ( const Image &src )
+	{
+		operator= ( src );
 	}
 
 	/**
@@ -778,26 +876,32 @@ public:
 	 * This makes a deep copy of the given image.
 	 * The image data are converted to T if necessary.
 	 */
-	MemImage &operator=( const Image &ref ) { // copy the image, and make sure its of the given type
+	MemImage &operator= ( const Image &ref )  // copy the image, and make sure its of the given type
+	{
 
-		Image::operator=( ref ); // ok we just copied the whole image
+		Image::operator= ( ref ); // ok we just copied the whole image
 
 		//we want deep copies of the chunks, and we want them to be of type T
-		struct : _internal::SortedChunkList::chunkPtrOperator {
+		struct : _internal::SortedChunkList::chunkPtrOperator
+		{
 			std::pair<util::ValueReference, util::ValueReference> scale;
-			boost::shared_ptr<Chunk> operator()( const boost::shared_ptr< Chunk >& ptr ) {
-				return boost::shared_ptr<Chunk>( new MemChunk<T>( *ptr, scale ) );
+			boost::shared_ptr<Chunk> operator() ( const boost::shared_ptr< Chunk >& ptr )
+			{
+				return boost::shared_ptr<Chunk> ( new MemChunk<T> ( *ptr, scale ) );
 			}
 		} conv_op;
-		conv_op.scale = ref.getScalingTo( ValuePtr<T>::staticID );
-		LOG( Debug, info ) << "Computed scaling for conversion from source image: [" << conv_op.scale << "]";
+		conv_op.scale = ref.getScalingTo ( ValuePtr<T>::staticID );
+		LOG ( Debug, info ) << "Computed scaling for conversion from source image: [" << conv_op.scale << "]";
 
-		this->set.transform( conv_op );
+		this->set.transform ( conv_op );
 
-		if( ref.isClean() ) {
+		if ( ref.isClean() )
+		{
 			this->lookup = this->set.getLookup(); // the lookup table still points to the old chunks
-		} else {
-			LOG( Debug, info ) << "Copied unclean image. Running reIndex on the copy.";
+		}
+		else
+		{
+			LOG ( Debug, info ) << "Copied unclean image. Running reIndex on the copy.";
 			this->reIndex();
 		}
 

@@ -17,7 +17,7 @@ WriteOp::WriteOp( const data::Image &image, size_t bitsPerVoxel, bool doFlip ): 
 {
 	if( doFlip ) {
 		data::Image dummy( image );
-		flip_dim = dummy.mapScannerAxesToImageDimension( data::z );
+		flip_dim = dummy.mapScannerAxisToImageDimension( data::z );
 	}
 }
 size_t WriteOp::getDataSize() {return getVolume() * m_bpv / 8;}
