@@ -489,6 +489,24 @@ std::list< data::Chunk > ImageFormat_NiftiSa::parseHeader( const isis::image_io:
 
 std::string ImageFormat_NiftiSa::getName()const {return "Nifti standalone";}
 
+isis::data::ValuePtr< bool > ImageFormat_NiftiSa::bitRead(data::ValuePtr< uint8_t > src,size_t size)
+{
+	assert(size);
+	if(src.getLength()*8<size){
+		std::string err("unexpected end of file (missing ");
+		err+=boost::lexical_cast<std::string>( size-src.getLength()*8)+" bytes)";
+		throwGenericError(err);
+	}
+	isis::data::ValuePtr< bool > ret(size);
+	for(size_t i=0;i<size;i++){
+		const size_t byte=i/8;
+		const uint8_t mask=128>>(i%8);
+		ret[i]=mask&src[byte];
+	}
+	return ret;
+}
+
+
 int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & )
 {
 	data::FilePtr mfile( filename );
@@ -529,6 +547,22 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 
 		data_src = buff;
 		size[data::timeDim] = 1;
+	} else if( util::istring( "fsl" ) == dialect.c_str() && header->datatype == NIFTI_TYPE_FLOAT32 && size[data::timeDim] == 3 ) { //if its fsl-three-volume-vector copy the volumes
+		LOG( Runtime, notice ) << "The image has 3 timesteps and its type is FLOAT32, assuming it is an fsl vector image.";
+		const size_t volume = size.product() / 3;
+		data::ValuePtr<util::fvector4> buff( volume );
+		const data::ValuePtr<float> src = mfile.at<float>( header->vox_offset );
+
+		for( size_t v = 0; v < volume; v++ ) {
+			buff[v][0] = src[v];
+			buff[v][1] = src[v + volume];
+			buff[v][2] = src[v + volume * 2];
+		}
+
+		data_src = buff;
+		size[data::timeDim] = 1;
+	} else if(header->datatype == NIFTI_TYPE_BINARY){ // image is binary encoded - needs special decoding
+		data_src=bitRead(mfile.at<uint8_t>( header->vox_offset),size.product());
 	} else {
 		unsigned int type = nifti_type2isis_type[header->datatype];
 
