@@ -80,8 +80,10 @@ protected:
 	Chunk() {}; //do not use this
 public:
 
-	typedef _internal::ValuePtrBase::value_iterator value_iterator;
-	typedef _internal::ValuePtrBase::const_value_iterator const_value_iterator;
+	typedef _internal::ValuePtrBase::value_iterator iterator;
+	typedef _internal::ValuePtrBase::const_value_iterator const_iterator;
+	typedef iterator::reference reference;
+	typedef const_iterator::reference const_reference;
 
 	Chunk( const ValuePtrReference &src, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 );
 
@@ -155,10 +157,10 @@ public:
 		return foreachVoxel<TYPE>( op, util::vector4<size_t>() );
 	}
 
-	value_iterator begin();
-	value_iterator end();
-	const_value_iterator begin()const;
-	const_value_iterator end()const;
+	iterator begin();
+	iterator end();
+	const_iterator begin()const;
+	const_iterator end()const;
 
 	_internal::ValuePtrBase &asValuePtrBase() {return operator*();}
 	const _internal::ValuePtrBase &getValuePtrBase()const {return operator*();}

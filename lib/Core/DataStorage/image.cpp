@@ -955,10 +955,36 @@ util::fvector4 Image::getFoV() const
 	return _internal::NDimensional<4>::getFoV( getPropertyAs<util::fvector4>( "voxelSize" ), voxelGap );
 }
 
-Image::value_iterator Image::begin() {return value_iterator( lookup.begin(), lookup.end() );}
-Image::value_iterator Image::end() {return begin() + getVolume();}
-Image::const_value_iterator Image::begin()const {return const_value_iterator( lookup.begin(), lookup.end() );}
-Image::const_value_iterator Image::end()const {return begin() + getVolume();}
+Image::iterator Image::begin()
+{
+	if( checkMakeClean() ) {
+		std::vector<Chunk *> vec( lookup.size() );
+
+		for( size_t i = 0; i < lookup.size(); i++ )
+			vec[i] = lookup[i].get();
+
+		return iterator( vec );
+	} else {
+		LOG( Debug, error )  << "Image is not clean. Returning empty iterator ...";
+		return iterator();
+	}
+}
+Image::iterator Image::end() {return begin() + getVolume();}
+Image::const_iterator Image::begin()const
+{
+	if( isClean() ) {
+		std::vector<const Chunk *> vec( lookup.size() );
+
+		for( size_t i = 0; i < lookup.size(); i++ )
+			vec[i] = lookup[i].get();
+
+		return const_iterator( vec );
+	} else {
+		LOG( Debug, error )  << "Image is not clean. Returning empty iterator ...";
+		return const_iterator();
+	}
+}
+Image::const_iterator Image::end()const {return begin() + getVolume();}
 
 const util::ValueReference Image::getVoxelValue ( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps ) const
 {
