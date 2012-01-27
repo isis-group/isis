@@ -572,7 +572,7 @@ public:
 		return true;
 	}
 
-	/** Maps the given scanner Axes to the dimension with the minimal angle.
+	/** Maps the given scanner Axis to the dimension with the minimal angle.
 	 *  This is done by latching the orientation of the image by setting the biggest absolute
 	 *  value of each orientation vector to 1 and the others to 0.
 	 *  Example:
@@ -585,7 +585,7 @@ public:
 	 *  \return the mapped image dimension
 	 */
 
-	dimensions mapScannerAxesToImageDimension( scannerAxis scannerAxes );
+	dimensions mapScannerAxisToImageDimension( scannerAxis scannerAxes );
 
 	/** Computes the physical coordinates (in scanner space) of the given voxel index.
 	 *  This function does not perform any test if the voxel index is inside the image.
