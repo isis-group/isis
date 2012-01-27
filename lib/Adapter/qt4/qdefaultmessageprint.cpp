@@ -24,7 +24,7 @@ isis::qt4::QDefaultMessagePrint::~QDefaultMessagePrint()
 {
 
 }
-const isis::qt4::QMessageList& isis::qt4::QDefaultMessagePrint::getMessageList() const
+const isis::qt4::QMessageList &isis::qt4::QDefaultMessagePrint::getMessageList() const
 {
 	return util::Singletons::get<QMessageList, 10>();
 }
