@@ -40,18 +40,18 @@ namespace _internal
  */
 template<typename CHUNK_TYPE> class ImageIteratorTemplate: public std::iterator <
 	std::random_access_iterator_tag,
-	typename boost::mpl::if_<boost::is_const<CHUNK_TYPE>,typename CHUNK_TYPE::const_iterator,typename CHUNK_TYPE::iterator>::type::value_type,
-	typename boost::mpl::if_<boost::is_const<CHUNK_TYPE>,typename CHUNK_TYPE::const_iterator,typename CHUNK_TYPE::iterator>::type::difference_type,
-	typename boost::mpl::if_<boost::is_const<CHUNK_TYPE>,typename CHUNK_TYPE::const_iterator,typename CHUNK_TYPE::iterator>::type::pointer,
-	typename boost::mpl::if_<boost::is_const<CHUNK_TYPE>,typename CHUNK_TYPE::const_iterator,typename CHUNK_TYPE::iterator>::type::reference
+	typename boost::mpl::if_<boost::is_const<CHUNK_TYPE>, typename CHUNK_TYPE::const_iterator, typename CHUNK_TYPE::iterator>::type::value_type,
+	typename boost::mpl::if_<boost::is_const<CHUNK_TYPE>, typename CHUNK_TYPE::const_iterator, typename CHUNK_TYPE::iterator>::type::difference_type,
+	typename boost::mpl::if_<boost::is_const<CHUNK_TYPE>, typename CHUNK_TYPE::const_iterator, typename CHUNK_TYPE::iterator>::type::pointer,
+	typename boost::mpl::if_<boost::is_const<CHUNK_TYPE>, typename CHUNK_TYPE::const_iterator, typename CHUNK_TYPE::iterator>::type::reference
 	>
 {
 protected:
-	typedef typename boost::mpl::if_<boost::is_const<CHUNK_TYPE>,typename CHUNK_TYPE::const_iterator,typename CHUNK_TYPE::iterator>::type inner_iterator;
+	typedef typename boost::mpl::if_<boost::is_const<CHUNK_TYPE>, typename CHUNK_TYPE::const_iterator, typename CHUNK_TYPE::iterator>::type inner_iterator;
 	typedef CHUNK_TYPE chunk_type;
 	typedef ImageIteratorTemplate<CHUNK_TYPE> ThisType;
 
-	std::vector<chunk_type*> chunks;
+	std::vector<chunk_type *> chunks;
 	size_t ch_idx;
 	inner_iterator current_it;
 	typename inner_iterator::difference_type ch_len;
@@ -68,23 +68,23 @@ protected:
 public:
 	//will become additional constructor from non const if this is const, otherwise overrride the default copy contructor
 	ImageIteratorTemplate( const ImageIteratorTemplate<typename boost::remove_const<CHUNK_TYPE>::type > &src ):
-		chunks(src.chunks.begin(),src.chunks.end()),ch_idx(src.ch_idx),
-		current_it(src.current_it),
-		ch_len(src.ch_len)
+		chunks( src.chunks.begin(), src.chunks.end() ), ch_idx( src.ch_idx ),
+		current_it( src.current_it ),
+		ch_len( src.ch_len )
 	{}
 
 	// empty constructor
-	ImageIteratorTemplate():ch_idx(0),ch_len(0){}
+	ImageIteratorTemplate(): ch_idx( 0 ), ch_len( 0 ) {}
 
 	// normal conytructor
-	explicit ImageIteratorTemplate(const std::vector<chunk_type*>& _chunks):
-		chunks(_chunks),ch_idx(0),
+	explicit ImageIteratorTemplate( const std::vector<chunk_type *>& _chunks ):
+		chunks( _chunks ), ch_idx( 0 ),
 		current_it( chunks[0]->begin() ),
 		ch_len( std::distance( current_it, chunks[0]->end() ) )
 	{}
 
-	ThisType& operator++() {return operator+=( 1 );}
-	ThisType& operator--() {return operator-=( 1 );}
+	ThisType &operator++() {return operator+=( 1 );}
+	ThisType &operator--() {return operator-=( 1 );}
 
 	ThisType operator++( int ) {ThisType tmp = *this; operator++(); return tmp;}
 	ThisType operator--( int ) {ThisType tmp = *this; operator--(); return tmp;}
@@ -92,16 +92,16 @@ public:
 	typename inner_iterator::reference operator*() const {return current_it.operator * ();}
 	typename inner_iterator::pointer  operator->() const {return current_it.operator->();}
 
-	bool operator==( const ThisType& cmp )const {return ch_idx == cmp.ch_idx && current_it == cmp.current_it;}
-	bool operator!=( const ThisType& cmp )const {return !operator==( cmp );}
+	bool operator==( const ThisType &cmp )const {return ch_idx == cmp.ch_idx && current_it == cmp.current_it;}
+	bool operator!=( const ThisType &cmp )const {return !operator==( cmp );}
 
-	bool operator>( const ThisType& cmp )const {return ch_idx > cmp.ch_idx || ( ch_idx == cmp.ch_idx && current_it > cmp.current_it );}
-	bool operator<( const ThisType& cmp )const {return ch_idx < cmp.ch_idx || ( ch_idx == cmp.ch_idx && current_it < cmp.current_it );}
+	bool operator>( const ThisType &cmp )const {return ch_idx > cmp.ch_idx || ( ch_idx == cmp.ch_idx && current_it > cmp.current_it );}
+	bool operator<( const ThisType &cmp )const {return ch_idx < cmp.ch_idx || ( ch_idx == cmp.ch_idx && current_it < cmp.current_it );}
 
-	bool operator>=( const ThisType& cmp )const {return operator>( cmp ) || operator==( cmp );}
-	bool operator<=( const ThisType& cmp )const {return operator<( cmp ) || operator==( cmp );}
+	bool operator>=( const ThisType &cmp )const {return operator>( cmp ) || operator==( cmp );}
+	bool operator<=( const ThisType &cmp )const {return operator<( cmp ) || operator==( cmp );}
 
-	typename inner_iterator::difference_type operator-( const ThisType& cmp )const {
+	typename inner_iterator::difference_type operator-( const ThisType &cmp )const {
 		typename inner_iterator::difference_type dist = ( ch_idx - cmp.ch_idx ) * ch_len; // get the (virtual) distance from my current block to cmp's current block
 
 		if( ch_idx >= cmp.ch_idx ) { //if I'm beyond cmp add my current pos to the distance, and substract his
@@ -118,8 +118,8 @@ public:
 
 	ThisType &operator+=( typename inner_iterator::difference_type n ) {
 		n += currentDist(); //start from current begin (add current_it-(begin of the current chunk) to n)
-		assert(( n / ch_len + static_cast<typename ThisType::difference_type>(ch_idx)  ) >= 0);
-		ch_idx+= n / ch_len; //if neccesary jump to next chunk
+		assert( ( n / ch_len + static_cast<typename ThisType::difference_type>( ch_idx )  ) >= 0 );
+		ch_idx += n / ch_len; //if neccesary jump to next chunk
 
 		if( ch_idx < chunks.size() )
 			current_it = chunks[ch_idx]->begin() + n % ch_len; //set new current iterator in new chunk plus the "rest"
@@ -131,7 +131,7 @@ public:
 	ThisType &operator-=( typename inner_iterator::difference_type n ) {return operator+=( -n );}
 
 	typename ThisType::reference operator[]( typename inner_iterator::difference_type n )const {
-		return *( ThisType( chunks) += n );
+		return *( ThisType( chunks ) += n );
 	}
 
 };
@@ -752,30 +752,34 @@ public:
 	void copyToMem( void *dst )const {
 		Image::copyToMem<T>( ( T * )dst );
 	}
-	iterator begin(){
-		if(checkMakeClean()){
-			std::vector<data::ValuePtr<T>*> vec(lookup.size());
-			for(size_t i=0;i<lookup.size();i++)
-				vec[i]=&lookup[i]->asValuePtr<T>();
+	iterator begin() {
+		if( checkMakeClean() ) {
+			std::vector<data::ValuePtr<T>*> vec( lookup.size() );
+
+			for( size_t i = 0; i < lookup.size(); i++ )
+				vec[i] = &lookup[i]->asValuePtr<T>();
+
 			return iterator( vec );
 		} else {
 			LOG( Debug, error )  << "Image is not clean. Returning empty iterator ...";
 			return iterator();
 		}
 	}
-	iterator end(){return begin()+getVolume();};
-	const_iterator begin()const{
-		if(isClean()){
-			std::vector<const data::ValuePtr<T>*> vec(lookup.size());
-			for(size_t i=0;i<lookup.size();i++)
-				vec[i]=&lookup[i]->asValuePtr<T>();
+	iterator end() {return begin() + getVolume();};
+	const_iterator begin()const {
+		if( isClean() ) {
+			std::vector<const data::ValuePtr<T>*> vec( lookup.size() );
+
+			for( size_t i = 0; i < lookup.size(); i++ )
+				vec[i] = &lookup[i]->asValuePtr<T>();
+
 			return const_iterator( vec );
 		} else {
 			LOG( Debug, error )  << "Image is not clean. Returning empty iterator ...";
 			return const_iterator();
 		}
 	}
-	const_iterator end()const{return begin()+getVolume();};
+	const_iterator end()const {return begin() + getVolume();};
 };
 
 /**
