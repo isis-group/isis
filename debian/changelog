@@ -1,4 +1,4 @@
-isis (0.4.5gb918f62-0) stable; urgency=low
+isis (0.4.6g3a97853-0) stable; urgency=low
 
   * add support for writing 24/48bit rgb, and for 16bit grayscale images as
     PNG
