@@ -17,7 +17,7 @@ WriteOp::WriteOp( const data::Image &image, size_t bitsPerVoxel, bool doFlip ): 
 {
 	if( doFlip ) {
 		data::Image dummy( image );
-		flip_dim = dummy.mapScannerAxesToImageDimension( data::z );
+		flip_dim = dummy.mapScannerAxisToImageDimension( data::z );
 	}
 }
 size_t WriteOp::getDataSize() {return getVolume() * m_bpv / 8;}
@@ -324,7 +324,7 @@ bool ImageFormat_NiftiSa::parseDescripForSPM( isis::util::PropertyMap &props, co
 	if ( boost::regex_match( desc, results,  descriptionRegex ) ) {
 		props.propertyValue( "repetitionTime" ) = util::Value<uint16_t>( results.str( 1 ) );
 		props.propertyValue( "echoTime" ) = util::Value<uint16_t>( results.str( 2 ) );
-		props.propertyValue( "flipAngle" ) = util::Value<uint16_t>( results.str( 2 ) );
+		props.propertyValue( "flipAngle" ) = util::Value<uint16_t>( results.str( 3 ) );
 
 		const util::Value<int> day = results.str( 4 ), month = results.str( 5 ), year = results.str( 6 );
 		const util::Value<uint8_t> hours = boost::lexical_cast<uint8_t>( results.str( 7 ) ), minutes = boost::lexical_cast<uint8_t>( results.str( 8 ) ), seconds = boost::lexical_cast<uint8_t>( results.str( 9 ) );
