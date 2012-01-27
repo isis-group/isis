@@ -37,14 +37,14 @@ int main()
 
 	timer.restart();
 
-	BOOST_FOREACH(data::TypedImage<short>::iterator::reference ref,img){
+	BOOST_FOREACH(data::TypedImage<short>::reference ref,img){
 		ref = 42;
 	}
 
 	std::cout << img.getVolume() << " voxel set to 42 in " << timer.elapsed() << " sec" << std::endl;
 	timer.restart();
 
-	BOOST_FOREACH(data::TypedImage<short>::const_iterator::reference ref,img){
+	BOOST_FOREACH(data::TypedImage<short>::const_reference ref,img){
 		if(ref != 42)
 			std::cout << "Whoops, something is very wrong ..." << std::endl;
 	}

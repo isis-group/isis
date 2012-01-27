@@ -82,6 +82,8 @@ public:
 
 	typedef _internal::ValuePtrBase::value_iterator iterator;
 	typedef _internal::ValuePtrBase::const_value_iterator const_iterator;
+	typedef iterator::reference reference;
+	typedef const_iterator::reference const_reference;
 
 	Chunk( const ValuePtrReference &src, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 );
 

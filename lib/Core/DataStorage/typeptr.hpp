@@ -158,6 +158,9 @@ protected:
 public:
 	typedef _internal::ValuePtrIterator<TYPE> iterator;
 	typedef _internal::ValuePtrIterator<const TYPE> const_iterator;
+	typedef typename iterator::reference reference;
+	typedef typename const_iterator::reference const_reference;
+
 	static const unsigned short staticID = util::_internal::TypeID<TYPE>::value << 8;
 	/// delete-functor which does nothing (in case someone else manages the data).
 	struct NonDeleter {

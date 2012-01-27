@@ -165,6 +165,8 @@ public:
 	enum orientation {axial, reversed_axial, sagittal, reversed_sagittal, coronal, reversed_coronal};
 	typedef _internal::ImageIteratorTemplate<Chunk> iterator;
 	typedef _internal::ImageIteratorTemplate<const Chunk> const_iterator;
+	typedef iterator::reference reference;
+	typedef const_iterator::reference const_reference;
 protected:
 	_internal::SortedChunkList set;
 	std::vector<boost::shared_ptr<Chunk> > lookup;
@@ -726,6 +728,8 @@ protected:
 public:
 	typedef _internal::ImageIteratorTemplate<data::ValuePtr<T> > iterator;
 	typedef _internal::ImageIteratorTemplate<const data::ValuePtr<T> > const_iterator;
+	typedef typename iterator::reference reference;
+	typedef typename const_iterator::reference const_reference;
 	/// cheap copy another Image and make sure all chunks have type T
 	TypedImage( const Image &src ): Image( src ) { // ok we just copied the whole image
 		//but we want it to be of type T

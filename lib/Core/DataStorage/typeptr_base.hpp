@@ -133,6 +133,8 @@ protected:
 public:
 	typedef GenericValueIterator<false> value_iterator;
 	typedef GenericValueIterator<true> const_value_iterator;
+	typedef value_iterator value_reference;
+	typedef const_value_iterator const_value_reference;
 	/// Proxy-Deleter to encapsulate the real deleter/shared_ptr when creating shared_ptr for parts of a shared_ptr
 	class DelProxy : public boost::shared_ptr<const void>
 	{
