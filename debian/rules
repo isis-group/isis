@@ -20,25 +20,29 @@ gitver = $(shell [ -x /usr/bin/git ] && git describe --tags --match '*\.*\.*' $$
 # currently tests only get built but do not run as the test suite assumes
 # an already installed package -- upstream is working on a fix
 CMAKE_FLAGS=-DCMAKE_INSTALL_PREFIX:PATH=/usr \
+            -DBUILD_SHARED_LIBS:BOOL=ON \
             -DCMAKE_SHARED_LINKER_FLAGS="-Wl,--no-undefined" \
             -DCMAKE_EXE_LINKER_FLAGS="-Wl,--no-undefined" \
             -DISIS_APPS_CALC:BOOL=ON \
-            -DISIS_BUILD_TESTS:BOOL=ON \
-            -DISIS_BUILD_STATIC_AND_SHARED:BOOL=ON \
+            -DISIS_BUILD_TESTS:BOOL=OFF \
             -DISIS_BUILD_TOOLS:BOOL=ON \
-            -DISIS_BUILD_PYTHON_EXT:BOOL=OFF \
+            -DISIS_BUILD_PYTHON_EXT:BOOL=ON \
             -DISIS_IOPLUGIN_DICOM:BOOL=ON \
             -DISIS_IOPLUGIN_GZ:BOOL=ON \
             -DISIS_IOPLUGIN_NIFTI:BOOL=ON \
+            -DISIS_IOPLUGIN_NIFTI_SA:BOOL=ON \
             -DISIS_IOPLUGIN_NULL:BOOL=ON \
             -DISIS_IOPLUGIN_PNG:BOOL=ON \
             -DISIS_IOPLUGIN_RAW:BOOL=ON \
             -DISIS_IOPLUGIN_TAR:BOOL=ON \
             -DISIS_IOPLUGIN_VISTA:BOOL=ON \
+            -DISIS_IOPLUGIN_FLIST:BOOL=ON \
+            -DISIS_IOPLUGIN_PROCESS:BOOL=ON \
             -DISIS_ITK:BOOL=OFF \
-            -DISIS_QT4:BOOL=OFF \
-            -DISIS_USE_LIBOIL:BOOL=OFF \
+            -DISIS_QT4:BOOL=ON \
+            -DISIS_USE_LIBOIL:BOOL=ON \
             -DISIS_RUNTIME_LOG:BOOL=ON \
+            -DISIS_BUILD_PYTHON_EXT:BOOL=ON \
             -DISIS_DEBUG_LOG:BOOL=OFF \
             -DGIT_REVISION="Debian-$(debver)"
 
