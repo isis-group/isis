@@ -1,3 +1,9 @@
+isis (0.4.6+git9-gaed523b-1) stable; urgency=low
+
+  * Test me.
+
+ -- Enrico Reimer <reimer@cbs.mpg.de>  Tue, 31 Jan 2012 14:40:42 +0100
+
 isis (0.4.6g3a97853-0) stable; urgency=low
 
   * add support for writing 24/48bit rgb, and for 16bit grayscale images as
