@@ -28,14 +28,12 @@ QApplication &isis::qt4::QtApplication::getQApplication()
 	LOG_IF( not m_qapp, util::Debug, error ) << "The QApplication was not yet created, you should run init() before using getQApplication.";
 	return *m_qapp;
 }
-bool isis::qt4::QtApplication::init( int argc, char **argv, bool exitOnError )
+bool isis::qt4::QtApplication::init( int &argc, char **argv, bool exitOnError )
 {
 	if ( m_qapp ) {
 		LOG( util::Debug, error ) << "The QApplication allready exists. This should not happen. I'll not touch it";
 	} else {
-		m_argc = argc; // create local copies
-		m_argv = argv;
-		m_qapp.reset( new QApplication( m_argc, m_argv ) );
+		m_qapp.reset( new QApplication( argc, argv ) );
 	}
 
 	return util::Application::init( argc, argv, exitOnError );
@@ -52,17 +50,20 @@ QApplication &isis::qt4::IOQtApplication::getQApplication()
 	return *m_qapp;
 }
 
-bool isis::qt4::IOQtApplication::init( int argc, char **argv, bool exitOnError )
+bool isis::qt4::IOQtApplication::init( int &argc, char **argv, bool exitOnError )
 {
 	if( m_qapp ) {
 		LOG( util::Debug, error ) << "The QApplication allready exists. This should not happen. I'll not touch it";
 	} else {
-		m_argc = argc;
-		m_argv = argv;
-		m_qapp.reset( new QApplication( m_argc, m_argv ) );
+		m_qapp.reset( new QApplication( argc, argv ) );
 	}
 
 	return isis::data::IOApplication::init( argc, argv, exitOnError );
 }
 
+
+boost::shared_ptr< isis::util::_internal::MessageHandlerBase > isis::qt4::IOQtApplication::getLogHandler( std::string /*module*/, isis::LogLevel level )const
+{
+	return boost::shared_ptr< isis::util::_internal::MessageHandlerBase >( level ? new isis::qt4::QDefaultMessagePrint( level ) : 0 );
+}
 

@@ -53,7 +53,7 @@ namespace adapter
 class itkAdapter
 {
 public:
-	itkAdapter() : m_TypeID( 0 ) {};
+	itkAdapter() : m_TypeID( 0 ), m_ChunkPropertyMapVector( NULL ), m_ImagePropertyMap( util::PropertyMap() ), m_RelevantDim( 0 ) {};
 	/**
 	  * Converts an isis image object in an itk image.
 	  * \param src boost sharedpointer of the isisImage
@@ -92,7 +92,7 @@ protected:
 private:
 
 	boost::shared_ptr<data::Image> m_ImageISIS;
-// 	data::Image m_ImageISIS;
+	//  data::Image m_ImageISIS;
 	unsigned short m_TypeID;
 	std::vector< boost::shared_ptr<util::PropertyMap> > m_ChunkPropertyMapVector;
 	util::PropertyMap m_ImagePropertyMap;

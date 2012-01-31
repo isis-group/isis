@@ -15,7 +15,7 @@ int main( int argc, char **argv )
 	{
 	public:
 		data::dimensions dim;
-		bool operator()( data::Chunk &ch, util::FixedVector<size_t, 4> /*posInImage*/ ) {
+		bool operator()( data::Chunk &ch, util::vector4<size_t> /*posInImage*/ ) {
 			ch.swapAlong( dim );
 			return true;
 		}
@@ -46,7 +46,7 @@ int main( int argc, char **argv )
 		boost::numeric::ublas::matrix<float> T = boost::numeric::ublas::identity_matrix<float>( 3, 3 );
 
 		if( dim > 2 ) {
-			dim = refImage.mapScannerAxesToImageDimension( static_cast<data::scannerAxis>( dim - 3 ) );
+			dim = refImage.mapScannerAxisToImageDimension( static_cast<data::scannerAxis>( dim - 3 ) );
 		}
 
 		T( dim, dim ) *= -1;

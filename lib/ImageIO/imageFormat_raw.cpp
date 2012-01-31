@@ -15,7 +15,7 @@ class ImageFormat_raw: public FileFormat
 {
 	typedef std::map<std::string, unsigned short> typemap;
 protected:
-	std::string suffixes()const {
+	std::string suffixes( io_modes /*modes=both*/ )const {
 		return std::string( "raw" );
 	}
 public:
@@ -47,7 +47,7 @@ public:
 
 		const size_t fsize = mfile.getLength();
 
-		const unsigned short type = util::getTransposedTypeMap( false, true )[dialect+"*"];
+		const unsigned short type = util::getTransposedTypeMap( false, true )[dialect + "*"];
 
 		if( type == 0 ) {
 			LOG( Runtime, error ) << "No known datatype given, you have to give the type of the raw data as rdialect (eg. \"-rdialect u16bit\")";
@@ -87,7 +87,7 @@ public:
 			WriteOp( std::string fname, unsigned short ID ): out( fname.c_str() ), typeID( ID ) {
 				out.exceptions( std::ios::failbit | std::ios::badbit );
 			}
-			bool operator()( data::Chunk &ref, util::FixedVector<size_t, 4 > /*posInImage*/ ) {
+			bool operator()( data::Chunk &ref, util::vector4<size_t> /*posInImage*/ ) {
 				const boost::shared_ptr<const void> data( ref.getValuePtrBase().getRawAddress() );
 				const size_t data_size = ref.bytesPerVoxel() * ref.getVolume();
 				out.write( static_cast<const char *>( data.get() ), data_size );

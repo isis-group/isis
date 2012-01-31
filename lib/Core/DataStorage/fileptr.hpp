@@ -13,6 +13,13 @@
 #include <boost/filesystem.hpp>
 #include "typeptr.hpp"
 
+#ifdef WIN32
+#include <windows.h>
+#define FILE_HANDLE HANDLE
+#else
+#define FILE_HANDLE int
+#endif
+
 namespace isis
 {
 namespace data
@@ -30,9 +37,10 @@ namespace data
 class FilePtr: public ValuePtr<uint8_t>
 {
 	struct Closer {
-		int file;
+		FILE_HANDLE file, mmaph;
 		size_t len;
 		boost::filesystem::path filename;
+		bool write;
 		void operator()( void *p );
 	};
 	typedef data::ValuePtrReference( *generator_type )( data::FilePtr &, size_t, size_t );
@@ -48,10 +56,13 @@ class FilePtr: public ValuePtr<uint8_t>
 		};
 	};
 
-	bool map( int file, size_t len, bool write, const boost::filesystem::path &filename );
-	size_t checkSize( bool write, int file, const boost::filesystem::path &filename, size_t size = 0 );
+	bool map( FILE_HANDLE file, size_t len, bool write, const boost::filesystem::path &filename );
+
+	size_t checkSize( bool write, FILE_HANDLE file, const boost::filesystem::path &filename, size_t size = 0 );
 	bool m_good;
 public:
+	/// empty creator - result will not be usefull until filled
+	FilePtr();
 	/**
 	 * Create a FilePtr, mapping the given file.
 	 * if the write is true:
@@ -80,6 +91,8 @@ public:
 	 * So the file will be unmapped and closed if, and only if all ValuePtr created by this function and the FilePtr are closed.
 	 *
 	 * If the FilePtr was opened writing, writing access to this ValuePtr objects will result in writes to the file. Otherwise it will just write into memory.
+	 *
+	 * Note that there is no conversion done, just reinterpretation of the raw data in the file.
 	 * \param offset the position in the file to start from (in bytes)
 	 * \param len the requested length of the resulting ValuePtr in elements (if that will go behind the end of the file, a warning will be issued).
 	 */
@@ -96,10 +109,21 @@ public:
 		LOG_IF( len * sizeof( T ) > ( getLength() - offset ), Debug, error ) << "The requested length will be " << len - ( getLength() - offset ) << " bytes behind the end of the source.";
 		return data::ValuePtr<T>( ptr, len );
 	}
+
+	/**
+	 * Get a ValuePtrReference to a ValuePtr of the requested type.
+	 * The resulting ValuePtr will use a proxy deleter to keep track of the mapped file.
+	 * So the file will be unmapped and closed if, and only if all ValuePtr created by this function and the FilePtr are closed.
+	 *
+	 * If the FilePtr was opened writing, writing access to this ValuePtr objects will result in writes to the file. Otherwise it will just write into memory.
+	 * \param ID the requested type (note that there is no conversion done, just reinterpretation of the raw data in the file)
+	 * \param offset the position in the file to start from (in bytes)
+	 * \param len the requested length of the resulting ValuePtr in elements (if that will go behind the end of the file, a warning will be issued).
+	 */
 	data::ValuePtrReference atByID( unsigned short ID, size_t offset, size_t len = 0 );
 
 	bool good();
-	void close();
+	void release();
 };
 
 }

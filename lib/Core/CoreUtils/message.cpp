@@ -14,8 +14,6 @@
 #include "common.hpp"
 #include <sys/types.h>
 
-#define BOOST_FILESYSTEM_VERSION 2 //@todo switch to 3 as soon as we drop support for boost < 1.44
-#include <boost/filesystem/path.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp> //we need the to_string functions for the automatic conversion
 
 #ifndef WIN32
@@ -48,6 +46,14 @@ const char *logLevelNames( LogLevel level )
 
 void MessageHandlerBase::stopBelow( LogLevel stop )
 {
+#ifdef WIN32
+	LOG( Debug, error ) << "Sorry stopping is not supported on Win32";
+	return;
+#endif
+#ifdef NDEBUG
+	LOG( Debug, error ) << "Wont apply stopping because NDEBUG is set";
+	return;
+#endif
 	m_stop_below = stop;
 }
 
@@ -55,7 +61,6 @@ bool MessageHandlerBase::requestStop( LogLevel _level )
 {
 	if ( m_stop_below > _level ) {
 #ifdef WIN32
-		LOG( Debug, error ) << "Sorry stopping is not supported on Win32";
 		return false;
 #else
 		return kill( getpid(), SIGTSTP ) == 0;

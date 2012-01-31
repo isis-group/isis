@@ -12,7 +12,6 @@
 #include <boost/iostreams/filter/bzip2.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include <tar.h>
 #include <fstream>
 #include "DataStorage/fileptr.hpp"
 
@@ -73,8 +72,11 @@ private:
 	}
 
 protected:
-	std::string suffixes()const {
-		return std::string( "tar tar.gz tgz tar.bz2 tbz tar.Z taz" );
+	std::string suffixes( io_modes modes = both )const {
+		if( modes == write_only )
+			return std::string();
+		else
+			return std::string( "tar tar.gz tgz tar.bz2 tbz tar.Z taz" );
 	}
 public:
 	std::string dialects( const std::string &/*filename*/ )const {
@@ -133,7 +135,7 @@ public:
 			if( size == 0 ) //if there is no content skip this entry (there are allways two "empty" blocks at the end of a tar)
 				continue;
 
-			if( tar_header.typeflag == AREGTYPE || tar_header.typeflag == REGTYPE ) {
+			if( tar_header.typeflag == '\0' || tar_header.typeflag == '0' ) { //only do regulars files
 
 				data::IOFactory::FileFormatList formats = data::IOFactory::getFileFormatList( org_file.file_string(), dialect ); // and get the reading pluging for that
 
@@ -155,7 +157,7 @@ public:
 
 					size_t red = boost::iostreams::read( in, ( char * )&mfile[0], size ); // read data from the stream into the mapped memory
 					next_header_in -= red;
-					mfile.close(); //close and unmap the temporary file/mapped memory
+					mfile.release(); //close and unmap the temporary file/mapped memory
 
 					if( red != size ) { // read the data from the stream
 						LOG( Runtime, warning ) << "Could not read all " << size << " bytes for " << tmpfile.file_string();

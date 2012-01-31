@@ -21,6 +21,7 @@
 #include <boost/foreach.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
+#include <boost/type_traits/remove_const.hpp>
 #include <stack>
 #include "sortedchunklist.hpp"
 #include "common.hpp"
@@ -29,12 +30,119 @@ namespace isis
 {
 namespace data
 {
+namespace _internal
+{
+/**
+ * Generic iterator for voxels in Images.
+ * It automatically jumps from chunk to Chunk.
+ * It needs the chunks and the image to be there for to work properly (so don't delete the image, and dont reIndex it),
+ * It assumes that all Chunks have the same size (which is a rule for Image as well, so this should be given)
+ */
+template<typename CHUNK_TYPE> class ImageIteratorTemplate: public std::iterator <
+	std::random_access_iterator_tag,
+	typename boost::mpl::if_<boost::is_const<CHUNK_TYPE>, typename CHUNK_TYPE::const_iterator, typename CHUNK_TYPE::iterator>::type::value_type,
+	typename boost::mpl::if_<boost::is_const<CHUNK_TYPE>, typename CHUNK_TYPE::const_iterator, typename CHUNK_TYPE::iterator>::type::difference_type,
+	typename boost::mpl::if_<boost::is_const<CHUNK_TYPE>, typename CHUNK_TYPE::const_iterator, typename CHUNK_TYPE::iterator>::type::pointer,
+	typename boost::mpl::if_<boost::is_const<CHUNK_TYPE>, typename CHUNK_TYPE::const_iterator, typename CHUNK_TYPE::iterator>::type::reference
+	>
+{
+protected:
+	typedef typename boost::mpl::if_<boost::is_const<CHUNK_TYPE>, typename CHUNK_TYPE::const_iterator, typename CHUNK_TYPE::iterator>::type inner_iterator;
+	typedef CHUNK_TYPE chunk_type;
+	typedef ImageIteratorTemplate<CHUNK_TYPE> ThisType;
+
+	std::vector<chunk_type *> chunks;
+	size_t ch_idx;
+	inner_iterator current_it;
+	typename inner_iterator::difference_type ch_len;
+
+	typename inner_iterator::difference_type currentDist()const {
+		if( ch_idx >= chunks.size() )
+			return 0; // if we're behind the last chunk assume we are at the "start" of the "end"-chunk
+		else {
+			const inner_iterator chit_begin = chunks[ch_idx]->begin(); // cast in a const or cast out a non existing one
+			return std::distance( chit_begin, current_it ); // so we use same iterators here
+		}
+	}
+	friend class ImageIteratorTemplate<const CHUNK_TYPE>; //yes, I'm my own friend, sometimes :-) (enables the constructor below)
+public:
+	//will become additional constructor from non const if this is const, otherwise overrride the default copy contructor
+	ImageIteratorTemplate( const ImageIteratorTemplate<typename boost::remove_const<CHUNK_TYPE>::type > &src ):
+		chunks( src.chunks.begin(), src.chunks.end() ), ch_idx( src.ch_idx ),
+		current_it( src.current_it ),
+		ch_len( src.ch_len )
+	{}
+
+	// empty constructor
+	ImageIteratorTemplate(): ch_idx( 0 ), ch_len( 0 ) {}
+
+	// normal conytructor
+	explicit ImageIteratorTemplate( const std::vector<chunk_type *>& _chunks ):
+		chunks( _chunks ), ch_idx( 0 ),
+		current_it( chunks[0]->begin() ),
+		ch_len( std::distance( current_it, chunks[0]->end() ) )
+	{}
+
+	ThisType &operator++() {return operator+=( 1 );}
+	ThisType &operator--() {return operator-=( 1 );}
+
+	ThisType operator++( int ) {ThisType tmp = *this; operator++(); return tmp;}
+	ThisType operator--( int ) {ThisType tmp = *this; operator--(); return tmp;}
+
+	typename inner_iterator::reference operator*() const {return current_it.operator * ();}
+	typename inner_iterator::pointer  operator->() const {return current_it.operator->();}
+
+	bool operator==( const ThisType &cmp )const {return ch_idx == cmp.ch_idx && current_it == cmp.current_it;}
+	bool operator!=( const ThisType &cmp )const {return !operator==( cmp );}
+
+	bool operator>( const ThisType &cmp )const {return ch_idx > cmp.ch_idx || ( ch_idx == cmp.ch_idx && current_it > cmp.current_it );}
+	bool operator<( const ThisType &cmp )const {return ch_idx < cmp.ch_idx || ( ch_idx == cmp.ch_idx && current_it < cmp.current_it );}
+
+	bool operator>=( const ThisType &cmp )const {return operator>( cmp ) || operator==( cmp );}
+	bool operator<=( const ThisType &cmp )const {return operator<( cmp ) || operator==( cmp );}
+
+	typename inner_iterator::difference_type operator-( const ThisType &cmp )const {
+		typename inner_iterator::difference_type dist = ( ch_idx - cmp.ch_idx ) * ch_len; // get the (virtual) distance from my current block to cmp's current block
+
+		if( ch_idx >= cmp.ch_idx ) { //if I'm beyond cmp add my current pos to the distance, and substract his
+			dist += currentDist() - cmp.currentDist();
+		} else {
+			dist += cmp.currentDist() - currentDist();
+		}
+
+		return dist;
+	}
+
+	ThisType operator+( typename ThisType::difference_type n )const {return ThisType( *this ) += n;}
+	ThisType operator-( typename ThisType::difference_type n )const {return ThisType( *this ) -= n;}
+
+	ThisType &operator+=( typename inner_iterator::difference_type n ) {
+		n += currentDist(); //start from current begin (add current_it-(begin of the current chunk) to n)
+		assert( ( n / ch_len + static_cast<typename ThisType::difference_type>( ch_idx )  ) >= 0 );
+		ch_idx += n / ch_len; //if neccesary jump to next chunk
+
+		if( ch_idx < chunks.size() )
+			current_it = chunks[ch_idx]->begin() + n % ch_len; //set new current iterator in new chunk plus the "rest"
+		else
+			current_it = ( *( chunks.end() - 1 ) )->end() ; //set current_it to the last chunks end iterator if we are behind it
+
+		return *this;
+	}
+	ThisType &operator-=( typename inner_iterator::difference_type n ) {return operator+=( -n );}
+
+	typename ThisType::reference operator[]( typename inner_iterator::difference_type n )const {
+		return *( ThisType( chunks ) += n );
+	}
+
+};
+}
 
 /// Base class for operators used for foreachChunk
 class ChunkOp : std::unary_function<Chunk &, bool>
 {
 public:
-	virtual bool operator()( Chunk &, util::FixedVector<size_t, 4> posInImage ) = 0;
+	virtual bool operator()( Chunk &, util::vector4<size_t> posInImage ) = 0;
+	virtual ~ChunkOp();
 };
 
 /// Main class for generic 4D-images
@@ -55,7 +163,10 @@ public:
 	 */
 	void setIndexingDim( dimensions d = rowDim );
 	enum orientation {axial, reversed_axial, sagittal, reversed_sagittal, coronal, reversed_coronal};
-
+	typedef _internal::ImageIteratorTemplate<Chunk> iterator;
+	typedef _internal::ImageIteratorTemplate<const Chunk> const_iterator;
+	typedef iterator::reference reference;
+	typedef const_iterator::reference const_reference;
 protected:
 	_internal::SortedChunkList set;
 	std::vector<boost::shared_ptr<Chunk> > lookup;
@@ -89,7 +200,7 @@ private:
 		LOG_IF( set.isEmpty(), Debug, error )
 				<< "Getting data from a empty image will result in undefined behavior.";
 		LOG_IF( !isInRange( idx ), Debug, isis::error )
-				<< "Index " << util::listToString( idx, idx + 4, "|" ) << " is out of range (" << getSizeAsString() << ")";
+				<< "Index " << util::vector4<size_t>( idx ) << " is out of range (" << getSizeAsString() << ")";
 		const size_t index = getLinearIndex( idx );
 		return std::make_pair( index / chunkVolume, index % chunkVolume );
 	}
@@ -260,6 +371,8 @@ public:
 		return data[index.second];
 	}
 
+	const util::ValueReference getVoxelValue( size_t nrOfColumns, size_t nrOfRows = 0, size_t nrOfSlices = 0, size_t nrOfTimesteps = 0 )const;
+	void setVoxelValue( const util::ValueReference &val, size_t nrOfColumns, size_t nrOfRows = 0, size_t nrOfSlices = 0, size_t nrOfTimesteps = 0 );
 
 	/**
 	 * Get the type of the chunk with "biggest" type.
@@ -274,6 +387,11 @@ public:
 	unsigned short getMajorTypeID() const;
 	/// \returns the typename correspondig to the result of typeID
 	std::string getMajorTypeName() const;
+
+	iterator begin();
+	iterator end();
+	const_iterator begin()const;
+	const_iterator end()const;
 
 	/**
 	 * Get a chunk via index (and the lookup table).
@@ -375,7 +493,7 @@ public:
 	 */
 	std::list<util::PropertyValue> getChunksProperties( const util::PropertyMap::KeyType &key, bool unique = false )const;
 
-	/// get the size of every voxel (in bytes)
+	/// get the voxelsize (in bytes) for the major type in the image
 	size_t getBytesPerVoxel()const;
 
 	/**
@@ -454,7 +572,7 @@ public:
 		return true;
 	}
 
-	/** Maps the given scanner Axes to the dimension with the minimal angle.
+	/** Maps the given scanner Axis to the dimension with the minimal angle.
 	 *  This is done by latching the orientation of the image by setting the biggest absolute
 	 *  value of each orientation vector to 1 and the others to 0.
 	 *  Example:
@@ -467,7 +585,7 @@ public:
 	 *  \return the mapped image dimension
 	 */
 
-	dimensions mapScannerAxesToImageDimension( scannerAxis scannerAxes );
+	dimensions mapScannerAxisToImageDimension( scannerAxis scannerAxes );
 
 	/** Computes the physical coordinates (in scanner space) of the given voxel index.
 	 *  This function does not perform any test if the voxel index is inside the image.
@@ -484,20 +602,26 @@ public:
 	 *  \param physicalCoords the physical coords from which you want to get the voxel index.
 	 *  \return voxel index associated with the given physicalCoords
 	 */
-	util::ivector4 getIndexFromPhysicalCoords( const util::fvector4 &physicalCoords ) const;
+	util::ivector4 getIndexFromPhysicalCoords( const util::fvector4 &physicalCoords, bool restrictedToImageBox = false ) const;
 
 	/**
 	 * Copy all voxel data of the image into memory.
 	 * If neccessary a conversion into T is done using min/max of the image.
+	 * \param dst c-pointer for the memory to copy into
+	 * \param len the allocated size of that memory in elements
+	 * \param scaling the scaling to be used when converting the data (will be determined automatically if not given)
 	 */
-	template<typename T> void copyToMem( T *dst, size_t len )const {
+	template<typename T> void copyToMem( T *dst, size_t len,  scaling_pair scaling = scaling_pair()   )const {
 		if( clean ) {
-			scaling_pair scale = getScalingTo( ValuePtr<T>::staticID );
+			if( scaling.first.isEmpty() || scaling.second.isEmpty() ) {
+				scaling = getScalingTo( ValuePtr<T>::staticID );
+			}
+
 			// we could do this using convertToType - but this solution does not need any additional temporary memory
 			BOOST_FOREACH( const boost::shared_ptr<Chunk> &ref, lookup ) {
 				const size_t cSize = ref->getSizeAsVector().product();
 
-				if( !ref->copyToMem<T>( dst, len, scale ) ) {
+				if( !ref->copyToMem<T>( dst, len, scaling ) ) {
 					LOG( Runtime, error ) << "Failed to copy raw data of type " << ref->getTypeName() << " from image into memory of type " << ValuePtr<T>::staticName();
 				} else {
 					if( len < cSize ) {
@@ -522,9 +646,9 @@ public:
 	 * \returns a MemChunk\<T\> containing the voxeldata of the Image (but not its Properties)
 	 */
 	template<typename T> MemChunk<T> copyToMemChunk()const {
-		const util::FixedVector<size_t, 4> size = getSizeAsVector();
+		const util::vector4<size_t> size = getSizeAsVector();
 		data::MemChunk<T> ret( size[0], size[1], size[2], size[3] );
-		copyToMem<T>( &ret.voxel<T>( 0, 0, 0, 0 ) );
+		copyToMem<T>( &ret.voxel<T>( 0, 0, 0, 0 ), ret.getVolume() );
 		return ret;
 	}
 
@@ -572,7 +696,7 @@ public:
 			VoxelOp<TYPE> &op;
 		public:
 			_proxy( VoxelOp<TYPE> &_op ): op( _op ) {}
-			bool operator()( Chunk &ch, util::FixedVector<size_t, 4 > posInImage ) {
+			bool operator()( Chunk &ch, util::vector4<size_t> posInImage ) {
 				return ch.foreachVoxel<TYPE>( op, posInImage ) == 0;
 			}
 		};
@@ -583,7 +707,7 @@ public:
 	/// \returns the number of rows of the image
 	size_t getNrOfRows()const;
 	/// \returns the number of columns of the image
-	size_t getNrOfColumms()const;
+	size_t getNrOfColumns()const;
 	/// \returns the number of slices of the image
 	size_t getNrOfSlices()const;
 	/// \returns the number of timesteps of the image
@@ -602,6 +726,10 @@ template<typename T> class TypedImage: public Image
 protected:
 	TypedImage() {} // to be used only by inheriting classes
 public:
+	typedef _internal::ImageIteratorTemplate<data::ValuePtr<T> > iterator;
+	typedef _internal::ImageIteratorTemplate<const data::ValuePtr<T> > const_iterator;
+	typedef typename iterator::reference reference;
+	typedef typename const_iterator::reference const_reference;
 	/// cheap copy another Image and make sure all chunks have type T
 	TypedImage( const Image &src ): Image( src ) { // ok we just copied the whole image
 		//but we want it to be of type T
@@ -624,6 +752,34 @@ public:
 	void copyToMem( void *dst )const {
 		Image::copyToMem<T>( ( T * )dst );
 	}
+	iterator begin() {
+		if( checkMakeClean() ) {
+			std::vector<data::ValuePtr<T>*> vec( lookup.size() );
+
+			for( size_t i = 0; i < lookup.size(); i++ )
+				vec[i] = &lookup[i]->asValuePtr<T>();
+
+			return iterator( vec );
+		} else {
+			LOG( Debug, error )  << "Image is not clean. Returning empty iterator ...";
+			return iterator();
+		}
+	}
+	iterator end() {return begin() + getVolume();};
+	const_iterator begin()const {
+		if( isClean() ) {
+			std::vector<const data::ValuePtr<T>*> vec( lookup.size() );
+
+			for( size_t i = 0; i < lookup.size(); i++ )
+				vec[i] = &lookup[i]->asValuePtr<T>();
+
+			return const_iterator( vec );
+		} else {
+			LOG( Debug, error )  << "Image is not clean. Returning empty iterator ...";
+			return const_iterator();
+		}
+	}
+	const_iterator end()const {return begin() + getVolume();};
 };
 
 /**

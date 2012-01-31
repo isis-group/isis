@@ -63,14 +63,14 @@ bool inverseMatrix( const matrix<TYPE> &inMatrix, matrix<TYPE> &inverse )
 	return true;
 }
 
-bool transformCoords( isis::util::PropertyMap &, const isis::util::FixedVector<size_t, 4> size, boost::numeric::ublas::matrix<float>, bool transformCenterIsImageCenter = false );
+bool transformCoords( isis::util::PropertyMap &, const isis::util::vector4<size_t> size, boost::numeric::ublas::matrix<float>, bool transformCenterIsImageCenter = false );
 
 }
 
 typedef DataLog Runtime;
 typedef DataDebug Debug;
 enum dimensions {rowDim = 0, columnDim, sliceDim, timeDim};
-enum scannerAxis { x = 0, y, z };
+enum scannerAxis { x = 0, y, z, t };
 
 /**
  * Set logging level for the namespace data.

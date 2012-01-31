@@ -16,6 +16,7 @@
 
 #include "chunk.hpp"
 #include <boost/foreach.hpp>
+#include <boost/scoped_ptr.hpp>
 
 namespace isis
 {
@@ -46,7 +47,7 @@ Chunk::Chunk( const ValuePtrReference &src, size_t nrOfColumns, size_t nrOfRows,
 
 Chunk Chunk::cloneToNew( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps )const
 {
-	util::FixedVector<size_t, 4> newSize = getSizeAsVector();
+	util::vector4<size_t> newSize = getSizeAsVector();
 
 	if ( nrOfColumns )newSize[0] = nrOfColumns;
 
@@ -97,13 +98,13 @@ void Chunk::copySlice( size_t thirdDimS, size_t fourthDimS, Chunk &dst, size_t t
 void Chunk::copyRange( const size_t source_start[], const size_t source_end[], Chunk &dst, const size_t destination[] ) const
 {
 	LOG_IF( ! isInRange( source_start ), Debug, error )
-			<< "Copy start " << util::FixedVector<size_t, 4>( source_start )
+			<< "Copy start " << util::vector4<size_t>( source_start )
 			<< " is out of range (" << getSizeAsString() << ") at the source chunk";
 	LOG_IF( ! isInRange( source_end ), Debug, error )
-			<< "Copy end " << util::FixedVector<size_t, 4>( source_end )
+			<< "Copy end " << util::vector4<size_t>( source_end )
 			<< " is out of range (" << getSizeAsString() << ") at the source chunk";
 	LOG_IF( ! dst.isInRange( destination ), Debug, error )
-			<< "Index " << util::FixedVector<size_t, 4>( destination )
+			<< "Index " << util::vector4<size_t>( destination )
 			<< " is out of range (" << getSizeAsString() << ") at the destination chunk";
 	const size_t sstart = getLinearIndex( source_start );
 	const size_t send = getLinearIndex( source_end );
@@ -114,17 +115,17 @@ void Chunk::copyRange( const size_t source_start[], const size_t source_end[], C
 size_t Chunk::compareRange( const size_t source_start[], const size_t source_end[], const Chunk &dst, const size_t destination[] ) const
 {
 	LOG_IF( ! isInRange( source_start ), Debug, error )
-			<< "memcmp start " << util::FixedVector<size_t, 4>( source_start )
+			<< "memcmp start " << util::vector4<size_t>( source_start )
 			<< " is out of range (" << getSizeAsString() << ") at the first chunk";
 	LOG_IF( ! isInRange( source_end ), Debug, error )
-			<< "memcmp end " << util::FixedVector<size_t, 4>( source_end )
+			<< "memcmp end " << util::vector4<size_t>( source_end )
 			<< " is out of range (" << getSizeAsString() << ") at the first chunk";
 	LOG_IF( ! dst.isInRange( destination ), Debug, error )
-			<< "Index " << util::FixedVector<size_t, 4>( destination )
+			<< "Index " << util::vector4<size_t>( destination )
 			<< " is out of range (" << getSizeAsString() << ") at the second chunk";
 	LOG( Debug, verbose_info )
-			<< "Comparing range from " << util::FixedVector<size_t, 4>( source_start ) << " to " << util::FixedVector<size_t, 4>( source_end )
-			<< " and " << util::FixedVector<size_t, 4>( destination );
+			<< "Comparing range from " << util::vector4<size_t>( source_start ) << " to " << util::vector4<size_t>( source_end )
+			<< " and " << util::vector4<size_t>( destination );
 	const size_t sstart = getLinearIndex( source_start );
 	const size_t send = getLinearIndex( source_end );
 	const size_t dstart = dst.getLinearIndex( destination );
@@ -206,23 +207,36 @@ std::list<Chunk> Chunk::autoSplice ( uint32_t acquisitionNumberStride )const
 	// prepare some attributes
 	assert( util::fuzzyEqual<float>( offset.sqlen(), 1 ) ); // it should be norm here
 	const util::fvector4 indexOriginOffset = offset * distance[atDim];
-	size_t cnt = 0;
+
 	LOG( Debug, info ) << "Splicing chunk at dimenstion " << atDim + 1 << " with indexOrigin stride " << indexOriginOffset << " and acquisitionNumberStride " << acquisitionNumberStride;
 	std::list<Chunk> ret = splice( ( dimensions )atDim ); // do low level splice - get the chunklist
-	BOOST_FOREACH( Chunk & ref, ret ) { // adapt some metadata in them
-		util::fvector4 &orig = ref.propertyValue( "indexOrigin" )->castTo<util::fvector4>();
-		uint32_t &acq = ref.propertyValue( "acquisitionNumber" )->castTo<uint32_t>();
-		LOG( Debug, verbose_info ) << "Origin was " << orig << " will be moved by " << indexOriginOffset << "*"  << cnt;
-		orig = orig + indexOriginOffset * ( float )cnt;
-		acq += acquisitionNumberStride * cnt; //@todo this might cause trouble if we try to insert this chunks into an image
-		cnt++;
+
+	std::list<Chunk>::iterator it = ret.begin();
+	it++;// skip the first one
+
+	for( size_t cnt = 1; it != ret.end(); it++, cnt++ ) { // adapt some metadata in them
+		util::fvector4 &orig = it->propertyValue( "indexOrigin" )->castTo<util::fvector4>();
+
+		if( orig == ret.front().getPropertyAs<util::fvector4>( "indexOrigin" ) ) { // fix pos if its the same as for the first
+			LOG( Debug, verbose_info ) << "Origin was " << orig << " will be moved by " << indexOriginOffset << "*"  << cnt;
+			orig = orig + indexOriginOffset * ( float )cnt;
+		}
+
+		uint32_t &acq = it->propertyValue( "acquisitionNumber" )->castTo<uint32_t>();
+
+		if( acq == ret.front().getPropertyAs<uint32_t>( "acquisitionNumber" ) ) {
+			LOG( Debug, verbose_info ) << "acquisitionNumber was " << acq << " will be moved by " << acquisitionNumberStride << "*"  << cnt;
+			acq += acquisitionNumberStride * cnt; //@todo this might cause trouble if we try to insert this chunks into an image
+		}
 	}
+
 	return ret;
 }
 
 std::list<Chunk> Chunk::splice ( dimensions atDim )const
 {
 	std::list<Chunk> ret;
+
 	//@todo should be locking
 	typedef std::vector<ValuePtrReference> ValuePtrList;
 	const util::FixedVector<size_t, dims> wholesize = getSizeAsVector();
@@ -232,10 +246,19 @@ std::list<Chunk> Chunk::splice ( dimensions atDim )const
 	spliceSize.copyFrom( &wholesize[0], &wholesize[atDim] );
 	//get the spliced ValuePtr's (the volume of the requested dims is the split-size - in case of sliceDim it is rows*columns)
 	const ValuePtrList pointers = this->getValuePtrBase().splice( spliceSize.product() );
+
+	const util::PropertyMap::KeyList lists = this->findLists();
+	size_t list_idx = 0;
+
 	//create new Chunks from this ValuePtr's
 	BOOST_FOREACH( ValuePtrList::const_reference ref, pointers ) {
 		ret.push_back( Chunk( ref, spliceSize[0], spliceSize[1], spliceSize[2], spliceSize[3] ) ); //@todo make sure this is only one copy-operation
-		static_cast<util::PropertyMap &>( ret.back() ) = static_cast<const util::PropertyMap &>( *this ); //copy my metadate into all spliced
+		static_cast<util::PropertyMap &>( ret.back() ) = static_cast<const util::PropertyMap &>( *this ); // copy all props into the splices
+		BOOST_FOREACH( const util::PropertyMap::KeyType & key, lists ) { // override list-entries in the splices with their respective entries
+			ret.back().propertyValue( key ) = this->propertyValueAt( key, list_idx );
+		}
+		//      std::cout << static_cast<util::PropertyMap &>( ret.back() ) << std::endl;
+		list_idx++;
 	}
 	return ret;
 }
@@ -248,8 +271,8 @@ size_t Chunk::useCount() const
 void Chunk::swapAlong( const dimensions dim ) const
 {
 	const size_t elSize = bytesPerVoxel();
-	const util::FixedVector<size_t, 4> whole_size = getSizeAsVector();
-	const util::FixedVector<size_t, 4> outer_size = whole_size;
+	const util::vector4<size_t> whole_size = getSizeAsVector();
+	const util::vector4<size_t> outer_size = whole_size;
 
 	boost::shared_ptr<uint8_t> swap_ptr = boost::shared_static_cast<uint8_t>( get()->getRawAddress() );
 	uint8_t *swap_start = swap_ptr.get();
@@ -265,7 +288,7 @@ void Chunk::swapAlong( const dimensions dim ) const
 	assert( block_volume );
 	block_volume *= elSize;
 	const size_t swap_volume = block_volume * whole_size[dim];
-	const std::auto_ptr<uint8_t> buff( static_cast<uint8_t *>( malloc( block_volume ) ) );
+	const boost::scoped_array<uint8_t> buff( new uint8_t[ block_volume ] );
 
 	//iterate over all swap-volumes
 	for( ; swap_start < swap_end; swap_start += swap_volume ) { //outer loop
@@ -285,7 +308,7 @@ void Chunk::swapAlong( const dimensions dim ) const
 util::PropertyValue &Chunk::propertyValueAt( const util::PropertyMap::KeyType &key, size_t at )
 {
 	std::vector< util::PropertyValue > &vec = propertyValueVec( key );
-	const size_t cSize = getSizeAsVector()[getRelevantDims()-1];
+	const size_t cSize = getSizeAsVector()[getRelevantDims() - 1];
 
 	if( vec.size() != cSize ) {
 		LOG( Debug, info ) << "Resizing sub-property " << key << " to size of the chunk (" << cSize  << ")";
@@ -297,10 +320,55 @@ util::PropertyValue &Chunk::propertyValueAt( const util::PropertyMap::KeyType &k
 const util::PropertyValue &Chunk::propertyValueAt( const util::PropertyMap::KeyType &key, size_t at ) const
 {
 	const std::vector< util::PropertyValue > &vec = propertyValueVec( key );
-	const size_t cSize = getSizeAsVector()[getRelevantDims()-1];
+	const size_t cSize = getSizeAsVector()[getRelevantDims() - 1];
 	LOG_IF( vec.size() != cSize, Debug, warning ) << "Sub-property " << key << " does not have the size of the chunk (" << cSize  << ")";
 	return vec.at( at );
 }
+
+Chunk::iterator Chunk::begin()
+{
+	return asValuePtrBase().beginGeneric();
+}
+
+Chunk::iterator Chunk::end()
+{
+	return asValuePtrBase().endGeneric();
+}
+Chunk::const_iterator Chunk::begin()const
+{
+	return getValuePtrBase().beginGeneric();
+}
+
+Chunk::const_iterator Chunk::end()const
+{
+	return getValuePtrBase().endGeneric();
+}
+
+const util::ValueReference Chunk::getVoxelValue ( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps ) const
+{
+	const size_t idx[] = {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps};
+
+	if ( !isInRange( idx ) ) {
+		LOG( Debug, isis::error )
+				<< "Index " << util::vector4<size_t>( idx ) << nrOfTimesteps
+				<< " is out of range (" << getSizeAsString() << ")";
+	}
+
+	return begin()[getLinearIndex( idx )];
+}
+void Chunk::setVoxelValue ( const util::ValueReference &val, size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps )
+{
+	const size_t idx[] = {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps};
+
+	if ( !isInRange( idx ) ) {
+		LOG( Debug, isis::error )
+				<< "Index " << util::vector4<size_t>( idx ) << nrOfTimesteps
+				<< " is out of range (" << getSizeAsString() << ")";
+	}
+
+	begin()[getLinearIndex( idx )] = val;
+}
+
 
 }
 }

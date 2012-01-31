@@ -23,10 +23,11 @@ namespace _internal
 {
 
 
-bool transformCoords( isis::util::PropertyMap &properties, util::FixedVector<size_t, 4> size, boost::numeric::ublas::matrix<float> transform, bool transformCenterIsImageCenter  )
+bool transformCoords( isis::util::PropertyMap &properties, util::vector4<size_t> size, boost::numeric::ublas::matrix<float> transform, bool transformCenterIsImageCenter  )
 {
 	if( !properties.hasProperty( "rowVec" ) || !properties.hasProperty( "columnVec" ) || !properties.hasProperty( "sliceVec" )
 		|| !properties.hasProperty( "voxelSize" ) || !properties.hasProperty( "indexOrigin" ) ) {
+		LOG( Runtime, error ) << "Missing one of the properties (rowVec, columnVec, sliceVec, voxelSize, indexOrigin)";
 		return false;
 	}
 
@@ -41,7 +42,15 @@ bool transformCoords( isis::util::PropertyMap &properties, util::FixedVector<siz
 	// get index origin from property map
 	isis::util::fvector4 indexorig = properties.getPropertyAs<util::fvector4>( "indexOrigin" );
 	vector<float> origin_out = vector<float>( 3 );
-	isis::util::fvector4 scaling  = properties.getPropertyAs<util::fvector4>( "voxelSize" ) + properties.getPropertyAs<util::fvector4>( "voxelGap" );
+	//check if we have a property "voxelGap" to prevent isis from throwing a warning "blabla"
+	isis::util::fvector4 scaling;
+
+	if( properties.hasProperty( "voxelGap" ) ) {
+		scaling  = properties.getPropertyAs<util::fvector4>( "voxelSize" ) +  properties.getPropertyAs<util::fvector4>( "voxelGap" );
+	} else {
+		scaling  = properties.getPropertyAs<util::fvector4>( "voxelSize" );
+	}
+
 	// create boost::numeric data structures
 	// STEP 1 transform orientation matrix
 	// input matrix
@@ -78,6 +87,7 @@ bool transformCoords( isis::util::PropertyMap &properties, util::FixedVector<siz
 		matrix<float> R_in_inverse( R_in );
 
 		if( !_internal::inverseMatrix<float>( R_in, R_in_inverse ) ) {
+			LOG( Runtime, error ) << "Can not inverse orientation matrix: " << R_in;
 			return false;
 		}
 

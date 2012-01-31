@@ -18,8 +18,8 @@ project(ISIS)
 # set isis version number
 ############################################################
 set(ISIS_VERSION_MAJOR "0")
-set(ISIS_VERSION_MINOR "3")
-set(ISIS_VERSION_PATCH "4")
+set(ISIS_VERSION_MINOR "4")
+set(ISIS_VERSION_PATCH "5")
 
 add_definitions(-D_ISIS_VERSION_MAJOR=${ISIS_VERSION_MAJOR})
 add_definitions(-D_ISIS_VERSION_MINOR=${ISIS_VERSION_MINOR})
@@ -29,10 +29,12 @@ set(ISIS_VERSION
   ${ISIS_VERSION_MAJOR}.${ISIS_VERSION_MINOR}.${ISIS_VERSION_PATCH}
   CACHE INTERNAL "The current Version of the ISIS project")
 
+if(NOT WIN32)
 ############################################################
 # set install infix for plugin installation path
 ############################################################
 set(ISIS_PLUGIN_INFIX lib/isis/plugins)
+endif(NOT WIN32)
 
 ############################################################
 # set project specific module path
@@ -49,11 +51,22 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wstrict-aliasing=2"  )
 ############################################################
 # compiler flags on 64Bit cpus
 ############################################################
-if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
+
+if(${APPLE})
+  if(${CMAKE_OSX_ARCHITECTURES})
+    set(PROCESSOR ${CMAKE_OSX_ARCHITECTURES})
+  else(${CMAKE_OSX_ARCHITECTURES})
+    set(PROCESSOR "x86_64")
+  endif(${CMAKE_OSX_ARCHITECTURES})  
+else(${APPLE})
+  set(PROCESSOR ${CMAKE_SYSTEM_PROCESSOR})
+endif(${APPLE})
+
+if("${PROCESSOR}" STREQUAL "x86_64")
   message(STATUS "Compiling on x86_64. Using the '-fPIC' option in any case")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC" )
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC"  )
-endif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" )
+endif("${PROCESSOR}" STREQUAL "x86_64" )
 
 ############################################################
 # Logging options are global for all components in the tree
@@ -79,6 +92,7 @@ endif(ISIS_DEBUG_LOG)
 # since ISIS stongly depends on the boost libraries we will configure them
 # globally.
 find_package(Boost REQUIRED COMPONENTS filesystem regex system date_time)
+
 include_directories(${Boost_INCLUDE_DIR})
 
 ############################################################
@@ -92,7 +106,7 @@ if (NOT GIT_REVISION)
   if (GIT_COMMAND)
     execute_process(COMMAND ${GIT_COMMAND} describe OUTPUT_VARIABLE OUT WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} OUTPUT_STRIP_TRAILING_WHITESPACE)
     string(REGEX MATCH "[0-9]+-[^-]+$" GIT_REVISION "${OUT}") #@todo wont work with more complex revisions/modified sources
-    set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}-${GIT_REVISION}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}-${CMAKE_BUILD_TYPE})
+    set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}-${GIT_REVISION}-${CMAKE_SYSTEM_NAME}-${PROCESSOR}-${CMAKE_BUILD_TYPE})
   else(GIT_COMMAND)
     message(STATUS "git not found")
   endif (GIT_COMMAND)
@@ -126,21 +140,27 @@ SET(CPACK_PACKAGE_VENDOR "the friendly isis team")
 SET(CPACK_PACKAGE_CONTACT "reimer@cbs.mpg.de")
 SET(CPACK_PACKAGE_NAME "isis-core")
 SET(CPACK_BUNDLE_NAME ${CPACK_PACKAGE_NAME})
-SET(CPACK_COMPONENTS_ALL "CLI Tools" "IO plugins" "Development" "RuntimeLibraries")
+SET(CPACK_COMPONENTS_ALL "CLI_Tools" "IO_plugins" "Development" "RuntimeLibraries")
 #SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/ReadMe.txt")
 SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/COPYING.txt")
 SET(CPACK_PACKAGE_VERSION_MAJOR ${${CMAKE_PROJECT_NAME}_VERSION_MAJOR})
 SET(CPACK_PACKAGE_VERSION_MINOR ${${CMAKE_PROJECT_NAME}_VERSION_MINOR})
 SET(CPACK_PACKAGE_VERSION_PATCH ${${CMAKE_PROJECT_NAME}_VERSION_PATCH})
-SET(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${ISIS_CORE_REV_STRING}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}-${CMAKE_BUILD_TYPE})
+SET(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${ISIS_CORE_REV_STRING}-${CMAKE_SYSTEM_NAME}-${PROCESSOR}-${CMAKE_BUILD_TYPE})
 #SET(CPACK_PACKAGE_INSTALL_DIRECTORY "CMake ${${CMAKE_PROJECT_NAME}_VERSION_MAJOR}.${${CMAKE_PROJECT_NAME}_VERSION_MINOR}")
+SET(CPACK_NSIS_MODIFY_PATH ON)
+SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\isis-group.github.com/isis")
 INCLUDE(CPack)
 
 # status messages
 message(STATUS "/bin directory: ${CMAKE_INSTALL_PREFIX}/bin")
 message(STATUS "/lib directory: ${CMAKE_INSTALL_PREFIX}/lib")
 message(STATUS "/include directory: ${CMAKE_INSTALL_PREFIX}/include")
+if(WIN32)
+message(STATUS "/plugins directory: ${CMAKE_INSTALL_PREFIX}/bin")
+else(WIN32)
 message(STATUS "/plugins directory: ${CMAKE_INSTALL_PREFIX}/${ISIS_PLUGIN_INFIX}")
+endif(WIN32)
 
 # build the ISIS libraries
 add_subdirectory(lib)

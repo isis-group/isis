@@ -17,13 +17,14 @@
 
 */
 
-#ifndef APPLICATION_H
-#define APPLICATION_H
+#ifndef QT_APPLICATION_HPP
+#define QT_APPLICATION_HPP
 
 #include <QApplication>
 #include <CoreUtils/application.hpp>
 #include <DataStorage/io_application.hpp>
 #include <boost/scoped_ptr.hpp>
+#include "qdefaultmessageprint.hpp"
 
 namespace isis
 {
@@ -32,13 +33,12 @@ namespace qt4
 
 class QtApplication : public util::Application
 {
-	int m_argc; //we need local copies here, so we can give references to QApplication
-	char **m_argv;
 	boost::scoped_ptr<QApplication> m_qapp;
 public:
 	QApplication &getQApplication();
 	QtApplication( const char name[] );
-	virtual bool init( int argc, char **argv, bool exitOnError = true );
+	/// see http://developer.qt.nokia.com/doc/qt-4.8/qapplication.html#QApplication
+	virtual bool init( int &argc, char **argv, bool exitOnError = true );
 };
 
 class IOQtApplication : public data::IOApplication
@@ -49,10 +49,13 @@ class IOQtApplication : public data::IOApplication
 public:
 	QApplication &getQApplication();
 	IOQtApplication( const char name[], bool have_input = true, bool have_output = true );
-	virtual bool init( int argc, char **argv, bool exitOnError = true );
+	/// see http://developer.qt.nokia.com/doc/qt-4.8/qapplication.html#QApplication
+	virtual bool init( int &argc, char **argv, bool exitOnError = true );
+protected:
+	virtual boost::shared_ptr<util::_internal::MessageHandlerBase> getLogHandler( std::string module, isis::LogLevel level )const;
 
 };
 }
 }
 
-#endif // APPLICATION_H
+#endif // QT_APPLICATION_HPP

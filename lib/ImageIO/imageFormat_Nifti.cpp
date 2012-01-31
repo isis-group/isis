@@ -60,7 +60,7 @@ class Flip : public data::ChunkOp
 	data::dimensions dim;
 public:
 	Flip( data::dimensions d ) { dim = d; }
-	bool operator()( data::Chunk &ch, util::FixedVector<size_t, 4> /*posInImage*/ ) {
+	bool operator()( data::Chunk &ch, util::vector4<size_t> /*posInImage*/ ) {
 		ch.swapAlong( dim );
 		return true;
 	}
@@ -74,7 +74,7 @@ public:
 		LOG( ImageIoDebug, info ) << "create NiftiChunk";
 	}
 
-	//TODO: This is really weird staff - the gcc4.2 on MAC and RedHat is complaining about
+	//TODO: This is really weird stuff - the gcc4.2 on MAC and RedHat is complaining about
 	// the private copy constructor because he cannot resolve the template constructor when creating NiftiChunk
 	// e.g. in retList.push_back( _internal::NiftiChunk::makeNiftiChunk( static_cast<uint8_t *> (ni->data), del, ni->dim[1], ni->dim[2], ni->dim[3], ni->dim[4] ? ni->dim[4] : 1 )  );
 	// That's completely crazy but this workaround is a first solution - we hope to find a better one
@@ -113,7 +113,7 @@ class ImageFormat_Nifti : public FileFormat
 		}
 	};
 protected:
-	std::string suffixes()const {
+	std::string suffixes( io_modes /*modes=both*/ )const {
 		return std::string( ".nii.gz .nii .hdr" );
 	}
 public:
@@ -212,7 +212,7 @@ public:
 			boost::numeric::ublas::matrix<float> spmTransform = boost::numeric::ublas::identity_matrix<float> ( 3, 3 );
 			spmTransform( 1, 1 ) = -1;
 			image.transformCoords( spmTransform, true );
-			_internal::Flip flipOp( image.mapScannerAxesToImageDimension( data::z ) );
+			_internal::Flip flipOp( image.mapScannerAxisToImageDimension( data::z ) );
 			image.foreachChunk( flipOp );
 			//set the description
 			std::stringstream description;
@@ -580,8 +580,8 @@ private:
 	void copyDataToNifti( const data::Image &image, nifti_image &ni ) {
 		ni.data = malloc( image.getBytesPerVoxel() * image.getVolume() );
 		T *refNii = ( T * ) ni.data;
-		const util::FixedVector<size_t, 4> csize = image.getChunk( 0, 0 ).getSizeAsVector();
-		const util::FixedVector<size_t, 4> isize = image.getSizeAsVector();
+		const util::vector4<size_t> csize = image.getChunk( 0, 0 ).getSizeAsVector();
+		const util::vector4<size_t> isize = image.getSizeAsVector();
 		const data::scaling_pair scale = image.getScalingTo( data::ValuePtr<T>::staticID );
 
 		for ( size_t t = 0; t < isize[3]; t += csize[3] ) {
@@ -589,9 +589,9 @@ private:
 				for ( size_t y = 0; y < isize[1]; y += csize[1] ) {
 					for ( size_t x = 0; x < isize[0]; x += csize[0] ) {
 						const size_t dim[] = {x, y, z, t};
-						const data::Chunk ch = image.getChunkAs<T>( scale, x, y, z, t );
 						T *target = refNii + image.getLinearIndex( dim );
-						ch.getValuePtr<T>().copyToMem( target, ch.getVolume() );
+						const data::Chunk ch = image.getChunk( x, y, z, t, false );
+						ch.copyToMem( target, ch.getVolume(), scale );
 					}
 				}
 			}

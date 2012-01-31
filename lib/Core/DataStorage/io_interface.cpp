@@ -27,10 +27,15 @@ void FileFormat::write( const std::list<data::Image> &images, const std::string 
 	std::list<std::string>::const_iterator inames = names.begin();
 	BOOST_FOREACH( std::list<data::Image>::const_reference ref, images ) {
 		std::string uniquePath = *( inames++ );
-		LOG( Runtime, notice )   << "Writing image of size " << ref.getSizeAsVector() << " to " <<  uniquePath;
 
 		try {
 			write( ref, uniquePath, dialect );
+			LOG( Runtime, notice )
+					<< "Image of size " << ref.getSizeAsVector() << " written to " <<  uniquePath
+					<< " using " <<  getName() << ( dialect.empty() ?
+													std::string() :
+													std::string( " and dialect " ) + dialect
+												  );
 		} catch ( std::runtime_error &e ) {
 			LOG( Runtime, warning )
 					<< "Failed to write image to " <<  uniquePath << " using " <<  getName() << " (" << e.what() << ")";
@@ -43,7 +48,7 @@ bool FileFormat::hasOrTell( const util::PropertyMap::KeyType &name, const isis::
 	if ( object.hasProperty( name ) ) {
 		return true;
 	} else {
-		LOG( Runtime, level ) << "Missing property " << util::MSubject( name );
+		LOG( Runtime, level ) << "Missing property " << name;
 		return false;
 	}
 }
@@ -58,9 +63,9 @@ void FileFormat::throwSystemError( int err, std::string desc )
 	throw( boost::system::system_error( err, boost::system::get_system_category(), desc ) );
 }
 
-std::list< util::istring > FileFormat::getSuffixes()const
+std::list< util::istring > FileFormat::getSuffixes( io_modes mode )const
 {
-	std::list<util::istring> ret = util::stringToList<util::istring>( suffixes(), boost::regex( "[[:space:]]" ) );
+	std::list<util::istring> ret = util::stringToList<util::istring>( suffixes( mode ), boost::regex( "[[:space:]]" ) );
 	BOOST_FOREACH( util::istring & ref, ret ) {
 		ref.erase( 0, ref.find_first_not_of( '.' ) ); // remove leading . if there are some
 	}
@@ -88,27 +93,85 @@ std::pair< std::string, std::string > FileFormat::makeBasename( const std::strin
 std::string FileFormat::makeFilename( const util::PropertyMap &props, std::string namePattern )
 {
 	boost::regex reg( "\\{[^{}]+\\}" );
-	boost::match_results<std::string::iterator> what;
+	boost::regex regFormatInt( "%d_" ); // add leading zeros to int values - always as much as possible
+	//NOTE: can also be done for rounding floats, but at the moment not required so not done right now
 
-	while( boost::regex_search( namePattern.begin(), namePattern.end() , what, reg ) ) {
-		const util::PropertyMap::KeyType prop( what[0].str().substr( 1, what.length() - 2 ).c_str() );
+	boost::match_results<std::string::iterator> what;
+	std::string::iterator pos = namePattern.begin();
+
+
+	while( boost::regex_search( pos, namePattern.end() , what, reg ) ) {
+
+		bool isFormatUsed = false;
+		boost::cmatch m;
+		size_t mSize = 1;
+
+		if ( boost::regex_match( what[0].str().substr( 1, regFormatInt.size() ).c_str(), m, regFormatInt ) ) {
+			mSize += regFormatInt.size();
+			isFormatUsed = true;
+		}
+
+		util::PropertyMap::KeyType prop( what[0].str().substr( mSize, what.length() - 1 - mSize ).c_str() );
+		const std::string::iterator start = what[0].first, end = what[0].second;
 
 		if( props.hasProperty( prop ) ) {
+			std::string pstring;
 
-			const std::string pstring =  boost::regex_replace( props.getPropertyAs<std::string>( prop ), boost::regex( "[[:space:]/\\\\]" ), "_" );
+			if ( true == isFormatUsed ) {
+				size_t overallDigits = 0;
+				unsigned short tID = ( *props.propertyValue( prop ) ).getTypeID();
 
-			namePattern.replace( what[0].first, what[0].second, pstring );
+				switch ( tID = ( *props.propertyValue( prop ) ).getTypeID() ) {
+				case util::Value<uint8_t>::staticID:
+					overallDigits = ceil( log10( std::numeric_limits<uint8_t>::max() ) );
+					break;
+				case util::Value<int8_t>::staticID:
+					overallDigits = ceil( log10( std::numeric_limits<int8_t>::max() ) );
+					break;
+				case util::Value<uint16_t>::staticID:
+					overallDigits = ceil( log10( std::numeric_limits<uint16_t>::max() ) );
+					break;
+				case util::Value<int16_t>::staticID:
+					overallDigits = ceil( log10( std::numeric_limits<int16_t>::max() ) );
+					break;
+				case util::Value<uint32_t>::staticID:
+					overallDigits = ceil( log10( std::numeric_limits<uint32_t>::max() ) );
+					break;
+				case util::Value<int32_t>::staticID:
+					overallDigits = ceil( log10( std::numeric_limits<int32_t>::max() ) );
+					break;
+				default:
+					break;
+				}
+
+				pstring =  boost::regex_replace( props.getPropertyAs<std::string>( prop ), boost::regex( "[[:space:]/\\\\]" ), "_" );
+
+				if ( 0 < overallDigits ) {
+					size_t zerosToFill = overallDigits - pstring.length();
+					pstring.insert( 0, zerosToFill, '0' );
+				}
+			} else {
+				pstring =  boost::regex_replace( props.getPropertyAs<std::string>( prop ), boost::regex( "[[:space:]/\\\\]" ), "_" );
+			}
+
+			const size_t dist = start - namePattern.begin();
+
+			namePattern.replace( start, end, pstring );
+
+			pos = namePattern.begin() + dist + pstring.length();
+
 			LOG( Debug, info )
-					<< "Replacing " << util::MSubject( util::PropertyMap::KeyType( "{" ) + prop + "}" ) << " by "   << util::MSubject( props.getPropertyAs<std::string>( prop ) )
-					<< " the string is now " << util::MSubject( namePattern );
+					<< "Replacing " << util::PropertyMap::KeyType( "{" ) + prop + "}" << " by "   << props.getPropertyAs<std::string>( prop )
+					<< " the string is now " << namePattern;
 		} else {
 			LOG( Runtime, warning ) << "The property " << util::MSubject( prop ) << " does not exist - ignoring it";
-			namePattern.replace( what[0].first, what[0].second, "" ); // it must be removed, or it will match forever
+			namePattern.replace( start, end, "" ); // it must be removed, or it will match forever
 		}
 	}
 
 	return namePattern;
 }
+
 std::list<std::string> FileFormat::makeUniqueFilenames( const std::list<data::Image> &images, const std::string &namePattern )const
 {
 	std::list<std::string> ret;

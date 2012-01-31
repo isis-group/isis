@@ -19,7 +19,7 @@ public:
 		parser.DefineVar( std::string( "pos_z" ), &posBuff[data::sliceDim] );
 		parser.DefineVar( std::string( "pos_t" ), &posBuff[data::timeDim] );
 	}
-	bool operator()( double &vox, const isis::util::FixedVector< size_t, 4 >& pos ) {
+	bool operator()( double &vox, const isis::util::vector4<size_t>& pos ) {
 		voxBuff = vox; //using parser.DefineVar every time would slow down the evaluation
 		posBuff = pos;
 		vox = parser.Eval();

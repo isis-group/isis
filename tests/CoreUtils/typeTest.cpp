@@ -13,7 +13,6 @@
 
 #define BOOST_TEST_MODULE ValueTest
 #define NOMINMAX 1
-#define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
 #include <string>
 #include "CoreUtils/type.hpp"
@@ -130,10 +129,10 @@ BOOST_AUTO_TEST_CASE( type_comparison_test )
 	BOOST_CHECK( _200.eq( _200komma4 ) ) ;
 	//200.6 will be rounded to 201
 	BOOST_CHECK( _200.lt( _200komma6 ) ) ;
-	// kompares 200.4 to 200f
+	// compares 200.4 to 200f
 	BOOST_CHECK( ! _200komma4.eq( _200 ) ) ;
 	BOOST_CHECK( _200komma4.gt( _200 ) ) ;
-	// kompares 200.4 to 200f
+	// compares 200.4 to 1000i
 	BOOST_CHECK( _200komma4.lt( _1000 ) );
 	// push the limits
 	BOOST_CHECK( _1000.lt( fucking_much ) );
@@ -154,7 +153,7 @@ BOOST_AUTO_TEST_CASE( type_conversion_test )
 	BOOST_CHECK_EQUAL( iRef->as<double>(), 42 );
 	BOOST_CHECK_EQUAL( fRef1->as<int32_t>(), ( int32_t )ceil( tFloat1 - .5 ) );
 	BOOST_CHECK_EQUAL( fRef2->as<int32_t>(), ( int32_t )ceil( tFloat2 - .5 ) );
-	BOOST_CHECK_EQUAL( fRef2->as<std::string>(), "3.54150009" );
+	BOOST_CHECK_EQUAL( fRef2->as<std::string>(), "3.5415" );
 	BOOST_CHECK_EQUAL( vRef->as<fvector4>(), fvector4( 1, 2, 3, 4 ) );
 }
 

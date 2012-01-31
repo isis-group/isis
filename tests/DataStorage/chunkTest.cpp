@@ -6,9 +6,8 @@
 */
 
 #define BOOST_TEST_MODULE ChunkTest
-#define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
-#include <DataStorage/chunk.hpp>
+#include "DataStorage/chunk.hpp"
 #include <boost/foreach.hpp>
 
 namespace isis
@@ -54,7 +53,7 @@ BOOST_AUTO_TEST_CASE ( chunk_foreach_voxel_test )
 	class : public data::VoxelOp<uint8_t>
 	{
 	public:
-		bool operator()( uint8_t &vox, const util::FixedVector< size_t, 4 >& /*pos*/ ) {
+		bool operator()( uint8_t &vox, const util::vector4<size_t>& /*pos*/ ) {
 			return vox == 0;
 		}
 	} zero;
@@ -64,7 +63,7 @@ BOOST_AUTO_TEST_CASE ( chunk_foreach_voxel_test )
 		data::_internal::NDimensional<4> chunkGeometry;
 	public:
 		setIdx( data::_internal::NDimensional<4> geo ): chunkGeometry( geo ) {}
-		bool operator()( uint8_t &vox, const util::FixedVector< size_t, 4 >& pos ) {
+		bool operator()( uint8_t &vox, const util::vector4<size_t>& pos ) {
 			vox = chunkGeometry.getLinearIndex( &pos[0] );
 			return true;
 		}
@@ -74,7 +73,7 @@ BOOST_AUTO_TEST_CASE ( chunk_foreach_voxel_test )
 		data::_internal::NDimensional<4> chunkGeometry;
 	public:
 		checkIdx( data::_internal::NDimensional<4> geo ): chunkGeometry( geo ) {}
-		bool operator()( uint8_t &vox, const util::FixedVector< size_t, 4 >& pos ) {
+		bool operator()( uint8_t &vox, const util::vector4<size_t>& pos ) {
 			return vox == chunkGeometry.getLinearIndex( &pos[0] );
 		}
 	};
@@ -92,13 +91,45 @@ BOOST_AUTO_TEST_CASE ( chunk_foreach_voxel_test )
 
 BOOST_AUTO_TEST_CASE ( chunk_mem_init_test )
 {
-	const short data[3*3] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+	const short data[3 * 3] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
 	data::MemChunk<short> ch( data, 3, 3 );
 	BOOST_CHECK_EQUAL( ch.getVolume(), 3 * 3 );
 
 	for ( int i = 0; i < 3; i++ )
 		for ( int j = 0; j < 3; j++ )
 			BOOST_CHECK_EQUAL( ch.voxel<short>( i, j ), i + j * 3 );
+}
+
+
+BOOST_AUTO_TEST_CASE ( chunk_iterator_test )
+{
+	const short data[3 * 3] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+	data::MemChunk<short> ch( data, 3, 3 );
+	BOOST_CHECK_EQUAL( ch.getVolume(), 3 * 3 );
+
+	data::Chunk::const_iterator i = ch.begin();
+
+	for( ; i != ch.end(); ++i ) {
+		const util::Value<short> datVal( data[std::distance( const_cast<const data::MemChunk<short>&>( ch ).begin(), i )] );
+		BOOST_CHECK_EQUAL( *i, datVal );
+	}
+}
+
+BOOST_AUTO_TEST_CASE ( chunk_voxel_value_test )
+{
+	const short data[3 * 3] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+	data::MemChunk<short> ch( data, 3, 3 );
+	BOOST_CHECK_EQUAL( ch.getVolume(), 3 * 3 );
+
+	for ( int i = 0; i < 3; i++ )
+		for ( int j = 0; j < 3; j++ ) {
+			BOOST_CHECK_EQUAL( ch.getVoxelValue( i, j )->as<int>(),  i + j * 3 );
+			ch.setVoxelValue( util::Value<int>( i + j * 3 + 42 ), i, j );
+		}
+
+	for ( int i = 0; i < 3; i++ )
+		for ( int j = 0; j < 3; j++ )
+			BOOST_CHECK_EQUAL( ch.voxel<short>( i, j ), i + j * 3 + 42 );
 }
 
 BOOST_AUTO_TEST_CASE ( chunk_property_test )
@@ -275,7 +306,7 @@ BOOST_AUTO_TEST_CASE ( chunk_swap_test )
 {
 	class : public data::VoxelOp<int>
 	{
-		bool operator()( int &vox, const util::FixedVector<size_t, 4> & ) {
+		bool operator()( int &vox, const util::vector4<size_t> & ) {
 			vox = rand();
 			return true;
 		}
@@ -286,8 +317,8 @@ BOOST_AUTO_TEST_CASE ( chunk_swap_test )
 	public:
 		data::MemChunk<int> orig;
 		SwapCheck( data::MemChunk<int> &_orig, size_t _swapidx, size_t _sizeRange ): swapidx( _swapidx ), sizeRange( _sizeRange ), orig( _orig ) {}
-		bool operator()( int &vox, const util::FixedVector<size_t, 4> &pos ) {
-			util::FixedVector<size_t, 4> opos = pos;
+		bool operator()( int &vox, const util::vector4<size_t> &pos ) {
+			util::vector4<size_t> opos = pos;
 			opos[swapidx] = sizeRange - 1 - opos[swapidx];
 			//          if(orig.voxel<int>(opos[0],opos[1],opos[2],opos[3])!=vox)
 			//              std::cout << "Comparing " << pos << " against " << opos

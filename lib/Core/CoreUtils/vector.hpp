@@ -53,6 +53,7 @@ public:
 	typedef typename CONTAINER::iterator iterator;
 	typedef typename CONTAINER::const_iterator const_iterator;
 	typedef FixedVector<TYPE, SIZE, CONTAINER> this_class;
+	typedef CONTAINER container_type;
 protected:
 	/// Generic operations
 	template<typename OP> this_class binaryOp ( const this_class &src )const {
@@ -169,11 +170,11 @@ public:
 	 * If any of the values is greater than "1" the "allowed" difference will be bigger.
 	 * \returns true if the difference between the two types is significantly small compared to the values.
 	 */
-	bool fuzzyEqual( const this_class &other, TYPE thresh = 0 )const {
+	bool fuzzyEqual( const this_class &other, unsigned short scale = 10 )const {
 		const_iterator b = other.begin();
 
 		for ( const_iterator a = CONTAINER::begin(); a != CONTAINER::end(); ++a, ++b ) {
-			if ( ! util::fuzzyEqual( *a, *b, thresh ) )
+			if ( ! util::fuzzyEqual( *a, *b, scale ) )
 				return false;
 		}
 
@@ -297,6 +298,10 @@ public:
 		util::listToOStream( CONTAINER::begin(), CONTAINER::end(), out, "|", "<", ">" );
 	}
 
+	iterator begin() {return CONTAINER::begin();}
+	iterator end() {return CONTAINER::end();}
+	const_iterator begin()const {return CONTAINER::begin();}
+	const_iterator end()const {return CONTAINER::end();}
 };
 
 template<typename TYPE>
@@ -305,6 +310,7 @@ class vector4 : public FixedVector<TYPE, 4>
 public:
 	vector4() {}
 	template<typename TYPE2, typename CONTAINER2> vector4( const FixedVector<TYPE2, 4, CONTAINER2> &src ) : FixedVector< TYPE, 4> ( src ) {}
+	vector4( const TYPE src[4] ): FixedVector< TYPE, 4>( src ) {}
 	vector4( TYPE first, TYPE second, TYPE third = 0, TYPE fourth = 0 ) {
 		this->operator[]( 3 ) = fourth;
 		this->operator[]( 2 ) = third;

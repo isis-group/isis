@@ -11,7 +11,7 @@
 ############################################################
 # configure targets
 ############################################################
-add_library(_core SHARED core.cpp _vector.hpp _application.hpp _property.hpp _propmap.hpp )
+add_library(_core SHARED core.cpp _vector.hpp _application.cpp _propmap.cpp _convertFromPython.cpp _convertToPython.hpp )
 set_target_properties(_core PROPERTIES PREFIX "")
 target_link_libraries( _core ${ISIS_LIB_DEPENDS} isis_core ${PYTHON_LIBRARIES} ${Boost_LIBRARIES})
 
