@@ -1,0 +1,4 @@
+debian/tmp/usr/share/isis/cmake usr/share/isis
+debian/tmp/usr/include/* usr/include/
+debian/tmp/usr/lib/*.so usr/lib/
+

@@ -51,7 +51,8 @@ macro( build_core name type)
 	target_link_libraries( ${name} ${CMAKE_DL_LIBS} ${Boost_LIBRARIES} ${LibOil_LIBRARY})
     set_target_properties( ${name} PROPERTIES
 		${ISIS_BUILD_PROPERTIES}
-		VERSION ${${CMAKE_PROJECT_NAME}_VERSION}
+		SOVERSION ${${CMAKE_PROJECT_NAME}_VERSION_SO}
+		VERSION ${${CMAKE_PROJECT_NAME}_VERSION_API}
 		INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
 		OUTPUT_NAME "isis_core")
     set(target_list ${target_list} ${name})

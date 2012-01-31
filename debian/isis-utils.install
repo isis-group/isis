@@ -1,5 +1,1 @@
-debian/tmp/usr/bin/isisconv
-debian/tmp/usr/bin/isisflip
-debian/tmp/usr/bin/isisdump
-debian/tmp/usr/bin/isisdiff
-
+debian/tmp/usr/bin/* usr/bin
