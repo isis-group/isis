@@ -39,7 +39,7 @@ Description: data format plugins for the ISIS framework
 
 Package: libisis-dev
 Section: libdevel
-Architecture: any
+Architecture: all
 Depends: libisis0 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: I/O framework for neuroimaging data
  This framework aids access of and conversion between various established
@@ -60,3 +60,38 @@ Description: utilities for the ISIS neuroimaging data I/O framework
  .
  This package provides a number of utilities to process neuroimaging data. This
  includes a multi-format converter and tools to inspect image meta data.
+
+
+Package: libisis0-qt4
+Section: libs
+Conflicts: isis-qt4
+Replaces: isis-qt4
+Architecture: any
+Depends: libisis0 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: Qt4 bindings for ISIS data I/O framework
+ This framework aids access of and conversion between various established
+ neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
+ is extensible with plugins to add support for additional data formats.
+
+
+Package: libisis-qt4-dev
+Section: devel
+Conflicts: isis-qt4-dev
+Architecture: all
+Depends: libisis0-qt4 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}, libqt4-dev
+Description: Qt4 bindings for ISIS data I/O framework (development headers)
+ This framework aids access of and conversion between various established
+ neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
+ is extensible with plugins to add support for additional data formats.
+
+
+Package: python-isis
+Section: python
+Architecture: any
+Conflicts: isis-python
+Replaces: isis-python
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Python bindings for ISIS data I/O framework (development headers)
+ This framework aids access of and conversion between various established
+ neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
+ is extensible with plugins to add support for additional data formats.
