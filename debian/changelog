@@ -1,12 +1,13 @@
-isis (0.4.6g3a97853-0) UNRELEASED; urgency=low
+isis (0.4.6+git10-g7b6a946-1) stable; urgency=low
 
   * add support for writing 24/48bit rgb, and for 16bit grayscale images as
     PNG
   * dicom plugin builds on WIN32
   * fix bug which caused Chunk::swapAlong to fail for non 8bit data
   * add support for reading 24/48bit rgb, and for 16bit grayscale images (PNG)
+  * Initial Debian packaging (Closes: #633677).
 
- -- ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>  Tue, 17 Jan  2012 13:22:00 +0200
+ -- Enrico Reimer <reimer@cbs.mpg.de>  Tue, 31 Jan 2012 14:40:42 +0100
 
 isis (0.4.4gca0af59-0) UNRELEASED; urgency=low
 
@@ -110,7 +111,6 @@ isis (0.3.4g5ae6013-0) UNRELEASED; urgency=low
 
 isis (0.3.3gitg71597cb-1) UNRELEASED; urgency=low
 
-   * Fixed wrong dependencies
 
    * isis core should be build without debug log
 

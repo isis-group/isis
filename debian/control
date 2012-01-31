@@ -1,234 +1,97 @@
 Source: isis
 Section: science
-Priority: optional
-Maintainer: ISIS Group (The friendly isis team) <gr_isis@cbs.mpg.de>
-Build-Depends: libnifti1-dev | libnifti-dev | libniftiio-dev, libtiff-dev,liboil-dev
-Standards-Version: 3.8.1
+Priority: extra
+Maintainer: ISIS Group <gr_isis@cbs.mpg.de>
+Uploaders: Enrico Reimer <reimer@cbs.mpg.de>
+Build-Depends: debhelper (>= 7.0.50~), doxygen, cmake, libbz2-dev, libmuparser-dev, libnifti-dev, libvia-dev, libboost-python-dev, liboil0.3-dev | liboil-dev, python-all-dev
+Standards-Version: 3.9.2
+Homepage: https://github.com/isis-group
+Vcs-Browser: http://git.debian.org/?p=pkg-exppsy/isis.git
+Vcs-Git: git://git.debian.org/git/pkg-exppsy/isis.git
 
-Package: libisiscore0
-Section: science
+
+Package: libisis0
+Section: libs
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (= 0.4.6g3a97853-0)
-Description: The ISIS package provides a general I/O framework for neuroimaging
- data.  Being started with fMRI data, it can handle several established data
- formats, like Nifti, Analyze, DICOM and vista. A first application based on this
- project is a data converter that allows an easy and unified handling of fMRI
- data from various MRI scanners. 
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: I/O framework for neuroimaging data
+ This framework aids access of and conversion between various established
+ neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
+ is extensible with plugins to add support for additional data formats.
  .
- This Package provides the core libraries needed by all applications that
+ This Package provides the core library needed by all applications that
  are build upon ISIS.
 
-Package: libisiscore0-dev
-Section: science
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (= 0.4.6g3a97853-0), libboost-filesystem1.35-dev | libboost-filesystem-dev, libboost-regex1.35-dev | libboost-regex-dev, libboost-date-time1.35-dev | libboost-date-time-dev, libboost-system1.35-dev | libboost-system-dev, libboost-iostreams1.35-dev | libboost-iostreams-dev
-Description: The ISIS package provides a general I/O framework for neuroimaging
- data.  Being started with fMRI data, it can handle several established data
- formats, like Nifti, Analyze, DICOM and vista. A first application based on this
- project is a data converter that allows an easy and unified handling of fMRI
- data from various MRI scanners. 
- .
- This Package provides all header and library files necessary to develop ISIS based
- applications.
 
-Package: isisio0-dicom
-Section: science
+Package: libisis-plugins
+Section: libs
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (= 0.4.6g3a97853-0)
-Description: The ISIS package provides a general I/O framework for neuroimaging
- data.  Being started with fMRI data, it can handle several established data
- formats, like Nifti, Analyze, DICOM and vista. A first application based on this
- project is a data converter that allows an easy and unified handling of fMRI
- data from various MRI scanners. 
+Depends: libisis0 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: data format plugins for the ISIS framework
+ This framework aids access of and conversion between various established
+ neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
+ is extensible with plugins to add support for additional data formats.
  .
- This Package provides the ISIS I/O plugins for the DICOM support.
+ This package provides plugins for data in DICOM, NIfTI, PNG, VISTA format,
+ raw-data access, as well as plugins for gzip-compression and tar-archive
+ support.
 
-Package: isisio0-nifti
-Section: science
-Architecture: any
-Conflicts: isisio0-nifti-sa
-Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (= 0.4.6g3a97853-0)
-Description: The ISIS package provides a general I/O framework for neuroimaging
- data.  Being started with fMRI data, it can handle several established data
- formats, like Nifti, Analyze, DICOM and vista. A first application based on this
- project is a data converter that allows an easy and unified handling of fMRI
- data from various MRI scanners. 
- .
- This Package provides the ISIS I/O plugins for the NIFTI support.
 
-Package: isisio0-nifti-sa
-Section: science
-Architecture: any
-Conflicts: isisio0-nifti
-Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (= 0.4.6g3a97853-0)
-Description: The ISIS package provides a general I/O framework for neuroimaging
- data.  Being started with fMRI data, it can handle several established data
- formats, like Nifti, Analyze, DICOM and vista. A first application based on this
- project is a data converter that allows an easy and unified handling of fMRI
- data from various MRI scanners. 
+Package: libisis-dev
+Section: libdevel
+Architecture: all
+Depends: libisis0 (>= ${source:Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: I/O framework for neuroimaging data
+ This framework aids access of and conversion between various established
+ neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
+ is extensible with plugins to add support for additional data formats.
  .
- This Package provides the ISIS I/O standalone plugins for the NIFTI support.
+ This package provides headers and library to develop applications with ISIS.
 
-Package: isisio0-vista
-Section: science
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (= 0.4.6g3a97853-0)
-Description: The ISIS package provides a general I/O framework for neuroimaging
- data.  Being started with fMRI data, it can handle several established data
- formats, like Nifti, Analyze, DICOM and vista. A first application based on this
- project is a data converter that allows an easy and unified handling of fMRI
- data from various MRI scanners. 
- .
- This Package provides the ISIS I/O plugins for the VISTA support.
-
-Package: isisio0-gz-proxy
-Section: science
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (= 0.4.6g3a97853-0)
-Description: The ISIS package provides a general I/O framework for neuroimaging
- data.  Being started with fMRI data, it can handle several established data
- formats, like Nifti, Analyze, DICOM and vista. A first application based on this
- project is a data converter that allows an easy and unified handling of fMRI
- data from various MRI scanners. 
- .
- This Package provides the ISIS I/O plugins for the gzip proxy support. The gzip
- proxy uses the gnuzip implementation to create a compressed archive file from
- any other ISIS image IO plugin.
-
-Package: isisio0-tar-proxy
-Section: science
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (= 0.4.6g3a97853-0)
-Description: The ISIS package provides a general I/O framework for neuroimaging
- data.  Being started with fMRI data, it can handle several established data
- formats, like Nifti, Analyze, DICOM and vista. A first application based on this
- project is a data converter that allows an easy and unified handling of fMRI
- data from various MRI scanners.
- .
- This Package provides the ISIS I/O plugins for the tar support. 
-
-Package: isisio0-raw
-Section: science
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (= 0.4.6g3a97853-0)
-Description: The ISIS package provides a general I/O framework for neuroimaging
- data.  Being started with fMRI data, it can handle several established data
- formats, like Nifti, Analyze, DICOM and vista. A first application based on this
- project is a data converter that allows an easy and unified handling of fMRI
- data from various MRI scanners.
- .
- This Package provides the ISIS I/O plugins for the raw data support. 
-
-Package: isisio0-png
-Section: science
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (= 0.4.6g3a97853-0)
-Description: The ISIS package provides a general I/O framework for neuroimaging
- data.  Being started with fMRI data, it can handle several established data
- formats, like Nifti, Analyze, DICOM and vista. A first application based on this
- project is a data converter that allows an easy and unified handling of fMRI
- data from various MRI scanners.
- .
- This Package provides the ISIS I/O plugins for the png data support. 
-
-Package: isisio0-flist-proxy
-Section: science
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (= 0.4.6g3a97853-0)
-Description: The ISIS package provides a general I/O framework for neuroimaging
- data.  Being started with fMRI data, it can handle several established data
- formats, like Nifti, Analyze, DICOM and vista. A first application based on this
- project is a data converter that allows an easy and unified handling of fMRI
- data from various MRI scanners.
- .
- This Package provides the ISIS I/O plugins for flist support.
-
-Package: isisio0-process-proxy
-Section: science
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (= 0.4.6g3a97853-0)
-Description: The ISIS package provides a general I/O framework for neuroimaging
- data.  Being started with fMRI data, it can handle several established data
- formats, like Nifti, Analyze, DICOM and vista. A first application based on this
- project is a data converter that allows an easy and unified handling of fMRI
- data from various MRI scanners.
- .
- This Package provides the ISIS I/O plugins for process support.
 
 Package: isis-utils
 Section: science
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (= 0.4.6g3a97853-0)
-Recommends: isisio0-common
-Description: The ISIS package provides a general I/O framework for neuroimaging
- data.  Being started with fMRI data, it can handle several established data
- formats, like Nifti, Analyze, DICOM and vista. A first application based on this
- project is a data converter that allows an easy and unified handling of fMRI
- data from various MRI scanners. 
+Depends: libisis0 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: utilities for the ISIS neuroimaging data I/O framework
+ This framework aids access of and conversion between various established
+ neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
+ is extensible with plugins to add support for additional data formats.
  .
- This Package provides a number of utilities to handle neuroimaging data. This includes
- a multi-format converter and tools to inspect the image meta data.
+ This package provides a number of utilities to process neuroimaging data. This
+ includes a multi-format converter and tools to inspect image meta data.
 
-Package: libisis-qt4
-Section: science
+
+Package: libisis0-qt4
+Section: libs
 Conflicts: isis-qt4
+Replaces: isis-qt4
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (= 0.4.6g3a97853-0), libqt4-core
-Description: The ISIS package provides a general I/O framework for neuroimaging
- data.  Being started with fMRI data, it can handle several established data
- formats, like Nifti, Analyze, DICOM and vista. A first application based on this
- project is a data converter that allows an easy and unified handling of fMRI
- data from various MRI scanners. 
- .
- This Package provides a bridge to qt4 applications.
+Depends: libisis0 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: Qt4 bindings for ISIS data I/O framework
+ This framework aids access of and conversion between various established
+ neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
+ is extensible with plugins to add support for additional data formats.
+
 
 Package: libisis-qt4-dev
-Section: science
+Section: libdevel
 Conflicts: isis-qt4-dev
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0-dev (= 0.4.6g3a97853-0), libisis-qt4, libqt4-dev
-Description: The ISIS package provides a general I/O framework for neuroimaging
- data.  Being started with fMRI data, it can handle several established data
- formats, like Nifti, Analyze, DICOM and vista. A first application based on this
- project is a data converter that allows an easy and unified handling of fMRI
- data from various MRI scanners. 
- .
- This Package provides the development files for the bridge to qt4 applications.
+Architecture: all
+Depends: libisis0-qt4 (>= ${source:Version}), ${shlibs:Depends}, ${misc:Depends}, libqt4-dev
+Description: Qt4 bindings for ISIS data I/O framework (development headers)
+ This framework aids access of and conversion between various established
+ neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
+ is extensible with plugins to add support for additional data formats.
 
-Package: isis-itk
-Section: science
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0-dev (= 0.4.6g3a97853-0)
-Recommends: libinsighttoolkit3-dev (>= 3.6.0 )
-Description: The ISIS package provides a general I/O framework for neuroimaging
- data.  Being started with fMRI data, it can handle several established data
- formats, like Nifti, Analyze, DICOM and vista. A first application based on this
- project is a data converter that allows an easy and unified handling of fMRI
- data from various MRI scanners. 
- .
- This Package provides a bridge to itk insight toolkit library.
 
-Package: isis-python
-Section: science
+Package: python-isis
+Section: python
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (= 0.4.6g3a97853-0)
-Description: The ISIS package provides a general I/O framework for neuroimaging
- data.  Being started with fMRI data, it can handle several established data
- formats, like Nifti, Analyze, DICOM and vista. A first application based on this
- project is a data converter that allows an easy and unified handling of fMRI
- data from various MRI scanners. 
- .
- This Package provides a bridge to the python language.
-
-Package: isisio0-common
-Section: science
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libisiscore0 (= 0.4.6g3a97853-0), isisio0-nifti-sa, isisio0-raw, isisio0-tar-proxy, isisio0-gz-proxy, isisio0-flist-proxy, isisio0-process-proxy
-Description: The ISIS package provides a general I/O framework for neuroimaging
- data.  Being started with fMRI data, it can handle several established data
- formats, like Nifti, Analyze, DICOM and vista. A first application based on this
- project is a data converter that allows an easy and unified handling of fMRI
- data from various MRI scanners. 
- .
- This is the common io package which consists of all plugins that have no dependencies. 
- It replaces the packages isisio0-nifti-sa, isisio0-raw, isisio0-tar-proxy, isisio0-flist-proxy, isisio0-process-proxy and isisio0-gz-proxy
+Conflicts: isis-python
+Replaces: isis-python
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${python:Depends}
+Description: Python bindings for ISIS data I/O framework (development headers)
+ This framework aids access of and conversion between various established
+ neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
+ is extensible with plugins to add support for additional data formats.
