@@ -52,6 +52,7 @@ macro( build_core name type)
     set_target_properties( ${name} PROPERTIES
 		${ISIS_BUILD_PROPERTIES}
 		SOVERSION ${${CMAKE_PROJECT_NAME}_VERSION_SO}
+		VERSION ${${CMAKE_PROJECT_NAME}_VERSION_API}
 		INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
 		OUTPUT_NAME "isis_core")
     set(target_list ${target_list} ${name})
