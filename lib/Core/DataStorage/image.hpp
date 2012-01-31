@@ -200,17 +200,11 @@ public:
 	 */
 	void setIndexingDim ( dimensions d = rowDim );
 	enum orientation {axial, reversed_axial, sagittal, reversed_sagittal, coronal, reversed_coronal};
-	<<< <<< < HEAD
-	typedef _internal::GenericImageIterator<false> value_iterator;
-	typedef _internal::GenericImageIterator<true> const_value_iterator;
-	typedef value_iterator iterator;
 
-	== == == =
-		typedef _internal::ImageIteratorTemplate<Chunk> iterator;
+	typedef _internal::ImageIteratorTemplate<Chunk> iterator;
 	typedef _internal::ImageIteratorTemplate<const Chunk> const_iterator;
 	typedef iterator::reference reference;
 	typedef const_iterator::reference const_reference;
-	>>> >>> > gmaster
 protected:
 	_internal::SortedChunkList set;
 	std::vector<boost::shared_ptr<Chunk> > lookup;
@@ -432,17 +426,10 @@ public:
 	/// \returns the typename correspondig to the result of typeID
 	std::string getMajorTypeName() const;
 
-	<<< <<< < HEAD
-	value_iterator begin();
-	value_iterator end();
-	const_value_iterator begin() const;
-	const_value_iterator end() const;
-	== == == =
-		iterator begin();
+	iterator begin();
 	iterator end();
 	const_iterator begin() const;
 	const_iterator end() const;
-	>>> >>> > gmaster
 
 	/**
 	 * Get a chunk via index (and the lookup table).
