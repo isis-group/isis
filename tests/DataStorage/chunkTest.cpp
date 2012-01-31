@@ -7,7 +7,7 @@
 
 #define BOOST_TEST_MODULE ChunkTest
 #include <boost/test/unit_test.hpp>
-#include <DataStorage/chunk.hpp>
+#include "DataStorage/chunk.hpp"
 #include <boost/foreach.hpp>
 
 namespace isis
@@ -98,6 +98,38 @@ BOOST_AUTO_TEST_CASE ( chunk_mem_init_test )
 	for ( int i = 0; i < 3; i++ )
 		for ( int j = 0; j < 3; j++ )
 			BOOST_CHECK_EQUAL( ch.voxel<short>( i, j ), i + j * 3 );
+}
+
+
+BOOST_AUTO_TEST_CASE ( chunk_iterator_test )
+{
+	const short data[3 * 3] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+	data::MemChunk<short> ch( data, 3, 3 );
+	BOOST_CHECK_EQUAL( ch.getVolume(), 3 * 3 );
+
+	data::Chunk::const_iterator i = ch.begin();
+
+	for( ; i != ch.end(); ++i ) {
+		const util::Value<short> datVal( data[std::distance( const_cast<const data::MemChunk<short>&>( ch ).begin(), i )] );
+		BOOST_CHECK_EQUAL( *i, datVal );
+	}
+}
+
+BOOST_AUTO_TEST_CASE ( chunk_voxel_value_test )
+{
+	const short data[3 * 3] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+	data::MemChunk<short> ch( data, 3, 3 );
+	BOOST_CHECK_EQUAL( ch.getVolume(), 3 * 3 );
+
+	for ( int i = 0; i < 3; i++ )
+		for ( int j = 0; j < 3; j++ ) {
+			BOOST_CHECK_EQUAL( ch.getVoxelValue( i, j )->as<int>(),  i + j * 3 );
+			ch.setVoxelValue( util::Value<int>( i + j * 3 + 42 ), i, j );
+		}
+
+	for ( int i = 0; i < 3; i++ )
+		for ( int j = 0; j < 3; j++ )
+			BOOST_CHECK_EQUAL( ch.voxel<short>( i, j ), i + j * 3 + 42 );
 }
 
 BOOST_AUTO_TEST_CASE ( chunk_property_test )

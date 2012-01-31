@@ -16,12 +16,9 @@
 #package install path in order to replace it with the cmake install prefix
 set(PYTHON_PACKAGE_PATH_PREFIX "/usr/")
 
-# execute_process( COMMAND pyversions -s OUTPUT_VARIABLE PYTHON_VERSIONS OUTPUT_STRIP_TRAILING_WHITESPACE)
 message(STATUS "Building python package for: ${PYTHON_VERSIONS}")
-## set(PYTHON_VERSIONS_LIST ${PYTHON_VERSIONS})
 
 foreach(pv ${PYTHON_VERSIONS})
-  message(STATUS ${pv})
   execute_process ( COMMAND ${pv} -c "from distutils.sysconfig import get_python_lib; print get_python_lib().lstrip('${PYTHON_PACKAGE_PATH_PREFIX}')" OUTPUT_VARIABLE PYTHON_SITE_PACKAGES OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 

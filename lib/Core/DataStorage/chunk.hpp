@@ -79,6 +79,12 @@ protected:
 
 	Chunk() {}; //do not use this
 public:
+
+	typedef _internal::ValuePtrBase::value_iterator iterator;
+	typedef _internal::ValuePtrBase::const_value_iterator const_iterator;
+	typedef iterator::reference reference;
+	typedef const_iterator::reference const_reference;
+
 	Chunk( const ValuePtrReference &src, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 );
 
 	/**
@@ -94,6 +100,9 @@ public:
 		return ret[getLinearIndex( idx )];
 	}
 
+	const util::ValueReference getVoxelValue( size_t nrOfColumns, size_t nrOfRows = 0, size_t nrOfSlices = 0, size_t nrOfTimesteps = 0 )const;
+	void setVoxelValue( const util::ValueReference &val, size_t nrOfColumns, size_t nrOfRows = 0, size_t nrOfSlices = 0, size_t nrOfTimesteps = 0 );
+
 	/**
 	 * Gets a const reference of the element at a given index.
 	 * \copydetails Chunk::voxel
@@ -103,7 +112,7 @@ public:
 
 		if ( !isInRange( idx ) ) {
 			LOG( Debug, isis::error )
-					<< "Index " << nrOfColumns << "|" << nrOfRows << "|" << nrOfSlices << "|" << nrOfTimesteps
+					<< "Index " << util::vector4<size_t>( idx ) << nrOfTimesteps
 					<< " is out of range (" << getSizeAsString() << ")";
 		}
 
@@ -147,6 +156,11 @@ public:
 	template<typename TYPE> size_t foreachVoxel( VoxelOp<TYPE> &op ) {
 		return foreachVoxel<TYPE>( op, util::vector4<size_t>() );
 	}
+
+	iterator begin();
+	iterator end();
+	const_iterator begin()const;
+	const_iterator end()const;
 
 	_internal::ValuePtrBase &asValuePtrBase() {return operator*();}
 	const _internal::ValuePtrBase &getValuePtrBase()const {return operator*();}
