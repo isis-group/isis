@@ -41,6 +41,12 @@ if(ISIS_QT4)
   qt4_wrap_cpp(qdefaultmessageprint_moc qt4/qdefaultmessageprint.hpp)
   # configure target
   add_library(isisAdapter_qt4 SHARED qt4/qtapplication.cpp ${qdefaultmessageprint_moc} qt4/qdefaultmessageprint.cpp )
+  set_target_properties(isisAdapter_qt4  PROPERTIES
+	      ${ISIS_BUILD_PROPERTIES}
+	      SOVERSION ${${CMAKE_PROJECT_NAME}_VERSION_SO}
+	      INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
+	      OUTPUT_NAME "isisAdapter_qt4")
+
   target_link_libraries(isisAdapter_qt4 isis_core ${ISIS_LIB_DEPENDS} ${QT_LIBRARIES} ${CMAKE_C_STANDARD_LIBRARIES})
 
   # configure install destination
