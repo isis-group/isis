@@ -16,7 +16,6 @@
 #package install path in order to replace it with the cmake install prefix
 set(PYTHON_PACKAGE_PATH_PREFIX "/usr/")
 
-execute_process( COMMAND pyversions -s OUTPUT_VARIABLE PYTHON_VERSIONS OUTPUT_STRIP_TRAILING_WHITESPACE)
 message(STATUS "Building python package for: ${PYTHON_VERSIONS}")
 
 foreach(pv ${PYTHON_VERSIONS})
