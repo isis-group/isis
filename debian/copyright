@@ -3,7 +3,7 @@ Upstream-Name: isis
 Upstream-Maintainer: ISIS developers
 
 Files: *
-Copyright: 2008-2011 Erik Tuerke <tuerke@cbs.mpg.de>, Enrico Reimer 
+Copyright: 2008-2011 Erik Tuerke <tuerke@cbs.mpg.de>, Enrico Reimer
     <reimer@cbs.mpg.de>. Lydia Hellrung <hellrung@cbs.mpg.de>,
     Thomas Proeger <proege@googlemail.com> 
 License: GPL-2+
