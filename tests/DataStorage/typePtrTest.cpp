@@ -307,7 +307,7 @@ BOOST_AUTO_TEST_CASE( ValuePtr_iterator_test )
 
 	size_t cnt = 0;
 
-	for( data::ValuePtr< short >::typed_iterator i = array.begin(); i != array.end(); i++, cnt++ ) {
+	for( data::ValuePtr< short >::iterator i = array.begin(); i != array.end(); i++, cnt++ ) {
 		BOOST_CHECK_EQUAL( *i, cnt + 1 ); // normal increment
 		BOOST_CHECK_EQUAL( *( array.begin() + cnt ), cnt + 1 ); //+=
 	}

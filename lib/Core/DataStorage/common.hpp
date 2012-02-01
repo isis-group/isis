@@ -70,7 +70,7 @@ bool transformCoords( isis::util::PropertyMap &, const isis::util::vector4<size_
 typedef DataLog Runtime;
 typedef DataDebug Debug;
 enum dimensions {rowDim = 0, columnDim, sliceDim, timeDim};
-enum scannerAxis { x = 0, y, z };
+enum scannerAxis { x = 0, y, z, t };
 
 /**
  * Set logging level for the namespace data.

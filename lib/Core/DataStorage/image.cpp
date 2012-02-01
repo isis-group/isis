@@ -212,7 +212,7 @@ util::ivector4 Image::getIndexFromPhysicalCoords( const isis::util::fvector4 &ph
 		for( unsigned short i = 0; i < 4; i ++ ) {
 			if( retAsIvector4[i] < 0 )retAsIvector4[i] =  0;
 
-			if( retAsIvector4[i] >= size[i] )retAsIvector4[i] =  static_cast<int>( size[i] - 1 );
+			if( retAsIvector4[i] >= static_cast<int>( size[i] ) )retAsIvector4[i] =  static_cast<int>( size[i] - 1 );
 		}
 	}
 
@@ -270,16 +270,17 @@ bool Image::updateOrientationMatrices()
 }
 
 
-dimensions Image::mapScannerAxesToImageDimension( scannerAxis scannerAxes )
+dimensions Image::mapScannerAxisToImageDimension( scannerAxis scannerAxes )
 {
 	updateOrientationMatrices();
-	boost::numeric::ublas::matrix<float> latchedOrientation = boost::numeric::ublas::zero_matrix<float>( 3, 3 );
-	boost::numeric::ublas::vector<float>mapping( 3 );
+	boost::numeric::ublas::matrix<float> latchedOrientation = boost::numeric::ublas::zero_matrix<float>( 4, 4 );
+	boost::numeric::ublas::vector<float>mapping( 4 );
 	latchedOrientation( m_RowVec.getBiggestVecElemAbs(), 0 ) = 1;
 	latchedOrientation( m_ColumnVec.getBiggestVecElemAbs(), 1 ) = 1;
 	latchedOrientation( m_SliceVec.getBiggestVecElemAbs(), 2 ) = 1;
+	latchedOrientation( 3, 3 ) = 1;
 
-	for( size_t i = 0; i < 3; i++ ) {
+	for( size_t i = 0; i < 4; i++ ) {
 		mapping( i ) = i;
 	}
 
@@ -954,18 +955,50 @@ util::fvector4 Image::getFoV() const
 	return _internal::NDimensional<4>::getFoV( getPropertyAs<util::fvector4>( "voxelSize" ), voxelGap );
 }
 
-Image::value_iterator Image::begin() {return value_iterator( lookup.begin(), lookup.end() );}
-Image::value_iterator Image::end() {return begin() + getVolume();}
-Image::const_value_iterator Image::begin()const {return const_value_iterator( lookup.begin(), lookup.end() );}
-Image::const_value_iterator Image::end()const {return begin() + getVolume();}
+Image::iterator Image::begin()
+{
+	if( checkMakeClean() ) {
+		std::vector<Chunk *> vec( lookup.size() );
+
+		for( size_t i = 0; i < lookup.size(); i++ )
+			vec[i] = lookup[i].get();
+
+		return iterator( vec );
+	} else {
+		LOG( Debug, error )  << "Image is not clean. Returning empty iterator ...";
+		return iterator();
+	}
+}
+Image::iterator Image::end() {return begin() + getVolume();}
+Image::const_iterator Image::begin()const
+{
+	if( isClean() ) {
+		std::vector<const Chunk *> vec( lookup.size() );
+
+		for( size_t i = 0; i < lookup.size(); i++ )
+			vec[i] = lookup[i].get();
+
+		return const_iterator( vec );
+	} else {
+		LOG( Debug, error )  << "Image is not clean. Returning empty iterator ...";
+		return const_iterator();
+	}
+}
+Image::const_iterator Image::end()const {return begin() + getVolume();}
 
 const util::ValueReference Image::getVoxelValue ( size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps ) const
 {
-	return begin()[getLinearIndex( util::vector4<size_t>( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ) )];
+	const size_t idx[] = {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps};
+	LOG_IF( !isInRange( idx ), Debug, isis::error )
+			<< "Index " << util::vector4<size_t>( idx ) << " is out of range (" << getSizeAsString() << ")";
+	return begin()[getLinearIndex( idx )];
 }
 void Image::setVoxelValue ( const util::ValueReference &val, size_t nrOfColumns, size_t nrOfRows, size_t nrOfSlices, size_t nrOfTimesteps )
 {
-	begin()[getLinearIndex( util::vector4<size_t>( nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps ) )] = val;
+	const size_t idx[] = {nrOfColumns, nrOfRows, nrOfSlices, nrOfTimesteps};
+	LOG_IF( !isInRange( idx ), Debug, isis::error )
+			<< "Index " << util::vector4<size_t>( idx ) << " is out of range (" << getSizeAsString() << ")";
+	begin()[getLinearIndex( idx )] = val;
 }
 
 

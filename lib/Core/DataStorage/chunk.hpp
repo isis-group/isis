@@ -80,8 +80,10 @@ protected:
 	Chunk() {}; //do not use this
 public:
 
-	typedef ValuePtrBase::value_iterator value_iterator;
-	typedef ValuePtrBase::const_value_iterator const_value_iterator;
+	typedef ValuePtrBase::value_iterator iterator;
+	typedef ValuePtrBase::const_value_iterator const_iterator;
+	typedef iterator::reference reference;
+	typedef const_iterator::reference const_reference;
 
 	Chunk( const ValuePtrReference &src, size_t nrOfColumns, size_t nrOfRows = 1, size_t nrOfSlices = 1, size_t nrOfTimesteps = 1 );
 
@@ -110,7 +112,7 @@ public:
 
 		if ( !isInRange( idx ) ) {
 			LOG( Debug, isis::error )
-					<< "Index " << nrOfColumns << "|" << nrOfRows << "|" << nrOfSlices << "|" << nrOfTimesteps
+					<< "Index " << util::vector4<size_t>( idx ) << nrOfTimesteps
 					<< " is out of range (" << getSizeAsString() << ")";
 		}
 
@@ -155,10 +157,10 @@ public:
 		return foreachVoxel<TYPE>( op, util::vector4<size_t>() );
 	}
 
-	value_iterator begin();
-	value_iterator end();
-	const_value_iterator begin()const;
-	const_value_iterator end()const;
+	iterator begin();
+	iterator end();
+	const_iterator begin()const;
+	const_iterator end()const;
 
 	ValuePtrBase &asValuePtrBase() {return operator*();}
 	const ValuePtrBase &getValuePtrBase()const {return operator*();}

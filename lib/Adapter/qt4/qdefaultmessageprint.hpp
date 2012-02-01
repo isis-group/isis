@@ -23,6 +23,9 @@ public:
 	std::string time_str;
 };
 
+class QMessageList : public std::list<QMessage> {};
+
+
 class QDefaultMessagePrint : public QObject, public util::_internal::MessageHandlerBase
 {
 	Q_OBJECT
@@ -34,8 +37,7 @@ public:
 	virtual void commit( const util::_internal::Message &msg );
 	QDefaultMessagePrint( LogLevel level );
 	virtual ~QDefaultMessagePrint();
-
-
+	const QMessageList &getMessageList() const;
 
 };
 

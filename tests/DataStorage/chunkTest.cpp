@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE ( chunk_iterator_test )
 	data::MemChunk<short> ch( data, 3, 3 );
 	BOOST_CHECK_EQUAL( ch.getVolume(), 3 * 3 );
 
-	data::Chunk::const_value_iterator i = ch.begin();
+	data::Chunk::const_iterator i = ch.begin();
 
 	for( ; i != ch.end(); ++i ) {
 		const util::Value<short> datVal( data[std::distance( const_cast<const data::MemChunk<short>&>( ch ).begin(), i )] );

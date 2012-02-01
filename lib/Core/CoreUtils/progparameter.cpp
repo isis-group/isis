@@ -146,9 +146,9 @@ bool ParameterMap::parse( int argc, char **argv )
 					at( matchingStrings.front() ).needed() = false; //remove needed flag, because the value is set (aka "not needed anymore")
 				} else {
 					LOG( Runtime, error )
-							<< "Failed to parse value(s) "
-							<< MSubject( listToString( argv + start, argv + i, " ", "", "" ) )
-							<< " for "  << matchingStrings.front() << "(" << at( matchingStrings.front() )->getTypeName() << ")";
+							<< "Failed to parse the parameter " << MSubject( std::string( "-" ) + matchingStrings.front() ) << ": "
+							<< ( start == i ? "nothing" : listToString( argv + start, argv + i, " ", "\"", "\"" ) )
+							<< " was given, but a " << at( matchingStrings.front() )->getTypeName() << " was expected.";
 					parsed = false;
 				}
 

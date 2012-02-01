@@ -26,6 +26,7 @@
 #include "typeptr_converter.hpp"
 #include "../CoreUtils/type.hpp"
 #include "common.hpp"
+#include <boost/type_traits/remove_const.hpp>
 
 namespace isis
 {
@@ -95,9 +96,11 @@ template<typename TYPE> class ValuePtrIterator: public std::iterator<std::random
 {
 	TYPE *p;
 	typedef typename std::iterator<std::random_access_iterator_tag, TYPE>::difference_type distance;
+	friend class ValuePtrIterator<const TYPE>;
 public:
 	ValuePtrIterator(): p( NULL ) {}
 	ValuePtrIterator( TYPE *_p ): p( _p ) {}
+	ValuePtrIterator( const ValuePtrIterator<typename boost::remove_const<TYPE>::type > &src ): p( src.p ) {}
 
 	ValuePtrIterator<TYPE>& operator++() {++p; return *this;}
 	ValuePtrIterator<TYPE>& operator--() {--p; return *this;}
@@ -153,8 +156,11 @@ protected:
 		return new ValuePtr( *this );
 	}
 public:
-	typedef _internal::ValuePtrIterator<TYPE> typed_iterator;
-	typedef _internal::ValuePtrIterator<const TYPE> const_typed_iterator;
+	typedef _internal::ValuePtrIterator<TYPE> iterator;
+	typedef _internal::ValuePtrIterator<const TYPE> const_iterator;
+	typedef typename iterator::reference reference;
+	typedef typename const_iterator::reference const_reference;
+
 	static const unsigned short staticID = util::_internal::TypeID<TYPE>::value << 8;
 	/// delete-functor which does nothing (in case someone else manages the data).
 	struct NonDeleter {
@@ -236,10 +242,10 @@ public:
 		return const_value_iterator( ( uint8_t * )m_val.get(), ( uint8_t * )m_val.get(), bytesPerElem(), getValueFrom, setValueInto );
 	}
 
-	typed_iterator begin() {return typed_iterator( m_val.get() );}
-	typed_iterator end() {return begin() + m_len;};
-	const_typed_iterator begin()const {return const_typed_iterator( m_val.get() );}
-	const_typed_iterator end()const {return begin() + m_len;}
+	iterator begin() {return iterator( m_val.get() );}
+	iterator end() {return begin() + m_len;};
+	const_iterator begin()const {return const_iterator( m_val.get() );}
+	const_iterator end()const {return begin() + m_len;}
 
 	/// @copydoc util::Value::toString
 	virtual std::string toString( bool labeled = false )const {
@@ -247,7 +253,7 @@ public:
 
 		if ( m_len ) {
 			// if you get trouble with to_tm here include <boost/date_time/gregorian/gregorian.hpp> or <boost/date_time/posix_time/posix_time.hpp> in your cpp
-			for ( const_typed_iterator i = begin(); i < end() - 1; i++ )
+			for ( const_iterator i = begin(); i < end() - 1; i++ )
 				ret += util::Value<TYPE>( *i ).toString( false ) + "|";
 
 
