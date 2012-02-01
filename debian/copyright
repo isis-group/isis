@@ -1,18 +1,35 @@
-Format-Specification: http://wiki.debian.org/Proposals/CopyrightFormat
+Format: http://dep.debian.net/deps/dep5/
 Upstream-Name: isis
-Upstream-Maintainer: ISIS developers
+Upstream-Contact: ISIS developers <gr_isis@cbs.mpg.de>
+Source: https://github.com/isis-group
+
 
 Files: *
 Copyright: 2008-2011 Erik Tuerke <tuerke@cbs.mpg.de>, Enrico Reimer
     <reimer@cbs.mpg.de>. Lydia Hellrung <hellrung@cbs.mpg.de>,
     Thomas Proeger <proege@googlemail.com> 
-License: GPL-2+
- On Debian systems the full text of the GNU General Public License can be found
- in the `/usr/share/common-licenses/GPL-2' file.
+License: GPL-3+
 
 
 Files: debian/*
-Copyright: Copyright 2011, Michael Hanke <michael.hanke@gmail.com>
-License: GPL-2+
- On Debian systems the full text of the GNU General Public License can be found
- in the `/usr/share/common-licenses/GPL' file.
+Copyright: 2011-2012, Michael Hanke <michael.hanke@gmail.com>,
+           2008-2011 Erik Tuerke <tuerke@cbs.mpg.de>
+License: GPL-3+
+
+
+License: GPL-3+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ .
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ .
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ .
+ On Debian systems the full text of the GNU General Public License can be
+ found in the `/usr/share/common-licenses/GPL-3' file.

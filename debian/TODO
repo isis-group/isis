@@ -1,4 +1,3 @@
-Think about whether a -plugins package is necessary. All plugins link against
-the shared lib anyway. If a new lib package is built the plugins get rebuilt as
-well. If the shared lib interface changes the old plugins probably stop working
-anyway...
+* Enable the test battery once it uses CTest.
+* Tools in /usr/bin need to have a manpage -- even if it is just a
+  stub shared among all of them that tell where they are coming from.
