@@ -1,1 +1,3 @@
 * Enable the test battery once it uses CTest.
+* Tools in /usr/bin need to have a manpage -- even if it is just a
+  stub shared among all of them that tell where they are coming from.
