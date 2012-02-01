@@ -5,7 +5,10 @@ Maintainer: ISIS Group <gr_isis@cbs.mpg.de>
 Uploaders: Enrico Reimer <reimer@cbs.mpg.de>, Michael Hanke <mih@debian.org>
 Build-Depends: debhelper (>= 7.0.50~), doxygen, cmake, libbz2-dev,
  libmuparser-dev, libnifti-dev, libvia-dev, libboost-python-dev,
- liboil0.3-dev | liboil-dev, python-all-dev
+ liboil0.3-dev | liboil-dev, python-all-dev, libqt4-dev,
+ libpng12-dev | libpng-dev, libtiff4-dev | libtiff-dev,
+ libdcmtk2-dev | libdcmtk1-dev, libboost-iostreams-dev, libboost-filesystem-dev,
+ libboost-system-dev, libboost-date-time-dev
 Standards-Version: 3.9.2
 Homepage: https://github.com/isis-group
 Vcs-Browser: http://git.debian.org/?p=pkg-exppsy/isis.git
