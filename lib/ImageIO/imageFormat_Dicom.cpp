@@ -321,9 +321,9 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 	if ( dicomTree.hasProperty( "DiffusionBValue" ) ) { //in case someone actually used the right Tag
 		bValue = dicomTree.getPropertyAs<int32_t>( "DiffusionBValue" );
 		dicomTree.remove( "DiffusionBValue" );
-	} else if ( dicomTree.hasProperty( util::istring( unknownTagName ) + "(0019,100c)" ) ) { //fallback for siemens
-		bValue = dicomTree.getPropertyAs<int32_t>( util::istring( unknownTagName ) + "(0019,100c)" );
-		dicomTree.remove( util::istring( unknownTagName ) + "(0019,100c)" );
+	} else if ( dicomTree.hasProperty( "SiemensDiffusionBValue" ) ) { //fallback for siemens
+		bValue = dicomTree.getPropertyAs<int32_t>( "SiemensDiffusionBValue" );
+		dicomTree.remove( "SiemensDiffusionBValue" );
 	} else foundDiff = false;
 
 	// If we do have DWI here, create a property diffusionGradient (which defaults to 0,0,0,0)
@@ -334,9 +334,9 @@ void ImageFormat_Dicom::sanitise( util::PropertyMap &object, std::string /*diale
 			if( dicomTree.hasProperty( "DiffusionGradientOrientation" ) ) {
 				diff = dicomTree.getPropertyAs<util::fvector4>( "DiffusionGradientOrientation" ) * bValue;
 				dicomTree.remove( "DiffusionGradientOrientation" );
-			} else if( dicomTree.hasProperty( util::istring( unknownTagName ) + "(0019,100e)" ) ) {
-				diff = dicomTree.getPropertyAs<util::fvector4>( util::istring( unknownTagName ) + "(0019,100e)" ) * bValue;
-				dicomTree.remove( util::istring( unknownTagName ) + "(0019,100e)" );
+			} else if( dicomTree.hasProperty( "SiemensDiffusionGradientOrientation" ) ) {
+				diff = dicomTree.getPropertyAs<util::fvector4>( "SiemensDiffusionGradientOrientation" ) * bValue;
+				dicomTree.remove( "SiemensDiffusionGradientOrientation" );
 			} else {
 				LOG( Runtime, error ) << "Found no diffusion direction for DiffusionBValue " << util::MSubject( bValue );
 			}
@@ -549,8 +549,10 @@ ImageFormat_Dicom::ImageFormat_Dicom()
 
 	dictionary[DcmTag( 0x0008, 0x1050 )] = "PerformingPhysiciansName";
 
-	// override 0x0019, 0x100a with "SiemensNumberOfImagesInMosaic" because it is SliceOrientation in the standard and mosaic-size for siemens - we will figure out while sanitizing
+	// override some Siemens specific stuff because it is SliceOrientation in the standard and mosaic-size for siemens - we will figure out while sanitizing
 	dictionary[DcmTag( 0x0019, 0x100a )] = "SiemensNumberOfImagesInMosaic";
+	dictionary[DcmTag( 0x0019, 0x100c )] = "SiemensDiffusionBValue";
+	dictionary[DcmTag( 0x0019, 0x100e )] = "SiemensDiffusionGradientOrientation";
 
 	dictionary[DcmTag( 0x0029, 0x0010 )] = "PrivateCreator";
 }
