@@ -22,7 +22,7 @@ WriteOp::WriteOp( const data::Image &image, size_t bitsPerVoxel, bool doFlip ): 
 size_t WriteOp::getDataSize()
 {
 	const size_t bitsize = getVolume() * m_bpv;
-	const size_t fill = 8-(bitsize % 8);
+	const size_t fill = 8 - ( bitsize % 8 );
 	return ( bitsize + fill ) / 8;
 }
 
