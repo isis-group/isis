@@ -31,7 +31,7 @@ namespace data
 
 void FilePtr::Closer::operator()( void *p )
 {
-	LOG( Debug, info ) << "Unmapping and closing " << util::MSubject( filename.file_string() );
+	LOG( Debug, info ) << "Unmapping and closing " << util::MSubject( filename.file_string() ) << " it was mapped at " << p;
 
 	bool unmapped = false;
 #ifdef WIN32
@@ -193,8 +193,10 @@ FilePtr::FilePtr( const boost::filesystem::path &filename, size_t len, bool writ
 
 	const size_t map_size = checkSize( write, file, filename, len ); // get the mapping size
 
-	if( map_size )
+	if( map_size ){
 		m_good = map( file, map_size, write, filename ); //and do the mapping
+		LOG(Debug,info) << "Mapped " << map_size << " bytes of " << util::MSubject( filename.file_string() ) << " at " << getRawAddress().get();
+	}
 
 	// from here on the pointer will be set if mapping succeded
 }
