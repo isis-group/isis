@@ -585,7 +585,8 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 		LOG( Runtime, notice ) << "The image has 3 timesteps and its type is UINT8, assuming it is an fsl color image.";
 		const size_t volume = size.product() / 3;
 		data::ValuePtr<util::color24> buff( volume );
-		const data::ValuePtr<uint8_t> src = mfile.at<uint8_t>( header->vox_offset );
+		const data::ValuePtr<uint8_t> src = mfile.at<uint8_t>( header->vox_offset,volume*3 );
+		LOG( Runtime, info ) << "Mapping nifti image as FSL RBG set of 3*" << volume << " elements";
 
 		for( size_t v = 0; v < volume; v++ ) {
 			buff[v].r = src[v];
@@ -613,8 +614,9 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 		unsigned int type = nifti_type2isis_type[header->datatype];
 
 		if( type ) {
-			data_src = mfile.atByID( type, header->vox_offset );
-			LOG( Runtime, info ) << "Mapping nifti image as " << data_src->getTypeName() << " of length " << data_src->getLength();
+			data_src = mfile.atByID( type, header->vox_offset, size.product() );
+			LOG( Runtime, info ) << "Mapping nifti image as " << data_src->getTypeName() << " of " << data_src->getLength() << " elements (" << data_src->bytesPerElem()*data_src->getLength() << ")";
+
 			LOG_IF( ( size_t )header->bitpix != data_src->bytesPerElem() * 8, Runtime, warning )
 					<< "nifti field bitpix does not fit the bytesize of the given datatype (" << data_src->getTypeName() << "/" << header->bitpix <<  ")";
 
