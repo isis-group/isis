@@ -53,7 +53,6 @@ bool inverseMatrix( const matrix<TYPE> &inMatrix, matrix<TYPE> &inverse )
 {
 	matrix<TYPE> A( inMatrix );
 	permutation_matrix<TYPE> pm( A.size1() );
-
 	if( lu_factorize( A, pm ) != 0 ) {
 		return false;
 	}
