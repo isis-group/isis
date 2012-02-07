@@ -1,9 +1,9 @@
 #!/bin/bash
 
-TMPROOT=@CMAKE_BINARY_DIR@
-PACKAGE=isisio0
-TMPDIR=${TMPROOT}/rpm
-FILES="../CMakeLists.txt \
+TMPROOT = @CMAKE_BINARY_DIR@
+		  PACKAGE = isisio0
+					TMPDIR = $ {TMPROOT} / rpm
+							 FILES = "../CMakeLists.txt \
 ../cmake \
 ../common.hpp \
 ../imageFormat_Dicom.cpp \
@@ -15,37 +15,41 @@ FILES="../CMakeLists.txt \
 ../imageFormat_Vista.h \
 ../isisImageFormat_gz_proxy.cpp"
 
-VERSION=@ISIS_IMAGE_IO_VERSION@
-TGZTMPDIR=${PACKAGE}-${VERSION}
+									 VERSION = @ISIS_IMAGE_IO_VERSION@
+											 TGZTMPDIR = $ {PACKAGE} -$ {VERSION}
 
 # create temporary directories
-if [ -d ${TMPDIR} ];then
-    echo "Old temporary directory found. Removing content."
-    rm -rf ${TMPDIR}
+
+													 if [ -d $ {TMPDIR} ];
+then
+echo "Old temporary directory found. Removing content."
+rm - rf $ {TMPDIR}
 fi
 
-mkdir ${TMPDIR}
-mkdir ${TMPDIR}/BUILD
-mkdir ${TMPDIR}/RPMS
-mkdir ${TMPDIR}/SOURCES
-mkdir ${TMPDIR}/SRPMS
-mkdir ${TMPDIR}/SPECS
+mkdir $ {TMPDIR}
+mkdir $ {TMPDIR} / BUILD
+mkdir $ {TMPDIR} / RPMS
+mkdir $ {TMPDIR} / SOURCES
+mkdir $ {TMPDIR} / SRPMS
+mkdir $ {TMPDIR} / SPECS
 
 # create source archive and copy it to temp. directory
-if [ -d  ${TMPDIR}/${TGZTMPDIR} ];then
-    rm -rf ${TMPDIR}/${TGZTMPDIR}
+
+if [ -d  $ {TMPDIR} / $ {TGZTMPDIR} ];
+then
+rm - rf $ {TMPDIR} / $ {TGZTMPDIR}
 fi
-mkdir ${TMPDIR}/${TGZTMPDIR}
-cp -r ${FILES} ${TMPDIR}/${TGZTMPDIR}
-pushd ${TMPDIR}
-tar -czf SOURCES/${PACKAGE}-${VERSION}.tar.gz ${TGZTMPDIR}
-rm -rf ${TGZTMPDIR}
+mkdir $ {TMPDIR} / $ {TGZTMPDIR}
+cp - r $ {FILES} $ {TMPDIR} / $ {TGZTMPDIR}
+pushd $ {TMPDIR}
+tar - czf SOURCES / $ {PACKAGE} -$ {VERSION} .tar.gz $ {TGZTMPDIR}
+rm - rf $ {TGZTMPDIR}
 popd
 
 # copy spec file
-cp ${PACKAGE}.spec ${TMPDIR}/SPECS
+cp $ {PACKAGE} .spec $ {TMPDIR} / SPECS
 
 # build rpm package
-cd ${TMPDIR}
-rpmbuild -v -bb SPECS/${PACKAGE}.spec
+cd $ {TMPDIR}
+rpmbuild - v - bb SPECS / $ {PACKAGE} .spec
 

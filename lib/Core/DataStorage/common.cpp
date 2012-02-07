@@ -55,6 +55,7 @@ bool transformCoords( isis::util::PropertyMap &properties, util::vector4<size_t>
 	// STEP 1 transform orientation matrix
 	// input matrix
 	matrix<float> R_in( 3, 3 );
+
 	for( int i = 0; i < 3; i++ ) {
 		R_in( i, 0 ) = row[i];
 		R_in( i, 1 ) = column[i];
