@@ -139,7 +139,9 @@ protected:
 	size_t m_voxelstart, m_bpv;
 	WriteOp( const data::Image &image, size_t bitsPerVoxel, bool doFlip = false );
 	virtual bool doCopy( data::Chunk &ch, util::vector4<size_t> posInImage ) = 0;
+	void applyFlip( data::ValuePtrReference dat, isis::util::vector4< size_t > chunkSize );
 public:
+	virtual ~WriteOp() {}
 	nifti_1_header *getHeader();
 	virtual unsigned short getTypeId() = 0;
 	virtual size_t getDataSize();
@@ -163,9 +165,8 @@ class ImageFormat_NiftiSa: public FileFormat
 	static void storeSForm( const util::PropertyMap &props, _internal::nifti_1_header *head );
 	std::map<short, unsigned short> nifti_type2isis_type;
 	std::map<unsigned short, short> isis_type2nifti_type;
-	template<typename T> static unsigned short typeFallBack() {
-		typedef typename boost::make_signed<T>::type NEW_T;
-		LOG( Runtime, info ) << data::ValuePtr<T>::staticName() <<  " is not supported by fsl falling back to " << data::ValuePtr<NEW_T>::staticName();
+	template<typename T, typename NEW_T> static unsigned short typeFallBack( const std::string name ) {
+		LOG( Runtime, info ) << data::ValuePtr<T>::staticName() <<  " is not supported by " << name << " falling back to " << data::ValuePtr<NEW_T>::staticName();
 		return data::ValuePtr<NEW_T>::staticID;
 	}
 	static void guessSliceOrdering( const data::Image img, char &slice_code, float &slice_duration );
@@ -176,6 +177,7 @@ class ImageFormat_NiftiSa: public FileFormat
 	static void storeHeader( const util::PropertyMap &props, _internal::nifti_1_header *head );
 	static std::list<data::Chunk> parseHeader( const _internal::nifti_1_header *head, data::Chunk props );
 	std::auto_ptr<_internal::WriteOp> getWriteOp( const data::Image &src, util::istring dialect );
+	data::ValuePtr<bool> bitRead( isis::data::ValuePtr< uint8_t > src, size_t length );
 public:
 	ImageFormat_NiftiSa();
 	std::string getName()const;
