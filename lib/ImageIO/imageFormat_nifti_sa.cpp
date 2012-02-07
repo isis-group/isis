@@ -585,7 +585,7 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 		LOG( Runtime, notice ) << "The image has 3 timesteps and its type is UINT8, assuming it is an fsl color image.";
 		const size_t volume = size.product() / 3;
 		data::ValuePtr<util::color24> buff( volume );
-		const data::ValuePtr<uint8_t> src = mfile.at<uint8_t>( header->vox_offset,volume*3 );
+		const data::ValuePtr<uint8_t> src = mfile.at<uint8_t>( header->vox_offset, volume * 3 );
 		LOG( Runtime, info ) << "Mapping nifti image as FSL RBG set of 3*" << volume << " elements";
 
 		for( size_t v = 0; v < volume; v++ ) {
@@ -820,12 +820,23 @@ void ImageFormat_NiftiSa::useQForm( util::PropertyMap &props )
 {
 
 	// orientation //////////////////////////////////////////////////////////////////////////////////
+	//inspired by/stolen from nifticlib/nifti1_io.c:1466
 	//see http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/quatern.html
 	//and http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/qformExt.jpg
-	double b = props.getPropertyAs<double>( "nifti/quatern_b" );
-	double c = props.getPropertyAs<double>( "nifti/quatern_c" );
-	double d = props.getPropertyAs<double>( "nifti/quatern_d" );
-	double a = sqrt( 1.0 - ( b * b + c * c + d * d ) );
+	util::dvector4 quaternion(
+		0,//a
+		props.getPropertyAs<double>( "nifti/quatern_b" ),
+		props.getPropertyAs<double>( "nifti/quatern_c" ),
+		props.getPropertyAs<double>( "nifti/quatern_d" )
+	);
+
+	double &a = quaternion[0], &b = quaternion[1], &c = quaternion[2], &d = quaternion[3];
+
+	if( 1 - quaternion.sqlen() ) { //if the quaternion is to "long"
+		quaternion.norm();      //normalize it and leave the angle as 0
+	} else {
+		a = sqrt( 1 - quaternion.sqlen() );                 /* angle = 2*arccos(a) */
+	}
 
 	LOG( Debug, info )
 			<< "Using qform (" << props.propertyValue( "nifti/qform_code" ).toString()
