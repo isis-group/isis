@@ -29,7 +29,7 @@ namespace image_io
 class FileFormat
 {
 public:
-	enum io_modes {read_only = 1, write_only = 2, both = 3};
+	enum io_modes{read_only=1,write_only=2,both=3};
 protected:
 	/**
 	 * Check if a given property exists in the given PropMap.
@@ -52,7 +52,7 @@ protected:
 		return false;
 	}
 	/// \return the file-suffixes the plugin supports
-	virtual std::string suffixes( io_modes modes = both )const = 0;
+	virtual std::string suffixes(io_modes modes=both)const = 0;
 	static const float invalid_float;
 public:
 	static void throwGenericError( std::string desc );
@@ -62,7 +62,7 @@ public:
 	/// splits the suffix (and the ".") from the filename (or path) and returns a pair made of both parts
 	virtual std::pair<std::string, std::string> makeBasename( const std::string &filename )const;
 
-	static std::string makeFilename( const util::PropertyMap &img, std::string namePattern );
+	static std::string makeFilename(const util::PropertyMap &img,std::string namePattern);
 	std::list<std::string> makeUniqueFilenames( const std::list<data::Image> &images, const std::string &namePattern )const;
 
 
@@ -79,7 +79,7 @@ public:
 	 * - both ask for suffixes which can be red \b or written (sould never be empty)
 	 * @return a list of suffixes the plugin handles
 	 */
-	std::list<util::istring> getSuffixes( io_modes mode = both )const;
+	std::list<util::istring> getSuffixes(io_modes mode = both)const;
 
 
 	/// \return a space separated list of the dialects the plugin supports
