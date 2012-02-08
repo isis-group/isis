@@ -34,7 +34,7 @@ class _WritingValueAdapter : public isis::data::_internal::WritingValueAdapter, 
 {
 public:
 	_WritingValueAdapter ( PyObject *p, const isis::data::_internal::WritingValueAdapter &base );
-// 	_WritingValueAdapter( PyObject *p, const
+	//  _WritingValueAdapter( PyObject *p, const
 
 	api::object _as( );
 
@@ -51,56 +51,47 @@ public:
 	_Image ( PyObject *p );
 	_Image ( PyObject *p, const Image &base );
 
-	api::object _voxel ( const size_t &first, const size_t &second, const size_t &third, const size_t &fourth )
-	{
+	api::object _voxel ( const size_t &first, const size_t &second, const size_t &third, const size_t &fourth ) {
 		const Chunk &ch = getChunk ( first, second, third, fourth, false );
 		return isis::python::data::_internal::VoxelOp::getVoxelAsPyObject ( ch, first, second, third, fourth );
 	}
-	api::object _voxel ( const isis::util::ivector4 &coord )
-	{
+	api::object _voxel ( const isis::util::ivector4 &coord ) {
 		return _voxel ( coord[0], coord[1], coord[2], coord[3] );
 	}
 
 
-	bool _setVoxel ( const size_t &first, const size_t &second, const size_t &third, const size_t &fourth, const api::object &value )
-	{
+	bool _setVoxel ( const size_t &first, const size_t &second, const size_t &third, const size_t &fourth, const api::object &value ) {
 		Chunk ch = getChunk ( first, second, third, fourth, false );
 		return isis::python::data::_internal::VoxelOp::setVoxelAsPyObject ( ch, first, second, third, fourth, value );
 
 
 	}
 
-	bool _setVoxel ( const isis::util::ivector4 &coord, const api::object &value )
-	{
+	bool _setVoxel ( const isis::util::ivector4 &coord, const api::object &value ) {
 		return _setVoxel ( coord[0], coord[1], coord[2], coord[3], value );
 	}
 
 	std::list<Chunk> _getChunksAsVector ( void );
 
-	const isis::util::ivector4 _getSizeAsVector( )
-	{
+	const isis::util::ivector4 _getSizeAsVector( ) {
 		return this->getSizeAsVector();
 	}
 
-	Chunk _getChunk ( const isis::util::ivector4 &coord, bool copy_metadata )
-	{
+	Chunk _getChunk ( const isis::util::ivector4 &coord, bool copy_metadata ) {
 		return getChunk ( coord[0], coord[1], coord[2], coord[3], copy_metadata );
 	}
 
 	Chunk _getChunkAs ( const size_t &first, const size_t &second, const size_t &third, const size_t &fourth, const std::string &type );
 
-	Chunk _getChunkAs ( const isis::util::ivector4 &coord, const std::string &type )
-	{
+	Chunk _getChunkAs ( const isis::util::ivector4 &coord, const std::string &type ) {
 		return _getChunkAs ( coord[0], coord[1], coord[2], coord[3], type );
 	}
 
-	api::object _getMin( )
-	{
+	api::object _getMin( ) {
 		return  util::Singletons::get<isis::python::core::_internal::TypesMap, 10>().at (
 					getMinMax().first->getTypeID() )->convert ( *getMinMax().first );
 	}
-	api::object _getMax( )
-	{
+	api::object _getMax( ) {
 		return  util::Singletons::get<isis::python::core::_internal::TypesMap, 10>().at (
 					getMinMax().second->getTypeID() )->convert ( *getMinMax().second );
 	}
@@ -117,8 +108,7 @@ public:
 
 	Image _deepCopy ( isis::python::data::image_types type );
 
-	Image _cheapCopy ( void )
-	{
+	Image _cheapCopy ( void ) {
 		return *this;
 	}
 
@@ -128,8 +118,7 @@ private:
 	PyObject *self;
 
 	template<typename TYPE>
-	static Image _internCreateImage ( const size_t &first, const size_t &second, const size_t &third, const size_t &fourth )
-	{
+	static Image _internCreateImage ( const size_t &first, const size_t &second, const size_t &third, const size_t &fourth ) {
 		data::MemChunk<TYPE> chunk ( first, second, third, fourth );
 		chunk.setPropertyAs<uint32_t> ( "acquisitionNumber", 0 );
 		chunk.setPropertyAs<util::fvector4> ( "rowVec", util::fvector4 ( 1, 0, 0, 0 ) );

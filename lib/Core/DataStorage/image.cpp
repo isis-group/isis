@@ -227,9 +227,11 @@ bool Image::updateOrientationMatrices()
 	const util::fvector4 sliceVec = getPropertyAs<util::fvector4>( "sliceVec" );
 	m_Offset = getPropertyAs<util::fvector4>( "indexOrigin" );
 	util::fvector4 spacing = getPropertyAs<util::fvector4>( "voxelSize" ) + ( hasProperty( "voxelGap" ) ? getPropertyAs<util::fvector4>( "voxelGap" ) : util::fvector4( 0, 0, 0 ) );
+
 	for( unsigned short i = 0; i < 3; i++ ) {
 		if( spacing[i] == 0 ) spacing[i] = 1;
 	}
+
 	m_RowVec = util::fvector4( rowVec[0] * spacing[0], rowVec[1] * spacing[0], rowVec[2] * spacing[0] );
 	m_ColumnVec = util::fvector4( columnVec[0] * spacing[1], columnVec[1] * spacing[1], columnVec[2] * spacing[1] );
 	m_SliceVec = util::fvector4( sliceVec[0] * spacing[2], sliceVec[1] * spacing[2], sliceVec[2] * spacing[2] );
