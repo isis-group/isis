@@ -19,7 +19,7 @@ project(ISIS)
 ############################################################
 set(ISIS_VERSION_MAJOR "0")
 set(ISIS_VERSION_MINOR "4")
-set(ISIS_VERSION_PATCH "5")
+set(ISIS_VERSION_PATCH "7")
 
 set(ISIS_VERSION_API "0.0.0")
 
