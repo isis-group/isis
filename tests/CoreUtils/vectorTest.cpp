@@ -12,6 +12,8 @@
 #include <boost/test/unit_test.hpp>
 #include "CoreUtils/vector.hpp"
 #include "CoreUtils/matrix.hpp"
+
+#include <boost/numeric/ublas/matrix.hpp>
 #include <string.h>
 
 namespace isis
@@ -111,7 +113,56 @@ BOOST_AUTO_TEST_CASE( matrix_dot_test )
 	);
 }
 
+BOOST_AUTO_TEST_CASE( matrix_from_boost_to_boost )
+{
+	using namespace boost::numeric::ublas;
+	const size_t m = 10;
+	const size_t n = 7;
+	matrix<float> boost_matrix = matrix<float>( m, n );
+	unsigned short index = 0;
 
+	for ( unsigned short i = 0; i < m; i++ ) {
+		for ( unsigned short j = 0; j < n; j++ ) {
+			boost_matrix( i, j ) = index++;
+		}
+	}
+
+	isis::util::FixedMatrix<float, n, m> isis_matrix( boost_matrix );
+
+	for ( unsigned short i = 0; i < m; i++ ) {
+		for ( unsigned short j = 0; j < n; j++ ) {
+			BOOST_CHECK_EQUAL( boost_matrix( i, j ), isis_matrix.elem( j, i ) );
+			BOOST_CHECK_EQUAL( boost_matrix( i, j ), isis_matrix.getBoostMatrix()( i, j ) );
+		}
+	}
+}
+
+BOOST_AUTO_TEST_CASE( matrix_inverse )
+{
+	isis::util::IdentityMatrix<float, 3> identity_matrix;
+	isis::util::FixedMatrix<float, 3, 3> initial_matrix;
+	initial_matrix.elem( 0, 0 ) = 0;
+	initial_matrix.elem( 1, 0 ) = 1;
+	initial_matrix.elem( 2, 0 ) = 0;
+	initial_matrix.elem( 0, 1 ) = 1;
+	initial_matrix.elem( 1, 1 ) = 0;
+	initial_matrix.elem( 2, 1 ) = 0;
+	initial_matrix.elem( 0, 2 ) = 0;
+	initial_matrix.elem( 1, 2 ) = 0;
+	initial_matrix.elem( 2, 2 ) = 1;
+	bool ok;
+	isis::util::FixedMatrix<float, 3, 3> inverse = initial_matrix.inverse( ok );
+	BOOST_CHECK( ok );
+	isis::util::FixedMatrix<float, 3, 3> result( boost::numeric::ublas::prod( inverse.getBoostMatrix(), initial_matrix.getBoostMatrix() ) );
+
+	for( unsigned short i = 0; i < 3; i++ ) {
+		for( unsigned short j = 0; j < 3; j++ ) {
+			BOOST_CHECK_EQUAL( result.elem( i, j ), identity_matrix.elem( i , j ) );
+		}
+	}
+
+
+}
 
 }
 }
