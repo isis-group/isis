@@ -1,5 +1,5 @@
 # -*- mode:rpm-spec -*-
-# This is the rpm spec file template. 
+# This is the rpm spec file template.
 
 %define _topdir     @CMAKE_BINARY_DIR@/rpm
 %define name        isisio0
@@ -22,7 +22,7 @@ The ISIS package provides a general I/O framework for neuroimaging
 data.  Being started with fMRI data, it can handle several established data
 formats, like Nifti, Analyze, DICOM and vista. A first application based on this
 project is a data converter that allows an easy and unified handling of fMRI
-data from various MRI scanners. 
+data from various MRI scanners.
 
 This Package provides additional IO plugins for the ISIS core library. It supports:
 DICOM, NIFTI, vista and gnuzip archives.

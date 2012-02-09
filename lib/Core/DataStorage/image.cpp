@@ -222,11 +222,16 @@ util::ivector4 Image::getIndexFromPhysicalCoords( const isis::util::fvector4 &ph
 
 bool Image::updateOrientationMatrices()
 {
-	util::fvector4 rowVec = getPropertyAs<util::fvector4>( "rowVec" );
-	util::fvector4 columnVec = getPropertyAs<util::fvector4>( "columnVec" );
-	util::fvector4 sliceVec = getPropertyAs<util::fvector4>( "sliceVec" );
+	const util::fvector4 rowVec = getPropertyAs<util::fvector4>( "rowVec" );
+	const util::fvector4 columnVec = getPropertyAs<util::fvector4>( "columnVec" );
+	const util::fvector4 sliceVec = getPropertyAs<util::fvector4>( "sliceVec" );
 	m_Offset = getPropertyAs<util::fvector4>( "indexOrigin" );
 	util::fvector4 spacing = getPropertyAs<util::fvector4>( "voxelSize" ) + ( hasProperty( "voxelGap" ) ? getPropertyAs<util::fvector4>( "voxelGap" ) : util::fvector4( 0, 0, 0 ) );
+
+	for( unsigned short i = 0; i < 3; i++ ) {
+		if( spacing[i] == 0 ) spacing[i] = 1;
+	}
+
 	m_RowVec = util::fvector4( rowVec[0] * spacing[0], rowVec[1] * spacing[0], rowVec[2] * spacing[0] );
 	m_ColumnVec = util::fvector4( columnVec[0] * spacing[1], columnVec[1] * spacing[1], columnVec[2] * spacing[1] );
 	m_SliceVec = util::fvector4( sliceVec[0] * spacing[2], sliceVec[1] * spacing[2], sliceVec[2] * spacing[2] );
@@ -460,7 +465,7 @@ bool Image::reIndex()
 
 		if ( hasProperty( "sliceVec" ) ) {
 			util::fvector4 &sliceVec = propertyValue( "sliceVec" )->castTo<util::fvector4>(); //get the slice vector
-			LOG_IF( ! crossVec.fuzzyEqual( sliceVec ), Runtime, warning )
+			LOG_IF( std::acos( crossVec.dot( sliceVec ) )  > 180 / M_PI, Runtime, warning ) //angle more than one degree
 					<< "The existing sliceVec " << sliceVec
 					<< " differs from the cross product of the row- and column vector " << crossVec;
 		} else {
@@ -756,7 +761,7 @@ Image::orientation Image::getMainOrientation()const
 	double a_sagittal = std::acos( crossVec.dot( x ) ) / M_PI;
 	double a_coronal  = std::acos( crossVec.dot( y ) ) / M_PI;
 	bool a_inverse = false, s_inverse = false, c_inverse = false;
-	LOG( Debug, info ) << "Angles to vectors are " << a_sagittal << " to x, " << a_coronal << " to y and " << a_axial << " to z";
+	LOG( Debug, info ) << "Angles to vectors are " << ( a_sagittal * 180 ) << " to x, " << ( a_coronal * 180 ) << " to y and " << ( a_axial * 180 ) << " to z";
 
 	if( a_axial > .5 ) {
 		a_axial = std::abs( a_axial - 1 );
