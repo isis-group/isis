@@ -832,7 +832,7 @@ void ImageFormat_NiftiSa::useQForm( util::PropertyMap &props )
 
 	double &a = quaternion[0], &b = quaternion[1], &c = quaternion[2], &d = quaternion[3];
 
-	if( 1 - quaternion.sqlen() ) { //if the quaternion is to "long"
+	if( 1 - quaternion.sqlen() < 1.e-7) { //if the quaternion is to "long"
 		quaternion.norm();      //normalize it and leave the angle as 0
 	} else {
 		a = sqrt( 1 - quaternion.sqlen() );                 /* angle = 2*arccos(a) */
