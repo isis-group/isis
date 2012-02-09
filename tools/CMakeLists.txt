@@ -21,25 +21,28 @@
 ###########################################################
 include_directories(${CMAKE_SOURCE_DIR}/lib/Core)
 
-
 ############################################################
 # configure the targets
 ############################################################
 add_executable(isisdump isisdump.cpp)
 target_link_libraries(isisdump isis_core ${ISIS_LIB_DEPENDS})
 set_target_properties(isisdump PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
+build_manpage(isisdump)
 
 add_executable(isisdiff isisdiff.cpp)
 target_link_libraries(isisdiff isis_core ${ISIS_LIB_DEPENDS})
 set_target_properties(isisdiff PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
+build_manpage(isisdiff)
 
 add_executable(isisconv isisconv.cpp)
 target_link_libraries(isisconv isis_core ${ISIS_LIB_DEPENDS})
 set_target_properties(isisconv PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
+build_manpage(isisconv)
 
 add_executable(isisflip isisflip.cpp)
 target_link_libraries(isisflip isis_core ${ISIS_LIB_DEPENDS})
 set_target_properties(isisflip PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
+build_manpage(isisflip)
 
 # the install targets.
 install(TARGETS
