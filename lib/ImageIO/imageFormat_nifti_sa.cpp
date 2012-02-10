@@ -21,9 +21,12 @@ WriteOp::WriteOp( const data::Image &image, size_t bitsPerVoxel, bool doFlip ): 
 }
 size_t WriteOp::getDataSize()
 {
-	const size_t bitsize = getVolume() * m_bpv;
-	const size_t fill = 8 - ( bitsize % 8 );
-	return ( bitsize + fill ) / 8;
+	size_t bitsize = getVolume() * m_bpv;
+
+	if( bitsize % 8 )
+		bitsize += 1;
+
+	return bitsize / 8;
 }
 
 bool WriteOp::setOutput( const std::string &filename, size_t voxelstart )
@@ -150,10 +153,10 @@ public:
 class BitWriteOp: public WriteOp
 {
 public:
-	BitWriteOp( data::TypedImage<bool> image ): WriteOp( image, 1 ) {}
+	BitWriteOp( const data::Image &image ): WriteOp( image, 1 ) {}
 
 	bool doCopy( data::Chunk &src, util::vector4<size_t> posInImage ) {
-		data::ValuePtr<bool> in_data = src.asValuePtr<bool>();
+		data::ValuePtr<bool> in_data = src.asValuePtrBase().as<bool>();
 		const size_t offset = m_voxelstart + getLinearIndex( posInImage ) * m_bpv ;
 
 		data::ValuePtr<uint8_t> out_data = m_out.at<uint8_t>( offset, in_data.getLength() / 8 );
@@ -550,56 +553,57 @@ isis::data::ValuePtr< bool > ImageFormat_NiftiSa::bitRead( data::ValuePtr< uint8
 	return ret;
 }
 
-bool ImageFormat_NiftiSa::checkSwapEndian ( _internal::nifti_1_header* header )
+bool ImageFormat_NiftiSa::checkSwapEndian ( _internal::nifti_1_header *header )
 {
 #define DO_SWAP(VAR) VAR=data::endianSwap(VAR)
 #define DO_SWAPA(VAR,SIZE) data::endianSwapArray(VAR,VAR+SIZE,VAR);
 
-	if(data::endianSwap(header->sizeof_hdr) == 348){ // ok we have to swap the endianess
-		DO_SWAP(header->sizeof_hdr);
-		DO_SWAP(header->extents);
-   		DO_SWAP(header->session_error);
+	if( data::endianSwap( header->sizeof_hdr ) == 348 ) { // ok we have to swap the endianess
+		DO_SWAP( header->sizeof_hdr );
+		DO_SWAP( header->extents );
+		DO_SWAP( header->session_error );
 
-   		DO_SWAP(header->intent_p1);
-   		DO_SWAP(header->intent_p2);
-   		DO_SWAP(header->intent_p3);
+		DO_SWAP( header->intent_p1 );
+		DO_SWAP( header->intent_p2 );
+		DO_SWAP( header->intent_p3 );
 
-   		DO_SWAP(header->intent_code);
-   		DO_SWAP(header->datatype);
-   		DO_SWAP(header->bitpix);
-   		DO_SWAP(header->slice_start);
+		DO_SWAP( header->intent_code );
+		DO_SWAP( header->datatype );
+		DO_SWAP( header->bitpix );
+		DO_SWAP( header->slice_start );
 
-   		DO_SWAP(header->vox_offset);
-   		DO_SWAP(header->scl_slope);
-   		DO_SWAP(header->scl_inter);
-   		DO_SWAP(header->slice_end);
+		DO_SWAP( header->vox_offset );
+		DO_SWAP( header->scl_slope );
+		DO_SWAP( header->scl_inter );
+		DO_SWAP( header->slice_end );
 
-   		DO_SWAP(header->cal_max);
-   		DO_SWAP(header->cal_min);
-   		DO_SWAP(header->slice_duration);
-   		DO_SWAP(header->toffset);
-   		DO_SWAP(header->glmax);
-   		DO_SWAP(header->glmin);
+		DO_SWAP( header->cal_max );
+		DO_SWAP( header->cal_min );
+		DO_SWAP( header->slice_duration );
+		DO_SWAP( header->toffset );
+		DO_SWAP( header->glmax );
+		DO_SWAP( header->glmin );
 
-   		DO_SWAP(header->qform_code);
-   		DO_SWAP(header->sform_code);
+		DO_SWAP( header->qform_code );
+		DO_SWAP( header->sform_code );
 
-   		DO_SWAP(header->quatern_b);
-   		DO_SWAP(header->quatern_c);
-   		DO_SWAP(header->quatern_d);
-   		DO_SWAP(header->qoffset_x);
-   		DO_SWAP(header->qoffset_y);
-   		DO_SWAP(header->qoffset_z);
+		DO_SWAP( header->quatern_b );
+		DO_SWAP( header->quatern_c );
+		DO_SWAP( header->quatern_d );
+		DO_SWAP( header->qoffset_x );
+		DO_SWAP( header->qoffset_y );
+		DO_SWAP( header->qoffset_z );
 
-		DO_SWAPA(header->dim,8);
-		DO_SWAPA(header->pixdim,8);
-		DO_SWAPA(header->srow_x,4);
-		DO_SWAPA(header->srow_y,4);
-		DO_SWAPA(header->srow_z,4);
+		DO_SWAPA( header->dim, 8 );
+		DO_SWAPA( header->pixdim, 8 );
+		DO_SWAPA( header->srow_x, 4 );
+		DO_SWAPA( header->srow_y, 4 );
+		DO_SWAPA( header->srow_z, 4 );
 
 		return true;
 	} else
 		return false;
+
 #undef DO_SWAP
 #undef DO_SWAPA
 }
@@ -619,25 +623,25 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 
 	//get the header - we use it directly from the file
 	_internal::nifti_1_header *header = reinterpret_cast<_internal::nifti_1_header *>( &mfile[0] );
-	const bool swap_endian=checkSwapEndian(header);
+	const bool swap_endian = checkSwapEndian( header );
 
 	if( header->intent_code != 0 ) {
 		throwGenericError( std::string( "only intent_code==0 is supportet" ) );
 	}
 
 	if( header->sizeof_hdr < 348 ) {
-		LOG(Runtime,warning) << "sizeof_hdr of the file (" << header->vox_offset << ") is invalid, assuming 348";
+		LOG( Runtime, warning ) << "sizeof_hdr of the file (" << header->vox_offset << ") is invalid, assuming 348";
 		header->sizeof_hdr = 348;
 	}
 
 	if( header->vox_offset < 352 ) {
-		LOG(Runtime,warning) << "vox_offset of the file (" << header->vox_offset << ") is invalid, assuming 352";
+		LOG( Runtime, warning ) << "vox_offset of the file (" << header->vox_offset << ") is invalid, assuming 352";
 		header->vox_offset = 352;
 	}
-	
+
 	if( header->slice_duration < 0 ) {
-		LOG(Runtime,warning) << "ignoring invalid slice duration (" << header->slice_duration << ")";
-		header->slice_duration=0;
+		LOG( Runtime, warning ) << "ignoring invalid slice duration (" << header->slice_duration << ")";
+		header->slice_duration = 0;
 	}
 
 	//set up the size - copy dim[0] values from dim[1]..dim[dim[0]]
@@ -668,7 +672,7 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 		LOG( Runtime, notice ) << "The image has 3 timesteps and its type is FLOAT32, assuming it is an fsl vector image.";
 		const size_t volume = size.product() / 3;
 		data::ValuePtr<util::fvector4> buff( volume );
-		const data::ValuePtr<float> src = mfile.at<float>( header->vox_offset,size.product(),swap_endian );
+		const data::ValuePtr<float> src = mfile.at<float>( header->vox_offset, size.product(), swap_endian );
 
 		for( size_t v = 0; v < volume; v++ ) {
 			buff[v][0] = src[v];
@@ -682,15 +686,16 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 		unsigned int type = nifti_type2isis_type[header->datatype];
 
 		if( type ) {
-			data_src = mfile.atByID( type, header->vox_offset, size.product(),swap_endian );
-			if(swap_endian){
+			data_src = mfile.atByID( type, header->vox_offset, size.product(), swap_endian );
+
+			if( swap_endian ) {
 				LOG( Runtime, info )
-					<< "Opened nifti image as endianess swapped " << data_src->getTypeName() << " of " << data_src->getLength()
-					<< " elements (" << data_src->bytesPerElem()*data_src->getLength() << ")";
+						<< "Opened nifti image as endianess swapped " << data_src->getTypeName() << " of " << data_src->getLength()
+				<< " elements (" << data_src->bytesPerElem()*data_src->getLength() << ")";
 			} else {
 				LOG( Runtime, info )
-					<< "Mapped nifti image natively as " << data_src->getTypeName() << " of " << data_src->getLength()
-					<< " elements (" << data_src->bytesPerElem()*data_src->getLength() << ")";
+						<< "Mapped nifti image natively as " << data_src->getTypeName() << " of " << data_src->getLength()
+				<< " elements (" << data_src->bytesPerElem()*data_src->getLength() << ")";
 			}
 
 			LOG_IF( ( size_t )header->bitpix != data_src->bytesPerElem() * 8, Runtime, warning )
@@ -713,20 +718,22 @@ std::auto_ptr< _internal::WriteOp > ImageFormat_NiftiSa::getWriteOp( const isis:
 	unsigned short target_id = src.getMajorTypeID(); //default to major type of the image
 
 	//bitmap is not supportet by spm and fsl
-	if( ( dialect == "fsl" || dialect == "spm" ) && target_id == data::ValuePtr<bool>::staticID ) {
-		target_id = typeFallBack<bool, uint8_t>( dialect.c_str() );
-	} else {
-		return std::auto_ptr<_internal::WriteOp>( new _internal::BitWriteOp( src ) );
+	if( target_id == data::ValuePtr<bool>::staticID ) {
+		if( dialect == "fsl" || dialect == "spm" ) {
+			target_id = typeFallBack<bool, uint8_t>( dialect.c_str() );// fall back to uint8_t and use normal writer for that
+		} else {
+			return std::auto_ptr<_internal::WriteOp>( new _internal::BitWriteOp( src ) ); // use special writer for bit
+		}
 	}
 
 	// fsl cannot deal with some types
 	if( dialect == "fsl" ) {
 		switch( target_id ) {
 		case data::ValuePtr<uint16_t>::staticID:
-			return std::auto_ptr<_internal::WriteOp>( new _internal::CommonWriteOp( src, typeFallBack<uint16_t, int16_t>( "fsl" ), bpv, false ) );
+			target_id = typeFallBack<uint16_t, int16_t>( "fsl" );
 			break;
 		case data::ValuePtr<uint32_t>::staticID:
-			return std::auto_ptr<_internal::WriteOp>( new _internal::CommonWriteOp( src, typeFallBack<uint32_t, int32_t>( "fsl" ), bpv, false ) );
+			target_id = typeFallBack<uint32_t, int32_t>( "fsl" );
 			break;
 		case data::ValuePtr<util::color24>::staticID:
 
@@ -742,7 +749,7 @@ std::auto_ptr< _internal::WriteOp > ImageFormat_NiftiSa::getWriteOp( const isis:
 		}
 	}
 
-	// default case (no fsl dialect or type can be used directly)
+	// generic case (use generic scalar writer for the target_id)
 	return std::auto_ptr<_internal::WriteOp>( new _internal::CommonWriteOp( src, target_id, bpv, ( dialect == "spm" ) ) );
 }
 
@@ -908,7 +915,7 @@ void ImageFormat_NiftiSa::useQForm( util::PropertyMap &props )
 
 	double &a = quaternion[0], &b = quaternion[1], &c = quaternion[2], &d = quaternion[3];
 
-	if( 1 - quaternion.sqlen() < 1.e-7) { //if the quaternion is to "long"
+	if( 1 - quaternion.sqlen() < 1.e-7 ) { //if the quaternion is to "long"
 		quaternion.norm();      //normalize it and leave the angle as 0
 	} else {
 		a = sqrt( 1 - quaternion.sqlen() );                 /* angle = 2*arccos(a) */
