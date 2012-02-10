@@ -106,7 +106,7 @@ bool FilePtr::map( FILE_HANDLE file, size_t len, bool write, const boost::filesy
 		return false;
 	} else {
 		const Closer cl = {file, mmaph, len, filename, write};
-		writing=write;
+		writing = write;
 		static_cast<ValuePtr<uint8_t>&>( *this ) = ValuePtr<uint8_t>( static_cast<uint8_t * const>( ptr ), len, cl );
 		return true;
 	}

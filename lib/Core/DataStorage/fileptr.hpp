@@ -43,11 +43,11 @@ class FilePtr: public ValuePtr<uint8_t>
 		bool write;
 		void operator()( void *p );
 	};
-	typedef data::ValuePtrReference( *generator_type )( data::FilePtr &, size_t, size_t, bool);
+	typedef data::ValuePtrReference( *generator_type )( data::FilePtr &, size_t, size_t, bool );
 	struct GeneratorMap: public std::map<unsigned short, generator_type> {
 		GeneratorMap();
-		template<class T> static data::ValuePtrReference generator( data::FilePtr &mfile, size_t offset, size_t len, bool swap_endianess) {
-			return mfile.at<T>( offset, len,swap_endianess);
+		template<class T> static data::ValuePtrReference generator( data::FilePtr &mfile, size_t offset, size_t len, bool swap_endianess ) {
+			return mfile.at<T>( offset, len, swap_endianess );
 		}
 		struct proc {
 			std::map<unsigned short, generator_type> *m_map;
@@ -61,7 +61,7 @@ class FilePtr: public ValuePtr<uint8_t>
 	bool map( FILE_HANDLE file, size_t len, bool write, const boost::filesystem::path &filename );
 
 	size_t checkSize( bool write, FILE_HANDLE file, const boost::filesystem::path &filename, size_t size = 0 );
-	bool m_good,writing;
+	bool m_good, writing;
 public:
 	/// empty creator - result will not be usefull until filled
 	FilePtr();
@@ -99,7 +99,7 @@ public:
 	 * \param len the requested length of the resulting ValuePtr in elements (if that will go behind the end of the file, a warning will be issued).
 	 * \param swap_endianess if endianess should be swapped when reading data file (ignored when used on files opened for writing)
 	 */
-	template<typename T> ValuePtr<T> at( size_t offset, size_t len = 0, bool swap_endianess=false) {
+	template<typename T> ValuePtr<T> at( size_t offset, size_t len = 0, bool swap_endianess = false ) {
 		boost::shared_ptr<T> ptr = boost::static_pointer_cast<T>( getRawAddress( offset ) );
 
 		if( len == 0 ) {
@@ -110,19 +110,19 @@ public:
 		}
 
 		LOG_IF( len * sizeof( T ) > ( getLength() - offset ), Debug, error )
-			<< "The requested length will be " << len - ( getLength() - offset ) << " bytes behind the end of the source.";
+				<< "The requested length will be " << len - ( getLength() - offset ) << " bytes behind the end of the file.";
 		LOG_IF( writing && swap_endianess, Debug, warning )
-			<< "Ignoring requested to swap byte order for writing (the systems byte order is "<< __BYTE_ORDER << " and that will be used)";
-			
-		if(writing || !swap_endianess ){ // if not endianess swapping was requested or T is not float (or if we are writing)
+				<< "Ignoring requested to swap byte order for writing (the systems byte order is " << __BYTE_ORDER << " and that will be used)";
+
+		if( writing || !swap_endianess ) { // if not endianess swapping was requested or T is not float (or if we are writing)
 			return data::ValuePtr<T>( ptr, len ); // return a cheap copy
 		} else { // flip bytes into a new ValuePtr
-			LOG(Debug, info )<< "Byte swapping " <<  ValuePtr<T>::staticName() << " for endianess";
-			ValuePtr<T> ret(len);
-			data::endianSwapArray(ptr.get(),ptr.get()+std::min(len,getLength()/sizeof(T)),ret.begin());
+			LOG( Debug, info ) << "Byte swapping " <<  ValuePtr<T>::staticName() << " for endianess";
+			ValuePtr<T> ret( len );
+			data::endianSwapArray( ptr.get(), ptr.get() + std::min( len, getLength() / sizeof( T ) ), ret.begin() );
 			return ret;
 		}
-		
+
 	}
 
 	/**
@@ -132,16 +132,16 @@ public:
 	 *
 	 * If the FilePtr was opened writing, writing access to this ValuePtr objects will result in writes to the file.
 	 * Otherwise it will just write into memory.
-	 * 
+	 *
 	 * If the FilePtr was opened reading and the assumed endianess of the file (see parameter) does not fit the endianess
 	 * of the system an (endianess-converted) deep copy is created.
-	 * 
+	 *
 	 * \param ID the requested type (note that there is no conversion done, just reinterpretation of the raw data in the file)
 	 * \param offset the position in the file to start from (in bytes)
 	 * \param len the requested length of the resulting ValuePtr in elements (if that will go behind the end of the file, a warning will be issued).
 	 * \param swap_endianess if endianess should be swapped when reading data file (ignored when used on files opened for writing)
 	 */
-	data::ValuePtrReference atByID( unsigned short ID, size_t offset, size_t len = 0, bool swap_endianess=false );
+	data::ValuePtrReference atByID( unsigned short ID, size_t offset, size_t len = 0, bool swap_endianess = false );
 
 	bool good();
 	void release();
