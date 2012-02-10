@@ -19,8 +19,7 @@ Package: libisis-core0
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Recommends: libisis-ioplugins-common
-Suggests: libisis-ioplugins-dicom 
+Recommends: libisis-ioplugins-common, libisis-ioplugins-dicom
 Description: I/O framework for neuroimaging data
  This framework aids access of and conversion between various established
  neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
