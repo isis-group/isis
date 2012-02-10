@@ -24,7 +24,7 @@ size_t WriteOp::getDataSize()
 	size_t bitsize = getVolume() * m_bpv;
 
 	if( bitsize % 8 )
-		bitsize += 1;
+		bitsize += 8;
 
 	return bitsize / 8;
 }
