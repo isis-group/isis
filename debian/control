@@ -46,7 +46,7 @@ Description: data format plugins for the ISIS framework
 Package: libisis-ioplugins-dicom
 Section: science
 Architecture: any
-Depends: libisis-core0 (= ${binary:Version}), dcmtk, ${shlibs:Depends}, ${misc:Depends}
+Depends: libisis-core0 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: dicom io plugin for the ISIS framework
  This framework aids access of and conversion between various established
  neuro-imaging data formats, like  Nifti, Analyze, DICOM and VISTA. ISIS
