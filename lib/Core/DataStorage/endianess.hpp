@@ -21,7 +21,7 @@ template<uint_fast8_t SIZE> struct SwapImpl {
 		const uint8_t *srcPtr = reinterpret_cast<const uint8_t *>( &src );
 
 		for ( uint_fast8_t i = 0; i < SIZE; i++ )
-			retPtr[i] =  srcPtr[SIZE-1-i];
+			retPtr[i] =  srcPtr[SIZE - 1 - i];
 
 		return ret;
 	}
