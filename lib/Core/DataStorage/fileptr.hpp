@@ -11,6 +11,7 @@
 
 #define BOOST_FILESYSTEM_VERSION 2 //@todo remove as soon as we switch to boost 1.42
 #include <boost/filesystem.hpp>
+#include <boost/detail/endian.hpp>
 #include "typeptr.hpp"
 #include "endianess.hpp"
 
