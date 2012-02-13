@@ -272,7 +272,6 @@ void Chunk::swapAlong( const dimensions dim ) const
 {
 	const size_t elSize = bytesPerVoxel();
 	const util::vector4<size_t> whole_size = getSizeAsVector();
-	const util::vector4<size_t> outer_size = whole_size;
 
 	boost::shared_ptr<uint8_t> swap_ptr = boost::shared_static_cast<uint8_t>( get()->getRawAddress() );
 	uint8_t *swap_start = swap_ptr.get();

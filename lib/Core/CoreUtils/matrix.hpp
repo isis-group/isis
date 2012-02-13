@@ -17,10 +17,14 @@
 */
 
 
-#ifndef MATRIX_HPP
-#define MATRIX_HPP
+#ifndef ISIS_MATRIX_HPP
+#define ISIS_MATRIX_HPP
 
 #include "vector.hpp"
+
+#include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/lu.hpp>
+#include <iomanip>
 
 
 namespace isis
@@ -51,9 +55,35 @@ public:
 	template<typename TYPE2, typename CONTAINER2>
 	FixedMatrix( const FixedVector<TYPE2, COLS, CONTAINER2> src[ROWS] ) {copyFrom( src );}
 
+	FixedMatrix( const boost::numeric::ublas::matrix<TYPE> &boost_matrix ) throw ( std::logic_error & ) {
+		if( boost_matrix.size1() == ROWS && boost_matrix.size2() == COLS ) {
+			for( size_t m = 0; m < ROWS; m++ ) {
+				for( size_t n = 0; n < COLS; n++ ) {
+					this->elem( n, m ) = boost_matrix( m, n );
+				}
+			}
+		} else {
+			LOG( Runtime, error ) << "The size of the boost matrix ("
+								  << boost_matrix.size1() << ", " << boost_matrix.size2()
+								  << ") does not coincide with the size of the isis matrix (" << ROWS << ", " << COLS << ").";
+			throw( std::logic_error( "Size mismatch" ) );
+		}
+	};
 
 	TYPE &elem( size_t column, size_t row ) {return ( *this )[column + row * COLS];}
 	const TYPE &elem( size_t column, size_t row )const {return ( *this )[column + row * COLS];}
+
+	boost::numeric::ublas::matrix<TYPE> getBoostMatrix() const {
+		boost::numeric::ublas::matrix<TYPE> ret = boost::numeric::ublas::matrix<TYPE>( ROWS, COLS );
+
+		for( size_t m = 0; m < ROWS; m++ ) {
+			for( size_t n = 0; n < COLS; n++ ) {
+				ret( m, n ) = this->elem( n, m );
+			}
+		}
+
+		return ret;
+	}
 
 	FixedMatrix<TYPE, ROWS, COLS> transpose()const {
 		FixedMatrix<TYPE, ROWS, COLS> ret;
@@ -65,6 +95,31 @@ public:
 
 		return ret;
 	}
+
+	FixedMatrix<TYPE, COLS, ROWS> inverse( bool &invertible )const throw ( std::logic_error & ) {
+		if( COLS != ROWS ) {
+			LOG( Runtime, error ) << "Matrix is not a square matrix so is not invertible!";
+			throw( std::logic_error( "Matrix is not a square matrix so is not invertible!" ) );
+		}
+
+		using namespace boost::numeric::ublas;
+		FixedMatrix<TYPE, COLS, ROWS> ret;
+		matrix<TYPE> boost_matrix_in = this->getBoostMatrix();
+		matrix<TYPE> boost_matrix_inverse = matrix<TYPE>( ROWS, COLS );
+		permutation_matrix<TYPE> pm( boost_matrix_in.size1() );
+		//check if det is 0 -> singular
+		invertible = lu_factorize( boost_matrix_in, pm ) == 0;
+
+		if( invertible ) {
+			boost_matrix_inverse.assign( identity_matrix<TYPE>( boost_matrix_in.size1() ) ) ;
+			lu_substitute( boost_matrix_in, pm, boost_matrix_inverse );
+			return FixedMatrix<TYPE, COLS, ROWS>( boost_matrix_inverse );
+		} else {
+			LOG( Runtime, error ) << "Matrix is singular. Returning initial matrix.";
+			return *this;
+		}
+	}
+
 	template<typename TYPE2, size_t COLS2, typename CONTAINER2> FixedMatrix<TYPE2, COLS2, ROWS, CONTAINER2>
 	dot( const FixedMatrix<TYPE2, COLS2, COLS, CONTAINER2> &right )const {
 		// transpose the right, so we can use columns as rows
@@ -83,6 +138,7 @@ public:
 
 		return ret;
 	}
+
 
 	template<typename TYPE2, typename CONTAINER2> FixedVector<TYPE2, COLS, CONTAINER2>
 	dot( const FixedVector<TYPE2, COLS, CONTAINER2> &right )const {
@@ -104,6 +160,25 @@ public:
 		const typename FixedVector<TYPE, ROWS *COLS, CONTAINER>::const_iterator end = start + COLS;
 		ret.copyFrom( start, end );
 		return ret;
+	}
+
+
+};
+
+template<typename TYPE, size_t ELEMS>
+class IdentityMatrix : public FixedMatrix<TYPE, ELEMS, ELEMS>
+{
+public:
+	IdentityMatrix( TYPE value = 1 ) {
+		for( size_t m = 0; m < ELEMS; m++ ) {
+			for( size_t n = 0; n < ELEMS; n++ ) {
+				if( m == n ) {
+					this->elem( n, m ) = static_cast<TYPE>( value );
+				} else {
+					this->elem( n, m ) = static_cast<TYPE>( 0 );
+				}
+			}
+		}
 	}
 };
 
@@ -127,6 +202,29 @@ public:
 
 }
 }
+/// Streaming output for FixedMatrix
+namespace std
+{
 
+template<typename charT, typename traits, typename TYPE, size_t COLS, size_t ROWS, typename CONTAINER > basic_ostream<charT, traits>&
+operator<<( basic_ostream<charT, traits> &out, const ::isis::util::FixedMatrix<TYPE, COLS, ROWS, CONTAINER>& m )
+{
+	out << "FixedMatrix of size (" << m.columns << " columns, " << m.rows << " rows):" << std::endl;
 
-#endif // MATRIX_HPP
+	for( size_t row = 0; row < ROWS; row++ ) {
+		out << "<";
+
+		for( size_t col = 0; col < COLS; col++ ) {
+			out << m.elem( col, row );
+
+			if( col < COLS - 1 ) out << "\t";
+		}
+
+		out << ">" << std::endl;
+	}
+
+	return out;
+}
+}
+
+#endif // ISIS_MATRIX_HPP
