@@ -203,26 +203,26 @@ public:
 		if( image.getRelevantDims() < 2 ) { // ... make sure its made of slices
 			throwGenericError( "Cannot write png when image is made of stripes" );
 		}
-	
+
 		png_byte color_type, bit_depth; ;
 
 		switch( isis_data_type ) {
 		case data::ValuePtr< int8_t>::staticID: // if its signed, fall "back" to unsigned
 		case data::ValuePtr<uint8_t>::staticID:
-			tImg.convertToType(data::ValuePtr<uint8_t>::staticID);// make sure whole image has same type   (u8bit)
+			tImg.convertToType( data::ValuePtr<uint8_t>::staticID ); // make sure whole image has same type   (u8bit)
 			color_type = PNG_COLOR_TYPE_GRAY;
 			bit_depth = 8;
 		case data::ValuePtr< int16_t>::staticID: // if its signed, fall "back" to unsigned
 		case data::ValuePtr<uint16_t>::staticID:
-			tImg.convertToType(data::ValuePtr<uint16_t>::staticID);// make sure whole image has same type (u16bit)
+			tImg.convertToType( data::ValuePtr<uint16_t>::staticID ); // make sure whole image has same type (u16bit)
 			color_type = PNG_COLOR_TYPE_GRAY;
 			bit_depth = 16;
 			break;
 		case data::ValuePtr<util::color24>::staticID:
 		case data::ValuePtr<util::color48>::staticID:
-			tImg.convertToType(isis_data_type); // make sure whole image hase same type (color24 or color48)
+			tImg.convertToType( isis_data_type ); // make sure whole image hase same type (color24 or color48)
 			color_type = PNG_COLOR_TYPE_RGB;
-			bit_depth = ( png_byte )tImg.getChunk(0,0).bytesPerVoxel() * 8 / 3;
+			bit_depth = ( png_byte )tImg.getChunk( 0, 0 ).bytesPerVoxel() * 8 / 3;
 			break;
 		default:
 			LOG( Runtime, error ) << "Sorry, writing images of type " << image.getMajorTypeName() << " is not supportet";

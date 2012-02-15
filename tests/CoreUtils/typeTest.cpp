@@ -84,12 +84,12 @@ BOOST_AUTO_TEST_CASE( type_toString_test )
 	Value<int32_t> tInt( 42 );
 	Value<float> tFloat( 3.1415 );
 	Value<std::string> tString( std::string( "Hello World" ) );
-	Value<boost::posix_time::ptime> tTime=boost::posix_time::time_from_string("2002-Jan-20 23:59:59");
-	
+	Value<boost::posix_time::ptime> tTime = boost::posix_time::time_from_string( "2002-Jan-20 23:59:59" );
+
 	BOOST_CHECK_EQUAL( tInt.toString(), "42" );
 	BOOST_CHECK_EQUAL( tFloat.toString(), "3.1415" );
 	BOOST_CHECK_EQUAL( tString.toString(), "Hello World" );
-	BOOST_CHECK_EQUAL( tTime.toString(), "2002-Jan-20 23:59:59");
+	BOOST_CHECK_EQUAL( tTime.toString(), "2002-Jan-20 23:59:59" );
 }
 
 // TestCase is()
@@ -186,19 +186,19 @@ BOOST_AUTO_TEST_CASE( complex_conversion_test )
 BOOST_AUTO_TEST_CASE( from_string_conversion_test )
 {
 	// convert a string into a list of strings
-	const char *sentence[]={"This", "is", "a", "sentence"};
-	Value<std::string> sSentence("This is a sentence");
-	BOOST_CHECK_EQUAL(sSentence.as<util::slist>(),std::list<std::string>(sentence,sentence+4));
+	const char *sentence[] = {"This", "is", "a", "sentence"};
+	Value<std::string> sSentence( "This is a sentence" );
+	BOOST_CHECK_EQUAL( sSentence.as<util::slist>(), std::list<std::string>( sentence, sentence + 4 ) );
 
 	// convert a string into a list of numbers (pick the numbers, ignore the rest)
-	const int inumbers[]={1, 2, 3, 4, 5};
-	const double dnumbers[]={1, 2, 3, 4.4, 4.6};
-	Value<std::string> sNumbers("1, 2, 3 and 4.4 or maybe 4.6"); 
-	BOOST_CHECK_EQUAL(sNumbers.as<util::ilist>(),std::list<int>(inumbers,inumbers+5));// 4.4 and 4.6 will be rounded
-	BOOST_CHECK_EQUAL(sNumbers.as<util::dlist>(),std::list<double>(dnumbers,dnumbers+5));
+	const int inumbers[] = {1, 2, 3, 4, 5};
+	const double dnumbers[] = {1, 2, 3, 4.4, 4.6};
+	Value<std::string> sNumbers( "1, 2, 3 and 4.4 or maybe 4.6" );
+	BOOST_CHECK_EQUAL( sNumbers.as<util::ilist>(), std::list<int>( inumbers, inumbers + 5 ) ); // 4.4 and 4.6 will be rounded
+	BOOST_CHECK_EQUAL( sNumbers.as<util::dlist>(), std::list<double>( dnumbers, dnumbers + 5 ) );
 
-	BOOST_CHECK_EQUAL(util::Value<std::string>("<1|2|3>").as<util::fvector4>(),util::fvector4(1,2,3));//should also work for fvector
-	BOOST_CHECK_EQUAL(util::Value<std::string>("<1|2|3|4|5>").as<util::fvector4>(),util::fvector4(1,2,3,4));//elements behind end are ignored
+	BOOST_CHECK_EQUAL( util::Value<std::string>( "<1|2|3>" ).as<util::fvector4>(), util::fvector4( 1, 2, 3 ) ); //should also work for fvector
+	BOOST_CHECK_EQUAL( util::Value<std::string>( "<1|2|3|4|5>" ).as<util::fvector4>(), util::fvector4( 1, 2, 3, 4 ) ); //elements behind end are ignored
 }
 
 }

@@ -116,7 +116,7 @@ public:
 					<< " is out of range (" << getSizeAsString() << ")";
 		}
 
-		const ValuePtr<TYPE> &ret = const_cast<Chunk&>(*this).asValuePtr<TYPE>();
+		const ValuePtr<TYPE> &ret = const_cast<Chunk &>( *this ).asValuePtr<TYPE>();
 
 		return ret[getLinearIndex( idx )];
 	}
