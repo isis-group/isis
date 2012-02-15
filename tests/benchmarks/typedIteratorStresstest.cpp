@@ -3,7 +3,7 @@
 
 using namespace isis;
 
-template<typename T> data::MemChunk<T> makeChunk( size_t size, size_t slice )
+template<typename T> data::MemChunk<T> makeChunk( size_t size, short slice )
 {
 	data::MemChunk<T> ret( size, size );
 	ret.setPropertyAs( "rowVec", util::fvector4( 1, 0 ) );
@@ -20,10 +20,10 @@ int main()
 	{
 		std::cout << "===============Testing Image==================" << std::endl;
 		std::list<data::Chunk> chunks;
-		const size_t slices = 256;
+		const short slices = 256;
 		timer.restart();
 
-		for ( size_t slice = 0; slice < slices; slice++ ) {
+		for ( short slice = 0; slice < slices; slice++ ) {
 			chunks.push_back( makeChunk<short>( 256, slice ) );
 			chunks.back().setPropertyAs( "acquisitionNumber", slice );
 		}

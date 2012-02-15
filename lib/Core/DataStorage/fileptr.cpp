@@ -31,7 +31,7 @@ namespace data
 
 void FilePtr::Closer::operator()( void *p )
 {
-	LOG( Debug, info ) << "Unmapping and closing " << util::MSubject( filename.file_string() );
+	LOG( Debug, info ) << "Unmapping and closing " << util::MSubject( filename.file_string() ) << " it was mapped at " << p;
 
 	bool unmapped = false;
 #ifdef WIN32
@@ -106,6 +106,7 @@ bool FilePtr::map( FILE_HANDLE file, size_t len, bool write, const boost::filesy
 		return false;
 	} else {
 		const Closer cl = {file, mmaph, len, filename, write};
+		writing = write;
 		static_cast<ValuePtr<uint8_t>&>( *this ) = ValuePtr<uint8_t>( static_cast<uint8_t * const>( ptr ), len, cl );
 		return true;
 	}
@@ -193,8 +194,10 @@ FilePtr::FilePtr( const boost::filesystem::path &filename, size_t len, bool writ
 
 	const size_t map_size = checkSize( write, file, filename, len ); // get the mapping size
 
-	if( map_size )
+	if( map_size ) {
 		m_good = map( file, map_size, write, filename ); //and do the mapping
+		LOG( Debug, info ) << "Mapped " << map_size << " bytes of " << util::MSubject( filename.file_string() ) << " at " << getRawAddress().get();
+	}
 
 	// from here on the pointer will be set if mapping succeded
 }
@@ -207,7 +210,7 @@ void FilePtr::release()
 	m_good = false;
 }
 
-ValuePtrReference FilePtr::atByID( short unsigned int ID, size_t offset, size_t len )
+ValuePtrReference FilePtr::atByID( short unsigned int ID, size_t offset, size_t len, bool swap_endianess )
 {
 	LOG_IF( static_cast<boost::shared_ptr<uint8_t>&>( *this ).get() == 0, Debug, error )
 			<< "There is no mapped data for this FilePtr - I'm very likely gonna crash soon ..";
@@ -215,7 +218,7 @@ ValuePtrReference FilePtr::atByID( short unsigned int ID, size_t offset, size_t 
 	assert( !map.empty() );
 	const generator_type gen = map[ID];
 	assert( gen );
-	return gen( *this, offset, len );
+	return gen( *this, offset, len, swap_endianess );
 }
 
 

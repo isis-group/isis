@@ -1,7 +1,6 @@
 #include <DataStorage/fileptr.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
-#include <boost/type_traits/make_signed.hpp>
 #include "imageFormat_nifti_sa.hpp"
 #include <errno.h>
 
@@ -20,7 +19,15 @@ WriteOp::WriteOp( const data::Image &image, size_t bitsPerVoxel, bool doFlip ): 
 		flip_dim = dummy.mapScannerAxisToImageDimension( data::z );
 	}
 }
-size_t WriteOp::getDataSize() {return getVolume() * m_bpv / 8;}
+size_t WriteOp::getDataSize()
+{
+	size_t bitsize = getVolume() * m_bpv;
+
+	if( bitsize % 8 )
+		bitsize += 8;
+
+	return bitsize / 8;
+}
 
 bool WriteOp::setOutput( const std::string &filename, size_t voxelstart )
 {
@@ -36,6 +43,10 @@ bool WriteOp::setOutput( const std::string &filename, size_t voxelstart )
 		getSizeAsVector().copyTo( header->dim + 1 );
 		std::fill( header->dim + 5, header->dim + 8, 1 );
 
+		//some nifti readers expect analyze fields, but for now we disable this
+		/*header->extents=16*1024;
+		header->regular='r';
+		memcpy(header->data_type,"dsr        ",10);*/
 		header->sizeof_hdr = 348; // must be 348
 		header->vox_offset = m_voxelstart;
 		header->bitpix = m_bpv;
@@ -55,6 +66,16 @@ bool WriteOp::operator()( data::Chunk &ch, util::vector4<size_t> posInImage )
 		return true;
 	}
 }
+void WriteOp::applyFlip ( isis::data::ValuePtrReference dat, isis::util::vector4< size_t > chunkSize )
+{
+	if( m_doFlip ) {
+		// wrap the copied part back into a Chunk to flip it
+		data::Chunk cp( dat, chunkSize[data::rowDim], chunkSize[data::columnDim], chunkSize[data::sliceDim], chunkSize[data::timeDim] ); // this is a cheap copy
+		cp.swapAlong( flip_dim ); // .. so changing its data, will also change the data we just copied
+	}
+}
+
+
 class CommonWriteOp: public WriteOp
 {
 	const unsigned short m_targetId;
@@ -68,14 +89,7 @@ public:
 		size_t offset = m_voxelstart + getLinearIndex( posInImage ) * m_bpv / 8;
 		data::ValuePtrReference out_data = m_out.atByID( m_targetId, offset, ch.getVolume() );
 		ch.asValuePtrBase().copyTo( *out_data, m_scale );
-
-		if( m_doFlip ) {
-			// wrap the copied part back into a Chunk to flip it
-			util::vector4<size_t> sz = ch.getSizeAsVector();
-			data::Chunk cp( out_data, sz[data::rowDim], sz[data::columnDim], sz[data::sliceDim], sz[data::timeDim] ); // this is a cheap copy
-			cp.swapAlong( flip_dim ); // .. so changing its data, will also change the data we just copied
-		}
-
+		applyFlip( out_data, ch.getSizeAsVector() );
 		return true;
 	}
 
@@ -121,7 +135,7 @@ public:
 		VoxelCp cp;
 		assert( posInImage[data::timeDim] == 0 );
 
-		for( ; posInImage[data::timeDim] < 3; posInImage[data::timeDim]++ ) {
+		for( ; posInImage[data::timeDim] < 3; posInImage[data::timeDim]++ ) { //copy each color/timestep into m_out
 			const size_t offset = m_voxelstart + getLinearIndex( posInImage ) * m_bpv / 8;
 			data::ValuePtr<uint8_t> out_data = m_out.at<uint8_t>( offset, ch.getVolume() );
 			cp.ptr = &out_data[0];
@@ -134,6 +148,33 @@ public:
 	}
 
 	short unsigned int getTypeId() {return data::ValuePtr<uint8_t>::staticID;}
+};
+
+class BitWriteOp: public WriteOp
+{
+public:
+	BitWriteOp( const data::Image &image ): WriteOp( image, 1 ) {}
+
+	bool doCopy( data::Chunk &src, util::vector4<size_t> posInImage ) {
+		data::ValuePtr<bool> in_data = src.asValuePtrBase().as<bool>();
+		const size_t offset = m_voxelstart + getLinearIndex( posInImage ) * m_bpv ;
+
+		data::ValuePtr<uint8_t> out_data = m_out.at<uint8_t>( offset, in_data.getLength() / 8 );
+		memset( &out_data[0], 0, out_data.getLength() );
+
+		for( size_t i = 0; i < in_data.getLength(); i++ ) {
+			const size_t byte = i / 8;
+			const uint8_t mask = 128 >> ( i % 8 );
+
+			if( in_data[i] ) {
+				out_data[byte] |= mask;
+			}
+		}
+
+		return true;
+	}
+
+	short unsigned int getTypeId() {return data::ValuePtr<bool>::staticID;}
 };
 
 
@@ -158,6 +199,8 @@ ImageFormat_NiftiSa::ImageFormat_NiftiSa()
 
 	nifti_type2isis_type[NIFTI_TYPE_COMPLEX64] = data::ValuePtr<std::complex<float> >::staticID;
 	nifti_type2isis_type[NIFTI_TYPE_COMPLEX128] = data::ValuePtr<std::complex<double> >::staticID;
+
+	nifti_type2isis_type[NIFTI_TYPE_BINARY] = data::ValuePtr<bool>::staticID;
 
 	typedef std::map<short, unsigned short>::const_reference ref_type;
 	BOOST_FOREACH( ref_type ref, nifti_type2isis_type ) {
@@ -330,15 +373,15 @@ bool ImageFormat_NiftiSa::parseDescripForSPM( isis::util::PropertyMap &props, co
 		const util::Value<uint8_t> hours = boost::lexical_cast<uint8_t>( results.str( 7 ) ), minutes = boost::lexical_cast<uint8_t>( results.str( 8 ) ), seconds = boost::lexical_cast<uint8_t>( results.str( 9 ) );
 
 		boost::posix_time::ptime sequenceStart = boost::posix_time::ptime(
-					boost::gregorian::date( ( int )year, ( int )month, ( int )day ),
-					boost::posix_time::time_duration( hours, minutes, seconds )
-				);
+			boost::gregorian::date( ( int )year, ( int )month, ( int )day ),
+			boost::posix_time::time_duration( hours, minutes, seconds )
+		);
 		props.setPropertyAs<boost::posix_time::ptime>( "sequenceStart", sequenceStart );
 
 		LOG( Runtime, info )
 				<< "Using Tr=" << props.propertyValue( "repetitionTime" ) << ", Te=" << props.propertyValue( "echoTime" )
-				<< ", flipAngle=" << props.propertyValue( "flipAngle" ) << " and sequenceStart=" << props.propertyValue( "sequenceStart" )
-				<< " from SPM8 description.";
+		<< ", flipAngle=" << props.propertyValue( "flipAngle" ) << " and sequenceStart=" << props.propertyValue( "sequenceStart" )
+		<< " from SPM8 description.";
 
 		return true;
 	} else
@@ -383,7 +426,7 @@ void ImageFormat_NiftiSa::storeHeader( const util::PropertyMap &props, _internal
 		head->qform_code = props.getPropertyAs<util::Selection>( "nifti/qform_code" );
 
 		if( props.hasProperty( "nifti/quatern_b" ) && props.hasProperty( "nifti/quatern_c" ) && props.hasProperty( "nifti/quatern_d" ) &&
-			props.hasProperty( "nifti/qoffset" ) && props.hasProperty( "nifti/qfac" )
+		props.hasProperty( "nifti/qoffset" ) && props.hasProperty( "nifti/qfac" )
 		  ) {
 			const util::fvector4 offset = props.getPropertyAs<util::fvector4>( "nifti/qoffset" );
 			head->quatern_b = props.getPropertyAs<float>( "nifti/quatern_b" );
@@ -489,6 +532,83 @@ std::list< data::Chunk > ImageFormat_NiftiSa::parseHeader( const isis::image_io:
 
 std::string ImageFormat_NiftiSa::getName()const {return "Nifti standalone";}
 
+isis::data::ValuePtr< bool > ImageFormat_NiftiSa::bitRead( data::ValuePtr< uint8_t > src, size_t size )
+{
+	assert( size );
+
+	if( src.getLength() * 8 < size ) {
+		std::string err( "unexpected end of file (missing " );
+		err += boost::lexical_cast<std::string>( size - src.getLength() * 8 ) + " bytes)";
+		throwGenericError( err );
+	}
+
+	isis::data::ValuePtr< bool > ret( size );
+
+	for( size_t i = 0; i < size; i++ ) {
+		const size_t byte = i / 8;
+		const uint8_t mask = 128 >> ( i % 8 );
+		ret[i] = mask & src[byte];
+	}
+
+	return ret;
+}
+
+bool ImageFormat_NiftiSa::checkSwapEndian ( _internal::nifti_1_header *header )
+{
+#define DO_SWAP(VAR) VAR=data::endianSwap(VAR)
+#define DO_SWAPA(VAR,SIZE) data::endianSwapArray(VAR,VAR+SIZE,VAR);
+
+	if( data::endianSwap( header->sizeof_hdr ) == 348 ) { // ok we have to swap the endianess
+		DO_SWAP( header->sizeof_hdr );
+		DO_SWAP( header->extents );
+		DO_SWAP( header->session_error );
+
+		DO_SWAP( header->intent_p1 );
+		DO_SWAP( header->intent_p2 );
+		DO_SWAP( header->intent_p3 );
+
+		DO_SWAP( header->intent_code );
+		DO_SWAP( header->datatype );
+		DO_SWAP( header->bitpix );
+		DO_SWAP( header->slice_start );
+
+		DO_SWAP( header->vox_offset );
+		DO_SWAP( header->scl_slope );
+		DO_SWAP( header->scl_inter );
+		DO_SWAP( header->slice_end );
+
+		DO_SWAP( header->cal_max );
+		DO_SWAP( header->cal_min );
+		DO_SWAP( header->slice_duration );
+		DO_SWAP( header->toffset );
+		DO_SWAP( header->glmax );
+		DO_SWAP( header->glmin );
+
+		DO_SWAP( header->qform_code );
+		DO_SWAP( header->sform_code );
+
+		DO_SWAP( header->quatern_b );
+		DO_SWAP( header->quatern_c );
+		DO_SWAP( header->quatern_d );
+		DO_SWAP( header->qoffset_x );
+		DO_SWAP( header->qoffset_y );
+		DO_SWAP( header->qoffset_z );
+
+		DO_SWAPA( header->dim, 8 );
+		DO_SWAPA( header->pixdim, 8 );
+		DO_SWAPA( header->srow_x, 4 );
+		DO_SWAPA( header->srow_y, 4 );
+		DO_SWAPA( header->srow_z, 4 );
+
+		return true;
+	} else
+		return false;
+
+#undef DO_SWAP
+#undef DO_SWAPA
+}
+
+
 int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::string &filename, const std::string &dialect )  throw( std::runtime_error & )
 {
 	data::FilePtr mfile( filename );
@@ -502,10 +622,26 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 	}
 
 	//get the header - we use it directly from the file
-	const _internal::nifti_1_header *header = reinterpret_cast<const _internal::nifti_1_header *>( &mfile[0] );
+	_internal::nifti_1_header *header = reinterpret_cast<_internal::nifti_1_header *>( &mfile[0] );
+	const bool swap_endian = checkSwapEndian( header );
 
 	if( header->intent_code != 0 ) {
 		throwGenericError( std::string( "only intent_code==0 is supportet" ) );
+	}
+
+	if( header->sizeof_hdr < 348 ) {
+		LOG( Runtime, warning ) << "sizeof_hdr of the file (" << header->vox_offset << ") is invalid, assuming 348";
+		header->sizeof_hdr = 348;
+	}
+
+	if( header->vox_offset < 352 ) {
+		LOG( Runtime, warning ) << "vox_offset of the file (" << header->vox_offset << ") is invalid, assuming 352";
+		header->vox_offset = 352;
+	}
+
+	if( header->slice_duration < 0 ) {
+		LOG( Runtime, warning ) << "ignoring invalid slice duration (" << header->slice_duration << ")";
+		header->slice_duration = 0;
 	}
 
 	//set up the size - copy dim[0] values from dim[1]..dim[dim[0]]
@@ -515,11 +651,14 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 	size.copyFrom( header->dim + 1, header->dim + 1 + header->dim[0] );
 	data::ValuePtrReference data_src;
 
-	if( util::istring( "fsl" ) == dialect.c_str() && header->datatype == NIFTI_TYPE_UINT8 && size[data::timeDim] == 3 ) { //if its fsl-three-volume-color copy the volumes
+	if( header->datatype == NIFTI_TYPE_BINARY ) { // image is binary encoded - needs special decoding
+		data_src = bitRead( mfile.at<uint8_t>( header->vox_offset ), size.product() );
+	} else if( util::istring( "fsl" ) == dialect.c_str() && header->datatype == NIFTI_TYPE_UINT8 && size[data::timeDim] == 3 ) { //if its fsl-three-volume-color copy the volumes
 		LOG( Runtime, notice ) << "The image has 3 timesteps and its type is UINT8, assuming it is an fsl color image.";
 		const size_t volume = size.product() / 3;
 		data::ValuePtr<util::color24> buff( volume );
-		const data::ValuePtr<uint8_t> src = mfile.at<uint8_t>( header->vox_offset );
+		const data::ValuePtr<uint8_t> src = mfile.at<uint8_t>( header->vox_offset, volume * 3 );
+		LOG( Runtime, info ) << "Mapping nifti image as FSL RBG set of 3*" << volume << " elements";
 
 		for( size_t v = 0; v < volume; v++ ) {
 			buff[v].r = src[v];
@@ -529,12 +668,36 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 
 		data_src = buff;
 		size[data::timeDim] = 1;
+	} else if( util::istring( "fsl" ) == dialect.c_str() && header->datatype == NIFTI_TYPE_FLOAT32 && size[data::timeDim] == 3 ) { //if its fsl-three-volume-vector copy the volumes
+		LOG( Runtime, notice ) << "The image has 3 timesteps and its type is FLOAT32, assuming it is an fsl vector image.";
+		const size_t volume = size.product() / 3;
+		data::ValuePtr<util::fvector4> buff( volume );
+		const data::ValuePtr<float> src = mfile.at<float>( header->vox_offset, size.product(), swap_endian );
+
+		for( size_t v = 0; v < volume; v++ ) {
+			buff[v][0] = src[v];
+			buff[v][1] = src[v + volume];
+			buff[v][2] = src[v + volume * 2];
+		}
+
+		data_src = buff;
+		size[data::timeDim] = 1;
 	} else {
 		unsigned int type = nifti_type2isis_type[header->datatype];
 
 		if( type ) {
-			data_src = mfile.atByID( type, header->vox_offset );
-			LOG( Runtime, info ) << "Mapping nifti image as " << data_src->getTypeName() << " of length " << data_src->getLength();
+			data_src = mfile.atByID( type, header->vox_offset, size.product(), swap_endian );
+
+			if( swap_endian ) {
+				LOG( Runtime, info )
+						<< "Opened nifti image as endianess swapped " << data_src->getTypeName() << " of " << data_src->getLength()
+				<< " elements (" << data_src->bytesPerElem()*data_src->getLength() << ")";
+			} else {
+				LOG( Runtime, info )
+						<< "Mapped nifti image natively as " << data_src->getTypeName() << " of " << data_src->getLength()
+				<< " elements (" << data_src->bytesPerElem()*data_src->getLength() << ")";
+			}
+
 			LOG_IF( ( size_t )header->bitpix != data_src->bytesPerElem() * 8, Runtime, warning )
 					<< "nifti field bitpix does not fit the bytesize of the given datatype (" << data_src->getTypeName() << "/" << header->bitpix <<  ")";
 
@@ -552,16 +715,25 @@ int ImageFormat_NiftiSa::load ( std::list<data::Chunk> &chunks, const std::strin
 std::auto_ptr< _internal::WriteOp > ImageFormat_NiftiSa::getWriteOp( const isis::data::Image &src, isis::util::istring dialect )
 {
 	const size_t bpv = src.getBytesPerVoxel() * 8;
-	const unsigned short target_id = src.getMajorTypeID();
+	unsigned short target_id = src.getMajorTypeID(); //default to major type of the image
+
+	//bitmap is not supportet by spm and fsl
+	if( target_id == data::ValuePtr<bool>::staticID ) {
+		if( dialect == "fsl" || dialect == "spm" ) {
+			target_id = typeFallBack<bool, uint8_t>( dialect.c_str() );// fall back to uint8_t and use normal writer for that
+		} else {
+			return std::auto_ptr<_internal::WriteOp>( new _internal::BitWriteOp( src ) ); // use special writer for bit
+		}
+	}
 
 	// fsl cannot deal with some types
 	if( dialect == "fsl" ) {
 		switch( target_id ) {
 		case data::ValuePtr<uint16_t>::staticID:
-			return std::auto_ptr<_internal::WriteOp>( new _internal::CommonWriteOp( src, typeFallBack<uint16_t>(), bpv, false ) );
+			target_id = typeFallBack<uint16_t, int16_t>( "fsl" );
 			break;
 		case data::ValuePtr<uint32_t>::staticID:
-			return std::auto_ptr<_internal::WriteOp>( new _internal::CommonWriteOp( src, typeFallBack<uint32_t>(), bpv, false ) );
+			target_id = typeFallBack<uint32_t, int32_t>( "fsl" );
 			break;
 		case data::ValuePtr<util::color24>::staticID:
 
@@ -577,7 +749,8 @@ std::auto_ptr< _internal::WriteOp > ImageFormat_NiftiSa::getWriteOp( const isis:
 		}
 	}
 
-	return std::auto_ptr<_internal::WriteOp>( new _internal::CommonWriteOp( src, target_id, bpv, ( dialect == "spm" ) ) ); // default case (no fsl dialect or type can be used directly)
+	// generic case (use generic scalar writer for the target_id)
+	return std::auto_ptr<_internal::WriteOp>( new _internal::CommonWriteOp( src, target_id, bpv, ( dialect == "spm" ) ) );
 }
 
 
@@ -585,9 +758,9 @@ void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &fi
 {
 	const size_t voxel_offset = 352; // must be >=352 (and multiple of 16)  (http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/vox_offset.html)
 	std::auto_ptr< _internal::WriteOp > writer = getWriteOp( image, dialect.c_str() ); // get a fitting writer for the datatype
-	const unsigned int target_id = isis_type2nifti_type[writer->getTypeId()]; // get the nifti datatype corresponding to our datatype
+	const unsigned int nifti_id = isis_type2nifti_type[writer->getTypeId()]; // get the nifti datatype corresponding to our datatype
 
-	if( target_id ) { // there is a corresponding nifti datatype
+	if( nifti_id ) { // there is a corresponding nifti datatype
 
 		// open/map the new file
 		if( !writer->setOutput( filename, voxel_offset ) ) {
@@ -601,7 +774,7 @@ void ImageFormat_NiftiSa::write( const data::Image &image, const std::string &fi
 
 		// get the first 348 bytes as header
 		_internal::nifti_1_header *header = writer->getHeader();
-		header->datatype = target_id;
+		header->datatype = nifti_id;
 
 		guessSliceOrdering( image, header->slice_code, header->slice_duration );
 
@@ -653,11 +826,11 @@ util::Matrix4x4<double> ImageFormat_NiftiSa::getNiftiMatrix( const util::Propert
 	}
 
 	util::Matrix4x4<double> image2isis = util::Matrix4x4<double>(
-			mat_rows[data::rowDim] * scale[data::rowDim],
-			mat_rows[data::columnDim] * scale[data::columnDim],
-			mat_rows[data::sliceDim] * scale[data::sliceDim],
-			offset
-										 ).transpose();// the columns of the transform matrix are the scaled row-, column-, sliceVec and the offset
+		mat_rows[data::rowDim] * scale[data::rowDim],
+		mat_rows[data::columnDim] * scale[data::columnDim],
+		mat_rows[data::sliceDim] * scale[data::sliceDim],
+		offset
+	).transpose();// the columns of the transform matrix are the scaled row-, column-, sliceVec and the offset
 	image2isis.elem( 3, 3 ) = 1; // element 4/4 must be "1"
 
 	return nifti2isis.transpose().dot( image2isis ); // apply inverse transform from nifti to isis => return transformation from image to nifti space
@@ -671,10 +844,10 @@ void ImageFormat_NiftiSa::useSForm( util::PropertyMap &props )
 	// [z] [ nifti/srow_z ]   [k]
 
 	LOG( Debug, info ) << "Using sform (" << props.propertyValue( "nifti/sform_code" ).toString() << ") " << util::MSubject(
-						   props.propertyValue( "nifti/srow_x" ).toString() + "-" +
-						   props.propertyValue( "nifti/srow_y" ).toString() + "-" +
-						   props.propertyValue( "nifti/srow_z" ).toString()
-					   ) << " to calc orientation";
+		props.propertyValue( "nifti/srow_x" ).toString() + "-" +
+		props.propertyValue( "nifti/srow_y" ).toString() + "-" +
+		props.propertyValue( "nifti/srow_z" ).toString()
+	) << " to calc orientation";
 
 
 	// transform from image space to nifti space
@@ -692,10 +865,10 @@ void ImageFormat_NiftiSa::useSForm( util::PropertyMap &props )
 
 	//remove offset from image2isis
 	image2isis = util::Matrix4x4<float>(
-					 util::fvector4( 1, 0, 0, -origin[0] ),
-					 util::fvector4( 0, 1, 0, -origin[1] ),
-					 util::fvector4( 0, 0, 1, -origin[2] )
-				 ).dot( image2isis );
+		util::fvector4( 1, 0, 0, -origin[0] ),
+		util::fvector4( 0, 1, 0, -origin[1] ),
+		util::fvector4( 0, 0, 1, -origin[2] )
+	).dot( image2isis );
 
 	const util::fvector4 voxelSize( // get voxel sizes by transforming othogonal vectors of one voxel from image to isis
 		image2isis.dot( util::fvector4( 1, 0, 0 ) ).len(),
@@ -708,10 +881,10 @@ void ImageFormat_NiftiSa::useSForm( util::PropertyMap &props )
 
 	//remove scaling from image2isis
 	image2isis = image2isis.dot( util::Matrix4x4<float>(
-									 util::fvector4( 1 / voxelSize[0], 0, 0 ),
-									 util::fvector4( 0, 1 / voxelSize[1], 0 ),
-									 util::fvector4( 0, 0, 1 / voxelSize[2] )
-								 ) );
+		util::fvector4( 1 / voxelSize[0], 0, 0 ),
+		util::fvector4( 0, 1 / voxelSize[1], 0 ),
+		util::fvector4( 0, 0, 1 / voxelSize[2] )
+	) );
 
 	props.setPropertyAs<util::fvector4>( "rowVec", image2isis.transpose().getRow( 0 ) );
 	props.setPropertyAs<util::fvector4>( "columnVec", image2isis.transpose().getRow( 1 ) );
@@ -719,8 +892,8 @@ void ImageFormat_NiftiSa::useSForm( util::PropertyMap &props )
 
 	LOG( Debug, info )
 			<< "Computed rowVec=" << props.getPropertyAs<util::fvector4>( "rowVec" ) << ", "
-			<< "columnVec=" << props.getPropertyAs<util::fvector4>( "columnVec" ) << " and "
-			<< "sliceVec=" << props.getPropertyAs<util::fvector4>( "sliceVec" ) << " from sform";
+	<< "columnVec=" << props.getPropertyAs<util::fvector4>( "columnVec" ) << " and "
+	<< "sliceVec=" << props.getPropertyAs<util::fvector4>( "sliceVec" ) << " from sform";
 
 	props.remove( "nifti/srow_x" );
 	props.remove( "nifti/srow_y" );
@@ -730,18 +903,29 @@ void ImageFormat_NiftiSa::useQForm( util::PropertyMap &props )
 {
 
 	// orientation //////////////////////////////////////////////////////////////////////////////////
+	//inspired by/stolen from nifticlib/nifti1_io.c:1466
 	//see http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/quatern.html
 	//and http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/qformExt.jpg
-	double b = props.getPropertyAs<double>( "nifti/quatern_b" );
-	double c = props.getPropertyAs<double>( "nifti/quatern_c" );
-	double d = props.getPropertyAs<double>( "nifti/quatern_d" );
-	double a = sqrt( 1.0 - ( b * b + c * c + d * d ) );
+	util::dvector4 quaternion(
+		0,//a
+		props.getPropertyAs<double>( "nifti/quatern_b" ),
+		props.getPropertyAs<double>( "nifti/quatern_c" ),
+		props.getPropertyAs<double>( "nifti/quatern_d" )
+	);
+
+	double &a = quaternion[0], &b = quaternion[1], &c = quaternion[2], &d = quaternion[3];
+
+	if( 1 - quaternion.sqlen() < 1.e-7 ) { //if the quaternion is to "long"
+		quaternion.norm();      //normalize it and leave the angle as 0
+	} else {
+		a = sqrt( 1 - quaternion.sqlen() );                 /* angle = 2*arccos(a) */
+	}
 
 	LOG( Debug, info )
 			<< "Using qform (" << props.propertyValue( "nifti/qform_code" ).toString()
-			<< ") quaternion=" << util::fvector4( a, b, c, d ) << " with qfac=" << props.propertyValue( "nifti/qfac" ).toString()
-			<< ", pixdim=" << props.propertyValue( "nifti/pixdim" ).toString()
-			<< " and qoffset= " << props.propertyValue( "nifti/qoffset" ).toString();
+	<< ") quaternion=" << util::fvector4( a, b, c, d ) << " with qfac=" << props.propertyValue( "nifti/qfac" ).toString()
+	<< ", pixdim=" << props.propertyValue( "nifti/pixdim" ).toString()
+	<< " and qoffset= " << props.propertyValue( "nifti/qoffset" ).toString();
 
 	const util::Matrix4x4<double> M(
 		util::fvector4( a * a + b * b - c * c - d * d, 2 * b * c - 2 * a * d, 2 * b * d + 2 * a * c ),
@@ -756,8 +940,8 @@ void ImageFormat_NiftiSa::useQForm( util::PropertyMap &props )
 
 	LOG( Debug, info )
 			<< "Computed rowVec=" << props.getPropertyAs<util::fvector4>( "rowVec" ) << ", "
-			<< "columnVec=" << props.getPropertyAs<util::fvector4>( "columnVec" ) << " and "
-			<< "sliceVec=" << props.getPropertyAs<util::fvector4>( "sliceVec" ) << " from qform";
+	<< "columnVec=" << props.getPropertyAs<util::fvector4>( "columnVec" ) << " and "
+	<< "sliceVec=" << props.getPropertyAs<util::fvector4>( "sliceVec" ) << " from qform";
 
 	props.remove( "nifti/quatern_b" );
 	props.remove( "nifti/quatern_c" );
@@ -789,8 +973,8 @@ bool ImageFormat_NiftiSa::storeQForm( const util::PropertyMap &props, _internal:
 
 	// compute the determinant to determine if the transformation is proper
 	const float determinant =
-		col[0][0] * col[1][1] * col[2][2] - col[0][0] * col[1][2] * col[2][1] - col[0][1] * col[1][0] * col[2][2] +
-		col[0][1] * col[1][2] * col[2][0] + col[0][2] * col[1][0] * col[2][1] - col[0][2] * col[1][1] * col[2][0];
+	col[0][0] * col[1][1] * col[2][2] - col[0][0] * col[1][2] * col[2][1] - col[0][1] * col[1][0] * col[2][2] +
+	col[0][1] * col[1][2] * col[2][0] + col[0][2] * col[1][0] * col[2][1] - col[0][2] * col[1][1] * col[2][0];
 
 	if( determinant > 0 ) {
 		head->pixdim[0] = 1;
