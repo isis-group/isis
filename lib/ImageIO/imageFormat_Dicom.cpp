@@ -419,24 +419,9 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 	source.remove( NumberOfImagesInMosaicProp ); // we dont need that anymore
 	source.setPropertyAs( prefix + "ImageType", iType );
 
-	// if we dont have a sliceVec - compute it
-	if( !source.hasProperty( "sliceVec" ) ) {
-		const util::fvector4 crossVec = util::fvector4(
-											rowVec[1] * columnVec[2] - rowVec[2] * columnVec[1],
-											rowVec[2] * columnVec[0] - rowVec[0] * columnVec[2],
-											rowVec[0] * columnVec[1] - rowVec[1] * columnVec[0]
-										);
-		source.setPropertyAs( "sliceVec", crossVec );
-		LOG( Debug, info ) << "Computed sliceVec as " << source.propertyValue( "sliceVec" );
-	}
-
-	const util::fvector4 sliceVec = source.getPropertyAs<util::fvector4>( "sliceVec" ).norm() * ( voxelSize[2] + voxelGap[2] );
-
 	//store and remove acquisitionTime
 	std::list<double> acqTimeList;
-
 	std::list<double>::const_iterator acqTimeIt;
-
 	bool haveAcqTimeList = source.hasProperty( prefix + "CSAImageHeaderInfo/MosaicRefAcqTimes" );
 
 	float acqTime = 0;
@@ -452,7 +437,7 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 		acqTime = source.propertyValue( "acquisitionTime" )->castTo<float>();
 	}
 
-	data::Chunk dest = source.cloneToNew( size[0], size[1], size[2] );
+	data::Chunk dest = source.cloneToNew( size[0], size[1], size[2] ); //create new 3D chunk of the same type
 	static_cast<util::PropertyMap &>( dest ) = static_cast<const util::PropertyMap &>( source ); //copy _only_ the Properties of source
 	// update origin
 	dest.setPropertyAs( "indexOrigin", origin );
@@ -467,7 +452,7 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 
 	// for every slice
 	for ( size_t slice = 0; slice < images; slice++ ) {
-		// copy the lines into the corresponding slice-chunk
+		// copy the lines into the corresponding slice in the chunk
 		for ( size_t line = 0; line < size[1]; line++ ) {
 			const size_t dpos[] = {0, line, slice, 0}; //begin of the target line
 			const size_t column = slice % matrixSize; //column of the mosaic
@@ -477,8 +462,6 @@ data::Chunk ImageFormat_Dicom::readMosaic( data::Chunk source )
 			source.copyRange( sstart, send, dest, dpos );
 		}
 
-		/*      // fix/set acquisitionNumber and acquisitionTime
-		        dest.propertyValueAt( "acquisitionNumber",slice )->castTo<uint32_t>() += slice;*/
 		if( haveAcqTimeList ) {
 			dest.propertyValueAt( "acquisitionTime", slice ) = float( acqTime +  * ( acqTimeIt++ ) );
 		}

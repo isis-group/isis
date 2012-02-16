@@ -101,6 +101,30 @@ find_package(Boost REQUIRED COMPONENTS filesystem regex system date_time)
 include_directories(${Boost_INCLUDE_DIR})
 
 ############################################################
+# Macro to generate manpages for CLI programms
+############################################################
+set(MANPAGES OFF CACHE BOOL "Create manpages for the tools")
+
+if(MANPAGES)
+	find_program(HELP2MAN help2man)
+endif(MANPAGES)
+
+macro( build_manpage name desc)
+	if(MANPAGES)
+		add_custom_command(
+			TARGET ${name}
+			POST_BUILD
+			COMMAND ${HELP2MAN} ./${name} --version-string=${ISIS_CORE_REV_STRING} --no-discard-stderr --no-info -o ${name}.1 -s 1 --name=${desc}
+			COMMENT "(Re)Generating manpage ${name}.1"
+            VERBATIM
+		)
+		install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${name}.1 DESTINATION share/man/man1 COMPONENT "CLI Tools")
+	endif(MANPAGES)
+endmacro( build_manpage )
+
+
+
+############################################################
 # RCS revision number
 ############################################################
 # The revision number is based on GIT commit informations.
