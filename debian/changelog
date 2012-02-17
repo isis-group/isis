@@ -1,8 +1,8 @@
-isis (0.4.6+git12-g042d303-1) UNRELEASED; urgency=low
+isis (0.4.7-1) UNRELEASED; urgency=low
 
   * Initial Debian packaging (Closes: #633677).
 
- -- Michael Hanke <mih@debian.org>  Wed, 01 Feb 2012 08:25:26 +0100
+ -- Michael Hanke <mih@debian.org>  Thu, 16 Feb 2012 09:31:22 +0100
 
 isis (0.4.6+git10-g7b6a946-1) UNRELEASED; urgency=low
 
