@@ -199,6 +199,7 @@ BOOST_AUTO_TEST_CASE( from_string_conversion_test )
 
 	BOOST_CHECK_EQUAL( util::Value<std::string>( "<1|2|3>" ).as<util::fvector4>(), util::fvector4( 1, 2, 3 ) ); //should also work for fvector
 	BOOST_CHECK_EQUAL( util::Value<std::string>( "<1|2|3|4|5>" ).as<util::fvector4>(), util::fvector4( 1, 2, 3, 4 ) ); //elements behind end are ignored
+	BOOST_CHECK_EQUAL( util::Value<std::string>( "1,2,3,4,5>" ).as<util::ivector4>(), util::ivector4( 1, 2, 3, 4 ) ); //elements behind end are ignored
 }
 
 }
